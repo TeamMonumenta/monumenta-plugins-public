@@ -5,19 +5,19 @@ import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 
+import com.playmonumenta.plugins.utils.InventoryUtils;
+
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import com.playmonumenta.plugins.utils.InventoryUtils;
-
-import io.github.jorelali.commandapi.api.CommandAPI;
-import io.github.jorelali.commandapi.api.CommandPermission;
-import io.github.jorelali.commandapi.api.arguments.Argument;
-import io.github.jorelali.commandapi.api.arguments.EntitySelectorArgument;
-import io.github.jorelali.commandapi.api.arguments.EntitySelectorArgument.EntitySelector;
-import io.github.jorelali.commandapi.api.arguments.ItemStackArgument;
+import dev.jorel.commandapi.CommandAPICommand;
+import dev.jorel.commandapi.CommandPermission;
+import dev.jorel.commandapi.arguments.Argument;
+import dev.jorel.commandapi.arguments.EntitySelectorArgument;
+import dev.jorel.commandapi.arguments.EntitySelectorArgument.EntitySelector;
+import dev.jorel.commandapi.arguments.ItemStackArgument;
 
 /*
  * NOTICE!
@@ -34,15 +34,15 @@ public class GiveSoulbound extends GenericCommand {
 		LinkedHashMap<String, Argument> arguments = new LinkedHashMap<>();
 		arguments.put("players", new EntitySelectorArgument(EntitySelector.MANY_PLAYERS));
 		arguments.put("item", new ItemStackArgument());
-		CommandAPI.getInstance().register("givesoulbound",
-		                                  perms,
-		                                  arguments,
-		                                  (sender, args) -> {
-		                                      for (Player player : (Collection<Player>)args[0]) {
-												  give(player, (ItemStack)args[1]);
-		                                      }
-		                                  }
-		);
+		new CommandAPICommand("givesoulbound")
+			.withPermission(perms)
+			.withArguments(arguments)
+			.executes((sender, args) -> {
+				for (Player player : (Collection<Player>)args[0]) {
+					give(player, (ItemStack)args[1]);
+				}
+			})
+			.register();
 	}
 
 	private static void give(Player player, ItemStack stack) {

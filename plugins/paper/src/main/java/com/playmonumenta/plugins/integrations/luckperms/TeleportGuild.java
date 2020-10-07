@@ -7,38 +7,48 @@ import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
-import io.github.jorelali.commandapi.api.CommandAPI;
-import io.github.jorelali.commandapi.api.CommandPermission;
-import io.github.jorelali.commandapi.api.arguments.Argument;
-import io.github.jorelali.commandapi.api.arguments.EntitySelectorArgument;
-import io.github.jorelali.commandapi.api.arguments.EntitySelectorArgument.EntitySelector;
-import io.github.jorelali.commandapi.api.arguments.TextArgument;
-import io.github.jorelali.commandapi.api.exceptions.WrapperCommandSyntaxException;
-
+import dev.jorel.commandapi.CommandAPI;
+import dev.jorel.commandapi.CommandAPICommand;
+import dev.jorel.commandapi.CommandPermission;
+import dev.jorel.commandapi.arguments.Argument;
+import dev.jorel.commandapi.arguments.EntitySelectorArgument;
+import dev.jorel.commandapi.arguments.EntitySelectorArgument.EntitySelector;
+import dev.jorel.commandapi.arguments.TextArgument;
+import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
 import me.lucko.luckperms.api.Group;
 import me.lucko.luckperms.api.LuckPermsApi;
 
 public class TeleportGuild {
+	private static final String COMMAND = "teleportguild";
+
 	@SuppressWarnings("unchecked")
 	public static void register(LuckPermsApi lp) {
 		// teleportguild <guildname> <player>
 		CommandPermission perms = CommandPermission.fromString("monumenta.command.teleportguild");
 
 		LinkedHashMap<String, Argument> arguments = new LinkedHashMap<>();
-		arguments.put("player", new EntitySelectorArgument(EntitySelector.MANY_PLAYERS));
 
-		CommandAPI.getInstance().register("teleportguild", perms, arguments, (sender, args) -> {
-			for (Player player : (List<Player>)args[0]) {
-				run(lp, player, null);
-			}
-		});
+		arguments.put("player", new EntitySelectorArgument(EntitySelector.MANY_PLAYERS));
+		new CommandAPICommand(COMMAND)
+			.withPermission(perms)
+			.withArguments(arguments)
+			.executes((sender, args) -> {
+				for (Player player : (List<Player>)args[0]) {
+					run(lp, player, null);
+				}
+			})
+			.register();
 
 		arguments.put("guild name", new TextArgument());
-		CommandAPI.getInstance().register("teleportguild", perms, arguments, (sender, args) -> {
-			for (Player player : (List<Player>)args[0]) {
-				run(lp, player, (String)args[1]);
-			}
-		});
+		new CommandAPICommand(COMMAND)
+			.withPermission(perms)
+			.withArguments(arguments)
+			.executes((sender, args) -> {
+				for (Player player : (List<Player>)args[0]) {
+					run(lp, player, (String)args[1]);
+				}
+			})
+			.register();
 	}
 
 	private static void run(LuckPermsApi lp, Player player, String guildName) throws WrapperCommandSyntaxException {

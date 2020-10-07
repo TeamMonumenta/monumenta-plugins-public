@@ -5,22 +5,22 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.UUID;
 
-import org.bukkit.entity.Player;
-
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.network.SocketManager;
 import com.playmonumenta.plugins.packets.BungeeGetVotesUnclaimedPacket;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 
-import io.github.jorelali.commandapi.api.CommandAPI;
-import io.github.jorelali.commandapi.api.CommandPermission;
-import io.github.jorelali.commandapi.api.FunctionWrapper;
-import io.github.jorelali.commandapi.api.arguments.Argument;
-import io.github.jorelali.commandapi.api.arguments.EntitySelectorArgument;
-import io.github.jorelali.commandapi.api.arguments.EntitySelectorArgument.EntitySelector;
-import io.github.jorelali.commandapi.api.arguments.FunctionArgument;
-import io.github.jorelali.commandapi.api.arguments.StringArgument;
-import io.github.jorelali.commandapi.api.exceptions.WrapperCommandSyntaxException;
+import org.bukkit.entity.Player;
+
+import dev.jorel.commandapi.CommandAPICommand;
+import dev.jorel.commandapi.CommandPermission;
+import dev.jorel.commandapi.arguments.Argument;
+import dev.jorel.commandapi.arguments.EntitySelectorArgument;
+import dev.jorel.commandapi.arguments.EntitySelectorArgument.EntitySelector;
+import dev.jorel.commandapi.arguments.FunctionArgument;
+import dev.jorel.commandapi.arguments.StringArgument;
+import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
+import dev.jorel.commandapi.wrappers.FunctionWrapper;
 
 /*
  * This is obnoxiously complicated.
@@ -62,13 +62,13 @@ public class RedeemVoteRewards extends GenericCommand {
 		arguments.put("scoreboard", new StringArgument());
 		arguments.put("function", new FunctionArgument());
 
-		CommandAPI.getInstance().register("redeemvoterewards",
-		                                  CommandPermission.fromString("monumenta.command.redeemvoterewards"),
-		                                  arguments,
-		                                  (sender, args) -> {
-											  run(plugin, (Player)args[0], (String)args[1], (FunctionWrapper[])args[2]);
-		                                  }
-		);
+		new CommandAPICommand("redeemvoterewards")
+			.withPermission(CommandPermission.fromString("monumenta.command.redeemvoterewards"))
+			.withArguments(arguments)
+			.executes((sender, args) -> {
+				run(plugin, (Player)args[0], (String)args[1], (FunctionWrapper[])args[2]);
+			})
+			.register();
 	}
 
 	private static void run(Plugin plugin, Player player, String scoreboardName, FunctionWrapper[] functions) throws WrapperCommandSyntaxException {

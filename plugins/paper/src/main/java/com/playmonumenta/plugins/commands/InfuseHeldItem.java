@@ -3,23 +3,24 @@ package com.playmonumenta.plugins.commands;
 import java.util.LinkedHashMap;
 import java.util.List;
 
+import com.playmonumenta.plugins.utils.InfusionUtils;
+import com.playmonumenta.plugins.utils.InfusionUtils.InfusionSelection;
+
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.Player;
 
-import com.playmonumenta.plugins.utils.InfusionUtils;
-import com.playmonumenta.plugins.utils.InfusionUtils.InfusionSelection;
-
-import io.github.jorelali.commandapi.api.CommandAPI;
-import io.github.jorelali.commandapi.api.CommandPermission;
-import io.github.jorelali.commandapi.api.arguments.Argument;
-import io.github.jorelali.commandapi.api.arguments.EntitySelectorArgument;
-import io.github.jorelali.commandapi.api.arguments.EntitySelectorArgument.EntitySelector;
-import io.github.jorelali.commandapi.api.arguments.IntegerArgument;
-import io.github.jorelali.commandapi.api.arguments.LiteralArgument;
-import io.github.jorelali.commandapi.api.exceptions.WrapperCommandSyntaxException;
+import dev.jorel.commandapi.CommandAPI;
+import dev.jorel.commandapi.CommandAPICommand;
+import dev.jorel.commandapi.CommandPermission;
+import dev.jorel.commandapi.arguments.Argument;
+import dev.jorel.commandapi.arguments.EntitySelectorArgument;
+import dev.jorel.commandapi.arguments.EntitySelectorArgument.EntitySelector;
+import dev.jorel.commandapi.arguments.IntegerArgument;
+import dev.jorel.commandapi.arguments.LiteralArgument;
+import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
 
 /*
  * NOTICE!
@@ -30,30 +31,37 @@ import io.github.jorelali.commandapi.api.exceptions.WrapperCommandSyntaxExceptio
  */
 public class InfuseHeldItem extends GenericCommand {
 	static final String COMMAND = "infusehelditem";
-	static final String PERMISSION = "monumenta.command.infusehelditem";
 
 	@SuppressWarnings("unchecked")
 	private static void registerType(InfusionSelection selection) {
+		CommandPermission perms = CommandPermission.fromString("monumenta.command.infusehelditem");
+
 		LinkedHashMap<String, Argument> arguments = new LinkedHashMap<>();
 		arguments.put(selection.getLabel(), new LiteralArgument(selection.getLabel()));
 		arguments.put("level", new IntegerArgument(1));
-		CommandAPI.getInstance().register(COMMAND, CommandPermission.fromString(PERMISSION), arguments,
-			(sender, args) -> {
+		new CommandAPICommand(COMMAND)
+			.withPermission(perms)
+			.withArguments(arguments)
+			.executes((sender, args) -> {
 				if (sender instanceof Player) {
 					InfusionUtils.freeInfusion(sender, (Player)sender, selection, (Integer)args[0]);
 				} else {
 					CommandAPI.fail("This command can only be run by players");
 				}
-			});
+			})
+			.register();
 
 		arguments.clear();
 		arguments.put(selection.getLabel(), new LiteralArgument(selection.getLabel()));
 		arguments.put("player", new EntitySelectorArgument(EntitySelector.ONE_PLAYER));
 		arguments.put("frames", new EntitySelectorArgument(EntitySelector.MANY_ENTITIES));
-		CommandAPI.getInstance().register(COMMAND, CommandPermission.fromString(PERMISSION), arguments,
-			(sender, args) -> {
+		new CommandAPICommand(COMMAND)
+			.withPermission(perms)
+			.withArguments(arguments)
+			.executes((sender, args) -> {
 				run(sender, (Player)args[0], (List<Entity>)args[1], selection);
-			});
+			})
+			.register();
 	}
 
 	public static void register() {

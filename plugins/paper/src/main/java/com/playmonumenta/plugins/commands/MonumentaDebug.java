@@ -5,53 +5,55 @@ import java.util.logging.Level;
 
 import com.playmonumenta.plugins.Plugin;
 
-import io.github.jorelali.commandapi.api.CommandAPI;
-import io.github.jorelali.commandapi.api.CommandPermission;
-import io.github.jorelali.commandapi.api.arguments.Argument;
-import io.github.jorelali.commandapi.api.arguments.LiteralArgument;
+import dev.jorel.commandapi.CommandAPICommand;
+import dev.jorel.commandapi.CommandPermission;
+import dev.jorel.commandapi.arguments.Argument;
+import dev.jorel.commandapi.arguments.LiteralArgument;
 
 public class MonumentaDebug {
+	static final String COMMAND = "monumentadebug";
+
 	public static void register(Plugin plugin) {
+		CommandPermission perms = CommandPermission.fromString("monumenta.command.monumentadebug");
+
 		LinkedHashMap<String, Argument> arguments = new LinkedHashMap<>();
 		arguments.put("level", new LiteralArgument("INFO"));
-		CommandAPI.getInstance().register("monumentadebug",
-		                                  CommandPermission.fromString("monumenta.command.monumentadebug"),
-		                                  arguments,
-		                                  (sender, args) -> {
-											  plugin.getLogger().setLevel(Level.INFO);
-		                                  }
-		);
+		new CommandAPICommand(COMMAND)
+			.withPermission(perms)
+			.withArguments(arguments)
+			.executes((sender, args) -> {
+				plugin.getLogger().setLevel(Level.INFO);
+			})
+			.register();
 
 		arguments.clear();
 		arguments.put("level", new LiteralArgument("FINE"));
-		CommandAPI.getInstance().register("monumentadebug",
-		                                  CommandPermission.fromString("monumenta.command.monumentadebug"),
-		                                  arguments,
-		                                  (sender, args) -> {
-											  plugin.getLogger().setLevel(Level.FINE);
-		                                  }
-		);
+		new CommandAPICommand(COMMAND)
+			.withPermission(perms)
+			.withArguments(arguments)
+			.executes((sender, args) -> {
+				plugin.getLogger().setLevel(Level.FINE);
+			})
+			.register();
 
 		arguments.clear();
 		arguments.put("level", new LiteralArgument("FINER"));
-		CommandAPI.getInstance().register("monumentadebug",
-		                                  CommandPermission.fromString("monumenta.command.monumentadebug"),
-		                                  arguments,
-		                                  (sender, args) -> {
-											  plugin.getLogger().setLevel(Level.FINER);
-		                                  }
-		);
+		new CommandAPICommand(COMMAND)
+			.withPermission(perms)
+			.withArguments(arguments)
+			.executes((sender, args) -> {
+				plugin.getLogger().setLevel(Level.FINER);
+			})
+			.register();
 
 		arguments.clear();
 		arguments.put("level", new LiteralArgument("FINEST"));
-		CommandAPI.getInstance().register("monumentadebug",
-		                                  CommandPermission.fromString("monumenta.command.monumentadebug"),
-		                                  arguments,
-		                                  (sender, args) -> {
-											  plugin.getLogger().setLevel(Level.FINEST);
-		                                  }
-		);
+		new CommandAPICommand(COMMAND)
+			.withPermission(perms)
+			.withArguments(arguments)
+			.executes((sender, args) -> {
+				plugin.getLogger().setLevel(Level.FINEST);
+			})
+			.register();
 	}
 }
-
-

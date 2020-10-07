@@ -2,6 +2,9 @@ package com.playmonumenta.plugins.commands;
 
 import java.util.LinkedHashMap;
 
+import com.playmonumenta.plugins.bosses.BossManager;
+import com.playmonumenta.plugins.utils.MessagingUtils;
+
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
@@ -9,49 +12,45 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
-import com.playmonumenta.plugins.bosses.BossManager;
-import com.playmonumenta.plugins.utils.MessagingUtils;
-
-import io.github.jorelali.commandapi.api.CommandAPI;
-import io.github.jorelali.commandapi.api.CommandPermission;
-import io.github.jorelali.commandapi.api.arguments.Argument;
-import io.github.jorelali.commandapi.api.arguments.DynamicSuggestedStringArgument;
-import io.github.jorelali.commandapi.api.arguments.EntitySelectorArgument;
-import io.github.jorelali.commandapi.api.arguments.EntitySelectorArgument.EntitySelector;
-import io.github.jorelali.commandapi.api.arguments.LocationArgument;
+import dev.jorel.commandapi.CommandAPICommand;
+import dev.jorel.commandapi.CommandPermission;
+import dev.jorel.commandapi.arguments.Argument;
+import dev.jorel.commandapi.arguments.EntitySelectorArgument;
+import dev.jorel.commandapi.arguments.EntitySelectorArgument.EntitySelector;
+import dev.jorel.commandapi.arguments.LocationArgument;
+import dev.jorel.commandapi.arguments.StringArgument;
 
 public class BossFight {
+	static final String COMMAND = "bossfight";
+
 	public static void register() {
-		CommandPermission perm = CommandPermission.fromString("monumenta.bossfight");
+		CommandPermission perms = CommandPermission.fromString("monumenta.bossfight");
 		/* First one has just the boss name (stateless) */
 		LinkedHashMap<String, Argument> arguments = new LinkedHashMap<>();
 
 		arguments.put("entity", new EntitySelectorArgument(EntitySelector.ONE_ENTITY));
-		arguments.put("boss_tag", new DynamicSuggestedStringArgument(
-			() -> {
+		arguments.put("boss_tag", new StringArgument().overrideSuggestions(
+			(sender) -> {
 				return BossManager.getInstance().listBosses();
 			}
 		));
-		CommandAPI.getInstance().register("bossfight",
-		                                  perm,
-		                                  arguments,
-		                                  (sender, args) -> {
-		                                      createBossStateless(sender, (Entity)args[0],
-		                                                          (String)args[1]);
-		                                  }
-		);
+		new CommandAPICommand(COMMAND)
+			.withPermission(perms)
+			.withArguments(arguments)
+			.executes((sender, args) -> {
+				createBossStateless(sender, (Entity)args[0], (String)args[1]);
+			})
+			.register();
 
 		/* Second one of these includes coordinate arguments */
 		arguments.put("redstone_pos", new LocationArgument());
-		CommandAPI.getInstance().register("bossfight",
-		                                  perm,
-		                                  arguments,
-		                                  (sender, args) -> {
-		                                      createBossStateful(sender, (Entity)args[0],
-		                                                         (String)args[1],
-		                                                         (Location)args[2]);
-		                                  }
-		);
+		new CommandAPICommand(COMMAND)
+			.withPermission(perms)
+			.withArguments(arguments)
+			.executes((sender, args) -> {
+				createBossStateful(sender, (Entity)args[0], (String)args[1], (Location)args[2]);
+			})
+			.register();
 	}
 
 	private static void createBossStateless(CommandSender sender, Entity entity, String requestedTag) {

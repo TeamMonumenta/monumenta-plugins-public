@@ -13,12 +13,12 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import io.github.jorelali.commandapi.api.CommandAPI;
-import io.github.jorelali.commandapi.api.CommandPermission;
-import io.github.jorelali.commandapi.api.arguments.Argument;
-import io.github.jorelali.commandapi.api.arguments.IntegerArgument;
-import io.github.jorelali.commandapi.api.arguments.LiteralArgument;
-import io.github.jorelali.commandapi.api.arguments.LocationArgument;
+import dev.jorel.commandapi.CommandAPICommand;
+import dev.jorel.commandapi.CommandPermission;
+import dev.jorel.commandapi.arguments.Argument;
+import dev.jorel.commandapi.arguments.IntegerArgument;
+import dev.jorel.commandapi.arguments.LiteralArgument;
+import dev.jorel.commandapi.arguments.LocationArgument;
 
 public class SpellDetectionCircle extends Spell {
 	private Plugin mPlugin;
@@ -36,14 +36,14 @@ public class SpellDetectionCircle extends Spell {
 		arguments.put("duration", new IntegerArgument(1, Integer.MAX_VALUE));
 		arguments.put("redstone_pos", new LocationArgument());
 
-		CommandAPI.getInstance().register("mobspell",
-		                                  CommandPermission.fromString("mobspell.detectioncircle"),
-		                                  arguments,
-		                                  (sender, args) -> {
-		                                      new SpellDetectionCircle(plugin, (Location)args[0], (Integer)args[1],
-		                                                               (Integer)args[2], (Location)args[3]).run();
-		                                  }
-		);
+		new CommandAPICommand("mobspell")
+			.withPermission(CommandPermission.fromString("mobspell.detectioncircle"))
+			.withArguments(arguments)
+			.executes((sender, args) -> {
+				new SpellDetectionCircle(plugin, (Location)args[0], (Integer)args[1],
+										 (Integer)args[2], (Location)args[3]).run();
+			})
+			.register();
 	}
 
 	public SpellDetectionCircle(Plugin plugin, Location center, int radius, int duration, Location target) {

@@ -4,6 +4,8 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Set;
 
+import com.playmonumenta.plugins.server.properties.ServerProperties;
+
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ProxiedCommandSender;
@@ -16,12 +18,11 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
 
-import com.playmonumenta.plugins.server.properties.ServerProperties;
-
-import io.github.jorelali.commandapi.api.CommandAPI;
-import io.github.jorelali.commandapi.api.CommandPermission;
-import io.github.jorelali.commandapi.api.arguments.Argument;
-import io.github.jorelali.commandapi.api.exceptions.WrapperCommandSyntaxException;
+import dev.jorel.commandapi.CommandAPI;
+import dev.jorel.commandapi.CommandAPICommand;
+import dev.jorel.commandapi.CommandPermission;
+import dev.jorel.commandapi.arguments.Argument;
+import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
 
 public class JunkItemListener implements Listener {
 	private static final String NO_JUNK_ITEMS_TAG = "NoJunkItemsPickup";
@@ -29,17 +30,16 @@ public class JunkItemListener implements Listener {
 	private final Set<Player> mPlayers = new HashSet<Player>();
 
 	public JunkItemListener() {
-		final String command = "pickup";
 		final CommandPermission perms = CommandPermission.fromString("monumenta.command.pickup");
 
 		LinkedHashMap<String, Argument> arguments = new LinkedHashMap<>();
-		CommandAPI.getInstance().register(command,
-		                                  perms,
-		                                  arguments,
-		                                  (sender, args) -> {
-											  playerToggle(sender);
-		                                  }
-		);
+		new CommandAPICommand("pickup")
+			.withPermission(perms)
+			.withArguments(arguments)
+			.executes((sender, args) -> {
+				playerToggle(sender);
+			})
+			.register();
 	}
 
 	private void playerToggle(CommandSender sender) throws WrapperCommandSyntaxException {

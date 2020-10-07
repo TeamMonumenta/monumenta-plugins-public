@@ -2,6 +2,10 @@ package com.playmonumenta.plugins.commands;
 
 import java.util.LinkedHashMap;
 
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.utils.ZoneUtils;
+import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
+
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -13,14 +17,11 @@ import org.bukkit.event.player.PlayerGameModeChangeEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.metadata.FixedMetadataValue;
 
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.utils.ZoneUtils;
-import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
-
-import io.github.jorelali.commandapi.api.CommandAPI;
-import io.github.jorelali.commandapi.api.CommandPermission;
-import io.github.jorelali.commandapi.api.arguments.Argument;
-import io.github.jorelali.commandapi.api.exceptions.WrapperCommandSyntaxException;
+import dev.jorel.commandapi.CommandAPI;
+import dev.jorel.commandapi.CommandAPICommand;
+import dev.jorel.commandapi.CommandPermission;
+import dev.jorel.commandapi.arguments.Argument;
+import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
 
 public class Spectate implements Listener {
 	public static final String SPECTATE_METAKEY = "MonumentaSpectateMetakey";
@@ -58,16 +59,17 @@ public class Spectate implements Listener {
 		LinkedHashMap<String, Argument> arguments = new LinkedHashMap<>();
 
 		/* No-argument variant which just is the sender (if they are a player) */
-		CommandAPI.getInstance().register("spectate",
-		                                  CommandPermission.fromString("monumenta.command.spectate"),
-		                                  arguments,
-		                                  (sender, args) -> {
-											  if (sender instanceof Player) {
-												  run(plugin, (Player)sender);
-											  } else {
-												  CommandAPI.fail(ChatColor.RED + "This command must be run by a player!");
-											  }
-		                                  });
+		new CommandAPICommand("spectate")
+			.withPermission(CommandPermission.fromString("monumenta.command.spectate"))
+			.withArguments(arguments)
+			.executes((sender, args) -> {
+				if (sender instanceof Player) {
+					run(plugin, (Player)sender);
+				} else {
+					CommandAPI.fail(ChatColor.RED + "This command must be run by a player!");
+				}
+			})
+			.register();
 	}
 
 	public static boolean run(Plugin plugin, Player player) throws WrapperCommandSyntaxException {

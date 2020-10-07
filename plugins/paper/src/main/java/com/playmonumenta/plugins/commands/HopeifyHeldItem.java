@@ -1,11 +1,11 @@
 package com.playmonumenta.plugins.commands;
 
+import com.playmonumenta.plugins.utils.CommandUtils;
+
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import com.playmonumenta.plugins.utils.CommandUtils;
-
-import io.github.jorelali.commandapi.api.exceptions.WrapperCommandSyntaxException;
+import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
 
 /*
  * NOTICE!
@@ -16,10 +16,7 @@ import io.github.jorelali.commandapi.api.exceptions.WrapperCommandSyntaxExceptio
  */
 public class HopeifyHeldItem extends GenericCommand {
 	public static void register() {
-		registerPlayerCommand("hopeifyhelditem", "monumenta.command.hopeifyhelditem",
-		                      (sender, player) -> {
-		                          run(sender, player);
-		                      });
+		registerPlayerCommand("hopeifyhelditem", "monumenta.command.hopeifyhelditem", HopeifyHeldItem::run);
 	}
 
 	private static void run(CommandSender sender, Player player) throws WrapperCommandSyntaxException {

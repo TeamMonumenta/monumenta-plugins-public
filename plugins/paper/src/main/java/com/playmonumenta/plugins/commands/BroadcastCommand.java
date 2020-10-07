@@ -1,24 +1,25 @@
 package com.playmonumenta.plugins.commands;
 
 import java.util.Arrays;
-import java.util.List;
 import java.util.LinkedHashMap;
+import java.util.List;
+
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.network.SocketManager;
 
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ProxiedCommandSender;
 import org.bukkit.entity.Player;
 
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.network.SocketManager;
-
-import io.github.jorelali.commandapi.api.CommandAPI;
-import io.github.jorelali.commandapi.api.CommandPermission;
-import io.github.jorelali.commandapi.api.arguments.Argument;
-import io.github.jorelali.commandapi.api.arguments.GreedyStringArgument;
-import io.github.jorelali.commandapi.api.arguments.StringArgument;
+import dev.jorel.commandapi.CommandAPICommand;
+import dev.jorel.commandapi.CommandPermission;
+import dev.jorel.commandapi.arguments.Argument;
+import dev.jorel.commandapi.arguments.GreedyStringArgument;
+import dev.jorel.commandapi.arguments.StringArgument;
 
 public class BroadcastCommand {
+	static final String COMMAND = "broadcastcommand";
 	private static final String[] ALLOWED_COMMANDS = {
 	            "whitelist",
 	            "ban",
@@ -49,25 +50,26 @@ public class BroadcastCommand {
 	private static final List<String> ALLOWED_COMMANDS_LIST = Arrays.asList(ALLOWED_COMMANDS);
 
 	public static void register(Plugin plugin) {
-		CommandPermission perm = CommandPermission.fromString("monumenta.command.broadcastcommand");
+		CommandPermission perms = CommandPermission.fromString("monumenta.command.broadcastcommand");
 		LinkedHashMap<String, Argument> arguments = new LinkedHashMap<>();
+
 		arguments.put("command", new StringArgument().overrideSuggestions(ALLOWED_COMMANDS));
-		CommandAPI.getInstance().register("broadcastcommand",
-		                                  perm,
-		                                  arguments,
-		                                  (sender, args) -> {
-											  run(plugin, sender, (String)args[0], null);
-		                                  }
-		);
+		new CommandAPICommand(COMMAND)
+			.withPermission(perms)
+			.withArguments(arguments)
+			.executes((sender, args) -> {
+				run(plugin, sender, (String)args[0], null);
+			})
+			.register();
 
 		arguments.put("args", new GreedyStringArgument());
-		CommandAPI.getInstance().register("broadcastcommand",
-		                                  perm,
-		                                  arguments,
-		                                  (sender, args) -> {
-											  run(plugin, sender, (String)args[0], (String)args[1]);
-		                                  }
-		);
+		new CommandAPICommand(COMMAND)
+			.withPermission(perms)
+			.withArguments(arguments)
+			.executes((sender, args) -> {
+				run(plugin, sender, (String)args[0], (String)args[1]);
+			})
+			.register();
 	}
 
 	private static void run(Plugin plugin, CommandSender sender, String command, String args) {

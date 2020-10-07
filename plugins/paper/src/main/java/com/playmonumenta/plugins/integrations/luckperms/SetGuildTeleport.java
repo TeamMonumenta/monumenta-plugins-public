@@ -2,19 +2,19 @@ package com.playmonumenta.plugins.integrations.luckperms;
 
 import java.util.LinkedHashMap;
 
+import com.playmonumenta.plugins.Plugin;
+
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import com.playmonumenta.plugins.Plugin;
-
-import io.github.jorelali.commandapi.api.CommandAPI;
-import io.github.jorelali.commandapi.api.CommandPermission;
-import io.github.jorelali.commandapi.api.arguments.Argument;
-import io.github.jorelali.commandapi.api.arguments.TextArgument;
-import io.github.jorelali.commandapi.api.exceptions.WrapperCommandSyntaxException;
-
+import dev.jorel.commandapi.CommandAPI;
+import dev.jorel.commandapi.CommandAPICommand;
+import dev.jorel.commandapi.CommandPermission;
+import dev.jorel.commandapi.arguments.Argument;
+import dev.jorel.commandapi.arguments.TextArgument;
+import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
 import me.lucko.luckperms.api.Group;
 import me.lucko.luckperms.api.LuckPermsApi;
 
@@ -26,9 +26,13 @@ public class SetGuildTeleport {
 		LinkedHashMap<String, Argument> arguments = new LinkedHashMap<>();
 		arguments.put("guild name", new TextArgument());
 
-		CommandAPI.getInstance().register("setguildteleport", perms, arguments, (sender, args) -> {
-			run(plugin, lp, sender, (String)args[0]);
-		});
+		new CommandAPICommand("setguildteleport")
+			.withPermission(perms)
+			.withArguments(arguments)
+			.executes((sender, args) -> {
+				run(plugin, lp, sender, (String)args[0]);
+			})
+			.register();
 	}
 
 	private static void run(Plugin plugin, LuckPermsApi lp, CommandSender sender,

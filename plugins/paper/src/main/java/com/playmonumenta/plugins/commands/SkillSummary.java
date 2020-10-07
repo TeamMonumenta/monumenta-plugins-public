@@ -2,45 +2,43 @@ package com.playmonumenta.plugins.commands;
 
 import java.util.LinkedHashMap;
 
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.Ability;
+
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ProxiedCommandSender;
 import org.bukkit.entity.Player;
 
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.Ability;
-
-import io.github.jorelali.commandapi.api.CommandAPI;
-import io.github.jorelali.commandapi.api.CommandPermission;
-import io.github.jorelali.commandapi.api.arguments.Argument;
-import io.github.jorelali.commandapi.api.arguments.BooleanArgument;
-
+import dev.jorel.commandapi.CommandAPICommand;
+import dev.jorel.commandapi.CommandPermission;
+import dev.jorel.commandapi.arguments.Argument;
+import dev.jorel.commandapi.arguments.BooleanArgument;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 
 public class SkillSummary extends GenericCommand {
-	@SuppressWarnings("unchecked")
+	private static final String COMMAND = "skillsummary";
+
 	public static void register(Plugin plugin) {
-		String command = "skillsummary";
 		CommandPermission perms = CommandPermission.fromString("monumenta.command.skillsummary");
 
 		LinkedHashMap<String, Argument> arguments = new LinkedHashMap<>();
-		CommandAPI.getInstance().register(command,
-		                                  perms,
-		                                  arguments,
-		                                  (sender, args) -> {
-		                                      tell(plugin, sender, false);
-		                                  }
-		);
+		new CommandAPICommand(COMMAND)
+			.withPermission(perms)
+			.withArguments(arguments)
+			.executes((sender, args) -> {
+				tell(plugin, sender, false);
+			})
+			.register();
 
-		arguments = new LinkedHashMap<>();
 		arguments.put("shorthand", new BooleanArgument());
-		CommandAPI.getInstance().register(command,
-		                                  perms,
-		                                  arguments,
-		                                  (sender, args) -> {
-		                                      tell(plugin, sender, (boolean) args[0]);
-		                                  }
-		);
+		new CommandAPICommand(COMMAND)
+			.withPermission(perms)
+			.withArguments(arguments)
+			.executes((sender, args) -> {
+				tell(plugin, sender, (Boolean) args[0]);
+			})
+			.register();
 	}
 
 	private static void tell(Plugin plugin, CommandSender sender, boolean useShorthand) {

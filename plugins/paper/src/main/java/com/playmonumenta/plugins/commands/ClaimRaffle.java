@@ -3,19 +3,20 @@ package com.playmonumenta.plugins.commands;
 import java.util.LinkedHashMap;
 import java.util.UUID;
 
-import org.bukkit.ChatColor;
-import org.bukkit.entity.Player;
-import org.bukkit.metadata.FixedMetadataValue;
-
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.network.SocketManager;
 import com.playmonumenta.plugins.packets.BungeeCheckRaffleEligibilityPacket;
 import com.playmonumenta.plugins.utils.CommandUtils;
 
-import io.github.jorelali.commandapi.api.CommandAPI;
-import io.github.jorelali.commandapi.api.CommandPermission;
-import io.github.jorelali.commandapi.api.arguments.Argument;
-import io.github.jorelali.commandapi.api.exceptions.WrapperCommandSyntaxException;
+import org.bukkit.ChatColor;
+import org.bukkit.entity.Player;
+import org.bukkit.metadata.FixedMetadataValue;
+
+import dev.jorel.commandapi.CommandAPI;
+import dev.jorel.commandapi.CommandAPICommand;
+import dev.jorel.commandapi.CommandPermission;
+import dev.jorel.commandapi.arguments.Argument;
+import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
 
 public class ClaimRaffle {
 	private static final String CONFIRMED_METAKEY = "MonumentaRaffleClaimMetadata";
@@ -24,16 +25,17 @@ public class ClaimRaffle {
 		LinkedHashMap<String, Argument> arguments = new LinkedHashMap<>();
 
 		/* No-argument variant which just is the sender (if they are a player) */
-		CommandAPI.getInstance().register("claimRaffle",
-		                                  CommandPermission.fromString("monumenta.command.claimraffle"),
-		                                  arguments,
-		                                  (sender, args) -> {
-											  if (sender instanceof Player) {
-												  run(plugin, (Player)sender);
-											  } else {
-												  CommandAPI.fail(ChatColor.RED + "This command must be run by a player!");
-											  }
-		                                  });
+		new CommandAPICommand("claimRaffle")
+			.withPermission(CommandPermission.fromString("monumenta.command.claimraffle"))
+			.withArguments(arguments)
+			.executes((sender, args) -> {
+				if (sender instanceof Player) {
+					run(plugin, (Player)sender);
+				} else {
+					CommandAPI.fail(ChatColor.RED + "This command must be run by a player!");
+				}
+			})
+			.register();
 	}
 
 	private static void run(Plugin plugin, Player player) throws WrapperCommandSyntaxException {
