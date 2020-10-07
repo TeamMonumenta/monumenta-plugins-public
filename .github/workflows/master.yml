@@ -14,18 +14,31 @@ jobs:
       uses: actions/setup-java@v1
       with:
         java-version: 1.8
-    - name: git config user.name
-      run: git config --global user.name "Monumenta CI"
-    - name: git config user.email
-      run: git config --global user.email "Monumenta.CI@NotARealEmail.com"
-    - name: Get Paper
+
+    - name: git config
       run: |
+          git config --global user.name "Monumenta CI"
+          git config --global user.email "Monumenta.CI@NotARealEmail.com"
+
+    - name: Cache maven dependencies
+      uses: actions/cache@v2
+      env:
+        cache-name: cache-maven-dependencies
+      with:
+        # maven files are stored in `~/.m2/repository`
+        path: ~/.m2/repository
+        # Create the key based on runner os, cache name, and a hash of all the pom.xml files
+        key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/pom.xml') }}
+
+    - name: Build Paper
+      run: |
+        if [[ ! -d ~/.m2/repository/com/destroystokyo/paper ]]; then
           git clone https://github.com/TeamMonumenta/Paper.git
           cd Paper
           git checkout 1.15
-    - name: Build Paper
-      working-directory: ./Paper
-      run: ./paper jar
+          ./paper jar
+        fi
+
     - name: Build with Maven
       working-directory: ./plugins
-      run: ./compile-all.sh
+      run: ./compile-all.sh --batch-mode --no-snapshot-updates

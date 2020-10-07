@@ -11,7 +11,7 @@ VERSION=$(git describe --tags --always --dirty)
 perl -p -i -e "s|<version>dev</version>|<version>$VERSION</version>|g" "$SCRIPT_DIR/pom.xml"
 perl -p -i -e "s|^version: .*$|version: $VERSION|g" "$SCRIPT_DIR/src/main/resources/plugin.yml"
 
-mvn clean install
+mvn clean install "$@"
 retcode=$?
 
 # Restore the original files with version numbers
