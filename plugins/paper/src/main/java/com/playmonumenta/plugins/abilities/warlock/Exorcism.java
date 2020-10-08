@@ -35,8 +35,8 @@ public class Exorcism  extends Ability {
 		mInfo.mLinkedSpell = Spells.EXORCISM;
 		mInfo.mScoreboardId = "Exorcism";
 		mInfo.mShorthandName = "Ex";
-		mInfo.mDescriptions.add("Right click while looking down without sneaking removes all your debuffs and applies them to enemies within 12 blocks of you. Level of debuffs is preserved. (Cooldown: 25s)");
-		mInfo.mDescriptions.add("Also apply the corresponding debuff to enemies for every buff you have. Cooldown is reduced to 15s.");
+		mInfo.mDescriptions.add("Right click while looking down without sneaking removes all your debuffs and applies them to enemies within 12 blocks of you. Level of debuffs is preserved. Cooldown: 25s.");
+		mInfo.mDescriptions.add("Also apply the corresponding debuff to enemies for every buff you have. Cooldown: 15s.");
 		mInfo.mCooldown = getAbilityScore() == 1 ? COOLDOWN_1 : COOLDOWN_2;
 		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
 	}

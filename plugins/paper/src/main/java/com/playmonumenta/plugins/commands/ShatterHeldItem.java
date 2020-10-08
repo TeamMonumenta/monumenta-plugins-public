@@ -1,14 +1,14 @@
 package com.playmonumenta.plugins.commands;
 
+import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.utils.ItemUtils;
+
 import org.bukkit.Sound;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-import com.playmonumenta.plugins.utils.InventoryUtils;
-import com.playmonumenta.plugins.utils.ItemUtils;
-
-import io.github.jorelali.commandapi.api.exceptions.WrapperCommandSyntaxException;
+import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
 import net.md_5.bungee.api.ChatColor;
 
 

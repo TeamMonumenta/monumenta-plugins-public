@@ -7,10 +7,7 @@ import org.bukkit.entity.Player;
 
 public class RemoveTags extends GenericCommand {
 	public static void register() {
-		registerEntityCommand("removetags", "monumenta.command.removetags",
-		                      (sender, entity) -> {
-		                          run(sender, entity);
-		                      });
+		registerEntityCommand("removetags", "monumenta.command.removetags", RemoveTags::run);
 	}
 
 	private static void run(CommandSender sender, Entity entity) {

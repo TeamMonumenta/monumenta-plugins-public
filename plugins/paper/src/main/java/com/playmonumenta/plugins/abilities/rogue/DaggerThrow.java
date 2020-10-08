@@ -2,12 +2,6 @@ package com.playmonumenta.plugins.abilities.rogue;
 
 import java.util.List;
 
-import com.playmonumenta.plugins.utils.FastUtils;
-import com.playmonumenta.plugins.utils.InventoryUtils;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.PotionUtils;
-import com.playmonumenta.plugins.utils.MetadataUtils;
-
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -29,6 +23,11 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.classes.magic.MagicType;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.utils.MetadataUtils;
+import com.playmonumenta.plugins.utils.PotionUtils;
 
 public class DaggerThrow extends Ability {
 
@@ -51,7 +50,7 @@ public class DaggerThrow extends Ability {
 		mInfo.mLinkedSpell = Spells.DAGGER_THROW;
 		mInfo.mScoreboardId = "DaggerThrow";
 		mInfo.mShorthandName = "DT";
-		mInfo.mDescriptions.add("Sneak left click while holding two swords to throw three daggers which deal 6 damage and gives each target 20% Vulnerability for 10 seconds. Cooldown 15s");
+		mInfo.mDescriptions.add("Sneak left click while holding two swords to throw three daggers which deal 6 damage and gives each target 20% Vulnerability for 10 seconds. Cooldown: 15s.");
 		mInfo.mDescriptions.add("The damage is increased to 12 and the Vulnerability increased to 40%.");
 		mInfo.mCooldown = DAGGER_THROW_COOLDOWN;
 		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;

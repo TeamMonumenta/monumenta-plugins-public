@@ -4,24 +4,24 @@ import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.concurrent.Executor;
 
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.network.SocketManager;
+import com.playmonumenta.plugins.utils.ScoreboardUtils;
+
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Sound;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.network.SocketManager;
-import com.playmonumenta.plugins.utils.ScoreboardUtils;
-
-import io.github.jorelali.commandapi.api.CommandAPI;
-import io.github.jorelali.commandapi.api.CommandPermission;
-import io.github.jorelali.commandapi.api.arguments.Argument;
-import io.github.jorelali.commandapi.api.arguments.EntitySelectorArgument;
-import io.github.jorelali.commandapi.api.arguments.EntitySelectorArgument.EntitySelector;
-import io.github.jorelali.commandapi.api.arguments.TextArgument;
-import io.github.jorelali.commandapi.api.exceptions.WrapperCommandSyntaxException;
-
+import dev.jorel.commandapi.CommandAPI;
+import dev.jorel.commandapi.CommandAPICommand;
+import dev.jorel.commandapi.CommandPermission;
+import dev.jorel.commandapi.arguments.Argument;
+import dev.jorel.commandapi.arguments.EntitySelectorArgument;
+import dev.jorel.commandapi.arguments.EntitySelectorArgument.EntitySelector;
+import dev.jorel.commandapi.arguments.TextArgument;
+import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
 import me.lucko.luckperms.api.LuckPermsApi;
 import me.lucko.luckperms.api.MessagingService;
 import me.lucko.luckperms.api.User;
@@ -39,9 +39,13 @@ public class CreateGuild {
 		arguments.put("founders", new EntitySelectorArgument(EntitySelector.MANY_PLAYERS)
 		              .overrideSuggestions("@a[x=-770,y=106,z=-128,dx=7,dy=4,dz=13]"));
 
-		CommandAPI.getInstance().register("createguild", perms, arguments, (sender, args) -> {
-			run(plugin, lp, sender, (String) args[0], (String) args[1], (Collection<Player>) args[2]);
-		});
+		new CommandAPICommand("createguild")
+			.withPermission(perms)
+			.withArguments(arguments)
+			.executes((sender, args) -> {
+				run(plugin, lp, sender, (String) args[0], (String) args[1], (Collection<Player>) args[2]);
+			})
+			.register();
 	}
 
 	private static void run(Plugin plugin, LuckPermsApi lp, CommandSender sender,

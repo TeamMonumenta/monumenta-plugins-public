@@ -47,7 +47,7 @@ public class DarkPact extends Ability {
 		super(plugin, world, player, "Dark Pact");
 		mInfo.mScoreboardId = "DarkPact";
 		mInfo.mShorthandName = "DaP";
-		mInfo.mDescriptions.add("Left clicking twice with a scythe causes you to deal +40% melee damage for 10 seconds. Each kill during this time increases the duration by 1 second and gives 1 absorption health (capped at 6) for the duration of the melee bonus. However, the player cannot heal for 10 seconds, and Soul Rend cannot be triggered during the anti-heal period. Cooldown: 25 seconds.");
+		mInfo.mDescriptions.add("Left clicking twice with a scythe causes you to deal +40% melee damage for 10 seconds. Each kill during this time increases the duration by 1 second and gives 1 absorption health (capped at 6) for the duration of the melee bonus. However, the player cannot heal for 10 seconds, and Soul Rend cannot be triggered during the anti-heal period. Cooldown: 25s.");
 		mInfo.mDescriptions.add("You deal +80% melee damage instead.");
 		mInfo.mCooldown = COOLDOWN;
 		mInfo.mLinkedSpell = Spells.DARK_PACT;

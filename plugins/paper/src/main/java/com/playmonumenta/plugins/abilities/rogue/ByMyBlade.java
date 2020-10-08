@@ -65,7 +65,7 @@ public class ByMyBlade extends Ability {
 		mInfo.mLinkedSpell = Spells.BY_MY_BLADE;
 		mInfo.mScoreboardId = "ByMyBlade";
 		mInfo.mShorthandName = "BmB";
-		mInfo.mDescriptions.add("While holding two swords, your next critical strike grants Haste II for 4 seconds and deals 12 additional damage. (Cooldown 10s)");
+		mInfo.mDescriptions.add("While holding two swords, your next critical strike grants Haste II for 4 seconds and deals 12 additional damage. Cooldown 10s.");
 		mInfo.mDescriptions.add("This buff is increased to Haste IV and critical strikes deal 24 additional damage instead.");
 		mInfo.mCooldown = BY_MY_BLADE_COOLDOWN;
 		mDamageBonus = getAbilityScore() == 1 ? BY_MY_BLADE_1_DAMAGE : BY_MY_BLADE_2_DAMAGE;

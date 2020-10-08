@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import com.playmonumenta.plugins.enchantments.AttributeProjectileDamage;
 import com.playmonumenta.plugins.enchantments.AttributeProjectileSpeed;
+import com.playmonumenta.plugins.enchantments.AttributeThornsDamage;
 import com.playmonumenta.plugins.enchantments.AttributeThrowRate;
 import com.playmonumenta.plugins.enchantments.BaseAttribute;
 
@@ -16,6 +17,7 @@ public enum Attribute {
 	RANGED_DAMAGE(new AttributeProjectileDamage()),
 	PROJECTILE_SPEED(new AttributeProjectileSpeed()),
 	THROW_RATE(new AttributeThrowRate()),
+	THORNS_DAMAGE(new AttributeThornsDamage()),
 
 	//bukkit attributes
 	MAX_HEALTH(org.bukkit.attribute.Attribute.GENERIC_MAX_HEALTH, " Max Health"),

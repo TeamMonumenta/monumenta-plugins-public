@@ -48,7 +48,7 @@ public class WindWalk extends MultipleChargeAbility {
 		mInfo.mLinkedSpell = Spells.WIND_WALK;
 		mInfo.mScoreboardId = "WindWalk";
 		mInfo.mShorthandName = "WW";
-		mInfo.mDescriptions.add("Left-click twice without hitting a mob while sprinting to dash in the target direction, stunning and levitating enemies for 2 seconds. Elites are not levitated. Cooldown: 25 seconds. Charges: 2.");
+		mInfo.mDescriptions.add("Left-click twice without hitting a mob while sprinting to dash in the target direction, stunning and levitating enemies for 2 seconds. Elites are not levitated. Cooldown: 25s. Charges: 2.");
 		mInfo.mDescriptions.add("Now afflicts 30% Vulnerability; enemies are stunned and levitated for 4 seconds.");
 		mInfo.mCooldown = WIND_WALK_COOLDOWN;
 		mInfo.mIgnoreCooldown = true;

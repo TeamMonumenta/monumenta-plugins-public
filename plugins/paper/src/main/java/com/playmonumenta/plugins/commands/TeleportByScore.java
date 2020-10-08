@@ -14,48 +14,50 @@ import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
-import io.github.jorelali.commandapi.api.CommandAPI;
-import io.github.jorelali.commandapi.api.CommandPermission;
-import io.github.jorelali.commandapi.api.arguments.Argument;
-import io.github.jorelali.commandapi.api.arguments.EntitySelectorArgument;
-import io.github.jorelali.commandapi.api.arguments.EntitySelectorArgument.EntitySelector;
-import io.github.jorelali.commandapi.api.arguments.FloatArgument;
-import io.github.jorelali.commandapi.api.arguments.StringArgument;
+import dev.jorel.commandapi.CommandAPICommand;
+import dev.jorel.commandapi.CommandPermission;
+import dev.jorel.commandapi.arguments.Argument;
+import dev.jorel.commandapi.arguments.EntitySelectorArgument;
+import dev.jorel.commandapi.arguments.EntitySelectorArgument.EntitySelector;
+import dev.jorel.commandapi.arguments.FloatArgument;
+import dev.jorel.commandapi.arguments.ObjectiveArgument;
 
 public class TeleportByScore extends GenericCommand {
+	private static final String COMMAND = "teleportbyscore";
 	public static void register() {
-		String command = "teleportbyscore";
 		CommandPermission perms = CommandPermission.fromString("monumenta.command.teleportbyscore");
 
 		LinkedHashMap<String, Argument> arguments = new LinkedHashMap<>();
 		arguments.put("entity", new EntitySelectorArgument(EntitySelector.ONE_ENTITY));
-		arguments.put("x objective", new StringArgument());
-		arguments.put("y objective", new StringArgument());
-		arguments.put("z objective", new StringArgument());
-		CommandAPI.getInstance().register(command,
-		                                  perms,
-		                                  arguments,
-		                                  (sender, args) -> {
-											  teleport(sender, (Entity)args[0], (String)args[1], (String)args[2], (String)args[3], null, null, 1.0f);
-		                                  }
-		);
-		arguments.put("yaw objective", new StringArgument());
-		arguments.put("pitch objective", new StringArgument());
-		CommandAPI.getInstance().register(command,
-		                                  perms,
-		                                  arguments,
-		                                  (sender, args) -> {
-											  teleport(sender, (Entity)args[0], (String)args[1], (String)args[2], (String)args[3], (String)args[4], (String)args[5], 1.0f);
-		                                  }
-		);
+		arguments.put("x objective", new ObjectiveArgument());
+		arguments.put("y objective", new ObjectiveArgument());
+		arguments.put("z objective", new ObjectiveArgument());
+		new CommandAPICommand(COMMAND)
+			.withPermission(perms)
+			.withArguments(arguments)
+			.executes((sender, args) -> {
+				teleport(sender, (Entity)args[0], (String)args[1], (String)args[2], (String)args[3], null, null, 1.0f);
+			})
+			.register();
+
+		arguments.put("yaw objective", new ObjectiveArgument());
+		arguments.put("pitch objective", new ObjectiveArgument());
+		new CommandAPICommand(COMMAND)
+			.withPermission(perms)
+			.withArguments(arguments)
+			.executes((sender, args) -> {
+				teleport(sender, (Entity)args[0], (String)args[1], (String)args[2], (String)args[3], (String)args[4], (String)args[5], 1.0f);
+			})
+			.register();
+
 		arguments.put("scale", new FloatArgument(1));
-		CommandAPI.getInstance().register(command,
-		                                  perms,
-		                                  arguments,
-		                                  (sender, args) -> {
-											  teleport(sender, (Entity)args[0], (String)args[1], (String)args[2], (String)args[3], (String)args[4], (String)args[5], (Float)args[6]);
-		                                  }
-		);
+		new CommandAPICommand(COMMAND)
+			.withPermission(perms)
+			.withArguments(arguments)
+			.executes((sender, args) -> {
+				teleport(sender, (Entity)args[0], (String)args[1], (String)args[2], (String)args[3], (String)args[4], (String)args[5], (Float)args[6]);
+			})
+			.register();
 	}
 
 	@Nullable

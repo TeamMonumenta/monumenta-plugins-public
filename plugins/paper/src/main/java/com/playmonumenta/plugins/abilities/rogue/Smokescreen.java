@@ -37,7 +37,7 @@ public class Smokescreen extends Ability {
 		mInfo.mLinkedSpell = Spells.SMOKESCREEN;
 		mInfo.mScoreboardId = "SmokeScreen";
 		mInfo.mShorthandName = "Smk";
-		mInfo.mDescriptions.add("When holding two swords, right-click while sneaking and looking down to release a cloud of smoke, afflicting all enemies in a 6 block radius with 8 s of Weakness I and Slowness II. (Cooldown: 20 s)");
+		mInfo.mDescriptions.add("When holding two swords, right-click while sneaking and looking down to release a cloud of smoke, afflicting all enemies in a 6 block radius with 8 s of Weakness I and Slowness II. Cooldown: 20s.");
 		mInfo.mDescriptions.add("The Weakness debuff is increased to level II.");
 		mInfo.mCooldown = SMOKESCREEN_COOLDOWN;
 		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;

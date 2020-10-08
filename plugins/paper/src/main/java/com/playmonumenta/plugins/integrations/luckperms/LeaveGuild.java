@@ -3,20 +3,20 @@ package com.playmonumenta.plugins.integrations.luckperms;
 import java.util.LinkedHashMap;
 import java.util.Map.Entry;
 
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.utils.ScoreboardUtils;
+
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.utils.ScoreboardUtils;
-
-import io.github.jorelali.commandapi.api.CommandAPI;
-import io.github.jorelali.commandapi.api.CommandPermission;
-import io.github.jorelali.commandapi.api.arguments.Argument;
-import io.github.jorelali.commandapi.api.arguments.EntitySelectorArgument;
-import io.github.jorelali.commandapi.api.arguments.EntitySelectorArgument.EntitySelector;
-import io.github.jorelali.commandapi.api.exceptions.WrapperCommandSyntaxException;
-
+import dev.jorel.commandapi.CommandAPI;
+import dev.jorel.commandapi.CommandAPICommand;
+import dev.jorel.commandapi.CommandPermission;
+import dev.jorel.commandapi.arguments.Argument;
+import dev.jorel.commandapi.arguments.EntitySelectorArgument;
+import dev.jorel.commandapi.arguments.EntitySelectorArgument.EntitySelector;
+import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
 import me.lucko.luckperms.api.Group;
 import me.lucko.luckperms.api.LuckPermsApi;
 import me.lucko.luckperms.api.MessagingService;
@@ -32,9 +32,13 @@ public class LeaveGuild {
 		LinkedHashMap<String, Argument> arguments = new LinkedHashMap<>();
 		arguments.put("player", new EntitySelectorArgument(EntitySelector.ONE_PLAYER));
 
-		CommandAPI.getInstance().register("leaveguild", perms, arguments, (sender, args) -> {
-			run(plugin, lp, (Player) args[0]);
-		});
+		new CommandAPICommand("leaveguild")
+			.withPermission(perms)
+			.withArguments(arguments)
+			.executes((sender, args) -> {
+				run(plugin, lp, (Player) args[0]);
+			})
+			.register();
 	}
 
 	private static void run(Plugin plugin, LuckPermsApi lp, Player player) throws WrapperCommandSyntaxException {

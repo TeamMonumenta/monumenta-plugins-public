@@ -27,8 +27,6 @@ public class DailyReset {
 							handle(plugin, player);
 						}
 
-						updateApartments(plugin);
-
 						mCurVers = newVers;
 					}
 				}
@@ -39,44 +37,6 @@ public class DailyReset {
 	private static int getDailyVersion() {
 		return (int)((System.currentTimeMillis() - 25200000) / 86400000);
 	}
-
-	private static void updateApartments(Plugin plugin) {
-		Scoreboard scoreboard = Bukkit.getScoreboardManager().getMainScoreboard();
-		Objective aptObjective = scoreboard.getObjective("Apartment");
-		Objective aptIdleObjective = scoreboard.getObjective("AptIdle");
-
-		if (aptObjective == null) {
-			plugin.getLogger().severe("Failed to update apartments: Scoreboard 'Apartment' does not exist!");
-			return;
-		} else if (aptIdleObjective == null) {
-			plugin.getLogger().severe("Failed to update apartments: Scoreboard 'AptIdle' does not exist!");
-			return;
-		}
-
-		for (String entry : scoreboard.getEntries()) {
-			int aptScore = aptObjective.getScore(entry).getScore();
-			int aptIdleScore = aptIdleObjective.getScore(entry).getScore();
-
-			/* If the player has no Apartment but has an AptIdle score, clear it */
-			if (aptScore <= 0 && aptIdleScore > 0) {
-				aptIdleScore = 0;
-				aptIdleObjective.getScore(entry).setScore(aptIdleScore);
-			}
-
-			/* If the player has an AptIdle score, decrement it */
-			if (aptIdleScore > 0) {
-				aptIdleScore--;
-				aptIdleObjective.getScore(entry).setScore(aptIdleScore);
-			}
-
-			/* If the player has no AptIdle score, clear Apartment score */
-			if (aptIdleScore <= 0 && aptScore > 0) {
-				aptScore = 0;
-				aptObjective.getScore(entry).setScore(aptScore);
-			}
-		}
-	}
-
 
 	public static void handle(Plugin plugin, Player player) {
 		if (ServerProperties.getDailyResetEnabled() && player != null) {

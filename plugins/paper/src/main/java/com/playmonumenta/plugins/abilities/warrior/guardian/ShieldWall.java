@@ -3,13 +3,6 @@ package com.playmonumenta.plugins.abilities.warrior.guardian;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.playmonumenta.plugins.utils.FastUtils;
-import com.playmonumenta.plugins.utils.VectorUtils;
-import com.playmonumenta.plugins.utils.MovementUtils;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.PotionUtils;
-import com.playmonumenta.plugins.utils.MetadataUtils;
-
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -33,6 +26,12 @@ import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.classes.magic.MagicType;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.MetadataUtils;
+import com.playmonumenta.plugins.utils.MovementUtils;
+import com.playmonumenta.plugins.utils.PotionUtils;
+import com.playmonumenta.plugins.utils.VectorUtils;
 
 /*
  * Shield Wall: Blocking and then blocking again within 0.25s
@@ -58,7 +57,7 @@ public class ShieldWall extends Ability {
 		mInfo.mScoreboardId = "ShieldWall";
 		mInfo.mShorthandName = "SW";
 		mInfo.mDescriptions.add("Blocking and then blocking again within .25s creates a 180 degree arc of particles 5 blocks high and 4 blocks wide in front of the user. This blocks all enemy projectiles (Ghast fireballs explode on the wall) and deals 6 damage to enemies that pass through the wall. The shield lasts 8 seconds. Cooldown: 30s.");
-		mInfo.mDescriptions.add("The shield lasts 10 seconds instead. Additionally, the shield knocks back enemies that try to go through it. Cooldown is reduced to 20s.");
+		mInfo.mDescriptions.add("The shield lasts 10 seconds instead. Additionally, the shield knocks back enemies that try to go through it. Cooldown: 20s.");
 		mInfo.mCooldown = getAbilityScore() == 1 ? SHIELD_WALL_1_COOLDOWN : SHIELD_WALL_2_COOLDOWN;
 		mInfo.mLinkedSpell = Spells.SHIELD_WALL;
 		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
@@ -154,7 +153,8 @@ public class ShieldWall extends Ability {
 									mMobsAlreadyHit.add(le);
 									Vector v = le.getVelocity();
 									EntityUtils.damageEntity(mPlugin, le, SHIELD_WALL_DAMAGE, mPlayer, MagicType.HOLY, true, mInfo.mLinkedSpell);
-									if (knockback) {
+									//Bosses should not be affected by slowness or knockback.
+									if (knockback && !e.getScoreboardTags().contains("Boss")) {
 										MovementUtils.knockAway(mLoc, le, 0.3f);
 										mWorld.spawnParticle(Particle.EXPLOSION_NORMAL, eLoc, 50, 0, 0, 0, 0.35f);
 										mWorld.playSound(eLoc, Sound.ENTITY_GENERIC_EXPLODE, 1, 1f);
@@ -162,7 +162,7 @@ public class ShieldWall extends Ability {
 										le.setVelocity(v);
 									}
 								} else if (le.getNoDamageTicks() + 5 < le.getMaximumNoDamageTicks()) {
-									if (knockback) {
+									if (knockback && !e.getScoreboardTags().contains("Boss")) {
 										/*
 										 * This is a temporary fix while we decide how to handle KBR mobs with Shield Wall level 2.
 										 *

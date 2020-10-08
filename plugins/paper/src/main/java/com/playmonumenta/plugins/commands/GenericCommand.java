@@ -9,12 +9,13 @@ import org.bukkit.command.ProxiedCommandSender;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
-import io.github.jorelali.commandapi.api.CommandAPI;
-import io.github.jorelali.commandapi.api.CommandPermission;
-import io.github.jorelali.commandapi.api.arguments.Argument;
-import io.github.jorelali.commandapi.api.arguments.EntitySelectorArgument;
-import io.github.jorelali.commandapi.api.arguments.EntitySelectorArgument.EntitySelector;
-import io.github.jorelali.commandapi.api.exceptions.WrapperCommandSyntaxException;
+import dev.jorel.commandapi.CommandAPI;
+import dev.jorel.commandapi.CommandAPICommand;
+import dev.jorel.commandapi.CommandPermission;
+import dev.jorel.commandapi.arguments.Argument;
+import dev.jorel.commandapi.arguments.EntitySelectorArgument;
+import dev.jorel.commandapi.arguments.EntitySelectorArgument.EntitySelector;
+import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
 
 public class GenericCommand {
 	@FunctionalInterface
@@ -46,36 +47,36 @@ public class GenericCommand {
 		LinkedHashMap<String, Argument> arguments = new LinkedHashMap<>();
 
 		/* No-argument variant which just is the sender (if they are a player) */
-		CommandAPI.getInstance().register(command,
-		                                  perms,
-		                                  arguments,
-		                                  (sender, args) -> {
-											  if (sender instanceof Player) {
-												  exec.run(sender, (Player)sender);
-											  } else if (sender instanceof ProxiedCommandSender) {
-												  ProxiedCommandSender s = (ProxiedCommandSender)sender;
-												  if (s.getCallee() instanceof Player) {
-													  exec.run(sender, (Player)s.getCallee());
-												  } else {
-													  CommandAPI.fail(ChatColor.RED + "This command must be run by/as a player!");
-												  }
-											  } else {
-												  CommandAPI.fail(ChatColor.RED + "This command must be run by/as a player!");
-											  }
-		                                  }
-		);
+		new CommandAPICommand(command)
+			.withPermission(perms)
+			.withArguments(arguments)
+			.executes((sender, args) -> {
+				if (sender instanceof Player) {
+					exec.run(sender, (Player)sender);
+				} else if (sender instanceof ProxiedCommandSender) {
+					ProxiedCommandSender s = (ProxiedCommandSender)sender;
+					if (s.getCallee() instanceof Player) {
+					  exec.run(sender, (Player)s.getCallee());
+					} else {
+					  CommandAPI.fail(ChatColor.RED + "This command must be run by/as a player!");
+					}
+				} else {
+					CommandAPI.fail(ChatColor.RED + "This command must be run by/as a player!");
+				}
+			})
+			.register();
 
 		/* Variant with player selector as arguments */
 		arguments.put("players", new EntitySelectorArgument(EntitySelector.MANY_PLAYERS));
-		CommandAPI.getInstance().register(command,
-		                                  perms,
-		                                  arguments,
-		                                  (sender, args) -> {
-		                                      for (Player player : (Collection<Player>)args[0]) {
-												  exec.run(sender, player);
-		                                      }
-		                                  }
-		);
+		new CommandAPICommand(command)
+			.withPermission(perms)
+			.withArguments(arguments)
+			.executes((sender, args) -> {
+				for (Player player : (Collection<Player>)args[0]) {
+					exec.run(sender, player);
+				}
+			})
+			.register();
 	}
 
 	@SuppressWarnings("unchecked")
@@ -84,15 +85,15 @@ public class GenericCommand {
 
 		LinkedHashMap<String, Argument> arguments = new LinkedHashMap<>();
 		arguments.put("entities", new EntitySelectorArgument(EntitySelector.MANY_ENTITIES));
-		CommandAPI.getInstance().register(command,
-		                                  perms,
-		                                  arguments,
-		                                  (sender, args) -> {
-		                                      for (Entity entity : (Collection<Entity>)args[0]) {
-												  exec.run(sender, entity);
-		                                      }
-		                                  }
-		);
+		new CommandAPICommand(command)
+			.withPermission(perms)
+			.withArguments(arguments)
+			.executes((sender, args) -> {
+				for (Entity entity : (Collection<Entity>)args[0]) {
+					exec.run(sender, entity);
+				}
+			})
+			.register();
 	}
 
 	protected static void error(CommandSender sender, String msg) {

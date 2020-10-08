@@ -52,7 +52,7 @@ public class CleansingRain extends Ability {
 		mInfo.mScoreboardId = "Cleansing";
 		mInfo.mShorthandName = "CR";
 		mInfo.mDescriptions.add("Right click while sneaking and looking upwards to summon a \"cleansing rain\" that follows you, removing negative effects from players within 4 blocks, including yourself, and lasts for 15 seconds. (Cooldown: 45 seconds)");
-		mInfo.mDescriptions.add("Additionally grants Resistance I (Cooldown: 30 seconds).");
+		mInfo.mDescriptions.add("Additionally grants Resistance I. Cooldown: 30s.");
 		mInfo.mCooldown = getAbilityScore() == 1 ? CLEANSING_1_COOLDOWN : CLEANSING_2_COOLDOWN;
 		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
 	}

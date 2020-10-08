@@ -320,6 +320,10 @@ public class PlayerInventory {
 
 			property.onHurtByEntity(plugin, player, level, event);
 		}
+
+		for (BaseAttribute attribute : plugin.mAttributeManager.mAttributes) {
+			attribute.onHurtByEntity(plugin, player, plugin.mAttributeManager.mAttributeTrie.get(attribute.getProperty(), player), event);
+		}
 	}
 
 	public void onFatalHurt(Plugin plugin, Player player, EntityDamageEvent event) {

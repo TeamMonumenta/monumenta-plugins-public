@@ -84,7 +84,7 @@ public class PurpleHaze extends Ability {
 		mInfo.mScoreboardId = "PurpleHaze";
 		mInfo.mShorthandName = "PH";
 		mInfo.mDescriptions.add("Left-clicking while shifted with a bow while looking at a mob within 32 blocks deals 3 damage per second and gives Slowness III for 8 seconds to that mob. If the target dies, the user gains an additional Alchemist's Potion and the effects transfer to up to 2 mob up to 5 blocks from the target that died. The maximum number of times effects can spread is a chain 2 mobs deep. Cooldown: 35s.");
-		mInfo.mDescriptions.add("Damage and Slowness duration increases to 10 seconds. Cooldown reduced to 20 seconds.");
+		mInfo.mDescriptions.add("Damage and Slowness duration increases to 10 seconds. Cooldown reduced to 20s.");
 		mInfo.mCooldown = getAbilityScore() == 1 ? PURPLE_HAZE_1_COOLDOWN : PURPLE_HAZE_2_COOLDOWN;
 		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;
 		mDuration = getAbilityScore() == 1 ? PURPLE_HAZE_1_DURATION : PURPLE_HAZE_2_DURATION;

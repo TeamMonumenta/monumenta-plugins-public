@@ -52,7 +52,7 @@ public class IronTincture extends Ability {
 		mInfo.mLinkedSpell = Spells.IRON_TINCTURE;
 		mInfo.mScoreboardId = "IronTincture";
 		mInfo.mShorthandName = "IT";
-		mInfo.mDescriptions.add("Crouch and right-click to throw a tincture. If you walk over the tincture, gain 8 absorption health for 50 seconds, up to 8 absorption health. If an ally walks over it, or is hit by it, you both gain the effect. If it isn't grabbed before it disappears it will quickly come off cooldown. Cooldown: 50 seconds.");
+		mInfo.mDescriptions.add("Crouch and right-click to throw a tincture. If you walk over the tincture, gain 8 absorption health for 50 seconds, up to 8 absorption health. If an ally walks over it, or is hit by it, you both gain the effect. If it isn't grabbed before it disappears it will quickly come off cooldown. Cooldown: 50s.");
 		mInfo.mDescriptions.add("Effect and effect cap increased to 12 absorption health.");
 		mInfo.mCooldown = IRON_TINCTURE_USE_COOLDOWN; // Full duration cooldown
 		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;

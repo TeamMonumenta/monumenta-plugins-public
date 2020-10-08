@@ -1,23 +1,20 @@
 package com.playmonumenta.plugins.commands;
 
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
-import java.util.List;
 
-import org.bukkit.ChatColor;
+import com.playmonumenta.plugins.utils.CommandUtils;
+
 import org.bukkit.Sound;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 
-import io.github.jorelali.commandapi.api.CommandAPI;
-import io.github.jorelali.commandapi.api.CommandPermission;
-import io.github.jorelali.commandapi.api.arguments.Argument;
-import io.github.jorelali.commandapi.api.arguments.EntitySelectorArgument;
-import io.github.jorelali.commandapi.api.arguments.EntitySelectorArgument.EntitySelector;
-import io.github.jorelali.commandapi.api.arguments.LiteralArgument;
-import io.github.jorelali.commandapi.api.exceptions.WrapperCommandSyntaxException;
+import dev.jorel.commandapi.CommandAPICommand;
+import dev.jorel.commandapi.CommandPermission;
+import dev.jorel.commandapi.arguments.Argument;
+import dev.jorel.commandapi.arguments.EntitySelectorArgument;
+import dev.jorel.commandapi.arguments.EntitySelectorArgument.EntitySelector;
+import dev.jorel.commandapi.arguments.LiteralArgument;
+import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
 
 /*
  * NOTICE!
@@ -28,22 +25,21 @@ import io.github.jorelali.commandapi.api.exceptions.WrapperCommandSyntaxExceptio
  */
 public class BarkifyHeldItem extends GenericCommand {
 	static final String COMMAND = "barkifyhelditem";
-	static final String PERMISSION = "monumenta.command.barkifyhelditem";
 
 	private static void registerType(String selection) {
+		CommandPermission perms = CommandPermission.fromString("monumenta.command.barkifyhelditem");
 		LinkedHashMap<String, Argument> arguments = new LinkedHashMap<>();
-		arguments.put(selection, new LiteralArgument(selection));
-		CommandAPI.getInstance().register(COMMAND, CommandPermission.fromString(PERMISSION), arguments,
-			(sender, args) -> {
-			});
 
-		arguments.clear();
 		arguments.put(selection, new LiteralArgument(selection));
 		arguments.put("player", new EntitySelectorArgument(EntitySelector.ONE_PLAYER));
-		CommandAPI.getInstance().register(COMMAND, CommandPermission.fromString(PERMISSION), arguments,
-			(sender, args) -> {
+
+		new CommandAPICommand(COMMAND)
+			.withPermission(perms)
+			.withArguments(arguments)
+			.executes((sender, args) -> {
 				run(sender, (Player)args[0], selection);
-			});
+			})
+			.register();
 	}
 
 	public static void register() {
@@ -53,34 +49,11 @@ public class BarkifyHeldItem extends GenericCommand {
 	}
 
 	private static void run(CommandSender sender, Player player, String selection) throws WrapperCommandSyntaxException {
-		List<String> newLore = new ArrayList<>();
-		ItemStack item = player.getEquipment().getItemInMainHand();
-		ItemMeta meta = item.getItemMeta();
-		List<String> lore = meta.getLore();
-		boolean enchantmentFound = false;
 		if (selection == "Barking2") {
 			selection = "Barking II";
 		}
 
-		for (String loreEntry : lore) {
-			if (loreEntry.contains(ChatColor.GRAY + selection)) {
-				enchantmentFound = true;
-			}
-
-			String loreStripped = ChatColor.stripColor(loreEntry).trim();
-			if (!enchantmentFound && (loreStripped.contains("King's Valley :") ||
-			                          loreStripped.contains("Celsian Isles :") ||
-			                          loreStripped.contains("Monumenta :") ||
-			                          loreStripped.contains("Armor") ||
-			                          loreStripped.contains("Magic Wand") ||
-			                          loreStripped.isEmpty())) {
-				newLore.add(ChatColor.GRAY + selection);
-				enchantmentFound = true;
-			}
-				newLore.add(loreEntry);
-		}
-		meta.setLore(newLore);
-		item.setItemMeta(meta);
+		CommandUtils.enchantify(sender, player, selection);
 
 		if (selection == "Barking") {
 			player.playSound(player.getLocation(), Sound.ENTITY_WOLF_AMBIENT, 1, 1f);
@@ -89,7 +62,5 @@ public class BarkifyHeldItem extends GenericCommand {
 		} else {
 			player.playSound(player.getLocation(), Sound.ENTITY_WOLF_GROWL, 1, 1f);
 		}
-
-		sender.sendMessage("Succesfully added " + selection + " to player's held item");
 	}
 }

@@ -3,6 +3,11 @@ package com.playmonumenta.plugins.utils;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.annotation.Nullable;
+
+import com.playmonumenta.plugins.point.AreaBounds;
+import com.playmonumenta.plugins.point.Point;
+
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -14,13 +19,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import com.playmonumenta.plugins.point.AreaBounds;
-import com.playmonumenta.plugins.point.Point;
-
-import io.github.jorelali.commandapi.api.CommandAPI;
-import io.github.jorelali.commandapi.api.exceptions.WrapperCommandSyntaxException;
-
-import javax.annotation.Nullable;
+import dev.jorel.commandapi.CommandAPI;
+import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
 
 public class CommandUtils {
 
@@ -209,6 +209,41 @@ public class CommandUtils {
 		item.setItemMeta(meta);
 
 		sender.sendMessage("Succesfully added " + enchantment + " to player's held item");
+	}
+
+	public static void deEnchantifyHeldItem(CommandSender sender, Player player, String enchantment) throws WrapperCommandSyntaxException {
+		enchantment = ChatColor.stripColor(enchantment);
+
+		ItemStack item = player.getInventory().getItemInMainHand();
+
+		ItemMeta meta = item.getItemMeta();
+		if (meta == null) {
+			CommandAPI.fail("Player must have a " + enchantment + " item in their main hand!");
+		}
+
+		List<String> lore = meta.getLore();
+		if (lore == null || lore.isEmpty()) {
+			CommandAPI.fail("Player must have a " + enchantment + " item in their main hand!");
+		}
+
+		List<String> newLore = new ArrayList<>();
+		boolean hasEnchant = false;
+		for (String loreEntry : lore) {
+			if (ChatColor.stripColor(loreEntry).startsWith(enchantment)) {
+				hasEnchant = true;
+			} else {
+				newLore.add(loreEntry);
+			}
+		}
+
+		if (!hasEnchant) {
+			CommandAPI.fail("Player must have a " + enchantment + " item in their main hand!");
+		} else {
+			meta.setLore(newLore);
+			item.setItemMeta(meta);
+
+			sender.sendMessage("Successfully removed " + enchantment + " from the player's held item");
+		}
 	}
 
 	public static void runCommandViaConsole(String cmd) {

@@ -8,6 +8,11 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.LocationUtils;
+import com.playmonumenta.plugins.utils.NmsUtils;
+
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
@@ -21,15 +26,11 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.utils.FastUtils;
-import com.playmonumenta.plugins.utils.LocationUtils;
-import com.playmonumenta.plugins.utils.NmsUtils;
-
-import io.github.jorelali.commandapi.api.CommandAPI;
-import io.github.jorelali.commandapi.api.CommandPermission;
-import io.github.jorelali.commandapi.api.arguments.Argument;
-import io.github.jorelali.commandapi.api.exceptions.WrapperCommandSyntaxException;
+import dev.jorel.commandapi.CommandAPI;
+import dev.jorel.commandapi.CommandAPICommand;
+import dev.jorel.commandapi.CommandPermission;
+import dev.jorel.commandapi.arguments.Argument;
+import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
 
 public class SpectateBot extends GenericCommand implements Listener {
 	public static final int MAX_RADIUS = 17;
@@ -67,16 +68,17 @@ public class SpectateBot extends GenericCommand implements Listener {
 		LinkedHashMap<String, Argument> arguments = new LinkedHashMap<>();
 
 		/* No-argument variant which just is the sender (if they are a player) */
-		CommandAPI.getInstance().register("spectatebot",
-		                                  CommandPermission.fromString("monumenta.command.spectatebot"),
-		                                  arguments,
-		                                  (sender, args) -> {
-											  if (sender instanceof Player && ((Player)sender).getGameMode().equals(GameMode.SPECTATOR)) {
-												  run(plugin, (Player)sender);
-											  } else {
-												  CommandAPI.fail(ChatColor.RED + "This command must be run by a player in spectator mode!");
-											  }
-		                                  });
+		new CommandAPICommand("spectatebot")
+			.withPermission(CommandPermission.fromString("monumenta.command.spectatebot"))
+			.withArguments(arguments)
+			.executes((sender, args) -> {
+				if (sender instanceof Player && ((Player)sender).getGameMode().equals(GameMode.SPECTATOR)) {
+				    run(plugin, (Player)sender);
+				} else {
+				    CommandAPI.fail(ChatColor.RED + "This command must be run by a player in spectator mode!");
+				}
+			})
+			.register();
 	}
 
 	private static Player getPlayerToSpectate(Player spectator) {

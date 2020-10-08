@@ -85,9 +85,9 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>io.github.jorelali</groupId>
-            <artifactId>commandapi</artifactId>
-            <version>2.3</version>
+            <groupId>dev.jorel</groupId>
+            <artifactId>commandapi-core</artifactId>
+            <version>4.3</version>
             <scope>provided</scope>
         </dependency>
         <dependency>

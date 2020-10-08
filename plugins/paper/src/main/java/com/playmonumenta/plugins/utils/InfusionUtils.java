@@ -4,6 +4,15 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.enchantments.infusions.Acumen;
+import com.playmonumenta.plugins.enchantments.infusions.Focus;
+import com.playmonumenta.plugins.enchantments.infusions.Perspicacity;
+import com.playmonumenta.plugins.enchantments.infusions.Tenacity;
+import com.playmonumenta.plugins.enchantments.infusions.Vigor;
+import com.playmonumenta.plugins.enchantments.infusions.Vitality;
+import com.playmonumenta.plugins.utils.ItemUtils.ItemRegion;
+
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
@@ -22,17 +31,8 @@ import org.bukkit.loot.LootContext;
 import org.bukkit.loot.LootTable;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.enchantments.infusions.Acumen;
-import com.playmonumenta.plugins.enchantments.infusions.Focus;
-import com.playmonumenta.plugins.enchantments.infusions.Perspicacity;
-import com.playmonumenta.plugins.enchantments.infusions.Tenacity;
-import com.playmonumenta.plugins.enchantments.infusions.Vigor;
-import com.playmonumenta.plugins.enchantments.infusions.Vitality;
-import com.playmonumenta.plugins.utils.ItemUtils.ItemRegion;
-
-import io.github.jorelali.commandapi.api.CommandAPI;
-import io.github.jorelali.commandapi.api.exceptions.WrapperCommandSyntaxException;
+import dev.jorel.commandapi.CommandAPI;
+import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
 
 public class InfusionUtils {
 

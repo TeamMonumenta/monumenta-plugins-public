@@ -71,7 +71,7 @@ public class LeapBoss extends BossAbilityGroup {
 						for (Player p : PlayerUtils.playersInRange(loc, DAMAGE_RADIUS)) {
 							BossUtils.bossDamage(mBoss, p, DAMAGE);
 						}
-					})
+					}, null, null)
 		));
 
 		super.constructBoss(plugin, identityTag, mBoss, activeSpells, null, detectionRange, null);

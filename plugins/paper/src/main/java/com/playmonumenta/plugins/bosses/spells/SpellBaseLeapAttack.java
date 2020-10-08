@@ -37,6 +37,31 @@ public class SpellBaseLeapAttack extends Spell {
 		void run(World world, Player player, Location loc, Vector dir);
 	}
 
+	@FunctionalInterface
+	public interface JumpVelocityModifier {
+		/**
+		 * Called just before the boss's velocity is set to leap them towards the player
+		 * @param velocity Initial velocity
+		 * @param bossLoc Boss's starting leap location
+		 * @param targetLoc Target leap location
+		 * @return Modified velocity
+		 */
+		Vector run(Vector velocity, Location bossLoc, Location targetLoc);
+	}
+
+	@FunctionalInterface
+	public interface MidLeapTickAction {
+		/**
+		 * Called on the boss every tick while leaping.
+		 *
+		 * Can use this to adjust the boss's velocity to nudge towards the player, for example, or other effects.
+		 *
+		 * @param boss The boss
+		 * @param targetPlayer The player the boss leaped towards
+		 */
+		void run(LivingEntity boss, Player targetPlayer);
+	}
+
 	private final Plugin mPlugin;
 	private final LivingEntity mBoss;
 	private final World mWorld;
@@ -49,6 +74,8 @@ public class SpellBaseLeapAttack extends Spell {
 	private final AestheticAction mLeapAesthetic;
 	private final AestheticAction mLeapingAesthetic;
 	private final HitAction mHitAction;
+	private final JumpVelocityModifier mVelocityModifier;
+	private final MidLeapTickAction mMidLeapTick;
 
 	/**
 	 * @param plugin              Plugin
@@ -62,9 +89,13 @@ public class SpellBaseLeapAttack extends Spell {
 	 * @param leapAesthetic       Called when the boss leaps
 	 * @param leapingAesthetic    Called each tick at boss location during leap
 	 * @param hitAction           Called when the boss intersects a player or lands
+	 * @param velocityModifier    Called just before the boss's velocity is set to leap them towards the player
+	 * @param midLeapTick         Called whilet he boss is in mid air heading towards a target player
 	 */
-	public SpellBaseLeapAttack(Plugin plugin, LivingEntity boss, int range, int minRange, int runDistance, int cooldown, double velocityMultiplier,
-			AestheticAction initiateAesthetic, AestheticAction leapAesthetic, AestheticAction leapingAesthetic, HitAction hitAction) {
+	public SpellBaseLeapAttack(Plugin plugin, LivingEntity boss, int range, int minRange, int runDistance, int cooldown,
+	                           double velocityMultiplier, AestheticAction initiateAesthetic, AestheticAction leapAesthetic,
+							   AestheticAction leapingAesthetic, HitAction hitAction, JumpVelocityModifier velocityModifier,
+							   MidLeapTickAction midLeapTick) {
 		mPlugin = plugin;
 		mBoss = boss;
 		mWorld = boss.getWorld();
@@ -77,6 +108,8 @@ public class SpellBaseLeapAttack extends Spell {
 		mLeapAesthetic = leapAesthetic;
 		mLeapingAesthetic = leapingAesthetic;
 		mHitAction = hitAction;
+		mVelocityModifier = velocityModifier;
+		mMidLeapTick = midLeapTick;
 	}
 
 	@Override
@@ -84,7 +117,7 @@ public class SpellBaseLeapAttack extends Spell {
 		if (!(mBoss instanceof Mob)) {
 			return;
 		}
-
+		Player targetPlayer = null;
 		Location loc = mBoss.getLocation();
 		Location locTarget = null;
 		List<Player> players = PlayerUtils.playersInRange(loc, mRange);
@@ -94,15 +127,15 @@ public class SpellBaseLeapAttack extends Spell {
 				Location locPlayer = player.getLocation();
 				if (LocationUtils.hasLineOfSight(mBoss, player) && loc.distance(locPlayer) > mMinRange) {
 					locTarget = locPlayer;
+					targetPlayer = player;
 					break;
 				}
 			}
 		}
 
-		if (locTarget == null) {
+		if (locTarget == null || targetPlayer == null) {
 			return;
 		}
-
 
 		mInitiateAesthetic.run(mWorld, mBoss.getEyeLocation());
 
@@ -128,12 +161,18 @@ public class SpellBaseLeapAttack extends Spell {
 		double distance = moveTo.distance(locTarget);
 		Vector velocity = locTarget.subtract(moveTo).toVector().multiply(0.19 * mVelocityMultiplier);
 		velocity.setY(velocity.getY() * 0.5 + distance * 0.08);
+		if (mVelocityModifier != null) {
+			velocity = mVelocityModifier.run(velocity, mBoss.getLocation(), locTarget);
+		}
+
+		final Player finalTargetPlayer = targetPlayer;
+		final Vector finalVelocity = velocity;
 
 		BukkitRunnable leap = new BukkitRunnable() {
 			Location mLeapLocation = moveTo;
-			Vector mVelocity = velocity.clone();
-			Vector mDirection = velocity.setY(0).normalize();
+			Vector mDirection = finalVelocity.clone().setY(0).normalize();
 			boolean mLeaping = false;
+			boolean mHasBeenOneTick = false;
 			int mTime = 0;
 
 			@Override
@@ -142,7 +181,7 @@ public class SpellBaseLeapAttack extends Spell {
 					if (mBoss.getLocation().distance(mLeapLocation) < 1) {
 						mLeapAesthetic.run(mWorld, mBoss.getLocation());
 						((Mob) mBoss).getPathfinder().stopPathfinding();
-						mBoss.setVelocity(mVelocity);
+						mBoss.setVelocity(finalVelocity);
 						mLeaping = true;
 					} else {
 						mTime++;
@@ -155,8 +194,8 @@ public class SpellBaseLeapAttack extends Spell {
 					}
 				} else {
 					mLeapingAesthetic.run(mWorld, mBoss.getLocation());
-
-					if (mBoss.isOnGround()) {
+					mBoss.setFallDistance(0);
+					if (mBoss.isOnGround() && mHasBeenOneTick) {
 						mHitAction.run(mWorld, null, mBoss.getLocation(), mDirection);
 						this.cancel();
 						return;
@@ -164,13 +203,21 @@ public class SpellBaseLeapAttack extends Spell {
 
 					BoundingBox hitbox = mBoss.getBoundingBox();
 					for (Player player : Bukkit.getServer().getOnlinePlayers()) {
-						if (player.getBoundingBox().overlaps(hitbox)) {
+						if (player.getBoundingBox().overlaps(hitbox) && mHasBeenOneTick) {
 							((Mob) mBoss).setTarget(player);
 							mHitAction.run(mWorld, player, player.getLocation(), mDirection);
 							this.cancel();
 							return;
 						}
 					}
+
+					// Give the caller a chance to run extra effects or manipulate the boss's leap velocity
+					if (finalTargetPlayer.isOnline() && mMidLeapTick != null) {
+						mMidLeapTick.run(mBoss, finalTargetPlayer);
+					}
+
+					// At least one tick has passed to avoid insta smacking a nearby player
+					mHasBeenOneTick = true;
 				}
 			}
 		};

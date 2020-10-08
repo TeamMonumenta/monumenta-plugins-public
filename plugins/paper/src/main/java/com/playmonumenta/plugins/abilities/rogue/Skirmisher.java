@@ -4,6 +4,7 @@ import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
@@ -39,7 +40,27 @@ public class Skirmisher extends Ability {
 			LivingEntity mob = (LivingEntity) event.getEntity();
 			Location loc = mob.getLocation();
 
-			if (EntityUtils.getNearbyMobs(loc, SKIRMISHER_ISOLATION_RADIUS, mob).size() == 0
+			/* Count stacked mobs as one mob.
+			 * Since skirmisher doesn't trigger when mobs are around, this part only matters for when a stacked mob is hit, since
+			 * the amount of mobs checked around the base mob needs to be raised.
+			 * This means that if the amount of mobs to trigger skirmisher changes in the future, this part will have to be rewritten for non-stacked mobs.
+			 */
+			int mobCount = 0;
+			Entity currentVehicleMob = mob;
+			while (currentVehicleMob.getVehicle() != null) {
+				mobCount += 1;
+				currentVehicleMob = currentVehicleMob.getVehicle();
+			}
+			if (mob.getPassengers() != null) {
+				Entity currentMob = mob;
+				while (!currentMob.getPassengers().isEmpty()) {
+					mobCount += 1;
+					currentMob = currentMob.getPassengers().get(0);
+				}
+			}
+
+			//Less than or equals to mobCount since stacked mobs can be outside of skirmish radius
+			if (EntityUtils.getNearbyMobs(loc, SKIRMISHER_ISOLATION_RADIUS, mob).size() <= mobCount
 					|| getAbilityScore() > 1 && mob instanceof Mob && !mPlayer.equals(((Mob) mob).getTarget())) {
 				mWorld.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1f, 1.5f);
 				mWorld.playSound(loc, Sound.BLOCK_IRON_TRAPDOOR_CLOSE, 1, 0.5f);
