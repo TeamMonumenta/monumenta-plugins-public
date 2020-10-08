@@ -41,13 +41,13 @@ public class GhoulishTaunt extends Ability {
 	private static final double PERCENT_1 = 0.1;
 	private static final double PERCENT_2 = 0.2;
 
-	private static final double CLEAVE_RADIUS = 1.5;
+	private static final double CLEAVE_RADIUS = 2.0;
 	private static final double CLEAVE_PERCENT_DAMAGE_1 = 0.3;
 	private static final double CLEAVE_PERCENT_DAMAGE_2 = 0.5;
 	private static final int WEAKNESS_AMPLIFIER_1 = 0;
 	private static final int WEAKNESS_AMPLIFIER_2 = 1;
 	private static final int WEAKNESS_RADIUS = 12;
-	private static final int COOLDOWN = 20 * 25;
+	private static final int COOLDOWN = 20 * 20;
 
 	private int mLeftClicks = 0;
 	private final double mPercent;
@@ -58,7 +58,7 @@ public class GhoulishTaunt extends Ability {
 		super(plugin, world, player, "Ghoulish Taunt");
 		mInfo.mScoreboardId = "GhoulishTaunt";
 		mInfo.mShorthandName = "GT";
-		mInfo.mDescriptions.add("Left clicking twice with a scythe unleashes a devilish shriek, causing all mobs within a 12 block range to target you and afflicting them with Weakness I for 10 seconds. For the next 10 seconds, gain +10% speed and +10% attack speed, and your melee attacks cleave in a 1.5 block radius from the strike, dealing 30% of the damage from the original attack. Each kill during this time increases the duration of the buffs by 1 second. Cooldown: 25s.");
+		mInfo.mDescriptions.add("Left clicking twice with a scythe unleashes a devilish shriek, causing all mobs within a 12 block range to target you and afflicting them with Weakness I for 10 seconds. For the next 10 seconds, gain +10% speed and +10% attack speed, and your melee attacks cleave in a 2 block radius from the strike, dealing 30% of the damage from the original attack. Each kill during this time increases the duration of the buffs by 1 second. Cooldown: 20s.");
 		mInfo.mDescriptions.add("Apply Weakness II to mobs instead, and gain +20% speed and +20% attack speed and 50% cleaving damage instead.");
 		mInfo.mLinkedSpell = Spells.GHOULISH_TAUNT;
 		mInfo.mCooldown = COOLDOWN;
@@ -78,7 +78,9 @@ public class GhoulishTaunt extends Ability {
 			mWorld.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1, 0.4f);
 			double damage = event.getDamage() * mCleavePercentDamage;
 			for (LivingEntity mob : EntityUtils.getNearbyMobs(loc, CLEAVE_RADIUS)) {
-				EntityUtils.damageEntity(mPlugin, mob, damage, mPlayer, null, false, mInfo.mLinkedSpell);
+				if (mob != event.getEntity()) {
+					EntityUtils.damageEntity(mPlugin, mob, damage, mPlayer, null, false, mInfo.mLinkedSpell);
+				}
 			}
 		}
 

@@ -23,7 +23,7 @@ import com.playmonumenta.plugins.utils.MetadataUtils;
  * Name/Lore/Stats.
  */
 public class Multitool implements BaseEnchantment {
-	private static String PROPERTY_NAME = ChatColor.GRAY + "Multitool";
+	public static String PROPERTY_NAME = ChatColor.GRAY + "Multitool";
 
 	@Override
 	public String getProperty() {

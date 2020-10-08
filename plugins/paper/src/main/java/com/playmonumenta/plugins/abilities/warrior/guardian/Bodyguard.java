@@ -9,7 +9,6 @@ import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -30,9 +29,6 @@ import com.playmonumenta.plugins.utils.ZoneUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
 
 public class Bodyguard extends Ability {
-
-	private static final double DAMAGE_RESISTANCE_1 = 0.05;
-	private static final double DAMAGE_RESISTANCE_2 = 0.1;
 	private static final int COOLDOWN = 30 * 20;
 	private static final int RANGE = 25;
 	private static final int RADIUS = 4;
@@ -41,7 +37,6 @@ public class Bodyguard extends Ability {
 	private static final int BUFF_DURATION = 20 * 10;
 	private static final int STUN_DURATION = 20 * 3;
 
-	private final double mDamageResistance;
 	private final int mAbsorptionAmplifier;
 
 	private int mLeftClicks = 0;
@@ -50,13 +45,12 @@ public class Bodyguard extends Ability {
 		super(plugin, world, player, "Bodyguard");
 		mInfo.mScoreboardId = "Bodyguard";
 		mInfo.mShorthandName = "Bg";
-		mInfo.mDescriptions.add("Passively gain 5% damage resistance. Left-click the air twice while looking directly at another player within 25 blocks to charge to them (cannot be used in safezones). Upon arriving, knock away all mobs within 4 blocks. Both you and the other player gain Absorption II for 10 seconds. Left-click twice while looking down to cast on yourself. Cooldown: 30s.");
-		mInfo.mDescriptions.add("Passive damage resistance increased to 10% and Absorption increased to III. Additionally, affected mobs are stunned for 3 seconds.");
+		mInfo.mDescriptions.add("Left-click the air twice while looking directly at another player within 25 blocks to charge to them (cannot be used in safezones). Upon arriving, knock away all mobs within 4 blocks. Both you and the other player gain Absorption II for 10 seconds. Left-click twice while looking down to cast on yourself. Cooldown: 30s.");
+		mInfo.mDescriptions.add("Absorption increased to III. Additionally, affected mobs are stunned for 3 seconds.");
 		mInfo.mLinkedSpell = Spells.BODYGUARD;
 		mInfo.mCooldown = COOLDOWN;
 		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;
 		mInfo.mIgnoreCooldown = true;
-		mDamageResistance = getAbilityScore() == 1 ? DAMAGE_RESISTANCE_1 : DAMAGE_RESISTANCE_2;
 		mAbsorptionAmplifier = getAbilityScore() == 1 ? ABSORPTION_AMPLIFIER_1 : ABSORPTION_AMPLIFIER_2;
 	}
 
@@ -172,17 +166,4 @@ public class Bodyguard extends Ability {
 			}
 		}
 	}
-
-	@Override
-	public boolean playerDamagedByLivingEntityEvent(EntityDamageByEntityEvent event) {
-		event.setDamage(EntityUtils.getDamageApproximation(event, 1 - mDamageResistance));
-		return true;
-	}
-
-	@Override
-	public boolean playerDamagedByProjectileEvent(EntityDamageByEntityEvent event) {
-		event.setDamage(EntityUtils.getDamageApproximation(event, 1 - mDamageResistance));
-		return true;
-	}
-
 }

@@ -1,11 +1,5 @@
 package com.playmonumenta.plugins.abilities.mage.arcanist;
 
-import com.playmonumenta.plugins.utils.FastUtils;
-import com.playmonumenta.plugins.utils.VectorUtils;
-import com.playmonumenta.plugins.utils.MovementUtils;
-import com.playmonumenta.plugins.utils.InventoryUtils;
-import com.playmonumenta.plugins.utils.EntityUtils;
-
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -25,15 +19,19 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.classes.magic.MagicType;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.utils.MovementUtils;
+import com.playmonumenta.plugins.utils.VectorUtils;
 
 public class FlashSword extends Ability {
 
 	private static final int DAMAGE_1 = 4;
-	private static final int DAMAGE_2 = 7;
+	private static final int DAMAGE_2 = 8;
 	private static final int SWINGS = 3;
 	private static final int RADIUS = 5;
-	private static final int COOLDOWN_1 = 20 * 12;
-	private static final int COOLDOWN_2 = 20 * 10;
+	private static final int COOLDOWN = 20 * 10;
 	private static final float KNOCKBACK_SPEED_1 = 0.2f;
 	private static final float KNOCKBACK_SPEED_2 = 0.4f;
 	private static final double DOT_ANGLE = 0.33;
@@ -47,10 +45,10 @@ public class FlashSword extends Ability {
 		super(plugin, world, player, "Flash Sword");
 		mInfo.mScoreboardId = "FlashSword";
 		mInfo.mShorthandName = "FS";
-		mInfo.mDescriptions.add("Sprint left-clicking with a wand causes a wave of Arcane blades to hit every enemy within a 5 block cone 3 times (4 damage per hit) in rapid succession. The last hit causes knockback. Only the first hit can apply or trigger spellshock. Cooldown: 12s.");
-		mInfo.mDescriptions.add("You instead do 7 damage 3 times. Knockback on the last hit is increased. Cooldown: 10s.");
+		mInfo.mDescriptions.add("Sprint left-clicking with a wand causes a wave of Arcane blades to hit every enemy within a 5 block cone 3 times (4 damage per hit) in rapid succession. The last hit causes knockback. Only the first hit can apply or trigger spellshock. Cooldown: 10s.");
+		mInfo.mDescriptions.add("You instead do 8 damage 3 times. Knockback on the last hit is increased.");
 		mInfo.mLinkedSpell = Spells.FSWORD;
-		mInfo.mCooldown = getAbilityScore() == 1 ? COOLDOWN_1 : COOLDOWN_2;
+		mInfo.mCooldown = COOLDOWN;
 		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;
 		mDamage = getAbilityScore() == 1 ? DAMAGE_1 : DAMAGE_2;
 		mKnockbackSpeed = getAbilityScore() == 1 ? KNOCKBACK_SPEED_1 : KNOCKBACK_SPEED_2;

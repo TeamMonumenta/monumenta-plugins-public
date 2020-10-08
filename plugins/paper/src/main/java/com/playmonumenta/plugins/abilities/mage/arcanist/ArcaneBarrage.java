@@ -22,7 +22,7 @@ import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.mage.ManaLance;
 import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.classes.magic.MagicType;
-import com.playmonumenta.plugins.effects.OverloadBarrage;
+import com.playmonumenta.plugins.effects.PercentDamageReceived;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
@@ -30,19 +30,18 @@ import com.playmonumenta.plugins.utils.MovementUtils;
 
 public class ArcaneBarrage extends Ability {
 
-	private static final String OVERLOAD_EFFECT_NAME = "OverloadFlatDamageDealtEffect";
-	private static final int OVERLOAD_DURATION = 20 * 4;
-	private static final double OVERLOAD_AMOUNT_1 = 1;
-	private static final double OVERLOAD_AMOUNT_2 = 2;
-	private static final EnumSet<DamageCause> OVERLOAD_DAMAGE_CAUSES = EnumSet.of(DamageCause.CUSTOM);
+	private static final String BARRAGE_EFFECT_NAME = "BarragePercentDamageRecievedEffect";
+	private static final int SPELL_VULN_DURATION = 20 * 4;
+	private static final double SPELL_VULN_AMOUNT = 0.2;
+	private static final double OVERLOAD_AMOUNT_1 = 2;
+	private static final double OVERLOAD_AMOUNT_2 = 4;
+	private static final EnumSet<DamageCause> SPELL_VULN_DAMAGE_CAUSES = EnumSet.of(DamageCause.CUSTOM);
 
 	private static final double HALF_HITBOX_LENGTH = 0.275;
 	private static final int RANGE = 12;
-	private static final int MISSILE_COUNT_1 = 3;
-	private static final int MISSILE_COUNT_2 = 5;
+	private static final int MISSILE_COUNT = 3;
 	private static final int DAMAGE = 7;
-	private static final int DURATION_1 = 20 * 10;
-	private static final int DURATION_2 = 20 * 20;
+	private static final int DURATION = 20 * 10;
 	private static final int COOLDOWN = 20 * 20;
 
 	private static final Particle.DustOptions COLOR = new Particle.DustOptions(Color.fromRGB(16, 144, 192), 1.0f);
@@ -61,14 +60,14 @@ public class ArcaneBarrage extends Ability {
 		super(plugin, world, player, "Arcane Barrage");
 		mInfo.mScoreboardId = "ArcaneBarrage";
 		mInfo.mShorthandName = "AB";
-		mInfo.mDescriptions.add("Right-click while not sneaking and looking up to summon 3 Arcane Missiles around you for up to 10 seconds. If missiles are active, right-clicking while not sneaking with a Wand fires a missile in the target direction, piercing through enemies within 12 blocks and dealing 7 damage. If cast with Overload, mobs damaged by the spear take 1 (Overload level 1) or 2 (Overload level 2) more ability damage (from any player) for 4 seconds. Cooldown: 20s.");
-		mInfo.mDescriptions.add("Missiles last for 20 seconds instead, and gain 5 missiles when casting.");
+		mInfo.mDescriptions.add("Right-click while not sneaking and looking up to summon 3 Arcane Missiles around you for up to 10 seconds. If missiles are active, right-clicking while not sneaking with a Wand fires a missile in the target direction, piercing through enemies within 12 blocks and dealing 7 damage. If cast with Overload, your missiles deal 2 (Overload I) or 4 (Overload II) extra damage. Cooldown: 20s.");
+		mInfo.mDescriptions.add("Missiles deal 10 damage and apply 20% Spell Vulnerability for 4 seconds. Mana lances cast while Barrage is active puts Mana Lance on cooldown and casts a missile instead (does not consume a missile).");
 		mInfo.mLinkedSpell = Spells.ARCANE_BARRAGE;
 		mInfo.mCooldown = COOLDOWN;
 		mInfo.mTrigger = AbilityTrigger.ALL;
 		mInfo.mIgnoreCooldown = true;
-		mDuration = getAbilityScore() == 1 ? DURATION_1 : DURATION_2;
-		mMissileCount = getAbilityScore() == 1 ? MISSILE_COUNT_1 : MISSILE_COUNT_2;
+		mDuration = DURATION;
+		mMissileCount = MISSILE_COUNT;
 	}
 
 	@Override
@@ -115,7 +114,14 @@ public class ArcaneBarrage extends Ability {
 
 			putOnCooldown();
 		} else if ((action == Action.RIGHT_CLICK_AIR || action == Action.RIGHT_CLICK_BLOCK) && mMissiles > 0) {
-			mMissiles--;
+			//Fires a missile replacing mana lance and sets mana lance on cooldown if barrage is level 2.
+			ManaLance manaLance = AbilityManager.getManager().getPlayerAbility(mPlayer, ManaLance.class);
+			if (manaLance != null && !manaLance.isOnCooldown() && getAbilityScore() == 2) {
+				manaLance.putOnCooldown();
+			} else {
+				mMissiles--;
+			}
+			//Fire missile.
 			Location loc = mPlayer.getEyeLocation();
 			Vector shift = mPlayer.getLocation().getDirection();
 
@@ -129,12 +135,16 @@ public class ArcaneBarrage extends Ability {
 			}
 
 			for (LivingEntity mob : EntityUtils.getMobsInLine(mPlayer.getEyeLocation(), shift, RANGE, HALF_HITBOX_LENGTH)) {
-				EntityUtils.damageEntity(mPlugin, mob, DAMAGE, mPlayer, MagicType.ARCANE, true, mInfo.mLinkedSpell);
-				MovementUtils.knockAway(mPlayer.getLocation(), mob, 0.2f, 0.2f);
+				int damageToBeDealt = DAMAGE;
 				if (mOverloadIsActive) {
 					Overload overload = AbilityManager.getManager().getPlayerAbility(mPlayer, Overload.class);
 					mOverloadAmount = overload.getAbilityScore() == 1 ? OVERLOAD_AMOUNT_1 : OVERLOAD_AMOUNT_2;
-					mPlugin.mEffectManager.addEffect(mob, OVERLOAD_EFFECT_NAME, new OverloadBarrage(OVERLOAD_DURATION, mOverloadAmount, OVERLOAD_DAMAGE_CAUSES));
+					damageToBeDealt += mOverloadAmount;
+				}
+				EntityUtils.damageEntity(mPlugin, mob, damageToBeDealt, mPlayer, MagicType.ARCANE, true, mInfo.mLinkedSpell);
+				MovementUtils.knockAway(mPlayer.getLocation(), mob, 0.2f, 0.2f);
+				if (getAbilityScore() == 2) {
+					mPlugin.mEffectManager.addEffect(mob, BARRAGE_EFFECT_NAME, new PercentDamageReceived(SPELL_VULN_DURATION, SPELL_VULN_AMOUNT, SPELL_VULN_DAMAGE_CAUSES));
 				}
 			}
 		}
@@ -142,9 +152,9 @@ public class ArcaneBarrage extends Ability {
 
 	@Override
 	public boolean runCheck() {
-		//Cancels if mana lance is able to be cast and missiles are up.
+		//Cancels barrage if mana lance is up and barrage is level one.
 		ManaLance manaLance = AbilityManager.getManager().getPlayerAbility(mPlayer, ManaLance.class);
-		if (manaLance != null && !manaLance.isOnCooldown() && mMissiles != 0) {
+		if (manaLance != null && !manaLance.isOnCooldown() && mMissiles != 0 && getAbilityScore() == 1) {
 			return false;
 		}
         return (!mPlayer.isSneaking() && InventoryUtils.isWandItem(mPlayer.getInventory().getItemInMainHand()));

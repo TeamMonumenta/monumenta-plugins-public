@@ -56,7 +56,7 @@ public class HolyJavelin extends Ability {
 	@Override
 	public boolean runCheck() {
 		ItemStack mainHand = mPlayer.getInventory().getItemInMainHand();
-		return mPlayer.isSprinting() && !InventoryUtils.isPickaxeItem(mainHand);
+		return mPlayer.isSprinting() && !mPlayer.isSneaking() && !InventoryUtils.isPickaxeItem(mainHand);
 	}
 
 	@Override

@@ -4,6 +4,7 @@ import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
+import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
@@ -19,7 +20,6 @@ public class DivineJustice extends Ability {
 
 	private static final int CRITICAL_UNDEAD_DAMAGE_1 = 5;
 	private static final int CRITICAL_UNDEAD_DAMAGE_2 = 8;
-	private static final int ON_UNDEAD_KILL_HEAL = 2;
 
 	private final int mCriticalUndeadDamage;
 
@@ -28,7 +28,7 @@ public class DivineJustice extends Ability {
 		mInfo.mScoreboardId = "DivineJustice";
 		mInfo.mShorthandName = "DJ";
 		mInfo.mDescriptions.add("Your critical strikes deal +5 damage to undead enemies.");
-		mInfo.mDescriptions.add("Your critical strikes deal +8 damage to undead enemies. Additionally, heal 2 health whenever you kill an undead enemy.");
+		mInfo.mDescriptions.add("Your critical strikes deal +8 damage to undead enemies. Additionally, heal 10% of your max health whenever you kill an undead enemy.");
 		mCriticalUndeadDamage = getAbilityScore() == 1 ? CRITICAL_UNDEAD_DAMAGE_1 : CRITICAL_UNDEAD_DAMAGE_2;
 	}
 
@@ -47,14 +47,14 @@ public class DivineJustice extends Ability {
 				event.setDamage(event.getDamage() + mCriticalUndeadDamage);
 			}
 		}
-
 		return true;
 	}
 
 	@Override
 	public void entityDeathEvent(EntityDeathEvent event, boolean shouldGenDrops) {
 		if (EntityUtils.isUndead(event.getEntity())) {
-			PlayerUtils.healPlayer(mPlayer, ON_UNDEAD_KILL_HEAL);
+			double percentMaxHealth = mPlayer.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue() * 0.1;
+			PlayerUtils.healPlayer(mPlayer, percentMaxHealth);
 		}
 	}
 

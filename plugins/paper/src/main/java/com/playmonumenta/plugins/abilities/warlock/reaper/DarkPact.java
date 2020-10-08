@@ -20,6 +20,7 @@ import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.effects.Aesthetics;
 import com.playmonumenta.plugins.effects.Effect;
 import com.playmonumenta.plugins.effects.PercentDamageDealt;
+import com.playmonumenta.plugins.effects.PercentDamageReceived;
 import com.playmonumenta.plugins.effects.PercentHeal;
 import com.playmonumenta.plugins.utils.AbsorptionUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
@@ -28,7 +29,8 @@ public class DarkPact extends Ability {
 
 	public static final String PERCENT_HEAL_EFFECT_NAME = "DarkPactPercentHealEffect";
 	private static final int PERCENT_HEAL = -1;
-
+	private static final String PERCENT_DAMAGE_RESIST_EFFECT_NAME = "DarkPactPercentDamageResistEffect";
+	private static final double PERCENT_DAMAGE_RESIST = -0.2;
 	private static final String AESTHETICS_EFFECT_NAME = "DarkPactAestheticsEffect";
 	private static final String PERCENT_DAMAGE_DEALT_EFFECT_NAME = "DarkPactPercentDamageDealtEffect";
 	private static final int DURATION = 20 * 10;
@@ -39,7 +41,7 @@ public class DarkPact extends Ability {
 
 	private static final int ABSORPTION_ON_KILL = 1;
 	private static final int MAX_ABSORPTION = 6;
-	private static final int COOLDOWN = 20 * 25;
+	private static final int COOLDOWN = 20 * 20;
 	private int mLeftClicks = 0;
 	private final double mPercentDamageDealt;
 
@@ -47,7 +49,7 @@ public class DarkPact extends Ability {
 		super(plugin, world, player, "Dark Pact");
 		mInfo.mScoreboardId = "DarkPact";
 		mInfo.mShorthandName = "DaP";
-		mInfo.mDescriptions.add("Left clicking twice with a scythe causes you to deal +40% melee damage for 10 seconds. Each kill during this time increases the duration by 1 second and gives 1 absorption health (capped at 6) for the duration of the melee bonus. However, the player cannot heal for 10 seconds, and Soul Rend cannot be triggered during the anti-heal period. Cooldown: 25s.");
+		mInfo.mDescriptions.add("Left clicking twice with a scythe causes you to gain 20% damage reduction and deal +40% melee damage for 10 seconds. Each kill during this time increases the duration by 1 second and gives 1 absorption health (capped at 6) for the duration of the melee bonus. However, the player cannot heal for 10 seconds, and Soul Rend cannot be triggered during the anti-heal period. Cooldown: 20s.");
 		mInfo.mDescriptions.add("You deal +80% melee damage instead.");
 		mInfo.mCooldown = COOLDOWN;
 		mInfo.mLinkedSpell = Spells.DARK_PACT;
@@ -81,6 +83,7 @@ public class DarkPact extends Ability {
 
 		mPlugin.mEffectManager.addEffect(mPlayer, PERCENT_DAMAGE_DEALT_EFFECT_NAME, new PercentDamageDealt(DURATION, mPercentDamageDealt, ALLOWED_DAMAGE_CAUSES));
 		mPlugin.mEffectManager.addEffect(mPlayer, PERCENT_HEAL_EFFECT_NAME, new PercentHeal(DURATION, PERCENT_HEAL));
+		mPlugin.mEffectManager.addEffect(mPlayer, PERCENT_DAMAGE_RESIST_EFFECT_NAME, new PercentDamageReceived(DURATION, PERCENT_DAMAGE_RESIST));
 		mPlugin.mEffectManager.addEffect(mPlayer, AESTHETICS_EFFECT_NAME, new Aesthetics(DURATION,
 				(entity, fourHertz, twoHertz, oneHertz) -> {
 					entity.getWorld().spawnParticle(Particle.SPELL_WITCH, entity.getLocation(), 3, 0.2, 0.2, 0.2, 0.2);
@@ -108,5 +111,4 @@ public class DarkPact extends Ability {
 			}
 		}
 	}
-
 }

@@ -25,8 +25,8 @@ public class Challenge extends Ability {
 
 	private static final String PERCENT_DAMAGE_DEALT_EFFECT_NAME = "ChallengePercentDamageDealtEffect";
 	private static final int DURATION = 20 * 10;
-	private static final double PERCENT_DAMAGE_DEALT_EFFECT_1 = 0.1;
-	private static final double PERCENT_DAMAGE_DEALT_EFFECT_2 = 0.2;
+	private static final double PERCENT_DAMAGE_DEALT_EFFECT_1 = 0.15;
+	private static final double PERCENT_DAMAGE_DEALT_EFFECT_2 = 0.3;
 	private static final EnumSet<DamageCause> AFFECTED_DAMAGE_CAUSES = EnumSet.of(
 			DamageCause.ENTITY_ATTACK,
 			DamageCause.ENTITY_SWEEP_ATTACK
@@ -34,8 +34,8 @@ public class Challenge extends Ability {
 
 	private static final int ABSORPTION_PER_MOB_1 = 1;
 	private static final int ABSORPTION_PER_MOB_2 = 2;
-	private static final int MAX_ABSORPTION_1 = 8;
-	private static final int MAX_ABSORPTION_2 = 16;
+	private static final int MAX_ABSORPTION_1 = 4;
+	private static final int MAX_ABSORPTION_2 = 8;
 	private static final int CHALLENGE_RANGE = 12;
 	private static final int COOLDOWN = 20 * 20;
 
@@ -47,8 +47,8 @@ public class Challenge extends Ability {
 		super(plugin, world, player, "Challenge");
 		mInfo.mScoreboardId = "Challenge";
 		mInfo.mShorthandName = "Ch";
-		mInfo.mDescriptions.add("Left-clicking while sneaking makes all enemies within 12 blocks target you. You gain 1 Absorption per affected mob (up to 8 Absorption) for 10 seconds and +10% melee damage for 10 seconds. Cooldown: 20s.");
-		mInfo.mDescriptions.add("You gain 2 Absorption per affected mob (up to 16 Absorption) and +20% melee damage instead.");
+		mInfo.mDescriptions.add("Left-clicking while sneaking makes all enemies within 12 blocks target you. You gain 1 Absorption per affected mob (up to 4 Absorption) for 10 seconds and +15% melee damage for 10 seconds. Cooldown: 20s.");
+		mInfo.mDescriptions.add("You gain 2 Absorption per affected mob (up to 8 Absorption) and +30% melee damage instead.");
 		mInfo.mCooldown = COOLDOWN;
 		mInfo.mIgnoreCooldown = true;
 		mInfo.mLinkedSpell = Spells.CHALLENGE;

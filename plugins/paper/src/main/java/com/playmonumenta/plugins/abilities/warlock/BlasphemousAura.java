@@ -1,9 +1,6 @@
 package com.playmonumenta.plugins.abilities.warlock;
 
 import org.bukkit.World;
-import org.bukkit.attribute.Attribute;
-import org.bukkit.attribute.AttributeModifier;
-import org.bukkit.attribute.AttributeModifier.Operation;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -16,25 +13,23 @@ import com.playmonumenta.plugins.abilities.warlock.reaper.DeathsTouch;
 import com.playmonumenta.plugins.abilities.warlock.reaper.GhoulishTaunt;
 import com.playmonumenta.plugins.abilities.warlock.tenebrist.FractalEnervation;
 import com.playmonumenta.plugins.abilities.warlock.tenebrist.WitheringGaze;
+import com.playmonumenta.plugins.effects.PercentDamageReceived;
 import com.playmonumenta.plugins.events.CustomDamageEvent;
-import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
 
 public class BlasphemousAura extends Ability {
-
-	private static final String ARMOR_ATTRIBUTE_NAME = "BlasphemousAuraArmorAttribute";
-	private static final String TOUGHNESS_ATTRIBUTE_NAME = "BlasphemousAuraToughnessAttribute";
 	private static final int VULNERABILITY_AMPLIFIER = 2;
 	private static final int VULNERABILITY_DURATION = 20 * 5;
-	private static final double ARMOR_INCREMENT = 1;
-	private static final double TOUGHNESS_INCREMENT = 0.5;
+	private static final String PERCENT_DAMAGE_RESIST_EFFECT_NAME = "BlasphemousAuraPercentDamageResistEffect";
+	private static final double PERCENT_DAMAGE_RESIST = -0.03;
+
 
 	public BlasphemousAura(Plugin plugin, World world, Player player) {
 		super(plugin, world, player, "Blasphemous Aura");
 		mInfo.mScoreboardId = "BlasphemousAura";
 		mInfo.mShorthandName = "BA";
 		mInfo.mDescriptions.add("Enemies you damage with an ability are afflicted with 15% vulnerability for 5 seconds.");
-		mInfo.mDescriptions.add("The warlock gains +1 armor and +0.5 armor toughness for every ability they have on cooldown lasting until skills come off cooldown.");
+		mInfo.mDescriptions.add("The warlock gains +3% damage reduction for every ability they have on cooldown lasting until skills come off cooldown.");
 	}
 
 	@Override
@@ -44,6 +39,7 @@ public class BlasphemousAura extends Ability {
 
 	@Override
 	public void periodicTrigger(boolean fourHertz, boolean twoHertz, boolean oneSecond, int ticks) {
+		//Triggers four times a second
 		if (getAbilityScore() > 1) {
 			Ability[] abilities = new Ability[10];
 			abilities[0] = AbilityManager.getManager().getPlayerAbility(mPlayer, AmplifyingHex.class);
@@ -63,13 +59,7 @@ public class BlasphemousAura extends Ability {
 					cooldowns++;
 				}
 			}
-
-			EntityUtils.removeAttribute(mPlayer, Attribute.GENERIC_ARMOR, ARMOR_ATTRIBUTE_NAME);
-			EntityUtils.addAttribute(mPlayer, Attribute.GENERIC_ARMOR,
-					new AttributeModifier(ARMOR_ATTRIBUTE_NAME, cooldowns * ARMOR_INCREMENT, Operation.ADD_NUMBER));
-			EntityUtils.removeAttribute(mPlayer, Attribute.GENERIC_ARMOR_TOUGHNESS, TOUGHNESS_ATTRIBUTE_NAME);
-			EntityUtils.addAttribute(mPlayer, Attribute.GENERIC_ARMOR_TOUGHNESS,
-					new AttributeModifier(TOUGHNESS_ATTRIBUTE_NAME, cooldowns * TOUGHNESS_INCREMENT, Operation.ADD_NUMBER));
+			mPlugin.mEffectManager.addEffect(mPlayer, PERCENT_DAMAGE_RESIST_EFFECT_NAME, new PercentDamageReceived(6, PERCENT_DAMAGE_RESIST * cooldowns));
 		}
 	}
 }

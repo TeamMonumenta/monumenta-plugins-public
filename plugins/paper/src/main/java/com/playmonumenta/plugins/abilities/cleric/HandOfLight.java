@@ -21,6 +21,7 @@ import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.cleric.hierophant.EnchantedPrayer;
 import com.playmonumenta.plugins.abilities.cleric.paladin.LuminousInfusion;
 import com.playmonumenta.plugins.classes.Spells;
+import com.playmonumenta.plugins.enchantments.Multitool;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ParticleUtils;
@@ -51,6 +52,11 @@ public class HandOfLight extends Ability {
 		ItemStack inOffHand = mPlayer.getInventory().getItemInOffHand();
 		if (InventoryUtils.isBowItem(inMainHand) || InventoryUtils.isBowItem(inOffHand) || InventoryUtils.isPotionItem(inMainHand) || inMainHand.getType().isBlock()
 				|| inMainHand.getType().isEdible() || inMainHand.getType() == Material.TRIDENT || inMainHand.getType() == Material.COMPASS) {
+			return;
+		}
+
+		//Cannot be cast with multitool.
+		if (InventoryUtils.testForItemWithLore(inMainHand, Multitool.PROPERTY_NAME)) {
 			return;
 		}
 
