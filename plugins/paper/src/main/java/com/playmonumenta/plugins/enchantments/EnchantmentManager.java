@@ -20,7 +20,7 @@ import org.bukkit.inventory.PlayerInventory;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.alchemist.AlchemistPotions.AlchemistPotionsDamageEnchantment;
-import com.playmonumenta.plugins.abilities.alchemist.IronTincture.IronTinctureCooldownEnchantment;
+import com.playmonumenta.plugins.abilities.alchemist.EnfeeblingElixir.EnfeeblingElixirCooldownEnchantment;
 import com.playmonumenta.plugins.abilities.cleric.Celestial.CelestialCooldownEnchantment;
 import com.playmonumenta.plugins.abilities.cleric.CleansingRain.CleansingRainCooldownEnchantment;
 import com.playmonumenta.plugins.abilities.mage.ManaLance.ManaLanceCooldownEnchantment;
@@ -118,8 +118,9 @@ public class EnchantmentManager implements Listener {
 
 		//Alchemist
 		//init.add(new IronTinctureAbsorptionEnchantment());
-		init.add(new IronTinctureCooldownEnchantment());
+		//init.add(new IronTinctureCooldownEnchantment());
 		init.add(new AlchemistPotionsDamageEnchantment());
+		init.add(new EnfeeblingElixirCooldownEnchantment());
 
 		//Warlock
 		//init.add(new AmplifyingHexDamageEnchantment());

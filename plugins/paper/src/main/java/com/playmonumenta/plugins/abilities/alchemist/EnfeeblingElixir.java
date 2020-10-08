@@ -1,5 +1,7 @@
 package com.playmonumenta.plugins.abilities.alchemist;
 
+import java.util.EnumSet;
+
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -17,12 +19,21 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.classes.Spells;
+import com.playmonumenta.plugins.enchantments.BaseAbilityEnchantment;
+import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
 
 public class EnfeeblingElixir extends Ability {
+
+	public static class EnfeeblingElixirCooldownEnchantment extends BaseAbilityEnchantment {
+		public EnfeeblingElixirCooldownEnchantment() {
+			super("Enfeebling Elixir Cooldown", EnumSet.of(ItemSlot.ARMOR));
+		}
+	}
+
 	private static final int COOLDOWN = 20 * 20;
 	private static final int DURATION_1 = 7 * 20;
 	private static final int DURATION_2 = 10 * 20;
@@ -72,6 +83,8 @@ public class EnfeeblingElixir extends Ability {
 
 			mWorld.spawnParticle(Particle.SPELL_MOB, mPlayer.getLocation(), 100, 2, 1.5, 2, 0);
 			mWorld.playSound(mPlayer.getLocation(), Sound.BLOCK_LAVA_EXTINGUISH, 1, 0);
+
+			mInfo.mCooldown = (int) EnfeeblingElixirCooldownEnchantment.getCooldown(mPlayer, COOLDOWN, EnfeeblingElixirCooldownEnchantment.class);
 			putOnCooldown();
 		}
 	}
