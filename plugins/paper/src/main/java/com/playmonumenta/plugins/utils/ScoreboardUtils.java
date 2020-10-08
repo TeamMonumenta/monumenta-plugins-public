@@ -22,12 +22,14 @@ public class ScoreboardUtils {
 		DELVE_SHARD_SCOREBOARD_MAPPINGS.put("lightblue", "Delve4Challenge");
 		DELVE_SHARD_SCOREBOARD_MAPPINGS.put("yellow", "Delve5Challenge");
 		DELVE_SHARD_SCOREBOARD_MAPPINGS.put("willows", "DelveWChallenge");
+		DELVE_SHARD_SCOREBOARD_MAPPINGS.put("reverie", "DelveMRChallenge");
 		DELVE_SHARD_SCOREBOARD_MAPPINGS.put("lime", "Delve6Challenge");
 		DELVE_SHARD_SCOREBOARD_MAPPINGS.put("pink", "Delve7Challenge");
 		DELVE_SHARD_SCOREBOARD_MAPPINGS.put("gray", "Delve8Challenge");
 		DELVE_SHARD_SCOREBOARD_MAPPINGS.put("lightgray", "Delve9Challenge");
 		DELVE_SHARD_SCOREBOARD_MAPPINGS.put("cyan", "Delve10Challenge");
 		DELVE_SHARD_SCOREBOARD_MAPPINGS.put("purple", "Delve11Challenge");
+		DELVE_SHARD_SCOREBOARD_MAPPINGS.put("teal", "DelveTLChallenge");
 		DELVE_SHARD_SCOREBOARD_MAPPINGS.put("dev1", "DelveChallenge");
 		DELVE_SHARD_SCOREBOARD_MAPPINGS.put("dev2", "DelveChallenge");
 		DELVE_SHARD_SCOREBOARD_MAPPINGS.put("mobs", "DelveChallenge");

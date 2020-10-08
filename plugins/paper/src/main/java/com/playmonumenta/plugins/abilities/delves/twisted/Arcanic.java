@@ -9,10 +9,6 @@ import com.playmonumenta.plugins.abilities.delves.StatMultiplier;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 
-/*
- * ARCANIC: mobs have x1.6 health and get a random STRONKER ability (and are blast resistant)
- */
-
 public class Arcanic extends StatMultiplier {
 
 	public static final String MESSAGE = ChatColor.GRAY + "A strange feeling washes over you, whispering of " + ChatColor.DARK_RED + ChatColor.BOLD + "ARCANIC" + ChatColor.GRAY + " powers channeled within.";
@@ -20,8 +16,8 @@ public class Arcanic extends StatMultiplier {
 
 	private static final double ARCANIC_MOB_HEALTH_MULTIPLIER = 1.6;
 	private static final double ARCANIC_1_ABILITY_DAMAGE_TAKEN_MULTIPLIER = 1;
-	private static final double ARCANIC_2_ABILITY_DAMAGE_TAKEN_MULTIPLIER = 2;
-	private static final double ARCANIC_ABILITY_CHANCE = 1;
+	private static final double ARCANIC_2_ABILITY_DAMAGE_TAKEN_MULTIPLIER = 2.5;
+	private static final double ARCANIC_ABILITY_CHANCE = 0.5;
 
 	private static final String[] ARCANIC_ABILITY_POOL = {
 		"boss_rejuvenation",

@@ -31,7 +31,6 @@ public class ChestUtils {
 		}
 	}
 
-	// Index 0 = mobs shard, everything else is the numeric wool dungeon
 	private static final Map<String, DelvesLootTableMappings> DELVES_LOOT_TABLE_MAPPINGS = new HashMap<String, DelvesLootTableMappings>();
 
 	// Excuse the god awful loot table mappings
@@ -109,6 +108,11 @@ public class ChestUtils {
 		willowsTwistedLootTableMappings.put("r1/dungeons/bonus/level_4_chest", "r1/dungeons/delves/willows/twisted_chest");
 		willowsTwistedLootTableMappings.put("r1/dungeons/bonus/level_5_chest", "r1/dungeons/delves/willows/twisted_chest");
 		willowsTwistedLootTableMappings.put("r1/dungeons/bonus/final_chest", "r1/dungeons/delves/willows/twisted_final");
+
+		Map<String, String> reverieCursedLootTableMappings = new HashMap<String, String>();
+		Map<String, String> reverieTwistedLootTableMappings = new HashMap<String, String>();
+		reverieCursedLootTableMappings.put("r1/dungeons/reverie/chest", "r1/dungeons/delves/reverie/cursed_chest");
+		reverieTwistedLootTableMappings.put("r1/dungeons/reverie/chest", "r1/dungeons/delves/reverie/twisted_chest");
 
 		Map<String, String> limeCursedLootTableMappings = new HashMap<String, String>();
 		Map<String, String> limeTwistedLootTableMappings = new HashMap<String, String>();
@@ -188,6 +192,21 @@ public class ChestUtils {
 		purpleTwistedLootTableMappings.put("r2/dungeons/purple/chesttemple", "r2/dungeons/delves/purple/twisted_temple");
 		purpleTwistedLootTableMappings.put("r2/dungeons/purple/final_chest", "r2/dungeons/delves/purple/twisted_final");
 
+		Map<String, String> tealCursedLootTableMappings = new HashMap<String, String>();
+		Map<String, String> tealTwistedLootTableMappings = new HashMap<String, String>();
+		tealCursedLootTableMappings.put("r2/dungeons/teal/ruined", "r2/dungeons/delves/teal/cursed_ruined");
+		tealCursedLootTableMappings.put("r2/dungeons/teal/eroded", "r2/dungeons/delves/teal/cursed_eroded");
+		tealCursedLootTableMappings.put("r2/dungeons/teal/pristine", "r2/dungeons/delves/teal/cursed_pristine");
+		tealCursedLootTableMappings.put("r2/dungeons/teal/colosseum", "r2/dungeons/delves/teal/cursed_colosseum");
+		tealCursedLootTableMappings.put("r2/dungeons/teal/escape", "r2/dungeons/delves/teal/cursed_escape");
+		tealCursedLootTableMappings.put("r2/dungeons/teal/final", "r2/dungeons/delves/teal/cursed_final");
+		tealTwistedLootTableMappings.put("r2/dungeons/teal/ruined", "r2/dungeons/delves/teal/twisted_ruined");
+		tealTwistedLootTableMappings.put("r2/dungeons/teal/eroded", "r2/dungeons/delves/teal/twisted_eroded");
+		tealTwistedLootTableMappings.put("r2/dungeons/teal/pristine", "r2/dungeons/delves/teal/twisted_pristine");
+		tealTwistedLootTableMappings.put("r2/dungeons/teal/colosseum", "r2/dungeons/delves/teal/twisted_colosseum");
+		tealTwistedLootTableMappings.put("r2/dungeons/teal/escape", "r2/dungeons/delves/teal/twisted_escape");
+		tealTwistedLootTableMappings.put("r2/dungeons/teal/final", "r2/dungeons/delves/teal/twisted_final");
+
 		// Testing purposes
 		Map<String, String> mobsCursedLootTableMappings = new HashMap<String, String>();
 		Map<String, String> mobsTwistedLootTableMappings = new HashMap<String, String>();
@@ -196,23 +215,29 @@ public class ChestUtils {
 		mobsCursedLootTableMappings.putAll(magentaCursedLootTableMappings);
 		mobsCursedLootTableMappings.putAll(lightblueCursedLootTableMappings);
 		mobsCursedLootTableMappings.putAll(yellowCursedLootTableMappings);
+		mobsCursedLootTableMappings.putAll(willowsCursedLootTableMappings);
+		mobsCursedLootTableMappings.putAll(reverieCursedLootTableMappings);
 		mobsCursedLootTableMappings.putAll(limeCursedLootTableMappings);
 		mobsCursedLootTableMappings.putAll(pinkCursedLootTableMappings);
 		mobsCursedLootTableMappings.putAll(grayCursedLootTableMappings);
 		mobsCursedLootTableMappings.putAll(lightgrayCursedLootTableMappings);
 		mobsCursedLootTableMappings.putAll(cyanCursedLootTableMappings);
 		mobsCursedLootTableMappings.putAll(purpleCursedLootTableMappings);
+		mobsCursedLootTableMappings.putAll(tealCursedLootTableMappings);
 		mobsTwistedLootTableMappings.putAll(whiteTwistedLootTableMappings);
 		mobsTwistedLootTableMappings.putAll(orangeTwistedLootTableMappings);
 		mobsTwistedLootTableMappings.putAll(magentaTwistedLootTableMappings);
 		mobsTwistedLootTableMappings.putAll(lightblueTwistedLootTableMappings);
 		mobsTwistedLootTableMappings.putAll(yellowTwistedLootTableMappings);
+		mobsTwistedLootTableMappings.putAll(willowsTwistedLootTableMappings);
+		mobsTwistedLootTableMappings.putAll(reverieTwistedLootTableMappings);
 		mobsTwistedLootTableMappings.putAll(limeTwistedLootTableMappings);
 		mobsTwistedLootTableMappings.putAll(pinkTwistedLootTableMappings);
 		mobsTwistedLootTableMappings.putAll(grayTwistedLootTableMappings);
 		mobsTwistedLootTableMappings.putAll(lightgrayTwistedLootTableMappings);
 		mobsTwistedLootTableMappings.putAll(cyanTwistedLootTableMappings);
 		mobsTwistedLootTableMappings.putAll(purpleTwistedLootTableMappings);
+		mobsTwistedLootTableMappings.putAll(tealTwistedLootTableMappings);
 
 		DELVES_LOOT_TABLE_MAPPINGS.put("white", new DelvesLootTableMappings("Delve1Challenge", Arrays.asList(whiteCursedLootTableMappings, whiteTwistedLootTableMappings)));
 		DELVES_LOOT_TABLE_MAPPINGS.put("orange", new DelvesLootTableMappings("Delve2Challenge", Arrays.asList(orangeCursedLootTableMappings, orangeTwistedLootTableMappings)));
@@ -220,12 +245,14 @@ public class ChestUtils {
 		DELVES_LOOT_TABLE_MAPPINGS.put("lightblue", new DelvesLootTableMappings("Delve4Challenge", Arrays.asList(lightblueCursedLootTableMappings, lightblueTwistedLootTableMappings)));
 		DELVES_LOOT_TABLE_MAPPINGS.put("yellow", new DelvesLootTableMappings("Delve5Challenge", Arrays.asList(yellowCursedLootTableMappings, yellowTwistedLootTableMappings)));
 		DELVES_LOOT_TABLE_MAPPINGS.put("willows", new DelvesLootTableMappings("DelveWChallenge", Arrays.asList(willowsCursedLootTableMappings, willowsTwistedLootTableMappings)));
+		DELVES_LOOT_TABLE_MAPPINGS.put("reverie", new DelvesLootTableMappings("DelveMRChallenge", Arrays.asList(reverieCursedLootTableMappings, reverieTwistedLootTableMappings)));
 		DELVES_LOOT_TABLE_MAPPINGS.put("lime", new DelvesLootTableMappings("Delve6Challenge", Arrays.asList(limeCursedLootTableMappings, limeTwistedLootTableMappings)));
 		DELVES_LOOT_TABLE_MAPPINGS.put("pink", new DelvesLootTableMappings("Delve7Challenge", Arrays.asList(pinkCursedLootTableMappings, pinkTwistedLootTableMappings)));
 		DELVES_LOOT_TABLE_MAPPINGS.put("gray", new DelvesLootTableMappings("Delve8Challenge", Arrays.asList(grayCursedLootTableMappings, grayTwistedLootTableMappings)));
 		DELVES_LOOT_TABLE_MAPPINGS.put("lightgray", new DelvesLootTableMappings("Delve9Challenge", Arrays.asList(lightgrayCursedLootTableMappings, lightgrayTwistedLootTableMappings)));
 		DELVES_LOOT_TABLE_MAPPINGS.put("cyan", new DelvesLootTableMappings("Delve10Challenge", Arrays.asList(cyanCursedLootTableMappings, cyanTwistedLootTableMappings)));
 		DELVES_LOOT_TABLE_MAPPINGS.put("purple", new DelvesLootTableMappings("Delve11Challenge", Arrays.asList(purpleCursedLootTableMappings, purpleTwistedLootTableMappings)));
+		DELVES_LOOT_TABLE_MAPPINGS.put("teal", new DelvesLootTableMappings("DelveTLChallenge", Arrays.asList(tealCursedLootTableMappings, tealTwistedLootTableMappings)));
 		DELVES_LOOT_TABLE_MAPPINGS.put("dev1", new DelvesLootTableMappings("DelveChallenge", Arrays.asList(mobsCursedLootTableMappings, mobsTwistedLootTableMappings)));
 		DELVES_LOOT_TABLE_MAPPINGS.put("dev2", new DelvesLootTableMappings("DelveChallenge", Arrays.asList(mobsCursedLootTableMappings, mobsTwistedLootTableMappings)));
 		DELVES_LOOT_TABLE_MAPPINGS.put("mobs", new DelvesLootTableMappings("DelveChallenge", Arrays.asList(mobsCursedLootTableMappings, mobsTwistedLootTableMappings)));
@@ -244,7 +271,7 @@ public class ChestUtils {
 			4.2,
 			4.4,
 			4.5
-	};		
+	};
 
 	public static void chestScalingLuck(Plugin plugin, Player player, Block block) {
 		int chestLuck = ScoreboardUtils.getScoreboardValue(player, "ChestLuckToggle");
