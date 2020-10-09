@@ -1,10 +1,16 @@
 package com.playmonumenta.plugins.bosses.spells;
 
+import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.LocationUtils;
+import com.playmonumenta.plugins.utils.MovementUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
+
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
-import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
@@ -12,16 +18,11 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
-import com.playmonumenta.plugins.utils.FastUtils;
-import com.playmonumenta.plugins.utils.LocationUtils;
-import com.playmonumenta.plugins.utils.MovementUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
-
 public class SpellBladeDance extends Spell {
 	private Plugin mPlugin;
-	private Entity mCaster;
+	private LivingEntity mCaster;
 
-	public SpellBladeDance(Plugin plugin, Entity caster) {
+	public SpellBladeDance(Plugin plugin, LivingEntity caster) {
 		mPlugin = plugin;
 		mCaster = caster;
 	}
@@ -120,7 +121,7 @@ public class SpellBladeDance extends Spell {
 					world.spawnParticle(Particle.CLOUD, mCaster.getLocation(), 70, 0, 0, 0, 0.25);
 					world.spawnParticle(Particle.SWEEP_ATTACK, mCaster.getLocation(), 150, 4, 4, 4, 0);
 					for (Player player : PlayerUtils.playersInRange(mCaster.getLocation(), 4)) {
-						player.addPotionEffect(new PotionEffect(PotionEffectType.HARM, 1, 2));
+						BossUtils.bossDamage(mCaster, player, 16, null);
 						MovementUtils.knockAway(mCaster.getLocation(), player, 0.45f);
 					}
 				}
