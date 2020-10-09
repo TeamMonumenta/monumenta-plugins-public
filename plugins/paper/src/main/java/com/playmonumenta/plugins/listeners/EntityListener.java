@@ -79,7 +79,6 @@ import com.destroystokyo.paper.event.entity.EntityRemoveFromWorldEvent;
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityManager;
-import com.playmonumenta.plugins.abilities.cleric.Celestial;
 import com.playmonumenta.plugins.abilities.cleric.hierophant.EnchantedPrayer;
 import com.playmonumenta.plugins.enchantments.AttributeProjectileDamage;
 import com.playmonumenta.plugins.enchantments.Duelist;
@@ -327,8 +326,6 @@ public class EntityListener implements Listener {
 					mPlugin.mTrackingManager.mPlayers.onDamage(mPlugin, player, (LivingEntity)damagee, event);
 					if (event.getCause().equals(DamageCause.ENTITY_ATTACK)) {
 						mPlugin.mTrackingManager.mPlayers.onAttack(mPlugin, player, (LivingEntity)damagee, event);
-						// Also do Celestial Blessing since it is +%
-						Celestial.modifyDamage(player, event);
 					}
 
 					if (!mAbilities.livingEntityDamagedByPlayerEvent(player, event)) {

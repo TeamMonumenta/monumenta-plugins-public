@@ -3,27 +3,25 @@ package com.playmonumenta.plugins.abilities.cleric;
 import java.util.EnumSet;
 import java.util.List;
 
-import org.bukkit.Location;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
-import org.bukkit.World;
-import org.bukkit.attribute.Attribute;
-import org.bukkit.attribute.AttributeInstance;
-import org.bukkit.entity.Player;
-import org.bukkit.event.block.Action;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.metadata.FixedMetadataValue;
-import org.bukkit.scheduler.BukkitRunnable;
-
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.classes.Spells;
+import com.playmonumenta.plugins.effects.Aesthetics;
+import com.playmonumenta.plugins.effects.PercentDamageDealt;
+import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.enchantments.BaseAbilityEnchantment;
 import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
+
+import org.bukkit.Location;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
+import org.bukkit.World;
+import org.bukkit.entity.Player;
+import org.bukkit.event.block.Action;
+import org.bukkit.inventory.ItemStack;
 
 public class Celestial extends Ability {
 
@@ -37,11 +35,10 @@ public class Celestial extends Ability {
 	private static final int CELESTIAL_1_DURATION = 10 * 20;
 	private static final int CELESTIAL_2_DURATION = 12 * 20;
 	private static final double CELESTIAL_RADIUS = 12;
-	private static final String CELESTIAL_1_TAGNAME = "Celestial_1";
-	private static final String CELESTIAL_2_TAGNAME = "Celestial_2";
-	private static final String CELESTIAL_MULTIPLE_TAGNAME = "CelestialAlreadyHasBuff";
-	private static final double CELESTIAL_1_DAMAGE_MULTIPLIER = 1.20;
-	private static final double CELESTIAL_2_DAMAGE_MULTIPLIER = 1.35;
+	private static final double CELESTIAL_1_EXTRA_DAMAGE = 0.20;
+	private static final double CELESTIAL_2_EXTRA_DAMAGE = 0.35;
+	private static final double CELESTIAL_EXTRA_SPEED = 0.02;
+	private static final String ATTR_NAME = "CelestialBlessingExtraSpeedAttr";
 
 	public Celestial(Plugin plugin, World world, Player player) {
 		super(plugin, world, player, "Celestial Blessing");
@@ -61,7 +58,7 @@ public class Celestial extends Ability {
 
 		World world = mPlayer.getWorld();
 		int duration = celestial == 1 ? CELESTIAL_1_DURATION : CELESTIAL_2_DURATION;
-		String tagName = celestial == 1 ? CELESTIAL_1_TAGNAME : CELESTIAL_2_TAGNAME;
+		double extraDamage = celestial == 1 ? CELESTIAL_1_EXTRA_DAMAGE : CELESTIAL_2_EXTRA_DAMAGE;
 
 		List<Player> affectedPlayers = PlayerUtils.playersInRange(mPlayer, CELESTIAL_RADIUS, true);
 
@@ -70,61 +67,30 @@ public class Celestial extends Ability {
 
 		// Give these players the metadata tag that boosts their damage
 		for (Player p : affectedPlayers) {
-			// This workaround means that up to two Celestial Blessing clerics can use this ability without interfering with the other
-			// Does not solve anything for 3+ clerics using the ability at the same time, but this would be a rare edge case
-			if (!p.hasMetadata(CELESTIAL_MULTIPLE_TAGNAME) && (p.hasMetadata(CELESTIAL_1_TAGNAME) || p.hasMetadata(CELESTIAL_2_TAGNAME))) {
-				p.setMetadata(CELESTIAL_MULTIPLE_TAGNAME, new FixedMetadataValue(mPlugin, 0));
-			} else if (!p.hasMetadata(CELESTIAL_1_TAGNAME) && !p.hasMetadata(CELESTIAL_2_TAGNAME)) {
-				p.setMetadata(tagName, new FixedMetadataValue(mPlugin, 0));
-				AttributeInstance speed = p.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED);
-				if (speed != null) {
-					speed.setBaseValue(speed.getBaseValue() + 0.02);
-				}
-				Location loc = p.getLocation();
-				world.spawnParticle(Particle.SPELL_INSTANT, loc.clone().add(0, 1, 0), 30, 0.5, 0.5, 0.5, 0.1);
-				world.spawnParticle(Particle.SPELL_INSTANT, loc.clone().add(0, 1, 0), 25, 0.5, 0.5, 0.5, 0);
-				world.spawnParticle(Particle.VILLAGER_HAPPY, loc.clone().add(0, 1, 0), 25, 0.5, 0.5, 0.5, 0.1);
-				world.playSound(loc, Sound.ENTITY_PLAYER_LEVELUP, 0.5f, 1.75f);
-				world.playSound(loc, Sound.ENTITY_ILLUSIONER_CAST_SPELL, 0.75f, 1.25f);
-				world.playSound(loc, Sound.ENTITY_ILLUSIONER_PREPARE_BLINDNESS, 0.75f, 1.1f);
-			}
-		}
-
-
-		new BukkitRunnable() {
-			int mT = 0;
-			@Override
-			public void run() {
-				mT += 2;
-				for (Player p : affectedPlayers) {
+			mPlugin.mEffectManager.addEffect(p, "CelestialBlessingExtraDamage", new PercentDamageDealt(duration, extraDamage));
+			mPlugin.mEffectManager.addEffect(p, "CelestialBlessingExtraSpeed", new PercentSpeed(duration, CELESTIAL_EXTRA_SPEED, ATTR_NAME));
+			mPlugin.mEffectManager.addEffect(p, "CelestialBlessingParticles", new Aesthetics(duration,
+				(entity, fourHertz, twoHertz, oneHertz) -> {
+					// Tick effect
+					Location loc = p.getLocation().add(0, 1, 0);
+					mWorld.spawnParticle(Particle.SPELL_INSTANT, loc, 2, 0.25, 0.25, 0.25, 0.1);
+					mWorld.spawnParticle(Particle.SPELL_INSTANT, loc, 2, 0.5, 0.5, 0.5, 0);
+					mWorld.spawnParticle(Particle.VILLAGER_HAPPY, loc, 2, 0.5, 0.5, 0.5, 0.1);
+				}, (entity) -> {
+					// Lose effect
 					Location loc = p.getLocation();
-					world.spawnParticle(Particle.SPELL_INSTANT, loc.clone().add(0, 1, 0), 1, 0.25, 0.25, 0.25, 0.1);
-					world.spawnParticle(Particle.SPELL_INSTANT, loc.clone().add(0, 1, 0), 1, 0.5, 0.5, 0.5, 0);
-					world.spawnParticle(Particle.VILLAGER_HAPPY, loc.clone().add(0, 1, 0), 1, 0.5, 0.5, 0.5, 0.1);
-				}
-
-				if (mT >= duration) {
-					for (Player p : affectedPlayers) {
-						if (p.hasMetadata(CELESTIAL_MULTIPLE_TAGNAME)) {
-							p.removeMetadata(CELESTIAL_MULTIPLE_TAGNAME, mPlugin);
-						} else {
-							p.removeMetadata(tagName, mPlugin);
-							AttributeInstance speed = p.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED);
-							if (speed != null) {
-								speed.setBaseValue(speed.getBaseValue() - 0.02);
-							}
-						}
-						Location loc = p.getLocation();
-						world.playSound(loc, Sound.ENTITY_ILLUSIONER_CAST_SPELL, 1f, 0.65f);
-						world.spawnParticle(Particle.SPELL_INSTANT, loc.clone().add(0, 1, 0), 30, 0.5, 0.5, 0.5, 0.1);
-						world.spawnParticle(Particle.SPELL_INSTANT, loc.clone().add(0, 1, 0), 25, 0.5, 0.5, 0.5, 0);
-						world.spawnParticle(Particle.VILLAGER_HAPPY, loc.clone().add(0, 1, 0), 25, 0.5, 0.5, 0.5, 0.1);
-					}
-					this.cancel();
-				}
-			}
-
-		}.runTaskTimer(mPlugin, 0, 2);
+					world.playSound(loc, Sound.ENTITY_ILLUSIONER_CAST_SPELL, 1f, 0.65f);
+					world.spawnParticle(Particle.SPELL_INSTANT, loc.clone().add(0, 1, 0), 30, 0.5, 0.5, 0.5, 0.1);
+					world.spawnParticle(Particle.SPELL_INSTANT, loc.clone().add(0, 1, 0), 25, 0.5, 0.5, 0.5, 0);
+					world.spawnParticle(Particle.VILLAGER_HAPPY, loc.clone().add(0, 1, 0), 25, 0.5, 0.5, 0.5, 0.1);
+				})
+			);
+			// Start effect
+			Location loc = p.getLocation();
+			world.playSound(loc, Sound.ENTITY_PLAYER_LEVELUP, 0.5f, 1.75f);
+			world.playSound(loc, Sound.ENTITY_ILLUSIONER_CAST_SPELL, 0.75f, 1.25f);
+			world.playSound(loc, Sound.ENTITY_ILLUSIONER_PREPARE_BLINDNESS, 0.75f, 1.1f);
+		}
 
 		putOnCooldown();
 	}
@@ -136,17 +102,5 @@ public class Celestial extends Ability {
 			return (mPlayer.isSneaking() && !InventoryUtils.isPickaxeItem(mainHand));
 		}
 		return false;
-	}
-
-	/**
-	 * A static method that is run every time a player does damage (regardless of class) to
-	 * check for this ability.
-	 */
-	public static void modifyDamage(Player player, EntityDamageByEntityEvent event) {
-		if (player.hasMetadata(CELESTIAL_1_TAGNAME)) {
-			event.setDamage(event.getDamage() * CELESTIAL_1_DAMAGE_MULTIPLIER);
-		} else if (player.hasMetadata(CELESTIAL_2_TAGNAME)) {
-			event.setDamage(event.getDamage() * CELESTIAL_2_DAMAGE_MULTIPLIER);
-		}
 	}
 }
