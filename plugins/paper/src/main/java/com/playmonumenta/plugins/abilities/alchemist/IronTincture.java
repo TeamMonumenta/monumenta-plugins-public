@@ -69,7 +69,7 @@ public class IronTincture extends Ability {
 
 	@Override
 	public void cast(Action action) {
-		Location loc = mPlayer.getLocation().add(0, 1.8, 0);
+		Location loc = mPlayer.getEyeLocation();
 		ItemStack itemTincture = new ItemStack(Material.SPLASH_POTION);
 		mWorld.playSound(loc, Sound.ENTITY_SNOWBALL_THROW, 1, 0.15f);
 		Item tincture = mWorld.dropItem(loc, itemTincture);
