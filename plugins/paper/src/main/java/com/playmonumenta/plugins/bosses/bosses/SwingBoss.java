@@ -26,7 +26,7 @@ public class SwingBoss extends BossAbilityGroup {
 
 	private static final int RADIUS = 3;
 	private static final int DURATION = 20;
-	private static final int COOLDOWN = 20 * 12;
+	private static final int COOLDOWN = 20 * 8;
 	private static final Particle.DustOptions REDSTONE_COLOR = new Particle.DustOptions(Color.fromRGB(255, 255, 255), 1.0f);
 
 	private LivingEntity mBoss;
@@ -43,7 +43,7 @@ public class SwingBoss extends BossAbilityGroup {
 						(Location loc) -> {
 							boss.addPotionEffect(new PotionEffect(PotionEffectType.GLOWING, 1, 2));
 							World world = loc.getWorld();
-							world.spawnParticle(Particle.SWEEP_ATTACK, loc, 1, ((double) RADIUS) / 2, ((double) RADIUS) / 2, ((double) RADIUS) / 2, 0.05);
+							world.spawnParticle(Particle.SWEEP_ATTACK, loc, 1, ((double) RADIUS) / 3, ((double) RADIUS) / 3, ((double) RADIUS) / 3, 0.05);
 						}, (Location loc) -> {
 							World world = loc.getWorld();
 							world.spawnParticle(Particle.CRIT, loc, 1, 0.25, 0.25, 0.25, 0.05);
@@ -58,8 +58,7 @@ public class SwingBoss extends BossAbilityGroup {
 							for (Player player : PlayerUtils.playersInRange(boss.getLocation(), RADIUS)) {
 								BossUtils.bossDamage(boss, player, 35);
 							}
-						})
-				));
+						})));
 
 		super.constructBoss(plugin, identityTag, mBoss, activeSpells, null, detectionRange, null);
 	}

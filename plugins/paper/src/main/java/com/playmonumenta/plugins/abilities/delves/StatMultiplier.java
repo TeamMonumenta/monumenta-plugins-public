@@ -18,6 +18,7 @@ public class StatMultiplier extends Ability {
 
 	private static final String HEALTH_MODIFIER_NAME = "DelvesHealthModifier";
 	private static final String SPEED_MODIFIER_NAME = "DelvesSpeedModifier";
+	private static final String AVOID_MODIFIERS = "boss_delveimmune";
 
 	private final double mDamageTakenMultiplier;
 	private final double mAbilityDamageTakenMultiplier;
@@ -69,9 +70,9 @@ public class StatMultiplier extends Ability {
 
 	@Override
 	public boolean playerDamagedByLivingEntityEvent(EntityDamageByEntityEvent event) {
-		if (event.getCause() == DamageCause.CUSTOM) {
+		if (event.getCause() == DamageCause.CUSTOM && (event.getDamager().getScoreboardTags() == null || !event.getDamager().getScoreboardTags().contains(AVOID_MODIFIERS))) {
 			event.setDamage(EntityUtils.getDamageApproximation(event, mAbilityDamageTakenMultiplier));
-		} else {
+		} else if (event.getDamager().getScoreboardTags() == null || !event.getDamager().getScoreboardTags().contains(AVOID_MODIFIERS)) {
 			event.setDamage(EntityUtils.getDamageApproximation(event, mDamageTakenMultiplier));
 		}
 
@@ -80,7 +81,10 @@ public class StatMultiplier extends Ability {
 
 	@Override
 	public boolean playerDamagedByProjectileEvent(EntityDamageByEntityEvent event) {
-		event.setDamage(EntityUtils.getDamageApproximation(event, mDamageTakenMultiplier));
+		if (event.getDamager().getScoreboardTags() == null || !event.getDamager().getScoreboardTags().contains(AVOID_MODIFIERS)) {
+			event.setDamage(EntityUtils.getDamageApproximation(event, mDamageTakenMultiplier));
+		}
+
 		return true;
 	}
 
@@ -95,7 +99,7 @@ public class StatMultiplier extends Ability {
 			}
 		}
 
-		if (!hasProperties) {
+		if (!hasProperties && (mob.getScoreboardTags() == null || !mob.getScoreboardTags().contains(AVOID_MODIFIERS))) {
 			// Health
 			AttributeModifier healthMod = new AttributeModifier(HEALTH_MODIFIER_NAME,
 					mMobHealthMultiplier - 1, AttributeModifier.Operation.MULTIPLY_SCALAR_1);

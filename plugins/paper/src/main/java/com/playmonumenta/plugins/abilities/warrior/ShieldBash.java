@@ -12,6 +12,8 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import com.playmonumenta.plugins.Plugin;
@@ -84,11 +86,19 @@ public class ShieldBash extends Ability {
 
 								if (getAbilityScore() == 1) {
 									EntityUtils.damageEntity(mPlugin, mob, damage, mPlayer);
-									EntityUtils.applyStun(mPlugin, SHIELD_BASH_STUN, mob);
+									if (EntityUtils.isBoss(mob) || EntityUtils.isElite(mob)) {
+										mob.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, SHIELD_BASH_STUN, 6));
+									} else {
+										EntityUtils.applyStun(mPlugin, SHIELD_BASH_STUN, mob);
+									}
 								} else {
 									for (LivingEntity le : EntityUtils.getNearbyMobs(mob.getLocation(), SHIELD_BASH_2_RADIUS)) {
 										EntityUtils.damageEntity(mPlugin, le, damage, mPlayer);
-										EntityUtils.applyStun(mPlugin, SHIELD_BASH_STUN, le);
+										if (EntityUtils.isBoss(mob) || EntityUtils.isElite(mob)) {
+											le.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, SHIELD_BASH_STUN, 6));
+										} else {
+											EntityUtils.applyStun(mPlugin, SHIELD_BASH_STUN, le);
+										}
 									}
 								}
 

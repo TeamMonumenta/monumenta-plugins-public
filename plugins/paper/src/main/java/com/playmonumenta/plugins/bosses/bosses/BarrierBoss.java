@@ -39,8 +39,8 @@ public class BarrierBoss extends BossAbilityGroup {
 					world.playSound(loc, Sound.BLOCK_BEACON_ACTIVATE, SoundCategory.HOSTILE, 1, 1);
 				}, (Location loc) -> {
 					World world = loc.getWorld();
-					world.spawnParticle(Particle.REDSTONE, loc, 4, 0, 0, 0, REDSTONE_COLOR);
-				},  (Location loc) -> {
+					world.spawnParticle(Particle.REDSTONE, loc, 4, 0, 1, 0, REDSTONE_COLOR);
+				}, (Location loc) -> {
 					World world = loc.getWorld();
 					world.playSound(loc, Sound.ITEM_SHIELD_BREAK, SoundCategory.HOSTILE, 1, 1);
 				})));
