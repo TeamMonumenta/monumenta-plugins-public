@@ -193,6 +193,24 @@ public class Boss {
 		}
 	}
 
+	/*
+	 * Boss was stunned by a player. Mobs with the "Boss" tag can't be stunned
+	 */
+	public void bossStunned() {
+		for (BossAbilityGroup ability : mAbilities) {
+			ability.bossStunned();
+		}
+	}
+
+	/*
+	 * Boss was confused by a player. Mobs with the "Boss" tag can't be confused
+	 */
+	public void bossConfused() {
+		for (BossAbilityGroup ability : mAbilities) {
+			ability.bossConfused();
+		}
+	}
+
 	public List<BossAbilityGroup> getAbilities() {
 		return new ArrayList<BossAbilityGroup>(mAbilities);
 	}

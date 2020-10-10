@@ -670,6 +670,24 @@ public class BossManager implements Listener {
 		}
 	}
 
+	/* Not actually an event handler - must be called by EntityUtils applyStun() */
+	/* TODO: Probably make this an actual event? */
+	public void entityStunned(Entity entity) {
+		Boss boss = mBosses.get(entity.getUniqueId());
+		if (boss != null) {
+			boss.bossStunned();
+		}
+	}
+
+	/* Not actually an event handler - must be called by EntityUtils applyConfusion() */
+	/* TODO: Probably make this an actual event? */
+	public void entityConfused(Entity entity) {
+		Boss boss = mBosses.get(entity.getUniqueId());
+		if (boss != null) {
+			boss.bossConfused();
+		}
+	}
+
 	/* Kind of a weird one - not hooked to bosses but used for snowman killer */
 	@EventHandler(priority = EventPriority.HIGHEST)
 	public void playerDeathEvent(PlayerDeathEvent event) {

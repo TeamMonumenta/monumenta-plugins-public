@@ -64,6 +64,7 @@ import org.bukkit.util.Vector;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityManager;
+import com.playmonumenta.plugins.bosses.BossManager;
 import com.playmonumenta.plugins.bosses.bosses.CrowdControlImmunityBoss;
 import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.classes.magic.MagicType;
@@ -825,6 +826,9 @@ public class EntityUtils {
 			mob.setVelocity(new Vector(0, 0, 0));
 		}
 
+		/* Fake "event" so bosses can handle being stunned if they need to */
+		BossManager.getInstance().entityStunned(mob);
+
 		// Only reduce speed if mob is not already in map. We can avoid storing original speed by just +/- 10.
 		Integer t = STUNNED_MOBS.get(mob);
 		if (t == null) {
@@ -857,6 +861,9 @@ public class EntityUtils {
 		if (mob instanceof Vex) {
 			mob.setVelocity(new Vector(0, 0, 0));
 		}
+
+		/* Fake "event" so bosses can handle being confused if they need to */
+		BossManager.getInstance().entityConfused(mob);
 
 		List<LivingEntity> nearby = getNearbyMobs(mob.getLocation(), 8, mob);
 		if (nearby.size() > 0) {

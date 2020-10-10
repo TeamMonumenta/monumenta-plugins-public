@@ -257,6 +257,24 @@ public abstract class BossAbilityGroup {
 	}
 
 	/*
+	 * Boss was stunned by a player. Mobs with the "Boss" tag can't be stunned
+	 */
+	public void bossStunned() {
+		if (mActiveSpells != null) {
+			mActiveSpells.cancelAll();
+		}
+	}
+
+	/*
+	 * Boss was confused by a player. Mobs with the "Boss" tag can't be confused
+	 */
+	public void bossConfused() {
+		if (mActiveSpells != null) {
+			mActiveSpells.cancelAll();
+		}
+	}
+
+	/*
 	 * Called only the first time the boss is summoned into the world
 	 *
 	 * Useful to set the bosses health / armor / etc. based on # of players
