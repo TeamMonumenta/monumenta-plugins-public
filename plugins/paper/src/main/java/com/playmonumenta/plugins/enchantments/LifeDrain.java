@@ -3,6 +3,10 @@ package com.playmonumenta.plugins.enchantments;
 import java.util.Collection;
 import java.util.EnumSet;
 
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
+import com.playmonumenta.plugins.utils.PlayerUtils;
+
 import org.bukkit.ChatColor;
 import org.bukkit.Particle;
 import org.bukkit.attribute.Attribute;
@@ -12,10 +16,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.inventory.EquipmentSlot;
-
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
-import com.playmonumenta.plugins.utils.PlayerUtils;
+import org.bukkit.inventory.meta.ItemMeta;
 
 public class LifeDrain implements BaseEnchantment {
 
@@ -41,14 +42,19 @@ public class LifeDrain implements BaseEnchantment {
 		} else {
 			double attackSpeed = 4;
 			double multiplier = 1;
-			Collection<AttributeModifier> modifiers = player.getInventory().getItemInMainHand().getItemMeta().getAttributeModifiers(Attribute.GENERIC_ATTACK_SPEED);
-			if (modifiers != null) {
-				for (AttributeModifier modifier : modifiers) {
-					if (modifier.getSlot() == EquipmentSlot.HAND) {
-						if (modifier.getOperation() == Operation.ADD_NUMBER) {
-							attackSpeed += modifier.getAmount();
-						} else if (modifier.getOperation() == Operation.ADD_SCALAR) {
-							multiplier += modifier.getAmount();
+			if (player.getInventory().getItemInMainHand() != null && player.getInventory().getItemInMainHand().hasItemMeta()) {
+				ItemMeta meta = player.getInventory().getItemInMainHand().getItemMeta();
+				if (meta.hasAttributeModifiers()) {
+					Collection<AttributeModifier> modifiers = meta.getAttributeModifiers(Attribute.GENERIC_ATTACK_SPEED);
+					if (modifiers != null) {
+						for (AttributeModifier modifier : modifiers) {
+							if (modifier.getSlot() == EquipmentSlot.HAND) {
+								if (modifier.getOperation() == Operation.ADD_NUMBER) {
+									attackSpeed += modifier.getAmount();
+								} else if (modifier.getOperation() == Operation.ADD_SCALAR) {
+									multiplier += modifier.getAmount();
+								}
+							}
 						}
 					}
 				}
