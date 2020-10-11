@@ -3,10 +3,10 @@ package com.playmonumenta.plugins.utils;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -40,7 +40,7 @@ public class AbilityUtils {
 	private static final String ARROW_REFUNDED_METAKEY = "ArrowRefunded";
 	private static final String POTION_REFUNDED_METAKEY = "PotionRefunded";
 
-	private static final Map<UUID, Integer> INVISIBLE_PLAYERS = new HashMap<UUID, Integer>();
+	private static final Map<Player, Integer> INVISIBLE_PLAYERS = new HashMap<Player, Integer>();
 	private static BukkitRunnable invisTracker = null;
 
 	private static void startInvisTracker(Plugin plugin) {
@@ -50,16 +50,26 @@ public class AbilityUtils {
 				if (INVISIBLE_PLAYERS.isEmpty()) {
 					this.cancel();
 				} else {
-					for (Entry<UUID, Integer> entry : INVISIBLE_PLAYERS.entrySet()) {
-						Player player = Bukkit.getPlayer(entry.getKey());
+					Iterator<Entry<Player, Integer>> iter = INVISIBLE_PLAYERS.entrySet().iterator();
+					while (iter.hasNext()) {
+						Entry<Player, Integer> entry = iter.next();
+
+						Player player = entry.getKey();
+						if (!player.isValid() || player.isDead() || !player.isOnline()) {
+							iter.remove();
+							continue;
+						}
+
 						ItemStack item = player.getInventory().getItemInMainHand();
 						if (entry.getValue() <= 0) {
-							removeStealth(plugin, player, false);
-						} else if (!InventoryUtils.isAxeItem(item) && !InventoryUtils.isSwordItem(item) && !InventoryUtils.isScytheItem(item)) {
-							removeStealth(plugin, player, true);
+							// Run after this loop is complete to avoid concurrent modification
+							Bukkit.getScheduler().runTask(plugin, () -> removeStealth(plugin, player, false));
+						} else if (item == null || item.getType().isAir() || (!InventoryUtils.isAxeItem(item) && !InventoryUtils.isSwordItem(item) && !InventoryUtils.isScytheItem(item))) {
+							// Run after this loop is complete to avoid concurrent modification
+							Bukkit.getScheduler().runTask(plugin, () -> removeStealth(plugin, player, true));
 						} else {
 							player.getWorld().spawnParticle(Particle.SMOKE_NORMAL, player.getLocation().clone().add(0, 0.5, 0), 1, 0.35, 0.25, 0.35, 0.05f);
-							INVISIBLE_PLAYERS.put(player.getUniqueId(), entry.getValue() - 1);
+							entry.setValue(entry.getValue() - 1);
 						}
 					}
 				}
@@ -69,7 +79,7 @@ public class AbilityUtils {
 	}
 
 	public static boolean isStealthed(Player player) {
-		return INVISIBLE_PLAYERS.containsKey(player.getUniqueId());
+		return INVISIBLE_PLAYERS.containsKey(player);
 	}
 
 	public static void removeStealth(Plugin plugin, Player player, boolean inflictPenalty) {
@@ -83,7 +93,7 @@ public class AbilityUtils {
 
 		plugin.mPotionManager.removePotion(player, PotionID.ABILITY_SELF, PotionEffectType.INVISIBILITY);
 
-		INVISIBLE_PLAYERS.remove(player.getUniqueId());
+		INVISIBLE_PLAYERS.remove(player);
 
 		if (inflictPenalty) {
 			plugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.SLOW_DIGGING, 20 * 3, 1));
@@ -101,12 +111,12 @@ public class AbilityUtils {
 
 		if (!isStealthed(player)) {
 			plugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.INVISIBILITY, duration, 0));
-			INVISIBLE_PLAYERS.put(player.getUniqueId(), duration);
+			INVISIBLE_PLAYERS.put(player, duration);
 		} else {
-			int currentDuration = INVISIBLE_PLAYERS.get(player.getUniqueId());
+			int currentDuration = INVISIBLE_PLAYERS.get(player);
 			plugin.mPotionManager.removePotion(player, PotionID.ABILITY_SELF, PotionEffectType.INVISIBILITY);
 			plugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.INVISIBILITY, duration + currentDuration, 0));
-			INVISIBLE_PLAYERS.put(player.getUniqueId(), duration + currentDuration);
+			INVISIBLE_PLAYERS.put(player, duration + currentDuration);
 		}
 
 		if (invisTracker == null || invisTracker.isCancelled()) {
