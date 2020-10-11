@@ -73,10 +73,13 @@ public class Overload extends Ability {
 
 			// This is necessary for skills triggering over periods of time, such as Flash Sword and the soon to exist Arcane Barrage
 			mAffectedSpell = event.getAbility();
-
+			ArcaneBarrage barrage = AbilityManager.getManager().getPlayerAbility(mPlayer, ArcaneBarrage.class);
 			if (mAffectedSpell == Spells.ARCANE_BARRAGE) {
 				mAffectedSpell = null;
 				AbilityManager.getManager().getPlayerAbility(mPlayer, ArcaneBarrage.class).activateOverload();
+			} else if (mAffectedSpell == Spells.MANA_LANCE && barrage != null && barrage.getAbilityScore() == 2 && mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), Spells.ARCANE_BARRAGE) && barrage.getMissiles() > 0) {
+				mAffectedSpell = null;
+				mSpellsToOverload = 1;
 			} else {
 				new BukkitRunnable() {
 					@Override
@@ -101,7 +104,7 @@ public class Overload extends Ability {
 		if (event.getSpell() == mAffectedSpell) {
 			event.setDamage(event.getDamage() + mDamage);
 			mWorld.spawnParticle(Particle.REDSTONE, locD, 35, 0.4, 0.4, 0.4, COLOR);
-			mWorld.spawnParticle(Particle.EXPLOSION_NORMAL, locD, 35, 0, 0, 0, 0.2, COLOR2);
+			mWorld.spawnParticle(Particle.EXPLOSION_NORMAL, locD, 35, 0, 0, 0, 0.2);
 		}
 	}
 

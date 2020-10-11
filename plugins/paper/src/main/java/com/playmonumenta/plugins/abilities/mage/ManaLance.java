@@ -117,4 +117,9 @@ public class ManaLance extends Ability {
 		ItemStack mainHand = mPlayer.getInventory().getItemInMainHand();
 		return !mPlayer.isSneaking() && InventoryUtils.isWandItem(mainHand);
 	}
+
+	public int getDamage() {
+		//Just in case the damage changes in the future
+		return getAbilityScore() == 1 ? DAMAGE_1 : DAMAGE_2;
+	}
 }
