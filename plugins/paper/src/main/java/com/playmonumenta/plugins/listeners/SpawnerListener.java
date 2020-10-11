@@ -66,7 +66,7 @@ public class SpawnerListener implements Listener {
 					while (spawnerListIter.hasNext()) {
 						Entity mob = spawnerListIter.next().mMob;
 						if (mob != null && (mob.isDead() || !mob.isValid())) {
-							mobInfoIter.remove();
+							spawnerListIter.remove();
 						}
 					}
 
