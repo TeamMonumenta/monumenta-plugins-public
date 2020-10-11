@@ -171,7 +171,8 @@ public class SpellEarthshake extends SpellBaseAoE {
 							double x = (FastUtils.RANDOM.nextInt(5) - 2) / 10.0;
 							double z = (FastUtils.RANDOM.nextInt(5) - 2) / 10.0;
 
-							Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "summon minecraft:falling_block " + b.getLocation().getX() + " " + b.getLocation().getY() + " " + b.getLocation().getZ() + " " + FALLING_BLOCK_COMMAND1 + b.getBlockData().getAsString() + FALLING_BLOCK_COMMAND2 + x + ",1.0," + z + "]}");
+							// TODO: Summon these directly, rather than via console
+							Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "summon minecraft:falling_block " + b.getLocation().getX() + " " + b.getLocation().getY() + " " + b.getLocation().getZ() + " " + FALLING_BLOCK_COMMAND1 + material.toString().toLowerCase() + FALLING_BLOCK_COMMAND2 + x + ",1.0," + z + "]}");
 							world.getBlockAt(b.getLocation()).setType(Material.AIR);
 						}
 					}
