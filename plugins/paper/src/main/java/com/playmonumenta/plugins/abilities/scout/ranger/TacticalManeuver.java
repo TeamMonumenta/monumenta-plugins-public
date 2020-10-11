@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.abilities.scout.ranger;
 
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -95,7 +96,11 @@ public class TacticalManeuver extends MultipleChargeAbility {
 
 					mWorld.spawnParticle(Particle.SMOKE_NORMAL, mPlayer.getLocation(), 5, 0.25, 0.1, 0.25, 0.1);
 
-					for (LivingEntity le : EntityUtils.getNearbyMobs(mPlayer.getLocation().clone().add(mPlayer.getVelocity().normalize()), 2, mPlayer)) {
+					Location loc = mPlayer.getLocation();
+					if (mPlayer.getVelocity().length() > 0.001) {
+						loc.add(mPlayer.getVelocity().normalize());
+					}
+					for (LivingEntity le : EntityUtils.getNearbyMobs(loc, 2, mPlayer)) {
 						if (!le.isDead()) {
 							EntityUtils.damageEntity(mPlugin, le, TACTICAL_DASH_DAMAGE, mPlayer, null, true, mInfo.mLinkedSpell);
 							for (LivingEntity e : EntityUtils.getNearbyMobs(le.getLocation(), TACTICAL_MANEUVER_RADIUS)) {
