@@ -244,18 +244,20 @@ public class EntityListener implements Listener {
 				// Illagers shooting crossbows (or any non player entity using a crossbow)
 				ProjectileSource source = ((Projectile) damager).getShooter();
 				if (!(source instanceof Player) && source instanceof LivingEntity) {
-					ItemStack item = ((LivingEntity)source).getEquipment().getItemInMainHand();
-					if (item.getType() == Material.CROSSBOW) {
-						ItemMeta meta = item.getItemMeta();
-						if (meta != null && meta.hasAttributeModifiers()) {
-							Collection<AttributeModifier> modifiers = meta.getAttributeModifiers(Attribute.GENERIC_ATTACK_DAMAGE);
-							if (modifiers != null) {
-								Iterator<AttributeModifier> iter = modifiers.iterator();
-								while (iter.hasNext()) {
-									AttributeModifier mod = iter.next();
-									if (mod.getOperation().equals(AttributeModifier.Operation.ADD_NUMBER)) {
-										// Sets damage to exactly the attribute modifiers, has +1 for consistency with tridents
-										event.setDamage(mod.getAmount() + 1);
+					if (((LivingEntity)source).getEquipment() != null) {
+						ItemStack item = ((LivingEntity)source).getEquipment().getItemInMainHand();
+						if (item.getType() == Material.CROSSBOW) {
+							ItemMeta meta = item.getItemMeta();
+							if (meta != null && meta.hasAttributeModifiers()) {
+								Collection<AttributeModifier> modifiers = meta.getAttributeModifiers(Attribute.GENERIC_ATTACK_DAMAGE);
+								if (modifiers != null) {
+									Iterator<AttributeModifier> iter = modifiers.iterator();
+									while (iter.hasNext()) {
+										AttributeModifier mod = iter.next();
+										if (mod.getOperation().equals(AttributeModifier.Operation.ADD_NUMBER)) {
+											// Sets damage to exactly the attribute modifiers, has +1 for consistency with tridents
+											event.setDamage(mod.getAmount() + 1);
+										}
 									}
 								}
 							}
