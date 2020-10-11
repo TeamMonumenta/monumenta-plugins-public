@@ -69,11 +69,7 @@ public class PinningShot extends Ability {
 	@Override
 	public void periodicTrigger(boolean fourHertz, boolean twoHertz, boolean oneSecond, int ticks) {
 		if (oneSecond) {
-			for (LivingEntity mob : mPinnedMobs.keySet()) {
-				if (!mob.isValid() || mob.isDead()) {
-					mPinnedMobs.remove(mob);
-				}
-			}
+			mPinnedMobs.entrySet().removeIf((entry) -> !entry.getKey().isValid() || entry.getKey().isDead());
 		}
 	}
 
