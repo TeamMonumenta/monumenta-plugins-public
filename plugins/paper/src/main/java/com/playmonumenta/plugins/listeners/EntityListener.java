@@ -243,7 +243,7 @@ public class EntityListener implements Listener {
 			} else if (damager instanceof AbstractArrow) {
 				// Illagers shooting crossbows (or any non player entity using a crossbow)
 				ProjectileSource source = ((Projectile) damager).getShooter();
-				if (!(source instanceof Player)) {
+				if (!(source instanceof Player) && source instanceof LivingEntity) {
 					ItemStack item = ((LivingEntity)source).getEquipment().getItemInMainHand();
 					if (item.getType() == Material.CROSSBOW) {
 						ItemMeta meta = item.getItemMeta();
