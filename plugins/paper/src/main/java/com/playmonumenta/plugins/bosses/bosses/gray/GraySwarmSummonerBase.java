@@ -90,6 +90,7 @@ public abstract class GraySwarmSummonerBase extends BossAbilityGroup {
 									} catch (Exception ex) {
 										ex.printStackTrace();
 									}
+									this.cancel();
 								}
 							}.runTaskLater(plugin, SUMMON_PARTICLE_DELAY);
 						}

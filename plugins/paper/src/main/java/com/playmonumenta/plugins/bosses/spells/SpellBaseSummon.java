@@ -30,6 +30,8 @@ public class SpellBaseSummon extends Spell {
 		 *
 		 * Might want to also override the cancel method here to do something to the mob
 		 * if gets cancelled
+		 *
+		 * Note this needs to always explicitly call cancel() when done to be cleaned up correctly.
 		 */
 		BukkitRunnable run(Location loc, Player player);
 	}
@@ -41,6 +43,8 @@ public class SpellBaseSummon extends Spell {
 		 *
 		 * Might want to also override the cancel method here to do something to the mob
 		 * if gets cancelled
+		 *
+		 * Note this needs to always explicitly call cancel() when done to be cleaned up correctly.
 		 */
 		BukkitRunnable run();
 	}
