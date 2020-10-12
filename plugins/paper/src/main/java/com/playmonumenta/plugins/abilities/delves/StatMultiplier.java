@@ -101,16 +101,14 @@ public class StatMultiplier extends Ability {
 
 		if (!hasProperties && (mob.getScoreboardTags() == null || !mob.getScoreboardTags().contains(AVOID_MODIFIERS))) {
 			// Health
-			AttributeModifier healthMod = new AttributeModifier(HEALTH_MODIFIER_NAME,
-					mMobHealthMultiplier - 1, AttributeModifier.Operation.MULTIPLY_SCALAR_1);
-			health.addModifier(healthMod);
-			mob.setHealth(mob.getHealth() * mMobHealthMultiplier);
+			EntityUtils.addAttribute(mob, Attribute.GENERIC_MAX_HEALTH,
+			                         new AttributeModifier(HEALTH_MODIFIER_NAME, mMobHealthMultiplier - 1, AttributeModifier.Operation.MULTIPLY_SCALAR_1));
+			// Scale the mobs health up to their maximum health
+			mob.setHealth(Math.min(health.getValue(), mob.getHealth() * mMobHealthMultiplier));
 
 			// Speed
-			AttributeInstance speed = mob.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED);
-			AttributeModifier speedMod = new AttributeModifier(SPEED_MODIFIER_NAME,
-					mMobSpeedMultiplier - 1, AttributeModifier.Operation.MULTIPLY_SCALAR_1);
-			speed.addModifier(speedMod);
+			EntityUtils.addAttribute(mob, Attribute.GENERIC_MOVEMENT_SPEED,
+			                         new AttributeModifier(SPEED_MODIFIER_NAME, mMobSpeedMultiplier - 1, AttributeModifier.Operation.MULTIPLY_SCALAR_1));
 
 			// Abilities
 			if (FastUtils.RANDOM.nextDouble() < mMobAbilityChance) {
