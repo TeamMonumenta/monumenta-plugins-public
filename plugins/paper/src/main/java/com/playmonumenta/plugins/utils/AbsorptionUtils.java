@@ -1,26 +1,24 @@
 package com.playmonumenta.plugins.utils;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
+import com.playmonumenta.plugins.Plugin;
+
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import com.playmonumenta.plugins.Plugin;
-
 public class AbsorptionUtils {
 
 	private static class AbsorptionInstances {
-		final SortedMap<Float, Integer> mAbsorptionInstances = new TreeMap<Float, Integer>();
+		final SortedMap<Double, Integer> mAbsorptionInstances = new TreeMap<Double, Integer>();
 
-		private void addAbsorptionInstance(float amount, int duration) {
+		private void addAbsorptionInstance(double amount, int duration) {
 			Integer currentDuration = mAbsorptionInstances.get(amount);
 			if (currentDuration == null || currentDuration < duration) {
 				mAbsorptionInstances.put(amount, duration);
@@ -28,11 +26,11 @@ public class AbsorptionUtils {
 		}
 
 		// Removes expired absorption instances and returns the next maximum absorption amount
-		private float elapse(int ticks) {
-			Iterator<SortedMap.Entry<Float, Integer>> iter = mAbsorptionInstances.entrySet().iterator();
+		private double elapse(int ticks) {
+			Iterator<SortedMap.Entry<Double, Integer>> iter = mAbsorptionInstances.entrySet().iterator();
 			while (iter.hasNext()) {
-				SortedMap.Entry<Float, Integer> entry = iter.next();
-				float amount = entry.getKey();
+				SortedMap.Entry<Double, Integer> entry = iter.next();
+				double amount = entry.getKey();
 				int newDuration = entry.getValue() - ticks;
 				mAbsorptionInstances.put(amount, newDuration);
 
@@ -50,14 +48,10 @@ public class AbsorptionUtils {
 
 	private static final int TRACKER_PERIOD = 20;
 
-	private static Method handleMethod;
-	private static Method getAbsorptionMethod;
-	private static Method setAbsorptionMethod;
-
 	// Doesn't work for subtracting absorption because newAbsorption makes sure it never drops (in case absorption is higher than maxAmount)
-	public static void addAbsorption(LivingEntity entity, float amount, float maxAmount, int duration) {
-		float absorption = getAbsorption(entity);
-		float newAbsorption = Math.min(absorption + amount, maxAmount);
+	public static void addAbsorption(LivingEntity entity, double amount, double maxAmount, int duration) {
+		double absorption = getAbsorption(entity);
+		double newAbsorption = Math.min(absorption + amount, maxAmount);
 		if (newAbsorption > absorption) {
 			setAbsorption(entity, newAbsorption, duration);
 		} else {
@@ -66,37 +60,24 @@ public class AbsorptionUtils {
 		}
 	}
 
-	public static void subtractAbsorption(LivingEntity entity, float amount) {
-		float absorption = getAbsorption(entity);
-		float newAbsorption = Math.max(absorption - amount, 0);
+	public static void subtractAbsorption(LivingEntity entity, double amount) {
+		double absorption = getAbsorption(entity);
+		double newAbsorption = Math.max(absorption - amount, 0);
 		if (newAbsorption < absorption) {
 			setAbsorption(entity, newAbsorption, -1);
 		}
 	}
 
-	public static void setAbsorption(LivingEntity entity, float amount, int duration) {
-		cacheReflectionMethods(entity);
-
-		try {
-			setAbsorptionMethod.invoke(handleMethod.invoke(entity), amount);
-			addAbsorptionInstance(entity, amount, duration);
-		} catch (IllegalAccessException | InvocationTargetException e) {
-			e.printStackTrace();
-		}
+	public static void setAbsorption(LivingEntity entity, double amount, int duration) {
+		entity.setAbsorptionAmount(amount);
+		addAbsorptionInstance(entity, amount, duration);
 	}
 
-	public static float getAbsorption(LivingEntity entity) {
-		cacheReflectionMethods(entity);
-
-		try {
-			return (Float) getAbsorptionMethod.invoke(handleMethod.invoke(entity));
-		} catch (IllegalAccessException | InvocationTargetException e) {
-			e.printStackTrace();
-			return 0;
-		}
+	public static double getAbsorption(LivingEntity entity) {
+		return entity.getAbsorptionAmount();
 	}
 
-	public static void addAbsorptionInstance(LivingEntity entity, float amount, int duration) {
+	public static void addAbsorptionInstance(LivingEntity entity, double amount, int duration) {
 		if (duration >= 0) {
 			initializeTracker();
 
@@ -107,19 +88,6 @@ public class AbsorptionUtils {
 			}
 
 			absorptionInstances.addAbsorptionInstance(amount, duration);
-		}
-	}
-
-	private static void cacheReflectionMethods(LivingEntity entity) {
-		if (handleMethod == null || getAbsorptionMethod == null || setAbsorptionMethod == null) {
-			try {
-				handleMethod = entity.getClass().getMethod("getHandle");
-				Object handle = handleMethod.invoke(entity);
-				getAbsorptionMethod = handle.getClass().getMethod("getAbsorptionHearts");
-				setAbsorptionMethod = handle.getClass().getMethod("setAbsorptionHearts", float.class);
-			} catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
-				e.printStackTrace();
-			}
 		}
 	}
 
@@ -134,7 +102,7 @@ public class AbsorptionUtils {
 						Map.Entry<LivingEntity, AbsorptionInstances> entry = iter.next();
 						LivingEntity entity = entry.getKey();
 						AbsorptionInstances absorptionInstances = entry.getValue();
-						float newAmount = absorptionInstances.elapse(TRACKER_PERIOD);
+						double newAmount = absorptionInstances.elapse(TRACKER_PERIOD);
 						if (entity.hasPotionEffect(PotionEffectType.ABSORPTION)) {
 							newAmount += (entity.getPotionEffect(PotionEffectType.ABSORPTION).getAmplifier() + 1) * 4;
 						}

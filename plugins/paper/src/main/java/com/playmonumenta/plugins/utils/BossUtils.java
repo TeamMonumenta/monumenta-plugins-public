@@ -115,7 +115,7 @@ public class BossUtils {
 				ItemUtils.damageShield(target, (int)(percentHealth * 20 / 2.5));
 			}
 		} else {
-			float absorp = AbsorptionUtils.getAbsorption(target);
+			double absorp = AbsorptionUtils.getAbsorption(target);
 			double adjustedHealth = (target.getHealth() + absorp) - toTake;
 
 			if (adjustedHealth <= 0) {
