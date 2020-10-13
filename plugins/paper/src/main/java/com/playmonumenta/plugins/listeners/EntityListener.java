@@ -621,6 +621,12 @@ public class EntityListener implements Listener {
 				ItemStack itemInMainHand = player.getEquipment().getItemInMainHand();
 				ItemStack itemInOffHand = player.getEquipment().getItemInOffHand();
 
+				// TODO: Remove this if we ever figure out how to detect offhand pearl interactables
+				if (itemInOffHand.getType().equals(Material.ENDER_PEARL)) {
+					event.setCancelled(true);
+					return;
+				}
+
 				// Check if the player has an infinity ender pearl in main or off hand
 				if (((itemInMainHand.getType().equals(Material.ENDER_PEARL)) &&
 				     (itemInMainHand.getEnchantmentLevel(Enchantment.ARROW_INFINITE) > 0)) ||
