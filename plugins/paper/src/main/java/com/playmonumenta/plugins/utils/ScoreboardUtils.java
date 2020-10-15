@@ -30,6 +30,7 @@ public class ScoreboardUtils {
 		DELVE_SHARD_SCOREBOARD_MAPPINGS.put("cyan", "Delve10Challenge");
 		DELVE_SHARD_SCOREBOARD_MAPPINGS.put("purple", "Delve11Challenge");
 		DELVE_SHARD_SCOREBOARD_MAPPINGS.put("teal", "DelveTLChallenge");
+		DELVE_SHARD_SCOREBOARD_MAPPINGS.put("shiftingcity", "DelveSCChallenge");
 		DELVE_SHARD_SCOREBOARD_MAPPINGS.put("dev1", "DelveChallenge");
 		DELVE_SHARD_SCOREBOARD_MAPPINGS.put("dev2", "DelveChallenge");
 		DELVE_SHARD_SCOREBOARD_MAPPINGS.put("mobs", "DelveChallenge");

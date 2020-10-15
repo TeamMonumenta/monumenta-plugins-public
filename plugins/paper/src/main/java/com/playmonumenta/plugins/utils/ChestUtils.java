@@ -207,6 +207,25 @@ public class ChestUtils {
 		tealTwistedLootTableMappings.put("r2/dungeons/teal/escape", "r2/dungeons/delves/teal/twisted_escape");
 		tealTwistedLootTableMappings.put("r2/dungeons/teal/final", "r2/dungeons/delves/teal/twisted_final");
 
+		Map<String, String> shiftingCursedLootTableMappings = new HashMap<String, String>();
+		Map<String, String> shiftingTwistedLootTableMappings = new HashMap<String, String>();
+		shiftingCursedLootTableMappings.put("r2/dungeons/fred/normal_city", "r2/dungeons/delves/fred/cursed_city");
+		shiftingCursedLootTableMappings.put("r2/dungeons/fred/objective_city", "r2/dungeons/delves/fred/cursed_city");
+		shiftingCursedLootTableMappings.put("r2/dungeons/fred/normal_lush", "r2/dungeons/delves/fred/cursed_lush");
+		shiftingCursedLootTableMappings.put("r2/dungeons/fred/objective_lush", "r2/dungeons/delves/fred/cursed_lush");
+		shiftingCursedLootTableMappings.put("r2/dungeons/fred/normal_water", "r2/dungeons/delves/fred/cursed_water");
+		shiftingCursedLootTableMappings.put("r2/dungeons/fred/objective_water", "r2/dungeons/delves/fred/cursed_water");
+		shiftingCursedLootTableMappings.put("r2/dungeons/fred/challenge", "r2/dungeons/delves/fred/cursed_challenge");
+		shiftingCursedLootTableMappings.put("r2/dungeons/fred/final_chest", "r2/dungeons/delves/fred/cursed_final");
+		shiftingTwistedLootTableMappings.put("r2/dungeons/fred/normal_city", "r2/dungeons/delves/fred/twisted_city");
+		shiftingTwistedLootTableMappings.put("r2/dungeons/fred/objective_city", "r2/dungeons/delves/fred/twisted_city");
+		shiftingTwistedLootTableMappings.put("r2/dungeons/fred/normal_lush", "r2/dungeons/delves/fred/twisted_lush");
+		shiftingTwistedLootTableMappings.put("r2/dungeons/fred/objective_lush", "r2/dungeons/delves/fred/twisted_lush");
+		shiftingTwistedLootTableMappings.put("r2/dungeons/fred/normal_water", "r2/dungeons/delves/fred/twisted_water");
+		shiftingTwistedLootTableMappings.put("r2/dungeons/fred/objective_water", "r2/dungeons/delves/fred/twisted_water");
+		shiftingTwistedLootTableMappings.put("r2/dungeons/fred/challenge", "r2/dungeons/delves/fred/twisted_challenge");
+		shiftingTwistedLootTableMappings.put("r2/dungeons/fred/final_chest", "r2/dungeons/delves/fred/twisted_final");
+
 		// Testing purposes
 		Map<String, String> mobsCursedLootTableMappings = new HashMap<String, String>();
 		Map<String, String> mobsTwistedLootTableMappings = new HashMap<String, String>();
@@ -224,6 +243,7 @@ public class ChestUtils {
 		mobsCursedLootTableMappings.putAll(cyanCursedLootTableMappings);
 		mobsCursedLootTableMappings.putAll(purpleCursedLootTableMappings);
 		mobsCursedLootTableMappings.putAll(tealCursedLootTableMappings);
+		mobsCursedLootTableMappings.putAll(shiftingCursedLootTableMappings);
 		mobsTwistedLootTableMappings.putAll(whiteTwistedLootTableMappings);
 		mobsTwistedLootTableMappings.putAll(orangeTwistedLootTableMappings);
 		mobsTwistedLootTableMappings.putAll(magentaTwistedLootTableMappings);
@@ -238,6 +258,7 @@ public class ChestUtils {
 		mobsTwistedLootTableMappings.putAll(cyanTwistedLootTableMappings);
 		mobsTwistedLootTableMappings.putAll(purpleTwistedLootTableMappings);
 		mobsTwistedLootTableMappings.putAll(tealTwistedLootTableMappings);
+		mobsTwistedLootTableMappings.putAll(shiftingTwistedLootTableMappings);
 
 		DELVES_LOOT_TABLE_MAPPINGS.put("white", new DelvesLootTableMappings("Delve1Challenge", Arrays.asList(whiteCursedLootTableMappings, whiteTwistedLootTableMappings)));
 		DELVES_LOOT_TABLE_MAPPINGS.put("orange", new DelvesLootTableMappings("Delve2Challenge", Arrays.asList(orangeCursedLootTableMappings, orangeTwistedLootTableMappings)));
@@ -253,6 +274,7 @@ public class ChestUtils {
 		DELVES_LOOT_TABLE_MAPPINGS.put("cyan", new DelvesLootTableMappings("Delve10Challenge", Arrays.asList(cyanCursedLootTableMappings, cyanTwistedLootTableMappings)));
 		DELVES_LOOT_TABLE_MAPPINGS.put("purple", new DelvesLootTableMappings("Delve11Challenge", Arrays.asList(purpleCursedLootTableMappings, purpleTwistedLootTableMappings)));
 		DELVES_LOOT_TABLE_MAPPINGS.put("teal", new DelvesLootTableMappings("DelveTLChallenge", Arrays.asList(tealCursedLootTableMappings, tealTwistedLootTableMappings)));
+		DELVES_LOOT_TABLE_MAPPINGS.put("shiftingcity", new DelvesLootTableMappings("DelveSCChallenge", Arrays.asList(shiftingCursedLootTableMappings, shiftingTwistedLootTableMappings)));
 		DELVES_LOOT_TABLE_MAPPINGS.put("dev1", new DelvesLootTableMappings("DelveChallenge", Arrays.asList(mobsCursedLootTableMappings, mobsTwistedLootTableMappings)));
 		DELVES_LOOT_TABLE_MAPPINGS.put("dev2", new DelvesLootTableMappings("DelveChallenge", Arrays.asList(mobsCursedLootTableMappings, mobsTwistedLootTableMappings)));
 		DELVES_LOOT_TABLE_MAPPINGS.put("mobs", new DelvesLootTableMappings("DelveChallenge", Arrays.asList(mobsCursedLootTableMappings, mobsTwistedLootTableMappings)));
