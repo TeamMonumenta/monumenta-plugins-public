@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.listeners;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Logger;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -35,6 +36,11 @@ import com.playmonumenta.plugins.packets.AuditLogPacket;
 
 public class AuditListener implements Listener {
 	private final Map<HumanEntity, ItemStack> mLastCreativeDestroy = new HashMap<HumanEntity, ItemStack>();
+	private final Logger mLogger;
+
+	public AuditListener(Logger logger) {
+		mLogger = logger;
+	}
 
 	@EventHandler(priority = EventPriority.MONITOR)
 	public void gamemode(PlayerGameModeChangeEvent event) {
@@ -67,9 +73,6 @@ public class AuditListener implements Listener {
 		}
 
 		Player player = event.getEntity();
-		if (!player.isOp()) {
-			return;
-		}
 
 		log("Death: " + player.getName() + " " + event.getDeathMessage());
 
@@ -257,6 +260,8 @@ public class AuditListener implements Listener {
 	}
 
 	private void log(@Nonnull String message) {
+		mLogger.info("Audit:" + message);
+
 		SocketManager.sendPacket(new AuditLogPacket(message));
 	}
 }

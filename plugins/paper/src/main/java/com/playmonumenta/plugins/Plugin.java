@@ -232,7 +232,7 @@ public class Plugin extends JavaPlugin {
 		manager.registerEvents(new SpectateBot(this), this);
 
 		if (ServerProperties.getAuditMessagesEnabled()) {
-			manager.registerEvents(new AuditListener(), this);
+			manager.registerEvents(new AuditListener(getLogger()), this);
 		}
 		manager.registerEvents(new ExceptionListener(this), this);
 		manager.registerEvents(new PlayerListener(this, mWorld), this);
