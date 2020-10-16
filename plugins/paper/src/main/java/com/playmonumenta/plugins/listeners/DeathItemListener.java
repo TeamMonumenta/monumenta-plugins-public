@@ -1,14 +1,17 @@
 package com.playmonumenta.plugins.listeners;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.utils.ItemUtils;
+
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Item;
@@ -23,11 +26,6 @@ import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.utils.FastUtils;
-import com.playmonumenta.plugins.utils.InventoryUtils;
-import com.playmonumenta.plugins.utils.ItemUtils;
-
 import de.tr7zw.nbtapi.NBTEntity;
 
 
@@ -35,8 +33,8 @@ import de.tr7zw.nbtapi.NBTEntity;
 public class DeathItemListener implements Listener {
 	private static final String DEATH_SORT_TAG = "DeathSortTag";
 
-	private final Map<UUID, Map<ItemStack, List<Integer>>> mInventories = new HashMap<>();
-	private final Map<UUID, List<ItemStack>> mItemSlots = new HashMap<>();
+	//Snapshot of the player's inventory at death
+	private final Map<UUID, List<ItemStack>> mBeforeDeathItems = new HashMap<>();
 	private final Map<UUID, BukkitRunnable> mTimers30Sec = new HashMap<>();
 	private final Map<UUID, BukkitRunnable> mTimers15Min = new HashMap<>();
 	private Plugin mPlugin;
@@ -59,224 +57,121 @@ public class DeathItemListener implements Listener {
 				//Player is in an area where they drop their items
 				&& !event.getKeepInventory()) {
 
-			Map<ItemStack, List<Integer>> items = new HashMap<>();
 			ItemStack[] contents = event.getEntity().getInventory().getContents();
-			List<ItemStack> itemSlots = Arrays.asList(contents);
-
-			//Put inventory in hashmap, prioritize armor and offhand first
-			//For armor and offhand, it will not save curse of binding or curse of vanishing gear
-			for (int i = 36; i < contents.length; i++) {
-				if (contents[i] != null && contents[i].getType() != Material.AIR
-						&& !contents[i].containsEnchantment(Enchantment.VANISHING_CURSE) && !contents[i].containsEnchantment(Enchantment.BINDING_CURSE)) {
-					if (items.get(contents[i]) == null || items.get(contents[i]).isEmpty()) {
-						items.put(contents[i], new ArrayList<Integer>());
-					}
-					items.get(contents[i]).add(i);
-				}
-			}
-			//Rest of inventory saved, curse of vanishing gear isn't, as the item changes to shattered on death
-			for (int i = 0; i < 36; i++) {
-				if (contents[i] != null && contents[i].getType() != Material.AIR
-						&& !contents[i].containsEnchantment(Enchantment.VANISHING_CURSE)) {
-					if (items.get(contents[i]) == null || items.get(contents[i]).isEmpty()) {
-						items.put(contents[i], new ArrayList<Integer>());
-					}
-					items.get(contents[i]).add(i);
-				}
-			}
+			List<ItemStack> beforeDeathItems = Arrays.asList(contents);
 
 			//Do not put in the death map of a player with no items
-			if (items.size() > 0) {
-				//Extra check/loop through to make sure that air was not accidentally saved
-				for (Map.Entry<ItemStack, List<Integer>> e : items.entrySet()) {
-					//If an item was found in the map that was not air, update the player's death inventory
+			for (ItemStack item : beforeDeathItems) {
+				if (item != null && !item.getType().isAir()) {
+					//Found at least one non-air item
+					//Save the player's death inventory
 					//Update inventory includes the 15 minute timer that starts to run on death (synced up to hoped items despawn timer)
-					//Otherwise do not save if it finds nothing but air
-					if (e.getKey().getType() != Material.AIR) {
-						mInventories.put(event.getEntity().getUniqueId(), items);
-						mItemSlots.put(event.getEntity().getUniqueId(), itemSlots);
-						cancelTimers(event.getEntity().getUniqueId());
-						run15MinClearMap(event.getEntity().getUniqueId());
-						break;
-					}
-				}
-
-			}
-		}
-	}
-
-	//If item is in the hashmap specified, tries to set it to the slot it originally was in if not filled
-	@EventHandler(priority = EventPriority.HIGHEST)
-	public void checkItemEvent(EntityPickupItemEvent event) {
-		if (!event.isCancelled() && event.getEntity() instanceof Player && event.getEntity().getScoreboardTags().contains(DEATH_SORT_TAG)) {
-
-			//Get the item picked up
-			Player player = (Player) event.getEntity();
-			PlayerInventory inventory = player.getInventory();
-			ItemStack item = event.getItem().getItemStack();
-
-			Map<ItemStack, List<Integer>> itemToSlots = mInventories.get(player.getUniqueId());
-			if (itemToSlots != null) {
-
-				//Check if picked up item is in hashmap from death inventory locations
-				if (itemToSlots.containsKey(item) && itemToSlots.get(item) != null && !itemToSlots.get(item).isEmpty()) {
-					for (int slot : itemToSlots.get(item)) {
-						//For armor equipments, do not place in armor slot if the item has curse of binding
-						if (slot >= 36 && slot <= 39) {
-							if (item.containsEnchantment(Enchantment.BINDING_CURSE)) {
-								List<ItemStack> itemSlots = mItemSlots.get(player.getUniqueId());
-
-								checkForOpenSlot(itemSlots, item, inventory, player, mPlugin, event);
-
-								return;
-							}
-						}
-						//If slot isn't filled, place the item there
-						if (inventory.getItem(slot) == null || inventory.getItem(slot).getType() == Material.AIR) {
-
-							//Set item and remove from array. If array is empty, remove it for this itemstack
-							inventory.setItem(slot, item);
-							itemToSlots.get(item).remove(Integer.valueOf(slot));
-							if (itemToSlots.get(item).isEmpty()) {
-								itemToSlots.remove(item);
-							}
-
-							//Play armor equip sound if it was an armor piece that was auto equipped
-							if (ItemUtils.isArmorItem(item.getType()) && slot >= 36 && slot <= 39) {
-								player.getWorld().playSound(player.getLocation(), ItemUtils.getArmorEquipSound(item.getType()), 0.75f, 1);
-							}
-
-							InventoryUtils.scheduleDelayedEquipmentSlotCheck(mPlugin, player, slot);
-							simulatePickup(event.getItem(), player, mPlugin);
-							event.setCancelled(true);
-
-							//Remove Map after it has been exhausted
-							if (itemToSlots == null || itemToSlots.isEmpty()) {
-								mInventories.remove(player.getUniqueId());
-								mItemSlots.remove(player.getUniqueId());
-								cancelTimers(player.getUniqueId());
-								mTimers30Sec.remove(player.getUniqueId());
-								mTimers15Min.remove(player.getUniqueId());
-							}
-
-							runClearMapDelay(player.getUniqueId());
-
-							return;
-						} else {
-							//Remove from Map if filled, remove List too
-							itemToSlots.get(item).remove(Integer.valueOf(slot));
-							if (itemToSlots.get(item).isEmpty()) {
-								itemToSlots.remove(item);
-							}
-						}
-					}
-
-					runClearMapDelay(player.getUniqueId());
-
-				}
-
-				//Place item in next open spot not filled from before death and current inventory
-				//If neither works, run event as completely normal
-				List<ItemStack> itemSlots = mItemSlots.get(player.getUniqueId());
-
-				checkForOpenSlot(itemSlots, item, inventory, player, mPlugin, event);
-
-				//Remove Map after it has been exhausted, remove List too
-				if (itemToSlots == null || itemToSlots.isEmpty()) {
-					mInventories.remove(player.getUniqueId());
-					mItemSlots.remove(player.getUniqueId());
-					cancelTimers(player.getUniqueId());
-					mTimers30Sec.remove(player.getUniqueId());
-					mTimers15Min.remove(player.getUniqueId());
-				}
-
-			}
-		}
-	}
-
-	//Clears the saving of the players inventory after 30 seconds
-	//30 SECOND VARIANT
-	private void runClearMapDelay(UUID id) {
-		if (!mTimers30Sec.containsKey(id)) {
-			//Delete the HashMap after 30 seconds once the player successfully picks up one item from their death pile
-			BukkitRunnable runnable = new BukkitRunnable() {
-				@Override
-				public void run() {
-					mInventories.remove(id);
-					mItemSlots.remove(id);
-					cancelTimers(id);
-					mTimers30Sec.remove(id);
-					mTimers15Min.remove(id);
-				}
-			};
-			runnable.runTaskLater(mPlugin, 20 * 30); //(20 ticks to one second) * (30 seconds)
-			mTimers30Sec.put(id, runnable);
-		}
-	}
-
-	//Clears the saving of the players inventory after 15 minutes
-	//15 MINUTE VARIANT
-	private void run15MinClearMap(UUID id) {
-		if (!mTimers15Min.containsKey(id)) {
-			//Delete the HashMap after 30 seconds once the player successfully picks up one item from their death pile
-			BukkitRunnable runnable = new BukkitRunnable() {
-				@Override
-				public void run() {
-					mInventories.remove(id);
-					mItemSlots.remove(id);
-					cancelTimers(id);
-					mTimers30Sec.remove(id);
-					mTimers15Min.remove(id);
-				}
-			};
-			runnable.runTaskLater(mPlugin, 20 * 60 * 15); //(20 ticks to one second) * (60 seconds to a minute) * (15 minutes)
-			mTimers15Min.put(id, runnable);
-		}
-	}
-
-	//Cancels the map wipe timers
-	private void cancelTimers(UUID id) {
-		if (mTimers15Min.containsKey(id)) {
-			mTimers15Min.get(id).cancel();
-		}
-		if (mTimers30Sec.containsKey(id)) {
-			mTimers30Sec.get(id).cancel();
-		}
-	}
-
-	//Goes through inventory, top to bottom, left to right
-	//0-8 represents hotbar
-	//Puts it in an unoccupied spot from before death, combines it with a similar one, or doesn't do anything
-	private static void checkForOpenSlot(List<ItemStack> itemSlots, ItemStack item, PlayerInventory inventory, Player player, Plugin plugin, EntityPickupItemEvent event) {
-		//Iterates through inventory
-		for (int i = 0; i < 36; i++) {
-			//Set item at next available spot in both the inventory currently and before death
-			if ((itemSlots.get(i) == null || itemSlots.get(i).getType() == Material.AIR)
-					&& (inventory.getItem(i) == null || inventory.getItem(i).getType() == Material.AIR)) {
-				inventory.setItem(i, event.getItem().getItemStack());
-
-				InventoryUtils.scheduleDelayedEquipmentSlotCheck(plugin, player, i);
-				simulatePickup(event.getItem(), player, plugin);
-				event.setCancelled(true);
-
-				break;
-			//Combine item with the same item if it can be stacked into it (do nothing)
-			} else if (inventory.getItem(i) != null && inventory.getItem(i).getType() != Material.AIR && inventory.getItem(i).getAmount() < inventory.getItem(i).getMaxStackSize() && inventory.getItem(i).isSimilar(item)) {
-				break;
-			//If there was an itemstack before of the same item, set/add it there.
-			} else if (itemSlots.get(i) != null && itemSlots.get(i).getAmount() < itemSlots.get(i).getMaxStackSize() && itemSlots.get(i).isSimilar(item)) {
-				//If slot is empty, place it there, otherwise, do nothing, they will combine normally through the event
-				if (inventory.getItem(i) == null || inventory.getItem(i).getType() == Material.AIR) {
-					inventory.setItem(i, event.getItem().getItemStack());
-				} else {
+					mBeforeDeathItems.put(event.getEntity().getUniqueId(), beforeDeathItems);
+					cancelTimers(event.getEntity().getUniqueId());
+					//Clears the saving of the players inventory after 15 minutes
+					runClearMapDelay(event.getEntity().getUniqueId(), 20 * 60 * 15, mTimers15Min);
 					break;
 				}
-				InventoryUtils.scheduleDelayedEquipmentSlotCheck(plugin, player, i);
-				simulatePickup(event.getItem(), player, plugin);
+			}
+		}
+	}
+
+	@EventHandler(priority = EventPriority.HIGHEST)
+	public void checkItemEvent(EntityPickupItemEvent event) {
+		if (event.isCancelled() || !(event.getEntity() instanceof Player) || !event.getEntity().getScoreboardTags().contains(DEATH_SORT_TAG)) {
+			return; //Cancelled, not a player, or they don't have death sort enabled
+		}
+
+		//Get the item picked up
+		Player player = (Player) event.getEntity();
+		PlayerInventory inventory = player.getInventory();
+		ItemStack item = event.getItem().getItemStack();
+
+		//Get the player's inventory before they died
+		List<ItemStack> beforeDeathItems = mBeforeDeathItems.get(player.getUniqueId());
+		if (beforeDeathItems == null) {
+			return; //No data
+		}
+
+		//Combine item with the same item if it can be stacked into it (do nothing)
+		for (int slot = 0; slot < beforeDeathItems.size(); slot++) {
+			ItemStack invItem = inventory.getItem(slot);
+			if (invItem != null && !invItem.getType().isAir() && invItem.getAmount() < invItem.getMaxStackSize() && invItem.isSimilar(item)) {
+				//Item picked up will stack with one already in inventory - don't need to do anything
+				return;
+			}
+		}
+
+		//Attempt to place this in an empty inventory slot where it previously was
+		for (int slot = 0; slot < beforeDeathItems.size(); slot++) {
+			ItemStack originalItem = beforeDeathItems.get(slot);
+			ItemStack invItem = inventory.getItem(slot);
+			if (originalItem != null && (invItem == null || invItem.getType().isAir()) && originalItem.isSimilar(item)) {
+				//Put the item back in this slot, unless it was an armor slot and the item was curse of binding
+				if (slot < 36 || !item.containsEnchantment(Enchantment.BINDING_CURSE)) {
+					if (ItemUtils.isArmorItem(item.getType()) && slot >= 36 && slot <= 39) {
+						player.getWorld().playSound(player.getLocation(), ItemUtils.getArmorEquipSound(item.getType()), 0.75f, 1);
+					}
+
+					//Simulate item pickup
+					inventory.setItem(slot, event.getItem().getItemStack());
+					InventoryUtils.scheduleDelayedEquipmentSlotCheck(mPlugin, player, slot);
+					simulatePickup(event.getItem(), player, mPlugin);
+					event.setCancelled(true);
+
+					//Delete the inventory slots data after 30 seconds once the player successfully picks up one item from their death pile
+					runClearMapDelay(player.getUniqueId(), 20 * 30, mTimers30Sec);
+
+					return; //Nothing left to do, this item is handled
+				}
+			}
+		}
+
+		//Attempt to place this in an empty inventory slot that was empty before death
+		for (int slot = 0; slot < 36; slot++) {
+			ItemStack originalItem = beforeDeathItems.get(slot);
+			ItemStack invItem = inventory.getItem(slot);
+			if ((originalItem == null || originalItem.getType().isAir()) && (invItem == null || invItem.getType().isAir())) {
+				//Found an empty slot that was empty before death
+
+				//Simulate item pickup
+				inventory.setItem(slot, event.getItem().getItemStack());
+				InventoryUtils.scheduleDelayedEquipmentSlotCheck(mPlugin, player, slot);
+				simulatePickup(event.getItem(), player, mPlugin);
 				event.setCancelled(true);
 
-				break;
+				return; //Nothing left to do, this item is handled
 			}
+		}
+
+		//Failed to put it on an existing stack, or where it was before, or in an empty slot before death.
+		//Just let normal item pickup do its thing
+	}
+
+	//Clears the saving of the players inventory after some delay
+	private void runClearMapDelay(UUID id, int delay, Map<UUID, BukkitRunnable> trackingMap) {
+		if (!trackingMap.containsKey(id)) {
+			BukkitRunnable runnable = new BukkitRunnable() {
+				@Override
+				public void run() {
+					mBeforeDeathItems.remove(id);
+					cancelTimers(id);
+				}
+			};
+			runnable.runTaskLater(mPlugin, delay);
+			trackingMap.put(id, runnable);
+		}
+	}
+
+	//Cancels and removes the map wipe timers
+	private void cancelTimers(UUID id) {
+		BukkitRunnable timer = mTimers15Min.remove(id);
+		if (timer != null) {
+			timer.cancel();
+		}
+		timer = mTimers30Sec.remove(id);
+		if (timer != null) {
+			timer.cancel();
 		}
 	}
 
@@ -284,8 +179,8 @@ public class DeathItemListener implements Listener {
 	private static void simulatePickup(Item item, Player player, Plugin plugin) {
 
 		NBTEntity nbte = new NBTEntity(item);
-		nbte.setShort("PickupDelay", new Short((short)32767)); //Makes item unpickupable
-		nbte.setShort("Age", new Short((short)5990)); //Makes item despawn soon if this code misses removing it somehow
+		nbte.setShort("PickupDelay", Short.valueOf((short)32767)); //Makes item unpickupable
+		nbte.setShort("Age", Short.valueOf((short)5990)); //Makes item despawn soon if this code misses removing it somehow
 
 		//Deletes item after 2 ticks
 		new BukkitRunnable() {
