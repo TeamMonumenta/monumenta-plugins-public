@@ -37,7 +37,8 @@ public class AttributeThornsDamage implements BaseAttribute {
 		}
 		//Only deal damage if damager is alive and damage is not from an ability.
 		//Damage will be 0.0 if used in the wrong slot, but attribute will still be called. Cancel the damage effect if this is the case as well.
-		if ((damager instanceof LivingEntity) && (value != 0.0) && (event.getCause() != DamageCause.CUSTOM)) {
+		//getFinalDamage check is to prevent thorns from triggering on blocked attack
+		if ((damager instanceof LivingEntity) && (value != 0.0) && (event.getCause() != DamageCause.CUSTOM) && (event.getFinalDamage() != 0)) {
 			((LivingEntity) damager).damage(value);
 		}
 	}
