@@ -266,6 +266,24 @@ public class ItemOverrides {
 		mItems.put(Material.POTTED_FERN, flowerOverride);
 		mItems.put(Material.POTTED_DEAD_BUSH, flowerOverride);
 		mItems.put(Material.POTTED_CACTUS, flowerOverride);
+
+		BaseOverride firmamentOverride = new FirmamentOverride();
+		mItems.put(Material.WHITE_SHULKER_BOX, firmamentOverride);
+		mItems.put(Material.ORANGE_SHULKER_BOX, firmamentOverride);
+		mItems.put(Material.MAGENTA_SHULKER_BOX, firmamentOverride);
+		mItems.put(Material.LIGHT_BLUE_SHULKER_BOX, firmamentOverride);
+		mItems.put(Material.YELLOW_SHULKER_BOX, firmamentOverride);
+		mItems.put(Material.LIME_SHULKER_BOX, firmamentOverride);
+		mItems.put(Material.PINK_SHULKER_BOX, firmamentOverride);
+		mItems.put(Material.GRAY_SHULKER_BOX, firmamentOverride);
+		mItems.put(Material.LIGHT_GRAY_SHULKER_BOX, firmamentOverride);
+		mItems.put(Material.CYAN_SHULKER_BOX, firmamentOverride);
+		mItems.put(Material.PURPLE_SHULKER_BOX, firmamentOverride);
+		mItems.put(Material.BLUE_SHULKER_BOX, firmamentOverride);
+		mItems.put(Material.BROWN_SHULKER_BOX, firmamentOverride);
+		mItems.put(Material.GREEN_SHULKER_BOX, firmamentOverride);
+		mItems.put(Material.RED_SHULKER_BOX, firmamentOverride);
+		mItems.put(Material.BLACK_SHULKER_BOX, firmamentOverride);
 	}
 
 	public boolean rightClickInteraction(Plugin plugin, Player player, Action action, ItemStack item, Block block, PlayerInteractEvent event) {
