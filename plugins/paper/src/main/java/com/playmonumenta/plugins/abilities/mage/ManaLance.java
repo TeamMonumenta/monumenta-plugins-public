@@ -55,7 +55,7 @@ public class ManaLance extends Ability {
 		mInfo.mScoreboardId = "ManaLance";
 		mInfo.mShorthandName = "ML";
 		mInfo.mDescriptions.add("Right clicking with a wand fires forth a piercing beam of Mana going 8 blocks, dealing 8 damage to enemies in the path of the beam. This beam will not go through solid blocks. Cooldown: 5s.");
-		mInfo.mDescriptions.add("The beam instead deals 10 damage. Cooldown: 10s.");
+		mInfo.mDescriptions.add("The beam instead deals 10 damage. Cooldown: 3s.");
 		mInfo.mCooldown = getAbilityScore() == 1 ? COOLDOWN_1 : COOLDOWN_2;
 		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
 	}
