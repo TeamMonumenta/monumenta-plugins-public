@@ -8,17 +8,13 @@ import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Silverfish;
 
-import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
 
 public class SilverfishTracking implements EntityTracking {
-	Plugin mPlugin = null;
 	private Set<Silverfish> mEntities = new HashSet<Silverfish>();
-
-	SilverfishTracking(Plugin plugin) {
-		mPlugin = plugin;
-	}
+	private int mTicks = 0;
 
 	@Override
 	public void addEntity(Entity entity) {
@@ -39,6 +35,15 @@ public class SilverfishTracking implements EntityTracking {
 				if (ZoneUtils.hasZoneProperty(silverfish, ZoneProperty.ADVENTURE_MODE)) {
 					silverfish.remove();
 					silverfishIter.remove();
+				} else {
+					// Very infrequently check if the silverfish is still actually there
+					mTicks++;
+					if (mTicks > 306) {
+						mTicks = 0;
+						if (!EntityUtils.isStillLoaded(silverfish)) {
+							silverfishIter.remove();
+						}
+					}
 				}
 			} else {
 				silverfishIter.remove();

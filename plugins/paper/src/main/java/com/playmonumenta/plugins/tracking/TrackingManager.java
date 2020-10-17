@@ -47,9 +47,9 @@ public class TrackingManager {
 
 		mPlayers = new PlayerTracking(mPlugin);
 		mCreepers = new CreeperTracking();
-		mBoats = new BoatTracking(mPlugin);
-		mMinecarts = new MinecartTracking(mPlugin);
-		mSilverfish = new SilverfishTracking(mPlugin);
+		mBoats = new BoatTracking();
+		mMinecarts = new MinecartTracking();
+		mSilverfish = new SilverfishTracking();
 		mFishingHook = new FishingHookTracking();
 
 		List<Entity> entities = world.getEntities();

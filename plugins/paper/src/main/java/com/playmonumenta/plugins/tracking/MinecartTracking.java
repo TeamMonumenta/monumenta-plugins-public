@@ -14,16 +14,12 @@ import org.bukkit.entity.minecart.PoweredMinecart;
 import org.bukkit.entity.minecart.StorageMinecart;
 import org.bukkit.inventory.ItemStack;
 
-import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 
 public class MinecartTracking implements EntityTracking {
-	Plugin mPlugin = null;
 	private Set<Minecart> mEntities = new HashSet<Minecart>();
-
-	MinecartTracking(Plugin plugin) {
-		mPlugin = plugin;
-	}
+	private int mTicks = 0;
 
 	@Override
 	public void addEntity(Entity entity) {
@@ -55,6 +51,15 @@ public class MinecartTracking implements EntityTracking {
 					}
 					minecartIter.remove();
 					minecart.remove();
+				} else {
+					// Very infrequently check if the minecart is still actually there
+					mTicks++;
+					if (mTicks > 306) {
+						mTicks = 0;
+						if (!EntityUtils.isStillLoaded(minecart)) {
+							minecartIter.remove();
+						}
+					}
 				}
 			} else {
 				minecartIter.remove();

@@ -11,16 +11,12 @@ import org.bukkit.entity.Boat;
 import org.bukkit.entity.Entity;
 import org.bukkit.inventory.ItemStack;
 
-import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 
 public class BoatTracking implements EntityTracking {
-	Plugin mPlugin = null;
 	private Set<Boat> mEntities = new HashSet<Boat>();
-
-	BoatTracking(Plugin plugin) {
-		mPlugin = plugin;
-	}
+	private int mTicks = 0;
 
 	@Override
 	public void addEntity(Entity entity) {
@@ -63,6 +59,15 @@ public class BoatTracking implements EntityTracking {
 					}
 					boatIter.remove();
 					boat.remove();
+				} else {
+					// Very infrequently check if the boat is still actually there
+					mTicks++;
+					if (mTicks > 306) {
+						mTicks = 0;
+						if (!EntityUtils.isStillLoaded(boat)) {
+							boatIter.remove();
+						}
+					}
 				}
 			} else {
 				boatIter.remove();
