@@ -110,7 +110,9 @@ public class SpellSinisterReach extends Spell {
 					if (mT >= 30) {
 						this.cancel();
 						mBoss.setAI(true);
-						horse.setAI(true);
+						if (horse != null) {
+							horse.setAI(true);
+						}
 						world.playSound(mBoss.getLocation(), Sound.ENTITY_BLAZE_SHOOT, 3, 0.9f);
 						world.playSound(mBoss.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 3, 0.75f);
 						world.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_BREAK_BLOCK, 3, 0.75f);
@@ -172,7 +174,9 @@ public class SpellSinisterReach extends Spell {
 				if (mInc >= 36) {
 					p.setNoDamageTicks(mNDT);
 					mBoss.setAI(true);
-					horse.setAI(true);
+					if (horse != null) {
+						horse.setAI(true);
+					}
 					this.cancel();
 				}
 			}

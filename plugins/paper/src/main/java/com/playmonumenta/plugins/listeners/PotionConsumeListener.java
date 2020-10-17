@@ -154,7 +154,8 @@ public class PotionConsumeListener implements Listener {
 							Inventory inv = event.getClickedInventory();
 							int slot = event.getSlot();
 							ItemStack potion = mPotionsConsumed.get(player.getUniqueId());
-							if (inv.getItem(slot).getType() == Material.AIR || inv.getItem(slot).getType() == Material.GLASS_BOTTLE) {
+							ItemStack invItem = inv.getItem(slot);
+							if (invItem == null || invItem.getType().isAir() || invItem.getType().equals(Material.GLASS_BOTTLE)) {
 								inv.setItem(slot, potion);
 							} else {
 								inv.addItem(potion);

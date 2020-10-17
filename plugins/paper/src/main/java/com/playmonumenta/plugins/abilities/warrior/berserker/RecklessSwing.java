@@ -66,7 +66,7 @@ public class RecklessSwing extends Ability {
 			if (mPlayer.getHealth() <= SELF_DAMAGE) {
 				mPlayer.damage(9001);
 			} else {
-				mPlayer.setHealth(mPlayer.getHealth() - SELF_DAMAGE);
+				mPlayer.setHealth(Math.min(mPlayer.getHealth() - SELF_DAMAGE, mPlayer.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue()));
 				mPlayer.damage(0);
 			}
 
