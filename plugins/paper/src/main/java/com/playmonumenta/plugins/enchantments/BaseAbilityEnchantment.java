@@ -46,7 +46,6 @@ public abstract class BaseAbilityEnchantment implements BaseEnchantment {
 				if (lore != null && !lore.isEmpty()) {
 					for (String loreEntry : lore) {
 						if (loreEntry.contains(mPropertyName)) {
-							Plugin.getInstance().getLogger().info("Lore Entry: " + loreEntry);
 							return parseValue(loreEntry);
 						}
 					}
@@ -70,7 +69,6 @@ public abstract class BaseAbilityEnchantment implements BaseEnchantment {
 			if (!add) {
 				sint = sint * -1;
 			}
-			Plugin.getInstance().getLogger().info("Parsed Value: " + sint);
 			s.close();
 			return sint;
 		}
