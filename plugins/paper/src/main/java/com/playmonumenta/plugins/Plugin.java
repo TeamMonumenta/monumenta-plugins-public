@@ -85,7 +85,6 @@ import com.playmonumenta.plugins.potion.PotionManager;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.server.reset.DailyReset;
 import com.playmonumenta.plugins.spawnzone.SpawnZoneManager;
-import com.playmonumenta.plugins.timers.CombatLoggingTimers;
 import com.playmonumenta.plugins.timers.CooldownTimers;
 import com.playmonumenta.plugins.timers.ProjectileEffectTimers;
 import com.playmonumenta.plugins.tracking.TrackingManager;
@@ -94,7 +93,6 @@ import com.playmonumenta.plugins.utils.MetadataUtils;
 public class Plugin extends JavaPlugin {
 	public CooldownTimers mTimers = null;
 	public ProjectileEffectTimers mProjectileEffectTimers = null;
-	public CombatLoggingTimers mCombatLoggingTimers = null;
 	int mPeriodicTimer = -1;
 
 	public EnchantmentManager mEnchantmentManager;
@@ -206,7 +204,6 @@ public class Plugin extends JavaPlugin {
 
 		//  Initialize Variables.
 		mTimers = new CooldownTimers(this);
-		mCombatLoggingTimers = new CombatLoggingTimers();
 
 		mWorld = Bukkit.getWorlds().get(0);
 		mProjectileEffectTimers = new ProjectileEffectTimers(this, mWorld);
@@ -298,12 +295,6 @@ public class Plugin extends JavaPlugin {
 				if (fourHertz) {
 					try {
 						mTrackingManager.update(mWorld, Constants.QUARTER_TICKS_PER_SECOND);
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
-
-					try {
-						mCombatLoggingTimers.update(mWorld, Constants.QUARTER_TICKS_PER_SECOND);
 					} catch (Exception e) {
 						e.printStackTrace();
 					}

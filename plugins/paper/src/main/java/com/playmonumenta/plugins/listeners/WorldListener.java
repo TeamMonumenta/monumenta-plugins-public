@@ -49,20 +49,6 @@ public class WorldListener implements Listener {
 
 		for (Entity entity : entities) {
 			mPlugin.mTrackingManager.addEntity(entity);
-
-			if (entity instanceof Monster) {
-				Monster mob = (Monster)entity;
-
-				int timer = mPlugin.mCombatLoggingTimers.getTimer(entity.getUniqueId());
-				if (timer >= 0) {
-					Set<String> tags = mob.getScoreboardTags();
-					if (!tags.contains("Elite") && !tags.contains("Boss")) {
-						mob.setRemoveWhenFarAway(false);
-					}
-
-					mPlugin.mCombatLoggingTimers.removeTimer(entity.getUniqueId());
-				}
-			}
 		}
 	}
 
