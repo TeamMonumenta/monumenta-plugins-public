@@ -25,6 +25,7 @@ import org.bukkit.inventory.meta.BlockStateMeta;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.enchantments.CurseOfEphemerality;
+import com.playmonumenta.plugins.overrides.FirmamentOverride;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 
@@ -143,7 +144,7 @@ public class ShulkerEquipmentListener implements Listener {
 		/* Prevent swapping/nesting shulkers */
 		for (Map.Entry<Integer, Integer> slot : SWAP_SLOTS.entrySet()) {
 			ItemStack item = pInv.getItem(slot.getKey());
-			if (item != null && ItemUtils.isShulkerBox(item.getType())) {
+			if (item != null && ItemUtils.isShulkerBox(item.getType()) && !FirmamentOverride.isFirmamentItem(item)) {
 				player.sendMessage(ChatColor.RED + "You can not store shulker boxes");
 				player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1.0f, 1.1f);
 				return;

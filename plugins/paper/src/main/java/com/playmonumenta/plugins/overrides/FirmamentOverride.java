@@ -136,7 +136,7 @@ public class FirmamentOverride extends BaseOverride {
 		return true;
 	}
 
-	private boolean isFirmamentItem(ItemStack item) {
+	public static boolean isFirmamentItem(ItemStack item) {
 		return item != null &&
 		       item.getType() != null &&
 		       InventoryUtils.testForItemWithName(item, ITEM_NAME) &&
