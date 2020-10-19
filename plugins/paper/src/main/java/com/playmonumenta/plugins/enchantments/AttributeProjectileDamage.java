@@ -1,6 +1,6 @@
 package com.playmonumenta.plugins.enchantments;
 
-import org.bukkit.entity.Arrow;
+import org.bukkit.entity.AbstractArrow;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
@@ -42,7 +42,7 @@ public class AttributeProjectileDamage implements BaseAttribute {
 		if (proj.hasMetadata(DAMAGE_METAKEY)) {
 			double damage = proj.getMetadata(DAMAGE_METAKEY).get(0).asDouble();
 			// Only scale damage if not fully charged arrow and if it is an arrow being launched
-			if (proj instanceof Arrow && !((Arrow) proj).isCritical()) {
+			if (proj instanceof AbstractArrow && !(proj instanceof Trident) && !((AbstractArrow) proj).isCritical()) {
 				// Arrow speed will be different if arrow speed attribute is active, so scale properly
 				damage *= Math.min(1, proj.getVelocity().length() / ARROW_VELOCITY_SCALE / AttributeProjectileSpeed.getProjectileSpeedModifier(proj));
 			}
