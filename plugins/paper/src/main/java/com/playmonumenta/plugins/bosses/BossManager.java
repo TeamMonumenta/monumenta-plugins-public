@@ -106,6 +106,7 @@ import com.playmonumenta.plugins.bosses.bosses.LivingBladeBoss;
 import com.playmonumenta.plugins.bosses.bosses.MagicArrowBoss;
 import com.playmonumenta.plugins.bosses.bosses.Masked;
 import com.playmonumenta.plugins.bosses.bosses.MeteorSlamBoss;
+import com.playmonumenta.plugins.bosses.bosses.MimicQueen;
 import com.playmonumenta.plugins.bosses.bosses.NoExperienceBoss;
 import com.playmonumenta.plugins.bosses.bosses.OldLabsBoss;
 import com.playmonumenta.plugins.bosses.bosses.Orangyboi;
@@ -263,6 +264,7 @@ public class BossManager implements Listener {
 		mStatelessBosses.put(MagicArrowBoss.identityTag, (Plugin p, LivingEntity e) -> new MagicArrowBoss(p, e));
 		mStatelessBosses.put(SeekingProjectileBoss.identityTag, (Plugin p, LivingEntity e) -> new SeekingProjectileBoss(p, e));
 		mStatelessBosses.put(TrackingProjectileBoss.identityTag, (Plugin p, LivingEntity e) -> new TrackingProjectileBoss(p, e));
+		mStatelessBosses.put(MimicQueen.identityTag, (Plugin p, LivingEntity e) -> new MimicQueen(p, e));
 		mStatelessBosses.put(WrathBoss.identityTag, (Plugin p, LivingEntity e) -> new WrathBoss(p, e));
 		mStatelessBosses.put(PrideBoss.identityTag, (Plugin p, LivingEntity e) -> new PrideBoss(p, e));
 		mStatelessBosses.put(LeapBoss.identityTag, (Plugin p, LivingEntity e) -> new LeapBoss(p, e));
@@ -385,6 +387,7 @@ public class BossManager implements Listener {
 		mBossDeserializers.put(MagicArrowBoss.identityTag, (Plugin p, LivingEntity e) -> MagicArrowBoss.deserialize(p, e));
 		mBossDeserializers.put(SeekingProjectileBoss.identityTag, (Plugin p, LivingEntity e) -> SeekingProjectileBoss.deserialize(p, e));
 		mBossDeserializers.put(TrackingProjectileBoss.identityTag, (Plugin p, LivingEntity e) -> TrackingProjectileBoss.deserialize(p, e));
+		mBossDeserializers.put(MimicQueen.identityTag, (Plugin p, LivingEntity e) -> MimicQueen.deserialize(p, e));
 		mBossDeserializers.put(WrathBoss.identityTag, (Plugin p, LivingEntity e) -> WrathBoss.deserialize(p, e));
 		mBossDeserializers.put(PrideBoss.identityTag, (Plugin p, LivingEntity e) -> PrideBoss.deserialize(p, e));
 		mBossDeserializers.put(LeapBoss.identityTag, (Plugin p, LivingEntity e) -> LeapBoss.deserialize(p, e));
