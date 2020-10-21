@@ -21,15 +21,13 @@ import com.playmonumenta.plugins.utils.PotionUtils;
 
 public class Smokescreen extends Ability {
 
-	private static final int SMOKESCREEN_RANGE = 7;
+	private static final int SMOKESCREEN_RANGE = 6;
 	private static final int SMOKESCREEN_DURATION = 8 * 20;
-	private static final int SMOKESCREEN_1_SLOWNESS_AMPLIFIER = 1;
-	private static final int SMOKESCREEN_2_SLOWNESS_AMPLIFIER = 2;
+	private static final int SMOKESCREEN_SLOWNESS_AMPLIFIER = 1;
 	private static final int SMOKESCREEN_1_WEAKNESS_AMPLIFIER = 0;
 	private static final int SMOKESCREEN_2_WEAKNESS_AMPLIFIER = 1;
 	private static final int SMOKESCREEN_COOLDOWN = 20 * 20;
 
-	private final int mSlownessAmplifier;
 	private final int mWeaknessAmplifier;
 
 	public Smokescreen(Plugin plugin, Player player) {
@@ -41,7 +39,6 @@ public class Smokescreen extends Ability {
 		mInfo.mDescriptions.add("The Weakness debuff is increased to level II.");
 		mInfo.mCooldown = SMOKESCREEN_COOLDOWN;
 		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
-		mSlownessAmplifier = getAbilityScore() == 1 ? SMOKESCREEN_1_SLOWNESS_AMPLIFIER : SMOKESCREEN_2_SLOWNESS_AMPLIFIER;
 		mWeaknessAmplifier = getAbilityScore() == 1 ? SMOKESCREEN_1_WEAKNESS_AMPLIFIER : SMOKESCREEN_2_WEAKNESS_AMPLIFIER;
 	}
 
@@ -49,11 +46,11 @@ public class Smokescreen extends Ability {
 	public void cast(Action action) {
 		Location loc = mPlayer.getLocation();
 		World world = mPlayer.getWorld();
-		world.spawnParticle(Particle.SMOKE_LARGE, loc.clone().add(0, 1, 0), 300, 2.5, 0.8, 2.5, 0.05);
-		world.spawnParticle(Particle.SMOKE_NORMAL, loc, 600, 2.5, 0.2, 2.5, 0.1);
+		world.spawnParticle(Particle.SMOKE_LARGE, loc.clone().add(0, 1, 0), 750, 4.5, 0.8, 4.5, 0.05);
+		world.spawnParticle(Particle.SMOKE_NORMAL, loc, 1500, 4.5, 0.2, 4.5, 0.1);
 		world.playSound(loc, Sound.ENTITY_BLAZE_SHOOT, 1.0f, 0.35f);
-		for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), SMOKESCREEN_RANGE, mPlayer)) {
-			PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(PotionEffectType.SLOW, SMOKESCREEN_DURATION, mSlownessAmplifier, false, true));
+		for (LivingEntity mob : EntityUtils.getNearbyMobs(loc, SMOKESCREEN_RANGE, mPlayer)) {
+			PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(PotionEffectType.SLOW, SMOKESCREEN_DURATION, SMOKESCREEN_SLOWNESS_AMPLIFIER, false, true));
 			PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(PotionEffectType.WEAKNESS, SMOKESCREEN_DURATION, mWeaknessAmplifier, false, true));
 		}
 		putOnCooldown();

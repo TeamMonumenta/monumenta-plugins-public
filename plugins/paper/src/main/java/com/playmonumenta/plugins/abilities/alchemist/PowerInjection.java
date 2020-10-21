@@ -56,8 +56,8 @@ public class PowerInjection extends Ability {
 		mInfo.mLinkedSpell = Spells.POWER_INJECTION;
 		mInfo.mScoreboardId = "PowerInjection";
 		mInfo.mShorthandName = "PI";
-		mInfo.mDescriptions.add("Left-clicking while holding an Alchemist Potion gives you +15% speed, and +1 and +15% melee damage for 15 seconds. If you were looking at another player, also give that player the effects. Cooldown: 30s.");
-		mInfo.mDescriptions.add("Give +3 and +30% melee damage instead.");
+		mInfo.mDescriptions.add("Left-clicking while holding an Alchemist Potion gives you +15% speed, +1 melee damage, and +15% melee damage for 15 seconds. If you were looking at another player, also give that player the effects. Cooldown: 30s.");
+		mInfo.mDescriptions.add("Give +3 melee damage and +30% melee damage instead.");
 		mInfo.mCooldown = COOLDOWN;
 		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;
 		mFlatDamageDealtEffect = getAbilityScore() == 1 ? FLAT_DAMAGE_DEALT_EFFECT_1 : FLAT_DAMAGE_DEALT_EFFECT_2;

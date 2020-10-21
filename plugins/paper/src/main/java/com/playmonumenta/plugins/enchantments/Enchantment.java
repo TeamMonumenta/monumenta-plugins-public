@@ -7,7 +7,6 @@ import org.bukkit.ChatColor;
 import com.playmonumenta.plugins.enchantments.evasions.AbilityEvasion;
 import com.playmonumenta.plugins.enchantments.evasions.Evasion;
 import com.playmonumenta.plugins.enchantments.evasions.MeleeEvasion;
-import com.playmonumenta.plugins.enchantments.evasions.SecondWind;
 import com.playmonumenta.plugins.enchantments.infusions.Acumen;
 import com.playmonumenta.plugins.enchantments.infusions.Focus;
 import com.playmonumenta.plugins.enchantments.infusions.Perspicacity;
@@ -87,7 +86,6 @@ public enum Enchantment {
 	EVASION(new Evasion()),
 	MELEE_EVASION(new MeleeEvasion()),
 	ABILITY_EVASION(new AbilityEvasion()),
-	SECOND_WIND(new SecondWind()),
 	RESURRECTION(new Resurrection()),
 	VOID_TETHER(new VoidTether()),
 	ASHES_OF_ETERNITY(new AshesOfEternity()),
@@ -212,7 +210,6 @@ public enum Enchantment {
 			case TWO_HANDED:
 			case DIVINE_AURA:
 			case RESURRECTION:
-			case SECOND_WIND:
 			case VOID_TETHER:
 			case AQUA_AFFINITY:
 			case CURSE_BINDING:
