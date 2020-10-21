@@ -9,6 +9,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
@@ -67,14 +68,14 @@ public class AzacorNormal extends BossAbilityGroup {
 			new SpellFireball(plugin, boss, detectionRange, 40, 1, 100, 2.0f, true, false,
 			                  // Launch effect
 			                  (Location loc) -> {
-			                      loc.getWorld().playSound(loc, Sound.ENTITY_GHAST_SHOOT, 1.0f, 1.0f);
+			                      loc.getWorld().playSound(loc, Sound.ENTITY_GHAST_SHOOT, SoundCategory.HOSTILE, 1.0f, 1.0f);
 			                      loc.getWorld().spawnParticle(Particle.VILLAGER_ANGRY, loc, 10, 0.4, 0.4, 0.4, 0);
 			                  }),
 			new SpellBaseLaser(plugin, boss, detectionRange, 100, false, false, 160,
 			                   // Tick action per player
 			                   (Player player, int ticks, boolean blocked) -> {
-			                       player.playSound(player.getLocation(), Sound.UI_TOAST_IN, 2, 0.5f + (ticks / 80f) * 1.5f);
-			                       boss.getLocation().getWorld().playSound(boss.getLocation(), Sound.UI_TOAST_IN, 2, 0.5f + (ticks / 80f) * 1.5f);
+			                       player.playSound(player.getLocation(), Sound.UI_TOAST_IN, SoundCategory.HOSTILE, 0.75f, 0.5f + (ticks / 80f) * 1.5f);
+			                       boss.getLocation().getWorld().playSound(boss.getLocation(), Sound.UI_TOAST_IN, SoundCategory.HOSTILE, 1.0f, 0.5f + (ticks / 80f) * 1.5f);
 			                       if (ticks == 0) {
 			                           boss.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 110, 4));
 			                       }
@@ -86,7 +87,7 @@ public class AzacorNormal extends BossAbilityGroup {
 			                   },
 			                   // Damage generated at the end of the attack
 			                   (Player player, Location loc, boolean blocked) -> {
-			                       loc.getWorld().playSound(loc, Sound.ENTITY_DRAGON_FIREBALL_EXPLODE, 1f, 1.5f);
+			                       loc.getWorld().playSound(loc, Sound.ENTITY_DRAGON_FIREBALL_EXPLODE, SoundCategory.HOSTILE, 1f, 1.5f);
 			                       loc.getWorld().spawnParticle(Particle.EXPLOSION_LARGE, loc, 30, 0, 0, 0, 0.3);
 
 			                       if (!blocked) {
