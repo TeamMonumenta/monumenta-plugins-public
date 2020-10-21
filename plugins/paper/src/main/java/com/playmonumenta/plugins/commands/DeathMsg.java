@@ -19,6 +19,7 @@ import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
 
 public class DeathMsg {
 	private static final String COMMAND = "deathmsg";
+
 	public static void register() {
 		final CommandPermission perms = CommandPermission.fromString("monumenta.command.deathmsg");
 

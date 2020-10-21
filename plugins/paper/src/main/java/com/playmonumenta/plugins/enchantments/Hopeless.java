@@ -7,7 +7,6 @@ import java.util.Set;
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.Particle;
-import org.bukkit.World;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;

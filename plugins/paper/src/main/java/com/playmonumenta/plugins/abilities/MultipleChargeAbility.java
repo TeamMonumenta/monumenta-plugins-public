@@ -1,6 +1,5 @@
 package com.playmonumenta.plugins.abilities;
 
-import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 

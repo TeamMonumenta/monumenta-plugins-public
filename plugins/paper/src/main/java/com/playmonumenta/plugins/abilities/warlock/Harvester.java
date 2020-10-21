@@ -1,7 +1,6 @@
 package com.playmonumenta.plugins.abilities.warlock;
 
 import org.bukkit.Particle;
-import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDeathEvent;

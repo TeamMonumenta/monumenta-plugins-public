@@ -1,6 +1,5 @@
 package com.playmonumenta.plugins.abilities.cleric;
 
-import org.bukkit.World;
 import org.bukkit.entity.AbstractArrow;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.ThrownPotion;

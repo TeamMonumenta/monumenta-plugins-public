@@ -1,6 +1,5 @@
 package com.playmonumenta.plugins.abilities.scout;
 
-import org.bukkit.World;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;

@@ -29,7 +29,6 @@ import com.playmonumenta.plugins.abilities.delves.twisted.Dreadful;
 import com.playmonumenta.plugins.abilities.delves.twisted.Merciless;
 import com.playmonumenta.plugins.abilities.delves.twisted.Relentless;
 import com.playmonumenta.plugins.utils.MessagingUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 
 public class DelvesListener implements Listener {

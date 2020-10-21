@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
-import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.PluginManager;

@@ -17,7 +17,7 @@ public class SpellPushPlayersAway extends Spell {
 	private int mMaxNearTime;
 
 	/* Tracks how long players have been too close */
-	Map<UUID, Integer> playerNearTime = new HashMap<UUID, Integer>();
+	Map<UUID, Integer> mPlayerNearTimes = new HashMap<UUID, Integer>();
 
 	/* Push players away that have been too close for too long */
 	public SpellPushPlayersAway(Entity launcher, int radius, int maxNearTime) {
@@ -32,7 +32,7 @@ public class SpellPushPlayersAway extends Spell {
 			Integer nearTime = 0;
 			Location pLoc = player.getLocation();
 			if (pLoc.distance(mLauncher.getLocation()) < mRadius) {
-				nearTime = playerNearTime.get(player.getUniqueId());
+				nearTime = mPlayerNearTimes.get(player.getUniqueId());
 				if (nearTime == null) {
 					nearTime = 0;
 				}
@@ -44,7 +44,7 @@ public class SpellPushPlayersAway extends Spell {
 					player.setVelocity(vect);
 				}
 			}
-			playerNearTime.put(player.getUniqueId(), nearTime);
+			mPlayerNearTimes.put(player.getUniqueId(), nearTime);
 		}
 	}
 

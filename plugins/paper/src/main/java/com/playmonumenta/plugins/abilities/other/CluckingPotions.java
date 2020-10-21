@@ -6,7 +6,6 @@ import java.util.List;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Particle;
-import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.ThrownPotion;

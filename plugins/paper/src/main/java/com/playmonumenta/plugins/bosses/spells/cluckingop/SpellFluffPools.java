@@ -52,27 +52,27 @@ public class SpellFluffPools extends Spell {
 		World world = loc.getWorld();
 		world.playSound(loc, Sound.BLOCK_FIRE_EXTINGUISH, 1, 0.5f);
 		new BukkitRunnable() {
-			int t = 0;
+			int mTicks = 0;
 			@Override
 			public void run() {
-				t++;
+				mTicks++;
 				world.spawnParticle(Particle.CLOUD, loc, 1, 1, 0.1, 1, 0.1);
 
-				if (t >= 20) {
+				if (mTicks >= 20) {
 					this.cancel();
 					world.spawnParticle(Particle.CLOUD, loc, 250, 0, 0, 0, 0.3);
 					world.playSound(loc, Sound.ITEM_TOTEM_USE, 1, 1f);
 					new BukkitRunnable() {
-						int i = 0;
+						int mInnerTicks = 0;
 						@Override
 						public void run() {
-							i += 2;
+							mInnerTicks += 2;
 							for (Player player : PlayerUtils.playersInRange(loc, 3)) {
 								BossUtils.bossDamage(mBoss, player, 1);
 								player.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, 20 * 5, -6));
 							}
 							world.spawnParticle(Particle.CLOUD, loc, 35, 3, 0.1, 3, 0.1);
-							if (i >= 20 * 8) {
+							if (mInnerTicks >= 20 * 8) {
 								this.cancel();
 							}
 						}

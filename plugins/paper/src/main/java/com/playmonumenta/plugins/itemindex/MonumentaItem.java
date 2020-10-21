@@ -75,6 +75,7 @@ public class MonumentaItem {
 	public MonumentaItem() {
 	}
 
+	@SuppressWarnings("unchecked")
 	public MonumentaItem clone() {
 		MonumentaItem out = new MonumentaItem();
 		out.mName = this.mName;

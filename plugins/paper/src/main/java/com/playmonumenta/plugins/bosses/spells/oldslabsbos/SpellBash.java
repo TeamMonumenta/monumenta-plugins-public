@@ -59,12 +59,12 @@ public class SpellBash extends Spell {
 					mWorld.spawnParticle(Particle.CLOUD, mBoss.getLocation(), 25, 0.1, 0.1, 0.1, 0.25);
 					mWorld.spawnParticle(Particle.EXPLOSION_NORMAL, mBoss.getLocation(), 15, 0.1, 0.1, 0.1, 0.2);
 					new BukkitRunnable() {
-						double d = 30;
+						double mDegrees = 30;
 						@Override
 						public void run() {
 							Vector vec;
 							for (double r = 1; r < 5; r += 0.5) {
-								for (double degree = d; degree <= d + 60; degree += 8) {
+								for (double degree = mDegrees; degree <= mDegrees + 60; degree += 8) {
 									double radian1 = Math.toRadians(degree);
 									vec = new Vector(FastUtils.cos(radian1) * r, 0.75, FastUtils.sin(radian1) * r);
 									vec = VectorUtils.rotateZAxis(vec, 20);
@@ -76,8 +76,8 @@ public class SpellBash extends Spell {
 									mWorld.spawnParticle(Particle.CRIT_MAGIC, l, 1, 0.1, 0.1, 0.1, 0.025);
 								}
 							}
-							d += 60;
-							if (d >= 150) {
+							mDegrees += 60;
+							if (mDegrees >= 150) {
 								this.cancel();
 							}
 						}
@@ -99,7 +99,6 @@ public class SpellBash extends Spell {
 
 	@Override
 	public int duration() {
-		// TODO Auto-generated method stub
 		return 20 * 5;
 	}
 

@@ -61,7 +61,8 @@ public class CleansingRain extends Ability {
 	public void cast(Action action) {
 		int cd = getAbilityScore() == 1 ? CLEANSING_1_COOLDOWN : CLEANSING_2_COOLDOWN;
 		mInfo.mCooldown = (int) CleansingRainCooldownEnchantment.getCooldown(mPlayer, cd, CleansingRainCooldownEnchantment.class);
-		mPlayer.getWorld().playSound(mPlayer.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1.45f, 0.8f);
+		World world = mPlayer.getWorld();
+		world.playSound(mPlayer.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1.45f, 0.8f);
 		putOnCooldown();
 
 		int cleansing = getAbilityScore();
@@ -71,9 +72,9 @@ public class CleansingRain extends Ability {
 			int mTicks = 0;
 			@Override
 			public void run() {
-				mPlayer.getWorld().spawnParticle(Particle.CLOUD, mPlayer.getLocation().add(0, 4, 0), 5, 2.5, 0.35, 2.5, 0);
-				mPlayer.getWorld().spawnParticle(Particle.WATER_DROP, mPlayer.getLocation().add(0, 2, 0), 15, 2.5, 2, 2.5, 0.001);
-				mPlayer.getWorld().spawnParticle(Particle.VILLAGER_HAPPY, mPlayer.getLocation().add(0, 2, 0), 1, 2, 1.5, 2, 0.001);
+				world.spawnParticle(Particle.CLOUD, mPlayer.getLocation().add(0, 4, 0), 5, 2.5, 0.35, 2.5, 0);
+				world.spawnParticle(Particle.WATER_DROP, mPlayer.getLocation().add(0, 2, 0), 15, 2.5, 2, 2.5, 0.001);
+				world.spawnParticle(Particle.VILLAGER_HAPPY, mPlayer.getLocation().add(0, 2, 0), 1, 2, 1.5, 2, 0.001);
 
 				float radius = CleansingRainRadiusEnchantment.getRadius(mPlayer, CLEANSING_RADIUS, CleansingRainRadiusEnchantment.class);
 

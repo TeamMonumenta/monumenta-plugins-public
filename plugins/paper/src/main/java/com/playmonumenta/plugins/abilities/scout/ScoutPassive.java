@@ -1,7 +1,6 @@
 package com.playmonumenta.plugins.abilities.scout;
 
 import org.bukkit.Sound;
-import org.bukkit.World;
 import org.bukkit.entity.AbstractArrow;
 import org.bukkit.entity.Player;
 

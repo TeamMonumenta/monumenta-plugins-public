@@ -133,7 +133,7 @@ public class NameListener implements Listener {
 	}
 
 	@Nullable
-	private static String uuid2name(@Nonnull UUID uuid) {
+	public static String uuid2name(@Nonnull UUID uuid) {
 		if (globalNameListener == null) {
 			return null;
 		}

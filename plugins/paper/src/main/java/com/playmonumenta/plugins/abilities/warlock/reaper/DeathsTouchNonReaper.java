@@ -3,7 +3,6 @@ package com.playmonumenta.plugins.abilities.warlock.reaper;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;

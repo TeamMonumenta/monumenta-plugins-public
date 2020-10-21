@@ -218,6 +218,7 @@ public class InfusionUtils {
 		}
 		CommandUtils.enchantify(sender, player, ChatColor.stripColor(selection.getEnchantName()) + numeral);
 	}
+
 	/*
 	 * Special Refunds for items that were infused prior to 4/2/2020 cost changes
 	 * Items must be marked with 'PRE-UPDATE' lore text to be eligible.

@@ -105,6 +105,7 @@ public class LootChestsInInventory implements Listener {
 		emptyChest.setItemMeta(emptyChestMeta);
 		InventoryUtils.giveItem(player, emptyChest);
 	}
+
 	//Drop the items upon closing the inventory
 	@EventHandler(priority = EventPriority.LOW)
 	public void inventoryCloseEvent(InventoryCloseEvent event) {
@@ -123,6 +124,7 @@ public class LootChestsInInventory implements Listener {
 			lootMen.remove(event.getPlayer());
 		}
 	}
+
 	//Failsafes
 	@EventHandler(priority = EventPriority.LOW)
 	public void playerJoinEvent(PlayerJoinEvent event) {

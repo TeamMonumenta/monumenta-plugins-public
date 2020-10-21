@@ -24,6 +24,7 @@ import dev.jorel.commandapi.arguments.ObjectiveArgument;
 
 public class TeleportByScore extends GenericCommand {
 	private static final String COMMAND = "teleportbyscore";
+
 	public static void register() {
 		CommandPermission perms = CommandPermission.fromString("monumenta.command.teleportbyscore");
 

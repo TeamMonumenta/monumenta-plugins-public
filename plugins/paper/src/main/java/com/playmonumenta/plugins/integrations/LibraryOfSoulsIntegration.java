@@ -12,8 +12,9 @@ public class LibraryOfSoulsIntegration {
 	private static boolean LOS_CHECKED = false;
 
 	private static void ensureInitialized() {
-		if (LOS_CHECKED)
+		if (LOS_CHECKED) {
 			return;
+		}
 
 		LOS_CHECKED = true;
 

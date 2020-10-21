@@ -1,6 +1,5 @@
 package com.playmonumenta.plugins.abilities.warrior;
 
-import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.entity.Player;

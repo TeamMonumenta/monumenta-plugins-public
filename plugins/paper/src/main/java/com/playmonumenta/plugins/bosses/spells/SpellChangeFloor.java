@@ -76,13 +76,13 @@ public class SpellChangeFloor extends Spell {
 
 		BukkitRunnable runnable = new BukkitRunnable() {
 			int mTicks = 0;
-			List<BlockState> restoreBlocks = new LinkedList<BlockState>();
+			List<BlockState> mBlocksToRestore = new LinkedList<BlockState>();
 
 			@Override
 			public void run() {
 				if (mTicks > 0 && mTicks < PHASE2_TICKS) {
 					// Particles over the changed blocks
-					for (BlockState state : restoreBlocks) {
+					for (BlockState state : mBlocksToRestore) {
 						Location loc = state.getLocation().add(0.5f, 1f, 0.5f);
 						loc.getWorld().spawnParticle(Particle.DRAGON_BREATH, loc, 1, 0.3, 0.3, 0.3, 0);
 					}
@@ -102,14 +102,14 @@ public class SpellChangeFloor extends Spell {
 								if (!mIgnoredMats.contains(state.getType()) &&
 								    !state.getType().isInteractable() &&
 									FastUtils.RANDOM.nextInt(16) > 6) {
-									restoreBlocks.add(state);
+									mBlocksToRestore.add(state);
 								}
 							}
 						}
 					}
 				} else if (mTicks == PHASE1_TICKS) {
 					// Set the blocks to the specified material
-					for (BlockState state : restoreBlocks) {
+					for (BlockState state : mBlocksToRestore) {
 						state.getLocation().getBlock().setType(mMaterial);
 					}
 
@@ -121,7 +121,7 @@ public class SpellChangeFloor extends Spell {
 					mActiveRunnables.remove(this);
 				} else if (mTicks == PHASE2_TICKS) {
 					// Restore the block states saved earlier
-					for (BlockState state : restoreBlocks) {
+					for (BlockState state : mBlocksToRestore) {
 						state.update(true);
 					}
 				} else if (mTicks > PHASE2_TICKS) {

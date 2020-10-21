@@ -16,6 +16,7 @@ import dev.jorel.commandapi.arguments.StringArgument;
 
 public class SkillDescription extends GenericCommand {
 	private static final String COMMAND = "skilldescription";
+
 	public static void register(Plugin plugin) {
 		CommandPermission perms = CommandPermission.fromString("monumenta.command.skilldescription");
 

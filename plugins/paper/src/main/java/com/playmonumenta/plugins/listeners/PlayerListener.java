@@ -943,6 +943,7 @@ public class PlayerListener implements Listener {
 			}
 		}.runTaskTimer(mPlugin, 0, 1);
 	}
+
 	/** Implements bed teleporters.
 	 *
 	 * When a player sleeps in a bed, the 10 blocks under that bed are checked for

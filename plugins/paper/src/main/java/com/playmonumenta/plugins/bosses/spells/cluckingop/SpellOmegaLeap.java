@@ -49,30 +49,30 @@ public class SpellOmegaLeap extends Spell {
 					world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 1.5f, 1.5f);
 					world.playSound(mBoss.getLocation(), Sound.ENTITY_ENDER_DRAGON_GROWL, 1.5f, 0f);
 					new BukkitRunnable() {
-						double rotation = 0;
-						double radius = 1;
-						Location l = mBoss.getLocation();
+						double mRotation = 0;
+						double mRadius = 1;
+						Location mAttackLocation = mBoss.getLocation();
 						@Override
 						public void run() {
-							if (radius >= 15) {
+							if (mRadius >= 15) {
 								this.cancel();
 							}
 							for (int i = 0; i < 36; i++) {
 								Location loc = mBoss.getLocation();
-								rotation += 10;
-								double radian1 = Math.toRadians(rotation);
-								loc.add(FastUtils.cos(radian1)*radius, 0.25, FastUtils.sin(radian1)*radius);
+								mRotation += 10;
+								double radian1 = Math.toRadians(mRotation);
+								loc.add(FastUtils.cos(radian1)*mRadius, 0.25, FastUtils.sin(radian1)*mRadius);
 								world.spawnParticle(Particle.FLAME, loc, 2, 0.2, 0.2, 0.2, 0.1, null, true);
 								world.spawnParticle(Particle.SMOKE_NORMAL, loc, 1, 0.2, 0.2, 0.2, 0.65, null, true);
 
-								loc.subtract(FastUtils.cos(radian1)*radius, 0.25, FastUtils.sin(radian1)*radius);
+								loc.subtract(FastUtils.cos(radian1)*mRadius, 0.25, FastUtils.sin(radian1)*mRadius);
 							}
-							for (Player player : PlayerUtils.playersInRange(l, radius)) {
-								if (player.getLocation().toVector().isInSphere(l.toVector(), radius)) {
+							for (Player player : PlayerUtils.playersInRange(mAttackLocation, mRadius)) {
+								if (player.getLocation().toVector().isInSphere(mAttackLocation.toVector(), mRadius)) {
 									BossUtils.bossDamage(mBoss, player, 1);
 								}
 							}
-							radius += 1;
+							mRadius += 1;
 
 						}
 
@@ -87,7 +87,6 @@ public class SpellOmegaLeap extends Spell {
 
 	@Override
 	public int duration() {
-		// TODO Auto-generated method stub
 		return 20 * 6;
 	}
 

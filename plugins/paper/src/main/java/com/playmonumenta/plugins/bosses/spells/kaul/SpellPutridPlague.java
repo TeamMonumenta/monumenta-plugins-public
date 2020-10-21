@@ -125,10 +125,10 @@ public class SpellPutridPlague extends Spell {
 			players.removeIf(p -> p.getLocation().getY() >= 61);
 			new BukkitRunnable() {
 				int t = 0;
-				Location p1 = point.getLocation().add(4, 6, 4);
-				Location p2 = point.getLocation().add(-4, 6, -4);
-				Location p3 = point.getLocation().add(4, 6, -4);
-				Location p4 = point.getLocation().add(-4, 6, 4);
+				Location mPoint1 = point.getLocation().add(4, 6, 4);
+				Location mPoint2 = point.getLocation().add(-4, 6, -4);
+				Location mPoint3 = point.getLocation().add(4, 6, -4);
+				Location mPoint4 = point.getLocation().add(-4, 6, 4);
 				@Override
 				public void run() {
 					t += 2;
@@ -139,10 +139,10 @@ public class SpellPutridPlague extends Spell {
 						player.spawnParticle(Particle.SMOKE_NORMAL, player.getLocation(), 60, 15, 0, 15, 0);
 					}
 
-					world.spawnParticle(Particle.SPELL_INSTANT, p1, 30, 0.45, 6, 0.45, 0, null, true);
-					world.spawnParticle(Particle.SPELL_INSTANT, p2, 30, 0.45, 6, 0.45, 0, null, true);
-					world.spawnParticle(Particle.SPELL_INSTANT, p3, 30, 0.45, 6, 0.45, 0, null, true);
-					world.spawnParticle(Particle.SPELL_INSTANT, p4, 30, 0.45, 6, 0.45, 0, null, true);
+					world.spawnParticle(Particle.SPELL_INSTANT, mPoint1, 30, 0.45, 6, 0.45, 0, null, true);
+					world.spawnParticle(Particle.SPELL_INSTANT, mPoint2, 30, 0.45, 6, 0.45, 0, null, true);
+					world.spawnParticle(Particle.SPELL_INSTANT, mPoint3, 30, 0.45, 6, 0.45, 0, null, true);
+					world.spawnParticle(Particle.SPELL_INSTANT, mPoint4, 30, 0.45, 6, 0.45, 0, null, true);
 					world.spawnParticle(Particle.SPELL_INSTANT, point.getLocation(), 65, 7, 3, 7, 0, null, true);
 
 					Location cLoc = point.getLocation();
