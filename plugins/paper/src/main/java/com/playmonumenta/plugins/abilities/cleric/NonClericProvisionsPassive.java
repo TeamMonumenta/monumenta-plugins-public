@@ -23,8 +23,8 @@ public class NonClericProvisionsPassive extends Ability {
 	private static final float PROVISIONS_1_CHANCE = 0.2f;
 	private static final float PROVISIONS_2_CHANCE = 0.4f;
 
-	public NonClericProvisionsPassive(Plugin plugin, World world, Player player) {
-		super(plugin, world, player, null);
+	public NonClericProvisionsPassive(Plugin plugin, Player player) {
+		super(plugin, player, null);
 	}
 
 	@Override

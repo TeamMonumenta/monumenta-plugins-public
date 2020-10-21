@@ -21,8 +21,8 @@ public class SwiftCuts extends Ability {
 
 	private LivingEntity mLastTarget = null;
 
-	public SwiftCuts(Plugin plugin, World world, Player player) {
-		super(plugin, world, player, "Swift Cuts");
+	public SwiftCuts(Plugin plugin, Player player) {
+		super(plugin, player, "Swift Cuts");
 		mInfo.mScoreboardId = "SwiftCuts";
 		mInfo.mShorthandName = "SC";
 		mInfo.mDescriptions.add("If you perform a melee attack on the same mob 2 or more times in a row, each hit after the first does +20% damage.");
@@ -37,8 +37,9 @@ public class SwiftCuts extends Ability {
 
 			if (mob.equals(mLastTarget)) {
 				Location loc = mob.getLocation();
-				mWorld.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 0.5f, 1.5f);
-				mWorld.spawnParticle(Particle.SWEEP_ATTACK, loc, 2, 0.25, 0.35, 0.25, 0.001);
+				World world = mPlayer.getWorld();
+				world.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 0.5f, 1.5f);
+				world.spawnParticle(Particle.SWEEP_ATTACK, loc, 2, 0.25, 0.35, 0.25, 0.001);
 
 				event.setDamage(event.getDamage() * (1 + mConsecutivePercentDamage));
 			} else {

@@ -2,7 +2,6 @@ package com.playmonumenta.plugins.abilities.alchemist.harbinger;
 
 import org.bukkit.Location;
 import org.bukkit.Particle;
-import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
@@ -22,8 +21,8 @@ public class NightmarishAlchemy extends PotionAbility {
 
 	private final float mConfusionChance;
 
-	public NightmarishAlchemy(Plugin plugin, World world, Player player) {
-		super(plugin, world, player, "Nightmarish Alchemy", NIGHTMARISH_ALCHEMY_1_DAMAGE, NIGHTMARISH_ALCHEMY_2_DAMAGE);
+	public NightmarishAlchemy(Plugin plugin, Player player) {
+		super(plugin, player, "Nightmarish Alchemy", NIGHTMARISH_ALCHEMY_1_DAMAGE, NIGHTMARISH_ALCHEMY_2_DAMAGE);
 		mInfo.mLinkedSpell = Spells.NIGHTMARISH_ALCHEMY;
 		mInfo.mScoreboardId = "Nightmarish";
 		mInfo.mShorthandName = "Nm";
@@ -35,7 +34,7 @@ public class NightmarishAlchemy extends PotionAbility {
 
 	@Override
 	public void createAura(Location loc, double radius) {
-		mWorld.spawnParticle(Particle.SPELL_WITCH, loc, 50, 1, 0, 1, 1);
+		loc.getWorld().spawnParticle(Particle.SPELL_WITCH, loc, 50, 1, 0, 1, 1);
 	}
 
 	@Override

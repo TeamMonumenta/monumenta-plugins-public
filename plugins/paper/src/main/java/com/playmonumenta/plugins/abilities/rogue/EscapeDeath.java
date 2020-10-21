@@ -29,8 +29,8 @@ public class EscapeDeath extends Ability {
 	private static final int JUMP_BOOST_AMPLIFIER = 2;
 	private static final int COOLDOWN = 90 * 20;
 
-	public EscapeDeath(Plugin plugin, World world, Player player) {
-		super(plugin, world, player, "Escape Death");
+	public EscapeDeath(Plugin plugin, Player player) {
+		super(plugin, player, "Escape Death");
 		mInfo.mLinkedSpell = Spells.ESCAPE_DEATH;
 		mInfo.mScoreboardId = "EscapeDeath";
 		mInfo.mShorthandName = "ED";
@@ -72,11 +72,12 @@ public class EscapeDeath extends Ability {
 			Location loc = mPlayer.getLocation();
 			loc.add(0, 1, 0);
 
-			mWorld.spawnParticle(Particle.EXPLOSION_NORMAL, loc, 80, 0, 0, 0, 0.25);
-			mWorld.spawnParticle(Particle.FIREWORKS_SPARK, loc, 125, 0, 0, 0, 0.3);
+			World world = mPlayer.getWorld();
+			world.spawnParticle(Particle.EXPLOSION_NORMAL, loc, 80, 0, 0, 0, 0.25);
+			world.spawnParticle(Particle.FIREWORKS_SPARK, loc, 125, 0, 0, 0, 0.3);
 
-			mWorld.playSound(loc, Sound.ITEM_TOTEM_USE, 0.75f, 1.5f);
-			mWorld.playSound(loc, Sound.ENTITY_ARROW_SHOOT, 1f, 0f);
+			world.playSound(loc, Sound.ITEM_TOTEM_USE, 0.75f, 1.5f);
+			world.playSound(loc, Sound.ENTITY_ARROW_SHOOT, 1f, 0f);
 
 			MessagingUtils.sendActionBarMessage(mPlugin, mPlayer, "Escape Death has been activated");
 		}

@@ -28,7 +28,6 @@ import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.ItemFrame;
-import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
@@ -117,11 +116,9 @@ import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
 
 public class PlayerListener implements Listener {
 	Plugin mPlugin = null;
-	World mWorld = null;
 
-	public PlayerListener(Plugin plugin, World world) {
+	public PlayerListener(Plugin plugin) {
 		mPlugin = plugin;
-		mWorld = world;
 	}
 
 	@EventHandler(priority = EventPriority.LOW)

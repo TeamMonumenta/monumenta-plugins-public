@@ -46,8 +46,8 @@ public class ShieldBash extends Ability {
 	private static final int SHIELD_BASH_2_RADIUS = 2;
 	private static final int SHIELD_BASH_RANGE = 4;
 
-	public ShieldBash(Plugin plugin, World world, Player player) {
-		super(plugin, world, player, "Shield Bash");
+	public ShieldBash(Plugin plugin, Player player) {
+		super(plugin, player, "Shield Bash");
 		mInfo.mLinkedSpell = Spells.SHIELD_BASH;
 		mInfo.mScoreboardId = "ShieldBash";
 		mInfo.mShorthandName = "SB";
@@ -75,14 +75,15 @@ public class ShieldBash extends Ability {
 
 					List<LivingEntity> mobs = data.getEntities();
 					if (mobs != null && !mobs.isEmpty()) {
+						World world = mPlayer.getWorld();
 						for (LivingEntity mob : mobs) {
 							if (mob.isValid() && !mob.isDead() && EntityUtils.isHostileMob(mob)) {
 								Location mobLoc = mob.getEyeLocation();
-								mWorld.spawnParticle(Particle.CRIT, mobLoc, 50, 0, 0.25, 0, 0.25);
-								mWorld.spawnParticle(Particle.CRIT_MAGIC, mobLoc, 50, 0, 0.25, 0, 0.25);
-								mWorld.spawnParticle(Particle.CLOUD, mobLoc, 5, 0.15, 0.5, 0.15, 0);
-								mWorld.playSound(eyeLoc, Sound.ITEM_SHIELD_BLOCK, 1.5f, 1);
-								mWorld.playSound(eyeLoc, Sound.ENTITY_PLAYER_ATTACK_CRIT, 1.5f, 0.5f);
+								world.spawnParticle(Particle.CRIT, mobLoc, 50, 0, 0.25, 0, 0.25);
+								world.spawnParticle(Particle.CRIT_MAGIC, mobLoc, 50, 0, 0.25, 0, 0.25);
+								world.spawnParticle(Particle.CLOUD, mobLoc, 5, 0.15, 0.5, 0.15, 0);
+								world.playSound(eyeLoc, Sound.ITEM_SHIELD_BLOCK, 1.5f, 1);
+								world.playSound(eyeLoc, Sound.ENTITY_PLAYER_ATTACK_CRIT, 1.5f, 0.5f);
 
 								if (getAbilityScore() == 1) {
 									EntityUtils.damageEntity(mPlugin, mob, damage, mPlayer);

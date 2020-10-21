@@ -21,8 +21,8 @@ public class Merciless extends StatMultiplier {
 		"boss_avenger"
 	};
 
-	public Merciless(Plugin plugin, World world, Player player) {
-		super(plugin, world, player, MERCILESS_MOB_DAMAGE_MULTIPLIER, MERCILESS_MOB_DAMAGE_MULTIPLIER, MERCILESS_MOB_HEALTH_MULTIPLIER,
+	public Merciless(Plugin plugin, Player player) {
+		super(plugin, player, MERCILESS_MOB_DAMAGE_MULTIPLIER, MERCILESS_MOB_DAMAGE_MULTIPLIER, MERCILESS_MOB_HEALTH_MULTIPLIER,
 				RUTHLESS_ABILITY_POOL, RUTHLESS_ABILITY_CHANCE);
 	}
 

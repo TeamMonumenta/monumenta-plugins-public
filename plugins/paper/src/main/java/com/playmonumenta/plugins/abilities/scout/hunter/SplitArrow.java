@@ -27,8 +27,8 @@ public class SplitArrow extends Ability {
 
 	private final double mDamagePercent;
 
-	public SplitArrow(Plugin plugin, World world, Player player) {
-		super(plugin, world, player, "Split Arrow");
+	public SplitArrow(Plugin plugin, Player player) {
+		super(plugin, player, "Split Arrow");
 		mInfo.mLinkedSpell = Spells.SPLIT_ARROW;
 		mInfo.mScoreboardId = "SplitArrow";
 		mInfo.mShorthandName = "SA";
@@ -49,16 +49,17 @@ public class SplitArrow extends Ability {
 				Location loc = damagee.getEyeLocation();
 				Location eye = nearestMob.getEyeLocation();
 				Vector dir = LocationUtils.getDirectionTo(eye, loc);
+				World world = mPlayer.getWorld();
 				for (int i = 0; i < 50; i++) {
 					loc.add(dir.clone().multiply(0.1));
-					mWorld.spawnParticle(Particle.CRIT, loc, 2, 0.1, 0.1, 0.1, 0);
+					world.spawnParticle(Particle.CRIT, loc, 2, 0.1, 0.1, 0.1, 0);
 					if (loc.distance(eye) < 0.4) {
 						break;
 					}
 				}
-				mWorld.spawnParticle(Particle.CRIT, eye, 30, 0, 0, 0, 0.6);
-				mWorld.spawnParticle(Particle.CRIT_MAGIC, eye, 20, 0, 0, 0, 0.6);
-				mWorld.playSound(eye, Sound.ENTITY_ARROW_HIT, 1, 1.2f);
+				world.spawnParticle(Particle.CRIT, eye, 30, 0, 0, 0, 0.6);
+				world.spawnParticle(Particle.CRIT_MAGIC, eye, 20, 0, 0, 0, 0.6);
+				world.playSound(eye, Sound.ENTITY_ARROW_HIT, 1, 1.2f);
 
 				nearestMob.setNoDamageTicks(0);
 				EntityUtils.damageEntity(mPlugin, nearestMob, event.getDamage() * mDamagePercent, mPlayer, MagicType.PHYSICAL, true, mInfo.mLinkedSpell);

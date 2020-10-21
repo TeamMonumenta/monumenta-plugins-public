@@ -70,8 +70,8 @@ public class AmplifyingHex extends Ability {
 
 	private final int mAmplifierDamage;
 
-	public AmplifyingHex(Plugin plugin, World world, Player player) {
-		super(plugin, world, player, "Amplifying Hex");
+	public AmplifyingHex(Plugin plugin, Player player) {
+		super(plugin, player, "Amplifying Hex");
 		mInfo.mScoreboardId = "AmplifyingHex";
 		mInfo.mShorthandName = "AH";
 		mInfo.mDescriptions.add("Sneak left click with a scythe without looking up or down to fire a magic cone up to 8 blocks in front of you, dealing 5 damage to each enemy per debuff (potion effects like slowness or wither, as well as stun) they have, and an extra +1 damage per extra level of debuff (capped at 2 extra levels. Extra levels of Vulnerability not counted). Cooldown: 12s.");
@@ -87,6 +87,7 @@ public class AmplifyingHex extends Ability {
 		int cd = (getAbilityScore() == 1) ? COOLDOWN_1 : COOLDOWN_2;
 		mInfo.mCooldown = (int) AmplifyingHexCooldownEnchantment.getCooldown(mPlayer, cd, AmplifyingHexCooldownEnchantment.class);
 
+		World world = mPlayer.getWorld();
 		new BukkitRunnable() {
 			final Location mLoc = mPlayer.getLocation();
 			double mRadius = 0.5;
@@ -105,8 +106,8 @@ public class AmplifyingHex extends Ability {
 					vec = VectorUtils.rotateYAxis(vec, mLoc.getYaw());
 
 					Location l = mLoc.clone().clone().add(0, 0.15, 0).add(vec);
-					mWorld.spawnParticle(Particle.DRAGON_BREATH, l, 2, 0.05, 0.05, 0.05, 0.1);
-					mWorld.spawnParticle(Particle.SMOKE_NORMAL, l, 3, 0.05, 0.05, 0.05, 0.1);
+					world.spawnParticle(Particle.DRAGON_BREATH, l, 2, 0.05, 0.05, 0.05, 0.1);
+					world.spawnParticle(Particle.SMOKE_NORMAL, l, 3, 0.05, 0.05, 0.05, 0.1);
 				}
 
 				if (mRadius >= RADIUS + 1) {
@@ -118,8 +119,8 @@ public class AmplifyingHex extends Ability {
 
 		float effectDamage = getAbilityScore() == 1 ? EFFECT_DAMAGE_1 : EFFECT_DAMAGE_2;
 		effectDamage += AmplifyingHexDamageEnchantment.getExtraDamage(mPlayer, AmplifyingHexDamageEnchantment.class);
-		mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_POLAR_BEAR_WARNING, 1.0f, 0.65f);
-		mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_BLAZE_SHOOT, 1.0f, 0.65f);
+		world.playSound(mPlayer.getLocation(), Sound.ENTITY_POLAR_BEAR_WARNING, 1.0f, 0.65f);
+		world.playSound(mPlayer.getLocation(), Sound.ENTITY_BLAZE_SHOOT, 1.0f, 0.65f);
 
 		Vector playerDir = mPlayer.getEyeLocation().getDirection().setY(0).normalize();
 		for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), RADIUS, mPlayer)) {

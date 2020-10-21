@@ -32,8 +32,8 @@ public class Smokescreen extends Ability {
 	private final int mSlownessAmplifier;
 	private final int mWeaknessAmplifier;
 
-	public Smokescreen(Plugin plugin, World world, Player player) {
-		super(plugin, world, player, "Smoke Screen");
+	public Smokescreen(Plugin plugin, Player player) {
+		super(plugin, player, "Smoke Screen");
 		mInfo.mLinkedSpell = Spells.SMOKESCREEN;
 		mInfo.mScoreboardId = "SmokeScreen";
 		mInfo.mShorthandName = "Smk";
@@ -48,9 +48,10 @@ public class Smokescreen extends Ability {
 	@Override
 	public void cast(Action action) {
 		Location loc = mPlayer.getLocation();
-		mWorld.spawnParticle(Particle.SMOKE_LARGE, loc.clone().add(0, 1, 0), 300, 2.5, 0.8, 2.5, 0.05);
-		mWorld.spawnParticle(Particle.SMOKE_NORMAL, loc, 600, 2.5, 0.2, 2.5, 0.1);
-		mWorld.playSound(loc, Sound.ENTITY_BLAZE_SHOOT, 1.0f, 0.35f);
+		World world = mPlayer.getWorld();
+		world.spawnParticle(Particle.SMOKE_LARGE, loc.clone().add(0, 1, 0), 300, 2.5, 0.8, 2.5, 0.05);
+		world.spawnParticle(Particle.SMOKE_NORMAL, loc, 600, 2.5, 0.2, 2.5, 0.1);
+		world.playSound(loc, Sound.ENTITY_BLAZE_SHOOT, 1.0f, 0.35f);
 		for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), SMOKESCREEN_RANGE, mPlayer)) {
 			PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(PotionEffectType.SLOW, SMOKESCREEN_DURATION, mSlownessAmplifier, false, true));
 			PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(PotionEffectType.WEAKNESS, SMOKESCREEN_DURATION, mWeaknessAmplifier, false, true));

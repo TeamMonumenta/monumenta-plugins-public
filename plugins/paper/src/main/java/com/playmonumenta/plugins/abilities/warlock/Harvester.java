@@ -16,8 +16,8 @@ public class Harvester extends Ability {
 	private static final int COOLDOWN_REDUCTION = 10;
 	private static final double PERCENT_HEAL = 0.05;
 
-	public Harvester(Plugin plugin, World world, Player player) {
-		super(plugin, world, player, "Harvester of the Damned");
+	public Harvester(Plugin plugin, Player player) {
+		super(plugin, player, "Harvester of the Damned");
 		mInfo.mScoreboardId = "Harvester";
 		mInfo.mShorthandName = "HotD";
 		mInfo.mDescriptions.add("Whenever an enemy dies within 8 blocks of you, reduce the cooldown of your skills by .5s.");
@@ -26,7 +26,7 @@ public class Harvester extends Ability {
 
 	@Override
 	public void entityDeathRadiusEvent(EntityDeathEvent event, boolean shouldGenDrops) {
-		mWorld.spawnParticle(Particle.SPELL_WITCH, mPlayer.getLocation().add(0, 1, 0), 9, 0.35, 0.45, 0.35, 0.001);
+		mPlayer.getWorld().spawnParticle(Particle.SPELL_WITCH, mPlayer.getLocation().add(0, 1, 0), 9, 0.35, 0.45, 0.35, 0.001);
 
 		// We want this to run after any relevant abilities have gone on cooldown
 		new BukkitRunnable() {

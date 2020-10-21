@@ -6,7 +6,6 @@ import java.util.Map.Entry;
 
 import org.bukkit.Location;
 import org.bukkit.Particle;
-import org.bukkit.World;
 import org.bukkit.entity.AbstractArrow;
 import org.bukkit.entity.Entity;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -15,13 +14,11 @@ import com.playmonumenta.plugins.Plugin;
 
 public class ProjectileEffectTimers {
 	private Plugin mPlugin;
-	private World mWorld;
 	private HashMap<Entity, Particle> mTrackingEntities;
 	private int mDeadTicks = 0;
 
-	public ProjectileEffectTimers(Plugin plugin, World world) {
+	public ProjectileEffectTimers(Plugin plugin) {
 		mPlugin = plugin;
-		mWorld = world;
 		mTrackingEntities = new HashMap<Entity, Particle>();
 	}
 
@@ -58,13 +55,13 @@ public class ProjectileEffectTimers {
 				numParticles = 1;
 			}
 
-			mWorld.spawnParticle(particle, entity.getLocation(), numParticles, 0.1, 0.1, 0.1, 0);
+			Location entityLoc = entity.getLocation();
+			entityLoc.getWorld().spawnParticle(particle, entityLoc, numParticles, 0.1, 0.1, 0.1, 0);
 
 			/* EVery so often check if this entity is actually still there */
 			if (mDeadTicks > 100) {
 				mDeadTicks = 0;
 				boolean isPresent = false;
-				Location entityLoc = entity.getLocation();
 				for (Entity e : entityLoc.getWorld().getNearbyEntities(entityLoc, 4, 4, 4)) {
 					if (e.getUniqueId().equals(entity.getUniqueId())) {
 						isPresent = true;

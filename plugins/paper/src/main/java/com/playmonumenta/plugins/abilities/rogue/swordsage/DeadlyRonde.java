@@ -50,8 +50,8 @@ public class DeadlyRonde extends Ability {
 	BukkitRunnable mActiveRunnable = null;
 	int mRondeStacks = 0;
 
-	public DeadlyRonde(Plugin plugin, World world, Player player) {
-		super(plugin, world, player, "Deadly Ronde");
+	public DeadlyRonde(Plugin plugin, Player player) {
+		super(plugin, player, "Deadly Ronde");
 		mInfo.mLinkedSpell = Spells.RONDE;
 		mInfo.mScoreboardId = "DeadlyRonde";
 		mInfo.mShorthandName = "DR";
@@ -69,7 +69,7 @@ public class DeadlyRonde extends Ability {
 
 				@Override
 				public void run() {
-					mWorld.spawnParticle(Particle.REDSTONE, mPlayer.getLocation().add(0, 1, 0), 3, 0.25, 0.45, 0.25, SWORDSAGE_COLOR);
+					mPlayer.getWorld().spawnParticle(Particle.REDSTONE, mPlayer.getLocation().add(0, 1, 0), 3, 0.25, 0.45, 0.25, SWORDSAGE_COLOR);
 					mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.SPEED, 5, 0));
 					if (mActiveRunnable == null) {
 						this.cancel();
@@ -122,15 +122,16 @@ public class DeadlyRonde extends Ability {
 
 			Location particleLoc = mPlayer.getEyeLocation().add(mPlayer.getEyeLocation().getDirection().multiply(3));
 
-			mWorld.spawnParticle(Particle.SWEEP_ATTACK, particleLoc, 10, 1.5, 0.5, 1.5);
-			mWorld.spawnParticle(Particle.CRIT, particleLoc, 50, 1.5, 0.5, 1.5, 0.2);
-			mWorld.spawnParticle(Particle.CLOUD, particleLoc, 20, 1.5, 0.5, 1.5, 0.3);
-			mWorld.spawnParticle(Particle.REDSTONE, particleLoc, 45, 1.5, 0.5, 1.5, SWORDSAGE_COLOR);
+			World world = mPlayer.getWorld();
+			world.spawnParticle(Particle.SWEEP_ATTACK, particleLoc, 10, 1.5, 0.5, 1.5);
+			world.spawnParticle(Particle.CRIT, particleLoc, 50, 1.5, 0.5, 1.5, 0.2);
+			world.spawnParticle(Particle.CLOUD, particleLoc, 20, 1.5, 0.5, 1.5, 0.3);
+			world.spawnParticle(Particle.REDSTONE, particleLoc, 45, 1.5, 0.5, 1.5, SWORDSAGE_COLOR);
 
-			mWorld.playSound(particleLoc, Sound.ITEM_TRIDENT_THROW, 1, 1.25f);
-			mWorld.playSound(particleLoc, Sound.ENTITY_PLAYER_ATTACK_CRIT, 0.8f, 0.75f);
-			mWorld.playSound(particleLoc, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1, 0.75f);
-			mWorld.playSound(particleLoc, Sound.ENTITY_BLAZE_SHOOT, 1, 0.75f);
+			world.playSound(particleLoc, Sound.ITEM_TRIDENT_THROW, 1, 1.25f);
+			world.playSound(particleLoc, Sound.ENTITY_PLAYER_ATTACK_CRIT, 0.8f, 0.75f);
+			world.playSound(particleLoc, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1, 0.75f);
+			world.playSound(particleLoc, Sound.ENTITY_BLAZE_SHOOT, 1, 0.75f);
 
 			mActiveRunnable.cancel();
 			mActiveRunnable = null;

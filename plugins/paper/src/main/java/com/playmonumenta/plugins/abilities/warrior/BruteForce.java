@@ -51,8 +51,8 @@ public class BruteForce extends Ability {
 	private static final double BRUTE_FORCE_2_DAMAGE = 5;
 	private static final float BRUTE_FORCE_KNOCKBACK_SPEED = 0.7f;
 
-	public BruteForce(Plugin plugin, World world, Player player) {
-		super(plugin, world, player, "Brute Force");
+	public BruteForce(Plugin plugin, Player player) {
+		super(plugin, player, "Brute Force");
 		mInfo.mLinkedSpell = Spells.BRUTE_FORCE;
 		mInfo.mScoreboardId = "BruteForce";
 		mInfo.mShorthandName = "BF";
@@ -68,8 +68,9 @@ public class BruteForce extends Ability {
 			event.setDamage(event.getDamage() + damageBonus);
 
 			Location loc = event.getEntity().getLocation().add(0, 0.75, 0);
-			mWorld.spawnParticle(Particle.EXPLOSION_LARGE, loc, 1, 0, 0, 0, 1);
-			mWorld.spawnParticle(Particle.EXPLOSION_NORMAL, loc, 10, 0, 0, 0, 0.135);
+			World world = mPlayer.getWorld();
+			world.spawnParticle(Particle.EXPLOSION_LARGE, loc, 1, 0, 0, 0, 1);
+			world.spawnParticle(Particle.EXPLOSION_NORMAL, loc, 10, 0, 0, 0, 0.135);
 
 			float radius = BruteForceRadiusEnchantment.getRadius(mPlayer, BRUTE_FORCE_RADIUS, BruteForceRadiusEnchantment.class);
 			float knockback = BruteForceKnockbackEnchantment.getKnockback(mPlayer, BRUTE_FORCE_KNOCKBACK_SPEED);

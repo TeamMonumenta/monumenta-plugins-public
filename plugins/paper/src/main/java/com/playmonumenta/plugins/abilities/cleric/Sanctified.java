@@ -31,8 +31,8 @@ public class Sanctified extends Ability {
 
 	private final int mPercentDamageReturned;
 
-	public Sanctified(Plugin plugin, World world, Player player) {
-		super(plugin, world, player, "Sanctified Armor");
+	public Sanctified(Plugin plugin, Player player) {
+		super(plugin, player, "Sanctified Armor");
 		mInfo.mLinkedSpell = Spells.SANCTIFIED;
 		mInfo.mScoreboardId = "Sanctified";
 		mInfo.mShorthandName = "Sa";
@@ -66,8 +66,9 @@ public class Sanctified extends Ability {
 
 	private void trigger(LivingEntity mob, EntityDamageByEntityEvent event) {
 		Location loc = mob.getLocation();
-		mPlayer.getWorld().spawnParticle(Particle.FIREWORKS_SPARK, loc.add(0, mob.getHeight() / 2, 0), 7, 0.35, 0.35, 0.35, 0.125);
-		mWorld.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_KNOCKBACK, 0.7f, 1.2f);
+		World world = mPlayer.getWorld();
+		world.spawnParticle(Particle.FIREWORKS_SPARK, loc.add(0, mob.getHeight() / 2, 0), 7, 0.35, 0.35, 0.35, 0.125);
+		world.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_KNOCKBACK, 0.7f, 1.2f);
 
 		MovementUtils.knockAway(mPlayer, mob, KNOCKBACK_SPEED, KNOCKBACK_SPEED);
 		if (!mPlayer.isBlocking() || event.getFinalDamage() > 0) {

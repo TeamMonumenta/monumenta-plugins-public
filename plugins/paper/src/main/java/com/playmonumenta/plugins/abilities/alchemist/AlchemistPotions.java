@@ -59,8 +59,8 @@ public class AlchemistPotions extends Ability implements KillTriggeredAbility {
 	private List<PotionAbility> mPotionAbilities = new ArrayList<PotionAbility>();
 	private double mDamage = 0;
 
-	public AlchemistPotions(Plugin plugin, World world, Player player) {
-		super(plugin, world, player, null);
+	public AlchemistPotions(Plugin plugin, Player player) {
+		super(plugin, player, null);
 		mInfo.mLinkedSpell = Spells.ALCHEMIST_POTION;
 		mTracker = new KillTriggeredAbilityTracker(this);
 

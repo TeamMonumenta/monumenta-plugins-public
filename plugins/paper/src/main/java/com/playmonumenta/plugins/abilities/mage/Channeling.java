@@ -41,8 +41,8 @@ public class Channeling extends Ability {
 	private final int mDamage;
 	private Spells mLastSpellCast;
 
-	public Channeling(Plugin plugin, World world, Player player) {
-		super(plugin, world, player, "Channeling");
+	public Channeling(Plugin plugin, Player player) {
+		super(plugin, player, "Channeling");
 		mInfo.mLinkedSpell = Spells.CHANNELING;
 		mInfo.mScoreboardId = "Channeling";
 		mInfo.mShorthandName = "Ch";
@@ -78,27 +78,28 @@ public class Channeling extends Ability {
 			}.runTaskLater(mPlugin, 1);
 
 			Location loc = mob.getLocation();
-			mWorld.playSound(loc, Sound.BLOCK_ENDER_CHEST_OPEN, 1f, 1.5f);
-			mWorld.playSound(loc, Sound.BLOCK_ENCHANTMENT_TABLE_USE, 1f, 2f);
-			mWorld.spawnParticle(Particle.REDSTONE, loc.clone().add(0, 1, 0), 25, 0.45, 0.65, 0.45, 0, CHANNELING_COLOR);
-			mWorld.spawnParticle(Particle.FIREWORKS_SPARK, loc.clone().add(0, 1, 0), 8, 0.25, 0.5, 0.25, 0.05);
-			mWorld.spawnParticle(Particle.FIREWORKS_SPARK, loc, 8, 0.35, 0, 0.35, 0.12);
+			World world = mPlayer.getWorld();
+			world.playSound(loc, Sound.BLOCK_ENDER_CHEST_OPEN, 1f, 1.5f);
+			world.playSound(loc, Sound.BLOCK_ENCHANTMENT_TABLE_USE, 1f, 2f);
+			world.spawnParticle(Particle.REDSTONE, loc.clone().add(0, 1, 0), 25, 0.45, 0.65, 0.45, 0, CHANNELING_COLOR);
+			world.spawnParticle(Particle.FIREWORKS_SPARK, loc.clone().add(0, 1, 0), 8, 0.25, 0.5, 0.25, 0.05);
+			world.spawnParticle(Particle.FIREWORKS_SPARK, loc, 8, 0.35, 0, 0.35, 0.12);
 
 			if (mLastSpellCast == Spells.MAGMA_SHIELD || mLastSpellCast == Spells.STARFALL) {
-				mWorld.spawnParticle(Particle.FLAME, loc.clone().add(0, 1, 0), 18, 0.25, 0.5, 0.25, 0.05);
-				mWorld.spawnParticle(Particle.SMOKE_NORMAL, loc.clone().add(0, 1, 0), 10, 0.25, 0.5, 0.25, 0.05);
-				mWorld.spawnParticle(Particle.LAVA, loc.clone().add(0, 1, 0), 4, 0.25, 0.5, 0.25, 0.0);
-				mWorld.playSound(loc, Sound.ENTITY_PLAYER_HURT_ON_FIRE, 1f, 0.5f);
+				world.spawnParticle(Particle.FLAME, loc.clone().add(0, 1, 0), 18, 0.25, 0.5, 0.25, 0.05);
+				world.spawnParticle(Particle.SMOKE_NORMAL, loc.clone().add(0, 1, 0), 10, 0.25, 0.5, 0.25, 0.05);
+				world.spawnParticle(Particle.LAVA, loc.clone().add(0, 1, 0), 4, 0.25, 0.5, 0.25, 0.0);
+				world.playSound(loc, Sound.ENTITY_PLAYER_HURT_ON_FIRE, 1f, 0.5f);
 				EntityUtils.applyFire(mPlugin, CHANNELING_EFFECT_DURATION, mob, mPlayer);
 			} else if (mLastSpellCast == Spells.FROST_NOVA || mLastSpellCast == Spells.BLIZZARD) {
-				mWorld.spawnParticle(Particle.FALLING_DUST, loc.clone().add(0, 1, 0), 35, 0.45, 0.5, 0.45, 0, Bukkit.createBlockData("snow_block"));
-				mWorld.spawnParticle(Particle.SNOWBALL, loc.clone().add(0, 1, 0), 35, 0.25, 0.5, 0.25, 0.3);
-				mWorld.playSound(loc, Sound.ITEM_TRIDENT_RIPTIDE_1, 1f, 0.65f);
-				mWorld.playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_TWINKLE_FAR, 1f, 2f);
+				world.spawnParticle(Particle.FALLING_DUST, loc.clone().add(0, 1, 0), 35, 0.45, 0.5, 0.45, 0, Bukkit.createBlockData("snow_block"));
+				world.spawnParticle(Particle.SNOWBALL, loc.clone().add(0, 1, 0), 35, 0.25, 0.5, 0.25, 0.3);
+				world.playSound(loc, Sound.ITEM_TRIDENT_RIPTIDE_1, 1f, 0.65f);
+				world.playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_TWINKLE_FAR, 1f, 2f);
 				PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(PotionEffectType.SLOW, CHANNELING_EFFECT_DURATION, 1, false, true));
 			} else {
-				mWorld.spawnParticle(Particle.SPELL_WITCH, loc.clone().add(0, 1, 0), 15, 0.25, 0.5, 0.25, 0.25);
-				mWorld.playSound(loc, Sound.ENTITY_ILLUSIONER_CAST_SPELL, 1f, 1.25f);
+				world.spawnParticle(Particle.SPELL_WITCH, loc.clone().add(0, 1, 0), 15, 0.25, 0.5, 0.25, 0.25);
+				world.playSound(loc, Sound.ENTITY_ILLUSIONER_CAST_SPELL, 1f, 1.25f);
 				PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(PotionEffectType.WEAKNESS, CHANNELING_EFFECT_DURATION, 0, false, true));
 			}
 			mLastSpellCast = null;

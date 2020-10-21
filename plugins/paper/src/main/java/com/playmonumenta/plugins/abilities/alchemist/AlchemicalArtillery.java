@@ -38,8 +38,8 @@ public class AlchemicalArtillery extends Ability {
 	private final int mCost;
 	private boolean mActive = false;
 
-	public AlchemicalArtillery(Plugin plugin, World world, Player player) {
-		super(plugin, world, player, "Alchemical Artillery");
+	public AlchemicalArtillery(Plugin plugin, Player player) {
+		super(plugin, player, "Alchemical Artillery");
 		mInfo.mLinkedSpell = Spells.ALCHEMICAL_ARTILLERY;
 		mInfo.mScoreboardId = "Artillery";
 		mInfo.mShorthandName = "AAr";
@@ -56,15 +56,16 @@ public class AlchemicalArtillery extends Ability {
 		if (!mActive) {
 			if (!mPlayer.isSneaking() && InventoryUtils.isBowItem(mPlayer.getInventory().getItemInMainHand())) {
 				mActive = true;
-				mWorld.playSound(mPlayer.getLocation(), Sound.BLOCK_IRON_TRAPDOOR_OPEN, 1, 2.5f);
+				World world = mPlayer.getWorld();
+				world.playSound(mPlayer.getLocation(), Sound.BLOCK_IRON_TRAPDOOR_OPEN, 1, 2.5f);
 				new BukkitRunnable() {
 					int mTicks = 0;
 					@Override
 					public void run() {
 						mTicks++;
-						mWorld.spawnParticle(Particle.SMOKE_LARGE, mPlayer.getLocation(), 1, 0.25, 0, 0.25, 0);
+						world.spawnParticle(Particle.SMOKE_LARGE, mPlayer.getLocation(), 1, 0.25, 0, 0.25, 0);
 						if (mTicks == 3) {
-							mWorld.playSound(mPlayer.getLocation(), Sound.BLOCK_IRON_TRAPDOOR_OPEN, 1, 2.5f);
+							world.playSound(mPlayer.getLocation(), Sound.BLOCK_IRON_TRAPDOOR_OPEN, 1, 2.5f);
 						}
 						if (!mActive || mTicks > ALCHEMICAL_ARTILLERY_ACTIVITY_PERIOD) {
 							mActive = false;
@@ -91,11 +92,12 @@ public class AlchemicalArtillery extends Ability {
 					public void run() {
 						Location loc = EntityUtils.getProjectileHitLocation(event);
 
-						mWorld.spawnParticle(Particle.SPELL_MOB, loc, 15 * (int) Math.pow(mRadius, 2), mRadius, 0.5, mRadius, 0);
-						mWorld.spawnParticle(Particle.FLAME, loc, 3 * (int) Math.pow(mRadius, 2), 0, 0, 0, 0.06 * mRadius);
-						mWorld.spawnParticle(Particle.SMOKE_LARGE, loc, 5 * (int) Math.pow(mRadius, 2), 0, 0, 0, 0.08 * mRadius);
-						mWorld.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 1.5f, 1);
-						mWorld.playSound(loc, Sound.BLOCK_GLASS_BREAK, 1.5f, 1);
+						World world = mPlayer.getWorld();
+						world.spawnParticle(Particle.SPELL_MOB, loc, 15 * (int) Math.pow(mRadius, 2), mRadius, 0.5, mRadius, 0);
+						world.spawnParticle(Particle.FLAME, loc, 3 * (int) Math.pow(mRadius, 2), 0, 0, 0, 0.06 * mRadius);
+						world.spawnParticle(Particle.SMOKE_LARGE, loc, 5 * (int) Math.pow(mRadius, 2), 0, 0, 0, 0.08 * mRadius);
+						world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 1.5f, 1);
+						world.playSound(loc, Sound.BLOCK_GLASS_BREAK, 1.5f, 1);
 
 						AlchemistPotions ap = AbilityManager.getManager().getPlayerAbility(mPlayer, AlchemistPotions.class);
 						BasiliskPoison bp = AbilityManager.getManager().getPlayerAbility(mPlayer, BasiliskPoison.class);

@@ -1,14 +1,13 @@
 package com.playmonumenta.plugins.tracking;
 
-import org.bukkit.World;
 import org.bukkit.entity.Entity;
 
 public interface EntityTracking {
-	void addEntity(Entity entity);
+	default void addEntity(Entity entity) {}
 
-	void removeEntity(Entity entity);
+	default void removeEntity(Entity entity) {}
 
-	void unloadTrackedEntities();
+	default void unloadTrackedEntities() {}
 
-	void update(World world, int ticks);
+	default void update(int ticks) {}
 }

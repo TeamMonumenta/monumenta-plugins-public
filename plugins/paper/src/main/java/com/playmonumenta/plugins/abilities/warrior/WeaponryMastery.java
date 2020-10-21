@@ -21,8 +21,8 @@ public class WeaponryMastery extends Ability {
 	private final double mDamageBonusAxe;
 	private final double mDamageBonusSword;
 
-	public WeaponryMastery(Plugin plugin, World world, Player player) {
-		super(plugin, world, player, "Weapon Mastery");
+	public WeaponryMastery(Plugin plugin, Player player) {
+		super(plugin, player, "Weapon Mastery");
 		mInfo.mScoreboardId = "WeaponMastery";
 		mInfo.mShorthandName = "WM";
 		mInfo.mDescriptions.add("You gain 10% damage resistance while holding a sword. Deal +3 damage while using an axe.");

@@ -45,8 +45,8 @@ public class DarkPact extends Ability {
 	private int mLeftClicks = 0;
 	private final double mPercentDamageDealt;
 
-	public DarkPact(Plugin plugin, World world, Player player) {
-		super(plugin, world, player, "Dark Pact");
+	public DarkPact(Plugin plugin, Player player) {
+		super(plugin, player, "Dark Pact");
 		mInfo.mScoreboardId = "DarkPact";
 		mInfo.mShorthandName = "DaP";
 		mInfo.mDescriptions.add("Left clicking twice with a scythe causes you to gain 20% damage reduction and deal +40% melee damage for 10 seconds. Each kill during this time increases the duration by 1 second and gives 1 absorption health (capped at 6) for the duration of the melee bonus. However, the player cannot heal for 10 seconds, and Soul Rend cannot be triggered during the anti-heal period. Cooldown: 20s.");
@@ -77,19 +77,20 @@ public class DarkPact extends Ability {
 			return;
 		}
 
-		mPlayer.getWorld().spawnParticle(Particle.SPELL_WITCH, mPlayer.getLocation(), 50, 0.2, 0.1, 0.2, 1);
-		mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_WITHER_SPAWN, SoundCategory.PLAYERS, 0.5f, 1.25f);
-		mWorld.playSound(mPlayer.getLocation(), Sound.BLOCK_BUBBLE_COLUMN_WHIRLPOOL_INSIDE, SoundCategory.PLAYERS, 1, 0.5f);
+		World world = mPlayer.getWorld();
+		world.spawnParticle(Particle.SPELL_WITCH, mPlayer.getLocation(), 50, 0.2, 0.1, 0.2, 1);
+		world.playSound(mPlayer.getLocation(), Sound.ENTITY_WITHER_SPAWN, SoundCategory.PLAYERS, 0.5f, 1.25f);
+		world.playSound(mPlayer.getLocation(), Sound.BLOCK_BUBBLE_COLUMN_WHIRLPOOL_INSIDE, SoundCategory.PLAYERS, 1, 0.5f);
 
 		mPlugin.mEffectManager.addEffect(mPlayer, PERCENT_DAMAGE_DEALT_EFFECT_NAME, new PercentDamageDealt(DURATION, mPercentDamageDealt, ALLOWED_DAMAGE_CAUSES));
 		mPlugin.mEffectManager.addEffect(mPlayer, PERCENT_HEAL_EFFECT_NAME, new PercentHeal(DURATION, PERCENT_HEAL));
 		mPlugin.mEffectManager.addEffect(mPlayer, PERCENT_DAMAGE_RESIST_EFFECT_NAME, new PercentDamageReceived(DURATION, PERCENT_DAMAGE_RESIST));
 		mPlugin.mEffectManager.addEffect(mPlayer, AESTHETICS_EFFECT_NAME, new Aesthetics(DURATION,
 				(entity, fourHertz, twoHertz, oneHertz) -> {
-					entity.getWorld().spawnParticle(Particle.SPELL_WITCH, entity.getLocation(), 3, 0.2, 0.2, 0.2, 0.2);
+					world.spawnParticle(Particle.SPELL_WITCH, entity.getLocation(), 3, 0.2, 0.2, 0.2, 0.2);
 				},
 				(entity) -> {
-					entity.getWorld().playSound(entity.getLocation(), Sound.ENTITY_WITHER_SPAWN, SoundCategory.PLAYERS, 0.3f, 0.75f);
+					world.playSound(entity.getLocation(), Sound.ENTITY_WITHER_SPAWN, SoundCategory.PLAYERS, 0.3f, 0.75f);
 				}));
 
 		putOnCooldown();

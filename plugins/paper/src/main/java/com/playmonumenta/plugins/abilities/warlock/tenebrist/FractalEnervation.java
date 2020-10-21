@@ -39,8 +39,8 @@ public class FractalEnervation extends Ability {
 	private static final int FRACTAL_1_COOLDOWN = 20 * 12;
 	private static final int FRACTAL_2_COOLDOWN = 20 * 10;
 
-	public FractalEnervation(Plugin plugin, World world, Player player) {
-		super(plugin, world, player, "Fractal Enervation");
+	public FractalEnervation(Plugin plugin, Player player) {
+		super(plugin, player, "Fractal Enervation");
 		mInfo.mScoreboardId = "Fractal";
 		mInfo.mShorthandName = "FE";
 		mInfo.mDescriptions.add("Right-clicking while not looking down and not shifting fires a dark magic beam that travels up to 9 blocks. The first enemy hit is afflicted with Mining Fatigue for 12s and takes 1 damage. In addition, all debuffs on the enemy increase by 1 effect level, and have their durations increased to 6 seconds if below 6 seconds. The beam then instantly spreads to all enemies in a 3 block radius, applying the same effects. It will continue spreading until it doesn't find any new targets. Cooldown: 12s.");
@@ -54,7 +54,8 @@ public class FractalEnervation extends Ability {
 
 	@Override
 	public void cast(Action action) {
-		mWorld.playSound(mPlayer.getLocation(), Sound.BLOCK_BUBBLE_COLUMN_WHIRLPOOL_INSIDE, 1, 0.9f);
+		World world = mPlayer.getWorld();
+		world.playSound(mPlayer.getLocation(), Sound.BLOCK_BUBBLE_COLUMN_WHIRLPOOL_INSIDE, 1, 0.9f);
 		BoundingBox box = BoundingBox.of(mPlayer.getEyeLocation(), 0.7, 0.7, 0.7);
 		Vector dir = mPlayer.getEyeLocation().getDirection();
 		List<LivingEntity> mobsInInitialRange = EntityUtils.getNearbyMobs(mPlayer.getEyeLocation(), FRACTAL_INITIAL_RANGE, mPlayer);
@@ -64,12 +65,12 @@ public class FractalEnervation extends Ability {
 		boolean cancel = false;
 		for (int i = 0; i < FRACTAL_INITIAL_RANGE; i++) {
 			box.shift(dir);
-			Location loc = box.getCenter().toLocation(mWorld);
-			mWorld.spawnParticle(Particle.SPELL_WITCH, loc, 5, 0.15, 0.15,
+			Location loc = box.getCenter().toLocation(world);
+			world.spawnParticle(Particle.SPELL_WITCH, loc, 5, 0.15, 0.15,
 			                     0.15, 0.15);
-			mWorld.spawnParticle(Particle.SMOKE_NORMAL, loc, 4, 0.15, 0.15,
+			world.spawnParticle(Particle.SMOKE_NORMAL, loc, 4, 0.15, 0.15,
 			                     0.15, 0.075);
-			mWorld.spawnParticle(Particle.SMOKE_LARGE, loc, 2, 0.1, 0.1, 0.1,
+			world.spawnParticle(Particle.SMOKE_LARGE, loc, 2, 0.1, 0.1, 0.1,
 			                     0.1);
 			// Find the first hit mob and add it to justHit
 			for (LivingEntity mob : mobsInInitialRange) {
@@ -118,8 +119,8 @@ public class FractalEnervation extends Ability {
 			mob.setMetadata(FRACTAL_CAP_REMOVED_METAKEY, new FixedMetadataValue(mPlugin, null));
 			PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(PotionEffectType.SLOW_DIGGING, FRACTAL_FATIGUE_DURATION, 0));
 			EntityUtils.damageEntity(mPlugin, mob, FRACTAL_DAMAGE, mPlayer, MagicType.DARK_MAGIC, true, mInfo.mLinkedSpell);
-			mWorld.spawnParticle(Particle.SPELL_WITCH, mob.getLocation(), 20, 0.25, 0.45, 0.25, 0.15);
-			mWorld.spawnParticle(Particle.SPELL_MOB, mob.getLocation(), 10, 0.25, 0.45, 0.25, 0);
+			world.spawnParticle(Particle.SPELL_WITCH, mob.getLocation(), 20, 0.25, 0.45, 0.25, 0.15);
+			world.spawnParticle(Particle.SPELL_MOB, mob.getLocation(), 10, 0.25, 0.45, 0.25, 0);
 		}
 
 		mHit.clear();

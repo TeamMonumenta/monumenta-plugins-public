@@ -25,8 +25,8 @@ public class Skirmisher extends Ability {
 
 	private final double mIsolatedPercentDamage;
 
-	public Skirmisher(Plugin plugin, World world, Player player) {
-		super(plugin, world, player, "Skirmisher");
+	public Skirmisher(Plugin plugin, Player player) {
+		super(plugin, player, "Skirmisher");
 		mInfo.mScoreboardId = "Skirmisher";
 		mInfo.mShorthandName = "Sk";
 		mInfo.mDescriptions.add("When holding two swords, deal +25% melee damage to mobs with no other mobs within 2.5 blocks.");
@@ -62,13 +62,14 @@ public class Skirmisher extends Ability {
 			//Less than or equals to mobCount since stacked mobs can be outside of skirmish radius
 			if (EntityUtils.getNearbyMobs(loc, SKIRMISHER_ISOLATION_RADIUS, mob).size() <= mobCount
 					|| getAbilityScore() > 1 && mob instanceof Mob && !mPlayer.equals(((Mob) mob).getTarget())) {
-				mWorld.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1f, 1.5f);
-				mWorld.playSound(loc, Sound.BLOCK_IRON_TRAPDOOR_CLOSE, 1, 0.5f);
-				mWorld.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_STRONG, 1f, 0.5f);
+				World world = mPlayer.getWorld();
+				world.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1f, 1.5f);
+				world.playSound(loc, Sound.BLOCK_IRON_TRAPDOOR_CLOSE, 1, 0.5f);
+				world.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_STRONG, 1f, 0.5f);
 				loc.add(0, 1, 0);
-				mWorld.spawnParticle(Particle.SMOKE_NORMAL, loc, 10, 0.35, 0.5, 0.35, 0.05);
-				mWorld.spawnParticle(Particle.SPELL_MOB, loc, 10, 0.35, 0.5, 0.35, 0.00001);
-				mWorld.spawnParticle(Particle.CRIT, loc, 10, 0.25, 0.5, 0.25, 0.55);
+				world.spawnParticle(Particle.SMOKE_NORMAL, loc, 10, 0.35, 0.5, 0.35, 0.05);
+				world.spawnParticle(Particle.SPELL_MOB, loc, 10, 0.35, 0.5, 0.35, 0.00001);
+				world.spawnParticle(Particle.CRIT, loc, 10, 0.25, 0.5, 0.25, 0.55);
 
 				event.setDamage(event.getDamage() * (1 + mIsolatedPercentDamage));
 			}

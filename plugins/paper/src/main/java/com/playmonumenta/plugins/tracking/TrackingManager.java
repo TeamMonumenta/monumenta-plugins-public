@@ -32,7 +32,7 @@ public class TrackingManager {
 	public SilverfishTracking mSilverfish;
 	public FishingHookTracking mFishingHook;
 
-	public TrackingManager(Plugin plugin, World world) {
+	public TrackingManager(Plugin plugin) {
 		mPlugin = plugin;
 
 		// Create a new team (or clear it if it exists) on the scoreboard to use to
@@ -52,9 +52,11 @@ public class TrackingManager {
 		mSilverfish = new SilverfishTracking();
 		mFishingHook = new FishingHookTracking();
 
-		List<Entity> entities = world.getEntities();
-		for (Entity entity : entities) {
-			addEntity(entity);
+		for (World world : Bukkit.getWorlds()) {
+			List<Entity> entities = world.getEntities();
+			for (Entity entity : entities) {
+				addEntity(entity);
+			}
 		}
 	}
 
@@ -105,33 +107,33 @@ public class TrackingManager {
 		}
 	}
 
-	public void update(World world, int ticks) {
+	public void update(int ticks) {
 		try {
-			mPlayers.update(world, ticks);
+			mPlayers.update(ticks);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
 		try {
-			mCreepers.update(world, ticks);
+			mCreepers.update(ticks);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
 		try {
-			mBoats.update(world, ticks);
+			mBoats.update(ticks);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
 		try {
-			mMinecarts.update(world, ticks);
+			mMinecarts.update(ticks);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
 		try {
-			mSilverfish.update(world, ticks);
+			mSilverfish.update(ticks);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

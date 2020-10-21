@@ -38,8 +38,8 @@ public class Spectral extends StatMultiplier {
 
 	private int mSpawnCounter = 0;
 
-	public Spectral(Plugin plugin, World world, Player player) {
-		super(plugin, world, player, SPECTRAL_DAMAGE_TAKEN_MULTIPLIER, SPECTRAL_DAMAGE_TAKEN_MULTIPLIER, 1);
+	public Spectral(Plugin plugin, Player player) {
+		super(plugin, player, SPECTRAL_DAMAGE_TAKEN_MULTIPLIER, SPECTRAL_DAMAGE_TAKEN_MULTIPLIER, 1);
 		mSpectralSummonCommandData = ServerProperties.getClassSpecializationsEnabled() ? SPECTRAL_2_SUMMON_COMMAND_DATA : SPECTRAL_1_SUMMON_COMMAND_DATA;
 	}
 
@@ -63,8 +63,9 @@ public class Spectral extends StatMultiplier {
 				Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), command);
 
 				loc.add(0, 1, 0);
-				mWorld.spawnParticle(Particle.SPELL_WITCH, loc, 50, 0, 0, 0, 0.5);
-				mWorld.spawnParticle(Particle.SMOKE_LARGE, loc, 50, 0.5, 1, 0.5, 0);
+				World world = mPlayer.getWorld();
+				world.spawnParticle(Particle.SPELL_WITCH, loc, 50, 0, 0, 0, 0.5);
+				world.spawnParticle(Particle.SMOKE_LARGE, loc, 50, 0.5, 1, 0.5, 0);
 			}
 		}
 	}

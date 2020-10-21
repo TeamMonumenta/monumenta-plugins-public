@@ -40,8 +40,8 @@ public class ConsumingFlames extends Ability {
 
 	private final int mDamage;
 
-	public ConsumingFlames(Plugin plugin, World world, Player player) {
-		super(plugin, world, player, "Consuming Flames");
+	public ConsumingFlames(Plugin plugin, Player player) {
+		super(plugin, player, "Consuming Flames");
 		mInfo.mScoreboardId = "ConsumingFlames";
 		mInfo.mShorthandName = "CF";
 		mInfo.mDescriptions.add("Sneaking and right-clicking while not looking down while holding a scythe knocks back and ignites mobs within 8 blocks of you for 7s, additionally dealing 1 damage. Amplifying Hex now counts fire as a debuff, and levels of inferno as extra debuff levels. Cooldown: 10s.");
@@ -56,6 +56,7 @@ public class ConsumingFlames extends Ability {
 	public void cast(Action action) {
 		Location loc = mPlayer.getLocation();
 
+		World world = mPlayer.getWorld();
 		new BukkitRunnable() {
 			double mRadius = 0;
 			final Location mLoc = mPlayer.getLocation();
@@ -65,8 +66,8 @@ public class ConsumingFlames extends Ability {
 				for (double j = 0; j < 360; j += 18) {
 					double radian1 = Math.toRadians(j);
 					mLoc.add(FastUtils.cos(radian1) * mRadius, 0.15, FastUtils.sin(radian1) * mRadius);
-					mWorld.spawnParticle(Particle.FLAME, mLoc, 2, 0, 0, 0, 0.125);
-					mWorld.spawnParticle(Particle.SMOKE_NORMAL, mLoc, 3, 0, 0, 0, 0.15);
+					world.spawnParticle(Particle.FLAME, mLoc, 2, 0, 0, 0, 0.125);
+					world.spawnParticle(Particle.SMOKE_NORMAL, mLoc, 3, 0, 0, 0, 0.15);
 					mLoc.subtract(FastUtils.cos(radian1) * mRadius, 0.15, FastUtils.sin(radian1) * mRadius);
 				}
 
@@ -77,9 +78,9 @@ public class ConsumingFlames extends Ability {
 
 		}.runTaskTimer(mPlugin, 0, 1);
 
-		mWorld.spawnParticle(Particle.SMOKE_LARGE, loc, 30, 0, 0, 0, 0.15);
-		mWorld.playSound(loc, Sound.ENTITY_BLAZE_AMBIENT, 1.0f, 0.35f);
-		mWorld.playSound(loc, Sound.ENTITY_BLAZE_SHOOT, 1.0f, 0.35f);
+		world.spawnParticle(Particle.SMOKE_LARGE, loc, 30, 0, 0, 0, 0.15);
+		world.playSound(loc, Sound.ENTITY_BLAZE_AMBIENT, 1.0f, 0.35f);
+		world.playSound(loc, Sound.ENTITY_BLAZE_SHOOT, 1.0f, 0.35f);
 
 		for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), RADIUS, mPlayer)) {
 			EntityUtils.damageEntity(mPlugin, mob, mDamage, mPlayer, MagicType.DARK_MAGIC, true, mInfo.mLinkedSpell);

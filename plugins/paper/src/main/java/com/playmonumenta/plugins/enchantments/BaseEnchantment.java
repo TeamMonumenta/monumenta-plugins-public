@@ -2,7 +2,6 @@ package com.playmonumenta.plugins.enchantments;
 
 import java.util.EnumSet;
 
-import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.LivingEntity;
@@ -112,7 +111,7 @@ public interface BaseEnchantment {
 
 
 	/* This method will be called four times per second */
-	default void tick(Plugin plugin, World world, Player player, int level) {
+	default void tick(Plugin plugin, Player player, int level) {
 
 	}
 

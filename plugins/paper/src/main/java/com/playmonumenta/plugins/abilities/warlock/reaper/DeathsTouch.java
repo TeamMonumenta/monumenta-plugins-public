@@ -47,8 +47,8 @@ public class DeathsTouch extends Ability {
 	private LivingEntity mTarget = null;
 	private int mRightClicks = 0;
 
-	public DeathsTouch(Plugin plugin, World world, Player player) {
-		super(plugin, world, player, "Death's Touch");
+	public DeathsTouch(Plugin plugin, Player player) {
+		super(plugin, player, "Death's Touch");
 		mInfo.mLinkedSpell = Spells.DEATHS_TOUCH;
 		mInfo.mScoreboardId = "DeathsTouch";
 		mInfo.mShorthandName = "DT";
@@ -86,21 +86,22 @@ public class DeathsTouch extends Ability {
 
 		Location loc = mPlayer.getEyeLocation();
 		Vector dir = loc.getDirection();
-		loc.getWorld().playSound(loc, Sound.ENTITY_WITHER_SHOOT, SoundCategory.PLAYERS, 0.5f, 0.25f);
+		World world = mPlayer.getWorld();
+		world.playSound(loc, Sound.ENTITY_WITHER_SHOOT, SoundCategory.PLAYERS, 0.5f, 0.25f);
 
 		// Get a list of mobs that can possibly be hit - so we don't have to ask the game for nearby mobs every time
 		List<LivingEntity> mobsInRange = EntityUtils.getNearbyMobs(loc, DEATHS_TOUCH_RANGE, mPlayer);
 		BoundingBox box = BoundingBox.of(loc, 1, 1, 1);
 		for (int i = 0; i < DEATHS_TOUCH_RANGE; i++) {
 			box.shift(dir);
-			Location bloc = box.getCenter().toLocation(mWorld);
-			mWorld.spawnParticle(Particle.SPELL_MOB, bloc, 5, 0.15, 0.15, 0.15, 0);
+			Location bloc = box.getCenter().toLocation(world);
+			world.spawnParticle(Particle.SPELL_MOB, bloc, 5, 0.15, 0.15, 0.15, 0);
 			for (LivingEntity mob : mobsInRange) {
 				if (mob.getBoundingBox().overlaps(box)) {
 					mTarget = mob;
 					mob.setMetadata(DEATHS_TOUCH_BUFF_DURATION, new FixedMetadataValue(mPlugin, mBuffDuration));
 					mob.setMetadata(DEATHS_TOUCH_AMPLIFIER_CAP, new FixedMetadataValue(mPlugin, mAmplifierCap));
-					loc.getWorld().playSound(loc, Sound.ENTITY_WITHER_SPAWN, SoundCategory.PLAYERS, 0.25f, 1f);
+					world.playSound(loc, Sound.ENTITY_WITHER_SPAWN, SoundCategory.PLAYERS, 0.25f, 1f);
 
 					new BukkitRunnable() {
 						final int mRunnableDuration = getAbilityScore() == 1 ? DEATHS_TOUCH_1_COOLDOWN : DEATHS_TOUCH_2_COOLDOWN;

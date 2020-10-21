@@ -2,7 +2,6 @@ package com.playmonumenta.plugins.abilities;
 
 import java.util.Collection;
 
-import org.bukkit.World;
 import org.bukkit.entity.AbstractArrow;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -34,14 +33,12 @@ import net.md_5.bungee.api.chat.ComponentBuilder;
 
 public abstract class Ability {
 	protected final Plugin mPlugin;
-	protected final World mWorld;
 	protected final AbilityInfo mInfo;
 	protected final Player mPlayer;
 	private Integer mScore = null;
 
-	public Ability(Plugin plugin, World world, Player player, String displayName) {
+	public Ability(Plugin plugin, Player player, String displayName) {
 		mPlugin = plugin;
-		mWorld = world;
 		mPlayer = player;
 		mInfo = new AbilityInfo();
 		mInfo.mDisplayName = displayName;

@@ -57,7 +57,7 @@ public class Festive implements BaseEnchantment {
 	}
 
 	@Override
-	public void tick(Plugin plugin, World world, Player player, int level) {
+	public void tick(Plugin plugin, Player player, int level) {
 		final Location loc = player.getLocation().add(0, 1, 0);
 		if (NO_SELF_PARTICLES.contains(player)) {
 			for (Player other : PlayerUtils.playersInRange(player, 30, false)) {
@@ -66,6 +66,7 @@ public class Festive implements BaseEnchantment {
 				other.spawnParticle(Particle.SNOWBALL, loc, Math.max(3, level), 0.4, 0.4, 0.4, 0);
 			}
 		} else {
+			World world = player.getWorld();
 			world.spawnParticle(Particle.REDSTONE, loc, Math.max(6, 2 + level), 0.4, 0.4, 0.4, FESTIVE_RED_COLOR);
 			world.spawnParticle(Particle.REDSTONE, loc, Math.max(6, 2 + level), 0.4, 0.4, 0.4, FESTIVE_GREEN_COLOR);
 			world.spawnParticle(Particle.SNOWBALL, loc, Math.max(3, level), 0.4, 0.4, 0.4, 0);

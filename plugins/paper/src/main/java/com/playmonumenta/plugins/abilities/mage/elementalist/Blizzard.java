@@ -37,8 +37,8 @@ public class Blizzard extends Ability {
 	private static final int BLIZZARD_1_COOLDOWN = 30;
 	private static final int BLIZZARD_2_COOLDOWN = 25;
 
-	public Blizzard(Plugin plugin, World world, Player player) {
-		super(plugin, world, player, "Blizzard");
+	public Blizzard(Plugin plugin, Player player) {
+		super(plugin, player, "Blizzard");
 		mInfo.mScoreboardId = "Blizzard";
 		mInfo.mShorthandName = "Bl";
 		mInfo.mDescriptions.add("Shift Right Clicking while looking up creates an aura of ice and snow in a radius of 6 blocks that lasts 10 seconds and stays centered on the user. Mobs that enter the aura get Slowness 1. After three seconds in the aura they get Slowness 2. After six seconds in the aura enemies are given Slowness 4 (bosses remain at Slowness 2). Enemies take 2 damage a second while in the aura. Entities that are on fire within the aura are extinguished. This spell can trigger Spellshock but cannot apply it. Cooldown: 30s (starting after cast).");
@@ -60,8 +60,9 @@ public class Blizzard extends Ability {
 		mActive = true;
 		putOnCooldown();
 
-		mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_BLAZE_SHOOT, 1, 2);
-		mWorld.playSound(mPlayer.getLocation(), Sound.BLOCK_GLASS_BREAK, 1, 0.75f);
+		World world = mPlayer.getWorld();
+		world.playSound(mPlayer.getLocation(), Sound.ENTITY_BLAZE_SHOOT, 1, 2);
+		world.playSound(mPlayer.getLocation(), Sound.BLOCK_GLASS_BREAK, 1, 0.75f);
 		double damage = getAbilityScore() == 1 ? BLIZZARD_1_DAMAGE : BLIZZARD_2_DAMAGE;
 		double radius = getAbilityScore() == 1 ? BLIZZARD_1_RADIUS : BLIZZARD_2_RADIUS;
 		new BukkitRunnable() {
@@ -100,9 +101,9 @@ public class Blizzard extends Ability {
 					}
 				}
 
-				mWorld.spawnParticle(Particle.SNOWBALL, loc, 6, 2, 2, 2, 0.1);
-				mWorld.spawnParticle(Particle.CLOUD, loc, 4, 2, 2, 2, 0.05);
-				mWorld.spawnParticle(Particle.CLOUD, loc, 3, 0.1, 0.1, 0.1, 0.15);
+				world.spawnParticle(Particle.SNOWBALL, loc, 6, 2, 2, 2, 0.1);
+				world.spawnParticle(Particle.CLOUD, loc, 4, 2, 2, 2, 0.05);
+				world.spawnParticle(Particle.CLOUD, loc, 3, 0.1, 0.1, 0.1, 0.15);
 				if (mT >= 20 * 10 || mPlayer.isDead() || !mPlayer.isValid()) {
 					this.cancel();
 					mAffected.clear();

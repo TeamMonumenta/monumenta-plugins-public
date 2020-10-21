@@ -40,8 +40,8 @@ public class Celestial extends Ability {
 	private static final double CELESTIAL_EXTRA_SPEED = 0.02;
 	private static final String ATTR_NAME = "CelestialBlessingExtraSpeedAttr";
 
-	public Celestial(Plugin plugin, World world, Player player) {
-		super(plugin, world, player, "Celestial Blessing");
+	public Celestial(Plugin plugin, Player player) {
+		super(plugin, player, "Celestial Blessing");
 		mInfo.mLinkedSpell = Spells.CELESTIAL_BLESSING;
 		mInfo.mScoreboardId = "Celestial";
 		mInfo.mShorthandName = "CB";
@@ -73,9 +73,9 @@ public class Celestial extends Ability {
 				(entity, fourHertz, twoHertz, oneHertz) -> {
 					// Tick effect
 					Location loc = p.getLocation().add(0, 1, 0);
-					mWorld.spawnParticle(Particle.SPELL_INSTANT, loc, 2, 0.25, 0.25, 0.25, 0.1);
-					mWorld.spawnParticle(Particle.SPELL_INSTANT, loc, 2, 0.5, 0.5, 0.5, 0);
-					mWorld.spawnParticle(Particle.VILLAGER_HAPPY, loc, 2, 0.5, 0.5, 0.5, 0.1);
+					world.spawnParticle(Particle.SPELL_INSTANT, loc, 2, 0.25, 0.25, 0.25, 0.1);
+					world.spawnParticle(Particle.SPELL_INSTANT, loc, 2, 0.5, 0.5, 0.5, 0);
+					world.spawnParticle(Particle.VILLAGER_HAPPY, loc, 2, 0.5, 0.5, 0.5, 0.1);
 				}, (entity) -> {
 					// Lose effect
 					Location loc = p.getLocation();

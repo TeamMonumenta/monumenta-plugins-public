@@ -41,8 +41,8 @@ public class EnchantedShot extends Ability {
 
 	private boolean mActive = false;
 
-	public EnchantedShot(Plugin plugin, World world, Player player) {
-		super(plugin, world, player, "Enchanted Arrow");
+	public EnchantedShot(Plugin plugin, Player player) {
+		super(plugin, player, "Enchanted Arrow");
 		mInfo.mScoreboardId = "EnchantedArrow";
 		mInfo.mShorthandName = "EA";
 		mInfo.mDescriptions.add("Left-clicking with a bow while not sneaking, will prime an enchanted arrow that unprimes after 5 seconds. When you fire a critical arrow, it will instantaneously travel in a straight line for up to 30 blocks or until it hits a block. All targets hit take 25 damage, affected by Bow Mastery and Sharpshooter. Hit targets contribute to Sharpshooter stacks. Cooldown: 20s.");
@@ -62,13 +62,14 @@ public class EnchantedShot extends Ability {
 			if (InventoryUtils.isBowItem(mainHand)) {
 				Player player = mPlayer;
 				mActive = true;
-				player.getWorld().playSound(player.getLocation(), Sound.ENTITY_FIREWORK_ROCKET_LAUNCH, 1, 1.45f);
+				World world = mPlayer.getWorld();
+				world.playSound(player.getLocation(), Sound.ENTITY_FIREWORK_ROCKET_LAUNCH, 1, 1.45f);
 				new BukkitRunnable() {
 					int mTicks = 0;
 					@Override
 					public void run() {
 						mTicks++;
-						mWorld.spawnParticle(Particle.SPELL_INSTANT, player.getLocation(), 4, 0.25, 0, 0.25, 0);
+						world.spawnParticle(Particle.SPELL_INSTANT, player.getLocation(), 4, 0.25, 0, 0.25, 0);
 						if (!mActive || mTicks >= 20 * 5) {
 							mActive = false;
 							this.cancel();
@@ -90,13 +91,14 @@ public class EnchantedShot extends Ability {
 			Player player = mPlayer;
 			Location loc = player.getEyeLocation();
 			Vector dir = loc.getDirection().normalize();
-			player.getWorld().playSound(loc, Sound.ENTITY_PUFFER_FISH_DEATH, 0.7f, 0.8f);
-			player.getWorld().playSound(loc, Sound.ITEM_TRIDENT_RIPTIDE_3, 1f, 1.5f);
-			player.getWorld().playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_LAUNCH, 1f, 0.75f);
-			player.getWorld().playSound(loc, Sound.ENTITY_ILLUSIONER_MIRROR_MOVE, 1f, 1f);
-			player.getWorld().playSound(loc, Sound.ENTITY_IRON_GOLEM_HURT, 1f, 0.75f);
-			mWorld.spawnParticle(Particle.SMOKE_NORMAL, loc.clone().add(dir), 20, 0.2, 0.2, 0.2, 0.15);
-			mWorld.spawnParticle(Particle.CRIT_MAGIC, loc.clone().add(dir), 10, 0.2, 0.2, 0.2, 0.15);
+			World world = mPlayer.getWorld();
+			world.playSound(loc, Sound.ENTITY_PUFFER_FISH_DEATH, 0.7f, 0.8f);
+			world.playSound(loc, Sound.ITEM_TRIDENT_RIPTIDE_3, 1f, 1.5f);
+			world.playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_LAUNCH, 1f, 0.75f);
+			world.playSound(loc, Sound.ENTITY_ILLUSIONER_MIRROR_MOVE, 1f, 1f);
+			world.playSound(loc, Sound.ENTITY_IRON_GOLEM_HURT, 1f, 0.75f);
+			world.spawnParticle(Particle.SMOKE_NORMAL, loc.clone().add(dir), 20, 0.2, 0.2, 0.2, 0.15);
+			world.spawnParticle(Particle.CRIT_MAGIC, loc.clone().add(dir), 10, 0.2, 0.2, 0.2, 0.15);
 
 			List<LivingEntity> mobs = EntityUtils.getNearbyMobs(mPlayer.getEyeLocation(), 30, mPlayer);
 
@@ -110,23 +112,23 @@ public class EnchantedShot extends Ability {
 
 			for (int i = 0; i < 30; i++) {
 				box.shift(dir);
-				Location bLoc = box.getCenter().toLocation(mWorld);
-				mWorld.spawnParticle(Particle.SMOKE_NORMAL, bLoc, 5, 0.1, 0.1, 0.1, 0.2);
-				mWorld.spawnParticle(Particle.FALLING_DUST, bLoc, 5, 0.1, 0.1, 0.1, 0, Bukkit.createBlockData("light_gray_glazed_terracotta"));
-				mWorld.spawnParticle(Particle.SPELL_INSTANT, bLoc, 6, 0.2, 0.2, 0.2, 0.15);
-				mWorld.spawnParticle(Particle.SMOKE_NORMAL, bLoc, 3, 0.1, 0.1, 0.1, 0);
-				mWorld.spawnParticle(Particle.REDSTONE, bLoc, 3, 0.1, 0.1, 0.1, 0, ENCHANTED_ARROW_COLOR);
-				mWorld.spawnParticle(Particle.CRIT, bLoc, 5, 0.15, 0.15, 0.15, 0.4);
-				mWorld.spawnParticle(Particle.REDSTONE, bLoc.clone().add(pVec), 1, 0, 0, 0, 0, ENCHANTED_ARROW_FRINGE_COLOR);
-				mWorld.spawnParticle(Particle.END_ROD, bLoc.clone().add(pVec), 1, 0, 0, 0, 0.02);
-				mWorld.spawnParticle(Particle.REDSTONE, bLoc.clone().add(dir.clone().multiply(0.5)).add(pVec.clone().rotateAroundAxis(dir, Math.PI / 12)), 1, 0, 0, 0, 0, ENCHANTED_ARROW_FRINGE_COLOR);
+				Location bLoc = box.getCenter().toLocation(world);
+				world.spawnParticle(Particle.SMOKE_NORMAL, bLoc, 5, 0.1, 0.1, 0.1, 0.2);
+				world.spawnParticle(Particle.FALLING_DUST, bLoc, 5, 0.1, 0.1, 0.1, 0, Bukkit.createBlockData("light_gray_glazed_terracotta"));
+				world.spawnParticle(Particle.SPELL_INSTANT, bLoc, 6, 0.2, 0.2, 0.2, 0.15);
+				world.spawnParticle(Particle.SMOKE_NORMAL, bLoc, 3, 0.1, 0.1, 0.1, 0);
+				world.spawnParticle(Particle.REDSTONE, bLoc, 3, 0.1, 0.1, 0.1, 0, ENCHANTED_ARROW_COLOR);
+				world.spawnParticle(Particle.CRIT, bLoc, 5, 0.15, 0.15, 0.15, 0.4);
+				world.spawnParticle(Particle.REDSTONE, bLoc.clone().add(pVec), 1, 0, 0, 0, 0, ENCHANTED_ARROW_FRINGE_COLOR);
+				world.spawnParticle(Particle.END_ROD, bLoc.clone().add(pVec), 1, 0, 0, 0, 0.02);
+				world.spawnParticle(Particle.REDSTONE, bLoc.clone().add(dir.clone().multiply(0.5)).add(pVec.clone().rotateAroundAxis(dir, Math.PI / 12)), 1, 0, 0, 0, 0, ENCHANTED_ARROW_FRINGE_COLOR);
 				Iterator<LivingEntity> iterator = mobs.iterator();
 				while (iterator.hasNext()) {
 					LivingEntity mob = iterator.next();
 					if (mob.getBoundingBox().overlaps(box)) {
-						mWorld.spawnParticle(Particle.CRIT_MAGIC, mob.getLocation().add(0, 1, 0), 15, 0.1, 0.2, 0.1, 0.15);
-						mWorld.spawnParticle(Particle.SPELL_INSTANT, mob.getLocation().add(0, 1, 0), 20, 0.1, 0.2, 0.1, 0.15);
-						mWorld.spawnParticle(Particle.FIREWORKS_SPARK, mob.getLocation().add(0, 1, 0), 10, 0.1, 0.2, 0.1, 0.1);
+						world.spawnParticle(Particle.CRIT_MAGIC, mob.getLocation().add(0, 1, 0), 15, 0.1, 0.2, 0.1, 0.15);
+						world.spawnParticle(Particle.SPELL_INSTANT, mob.getLocation().add(0, 1, 0), 20, 0.1, 0.2, 0.1, 0.15);
+						world.spawnParticle(Particle.FIREWORKS_SPARK, mob.getLocation().add(0, 1, 0), 10, 0.1, 0.2, 0.1, 0.1);
 						EntityUtils.damageEntity(mPlugin, mob, damage, mPlayer, MagicType.ARCANE, true, mInfo.mLinkedSpell);
 						/* Prevent mob from being hit twice in one shot */
 						iterator.remove();
@@ -134,10 +136,10 @@ public class EnchantedShot extends Ability {
 					}
 				}
 				if (bLoc.getBlock().getType().isSolid()) {
-					mWorld.spawnParticle(Particle.SMOKE_LARGE, bLoc, 80, 0.1, 0.1, 0.1, 0.2);
-					mWorld.spawnParticle(Particle.CLOUD, bLoc, 80, 0.1, 0.1, 0.1, 0.2);
-					mWorld.spawnParticle(Particle.FIREWORKS_SPARK, bLoc, 50, 0.1, 0.1, 0.1, 0.3);
-					player.getWorld().playSound(bLoc, Sound.ENTITY_FIREWORK_ROCKET_BLAST, 1, 0.85f);
+					world.spawnParticle(Particle.SMOKE_LARGE, bLoc, 80, 0.1, 0.1, 0.1, 0.2);
+					world.spawnParticle(Particle.CLOUD, bLoc, 80, 0.1, 0.1, 0.1, 0.2);
+					world.spawnParticle(Particle.FIREWORKS_SPARK, bLoc, 50, 0.1, 0.1, 0.1, 0.3);
+					world.playSound(bLoc, Sound.ENTITY_FIREWORK_ROCKET_BLAST, 1, 0.85f);
 					break;
 				}
 

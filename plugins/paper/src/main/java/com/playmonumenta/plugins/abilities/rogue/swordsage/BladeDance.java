@@ -33,8 +33,8 @@ public class BladeDance extends Ability {
 	private static final float DANCE_KNOCKBACK_SPEED = 0.2f;
 	private static final Particle.DustOptions SWORDSAGE_COLOR = new Particle.DustOptions(Color.fromRGB(150, 0, 0), 1.0f);
 
-	public BladeDance(Plugin plugin, World world, Player player) {
-		super(plugin, world, player, "Blade Dance");
+	public BladeDance(Plugin plugin, Player player) {
+		super(plugin, player, "Blade Dance");
 		mInfo.mScoreboardId = "BladeDance";
 		mInfo.mShorthandName = "BD";
 		mInfo.mDescriptions.add("When holding two swords, right-click while looking down to enter a defensive stance, parrying all attacks and becoming invulnerable for 0.75 seconds. Afterwards, unleash a powerful attack that deals 12 damage to and afflicts Weakness III to all enemies in a 4 block radius for 5 seconds. Cooldown: 20s.");
@@ -60,12 +60,13 @@ public class BladeDance extends Ability {
 			return;
 		}
 
-		mWorld.playSound(mPlayer.getLocation(), Sound.ITEM_TRIDENT_RETURN, 1f, 0.75f);
-		mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_PLAYER_ATTACK_STRONG, 1f, 0.5f);
-		mWorld.playSound(mPlayer.getLocation(), Sound.BLOCK_BEACON_ACTIVATE, 1f, 2f);
-		mWorld.spawnParticle(Particle.VILLAGER_ANGRY, mPlayer.getLocation().clone().add(0, 1, 0), 6, 0.45, 0.5, 0.45, 0);
-		mWorld.spawnParticle(Particle.CLOUD, mPlayer.getLocation().clone().add(0, 1, 0), 20, 0.25, 0.5, 0.25, 0.15);
-		mWorld.spawnParticle(Particle.REDSTONE, mPlayer.getLocation().clone().add(0, 1, 0), 6, 0.45, 0.5, 0.45, 0, SWORDSAGE_COLOR);
+		World world = mPlayer.getWorld();
+		world.playSound(mPlayer.getLocation(), Sound.ITEM_TRIDENT_RETURN, 1f, 0.75f);
+		world.playSound(mPlayer.getLocation(), Sound.ENTITY_PLAYER_ATTACK_STRONG, 1f, 0.5f);
+		world.playSound(mPlayer.getLocation(), Sound.BLOCK_BEACON_ACTIVATE, 1f, 2f);
+		world.spawnParticle(Particle.VILLAGER_ANGRY, mPlayer.getLocation().clone().add(0, 1, 0), 6, 0.45, 0.5, 0.45, 0);
+		world.spawnParticle(Particle.CLOUD, mPlayer.getLocation().clone().add(0, 1, 0), 20, 0.25, 0.5, 0.25, 0.15);
+		world.spawnParticle(Particle.REDSTONE, mPlayer.getLocation().clone().add(0, 1, 0), 6, 0.45, 0.5, 0.45, 0, SWORDSAGE_COLOR);
 		mPlayer.setInvulnerable(true);
 		if (getAbilityScore() >= 2) {
 			mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.SPEED, 20 * 2, 1, true, false));
@@ -79,21 +80,21 @@ public class BladeDance extends Ability {
 				mTicks += 1;
 				Location loc = mPlayer.getLocation();
 				double r = DANCE_RADIUS - (3 * mPitch);
-				mWorld.spawnParticle(Particle.SWEEP_ATTACK, loc, 3, r, 2, r, 0);
-				mWorld.spawnParticle(Particle.REDSTONE, loc, 4, r, 2, r, 0, SWORDSAGE_COLOR);
-				mWorld.spawnParticle(Particle.CLOUD, loc, 4, r, 2, r, 0);
+				world.spawnParticle(Particle.SWEEP_ATTACK, loc, 3, r, 2, r, 0);
+				world.spawnParticle(Particle.REDSTONE, loc, 4, r, 2, r, 0, SWORDSAGE_COLOR);
+				world.spawnParticle(Particle.CLOUD, loc, 4, r, 2, r, 0);
 				if (mTicks % 2 == 0) {
-					mWorld.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 0.75f, mPitch);
+					world.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 0.75f, mPitch);
 					mPitch += 0.1f;
 				}
 
 				if (mTicks >= 15) {
 					mPlayer.setInvulnerable(false);
-					mWorld.playSound(loc, Sound.ENTITY_ILLUSIONER_CAST_SPELL, 1, 1);
-					mWorld.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 1, 2f);
-					mWorld.playSound(loc, Sound.ENTITY_BLAZE_SHOOT, 1, 0.75f);
+					world.playSound(loc, Sound.ENTITY_ILLUSIONER_CAST_SPELL, 1, 1);
+					world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 1, 2f);
+					world.playSound(loc, Sound.ENTITY_BLAZE_SHOOT, 1, 0.75f);
 
-					mWorld.spawnParticle(Particle.VILLAGER_ANGRY, mPlayer.getLocation().clone().add(0, 1, 0), 6, 0.45, 0.5, 0.45, 0);
+					world.spawnParticle(Particle.VILLAGER_ANGRY, mPlayer.getLocation().clone().add(0, 1, 0), 6, 0.45, 0.5, 0.45, 0);
 
 					int damage = getAbilityScore() == 1 ? DANCE_1_DAMAGE : DANCE_2_DAMAGE;
 
@@ -106,9 +107,9 @@ public class BladeDance extends Ability {
 						PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(PotionEffectType.WEAKNESS, 100, amplifier, true, true));
 
 						Location mobLoc = mob.getLocation().add(0, 1, 0);
-						mWorld.spawnParticle(Particle.SWEEP_ATTACK, mobLoc, 5, 0.35, 0.5, 0.35, 0);
-						mWorld.spawnParticle(Particle.CRIT, mobLoc, 10, 0.25, 0.5, 0.25, 0.3);
-						mWorld.spawnParticle(Particle.REDSTONE, mobLoc, 15, 0.35, 0.5, 0.35, 0, SWORDSAGE_COLOR);
+						world.spawnParticle(Particle.SWEEP_ATTACK, mobLoc, 5, 0.35, 0.5, 0.35, 0);
+						world.spawnParticle(Particle.CRIT, mobLoc, 10, 0.25, 0.5, 0.25, 0.3);
+						world.spawnParticle(Particle.REDSTONE, mobLoc, 15, 0.35, 0.5, 0.35, 0, SWORDSAGE_COLOR);
 					}
 
 					new BukkitRunnable() {
@@ -121,10 +122,10 @@ public class BladeDance extends Ability {
 							mVec = new Vector(FastUtils.cos(mRadians) * DANCE_RADIUS / 1.5, 0, FastUtils.sin(mRadians) * DANCE_RADIUS / 1.5);
 
 							Location loc2 = mPlayer.getEyeLocation().add(mVec);
-							mWorld.spawnParticle(Particle.SWEEP_ATTACK, loc2, 5, 1, 0.25, 1, 0);
-							mWorld.spawnParticle(Particle.CRIT, loc2, 10, 1, 0.25, 1, 0.3);
-							mWorld.spawnParticle(Particle.REDSTONE, loc2, 10, 1, 0.25, 1, 0, SWORDSAGE_COLOR);
-							mWorld.playSound(loc2, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1, 1.5f);
+							world.spawnParticle(Particle.SWEEP_ATTACK, loc2, 5, 1, 0.25, 1, 0);
+							world.spawnParticle(Particle.CRIT, loc2, 10, 1, 0.25, 1, 0.3);
+							world.spawnParticle(Particle.REDSTONE, loc2, 10, 1, 0.25, 1, 0, SWORDSAGE_COLOR);
+							world.playSound(loc2, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1, 1.5f);
 
 							if (mTicks >= 5) {
 								this.cancel();

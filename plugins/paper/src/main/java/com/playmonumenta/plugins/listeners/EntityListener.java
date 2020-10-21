@@ -143,12 +143,10 @@ public class EntityListener implements Listener {
 	        );
 
 	Plugin mPlugin;
-	World mWorld;
 	AbilityManager mAbilities;
 
-	public EntityListener(Plugin plugin, World world, AbilityManager abilities) {
+	public EntityListener(Plugin plugin, AbilityManager abilities) {
 		mPlugin = plugin;
-		mWorld = world;
 		mAbilities = abilities;
 	}
 
@@ -605,7 +603,7 @@ public class EntityListener implements Listener {
 				    ((itemInOffHand.getType().equals(Material.SNOWBALL)) &&
 				     (itemInOffHand.getEnchantmentLevel(Enchantment.ARROW_INFINITE) > 0))) {
 
-					Snowball newBall = (Snowball)mWorld.spawnEntity(origBall.getLocation(), EntityType.SNOWBALL);
+					Snowball newBall = (Snowball)origBall.getWorld().spawnEntity(origBall.getLocation(), EntityType.SNOWBALL);
 					newBall.setShooter(player);
 					newBall.setVelocity(origBall.getVelocity());
 					// Set projectile attributes; don't need to do speed attribute since that's only used to calculate non-critical arrow damage
@@ -633,7 +631,7 @@ public class EntityListener implements Listener {
 				    ((itemInOffHand.getType().equals(Material.ENDER_PEARL)) &&
 				     (itemInOffHand.getEnchantmentLevel(Enchantment.ARROW_INFINITE) > 0))) {
 
-					EnderPearl newPearl = (EnderPearl)mWorld.spawnEntity(origPearl.getLocation(), EntityType.ENDER_PEARL);
+					EnderPearl newPearl = (EnderPearl)origPearl.getWorld().spawnEntity(origPearl.getLocation(), EntityType.ENDER_PEARL);
 					newPearl.setShooter(player);
 					newPearl.setVelocity(origPearl.getVelocity());
 					//Set Ranged Damage attribute

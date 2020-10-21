@@ -6,7 +6,6 @@ import java.util.Map;
 import java.util.UUID;
 
 import org.bukkit.ChatColor;
-import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
@@ -47,7 +46,7 @@ public class Regeneration implements BaseEnchantment {
 
 	// This seems to trigger 4 times a second despite BaseEnchantment claiming it triggers once a second
 	@Override
-	public void tick(Plugin plugin, World world, Player player, int level) {
+	public void tick(Plugin plugin, Player player, int level) {
 		if (!mRegenerationTracker.containsKey(player.getUniqueId())) {
 			mRegenerationTracker.put(player.getUniqueId(), 0.0);
 		} else {

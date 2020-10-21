@@ -40,8 +40,8 @@ public class HolyJavelin extends Ability {
 	private final int mDamage;
 	private final int mUndeadDamage;
 
-	public HolyJavelin(Plugin plugin, World world, Player player) {
-		super(plugin, world, player, "Holy Javelin");
+	public HolyJavelin(Plugin plugin, Player player) {
+		super(plugin, player, "Holy Javelin");
 		mInfo.mLinkedSpell = Spells.HOLY_JAVELIN;
 		mInfo.mScoreboardId = "HolyJavelin";
 		mInfo.mShorthandName = "HJ";
@@ -61,21 +61,22 @@ public class HolyJavelin extends Ability {
 
 	@Override
 	public void cast(Action action) {
-		mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_SHULKER_SHOOT, 1, 1.75f);
-		mWorld.playSound(mPlayer.getLocation(), Sound.ITEM_TRIDENT_THROW, 1, 0.9f);
+		World world = mPlayer.getWorld();
+		world.playSound(mPlayer.getLocation(), Sound.ENTITY_SHULKER_SHOOT, 1, 1.75f);
+		world.playSound(mPlayer.getLocation(), Sound.ITEM_TRIDENT_THROW, 1, 0.9f);
 		Location playerLoc = mPlayer.getEyeLocation();
 		Location location = playerLoc.clone();
 		Vector increment = location.getDirection();
-		mWorld.spawnParticle(Particle.EXPLOSION_NORMAL, location.clone().add(increment), 10, 0, 0, 0, 0.125f);
+		world.spawnParticle(Particle.EXPLOSION_NORMAL, location.clone().add(increment), 10, 0, 0, 0, 0.125f);
 
 		// Get a list of all the mobs this could possibly hit (that are within range of the player)
 		List<LivingEntity> mobs = EntityUtils.getNearbyMobs(location, RANGE, mPlayer);
 		BoundingBox box = BoundingBox.of(playerLoc, HITBOX_LENGTH, HITBOX_LENGTH, HITBOX_LENGTH);
 		for (int i = 0; i < RANGE; i++) {
 			box.shift(increment);
-			Location loc = box.getCenter().toLocation(mWorld);
-			mWorld.spawnParticle(Particle.REDSTONE, loc, 22, 0.25, 0.25, 0.25, COLOR);
-			mWorld.spawnParticle(Particle.EXPLOSION_NORMAL, loc, 2, 0f, 0f, 0f, 0.025f);
+			Location loc = box.getCenter().toLocation(world);
+			world.spawnParticle(Particle.REDSTONE, loc, 22, 0.25, 0.25, 0.25, COLOR);
+			world.spawnParticle(Particle.EXPLOSION_NORMAL, loc, 2, 0f, 0f, 0f, 0.025f);
 
 			Iterator<LivingEntity> iter = mobs.iterator();
 			while (iter.hasNext()) {
@@ -93,9 +94,9 @@ public class HolyJavelin extends Ability {
 
 			if (loc.getBlock().getType().isSolid()) {
 				loc.subtract(increment.multiply(0.5));
-				mWorld.spawnParticle(Particle.CLOUD, loc, 30, 0, 0, 0, 0.125f);
-				mWorld.playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_BLAST, 1, 1.65f);
-				mWorld.playSound(loc, Sound.ENTITY_ARROW_HIT, 1, 0.9f);
+				world.spawnParticle(Particle.CLOUD, loc, 30, 0, 0, 0, 0.125f);
+				world.playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_BLAST, 1, 1.65f);
+				world.playSound(loc, Sound.ENTITY_ARROW_HIT, 1, 0.9f);
 				break;
 			}
 		}

@@ -5,15 +5,12 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Queue;
-import java.util.Set;
 
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.Monster;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -35,11 +32,9 @@ import com.playmonumenta.plugins.utils.MessagingUtils;
 
 public class WorldListener implements Listener {
 	Plugin mPlugin;
-	World mWorld;
 
-	public WorldListener(Plugin plugin, World world) {
+	public WorldListener(Plugin plugin) {
 		mPlugin = plugin;
-		mWorld = world;
 	}
 
 	//  A Chunk Loaded.

@@ -5,7 +5,6 @@ import java.util.Iterator;
 import java.util.Map.Entry;
 import java.util.UUID;
 
-import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.FishHook;
 import org.bukkit.entity.Player;
@@ -13,20 +12,12 @@ import org.bukkit.entity.Player;
 public class FishingHookTracking implements EntityTracking {
 	private HashMap<UUID, FishHook> mEntities = new HashMap<UUID, FishHook>();
 
-	@Override
-	public void addEntity(Entity entity) {
-
-	}
-
+	// Note this is not from the base class
 	public void addEntity(Player player, Entity entity) {
 		mEntities.put(player.getUniqueId(), (FishHook)entity);
 	}
 
-	@Override
-	public void removeEntity(Entity entity) {
-
-	}
-
+	// Note this is not from the base class
 	public void removeEntity(Player player) {
 		UUID uuid = player.getUniqueId();
 
@@ -40,11 +31,6 @@ public class FishingHookTracking implements EntityTracking {
 
 	public boolean containsEntity(Player player) {
 		return mEntities.get(player.getUniqueId()) != null;
-	}
-
-	@Override
-	public void update(World world, int ticks) {
-
 	}
 
 	@Override

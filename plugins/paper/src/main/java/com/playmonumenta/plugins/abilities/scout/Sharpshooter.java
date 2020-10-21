@@ -23,8 +23,8 @@ public class Sharpshooter extends Ability {
 
 	private final int mMaxStacks;
 
-	public Sharpshooter(Plugin plugin, World world, Player player) {
-		super(plugin, world, player, "Sharpshooter");
+	public Sharpshooter(Plugin plugin, Player player) {
+		super(plugin, player, "Sharpshooter");
 		mInfo.mScoreboardId = "Sharpshooter";
 		mInfo.mShorthandName = "Ss";
 		mInfo.mDescriptions.add("Each enemy hit with a critical arrow gives you a stack of Sharpshooter, up to 5. Stacks decay after 4 seconds of not gaining a stack. Each stack makes your arrows deal +7% damage.");

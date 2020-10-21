@@ -62,8 +62,8 @@ public class ScorchedEarth extends MultipleChargeAbility {
 	private static Map<LivingEntity, Double> mMobHealths = new HashMap<>();
 	private static BukkitRunnable mMobHealthsTracker;
 
-	public ScorchedEarth(Plugin plugin, World world, Player player) {
-		super(plugin, world, player, "Scorched Earth", SCORCHED_EARTH_1_CHARGES, SCORCHED_EARTH_2_CHARGES);
+	public ScorchedEarth(Plugin plugin, Player player) {
+		super(plugin, player, "Scorched Earth", SCORCHED_EARTH_1_CHARGES, SCORCHED_EARTH_2_CHARGES);
 		mInfo.mLinkedSpell = Spells.SCORCHED_EARTH;
 		mInfo.mScoreboardId = "ScorchedEarth";
 		mInfo.mShorthandName = "SE";
@@ -77,6 +77,7 @@ public class ScorchedEarth extends MultipleChargeAbility {
 			mMobHealthsTracker = new BukkitRunnable() {
 				@Override
 				public void run() {
+					World world = mPlayer.getWorld();
 					// Tick and remove expired zones
 					Iterator<Map.Entry<Location, Map.Entry<Player, Integer>>> iter = mZoneCenters.entrySet().iterator();
 					while (iter.hasNext()) {
@@ -89,19 +90,19 @@ public class ScorchedEarth extends MultipleChargeAbility {
 
 							Location loc = entry.getKey();
 
-							mWorld.spawnParticle(Particle.SMOKE_LARGE, loc, 1, 2.1, 0.3, 2.1, 0);
-							mWorld.spawnParticle(Particle.FLAME, loc, 1, 2, 0.1, 2, 0.1f);
-							mWorld.spawnParticle(Particle.REDSTONE, loc, 2, 2.1, 0.3, 2.1, new Particle.DustOptions(SCORCHED_EARTH_COLOR_LIGHT, 1.5f));
-							mWorld.spawnParticle(Particle.REDSTONE, loc, 2, 2.1, 0.3, 2.1, new Particle.DustOptions(SCORCHED_EARTH_COLOR_DARK, 1.5f));
+							world.spawnParticle(Particle.SMOKE_LARGE, loc, 1, 2.1, 0.3, 2.1, 0);
+							world.spawnParticle(Particle.FLAME, loc, 1, 2, 0.1, 2, 0.1f);
+							world.spawnParticle(Particle.REDSTONE, loc, 2, 2.1, 0.3, 2.1, new Particle.DustOptions(SCORCHED_EARTH_COLOR_LIGHT, 1.5f));
+							world.spawnParticle(Particle.REDSTONE, loc, 2, 2.1, 0.3, 2.1, new Particle.DustOptions(SCORCHED_EARTH_COLOR_DARK, 1.5f));
 
-							mWorld.spawnParticle(Particle.REDSTONE, loc.clone().add(5 * FastUtils.sin((timer.getValue() % 40 / 20.0 - 1) * Math.PI), 0, 5 * FastUtils.cos((timer.getValue() % 40 / 20.0 - 1) * Math.PI)), 1, 0, 0, 0, new Particle.DustOptions(Color.fromRGB(0, 0, 0), 1.25f));
+							world.spawnParticle(Particle.REDSTONE, loc.clone().add(5 * FastUtils.sin((timer.getValue() % 40 / 20.0 - 1) * Math.PI), 0, 5 * FastUtils.cos((timer.getValue() % 40 / 20.0 - 1) * Math.PI)), 1, 0, 0, 0, new Particle.DustOptions(Color.fromRGB(0, 0, 0), 1.25f));
 
 							if (timer.getValue() % 4 == 0) {
-								mWorld.spawnParticle(Particle.LAVA, loc, 1, 2.1, 0.1, 2.1, 0);
+								world.spawnParticle(Particle.LAVA, loc, 1, 2.1, 0.1, 2.1, 0);
 							}
 
 							if (timer.getValue() % 120 == 0 && timer.getValue() > 1) {
-								mWorld.playSound(loc, Sound.BLOCK_FIRE_AMBIENT, 1f, 0.5f);
+								world.playSound(loc, Sound.BLOCK_FIRE_AMBIENT, 1f, 0.5f);
 							}
 						}
 					}
@@ -128,9 +129,9 @@ public class ScorchedEarth extends MultipleChargeAbility {
 					// Damage the mobs
 					for (Map.Entry<LivingEntity, Player> entry : mobsToBeDamaged.entrySet()) {
 						LivingEntity mob = entry.getKey();
-						mWorld.spawnParticle(Particle.FLAME, mob.getLocation().clone().add(0, 1, 0), 5, 0.25, 0.5, 0.25, 0.05);
-						mWorld.spawnParticle(Particle.REDSTONE, mob.getLocation().clone().add(0, 1, 0), 15, 0.35, 0.5, 0.35, new Particle.DustOptions(SCORCHED_EARTH_COLOR_DARK, 1.0f));
-						mWorld.spawnParticle(Particle.LAVA, mob.getLocation().clone().add(0, 1, 0), 3, 0.25, 0.5, 0.25, 0);
+						world.spawnParticle(Particle.FLAME, mob.getLocation().clone().add(0, 1, 0), 5, 0.25, 0.5, 0.25, 0.05);
+						world.spawnParticle(Particle.REDSTONE, mob.getLocation().clone().add(0, 1, 0), 15, 0.35, 0.5, 0.35, new Particle.DustOptions(SCORCHED_EARTH_COLOR_DARK, 1.0f));
+						world.spawnParticle(Particle.LAVA, mob.getLocation().clone().add(0, 1, 0), 3, 0.25, 0.5, 0.25, 0);
 						mob.setNoDamageTicks(0);
 						Vector velocity = mob.getVelocity();
 						EntityUtils.damageEntity(mPlugin, mob, SCORCHED_EARTH_BONUS_DAMAGE, entry.getValue(), MagicType.ALCHEMY, true, mInfo.mLinkedSpell);
@@ -162,15 +163,16 @@ public class ScorchedEarth extends MultipleChargeAbility {
 	public boolean playerSplashPotionEvent(Collection<LivingEntity> affectedEntities, ThrownPotion potion, PotionSplashEvent event) {
 		if (potion.hasMetadata(SCORCHED_EARTH_POTION_METAKEY)) {
 			Location loc = potion.getLocation();
-			mWorld.spawnParticle(Particle.SMOKE_NORMAL, loc, 50, 2.1, 0.5, 2.1, 0.1);
-			mWorld.spawnParticle(Particle.SMOKE_LARGE, loc, 15, 2.1, 0.5, 2.1, 0);
-			mWorld.spawnParticle(Particle.REDSTONE, loc, 20, 2.1, 0.5, 2.1, new Particle.DustOptions(SCORCHED_EARTH_COLOR_DARK, 2.0f));
-			mWorld.spawnParticle(Particle.FLAME, loc, 30, 2.1, 0.5, 2.1, 0.1);
-			mWorld.spawnParticle(Particle.LAVA, loc, 25, 1.5, 0.5, 1.5, 0);
+			World world = mPlayer.getWorld();
+			world.spawnParticle(Particle.SMOKE_NORMAL, loc, 50, 2.1, 0.5, 2.1, 0.1);
+			world.spawnParticle(Particle.SMOKE_LARGE, loc, 15, 2.1, 0.5, 2.1, 0);
+			world.spawnParticle(Particle.REDSTONE, loc, 20, 2.1, 0.5, 2.1, new Particle.DustOptions(SCORCHED_EARTH_COLOR_DARK, 2.0f));
+			world.spawnParticle(Particle.FLAME, loc, 30, 2.1, 0.5, 2.1, 0.1);
+			world.spawnParticle(Particle.LAVA, loc, 25, 1.5, 0.5, 1.5, 0);
 
-			mWorld.playSound(loc, Sound.BLOCK_FIRE_EXTINGUISH, 1f, 0.5f);
-			mWorld.playSound(loc, Sound.ENTITY_BLAZE_SHOOT, 1f, 0.5f);
-			mWorld.playSound(loc, Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, 0.5f, 1.5f);
+			world.playSound(loc, Sound.BLOCK_FIRE_EXTINGUISH, 1f, 0.5f);
+			world.playSound(loc, Sound.ENTITY_BLAZE_SHOOT, 1f, 0.5f);
+			world.playSound(loc, Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, 0.5f, 1.5f);
 
 			mZoneCenters.put(loc, new AbstractMap.SimpleEntry<>(mPlayer, SCORCHED_EARTH_DURATION));
 		}

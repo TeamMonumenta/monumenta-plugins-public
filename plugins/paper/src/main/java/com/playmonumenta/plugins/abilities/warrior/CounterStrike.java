@@ -36,8 +36,8 @@ public class CounterStrike extends Ability {
 	private BukkitRunnable mActivityTimer;
 	private boolean mActive = false;
 
-	public CounterStrike(Plugin plugin, World world, Player player) {
-		super(plugin, world, player, "Counter Strike");
+	public CounterStrike(Plugin plugin, Player player) {
+		super(plugin, player, "Counter Strike");
 		mInfo.mScoreboardId = "CounterStrike";
 		mInfo.mShorthandName = "CS";
 		mInfo.mDescriptions.add("Hitting a mob within 2s of successfully blocking an attack with either a shield or with Riposte deals 6 damage in an AoE cone 7 blocks in front of you. Cooldown: 8s. In addition, when you are hit you have a 15% chance to deal 6 damage to all enemies in a 5 block radius when you are hit by a melee attack (Even if you block).");
@@ -58,8 +58,9 @@ public class CounterStrike extends Ability {
 				Entity damager = event.getDamager();
 				Vector dir = LocationUtils.getDirectionTo(mPlayer.getLocation().add(0, 1, 0), damager.getLocation().add(0, damager.getHeight() / 2, 0));
 				Location loc = mPlayer.getLocation().add(0, 1, 0).subtract(dir);
-				mWorld.spawnParticle(Particle.SWEEP_ATTACK, loc, 8, 0.75, 0.5, 0.75, 0.001);
-				mWorld.spawnParticle(Particle.FIREWORKS_SPARK, loc, 20, 0.75, 0.5, 0.75, 0.1);
+				World world = mPlayer.getWorld();
+				world.spawnParticle(Particle.SWEEP_ATTACK, loc, 8, 0.75, 0.5, 0.75, 0.001);
+				world.spawnParticle(Particle.FIREWORKS_SPARK, loc, 20, 0.75, 0.5, 0.75, 0.1);
 				mPlayer.playSound(mPlayer.getLocation(), Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, 1f, 0.7f);
 				double csDamage = counterStrike == 1 ? COUNTER_STRIKE_1_DAMAGE : COUNTER_STRIKE_2_DAMAGE;
 
@@ -85,7 +86,8 @@ public class CounterStrike extends Ability {
 		if (mActive && event.getCause() == DamageCause.ENTITY_ATTACK) {
 			mActive = false;
 			Location loc = mPlayer.getLocation().add(mPlayer.getLocation().getDirection().multiply(0.5));
-			mWorld.spawnParticle(Particle.EXPLOSION_NORMAL, mPlayer.getLocation(), 25, 0, 0, 0, 0.15);
+			World world = mPlayer.getWorld();
+			world.spawnParticle(Particle.EXPLOSION_NORMAL, mPlayer.getLocation(), 25, 0, 0, 0, 0.15);
 			new BukkitRunnable() {
 				double mD = 30;
 				@Override
@@ -100,8 +102,8 @@ public class CounterStrike extends Ability {
 							vec = VectorUtils.rotateYAxis(vec, loc.getYaw());
 
 							Location l = loc.clone().add(vec);
-							mWorld.spawnParticle(Particle.CRIT, l, 1, 0.1, 0.1, 0.1, 0.025);
-							mWorld.spawnParticle(Particle.CRIT_MAGIC, l, 1, 0.1, 0.1, 0.1, 0.025);
+							world.spawnParticle(Particle.CRIT, l, 1, 0.1, 0.1, 0.1, 0.025);
+							world.spawnParticle(Particle.CRIT_MAGIC, l, 1, 0.1, 0.1, 0.1, 0.025);
 						}
 					}
 					mD += 60;

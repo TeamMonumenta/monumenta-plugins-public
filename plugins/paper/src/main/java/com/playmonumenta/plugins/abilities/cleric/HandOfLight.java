@@ -34,8 +34,8 @@ public class HandOfLight extends Ability {
 	private static final int HEALING_1_COOLDOWN = 14 * 20;
 	private static final int HEALING_2_COOLDOWN = 10 * 20;
 
-	public HandOfLight(Plugin plugin, World world, Player player) {
-		super(plugin, world, player, "Hand of Light");
+	public HandOfLight(Plugin plugin, Player player) {
+		super(plugin, player, "Hand of Light");
 		mInfo.mLinkedSpell = Spells.HEALING;
 		mInfo.mScoreboardId = "Healing";
 		mInfo.mShorthandName = "HoL";

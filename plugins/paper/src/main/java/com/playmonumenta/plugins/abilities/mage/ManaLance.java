@@ -49,8 +49,8 @@ public class ManaLance extends Ability {
 	private static final int COOLDOWN_2 = 3 * 20;
 	private static final Particle.DustOptions MANA_LANCE_COLOR = new Particle.DustOptions(Color.fromRGB(91, 187, 255), 1.0f);
 
-	public ManaLance(Plugin plugin, World world, Player player) {
-		super(plugin, world, player, "Mana Lance");
+	public ManaLance(Plugin plugin, Player player) {
+		super(plugin, player, "Mana Lance");
 		mInfo.mLinkedSpell = Spells.MANA_LANCE;
 		mInfo.mScoreboardId = "ManaLance";
 		mInfo.mShorthandName = "ML";
@@ -75,19 +75,20 @@ public class ManaLance extends Ability {
 		Vector dir = loc.getDirection();
 		box.shift(dir);
 		List<LivingEntity> mobs = EntityUtils.getNearbyMobs(mPlayer.getLocation(), 10, mPlayer);
-		mWorld.spawnParticle(Particle.EXPLOSION_NORMAL, loc, 10, 0, 0, 0, 0.125);
+		World world = mPlayer.getWorld();
+		world.spawnParticle(Particle.EXPLOSION_NORMAL, loc, 10, 0, 0, 0, 0.125);
 
 		for (int i = 0; i < 8; i++) {
 			box.shift(dir);
-			Location bLoc = box.getCenter().toLocation(mWorld);
+			Location bLoc = box.getCenter().toLocation(world);
 
-			mWorld.spawnParticle(Particle.EXPLOSION_NORMAL, bLoc, 2, 0.05, 0.05, 0.05, 0.025);
-			mWorld.spawnParticle(Particle.REDSTONE, bLoc, 18, 0.35, 0.35, 0.35, MANA_LANCE_COLOR);
+			world.spawnParticle(Particle.EXPLOSION_NORMAL, bLoc, 2, 0.05, 0.05, 0.05, 0.025);
+			world.spawnParticle(Particle.REDSTONE, bLoc, 18, 0.35, 0.35, 0.35, MANA_LANCE_COLOR);
 
 			if (bLoc.getBlock().getType().isSolid()) {
 				bLoc.subtract(dir.multiply(0.5));
-				mWorld.spawnParticle(Particle.CLOUD, bLoc, 30, 0, 0, 0, 0.125);
-				mWorld.playSound(bLoc, Sound.ENTITY_FIREWORK_ROCKET_BLAST, 1, 1.65f);
+				world.spawnParticle(Particle.CLOUD, bLoc, 30, 0, 0, 0, 0.125);
+				world.playSound(bLoc, Sound.ENTITY_FIREWORK_ROCKET_BLAST, 1, 1.65f);
 				break;
 			}
 			Iterator<LivingEntity> iter = mobs.iterator();
@@ -102,7 +103,7 @@ public class ManaLance extends Ability {
 			}
 		}
 
-		mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_SHULKER_SHOOT, 1, 1.75f);
+		world.playSound(mPlayer.getLocation(), Sound.ENTITY_SHULKER_SHOOT, 1, 1.75f);
 	}
 
 	@Override

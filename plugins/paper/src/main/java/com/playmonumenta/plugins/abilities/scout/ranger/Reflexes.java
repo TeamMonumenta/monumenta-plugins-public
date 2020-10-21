@@ -21,8 +21,8 @@ public class Reflexes extends Ability {
 	private final double mDamageResistancePerMob;
 	private final double mDamageBonusPerMob;
 
-	public Reflexes(Plugin plugin, World world, Player player) {
-		super(plugin, world, player, "Reflexes");
+	public Reflexes(Plugin plugin, Player player) {
+		super(plugin, player, "Reflexes");
 		mInfo.mScoreboardId = "Reflexes";
 		mInfo.mShorthandName = "Re";
 		mInfo.mDescriptions.add("For each mob in an 8 block radius (up to 10 mobs), gain 2% damage resistance and 3% extra damage.");

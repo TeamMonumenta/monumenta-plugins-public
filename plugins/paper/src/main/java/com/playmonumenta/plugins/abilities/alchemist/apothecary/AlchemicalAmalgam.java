@@ -47,8 +47,8 @@ public class AlchemicalAmalgam extends Ability {
 	private final int mDamage;
 	private final int mShield;
 
-	public AlchemicalAmalgam(Plugin plugin, World world, Player player) {
-		super(plugin, world, player, "Alchemical Amalgam");
+	public AlchemicalAmalgam(Plugin plugin, Player player) {
+		super(plugin, player, "Alchemical Amalgam");
 		mInfo.mScoreboardId = "Alchemical";
 		mInfo.mShorthandName = "AAm";
 		mInfo.mDescriptions.add("Shift left click with a Bow to shoot a mixture that deals 8 damage to every enemy touched and adds 2 absorption health to players (including yourself), lasting 30 seconds, maximum 12. After hitting a block or traveling 10 blocks, the mixture traces and returns to you, able to damage enemies and shield allies a second time. Cooldown: 30s.");
@@ -62,11 +62,12 @@ public class AlchemicalAmalgam extends Ability {
 
 	@Override
 	public void cast(Action action) {
-		mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_BLAZE_AMBIENT, 1, 1.75f);
-		mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_WITHER_AMBIENT, 1, 0.75f);
-		mWorld.playSound(mPlayer.getLocation(), Sound.BLOCK_BUBBLE_COLUMN_WHIRLPOOL_INSIDE, 1, 1.25f);
-		mWorld.spawnParticle(Particle.SPELL_INSTANT, mPlayer.getLocation(), 25, 0.2, 0, 0.2, 1);
-		mWorld.spawnParticle(Particle.SPELL_WITCH, mPlayer.getLocation(), 25, 0.2, 0, 0.2, 1);
+		World world = mPlayer.getWorld();
+		world.playSound(mPlayer.getLocation(), Sound.ENTITY_BLAZE_AMBIENT, 1, 1.75f);
+		world.playSound(mPlayer.getLocation(), Sound.ENTITY_WITHER_AMBIENT, 1, 0.75f);
+		world.playSound(mPlayer.getLocation(), Sound.BLOCK_BUBBLE_COLUMN_WHIRLPOOL_INSIDE, 1, 1.25f);
+		world.spawnParticle(Particle.SPELL_INSTANT, mPlayer.getLocation(), 25, 0.2, 0, 0.2, 1);
+		world.spawnParticle(Particle.SPELL_WITCH, mPlayer.getLocation(), 25, 0.2, 0, 0.2, 1);
 
 		AbsorptionUtils.addAbsorption(mPlayer, mShield, AMALGAM_MAX_SHIELD, AMALGAM_ABSORPTION_DURATION);
 		putOnCooldown();
@@ -124,11 +125,11 @@ public class AlchemicalAmalgam extends Ability {
 					vec = VectorUtils.rotateYAxis(vec, mLoc.getYaw());
 
 					Location l = mLoc.clone().add(vec);
-					mWorld.spawnParticle(Particle.REDSTONE, l, 5, 0.1, 0.1, 0.1, APOTHECARY_LIGHT_COLOR);
-					mWorld.spawnParticle(Particle.REDSTONE, l, 5, 0.1, 0.1, 0.1, APOTHECARY_DARK_COLOR);
+					world.spawnParticle(Particle.REDSTONE, l, 5, 0.1, 0.1, 0.1, APOTHECARY_LIGHT_COLOR);
+					world.spawnParticle(Particle.REDSTONE, l, 5, 0.1, 0.1, 0.1, APOTHECARY_DARK_COLOR);
 				}
-				mWorld.spawnParticle(Particle.SPELL_INSTANT, mLoc, 5, 0.35, 0.35, 0.35, 1);
-				mWorld.spawnParticle(Particle.SPELL_WITCH, mLoc, 5, 0.35, 0.35, 0.35, 1);
+				world.spawnParticle(Particle.SPELL_INSTANT, mLoc, 5, 0.35, 0.35, 0.35, 1);
+				world.spawnParticle(Particle.SPELL_WITCH, mLoc, 5, 0.35, 0.35, 0.35, 1);
 
 				if (!mReverse && (LocationUtils.collidesWithSolid(mLoc, mLoc.getBlock()) || mTicks >= AMALGAM_MAX_DURATION)) {
 					mMobs = EntityUtils.getNearbyMobs(mLoc, (0.3 + AMALGAM_MOVE_SPEED) * AMALGAM_MAX_DURATION + 2, mPlayer);
@@ -140,10 +141,10 @@ public class AlchemicalAmalgam extends Ability {
 				if (mReverse) {
 					if (mTicks <= 0) {
 						AbsorptionUtils.addAbsorption(mPlayer, mShield, AMALGAM_MAX_SHIELD, AMALGAM_ABSORPTION_DURATION);
-						mWorld.playSound(mLoc, Sound.BLOCK_ENCHANTMENT_TABLE_USE, 1.2f, 2.4f);
-						mWorld.spawnParticle(Particle.SPELL_INSTANT, mPlayer.getLocation().add(0, 1, 0), 8, 0.25, 0.5, 0.25, 0.5);
-						mWorld.spawnParticle(Particle.SPELL, mPlayer.getLocation().add(0, 1, 0), 8, 0.35, 0.5, 0.35);
-						mWorld.spawnParticle(Particle.REDSTONE, mPlayer.getLocation().add(0, 1, 0), 25, 0.35, 0.5, 0.35, APOTHECARY_LIGHT_COLOR);
+						world.playSound(mLoc, Sound.BLOCK_ENCHANTMENT_TABLE_USE, 1.2f, 2.4f);
+						world.spawnParticle(Particle.SPELL_INSTANT, mPlayer.getLocation().add(0, 1, 0), 8, 0.25, 0.5, 0.25, 0.5);
+						world.spawnParticle(Particle.SPELL, mPlayer.getLocation().add(0, 1, 0), 8, 0.35, 0.5, 0.35);
+						world.spawnParticle(Particle.REDSTONE, mPlayer.getLocation().add(0, 1, 0), 25, 0.35, 0.5, 0.35, APOTHECARY_LIGHT_COLOR);
 						this.cancel();
 					}
 

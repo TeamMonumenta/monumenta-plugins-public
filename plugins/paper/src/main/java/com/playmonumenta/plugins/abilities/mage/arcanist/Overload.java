@@ -37,8 +37,8 @@ public class Overload extends Ability {
 	private int mSpellsToOverload = SPELLS_PER_OVERLOAD;
 	private Spells mAffectedSpell = null;
 
-	public Overload(Plugin plugin, World world, Player player) {
-		super(plugin, world, player, "Overload");
+	public Overload(Plugin plugin, Player player) {
+		super(plugin, player, "Overload");
 		mInfo.mScoreboardId = "Overload";
 		mInfo.mShorthandName = "Ov";
 		mInfo.mDescriptions.add("Every 3rd spell cast is \"overloaded\" and deals +4 damage. When your next spell is overloaded, non-elite and non-boss mobs that melee or projectile attack you are stunned for 1 second.");
@@ -50,8 +50,9 @@ public class Overload extends Ability {
 	public void periodicTrigger(boolean fourHertz, boolean twoHertz, boolean oneSecond, int ticks) {
 		if (mSpellsToOverload == 1) {
 			Location loc = mPlayer.getLocation().add(0, 1, 0);
-			mWorld.spawnParticle(Particle.REDSTONE, loc, 3, 0.4, 0.4, 0.4, COLOR);
-			mWorld.spawnParticle(Particle.REDSTONE, loc, 3, 0.5, 0.5, 0.5, COLOR2);
+			World world = mPlayer.getWorld();
+			world.spawnParticle(Particle.REDSTONE, loc, 3, 0.4, 0.4, 0.4, COLOR);
+			world.spawnParticle(Particle.REDSTONE, loc, 3, 0.5, 0.5, 0.5, COLOR2);
 		}
 	}
 
@@ -68,8 +69,9 @@ public class Overload extends Ability {
 			mSpellsToOverload = SPELLS_PER_OVERLOAD;
 
 			Location loc = mPlayer.getLocation().add(0, 1, 0);
-			mWorld.spawnParticle(Particle.REDSTONE, loc, 35, 0.4, 0.4, 0.4, COLOR);
-			mWorld.spawnParticle(Particle.REDSTONE, loc, 35, 0.5, 0.5, 0.5, COLOR2);
+			World world = mPlayer.getWorld();
+			world.spawnParticle(Particle.REDSTONE, loc, 35, 0.4, 0.4, 0.4, COLOR);
+			world.spawnParticle(Particle.REDSTONE, loc, 35, 0.5, 0.5, 0.5, COLOR2);
 
 			// This is necessary for skills triggering over periods of time, such as Flash Sword and the soon to exist Arcane Barrage
 			mAffectedSpell = event.getAbility();
@@ -103,8 +105,9 @@ public class Overload extends Ability {
 		Location locD = damagee.getLocation().add(0, 1, 0);
 		if (event.getSpell() == mAffectedSpell) {
 			event.setDamage(event.getDamage() + mDamage);
-			mWorld.spawnParticle(Particle.REDSTONE, locD, 35, 0.4, 0.4, 0.4, COLOR);
-			mWorld.spawnParticle(Particle.EXPLOSION_NORMAL, locD, 35, 0, 0, 0, 0.2);
+			World world = mPlayer.getWorld();
+			world.spawnParticle(Particle.REDSTONE, locD, 35, 0.4, 0.4, 0.4, COLOR);
+			world.spawnParticle(Particle.EXPLOSION_NORMAL, locD, 35, 0, 0, 0, 0.2);
 		}
 	}
 
@@ -136,7 +139,7 @@ public class Overload extends Ability {
 	}
 
 	private void stun(LivingEntity mob) {
-		mWorld.playSound(mob.getLocation(), Sound.BLOCK_GLASS_BREAK, 0.5f, 1.5f);
+		mob.getWorld().playSound(mob.getLocation(), Sound.BLOCK_GLASS_BREAK, 0.5f, 1.5f);
 		EntityUtils.applyStun(mPlugin, STUN_DURATION, mob);
 	}
 

@@ -38,8 +38,8 @@ public class PrismaticShield extends Ability {
 	private final int mDuration;
 	private final int mDamage;
 
-	public PrismaticShield(Plugin plugin, World world, Player player) {
-		super(plugin, world, player, "Prismatic Shield");
+	public PrismaticShield(Plugin plugin, Player player) {
+		super(plugin, player, "Prismatic Shield");
 		mInfo.mLinkedSpell = Spells.PRISMATIC_SHIELD;
 		mInfo.mScoreboardId = "Prismatic";
 		mInfo.mShorthandName = "PS";
@@ -117,9 +117,10 @@ public class PrismaticShield extends Ability {
 
 		mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF,
 		                                 new PotionEffect(PotionEffectType.ABSORPTION, mDuration, mAmplifier, true, true));
-		mWorld.spawnParticle(Particle.FIREWORKS_SPARK, mPlayer.getLocation().add(0, 1.15, 0), 150, 0.2, 0.35, 0.2, 0.5);
-		mWorld.spawnParticle(Particle.SPELL_INSTANT, mPlayer.getLocation().add(0, 1.15, 0), 100, 0.2, 0.35, 0.2, 1);
-		mWorld.playSound(mPlayer.getLocation(), Sound.ITEM_TOTEM_USE, 1, 1.35f);
+		World world = mPlayer.getWorld();
+		world.spawnParticle(Particle.FIREWORKS_SPARK, mPlayer.getLocation().add(0, 1.15, 0), 150, 0.2, 0.35, 0.2, 0.5);
+		world.spawnParticle(Particle.SPELL_INSTANT, mPlayer.getLocation().add(0, 1.15, 0), 100, 0.2, 0.35, 0.2, 1);
+		world.playSound(mPlayer.getLocation(), Sound.ITEM_TOTEM_USE, 1, 1.35f);
 		MessagingUtils.sendActionBarMessage(mPlugin, mPlayer, "Prismatic Shield has been activated");
 
 		if (dealDamageLater) {

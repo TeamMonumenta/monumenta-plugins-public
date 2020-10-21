@@ -41,8 +41,8 @@ public class Bodyguard extends Ability {
 
 	private int mLeftClicks = 0;
 
-	public Bodyguard(Plugin plugin, World world, Player player) {
-		super(plugin, world, player, "Bodyguard");
+	public Bodyguard(Plugin plugin, Player player) {
+		super(plugin, player, "Bodyguard");
 		mInfo.mScoreboardId = "Bodyguard";
 		mInfo.mShorthandName = "Bg";
 		mInfo.mDescriptions.add("Left-click the air twice while looking directly at another player within 25 blocks to charge to them (cannot be used in safezones). Upon arriving, knock away all mobs within 4 blocks. Both you and the other player gain Absorption II for 10 seconds. Left-click twice while looking down to cast on yourself. Cooldown: 30s.");
@@ -63,13 +63,14 @@ public class Bodyguard extends Ability {
 
 		BoundingBox box = BoundingBox.of(mPlayer.getEyeLocation(), 1, 1, 1);
 		Location oLoc = mPlayer.getLocation();
+		World world = mPlayer.getWorld();
 		boolean lookingDown = oLoc.getPitch() > 50;
 		Vector dir = oLoc.getDirection();
 		List<Player> players = PlayerUtils.playersInRange(mPlayer.getEyeLocation(), RANGE);
 		players.remove(mPlayer);
 		for (int i = 0; i < RANGE; i++) {
 			box.shift(dir);
-			Location bLoc = box.getCenter().toLocation(mWorld);
+			Location bLoc = box.getCenter().toLocation(world);
 			if (bLoc.getBlock().getType().isSolid()) {
 				if (lookingDown) {
 					mLeftClicks++;
@@ -108,7 +109,7 @@ public class Bodyguard extends Ability {
 					Location loc = mPlayer.getEyeLocation();
 					for (int j = 0; j < 45; j++) {
 						loc.add(dir.clone().multiply(0.33));
-						mWorld.spawnParticle(Particle.FLAME, loc, 4, 0.25, 0.25, 0.25, 0f);
+						world.spawnParticle(Particle.FLAME, loc, 4, 0.25, 0.25, 0.25, 0f);
 						if (loc.distance(bLoc) < 1) {
 							break;
 						}
@@ -120,7 +121,7 @@ public class Bodyguard extends Ability {
 						double z = FastUtils.randomDoubleInRange(-3, 3);
 						Location to = player.getLocation().add(x, 0.15, z);
 						Vector pdir = LocationUtils.getDirectionTo(to, player.getLocation().add(0, 0.15, 0));
-						mWorld.spawnParticle(Particle.FLAME, player.getLocation().add(0, 0.15, 0), 0, (float) pdir.getX(), 0f, (float) pdir.getZ(), FastUtils.randomDoubleInRange(0.1, 0.4));
+						world.spawnParticle(Particle.FLAME, player.getLocation().add(0, 0.15, 0), 0, (float) pdir.getX(), 0f, (float) pdir.getZ(), FastUtils.randomDoubleInRange(0.1, 0.4));
 					}
 
 					// Explosion_Normal
@@ -129,7 +130,7 @@ public class Bodyguard extends Ability {
 						double z = FastUtils.randomDoubleInRange(-3, 3);
 						Location to = player.getLocation().add(x, 0.15, z);
 						Vector pdir = LocationUtils.getDirectionTo(to, player.getLocation().add(0, 0.15, 0));
-						mWorld.spawnParticle(Particle.EXPLOSION_NORMAL, player.getLocation().add(0, 0.15, 0), 0, (float) pdir.getX(), 0f, (float) pdir.getZ(), FastUtils.randomDoubleInRange(0.15, 0.5));
+						world.spawnParticle(Particle.EXPLOSION_NORMAL, player.getLocation().add(0, 0.15, 0), 0, (float) pdir.getX(), 0f, (float) pdir.getZ(), FastUtils.randomDoubleInRange(0.15, 0.5));
 					}
 
 					if (mPlayer.getLocation().distance(player.getLocation()) > 1) {
@@ -137,8 +138,8 @@ public class Bodyguard extends Ability {
 					}
 
 					Location tloc = player.getLocation().clone().subtract(dir.clone().multiply(0.5)).add(0, 0.5, 0);
-					mWorld.playSound(tloc, Sound.ENTITY_BLAZE_SHOOT, 1, 0.75f);
-					mWorld.playSound(tloc, Sound.ENTITY_ENDER_DRAGON_HURT, 1, 0.9f);
+					world.playSound(tloc, Sound.ENTITY_BLAZE_SHOOT, 1, 0.75f);
+					world.playSound(tloc, Sound.ENTITY_ENDER_DRAGON_HURT, 1, 0.9f);
 
 					mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_OTHER,
 							new PotionEffect(PotionEffectType.ABSORPTION, BUFF_DURATION, mAbsorptionAmplifier, false, true));
@@ -153,8 +154,8 @@ public class Bodyguard extends Ability {
 		mLeftClicks = 0;
 		putOnCooldown();
 
-		mWorld.playSound(oLoc, Sound.ENTITY_BLAZE_SHOOT, 1, 0.75f);
-		mWorld.spawnParticle(Particle.FLAME, oLoc.add(0, 0.15, 0), 25, 0.2, 0, 0.2, 0.1);
+		world.playSound(oLoc, Sound.ENTITY_BLAZE_SHOOT, 1, 0.75f);
+		world.spawnParticle(Particle.FLAME, oLoc.add(0, 0.15, 0), 25, 0.2, 0, 0.2, 0.1);
 
 		mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF,
 				new PotionEffect(PotionEffectType.ABSORPTION, BUFF_DURATION, mAbsorptionAmplifier, false, true));

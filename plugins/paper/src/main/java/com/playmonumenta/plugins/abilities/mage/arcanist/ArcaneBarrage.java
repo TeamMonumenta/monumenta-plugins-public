@@ -58,8 +58,8 @@ public class ArcaneBarrage extends Ability {
 	private int mSummonTick = 0;
 	private boolean mOverloadIsActive = false;
 
-	public ArcaneBarrage(Plugin plugin, World world, Player player) {
-		super(plugin, world, player, "Arcane Barrage");
+	public ArcaneBarrage(Plugin plugin, Player player) {
+		super(plugin, player, "Arcane Barrage");
 		mInfo.mScoreboardId = "ArcaneBarrage";
 		mInfo.mShorthandName = "AB";
 		mInfo.mDescriptions.add("Right-click while not sneaking and looking up to summon 3 Arcane Missiles around you for up to 10 seconds. If missiles are active, right-clicking while not sneaking with a Wand fires a missile in the target direction, piercing through enemies within 12 blocks and dealing 7 damage. If cast with Overload, your missiles deal 2 (Overload I) or 4 (Overload II) extra damage. Cooldown: 20s.");
@@ -80,8 +80,9 @@ public class ArcaneBarrage extends Ability {
 				&& !mPlayer.isSneaking() && mPlayer.getLocation().getPitch() < -50 && mMissiles == 0) {
 			mMissiles = mMissileCount;
 			mSummonTick = mPlayer.getTicksLived();
-			mWorld.playSound(mPlayer.getLocation(), Sound.BLOCK_END_PORTAL_SPAWN, SoundCategory.PLAYERS, 0.4f, 1.75f);
-			mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_FIREWORK_ROCKET_LAUNCH, SoundCategory.PLAYERS, 1f, 1.5f);
+			World world = mPlayer.getWorld();
+			world.playSound(mPlayer.getLocation(), Sound.BLOCK_END_PORTAL_SPAWN, SoundCategory.PLAYERS, 0.4f, 1.75f);
+			world.playSound(mPlayer.getLocation(), Sound.ENTITY_FIREWORK_ROCKET_LAUNCH, SoundCategory.PLAYERS, 1f, 1.5f);
 
 			mParticleRunnable = new BukkitRunnable() {
 				final int mRadius = getAbilityScore() == 1 ? 2 : 3;
@@ -107,7 +108,7 @@ public class ArcaneBarrage extends Ability {
 						double dz = mRadius * FastUtils.sin(rotation);
 
 						loc.add(dx, 0, dz);
-						mWorld.spawnParticle(Particle.REDSTONE, loc, 15, 0.2, 0.2, 0.2, 0.1, COLOR);
+						world.spawnParticle(Particle.REDSTONE, loc, 15, 0.2, 0.2, 0.2, 0.1, COLOR);
 						loc.subtract(dx, 0, dz);
 					}
 				}
@@ -129,14 +130,15 @@ public class ArcaneBarrage extends Ability {
 			//Fire missile.
 			Location loc = mPlayer.getEyeLocation();
 			Vector shift = mPlayer.getLocation().getDirection();
+			World world = mPlayer.getWorld();
 
-			mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_SHULKER_SHOOT, 0.75f, 1.5f);
-			mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_FIREWORK_ROCKET_LAUNCH, 0.25f, 0.5f);
+			world.playSound(mPlayer.getLocation(), Sound.ENTITY_SHULKER_SHOOT, 0.75f, 1.5f);
+			world.playSound(mPlayer.getLocation(), Sound.ENTITY_FIREWORK_ROCKET_LAUNCH, 0.25f, 0.5f);
 			for (int i = 0; i < RANGE; i++) {
 				loc.add(shift);
-				mWorld.spawnParticle(Particle.FIREWORKS_SPARK, loc, 5, 0.1, 0.1, 0.1, 0.1);
-				mWorld.spawnParticle(Particle.SPELL_WITCH, loc, 5, 0, 0, 0, 0.5);
-				mWorld.spawnParticle(Particle.REDSTONE, loc, 20, 0.2, 0.2, 0.2, 0.1, COLOR);
+				world.spawnParticle(Particle.FIREWORKS_SPARK, loc, 5, 0.1, 0.1, 0.1, 0.1);
+				world.spawnParticle(Particle.SPELL_WITCH, loc, 5, 0, 0, 0, 0.5);
+				world.spawnParticle(Particle.REDSTONE, loc, 20, 0.2, 0.2, 0.2, 0.1, COLOR);
 			}
 
 			for (LivingEntity mob : EntityUtils.getMobsInLine(mPlayer.getEyeLocation(), shift, RANGE, HALF_HITBOX_LENGTH)) {

@@ -19,8 +19,8 @@ public class BrutalAlchemy extends PotionAbility {
 
 	private final int mVulnerabilityAmplifier;
 
-	public BrutalAlchemy(Plugin plugin, World world, Player player) {
-		super(plugin, world, player, "Brutal Alchemy", BRUTAL_ALCHEMY_1_DAMAGE, BRUTAL_ALCHEMY_2_DAMAGE);
+	public BrutalAlchemy(Plugin plugin, Player player) {
+		super(plugin, player, "Brutal Alchemy", BRUTAL_ALCHEMY_1_DAMAGE, BRUTAL_ALCHEMY_2_DAMAGE);
 		mInfo.mLinkedSpell = Spells.BRUTAL_ALCHEMY;
 		mInfo.mScoreboardId = "BrutalAlchemy";
 		mInfo.mShorthandName = "BA";

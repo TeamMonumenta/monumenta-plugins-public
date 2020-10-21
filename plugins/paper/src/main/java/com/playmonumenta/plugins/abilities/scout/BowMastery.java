@@ -1,7 +1,6 @@
 package com.playmonumenta.plugins.abilities.scout;
 
 import org.bukkit.Particle;
-import org.bukkit.World;
 import org.bukkit.entity.AbstractArrow;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.LivingEntity;
@@ -20,8 +19,9 @@ public class BowMastery extends Ability {
 	private static final double BOW_MASTERY_2_DAMAGE_MULTIPLIER = 1.35;
 
 	private final double mDamageMultiplier;
-	public BowMastery(Plugin plugin, World world, Player player) {
-		super(plugin, world, player, "Bow Mastery");
+
+	public BowMastery(Plugin plugin, Player player) {
+		super(plugin, player, "Bow Mastery");
 		mInfo.mScoreboardId = "BowMastery";
 		mInfo.mShorthandName = "BM";
 		mInfo.mDescriptions.add("Your arrows deal 20% more damage.");

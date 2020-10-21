@@ -60,8 +60,8 @@ public class ByMyBlade extends Ability {
 
 	private final int mDamageBonus;
 
-	public ByMyBlade(Plugin plugin, World world, Player player) {
-		super(plugin, world, player, "By My Blade");
+	public ByMyBlade(Plugin plugin, Player player) {
+		super(plugin, player, "By My Blade");
 		mInfo.mLinkedSpell = Spells.BY_MY_BLADE;
 		mInfo.mScoreboardId = "ByMyBlade";
 		mInfo.mShorthandName = "BmB";
@@ -95,10 +95,11 @@ public class ByMyBlade extends Ability {
 			event.setDamage(event.getDamage() + extraDamage);
 
 			Location loc = damagee.getLocation();
+			World world = mPlayer.getWorld();
 			loc.add(0, 1, 0);
 			int count = 15;
 			if (getAbilityScore() > 1) {
-				mWorld.spawnParticle(Particle.SPELL_WITCH, loc, 45, 0.2, 0.65, 0.2, 1.0);
+				world.spawnParticle(Particle.SPELL_WITCH, loc, 45, 0.2, 0.65, 0.2, 1.0);
 				count = 30;
 				if (damagee instanceof Player) {
 					MovementUtils.knockAway(mPlayer, damagee, 0.3f);
@@ -106,9 +107,9 @@ public class ByMyBlade extends Ability {
 					                                 new PotionEffect(PotionEffectType.SPEED, BY_MY_BLADE_HASTE_DURATION, 0, false, true));
 				}
 			}
-			mWorld.spawnParticle(Particle.SPELL_MOB, loc, count, 0.25, 0.5, 0.5, 0.001);
-			mWorld.spawnParticle(Particle.CRIT, loc, 30, 0.25, 0.5, 0.5, 0.001);
-			mWorld.playSound(loc, Sound.ITEM_SHIELD_BREAK, 2.0f, 0.5f);
+			world.spawnParticle(Particle.SPELL_MOB, loc, count, 0.25, 0.5, 0.5, 0.001);
+			world.spawnParticle(Particle.CRIT, loc, 30, 0.25, 0.5, 0.5, 0.001);
+			world.playSound(loc, Sound.ITEM_SHIELD_BREAK, 2.0f, 0.5f);
 			putOnCooldown();
 		}
 		return true;

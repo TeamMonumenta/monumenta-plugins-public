@@ -62,8 +62,8 @@ public class Dodging extends Ability {
 
 	private int mTriggerTick = 0;
 
-	public Dodging(Plugin plugin, World world, Player player) {
-		super(plugin, world, player, "Dodging");
+	public Dodging(Plugin plugin, Player player) {
+		super(plugin, player, "Dodging");
 		mInfo.mLinkedSpell = Spells.DODGING;
 		mInfo.mScoreboardId = "Dodging";
 		mInfo.mShorthandName = "Dg";
@@ -161,6 +161,7 @@ public class Dodging extends Ability {
 		putOnCooldown();
 
 		Location loc = mPlayer.getLocation().add(0, 1, 0);
+		World world = mPlayer.getWorld();
 		int dodging = getAbilityScore();
 		if (dodging > 1) {
 			mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF,
@@ -168,11 +169,11 @@ public class Dodging extends Ability {
 			                                                  DODGING_SPEED_EFFECT_DURATION,
 			                                                  DODGING_SPEED_EFFECT_LEVEL,
 			                                                  true, true));
-			mWorld.spawnParticle(Particle.EXPLOSION_NORMAL, loc, 20, 0.25, 0.45, 0.25, 0.15);
-			mWorld.playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_LAUNCH, 1, 1.35f);
+			world.spawnParticle(Particle.EXPLOSION_NORMAL, loc, 20, 0.25, 0.45, 0.25, 0.15);
+			world.playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_LAUNCH, 1, 1.35f);
 		}
-		mWorld.spawnParticle(Particle.SMOKE_NORMAL, loc, 90, 0.25, 0.45, 0.25, 0.1);
-		mWorld.playSound(loc, Sound.ENTITY_BLAZE_SHOOT, 1, 2f);
+		world.spawnParticle(Particle.SMOKE_NORMAL, loc, 90, 0.25, 0.45, 0.25, 0.1);
+		world.playSound(loc, Sound.ENTITY_BLAZE_SHOOT, 1, 2f);
 		return true;
 	}
 }

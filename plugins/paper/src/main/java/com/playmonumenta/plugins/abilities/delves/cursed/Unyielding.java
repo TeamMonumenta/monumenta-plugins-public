@@ -17,8 +17,8 @@ public class Unyielding extends StatMultiplier {
 	private static final double UNYIELDING_DAMAGE_TAKEN_MULTIPLIER = 1.6;
 	private static final double UNYIELDING_SPEED_MULTIPLIER = 1.2;
 
-	public Unyielding(Plugin plugin, World world, Player player) {
-		super(plugin, world, player, UNYIELDING_DAMAGE_TAKEN_MULTIPLIER, UNYIELDING_DAMAGE_TAKEN_MULTIPLIER, UNYIELDING_MOB_HEALTH_MULTIPLIER, UNYIELDING_SPEED_MULTIPLIER);
+	public Unyielding(Plugin plugin, Player player) {
+		super(plugin, player, UNYIELDING_DAMAGE_TAKEN_MULTIPLIER, UNYIELDING_DAMAGE_TAKEN_MULTIPLIER, UNYIELDING_MOB_HEALTH_MULTIPLIER, UNYIELDING_SPEED_MULTIPLIER);
 	}
 
 	@Override

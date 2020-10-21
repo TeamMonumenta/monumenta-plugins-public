@@ -54,8 +54,8 @@ public class GhoulishTaunt extends Ability {
 	private final double mCleavePercentDamage;
 	private final int mWeaknessAmplifier;
 
-	public GhoulishTaunt(Plugin plugin, World world, Player player) {
-		super(plugin, world, player, "Ghoulish Taunt");
+	public GhoulishTaunt(Plugin plugin, Player player) {
+		super(plugin, player, "Ghoulish Taunt");
 		mInfo.mScoreboardId = "GhoulishTaunt";
 		mInfo.mShorthandName = "GT";
 		mInfo.mDescriptions.add("Left clicking twice with a scythe unleashes a devilish shriek, causing all mobs within a 12 block range to target you and afflicting them with Weakness I for 10 seconds. For the next 10 seconds, gain +10% speed and +10% attack speed, and your melee attacks cleave in a 2 block radius from the strike, dealing 30% of the damage from the original attack. Each kill during this time increases the duration of the buffs by 1 second. Cooldown: 20s.");
@@ -74,8 +74,9 @@ public class GhoulishTaunt extends Ability {
 		// Just use the other buffs as a flag for the cleave
 		if (event.getCause() == DamageCause.ENTITY_ATTACK && mPlugin.mEffectManager.getEffects(mPlayer, PERCENT_SPEED_EFFECT_NAME) != null) {
 			Location loc = event.getEntity().getLocation().add(0, 1, 0);
-			mWorld.spawnParticle(Particle.SWEEP_ATTACK, loc, 1, 0, 0, 0);
-			mWorld.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1, 0.4f);
+			World world = mPlayer.getWorld();
+			world.spawnParticle(Particle.SWEEP_ATTACK, loc, 1, 0, 0, 0);
+			world.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1, 0.4f);
 			double damage = event.getDamage() * mCleavePercentDamage;
 			for (LivingEntity mob : EntityUtils.getNearbyMobs(loc, CLEAVE_RADIUS)) {
 				if (mob != event.getEntity()) {
@@ -129,11 +130,12 @@ public class GhoulishTaunt extends Ability {
 		}
 
 		Location loc = mPlayer.getEyeLocation();
-		mWorld.playSound(loc, Sound.ENTITY_GHAST_SCREAM, SoundCategory.PLAYERS, 0.6f, 0.4f);
-		mWorld.playSound(loc, Sound.ENTITY_GHAST_SCREAM, SoundCategory.PLAYERS, 0.6f, 0.6f);
-		mWorld.playSound(loc, Sound.ENTITY_GHAST_SCREAM, SoundCategory.PLAYERS, 0.6f, 0.8f);
-		mWorld.playSound(loc, Sound.ENTITY_GHAST_HURT, SoundCategory.PLAYERS, 0.6f, 0.6f);
-		mWorld.spawnParticle(Particle.ENCHANTMENT_TABLE, loc, 400, 0, 0, 0, 4);
+		World world = mPlayer.getWorld();
+		world.playSound(loc, Sound.ENTITY_GHAST_SCREAM, SoundCategory.PLAYERS, 0.6f, 0.4f);
+		world.playSound(loc, Sound.ENTITY_GHAST_SCREAM, SoundCategory.PLAYERS, 0.6f, 0.6f);
+		world.playSound(loc, Sound.ENTITY_GHAST_SCREAM, SoundCategory.PLAYERS, 0.6f, 0.8f);
+		world.playSound(loc, Sound.ENTITY_GHAST_HURT, SoundCategory.PLAYERS, 0.6f, 0.6f);
+		world.spawnParticle(Particle.ENCHANTMENT_TABLE, loc, 400, 0, 0, 0, 4);
 
 		List<LivingEntity> mobs = EntityUtils.getNearbyMobs(loc, WEAKNESS_RADIUS);
 		for (LivingEntity mob : mobs) {

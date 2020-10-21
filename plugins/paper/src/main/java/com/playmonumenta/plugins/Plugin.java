@@ -114,8 +114,6 @@ public class Plugin extends JavaPlugin {
 
 	public ItemOverrides mItemOverrides;
 
-	public World mWorld;
-
 	private static Plugin INSTANCE = null;
 
 	public static Plugin getInstance() {
@@ -205,15 +203,14 @@ public class Plugin extends JavaPlugin {
 		//  Initialize Variables.
 		mTimers = new CooldownTimers(this);
 
-		mWorld = Bukkit.getWorlds().get(0);
-		mProjectileEffectTimers = new ProjectileEffectTimers(this, mWorld);
+		mProjectileEffectTimers = new ProjectileEffectTimers(this);
 
 		mItemManager = new ItemManager();
 		mIndexInventoryManager = new IndexInventoryManager();
 		mPotionManager = new PotionManager();
-		mTrackingManager = new TrackingManager(this, mWorld);
+		mTrackingManager = new TrackingManager(this);
 		mZoneManager = new SpawnZoneManager(this);
-		mAbilityManager = new AbilityManager(this, mWorld);
+		mAbilityManager = new AbilityManager(this);
 		mShulkerInventoryManager = new ShulkerInventoryManager(this);
 		mCookingTableInventoryManager = new CookingTableInventoryManager(this);
 		mBossManager = new BossManager(this);
@@ -232,11 +229,11 @@ public class Plugin extends JavaPlugin {
 			manager.registerEvents(new AuditListener(getLogger()), this);
 		}
 		manager.registerEvents(new ExceptionListener(this), this);
-		manager.registerEvents(new PlayerListener(this, mWorld), this);
+		manager.registerEvents(new PlayerListener(this), this);
 		manager.registerEvents(new MobListener(this), this);
-		manager.registerEvents(new EntityListener(this, mWorld, mAbilityManager), this);
+		manager.registerEvents(new EntityListener(this, mAbilityManager), this);
 		manager.registerEvents(new VehicleListener(this), this);
-		manager.registerEvents(new WorldListener(this, mWorld), this);
+		manager.registerEvents(new WorldListener(this), this);
 		manager.registerEvents(new ShulkerShortcutListener(this), this);
 		manager.registerEvents(new ShulkerEquipmentListener(this), this);
 		manager.registerEvents(new PortableEnderListener(), this);
@@ -294,7 +291,7 @@ public class Plugin extends JavaPlugin {
 				//  4 times a second.
 				if (fourHertz) {
 					try {
-						mTrackingManager.update(mWorld, Constants.QUARTER_TICKS_PER_SECOND);
+						mTrackingManager.update(Constants.QUARTER_TICKS_PER_SECOND);
 					} catch (Exception e) {
 						e.printStackTrace();
 					}

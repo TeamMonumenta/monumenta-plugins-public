@@ -41,8 +41,8 @@ public class FlashSword extends Ability {
 	private final int mDamage;
 	private final float mKnockbackSpeed;
 
-	public FlashSword(Plugin plugin, World world, Player player) {
-		super(plugin, world, player, "Flash Sword");
+	public FlashSword(Plugin plugin, Player player) {
+		super(plugin, player, "Flash Sword");
 		mInfo.mScoreboardId = "FlashSword";
 		mInfo.mShorthandName = "FS";
 		mInfo.mDescriptions.add("Sprint left-clicking with a wand causes a wave of Arcane blades to hit every enemy within a 5 block cone 3 times (4 damage per hit) in rapid succession. The last hit causes knockback. Only the first hit can apply or trigger spellshock. Cooldown: 10s.");
@@ -97,8 +97,9 @@ public class FlashSword extends Ability {
 				if (mT >= SWINGS) {
 					mPitch = 1.45f;
 				}
-				mWorld.playSound(origin, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 0.75f, 0.8f);
-				mWorld.playSound(origin, Sound.ENTITY_WITHER_SHOOT, 0.75f, mPitch);
+				World world = mPlayer.getWorld();
+				world.playSound(origin, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 0.75f, 0.8f);
+				world.playSound(origin, Sound.ENTITY_WITHER_SHOOT, 0.75f, mPitch);
 				new BukkitRunnable() {
 					final int mI = mSw;
 					double mRoll;
@@ -128,8 +129,8 @@ public class FlashSword extends Ability {
 									vec = VectorUtils.rotateYAxis(vec, origin.getYaw());
 
 									Location l = origin.clone().add(0, 1.25, 0).add(vec);
-									mWorld.spawnParticle(Particle.REDSTONE, l, 1, 0.1, 0.1, 0.1, FSWORD_COLOR1);
-									mWorld.spawnParticle(Particle.REDSTONE, l, 1, 0.1, 0.1, 0.1, FSWORD_COLOR2);
+									world.spawnParticle(Particle.REDSTONE, l, 1, 0.1, 0.1, 0.1, FSWORD_COLOR1);
+									world.spawnParticle(Particle.REDSTONE, l, 1, 0.1, 0.1, 0.1, FSWORD_COLOR2);
 								}
 							}
 
@@ -145,8 +146,8 @@ public class FlashSword extends Ability {
 									vec = VectorUtils.rotateYAxis(vec, origin.getYaw());
 
 									Location l = origin.clone().add(0, 1.25, 0).add(vec);
-									mWorld.spawnParticle(Particle.REDSTONE, l, 1, 0.1, 0.1, 0.1, FSWORD_COLOR1);
-									mWorld.spawnParticle(Particle.REDSTONE, l, 1, 0.1, 0.1, 0.1, FSWORD_COLOR2);
+									world.spawnParticle(Particle.REDSTONE, l, 1, 0.1, 0.1, 0.1, FSWORD_COLOR1);
+									world.spawnParticle(Particle.REDSTONE, l, 1, 0.1, 0.1, 0.1, FSWORD_COLOR2);
 								}
 							}
 							mD -= 30;

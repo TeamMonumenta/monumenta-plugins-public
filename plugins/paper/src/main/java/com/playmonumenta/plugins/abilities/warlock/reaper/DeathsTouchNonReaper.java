@@ -27,8 +27,8 @@ public class DeathsTouchNonReaper extends Ability implements KillTriggeredAbilit
 
 	private final KillTriggeredAbilityTracker mTracker;
 
-	public DeathsTouchNonReaper(Plugin plugin, World world, Player player) {
-		super(plugin, world, player, null);
+	public DeathsTouchNonReaper(Plugin plugin, Player player) {
+		super(plugin, player, null);
 		mTracker = new KillTriggeredAbilityTracker(this);
 	}
 

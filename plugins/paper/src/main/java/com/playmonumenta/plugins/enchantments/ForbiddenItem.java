@@ -4,7 +4,6 @@ import java.util.EnumSet;
 
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
-import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -53,7 +52,7 @@ public class ForbiddenItem implements BaseEnchantment {
 	}
 
 	@Override
-	public void tick(Plugin plugin, World world, Player player, int level) {
+	public void tick(Plugin plugin, Player player, int level) {
 		applyProperty(plugin, player, level);
 	}
 }

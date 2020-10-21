@@ -41,8 +41,8 @@ public class WitheringGaze extends Ability {
 	private static final int WITHERING_GAZE_1_COOLDOWN = 20 * 30;
 	private static final int WITHERING_GAZE_2_COOLDOWN = 20 * 20;
 
-	public WitheringGaze(Plugin plugin, World world, Player player) {
-		super(plugin, world, player, "Withering Gaze");
+	public WitheringGaze(Plugin plugin, Player player) {
+		super(plugin, player, "Withering Gaze");
 		mInfo.mScoreboardId = "WitheringGaze";
 		mInfo.mShorthandName = "WG";
 		mInfo.mDescriptions.add("Sprint left-clicking unleashes a 9 block long cone in the direction the player is facing. Enemies in its path are stunned for 3 seconds (elites and bosses are given Slowness 3 instead) and given Wither 3 for 6 seconds. Cooldown: 30s.");
@@ -58,8 +58,9 @@ public class WitheringGaze extends Ability {
 		Location loc = player.getLocation().add(0, 0.65, 0); // the Y height is higher so that the skill doesn't get stomped by half slabs
 		Vector direction = loc.getDirection().setY(0).normalize();
 		int duration = getAbilityScore() == 1 ? 20 * WITHERING_GAZE_1_DURATION : 20 * WITHERING_GAZE_2_DURATION;
-		player.getLocation().getWorld().playSound(loc, Sound.ENTITY_WITHER_SHOOT, 1f, 0.4f);
-		player.getLocation().getWorld().playSound(loc, Sound.ENTITY_WITHER_AMBIENT, 1f, 1f);
+		World world = mPlayer.getWorld();
+		world.playSound(loc, Sound.ENTITY_WITHER_SHOOT, 1f, 0.4f);
+		world.playSound(loc, Sound.ENTITY_WITHER_AMBIENT, 1f, 1f);
 		new BukkitRunnable() {
 			double mT = 0;
 			double mDamageRange = 1.15;
@@ -76,9 +77,9 @@ public class WitheringGaze extends Ability {
 					vec = VectorUtils.rotateYAxis(vec, loc.getYaw());
 
 					Location l = loc.clone().add(vec);
-					mWorld.spawnParticle(Particle.SPELL_WITCH, l, 3, 0.15, 0.15, 0.15, 0.15);
-					mWorld.spawnParticle(Particle.SPELL_MOB, l, 3, 0.15, 0.15, 0.15, 0);
-					mWorld.spawnParticle(Particle.SMOKE_NORMAL, l, 2, 0.15, 0.15, 0.15, 0.05);
+					world.spawnParticle(Particle.SPELL_WITCH, l, 3, 0.15, 0.15, 0.15, 0.15);
+					world.spawnParticle(Particle.SPELL_MOB, l, 3, 0.15, 0.15, 0.15, 0);
+					world.spawnParticle(Particle.SMOKE_NORMAL, l, 2, 0.15, 0.15, 0.15, 0.05);
 				}
 				mR += 0.55;
 

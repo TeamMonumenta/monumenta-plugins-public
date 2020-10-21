@@ -22,8 +22,8 @@ public class Swiftness extends Ability {
 
 	private boolean mWasInNoMobilityZone = false;
 
-	public Swiftness(Plugin plugin, World world, Player player) {
-		super(plugin, world, player, "Swiftness");
+	public Swiftness(Plugin plugin, Player player) {
+		super(plugin, player, "Swiftness");
 		mInfo.mScoreboardId = "Swiftness";
 		mInfo.mShorthandName = "Swf";
 		mInfo.mDescriptions.add("Gain +20% Speed when you are not inside a town.");

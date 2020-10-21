@@ -3,7 +3,6 @@ package com.playmonumenta.plugins.abilities.cleric;
 import java.util.Collection;
 
 import org.bukkit.Location;
-import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
@@ -36,8 +35,8 @@ public class HeavenlyBoon extends Ability implements KillTriggeredAbility {
 	private final KillTriggeredAbilityTracker mTracker;
 	private final double mChance;
 
-	public HeavenlyBoon(Plugin plugin, World world, Player player) {
-		super(plugin, world, player, "Heavenly Boon");
+	public HeavenlyBoon(Plugin plugin, Player player) {
+		super(plugin, player, "Heavenly Boon");
 		mInfo.mScoreboardId = "HeavenlyBoon";
 		mInfo.mShorthandName = "HB";
 		mInfo.mDescriptions.add("Whenever you are hit with a positive splash potion, the effects are also given to other players in a 12 block radius. In addition, whenever you kill an undead mob, you have a 6% chance to be splashed with an Instant Health I potion, as well as either a Speed I, Regen I, or Absorption I potion.");
@@ -147,7 +146,7 @@ public class HeavenlyBoon extends Ability implements KillTriggeredAbility {
 			ItemUtils.addPotionEffect(potions, PotionInfo.HEALING);
 
 			Location pos = (mPlayer.getLocation()).add(0, 2, 0);
-			EntityUtils.spawnCustomSplashPotion(mWorld, mPlayer, potions, pos);
+			EntityUtils.spawnCustomSplashPotion(mPlayer, potions, pos);
 		}
 	}
 

@@ -43,8 +43,8 @@ public class Challenge extends Ability {
 	private final int mAbsorptionPerMob;
 	private final int mMaxAbsorption;
 
-	public Challenge(Plugin plugin, World world, Player player) {
-		super(plugin, world, player, "Challenge");
+	public Challenge(Plugin plugin, Player player) {
+		super(plugin, player, "Challenge");
 		mInfo.mScoreboardId = "Challenge";
 		mInfo.mShorthandName = "Ch";
 		mInfo.mDescriptions.add("Left-clicking while sneaking makes all enemies within 12 blocks target you. You gain 1 Absorption per affected mob (up to 4 Absorption) for 10 seconds and +15% melee damage for 10 seconds. Cooldown: 20s.");
@@ -65,12 +65,13 @@ public class Challenge extends Ability {
 		}
 
 		Location loc = mPlayer.getLocation();
-		mWorld.playSound(loc, Sound.ENTITY_ENDER_DRAGON_GROWL, 2, 1);
-		mWorld.spawnParticle(Particle.FLAME, loc, 25, 0.4, 1, 0.4, 0.7f);
+		World world = mPlayer.getWorld();
+		world.playSound(loc, Sound.ENTITY_ENDER_DRAGON_GROWL, 2, 1);
+		world.spawnParticle(Particle.FLAME, loc, 25, 0.4, 1, 0.4, 0.7f);
 		loc.add(0, 1.25, 0);
-		mWorld.spawnParticle(Particle.EXPLOSION_NORMAL, loc, 250, 0, 0, 0, 0.425);
-		mWorld.spawnParticle(Particle.CRIT, loc, 300, 0, 0, 0, 1);
-		mWorld.spawnParticle(Particle.CRIT_MAGIC, loc, 300, 0, 0, 0, 1);
+		world.spawnParticle(Particle.EXPLOSION_NORMAL, loc, 250, 0, 0, 0, 0.425);
+		world.spawnParticle(Particle.CRIT, loc, 300, 0, 0, 0, 1);
+		world.spawnParticle(Particle.CRIT_MAGIC, loc, 300, 0, 0, 0, 1);
 
 		List<LivingEntity> mobs = EntityUtils.getNearbyMobs(mPlayer.getLocation(), CHALLENGE_RANGE, mPlayer);
 		AbsorptionUtils.addAbsorption(mPlayer, mAbsorptionPerMob * mobs.size(), mMaxAbsorption, DURATION);

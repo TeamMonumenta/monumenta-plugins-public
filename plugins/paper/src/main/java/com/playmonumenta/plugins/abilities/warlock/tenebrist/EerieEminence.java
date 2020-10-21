@@ -60,8 +60,8 @@ public class EerieEminence extends Ability {
 
 	private final List<DebuffElement> mDebuffs = new ArrayList<>();
 
-	public EerieEminence(Plugin plugin, World world, Player player) {
-		super(plugin, world, player, "Eerie Eminence");
+	public EerieEminence(Plugin plugin, Player player) {
+		super(plugin, player, "Eerie Eminence");
 		mInfo.mScoreboardId = "EerieEminence";
 		mInfo.mShorthandName = "EE";
 		mInfo.mDescriptions.add("You gain an AoE debuff aura around you that applies a level 1 debuff for every of the following four skills that you used in the last 10s. Grasping Claws > Slowness. Consuming Flames > Set mobs on Fire. Fractal Enervation > Mining Fatigue. Withering Gaze > Wither. The AoE affects all enemies in a 6 block radius.");

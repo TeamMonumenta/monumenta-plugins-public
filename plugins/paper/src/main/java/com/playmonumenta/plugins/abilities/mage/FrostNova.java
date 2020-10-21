@@ -38,8 +38,8 @@ public class FrostNova extends Ability {
 	private final int mDamage;
 	private final int mSlownessAmplifier;
 
-	public FrostNova(Plugin plugin, World world, Player player) {
-		super(plugin, world, player, "Frost Nova");
+	public FrostNova(Plugin plugin, Player player) {
+		super(plugin, player, "Frost Nova");
 		mInfo.mLinkedSpell = Spells.FROST_NOVA;
 		mInfo.mScoreboardId = "FrostNova";
 		mInfo.mShorthandName = "FN";
@@ -77,6 +77,7 @@ public class FrostNova extends Ability {
 			}
 		}
 
+		World world = mPlayer.getWorld();
 		new BukkitRunnable() {
 			double mRadius = 0;
 			final Location mLoc = mPlayer.getLocation();
@@ -86,8 +87,8 @@ public class FrostNova extends Ability {
 				for (double j = 0; j < 360; j += 18) {
 					double radian1 = Math.toRadians(j);
 					mLoc.add(FastUtils.cos(radian1) * mRadius, 0.15, FastUtils.sin(radian1) * mRadius);
-					mWorld.spawnParticle(Particle.CLOUD, mLoc, 1, 0, 0, 0, 0.1);
-					mWorld.spawnParticle(Particle.CRIT_MAGIC, mLoc, 8, 0, 0, 0, 0.65);
+					world.spawnParticle(Particle.CLOUD, mLoc, 1, 0, 0, 0, 0.1);
+					world.spawnParticle(Particle.CRIT_MAGIC, mLoc, 8, 0, 0, 0, 0.65);
 					mLoc.subtract(FastUtils.cos(radian1) * mRadius, 0.15, FastUtils.sin(radian1) * mRadius);
 				}
 
@@ -98,12 +99,12 @@ public class FrostNova extends Ability {
 
 		}.runTaskTimer(mPlugin, 0, 1);
 		Location loc = mPlayer.getLocation().add(0, 1, 0);
-		mWorld.playSound(loc, Sound.BLOCK_GLASS_BREAK, 1, 0.65f);
-		mWorld.playSound(loc, Sound.BLOCK_GLASS_BREAK, 1, 0.45f);
-		mWorld.playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_BLAST, 1, 1.25f);
-		mWorld.spawnParticle(Particle.CLOUD, loc, 25, 0, 0, 0, 0.35);
-		mWorld.spawnParticle(Particle.SPIT, loc, 35, 0, 0, 0, 0.45);
-		mWorld.playSound(loc, Sound.BLOCK_GLASS_BREAK, 0.5f, 1.0f);
+		world.playSound(loc, Sound.BLOCK_GLASS_BREAK, 1, 0.65f);
+		world.playSound(loc, Sound.BLOCK_GLASS_BREAK, 1, 0.45f);
+		world.playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_BLAST, 1, 1.25f);
+		world.spawnParticle(Particle.CLOUD, loc, 25, 0, 0, 0, 0.35);
+		world.spawnParticle(Particle.SPIT, loc, 35, 0, 0, 0, 0.45);
+		world.playSound(loc, Sound.BLOCK_GLASS_BREAK, 0.5f, 1.0f);
 	}
 
 	@Override

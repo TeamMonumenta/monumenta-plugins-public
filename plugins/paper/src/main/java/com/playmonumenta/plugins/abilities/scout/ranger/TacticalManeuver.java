@@ -37,8 +37,8 @@ public class TacticalManeuver extends MultipleChargeAbility {
 
 	private int mLastCastTicks = 0;
 
-	public TacticalManeuver(Plugin plugin, World world, Player player) {
-		super(plugin, world, player, "Tactical Maneuver", TACTICAL_MANEUVER_1_MAX_CHARGES, TACTICAL_MANEUVER_2_MAX_CHARGES);
+	public TacticalManeuver(Plugin plugin, Player player) {
+		super(plugin, player, "Tactical Maneuver", TACTICAL_MANEUVER_1_MAX_CHARGES, TACTICAL_MANEUVER_2_MAX_CHARGES);
 		mInfo.mLinkedSpell = Spells.TACTICAL_MANEUVER;
 		mInfo.mScoreboardId = "TacticalManeuver";
 		mInfo.mShorthandName = "TM";
@@ -72,11 +72,12 @@ public class TacticalManeuver extends MultipleChargeAbility {
 
 		mLastCastTicks = ticks;
 
+		World world = mPlayer.getWorld();
 		if (mPlayer.isSprinting()) {
-			mWorld.spawnParticle(Particle.SMOKE_NORMAL, mPlayer.getLocation(), 63, 0.25, 0.1, 0.25, 0.2);
-			mWorld.spawnParticle(Particle.CLOUD, mPlayer.getLocation(), 20, 0.25, 0.1, 0.25, 0.125);
-			mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_BLAZE_SHOOT, 1, 2);
-			mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_BLAZE_SHOOT, 1, 1.7f);
+			world.spawnParticle(Particle.SMOKE_NORMAL, mPlayer.getLocation(), 63, 0.25, 0.1, 0.25, 0.2);
+			world.spawnParticle(Particle.CLOUD, mPlayer.getLocation(), 20, 0.25, 0.1, 0.25, 0.125);
+			world.playSound(mPlayer.getLocation(), Sound.ENTITY_BLAZE_SHOOT, 1, 2);
+			world.playSound(mPlayer.getLocation(), Sound.ENTITY_BLAZE_SHOOT, 1, 1.7f);
 			Vector dir = mPlayer.getLocation().getDirection();
 			mPlayer.setVelocity(dir.setY(dir.getY() * 0.5 + 0.4));
 
@@ -94,7 +95,7 @@ public class TacticalManeuver extends MultipleChargeAbility {
 						return;
 					}
 
-					mWorld.spawnParticle(Particle.SMOKE_NORMAL, mPlayer.getLocation(), 5, 0.25, 0.1, 0.25, 0.1);
+					world.spawnParticle(Particle.SMOKE_NORMAL, mPlayer.getLocation(), 5, 0.25, 0.1, 0.25, 0.1);
 
 					Location loc = mPlayer.getLocation();
 					if (mPlayer.getVelocity().length() > 0.001) {
@@ -107,9 +108,9 @@ public class TacticalManeuver extends MultipleChargeAbility {
 								EntityUtils.applyStun(mPlugin, TACTICAL_DASH_STUN_DURATION, e);
 							}
 
-							mWorld.spawnParticle(Particle.SMOKE_NORMAL, mPlayer.getLocation(), 63, 0.25, 0.1, 0.25, 0.2);
-							mWorld.spawnParticle(Particle.CLOUD, mPlayer.getLocation(), 20, 0.25, 0.1, 0.25, 0.125);
-							mWorld.playSound(mPlayer.getLocation(), Sound.ITEM_SHIELD_BREAK, 2.0f, 0.5f);
+							world.spawnParticle(Particle.SMOKE_NORMAL, mPlayer.getLocation(), 63, 0.25, 0.1, 0.25, 0.2);
+							world.spawnParticle(Particle.CLOUD, mPlayer.getLocation(), 20, 0.25, 0.1, 0.25, 0.125);
+							world.playSound(mPlayer.getLocation(), Sound.ITEM_SHIELD_BREAK, 2.0f, 0.5f);
 
 							this.cancel();
 							break;
@@ -124,11 +125,11 @@ public class TacticalManeuver extends MultipleChargeAbility {
 				MovementUtils.knockAway(mPlayer, le, TACTICAL_LEAP_KNOCKBACK_SPEED);
 			}
 
-			mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_BLAZE_SHOOT, 1, 2);
-			mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_FIREWORK_ROCKET_SHOOT, 1, 1.2f);
-			mWorld.spawnParticle(Particle.CLOUD, mPlayer.getLocation(), 15, 0.1f, 0, 0.1f, 0.125f);
-			mWorld.spawnParticle(Particle.EXPLOSION_NORMAL, mPlayer.getLocation(), 10, 0.1f, 0, 0.1f, 0.15f);
-			mWorld.spawnParticle(Particle.SMOKE_NORMAL, mPlayer.getLocation(), 25, 0.1f, 0, 0.1f, 0.15f);
+			world.playSound(mPlayer.getLocation(), Sound.ENTITY_BLAZE_SHOOT, 1, 2);
+			world.playSound(mPlayer.getLocation(), Sound.ENTITY_FIREWORK_ROCKET_SHOOT, 1, 1.2f);
+			world.spawnParticle(Particle.CLOUD, mPlayer.getLocation(), 15, 0.1f, 0, 0.1f, 0.125f);
+			world.spawnParticle(Particle.EXPLOSION_NORMAL, mPlayer.getLocation(), 10, 0.1f, 0, 0.1f, 0.15f);
+			world.spawnParticle(Particle.SMOKE_NORMAL, mPlayer.getLocation(), 25, 0.1f, 0, 0.1f, 0.15f);
 			mPlayer.setVelocity(mPlayer.getLocation().getDirection().setY(0).normalize().multiply(-1.65).setY(0.65));
 		}
 	}

@@ -1,7 +1,6 @@
 package com.playmonumenta.plugins.abilities.alchemist;
 
 import org.bukkit.Location;
-import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -14,14 +13,13 @@ public abstract class PotionAbility extends Ability {
 	private double mDamage;
 	private double mRadius;
 
-	public PotionAbility(Plugin plugin, World world, Player player,
-			String displayName, double damage1, double damage2) {
-		this(plugin, world, player, displayName, damage1, damage2, 3);
+	public PotionAbility(Plugin plugin, Player player, String displayName, double damage1, double damage2) {
+		this(plugin, player, displayName, damage1, damage2, 3);
 	}
 
-	public PotionAbility(Plugin plugin, World world, Player player,
+	public PotionAbility(Plugin plugin, Player player,
 			String displayName, double damage1, double damage2, double radius) {
-		super(plugin, world, player, displayName);
+		super(plugin, player, displayName);
 
 		// getAbilityScore() doesn't work until we set the mInfo.mScoreboard in the child class
 		new BukkitRunnable() {

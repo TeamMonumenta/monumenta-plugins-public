@@ -38,7 +38,7 @@ public class VoidTether implements BaseEnchantment {
 	}
 
 	@Override
-	public void tick(Plugin plugin, World world, Player player, int level) {
+	public void tick(Plugin plugin, Player player, int level) {
 		Location ploc = player.getLocation();
 		if (ploc.getY() > 0) {
 			/* Not in the void - clear player's location */

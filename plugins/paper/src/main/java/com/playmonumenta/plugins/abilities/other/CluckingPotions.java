@@ -27,8 +27,8 @@ import com.playmonumenta.plugins.utils.InventoryUtils;
  * into something like EntityListener
  */
 public class CluckingPotions extends Ability {
-	public CluckingPotions(Plugin plugin, World world, Player player) {
-		super(plugin, world, player, null);
+	public CluckingPotions(Plugin plugin, Player player) {
+		super(plugin, player, null);
 	}
 
 	@Override

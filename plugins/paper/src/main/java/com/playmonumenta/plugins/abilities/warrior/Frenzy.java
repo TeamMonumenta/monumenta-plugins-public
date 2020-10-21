@@ -2,7 +2,6 @@ package com.playmonumenta.plugins.abilities.warrior;
 
 import org.bukkit.Location;
 import org.bukkit.Sound;
-import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.inventory.ItemStack;
@@ -18,8 +17,8 @@ public class Frenzy extends Ability {
 
 	private static final int FRENZY_DURATION = 5 * 20;
 
-	public Frenzy(Plugin plugin, World world, Player player) {
-		super(plugin, world, player, "Frenzy");
+	public Frenzy(Plugin plugin, Player player) {
+		super(plugin, player, "Frenzy");
 		mInfo.mScoreboardId = "Frenzy";
 		mInfo.mShorthandName = "Fnz";
 		mInfo.mDescriptions.add("You gain 5 seconds of Haste III after killing a mob. You lose this buff when you hold a pickaxe.");
@@ -36,7 +35,7 @@ public class Frenzy extends Ability {
 			mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.FAST_DIGGING, FRENZY_DURATION, hasteAmp, true, true));
 
 			Location loc = mPlayer.getLocation();
-			mWorld.playSound(loc, Sound.ENTITY_POLAR_BEAR_HURT, 0.1f, 1.0f);
+			loc.getWorld().playSound(loc, Sound.ENTITY_POLAR_BEAR_HURT, 0.1f, 1.0f);
 
 			if (frenzy > 1) {
 				mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.SPEED, FRENZY_DURATION, 0, true, true));

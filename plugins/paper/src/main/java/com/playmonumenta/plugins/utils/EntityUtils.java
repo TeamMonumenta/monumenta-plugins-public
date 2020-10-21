@@ -464,8 +464,8 @@ public class EntityUtils {
 		return cloud;
 	}
 
-	public static ThrownPotion spawnCustomSplashPotion(World world, Player player, ItemStack potionStack, Location loc) {
-		ThrownPotion potion = (ThrownPotion)world.spawnEntity(loc.add(0, 0.5, 0), EntityType.SPLASH_POTION);
+	public static ThrownPotion spawnCustomSplashPotion(Player player, ItemStack potionStack, Location loc) {
+		ThrownPotion potion = (ThrownPotion)loc.getWorld().spawnEntity(loc.add(0, 0.5, 0), EntityType.SPLASH_POTION);
 		potion.setShooter(player);
 		potion.setItem(potionStack);
 

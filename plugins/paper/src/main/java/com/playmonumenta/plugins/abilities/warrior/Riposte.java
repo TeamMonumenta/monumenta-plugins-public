@@ -30,8 +30,8 @@ public class Riposte extends Ability {
 	private static final int RIPOSTE_AXE_DURATION = 3 * 20;
 	private static final float RIPOSTE_KNOCKBACK_SPEED = 0.15f;
 
-	public Riposte(Plugin plugin, World world, Player player) {
-		super(plugin, world, player, "Riposte");
+	public Riposte(Plugin plugin, Player player) {
+		super(plugin, player, "Riposte");
 		mInfo.mLinkedSpell = Spells.RIPOSTE;
 		mInfo.mScoreboardId = "Obliteration";
 		mInfo.mShorthandName = "Rip";
@@ -61,13 +61,14 @@ public class Riposte extends Ability {
 						}
 					}
 
-					mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1f, 1.2f);
-					mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, 0.75f, 1.8f);
+					World world = mPlayer.getWorld();
+					world.playSound(mPlayer.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1f, 1.2f);
+					world.playSound(mPlayer.getLocation(), Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, 0.75f, 1.8f);
 					Vector dir = LocationUtils.getDirectionTo(mPlayer.getLocation().add(0, 1, 0), damager.getLocation().add(0, damager.getHeight() / 2, 0));
 					Location loc = mPlayer.getLocation().add(0, 1, 0).subtract(dir);
-					mWorld.spawnParticle(Particle.SWEEP_ATTACK, loc, 8, 0.75, 0.5, 0.75, 0.001);
-					mWorld.spawnParticle(Particle.FIREWORKS_SPARK, loc, 20, 0.75, 0.5, 0.75, 0.1);
-					mWorld.spawnParticle(Particle.CRIT, loc, 75, 0.1, 0.1, 0.1, 0.6);
+					world.spawnParticle(Particle.SWEEP_ATTACK, loc, 8, 0.75, 0.5, 0.75, 0.001);
+					world.spawnParticle(Particle.FIREWORKS_SPARK, loc, 20, 0.75, 0.5, 0.75, 0.1);
+					world.spawnParticle(Particle.CRIT, loc, 75, 0.1, 0.1, 0.1, 0.6);
 					putOnCooldown();
 					return false;
 				}

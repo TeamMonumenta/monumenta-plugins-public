@@ -23,8 +23,8 @@ public class DivineJustice extends Ability {
 
 	private final int mCriticalUndeadDamage;
 
-	public DivineJustice(Plugin plugin, World world, Player player) {
-		super(plugin, world, player, "Divine Justice");
+	public DivineJustice(Plugin plugin, Player player) {
+		super(plugin, player, "Divine Justice");
 		mInfo.mScoreboardId = "DivineJustice";
 		mInfo.mShorthandName = "DJ";
 		mInfo.mDescriptions.add("Your critical strikes deal +5 damage to undead enemies.");
@@ -40,9 +40,10 @@ public class DivineJustice extends Ability {
 				Location loc = damagee.getLocation().add(0, damagee.getHeight() / 2, 0);
 				double xz = damagee.getWidth() / 2 + 0.1;
 				double y = damagee.getHeight() / 3;
-				mWorld.spawnParticle(Particle.END_ROD, loc, 5, xz, y, xz, 0.065);
-				mWorld.spawnParticle(Particle.FLAME, loc, 6, xz, y, xz, 0.05);
-				mWorld.playSound(loc, Sound.BLOCK_ANVIL_LAND, 0.15f, 1.5f);
+				World world = mPlayer.getWorld();
+				world.spawnParticle(Particle.END_ROD, loc, 5, xz, y, xz, 0.065);
+				world.spawnParticle(Particle.FLAME, loc, 6, xz, y, xz, 0.05);
+				world.playSound(loc, Sound.BLOCK_ANVIL_LAND, 0.15f, 1.5f);
 
 				event.setDamage(event.getDamage() + mCriticalUndeadDamage);
 			}

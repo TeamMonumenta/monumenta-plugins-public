@@ -30,8 +30,8 @@ public class CursedWound extends Ability {
 
 	private final int mDamageBonus;
 
-	public CursedWound(Plugin plugin, World world, Player player) {
-		super(plugin, world, player, "Cursed Wound");
+	public CursedWound(Plugin plugin, Player player) {
+		super(plugin, player, "Cursed Wound");
 		mInfo.mScoreboardId = "CursedWound";
 		mInfo.mShorthandName = "CW";
 		mInfo.mDescriptions.add("Hitting an enemy with a scythe gives 6s of Wither II. In addition, scythe attacks deal +1 damage.");
@@ -45,10 +45,11 @@ public class CursedWound extends Ability {
 		if (event.getCause() == DamageCause.ENTITY_ATTACK) {
 			LivingEntity damagee = (LivingEntity) event.getEntity();
 			BlockData fallingDustData = Material.ANVIL.createBlockData();
+			World world = mPlayer.getWorld();
 			if (EntityUtils.isHostileMob(damagee)) {
-				mWorld.spawnParticle(Particle.FALLING_DUST, damagee.getLocation().add(0, damagee.getHeight() / 2, 0), 3,
+				world.spawnParticle(Particle.FALLING_DUST, damagee.getLocation().add(0, damagee.getHeight() / 2, 0), 3,
 				                     (damagee.getWidth() / 2) + 0.1, damagee.getHeight() / 3, (damagee.getWidth() / 2) + 0.1, fallingDustData);
-				mWorld.spawnParticle(Particle.SPELL_MOB, damagee.getLocation().add(0, damagee.getHeight() / 2, 0), 6,
+				world.spawnParticle(Particle.SPELL_MOB, damagee.getLocation().add(0, damagee.getHeight() / 2, 0), 6,
 				                     (damagee.getWidth() / 2) + 0.1, damagee.getHeight() / 3, (damagee.getWidth() / 2) + 0.1, 0);
 				PotionUtils.applyPotion(mPlayer, damagee, new PotionEffect(PotionEffectType.WITHER, CURSED_WOUND_DURATION, CURSED_WOUND_EFFECT_LEVEL, false, true));
 				event.setDamage(event.getDamage() + mDamageBonus);
@@ -58,9 +59,9 @@ public class CursedWound extends Ability {
 
 			if (getAbilityScore() > 1 && PlayerUtils.isCritical(mPlayer)) {
 				for (LivingEntity mob : EntityUtils.getNearbyMobs(damagee.getLocation(), CURSED_WOUND_RADIUS, mPlayer)) {
-					mWorld.spawnParticle(Particle.FALLING_DUST, mob.getLocation().add(0, mob.getHeight() / 2, 0), 3,
+					world.spawnParticle(Particle.FALLING_DUST, mob.getLocation().add(0, mob.getHeight() / 2, 0), 3,
 					                     (mob.getWidth() / 2) + 0.1, mob.getHeight() / 3, (mob.getWidth() / 2) + 0.1, fallingDustData);
-					mWorld.spawnParticle(Particle.SPELL_MOB, mob.getLocation().add(0, mob.getHeight() / 2, 0), 6,
+					world.spawnParticle(Particle.SPELL_MOB, mob.getLocation().add(0, mob.getHeight() / 2, 0), 6,
 					                     (mob.getWidth() / 2) + 0.1, mob.getHeight() / 3, (mob.getWidth() / 2) + 0.1, 0);
 					PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(PotionEffectType.WITHER, CURSED_WOUND_DURATION, CURSED_WOUND_EFFECT_LEVEL, true, false));
 				}

@@ -20,8 +20,8 @@ public class Agility extends Ability {
 
 	private final int mDamageBonus;
 
-	public Agility(Plugin plugin, World world, Player player) {
-		super(plugin, world, player, "Agility");
+	public Agility(Plugin plugin, Player player) {
+		super(plugin, player, "Agility");
 		mInfo.mScoreboardId = "Agility";
 		mInfo.mShorthandName = "Agl";
 		mInfo.mDescriptions.add("You gain permanent Haste I. Your melee attacks deal +1 extra damage.");

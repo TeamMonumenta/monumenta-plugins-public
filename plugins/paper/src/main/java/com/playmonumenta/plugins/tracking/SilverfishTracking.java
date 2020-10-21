@@ -4,7 +4,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
-import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Silverfish;
 
@@ -27,7 +26,7 @@ public class SilverfishTracking implements EntityTracking {
 	}
 
 	@Override
-	public void update(World world, int ticks) {
+	public void update(int ticks) {
 		Iterator<Silverfish> silverfishIter = mEntities.iterator();
 		while (silverfishIter.hasNext()) {
 			Silverfish silverfish = silverfishIter.next();

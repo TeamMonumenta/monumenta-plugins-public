@@ -24,8 +24,8 @@ public class BlasphemousAura extends Ability {
 	private static final double PERCENT_DAMAGE_RESIST = -0.03;
 
 
-	public BlasphemousAura(Plugin plugin, World world, Player player) {
-		super(plugin, world, player, "Blasphemous Aura");
+	public BlasphemousAura(Plugin plugin, Player player) {
+		super(plugin, player, "Blasphemous Aura");
 		mInfo.mScoreboardId = "BlasphemousAura";
 		mInfo.mShorthandName = "BA";
 		mInfo.mDescriptions.add("Enemies you damage with an ability are afflicted with 15% vulnerability for 5 seconds.");

@@ -28,8 +28,8 @@ public class Mystic extends StatMultiplier {
 			"boss_magicarrow"
 	};
 
-	public Mystic(Plugin plugin, World world, Player player) {
-		super(plugin, world, player,
+	public Mystic(Plugin plugin, Player player) {
+		super(plugin, player,
 				1, ServerProperties.getClassSpecializationsEnabled() ? MYSTIC_2_ABILITY_DAMAGE_TAKEN_MULTIPLIER : MYSTIC_1_ABILITY_DAMAGE_TAKEN_MULTIPLIER,
 				MYSTIC_MOB_HEALTH_MULTIPLIER, MYSTIC_ABILITY_POOL, MYSTIC_ABILITY_CHANCE);
 	}

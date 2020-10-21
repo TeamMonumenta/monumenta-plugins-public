@@ -4,7 +4,6 @@ import java.util.EnumSet;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Particle;
-import org.bukkit.World;
 import org.bukkit.entity.Player;
 
 import com.playmonumenta.plugins.Plugin;
@@ -29,7 +28,7 @@ public class Stylish implements BaseEnchantment {
 	}
 
 	@Override
-	public void tick(Plugin plugin, World world, Player player, int level) {
-		world.spawnParticle(Particle.SMOKE_NORMAL, player.getLocation().add(0, 1.5, 0), 5, 0.4, 0.4, 0.4, 0);
+	public void tick(Plugin plugin, Player player, int level) {
+		player.getWorld().spawnParticle(Particle.SMOKE_NORMAL, player.getLocation().add(0, 1.5, 0), 5, 0.4, 0.4, 0.4, 0);
 	}
 }

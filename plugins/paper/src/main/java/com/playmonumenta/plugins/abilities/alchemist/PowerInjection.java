@@ -51,8 +51,8 @@ public class PowerInjection extends Ability {
 
 	private Player mTargetPlayer;
 
-	public PowerInjection(Plugin plugin, World world, Player player) {
-		super(plugin, world, player, "Power Injection");
+	public PowerInjection(Plugin plugin, Player player) {
+		super(plugin, player, "Power Injection");
 		mInfo.mLinkedSpell = Spells.POWER_INJECTION;
 		mInfo.mScoreboardId = "PowerInjection";
 		mInfo.mShorthandName = "PI";
@@ -72,12 +72,13 @@ public class PowerInjection extends Ability {
 			applyEffects(mTargetPlayer);
 
 			Location loc = mPlayer.getEyeLocation();
+			World world = mPlayer.getWorld();
 			Vector dir = loc.getDirection();
 			for (int i = 0; i < 50; i++) {
 				loc.add(dir.clone().multiply(0.5));
-				mWorld.spawnParticle(Particle.CRIT_MAGIC, loc, 5, 0.2, 0.2, 0.2, 0.35);
-				mWorld.spawnParticle(Particle.CRIT, loc, 1, 0.2, 0.2, 0.2, 0.35);
-				mWorld.spawnParticle(Particle.FLAME, loc, 2, 0.11, 0.11, 0.11, 0.025);
+				world.spawnParticle(Particle.CRIT_MAGIC, loc, 5, 0.2, 0.2, 0.2, 0.35);
+				world.spawnParticle(Particle.CRIT, loc, 1, 0.2, 0.2, 0.2, 0.35);
+				world.spawnParticle(Particle.FLAME, loc, 2, 0.11, 0.11, 0.11, 0.025);
 
 				if (loc.distance(mTargetPlayer.getLocation().add(0, 1, 0)) < 1.25) {
 					break;
@@ -85,9 +86,9 @@ public class PowerInjection extends Ability {
 			}
 
 			Location locPlayer = mPlayer.getEyeLocation();
-			mWorld.playSound(locPlayer, Sound.ENTITY_ILLUSIONER_CAST_SPELL, 1.2f, 1.25f);
-			mWorld.playSound(locPlayer, Sound.ENTITY_WITHER_SHOOT, 0.5f, 1.75f);
-			mWorld.spawnParticle(Particle.FLAME, locPlayer.add(locPlayer.getDirection().multiply(0.75)), 20, 0, 0, 0, 0.25);
+			world.playSound(locPlayer, Sound.ENTITY_ILLUSIONER_CAST_SPELL, 1.2f, 1.25f);
+			world.playSound(locPlayer, Sound.ENTITY_WITHER_SHOOT, 0.5f, 1.75f);
+			world.spawnParticle(Particle.FLAME, locPlayer.add(locPlayer.getDirection().multiply(0.75)), 20, 0, 0, 0, 0.25);
 
 			mTargetPlayer = null;
 		}
@@ -97,11 +98,12 @@ public class PowerInjection extends Ability {
 
 	private void applyEffects(Player player) {
 		Location loc = player.getLocation().add(0, 1, 0);
-		mWorld.spawnParticle(Particle.FLAME, loc, 15, 0.4, 0.45, 0.4, 0.025);
-		mWorld.spawnParticle(Particle.SPELL_INSTANT, loc, 50, 0.25, 0.45, 0.25, 0.001);
-		mWorld.spawnParticle(Particle.REDSTONE, loc, 45, 0.4, 0.45, 0.4, COLOR);
-		mWorld.playSound(loc, Sound.ENTITY_ILLUSIONER_PREPARE_BLINDNESS, 1.2f, 1.25f);
-		mWorld.playSound(loc, Sound.BLOCK_BEACON_ACTIVATE, 1.2f, 1.1f);
+		World world = mPlayer.getWorld();
+		world.spawnParticle(Particle.FLAME, loc, 15, 0.4, 0.45, 0.4, 0.025);
+		world.spawnParticle(Particle.SPELL_INSTANT, loc, 50, 0.25, 0.45, 0.25, 0.001);
+		world.spawnParticle(Particle.REDSTONE, loc, 45, 0.4, 0.45, 0.4, COLOR);
+		world.playSound(loc, Sound.ENTITY_ILLUSIONER_PREPARE_BLINDNESS, 1.2f, 1.25f);
+		world.playSound(loc, Sound.BLOCK_BEACON_ACTIVATE, 1.2f, 1.1f);
 
 		mPlugin.mEffectManager.addEffect(player, FLAT_DAMAGE_DEALT_EFFECT_NAME, new FlatDamageDealt(DURATION, mFlatDamageDealtEffect, AFFECTED_DAMAGE_CAUSES));
 		mPlugin.mEffectManager.addEffect(player, PERCENT_DAMAGE_DEALT_EFFECT_NAME, new PercentDamageDealt(DURATION, mPercentDamageDealtEffect, AFFECTED_DAMAGE_CAUSES));

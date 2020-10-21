@@ -11,7 +11,6 @@ import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
-import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.inventory.ItemStack;
@@ -75,7 +74,7 @@ public class Barking implements BaseEnchantment {
 	}
 
 	@Override
-	public void tick(Plugin plugin, World world, Player player, int level) {
+	public void tick(Plugin plugin, Player player, int level) {
 		if ((level > 1) && !HAS_DEBARKING.contains(player.getUniqueId())) {
 
 			staticTicks++;
@@ -94,7 +93,7 @@ public class Barking implements BaseEnchantment {
 			modulo = modulo / 20;
 
 			if (staticTicks % modulo == 0) {
-				world.playSound(player.getLocation(), Sound.ENTITY_WOLF_AMBIENT, SoundCategory.HOSTILE, 1.0f, 0.8f);
+				player.getWorld().playSound(player.getLocation(), Sound.ENTITY_WOLF_AMBIENT, SoundCategory.HOSTILE, 1.0f, 0.8f);
 			}
 		}
 	}

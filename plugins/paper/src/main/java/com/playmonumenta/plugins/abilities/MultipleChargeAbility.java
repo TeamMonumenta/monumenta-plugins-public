@@ -15,9 +15,9 @@ public class MultipleChargeAbility extends Ability {
 	private int mCharges;
 	private boolean mWasOnCooldown;
 
-	public MultipleChargeAbility(Plugin plugin, World world, Player player,
+	public MultipleChargeAbility(Plugin plugin, Player player,
 			String displayName, int maxCharges1, int maxCharges2) {
-		super(plugin, world, player, displayName);
+		super(plugin, player, displayName);
 
 		// getAbilityScore() doesn't work until we set the mInfo.mScoreboard in the child class
 		new BukkitRunnable() {

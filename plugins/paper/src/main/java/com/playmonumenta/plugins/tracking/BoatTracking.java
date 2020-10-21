@@ -29,13 +29,14 @@ public class BoatTracking implements EntityTracking {
 	}
 
 	@Override
-	public void update(World world, int ticks) {
+	public void update(int ticks) {
 		Iterator<Boat> boatIter = mEntities.iterator();
 		while (boatIter.hasNext()) {
 			Boat boat = boatIter.next();
 			if (boat != null && boat.isValid()) {
 				if (!LocationUtils.isValidBoatLocation(boat.getLocation())) {
 					TreeSpecies woodType = boat.getWoodType();
+					World world = boat.getWorld();
 					switch (woodType) {
 					case ACACIA:
 						world.dropItem(boat.getLocation(), new ItemStack(Material.ACACIA_BOAT));

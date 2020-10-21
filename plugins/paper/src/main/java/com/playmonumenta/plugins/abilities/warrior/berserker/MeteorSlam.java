@@ -58,8 +58,8 @@ public class MeteorSlam extends Ability {
 	private boolean mCanTrigger = false;
 	private final BukkitRunnable mRunnable;
 
-	public MeteorSlam(Plugin plugin, World world, Player player) {
-		super(plugin, world, player, "Meteor Slam");
+	public MeteorSlam(Plugin plugin, Player player) {
+		super(plugin, player, "Meteor Slam");
 		mInfo.mLinkedSpell = Spells.METEOR_SLAM;
 		mInfo.mScoreboardId = "MeteorSlam";
 		mInfo.mShorthandName = "MS";
@@ -149,8 +149,9 @@ public class MeteorSlam extends Ability {
 
 			mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.JUMP, DURATION, mJumpBoostAmplifier, true, false));
 			putOnCooldown();
-			mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_ENDER_DRAGON_GROWL, SoundCategory.PLAYERS, 1, 1);
-			mWorld.spawnParticle(Particle.LAVA, mPlayer.getLocation(), 15, 1, 0f, 1, 0);
+			World world = mPlayer.getWorld();
+			world.playSound(mPlayer.getLocation(), Sound.ENTITY_ENDER_DRAGON_GROWL, SoundCategory.PLAYERS, 1, 1);
+			world.spawnParticle(Particle.LAVA, mPlayer.getLocation(), 15, 1, 0f, 1, 0);
 
 			// Flame particles that have no y velocity and only x and z.
 			for (int i = 0; i < 60; i++) {
@@ -158,7 +159,7 @@ public class MeteorSlam extends Ability {
 				double z = FastUtils.randomDoubleInRange(-3, 3);
 				Location to = mPlayer.getLocation().add(x, 0.15, z);
 				Vector dir = LocationUtils.getDirectionTo(to, mPlayer.getLocation().add(0, 0.15, 0));
-				mWorld.spawnParticle(Particle.FLAME, mPlayer.getLocation().add(0, 0.15, 0), 0, (float) dir.getX(), 0f, (float) dir.getZ(), FastUtils.randomDoubleInRange(0.1, 0.3));
+				world.spawnParticle(Particle.FLAME, mPlayer.getLocation().add(0, 0.15, 0), 0, (float) dir.getX(), 0f, (float) dir.getZ(), FastUtils.randomDoubleInRange(0.1, 0.3));
 			}
 		}
 	}
@@ -177,11 +178,12 @@ public class MeteorSlam extends Ability {
 			}
 		}
 
-		mWorld.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.PLAYERS, 1.3F, 0);
-		mWorld.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.PLAYERS, 2, 1.25F);
-		mWorld.spawnParticle(Particle.FLAME, loc, 60, 0F, 0F, 0F, 0.2F);
-		mWorld.spawnParticle(Particle.EXPLOSION_NORMAL, loc, 20, 0F, 0F, 0F, 0.3F);
-		mWorld.spawnParticle(Particle.LAVA, loc, 3 * (int)(mRadius * mRadius), mRadius, 0.25f, mRadius, 0);
+		World world = mPlayer.getWorld();
+		world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.PLAYERS, 1.3F, 0);
+		world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.PLAYERS, 2, 1.25F);
+		world.spawnParticle(Particle.FLAME, loc, 60, 0F, 0F, 0F, 0.2F);
+		world.spawnParticle(Particle.EXPLOSION_NORMAL, loc, 20, 0F, 0F, 0F, 0.3F);
+		world.spawnParticle(Particle.LAVA, loc, 3 * (int)(mRadius * mRadius), mRadius, 0.25f, mRadius, 0);
 	}
 
 	public double getSlamDamage() {

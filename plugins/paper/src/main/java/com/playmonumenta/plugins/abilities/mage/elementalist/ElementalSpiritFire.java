@@ -38,8 +38,8 @@ public class ElementalSpiritFire extends Ability {
 	private BukkitRunnable mMobsDamagedParser;
 	private BukkitRunnable mParticleGenerator;
 
-	public ElementalSpiritFire(Plugin plugin, World world, Player player) {
-		super(plugin, world, player, "Elemental Spirit");
+	public ElementalSpiritFire(Plugin plugin, Player player) {
+		super(plugin, player, "Elemental Spirit");
 		mInfo.mScoreboardId = "ElementalSpirit";
 		mInfo.mShorthandName = "ES";
 		mInfo.mDescriptions.add("You are accompanied a spirit of fire and a spirit of ice. Upon using a fire spell, the fire spirit will rush towards the farthest enemy hit with the spell, damaging all enemies along the way by 12. Upon using an ice spell, the ice spirit will rush towards the closest enemy hit with the spell, damaging mobs in a 3 block radius by 4 per second for 3 seconds. Each spirit operates on its own cooldown of 12s.");
@@ -79,7 +79,8 @@ public class ElementalSpiritFire extends Ability {
 							Vector dir = farthestMob.getLocation().subtract(loc).toVector().normalize();
 							BoundingBox fireSpirit = BoundingBox.of(mPlayer.getEyeLocation(), ES_FIRE_SIZE, ES_FIRE_SIZE, ES_FIRE_SIZE);
 
-							mWorld.playSound(loc, Sound.ENTITY_BLAZE_AMBIENT, 1, 0.5f);
+							World world = mPlayer.getWorld();
+							world.playSound(loc, Sound.ENTITY_BLAZE_AMBIENT, 1, 0.5f);
 
 							for (int i = 0; i < (int)(farthestDistance + 1); i++) {
 								Iterator<LivingEntity> iter = mobs.iterator();
@@ -93,8 +94,8 @@ public class ElementalSpiritFire extends Ability {
 								}
 
 								fireSpirit.shift(dir);
-								mWorld.spawnParticle(Particle.FLAME, fireSpirit.getCenterX(), fireSpirit.getCenterY(), fireSpirit.getCenterZ(), 20, 0.4, 0.4, 0.4, 0.01);
-								mWorld.spawnParticle(Particle.SMOKE_LARGE, fireSpirit.getCenterX(), fireSpirit.getCenterY(), fireSpirit.getCenterZ(), 10, 0.4, 0.4, 0.4, 0.01);
+								world.spawnParticle(Particle.FLAME, fireSpirit.getCenterX(), fireSpirit.getCenterY(), fireSpirit.getCenterZ(), 20, 0.4, 0.4, 0.4, 0.01);
+								world.spawnParticle(Particle.SMOKE_LARGE, fireSpirit.getCenterX(), fireSpirit.getCenterY(), fireSpirit.getCenterZ(), 10, 0.4, 0.4, 0.4, 0.01);
 							}
 
 							putOnCooldown();
@@ -132,7 +133,7 @@ public class ElementalSpiritFire extends Ability {
 							other.spawnParticle(Particle.FLAME, loc, 1, 0, 0, 0, 0.01);
 						}
 					} else {
-						mWorld.spawnParticle(Particle.FLAME, loc, 1, 0, 0, 0, 0.01);
+						mPlayer.getWorld().spawnParticle(Particle.FLAME, loc, 1, 0, 0, 0, 0.01);
 					}
 
 					if (AbilityManager.getManager().getPlayerAbility(mPlayer, ElementalSpiritFire.class) == null

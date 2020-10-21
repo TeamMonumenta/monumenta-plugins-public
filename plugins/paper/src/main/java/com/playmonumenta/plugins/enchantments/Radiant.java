@@ -3,7 +3,6 @@ package com.playmonumenta.plugins.enchantments;
 import java.util.EnumSet;
 
 import org.bukkit.ChatColor;
-import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
@@ -49,7 +48,7 @@ public class Radiant implements BaseEnchantment {
 	}
 
 	@Override
-	public void tick(Plugin plugin, World world, Player player, int level) {
+	public void tick(Plugin plugin, Player player, int level) {
 		applyProperty(plugin, player, level);
 	}
 }

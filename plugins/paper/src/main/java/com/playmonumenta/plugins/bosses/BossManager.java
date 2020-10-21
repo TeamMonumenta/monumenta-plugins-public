@@ -12,6 +12,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.AreaEffectCloud;
 import org.bukkit.entity.Creeper;
@@ -409,12 +410,14 @@ public class BossManager implements Listener {
 		mBosses = new HashMap<UUID, Boss>();
 
 		/* When starting up, look for bosses in all current world entities */
-		for (Entity entity : Bukkit.getWorlds().get(0).getEntities()) {
-			if (!(entity instanceof LivingEntity)) {
-				continue;
-			}
+		for (World world : Bukkit.getWorlds()) {
+			for (Entity entity : world.getEntities()) {
+				if (!(entity instanceof LivingEntity)) {
+					continue;
+				}
 
-			processEntity((LivingEntity)entity);
+				processEntity((LivingEntity)entity);
+			}
 		}
 	}
 

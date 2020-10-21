@@ -25,8 +25,8 @@ public class FinishingBlow extends Ability {
 
 	private final double mPercentOfBowDamage;
 
-	public FinishingBlow(Plugin plugin, World world, Player player) {
-		super(plugin, world, player, "Finishing Blow");
+	public FinishingBlow(Plugin plugin, Player player) {
+		super(plugin, player, "Finishing Blow");
 		mInfo.mScoreboardId = "FinishingBlow";
 		mInfo.mDescriptions.add("Shooting an enemy with a bow marks it for 5 seconds. If you melee attack a marked enemy, remove the mark and deal bonus damage equal to 10% of the damage of the bow shot that left the mark. The bonus damage is doubled on enemies below 50% health.");
 		mInfo.mDescriptions.add("Bonus damage increased to 20% of the damage of the bow shot.");

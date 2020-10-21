@@ -34,8 +34,8 @@ public class CoupDeGrace extends Ability {
 	private final double mNormalThreshold;
 	private final double mEliteThreshold;
 
-	public CoupDeGrace(Plugin plugin, World world, Player player) {
-		super(plugin, world, player, "Coup de Grace");
+	public CoupDeGrace(Plugin plugin, Player player) {
+		super(plugin, player, "Coup de Grace");
 		mInfo.mScoreboardId = "CoupDeGrace";
 		mInfo.mShorthandName = "CdG";
 		mInfo.mDescriptions.add("If you melee attack a normal enemy and they get under 10% health they die instantly. The threshold for elites is 20% health");
@@ -69,12 +69,13 @@ public class CoupDeGrace extends Ability {
 	private void execute(EntityDamageByEntityEvent event) {
 		LivingEntity le = (LivingEntity) event.getEntity();
 		event.setDamage(event.getDamage() + 9001);
-		mWorld.playSound(le.getLocation(), Sound.ENTITY_PLAYER_HURT, 0.75f, 0.75f);
-		mWorld.playSound(le.getLocation(), Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, 0.5f, 1.5f);
-		mWorld.spawnParticle(Particle.BLOCK_DUST, le.getLocation().add(0, le.getHeight() / 2, 0), 20, le.getWidth() / 2, le.getHeight() / 3, le.getWidth() / 2, 0.65, Material.REDSTONE_WIRE.createBlockData());
+		World world = mPlayer.getWorld();
+		world.playSound(le.getLocation(), Sound.ENTITY_PLAYER_HURT, 0.75f, 0.75f);
+		world.playSound(le.getLocation(), Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, 0.5f, 1.5f);
+		world.spawnParticle(Particle.BLOCK_DUST, le.getLocation().add(0, le.getHeight() / 2, 0), 20, le.getWidth() / 2, le.getHeight() / 3, le.getWidth() / 2, 0.65, Material.REDSTONE_WIRE.createBlockData());
 		if (getAbilityScore() > 1) {
-			mWorld.spawnParticle(Particle.SPELL_WITCH, le.getLocation().add(0, le.getHeight() / 2, 0), 10, le.getWidth() / 2, le.getHeight() / 3, le.getWidth() / 2, 0.65);
-			mWorld.spawnParticle(Particle.BLOCK_DUST, le.getLocation().add(0, le.getHeight() / 2, 0), 20, le.getWidth() / 2, le.getHeight() / 3, le.getWidth() / 2, 0.65, Material.REDSTONE_BLOCK.createBlockData());
+			world.spawnParticle(Particle.SPELL_WITCH, le.getLocation().add(0, le.getHeight() / 2, 0), 10, le.getWidth() / 2, le.getHeight() / 3, le.getWidth() / 2, 0.65);
+			world.spawnParticle(Particle.BLOCK_DUST, le.getLocation().add(0, le.getHeight() / 2, 0), 20, le.getWidth() / 2, le.getHeight() / 3, le.getWidth() / 2, 0.65, Material.REDSTONE_BLOCK.createBlockData());
 		}
 	}
 

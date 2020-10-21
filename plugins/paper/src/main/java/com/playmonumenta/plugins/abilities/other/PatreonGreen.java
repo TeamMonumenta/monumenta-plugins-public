@@ -1,7 +1,6 @@
 package com.playmonumenta.plugins.abilities.other;
 
 import org.bukkit.Particle;
-import org.bukkit.World;
 import org.bukkit.entity.Player;
 
 import com.playmonumenta.plugins.Plugin;
@@ -12,8 +11,8 @@ import com.playmonumenta.plugins.utils.ScoreboardUtils;
 public class PatreonGreen extends Ability {
 	private final boolean mNoSelfParticles;
 
-	public PatreonGreen(Plugin plugin, World world, Player player) {
-		super(plugin, world, player, null);
+	public PatreonGreen(Plugin plugin, Player player) {
+		super(plugin, player, null);
 
 		if (player != null) {
 			mNoSelfParticles = player.getScoreboardTags().contains("noSelfParticles");
@@ -37,7 +36,7 @@ public class PatreonGreen extends Ability {
 					other.spawnParticle(Particle.VILLAGER_HAPPY, mPlayer.getLocation().add(0, 0.2, 0), 4, 0.25, 0.25, 0.25, 0);
 				}
 			} else {
-				mWorld.spawnParticle(Particle.VILLAGER_HAPPY, mPlayer.getLocation().add(0, 0.2, 0), 4, 0.25, 0.25, 0.25, 0);
+				mPlayer.getWorld().spawnParticle(Particle.VILLAGER_HAPPY, mPlayer.getLocation().add(0, 0.2, 0), 4, 0.25, 0.25, 0.25, 0);
 			}
 		}
 	}

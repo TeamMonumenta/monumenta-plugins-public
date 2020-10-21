@@ -74,14 +74,14 @@ public class Hopeless implements BaseEnchantment {
 	}
 
 	@Override
-	public void tick(Plugin plugin, World world, Player player, int level) {
+	public void tick(Plugin plugin, Player player, int level) {
 		//Runs dark red particles while wearing, subject to no self particle PEB option
 		if (NO_SELF_PARTICLES.contains(player)) {
 			for (Player other : PlayerUtils.playersInRange(player, 30, false)) {
 				other.spawnParticle(Particle.REDSTONE, player.getLocation().add(0, 1.5, 0), 3, 0.4, 0.4, 0.4, 0, DARK_RED_PARTICLE_COLOR);
 			}
 		} else {
-			world.spawnParticle(Particle.REDSTONE, player.getLocation().add(0, 1.5, 0), 3, 0.4, 0.4, 0.4, 0, DARK_RED_PARTICLE_COLOR);
+			player.getWorld().spawnParticle(Particle.REDSTONE, player.getLocation().add(0, 1.5, 0), 3, 0.4, 0.4, 0.4, 0, DARK_RED_PARTICLE_COLOR);
 		}
 	}
 }

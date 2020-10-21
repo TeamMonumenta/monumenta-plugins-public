@@ -26,8 +26,8 @@ public class NonAlchemistPotionPassive extends Ability implements KillTriggeredA
 
 	private final KillTriggeredAbilityTracker mTracker;
 
-	public NonAlchemistPotionPassive(Plugin plugin, World world, Player player) {
-		super(plugin, world, player, null);
+	public NonAlchemistPotionPassive(Plugin plugin, Player player) {
+		super(plugin, player, null);
 		mTracker = new KillTriggeredAbilityTracker(this);
 	}
 

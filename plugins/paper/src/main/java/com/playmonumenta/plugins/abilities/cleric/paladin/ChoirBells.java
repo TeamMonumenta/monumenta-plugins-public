@@ -3,7 +3,6 @@ package com.playmonumenta.plugins.abilities.cleric.paladin;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
-import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
@@ -40,8 +39,8 @@ public class ChoirBells extends Ability {
 	private final double mWeakenEffect;
 	private final double mVulnerabilityEffect;
 
-	public ChoirBells(Plugin plugin, World world, Player player) {
-		super(plugin, world, player, "Choir Bells");
+	public ChoirBells(Plugin plugin, Player player) {
+		super(plugin, player, "Choir Bells");
 		mInfo.mLinkedSpell = Spells.CHOIR_BELLS;
 		mInfo.mScoreboardId = "ChoirBells";
 		mInfo.mShorthandName = "CB";
@@ -69,7 +68,7 @@ public class ChoirBells extends Ability {
 			new BukkitRunnable() {
 				@Override
 				public void run() {
-					mWorld.playSound(mPlayer.getLocation(), Sound.BLOCK_NOTE_BLOCK_CHIME, 1, pitch);
+					mPlayer.getWorld().playSound(mPlayer.getLocation(), Sound.BLOCK_NOTE_BLOCK_CHIME, 1, pitch);
 				}
 			}.runTaskLater(mPlugin, i);
 		}

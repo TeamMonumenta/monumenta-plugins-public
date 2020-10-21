@@ -4,7 +4,6 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.bukkit.GameMode;
-import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -66,7 +65,7 @@ public class PlayerInventory {
 		InventoryUtils.scheduleDelayedEquipmentCheck(plugin, player, new PlayerJoinEvent(player, ""));	// Just a dummy event
 	}
 
-	public void tick(Plugin plugin, World world, Player player) {
+	public void tick(Plugin plugin, Player player) {
 		// Players in spectator do not have ticking effects
 		// TODO: Add vanish hook here also
 		if (player.getGameMode().equals(GameMode.SPECTATOR)) {
@@ -77,7 +76,7 @@ public class PlayerInventory {
 			BaseEnchantment property = iter.getKey();
 			Integer level = iter.getValue();
 
-			property.tick(plugin, world, player, level);
+			property.tick(plugin, player, level);
 		}
 	}
 

@@ -56,8 +56,8 @@ public class Spellshock extends Ability {
 	private static final int DAMAGE_2 = 5;
 	private static final int RADIUS = 3;
 
-	public Spellshock(Plugin plugin, World world, Player player) {
-		super(plugin, world, player, "Spellshock");
+	public Spellshock(Plugin plugin, Player player) {
+		super(plugin, player, "Spellshock");
 		mInfo.mLinkedSpell = Spells.SPELLSHOCK;
 		mInfo.mScoreboardId = "SpellShock";
 		mInfo.mShorthandName = "SS";
@@ -82,11 +82,12 @@ public class Spellshock extends Ability {
 				}
 
 				Location loc = mob.getLocation().add(0, 1, 0);
-				mWorld.spawnParticle(Particle.SPELL_WITCH, loc, 60, 1, 1, 1, 0.001);
-				mWorld.spawnParticle(Particle.CRIT_MAGIC, loc, 45, 1, 1, 1, 0.25);
-				mWorld.playSound(loc, Sound.ENTITY_PLAYER_HURT_ON_FIRE, 0.75f, 2.5f);
-				mWorld.playSound(loc, Sound.ENTITY_PLAYER_HURT_ON_FIRE, 0.75f, 2.0f);
-				mWorld.playSound(loc, Sound.ENTITY_PLAYER_HURT_ON_FIRE, 0.75f, 1.5f);
+				World world = mPlayer.getWorld();
+				world.spawnParticle(Particle.SPELL_WITCH, loc, 60, 1, 1, 1, 0.001);
+				world.spawnParticle(Particle.CRIT_MAGIC, loc, 45, 1, 1, 1, 0.25);
+				world.playSound(loc, Sound.ENTITY_PLAYER_HURT_ON_FIRE, 0.75f, 2.5f);
+				world.playSound(loc, Sound.ENTITY_PLAYER_HURT_ON_FIRE, 0.75f, 2.0f);
+				world.playSound(loc, Sound.ENTITY_PLAYER_HURT_ON_FIRE, 0.75f, 1.5f);
 
 				// Grab all realistically possible nearby mobs for simplicity, use Set for fast removal
 				Set<LivingEntity> nearbyMobs = new HashSet<LivingEntity>(EntityUtils.getNearbyMobs(mob.getLocation(), 32));

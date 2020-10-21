@@ -18,8 +18,8 @@ public class MagePassive extends Ability {
 
 	private int mTicksOnFire = 0;
 
-	public MagePassive(Plugin plugin, World world, Player player) {
-		super(plugin, world, player, null);
+	public MagePassive(Plugin plugin, Player player) {
+		super(plugin, player, null);
 	}
 
 	@Override

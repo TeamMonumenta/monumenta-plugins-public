@@ -30,8 +30,8 @@ public class PinningShot extends Ability {
 
 	private final Map<LivingEntity, Boolean> mPinnedMobs = new HashMap<LivingEntity, Boolean>();
 
-	public PinningShot(Plugin plugin, World world, Player player) {
-		super(plugin, world, player, "Pinning Shot");
+	public PinningShot(Plugin plugin, Player player) {
+		super(plugin, player, "Pinning Shot");
 		mInfo.mScoreboardId = "PinningShot";
 		mInfo.mShorthandName = "PSh";
 		mInfo.mDescriptions.add("The first time you shoot a non-boss enemy, pin it for 4s. Pinned enemies are afflicted with Slowness VII. Shooting a pinned enemy deals 20% more damage and removes the pin.");
@@ -44,21 +44,22 @@ public class PinningShot extends Ability {
 
 	@Override
 	public boolean livingEntityShotByPlayerEvent(Projectile proj, LivingEntity damagee, EntityDamageByEntityEvent event) {
+		World world = mPlayer.getWorld();
 		if (mPinnedMobs.containsKey(damagee)) {
 			// If currently pinned
 			if (mPinnedMobs.get(damagee)) {
 				Location loc = damagee.getEyeLocation();
-				mWorld.playSound(loc, Sound.BLOCK_GLASS_BREAK, 1, 0.5f);
-				mWorld.spawnParticle(Particle.FIREWORKS_SPARK, loc, 20, 0, 0, 0, 0.2);
-				mWorld.spawnParticle(Particle.SNOWBALL, loc, 30, 0, 0, 0, 0.25);
+				world.playSound(loc, Sound.BLOCK_GLASS_BREAK, 1, 0.5f);
+				world.spawnParticle(Particle.FIREWORKS_SPARK, loc, 20, 0, 0, 0, 0.2);
+				world.spawnParticle(Particle.SNOWBALL, loc, 30, 0, 0, 0, 0.25);
 				damagee.removePotionEffect(PotionEffectType.SLOW);
 				event.setDamage(event.getDamage() * mDamageMultiplier);
 				mPinnedMobs.put(damagee, false);
 			}
 		} else {
 			Location loc = damagee.getLocation();
-			mWorld.playSound(loc, Sound.BLOCK_SLIME_BLOCK_PLACE, 1, 0.5f);
-			mWorld.spawnParticle(Particle.EXPLOSION_NORMAL, loc, 8, 0, 0, 0, 0.2);
+			world.playSound(loc, Sound.BLOCK_SLIME_BLOCK_PLACE, 1, 0.5f);
+			world.spawnParticle(Particle.EXPLOSION_NORMAL, loc, 8, 0, 0, 0, 0.2);
 			PotionUtils.applyPotion(mPlayer, damagee, new PotionEffect(PotionEffectType.SLOW, mDuration, 6));
 			mPinnedMobs.put(damagee, true);
 		}

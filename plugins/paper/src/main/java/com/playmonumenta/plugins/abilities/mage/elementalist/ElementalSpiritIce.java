@@ -37,10 +37,10 @@ public class ElementalSpiritIce extends Ability {
 	private BukkitRunnable mMobsDamagedParser;
 	private BukkitRunnable mParticleGenerator;
 
-	public ElementalSpiritIce(Plugin plugin, World world, Player player) {
+	public ElementalSpiritIce(Plugin plugin, Player player) {
 		/* NOTE: Display name is null so this variant will be ignored by the tesseract.
 		 * This variant also does not have a description */
-		super(plugin, world, player, null);
+		super(plugin, player, null);
 		mInfo.mScoreboardId = "ElementalSpirit";
 		mInfo.mLinkedSpell = Spells.ELEMENTAL_SPIRIT_ICE;
 		mInfo.mCooldown = ES_ICE_COOLDOWN;
@@ -79,10 +79,11 @@ public class ElementalSpiritIce extends Ability {
 
 								@Override
 								public void run() {
-									mWorld.spawnParticle(Particle.SNOWBALL, mLoc, 150, 2, 0.25, 2, 0.1);
-									mWorld.spawnParticle(Particle.FIREWORKS_SPARK, mLoc, 30, 2, 0.25, 2, 0.1);
-									mWorld.playSound(mLoc, Sound.ENTITY_TURTLE_HURT_BABY, 1, 0.2f);
-									mWorld.playSound(mLoc, Sound.BLOCK_GLASS_BREAK, 0.5f, 0.05f);
+									World world = mPlayer.getWorld();
+									world.spawnParticle(Particle.SNOWBALL, mLoc, 150, 2, 0.25, 2, 0.1);
+									world.spawnParticle(Particle.FIREWORKS_SPARK, mLoc, 30, 2, 0.25, 2, 0.1);
+									world.playSound(mLoc, Sound.ENTITY_TURTLE_HURT_BABY, 1, 0.2f);
+									world.playSound(mLoc, Sound.BLOCK_GLASS_BREAK, 0.5f, 0.05f);
 									for (LivingEntity mob : EntityUtils.getNearbyMobs(mLoc, ES_ICE_RADIUS)) {
 										mob.setNoDamageTicks(0);
 										EntityUtils.damageEntity(mPlugin, mob, mDamage, mPlayer, MagicType.ICE, true, mInfo.mLinkedSpell);
@@ -131,7 +132,7 @@ public class ElementalSpiritIce extends Ability {
 							other.spawnParticle(Particle.SNOWBALL, loc, 3, 0, 0, 0, 0);
 						}
 					} else {
-						mWorld.spawnParticle(Particle.SNOWBALL, loc, 3, 0, 0, 0, 0);
+						mPlayer.getWorld().spawnParticle(Particle.SNOWBALL, loc, 3, 0, 0, 0, 0);
 					}
 
 					if (AbilityManager.getManager().getPlayerAbility(mPlayer, ElementalSpiritIce.class) == null

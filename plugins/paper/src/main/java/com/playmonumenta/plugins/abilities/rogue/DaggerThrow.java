@@ -45,8 +45,8 @@ public class DaggerThrow extends Ability {
 	private final int mDamage;
 	private final int mVulnAmplifier;
 
-	public DaggerThrow(Plugin plugin, World world, Player player) {
-		super(plugin, world, player, "Dagger Throw");
+	public DaggerThrow(Plugin plugin, Player player) {
+		super(plugin, player, "Dagger Throw");
 		mInfo.mLinkedSpell = Spells.DAGGER_THROW;
 		mInfo.mScoreboardId = "DaggerThrow";
 		mInfo.mShorthandName = "DT";
@@ -63,9 +63,10 @@ public class DaggerThrow extends Ability {
 		Location loc = mPlayer.getEyeLocation();
 		Vector dir = loc.getDirection();
 		List<LivingEntity> mobs = EntityUtils.getNearbyMobs(loc, DAGGER_THROW_RANGE + 1, mPlayer);
-		mWorld.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 0.9f, 1.5f);
-		mWorld.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 0.9f, 1.25f);
-		mWorld.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 0.9f, 1.0f);
+		World world = mPlayer.getWorld();
+		world.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 0.9f, 1.5f);
+		world.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 0.9f, 1.25f);
+		world.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 0.9f, 1.0f);
 
 		for (int a = -1; a <= 1; a++) {
 			double angle = a * DAGGER_THROW_SPREAD;
@@ -77,26 +78,26 @@ public class DaggerThrow extends Ability {
 
 			for (int i = 0; i <= DAGGER_THROW_RANGE; i++) {
 				box.shift(newDir);
-				Location bLoc = box.getCenter().toLocation(mWorld);
+				Location bLoc = box.getCenter().toLocation(world);
 				Location pLoc = bLoc.clone();
 				for (int t = 0; t < 10; t++) {
 					pLoc.add((newDir.clone()).multiply(0.1));
-					mWorld.spawnParticle(Particle.REDSTONE, pLoc, 1, 0.1, 0.1, 0.1, DAGGER_THROW_COLOR);
+					world.spawnParticle(Particle.REDSTONE, pLoc, 1, 0.1, 0.1, 0.1, DAGGER_THROW_COLOR);
 				}
 
 				for (LivingEntity mob : mobs) {
 					if (mob.getBoundingBox().overlaps(box)
 						&& MetadataUtils.checkOnceThisTick(mPlugin, mob, DAGGER_THROW_MOB_HIT_TICK)) {
 						bLoc.subtract((newDir.clone()).multiply(0.5));
-						mWorld.spawnParticle(Particle.SWEEP_ATTACK, bLoc, 3, 0.3, 0.3, 0.3, 0.1);
-						mWorld.playSound(loc, Sound.BLOCK_ANVIL_PLACE, 0.4f, 2.5f);
+						world.spawnParticle(Particle.SWEEP_ATTACK, bLoc, 3, 0.3, 0.3, 0.3, 0.1);
+						world.playSound(loc, Sound.BLOCK_ANVIL_PLACE, 0.4f, 2.5f);
 
 						EntityUtils.damageEntity(mPlugin, mob, mDamage, mPlayer, MagicType.PHYSICAL, true, mInfo.mLinkedSpell);
 						PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(PotionEffectType.UNLUCK, DAGGER_THROW_DURATION, mVulnAmplifier, true, false));
 						break;
 					} else if (bLoc.getBlock().getType().isSolid()) {
 						bLoc.subtract((newDir.clone()).multiply(0.5));
-						mWorld.spawnParticle(Particle.SWEEP_ATTACK, bLoc, 3, 0.3, 0.3, 0.3, 0.1);
+						world.spawnParticle(Particle.SWEEP_ATTACK, bLoc, 3, 0.3, 0.3, 0.3, 0.1);
 						break;
 					}
 				}

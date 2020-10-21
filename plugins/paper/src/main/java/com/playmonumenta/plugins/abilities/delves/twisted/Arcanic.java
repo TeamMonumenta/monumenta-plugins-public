@@ -33,8 +33,8 @@ public class Arcanic extends StatMultiplier {
 		"boss_magicarrow"
 	};
 
-	public Arcanic(Plugin plugin, World world, Player player) {
-		super(plugin, world, player,
+	public Arcanic(Plugin plugin, Player player) {
+		super(plugin, player,
 				1, ServerProperties.getClassSpecializationsEnabled() ? ARCANIC_2_ABILITY_DAMAGE_TAKEN_MULTIPLIER : ARCANIC_1_ABILITY_DAMAGE_TAKEN_MULTIPLIER,
 				ARCANIC_MOB_HEALTH_MULTIPLIER, ARCANIC_ABILITY_POOL, ARCANIC_ABILITY_CHANCE);
 	}

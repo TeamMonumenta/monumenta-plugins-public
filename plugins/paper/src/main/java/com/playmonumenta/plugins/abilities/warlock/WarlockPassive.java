@@ -17,8 +17,8 @@ public class WarlockPassive extends Ability {
 
 	private static final int PASSIVE_DURATION = 6 * 20;
 
-	public WarlockPassive(Plugin plugin, World world, Player player) {
-		super(plugin, world, player, null);
+	public WarlockPassive(Plugin plugin, Player player) {
+		super(plugin, player, null);
 	}
 
 	@Override

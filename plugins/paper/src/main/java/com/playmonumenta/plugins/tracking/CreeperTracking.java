@@ -7,7 +7,6 @@ import java.util.Set;
 import com.playmonumenta.plugins.utils.EntityUtils;
 
 import org.bukkit.Particle;
-import org.bukkit.World;
 import org.bukkit.entity.Creeper;
 import org.bukkit.entity.Entity;
 
@@ -26,14 +25,14 @@ public class CreeperTracking implements EntityTracking {
 	}
 
 	@Override
-	public void update(World world, int ticks) {
+	public void update(int ticks) {
 		Iterator<Creeper> creeperIter = mEntities.iterator();
 		while (creeperIter.hasNext()) {
 			Creeper creeper = creeperIter.next();
 			if (creeper != null && creeper.isValid()) {
 				Set<String> tags = creeper.getScoreboardTags();
 				if (tags != null && tags.contains("Snuggles")) {
-					world.spawnParticle(Particle.HEART, creeper.getLocation().add(0, 1, 0), 1, 0.4, 1, 0.4, 0);
+					creeper.getWorld().spawnParticle(Particle.HEART, creeper.getLocation().add(0, 1, 0), 1, 0.4, 1, 0.4, 0);
 				}
 
 				// Very infrequently check if the creeper is still actually there

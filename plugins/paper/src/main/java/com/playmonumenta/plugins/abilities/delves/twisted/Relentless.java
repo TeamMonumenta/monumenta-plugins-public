@@ -17,8 +17,8 @@ public class Relentless extends StatMultiplier {
 	private static final double RELENTLESS_DAMAGE_TAKEN_MULTIPLIER = 2;
 	private static final double RELENTLESS_SPEED_MULTIPLIER = 1.4;
 
-	public Relentless(Plugin plugin, World world, Player player) {
-		super(plugin, world, player, RELENTLESS_DAMAGE_TAKEN_MULTIPLIER, RELENTLESS_DAMAGE_TAKEN_MULTIPLIER, RELENTLESS_MOB_HEALTH_MULTIPLIER, RELENTLESS_SPEED_MULTIPLIER);
+	public Relentless(Plugin plugin, Player player) {
+		super(plugin, player, RELENTLESS_DAMAGE_TAKEN_MULTIPLIER, RELENTLESS_DAMAGE_TAKEN_MULTIPLIER, RELENTLESS_MOB_HEALTH_MULTIPLIER, RELENTLESS_SPEED_MULTIPLIER);
 	}
 
 	@Override

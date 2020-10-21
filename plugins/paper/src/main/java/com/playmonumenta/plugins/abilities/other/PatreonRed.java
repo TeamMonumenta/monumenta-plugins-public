@@ -2,7 +2,6 @@ package com.playmonumenta.plugins.abilities.other;
 
 import org.bukkit.Color;
 import org.bukkit.Particle;
-import org.bukkit.World;
 import org.bukkit.entity.Player;
 
 import com.playmonumenta.plugins.Plugin;
@@ -15,8 +14,8 @@ public class PatreonRed extends Ability {
 
 	private final boolean mNoSelfParticles;
 
-	public PatreonRed(Plugin plugin, World world, Player player) {
-		super(plugin, world, player, null);
+	public PatreonRed(Plugin plugin, Player player) {
+		super(plugin, player, null);
 
 		if (player != null) {
 			mNoSelfParticles = player.getScoreboardTags().contains("noSelfParticles");
@@ -40,7 +39,7 @@ public class PatreonRed extends Ability {
 					other.spawnParticle(Particle.REDSTONE, mPlayer.getLocation().add(0, 0.2, 0), 4, 0.25, 0.25, 0.25, 0, RED_PARTICLE_COLOR);
 				}
 			} else {
-				mWorld.spawnParticle(Particle.REDSTONE, mPlayer.getLocation().add(0, 0.2, 0), 4, 0.25, 0.25, 0.25, 0, RED_PARTICLE_COLOR);
+				mPlayer.getWorld().spawnParticle(Particle.REDSTONE, mPlayer.getLocation().add(0, 0.2, 0), 4, 0.25, 0.25, 0.25, 0, RED_PARTICLE_COLOR);
 			}
 		}
 	}

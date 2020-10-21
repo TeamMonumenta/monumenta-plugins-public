@@ -156,7 +156,7 @@ public class DivineAura implements BaseEnchantment {
 	}
 
 	@Override
-	public void tick(Plugin plugin, World world, Player player, int level) {
+	public void tick(Plugin plugin, Player player, int level) {
 		if (isActive(level)) {
 			STATIC_TICKS += 5;
 			if (STATIC_TICKS >= 20 * 300) {
@@ -186,7 +186,7 @@ public class DivineAura implements BaseEnchantment {
 					other.spawnParticle(Particle.SPELL_INSTANT, loc, 5, 0.4, 0.4, 0.4, 0);
 				}
 			} else {
-				world.spawnParticle(Particle.SPELL_INSTANT, loc, 5, 0.4, 0.4, 0.4, 0);
+				player.getWorld().spawnParticle(Particle.SPELL_INSTANT, loc, 5, 0.4, 0.4, 0.4, 0);
 			}
 		}
 	}

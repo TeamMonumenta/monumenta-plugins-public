@@ -29,8 +29,8 @@ public class EagleEye extends Ability {
 	private static final int EAGLE_EYE_2_VULN_LEVEL = 6; // 35%
 	private static final int EAGLE_EYE_RADIUS = 20;
 
-	public EagleEye(Plugin plugin, World world, Player player) {
-		super(plugin, world, player, "Eagle Eye");
+	public EagleEye(Plugin plugin, Player player) {
+		super(plugin, player, "Eagle Eye");
 		mInfo.mLinkedSpell = Spells.EAGLE_EYE;
 		mInfo.mScoreboardId = "Tinkering"; // lmao
 		mInfo.mShorthandName = "EE";

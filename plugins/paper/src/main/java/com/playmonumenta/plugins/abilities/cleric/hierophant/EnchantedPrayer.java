@@ -40,8 +40,8 @@ public class EnchantedPrayer extends Ability {
 	private static final int ENCHANTED_PRAYER_1_HEAL = 2;
 	private static final int ENCHANTED_PRAYER_2_HEAL = 4;
 
-	public EnchantedPrayer(Plugin plugin, World world, Player player) {
-		super(plugin, world, player, "Enchanted Prayer");
+	public EnchantedPrayer(Plugin plugin, Player player) {
+		super(plugin, player, "Enchanted Prayer");
 		mInfo.mScoreboardId = "EPrayer";
 		mInfo.mShorthandName = "EP";
 		mInfo.mDescriptions.add("Left-clicking in the air while shifted enchants the weapons of all players in a 15 block radius with holy magic. Their next melee attack deals an additional 7 damage in a 3-block radius while healing the player for 2 hp. Cooldown: 18s.");
@@ -55,7 +55,8 @@ public class EnchantedPrayer extends Ability {
 
 	@Override
 	public void cast(Action action) {
-		mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_EVOKER_PREPARE_SUMMON, 1.5f, 1);
+		World world = mPlayer.getWorld();
+		world.playSound(mPlayer.getLocation(), Sound.ENTITY_EVOKER_PREPARE_SUMMON, 1.5f, 1);
 		putOnCooldown();
 		new BukkitRunnable() {
 			double mRotation = 0;
@@ -70,7 +71,7 @@ public class EnchantedPrayer extends Ability {
 					mRotation += 10;
 					double radian1 = Math.toRadians(mRotation);
 					mLoc.add(FastUtils.cos(radian1) * mRadius, 0.15, FastUtils.sin(radian1) * mRadius);
-					mWorld.spawnParticle(Particle.SPELL_INSTANT, mLoc, 2, 0.15, 0.15, 0.15, 0);
+					world.spawnParticle(Particle.SPELL_INSTANT, mLoc, 2, 0.15, 0.15, 0.15, 0);
 					mLoc.subtract(FastUtils.cos(radian1) * mRadius, 0.15, FastUtils.sin(radian1) * mRadius);
 
 				}
@@ -84,7 +85,7 @@ public class EnchantedPrayer extends Ability {
 		int enchantedPrayer = getAbilityScore();
 		for (Player p : PlayerUtils.playersInRange(mPlayer, 15, true)) {
 			p.playSound(p.getLocation(), Sound.ENTITY_ILLUSIONER_PREPARE_MIRROR, 1.2f, 1.0f);
-			mWorld.spawnParticle(Particle.SPELL_INSTANT, mPlayer.getLocation(), 50, 0.25, 0, 0.25, 0.01);
+			world.spawnParticle(Particle.SPELL_INSTANT, mPlayer.getLocation(), 50, 0.25, 0, 0.25, 0.01);
 			p.setMetadata(ENCHANTED_PRAYER_METAKEY, new FixedMetadataValue(mPlugin, enchantedPrayer));
 			new BukkitRunnable() {
 				int mT = 0;
@@ -93,8 +94,8 @@ public class EnchantedPrayer extends Ability {
 					mT++;
 					Location rightHand = PlayerUtils.getRightSide(p.getEyeLocation(), 0.45).subtract(0, .8, 0);
 					Location leftHand = PlayerUtils.getRightSide(p.getEyeLocation(), -0.45).subtract(0, .8, 0);
-					mWorld.spawnParticle(Particle.SPELL_INSTANT, leftHand, 1, 0.05f, 0.05f, 0.05f, 0);
-					mWorld.spawnParticle(Particle.SPELL_INSTANT, rightHand, 1, 0.05f, 0.05f, 0.05f, 0);
+					world.spawnParticle(Particle.SPELL_INSTANT, leftHand, 1, 0.05f, 0.05f, 0.05f, 0);
+					world.spawnParticle(Particle.SPELL_INSTANT, rightHand, 1, 0.05f, 0.05f, 0.05f, 0);
 					if (!p.hasMetadata(ENCHANTED_PRAYER_METAKEY)) {
 						this.cancel();
 					}

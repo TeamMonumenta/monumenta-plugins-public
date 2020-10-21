@@ -40,8 +40,8 @@ public class Rampage extends Ability {
 	private int mRemainderDamage = 0;
 	private int mTimeToStackDecay = 0;
 
-	public Rampage(Plugin plugin, World world, Player player) {
-		super(plugin, world, player, "Rampage");
+	public Rampage(Plugin plugin, Player player) {
+		super(plugin, player, "Rampage");
 		mInfo.mLinkedSpell = Spells.RAMPAGE;
 		mInfo.mCooldown = 0;
 		mInfo.mScoreboardId = "Rampage";
@@ -64,17 +64,18 @@ public class Rampage extends Ability {
 		Location loc = mPlayer.getLocation();
 
 		if (mStacks >= 10 && loc.getPitch() > 70) {
+			World world = mPlayer.getWorld();
 			for (LivingEntity mob : EntityUtils.getNearbyMobs(loc, RAMPAGE_RADIUS)) {
 				EntityUtils.damageEntity(mPlugin, mob, mStacks, mPlayer, MagicType.PHYSICAL, true, mInfo.mLinkedSpell);
-				mWorld.spawnParticle(Particle.VILLAGER_ANGRY, mob.getLocation(), 5, 0, 0, 0, 0.1);
+				world.spawnParticle(Particle.VILLAGER_ANGRY, mob.getLocation(), 5, 0, 0, 0, 0.1);
 			}
 
 			PlayerUtils.healPlayer(mPlayer, mStacks * RAMPAGE_HEAL_STACK_RATIO);
-			mWorld.spawnParticle(Particle.EXPLOSION_HUGE, loc, 3, 0.2, 0.2, 0.2, 0);
-			mWorld.spawnParticle(Particle.SWEEP_ATTACK, loc.clone().add(0, 1, 0), 50, 3, 1, 3, 0);
-			mWorld.playSound(loc, Sound.ENTITY_IRON_GOLEM_HURT, mStacks * 0.4f, 0.5f);
-			mWorld.playSound(loc, Sound.ENTITY_IRON_GOLEM_HURT, mStacks * 0.4f, 1.5f);
-			mWorld.playSound(loc, Sound.ENTITY_IRON_GOLEM_HURT, mStacks * 0.4f, 2);
+			world.spawnParticle(Particle.EXPLOSION_HUGE, loc, 3, 0.2, 0.2, 0.2, 0);
+			world.spawnParticle(Particle.SWEEP_ATTACK, loc.clone().add(0, 1, 0), 50, 3, 1, 3, 0);
+			world.playSound(loc, Sound.ENTITY_IRON_GOLEM_HURT, mStacks * 0.4f, 0.5f);
+			world.playSound(loc, Sound.ENTITY_IRON_GOLEM_HURT, mStacks * 0.4f, 1.5f);
+			world.playSound(loc, Sound.ENTITY_IRON_GOLEM_HURT, mStacks * 0.4f, 2);
 
 			mStacks = 0;
 			MessagingUtils.sendActionBarMessage(mPlugin, mPlayer, "Rage: " + mStacks);

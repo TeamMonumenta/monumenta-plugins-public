@@ -41,8 +41,8 @@ public class ArcaneStrike extends Ability {
 	private final int mDamageBonus;
 	private final int mDamageBonusAffected;
 
-	public ArcaneStrike(Plugin plugin, World world, Player player) {
-		super(plugin, world, player, "Arcane Strike");
+	public ArcaneStrike(Plugin plugin, Player player) {
+		super(plugin, player, "Arcane Strike");
 		mInfo.mLinkedSpell = Spells.ARCANE_STRIKE;
 		mInfo.mScoreboardId = "ArcaneStrike";
 		mInfo.mShorthandName = "AS";
@@ -77,14 +77,15 @@ public class ArcaneStrike extends Ability {
 			}
 
 			Location locD = damagee.getLocation().add(0, 1, 0);
-			mWorld.spawnParticle(Particle.DRAGON_BREATH, locD, 75, 0, 0, 0, 0.25);
-			mWorld.spawnParticle(Particle.EXPLOSION_NORMAL, locD, 35, 0, 0, 0, 0.2);
-			mWorld.spawnParticle(Particle.SPELL_WITCH, locD, 150, 2.5, 1, 2.5, 0.001);
-			mWorld.playSound(locD, Sound.ENTITY_DRAGON_FIREBALL_EXPLODE, 0.75f, 1.5f);
+			World world = mPlayer.getWorld();
+			world.spawnParticle(Particle.DRAGON_BREATH, locD, 75, 0, 0, 0, 0.25);
+			world.spawnParticle(Particle.EXPLOSION_NORMAL, locD, 35, 0, 0, 0, 0.2);
+			world.spawnParticle(Particle.SPELL_WITCH, locD, 150, 2.5, 1, 2.5, 0.001);
+			world.playSound(locD, Sound.ENTITY_DRAGON_FIREBALL_EXPLODE, 0.75f, 1.5f);
 
 			Location loc = mPlayer.getLocation().add(mPlayer.getLocation().getDirection().multiply(0.5));
-			mWorld.playSound(loc, Sound.ENTITY_WITHER_SHOOT, 0.75f, 1.65f);
-			mWorld.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 0.75f, 0.5f);
+			world.playSound(loc, Sound.ENTITY_WITHER_SHOOT, 0.75f, 1.65f);
+			world.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 0.75f, 0.5f);
 			new BukkitRunnable() {
 				double mD = 30;
 				@Override
@@ -100,8 +101,8 @@ public class ArcaneStrike extends Ability {
 							vec = VectorUtils.rotateYAxis(vec, loc.getYaw());
 
 							Location l = loc.clone().add(vec);
-							mWorld.spawnParticle(Particle.REDSTONE, l, 1, 0.1, 0.1, 0.1, COLOR_1);
-							mWorld.spawnParticle(Particle.REDSTONE, l, 1, 0.1, 0.1, 0.1, COLOR_2);
+							world.spawnParticle(Particle.REDSTONE, l, 1, 0.1, 0.1, 0.1, COLOR_1);
+							world.spawnParticle(Particle.REDSTONE, l, 1, 0.1, 0.1, 0.1, COLOR_2);
 						}
 					}
 					mD += 30;

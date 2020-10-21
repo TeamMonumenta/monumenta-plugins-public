@@ -24,8 +24,8 @@ public class WardingRemedyNonApothecary extends Ability {
 	private static final double WARDING_REMEDY_2_DAMAGE_MULTIPLIER = 1.25;
 	private static final Particle.DustOptions APOTHECARY_DARK_COLOR = new Particle.DustOptions(Color.fromRGB(83, 0, 135), 1.0f);
 
-	public WardingRemedyNonApothecary(Plugin plugin, World world, Player player) {
-		super(plugin, world, player, null);
+	public WardingRemedyNonApothecary(Plugin plugin, Player player) {
+		super(plugin, player, null);
 	}
 
 	@Override
@@ -54,8 +54,9 @@ public class WardingRemedyNonApothecary extends Ability {
 		if (level > 0 && AbsorptionUtils.getAbsorption(mPlayer) >= WARDING_REMEDY_DAMAGE_THRESHOLD) {
 			double multiplier = level == 1 ? WARDING_REMEDY_1_DAMAGE_MULTIPLIER : WARDING_REMEDY_2_DAMAGE_MULTIPLIER;
 			Location loc = event.getEntity().getLocation().add(0, 1, 0);
-			mWorld.spawnParticle(Particle.SPELL_WITCH, loc, 8, 0.3, 0.5, 0.3);
-			mWorld.spawnParticle(Particle.REDSTONE, loc, 10, 0.4, 0.5, 0.4, APOTHECARY_DARK_COLOR);
+			World world = mPlayer.getWorld();
+			world.spawnParticle(Particle.SPELL_WITCH, loc, 8, 0.3, 0.5, 0.3);
+			world.spawnParticle(Particle.REDSTONE, loc, 10, 0.4, 0.5, 0.4, APOTHECARY_DARK_COLOR);
 			event.setDamage(event.getDamage() * multiplier);
 		}
 	}

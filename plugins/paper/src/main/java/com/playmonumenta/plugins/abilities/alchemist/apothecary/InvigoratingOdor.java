@@ -25,8 +25,8 @@ public class InvigoratingOdor extends PotionAbility {
 	private static final Particle.DustOptions APOTHECARY_LIGHT_COLOR = new Particle.DustOptions(Color.fromRGB(255, 255, 100), 1.5f);
 	private static final Particle.DustOptions APOTHECARY_DARK_COLOR = new Particle.DustOptions(Color.fromRGB(83, 0, 135), 1.5f);
 
-	public InvigoratingOdor(Plugin plugin, World world, Player player) {
-		super(plugin, world, player, "Invigorating Odor", INVIGORATING_1_DAMAGE, INVIGORATING_2_DAMAGE);
+	public InvigoratingOdor(Plugin plugin, Player player) {
+		super(plugin, player, "Invigorating Odor", INVIGORATING_1_DAMAGE, INVIGORATING_2_DAMAGE);
 		mInfo.mLinkedSpell = Spells.INVIGORATING_ODOR;
 		mInfo.mScoreboardId = "InvigoratingOdor";
 		mInfo.mShorthandName = "IO";
@@ -36,17 +36,18 @@ public class InvigoratingOdor extends PotionAbility {
 
 	@Override
 	public void createAura(Location loc, double radius) {
-		mWorld.spawnParticle(Particle.END_ROD, loc, 35, 0.3, 0.3, 0.3, 0.1);
-		mWorld.spawnParticle(Particle.SPELL, loc, 35, radius / 2, 0.15, radius / 2);
+		World world = mPlayer.getWorld();
+		world.spawnParticle(Particle.END_ROD, loc, 35, 0.3, 0.3, 0.3, 0.1);
+		world.spawnParticle(Particle.SPELL, loc, 35, radius / 2, 0.15, radius / 2);
 
 		new BukkitRunnable() {
 			int mTicks = 0;
 
 			@Override
 			public void run() {
-				mWorld.spawnParticle(Particle.REDSTONE, loc, 3, 0.3, 0.3, 0.3, APOTHECARY_DARK_COLOR);
-				mWorld.spawnParticle(Particle.END_ROD, loc, 1, radius / 2, 0.15, radius / 2, 0.05);
-				mWorld.spawnParticle(Particle.REDSTONE, loc, (int) Math.pow(radius, 2) * 2, radius / 2, 0.15, radius / 2, APOTHECARY_LIGHT_COLOR);
+				world.spawnParticle(Particle.REDSTONE, loc, 3, 0.3, 0.3, 0.3, APOTHECARY_DARK_COLOR);
+				world.spawnParticle(Particle.END_ROD, loc, 1, radius / 2, 0.15, radius / 2, 0.05);
+				world.spawnParticle(Particle.REDSTONE, loc, (int) Math.pow(radius, 2) * 2, radius / 2, 0.15, radius / 2, APOTHECARY_LIGHT_COLOR);
 
 				for (Player player : PlayerUtils.playersInRange(loc, radius)) {
 					mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_OTHER, new PotionEffect(PotionEffectType.SPEED, INVIGORATING_DURATION, 0, true, true));

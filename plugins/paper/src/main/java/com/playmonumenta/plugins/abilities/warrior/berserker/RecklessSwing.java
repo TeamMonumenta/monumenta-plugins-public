@@ -35,8 +35,8 @@ public class RecklessSwing extends Ability {
 	private final double mMaxDamagePercent;
 	private final int mDamage;
 
-	public RecklessSwing(Plugin plugin, World world, Player player) {
-		super(plugin, world, player, "Reckless Swing");
+	public RecklessSwing(Plugin plugin, Player player) {
+		super(plugin, player, "Reckless Swing");
 		mInfo.mLinkedSpell = Spells.RECKLESS_SWING;
 		mInfo.mScoreboardId = "RecklessSwing";
 		mInfo.mShorthandName = "RS";
@@ -71,8 +71,9 @@ public class RecklessSwing extends Ability {
 			}
 
 			Location loc = mPlayer.getLocation();
-			mWorld.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1, 1);
-			mWorld.spawnParticle(Particle.SWEEP_ATTACK, loc, 25, 2, 0, 2, 0);
+			World world = mPlayer.getWorld();
+			world.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1, 1);
+			world.spawnParticle(Particle.SWEEP_ATTACK, loc, 25, 2, 0, 2, 0);
 
 			for (LivingEntity mob : EntityUtils.getNearbyMobs(loc, RADIUS)) {
 				EntityUtils.damageEntity(mPlugin, mob, mDamage, mPlayer);

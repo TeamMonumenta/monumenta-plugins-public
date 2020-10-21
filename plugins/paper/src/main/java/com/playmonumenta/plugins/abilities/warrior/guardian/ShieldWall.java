@@ -52,8 +52,8 @@ public class ShieldWall extends Ability {
 	private static final int SHIELD_WALL_1_COOLDOWN = 20 * 30;
 	private static final int SHIELD_WALL_2_COOLDOWN = 20 * 20;
 
-	public ShieldWall(Plugin plugin, World world, Player player) {
-		super(plugin, world, player, "Shield Wall");
+	public ShieldWall(Plugin plugin, Player player) {
+		super(plugin, player, "Shield Wall");
 		mInfo.mScoreboardId = "ShieldWall";
 		mInfo.mShorthandName = "SW";
 		mInfo.mDescriptions.add("Blocking and then blocking again within .25s creates a 180 degree arc of particles 5 blocks high and 4 blocks wide in front of the user. This blocks all enemy projectiles (Ghast fireballs explode on the wall) and deals 6 damage to enemies that pass through the wall. The shield lasts 8 seconds. Cooldown: 30s.");
@@ -96,9 +96,10 @@ public class ShieldWall extends Ability {
 		if (mRightClicks >= 2) {
 			int time = getAbilityScore() == 1 ? SHIELD_WALL_1_DURATION : SHIELD_WALL_2_DURATION;
 			boolean knockback = getAbilityScore() != 1;
-			mWorld.playSound(mPlayer.getLocation(), Sound.BLOCK_ANVIL_PLACE, 1, 1.5f);
-			mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_IRON_GOLEM_HURT, 1, 0.8f);
-			mWorld.spawnParticle(Particle.FIREWORKS_SPARK, mPlayer.getLocation(), 70, 0, 0, 0, 0.3f);
+			World world = mPlayer.getWorld();
+			world.playSound(mPlayer.getLocation(), Sound.BLOCK_ANVIL_PLACE, 1, 1.5f);
+			world.playSound(mPlayer.getLocation(), Sound.ENTITY_IRON_GOLEM_HURT, 1, 0.8f);
+			world.spawnParticle(Particle.FIREWORKS_SPARK, mPlayer.getLocation(), 70, 0, 0, 0, 0.3f);
 			putOnCooldown();
 			new BukkitRunnable() {
 				int mT = 0;
@@ -121,7 +122,7 @@ public class ShieldWall extends Ability {
 
 							Location l = mLoc.clone().add(vec);
 							if (mT % 4 == 0) {
-								mWorld.spawnParticle(Particle.SPELL_INSTANT, l, 1, 0.1, 0.2, 0.1, 0);
+								world.spawnParticle(Particle.SPELL_INSTANT, l, 1, 0.1, 0.2, 0.1, 0);
 							}
 							if (!mHitboxes) {
 								mBoxes.add(BoundingBox.of(l.clone().subtract(0.6, 0, 0.6),
@@ -132,7 +133,7 @@ public class ShieldWall extends Ability {
 					}
 
 					for (BoundingBox box : mBoxes) {
-						for (Entity e : mWorld.getNearbyEntities(box)) {
+						for (Entity e :world.getNearbyEntities(box)) {
 							Location eLoc = e.getLocation();
 							if (e instanceof Projectile) {
 								Projectile proj = (Projectile) e;
@@ -140,8 +141,8 @@ public class ShieldWall extends Ability {
 									LivingEntity shooter = (LivingEntity) proj.getShooter();
 									if (!(shooter instanceof Player) || AbilityManager.getManager().isPvPEnabled((Player)shooter)) {
 										proj.remove();
-										mWorld.spawnParticle(Particle.FIREWORKS_SPARK, eLoc, 5, 0, 0, 0, 0.25f);
-										mWorld.playSound(eLoc, Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, 0.75f, 1.5f);
+										world.spawnParticle(Particle.FIREWORKS_SPARK, eLoc, 5, 0, 0, 0, 0.25f);
+										world.playSound(eLoc, Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, 0.75f, 1.5f);
 									}
 								}
 							} else if (EntityUtils.isHostileMob(e)) {
@@ -156,8 +157,8 @@ public class ShieldWall extends Ability {
 									//Bosses should not be affected by slowness or knockback.
 									if (knockback && !e.getScoreboardTags().contains("Boss")) {
 										MovementUtils.knockAway(mLoc, le, 0.3f);
-										mWorld.spawnParticle(Particle.EXPLOSION_NORMAL, eLoc, 50, 0, 0, 0, 0.35f);
-										mWorld.playSound(eLoc, Sound.ENTITY_GENERIC_EXPLODE, 1, 1f);
+										world.spawnParticle(Particle.EXPLOSION_NORMAL, eLoc, 50, 0, 0, 0, 0.35f);
+										world.playSound(eLoc, Sound.ENTITY_GENERIC_EXPLODE, 1, 1f);
 									} else {
 										le.setVelocity(v);
 									}

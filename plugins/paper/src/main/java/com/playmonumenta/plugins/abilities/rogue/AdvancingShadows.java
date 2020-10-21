@@ -79,8 +79,8 @@ public class AdvancingShadows extends Ability {
 
 	private LivingEntity mTarget = null;
 
-	public AdvancingShadows(Plugin plugin, World world, Player player) {
-		super(plugin, world, player, "Advancing Shadows");
+	public AdvancingShadows(Plugin plugin, Player player) {
+		super(plugin, player, "Advancing Shadows");
 		mInfo.mLinkedSpell = Spells.ADVANCING_SHADOWS;
 		mInfo.mScoreboardId = "AdvancingShadows";
 		mInfo.mCooldown = ADVANCING_SHADOWS_COOLDOWN;
@@ -98,11 +98,12 @@ public class AdvancingShadows extends Ability {
 		if (entity != null) {
 			int advancingShadows = getAbilityScore();
 			Vector dir = LocationUtils.getDirectionTo(entity.getLocation(), mPlayer.getLocation());
+			World world = mPlayer.getWorld();
 			Location loc = mPlayer.getLocation();
 			while (loc.distance(entity.getLocation()) > ADVANCING_SHADOWS_OFFSET) {
 				loc.add(dir.clone().multiply(0.3333));
-				mWorld.spawnParticle(Particle.SPELL_WITCH, loc.clone().add(0, 1, 0), 4, 0.3, 0.5, 0.3, 1.0);
-				mWorld.spawnParticle(Particle.SMOKE_NORMAL, loc.clone().add(0, 1, 0), 10, 0.3, 0.5, 0.3, 0.025);
+				world.spawnParticle(Particle.SPELL_WITCH, loc.clone().add(0, 1, 0), 4, 0.3, 0.5, 0.3, 1.0);
+				world.spawnParticle(Particle.SMOKE_NORMAL, loc.clone().add(0, 1, 0), 10, 0.3, 0.5, 0.3, 0.025);
 				if (loc.distance(entity.getLocation()) < ADVANCING_SHADOWS_OFFSET) {
 					double multiplier = ADVANCING_SHADOWS_OFFSET - loc.distance(entity.getLocation());
 					loc.subtract(dir.clone().multiply(multiplier));
@@ -130,7 +131,7 @@ public class AdvancingShadows extends Ability {
 
 				// Maybe void - not worth it
 				if (!safe) {
-					mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_ILLUSIONER_MIRROR_MOVE, 1.0f, 1.8f);
+					world.playSound(mPlayer.getLocation(), Sound.ENTITY_ILLUSIONER_MIRROR_MOVE, 1.0f, 1.8f);
 					return;
 				}
 
@@ -138,9 +139,9 @@ public class AdvancingShadows extends Ability {
 				loc.setY(Math.max(1.1, loc.getY()));
 			}
 
-			mWorld.spawnParticle(Particle.SPELL_WITCH, mPlayer.getLocation().add(0, 1.1, 0), 50, 0.35, 0.5, 0.35, 1.0);
-			mWorld.spawnParticle(Particle.SMOKE_LARGE, mPlayer.getLocation().add(0, 1.1, 0), 12, 0.35, 0.5, 0.35, 0.05);
-			mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_ILLUSIONER_MIRROR_MOVE, 1.0f, 1.1f);
+			world.spawnParticle(Particle.SPELL_WITCH, mPlayer.getLocation().add(0, 1.1, 0), 50, 0.35, 0.5, 0.35, 1.0);
+			world.spawnParticle(Particle.SMOKE_LARGE, mPlayer.getLocation().add(0, 1.1, 0), 12, 0.35, 0.5, 0.35, 0.05);
+			world.playSound(mPlayer.getLocation(), Sound.ENTITY_ILLUSIONER_MIRROR_MOVE, 1.0f, 1.1f);
 
 			mPlayer.teleport(loc, TeleportCause.UNKNOWN);
 
@@ -158,9 +159,9 @@ public class AdvancingShadows extends Ability {
 				}
 			}
 
-			mWorld.spawnParticle(Particle.SPELL_WITCH, mPlayer.getLocation().add(0, 1.1, 0), 50, 0.35, 0.5, 0.35, 1.0);
-			mWorld.spawnParticle(Particle.SMOKE_LARGE, mPlayer.getLocation().add(0, 1.1, 0), 12, 0.35, 0.5, 0.35, 0.05);
-			mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_ILLUSIONER_MIRROR_MOVE, 1.0f, 1.1f);
+			world.spawnParticle(Particle.SPELL_WITCH, mPlayer.getLocation().add(0, 1.1, 0), 50, 0.35, 0.5, 0.35, 1.0);
+			world.spawnParticle(Particle.SMOKE_LARGE, mPlayer.getLocation().add(0, 1.1, 0), 12, 0.35, 0.5, 0.35, 0.05);
+			world.playSound(mPlayer.getLocation(), Sound.ENTITY_ILLUSIONER_MIRROR_MOVE, 1.0f, 1.1f);
 			mTarget = null;
 			putOnCooldown();
 		}

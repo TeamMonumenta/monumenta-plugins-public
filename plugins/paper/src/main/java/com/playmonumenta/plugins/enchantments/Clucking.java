@@ -5,7 +5,6 @@ import java.util.EnumSet;
 import org.bukkit.ChatColor;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
-import org.bukkit.World;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -45,7 +44,7 @@ public class Clucking implements BaseEnchantment {
 	}
 
 	@Override
-	public void tick(Plugin plugin, World world, Player player, int level) {
+	public void tick(Plugin plugin, Player player, int level) {
 		staticTicks++;
 
 		/*
@@ -62,7 +61,7 @@ public class Clucking implements BaseEnchantment {
 		modulo = modulo / 20;
 
 		if (staticTicks % modulo == 0) {
-			world.playSound(player.getLocation(), Sound.ENTITY_CHICKEN_AMBIENT, SoundCategory.HOSTILE, 1.0f, 0.8f);
+			player.getWorld().playSound(player.getLocation(), Sound.ENTITY_CHICKEN_AMBIENT, SoundCategory.HOSTILE, 1.0f, 0.8f);
 		}
 	}
 

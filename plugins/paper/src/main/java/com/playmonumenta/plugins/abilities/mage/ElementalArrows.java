@@ -29,8 +29,8 @@ public class ElementalArrows extends Ability {
 	private static final int ELEMENTAL_ARROWS_DURATION = 20 * 6;
 	private static final double ELEMENTAL_ARROWS_RADIUS = 3.0;
 
-	public ElementalArrows(Plugin plugin, World world, Player player) {
-		super(plugin, world, player, "Elemental Arrows");
+	public ElementalArrows(Plugin plugin, Player player) {
+		super(plugin, player, "Elemental Arrows");
 		mInfo.mLinkedSpell = Spells.ELEMENTAL_ARROWS;
 		mInfo.mScoreboardId = "Elemental";
 		mInfo.mShorthandName = "EA";

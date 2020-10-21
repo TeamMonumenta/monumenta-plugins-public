@@ -29,33 +29,33 @@ public class StatMultiplier extends Ability {
 	private final String[] mMobAbilityPool;
 	private final double mMobAbilityChance;
 
-	public StatMultiplier(Plugin plugin, World world, Player player,
+	public StatMultiplier(Plugin plugin, Player player,
 			double damageTakenMultiplier, double abilityDamageTakenMultiplier, double mobHealthMultiplier) {
-		this(plugin, world, player,
+		this(plugin, player,
 				damageTakenMultiplier, abilityDamageTakenMultiplier, mobHealthMultiplier,
 				1, null, 0);
 	}
 
-	public StatMultiplier(Plugin plugin, World world, Player player,
+	public StatMultiplier(Plugin plugin, Player player,
 			double damageTakenMultiplier, double abilityDamageTakenMultiplier,
 			double mobHealthMultiplier, double mobSpeedMultiplier) {
-		this(plugin, world, player,
+		this(plugin, player,
 				damageTakenMultiplier, abilityDamageTakenMultiplier, mobHealthMultiplier, mobSpeedMultiplier,
 				null, 0);
 	}
 
-	public StatMultiplier(Plugin plugin, World world, Player player,
+	public StatMultiplier(Plugin plugin, Player player,
 			double damageTakenMultiplier, double abilityDamageTakenMultiplier,
 			double mobHealthMultiplier, String[] mobAbilitiesPool, double mobAbilitiesChance) {
-		this(plugin, world, player,
+		this(plugin, player,
 				damageTakenMultiplier, abilityDamageTakenMultiplier, mobHealthMultiplier, 1,
 				mobAbilitiesPool, mobAbilitiesChance);
 	}
 
-	public StatMultiplier(Plugin plugin, World world, Player player,
+	public StatMultiplier(Plugin plugin, Player player,
 			double damageTakenMultiplier, double abilityDamageTakenMultiplier,
 			double mobHealthMultiplier, double mobSpeedMultiplier, String[] mobAbilityPool, double mobAbilityChance) {
-		super(plugin, world, player, null);
+		super(plugin, player, null);
 		mInfo.mIgnoreTriggerCap = true;
 
 		mDamageTakenMultiplier = damageTakenMultiplier;

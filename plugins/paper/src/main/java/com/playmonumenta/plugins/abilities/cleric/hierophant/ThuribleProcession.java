@@ -47,8 +47,8 @@ public class ThuribleProcession extends Ability {
 	private int mSeconds = 0;
 	private int mBuffs = 0;
 
-	public ThuribleProcession(Plugin plugin, World world, Player player) {
-		super(plugin, world, player, "Thurible Procession");
+	public ThuribleProcession(Plugin plugin, Player player) {
+		super(plugin, player, "Thurible Procession");
 		mInfo.mScoreboardId = "Thurible";
 		mInfo.mShorthandName = "TP";
 		mInfo.mDescriptions.add("The Hierophant passively builds up potion effect buffs, which are applied to all other players within 20 blocks. Buffs end and the buildup resets upon a melee attack on a hostile mob, unless the full set of buffs have been obtained. Then all players (including the Hierophant) get 8 seconds of all built-up buffs. After these 8 seconds the timer resets and the Procession begins anew. Progression - Haste 1 (after 5s of no melee), Speed 1 (after 10s of no melee), Strength 1 (after 15s of no melee)");
@@ -72,10 +72,11 @@ public class ThuribleProcession extends Ability {
 			//Give everyone buffs from the array
 			applyBuffs(EFFECTS_DURATION);
 
-			mPlayer.getWorld().playSound(mPlayer.getLocation(), Sound.ENTITY_EVOKER_CAST_SPELL, 1, 1);
-			mWorld.spawnParticle(Particle.FIREWORKS_SPARK, mPlayer.getLocation(), 60, 0, 0, 0, 0.35);
-			mWorld.spawnParticle(Particle.SPELL_INSTANT, mPlayer.getLocation(), 60, 0.4, 0.4, 0.4, 1);
-			mWorld.spawnParticle(Particle.SPELL_INSTANT, mPlayer.getLocation(), 200, 5, 3, 5, 1);
+			World world = mPlayer.getWorld();
+			world.playSound(mPlayer.getLocation(), Sound.ENTITY_EVOKER_CAST_SPELL, 1, 1);
+			world.spawnParticle(Particle.FIREWORKS_SPARK, mPlayer.getLocation(), 60, 0, 0, 0, 0.35);
+			world.spawnParticle(Particle.SPELL_INSTANT, mPlayer.getLocation(), 60, 0.4, 0.4, 0.4, 1);
+			world.spawnParticle(Particle.SPELL_INSTANT, mPlayer.getLocation(), 200, 5, 3, 5, 1);
 
 			//Reset timer and have 8 second cooldown
 			mSeconds = 0;
@@ -97,7 +98,7 @@ public class ThuribleProcession extends Ability {
 		if (fourHertz) {
 			for (int i = 0; i < mBuffs; i++) {
 				Particle.DustOptions color = new Particle.DustOptions(EFFECTS[i].getColor(), 1);
-				mWorld.spawnParticle(Particle.REDSTONE, mPlayer.getLocation(), 1, 0.4, 0.4, 0.4, color);
+				mPlayer.getWorld().spawnParticle(Particle.REDSTONE, mPlayer.getLocation(), 1, 0.4, 0.4, 0.4, color);
 			}
 		}
 	}

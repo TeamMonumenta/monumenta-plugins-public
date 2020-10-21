@@ -1,7 +1,6 @@
 package com.playmonumenta.plugins.abilities.alchemist;
 
 import org.bukkit.Particle;
-import org.bukkit.World;
 import org.bukkit.entity.AbstractArrow;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.LivingEntity;
@@ -22,8 +21,8 @@ public class BasiliskPoison extends Ability {
 	private static final int BASILISK_POISON_1_DURATION = 7 * 20;
 	private static final int BASILISK_POISON_2_DURATION = 6 * 20;
 
-	public BasiliskPoison(Plugin plugin, World world, Player player) {
-		super(plugin, world, player, "Basilisk Poison");
+	public BasiliskPoison(Plugin plugin, Player player) {
+		super(plugin, player, "Basilisk Poison");
 		mInfo.mScoreboardId = "BasiliskPoison";
 		mInfo.mShorthandName = "BP";
 		mInfo.mDescriptions.add("Equips your arrows with a noxious mixture that afflicts targets with 7s of Wither II.");
@@ -34,7 +33,7 @@ public class BasiliskPoison extends Ability {
 	public boolean livingEntityShotByPlayerEvent(Projectile proj, LivingEntity damagee, EntityDamageByEntityEvent event) {
 		if (proj instanceof Arrow || proj instanceof SpectralArrow) {
 			apply(damagee);
-			mWorld.spawnParticle(Particle.TOTEM, damagee.getLocation().add(0, 1.6, 0), 12, 0.4, 0.4, 0.4, 0.1);
+			mPlayer.getWorld().spawnParticle(Particle.TOTEM, damagee.getLocation().add(0, 1.6, 0), 12, 0.4, 0.4, 0.4, 0.1);
 		}
 
 		return true;

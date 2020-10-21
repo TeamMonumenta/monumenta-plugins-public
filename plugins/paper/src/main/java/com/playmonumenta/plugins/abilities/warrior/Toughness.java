@@ -21,8 +21,8 @@ public class Toughness extends Ability {
 
 	private final double mDoTDamageReduction;
 
-	public Toughness(Plugin plugin, World world, Player player) {
-		super(plugin, world, player, "Toughness");
+	public Toughness(Plugin plugin, Player player) {
+		super(plugin, player, "Toughness");
 		mInfo.mScoreboardId = "Toughness";
 		mInfo.mShorthandName = "Tgh";
 		mInfo.mDescriptions.add("Gain +10% max health and damage from Poison and Wither is reduced by 33%.");

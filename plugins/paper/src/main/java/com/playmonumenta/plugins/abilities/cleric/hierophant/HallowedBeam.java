@@ -31,8 +31,8 @@ public class HallowedBeam extends Ability {
 	private static final double HALLOWED_DAMAGE_DIRECT = 42;
 	private static final double HALLOWED_DAMAGE_EXPLOSION = 22;
 
-	public HallowedBeam(Plugin plugin, World world, Player player) {
-		super(plugin, world, player, "Hallowed Beam");
+	public HallowedBeam(Plugin plugin, Player player) {
+		super(plugin, player, "Hallowed Beam");
 		mInfo.mScoreboardId = "HallowedBeam";
 		mInfo.mShorthandName = "HB";
 		mInfo.mDescriptions.add("Firing a fully-drawn bow while shifted, while pointing directly at a non-boss undead, will instantly deal 42 damage to the undead instead of consuming an arrow. Cooldown: 20s.");
@@ -52,10 +52,11 @@ public class HallowedBeam extends Ability {
 				player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ARROW_SHOOT, 1, 0.9f);
 				Location loc = player.getEyeLocation();
 				Vector dir = LocationUtils.getDirectionTo(e.getEyeLocation(), loc);
+				World world = mPlayer.getWorld();
 				for (int i = 0; i < 30; i++) {
 					loc.add(dir);
-					mWorld.spawnParticle(Particle.VILLAGER_HAPPY, loc, 5, 0.25, 0.25, 0.25, 0);
-					mWorld.spawnParticle(Particle.EXPLOSION_NORMAL, loc, 2, 0.05f, 0.05f, 0.05f, 0.025f);
+					world.spawnParticle(Particle.VILLAGER_HAPPY, loc, 5, 0.25, 0.25, 0.25, 0);
+					world.spawnParticle(Particle.EXPLOSION_NORMAL, loc, 2, 0.05f, 0.05f, 0.05f, 0.025f);
 					if (loc.distance(e.getEyeLocation()) < 1.25) {
 						loc.getWorld().playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_BLAST, 1, 1.35f);
 						loc.getWorld().playSound(loc, Sound.ENTITY_ARROW_HIT, 1, 0.9f);
@@ -64,12 +65,12 @@ public class HallowedBeam extends Ability {
 				}
 				EntityUtils.damageEntity(mPlugin, e, HALLOWED_DAMAGE_DIRECT, player, MagicType.HOLY, true, mInfo.mLinkedSpell);
 				Location eLoc = e.getLocation().add(0, e.getHeight() / 2, 0);
-				mWorld.spawnParticle(Particle.SPIT, eLoc, 40, 0, 0, 0, 0.25f);
-				mWorld.spawnParticle(Particle.FIREWORKS_SPARK, eLoc, 75, 0, 0, 0, 0.3f);
+				world.spawnParticle(Particle.SPIT, eLoc, 40, 0, 0, 0, 0.25f);
+				world.spawnParticle(Particle.FIREWORKS_SPARK, eLoc, 75, 0, 0, 0, 0.3f);
 				if (getAbilityScore() > 1) {
 					// TODO: Revamp explosion effects
-					mWorld.spawnParticle(Particle.SPELL_INSTANT, e.getLocation(), 500, 2.5, 0.15f, 2.5, 1);
-					mWorld.spawnParticle(Particle.VILLAGER_HAPPY, e.getLocation(), 150, 2.55, 0.15f, 2.5, 1);
+					world.spawnParticle(Particle.SPELL_INSTANT, e.getLocation(), 500, 2.5, 0.15f, 2.5, 1);
+					world.spawnParticle(Particle.VILLAGER_HAPPY, e.getLocation(), 150, 2.55, 0.15f, 2.5, 1);
 					for (LivingEntity le : EntityUtils.getNearbyMobs(eLoc, 5)) {
 						if (EntityUtils.isUndead(le)) {
 							EntityUtils.damageEntity(mPlugin, le, HALLOWED_DAMAGE_EXPLOSION, player, MagicType.HOLY, true, mInfo.mLinkedSpell);

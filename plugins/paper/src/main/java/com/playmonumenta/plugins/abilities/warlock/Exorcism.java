@@ -30,8 +30,8 @@ public class Exorcism  extends Ability {
 	private static final int COOLDOWN_2 = 20 * 15;
 	private static final double EXORCISM_ANGLE = 50.0;
 
-	public Exorcism(Plugin plugin, World world, Player player) {
-		super(plugin, world, player, "Exorcism");
+	public Exorcism(Plugin plugin, Player player) {
+		super(plugin, player, "Exorcism");
 		mInfo.mLinkedSpell = Spells.EXORCISM;
 		mInfo.mScoreboardId = "Exorcism";
 		mInfo.mShorthandName = "Ex";
@@ -46,7 +46,8 @@ public class Exorcism  extends Ability {
 	@Override
 	public void cast(Action action) {
 		//	needs better sound
-		mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_WITHER_AMBIENT, 0.7f, -3f);
+		World world = mPlayer.getWorld();
+		world.playSound(mPlayer.getLocation(), Sound.ENTITY_WITHER_AMBIENT, 0.7f, -3f);
 
 		putOnCooldown();
 
@@ -83,7 +84,7 @@ public class Exorcism  extends Ability {
 			if (onFire) {
 				EntityUtils.applyFire(mPlugin, DURATION, mob, mPlayer);
 			}
-			mWorld.spawnParticle(Particle.SQUID_INK, mob.getLocation(), 40, 0.1, 0.2, 0.1, 0.15);
+			world.spawnParticle(Particle.SQUID_INK, mob.getLocation(), 40, 0.1, 0.2, 0.1, 0.15);
 		}
 
 		// a cool particle effect on the player would be nice too

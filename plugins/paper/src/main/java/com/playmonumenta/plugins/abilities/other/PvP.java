@@ -27,8 +27,8 @@ import com.playmonumenta.plugins.utils.PotionUtils;
  */
 public class PvP extends Ability {
 
-	public PvP(Plugin plugin, World world, Player player) {
-		super(plugin, world, player, null);
+	public PvP(Plugin plugin, Player player) {
+		super(plugin, player, null);
 
 		if (player != null) {
 			AttributeInstance maxHealth = player.getAttribute(Attribute.GENERIC_MAX_HEALTH);
@@ -51,8 +51,9 @@ public class PvP extends Ability {
 			}
 			event.setCancelled(true);
 			player.setGameMode(GameMode.SPECTATOR);
-			player.getLocation().getWorld().playSound(player.getLocation(), Sound.ENTITY_VILLAGER_DEATH, 1, 1);
-			mWorld.spawnParticle(Particle.BLOCK_CRACK, player.getLocation().add(0, 1, 0), 30, 0.15, 0.15, 0.15, 0.75F, Material.REDSTONE_BLOCK.createBlockData());
+			World world = mPlayer.getWorld();
+			world.playSound(player.getLocation(), Sound.ENTITY_VILLAGER_DEATH, 1, 1);
+			world.spawnParticle(Particle.BLOCK_CRACK, player.getLocation().add(0, 1, 0), 30, 0.15, 0.15, 0.15, 0.75F, Material.REDSTONE_BLOCK.createBlockData());
 			player.sendTitle(ChatColor.RED + "Respawning...", ChatColor.GREEN + "In 3 seconds...", 10, 20 * 2, 10);
 			PotionUtils.clearNegatives(mPlugin, player);
 			ItemStack[] inv = player.getInventory().getContents();
@@ -63,14 +64,14 @@ public class PvP extends Ability {
 					item.setItemMeta(meta);
 				}
 				if (item != null) {
-					mWorld.dropItemNaturally(player.getLocation(), item);
+					world.dropItemNaturally(player.getLocation(), item);
 				}
 			}
 			player.getInventory().clear();
 			new BukkitRunnable() {
 				@Override
 				public void run() {
-					player.teleport(mWorld.getSpawnLocation());
+					player.teleport(world.getSpawnLocation());
 					player.setGameMode(GameMode.SURVIVAL);
 					player.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 20 * 3, 10));
 

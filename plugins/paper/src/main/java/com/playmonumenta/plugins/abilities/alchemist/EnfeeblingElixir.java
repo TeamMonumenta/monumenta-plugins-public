@@ -51,8 +51,8 @@ public class EnfeeblingElixir extends Ability {
 	private final int mSpeedAmp;
 	private final float mKnockbackSpeed;
 
-	public EnfeeblingElixir(Plugin plugin, World world, Player player) {
-		super(plugin, world, player, "Enfeebling Elixir");
+	public EnfeeblingElixir(Plugin plugin, Player player) {
+		super(plugin, player, "Enfeebling Elixir");
 		mInfo.mLinkedSpell = Spells.ENFEEBLING_ELIXIR;
 		mInfo.mScoreboardId = "EnfeeblingElixir";
 		mInfo.mShorthandName = "EE";
@@ -81,8 +81,9 @@ public class EnfeeblingElixir extends Ability {
 			mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF,
 			                                 new PotionEffect(PotionEffectType.JUMP, mDuration, JUMP_LEVEL));
 
-			mWorld.spawnParticle(Particle.SPELL_MOB, mPlayer.getLocation(), 100, 2, 1.5, 2, 0);
-			mWorld.playSound(mPlayer.getLocation(), Sound.BLOCK_LAVA_EXTINGUISH, 1, 0);
+			World world = mPlayer.getWorld();
+			world.spawnParticle(Particle.SPELL_MOB, mPlayer.getLocation(), 100, 2, 1.5, 2, 0);
+			world.playSound(mPlayer.getLocation(), Sound.BLOCK_LAVA_EXTINGUISH, 1, 0);
 
 			mInfo.mCooldown = (int) EnfeeblingElixirCooldownEnchantment.getCooldown(mPlayer, COOLDOWN, EnfeeblingElixirCooldownEnchantment.class);
 			putOnCooldown();

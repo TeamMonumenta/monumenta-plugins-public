@@ -44,8 +44,8 @@ public class Dreadful extends StatMultiplier {
 	private int mSpawnCounter = 0;
 	private int mEliteSpawnCounter = 0;
 
-	public Dreadful(Plugin plugin, World world, Player player) {
-		super(plugin, world, player, DREADFUL_DAMAGE_TAKEN_MULTIPLIER, DREADFUL_DAMAGE_TAKEN_MULTIPLIER, 1);
+	public Dreadful(Plugin plugin, Player player) {
+		super(plugin, player, DREADFUL_DAMAGE_TAKEN_MULTIPLIER, DREADFUL_DAMAGE_TAKEN_MULTIPLIER, 1);
 		mSpectralSummonCommandData = ServerProperties.getClassSpecializationsEnabled() ? Spectral.SPECTRAL_2_SUMMON_COMMAND_DATA : Spectral.SPECTRAL_1_SUMMON_COMMAND_DATA;
 		mDreadfulSummonCommandData = ServerProperties.getClassSpecializationsEnabled() ? DREADFUL_2_SUMMON_COMMAND_DATA : DREADFUL_1_SUMMON_COMMAND_DATA;
 	}
@@ -62,6 +62,7 @@ public class Dreadful extends StatMultiplier {
 		if (!mob.getScoreboardTags().contains(DREADFUL_DREADNAUGHT_TAG)
 				&& !mob.getScoreboardTags().contains(Spectral.SPECTRAL_SPECTRE_TAG)
 				&& !mob.getScoreboardTags().contains(DREADFUL_DREADLING_TAG)) {
+			World world = mPlayer.getWorld();
 			if (EntityUtils.isElite(mob)) {
 				mEliteSpawnCounter += (4 + FastUtils.RANDOM.nextInt(3));
 
@@ -72,8 +73,8 @@ public class Dreadful extends StatMultiplier {
 					Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), command);
 
 					loc.add(0, 1, 0);
-					mWorld.spawnParticle(Particle.FLAME, loc, 50, 0, 0, 0, 0.1);
-					mWorld.spawnParticle(Particle.SMOKE_LARGE, loc, 50, 0.5, 1, 0.5, 0);
+					world.spawnParticle(Particle.FLAME, loc, 50, 0, 0, 0, 0.1);
+					world.spawnParticle(Particle.SMOKE_LARGE, loc, 50, 0.5, 1, 0.5, 0);
 				}
 			} else {
 				mSpawnCounter += (2 + FastUtils.RANDOM.nextInt(2));
@@ -85,8 +86,8 @@ public class Dreadful extends StatMultiplier {
 					Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), command);
 
 					loc.add(0, 1, 0);
-					mWorld.spawnParticle(Particle.SPELL_WITCH, loc, 50, 0, 0, 0, 0.5);
-					mWorld.spawnParticle(Particle.SMOKE_LARGE, loc, 50, 0.5, 1, 0.5, 0);
+					world.spawnParticle(Particle.SPELL_WITCH, loc, 50, 0, 0, 0, 0.5);
+					world.spawnParticle(Particle.SMOKE_LARGE, loc, 50, 0.5, 1, 0.5, 0);
 				}
 			}
 		}

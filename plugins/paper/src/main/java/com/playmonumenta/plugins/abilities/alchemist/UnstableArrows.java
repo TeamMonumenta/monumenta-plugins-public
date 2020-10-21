@@ -36,8 +36,8 @@ public class UnstableArrows extends Ability {
 
 	private AbstractArrow mUnstableArrow = null;
 
-	public UnstableArrows(Plugin plugin, World world, Player player) {
-		super(plugin, world, player, "Unstable Arrows");
+	public UnstableArrows(Plugin plugin, Player player) {
+		super(plugin, player, "Unstable Arrows");
 		mInfo.mLinkedSpell = Spells.UNSTABLE_ARROWS;
 		mInfo.mScoreboardId = "BombArrow";
 		mInfo.mShorthandName = "UA";
@@ -64,22 +64,23 @@ public class UnstableArrows extends Ability {
 					int mTicks = 0;
 					@Override
 					public void run() {
-						mWorld.spawnParticle(Particle.FLAME, mLoc, 3, 0.3, 0.3, 0.3, 0.05);
-						mWorld.spawnParticle(Particle.SMOKE_NORMAL, mLoc, 7, 0.5, 0.5, 0.5, 0.075);
-						mWorld.playSound(mLoc, Sound.BLOCK_LAVA_EXTINGUISH, 0.3f,
+						World world = mPlayer.getWorld();
+						world.spawnParticle(Particle.FLAME, mLoc, 3, 0.3, 0.3, 0.3, 0.05);
+						world.spawnParticle(Particle.SMOKE_NORMAL, mLoc, 7, 0.5, 0.5, 0.5, 0.075);
+						world.playSound(mLoc, Sound.BLOCK_LAVA_EXTINGUISH, 0.3f,
 						                 ((UNSTABLE_ARROWS_DURATION / 3.0f) + mTicks) / (1.5f * UNSTABLE_ARROWS_DURATION));
 						if (mTicks % 18 == 0) {
-							mWorld.playSound(mLoc, Sound.BLOCK_LAVA_EXTINGUISH, 1.6f, 1f + mTicks / 36f);
-							mWorld.spawnParticle(Particle.LAVA, mLoc, 80, UNSTABLE_ARROWS_RADIUS, 0, UNSTABLE_ARROWS_RADIUS, 0);
+							world.playSound(mLoc, Sound.BLOCK_LAVA_EXTINGUISH, 1.6f, 1f + mTicks / 36f);
+							world.spawnParticle(Particle.LAVA, mLoc, 80, UNSTABLE_ARROWS_RADIUS, 0, UNSTABLE_ARROWS_RADIUS, 0);
 						}
 						if (mTicks >= UNSTABLE_ARROWS_DURATION) {
 							arrow.remove();
-							mWorld.playSound(mLoc, Sound.ENTITY_GENERIC_EXPLODE, 0.8f, 0f);
-							mWorld.playSound(mLoc, Sound.ENTITY_GENERIC_EXPLODE, 0.8f, 1.25f);
+							world.playSound(mLoc, Sound.ENTITY_GENERIC_EXPLODE, 0.8f, 0f);
+							world.playSound(mLoc, Sound.ENTITY_GENERIC_EXPLODE, 0.8f, 1.25f);
 
-							mWorld.spawnParticle(Particle.FLAME, mLoc, 115, 0.02, 0.02, 0.02, 0.2);
-							mWorld.spawnParticle(Particle.SMOKE_LARGE, mLoc, 40, 0.02, 0.02, 0.02, 0.35);
-							mWorld.spawnParticle(Particle.EXPLOSION_NORMAL, mLoc, 40, 0.02, 0.02, 0.02, 0.35);
+							world.spawnParticle(Particle.FLAME, mLoc, 115, 0.02, 0.02, 0.02, 0.2);
+							world.spawnParticle(Particle.SMOKE_LARGE, mLoc, 40, 0.02, 0.02, 0.02, 0.35);
+							world.spawnParticle(Particle.EXPLOSION_NORMAL, mLoc, 40, 0.02, 0.02, 0.02, 0.35);
 							BasiliskPoison bp = AbilityManager.getManager().getPlayerAbility(mPlayer, BasiliskPoison.class);
 
 							int baseDamage = (getAbilityScore() == 1) ? UNSTABLE_ARROWS_1_DAMAGE : UNSTABLE_ARROWS_2_DAMAGE;
@@ -118,7 +119,7 @@ public class UnstableArrows extends Ability {
 	public boolean playerShotArrowEvent(AbstractArrow arrow) {
 		// Can't use runCheck for this because player doesn't need to be sneaking when arrow lands
 		if (mPlayer.isSneaking()) {
-			mWorld.playSound(mPlayer.getLocation(), Sound.BLOCK_LAVA_EXTINGUISH, 5.0f, 0.25f);
+			mPlayer.getWorld().playSound(mPlayer.getLocation(), Sound.BLOCK_LAVA_EXTINGUISH, 5.0f, 0.25f);
 			mUnstableArrow = arrow;
 			mPlugin.mProjectileEffectTimers.addEntity(arrow, Particle.FLAME);
 		}

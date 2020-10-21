@@ -39,8 +39,8 @@ public class LuminousInfusion extends Ability {
 
 	private boolean mActive = false;
 
-	public LuminousInfusion(Plugin plugin, World world, Player player) {
-		super(plugin, world, player, "Luminous Infusion");
+	public LuminousInfusion(Plugin plugin, Player player) {
+		super(plugin, player, "Luminous Infusion");
 		mInfo.mLinkedSpell = Spells.LUMINOUS_INFUSION;
 		mInfo.mScoreboardId = "LuminousInfusion";
 		mInfo.mShorthandName = "LI";
@@ -67,9 +67,10 @@ public class LuminousInfusion extends Ability {
 		// Cast conditions met
 		mActive = true;
 		MessagingUtils.sendActionBarMessage(mPlugin, mPlayer, "Holy energy radiates from your hands...");
-		mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_ILLUSIONER_PREPARE_MIRROR, 1, 1);
-		mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_BLAZE_AMBIENT, 1, 1.65f);
-		mWorld.spawnParticle(Particle.SPELL_INSTANT, mPlayer.getLocation(), 50, 0.75f, 0.25f, 0.75f, 1);
+		World world = mPlayer.getWorld();
+		world.playSound(mPlayer.getLocation(), Sound.ENTITY_ILLUSIONER_PREPARE_MIRROR, 1, 1);
+		world.playSound(mPlayer.getLocation(), Sound.ENTITY_BLAZE_AMBIENT, 1, 1.65f);
+		world.spawnParticle(Particle.SPELL_INSTANT, mPlayer.getLocation(), 50, 0.75f, 0.25f, 0.75f, 1);
 		new BukkitRunnable() {
 			int mT = 0;
 
@@ -78,8 +79,8 @@ public class LuminousInfusion extends Ability {
 				mT++;
 				Location rightHand = PlayerUtils.getRightSide(mPlayer.getEyeLocation(), 0.45).subtract(0, .8, 0);
 				Location leftHand = PlayerUtils.getRightSide(mPlayer.getEyeLocation(), -0.45).subtract(0, .8, 0);
-				mWorld.spawnParticle(Particle.SPELL_INSTANT, leftHand, 1, 0.05f, 0.05f, 0.05f, 0);
-				mWorld.spawnParticle(Particle.SPELL_INSTANT, rightHand, 1, 0.05f, 0.05f, 0.05f, 0);
+				world.spawnParticle(Particle.SPELL_INSTANT, leftHand, 1, 0.05f, 0.05f, 0.05f, 0);
+				world.spawnParticle(Particle.SPELL_INSTANT, rightHand, 1, 0.05f, 0.05f, 0.05f, 0);
 				if (mT >= COOLDOWN || !mActive) {
 					if (mT >= COOLDOWN) {
 						MessagingUtils.sendActionBarMessage(mPlugin, mPlayer, EXPIRATION_MESSAGE);
@@ -130,18 +131,19 @@ public class LuminousInfusion extends Ability {
 		EntityUtils.damageEntity(mPlugin, damagee, UNDEAD_DAMAGE, mPlayer, MagicType.HOLY, true, mInfo.mLinkedSpell);
 
 		Location loc = damagee.getLocation();
-		mWorld.spawnParticle(Particle.FIREWORKS_SPARK, loc, 100, 0.05f, 0.05f, 0.05f, 0.3);
-		mWorld.spawnParticle(Particle.FLAME, loc, 75, 0.05f, 0.05f, 0.05f, 0.3);
-		mWorld.playSound(loc, Sound.ITEM_TOTEM_USE, 0.8f, 1.1f);
+		World world = mPlayer.getWorld();
+		world.spawnParticle(Particle.FIREWORKS_SPARK, loc, 100, 0.05f, 0.05f, 0.05f, 0.3);
+		world.spawnParticle(Particle.FLAME, loc, 75, 0.05f, 0.05f, 0.05f, 0.3);
+		world.playSound(loc, Sound.ITEM_TOTEM_USE, 0.8f, 1.1f);
 
 		// Exclude the damagee so that the knockaway is valid
 		List<LivingEntity> affected = EntityUtils.getNearbyMobs(loc, RADIUS, damagee);
 		for (LivingEntity e : affected) {
 			// Reduce overall volume of noise the more mobs there are, but still make it louder for more mobs
 			double volume = 0.6 / Math.sqrt(affected.size());
-			mWorld.playSound(loc, Sound.ITEM_TOTEM_USE, (float) volume, 1.1f);
-			mWorld.spawnParticle(Particle.FIREWORKS_SPARK, loc, 10, 0.05f, 0.05f, 0.05f, 0.1);
-			mWorld.spawnParticle(Particle.FLAME, loc, 7, 0.05f, 0.05f, 0.05f, 0.1);
+			world.playSound(loc, Sound.ITEM_TOTEM_USE, (float) volume, 1.1f);
+			world.spawnParticle(Particle.FIREWORKS_SPARK, loc, 10, 0.05f, 0.05f, 0.05f, 0.1);
+			world.spawnParticle(Particle.FLAME, loc, 7, 0.05f, 0.05f, 0.05f, 0.1);
 
 			if (EntityUtils.isUndead(e)) {
 				EntityUtils.damageEntity(mPlugin, e, UNDEAD_DAMAGE, mPlayer, MagicType.HOLY, true, mInfo.mLinkedSpell);

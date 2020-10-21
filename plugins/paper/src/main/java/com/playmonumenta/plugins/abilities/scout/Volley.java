@@ -74,8 +74,8 @@ public class Volley extends Ability {
 	private static final double VOLLEY_1_DAMAGE_MULTIPLIER = 1.3;
 	private static final double VOLLEY_2_DAMAGE_MULTIPLIER = 1.5;
 
-	public Volley(Plugin plugin, World world, Player player) {
-		super(plugin, world, player, "Volley");
+	public Volley(Plugin plugin, Player player) {
+		super(plugin, player, "Volley");
 		mInfo.mLinkedSpell = Spells.VOLLEY;
 		mInfo.mScoreboardId = "Volley";
 		mInfo.mShorthandName = "Vly";
@@ -97,9 +97,10 @@ public class Volley extends Ability {
 		// Start the cooldown first so we don't cause an infinite loop of Volleys
 		mInfo.mCooldown = (int) VolleyCooldownEnchantment.getCooldown(mPlayer, VOLLEY_COOLDOWN, VolleyCooldownEnchantment.class);
 		putOnCooldown();
-		mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_ARROW_SHOOT, 1, 0.75f);
-		mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_ARROW_SHOOT, 1, 1f);
-		mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_ARROW_SHOOT, 1, 1.33f);
+		World world = mPlayer.getWorld();
+		world.playSound(mPlayer.getLocation(), Sound.ENTITY_ARROW_SHOOT, 1, 0.75f);
+		world.playSound(mPlayer.getLocation(), Sound.ENTITY_ARROW_SHOOT, 1, 1f);
+		world.playSound(mPlayer.getLocation(), Sound.ENTITY_ARROW_SHOOT, 1, 1.33f);
 
 		// Give time for other skills to set data
 		new BukkitRunnable() {

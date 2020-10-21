@@ -78,8 +78,8 @@ public class PurpleHaze extends Ability {
 
 	private LivingEntity mTarget = null;
 
-	public PurpleHaze(Plugin plugin, World world, Player player) {
-		super(plugin, world, player, "Purple Haze");
+	public PurpleHaze(Plugin plugin, Player player) {
+		super(plugin, player, "Purple Haze");
 		mInfo.mLinkedSpell = Spells.PURPLE_HAZE;
 		mInfo.mScoreboardId = "PurpleHaze";
 		mInfo.mShorthandName = "PH";
@@ -98,6 +98,7 @@ public class PurpleHaze extends Ability {
 				int mCounter = 0;
 				@Override
 				public void run() {
+					World world = mPlayer.getWorld();
 					mCounter++;
 					if (mCounter % 20 == 0) {
 						for (Map.Entry<UUID, HazedMob> entry : mHazedMobs.entrySet()) {
@@ -115,9 +116,9 @@ public class PurpleHaze extends Ability {
 							damagee.setNoDamageTicks(ticks);
 							PotionUtils.applyPotion(e.mTriggeredBy, damagee, new PotionEffect(PotionEffectType.SLOW, 40, 2, false, true));
 							Location loc = damagee.getLocation().add(0, 1, 0);
-							mWorld.spawnParticle(Particle.SPELL_WITCH, loc, 10, 0, 0.2, 0, 0.0001);
-							mWorld.spawnParticle(Particle.FALLING_DUST, loc, 10, 0.2, 0.65, 0.2, Bukkit.createBlockData("purple_concrete"));
-							mWorld.spawnParticle(Particle.FALLING_DUST, loc, 10, 0.2, 0.65, 0.2, Bukkit.createBlockData("pink_terracotta"));
+							world.spawnParticle(Particle.SPELL_WITCH, loc, 10, 0, 0.2, 0, 0.0001);
+							world.spawnParticle(Particle.FALLING_DUST, loc, 10, 0.2, 0.65, 0.2, Bukkit.createBlockData("purple_concrete"));
+							world.spawnParticle(Particle.FALLING_DUST, loc, 10, 0.2, 0.65, 0.2, Bukkit.createBlockData("pink_terracotta"));
 							mCounter = 0;
 						}
 					}
@@ -132,11 +133,11 @@ public class PurpleHaze extends Ability {
 								Location loc = hazer.mMob.getLocation();
 								// Perhaps a ball of purple haze going from the dead mob to the next instead?
 
-								mWorld.spawnParticle(Particle.SPELL_WITCH, loc.clone().add(0, 1, 0), 40, 2, 1, 2, 0.0001);
-								mWorld.spawnParticle(Particle.FALLING_DUST, loc.clone().add(0, 1, 0), 15, 1, 1, 1, Bukkit.createBlockData("purple_concrete"));
-								mWorld.spawnParticle(Particle.FALLING_DUST, loc.clone().add(0, 1, 0), 15, 1, 1, 1, Bukkit.createBlockData("pink_terracotta"));
-								mWorld.playSound(loc, Sound.BLOCK_CHORUS_FLOWER_GROW, 1.0f, 2.0f);
-								mWorld.playSound(loc, Sound.ENTITY_ENDER_DRAGON_HURT, 0.55f, 1.5f);
+								world.spawnParticle(Particle.SPELL_WITCH, loc.clone().add(0, 1, 0), 40, 2, 1, 2, 0.0001);
+								world.spawnParticle(Particle.FALLING_DUST, loc.clone().add(0, 1, 0), 15, 1, 1, 1, Bukkit.createBlockData("purple_concrete"));
+								world.spawnParticle(Particle.FALLING_DUST, loc.clone().add(0, 1, 0), 15, 1, 1, 1, Bukkit.createBlockData("pink_terracotta"));
+								world.playSound(loc, Sound.BLOCK_CHORUS_FLOWER_GROW, 1.0f, 2.0f);
+								world.playSound(loc, Sound.ENTITY_ENDER_DRAGON_HURT, 0.55f, 1.5f);
 
 								for (int i = 0; i < PURPLE_HAZE_TRANSFER_BREADTH; i++) {
 									double closest = PURPLE_HAZE_RADIUS + 1;
@@ -154,7 +155,7 @@ public class PurpleHaze extends Ability {
 										HazedMob hazed = new HazedMob(closestMob, hazer.mTriggeredBy, hazer.mDuration, hazer.mTransfers - 1);
 										newHazedMobs.put(hazed.mMob.getUniqueId(), hazed);
 										Location loc2 = hazed.mMob.getLocation();
-										mWorld.spawnParticle(Particle.SPELL_WITCH, loc2.clone().add(0, 1, 0), 60, 0.5, 1, 0.5, 0.001);
+										world.spawnParticle(Particle.SPELL_WITCH, loc2.clone().add(0, 1, 0), 60, 0.5, 1, 0.5, 0.001);
 
 										Location hazedLoc = hazed.mMob.getEyeLocation();
 										Location hazerLoc = hazer.mMob.getEyeLocation();
@@ -162,11 +163,11 @@ public class PurpleHaze extends Ability {
 										for (int j = 0; j < 50; j++) {
 											hazerLoc.add(dir.clone().multiply(0.1));
 											if (j % 2 == 0) { // Just to maintain the two colours without having too many particles
-												mWorld.spawnParticle(Particle.FALLING_DUST, hazerLoc, 1, 0.1, 0.1, 0.1, Bukkit.createBlockData("purple_concrete"));
+												world.spawnParticle(Particle.FALLING_DUST, hazerLoc, 1, 0.1, 0.1, 0.1, Bukkit.createBlockData("purple_concrete"));
 											} else {
-												mWorld.spawnParticle(Particle.FALLING_DUST, hazerLoc, 1, 0.1, 0.1, 0.1, Bukkit.createBlockData("pink_terracotta"));
+												world.spawnParticle(Particle.FALLING_DUST, hazerLoc, 1, 0.1, 0.1, 0.1, Bukkit.createBlockData("pink_terracotta"));
 											}
-											mWorld.spawnParticle(Particle.SPELL_WITCH, hazerLoc, 1, 0.05, 0.05, 0.05, 0.0001);
+											world.spawnParticle(Particle.SPELL_WITCH, hazerLoc, 1, 0.05, 0.05, 0.05, 0.0001);
 											if (hazerLoc.distance(hazedLoc) < 0.4) {
 												break;
 											}
@@ -228,9 +229,10 @@ public class PurpleHaze extends Ability {
 			HazedMob hazed = new HazedMob(entity, mPlayer, mDuration, PURPLE_HAZE_TRANSFER_DEPTH);
 			mHazedMobs.put(entity.getUniqueId(), hazed);
 			Location loc = hazed.mMob.getLocation();
-			mWorld.spawnParticle(Particle.SPELL_WITCH, loc.clone().add(0, 1, 0), 60, 0.5, 1, 0.5, 0.001);
-			mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_EVOKER_CAST_SPELL, 0.5f, 0.5f);
-			mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_ZOMBIE_ATTACK_WOODEN_DOOR, 0.25f, 0.5f);
+			World world = mPlayer.getWorld();
+			world.spawnParticle(Particle.SPELL_WITCH, loc.clone().add(0, 1, 0), 60, 0.5, 1, 0.5, 0.001);
+			world.playSound(mPlayer.getLocation(), Sound.ENTITY_EVOKER_CAST_SPELL, 0.5f, 0.5f);
+			world.playSound(mPlayer.getLocation(), Sound.ENTITY_ZOMBIE_ATTACK_WOODEN_DOOR, 0.25f, 0.5f);
 			putOnCooldown();
 		}
 		mTarget = null;

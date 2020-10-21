@@ -19,8 +19,8 @@ public class GruesomeAlchemy extends PotionAbility {
 	private final int mSlownessAmplifier;
 	private final int mWitherAmplifier;
 
-	public GruesomeAlchemy(Plugin plugin, World world, Player player) {
-		super(plugin, world, player, "Gruesome Alchemy", 0, 0);
+	public GruesomeAlchemy(Plugin plugin, Player player) {
+		super(plugin, player, "Gruesome Alchemy", 0, 0);
 		mInfo.mScoreboardId = "GruesomeAlchemy";
 		mInfo.mShorthandName = "GA";
 		mInfo.mDescriptions.add("Your Alchemist's Potions give Slowness I and Wither I for 8 seconds.");

@@ -40,8 +40,8 @@ public class CloakAndDagger extends Ability implements KillTriggeredAbility {
 	private int mCloakOnActivation = 0;
 	private boolean mActive = false;
 
-	public CloakAndDagger(Plugin plugin, World world, Player player) {
-		super(plugin, world, player, "Cloak and Dagger");
+	public CloakAndDagger(Plugin plugin, Player player) {
+		super(plugin, player, "Cloak and Dagger");
 		mInfo.mScoreboardId = "CloakAndDagger";
 		mInfo.mShorthandName = "CnD";
 		mInfo.mDescriptions.add("When you kill an enemy you gain a stack of cloak. Elite kills and Boss \"kills\" give you five stacks. Stacks are capped at 8. When you sneak left click while looking up with dual wielded swords, you lose your cloak stacks and gain X seconds of Stealth and (1.5)(X) extra damage on your next stealth attack, where X is the number of stacks you had at activation. You must have at least 5 stacks to activate this.");
@@ -64,9 +64,10 @@ public class CloakAndDagger extends Ability implements KillTriggeredAbility {
 			mCloak = 0;
 			mActive = true;
 			AbilityUtils.applyStealth(mPlugin, mPlayer, 20 * mCloakOnActivation);
-			mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_ILLUSIONER_MIRROR_MOVE, 1, 1);
-			mWorld.spawnParticle(Particle.SPELL_WITCH, mPlayer.getLocation().add(0, 1, 0), 70, 0.25, 0.45, 0.25, 0.15);
-			mWorld.spawnParticle(Particle.EXPLOSION_NORMAL, mPlayer.getLocation(), 25, 0.2, 0, 0.2, 0.1);
+			World world = mPlayer.getWorld();
+			world.playSound(mPlayer.getLocation(), Sound.ENTITY_ILLUSIONER_MIRROR_MOVE, 1, 1);
+			world.spawnParticle(Particle.SPELL_WITCH, mPlayer.getLocation().add(0, 1, 0), 70, 0.25, 0.45, 0.25, 0.15);
+			world.spawnParticle(Particle.EXPLOSION_NORMAL, mPlayer.getLocation(), 25, 0.2, 0, 0.2, 0.1);
 		}
 	}
 
@@ -80,9 +81,10 @@ public class CloakAndDagger extends Ability implements KillTriggeredAbility {
 
 			Location loc = event.getEntity().getLocation();
 
-			mWorld.playSound(loc, Sound.ENTITY_IRON_GOLEM_DEATH, 1f, 2f);
-			mWorld.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_STRONG, 1f, 0.5f);
-			mWorld.spawnParticle(Particle.SMOKE_NORMAL, loc.clone().add(0, 1, 0), 25, 0.25, 0.5, 0.25, 0.2f);
+			World world = mPlayer.getWorld();
+			world.playSound(loc, Sound.ENTITY_IRON_GOLEM_DEATH, 1f, 2f);
+			world.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_STRONG, 1f, 0.5f);
+			world.spawnParticle(Particle.SMOKE_NORMAL, loc.clone().add(0, 1, 0), 25, 0.25, 0.5, 0.25, 0.2f);
 
 			mActive = false;
 		}

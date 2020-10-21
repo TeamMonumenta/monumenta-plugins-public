@@ -219,7 +219,7 @@ public class PlayerTracking implements EntityTracking {
 	}
 
 	@Override
-	public void update(World world, int ticks) {
+	public void update(int ticks) {
 		Iterator<Entry<Player, PlayerInventory>> playerIter = mPlayers.entrySet().iterator();
 		while (playerIter.hasNext()) {
 			Entry<Player, PlayerInventory> entry = playerIter.next();
@@ -235,7 +235,7 @@ public class PlayerTracking implements EntityTracking {
 				// First we'll check if the player is too high, if so they shouldn't be here.
 				if (loc.mY >= 255 && player.isOnGround()) {
 					// Double check to make sure they're on the ground as it can trigger a false positive.
-					Block below = world.getBlockAt(location.subtract(0, 1, 0));
+					Block below = player.getWorld().getBlockAt(location.subtract(0, 1, 0));
 					if (below != null && below.getType() == Material.AIR) {
 						continue;
 					}
@@ -275,7 +275,7 @@ public class PlayerTracking implements EntityTracking {
 
 			// Extra Effects
 			try {
-				inventory.tick(mPlugin, world, player);
+				inventory.tick(mPlugin, player);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}

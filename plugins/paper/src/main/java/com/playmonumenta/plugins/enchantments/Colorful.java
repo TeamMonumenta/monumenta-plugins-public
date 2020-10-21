@@ -7,7 +7,6 @@ import java.util.List;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
-import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
@@ -51,7 +50,7 @@ public class Colorful implements BaseEnchantment {
 	}
 
 	@Override
-	public void tick(Plugin plugin, World world, Player player, int level) {
+	public void tick(Plugin plugin, Player player, int level) {
 		mTicks++;
 
 		int modulo = 10; //once a minute

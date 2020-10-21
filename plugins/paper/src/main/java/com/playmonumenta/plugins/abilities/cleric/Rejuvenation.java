@@ -4,7 +4,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.bukkit.Particle;
-import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Player;
 
@@ -26,8 +25,8 @@ public class Rejuvenation extends Ability {
 
 	private int mTimer = 0;
 
-	public Rejuvenation(Plugin plugin, World world, Player player) {
-		super(plugin, world, player, "Rejuvenation");
+	public Rejuvenation(Plugin plugin, Player player) {
+		super(plugin, player, "Rejuvenation");
 		mInfo.mScoreboardId = "Rejuvenation";
 		mInfo.mShorthandName = "Rjv";
 		mInfo.mDescriptions.add("You and all other players in a 12 block radius regenerate 5% of their max health every 5 seconds.");
@@ -53,7 +52,7 @@ public class Rejuvenation extends Ability {
 						double maxHealth = player.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue();
 						if (player.getHealth() != maxHealth) {
 							PlayerUtils.healPlayer(player, PERCENT_HEAL * maxHealth);
-							mWorld.spawnParticle(Particle.HEART, (player.getLocation()).add(0, 2, 0), 1, 0.07, 0.07, 0.07, 0.001);
+							player.getWorld().spawnParticle(Particle.HEART, (player.getLocation()).add(0, 2, 0), 1, 0.07, 0.07, 0.07, 0.001);
 						}
 					}
 				}

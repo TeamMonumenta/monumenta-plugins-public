@@ -19,8 +19,8 @@ public class ClericPassive extends Ability {
 
 	private int mTimer = 0;
 
-	public ClericPassive(Plugin plugin, World world, Player player) {
-		super(plugin, world, player, null);
+	public ClericPassive(Plugin plugin, Player player) {
+		super(plugin, player, null);
 	}
 
 	@Override

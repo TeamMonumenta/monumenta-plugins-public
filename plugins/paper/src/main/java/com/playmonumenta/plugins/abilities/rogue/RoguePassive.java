@@ -17,8 +17,8 @@ public class RoguePassive extends Ability {
 	public static final double PASSIVE_DAMAGE_ELITE_MODIFIER = 2.0;
 	public static final double PASSIVE_DAMAGE_BOSS_MODIFIER = 1.25;
 
-	public RoguePassive(Plugin plugin, World world, Player player) {
-		super(plugin, world, player, null);
+	public RoguePassive(Plugin plugin, Player player) {
+		super(plugin, player, null);
 	}
 
 	@Override

@@ -39,8 +39,8 @@ public class DefensiveLine extends Ability {
 
 	private final int mResistanceAmplifier;
 
-	public DefensiveLine(Plugin plugin, World world, Player player) {
-		super(plugin, world, player, "Defensive Line");
+	public DefensiveLine(Plugin plugin, Player player) {
+		super(plugin, player, "Defensive Line");
 		mInfo.mLinkedSpell = Spells.DEFENSIVE_LINE;
 		mInfo.mScoreboardId = "DefensiveLine";
 		mInfo.mShorthandName = "DL";
@@ -58,9 +58,10 @@ public class DefensiveLine extends Ability {
 			@Override
 			public void run() {
 				if (mPlayer.isHandRaised()) {
-					mWorld.playSound(mPlayer.getLocation(), Sound.BLOCK_ANVIL_PLACE, 1.25f, 1.35f);
-					mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_ILLUSIONER_CAST_SPELL, 1.25f, 1.1f);
-					mWorld.spawnParticle(Particle.FIREWORKS_SPARK, mPlayer.getLocation(), 35, 0.2, 0, 0.2, 0.25);
+					World world = mPlayer.getWorld();
+					world.playSound(mPlayer.getLocation(), Sound.BLOCK_ANVIL_PLACE, 1.25f, 1.35f);
+					world.playSound(mPlayer.getLocation(), Sound.ENTITY_ILLUSIONER_CAST_SPELL, 1.25f, 1.1f);
+					world.spawnParticle(Particle.FIREWORKS_SPARK, mPlayer.getLocation(), 35, 0.2, 0, 0.2, 0.25);
 
 					List<Player> players = PlayerUtils.playersInRange(mPlayer, RADIUS, true);
 
@@ -71,7 +72,7 @@ public class DefensiveLine extends Ability {
 						}
 
 						Location loc = player.getLocation().add(0, 1, 0);
-						mWorld.spawnParticle(Particle.SPELL_INSTANT, loc, 35, 0.4, 0.4, 0.4, 0.25);
+						world.spawnParticle(Particle.SPELL_INSTANT, loc, 35, 0.4, 0.4, 0.4, 0.25);
 
 						mPlugin.mPotionManager.addPotion(player, PotionID.APPLIED_POTION,
 								new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, DURATION, mResistanceAmplifier, true, true));
@@ -109,8 +110,8 @@ public class DefensiveLine extends Ability {
 
 									for (int i = 0; i < 20; i++) {
 										loc.add(dx[i], 0, dz[i]);
-										mWorld.spawnParticle(Particle.CRIT_MAGIC, loc, 3, 0.1, 0.1, 0.1, 0.125);
-										mWorld.spawnParticle(Particle.SPELL_INSTANT, loc, 1, 0, 0, 0, 0);
+										world.spawnParticle(Particle.CRIT_MAGIC, loc, 3, 0.1, 0.1, 0.1, 0.125);
+										world.spawnParticle(Particle.SPELL_INSTANT, loc, 1, 0, 0, 0, 0);
 										loc.subtract(dx[i], 0, dz[i]);
 									}
 								}

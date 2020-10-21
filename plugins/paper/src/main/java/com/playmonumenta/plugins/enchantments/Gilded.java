@@ -8,7 +8,6 @@ import org.bukkit.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
-import org.bukkit.World;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -59,7 +58,7 @@ public class Gilded implements BaseEnchantment {
 	}
 
 	@Override
-	public void tick(Plugin plugin, World world, Player player, int level) {
+	public void tick(Plugin plugin, Player player, int level) {
 		final Particle.DustOptions color;
 		final int count;
 		switch (level) {
@@ -86,7 +85,7 @@ public class Gilded implements BaseEnchantment {
 				other.spawnParticle(Particle.REDSTONE, loc, count, 0.3, 0.5, 0.3, color);
 			}
 		} else {
-			world.spawnParticle(Particle.REDSTONE, loc, count, 0.3, 0.5, 0.3, color);
+			player.getWorld().spawnParticle(Particle.REDSTONE, loc, count, 0.3, 0.5, 0.3, color);
 		}
 	}
 

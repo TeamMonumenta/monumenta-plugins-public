@@ -30,8 +30,8 @@ public class Quickdraw extends Ability {
 	private static final int QUICKDRAW_SLOWNESS_LEVEL = 2;
 	private static final int QUICKDRAW_PIERCING_BONUS = 1;
 
-	public Quickdraw(Plugin plugin, World world, Player player) {
-		super(plugin, world, player, "Quickdraw");
+	public Quickdraw(Plugin plugin, Player player) {
+		super(plugin, player, "Quickdraw");
 		mInfo.mLinkedSpell = Spells.QUICKDRAW;
 		mInfo.mScoreboardId = "Quickdraw";
 		mInfo.mShorthandName = "Qd";
@@ -47,9 +47,10 @@ public class Quickdraw extends Ability {
 		ItemStack inMainHand = mPlayer.getInventory().getItemInMainHand();
 		if (!mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.mLinkedSpell)
 				&& InventoryUtils.isBowItem(inMainHand)) {
-			mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_ARROW_SHOOT, 1, 1.4f);
-			mWorld.spawnParticle(Particle.CRIT, mPlayer.getEyeLocation().add(mPlayer.getLocation().getDirection()), 15, 0, 0, 0, 0.6f);
-			mWorld.spawnParticle(Particle.CRIT_MAGIC, mPlayer.getEyeLocation().add(mPlayer.getLocation().getDirection()), 15, 0, 0, 0, 0.6f);
+			World world = mPlayer.getWorld();
+			world.playSound(mPlayer.getLocation(), Sound.ENTITY_ARROW_SHOOT, 1, 1.4f);
+			world.spawnParticle(Particle.CRIT, mPlayer.getEyeLocation().add(mPlayer.getLocation().getDirection()), 15, 0, 0, 0, 0.6f);
+			world.spawnParticle(Particle.CRIT_MAGIC, mPlayer.getEyeLocation().add(mPlayer.getLocation().getDirection()), 15, 0, 0, 0, 0.6f);
 
 			Arrow arrow = mPlayer.launchProjectile(Arrow.class);
 			if (inMainHand.containsEnchantment(Enchantment.ARROW_FIRE)) {

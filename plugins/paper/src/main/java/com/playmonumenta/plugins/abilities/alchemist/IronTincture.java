@@ -47,8 +47,8 @@ public class IronTincture extends Ability {
 	private static final int IRON_TINCTURE_TICK_PERIOD = 2;
 	private static final double IRON_TINCTURE_VELOCITY = 0.7;
 
-	public IronTincture(Plugin plugin, World world, Player player) {
-		super(plugin, world, player, "Iron Tincture");
+	public IronTincture(Plugin plugin, Player player) {
+		super(plugin, player, "Iron Tincture");
 		mInfo.mLinkedSpell = Spells.IRON_TINCTURE;
 		mInfo.mScoreboardId = "IronTincture";
 		mInfo.mShorthandName = "IT";
@@ -71,8 +71,9 @@ public class IronTincture extends Ability {
 	public void cast(Action action) {
 		Location loc = mPlayer.getEyeLocation();
 		ItemStack itemTincture = new ItemStack(Material.SPLASH_POTION);
-		mWorld.playSound(loc, Sound.ENTITY_SNOWBALL_THROW, 1, 0.15f);
-		Item tincture = mWorld.dropItem(loc, itemTincture);
+		World world = mPlayer.getWorld();
+		world.playSound(loc, Sound.ENTITY_SNOWBALL_THROW, 1, 0.15f);
+		Item tincture = world.dropItem(loc, itemTincture);
 		tincture.setPickupDelay(Integer.MAX_VALUE);
 
 		Vector vel = mPlayer.getEyeLocation().getDirection().normalize();
@@ -90,7 +91,7 @@ public class IronTincture extends Ability {
 
 			@Override
 			public void run() {
-				mWorld.spawnParticle(Particle.SPELL, tincture.getLocation(), 3, 0, 0, 0, 0.1);
+				world.spawnParticle(Particle.SPELL, tincture.getLocation(), 3, 0, 0, 0, 0.1);
 
 				for (Player p : PlayerUtils.playersInRange(tincture.getLocation(), 1)) {
 					// Prevent players from picking up their own tincture instantly
@@ -98,9 +99,9 @@ public class IronTincture extends Ability {
 						continue;
 					}
 
-					mWorld.playSound(tincture.getLocation(), Sound.BLOCK_GLASS_BREAK, 1, 0.85f);
-					mWorld.spawnParticle(Particle.BLOCK_DUST, tincture.getLocation(), 50, 0.1, 0.1, 0.1, 0.1, Material.GLASS.createBlockData());
-					mWorld.spawnParticle(Particle.FIREWORKS_SPARK, tincture.getLocation(), 30, 0.1, 0.1, 0.1, 0.2);
+					world.playSound(tincture.getLocation(), Sound.BLOCK_GLASS_BREAK, 1, 0.85f);
+					world.spawnParticle(Particle.BLOCK_DUST, tincture.getLocation(), 50, 0.1, 0.1, 0.1, 0.1, Material.GLASS.createBlockData());
+					world.spawnParticle(Particle.FIREWORKS_SPARK, tincture.getLocation(), 30, 0.1, 0.1, 0.1, 0.2);
 					tincture.remove();
 
 					execute(mPlayer);
@@ -134,8 +135,9 @@ public class IronTincture extends Ability {
 
 		AbsorptionUtils.addAbsorption(player, absorption, absorption, IRON_TINCTURE_ABSORPTION_DURATION);
 
-		mWorld.playSound(player.getLocation(), Sound.ENTITY_ILLUSIONER_PREPARE_MIRROR, 1.2f, 1.0f);
-		mWorld.spawnParticle(Particle.FLAME, player.getLocation(), 30, 0.25, 0.1, 0.25, 0.125);
+		World world = mPlayer.getWorld();
+		world.playSound(player.getLocation(), Sound.ENTITY_ILLUSIONER_PREPARE_MIRROR, 1.2f, 1.0f);
+		world.spawnParticle(Particle.FLAME, player.getLocation(), 30, 0.25, 0.1, 0.25, 0.125);
 		new BukkitRunnable() {
 			double mRotation = 0;
 			double mY = 0.15;
@@ -148,8 +150,8 @@ public class IronTincture extends Ability {
 				for (int i = 0; i < 3; i++) {
 					double degree = Math.toRadians(mRotation + (i * 120));
 					loc.add(FastUtils.cos(degree) * mRadius, mY, FastUtils.sin(degree) * mRadius);
-					mWorld.spawnParticle(Particle.FLAME, loc, 1, 0.05, 0.05, 0.05, 0.05);
-					mWorld.spawnParticle(Particle.SPELL_INSTANT, loc, 2, 0.05, 0.05, 0.05, 0);
+					world.spawnParticle(Particle.FLAME, loc, 1, 0.05, 0.05, 0.05, 0.05);
+					world.spawnParticle(Particle.SPELL_INSTANT, loc, 2, 0.05, 0.05, 0.05, 0);
 					loc.subtract(FastUtils.cos(degree) * mRadius, mY, FastUtils.sin(degree) * mRadius);
 				}
 

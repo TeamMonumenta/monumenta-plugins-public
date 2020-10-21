@@ -38,8 +38,8 @@ public class Starfall extends Ability {
 	/* The player's getTicksLived() when the skill was last primed or cast */
 	private int mPrimedTick = -1;
 
-	public Starfall(Plugin plugin, World world, Player player) {
-		super(plugin, world, player, "Starfall");
+	public Starfall(Plugin plugin, Player player) {
+		super(plugin, player, "Starfall");
 		mInfo.mLinkedSpell = Spells.STARFALL;
 		mInfo.mScoreboardId = "Starfall";
 		mInfo.mShorthandName = "SF";
@@ -83,9 +83,10 @@ public class Starfall extends Ability {
 		mPrimedTick = mPlayer.getTicksLived();
 
 		Location loc = mPlayer.getEyeLocation();
-		mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_BLAZE_SHOOT, 1, 0.85f);
-		mWorld.spawnParticle(Particle.LAVA, mPlayer.getLocation(), 15, 0.25f, 0.1f, 0.25f);
-		mWorld.spawnParticle(Particle.FLAME, mPlayer.getLocation(), 30, 0.25f, 0.1f, 0.25f, 0.15f);
+		World world = mPlayer.getWorld();
+		world.playSound(mPlayer.getLocation(), Sound.ENTITY_BLAZE_SHOOT, 1, 0.85f);
+		world.spawnParticle(Particle.LAVA, mPlayer.getLocation(), 15, 0.25f, 0.1f, 0.25f);
+		world.spawnParticle(Particle.FLAME, mPlayer.getLocation(), 30, 0.25f, 0.1f, 0.25f, 0.15f);
 		Vector dir = loc.getDirection().normalize();
 		for (int i = 0; i < 25; i++) {
 			loc.add(dir);
@@ -109,14 +110,15 @@ public class Starfall extends Ability {
 			@Override
 			public void run() {
 				mT += 1;
+				World world = mPlayer.getWorld();
 				for (int i = 0; i < 8; i++) {
 					loc.subtract(0, 0.25, 0);
 					if (loc.getBlock().getType().isSolid()) {
 						if (loc.getY() - ogLoc.getY() <= 2) {
-							loc.getWorld().playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 1, 0);
-							mWorld.spawnParticle(Particle.FLAME, loc, 175, 0, 0, 0, 0.235F);
-							mWorld.spawnParticle(Particle.SMOKE_LARGE, loc, 50, 0, 0, 0, 0.2F);
-							mWorld.spawnParticle(Particle.EXPLOSION_NORMAL, loc, 50, 0, 0, 0, 0.2F);
+							world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 1, 0);
+							world.spawnParticle(Particle.FLAME, loc, 175, 0, 0, 0, 0.235F);
+							world.spawnParticle(Particle.SMOKE_LARGE, loc, 50, 0, 0, 0, 0.2F);
+							world.spawnParticle(Particle.EXPLOSION_NORMAL, loc, 50, 0, 0, 0, 0.2F);
 							this.cancel();
 
 							for (LivingEntity e : EntityUtils.getNearbyMobs(loc, STARFALL_RADIUS, mPlayer)) {
@@ -128,9 +130,9 @@ public class Starfall extends Ability {
 						}
 					}
 				}
-				loc.getWorld().playSound(loc, Sound.ENTITY_BLAZE_SHOOT, 1, 1);
-				mWorld.spawnParticle(Particle.FLAME, loc, 25, 0.25F, 0.25F, 0.25F, 0.1F);
-				mWorld.spawnParticle(Particle.SMOKE_LARGE, loc, 5, 0.25F, 0.25F, 0.25F, 0.1F);
+				world.playSound(loc, Sound.ENTITY_BLAZE_SHOOT, 1, 1);
+				world.spawnParticle(Particle.FLAME, loc, 25, 0.25F, 0.25F, 0.25F, 0.1F);
+				world.spawnParticle(Particle.SMOKE_LARGE, loc, 5, 0.25F, 0.25F, 0.25F, 0.1F);
 
 				if (mT >= 50) {
 					this.cancel();

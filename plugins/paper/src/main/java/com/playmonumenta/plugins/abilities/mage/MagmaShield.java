@@ -34,8 +34,8 @@ public class MagmaShield extends Ability {
 
 	private final int mDamage;
 
-	public MagmaShield(Plugin plugin, World world, Player player) {
-		super(plugin, world, player, "Magma Shield");
+	public MagmaShield(Plugin plugin, Player player) {
+		super(plugin, player, "Magma Shield");
 		mInfo.mLinkedSpell = Spells.MAGMA_SHIELD;
 		mInfo.mScoreboardId = "Magma";
 		mInfo.mShorthandName = "MS";
@@ -61,7 +61,8 @@ public class MagmaShield extends Ability {
 			}
 		}
 
-		mWorld.spawnParticle(Particle.SMOKE_LARGE, mPlayer.getLocation(), 15, 0.05, 0.05, 0.05, 0.1);
+		World world = mPlayer.getWorld();
+		world.spawnParticle(Particle.SMOKE_LARGE, mPlayer.getLocation(), 15, 0.05, 0.05, 0.05, 0.1);
 		new BukkitRunnable() {
 			final Location mLoc = mPlayer.getLocation();
 			double mRadius = 0;
@@ -80,8 +81,8 @@ public class MagmaShield extends Ability {
 					vec = VectorUtils.rotateYAxis(vec, mLoc.getYaw());
 
 					Location l = mLoc.clone().add(0, 0.1, 0).add(vec);
-					mWorld.spawnParticle(Particle.FLAME, l, 2, 0.15, 0.15, 0.15, 0.15);
-					mWorld.spawnParticle(Particle.SMOKE_NORMAL, l, 3, 0.15, 0.15, 0.15, 0.1);
+					world.spawnParticle(Particle.FLAME, l, 2, 0.15, 0.15, 0.15, 0.15);
+					world.spawnParticle(Particle.SMOKE_NORMAL, l, 3, 0.15, 0.15, 0.15, 0.1);
 				}
 
 				if (mRadius >= RADIUS + 1) {
@@ -91,9 +92,9 @@ public class MagmaShield extends Ability {
 
 		}.runTaskTimer(mPlugin, 0, 1);
 
-		mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_BLAZE_SHOOT, 1f, 0.75f);
-		mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_FIREWORK_ROCKET_LARGE_BLAST, 1f, 1.25f);
-		mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_BLAZE_SHOOT, 1f, 0.5f);
+		world.playSound(mPlayer.getLocation(), Sound.ENTITY_BLAZE_SHOOT, 1f, 0.75f);
+		world.playSound(mPlayer.getLocation(), Sound.ENTITY_FIREWORK_ROCKET_LARGE_BLAST, 1f, 1.25f);
+		world.playSound(mPlayer.getLocation(), Sound.ENTITY_BLAZE_SHOOT, 1f, 0.5f);
 	}
 
 	@Override
