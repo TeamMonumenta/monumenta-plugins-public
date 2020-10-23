@@ -98,7 +98,6 @@ public class PurpleHaze extends Ability {
 				int mCounter = 0;
 				@Override
 				public void run() {
-					World world = mPlayer.getWorld();
 					mCounter++;
 					if (mCounter % 20 == 0) {
 						for (Map.Entry<UUID, HazedMob> entry : mHazedMobs.entrySet()) {
@@ -116,6 +115,7 @@ public class PurpleHaze extends Ability {
 							damagee.setNoDamageTicks(ticks);
 							PotionUtils.applyPotion(e.mTriggeredBy, damagee, new PotionEffect(PotionEffectType.SLOW, 40, 2, false, true));
 							Location loc = damagee.getLocation().add(0, 1, 0);
+							World world = damagee.getWorld();
 							world.spawnParticle(Particle.SPELL_WITCH, loc, 10, 0, 0.2, 0, 0.0001);
 							world.spawnParticle(Particle.FALLING_DUST, loc, 10, 0.2, 0.65, 0.2, Bukkit.createBlockData("purple_concrete"));
 							world.spawnParticle(Particle.FALLING_DUST, loc, 10, 0.2, 0.65, 0.2, Bukkit.createBlockData("pink_terracotta"));
@@ -133,6 +133,7 @@ public class PurpleHaze extends Ability {
 								Location loc = hazer.mMob.getLocation();
 								// Perhaps a ball of purple haze going from the dead mob to the next instead?
 
+								World world = hazer.mMob.getWorld();
 								world.spawnParticle(Particle.SPELL_WITCH, loc.clone().add(0, 1, 0), 40, 2, 1, 2, 0.0001);
 								world.spawnParticle(Particle.FALLING_DUST, loc.clone().add(0, 1, 0), 15, 1, 1, 1, Bukkit.createBlockData("purple_concrete"));
 								world.spawnParticle(Particle.FALLING_DUST, loc.clone().add(0, 1, 0), 15, 1, 1, 1, Bukkit.createBlockData("pink_terracotta"));

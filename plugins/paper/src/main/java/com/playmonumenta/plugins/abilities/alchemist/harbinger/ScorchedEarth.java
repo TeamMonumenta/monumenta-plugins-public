@@ -77,7 +77,6 @@ public class ScorchedEarth extends MultipleChargeAbility {
 			mMobHealthsTracker = new BukkitRunnable() {
 				@Override
 				public void run() {
-					World world = mPlayer.getWorld();
 					// Tick and remove expired zones
 					Iterator<Map.Entry<Location, Map.Entry<Player, Integer>>> iter = mZoneCenters.entrySet().iterator();
 					while (iter.hasNext()) {
@@ -90,6 +89,7 @@ public class ScorchedEarth extends MultipleChargeAbility {
 
 							Location loc = entry.getKey();
 
+							World world = timer.getKey().getWorld();
 							world.spawnParticle(Particle.SMOKE_LARGE, loc, 1, 2.1, 0.3, 2.1, 0);
 							world.spawnParticle(Particle.FLAME, loc, 1, 2, 0.1, 2, 0.1f);
 							world.spawnParticle(Particle.REDSTONE, loc, 2, 2.1, 0.3, 2.1, new Particle.DustOptions(SCORCHED_EARTH_COLOR_LIGHT, 1.5f));
@@ -129,6 +129,7 @@ public class ScorchedEarth extends MultipleChargeAbility {
 					// Damage the mobs
 					for (Map.Entry<LivingEntity, Player> entry : mobsToBeDamaged.entrySet()) {
 						LivingEntity mob = entry.getKey();
+						World world = entry.getValue().getWorld();
 						world.spawnParticle(Particle.FLAME, mob.getLocation().clone().add(0, 1, 0), 5, 0.25, 0.5, 0.25, 0.05);
 						world.spawnParticle(Particle.REDSTONE, mob.getLocation().clone().add(0, 1, 0), 15, 0.35, 0.5, 0.35, new Particle.DustOptions(SCORCHED_EARTH_COLOR_DARK, 1.0f));
 						world.spawnParticle(Particle.LAVA, mob.getLocation().clone().add(0, 1, 0), 3, 0.25, 0.5, 0.25, 0);
