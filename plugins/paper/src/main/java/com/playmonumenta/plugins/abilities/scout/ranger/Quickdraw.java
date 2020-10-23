@@ -13,6 +13,7 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
@@ -21,6 +22,7 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.utils.ItemUtils;
 
 public class Quickdraw extends Ability {
 
@@ -71,6 +73,14 @@ public class Quickdraw extends Ability {
 			Bukkit.getPluginManager().callEvent(eventLaunch);
 			if (!eventLaunch.isCancelled()) {
 				putOnCooldown();
+			}
+
+			//Delete bow if durability is 0 and isn't shattered.
+			//This is needed because QuickDraw doesn't consume durability, but there is a high-damage uncommon bow
+			//with 0 durability that should not be infinitely usable with the QuickDraw ability
+			Damageable damageable = (Damageable)inMainHand.getItemMeta();
+			if ((damageable.getDamage() == inMainHand.getType().getMaxDurability())  && !ItemUtils.isItemShattered(inMainHand)) {
+				inMainHand.setAmount(0);
 			}
 		}
 	}

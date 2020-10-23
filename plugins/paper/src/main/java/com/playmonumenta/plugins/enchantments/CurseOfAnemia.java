@@ -22,12 +22,18 @@ public class CurseOfAnemia implements BaseEnchantment {
 
 	@Override
 	public EnumSet<ItemSlot> validSlots() {
-		return EnumSet.of(ItemSlot.ARMOR);
+		return EnumSet.of(ItemSlot.MAINHAND, ItemSlot.OFFHAND, ItemSlot.ARMOR);
 	}
 
 	@Override
 	public void onRegain(Plugin plugin, Player player, int level, EntityRegainHealthEvent event) {
-		double reducedHealth = event.getAmount() * (1 - (0.1 * level));
+		double reducedHealth;
+		//Case if player has over 100% reduced hp, make hp gain 0 instead of losing hp
+		if (level >= 10) {
+			reducedHealth = 0;
+		} else {
+			reducedHealth = event.getAmount() * (1 - (0.1 * level));
+		}
 		event.setAmount(reducedHealth);
 	}
 }

@@ -58,7 +58,7 @@ public class TacticalManeuver extends MultipleChargeAbility {
 		ItemStack inMainHand = mPlayer.getInventory().getItemInMainHand();
 		ItemStack inOffHand = mPlayer.getInventory().getItemInOffHand();
 		if (InventoryUtils.isBowItem(inMainHand) || InventoryUtils.isBowItem(inOffHand) || InventoryUtils.isPotionItem(inMainHand) || inMainHand.getType().isBlock()
-				|| inMainHand.getType().isEdible() || inMainHand.getType() == Material.TRIDENT || inMainHand.getType() == Material.COMPASS) {
+				|| inMainHand.getType().isEdible() || inMainHand.getType() == Material.TRIDENT || inMainHand.getType() == Material.COMPASS || inMainHand.getType() == Material.SHIELD) {
 			return;
 		}
 
