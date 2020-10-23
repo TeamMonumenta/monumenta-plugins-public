@@ -95,7 +95,7 @@ public class ShieldBash extends Ability {
 								} else {
 									for (LivingEntity le : EntityUtils.getNearbyMobs(mob.getLocation(), SHIELD_BASH_2_RADIUS)) {
 										EntityUtils.damageEntity(mPlugin, le, damage, mPlayer);
-										if (EntityUtils.isBoss(mob) || EntityUtils.isElite(mob)) {
+										if (EntityUtils.isBoss(le) || EntityUtils.isElite(le)) {
 											le.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, SHIELD_BASH_STUN, 6));
 										} else {
 											EntityUtils.applyStun(mPlugin, SHIELD_BASH_STUN, le);
