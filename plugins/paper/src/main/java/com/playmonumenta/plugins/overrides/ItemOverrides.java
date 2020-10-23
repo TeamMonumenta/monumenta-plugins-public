@@ -98,7 +98,9 @@ public class ItemOverrides {
 	public void registerOverrides() {
 		BaseOverride monsterEggOverride = new MonsterEggOverride();
 		mItems.put(Material.BAT_SPAWN_EGG, monsterEggOverride);
+		mItems.put(Material.BEE_SPAWN_EGG, monsterEggOverride);
 		mItems.put(Material.BLAZE_SPAWN_EGG, monsterEggOverride);
+		mItems.put(Material.CAT_SPAWN_EGG, monsterEggOverride);
 		mItems.put(Material.CAVE_SPIDER_SPAWN_EGG, monsterEggOverride);
 		mItems.put(Material.CHICKEN_SPAWN_EGG, monsterEggOverride);
 		mItems.put(Material.COD_SPAWN_EGG, monsterEggOverride);
@@ -111,8 +113,10 @@ public class ItemOverrides {
 		mItems.put(Material.ENDERMAN_SPAWN_EGG, monsterEggOverride);
 		mItems.put(Material.ENDERMITE_SPAWN_EGG, monsterEggOverride);
 		mItems.put(Material.EVOKER_SPAWN_EGG, monsterEggOverride);
+		mItems.put(Material.FOX_SPAWN_EGG, monsterEggOverride);
 		mItems.put(Material.GHAST_SPAWN_EGG, monsterEggOverride);
 		mItems.put(Material.GUARDIAN_SPAWN_EGG, monsterEggOverride);
+		mItems.put(Material.HOGLIN_SPAWN_EGG, monsterEggOverride);
 		mItems.put(Material.HORSE_SPAWN_EGG, monsterEggOverride);
 		mItems.put(Material.HUSK_SPAWN_EGG, monsterEggOverride);
 		mItems.put(Material.LLAMA_SPAWN_EGG, monsterEggOverride);
@@ -120,12 +124,17 @@ public class ItemOverrides {
 		mItems.put(Material.MOOSHROOM_SPAWN_EGG, monsterEggOverride);
 		mItems.put(Material.MULE_SPAWN_EGG, monsterEggOverride);
 		mItems.put(Material.OCELOT_SPAWN_EGG, monsterEggOverride);
+		mItems.put(Material.PANDA_SPAWN_EGG, monsterEggOverride);
 		mItems.put(Material.PARROT_SPAWN_EGG, monsterEggOverride);
 		mItems.put(Material.PHANTOM_SPAWN_EGG, monsterEggOverride);
 		mItems.put(Material.PIG_SPAWN_EGG, monsterEggOverride);
+		mItems.put(Material.PIGLIN_BRUTE_SPAWN_EGG, monsterEggOverride);
+		mItems.put(Material.PIGLIN_SPAWN_EGG, monsterEggOverride);
+		mItems.put(Material.PILLAGER_SPAWN_EGG, monsterEggOverride);
 		mItems.put(Material.POLAR_BEAR_SPAWN_EGG, monsterEggOverride);
 		mItems.put(Material.PUFFERFISH_SPAWN_EGG, monsterEggOverride);
 		mItems.put(Material.RABBIT_SPAWN_EGG, monsterEggOverride);
+		mItems.put(Material.RAVAGER_SPAWN_EGG, monsterEggOverride);
 		mItems.put(Material.SALMON_SPAWN_EGG, monsterEggOverride);
 		mItems.put(Material.SHEEP_SPAWN_EGG, monsterEggOverride);
 		mItems.put(Material.SHULKER_SPAWN_EGG, monsterEggOverride);
@@ -136,18 +145,22 @@ public class ItemOverrides {
 		mItems.put(Material.SPIDER_SPAWN_EGG, monsterEggOverride);
 		mItems.put(Material.SQUID_SPAWN_EGG, monsterEggOverride);
 		mItems.put(Material.STRAY_SPAWN_EGG, monsterEggOverride);
+		mItems.put(Material.STRIDER_SPAWN_EGG, monsterEggOverride);
+		mItems.put(Material.TRADER_LLAMA_SPAWN_EGG, monsterEggOverride);
 		mItems.put(Material.TROPICAL_FISH_SPAWN_EGG, monsterEggOverride);
 		mItems.put(Material.TURTLE_SPAWN_EGG, monsterEggOverride);
 		mItems.put(Material.VEX_SPAWN_EGG, monsterEggOverride);
 		mItems.put(Material.VILLAGER_SPAWN_EGG, monsterEggOverride);
 		mItems.put(Material.VINDICATOR_SPAWN_EGG, monsterEggOverride);
+		mItems.put(Material.WANDERING_TRADER_SPAWN_EGG, monsterEggOverride);
 		mItems.put(Material.WITCH_SPAWN_EGG, monsterEggOverride);
 		mItems.put(Material.WITHER_SKELETON_SPAWN_EGG, monsterEggOverride);
 		mItems.put(Material.WOLF_SPAWN_EGG, monsterEggOverride);
+		mItems.put(Material.ZOGLIN_SPAWN_EGG, monsterEggOverride);
 		mItems.put(Material.ZOMBIE_HORSE_SPAWN_EGG, monsterEggOverride);
-		mItems.put(Material.ZOMBIE_PIGMAN_SPAWN_EGG, monsterEggOverride);
 		mItems.put(Material.ZOMBIE_SPAWN_EGG, monsterEggOverride);
 		mItems.put(Material.ZOMBIE_VILLAGER_SPAWN_EGG, monsterEggOverride);
+		mItems.put(Material.ZOMBIFIED_PIGLIN_SPAWN_EGG, monsterEggOverride);
 
 		BaseOverride bedOverride = new BedOverride();
 		mItems.put(Material.WHITE_BED, bedOverride);

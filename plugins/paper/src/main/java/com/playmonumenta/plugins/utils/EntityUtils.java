@@ -92,7 +92,7 @@ public class EntityUtils {
 	private static final EnumSet<EntityType> UNDEAD_MOBS = EnumSet.of(
 			EntityType.ZOMBIE,
 			EntityType.ZOMBIE_VILLAGER,
-			EntityType.PIG_ZOMBIE,
+			EntityType.ZOMBIFIED_PIGLIN,
 			EntityType.HUSK,
 		    EntityType.SKELETON,
 		    EntityType.WITHER_SKELETON,
