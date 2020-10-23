@@ -17,20 +17,46 @@ public class SpellPlayerAction extends Spell {
 		void run(Player player);
 	}
 
+	@FunctionalInterface
+	public interface TickAction {
+		/**
+		 * User function called once every two ticks while bolt is charging
+		 * @param entity  The entity charging the bolt
+		 * @param tick    Number of ticks since start of attack
+		 *      NOTE - Only even numbers are returned here!
+		 */
+		void run(Player player, int tick);
+	}
+
 	private LivingEntity mBoss;
 	private double mRange;
 	private Action mAction;
+	private TickAction mTickAction;
+	private int mTicks;
 
 	public SpellPlayerAction(LivingEntity boss, double range, Action action) {
 		mBoss = boss;
 		mRange = range;
 		mAction = action;
+		mTickAction = null;
+	}
+
+	public SpellPlayerAction(LivingEntity boss, double range, TickAction action) {
+		mBoss = boss;
+		mRange = range;
+		mTickAction = action;
+		mTicks = 0;
 	}
 
 	@Override
 	public void run() {
 		for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), mRange)) {
-			mAction.run(player);
+			if (mTickAction != null) {
+				mTicks += 2;
+				mTickAction.run(player, mTicks);
+			} else {
+				mAction.run(player);
+			}
 		}
 	}
 

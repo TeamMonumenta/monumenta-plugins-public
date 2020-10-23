@@ -97,6 +97,7 @@ public class SpellBaseSummon extends Spell {
 		}
 	}
 
+	@Override
 	public void run() {
 		List<Player> players = mGetPlayers.run();
 
@@ -153,6 +154,7 @@ public class SpellBaseSummon extends Spell {
 		return mCastTime;
 	}
 
+	@Override
 	public int duration() {
 		return mDuration;
 	}

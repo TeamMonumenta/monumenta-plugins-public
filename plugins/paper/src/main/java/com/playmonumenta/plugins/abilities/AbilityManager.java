@@ -411,7 +411,7 @@ public class AbilityManager {
 		return mManager;
 	}
 
-	public void updatePlayerAbilities(Player player) {
+	public AbilityCollection updatePlayerAbilities(Player player) {
 		// Clear self-given potions
 		mPlugin.mPotionManager.clearPotionIDType(player, PotionID.ABILITY_SELF);
 
@@ -468,8 +468,9 @@ public class AbilityManager {
 
 		if (player.getScoreboardTags().contains("disable_class") || player.getGameMode().equals(GameMode.SPECTATOR)) {
 			/* This player's abilities are disabled - give them an empty set and stop here */
-			mAbilities.put(player.getUniqueId(), new AbilityCollection(abilities));
-			return;
+			AbilityCollection collection = new AbilityCollection(player, abilities);
+			mAbilities.put(player.getUniqueId(), collection);
+			return collection;
 		}
 
 		try {
@@ -487,12 +488,14 @@ public class AbilityManager {
 			e.printStackTrace();
 		}
 
-		mAbilities.put(player.getUniqueId(), new AbilityCollection(abilities));
+		AbilityCollection collection = new AbilityCollection(player, abilities);
+		mAbilities.put(player.getUniqueId(), collection);
 
 		// Set up new class potion abilities
 		for (Ability abil : getPlayerAbilities(player).getAbilities()) {
 			abil.setupClassPotionEffects();
 		}
+		return collection;
 	}
 
 	public <T extends Ability> T getPlayerAbility(Player player, Class<T> cls) {
@@ -743,12 +746,13 @@ public class AbilityManager {
 
 	//---------------------------------------------------------------------------------------------------------------
 
-	//Private methods
+	//public methods
 	public AbilityCollection getPlayerAbilities(Player player) {
-		if (!mAbilities.containsKey(player.getUniqueId())) {
-			updatePlayerAbilities(player);
+		AbilityCollection collection = mAbilities.get(player.getUniqueId());
+		if (collection == null) {
+			return updatePlayerAbilities(player);
 		}
-		return mAbilities.get(player.getUniqueId());
+		return collection;
 	}
 
 	public void resetPlayerAbilities(Player player) {

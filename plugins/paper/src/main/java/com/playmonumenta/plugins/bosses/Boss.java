@@ -7,6 +7,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.event.entity.AreaEffectCloudApplyEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.event.entity.EntityPotionEffectEvent;
 import org.bukkit.event.entity.EntityTargetEvent;
 import org.bukkit.event.entity.PotionSplashEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
@@ -253,6 +254,12 @@ public class Boss {
 	public void nearbyEntityDeath(EntityDeathEvent event) {
 		for (BossAbilityGroup ability : mAbilities) {
 			ability.nearbyEntityDeath(event);
+		}
+	}
+
+	public void entityPotionEffectEvent(EntityPotionEffectEvent event) {
+		for (BossAbilityGroup ability : mAbilities) {
+			ability.entityPotionEffectEvent(event);
 		}
 	}
 

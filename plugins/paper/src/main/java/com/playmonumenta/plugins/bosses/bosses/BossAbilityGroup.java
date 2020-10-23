@@ -10,6 +10,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.entity.AreaEffectCloudApplyEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.event.entity.EntityPotionEffectEvent;
 import org.bukkit.event.entity.EntityTargetEvent;
 import org.bukkit.event.entity.PotionSplashEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
@@ -241,6 +242,10 @@ public abstract class BossAbilityGroup {
 	 * Boss-shot projectile hit something
 	 */
 	public void splashPotionAppliedToBoss(PotionSplashEvent event) {
+
+	}
+
+	public void entityPotionEffectEvent(EntityPotionEffectEvent event) {
 
 	}
 

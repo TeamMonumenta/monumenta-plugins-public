@@ -33,6 +33,7 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
+import org.bukkit.event.entity.EntityPotionEffectEvent;
 import org.bukkit.event.entity.EntitySpawnEvent;
 import org.bukkit.event.entity.EntityTargetEvent;
 import org.bukkit.event.entity.LingeringPotionSplashEvent;
@@ -48,101 +49,7 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.projectiles.ProjectileSource;
 
 import com.destroystokyo.paper.event.entity.EntityPathfindEvent;
-import com.playmonumenta.plugins.bosses.bosses.ArcaneLaserBoss;
-import com.playmonumenta.plugins.bosses.bosses.AuraLargeFatigueBoss;
-import com.playmonumenta.plugins.bosses.bosses.AuraLargeHungerBoss;
-import com.playmonumenta.plugins.bosses.bosses.AuraLargeSlownessBoss;
-import com.playmonumenta.plugins.bosses.bosses.AuraLargeWeaknessBoss;
-import com.playmonumenta.plugins.bosses.bosses.AuraSmallFatigueBoss;
-import com.playmonumenta.plugins.bosses.bosses.AuraSmallHungerBoss;
-import com.playmonumenta.plugins.bosses.bosses.AuraSmallSlownessBoss;
-import com.playmonumenta.plugins.bosses.bosses.AuraSmallWeaknessBoss;
-import com.playmonumenta.plugins.bosses.bosses.AvengerBoss;
-import com.playmonumenta.plugins.bosses.bosses.Azacor;
-import com.playmonumenta.plugins.bosses.bosses.AzacorNormal;
-import com.playmonumenta.plugins.bosses.bosses.BarrierBoss;
-import com.playmonumenta.plugins.bosses.bosses.BerserkerBoss;
-import com.playmonumenta.plugins.bosses.bosses.BlastResistBoss;
-import com.playmonumenta.plugins.bosses.bosses.BlockBreakBoss;
-import com.playmonumenta.plugins.bosses.bosses.BombTossBoss;
-import com.playmonumenta.plugins.bosses.bosses.BombTossNoBlockBreakBoss;
-import com.playmonumenta.plugins.bosses.bosses.BossAbilityGroup;
-import com.playmonumenta.plugins.bosses.bosses.CAxtal;
-import com.playmonumenta.plugins.bosses.bosses.CShuraPhaseOne;
-import com.playmonumenta.plugins.bosses.bosses.CShuraPhaseTwo;
-import com.playmonumenta.plugins.bosses.bosses.ChargerBoss;
-import com.playmonumenta.plugins.bosses.bosses.ChargerStrongBoss;
-import com.playmonumenta.plugins.bosses.bosses.CorruptInfestedBoss;
-import com.playmonumenta.plugins.bosses.bosses.CrowdControlImmunityBoss;
-import com.playmonumenta.plugins.bosses.bosses.CrowdControlResistanceBoss;
-import com.playmonumenta.plugins.bosses.bosses.CrownbearerBoss;
-import com.playmonumenta.plugins.bosses.bosses.CyanSummonBoss;
-import com.playmonumenta.plugins.bosses.bosses.DamageReducedBoss;
-import com.playmonumenta.plugins.bosses.bosses.DebuffHitBoss;
-import com.playmonumenta.plugins.bosses.bosses.DreadlingBoss;
-import com.playmonumenta.plugins.bosses.bosses.DreadnaughtParticleBoss;
-import com.playmonumenta.plugins.bosses.bosses.EarthshakeBoss;
-import com.playmonumenta.plugins.bosses.bosses.FireResistantBoss;
-import com.playmonumenta.plugins.bosses.bosses.FireballBoss;
-import com.playmonumenta.plugins.bosses.bosses.FlameLaserBoss;
-import com.playmonumenta.plugins.bosses.bosses.FlameNovaBoss;
-import com.playmonumenta.plugins.bosses.bosses.FloatBoss;
-import com.playmonumenta.plugins.bosses.bosses.FocusFireBoss;
-import com.playmonumenta.plugins.bosses.bosses.ForceBoss;
-import com.playmonumenta.plugins.bosses.bosses.FrostNovaBoss;
-import com.playmonumenta.plugins.bosses.bosses.GenericBoss;
-import com.playmonumenta.plugins.bosses.bosses.HalloweenCreeperBoss;
-import com.playmonumenta.plugins.bosses.bosses.HandSwapBoss;
-import com.playmonumenta.plugins.bosses.bosses.HeadlessHorsemanBoss;
-import com.playmonumenta.plugins.bosses.bosses.HiddenBoss;
-import com.playmonumenta.plugins.bosses.bosses.HungerCloudBoss;
-import com.playmonumenta.plugins.bosses.bosses.IceAspectBoss;
-import com.playmonumenta.plugins.bosses.bosses.IceBreakBoss;
-import com.playmonumenta.plugins.bosses.bosses.ImmortalElementalKaulBoss;
-import com.playmonumenta.plugins.bosses.bosses.InfestedBoss;
-import com.playmonumenta.plugins.bosses.bosses.InvisibleBoss;
-import com.playmonumenta.plugins.bosses.bosses.Kaul;
-import com.playmonumenta.plugins.bosses.bosses.LeapBoss;
-import com.playmonumenta.plugins.bosses.bosses.LivingBladeBoss;
-import com.playmonumenta.plugins.bosses.bosses.MagicArrowBoss;
-import com.playmonumenta.plugins.bosses.bosses.Masked;
-import com.playmonumenta.plugins.bosses.bosses.MeteorSlamBoss;
-import com.playmonumenta.plugins.bosses.bosses.MimicQueen;
-import com.playmonumenta.plugins.bosses.bosses.NoExperienceBoss;
-import com.playmonumenta.plugins.bosses.bosses.OldLabsBoss;
-import com.playmonumenta.plugins.bosses.bosses.Orangyboi;
-import com.playmonumenta.plugins.bosses.bosses.PlayerDamageOnlyBoss;
-import com.playmonumenta.plugins.bosses.bosses.PlayerTargetBoss;
-import com.playmonumenta.plugins.bosses.bosses.PrideBoss;
-import com.playmonumenta.plugins.bosses.bosses.PrimordialElementalKaulBoss;
-import com.playmonumenta.plugins.bosses.bosses.ProjectileDeflectionBoss;
-import com.playmonumenta.plugins.bosses.bosses.PulseLaserBoss;
-import com.playmonumenta.plugins.bosses.bosses.PunchResistBoss;
-import com.playmonumenta.plugins.bosses.bosses.RabbitGodBoss;
-import com.playmonumenta.plugins.bosses.bosses.RageBoss;
-import com.playmonumenta.plugins.bosses.bosses.RejuvenationBoss;
-import com.playmonumenta.plugins.bosses.bosses.SeekingProjectileBoss;
-import com.playmonumenta.plugins.bosses.bosses.ShieldSwitchBoss;
-import com.playmonumenta.plugins.bosses.bosses.SnowballDamageBoss;
-import com.playmonumenta.plugins.bosses.bosses.SpectreParticleBoss;
-import com.playmonumenta.plugins.bosses.bosses.SwingBoss;
-import com.playmonumenta.plugins.bosses.bosses.SwordsageRichter;
-import com.playmonumenta.plugins.bosses.bosses.TCalin;
-import com.playmonumenta.plugins.bosses.bosses.TealQuestBoss;
-import com.playmonumenta.plugins.bosses.bosses.TpBehindBoss;
-import com.playmonumenta.plugins.bosses.bosses.TpBehindTargetedBoss;
-import com.playmonumenta.plugins.bosses.bosses.TpSwapBoss;
-import com.playmonumenta.plugins.bosses.bosses.TrackingProjectileBoss;
-import com.playmonumenta.plugins.bosses.bosses.TrainingDummyBoss;
-import com.playmonumenta.plugins.bosses.bosses.TsunamiChargerBoss;
-import com.playmonumenta.plugins.bosses.bosses.UnstableBoss;
-import com.playmonumenta.plugins.bosses.bosses.Varcosa;
-import com.playmonumenta.plugins.bosses.bosses.Virius;
-import com.playmonumenta.plugins.bosses.bosses.VolatileBoss;
-import com.playmonumenta.plugins.bosses.bosses.WeaponSwitchBoss;
-import com.playmonumenta.plugins.bosses.bosses.WinterSnowmanEventBoss;
-import com.playmonumenta.plugins.bosses.bosses.WitherHitBoss;
-import com.playmonumenta.plugins.bosses.bosses.WrathBoss;
+import com.playmonumenta.plugins.bosses.bosses.*;
 import com.playmonumenta.plugins.bosses.bosses.gray.GrayBookSummoner;
 import com.playmonumenta.plugins.bosses.bosses.gray.GrayDemonSummoner;
 import com.playmonumenta.plugins.bosses.bosses.gray.GrayGolemSummoner;
@@ -272,6 +179,8 @@ public class BossManager implements Listener {
 		mStatelessBosses.put(CrowdControlResistanceBoss.identityTag, (Plugin p, LivingEntity e) -> new CrowdControlResistanceBoss(p, e));
 		mStatelessBosses.put(MeteorSlamBoss.identityTag, (Plugin p, LivingEntity e) -> new MeteorSlamBoss(p, e));
 		mStatelessBosses.put(SwingBoss.identityTag, (Plugin p, LivingEntity e) -> new SwingBoss(p, e));
+		mStatelessBosses.put(MistMob.identityTag, (Plugin p, LivingEntity e) -> new MistMob(p, e));
+		mStatelessBosses.put(HookBoss.identityTag, (Plugin p, LivingEntity e) -> new HookBoss(p, e));
 
 
 		/* Stateful bosses have a remembered spawn location and end location where a redstone block is set when they die */
@@ -293,6 +202,9 @@ public class BossManager implements Listener {
 		mStatefulBosses.put(HeadlessHorsemanBoss.identityTag, (Plugin p, LivingEntity e, Location s, Location l) -> new HeadlessHorsemanBoss(p, e, s, l));
 		mStatefulBosses.put(Varcosa.identityTag, (Plugin p, LivingEntity e, Location s, Location l) -> new Varcosa(p, e, s, l));
 		mStatefulBosses.put(TealQuestBoss.identityTag, (Plugin p, LivingEntity e, Location s, Location l) -> new TealQuestBoss(p, e, s, l));
+		mStatefulBosses.put(VarcosaSummonerBoss.identityTag, (Plugin p, LivingEntity e, Location s, Location l) -> new VarcosaSummonerBoss(p, e, s, l));
+		mStatefulBosses.put(VarcosasLastBreathBoss.identityTag, (Plugin p, LivingEntity e, Location s, Location l) -> new VarcosasLastBreathBoss(p, e, s, l));
+		mStatefulBosses.put(VarcosaLingeringWillBoss.identityTag, (Plugin p, LivingEntity e, Location s, Location l) -> new VarcosaLingeringWillBoss(p, e, s, l));
 
 		/* All bosses have a deserializer which gives the boss back their abilities when chunks re-load */
 		mBossDeserializers = new HashMap<String, BossDeserializer>();
@@ -382,6 +294,9 @@ public class BossManager implements Listener {
 		mBossDeserializers.put(AvengerBoss.identityTag, (Plugin p, LivingEntity e) -> AvengerBoss.deserialize(p, e));
 		mBossDeserializers.put(RageBoss.identityTag, (Plugin p, LivingEntity e) -> RageBoss.deserialize(p, e));
 		mBossDeserializers.put(Varcosa.identityTag, (Plugin p, LivingEntity e) -> Varcosa.deserialize(p, e));
+		mBossDeserializers.put(VarcosaSummonerBoss.identityTag, (Plugin p, LivingEntity e) -> VarcosaSummonerBoss.deserialize(p, e));
+		mBossDeserializers.put(VarcosasLastBreathBoss.identityTag, (Plugin p, LivingEntity e) -> VarcosasLastBreathBoss.deserialize(p, e));
+		mBossDeserializers.put(VarcosaLingeringWillBoss.identityTag, (Plugin p, LivingEntity e) -> VarcosaLingeringWillBoss.deserialize(p, e));
 		mBossDeserializers.put(EarthshakeBoss.identityTag, (Plugin p, LivingEntity e) -> EarthshakeBoss.deserialize(p, e));
 		mBossDeserializers.put(MagicArrowBoss.identityTag, (Plugin p, LivingEntity e) -> MagicArrowBoss.deserialize(p, e));
 		mBossDeserializers.put(SeekingProjectileBoss.identityTag, (Plugin p, LivingEntity e) -> SeekingProjectileBoss.deserialize(p, e));
@@ -395,6 +310,8 @@ public class BossManager implements Listener {
 		mBossDeserializers.put(MeteorSlamBoss.identityTag, (Plugin p, LivingEntity e) -> MeteorSlamBoss.deserialize(p, e));
 		mBossDeserializers.put(SwingBoss.identityTag, (Plugin p, LivingEntity e) -> SwingBoss.deserialize(p, e));
 		mBossDeserializers.put(TealQuestBoss.identityTag, (Plugin p, LivingEntity e) -> TealQuestBoss.deserialize(p, e));
+		mBossDeserializers.put(MistMob.identityTag, (Plugin p, LivingEntity e) -> MistMob.deserialize(p, e));
+		mBossDeserializers.put(HookBoss.identityTag, (Plugin p, LivingEntity e) -> HookBoss.deserialize(p, e));
 
 	}
 
@@ -559,6 +476,14 @@ public class BossManager implements Listener {
 			if (boss != null) {
 				boss.splashPotionAppliedToBoss(event);
 			}
+		}
+	}
+
+	@EventHandler(priority = EventPriority.HIGHEST)
+	public void entityPotionEffectEvent(EntityPotionEffectEvent event) {
+		Boss boss = mBosses.get(event.getEntity().getUniqueId());
+		if (boss != null) {
+			boss.entityPotionEffectEvent(event);
 		}
 	}
 
@@ -853,6 +778,16 @@ public class BossManager implements Listener {
 					}
 				}
 			}
+		}
+	}
+
+	public void manuallyRegisterBoss(LivingEntity entity, BossAbilityGroup ability) {
+		Boss boss = mBosses.get(entity.getUniqueId());
+		if (boss == null) {
+			boss = new Boss(mPlugin, ability);
+			mBosses.put(entity.getUniqueId(), boss);
+		} else {
+			boss.add(ability);
 		}
 	}
 
