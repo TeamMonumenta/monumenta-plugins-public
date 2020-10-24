@@ -61,6 +61,11 @@ public class VarcosasLastBreathBoss extends BossAbilityGroup {
 		});
 	}
 
+	@Override
+	public String serialize() {
+		return SerializationUtils.statefulBossSerializer(mSpawnLoc, mEndLoc);
+	}
+
 	public VarcosasLastBreathBoss(Plugin plugin, LivingEntity boss, Location spawnLoc, Location endLoc) {
 		mPlugin = plugin;
 		mBoss = boss;

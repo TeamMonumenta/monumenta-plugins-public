@@ -60,6 +60,11 @@ public class VarcosaLingeringWillBoss extends BossAbilityGroup {
 		});
 	}
 
+	@Override
+	public String serialize() {
+		return SerializationUtils.statefulBossSerializer(mSpawnLoc, mEndLoc);
+	}
+
 	public VarcosaLingeringWillBoss(Plugin plugin, LivingEntity boss, Location spawnLoc, Location endLoc) {
 		mPlugin = plugin;
 		mBoss = boss;
