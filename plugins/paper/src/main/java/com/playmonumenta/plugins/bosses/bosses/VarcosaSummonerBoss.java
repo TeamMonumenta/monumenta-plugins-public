@@ -122,7 +122,7 @@ public class VarcosaSummonerBoss extends BossAbilityGroup {
 	@Override
 	public void init() {
 		int bossTargetHp = 0;
-		int hpDelta = 500;
+		int hpDelta = 650;
 		int playerCount = BossUtils.getPlayersInRangeForHealthScaling(mBoss, detectionRange);
 		while (playerCount > 0) {
 			bossTargetHp = bossTargetHp + hpDelta;

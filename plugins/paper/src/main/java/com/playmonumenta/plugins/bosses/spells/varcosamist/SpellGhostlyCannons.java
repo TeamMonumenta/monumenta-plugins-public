@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.bosses.spells.varcosamist;
 import java.util.Collections;
 import java.util.List;
 
+import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -28,6 +29,7 @@ public class SpellGhostlyCannons extends Spell {
 	private Location mCenter;
 	private boolean mPhaseThree;
 	private String mDio;
+	private static final Particle.DustOptions CANNONS_COLOR = new Particle.DustOptions(Color.fromRGB(128, 128, 128), 1.0f);
 
 	public SpellGhostlyCannons(Plugin plugin, LivingEntity boss, double range, Location center, boolean phaseThree, String dio) {
 		mPlugin = plugin;
@@ -119,7 +121,7 @@ public class SpellGhostlyCannons extends Spell {
 						double dist = player.getLocation().distance(mLoc);
 						double step = dist < 10 ? 0.5 : (dist < 15 ? 1 : 3);
 						for (double deg = 0; deg < 360; deg += (step * 45)) {
-							player.spawnParticle(Particle.SMOKE_NORMAL, mLoc.clone().add(FastUtils.cos(deg), 0, FastUtils.sin(deg)), 1, 0.15, 0.15, 0.15, 0);
+							player.spawnParticle(Particle.REDSTONE, mLoc.clone().add(FastUtils.cos(deg), 0, FastUtils.sin(deg)), 1, 0.15, 0.15, 0.15, 0, CANNONS_COLOR);
 						}
 					}
 				}

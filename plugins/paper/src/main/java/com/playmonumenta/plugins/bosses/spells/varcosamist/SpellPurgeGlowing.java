@@ -22,6 +22,7 @@ public class SpellPurgeGlowing extends Spell {
 		if (mCooldown <= 0) {
 			mCooldown = mTimer;
 			mBoss.removePotionEffect(PotionEffectType.GLOWING);
+			mBoss.addScoreboardTag("HiddenMob");
 		}
 	}
 

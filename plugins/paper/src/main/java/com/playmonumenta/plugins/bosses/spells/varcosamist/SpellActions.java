@@ -35,7 +35,7 @@ public class SpellActions {
 
 	public static SpellPlayerAction getTooHighAction(LivingEntity boss, Location center) {
 		return new SpellPlayerAction(boss, 50, (player, tick) -> {
-			if (player.getLocation().getBlockY() >= center.getY() + 3 && tick % 20 == 0) {
+			if (player.getLocation().getBlockY() >= center.getY() + 3) {
 				Vector velocity = player.getVelocity();
 				BossUtils.bossDamagePercent(boss, player, 0.025);
 				player.setVelocity(velocity);
