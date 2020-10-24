@@ -28,7 +28,7 @@ public class SpellSummonConstantly extends Spell {
 	private int mDuration;
 	private int mTimer;
 	private int mRadius;
-	private int mSpawnsPerPlayer;
+	private final int mBaseSpawns;
 	private Location mCenter;
 	private List<Vector> mLocationOffsets;
 	private final BossAbilityGroup mSummoner;
@@ -42,7 +42,7 @@ public class SpellSummonConstantly extends Spell {
 		mTimer = mDuration / 3;
 		mCenter = center;
 		mRadius = radius;
-		mSpawnsPerPlayer = spawnsPerPlayer + BossUtils.getPlayersInRangeForHealthScaling(boss, radius) - 1;
+		mBaseSpawns = spawnsPerPlayer;
 		mSummoner = summoner;
 
 		mLocationOffsets = new ArrayList<Vector>();
@@ -66,6 +66,10 @@ public class SpellSummonConstantly extends Spell {
 			for (Player player : mCenter.getNearbyPlayers(50)) {
 				player.playSound(player.getLocation(), Sound.ENTITY_EVOKER_PREPARE_SUMMON, SoundCategory.HOSTILE, 1, 1);
 			}
+
+			//Hopefully shouldn't break - the idea is that it will refresh how many mobs per player after each death, but it will be based upon a final, unchanging number mBaseSpawns. Also it only changes it when the spell is cast
+			int spawnsPerPlayer = BossUtils.getPlayersInRangeForHealthScaling(mCenter, 50) - 1 + mBaseSpawns;
+
 			mTimer = mDuration;
 			Collection<ArmorStand> stands = mCenter.getNearbyEntitiesByType(ArmorStand.class, mRadius);
 
@@ -101,7 +105,7 @@ public class SpellSummonConstantly extends Spell {
 
 					// Stop once the right number of mobs have been summoned for this player
 					numSummoned++;
-					if (numSummoned >= mSpawnsPerPlayer) {
+					if (numSummoned >= spawnsPerPlayer) {
 						break;
 					}
 				}
