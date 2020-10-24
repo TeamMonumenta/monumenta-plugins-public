@@ -27,9 +27,9 @@ import com.playmonumenta.plugins.bosses.BossBarManager;
 import com.playmonumenta.plugins.bosses.BossBarManager.BossHealthAction;
 import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.spells.Spell;
-import com.playmonumenta.plugins.bosses.spells.SpellBlockBreak;
 import com.playmonumenta.plugins.bosses.spells.SpellPlayerAction;
 import com.playmonumenta.plugins.bosses.spells.SpellPurgeNegatives;
+import com.playmonumenta.plugins.bosses.spells.kaul.SpellKaulBlockBreak;
 import com.playmonumenta.plugins.bosses.spells.varcosamist.SpellActions;
 import com.playmonumenta.plugins.bosses.spells.varcosamist.SpellDeathlyCharge;
 import com.playmonumenta.plugins.bosses.spells.varcosamist.SpellGhostlyCannons;
@@ -100,8 +100,8 @@ public class VarcosaLingeringWillBoss extends BossAbilityGroup {
 
 		runnable.runTaskTimer(plugin, 20, 20 * 2);
 		List<Spell> passiveSpells = Arrays.asList(
-				new SpellSummonConstantly(mSummonableMobs, 20 * 13, 50, 3, 2, mCenter, mBoss, this),
-				new SpellJibberJabber(mBoss, mSpeak, detectionRange), new SpellPurgeNegatives(mBoss, 2), new SpellPurgeGlowing(mBoss, 20 * 15), new SpellBlockBreak(mBoss),
+				new SpellSummonConstantly(mSummonableMobs, 20 * 16, 50, 4, 2, mCenter, mBoss, this),
+				new SpellJibberJabber(mBoss, mSpeak, detectionRange), new SpellPurgeNegatives(mBoss, 2), new SpellPurgeGlowing(mBoss, 20 * 15), new SpellKaulBlockBreak(mBoss),
 				action, tooHighAction
 				);
 
@@ -145,13 +145,13 @@ public class VarcosaLingeringWillBoss extends BossAbilityGroup {
 	public void init() {
 		mBoss.teleport(mSpawnLoc);
 		int bossTargetHp = 0;
-		int bossHpDelta = 1200;
+		int bossHpDelta = 1000;
 		int playersInRange = BossUtils.getPlayersInRangeForHealthScaling(mBoss, detectionRange);
 		int armor = (int)(Math.sqrt(playersInRange * 2) - 1);
 		armor = playersInRange / 2 + 1;
 		while (playersInRange > 0) {
 			bossTargetHp += bossHpDelta;
-			bossHpDelta = (int)Math.floor(bossHpDelta / 1.5 + 100);
+			bossHpDelta = (int)Math.floor(bossHpDelta / 1.8 + 100);
 			playersInRange--;
 		}
 

@@ -28,10 +28,10 @@ import com.playmonumenta.plugins.bosses.BossBarManager;
 import com.playmonumenta.plugins.bosses.BossBarManager.BossHealthAction;
 import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.spells.Spell;
-import com.playmonumenta.plugins.bosses.spells.SpellBlockBreak;
 import com.playmonumenta.plugins.bosses.spells.SpellConditionalTeleport;
 import com.playmonumenta.plugins.bosses.spells.SpellPlayerAction;
 import com.playmonumenta.plugins.bosses.spells.SpellPurgeNegatives;
+import com.playmonumenta.plugins.bosses.spells.kaul.SpellKaulBlockBreak;
 import com.playmonumenta.plugins.bosses.spells.varcosamist.SpellActions;
 import com.playmonumenta.plugins.bosses.spells.varcosamist.SpellDeathlyCharge;
 import com.playmonumenta.plugins.bosses.spells.varcosamist.SpellGhostlyCannons;
@@ -99,9 +99,9 @@ public class VarcosasLastBreathBoss extends BossAbilityGroup {
 		//Passives
 
 		List<Spell> passiveSpells = Arrays.asList(
-				new SpellSummonConstantly(mSummonableMobs, 20 * 16, 50, 2, 2, mCenter, mBoss, this),
+				new SpellSummonConstantly(mSummonableMobs, 20 * 16, 50, 4, 2, mCenter, mBoss, this),
 				new SpellConditionalTeleport(mBoss, mSpawnLoc, b -> b.getLocation().getBlock().getType() == Material.WATER),
-				new SpellJibberJabber(mBoss, mSpeak, detectionRange), new SpellPurgeNegatives(mBoss, 20 * 3), new SpellBlockBreak(mBoss),
+				new SpellJibberJabber(mBoss, mSpeak, detectionRange), new SpellPurgeNegatives(mBoss, 20 * 3), new SpellKaulBlockBreak(mBoss),
 				action, tooHighAction
 				);
 
@@ -136,12 +136,12 @@ public class VarcosasLastBreathBoss extends BossAbilityGroup {
 	public void init() {
 		mBoss.teleport(mCenter.clone().add(0, 1, 0));
 		int bossTargetHp = 0;
-		int bossHpDelta = 1400;
+		int bossHpDelta = 1200;
 		int playersInRange = BossUtils.getPlayersInRangeForHealthScaling(mBoss, detectionRange);
 		int armor = (int)(Math.sqrt(playersInRange * 2) - 1);
 		while (playersInRange > 0) {
 			bossTargetHp += bossHpDelta;
-			bossHpDelta = (int)Math.floor(bossHpDelta / 1.5 + 100);
+			bossHpDelta = (int)Math.floor(bossHpDelta / 1.8 + 100);
 			playersInRange--;
 		}
 

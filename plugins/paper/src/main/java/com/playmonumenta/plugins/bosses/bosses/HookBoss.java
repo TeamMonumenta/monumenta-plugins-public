@@ -32,12 +32,12 @@ public class HookBoss extends BossAbilityGroup {
 	private static final double HITBOX_LENGTH = 0.5;
 	private static final boolean COLLIDES_WITH_BLOCKS = true;
 	private static final boolean LINGERS = true;
-	private static final int DAMAGE = 20;
+	private static final int DAMAGE = 30;
 
 	LivingEntity mBoss;
 
 	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
-		return new SeekingProjectileBoss(plugin, boss);
+		return new HookBoss(plugin, boss);
 	}
 
 	public HookBoss(Plugin plugin, LivingEntity boss) {
