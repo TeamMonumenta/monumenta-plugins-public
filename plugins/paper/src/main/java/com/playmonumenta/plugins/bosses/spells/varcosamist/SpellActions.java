@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.bosses.spells.varcosamist;
 
 import java.util.Collection;
 
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.LivingEntity;
@@ -13,8 +14,6 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.bosses.spells.SpellPlayerAction;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.scriptedquests.utils.MetadataUtils;
-
-import net.md_5.bungee.api.ChatColor;
 
 public class SpellActions {
 	//Not technically a spell - just putting the repeated actions in a seperate class
@@ -35,10 +34,18 @@ public class SpellActions {
 
 	public static SpellPlayerAction getTooHighAction(LivingEntity boss, Location center) {
 		return new SpellPlayerAction(boss, 50, (player, tick) -> {
-			if (player.getLocation().getBlockY() >= center.getY() + 3) {
-				Vector velocity = player.getVelocity();
-				BossUtils.bossDamagePercent(boss, player, 0.025);
-				player.setVelocity(velocity);
+			if (player.isOnGround()) {
+				if (player.getLocation().getBlockY() >= center.getY() + 2) {
+					Vector velocity = player.getVelocity();
+					BossUtils.bossDamagePercent(boss, player, 0.025);
+					player.setVelocity(velocity);
+				}
+			} else {
+				if (player.getLocation().subtract(0, 5, 0).getBlock().getType().isSolid() && player.getLocation().getY() > center.getY() + 5) {
+					Vector velocity = player.getVelocity();
+					BossUtils.bossDamagePercent(boss, player, 0.025);
+					player.setVelocity(velocity);
+				}
 			}
 		});
 	}
