@@ -9,7 +9,7 @@ import org.bukkit.inventory.ItemStack;
 
 import com.playmonumenta.plugins.Plugin;
 
-public class EnchantmentTableOverride extends BaseOverride {
+public class EnchantmentTableOverride extends UnbreakableOnBedrockOverride {
 	@Override
 	public boolean rightClickBlockInteraction(Plugin plugin, Player player, Action action, ItemStack item, Block block, PlayerInteractEvent event) {
 		return (player == null || player.getGameMode() == GameMode.CREATIVE);
