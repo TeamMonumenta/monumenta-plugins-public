@@ -106,7 +106,9 @@ public class VarcosasLastBreathBoss extends BossAbilityGroup {
 		List<Spell> passiveSpells = Arrays.asList(
 				new SpellSummonConstantly(mSummonableMobs, 20 * 16, 50, 4, 2, mCenter, mBoss, this),
 				new SpellConditionalTeleport(mBoss, mSpawnLoc, b -> b.getLocation().getBlock().getType() == Material.WATER),
-				new SpellJibberJabber(mBoss, mSpeak, detectionRange), new SpellPurgeNegatives(mBoss, 20 * 3), new SpellKaulBlockBreak(mBoss),
+				new SpellJibberJabber(mBoss, mSpeak, detectionRange),
+				new SpellPurgeNegatives(mBoss, 20 * 3),
+				new SpellKaulBlockBreak(mBoss, 52),
 				action, tooHighAction
 				);
 

@@ -97,7 +97,7 @@ public class PrimordialElementalKaulBoss extends BossAbilityGroup {
 		));
 
 		List<Spell> passiveSpells = Arrays.asList(
-			new SpellKaulBlockBreak(mBoss),
+			new SpellKaulBlockBreak(mBoss, 8),
 			new SpellBaseParticleAura(boss, 1,
 				(LivingEntity mBoss) -> {
 					world.spawnParticle(Particle.FALLING_DUST, mBoss.getLocation().add(0, mBoss.getHeight() / 2, 0), 8, 0.35,
