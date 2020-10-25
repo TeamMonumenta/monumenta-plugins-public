@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
@@ -15,6 +16,7 @@ import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -32,6 +34,7 @@ import com.playmonumenta.plugins.bosses.spells.mimicqueen.SpellSummonMiniboss;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
+import com.playmonumenta.plugins.utils.SerializationUtils;
 
 public class MimicQueen extends BossAbilityGroup {
 	public static final String identityTag = "boss_mimicqueen";
@@ -50,13 +53,26 @@ public class MimicQueen extends BossAbilityGroup {
 	private static final int DAMAGE = 35;
 
 	private LivingEntity mBoss;
+	private final Location mSpawnLoc;
+	private final Location mEndLoc;
 
 	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
-		return new MimicQueen(plugin, boss);
+		return SerializationUtils.statefulBossDeserializer(boss, identityTag, (spawnLoc, endLoc) -> {
+			return new MimicQueen(plugin, boss, spawnLoc, endLoc);
+		});
 	}
 
-	public MimicQueen(Plugin plugin, LivingEntity boss) {
+	@Override
+	public String serialize() {
+		return SerializationUtils.statefulBossSerializer(mSpawnLoc, mEndLoc);
+	}
+
+
+	public MimicQueen(Plugin plugin, LivingEntity boss, Location spawnLoc, Location endLoc) {
 		mBoss = boss;
+		mSpawnLoc = spawnLoc;
+		mEndLoc = endLoc;
+
 
 		SpellManager activeSpells = new SpellManager(Arrays.asList(
 				new SpellMultihitHeal(plugin, boss),
@@ -125,5 +141,10 @@ public class MimicQueen extends BossAbilityGroup {
 		PlayerUtils.executeCommandOnNearbyPlayers(loc, detectionRange + 20, "title @s title [\"\",{\"text\":\"Mimic Queen\",\"color\":\"dark_purple\",\"bold\":true}]");
 		PlayerUtils.executeCommandOnNearbyPlayers(loc, detectionRange + 20, "title @s subtitle [\"\",{\"text\":\"Varcosa's Plunder Protector\",\"color\":\"purple\",\"bold\":true}]");
 		PlayerUtils.executeCommandOnNearbyPlayers(loc, detectionRange + 20, "playsound minecraft:entity.wither.spawn master @s ~ ~ ~ 10 0.7");
+	}
+
+	@Override
+	public void death(EntityDeathEvent event) {
+		mEndLoc.getBlock().setType(Material.REDSTONE_BLOCK);
 	}
 }
