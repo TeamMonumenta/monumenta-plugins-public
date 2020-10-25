@@ -242,7 +242,6 @@ public class ItemOverrides {
 		BaseOverride unbreakableOverride = new UnbreakableOnBedrockOverride();
 		mItems.put(Material.SPAWNER, unbreakableOverride);
 		mItems.put(Material.SLIME_BLOCK, unbreakableOverride);
-		mItems.put(Material.ENCHANTING_TABLE, unbreakableOverride);
 
 		BaseOverride flowerOverride = new FlowerPotOverride();
 		mItems.put(Material.FLOWER_POT, flowerOverride);
