@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.overrides;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
@@ -27,7 +28,8 @@ public class PumpkinPieOverride extends BaseOverride {
 			return true;
 		}
 
-		((Creeper)clickedEntity).setIgnited(true);
+		// TODO: Clean this up once the boss plugin and main plugin are merged
+		Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "bossfight " + clickedEntity.getUniqueId().toString() + " boss_halloween_creeper");
 
 		// Consume the item
 		item.subtract(1);
