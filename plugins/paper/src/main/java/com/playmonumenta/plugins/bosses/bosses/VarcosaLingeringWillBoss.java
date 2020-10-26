@@ -144,7 +144,9 @@ public class VarcosaLingeringWillBoss extends BossAbilityGroup {
 		new BukkitRunnable() {
 			@Override
 			public void run() {
-				mEndLoc.getBlock().setType(Material.REDSTONE_BLOCK);
+				if (!PlayerUtils.playersInRange(mCenter, detectionRange, true).isEmpty()) {
+					mEndLoc.getBlock().setType(Material.REDSTONE_BLOCK);
+				}
 			}
 		}.runTaskLater(mPlugin, 20 * 3);
 	}
