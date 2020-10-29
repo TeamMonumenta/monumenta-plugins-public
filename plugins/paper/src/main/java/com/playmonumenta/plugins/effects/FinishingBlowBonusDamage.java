@@ -72,6 +72,8 @@ public class FinishingBlowBonusDamage extends Effect {
 					event.setDamage(event.getDamage() + mAmount);
 				}
 			}
+
+			setDuration(0);
 		}
 
 		return true;

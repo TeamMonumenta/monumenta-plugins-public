@@ -88,6 +88,10 @@ public class StatMultiplier extends Ability {
 	}
 
 	public void applyOnSpawnModifiers(LivingEntity mob) {
+		if (!EntityUtils.isHostileMob(mob)) {
+			return;
+		}
+
 		// Good candidate for property detection since both the speed and ability modifiers have health modifiers
 		boolean hasProperties = false;
 		AttributeInstance health = mob.getAttribute(Attribute.GENERIC_MAX_HEALTH);
