@@ -56,7 +56,13 @@ public class HalloweenCreeperBoss extends BossAbilityGroup {
 						case 5:
 						case 7:
 						case 8:
+						case 9:
+						case 10:
+						case 11:
 							// Sorta jank - do nothing during intermediate steps
+							break;
+						case 12:
+							CommandUtils.runCommandViaConsole("setblock " + Integer.toString(loc.getBlockX()) + " " + Integer.toString(loc.getBlockY()) + " " + Integer.toString(loc.getBlockZ()) + " minecraft:chest{LootTable:\"epic:event/halloween2019/tricked_creeper\",CustomName:\"{\\\"text\\\":\\\"§6§lCreeperween Chest\\\"}\"}");
 							break;
 						case 2:
 							CommandUtils.runCommandViaConsole(baseCmd + " {Silent:1b,FireworksItem:{id:firework_rocket,Count:1,tag:{Fireworks:{Explosions:[{Type:0,Flicker:0b,Colors:[I;16738847],FadeColors:[I;0]}]}}}}");
@@ -81,19 +87,5 @@ public class HalloweenCreeperBoss extends BossAbilityGroup {
 	public void bossDamagedByEntity(EntityDamageByEntityEvent event) {
 		// Reduce the damage but don't cancel the hit
 		event.setDamage(0);
-	}
-
-	@Override
-	public void unload() {
-		super.unload();
-
-		if (mRunnable != null) {
-			mRunnable.cancel();
-		}
-
-		if (mCreeper.isDead() || !mCreeper.isValid()) {
-			Location loc = mCreeper.getLocation().add(0, 1, 0);
-			CommandUtils.runCommandViaConsole("setblock " + Integer.toString(loc.getBlockX()) + " " + Integer.toString(loc.getBlockY()) + " " + Integer.toString(loc.getBlockZ()) + " minecraft:chest{LootTable:\"epic:event/halloween2019/tricked_creeper\",CustomName:\"{\\\"text\\\":\\\"§6§lCreeperween Chest\\\"}\"}");
-		}
 	}
 }
