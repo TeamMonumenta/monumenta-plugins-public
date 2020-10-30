@@ -53,6 +53,10 @@
             <id>jeff-media-repo</id>
             <url>https://repo.jeff-media.de/maven2</url>
         </repository>
+        <repository>
+            <id>BKCommonLib</id>
+            <url>https://ci.mg-dev.eu/plugin/repository/everything</url>
+        </repository>
 
         <!-- Prevent these unimportant repos from slowing down the build -->
         <repository>
@@ -132,7 +136,12 @@
             <version>2.1</version>
             <scope>provided</scope>
         </dependency>
-
+        <dependency>
+            <groupId>com.bergerkiller.bukkit</groupId>
+            <artifactId>BKCommonLib</artifactId>
+            <version>1.15.2-v2</version>
+            <scope>provided</scope>
+        </dependency>
         <dependency>
             <groupId>com.goncalomb.bukkit</groupId>
             <artifactId>nbteditor</artifactId>
