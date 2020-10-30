@@ -56,7 +56,6 @@ public class HalloweenCreeperBoss extends BossAbilityGroup {
 						case 5:
 						case 7:
 						case 8:
-						case 9:
 						case 10:
 						case 11:
 							// Sorta jank - do nothing during intermediate steps
@@ -69,6 +68,9 @@ public class HalloweenCreeperBoss extends BossAbilityGroup {
 							break;
 						case 6:
 							CommandUtils.runCommandViaConsole(baseCmd + " {Silent:1b,FireworksItem:{id:firework_rocket,Count:1,tag:{Fireworks:{Explosions:[{Type:1,Flicker:0b,Colors:[I;16738847],FadeColors:[I;0]}]}}}}");
+							break;
+						case 9:
+							CommandUtils.runCommandViaConsole(baseCmd + " {Silent:1b,FireworksItem:{id:firework_rocket,Count:1,tag:{Fireworks:{Explosions:[{Type:3,Flicker:1b,Colors:[I;16738847],FadeColors:[I;0]}]}}}}");
 							break;
 						default:
 							CommandUtils.runCommandViaConsole(baseCmd + " {Silent:1b,FireworksItem:{id:firework_rocket,Count:1,tag:{Fireworks:{Explosions:[{Type:3,Flicker:1b,Colors:[I;16738847],FadeColors:[I;0]}]}}}}");
