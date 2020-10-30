@@ -25,6 +25,10 @@ public class MistMob extends BossAbilityGroup {
 
 	@Override
 	public void death(EntityDeathEvent event) {
+		if (event.getEntity() == null) {
+			//If the mob explodes it hits this method, but the event cannot grab the entity, so to prevent null pointers, this is needed
+			return;
+		}
 		Location loc = event.getEntity().getLocation();
 		Bukkit.getConsoleSender().getServer().dispatchCommand(Bukkit.getConsoleSender(), "execute positioned " + loc.getX() + " " + loc.getY() + " " + loc.getZ() + " run function monumenta:black_mist/mob_death");
 	}

@@ -29,7 +29,7 @@ public class SpellGhostlyCannons extends Spell {
 	private Location mCenter;
 	private boolean mPhaseThree;
 	private String mDio;
-	private static final Particle.DustOptions CANNONS_COLOR = new Particle.DustOptions(Color.fromRGB(128, 128, 128), 1.0f);
+	private static final Particle.DustOptions CANNONS_COLOR = new Particle.DustOptions(Color.fromRGB(255, 255, 255), 1.0f);
 
 	public SpellGhostlyCannons(Plugin plugin, LivingEntity boss, double range, Location center, boolean phaseThree, String dio) {
 		mPlugin = plugin;
@@ -54,11 +54,11 @@ public class SpellGhostlyCannons extends Spell {
 				float ft = fTick / 25;
 				world.spawnParticle(Particle.SMOKE_LARGE, mBoss.getLocation(), 4, 0.35, 0, 0.35, 0.005);
 				world.spawnParticle(Particle.CRIT, mBoss.getLocation().add(0, 1, 0), 3, 0.3, 0, 0.3, 0.125);
-				world.playSound(mBoss.getLocation(), Sound.BLOCK_FIRE_AMBIENT, 10, 0.5f + ft);
+				world.playSound(mBoss.getLocation(), Sound.ENTITY_FIREWORK_ROCKET_BLAST, 10, 0.5f + ft);
 				if (mTicks >= 20 * 2) {
 					this.cancel();
 					mActiveRunnables.remove(this);
-					world.playSound(mBoss.getLocation(), Sound.ENTITY_FIREWORK_ROCKET_SHOOT, 1, 0.5f);
+					world.playSound(mBoss.getLocation(), Sound.ENTITY_FIREWORK_ROCKET_SHOOT, 3, 0.5f);
 					BukkitRunnable runnable = new BukkitRunnable() {
 
 						int mI = 0;
@@ -134,8 +134,8 @@ public class SpellGhostlyCannons extends Spell {
 				if (mY <= 0) {
 					this.cancel();
 					mActiveRunnables.remove(this);
-					mWorld.spawnParticle(Particle.EXPLOSION_NORMAL, mLoc, 50, 0, 0, 0, 0.175, null, true);
-					mWorld.spawnParticle(Particle.CRIT, mLoc, 10, 0, 0, 0, 0.25, null, true);
+					mWorld.spawnParticle(Particle.EXPLOSION_NORMAL, mLoc, 15, 0, 0, 0, 0.175, null, false);
+					mWorld.spawnParticle(Particle.CRIT, mLoc, 10, 0, 0, 0, 0.25, null, false);
 					mWorld.playSound(mLoc, Sound.ENTITY_GENERIC_EXPLODE, 1.5f, 0.9f);
 					BoundingBox box = BoundingBox.of(mLoc, 3, 3, 3);
 					for (Player player : PlayerUtils.playersInRange(mLoc, 3)) {
