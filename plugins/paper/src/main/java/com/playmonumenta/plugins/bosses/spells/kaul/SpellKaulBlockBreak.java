@@ -1,10 +1,10 @@
 package com.playmonumenta.plugins.bosses.spells.kaul;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.List;
 
-import com.playmonumenta.plugins.utils.FastUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -15,11 +15,8 @@ import org.bukkit.block.Container;
 import org.bukkit.entity.Creature;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.entity.EntityExplodeEvent;
-import org.bukkit.util.Vector;
 
 import com.playmonumenta.plugins.bosses.spells.Spell;
-import com.playmonumenta.plugins.utils.LocationUtils;
-import com.playmonumenta.plugins.utils.VectorUtils;
 
 public class SpellKaulBlockBreak extends Spell {
 	private final LivingEntity mBoss;
@@ -54,7 +51,7 @@ public class SpellKaulBlockBreak extends Spell {
 			this.cancel();
 			return;
 		}
-		
+
 		Location l = mBoss.getLocation();
 
 		/* Get a list of all blocks that impede the boss's movement */
@@ -75,7 +72,7 @@ public class SpellKaulBlockBreak extends Spell {
 
 		for (int x = -1; x <= 1; x++) {
 			testloc.setX(l.getX() + x);
-			for (int y = 1; y <= 4; y++) {
+			for (int y = 0; y <= 4; y++) {
 				testloc.setY(l.getY() + y);
 				if (l.getY() < 8) {
 					testloc.setY(l.getY() + y + 1);
@@ -83,7 +80,18 @@ public class SpellKaulBlockBreak extends Spell {
 				for (int z = -1; z <= 1; z++) {
 					testloc.setZ(l.getZ());
 					Block block = testloc.getBlock();
-					if (!mIgnoredMats.contains(block.getType())) {
+					Material mat = block.getType();
+					if (y == 0 && mat == Material.COBWEB) {
+						/* Break cobwebs immediately, don't add them to the bad block list */
+						EntityExplodeEvent event = new EntityExplodeEvent(mBoss, mBoss.getLocation(), Arrays.asList(block), 0f);
+						Bukkit.getServer().getPluginManager().callEvent(event);
+						if (!event.isCancelled()) {
+							/* Only allow bosses to break blocks in areas where explosions are allowed */
+							testloc.getBlock().setType(Material.AIR);
+							loc.getWorld().playSound(loc, Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, 0.3f, 0.9f);
+							loc.getWorld().spawnParticle(Particle.EXPLOSION_NORMAL, loc, 6, 1, 1, 1, 0.03);
+						}
+					} else if (!mIgnoredMats.contains(block.getType()) && y != 0) {
 						badBlockList.add(block);
 					}
 				}
