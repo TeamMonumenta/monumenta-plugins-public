@@ -69,6 +69,7 @@ import com.playmonumenta.plugins.listeners.MobListener;
 import com.playmonumenta.plugins.listeners.PlayerListener;
 import com.playmonumenta.plugins.listeners.PortableEnderListener;
 import com.playmonumenta.plugins.listeners.PotionConsumeListener;
+import com.playmonumenta.plugins.listeners.RepairExplosionsListener;
 import com.playmonumenta.plugins.listeners.ShatteredEquipmentListener;
 import com.playmonumenta.plugins.listeners.ShulkerEquipmentListener;
 import com.playmonumenta.plugins.listeners.ShulkerShortcutListener;
@@ -323,6 +324,11 @@ public class Plugin extends JavaPlugin {
 		// Register luckperms commands if LuckPerms is present
 		if (Bukkit.getPluginManager().isPluginEnabled("LuckPerms")) {
 			new LuckPermsIntegration(this);
+		}
+
+		// Register the explosion repair mechanism if BKCommonLib is present
+		if (Bukkit.getPluginManager().isPluginEnabled("BKCommonLib")) {
+			manager.registerEvents(new RepairExplosionsListener(this), this);
 		}
 	}
 

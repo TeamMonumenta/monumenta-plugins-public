@@ -35,6 +35,7 @@ public class ServerProperties {
 	private boolean mKeepLowTierInventory = false;
 	private boolean mClassSpecializationsEnabled = false;
 	private boolean mAuditMessagesEnabled = true;
+	private boolean mRepairExplosions = false;
 	private int mHTTPStatusPort = 8000;
 
 	private String mShardName = "default_settings";
@@ -103,6 +104,11 @@ public class ServerProperties {
 	public static boolean getAuditMessagesEnabled() {
 		ensureInstance();
 		return INSTANCE.mAuditMessagesEnabled;
+	}
+
+	public static boolean getRepairExplosions() {
+		ensureInstance();
+		return INSTANCE.mRepairExplosions;
 	}
 
 	public static int getHTTPStatusPort() {
@@ -184,6 +190,7 @@ public class ServerProperties {
 					mKeepLowTierInventory        = getPropertyValueBool(plugin, object, "keepLowTierInventory", mKeepLowTierInventory);
 					mClassSpecializationsEnabled = getPropertyValueBool(plugin, object, "classSpecializationsEnabled", mClassSpecializationsEnabled);
 					mAuditMessagesEnabled        = getPropertyValueBool(plugin, object, "auditMessagesEnabled", mAuditMessagesEnabled);
+					mRepairExplosions            = getPropertyValueBool(plugin, object, "repairExplosions", mRepairExplosions);
 					mHTTPStatusPort              = getPropertyValueInt(plugin, object, "httpStatusPort", mHTTPStatusPort);
 
 					mShardName                   = getPropertyValueString(plugin, object, "shardName", mShardName);
