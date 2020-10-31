@@ -176,15 +176,15 @@ public class AttributeManager {
 
 	private static final String[] ATTRIBUTE_INDICATORS = {
 			ChatColor.RESET + "",
-			ChatColor.GRAY + "When in main hand:",
-			ChatColor.GRAY + "When in off hand:",
-			ChatColor.GRAY + "When on head:",
-			ChatColor.GRAY + "When on body:",
-			ChatColor.GRAY + "When on legs:",
-			ChatColor.GRAY + "When on feet:"
+			ChatColor.GRAY + "When in Main Hand:",
+			ChatColor.GRAY + "When in Off Hand:",
+			ChatColor.GRAY + "When on Head:",
+			ChatColor.GRAY + "When on Body:",
+			ChatColor.GRAY + "When on Legs:",
+			ChatColor.GRAY + "When on Feet:"
 	};
 
-	private static final String ATTRIBUTE_ARROW = ChatColor.GRAY + "When shot:";
+	private static final String ATTRIBUTE_ARROW = ChatColor.GRAY + "When Shot:";
 
 	public AttributeTrie mAttributeTrie = new AttributeTrie();
 	public List<BaseAttribute> mAttributes = new ArrayList<BaseAttribute>();
