@@ -533,9 +533,7 @@ public class PlayerListener implements Listener {
 			if (ChestUtils.isEmpty(chest)
 			    && (GraveUtils.isGrave(chest)
 			        || (chest.getCustomName() != null && chest.getCustomName().contains("Creeperween Chest")))) {
-				if (!ZoneUtils.hasZoneProperty(chest.getLocation(), ZoneProperty.ADVENTURE_MODE)) {
-					chest.getBlock().breakNaturally();
-				}
+				chest.getBlock().breakNaturally();
 			}
 		}
 		if (event.getPlayer() != null && event.getPlayer() instanceof Player) {
