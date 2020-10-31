@@ -11,6 +11,7 @@ import org.bukkit.entity.Trident;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.utils.ItemUtils;
@@ -30,20 +31,25 @@ public class AttributeThrowRate implements BaseAttribute {
 			Trident trident = (Trident) proj;
 			ItemStack item = trident.getItemStack();
 
+			// Off hand projectiles not supported
+			if (player.getInventory().getItemInOffHand().equals(item)) {
+				return;
+			}
+
 			// Only run Throw Rate if the Infinity enchantment is not on the trident
 			if (item.getEnchantmentLevel(Enchantment.ARROW_INFINITE) <= 0 && value > 0) {
-				//Make trident unpickupable, set cooldown, damage trident based on Unbreaking enchant
+				// Make trident unpickupable, set cooldown, damage trident based on Unbreaking enchant
 				player.setCooldown(item.getType(), (int)(20 / value));
 				trident.setPickupStatus(PickupStatus.CREATIVE_ONLY);
+				ItemUtils.damageItemWithUnbreaking(item, 1, false);
 
-				//Replace item in hand so that it stays in inventory
-				if (player.getInventory().getItemInMainHand().equals(item)) {
-					ItemUtils.damageItemWithUnbreaking(item, 1, false);
-					player.getInventory().setItemInMainHand(item);
-				} else if (player.getInventory().getItemInOffHand().equals(item)) {
-					ItemUtils.damageItemWithUnbreaking(item, 1, false);
-					player.getInventory().setItemInOffHand(item);
-				}
+				// Replace item in hand so that it stays in inventory, delayed or else trident doesn't throw
+				new BukkitRunnable() {
+					@Override
+					public void run() {
+						player.getInventory().setItemInMainHand(item);
+					}
+				}.runTaskLater(plugin, 0);
 			}
 		} else if (proj instanceof Snowball) {
 			if (value > 0) {
