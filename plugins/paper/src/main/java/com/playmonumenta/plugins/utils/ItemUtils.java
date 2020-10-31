@@ -879,7 +879,6 @@ public class ItemUtils {
 				item.setAmount(0);
 			} else {
 				dMeta.setDamage(Math.min(maxDurability - 1, newDamage));
-				// Probably redundant, but can't hurt
 				item.setItemMeta(meta);
 			}
 		}
@@ -897,7 +896,6 @@ public class ItemUtils {
 				item.setAmount(0);
 			} else {
 				dMeta.setDamage(Math.min(maxDurability - 1, newDamage));
-				// Probably redundant, but can't hurt
 				item.setItemMeta(meta);
 			}
 		}
