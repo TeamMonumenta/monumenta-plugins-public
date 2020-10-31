@@ -20,7 +20,7 @@ public class ForbiddenItem implements BaseEnchantment {
 	public static final PotionEffect FORBIDDEN_ITEM_SLOWNESS_EFFECT = new PotionEffect(PotionEffectType.SLOW, 60, 3, true, false);
 	public static final PotionEffect FORBIDDEN_ITEM_BLINDNESS_EFFECT = new PotionEffect(PotionEffectType.BLINDNESS, 78, 0, true, false);
 
-	/* This is dynamicly set based on config */
+	/* This is dynamically set based on config */
 	private final String mPropertyName;
 
 	public ForbiddenItem(String propertyName) {
@@ -42,10 +42,10 @@ public class ForbiddenItem implements BaseEnchantment {
 		// Forbidden items are different from the others - it applies effects only for a short duration
 		// and doesn't remove them when you switch off
 		if (!ZoneUtils.hasZoneProperty(player, ZoneProperty.RESIST_5)) {
-			plugin.mPotionManager.addPotion(player, PotionID.SAFE_ZONE, FORBIDDEN_ITEM_SLOWNESS_EFFECT);
-			plugin.mPotionManager.addPotion(player, PotionID.SAFE_ZONE, FORBIDDEN_ITEM_WEAKNESS_EFFECT);
+			plugin.mPotionManager.addPotion(player, PotionID.ITEM, FORBIDDEN_ITEM_SLOWNESS_EFFECT);
+			plugin.mPotionManager.addPotion(player, PotionID.ITEM, FORBIDDEN_ITEM_WEAKNESS_EFFECT);
 			if (!player.getGameMode().equals(GameMode.CREATIVE)) {
-				plugin.mPotionManager.addPotion(player, PotionID.SAFE_ZONE, FORBIDDEN_ITEM_BLINDNESS_EFFECT);
+				plugin.mPotionManager.addPotion(player, PotionID.ITEM, FORBIDDEN_ITEM_BLINDNESS_EFFECT);
 			}
 			MessagingUtils.sendActionBarMessage(plugin, player, ChatColor.stripColor(mPropertyName).replace(" :", "") + " items can not be used here!");
 		}
