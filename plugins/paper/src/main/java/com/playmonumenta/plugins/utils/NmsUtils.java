@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.utils;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import org.bukkit.craftbukkit.v1_16_R2.entity.CraftEntity;
 import org.bukkit.craftbukkit.v1_16_R2.entity.CraftHumanEntity;
 import org.bukkit.craftbukkit.v1_16_R2.entity.CraftLivingEntity;
 import org.bukkit.craftbukkit.v1_16_R2.entity.CraftPlayer;
@@ -16,6 +17,7 @@ import net.minecraft.server.v1_16_R2.EntityDamageSource;
 import net.minecraft.server.v1_16_R2.EntityLiving;
 import net.minecraft.server.v1_16_R2.EntityPlayer;
 import net.minecraft.server.v1_16_R2.IChatBaseComponent;
+import net.minecraft.server.v1_16_R2.NBTTagCompound;
 import net.minecraft.server.v1_16_R2.Vec3D;
 
 public class NmsUtils {
@@ -78,5 +80,19 @@ public class NmsUtils {
         DamageSource reason = new UnblockableEntityDamageSource(damager == null ? null : ((CraftLivingEntity) damager).getHandle());
 
         ((CraftLivingEntity)damagee).getHandle().damageEntity(reason, (float) amount);
+	}
+
+	@SuppressWarnings("unchecked")
+	public static <T extends org.bukkit.entity.Entity> T duplicateEntity(T entity) {
+		T newEntity = (T)entity.getWorld().spawnEntity(entity.getLocation(), entity.getType());
+
+		NBTTagCompound nbttagcompound = ((CraftEntity)entity).getHandle().save(new NBTTagCompound());
+		nbttagcompound.remove("UUID");
+		nbttagcompound.remove("UUIDMost");
+		nbttagcompound.remove("UUIDLeast");
+
+		((CraftEntity)newEntity).getHandle().load(nbttagcompound);
+
+		return newEntity;
 	}
 }
