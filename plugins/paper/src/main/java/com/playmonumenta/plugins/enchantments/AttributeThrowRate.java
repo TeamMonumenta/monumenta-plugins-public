@@ -46,11 +46,10 @@ public class AttributeThrowRate implements BaseAttribute {
 			if (item.getEnchantmentLevel(Enchantment.ARROW_INFINITE) <= 0 && value > 0) {
 				// Make trident unpickupable, set cooldown, damage trident based on Unbreaking enchant
 				player.setCooldown(item.getType(), (int)(20 / value));
-				trident.setPickupStatus(PickupStatus.CREATIVE_ONLY);
 				ItemUtils.damageItemWithUnbreaking(item, 1, false);
 
 				// Duplicate the entity, then cancel the throw event so the trident doesn't leave inventory
-				Projectile newProj = NmsUtils.duplicateEntity(proj);
+				Trident newProj = NmsUtils.duplicateEntity(trident);
 
 				// Set a bunch of stuff that isn't caught by the entity duplication
 				newProj.setShooter(player);
@@ -58,6 +57,8 @@ public class AttributeThrowRate implements BaseAttribute {
 					newProj.setMetadata(AttributeProjectileDamage.DAMAGE_METAKEY, new FixedMetadataValue(plugin, proj.getMetadata(AttributeProjectileDamage.DAMAGE_METAKEY).get(0).asDouble()));
 				}
 
+				newProj.setPickupStatus(PickupStatus.CREATIVE_ONLY);
+				trident.setPickupStatus(PickupStatus.CREATIVE_ONLY);
 				event.setCancelled(true);
 			}
 		} else if (proj instanceof Snowball) {
