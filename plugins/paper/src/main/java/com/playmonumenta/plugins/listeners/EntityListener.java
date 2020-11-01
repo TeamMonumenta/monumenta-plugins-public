@@ -428,6 +428,10 @@ public class EntityListener implements Listener {
 			event.setCancelled(true);
 			return;
 		}
+		if (damagee instanceof ItemFrame && ZoneUtils.hasZoneProperty(damagee.getLocation(), ZoneProperty.ADVENTURE_MODE)) {
+			event.setCancelled(true);
+			return;
+		}
 		if (damagee instanceof Player) {
 			Player player = (Player)damagee;
 			World world = player.getWorld();
