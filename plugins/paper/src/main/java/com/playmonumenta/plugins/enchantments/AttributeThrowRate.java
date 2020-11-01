@@ -11,10 +11,10 @@ import org.bukkit.entity.Trident;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
-import org.bukkit.scheduler.BukkitRunnable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.NmsUtils;
 
 public class AttributeThrowRate implements BaseAttribute {
 	//Trident attribute only
@@ -27,6 +27,12 @@ public class AttributeThrowRate implements BaseAttribute {
 
 	@Override
 	public void onLaunchProjectile(Plugin plugin, Player player, double value, Projectile proj, ProjectileLaunchEvent event) {
+		/*
+		 * TODO:
+		 * Since we have a generic entity cloning method now, we can
+		 * get rid of the item type checks. Not going to mess with it
+		 * currently since we need to hotfix the trident dupe bug.
+		 */
 		if (proj instanceof Trident) {
 			Trident trident = (Trident) proj;
 			ItemStack item = trident.getItemStack();
@@ -43,13 +49,16 @@ public class AttributeThrowRate implements BaseAttribute {
 				trident.setPickupStatus(PickupStatus.CREATIVE_ONLY);
 				ItemUtils.damageItemWithUnbreaking(item, 1, false);
 
-				// Replace item in hand so that it stays in inventory, delayed or else trident doesn't throw
-				new BukkitRunnable() {
-					@Override
-					public void run() {
-						player.getInventory().setItemInMainHand(item);
-					}
-				}.runTaskLater(plugin, 0);
+				// Duplicate the entity, then cancel the throw event so the trident doesn't leave inventory
+				Projectile newProj = NmsUtils.duplicateEntity(proj);
+
+				// Set a bunch of stuff that isn't caught by the entity duplication
+				newProj.setShooter(player);
+				if (proj.hasMetadata(AttributeProjectileDamage.DAMAGE_METAKEY)) {
+					newProj.setMetadata(AttributeProjectileDamage.DAMAGE_METAKEY, new FixedMetadataValue(plugin, proj.getMetadata(AttributeProjectileDamage.DAMAGE_METAKEY).get(0).asDouble()));
+				}
+
+				event.setCancelled(true);
 			}
 		} else if (proj instanceof Snowball) {
 			if (value > 0) {
