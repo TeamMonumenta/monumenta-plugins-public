@@ -428,8 +428,23 @@ public class EntityListener implements Listener {
 			event.setCancelled(true);
 			return;
 		}
-		if (damagee instanceof ItemFrame && ZoneUtils.hasZoneProperty(damagee.getLocation(), ZoneProperty.ADVENTURE_MODE)) {
-			event.setCancelled(true);
+		if (damagee instanceof ItemFrame) {
+			// Attempting to damage an item frame
+			if (event instanceof EntityDamageByEntityEvent) {
+				// This event is damage attributable to an entity
+				EntityDamageByEntityEvent edbee = (EntityDamageByEntityEvent)event;
+				if (!(edbee.getDamager() instanceof Player) ||
+				    (damagee.isInvulnerable() && !((Player)edbee.getDamager()).getGameMode().equals(GameMode.CREATIVE))) {
+					// This damage is from an entity, but that entity is not a player
+					// OR The damage is from a player but the item frame is invulnerable and the player is not in creative
+					// Don't allow it
+					event.setCancelled(true);
+				}
+			} else {
+				// This damage is not from a particular entity source - don't allow it
+				event.setCancelled(true);
+			}
+			// No more processing needed for invulnerable item frames
 			return;
 		}
 		if (damagee instanceof Player) {
