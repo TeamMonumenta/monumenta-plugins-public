@@ -34,4 +34,18 @@ public class FlatDamageDealt extends Effect {
 		return true;
 	}
 
+	@Override
+	public String toString() {
+		String causes = "any";
+		if (mAffectedDamageCauses != null) {
+			causes = "";
+			for (EntityDamageEvent.DamageCause cause : mAffectedDamageCauses) {
+				if (!causes.isEmpty()) {
+					causes += ",";
+				}
+				causes += cause.name();
+			}
+		}
+		return String.format("FlatDamageDealt duration:%d causes:%s amount:%f", this.getDuration(), causes, mAmount);
+	}
 }

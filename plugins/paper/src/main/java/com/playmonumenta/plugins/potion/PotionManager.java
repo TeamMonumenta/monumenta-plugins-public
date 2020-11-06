@@ -173,15 +173,4 @@ public class PotionManager {
 			}
 		}
 	}
-
-	public String printInfo(Player player) {
-		JsonObject object = getAsJsonObject(player);
-		if (object != null) {
-
-			Gson gson = new GsonBuilder().setPrettyPrinting().create();
-			return gson.toJson(object);
-		} else {
-			return "{}";
-		}
-	}
 }

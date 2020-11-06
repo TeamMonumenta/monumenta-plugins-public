@@ -6,7 +6,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.google.gson.JsonObject;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.playmonumenta.scriptedquests.utils.MessagingUtils;
 
 import org.bukkit.entity.Player;
@@ -47,11 +48,11 @@ public class AbilityCollection {
 		}
 	}
 
-	public JsonObject getAsJsonObject() {
-		JsonObject playerAbilities = new JsonObject();
+	public JsonElement getAsJson() {
+		JsonArray playerAbilities = new JsonArray();
 
 		for (Ability ability : mAbilities.values()) {
-			playerAbilities.add(ability.getClass().getName(), ability.getAsJsonObject());
+			playerAbilities.add(ability.toString());
 		}
 
 		return playerAbilities;

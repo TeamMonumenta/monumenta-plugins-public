@@ -46,4 +46,16 @@ public class Aesthetics extends Effect {
 		}
 	}
 
+	@Override
+	public String toString() {
+		String tickClass = "null";
+		if (mTickEffectAction != null) {
+			tickClass = mTickEffectAction.getClass().getName();
+		}
+		String loseClass = "null";
+		if (mLoseEffectAction != null) {
+			loseClass = mLoseEffectAction.getClass().getName();
+		}
+		return String.format("Aesthetics duration:%d tickClass:%s loseClass:%s", this.getDuration(), tickClass, loseClass);
+	}
 }

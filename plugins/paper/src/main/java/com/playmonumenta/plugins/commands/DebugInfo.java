@@ -1,10 +1,13 @@
 package com.playmonumenta.plugins.commands;
 
-import org.bukkit.ChatColor;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.tracking.PlayerTracking;
+
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-
-import com.playmonumenta.plugins.Plugin;
 
 public class DebugInfo extends GenericCommand {
 	public static void register(Plugin plugin) {
@@ -15,13 +18,22 @@ public class DebugInfo extends GenericCommand {
 	}
 
 	private static void run(Plugin plugin, CommandSender sender, Player player) {
+		JsonObject debugInfo = new JsonObject();
+
 		if (plugin.mPotionManager != null) {
-			sender.sendMessage(ChatColor.GREEN + "Potion info for player '" + player.getName() + "': " + ChatColor.GOLD +
-			                   plugin.mPotionManager.printInfo(player));
+			debugInfo.add("Potion Manager", plugin.mPotionManager.getAsJsonObject(player));
 		}
 		if (plugin.mAbilityManager != null) {
-			sender.sendMessage(ChatColor.GREEN + "Ability info for player '" + player.getName() + "': " + ChatColor.GOLD +
-			                   plugin.mAbilityManager.printInfo(player));
+			debugInfo.add("Ability Manager", plugin.mAbilityManager.getAsJson(player));
 		}
+		if (plugin.mEffectManager != null) {
+			debugInfo.add("Effect Manager", plugin.mEffectManager.getAsJsonObject(player));
+		}
+		if (PlayerTracking.getInstance() != null) {
+			debugInfo.add("Enchants", PlayerTracking.getInstance().getAsJsonObject(player));
+		}
+
+		Gson gson = new GsonBuilder().setPrettyPrinting().create();
+		sender.sendMessage(gson.toJson(debugInfo));
 	}
 }

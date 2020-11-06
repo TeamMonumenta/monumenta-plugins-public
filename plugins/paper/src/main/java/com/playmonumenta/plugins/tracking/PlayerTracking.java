@@ -8,7 +8,6 @@ import java.util.Set;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -27,6 +26,7 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.inventory.ItemStack;
 
+import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.enchantments.BaseEnchantment;
@@ -88,6 +88,14 @@ public class PlayerTracking implements EntityTracking {
 
 	public Set<Player> getPlayers() {
 		return mPlayers.keySet();
+	}
+
+	public JsonObject getAsJsonObject(Player player) {
+		PlayerInventory manager = mPlayers.get(player);
+		if (manager != null) {
+			return manager.getAsJsonObject();
+		}
+		return new JsonObject();
 	}
 
 	public int getPlayerCustomEnchantLevel(Player player, Class<? extends BaseEnchantment> cls) {

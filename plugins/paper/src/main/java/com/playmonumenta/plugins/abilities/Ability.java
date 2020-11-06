@@ -278,17 +278,9 @@ public abstract class Ability {
 		return mInfo.getLevelHover(getAbilityScore(), useShorthand);
 	}
 
-	public JsonObject getAsJsonObject() {
-		return getAsJsonObject(false);
-	}
-
-	public JsonObject getAsJsonObject(boolean fullDetails) {
-		JsonObject obj = mInfo.getAsJsonObject(fullDetails);
-		if (fullDetails) {
-			obj.addProperty("javaClassName", getClass().getName());
-		}
-		obj.addProperty("score", getAbilityScore());
-		return obj;
+	@Override
+	public String toString() {
+		return String.format("%s: %d", this.getClass().getName(), getAbilityScore());
 	}
 
 	/* When called, the ability is no longer applicable to the player and any active runnables should be cancelled */

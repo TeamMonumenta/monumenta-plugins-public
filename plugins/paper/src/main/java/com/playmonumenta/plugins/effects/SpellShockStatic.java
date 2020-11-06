@@ -7,14 +7,6 @@ import org.bukkit.World;
 import org.bukkit.entity.Entity;
 
 public class SpellShockStatic extends Effect {
-
-	// Flags a mob as damaged by SpellShock
-	public static class SpellShockDamaged extends Effect {
-		public SpellShockDamaged() {
-			super(0);
-		}
-	}
-
 	private static final Particle.DustOptions COLOR = new Particle.DustOptions(Color.fromRGB(220, 147, 249), 1.0f);
 
 	private boolean mTriggered = false;
@@ -40,4 +32,8 @@ public class SpellShockStatic extends Effect {
 		world.spawnParticle(Particle.REDSTONE, loc, 3, 0.3, 0.6, 0.3, COLOR);
 	}
 
+	@Override
+	public String toString() {
+		return String.format("SpellShockStatic duration=%d", this.getDuration());
+	}
 }
