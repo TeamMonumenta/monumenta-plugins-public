@@ -26,6 +26,7 @@ public class Exorcism  extends Ability {
 
 	private static final int RANGE = 12;
 	private static final int DURATION = 20 * 15;
+	private static final int AMPLIFIER_CAP = 1;
 	private static final int COOLDOWN_1 = 20 * 25;
 	private static final int COOLDOWN_2 = 20 * 15;
 	private static final double EXORCISM_ANGLE = 50.0;
@@ -35,7 +36,7 @@ public class Exorcism  extends Ability {
 		mInfo.mLinkedSpell = Spells.EXORCISM;
 		mInfo.mScoreboardId = "Exorcism";
 		mInfo.mShorthandName = "Ex";
-		mInfo.mDescriptions.add("Right click while looking down without sneaking removes all your debuffs and applies them to enemies within 12 blocks of you. Level of debuffs is preserved. Cooldown: 25s.");
+		mInfo.mDescriptions.add("Right click while looking down without sneaking removes all your debuffs and applies them to enemies within 12 blocks of you. Level of debuffs is preserved up to level 2. Cooldown: 25s.");
 		mInfo.mDescriptions.add("Also apply the corresponding debuff to enemies for every buff you have. Cooldown: 15s.");
 		mInfo.mCooldown = getAbilityScore() == 1 ? COOLDOWN_1 : COOLDOWN_2;
 		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
@@ -54,18 +55,18 @@ public class Exorcism  extends Ability {
 		boolean onFire = false;
 		for (PotionEffect effect : mPlayer.getActivePotionEffects()) {
 			if (PotionUtils.hasNegativeEffects(effect.getType())) {
-				mDebuffs.add(effect.getType().createEffect(DURATION, effect.getAmplifier()));
+				mDebuffs.add(effect.getType().createEffect(DURATION, Math.min(AMPLIFIER_CAP, effect.getAmplifier())));
 			} else if (getAbilityScore() > 1) {
 				if (effect.getType().equals(PotionEffectType.SPEED)) {
-					mDebuffs.add(new PotionEffect(PotionEffectType.SLOW, DURATION, effect.getAmplifier()));
+					mDebuffs.add(new PotionEffect(PotionEffectType.SLOW, DURATION, Math.min(AMPLIFIER_CAP, effect.getAmplifier())));
 				} else if (effect.getType().equals(PotionEffectType.INCREASE_DAMAGE)) {
-					mDebuffs.add(new PotionEffect(PotionEffectType.WEAKNESS, DURATION, effect.getAmplifier()));
+					mDebuffs.add(new PotionEffect(PotionEffectType.WEAKNESS, DURATION, Math.min(AMPLIFIER_CAP, effect.getAmplifier())));
 				} else if (effect.getType().equals(PotionEffectType.REGENERATION)) {
-					mDebuffs.add(new PotionEffect(PotionEffectType.WITHER, DURATION, effect.getAmplifier()));
+					mDebuffs.add(new PotionEffect(PotionEffectType.WITHER, DURATION, Math.min(AMPLIFIER_CAP, effect.getAmplifier())));
 				} else if (effect.getType().equals(PotionEffectType.FAST_DIGGING)) {
-					mDebuffs.add(new PotionEffect(PotionEffectType.SLOW_DIGGING, DURATION, effect.getAmplifier()));
+					mDebuffs.add(new PotionEffect(PotionEffectType.SLOW_DIGGING, DURATION, Math.min(AMPLIFIER_CAP, effect.getAmplifier())));
 				} else if (effect.getType().equals(PotionEffectType.DAMAGE_RESISTANCE)) {
-					mDebuffs.add(new PotionEffect(PotionEffectType.UNLUCK, DURATION, (effect.getAmplifier()*2) + 1));
+					mDebuffs.add(new PotionEffect(PotionEffectType.UNLUCK, DURATION, (Math.min(AMPLIFIER_CAP, effect.getAmplifier())*2) + 1));
 				} else if (effect.getType().equals(PotionEffectType.FIRE_RESISTANCE)) {
 					onFire = true;
 				}

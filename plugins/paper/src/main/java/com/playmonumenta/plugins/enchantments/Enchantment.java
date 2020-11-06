@@ -29,11 +29,11 @@ public enum Enchantment {
 	BANE_ARTHROPODS(ChatColor.GRAY + "Bane of Arthropods", org.bukkit.enchantments.Enchantment.DAMAGE_ARTHROPODS),
 	SLAYER(new Slayer()),
 	DUELIST(new Duelist()),
+	REGICIDE(new Regicide()),
 	HEX_EATER(new HexEater()),
 	CHAOTIC(new Chaotic()),
 	POINT_BLANK(new PointBlank()),
 	SNIPER(new Sniper()),
-	IMPACT(new Impact()),
 	IMPALING(ChatColor.GRAY + "Impaling", org.bukkit.enchantments.Enchantment.IMPALING),
 	SWEEPING_EDGE(ChatColor.GRAY + "Sweeping Edge", org.bukkit.enchantments.Enchantment.SWEEPING_EDGE),
 

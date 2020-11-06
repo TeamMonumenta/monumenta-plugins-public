@@ -12,15 +12,13 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.classes.Spells;
-import com.playmonumenta.plugins.potion.PotionManager.PotionID;
+import com.playmonumenta.plugins.effects.PercentDamageReceived;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
@@ -29,26 +27,28 @@ import com.playmonumenta.plugins.utils.PlayerUtils;
 
 public class DefensiveLine extends Ability {
 
-	private static final int COOLDOWN = 20 * 30;
+	private static final String PERCENT_DAMAGE_RECEIVED_EFFECT_NAME = "DefensiveLinePercentDamageReceivedEffect";
+	private static final double PERCENT_DAMAGE_RECEIVED_EFFECT_1 = -0.15;
+	private static final double PERCENT_DAMAGE_RECEIVED_EFFECT_2 = -0.25;
 	private static final int DURATION = 20 * 14;
-	private static final int RESISTANCE_AMPLIFIER_1 = 0;
-	private static final int RESISTANCE_AMPLIFIER_2 = 1;
+
+	private static final int COOLDOWN = 20 * 30;
 	private static final int RADIUS = 8;
 	private static final int KNOCK_AWAY_RADIUS = 3;
 	private static final float KNOCK_AWAY_SPEED = 0.25f;
 
-	private final int mResistanceAmplifier;
+	private final double mPercentDamageReceived;
 
 	public DefensiveLine(Plugin plugin, Player player) {
 		super(plugin, player, "Defensive Line");
 		mInfo.mLinkedSpell = Spells.DEFENSIVE_LINE;
 		mInfo.mScoreboardId = "DefensiveLine";
 		mInfo.mShorthandName = "DL";
-		mInfo.mDescriptions.add("When you block while sneaking, you and your allies in an 8 block radius gain Resistance I for 14 seconds. Upon activating this skill mobs in a 3 block radius of you and your allies are knocked back. Cooldown: 30s.");
-		mInfo.mDescriptions.add("The effect is increased to Resistance II.");
+		mInfo.mDescriptions.add("When you block while sneaking, you and your allies in an 8 block radius gain 15% Resistance for 14 seconds. Upon activating this skill mobs in a 3 block radius of you and your allies are knocked back. Cooldown: 30s.");
+		mInfo.mDescriptions.add("The effect is increased to 25% Resistance.");
 		mInfo.mCooldown = COOLDOWN;
 		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
-		mResistanceAmplifier = getAbilityScore() == 1 ? RESISTANCE_AMPLIFIER_1 : RESISTANCE_AMPLIFIER_2;
+		mPercentDamageReceived = getAbilityScore() == 1 ? PERCENT_DAMAGE_RECEIVED_EFFECT_1 : PERCENT_DAMAGE_RECEIVED_EFFECT_2;
 	}
 
 	@Override
@@ -74,8 +74,7 @@ public class DefensiveLine extends Ability {
 						Location loc = player.getLocation().add(0, 1, 0);
 						world.spawnParticle(Particle.SPELL_INSTANT, loc, 35, 0.4, 0.4, 0.4, 0.25);
 
-						mPlugin.mPotionManager.addPotion(player, PotionID.APPLIED_POTION,
-								new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, DURATION, mResistanceAmplifier, true, true));
+						mPlugin.mEffectManager.addEffect(player, PERCENT_DAMAGE_RECEIVED_EFFECT_NAME, new PercentDamageReceived(DURATION, mPercentDamageReceived));
 
 						for (LivingEntity mob : EntityUtils.getNearbyMobs(loc, KNOCK_AWAY_RADIUS, mPlayer)) {
 							MovementUtils.knockAway(player, mob, KNOCK_AWAY_SPEED);

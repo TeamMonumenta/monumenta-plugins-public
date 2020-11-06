@@ -80,6 +80,9 @@ public class DeathsTouchNonReaper extends Ability implements KillTriggeredAbilit
 				if (effect.getKey() == PotionEffectType.DAMAGE_RESISTANCE) {
 					// Only do Resistance I regardless of Vulnerability level
 					mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_OTHER, new PotionEffect(effect.getKey(), duration, 0, true, true));
+				} else if (effect.getKey() == PotionEffectType.REGENERATION) {
+					// Only do Regeneration I regardless of Poison/Wither level
+					mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_OTHER, new PotionEffect(effect.getKey(), duration, 0, true, true));
 				} else {
 					mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_OTHER, new PotionEffect(effect.getKey(), duration, Math.min(amplifierCap, effect.getValue()), true, true));
 				}
