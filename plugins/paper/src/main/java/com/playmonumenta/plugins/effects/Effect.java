@@ -63,4 +63,6 @@ public abstract class Effect implements Comparable<Effect> {
 		return mDuration <= 0;
 	}
 
+	/* Must implement this method to print info about what the effect does for debug */
+	public abstract String toString();
 }

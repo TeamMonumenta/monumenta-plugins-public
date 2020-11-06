@@ -89,4 +89,8 @@ public class FinishingBlowBonusDamage extends Effect {
 		}
 	}
 
+	@Override
+	public String toString() {
+		return String.format("FinishingBlowBonusDamage duration:%d player:%s amount:%f", this.getDuration(), mPlayer.getName(), mAmount);
+	}
 }

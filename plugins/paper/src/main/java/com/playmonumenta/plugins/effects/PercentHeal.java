@@ -22,4 +22,8 @@ public class PercentHeal extends Effect {
 		return mAmount > -1;
 	}
 
+	@Override
+	public String toString() {
+		return String.format("PercentHeal duration:%d amount:%f", this.getDuration(), mAmount);
+	}
 }

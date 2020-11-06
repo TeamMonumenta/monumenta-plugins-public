@@ -37,4 +37,8 @@ public class PercentSpeed extends Effect {
 		}
 	}
 
+	@Override
+	public String toString() {
+		return String.format("PercentSpeed duration:%d modifier:%s amount:%f", this.getDuration(), mModifierName, mAmount);
+	}
 }

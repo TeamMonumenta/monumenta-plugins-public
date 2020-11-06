@@ -7,6 +7,10 @@ import java.util.Map;
 import java.util.NavigableSet;
 import java.util.TreeSet;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.playmonumenta.plugins.Plugin;
+
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
@@ -18,8 +22,6 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityRegainHealthEvent;
 import org.bukkit.projectiles.ProjectileSource;
 import org.bukkit.scheduler.BukkitRunnable;
-
-import com.playmonumenta.plugins.Plugin;
 
 public class EffectManager implements Listener {
 
@@ -107,6 +109,25 @@ public class EffectManager implements Listener {
 
 				priorityEffects.clear();
 			}
+		}
+
+		/**
+		 * Gets all effects as a json object
+		 */
+		public JsonObject getAsJsonObject() {
+			JsonObject ret = new JsonObject();
+			for (Map.Entry<EffectPriority, Map<String, NavigableSet<Effect>>> priorityEntries : mPriorityMap.entrySet()) {
+				JsonObject mid = new JsonObject();
+				for (Map.Entry<String, NavigableSet<Effect>> effects : priorityEntries.getValue().entrySet()) {
+					JsonArray inner = new JsonArray();
+					for (Effect effect : effects.getValue()) {
+						inner.add(effect.toString());
+					}
+					mid.add(effects.getKey(), inner);
+				}
+				ret.add(priorityEntries.getKey().name(), mid);
+			}
+			return ret;
 		}
 	}
 
@@ -260,6 +281,19 @@ public class EffectManager implements Listener {
 			effects.clearEffects();
 			mEntities.remove(entity);
 		}
+	}
+
+	/**
+	 * Gets all effects for an entity as a single json object
+	 *
+	 * @param entity the entity to get effects for
+	 */
+	public JsonObject getAsJsonObject(Entity entity) {
+		Effects effects = mEntities.get(entity);
+		if (effects != null) {
+			return effects.getAsJsonObject();
+		}
+		return new JsonObject();
 	}
 
 	@EventHandler(priority = EventPriority.NORMAL)
