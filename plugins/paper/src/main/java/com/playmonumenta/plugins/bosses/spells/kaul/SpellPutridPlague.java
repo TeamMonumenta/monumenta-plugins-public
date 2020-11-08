@@ -124,14 +124,14 @@ public class SpellPutridPlague extends Spell {
 			List<Player> players = PlayerUtils.playersInRange(mCenter, mRange);
 			players.removeIf(p -> p.getLocation().getY() >= 61);
 			new BukkitRunnable() {
-				int t = 0;
+				int mTicks = 0;
 				Location mPoint1 = point.getLocation().add(4, 6, 4);
 				Location mPoint2 = point.getLocation().add(-4, 6, -4);
 				Location mPoint3 = point.getLocation().add(4, 6, -4);
 				Location mPoint4 = point.getLocation().add(-4, 6, 4);
 				@Override
 				public void run() {
-					t += 2;
+					mTicks += 2;
 
 					for (Player player : players) {
 						// Spawn the particles for players so that way there
@@ -153,7 +153,7 @@ public class SpellPutridPlague extends Spell {
 						cLoc.subtract(FastUtils.cos(radian) * 7, 0, FastUtils.sin(radian) * 7);
 					}
 
-					if (t >= mTime) {
+					if (mTicks >= mTime) {
 						this.cancel();
 						Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "team modify kaul color white");
 						List<Player> safe = PlayerUtils.playersInRange(point.getLocation(), 8);

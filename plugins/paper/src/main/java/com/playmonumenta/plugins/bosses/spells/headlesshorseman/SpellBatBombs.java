@@ -39,27 +39,27 @@ public class SpellBatBombs extends Spell {
 	public void spawnBat(Location loc) {
 		World world = loc.getWorld();
 		new BukkitRunnable() {
-			int t = 0;
+			int mTicks = 0;
 			@Override
 			public void run() {
-				t++;
+				mTicks++;
 
-				if (t >= 30) {
+				if (mTicks >= 30) {
 					this.cancel();
 					world.spawnParticle(Particle.SMOKE_NORMAL, loc, 25, 0.15, .15, .15, 0.125);
 
 					LivingEntity bat = (LivingEntity) world.spawnEntity(loc, EntityType.BAT);
 					bat.setCustomName("A Spooky Bat");
 					new BukkitRunnable() {
-						int t = 0;
+						int mTicks = 0;
 						@Override
 						public void run() {
-							t++;
-							if (t % 2 == 0) {
+							mTicks++;
+							if (mTicks % 2 == 0) {
 								world.spawnParticle(Particle.FLAME, bat.getLocation(), 1, 0.25, .25, .25, 0.025);
 								world.spawnParticle(Particle.SMOKE_NORMAL, bat.getLocation(), 2, 0.25, .25, .25, 0.025);
 							}
-							if (t >= 20 * 6) {
+							if (mTicks >= 20 * 6) {
 								bat.remove();
 								this.cancel();
 								Location loc = bat.getLocation();
@@ -116,11 +116,11 @@ public class SpellBatBombs extends Spell {
 		world.playSound(mBoss.getLocation(), Sound.ENTITY_ENDER_DRAGON_FLAP, 3, 0.75f);
 		world.spawnParticle(Particle.SMOKE_NORMAL, mBoss.getLocation().add(0, 1, 0), 20, 0.4, .4, .4, 0.1);
 		new BukkitRunnable() {
-			int t = 0;
+			int mTicks = 0;
 			Location loc = mBoss.getLocation().add(0, 1, 0);
 			@Override
 			public void run() {
-				t++;
+				mTicks++;
 
 				if (mBoss.isDead() || !mBoss.isValid()) {
 					this.cancel();
@@ -128,7 +128,7 @@ public class SpellBatBombs extends Spell {
 				}
 
 				world.spawnParticle(Particle.SMOKE_NORMAL, loc, 5, 0.4, .4, .4, 0.025);
-				if (t >= 30) {
+				if (mTicks >= 30) {
 					this.cancel();
 					world.spawnParticle(Particle.FLAME, mBoss.getLocation().add(0, 1, 0), 5, 0.4, .4, .4, 0.125);
 					world.spawnParticle(Particle.SMOKE_LARGE, mBoss.getLocation().add(0, 1, 0), 20, 0.4, .4, .4, 0.09);

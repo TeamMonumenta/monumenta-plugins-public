@@ -49,24 +49,25 @@ public class SpellBurningVengence extends Spell {
 				horse.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 65, 2));
 			}
 		}
-		if (mBoss.getVehicle() != null) {
 
+		if (mBoss.getVehicle() != null) {
 			if (mBoss.getVehicle() instanceof LivingEntity) {
 				mHorseman.disableShield();
 				LivingEntity h = (LivingEntity) mBoss.getVehicle();
 				new BukkitRunnable() {
-					double radius = 16;
-					int t = 0;
+					double mRadius = 16;
+					int mTicks = 0;
+
 					@Override
 					public void run() {
 
-						if (t % 2 == 0) {
-							world.playSound(mBoss.getLocation(), Sound.BLOCK_END_PORTAL_FRAME_FILL, 3, 0.5f + t / 32f);
+						if (mTicks % 2 == 0) {
+							world.playSound(mBoss.getLocation(), Sound.BLOCK_END_PORTAL_FRAME_FILL, 3, 0.5f + mTicks / 32f);
 						}
-						t++;
+						mTicks++;
 						Location loc = h.getLocation();
 						for (int i = 0; i < 3; i++) {
-							double radian1 = Math.toRadians(i * 120 + (t * 3));
+							double radian1 = Math.toRadians(i * 120 + (mTicks * 3));
 							loc.add(FastUtils.cos(radian1) * 4, 0, FastUtils.sin(radian1) * 4);
 							world.spawnParticle(Particle.FLAME, loc, 2, 0.1, 0.1, 0.1, 0.065);
 							world.spawnParticle(Particle.SMOKE_NORMAL, loc, 2, 0.1, 0.1, 0.1, 0.065);
@@ -76,7 +77,7 @@ public class SpellBurningVengence extends Spell {
 						for (double i = 0; i < 360; i += 7.5) {
 							double radian1 = Math.toRadians(i);
 							boolean reduce = false;
-							loc.add(FastUtils.cos(radian1) * radius, 0, FastUtils.sin(radian1) * radius);
+							loc.add(FastUtils.cos(radian1) * mRadius, 0, FastUtils.sin(radian1) * mRadius);
 							if (loc.getBlock().getType().isSolid()) {
 								loc.add(0, 1, 0);
 								reduce = true;
@@ -95,12 +96,12 @@ public class SpellBurningVengence extends Spell {
 							if (reduce) {
 								loc.subtract(0, 1, 0);
 							}
-							loc.subtract(FastUtils.cos(radian1) * radius, 0, FastUtils.sin(radian1) * radius);
+							loc.subtract(FastUtils.cos(radian1) * mRadius, 0, FastUtils.sin(radian1) * mRadius);
 						}
 
-						radius -= 0.25;
+						mRadius -= 0.25;
 
-						if (radius <= 0) {
+						if (mRadius <= 0) {
 							this.cancel();
 							h.removePotionEffect(PotionEffectType.SLOW);
 							world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 3, 1.25f);
@@ -124,8 +125,6 @@ public class SpellBurningVengence extends Spell {
 
 	@Override
 	public int duration() {
-		// TODO Auto-generated method stub
 		return 20 * 10;
 	}
-
 }

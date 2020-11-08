@@ -22,7 +22,7 @@ public class SpellKnockAway extends Spell {
 	private int mRadius;
 	private int mTime;
 	private float mSpeed;
-	private int w;
+	private int mWidth;
 
 	public SpellKnockAway(Plugin plugin, LivingEntity launcher, int radius, int time, float speed) {
 		mPlugin = plugin;
@@ -34,7 +34,7 @@ public class SpellKnockAway extends Spell {
 
 	@Override
 	public void run() {
-		w = 0;
+		mWidth = 0;
 		animation(mLauncher.getLocation());
 		deal_damage();
 	}
@@ -85,7 +85,7 @@ public class SpellKnockAway extends Spell {
 				double precision = FastUtils.RANDOM.nextInt(50) + 100;
 				double increment = (2 * Math.PI) / precision;
 				Location particleLoc = new Location(lloc.getWorld(), 0, lloc.getY() + 1.5, 0);
-				double rad = (double)(mRadius * w) / 5;
+				double rad = (double)(mRadius * mWidth) / 5;
 				double angle = 0;
 				for (int j = 0; j < precision; j++) {
 					angle = j * increment;
@@ -94,12 +94,12 @@ public class SpellKnockAway extends Spell {
 					particleLoc.setY(lloc.getY() + 1.5);
 					particleLoc.getWorld().spawnParticle(Particle.CRIT, particleLoc, 1, 0.02, 1.5 * rad, 0.02, 0);
 				}
-				if (w == 0) {
+				if (mWidth == 0) {
 					particleLoc.getWorld().playSound(particleLoc, Sound.ENTITY_WITHER_SHOOT, (float)mRadius / 7, 0.77F);
 					particleLoc.getWorld().playSound(particleLoc, Sound.ENTITY_WITHER_SHOOT, (float)mRadius / 7, 0.5F);
 					particleLoc.getWorld().playSound(particleLoc, Sound.ENTITY_WITHER_SHOOT, (float)mRadius / 7, 0.65F);
 				}
-				w++;
+				mWidth++;
 			}
 		};
 

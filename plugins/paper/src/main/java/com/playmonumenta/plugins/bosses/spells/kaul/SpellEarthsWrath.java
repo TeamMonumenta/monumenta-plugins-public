@@ -38,15 +38,15 @@ public class SpellEarthsWrath extends Spell {
 		Location centerLoc = mBoss.getLocation();
 
 		new BukkitRunnable() {
-			int t = 0;
+			int mTicks = 0;
 			@Override
 			public void run() {
-				t++;
-				if (t % 2 == 0) {
+				mTicks++;
+				if (mTicks % 2 == 0) {
 					world.playSound(mBoss.getLocation(), Sound.ENTITY_IRON_GOLEM_HURT, 2, 1);
 				}
 				world.spawnParticle(Particle.SMOKE_LARGE, mBoss.getLocation(), 2, 0.25, 0.1, 0.25, 0.25);
-				if (t >= 20 * 2.15) {
+				if (mTicks >= 20 * 2.15) {
 					this.cancel();
 					world.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_SHOOT, 2, 1);
 					Location loc = mBoss.getLocation().add(0, 0.25, 0);
@@ -58,10 +58,10 @@ public class SpellEarthsWrath extends Spell {
 							final double mRadian1 = Math.toRadians((7.5 * j));
 							final Location mPoint = loc.clone().add(FastUtils.cos(mRadian1) * 0.5, 0, FastUtils.sin(mRadian1) * 0.5);
 							final Vector mDir = LocationUtils.getDirectionTo(mPoint, loc);
-							int t = 0;
+							int mTicks = 0;
 							@Override
 							public void run() {
-								t++;
+								mTicks++;
 								mBox.shift(mDir.clone().multiply(0.45));
 								Location bLoc = mBox.getCenter().toLocation(world);
 								world.spawnParticle(Particle.DAMAGE_INDICATOR, bLoc, 1, 0.25, 0.25, 0.25, 0);
@@ -74,7 +74,7 @@ public class SpellEarthsWrath extends Spell {
 										player.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, 20 * 10, -4));
 									}
 								}
-								if (t >= 20 * 3) {
+								if (mTicks >= 20 * 3) {
 									this.cancel();
 								}
 							}

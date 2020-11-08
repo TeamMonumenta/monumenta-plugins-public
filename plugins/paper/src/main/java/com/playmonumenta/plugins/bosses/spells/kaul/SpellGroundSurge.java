@@ -45,20 +45,20 @@ public class SpellGroundSurge extends Spell {
 		List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), mRange);
 		players.removeIf(p -> p.getLocation().getY() >= 61);
 		new BukkitRunnable() {
-			int t = 0;
-			float pitch = 0;
+			int mTicks = 0;
+			float mPitch = 0;
 			@Override
 			public void run() {
-				t++;
+				mTicks++;
 				Location loc = mBoss.getLocation();
-				pitch += 0.025;
-				if (t % 2 == 0) {
-					world.playSound(loc, Sound.ENTITY_ENDER_DRAGON_HURT, 3, pitch);
+				mPitch += 0.025;
+				if (mTicks % 2 == 0) {
+					world.playSound(loc, Sound.ENTITY_ENDER_DRAGON_HURT, 3, mPitch);
 				}
 				world.spawnParticle(Particle.BLOCK_DUST, loc, 8, 0.4, 0.1, 0.4, 0.25, Material.COARSE_DIRT.createBlockData());
 				world.spawnParticle(Particle.SMOKE_LARGE, loc, 2, 0.25, 0.1, 0.25, 0.25);
 
-				if (t >= 20 * 2.5) {
+				if (mTicks >= 20 * 2.5) {
 					this.cancel();
 					final int targets;
 					if (players.size() == 0) {
@@ -90,17 +90,19 @@ public class SpellGroundSurge extends Spell {
 						}
 					}
 
+					Location nloc = mBoss.getLocation().add(0, 0.5, 0);
 					for (Player target : toHit) {
+						Vector dir = LocationUtils.getDirectionTo(target.getLocation(), nloc).setY(0).normalize().multiply(1.1);
+
 						new BukkitRunnable() {
-							int i = 0;
-							Location nloc = mBoss.getLocation().add(0, 0.5, 0);
-							BoundingBox box = BoundingBox.of(nloc, 0.65, 0.65, 0.65);
-							Vector dir = LocationUtils.getDirectionTo(target.getLocation(), nloc).setY(0).normalize();
+							int mInnerTicks = 0;
+							BoundingBox mBox = BoundingBox.of(nloc, 0.65, 0.65, 0.65);
+
 							@Override
 							public void run() {
-								i++;
-								box.shift(dir.clone().multiply(1.1));
-								Location bLoc = box.getCenter().toLocation(world);
+								mInnerTicks++;
+								mBox.shift(dir);
+								Location bLoc = mBox.getCenter().toLocation(world);
 								if (bLoc.getBlock().getType().isSolid()) {
 									bLoc.add(0, 1, 0);
 									if (bLoc.getBlock().getType().isSolid()) {
@@ -120,7 +122,7 @@ public class SpellGroundSurge extends Spell {
 								}
 								bLoc.add(0, 0.5, 0);
 
-								if (i >= 45) {
+								if (mInnerTicks >= 45) {
 									this.cancel();
 								}
 
@@ -129,7 +131,7 @@ public class SpellGroundSurge extends Spell {
 								world.spawnParticle(Particle.FLAME, bLoc, 15, 0.5, 0.5, 0.5, 0.075);
 								world.spawnParticle(Particle.LAVA, bLoc, 2, 0.5, 0.5, 0.5, 0.25);
 								for (Player player : players) {
-									if (player.getBoundingBox().overlaps(box)) {
+									if (player.getBoundingBox().overlaps(mBox)) {
 										this.cancel();
 										BossUtils.bossDamage(mBoss, player, 30);
 										player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 20, 2));
@@ -150,16 +152,16 @@ public class SpellGroundSurge extends Spell {
 										Player tPlayer = rPlayer;
 										new BukkitRunnable() {
 											Player _tPlayer = tPlayer;
-											BoundingBox box = BoundingBox.of(bLoc, 0.4, 0.4, 0.4);
+											BoundingBox mBox = BoundingBox.of(bLoc, 0.4, 0.4, 0.4);
 											int mTicks = 0;
 											int mHits = 0;
 											List<UUID> mHit = new ArrayList<UUID>();
 											@Override
 											public void run() {
 												mTicks++;
-												Location innerBoxLoc = box.getCenter().toLocation(world);
+												Location innerBoxLoc = mBox.getCenter().toLocation(world);
 												Vector dir = LocationUtils.getDirectionTo(_tPlayer.getLocation(), innerBoxLoc).setY(0).normalize();
-												box.shift(dir.clone().multiply(0.7));
+												mBox.shift(dir.clone().multiply(0.7));
 												if (innerBoxLoc.getBlock().getType().isSolid()) {
 													innerBoxLoc.add(0, 1, 0);
 													if (innerBoxLoc.getBlock().getType().isSolid()) {
@@ -185,7 +187,7 @@ public class SpellGroundSurge extends Spell {
 												world.spawnParticle(Particle.FLAME, innerBoxLoc, 6, 0.2, 0.2, 0.2, 0.075);
 												player.spawnParticle(Particle.LAVA, innerBoxLoc, 1, 0.2, 0.2, 0.2, 0.25);
 												for (Player surgePlayer : players) {
-													if (surgePlayer.getBoundingBox().overlaps(box)
+													if (surgePlayer.getBoundingBox().overlaps(mBox)
 															&& !surgePlayer.getUniqueId().equals(player.getUniqueId())
 															&& !mHit.contains(surgePlayer.getUniqueId())) {
 														mHit.add(surgePlayer.getUniqueId());

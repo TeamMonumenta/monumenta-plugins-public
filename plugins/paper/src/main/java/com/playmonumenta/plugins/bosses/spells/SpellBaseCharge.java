@@ -261,10 +261,11 @@ public class SpellBaseCharge extends Spell {
 	private void launch(Player target, List<Player> players, int charges, int rate) {
 		BukkitRunnable runnable = new BukkitRunnable() {
 			private int mTicks = 0;
-			private int charges_done = 0;
-			Location targetLoc;
-			List<Player> bystanders = players;
+			private int mChargesDone = 0;
+			Location mTargetLoc;
+			List<Player> mBystanders = players;
 			Player mTarget = target;
+
 			@Override
 			public void run() {
 				if (mBoss == null || !mBoss.isValid() || mBoss.isDead() || EntityUtils.isStunned(mBoss)) {
@@ -275,24 +276,24 @@ public class SpellBaseCharge extends Spell {
 					return;
 				}
 				if (mTicks == 0) {
-					targetLoc = mTarget.getEyeLocation();
+					mTargetLoc = mTarget.getEyeLocation();
 					if (mWarningAction != null) {
 						mWarningAction.run(target);
 					}
 				} else if (mTicks > 0 && mTicks < mChargeTicks) {
 					// This runs once every other tick while charging
-					doCharge(mTarget, mBoss, targetLoc, bystanders, null, mWarnParticleAction, null, null, false, mStopOnFirstHit);
+					doCharge(mTarget, mBoss, mTargetLoc, mBystanders, null, mWarnParticleAction, null, null, false, mStopOnFirstHit);
 				} else if (mTicks >= mChargeTicks) {
 					// Do the "real" charge attack
-					doCharge(mTarget, mBoss, targetLoc, bystanders, mStartAction, mParticleAction, mHitPlayerAction,
+					doCharge(mTarget, mBoss, mTargetLoc, mBystanders, mStartAction, mParticleAction, mHitPlayerAction,
 					         mEndAction, true, mStopOnFirstHit);
-					charges_done++;
-					if (charges_done >= charges) {
+					mChargesDone++;
+					if (mChargesDone >= charges) {
 						this.cancel();
 						mActiveRunnables.remove(this);
 					} else {
 						// Get list of all nearby players who could be hit by the attack
-						bystanders = PlayerUtils.playersInRange(mBoss.getLocation(), mRange * 2);
+						mBystanders = PlayerUtils.playersInRange(mBoss.getLocation(), mRange * 2);
 
 						// Choose random player within range that has line of sight to boss
 						List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), mRange);
@@ -300,7 +301,7 @@ public class SpellBaseCharge extends Spell {
 						for (Player player : players) {
 							if (LocationUtils.hasLineOfSight(mBoss, player)) {
 								mTarget = player;
-								targetLoc = mTarget.getLocation().add(0, 1.0f, 0);
+								mTargetLoc = mTarget.getLocation().add(0, 1.0f, 0);
 								break;
 							}
 						}
@@ -318,7 +319,7 @@ public class SpellBaseCharge extends Spell {
 	private void launch(Player target, List<Player> players) {
 		BukkitRunnable runnable = new BukkitRunnable() {
 			private int mTicks = 0;
-			Location targetLoc;
+			Location mTargetLoc;
 
 			@Override
 			public void run() {
@@ -327,16 +328,16 @@ public class SpellBaseCharge extends Spell {
 					return;
 				}
 				if (mTicks == 0) {
-					targetLoc = target.getLocation().add(0, 1.0f, 0);
+					mTargetLoc = target.getLocation().add(0, 1.0f, 0);
 					if (mWarningAction != null) {
 						mWarningAction.run(target);
 					}
 				} else if (mTicks > 0 && mTicks < mChargeTicks) {
 					// This runs once every other tick while charging
-					doCharge(target, mBoss, targetLoc, players, null, mWarnParticleAction, null, null, false, mStopOnFirstHit);
+					doCharge(target, mBoss, mTargetLoc, players, null, mWarnParticleAction, null, null, false, mStopOnFirstHit);
 				} else if (mTicks >= mChargeTicks) {
 					// Do the "real" charge attack
-					doCharge(target, mBoss, targetLoc, players, mStartAction, mParticleAction, mHitPlayerAction,
+					doCharge(target, mBoss, mTargetLoc, players, mStartAction, mParticleAction, mHitPlayerAction,
 					         mEndAction, true, mStopOnFirstHit);
 					this.cancel();
 					mActiveRunnables.remove(this);

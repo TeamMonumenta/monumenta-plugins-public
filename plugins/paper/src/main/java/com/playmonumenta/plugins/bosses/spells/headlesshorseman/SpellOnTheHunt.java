@@ -56,10 +56,10 @@ public class SpellOnTheHunt extends Spell {
 		world.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_SPAWN, 3, 1.25f);
 		world.playSound(mBoss.getLocation(), Sound.ENTITY_WITCH_AMBIENT, 3, 0.5f);
 		new BukkitRunnable() {
-			int t = 0;
+			int mTicks = 0;
 			@Override
 			public void run() {
-				t++;
+				mTicks++;
 
 				if (mBoss.isDead() || !mBoss.isValid()) {
 					this.cancel();
@@ -67,7 +67,7 @@ public class SpellOnTheHunt extends Spell {
 					return;
 				}
 				world.spawnParticle(Particle.SMOKE_NORMAL, mBoss.getLocation().add(0, 1, 0), 7, 0.4, 0.4, 0.4, 0.025);
-				if (t >= 20) {
+				if (mTicks >= 20) {
 					world.playSound(mBoss.getLocation(), Sound.ENTITY_HORSE_GALLOP, 3, 0.75f);
 					world.playSound(mBoss.getLocation(), Sound.BLOCK_BEACON_POWER_SELECT, 3, 1.25f);
 					world.playSound(mBoss.getLocation(), Sound.ENTITY_IRON_GOLEM_DEATH, 3, 1.75f);
@@ -78,10 +78,10 @@ public class SpellOnTheHunt extends Spell {
 					this.cancel();
 
 					new BukkitRunnable() {
-						int t = 0;
+						int mTicks = 0;
+
 						@Override
 						public void run() {
-
 							if (mBoss.isDead() || !mBoss.isValid()) {
 								this.cancel();
 								mActive = false;
@@ -99,9 +99,9 @@ public class SpellOnTheHunt extends Spell {
 								return;
 							}
 
-							t++;
+							mTicks++;
 							c.setTarget(target);
-							if (t >= 20 * 5) {
+							if (mTicks >= 20 * 5) {
 								this.cancel();
 								mActive = false;
 								world.spawnParticle(Particle.SMOKE_LARGE, mBoss.getLocation().add(0, 1, 0), 10, 0.4, 0.4, 0.4, 0);

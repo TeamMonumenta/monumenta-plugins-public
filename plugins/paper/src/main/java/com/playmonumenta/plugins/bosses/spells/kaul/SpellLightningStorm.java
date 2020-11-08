@@ -25,7 +25,7 @@ import com.playmonumenta.plugins.utils.PlayerUtils;
  * form of chat message as a warning)
  */
 public class SpellLightningStorm extends Spell {
-	private int t = 0;
+	private int mTicks = 0;
 	private LivingEntity mBoss;
 	private double mRange;
 	private static final String LIGHTNING_STORM_TAG = "KaulLightningStormTag";
@@ -47,9 +47,9 @@ public class SpellLightningStorm extends Spell {
 
 	@Override
 	public void run() {
-		t--;
-		if (t <= 0) {
-			t = 6;
+		mTicks--;
+		if (mTicks <= 0) {
+			mTicks = 6;
 			for (Player player : PlayerUtils.playersInRange(mCenter.getLocation(), mRange)) {
 				Location loc = player.getLocation();
 				if (player.isOnGround()) {

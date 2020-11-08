@@ -47,17 +47,17 @@ public class SpellHallowsEnd extends Spell {
 		World world = loc.getWorld();
 		world.playSound(loc, Sound.BLOCK_BUBBLE_COLUMN_WHIRLPOOL_INSIDE, 2, 0.85f);
 		new BukkitRunnable() {
-			int t = 0;
+			int mTicks = 0;
 			@Override
 			public void run() {
-				t++;
-				if (t % 2 == 0) {
+				mTicks++;
+				if (mTicks % 2 == 0) {
 					for (int i = 0; i < 15; i++) {
 						world.spawnParticle(Particle.FLAME, loc.clone().add(0, i, 0), 3, 0.2, 0.2, 0.2, 0.05);
 					}
 				}
 
-				if (t >= 25) {
+				if (mTicks >= 25) {
 					this.cancel();
 					for (int i = 0; i < 15; i++) {
 						world.spawnParticle(Particle.SMOKE_NORMAL, loc.clone().add(0, i, 0), 5, 0.2, 0.2, 0.2, 0.1);
@@ -103,15 +103,16 @@ public class SpellHallowsEnd extends Spell {
 		pillar(mBoss.getLocation(), false);
 
 		new BukkitRunnable() {
-			boolean init = false;
-			int t = 0;
-			int hits = 0;
+			boolean mInit = false;
+			int mTicks = 0;
+			int mHits = 0;
+
 			@Override
 			public void run() {
-				t++;
+				mTicks++;
 
-				if (!init) {
-					init = true;
+				if (!mInit) {
+					mInit = true;
 					List<Player> players = PlayerUtils.playersInRange(mHorseman.getSpawnLocation(), HeadlessHorsemanBoss.detectionRange);
 					Collections.shuffle(players);
 
@@ -127,8 +128,8 @@ public class SpellHallowsEnd extends Spell {
 
 				if (mHit) {
 					mHit = false;
-					t = 0;
-					hits++;
+					mTicks = 0;
+					mHits++;
 					List<Player> players = PlayerUtils.playersInRange(mHorseman.getSpawnLocation(), HeadlessHorsemanBoss.detectionRange);
 					Collections.shuffle(players);
 
@@ -142,7 +143,7 @@ public class SpellHallowsEnd extends Spell {
 					}
 				}
 
-				if (t > 30 || hits >= 5) {
+				if (mTicks > 30 || mHits >= 5) {
 					this.cancel();
 				}
 			}

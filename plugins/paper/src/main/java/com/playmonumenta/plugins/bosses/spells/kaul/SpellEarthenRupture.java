@@ -36,12 +36,12 @@ public class SpellEarthenRupture extends Spell {
 		mBoss.removePotionEffect(PotionEffectType.SLOW);
 		mBoss.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 50, 1));
 		new BukkitRunnable() {
-			int t = 0;
+			int mTicks = 0;
 			@Override
 			public void run() {
-				t++;
+				mTicks++;
 				Location loc = mBoss.getLocation();
-				if (t % 2 == 0) {
+				if (mTicks % 2 == 0) {
 					world.playSound(loc, Sound.BLOCK_GRAVEL_HIT, 2, 0.9f);
 				}
 
@@ -50,7 +50,7 @@ public class SpellEarthenRupture extends Spell {
 				if (mBoss.isDead() || !mBoss.isValid()) {
 					this.cancel();
 				}
-				if (t >= 45) {
+				if (mTicks >= 45) {
 					this.cancel();
 					world.playSound(loc, Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, 1.5f, 0.9f);
 					world.spawnParticle(Particle.BLOCK_DUST, loc, 250, 3, 0.1, 3, 0.25, Material.COARSE_DIRT.createBlockData());

@@ -66,12 +66,12 @@ public class SpellAGoshDamnAirCombo extends SpellBaseCharge {
 							MovementUtils.knockAway(boss.getLocation(), player, 0.65f);
 							boss.setVelocity(new Vector(0, -5, 0));
 							new BukkitRunnable() {
-								int t = 0;
+								int mTicks = 0;
 								@Override
 								public void run() {
-									t++;
+									mTicks++;
 
-									if (t >= 20 || boss.isOnGround()) {
+									if (mTicks >= 20 || boss.isOnGround()) {
 										this.cancel();
 										boss.setFallDistance(0);
 										boss.removePotionEffect(PotionEffectType.DAMAGE_RESISTANCE);
@@ -86,12 +86,12 @@ public class SpellAGoshDamnAirCombo extends SpellBaseCharge {
 							player.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, 20 * 6, 1));
 							player.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 20 * 3, 10));
 							new BukkitRunnable() {
-								int t = 0;
+								int mTicks = 0;
 								@Override
 								public void run() {
-									t++;
+									mTicks++;
 
-									if (t >= 20 || player.isOnGround()) {
+									if (mTicks >= 20 || player.isOnGround()) {
 										this.cancel();
 										player.setFallDistance(0);
 										player.removePotionEffect(PotionEffectType.DAMAGE_RESISTANCE);

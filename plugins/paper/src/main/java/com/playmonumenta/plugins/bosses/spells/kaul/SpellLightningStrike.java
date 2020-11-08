@@ -88,12 +88,14 @@ public class SpellLightningStrike extends Spell {
 	public void lightning(Player player) {
 		World world = player.getWorld();
 		world.playSound(player.getLocation(), Sound.ENTITY_FIREWORK_ROCKET_TWINKLE, 1, 1.25f);
+		Location loc = player.getLocation();
+
 		new BukkitRunnable() {
-			Location loc = player.getLocation();
-			int i = 0;
+			int mTicks = 0;
+
 			@Override
 			public void run() {
-				i++;
+				mTicks++;
 				world.spawnParticle(Particle.REDSTONE, loc, 12, 1.5, 0.1, 1.5, YELLOW_1_COLOR);
 				world.spawnParticle(Particle.REDSTONE, loc, 12, 1.5, 0.1, 1.5, YELLOW_2_COLOR);
 				world.spawnParticle(Particle.FIREWORKS_SPARK, loc.clone().add(0, 1, 0), 3, 1.5, 0.5, 1.5, 0.05);
@@ -102,7 +104,7 @@ public class SpellLightningStrike extends Spell {
 					prestrike.subtract(0, 1, 0);
 					world.spawnParticle(Particle.FLAME, prestrike, 1, 0, 0, 0, 0.05);
 				}
-				if (i >= 20 * 1.25) {
+				if (mTicks >= 20 * 1.25) {
 					this.cancel();
 					Location strike = loc.clone().add(0, 10, 0);
 					for (int i = 0; i < 10; i++) {

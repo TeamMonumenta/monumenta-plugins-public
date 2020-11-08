@@ -22,7 +22,7 @@ public class SpellArachnopocolypse extends Spell {
 	private LivingEntity mBoss;
 	private Location mLoc;
 	private double mDetectRange;
-	private boolean cooldown = false;
+	private boolean mCooldown = false;
 
 	public SpellArachnopocolypse(Plugin plugin, LivingEntity boss, Location loc, double detectRange) {
 		mPlugin = plugin;
@@ -33,18 +33,18 @@ public class SpellArachnopocolypse extends Spell {
 
 	@Override
 	public boolean canRun() {
-		return !cooldown;
+		return !mCooldown;
 	}
 
 	@Override
 	public void run() {
 		World world = mBoss.getWorld();
-		cooldown = true;
+		mCooldown = true;
 		new BukkitRunnable() {
 
 			@Override
 			public void run() {
-				cooldown = false;
+				mCooldown = false;
 			}
 
 		}.runTaskLater(mPlugin, 20 * 60);
@@ -62,12 +62,12 @@ public class SpellArachnopocolypse extends Spell {
 				world.playSound(mBoss.getLocation(), Sound.ENTITY_EVOKER_PREPARE_SUMMON, 10, 1);
 				world.spawnParticle(Particle.EXPLOSION_NORMAL, mBoss.getLocation(), 50, 0.5, 0.25, 0.5, 0);
 				new BukkitRunnable() {
-					int t = 0;
+					int mTicks = 0;
 					@Override
 					public void run() {
-						t++;
+						mTicks++;
 						riseSpider(getRandomLocation(mLoc, 32));
-						if (t >= a) {
+						if (mTicks >= a) {
 							this.cancel();
 						}
 					}
@@ -92,13 +92,13 @@ public class SpellArachnopocolypse extends Spell {
 
 		String toSummon = summon;
 		new BukkitRunnable() {
-			int t = 0;
+			int mTicks = 0;
 			@Override
 			public void run() {
-				t++;
+				mTicks++;
 				loc.getWorld().spawnParticle(Particle.BLOCK_DUST, loc, 2, 0.4, 0.1, 0.4, 0.25, Material.DIRT.createBlockData());
 
-				if (t >= 20) {
+				if (mTicks >= 20) {
 					this.cancel();
 					loc.getWorld().playSound(loc, Sound.BLOCK_GRAVEL_BREAK, 1, 1f);
 					loc.getWorld().spawnParticle(Particle.BLOCK_DUST, loc, 16, 0.25, 0.1, 0.25, 0.25, Material.DIRT.createBlockData());

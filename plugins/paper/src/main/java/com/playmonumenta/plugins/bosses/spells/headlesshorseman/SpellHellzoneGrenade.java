@@ -56,10 +56,10 @@ public class SpellHellzoneGrenade extends Spell {
 		List<Player> players = PlayerUtils.playersInRange(mCenter, mRange);
 
 		new BukkitRunnable() {
-			int t = 0;
+			int mTicks = 0;
 			@Override
 			public void run() {
-				t++;
+				mTicks++;
 
 				world.spawnParticle(Particle.FLAME, mBoss.getLocation(), 40, 0, 0, 0, 0.1);
 				world.spawnParticle(Particle.SMOKE_NORMAL, mBoss.getLocation(), 35, 0, 0, 0, 0.1);
@@ -72,7 +72,7 @@ public class SpellHellzoneGrenade extends Spell {
 						break;
 					}
 				}
-				if (t >= 5) {
+				if (mTicks >= 5) {
 					this.cancel();
 				}
 			}
@@ -110,22 +110,22 @@ public class SpellHellzoneGrenade extends Spell {
 						for (Player player : PlayerUtils.playersInRange(fallingBlock.getLocation(), 4)) {
 							if (mCenter.distance(player.getLocation()) < HeadlessHorsemanBoss.detectionRange) {
 								BossUtils.bossDamage(mBoss, player, 35);
-								// Shields don't stop fire!
+								// Shields don'mTicks stop fire!
 								player.setFireTicks(20 * 3);
 							}
 
 						}
 
 						new BukkitRunnable() {
-							int t = 0;
+							int mTicks = 0;
 							Location loc = fallingBlock.getLocation();
 							@Override
 							public void run() {
-								t += 2;
+								mTicks += 2;
 								world.spawnParticle(Particle.FLAME, loc, 12, 1.5, 0.15, 1.5, 0.05);
 								world.spawnParticle(Particle.SMOKE_LARGE, loc, 4, 1.5, 0.15, 1.5, 0.025);
 
-								if (t % 10 == 0) {
+								if (mTicks % 10 == 0) {
 									for (Player player : PlayerUtils.playersInRange(fallingBlock.getLocation(), 4)) {
 										if (mCenter.distance(player.getLocation()) < HeadlessHorsemanBoss.detectionRange) {
 											/* Fire aura can not be blocked */
@@ -135,7 +135,7 @@ public class SpellHellzoneGrenade extends Spell {
 									}
 								}
 
-								if (t >= 20 * 5) {
+								if (mTicks >= 20 * 5) {
 									this.cancel();
 								}
 							}

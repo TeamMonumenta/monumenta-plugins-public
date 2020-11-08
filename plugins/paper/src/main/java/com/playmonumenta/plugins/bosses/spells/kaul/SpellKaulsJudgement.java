@@ -59,7 +59,7 @@ public class SpellKaulsJudgement extends Spell implements Listener {
 	private final Plugin mPlugin = Plugin.getInstance();
 	private final Location mBossLoc;
 	private LivingEntity mTp = null;
-	private boolean onCooldown = false;
+	private boolean mOnCooldown = false;
 
 	private final List<Player> mJudgedPlayers = new ArrayList<Player>();
 	private final HashMap<Player, Location> mOrigPlayerLocs = new HashMap<Player, Location>();
@@ -94,12 +94,12 @@ public class SpellKaulsJudgement extends Spell implements Listener {
 
 	@Override
 	public void run() {
-		onCooldown = true;
+		mOnCooldown = true;
 		World world = mBossLoc.getWorld();
 		new BukkitRunnable() {
 			@Override
 			public void run() {
-				onCooldown = false;
+				mOnCooldown = false;
 			}
 		}.runTaskLater(mPlugin, 20 * 90);
 
@@ -256,7 +256,7 @@ public class SpellKaulsJudgement extends Spell implements Listener {
 
 	@Override
 	public boolean canRun() {
-		return mTp != null && !onCooldown;
+		return mTp != null && !mOnCooldown;
 	}
 
 	@Override

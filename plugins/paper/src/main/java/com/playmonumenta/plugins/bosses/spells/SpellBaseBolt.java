@@ -176,20 +176,22 @@ public class SpellBaseBolt extends Spell {
 			@Override
 			public void run() {
 				mTicks++;
+				Vector dir = LocationUtils.getDirectionTo(player.getLocation().add(0, 1, 0), mCaster.getEyeLocation());
+				Location detLoc = mCaster.getLocation();
+				List<Player> players = PlayerUtils.playersInRange(detLoc, 75);
+
 				new BukkitRunnable() {
-					BoundingBox box = BoundingBox.of(mCaster.getEyeLocation(), mHitboxRadius, mHitboxRadius, mHitboxRadius);
-					Vector dir = LocationUtils.getDirectionTo(player.getLocation().add(0, 1, 0), mCaster.getEyeLocation());
-					Location detLoc = mCaster.getLocation();
-					List<Player> players = PlayerUtils.playersInRange(detLoc, 75);
-					int i = 0;
+					BoundingBox mBox = BoundingBox.of(mCaster.getEyeLocation(), mHitboxRadius, mHitboxRadius, mHitboxRadius);
+					int mInnerTicks = 0;
+
 					@Override
 					public void run() {
 						// Iterate two times and half the velocity so that way we can have more accurate travel for intersection.
 						for (int j = 0; j < 2; j++) {
-							box.shift(dir.clone().multiply(mVelocity * 0.5));
-							Location loc = box.getCenter().toLocation(mCaster.getWorld());
+							mBox.shift(dir.clone().multiply(mVelocity * 0.5));
+							Location loc = mBox.getCenter().toLocation(mCaster.getWorld());
 							for (Player player : players) {
-								if (player.getBoundingBox().overlaps(box)) {
+								if (player.getBoundingBox().overlaps(mBox)) {
 									mIntersectAction.run(player, loc, false);
 									if (mStopOnFirstHit) {
 										this.cancel();
@@ -202,11 +204,11 @@ public class SpellBaseBolt extends Spell {
 								mIntersectAction.run(null, loc, true);
 							}
 						}
-						Location loc = box.getCenter().toLocation(mCaster.getWorld());
-						i++;
+						Location loc = mBox.getCenter().toLocation(mCaster.getWorld());
+						mInnerTicks++;
 						mParticleAction.run(loc);
 
-						if (i >= mDuration || mCaster == null || mCaster.isDead()) {
+						if (mInnerTicks >= mDuration || mCaster == null || mCaster.isDead()) {
 							this.cancel();
 						}
 					}
