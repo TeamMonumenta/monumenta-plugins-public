@@ -3,7 +3,6 @@ package com.playmonumenta.plugins.bosses.bosses;
 import java.util.Arrays;
 import java.util.List;
 
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -14,6 +13,7 @@ import org.bukkit.plugin.Plugin;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.bosses.spells.SpellDelayedAction;
 import com.playmonumenta.plugins.bosses.spells.SpellRunAction;
+import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 
 public class InfestedBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_infested";
@@ -57,7 +57,7 @@ public class InfestedBoss extends BossAbilityGroup {
 		                           loc.getWorld().spawnParticle(Particle.VILLAGER_ANGRY, loc.clone().add(0, -1, 0), 20, 0.6, 0.6, 0.6, 0);
 		                           //TODO: Raise location up to avoid spawning in blocks?
 		                           for (int i = 0; i < 4; i++) {
-		                               Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "summon minecraft:silverfish " + loc.getX() + " " + loc.getY() + " " + loc.getZ() + " {CustomName:\"{\\\"text\\\":\\\"Maggot\\\"}\",Health:25.0f,Attributes:[{Base:25.0d,Name:\"generic.maxHealth\"}],HandItems:[{id:\"minecraft:diamond_sword\",Count:1b,tag:{AttributeModifiers:[{UUIDMost:-333297535166493057L,UUIDLeast:-5147864146781586208L,Amount:8.0d,Slot:\"mainhand\",AttributeName:\"generic.attackDamage\",Operation:0,Name:\"Modifier\"},{UUIDMost:6450165871249213567L,UUIDLeast:-4838301806280773784L,Amount:0.02d,Slot:\"mainhand\",AttributeName:\"generic.movementSpeed\",Operation:1,Name:\"Modifier\"}]}},{}]}");
+		                               LibraryOfSoulsIntegration.summon(loc, "Maggot");
 		                           }
 		                       }).run();
 	}

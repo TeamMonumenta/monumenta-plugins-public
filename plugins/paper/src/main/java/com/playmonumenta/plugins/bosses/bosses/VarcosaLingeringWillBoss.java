@@ -198,7 +198,11 @@ public class VarcosaLingeringWillBoss extends BossAbilityGroup {
 
 	private void summonArmorStandIfNoneAreThere(Location loc) {
 		if (loc.getNearbyEntitiesByType(ArmorStand.class, 2, 2, 2).isEmpty()) {
-			EntityUtils.summonEntityAt(loc, EntityType.ARMOR_STAND, "{Pose:{},Marker:1b,Tags:[\"summon_constantly_stand\"],Invisible:1b,Invulnerable:1b}");
+			ArmorStand as = (ArmorStand) mBoss.getWorld().spawnEntity(loc, EntityType.ARMOR_STAND);
+			as.setInvisible(true);
+			as.setInvulnerable(true);
+			as.setMarker(true);
+			as.addScoreboardTag("summon_constantly_stand");
 		}
 	}
 }

@@ -2,8 +2,6 @@ package com.playmonumenta.plugins.bosses.spells;
 
 import java.util.List;
 
-import com.playmonumenta.plugins.utils.FastUtils;
-
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -13,6 +11,9 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitScheduler;
 import org.bukkit.util.Vector;
+
+import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
+import com.playmonumenta.plugins.utils.FastUtils;
 
 public class SpellAxtalMeleeMinions extends Spell {
 	private Plugin mPlugin;
@@ -60,7 +61,7 @@ public class SpellAxtalMeleeMinions extends Spell {
 			public void run() {
 				int numberToSpawn = mCount + (FastUtils.RANDOM.nextInt(2 * mScope) - mScope);
 				for (int j = 0; j < numberToSpawn; j++) {
-					Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "summon skeleton " + loc.getX() + " " + loc.getY() + " " + loc.getZ() + " {CustomName:\"\\\"Soul\\\"\",CustomNameVisible:1,Tags:[\"Soul\"],ArmorItems:[{},{},{id:\"minecraft:leather_chestplate\",Count:1b,tag:{display:{color:12430010}}},{id:\"minecraft:skeleton_skull\",Count:1b}],Attributes:[{Name:generic.maxHealth,Base:11},{Name:generic.attackDamage,Base:6}],Health:11.0f,DeathLootTable:\"minecraft:empty\",Team:\"Tlax\",ActiveEffects:[{Id:14b,Amplifier:1b,Duration:999999},{Id:20b,Amplifier:0b,Duration:999999}],Silent:1b}");
+					LibraryOfSoulsIntegration.summon(loc, "Soul");
 				}
 				for (Entity skelly : mLauncher.getNearbyEntities(0.2, 0.2, 0.2)) {
 					if (skelly.getType() == EntityType.SKELETON) {

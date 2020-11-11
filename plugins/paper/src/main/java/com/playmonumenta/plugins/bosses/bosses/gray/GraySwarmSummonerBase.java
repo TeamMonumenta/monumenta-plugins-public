@@ -9,7 +9,6 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
@@ -19,7 +18,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.bosses.BossAbilityGroup;
 import com.playmonumenta.plugins.bosses.spells.SpellBaseSummon;
-import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
@@ -34,7 +33,7 @@ public abstract class GraySwarmSummonerBase extends BossAbilityGroup {
 	private static final int PLAYER_RANGE = 32;
 	private static final int MAX_NEARBY_SUMMONS = 25;
 
-	GraySwarmSummonerBase(Plugin plugin, LivingEntity boss, String identityTag, int detectionRange, EntityType mobType, String mobNBT) throws Exception {
+	GraySwarmSummonerBase(Plugin plugin, LivingEntity boss, String identityTag, int detectionRange, String mobName) throws Exception {
 		if (!(boss instanceof Mob)) {
 			throw new Exception("gray boss tags only work on mobs!");
 		}
@@ -80,7 +79,7 @@ public abstract class GraySwarmSummonerBase extends BossAbilityGroup {
 								public void run() {
 									try {
 										summonLoc.getWorld().playSound(summonLoc, Sound.ENTITY_ENDERMAN_TELEPORT, 0.8f, 1.4f);
-										Entity entity = EntityUtils.getSummonEntityAt(summonLoc, mobType, mobNBT);
+										Entity entity = LibraryOfSoulsIntegration.summon(summonLoc, mobName);
 										if (entity != null && entity instanceof Mob) {
 											Mob mob = (Mob)entity;
 											mob.setTarget(player);

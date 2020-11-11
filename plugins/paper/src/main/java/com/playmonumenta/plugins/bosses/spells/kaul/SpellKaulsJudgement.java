@@ -14,7 +14,6 @@ import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -28,7 +27,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.bosses.spells.Spell;
-import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
 
@@ -51,7 +50,6 @@ public class SpellKaulsJudgement extends Spell implements Listener {
 	private static final String KAULS_JUDGEMENT_TAG = "KaulsJudgementTag";
 	private static final String KAULS_JUDGEMENT_MOB_SPAWN_TAG = "KaulsJudgementMobSpawn";
 	private static final String KAULS_JUDGEMENT_MOB_TAG = "deleteelite";
-	private static final String mob = "{ArmorDropChances:[-327.67f,-327.67f,-327.67f,-327.67f],CustomName:\"{\\\"text\\\":\\\"§6Stoneborn Immortal\\\"}\",IsBaby:0,Health:30.0f,ArmorItems:[{id:\"minecraft:leather_boots\",Count:1b,tag:{display:{color:10395294},Damage:0}},{id:\"minecraft:leather_leggings\",Count:1b,tag:{display:{color:6191160},Damage:0}},{id:\"minecraft:leather_chestplate\",Count:1b,tag:{display:{color:10395294},Damage:0}},{id:\"minecraft:player_head\",Count:1b,tag:{SkullOwner:{Id:\"86d08d4a-3cc6-46fa-61cf-c54d58373c70\",Properties:{textures:[{Value:\"eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYzk4ZDNjMzFmOWJjNTc1Mzk4MzdkMTc2NTdiOWJhZTczNWE4OTZmMWEwNzc4MTZlZDk1NzU3YzE1NDJhYTMifX19\"}]}}}}],Attributes:[{Base:30,Name:\"generic.maxHealth\"},{Base:0.21d,Name:\"generic.movementSpeed\"},{Base:0.0f,Name:\"zombie.spawnReinforcements\"},{Base:60,Name:\"generic.followRange\"}],HandDropChances:[-327.67f,-327.67f],PersistenceRequired:1b,Tags:[\"Elite\",\"deleteelite\"],ActiveEffects:[{Duration:1999980,Id:5,Amplifier:0},{Duration:1999980,Id:11,Amplifier:4}],HandItems:[{id:\"minecraft:shield\",Count:1b,tag:{BlockEntityTag:{id:\"minecraft:banner\",Patterns:[{Pattern:\"tt\",Color:7},{Pattern:\"cs\",Color:7},{Pattern:\"flo\",Color:7},{Pattern:\"gru\",Color:7}],Base:8},Enchantments:[{lvl:30s,id:\"minecraft:sharpness\"}],AttributeModifiers:[{UUIDMost:-1113277120483211494L,UUIDLeast:-5231964292071775789L,Amount:0.2d,Slot:\"mainhand\",AttributeName:\"generic.movementSpeed\",Operation:1,Name:\"Modifier\"}]}},{id:\"minecraft:shield\",Count:1b,tag:{BlockEntityTag:{id:\"minecraft:banner\",Patterns:[{Pattern:\"tt\",Color:7},{Pattern:\"cs\",Color:7},{Pattern:\"flo\",Color:7},{Pattern:\"gru\",Color:7}],Base:8},Enchantments:[{lvl:30s,id:\"minecraft:sharpness\"}],AttributeModifiers:[{UUIDMost:-1113277120483211494L,UUIDLeast:-5231964292071775789L,Amount:0.2d,Slot:\"mainhand\",AttributeName:\"generic.movementSpeed\",Operation:1,Name:\"Modifier\"}]}}]}";
 	private static final int KAULS_JUDGEMENT_TIME = 20 * 55;
 
 	private static SpellKaulsJudgement INSTANCE = null;
@@ -116,7 +114,7 @@ public class SpellKaulsJudgement extends Spell implements Listener {
 					if (e.getScoreboardTags().contains(KAULS_JUDGEMENT_MOB_SPAWN_TAG)) {
 						Location loc = e.getLocation().add(0, 1, 0);
 						world.spawnParticle(Particle.SPELL_WITCH, loc, 50, 0.3, 0.45, 0.3, 1);
-						EntityUtils.summonEntityAt(loc, EntityType.ZOMBIE, mob);
+						LibraryOfSoulsIntegration.summon(loc, "StonebornImmortal");
 					}
 				}
 			}

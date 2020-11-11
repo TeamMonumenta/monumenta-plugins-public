@@ -55,6 +55,7 @@ import com.playmonumenta.plugins.bosses.spells.kaul.SpellLightningStrike;
 import com.playmonumenta.plugins.bosses.spells.kaul.SpellPutridPlague;
 import com.playmonumenta.plugins.bosses.spells.kaul.SpellRaiseJungle;
 import com.playmonumenta.plugins.bosses.spells.kaul.SpellVolcanicDemise;
+import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
@@ -119,8 +120,8 @@ The elemental will lose his “Raise Jungle” ability, but will still possess t
 public class Kaul extends BossAbilityGroup {
 	public static final String identityTag = "boss_kaul";
 	public static final int detectionRange = 50;
-	private static final String primordial = "{CustomName:\"{\\\"text\\\":\\\"§6Primordial Elemental\\\"}\",Health:120.0f,ArmorItems:[{id:\"minecraft:leather_boots\",Count:1b,tag:{display:{color:8608560,Name:\"{\\\"text\\\":\\\"§fHobnailed Boots\\\"}\"},Damage:0}},{id:\"minecraft:leather_leggings\",Count:1b,tag:{display:{color:8608560,Name:\"{\\\"text\\\":\\\"§fHobnailed Leggings\\\"}\"},Damage:0}},{id:\"minecraft:leather_chestplate\",Count:1b,tag:{display:{color:8608560,Name:\"{\\\"text\\\":\\\"§fHobnailed Vest\\\"}\"},Damage:0}},{id:\"minecraft:brown_terracotta\",Count:1b,tag:{Enchantments:[{lvl:4s,id:\"minecraft:projectile_protection\"}],AttributeModifiers:[{UUIDMost:-4385518367071189805L,UUIDLeast:-8720188027200143741L,Amount:16.0d,Slot:\"head\",AttributeName:\"generic.attackDamage\",Operation:0,Name:\"Modifier\"},{UUIDMost:2698543145384691203L,UUIDLeast:-5523831565464878560L,Amount:0.15d,Slot:\"head\",AttributeName:\"generic.movementSpeed\",Operation:1,Name:\"Modifier\"}]}}],Attributes:[{Base:768.0d,Name:\"generic.maxHealth\"}],Tags:[\"Boss\",\"boss_kaulprimoridal\",\"boss_punchresist\"],Team:\"kaulele\"}";
-	private static final String immortal = "{CustomName:\"{\\\"text\\\":\\\"§6Immortal Elemental\\\"}\",Health:120.0f,ArmorItems:[{id:\"minecraft:leather_boots\",Count:1b,tag:{display:{color:8608560,Name:\"{\\\"text\\\":\\\"§fHobnailed Boots\\\"}\"},Damage:0}},{id:\"minecraft:leather_leggings\",Count:1b,tag:{display:{color:8608560,Name:\"{\\\"text\\\":\\\"§fHobnailed Leggings\\\"}\"},Damage:0}},{id:\"minecraft:leather_chestplate\",Count:1b,tag:{display:{color:8608560,Name:\"{\\\"text\\\":\\\"§fHobnailed Vest\\\"}\"},Damage:0}},{id:\"minecraft:brown_terracotta\",Count:1b,tag:{Enchantments:[{lvl:8s,id:\"minecraft:projectile_protection\"}],AttributeModifiers:[{UUIDMost:-4385518367071189805L,UUIDLeast:-8720188027200143741L,Amount:16.0d,Slot:\"head\",AttributeName:\"generic.attackDamage\",Operation:0,Name:\"Modifier\"},{UUIDMost:2698543145384691203L,UUIDLeast:-5523831565464878560L,Amount:0.15d,Slot:\"head\",AttributeName:\"generic.movementSpeed\",Operation:1,Name:\"Modifier\"}]}}],Attributes:[{Base:768.0d,Name:\"generic.maxHealth\"}],Tags:[\"Boss\",\"boss_kaulimmortal\"],Team:\"kaulele\"}";
+	private static final String primordial = "PrimordialElemental";
+	private static final String immortal = "ImmortalElemental";
 	private final Plugin mPlugin;
 	private final LivingEntity mBoss;
 	private final Location mSpawnLoc;
@@ -857,28 +858,12 @@ public class Kaul extends BossAbilityGroup {
 	}
 
 	private LivingEntity spawnPrimordial(Location loc) {
-		LivingEntity entity = null;
-		Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "summon minecraft:wither_skeleton " + loc.getX()
-		                                   + " " + loc.getY() + " " + loc.getZ() + " " + primordial);
-		for (Entity e : loc.getWorld().getNearbyEntities(loc, 0.65, 0.65, 0.65)) {
-			if (e instanceof LivingEntity && !(e instanceof Player)) {
-				entity = (LivingEntity) e;
-				break;
-			}
-		}
+		LivingEntity entity = (LivingEntity) LibraryOfSoulsIntegration.summon(loc, primordial);
 		return entity;
 	}
 
 	private LivingEntity spawnImmortal(Location loc) {
-		LivingEntity entity = null;
-		Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "summon minecraft:wither_skeleton " + loc.getX()
-		                                   + " " + loc.getY() + " " + loc.getZ() + " " + immortal);
-		for (Entity e : loc.getWorld().getNearbyEntities(loc, 0.65, 0.65, 0.65)) {
-			if (e instanceof LivingEntity && !(e instanceof Player)) {
-				entity = (LivingEntity) e;
-				break;
-			}
-		}
+		LivingEntity entity = (LivingEntity) LibraryOfSoulsIntegration.summon(loc, immortal);
 		return entity;
 	}
 

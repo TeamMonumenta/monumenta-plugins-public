@@ -3,7 +3,6 @@ package com.playmonumenta.plugins.bosses.bosses;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -20,6 +19,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import com.playmonumenta.plugins.bosses.BossBarManager;
 import com.playmonumenta.plugins.bosses.BossBarManager.BossHealthAction;
+import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
@@ -114,7 +114,7 @@ public class CrownbearerBoss extends BossAbilityGroup {
 	}
 
 	private void summonSOTF(Location loc) {
-		Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "summon minecraft:zombie_villager " + loc.getX() + " " + loc.getY() + " " + loc.getZ() + " " + sotf);
+		LibraryOfSoulsIntegration.summon(loc, "SonOfTheForest");
 	}
 
 	private void knockback(Plugin plugin, double r) {

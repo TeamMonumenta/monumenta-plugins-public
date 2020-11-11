@@ -11,7 +11,6 @@ import org.bukkit.attribute.Attribute;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.plugin.Plugin;
@@ -25,8 +24,8 @@ import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.spells.SpellBombToss;
 import com.playmonumenta.plugins.bosses.spells.oldslabsbos.SpellBash;
 import com.playmonumenta.plugins.bosses.spells.oldslabsbos.SpellWhirlwind;
+import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import com.playmonumenta.plugins.utils.BossUtils;
-import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.SerializationUtils;
 
@@ -145,14 +144,14 @@ public class OldLabsBoss extends BossAbilityGroup {
 			Location spawnLoc = mSpawnLoc.clone().add(-1, -1, 13);
 			try {
 				spawnLoc.getWorld().spawnParticle(Particle.SMOKE_LARGE, spawnLoc, 15, 0.2, 0.45, 0.2, 0.2);
-				Entity mob = EntityUtils.getSummonEntityAt(spawnLoc, EntityType.ZOMBIE, "{CustomName:\"{\\\"text\\\":\\\"Rebel Grunt\\\"}\",Health:12.0f,ArmorItems:[{id:\"minecraft:leather_boots\",tag:{display:{color:0}},Count:1b},{},{id:\"minecraft:leather_chestplate\",tag:{display:{color:6291456},AttributeModifiers:[{UUIDMost:3567652673379779674L,UUIDLeast:-7817819911413108453L,Amount:-0.3d,Slot:\"chest\",AttributeName:\"generic.movementSpeed\",Operation:1,Name:\"Modifier\"}]},Count:1b},{id:\"minecraft:player_head\",tag:{SkullOwner:{Id:\"56a75ceb-3e56-4e35-9921-22cd0fd80ad1\",Properties:{textures:[{Value:\"eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNWRmMzU4NjlhMDcwZjE3YzEzZmU1YjgxYjlkODVjNjgzM2FjNmFiOTdiZjFkZjNjOGViZjY4YmZhNzM3YzQifX19\"}]}},display:{Name:\"{\\\"text\\\":\\\"Bandit\\\"}\"}},Count:1b}],Attributes:[{Base:12.0d,Name:\"generic.maxHealth\"}],HandItems:[{id:\"minecraft:stone_sword\",tag:{AttributeModifiers:[{UUIDMost:8322475813561649056L,UUIDLeast:-8936876586311847215L,Amount:-2.0d,Slot:\"mainhand\",AttributeName:\"generic.attackDamage\",Operation:0,Name:\"Modifier\"}]},Count:1b},{}]}");
+				Entity mob = LibraryOfSoulsIntegration.summon(spawnLoc, "RebelGrunt");
 				if (mob instanceof LivingEntity) {
 					((LivingEntity)mob).addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 2, 4));
 				}
 
 				spawnLoc = spawnLoc.add(2, 0, 0);
 				spawnLoc.getWorld().spawnParticle(Particle.SMOKE_LARGE, spawnLoc, 15, 0.2, 0.45, 0.2, 0.2);
-				mob = EntityUtils.getSummonEntityAt(spawnLoc, EntityType.SKELETON, "{CustomName:\"{\\\"text\\\":\\\"Rebel Archer\\\"}\",Health:4.0f,ArmorItems:[{id:\"minecraft:leather_boots\",tag:{display:{color:0}},Count:1b},{},{id:\"minecraft:leather_chestplate\",tag:{display:{color:6291456},AttributeModifiers:[{UUIDMost:7791048258569127387L,UUIDLeast:-4726818348142260979L,Amount:-0.4d,Slot:\"chest\",AttributeName:\"generic.movementSpeed\",Operation:1,Name:\"Modifier\"}]},Count:1b},{id:\"minecraft:player_head\",tag:{SkullOwner:{Id:\"56a75ceb-3e56-4e35-9921-22cd0fd80ad1\",Properties:{textures:[{Value:\"eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNWRmMzU4NjlhMDcwZjE3YzEzZmU1YjgxYjlkODVjNjgzM2FjNmFiOTdiZjFkZjNjOGViZjY4YmZhNzM3YzQifX19\"}]}},display:{Name:\"{\\\"text\\\":\\\"Bandit\\\"}\"}},Count:1b}],Attributes:[{Base:4.0d,Name:\"generic.maxHealth\"}],HandItems:[{id:\"minecraft:bow\",tag:{},Count:1b},{}]}");
+				mob = LibraryOfSoulsIntegration.summon(spawnLoc, "RebelArcher");
 				if (mob instanceof LivingEntity) {
 					((LivingEntity)mob).addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 2, 4));
 				}

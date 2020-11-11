@@ -12,7 +12,6 @@ import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Phantom;
 import org.bukkit.entity.Player;
@@ -20,7 +19,7 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import com.playmonumenta.plugins.bosses.spells.Spell;
-import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 
 /*
@@ -36,7 +35,6 @@ public class SpellPhantomOfTheOpera extends Spell {
 	private double mRange;
 	private int mTimer;
 	private Set<UUID> mSummoned = new HashSet<UUID>();
-	private static final String mPhantom = "{CustomName:\"\\\"Night Terror\\\"\",Health:50.0f,Size:6,Attributes:[{Base:50.0d,Name:\"generic.maxHealth\"},{Base:100.0d,Name:\"generic.followRange\"}],Tags:[\"boss_chargerstrong\",\"boss_targetplayer\"],HandItems:[{id:\"minecraft:arrow\",Count:1b,tag:{display:{Name:\"\\\"Phantom Fang\\\"\"},AttributeModifiers:[{UUIDMost:-6498451240576266699L,UUIDLeast:-6858106810304442920L,Amount:12.0d,Slot:\"mainhand\",AttributeName:\"generic.attackDamage\",Operation:0,Name:\"Modifier\"}]}},{}]}";
 
 	public SpellPhantomOfTheOpera(Plugin plugin, LivingEntity entity, Location center, int range, int timer) {
 		mPlugin = plugin;
@@ -102,7 +100,7 @@ public class SpellPhantomOfTheOpera extends Spell {
 							Location sLoc = pLoc.clone().add(0, 7.5, 0);
 							world.playSound(sLoc, Sound.ENTITY_WITHER_HURT, 3, 0.75f);
 							world.spawnParticle(Particle.EXPLOSION_NORMAL, sLoc, 20, 0.3, 0.3, 0.3, 0.1);
-							EntityUtils.summonEntityAt(sLoc, EntityType.PHANTOM, mPhantom);
+							LibraryOfSoulsIntegration.summon(sLoc, "NightTerror");
 
 							List<Player> players = PlayerUtils.playersInRange(mCenter, mRange);
 							if (players.size() == 0) {

@@ -8,12 +8,15 @@ import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
+import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Spider;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 
@@ -83,11 +86,14 @@ public class SpellArachnopocolypse extends Spell {
 		int num = FastUtils.RANDOM.nextInt(3);//5
 		String summon = null;
 		if (num == 0) {
-			summon = "summon minecraft:spider " + loc.getX() + " " + (loc.getY() + 1) + " " + loc.getZ() + " {CustomName:\"{\\\"text\\\":\\\"Corrupted Spider\\\"}\",Health:23.0f,Attributes:[{Base:23,Name:\"generic.maxHealth\"},{Base:0.36d,Name:\"generic.movementSpeed\"},{Base:40,Name:\"generic.followRange\"}],Tags:[\"boss_force\"],HandDropChances:[-327.67f,0.085f],ActiveEffects:[{Duration:199980,Id:8,Amplifier:3}],HandItems:[{id:\"minecraft:wooden_sword\",tag:{Enchantments:[{lvl:2,id:\"minecraft:knockback\"}]},Count:1b},{}]}";
+			Spider spider = (Spider) LibraryOfSoulsIntegration.summon(loc.clone().add(0, 1, 0), "CorruptedSpider");
+			spider.getAttribute(Attribute.GENERIC_FOLLOW_RANGE).setBaseValue(100);
 		} else if (num == 1) {
-			summon = "summon minecraft:spider " + loc.getX() + " " + (loc.getY() + 1) + " " + loc.getZ() + " {CustomName:\"{\\\"text\\\":\\\"Shieldcrusher Spider\\\"}\",Health:27.0f,Attributes:[{Base:27,Name:\"generic.maxHealth\"},{Base:40,Name:\"generic.followRange\"}],HandDropChances:[-327.67f,0.085f],ActiveEffects:[{Duration:222220,Id:26,Amplifier:0}],HandItems:[{id:\"minecraft:wooden_axe\",tag:{AttributeModifiers:[{UUIDMost:339242,UUIDLeast:52922,Amount:2,AttributeName:\"generic.attackDamage\",Operation:0,Name:\"generic.attackDamage\"}]},Count:1b},{}]}";
+			Spider spider = (Spider) LibraryOfSoulsIntegration.summon(loc.clone().add(0, 1, 0), "ShieldcrusherSpider");
+			spider.getAttribute(Attribute.GENERIC_FOLLOW_RANGE).setBaseValue(100);
 		} else if (num == 2) {
-			summon = "summon minecraft:spider " + loc.getX() + " " + (loc.getY() + 1) + " " + loc.getZ() + " {CustomName:\"{\\\"text\\\":\\\"Monstrous Spider\\\"}\",Health:19.0f,Attributes:[{Base:19,Name:\"generic.maxHealth\"},{Base:0.24d,Name:\"generic.movementSpeed\"},{Base:40,Name:\"generic.followRange\"},{Base:10,Name:\"generic.attackDamage\"},{Base:1,Name:\"generic.knockbackResistance\"}],ActiveEffects:[{Duration:199980,Id:11,Amplifier:1}]}";
+			Spider spider = (Spider) LibraryOfSoulsIntegration.summon(loc.clone().add(0, 1, 0), "MonstrousSpider");
+			spider.getAttribute(Attribute.GENERIC_FOLLOW_RANGE).setBaseValue(100);
 		}
 
 		String toSummon = summon;

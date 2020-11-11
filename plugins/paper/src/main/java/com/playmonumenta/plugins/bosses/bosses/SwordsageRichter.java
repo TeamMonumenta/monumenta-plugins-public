@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -34,6 +33,7 @@ import com.playmonumenta.plugins.bosses.spells.SpellBladeDance;
 import com.playmonumenta.plugins.bosses.spells.SpellConditionalTeleport;
 import com.playmonumenta.plugins.bosses.spells.SpellProjectileDeflection;
 import com.playmonumenta.plugins.bosses.spells.SpellWindWalk;
+import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
@@ -229,16 +229,16 @@ public class SwordsageRichter extends BossAbilityGroup {
 			final String mobdata;
 			switch (t) {
 				case 3:
-					// Swing Living Sword
-					mobdata = "{DeathLootTable:\"minecraft:empty\",Tags:[\"boss_livingblade\"],Silent:1b,Health:30f,CustomName:\"{\\\"text\\\":\\\"Swift Living Blade\\\"}\",HandItems:[{id:\"minecraft:iron_sword\",Count:1b,tag:{Damage:4}},{}],ActiveEffects:[{Id:14b,Amplifier:1b,Duration:120000,ShowParticles:0b}],Attributes:[{Name:generic.maxHealth,Base:30},{Name:generic.movementSpeed,Base:0.425}]}";
+					// Swift Living Sword
+					mobdata = "SwiftLivingBlade";
 					break;
 				case 2:
 					// Fiery Living Sword
-					mobdata = "{DeathLootTable:\"minecraft:empty\",Tags:[\"boss_livingblade\"],Silent:1b,Health:40f,CustomName:\"{\\\"text\\\":\\\"Fiery Living Blade\\\"}\",HandItems:[{id:\"minecraft:golden_sword\",Count:1b,tag:{HideFlags:4,Unbreakable:1b,Damage:6,Enchantments:[{id:\"minecraft:fire_aspect\",lvl:2}]}},{}],ActiveEffects:[{Id:14b,Amplifier:1b,Duration:120000,ShowParticles:0b}],Attributes:[{Name:generic.maxHealth,Base:40},{Name:generic.movementSpeed,Base:0.325}]}";
+					mobdata = "FieryLivingBlade";
 					break;
 				default:
 					// Heavy Living Sword
-					mobdata = "{DeathLootTable:\"minecraft:empty\",Tags:[\"boss_livingblade\"],Silent:1b,Health:80f,CustomName:\"{\\\"text\\\":\\\"Heavy Living Blade\\\"}\",HandItems:[{id:\"minecraft:diamond_sword\",Count:1b,tag:{Damage:16}},{}],ActiveEffects:[{Id:14b,Amplifier:1b,Duration:120000,ShowParticles:0b}],Attributes:[{Name:generic.maxHealth,Base:80},{Name:generic.knockbackResistance,Base:0.5},{Name:generic.movementSpeed,Base:0.3}]}";
+					mobdata = "HeavyLivingBlade";
 					break;
 			}
 
@@ -267,7 +267,7 @@ public class SwordsageRichter extends BossAbilityGroup {
 						world.playSound(mBoss.getLocation(), Sound.ENTITY_ENDERMAN_TELEPORT, 1, 1.25f);
 						world.spawnParticle(Particle.SPELL_INSTANT, mLoc, 50, 0.1, 0.1, 0.1, 1);
 						world.spawnParticle(Particle.CRIT_MAGIC, mLoc, 150, 0.1, 0.1, 0.1, 1);
-						Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "summon minecraft:zombie " + mLoc.getX() + " " + mLoc.getY() + " " + mLoc.getZ() + " " + mobdata);
+						LibraryOfSoulsIntegration.summon(mLoc, mobdata);
 					}
 				}
 			}.runTaskTimer(plugin, t * 10, 1);

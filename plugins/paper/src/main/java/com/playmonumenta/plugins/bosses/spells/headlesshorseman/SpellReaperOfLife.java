@@ -12,11 +12,8 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
 import org.bukkit.entity.FallingBlock;
 import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.MagmaCube;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
@@ -26,8 +23,8 @@ import org.bukkit.util.Vector;
 
 import com.playmonumenta.plugins.bosses.bosses.HeadlessHorsemanBoss;
 import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import com.playmonumenta.plugins.utils.BossUtils;
-import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 
 public class SpellReaperOfLife extends Spell {
@@ -99,15 +96,9 @@ public class SpellReaperOfLife extends Spell {
 						if (mPlayerScalingHP > 1000) {
 							mPlayerScalingHP = 1000;
 						}
-						String summonNbt = "{CustomName:\"{\\\"text\\\":\\\"World Ender\\\"}\",Health:" + Double.toString(mPlayerScalingHP) + "f,Attributes:[{Base:" + Double.toString(mPlayerScalingHP) + "d,Name:\"generic.maxHealth\"}],Size:1}";
-						EntityUtils.summonEntityAt(mCenter, EntityType.MAGMA_CUBE, summonNbt);
-						LivingEntity nuke = null;
-						for (Entity e : mCenter.getWorld().getNearbyEntities(mCenter, 0.4, 0.4, 0.4)) {
-							if (e instanceof LivingEntity && !(e instanceof Player) && e instanceof MagmaCube && !mSummoned.contains(e.getUniqueId())) {
-								nuke = (LivingEntity) e;
-								break;
-							}
-						}
+						LivingEntity nuke = (LivingEntity) LibraryOfSoulsIntegration.summon(mCenter, "WorldEnder");
+						nuke.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(mPlayerScalingHP);
+						nuke.setHealth(mPlayerScalingHP);
 						if (!mSummoned.contains(nuke.getUniqueId())) {
 							mSummoned.add(nuke.getUniqueId());
 						}
