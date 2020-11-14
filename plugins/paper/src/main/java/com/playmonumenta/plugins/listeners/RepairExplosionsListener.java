@@ -64,7 +64,10 @@ public class RepairExplosionsListener implements Listener {
 		Material.ENCHANTING_TABLE,
 		Material.ENDER_CHEST,
 		Material.HOPPER,
-		Material.SCAFFOLDING
+		Material.SCAFFOLDING,
+		Material.GILDED_BLACKSTONE,
+		Material.ANCIENT_DEBRIS,
+		Material.NETHERITE_BLOCK
 	);
 
 	/* A hash table that stores the list of blocks to restore for each chunk */
