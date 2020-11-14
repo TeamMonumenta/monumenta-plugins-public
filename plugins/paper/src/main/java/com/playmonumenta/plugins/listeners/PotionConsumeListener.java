@@ -235,7 +235,7 @@ public class PotionConsumeListener implements Listener {
 		potion.setItem(item);
 		potion.setShooter(player);
 		ProjectileLaunchEvent newEvent = new ProjectileLaunchEvent(potion);
-		Bukkit.getPluginManager().callEvent(event);
+		Bukkit.getPluginManager().callEvent(newEvent);
 		if (newEvent.isCancelled()) {
 			potion.remove();
 			return;
