@@ -8,6 +8,7 @@ import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.ShulkerBox;
+import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockPlaceEvent;
@@ -18,6 +19,7 @@ import org.bukkit.inventory.meta.BlockStateMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.integrations.CoreProtectIntegration;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
@@ -46,50 +48,65 @@ public class FirmamentOverride extends BaseOverride {
 
 	private boolean placeBlock(Player player, ItemStack item, BlockPlaceEvent event) {
 		if (!isFirmamentItem(item)) {
-			//S omehow triggered when it wasn't the right item - shouldn't prevent the event to be safe - hopefully other shulkers with lore wont get placed
+			//Somehow triggered when it wasn't the right item - shouldn't prevent the event to be safe - hopefully other shulkers with lore wont get placed
 			return true;
 		}
 		if (!player.hasPermission("monumenta.firmament")) {
 			player.sendMessage(ChatColor.RED + "You don't have permission to use this item. Please ask a moderator to fix this.");
 			return false;
 		}
+
 		BlockStateMeta shulkerMeta = (BlockStateMeta)item.getItemMeta();
 		ShulkerBox shulkerBox = (ShulkerBox)shulkerMeta.getBlockState();
 		Inventory shulkerInventory = shulkerBox.getInventory();
 		for (int i = 0; i < 27; i++) {
 			ItemStack currentItem = shulkerInventory.getItem(i);
-			if (currentItem == null || currentItem.getType().isAir()) {
-				// Air breaks it, skip over it
+			if (currentItem == null || currentItem.getType().isAir() || ItemUtils.notAllowedTreeReplace.contains(currentItem.getType()) || (!currentItem.getType().isOccluding() && !ItemUtils.GOOD_OCCLUDERS.contains(currentItem.getType()))) {
+				// Air breaks it, skip over it. Also the banned items break it, skip over those.
 				continue;
 			}
+
+			// Safety
+			if (!Plugin.getInstance().mItemOverrides.blockPlaceInteraction(Plugin.getInstance(), player, currentItem, event)) {
+				return false;
+			}
+
 			ItemMeta meta = currentItem.getItemMeta();
 			// No known way to preserve BlockStateMeta - so check that it's either null or simple BlockDataMeta
 			if (currentItem.getType().isBlock() && (meta == null || meta instanceof BlockDataMeta)) {
 				BlockState state = event.getBlockReplacedState();
 				if (FastUtils.RANDOM.nextBoolean() && item.getItemMeta().hasLore() && item.getItemMeta().getLore().get(item.getItemMeta().getLore().size() - 1).contains("Enabled")) {
 					// Place a prismarine block instead of the block from the shulker
-					state.setBlockData(Material.PRISMARINE.createBlockData());
+					BlockData blockData = Material.PRISMARINE.createBlockData();
+					state.setBlockData(blockData);
 
 					// Forcibly update the new block state and apply physics
 					state.update(true, true);
 					state.setType(Material.PRISMARINE);
+					//Log the placement of prismarine
+					CoreProtectIntegration.logPlacement(player, event.getBlock().getLocation(), Material.PRISMARINE, blockData);
 					// No changes needed to the shulker, exit here and cancel the event
 					return false;
 				}
 
+				BlockData blockData = currentItem.getType().createBlockData();
+
 				if (meta == null) {
 					// If no block data (simple block), create default
-					state.setBlockData(currentItem.getType().createBlockData());
+					state.setBlockData(blockData);
 				} else if (meta instanceof BlockDataMeta) {
 					// If some block data (complex block), use it
 					BlockDataMeta blockMeta = (BlockDataMeta)meta;
 					if (blockMeta.hasBlockData()) {
-						state.setBlockData(blockMeta.getBlockData(currentItem.getType()));
+						//Change blockData if the meta has some already
+						blockData = blockMeta.getBlockData(currentItem.getType());
+						state.setBlockData(blockData);
 					} else {
-						state.setBlockData(currentItem.getType().createBlockData());
+						state.setBlockData(blockData);
 					}
 				}
-
+				//Log the placement of the blocks
+				CoreProtectIntegration.logPlacement(player, event.getBlock().getLocation(), currentItem.getType(), blockData);
 				// Forcibly update the new block state and apply physics
 				state.update(true, true);
 				// Set the type of the block

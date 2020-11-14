@@ -327,6 +327,31 @@ public class ItemUtils {
 		Material.EXPERIENCE_BOTTLE
 	);
 
+	public static final Set<Material> GOOD_OCCLUDERS = EnumSet.of(
+			Material.RED_STAINED_GLASS,
+			Material.GREEN_STAINED_GLASS,
+			Material.PURPLE_STAINED_GLASS,
+			Material.CYAN_STAINED_GLASS,
+			Material.LIGHT_GRAY_STAINED_GLASS,
+			Material.GRAY_STAINED_GLASS,
+			Material.PINK_STAINED_GLASS,
+			Material.LIME_STAINED_GLASS,
+			Material.YELLOW_STAINED_GLASS,
+			Material.BLUE_STAINED_GLASS,
+			Material.LIGHT_BLUE_STAINED_GLASS,
+			Material.MAGENTA_STAINED_GLASS,
+			Material.ORANGE_STAINED_GLASS,
+			Material.BROWN_STAINED_GLASS,
+			Material.BLACK_STAINED_GLASS,
+			Material.WHITE_STAINED_GLASS,
+			Material.SPRUCE_LEAVES,
+			Material.OAK_LEAVES,
+			Material.DARK_OAK_LEAVES,
+			Material.JUNGLE_LEAVES,
+			Material.BIRCH_LEAVES,
+			Material.ACACIA_LEAVES
+		);
+
 
 	public static String buildAttributeLoreLine(com.playmonumenta.plugins.itemindex.EquipmentSlot slot, Attribute attribute, AttributeModifier.Operation operation, Double amount) {
 		ChatColor color = ChatColor.BLUE;

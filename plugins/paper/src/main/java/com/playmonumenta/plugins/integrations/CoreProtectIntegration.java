@@ -2,6 +2,8 @@ package com.playmonumenta.plugins.integrations;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
@@ -35,6 +37,13 @@ public class CoreProtectIntegration {
 		CoreProtectAPI api = getCoreProtect();
 		if (api != null) {
 			api.logContainerTransaction(player.getName(), location);
+		}
+	}
+
+	public static void logPlacement(Player player, Location location, Material type, BlockData blockData) {
+		CoreProtectAPI api = getCoreProtect();
+		if (api != null) {
+			api.logPlacement(player.getName(), location, type, blockData);
 		}
 	}
 }
