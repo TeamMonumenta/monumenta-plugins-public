@@ -661,6 +661,16 @@ public class EntityListener implements Listener {
 					return;
 				}
 			} else if (event.getEntityType() == EntityType.ARROW || event.getEntityType() == EntityType.SPECTRAL_ARROW) {
+				ItemStack itemInMainHand = player.getEquipment().getItemInMainHand();
+				ItemStack itemInOffHand = player.getEquipment().getItemInOffHand();
+				if (itemInMainHand != null && itemInMainHand.getType().equals(Material.CROSSBOW) && itemInMainHand.containsEnchantment(Enchantment.MULTISHOT)
+					|| itemInOffHand != null && itemInOffHand.getType().equals(Material.CROSSBOW) && itemInOffHand.containsEnchantment(Enchantment.MULTISHOT)) {
+					if (!MetadataUtils.checkOnceThisTick(mPlugin, player, "MultishotThisTick")) {
+						// Only process the main multishot arrow, which is shot first
+						return;
+					}
+				}
+
 				AbstractArrow arrow = (AbstractArrow) proj;
 				if (!mAbilities.playerShotArrowEvent(player, arrow)) {
 					event.setCancelled(true);

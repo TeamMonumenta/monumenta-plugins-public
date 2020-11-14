@@ -16,6 +16,9 @@ import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.TileState;
+import org.bukkit.block.data.BlockData;
+import org.bukkit.block.data.Snowable;
+import org.bukkit.block.data.type.Snow;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -100,6 +103,9 @@ public class RepairExplosionsListener implements Listener {
 		 * as much while iterating, leading to fewer hashmap lookups
 		 */
 		blocks.sort((b1, b2) -> {
+			if (b1.getChunk().getChunkKey() == b2.getChunk().getChunkKey()) {
+				return Double.compare(b1.getLocation().getY(), b2.getLocation().getY());
+			}
 			return Long.compare(b1.getChunk().getChunkKey(), b2.getChunk().getChunkKey());
 		});
 
@@ -169,6 +175,25 @@ public class RepairExplosionsListener implements Listener {
 					mPlugin.getLogger().fine("Repairing block " + state.getType().toString() + " at " + state.getLocation().toString());
 					needsSave = true;
 					state.update(true, false);
+
+					if (state.getType().equals(Material.GRASS_BLOCK) && state.getBlockData() instanceof Snowable && ((Snowable)state.getBlockData()).isSnowy()) {
+						Block blockAbove = state.getLocation().add(0, 1, 0).getBlock();
+						if (blockAbove.getType().isAir()) {
+							blockAbove.setType(Material.SNOW);
+							Snow snow = (Snow)Material.SNOW.createBlockData();
+							snow.setLayers(snow.getMinimumLayers());
+							blockAbove.setBlockData(snow);
+						}
+					} else if (state.getType().equals(Material.SNOW)) {
+						Block blockBelow = state.getLocation().subtract(0, 1, 0).getBlock();
+						if (!blockBelow.getType().equals(Material.GRASS_BLOCK)) {
+							BlockData blockBelowData = blockBelow.getBlockData();
+							if (blockBelowData instanceof Snowable) {
+								((Snowable)blockBelowData).setSnowy(true);
+								blockBelow.setBlockData(blockBelowData);
+							}
+						}
+					}
 				}
 			}
 		}
