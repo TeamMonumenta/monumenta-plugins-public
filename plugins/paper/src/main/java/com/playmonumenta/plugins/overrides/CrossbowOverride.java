@@ -13,7 +13,7 @@ import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
 public class CrossbowOverride extends BaseOverride {
 	@Override
 	public boolean rightClickItemInteraction(Plugin plugin, Player player, Action action, ItemStack item, Block block) {
-		if (!ZoneUtils.hasZoneProperty(player, ZoneProperty.RESIST_5) && player.getInventory().getItemInOffHand().getType() == Material.FIREWORK_ROCKET) {
+		if (player.getInventory().getItemInMainHand().getType() == Material.FIREWORK_ROCKET || player.getInventory().getItemInOffHand().getType() == Material.FIREWORK_ROCKET) {
 			return false;
 		}
 		return true;
