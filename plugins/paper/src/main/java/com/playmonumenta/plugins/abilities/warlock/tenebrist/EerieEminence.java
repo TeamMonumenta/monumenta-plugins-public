@@ -113,8 +113,16 @@ public class EerieEminence extends Ability {
 
 					if (getAbilityScore() > 1) {
 						for (Player player : PlayerUtils.playersInRange(mPlayer, mRadius, true)) {
-							mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_OTHER,
-							                                 new PotionEffect(entry.getBuff(), 30, 0, true, true));
+							if (entry.getBuff().equals(PotionEffectType.REGENERATION)) {
+								/* Can't heal with regen, because regen only heals 1 health every 50 ticks.
+								 * Instead, heal the same amount over the period (4 health over 10s)
+								 * 0.1 * 10s * 4 ticks/s = 4 health
+								 */
+								PlayerUtils.healPlayer(player, 0.1d);
+							} else {
+								mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_OTHER,
+																 new PotionEffect(entry.getBuff(), 30, 0, true, true));
+							}
 						}
 					}
 				}
