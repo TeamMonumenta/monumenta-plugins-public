@@ -263,7 +263,9 @@ public class ShulkerShortcutListener implements Listener {
 	public void playerDropItemEvent(PlayerDropItemEvent event) {
 		if (isEnderExpansion(event.getItemDrop().getItemStack())) {
 			event.getPlayer().playSound(event.getPlayer().getLocation(), Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1.0f, 1.0f);
-			event.setCancelled(true);
+			if (event.getPlayer().getInventory().firstEmpty() >= 0) {
+				event.setCancelled(true);
+			}
 		}
 	}
 
