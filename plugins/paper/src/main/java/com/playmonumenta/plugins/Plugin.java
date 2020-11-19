@@ -47,6 +47,7 @@ import com.playmonumenta.plugins.cooking.CookingTableListeners;
 import com.playmonumenta.plugins.effects.EffectManager;
 import com.playmonumenta.plugins.enchantments.AttributeManager;
 import com.playmonumenta.plugins.enchantments.EnchantmentManager;
+import com.playmonumenta.plugins.integrations.ChestSortIntegration;
 import com.playmonumenta.plugins.integrations.MonumentaRedisSyncIntegration;
 import com.playmonumenta.plugins.integrations.PlaceholderAPIIntegration;
 import com.playmonumenta.plugins.integrations.luckperms.LuckPermsIntegration;
@@ -310,6 +311,11 @@ public class Plugin extends JavaPlugin {
 				mTicks = (mTicks + 1) % Constants.TICKS_PER_SECOND;
 			}
 		}, 0L, 1L);
+
+		// Hook into JeffChestSort for custom chest sorting if present
+		if (Bukkit.getPluginManager().isPluginEnabled("ChestSort")) {
+			manager.registerEvents(new ChestSortIntegration(), this);
+		}
 
 		// Hook into Monumenta Redis Sync for server transfers if available
 		if (Bukkit.getPluginManager().isPluginEnabled("MonumentaRedisSync")) {

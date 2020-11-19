@@ -19,6 +19,7 @@ import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.Damageable;
+import org.bukkit.inventory.meta.BookMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.potion.PotionData;
@@ -445,6 +446,18 @@ public class ItemUtils {
 		}
 	}
 
+	// Return the quest ID string, which is assumed to start with "#Q", or null
+	public static String getItemQuestId(ItemStack item) {
+		if (item != null && item.hasItemMeta() && item.getItemMeta().hasLore()) {
+			for (String loreEntry : item.getItemMeta().getLore()) {
+				if (loreEntry.startsWith("#Q")) {
+					return loreEntry;
+				}
+			}
+		}
+		return null;
+	}
+
 	public enum ItemDeathResult {
 		KEEP, // Item is kept in inventory on death, takes no damage
 		KEEP_DAMAGED, // Item is kept on death, with a durability loss
@@ -739,6 +752,28 @@ public class ItemUtils {
 		} else {
 			return -200.0f;
 		}
+	}
+
+	public static String getBookTitle(ItemStack book) {
+		if (book == null) {
+			return null;
+		}
+		ItemMeta itemMeta = book.getItemMeta();
+		if (itemMeta == null || !(itemMeta instanceof BookMeta)) {
+			return null;
+		}
+		return ((BookMeta) itemMeta).getTitle();
+	}
+
+	public static String getBookAuthor(ItemStack book) {
+		if (book == null) {
+			return null;
+		}
+		ItemMeta itemMeta = book.getItemMeta();
+		if (itemMeta == null || !(itemMeta instanceof BookMeta)) {
+			return null;
+		}
+		return ((BookMeta) itemMeta).getAuthor();
 	}
 
 	public static ItemStack createTippedArrows(PotionType type, int amount, PotionData data) {
