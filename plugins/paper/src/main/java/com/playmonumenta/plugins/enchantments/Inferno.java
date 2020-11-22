@@ -210,6 +210,7 @@ public class Inferno implements BaseEnchantment {
 						// This is usually caused by another DoT (wither 3, usually) eating iFrames, or the mob being fire resistant
 						if (ticksLived - mob.getMetadata(FIRE_TICK_METAKEY).get(0).asInt() > 20) {
 							double damage = EntityUtils.isFireResistant(mob) == true ? value.mFireResistantDamage : value.mLevel;
+							damage *= EntityUtils.vulnerabilityMult(mob);
 							mob.setNoDamageTicks(0);
 							mob.getWorld().spawnParticle(Particle.FLAME, mob.getLocation().add(0, 1, 0), 11, 0.4, 0.4, 0.4, 0.05);
 							Vector velocity = mob.getVelocity();
@@ -242,7 +243,8 @@ public class Inferno implements BaseEnchantment {
 			if (infernoValue != null) {
 				mob.setMetadata(FIRE_TICK_METAKEY, new FixedMetadataValue(Plugin.getInstance(), mob.getTicksLived()));
 				mob.getWorld().spawnParticle(Particle.FLAME, mob.getLocation().add(0, 1, 0), 11, 0.4, 0.4, 0.4, 0.05);
-				event.setDamage(event.getDamage() + infernoValue);
+				event.setDamage((event.getDamage() + infernoValue) * EntityUtils.vulnerabilityMult(mob));
+
 			}
 		}
 	}

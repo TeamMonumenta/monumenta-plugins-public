@@ -944,7 +944,7 @@ public class EntityListener implements Listener {
 			}
 		}
 
-		if (entity != null && entity instanceof LivingEntity) {
+		if (entity != null && entity instanceof LivingEntity && !(proj instanceof ThrownPotion)) {
 			LivingEntity hitEntity = (LivingEntity) entity;
 			if (hitEntity.getFireTicks() > 0) {
 				// Save old fireticks, the fire ticks will be managed in Inferno.onShootAttack(), which triggers for every projectile attack.

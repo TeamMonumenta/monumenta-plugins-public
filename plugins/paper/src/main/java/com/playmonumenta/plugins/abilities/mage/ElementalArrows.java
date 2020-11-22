@@ -50,7 +50,7 @@ public class ElementalArrows extends Ability {
 			if (elementalArrows > 1) {
 				for (LivingEntity mob : EntityUtils.getNearbyMobs(damagee.getLocation(), ELEMENTAL_ARROWS_RADIUS, damagee)) {
 					EntityUtils.damageEntity(mPlugin, mob, damage, mPlayer, MagicType.FIRE, true, mInfo.mLinkedSpell, false, true);
-					mob.setFireTicks(ELEMENTAL_ARROWS_DURATION);
+					EntityUtils.applyFire(mPlugin, ELEMENTAL_ARROWS_DURATION, mob, mPlayer);
 				}
 			}
 			if (damagee instanceof Stray) {

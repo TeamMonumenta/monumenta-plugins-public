@@ -281,6 +281,7 @@ public class ItemOverrides {
 		mItems.put(Material.POTTED_CACTUS, flowerOverride);
 
 		BaseOverride firmamentOverride = new FirmamentOverride();
+		mItems.put(Material.SHULKER_BOX, firmamentOverride);
 		mItems.put(Material.WHITE_SHULKER_BOX, firmamentOverride);
 		mItems.put(Material.ORANGE_SHULKER_BOX, firmamentOverride);
 		mItems.put(Material.MAGENTA_SHULKER_BOX, firmamentOverride);
