@@ -1,11 +1,10 @@
 package com.playmonumenta.plugins.bosses.spells;
 
-import org.bukkit.Bukkit;
+import java.util.function.Predicate;
+
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.potion.PotionEffect;
-import org.bukkit.scoreboard.Scoreboard;
-import org.bukkit.scoreboard.Team;
 
 
 public class SpellMinionResist extends Spell {
@@ -13,8 +12,7 @@ public class SpellMinionResist extends Spell {
 	private PotionEffect mPotion;
 	private int mRange;
 	private int mApplyPeriod;
-	private Scoreboard mScoreboard;
-	private Team mTeam;
+	private Predicate<Entity> mMinionTester;
 	private int mTicks;
 
 	/*
@@ -23,9 +21,7 @@ public class SpellMinionResist extends Spell {
 	 * Because this is expected to be called often (passive effect), this only actually does the check
 	 * every applyPeriod invocations
 	 */
-	public SpellMinionResist(LivingEntity launcher, PotionEffect potion, int range, int applyPeriod) {
-		mScoreboard = Bukkit.getScoreboardManager().getMainScoreboard();
-		mTeam = mScoreboard.getEntryTeam(launcher.getUniqueId().toString());
+	public SpellMinionResist(LivingEntity launcher, PotionEffect potion, int range, int applyPeriod, Predicate<Entity> minionTester) {
 		mLauncher = launcher;
 		mPotion = potion;
 		mRange = range;
@@ -40,8 +36,9 @@ public class SpellMinionResist extends Spell {
 			mTicks = 0;
 
 			for (Entity e : mLauncher.getNearbyEntities(mRange, mRange, mRange)) {
-				if (mTeam.equals(mScoreboard.getEntryTeam(e.getUniqueId().toString()))) {
+				if (mMinionTester.test(e)) {
 					mLauncher.addPotionEffect(mPotion);
+					break;
 				}
 			}
 		}

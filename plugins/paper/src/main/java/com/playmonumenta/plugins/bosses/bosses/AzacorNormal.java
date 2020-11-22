@@ -105,7 +105,8 @@ public class AzacorNormal extends BossAbilityGroup {
 			new SpellConditionalTeleport(mBoss, spawnLoc, b -> b.getLocation().getBlock().getType() == Material.BEDROCK ||
 			                                                   b.getLocation().add(0, 1, 0).getBlock().getType() == Material.BEDROCK ||
 			                                                   b.getLocation().getBlock().getType() == Material.LAVA),
-			new SpellMinionResist(mBoss, new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 30, 1), detectionRange, 5)
+			new SpellMinionResist(mBoss, new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 30, 1), detectionRange, 5,
+				(entity) -> (entity.getType().equals(EntityType.WITHER_SKELETON) || entity.getType().equals(EntityType.SKELETON)) && entity.getScoreboardTags().contains("azacor_minion"))
 		);
 
 		Map<Integer, BossHealthAction> events = new HashMap<Integer, BossHealthAction>();
