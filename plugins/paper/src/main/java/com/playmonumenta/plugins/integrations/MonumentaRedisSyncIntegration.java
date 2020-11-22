@@ -26,6 +26,8 @@ public class MonumentaRedisSyncIntegration implements Listener {
 		mLogger.info("PlayerTransferEvent: Player: " + player + "   Target: " + event.getTarget());
 		DelvesListener.onTransfer(player, event.getTarget());
 
+		player.closeInventory();
+
 		int dropped = InventoryUtils.removeSpecialItems(player, false);
 		if (dropped == 1) {
 			player.sendMessage(ChatColor.RED + "The dungeon key you were carrying was dropped!");

@@ -62,7 +62,8 @@ public class CrossbowListener implements Listener {
 				if ((itemInMainHand.getEnchantmentLevel(Enchantment.ARROW_INFINITE) > 0
 						|| itemInOffHand.getEnchantmentLevel(Enchantment.ARROW_INFINITE) > 0)
 						&&  arrow instanceof Arrow
-						&& !((Arrow)event.getEntity()).hasCustomEffects()) {
+						&& !((Arrow)event.getEntity()).hasCustomEffects()
+						&& ((Arrow)event.getEntity()).getPickupStatus() == AbstractArrow.PickupStatus.ALLOWED) {
 					arrow.setPickupStatus(AbstractArrow.PickupStatus.CREATIVE_ONLY);
 					if (player.getGameMode() != GameMode.CREATIVE) {
 						player.getInventory().addItem(new ItemStack(Material.ARROW));

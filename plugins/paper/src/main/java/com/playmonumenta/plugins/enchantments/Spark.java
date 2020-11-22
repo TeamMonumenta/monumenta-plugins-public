@@ -80,13 +80,15 @@ public class Spark implements BaseEnchantment {
 		if (proj.hasMetadata(LEVEL_METAKEY)) {
 			// Level isn't actually used currently
 
+			if (target instanceof Guardian || target instanceof IronGolem) {
+				event.setDamage(event.getDamage() + 1.0);
+			}
+
 			//0.5 second stun
 			if (!EntityUtils.isBoss(target) && !EntityUtils.isElite(target)) {
 				EntityUtils.applyStun(plugin, 10, target);
-			}
-
-			if (target instanceof Guardian || target instanceof IronGolem) {
-				event.setDamage(event.getDamage() + 1.0);
+			} else {
+				return;
 			}
 
 			World world = proj.getWorld();

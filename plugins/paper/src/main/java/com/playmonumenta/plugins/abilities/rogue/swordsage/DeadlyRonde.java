@@ -118,6 +118,8 @@ public class DeadlyRonde extends Ability {
 						MovementUtils.knockAway(mPlayer, mob, RONDE_KNOCKBACK_SPEED);
 					}
 				}
+			} else {
+				return true;
 			}
 
 			Location particleLoc = mPlayer.getEyeLocation().add(mPlayer.getEyeLocation().getDirection().multiply(3));
