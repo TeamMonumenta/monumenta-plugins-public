@@ -8,11 +8,11 @@ import org.bukkit.potion.PotionEffect;
 
 
 public class SpellMinionResist extends Spell {
-	private LivingEntity mLauncher;
-	private PotionEffect mPotion;
-	private int mRange;
-	private int mApplyPeriod;
-	private Predicate<Entity> mMinionTester;
+	private final LivingEntity mLauncher;
+	private final PotionEffect mPotion;
+	private final int mRange;
+	private final int mApplyPeriod;
+	private final Predicate<Entity> mMinionTester;
 	private int mTicks;
 
 	/*
@@ -26,6 +26,7 @@ public class SpellMinionResist extends Spell {
 		mPotion = potion;
 		mRange = range;
 		mApplyPeriod = applyPeriod;
+		mMinionTester = minionTester;
 		mTicks = mApplyPeriod;
 	}
 
