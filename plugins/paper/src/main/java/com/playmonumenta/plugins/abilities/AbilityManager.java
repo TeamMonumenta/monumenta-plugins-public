@@ -8,6 +8,31 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import org.bukkit.GameMode;
+import org.bukkit.Material;
+import org.bukkit.attribute.Attribute;
+import org.bukkit.attribute.AttributeInstance;
+import org.bukkit.attribute.AttributeModifier;
+import org.bukkit.entity.AbstractArrow;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
+import org.bukkit.entity.ThrownPotion;
+import org.bukkit.event.block.Action;
+import org.bukkit.event.entity.EntityCombustByEntityEvent;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
+import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.event.entity.EntityTargetLivingEntityEvent;
+import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.entity.PotionSplashEvent;
+import org.bukkit.event.entity.ProjectileHitEvent;
+import org.bukkit.event.player.PlayerAnimationEvent;
+import org.bukkit.event.player.PlayerItemConsumeEvent;
+import org.bukkit.event.player.PlayerItemDamageEvent;
+import org.bukkit.inventory.ItemStack;
+
 import com.google.gson.JsonElement;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.alchemist.AlchemicalArtillery;
@@ -141,34 +166,9 @@ import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.AbsorptionUtils;
-import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MetadataUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
-
-import org.bukkit.GameMode;
-import org.bukkit.Material;
-import org.bukkit.attribute.Attribute;
-import org.bukkit.attribute.AttributeInstance;
-import org.bukkit.entity.AbstractArrow;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
-import org.bukkit.entity.Projectile;
-import org.bukkit.entity.ThrownPotion;
-import org.bukkit.event.block.Action;
-import org.bukkit.event.entity.EntityCombustByEntityEvent;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
-import org.bukkit.event.entity.EntityDeathEvent;
-import org.bukkit.event.entity.EntityTargetLivingEntityEvent;
-import org.bukkit.event.entity.PlayerDeathEvent;
-import org.bukkit.event.entity.PotionSplashEvent;
-import org.bukkit.event.entity.ProjectileHitEvent;
-import org.bukkit.event.player.PlayerAnimationEvent;
-import org.bukkit.event.player.PlayerItemConsumeEvent;
-import org.bukkit.event.player.PlayerItemDamageEvent;
-import org.bukkit.inventory.ItemStack;
 
 public class AbilityManager {
 
@@ -447,9 +447,30 @@ public class AbilityManager {
 			&& !player.getGameMode().equals(GameMode.SPECTATOR)) {
 			movementSpeed.setBaseValue(0.1);
 		}
-		EntityUtils.removeAttribute(player, Attribute.GENERIC_MAX_HEALTH, "ToughnessMod");
-		Toughness.removeModifier(player);
-		Swiftness.removeModifier(player);
+
+		/*
+		 * Supposing that all instances of attribute modifiers are from abilities (which is the
+		 * case currently), this code is fine. If we use attribute modifiers for other things
+		 * in the future, then we'll need some way to differentiate them.
+		 *
+		 * This accounts for skipping over modifiers from items, but will remove all other
+		 * attribute modifiers, so hopefully those aren't used anywhere else in Vanilla...
+		 */
+		AttributeInstance speed = player.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED);
+		for (AttributeModifier mod : speed.getModifiers()) {
+			// The name of modifiers from items
+			if (!mod.getName().equals("Modifier")) {
+				speed.removeModifier(mod);
+			}
+		}
+		AttributeInstance health = player.getAttribute(Attribute.GENERIC_MAX_HEALTH);
+		for (AttributeModifier mod : health.getModifiers()) {
+			// The name of modifiers from items
+			if (!mod.getName().equals("Modifier")) {
+				health.removeModifier(mod);
+			}
+		}
+
 		player.setWalkSpeed(DEFAULT_WALK_SPEED);
 		player.setInvulnerable(false);
 		// The absorption tracker may lose track of the player when doing things like shard transfers, so reset absorption

@@ -1,7 +1,6 @@
 package com.playmonumenta.plugins.abilities.scout;
 
 import org.bukkit.attribute.Attribute;
-import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
@@ -10,6 +9,7 @@ import org.bukkit.potion.PotionEffectType;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
+import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
 
@@ -28,7 +28,9 @@ public class Swiftness extends Ability {
 		mInfo.mDescriptions.add("Gain +20% Speed when you are not inside a town.");
 		mInfo.mDescriptions.add("In addition, gain Jump Boost III when you are not inside a town.");
 
-		addModifier(player);
+		if (player != null) {
+			addModifier(player);
+		}
 	}
 
 	@Override
@@ -52,25 +54,13 @@ public class Swiftness extends Ability {
 		mWasInNoMobilityZone = isInNoMobilityZone;
 	}
 
-	public static void addModifier(Player player) {
-		if (player != null) {
-			AttributeInstance speed = player.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED);
-			if (speed != null) {
-				AttributeModifier mod = new AttributeModifier(SWIFTNESS_SPEED_MODIFIER, SWIFTNESS_SPEED_BONUS, AttributeModifier.Operation.MULTIPLY_SCALAR_1);
-				speed.addModifier(mod);
-			}
-		}
+	private static void addModifier(Player player) {
+		EntityUtils.addAttribute(player, Attribute.GENERIC_MOVEMENT_SPEED,
+				new AttributeModifier(SWIFTNESS_SPEED_MODIFIER, SWIFTNESS_SPEED_BONUS, AttributeModifier.Operation.MULTIPLY_SCALAR_1));
 	}
 
-	public static void removeModifier(Player player) {
-		AttributeInstance speed = player.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED);
-		if (speed != null) {
-			for (AttributeModifier mod : speed.getModifiers()) {
-				if (mod != null && mod.getName().equals(SWIFTNESS_SPEED_MODIFIER)) {
-					speed.removeModifier(mod);
-				}
-			}
-		}
+	private static void removeModifier(Player player) {
+		EntityUtils.removeAttribute(player, Attribute.GENERIC_MOVEMENT_SPEED, SWIFTNESS_SPEED_MODIFIER);
 	}
 
 }

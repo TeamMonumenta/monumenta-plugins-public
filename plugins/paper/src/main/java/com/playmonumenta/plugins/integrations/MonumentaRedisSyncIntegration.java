@@ -1,4 +1,3 @@
-
 package com.playmonumenta.plugins.integrations;
 
 import java.util.logging.Logger;
@@ -9,6 +8,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 
+import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.listeners.DelvesListener;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.redissync.event.PlayerServerTransferEvent;
@@ -25,6 +25,7 @@ public class MonumentaRedisSyncIntegration implements Listener {
 		Player player = event.getPlayer();
 		mLogger.info("PlayerTransferEvent: Player: " + player + "   Target: " + event.getTarget());
 		DelvesListener.onTransfer(player, event.getTarget());
+		Plugin.getInstance().mEffectManager.clearEffects(player);
 
 		player.closeInventory();
 

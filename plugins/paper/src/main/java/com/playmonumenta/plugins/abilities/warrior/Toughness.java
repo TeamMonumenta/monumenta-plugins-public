@@ -29,7 +29,6 @@ public class Toughness extends Ability {
 		mDoTDamageReduction = getAbilityScore() == 1 ? DOT_DAMAGE_REDUCTION_1 : DOT_DAMAGE_REDUCTION_2;
 
 		if (player != null) {
-			removeModifier(player);
 			double healthBoost = getAbilityScore() == 1 ? PERCENT_HEALTH_1 : PERCENT_HEALTH_2;
 			EntityUtils.addAttribute(player, Attribute.GENERIC_MAX_HEALTH,
 					new AttributeModifier(TOUGHNESS_MODIFIER_NAME, healthBoost, AttributeModifier.Operation.MULTIPLY_SCALAR_1));
@@ -45,7 +44,4 @@ public class Toughness extends Ability {
 		return true;
 	}
 
-	public static void removeModifier(Player player) {
-		EntityUtils.removeAttribute(player, Attribute.GENERIC_MAX_HEALTH, TOUGHNESS_MODIFIER_NAME);
-	}
 }
