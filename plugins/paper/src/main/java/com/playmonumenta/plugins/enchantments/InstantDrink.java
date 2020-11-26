@@ -21,6 +21,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
 import com.playmonumenta.plugins.utils.PotionUtils.PotionInfo;
 
@@ -45,7 +46,7 @@ public class InstantDrink implements BaseEnchantment {
 
 	@Override
 	public void onPlayerInteract(Plugin plugin, Player player, PlayerInteractEvent event, int level) {
-		if (event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK) {
+		if (event.getAction() == Action.RIGHT_CLICK_AIR || (event.getAction() == Action.RIGHT_CLICK_BLOCK && !ItemUtils.interactableBlocks.contains(event.getClickedBlock().getBlockData().getMaterial()))) {
 			ItemStack item = player.getInventory().getItemInMainHand();
 			if (item.getType() == Material.POTION) {
 				PotionMeta meta = (PotionMeta) item.getItemMeta();

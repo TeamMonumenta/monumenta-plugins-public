@@ -8,7 +8,10 @@ import org.bukkit.entity.Arrow;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
+import org.bukkit.entity.SpectralArrow;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 
 import com.playmonumenta.plugins.Plugin;
@@ -24,6 +27,7 @@ public class SplitArrow extends Ability {
 	private static final double SPLIT_ARROW_1_DAMAGE_PERCENT = 0.4;
 	private static final double SPLIT_ARROW_2_DAMAGE_PERCENT = 0.7;
 	private static final double SPLIT_ARROW_CHAIN_RANGE = 5;
+	private static final PotionEffect SPECTRAL_ARROW_EFFECT = new PotionEffect(PotionEffectType.GLOWING, 200, 0);
 
 	private final double mDamagePercent;
 
@@ -41,8 +45,7 @@ public class SplitArrow extends Ability {
 
 	@Override
 	public boolean livingEntityShotByPlayerEvent(Projectile proj, LivingEntity damagee, EntityDamageByEntityEvent event) {
-		if (proj instanceof Arrow) {
-			Arrow arrow = (Arrow) proj;
+		if (proj instanceof Arrow || proj instanceof SpectralArrow) {
 			LivingEntity nearestMob = EntityUtils.getNearestMob(damagee.getLocation(), SPLIT_ARROW_CHAIN_RANGE, damagee);
 
 			if (nearestMob != null) {
@@ -66,9 +69,14 @@ public class SplitArrow extends Ability {
 				nearestMob.setNoDamageTicks(0);
 				MovementUtils.knockAway(damagee, nearestMob, 0.125f, 0.35f);
 
-				if (arrow.getFireTicks() > 0) {
+				if (proj.getFireTicks() > 0) {
 					// Since Flame sets enemies on fire for 5 seconds.
 					nearestMob.setFireTicks(100);
+				}
+
+				if (proj instanceof SpectralArrow) {
+					// Copy over the spectral arrow glowing effect to the second mob as well
+					nearestMob.addPotionEffect(SPECTRAL_ARROW_EFFECT);
 				}
 			}
 		}
