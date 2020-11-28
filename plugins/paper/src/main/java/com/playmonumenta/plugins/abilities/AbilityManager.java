@@ -159,6 +159,7 @@ import com.playmonumenta.plugins.abilities.warrior.berserker.RecklessSwing;
 import com.playmonumenta.plugins.abilities.warrior.guardian.Bodyguard;
 import com.playmonumenta.plugins.abilities.warrior.guardian.Challenge;
 import com.playmonumenta.plugins.abilities.warrior.guardian.ShieldWall;
+import com.playmonumenta.plugins.enchantments.infusions.Vitality;
 import com.playmonumenta.plugins.events.AbilityCastEvent;
 import com.playmonumenta.plugins.events.CustomDamageEvent;
 import com.playmonumenta.plugins.events.PotionEffectApplyEvent;
@@ -455,19 +456,28 @@ public class AbilityManager {
 		 *
 		 * This accounts for skipping over modifiers from items, but will remove all other
 		 * attribute modifiers, so hopefully those aren't used anywhere else in Vanilla...
+		 *
+		 * As a side note, we should only really ever be adding modifiers to KBR, Speed, and
+		 * Health, but check all of them here just in case.
 		 */
-		AttributeInstance speed = player.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED);
-		for (AttributeModifier mod : speed.getModifiers()) {
-			// The name of modifiers from items
-			if (!mod.getName().equals("Modifier")) {
-				speed.removeModifier(mod);
-			}
-		}
-		AttributeInstance health = player.getAttribute(Attribute.GENERIC_MAX_HEALTH);
-		for (AttributeModifier mod : health.getModifiers()) {
-			// The name of modifiers from items
-			if (!mod.getName().equals("Modifier")) {
-				health.removeModifier(mod);
+		AttributeInstance[] instances = {
+				knockbackResistance,
+				armor,
+				toughness,
+				attackDamage,
+				attackSpeed,
+				movementSpeed,
+				maxHealth
+		};
+
+		for (AttributeInstance instance : instances) {
+			for (AttributeModifier mod : instance.getModifiers()) {
+				String name = mod.getName();
+				// The name of modifiers from vanilla attributes or the vitality infusion
+				if (!name.equals("Modifier") && !name.startsWith("minecraft:generic.")
+						&& !name.equals(Vitality.MODIFIER)) {
+					instance.removeModifier(mod);
+				}
 			}
 		}
 
