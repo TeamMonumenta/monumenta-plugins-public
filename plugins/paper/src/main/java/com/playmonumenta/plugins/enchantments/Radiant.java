@@ -15,6 +15,8 @@ import com.playmonumenta.plugins.utils.InventoryUtils;
 
 public class Radiant implements BaseEnchantment {
 	private static String PROPERTY_NAME = ChatColor.GRAY + "Radiant";
+	private static final String NIGHTVISION_DISABLED_TAG = "RadiantDarksightDisabled";
+
 
 	@Override
 	public String getProperty() {
@@ -44,7 +46,9 @@ public class Radiant implements BaseEnchantment {
 		// Radiant is different from the others - it applies effects only for a short duration
 		// and doesn't remove them when you switch off
 		plugin.mPotionManager.addPotion(player, PotionID.ITEM, new PotionEffect(PotionEffectType.GLOWING, 600, 0, true, false));
-		plugin.mPotionManager.addPotion(player, PotionID.ITEM, new PotionEffect(PotionEffectType.NIGHT_VISION, 600, 0, true, false));
+		if (!player.getScoreboardTags().contains(NIGHTVISION_DISABLED_TAG)) {
+			plugin.mPotionManager.addPotion(player, PotionID.ITEM, new PotionEffect(PotionEffectType.NIGHT_VISION, 600, 0, true, false));
+		}
 	}
 
 	@Override
