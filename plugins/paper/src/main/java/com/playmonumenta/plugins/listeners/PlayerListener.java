@@ -94,6 +94,7 @@ import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.enchantments.CurseOfEphemerality;
+import com.playmonumenta.plugins.enchantments.Hope;
 import com.playmonumenta.plugins.events.AbilityCastEvent;
 import com.playmonumenta.plugins.events.EvasionEvent;
 import com.playmonumenta.plugins.integrations.ChestSortIntegration;
@@ -368,6 +369,10 @@ public class PlayerListener implements Listener {
 			return;
 		}
 		InventoryUtils.scheduleDelayedEquipmentCheck(mPlugin, event.getPlayer(), event);
+
+		/* Drop the item as if it was dropped on death, applying grave settings & explosion resistance */
+		Item droppedItem = event.getItemDrop();
+		setDroppedItemGraveProperties(droppedItem, player, player.getLocation(), ItemUtils.getItemDeathResult(droppedItem.getItemStack()));
 	}
 
 	// An entity picked up an item
@@ -710,7 +715,16 @@ public class PlayerListener implements Listener {
 				}
 			}
 		}.runTaskTimer(Plugin.getInstance(), 1 * 20, 1 * 20);
-		if (InventoryUtils.testForItemWithLore(item, ChatColor.GRAY + "Hope")) {
+
+		// Tag the dropped item so it will create a grave. Includes logic to not tag items that should not grave
+		setDroppedItemGraveProperties(droppedItem, player, location, result);
+
+		droppedItems.add(droppedItem);
+		inv.clear(slot);
+	}
+
+	private void setDroppedItemGraveProperties(Item droppedItem, Player player, Location location, ItemDeathResult result) {
+		if (InventoryUtils.getCustomEnchantLevel(droppedItem.getItemStack(), Hope.PROPERTY_NAME, false) > 0) {
 			droppedItem.setInvulnerable(true);
 		} else {
 			// Make item invulnerable to explosions for 5 seconds
@@ -728,8 +742,6 @@ public class PlayerListener implements Listener {
 		    && !player.getScoreboardTags().contains("DisableGraves")) {
 			GraveUtils.setGraveScoreboard(droppedItem, player, location);
 		}
-		droppedItems.add(droppedItem);
-		inv.clear(slot);
 	}
 
 	// The player has respawned.

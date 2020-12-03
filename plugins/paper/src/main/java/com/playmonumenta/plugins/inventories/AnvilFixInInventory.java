@@ -77,6 +77,7 @@ public class AnvilFixInInventory implements Listener {
 
 			Bukkit.dispatchCommand(Bukkit.getConsoleSender(),
 			                       "execute as " + player.getName() + " run function monumenta:mechanisms/item_repair/grant_repair_advancement");
+			player.updateInventory();
 			event.setCancelled(true);
 		} else {
 			player.sendMessage(ChatColor.RED + "This is not a valid item to repair!");

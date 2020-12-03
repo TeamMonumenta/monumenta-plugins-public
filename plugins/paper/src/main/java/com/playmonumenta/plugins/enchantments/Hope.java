@@ -12,7 +12,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.utils.EntityUtils;
 
 public class Hope implements BaseEnchantment {
-	private static String PROPERTY_NAME = ChatColor.GRAY + "Hope";
+	public static String PROPERTY_NAME = ChatColor.GRAY + "Hope";
 
 	/* How much longer an item lasts per level */
 	private static final int EXTRA_MINUTES_PER_LEVEL = 5;
