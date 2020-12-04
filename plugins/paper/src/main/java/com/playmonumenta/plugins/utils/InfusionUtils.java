@@ -4,15 +4,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.enchantments.infusions.Acumen;
-import com.playmonumenta.plugins.enchantments.infusions.Focus;
-import com.playmonumenta.plugins.enchantments.infusions.Perspicacity;
-import com.playmonumenta.plugins.enchantments.infusions.Tenacity;
-import com.playmonumenta.plugins.enchantments.infusions.Vigor;
-import com.playmonumenta.plugins.enchantments.infusions.Vitality;
-import com.playmonumenta.plugins.utils.ItemUtils.ItemRegion;
-
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
@@ -30,6 +21,15 @@ import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.loot.LootContext;
 import org.bukkit.loot.LootTable;
 import org.bukkit.scheduler.BukkitRunnable;
+
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.enchantments.infusions.Acumen;
+import com.playmonumenta.plugins.enchantments.infusions.Focus;
+import com.playmonumenta.plugins.enchantments.infusions.Perspicacity;
+import com.playmonumenta.plugins.enchantments.infusions.Tenacity;
+import com.playmonumenta.plugins.enchantments.infusions.Vigor;
+import com.playmonumenta.plugins.enchantments.infusions.Vitality;
+import com.playmonumenta.plugins.utils.ItemUtils.ItemRegion;
 
 import dev.jorel.commandapi.CommandAPI;
 import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
@@ -307,6 +307,78 @@ public class InfusionUtils {
 			InventoryUtils.removeCustomEnchant(item, sel.getEnchantName());
 		}
 		giveMaterials(player, region, refundMaterials);
+
+		int level = getInfuseLevel(item);
+		int xp = ExperienceUtils.getTotalExperience(player);
+		switch (ItemUtils.getItemTier(item)) {
+			case MEME:
+			case UNCOMMON:
+			case ENHANCED_UNCOMMON:
+			case UNIQUE:
+			case UNIQUE_EVENT:
+			case RARE:
+			case PATRON_MADE:
+				switch (level) {
+					case 1:
+						ExperienceUtils.setTotalExperience(player, xp + (1395 / 2));
+						break;
+					case 2:
+						ExperienceUtils.setTotalExperience(player, xp + ((1395 + 2920) / 2));
+						break;
+					case 3:
+						ExperienceUtils.setTotalExperience(player, xp + ((1395 + 2920 + 5345) / 2));
+						break;
+					case 4:
+						ExperienceUtils.setTotalExperience(player, xp + ((1395 + 2920 + 5345 + 8670) / 2));
+						break;
+					default:
+					case 0:
+						break;
+				}
+				break;
+			case RELIC:
+			case ARTIFACT:
+			case ENHANCED_RARE:
+				switch (level) {
+					case 1:
+						ExperienceUtils.setTotalExperience(player, xp + (2920 / 2));
+						break;
+					case 2:
+						ExperienceUtils.setTotalExperience(player, xp + ((2920 + 5345) / 2));
+						break;
+					case 3:
+						ExperienceUtils.setTotalExperience(player, xp + ((2920 + 5345 + 8670) / 2));
+						break;
+					case 4:
+						ExperienceUtils.setTotalExperience(player, xp + ((2920 + 5345 + 8670 + 12895) / 2));
+						break;
+					default:
+					case 0:
+						break;
+				}
+				break;
+			case EPIC:
+				switch (level) {
+					case 1:
+						ExperienceUtils.setTotalExperience(player, xp + (5345 / 2));
+						break;
+					case 2:
+						ExperienceUtils.setTotalExperience(player, xp + ((5345 + 8670) / 2));
+						break;
+					case 3:
+						ExperienceUtils.setTotalExperience(player, xp + ((5345 + 8670 + 12895) / 2));
+						break;
+					case 4:
+						ExperienceUtils.setTotalExperience(player, xp + ((5345 + 8670 + 12895 + 18020) / 2));
+						break;
+					default:
+					case 0:
+						break;
+				}
+				break;
+			default:
+				CommandAPI.fail("Invalid item. Item must be infused!");
+		}
 	}
 
 	private static void giveMaterials(Player player, ItemRegion region, int refundMaterials) throws WrapperCommandSyntaxException {
@@ -429,13 +501,13 @@ public class InfusionUtils {
 			case 2:
 				switch (level) {
 					case 0:				// Infuse Level 0 Rare
-						return 2920;	// Exp Level 40
+						return 1395;	// Exp Level 30
 					case 1:				// Infuse Level 1 Rare
-						return 5345;	// Exp Level 50
+						return 2920;    // Exp Level 40
 					case 2:				// Infuse Level 2 Rare
-						return 8670;	// Exp Level 60
+						return 5345;    // Exp Level 50
 					case 3:				// Infuse Level 3 Rare
-						return 12895;	// Exp Level 70
+						return 8670;	// Exp Level 60
 					default:			// Infuse Level 4 Rare
 						CommandAPI.fail("ERROR while calculating experience cost (invalid score multiplier). Please contact a moderator if you see this message!");
 						return 99999999;// Exp Level 9000 (but not really)
@@ -443,13 +515,13 @@ public class InfusionUtils {
 			case 3:
 				switch (level) {
 					case 0:				// Infuse Level 0 Artifact
-						return 5345;	// Exp Level 50
+						return 2920;    // Exp Level 40
 					case 1:				// Infuse Level 1 Artifact
-						return 8670;	// Exp Level 60
+						return 5345;    // Exp Level 50
 					case 2:				// Infuse Level 2 Artifact
-						return 12895;	// Exp Level 70
+						return 8670;	// Exp Level 60
 					case 3:				// Infuse Level 3 Artifact
-						return 18020;	// Exp Level 80
+						return 12895;	// Exp Level 70
 					default:			// Infuse Level 4 Artifact
 						CommandAPI.fail("ERROR while calculating experience cost (invalid score multiplier). Please contact a moderator if you see this message!");
 						return 99999999;// Exp Level 9000 (but not really)
@@ -457,13 +529,13 @@ public class InfusionUtils {
 			case 6:
 				switch (level) {
 					case 0:				// Infuse Level 0 Epic
-						return 8670;	// Exp Level 60
+						return 5345;    // Exp Level 50
 					case 1:				// Infuse Level 1 Epic
-						return 12895;	// Exp Level 70
+						return 8670;	// Exp Level 60
 					case 2:				// Infuse Level 2 Epic
-						return 18020;	// Exp Level 80
+						return 12895;	// Exp Level 70
 					case 3:				// Infuse Level 3 Epic
-						return 24045;	// Exp Level 90
+						return 18020;	// Exp Level 80
 					default:			// Infuse Level 4 Epic
 						CommandAPI.fail("ERROR while calculating experience cost (invalid score multiplier). Please contact a moderator if you see this message!");
 						return 99999999;// Exp Level 9000 (but not really)

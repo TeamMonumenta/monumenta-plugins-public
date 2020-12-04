@@ -36,6 +36,7 @@ public enum Enchantment {
 	SNIPER(new Sniper()),
 	IMPALING(ChatColor.GRAY + "Impaling", org.bukkit.enchantments.Enchantment.IMPALING),
 	SWEEPING_EDGE(ChatColor.GRAY + "Sweeping Edge", org.bukkit.enchantments.Enchantment.SWEEPING_EDGE),
+	ARCANE_THRUST(new ArcaneThrust()),
 
 	// on hit debuffs
 	FLAME(ChatColor.GRAY + "Flame", org.bukkit.enchantments.Enchantment.ARROW_FIRE),

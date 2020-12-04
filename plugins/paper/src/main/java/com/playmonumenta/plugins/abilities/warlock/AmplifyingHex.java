@@ -69,6 +69,7 @@ public class AmplifyingHex extends Ability {
 	                                                      );
 
 	private final int mAmplifierDamage;
+	private ConsumingFlames mConsumingFlames;
 
 	public AmplifyingHex(Plugin plugin, Player player) {
 		super(plugin, player, "Amplifying Hex");
@@ -80,6 +81,14 @@ public class AmplifyingHex extends Ability {
 		mInfo.mCooldown = (getAbilityScore() == 1) ? COOLDOWN_1 : COOLDOWN_2;
 		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;
 		mAmplifierDamage = getAbilityScore() == 1 ? AMPLIFIER_DAMAGE_1 : AMPLIFIER_DAMAGE_2;
+
+		// Needs to wait for the entire AbilityCollection to be initialized
+		new BukkitRunnable() {
+			@Override
+			public void run() {
+				mConsumingFlames = AbilityManager.getManager().getPlayerAbility(mPlayer, ConsumingFlames.class);
+			}
+		}.runTaskLater(mPlugin, 1);
 	}
 
 	@Override
@@ -121,8 +130,8 @@ public class AmplifyingHex extends Ability {
 		effectDamage += AmplifyingHexDamageEnchantment.getExtraDamage(mPlayer, AmplifyingHexDamageEnchantment.class);
 		world.playSound(mPlayer.getLocation(), Sound.ENTITY_POLAR_BEAR_WARNING, 1.0f, 0.65f);
 		world.playSound(mPlayer.getLocation(), Sound.ENTITY_BLAZE_SHOOT, 1.0f, 0.65f);
-
 		Vector playerDir = mPlayer.getEyeLocation().getDirection().setY(0).normalize();
+
 		for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), RADIUS, mPlayer)) {
 			Vector toMobVector = mob.getLocation().toVector().subtract(mPlayer.getLocation().toVector()).setY(0).normalize();
 			if (playerDir.dot(toMobVector) > DOT_ANGLE) {
@@ -139,10 +148,8 @@ public class AmplifyingHex extends Ability {
 					}
 				}
 
-				ConsumingFlames cf = AbilityManager.getManager().getPlayerAbility(mPlayer, ConsumingFlames.class);
-
-				if (cf != null)	{
-					if (cf.getAbilityScore() > 0 && mob.getFireTicks() > 0) {
+				if (mConsumingFlames != null)	{
+					if (mConsumingFlames.getAbilityScore() > 0 && mob.getFireTicks() > 0) {
 						debuffCount++;
 						amplifierCount += Math.min(mob.hasMetadata(FractalEnervation.FRACTAL_CAP_REMOVED_METAKEY) ? FractalEnervation.FRACTAL_AMPLIFYING_HEX_CAP : AMPLIFIER_CAP,
 								Inferno.getMobInfernoLevel(mPlugin, mob));
@@ -159,7 +166,6 @@ public class AmplifyingHex extends Ability {
 				}
 			}
 		}
-
 		putOnCooldown();
 	}
 
@@ -169,5 +175,4 @@ public class AmplifyingHex extends Ability {
 		return mPlayer.isSneaking() && pitch < 50 && pitch > -50
 				&& InventoryUtils.isScytheItem(mPlayer.getInventory().getItemInMainHand());
 	}
-
 }

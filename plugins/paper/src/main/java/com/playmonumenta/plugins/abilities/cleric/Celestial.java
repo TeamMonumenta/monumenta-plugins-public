@@ -3,6 +3,14 @@ package com.playmonumenta.plugins.abilities.cleric;
 import java.util.EnumSet;
 import java.util.List;
 
+import org.bukkit.Location;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
+import org.bukkit.World;
+import org.bukkit.entity.Player;
+import org.bukkit.event.block.Action;
+import org.bukkit.inventory.ItemStack;
+
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
@@ -14,14 +22,6 @@ import com.playmonumenta.plugins.enchantments.BaseAbilityEnchantment;
 import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
-
-import org.bukkit.Location;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
-import org.bukkit.World;
-import org.bukkit.entity.Player;
-import org.bukkit.event.block.Action;
-import org.bukkit.inventory.ItemStack;
 
 public class Celestial extends Ability {
 
@@ -37,7 +37,7 @@ public class Celestial extends Ability {
 	private static final double CELESTIAL_RADIUS = 12;
 	private static final double CELESTIAL_1_EXTRA_DAMAGE = 0.20;
 	private static final double CELESTIAL_2_EXTRA_DAMAGE = 0.35;
-	private static final double CELESTIAL_EXTRA_SPEED = 0.02;
+	private static final double CELESTIAL_EXTRA_SPEED = 0.20;
 	private static final String ATTR_NAME = "CelestialBlessingExtraSpeedAttr";
 
 	public Celestial(Plugin plugin, Player player) {

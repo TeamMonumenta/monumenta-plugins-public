@@ -76,6 +76,7 @@ public class RecklessSwing extends Ability {
 			world.spawnParticle(Particle.SWEEP_ATTACK, loc, 25, 2, 0, 2, 0);
 
 			for (LivingEntity mob : EntityUtils.getNearbyMobs(loc, RADIUS)) {
+				mob.setNoDamageTicks(0);
 				EntityUtils.damageEntity(mPlugin, mob, mDamage, mPlayer);
 			}
 		}
