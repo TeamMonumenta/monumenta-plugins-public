@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.List;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -83,12 +84,11 @@ public class AmplifyingHex extends Ability {
 		mAmplifierDamage = getAbilityScore() == 1 ? AMPLIFIER_DAMAGE_1 : AMPLIFIER_DAMAGE_2;
 
 		// Needs to wait for the entire AbilityCollection to be initialized
-		new BukkitRunnable() {
-			@Override
-			public void run() {
+		Bukkit.getScheduler().runTask(plugin, () -> {
+			if (player != null) {
 				mConsumingFlames = AbilityManager.getManager().getPlayerAbility(mPlayer, ConsumingFlames.class);
 			}
-		}.runTaskLater(mPlugin, 1);
+		});
 	}
 
 	@Override

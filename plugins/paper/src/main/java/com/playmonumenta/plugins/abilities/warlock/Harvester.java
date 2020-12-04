@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.abilities.warlock;
 import java.util.Arrays;
 import java.util.List;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -50,7 +51,7 @@ public class Harvester extends Ability {
 	private int mHarvesterDeaths = 0;
 	private int mHexDeaths = 0;
 	private boolean mHexActive = false;
-	private ConsumingFlames mFlames = AbilityManager.getManager().getPlayerAbility(mPlayer, ConsumingFlames.class);
+	private ConsumingFlames mFlames = null;
 
 	public Harvester(Plugin plugin, Player player) {
 		super(plugin, player, "Harvester of the Damned");
@@ -58,6 +59,13 @@ public class Harvester extends Ability {
 		mInfo.mShorthandName = "HotD";
 		mInfo.mDescriptions.add("Enemies you damage with an ability are afflicted with 10% vulnerability for 5 seconds. Additionally, for each mob that dies within 8 blocks of the player, your next cast of Amplifying Hex does an additional 0.5 damage per debuff, capped at +4.");
 		mInfo.mDescriptions.add("Vulnerability is increased to 20%, and the cap is increased to +8 damage per debuff.");
+
+		// Needs to wait for the entire AbilityCollection to be initialized
+		Bukkit.getScheduler().runTask(plugin, () -> {
+			if (player != null) {
+				mFlames = AbilityManager.getManager().getPlayerAbility(mPlayer, ConsumingFlames.class);
+			}
+		});
 	}
 
 	@Override
