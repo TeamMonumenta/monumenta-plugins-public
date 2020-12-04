@@ -3,8 +3,17 @@ package com.playmonumenta.plugins.overrides;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.integrations.CoreProtectIntegration;
+import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.ItemUtils.ItemTier;
+
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.ShulkerBox;
@@ -17,13 +26,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BlockDataMeta;
 import org.bukkit.inventory.meta.BlockStateMeta;
 import org.bukkit.inventory.meta.ItemMeta;
-
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.integrations.CoreProtectIntegration;
-import com.playmonumenta.plugins.utils.FastUtils;
-import com.playmonumenta.plugins.utils.InventoryUtils;
-import com.playmonumenta.plugins.utils.ItemUtils;
-import com.playmonumenta.plugins.utils.ItemUtils.ItemTier;
 
 public class FirmamentOverride extends BaseOverride {
 
@@ -44,6 +46,15 @@ public class FirmamentOverride extends BaseOverride {
 	@Override
 	public boolean leftClickBlockInteraction(Plugin plugin, Player player, Action action, ItemStack item, Block block) {
 		return changeMode(item);
+	}
+
+	@Override
+	public boolean blockDispenseInteraction(Plugin plugin, Block block, ItemStack dispensed) {
+		if (isFirmamentItem(dispensed)) {
+			block.getWorld().playSound(block.getLocation(), Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1.0f, 1.0f);
+			return false;
+		}
+		return true;
 	}
 
 	private boolean placeBlock(Player player, ItemStack item, BlockPlaceEvent event) {
