@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.enchantments;
 
 import java.util.EnumSet;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -14,7 +15,6 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
-import com.playmonumenta.plugins.utils.MetadataUtils;
 
 /*
  * Multitool - Level one allows you to swap the tool
@@ -47,15 +47,15 @@ public class Multitool implements BaseEnchantment {
 			}
 			// You can swap your itemslot in the same tick, the event will begin when you right click the multitool item
 			// and then perform actions on the swapped to item. Re-get the level for the item being changed to safeguard this.
-			level = this.getLevelFromItem(item);
-			if (level > 0) {
-				if (MetadataUtils.checkOnceThisTick(plugin, player, "MultitoolMutex")) {
+			int confirmLevel = this.getLevelFromItem(item);
+			if (confirmLevel > 0) {
+				Bukkit.getScheduler().runTask(plugin, () -> {
 					String[] str = item.getType().toString().split("_");
 					if (InventoryUtils.isAxeItem(item)) {
 						Material mat = Material.valueOf(str[0] + "_" + "SHOVEL");
 						item.setType(mat);
 					} else if (InventoryUtils.isShovelItem(item)) {
-						if (level > 1) {
+						if (confirmLevel > 1) {
 							Material mat = Material.valueOf(str[0] + "_" + "PICKAXE");
 							item.setType(mat);
 						} else {
@@ -67,7 +67,8 @@ public class Multitool implements BaseEnchantment {
 						item.setType(mat);
 					}
 					player.playSound(player.getLocation(), Sound.BLOCK_CHEST_CLOSE, 1, 2F);
-				}
+					player.updateInventory();
+				});
 			}
 		}
 	}
