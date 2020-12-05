@@ -192,7 +192,7 @@ public class MeteorSlam extends Ability {
 
 	@Override
 	public void invalidate() {
-		if (mRunnable != null && mRunnable.isCancelled()) {
+		if (mRunnable != null && !mRunnable.isCancelled()) {
 			mRunnable.cancel();
 		}
 	}
