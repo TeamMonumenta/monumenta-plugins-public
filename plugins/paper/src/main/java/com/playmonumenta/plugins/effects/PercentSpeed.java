@@ -6,11 +6,15 @@ import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.entity.Entity;
 
 import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.ZoneUtils;
+import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
 
 public class PercentSpeed extends Effect {
 
 	private final double mAmount;
 	private final String mModifierName;
+
+	private boolean mWasInNoMobilityZone = false;
 
 	public PercentSpeed(int duration, double amount, String modifierName) {
 		super(duration);
@@ -35,6 +39,19 @@ public class PercentSpeed extends Effect {
 		if (entity instanceof Attributable) {
 			EntityUtils.removeAttribute((Attributable) entity, Attribute.GENERIC_MOVEMENT_SPEED, mModifierName);
 		}
+	}
+
+	@Override
+	public void entityTickEffect(Entity entity, boolean fourHertz, boolean twoHertz, boolean oneHertz) {
+		boolean isInNoMobilityZone = ZoneUtils.hasZoneProperty(entity, ZoneProperty.NO_MOBILITY_ABILITIES);
+
+		if (mWasInNoMobilityZone && !isInNoMobilityZone) {
+			entityGainEffect(entity);
+		} else if (!mWasInNoMobilityZone && isInNoMobilityZone) {
+			entityLoseEffect(entity);
+		}
+
+		mWasInNoMobilityZone = isInNoMobilityZone;
 	}
 
 	@Override
