@@ -33,7 +33,7 @@ public class AttributeProjectileDamage implements BaseAttribute {
 		 * snowball) to get lots of damage. Since we have no shootables with offhand stats, just ignore the attribute calculation
 		 * if the player shoots something and has a shootable in the offhand.
 		 */
-		if (value > 0 && !ItemUtils.isShootableItem(player.getInventory().getItemInOffHand().getType())) {
+		if (value > 0 && !ItemUtils.isShootableItem(player.getInventory().getItemInOffHand())) {
 			proj.setMetadata(DAMAGE_METAKEY, new FixedMetadataValue(plugin, value));
 		}
 	}

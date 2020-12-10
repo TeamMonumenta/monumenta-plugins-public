@@ -18,8 +18,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
-import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.BookMeta;
+import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.potion.PotionData;
@@ -314,10 +314,10 @@ public class ItemUtils {
 		Material.WHITE_DYE
 	);
 
+	// Exclude tridents, which get checked manually because Riptide tridents are not shootable
 	public static final Set<Material> SHOOTABLES = EnumSet.of(
 		Material.BOW,
 		Material.CROSSBOW,
-		Material.TRIDENT,
 		Material.SNOWBALL,
 		Material.EGG,
 		Material.ENDER_PEARL,
@@ -897,8 +897,13 @@ public class ItemUtils {
 		return item != null && isArmorItem(item.getType()) && isItemShattered(item);
 	}
 
-	public static boolean isShootableItem(Material mat) {
-		return SHOOTABLES.contains(mat);
+	public static boolean isShootableItem(ItemStack item) {
+		Material mat = item.getType();
+		if (mat == Material.TRIDENT) {
+			return !item.containsEnchantment(Enchantment.RIPTIDE);
+		} else {
+			return SHOOTABLES.contains(mat);
+		}
 	}
 
 	public static boolean isArmorItem(Material mat) {

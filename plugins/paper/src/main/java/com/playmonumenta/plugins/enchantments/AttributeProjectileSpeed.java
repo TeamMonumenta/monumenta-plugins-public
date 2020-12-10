@@ -27,7 +27,7 @@ public class AttributeProjectileSpeed implements BaseAttribute {
 		 *
 		 * Additionally, if the level is 0, then it's just a vanilla item with no modifiers.
 		 */
-		if (value != 0 && !ItemUtils.isShootableItem(player.getInventory().getItemInOffHand().getType())) {
+		if (value != 0 && !ItemUtils.isShootableItem(player.getInventory().getItemInOffHand())) {
 			proj.setMetadata(SPEED_METAKEY, new FixedMetadataValue(plugin, value));
 			proj.setVelocity(proj.getVelocity().multiply(value));
 		}
