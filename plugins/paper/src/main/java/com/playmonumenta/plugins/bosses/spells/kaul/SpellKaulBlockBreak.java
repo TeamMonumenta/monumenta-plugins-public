@@ -12,6 +12,7 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.block.Block;
 import org.bukkit.block.Container;
+import org.bukkit.block.data.type.TrapDoor;
 import org.bukkit.entity.Creature;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.entity.EntityExplodeEvent;
@@ -81,7 +82,7 @@ public class SpellKaulBlockBreak extends Spell {
 					testloc.setZ(l.getZ());
 					Block block = testloc.getBlock();
 					Material mat = block.getType();
-					if (y == 0 && mat == Material.COBWEB) {
+					if (mat == Material.COBWEB || block.getBlockData() instanceof TrapDoor) {
 						/* Break cobwebs immediately, don't add them to the bad block list */
 						EntityExplodeEvent event = new EntityExplodeEvent(mBoss, mBoss.getLocation(), Arrays.asList(block), 0f);
 						Bukkit.getServer().getPluginManager().callEvent(event);

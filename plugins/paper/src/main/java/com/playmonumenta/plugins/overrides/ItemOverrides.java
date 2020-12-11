@@ -250,6 +250,10 @@ public class ItemOverrides {
 		mItems.put(Material.OAK_WALL_SIGN, signOverride);
 		mItems.put(Material.SPRUCE_SIGN, signOverride);
 		mItems.put(Material.SPRUCE_WALL_SIGN, signOverride);
+		mItems.put(Material.WARPED_SIGN, signOverride);
+		mItems.put(Material.WARPED_WALL_SIGN, signOverride);
+		mItems.put(Material.CRIMSON_SIGN, signOverride);
+		mItems.put(Material.CRIMSON_WALL_SIGN, signOverride);
 
 
 		BaseOverride unbreakableOverride = new UnbreakableOnBedrockOverride();

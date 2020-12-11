@@ -370,9 +370,12 @@ public class PlayerListener implements Listener {
 		}
 		InventoryUtils.scheduleDelayedEquipmentCheck(mPlugin, event.getPlayer(), event);
 
-		/* Drop the item as if it was dropped on death, applying grave settings & explosion resistance */
 		Item droppedItem = event.getItemDrop();
-		setDroppedItemGraveProperties(droppedItem, player, player.getLocation(), ItemUtils.getItemDeathResult(droppedItem.getItemStack()));
+		if (!ZoneUtils.hasZoneProperty(droppedItem.getLocation(), ZoneProperty.ADVENTURE_MODE)) {
+			/* Not in an adventure mode area */
+			/* Drop the item as if it was dropped on death, applying grave settings & explosion resistance */
+			setDroppedItemGraveProperties(droppedItem, player, player.getLocation(), ItemUtils.getItemDeathResult(droppedItem.getItemStack()));
+		}
 	}
 
 	// An entity picked up an item

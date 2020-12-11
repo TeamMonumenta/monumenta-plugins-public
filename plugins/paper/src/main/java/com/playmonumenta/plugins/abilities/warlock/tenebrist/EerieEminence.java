@@ -119,10 +119,11 @@ public class EerieEminence extends Ability {
 								 * 0.1 * 10s * 4 ticks/s = 4 health
 								 */
 								PlayerUtils.healPlayer(player, 0.1d);
-							} else {
-								mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_OTHER,
-																 new PotionEffect(entry.getBuff(), 30, 0, true, true));
 							}
+
+							/* Give the player the regen effect anyway, just so the tooltip shows up. It won't do anything because duration < 50 ticks */
+							mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_OTHER,
+							                                 new PotionEffect(entry.getBuff(), 30, 0, true, true));
 						}
 					}
 				}

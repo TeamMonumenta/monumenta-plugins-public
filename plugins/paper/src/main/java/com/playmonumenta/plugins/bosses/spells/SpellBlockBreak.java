@@ -11,6 +11,7 @@ import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.block.Block;
+import org.bukkit.block.data.type.TrapDoor;
 import org.bukkit.entity.Entity;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.loot.Lootable;
@@ -47,14 +48,14 @@ public class SpellBlockBreak extends Spell {
 		Location testloc = new Location(loc.getWorld(), 0, 0, 0);
 		for (int x = -1; x <= 1; x++) {
 			testloc.setX(loc.getX() + x);
-			for (int y = 1; y <= 3; y++) {
+			for (int y = 0; y <= 3; y++) {
 				testloc.setY(loc.getY() + y);
 				for (int z = -1; z <= 1; z++) {
 					testloc.setZ(loc.getZ() + z);
 					Block block = testloc.getBlock();
 					Material material = block.getType();
 
-					if (material.equals(Material.COBWEB)) {
+					if (material.equals(Material.COBWEB) || block.getBlockData() instanceof TrapDoor) {
 						/* Break cobwebs immediately, don't add them to the bad block list */
 						EntityExplodeEvent event = new EntityExplodeEvent(mLauncher, mLauncher.getLocation(), Arrays.asList(block), 0f);
 						Bukkit.getServer().getPluginManager().callEvent(event);
@@ -64,9 +65,10 @@ public class SpellBlockBreak extends Spell {
 							loc.getWorld().playSound(loc, Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, 0.3f, 0.9f);
 							loc.getWorld().spawnParticle(Particle.EXPLOSION_NORMAL, loc, 6, 1, 1, 1, 0.03);
 						}
-					} else if ((!mIgnoredMats.contains(material)) && !mNoBreak.contains(material) &&
-						(material.isSolid() || material.equals(Material.COBWEB)) &&
-						(!(block.getState() instanceof Lootable) || !((Lootable)block.getState()).hasLootTable())) {
+					} else if (y > 0 &&
+					           (!mIgnoredMats.contains(material)) && !mNoBreak.contains(material) &&
+					           material.isSolid() &&
+					           (!(block.getState() instanceof Lootable) || !((Lootable)block.getState()).hasLootTable())) {
 						badBlockList.add(block);
 					}
 				}

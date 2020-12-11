@@ -31,6 +31,7 @@ import org.bukkit.entity.Firework;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Painting;
 import org.bukkit.entity.Pig;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
@@ -424,11 +425,11 @@ public class EntityListener implements Listener {
 			return;
 		}
 		if ((source == DamageCause.BLOCK_EXPLOSION || source == DamageCause.ENTITY_EXPLOSION) &&
-		    (damagee.getScoreboardTags().contains("ExplosionImmune") || damagee instanceof ItemFrame)) {
+		    (damagee.getScoreboardTags().contains("ExplosionImmune") || damagee instanceof ItemFrame) || damagee instanceof Painting) {
 			event.setCancelled(true);
 			return;
 		}
-		if (damagee instanceof ItemFrame) {
+		if (damagee instanceof ItemFrame || damagee instanceof Painting) {
 			// Attempting to damage an item frame
 			if (event instanceof EntityDamageByEntityEvent) {
 				// This event is damage attributable to an entity
@@ -436,7 +437,7 @@ public class EntityListener implements Listener {
 				if (!(edbee.getDamager() instanceof Player) ||
 				    (damagee.isInvulnerable() && !((Player)edbee.getDamager()).getGameMode().equals(GameMode.CREATIVE))) {
 					// This damage is from an entity, but that entity is not a player
-					// OR The damage is from a player but the item frame is invulnerable and the player is not in creative
+					// OR The damage is from a player but the item frame/painting is invulnerable and the player is not in creative
 					// Don't allow it
 					event.setCancelled(true);
 				}
@@ -444,7 +445,7 @@ public class EntityListener implements Listener {
 				// This damage is not from a particular entity source - don't allow it
 				event.setCancelled(true);
 			}
-			// No more processing needed for invulnerable item frames
+			// No more processing needed for invulnerable item frames/paintings
 			return;
 		}
 		if (damagee instanceof Player) {
