@@ -24,6 +24,7 @@ import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.event.player.PlayerExpChangeEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
+import org.bukkit.event.player.PlayerItemDamageEvent;
 import org.bukkit.inventory.ItemStack;
 
 import com.google.gson.JsonObject;
@@ -216,6 +217,14 @@ public class PlayerTracking implements EntityTracking {
 		if (manager != null) {
 
 			manager.onConsume(plugin, player, event);
+		}
+	}
+
+	public void onItemDamage(Plugin plugin, Player player, PlayerItemDamageEvent event) {
+		PlayerInventory manager = mPlayers.get(player);
+		if (manager != null) {
+
+			manager.onItemDamage(plugin, player, event);
 		}
 	}
 

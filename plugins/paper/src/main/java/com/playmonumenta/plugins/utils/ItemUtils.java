@@ -27,6 +27,7 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.potion.PotionType;
 
+import com.playmonumenta.plugins.enchantments.Colossal;
 import com.playmonumenta.plugins.itemindex.Attribute;
 import com.playmonumenta.plugins.listeners.ShulkerShortcutListener;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
@@ -982,7 +983,9 @@ public class ItemUtils {
 	public static void damageItemWithUnbreaking(ItemStack item, int damage, boolean canBreak) {
 		//Damages item by chance based on unbreaking level (always damages for no unbreaking)
 		//Chance to do damage (Unbreaking 0 = 1 or 100%, Unbreaking 1 = 1/2 or 50%, etc.)
-		double chance = 1.0 / (item.getEnchantmentLevel(Enchantment.DURABILITY) + 1);
+		//Colossal is also an extra 50% chance to not lose durability on top of unbreaking
+		//Need to add all enchantments to do with durability here
+		double chance = 1.0 / ((item.getEnchantmentLevel(Enchantment.DURABILITY) + 1) * (InventoryUtils.getCustomEnchantLevel(item, Colossal.PROPERTY_NAME, false) + 1));
 		double rand = Math.random();
 		if (rand < chance) {
 			damageItem(item, damage, canBreak);

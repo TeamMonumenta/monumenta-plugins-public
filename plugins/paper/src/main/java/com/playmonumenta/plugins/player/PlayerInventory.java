@@ -3,18 +3,6 @@ package com.playmonumenta.plugins.player;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import com.google.gson.JsonObject;
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.enchantments.BaseAttribute;
-import com.playmonumenta.plugins.enchantments.BaseEnchantment;
-import com.playmonumenta.plugins.enchantments.Enchantment;
-import com.playmonumenta.plugins.events.CustomDamageEvent;
-import com.playmonumenta.plugins.events.EvasionEvent;
-import com.playmonumenta.plugins.listeners.ShulkerEquipmentListener;
-import com.playmonumenta.plugins.utils.AbsorptionUtils;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.InventoryUtils;
-
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.entity.Entity;
@@ -39,10 +27,23 @@ import org.bukkit.event.player.PlayerExpChangeEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerItemBreakEvent;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
+import org.bukkit.event.player.PlayerItemDamageEvent;
 import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.inventory.ItemStack;
+
+import com.google.gson.JsonObject;
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.enchantments.BaseAttribute;
+import com.playmonumenta.plugins.enchantments.BaseEnchantment;
+import com.playmonumenta.plugins.enchantments.Enchantment;
+import com.playmonumenta.plugins.events.CustomDamageEvent;
+import com.playmonumenta.plugins.events.EvasionEvent;
+import com.playmonumenta.plugins.listeners.ShulkerEquipmentListener;
+import com.playmonumenta.plugins.utils.AbsorptionUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.InventoryUtils;
 
 public class PlayerInventory {
 	/*
@@ -363,6 +364,14 @@ public class PlayerInventory {
 			BaseEnchantment property = iter.getKey();
 			Integer level = iter.getValue();
 			property.onConsume(plugin, player, event, level);
+		}
+	}
+
+	public void onItemDamage(Plugin plugin, Player player, PlayerItemDamageEvent event) {
+		for (Map.Entry<BaseEnchantment, Integer> iter : mCurrentProperties.entrySet()) {
+			BaseEnchantment property = iter.getKey();
+			Integer level = iter.getValue();
+			property.onItemDamage(plugin, player, event, level);
 		}
 	}
 

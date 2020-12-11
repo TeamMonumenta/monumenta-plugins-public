@@ -17,6 +17,7 @@ import com.playmonumenta.plugins.commands.BossFight;
 import com.playmonumenta.plugins.commands.BroadcastCommand;
 import com.playmonumenta.plugins.commands.CalculateReforge;
 import com.playmonumenta.plugins.commands.ClaimRaffle;
+import com.playmonumenta.plugins.commands.ColossalifyHeldItem;
 import com.playmonumenta.plugins.commands.DeBarkifyHeldItem;
 import com.playmonumenta.plugins.commands.DeCluckifyHeldItem;
 import com.playmonumenta.plugins.commands.DeathMsg;
@@ -132,6 +133,7 @@ public class Plugin extends JavaPlugin {
 
 		GiveSoulbound.register();
 		HopeifyHeldItem.register();
+		ColossalifyHeldItem.register();
 		FestiveHeldItem.register();
 		GildifyHeldItem.register();
 		InfuseHeldItem.register();

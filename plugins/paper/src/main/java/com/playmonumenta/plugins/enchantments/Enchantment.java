@@ -117,6 +117,7 @@ public enum Enchantment {
 	MENDING(ChatColor.GRAY + "Mending", org.bukkit.enchantments.Enchantment.MENDING),
 	HOPELESS(new Hopeless()),
 	HOPE(new Hope()),
+	COLOSSAL(new Colossal()),
 
 	// curses
 	CURSE_CORRUPTION(new CurseOfCorruption()),
@@ -223,6 +224,7 @@ public enum Enchantment {
 			case CURSE_IRREPARABLE:
 			case CURSE_EPHEMERALITY:
 			case JUNGLE_NOURISHMENT:
+			case COLOSSAL:
 				return true;
 			default:
 				return false;

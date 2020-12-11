@@ -17,6 +17,7 @@ import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.event.player.PlayerExpChangeEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
+import org.bukkit.event.player.PlayerItemDamageEvent;
 import org.bukkit.inventory.ItemStack;
 
 import com.playmonumenta.plugins.Plugin;
@@ -191,6 +192,10 @@ public interface BaseEnchantment {
 	}
 
 	default void onConsume(Plugin plugin, Player player, PlayerItemConsumeEvent event, int level) {
+
+	}
+
+	default void onItemDamage(Plugin plugin, Player player, PlayerItemDamageEvent event, int level) {
 
 	}
 

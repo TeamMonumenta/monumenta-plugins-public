@@ -884,6 +884,8 @@ public class PlayerListener implements Listener {
 		if (event.getItem().getType() == Material.TRIDENT && ZoneUtils.hasZoneProperty(event.getPlayer(), ZoneProperty.NO_EQUIPMENT_DAMAGE)) {
 			event.setDamage(0);
 		}
+
+		mPlugin.mTrackingManager.mPlayers.onItemDamage(mPlugin, event.getPlayer(), event);
 	}
 
 	@EventHandler(priority = EventPriority.LOW)
