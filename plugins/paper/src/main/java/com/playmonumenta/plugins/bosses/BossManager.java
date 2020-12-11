@@ -153,6 +153,7 @@ public class BossManager implements Listener {
 		mStatelessBosses.put(CyanSummonBoss.identityTag, (Plugin p, LivingEntity e) -> new CyanSummonBoss(p, e));
 		mStatelessBosses.put(WitherHitBoss.identityTag, (Plugin p, LivingEntity e) -> new WitherHitBoss(p, e));
 		mStatelessBosses.put(VolatileBoss.identityTag, (Plugin p, LivingEntity e) -> new VolatileBoss(p, e));
+		mStatelessBosses.put(SwapOnDismountBoss.identityTag, (Plugin p, LivingEntity e) -> new SwapOnDismountBoss(p, e));
 		mStatelessBosses.put(PlayerDamageOnlyBoss.identityTag, (Plugin p, LivingEntity e) -> new PlayerDamageOnlyBoss(p, e));
 		mStatelessBosses.put(GrayDemonSummoner.identityTag, (Plugin p, LivingEntity e) -> new GrayDemonSummoner(p, e));
 		mStatelessBosses.put(GrayGolemSummoner.identityTag, (Plugin p, LivingEntity e) -> new GrayGolemSummoner(p, e));
@@ -180,7 +181,7 @@ public class BossManager implements Listener {
 		mStatelessBosses.put(SwingBoss.identityTag, (Plugin p, LivingEntity e) -> new SwingBoss(p, e));
 		mStatelessBosses.put(MistMob.identityTag, (Plugin p, LivingEntity e) -> new MistMob(p, e));
 		mStatelessBosses.put(HookBoss.identityTag, (Plugin p, LivingEntity e) -> new HookBoss(p, e));
-
+		mStatelessBosses.put(FrostGiantIcicle.identityTag, (Plugin p, LivingEntity e) -> new FrostGiantIcicle(p, e));
 
 		/* Stateful bosses have a remembered spawn location and end location where a redstone block is set when they die */
 		mStatefulBosses = new HashMap<String, StatefulBossConstructor>();
@@ -200,11 +201,13 @@ public class BossManager implements Listener {
 		mStatefulBosses.put(OldLabsBoss.identityTag, (Plugin p, LivingEntity e, Location s, Location l) -> new OldLabsBoss(p, e, s, l));
 		mStatefulBosses.put(HeadlessHorsemanBoss.identityTag, (Plugin p, LivingEntity e, Location s, Location l) -> new HeadlessHorsemanBoss(p, e, s, l));
 		mStatefulBosses.put(Varcosa.identityTag, (Plugin p, LivingEntity e, Location s, Location l) -> new Varcosa(p, e, s, l));
+		mStatefulBosses.put(FrostGiant.identityTag, (Plugin p, LivingEntity e, Location s, Location l) -> new FrostGiant(p, e, s, l));
 		mStatefulBosses.put(TealQuestBoss.identityTag, (Plugin p, LivingEntity e, Location s, Location l) -> new TealQuestBoss(p, e, s, l));
 		mStatefulBosses.put(VarcosaSummonerBoss.identityTag, (Plugin p, LivingEntity e, Location s, Location l) -> new VarcosaSummonerBoss(p, e, s, l));
 		mStatefulBosses.put(VarcosasLastBreathBoss.identityTag, (Plugin p, LivingEntity e, Location s, Location l) -> new VarcosasLastBreathBoss(p, e, s, l));
 		mStatefulBosses.put(VarcosaLingeringWillBoss.identityTag, (Plugin p, LivingEntity e, Location s, Location l) -> new VarcosaLingeringWillBoss(p, e, s, l));
 		mStatefulBosses.put(MimicQueen.identityTag, (Plugin p, LivingEntity e, Location s, Location l) -> new MimicQueen(p, e, s, l));
+
 
 		/* All bosses have a deserializer which gives the boss back their abilities when chunks re-load */
 		mBossDeserializers = new HashMap<String, BossDeserializer>();
@@ -312,6 +315,9 @@ public class BossManager implements Listener {
 		mBossDeserializers.put(TealQuestBoss.identityTag, (Plugin p, LivingEntity e) -> TealQuestBoss.deserialize(p, e));
 		mBossDeserializers.put(MistMob.identityTag, (Plugin p, LivingEntity e) -> MistMob.deserialize(p, e));
 		mBossDeserializers.put(HookBoss.identityTag, (Plugin p, LivingEntity e) -> HookBoss.deserialize(p, e));
+		mBossDeserializers.put(FrostGiant.identityTag, (Plugin p, LivingEntity e) -> FrostGiant.deserialize(p, e));
+		mBossDeserializers.put(FrostGiantIcicle.identityTag, (Plugin p, LivingEntity e) -> FrostGiantIcicle.deserialize(p, e));
+
 
 	}
 

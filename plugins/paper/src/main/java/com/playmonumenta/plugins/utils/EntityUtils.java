@@ -28,6 +28,7 @@ import org.bukkit.entity.Blaze;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Ghast;
+import org.bukkit.entity.Giant;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.MagmaCube;
 import org.bukkit.entity.Mob;
@@ -282,7 +283,7 @@ public class EntityUtils {
 		if (!entity.getScoreboardTags().contains("SkillImmune")) {
 			if (entity instanceof Monster || entity instanceof Slime || entity instanceof Ghast || entity instanceof PolarBear
 					|| entity instanceof Phantom || entity instanceof Shulker || entity instanceof PufferFish
-					|| entity instanceof SkeletonHorse || entity instanceof ZombieHorse) {
+					|| entity instanceof SkeletonHorse || entity instanceof ZombieHorse || entity instanceof Giant) {
 				return true;
 			} else if (entity instanceof Wolf) {
 				return ((Wolf) entity).isAngry() || entity.getScoreboardTags().contains("boss_targetplayer");

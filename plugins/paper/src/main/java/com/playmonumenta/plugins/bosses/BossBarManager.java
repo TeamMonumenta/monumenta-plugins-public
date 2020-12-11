@@ -26,6 +26,10 @@ public class BossBarManager {
 	private int mEventCursor;
 
 	public BossBarManager(Plugin plugin, LivingEntity boss, int range, BarColor color, BarStyle style, Map<Integer, BossHealthAction> events) {
+		this(plugin, boss, range, color, style, events, true);
+	}
+
+	public BossBarManager(Plugin plugin, LivingEntity boss, int range, BarColor color, BarStyle style, Map<Integer, BossHealthAction> events, boolean bossFog) {
 		mPlugin = plugin;
 		mBoss = boss;
 		mRange = range;
@@ -36,7 +40,11 @@ public class BossBarManager {
 			mEventCursor--;
 		}
 
-		mBar = Bukkit.getServer().createBossBar(boss.getCustomName(), color, style, BarFlag.CREATE_FOG, BarFlag.DARKEN_SKY, BarFlag.PLAY_BOSS_MUSIC);
+		if (bossFog) {
+			mBar = Bukkit.getServer().createBossBar(boss.getCustomName(), color, style, BarFlag.CREATE_FOG, BarFlag.DARKEN_SKY, BarFlag.PLAY_BOSS_MUSIC);
+		} else {
+			mBar = Bukkit.getServer().createBossBar(boss.getCustomName(), color, style, BarFlag.PLAY_BOSS_MUSIC);
+		}
 		mBar.setVisible(true);
 
 		for (Player player : Bukkit.getServer().getOnlinePlayers()) {

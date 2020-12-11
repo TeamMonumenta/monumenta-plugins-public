@@ -268,7 +268,9 @@ public class EntityListener implements Listener {
 			Player player = (Player)damagee;
 
 			mPlugin.mTrackingManager.mPlayers.onHurtByEntity(mPlugin, player, event);
-			EvasionInfo.triggerEvasion(player, event);
+			if (event.getDamage() > 0) {
+				EvasionInfo.triggerEvasion(player, event);
+			}
 
 			if (damager instanceof LivingEntity) {
 				if (!mAbilities.playerDamagedByLivingEntityEvent(player, event)) {
