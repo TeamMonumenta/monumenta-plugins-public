@@ -18,8 +18,7 @@ public class GraveUtils {
 
 	// An item entity should be destroyed. Determine what to do with it before destroying it.
 	// If this method returns false, it means the item was not explicitly destroyed. It might still be destroyed by the code that called this method.
-	public static boolean destroyItemEntity(Item entity) {
-		boolean destroyItem = true;
+	public static void destroyItemEntity(Item entity) {
 		ItemStack item = entity.getItemStack();
 		ItemDeathResult result = ItemUtils.getItemDeathResult(item);
 		if (result == ItemDeathResult.SAFE || (result == ItemDeathResult.SHATTER || result == ItemDeathResult.SHATTER_NOW)
@@ -89,12 +88,8 @@ public class GraveUtils {
 				}
 			}
 		}
-		if (destroyItem) {
-			// Make sure the entity is actually removed. Sometimes an item "dies" twice.
-			entity.remove();
-			return true;
-		}
-		return false;
+
+		entity.remove();
 	}
 
 	public static void setGraveScoreboard(Item item, Player player, Location location) {

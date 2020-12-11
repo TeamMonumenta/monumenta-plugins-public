@@ -393,7 +393,17 @@ public class PlayerListener implements Listener {
 				event.setCancelled(true);
 				return;
 			}
+
+			/* Don't let players pick up items that have already been processed for shattering */
+			if (event.getItem().getScoreboardTags().contains("ShatterProcessed")) {
+				event.setCancelled(true);
+				return;
+			}
+
 			InventoryUtils.scheduleDelayedEquipmentCheck(mPlugin, player, event);
+
+			/* Mark the item so it won't get shattered later */
+			event.getItem().addScoreboardTag("ShatterProcessed");
 		}
 	}
 
