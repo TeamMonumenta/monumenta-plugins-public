@@ -15,6 +15,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.MetadataUtils;
 
 /*
  * Multitool - Level one allows you to swap the tool
@@ -48,7 +49,7 @@ public class Multitool implements BaseEnchantment {
 			// You can swap your itemslot in the same tick, the event will begin when you right click the multitool item
 			// and then perform actions on the swapped to item. Re-get the level for the item being changed to safeguard this.
 			int confirmLevel = this.getLevelFromItem(item);
-			if (confirmLevel > 0) {
+			if (confirmLevel > 0 && MetadataUtils.checkOnceThisTick(plugin, player, "MultitoolMutex")) {
 				Bukkit.getScheduler().runTask(plugin, () -> {
 					String[] str = item.getType().toString().split("_");
 					if (InventoryUtils.isAxeItem(item)) {
