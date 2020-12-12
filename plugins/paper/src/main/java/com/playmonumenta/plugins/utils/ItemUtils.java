@@ -354,6 +354,25 @@ public class ItemUtils {
 			Material.ACACIA_LEAVES
 		);
 
+	public static final Set<Material> strippables = EnumSet.of(
+			Material.BIRCH_LOG,
+			Material.SPRUCE_LOG,
+			Material.JUNGLE_LOG,
+			Material.DARK_OAK_LOG,
+			Material.ACACIA_LOG,
+			Material.OAK_LOG,
+			Material.CRIMSON_HYPHAE,
+			Material.CRIMSON_STEM,
+			Material.BIRCH_WOOD,
+			Material.SPRUCE_WOOD,
+			Material.JUNGLE_WOOD,
+			Material.DARK_OAK_WOOD,
+			Material.ACACIA_WOOD,
+			Material.OAK_WOOD,
+			Material.WARPED_STEM,
+			Material.WARPED_HYPHAE
+			);
+
 
 	public static String buildAttributeLoreLine(com.playmonumenta.plugins.itemindex.EquipmentSlot slot, Attribute attribute, AttributeModifier.Operation operation, Double amount) {
 		ChatColor color = ChatColor.BLUE;
@@ -931,6 +950,10 @@ public class ItemUtils {
 	//Returns true if the item material is a dye
 	public static boolean isDye(Material mat) {
 		return dyes.contains(mat);
+	}
+
+	public static boolean isStrippable(Material mat) {
+		return strippables.contains(mat);
 	}
 
 	public static void damageItem(ItemStack item, int damage, boolean canBreak) {

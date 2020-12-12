@@ -2,7 +2,6 @@ package com.playmonumenta.plugins.enchantments;
 
 import java.util.EnumSet;
 
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -38,9 +37,11 @@ public class Multitool implements BaseEnchantment {
 
 	@Override
 	public void onPlayerInteract(Plugin plugin, Player player, PlayerInteractEvent event, int level) {
+		//Material of the block clicked
+		Material eventMat = event.getClickedBlock() == null ? null : event.getClickedBlock().getType();
 		//Does not swap when clicking an interactable
 		if (event.getAction() == Action.RIGHT_CLICK_AIR
-				|| (event.getAction() == Action.RIGHT_CLICK_BLOCK && !ItemUtils.interactableBlocks.contains(event.getClickedBlock().getBlockData().getMaterial()))) {
+				|| (event.getAction() == Action.RIGHT_CLICK_BLOCK && (!ItemUtils.interactableBlocks.contains(eventMat) || eventMat == Material.PUMPKIN))) {
 			ItemStack item = player.getInventory().getItemInMainHand();
 			//Does not swap when player is sneaking
 			if (player.isSneaking()) {
@@ -48,15 +49,15 @@ public class Multitool implements BaseEnchantment {
 			}
 			// You can swap your itemslot in the same tick, the event will begin when you right click the multitool item
 			// and then perform actions on the swapped to item. Re-get the level for the item being changed to safeguard this.
-			int confirmLevel = this.getLevelFromItem(item);
-			if (confirmLevel > 0 && MetadataUtils.checkOnceThisTick(plugin, player, "MultitoolMutex")) {
-				Bukkit.getScheduler().runTask(plugin, () -> {
+			level = this.getLevelFromItem(item);
+			if (level > 0) {
+				if (MetadataUtils.checkOnceThisTick(plugin, player, "MultitoolMutex")) {
 					String[] str = item.getType().toString().split("_");
 					if (InventoryUtils.isAxeItem(item)) {
 						Material mat = Material.valueOf(str[0] + "_" + "SHOVEL");
 						item.setType(mat);
 					} else if (InventoryUtils.isShovelItem(item)) {
-						if (confirmLevel > 1) {
+						if (level > 1) {
 							Material mat = Material.valueOf(str[0] + "_" + "PICKAXE");
 							item.setType(mat);
 						} else {
@@ -68,8 +69,11 @@ public class Multitool implements BaseEnchantment {
 						item.setType(mat);
 					}
 					player.playSound(player.getLocation(), Sound.BLOCK_CHEST_CLOSE, 1, 2F);
-					player.updateInventory();
-				});
+				}
+
+				if (eventMat == Material.GRASS_BLOCK || ItemUtils.isStrippable(eventMat)) {
+					event.setCancelled(true);
+				}
 			}
 		}
 	}
