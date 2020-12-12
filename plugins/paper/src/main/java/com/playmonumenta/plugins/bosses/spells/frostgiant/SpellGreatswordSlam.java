@@ -162,7 +162,7 @@ public class SpellGreatswordSlam extends Spell {
 										if (player.getBoundingBox().overlaps(box) &&
 										    (player.getLocation().getBlock().getRelative(BlockFace.DOWN).getType() != Material.AIR || player.getLocation().getBlock().getType() != Material.AIR)) {
 											BossUtils.bossDamagePercent(mBoss, player, 0.4);
-											MovementUtils.knockAway(loc, player, 3f, 1f);
+											MovementUtils.knockAway(loc, player, 3f, 1f, false);
 											break;
 										}
 									}

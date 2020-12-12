@@ -104,7 +104,7 @@ public class RingOfFrost extends Spell {
 						if (!player.getLocation().toVector().isInSphere(vec, mCurrentRadius) && mStartLoc.distance(player.getLocation()) <= FrostGiant.fighterRange) {
 							BossUtils.bossDamage(mBoss, player, 40, null);
 							world.spawnParticle(Particle.EXPLOSION_NORMAL, player.getLocation().add(0, 1, 0), 30, 0.25, 0.45, 0.25, 0.2);
-							MovementUtils.knockAway(loc, player, -2.75f);
+							MovementUtils.knockAway(loc, player, -2.75f, 0.5f, false);
 							player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 10, 3));
 						}
 					}

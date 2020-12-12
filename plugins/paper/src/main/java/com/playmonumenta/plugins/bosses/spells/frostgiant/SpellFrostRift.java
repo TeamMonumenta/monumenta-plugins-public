@@ -154,7 +154,7 @@ public class SpellFrostRift extends Spell {
 				for (Player player : players) {
 					if (player.getBoundingBox().overlaps(mBox)) {
 						BossUtils.bossDamage(mBoss, player, 30);
-						MovementUtils.knockAway(mBoss.getLocation(), player, 2f);
+						MovementUtils.knockAway(mBoss.getLocation(), player, 2f, 0.5f, false);
 					}
 				}
 				if (bLoc.distance(mOgLoc) >= 50) {

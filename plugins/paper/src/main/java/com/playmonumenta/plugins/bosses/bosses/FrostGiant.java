@@ -335,7 +335,7 @@ public class FrostGiant extends BossAbilityGroup {
 						} else {
 							target.damage(mAttackDamage, mBoss);
 						}
-						MovementUtils.knockAway(mBoss.getLocation(), target, 4f, 1f);
+						MovementUtils.knockAway(mBoss.getLocation(), target, 4f, 1f, false);
 						world.playSound(mBoss.getLocation(), Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, SoundCategory.HOSTILE, 2, 0.1f);
 						world.playSound(mBoss.getLocation(), Sound.ENTITY_GENERIC_HURT, SoundCategory.HOSTILE, 3, 0.5f);
 						world.spawnParticle(Particle.EXPLOSION_NORMAL, target.getLocation(), 50, 2, 0.1, 2, 0.1);
@@ -347,7 +347,7 @@ public class FrostGiant extends BossAbilityGroup {
 						for (Player player : players) {
 							if (!player.getUniqueId().equals(target.getUniqueId())) {
 								BossUtils.bossDamagePercent(mBoss, player, 0.6);
-								MovementUtils.knockAway(player.getLocation(), player, 1f);
+								MovementUtils.knockAway(player.getLocation(), player, 1f, 0.5f, false);
 							}
 						}
 					}

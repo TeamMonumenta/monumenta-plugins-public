@@ -189,7 +189,7 @@ public class Shatter extends Spell {
 						for (BoundingBox box : boxes) {
 							if (player.getBoundingBox().overlaps(box)) {
 								BossUtils.bossDamage(mBoss, player, 35, null);
-								MovementUtils.knockAway(loc, player, mKnockback, 1.25f);
+								MovementUtils.knockAway(loc, player, mKnockback, 1.25f, false);
 							}
 						}
 					}

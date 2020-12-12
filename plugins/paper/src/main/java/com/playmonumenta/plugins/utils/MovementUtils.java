@@ -20,6 +20,12 @@ public class MovementUtils {
 	}
 
 	public static void knockAway(Location loc, LivingEntity target, float speed, float y) {
+		knockAway(loc, target, speed, y, true);
+	}
+
+	//useKnockbackRes determines if max knockback resistance should be taken into account in the knock away
+	//If true, knockback res is factored, if false, not used at all
+	public static void knockAway(Location loc, LivingEntity target, float speed, float y, boolean useKnockbackRes) {
 		if (EntityUtils.isBoss(target)) {
 			speed /= 2;
 		}
@@ -34,7 +40,10 @@ public class MovementUtils {
 		dir = dir.normalize().multiply(speed);
 		dir.setY(y);
 		double mult = 1 - target.getAttribute(Attribute.GENERIC_KNOCKBACK_RESISTANCE).getValue();
-		if (mult > 0) {
+		if (mult > 0 || !useKnockbackRes) {
+			if (!useKnockbackRes) {
+				mult = 1;
+			}
 			dir.multiply(mult);
 
 			target.setVelocity(dir);
