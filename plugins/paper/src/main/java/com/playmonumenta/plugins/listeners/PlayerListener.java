@@ -395,7 +395,7 @@ public class PlayerListener implements Listener {
 			}
 
 			/* Don't let players pick up items that have already been processed for shattering */
-			if (event.getItem().getScoreboardTags().contains("ShatterProcessed")) {
+			if (event.getItem().getScoreboardTags().contains("ShatteringNoPickup")) {
 				event.setCancelled(true);
 				return;
 			}
