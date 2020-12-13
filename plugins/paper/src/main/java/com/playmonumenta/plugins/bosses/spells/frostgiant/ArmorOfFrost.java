@@ -179,11 +179,11 @@ public class ArmorOfFrost extends Spell {
 				mBossClass.mFrostArmorActive = true;
 				PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), FrostGiant.detectionRange, "tellraw @s [\"\",{\"text\":\"The armor reforms once again.\",\"color\":\"aqua\"}]");
 				mWarned.clear();
-				FrostGiant.changeArmorPhase(mBoss.getEquipment(), false);
+//				FrostGiant.changeArmorPhase(mBoss.getEquipment(), false);
 			}
 		};
 		mCooldown.runTaskLater(mPlugin, 20 * 45);
-		FrostGiant.changeArmorPhase(mBoss.getEquipment(), true);
+//		FrostGiant.changeArmorPhase(mBoss.getEquipment(), true);
 	}
 
 	private void runAnimation() {

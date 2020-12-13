@@ -6,7 +6,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import com.playmonumenta.plugins.utils.FastUtils;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -27,6 +26,7 @@ import com.playmonumenta.plugins.abilities.MultipleChargeAbility;
 import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.classes.magic.MagicType;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
 
@@ -135,7 +135,10 @@ public class ScorchedEarth extends MultipleChargeAbility {
 						world.spawnParticle(Particle.LAVA, mob.getLocation().clone().add(0, 1, 0), 3, 0.25, 0.5, 0.25, 0);
 						mob.setNoDamageTicks(0);
 						Vector velocity = mob.getVelocity();
+						//Restricts last damage so it does not override iframes and do ridiculous damage
+						double lastDamage = mob.getLastDamage();
 						EntityUtils.damageEntity(mPlugin, mob, SCORCHED_EARTH_BONUS_DAMAGE, entry.getValue(), MagicType.ALCHEMY, true, mInfo.mLinkedSpell);
+						mob.setLastDamage(lastDamage + 3);
 						mob.setVelocity(velocity);
 						newMobHealths.put(mob, mob.getHealth());
 					}

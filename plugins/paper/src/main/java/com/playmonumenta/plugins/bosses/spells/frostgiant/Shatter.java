@@ -25,6 +25,7 @@ import org.bukkit.util.Vector;
 
 import com.playmonumenta.plugins.bosses.bosses.FrostGiant;
 import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
@@ -114,13 +115,20 @@ public class Shatter extends Spell {
 									world.spawnParticle(Particle.FLAME, l, 1, 0.1, 0.2, 0.1, 0.1);
 								}
 
+								Location tempLoc = l.clone();
+								for (int y = 0; y <= 5; y++) {
+									tempLoc.setY(l.getY() + y);
+									tempLoc.getBlock().setType(Material.AIR);
+								}
+
 								l.subtract(0, 1, 0);
 								//Spawns crimson hyphae as a warning at a 1/3 rate, will try to climb 1 block up or down if needed
 								if (l.getBlock().getType() != Material.CRIMSON_HYPHAE) {
 									if (FastUtils.RANDOM.nextInt(3) == 0) {
 										if (l.getBlock().getRelative(BlockFace.UP).getType() != Material.AIR) {
 											l.add(0, 1, 0);
-										} else if (l.getBlock().getType() == Material.AIR && l.getBlock().getRelative(BlockFace.DOWN).getType().isSolid()) {
+										}
+										if (l.getBlock().getType() == Material.AIR && l.getBlock().getRelative(BlockFace.DOWN).getType().isSolid()) {
 											l.subtract(0, 1, 0);
 										}
 										if (l.getBlock().getType() == Material.AIR) {
@@ -190,6 +198,7 @@ public class Shatter extends Spell {
 							if (player.getBoundingBox().overlaps(box)) {
 								BossUtils.bossDamage(mBoss, player, 35, null);
 								MovementUtils.knockAway(loc, player, mKnockback, 1.25f, false);
+								AbilityUtils.silencePlayer(player, 20 * 5);
 							}
 						}
 					}

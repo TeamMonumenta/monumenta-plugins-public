@@ -53,14 +53,14 @@ public class SpellFrostbite extends Spell {
 	public void run() {
 		mAttack = false;
 		World world = mBoss.getWorld();
-		for (Player player : PlayerUtils.playersInRange(mStartLoc, 50)) {
+		for (Player player : PlayerUtils.playersInRange(mStartLoc, 90)) {
 			Location playerLoc = player.getLocation();
 
 			if (player.getGameMode() == GameMode.CREATIVE) {
 				return;
 			}
 
-			if (playerLoc.getY() - mStartLoc.getY() >= 10 && (player.getGameMode() == GameMode.SURVIVAL || player.getLocation().distance(mStartLoc) < FrostGiant.fighterRange)) {
+			if (playerLoc.getY() - mStartLoc.getY() >= 3 && (player.getGameMode() == GameMode.SURVIVAL || player.getLocation().distance(mStartLoc) < FrostGiant.fighterRange) && player.isOnGround()) {
 				BossUtils.bossDamagePercent(mBoss, player, 0.1, mBoss.getLocation());
 
 				world.playSound(playerLoc, Sound.BLOCK_GLASS_BREAK, SoundCategory.HOSTILE, 1, 1);

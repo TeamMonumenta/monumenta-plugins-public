@@ -125,8 +125,13 @@ public class SpellFallingIcicle extends Spell {
 							world.spawnParticle(Particle.CRIT, ice.getLocation(), 40, 0, 0, 0, 1);
 							world.spawnParticle(Particle.BLOCK_CRACK, ice.getLocation(), 40, 0, 0, 0, 1, Bukkit.createBlockData(Material.ICE));
 							for (FallingBlock b : ices) {
-								if (b.getLocation().getBlock().getType() == Material.ICE) {
-									b.getLocation().getBlock().setType(Material.AIR);
+								Location bLoc = b.getLocation();
+								if (bLoc.getBlock().getType() == Material.ICE || bLoc.getBlock().getType() == Material.FROSTED_ICE) {
+									bLoc.getBlock().setType(Material.AIR);
+								}
+								bLoc.add(0, -1, 0);
+								if (bLoc.getBlock().getType() == Material.FROSTED_ICE) {
+									bLoc.getBlock().setType(Material.CRACKED_STONE_BRICKS);
 								}
 								b.remove();
 							}
@@ -137,8 +142,13 @@ public class SpellFallingIcicle extends Spell {
 							world.spawnParticle(Particle.CRIT, ice.getLocation(), 40, 0, 0, 0, 1);
 							world.spawnParticle(Particle.BLOCK_CRACK, ice.getLocation(), 40, 0, 0, 0, 1, Bukkit.createBlockData(Material.ICE));
 							for (FallingBlock b : ices) {
-								if (b.getLocation().getBlock().getType() == Material.ICE) {
-									b.getLocation().getBlock().setType(Material.AIR);
+								Location bLoc = b.getLocation();
+								if (bLoc.getBlock().getType() == Material.ICE || bLoc.getBlock().getType() == Material.FROSTED_ICE) {
+									bLoc.getBlock().setType(Material.AIR);
+								}
+								bLoc.add(0, -1, 0);
+								if (bLoc.getBlock().getType() == Material.FROSTED_ICE) {
+									bLoc.getBlock().setType(Material.CRACKED_STONE_BRICKS);
 								}
 								b.remove();
 							}

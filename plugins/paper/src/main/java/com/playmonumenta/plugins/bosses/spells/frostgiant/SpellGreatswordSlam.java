@@ -29,6 +29,7 @@ import org.bukkit.util.Vector;
 import com.destroystokyo.paper.entity.Pathfinder;
 import com.playmonumenta.plugins.bosses.bosses.FrostGiant;
 import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
@@ -133,6 +134,11 @@ public class SpellGreatswordSlam extends Spell {
 									if (l.getBlock().getType() == Material.BEDROCK || l.getBlock().getType() == Material.BARRIER) {
 										l.add(0, 1, 0);
 									}
+									Location tempLoc = l.clone();
+									for (int y = 1; y <= 5; y++) {
+										tempLoc.setY(l.getY() + y);
+										tempLoc.getBlock().setType(Material.AIR);
+									}
 									if (l.getBlock().getType() != Material.FROSTED_ICE) {
 										oldBlocks.put(l, l.getBlock().getType());
 										oldData.put(l, l.getBlock().getBlockData());
@@ -162,6 +168,7 @@ public class SpellGreatswordSlam extends Spell {
 										if (player.getBoundingBox().overlaps(box) &&
 										    (player.getLocation().getBlock().getRelative(BlockFace.DOWN).getType() != Material.AIR || player.getLocation().getBlock().getType() != Material.AIR)) {
 											BossUtils.bossDamagePercent(mBoss, player, 0.4);
+											AbilityUtils.silencePlayer(player, 20 * 5);
 											MovementUtils.knockAway(loc, player, 3f, 1f, false);
 											break;
 										}
