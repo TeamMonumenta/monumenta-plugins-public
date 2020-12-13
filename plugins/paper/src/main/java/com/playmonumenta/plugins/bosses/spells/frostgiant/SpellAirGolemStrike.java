@@ -38,7 +38,7 @@ public class SpellAirGolemStrike extends Spell {
 	private boolean mSpellCooldown = false;
 	private boolean mCooldown = false;
 
-	private double mAttackDamage = 35;
+	private double mAttackDamage = 30;
 
 	public SpellAirGolemStrike(Plugin plugin, LivingEntity boss, Location loc) {
 		mPlugin = plugin;
@@ -56,7 +56,7 @@ public class SpellAirGolemStrike extends Spell {
 				mSpellCooldown = false;
 			}
 
-		}.runTaskLater(mPlugin, 20 * 16);
+		}.runTaskLater(mPlugin, 20 * 24);
 
 		int count = 0;
 		//List is sorted with nearest players earlier in the list, and farthest players at the end
@@ -65,12 +65,12 @@ public class SpellAirGolemStrike extends Spell {
 		if (players.size() == 1) {
 			count = 1;
 		} else if (players.size() <= 10) {
-			count = players.size() / 2;
+			count = players.size() / 4;
 		} else {
-			count = players.size() / 3 + 2;
+			count = players.size() / 5 + 1;
 		}
 
-		count = Math.min(15, count);
+		count = Math.min(8, count);
 
 		if (count <= 0) {
 			return;
@@ -117,7 +117,7 @@ public class SpellAirGolemStrike extends Spell {
 
 				mT++;
 
-				if (mT >= 70) {
+				if (mT >= 100) {
 					this.cancel();
 				}
 			}
@@ -186,10 +186,9 @@ public class SpellAirGolemStrike extends Spell {
 	private void setGolemAttack(LivingEntity golem) {
 		World world = golem.getWorld();
 		new BukkitRunnable() {
-			int mT = 0;
 			@Override
 			public void run() {
-				if (mBoss.isDead() || !mBoss.isValid() || mT >= 20 * 45) {
+				if (golem.isDead() || !golem.isValid() || mBoss.isDead() || !mBoss.isValid()) {
 					golem.remove();
 					this.cancel();
 				}
@@ -206,17 +205,15 @@ public class SpellAirGolemStrike extends Spell {
 								mCooldown = false;
 							}
 
-						}.runTaskLater(mPlugin, 20);
+						}.runTaskLater(mPlugin, 30);
 						target.damage(mAttackDamage, golem);
 						MovementUtils.knockAway(golem.getLocation(), target, 1f, 0.5f, false);
 						world.playSound(golem.getLocation(), Sound.ENTITY_IRON_GOLEM_ATTACK, SoundCategory.HOSTILE, 3, 0.5f);
 					}
 				}
-
-				mT++;
 			}
 
-		}.runTaskTimer(mPlugin, 0, 2);
+		}.runTaskTimer(mPlugin, 30, 2);
 	}
 
 	@Override

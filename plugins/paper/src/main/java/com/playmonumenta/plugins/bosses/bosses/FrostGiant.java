@@ -341,15 +341,6 @@ public class FrostGiant extends BossAbilityGroup {
 						world.spawnParticle(Particle.EXPLOSION_NORMAL, target.getLocation(), 50, 2, 0.1, 2, 0.1);
 						world.spawnParticle(Particle.LAVA, target.getLocation(), 15, 2, 0.1, 2, 0.1);
 						world.spawnParticle(Particle.BLOCK_DUST, target.getLocation(), 40, 2, 0.35, 2, 0.25, Material.COARSE_DIRT.createBlockData());
-
-						//Also knocks back nearby players on melee
-						List<Player> players = PlayerUtils.playersInRange(target.getLocation(), 6);
-						for (Player player : players) {
-							if (!player.getUniqueId().equals(target.getUniqueId())) {
-								BossUtils.bossDamagePercent(mBoss, player, 0.6);
-								MovementUtils.knockAway(player.getLocation(), player, 1f, 0.5f, false);
-							}
-						}
 					}
 				} else {
 					for (Player p : PlayerUtils.playersInRange(mStartLoc, detectionRange)) {
@@ -459,14 +450,13 @@ public class FrostGiant extends BossAbilityGroup {
 
 		SpellManager phase3Spells = new SpellManager(Arrays.asList(
 				new Shatter(mPlugin, mBoss, 4f),
-				new SpellAirGolemStrike(mPlugin, mBoss, mStartLoc),
 				new SpellTitanicRupture(mPlugin, mBoss, mStartLoc),
 				new SpellFrostRift(mPlugin, mBoss, mStartLoc),
 				new SpellGreatswordSlam(mPlugin, mBoss, 60, 90)
 				));
 
 		SpellManager phase4Spells = new SpellManager(Arrays.asList(
-				new Shatter(mPlugin, mBoss, 3f),
+				new Shatter(mPlugin, mBoss, 2f),
 				new SpellTitanicRupture(mPlugin, mBoss, mStartLoc),
 				new SpellFrostRift(mPlugin, mBoss, mStartLoc),
 				new SpellGreatswordSlam(mPlugin, mBoss, 30, 60)
