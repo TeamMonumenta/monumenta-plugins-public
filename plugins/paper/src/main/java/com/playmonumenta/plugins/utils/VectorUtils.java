@@ -49,4 +49,11 @@ public class VectorUtils {
 		return (new Vector(x * cos + y * sin, y * cos - x * sin, z));
 	}
 
+	public static Vector crossProd(Vector u, Vector v) {
+		Vector ret = new Vector();
+		ret.setX((u.getY() * v.getZ()) - (u.getZ() * v.getY()));
+		ret.setY((u.getZ() * v.getX()) - (u.getX() * v.getZ()));
+		ret.setZ((u.getX() * v.getY()) - (u.getY() * v.getX()));
+		return ret;
+	}
 }

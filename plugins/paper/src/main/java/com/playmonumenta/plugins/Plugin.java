@@ -17,6 +17,7 @@ import com.playmonumenta.plugins.commands.BossFight;
 import com.playmonumenta.plugins.commands.BroadcastCommand;
 import com.playmonumenta.plugins.commands.CalculateReforge;
 import com.playmonumenta.plugins.commands.ClaimRaffle;
+import com.playmonumenta.plugins.commands.ClearPortals;
 import com.playmonumenta.plugins.commands.ColossalifyHeldItem;
 import com.playmonumenta.plugins.commands.DeBarkifyHeldItem;
 import com.playmonumenta.plugins.commands.DeCluckifyHeldItem;
@@ -30,6 +31,8 @@ import com.playmonumenta.plugins.commands.HopeifyHeldItem;
 import com.playmonumenta.plugins.commands.InfuseHeldItem;
 import com.playmonumenta.plugins.commands.MonumentaDebug;
 import com.playmonumenta.plugins.commands.MonumentaReload;
+import com.playmonumenta.plugins.commands.Portal1;
+import com.playmonumenta.plugins.commands.Portal2;
 import com.playmonumenta.plugins.commands.RedeemVoteRewards;
 import com.playmonumenta.plugins.commands.ReforgeHeldItem;
 import com.playmonumenta.plugins.commands.ReforgeInventory;
@@ -161,6 +164,9 @@ public class Plugin extends JavaPlugin {
 		CookingCommand.register(this);
 		ItemIndexCommand.register();
 		TeleportByScore.register();
+		Portal1.register();
+		Portal2.register();
+		ClearPortals.register();
 
 		try {
 			mHttpManager = new HttpManager(this);

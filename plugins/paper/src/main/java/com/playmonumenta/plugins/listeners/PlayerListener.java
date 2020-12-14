@@ -99,6 +99,7 @@ import com.playmonumenta.plugins.events.AbilityCastEvent;
 import com.playmonumenta.plugins.events.EvasionEvent;
 import com.playmonumenta.plugins.integrations.ChestSortIntegration;
 import com.playmonumenta.plugins.point.Point;
+import com.playmonumenta.plugins.portals.PortalManager;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.server.reset.DailyReset;
@@ -147,6 +148,10 @@ public class PlayerListener implements Listener {
 		}
 
 		Player player = event.getPlayer();
+
+		/* Remove portals from player */
+		PortalManager.clearPortal(player, 1);
+		PortalManager.clearPortal(player, 2);
 
 		/* Remove ephemeral items on logout */
 		InventoryUtils.removeSpecialItems(player, true);
