@@ -32,13 +32,15 @@ public class SpellGlacialPrison extends Spell {
 	private Plugin mPlugin;
 	private LivingEntity mBoss;
 	private double mRange;
+	private Location mStartLoc;
 
 	private boolean mCooldown = false;
 
-	public SpellGlacialPrison(Plugin plugin, LivingEntity boss, double range) {
+	public SpellGlacialPrison(Plugin plugin, LivingEntity boss, double range, Location start) {
 		mPlugin = plugin;
 		mBoss = boss;
 		mRange = range;
+		mStartLoc = start;
 	}
 
 	@Override
@@ -96,6 +98,9 @@ public class SpellGlacialPrison extends Spell {
 						//Center the player first
 						Vector dir = player.getLocation().getDirection();
 						Location l = player.getLocation().getBlock().getLocation().add(0.5, 0.15, 0.5).setDirection(dir);
+						while (l.getY() - mStartLoc.getY() >= 3) {
+							l.add(0, -1, 0);
+						}
 						player.teleport(l);
 
 						Location center = player.getLocation();

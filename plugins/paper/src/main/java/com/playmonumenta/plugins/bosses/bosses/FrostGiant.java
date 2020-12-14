@@ -150,7 +150,7 @@ the Frost Giant explodes dealing 60 damage in an 8 block radius. High CD, High D
 
 public class FrostGiant extends BossAbilityGroup {
 	public static final String identityTag = "boss_frostgiant";
-	public static final int detectionRange = 60;
+	public static final int detectionRange = 80;
 
 	//Range of those who are actively in the fight from the center of the arena
 	public static final int fighterRange = 36;
@@ -435,7 +435,7 @@ public class FrostGiant extends BossAbilityGroup {
 		SpellManager phase1Spells = new SpellManager(Arrays.asList(
 				new SpellAirGolemStrike(mPlugin, mBoss, mStartLoc),
 				new Shatter(mPlugin, mBoss, 4f),
-				new SpellGlacialPrison(mPlugin, mBoss, fighterRange),
+				new SpellGlacialPrison(mPlugin, mBoss, fighterRange, mStartLoc),
 				new RingOfFrost(mPlugin, mBoss, 12, mStartLoc)
 				));
 
@@ -1048,6 +1048,16 @@ public class FrostGiant extends BossAbilityGroup {
 					}
 				}
 			}.runTaskTimer(mPlugin, 0, 1);
+
+			Projectile proj = (Projectile) event.getDamager();
+
+			//Check if arrow shot came from arena
+			if (proj.getShooter() instanceof Player) {
+				Player player = (Player) proj.getShooter();
+				if (player.getLocation().distance(mStartLoc) > FrostGiant.fighterRange) {
+					event.setCancelled(true);
+				}
+			}
 		}
 	}
 
