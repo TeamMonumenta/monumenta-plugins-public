@@ -38,7 +38,7 @@ public class SpellAirGolemStrike extends Spell {
 	private boolean mSpellCooldown = false;
 	private boolean mCooldown = false;
 
-	private double mAttackDamage = 30;
+	private double mAttackDamage = 35;
 
 	public SpellAirGolemStrike(Plugin plugin, LivingEntity boss, Location loc) {
 		mPlugin = plugin;
@@ -60,9 +60,9 @@ public class SpellAirGolemStrike extends Spell {
 
 		int count = 0;
 		//List is sorted with nearest players earlier in the list, and farthest players at the end
-		List<Player> players = EntityUtils.getNearestPlayers(mBoss.getLocation(), 35);
+		List<Player> players = EntityUtils.getNearestPlayers(mBoss.getLocation(), FrostGiant.detectionRange);
 		players.removeIf(p -> p.getGameMode() == GameMode.SPECTATOR || mStartLoc.distance(p.getLocation()) > FrostGiant.fighterRange);
-		if (players.size() == 1) {
+		if (players.size() < 4) {
 			count = 1;
 		} else if (players.size() <= 10) {
 			count = players.size() / 4;
@@ -70,7 +70,7 @@ public class SpellAirGolemStrike extends Spell {
 			count = players.size() / 5 + 1;
 		}
 
-		count = Math.min(8, count);
+		count = Math.min(12, count);
 
 		if (count <= 0) {
 			return;
@@ -117,7 +117,7 @@ public class SpellAirGolemStrike extends Spell {
 
 				mT++;
 
-				if (mT >= 100) {
+				if (mT >= 70) {
 					this.cancel();
 				}
 			}
@@ -213,7 +213,7 @@ public class SpellAirGolemStrike extends Spell {
 				}
 			}
 
-		}.runTaskTimer(mPlugin, 30, 2);
+		}.runTaskTimer(mPlugin, 0, 2);
 	}
 
 	@Override

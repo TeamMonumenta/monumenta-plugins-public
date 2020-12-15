@@ -23,7 +23,6 @@ import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
-import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 
 /*
@@ -94,8 +93,9 @@ public class SpellFrostRift extends Spell {
 				mPitch += 0.025;
 
 				for (Player p : targets) {
-					p.playSound(loc, Sound.BLOCK_ANVIL_LAND, SoundCategory.HOSTILE, 0.5f, mPitch);
+					p.playSound(loc, Sound.UI_TOAST_IN, SoundCategory.HOSTILE, 2f, mPitch + 0.5f);
 				}
+				world.playSound(loc, Sound.BLOCK_ANVIL_LAND, SoundCategory.HOSTILE, 0.5f, mPitch);
 				world.spawnParticle(Particle.CLOUD, loc, 8, 1, 0.1, 1, 0.25);
 				world.spawnParticle(Particle.SMOKE_LARGE, loc, 5, 1, 0.1, 1, 0.25);
 
@@ -154,7 +154,6 @@ public class SpellFrostRift extends Spell {
 				for (Player player : players) {
 					if (player.getBoundingBox().overlaps(mBox)) {
 						BossUtils.bossDamage(mBoss, player, 30);
-						MovementUtils.knockAway(mBoss.getLocation(), player, 2f, 0.5f, false);
 					}
 				}
 				if (bLoc.distance(mOgLoc) >= 50) {

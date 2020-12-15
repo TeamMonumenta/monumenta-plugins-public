@@ -133,7 +133,11 @@ public class BossUtils {
 					}
 				}
 				if (toTake > 0) {
-					target.setHealth(target.getHealth() - toTake);
+					if (target.getHealth() - toTake > target.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue()) {
+						target.setHealth(target.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue());
+					} else {
+						target.setHealth(target.getHealth() - toTake);
+					}
 				}
 				NmsUtils.unblockableEntityDamageEntity(target, 1, boss);
 			}

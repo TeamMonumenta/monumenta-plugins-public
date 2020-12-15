@@ -56,6 +56,7 @@ import com.playmonumenta.plugins.bosses.spells.frostgiant.SpellAirGolemStrike;
 import com.playmonumenta.plugins.bosses.spells.frostgiant.SpellFrostGiantBlockBreak;
 import com.playmonumenta.plugins.bosses.spells.frostgiant.SpellFrostRift;
 import com.playmonumenta.plugins.bosses.spells.frostgiant.SpellFrostbite;
+import com.playmonumenta.plugins.bosses.spells.frostgiant.SpellFrostedIceBreak;
 import com.playmonumenta.plugins.bosses.spells.frostgiant.SpellGlacialPrison;
 import com.playmonumenta.plugins.bosses.spells.frostgiant.SpellGreatswordSlam;
 import com.playmonumenta.plugins.bosses.spells.frostgiant.SpellHailstorm;
@@ -475,14 +476,16 @@ public class FrostGiant extends BossAbilityGroup {
 				new SpellPurgeNegatives(mBoss, 20 * 3),
 				new SpellFrostGiantBlockBreak(mBoss, 5, 15, 5, mStartLoc),
 				new SpellHailstorm(mPlugin, mBoss, 24, mStartLoc),
-				new SpellFrostbite(mPlugin, mBoss, mStartLoc)
+				new SpellFrostbite(mPlugin, mBoss, mStartLoc),
+				new SpellFrostedIceBreak(mBoss)
 				);
 		List<Spell> phase3PassiveSpells = Arrays.asList(
 				new ArmorOfFrost(mPlugin, mBoss, this, 1),
 				new SpellPurgeNegatives(mBoss, 20 * 2),
 				new SpellFrostGiantBlockBreak(mBoss, 5, 15, 5, mStartLoc),
 				new SpellHailstorm(mPlugin, mBoss, 24, mStartLoc),
-				new SpellFrostbite(mPlugin, mBoss, mStartLoc)
+				new SpellFrostbite(mPlugin, mBoss, mStartLoc),
+				new SpellFrostedIceBreak(mBoss)
 				);
 
 		List<Spell> phase4PassiveSpells = Arrays.asList(
@@ -490,7 +493,8 @@ public class FrostGiant extends BossAbilityGroup {
 				new SpellPurgeNegatives(mBoss, 20 * 2),
 				new SpellFrostGiantBlockBreak(mBoss, 5, 15, 5, mStartLoc),
 				new SpellHailstorm(mPlugin, mBoss, 24, mStartLoc),
-				new SpellFrostbite(mPlugin, mBoss, mStartLoc)
+				new SpellFrostbite(mPlugin, mBoss, mStartLoc),
+				new SpellFrostedIceBreak(mBoss)
 				);
 
 		Map<Integer, BossHealthAction> events = new HashMap<Integer, BossHealthAction>();
@@ -563,12 +567,6 @@ public class FrostGiant extends BossAbilityGroup {
 			mBoss.getEquipment().setItemInMainHand(axe);
 		});
 
-		//Guaranteed Titanic Rupture cast
-		events.put(25, mBoss -> {
-			SpellTitanicRupture rupture = new SpellTitanicRupture(mPlugin, mBoss, mStartLoc);
-			rupture.run();
-		});
-
 		//Third and fourth seismic ruin
 		events.put(10, mBoss -> {
 			PlayerUtils.executeCommandOnNearbyPlayers(mStartLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"I... WILL NOT... BE THE END... OF THE SONG!\",\"color\":\"dark_aqua\"}]");
@@ -584,6 +582,13 @@ public class FrostGiant extends BossAbilityGroup {
 			mRuin.run();
 			mRuin.run();
 			teleport(mStartLoc);
+
+			//Changes held weapon to iron scythe
+			ItemStack scythe =  modifyItemName(new ItemStack(Material.IRON_HOE), "Frost Giant's Crescent", ChatColor.AQUA + "" + ChatColor.BOLD + "" + ChatColor.UNDERLINE);
+			ItemMeta im = scythe.getItemMeta();
+			im.addAttributeModifier(Attribute.GENERIC_ATTACK_DAMAGE, new AttributeModifier("generic.attack_damage", -100, AttributeModifier.Operation.ADD_NUMBER));
+			scythe.setItemMeta(im);
+			mBoss.getEquipment().setItemInMainHand(scythe);
 		});
 
 		//Show hailstorm before fight starts

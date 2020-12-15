@@ -27,12 +27,10 @@ import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
 import com.destroystokyo.paper.entity.Pathfinder;
-import com.playmonumenta.plugins.bosses.bosses.FrostGiant;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
-import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.VectorUtils;
@@ -67,27 +65,40 @@ public class SpellGreatswordSlam extends Spell {
 
 		pathfinder.stopPathfinding();
 
-		Player target = null;
-		for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), FrostGiant.fighterRange)) {
-			c.setTarget(player);
-			target = player;
-			break;
-		}
-
-		if (target != null) {
-			Vector dir = LocationUtils.getDirectionTo(target.getLocation(), mBoss.getLocation()).setY(0).normalize();
-			mBoss.teleport(mBoss.getLocation().setDirection(dir));
-		}
-
 		//Saves locations for places to convert from frosted ice back to its original block
 		Map<Location, Material> oldBlocks = new HashMap<>();
 		Map<Location, BlockData> oldData = new HashMap<>();
+
+		Location loc = mBoss.getLocation();
+
+		new BukkitRunnable() {
+			int mT = 0;
+			@Override
+			public void run() {
+				mT += 10;
+				if (mT > 20 * 4) {
+					this.cancel();
+				}
+				for (int r = 0; r < 30; r++) {
+					for (double degree = 90 - mDeg/2; degree <= 90 + mDeg/2; degree += 5) {
+						double radian1 = Math.toRadians(degree);
+						Vector vec = new Vector(FastUtils.cos(radian1) * r, 0, FastUtils.sin(radian1) * r);
+						vec = VectorUtils.rotateXAxis(vec, 0);
+						vec = VectorUtils.rotateYAxis(vec, loc.getYaw());
+
+						Location l = loc.clone().add(vec);
+						world.spawnParticle(Particle.SPELL_WITCH, l, 1, 0.25, 0.25, 0.25, 0);
+					}
+				}
+			}
+		}.runTaskTimer(mPlugin, 0, 10);
 
 		new BukkitRunnable() {
 			int mT = 0;
 			@Override
 			public void run() {
 				mT += 2;
+
 				if (mT <= 20 && mT >= 10) {
 					//Initiates the jump upwards
 					mBoss.setVelocity(mBoss.getVelocity().setY(2));
@@ -98,7 +109,6 @@ public class SpellGreatswordSlam extends Spell {
 						mBoss.setVelocity(mBoss.getVelocity().setY(-2));
 					} else {
 						//Creates the giant 30 degree cone rift of damage
-						Location loc = mBoss.getLocation();
 						world.playSound(loc, Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, SoundCategory.HOSTILE, 1, 0);
 						new BukkitRunnable() {
 							int mRadius = 0;
@@ -241,7 +251,7 @@ public class SpellGreatswordSlam extends Spell {
 					if ((player.getLocation().getBlock().getRelative(BlockFace.DOWN).getType() != Material.AIR || player.getLocation().getBlock().getType() != Material.AIR)
 					    && (player.getLocation().getBlock().getRelative(BlockFace.DOWN).getType() == Material.FROSTED_ICE || player.getLocation().getBlock().getType() == Material.FROSTED_ICE)) {
 						Vector vel = player.getVelocity();
-						BossUtils.bossDamage(mBoss, player, 12, null);
+						BossUtils.bossDamage(mBoss, player, 18, null);
 						player.setVelocity(vel);
 					}
 				}
