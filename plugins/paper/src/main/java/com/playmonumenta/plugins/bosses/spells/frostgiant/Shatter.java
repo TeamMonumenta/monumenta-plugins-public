@@ -131,6 +131,10 @@ public class Shatter extends Spell {
 										if (l.getBlock().getType() == Material.AIR && l.getBlock().getRelative(BlockFace.DOWN).getType().isSolid()) {
 											l.subtract(0, 1, 0);
 										}
+										//Once it leaves the arena, stop iterating
+										if (l.getBlock().getRelative(BlockFace.UP).getType() == Material.AIR && l.getBlock().getRelative(BlockFace.DOWN).getType() == Material.AIR) {
+											break;
+										}
 										if (l.getBlock().getType() == Material.AIR) {
 											continue;
 										}

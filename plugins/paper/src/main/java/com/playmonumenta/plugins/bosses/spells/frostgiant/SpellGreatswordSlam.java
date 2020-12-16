@@ -69,8 +69,6 @@ public class SpellGreatswordSlam extends Spell {
 		Map<Location, Material> oldBlocks = new HashMap<>();
 		Map<Location, BlockData> oldData = new HashMap<>();
 
-		Location loc = mBoss.getLocation();
-
 		new BukkitRunnable() {
 			int mT = 0;
 			@Override
@@ -79,7 +77,10 @@ public class SpellGreatswordSlam extends Spell {
 				if (mT > 20 * 4) {
 					this.cancel();
 				}
-				for (int r = 0; r < 30; r++) {
+
+				Location loc = mBoss.getLocation();
+
+				for (int r = 0; r < 30; r += 2) {
 					for (double degree = 90 - mDeg/2; degree <= 90 + mDeg/2; degree += 5) {
 						double radian1 = Math.toRadians(degree);
 						Vector vec = new Vector(FastUtils.cos(radian1) * r, 0, FastUtils.sin(radian1) * r);
@@ -109,6 +110,7 @@ public class SpellGreatswordSlam extends Spell {
 						mBoss.setVelocity(mBoss.getVelocity().setY(-2));
 					} else {
 						//Creates the giant 30 degree cone rift of damage
+						Location loc = mBoss.getLocation();
 						world.playSound(loc, Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, SoundCategory.HOSTILE, 1, 0);
 						new BukkitRunnable() {
 							int mRadius = 0;
@@ -138,7 +140,7 @@ public class SpellGreatswordSlam extends Spell {
 									}
 									//Once it leaves the arena, stop iterating
 									if (l.getBlock().getRelative(BlockFace.UP).getType() == Material.AIR && l.getBlock().getRelative(BlockFace.DOWN).getType() == Material.AIR) {
-										continue;
+										break;
 									}
 									//If on bedrock or barriers, move up one to not replace that
 									if (l.getBlock().getType() == Material.BEDROCK || l.getBlock().getType() == Material.BARRIER) {
@@ -251,7 +253,7 @@ public class SpellGreatswordSlam extends Spell {
 					if ((player.getLocation().getBlock().getRelative(BlockFace.DOWN).getType() != Material.AIR || player.getLocation().getBlock().getType() != Material.AIR)
 					    && (player.getLocation().getBlock().getRelative(BlockFace.DOWN).getType() == Material.FROSTED_ICE || player.getLocation().getBlock().getType() == Material.FROSTED_ICE)) {
 						Vector vel = player.getVelocity();
-						BossUtils.bossDamage(mBoss, player, 18, null);
+						BossUtils.bossDamage(mBoss, player, 22, null);
 						player.setVelocity(vel);
 					}
 				}

@@ -72,12 +72,12 @@ public class SpellAirGolemStrike extends Spell {
 
 		count = Math.min(12, count);
 
-		if (count <= 0) {
+		if (count <= 0 || players.size() < 1) {
 			return;
 		}
 
 		List<Player> targets = new ArrayList<Player>();
-		for (int i = players.size() - 1; i >= players.size() - count; i--) {
+		for (int i = 0; i < count; i++) {
 			targets.add(players.get(i));
 		}
 		for (Player p : targets) {
@@ -189,14 +189,17 @@ public class SpellAirGolemStrike extends Spell {
 			@Override
 			public void run() {
 				if (golem.isDead() || !golem.isValid() || mBoss.isDead() || !mBoss.isValid()) {
-					golem.remove();
 					this.cancel();
+
+					if (mBoss.isDead() || !mBoss.isValid()) {
+						golem.remove();
+					}
 				}
 
 				Creature c = (Creature) golem;
 				if (c.getTarget() != null) {
 					LivingEntity target = c.getTarget();
-					if (target.getBoundingBox().overlaps(golem.getBoundingBox().expand(0.25, 0, 0.25)) && !mCooldown) {
+					if (target.getBoundingBox().overlaps(golem.getBoundingBox().expand(0.4, 0, 0.4)) && !mCooldown) {
 						mCooldown = true;
 						new BukkitRunnable() {
 

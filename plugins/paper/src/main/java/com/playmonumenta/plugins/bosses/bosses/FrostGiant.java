@@ -1038,7 +1038,8 @@ public class FrostGiant extends BossAbilityGroup {
 		if (event.getDamager() instanceof Mob && !(event.getDamager() instanceof Player)) {
 			event.setCancelled(true);
 		} else if (!mFrostArmorActive) {
-			world.playSound(mBoss.getLocation(), Sound.ENTITY_ENDER_DRAGON_HURT, SoundCategory.HOSTILE, 3, 0.75f);
+			world.playSound(mBoss.getLocation(), Sound.ENTITY_ENDER_DRAGON_HURT, SoundCategory.HOSTILE, 5, 0.75f);
+			world.playSound(mBoss.getLocation(), Sound.ENTITY_ZOMBIE_HURT, SoundCategory.HOSTILE, 5, 0);
 		}
 		//Punch resist
 		if (event.getDamager() instanceof Projectile) {
