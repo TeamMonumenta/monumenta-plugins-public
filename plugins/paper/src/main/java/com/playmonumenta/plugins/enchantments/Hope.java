@@ -65,7 +65,7 @@ public class Hope implements BaseEnchantment {
 			@Override
 			public void run() {
 				item.getWorld().spawnParticle(Particle.SPELL_INSTANT, item.getLocation(), 3, 0.2, 0.2, 0.2, 0);
-				if (item == null || item.isDead()) {
+				if (item == null || item.isDead() || !item.isValid()) {
 					this.cancel();
 				}
 

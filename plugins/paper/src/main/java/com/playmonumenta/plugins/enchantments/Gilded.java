@@ -96,7 +96,7 @@ public class Gilded implements BaseEnchantment {
 
 			@Override
 			public void run() {
-				if (item == null || item.isDead()) {
+				if (item == null || item.isDead() || !item.isValid()) {
 					this.cancel();
 				}
 

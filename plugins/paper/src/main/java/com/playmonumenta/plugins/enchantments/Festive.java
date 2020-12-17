@@ -80,7 +80,7 @@ public class Festive implements BaseEnchantment {
 			World mWorld = item.getWorld();
 			@Override
 			public void run() {
-				if (item == null || item.isDead()) {
+				if (item == null || item.isDead() || !item.isValid()) {
 					this.cancel();
 				}
 
