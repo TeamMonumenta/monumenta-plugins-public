@@ -374,7 +374,7 @@ public class FrostGiant extends BossAbilityGroup {
 					mTargeted = c.getTarget();
 
 					if (mTargeted instanceof Player) {
-						((Player) mTargeted).playSound(mTargeted.getLocation(), Sound.ENTITY_POLAR_BEAR_WARNING, SoundCategory.HOSTILE, 1, 0);
+						((Player) mTargeted).playSound(mTargeted.getLocation(), Sound.ENTITY_POLAR_BEAR_WARNING, SoundCategory.HOSTILE, 5, 0);
 					}
 				} else if (mT >= 20 * 30 && c.getTarget().equals(mTargeted)) {
 					new BukkitRunnable() {
@@ -398,7 +398,7 @@ public class FrostGiant extends BossAbilityGroup {
 								}
 								this.cancel();
 							} else {
-								mBoss.getWorld().playSound(mBoss.getLocation(), Sound.ENTITY_POLAR_BEAR_WARNING, SoundCategory.HOSTILE, 1, 0);
+								mBoss.getWorld().playSound(mBoss.getLocation(), Sound.ENTITY_POLAR_BEAR_WARNING, SoundCategory.HOSTILE, 5, 0);
 							}
 							mTicks += 5;
 						}
@@ -1038,8 +1038,11 @@ public class FrostGiant extends BossAbilityGroup {
 		if (event.getDamager() instanceof Mob && !(event.getDamager() instanceof Player)) {
 			event.setCancelled(true);
 		} else if (!mFrostArmorActive) {
-			world.playSound(mBoss.getLocation(), Sound.ENTITY_ENDER_DRAGON_HURT, SoundCategory.HOSTILE, 5, 0.75f);
-			world.playSound(mBoss.getLocation(), Sound.ENTITY_ZOMBIE_HURT, SoundCategory.HOSTILE, 5, 0);
+			if (event.getDamager() instanceof Player) {
+				((Player)event.getDamager()).playSound(mBoss.getLocation(), Sound.ENTITY_ENDER_DRAGON_HURT, SoundCategory.HOSTILE, 5, 0.75f);
+			} else {
+				world.playSound(mBoss.getLocation(), Sound.ENTITY_ENDER_DRAGON_HURT, SoundCategory.HOSTILE, 5, 0.75f);
+			}
 		}
 		//Punch resist
 		if (event.getDamager() instanceof Projectile) {

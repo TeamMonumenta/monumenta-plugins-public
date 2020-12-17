@@ -69,6 +69,8 @@ public class SpellGreatswordSlam extends Spell {
 		Map<Location, Material> oldBlocks = new HashMap<>();
 		Map<Location, BlockData> oldData = new HashMap<>();
 
+		Location loc = mBoss.getLocation();
+
 		new BukkitRunnable() {
 			int mT = 0;
 			@Override
@@ -77,8 +79,6 @@ public class SpellGreatswordSlam extends Spell {
 				if (mT > 20 * 4) {
 					this.cancel();
 				}
-
-				Location loc = mBoss.getLocation();
 
 				for (int r = 0; r < 30; r += 2) {
 					for (double degree = 90 - mDeg/2; degree <= 90 + mDeg/2; degree += 5) {
@@ -94,7 +94,7 @@ public class SpellGreatswordSlam extends Spell {
 			}
 		}.runTaskTimer(mPlugin, 0, 10);
 
-		new BukkitRunnable() {
+		BukkitRunnable runnable = new BukkitRunnable() {
 			int mT = 0;
 			@Override
 			public void run() {
@@ -102,15 +102,14 @@ public class SpellGreatswordSlam extends Spell {
 
 				if (mT <= 20 && mT >= 10) {
 					//Initiates the jump upwards
-					mBoss.setVelocity(mBoss.getVelocity().setY(2));
+					mBoss.setVelocity(new Vector(0, 2, 0));
 				}
 				if (mT >= 20) {
 					if (!mBoss.isOnGround()) {
 						//Initiates the slam down
-						mBoss.setVelocity(mBoss.getVelocity().setY(-2));
+						mBoss.setVelocity(new Vector(0, -2, 0));
 					} else {
 						//Creates the giant 30 degree cone rift of damage
-						Location loc = mBoss.getLocation();
 						world.playSound(loc, Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, SoundCategory.HOSTILE, 1, 0);
 						new BukkitRunnable() {
 							int mRadius = 0;
@@ -193,7 +192,9 @@ public class SpellGreatswordSlam extends Spell {
 					}
 				}
 			}
-		}.runTaskTimer(mPlugin, 0, 2);
+		};
+		runnable.runTaskTimer(mPlugin, 0, 2);
+		mActiveRunnables.add(runnable);
 
 
 		//Revert frosted ice after 60 seconds, and also damage players that step on it during that
