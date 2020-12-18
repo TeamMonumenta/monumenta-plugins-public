@@ -128,6 +128,7 @@ public class BossManager implements Listener {
 		mStatelessBosses.put(AuraSmallHungerBoss.identityTag, (Plugin p, LivingEntity e) -> new AuraSmallHungerBoss(p, e));
 		mStatelessBosses.put(AuraSmallSlownessBoss.identityTag, (Plugin p, LivingEntity e) -> new AuraSmallSlownessBoss(p, e));
 		mStatelessBosses.put(AuraSmallWeaknessBoss.identityTag, (Plugin p, LivingEntity e) -> new AuraSmallWeaknessBoss(p, e));
+		mStatelessBosses.put(FestiveTesseractSnowmanBoss.identityTag, (Plugin p, LivingEntity e) -> new FestiveTesseractSnowmanBoss(p, e));
 		mStatelessBosses.put(CrowdControlImmunityBoss.identityTag, (Plugin p, LivingEntity e) -> new CrowdControlImmunityBoss(p, e));
 		mStatelessBosses.put(FloatBoss.identityTag, (Plugin p, LivingEntity e) -> new FloatBoss(p, e));
 		mStatelessBosses.put(FrostNovaBoss.identityTag, (Plugin p, LivingEntity e) -> new FrostNovaBoss(p, e));
@@ -242,6 +243,7 @@ public class BossManager implements Listener {
 		mBossDeserializers.put(AuraSmallHungerBoss.identityTag, (Plugin p, LivingEntity e) -> AuraSmallHungerBoss.deserialize(p, e));
 		mBossDeserializers.put(AuraSmallSlownessBoss.identityTag, (Plugin p, LivingEntity e) -> AuraSmallSlownessBoss.deserialize(p, e));
 		mBossDeserializers.put(AuraSmallWeaknessBoss.identityTag, (Plugin p, LivingEntity e) -> AuraSmallWeaknessBoss.deserialize(p, e));
+		mBossDeserializers.put(FestiveTesseractSnowmanBoss.identityTag, (Plugin p, LivingEntity e) -> FestiveTesseractSnowmanBoss.deserialize(p, e));
 		mBossDeserializers.put(CrowdControlImmunityBoss.identityTag, (Plugin p, LivingEntity e) -> CrowdControlImmunityBoss.deserialize(p, e));
 		mBossDeserializers.put(FloatBoss.identityTag, (Plugin p, LivingEntity e) -> FloatBoss.deserialize(p, e));
 		mBossDeserializers.put(FrostNovaBoss.identityTag, (Plugin p, LivingEntity e) -> FrostNovaBoss.deserialize(p, e));
@@ -678,10 +680,9 @@ public class BossManager implements Listener {
 	 *******************************************************************************/
 
 	public void unload(LivingEntity entity, boolean shuttingDown) {
-		Boss boss = mBosses.get(entity.getUniqueId());
+		Boss boss = mBosses.remove(entity.getUniqueId());
 		if (boss != null) {
 			boss.unload(shuttingDown);
-			mBosses.remove(entity.getUniqueId());
 		}
 	}
 
@@ -696,15 +697,21 @@ public class BossManager implements Listener {
 		StatelessBossConstructor stateless = mStatelessBosses.get(requestedTag);
 		if (stateless != null) {
 			createBossInternal(targetEntity, stateless.construct(mPlugin, targetEntity));
-			sender.sendMessage("Successfully gave '" + requestedTag + "' to mob");
+			if (sender != null) {
+				sender.sendMessage("Successfully gave '" + requestedTag + "' to mob");
+			}
 		} else {
 			if (mStatefulBosses.get(requestedTag) != null) {
-				sender.sendMessage(ChatColor.GOLD + "There is a boss with the tag '" +
-				                   ChatColor.GREEN + requestedTag + ChatColor.GOLD +
-								   "' but it requires positional arguments");
-				sender.sendMessage(ChatColor.GOLD + "Try again with some ending location coordinates");
+				if (sender != null) {
+					sender.sendMessage(ChatColor.GOLD + "There is a boss with the tag '" +
+									   ChatColor.GREEN + requestedTag + ChatColor.GOLD +
+									   "' but it requires positional arguments");
+					sender.sendMessage(ChatColor.GOLD + "Try again with some ending location coordinates");
+				}
 			} else {
-				sender.sendMessage(ChatColor.RED + "No boss found with the tag '" + requestedTag + "'");
+				if (sender != null) {
+					sender.sendMessage(ChatColor.RED + "No boss found with the tag '" + requestedTag + "'");
+				}
 			}
 		}
 	}
@@ -713,15 +720,21 @@ public class BossManager implements Listener {
 		StatefulBossConstructor stateful = mStatefulBosses.get(requestedTag);
 		if (stateful != null) {
 			createBossInternal(targetEntity, stateful.construct(mPlugin, targetEntity, targetEntity.getLocation(), endLoc));
-			sender.sendMessage("Successfully gave '" + requestedTag + "' to mob");
+			if (sender != null) {
+				sender.sendMessage("Successfully gave '" + requestedTag + "' to mob");
+			}
 		} else {
 			if (mStatelessBosses.get(requestedTag) != null) {
-				sender.sendMessage(ChatColor.GOLD + "There is a boss with the tag '" +
-				                   ChatColor.GREEN + requestedTag + ChatColor.GOLD +
-								   "' but it does not take positional arguments");
-				sender.sendMessage(ChatColor.GOLD + "Try again without the coordinates");
+				if (sender != null) {
+					sender.sendMessage(ChatColor.GOLD + "There is a boss with the tag '" +
+									   ChatColor.GREEN + requestedTag + ChatColor.GOLD +
+									   "' but it does not take positional arguments");
+					sender.sendMessage(ChatColor.GOLD + "Try again without the coordinates");
+				}
 			} else {
-				sender.sendMessage(ChatColor.RED + "No boss found with the tag '" + requestedTag + "'");
+				if (sender != null) {
+					sender.sendMessage(ChatColor.RED + "No boss found with the tag '" + requestedTag + "'");
+				}
 			}
 		}
 	}
