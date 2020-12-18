@@ -95,7 +95,7 @@ public class EventListener implements Listener {
 	public void serverSwitchEvent(ServerSwitchEvent event) {
 		ProxiedPlayer player = event.getPlayer();
 
-		if (!mOnlinePlayers.contains(player.getUniqueId())) {
+		if (mMain.mJoinMessagesEnabled && !mOnlinePlayers.contains(player.getUniqueId())) {
 			/* This player is not already online - send join message */
 			mOnlinePlayers.add(player.getUniqueId());
 			_joinLeaveEvent(player, " joined the game",
@@ -107,7 +107,7 @@ public class EventListener implements Listener {
 	public void playerDisconnectEvent(PlayerDisconnectEvent event) {
 		ProxiedPlayer player = event.getPlayer();
 
-		if (mOnlinePlayers.contains(player.getUniqueId())) {
+		if (mMain.mJoinMessagesEnabled && mOnlinePlayers.contains(player.getUniqueId())) {
 			/* This player was online - send leave message */
 			mOnlinePlayers.remove(player.getUniqueId());
 			_joinLeaveEvent(player, " left the game",

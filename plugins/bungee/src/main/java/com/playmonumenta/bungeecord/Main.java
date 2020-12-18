@@ -23,6 +23,7 @@ public class Main extends Plugin {
 	private VoteManager mVoteManager = null;
 
 	public String mDefaultServer = null;
+	public boolean mJoinMessagesEnabled = true;
 
 	@Override
 	public void onEnable() {
@@ -87,6 +88,9 @@ public class Main extends Plugin {
 				mDefaultServer = null;
 			}
 
+			// Load join_messages_enabled
+			mJoinMessagesEnabled = mConfig.getBoolean("join_messages_enabled", mJoinMessagesEnabled);
+
 			// Load default server
 			String level = mConfig.getString("log_level", "INFO").toLowerCase();
 			switch (level) {
@@ -119,6 +123,7 @@ public class Main extends Plugin {
 			} else {
 				mConfig.set("default_server", mDefaultServer);
 			}
+			mConfig.set("join_messages_enabled", mJoinMessagesEnabled);
 
 			if (mLogLevel.equals(Level.FINEST)) {
 				mConfig.set("log_level", "FINEST");
