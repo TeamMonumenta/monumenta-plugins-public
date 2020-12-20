@@ -57,6 +57,10 @@
             <id>BKCommonLib</id>
             <url>https://ci.mg-dev.eu/plugin/repository/everything</url>
         </repository>
+        <repository>
+            <id>monumenta-redis-sync</id>
+            <url>https://raw.githubusercontent.com/TeamMonumenta/monumenta-redis-sync/master/mvn-repo/</url>
+        </repository>
 
         <!-- Prevent these unimportant repos from slowing down the build -->
         <repository>
