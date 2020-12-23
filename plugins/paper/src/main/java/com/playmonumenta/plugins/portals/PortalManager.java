@@ -343,7 +343,7 @@ public class PortalManager {
 		case "region_2":
 			return 204;
 		case "build":
-			return 278;
+			return 277;
 		default:
 			//Dungeon ids
 			return 439;
