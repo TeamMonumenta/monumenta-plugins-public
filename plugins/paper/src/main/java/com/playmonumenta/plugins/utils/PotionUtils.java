@@ -293,7 +293,7 @@ public class PotionUtils {
 			if (player.hasPotionEffect(type)) {
 				PotionEffect effect = player.getPotionEffect(type);
 				if (effect.getDuration() < Constants.THIRTY_MINUTES) {
-					plugin.mPotionManager.removePotion(player, PotionID.ALL, type);
+					plugin.mPotionManager.clearPotionEffectType(player, type);
 				}
 			}
 		}

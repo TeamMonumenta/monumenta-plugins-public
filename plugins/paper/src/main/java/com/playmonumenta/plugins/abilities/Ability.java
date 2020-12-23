@@ -279,7 +279,7 @@ public abstract class Ability {
 
 	@Override
 	public String toString() {
-		return String.format("%s: %d", this.getClass().getName(), getAbilityScore());
+		return String.format("%s: %d", this.getClass().getName().replaceAll("com.playmonumenta.plugins.abilities.", ""), getAbilityScore());
 	}
 
 	/* When called, the ability is no longer applicable to the player and any active runnables should be cancelled */

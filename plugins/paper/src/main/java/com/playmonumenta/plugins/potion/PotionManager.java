@@ -5,41 +5,39 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.UUID;
 
-import org.bukkit.entity.Player;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
+import javax.annotation.Nonnull;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.utils.PotionUtils.PotionInfo;
 
+import org.bukkit.entity.Player;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
+
 public class PotionManager {
 	//  Player ID / Player Potion Info
-	public HashMap<UUID, PlayerPotionInfo> mPlayerPotions = new HashMap<UUID, PlayerPotionInfo>();
+	private HashMap<UUID, PlayerPotionInfo> mPlayerPotions = new HashMap<UUID, PlayerPotionInfo>();
 
 	public enum PotionID {
 		APPLIED_POTION(0, "APPLIED_POTION"),
 		ABILITY_SELF(1, "ABILITY_SELF"),
 		ABILITY_OTHER(2, "ABILITY_OTHER"),
 		SAFE_ZONE(3, "SAFE_ZONE"),
-		ITEM(4, "ITEM"),
-		ALL(5, "ALL");
+		ITEM(4, "ITEM");
 
 		private int mValue;
 		private String mName;
-		PotionID(int value, String name)    {
+		PotionID(int value, String name) {
 			this.mValue = value;
 			this.mName = name;
 		}
 
-		public int getValue()       {
+		public int getValue() {
 			return mValue;
 		}
 
-		public String getName()     {
+		public String getName() {
 			return mName;
 		}
 
@@ -105,7 +103,6 @@ public class PotionManager {
 		}
 	}
 
-
 	public void clearAllPotions(Player player) {
 		mPlayerPotions.remove(player.getUniqueId());
 
@@ -137,40 +134,24 @@ public class PotionManager {
 		}
 	}
 
-	public JsonObject getAsJsonObject(Player player) {
-		PlayerPotionInfo info = mPlayerPotions.get(player.getUniqueId());
+	public @Nonnull JsonObject getAsJsonObject(@Nonnull Player player, boolean includeAll) {
+		final PlayerPotionInfo info;
+
+		info = mPlayerPotions.get(player.getUniqueId());
+
 		if (info != null) {
-			return info.getAsJsonObject();
+			return info.getAsJsonObject(includeAll);
 		}
 
-		return null;
+		return new JsonObject();
 	}
 
-	public void loadFromJsonObject(Player player, JsonObject object) throws Exception {
-		JsonElement potionInfo = object.get("potion_info");
-		if (potionInfo != null) {
-			clearAllPotions(player);
+	public void loadFromJsonObject(@Nonnull Player player, @Nonnull JsonObject object) throws Exception {
+		clearAllPotions(player);
 
-			PlayerPotionInfo info = new PlayerPotionInfo();
-			info.loadFromJsonObject(potionInfo.getAsJsonObject());
+		PlayerPotionInfo info = new PlayerPotionInfo();
+		info.loadFromJsonObject(object);
 
-			mPlayerPotions.put(player.getUniqueId(), info);
-		}
-	}
-
-	public void loadFromPlayer(Player player) {
-		mPlayerPotions.remove(player.getUniqueId());
-
-		for (PotionEffect type : player.getActivePotionEffects()) {
-			/*
-			 * Assume that any potions greater than 30 minutes were not
-			 * potions the player drank - and clear them from the player
-			 */
-			if (type.getDuration() < Constants.THIRTY_MINUTES) {
-				addPotion(player, PotionID.APPLIED_POTION, type);
-			} else {
-				player.removePotionEffect(type.getType());
-			}
-		}
+		mPlayerPotions.put(player.getUniqueId(), info);
 	}
 }

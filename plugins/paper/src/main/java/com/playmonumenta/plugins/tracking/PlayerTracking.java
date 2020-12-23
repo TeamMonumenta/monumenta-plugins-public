@@ -73,9 +73,6 @@ public class PlayerTracking implements EntityTracking {
 			player.setGameMode(GameMode.SURVIVAL);
 		}
 
-		// Initialize the player, either by loading data from disk or from the player
-		// TODO: Hook this up to PlayerData.applyTransferPlayerData
-
 		// Load the players inventory / custom enchantments and apply them
 		mPlayers.put(player, new PlayerInventory(mPlugin, player));
 	}

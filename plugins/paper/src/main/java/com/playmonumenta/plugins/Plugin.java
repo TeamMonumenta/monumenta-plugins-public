@@ -331,7 +331,7 @@ public class Plugin extends JavaPlugin {
 
 		// Hook into Monumenta Redis Sync for server transfers if available
 		if (Bukkit.getPluginManager().isPluginEnabled("MonumentaRedisSync")) {
-			manager.registerEvents(new MonumentaRedisSyncIntegration(this.getLogger()), this);
+			manager.registerEvents(new MonumentaRedisSyncIntegration(this), this);
 		}
 
 		// Provide placeholder API replacements if it is present

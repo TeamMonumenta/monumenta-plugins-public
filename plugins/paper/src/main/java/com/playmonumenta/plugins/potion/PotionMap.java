@@ -3,12 +3,9 @@ package com.playmonumenta.plugins.potion;
 import java.util.EnumMap;
 import java.util.Iterator;
 import java.util.Map.Entry;
-import java.util.Set;
 import java.util.TreeMap;
 
-import org.bukkit.entity.Player;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
+import javax.annotation.Nullable;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -16,6 +13,10 @@ import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.utils.PotionUtils;
 import com.playmonumenta.plugins.utils.PotionUtils.PotionInfo;
+
+import org.bukkit.entity.Player;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 
 public class PotionMap {
 	// PotionID is the type (safezone, item, etc.)
@@ -31,7 +32,7 @@ public class PotionMap {
 
 	private final boolean mIsNegative;
 
-	public PotionMap(PotionEffectType type) {
+	protected PotionMap(PotionEffectType type) {
 		mPotionMap = new EnumMap<PotionID, TreeMap<Integer, PotionInfo>>(PotionID.class);
 		mType = type;
 		mIsNegative = PotionUtils.hasNegativeEffects(type);
@@ -80,25 +81,20 @@ public class PotionMap {
 		mPotionMap.put(id, trackedPotionInfo);
 	}
 
-	public void addPotionMap(Player player, PotionID id, PotionInfo newPotionInfo) {
+	protected void addPotionMap(Player player, PotionID id, PotionInfo newPotionInfo) {
 		addPotionMap(id, newPotionInfo);
 
 		applyBestPotionEffect(player);
 	}
 
-	public void removePotionMap(Player player, PotionID id) {
-		if (id == PotionID.ALL) {
-			// Clear all effects from all sources
-			mPotionMap.clear();
-		} else {
-			// Clear out all effects from this source
-			mPotionMap.remove(id);
-		}
+	protected void removePotionMap(Player player, PotionID id) {
+		// Clear out all effects from this source
+		mPotionMap.remove(id);
 
 		applyBestPotionEffect(player);
 	}
 
-	public void updatePotionStatus(Player player, int ticks) {
+	protected void updatePotionStatus(Player player, int ticks) {
 		//  First update the timers of all our tracked potion timers.
 		boolean effectWoreOff = false;
 
@@ -179,63 +175,46 @@ public class PotionMap {
 		}
 	}
 
-	protected JsonObject getAsJsonObject() {
-		JsonObject potionIDObject = null;
-		JsonObject potionMapObject = new JsonObject();
-		boolean hasMapping = false;
+	protected @Nullable JsonObject getAsJsonObject(boolean includeAll) {
+		JsonObject potionMapObject = null;
 
-		Iterator<Entry<PotionID, TreeMap<Integer, PotionInfo>>> potionIter = mPotionMap.entrySet().iterator();
-		while (potionIter.hasNext()) {
-			Entry<PotionID, TreeMap<Integer, PotionInfo>> potionMapping = potionIter.next();
-			if (potionMapping != null) {
-				JsonArray effectListArray = new JsonArray();
+		for (Entry<PotionID, TreeMap<Integer, PotionInfo>> potionMapping : mPotionMap.entrySet()) {
+			if (!includeAll && (potionMapping.getKey().equals(PotionID.ITEM)
+			                    || potionMapping.getKey().equals(PotionID.ABILITY_SELF)
+			                    || potionMapping.getKey().equals(PotionID.SAFE_ZONE))) {
+				/*
+				 * Don't save ITEM, ABILITY_SELF, or SAFE_ZONE potions
+				 * These will be re-applied elsewhere when the player rejoins
+				 */
+				continue;
+			}
 
-				TreeMap<Integer, PotionInfo> potionInfo = potionMapping.getValue();
-				Iterator<Entry<Integer, PotionInfo>> potionInfoIter = potionInfo.entrySet().iterator();
-				while (potionInfoIter.hasNext()) {
-					PotionInfo info = potionInfoIter.next().getValue();
-					effectListArray.add(info.getAsJsonObject());
+			JsonArray effectListArray = new JsonArray();
+
+			for (Entry<Integer, PotionInfo> entry : potionMapping.getValue().entrySet()) {
+				effectListArray.add(entry.getValue().getAsJsonObject());
+			}
+
+			if (effectListArray.size() > 0) {
+				if (potionMapObject == null) {
+					potionMapObject = new JsonObject();
 				}
-
-				if (effectListArray.size() > 0) {
-					potionMapObject.add(potionMapping.getKey().getName(), effectListArray);
-					hasMapping = true;
-				}
+				potionMapObject.add(potionMapping.getKey().getName(), effectListArray);
 			}
 		}
 
-		if (hasMapping) {
-			if (potionIDObject == null) {
-				potionIDObject = new JsonObject();
-			}
-
-			potionIDObject.add("potion_map", potionMapObject);
-		}
-
-		return potionIDObject;
+		return potionMapObject;
 	}
 
 	protected void loadFromJsonObject(JsonObject object) throws Exception {
-		// Remove all current entries
-		mPotionMap.clear();
+		for (Entry<String, JsonElement> entry : object.entrySet()) {
+			PotionID id = PotionID.getFromString(entry.getKey());
+			if (id != null) {
+				for (JsonElement element : entry.getValue().getAsJsonArray()) {
+					PotionInfo info = new PotionInfo();
+					info.loadFromJsonObject(element.getAsJsonObject());
 
-		JsonObject potionMap = object.get("potion_map").getAsJsonObject();
-		if (potionMap != null) {
-			Set<Entry<String, JsonElement>> entries = potionMap.entrySet();
-			for (Entry<String, JsonElement> entry : entries) {
-				PotionID id = PotionID.getFromString(entry.getKey());
-				if (id != null) {
-					JsonArray potionInfoArray = entry.getValue().getAsJsonArray();
-
-					Iterator<JsonElement> elementIter = potionInfoArray.iterator();
-					while (elementIter.hasNext()) {
-						JsonElement element = elementIter.next();
-
-						PotionInfo info = new PotionInfo();
-						info.loadFromJsonObject(element.getAsJsonObject());
-
-						addPotionMap(id, info);
-					}
+					addPotionMap(id, info);
 				}
 			}
 		}

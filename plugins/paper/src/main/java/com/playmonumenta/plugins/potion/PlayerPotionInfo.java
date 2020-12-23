@@ -3,21 +3,22 @@ package com.playmonumenta.plugins.potion;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map.Entry;
-import java.util.Set;
 
-import org.bukkit.entity.Player;
-import org.bukkit.potion.PotionEffectType;
+import javax.annotation.Nonnull;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.utils.PotionUtils.PotionInfo;
 
+import org.bukkit.entity.Player;
+import org.bukkit.potion.PotionEffectType;
+
 public class PlayerPotionInfo {
 	//  Effect Type / Potion List
 	private final HashMap<PotionEffectType, PotionMap> mPotionInfo = new HashMap<PotionEffectType, PotionMap>();
 
-	public void addPotionInfo(Player player, PotionID id, PotionInfo info) {
+	protected void addPotionInfo(Player player, PotionID id, PotionInfo info) {
 		PotionMap type = mPotionInfo.get(info.mType);
 		if (type != null) {
 			type.addPotionMap(player, id, info);
@@ -28,21 +29,14 @@ public class PlayerPotionInfo {
 		}
 	}
 
-	public void removePotionInfo(Player player, PotionID id, PotionEffectType type) {
+	protected void removePotionInfo(Player player, PotionID id, PotionEffectType type) {
 		PotionMap potionMap = mPotionInfo.get(type);
 		if (potionMap != null) {
 			potionMap.removePotionMap(player, id);
 		}
-		/*
-		 * If we are removing all effects, make really sure to remove even
-		 * non-potion-manager-tracked effects
-		 */
-		if (id == PotionID.ALL) {
-			player.removePotionEffect(type);
-		}
 	}
 
-	public void clearPotionIDType(Player player, PotionID id) {
+	protected void clearPotionIDType(Player player, PotionID id) {
 		Iterator<Entry<PotionEffectType, PotionMap>> potionMapIter = mPotionInfo.entrySet().iterator();
 		while (potionMapIter.hasNext()) {
 			Entry<PotionEffectType, PotionMap> potionEntry = potionMapIter.next();
@@ -50,14 +44,11 @@ public class PlayerPotionInfo {
 		}
 	}
 
-	public void clearPotionEffectType(Player player, PotionEffectType type) {
-		PotionMap map = mPotionInfo.get(type);
-		if (map != null) {
-			map.removePotionMap(player, PotionID.ALL);
-		}
+	protected void clearPotionEffectType(Player player, PotionEffectType type) {
+		mPotionInfo.remove(type);
 	}
 
-	public void updatePotionStatus(Player player, int ticks) {
+	protected void updatePotionStatus(Player player, int ticks) {
 		Iterator<Entry<PotionEffectType, PotionMap>> potionMapIter = mPotionInfo.entrySet().iterator();
 		while (potionMapIter.hasNext()) {
 			Entry<PotionEffectType, PotionMap> potionEntry = potionMapIter.next();
@@ -65,14 +56,11 @@ public class PlayerPotionInfo {
 		}
 	}
 
-	protected JsonObject getAsJsonObject() {
+	protected @Nonnull JsonObject getAsJsonObject(boolean includeAll) {
 		JsonObject playerPotionInfoObject = new JsonObject();
 
-		Iterator<Entry<PotionEffectType, PotionMap>> potionMapIter = mPotionInfo.entrySet().iterator();
-		while (potionMapIter.hasNext()) {
-			Entry<PotionEffectType, PotionMap> potionEntry = potionMapIter.next();
-
-			JsonElement element = potionEntry.getValue().getAsJsonObject();
+		for (Entry<PotionEffectType, PotionMap> potionEntry : mPotionInfo.entrySet()) {
+			JsonElement element = potionEntry.getValue().getAsJsonObject(includeAll);
 			if (element != null) {
 				playerPotionInfoObject.add(potionEntry.getKey().getName(), element);
 			}
@@ -81,18 +69,14 @@ public class PlayerPotionInfo {
 		return playerPotionInfoObject;
 	}
 
-	protected void loadFromJsonObject(JsonObject object) throws Exception {
-		Set<Entry<String, JsonElement>> potionInfo = object.entrySet();
-		for (Entry<String, JsonElement> info : potionInfo) {
+	protected void loadFromJsonObject(@Nonnull JsonObject object) throws Exception {
+		for (Entry<String, JsonElement> info : object.entrySet()) {
 			PotionEffectType type = PotionEffectType.getByName(info.getKey());
 			PotionMap map = new PotionMap(type);
 
-			JsonElement mapElement = info.getValue();
-			if (mapElement != null) {
-				map.loadFromJsonObject(mapElement.getAsJsonObject());
+			map.loadFromJsonObject(info.getValue().getAsJsonObject());
 
-				mPotionInfo.put(type, map);
-			}
+			mPotionInfo.put(type, map);
 		}
 	}
 }

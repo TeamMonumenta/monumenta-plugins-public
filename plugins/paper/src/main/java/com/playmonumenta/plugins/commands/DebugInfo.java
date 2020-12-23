@@ -21,7 +21,7 @@ public class DebugInfo extends GenericCommand {
 		JsonObject debugInfo = new JsonObject();
 
 		if (plugin.mPotionManager != null) {
-			debugInfo.add("Potion Manager", plugin.mPotionManager.getAsJsonObject(player));
+			debugInfo.add("Potion Manager", plugin.mPotionManager.getAsJsonObject(player, true));
 		}
 		if (plugin.mAbilityManager != null) {
 			debugInfo.add("Ability Manager", plugin.mAbilityManager.getAsJson(player));
