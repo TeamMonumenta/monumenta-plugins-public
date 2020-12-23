@@ -5,7 +5,7 @@ import java.util.LinkedHashMap;
 import java.util.concurrent.Executor;
 
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.network.SocketManager;
+import com.playmonumenta.plugins.integrations.MonumentaNetworkRelayIntegration;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 
 import org.bukkit.Bukkit;
@@ -104,7 +104,7 @@ public class CreateGuild {
 		}
 
 		try {
-			SocketManager.broadcastCommand(plugin, "tellraw @a [\"\",{\"text\":\"A new guild has just been founded. Say hello to " + guildName + "!!\",\"bold\":true}]");
+			MonumentaNetworkRelayIntegration.broadcastCommand("tellraw @a [\"\",{\"text\":\"A new guild has just been founded. Say hello to " + guildName + "!!\",\"bold\":true}]");
 		} catch (Exception e) {
 			sender.sendMessage(ChatColor.RED + "Broadcasting command failed");
 		}

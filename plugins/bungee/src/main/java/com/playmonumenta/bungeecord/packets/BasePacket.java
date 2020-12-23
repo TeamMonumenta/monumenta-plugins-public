@@ -60,7 +60,7 @@ public abstract class BasePacket {
 			json.addProperty("dest", mDestination);
 		}
 		if (hasOperation()) {
-			json.addProperty("op", mOperation);
+			json.addProperty("channel", mOperation);
 		}
 		if (hasData()) {
 			json.add("data", mData);

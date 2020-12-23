@@ -61,6 +61,10 @@
             <id>monumenta-redis-sync</id>
             <url>https://raw.githubusercontent.com/TeamMonumenta/monumenta-redis-sync/master/mvn-repo/</url>
         </repository>
+        <repository>
+            <id>monumenta-network-relay</id>
+			<url>https://raw.githubusercontent.com/TeamMonumenta/monumenta-network-relay/master/mvn-repo/</url>
+        </repository>
 
         <!-- Prevent these unimportant repos from slowing down the build -->
         <repository>
@@ -142,6 +146,12 @@
         </dependency>
         <dependency>
             <groupId>com.playmonumenta</groupId>
+            <artifactId>monumenta-network-relay</artifactId>
+            <version>0.3</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.playmonumenta</groupId>
             <artifactId>libraryofsouls</artifactId>
             <version>2.1</version>
             <scope>provided</scope>
@@ -180,13 +190,6 @@
 			<artifactId>jmh-generator-annprocess</artifactId>
 			<version>1.19</version>
 		</dependency>
-
-        <!-- These need to be shaded in! -->
-        <dependency>
-            <groupId>com.rabbitmq</groupId>
-            <artifactId>amqp-client</artifactId>
-            <version>5.8.0</version>
-        </dependency>
     </dependencies>
 
     <build>

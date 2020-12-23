@@ -4,8 +4,7 @@ import java.util.LinkedHashMap;
 import java.util.UUID;
 
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.network.SocketManager;
-import com.playmonumenta.plugins.packets.BungeeCheckRaffleEligibilityPacket;
+import com.playmonumenta.plugins.integrations.MonumentaNetworkRelayIntegration;
 import com.playmonumenta.plugins.utils.CommandUtils;
 
 import org.bukkit.ChatColor;
@@ -41,21 +40,21 @@ public class ClaimRaffle {
 	private static void run(Plugin plugin, Player player) throws WrapperCommandSyntaxException {
 		if (player.hasMetadata(CONFIRMED_METAKEY)) {
 			// This player is running this command twice, to gild an item. And they had a credit to gild with earlier
-			SocketManager.sendPacket(new BungeeCheckRaffleEligibilityPacket(player.getUniqueId(), true, false));
+			MonumentaNetworkRelayIntegration.sendCheckRaffleEligibilityPacket(player.getUniqueId(), true, false);
 			plugin.getLogger().info("Requested raffle redeem for " + player.getName());
 		} else {
 			// This player is running this command for the first time - send a request to bungee to query eligibility
-			SocketManager.sendPacket(new BungeeCheckRaffleEligibilityPacket(player.getUniqueId(), false, false));
+			MonumentaNetworkRelayIntegration.sendCheckRaffleEligibilityPacket(player.getUniqueId(), false, false);
 			plugin.getLogger().info("Requested raffle eligibility for " + player.getName());
 		}
 	}
 
-	public static void queryResponseReceived(Plugin plugin, UUID uuid, boolean claimReward, boolean eligible) {
-		Player player = plugin.getPlayer(uuid);
+	public static void queryResponseReceived(UUID uuid, boolean claimReward, boolean eligible) {
+		Player player = Plugin.getInstance().getPlayer(uuid);
 		if (player == null || !player.isOnline()) {
 			if (claimReward && eligible) {
 				/* This player tried to claim a reward then disappeared - send back the reward to bungee */
-				SocketManager.sendPacket(new BungeeCheckRaffleEligibilityPacket(player.getUniqueId(), false, true));
+				MonumentaNetworkRelayIntegration.sendCheckRaffleEligibilityPacket(player.getUniqueId(), false, true);
 			}
 			return;
 		}
@@ -65,11 +64,11 @@ public class ClaimRaffle {
 				CommandUtils.enchantify(player, player, "Gilded", "Gilded by");
 			} catch (WrapperCommandSyntaxException ex) {
 				/* Failed to claim reward - send back the reward to bungee */
-				SocketManager.sendPacket(new BungeeCheckRaffleEligibilityPacket(player.getUniqueId(), false, true));
+				MonumentaNetworkRelayIntegration.sendCheckRaffleEligibilityPacket(player.getUniqueId(), false, true);
 				player.sendMessage(ChatColor.RED + ex.getException().getMessage());
 			}
 		} else if (!claimReward && eligible) {
-			player.setMetadata(CONFIRMED_METAKEY, new FixedMetadataValue(plugin, 0));
+			player.setMetadata(CONFIRMED_METAKEY, new FixedMetadataValue(Plugin.getInstance(), 0));
 			player.sendMessage(ChatColor.GREEN + "You have won the weekly voting raffle! Congratulations!");
 			player.sendMessage(ChatColor.GREEN + "The reward is to add the Gilded enchant to an item of your choice. This will give you a unique particle effect while it is anywhere in your inventory.");
 			player.sendMessage(ChatColor.GREEN + "To claim this reward, run " + ChatColor.GOLD + "/claimraffle " + ChatColor.GREEN + "again with the item you wish to gild in your main hand.");

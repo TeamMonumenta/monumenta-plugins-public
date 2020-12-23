@@ -4,10 +4,9 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.UUID;
+import java.util.logging.Logger;
 
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.network.SocketManager;
-import com.playmonumenta.plugins.packets.BungeeGetVotesUnclaimedPacket;
+import com.playmonumenta.plugins.integrations.MonumentaNetworkRelayIntegration;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 
 import org.bukkit.entity.Player;
@@ -55,7 +54,7 @@ public class RedeemVoteRewards extends GenericCommand {
 
 	private static final Map<UUID, PendingRewardContext> mPendingRewards = new HashMap<UUID, PendingRewardContext>();
 
-	public static void register(Plugin plugin) {
+	public static void register(Logger logger) {
 		LinkedHashMap<String, Argument> arguments = new LinkedHashMap<>();
 
 		arguments.put("player", new EntitySelectorArgument(EntitySelector.ONE_PLAYER));
@@ -66,31 +65,31 @@ public class RedeemVoteRewards extends GenericCommand {
 			.withPermission(CommandPermission.fromString("monumenta.command.redeemvoterewards"))
 			.withArguments(arguments)
 			.executes((sender, args) -> {
-				run(plugin, (Player)args[0], (String)args[1], (FunctionWrapper[])args[2]);
+				run(logger, (Player)args[0], (String)args[1], (FunctionWrapper[])args[2]);
 			})
 			.register();
 	}
 
-	private static void run(Plugin plugin, Player player, String scoreboardName, FunctionWrapper[] functions) throws WrapperCommandSyntaxException {
+	private static void run(Logger logger, Player player, String scoreboardName, FunctionWrapper[] functions) throws WrapperCommandSyntaxException {
 		PendingRewardContext context = new PendingRewardContext(player, scoreboardName, functions);
 
 		mPendingRewards.put(player.getUniqueId(), context);
 
 		// Count = 0 means request count
-		SocketManager.sendPacket(new BungeeGetVotesUnclaimedPacket(player.getUniqueId(), 0));
+		MonumentaNetworkRelayIntegration.sendGetVotesUnclaimedPacket(player.getUniqueId(), 0);
 
-		plugin.getLogger().info("Requested vote rewards for " + player.getName());
+		logger.info("Requested vote rewards for " + player.getName());
 	}
 
-	public static void gotVoteRewardMessage(Plugin plugin, UUID uuid, int rewardCount) {
+	public static void gotVoteRewardMessage(Logger logger, UUID uuid, int rewardCount) {
 		PendingRewardContext context = mPendingRewards.get(uuid);
 
 		if (context != null) {
 			context.run(rewardCount);
 			mPendingRewards.remove(uuid);
 		} else if (rewardCount > 0) {
-			SocketManager.sendPacket(new BungeeGetVotesUnclaimedPacket(uuid, rewardCount));
-			plugin.getLogger().info("Sending " + Integer.toString(rewardCount) + " votes back to bungee for " + uuid.toString());
+			MonumentaNetworkRelayIntegration.sendGetVotesUnclaimedPacket(uuid, rewardCount);
+			logger.info("Sending " + Integer.toString(rewardCount) + " votes back to bungee for " + uuid.toString());
 		}
 	}
 }

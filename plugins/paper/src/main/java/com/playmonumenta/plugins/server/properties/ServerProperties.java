@@ -27,7 +27,6 @@ public class ServerProperties {
 	private boolean mDailyResetEnabled = false;
 	private boolean mJoinMessagesEnabled = false;
 	private boolean mIsTownWorld = false;
-	private boolean mBroadcastCommandEnabled = true;
 	// Height of plots in Sierhaven so that players under plots stay in adventure
 	private int mPlotSurvivalMinHeight = 256;
 
@@ -74,11 +73,6 @@ public class ServerProperties {
 	public static boolean getIsTownWorld() {
 		ensureInstance();
 		return INSTANCE.mIsTownWorld;
-	}
-
-	public static boolean getBroadcastCommandEnabled() {
-		ensureInstance();
-		return INSTANCE.mBroadcastCommandEnabled;
 	}
 
 	public static int getPlotSurvivalMinHeight() {
@@ -183,7 +177,6 @@ public class ServerProperties {
 					mDailyResetEnabled           = getPropertyValueBool(plugin, object, "dailyResetEnabled", mDailyResetEnabled);
 					mJoinMessagesEnabled         = getPropertyValueBool(plugin, object, "joinMessagesEnabled", mJoinMessagesEnabled);
 					mIsTownWorld                 = getPropertyValueBool(plugin, object, "isTownWorld", mIsTownWorld);
-					mBroadcastCommandEnabled     = getPropertyValueBool(plugin, object, "broadcastCommandEnabled", mBroadcastCommandEnabled);
 					mPlotSurvivalMinHeight       = getPropertyValueInt(plugin, object, "plotSurvivalMinHeight", mPlotSurvivalMinHeight);
 
 					mIsSleepingEnabled           = getPropertyValueBool(plugin, object, "isSleepingEnabled", mIsSleepingEnabled);

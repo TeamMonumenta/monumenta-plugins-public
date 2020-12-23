@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.integrations;
 
 import java.util.Map;
+import java.util.logging.Logger;
 
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
@@ -20,6 +21,10 @@ import de.jeff_media.ChestSortAPI.ChestSortEvent;
 public class ChestSortIntegration implements Listener {
 	private static boolean checkedForPlugin = false;
 	private static ChestSortAPI chestSortAPI = null;
+
+	public ChestSortIntegration(Logger logger) {
+		logger.info("Enabling ChestSort integration");
+	}
 
 	private static void checkForPlugin() {
 		Plugin plugin = Bukkit.getServer().getPluginManager().getPlugin("ChestSort");
@@ -48,7 +53,7 @@ public class ChestSortIntegration implements Listener {
 	}
 
 	@EventHandler(priority = EventPriority.HIGH)
-	public static void chestSortEvent(ChestSortEvent event) {
+	public void chestSortEvent(ChestSortEvent event) {
 		for (Map.Entry<ItemStack, Map<String, String>> itemSortMapPair : event.getSortableMaps().entrySet()) {
 			ItemStack item = itemSortMapPair.getKey();
 			Map<String, String> sortMap = itemSortMapPair.getValue();

@@ -3,18 +3,11 @@ package com.playmonumenta.plugins;
 import java.io.IOException;
 import java.util.UUID;
 
-import org.bukkit.Bukkit;
-import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
-import org.bukkit.plugin.PluginManager;
-import org.bukkit.plugin.java.JavaPlugin;
-
 import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.bosses.BossManager;
 import com.playmonumenta.plugins.bosses.spells.SpellDetectionCircle;
 import com.playmonumenta.plugins.commands.BarkifyHeldItem;
 import com.playmonumenta.plugins.commands.BossFight;
-import com.playmonumenta.plugins.commands.BroadcastCommand;
 import com.playmonumenta.plugins.commands.CalculateReforge;
 import com.playmonumenta.plugins.commands.ClaimRaffle;
 import com.playmonumenta.plugins.commands.ClearPortals;
@@ -53,6 +46,9 @@ import com.playmonumenta.plugins.effects.EffectManager;
 import com.playmonumenta.plugins.enchantments.AttributeManager;
 import com.playmonumenta.plugins.enchantments.EnchantmentManager;
 import com.playmonumenta.plugins.integrations.ChestSortIntegration;
+import com.playmonumenta.plugins.integrations.CoreProtectIntegration;
+import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
+import com.playmonumenta.plugins.integrations.MonumentaNetworkRelayIntegration;
 import com.playmonumenta.plugins.integrations.MonumentaRedisSyncIntegration;
 import com.playmonumenta.plugins.integrations.PlaceholderAPIIntegration;
 import com.playmonumenta.plugins.integrations.luckperms.LuckPermsIntegration;
@@ -86,7 +82,6 @@ import com.playmonumenta.plugins.listeners.VehicleListener;
 import com.playmonumenta.plugins.listeners.WorldListener;
 import com.playmonumenta.plugins.listeners.ZonePropertyListener;
 import com.playmonumenta.plugins.network.HttpManager;
-import com.playmonumenta.plugins.network.SocketManager;
 import com.playmonumenta.plugins.overrides.ItemOverrides;
 import com.playmonumenta.plugins.potion.PotionManager;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
@@ -96,6 +91,12 @@ import com.playmonumenta.plugins.timers.CooldownTimers;
 import com.playmonumenta.plugins.timers.ProjectileEffectTimers;
 import com.playmonumenta.plugins.tracking.TrackingManager;
 import com.playmonumenta.plugins.utils.MetadataUtils;
+
+import org.bukkit.Bukkit;
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
+import org.bukkit.plugin.PluginManager;
+import org.bukkit.plugin.java.JavaPlugin;
 
 public class Plugin extends JavaPlugin {
 	public CooldownTimers mTimers = null;
@@ -116,8 +117,6 @@ public class Plugin extends JavaPlugin {
 	public ItemManager mItemManager;
 	public IndexInventoryManager mIndexInventoryManager;
 	public EffectManager mEffectManager;
-
-	public SocketManager mSocketManager;
 
 	public ItemOverrides mItemOverrides;
 
@@ -157,7 +156,7 @@ public class Plugin extends JavaPlugin {
 		MonumentaReload.register(this);
 		MonumentaDebug.register(this);
 		RestartEmptyCommand.register(this);
-		RedeemVoteRewards.register(this);
+		RedeemVoteRewards.register(this.getLogger());
 		BossFight.register();
 		SpellDetectionCircle.registerCommand(this);
 		SkillDescription.register(this);
@@ -185,10 +184,6 @@ public class Plugin extends JavaPlugin {
 		mAttributeManager = new AttributeManager();
 
 		mJunkItemsListener = new JunkItemListener();
-
-		if (ServerProperties.getBroadcastCommandEnabled()) {
-			BroadcastCommand.register(this);
-		}
 	}
 
 	//  Logic that is performed upon enabling the plugin.
@@ -198,17 +193,6 @@ public class Plugin extends JavaPlugin {
 		PluginManager manager = getServer().getPluginManager();
 
 		mHttpManager.start();
-
-		try {
-			mSocketManager = new SocketManager(this);
-		} catch (Exception ex) {
-			getLogger().warning("Failed to instantiate socket manager: " + ex.getMessage());
-			if (ex instanceof java.net.UnknownHostException) {
-				getLogger().warning("This is expected if running a standalone server");
-			} else {
-				ex.printStackTrace();
-			}
-		}
 
 		mItemOverrides = new ItemOverrides();
 
@@ -326,7 +310,7 @@ public class Plugin extends JavaPlugin {
 
 		// Hook into JeffChestSort for custom chest sorting if present
 		if (Bukkit.getPluginManager().isPluginEnabled("ChestSort")) {
-			manager.registerEvents(new ChestSortIntegration(), this);
+			manager.registerEvents(new ChestSortIntegration(this.getLogger()), this);
 		}
 
 		// Hook into Monumenta Redis Sync for server transfers if available
@@ -334,9 +318,24 @@ public class Plugin extends JavaPlugin {
 			manager.registerEvents(new MonumentaRedisSyncIntegration(this), this);
 		}
 
+		// Hook into Monumenta Network Relay for message brokering if available
+		if (Bukkit.getPluginManager().isPluginEnabled("MonumentaNetworkRelay")) {
+			manager.registerEvents(new MonumentaNetworkRelayIntegration(this.getLogger()), this);
+		}
+
+		// Hook into Library of Souls for mob management if available
+		if (Bukkit.getPluginManager().isPluginEnabled("LibraryOfSouls")) {
+			new LibraryOfSoulsIntegration(this.getLogger());
+		}
+
 		// Provide placeholder API replacements if it is present
 		if (Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI")) {
 			new PlaceholderAPIIntegration(this).register();
+		}
+
+		// Log things in CoreProtect if it is present
+		if (Bukkit.getPluginManager().isPluginEnabled("CoreProtect")) {
+			new CoreProtectIntegration(this.getLogger());
 		}
 
 		// Register luckperms commands if LuckPerms is present
@@ -358,9 +357,6 @@ public class Plugin extends JavaPlugin {
 
 		mTrackingManager.unloadTrackedEntities();
 		mHttpManager.stop();
-		if (mSocketManager != null) {
-			mSocketManager.stop();
-		}
 		mBossManager.unloadAll(true);
 		MetadataUtils.removeAllMetadata(this);
 	}

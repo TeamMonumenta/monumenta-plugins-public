@@ -39,7 +39,7 @@ public class Launch extends GenericCommand {
 		arguments.put("x", new DoubleArgument());
 		arguments.put("y", new DoubleArgument());
 		arguments.put("z", new DoubleArgument());
-        
+
 		new CommandAPICommand("launch")
 		.withPermission(perms)
 		.withArguments(arguments)

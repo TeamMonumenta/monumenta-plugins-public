@@ -64,7 +64,7 @@ public class SocketManager {
 				if (obj == null) {
 					throw new Exception("Failed to parse rabbit message as json: " + message);
 				}
-				if (!obj.has("op") || !obj.get("op").isJsonPrimitive() || !obj.get("op").getAsJsonPrimitive().isString()) {
+				if (!obj.has("channel") || !obj.get("channel").isJsonPrimitive() || !obj.get("channel").getAsJsonPrimitive().isString()) {
 					throw new Exception("Rabbit message missing 'op': " + message);
 				}
 				if (!obj.has("source") || !obj.get("source").isJsonPrimitive() || !obj.get("source").getAsJsonPrimitive().isString()) {
@@ -80,7 +80,7 @@ public class SocketManager {
 				return;
 			}
 
-			String op = obj.get("op").getAsString();
+			String op = obj.get("channel").getAsString();
 			String source = obj.get("source").getAsString();
 			JsonObject data = obj.get("data").getAsJsonObject();
 

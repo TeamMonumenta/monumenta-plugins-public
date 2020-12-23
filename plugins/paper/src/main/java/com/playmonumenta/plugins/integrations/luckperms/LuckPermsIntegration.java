@@ -18,6 +18,7 @@ import me.lucko.luckperms.api.Node;
 
 public class LuckPermsIntegration {
 	public LuckPermsIntegration(Plugin plugin) {
+		plugin.getLogger().info("Enabling LuckPerms integration");
 		LuckPermsApi lp = LuckPerms.getApi();
 
 		CreateGuild.register(plugin, lp);

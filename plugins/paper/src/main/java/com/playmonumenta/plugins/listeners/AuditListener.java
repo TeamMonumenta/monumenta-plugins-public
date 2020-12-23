@@ -7,6 +7,8 @@ import java.util.logging.Logger;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import com.playmonumenta.plugins.integrations.MonumentaNetworkRelayIntegration;
+
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.block.BlockState;
@@ -30,9 +32,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BlockStateMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.loot.Lootable;
-
-import com.playmonumenta.plugins.network.SocketManager;
-import com.playmonumenta.plugins.packets.AuditLogPacket;
 
 public class AuditListener implements Listener {
 	private final Map<HumanEntity, ItemStack> mLastCreativeDestroy = new HashMap<HumanEntity, ItemStack>();
@@ -261,7 +260,6 @@ public class AuditListener implements Listener {
 
 	private void log(@Nonnull String message) {
 		mLogger.info("Audit:" + message);
-
-		SocketManager.sendPacket(new AuditLogPacket(message));
+		MonumentaNetworkRelayIntegration.sendAuditLogMessage(message);
 	}
 }

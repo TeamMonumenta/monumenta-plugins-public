@@ -28,6 +28,7 @@ public class MonumentaRedisSyncIntegration implements Listener {
 	public MonumentaRedisSyncIntegration(Plugin plugin) {
 		mPlugin = plugin;
 		mLogger = plugin.getLogger();
+		mLogger.info("Enabling MonumentaRedisSync integration");
 	}
 
 	@EventHandler(priority = EventPriority.HIGH)
