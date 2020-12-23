@@ -29,6 +29,7 @@ import com.playmonumenta.plugins.commands.GildifyHeldItem;
 import com.playmonumenta.plugins.commands.GiveSoulbound;
 import com.playmonumenta.plugins.commands.HopeifyHeldItem;
 import com.playmonumenta.plugins.commands.InfuseHeldItem;
+import com.playmonumenta.plugins.commands.Launch;
 import com.playmonumenta.plugins.commands.MonumentaDebug;
 import com.playmonumenta.plugins.commands.MonumentaReload;
 import com.playmonumenta.plugins.commands.Portal1;
@@ -167,6 +168,7 @@ public class Plugin extends JavaPlugin {
 		Portal1.register();
 		Portal2.register();
 		ClearPortals.register();
+		Launch.register();
 
 		try {
 			mHttpManager = new HttpManager(this);

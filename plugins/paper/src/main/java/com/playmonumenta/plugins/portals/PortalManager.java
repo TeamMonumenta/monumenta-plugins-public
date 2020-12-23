@@ -83,7 +83,7 @@ public class PortalManager {
 			return;
 		}
 		//Check invalid block
-		if (blockHit.getType() != Material.SMOOTH_STONE && (mCurrentShard.equals("region_2") || mCurrentShard.equals("dev1"))) {
+		if (blockHit.getType() != Material.SMOOTH_STONE) {
 			valid = false;
 		} else if (!blockHit.getType().isSolid()) {
 			valid = false;
@@ -151,7 +151,7 @@ public class PortalManager {
 		}
 
 		//Check invalid block
-		if (adjacent.getType() != Material.SMOOTH_STONE && (mCurrentShard.equals("region_2") || mCurrentShard.equals("dev1"))) {
+		if (adjacent.getType() != Material.SMOOTH_STONE) {
 			return;
 		} else if (!adjacent.getType().isSolid()) {
 			return;
@@ -342,6 +342,8 @@ public class PortalManager {
 			return 421;
 		case "region_2":
 			return 204;
+		case "build":
+			return 278;
 		default:
 			//Dungeon ids
 			return 439;
