@@ -9,28 +9,29 @@ import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 
 public class LibraryOfSoulsIntegration {
-	private static LibraryOfSoulsIntegration INSTANCE = null;
+	private static boolean ENABLED = false;
 
 	public LibraryOfSoulsIntegration(Logger logger) {
 		logger.info("Enabling LibraryOfSouls integration");
+		ENABLED = true;
 	}
 
 	public static Entity summon(Location loc, String soulName) {
-		if (INSTANCE != null) {
+		if (ENABLED) {
 			return LibraryOfSoulsAPI.summon(loc, soulName);
 		}
 		return null;
 	}
 
 	public static Set<String> getSoulNames() {
-		if (INSTANCE != null) {
+		if (ENABLED) {
 			return LibraryOfSoulsAPI.getSoulNames();
 		}
 		return null;
 	}
 
 	public static Set<String> getSoulLocations() {
-		if (INSTANCE != null) {
+		if (ENABLED) {
 			return LibraryOfSoulsAPI.getSoulLocations();
 		}
 		return null;
