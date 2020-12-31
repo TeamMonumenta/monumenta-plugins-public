@@ -324,7 +324,7 @@ public class EntityListener implements Listener {
 			// Make sure to not trigger class abilities off Thorns
 			if (event.getCause() != DamageCause.THORNS) {
 				// Class damage-based abilities only apply to living entities that are not villagers
-				if (damagee instanceof LivingEntity && !(damagee instanceof Villager)) {
+				if (damagee instanceof LivingEntity && (damagee instanceof Player || EntityUtils.isHostileMob(damagee))) {
 					// Apply any damage modifications that items they have may apply.
 					mPlugin.mTrackingManager.mPlayers.onDamage(mPlugin, player, (LivingEntity)damagee, event);
 					if (event.getCause().equals(DamageCause.ENTITY_ATTACK)) {
