@@ -13,7 +13,7 @@ import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
  */
 
 public class CurseOfAnemia implements BaseEnchantment {
-	private static String PROPERTY_NAME = ChatColor.RED + "Curse of Anemia";
+	public static String PROPERTY_NAME = ChatColor.RED + "Curse of Anemia";
 
 	@Override
 	public String getProperty() {
@@ -27,12 +27,25 @@ public class CurseOfAnemia implements BaseEnchantment {
 
 	@Override
 	public void onRegain(Plugin plugin, Player player, int level, EntityRegainHealthEvent event) {
+		int levelOfReduction = level;
+		int sustenanceLevel = plugin.mTrackingManager.mPlayers.getPlayerCustomEnchantLevel(player, Sustenance.class);
+		//If player has both Anemia and Sustenance, only one enchant will boost/reduce depending on the higher level.
+		if ((sustenanceLevel != 0) && (level - sustenanceLevel > 0)) {
+			levelOfReduction = level - sustenanceLevel;
+			reduceHealing(plugin, player, levelOfReduction, event);
+			//If the player only has Anemia, reduce normally.
+		} else if (sustenanceLevel == 0) {
+			reduceHealing(plugin, player, level, event);
+		}
+	}
+
+	public void reduceHealing(Plugin plugin, Player player, int levelOfReduction, EntityRegainHealthEvent event) {
 		double reducedHealth;
 		//Case if player has over 100% reduced hp, make hp gain 0 instead of losing hp
-		if (level >= 10) {
+		if (levelOfReduction >= 10) {
 			reducedHealth = 0;
 		} else {
-			reducedHealth = event.getAmount() * (1 - (0.1 * level));
+			reducedHealth = event.getAmount() * (1 - (0.1 * levelOfReduction));
 		}
 		event.setAmount(reducedHealth);
 	}

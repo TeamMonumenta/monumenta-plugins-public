@@ -183,6 +183,7 @@ public class BossManager implements Listener {
 		mStatelessBosses.put(MistMob.identityTag, (Plugin p, LivingEntity e) -> new MistMob(p, e));
 		mStatelessBosses.put(HookBoss.identityTag, (Plugin p, LivingEntity e) -> new HookBoss(p, e));
 		mStatelessBosses.put(FrostGiantIcicle.identityTag, (Plugin p, LivingEntity e) -> new FrostGiantIcicle(p, e));
+		mStatelessBosses.put(ShiftingBoss.identityTag, (Plugin p, LivingEntity e) -> new ShiftingBoss(p, e));
 
 		/* Stateful bosses have a remembered spawn location and end location where a redstone block is set when they die */
 		mStatefulBosses = new HashMap<String, StatefulBossConstructor>();
@@ -319,6 +320,7 @@ public class BossManager implements Listener {
 		mBossDeserializers.put(HookBoss.identityTag, (Plugin p, LivingEntity e) -> HookBoss.deserialize(p, e));
 		mBossDeserializers.put(FrostGiant.identityTag, (Plugin p, LivingEntity e) -> FrostGiant.deserialize(p, e));
 		mBossDeserializers.put(FrostGiantIcicle.identityTag, (Plugin p, LivingEntity e) -> FrostGiantIcicle.deserialize(p, e));
+		mBossDeserializers.put(ShiftingBoss.identityTag, (Plugin p, LivingEntity e) -> ShiftingBoss.deserialize(p, e));
 
 
 	}
