@@ -8,6 +8,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.entity.ThrownPotion;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.entity.EntityCombustByEntityEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
@@ -106,6 +107,10 @@ public abstract class Ability {
 	//---------------------------------------------------------------------------------------------------------------
 
 	public boolean onStealthAttack(EntityDamageByEntityEvent event) {
+		return true;
+	}
+
+	public boolean blockBreakEvent(BlockBreakEvent event) {
 		return true;
 	}
 

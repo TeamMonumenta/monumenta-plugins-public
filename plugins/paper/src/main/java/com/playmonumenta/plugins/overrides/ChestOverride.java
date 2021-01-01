@@ -8,7 +8,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.Chest;
@@ -23,11 +22,10 @@ import org.bukkit.util.Vector;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.utils.ChestUtils;
-import com.playmonumenta.plugins.utils.CommandUtils;
+import com.playmonumenta.plugins.utils.DelvesUtils;
 import com.playmonumenta.plugins.utils.GraveUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.plugins.utils.ScoreboardUtils;
 
 import net.md_5.bungee.api.ChatColor;
 
@@ -99,7 +97,7 @@ public class ChestOverride extends BaseOverride {
 		if (player == null) {
 			return true;
 		} else if (player.getGameMode() != GameMode.SPECTATOR) {
-			ChestUtils.replaceWithDelveLootTable(player, block);
+			DelvesUtils.setDelveLootTable(player, block);
 			return true;
 		}
 
@@ -142,7 +140,7 @@ public class ChestOverride extends BaseOverride {
 		}
 
 		ChestUtils.chestScalingLuck(plugin, player, block);
-		ChestUtils.replaceWithDelveLootTable(player, block);
+		DelvesUtils.setDelveLootTable(player, block);
 
 		return true;
 	}
@@ -171,7 +169,7 @@ public class ChestOverride extends BaseOverride {
 		//Runs replacement with closest player
 		if (players.size() > 0 && players.get(0) != null) {
 			ChestUtils.chestScalingLuck(plugin, players.get(0), block);
-			ChestUtils.replaceWithDelveLootTable(players.get(0), block);
+			DelvesUtils.setDelveLootTable(players.get(0), block);
 		}
 
 		return true;

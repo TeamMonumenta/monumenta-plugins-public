@@ -1,124 +1,131 @@
 package com.playmonumenta.plugins.abilities.delves;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+
+import org.bukkit.attribute.Attributable;
 import org.bukkit.attribute.Attribute;
-import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.attribute.AttributeModifier;
+import org.bukkit.attribute.AttributeModifier.Operation;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
+import org.bukkit.event.entity.EntitySpawnEvent;
 
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.server.properties.ServerProperties;
+import com.playmonumenta.plugins.utils.DelvesUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.FastUtils;
 
-public class StatMultiplier extends Ability {
+public class StatMultiplier extends DelveModifier {
 
-	private static final String HEALTH_MODIFIER_NAME = "DelvesHealthModifier";
-	private static final String SPEED_MODIFIER_NAME = "DelvesSpeedModifier";
-	private static final String AVOID_MODIFIERS = "boss_delveimmune";
+	private static final String STAT_MULTIPLIER_MODIFIER_NAME = "DelveStatMultiplier";
+	private static final double STAT_MULTIPLIER_INCREMENT = 0.04;
+	private static final Map<String, Double> STAT_COMPENSATION_MAPPINGS = new HashMap<>();
 
-	private final double mDamageTakenMultiplier;
-	private final double mAbilityDamageTakenMultiplier;
+	protected static final String DELVE_MOB_TAG = "delve_mob";
+	private static final double DELVE_MOB_STAT_MULTIPLIER_R1 = 0.6;
+	private static final double DELVE_MOB_STAT_MULTIPLIER_R2 = 1;
+	private static final String DELVE_MOB_HEALTH_MODIFIER_NAME = "DelveMobHealthModifier";
 
-	private final double mMobHealthMultiplier;
-	private final double mMobSpeedMultiplier;
-
-	private final String[] mMobAbilityPool;
-	private final double mMobAbilityChance;
-
-	public StatMultiplier(Plugin plugin, Player player,
-			double damageTakenMultiplier, double abilityDamageTakenMultiplier, double mobHealthMultiplier) {
-		this(plugin, player,
-				damageTakenMultiplier, abilityDamageTakenMultiplier, mobHealthMultiplier,
-				1, null, 0);
+	static {
+		STAT_COMPENSATION_MAPPINGS.put("white", 1.6);
+		STAT_COMPENSATION_MAPPINGS.put("orange", 1.6);
+		STAT_COMPENSATION_MAPPINGS.put("magenta", 1.4);
+		STAT_COMPENSATION_MAPPINGS.put("lightblue", 1.1);
+		STAT_COMPENSATION_MAPPINGS.put("yellow", 1.0);
+		STAT_COMPENSATION_MAPPINGS.put("willows", 1.1);
+		STAT_COMPENSATION_MAPPINGS.put("reverie", 0.9);
+		STAT_COMPENSATION_MAPPINGS.put("lime", 1.6);
+		STAT_COMPENSATION_MAPPINGS.put("pink", 1.4);
+		STAT_COMPENSATION_MAPPINGS.put("gray", 1.4);
+		STAT_COMPENSATION_MAPPINGS.put("lightgray", 1.1);
+		STAT_COMPENSATION_MAPPINGS.put("cyan", 1.1);
+		STAT_COMPENSATION_MAPPINGS.put("purple", 1.0);
+		STAT_COMPENSATION_MAPPINGS.put("teal", 0.9);
+		STAT_COMPENSATION_MAPPINGS.put("shiftingcity", 0.9);
+		STAT_COMPENSATION_MAPPINGS.put("dev1", 1.0);
+		STAT_COMPENSATION_MAPPINGS.put("dev2", 1.0);
+		STAT_COMPENSATION_MAPPINGS.put("mobs", 1.0);
 	}
 
-	public StatMultiplier(Plugin plugin, Player player,
-			double damageTakenMultiplier, double abilityDamageTakenMultiplier,
-			double mobHealthMultiplier, double mobSpeedMultiplier) {
-		this(plugin, player,
-				damageTakenMultiplier, abilityDamageTakenMultiplier, mobHealthMultiplier, mobSpeedMultiplier,
-				null, 0);
-	}
+	private final double mStatCompensation;
+	private final double mStatMultiplier;
+	private final double mDelveMobStatMultiplier;
 
-	public StatMultiplier(Plugin plugin, Player player,
-			double damageTakenMultiplier, double abilityDamageTakenMultiplier,
-			double mobHealthMultiplier, String[] mobAbilitiesPool, double mobAbilitiesChance) {
-		this(plugin, player,
-				damageTakenMultiplier, abilityDamageTakenMultiplier, mobHealthMultiplier, 1,
-				mobAbilitiesPool, mobAbilitiesChance);
-	}
-
-	public StatMultiplier(Plugin plugin, Player player,
-			double damageTakenMultiplier, double abilityDamageTakenMultiplier,
-			double mobHealthMultiplier, double mobSpeedMultiplier, String[] mobAbilityPool, double mobAbilityChance) {
+	public StatMultiplier(Plugin plugin, Player player) {
 		super(plugin, player, null);
-		mInfo.mIgnoreTriggerCap = true;
 
-		mDamageTakenMultiplier = damageTakenMultiplier;
-		mAbilityDamageTakenMultiplier = abilityDamageTakenMultiplier;
+		Double statCompensation = STAT_COMPENSATION_MAPPINGS.get(ServerProperties.getShardName());
+		mStatCompensation = statCompensation == null ? 1 : statCompensation;
 
-		mMobHealthMultiplier = mobHealthMultiplier;
-		mMobSpeedMultiplier = mobSpeedMultiplier;
+		mStatMultiplier = getStatMultiplier(DelvesUtils.getDelveInfo(player).getDepthPoints());
 
-		mMobAbilityPool = mobAbilityPool;
-		mMobAbilityChance = mobAbilityChance;
+		mDelveMobStatMultiplier = ServerProperties.getClassSpecializationsEnabled()
+				? DELVE_MOB_STAT_MULTIPLIER_R2 : DELVE_MOB_STAT_MULTIPLIER_R1;
+	}
+
+	public static double getStatCompensation(String dungeon) {
+		return STAT_COMPENSATION_MAPPINGS.get(dungeon);
+	}
+
+	public static double getStatMultiplier(int depthPoints) {
+		return 1 + Math.min(DelvesUtils.getLootCapDepthPoints(9001), depthPoints) * STAT_MULTIPLIER_INCREMENT;
+	}
+
+	public static boolean canUseStatic(Player player) {
+		return DelvesUtils.getDelveInfo(player).getDepthPoints() > 0;
 	}
 
 	@Override
-	public boolean playerDamagedByLivingEntityEvent(EntityDamageByEntityEvent event) {
-		if (event.getCause() == DamageCause.CUSTOM && (event.getDamager().getScoreboardTags() == null || !event.getDamager().getScoreboardTags().contains(AVOID_MODIFIERS))) {
-			event.setDamage(EntityUtils.getDamageApproximation(event, mAbilityDamageTakenMultiplier));
-		} else if (event.getDamager().getScoreboardTags() == null || !event.getDamager().getScoreboardTags().contains(AVOID_MODIFIERS)) {
-			event.setDamage(EntityUtils.getDamageApproximation(event, mDamageTakenMultiplier));
-		}
-
-		return true;
+	public boolean canUse(Player player) {
+		return canUseStatic(player);
 	}
 
 	@Override
-	public boolean playerDamagedByProjectileEvent(EntityDamageByEntityEvent event) {
-		if (event.getDamager().getScoreboardTags() == null || !event.getDamager().getScoreboardTags().contains(AVOID_MODIFIERS)) {
-			event.setDamage(EntityUtils.getDamageApproximation(event, mDamageTakenMultiplier));
-		}
-
-		return true;
+	protected void playerTookCustomDamageEvent(EntityDamageByEntityEvent event) {
+		modifyDamage(event.getDamager(), event);
 	}
 
-	public void applyOnSpawnModifiers(LivingEntity mob) {
-		if (!EntityUtils.isHostileMob(mob)) {
-			return;
+	@Override
+	protected void playerTookMeleeDamageEvent(EntityDamageByEntityEvent event) {
+		modifyDamage(event.getDamager(), event);
+	}
+
+	@Override
+	protected void playerTookProjectileDamageEvent(Entity source, EntityDamageByEntityEvent event) {
+		modifyDamage(source, event);
+	}
+
+	private void modifyDamage(Entity source, EntityDamageByEntityEvent event) {
+		Set<String> tags = source.getScoreboardTags();
+		if (tags != null && tags.contains(DELVE_MOB_TAG) || event.getCause() == DamageCause.CUSTOM) {
+			event.setDamage(event.getDamage() * mDelveMobStatMultiplier);
+		} else {
+			event.setDamage(EntityUtils.getDamageApproximation(event, mStatCompensation));
 		}
 
-		// Good candidate for property detection since both the speed and ability modifiers have health modifiers
-		boolean hasProperties = false;
-		AttributeInstance health = mob.getAttribute(Attribute.GENERIC_MAX_HEALTH);
-		for (AttributeModifier mod : health.getModifiers()) {
-			if (mod != null && mod.getName().equals(HEALTH_MODIFIER_NAME)) {
-				hasProperties = true;
-				break;
-			}
-		}
+		event.setDamage(EntityUtils.getDamageApproximation(event, mStatMultiplier));
+	}
 
-		if (!hasProperties && (mob.getScoreboardTags() == null || !mob.getScoreboardTags().contains(AVOID_MODIFIERS))) {
-			// Health
+	@Override
+	public void applyModifiers(LivingEntity mob, EntitySpawnEvent event) {
+		if (mob instanceof Attributable) {
+			double healthProportion = Math.min(1, mob.getHealth() / mob.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue());
+
 			EntityUtils.addAttribute(mob, Attribute.GENERIC_MAX_HEALTH,
-			                         new AttributeModifier(HEALTH_MODIFIER_NAME, mMobHealthMultiplier - 1, AttributeModifier.Operation.MULTIPLY_SCALAR_1));
-			// Scale the mobs health up to their maximum health
-			mob.setHealth(Math.min(health.getValue(), mob.getHealth() * mMobHealthMultiplier));
+					new AttributeModifier(STAT_MULTIPLIER_MODIFIER_NAME, mStatMultiplier * mStatCompensation - 1, Operation.MULTIPLY_SCALAR_1));
 
-			// Speed
-			EntityUtils.addAttribute(mob, Attribute.GENERIC_MOVEMENT_SPEED,
-			                         new AttributeModifier(SPEED_MODIFIER_NAME, mMobSpeedMultiplier - 1, AttributeModifier.Operation.MULTIPLY_SCALAR_1));
-
-			// Abilities
-			if (FastUtils.RANDOM.nextDouble() < mMobAbilityChance) {
-				// This runs prior to BossManager parsing, so we can just add tags directly
-				mob.addScoreboardTag("boss_blastresist");
-				mob.addScoreboardTag(mMobAbilityPool[FastUtils.RANDOM.nextInt(mMobAbilityPool.length)]);
+			Set<String> tags = mob.getScoreboardTags();
+			if (tags != null && tags.contains(DELVE_MOB_TAG)) {
+				EntityUtils.addAttribute(mob, Attribute.GENERIC_MAX_HEALTH,
+						new AttributeModifier(DELVE_MOB_HEALTH_MODIFIER_NAME, mDelveMobStatMultiplier - 1, Operation.MULTIPLY_SCALAR_1));
 			}
+
+			mob.setHealth(healthProportion * mob.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue());
 		}
 	}
 

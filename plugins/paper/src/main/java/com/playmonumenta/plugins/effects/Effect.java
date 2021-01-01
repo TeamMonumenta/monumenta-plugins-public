@@ -64,5 +64,6 @@ public abstract class Effect implements Comparable<Effect> {
 	}
 
 	/* Must implement this method to print info about what the effect does for debug */
+	@Override
 	public abstract String toString();
 }

@@ -44,6 +44,7 @@ import org.bukkit.entity.Wither;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockExplodeEvent;
 import org.bukkit.event.entity.AreaEffectCloudApplyEvent;
 import org.bukkit.event.entity.EntityChangeBlockEvent;
@@ -1038,6 +1039,13 @@ public class EntityListener implements Listener {
 
 		// When sheep eat grass outside of plots, do not change to dirt
 		if (event.getEntity() instanceof Sheep && !ZoneUtils.inPlot(event.getBlock().getLocation(), ServerProperties.getIsTownWorld())) {
+			event.setCancelled(true);
+		}
+	}
+
+	@EventHandler
+	public void blockBreakEvent(BlockBreakEvent event) {
+		if (!mAbilities.blockBreakEvent(event.getPlayer(), event)) {
 			event.setCancelled(true);
 		}
 	}

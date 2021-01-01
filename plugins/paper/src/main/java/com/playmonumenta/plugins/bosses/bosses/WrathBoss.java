@@ -6,6 +6,8 @@ import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
+import org.bukkit.attribute.Attributable;
+import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -122,6 +124,15 @@ public class WrathBoss extends BossAbilityGroup {
 					}, null, null),
 			new SpellDuelist(plugin, boss, COOLDOWN, DAMAGE)
 		));
+
+		new BukkitRunnable() {
+			@Override
+			public void run() {
+				if (mBoss instanceof Attributable) {
+					mBoss.getAttribute(Attribute.GENERIC_KNOCKBACK_RESISTANCE).setBaseValue(1);
+				}
+			}
+		}.runTaskLater(plugin, 1);
 
 		super.constructBoss(plugin, identityTag, mBoss, activeSpells, null, detectionRange, null);
 	}

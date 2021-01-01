@@ -7,6 +7,7 @@ import java.util.List;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Sound;
+import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
@@ -22,6 +23,16 @@ import com.playmonumenta.plugins.utils.PlayerUtils;
 
 public class SpellBombToss extends Spell {
 
+	@FunctionalInterface
+	public interface ExplodeAction {
+		/**
+		 * Optional custom explosion code to replace the TNT explosion
+		 * @param tnt    TNT entity at the explosion (useful for line of sight calculations)
+		 * @param loc    Location of the explosion
+		 */
+		void run(World world, TNTPrimed tnt, Location loc);
+	}
+
 	private final Plugin mPlugin;
 	private final LivingEntity mBoss;
 	private final int mRange;
@@ -30,6 +41,7 @@ public class SpellBombToss extends Spell {
 	private final int mFuse;
 	private final boolean mSetFire;
 	private final boolean mBreakBlocks;
+	private final ExplodeAction mExplodeAction;
 
 	private final List<TNTPrimed> mTNTList = new ArrayList<TNTPrimed>();
 
@@ -46,6 +58,19 @@ public class SpellBombToss extends Spell {
 		mFuse = fuse;
 		mSetFire = setFire;
 		mBreakBlocks = breakBlocks;
+		mExplodeAction = null;
+	}
+
+	public SpellBombToss(Plugin plugin, LivingEntity boss, int range, int lobs, int fuse, ExplodeAction explodeAction) {
+		mPlugin = plugin;
+		mBoss = boss;
+		mRange = range;
+		mYield = 0;
+		mLobs = lobs;
+		mFuse = fuse;
+		mSetFire = false;
+		mBreakBlocks = false;
+		mExplodeAction = explodeAction;
 	}
 
 	@Override
@@ -115,7 +140,11 @@ public class SpellBombToss extends Spell {
 				TNTPrimed mTnt = tnt;
 				@Override
 				public void run() {
-					mBoss.getLocation().getWorld().createExplosion(mTnt.getLocation(), mYield, mSetFire, mBreakBlocks, mBoss);
+					if (mExplodeAction == null) {
+						mBoss.getLocation().getWorld().createExplosion(mTnt.getLocation(), mYield, mSetFire, mBreakBlocks, mBoss);
+					} else {
+						mExplodeAction.run(mTnt.getWorld(), mTnt, mTnt.getLocation());
+					}
 				}
 			};
 			explosion.runTaskLater(mPlugin, mFuse);

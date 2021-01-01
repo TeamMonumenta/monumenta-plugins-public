@@ -1,38 +1,43 @@
 package com.playmonumenta.plugins.abilities;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
-import com.playmonumenta.scriptedquests.utils.MessagingUtils;
-
-import org.bukkit.entity.Player;
-
-import net.md_5.bungee.api.ChatColor;
+import com.playmonumenta.plugins.abilities.delves.DelveModifier;
 
 public class AbilityCollection {
+
+	// This map contains all abilities, including delve modifiers
 	private final Map<Class<? extends Ability>, Ability> mAbilities = new LinkedHashMap<>();
-	private final Player mPlayer;
 
-	/* TODO: This should persist across relog so players can't skip it easily */
-	private int mSilencedUntil = 0;
+	/*
+	 * This map just contains delve modifiers for when the player is silenced
+	 *
+	 * Delve modifiers should probably not be piggybacking off the abilities
+	 * system, but that's a problem for another day
+	 */
+	private final Map<Class<? extends Ability>, Ability> mDelveModifiers = new LinkedHashMap<>();
 
-	public AbilityCollection(Player player, List<Ability> abilities) {
-		mPlayer = player;
+	private boolean mIsSilenced = false;
+
+	public AbilityCollection(List<Ability> abilities) {
 		for (Ability ability : abilities) {
 			mAbilities.put(ability.getClass(), ability);
+
+			if (ability instanceof DelveModifier) {
+				mDelveModifiers.put(ability.getClass(), ability);
+			}
 		}
 	}
 
 	public Collection<Ability> getAbilities() {
-		if (mPlayer.getTicksLived() < mSilencedUntil) {
-			MessagingUtils.sendActionBarMessage(mPlayer, ChatColor.DARK_RED, false, "You are silenced! You cannot use abilites for " + (mSilencedUntil - mPlayer.getTicksLived()) / 20 + "s");
+		if (mIsSilenced) {
 			// A silenced player has no abilities
-			return Collections.emptySet();
+			return mDelveModifiers.values();
 		} else {
 			return mAbilities.values();
 		}
@@ -40,11 +45,11 @@ public class AbilityCollection {
 
 	@SuppressWarnings("unchecked")
 	public <T extends Ability> T getAbility(Class<T> cls) {
-		if (mPlayer.getTicksLived() < mSilencedUntil) {
+		if (mIsSilenced) {
 			// A silenced player has no abilities
-			return null;
+			return (T) mDelveModifiers.get(cls);
 		} else {
-			return (T)mAbilities.get(cls);
+			return (T) mAbilities.get(cls);
 		}
 	}
 
@@ -58,13 +63,12 @@ public class AbilityCollection {
 		return playerAbilities;
 	}
 
-	/* Silence a player for this many ticks */
-	public void silence(int tickDuration) {
-		mSilencedUntil = mPlayer.getTicksLived() + tickDuration;
+	public void silence() {
+		mIsSilenced = true;
 	}
 
-	/* Silence a player for this many ticks */
 	public void unsilence() {
-		mSilencedUntil = 0;
+		mIsSilenced = false;
 	}
+
 }

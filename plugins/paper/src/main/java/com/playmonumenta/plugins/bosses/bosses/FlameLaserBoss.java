@@ -32,8 +32,8 @@ public class FlameLaserBoss extends BossAbilityGroup {
 			new SpellBaseLaser(plugin, boss, detectionRange, 100, false, false, 160,
 					// Tick action per player
 					(Player player, int ticks, boolean blocked) -> {
-						player.playSound(player.getLocation(), Sound.UI_TOAST_IN, 2, 0.5f + (ticks / 80f) * 1.5f);
-						boss.getLocation().getWorld().playSound(boss.getLocation(), Sound.UI_TOAST_IN, 2, 0.5f + (ticks / 80f) * 1.5f);
+						player.playSound(player.getLocation(), Sound.UI_TOAST_IN, 0.5f, 0.5f + (ticks / 80f) * 1.5f);
+						boss.getLocation().getWorld().playSound(boss.getLocation(), Sound.UI_TOAST_IN, 1f, 0.5f + (ticks / 80f) * 1.5f);
 						if (ticks == 0) {
 							boss.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 110, 4));
 						}

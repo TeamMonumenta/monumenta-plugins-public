@@ -41,6 +41,15 @@ public class SpellBaseTrail extends Spell {
 		void run(World world, Player player, Location loc);
 	}
 
+	@FunctionalInterface
+	public interface ExpireAction {
+		/**
+		 * Called when a trail node intersects a player
+		 * @param loc    Location of the trail node
+		 */
+		void run(World world, Location loc);
+	}
+
 	private final LivingEntity mBoss;
 	private final World mWorld;
 	private final int mTickRate;
@@ -51,6 +60,7 @@ public class SpellBaseTrail extends Spell {
 	private final double mHitboxLength;
 	private final AestheticAction mTrailAesthetic;
 	private final HitAction mHitAction;
+	private final ExpireAction mExpireAction;
 
 	private final Map<Location, TrailNode> mTrailNodes = new HashMap<Location, TrailNode>();
 
@@ -61,24 +71,25 @@ public class SpellBaseTrail extends Spell {
 	 * @param tickRate            How many ticks to wait between updates (trail creation, particles, etc.) - should divide trailRate
 	 * @param trailRate           How many ticks to wait between dropping trail nodes (must be multiple of 2)
 	 * @param trailDuration       How many ticks before a trail node expires (must be multiple of 2)
-	 * @param trailConsumed       Whether or not trail nodes should be removed when they hit a player
 	 * @param trailGroundOnly     Whether or not trail nodes should only be laid on the ground
+	 * @param trailConsumed       Whether or not trail nodes should be removed when they hit a player
 	 * @param hitboxLength        Length of trail node hitboxes
 	 * @param trailAesthetic      Called every two ticks at each trail node
 	 * @param hitAction           Called when a trail node intersects a player
 	 */
 	public SpellBaseTrail(LivingEntity boss, int tickRate, int trailRate, int trailDuration, boolean trailGroundOnly, boolean trailConsumed,
-			double hitboxLength, AestheticAction trailAesthetic, HitAction hitAction) {
+			double hitboxLength, AestheticAction trailAesthetic, HitAction hitAction, ExpireAction expireAction) {
 		mBoss = boss;
 		mWorld = boss.getWorld();
 		mTickRate = tickRate;
 		mTrailRate = trailRate;
 		mTrailDuration = trailDuration;
-		mTrailConsumed = trailConsumed;
 		mTrailGroundOnly = trailGroundOnly;
+		mTrailConsumed = trailConsumed;
 		mHitboxLength = hitboxLength;
 		mTrailAesthetic = trailAesthetic;
 		mHitAction = hitAction;
+		mExpireAction = expireAction;
 	}
 
 	@Override
@@ -99,6 +110,7 @@ public class SpellBaseTrail extends Spell {
 			mTrailAesthetic.run(mWorld, entry.getKey());
 			node.mDurationRemaining -= mTickRate;
 			if (node.mDurationRemaining <= 0) {
+				mExpireAction.run(mWorld, entry.getKey());
 				iterAesthetic.remove();
 			}
 		}

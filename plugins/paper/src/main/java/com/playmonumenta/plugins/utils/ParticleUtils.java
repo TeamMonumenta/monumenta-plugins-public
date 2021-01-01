@@ -25,6 +25,7 @@ public class ParticleUtils {
 		new BukkitRunnable() {
 			double mCurrentRadius = 0;
 
+			@Override
 			public void run() {
 				mCurrentRadius += radius / ticks;
 
@@ -51,12 +52,17 @@ public class ParticleUtils {
 	}
 
 	public static void explodingConeEffect(Plugin plugin, LivingEntity entity, float radius, Particle type1, double percent1, Particle type2, double percent2, double dotAngle) {
+		explodingConeEffect(plugin, entity, entity.getEyeLocation().getDirection().setY(0).normalize(), radius, type1, percent1, type2, percent2, dotAngle);
+	}
+
+	public static void explodingConeEffect(Plugin plugin, LivingEntity entity, Vector dir, float radius, Particle type1, double percent1, Particle type2, double percent2, double dotAngle) {
 		new BukkitRunnable() {
 			double mCurrentRadius = Math.PI / 4;
 			Location mLoc = entity.getLocation();
 			World mWorld = mLoc.getWorld();
-			Vector mDirection = entity.getEyeLocation().getDirection().setY(0).normalize();
+			Vector mDirection = dir.setY(0).normalize();
 
+			@Override
 			public void run() {
 				mCurrentRadius = mCurrentRadius + 0.25 * Math.PI;
 				for (double theta = 0; theta <= 2 * Math.PI; theta = theta + Math.PI / 64) {

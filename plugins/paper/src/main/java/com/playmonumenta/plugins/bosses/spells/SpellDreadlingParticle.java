@@ -16,7 +16,7 @@ public class SpellDreadlingParticle extends Spell {
 
 	@Override
 	public void run() {
-		mWorld.spawnParticle(Particle.SMOKE_LARGE, mBoss.getLocation().add(0, 0.5, 0), 5, 0.25, 0.15, 0.25, 0);
+		mWorld.spawnParticle(Particle.SMOKE_LARGE, mBoss.getLocation().add(0, 0.5, 0), 7, 0.3, 0.15, 0.3, 0);
 	}
 
 	@Override

@@ -6,14 +6,14 @@ import org.bukkit.Particle;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 
-public class SpellSpectreParticle extends Spell {
+public class SpellSpecterParticle extends Spell {
 
 	private static final Particle.DustOptions SPECTRAL_COLOR = new Particle.DustOptions(Color.fromRGB(0, 0, 0), 1.0f);
 
 	private final World mWorld;
 	private final LivingEntity mBoss;
 
-	public SpellSpectreParticle(LivingEntity boss) {
+	public SpellSpecterParticle(LivingEntity boss) {
 		mWorld = boss.getWorld();
 		mBoss = boss;
 	}

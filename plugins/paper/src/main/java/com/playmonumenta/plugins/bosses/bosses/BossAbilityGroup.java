@@ -24,6 +24,7 @@ import com.playmonumenta.plugins.bosses.BossManager;
 import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.events.SpellCastEvent;
 import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.events.CustomEffectApplyEvent;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.SerializationUtils;
 
@@ -258,6 +259,10 @@ public abstract class BossAbilityGroup {
 	}
 
 	public void bossChangedTarget(EntityTargetEvent event) {
+
+	}
+
+	public void customEffectAppliedToBoss(CustomEffectApplyEvent event) {
 
 	}
 

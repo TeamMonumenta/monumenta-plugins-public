@@ -33,8 +33,7 @@ import org.bukkit.potion.PotionType;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.AbilityCollection;
-import com.playmonumenta.plugins.abilities.AbilityManager;
+import com.playmonumenta.plugins.effects.AbilitySilence;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 
 public class AbilityUtils {
@@ -135,14 +134,14 @@ public class AbilityUtils {
 		}
 	}
 
+	private static final String ABILITY_SILENCE_EFFECT_NAME = "AbilitySilence";
+
 	public static void silencePlayer(Player player, int tickDuration) {
-		AbilityCollection abilities = AbilityManager.getManager().getPlayerAbilities(player);
-		abilities.silence(tickDuration);
+		Plugin.getInstance().mEffectManager.addEffect(player, ABILITY_SILENCE_EFFECT_NAME, new AbilitySilence(tickDuration));
 	}
 
 	public static void unsilencePlayer(Player player) {
-		AbilityCollection abilities = AbilityManager.getManager().getPlayerAbilities(player);
-		abilities.unsilence();
+		Plugin.getInstance().mEffectManager.clearEffects(player, ABILITY_SILENCE_EFFECT_NAME);
 	}
 
 	private static ItemStack getAlchemistPotion() {

@@ -8,6 +8,9 @@ import org.bukkit.plugin.Plugin;
 
 import com.playmonumenta.plugins.bosses.spells.CrowdControlImmunity;
 import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.effects.Effect;
+import com.playmonumenta.plugins.effects.PercentSpeed;
+import com.playmonumenta.plugins.events.CustomEffectApplyEvent;
 
 public class CrowdControlImmunityBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_ccimmune";
@@ -26,7 +29,15 @@ public class CrowdControlImmunityBoss extends BossAbilityGroup {
 			new CrowdControlImmunity(mBoss)
 		);
 
-		mBoss.setRemoveWhenFarAway(false);
 		super.constructBoss(plugin, identityTag, mBoss, null, passiveSpells, detectionRange, null);
+	}
+
+	@Override
+	public void customEffectAppliedToBoss(CustomEffectApplyEvent event) {
+		Effect effect = event.getEffect();
+
+		if (effect.getClass() == PercentSpeed.class && effect.getMagnitude() < 0) {
+			effect.setDuration(0);
+		}
 	}
 }

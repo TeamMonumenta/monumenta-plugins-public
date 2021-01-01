@@ -32,6 +32,7 @@ public class SeekingProjectileBoss extends BossAbilityGroup {
 	private static final boolean COLLIDES_WITH_BLOCKS = true;
 	private static final boolean LINGERS = true;
 	private static final int DAMAGE = 20;
+	private static final int FIRE_DURATION = 20 * 5;
 
 	LivingEntity mBoss;
 
@@ -69,6 +70,7 @@ public class SeekingProjectileBoss extends BossAbilityGroup {
 						world.spawnParticle(Particle.FLAME, loc, 50, 0, 0, 0, 0.25);
 						if (player != null) {
 							BossUtils.bossDamage(boss, player, DAMAGE);
+							player.setFireTicks(FIRE_DURATION);
 						}
 					})
 		));

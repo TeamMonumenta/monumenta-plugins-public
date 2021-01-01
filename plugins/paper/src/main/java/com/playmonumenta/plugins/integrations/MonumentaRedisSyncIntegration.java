@@ -2,14 +2,6 @@ package com.playmonumenta.plugins.integrations;
 
 import java.util.logging.Logger;
 
-import com.google.gson.JsonObject;
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.listeners.DelvesListener;
-import com.playmonumenta.plugins.utils.InventoryUtils;
-import com.playmonumenta.redissync.MonumentaRedisSyncAPI;
-import com.playmonumenta.redissync.event.PlayerSaveEvent;
-import com.playmonumenta.redissync.event.PlayerServerTransferEvent;
-
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
@@ -18,6 +10,13 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+
+import com.google.gson.JsonObject;
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.redissync.MonumentaRedisSyncAPI;
+import com.playmonumenta.redissync.event.PlayerSaveEvent;
+import com.playmonumenta.redissync.event.PlayerServerTransferEvent;
 
 public class MonumentaRedisSyncIntegration implements Listener {
 	private static final String IDENTIFIER = "Monumenta";
@@ -35,7 +34,6 @@ public class MonumentaRedisSyncIntegration implements Listener {
 	public void playerServerTransferEvent(PlayerServerTransferEvent event) {
 		Player player = event.getPlayer();
 		mLogger.info("PlayerTransferEvent: Player: " + player + "   Target: " + event.getTarget());
-		DelvesListener.onTransfer(player, event.getTarget());
 		Plugin.getInstance().mEffectManager.clearEffects(player);
 
 		player.closeInventory();

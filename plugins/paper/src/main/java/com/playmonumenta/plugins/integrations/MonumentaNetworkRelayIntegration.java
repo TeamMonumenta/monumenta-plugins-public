@@ -3,21 +3,20 @@ package com.playmonumenta.plugins.integrations;
 import java.util.UUID;
 import java.util.logging.Logger;
 
+import org.bukkit.ChatColor;
+import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.Listener;
+
 import com.google.gson.JsonObject;
 import com.playmonumenta.networkrelay.NetworkRelayAPI;
 import com.playmonumenta.networkrelay.NetworkRelayMessageEvent;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.commands.ClaimRaffle;
 import com.playmonumenta.plugins.commands.RedeemVoteRewards;
-import com.playmonumenta.plugins.listeners.DelvesListener;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.redissync.event.PlayerServerTransferEvent;
-
-import org.bukkit.ChatColor;
-import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
-import org.bukkit.event.Listener;
 
 public class MonumentaNetworkRelayIntegration implements Listener {
 	public static final String AUDIT_LOG_CHANNEL = "Monumenta.Automation.AuditLog";
@@ -37,7 +36,6 @@ public class MonumentaNetworkRelayIntegration implements Listener {
 	public void playerServerTransferEvent(PlayerServerTransferEvent event) {
 		Player player = event.getPlayer();
 		mLogger.info("PlayerTransferEvent: Player: " + player + "   Target: " + event.getTarget());
-		DelvesListener.onTransfer(player, event.getTarget());
 		Plugin.getInstance().mEffectManager.clearEffects(player);
 
 		player.closeInventory();

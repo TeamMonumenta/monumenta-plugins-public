@@ -81,6 +81,9 @@ public class SpellTpBehindTargetedPlayer extends Spell {
 							world.spawnParticle(Particle.SMOKE_LARGE, loc, 12, 0, 0.45, 0, 0.125);
 
 							mLauncher.teleport(locTest);
+							if (mLauncher instanceof Mob) {
+								((Mob) mLauncher).setTarget(target);
+							}
 
 							locTest.add(0, mLauncher.getHeight() / 2, 0);
 							world.spawnParticle(Particle.SPELL_WITCH, locTest, 30, 0.25, 0.45, 0.25, 1);

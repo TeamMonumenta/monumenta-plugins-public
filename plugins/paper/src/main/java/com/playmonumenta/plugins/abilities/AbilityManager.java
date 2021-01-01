@@ -19,6 +19,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.entity.ThrownPotion;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.entity.EntityCombustByEntityEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
@@ -68,14 +69,21 @@ import com.playmonumenta.plugins.abilities.cleric.hierophant.ThuribleProcession;
 import com.playmonumenta.plugins.abilities.cleric.paladin.ChoirBells;
 import com.playmonumenta.plugins.abilities.cleric.paladin.HolyJavelin;
 import com.playmonumenta.plugins.abilities.cleric.paladin.LuminousInfusion;
-import com.playmonumenta.plugins.abilities.delves.cursed.Mystic;
-import com.playmonumenta.plugins.abilities.delves.cursed.Ruthless;
-import com.playmonumenta.plugins.abilities.delves.cursed.Spectral;
-import com.playmonumenta.plugins.abilities.delves.cursed.Unyielding;
-import com.playmonumenta.plugins.abilities.delves.twisted.Arcanic;
-import com.playmonumenta.plugins.abilities.delves.twisted.Dreadful;
-import com.playmonumenta.plugins.abilities.delves.twisted.Merciless;
-import com.playmonumenta.plugins.abilities.delves.twisted.Relentless;
+import com.playmonumenta.plugins.abilities.delves.Arcanic;
+import com.playmonumenta.plugins.abilities.delves.Bloodthirsty;
+import com.playmonumenta.plugins.abilities.delves.Colossal;
+import com.playmonumenta.plugins.abilities.delves.Despair;
+import com.playmonumenta.plugins.abilities.delves.Dreadful;
+import com.playmonumenta.plugins.abilities.delves.Entropy;
+import com.playmonumenta.plugins.abilities.delves.Infernal;
+import com.playmonumenta.plugins.abilities.delves.Legionary;
+import com.playmonumenta.plugins.abilities.delves.Pernicious;
+import com.playmonumenta.plugins.abilities.delves.Relentless;
+import com.playmonumenta.plugins.abilities.delves.Spectral;
+import com.playmonumenta.plugins.abilities.delves.StatMultiplier;
+import com.playmonumenta.plugins.abilities.delves.Transcendent;
+import com.playmonumenta.plugins.abilities.delves.Twisted;
+import com.playmonumenta.plugins.abilities.delves.Vindictive;
 import com.playmonumenta.plugins.abilities.mage.ArcaneStrike;
 import com.playmonumenta.plugins.abilities.mage.Channeling;
 import com.playmonumenta.plugins.abilities.mage.ElementalArrows;
@@ -389,16 +397,21 @@ public class AbilityManager {
 		// These abilities should trigger after all event damage is calculated
 		mReferenceAbilities.addAll(Arrays.asList(
 									   //********** DELVES **********//
-		                               // CURSED
-		                               new Ruthless(mPlugin, null),
-		                               new Unyielding(mPlugin, null),
-		                               new Mystic(mPlugin, null),
-		                               new Spectral(mPlugin, null),
-		                               // TWISTED
-		                               new Merciless(mPlugin, null),
+                                       new StatMultiplier(mPlugin, null),
 		                               new Relentless(mPlugin, null),
 		                               new Arcanic(mPlugin, null),
+		                               new Infernal(mPlugin, null),
+		                               new Transcendent(mPlugin, null),
+		                               new Spectral(mPlugin, null),
 		                               new Dreadful(mPlugin, null),
+		                               new Colossal(mPlugin, null),
+		                               new Vindictive(mPlugin, null),
+		                               new Pernicious(mPlugin, null),
+		                               new Legionary(mPlugin, null),
+		                               new Bloodthirsty(mPlugin, null),
+		                               new Despair(mPlugin, null),
+		                               new Entropy(mPlugin, null),
+		                               new Twisted(mPlugin, null),
 
 		                               new FinishingBlow(mPlugin, null),
 									   new PrismaticShield(mPlugin, null),
@@ -497,7 +510,7 @@ public class AbilityManager {
 
 		if (player.getScoreboardTags().contains("disable_class") || player.getGameMode().equals(GameMode.SPECTATOR)) {
 			/* This player's abilities are disabled - give them an empty set and stop here */
-			AbilityCollection collection = new AbilityCollection(player, abilities);
+			AbilityCollection collection = new AbilityCollection(abilities);
 			mAbilities.put(player.getUniqueId(), collection);
 			return collection;
 		}
@@ -517,7 +530,7 @@ public class AbilityManager {
 			e.printStackTrace();
 		}
 
-		AbilityCollection collection = new AbilityCollection(player, abilities);
+		AbilityCollection collection = new AbilityCollection(abilities);
 		mAbilities.put(player.getUniqueId(), collection);
 
 		// Set up new class potion abilities
@@ -563,6 +576,10 @@ public class AbilityManager {
 			}
 		}
 		return true;
+	}
+
+	public boolean blockBreakEvent(Player player, BlockBreakEvent event) {
+		return conditionalCastCancellable(player, (ability) -> ability.blockBreakEvent(event));
 	}
 
 	public boolean livingEntityDamagedByPlayerEvent(Player player, EntityDamageByEntityEvent event) {

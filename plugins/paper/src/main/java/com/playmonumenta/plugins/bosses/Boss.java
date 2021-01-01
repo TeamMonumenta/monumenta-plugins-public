@@ -19,6 +19,7 @@ import com.destroystokyo.paper.event.entity.EntityPathfindEvent;
 import com.playmonumenta.plugins.bosses.bosses.BossAbilityGroup;
 import com.playmonumenta.plugins.bosses.events.SpellCastEvent;
 import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.events.CustomEffectApplyEvent;
 
 public class Boss {
 	private final Plugin mPlugin;
@@ -191,6 +192,12 @@ public class Boss {
 	public void bossChangedTarget(EntityTargetEvent event) {
 		for (BossAbilityGroup ability : mAbilities) {
 			ability.bossChangedTarget(event);
+		}
+	}
+
+	public void customEffectAppliedToBoss(CustomEffectApplyEvent event) {
+		for (BossAbilityGroup ability : mAbilities) {
+			ability.customEffectAppliedToBoss(event);
 		}
 	}
 

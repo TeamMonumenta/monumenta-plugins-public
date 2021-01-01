@@ -56,6 +56,7 @@ import com.playmonumenta.plugins.bosses.bosses.gray.GrayGolemSummoner;
 import com.playmonumenta.plugins.bosses.bosses.gray.GrayScarabSummoner;
 import com.playmonumenta.plugins.bosses.bosses.gray.GraySummoned;
 import com.playmonumenta.plugins.bosses.events.SpellCastEvent;
+import com.playmonumenta.plugins.events.CustomEffectApplyEvent;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.SerializationUtils;
@@ -144,7 +145,7 @@ public class BossManager implements Listener {
 		mStatelessBosses.put(SnowballDamageBoss.identityTag, (Plugin p, LivingEntity e) -> new SnowballDamageBoss(p, e));
 		mStatelessBosses.put(CorruptInfestedBoss.identityTag, (Plugin p, LivingEntity e) -> new CorruptInfestedBoss(p, e));
 		mStatelessBosses.put(FlameLaserBoss.identityTag, (Plugin p, LivingEntity e) -> new FlameLaserBoss(p, e));
-		mStatelessBosses.put(SpectreParticleBoss.identityTag, (Plugin p, LivingEntity e) -> new SpectreParticleBoss(p, e));
+		mStatelessBosses.put(SpecterParticleBoss.identityTag, (Plugin p, LivingEntity e) -> new SpecterParticleBoss(p, e));
 		mStatelessBosses.put(DreadnaughtParticleBoss.identityTag, (Plugin p, LivingEntity e) -> new DreadnaughtParticleBoss(p, e));
 		mStatelessBosses.put(DreadlingBoss.identityTag, (Plugin p, LivingEntity e) -> new DreadlingBoss(p, e));
 		mStatelessBosses.put(ProjectileDeflectionBoss.identityTag, (Plugin p, LivingEntity e) -> new ProjectileDeflectionBoss(p, e));
@@ -174,7 +175,6 @@ public class BossManager implements Listener {
 		mStatelessBosses.put(SeekingProjectileBoss.identityTag, (Plugin p, LivingEntity e) -> new SeekingProjectileBoss(p, e));
 		mStatelessBosses.put(TrackingProjectileBoss.identityTag, (Plugin p, LivingEntity e) -> new TrackingProjectileBoss(p, e));
 		mStatelessBosses.put(WrathBoss.identityTag, (Plugin p, LivingEntity e) -> new WrathBoss(p, e));
-		mStatelessBosses.put(PrideBoss.identityTag, (Plugin p, LivingEntity e) -> new PrideBoss(p, e));
 		mStatelessBosses.put(LeapBoss.identityTag, (Plugin p, LivingEntity e) -> new LeapBoss(p, e));
 		mStatelessBosses.put(BarrierBoss.identityTag, (Plugin p, LivingEntity e) -> new BarrierBoss(p, e));
 		mStatelessBosses.put(CrowdControlResistanceBoss.identityTag, (Plugin p, LivingEntity e) -> new CrowdControlResistanceBoss(p, e));
@@ -183,6 +183,19 @@ public class BossManager implements Listener {
 		mStatelessBosses.put(MistMob.identityTag, (Plugin p, LivingEntity e) -> new MistMob(p, e));
 		mStatelessBosses.put(HookBoss.identityTag, (Plugin p, LivingEntity e) -> new HookBoss(p, e));
 		mStatelessBosses.put(FrostGiantIcicle.identityTag, (Plugin p, LivingEntity e) -> new FrostGiantIcicle(p, e));
+		mStatelessBosses.put(SpellSlingerBoss.identityTag, (Plugin p, LivingEntity e) -> new SpellSlingerBoss(p, e));
+		mStatelessBosses.put(VindictiveBoss.identityTag, (Plugin p, LivingEntity e) -> new VindictiveBoss(p, e));
+		mStatelessBosses.put(ShadowTrailBoss.identityTag, (Plugin p, LivingEntity e) -> new ShadowTrailBoss(p, e));
+		mStatelessBosses.put(KineticProjectileBoss.identityTag, (Plugin p, LivingEntity e) -> new KineticProjectileBoss(p, e));
+		mStatelessBosses.put(FlameTrailBoss.identityTag, (Plugin p, LivingEntity e) -> new FlameTrailBoss(p, e));
+		mStatelessBosses.put(ShadeParticleBoss.identityTag, (Plugin p, LivingEntity e) -> new ShadeParticleBoss(p, e));
+		mStatelessBosses.put(FireBombTossBoss.identityTag, (Plugin p, LivingEntity e) -> new FireBombTossBoss(p, e));
+		mStatelessBosses.put(CommanderBoss.identityTag, (Plugin p, LivingEntity e) -> new CommanderBoss(p, e));
+		mStatelessBosses.put(ShadePossessedBoss.identityTag, (Plugin p, LivingEntity e) -> new ShadePossessedBoss(p, e));
+		mStatelessBosses.put(TwistedEventBoss.identityTag, (Plugin p, LivingEntity e) -> new TwistedEventBoss(p, e));
+		mStatelessBosses.put(TwistedDespairBoss.identityTag, (Plugin p, LivingEntity e) -> new TwistedDespairBoss(p, e));
+		mStatelessBosses.put(CoordinatedAttackBoss.identityTag, (Plugin p, LivingEntity e) -> new CoordinatedAttackBoss(p, e));
+		mStatelessBosses.put(AbilitySilenceBoss.identityTag, (Plugin p, LivingEntity e) -> new AbilitySilenceBoss(p, e));
 		mStatelessBosses.put(ShiftingBoss.identityTag, (Plugin p, LivingEntity e) -> new ShiftingBoss(p, e));
 
 		/* Stateful bosses have a remembered spawn location and end location where a redstone block is set when they die */
@@ -269,7 +282,7 @@ public class BossManager implements Listener {
 		mBossDeserializers.put(CorruptInfestedBoss.identityTag, (Plugin p, LivingEntity e) -> CorruptInfestedBoss.deserialize(p, e));
 		mBossDeserializers.put(FlameLaserBoss.identityTag, (Plugin p, LivingEntity e) -> FlameLaserBoss.deserialize(p, e));
 		mBossDeserializers.put(SwordsageRichter.identityTag, (Plugin p, LivingEntity e) -> SwordsageRichter.deserialize(p, e));
-		mBossDeserializers.put(SpectreParticleBoss.identityTag, (Plugin p, LivingEntity e) -> new SpectreParticleBoss(p, e));
+		mBossDeserializers.put(SpecterParticleBoss.identityTag, (Plugin p, LivingEntity e) -> new SpecterParticleBoss(p, e));
 		mBossDeserializers.put(DreadnaughtParticleBoss.identityTag, (Plugin p, LivingEntity e) -> new DreadnaughtParticleBoss(p, e));
 		mBossDeserializers.put(DreadlingBoss.identityTag, (Plugin p, LivingEntity e) -> new DreadlingBoss(p, e));
 		mBossDeserializers.put(ProjectileDeflectionBoss.identityTag, (Plugin p, LivingEntity e) -> new ProjectileDeflectionBoss(p, e));
@@ -309,7 +322,6 @@ public class BossManager implements Listener {
 		mBossDeserializers.put(TrackingProjectileBoss.identityTag, (Plugin p, LivingEntity e) -> TrackingProjectileBoss.deserialize(p, e));
 		mBossDeserializers.put(MimicQueen.identityTag, (Plugin p, LivingEntity e) -> MimicQueen.deserialize(p, e));
 		mBossDeserializers.put(WrathBoss.identityTag, (Plugin p, LivingEntity e) -> WrathBoss.deserialize(p, e));
-		mBossDeserializers.put(PrideBoss.identityTag, (Plugin p, LivingEntity e) -> PrideBoss.deserialize(p, e));
 		mBossDeserializers.put(LeapBoss.identityTag, (Plugin p, LivingEntity e) -> LeapBoss.deserialize(p, e));
 		mBossDeserializers.put(BarrierBoss.identityTag, (Plugin p, LivingEntity e) -> BarrierBoss.deserialize(p, e));
 		mBossDeserializers.put(CrowdControlResistanceBoss.identityTag, (Plugin p, LivingEntity e) -> CrowdControlResistanceBoss.deserialize(p, e));
@@ -320,8 +332,20 @@ public class BossManager implements Listener {
 		mBossDeserializers.put(HookBoss.identityTag, (Plugin p, LivingEntity e) -> HookBoss.deserialize(p, e));
 		mBossDeserializers.put(FrostGiant.identityTag, (Plugin p, LivingEntity e) -> FrostGiant.deserialize(p, e));
 		mBossDeserializers.put(FrostGiantIcicle.identityTag, (Plugin p, LivingEntity e) -> FrostGiantIcicle.deserialize(p, e));
+		mBossDeserializers.put(SpellSlingerBoss.identityTag, (Plugin p, LivingEntity e) -> SpellSlingerBoss.deserialize(p, e));
+		mBossDeserializers.put(VindictiveBoss.identityTag, (Plugin p, LivingEntity e) -> VindictiveBoss.deserialize(p, e));
+		mBossDeserializers.put(ShadowTrailBoss.identityTag, (Plugin p, LivingEntity e) -> ShadowTrailBoss.deserialize(p, e));
+		mBossDeserializers.put(KineticProjectileBoss.identityTag, (Plugin p, LivingEntity e) -> KineticProjectileBoss.deserialize(p, e));
+		mBossDeserializers.put(FlameTrailBoss.identityTag, (Plugin p, LivingEntity e) -> FlameTrailBoss.deserialize(p, e));
+		mBossDeserializers.put(ShadeParticleBoss.identityTag, (Plugin p, LivingEntity e) -> ShadeParticleBoss.deserialize(p, e));
+		mBossDeserializers.put(FireBombTossBoss.identityTag, (Plugin p, LivingEntity e) -> FireBombTossBoss.deserialize(p, e));
+		mBossDeserializers.put(CommanderBoss.identityTag, (Plugin p, LivingEntity e) -> CommanderBoss.deserialize(p, e));
+		mBossDeserializers.put(ShadePossessedBoss.identityTag, (Plugin p, LivingEntity e) -> ShadePossessedBoss.deserialize(p, e));
+		mBossDeserializers.put(TwistedEventBoss.identityTag, (Plugin p, LivingEntity e) -> TwistedEventBoss.deserialize(p, e));
+		mBossDeserializers.put(TwistedDespairBoss.identityTag, (Plugin p, LivingEntity e) -> TwistedDespairBoss.deserialize(p, e));
+		mBossDeserializers.put(CoordinatedAttackBoss.identityTag, (Plugin p, LivingEntity e) -> CoordinatedAttackBoss.deserialize(p, e));
+		mBossDeserializers.put(AbilitySilenceBoss.identityTag, (Plugin p, LivingEntity e) -> AbilitySilenceBoss.deserialize(p, e));
 		mBossDeserializers.put(ShiftingBoss.identityTag, (Plugin p, LivingEntity e) -> ShiftingBoss.deserialize(p, e));
-
 
 	}
 
@@ -655,6 +679,15 @@ public class BossManager implements Listener {
 					}
 				}
 			}
+		}
+	}
+
+	@EventHandler
+	public void customEffectAppliedToBoss(CustomEffectApplyEvent event) {
+		Boss boss = mBosses.get(event.getEntity().getUniqueId());
+
+		if (boss != null) {
+			boss.customEffectAppliedToBoss(event);
 		}
 	}
 
