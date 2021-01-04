@@ -1,5 +1,7 @@
 package com.playmonumenta.plugins.abilities.delves;
 
+import java.util.Set;
+
 import org.bukkit.attribute.Attributable;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
@@ -9,6 +11,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntitySpawnEvent;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.bosses.bosses.CrowdControlImmunityBoss;
 import com.playmonumenta.plugins.utils.DelvesUtils;
 import com.playmonumenta.plugins.utils.DelvesUtils.Modifier;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -53,8 +56,11 @@ public class Relentless extends DelveModifier {
 	@Override
 	public void applyModifiers(LivingEntity mob, EntitySpawnEvent event) {
 		if (mob instanceof Attributable) {
-			EntityUtils.addAttribute(mob, Attribute.GENERIC_MOVEMENT_SPEED,
-					new AttributeModifier(SPEED_MODIFIER_NAME, mSpeedModifier, Operation.MULTIPLY_SCALAR_1));
+			Set<String> tags = mob.getScoreboardTags();
+			if (tags == null || !tags.contains(CrowdControlImmunityBoss.identityTag)) {
+				EntityUtils.addAttribute(mob, Attribute.GENERIC_MOVEMENT_SPEED,
+						new AttributeModifier(SPEED_MODIFIER_NAME, mSpeedModifier, Operation.MULTIPLY_SCALAR_1));
+			}
 		}
 	}
 

@@ -23,7 +23,7 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 public class StatMultiplier extends DelveModifier {
 
 	private static final String STAT_MULTIPLIER_MODIFIER_NAME = "DelveStatMultiplier";
-	private static final double STAT_MULTIPLIER_INCREMENT = 0.04;
+	private static final double STAT_MULTIPLIER_INCREMENT = 0.03;
 	private static final Map<String, Double> STAT_COMPENSATION_MAPPINGS = new HashMap<>();
 
 	protected static final String DELVE_MOB_TAG = "delve_mob";
@@ -116,13 +116,13 @@ public class StatMultiplier extends DelveModifier {
 		if (mob instanceof Attributable) {
 			double healthProportion = Math.min(1, mob.getHealth() / mob.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue());
 
-			EntityUtils.addAttribute(mob, Attribute.GENERIC_MAX_HEALTH,
-					new AttributeModifier(STAT_MULTIPLIER_MODIFIER_NAME, mStatMultiplier * mStatCompensation - 1, Operation.MULTIPLY_SCALAR_1));
-
 			Set<String> tags = mob.getScoreboardTags();
 			if (tags != null && tags.contains(DELVE_MOB_TAG)) {
 				EntityUtils.addAttribute(mob, Attribute.GENERIC_MAX_HEALTH,
-						new AttributeModifier(DELVE_MOB_HEALTH_MODIFIER_NAME, mDelveMobStatMultiplier - 1, Operation.MULTIPLY_SCALAR_1));
+						new AttributeModifier(DELVE_MOB_HEALTH_MODIFIER_NAME, mStatMultiplier * mDelveMobStatMultiplier - 1, Operation.MULTIPLY_SCALAR_1));
+			} else {
+				EntityUtils.addAttribute(mob, Attribute.GENERIC_MAX_HEALTH,
+						new AttributeModifier(STAT_MULTIPLIER_MODIFIER_NAME, mStatMultiplier * mStatCompensation - 1, Operation.MULTIPLY_SCALAR_1));
 			}
 
 			mob.setHealth(healthProportion * mob.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue());

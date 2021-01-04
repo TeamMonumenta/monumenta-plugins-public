@@ -13,6 +13,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.SpawnerSpawnEvent;
+import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.ItemStack;
 
 import com.playmonumenta.plugins.Plugin;
@@ -109,7 +110,8 @@ public class Transcendent extends DelveModifier {
 			// This runs prior to BossManager parsing, so we can just add tags directly
 			mob.addScoreboardTag(TRANSCENDENT_TAG);
 
-			ItemStack mainhand = mob.getEquipment().getItemInMainHand();
+			EntityEquipment equipment = mob.getEquipment();
+			ItemStack mainhand = equipment == null ? null : equipment.getItemInMainHand();
 			Material material = mainhand == null ? null : mainhand.getType();
 			if (material == Material.BOW || material == Material.CROSSBOW || material == Material.TRIDENT
 					|| mob instanceof Evoker) {

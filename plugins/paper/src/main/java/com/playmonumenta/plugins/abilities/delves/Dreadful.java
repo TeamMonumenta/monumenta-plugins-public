@@ -6,7 +6,6 @@ import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDeathEvent;
-import org.bukkit.event.entity.PlayerDeathEvent;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
@@ -28,17 +27,17 @@ public class Dreadful extends DelveModifier {
 		"DreadnaughtofSorrow"
 	};
 
-	public static final String DESCRIPTION = "Dying elites and players transform into new enemies.";
+	public static final String DESCRIPTION = "Dying elites transform into new enemies.";
 
 	public static final String[][] RANK_DESCRIPTIONS = {
 			{
-				"Dying Elites and Players have a " + Math.round(SPAWN_CHANCE[0] * 100) + "% chance",
+				"Dying Elites have a " + Math.round(SPAWN_CHANCE[0] * 100) + "% chance",
 				"to spawn Dreadnaughts."
 			}, {
-				"Dying Elites and Players have a " + Math.round(SPAWN_CHANCE[1] * 100) + "% chance",
+				"Dying Elites have a " + Math.round(SPAWN_CHANCE[1] * 100) + "% chance",
 				"to spawn Dreadnaughts."
 			}, {
-				"Dying Elites and Players have a " + Math.round(SPAWN_CHANCE[2] * 100) + "% chance",
+				"Dying Elites have a " + Math.round(SPAWN_CHANCE[2] * 100) + "% chance",
 				"to spawn Dreadnaughts."
 			}
 	};
@@ -54,11 +53,6 @@ public class Dreadful extends DelveModifier {
 
 	@Override
 	public void entityDeathEvent(EntityDeathEvent event, boolean shouldGenDrops) {
-		execute(event.getEntity());
-	}
-
-	@Override
-	public void playerDeathEvent(PlayerDeathEvent event) {
 		execute(event.getEntity());
 	}
 

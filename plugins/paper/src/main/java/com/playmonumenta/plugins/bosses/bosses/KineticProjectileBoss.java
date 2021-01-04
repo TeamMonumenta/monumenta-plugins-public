@@ -22,13 +22,13 @@ import com.playmonumenta.plugins.utils.PotionUtils;
 
 public class KineticProjectileBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_kineticprojectile";
-	public static final int detectionRange = 24;
+	public static final int detectionRange = 16;
 
 	private static final boolean SINGLE_TARGET = true;
 	private static final boolean LAUNCH_TRACKING = false;
 	private static final int COOLDOWN = 20 * 4;
 	private static final int DELAY = 10;
-	private static final double SPEED = 0.8;
+	private static final double SPEED = 0.7;
 	private static final double TURN_RADIUS = 0;
 	private static final int DISTANCE = 32;
 	private static final int LIFETIME_TICKS = (int)(DISTANCE / SPEED);

@@ -18,9 +18,9 @@ import com.playmonumenta.plugins.utils.FastUtils;
 public class Colossal extends DelveModifier {
 
 	private static final double[] SPAWN_CHANCE = {
-			0.07,
-			0.14,
-			0.21
+			0.05,
+			0.1,
+			0.15
 	};
 
 	private static final String[] COLOSSI = {

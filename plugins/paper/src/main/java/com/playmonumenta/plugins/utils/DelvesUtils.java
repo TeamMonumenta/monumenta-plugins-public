@@ -444,6 +444,7 @@ public class DelvesUtils {
 	}
 
 
+
 	private static final int MINIMUM_DEPTH_POINTS = 5;
 
 	public static int getLootCapDepthPoints(int players) {
@@ -559,8 +560,8 @@ public class DelvesUtils {
 		new DelveLootTableGroup("r2/delves/teal/base_escape", "r2/delves/teal/dmat_escape", "r2/delves/teal/cmat_escape", "r2/dungeons/teal/escape").mapDelveLootTables(DELVE_LOOT_TABLE_REPLACEMENT_MAPPINGS);
 		new DelveLootTableGroup("r2/delves/teal/base_final", "r2/delves/teal/dmat_final", "r2/delves/teal/cmat_final", "r2/dungeons/teal/final").mapDelveLootTables(DELVE_LOOT_TABLE_REPLACEMENT_MAPPINGS);
 
-		new DelveLootTableGroup("r2/delves/shiftingcity/base_chest", "r2/delves/shifting/dmat_chest", "r2/delves/shiftingcity/cmat_chest", "r2/dungeons/fred/normal_city", "r2/dungeons/fred/objective_city", "r2/dungeons/fred/normal_lush", "r2/dungeons/fred/objective_lush", "r2/dungeons/fred/normal_water", "r2/dungeons/fred/objective_water", "r2/dungeons/fred/challenge").mapDelveLootTables(DELVE_LOOT_TABLE_REPLACEMENT_MAPPINGS);
-		new DelveLootTableGroup("r2/delves/shiftingcity/base_final", "r2/delves/shifting/dmat_final", "r2/delves/shiftingcity/cmat_final", "r2/dungeons/fred/final_chest").mapDelveLootTables(DELVE_LOOT_TABLE_REPLACEMENT_MAPPINGS);
+		new DelveLootTableGroup("r2/delves/shiftingcity/base_chest", "r2/delves/shiftingcity/dmat_chest", "r2/delves/shiftingcity/cmat_chest", "r2/dungeons/fred/normal_city", "r2/dungeons/fred/objective_city", "r2/dungeons/fred/normal_lush", "r2/dungeons/fred/objective_lush", "r2/dungeons/fred/normal_water", "r2/dungeons/fred/objective_water", "r2/dungeons/fred/challenge").mapDelveLootTables(DELVE_LOOT_TABLE_REPLACEMENT_MAPPINGS);
+		new DelveLootTableGroup("r2/delves/shiftingcity/base_final", "r2/delves/shiftingcity/dmat_final", "r2/delves/shiftingcity/cmat_final", "r2/dungeons/fred/final_chest").mapDelveLootTables(DELVE_LOOT_TABLE_REPLACEMENT_MAPPINGS);
 	}
 
 	public static void setDelveLootTable(Player player, Block block) {
@@ -628,7 +629,6 @@ public class DelvesUtils {
 		private final Inventory mInventory1 = Bukkit.createInventory(null, ROWS * COLUMNS, "Delve Modifier Selection");
 		private final Inventory mInventory2 = Bukkit.createInventory(null, ROWS * COLUMNS, "Delve Modifier Selection");
 
-		private boolean mAdvancedView = false;
 		private boolean mCanBeginDelve = false;
 
 		public DelveModifierSelectionGUI(Player player, String dungeon) {
@@ -681,11 +681,7 @@ public class DelvesUtils {
 				return;
 			}
 
-			if (mInventory1.getItem(SUMMARY_INDEX).equals(clickedItem)) {
-				toggleAdvancedView(mInventory1);
-			} else if (mInventory2.getItem(SUMMARY_INDEX).equals(clickedItem)) {
-				toggleAdvancedView(mInventory2);
-			} else if (mInventory1.getItem(NEXT_PAGE_INDEX).equals(clickedItem)) {
+			if (mInventory1.getItem(NEXT_PAGE_INDEX).equals(clickedItem)) {
 				nextPage();
 			} else if (mInventory2.getItem(PREVIOUS_PAGE_INDEX).equals(clickedItem)) {
 				previousPage();
@@ -710,13 +706,6 @@ public class DelvesUtils {
 				Bukkit.getConsoleSender().getServer().dispatchCommand(Bukkit.getConsoleSender(),
 						"execute as " + mPlayer.getName() + " at @s run " + DUNGEON_FUNCTION_MAPPINGS.get(mDungeon));
 			}
-		}
-
-		private void toggleAdvancedView(Inventory inventory) {
-			mPlayer.playSound(mPlayer.getLocation(), Sound.ENTITY_EVOKER_CAST_SPELL, 0.5f, 2f);
-
-			mAdvancedView ^= true;
-			inventory.setItem(SUMMARY_INDEX, getSummary());
 		}
 
 		private void nextPage() {
@@ -820,117 +809,47 @@ public class DelvesUtils {
 
 			int depthPoints = mDelveInfo.getDepthPoints();
 
-			if (mAdvancedView) {
-				lore.add(ChatColor.DARK_GRAY + "Click to Switch to Regular View");
+			lore.add(ChatColor.WHITE + "- " + mDelveInfo.getDepthPoints() + " Depth Points Assigned");
 
-				lore.add(ChatColor.WHITE + "- " + mDelveInfo.getDepthPoints() + " Depth Points Assigned");
-
-				double statMultiplier = StatMultiplier.getStatMultiplier(depthPoints);
-				double dungeonMultiplier = StatMultiplier.getStatCompensation(mDungeon);
-				if (statMultiplier >= 2) {
-					lore.add(ChatColor.DARK_RED + "- Enemy Health and Damage Multipliers:");
-					lore.add(String.format(ChatColor.DARK_RED + "  - Depth Points Multiplier: x%.2f", statMultiplier));
-					lore.add(String.format(ChatColor.DARK_RED + "  - Base Dungeon Multiplier: x%.2f", dungeonMultiplier));
-				} else if (statMultiplier >= 1.5) {
-					lore.add(ChatColor.RED + "- Enemy Health and Damage Multipliers:");
-					lore.add(String.format(ChatColor.RED + "  - Depth Points Multiplier: x%.2f", statMultiplier));
-					lore.add(String.format(ChatColor.RED + "  - Base Dungeon Multiplier: x%.2f", dungeonMultiplier));
-				} else {
-					lore.add(ChatColor.WHITE + "- Enemy Health and Damage Multipliers:");
-					lore.add(String.format(ChatColor.WHITE + "  - Depth Points Multiplier: x%.2f", statMultiplier));
-					lore.add(String.format(ChatColor.WHITE + "  - Base Dungeon Multiplier: x%.2f", dungeonMultiplier));
-				}
-
-				double baseAmount = DelveLootTableGroup.getDelveMaterialTableChance(MINIMUM_DEPTH_POINTS, 9001);
-				double delveMaterialMultiplierSolo = DelveLootTableGroup.getDelveMaterialTableChance(depthPoints, 1) / baseAmount;
-				double delveMaterialMultiplierDuo = DelveLootTableGroup.getDelveMaterialTableChance(depthPoints, 2) / baseAmount;
-				double delveMaterialMultiplierTrio = DelveLootTableGroup.getDelveMaterialTableChance(depthPoints, 3) / baseAmount;
-				double delveMaterialMultiplier = DelveLootTableGroup.getDelveMaterialTableChance(depthPoints, 9001) / baseAmount;
-				if (delveMaterialMultiplier > 0) {
-					lore.add(ChatColor.GRAY + "- Delve Material Multipliers (Not Counting Loot Scaling):");
-					lore.add(String.format(ChatColor.GRAY + "  - 1 Player: x%.2f", delveMaterialMultiplierSolo));
-					lore.add(String.format(ChatColor.GRAY + "  - 2 Players: x%.2f", delveMaterialMultiplierDuo));
-					lore.add(String.format(ChatColor.GRAY + "  - 3 Players: x%.2f", delveMaterialMultiplierTrio));
-					lore.add(String.format(ChatColor.GRAY + "  - 4+ Players: x%.2f", delveMaterialMultiplier));
-				} else {
-					lore.add(ChatColor.DARK_GRAY + "- Delve Material Multipliers (Not Counting Loot Scaling):");
-					lore.add(String.format(ChatColor.DARK_GRAY + "  - 1 Player: x%.2f", delveMaterialMultiplierSolo));
-					lore.add(String.format(ChatColor.DARK_GRAY + "  - 2 Players: x%.2f", delveMaterialMultiplierDuo));
-					lore.add(String.format(ChatColor.DARK_GRAY + "  - 3 Players: x%.2f", delveMaterialMultiplierTrio));
-					lore.add(String.format(ChatColor.DARK_GRAY + "  - 4+ Players: x%.2f", delveMaterialMultiplier));
-				}
-
-				/*
-				double cosmeticMaterialMultiplier = DelveLootTableGroup.getCosmeticMaterialTableChance(depthPoints) / baseAmount;
-				if (cosmeticMaterialMultiplier > 0) {
-					lore.add(String.format(ChatColor.YELLOW + "- Cosmetic Material Multiplier: x%.2f", cosmeticMaterialMultiplier));
-				} else {
-					lore.add(String.format(ChatColor.DARK_GRAY + "- Cosmetic Material Multiplier: x%.2f", cosmeticMaterialMultiplier));
-				}
-				 */
-
-				if (depthPoints == DelveInfo.getMaxDepthPoints()) {
-					lore.add(ChatColor.GOLD + "- All Modifiers Advancement Granted upon Completion");
-				} else {
-					lore.add(ChatColor.DARK_GRAY + "- All Modifiers Advancement Granted upon Completion");
-				}
+			double statMultiplier = StatMultiplier.getStatMultiplier(depthPoints);
+			double dungeonMultiplier = StatMultiplier.getStatCompensation(mDungeon);
+			if (statMultiplier >= 1.75) {
+				lore.add(ChatColor.DARK_RED + "- Enemy Health and Damage Multipliers:");
+				lore.add(String.format(ChatColor.DARK_RED + "  - Depth Points Multiplier: x%.2f", statMultiplier));
+				lore.add(String.format(ChatColor.DARK_RED + "  - Base Dungeon Multiplier: x%.2f", dungeonMultiplier));
+			} else if (statMultiplier >= 1.45) {
+				lore.add(ChatColor.RED + "- Enemy Health and Damage Multipliers:");
+				lore.add(String.format(ChatColor.RED + "  - Depth Points Multiplier: x%.2f", statMultiplier));
+				lore.add(String.format(ChatColor.RED + "  - Base Dungeon Multiplier: x%.2f", dungeonMultiplier));
 			} else {
-				lore.add(ChatColor.DARK_GRAY + "Click to Switch to Advanced View");
+				lore.add(ChatColor.WHITE + "- Enemy Health and Damage Multipliers:");
+				lore.add(String.format(ChatColor.WHITE + "  - Depth Points Multiplier: x%.2f", statMultiplier));
+				lore.add(String.format(ChatColor.WHITE + "  - Base Dungeon Multiplier: x%.2f", dungeonMultiplier));
+			}
 
-				lore.add(ChatColor.WHITE + "- " + mDelveInfo.getDepthPoints() + " Depth Points Assigned");
+			double baseAmount = DelveLootTableGroup.getDelveMaterialTableChance(MINIMUM_DEPTH_POINTS, 9001);
+			double delveMaterialMultiplierSolo = DelveLootTableGroup.getDelveMaterialTableChance(depthPoints, 1) / baseAmount;
+			double delveMaterialMultiplierDuo = DelveLootTableGroup.getDelveMaterialTableChance(depthPoints, 2) / baseAmount;
+			double delveMaterialMultiplierTrio = DelveLootTableGroup.getDelveMaterialTableChance(depthPoints, 3) / baseAmount;
+			double delveMaterialMultiplier = DelveLootTableGroup.getDelveMaterialTableChance(depthPoints, 9001) / baseAmount;
+			if (delveMaterialMultiplier > 0) {
+				lore.add(ChatColor.GRAY + "- Delve Material Multipliers (Not Counting Loot Scaling):");
+				lore.add(String.format(ChatColor.GRAY + "  - 1 Player: x%.2f", delveMaterialMultiplierSolo));
+				lore.add(String.format(ChatColor.GRAY + "  - 2 Players: x%.2f", delveMaterialMultiplierDuo));
+				lore.add(String.format(ChatColor.GRAY + "  - 3 Players: x%.2f", delveMaterialMultiplierTrio));
+				lore.add(String.format(ChatColor.GRAY + "  - 4+ Players: x%.2f", delveMaterialMultiplier));
+			} else {
+				lore.add(ChatColor.DARK_GRAY + "- Delve Material Multipliers (Not Counting Loot Scaling):");
+				lore.add(String.format(ChatColor.DARK_GRAY + "  - 1 Player: x%.2f", delveMaterialMultiplierSolo));
+				lore.add(String.format(ChatColor.DARK_GRAY + "  - 2 Players: x%.2f", delveMaterialMultiplierDuo));
+				lore.add(String.format(ChatColor.DARK_GRAY + "  - 3 Players: x%.2f", delveMaterialMultiplierTrio));
+				lore.add(String.format(ChatColor.DARK_GRAY + "  - 4+ Players: x%.2f", delveMaterialMultiplier));
+			}
 
-				double statMultiplier = StatMultiplier.getStatMultiplier(depthPoints);
-				if (statMultiplier >= 2) {
-					lore.add(String.format(ChatColor.DARK_RED + "- Enemies have x%.2f Health and Damage", statMultiplier));
-				} else if (statMultiplier >= 1.5) {
-					lore.add(String.format(ChatColor.RED + "- Enemies have x%.2f Health and Damage", statMultiplier));
-				} else {
-					lore.add(String.format(ChatColor.WHITE + "- Enemies have x%.2f Health and Damage", statMultiplier));
-				}
-
-				if (depthPoints >= MINIMUM_DEPTH_POINTS) {
-					lore.add(ChatColor.GRAY + "- Delve Materials included in Loot");
-				} else {
-					lore.add(ChatColor.DARK_GRAY + "- Delve Materials included in Loot");
-				}
-
-				if (depthPoints >= getLootCapDepthPoints(1)) {
-					lore.add(ChatColor.GRAY + "- Delve Material Loot Cap for 1 Player Reached");
-				} else {
-					lore.add(ChatColor.DARK_GRAY + "- Delve Material Loot Cap for 1 Player Reached");
-				}
-
-				if (depthPoints >= getLootCapDepthPoints(2)) {
-					lore.add(ChatColor.GRAY + "- Delve Material Loot Cap for 2 Players Reached");
-				} else {
-					lore.add(ChatColor.DARK_GRAY + "- Delve Material Loot Cap for 2 Players Reached");
-				}
-
-				if (depthPoints >= getLootCapDepthPoints(3)) {
-					lore.add(ChatColor.GRAY + "- Delve Material Loot Cap for 3 Players Reached");
-				} else {
-					lore.add(ChatColor.DARK_GRAY + "- Delve Material Loot Cap for 3 Players Reached");
-				}
-
-				if (depthPoints >= getLootCapDepthPoints(9001)) {
-					lore.add(ChatColor.YELLOW + "- Delve Material Loot Cap Reached");
-				} else {
-					lore.add(ChatColor.DARK_GRAY + "- Delve Material Loot Cap Reached");
-				}
-
-				/*
-				if (depthPoints > getLootCapDepthPoints(9001)) {
-					lore.add(ChatColor.YELLOW + "- Cosmetic Materials included in Loot");
-				} else {
-					lore.add(ChatColor.DARK_GRAY + "- Cosmetic Materials included in Loot");
-				}
-				 */
-
-				if (depthPoints == DelveInfo.getMaxDepthPoints()) {
-					lore.add(ChatColor.GOLD + "- All Modifiers Advancement Granted upon Completion");
-				} else {
-					lore.add(ChatColor.DARK_GRAY + "- All Modifiers Advancement Granted upon Completion");
-				}
+			if (depthPoints == DelveInfo.getMaxDepthPoints()) {
+				lore.add(ChatColor.GOLD + "- All Modifiers Advancement Granted upon Completion");
+			} else {
+				lore.add(ChatColor.DARK_GRAY + "- All Modifiers Advancement Granted upon Completion");
 			}
 
 			meta.setLore(lore);

@@ -34,6 +34,7 @@ public class DelvesListener implements Listener {
 		DUNGEONS.add("white");
 		DUNGEONS.add("orange");
 		DUNGEONS.add("magenta");
+		DUNGEONS.add("lightblue");
 		DUNGEONS.add("yellow");
 		DUNGEONS.add("willows");
 		DUNGEONS.add("reverie");
