@@ -86,7 +86,7 @@ public class FirmamentOverride extends BaseOverride {
 			// No known way to preserve BlockStateMeta - so check that it's either null or simple BlockDataMeta
 			if (currentItem.getType().isBlock() && (meta == null || meta instanceof BlockDataMeta)) {
 				BlockState state = event.getBlockReplacedState();
-				if (FastUtils.RANDOM.nextBoolean() && item.getItemMeta().hasLore() && item.getItemMeta().getLore().get(item.getItemMeta().getLore().size() - 1).contains("Enabled")) {
+				if (FastUtils.RANDOM.nextBoolean() && item.getItemMeta().hasLore() && item.getItemMeta().getLore().contains(ChatColor.AQUA + "Prismarine " + ChatColor.GREEN + "Enabled")) {
 					// Place a prismarine block instead of the block from the shulker
 					BlockData blockData = Material.PRISMARINE.createBlockData();
 					state.setBlockData(blockData);
@@ -154,7 +154,7 @@ public class FirmamentOverride extends BaseOverride {
 				continue;
 			}
 			newLore.add(loreEntry);
-			if (loreEntry.equals(lore.get(lore.size() - 1))) {
+			if (loreEntry.equals(lore.get(lore.size() - 1)) && !foundLine) {
 				newLore.add(PRISMARINE_ENABLED);
 			}
 		}
