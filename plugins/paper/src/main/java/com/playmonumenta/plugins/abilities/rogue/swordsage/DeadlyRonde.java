@@ -107,7 +107,7 @@ public class DeadlyRonde extends Ability {
 			ItemStack mainHand = mPlayer.getInventory().getItemInMainHand();
 			ItemStack offHand = mPlayer.getInventory().getItemInMainHand();
 
-			if (InventoryUtils.isSwordItem(mainHand) && InventoryUtils.isSwordItem(offHand)) {
+			if (InventoryUtils.rogueTriggerCheck(mainHand, offHand)) {
 				Vector playerDirVector = mPlayer.getEyeLocation().getDirection().setY(0).normalize();
 				for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), RONDE_RADIUS)) {
 					Vector toMobVector = mob.getLocation().toVector().subtract(mPlayer.getLocation().toVector()).setY(0).normalize();

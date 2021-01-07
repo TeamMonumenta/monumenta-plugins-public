@@ -58,8 +58,7 @@ public class CloakAndDagger extends Ability implements KillTriggeredAbility {
 	public void cast(Action action) {
 		if (!AbilityUtils.isStealthed(mPlayer) && mCloak >= CLOAK_MIN_STACKS
 				&& mPlayer.isSneaking() && mPlayer.getLocation().getPitch() < -50
-				&& InventoryUtils.isSwordItem(mPlayer.getInventory().getItemInMainHand())
-				&& InventoryUtils.isSwordItem(mPlayer.getInventory().getItemInOffHand())) {
+				&& InventoryUtils.rogueTriggerCheck(mPlayer.getInventory().getItemInMainHand(), mPlayer.getInventory().getItemInOffHand())) {
 			mCloakOnActivation = mCloak;
 			mCloak = 0;
 			mActive = true;
@@ -74,8 +73,7 @@ public class CloakAndDagger extends Ability implements KillTriggeredAbility {
 	@Override
 	public boolean onStealthAttack(EntityDamageByEntityEvent event) {
 		if (event.getCause() == DamageCause.ENTITY_ATTACK && mActive
-				&& InventoryUtils.isSwordItem(mPlayer.getInventory().getItemInMainHand())
-				&& InventoryUtils.isSwordItem(mPlayer.getInventory().getItemInOffHand())) {
+				&& InventoryUtils.rogueTriggerCheck(mPlayer.getInventory().getItemInMainHand(), mPlayer.getInventory().getItemInOffHand())) {
 			AbilityUtils.removeStealth(mPlugin, mPlayer, false);
 			event.setDamage(event.getDamage() + mCloakOnActivation * mDamageMultiplier);
 

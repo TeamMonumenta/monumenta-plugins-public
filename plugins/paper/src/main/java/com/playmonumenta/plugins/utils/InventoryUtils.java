@@ -27,6 +27,7 @@ import org.yaml.snakeyaml.external.biz.base64Coder.Base64Coder;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.enchantments.CurseOfEphemerality;
+import com.playmonumenta.plugins.enchantments.TwoHanded;
 
 public class InventoryUtils {
 	private static int OFFHAND_SLOT = 40;
@@ -444,5 +445,14 @@ public class InventoryUtils {
 		} else {
 			inv.addItem(item);
 		}
+	}
+
+	public static boolean rogueTriggerCheck(final ItemStack mainhand, final ItemStack offhand) {
+		boolean isMainhand = isSwordItem(mainhand);
+		boolean isOffhand = isSwordItem(offhand);
+		if ((isMainhand && isOffhand) || (isMainhand && testForItemWithLore(mainhand, TwoHanded.PROPERTY_NAME) && offhand.getType() == Material.AIR)) {
+			return true;
+		}
+		return false;
 	}
 }

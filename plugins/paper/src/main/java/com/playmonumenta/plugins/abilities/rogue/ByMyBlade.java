@@ -120,7 +120,7 @@ public class ByMyBlade extends Ability {
 		if (PlayerUtils.isCritical(mPlayer)) {
 			ItemStack mainHand = mPlayer.getInventory().getItemInMainHand();
 			ItemStack offHand = mPlayer.getInventory().getItemInOffHand();
-			return InventoryUtils.isSwordItem(mainHand) && InventoryUtils.isSwordItem(offHand);
+			return InventoryUtils.rogueTriggerCheck(mainHand, offHand);
 		}
 		return false;
 	}

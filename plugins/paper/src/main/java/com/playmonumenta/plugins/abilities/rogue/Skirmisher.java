@@ -82,7 +82,7 @@ public class Skirmisher extends Ability {
 	public boolean runCheck() {
 		ItemStack mainHand = mPlayer.getInventory().getItemInMainHand();
 		ItemStack offHand = mPlayer.getInventory().getItemInOffHand();
-		return InventoryUtils.isSwordItem(mainHand) && InventoryUtils.isSwordItem(offHand);
+		return InventoryUtils.rogueTriggerCheck(mainHand, offHand);
 	}
 }
 

@@ -32,7 +32,7 @@ public class RoguePassive extends Ability {
 
 			ItemStack mainHand = mPlayer.getInventory().getItemInMainHand();
 			ItemStack offHand = mPlayer.getInventory().getItemInOffHand();
-			if (InventoryUtils.isSwordItem(mainHand) && InventoryUtils.isSwordItem(offHand)) {
+			if (InventoryUtils.rogueTriggerCheck(mainHand, offHand)) {
 				//  This test if the damagee is an instance of a Elite.
 				if (damagee != null) {
 					if (EntityUtils.isElite(damagee)) {

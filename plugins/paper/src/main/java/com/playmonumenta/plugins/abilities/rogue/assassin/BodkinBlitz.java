@@ -62,8 +62,7 @@ public class BodkinBlitz extends MultipleChargeAbility {
 	@Override
 	public void cast(Action action) {
 		if (mTeleporting || !mPlayer.isSneaking() || ZoneUtils.hasZoneProperty(mPlayer, ZoneProperty.NO_MOBILITY_ABILITIES)
-				|| !InventoryUtils.isSwordItem(mPlayer.getInventory().getItemInMainHand())
-				|| !InventoryUtils.isSwordItem(mPlayer.getInventory().getItemInOffHand())) {
+				|| !InventoryUtils.rogueTriggerCheck(mPlayer.getInventory().getItemInMainHand(), mPlayer.getInventory().getItemInOffHand())) {
 			return;
 		}
 

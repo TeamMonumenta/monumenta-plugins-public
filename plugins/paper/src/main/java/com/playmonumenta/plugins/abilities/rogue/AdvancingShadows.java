@@ -171,7 +171,7 @@ public class AdvancingShadows extends Ability {
 	public boolean runCheck() {
 		ItemStack mainHand = mPlayer.getInventory().getItemInMainHand();
 		ItemStack offHand = mPlayer.getInventory().getItemInOffHand();
-		if (InventoryUtils.isSwordItem(mainHand) && InventoryUtils.isSwordItem(offHand)) {
+		if (InventoryUtils.rogueTriggerCheck(mainHand, offHand)) {
 			if (!mPlayer.isSneaking()) {
 				int advancingShadows = getAbilityScore();
 				int range = (advancingShadows == 1) ? ADVANCING_SHADOWS_RANGE_1 : ADVANCING_SHADOWS_RANGE_2;

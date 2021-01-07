@@ -83,6 +83,6 @@ public class CoupDeGrace extends Ability {
 	public boolean runCheck() {
 		ItemStack mHand = mPlayer.getInventory().getItemInMainHand();
 		ItemStack oHand = mPlayer.getInventory().getItemInOffHand();
-		return InventoryUtils.isSwordItem(mHand) && InventoryUtils.isSwordItem(oHand);
+		return InventoryUtils.rogueTriggerCheck(mHand, oHand);
 	}
 }

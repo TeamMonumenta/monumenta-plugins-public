@@ -55,8 +55,7 @@ public class BladeDance extends Ability {
 	public void cast(Action action) {
 		if (mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), Spells.BLADE_DANCE)
 				|| mPlayer.getLocation().getPitch() < 50 || mPlayer.isSneaking()
-				|| !InventoryUtils.isSwordItem(mPlayer.getInventory().getItemInMainHand())
-				|| !InventoryUtils.isSwordItem(mPlayer.getInventory().getItemInOffHand())) {
+				|| !InventoryUtils.rogueTriggerCheck(mPlayer.getInventory().getItemInMainHand(), mPlayer.getInventory().getItemInOffHand())) {
 			return;
 		}
 

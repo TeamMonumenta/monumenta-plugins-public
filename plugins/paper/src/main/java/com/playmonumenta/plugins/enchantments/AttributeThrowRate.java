@@ -13,6 +13,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.NmsUtils;
 
@@ -36,10 +37,19 @@ public class AttributeThrowRate implements BaseAttribute {
 		if (proj instanceof Trident) {
 			Trident trident = (Trident) proj;
 			ItemStack item = trident.getItemStack();
+			ItemStack mainhand = player.getInventory().getItemInMainHand();
+			ItemStack offhand = player.getInventory().getItemInOffHand();
 
 			// Off hand projectiles not supported
-			if (player.getInventory().getItemInOffHand().equals(item)) {
+			if (offhand.equals(item)) {
 				return;
+			}
+
+			//Check for Two Handed Curse.
+			if (InventoryUtils.testForItemWithLore(mainhand, TwoHanded.PROPERTY_NAME) || InventoryUtils.testForItemWithLore(offhand, TwoHanded.PROPERTY_NAME)) {
+				if (offhand.getType() != Material.AIR && mainhand.getType() != Material.AIR) {
+					return;
+				}
 			}
 
 			// Only run Throw Rate if the Infinity enchantment is not on the trident
