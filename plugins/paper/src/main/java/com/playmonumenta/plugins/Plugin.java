@@ -30,6 +30,7 @@ import com.playmonumenta.plugins.commands.GiveSoulbound;
 import com.playmonumenta.plugins.commands.HopeifyHeldItem;
 import com.playmonumenta.plugins.commands.InfuseHeldItem;
 import com.playmonumenta.plugins.commands.Launch;
+import com.playmonumenta.plugins.commands.Magnetize;
 import com.playmonumenta.plugins.commands.MonumentaDebug;
 import com.playmonumenta.plugins.commands.MonumentaReload;
 import com.playmonumenta.plugins.commands.OpenDelveModifierSelectionGUI;
@@ -172,6 +173,7 @@ public class Plugin extends JavaPlugin {
 		Launch.register();
 		OpenDelveModifierSelectionGUI.register();
 		GetDepthPoints.register();
+		Magnetize.register();
 
 		try {
 			mHttpManager = new HttpManager(this);

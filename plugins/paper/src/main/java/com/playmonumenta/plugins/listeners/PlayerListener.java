@@ -756,6 +756,8 @@ public class PlayerListener implements Listener {
 				}
 			}.runTaskLater(Plugin.getInstance(), 5 * 20);
 		}
+		droppedItem.addScoreboardTag("DeathDroppedBy;" + player.getName());
+		droppedItem.addScoreboardTag("DeathDroppedBy;" + player.getUniqueId());
 		if ((result == ItemDeathResult.SAFE || result == ItemDeathResult.SHATTER || result == ItemDeathResult.SHATTER_NOW)
 		    && !player.getScoreboardTags().contains("DisableGraves")) {
 			GraveUtils.setGraveScoreboard(droppedItem, player, location);
