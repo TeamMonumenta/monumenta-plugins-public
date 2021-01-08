@@ -3,13 +3,6 @@ package com.playmonumenta.plugins.overrides;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.integrations.CoreProtectIntegration;
-import com.playmonumenta.plugins.utils.FastUtils;
-import com.playmonumenta.plugins.utils.InventoryUtils;
-import com.playmonumenta.plugins.utils.ItemUtils;
-import com.playmonumenta.plugins.utils.ItemUtils.ItemTier;
-
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -27,6 +20,13 @@ import org.bukkit.inventory.meta.BlockDataMeta;
 import org.bukkit.inventory.meta.BlockStateMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.integrations.CoreProtectIntegration;
+import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.ItemUtils.ItemTier;
+
 public class FirmamentOverride extends BaseOverride {
 
 	private static final String PRISMARINE_ENABLED = ChatColor.AQUA + "Prismarine " + ChatColor.GREEN + "Enabled";
@@ -40,12 +40,12 @@ public class FirmamentOverride extends BaseOverride {
 
 	@Override
 	public boolean leftClickItemInteraction(Plugin plugin, Player player, Action action, ItemStack item, Block block) {
-		return changeMode(item);
+		return changeMode(item, player);
 	}
 
 	@Override
 	public boolean leftClickBlockInteraction(Plugin plugin, Player player, Action action, ItemStack item, Block block) {
-		return changeMode(item);
+		return changeMode(item, player);
 	}
 
 	@Override
@@ -133,9 +133,13 @@ public class FirmamentOverride extends BaseOverride {
 		return false;
 	}
 
-	private boolean changeMode(ItemStack item) {
+	private boolean changeMode(ItemStack item, Player player) {
 		if (!isFirmamentItem(item)) {
 			//Somehow triggered when it wasn't the right item - shouldn't prevent the event to be safe
+			return true;
+		}
+
+		if (!player.isSneaking()) {
 			return true;
 		}
 
@@ -161,6 +165,7 @@ public class FirmamentOverride extends BaseOverride {
 		ItemMeta meta = item.getItemMeta();
 		meta.setLore(newLore);
 		item.setItemMeta(meta);
+		player.playSound(player.getLocation(), Sound.BLOCK_SHULKER_BOX_CLOSE, SoundCategory.BLOCKS, 1, 1);
 		return true;
 	}
 

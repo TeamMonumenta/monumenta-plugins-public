@@ -346,12 +346,15 @@ public class ItemUtils {
 			Material.BROWN_STAINED_GLASS,
 			Material.BLACK_STAINED_GLASS,
 			Material.WHITE_STAINED_GLASS,
+			Material.GLASS,
 			Material.SPRUCE_LEAVES,
 			Material.OAK_LEAVES,
 			Material.DARK_OAK_LEAVES,
 			Material.JUNGLE_LEAVES,
 			Material.BIRCH_LEAVES,
-			Material.ACACIA_LEAVES
+			Material.ACACIA_LEAVES,
+			Material.SEA_LANTERN,
+			Material.GLOWSTONE
 		);
 
 	public static final Set<Material> strippables = EnumSet.of(
