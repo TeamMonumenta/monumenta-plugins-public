@@ -209,7 +209,11 @@ public class SpellAirGolemStrike extends Spell {
 							}
 
 						}.runTaskLater(mPlugin, 30);
-						target.damage(mAttackDamage, golem);
+						if (target instanceof Player) {
+							BossUtils.bossDamage(golem, (Player) target, mAttackDamage);
+						} else {
+							target.damage(mAttackDamage, golem);
+						}
 						MovementUtils.knockAway(golem.getLocation(), target, 1f, 0.5f, false);
 						world.playSound(golem.getLocation(), Sound.ENTITY_IRON_GOLEM_ATTACK, SoundCategory.HOSTILE, 3, 0.5f);
 					}
