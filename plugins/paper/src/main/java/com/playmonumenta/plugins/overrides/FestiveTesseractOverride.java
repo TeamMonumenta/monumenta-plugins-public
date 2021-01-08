@@ -131,6 +131,7 @@ public class FestiveTesseractOverride extends BaseOverride {
 			LivingEntity summon = summons[i];
 			if (summon != null) {
 				summon.getScoreboardTags().remove("boss_targetplayer");
+				summon.getScoreboardTags().remove("boss_winter_snowman");
 				if (summon instanceof Lootable) {
 					((Lootable)summon).clearLootTable();
 				}
