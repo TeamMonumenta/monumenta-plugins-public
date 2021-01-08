@@ -4,7 +4,6 @@ import java.util.EnumSet;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.entity.Arrow;
@@ -34,7 +33,7 @@ public class PointBlank implements BaseEnchantment {
 
 	@Override
 	public EnumSet<ItemSlot> validSlots() {
-		return EnumSet.of(ItemSlot.MAINHAND, ItemSlot.OFFHAND);
+		return EnumSet.of(ItemSlot.MAINHAND);
 	}
 
 	@Override
@@ -43,16 +42,6 @@ public class PointBlank implements BaseEnchantment {
 			if ((proj instanceof Arrow) && !((Arrow)proj).isCritical()) {
 				// If this is an arrow, it must be critical. Since this is not, abort early
 				return;
-			}
-
-			int mainHandLevel = this.getLevelFromItem(player.getInventory().getItemInMainHand());
-			int offHandLevel = this.getLevelFromItem(player.getInventory().getItemInOffHand());
-
-			if (mainHandLevel > 0 && offHandLevel > 0
-				&& player.getInventory().getItemInMainHand().getType().equals(Material.BOW)
-				&& player.getInventory().getItemInOffHand().getType().equals(Material.BOW)) {
-				/* If we're trying to cheat by dual-wielding this enchant, subtract the lower of the two levels */
-				level -= mainHandLevel < offHandLevel ? mainHandLevel : offHandLevel;
 			}
 
 			proj.setMetadata(LEVEL_METAKEY, new FixedMetadataValue(plugin, level));
