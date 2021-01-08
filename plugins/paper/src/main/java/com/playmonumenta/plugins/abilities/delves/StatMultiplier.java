@@ -16,14 +16,20 @@ import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.EntitySpawnEvent;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.bosses.bosses.CrowdControlImmunityBoss;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.DelvesUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 
 public class StatMultiplier extends DelveModifier {
 
-	private static final String STAT_MULTIPLIER_MODIFIER_NAME = "DelveStatMultiplier";
-	private static final double STAT_MULTIPLIER_INCREMENT = 0.03;
+	private static final String HEALTH_MODIFIER_NAME = "DelveHealthModifier";
+	private static final String SPEED_MODIFIER_NAME = "DelveSpeedModifier";
+
+	private static final double DAMAGE_MULTIPLIER_INCREMENT = 0.03;
+	private static final double HEALTH_MULTIPLIER_INCREMENT = 0.02;
+	private static final double SPEED_MULTIPLIER_INCREMENT = 0.01;
+
 	private static final Map<String, Double> STAT_COMPENSATION_MAPPINGS = new HashMap<>();
 
 	protected static final String DELVE_MOB_TAG = "delve_mob";
@@ -32,29 +38,31 @@ public class StatMultiplier extends DelveModifier {
 	private static final String DELVE_MOB_HEALTH_MODIFIER_NAME = "DelveMobHealthModifier";
 
 	static {
-		STAT_COMPENSATION_MAPPINGS.put("white", 1.6);
-		STAT_COMPENSATION_MAPPINGS.put("orange", 1.6);
-		STAT_COMPENSATION_MAPPINGS.put("magenta", 1.4);
-		STAT_COMPENSATION_MAPPINGS.put("lightblue", 1.1);
-		STAT_COMPENSATION_MAPPINGS.put("yellow", 1.0);
-		STAT_COMPENSATION_MAPPINGS.put("willows", 1.1);
-		STAT_COMPENSATION_MAPPINGS.put("reverie", 0.9);
-		STAT_COMPENSATION_MAPPINGS.put("lime", 1.6);
-		STAT_COMPENSATION_MAPPINGS.put("pink", 1.4);
-		STAT_COMPENSATION_MAPPINGS.put("gray", 1.4);
-		STAT_COMPENSATION_MAPPINGS.put("lightgray", 1.1);
-		STAT_COMPENSATION_MAPPINGS.put("cyan", 1.1);
-		STAT_COMPENSATION_MAPPINGS.put("purple", 1.0);
-		STAT_COMPENSATION_MAPPINGS.put("teal", 0.9);
-		STAT_COMPENSATION_MAPPINGS.put("shiftingcity", 0.9);
+		STAT_COMPENSATION_MAPPINGS.put("white", 1.7);
+		STAT_COMPENSATION_MAPPINGS.put("orange", 1.7);
+		STAT_COMPENSATION_MAPPINGS.put("magenta", 1.5);
+		STAT_COMPENSATION_MAPPINGS.put("lightblue", 1.2);
+		STAT_COMPENSATION_MAPPINGS.put("yellow", 1.1);
+		STAT_COMPENSATION_MAPPINGS.put("willows", 1.2);
+		STAT_COMPENSATION_MAPPINGS.put("reverie", 1.0);
+		STAT_COMPENSATION_MAPPINGS.put("lime", 1.7);
+		STAT_COMPENSATION_MAPPINGS.put("pink", 1.5);
+		STAT_COMPENSATION_MAPPINGS.put("gray", 1.5);
+		STAT_COMPENSATION_MAPPINGS.put("lightgray", 1.2);
+		STAT_COMPENSATION_MAPPINGS.put("cyan", 1.2);
+		STAT_COMPENSATION_MAPPINGS.put("purple", 1.1);
+		STAT_COMPENSATION_MAPPINGS.put("teal", 1.0);
+		STAT_COMPENSATION_MAPPINGS.put("shiftingcity", 1.0);
 		STAT_COMPENSATION_MAPPINGS.put("dev1", 1.0);
 		STAT_COMPENSATION_MAPPINGS.put("dev2", 1.0);
 		STAT_COMPENSATION_MAPPINGS.put("mobs", 1.0);
 	}
 
 	private final double mStatCompensation;
-	private final double mStatMultiplier;
 	private final double mDelveMobStatMultiplier;
+	private final double mDamageMultiplier;
+	private final double mHealthMultiplier;
+	private final double mSpeedMultiplier;
 
 	public StatMultiplier(Plugin plugin, Player player) {
 		super(plugin, player, null);
@@ -62,18 +70,28 @@ public class StatMultiplier extends DelveModifier {
 		Double statCompensation = STAT_COMPENSATION_MAPPINGS.get(ServerProperties.getShardName());
 		mStatCompensation = statCompensation == null ? 1 : statCompensation;
 
-		mStatMultiplier = getStatMultiplier(DelvesUtils.getDelveInfo(player).getDepthPoints());
-
 		mDelveMobStatMultiplier = ServerProperties.getClassSpecializationsEnabled()
 				? DELVE_MOB_STAT_MULTIPLIER_R2 : DELVE_MOB_STAT_MULTIPLIER_R1;
+
+		mDamageMultiplier = getDamageMultiplier(DelvesUtils.getDelveInfo(player).getDepthPoints());
+		mHealthMultiplier = getHealthMultiplier(DelvesUtils.getDelveInfo(player).getDepthPoints());
+		mSpeedMultiplier = getSpeedMultiplier(DelvesUtils.getDelveInfo(player).getDepthPoints());
 	}
 
 	public static double getStatCompensation(String dungeon) {
 		return STAT_COMPENSATION_MAPPINGS.get(dungeon);
 	}
 
-	public static double getStatMultiplier(int depthPoints) {
-		return 1 + Math.min(DelvesUtils.getLootCapDepthPoints(9001), depthPoints) * STAT_MULTIPLIER_INCREMENT;
+	public static double getDamageMultiplier(int depthPoints) {
+		return 1 + Math.min(DelvesUtils.getLootCapDepthPoints(9001), depthPoints) * DAMAGE_MULTIPLIER_INCREMENT;
+	}
+
+	public static double getHealthMultiplier(int depthPoints) {
+		return 1 + Math.min(DelvesUtils.getLootCapDepthPoints(9001), depthPoints) * HEALTH_MULTIPLIER_INCREMENT;
+	}
+
+	public static double getSpeedMultiplier(int depthPoints) {
+		return 1 + Math.min(DelvesUtils.getLootCapDepthPoints(9001), depthPoints) * SPEED_MULTIPLIER_INCREMENT;
 	}
 
 	public static boolean canUseStatic(Player player) {
@@ -108,7 +126,7 @@ public class StatMultiplier extends DelveModifier {
 			event.setDamage(EntityUtils.getDamageApproximation(event, mStatCompensation));
 		}
 
-		event.setDamage(EntityUtils.getDamageApproximation(event, mStatMultiplier));
+		event.setDamage(EntityUtils.getDamageApproximation(event, mDamageMultiplier));
 	}
 
 	@Override
@@ -119,10 +137,15 @@ public class StatMultiplier extends DelveModifier {
 			Set<String> tags = mob.getScoreboardTags();
 			if (tags != null && tags.contains(DELVE_MOB_TAG)) {
 				EntityUtils.addAttribute(mob, Attribute.GENERIC_MAX_HEALTH,
-						new AttributeModifier(DELVE_MOB_HEALTH_MODIFIER_NAME, mStatMultiplier * mDelveMobStatMultiplier - 1, Operation.MULTIPLY_SCALAR_1));
+						new AttributeModifier(DELVE_MOB_HEALTH_MODIFIER_NAME, mHealthMultiplier * mDelveMobStatMultiplier - 1, Operation.MULTIPLY_SCALAR_1));
 			} else {
 				EntityUtils.addAttribute(mob, Attribute.GENERIC_MAX_HEALTH,
-						new AttributeModifier(STAT_MULTIPLIER_MODIFIER_NAME, mStatMultiplier * mStatCompensation - 1, Operation.MULTIPLY_SCALAR_1));
+						new AttributeModifier(HEALTH_MODIFIER_NAME, mHealthMultiplier * mStatCompensation - 1, Operation.MULTIPLY_SCALAR_1));
+			}
+
+			if (tags == null || !tags.contains(CrowdControlImmunityBoss.identityTag)) {
+				EntityUtils.addAttribute(mob, Attribute.GENERIC_MOVEMENT_SPEED,
+						new AttributeModifier(SPEED_MODIFIER_NAME, mSpeedMultiplier - 1, Operation.MULTIPLY_SCALAR_1));
 			}
 
 			mob.setHealth(healthProportion * mob.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue());

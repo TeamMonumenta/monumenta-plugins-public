@@ -34,6 +34,7 @@ import com.playmonumenta.plugins.abilities.warlock.ConsumingFlames.ConsumingFlam
 import com.playmonumenta.plugins.abilities.warrior.BruteForce.BruteForceDamageEnchantment;
 import com.playmonumenta.plugins.abilities.warrior.ShieldBash.ShieldBashCooldownEnchantment;
 import com.playmonumenta.plugins.abilities.warrior.ShieldBash.ShieldBashDamageEnchantment;
+import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.ItemUtils;
 
 public class EnchantmentManager implements Listener {
@@ -225,19 +226,33 @@ public class EnchantmentManager implements Listener {
 
 			//If enum matches a slot (hand/armor), runs through those enchantments
 			if (slot != null) {
-				//Adds in the new custom enchants at the index only
-				for (BaseEnchantment property : mProperties.get(slot)) {
-					updateItem(plugin, index, slot, item, player, property, propertyMap, inventoryMap);
-				}
+				updateItem(plugin, index, slot, item, player, mProperties.get(slot), propertyMap, inventoryMap);
 			}
 
-			slot = ItemSlot.INVENTORY;
-			//Checks for inventory enchants too, since all slots use them, so always checks regardless of above
-			for (BaseEnchantment property : mProperties.get(slot)) {
-				updateItem(plugin, index, slot, item, player, property, propertyMap, inventoryMap);
-			}
+			// Checks for inventory enchants too, since all slots use them, so always checks regardless of above
+			updateItem(plugin, index, ItemSlot.INVENTORY, item, player, mProperties.get(ItemSlot.INVENTORY), propertyMap, inventoryMap);
 		} catch (Exception e) {
 			e.printStackTrace();
+		}
+	}
+
+	private static void updateItem(Plugin plugin, int index, ItemSlot slot, ItemStack item, Player player, List<BaseEnchantment> properties,
+			Map<BaseEnchantment, Integer> propertyMap, Map<Integer, Map<BaseEnchantment, Integer>> inventoryMap) {
+		// Prevent mainhand custom enchants from registering for R2 items in R1
+		RegionScalingDamageDealt regionScaling = new RegionScalingDamageDealt();
+		if (slot == ItemSlot.MAINHAND && !ServerProperties.getClassSpecializationsEnabled()
+				&& regionScaling.getLevelFromItem(item, player) > 0) {
+			updateItem(plugin, index, slot, item, player, new RegionScalingDamageDealt(), propertyMap, inventoryMap);
+			return;
+		}
+
+		// Prevents armor items being held in mainhand / offhand counting towards enchantment level
+		if ((slot == ItemSlot.OFFHAND || slot == ItemSlot.MAINHAND) && item != null && ItemUtils.isWearable(item.getType())) {
+			return;
+		}
+
+		for (BaseEnchantment property : properties) {
+			updateItem(plugin, index, slot, item, player, property, propertyMap, inventoryMap);
 		}
 	}
 
@@ -245,11 +260,6 @@ public class EnchantmentManager implements Listener {
 	                               Player player, BaseEnchantment property,
 	                               Map<BaseEnchantment, Integer> propertyMap,
 	                               Map<Integer, Map<BaseEnchantment, Integer>> inventoryMap) {
-		if ((slot == ItemSlot.OFFHAND || slot == ItemSlot.MAINHAND) && item != null && ItemUtils.isWearable(item.getType())) {
-			// Prevents armor items being held in mainhand / offhand counting towards enchantment level
-			return;
-		}
-
 		int level = property.getLevelFromItem(item, player, slot);
 		if (level > 0 || (property.negativeLevelsAllowed() && level < 0)) {
 			Integer currentLevel = propertyMap.get(property);

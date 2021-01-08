@@ -134,7 +134,7 @@ public interface BaseEnchantment {
 
 	/*
 	 * The onDamage() method will be called whenever the player damages something, no
-	 * matter the cause of damage.
+	 * matter the cause of damage (excluding projectiles)
 	 */
 	default void onDamage(Plugin plugin, Player player, int level, LivingEntity target, EntityDamageByEntityEvent event) {
 

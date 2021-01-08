@@ -32,7 +32,7 @@ public class KineticProjectileBoss extends BossAbilityGroup {
 	private static final double TURN_RADIUS = 0;
 	private static final int DISTANCE = 32;
 	private static final int LIFETIME_TICKS = (int)(DISTANCE / SPEED);
-	private static final double HITBOX_LENGTH = 1;
+	private static final double HITBOX_LENGTH = 1.25;
 	private static final boolean COLLIDES_WITH_BLOCKS = true;
 	private static final boolean LINGERS = true;
 	private static final int DAMAGE = 24;

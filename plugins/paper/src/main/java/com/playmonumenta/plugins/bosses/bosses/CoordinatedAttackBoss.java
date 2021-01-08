@@ -60,7 +60,7 @@ public class CoordinatedAttackBoss extends BossAbilityGroup {
 
 			World world = mBoss.getWorld();
 			Location loc = target.getLocation();
-			world.playSound(loc, Sound.ENTITY_PIGLIN_BRUTE_CONVERTED_TO_ZOMBIFIED, 0.5f, 1.5f);
+			world.playSound(loc, Sound.EVENT_RAID_HORN, 0.5f, 1.5f);
 			world.spawnParticle(Particle.VILLAGER_ANGRY, loc, 30, 3, 0, 3, 0);
 
 			new BukkitRunnable() {

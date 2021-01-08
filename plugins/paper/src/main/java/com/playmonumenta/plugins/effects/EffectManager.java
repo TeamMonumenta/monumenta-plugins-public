@@ -7,10 +7,6 @@ import java.util.Map;
 import java.util.NavigableSet;
 import java.util.TreeSet;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
-import com.playmonumenta.plugins.Plugin;
-
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
@@ -22,6 +18,10 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityRegainHealthEvent;
 import org.bukkit.projectiles.ProjectileSource;
 import org.bukkit.scheduler.BukkitRunnable;
+
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.playmonumenta.plugins.Plugin;
 
 public class EffectManager implements Listener {
 

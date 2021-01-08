@@ -71,8 +71,8 @@ import com.playmonumenta.plugins.abilities.cleric.paladin.HolyJavelin;
 import com.playmonumenta.plugins.abilities.cleric.paladin.LuminousInfusion;
 import com.playmonumenta.plugins.abilities.delves.Arcanic;
 import com.playmonumenta.plugins.abilities.delves.Bloodthirsty;
+import com.playmonumenta.plugins.abilities.delves.Carapace;
 import com.playmonumenta.plugins.abilities.delves.Colossal;
-import com.playmonumenta.plugins.abilities.delves.Despair;
 import com.playmonumenta.plugins.abilities.delves.Dreadful;
 import com.playmonumenta.plugins.abilities.delves.Entropy;
 import com.playmonumenta.plugins.abilities.delves.Infernal;
@@ -409,7 +409,7 @@ public class AbilityManager {
 		                               new Pernicious(mPlugin, null),
 		                               new Legionary(mPlugin, null),
 		                               new Bloodthirsty(mPlugin, null),
-		                               new Despair(mPlugin, null),
+		                               new Carapace(mPlugin, null),
 		                               new Entropy(mPlugin, null),
 		                               new Twisted(mPlugin, null),
 

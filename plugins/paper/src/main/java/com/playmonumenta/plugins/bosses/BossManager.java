@@ -197,6 +197,7 @@ public class BossManager implements Listener {
 		mStatelessBosses.put(CoordinatedAttackBoss.identityTag, (Plugin p, LivingEntity e) -> new CoordinatedAttackBoss(p, e));
 		mStatelessBosses.put(AbilitySilenceBoss.identityTag, (Plugin p, LivingEntity e) -> new AbilitySilenceBoss(p, e));
 		mStatelessBosses.put(ShiftingBoss.identityTag, (Plugin p, LivingEntity e) -> new ShiftingBoss(p, e));
+		mStatelessBosses.put(CarapaceBoss.identityTag, (Plugin p, LivingEntity e) -> new CarapaceBoss(p, e));
 		mStatelessBosses.put(KamikazeBoss.identityTag, (Plugin p, LivingEntity e) -> new KamikazeBoss(p,e));
 
 		/* Stateful bosses have a remembered spawn location and end location where a redstone block is set when they die */
@@ -347,6 +348,7 @@ public class BossManager implements Listener {
 		mBossDeserializers.put(CoordinatedAttackBoss.identityTag, (Plugin p, LivingEntity e) -> CoordinatedAttackBoss.deserialize(p, e));
 		mBossDeserializers.put(AbilitySilenceBoss.identityTag, (Plugin p, LivingEntity e) -> AbilitySilenceBoss.deserialize(p, e));
 		mBossDeserializers.put(ShiftingBoss.identityTag, (Plugin p, LivingEntity e) -> ShiftingBoss.deserialize(p, e));
+		mBossDeserializers.put(CarapaceBoss.identityTag, (Plugin p, LivingEntity e) -> CarapaceBoss.deserialize(p, e));
 		mBossDeserializers.put(KamikazeBoss.identityTag, (Plugin p, LivingEntity e) -> KamikazeBoss.deserialize(p, e));
 
 	}

@@ -83,19 +83,8 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.abilities.cleric.hierophant.EnchantedPrayer;
 import com.playmonumenta.plugins.enchantments.AttributeProjectileDamage;
-import com.playmonumenta.plugins.enchantments.Duelist;
-import com.playmonumenta.plugins.enchantments.Frost;
-import com.playmonumenta.plugins.enchantments.HexEater;
-import com.playmonumenta.plugins.enchantments.IceAspect;
 import com.playmonumenta.plugins.enchantments.Inferno;
-import com.playmonumenta.plugins.enchantments.PointBlank;
-import com.playmonumenta.plugins.enchantments.Slayer;
-import com.playmonumenta.plugins.enchantments.Sniper;
-import com.playmonumenta.plugins.enchantments.Spark;
 import com.playmonumenta.plugins.enchantments.ThrowingKnife;
-import com.playmonumenta.plugins.enchantments.Thunder;
-import com.playmonumenta.plugins.enchantments.evasions.EvasionInfo;
-import com.playmonumenta.plugins.enchantments.infusions.Focus;
 import com.playmonumenta.plugins.events.CustomDamageEvent;
 import com.playmonumenta.plugins.events.PotionEffectApplyEvent;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
@@ -268,11 +257,6 @@ public class EntityListener implements Listener {
 
 			Player player = (Player)damagee;
 
-			mPlugin.mTrackingManager.mPlayers.onHurtByEntity(mPlugin, player, event);
-			if (event.getDamage() > 0) {
-				EvasionInfo.triggerEvasion(player, event);
-			}
-
 			if (damager instanceof LivingEntity) {
 				if (!mAbilities.playerDamagedByLivingEntityEvent(player, event)) {
 					event.setCancelled(true);
@@ -326,12 +310,6 @@ public class EntityListener implements Listener {
 			if (event.getCause() != DamageCause.THORNS) {
 				// Class damage-based abilities only apply to living entities that are not villagers
 				if (damagee instanceof LivingEntity && (damagee instanceof Player || EntityUtils.isHostileMob(damagee))) {
-					// Apply any damage modifications that items they have may apply.
-					mPlugin.mTrackingManager.mPlayers.onDamage(mPlugin, player, (LivingEntity)damagee, event);
-					if (event.getCause().equals(DamageCause.ENTITY_ATTACK)) {
-						mPlugin.mTrackingManager.mPlayers.onAttack(mPlugin, player, (LivingEntity)damagee, event);
-					}
-
 					if (!mAbilities.livingEntityDamagedByPlayerEvent(player, event)) {
 						event.setCancelled(true);
 					}
@@ -366,38 +344,8 @@ public class EntityListener implements Listener {
 						return;
 					}
 
-					LivingEntity le = (LivingEntity) damagee;
-
-					AttributeProjectileDamage.onShootAttack(mPlugin, proj, le, event);
-
-					Sniper.onShootAttack(mPlugin, proj, le, event);
-					PointBlank.onShootAttack(mPlugin, proj, le, event);
-					Frost.onShootAttack(mPlugin, proj, le, event);
-					Inferno.onShootAttack(mPlugin, proj, le, event);
-					Focus.onShootAttack(mPlugin, proj, le, event);
-					Spark.onShootAttack(mPlugin, proj, le, event);
-
-					if (damager instanceof Trident) {
-						IceAspect.onShootAttack(mPlugin, proj, le, event);
-						Thunder.onShootAttack(mPlugin, proj, le, event);
-						HexEater.onShootAttack(mPlugin, proj, le, event);
-						Slayer.onShootAttack(mPlugin, proj, le, event);
-						Duelist.onShootAttack(mPlugin, proj, le, event);
-						Focus.onShootAttack(mPlugin, proj, le, event);
-
-						/*
-						 * The trident damage from Smite, Bane, Impaling seems to be properly applied, even
-						 * though AttributeProjectileDamage.onShootAttack(mPlugin, proj, le, event); does
-						 * direct damage setting, so that's convenient
-						 *
-						 * Sharpness bonus damage seems to not be registered, so no need to compensate there
-						 */
-					}
-
 					// Call events if not a throwing knife
 					if (!(proj instanceof Arrow && ThrowingKnife.isThrowingKnife((Arrow) proj))) {
-						mPlugin.mTrackingManager.mPlayers.onDamage(mPlugin, player, (LivingEntity) damagee, event);
-
 						if (!mAbilities.livingEntityShotByPlayerEvent(player, proj, (LivingEntity) damagee, event)) {
 							damager.remove();
 							event.setCancelled(true);
@@ -414,6 +362,16 @@ public class EntityListener implements Listener {
 			if (damagee instanceof Player) {
 				// Damage triggering logic in PlayerInventory.java
 				mPlugin.mTrackingManager.mPlayers.onFatalHurt(mPlugin, (Player) damagee, event);
+
+				// Armor Piercing rescaling
+				double damage = event.getDamage();
+				if (damage > 16) {
+					// Set event damage to the amount of damage that armor piercing should account for
+					event.setDamage(4 * Math.log(damage) / Math.log(2));
+
+					// Multiply the "final" event damage by the amount reduced - this multiplier adjusts for armor piercing
+					event.setDamage(EntityUtils.getDamageApproximation(event, damage / event.getDamage()));
+				}
 			}
 		}
 	}

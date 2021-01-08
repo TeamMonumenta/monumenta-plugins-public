@@ -31,9 +31,9 @@ import org.bukkit.loot.LootTable;
 
 import com.playmonumenta.plugins.abilities.delves.Arcanic;
 import com.playmonumenta.plugins.abilities.delves.Bloodthirsty;
+import com.playmonumenta.plugins.abilities.delves.Carapace;
 import com.playmonumenta.plugins.abilities.delves.Colossal;
 import com.playmonumenta.plugins.abilities.delves.DelveModifier;
-import com.playmonumenta.plugins.abilities.delves.Despair;
 import com.playmonumenta.plugins.abilities.delves.Dreadful;
 import com.playmonumenta.plugins.abilities.delves.Entropy;
 import com.playmonumenta.plugins.abilities.delves.Infernal;
@@ -53,7 +53,7 @@ public class DelvesUtils {
 
 	public enum Modifier {
 
-		RELENTLESS(Relentless.class, 1, Material.ELYTRA, "" + ChatColor.AQUA + ChatColor.BOLD + "Relentless", Relentless.DESCRIPTION, Relentless.RANK_DESCRIPTIONS),
+		RELENTLESS(Relentless.class, 1, Material.DIAMOND_PICKAXE, "" + ChatColor.AQUA + ChatColor.BOLD + "Relentless", Relentless.DESCRIPTION, Relentless.RANK_DESCRIPTIONS),
 		ARCANIC(Arcanic.class, 2, Material.NETHER_STAR, "" + ChatColor.LIGHT_PURPLE + ChatColor.BOLD + "Arcanic", Arcanic.DESCRIPTION, Arcanic.RANK_DESCRIPTIONS),
 		INFERNAL(Infernal.class, 3, Material.LAVA_BUCKET, "" + ChatColor.GOLD + ChatColor.BOLD + "Infernal", Infernal.DESCRIPTION, Infernal.RANK_DESCRIPTIONS),
 		TRANSCENDENT(Transcendent.class, 4, Material.ENDER_EYE, "" + ChatColor.GREEN + ChatColor.BOLD + "Transcendent", Transcendent.DESCRIPTION, Transcendent.RANK_DESCRIPTIONS),
@@ -64,7 +64,7 @@ public class DelvesUtils {
 		BLOODTHIRSTY(Bloodthirsty.class, 11, Material.ROTTEN_FLESH, "" + ChatColor.RED + ChatColor.BOLD + "Bloodthirsty", Bloodthirsty.DESCRIPTION, Bloodthirsty.RANK_DESCRIPTIONS),
 		PERNICIOUS(Pernicious.class, 12, Material.MUSIC_DISC_11, "" + ChatColor.DARK_AQUA + ChatColor.BOLD + "Pernicious", Pernicious.DESCRIPTION, Pernicious.RANK_DESCRIPTIONS),
 		LEGIONARY(Legionary.class, 13, Material.IRON_SWORD, "" + ChatColor.YELLOW + ChatColor.BOLD + "Legionary", Legionary.DESCRIPTION, Legionary.RANK_DESCRIPTIONS),
-		DESPAIR(Despair.class, 14, Material.GHAST_TEAR, "" + ChatColor.DARK_PURPLE + ChatColor.BOLD + "Despair", Despair.DESCRIPTION, Despair.RANK_DESCRIPTIONS),
+		CARAPACE(Carapace.class, 14, Material.NETHERITE_HELMET, "" + ChatColor.DARK_PURPLE + ChatColor.BOLD + "Carapace", Carapace.DESCRIPTION, Carapace.RANK_DESCRIPTIONS),
 		ENTROPY(Entropy.class, 15, Material.STRUCTURE_VOID, "" + ChatColor.BLUE + ChatColor.BOLD + "Entropy", Entropy.DESCRIPTION, Entropy.RANK_DESCRIPTIONS),
 		TWISTED(Twisted.class, 16, Material.TIPPED_ARROW, "" + ChatColor.DARK_RED + ChatColor.BOLD + "Twisted", Twisted.DESCRIPTION, Twisted.RANK_DESCRIPTIONS);
 
@@ -141,7 +141,7 @@ public class DelvesUtils {
 			MODIFIER_RANK_CAPS.put(Modifier.BLOODTHIRSTY, 3);
 			MODIFIER_RANK_CAPS.put(Modifier.PERNICIOUS, 3);
 			MODIFIER_RANK_CAPS.put(Modifier.LEGIONARY, 5);
-			MODIFIER_RANK_CAPS.put(Modifier.DESPAIR, 5);
+			MODIFIER_RANK_CAPS.put(Modifier.CARAPACE, 5);
 			MODIFIER_RANK_CAPS.put(Modifier.ENTROPY, 5);
 			MODIFIER_RANK_CAPS.put(Modifier.TWISTED, 1);
 
@@ -546,7 +546,7 @@ public class DelvesUtils {
 		new DelveLootTableGroup("r2/delves/gray/base_final", "r2/delves/gray/dmat_final", "r2/delves/gray/cmat_final", "r2/dungeons/gray/chest_final").mapDelveLootTables(DELVE_LOOT_TABLE_REPLACEMENT_MAPPINGS);
 
 		new DelveLootTableGroup("r2/delves/lightgray/base_chest", "r2/delves/lightgray/dmat_chest", "r2/delves/lightgray/cmat_chest", "r2/dungeons/lightgray/level_3_chestoutside", "r2/dungeons/lightgray/level_4_chestoutside", "r2/dungeons/lightgray/level_3_chestpalace", "r2/dungeons/lightgray/level_4_chestpalace").mapDelveLootTables(DELVE_LOOT_TABLE_REPLACEMENT_MAPPINGS);
-		new DelveLootTableGroup("r2/delves/lightgray/base_final", "r2/delves/lightgray/dmat_final", "r2/delves/lightgray/cmat_final", "r2/dungeons/gray/chest_final").mapDelveLootTables(DELVE_LOOT_TABLE_REPLACEMENT_MAPPINGS);
+		new DelveLootTableGroup("r2/delves/lightgray/base_final", "r2/delves/lightgray/dmat_final", "r2/delves/lightgray/cmat_final", "r2/dungeons/lightgray/chest_final").mapDelveLootTables(DELVE_LOOT_TABLE_REPLACEMENT_MAPPINGS);
 
 		new DelveLootTableGroup("r2/delves/cyan/base_mine", "r2/delves/cyan/dmat_mine", "r2/delves/cyan/cmat_mine", "r2/dungeons/cyan/level_3_chestmine", "r2/dungeons/cyan/level_4_chestmine").mapDelveLootTables(DELVE_LOOT_TABLE_REPLACEMENT_MAPPINGS);
 		new DelveLootTableGroup("r2/delves/cyan/base_temple", "r2/delves/cyan/dmat_temple", "r2/delves/cyan/cmat_temple", "r2/dungeons/cyan/level_3_chesttemple", "r2/dungeons/cyan/level_4_chesttemple").mapDelveLootTables(DELVE_LOOT_TABLE_REPLACEMENT_MAPPINGS);
@@ -799,7 +799,9 @@ public class DelvesUtils {
 		}
 
 		private ItemStack getSummary() {
-			ItemStack item = new ItemStack(Material.DIAMOND_PICKAXE, 1);
+			int depthPoints = mDelveInfo.getDepthPoints();
+
+			ItemStack item = new ItemStack(Material.SOUL_LANTERN, Math.max(1, depthPoints));
 
 			ItemMeta meta = item.getItemMeta();
 			meta.setDisplayName("" + ChatColor.GOLD + ChatColor.BOLD + "Delve Summary");
@@ -807,44 +809,76 @@ public class DelvesUtils {
 
 			List<String> lore = new ArrayList<>();
 
-			int depthPoints = mDelveInfo.getDepthPoints();
+			lore.add(ChatColor.WHITE + "" + mDelveInfo.getDepthPoints() + " Depth Points Assigned");
 
-			lore.add(ChatColor.WHITE + "- " + mDelveInfo.getDepthPoints() + " Depth Points Assigned");
+			lore.add(ChatColor.RESET + "");
 
-			double statMultiplier = StatMultiplier.getStatMultiplier(depthPoints);
-			double dungeonMultiplier = StatMultiplier.getStatCompensation(mDungeon);
-			if (statMultiplier >= 1.75) {
-				lore.add(ChatColor.DARK_RED + "- Enemy Health and Damage Multipliers:");
-				lore.add(String.format(ChatColor.DARK_RED + "  - Depth Points Multiplier: x%.2f", statMultiplier));
-				lore.add(String.format(ChatColor.DARK_RED + "  - Base Dungeon Multiplier: x%.2f", dungeonMultiplier));
-			} else if (statMultiplier >= 1.45) {
-				lore.add(ChatColor.RED + "- Enemy Health and Damage Multipliers:");
-				lore.add(String.format(ChatColor.RED + "  - Depth Points Multiplier: x%.2f", statMultiplier));
-				lore.add(String.format(ChatColor.RED + "  - Base Dungeon Multiplier: x%.2f", dungeonMultiplier));
+			lore.add(ChatColor.WHITE + "Stat Multipliers from Depth Points:");
+			double damageMultiplier = StatMultiplier.getDamageMultiplier(depthPoints);
+			double healthMultiplier = StatMultiplier.getHealthMultiplier(depthPoints);
+			double speedMultiplier = StatMultiplier.getSpeedMultiplier(depthPoints);
+			if (damageMultiplier >= 1.75) {
+				lore.add(String.format(ChatColor.DARK_RED + "- Damage Multiplier: x%.2f", damageMultiplier));
+				lore.add(String.format(ChatColor.DARK_RED + "- Health Multiplier: x%.2f", healthMultiplier));
+				lore.add(String.format(ChatColor.DARK_RED + "- Speed Multiplier: x%.2f", speedMultiplier));
+			} else if (damageMultiplier >= 1.45) {
+				lore.add(String.format(ChatColor.RED + "- Damage Multiplier: x%.2f", damageMultiplier));
+				lore.add(String.format(ChatColor.RED + "- Health Multiplier: x%.2f", healthMultiplier));
+				lore.add(String.format(ChatColor.RED + "- Speed Multiplier: x%.2f", speedMultiplier));
 			} else {
-				lore.add(ChatColor.WHITE + "- Enemy Health and Damage Multipliers:");
-				lore.add(String.format(ChatColor.WHITE + "  - Depth Points Multiplier: x%.2f", statMultiplier));
-				lore.add(String.format(ChatColor.WHITE + "  - Base Dungeon Multiplier: x%.2f", dungeonMultiplier));
+				lore.add(String.format(ChatColor.GRAY + "- Damage Multiplier: x%.2f", damageMultiplier));
+				lore.add(String.format(ChatColor.GRAY + "- Health Multiplier: x%.2f", healthMultiplier));
+				lore.add(String.format(ChatColor.GRAY + "- Speed Multiplier: x%.2f", speedMultiplier));
 			}
 
+			lore.add(ChatColor.RESET + "");
+
+			double dungeonMultiplier = StatMultiplier.getStatCompensation(mDungeon);
+			lore.add(ChatColor.WHITE + "Stat Multipliers from Base Dungeon:");
+			lore.add(String.format(ChatColor.GRAY + "- Damage Multiplier: x%.2f", dungeonMultiplier));
+			lore.add(String.format(ChatColor.GRAY + "- Health Multiplier: x%.2f", dungeonMultiplier));
+
+			lore.add(ChatColor.RESET + "");
+
+			lore.add(ChatColor.WHITE + "Delve Material Multipliers (Not Counting Loot Scaling):");
 			double baseAmount = DelveLootTableGroup.getDelveMaterialTableChance(MINIMUM_DEPTH_POINTS, 9001);
 			double delveMaterialMultiplierSolo = DelveLootTableGroup.getDelveMaterialTableChance(depthPoints, 1) / baseAmount;
 			double delveMaterialMultiplierDuo = DelveLootTableGroup.getDelveMaterialTableChance(depthPoints, 2) / baseAmount;
 			double delveMaterialMultiplierTrio = DelveLootTableGroup.getDelveMaterialTableChance(depthPoints, 3) / baseAmount;
 			double delveMaterialMultiplier = DelveLootTableGroup.getDelveMaterialTableChance(depthPoints, 9001) / baseAmount;
+
 			if (delveMaterialMultiplier > 0) {
-				lore.add(ChatColor.GRAY + "- Delve Material Multipliers (Not Counting Loot Scaling):");
-				lore.add(String.format(ChatColor.GRAY + "  - 1 Player: x%.2f", delveMaterialMultiplierSolo));
-				lore.add(String.format(ChatColor.GRAY + "  - 2 Players: x%.2f", delveMaterialMultiplierDuo));
-				lore.add(String.format(ChatColor.GRAY + "  - 3 Players: x%.2f", delveMaterialMultiplierTrio));
-				lore.add(String.format(ChatColor.GRAY + "  - 4+ Players: x%.2f", delveMaterialMultiplier));
+				if (delveMaterialMultiplierSolo == DelveLootTableGroup.getDelveMaterialTableChance(9001, 1) / baseAmount) {
+					lore.add(String.format(ChatColor.YELLOW + "- 1 Player: x%.2f (Capped)", delveMaterialMultiplierSolo));
+				} else {
+					lore.add(String.format(ChatColor.GRAY + "- 1 Player: x%.2f", delveMaterialMultiplierSolo));
+				}
+
+				if (delveMaterialMultiplierDuo == DelveLootTableGroup.getDelveMaterialTableChance(9001, 2) / baseAmount) {
+					lore.add(String.format(ChatColor.YELLOW + "- 2 Players: x%.2f (Capped)", delveMaterialMultiplierDuo));
+				} else {
+					lore.add(String.format(ChatColor.GRAY + "- 2 Players: x%.2f", delveMaterialMultiplierDuo));
+				}
+
+				if (delveMaterialMultiplierTrio == DelveLootTableGroup.getDelveMaterialTableChance(9001, 3) / baseAmount) {
+					lore.add(String.format(ChatColor.YELLOW + "- 3 Players: x%.2f (Capped)", delveMaterialMultiplierTrio));
+				} else {
+					lore.add(String.format(ChatColor.GRAY + "- 3 Players: x%.2f", delveMaterialMultiplierTrio));
+				}
+
+				if (delveMaterialMultiplier == DelveLootTableGroup.getDelveMaterialTableChance(9001, 9001) / baseAmount) {
+					lore.add(String.format(ChatColor.YELLOW + "- 4+ Players: x%.2f (Capped)", delveMaterialMultiplier));
+				} else {
+					lore.add(String.format(ChatColor.GRAY + "- 4+ Players: x%.2f", delveMaterialMultiplier));
+				}
 			} else {
-				lore.add(ChatColor.DARK_GRAY + "- Delve Material Multipliers (Not Counting Loot Scaling):");
 				lore.add(String.format(ChatColor.DARK_GRAY + "  - 1 Player: x%.2f", delveMaterialMultiplierSolo));
 				lore.add(String.format(ChatColor.DARK_GRAY + "  - 2 Players: x%.2f", delveMaterialMultiplierDuo));
 				lore.add(String.format(ChatColor.DARK_GRAY + "  - 3 Players: x%.2f", delveMaterialMultiplierTrio));
 				lore.add(String.format(ChatColor.DARK_GRAY + "  - 4+ Players: x%.2f", delveMaterialMultiplier));
 			}
+
+			lore.add(ChatColor.RESET + "");
 
 			if (depthPoints == DelveInfo.getMaxDepthPoints()) {
 				lore.add(ChatColor.GOLD + "- All Modifiers Advancement Granted upon Completion");
@@ -983,7 +1017,7 @@ public class DelvesUtils {
 
 			if (modifier == Modifier.PERNICIOUS) {
 				meta.addItemFlags(ItemFlag.HIDE_POTION_EFFECTS);
-			} else if (modifier == Modifier.LEGIONARY) {
+			} else if (modifier == Modifier.RELENTLESS || modifier == Modifier.LEGIONARY || modifier == Modifier.CARAPACE) {
 				meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
 			} else if (modifier == Modifier.TWISTED) {
 				((PotionMeta) meta).setColor(Color.fromRGB(6684672));

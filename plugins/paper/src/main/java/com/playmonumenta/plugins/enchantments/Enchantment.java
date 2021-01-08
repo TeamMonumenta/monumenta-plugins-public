@@ -131,6 +131,8 @@ public enum Enchantment {
 	CURSE_VANISHING(ChatColor.RED + "Curse of Vanishing", org.bukkit.enchantments.Enchantment.VANISHING_CURSE),
 	CURSE_ANEMIA(new CurseOfAnemia()),
 	TWO_HANDED(new TwoHanded()),
+	REGION_SCALING_DAMAGE_DEALT(new RegionScalingDamageDealt()),
+	REGION_SCALING_DAMAGE_TAKEN(new RegionScalingDamageTaken()),
 	;
 
 	String mReadableString;

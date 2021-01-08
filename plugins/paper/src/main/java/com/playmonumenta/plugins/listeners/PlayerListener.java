@@ -28,7 +28,11 @@ import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.ItemFrame;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
+import org.bukkit.entity.Trident;
+import org.bukkit.entity.Villager;
 import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -36,6 +40,8 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.entity.EntityRegainHealthEvent;
 import org.bukkit.event.entity.EntityShootBowEvent;
@@ -87,14 +93,29 @@ import org.bukkit.potion.PotionData;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.potion.PotionType;
+import org.bukkit.projectiles.ProjectileSource;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityManager;
+import com.playmonumenta.plugins.enchantments.AttributeProjectileDamage;
 import com.playmonumenta.plugins.enchantments.CurseOfEphemerality;
+import com.playmonumenta.plugins.enchantments.Duelist;
+import com.playmonumenta.plugins.enchantments.Frost;
+import com.playmonumenta.plugins.enchantments.HexEater;
 import com.playmonumenta.plugins.enchantments.Hope;
+import com.playmonumenta.plugins.enchantments.IceAspect;
+import com.playmonumenta.plugins.enchantments.Inferno;
+import com.playmonumenta.plugins.enchantments.PointBlank;
+import com.playmonumenta.plugins.enchantments.RegionScalingDamageDealt;
+import com.playmonumenta.plugins.enchantments.Slayer;
+import com.playmonumenta.plugins.enchantments.Sniper;
+import com.playmonumenta.plugins.enchantments.Spark;
+import com.playmonumenta.plugins.enchantments.Thunder;
+import com.playmonumenta.plugins.enchantments.evasions.EvasionInfo;
+import com.playmonumenta.plugins.enchantments.infusions.Focus;
 import com.playmonumenta.plugins.events.AbilityCastEvent;
 import com.playmonumenta.plugins.events.EvasionEvent;
 import com.playmonumenta.plugins.integrations.ChestSortIntegration;
@@ -1269,4 +1290,74 @@ public class PlayerListener implements Listener {
 			mPlugin.mTrackingManager.mPlayers.onRegain(mPlugin, player, event);
 		}
 	}
+
+	/*
+	 * Handles on damage enchants. Needs to be EventPriority.LOW to apply
+	 * base damage modifiers like projectile attributes before any
+	 * modifiers from custom effects (EventPriority.NORMAL) or abilities
+	 * (EventPriority.HIGH) are applied.
+	 */
+	@EventHandler(priority = EventPriority.LOW)
+	public void entityDamageByEntityEvent(EntityDamageByEntityEvent event) {
+		if (event.isCancelled()) {
+			return;
+		}
+
+		Entity damagee = event.getEntity();
+		Entity damager = event.getDamager();
+
+		if (damagee instanceof Player) {
+			Player player = (Player) damagee;
+
+			mPlugin.mTrackingManager.mPlayers.onHurtByEntity(mPlugin, player, event);
+			if (event.getDamage() > 0) {
+				EvasionInfo.triggerEvasion(player, event);
+			}
+		} else if (damagee instanceof LivingEntity && !(damagee instanceof Villager)) {
+			if (damager instanceof Projectile) {
+				ProjectileSource source = ((Projectile) damager).getShooter();
+				if (source instanceof Player) {
+					Projectile proj = (Projectile) damager;
+					LivingEntity le = (LivingEntity) damagee;
+
+					AttributeProjectileDamage.onShootAttack(mPlugin, proj, le, event);
+
+					Sniper.onShootAttack(mPlugin, proj, le, event);
+					PointBlank.onShootAttack(mPlugin, proj, le, event);
+					Frost.onShootAttack(mPlugin, proj, le, event);
+					Inferno.onShootAttack(mPlugin, proj, le, event);
+					Focus.onShootAttack(mPlugin, proj, le, event);
+					Spark.onShootAttack(mPlugin, proj, le, event);
+
+					if (damager instanceof Trident) {
+						IceAspect.onShootAttack(mPlugin, proj, le, event);
+						Thunder.onShootAttack(mPlugin, proj, le, event);
+						HexEater.onShootAttack(mPlugin, proj, le, event);
+						Slayer.onShootAttack(mPlugin, proj, le, event);
+						Duelist.onShootAttack(mPlugin, proj, le, event);
+						Focus.onShootAttack(mPlugin, proj, le, event);
+
+						/*
+						 * The trident damage from Smite, Bane, Impaling seems to be properly applied, even
+						 * though AttributeProjectileDamage.onShootAttack(mPlugin, proj, le, event); does
+						 * direct damage setting, so that's convenient
+						 */
+					}
+
+					RegionScalingDamageDealt.onShootAttack(mPlugin, proj, le, event);
+				}
+			} else if (damager instanceof Player) {
+				if (event.getCause() != DamageCause.THORNS) {
+					Player player = (Player) damager;
+
+					mPlugin.mTrackingManager.mPlayers.onDamage(mPlugin, player, (LivingEntity) damagee, event);
+
+					if (event.getCause().equals(DamageCause.ENTITY_ATTACK)) {
+						mPlugin.mTrackingManager.mPlayers.onAttack(mPlugin, player, (LivingEntity) damagee, event);
+					}
+				}
+			}
+		}
+	}
+
 }

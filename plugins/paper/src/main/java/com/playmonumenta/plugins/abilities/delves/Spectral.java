@@ -19,9 +19,9 @@ import com.playmonumenta.plugins.utils.FastUtils;
 public class Spectral extends DelveModifier {
 
 	private static final double[] SPAWN_CHANCE = {
-			0.1,
-			0.2,
-			0.3
+			0.7,
+			0.14,
+			0.21
 	};
 
 	private static final String[] SPECTERS = {

@@ -76,14 +76,14 @@ public class Pernicious extends DelveModifier {
 
 		// Try random-ish locations a few times
 		for (int i = 0; i < 5; i++) {
-			double distanceBackwards = FastUtils.RANDOM.nextDouble() * 6 + 6;
-			double distanceSideways = FastUtils.RANDOM.nextDouble() * 3 - 6;
+			double distanceBackwards = FastUtils.RANDOM.nextDouble() * 4 + 4;
+			double distanceSideways = FastUtils.RANDOM.nextDouble() * 2 - 4;
 
 			Location loc = player.getLocation()
 					.add(directionBackwards.clone().multiply(distanceBackwards))
 					.add(directionSideways.clone().multiply(distanceSideways));
 
-			if (PlayerUtils.playersInRange(loc, 6).size() > 0) {
+			if (PlayerUtils.playersInRange(loc, 4).size() > 0) {
 				continue;
 			}
 
