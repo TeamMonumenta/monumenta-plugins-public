@@ -26,8 +26,8 @@ import com.playmonumenta.plugins.utils.PlayerUtils;
 public class ElementalSpiritIce extends Ability {
 
 	private static final int ES_ICE_COOLDOWN = 20 * 12;
-	private static final int ES_ICE_1_DAMAGE = 4;
-	private static final int ES_ICE_2_DAMAGE = 7;
+	private static final int ES_ICE_1_DAMAGE = 5;
+	private static final int ES_ICE_2_DAMAGE = 8;
 	private static final int ES_ICE_RADIUS = 3;
 	private static final int ES_ICE_PULSES = 3;
 	private static final int ES_ICE_PULSE_INTERVAL = 20;

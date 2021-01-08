@@ -15,6 +15,7 @@ public class Regicide implements BaseEnchantment {
 
 	private static final String PROPERTY_NAME = ChatColor.GRAY + "Regicide";
 	private static final double DAMAGE_BONUS_PER_LEVEL = 0.1;
+	private static final double BOSS_BONUS_PER_LEVEL = 0.05;
 
 	@Override
 	public String getProperty() {
@@ -30,6 +31,8 @@ public class Regicide implements BaseEnchantment {
 	public void onDamage(Plugin plugin, Player player, int level, LivingEntity target, EntityDamageByEntityEvent event) {
 		if (EntityUtils.isElite(target)) {
 			event.setDamage(event.getDamage() * (1 + DAMAGE_BONUS_PER_LEVEL * level));
+		} else if (EntityUtils.isBoss(target)) {
+			event.setDamage(event.getDamage() * (1 + BOSS_BONUS_PER_LEVEL * level));
 		}
 	}
 }

@@ -29,8 +29,8 @@ import com.playmonumenta.plugins.utils.PlayerUtils;
 public class ElementalSpiritFire extends Ability {
 
 	private static final int ES_FIRE_COOLDOWN = 20 * 12;
-	private static final int ES_FIRE_1_DAMAGE = 12;
-	private static final int ES_FIRE_2_DAMAGE = 21;
+	private static final int ES_FIRE_1_DAMAGE = 15;
+	private static final int ES_FIRE_2_DAMAGE = 24;
 	private static final double ES_FIRE_SIZE = 1.5;
 
 	private final int mDamage;
@@ -42,8 +42,8 @@ public class ElementalSpiritFire extends Ability {
 		super(plugin, player, "Elemental Spirit");
 		mInfo.mScoreboardId = "ElementalSpirit";
 		mInfo.mShorthandName = "ES";
-		mInfo.mDescriptions.add("You are accompanied a spirit of fire and a spirit of ice. Upon using a fire spell, the fire spirit will rush towards the farthest enemy hit with the spell, damaging all enemies along the way by 12. Upon using an ice spell, the ice spirit will rush towards the closest enemy hit with the spell, damaging mobs in a 3 block radius by 4 per second for 3 seconds. Each spirit operates on its own cooldown of 12s.");
-		mInfo.mDescriptions.add("Damage dealt by the fire spirit is increased to 21, and damage dealt by the ice spirit is increased to 7.");
+		mInfo.mDescriptions.add("You are accompanied a spirit of fire and a spirit of ice. Upon using a fire spell, the fire spirit will rush towards the farthest enemy hit with the spell, damaging all enemies along the way by 15. Upon using an ice spell, the ice spirit will rush towards the closest enemy hit with the spell, damaging mobs in a 3 block radius by 5 per second for 3 seconds. Each spirit operates on its own cooldown of 12s.");
+		mInfo.mDescriptions.add("Damage dealt by the fire spirit is increased to 24, and damage dealt by the ice spirit is increased to 8.");
 		mInfo.mLinkedSpell = Spells.ELEMENTAL_SPIRIT_FIRE;
 		mInfo.mCooldown = ES_FIRE_COOLDOWN;
 		mDamage = getAbilityScore() == 1 ? ES_FIRE_1_DAMAGE : ES_FIRE_2_DAMAGE;

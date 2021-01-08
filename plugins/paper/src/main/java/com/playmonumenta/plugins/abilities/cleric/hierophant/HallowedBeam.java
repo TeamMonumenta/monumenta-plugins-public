@@ -1,93 +1,171 @@
 package com.playmonumenta.plugins.abilities.cleric.hierophant;
 
+import org.bukkit.Bukkit;
+import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
-import org.bukkit.entity.AbstractArrow;
+import org.bukkit.enchantments.Enchantment;
+import org.bukkit.event.block.Action;
+import org.bukkit.entity.AbstractArrow.PickupStatus;
+import org.bukkit.entity.Arrow;
+import org.bukkit.attribute.Attribute;
+import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.util.Vector;
+import org.bukkit.GameMode;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
+import org.bukkit.event.entity.ProjectileLaunchEvent;
+import org.bukkit.inventory.ItemStack;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.abilities.AbilityTrigger;
+import com.playmonumenta.plugins.abilities.MultipleChargeAbility;
 import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.classes.magic.MagicType;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
+import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.MovementUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.effects.PercentDamageReceived;
 
-/*
- * Hallowed Beam: Level 1 – Firing a fully-drawn bow while sneaking,
- * if pointed directly at a non-boss undead, will instantly deal 42 damage
- * to the undead instead of consuming the arrow. Cooldown: 20s. Level 2 -
- * The targeted undead explodes, dealing 22 damage to undead within a
- * 5-block radius, and giving slowness 4 to all enemies.
- */
-public class HallowedBeam extends Ability {
+public class HallowedBeam extends MultipleChargeAbility {
 
-	private static final double HALLOWED_DAMAGE_DIRECT = 42;
-	private static final double HALLOWED_DAMAGE_EXPLOSION = 22;
-
+	private static final int HALLOWED_1_MAX_CHARGES = 2;
+	private static final int HALLOWED_2_MAX_CHARGES = 3;
+	private static final int HALLOWED_1_COOLDOWN = 20 * 16;
+	private static final int HALLOWED_2_COOLDOWN = 20 * 12;
+	private static final double HALLOWED_HEAL_PERCENT = 0.2;
+	private static final double HALLOWED_DAMAGE_REDUCTION_PERCENT = 0.1;
+	private static final int HALLOWED_DAMAGE_REDUCTION_DURATION = 20 * 5;
+	private static final String PERCENT_DAMAGE_RESIST_EFFECT_NAME = "HallowedPercentDamageResistEffect";
+	private static final int HALLOWED_RADIUS = 4;
+	private static final int HALLOWED_UNDEAD_STUN = 10; // 20 * 0.5
+	private static final int HALLOWED_LIVING_STUN = 20 * 2;
+	
 	public HallowedBeam(Plugin plugin, Player player) {
-		super(plugin, player, "Hallowed Beam");
+		super(plugin, player, "Hallowed Beam", HALLOWED_1_MAX_CHARGES, HALLOWED_2_MAX_CHARGES);
 		mInfo.mScoreboardId = "HallowedBeam";
 		mInfo.mShorthandName = "HB";
-		mInfo.mDescriptions.add("Firing a fully-drawn bow while shifted, while pointing directly at a non-boss undead, will instantly deal 42 damage to the undead instead of consuming an arrow. Cooldown: 20s.");
-		mInfo.mDescriptions.add("The targeted undead explodes dealing 22 damage to undead within a 5 block radius. All affected enemies gain slowness 4 for 3s.");
+		mInfo.mDescriptions.add("Left-click the air with a bow or crossbow while looking directly at a player or mob to shoot a beam of light. If aimed at a player, the beam instantly heals them for 20% of their max health, knocking back enemies within 4 blocks. If aimed at an Undead, it instantly deals the equipped projectile weapon's damage to the target, and stuns them for half a second. If aimed at a non-undead mob, it instantly stuns them for 2s. Two charges. Cooldown: 16s each charge.");
+		mInfo.mDescriptions.add("Hallowed Beam gains a third charge, the cooldown is reduced to 12 seconds, and players healed by it gain 10% damage resistance for 5 seconds.");
 		mInfo.mLinkedSpell = Spells.HALLOWED_BEAM;
-		mInfo.mCooldown = 20 * 20;
+		mInfo.mCooldown = getAbilityScore() == 1 ? HALLOWED_1_COOLDOWN : HALLOWED_2_COOLDOWN;
+		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;
+		mInfo.mIgnoreCooldown = true;
 	}
-
+	
 	@Override
-	public boolean playerShotArrowEvent(AbstractArrow arrow) {
+	public void cast(Action action) {
 		Player player = mPlayer;
-		LivingEntity e = EntityUtils.getCrosshairTarget(player, 30, false, true, true, false);
-		if (e != null && EntityUtils.isUndead(e)) {
-			if (arrow.isCritical()) {
-				arrow.remove();
-				player.getLocation().getWorld().playSound(player.getLocation(), Sound.BLOCK_BUBBLE_COLUMN_WHIRLPOOL_INSIDE, 1, 0.85f);
-				player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ARROW_SHOOT, 1, 0.9f);
-				Location loc = player.getEyeLocation();
-				Vector dir = LocationUtils.getDirectionTo(e.getEyeLocation(), loc);
-				World world = mPlayer.getWorld();
-				for (int i = 0; i < 30; i++) {
-					loc.add(dir);
-					world.spawnParticle(Particle.VILLAGER_HAPPY, loc, 5, 0.25, 0.25, 0.25, 0);
-					world.spawnParticle(Particle.EXPLOSION_NORMAL, loc, 2, 0.05f, 0.05f, 0.05f, 0.025f);
-					if (loc.distance(e.getEyeLocation()) < 1.25) {
-						loc.getWorld().playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_BLAST, 1, 1.35f);
-						loc.getWorld().playSound(loc, Sound.ENTITY_ARROW_HIT, 1, 0.9f);
-						break;
-					}
-				}
-				EntityUtils.damageEntity(mPlugin, e, HALLOWED_DAMAGE_DIRECT, player, MagicType.HOLY, true, mInfo.mLinkedSpell);
-				Location eLoc = e.getLocation().add(0, e.getHeight() / 2, 0);
-				world.spawnParticle(Particle.SPIT, eLoc, 40, 0, 0, 0, 0.25f);
-				world.spawnParticle(Particle.FIREWORKS_SPARK, eLoc, 75, 0, 0, 0, 0.3f);
-				if (getAbilityScore() > 1) {
-					// TODO: Revamp explosion effects
-					world.spawnParticle(Particle.SPELL_INSTANT, e.getLocation(), 500, 2.5, 0.15f, 2.5, 1);
-					world.spawnParticle(Particle.VILLAGER_HAPPY, e.getLocation(), 150, 2.55, 0.15f, 2.5, 1);
-					for (LivingEntity le : EntityUtils.getNearbyMobs(eLoc, 5)) {
-						if (EntityUtils.isUndead(le)) {
-							EntityUtils.damageEntity(mPlugin, le, HALLOWED_DAMAGE_EXPLOSION, player, MagicType.HOLY, true, mInfo.mLinkedSpell);
-						}
-						PotionUtils.applyPotion(mPlayer, le, new PotionEffect(PotionEffectType.SLOW, 20 * 5, 3, false, true));
-					}
-
-				}
-				putOnCooldown();
+		LivingEntity e = EntityUtils.getEntityAtCursor(player, 30, true, true, true);
+		ItemStack inMainHand = mPlayer.getInventory().getItemInMainHand();
+		
+		if (InventoryUtils.isBowItem(inMainHand)) {
+			if (!consumeCharge()) {
+				return;
 			}
-		}
-		return true;
-	}
 
+			//Unsure why the runnable needs to exist, but it breaks if I don't have it
+			new BukkitRunnable() {
+				@Override
+				public void run() {
+					Location loc = player.getEyeLocation();
+					Vector dir = loc.getDirection();
+					World world = mPlayer.getWorld();
+					world.playSound(loc, Sound.BLOCK_BUBBLE_COLUMN_WHIRLPOOL_INSIDE, 1, 0.85f);
+					world.playSound(loc, Sound.ENTITY_ARROW_SHOOT, 1, 0.9f);
+					
+					if (e == null) {
+						for (int i = 0; i < 30; i++) {
+							loc.add(dir);
+							world.spawnParticle(Particle.VILLAGER_HAPPY, loc, 5, 0.25, 0.25, 0.25, 0);
+							world.spawnParticle(Particle.EXPLOSION_NORMAL, loc, 2, 0.05f, 0.05f, 0.05f, 0.025f);
+						}
+						this.cancel();
+						return;
+					}
+			
+					for (int i = 0; i < 30; i++) {
+						loc.add(dir);
+						world.spawnParticle(Particle.VILLAGER_HAPPY, loc, 5, 0.25, 0.25, 0.25, 0);
+						world.spawnParticle(Particle.EXPLOSION_NORMAL, loc, 2, 0.05f, 0.05f, 0.05f, 0.025f);
+						if (loc.distance(e.getEyeLocation()) < 1.25) {
+							loc.getWorld().playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_BLAST, 1, 1.35f);
+							loc.getWorld().playSound(loc, Sound.ENTITY_ARROW_HIT, 1, 0.9f);
+							break;
+						}
+					}
+					if (e instanceof Player && ((Player) e).getGameMode() != GameMode.SPECTATOR) {
+						Player pe = (Player) e;
+						Location eLoc = pe.getLocation().add(0, pe.getHeight() / 2, 0);
+						world.spawnParticle(Particle.SPELL_INSTANT, pe.getLocation(), 500, 2.5, 0.15f, 2.5, 1);
+						world.spawnParticle(Particle.VILLAGER_HAPPY, pe.getLocation(), 150, 2.55, 0.15f, 2.5, 1);
+						AttributeInstance maxHealth = pe.getAttribute(Attribute.GENERIC_MAX_HEALTH);
+						if (maxHealth != null) {
+							PlayerUtils.healPlayer(pe, maxHealth.getValue() * HALLOWED_HEAL_PERCENT);
+						}
+						if (getAbilityScore() == 2) {
+							mPlugin.mEffectManager.addEffect(pe, PERCENT_DAMAGE_RESIST_EFFECT_NAME, new PercentDamageReceived(HALLOWED_DAMAGE_REDUCTION_DURATION, HALLOWED_DAMAGE_REDUCTION_PERCENT));
+						}
+						for (LivingEntity le : EntityUtils.getNearbyMobs(eLoc, HALLOWED_RADIUS)) {
+							MovementUtils.knockAway(pe, le, 0.65f);
+						}
+					} else if (EntityUtils.isUndead(e)) {
+						Arrow arrow = mPlayer.launchProjectile(Arrow.class);
+						if (inMainHand.containsEnchantment(Enchantment.ARROW_FIRE)) {
+							arrow.setFireTicks(20 * 5);
+						}
+						arrow.setCritical(true);
+						arrow.setPickupStatus(PickupStatus.CREATIVE_ONLY);
+						arrow.setVelocity(mPlayer.getLocation().getDirection().multiply(100.0));
+						ProjectileLaunchEvent eventLaunch = new ProjectileLaunchEvent(arrow);
+						Bukkit.getPluginManager().callEvent(eventLaunch);
+		
+						EntityUtils.applyStun(mPlugin, HALLOWED_UNDEAD_STUN, e);
+						Location eLoc = e.getLocation().add(0, e.getHeight() / 2, 0);
+						world.spawnParticle(Particle.SPIT, eLoc, 40, 0, 0, 0, 0.25f);
+						world.spawnParticle(Particle.FIREWORKS_SPARK, eLoc, 75, 0, 0, 0, 0.3f);
+				
+						//Delete bow if durability is 0 and isn't shattered.
+						//This is needed because Hallowed doesn't consume durability, but there is a high-damage uncommon bow
+						//with 0 durability that should not be infinitely usable.
+						Damageable damageable = (Damageable)inMainHand.getItemMeta();
+						if ((damageable.getDamage() == inMainHand.getType().getMaxDurability())  && !ItemUtils.isItemShattered(inMainHand)) {
+							inMainHand.setAmount(0);
+						}
+					} else if (EntityUtils.isHostileMob(e)) {
+						EntityUtils.applyStun(mPlugin, HALLOWED_LIVING_STUN, e);
+						if (inMainHand.containsEnchantment(Enchantment.ARROW_FIRE)) {
+							EntityUtils.applyFire(mPlugin, 20 * 15, e, player);
+						}
+						Location eLoc = e.getLocation().add(0, e.getHeight() / 2, 0);
+						world.spawnParticle(Particle.SPIT, eLoc, 40, 0, 0, 0, 0.25f);
+						world.spawnParticle(Particle.CRIT_MAGIC, loc, 30, 1, 1, 1, 0.25);
+					}
+					this.cancel();
+				}
+			}.runTaskTimer(mPlugin, 0, 1);
+		}
+	}
+	
 	@Override
-	public boolean runCheck() {
-		return mPlayer.isSneaking();
+	public boolean livingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
+		if (event.getCause().equals(DamageCause.ENTITY_ATTACK)) {
+			cast(Action.LEFT_CLICK_AIR);
+		}
+
+		return true;
 	}
 
 }

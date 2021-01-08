@@ -125,12 +125,10 @@ public class CalculateReforge extends GenericCommand {
 				} else if (handRegion == ItemRegion.CELSIAN_ISLES) {
 					handCurrency = "CS";
 				} else if (handRegion == ItemRegion.MONUMENTA) {
-					// The "Monumenta" tag exists to allow items obtained in R2 to be used in R1.
-					// Since they are obtained in R2, they should always cost R2 currency to repair.
+					//Will need rework when R3 launches.
 					handCurrency = "CS";
 				} else if (handRegion == ItemRegion.SHULKER_BOX) {
-					// The "Shulker Box" tag does not exist. It is internally used to identify shulker boxes.
-					// Shulker boxes can be reforged with R1 or R2 currency, based on the region you are in.
+					// Use the current region to get the currency for the reforge.
 					if (player.getWorld().getName().equals("Project_Epic-region_1")) {
 						// King's Valley: Use XP
 						handCurrency = "XP";
@@ -156,8 +154,7 @@ public class CalculateReforge extends GenericCommand {
 			int cmm = fullInventoryCost.getOrDefault(ItemRegion.MONUMENTA, 0);
 			int csb = fullInventoryCost.getOrDefault(ItemRegion.SHULKER_BOX, 0);
 			if (cmm != 0) {
-				// The "Monumenta" tag exists to allow items obtained in R2 to be used in R1.
-				// Since they are obtained in R2, they should always cost R2 currency to repair.
+				//Will have to rework when R3 launches.
 				ccs += cmm;
 			}
 			if (csb != 0) {

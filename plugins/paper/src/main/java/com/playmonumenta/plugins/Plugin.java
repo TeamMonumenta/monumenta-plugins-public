@@ -62,6 +62,7 @@ import com.playmonumenta.plugins.integrations.MonumentaRedisSyncIntegration;
 import com.playmonumenta.plugins.integrations.PlaceholderAPIIntegration;
 import com.playmonumenta.plugins.integrations.luckperms.LuckPermsIntegration;
 import com.playmonumenta.plugins.inventories.AnvilFixInInventory;
+import com.playmonumenta.plugins.inventories.ShatterCoinInInventory;
 import com.playmonumenta.plugins.inventories.LootChestsInInventory;
 import com.playmonumenta.plugins.inventories.PlayerInventoryView;
 import com.playmonumenta.plugins.inventories.ShulkerInventoryManager;
@@ -255,6 +256,7 @@ public class Plugin extends JavaPlugin {
 		manager.registerEvents(new SpawnerListener(this), this);
 		manager.registerEvents(new PlayerInventoryView(), this);
 		manager.registerEvents(new AnvilFixInInventory(this), this);
+		manager.registerEvents(new ShatterCoinInInventory(this), this);
 		manager.registerEvents(new LootChestsInInventory(), this);
 		manager.registerEvents(new ArrowListener(this), this);
 

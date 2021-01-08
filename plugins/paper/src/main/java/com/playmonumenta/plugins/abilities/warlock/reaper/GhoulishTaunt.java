@@ -53,6 +53,7 @@ public class GhoulishTaunt extends Ability {
 	private final double mPercent;
 	private final double mCleavePercentDamage;
 	private final int mWeaknessAmplifier;
+	
 
 	public GhoulishTaunt(Plugin plugin, Player player) {
 		super(plugin, player, "Ghoulish Taunt");
@@ -141,7 +142,7 @@ public class GhoulishTaunt extends Ability {
 		for (LivingEntity mob : mobs) {
 			PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(PotionEffectType.WEAKNESS, DURATION, mWeaknessAmplifier));
 			if (mob instanceof Mob) {
-				((Mob) mob).setTarget(mPlayer);
+				EntityUtils.applyTaunt(mPlugin, mob, mPlayer);
 			}
 		}
 

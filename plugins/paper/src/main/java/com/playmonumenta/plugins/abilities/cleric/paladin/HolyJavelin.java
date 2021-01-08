@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.abilities.cleric.paladin;
 import java.util.Iterator;
 import java.util.List;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -20,37 +21,60 @@ import org.bukkit.util.Vector;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
+import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.classes.magic.MagicType;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.abilities.cleric.DivineJustice;
 
 public class HolyJavelin extends Ability {
 
 	private static final Particle.DustOptions COLOR = new Particle.DustOptions(Color.fromRGB(255, 255, 50), 1.0f);
 	private static final double HITBOX_LENGTH = 0.75;
 	private static final int RANGE = 12;
-	private static final int UNDEAD_DAMAGE_1 = 12;
+	private static final int UNDEAD_DAMAGE_1 = 18;
 	private static final int UNDEAD_DAMAGE_2 = 24;
-	private static final int DAMAGE_1 = 5;
-	private static final int DAMAGE_2 = 10;
+	private static final int DAMAGE_1 = 9;
+	private static final int DAMAGE_2 = 12;
 	private static final int FIRE_DURATION = 5 * 20;
-	private static final int COOLDOWN = 7 * 20;
-
+	private static final int COOLDOWN = 12 * 20;
+	private static final int DIVINE_JUSTICE_1_BONUS = 5;
+	private static final int DIVINE_JUSTICE_2_BONUS = 8;
+	private static final int LUMINOUS_2_BONUS = 4;
+	
 	private final int mDamage;
 	private final int mUndeadDamage;
+	
+	private int mBonusCritDamage = 0;
+	private int mBonusLumDamage = 0;
 
 	public HolyJavelin(Plugin plugin, Player player) {
 		super(plugin, player, "Holy Javelin");
 		mInfo.mLinkedSpell = Spells.HOLY_JAVELIN;
 		mInfo.mScoreboardId = "HolyJavelin";
 		mInfo.mShorthandName = "HJ";
-		mInfo.mDescriptions.add("Sprint left-clicking while not holding a pickaxe throws a piercing spear of light 12 blocks dealing 12 damage to undead and 5 damage to all others. All hit enemies are set on fire for 5s. Cooldown: 7s.");
-		mInfo.mDescriptions.add("Damage is increased to 24 to undead and 10 to all others.");
+		mInfo.mDescriptions.add("Sprint left-clicking while not holding a pickaxe throws a piercing spear of light 12 blocks forward, dealing 18 damage to undead and 9 damage to all others. All hit enemies are set on fire for 5s. Cooldown: 12s");
+		mInfo.mDescriptions.add("Damage is increased to 24 to undead and 12 to all others. If the melee attack that triggers this strikes an undead, any passive damage done from Divine Justice and Luminous Infusion is transmitted to all other targets struck by the Javelin.");
 		mInfo.mCooldown = COOLDOWN;
 		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;
 		mDamage = getAbilityScore() == 1 ? DAMAGE_1 : DAMAGE_2;
 		mUndeadDamage = getAbilityScore() == 1 ? UNDEAD_DAMAGE_1 : UNDEAD_DAMAGE_2;
+		
+		// Needs to wait for the entire AbilityCollection to be initialized
+		Bukkit.getScheduler().runTask(plugin, () -> {
+			if (player != null) {
+				DivineJustice mDivineJustice = AbilityManager.getManager().getPlayerAbility(mPlayer, DivineJustice.class);
+				LuminousInfusion mLuminousInfusion = AbilityManager.getManager().getPlayerAbility(mPlayer, LuminousInfusion.class);
+				if (mDivineJustice != null) {
+					mBonusCritDamage = mDivineJustice.getAbilityScore() == 1 ? DIVINE_JUSTICE_1_BONUS : DIVINE_JUSTICE_2_BONUS;
+				}
+				if (mLuminousInfusion != null) {
+					mBonusLumDamage = mLuminousInfusion.getAbilityScore() == 1 ? 0 : LUMINOUS_2_BONUS;
+				}
+			}
+		});
 	}
 
 	@Override
@@ -58,9 +82,8 @@ public class HolyJavelin extends Ability {
 		ItemStack mainHand = mPlayer.getInventory().getItemInMainHand();
 		return mPlayer.isSprinting() && !mPlayer.isSneaking() && !InventoryUtils.isPickaxeItem(mainHand);
 	}
-
-	@Override
-	public void cast(Action action) {
+	
+	public void execute(int bonusDamage) {
 		World world = mPlayer.getWorld();
 		world.playSound(mPlayer.getLocation(), Sound.ENTITY_SHULKER_SHOOT, 1, 1.75f);
 		world.playSound(mPlayer.getLocation(), Sound.ITEM_TRIDENT_THROW, 1, 0.9f);
@@ -83,9 +106,9 @@ public class HolyJavelin extends Ability {
 				LivingEntity mob = iter.next();
 				if (mob.getBoundingBox().overlaps(box)) {
 					if (EntityUtils.isUndead(mob)) {
-						EntityUtils.damageEntity(mPlugin, mob, mUndeadDamage, mPlayer, MagicType.HOLY, true, mInfo.mLinkedSpell);
+						EntityUtils.damageEntity(mPlugin, mob, mUndeadDamage + bonusDamage, mPlayer, MagicType.HOLY, true, mInfo.mLinkedSpell);
 					} else {
-						EntityUtils.damageEntity(mPlugin, mob, mDamage, mPlayer, MagicType.HOLY, true, mInfo.mLinkedSpell);
+						EntityUtils.damageEntity(mPlugin, mob, mDamage + bonusDamage, mPlayer, MagicType.HOLY, true, mInfo.mLinkedSpell);
 					}
 					EntityUtils.applyFire(mPlugin, FIRE_DURATION, mob, mPlayer);
 					iter.remove();
@@ -100,16 +123,22 @@ public class HolyJavelin extends Ability {
 				break;
 			}
 		}
-
 		putOnCooldown();
+	}
+
+	@Override
+	public void cast(Action action) {
+		execute(0);
 	}
 
 	@Override
 	public boolean livingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
 		if (event.getCause().equals(DamageCause.ENTITY_ATTACK)) {
-			cast(Action.LEFT_CLICK_AIR);
+			LivingEntity damagee = (LivingEntity) event.getEntity();
+			if (EntityUtils.isUndead(damagee)) {
+				execute(mBonusLumDamage + (PlayerUtils.isCritical(mPlayer) ? mBonusCritDamage : 0));
+			}
 		}
-
 		return true;
 	}
 

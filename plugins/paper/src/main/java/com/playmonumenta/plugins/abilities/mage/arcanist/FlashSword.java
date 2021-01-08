@@ -31,7 +31,7 @@ public class FlashSword extends Ability {
 	private static final int DAMAGE_2 = 8;
 	private static final int SWINGS = 3;
 	private static final int RADIUS = 5;
-	private static final int COOLDOWN = 20 * 10;
+	private static final int COOLDOWN = 20 * 9;
 	private static final float KNOCKBACK_SPEED_1 = 0.2f;
 	private static final float KNOCKBACK_SPEED_2 = 0.4f;
 	private static final double DOT_ANGLE = 0.33;
@@ -45,7 +45,7 @@ public class FlashSword extends Ability {
 		super(plugin, player, "Flash Sword");
 		mInfo.mScoreboardId = "FlashSword";
 		mInfo.mShorthandName = "FS";
-		mInfo.mDescriptions.add("Sprint left-clicking with a wand causes a wave of Arcane blades to hit every enemy within a 5 block cone 3 times (4 damage per hit) in rapid succession. The last hit causes knockback. Only the first hit can apply or trigger spellshock. Cooldown: 10s.");
+		mInfo.mDescriptions.add("Sprint left-clicking with a wand causes a wave of Arcane blades to hit every enemy within a 5 block cone 3 times (4 damage per hit) in rapid succession. The last hit causes knockback. Only the first hit can apply or trigger spellshock. Cooldown: 9s.");
 		mInfo.mDescriptions.add("You instead do 8 damage 3 times. Knockback on the last hit is increased.");
 		mInfo.mLinkedSpell = Spells.FSWORD;
 		mInfo.mCooldown = COOLDOWN;

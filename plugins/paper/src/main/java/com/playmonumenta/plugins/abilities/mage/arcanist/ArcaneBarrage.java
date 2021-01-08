@@ -40,8 +40,8 @@ public class ArcaneBarrage extends Ability {
 	private static final double HALF_HITBOX_LENGTH = 0.275;
 	private static final int RANGE = 12;
 	private static final int MISSILE_COUNT = 3;
-	private static final int DAMAGE_1 = 7;
-	private static final int DAMAGE_2 = 8;
+	private static final int DAMAGE_1 = 8;
+	private static final int DAMAGE_2 = 10;
 	private static final int DURATION = 20 * 10;
 	private static final int COOLDOWN = 20 * 20;
 
@@ -62,8 +62,8 @@ public class ArcaneBarrage extends Ability {
 		super(plugin, player, "Arcane Barrage");
 		mInfo.mScoreboardId = "ArcaneBarrage";
 		mInfo.mShorthandName = "AB";
-		mInfo.mDescriptions.add("Right-click while not sneaking and looking up to summon 3 Arcane Missiles around you for up to 10 seconds. If missiles are active, right-clicking while not sneaking with a Wand fires a missile in the target direction, piercing through enemies within 12 blocks and dealing 7 damage. If cast with Overload, your missiles deal 2 (Overload I) or 4 (Overload II) extra damage. Cooldown: 20s.");
-		mInfo.mDescriptions.add("Missiles deal 8 damage and apply 20% Spell Vulnerability for 4 seconds. Mana lances cast while Barrage is active puts Mana Lance on cooldown and casts a missile with the same base damage as the Mana Lance at its level would do instead (does not consume a missile).");
+		mInfo.mDescriptions.add("Right-click while not sneaking and looking up to summon 3 Arcane Missiles around you for up to 10 seconds. If missiles are active, right-clicking while not sneaking with a Wand fires a missile in the target direction, piercing through enemies within 12 blocks and dealing 8 damage. If cast with Overload, your missiles deal 2 (Overload I) or 4 (Overload II) extra damage. Cooldown: 20s.");
+		mInfo.mDescriptions.add("Missiles deal 10 damage and apply 20% Spell Vulnerability for 4 seconds. Mana lances cast while Barrage is active puts Mana Lance on cooldown and casts a missile with the same base damage as the Mana Lance at its level would do instead (does not consume a missile).");
 		mInfo.mLinkedSpell = Spells.ARCANE_BARRAGE;
 		mInfo.mCooldown = COOLDOWN;
 		mInfo.mTrigger = AbilityTrigger.ALL;

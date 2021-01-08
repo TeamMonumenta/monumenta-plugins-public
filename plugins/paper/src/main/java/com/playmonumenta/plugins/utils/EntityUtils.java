@@ -174,6 +174,7 @@ public class EntityUtils {
 
 	private static final Particle.DustOptions STUN_COLOR = new Particle.DustOptions(Color.fromRGB(255, 255, 100), 1.0f);
 	private static final Particle.DustOptions CONFUSION_COLOR = new Particle.DustOptions(Color.fromRGB(62, 0, 102), 1.0f);
+	private static final Particle.DustOptions TAUNT_COLOR = new Particle.DustOptions(Color.fromRGB(200, 0, 0), 1.0f);
 
 	private static void startTracker(Plugin plugin) {
 		mobsTracker = new BukkitRunnable() {
@@ -772,6 +773,21 @@ public class EntityUtils {
 		EntityUtils.damageEntity(plugin, mob, 0.001, player, MagicType.FIRE, false, null, false, false);
 		mob.setNoDamageTicks(iFrames);
 		mob.setVelocity(velocity);
+	}
+	
+	public static void applyTaunt(Plugin plugin, LivingEntity mob, Player player) {
+		World world = player.getWorld();
+		Mob m = (Mob) mob;
+		m.setTarget(player);
+		world.spawnParticle(Particle.REDSTONE, mob.getEyeLocation().add(0, 0.5, 0), 12, 0.4, 0.5, 0.4, TAUNT_COLOR);
+		
+		//Damage the entity to keep focus on the player who casted the taunt. Make sure it casts through iFrames and has no knockback.
+		int iFrames = m.getNoDamageTicks();
+		Vector velocity = m.getVelocity();
+		m.setNoDamageTicks(0);
+		EntityUtils.damageEntity(plugin, m, 0.001, player, MagicType.HOLY, false, null, false, false);
+		m.setNoDamageTicks(iFrames);
+		m.setVelocity(velocity);
 	}
 
 	public static boolean isCooling(Entity mob) {

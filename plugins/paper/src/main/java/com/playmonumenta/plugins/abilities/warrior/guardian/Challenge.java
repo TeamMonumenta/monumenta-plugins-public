@@ -38,7 +38,7 @@ public class Challenge extends Ability {
 	private static final int MAX_ABSORPTION_2 = 8;
 	private static final int CHALLENGE_RANGE = 12;
 	private static final int COOLDOWN = 20 * 20;
-
+	
 	private final double mPercentDamageDealtEffect;
 	private final int mAbsorptionPerMob;
 	private final int mMaxAbsorption;
@@ -79,7 +79,7 @@ public class Challenge extends Ability {
 
 		for (LivingEntity mob : mobs) {
 			if (mob instanceof Mob) {
-				((Mob) mob).setTarget(mPlayer);
+				EntityUtils.applyTaunt(mPlugin, (Mob) mob, mPlayer);
 			}
 		}
 

@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.enchantments;
 
 import java.util.EnumSet;
+import java.util.NavigableSet;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
@@ -12,6 +13,7 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
+import com.playmonumenta.plugins.effects.Effect;
 
 public class Adrenaline implements BaseEnchantment {
 
@@ -36,7 +38,14 @@ public class Adrenaline implements BaseEnchantment {
 	@Override
 	public void onAttack(Plugin plugin, Player player, int level, LivingEntity target, EntityDamageByEntityEvent event) {
 		player.getWorld().spawnParticle(Particle.REDSTONE, player.getLocation().add(0, 1, 0), 12, 0.4, 0.5, 0.4, RED_COLOR);
-		plugin.mEffectManager.addEffect(player, PERCENT_SPEED_EFFECT_NAME, new PercentSpeed(DURATION, PERCENT_SPEED_PER_LEVEL * level, PERCENT_SPEED_EFFECT_NAME));
+		NavigableSet<Effect> speedEffects = plugin.mEffectManager.getEffects(player, PERCENT_SPEED_EFFECT_NAME);
+		if (speedEffects != null) {
+			for (Effect effect : speedEffects) {
+				effect.setDuration(DURATION);
+			}
+		} else {
+			plugin.mEffectManager.addEffect(player, PERCENT_SPEED_EFFECT_NAME, new PercentSpeed(DURATION, PERCENT_SPEED_PER_LEVEL * level, PERCENT_SPEED_EFFECT_NAME));
+		}
 	}
 
 }

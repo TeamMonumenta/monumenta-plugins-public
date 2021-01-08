@@ -27,10 +27,10 @@ import com.playmonumenta.plugins.utils.PotionUtils.PotionInfo;
 
 public class HeavenlyBoon extends Ability implements KillTriggeredAbility {
 
-	private static final double HEAVENLY_BOON_1_CHANCE = 0.06;
-	private static final double HEAVENLY_BOON_2_CHANCE = 0.1;
+	private static final double HEAVENLY_BOON_1_CHANCE = 0.08;
+	private static final double HEAVENLY_BOON_2_CHANCE = 0.16;
 	private static final double HEAVENLY_BOON_RADIUS = 12;
-	private static final double HEAVENLY_BOON_TRIGGER_INTENSITY = 0.3;
+	private static final double HEAVENLY_BOON_TRIGGER_INTENSITY = 0.05;
 
 	private final KillTriggeredAbilityTracker mTracker;
 	private final double mChance;
@@ -39,8 +39,8 @@ public class HeavenlyBoon extends Ability implements KillTriggeredAbility {
 		super(plugin, player, "Heavenly Boon");
 		mInfo.mScoreboardId = "HeavenlyBoon";
 		mInfo.mShorthandName = "HB";
-		mInfo.mDescriptions.add("Whenever you are hit with a positive splash potion, the effects are also given to other players in a 12 block radius. In addition, whenever you kill an undead mob, you have a 6% chance to be splashed with an Instant Health I potion, as well as either a Speed I, Regen I, or Absorption I potion.");
-		mInfo.mDescriptions.add("The chance to be splashed upon killing an Undead increases to 10%, the effect potions can now also be Strength and Resistance, and the durations of each are greater.");
+		mInfo.mDescriptions.add("Whenever you are hit with a positive splash potion, the effects are also given to other players in a 12 block radius. In addition, whenever you kill an undead mob, you have a 8% chance to be splashed with an Instant Health I potion, as well as either a Speed I, Regen I, or Absorption I potion.");
+		mInfo.mDescriptions.add("The chance to be splashed upon killing an Undead increases to 16%, the effect potions can now also be Strength and Resistance, and the durations of each are greater.");
 		mTracker = new KillTriggeredAbilityTracker(this);
 		mChance = getAbilityScore() == 1 ? HEAVENLY_BOON_1_CHANCE : HEAVENLY_BOON_2_CHANCE;
 	}
@@ -145,7 +145,7 @@ public class HeavenlyBoon extends Ability implements KillTriggeredAbility {
 
 			ItemUtils.addPotionEffect(potions, PotionInfo.HEALING);
 
-			Location pos = (mPlayer.getLocation()).add(0, 2, 0);
+			Location pos = (mPlayer.getLocation()).add(0, 1, 0);
 			EntityUtils.spawnCustomSplashPotion(mPlayer, potions, pos);
 		}
 	}
