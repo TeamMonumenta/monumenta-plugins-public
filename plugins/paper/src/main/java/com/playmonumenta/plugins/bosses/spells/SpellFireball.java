@@ -137,7 +137,7 @@ public class SpellFireball extends Spell {
 				spawnLoc = spawnLoc.add(direction.multiply(2));
 				Fireball fireball = (Fireball)mBoss.getWorld().spawnEntity(spawnLoc, EntityType.FIREBALL);
 				fireball.setDirection(direction);
-				fireball.setVelocity(direction.multiply(2));		
+				fireball.setVelocity(direction.multiply(2));
 				fireball.setYield(mYield);
 				fireball.setIsIncendiary(mIsIncendiary);
 				mActiveRunnables.remove(this);

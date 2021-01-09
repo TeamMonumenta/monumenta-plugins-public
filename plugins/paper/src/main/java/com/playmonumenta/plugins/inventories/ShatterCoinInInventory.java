@@ -29,20 +29,20 @@ public class ShatterCoinInInventory implements Listener {
 	@EventHandler(priority = EventPriority.HIGHEST)
 	public void inventoryClickEvent(InventoryClickEvent event) {
 		Player player = (Player)event.getWhoClicked();
-		
+
 		if (!event.getClick().equals(ClickType.RIGHT)) {
 			return;
 		}
 
 		ItemStack coin = event.getCursor();
-		
+
 		if (coin == null || !InventoryUtils.testForItemWithName(coin, ChatColor.GOLD + "" + ChatColor.BOLD + "Shattered Denarius")) {
 			return;
 		}
 
 		ItemStack item = event.getCurrentItem();
 
-		if (item == null || item.getType().equals(Material.AIR) 
+		if (item == null || item.getType().equals(Material.AIR)
 				|| InventoryUtils.testForItemWithName(item, ChatColor.GOLD + "" + ChatColor.BOLD + "Shattered Denarius")) {
 			return;
 		}

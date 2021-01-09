@@ -53,7 +53,7 @@ public class GhoulishTaunt extends Ability {
 	private final double mPercent;
 	private final double mCleavePercentDamage;
 	private final int mWeaknessAmplifier;
-	
+
 
 	public GhoulishTaunt(Plugin plugin, Player player) {
 		super(plugin, player, "Ghoulish Taunt");

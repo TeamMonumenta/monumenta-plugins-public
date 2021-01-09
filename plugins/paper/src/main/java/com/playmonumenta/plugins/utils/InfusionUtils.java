@@ -303,7 +303,7 @@ public class InfusionUtils {
 		}
 
 		int level = getInfuseLevel(item);
-		
+
 		//Remove the infusion enchants from the item
 		for (InfusionSelection sel : InfusionSelection.values()) {
 			InventoryUtils.removeCustomEnchant(item, sel.getEnchantName());

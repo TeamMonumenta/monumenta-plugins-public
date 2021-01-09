@@ -15,7 +15,7 @@ public class SecondWind implements BaseEnchantment {
 	private static final String DAMAGE_RESIST_NAME =  "SecondWindDamageReduction";
 	private static final double DAMAGE_RESIST = 0.1;
 	private static final double HEALTH_LIMIT = 0.5;
-	
+
 	@Override
 	public String getProperty() {
 		return PROPERTY_NAME;

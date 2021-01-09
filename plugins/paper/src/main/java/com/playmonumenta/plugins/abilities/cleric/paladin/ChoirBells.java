@@ -34,7 +34,7 @@ public class ChoirBells extends Ability {
 	private static final double CHOIR_BELLS_CONICAL_THRESHOLD = 0.33;
 
 	private static final float[] CHOIR_BELLS_PITCHES = {0.6f, 0.8f, 0.6f, 0.8f, 1f};
-	
+
 	private final int mSlownessAmplifier;
 	private final double mWeakenEffect;
 	private final double mVulnerabilityEffect;

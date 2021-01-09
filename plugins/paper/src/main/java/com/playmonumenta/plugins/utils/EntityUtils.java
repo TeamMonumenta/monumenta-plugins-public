@@ -774,13 +774,13 @@ public class EntityUtils {
 		mob.setNoDamageTicks(iFrames);
 		mob.setVelocity(velocity);
 	}
-	
+
 	public static void applyTaunt(Plugin plugin, LivingEntity mob, Player player) {
 		World world = player.getWorld();
 		Mob m = (Mob) mob;
 		m.setTarget(player);
 		world.spawnParticle(Particle.REDSTONE, mob.getEyeLocation().add(0, 0.5, 0), 12, 0.4, 0.5, 0.4, TAUNT_COLOR);
-		
+
 		//Damage the entity to keep focus on the player who casted the taunt. Make sure it casts through iFrames and has no knockback.
 		int iFrames = m.getNoDamageTicks();
 		Vector velocity = m.getVelocity();

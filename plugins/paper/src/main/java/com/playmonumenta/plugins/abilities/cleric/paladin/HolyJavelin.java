@@ -43,10 +43,10 @@ public class HolyJavelin extends Ability {
 	private static final int DIVINE_JUSTICE_1_BONUS = 5;
 	private static final int DIVINE_JUSTICE_2_BONUS = 8;
 	private static final int LUMINOUS_2_BONUS = 4;
-	
+
 	private final int mDamage;
 	private final int mUndeadDamage;
-	
+
 	private int mBonusCritDamage = 0;
 	private int mBonusLumDamage = 0;
 
@@ -61,7 +61,7 @@ public class HolyJavelin extends Ability {
 		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;
 		mDamage = getAbilityScore() == 1 ? DAMAGE_1 : DAMAGE_2;
 		mUndeadDamage = getAbilityScore() == 1 ? UNDEAD_DAMAGE_1 : UNDEAD_DAMAGE_2;
-		
+
 		// Needs to wait for the entire AbilityCollection to be initialized
 		Bukkit.getScheduler().runTask(plugin, () -> {
 			if (player != null) {
@@ -82,7 +82,7 @@ public class HolyJavelin extends Ability {
 		ItemStack mainHand = mPlayer.getInventory().getItemInMainHand();
 		return mPlayer.isSprinting() && !mPlayer.isSneaking() && !InventoryUtils.isPickaxeItem(mainHand);
 	}
-	
+
 	public void execute(int bonusDamage) {
 		World world = mPlayer.getWorld();
 		world.playSound(mPlayer.getLocation(), Sound.ENTITY_SHULKER_SHOOT, 1, 1.75f);

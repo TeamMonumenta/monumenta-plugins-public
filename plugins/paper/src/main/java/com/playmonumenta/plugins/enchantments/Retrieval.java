@@ -25,7 +25,7 @@ public class Retrieval implements BaseEnchantment {
 	public String getProperty() {
 		return PROPERTY_NAME;
 	}
-	
+
 	@Override
 	public void onLaunchProjectile(Plugin plugin, Player player, int level, Projectile proj, ProjectileLaunchEvent event) {
 		if (proj.getType() == EntityType.ARROW) {
@@ -36,7 +36,7 @@ public class Retrieval implements BaseEnchantment {
 				int infLevel = Math.max(mainHand.getEnchantmentLevel(Enchantment.ARROW_INFINITE), offHand.getEnchantmentLevel(Enchantment.ARROW_INFINITE));
 				if (infLevel == 0 && FastUtils.RANDOM.nextDouble() < RETRIEVAL_CHANCE * level) {
 					player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ARROW_HIT_PLAYER, 0.3f, 1.0f);
-					
+
 					arrow.setPickupStatus(Arrow.PickupStatus.ALLOWED);
 					Inventory playerInv = player.getInventory();
 					int firstArrow = playerInv.first(Material.ARROW);
