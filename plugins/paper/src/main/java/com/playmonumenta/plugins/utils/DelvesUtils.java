@@ -675,6 +675,12 @@ public class DelvesUtils {
 		}
 
 		public void registerClick(InventoryClickEvent event) {
+			// Make sure player wasn't clicking their own inventory
+			Inventory inventory = event.getClickedInventory();
+			if (!mInventory1.equals(inventory) && !mInventory2.equals(inventory)) {
+				return;
+			}
+
 			ItemStack clickedItem = event.getCurrentItem();
 
 			if (clickedItem == null || clickedItem.getType() == Material.BLACK_STAINED_GLASS_PANE) {
