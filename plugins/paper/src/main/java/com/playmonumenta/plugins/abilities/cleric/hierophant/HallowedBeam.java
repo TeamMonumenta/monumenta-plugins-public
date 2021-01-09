@@ -18,6 +18,7 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
@@ -63,9 +64,11 @@ public class HallowedBeam extends MultipleChargeAbility {
 	public void cast(Action action) {
 		Player player = mPlayer;
 		LivingEntity e = EntityUtils.getEntityAtCursor(player, 30, true, true, true);
-		ItemStack inMainHand = mPlayer.getInventory().getItemInMainHand();
 
-		if (InventoryUtils.isBowItem(inMainHand)) {
+		PlayerInventory inventory = mPlayer.getInventory();
+		ItemStack inMainHand = inventory.getItemInMainHand();
+
+		if (InventoryUtils.isBowItem(inMainHand) && !ItemUtils.isShootableItem(inventory.getItemInOffHand())) {
 			if (!consumeCharge()) {
 				return;
 			}
