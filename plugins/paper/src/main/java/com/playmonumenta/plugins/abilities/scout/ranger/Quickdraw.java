@@ -79,7 +79,7 @@ public class Quickdraw extends Ability {
 			//This is needed because QuickDraw doesn't consume durability, but there is a high-damage uncommon bow
 			//with 0 durability that should not be infinitely usable with the QuickDraw ability
 			Damageable damageable = (Damageable)inMainHand.getItemMeta();
-			if ((damageable.getDamage() == inMainHand.getType().getMaxDurability())  && !ItemUtils.isItemShattered(inMainHand)) {
+			if ((damageable.getDamage() >= inMainHand.getType().getMaxDurability())  && !ItemUtils.isItemShattered(inMainHand)) {
 				inMainHand.setAmount(0);
 			}
 		}

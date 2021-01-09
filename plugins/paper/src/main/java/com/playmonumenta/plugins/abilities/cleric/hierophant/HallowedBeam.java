@@ -1,43 +1,37 @@
 package com.playmonumenta.plugins.abilities.cleric.hierophant;
 
 import org.bukkit.Bukkit;
-import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
-import org.bukkit.enchantments.Enchantment;
-import org.bukkit.event.block.Action;
-import org.bukkit.entity.AbstractArrow.PickupStatus;
-import org.bukkit.entity.Arrow;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
+import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.AbstractArrow.PickupStatus;
+import org.bukkit.entity.Arrow;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
-import org.bukkit.inventory.meta.Damageable;
-import org.bukkit.util.Vector;
-import org.bukkit.GameMode;
+import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.Damageable;
+import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.util.Vector;
 
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.MultipleChargeAbility;
 import com.playmonumenta.plugins.classes.Spells;
-import com.playmonumenta.plugins.classes.magic.MagicType;
+import com.playmonumenta.plugins.effects.PercentDamageReceived;
 import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.LocationUtils;
-import com.playmonumenta.plugins.utils.PotionUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.plugins.effects.PercentDamageReceived;
 
 public class HallowedBeam extends MultipleChargeAbility {
 
@@ -52,7 +46,7 @@ public class HallowedBeam extends MultipleChargeAbility {
 	private static final int HALLOWED_RADIUS = 4;
 	private static final int HALLOWED_UNDEAD_STUN = 10; // 20 * 0.5
 	private static final int HALLOWED_LIVING_STUN = 20 * 2;
-	
+
 	public HallowedBeam(Plugin plugin, Player player) {
 		super(plugin, player, "Hallowed Beam", HALLOWED_1_MAX_CHARGES, HALLOWED_2_MAX_CHARGES);
 		mInfo.mScoreboardId = "HallowedBeam";
@@ -64,13 +58,13 @@ public class HallowedBeam extends MultipleChargeAbility {
 		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;
 		mInfo.mIgnoreCooldown = true;
 	}
-	
+
 	@Override
 	public void cast(Action action) {
 		Player player = mPlayer;
 		LivingEntity e = EntityUtils.getEntityAtCursor(player, 30, true, true, true);
 		ItemStack inMainHand = mPlayer.getInventory().getItemInMainHand();
-		
+
 		if (InventoryUtils.isBowItem(inMainHand)) {
 			if (!consumeCharge()) {
 				return;
@@ -85,7 +79,7 @@ public class HallowedBeam extends MultipleChargeAbility {
 					World world = mPlayer.getWorld();
 					world.playSound(loc, Sound.BLOCK_BUBBLE_COLUMN_WHIRLPOOL_INSIDE, 1, 0.85f);
 					world.playSound(loc, Sound.ENTITY_ARROW_SHOOT, 1, 0.9f);
-					
+
 					if (e == null) {
 						for (int i = 0; i < 30; i++) {
 							loc.add(dir);
@@ -95,7 +89,7 @@ public class HallowedBeam extends MultipleChargeAbility {
 						this.cancel();
 						return;
 					}
-			
+
 					for (int i = 0; i < 30; i++) {
 						loc.add(dir);
 						world.spawnParticle(Particle.VILLAGER_HAPPY, loc, 5, 0.25, 0.25, 0.25, 0);
@@ -131,17 +125,17 @@ public class HallowedBeam extends MultipleChargeAbility {
 						arrow.setVelocity(mPlayer.getLocation().getDirection().multiply(100.0));
 						ProjectileLaunchEvent eventLaunch = new ProjectileLaunchEvent(arrow);
 						Bukkit.getPluginManager().callEvent(eventLaunch);
-		
+
 						EntityUtils.applyStun(mPlugin, HALLOWED_UNDEAD_STUN, e);
 						Location eLoc = e.getLocation().add(0, e.getHeight() / 2, 0);
 						world.spawnParticle(Particle.SPIT, eLoc, 40, 0, 0, 0, 0.25f);
 						world.spawnParticle(Particle.FIREWORKS_SPARK, eLoc, 75, 0, 0, 0, 0.3f);
-				
+
 						//Delete bow if durability is 0 and isn't shattered.
 						//This is needed because Hallowed doesn't consume durability, but there is a high-damage uncommon bow
 						//with 0 durability that should not be infinitely usable.
 						Damageable damageable = (Damageable)inMainHand.getItemMeta();
-						if ((damageable.getDamage() == inMainHand.getType().getMaxDurability())  && !ItemUtils.isItemShattered(inMainHand)) {
+						if ((damageable.getDamage() >= inMainHand.getType().getMaxDurability()) && !ItemUtils.isItemShattered(inMainHand)) {
 							inMainHand.setAmount(0);
 						}
 					} else if (EntityUtils.isHostileMob(e)) {
@@ -158,7 +152,7 @@ public class HallowedBeam extends MultipleChargeAbility {
 			}.runTaskTimer(mPlugin, 0, 1);
 		}
 	}
-	
+
 	@Override
 	public boolean livingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
 		if (event.getCause().equals(DamageCause.ENTITY_ATTACK)) {
