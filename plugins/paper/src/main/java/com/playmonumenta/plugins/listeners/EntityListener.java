@@ -12,8 +12,6 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.World;
-import org.bukkit.attribute.Attribute;
-import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.block.Block;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.AbstractArrow;
@@ -22,7 +20,6 @@ import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Creature;
 import org.bukkit.entity.Creeper;
-import org.bukkit.entity.Drowned;
 import org.bukkit.entity.EnderPearl;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
@@ -38,7 +35,6 @@ import org.bukkit.entity.Projectile;
 import org.bukkit.entity.Sheep;
 import org.bukkit.entity.Snowball;
 import org.bukkit.entity.ThrownPotion;
-import org.bukkit.entity.Trident;
 import org.bukkit.entity.Villager;
 import org.bukkit.entity.Wither;
 import org.bukkit.event.EventHandler;
@@ -66,7 +62,6 @@ import org.bukkit.event.entity.VillagerCareerChangeEvent;
 import org.bukkit.event.entity.VillagerReplenishTradeEvent;
 import org.bukkit.event.hanging.HangingBreakByEntityEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.potion.PotionData;
 import org.bukkit.potion.PotionEffect;
@@ -205,56 +200,6 @@ public class EntityListener implements Listener {
 
 		//  If the entity getting hurt is the player.
 		if (damagee instanceof Player) {
-			/*
-			 * First set the damage of the event to proper damage if it's a trident or crossbow
-			 *
-			 * We need to make this not a hard-coded mess at some point
-			 */
-			if (damager instanceof Trident) {
-				ProjectileSource source = ((Projectile) damager).getShooter();
-				if (source instanceof Drowned) {
-					ItemMeta meta = ((Drowned)source).getEquipment().getItemInMainHand().getItemMeta();
-					if (meta != null && meta.hasAttributeModifiers()) {
-						Collection<AttributeModifier> modifiers = meta.getAttributeModifiers(Attribute.GENERIC_ATTACK_DAMAGE);
-						if (modifiers != null) {
-							Iterator<AttributeModifier> iter = modifiers.iterator();
-							while (iter.hasNext()) {
-								AttributeModifier mod = iter.next();
-								if (mod.getOperation().equals(AttributeModifier.Operation.ADD_NUMBER)) {
-									// Use the last flat damage modifier on the trident, ignore other modifiers
-									// +1 for base damage to be consistent with melee attack damage
-									event.setDamage(mod.getAmount() + 1);
-								}
-							}
-						}
-					}
-				}
-			} else if (damager instanceof AbstractArrow) {
-				// Illagers shooting crossbows (or any non player entity using a crossbow)
-				ProjectileSource source = ((Projectile) damager).getShooter();
-				if (!(source instanceof Player) && source instanceof LivingEntity) {
-					if (((LivingEntity)source).getEquipment() != null) {
-						ItemStack item = ((LivingEntity)source).getEquipment().getItemInMainHand();
-						if (item.getType() == Material.CROSSBOW) {
-							ItemMeta meta = item.getItemMeta();
-							if (meta != null && meta.hasAttributeModifiers()) {
-								Collection<AttributeModifier> modifiers = meta.getAttributeModifiers(Attribute.GENERIC_ATTACK_DAMAGE);
-								if (modifiers != null) {
-									Iterator<AttributeModifier> iter = modifiers.iterator();
-									while (iter.hasNext()) {
-										AttributeModifier mod = iter.next();
-										if (mod.getOperation().equals(AttributeModifier.Operation.ADD_NUMBER)) {
-											// Sets damage to exactly the attribute modifiers, has +1 for consistency with tridents
-											event.setDamage(mod.getAmount() + 1);
-										}
-									}
-								}
-							}
-						}
-					}
-				}
-			}
-
 			Player player = (Player)damagee;
 
 			if (damager instanceof LivingEntity) {

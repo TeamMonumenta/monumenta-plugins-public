@@ -1,18 +1,25 @@
 package com.playmonumenta.plugins.listeners;
 
+import java.util.Collection;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.ListIterator;
 
 import org.bukkit.GameMode;
+import org.bukkit.Material;
+import org.bukkit.attribute.Attribute;
+import org.bukkit.attribute.AttributeModifier;
+import org.bukkit.attribute.AttributeModifier.Operation;
 import org.bukkit.block.Block;
 import org.bukkit.block.CreatureSpawner;
+import org.bukkit.entity.AbstractArrow;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Evoker;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
 import org.bukkit.entity.Slime;
 import org.bukkit.entity.Vex;
 import org.bukkit.event.EventHandler;
@@ -20,6 +27,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockIgniteEvent;
 import org.bukkit.event.entity.CreatureSpawnEvent;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.SpawnerSpawnEvent;
 import org.bukkit.inventory.EntityEquipment;
@@ -29,6 +37,7 @@ import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.metadata.MetadataValue;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.projectiles.ProjectileSource;
 
 import com.destroystokyo.paper.event.entity.EntityZapEvent;
 import com.playmonumenta.plugins.Constants;
@@ -127,6 +136,39 @@ public class MobListener implements Listener {
 		// Create new metadata entries
 		spawner.setMetadata(Constants.SPAWNER_COUNT_METAKEY, new FixedMetadataValue(mPlugin, spawnCount));
 		mob.setMetadata(Constants.SPAWNER_COUNT_METAKEY, new FixedMetadataValue(mPlugin, spawnCount));
+	}
+
+	@EventHandler(priority = EventPriority.LOWEST)
+	public void entityDamageByEntityEvent(EntityDamageByEntityEvent event) {
+		// Set base custom damage of crossbows and tridents before other modifications
+		if (event.getEntity() instanceof Player) {
+			Entity damager = event.getDamager();
+			if (damager instanceof AbstractArrow) {
+				ProjectileSource source = ((Projectile) damager).getShooter();
+				if (source instanceof LivingEntity) {
+					EntityEquipment equipment = ((LivingEntity) source).getEquipment();
+					if (equipment != null) {
+						ItemStack mainhand = equipment.getItemInMainHand();
+
+						// getItemInMainHand() is @NotNull
+						Material material = mainhand.getType();
+						if (material == Material.TRIDENT || material == Material.CROSSBOW) {
+							ItemMeta meta = mainhand.getItemMeta();
+							if (meta != null) {
+								Collection<AttributeModifier> modifiers = meta.getAttributeModifiers(Attribute.GENERIC_ATTACK_DAMAGE);
+								if (modifiers != null) {
+									for (AttributeModifier modifier : modifiers) {
+										if (modifier.getOperation() == Operation.ADD_NUMBER) {
+											event.setDamage(modifier.getAmount() + 1);
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
 	}
 
 	/* Prevent fire from catching in towns */

@@ -13,12 +13,17 @@ import org.bukkit.attribute.Attributable;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.attribute.AttributeModifier.Operation;
+import org.bukkit.entity.Creeper;
+import org.bukkit.entity.Enderman;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Flying;
+import org.bukkit.entity.IronGolem;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
+import org.bukkit.entity.Spider;
+import org.bukkit.entity.Witch;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.SpawnerSpawnEvent;
 import org.bukkit.potion.PotionEffect;
@@ -211,8 +216,12 @@ public class Twisted extends DelveModifier {
 					world.spawnParticle(Particle.SMOKE_LARGE, loc, 20, 0.2, 0.3, 0.2, 0.1);
 					world.playSound(loc, Sound.ENTITY_HUSK_AMBIENT, 1f, 0.5f);
 
-					PotionUtils.applyPotion(null, mob,
-							new PotionEffect(PotionEffectType.INVISIBILITY, 20 * 3600 * 100, 0, false, false));
+					// These mobs don't have visible equipment and are obnoxious when invisible
+					if (!(mob instanceof Creeper || mob instanceof Spider || mob instanceof Witch
+							|| mob instanceof Enderman || mob instanceof IronGolem)) {
+						PotionUtils.applyPotion(null, mob,
+								new PotionEffect(PotionEffectType.INVISIBILITY, 20 * 3600 * 100, 0, false, false));
+					}
 
 					if (mob instanceof Attributable) {
 						EntityUtils.addAttribute(mob, Attribute.GENERIC_MOVEMENT_SPEED,
