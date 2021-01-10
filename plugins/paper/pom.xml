@@ -14,7 +14,7 @@
         <maven.build.timestamp.format>yyyyMMdd-HHmmss</maven.build.timestamp.format>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
-        <minecraft.server.version>1.16.3-R0.1-SNAPSHOT</minecraft.server.version>
+        <minecraft.server.version>1.16.4-R0.1-SNAPSHOT</minecraft.server.version>
     </properties>
 
     <repositories>
@@ -193,7 +193,7 @@
     </dependencies>
 
     <build>
-        <finalName>Monumenta_1.16.3_${project.version}_${maven.build.timestamp}</finalName>
+        <finalName>Monumenta_1.16.4_${project.version}_${maven.build.timestamp}</finalName>
         <pluginManagement>
             <plugins>
                 <plugin>
