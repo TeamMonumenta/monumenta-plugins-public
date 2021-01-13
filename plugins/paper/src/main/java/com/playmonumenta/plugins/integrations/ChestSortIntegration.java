@@ -4,6 +4,7 @@ import java.util.Map;
 import java.util.logging.Logger;
 
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -58,6 +59,13 @@ public class ChestSortIntegration implements Listener {
 			ItemStack item = itemSortMapPair.getKey();
 			Map<String, String> sortMap = itemSortMapPair.getValue();
 
+			// Fix name sorting to ignore formatting
+			String customName = sortMap.get("{customName}");
+			if (customName != null) {
+				customName = ChatColor.stripColor(customName);
+				sortMap.put("{customName}", customName);
+			}
+
 			int itemCount = 0;
 			if (item != null) {
 				itemCount = item.getAmount();
@@ -90,11 +98,15 @@ public class ChestSortIntegration implements Listener {
 			String strBookTitle = ItemUtils.getBookTitle(item);
 			if (strBookTitle == null) {
 				strBookTitle = "~bookTitle~";
+			} else {
+				strBookTitle = ChatColor.stripColor(strBookTitle);
 			}
 
 			String strBookAuthor = ItemUtils.getBookAuthor(item);
 			if (strBookAuthor == null) {
 				strBookAuthor = "~bookAuthor~";
+			} else {
+				strBookAuthor = ChatColor.stripColor(strBookAuthor);
 			}
 
 			sortMap.put("{count}", strCount);

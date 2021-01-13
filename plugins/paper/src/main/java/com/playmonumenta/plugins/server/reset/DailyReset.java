@@ -1,5 +1,10 @@
 package com.playmonumenta.plugins.server.reset;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
+
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -9,6 +14,7 @@ import com.playmonumenta.plugins.utils.ScoreboardUtils;
 
 public class DailyReset {
 	private static final String DAILY_PLAYER_CHANGES_COMMAND = "execute as @S at @s run function monumenta:mechanisms/daily_player_changes";
+	private static final ZoneId TZ = ZoneId.of("America/New_York");
 	private static BukkitRunnable mRunnable = null;
 
 	public static void startTimer(Plugin plugin) {
@@ -32,7 +38,7 @@ public class DailyReset {
 	}
 
 	private static int getDailyVersion() {
-		return (int)((System.currentTimeMillis() - 25200000) / 86400000);
+		return (int) (ChronoUnit.DAYS.between(LocalDate.ofEpochDay(0), LocalDateTime.now(TZ)));
 	}
 
 	public static void handle(Plugin plugin, Player player) {
