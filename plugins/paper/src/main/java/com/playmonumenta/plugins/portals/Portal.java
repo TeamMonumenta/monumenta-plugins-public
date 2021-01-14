@@ -8,21 +8,21 @@ import org.bukkit.util.Vector;
 
 public class Portal {
 
-	Location mLocation1;
-	Location mLocation2;
+	public Location mLocation1;
+	public Location mLocation2;
 
-	Location mBlock1;
-	Location mBlock2;
+	public Location mBlock1;
+	public Location mBlock2;
 
-	BlockFace mFacing;
+	public BlockFace mFacing;
 
-	Entity mItemFrame1;
-	Entity mItemFrame2;
+	public Entity mItemFrame1;
+	public Entity mItemFrame2;
 
 	//The portal it links to
-	Portal mPair;
+	public Portal mPair;
 	//The owner of the portal
-	Player mOwner;
+	public Player mOwner;
 
 	public Portal(Location loc1, Location loc2, BlockFace face, Location b1, Location b2) {
 		mLocation1 = loc1;
