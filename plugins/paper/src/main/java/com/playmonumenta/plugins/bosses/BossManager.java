@@ -28,13 +28,13 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.AreaEffectCloudApplyEvent;
+import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.EntityPotionEffectEvent;
-import org.bukkit.event.entity.EntitySpawnEvent;
 import org.bukkit.event.entity.EntityTargetEvent;
 import org.bukkit.event.entity.LingeringPotionSplashEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
@@ -381,7 +381,7 @@ public class BossManager implements Listener {
 	 *******************************************************************************/
 
 	@EventHandler(priority = EventPriority.MONITOR)
-	public void entitySpawnEvent(EntitySpawnEvent event) {
+	public void creatureSpawnEvent(CreatureSpawnEvent event) {
 		if (!event.isCancelled()) {
 			Entity entity = event.getEntity();
 
