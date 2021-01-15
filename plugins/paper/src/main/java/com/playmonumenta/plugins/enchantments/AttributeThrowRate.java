@@ -82,7 +82,7 @@ public class AttributeThrowRate implements BaseAttribute {
 				Snowball snowball = (Snowball) player.getWorld().spawnEntity(proj.getLocation(), EntityType.SNOWBALL);
 				snowball.setShooter(player);
 				snowball.setVelocity(proj.getVelocity());
-				player.playSound(player.getLocation(), Sound.ENTITY_SNOWBALL_THROW, SoundCategory.PLAYERS, 1, 1);
+				player.playSound(player.getLocation(), Sound.ENTITY_SNOWBALL_THROW, SoundCategory.PLAYERS, 0.5f, 0.5f);
 				// Set projectile attributes; don't need to do speed attribute since that's only used to calculate non-critical arrow damage
 				if (proj.hasMetadata(AttributeProjectileDamage.DAMAGE_METAKEY)) {
 					snowball.setMetadata(AttributeProjectileDamage.DAMAGE_METAKEY, new FixedMetadataValue(plugin, proj.getMetadata(AttributeProjectileDamage.DAMAGE_METAKEY).get(0).asDouble()));
