@@ -13,7 +13,7 @@ import org.bukkit.plugin.Plugin;
 
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.bosses.spells.SpellBaseTrail;
-import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.NmsUtils;
 
 public class FlameTrailBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_flametrail";
@@ -46,8 +46,8 @@ public class FlameTrailBoss extends BossAbilityGroup {
 					// Hit Action
 					(World world, Player player, Location loc) -> {
 						world.playSound(loc, Sound.ENTITY_GENERIC_BURN, 0.5f, 1f);
-						BossUtils.bossDamage(boss, player, DAMAGE);
 						player.setFireTicks(FIRE_DURATION);
+						NmsUtils.unblockableEntityDamageEntity(player, DAMAGE, boss);
 					},
 					// Expire Action
 					(World world, Location loc) -> { })

@@ -18,7 +18,12 @@ import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 
 public class JunglesNourishment implements BaseEnchantment {
-	private static String PROPERTY_NAME = ChatColor.GRAY + "Jungle's Nourishment";
+
+	private static final String PROPERTY_NAME = ChatColor.GRAY + "Jungle's Nourishment";
+
+	private static final int HEAL = 8;
+	private static final int DURATION = 20 * 5;
+	private static final int COOLDOWN = 20 * 20;
 
 	@Override
 	public String getProperty() {
@@ -38,10 +43,10 @@ public class JunglesNourishment implements BaseEnchantment {
 	@Override
 	public void onConsume(Plugin plugin, Player player, PlayerItemConsumeEvent event, int level) {
 		if (InventoryUtils.testForItemWithLore(event.getItem(), "Jungle's Nourishment")) {
-			PlayerUtils.healPlayer(player, 8);
+			PlayerUtils.healPlayer(player, HEAL);
 			plugin.mPotionManager.addPotion(player, PotionID.ITEM,
-                    new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 20 * 5, 0, true, true));
-			player.setCooldown(event.getItem().getType(), 20 * 20);
+                    new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, DURATION, 0, true, true));
+			player.setCooldown(event.getItem().getType(), COOLDOWN);
 			player.setFoodLevel(24);
 			World world = player.getWorld();
 			world.spawnParticle(Particle.SPELL, player.getLocation().add(0, 1, 0), 20, 0.25, 0.5, 0.25, 1);

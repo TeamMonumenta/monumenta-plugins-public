@@ -26,7 +26,7 @@ public class VindictiveBoss extends BossAbilityGroup {
 	public static final String PERCENT_SPEED_EFFECT_NAME = "VindictivePercentSpeedEffect";
 	public static final String PERCENT_DAMAGE_DEALT_EFFECT_NAME = "VindictivePercentDamageDealtEffect";
 	public static final int DURATION = 20 * 8;
-	public static final double PERCENT_SPEED_EFFECT = 0.5;
+	public static final double PERCENT_SPEED_EFFECT = 0.3;
 	public static final double PERCENT_DAMAGE_DEALT_EFFECT = 0.8;
 	public static final int HEAL = 100;
 

@@ -32,8 +32,7 @@ public class StatMultiplier extends DelveModifier {
 
 	private static final Map<String, Double> STAT_COMPENSATION_MAPPINGS = new HashMap<>();
 
-	protected static final String DELVE_MOB_TAG = "delve_mob";
-	private static final double DELVE_MOB_STAT_MULTIPLIER_R1 = 0.6;
+	private static final double DELVE_MOB_STAT_MULTIPLIER_R1 = 0.5;
 	private static final double DELVE_MOB_STAT_MULTIPLIER_R2 = 1;
 	private static final String DELVE_MOB_HEALTH_MODIFIER_NAME = "DelveMobHealthModifier";
 
@@ -119,8 +118,7 @@ public class StatMultiplier extends DelveModifier {
 	}
 
 	private void modifyDamage(Entity source, EntityDamageByEntityEvent event) {
-		Set<String> tags = source.getScoreboardTags();
-		if (tags != null && tags.contains(DELVE_MOB_TAG) || event.getCause() == DamageCause.CUSTOM) {
+		if (DelvesUtils.isDelveMob(source) || event.getCause() == DamageCause.CUSTOM) {
 			event.setDamage(event.getDamage() * mDelveMobStatMultiplier);
 		} else {
 			event.setDamage(EntityUtils.getDamageApproximation(event, mStatCompensation));
@@ -134,8 +132,7 @@ public class StatMultiplier extends DelveModifier {
 		if (mob instanceof Attributable) {
 			double healthProportion = Math.min(1, mob.getHealth() / mob.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue());
 
-			Set<String> tags = mob.getScoreboardTags();
-			if (tags != null && tags.contains(DELVE_MOB_TAG)) {
+			if (DelvesUtils.isDelveMob(mob)) {
 				EntityUtils.addAttribute(mob, Attribute.GENERIC_MAX_HEALTH,
 						new AttributeModifier(DELVE_MOB_HEALTH_MODIFIER_NAME, mHealthMultiplier * mDelveMobStatMultiplier - 1, Operation.MULTIPLY_SCALAR_1));
 			} else {
@@ -143,6 +140,7 @@ public class StatMultiplier extends DelveModifier {
 						new AttributeModifier(HEALTH_MODIFIER_NAME, mHealthMultiplier * mStatCompensation - 1, Operation.MULTIPLY_SCALAR_1));
 			}
 
+			Set<String> tags = mob.getScoreboardTags();
 			if (tags == null || !tags.contains(CrowdControlImmunityBoss.identityTag)) {
 				EntityUtils.addAttribute(mob, Attribute.GENERIC_MOVEMENT_SPEED,
 						new AttributeModifier(SPEED_MODIFIER_NAME, mSpeedMultiplier - 1, Operation.MULTIPLY_SCALAR_1));

@@ -8,6 +8,7 @@ import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -19,6 +20,7 @@ import org.bukkit.Sound;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.Chest;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -428,6 +430,11 @@ public class DelvesUtils {
 	}
 
 	public static void duplicateLibraryOfSoulsMob(LivingEntity mob, Location loc) {
+		// Only the bottom mob's name is in the LoS
+		if (mob.isInsideVehicle()) {
+			return;
+		}
+
 		String name = mob.getCustomName();
 
 		if (name != null) {
@@ -1101,6 +1108,15 @@ public class DelvesUtils {
 
 			return Modifier.getModifier(column);
 		}
+	}
+
+
+
+	private static final String DELVE_MOB_TAG = "delve_mob";
+
+	public static boolean isDelveMob(Entity entity) {
+		Set<String> tags = entity.getScoreboardTags();
+		return tags != null && tags.contains(DELVE_MOB_TAG);
 	}
 
 }

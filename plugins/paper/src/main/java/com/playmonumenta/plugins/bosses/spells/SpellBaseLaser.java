@@ -135,8 +135,9 @@ public class SpellBaseLaser extends Spell {
 
 			@Override
 			public void run() {
-				Location launLoc = mBoss.getLocation().add(0, 1.6f, 0);
-				Location tarLoc = target.getEyeLocation();
+				Location launLoc = mBoss.getEyeLocation();
+				Location tarLoc = target.getLocation();
+				tarLoc.add(target.getEyeLocation().subtract(tarLoc).multiply(0.5));
 				Location endLoc = launLoc;
 				BoundingBox box = BoundingBox.of(endLoc, 0.5, 0.5, 0.5);
 
@@ -185,7 +186,7 @@ public class SpellBaseLaser extends Spell {
 				if (!blocked) {
 					// Really check to make sure it's not blocked
 					// This takes into account block shapes!
-					blocked = !(LocationUtils.hasLineOfSight(launLoc, target.getEyeLocation()));
+					blocked = !(LocationUtils.hasLineOfSight(launLoc, tarLoc));
 				}
 
 				if ((blocked && mStopWhenBlocked) || EntityUtils.isStunned(mBoss)) {
@@ -216,4 +217,5 @@ public class SpellBaseLaser extends Spell {
 		runnable.runTaskTimer(mPlugin, 0, 2);
 		mActiveRunnables.add(runnable);
 	}
+
 }

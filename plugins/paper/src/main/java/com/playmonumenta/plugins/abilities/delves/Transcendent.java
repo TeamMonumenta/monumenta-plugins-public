@@ -94,10 +94,7 @@ public class Transcendent extends DelveModifier {
 
 	@Override
 	public void applyModifiers(LivingEntity mob, SpawnerSpawnEvent event) {
-		Set<String> tags = mob.getScoreboardTags();
-		if (EntityUtils.isElite(mob)
-				&& !tags.contains(StatMultiplier.DELVE_MOB_TAG)
-				&& FastUtils.RANDOM.nextDouble() < mAbilityChance) {
+		if (EntityUtils.isElite(mob) && !DelvesUtils.isDelveMob(mob) && FastUtils.RANDOM.nextDouble() < mAbilityChance) {
 			if (mob instanceof Attributable) {
 				double healthProportion = Math.min(1, mob.getHealth() / mob.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue());
 

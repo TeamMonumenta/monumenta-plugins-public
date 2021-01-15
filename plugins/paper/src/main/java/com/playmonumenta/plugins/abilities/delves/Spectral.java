@@ -1,7 +1,5 @@
 package com.playmonumenta.plugins.abilities.delves;
 
-import java.util.Set;
-
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.World;
@@ -57,8 +55,7 @@ public class Spectral extends DelveModifier {
 	public void entityDeathEvent(EntityDeathEvent event, boolean shouldGenDrops) {
 		LivingEntity mob = event.getEntity();
 
-		Set<String> tags = mob.getScoreboardTags();
-		if (tags == null || !EntityUtils.isElite(mob) && !tags.contains(StatMultiplier.DELVE_MOB_TAG)) {
+		if (!EntityUtils.isElite(mob) && !DelvesUtils.isDelveMob(mob)) {
 			if (FastUtils.RANDOM.nextDouble() < mSpawnChance) {
 				Location loc = mob.getLocation();
 				World world = loc.getWorld();

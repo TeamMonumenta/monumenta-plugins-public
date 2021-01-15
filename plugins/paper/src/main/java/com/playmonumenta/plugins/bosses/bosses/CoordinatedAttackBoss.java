@@ -1,5 +1,7 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 
 import org.bukkit.Location;
@@ -30,6 +32,7 @@ public class CoordinatedAttackBoss extends BossAbilityGroup {
 	private static final int TARGET_RADIUS = 20;
 	private static final int DELAY = 10;
 	private static final int COOLDOWN = 20 * 3;
+	private static final int AFFECTED_MOB_CAP = 4;
 
 	private final com.playmonumenta.plugins.Plugin mPlugin;
 	private final LivingEntity mBoss;
@@ -75,6 +78,10 @@ public class CoordinatedAttackBoss extends BossAbilityGroup {
 					World world = mBoss.getWorld();
 					Location locTarget = mTarget.getLocation();
 
+					List<LivingEntity> mobs = EntityUtils.getNearbyMobs(locTarget, TARGET_RADIUS);
+					Collections.shuffle(mobs);
+
+					int i = 0;
 					for (LivingEntity mob : EntityUtils.getNearbyMobs(locTarget, TARGET_RADIUS)) {
 						if (mob instanceof Mob && mob.hasLineOfSight(mTarget)) {
 							Set<String> tags = mob.getScoreboardTags();
@@ -93,6 +100,11 @@ public class CoordinatedAttackBoss extends BossAbilityGroup {
 
 								world.spawnParticle(Particle.CLOUD, loc, 10, 0.1, 0.1, 0.1, 0.1);
 								world.spawnParticle(Particle.VILLAGER_ANGRY, mob.getEyeLocation(), 5, 0.3, 0.3, 0.3, 0);
+
+								i++;
+								if (i >= AFFECTED_MOB_CAP) {
+									break;
+								}
 							}
 						}
 					}

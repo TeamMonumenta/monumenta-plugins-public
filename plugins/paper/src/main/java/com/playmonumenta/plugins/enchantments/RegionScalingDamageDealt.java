@@ -12,15 +12,16 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
+import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.PotionUtils;
 
 public class RegionScalingDamageDealt implements BaseEnchantment {
 
@@ -69,7 +70,7 @@ public class RegionScalingDamageDealt implements BaseEnchantment {
 
 	@Override
 	public void tick(Plugin plugin, Player player, int level) {
-		PotionUtils.applyPotion(plugin, player,
+		plugin.mPotionManager.addPotion(player, PotionID.ITEM,
 				new PotionEffect(PotionEffectType.SLOW_DIGGING, 20, 0, false, true));
 	}
 
@@ -79,10 +80,13 @@ public class RegionScalingDamageDealt implements BaseEnchantment {
 
 		ItemStack mainhand = player.getInventory().getItemInMainHand();
 		if (mainhand != null) {
-			for (AttributeModifier modifier : mainhand.getItemMeta().getAttributeModifiers(Attribute.GENERIC_ARMOR)) {
-				if (modifier.getSlot() == EquipmentSlot.HAND && modifier.getAmount() > 0) {
-					EntityUtils.addAttribute(player, Attribute.GENERIC_ARMOR,
-							new AttributeModifier(ATTRIBUTE_CANCELLATION_NAME, -modifier.getAmount(), modifier.getOperation()));
+			ItemMeta meta = mainhand.getItemMeta();
+			if (meta != null) {
+				for (AttributeModifier modifier : meta.getAttributeModifiers(Attribute.GENERIC_ARMOR)) {
+					if (modifier.getSlot() == EquipmentSlot.HAND && modifier.getAmount() > 0) {
+						EntityUtils.addAttribute(player, Attribute.GENERIC_ARMOR,
+								new AttributeModifier(ATTRIBUTE_CANCELLATION_NAME, -modifier.getAmount(), modifier.getOperation()));
+					}
 				}
 			}
 		}

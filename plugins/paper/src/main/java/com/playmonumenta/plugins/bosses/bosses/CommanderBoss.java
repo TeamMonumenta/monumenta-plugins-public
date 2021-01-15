@@ -51,7 +51,9 @@ public class CommanderBoss extends BossAbilityGroup {
 			world.playSound(loc, Sound.ENTITY_HORSE_DEATH, 1f, 0.5f);
 
 			for (LivingEntity mob : EntityUtils.getNearbyMobs(mBoss.getLocation(), RANGE, mBoss)) {
-				DelvesUtils.duplicateLibraryOfSoulsMob(mob);
+				if (!EntityUtils.isBoss(mob)) {
+					DelvesUtils.duplicateLibraryOfSoulsMob(mob);
+				}
 			}
 		}
 	}

@@ -121,8 +121,7 @@ public class SpellBombToss extends Spell {
 	}
 
 	public void launch(Player target) {
-		Location sLoc = mBoss.getLocation();
-		sLoc.setY(sLoc.getY() + 1.7f);
+		Location sLoc = mBoss.getEyeLocation();
 		sLoc.getWorld().playSound(sLoc, Sound.ENTITY_EVOKER_CAST_SPELL, 1, 1);
 		try {
 			TNTPrimed tnt = (TNTPrimed) EntityUtils.getSummonEntityAt(sLoc, EntityType.PRIMED_TNT, "{Fuse:" + mFuse + "}");

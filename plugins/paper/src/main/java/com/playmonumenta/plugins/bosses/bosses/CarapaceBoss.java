@@ -8,6 +8,8 @@ import java.util.NavigableSet;
 import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.World;
+import org.bukkit.attribute.Attribute;
+import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.plugin.Plugin;
@@ -36,7 +38,7 @@ public class CarapaceBoss extends BossAbilityGroup {
 
 	private final com.playmonumenta.plugins.Plugin mPlugin;
 	private final LivingEntity mBoss;
-	private final int mCarapaceHealth;
+	private final double mCarapaceHealth;
 	private final double mSpeedEffect;
 
 	private final List<DamageInstance> mDamageInstancesPeriod = new LinkedList<DamageInstance>();
@@ -55,14 +57,19 @@ public class CarapaceBoss extends BossAbilityGroup {
 
 		super.constructBoss(plugin, identityTag, mBoss, null, null, detectionRange, null);
 
-		int carapaceHealth = 0;
+		double carapaceHealth = 0;
 		double speedEffect = 0;
 
 		for (String tag : mBoss.getScoreboardTags()) {
 			if (tag.startsWith(identityTag) && !tag.equals(identityTag)) {
 				try {
 					String[] values = tag.substring(identityTag.length()).split(",");
-					carapaceHealth = Integer.parseInt(values[0]);
+
+					AttributeInstance health = mBoss.getAttribute(Attribute.GENERIC_MAX_HEALTH);
+					if (health != null) {
+						carapaceHealth = Integer.parseInt(values[0]) / 100.0 * health.getValue();
+					}
+
 					speedEffect = Integer.parseInt(values[1]) / 100.0;
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -97,8 +104,8 @@ public class CarapaceBoss extends BossAbilityGroup {
 		double remainingCarapaceHealth = mCarapaceHealth - mDamageCounterPeriod;
 
 		if (remainingCarapaceHealth > 0) {
-			world.playSound(loc, Sound.BLOCK_ANVIL_PLACE, 0.2f, 2f);
-			world.playSound(loc, Sound.BLOCK_GRASS_PLACE, 0.1f, 0.5f);
+			world.playSound(loc, Sound.BLOCK_ANVIL_PLACE, 0.05f, 2f);
+			world.playSound(loc, Sound.BLOCK_GRASS_PLACE, 0.05f, 0.5f);
 
 			double newDamage = damage - remainingCarapaceHealth;
 			if (newDamage > 0) {
@@ -125,7 +132,7 @@ public class CarapaceBoss extends BossAbilityGroup {
 
 			NavigableSet<Effect> effects = mPlugin.mEffectManager.getEffects(mBoss, SPEED_EFFECT_NAME);
 			if (effects == null) {
-				world.playSound(loc, Sound.BLOCK_GLASS_BREAK, 0.5f, 0.2f);
+				world.playSound(loc, Sound.BLOCK_GLASS_BREAK, 0.3f, 0.2f);
 				mPlugin.mEffectManager.addEffect(mBoss, SPEED_EFFECT_NAME, new PercentSpeed(duration, mSpeedEffect, SPEED_EFFECT_NAME));
 			} else {
 				effects.last().setDuration(duration);

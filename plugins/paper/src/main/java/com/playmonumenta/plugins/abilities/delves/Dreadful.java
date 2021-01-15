@@ -3,7 +3,7 @@ package com.playmonumenta.plugins.abilities.delves;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.World;
-import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDeathEvent;
 
@@ -53,12 +53,8 @@ public class Dreadful extends DelveModifier {
 
 	@Override
 	public void entityDeathEvent(EntityDeathEvent event, boolean shouldGenDrops) {
-		execute(event.getEntity());
-	}
-
-	private void execute(LivingEntity mob) {
-		if (EntityUtils.isElite(mob) && !mob.getScoreboardTags().contains(StatMultiplier.DELVE_MOB_TAG)
-				|| mob instanceof Player) {
+		Entity mob = event.getEntity();
+		if (EntityUtils.isElite(mob) && !DelvesUtils.isDelveMob(mob)) {
 			if (FastUtils.RANDOM.nextDouble() < mSpawnChance) {
 				Location loc = mob.getLocation();
 				World world = loc.getWorld();
