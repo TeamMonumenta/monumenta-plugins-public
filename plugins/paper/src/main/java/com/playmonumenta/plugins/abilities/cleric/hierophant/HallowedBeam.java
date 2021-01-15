@@ -108,6 +108,7 @@ public class HallowedBeam extends MultipleChargeAbility {
 						Location eLoc = pe.getLocation().add(0, pe.getHeight() / 2, 0);
 						world.spawnParticle(Particle.SPELL_INSTANT, pe.getLocation(), 500, 2.5, 0.15f, 2.5, 1);
 						world.spawnParticle(Particle.VILLAGER_HAPPY, pe.getLocation(), 150, 2.55, 0.15f, 2.5, 1);
+						world.playSound(loc, Sound.ITEM_HONEY_BOTTLE_DRINK, 2, 1.5f);
 						AttributeInstance maxHealth = pe.getAttribute(Attribute.GENERIC_MAX_HEALTH);
 						if (maxHealth != null) {
 							PlayerUtils.healPlayer(pe, maxHealth.getValue() * HALLOWED_HEAL_PERCENT);

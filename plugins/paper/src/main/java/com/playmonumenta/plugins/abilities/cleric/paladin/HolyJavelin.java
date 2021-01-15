@@ -137,6 +137,8 @@ public class HolyJavelin extends Ability {
 			LivingEntity damagee = (LivingEntity) event.getEntity();
 			if (EntityUtils.isUndead(damagee)) {
 				execute(mBonusLumDamage + (PlayerUtils.isCritical(mPlayer) ? mBonusCritDamage : 0));
+			} else {
+				execute(0);
 			}
 		}
 		return true;

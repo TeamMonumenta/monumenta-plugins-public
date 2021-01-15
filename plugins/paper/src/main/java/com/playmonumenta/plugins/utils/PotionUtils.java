@@ -289,8 +289,15 @@ public class PotionUtils {
 	}
 
 	public static void clearNegatives(Plugin plugin, Player player) {
+		boolean dolphin = false;
+		if (player.hasPotionEffect(PotionEffectType.DOLPHINS_GRACE)) {
+			dolphin = true;
+		}
 		for (PotionEffectType type : NEGATIVE_EFFECTS) {
 			if (player.hasPotionEffect(type)) {
+				if (type.getName() == "SLOW" && dolphin) {
+					continue;
+				}
 				PotionEffect effect = player.getPotionEffect(type);
 				if (effect.getDuration() < Constants.THIRTY_MINUTES) {
 					plugin.mPotionManager.clearPotionEffectType(player, type);
