@@ -74,7 +74,7 @@ public class Carapace extends DelveModifier {
 
 	@Override
 	public void applyModifiers(LivingEntity mob, EntitySpawnEvent event) {
-		if (!DelvesUtils.isDelveMob(mob)) {
+		if (!DelvesUtils.isDelveMob(mob) && !EntityUtils.isBoss(mob)) {
 			mob.addScoreboardTag(CarapaceBoss.identityTag);
 
 			int healthPercent = EntityUtils.isElite(mob) ?
