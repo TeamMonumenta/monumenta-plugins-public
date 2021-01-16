@@ -47,7 +47,7 @@ public class ShatterCoinInInventory implements Listener {
 			return;
 		}
 
-		if ((item != null && ItemUtils.isItemShattered(item))) {
+		if ((item != null && ItemUtils.isItemShattered(item) && item.getAmount() == 1)) {
 			ItemUtils.reforgeItem(item);
 			coin.subtract();
 			World world = player.getWorld();
@@ -68,6 +68,9 @@ public class ShatterCoinInInventory implements Listener {
 
 			}.runTaskTimer(mPlugin, 0, 7);
 			player.updateInventory();
+			event.setCancelled(true);
+		} else if (item != null && item.getAmount() > 1) {
+			player.sendMessage(ChatColor.RED + "Cannot reforge stacks of items!");
 			event.setCancelled(true);
 		} else {
 			player.sendMessage(ChatColor.RED + "This item cannot be reforged!");
