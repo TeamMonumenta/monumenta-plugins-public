@@ -22,20 +22,24 @@ import com.playmonumenta.plugins.utils.MovementUtils;
 
 public class PrismaticShield extends Ability {
 
-	private static final float RADIUS = 4.0f;
-	private static final int TRIGGER_HEALTH = 6;
-	private static final int AMPLIFIER_1 = 1;
-	private static final int AMPLIFIER_2 = 2;
-	private static final int DURATION_1 = 12 * 20;
-	private static final int DURATION_2 = 12 * 20;
-	private static final int COOLDOWN_1 = 90 * 20;
-	private static final int COOLDOWN_2 = 70 * 20;
-	private static final float KNOCKBACK_SPEED = 0.7f;
 	private static final int DAMAGE_1 = 3;
 	private static final int DAMAGE_2 = 6;
+	private static final float RADIUS = 4.0f;
+	private static final int AMPLIFIER_1 = 1;
+	private static final int AMPLIFIER_1_HEARTS = (AMPLIFIER_1 + 1) * 2;
+	private static final int AMPLIFIER_2 = 2;
+	private static final int AMPLIFIER_2_HEARTS = (AMPLIFIER_2 + 1) * 2;
+	private static final int DURATION_SECONDS = 12;
+	private static final int DURATION = DURATION_SECONDS * 20;
+	private static final float KNOCKBACK_SPEED = 0.7f;
+	private static final int TRIGGER_HEALTH = 6;
+	private static final int TRIGGER_HEALTH_HEARTS = TRIGGER_HEALTH / 2;
+	private static final int COOLDOWN_1_SECONDS = 90;
+	private static final int COOLDOWN_1 = COOLDOWN_1_SECONDS * 20;
+	private static final int COOLDOWN_2_SECONDS = 70;
+	private static final int COOLDOWN_2 = COOLDOWN_2_SECONDS * 20;
 
 	private final int mAmplifier;
-	private final int mDuration;
 	private final int mDamage;
 
 	public PrismaticShield(Plugin plugin, Player player) {
@@ -43,11 +47,28 @@ public class PrismaticShield extends Ability {
 		mInfo.mLinkedSpell = Spells.PRISMATIC_SHIELD;
 		mInfo.mScoreboardId = "Prismatic";
 		mInfo.mShorthandName = "PS";
-		mInfo.mDescriptions.add("When your health drops below 3 hearts (including if the attack would've killed you), you receive an Absorption II shield (4 hearts) which lasts up to 12 s. In addition enemies within four blocks are knocked back and take 3 damage. Cooldown: 90s.");
-		mInfo.mDescriptions.add("The shield is improved to Absorption III (6 hearts) for 12 s. Enemies within four blocks now take 6 damage. Cooldown: 70s.");
+		mInfo.mDescriptions.add(
+			String.format(
+				"If an attack will drop you to %s hearts or less, %ss of absorption II (%s hearts) is first applied on you to try to save you from death. This skill also deals %s damage to all enemies within %s blocks of you and knocks them away. Cooldown: %ss.",
+				TRIGGER_HEALTH_HEARTS,
+				DURATION_SECONDS,
+				AMPLIFIER_1_HEARTS,
+				DAMAGE_1,
+				RADIUS,
+				COOLDOWN_1_SECONDS
+			) // AMPLIFIER_1 is not dynamic. KNOCKBACK_SPEED is not included
+		);
+		mInfo.mDescriptions.add(
+			String.format(
+				"Damage is increased from %s to %s. The strength of the absorption applied is increased from II to III (%s hearts).",
+				DAMAGE_1,
+				DAMAGE_2,
+				AMPLIFIER_2_HEARTS,
+				COOLDOWN_2_SECONDS
+			)
+		);
 		mInfo.mCooldown = getAbilityScore() == 1 ? COOLDOWN_1 : COOLDOWN_2;
 		mAmplifier = getAbilityScore() == 1 ? AMPLIFIER_1 : AMPLIFIER_2;
-		mDuration = getAbilityScore() == 1 ? DURATION_1 : DURATION_2;
 		mDamage = getAbilityScore() == 1 ? DAMAGE_1 : DAMAGE_2;
 	}
 
@@ -110,13 +131,13 @@ public class PrismaticShield extends Ability {
 		putOnCooldown();
 
 		// Conditions match - prismatic shield
-		for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), RADIUS, mPlayer)) {
+		for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation().add(0, damagee.getHeight() / 2, 0), RADIUS, mPlayer)) {
 			EntityUtils.damageEntity(mPlugin, mob, mDamage, mPlayer, MagicType.ARCANE, true, mInfo.mLinkedSpell);
 			MovementUtils.knockAway(mPlayer, mob, KNOCKBACK_SPEED);
 		}
 
 		mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF,
-		                                 new PotionEffect(PotionEffectType.ABSORPTION, mDuration, mAmplifier, true, true));
+		                                 new PotionEffect(PotionEffectType.ABSORPTION, DURATION, mAmplifier, true, true));
 		World world = mPlayer.getWorld();
 		world.spawnParticle(Particle.FIREWORKS_SPARK, mPlayer.getLocation().add(0, 1.15, 0), 150, 0.2, 0.35, 0.2, 0.5);
 		world.spawnParticle(Particle.SPELL_INSTANT, mPlayer.getLocation().add(0, 1.15, 0), 100, 0.2, 0.35, 0.2, 1);

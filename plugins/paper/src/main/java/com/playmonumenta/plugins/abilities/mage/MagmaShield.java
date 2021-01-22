@@ -24,13 +24,15 @@ import com.playmonumenta.plugins.utils.VectorUtils;
 
 public class MagmaShield extends Ability {
 
-	private static final int COOLDOWN = 12 * 20;
-	private static final int RADIUS = 6;
-	private static final int FIRE_DURATION = 4 * 20;
 	private static final int DAMAGE_1 = 7;
 	private static final int DAMAGE_2 = 14;
-	private static final float KNOCKBACK_SPEED = 0.5f;
+	private static final int RADIUS = 6;
+	private static final int FIRE_DURATION_SECONDS = 4;
+	private static final int FIRE_DURATION = FIRE_DURATION_SECONDS * 20;
 	private static final double DOT_ANGLE = 0.33;
+	private static final float KNOCKBACK_SPEED = 0.5f;
+	private static final int COOLDOWN_SECONDS = 12;
+	private static final int COOLDOWN = COOLDOWN_SECONDS * 20;
 
 	private final int mDamage;
 
@@ -39,8 +41,22 @@ public class MagmaShield extends Ability {
 		mInfo.mLinkedSpell = Spells.MAGMA_SHIELD;
 		mInfo.mScoreboardId = "Magma";
 		mInfo.mShorthandName = "MS";
-		mInfo.mDescriptions.add("When you block while you are sneaking, you summon a torrent of flames, knocking all enemies within 6 blocks that are in front of you away, dealing 7 damage and setting them on fire. You must hold a wand to trigger this effect. Cooldown: 12s.");
-		mInfo.mDescriptions.add("The damage is increased to 14.");
+		mInfo.mDescriptions.add(
+			String.format(
+				"While sneaking, right-clicking with a wand summons a torrent of flames, dealing %s damage to all enemies within %s blocks in front of you (in a 120° horizontal field of view), setting them on fire for %ss, and knocking them away. Cooldown: %ss.",
+				DAMAGE_1,
+				RADIUS,
+				FIRE_DURATION_SECONDS,
+				COOLDOWN_SECONDS
+			) // Amplifier has no constant. KNOCKBACK_SPEED is not included
+		);
+		mInfo.mDescriptions.add(
+			String.format(
+				"Damage is increased from %s to %s.",
+				DAMAGE_1,
+				DAMAGE_2
+			)
+		);
 		mInfo.mCooldown = COOLDOWN;
 		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
 		mDamage = getAbilityScore() == 1 ? DAMAGE_1 : DAMAGE_2;

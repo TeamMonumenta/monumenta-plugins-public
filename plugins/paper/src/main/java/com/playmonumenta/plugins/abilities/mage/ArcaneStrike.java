@@ -31,12 +31,18 @@ public class ArcaneStrike extends Ability {
 	private static final Particle.DustOptions COLOR_1 = new Particle.DustOptions(Color.fromRGB(220, 147, 249), 1.0f);
 	private static final Particle.DustOptions COLOR_2 = new Particle.DustOptions(Color.fromRGB(217, 122, 255), 1.0f);
 
-	private static final float RADIUS = 4.0f;
+	/*
+	 * Cloud's standardised constant order:
+	 * 		damage, extra damage, bonus damage, radii, amplifiers/multipliers, durations, other skill technicalities eg knockback, cooldowns
+	 * For pairs of values where one is used to calculate the other, like seconds or hearts, the resulting value goes second
+	 */
 	private static final int DAMAGE_1 = 5;
 	private static final int DAMAGE_2 = 8;
 	private static final int BONUS_DAMAGE_1 = 2;
 	private static final int BONUS_DAMAGE_2 = 4;
-	private static final int COOLDOWN = 6 * 20;
+	private static final float RADIUS = 4.0f;
+	private static final int COOLDOWN_SECONDS = 6;
+	private static final int COOLDOWN = COOLDOWN_SECONDS * 20;
 
 	private final int mDamageBonus;
 	private final int mDamageBonusAffected;
@@ -46,8 +52,24 @@ public class ArcaneStrike extends Ability {
 		mInfo.mLinkedSpell = Spells.ARCANE_STRIKE;
 		mInfo.mScoreboardId = "ArcaneStrike";
 		mInfo.mShorthandName = "AS";
-		mInfo.mDescriptions.add("When you attack an enemy with a wand, you unleash an arcane explosion dealing 5 damage to all mobs in a 4 block radius around the target. Enemies that are on fire or slowed take 2 extra damage. Arcane strike can not trigger Spellshock's static. Cooldown: 6s.");
-		mInfo.mDescriptions.add("The damage is increased to 8. Mobs that are on fire or slowed take 4 additional damage.");
+		mInfo.mDescriptions.add(
+			String.format(
+				"Attacking an enemy with a wand unleashes an arcane explosion, dealing %s damage to it and all enemies within %s blocks of it. Enemies that were already on fire or slowed take %s bonus damage. This spell does not count for Channeling and can apply but cannot trigger Spellshock's \"static\". Cooldown: %ss.",
+				DAMAGE_1,
+				RADIUS,
+				BONUS_DAMAGE_1,
+				COOLDOWN_SECONDS
+			)
+		);
+		mInfo.mDescriptions.add(
+			String.format(
+				"Damage is increased from %s to %s. Bonus damage is increased from %s to %s.",
+				DAMAGE_1,
+				DAMAGE_2,
+				BONUS_DAMAGE_1,
+				BONUS_DAMAGE_2
+			)
+		);
 		mInfo.mCooldown = COOLDOWN;
 		mDamageBonus = getAbilityScore() == 1 ? DAMAGE_1 : DAMAGE_2;
 		mDamageBonusAffected = getAbilityScore() == 1 ? BONUS_DAMAGE_1 : BONUS_DAMAGE_2;

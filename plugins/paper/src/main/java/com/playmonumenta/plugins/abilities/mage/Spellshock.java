@@ -49,20 +49,37 @@ public class Spellshock extends Ability {
 
 	private static final String SPELL_SHOCK_STATIC_EFFECT_NAME = "SpellShockStaticEffect";
 	private static final String PERCENT_SPEED_EFFECT_NAME = "SpellShockPercentSpeedEffect";
-	private static final int DURATION = 6 * 20;
-	private static final double PERCENT_SPEED_EFFECT_2 = 0.15;
 
 	private static final int DAMAGE_1 = 3;
 	private static final int DAMAGE_2 = 5;
 	private static final int RADIUS = 3;
+	private static final double PERCENT_SPEED_EFFECT_2 = 0.15;
+	private static final double PERCENT_SPEED_EFFECT_2_DISPLAY = Math.round(PERCENT_SPEED_EFFECT_2 * 100);
+	private static final int DURATION_SECONDS = 6;
+	private static final int DURATION = DURATION_SECONDS * 20;
 
 	public Spellshock(Plugin plugin, Player player) {
 		super(plugin, player, "Spellshock");
 		mInfo.mLinkedSpell = Spells.SPELLSHOCK;
 		mInfo.mScoreboardId = "SpellShock";
 		mInfo.mShorthandName = "SS";
-		mInfo.mDescriptions.add("Hitting an enemy with a wand or spell inflicts “static” for 6 seconds. If an enemy with static is hit by another spell, a spellshock centered on the enemy deals 3 damage to all mobs in a 3 block radius. Spellshock can cause a chain reaction on enemies with static. An enemy can only be hit by a spellshock once per tick.");
-		mInfo.mDescriptions.add("Damage is increased to 5. Additionally, gain +15% speed for 6 seconds whenever a spellshock is triggered.");
+		mInfo.mDescriptions.add(
+			String.format(
+				"Attacking an enemy with a wand or skill applies %ss of \"static\". Attacking an enemy that already has static with a skill triggers that static, causing a spellshock centered on that enemy, dealing %s damage to it and all enemies within %s blocks of it. This skill itself cannot apply but can trigger static, causing a chain reaction amongst other enemies with static, though each enemy can only be damaged by this once per chain reaction.",
+				DURATION_SECONDS,
+				DAMAGE_1,
+				RADIUS
+			)
+		);
+		mInfo.mDescriptions.add(
+			String.format(
+				"Damage is increased from %s to %s. Triggering static now applies %ss of +%s%% speed on you.",
+				DAMAGE_1,
+				DAMAGE_2,
+				DURATION_SECONDS,
+				PERCENT_SPEED_EFFECT_2_DISPLAY
+			)
+		);
 	}
 
 	@Override

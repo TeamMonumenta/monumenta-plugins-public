@@ -43,19 +43,35 @@ public class ManaLance extends Ability {
 		}
 	}
 
+	private static final Particle.DustOptions MANA_LANCE_COLOR = new Particle.DustOptions(Color.fromRGB(91, 187, 255), 1.0f);
+
 	private static final int DAMAGE_1 = 8;
 	private static final int DAMAGE_2 = 10;
-	private static final int COOLDOWN_1 = 5 * 20;
-	private static final int COOLDOWN_2 = 3 * 20;
-	private static final Particle.DustOptions MANA_LANCE_COLOR = new Particle.DustOptions(Color.fromRGB(91, 187, 255), 1.0f);
+	private static final int COOLDOWN_1_SECONDS = 5;
+	private static final int COOLDOWN_1 = COOLDOWN_1_SECONDS * 20;
+	private static final int COOLDOWN_2_SECONDS = 3;
+	private static final int COOLDOWN_2 = COOLDOWN_2_SECONDS * 20;
 
 	public ManaLance(Plugin plugin, Player player) {
 		super(plugin, player, "Mana Lance");
 		mInfo.mLinkedSpell = Spells.MANA_LANCE;
 		mInfo.mScoreboardId = "ManaLance";
 		mInfo.mShorthandName = "ML";
-		mInfo.mDescriptions.add("Right clicking with a wand fires forth a piercing beam of Mana going 8 blocks, dealing 8 damage to enemies in the path of the beam. This beam will not go through solid blocks. Cooldown: 5s.");
-		mInfo.mDescriptions.add("The beam instead deals 10 damage. Cooldown: 3s.");
+		mInfo.mDescriptions.add(
+			String.format(
+				"Right-clicking with a wand fires forth a beam of piercing mana half a block thick, dealing %s damage to all enemies in its path and knocking them away. It travels up to 8 blocks or until it hits a solid block. Cooldown: %ss.",
+				DAMAGE_1,
+				COOLDOWN_1_SECONDS
+			) // Range & bounding box size have no constants
+		);
+		mInfo.mDescriptions.add(
+			String.format(
+				"Damage is increased from %s to %s. Cooldown: %ss.",
+				DAMAGE_1,
+				DAMAGE_2,
+				COOLDOWN_2_SECONDS
+			)
+		);
 		mInfo.mCooldown = getAbilityScore() == 1 ? COOLDOWN_1 : COOLDOWN_2;
 		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
 	}

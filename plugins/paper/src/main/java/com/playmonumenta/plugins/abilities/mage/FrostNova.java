@@ -27,13 +27,15 @@ import com.playmonumenta.plugins.classes.magic.MagicType;
 
 public class FrostNova extends Ability {
 
-	private static final float RADIUS = 6.0f;
 	private static final int DAMAGE_1 = 4;
 	private static final int DAMAGE_2 = 8;
+	private static final float RADIUS = 6.0f;
 	private static final int AMPLIFIER_1 = 1;
 	private static final int AMPLIFIER_2 = 3;
-	private static final int COOLDOWN = 18 * 20;
-	private static final int DURATION = 4 * 20;
+	private static final int DURATION_SECONDS = 4;
+	private static final int DURATION = DURATION_SECONDS * 20;
+	private static final int COOLDOWN_SECONDS = 18;
+	private static final int COOLDOWN = COOLDOWN_SECONDS * 20;
 
 	private final int mDamage;
 	private final int mSlownessAmplifier;
@@ -43,8 +45,22 @@ public class FrostNova extends Ability {
 		mInfo.mLinkedSpell = Spells.FROST_NOVA;
 		mInfo.mScoreboardId = "FrostNova";
 		mInfo.mShorthandName = "FN";
-		mInfo.mDescriptions.add("When you strike with a wand while you are sneaking, you unleash a frost nova, dealing 4 damage to all enemies in a 6 block radius and afflicting them with 8 seconds of Slowness 2. Also extinguishes fire on nearby players and mobs. Cooldown 18s.");
-		mInfo.mDescriptions.add("Increases the damage to 8 and Slowness 4. Bosses and Elites are hit with 8 seconds of Slowness 2 and 8 damage instead.");
+		mInfo.mDescriptions.add(
+			String.format(
+				"While sneaking, attacking an enemy or the air with a wand unleashes a frost nova, dealing %s damage to all enemies within %s blocks of you, applying %ss of slowness II on them, and extinguishing them if they're on fire. The strength of the slowness applied is reduced by 1 on elites and bosses (from II to I), and the extinguishing also applies to you and other players in the nova. Cooldown %ss.",
+				DAMAGE_1,
+				RADIUS,
+				DURATION_SECONDS,
+				COOLDOWN_SECONDS
+			) // AMPLIFIER_1 is not dynamic. Elite/boss amplifier reduction has no constant
+		);
+		mInfo.mDescriptions.add(
+			String.format(
+				"Damage is increased from %s to %s. The strength of the slowness applied is increased from II to IV, but is still reduced by 1 on elites and bosses (from IV to III).",
+				DAMAGE_1,
+				DAMAGE_2
+			) // AMPLIFIER_1 & AMPLIFIER_2 are not dynamic. Elite/boss amplifier reduction has no constant
+		);
 		mInfo.mCooldown = COOLDOWN;
 		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;
 		mDamage = getAbilityScore() == 1 ? DAMAGE_1 : DAMAGE_2;

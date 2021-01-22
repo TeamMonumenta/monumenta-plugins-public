@@ -32,11 +32,12 @@ import com.playmonumenta.plugins.utils.PotionUtils;
 
 public class Channeling extends Ability {
 
+	private static final Particle.DustOptions CHANNELING_COLOR = new Particle.DustOptions(Color.fromRGB(91, 187, 255), 0.75f);
+
 	private static final int CHANNELING_1_DAMAGE = 3;
 	private static final int CHANNELING_2_DAMAGE = 6;
-	private static final int CHANNELING_EFFECT_DURATION = 20 * 4;
-
-	private static final Particle.DustOptions CHANNELING_COLOR = new Particle.DustOptions(Color.fromRGB(91, 187, 255), 0.75f);
+	private static final int CHANNELING_EFFECT_DURATION_SECONDS = 4;
+	private static final int CHANNELING_EFFECT_DURATION = CHANNELING_EFFECT_DURATION_SECONDS * 20;
 
 	private final int mDamage;
 	private Spells mLastSpellCast;
@@ -46,8 +47,20 @@ public class Channeling extends Ability {
 		mInfo.mLinkedSpell = Spells.CHANNELING;
 		mInfo.mScoreboardId = "Channeling";
 		mInfo.mShorthandName = "Ch";
-		mInfo.mDescriptions.add("After casting a spell, your next melee attack deals 3 extra damage. In addition it will have a bonus effect based on the type of spell used. Fire spells set the enemy on fire for 4s, ice spells slow the enemy for 4s, and arcane spells weaken the enemy for 4s.");
-		mInfo.mDescriptions.add("Bonus damage is increased to 6.");
+		mInfo.mDescriptions.add(
+			String.format(
+				"After casting a spell that has a cooldown, attacking an enemy with a wand deals %s extra arcane damage to it. Based on the type of that most recent spell with a cooldown, this skill also applies a %ss effect on that enemy - fire spells set it on fire and ice spells apply slowness II, while other (arcane) spells apply weakness I.",
+				CHANNELING_1_DAMAGE,
+				CHANNELING_EFFECT_DURATION_SECONDS
+			) // Amplifiers have no constants
+		);
+		mInfo.mDescriptions.add(
+			String.format(
+				"Extra damage is increased from %s to %s.",
+				CHANNELING_1_DAMAGE,
+				CHANNELING_2_DAMAGE
+			)
+		);
 		mDamage = getAbilityScore() == 1 ? CHANNELING_1_DAMAGE : CHANNELING_2_DAMAGE;
 	}
 
