@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.abilities.mage;
 
+import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.entity.AbstractArrow;
 import org.bukkit.entity.Arrow;

@@ -132,7 +132,7 @@ public class PrismaticShield extends Ability {
 		putOnCooldown();
 
 		// Conditions match - prismatic shield
-		for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation().add(0, damagee.getHeight() / 2, 0), RADIUS, mPlayer)) {
+		for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation().add(0, mPlayer.getHeight() / 2, 0), RADIUS, mPlayer)) {
 			EntityUtils.damageEntity(mPlugin, mob, mDamage, mPlayer, MagicType.ARCANE, true, mInfo.mLinkedSpell);
 			MovementUtils.knockAway(mPlayer, mob, KNOCKBACK_SPEED);
 		}
