@@ -98,16 +98,16 @@ public class Spellshock extends Ability {
 					mPlugin.mEffectManager.addEffect(mPlayer, PERCENT_SPEED_EFFECT_NAME, new PercentSpeed(DURATION, PERCENT_SPEED_EFFECT_2, PERCENT_SPEED_EFFECT_NAME));
 				}
 
-				Location loc = mob.getLocation().add(0, 1, 0);
+				Location mobCenterLocation = mob.getLocation().add(0, mob.getHeight() / 2, 0);
 				World world = mPlayer.getWorld();
-				world.spawnParticle(Particle.SPELL_WITCH, loc, 60, 1, 1, 1, 0.001);
-				world.spawnParticle(Particle.CRIT_MAGIC, loc, 45, 1, 1, 1, 0.25);
-				world.playSound(loc, Sound.ENTITY_PLAYER_HURT_ON_FIRE, 0.75f, 2.5f);
-				world.playSound(loc, Sound.ENTITY_PLAYER_HURT_ON_FIRE, 0.75f, 2.0f);
-				world.playSound(loc, Sound.ENTITY_PLAYER_HURT_ON_FIRE, 0.75f, 1.5f);
+				world.spawnParticle(Particle.SPELL_WITCH, mobCenterLocation, 60, 1, 1, 1, 0.001);
+				world.spawnParticle(Particle.CRIT_MAGIC, mobCenterLocation, 45, 1, 1, 1, 0.25);
+				world.playSound(mobCenterLocation, Sound.ENTITY_PLAYER_HURT_ON_FIRE, 0.75f, 2.5f);
+				world.playSound(mobCenterLocation, Sound.ENTITY_PLAYER_HURT_ON_FIRE, 0.75f, 2.0f);
+				world.playSound(mobCenterLocation, Sound.ENTITY_PLAYER_HURT_ON_FIRE, 0.75f, 1.5f);
 
 				// Grab all realistically possible nearby mobs for simplicity, use Set for fast removal
-				Set<LivingEntity> nearbyMobs = new HashSet<LivingEntity>(EntityUtils.getNearbyMobs(mob.getLocation(), 32));
+				Set<LivingEntity> nearbyMobs = new HashSet<LivingEntity>(EntityUtils.getNearbyMobs(mobCenterLocation, 32, mPlayer));
 				// Adding and removing elements in the middle of the list means LinkedList ListIterator should be more efficient
 				List<LivingEntity> triggeredMobs = new LinkedList<LivingEntity>();
 				triggeredMobs.add(mob);

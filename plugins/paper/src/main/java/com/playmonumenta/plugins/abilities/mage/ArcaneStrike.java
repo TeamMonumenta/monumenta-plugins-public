@@ -81,15 +81,16 @@ public class ArcaneStrike extends Ability {
 			putOnCooldown();
 
 			LivingEntity damagee = (LivingEntity) event.getEntity();
+			Location damageeCenterLocation = damagee.getLocation().add(0, damagee.getHeight() / 2, 0); // Where the explosion stems from (was thinking of saying something about enemy feet location in the skill description, but this position just makes more inherent sense)
 
-			for (LivingEntity mob : EntityUtils.getNearbyMobs(damagee.getLocation(), RADIUS, mPlayer)) {
+			for (LivingEntity mob : EntityUtils.getNearbyMobs(damageeCenterLocation, RADIUS, mPlayer)) {
 				int dmg = mDamageBonus;
 
 				// Arcane Strike extra damage if on fire or slowed (but effect not applied this tick)
 				if ((mob.hasPotionEffect(PotionEffectType.SLOW)
-				     && !MetadataUtils.happenedThisTick(mPlugin, mob, Constants.ENTITY_SLOWED_NONCE_METAKEY, 0))
-				    || (mob.getFireTicks() > 0
-				        && !MetadataUtils.happenedThisTick(mPlugin, mob, Constants.ENTITY_COMBUST_NONCE_METAKEY, 0))) {
+					 && !MetadataUtils.happenedThisTick(mPlugin, mob, Constants.ENTITY_SLOWED_NONCE_METAKEY, 0))
+					|| (mob.getFireTicks() > 0
+					    && !MetadataUtils.happenedThisTick(mPlugin, mob, Constants.ENTITY_COMBUST_NONCE_METAKEY, 0))) {
 					dmg += mDamageBonusAffected;
 				}
 
@@ -98,16 +99,15 @@ public class ArcaneStrike extends Ability {
 				mob.setVelocity(velocity);
 			}
 
-			Location locD = damagee.getLocation().add(0, 1, 0);
 			World world = mPlayer.getWorld();
-			world.spawnParticle(Particle.DRAGON_BREATH, locD, 75, 0, 0, 0, 0.25);
-			world.spawnParticle(Particle.EXPLOSION_NORMAL, locD, 35, 0, 0, 0, 0.2);
-			world.spawnParticle(Particle.SPELL_WITCH, locD, 150, 2.5, 1, 2.5, 0.001);
-			world.playSound(locD, Sound.ENTITY_DRAGON_FIREBALL_EXPLODE, 0.75f, 1.5f);
+			world.spawnParticle(Particle.DRAGON_BREATH, damageeCenterLocation, 75, 0, 0, 0, 0.25);
+			world.spawnParticle(Particle.EXPLOSION_NORMAL, damageeCenterLocation, 35, 0, 0, 0, 0.2);
+			world.spawnParticle(Particle.SPELL_WITCH, damageeCenterLocation, 150, 2.5, 1, 2.5, 0.001);
+			world.playSound(damageeCenterLocation, Sound.ENTITY_DRAGON_FIREBALL_EXPLODE, 0.75f, 1.5f);
 
-			Location loc = mPlayer.getLocation().add(mPlayer.getLocation().getDirection().multiply(0.5));
-			world.playSound(loc, Sound.ENTITY_WITHER_SHOOT, 0.75f, 1.65f);
-			world.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 0.75f, 0.5f);
+			Location wandWaveLocation = mPlayer.getLocation().add(mPlayer.getLocation().getDirection().multiply(0.5));
+			world.playSound(wandWaveLocation, Sound.ENTITY_WITHER_SHOOT, 0.75f, 1.65f);
+			world.playSound(wandWaveLocation, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 0.75f, 0.5f);
 			new BukkitRunnable() {
 				double mD = 30;
 				@Override
@@ -119,10 +119,10 @@ public class ArcaneStrike extends Ability {
 						double sin = FastUtils.sin(radian1);
 						for (double r = 1; r < 4; r += 0.5) {
 							vec = new Vector(cos * r, 1, sin * r);
-							vec = VectorUtils.rotateXAxis(vec, -loc.getPitch());
-							vec = VectorUtils.rotateYAxis(vec, loc.getYaw());
+							vec = VectorUtils.rotateXAxis(vec, -wandWaveLocation.getPitch());
+							vec = VectorUtils.rotateYAxis(vec, wandWaveLocation.getYaw());
 
-							Location l = loc.clone().add(vec);
+							Location l = wandWaveLocation.clone().add(vec);
 							world.spawnParticle(Particle.REDSTONE, l, 1, 0.1, 0.1, 0.1, COLOR_1);
 							world.spawnParticle(Particle.REDSTONE, l, 1, 0.1, 0.1, 0.1, COLOR_2);
 						}
