@@ -10,7 +10,6 @@ import org.bukkit.event.entity.SpawnerSpawnEvent;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.bosses.bosses.FireBombTossBoss;
-import com.playmonumenta.plugins.bosses.bosses.FlameLaserBoss;
 import com.playmonumenta.plugins.bosses.bosses.FlameNovaBoss;
 import com.playmonumenta.plugins.bosses.bosses.FlameTrailBoss;
 import com.playmonumenta.plugins.bosses.bosses.SeekingProjectileBoss;
@@ -63,7 +62,6 @@ public class Infernal extends DelveModifier {
 
 	private static final String[] ABILITY_POOL = {
 		SeekingProjectileBoss.identityTag,
-		FlameLaserBoss.identityTag,
 		FlameNovaBoss.identityTag,
 		FlameTrailBoss.identityTag,
 		FireBombTossBoss.identityTag

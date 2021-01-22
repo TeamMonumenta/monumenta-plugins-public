@@ -470,6 +470,9 @@ public class AbilityManager {
 		 * This accounts for skipping over modifiers from items, but will remove all other
 		 * attribute modifiers, so hopefully those aren't used anywhere else in Vanilla...
 		 *
+		 * Haha turns out potions use modifiers too. So double hopefully these aren't used
+		 * anywhere else in Vanilla.
+		 *
 		 * As a side note, we should only really ever be adding modifiers to KBR, Speed, and
 		 * Health, but check all of them here just in case.
 		 */
@@ -486,8 +489,10 @@ public class AbilityManager {
 		for (AttributeInstance instance : instances) {
 			for (AttributeModifier mod : instance.getModifiers()) {
 				String name = mod.getName();
-				// The name of modifiers from vanilla attributes or the vitality infusion
-				if (!name.equals("Modifier") && !name.startsWith("minecraft:generic.")
+				// The name of modifiers from vanilla attributes or potions or the vitality infusion
+				if (!name.equals("Modifier")
+						&& !name.startsWith("minecraft:generic.")
+						&& !name.startsWith("effect.minecraft.")
 						&& !name.equals(Vitality.MODIFIER)) {
 					instance.removeModifier(mod);
 				}

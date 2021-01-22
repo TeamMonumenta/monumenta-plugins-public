@@ -35,27 +35,27 @@ public class Carapace extends DelveModifier {
 	public static final String[][] RANK_DESCRIPTIONS = {
 			{
 				"Enemies gain Carapaces with " + CARAPACE_HEALTH_RAW_PERCENT[0] + "% of their Max Health",
-				"Elites Carapaces have x" + ELITE_CARAPACE_HEALTH_MULTIPLIER + " Health.",
+				"Elites' Carapaces have x" + ELITE_CARAPACE_HEALTH_MULTIPLIER + " Health.",
 				"A Carapace blocks that damage amount in any 10s period.",
 				"Enemies with inactive Carapaces gain " + CARAPACE_SPEED_RAW_PERCENT[0] + "% Speed."
 			}, {
 				"Enemies gain Carapaces with " + CARAPACE_HEALTH_RAW_PERCENT[1] + "% of their Max Health",
-				"Elites Carapaces have x" + ELITE_CARAPACE_HEALTH_MULTIPLIER + " Health.",
+				"Elites' Carapaces have x" + ELITE_CARAPACE_HEALTH_MULTIPLIER + " Health.",
 				"A Carapace blocks that damage amount in any 10s period.",
 				"Enemies with inactive Carapaces gain " + CARAPACE_SPEED_RAW_PERCENT[1] + "% Speed."
 			}, {
 				"Enemies gain Carapaces with " + CARAPACE_HEALTH_RAW_PERCENT[2] + "% of their Max Health",
-				"Elite Carapaces have x" + ELITE_CARAPACE_HEALTH_MULTIPLIER + " Health.",
+				"Elites' Carapaces have x" + ELITE_CARAPACE_HEALTH_MULTIPLIER + " Health.",
 				"A Carapace blocks that damage amount in any 10s period.",
 				"Enemies with inactive Carapaces gain " + CARAPACE_SPEED_RAW_PERCENT[2] + "% Speed."
 			}, {
 				"Enemies gain Carapaces with " + CARAPACE_HEALTH_RAW_PERCENT[3] + "% of their Max Health",
-				"Elites Carapaces have x" + ELITE_CARAPACE_HEALTH_MULTIPLIER + " Health.",
+				"Elites' Carapaces have x" + ELITE_CARAPACE_HEALTH_MULTIPLIER + " Health.",
 				"A Carapace blocks that damage amount in any 10s period.",
 				"Enemies with inactive Carapaces gain " + CARAPACE_SPEED_RAW_PERCENT[3] + "% Speed."
 			}, {
 				"Enemies gain Carapaces with " + CARAPACE_HEALTH_RAW_PERCENT[4] + "% of their Max Health",
-				"Elites Carapaces have x" + ELITE_CARAPACE_HEALTH_MULTIPLIER + " Health.",
+				"Elites' Carapaces have x" + ELITE_CARAPACE_HEALTH_MULTIPLIER + " Health.",
 				"A Carapace blocks that damage amount in any 10s period.",
 				"Enemies with inactive Carapaces gain " + CARAPACE_SPEED_RAW_PERCENT[4] + "% Speed."
 			}
