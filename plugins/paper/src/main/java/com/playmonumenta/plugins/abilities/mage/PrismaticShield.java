@@ -111,6 +111,7 @@ public class PrismaticShield extends Ability {
 		return true;
 	}
 
+	//FIXME Prismatic Shield still triggers despite shield blocks preventing damage - bug #6651
 	private void execute(EntityDamageEvent event) {
 		// Calculate whether this effect should not be run based on player health.
 		// It is intentional that Prismatic Shield saves you from death if you take a buttload of damage somehow.
