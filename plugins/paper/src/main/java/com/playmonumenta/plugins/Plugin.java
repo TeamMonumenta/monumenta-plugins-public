@@ -54,6 +54,7 @@ import com.playmonumenta.plugins.cooking.CookingTableListeners;
 import com.playmonumenta.plugins.effects.EffectManager;
 import com.playmonumenta.plugins.enchantments.AttributeManager;
 import com.playmonumenta.plugins.enchantments.EnchantmentManager;
+import com.playmonumenta.plugins.guis.SinglePageGUIManager;
 import com.playmonumenta.plugins.integrations.ChestSortIntegration;
 import com.playmonumenta.plugins.integrations.CoreProtectIntegration;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
@@ -62,9 +63,9 @@ import com.playmonumenta.plugins.integrations.MonumentaRedisSyncIntegration;
 import com.playmonumenta.plugins.integrations.PlaceholderAPIIntegration;
 import com.playmonumenta.plugins.integrations.luckperms.LuckPermsIntegration;
 import com.playmonumenta.plugins.inventories.AnvilFixInInventory;
-import com.playmonumenta.plugins.inventories.ShatterCoinInInventory;
 import com.playmonumenta.plugins.inventories.LootChestsInInventory;
 import com.playmonumenta.plugins.inventories.PlayerInventoryView;
+import com.playmonumenta.plugins.inventories.ShatterCoinInInventory;
 import com.playmonumenta.plugins.inventories.ShulkerInventoryManager;
 import com.playmonumenta.plugins.itemindex.IndexInventoryListeners;
 import com.playmonumenta.plugins.itemindex.IndexInventoryManager;
@@ -259,6 +260,7 @@ public class Plugin extends JavaPlugin {
 		manager.registerEvents(new ShatterCoinInInventory(this), this);
 		manager.registerEvents(new LootChestsInInventory(), this);
 		manager.registerEvents(new ArrowListener(this), this);
+		manager.registerEvents(new SinglePageGUIManager(), this);
 
 		//  Move the logic out of Plugin and into it's own class that derives off Runnable, a Timer class of some type.
 		getServer().getScheduler().scheduleSyncRepeatingTask(this, new Runnable() {
