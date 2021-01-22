@@ -66,10 +66,7 @@ public class Channeling extends Ability {
 
 	@Override
 	public boolean abilityCastEvent(AbilityCastEvent event) {
-		if (mLastSpellCast == null || !event.getAbility().equals(Spells.ARCANE_STRIKE)) {
-			// Replace previous if not arcane strike
-			mLastSpellCast = event.getAbility();
-		}
+		if (!event.getAbility().equals(Spells.ARCANE_STRIKE)) mLastSpellCast = event.getAbility(); // Replace previous spell as they are cast, except if it is Arcane Strike
 		return true;
 	}
 
