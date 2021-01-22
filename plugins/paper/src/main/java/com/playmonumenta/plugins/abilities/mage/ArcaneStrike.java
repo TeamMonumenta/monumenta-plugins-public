@@ -54,7 +54,7 @@ public class ArcaneStrike extends Ability {
 		mInfo.mShorthandName = "AS";
 		mInfo.mDescriptions.add(
 			String.format(
-				"Attacking an enemy with a wand unleashes an arcane explosion, dealing %s damage to it and all enemies within %s blocks of it. Enemies that were already on fire or slowed take %s bonus damage. This spell does not count for Channeling and can apply but cannot trigger Spellshock's \"static\". Cooldown: %ss.",
+				"Attacking an enemy with a wand unleashes an arcane explosion, dealing %s damage to it and all enemies within %s blocks of it. Enemies that were already on fire or slowed take %s bonus damage. This spell does not count for Channeling and can apply but not trigger Spellshock's \"static\". Cooldown: %ss.",
 				DAMAGE_1,
 				RADIUS,
 				BONUS_DAMAGE_1,

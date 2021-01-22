@@ -44,7 +44,7 @@ public class ElementalArrows extends Ability {
 		);
 		mInfo.mDescriptions.add(
 			String.format(
-				"Extra damage is increased from %s to %s. This extra damage and the applied effect now also affects all enemies within %s blocks of the enemy.",
+				"Extra damage is increased from %s to %s. This extra damage and the applied effect now also affect all enemies within %s blocks of the enemy.",
 				ELEMENTAL_ARROWS_1_DAMAGE,
 				ELEMENTAL_ARROWS_2_DAMAGE,
 				ELEMENTAL_ARROWS_2_RADIUS
