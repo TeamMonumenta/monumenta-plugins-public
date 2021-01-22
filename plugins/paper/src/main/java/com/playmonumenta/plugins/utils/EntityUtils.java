@@ -503,7 +503,7 @@ public class EntityUtils {
 		List<LivingEntity> mobs = new ArrayList<LivingEntity>(entities.size());
 		for (Entity entity : entities) {
 			if (types == null) {
-				if (types == null && isHostileMob(entity) && !entity.isDead() && entity.isValid()) {
+				if (isHostileMob(entity) && !entity.isDead() && entity.isValid()) {
 					mobs.add((LivingEntity)entity);
 				}
 			} else {
