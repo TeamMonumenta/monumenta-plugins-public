@@ -43,11 +43,11 @@ public class AttributeThrowRate implements BaseAttribute {
 			ItemStack mainhand = player.getInventory().getItemInMainHand();
 			ItemStack offhand = player.getInventory().getItemInOffHand();
 
-			// Off hand projectiles not supported
-			if (offhand.equals(item)) {
-				return;
-			}
-
+			/*
+			 * TODO:
+			 * This needs to be a generic check, preferably contained within
+			 * the code for the enchantment itself.
+			 */
 			//Check for Two Handed Curse.
 			if (InventoryUtils.testForItemWithLore(mainhand, TwoHanded.PROPERTY_NAME) || InventoryUtils.testForItemWithLore(offhand, TwoHanded.PROPERTY_NAME)) {
 				if (offhand.getType() != Material.AIR && mainhand.getType() != Material.AIR) {

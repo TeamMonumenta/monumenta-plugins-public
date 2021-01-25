@@ -20,6 +20,7 @@ import org.bukkit.attribute.Attributable;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.attribute.AttributeModifier;
+import org.bukkit.attribute.AttributeModifier.Operation;
 import org.bukkit.block.Block;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.AbstractArrow;
@@ -1026,6 +1027,18 @@ public class EntityUtils {
 		armor = Math.min(30, armor);
 		toughness = Math.min(20, toughness);
 		return damage * (1 - Math.min(20, Math.max(armor / 5, armor - damage / (2 + toughness / 4))) / 25);
+	}
+
+	// Only use this to set max health of newly spawned mobs
+	public static void scaleMaxHealth(LivingEntity mob, double modifierPercent, String modifierName) {
+		// Make sure the mob never has an invalid health
+		if (modifierPercent < 0) {
+			mob.setHealth(mob.getHealth() * (1 + modifierPercent));
+		}
+
+		addAttribute(mob, Attribute.GENERIC_MAX_HEALTH,
+				new AttributeModifier(modifierName, modifierPercent, Operation.MULTIPLY_SCALAR_1));
+		mob.setHealth(mob.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue());
 	}
 
 	public static void addAttribute(Attributable attributable, Attribute attribute, AttributeModifier modifier) {

@@ -154,7 +154,7 @@ public class MobListener implements Listener {
 						Material material = mainhand.getType();
 						if (material == Material.TRIDENT || material == Material.CROSSBOW) {
 							ItemMeta meta = mainhand.getItemMeta();
-							if (meta != null) {
+							if (meta != null && meta.hasAttributeModifiers()) {
 								Collection<AttributeModifier> modifiers = meta.getAttributeModifiers(Attribute.GENERIC_ATTACK_DAMAGE);
 								if (modifiers != null) {
 									for (AttributeModifier modifier : modifiers) {

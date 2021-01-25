@@ -514,6 +514,14 @@ public class EntityListener implements Listener {
 		if (shooter instanceof Player) {
 			Player player = (Player)shooter;
 
+			/*
+			 * Too many bugs arise as a result of being able to shoot things from offhand.
+			 */
+			if (ItemUtils.isShootableItem(player.getInventory().getItemInOffHand())) {
+				event.setCancelled(true);
+				return;
+			}
+
 			mPlugin.mTrackingManager.mPlayers.onLaunchProjectile(mPlugin, player, proj, event);
 			if (event.isCancelled()) {
 				return;
@@ -522,14 +530,10 @@ public class EntityListener implements Listener {
 			if (event.getEntityType() == EntityType.SNOWBALL) {
 				Snowball origBall = (Snowball)proj;
 				ItemStack itemInMainHand = player.getEquipment().getItemInMainHand();
-				ItemStack itemInOffHand = player.getEquipment().getItemInOffHand();
 
-				// Check if the player has an infinity snowball in main or off hand
-				if (((itemInMainHand.getType().equals(Material.SNOWBALL)) &&
-				     (itemInMainHand.getEnchantmentLevel(Enchantment.ARROW_INFINITE) > 0)) ||
-				    ((itemInOffHand.getType().equals(Material.SNOWBALL)) &&
-				     (itemInOffHand.getEnchantmentLevel(Enchantment.ARROW_INFINITE) > 0))) {
-
+				// Check if the player has an infinity snowball
+				if (itemInMainHand.getType().equals(Material.SNOWBALL)
+						&& itemInMainHand.getEnchantmentLevel(Enchantment.ARROW_INFINITE) > 0) {
 					Snowball newBall = (Snowball)origBall.getWorld().spawnEntity(origBall.getLocation(), EntityType.SNOWBALL);
 					newBall.setShooter(player);
 					newBall.setVelocity(origBall.getVelocity());
@@ -544,20 +548,10 @@ public class EntityListener implements Listener {
 			} else if (event.getEntityType() == EntityType.ENDER_PEARL) {
 				EnderPearl origPearl = (EnderPearl)proj;
 				ItemStack itemInMainHand = player.getEquipment().getItemInMainHand();
-				ItemStack itemInOffHand = player.getEquipment().getItemInOffHand();
 
-				// TODO: Remove this if we ever figure out how to detect offhand pearl interactables
-				if (itemInOffHand.getType().equals(Material.ENDER_PEARL)) {
-					event.setCancelled(true);
-					return;
-				}
-
-				// Check if the player has an infinity ender pearl in main or off hand
-				if (((itemInMainHand.getType().equals(Material.ENDER_PEARL)) &&
-				     (itemInMainHand.getEnchantmentLevel(Enchantment.ARROW_INFINITE) > 0)) ||
-				    ((itemInOffHand.getType().equals(Material.ENDER_PEARL)) &&
-				     (itemInOffHand.getEnchantmentLevel(Enchantment.ARROW_INFINITE) > 0))) {
-
+				// Check if the player has an infinity ender pearl
+				if (itemInMainHand.getType().equals(Material.ENDER_PEARL)
+						&& itemInMainHand.getEnchantmentLevel(Enchantment.ARROW_INFINITE) > 0) {
 					EnderPearl newPearl = (EnderPearl)origPearl.getWorld().spawnEntity(origPearl.getLocation(), EntityType.ENDER_PEARL);
 					newPearl.setShooter(player);
 					newPearl.setVelocity(origPearl.getVelocity());
@@ -569,16 +563,6 @@ public class EntityListener implements Listener {
 					return;
 				}
 			} else if (event.getEntityType() == EntityType.ARROW || event.getEntityType() == EntityType.SPECTRAL_ARROW) {
-				ItemStack itemInMainHand = player.getEquipment().getItemInMainHand();
-				ItemStack itemInOffHand = player.getEquipment().getItemInOffHand();
-				if (itemInMainHand != null && itemInMainHand.getType().equals(Material.CROSSBOW) && itemInMainHand.containsEnchantment(Enchantment.MULTISHOT)
-					|| itemInOffHand != null && itemInOffHand.getType().equals(Material.CROSSBOW) && itemInOffHand.containsEnchantment(Enchantment.MULTISHOT)) {
-					if (!MetadataUtils.checkOnceThisTick(mPlugin, player, "MultishotThisTick")) {
-						// Only process the main multishot arrow, which is shot first
-						return;
-					}
-				}
-
 				AbstractArrow arrow = (AbstractArrow) proj;
 				if (!mAbilities.playerShotArrowEvent(player, arrow)) {
 					event.setCancelled(true);

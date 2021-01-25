@@ -4,7 +4,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import org.bukkit.attribute.Attributable;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.attribute.AttributeModifier.Operation;
@@ -34,7 +33,6 @@ public class StatMultiplier extends DelveModifier {
 
 	private static final double DELVE_MOB_STAT_MULTIPLIER_R1 = 0.5;
 	private static final double DELVE_MOB_STAT_MULTIPLIER_R2 = 1;
-	private static final String DELVE_MOB_HEALTH_MODIFIER_NAME = "DelveMobHealthModifier";
 
 	static {
 		STAT_COMPENSATION_MAPPINGS.put("white", 1.7);
@@ -129,24 +127,13 @@ public class StatMultiplier extends DelveModifier {
 
 	@Override
 	public void applyModifiers(LivingEntity mob, EntitySpawnEvent event) {
-		if (mob instanceof Attributable) {
-			double healthProportion = Math.min(1, mob.getHealth() / mob.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue());
+		EntityUtils.scaleMaxHealth(mob, DelvesUtils.isDelveMob(mob) ?
+				mHealthMultiplier * mDelveMobStatMultiplier - 1 : mHealthMultiplier * mStatCompensation - 1, HEALTH_MODIFIER_NAME);
 
-			if (DelvesUtils.isDelveMob(mob)) {
-				EntityUtils.addAttribute(mob, Attribute.GENERIC_MAX_HEALTH,
-						new AttributeModifier(DELVE_MOB_HEALTH_MODIFIER_NAME, mHealthMultiplier * mDelveMobStatMultiplier - 1, Operation.MULTIPLY_SCALAR_1));
-			} else {
-				EntityUtils.addAttribute(mob, Attribute.GENERIC_MAX_HEALTH,
-						new AttributeModifier(HEALTH_MODIFIER_NAME, mHealthMultiplier * mStatCompensation - 1, Operation.MULTIPLY_SCALAR_1));
-			}
-
-			Set<String> tags = mob.getScoreboardTags();
-			if (tags == null || !tags.contains(CrowdControlImmunityBoss.identityTag)) {
-				EntityUtils.addAttribute(mob, Attribute.GENERIC_MOVEMENT_SPEED,
-						new AttributeModifier(SPEED_MODIFIER_NAME, mSpeedMultiplier - 1, Operation.MULTIPLY_SCALAR_1));
-			}
-
-			mob.setHealth(healthProportion * mob.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue());
+		Set<String> tags = mob.getScoreboardTags();
+		if (tags == null || !tags.contains(CrowdControlImmunityBoss.identityTag)) {
+			EntityUtils.addAttribute(mob, Attribute.GENERIC_MOVEMENT_SPEED,
+					new AttributeModifier(SPEED_MODIFIER_NAME, mSpeedMultiplier - 1, Operation.MULTIPLY_SCALAR_1));
 		}
 	}
 

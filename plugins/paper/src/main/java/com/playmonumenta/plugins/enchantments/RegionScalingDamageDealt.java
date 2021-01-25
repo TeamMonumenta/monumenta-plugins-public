@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.enchantments;
 
+import java.util.Collection;
 import java.util.EnumSet;
 
 import org.bukkit.ChatColor;
@@ -81,11 +82,14 @@ public class RegionScalingDamageDealt implements BaseEnchantment {
 		ItemStack mainhand = player.getInventory().getItemInMainHand();
 		if (mainhand != null) {
 			ItemMeta meta = mainhand.getItemMeta();
-			if (meta != null) {
-				for (AttributeModifier modifier : meta.getAttributeModifiers(Attribute.GENERIC_ARMOR)) {
-					if (modifier.getSlot() == EquipmentSlot.HAND && modifier.getAmount() > 0) {
-						EntityUtils.addAttribute(player, Attribute.GENERIC_ARMOR,
-								new AttributeModifier(ATTRIBUTE_CANCELLATION_NAME, -modifier.getAmount(), modifier.getOperation()));
+			if (meta != null && meta.hasAttributeModifiers()) {
+				Collection<AttributeModifier> modifiers = meta.getAttributeModifiers(Attribute.GENERIC_ARMOR);
+				if (modifiers != null) {
+					for (AttributeModifier modifier : modifiers) {
+						if (modifier.getSlot() == EquipmentSlot.HAND && modifier.getAmount() > 0) {
+							EntityUtils.addAttribute(player, Attribute.GENERIC_ARMOR,
+									new AttributeModifier(ATTRIBUTE_CANCELLATION_NAME, -modifier.getAmount(), modifier.getOperation()));
+						}
 					}
 				}
 			}
