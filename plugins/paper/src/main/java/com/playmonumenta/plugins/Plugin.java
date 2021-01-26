@@ -47,6 +47,7 @@ import com.playmonumenta.plugins.commands.SkillDescription;
 import com.playmonumenta.plugins.commands.SkillSummary;
 import com.playmonumenta.plugins.commands.Spectate;
 import com.playmonumenta.plugins.commands.SpectateBot;
+import com.playmonumenta.plugins.commands.TeleportAsync;
 import com.playmonumenta.plugins.commands.TeleportByScore;
 import com.playmonumenta.plugins.cooking.CookingCommand;
 import com.playmonumenta.plugins.cooking.CookingTableInventoryManager;
@@ -168,6 +169,7 @@ public class Plugin extends JavaPlugin {
 		SkillSummary.register(this);
 		CookingCommand.register(this);
 		ItemIndexCommand.register();
+		TeleportAsync.register();
 		TeleportByScore.register();
 		Portal1.register();
 		Portal2.register();

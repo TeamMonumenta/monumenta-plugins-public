@@ -1,0 +1,249 @@
+package com.playmonumenta.plugins.commands;
+
+import java.util.Collection;
+import java.util.LinkedHashMap;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentSkipListSet;
+
+import com.playmonumenta.plugins.utils.CommandUtils;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
+import org.bukkit.Location;
+import org.bukkit.util.Vector;
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.Mob;
+import org.bukkit.entity.Player;
+import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
+
+import dev.jorel.commandapi.CommandAPI;
+import dev.jorel.commandapi.CommandAPICommand;
+import dev.jorel.commandapi.CommandPermission;
+import dev.jorel.commandapi.arguments.Argument;
+import dev.jorel.commandapi.arguments.EntitySelectorArgument;
+import dev.jorel.commandapi.arguments.EntitySelectorArgument.EntitySelector;
+import dev.jorel.commandapi.arguments.LiteralArgument;
+import dev.jorel.commandapi.arguments.LocationArgument;
+import dev.jorel.commandapi.arguments.RotationArgument;
+import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
+import dev.jorel.commandapi.wrappers.Rotation;
+
+// Designed to be 1:1 with the vanilla teleport command, but loads chunks async before teleporting.
+public class TeleportAsync extends GenericCommand {
+	private static final String COMMAND = "teleportasync";
+	private static ConcurrentSkipListSet<Entity> entitiesTeleportingAsync = new ConcurrentSkipListSet<>();
+
+	@SuppressWarnings("unchecked")
+	public static void register() {
+		CommandPermission perms = CommandPermission.fromString("monumenta.command.teleportasync");
+
+		LinkedHashMap<String, Argument> arguments = new LinkedHashMap<>();
+		arguments.put("destination", new EntitySelectorArgument(EntitySelector.ONE_ENTITY));
+		new CommandAPICommand(COMMAND)
+			.withPermission(perms)
+			.withArguments(arguments)
+			.executes((sender, args) -> {
+				return teleport(sender, (Entity)args[0]);
+			})
+			.register();
+
+		arguments.clear();
+		arguments.put("location", new LocationArgument());
+		new CommandAPICommand(COMMAND)
+			.withPermission(perms)
+			.withArguments(arguments)
+			.executes((sender, args) -> {
+				return teleport(sender, (Location)args[0]);
+			})
+			.register();
+
+		arguments.clear();
+		arguments.put("targets", new EntitySelectorArgument(EntitySelector.MANY_ENTITIES));
+		arguments.put("destination", new EntitySelectorArgument(EntitySelector.ONE_ENTITY));
+		new CommandAPICommand(COMMAND)
+			.withPermission(perms)
+			.withArguments(arguments)
+			.executes((sender, args) -> {
+				Entity dst = (Entity)args[1];
+				return teleport(sender, (Collection<Entity>)args[0], dst.getLocation(), getEntityRotation(dst));
+			})
+			.register();
+
+		arguments.clear();
+		arguments.put("targets", new EntitySelectorArgument(EntitySelector.MANY_ENTITIES));
+		arguments.put("location", new LocationArgument());
+		new CommandAPICommand(COMMAND)
+			.withPermission(perms)
+			.withArguments(arguments)
+			.executes((sender, args) -> {
+				return teleport(sender, (Collection<Entity>)args[0], (Location)args[1], (Rotation)null);
+			})
+			.register();
+
+		arguments.clear();
+		arguments.put("targets", new EntitySelectorArgument(EntitySelector.MANY_ENTITIES));
+		arguments.put("location", new LocationArgument());
+		arguments.put("facing", new LiteralArgument("facing"));
+		arguments.put("entity", new LiteralArgument("entity"));
+		arguments.put("facingEntity", new EntitySelectorArgument(EntitySelector.ONE_ENTITY));
+		new CommandAPICommand(COMMAND)
+			.withPermission(perms)
+			.withArguments(arguments)
+			.executes((sender, args) -> {
+				return teleportFacing(sender, (Collection<Entity>)args[0], (Location)args[1], (Entity)args[2]);
+			})
+			.register();
+		// TODO facing anchors not currently supported by CommandAPI, no support here.
+
+		arguments.clear();
+		arguments.put("targets", new EntitySelectorArgument(EntitySelector.MANY_ENTITIES));
+		arguments.put("location", new LocationArgument());
+		arguments.put("facing", new LiteralArgument("facing"));
+		arguments.put("facingLocation", new LocationArgument());
+		new CommandAPICommand(COMMAND)
+			.withPermission(perms)
+			.withArguments(arguments)
+			.executes((sender, args) -> {
+				return teleportFacing(sender, (Collection<Entity>)args[0], (Location)args[1], (Location)args[2]);
+			})
+			.register();
+
+		arguments.clear();
+		arguments.put("targets", new EntitySelectorArgument(EntitySelector.MANY_ENTITIES));
+		arguments.put("location", new LocationArgument());
+		arguments.put("Rotation", new RotationArgument());
+		new CommandAPICommand(COMMAND)
+			.withPermission(perms)
+			.withArguments(arguments)
+			.executes((sender, args) -> {
+				return teleport(sender, (Collection<Entity>)args[0], (Location)args[1], (Rotation)args[2]);
+			})
+			.register();
+	}
+
+	// Teleport (possibly proxied) sender to an entity, copying its rotation
+	private static int teleport(@Nonnull CommandSender sender, @Nonnull Entity dst) throws WrapperCommandSyntaxException {
+		CommandSender srcSender = CommandUtils.getCallee(sender);
+
+		if (!(srcSender instanceof Entity)) {
+			CommandAPI.fail("An entity is required to run this command here");
+			return 0;
+		}
+
+		Entity src = (Entity)srcSender;
+		return teleport(sender, src, dst.getLocation(), getEntityRotation(dst));
+	}
+
+	// Teleport (possibly proxied) sender to a location
+	private static int teleport(@Nonnull CommandSender sender, @Nonnull Location dst) throws WrapperCommandSyntaxException {
+		CommandSender srcSender = CommandUtils.getCallee(sender);
+
+		if (!(srcSender instanceof Entity)) {
+			CommandAPI.fail("An entity is required to run this command here");
+			return 0;
+		}
+
+		Entity src = (Entity)srcSender;
+		return teleport(sender, src, dst, null);
+	}
+
+	private static int teleport(@Nonnull CommandSender sender, @Nonnull Collection<Entity> srcs, @Nonnull Location dst, @Nullable Rotation rot) {
+		int teleported = 0;
+		for (Entity src : srcs) {
+			teleported += teleport(sender, src, dst, rot);
+		}
+		return teleported;
+	}
+
+	public static int teleport(@Nonnull CommandSender sender, @Nonnull Entity src, @Nonnull Location dst, @Nullable Rotation rot) {
+		if (entitiesTeleportingAsync.contains(src)) {
+			sender.sendMessage(src.getName() + " is already scheduled to teleport, honoring previous request instead.");
+			return 0;
+		}
+
+		if (src instanceof Player) {
+			((Player)src).setSwimming(false);
+		}
+		if (src instanceof Mob) {
+			((Mob)src).setVelocity(new Vector(0, 0.1, 0));
+		}
+
+		Location srcLocation = src.getLocation();
+		Location adjustedDst = dst.clone();
+		if (rot == null) {
+			adjustedDst.setPitch(srcLocation.getPitch());
+			adjustedDst.setYaw(srcLocation.getYaw());
+		} else {
+			adjustedDst.setPitch(rot.getPitch());
+			adjustedDst.setYaw(rot.getYaw());
+		}
+
+		entitiesTeleportingAsync.add(src);
+		CompletableFuture<Boolean> completableFuture = src.teleportAsync(adjustedDst, TeleportCause.COMMAND);
+
+		completableFuture.thenApply(resultBool -> {
+			entitiesTeleportingAsync.remove(src);
+			if (resultBool) {
+				sender.sendMessage("Teleported " + src.getName());
+			} else {
+				sender.sendMessage("Didn't teleport " + src.getName() + "? Got False from CompletableFuture<Boolean>.");
+			}
+			return resultBool;
+		});
+		completableFuture.exceptionally(ex -> {
+			entitiesTeleportingAsync.remove(src);
+			sender.sendMessage("An exception occured teleporting " + src.getName() + ": " + ex.getMessage());
+			return false;
+		});
+
+		sender.sendMessage("Teleporting " + src.getName() + " to " + Double.toString(adjustedDst.getX()) + " " + Double.toString(adjustedDst.getY()) + " " + Double.toString(adjustedDst.getZ()) + ", yaw/pitch " + Float.toString(adjustedDst.getYaw()) + " " + Float.toString(adjustedDst.getPitch()));
+		return 1;
+	}
+
+	private static int teleportFacing(@Nonnull CommandSender sender, @Nonnull Collection<Entity> srcs, @Nonnull Location dst, @Nonnull Entity facingEntity) {
+		Rotation rot;
+		if (srcs.contains(facingEntity)) {
+			rot = new Rotation(0.0f, -90.0f);
+		} else {
+			rot = getFacingRotation(dst, facingEntity.getLocation());
+		}
+
+		int teleported = 0;
+		for (Entity src : srcs) {
+			teleported += teleport(sender, src, dst, rot);
+		}
+		return teleported;
+	}
+
+	private static int teleportFacing(@Nonnull CommandSender sender, @Nonnull Collection<Entity> srcs, @Nonnull Location dst, @Nonnull Location facing) {
+		Rotation rot = getFacingRotation(dst, facing);
+
+		int teleported = 0;
+		for (Entity src : srcs) {
+			teleported += teleport(sender, src, dst, rot);
+		}
+		return teleported;
+	}
+
+	private static Rotation getEntityRotation(@Nonnull Entity entity) {
+		Location loc = entity.getLocation();
+		return getLocationRotation(loc);
+	}
+
+	public static Rotation getLocationRotation(@Nonnull Location loc) {
+		return new Rotation(loc.getPitch(), loc.getYaw());
+	}
+
+	private static Rotation getFacingRotation(@Nonnull Location dst, @Nonnull Location facing) {
+		Vector dstVec = dst.toVector();
+		Vector facingVec = facing.toVector();
+		facingVec.subtract(dstVec);
+
+		Location workLoc = dst.clone();
+		workLoc.setDirection​(facingVec);
+
+		return new Rotation(workLoc.getPitch(), workLoc.getYaw());
+	}
+}

@@ -24,6 +24,13 @@ import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
 
 public class CommandUtils {
 
+	public static CommandSender getCallee(CommandSender sender) {
+		if (sender instanceof ProxiedCommandSender) {
+			return ((ProxiedCommandSender)sender).getCallee();
+		}
+		return sender;
+	}
+
 	/**
 	 * Gets a CommandSender's location (player, command block, /execute, etc.)
 	 *

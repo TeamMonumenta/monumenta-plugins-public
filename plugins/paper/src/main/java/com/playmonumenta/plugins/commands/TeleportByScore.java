@@ -17,6 +17,7 @@ import org.bukkit.util.Vector;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.CommandPermission;
 import dev.jorel.commandapi.arguments.Argument;
+import dev.jorel.commandapi.arguments.BooleanArgument;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument.EntitySelector;
 import dev.jorel.commandapi.arguments.FloatArgument;
@@ -37,7 +38,7 @@ public class TeleportByScore extends GenericCommand {
 			.withPermission(perms)
 			.withArguments(arguments)
 			.executes((sender, args) -> {
-				teleport(sender, (Entity)args[0], (String)args[1], (String)args[2], (String)args[3], null, null, 1.0f);
+				teleport(sender, (Entity)args[0], (String)args[1], (String)args[2], (String)args[3], null, null, 1.0f, false);
 			})
 			.register();
 
@@ -47,7 +48,7 @@ public class TeleportByScore extends GenericCommand {
 			.withPermission(perms)
 			.withArguments(arguments)
 			.executes((sender, args) -> {
-				teleport(sender, (Entity)args[0], (String)args[1], (String)args[2], (String)args[3], (String)args[4], (String)args[5], 1.0f);
+				teleport(sender, (Entity)args[0], (String)args[1], (String)args[2], (String)args[3], (String)args[4], (String)args[5], 1.0f, false);
 			})
 			.register();
 
@@ -56,7 +57,16 @@ public class TeleportByScore extends GenericCommand {
 			.withPermission(perms)
 			.withArguments(arguments)
 			.executes((sender, args) -> {
-				teleport(sender, (Entity)args[0], (String)args[1], (String)args[2], (String)args[3], (String)args[4], (String)args[5], (Float)args[6]);
+				teleport(sender, (Entity)args[0], (String)args[1], (String)args[2], (String)args[3], (String)args[4], (String)args[5], (Float)args[6], false);
+			})
+			.register();
+
+		arguments.put("async", new BooleanArgument());
+		new CommandAPICommand(COMMAND)
+			.withPermission(perms)
+			.withArguments(arguments)
+			.executes((sender, args) -> {
+				teleport(sender, (Entity)args[0], (String)args[1], (String)args[2], (String)args[3], (String)args[4], (String)args[5], (Float)args[6], (boolean)args[7]);
 			})
 			.register();
 	}
@@ -70,7 +80,7 @@ public class TeleportByScore extends GenericCommand {
 		return ScoreboardUtils.getScoreboardValue(entity.getName(), obj).orElse(null);
 	}
 
-	private static void teleport(@Nonnull CommandSender sender, @Nonnull Entity entity, @Nonnull String objX, @Nonnull String objY, @Nonnull String objZ, @Nullable String objYaw, @Nullable String objPitch, float scale) {
+	private static void teleport(@Nonnull CommandSender sender, @Nonnull Entity entity, @Nonnull String objX, @Nonnull String objY, @Nonnull String objZ, @Nullable String objYaw, @Nullable String objPitch, float scale, boolean async) {
 		Integer x = getValue(entity, objX);
 		Integer y = getValue(entity, objY);
 		Integer z = getValue(entity, objZ);
@@ -114,7 +124,11 @@ public class TeleportByScore extends GenericCommand {
 		if (entity instanceof Mob) {
 			((Mob)entity).setVelocity(new Vector(0, 0.1, 0));
 		}
-		entity.teleport(loc);
+		if (async) {
+			TeleportAsync.teleport(sender, entity, loc, TeleportAsync.getLocationRotation(loc));
+		} else {
+			entity.teleport(loc);
+		}
 	}
 }
 
