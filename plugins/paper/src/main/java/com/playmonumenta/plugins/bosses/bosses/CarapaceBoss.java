@@ -133,7 +133,10 @@ public class CarapaceBoss extends BossAbilityGroup {
 			NavigableSet<Effect> effects = mPlugin.mEffectManager.getEffects(mBoss, SPEED_EFFECT_NAME);
 			if (effects == null) {
 				world.playSound(loc, Sound.BLOCK_GLASS_BREAK, 0.3f, 0.2f);
-				mPlugin.mEffectManager.addEffect(mBoss, SPEED_EFFECT_NAME, new PercentSpeed(duration, mSpeedEffect, SPEED_EFFECT_NAME));
+
+				if (mSpeedEffect > 0) {
+					mPlugin.mEffectManager.addEffect(mBoss, SPEED_EFFECT_NAME, new PercentSpeed(duration, mSpeedEffect, SPEED_EFFECT_NAME));
+				}
 			} else {
 				effects.last().setDuration(duration);
 			}

@@ -34,6 +34,7 @@ import org.bukkit.loot.LootTable;
 import com.playmonumenta.plugins.abilities.delves.Arcanic;
 import com.playmonumenta.plugins.abilities.delves.Bloodthirsty;
 import com.playmonumenta.plugins.abilities.delves.Carapace;
+import com.playmonumenta.plugins.abilities.delves.Chivalrous;
 import com.playmonumenta.plugins.abilities.delves.Colossal;
 import com.playmonumenta.plugins.abilities.delves.DelveModifier;
 import com.playmonumenta.plugins.abilities.delves.Dreadful;
@@ -46,7 +47,6 @@ import com.playmonumenta.plugins.abilities.delves.Spectral;
 import com.playmonumenta.plugins.abilities.delves.StatMultiplier;
 import com.playmonumenta.plugins.abilities.delves.Transcendent;
 import com.playmonumenta.plugins.abilities.delves.Twisted;
-import com.playmonumenta.plugins.abilities.delves.Vindictive;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import com.playmonumenta.plugins.listeners.DelvesListener;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
@@ -62,7 +62,7 @@ public class DelvesUtils {
 		SPECTRAL(Spectral.class, 5, Material.PHANTOM_MEMBRANE, "" + ChatColor.WHITE + ChatColor.BOLD + "Spectral", Spectral.DESCRIPTION, Spectral.RANK_DESCRIPTIONS),
 		DREADFUL(Dreadful.class, 6, Material.BONE, "" + ChatColor.DARK_GRAY + ChatColor.BOLD + "Dreadful", Dreadful.DESCRIPTION, Dreadful.RANK_DESCRIPTIONS),
 		COLOSSAL(Colossal.class, 7, Material.IRON_BARS, "" + ChatColor.DARK_BLUE + ChatColor.BOLD + "Colossal", Colossal.DESCRIPTION, Colossal.RANK_DESCRIPTIONS),
-		VINDICTIVE(Vindictive.class, 10, Material.TOTEM_OF_UNDYING, "" + ChatColor.DARK_GREEN + ChatColor.BOLD + "Vindictive", Vindictive.DESCRIPTION, Vindictive.RANK_DESCRIPTIONS),
+		CHIVALROUS(Chivalrous.class, 10, Material.MAGMA_CREAM, "" + ChatColor.DARK_GREEN + ChatColor.BOLD + "Chivalrous", Chivalrous.DESCRIPTION, Chivalrous.RANK_DESCRIPTIONS),
 		BLOODTHIRSTY(Bloodthirsty.class, 11, Material.ROTTEN_FLESH, "" + ChatColor.RED + ChatColor.BOLD + "Bloodthirsty", Bloodthirsty.DESCRIPTION, Bloodthirsty.RANK_DESCRIPTIONS),
 		PERNICIOUS(Pernicious.class, 12, Material.MUSIC_DISC_11, "" + ChatColor.DARK_AQUA + ChatColor.BOLD + "Pernicious", Pernicious.DESCRIPTION, Pernicious.RANK_DESCRIPTIONS),
 		LEGIONARY(Legionary.class, 13, Material.IRON_SWORD, "" + ChatColor.YELLOW + ChatColor.BOLD + "Legionary", Legionary.DESCRIPTION, Legionary.RANK_DESCRIPTIONS),
@@ -139,7 +139,7 @@ public class DelvesUtils {
 			MODIFIER_RANK_CAPS.put(Modifier.SPECTRAL, 3);
 			MODIFIER_RANK_CAPS.put(Modifier.DREADFUL, 3);
 			MODIFIER_RANK_CAPS.put(Modifier.COLOSSAL, 3);
-			MODIFIER_RANK_CAPS.put(Modifier.VINDICTIVE, 3);
+			MODIFIER_RANK_CAPS.put(Modifier.CHIVALROUS, 3);
 			MODIFIER_RANK_CAPS.put(Modifier.BLOODTHIRSTY, 3);
 			MODIFIER_RANK_CAPS.put(Modifier.PERNICIOUS, 3);
 			MODIFIER_RANK_CAPS.put(Modifier.LEGIONARY, 5);

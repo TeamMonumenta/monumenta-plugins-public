@@ -869,7 +869,7 @@ public class EntityListener implements Listener {
 		}
 	}
 
-	@EventHandler
+	@EventHandler(priority = EventPriority.LOW)
 	public void entityTargetLivingEntityEvent(EntityTargetLivingEntityEvent event) {
 		if (event.getEntity() instanceof Creature && (EntityUtils.isStunned(event.getEntity())
 		                                              || EntityUtils.isConfused(event.getEntity()))) {

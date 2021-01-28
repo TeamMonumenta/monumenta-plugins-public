@@ -144,14 +144,14 @@ public class OldLabsBoss extends BossAbilityGroup {
 			Location spawnLoc = mSpawnLoc.clone().add(-1, -1, 13);
 			try {
 				spawnLoc.getWorld().spawnParticle(Particle.SMOKE_LARGE, spawnLoc, 15, 0.2, 0.45, 0.2, 0.2);
-				Entity mob = LibraryOfSoulsIntegration.summon(spawnLoc, "RebelGrunt");
+				Entity mob = LibraryOfSoulsIntegration.summon(spawnLoc, "RebelSoldier");
 				if (mob instanceof LivingEntity) {
 					((LivingEntity)mob).addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 2, 4));
 				}
 
 				spawnLoc = spawnLoc.add(2, 0, 0);
 				spawnLoc.getWorld().spawnParticle(Particle.SMOKE_LARGE, spawnLoc, 15, 0.2, 0.45, 0.2, 0.2);
-				mob = LibraryOfSoulsIntegration.summon(spawnLoc, "RebelArcher");
+				mob = LibraryOfSoulsIntegration.summon(spawnLoc, "RebelSlinger");
 				if (mob instanceof LivingEntity) {
 					((LivingEntity)mob).addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 2, 4));
 				}

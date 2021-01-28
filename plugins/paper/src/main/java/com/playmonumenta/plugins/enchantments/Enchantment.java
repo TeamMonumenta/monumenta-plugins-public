@@ -15,6 +15,10 @@ import com.playmonumenta.plugins.enchantments.infusions.Vigor;
 import com.playmonumenta.plugins.enchantments.infusions.Vitality;
 
 public enum Enchantment {
+	// These should always be applied first
+	REGION_SCALING_DAMAGE_DEALT(new RegionScalingDamageDealt()),
+	REGION_SCALING_DAMAGE_TAKEN(new RegionScalingDamageTaken()),
+
 	// armor upgrades : they should not be present in the item index, thus, unused here
 	TENACITY(new Tenacity()),
 	VITALITY(new Vitality()),
@@ -131,8 +135,6 @@ public enum Enchantment {
 	CURSE_VANISHING(ChatColor.RED + "Curse of Vanishing", org.bukkit.enchantments.Enchantment.VANISHING_CURSE),
 	CURSE_ANEMIA(new CurseOfAnemia()),
 	TWO_HANDED(new TwoHanded()),
-	REGION_SCALING_DAMAGE_DEALT(new RegionScalingDamageDealt()),
-	REGION_SCALING_DAMAGE_TAKEN(new RegionScalingDamageTaken()),
 	;
 
 	String mReadableString;

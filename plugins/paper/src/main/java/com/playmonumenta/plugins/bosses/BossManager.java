@@ -200,6 +200,9 @@ public class BossManager implements Listener {
 		mStatelessBosses.put(CarapaceBoss.identityTag, (Plugin p, LivingEntity e) -> new CarapaceBoss(p, e));
 		mStatelessBosses.put(KamikazeBoss.identityTag, (Plugin p, LivingEntity e) -> new KamikazeBoss(p,e));
 		mStatelessBosses.put(PortalBoss.identityTag, (Plugin p, LivingEntity e) -> new PortalBoss(p,e));
+		mStatelessBosses.put(TinyBombTossBoss.identityTag, (Plugin p, LivingEntity e) -> new TinyBombTossBoss(p,e));
+		mStatelessBosses.put(AntiRangeBoss.identityTag, (Plugin p, LivingEntity e) -> new AntiRangeBoss(p,e));
+		mStatelessBosses.put(ImmortalMountBoss.identityTag, (Plugin p, LivingEntity e) -> new ImmortalMountBoss(p,e));
 
 
 		/* Stateful bosses have a remembered spawn location and end location where a redstone block is set when they die */
@@ -353,6 +356,9 @@ public class BossManager implements Listener {
 		mBossDeserializers.put(CarapaceBoss.identityTag, (Plugin p, LivingEntity e) -> CarapaceBoss.deserialize(p, e));
 		mBossDeserializers.put(KamikazeBoss.identityTag, (Plugin p, LivingEntity e) -> KamikazeBoss.deserialize(p, e));
 		mBossDeserializers.put(PortalBoss.identityTag, (Plugin p, LivingEntity e) -> PortalBoss.deserialize(p, e));
+		mBossDeserializers.put(TinyBombTossBoss.identityTag, (Plugin p, LivingEntity e) -> TinyBombTossBoss.deserialize(p, e));
+		mBossDeserializers.put(AntiRangeBoss.identityTag, (Plugin p, LivingEntity e) -> AntiRangeBoss.deserialize(p, e));
+		mBossDeserializers.put(ImmortalMountBoss.identityTag, (Plugin p, LivingEntity e) -> ImmortalMountBoss.deserialize(p, e));
 
 	}
 
@@ -628,7 +634,7 @@ public class BossManager implements Listener {
 		}
 	}
 
-	@EventHandler
+	@EventHandler(priority = EventPriority.NORMAL)
 	public void entityTargetEvent(EntityTargetEvent event) {
 		if (event.getEntity() instanceof Mob) {
 			Mob entity = (Mob) event.getEntity();

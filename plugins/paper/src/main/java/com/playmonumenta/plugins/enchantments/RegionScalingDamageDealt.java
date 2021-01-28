@@ -28,7 +28,7 @@ public class RegionScalingDamageDealt implements BaseEnchantment {
 
 	private static final String PROPERTY_NAME = ChatColor.DARK_GRAY + "Celsian Isles : ";
 
-	private static final String APPLY_MULTIPLIER_METAKEY = "ApplyRegionScalingMultiplier";
+	public static final String APPLY_MULTIPLIER_METAKEY = "ApplyRegionScalingMultiplier";
 	private static final double DAMAGE_DEALT_MULTIPLIER = 0.5;
 
 	private static final String ATTRIBUTE_CANCELLATION_NAME = "RegionScalingAttributeCancellation";
@@ -72,7 +72,7 @@ public class RegionScalingDamageDealt implements BaseEnchantment {
 	@Override
 	public void tick(Plugin plugin, Player player, int level) {
 		plugin.mPotionManager.addPotion(player, PotionID.ITEM,
-				new PotionEffect(PotionEffectType.SLOW_DIGGING, 20, 0, false, true));
+				new PotionEffect(PotionEffectType.SLOW_DIGGING, 20, 0, false, false, false));
 	}
 
 	@Override

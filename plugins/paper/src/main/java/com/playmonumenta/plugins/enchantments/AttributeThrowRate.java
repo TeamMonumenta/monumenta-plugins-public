@@ -69,6 +69,9 @@ public class AttributeThrowRate implements BaseAttribute {
 
 				// Set a bunch of stuff that isn't caught by the entity duplication
 				newProj.setShooter(player);
+				if (proj.hasMetadata(RegionScalingDamageDealt.APPLY_MULTIPLIER_METAKEY)) {
+					newProj.setMetadata(RegionScalingDamageDealt.APPLY_MULTIPLIER_METAKEY, new FixedMetadataValue(plugin, null));
+				}
 				if (proj.hasMetadata(AttributeProjectileDamage.DAMAGE_METAKEY)) {
 					newProj.setMetadata(AttributeProjectileDamage.DAMAGE_METAKEY, new FixedMetadataValue(plugin, proj.getMetadata(AttributeProjectileDamage.DAMAGE_METAKEY).get(0).asDouble()));
 				}

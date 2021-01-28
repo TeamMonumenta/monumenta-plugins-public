@@ -72,6 +72,7 @@ import com.playmonumenta.plugins.abilities.cleric.paladin.LuminousInfusion;
 import com.playmonumenta.plugins.abilities.delves.Arcanic;
 import com.playmonumenta.plugins.abilities.delves.Bloodthirsty;
 import com.playmonumenta.plugins.abilities.delves.Carapace;
+import com.playmonumenta.plugins.abilities.delves.Chivalrous;
 import com.playmonumenta.plugins.abilities.delves.Colossal;
 import com.playmonumenta.plugins.abilities.delves.Dreadful;
 import com.playmonumenta.plugins.abilities.delves.Entropy;
@@ -83,7 +84,6 @@ import com.playmonumenta.plugins.abilities.delves.Spectral;
 import com.playmonumenta.plugins.abilities.delves.StatMultiplier;
 import com.playmonumenta.plugins.abilities.delves.Transcendent;
 import com.playmonumenta.plugins.abilities.delves.Twisted;
-import com.playmonumenta.plugins.abilities.delves.Vindictive;
 import com.playmonumenta.plugins.abilities.mage.ArcaneStrike;
 import com.playmonumenta.plugins.abilities.mage.Channeling;
 import com.playmonumenta.plugins.abilities.mage.ElementalArrows;
@@ -405,7 +405,7 @@ public class AbilityManager {
 		                               new Spectral(mPlugin, null),
 		                               new Dreadful(mPlugin, null),
 		                               new Colossal(mPlugin, null),
-		                               new Vindictive(mPlugin, null),
+		                               new Chivalrous(mPlugin, null),
 		                               new Pernicious(mPlugin, null),
 		                               new Legionary(mPlugin, null),
 		                               new Bloodthirsty(mPlugin, null),
