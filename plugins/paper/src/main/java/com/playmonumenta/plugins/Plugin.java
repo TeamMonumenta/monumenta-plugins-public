@@ -3,12 +3,6 @@ package com.playmonumenta.plugins;
 import java.io.IOException;
 import java.util.UUID;
 
-import org.bukkit.Bukkit;
-import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
-import org.bukkit.plugin.PluginManager;
-import org.bukkit.plugin.java.JavaPlugin;
-
 import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.bosses.BossManager;
 import com.playmonumenta.plugins.bosses.spells.SpellDetectionCircle;
@@ -42,6 +36,7 @@ import com.playmonumenta.plugins.commands.ReforgeInventory;
 import com.playmonumenta.plugins.commands.RefreshClass;
 import com.playmonumenta.plugins.commands.RemoveTags;
 import com.playmonumenta.plugins.commands.RestartEmptyCommand;
+import com.playmonumenta.plugins.commands.SetViewDistance;
 import com.playmonumenta.plugins.commands.ShatterHeldItem;
 import com.playmonumenta.plugins.commands.SkillDescription;
 import com.playmonumenta.plugins.commands.SkillSummary;
@@ -103,6 +98,12 @@ import com.playmonumenta.plugins.timers.CooldownTimers;
 import com.playmonumenta.plugins.timers.ProjectileEffectTimers;
 import com.playmonumenta.plugins.tracking.TrackingManager;
 import com.playmonumenta.plugins.utils.MetadataUtils;
+
+import org.bukkit.Bukkit;
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
+import org.bukkit.plugin.PluginManager;
+import org.bukkit.plugin.java.JavaPlugin;
 
 public class Plugin extends JavaPlugin {
 	public CooldownTimers mTimers = null;
@@ -178,6 +179,7 @@ public class Plugin extends JavaPlugin {
 		OpenDelveModifierSelectionGUI.register();
 		GetDepthPoints.register();
 		Magnetize.register();
+		SetViewDistance.register();
 
 		try {
 			mHttpManager = new HttpManager(this);
