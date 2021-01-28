@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.UUID;
 
@@ -90,6 +91,7 @@ import com.playmonumenta.plugins.listeners.WorldListener;
 import com.playmonumenta.plugins.listeners.ZonePropertyListener;
 import com.playmonumenta.plugins.network.HttpManager;
 import com.playmonumenta.plugins.overrides.ItemOverrides;
+import com.playmonumenta.plugins.plots.PlotAccessManager;
 import com.playmonumenta.plugins.potion.PotionManager;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.server.reset.DailyReset;
@@ -189,6 +191,11 @@ public class Plugin extends JavaPlugin {
 		}
 
 		ServerProperties.load(this, null);
+
+		/* If this is the plots shard, register /plotaccess functions and enable functionality */
+		if (ServerProperties.getShardName().equals("plots")) {
+			new PlotAccessManager(getLogger(), getDataFolder() + File.separator + "plot_access.json");
+		}
 
 		mEnchantmentManager = new EnchantmentManager(this);
 		mEnchantmentManager.load(ServerProperties.getForbiddenItemLore());

@@ -2,11 +2,12 @@ package com.playmonumenta.plugins.utils;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.time.Duration;
+
+import com.playmonumenta.plugins.Plugin;
 
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-
-import com.playmonumenta.plugins.Plugin;
 
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.ChatMessageType;
@@ -73,5 +74,15 @@ public class MessagingUtils {
 		sender.spigot().sendMessage(formattedMessage);
 
 		e.printStackTrace();
+	}
+
+	/* Gets the difference between now and the specified time in a pretty string like 4h30m */
+	public static String getTimeDifferencePretty(long time) {
+		Duration remaining = Duration.ofSeconds(time - java.time.Instant.now().getEpochSecond());
+
+		return remaining.toString()
+            .substring(2)
+            .replaceAll("(\\d[HMS])(?!$)", "$1 ")
+            .toLowerCase();
 	}
 }
