@@ -2,21 +2,22 @@ package com.playmonumenta.plugins.commands;
 
 import java.util.Collection;
 import java.util.LinkedHashMap;
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentSkipListSet;
-
-import com.playmonumenta.plugins.utils.CommandUtils;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import com.playmonumenta.plugins.utils.CommandUtils;
+
 import org.bukkit.Location;
-import org.bukkit.util.Vector;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
+import org.bukkit.util.Vector;
 
 import dev.jorel.commandapi.CommandAPI;
 import dev.jorel.commandapi.CommandAPICommand;
@@ -35,7 +36,7 @@ import dev.jorel.commandapi.wrappers.Rotation;
 // Designed to be 1:1 with the vanilla teleport command, but loads chunks async before teleporting.
 public class TeleportAsync extends GenericCommand {
 	private static final String COMMAND = "teleportasync";
-	private static ConcurrentSkipListSet<Entity> entitiesTeleportingAsync = new ConcurrentSkipListSet<>();
+	private static ConcurrentSkipListSet<UUID> entitiesTeleportingAsync = new ConcurrentSkipListSet<>();
 
 	@SuppressWarnings("unchecked")
 	public static void register() {
@@ -167,7 +168,7 @@ public class TeleportAsync extends GenericCommand {
 	}
 
 	public static int teleport(@Nonnull CommandSender sender, @Nonnull FunctionWrapper[] functions, @Nonnull Entity src, @Nonnull Location dst, @Nullable Rotation rot) {
-		if (entitiesTeleportingAsync.contains(src)) {
+		if (entitiesTeleportingAsync.contains(src.getUniqueId())) {
 			sender.sendMessage(src.getName() + " is already scheduled to teleport, honoring previous request instead.");
 			return 0;
 		}
@@ -189,11 +190,11 @@ public class TeleportAsync extends GenericCommand {
 			adjustedDst.setYaw(rot.getYaw());
 		}
 
-		entitiesTeleportingAsync.add(src);
+		entitiesTeleportingAsync.add(src.getUniqueId());
 		CompletableFuture<Boolean> completableFuture = src.teleportAsync(adjustedDst, TeleportCause.COMMAND);
 
 		completableFuture.thenApply(resultBool -> {
-			entitiesTeleportingAsync.remove(src);
+			entitiesTeleportingAsync.remove(src.getUniqueId());
 
 			if (resultBool) {
 				sender.sendMessage("Teleported " + src.getName());
@@ -208,7 +209,7 @@ public class TeleportAsync extends GenericCommand {
 			return resultBool;
 		});
 		completableFuture.exceptionally(ex -> {
-			entitiesTeleportingAsync.remove(src);
+			entitiesTeleportingAsync.remove(src.getUniqueId());
 			sender.sendMessage("An exception occured teleporting " + src.getName() + ": " + ex.getMessage());
 			return false;
 		});
