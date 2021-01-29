@@ -26,6 +26,7 @@ import com.playmonumenta.plugins.utils.DelvesUtils;
 import com.playmonumenta.plugins.utils.GraveUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.utils.TOVUtils;
 
 import net.md_5.bungee.api.ChatColor;
 
@@ -98,6 +99,7 @@ public class ChestOverride extends BaseOverride {
 			return true;
 		} else if (player.getGameMode() != GameMode.SPECTATOR) {
 			DelvesUtils.setDelveLootTable(player, block);
+			TOVUtils.setTOVLootTable(plugin, player, block);
 			return true;
 		}
 
@@ -141,8 +143,7 @@ public class ChestOverride extends BaseOverride {
 
 		ChestUtils.chestScalingLuck(plugin, player, block);
 		DelvesUtils.setDelveLootTable(player, block);
-
-		return true;
+		return TOVUtils.canBreak(plugin, player, block, event);
 	}
 
 	@Override
