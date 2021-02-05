@@ -50,7 +50,7 @@ public class Sharpshooter extends Ability {
 				}
 			}
 
-			event.setDamage(event.getDamage() * ((1 + mStacks) * PERCENT_DAMAGE_PER_STACK));
+			event.setDamage(event.getDamage() * (1 + mStacks * PERCENT_DAMAGE_PER_STACK));
 		}
 
 		return true;
