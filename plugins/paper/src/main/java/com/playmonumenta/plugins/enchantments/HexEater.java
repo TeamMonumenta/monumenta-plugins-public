@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.enchantments;
 
 import java.util.EnumSet;
+import java.util.List;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Particle;
@@ -11,6 +12,7 @@ import org.bukkit.entity.Trident;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.metadata.FixedMetadataValue;
+import org.bukkit.potion.PotionEffectType;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
@@ -42,13 +44,26 @@ public class HexEater implements BaseEnchantment {
 
 	//Apply the damage from effects
 	public static void applyHexDamage(Plugin plugin, boolean tridentThrow, Player player, int level, LivingEntity target, EntityDamageByEntityEvent event) {
-		int effects = PotionUtils.getNegativeEffects(target).size();
+		List<PotionEffectType> e = PotionUtils.getNegativeEffects(plugin, target);
+		int effects = e.size();
 
 		if (EntityUtils.isStunned(target)) {
 			effects++;
 		}
 
 		if (EntityUtils.isConfused(target)) {
+			effects++;
+		}
+		
+		if (EntityUtils.isBleeding(plugin, target)) {
+			effects++;
+		}
+		
+		if (EntityUtils.isSlowed(plugin, target) && !e.contains(PotionEffectType.SLOW)) {
+			effects++;
+		}
+		
+		if (target.getFireTicks() > 0 || Inferno.getMobInfernoLevel(plugin, target) > 0) {
 			effects++;
 		}
 

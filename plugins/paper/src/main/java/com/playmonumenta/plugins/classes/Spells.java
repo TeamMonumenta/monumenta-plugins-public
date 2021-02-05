@@ -12,7 +12,7 @@ public enum Spells {
 	ARCANE_STRIKE("Arcane Strike"),
 	ELEMENTAL_ARROWS("Elemental Arrows"),
 	SPELLSHOCK("Spellshock"),
-	CHANNELING("Channeling"),
+	THUNDER_STEP("Thunder Step"),
 
 	//--Elementalist Spec.
 	BLIZZARD("Blizzard"),

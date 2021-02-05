@@ -19,9 +19,8 @@ import com.playmonumenta.plugins.utils.PlayerUtils;
 public class WardingRemedyNonApothecary extends Ability {
 
 	private static final int WARDING_REMEDY_RANGE = 12;
-	private static final int WARDING_REMEDY_DAMAGE_THRESHOLD = 3;
-	private static final double WARDING_REMEDY_1_DAMAGE_MULTIPLIER = 1.15;
-	private static final double WARDING_REMEDY_2_DAMAGE_MULTIPLIER = 1.25;
+	private static final double WARDING_REMEDY_1_DAMAGE_MULTIPLIER = 1.10;
+	private static final double WARDING_REMEDY_2_DAMAGE_MULTIPLIER = 1.15;
 	private static final Particle.DustOptions APOTHECARY_DARK_COLOR = new Particle.DustOptions(Color.fromRGB(83, 0, 135), 1.0f);
 
 	public WardingRemedyNonApothecary(Plugin plugin, Player player) {
@@ -51,7 +50,7 @@ public class WardingRemedyNonApothecary extends Ability {
 
 	private void applyBonusDamage(EntityDamageByEntityEvent event) {
 		int level = getWardingRemedyLevel();
-		if (level > 0 && AbsorptionUtils.getAbsorption(mPlayer) >= WARDING_REMEDY_DAMAGE_THRESHOLD) {
+		if (level > 0 && AbsorptionUtils.getAbsorption(mPlayer) > 0) {
 			double multiplier = level == 1 ? WARDING_REMEDY_1_DAMAGE_MULTIPLIER : WARDING_REMEDY_2_DAMAGE_MULTIPLIER;
 			Location loc = event.getEntity().getLocation().add(0, 1, 0);
 			World world = mPlayer.getWorld();

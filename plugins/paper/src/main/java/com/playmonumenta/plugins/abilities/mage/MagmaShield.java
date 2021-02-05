@@ -13,9 +13,11 @@ import org.bukkit.util.Vector;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.classes.magic.MagicType;
+import com.playmonumenta.plugins.enchantments.SpellDamage;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
@@ -27,8 +29,8 @@ public class MagmaShield extends Ability {
 	private static final int COOLDOWN = 12 * 20;
 	private static final int RADIUS = 6;
 	private static final int FIRE_DURATION = 4 * 20;
-	private static final int DAMAGE_1 = 7;
-	private static final int DAMAGE_2 = 14;
+	private static final int DAMAGE_1 = 6;
+	private static final int DAMAGE_2 = 12;
 	private static final float KNOCKBACK_SPEED = 0.5f;
 	private static final double DOT_ANGLE = 0.33;
 
@@ -39,8 +41,8 @@ public class MagmaShield extends Ability {
 		mInfo.mLinkedSpell = Spells.MAGMA_SHIELD;
 		mInfo.mScoreboardId = "Magma";
 		mInfo.mShorthandName = "MS";
-		mInfo.mDescriptions.add("When you block while you are sneaking, you summon a torrent of flames, knocking all enemies within 6 blocks that are in front of you away, dealing 7 damage and setting them on fire. You must hold a wand to trigger this effect. Cooldown: 12s.");
-		mInfo.mDescriptions.add("The damage is increased to 14.");
+		mInfo.mDescriptions.add("When you right click while you are sneaking, you summon a torrent of flames, knocking all enemies within 6 blocks that are in front of you away, dealing 6 damage and setting them on fire. You must hold a wand to trigger this effect. Cooldown: 12s.");
+		mInfo.mDescriptions.add("The damage is increased to 12.");
 		mInfo.mCooldown = COOLDOWN;
 		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
 		mDamage = getAbilityScore() == 1 ? DAMAGE_1 : DAMAGE_2;
@@ -50,6 +52,7 @@ public class MagmaShield extends Ability {
 	public void cast(Action action) {
 		putOnCooldown();
 
+		float damage = SpellDamage.getSpellDamage(mPlayer, mDamage);
 		Vector playerDir = mPlayer.getEyeLocation().getDirection().setY(0).normalize();
 		for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), RADIUS, mPlayer)) {
 			Vector toMobVector = mob.getLocation().toVector().subtract(mPlayer.getLocation().toVector()).setY(0).normalize();
@@ -57,7 +60,7 @@ public class MagmaShield extends Ability {
 				float kb = (mob instanceof Player) ? 0.3f : KNOCKBACK_SPEED;
 				MovementUtils.knockAway(mPlayer, mob, kb);
 				EntityUtils.applyFire(mPlugin, FIRE_DURATION, mob, mPlayer);
-				EntityUtils.damageEntity(mPlugin, mob, mDamage, mPlayer, MagicType.FIRE, true, mInfo.mLinkedSpell);
+				EntityUtils.damageEntity(mPlugin, mob, damage, mPlayer, MagicType.FIRE, true, mInfo.mLinkedSpell);
 			}
 		}
 
@@ -100,8 +103,12 @@ public class MagmaShield extends Ability {
 	@Override
 	public boolean runCheck() {
 		ItemStack mainHand = mPlayer.getInventory().getItemInMainHand();
+		ThunderStep thunder = AbilityManager.getManager().getPlayerAbility(mPlayer, ThunderStep.class);
 		if (InventoryUtils.isWandItem(mainHand)) {
-			return mPlayer.isSneaking() && mPlayer.getLocation().getPitch() > -50;
+			if (thunder != null) {
+				return (mPlayer.isSneaking() && mPlayer.isOnGround());
+			}
+			return mPlayer.isSneaking();
 		}
 		return false;
 	}

@@ -14,8 +14,8 @@ public class Toughness extends Ability {
 
 	public static final double PERCENT_HEALTH_1 = 0.1;
 	public static final double PERCENT_HEALTH_2 = 0.2;
-	public static final double DOT_DAMAGE_REDUCTION_1 = 0.33;
-	public static final double DOT_DAMAGE_REDUCTION_2 = 0.66;
+	public static final double DOT_DAMAGE_REDUCTION_1 = 0.25;
+	public static final double DOT_DAMAGE_REDUCTION_2 = 0.50;
 	public static final String TOUGHNESS_MODIFIER_NAME = "ToughnessPercentHealthModifier";
 
 	private final double mDoTDamageReduction;
@@ -24,8 +24,8 @@ public class Toughness extends Ability {
 		super(plugin, player, "Toughness");
 		mInfo.mScoreboardId = "Toughness";
 		mInfo.mShorthandName = "Tgh";
-		mInfo.mDescriptions.add("Gain +10% max health and damage from Poison and Wither is reduced by 33%.");
-		mInfo.mDescriptions.add("Gain +20% max health and damage from Poison and Wither is reduced by 66%.");
+		mInfo.mDescriptions.add("Gain +10% max health and damage from Poison, Wither, and Drowning is reduced by 25%.");
+		mInfo.mDescriptions.add("Gain +20% max health and damage from Poison, Wither, and Drowning is reduced by 50%.");
 		mDoTDamageReduction = getAbilityScore() == 1 ? DOT_DAMAGE_REDUCTION_1 : DOT_DAMAGE_REDUCTION_2;
 
 		if (player != null) {
@@ -37,7 +37,7 @@ public class Toughness extends Ability {
 
 	@Override
 	public boolean playerDamagedEvent(EntityDamageEvent event) {
-		if (event.getCause() == DamageCause.POISON || event.getCause() == DamageCause.WITHER) {
+		if (event.getCause() == DamageCause.POISON || event.getCause() == DamageCause.WITHER || event.getCause() == DamageCause.DROWNING) {
 			event.setDamage(event.getDamage() * (1 - mDoTDamageReduction));
 		}
 

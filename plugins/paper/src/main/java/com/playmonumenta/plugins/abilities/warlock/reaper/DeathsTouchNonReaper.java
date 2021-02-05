@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.abilities.warlock.reaper;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.bukkit.Bukkit;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
@@ -17,6 +18,7 @@ import com.playmonumenta.plugins.abilities.KillTriggeredAbilityTracker;
 import com.playmonumenta.plugins.abilities.KillTriggeredAbilityTracker.KillTriggeredAbility;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.utils.PotionUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
 
 public class DeathsTouchNonReaper extends Ability implements KillTriggeredAbility {
 
@@ -76,15 +78,33 @@ public class DeathsTouchNonReaper extends Ability implements KillTriggeredAbilit
 			Map<PotionEffectType, Integer> effects = getOppositeEffects(mob);
 			int duration = mob.getMetadata(DeathsTouch.DEATHS_TOUCH_BUFF_DURATION).get(0).asInt();
 			int amplifierCap = mob.getMetadata(DeathsTouch.DEATHS_TOUCH_AMPLIFIER_CAP).get(0).asInt();
+			String caster = mob.getMetadata(DeathsTouch.DEATHS_TOUCH_CASTER).get(0).asString();
+			Player p = Bukkit.getPlayer(caster);
+			// Custom slow interaction
+			if (EntityUtils.isSlowed(mPlugin, mob)) {
+				mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_OTHER, new PotionEffect(PotionEffectType.SPEED, duration, Math.min(amplifierCap, (int) (EntityUtils.getSlowAmount(mPlugin, mob) * 10) - 1), true, true));
+				if (!mPlayer.equals(p)) {
+					mPlugin.mPotionManager.addPotion(p, PotionID.ABILITY_OTHER, new PotionEffect(PotionEffectType.SPEED, duration, 0, true, true));	
+				}
+			}
 			for (Map.Entry<PotionEffectType, Integer> effect : effects.entrySet()) {
 				if (effect.getKey() == PotionEffectType.DAMAGE_RESISTANCE) {
 					// Only do Resistance I regardless of Vulnerability level
 					mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_OTHER, new PotionEffect(effect.getKey(), duration, 0, true, true));
+					if (!mPlayer.equals(p)) {
+						mPlugin.mPotionManager.addPotion(p, PotionID.ABILITY_OTHER, new PotionEffect(effect.getKey(), duration, 0, true, true));
+					}
 				} else if (effect.getKey() == PotionEffectType.REGENERATION) {
 					// Only do Regeneration I regardless of Poison/Wither level
 					mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_OTHER, new PotionEffect(effect.getKey(), duration, 0, true, true));
+					if (!mPlayer.equals(p)) {
+						mPlugin.mPotionManager.addPotion(p, PotionID.ABILITY_OTHER, new PotionEffect(effect.getKey(), duration, 0, true, true));
+					}
 				} else {
 					mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_OTHER, new PotionEffect(effect.getKey(), duration, Math.min(amplifierCap, effect.getValue()), true, true));
+					if (!mPlayer.equals(p)) {
+						mPlugin.mPotionManager.addPotion(p, PotionID.ABILITY_OTHER, new PotionEffect(effect.getKey(), duration, 0, true, true));
+					}
 				}
 			}
 		}

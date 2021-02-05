@@ -13,7 +13,6 @@ import org.bukkit.potion.PotionEffectType;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.classes.Spells;
-import com.playmonumenta.plugins.classes.magic.MagicType;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.utils.AbsorptionUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -31,24 +30,21 @@ public class PrismaticShield extends Ability {
 	private static final int COOLDOWN_1 = 90 * 20;
 	private static final int COOLDOWN_2 = 70 * 20;
 	private static final float KNOCKBACK_SPEED = 0.7f;
-	private static final int DAMAGE_1 = 3;
-	private static final int DAMAGE_2 = 6;
+	private static final int STUN_DURATION = 20;
 
 	private final int mAmplifier;
 	private final int mDuration;
-	private final int mDamage;
 
 	public PrismaticShield(Plugin plugin, Player player) {
 		super(plugin, player, "Prismatic Shield");
 		mInfo.mLinkedSpell = Spells.PRISMATIC_SHIELD;
 		mInfo.mScoreboardId = "Prismatic";
 		mInfo.mShorthandName = "PS";
-		mInfo.mDescriptions.add("When your health drops below 3 hearts (including if the attack would've killed you), you receive an Absorption II shield (4 hearts) which lasts up to 12 s. In addition enemies within four blocks are knocked back and take 3 damage. Cooldown: 90s.");
-		mInfo.mDescriptions.add("The shield is improved to Absorption III (6 hearts) for 12 s. Enemies within four blocks now take 6 damage. Cooldown: 70s.");
+		mInfo.mDescriptions.add("When your health drops below 3 hearts (including if the attack would've killed you), you receive an Absorption II shield (4 hearts) which lasts up to 12 s. In addition enemies within four blocks are knocked back. Cooldown: 90s.");
+		mInfo.mDescriptions.add("The shield is improved to Absorption III (6 hearts) for 12 s. Enemies within four blocks are knocked back and stunned for 1 s. Cooldown: 70s.");
 		mInfo.mCooldown = getAbilityScore() == 1 ? COOLDOWN_1 : COOLDOWN_2;
 		mAmplifier = getAbilityScore() == 1 ? AMPLIFIER_1 : AMPLIFIER_2;
 		mDuration = getAbilityScore() == 1 ? DURATION_1 : DURATION_2;
-		mDamage = getAbilityScore() == 1 ? DAMAGE_1 : DAMAGE_2;
 	}
 
 	/*
@@ -111,8 +107,10 @@ public class PrismaticShield extends Ability {
 
 		// Conditions match - prismatic shield
 		for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), RADIUS, mPlayer)) {
-			EntityUtils.damageEntity(mPlugin, mob, mDamage, mPlayer, MagicType.ARCANE, true, mInfo.mLinkedSpell);
 			MovementUtils.knockAway(mPlayer, mob, KNOCKBACK_SPEED);
+			if (getAbilityScore() == 2) {
+				EntityUtils.applyStun(mPlugin, STUN_DURATION, mob);
+			}
 		}
 
 		mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF,

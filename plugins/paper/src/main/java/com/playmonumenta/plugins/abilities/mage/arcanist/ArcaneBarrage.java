@@ -23,6 +23,7 @@ import com.playmonumenta.plugins.abilities.mage.ManaLance;
 import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.classes.magic.MagicType;
 import com.playmonumenta.plugins.effects.PercentDamageReceived;
+import com.playmonumenta.plugins.enchantments.SpellDamage;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
@@ -40,8 +41,8 @@ public class ArcaneBarrage extends Ability {
 	private static final double HALF_HITBOX_LENGTH = 0.275;
 	private static final int RANGE = 12;
 	private static final int MISSILE_COUNT = 3;
-	private static final int DAMAGE_1 = 8;
-	private static final int DAMAGE_2 = 10;
+	private static final int DAMAGE_1 = 5;
+	private static final int DAMAGE_2 = 6;
 	private static final int DURATION = 20 * 10;
 	private static final int COOLDOWN = 20 * 20;
 
@@ -62,8 +63,8 @@ public class ArcaneBarrage extends Ability {
 		super(plugin, player, "Arcane Barrage");
 		mInfo.mScoreboardId = "ArcaneBarrage";
 		mInfo.mShorthandName = "AB";
-		mInfo.mDescriptions.add("Right-click while not sneaking and looking up to summon 3 Arcane Missiles around you for up to 10 seconds. If missiles are active, right-clicking while not sneaking with a Wand fires a missile in the target direction, piercing through enemies within 12 blocks and dealing 8 damage. If cast with Overload, your missiles deal 2 (Overload I) or 4 (Overload II) extra damage. Cooldown: 20s.");
-		mInfo.mDescriptions.add("Missiles deal 10 damage and apply 20% Spell Vulnerability for 4 seconds. Mana lances cast while Barrage is active puts Mana Lance on cooldown and casts a missile with the same base damage as the Mana Lance at its level would do instead (does not consume a missile).");
+		mInfo.mDescriptions.add("Right-click while not sneaking and looking up to summon 3 Arcane Missiles around you for up to 10 seconds. If missiles are active, right-clicking while not sneaking with a Wand fires a missile in the target direction, piercing through enemies within 12 blocks and dealing 5 damage. If cast with Overload, your missiles deal 2 (Overload I) or 4 (Overload II) extra damage. Cooldown: 20s.");
+		mInfo.mDescriptions.add("Missiles deal 6 damage and apply 20% Spell Vulnerability for 4 seconds. Mana lances cast while Barrage is active puts Mana Lance on cooldown and casts a missile with the same base damage as the Mana Lance at its level would do instead (does not consume a missile).");
 		mInfo.mLinkedSpell = Spells.ARCANE_BARRAGE;
 		mInfo.mCooldown = COOLDOWN;
 		mInfo.mTrigger = AbilityTrigger.ALL;
@@ -120,7 +121,7 @@ public class ArcaneBarrage extends Ability {
 		} else if ((action == Action.RIGHT_CLICK_AIR || action == Action.RIGHT_CLICK_BLOCK) && mMissiles > 0) {
 			//Fires a missile replacing mana lance and sets mana lance on cooldown if barrage is level 2, as well as makes the damage equal to the mana lance damage.
 			ManaLance manaLance = AbilityManager.getManager().getPlayerAbility(mPlayer, ManaLance.class);
-			int damage = 0;
+			float damage = 0.0f;
 			if (manaLance != null && !manaLance.isOnCooldown() && getAbilityScore() == 2) {
 				damage = manaLance.getDamage();
 				manaLance.putOnCooldown();
@@ -142,12 +143,13 @@ public class ArcaneBarrage extends Ability {
 			}
 
 			for (LivingEntity mob : EntityUtils.getMobsInLine(mPlayer.getEyeLocation(), shift, RANGE, HALF_HITBOX_LENGTH)) {
-				int damageToBeDealt = damage > 0 ? damage : mDamage;
+				float damageToBeDealt = damage > 0 ? damage : mDamage;
 				if (mOverloadIsActive) {
 					Overload overload = AbilityManager.getManager().getPlayerAbility(mPlayer, Overload.class);
 					mOverloadAmount = overload.getAbilityScore() == 1 ? OVERLOAD_AMOUNT_1 : OVERLOAD_AMOUNT_2;
 					damageToBeDealt += mOverloadAmount;
 				}
+				damageToBeDealt = SpellDamage.getSpellDamage(mPlayer, damageToBeDealt);
 				EntityUtils.damageEntity(mPlugin, mob, damageToBeDealt, mPlayer, MagicType.ARCANE, true, mInfo.mLinkedSpell);
 				MovementUtils.knockAway(mPlayer.getLocation(), mob, 0.2f, 0.2f);
 				if (getAbilityScore() == 2) {

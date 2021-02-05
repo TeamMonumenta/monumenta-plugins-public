@@ -23,6 +23,7 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.classes.magic.MagicType;
+import com.playmonumenta.plugins.enchantments.SpellDamage;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
@@ -32,8 +33,8 @@ public class Blizzard extends Ability {
 
 	private static final int BLIZZARD_1_RADIUS = 6;
 	private static final int BLIZZARD_2_RADIUS = 8;
-	private static final int BLIZZARD_1_DAMAGE = 2;
-	private static final int BLIZZARD_2_DAMAGE = 3;
+	private static final float BLIZZARD_1_DAMAGE = 1.5f;
+	private static final float BLIZZARD_2_DAMAGE = 3.0f;
 	private static final int BLIZZARD_1_COOLDOWN = 30;
 	private static final int BLIZZARD_2_COOLDOWN = 25;
 
@@ -41,7 +42,7 @@ public class Blizzard extends Ability {
 		super(plugin, player, "Blizzard");
 		mInfo.mScoreboardId = "Blizzard";
 		mInfo.mShorthandName = "Bl";
-		mInfo.mDescriptions.add("Shift Right Clicking while looking up creates an aura of ice and snow in a radius of 6 blocks that lasts 10 seconds and stays centered on the user. Mobs that enter the aura get Slowness 1. After three seconds in the aura they get Slowness 2. After six seconds in the aura enemies are given Slowness 4 (bosses remain at Slowness 2). Enemies take 2 damage a second while in the aura. Entities that are on fire within the aura are extinguished. This spell can trigger Spellshock but cannot apply it. Cooldown: 30s (starting after cast).");
+		mInfo.mDescriptions.add("Shift Right Clicking while looking up creates an aura of ice and snow in a radius of 6 blocks that lasts 10 seconds and stays centered on the user. Mobs that enter the aura get 10% Slowness. After three seconds in the aura they get 20% Slowness. After six seconds in the aura enemies are given 40% Slowness (bosses remain at 20%). Enemies take 1.5 damage a second while in the aura. Entities that are on fire within the aura are extinguished. This spell can trigger Spellshock but cannot apply it. Cooldown: 30s (starting after cast).");
 		mInfo.mDescriptions.add("The radius is increased to 8 blocks. Mobs take 3 damage a second. Cooldown: 25s.");
 		mInfo.mLinkedSpell = Spells.BLIZZARD;
 		mInfo.mCooldown = getAbilityScore() == 1 ? 20 * BLIZZARD_1_COOLDOWN : 20 * BLIZZARD_2_COOLDOWN;
@@ -63,7 +64,7 @@ public class Blizzard extends Ability {
 		World world = mPlayer.getWorld();
 		world.playSound(mPlayer.getLocation(), Sound.ENTITY_BLAZE_SHOOT, 1, 2);
 		world.playSound(mPlayer.getLocation(), Sound.BLOCK_GLASS_BREAK, 1, 0.75f);
-		double damage = getAbilityScore() == 1 ? BLIZZARD_1_DAMAGE : BLIZZARD_2_DAMAGE;
+		float damage = SpellDamage.getSpellDamage(mPlayer, getAbilityScore() == 1 ? BLIZZARD_1_DAMAGE : BLIZZARD_2_DAMAGE);
 		double radius = getAbilityScore() == 1 ? BLIZZARD_1_RADIUS : BLIZZARD_2_RADIUS;
 		new BukkitRunnable() {
 			int mT = 0;
@@ -79,14 +80,14 @@ public class Blizzard extends Ability {
 					}
 					for (LivingEntity mob : mobs) {
 						if (!mAffected.containsKey(mob.getUniqueId())) {
-							PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(PotionEffectType.SLOW, 20 * 5, 0, false, true));
+							EntityUtils.applySlow(mPlugin, 20 * 5, 0.1, mob);
 							mAffected.put(mob.getUniqueId(), 1);
 						} else {
 							int duration = mAffected.get(mob.getUniqueId());
-							if (duration >= 12) {
-								PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(PotionEffectType.SLOW, 20 * 5, 3, false, true));
+							if (duration >= 12 && !EntityUtils.isBoss(mob)) {
+								EntityUtils.applySlow(mPlugin, 20 * 5, 0.4, mob);
 							} else if (duration >= 6) {
-								PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(PotionEffectType.SLOW, 20 * 5, 1, false, true));
+								EntityUtils.applySlow(mPlugin, 20 * 5, 0.2, mob);
 							}
 							mAffected.put(mob.getUniqueId(), duration + 1);
 						}
@@ -96,7 +97,10 @@ public class Blizzard extends Ability {
 				if (mT % 20 == 0) {
 					for (LivingEntity mob : mobs) {
 						Vector v = mob.getVelocity();
-						EntityUtils.damageEntity(mPlugin, mob, (float) damage, mPlayer, MagicType.ICE, true, mInfo.mLinkedSpell, false, true);
+						mob.setNoDamageTicks(0);
+						double lastDamage = mob.getLastDamage();
+						EntityUtils.damageEntity(mPlugin, mob, damage, mPlayer, MagicType.ICE, true, mInfo.mLinkedSpell, false, true);
+						mob.setLastDamage(lastDamage + damage);
 						mob.setVelocity(v);
 					}
 				}

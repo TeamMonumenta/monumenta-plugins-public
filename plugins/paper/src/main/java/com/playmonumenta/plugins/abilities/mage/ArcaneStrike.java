@@ -1,11 +1,5 @@
 package com.playmonumenta.plugins.abilities.mage;
 
-import com.playmonumenta.plugins.utils.FastUtils;
-import com.playmonumenta.plugins.utils.VectorUtils;
-import com.playmonumenta.plugins.utils.InventoryUtils;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.MetadataUtils;
-
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -25,6 +19,12 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.classes.magic.MagicType;
+import com.playmonumenta.plugins.enchantments.SpellDamage;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.utils.MetadataUtils;
+import com.playmonumenta.plugins.utils.VectorUtils;
 
 public class ArcaneStrike extends Ability {
 
@@ -32,10 +32,10 @@ public class ArcaneStrike extends Ability {
 	private static final Particle.DustOptions COLOR_2 = new Particle.DustOptions(Color.fromRGB(217, 122, 255), 1.0f);
 
 	private static final float RADIUS = 4.0f;
-	private static final int DAMAGE_1 = 5;
-	private static final int DAMAGE_2 = 8;
+	private static final int DAMAGE_1 = 4;
+	private static final int DAMAGE_2 = 6;
 	private static final int BONUS_DAMAGE_1 = 2;
-	private static final int BONUS_DAMAGE_2 = 4;
+	private static final int BONUS_DAMAGE_2 = 3;
 	private static final int COOLDOWN = 6 * 20;
 
 	private final int mDamageBonus;
@@ -46,8 +46,8 @@ public class ArcaneStrike extends Ability {
 		mInfo.mLinkedSpell = Spells.ARCANE_STRIKE;
 		mInfo.mScoreboardId = "ArcaneStrike";
 		mInfo.mShorthandName = "AS";
-		mInfo.mDescriptions.add("When you attack an enemy with a wand, you unleash an arcane explosion dealing 5 damage to all mobs in a 4 block radius around the target. Enemies that are on fire or slowed take 2 extra damage. Arcane strike can not trigger Spellshock's static. Cooldown: 6s.");
-		mInfo.mDescriptions.add("The damage is increased to 8. Mobs that are on fire or slowed take 4 additional damage.");
+		mInfo.mDescriptions.add("When you attack an enemy with a wand, you unleash an arcane explosion dealing 4 damage to all mobs in a 4 block radius around the target. Enemies that are on fire or slowed take 2 extra damage. Arcane strike can not trigger Spellshock's static. Cooldown: 6s.");
+		mInfo.mDescriptions.add("The damage is increased to 6. Mobs that are on fire or slowed take 3 additional damage.");
 		mInfo.mCooldown = COOLDOWN;
 		mDamageBonus = getAbilityScore() == 1 ? DAMAGE_1 : DAMAGE_2;
 		mDamageBonusAffected = getAbilityScore() == 1 ? BONUS_DAMAGE_1 : BONUS_DAMAGE_2;
@@ -61,14 +61,14 @@ public class ArcaneStrike extends Ability {
 			LivingEntity damagee = (LivingEntity) event.getEntity();
 
 			for (LivingEntity mob : EntityUtils.getNearbyMobs(damagee.getLocation(), RADIUS, mPlayer)) {
-				int dmg = mDamageBonus;
+				float dmg = SpellDamage.getSpellDamage(mPlayer, mDamageBonus);
 
 				// Arcane Strike extra damage if on fire or slowed (but effect not applied this tick)
 				if ((mob.hasPotionEffect(PotionEffectType.SLOW)
 				     && !MetadataUtils.happenedThisTick(mPlugin, mob, Constants.ENTITY_SLOWED_NONCE_METAKEY, 0))
 				    || (mob.getFireTicks() > 0
 				        && !MetadataUtils.happenedThisTick(mPlugin, mob, Constants.ENTITY_COMBUST_NONCE_METAKEY, 0))) {
-					dmg += mDamageBonusAffected;
+					dmg += SpellDamage.getSpellDamage(mPlayer, mDamageBonusAffected);
 				}
 
 				Vector velocity = mob.getVelocity();

@@ -76,7 +76,7 @@ public class AmplifyingHex extends Ability {
 		super(plugin, player, "Amplifying Hex");
 		mInfo.mScoreboardId = "AmplifyingHex";
 		mInfo.mShorthandName = "AH";
-		mInfo.mDescriptions.add("Sneak left click with a scythe without looking up or down to fire a magic cone up to 8 blocks in front of you, dealing 5 damage to each enemy per debuff (potion effects like slowness or wither, as well as stun) they have, and an extra +1 damage per extra level of debuff (capped at 2 extra levels. Extra levels of Vulnerability not counted). Cooldown: 12s.");
+		mInfo.mDescriptions.add("Sneak left click with a scythe without looking up or down to fire a magic cone up to 8 blocks in front of you, dealing 5 damage to each enemy per debuff (potion effects like Weakness or Wither, as well as custom effects like Bleed and Percent Slowness) they have, and an extra +1 damage per extra level of debuff (capped at 2 extra levels. 10% Slowness, Weaken, etc. count as one level). Cooldown: 12s.");
 		mInfo.mDescriptions.add("The damage is increased to 7 damage per debuff, and extra damage increased to +2 per extra level. Cooldown: 10s.");
 		mInfo.mLinkedSpell = Spells.AMPLIFYING;
 		mInfo.mCooldown = (getAbilityScore() == 1) ? COOLDOWN_1 : COOLDOWN_2;
@@ -142,9 +142,9 @@ public class AmplifyingHex extends Ability {
 					if (effect != null) {
 						debuffCount++;
 						amplifierCount += Math.min(mob.hasMetadata(FractalEnervation.FRACTAL_CAP_REMOVED_METAKEY)
-						                           ? FractalEnervation.FRACTAL_AMPLIFYING_HEX_CAP
-						                           : AMPLIFIER_CAP,
-						                           effect.getAmplifier());
+		                           ? FractalEnervation.FRACTAL_AMPLIFYING_HEX_CAP
+		                           : AMPLIFIER_CAP,
+		                           effect.getAmplifier());
 					}
 				}
 
@@ -155,9 +155,31 @@ public class AmplifyingHex extends Ability {
 								Inferno.getMobInfernoLevel(mPlugin, mob));
 					}
 				}
+				
 				if (EntityUtils.isStunned(mob)) {
 					debuffCount++;
 				}
+				
+				if (EntityUtils.isConfused(mob)) {
+					debuffCount++;
+				}
+				
+				if (EntityUtils.isBleeding(mPlugin, mob)) {
+					debuffCount++;
+					amplifierCount += Math.min(mob.hasMetadata(FractalEnervation.FRACTAL_CAP_REMOVED_METAKEY)
+	                           ? FractalEnervation.FRACTAL_AMPLIFYING_HEX_CAP
+	                           : AMPLIFIER_CAP, EntityUtils.getBleedLevel(mPlugin, mob) - 1);
+				}
+				
+				//Custom slow effect interaction
+				if (EntityUtils.isSlowed(mPlugin, mob) && mob.getPotionEffect(PotionEffectType.SLOW) == null) {
+					debuffCount++;
+					double slowAmp = EntityUtils.getSlowAmount(mPlugin, mob);
+					amplifierCount += Math.min(mob.hasMetadata(FractalEnervation.FRACTAL_CAP_REMOVED_METAKEY)
+	                           ? FractalEnervation.FRACTAL_AMPLIFYING_HEX_CAP
+	                           : AMPLIFIER_CAP, Math.max((int) Math.floor(slowAmp * 10) - 1, 0));
+				}
+				
 				if (debuffCount > 0) {
 					EntityUtils.damageEntity(mPlugin, mob,
 							debuffCount * effectDamage + amplifierCount * mAmplifierDamage,
@@ -172,7 +194,7 @@ public class AmplifyingHex extends Ability {
 	@Override
 	public boolean runCheck() {
 		double pitch = mPlayer.getLocation().getPitch();
-		return mPlayer.isSneaking() && pitch < 50 && pitch > -50
-				&& InventoryUtils.isScytheItem(mPlayer.getInventory().getItemInMainHand());
+		return (mPlayer.isSneaking() && pitch < 50 && pitch > -50
+				&& InventoryUtils.isScytheItem(mPlayer.getInventory().getItemInMainHand()));
 	}
 }

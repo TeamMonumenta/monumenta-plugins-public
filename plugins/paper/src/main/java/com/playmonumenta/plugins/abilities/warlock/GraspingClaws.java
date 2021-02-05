@@ -30,15 +30,15 @@ public class GraspingClaws extends Ability {
 
 	private static final int RADIUS = 8;
 	private static final float PULL_SPEED = 0.175f;
-	private static final int AMPLIFIER_1 = 1;
-	private static final int AMPLIFIER_2 = 2;
+	private static final double AMPLIFIER_1 = 0.2;
+	private static final double AMPLIFIER_2 = 0.3;
 	private static final int DAMAGE_1 = 3;
 	private static final int DAMAGE_2 = 8;
 	private static final int DURATION = 8 * 20;
 	private static final int COOLDOWN_1 = 16 * 20;
 	private static final int COOLDOWN_2 = 12 * 20;
 
-	private final int mAmplifier;
+	private final double mAmplifier;
 	private final int mDamage;
 	private Arrow mArrow = null;
 
@@ -46,8 +46,8 @@ public class GraspingClaws extends Ability {
 		super(plugin, player, "Grasping Claws");
 		mInfo.mScoreboardId = "GraspingClaws";
 		mInfo.mShorthandName = "GC";
-		mInfo.mDescriptions.add("Left-clicking while shifted while holding a bow fires an arrow that pulls nearby enemies towards your arrow once it makes contact with a mob or block. Mobs caught in the arrow's 8 block radius are given Slowness 2 for 8 seconds and take 3 damage. Cooldown: 16s.");
-		mInfo.mDescriptions.add("The pulled enemies now take 8 damage, and Slowness is increased to 3.");
+		mInfo.mDescriptions.add("Left-clicking while shifted while holding a bow fires an arrow that pulls nearby enemies towards your arrow once it makes contact with a mob or block. Mobs caught in the arrow's 8 block radius are given 20% Slowness for 8 seconds and take 3 damage. Cooldown: 16s.");
+		mInfo.mDescriptions.add("The pulled enemies now take 8 damage, and their Slowness is increased to 30%.");
 		mInfo.mLinkedSpell = Spells.GRASPING_CLAWS;
 		mInfo.mCooldown = getAbilityScore() == 1 ? COOLDOWN_1 : COOLDOWN_2;
 		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;
@@ -86,9 +86,9 @@ public class GraspingClaws extends Ability {
 			for (LivingEntity mob : EntityUtils.getNearbyMobs(loc, RADIUS, mPlayer)) {
 				EntityUtils.damageEntity(mPlugin, mob, mDamage, mPlayer, MagicType.DARK_MAGIC, true, mInfo.mLinkedSpell);
 				MovementUtils.pullTowards(proj, mob, PULL_SPEED);
-				PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(PotionEffectType.SLOW, DURATION, mAmplifier, false, true));
+				EntityUtils.applySlow(mPlugin, DURATION, mAmplifier, mob);
 			}
-
+			
 			proj.remove();
 		}
 	}

@@ -258,10 +258,6 @@ public class EntityListener implements Listener {
 					if (!mAbilities.livingEntityDamagedByPlayerEvent(player, event)) {
 						event.setCancelled(true);
 					}
-
-					if (event.getCause().equals(DamageCause.ENTITY_ATTACK)) {
-						EnchantedPrayer.onEntityAttack(mPlugin, player, (LivingEntity)damagee);
-					}
 				}
 			}
 		} else if (damager instanceof Projectile) {

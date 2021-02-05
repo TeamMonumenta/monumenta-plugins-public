@@ -43,7 +43,7 @@ public class FractalEnervation extends Ability {
 		super(plugin, player, "Fractal Enervation");
 		mInfo.mScoreboardId = "Fractal";
 		mInfo.mShorthandName = "FE";
-		mInfo.mDescriptions.add("Right-clicking while not looking down and not shifting fires a dark magic beam that travels up to 9 blocks. The first enemy hit is afflicted with Mining Fatigue for 12s and takes 1 damage. In addition, all debuffs on the enemy increase by 1 effect level, and have their durations increased to 6 seconds if below 6 seconds. The beam then instantly spreads to all enemies in a 3 block radius, applying the same effects. It will continue spreading until it doesn't find any new targets. Cooldown: 12s.");
+		mInfo.mDescriptions.add("Right-clicking while not looking down and not shifting fires a dark magic beam that travels up to 9 blocks. The first enemy hit is afflicted with Mining Fatigue for 12s and takes 1 damage. In addition, all debuffs on the enemy increase by 1 effect level (custom percent effects by 10%), and have their durations increased to 6 seconds if below 6 seconds. The beam then instantly spreads to all enemies in a 3 block radius, applying the same effects. It will continue spreading until it doesn't find any new targets. Cooldown: 12s.");
 		mInfo.mDescriptions.add("The spread radius is increased to 4 blocks. Additionally, Amplifying Hex's extra level cap is increased from 2 to 4 on affected enemies. Cooldown: 10s.");
 		mInfo.mLinkedSpell = Spells.FRACTAL_ENERVATION;
 		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
@@ -108,14 +108,22 @@ public class FractalEnervation extends Ability {
 
 		// Apply everything in one go
 		for (LivingEntity mob : mHit) {
-			for (PotionEffectType effectType : PotionUtils.getNegativeEffects(mob)) {
-				PotionEffect effect = mob.getPotionEffect(effectType);
-				if (effect != null) {
-					mob.removePotionEffect(effectType);
-					// No chance of overwriting and we don't want to trigger PotionApplyEvent for "upgrading" effects, so don't use PotionUtils here
-					mob.addPotionEffect(new PotionEffect(effectType, Math.max(FRACTAL_REFRESH_DURATION, effect.getDuration()), effect.getAmplifier() + 1));
-				}
+			//Bleed interaction
+			if (EntityUtils.isBleeding(mPlugin, mob)) {
+				EntityUtils.applyBleed(mPlugin, Math.max(FRACTAL_REFRESH_DURATION, EntityUtils.getBleedTicks(mPlugin, mob)), EntityUtils.getBleedLevel(mPlugin, mob) + 1, mob);
 			}
+			//Custom slow effect interaction
+			if (EntityUtils.isSlowed(mPlugin, mob)) {
+				EntityUtils.applySlow(mPlugin, Math.max(FRACTAL_REFRESH_DURATION, EntityUtils.getSlowTicks(mPlugin, mob)), EntityUtils.getSlowAmount(mPlugin, mob) + 0.1, mob);
+			}
+			for (PotionEffectType effectType : PotionUtils.getNegativeEffects(mPlugin, mob)) {
+				PotionEffect effect = mob.getPotionEffect(effectType);
+				if (effect != null && effect.getType() != PotionEffectType.SLOW) {
+						mob.removePotionEffect(effectType);
+						// No chance of overwriting and we don't want to trigger PotionApplyEvent for "upgrading" effects, so don't use PotionUtils here
+						mob.addPotionEffect(new PotionEffect(effectType, Math.max(FRACTAL_REFRESH_DURATION, effect.getDuration()), effect.getAmplifier() + 1));
+					}
+				}
 			mob.setMetadata(FRACTAL_CAP_REMOVED_METAKEY, new FixedMetadataValue(mPlugin, null));
 			PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(PotionEffectType.SLOW_DIGGING, FRACTAL_FATIGUE_DURATION, 0));
 			EntityUtils.damageEntity(mPlugin, mob, FRACTAL_DAMAGE, mPlayer, MagicType.DARK_MAGIC, true, mInfo.mLinkedSpell);

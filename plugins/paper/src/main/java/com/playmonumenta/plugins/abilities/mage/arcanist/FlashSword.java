@@ -19,6 +19,7 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.classes.magic.MagicType;
+import com.playmonumenta.plugins.enchantments.SpellDamage;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
@@ -27,8 +28,8 @@ import com.playmonumenta.plugins.utils.VectorUtils;
 
 public class FlashSword extends Ability {
 
-	private static final int DAMAGE_1 = 4;
-	private static final int DAMAGE_2 = 8;
+	private static final float DAMAGE_1 = 2.5f;
+	private static final float DAMAGE_2 = 5.0f;
 	private static final int SWINGS = 3;
 	private static final int RADIUS = 5;
 	private static final int COOLDOWN = 20 * 9;
@@ -38,19 +39,17 @@ public class FlashSword extends Ability {
 	private static final Particle.DustOptions FSWORD_COLOR1 = new Particle.DustOptions(Color.fromRGB(106, 203, 255), 1.0f);
 	private static final Particle.DustOptions FSWORD_COLOR2 = new Particle.DustOptions(Color.fromRGB(168, 226, 255), 1.0f);
 
-	private final int mDamage;
 	private final float mKnockbackSpeed;
 
 	public FlashSword(Plugin plugin, Player player) {
 		super(plugin, player, "Flash Sword");
 		mInfo.mScoreboardId = "FlashSword";
 		mInfo.mShorthandName = "FS";
-		mInfo.mDescriptions.add("Sprint left-clicking with a wand causes a wave of Arcane blades to hit every enemy within a 5 block cone 3 times (4 damage per hit) in rapid succession. The last hit causes knockback. Only the first hit can apply or trigger spellshock. Cooldown: 9s.");
-		mInfo.mDescriptions.add("You instead do 8 damage 3 times. Knockback on the last hit is increased.");
+		mInfo.mDescriptions.add("Sprint left-clicking with a wand causes a wave of Arcane blades to hit every enemy within a 5 block cone 3 times (2.5 damage per hit) in rapid succession. The last hit causes knockback. Only the first hit can apply or trigger spellshock. Cooldown: 9s.");
+		mInfo.mDescriptions.add("You instead do 5 damage 3 times. Knockback on the last hit is increased.");
 		mInfo.mLinkedSpell = Spells.FSWORD;
 		mInfo.mCooldown = COOLDOWN;
 		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;
-		mDamage = getAbilityScore() == 1 ? DAMAGE_1 : DAMAGE_2;
 		mKnockbackSpeed = getAbilityScore() == 1 ? KNOCKBACK_SPEED_1 : KNOCKBACK_SPEED_2;
 	}
 
@@ -78,12 +77,14 @@ public class FlashSword extends Ability {
 					if (playerDir.dot(toMobVector) > DOT_ANGLE) {
 						Vector velocity = mob.getVelocity();
 						mob.setNoDamageTicks(0);
+						float damage = getAbilityScore() == 1 ? DAMAGE_1 : DAMAGE_2;
+						damage = SpellDamage.getSpellDamage(mPlayer, damage);
 
 						// Only interact with spellshock on the first swing
 						if (mT == 1) {
-							EntityUtils.damageEntity(mPlugin, mob, mDamage, mPlayer, MagicType.ARCANE, true, mInfo.mLinkedSpell, true, true);
+							EntityUtils.damageEntity(mPlugin, mob, damage, mPlayer, MagicType.ARCANE, true, mInfo.mLinkedSpell, true, true);
 						} else {
-							EntityUtils.damageEntity(mPlugin, mob, mDamage, mPlayer, MagicType.ARCANE, true, mInfo.mLinkedSpell, false, false);
+							EntityUtils.damageEntity(mPlugin, mob, damage, mPlayer, MagicType.ARCANE, true, mInfo.mLinkedSpell, false, false);
 						}
 
 						if (mT >= SWINGS) {

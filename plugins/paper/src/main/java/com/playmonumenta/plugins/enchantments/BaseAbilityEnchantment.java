@@ -105,4 +105,16 @@ public abstract class BaseAbilityEnchantment implements BaseEnchantment {
 		int level = PlayerTracking.getInstance().getPlayerCustomEnchantLevel(player, c);
 		return level;
 	}
+
+	//Float version
+	public static float getSpellDamage(Player player, float baseDamage) {
+		int level = PlayerTracking.getInstance().getPlayerCustomEnchantLevel(player, SpellDamage.class);
+		return baseDamage * (float) ((level / 100.0) + 1);
+	}
+
+	//Int to float version
+	public static float getSpellDamage(Player player, int baseDamage) {
+		int level = PlayerTracking.getInstance().getPlayerCustomEnchantLevel(player, SpellDamage.class);
+		return baseDamage * (float) ((level / 100.0) + 1);
+	}
 }

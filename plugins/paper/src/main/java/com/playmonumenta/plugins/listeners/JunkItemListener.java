@@ -17,6 +17,8 @@ import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.PlayerInventory;
+import org.bukkit.Material;
 
 import dev.jorel.commandapi.CommandAPI;
 import dev.jorel.commandapi.CommandAPICommand;
@@ -84,15 +86,27 @@ public class JunkItemListener implements Listener {
 	public void pickupItem(EntityPickupItemEvent event) {
 		if (!event.isCancelled() && (event.getEntity() instanceof Player)) {
 			ItemStack item = event.getItem().getItemStack();
-			if (mPlayers.contains((Player)event.getEntity()) && !isInteresting(item)) {
+			Player p = (Player) event.getEntity();
+			PlayerInventory inv = p.getInventory();
+			Set<Material> hotbar = new HashSet<Material>();
+			
+			//allow colletion of "junk" items on hotbar
+			for (int i = 0; i <= 8; i++) {
+				Material m = inv.getItem(i).getType();
+				if (m != null && !m.isAir()) {
+					hotbar.add(m);
+				}
+			}
+			if (mPlayers.contains((Player)event.getEntity()) && !isInteresting(item, hotbar)) {
 				event.setCancelled(true);
 			}
 		}
 	}
 
-	private boolean isInteresting(ItemStack item) {
+	private boolean isInteresting(ItemStack item, Set<Material> hotbar) {
 		return item.getAmount() >= JUNK_ITEM_SIZE_THRESHOLD
 		       || ServerProperties.getAlwaysPickupMats().contains(item.getType())
+		       || hotbar.contains(item.getType())
 		       || (item.hasItemMeta() && (item.getItemMeta().hasLore() ||
 					                      (item.getItemMeta().hasDisplayName()
 										   && ServerProperties.getNamedPickupMats().contains(item.getType()))));

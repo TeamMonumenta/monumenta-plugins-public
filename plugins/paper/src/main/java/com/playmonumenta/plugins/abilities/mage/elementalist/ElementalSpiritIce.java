@@ -3,7 +3,7 @@ package com.playmonumenta.plugins.abilities.mage.elementalist;
 import java.util.HashSet;
 import java.util.Set;
 
-import com.playmonumenta.plugins.utils.FastUtils;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -16,18 +16,21 @@ import org.bukkit.util.Vector;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityManager;
+import com.playmonumenta.plugins.abilities.mage.ElementalArrows;
 import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.classes.magic.MagicType;
+import com.playmonumenta.plugins.enchantments.SpellDamage;
 import com.playmonumenta.plugins.events.CustomDamageEvent;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 
 
 public class ElementalSpiritIce extends Ability {
 
 	private static final int ES_ICE_COOLDOWN = 20 * 12;
-	private static final int ES_ICE_1_DAMAGE = 5;
-	private static final int ES_ICE_2_DAMAGE = 8;
+	private static final int ES_ICE_1_DAMAGE = 4;
+	private static final int ES_ICE_2_DAMAGE = 6;
 	private static final int ES_ICE_RADIUS = 3;
 	private static final int ES_ICE_PULSES = 3;
 	private static final int ES_ICE_PULSE_INTERVAL = 20;
@@ -36,6 +39,7 @@ public class ElementalSpiritIce extends Ability {
 	private final Set<LivingEntity> mMobsDamaged = new HashSet<>();
 	private BukkitRunnable mMobsDamagedParser;
 	private BukkitRunnable mParticleGenerator;
+	private ElementalArrows mElementalArrows;
 
 	public ElementalSpiritIce(Plugin plugin, Player player) {
 		/* NOTE: Display name is null so this variant will be ignored by the tesseract.
@@ -45,6 +49,13 @@ public class ElementalSpiritIce extends Ability {
 		mInfo.mLinkedSpell = Spells.ELEMENTAL_SPIRIT_ICE;
 		mInfo.mCooldown = ES_ICE_COOLDOWN;
 		mDamage = getAbilityScore() == 1 ? ES_ICE_1_DAMAGE : ES_ICE_2_DAMAGE;
+
+		// Needs to wait for the entire AbilityCollection to be initialized
+				Bukkit.getScheduler().runTask(plugin, () -> {
+					if (player != null) {
+						mElementalArrows = AbilityManager.getManager().getPlayerAbility(mPlayer, ElementalArrows.class);
+					}
+				});
 	}
 
 	@Override
@@ -84,9 +95,14 @@ public class ElementalSpiritIce extends Ability {
 									world.spawnParticle(Particle.FIREWORKS_SPARK, mLoc, 30, 2, 0.25, 2, 0.1);
 									world.playSound(mLoc, Sound.ENTITY_TURTLE_HURT_BABY, 1, 0.2f);
 									world.playSound(mLoc, Sound.BLOCK_GLASS_BREAK, 0.5f, 0.05f);
+									float damage = SpellDamage.getSpellDamage(mPlayer, mDamage);
 									for (LivingEntity mob : EntityUtils.getNearbyMobs(mLoc, ES_ICE_RADIUS)) {
 										mob.setNoDamageTicks(0);
-										EntityUtils.damageEntity(mPlugin, mob, mDamage, mPlayer, MagicType.ICE, true, mInfo.mLinkedSpell);
+										if (event.getSpell().equals(Spells.ELEMENTAL_ARROWS) && mElementalArrows != null) {
+											EntityUtils.damageEntity(mPlugin, mob, mElementalArrows.getLastDamage() * 0.1, mPlayer, MagicType.ICE, true, mInfo.mLinkedSpell);
+										} else {
+											EntityUtils.damageEntity(mPlugin, mob, damage, mPlayer, MagicType.ICE, true, mInfo.mLinkedSpell);
+										}
 										mob.setVelocity(new Vector(0, 0, 0));
 									}
 

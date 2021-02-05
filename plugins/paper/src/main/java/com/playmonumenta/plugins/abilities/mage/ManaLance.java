@@ -26,6 +26,7 @@ import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.classes.magic.MagicType;
 import com.playmonumenta.plugins.enchantments.BaseAbilityEnchantment;
 import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
+import com.playmonumenta.plugins.enchantments.SpellDamage;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
@@ -43,8 +44,8 @@ public class ManaLance extends Ability {
 		}
 	}
 
-	private static final int DAMAGE_1 = 8;
-	private static final int DAMAGE_2 = 10;
+	private static final float DAMAGE_1 = 6.0f;
+	private static final float DAMAGE_2 = 7.0f;
 	private static final int COOLDOWN_1 = 5 * 20;
 	private static final int COOLDOWN_2 = 3 * 20;
 	private static final Particle.DustOptions MANA_LANCE_COLOR = new Particle.DustOptions(Color.fromRGB(91, 187, 255), 1.0f);
@@ -54,8 +55,8 @@ public class ManaLance extends Ability {
 		mInfo.mLinkedSpell = Spells.MANA_LANCE;
 		mInfo.mScoreboardId = "ManaLance";
 		mInfo.mShorthandName = "ML";
-		mInfo.mDescriptions.add("Right clicking with a wand fires forth a piercing beam of Mana going 8 blocks, dealing 8 damage to enemies in the path of the beam. This beam will not go through solid blocks. Cooldown: 5s.");
-		mInfo.mDescriptions.add("The beam instead deals 10 damage. Cooldown: 3s.");
+		mInfo.mDescriptions.add("Right clicking with a wand fires forth a piercing beam of Mana going 8 blocks, dealing 6 damage to enemies in the path of the beam. This beam will not go through solid blocks. Cooldown: 5s.");
+		mInfo.mDescriptions.add("The beam instead deals 7 damage. Cooldown: 3s.");
 		mInfo.mCooldown = getAbilityScore() == 1 ? COOLDOWN_1 : COOLDOWN_2;
 		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
 	}
@@ -63,8 +64,9 @@ public class ManaLance extends Ability {
 	@Override
 	public void cast(Action action) {
 		//Ability enchantments
-		int damage = getAbilityScore() == 1 ? DAMAGE_1 : DAMAGE_2;
+		float damage = getAbilityScore() == 1 ? DAMAGE_1 : DAMAGE_2;
 		damage += ManaLanceDamageEnchantment.getExtraDamage(mPlayer, ManaLanceDamageEnchantment.class);
+		damage = SpellDamage.getSpellDamage(mPlayer, damage);
 		float cd = getAbilityScore() == 1 ? COOLDOWN_1 : COOLDOWN_2;
 		mInfo.mCooldown = (int) ManaLanceCooldownEnchantment.getCooldown(mPlayer, cd, ManaLanceCooldownEnchantment.class);
 
@@ -119,7 +121,7 @@ public class ManaLance extends Ability {
 		return !mPlayer.isSneaking() && InventoryUtils.isWandItem(mainHand);
 	}
 
-	public int getDamage() {
+	public float getDamage() {
 		//Just in case the damage changes in the future
 		return getAbilityScore() == 1 ? DAMAGE_1 : DAMAGE_2;
 	}

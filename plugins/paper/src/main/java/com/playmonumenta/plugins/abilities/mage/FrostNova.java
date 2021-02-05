@@ -1,11 +1,5 @@
 package com.playmonumenta.plugins.abilities.mage;
 
-import com.playmonumenta.plugins.utils.FastUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.plugins.utils.InventoryUtils;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.PotionUtils;
-
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -24,45 +18,50 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.classes.magic.MagicType;
+import com.playmonumenta.plugins.enchantments.SpellDamage;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 
 public class FrostNova extends Ability {
 
 	private static final float RADIUS = 6.0f;
 	private static final int DAMAGE_1 = 4;
 	private static final int DAMAGE_2 = 8;
-	private static final int AMPLIFIER_1 = 1;
-	private static final int AMPLIFIER_2 = 3;
+	private static final double AMPLIFIER_1 = 0.2;
+	private static final double AMPLIFIER_2 = 0.4;
 	private static final int COOLDOWN = 18 * 20;
 	private static final int DURATION = 4 * 20;
 
 	private final int mDamage;
-	private final int mSlownessAmplifier;
+	private final double mSlownessAmount;
 
 	public FrostNova(Plugin plugin, Player player) {
 		super(plugin, player, "Frost Nova");
 		mInfo.mLinkedSpell = Spells.FROST_NOVA;
 		mInfo.mScoreboardId = "FrostNova";
 		mInfo.mShorthandName = "FN";
-		mInfo.mDescriptions.add("When you strike with a wand while you are sneaking, you unleash a frost nova, dealing 4 damage to all enemies in a 6 block radius and afflicting them with 8 seconds of Slowness 2. Also extinguishes fire on nearby players and mobs. Cooldown 18s.");
-		mInfo.mDescriptions.add("Increases the damage to 8 and Slowness 4. Bosses and Elites are hit with 8 seconds of Slowness 2 and 8 damage instead.");
+		mInfo.mDescriptions.add("When you strike with a wand while you are sneaking, you unleash a frost nova, dealing 4 damage to all enemies in a 6 block radius and afflicting them with 20% Slowness for 8 seconds. Also extinguishes fire on nearby players and mobs. Cooldown 18s.");
+		mInfo.mDescriptions.add("Increases the damage to 8 and the Slowness to 40%. Bosses and Elites are hit with 8 seconds of 20% Slowness and 8 damage instead.");
 		mInfo.mCooldown = COOLDOWN;
 		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;
 		mDamage = getAbilityScore() == 1 ? DAMAGE_1 : DAMAGE_2;
-		mSlownessAmplifier = getAbilityScore() == 1 ? AMPLIFIER_1 : AMPLIFIER_2;
+		mSlownessAmount = getAbilityScore() == 1 ? AMPLIFIER_1 : AMPLIFIER_2;
 	}
 
 	@Override
 	public void cast(Action action) {
 		putOnCooldown();
-
+		float damage = SpellDamage.getSpellDamage(mPlayer, mDamage);
 		for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), RADIUS, mPlayer)) {
 			Vector velocity = mob.getVelocity();
-			EntityUtils.damageEntity(mPlugin, mob, mDamage, mPlayer, MagicType.ICE, true, mInfo.mLinkedSpell);
+			EntityUtils.damageEntity(mPlugin, mob, damage, mPlayer, MagicType.ICE, true, mInfo.mLinkedSpell);
 			mob.setVelocity(velocity);
 			if (EntityUtils.isElite(mob) || EntityUtils.isBoss(mob)) {
-				PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(PotionEffectType.SLOW, DURATION, mSlownessAmplifier - 1, true, false));
+				EntityUtils.applySlow(mPlugin, DURATION, mSlownessAmount - 0.1, mob);
 			} else {
-				PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(PotionEffectType.SLOW, DURATION, mSlownessAmplifier, true, false));
+				EntityUtils.applySlow(mPlugin, DURATION, mSlownessAmount, mob);
 			}
 
 			if (mob.getFireTicks() > 1) {

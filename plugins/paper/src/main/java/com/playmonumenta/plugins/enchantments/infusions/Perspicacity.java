@@ -28,6 +28,9 @@ public class Perspicacity implements BaseEnchantment {
 
 	@Override
 	public void onAbility(Plugin plugin, Player player, Integer level, LivingEntity target, CustomDamageEvent event) {
+		if (event.getSpell() == null) {
+			return;
+		}
 		double abilityDmgBuffPct = level * DAMAGE_PCT_PER_LEVEL;
 		event.setDamage(event.getDamage() * (1.0 + abilityDmgBuffPct));
 	}

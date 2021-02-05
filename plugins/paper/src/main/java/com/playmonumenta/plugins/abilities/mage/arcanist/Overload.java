@@ -18,6 +18,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.classes.Spells;
+import com.playmonumenta.plugins.enchantments.SpellDamage;
 import com.playmonumenta.plugins.events.AbilityCastEvent;
 import com.playmonumenta.plugins.events.CustomDamageEvent;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -25,14 +26,12 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 public class Overload extends Ability {
 
 	private static final int SPELLS_PER_OVERLOAD = 3;
-	private static final int DAMAGE_1 = 4;
-	private static final int DAMAGE_2 = 8;
+	private static final float DAMAGE_1 = 2.5f;
+	private static final float DAMAGE_2 = 5.0f;
 	private static final int STUN_DURATION = 20 * 1;
 
 	private static final Particle.DustOptions COLOR = new Particle.DustOptions(Color.fromRGB(222, 219, 36), 1.0f);
 	private static final Particle.DustOptions COLOR2 = new Particle.DustOptions(Color.fromRGB(255, 255, 120), 1.0f);
-
-	private final int mDamage;
 
 	private int mSpellsToOverload = SPELLS_PER_OVERLOAD;
 	private Spells mAffectedSpell = null;
@@ -41,9 +40,8 @@ public class Overload extends Ability {
 		super(plugin, player, "Overload");
 		mInfo.mScoreboardId = "Overload";
 		mInfo.mShorthandName = "Ov";
-		mInfo.mDescriptions.add("Every 3rd spell cast is \"overloaded\" and deals +4 damage. When your next spell is overloaded, non-elite and non-boss mobs that melee or projectile attack you are stunned for 1 second.");
-		mInfo.mDescriptions.add("Overloaded spell damage is increased to +8.");
-		mDamage = getAbilityScore() == 1 ? DAMAGE_1 : DAMAGE_2;
+		mInfo.mDescriptions.add("Every 3rd spell cast is \"overloaded\" and deals +2.5 damage. When your next spell is overloaded, non-elite and non-boss mobs that melee or projectile attack you are stunned for 1 second.");
+		mInfo.mDescriptions.add("Overloaded spell damage is increased to +5.");
 	}
 
 	@Override
@@ -101,10 +99,12 @@ public class Overload extends Ability {
 
 	@Override
 	public void playerDealtCustomDamageEvent(CustomDamageEvent event) {
+		float damage = getAbilityScore() == 1 ? DAMAGE_1 : DAMAGE_2;
+		damage = SpellDamage.getSpellDamage(mPlayer, damage);
 		LivingEntity damagee = event.getDamaged();
 		Location locD = damagee.getLocation().add(0, 1, 0);
-		if (event.getSpell() == mAffectedSpell) {
-			event.setDamage(event.getDamage() + mDamage);
+		if (event.getSpell() == mAffectedSpell && mAffectedSpell != Spells.SPELLSHOCK && mAffectedSpell != null) {
+			event.setDamage(event.getDamage() + damage);
 			World world = mPlayer.getWorld();
 			world.spawnParticle(Particle.REDSTONE, locD, 35, 0.4, 0.4, 0.4, COLOR);
 			world.spawnParticle(Particle.EXPLOSION_NORMAL, locD, 35, 0, 0, 0, 0.2);

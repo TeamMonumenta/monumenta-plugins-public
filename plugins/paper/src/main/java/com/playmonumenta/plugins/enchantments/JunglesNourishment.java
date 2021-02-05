@@ -23,8 +23,8 @@ public class JunglesNourishment implements BaseEnchantment {
 
 	private static final int HEAL = 8;
 	private static final int DURATION = 20 * 5;
-	private static final int COOLDOWN = 20 * 20;
-
+	private static final int COOLDOWN = 20 * 25;
+	
 	@Override
 	public String getProperty() {
 		return PROPERTY_NAME;

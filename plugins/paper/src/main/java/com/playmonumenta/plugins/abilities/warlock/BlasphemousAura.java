@@ -28,7 +28,7 @@ public class BlasphemousAura extends Ability {
 		mInfo.mScoreboardId = "BlasphemousAura";
 		mInfo.mShorthandName = "BA";
 		mInfo.mDescriptions.add("The warlock gains +3% damage reduction for every ability they have on cooldown lasting until skills come off cooldown.");
-		mInfo.mDescriptions.add("You also heal for 5% of your max health when an enemy dies within 8 blocks of you.");
+		mInfo.mDescriptions.add("You also heal for 5% of your max health when killing an enemy.");
 	}
 
 	@Override
@@ -56,16 +56,10 @@ public class BlasphemousAura extends Ability {
 	}
 
 	@Override
-	public void entityDeathRadiusEvent(EntityDeathEvent event, boolean shouldGenDrops) {
+	public void entityDeathEvent(EntityDeathEvent event, boolean shouldGenDrops) {
 		mPlayer.getWorld().spawnParticle(Particle.CRIMSON_SPORE, mPlayer.getLocation().add(0, 1, 0), 9, 0.35, 0.45, 0.35, 0.001);
-
 		if (getAbilityScore() > 1) {
 			PlayerUtils.healPlayer(mPlayer, PERCENT_HEAL * mPlayer.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue());
 		}
-	}
-
-	@Override
-	public double entityDeathRadius() {
-		return 8;
 	}
 }

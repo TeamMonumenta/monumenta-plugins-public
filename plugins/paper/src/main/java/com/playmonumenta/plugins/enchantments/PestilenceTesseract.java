@@ -61,7 +61,7 @@ public class PestilenceTesseract implements BaseEnchantment {
 
 				for (LivingEntity mob : EntityUtils.getNearbyMobs(item.getLocation(), EFFECT_RADIUS)) {
 					mob.addPotionEffect(new PotionEffect(PotionEffectType.WITHER, 600, 2, false, true));
-					mob.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 600, 1, false, true));
+					EntityUtils.applySlow(plugin, 600, 0.2, mob);
 				}
 
 				mTicks++;

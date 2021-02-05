@@ -28,6 +28,7 @@ public class DeathsTouch extends Ability {
 
 	public static final String DEATHS_TOUCH_BUFF_DURATION = "DeathsTouchBuffDuration";
 	public static final String DEATHS_TOUCH_AMPLIFIER_CAP = "DeathsTouchAmplifierCap";
+	public static final String DEATHS_TOUCH_CASTER = "DeathsTouchCaster";
 
 	private static final String CHECK_ONCE_THIS_TICK_METAKEY = "DeathsTouchTickRightClicked";
 
@@ -52,8 +53,8 @@ public class DeathsTouch extends Ability {
 		mInfo.mLinkedSpell = Spells.DEATHS_TOUCH;
 		mInfo.mScoreboardId = "DeathsTouch";
 		mInfo.mShorthandName = "DT";
-		mInfo.mDescriptions.add("Double right-clicking marks the enemy you are looking at as the reaper's next victim. If you do not correctly aim at a mob this skill goes on cooldown for 5s and it does nothing. If you or another player kills that enemy, the player that killed it is granted 15s of level 1 buffs contrary to the debuffs affecting it. Weakness > Strength. Slowness > Speed. Fire > Fire Resistance. Vulnerability > Resistance. Wither/Poison > Regeneration. Mining Fatigue > Haste. Blindness > Night Vision. Cooldown: 25s.");
-		mInfo.mDescriptions.add("The killing player gets buffs for 20 seconds instead, and the level of the buff is preserved, up to level 2, except for Resistance and Regeneration. Cooldown: 15s.");
+		mInfo.mDescriptions.add("Double right-clicking marks the enemy you are looking at as the reaper's next victim. If you do not correctly aim at a mob this skill goes on cooldown for 5s and it does nothing. If you or another player kills that enemy, the player that killed it and the warlock who marked the mob are granted 15s of level 1 buffs contrary to the debuffs affecting it. Weakness > Strength. Slowness (and custom percent Slowness) > Speed. Fire > Fire Resistance. Vulnerability > Resistance. Wither/Poison > Regeneration. Mining Fatigue > Haste. Blindness > Night Vision. Cooldown: 25s.");
+		mInfo.mDescriptions.add("The killing player gets buffs for 20 seconds instead, and the level of the buff is preserved, up to level 2, except for Resistance and Regeneration. If the killing player is not the caster, the caster still recieves level 1 buffs. Cooldown: 15s.");
 		mInfo.mCooldown = getAbilityScore() == 1 ? DEATHS_TOUCH_1_COOLDOWN : DEATHS_TOUCH_2_COOLDOWN;
 		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
 		mBuffDuration = getAbilityScore() == 1 ? DEATHS_TOUCH_1_BUFF_DURATION : DEATHS_TOUCH_2_BUFF_DURATION;
@@ -101,6 +102,7 @@ public class DeathsTouch extends Ability {
 					mTarget = mob;
 					mob.setMetadata(DEATHS_TOUCH_BUFF_DURATION, new FixedMetadataValue(mPlugin, mBuffDuration));
 					mob.setMetadata(DEATHS_TOUCH_AMPLIFIER_CAP, new FixedMetadataValue(mPlugin, mAmplifierCap));
+					mob.setMetadata(DEATHS_TOUCH_CASTER, new FixedMetadataValue(mPlugin, mPlayer.getName()));
 					world.playSound(loc, Sound.ENTITY_WITHER_SPAWN, SoundCategory.PLAYERS, 0.25f, 1f);
 
 					new BukkitRunnable() {

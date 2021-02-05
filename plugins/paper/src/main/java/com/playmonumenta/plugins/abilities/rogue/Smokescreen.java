@@ -23,7 +23,7 @@ public class Smokescreen extends Ability {
 
 	private static final int SMOKESCREEN_RANGE = 6;
 	private static final int SMOKESCREEN_DURATION = 8 * 20;
-	private static final int SMOKESCREEN_SLOWNESS_AMPLIFIER = 1;
+	private static final double SMOKESCREEN_SLOWNESS_AMPLIFIER = 0.2;
 	private static final int SMOKESCREEN_1_WEAKNESS_AMPLIFIER = 0;
 	private static final int SMOKESCREEN_2_WEAKNESS_AMPLIFIER = 1;
 	private static final int SMOKESCREEN_COOLDOWN = 20 * 20;
@@ -35,7 +35,7 @@ public class Smokescreen extends Ability {
 		mInfo.mLinkedSpell = Spells.SMOKESCREEN;
 		mInfo.mScoreboardId = "SmokeScreen";
 		mInfo.mShorthandName = "Smk";
-		mInfo.mDescriptions.add("When holding two swords, right-click while sneaking and looking down to release a cloud of smoke, afflicting all enemies in a 6 block radius with 8 s of Weakness I and Slowness II. Cooldown: 20s.");
+		mInfo.mDescriptions.add("When holding two swords, right-click while sneaking and looking down to release a cloud of smoke, afflicting all enemies in a 6 block radius with 8 s of Weakness I and 20% Slowness. Cooldown: 20s.");
 		mInfo.mDescriptions.add("The Weakness debuff is increased to level II.");
 		mInfo.mCooldown = SMOKESCREEN_COOLDOWN;
 		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
@@ -50,7 +50,7 @@ public class Smokescreen extends Ability {
 		world.spawnParticle(Particle.SMOKE_NORMAL, loc, 1500, 4.5, 0.2, 4.5, 0.1);
 		world.playSound(loc, Sound.ENTITY_BLAZE_SHOOT, 1.0f, 0.35f);
 		for (LivingEntity mob : EntityUtils.getNearbyMobs(loc, SMOKESCREEN_RANGE, mPlayer)) {
-			PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(PotionEffectType.SLOW, SMOKESCREEN_DURATION, SMOKESCREEN_SLOWNESS_AMPLIFIER, false, true));
+			EntityUtils.applySlow(mPlugin, SMOKESCREEN_DURATION, SMOKESCREEN_SLOWNESS_AMPLIFIER, mob);
 			PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(PotionEffectType.WEAKNESS, SMOKESCREEN_DURATION, mWeaknessAmplifier, false, true));
 		}
 		putOnCooldown();

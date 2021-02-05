@@ -63,6 +63,7 @@ public class PurpleHaze extends Ability {
 	private static final int PURPLE_HAZE_2_DURATION = 20 * 10;
 	private static final int PURPLE_HAZE_1_COOLDOWN = 20 * 35;
 	private static final int PURPLE_HAZE_2_COOLDOWN = 20 * 20;
+	private static final double PURPLE_HAZE_SLOW = 0.3;
 	private static final int PURPLE_HAZE_TRANSFER_DEPTH = 2;
 	private static final int PURPLE_HAZE_TRANSFER_BREADTH = 2;
 	private static final double PURPLE_HAZE_DAMAGE = 3;
@@ -83,8 +84,8 @@ public class PurpleHaze extends Ability {
 		mInfo.mLinkedSpell = Spells.PURPLE_HAZE;
 		mInfo.mScoreboardId = "PurpleHaze";
 		mInfo.mShorthandName = "PH";
-		mInfo.mDescriptions.add("Left-clicking while shifted with a bow while looking at a mob within 32 blocks deals 3 damage per second and gives Slowness III for 8 seconds to that mob. If the target dies, the user gains an additional Alchemist's Potion and the effects transfer to up to 2 mob up to 5 blocks from the target that died. The maximum number of times effects can spread is a chain 2 mobs deep. Cooldown: 35s.");
-		mInfo.mDescriptions.add("Damage and Slowness duration increases to 10 seconds. Cooldown reduced to 20s.");
+		mInfo.mDescriptions.add("Left-clicking while shifted with a bow while looking at a mob within 32 blocks deals 3 damage per second and gives 30% Slowness for 8 seconds to that mob. If the target dies, the user gains an additional Alchemist's Potion and the effects transfer to up to 2 mob up to 5 blocks from the target that died. The maximum number of times effects can spread is a chain 2 mobs deep. Cooldown: 35s.");
+		mInfo.mDescriptions.add("Damage and Reduced Speed duration increases to 10 seconds. Cooldown reduced to 20s.");
 		mInfo.mCooldown = getAbilityScore() == 1 ? PURPLE_HAZE_1_COOLDOWN : PURPLE_HAZE_2_COOLDOWN;
 		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;
 		mDuration = getAbilityScore() == 1 ? PURPLE_HAZE_1_DURATION : PURPLE_HAZE_2_DURATION;
@@ -113,7 +114,7 @@ public class PurpleHaze extends Ability {
 							EntityUtils.damageEntity(plugin, damagee, PURPLE_HAZE_DAMAGE, e.mTriggeredBy, MagicType.ALCHEMY, false /* do not register CustomDamageEvent */, mInfo.mLinkedSpell);
 							damagee.setVelocity(v);
 							damagee.setNoDamageTicks(ticks);
-							PotionUtils.applyPotion(e.mTriggeredBy, damagee, new PotionEffect(PotionEffectType.SLOW, 40, 2, false, true));
+							EntityUtils.applySlow(mPlugin, mDuration, PURPLE_HAZE_SLOW, damagee);
 							Location loc = damagee.getLocation().add(0, 1, 0);
 							World world = damagee.getWorld();
 							world.spawnParticle(Particle.SPELL_WITCH, loc, 10, 0, 0.2, 0, 0.0001);

@@ -1,6 +1,9 @@
 package com.playmonumenta.plugins.abilities.cleric.hierophant;
 
 import com.playmonumenta.plugins.utils.FastUtils;
+
+import java.util.EnumSet;
+
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -10,6 +13,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
@@ -18,6 +22,7 @@ import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.classes.magic.MagicType;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.effects.EnchantedPrayerAoE;
 
 /*
  * Enchanted Prayer: Jump and shift right-click to enchant the
@@ -39,16 +44,26 @@ public class EnchantedPrayer extends Ability {
 	private static final int ENCHANTED_PRAYER_2_DAMAGE = 12;
 	private static final int ENCHANTED_PRAYER_1_HEAL = 2;
 	private static final int ENCHANTED_PRAYER_2_HEAL = 4;
+	private static final int ENCHANTED_PRAYER_RANGE = 15;
+	private static final EnumSet<DamageCause> AFFECTED_DAMAGE_CAUSES = EnumSet.of(
+			DamageCause.ENTITY_ATTACK,
+			DamageCause.PROJECTILE
+	);
+	
+	private final int mDamage;
+	private final int mHeal;
 
 	public EnchantedPrayer(Plugin plugin, Player player) {
 		super(plugin, player, "Enchanted Prayer");
 		mInfo.mScoreboardId = "EPrayer";
 		mInfo.mShorthandName = "EP";
-		mInfo.mDescriptions.add("Left-clicking in the air while shifted enchants the weapons of all players in a 15 block radius with holy magic. Their next melee attack deals an additional 7 damage in a 3-block radius while healing the player for 2 hp. Cooldown: 18s.");
+		mInfo.mDescriptions.add("Left-clicking in the air while shifted enchants the weapons of all players in a 15 block radius with holy magic. Their next melee or projectile attack deals an additional 7 damage in a 3-block radius while healing the player for 2 hp. Cooldown: 18s.");
 		mInfo.mDescriptions.add("Damage is increased to 12. Healing is increased to 4 hp.");
 		mInfo.mLinkedSpell = Spells.ENCHANTED_PRAYER;
 		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;
 		mInfo.mCooldown = ENCHANTED_PRAYER_COOLDOWN;
+		mDamage = getAbilityScore() == 1 ? ENCHANTED_PRAYER_1_DAMAGE : ENCHANTED_PRAYER_2_DAMAGE;
+		mHeal = getAbilityScore() == 1 ? ENCHANTED_PRAYER_1_HEAL : ENCHANTED_PRAYER_2_HEAL;
 	}
 
 	public static final String ENCHANTED_PRAYER_METAKEY = "EnchantedPrayerMetakey";
@@ -83,56 +98,16 @@ public class EnchantedPrayer extends Ability {
 
 		}.runTaskTimer(mPlugin, 0, 1);
 		int enchantedPrayer = getAbilityScore();
-		for (Player p : PlayerUtils.playersInRange(mPlayer, 15, true)) {
+		for (Player p : PlayerUtils.playersInRange(mPlayer, ENCHANTED_PRAYER_RANGE, true)) {
 			p.playSound(p.getLocation(), Sound.ENTITY_ILLUSIONER_PREPARE_MIRROR, 1.2f, 1.0f);
 			world.spawnParticle(Particle.SPELL_INSTANT, mPlayer.getLocation(), 50, 0.25, 0, 0.25, 0.01);
-			p.setMetadata(ENCHANTED_PRAYER_METAKEY, new FixedMetadataValue(mPlugin, enchantedPrayer));
-			new BukkitRunnable() {
-				int mT = 0;
-				@Override
-				public void run() {
-					mT++;
-					Location rightHand = PlayerUtils.getRightSide(p.getEyeLocation(), 0.45).subtract(0, .8, 0);
-					Location leftHand = PlayerUtils.getRightSide(p.getEyeLocation(), -0.45).subtract(0, .8, 0);
-					world.spawnParticle(Particle.SPELL_INSTANT, leftHand, 1, 0.05f, 0.05f, 0.05f, 0);
-					world.spawnParticle(Particle.SPELL_INSTANT, rightHand, 1, 0.05f, 0.05f, 0.05f, 0);
-					if (!p.hasMetadata(ENCHANTED_PRAYER_METAKEY)) {
-						this.cancel();
-					}
-
-					if (mT >= ENCHANTED_PRAYER_COOLDOWN || p.isDead() || !p.isOnline()) {
-						this.cancel();
-						p.removeMetadata(ENCHANTED_PRAYER_METAKEY, mPlugin);
-					}
-				}
-
-			}.runTaskTimer(mPlugin, 0, 1);
+			mPlugin.mEffectManager.addEffect(p, "EnchantedPrayerEffect", 
+					new EnchantedPrayerAoE(mPlugin, ENCHANTED_PRAYER_COOLDOWN, mDamage, mHeal, p, AFFECTED_DAMAGE_CAUSES));
 		}
 	}
 
 	@Override
 	public boolean runCheck() {
 		return mPlayer.isSneaking() && !mPlayer.isOnGround();
-	}
-
-	/*
-	 * Must be called for all players in the appropriate place in EntityDamageByEntityEvent!
-	 */
-	public static void onEntityAttack(Plugin plugin, Player player, LivingEntity damagee) {
-		if (player.hasMetadata(ENCHANTED_PRAYER_METAKEY)) {
-			World world = player.getWorld();
-			int enchantedPrayer = player.getMetadata(ENCHANTED_PRAYER_METAKEY).get(0).asInt();
-			player.removeMetadata(ENCHANTED_PRAYER_METAKEY, plugin);
-			world.playSound(damagee.getLocation(), Sound.ENTITY_FIREWORK_ROCKET_BLAST, 1, 0.9f);
-			world.playSound(damagee.getLocation(), Sound.ENTITY_BLAZE_DEATH, 1, 1.75f);
-			world.spawnParticle(Particle.SPELL_INSTANT, damagee.getLocation().add(0, damagee.getHeight() / 2, 0), 100, 0.25f, 0.3f, 0.25f, 1);
-			world.spawnParticle(Particle.FIREWORKS_SPARK, damagee.getLocation().add(0, damagee.getHeight() / 2, 0), 75, 0, 0, 0, 0.3);
-			double damage = enchantedPrayer == 1 ? ENCHANTED_PRAYER_1_DAMAGE : ENCHANTED_PRAYER_2_DAMAGE;
-			double heal = enchantedPrayer == 1 ? ENCHANTED_PRAYER_1_HEAL : ENCHANTED_PRAYER_2_HEAL;
-			for (LivingEntity le : EntityUtils.getNearbyMobs(damagee.getLocation(), 3.5)) {
-				EntityUtils.damageEntity(plugin, le, damage, player, MagicType.HOLY, true, Spells.ENCHANTED_PRAYER);
-			}
-			PlayerUtils.healPlayer(player, heal);
-		}
 	}
 }

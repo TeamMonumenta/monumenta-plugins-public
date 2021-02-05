@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.NavigableSet;
 
 import org.bukkit.Bukkit;
 import org.bukkit.attribute.Attribute;
@@ -24,6 +25,7 @@ import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.events.PotionEffectApplyEvent;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
+import com.playmonumenta.plugins.effects.Effect;
 
 public class PotionUtils {
 	private static final int SECONDS_1 = 20;
@@ -376,7 +378,7 @@ public class PotionUtils {
 		}
 	}
 
-	public static List<PotionEffectType> getNegativeEffects(LivingEntity le) {
+	public static List<PotionEffectType> getNegativeEffects(Plugin plugin, LivingEntity le) {
 		List<PotionEffectType> types = new ArrayList<PotionEffectType>();
 		List<PotionEffectType> negatives = Arrays.asList(NEGATIVE_EFFECTS);
 		for (PotionEffect effect : le.getActivePotionEffects()) {
@@ -384,6 +386,12 @@ public class PotionUtils {
 				types.add(effect.getType());
 			}
 		}
+		
+		NavigableSet<Effect> slows = plugin.mEffectManager.getEffects((Entity) le, "SlowEffect");
+		if (slows != null  && !types.contains(PotionEffectType.SLOW)) {
+			types.add(PotionEffectType.SLOW);
+		}
+		
 		return types;
 	}
 

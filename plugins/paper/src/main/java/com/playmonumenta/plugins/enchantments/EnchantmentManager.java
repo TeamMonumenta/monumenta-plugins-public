@@ -86,6 +86,7 @@ public class EnchantmentManager implements Listener {
 		//init.add(new ManaLanceDamageEnchantment());
 		init.add(new ManaLanceCooldownEnchantment());
 		init.add(new SpellshockDamageEnchantment());
+		init.add(new SpellDamage());
 		//init.add(new SpellshockRadiusEnchantment());
 
 		//Rogue

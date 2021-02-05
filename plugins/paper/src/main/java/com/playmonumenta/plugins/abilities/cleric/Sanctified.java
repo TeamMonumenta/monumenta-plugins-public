@@ -25,7 +25,7 @@ public class Sanctified extends Ability {
 
 	private static final int PERCENT_DAMAGE_RETURNED_1 = 2;
 	private static final int PERCENT_DAMAGE_RETURNED_2 = 3;
-	private static final int SLOWNESS_AMPLIFIER_2 = 1;
+	private static final double SLOWNESS_AMPLIFIER_2 = 0.2;
 	private static final int SLOWNESS_DURATION = 20 * 3;
 	private static final float KNOCKBACK_SPEED = 0.4f;
 
@@ -37,7 +37,7 @@ public class Sanctified extends Ability {
 		mInfo.mScoreboardId = "Sanctified";
 		mInfo.mShorthandName = "Sa";
 		mInfo.mDescriptions.add("Whenever a non-boss undead enemy hits you with a melee or projectile attack, it takes twice the final damage you took and is knocked away from you.");
-		mInfo.mDescriptions.add("Deal triple the final damage instead, and the undead enemy is also afflicted with Slowness II for 3 seconds (even if you are blocking).");
+		mInfo.mDescriptions.add("Deal triple the final damage instead, and the undead enemy is also afflicted with 20% Slowness for 3 seconds (even if you are blocking).");
 		mPercentDamageReturned = getAbilityScore() == 1 ? PERCENT_DAMAGE_RETURNED_1 : PERCENT_DAMAGE_RETURNED_2;
 	}
 
@@ -76,7 +76,7 @@ public class Sanctified extends Ability {
 		}
 
 		if (getAbilityScore() > 1) {
-			PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(PotionEffectType.SLOW, SLOWNESS_DURATION, SLOWNESS_AMPLIFIER_2, false, true));
+			EntityUtils.applySlow(mPlugin, SLOWNESS_DURATION, SLOWNESS_AMPLIFIER_2, mob);
 		}
 	}
 

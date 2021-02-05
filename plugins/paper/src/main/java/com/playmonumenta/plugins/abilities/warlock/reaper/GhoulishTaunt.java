@@ -39,7 +39,7 @@ public class GhoulishTaunt extends Ability {
 	private static final int DURATION = 20 * 10;
 	private static final int DURATION_INCREASE_ON_KILL = 20 * 1;
 	private static final double PERCENT_1 = 0.1;
-	private static final double PERCENT_2 = 0.2;
+	private static final double PERCENT_2 = 0.15;
 
 	private static final double CLEAVE_RADIUS = 2.0;
 	private static final double CLEAVE_PERCENT_DAMAGE_1 = 0.3;
@@ -60,7 +60,7 @@ public class GhoulishTaunt extends Ability {
 		mInfo.mScoreboardId = "GhoulishTaunt";
 		mInfo.mShorthandName = "GT";
 		mInfo.mDescriptions.add("Left clicking twice with a scythe unleashes a devilish shriek, causing all mobs within a 12 block range to target you and afflicting them with Weakness I for 10 seconds. For the next 10 seconds, gain +10% speed and +10% attack speed, and your melee attacks cleave in a 2 block radius from the strike, dealing 30% of the damage from the original attack. Each kill during this time increases the duration of the buffs by 1 second. Cooldown: 20s.");
-		mInfo.mDescriptions.add("Apply Weakness II to mobs instead, and gain +20% speed and +20% attack speed and 50% cleaving damage instead.");
+		mInfo.mDescriptions.add("Apply Weakness II to mobs instead, and gain +15% speed and +15% attack speed and 50% cleaving damage instead.");
 		mInfo.mLinkedSpell = Spells.GHOULISH_TAUNT;
 		mInfo.mCooldown = COOLDOWN;
 		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;

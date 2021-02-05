@@ -16,9 +16,8 @@ import com.playmonumenta.plugins.utils.MessagingUtils;
 public class Sharpshooter extends Ability {
 	private static final int SHARPSHOOTER_DECAY_TIMER = 20 * 4;
 	private static final int MAX_STACKS_1 = 5;
-	private static final int MAX_STACKS_2 = 15;
-	private static final int MAX_EFFECTIVE_STACKS = 10;
-	private static final double PERCENT_DAMAGE_PER_STACK = 0.07;
+	private static final int MAX_STACKS_2 = 10;
+	private static final double PERCENT_DAMAGE_PER_STACK = 0.06;
 
 	private final int mMaxStacks;
 
@@ -26,8 +25,8 @@ public class Sharpshooter extends Ability {
 		super(plugin, player, "Sharpshooter");
 		mInfo.mScoreboardId = "Sharpshooter";
 		mInfo.mShorthandName = "Ss";
-		mInfo.mDescriptions.add("Each enemy hit with a critical arrow gives you a stack of Sharpshooter, up to 5. Stacks decay after 4 seconds of not gaining a stack. Each stack makes your arrows deal +7% damage.");
-		mInfo.mDescriptions.add("Max stacks increased to 15, but the damage bonus is capped at 10 stacks (+70% damage)");
+		mInfo.mDescriptions.add("Each enemy hit with a critical arrow gives you a stack of Sharpshooter, up to 5. Stacks decay after 4 seconds of not gaining a stack. Each stack makes your arrows deal +6% damage.");
+		mInfo.mDescriptions.add("Max stacks increased to 10 (+60% damage).");
 		mInfo.mIgnoreTriggerCap = true;
 
 		mMaxStacks = getAbilityScore() == 1 ? MAX_STACKS_1 : MAX_STACKS_2;
@@ -51,7 +50,7 @@ public class Sharpshooter extends Ability {
 				}
 			}
 
-			event.setDamage(event.getDamage() * (1 + Math.min(MAX_EFFECTIVE_STACKS, mStacks) * PERCENT_DAMAGE_PER_STACK));
+			event.setDamage(event.getDamage() * ((1 + mStacks) * PERCENT_DAMAGE_PER_STACK));
 		}
 
 		return true;
@@ -80,7 +79,7 @@ public class Sharpshooter extends Ability {
 
 	public static double getDamageMultiplier(Player player) {
 		Sharpshooter ss = AbilityManager.getManager().getPlayerAbility(player, Sharpshooter.class);
-		return ss == null ? 1 : (1 + Math.min(MAX_EFFECTIVE_STACKS, ss.mStacks) * PERCENT_DAMAGE_PER_STACK);
+		return ss == null ? 1 : ((1 + ss.mStacks) * PERCENT_DAMAGE_PER_STACK);
 	}
 
 }

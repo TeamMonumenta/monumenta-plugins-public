@@ -8,6 +8,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.NavigableSet;
 import java.util.Set;
 import java.util.UUID;
 
@@ -70,8 +71,11 @@ import com.playmonumenta.plugins.bosses.BossManager;
 import com.playmonumenta.plugins.bosses.bosses.CrowdControlImmunityBoss;
 import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.classes.magic.MagicType;
+import com.playmonumenta.plugins.effects.Bleed;
+import com.playmonumenta.plugins.effects.Effect;
 import com.playmonumenta.plugins.effects.PercentDamageDealt;
 import com.playmonumenta.plugins.effects.PercentDamageReceived;
+import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.enchantments.Inferno;
 import com.playmonumenta.plugins.events.CustomDamageEvent;
 
@@ -751,7 +755,92 @@ public class EntityUtils {
 		plugin.mEffectManager.addEffect(mob, VULNERABILITY_EFFECT_NAME, new PercentDamageReceived(ticks, amount));
 	}
 
+	private static final String BLEED_EFFECT_NAME = "BleedEffect";
+
+	public static void applyBleed(Plugin plugin, int ticks, int level, LivingEntity mob) {
+		plugin.mEffectManager.addEffect(mob, BLEED_EFFECT_NAME, new Bleed(ticks, level, plugin));
+	}
+
+	public static boolean isBleeding(Plugin plugin, LivingEntity mob) {
+		NavigableSet<Effect> bleeds = plugin.mEffectManager.getEffects(mob, BLEED_EFFECT_NAME);
+		if (bleeds != null) {
+			return true;
+		}
+		return false;
+	}
+
+	public static int getBleedLevel(Plugin plugin, LivingEntity mob) {
+		NavigableSet<Effect> bleeds = plugin.mEffectManager.getEffects(mob, BLEED_EFFECT_NAME);
+		if (bleeds != null) {
+			Effect bleed = bleeds.last();
+			return (int) bleed.getMagnitude();
+		} else {
+			return 0;
+		}
+	}
+
+	public static int getBleedTicks(Plugin plugin, LivingEntity mob) {
+		NavigableSet<Effect> bleeds = plugin.mEffectManager.getEffects(mob, BLEED_EFFECT_NAME);
+		if (bleeds != null) {
+			Effect bleed = bleeds.last();
+			return bleed.getDuration();
+		} else {
+			return 0;
+		}
+	}
+
+	public static void setBleedTicks(Plugin plugin, LivingEntity mob, int ticks) {
+		NavigableSet<Effect> bleeds = plugin.mEffectManager.getEffects(mob, BLEED_EFFECT_NAME);
+		if (bleeds != null) {
+			Effect bleed = bleeds.last();
+			bleed.setDuration(ticks);
+		}
+	}
+
+	private static final String SLOW_EFFECT_NAME = "SlowEffect";
+
+	public static void applySlow(Plugin plugin, int ticks, double amount, LivingEntity mob) {
+		plugin.mEffectManager.addEffect(mob, SLOW_EFFECT_NAME, new PercentSpeed(ticks, -amount, SLOW_EFFECT_NAME));
+	}
+
+	public static boolean isSlowed(Plugin plugin, LivingEntity mob) {
+		NavigableSet<Effect> slows = plugin.mEffectManager.getEffects(mob, SLOW_EFFECT_NAME);
+		if (slows != null) {
+			return true;
+		}
+		return false;
+	}
+
+	public static double getSlowAmount(Plugin plugin, LivingEntity mob) {
+		NavigableSet<Effect> slows = plugin.mEffectManager.getEffects(mob, SLOW_EFFECT_NAME);
+		if (slows != null) {
+			Effect slow = slows.last();
+			return slow.getMagnitude();
+		} else {
+			return 0;
+		}
+	}
+
+	public static int getSlowTicks(Plugin plugin, LivingEntity mob) {
+		NavigableSet<Effect> slows = plugin.mEffectManager.getEffects(mob, SLOW_EFFECT_NAME);
+		if (slows != null) {
+			Effect slow = slows.last();
+			return slow.getDuration();
+		} else {
+			return 0;
+		}
+	}
+
+	public static void setSlowTicks(Plugin plugin, LivingEntity mob, int ticks) {
+		NavigableSet<Effect> slows = plugin.mEffectManager.getEffects(mob, SLOW_EFFECT_NAME);
+		if (slows != null) {
+			Effect slow = slows.last();
+			slow.setDuration(ticks);
+		}
+	}
+
 	private static final String WEAKEN_EFFECT_NAME = "WeakenEffect";
+
 	private static final EnumSet<DamageCause> WEAKEN_EFFECT_AFFECTED_DAMAGE_CAUSES = EnumSet.of(
 			DamageCause.ENTITY_ATTACK,
 			DamageCause.PROJECTILE

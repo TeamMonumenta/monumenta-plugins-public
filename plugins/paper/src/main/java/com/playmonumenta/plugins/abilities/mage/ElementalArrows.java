@@ -22,19 +22,21 @@ import com.playmonumenta.plugins.utils.PotionUtils;
 
 public class ElementalArrows extends Ability {
 
-	private static final int ELEMENTAL_ARROWS_1_DAMAGE = 1;
-	private static final int ELEMENTAL_ARROWS_2_DAMAGE = 3;
+	private static final double DAMAGE_MULTIPLIER_1 = 0.1;
+	private static final double DAMAGE_MULTIPLIER_2 = 0.2;
 	private static final int ELEMENTAL_ARROWS_BONUS_DAMAGE = 8;
 	private static final int ELEMENTAL_ARROWS_DURATION = 20 * 6;
 	private static final double ELEMENTAL_ARROWS_RADIUS = 3.0;
+	private double mLastDamage = 0;
+	private static final double SLOW_AMPLIFIER = 0.2;
 
 	public ElementalArrows(Plugin plugin, Player player) {
 		super(plugin, player, "Elemental Arrows");
 		mInfo.mLinkedSpell = Spells.ELEMENTAL_ARROWS;
 		mInfo.mScoreboardId = "Elemental";
 		mInfo.mShorthandName = "EA";
-		mInfo.mDescriptions.add("Your arrows are set on fire. If you are shooting an arrow while sneaking, it turns into an ice arrow instead, afflicting the target with 6 seconds of Slowness II. Fire and Ice arrows deal 1 extra damage. Ice arrows deal 8 extra damage to Blazes. Fire arrows deal 8 extra damage to strays. This skill can not apply Spellshock.");
-		mInfo.mDescriptions.add("Your fire arrows also set nearby enemies within a radius of 3 blocks on fire when they hit a target. Your ice arrows also slow nearby enemies within a radius of 3 blocks when they hit a target. Both area of effect effects do 3 damage to all targets affected.");
+		mInfo.mDescriptions.add("Your arrows are set on fire. If you are shooting an arrow while sneaking, it turns into an ice arrow instead, afflicting the target with 20% Slowness for 6 seconds. Fire and Ice arrows deal 10% extra damage. Ice arrows deal 8 extra damage to Blazes. Fire arrows deal 8 extra damage to strays. This skill can not apply Spellshock.");
+		mInfo.mDescriptions.add("Your fire arrows also set nearby enemies within a radius of 3 blocks on fire when they hit a target. Your ice arrows also slow nearby enemies within a radius of 3 blocks when they hit a target. Both area of effect effects do 20% bow damage to all targets affected.");
 	}
 
 	@Override
@@ -45,7 +47,7 @@ public class ElementalArrows extends Ability {
 		Arrow arrow = (Arrow) proj;
 
 		int elementalArrows = getAbilityScore();
-		int damage = elementalArrows == 1 ? ELEMENTAL_ARROWS_1_DAMAGE : ELEMENTAL_ARROWS_2_DAMAGE;
+		double damage = elementalArrows == 1 ? DAMAGE_MULTIPLIER_1 * event.getDamage() : DAMAGE_MULTIPLIER_2 * event.getDamage();
 		if (arrow.hasMetadata("ElementalArrowsFireArrow")) {
 			if (elementalArrows > 1) {
 				for (LivingEntity mob : EntityUtils.getNearbyMobs(damagee.getLocation(), ELEMENTAL_ARROWS_RADIUS, damagee)) {
@@ -59,11 +61,12 @@ public class ElementalArrows extends Ability {
 
 			EntityUtils.damageEntity(mPlugin, damagee, damage, mPlayer, MagicType.FIRE, true, mInfo.mLinkedSpell, false, true);
 			EntityUtils.applyFire(mPlugin, ELEMENTAL_ARROWS_DURATION, damagee, mPlayer);
+			mLastDamage = event.getDamage();
 		} else if (arrow.hasMetadata("ElementalArrowsIceArrow")) {
 			if (elementalArrows > 1) {
 				for (LivingEntity mob : EntityUtils.getNearbyMobs(damagee.getLocation(), ELEMENTAL_ARROWS_RADIUS, damagee)) {
 					EntityUtils.damageEntity(mPlugin, mob, damage, mPlayer, MagicType.ICE, true, mInfo.mLinkedSpell, false, true);
-					PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(PotionEffectType.SLOW, ELEMENTAL_ARROWS_DURATION, 1));
+					EntityUtils.applySlow(mPlugin, ELEMENTAL_ARROWS_DURATION, SLOW_AMPLIFIER, mob);
 				}
 			}
 			if (damagee instanceof Blaze) {
@@ -71,24 +74,30 @@ public class ElementalArrows extends Ability {
 			}
 
 			EntityUtils.damageEntity(mPlugin, damagee, damage, mPlayer, MagicType.ICE, true, mInfo.mLinkedSpell, false, true);
-			PotionUtils.applyPotion(mPlayer, damagee, new PotionEffect(PotionEffectType.SLOW, ELEMENTAL_ARROWS_DURATION, 1));
+			EntityUtils.applySlow(mPlugin, ELEMENTAL_ARROWS_DURATION, SLOW_AMPLIFIER, damagee);
+			mLastDamage = event.getDamage();
 		}
 
 		return true;
 	}
 
+	public double getLastDamage() {
+		return mLastDamage;
+	}
+
 	@Override
 	public boolean playerShotArrowEvent(AbstractArrow arrow) {
-		if (mPlayer.isSneaking()) {
-			arrow.setMetadata("ElementalArrowsIceArrow", new FixedMetadataValue(mPlugin, 0));
-			arrow.setFireTicks(0);
-			mPlugin.mProjectileEffectTimers.addEntity(arrow, Particle.SNOW_SHOVEL);
-		} else {
-			arrow.setMetadata("ElementalArrowsFireArrow", new FixedMetadataValue(mPlugin, 0));
-			arrow.setFireTicks(ELEMENTAL_ARROWS_DURATION);
-			mPlugin.mProjectileEffectTimers.addEntity(arrow, Particle.FLAME);
+		if (arrow.isCritical()) {
+			if (mPlayer.isSneaking()) {
+				arrow.setMetadata("ElementalArrowsIceArrow", new FixedMetadataValue(mPlugin, 0));
+				arrow.setFireTicks(0);
+				mPlugin.mProjectileEffectTimers.addEntity(arrow, Particle.SNOW_SHOVEL);
+			} else {
+				arrow.setMetadata("ElementalArrowsFireArrow", new FixedMetadataValue(mPlugin, 0));
+				arrow.setFireTicks(ELEMENTAL_ARROWS_DURATION);
+				mPlugin.mProjectileEffectTimers.addEntity(arrow, Particle.FLAME);
+			}
 		}
-
 		return true;
 	}
 }

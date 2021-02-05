@@ -5,7 +5,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-import com.playmonumenta.plugins.utils.FastUtils;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -19,41 +19,51 @@ import org.bukkit.util.Vector;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityManager;
+import com.playmonumenta.plugins.abilities.mage.ElementalArrows;
 import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.classes.magic.MagicType;
+import com.playmonumenta.plugins.enchantments.SpellDamage;
 import com.playmonumenta.plugins.events.CustomDamageEvent;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 
 
 public class ElementalSpiritFire extends Ability {
 
 	private static final int ES_FIRE_COOLDOWN = 20 * 12;
-	private static final int ES_FIRE_1_DAMAGE = 15;
-	private static final int ES_FIRE_2_DAMAGE = 24;
+	private static final int ES_FIRE_1_DAMAGE = 10;
+	private static final int ES_FIRE_2_DAMAGE = 15;
 	private static final double ES_FIRE_SIZE = 1.5;
 
 	private final int mDamage;
 	private final Set<LivingEntity> mMobsDamaged = new HashSet<>();
 	private BukkitRunnable mMobsDamagedParser;
 	private BukkitRunnable mParticleGenerator;
+	private ElementalArrows mElementalArrows;
 
 	public ElementalSpiritFire(Plugin plugin, Player player) {
 		super(plugin, player, "Elemental Spirit");
 		mInfo.mScoreboardId = "ElementalSpirit";
 		mInfo.mShorthandName = "ES";
-		mInfo.mDescriptions.add("You are accompanied a spirit of fire and a spirit of ice. Upon using a fire spell, the fire spirit will rush towards the farthest enemy hit with the spell, damaging all enemies along the way by 15. Upon using an ice spell, the ice spirit will rush towards the closest enemy hit with the spell, damaging mobs in a 3 block radius by 5 per second for 3 seconds. Each spirit operates on its own cooldown of 12s.");
-		mInfo.mDescriptions.add("Damage dealt by the fire spirit is increased to 24, and damage dealt by the ice spirit is increased to 8.");
+		mInfo.mDescriptions.add("You are accompanied a spirit of fire and a spirit of ice. Upon using a fire spell, the fire spirit will rush towards the farthest enemy hit with the spell, damaging all enemies along the way by 10 (25 percent of bow damage if using elemental arrows). Upon using an ice spell, the ice spirit will rush towards the closest enemy hit with the spell, damaging mobs in a 3 block radius by 4 per second (10% of bow damage if using elemental arrows) for 3 seconds. Each spirit operates on its own cooldown of 12s.");
+		mInfo.mDescriptions.add("Damage dealt by the fire spirit is increased to 15, and damage dealt by the ice spirit is increased to 6. The elemental arrows damage remains unchanged.");
 		mInfo.mLinkedSpell = Spells.ELEMENTAL_SPIRIT_FIRE;
 		mInfo.mCooldown = ES_FIRE_COOLDOWN;
 		mDamage = getAbilityScore() == 1 ? ES_FIRE_1_DAMAGE : ES_FIRE_2_DAMAGE;
+
+		// Needs to wait for the entire AbilityCollection to be initialized
+		Bukkit.getScheduler().runTask(plugin, () -> {
+			if (player != null) {
+				mElementalArrows = AbilityManager.getManager().getPlayerAbility(mPlayer, ElementalArrows.class);
+			}
+		});
 	}
 
 	@Override
 	public void playerDealtCustomDamageEvent(CustomDamageEvent event) {
 		if (event.getMagicType() == MagicType.FIRE && event.getSpell() != null && !event.getSpell().equals(mInfo.mLinkedSpell)) {
 			mMobsDamaged.add(event.getDamaged());
-
 			// We make 1 runnable that processes everything 1 tick later, so all the mob information is in.
 			if (mMobsDamagedParser == null) {
 				mMobsDamagedParser = new BukkitRunnable() {
@@ -82,13 +92,19 @@ public class ElementalSpiritFire extends Ability {
 							World world = mPlayer.getWorld();
 							world.playSound(loc, Sound.ENTITY_BLAZE_AMBIENT, 1, 0.5f);
 
+							float damage = SpellDamage.getSpellDamage(mPlayer, mDamage);
+
 							for (int i = 0; i < (int)(farthestDistance + 1); i++) {
 								Iterator<LivingEntity> iter = mobs.iterator();
 								while (iter.hasNext()) {
 									LivingEntity mob = iter.next();
 									if (mob.getBoundingBox().overlaps(fireSpirit)) {
 										mob.setNoDamageTicks(0);
-										EntityUtils.damageEntity(mPlugin, mob, mDamage, mPlayer, MagicType.FIRE, true, mInfo.mLinkedSpell);
+										if (event.getSpell().equals(Spells.ELEMENTAL_ARROWS) && mElementalArrows != null) {
+											EntityUtils.damageEntity(mPlugin, mob, mElementalArrows.getLastDamage() * 0.25, mPlayer, MagicType.FIRE, true, mInfo.mLinkedSpell);
+										} else {
+											EntityUtils.damageEntity(mPlugin, mob, damage, mPlayer, MagicType.FIRE, true, mInfo.mLinkedSpell);
+										}
 										iter.remove();
 									}
 								}

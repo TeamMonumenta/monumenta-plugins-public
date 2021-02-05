@@ -85,7 +85,7 @@ import com.playmonumenta.plugins.abilities.delves.StatMultiplier;
 import com.playmonumenta.plugins.abilities.delves.Transcendent;
 import com.playmonumenta.plugins.abilities.delves.Twisted;
 import com.playmonumenta.plugins.abilities.mage.ArcaneStrike;
-import com.playmonumenta.plugins.abilities.mage.Channeling;
+import com.playmonumenta.plugins.abilities.mage.ThunderStep;
 import com.playmonumenta.plugins.abilities.mage.ElementalArrows;
 import com.playmonumenta.plugins.abilities.mage.FrostNova;
 import com.playmonumenta.plugins.abilities.mage.MagePassive;
@@ -235,7 +235,7 @@ public class AbilityManager {
 
 		                               //********** MAGE **********//
 		                               new ArcaneStrike(mPlugin, null),
-		                               new Channeling(mPlugin, null),
+		                               new ThunderStep(mPlugin, null),
 		                               new ElementalArrows(mPlugin, null),
 		                               new FrostNova(mPlugin, null),
 		                               new MagePassive(mPlugin, null),

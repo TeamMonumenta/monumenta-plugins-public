@@ -23,9 +23,10 @@ import com.playmonumenta.plugins.utils.PotionUtils;
 
 public class EerieEminence extends Ability {
 
-	private static final double EERIE_1_RADIUS = 6;
-	private static final double EERIE_2_RADIUS = 8;
+	private static final double EERIE_RADIUS = 8;
 	private static final int EERIE_EFFECT_TIMER = 20 * 9;	// The linger still inherently exists for 1 second or so, bringing this up to essentially 10 seconds
+	private static final int EERIE_VULN_1 = 1;
+	private static final int EERIE_VULN_2 = 3;
 
 	private static class DebuffElement {
 		protected final PotionEffectType mDebuff;
@@ -55,7 +56,7 @@ public class EerieEminence extends Ability {
 		}
 	}
 
-	private final double mRadius;
+	private final int mVulnLevel;
 
 	private final List<DebuffElement> mDebuffs = new ArrayList<>();
 
@@ -63,9 +64,9 @@ public class EerieEminence extends Ability {
 		super(plugin, player, "Eerie Eminence");
 		mInfo.mScoreboardId = "EerieEminence";
 		mInfo.mShorthandName = "EE";
-		mInfo.mDescriptions.add("You gain an AoE debuff aura around you that applies a level 1 debuff for every of the following four skills that you used in the last 10s. Grasping Claws > Slowness. Consuming Flames > Set mobs on Fire. Fractal Enervation > Mining Fatigue. Withering Gaze > Wither. The AoE affects all enemies in a 6 block radius.");
-		mInfo.mDescriptions.add("The range is increased to 8. In addition it provides the opposite effect to players in range. Slowness > Speed. Set Fire > Extinguish Fire. Mining Fatigue > Haste. Wither > Regeneration.");
-		mRadius = getAbilityScore() == 1 ? EERIE_1_RADIUS : EERIE_2_RADIUS;
+		mInfo.mDescriptions.add("You gain an AoE debuff aura around you that applies 10% Vulnerability and a level 1 debuff for every of the following four skills that you used in the last 10s. Grasping Claws > 10% Slowness. Consuming Flames > Set mobs on Fire. Fractal Enervation > Mining Fatigue. Withering Gaze > Wither. The AoE affects all enemies in a 8 block radius.");
+		mInfo.mDescriptions.add("The Vulnerability is increased to 20%. In addition it provides the opposite effect to players in range. Slowness > Speed. Set Fire > Extinguish Fire. Mining Fatigue > Haste. Wither > Regeneration.");
+		mVulnLevel = getAbilityScore() == 1 ? EERIE_VULN_1 : EERIE_VULN_2;
 	}
 
 	@Override
@@ -92,7 +93,8 @@ public class EerieEminence extends Ability {
 
 				// Consuming Flames case
 				if (entry.getDebuff() == null) {
-					for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), mRadius)) {
+					for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), EERIE_RADIUS)) {
+						PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(PotionEffectType.UNLUCK, 30, mVulnLevel));
 						// Check that the mob is not on fire, that the mob can be set on fire, and that the mob won't be extinguished
 						if (mob.getFireTicks() <= 0 && !Inferno.mobHasInferno(mPlugin, mob)
 								&& (!EntityUtils.isFireResistant(mob) || PlayerTracking.getInstance().getPlayerCustomEnchantLevel(mPlayer, Inferno.class) > 0)
@@ -102,17 +104,23 @@ public class EerieEminence extends Ability {
 					}
 
 					if (getAbilityScore() > 1) {
-						for (Player player : PlayerUtils.playersInRange(mPlayer, mRadius, true)) {
+						for (Player player : PlayerUtils.playersInRange(mPlayer, EERIE_RADIUS, true)) {
 							player.setFireTicks(0);
 						}
 					}
 				} else {
-					for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), mRadius)) {
-						PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(entry.getDebuff(), 30, 0));
+					for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), EERIE_RADIUS)) {
+						PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(PotionEffectType.UNLUCK, 30, mVulnLevel));
+						// Custom slow interaction
+						if (entry.getDebuff().equals(PotionEffectType.SLOW)) {
+							EntityUtils.applySlow(mPlugin, 30, 0.1, mob);
+						} else {
+							PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(entry.getDebuff(), 30, 0));
+						}
 					}
 
 					if (getAbilityScore() > 1) {
-						for (Player player : PlayerUtils.playersInRange(mPlayer, mRadius, true)) {
+						for (Player player : PlayerUtils.playersInRange(mPlayer, EERIE_RADIUS, true)) {
 							if (entry.getBuff().equals(PotionEffectType.REGENERATION)) {
 								/* Can't heal with regen, because regen only heals 1 health every 50 ticks.
 								 * Instead, heal the same amount over the period (4 health over 10s)

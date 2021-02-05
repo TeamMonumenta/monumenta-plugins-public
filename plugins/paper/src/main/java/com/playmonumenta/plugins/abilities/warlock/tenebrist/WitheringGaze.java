@@ -45,7 +45,7 @@ public class WitheringGaze extends Ability {
 		super(plugin, player, "Withering Gaze");
 		mInfo.mScoreboardId = "WitheringGaze";
 		mInfo.mShorthandName = "WG";
-		mInfo.mDescriptions.add("Sprint left-clicking unleashes a 9 block long cone in the direction the player is facing. Enemies in its path are stunned for 3 seconds (elites and bosses are given Slowness 3 instead) and given Wither 3 for 6 seconds. Cooldown: 30s.");
+		mInfo.mDescriptions.add("Sprint left-clicking unleashes a 9 block long cone in the direction the player is facing. Enemies in its path are stunned for 3 seconds (elites and bosses are given 30% Slowness instead) and given Wither 3 for 6 seconds. Cooldown: 30s.");
 		mInfo.mDescriptions.add("Stun lasts for 4 seconds and Wither lasts for 8 seconds. Cooldown: 20s.");
 		mInfo.mLinkedSpell = Spells.WITHERING_GAZE;
 		mInfo.mCooldown = getAbilityScore() == 1 ? WITHERING_GAZE_1_COOLDOWN : WITHERING_GAZE_2_COOLDOWN;
@@ -89,7 +89,7 @@ public class WitheringGaze extends Ability {
 						if (direction.dot(eVec) > 0.4) {
 							LivingEntity le = (LivingEntity) e;
 							if (EntityUtils.isElite(le) || EntityUtils.isBoss(le) || ((e instanceof Player) && AbilityManager.getManager().isPvPEnabled((Player)e))) {
-								PotionUtils.applyPotion(player, le, new PotionEffect(PotionEffectType.SLOW, duration, 2));
+								EntityUtils.applySlow(mPlugin, duration, 0.3, le);
 							} else {
 								EntityUtils.applyStun(mPlugin, duration, le);
 							}

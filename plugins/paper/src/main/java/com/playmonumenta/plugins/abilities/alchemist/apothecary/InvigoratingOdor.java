@@ -30,8 +30,8 @@ public class InvigoratingOdor extends PotionAbility {
 		mInfo.mLinkedSpell = Spells.INVIGORATING_ODOR;
 		mInfo.mScoreboardId = "InvigoratingOdor";
 		mInfo.mShorthandName = "IO";
-		mInfo.mDescriptions.add("Alchemist Potions deal +1 damage and leave an aura for 3 seconds where they hit. The aura provides Speed I and Haste I to players for 10 seconds. The 50% chance for a potion on ally kills is increased to 75%.");
-		mInfo.mDescriptions.add("Alchemist Potions deal +2 damage and Resistance I is added to the aura. The chance for a potion on ally kills is increased to 100%.");
+		mInfo.mDescriptions.add("Alchemist Potions deal +1 damage and leave an aura for 3 seconds where they hit. The aura provides Speed I to players for 10 seconds. The 50% chance for a potion on ally kills is increased to 75%.");
+		mInfo.mDescriptions.add("Alchemist Potions deal +2 damage and Haste I is added to the aura. The chance for a potion on ally kills is increased to 100%.");
 	}
 
 	@Override
@@ -51,9 +51,8 @@ public class InvigoratingOdor extends PotionAbility {
 
 				for (Player player : PlayerUtils.playersInRange(loc, radius)) {
 					mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_OTHER, new PotionEffect(PotionEffectType.SPEED, INVIGORATING_DURATION, 0, true, true));
-					mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_OTHER, new PotionEffect(PotionEffectType.FAST_DIGGING, INVIGORATING_DURATION, 0, true, true));
 					if (getAbilityScore() > 1) {
-						mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_OTHER, new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 20 * 10, 0, true, true));
+						mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_OTHER, new PotionEffect(PotionEffectType.FAST_DIGGING, INVIGORATING_DURATION, 0, true, true));
 					}
 				}
 

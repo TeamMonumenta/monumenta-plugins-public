@@ -17,6 +17,7 @@ import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.classes.magic.MagicType;
+import com.playmonumenta.plugins.enchantments.SpellDamage;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
@@ -27,8 +28,8 @@ public class Starfall extends Ability {
 	private static final double STARFALL_ANGLE = 70.0;
 
 	private static final int STARFALL_COOLDOWN = 20 * 18;
-	private static final int STARFALL_1_DAMAGE = 20;
-	private static final int STARFALL_2_DAMAGE = 36;
+	private static final int STARFALL_1_DAMAGE = 14;
+	private static final int STARFALL_2_DAMAGE = 24;
 	private static final int STARFALL_FIRE_DURATION = 20 * 3;
 	private static final double STARFALL_RADIUS = 5;
 	private static final float STARFALL_KNOCKAWAY_SPEED = 0.7f;
@@ -43,8 +44,8 @@ public class Starfall extends Ability {
 		mInfo.mLinkedSpell = Spells.STARFALL;
 		mInfo.mScoreboardId = "Starfall";
 		mInfo.mShorthandName = "SF";
-		mInfo.mDescriptions.add("Right click while looking up to prime the next right click within 10s to summon a meteor where the player is looking (up to 25 blocks). It deals 20 damage in a 5 block radius and sets enemies on fire for 3 seconds. This spell can trigger SpellShock and will not trigger Mana Lance. Cooldown: 18s.");
-		mInfo.mDescriptions.add("Damage is increased to 36.");
+		mInfo.mDescriptions.add("Right click while looking up to prime the next right click within 10s to summon a meteor where the player is looking (up to 25 blocks). It deals 14 damage in a 5 block radius and sets enemies on fire for 3 seconds. This spell can trigger SpellShock and will not trigger Mana Lance. Cooldown: 18s.");
+		mInfo.mDescriptions.add("Damage is increased to 24.");
 		mInfo.mCooldown = STARFALL_COOLDOWN;
 		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
 		mDamage = getAbilityScore() == 1 ? STARFALL_1_DAMAGE : STARFALL_2_DAMAGE;
@@ -121,8 +122,10 @@ public class Starfall extends Ability {
 							world.spawnParticle(Particle.EXPLOSION_NORMAL, loc, 50, 0, 0, 0, 0.2F);
 							this.cancel();
 
+							float damage = SpellDamage.getSpellDamage(mPlayer, mDamage);
+
 							for (LivingEntity e : EntityUtils.getNearbyMobs(loc, STARFALL_RADIUS, mPlayer)) {
-								EntityUtils.damageEntity(mPlugin, e, mDamage, player, MagicType.FIRE, true, mInfo.mLinkedSpell);
+								EntityUtils.damageEntity(mPlugin, e, damage, player, MagicType.FIRE, true, mInfo.mLinkedSpell);
 								EntityUtils.applyFire(mPlugin, STARFALL_FIRE_DURATION, e, mPlayer);
 								MovementUtils.knockAway(loc, e, STARFALL_KNOCKAWAY_SPEED);
 							}

@@ -17,6 +17,7 @@ import org.bukkit.potion.PotionEffectType;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.utils.PotionUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
 
 public class PinningShot extends Ability {
 
@@ -24,6 +25,7 @@ public class PinningShot extends Ability {
 	private static final double PINNING_SHOT_2_DAMAGE_MULTIPLIER = 1.6;
 	private static final int PINNING_SHOT_1_DURATION = 20 * 4;
 	private static final int PINNING_SHOT_2_DURATION = 20 * 6;
+	private static final double PINNING_SLOW = 0.7;
 
 	private final double mDamageMultiplier;
 	private final int mDuration;
@@ -34,7 +36,7 @@ public class PinningShot extends Ability {
 		super(plugin, player, "Pinning Shot");
 		mInfo.mScoreboardId = "PinningShot";
 		mInfo.mShorthandName = "PSh";
-		mInfo.mDescriptions.add("The first time you shoot a non-boss enemy, pin it for 4s. Pinned enemies are afflicted with Slowness VII. Shooting a pinned enemy deals 20% more damage and removes the pin.");
+		mInfo.mDescriptions.add("The first time you shoot a non-boss enemy, pin it for 4s. Pinned enemies are afflicted with 70% Slowness. Shooting a pinned enemy deals 20% more damage and removes the pin.");
 		mInfo.mDescriptions.add("Pins last for 6s instead, and bonus damage when shooting pinned enemies is increased to 60%.");
 		mInfo.mIgnoreTriggerCap = true;
 
@@ -60,7 +62,7 @@ public class PinningShot extends Ability {
 			Location loc = damagee.getLocation();
 			world.playSound(loc, Sound.BLOCK_SLIME_BLOCK_PLACE, 1, 0.5f);
 			world.spawnParticle(Particle.EXPLOSION_NORMAL, loc, 8, 0, 0, 0, 0.2);
-			PotionUtils.applyPotion(mPlayer, damagee, new PotionEffect(PotionEffectType.SLOW, mDuration, 6));
+			EntityUtils.applySlow(mPlugin, mDuration, PINNING_SLOW, damagee);
 			mPinnedMobs.put(damagee, true);
 		}
 

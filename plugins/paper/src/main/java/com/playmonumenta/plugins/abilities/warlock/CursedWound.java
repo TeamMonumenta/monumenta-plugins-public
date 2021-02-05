@@ -10,8 +10,8 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
-import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.potion.PotionEffect;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
@@ -89,7 +89,15 @@ public class CursedWound extends Ability {
 					                     (mob.getWidth() / 2) + 0.1, mob.getHeight() / 3, (mob.getWidth() / 2) + 0.1, 0);
 					PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(PotionEffectType.WITHER, CURSED_WOUND_DURATION, CURSED_WOUND_EFFECT_LEVEL, true, false));
 					if (getAbilityScore() > 1) {
-						for (PotionEffectType effectType : PotionUtils.getNegativeEffects(mob)) {
+						//Bleed interaction
+						if (EntityUtils.isBleeding(mPlugin, mob)) {
+							EntityUtils.setBleedTicks(mPlugin, mob, EntityUtils.getBleedTicks(mPlugin, mob) + CURSED_WOUND_EXTENDED_DURATION);
+						}
+						//Custom slow effect interaction
+						if (EntityUtils.isSlowed(mPlugin, mob)) {
+							EntityUtils.setSlowTicks(mPlugin, mob, EntityUtils.getSlowTicks(mPlugin, mob) + CURSED_WOUND_EXTENDED_DURATION);
+						}
+						for (PotionEffectType effectType : PotionUtils.getNegativeEffects(mPlugin, mob)) {
 							PotionEffect effect = mob.getPotionEffect(effectType);
 							if (effect != null) {
 								mob.removePotionEffect(effectType);

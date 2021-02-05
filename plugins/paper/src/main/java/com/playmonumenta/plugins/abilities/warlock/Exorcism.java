@@ -36,7 +36,7 @@ public class Exorcism  extends Ability {
 		mInfo.mLinkedSpell = Spells.EXORCISM;
 		mInfo.mScoreboardId = "Exorcism";
 		mInfo.mShorthandName = "Ex";
-		mInfo.mDescriptions.add("Right click while looking down without sneaking removes all your debuffs and applies them to enemies within 12 blocks of you. Level of debuffs is preserved up to level 2. Cooldown: 25s.");
+		mInfo.mDescriptions.add("Right click while looking down without sneaking removes all your debuffs and applies them to enemies within 12 blocks of you. Slowness is converted to 10% Slowness per level. Level of debuffs is preserved up to level 2. Cooldown: 25s.");
 		mInfo.mDescriptions.add("Also apply the corresponding debuff to enemies for every buff you have. Cooldown: 15s.");
 		mInfo.mCooldown = getAbilityScore() == 1 ? COOLDOWN_1 : COOLDOWN_2;
 		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
@@ -80,7 +80,13 @@ public class Exorcism  extends Ability {
 
 		for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), RANGE)) {
 			for (PotionEffect debuff : mDebuffs) {
-				PotionUtils.applyPotion(mPlayer, mob, debuff);
+				// Custom slow interaction
+				if (debuff.getType() == PotionEffectType.SLOW) {
+					double slowLevel = debuff.getAmplifier() >= 1 ? 0.2 : 0.1;
+					EntityUtils.applySlow(mPlugin, DURATION, slowLevel, mob);
+				} else {
+					PotionUtils.applyPotion(mPlayer, mob, debuff);
+				}
 			}
 			if (onFire) {
 				EntityUtils.applyFire(mPlugin, DURATION, mob, mPlayer);

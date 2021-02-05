@@ -27,6 +27,7 @@ import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.effects.SpellShockStatic;
 import com.playmonumenta.plugins.enchantments.BaseAbilityEnchantment;
 import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
+import com.playmonumenta.plugins.enchantments.SpellDamage;
 import com.playmonumenta.plugins.events.CustomDamageEvent;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
@@ -52,21 +53,27 @@ public class Spellshock extends Ability {
 	private static final int DURATION = 6 * 20;
 	private static final double PERCENT_SPEED_EFFECT_2 = 0.15;
 
-	private static final int DAMAGE_1 = 3;
-	private static final int DAMAGE_2 = 5;
+	private static final float DAMAGE_1 = 2.5f;
+	private static final float DAMAGE_2 = 4.0f;
 	private static final int RADIUS = 3;
+
+	private final float mDamage;
 
 	public Spellshock(Plugin plugin, Player player) {
 		super(plugin, player, "Spellshock");
 		mInfo.mLinkedSpell = Spells.SPELLSHOCK;
 		mInfo.mScoreboardId = "SpellShock";
 		mInfo.mShorthandName = "SS";
-		mInfo.mDescriptions.add("Hitting an enemy with a wand or spell inflicts “static” for 6 seconds. If an enemy with static is hit by another spell, a spellshock centered on the enemy deals 3 damage to all mobs in a 3 block radius. Spellshock can cause a chain reaction on enemies with static. An enemy can only be hit by a spellshock once per tick.");
-		mInfo.mDescriptions.add("Damage is increased to 5. Additionally, gain +15% speed for 6 seconds whenever a spellshock is triggered.");
+		mInfo.mDescriptions.add("Hitting an enemy with a wand or spell inflicts static for 6 seconds. If an enemy with static is hit by another spell, a spellshock centered on the enemy deals 2.5 damage to all mobs in a 3 block radius. Spellshock can cause a chain reaction on enemies with static. An enemy can only be hit by a spellshock once per tick.");
+		mInfo.mDescriptions.add("Damage is increased to 4. Additionally, gain +15% speed for 6 seconds whenever a spellshock is triggered.");
+		mDamage = getAbilityScore() == 1 ? DAMAGE_1 : DAMAGE_2;
 	}
 
 	@Override
 	public void playerDealtCustomDamageEvent(CustomDamageEvent event) {
+		if (event.getSpell() == null) {
+			return;
+		}
 		LivingEntity mob = event.getDamaged();
 
 		// Check if the mob has static, and trigger it if possible; otherwise, apply/refresh it
@@ -96,9 +103,8 @@ public class Spellshock extends Ability {
 				triggeredMobs.add(mob);
 
 				int radius = (int) SpellshockRadiusEnchantment.getRadius(mPlayer, RADIUS, SpellshockRadiusEnchantment.class);
-				int damage = getAbilityScore() == 1 ? DAMAGE_1 : DAMAGE_2;
-				damage += SpellshockDamageEnchantment.getExtraDamage(mPlayer, SpellshockDamageEnchantment.class);
-
+				float damage = mDamage + SpellshockDamageEnchantment.getExtraDamage(mPlayer, SpellshockDamageEnchantment.class);
+				damage = SpellDamage.getSpellDamage(mPlayer, damage);
 				/*
 				 * Loop through triggeredMobs, and check distances to each in nearbyMobs. If in range,
 				 * deal damage. If the mob can be triggered, trigger it, adding it before the iteration

@@ -47,6 +47,7 @@ public class HallowedBeam extends MultipleChargeAbility {
 	private static final int HALLOWED_RADIUS = 4;
 	private static final int HALLOWED_UNDEAD_STUN = 10; // 20 * 0.5
 	private static final int HALLOWED_LIVING_STUN = 20 * 2;
+	private static final int CAST_RANGE = 30;
 
 	public HallowedBeam(Plugin plugin, Player player) {
 		super(plugin, player, "Hallowed Beam", HALLOWED_1_MAX_CHARGES, HALLOWED_2_MAX_CHARGES);
@@ -63,7 +64,7 @@ public class HallowedBeam extends MultipleChargeAbility {
 	@Override
 	public void cast(Action action) {
 		Player player = mPlayer;
-		LivingEntity e = EntityUtils.getEntityAtCursor(player, 30, true, true, true);
+		LivingEntity e = EntityUtils.getEntityAtCursor(player, CAST_RANGE, true, true, true);
 
 		PlayerInventory inventory = mPlayer.getInventory();
 		ItemStack inMainHand = inventory.getItemInMainHand();
@@ -84,7 +85,7 @@ public class HallowedBeam extends MultipleChargeAbility {
 					world.playSound(loc, Sound.ENTITY_ARROW_SHOOT, 1, 0.9f);
 
 					if (e == null) {
-						for (int i = 0; i < 30; i++) {
+						for (int i = 0; i < CAST_RANGE; i++) {
 							loc.add(dir);
 							world.spawnParticle(Particle.VILLAGER_HAPPY, loc, 5, 0.25, 0.25, 0.25, 0);
 							world.spawnParticle(Particle.EXPLOSION_NORMAL, loc, 2, 0.05f, 0.05f, 0.05f, 0.025f);
@@ -93,7 +94,7 @@ public class HallowedBeam extends MultipleChargeAbility {
 						return;
 					}
 
-					for (int i = 0; i < 30; i++) {
+					for (int i = 0; i < CAST_RANGE; i++) {
 						loc.add(dir);
 						world.spawnParticle(Particle.VILLAGER_HAPPY, loc, 5, 0.25, 0.25, 0.25, 0);
 						world.spawnParticle(Particle.EXPLOSION_NORMAL, loc, 2, 0.05f, 0.05f, 0.05f, 0.025f);
@@ -108,7 +109,7 @@ public class HallowedBeam extends MultipleChargeAbility {
 						Location eLoc = pe.getLocation().add(0, pe.getHeight() / 2, 0);
 						world.spawnParticle(Particle.SPELL_INSTANT, pe.getLocation(), 500, 2.5, 0.15f, 2.5, 1);
 						world.spawnParticle(Particle.VILLAGER_HAPPY, pe.getLocation(), 150, 2.55, 0.15f, 2.5, 1);
-						world.playSound(loc, Sound.ITEM_HONEY_BOTTLE_DRINK, 2, 1.5f);
+						world.playSound(player.getEyeLocation(), Sound.ITEM_HONEY_BOTTLE_DRINK, 2, 1.5f);
 						AttributeInstance maxHealth = pe.getAttribute(Attribute.GENERIC_MAX_HEALTH);
 						if (maxHealth != null) {
 							PlayerUtils.healPlayer(pe, maxHealth.getValue() * HALLOWED_HEAL_PERCENT);
@@ -164,6 +165,16 @@ public class HallowedBeam extends MultipleChargeAbility {
 		}
 
 		return true;
+	}
+	
+	@Override
+	public boolean runCheck() {
+		LivingEntity targetEntity = EntityUtils.getEntityAtCursor(mPlayer, CAST_RANGE, true, true, true);
+		if ((targetEntity instanceof Player && ((Player) targetEntity).getGameMode() != GameMode.SPECTATOR) 
+				|| EntityUtils.isHostileMob(targetEntity)) {
+			return !mPlayer.isSneaking();
+		}
+		return false;
 	}
 
 }

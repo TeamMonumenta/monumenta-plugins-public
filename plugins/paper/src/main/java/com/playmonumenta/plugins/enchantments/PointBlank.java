@@ -67,7 +67,7 @@ public class PointBlank implements BaseEnchantment {
 				// TODO: Fix this shitty particle! Maybe add sound?
 				target.getWorld().spawnParticle(Particle.SMOKE_NORMAL, target.getEyeLocation(), 30, 0, 0, 0, 0.25);
 				target.getWorld().spawnParticle(Particle.CRIT_MAGIC, target.getEyeLocation(), 30, 0, 0, 0, 0.65);
-				target.getWorld().playSound(target.getLocation(), Sound.ENTITY_ARMOR_STAND_BREAK, 1, 0.75f);
+				target.getWorld().playSound(target.getLocation(), Sound.ENTITY_ARMOR_STAND_BREAK, 1.5f, 0.75f);
 			}
 		}
 	}

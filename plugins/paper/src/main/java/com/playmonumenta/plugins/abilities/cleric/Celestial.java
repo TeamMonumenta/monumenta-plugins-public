@@ -10,6 +10,7 @@ import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
@@ -39,6 +40,11 @@ public class Celestial extends Ability {
 	private static final double CELESTIAL_2_EXTRA_DAMAGE = 0.35;
 	private static final double CELESTIAL_EXTRA_SPEED = 0.20;
 	private static final String ATTR_NAME = "CelestialBlessingExtraSpeedAttr";
+	private static final EnumSet<DamageCause> AFFECTED_DAMAGE_CAUSES = EnumSet.of(
+			DamageCause.ENTITY_ATTACK,
+			DamageCause.ENTITY_SWEEP_ATTACK,
+			DamageCause.PROJECTILE
+	);
 
 	public Celestial(Plugin plugin, Player player) {
 		super(plugin, player, "Celestial Blessing");
@@ -67,7 +73,7 @@ public class Celestial extends Ability {
 
 		// Give these players the metadata tag that boosts their damage
 		for (Player p : affectedPlayers) {
-			mPlugin.mEffectManager.addEffect(p, "CelestialBlessingExtraDamage", new PercentDamageDealt(duration, extraDamage));
+			mPlugin.mEffectManager.addEffect(p, "CelestialBlessingExtraDamage", new PercentDamageDealt(duration, extraDamage, AFFECTED_DAMAGE_CAUSES));
 			mPlugin.mEffectManager.addEffect(p, "CelestialBlessingExtraSpeed", new PercentSpeed(duration, CELESTIAL_EXTRA_SPEED, ATTR_NAME));
 			mPlugin.mEffectManager.addEffect(p, "CelestialBlessingParticles", new Aesthetics(duration,
 				(entity, fourHertz, twoHertz, oneHertz) -> {

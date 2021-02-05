@@ -83,10 +83,14 @@ public class Spark implements BaseEnchantment {
 			if (target instanceof Guardian || target instanceof IronGolem) {
 				event.setDamage(event.getDamage() + 1.0);
 			}
+			
+			double rand = FastUtils.RANDOM.nextDouble();
 
-			//0.5 second stun
-			if (!EntityUtils.isBoss(target) && !EntityUtils.isElite(target)) {
-				EntityUtils.applyStun(plugin, 10, target);
+			//50% chance for 0.5 second stun
+			if (rand < 0.5) {
+				if (!EntityUtils.isBoss(target) && !EntityUtils.isElite(target)) {
+					EntityUtils.applyStun(plugin, 10, target);
+				}
 			} else {
 				return;
 			}

@@ -196,25 +196,30 @@ public class Inferno implements BaseEnchantment {
 						// TODO: Better water hitbox registration (not a huge issue because fire resistant mobs near water is a fringe case)
 						if (!mob.isValid() || mob.getHealth() <= 0) {
 							infernoMobsIter.remove();
+							continue;
 						} else if (EntityUtils.isFireResistant(mob)) {
 							if (mob.getLocation().getBlock().getType() == Material.WATER
 								|| ticksLived - mob.getMetadata(SET_FIRE_TICK_METAKEY).get(0).asInt() >= FIRE_RESISTANT_INFERNO_TICKS) {
 								infernoMobsIter.remove();
+								continue;
 							}
 						} else if (mob.getFireTicks() < 20) {
 							// 20 ticks is the default value for how long a mob can be on fire without burning
 							infernoMobsIter.remove();
+							continue;
 						}
 
 						// If the mob hasn't taken a fire tick in the past second, then give it a manual damage tick
 						// This is usually caused by another DoT (wither 3, usually) eating iFrames, or the mob being fire resistant
 						if (ticksLived - mob.getMetadata(FIRE_TICK_METAKEY).get(0).asInt() > 20) {
+							double lastDamage = mob.getLastDamage();
 							double damage = EntityUtils.isFireResistant(mob) == true ? value.mFireResistantDamage : value.mLevel;
 							damage *= EntityUtils.vulnerabilityMult(mob);
 							mob.setNoDamageTicks(0);
 							mob.getWorld().spawnParticle(Particle.FLAME, mob.getLocation().add(0, 1, 0), 11, 0.4, 0.4, 0.4, 0.05);
 							Vector velocity = mob.getVelocity();
-							EntityUtils.damageEntity(plugin, mob, 1 + damage, value.mTriggeredBy, MagicType.ALCHEMY /* Use a better type here */);
+							EntityUtils.damageEntity(plugin, mob, 1 + damage, value.mTriggeredBy, MagicType.FIRE);
+							mob.setLastDamage(lastDamage + 1 + damage);
 							mob.setVelocity(velocity);
 							mob.setMetadata(FIRE_TICK_METAKEY, new FixedMetadataValue(plugin, mob.getTicksLived()));
 						}
@@ -244,7 +249,6 @@ public class Inferno implements BaseEnchantment {
 				mob.setMetadata(FIRE_TICK_METAKEY, new FixedMetadataValue(Plugin.getInstance(), mob.getTicksLived()));
 				mob.getWorld().spawnParticle(Particle.FLAME, mob.getLocation().add(0, 1, 0), 11, 0.4, 0.4, 0.4, 0.05);
 				event.setDamage((event.getDamage() + infernoValue) * EntityUtils.vulnerabilityMult(mob));
-
 			}
 		}
 	}

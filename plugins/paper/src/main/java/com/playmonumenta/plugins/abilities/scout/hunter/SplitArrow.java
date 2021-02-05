@@ -36,7 +36,7 @@ public class SplitArrow extends Ability {
 		mInfo.mLinkedSpell = Spells.SPLIT_ARROW;
 		mInfo.mScoreboardId = "SplitArrow";
 		mInfo.mShorthandName = "SA";
-		mInfo.mDescriptions.add("When you hit an enemy with an arrow, the next nearest enemy within 5 blocks takes 40% of the original arrow damage (ignores invulnerability frames). Any effects the arrows might have are also applied.");
+		mInfo.mDescriptions.add("When you hit an enemy with an arrow, the next nearest enemy within 5 blocks takes 40% of the original arrow damage (ignores invulnerability frames).");
 		mInfo.mDescriptions.add("Damage to the second target is increased to 70% of the original arrow damage.");
 		mInfo.mIgnoreTriggerCap = true;
 
@@ -65,19 +65,10 @@ public class SplitArrow extends Ability {
 				world.playSound(eye, Sound.ENTITY_ARROW_HIT, 1, 1.2f);
 
 				nearestMob.setNoDamageTicks(0);
+				double lastDamage = nearestMob.getLastDamage();
 				EntityUtils.damageEntity(mPlugin, nearestMob, event.getDamage() * mDamagePercent, mPlayer, MagicType.PHYSICAL, true, mInfo.mLinkedSpell);
-				nearestMob.setNoDamageTicks(0);
+				nearestMob.setLastDamage(lastDamage + event.getDamage() * mDamagePercent);
 				MovementUtils.knockAway(damagee, nearestMob, 0.125f, 0.35f);
-
-				if (proj.getFireTicks() > 0) {
-					// Since Flame sets enemies on fire for 5 seconds.
-					nearestMob.setFireTicks(100);
-				}
-
-				if (proj instanceof SpectralArrow) {
-					// Copy over the spectral arrow glowing effect to the second mob as well
-					nearestMob.addPotionEffect(SPECTRAL_ARROW_EFFECT);
-				}
 			}
 		}
 
