@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.abilities.delves;
 
+import org.bukkit.entity.Creeper;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Flying;
 import org.bukkit.entity.LivingEntity;
@@ -55,6 +56,11 @@ public class Chivalrous extends DelveModifier {
 			Entity mount = LibraryOfSoulsIntegration.summon(mob.getLocation(), MOUNTS[FastUtils.RANDOM.nextInt(MOUNTS.length)]);
 			mount.addPassenger(mob);
 			mob.addScoreboardTag(AntiRangeBoss.identityTag);
+
+			if (mob instanceof Creeper) {
+				Creeper creeper = (Creeper) mob;
+				creeper.setExplosionRadius((creeper.getExplosionRadius() + 1) / 2);
+			}
 		}
 	}
 

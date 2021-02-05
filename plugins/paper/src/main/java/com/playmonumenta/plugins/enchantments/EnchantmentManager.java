@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.enchantments;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.EnumMap;
 import java.util.HashMap;
@@ -51,6 +52,11 @@ public class EnchantmentManager implements Listener {
 		INVENTORY, // Includes everything, including armor, offhand, and hotbar
 		NONE,
 	}
+
+	public static final List<BaseEnchantment> CROSS_REGION_PROPERTIES = Arrays.asList(
+			new RegionScalingDamageDealt(),
+			new Recoil()
+	);
 
 	/*
 	 * Keep a map of which properties apply to which slots
@@ -243,7 +249,10 @@ public class EnchantmentManager implements Listener {
 		RegionScalingDamageDealt regionScaling = new RegionScalingDamageDealt();
 		if (slot == ItemSlot.MAINHAND && !ServerProperties.getClassSpecializationsEnabled()
 				&& regionScaling.getLevelFromItem(item, player) > 0) {
-			updateItem(plugin, index, slot, item, player, new RegionScalingDamageDealt(), propertyMap, inventoryMap);
+			for (BaseEnchantment property : CROSS_REGION_PROPERTIES) {
+				updateItem(plugin, index, slot, item, player, property, propertyMap, inventoryMap);
+			}
+
 			return;
 		}
 

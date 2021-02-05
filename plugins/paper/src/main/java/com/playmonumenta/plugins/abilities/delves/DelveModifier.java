@@ -10,6 +10,8 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.EntitySpawnEvent;
 import org.bukkit.event.entity.SpawnerSpawnEvent;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 import org.bukkit.projectiles.ProjectileSource;
 
 import com.playmonumenta.plugins.Plugin;
@@ -89,10 +91,13 @@ public class DelveModifier extends Ability {
 		if (EntityUtils.isHostileMob(mob)) {
 			Set<String> tags = mob.getScoreboardTags();
 			if (tags == null || !tags.contains(AVOID_MODIFIERS)) {
-				applyModifiers(mob, event);
+				PotionEffect resistance = mob.getPotionEffect(PotionEffectType.DAMAGE_RESISTANCE);
+				if (resistance == null || resistance.getAmplifier() < 4 || resistance.getDuration() < 20 * 8) {
+					applyModifiers(mob, event);
 
-				if (event instanceof SpawnerSpawnEvent) {
-					applyModifiers(mob, (SpawnerSpawnEvent) event);
+					if (event instanceof SpawnerSpawnEvent) {
+						applyModifiers(mob, (SpawnerSpawnEvent) event);
+					}
 				}
 			}
 		}

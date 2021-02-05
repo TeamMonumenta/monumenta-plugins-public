@@ -99,8 +99,7 @@ public class ChestOverride extends BaseOverride {
 			return true;
 		} else if (player.getGameMode() != GameMode.SPECTATOR) {
 			DelvesUtils.setDelveLootTable(player, block);
-			TOVUtils.setTOVLootTable(plugin, player, block);
-			return true;
+			return TOVUtils.setTOVLootTable(plugin, player, block);
 		}
 
 		/* Only spectating players get to here */

@@ -15,7 +15,8 @@ import com.playmonumenta.plugins.Plugin;
 
 public class TOVUtils {
 
-	public static final String CACHE_NAME = "TOVCache";
+	public static final String UNOPENED_CACHE_NAME = "TOVCache";
+	public static final String OPENED_CACHE_NAME = "Cache";
 	public static final String CACHE_LOOT_TABLE = "r2/treasure_hunt/cache";
 
 	public static final String CACHES_OPENED_SCORE = "TreasureHunt";
@@ -24,23 +25,37 @@ public class TOVUtils {
 
 	public static boolean canBreak(Plugin plugin, Player player, Block block, BlockBreakEvent event) {
 		BlockState blockState = block.getState();
-		if (blockState instanceof Chest && CACHE_NAME.equals(((Chest) blockState).getCustomName())) {
-			MessagingUtils.sendActionBarMessage(plugin, player, "You cannot break Treasures of Viridia Caches.");
+		if (blockState instanceof Chest) {
+			String name = ((Chest) blockState).getCustomName();
+			if (UNOPENED_CACHE_NAME.equals(name) || OPENED_CACHE_NAME.equals(name)) {
+				MessagingUtils.sendActionBarMessage(plugin, player, "You cannot break Treasures of Viridia Caches.");
+
+				return false;
+			}
 		}
 
 		return true;
 	}
 
-	public static void setTOVLootTable(Plugin plugin, Player player, Block block) {
+	public static boolean setTOVLootTable(Plugin plugin, Player player, Block block) {
 		BlockState blockState = block.getState();
 		if (blockState instanceof Chest) {
 			Chest chest = (Chest) blockState;
-			if (CACHE_NAME.equals(chest.getCustomName()) && canOpen(plugin, player)) {
-				chest.setCustomName(null);
-				chest.setLootTable(Bukkit.getLootTable(new NamespacedKey("epic", CACHE_LOOT_TABLE)));
-				chest.update();
+			String name = ((Chest) blockState).getCustomName();
+			if (UNOPENED_CACHE_NAME.equals(name) || OPENED_CACHE_NAME.equals(name)) {
+				if (!canOpen(plugin, player)) {
+					return false;
+				}
+
+				if (UNOPENED_CACHE_NAME.equals(name)) {
+					chest.setCustomName(OPENED_CACHE_NAME);
+					chest.setLootTable(Bukkit.getLootTable(new NamespacedKey("epic", CACHE_LOOT_TABLE)));
+					chest.update();
+				}
 			}
 		}
+
+		return true;
 	}
 
 	private static boolean canOpen(Plugin plugin, Player player) {
