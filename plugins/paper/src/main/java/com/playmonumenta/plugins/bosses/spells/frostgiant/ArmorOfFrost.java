@@ -88,7 +88,7 @@ public class ArmorOfFrost extends Spell {
 
 				//Debug purposes
 				ItemMeta im = ((Player)event.getDamager()).getInventory().getItemInMainHand().getItemMeta();
-				if (im.getDisplayName().equals("Frost Giant Damager")) {
+				if (im != null && im.getDisplayName().equals("Frost Giant Damager")) {
 					return;
 				}
 

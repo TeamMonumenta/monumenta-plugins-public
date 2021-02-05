@@ -1,14 +1,18 @@
 package com.playmonumenta.plugins.bosses.spells.frostgiant;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.bukkit.Color;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.World;
+import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
@@ -115,6 +119,10 @@ public class SpellFrostRift extends Spell {
 	private void createRift(Player target, List<Player> players) {
 		List<Location> locs = new ArrayList<Location>();
 		World world = target.getWorld();
+
+		Map<Location, Material> oldBlocks = new HashMap<>();
+		Map<Location, BlockData> oldData = new HashMap<>();
+
 		new BukkitRunnable() {
 			Location mLoc = mBoss.getLocation().add(0, 0.5, 0);
 			World mWorld = mLoc.getWorld();
@@ -144,6 +152,16 @@ public class SpellFrostRift extends Spell {
 						}
 					}
 				}
+
+				//Do not replace frosted ice back down, set it to cracked stone bricks
+				if (bLoc.getBlock().getType() == Material.FROSTED_ICE) {
+					oldBlocks.put(bLoc.clone(), Material.CRACKED_STONE_BRICKS);
+				} else {
+					oldBlocks.put(bLoc.clone(), bLoc.getBlock().getType());
+					oldData.put(bLoc.clone(), bLoc.getBlock().getBlockData());
+				}
+				bLoc.getBlock().setType(Material.BLACKSTONE);
+
 				bLoc.add(0, 0.5, 0);
 
 				locs.add(bLoc);
@@ -187,6 +205,12 @@ public class SpellFrostRift extends Spell {
 
 				if (mT >= 20 * 18) {
 					this.cancel();
+					for (Map.Entry<Location, Material> e : oldBlocks.entrySet()) {
+						e.getKey().getBlock().setType(e.getValue());
+						if (oldData.containsKey(e.getKey())) {
+							e.getKey().getBlock().setBlockData(oldData.get(e.getKey()));
+						}
+					}
 					locs.clear();
 				}
 			}

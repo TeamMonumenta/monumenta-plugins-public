@@ -2,16 +2,13 @@ package com.playmonumenta.plugins.bosses.spells.kaul;
 
 import java.util.List;
 
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
-import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.entity.Spider;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -82,37 +79,29 @@ public class SpellArachnopocolypse extends Spell {
 
 	}
 
+	private static final String[] SPIDER_SUMMONS = {
+	        "BlackrootBroodmother",
+	        "BlackrootArachnid",
+	        "ShieldbreakerSpider",
+	        "BlackrootMonster"
+	};
+
 	public void riseSpider(Location loc) {
-		int num = FastUtils.RANDOM.nextInt(3);//5
-		String summon = null;
-		if (num == 0) {
-			Spider spider = (Spider) LibraryOfSoulsIntegration.summon(loc.clone().add(0, 1, 0), "CorruptedSpider");
-			spider.getAttribute(Attribute.GENERIC_FOLLOW_RANGE).setBaseValue(100);
-		} else if (num == 1) {
-			Spider spider = (Spider) LibraryOfSoulsIntegration.summon(loc.clone().add(0, 1, 0), "ShieldcrusherSpider");
-			spider.getAttribute(Attribute.GENERIC_FOLLOW_RANGE).setBaseValue(100);
-		} else if (num == 2) {
-			Spider spider = (Spider) LibraryOfSoulsIntegration.summon(loc.clone().add(0, 1, 0), "MonstrousSpider");
-			spider.getAttribute(Attribute.GENERIC_FOLLOW_RANGE).setBaseValue(100);
-		}
-
-		String toSummon = summon;
-		new BukkitRunnable() {
-			int mTicks = 0;
-			@Override
-			public void run() {
-				mTicks++;
-				loc.getWorld().spawnParticle(Particle.BLOCK_DUST, loc, 2, 0.4, 0.1, 0.4, 0.25, Material.DIRT.createBlockData());
-
-				if (mTicks >= 20) {
-					this.cancel();
-					loc.getWorld().playSound(loc, Sound.BLOCK_GRAVEL_BREAK, 1, 1f);
-					loc.getWorld().spawnParticle(Particle.BLOCK_DUST, loc, 16, 0.25, 0.1, 0.25, 0.25, Material.DIRT.createBlockData());
-					Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), toSummon);
-				}
-			}
-
-		}.runTaskTimer(mPlugin, 0, 1);
+	    new BukkitRunnable() {
+	        int mTicks = 0;
+	        @Override
+	        public void run() {
+	            mTicks++;
+	            World world = loc.getWorld();
+	            world.spawnParticle(Particle.BLOCK_DUST, loc, 2, 0.4, 0.1, 0.4, 0.25, Material.DIRT.createBlockData());
+	            if (mTicks >= 20) {
+	                this.cancel();
+	                world.playSound(loc, Sound.BLOCK_GRAVEL_BREAK, 1, 1f);
+	                world.spawnParticle(Particle.BLOCK_DUST, loc, 16, 0.25, 0.1, 0.25, 0.25, Material.DIRT.createBlockData());
+	                LibraryOfSoulsIntegration.summon(loc.clone().add(0, 1, 0), SPIDER_SUMMONS[FastUtils.RANDOM.nextInt(SPIDER_SUMMONS.length)]);
+	            }
+	        }
+	    }.runTaskTimer(mPlugin, 0, 1);
 	}
 
 	private Location getRandomLocation(Location origin, double range) {

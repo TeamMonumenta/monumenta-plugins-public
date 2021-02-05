@@ -293,7 +293,8 @@ public class ItemUtils {
 		Attribute.ATTACK_SPEED,
 		Attribute.PROJECTILE_SPEED,
 		Attribute.THROW_RATE,
-		Attribute.THORNS_DAMAGE
+		Attribute.THORNS_DAMAGE,
+		Attribute.ABILITY_POWER
 	);
 
 	public static final Set<Material> dyes = EnumSet.of(

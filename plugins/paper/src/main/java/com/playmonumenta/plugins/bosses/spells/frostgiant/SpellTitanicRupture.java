@@ -44,6 +44,7 @@ public class SpellTitanicRupture extends Spell {
 
 	@Override
 	public void run() {
+		FrostGiant.freezeGolems(mBoss);
 		mCooldown = true;
 		new BukkitRunnable() {
 
@@ -164,7 +165,7 @@ public class SpellTitanicRupture extends Spell {
 							world.spawnParticle(Particle.DRAGON_BREATH, loc.clone().add(5 * cos, 0, 5 * sin), 1, 0.15, 0.15, 0.15, 0.1);
 						}
 					}
-
+					FrostGiant.unfreezeGolems(mBoss);
 					this.cancel();
 				}
 

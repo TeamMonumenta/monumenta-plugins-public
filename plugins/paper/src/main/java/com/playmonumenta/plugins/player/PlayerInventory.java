@@ -246,6 +246,10 @@ public class PlayerInventory {
 
 			property.onDamage(plugin, player, level, target, event);
 		}
+
+		for (BaseAttribute attribute : plugin.mAttributeManager.mAttributes) {
+			attribute.onDamage(plugin, player, plugin.mAttributeManager.mAttributeTrie.get(attribute.getProperty(), player), event);
+		}
 	}
 
 	public void onAbility(Plugin plugin, Player player, LivingEntity target, CustomDamageEvent event) {

@@ -17,7 +17,6 @@ import com.playmonumenta.plugins.Plugin;
 */
 public class AttributeThornsDamage implements BaseAttribute {
 	private static final String PROPERTY_NAME = "Thorns Damage";
-	public static final String DAMAGE_METAKEY = "AttributeThornsDamageMetakey";
 
 	@Override
 	public String getProperty() {

@@ -13,6 +13,7 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import com.playmonumenta.plugins.bosses.bosses.FrostGiant;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
@@ -35,6 +36,7 @@ public class SpellWhirlwind extends Spell {
 
 	@Override
 	public void run() {
+		FrostGiant.freezeGolems(mBoss);
 		World world = mBoss.getWorld();
 		world.playSound(mBoss.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, SoundCategory.HOSTILE, 3, 0.25f);
 		world.playSound(mBoss.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, SoundCategory.HOSTILE, 3, 0.65f);
@@ -73,6 +75,7 @@ public class SpellWhirlwind extends Spell {
 				//After 1.5 seconds, starts moving and attacking
 				if (mTicks >= 30) {
 					mBoss.setAI(true);
+					FrostGiant.unfreezeGolems(mBoss);
 					if (target != null) {
 						c.setTarget(target);
 					}

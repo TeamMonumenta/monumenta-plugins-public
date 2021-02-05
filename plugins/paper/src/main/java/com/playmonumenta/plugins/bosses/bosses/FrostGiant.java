@@ -63,6 +63,7 @@ import com.playmonumenta.plugins.bosses.spells.frostgiant.SpellHailstorm;
 import com.playmonumenta.plugins.bosses.spells.frostgiant.SpellSpinDown;
 import com.playmonumenta.plugins.bosses.spells.frostgiant.SpellTitanicRupture;
 import com.playmonumenta.plugins.bosses.spells.frostgiant.UltimateSeismicRuin;
+import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
@@ -1124,5 +1125,31 @@ public class FrostGiant extends BossAbilityGroup {
 	@Override
 	public void bossHitByProjectile(ProjectileHitEvent event) {
 		mBoss.setVelocity(new Vector(0, 0, 0));
+	}
+
+	private static final String GOLEM_FREEZE_EFFECT_NAME = "FrostGiantGolemPercentSpeedEffect";
+
+	//Golem Stun on certain ability casts from boss.
+	public static void freezeGolems(LivingEntity mBoss) {
+		mBoss.addScoreboardTag("GolemFreeze");
+		Location loc = mBoss.getLocation();
+		for (LivingEntity mob : EntityUtils.getNearbyMobs(loc, FrostGiant.detectionRange)) {
+			if (mob.getType() == EntityType.IRON_GOLEM) {
+				com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(mob, GOLEM_FREEZE_EFFECT_NAME,
+						new PercentSpeed(20 * 20, -1, GOLEM_FREEZE_EFFECT_NAME));
+				mob.addPotionEffect((new PotionEffect(PotionEffectType.GLOWING, 200, 10)));
+			}
+		}
+	}
+
+	public static void unfreezeGolems(LivingEntity mBoss) {
+		if (mBoss.getScoreboardTags().contains("GolemFreeze")) {
+			Location loc = mBoss.getLocation();
+			mBoss.removeScoreboardTag("GolemFreeze");
+			for (LivingEntity mob : EntityUtils.getNearbyMobs(loc, FrostGiant.detectionRange)) {
+				com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.clearEffects(mob, GOLEM_FREEZE_EFFECT_NAME);
+				mob.removePotionEffect(PotionEffectType.GLOWING);
+			}
+		}
 	}
 }

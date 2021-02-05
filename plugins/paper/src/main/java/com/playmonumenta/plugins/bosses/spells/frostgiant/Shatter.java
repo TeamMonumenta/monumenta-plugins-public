@@ -59,6 +59,7 @@ public class Shatter extends Spell {
 
 	@Override
 	public void run() {
+		FrostGiant.freezeGolems(mBoss);
 		mOldBlocks.clear();
 		mOldData.clear();
 
@@ -147,6 +148,7 @@ public class Shatter extends Spell {
 											mOldData.put(l, l.getBlock().getBlockData());
 										}
 										l.getBlock().setType(Material.CRIMSON_HYPHAE);
+										world.spawnParticle(Particle.SPELL_INSTANT, l, 3, 0.45, 6, 0.45, 0, null, true);
 									}
 								}
 							}
@@ -186,7 +188,8 @@ public class Shatter extends Spell {
 								vec = VectorUtils.rotateYAxis(vec, loc.getYaw() + dir);
 
 								Location l = loc.clone().add(vec);
-								BoundingBox box = BoundingBox.of(l, 0.65, 1.5, 0.65);
+								//1.5 -> 15
+								BoundingBox box = BoundingBox.of(l, 0.65, 15, 0.65);
 								boxes.add(box);
 
 								if (r % 2 == 0 && degree % 10 == 0) {
@@ -242,6 +245,7 @@ public class Shatter extends Spell {
 											}
 										}
 										mBlocks.remove();
+										FrostGiant.unfreezeGolems(mBoss);
 									}
 								}
 							}
@@ -251,7 +255,6 @@ public class Shatter extends Spell {
 			}
 
 		}.runTaskTimer(mPlugin, 0, 2);
-
 	}
 
 	@Override

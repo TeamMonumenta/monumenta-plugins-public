@@ -62,12 +62,14 @@ public class SpellAirGolemStrike extends Spell {
 		//List is sorted with nearest players earlier in the list, and farthest players at the end
 		List<Player> players = EntityUtils.getNearestPlayers(mBoss.getLocation(), FrostGiant.detectionRange);
 		players.removeIf(p -> p.getGameMode() == GameMode.SPECTATOR || mStartLoc.distance(p.getLocation()) > FrostGiant.fighterRange);
-		if (players.size() < 4) {
+		if (players.size() < 3) {
 			count = 1;
+		} else if (players.size() == 3) {
+			count = 2;
 		} else if (players.size() <= 10) {
-			count = players.size() / 4;
+			count = players.size() / 2;
 		} else {
-			count = players.size() / 5 + 1;
+			count = (int)((players.size() / 3) + 1.5);
 		}
 
 		count = Math.min(12, count);
@@ -190,12 +192,10 @@ public class SpellAirGolemStrike extends Spell {
 			public void run() {
 				if (golem.isDead() || !golem.isValid() || mBoss.isDead() || !mBoss.isValid()) {
 					this.cancel();
-
 					if (mBoss.isDead() || !mBoss.isValid()) {
 						golem.remove();
 					}
 				}
-
 				Creature c = (Creature) golem;
 				if (c.getTarget() != null) {
 					LivingEntity target = c.getTarget();

@@ -27,6 +27,7 @@ import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
 import com.destroystokyo.paper.entity.Pathfinder;
+import com.playmonumenta.plugins.bosses.bosses.FrostGiant;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.BossUtils;
@@ -54,6 +55,7 @@ public class SpellGreatswordSlam extends Spell {
 
 	@Override
 	public void run() {
+		FrostGiant.freezeGolems(mBoss);
 		World world = mBoss.getWorld();
 		world.playSound(mBoss.getLocation(), Sound.ENTITY_RAVAGER_ROAR, SoundCategory.HOSTILE, 10, 1);
 		world.playSound(mBoss.getLocation(), Sound.ENTITY_BLAZE_SHOOT, SoundCategory.HOSTILE, 5, 1.5f);
@@ -155,11 +157,13 @@ public class SpellGreatswordSlam extends Spell {
 										oldData.put(l, l.getBlock().getBlockData());
 									}
 									l.getBlock().setType(Material.FROSTED_ICE);
+									world.spawnParticle(Particle.SPELL_INSTANT, l, 3, 0.45, 6, 0.45, 0, null, true);
 									Ageable age = (Ageable) l.getBlock().getBlockData();
 									age.setAge(1 + FastUtils.RANDOM.nextInt(3));
 									l.getBlock().setBlockData(age);
 
-									BoundingBox box = BoundingBox.of(l, 1, 1.65, 1);
+									//1.65 -> 15
+									BoundingBox box = BoundingBox.of(l, 1, 15, 1);
 									boxes.add(box);
 
 									FallingBlock fallBlock = world.spawnFallingBlock(l, Bukkit.createBlockData(Material.BLUE_ICE));
@@ -188,6 +192,7 @@ public class SpellGreatswordSlam extends Spell {
 								mRadius++;
 							}
 						}.runTaskTimer(mPlugin, 0, 2);
+						FrostGiant.unfreezeGolems(mBoss);
 						this.cancel();
 					}
 				}
@@ -261,7 +266,6 @@ public class SpellGreatswordSlam extends Spell {
 				mT += 10;
 			}
 		}.runTaskTimer(mPlugin, 0, 10); //Every 0.5 seconds, check if player is on cone area damage
-
 	}
 
 	@Override

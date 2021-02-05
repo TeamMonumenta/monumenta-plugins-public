@@ -17,6 +17,7 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
+import com.playmonumenta.plugins.bosses.bosses.FrostGiant;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
@@ -45,6 +46,7 @@ public class SpellGlacialPrison extends Spell {
 
 	@Override
 	public void run() {
+		FrostGiant.freezeGolems(mBoss);
 		//Glacial Prison can not be cast whithin 60 seconds of the previous cast of it
 		mCooldown = true;
 		new BukkitRunnable() {
@@ -170,6 +172,7 @@ public class SpellGlacialPrison extends Spell {
 
 								//If player did not escape within 4 seconds, damage by 80% of health and remove the ice prison
 								if (mTicks >= 20 * 4) {
+									FrostGiant.unfreezeGolems(mBoss);
 									this.cancel();
 									for (int i = 0; i < locs.length; i++) {
 										Location loc = locs[i];

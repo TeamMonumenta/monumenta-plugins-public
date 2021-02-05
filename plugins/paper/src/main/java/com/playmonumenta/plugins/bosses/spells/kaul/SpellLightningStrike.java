@@ -13,6 +13,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import com.playmonumenta.plugins.bosses.bosses.Kaul;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
@@ -120,6 +121,7 @@ public class SpellLightningStrike extends Spell {
 					for (Player p : PlayerUtils.playersInRange(loc, 3)) {
 						multiHit(p);
 					}
+					lingeringDamage(world, loc);
 				}
 			}
 
@@ -151,5 +153,32 @@ public class SpellLightningStrike extends Spell {
 				}
 			}
 		}.runTaskTimer(mPlugin, 0, 1);
+	}
+
+	public void lingeringDamage(World world, Location loc) {
+        new BukkitRunnable() {
+            int mTicks = 0;
+            @Override
+            public void run() {
+                mTicks += 2;
+                world.spawnParticle(Particle.FIREWORKS_SPARK, loc, 12, 1.5, 0.15, 1.5, 0.05);
+                world.spawnParticle(Particle.DRAGON_BREATH, loc, 4, 1.5, 0.15, 1.5, 0.025);
+
+                if (mTicks % 10 == 0) {
+                    for (Player player : PlayerUtils.playersInRange(loc, 4)) {
+                        if (loc.distance(player.getLocation()) < Kaul.detectionRange) {
+                            BossUtils.bossDamagePercent(mBoss, player, 0.1, (Location)null);
+                            player.setFireTicks(20 * 3);
+                        }
+                    }
+                }
+
+                if (mTicks >= 20 * 5) {
+                    this.cancel();
+                }
+            }
+
+        }.runTaskTimer(mPlugin, 5, 2);
+        this.cancel();
 	}
 }

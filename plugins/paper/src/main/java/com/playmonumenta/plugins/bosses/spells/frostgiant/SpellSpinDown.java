@@ -46,6 +46,7 @@ public class SpellSpinDown extends Spell {
 
 	@Override
 	public void run() {
+		FrostGiant.freezeGolems(mBoss);
 		mCooldown = true;
 		new BukkitRunnable() {
 
@@ -159,7 +160,7 @@ public class SpellSpinDown extends Spell {
 					if (FrostGiant.mInstance != null) {
 						FrostGiant.mInstance.mPreventTargetting = false;
 					}
-
+					FrostGiant.unfreezeGolems(mBoss);
 					this.cancel();
 				}
 

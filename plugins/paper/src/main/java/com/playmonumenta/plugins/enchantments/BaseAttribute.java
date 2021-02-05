@@ -23,4 +23,8 @@ public interface BaseAttribute {
 
 	//Thorns attribute
 	default void onHurtByEntity(Plugin plugin, Player player, double value, EntityDamageByEntityEvent event) { }
+
+	//Damage attributes
+	//Currently only used for ability power.
+	default void onDamage(Plugin plugin, Player player, double value, EntityDamageByEntityEvent event) { }
 }

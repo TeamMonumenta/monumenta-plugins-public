@@ -46,6 +46,7 @@ public class RingOfFrost extends Spell {
 
 	@Override
 	public void run() {
+		FrostGiant.freezeGolems(mBoss);
 		World world = mBoss.getWorld();
 		world.playSound(mBoss.getLocation(), Sound.ENTITY_BLAZE_SHOOT, SoundCategory.HOSTILE, 3, 1.5f);
 		world.playSound(mBoss.getLocation(), Sound.ENTITY_POLAR_BEAR_WARNING, SoundCategory.HOSTILE, 5, 0);
@@ -88,6 +89,7 @@ public class RingOfFrost extends Spell {
 
 				//After 4 seconds, damage everyone outside the green circle and pull them in
 				if (mTicks >= 20 * 4) {
+					FrostGiant.unfreezeGolems(mBoss);
 					this.cancel();
 					for (double degree = 0; degree < 360; degree += 5) {
 						double radian = Math.toRadians(degree);
@@ -114,7 +116,6 @@ public class RingOfFrost extends Spell {
 		};
 		runnable.runTaskTimer(mPlugin, 0, 2);
 		mActiveRunnables.add(runnable);
-
 	}
 
 	@Override
