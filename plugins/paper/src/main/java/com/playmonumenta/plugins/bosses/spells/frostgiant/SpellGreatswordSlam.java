@@ -91,6 +91,7 @@ public class SpellGreatswordSlam extends Spell {
 
 						Location l = loc.clone().add(vec);
 						world.spawnParticle(Particle.SPELL_WITCH, l, 1, 0.25, 0.25, 0.25, 0);
+						world.spawnParticle(Particle.END_ROD, l, 1, 0.25, 0.25, 0.25, 0);
 					}
 				}
 			}
