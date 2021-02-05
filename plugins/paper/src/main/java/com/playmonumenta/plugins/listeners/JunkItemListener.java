@@ -4,9 +4,8 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Set;
 
-import com.playmonumenta.plugins.server.properties.ServerProperties;
-
 import org.bukkit.ChatColor;
+import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ProxiedCommandSender;
 import org.bukkit.entity.Player;
@@ -18,7 +17,8 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
-import org.bukkit.Material;
+
+import com.playmonumenta.plugins.server.properties.ServerProperties;
 
 import dev.jorel.commandapi.CommandAPI;
 import dev.jorel.commandapi.CommandAPICommand;
@@ -89,15 +89,19 @@ public class JunkItemListener implements Listener {
 			Player p = (Player) event.getEntity();
 			PlayerInventory inv = p.getInventory();
 			Set<Material> hotbar = new HashSet<Material>();
-			
-			//allow colletion of "junk" items on hotbar
+
+			// Allow collection of any items on the hotbar
 			for (int i = 0; i <= 8; i++) {
-				Material m = inv.getItem(i).getType();
-				if (m != null && !m.isAir()) {
-					hotbar.add(m);
+				ItemStack hotbarItem = inv.getItem(i);
+				if (hotbarItem != null) {
+					Material material = hotbarItem.getType();
+					if (!material.isAir()) {
+						hotbar.add(material);
+					}
 				}
 			}
-			if (mPlayers.contains((Player)event.getEntity()) && !isInteresting(item, hotbar)) {
+
+			if (mPlayers.contains(event.getEntity()) && !isInteresting(item, hotbar)) {
 				event.setCancelled(true);
 			}
 		}

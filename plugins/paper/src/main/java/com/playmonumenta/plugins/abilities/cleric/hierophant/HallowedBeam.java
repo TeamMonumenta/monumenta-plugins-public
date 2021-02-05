@@ -166,14 +166,15 @@ public class HallowedBeam extends MultipleChargeAbility {
 
 		return true;
 	}
-	
+
 	@Override
 	public boolean runCheck() {
 		LivingEntity targetEntity = EntityUtils.getEntityAtCursor(mPlayer, CAST_RANGE, true, true, true);
-		if ((targetEntity instanceof Player && ((Player) targetEntity).getGameMode() != GameMode.SPECTATOR) 
-				|| EntityUtils.isHostileMob(targetEntity)) {
+		if (targetEntity instanceof Player && ((Player) targetEntity).getGameMode() != GameMode.SPECTATOR
+				|| targetEntity != null && EntityUtils.isHostileMob(targetEntity)) {
 			return !mPlayer.isSneaking();
 		}
+
 		return false;
 	}
 
