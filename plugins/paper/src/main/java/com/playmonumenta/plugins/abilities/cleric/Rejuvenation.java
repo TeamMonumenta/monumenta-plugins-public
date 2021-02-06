@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.abilities.cleric;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 import org.bukkit.Particle;
 import org.bukkit.attribute.Attribute;
@@ -19,7 +20,7 @@ public class Rejuvenation extends Ability {
 	private static final int HEAL_INTERVAL_2 = 20 * 3;
 	private static final double PERCENT_HEAL = 0.05;
 
-	private static final Map<Player, Integer> LAST_HEAL_TICK = new HashMap<Player, Integer>();
+	private static final Map<UUID, Integer> LAST_HEAL_TICK = new HashMap<>();
 
 	private final int mHealInterval;
 
@@ -45,9 +46,9 @@ public class Rejuvenation extends Ability {
 						continue;
 					}
 
-					Integer lastHealTick = LAST_HEAL_TICK.get(player);
-					if (lastHealTick == null || player.getTicksLived() - LAST_HEAL_TICK.get(player) >= mHealInterval) {
-						LAST_HEAL_TICK.put(player, player.getTicksLived());
+					Integer lastHealTick = LAST_HEAL_TICK.get(player.getUniqueId());
+					if (lastHealTick == null || player.getTicksLived() - LAST_HEAL_TICK.get(player.getUniqueId()) >= mHealInterval) {
+						LAST_HEAL_TICK.put(player.getUniqueId(), player.getTicksLived());
 
 						double maxHealth = player.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue();
 						if (player.getHealth() != maxHealth) {

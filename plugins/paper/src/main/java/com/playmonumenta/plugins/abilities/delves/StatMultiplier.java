@@ -70,9 +70,15 @@ public class StatMultiplier extends DelveModifier {
 		mDelveMobStatMultiplier = ServerProperties.getClassSpecializationsEnabled()
 				? DELVE_MOB_STAT_MULTIPLIER_R2 : DELVE_MOB_STAT_MULTIPLIER_R1;
 
-		mDamageMultiplier = getDamageMultiplier(DelvesUtils.getDelveInfo(player).getDepthPoints());
-		mHealthMultiplier = getHealthMultiplier(DelvesUtils.getDelveInfo(player).getDepthPoints());
-		mSpeedMultiplier = getSpeedMultiplier(DelvesUtils.getDelveInfo(player).getDepthPoints());
+		if (player != null) {
+			mDamageMultiplier = getDamageMultiplier(DelvesUtils.getDelveInfo(player).getDepthPoints());
+			mHealthMultiplier = getHealthMultiplier(DelvesUtils.getDelveInfo(player).getDepthPoints());
+			mSpeedMultiplier = getSpeedMultiplier(DelvesUtils.getDelveInfo(player).getDepthPoints());
+		} else {
+			mDamageMultiplier = 0;
+			mHealthMultiplier = 0;
+			mSpeedMultiplier = 0;
+		}
 	}
 
 	public static double getStatCompensation(String dungeon) {

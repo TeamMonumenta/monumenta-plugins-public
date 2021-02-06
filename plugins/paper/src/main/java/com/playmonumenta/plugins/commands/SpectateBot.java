@@ -7,6 +7,7 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.utils.FastUtils;
@@ -61,7 +62,7 @@ public class SpectateBot extends GenericCommand implements Listener {
 		}
 	}
 
-	public final Map<Player, SpectateContext> mSpectators = new HashMap<Player, SpectateContext>();
+	public final Map<UUID, SpectateContext> mSpectators = new HashMap<>();
 	public BukkitRunnable mRunnable = null;
 
 	public SpectateBot(Plugin plugin) {
@@ -102,11 +103,11 @@ public class SpectateBot extends GenericCommand implements Listener {
 	}
 
 	private void run(Plugin plugin, Player player) throws WrapperCommandSyntaxException {
-		if (mSpectators.containsKey(player)) {
+		if (mSpectators.containsKey(player.getUniqueId())) {
 			player.sendMessage(ChatColor.RED + "You are no longer spectate botting");
-			mSpectators.remove(player);
+			mSpectators.remove(player.getUniqueId());
 		} else {
-			mSpectators.put(player, new SpectateContext(player));
+			mSpectators.put(player.getUniqueId(), new SpectateContext(player));
 
 			if (mRunnable == null || mRunnable.isCancelled()) {
 				mRunnable = new BukkitRunnable() {
@@ -114,9 +115,9 @@ public class SpectateBot extends GenericCommand implements Listener {
 
 					@Override
 					public void run() {
-						Iterator<Map.Entry<Player, SpectateContext>> it = mSpectators.entrySet().iterator();
+						Iterator<Map.Entry<UUID, SpectateContext>> it = mSpectators.entrySet().iterator();
 						while (it.hasNext()) {
-							Map.Entry<Player, SpectateContext> entry = it.next();
+							Map.Entry<UUID, SpectateContext> entry = it.next();
 							SpectateContext ctx = entry.getValue();
 
 							if (ctx.mTarget == null || !ctx.mTarget.isOnline() || ctx.mTimeSinceLastSwitch > AUTO_PLAYER_SWITCH_TICKS) {
@@ -213,7 +214,7 @@ public class SpectateBot extends GenericCommand implements Listener {
 
 			// If the player switches out of spectator remove them from the list
 			if (!event.getNewGameMode().equals(GameMode.SPECTATOR)) {
-				mSpectators.remove(player);
+				mSpectators.remove(player.getUniqueId());
 			}
 		}
 	}
@@ -223,6 +224,6 @@ public class SpectateBot extends GenericCommand implements Listener {
 		Player player = event.getPlayer();
 
 		// If the player leaves the game remove them from the list
-		mSpectators.remove(player);
+		mSpectators.remove(player.getUniqueId());
 	}
 }

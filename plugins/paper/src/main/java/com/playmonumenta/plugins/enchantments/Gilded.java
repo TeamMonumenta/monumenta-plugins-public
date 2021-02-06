@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.enchantments;
 import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
@@ -24,7 +25,7 @@ public class Gilded implements BaseEnchantment {
 	private static final Particle.DustOptions GILDED_3_COLOR = new Particle.DustOptions(Color.fromRGB(229, 229, 128), 1.0f);
 	private static final String PROPERTY_NAME = ChatColor.GRAY + "Gilded";
 	private static final int TICK_PERIOD = 6;
-	private static final Set<Player> NO_SELF_PARTICLES = new HashSet<Player>();
+	private static final Set<UUID> NO_SELF_PARTICLES = new HashSet<>();
 
 
 	@Override
@@ -50,9 +51,9 @@ public class Gilded implements BaseEnchantment {
 	@Override
 	public int getLevelFromItem(ItemStack item, Player player) {
 		if (player.getScoreboardTags().contains("noSelfParticles")) {
-			NO_SELF_PARTICLES.add(player);
+			NO_SELF_PARTICLES.add(player.getUniqueId());
 		} else {
-			NO_SELF_PARTICLES.remove(player);
+			NO_SELF_PARTICLES.remove(player.getUniqueId());
 		}
 		return getLevelFromItem(item);
 	}
@@ -80,7 +81,7 @@ public class Gilded implements BaseEnchantment {
 		}
 
 		final Location loc = player.getLocation().add(0, 0.8, 0);
-		if (NO_SELF_PARTICLES.contains(player)) {
+		if (NO_SELF_PARTICLES.contains(player.getUniqueId())) {
 			for (Player other : PlayerUtils.playersInRange(player, 30, false)) {
 				other.spawnParticle(Particle.REDSTONE, loc, count, 0.3, 0.5, 0.3, color);
 			}

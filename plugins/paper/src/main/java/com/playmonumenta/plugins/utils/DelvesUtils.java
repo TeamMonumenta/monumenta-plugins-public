@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -287,7 +288,7 @@ public class DelvesUtils {
 
 			setDelveScore(mPlayer, mDungeon, mDelveScore);
 
-			DELVE_INFO_MAPPINGS.put(mPlayer, this);
+			DELVE_INFO_MAPPINGS.put(mPlayer.getUniqueId(), this);
 		}
 
 		private void assignEntropyDepthPoints() {
@@ -355,7 +356,7 @@ public class DelvesUtils {
 		}
 	}
 
-	private static final Map<Player, DelveInfo> DELVE_INFO_MAPPINGS = new HashMap<>();
+	private static final Map<UUID, DelveInfo> DELVE_INFO_MAPPINGS = new HashMap<>();
 
 	private static final Map<String, String> SHARD_SCOREBOARD_PREFIX_MAPPINGS = new HashMap<>();
 
@@ -406,10 +407,10 @@ public class DelvesUtils {
 	}
 
 	public static DelveInfo getDelveInfo(Player player) {
-		DelveInfo info = DELVE_INFO_MAPPINGS.get(player);
+		DelveInfo info = DELVE_INFO_MAPPINGS.get(player.getUniqueId());
 		if (info == null) {
 			info = new DelveInfo(player);
-			DELVE_INFO_MAPPINGS.put(player, info);
+			DELVE_INFO_MAPPINGS.put(player.getUniqueId(), info);
 		}
 
 		return info;

@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.enchantments;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -20,7 +21,7 @@ import com.playmonumenta.plugins.utils.ItemUtils;
 
 public class VoidTether implements BaseEnchantment {
 	private static final String PROPERTY_NAME = ChatColor.GRAY + "Void Tether";
-	private static final Map<Player, Location> PLAYER_LOCS = new HashMap<Player, Location>();
+	private static final Map<UUID, Location> PLAYER_LOCS = new HashMap<>();
 
 	@Override
 	public String getProperty() {
@@ -42,13 +43,13 @@ public class VoidTether implements BaseEnchantment {
 		Location ploc = player.getLocation();
 		if (ploc.getY() > 0) {
 			/* Not in the void - clear player's location */
-			PLAYER_LOCS.remove(player);
+			PLAYER_LOCS.remove(player.getUniqueId());
 		} else {
 			/* In the void - remember the highest-most Y value location (closest point to where they fell in) */
-			Location lastPlayerLoc = PLAYER_LOCS.get(player);
+			Location lastPlayerLoc = PLAYER_LOCS.get(player.getUniqueId());
 			if (lastPlayerLoc == null || lastPlayerLoc.getY() < ploc.getY()) {
 				lastPlayerLoc = ploc;
-				PLAYER_LOCS.put(player, lastPlayerLoc);
+				PLAYER_LOCS.put(player.getUniqueId(), lastPlayerLoc);
 			}
 		}
 	}
@@ -99,7 +100,7 @@ public class VoidTether implements BaseEnchantment {
 		}
 
 		/* In the void and taking near-fatal damage - activate! */
-		Location lastPlayerLoc = PLAYER_LOCS.get(player);
+		Location lastPlayerLoc = PLAYER_LOCS.get(player.getUniqueId());
 		if (lastPlayerLoc == null || lastPlayerLoc.getY() < ploc.getY()) {
 			lastPlayerLoc = ploc;
 		}

@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.enchantments;
 import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
@@ -19,7 +20,7 @@ import com.playmonumenta.plugins.utils.PlayerUtils;
 public class Hopeless implements BaseEnchantment {
 	private static final Particle.DustOptions DARK_RED_PARTICLE_COLOR = new Particle.DustOptions(Color.fromRGB(150, 0, 0), 1.0f);
 	private static String PROPERTY_NAME = ChatColor.GRAY + "Hopeless";
-	private static final Set<Player> NO_SELF_PARTICLES = new HashSet<Player>();
+	private static final Set<UUID> NO_SELF_PARTICLES = new HashSet<>();
 
 	private static final int TICK_PERIOD = 6;
 
@@ -44,9 +45,9 @@ public class Hopeless implements BaseEnchantment {
 			return 0;
 		}
 		if (player.getScoreboardTags().contains("noSelfParticles")) {
-			NO_SELF_PARTICLES.add(player);
+			NO_SELF_PARTICLES.add(player.getUniqueId());
 		} else {
-			NO_SELF_PARTICLES.remove(player);
+			NO_SELF_PARTICLES.remove(player.getUniqueId());
 		}
 		return 1;
 	}
@@ -75,7 +76,7 @@ public class Hopeless implements BaseEnchantment {
 	@Override
 	public void tick(Plugin plugin, Player player, int level) {
 		//Runs dark red particles while wearing, subject to no self particle PEB option
-		if (NO_SELF_PARTICLES.contains(player)) {
+		if (NO_SELF_PARTICLES.contains(player.getUniqueId())) {
 			for (Player other : PlayerUtils.playersInRange(player, 30, false)) {
 				other.spawnParticle(Particle.REDSTONE, player.getLocation().add(0, 1.5, 0), 3, 0.4, 0.4, 0.4, 0, DARK_RED_PARTICLE_COLOR);
 			}

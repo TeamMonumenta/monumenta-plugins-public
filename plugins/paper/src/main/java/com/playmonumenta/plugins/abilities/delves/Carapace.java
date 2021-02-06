@@ -53,8 +53,12 @@ public class Carapace extends DelveModifier {
 	public Carapace(Plugin plugin, Player player) {
 		super(plugin, player, Modifier.CARAPACE);
 
-		int rank = DelvesUtils.getDelveInfo(player).getRank(Modifier.CARAPACE);
-		mCarapaceHealthRawPercent = CARAPACE_HEALTH_RAW_PERCENT[rank - 1];
+		if (player != null) {
+			int rank = DelvesUtils.getDelveInfo(player).getRank(Modifier.CARAPACE);
+			mCarapaceHealthRawPercent = CARAPACE_HEALTH_RAW_PERCENT[rank - 1];
+		} else {
+			mCarapaceHealthRawPercent = 0;
+		}
 	}
 
 	@Override

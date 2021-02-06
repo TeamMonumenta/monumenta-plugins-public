@@ -53,8 +53,12 @@ public class Transcendent extends DelveModifier {
 	public Transcendent(Plugin plugin, Player player) {
 		super(plugin, player, Modifier.TRANSCENDENT);
 
-		int rank = DelvesUtils.getDelveInfo(player).getRank(Modifier.TRANSCENDENT);
-		mAbilityChance = ABILITY_CHANCE[rank - 1];
+		if (player != null) {
+			int rank = DelvesUtils.getDelveInfo(player).getRank(Modifier.TRANSCENDENT);
+			mAbilityChance = ABILITY_CHANCE[rank - 1];
+		} else {
+			mAbilityChance = 0;
+		}
 	}
 
 	@Override

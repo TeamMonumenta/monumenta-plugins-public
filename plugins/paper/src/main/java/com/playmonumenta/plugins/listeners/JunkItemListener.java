@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.listeners;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Set;
+import java.util.UUID;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -29,7 +30,7 @@ import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
 public class JunkItemListener implements Listener {
 	private static final String NO_JUNK_ITEMS_TAG = "NoJunkItemsPickup";
 	private static final int JUNK_ITEM_SIZE_THRESHOLD = 17;
-	private final Set<Player> mPlayers = new HashSet<Player>();
+	private final Set<UUID> mPlayers = new HashSet<>();
 
 	public JunkItemListener() {
 		final CommandPermission perms = CommandPermission.fromString("monumenta.command.pickup");
@@ -60,11 +61,11 @@ public class JunkItemListener implements Listener {
 		Set<String> tags = player.getScoreboardTags();
 		if (tags.contains(NO_JUNK_ITEMS_TAG)) {
 			tags.remove(NO_JUNK_ITEMS_TAG);
-			mPlayers.remove(player);
+			mPlayers.remove(player.getUniqueId());
 			player.sendMessage(ChatColor.GOLD + "" + ChatColor.BOLD + "You will now pick up all items");
 		} else {
 			tags.add(NO_JUNK_ITEMS_TAG);
-			mPlayers.add(player);
+			mPlayers.add(player.getUniqueId());
 			player.sendMessage(ChatColor.GOLD + "" + ChatColor.BOLD + "You will no longer pick up uninteresting items");
 		}
 	}
@@ -73,13 +74,13 @@ public class JunkItemListener implements Listener {
 	public void join(PlayerJoinEvent event) {
 		Player player = event.getPlayer();
 		if (player.getScoreboardTags() != null && player.getScoreboardTags().contains(NO_JUNK_ITEMS_TAG)) {
-			mPlayers.add(player);
+			mPlayers.add(player.getUniqueId());
 		}
 	}
 
 	@EventHandler(priority = EventPriority.MONITOR)
 	public void quit(PlayerQuitEvent event) {
-		mPlayers.remove(event.getPlayer());
+		mPlayers.remove(event.getPlayer().getUniqueId());
 	}
 
 	@EventHandler(priority = EventPriority.LOWEST)
@@ -101,7 +102,7 @@ public class JunkItemListener implements Listener {
 				}
 			}
 
-			if (mPlayers.contains(event.getEntity()) && !isInteresting(item, hotbar)) {
+			if (mPlayers.contains(event.getEntity().getUniqueId()) && !isInteresting(item, hotbar)) {
 				event.setCancelled(true);
 			}
 		}

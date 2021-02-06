@@ -69,9 +69,14 @@ public class Arcanic extends DelveModifier {
 	public Arcanic(Plugin plugin, Player player) {
 		super(plugin, player, Modifier.ARCANIC);
 
-		int rank = DelvesUtils.getDelveInfo(player).getRank(Modifier.ARCANIC);
-		mCustomDamageTakenMultiplier = CUSTOM_DAMAGE_TAKEN_MULTIPLIER[rank - 1];
-		mAbilityChance = ABILITY_CHANCE[rank - 1];
+		if (player != null) {
+			int rank = DelvesUtils.getDelveInfo(player).getRank(Modifier.ARCANIC);
+			mCustomDamageTakenMultiplier = CUSTOM_DAMAGE_TAKEN_MULTIPLIER[rank - 1];
+			mAbilityChance = ABILITY_CHANCE[rank - 1];
+		} else {
+			mCustomDamageTakenMultiplier = 0;
+			mAbilityChance = 0;
+		}
 	}
 
 	@Override

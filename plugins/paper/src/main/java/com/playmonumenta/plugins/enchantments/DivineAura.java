@@ -26,7 +26,7 @@ import com.playmonumenta.plugins.utils.PlayerUtils;
 public class DivineAura implements BaseEnchantment {
 	private static final String PROPERTY_NAME = ChatColor.GRAY + "Divine Aura";
 	private static final String TAG_TO_DISABLE = "NoDivineAura";
-	private static final Set<Player> NO_SELF_PARTICLES = new HashSet<Player>();
+	private static final Set<UUID> NO_SELF_PARTICLES = new HashSet<>();
 	private static int STATIC_TICKS = 0;
 
 	// A little easter egg for my friends.
@@ -119,9 +119,9 @@ public class DivineAura implements BaseEnchantment {
 			return 1000;
 		}
 		if (player.getScoreboardTags().contains("noSelfParticles")) {
-			NO_SELF_PARTICLES.add(player);
+			NO_SELF_PARTICLES.add(player.getUniqueId());
 		} else {
-			NO_SELF_PARTICLES.remove(player);
+			NO_SELF_PARTICLES.remove(player.getUniqueId());
 		}
 		return 1;
 	}
@@ -144,7 +144,7 @@ public class DivineAura implements BaseEnchantment {
 					world.spawnParticle(Particle.SPELL_INSTANT, player.getLocation().add(0, 1, 0), 25, 0.5, 0.45, 0.25, 1);
 					world.playSound(player.getLocation(), Sound.ENTITY_ILLUSIONER_CAST_SPELL, 1, 1.25f);
 					player.sendMessage(ChatColor.AQUA + "You feel a Divine Aura envelop you.");
-					if (NO_SELF_PARTICLES.contains(player)) {
+					if (NO_SELF_PARTICLES.contains(player.getUniqueId())) {
 						player.sendMessage(ChatColor.GRAY + "Note: You have self-particles disabled");
 					}
 					player.removeScoreboardTag(TAG_TO_DISABLE);
@@ -181,7 +181,7 @@ public class DivineAura implements BaseEnchantment {
 				}
 			}
 			final Location loc = player.getLocation().add(0, 1, 0);
-			if (NO_SELF_PARTICLES.contains(player)) {
+			if (NO_SELF_PARTICLES.contains(player.getUniqueId())) {
 				for (Player other : PlayerUtils.playersInRange(player, 30, false)) {
 					other.spawnParticle(Particle.SPELL_INSTANT, loc, 5, 0.4, 0.4, 0.4, 0);
 				}

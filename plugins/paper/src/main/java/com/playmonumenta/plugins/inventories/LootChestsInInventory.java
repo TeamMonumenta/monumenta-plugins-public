@@ -1,9 +1,10 @@
 package com.playmonumenta.plugins.inventories;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Random;
+import java.util.Set;
+import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -38,7 +39,7 @@ import de.tr7zw.nbtapi.NBTItem;
 import net.md_5.bungee.api.ChatColor;
 
 public class LootChestsInInventory implements Listener {
-	private static List<Player> lootMen = new ArrayList<>();
+	private static Set<UUID> mLootMenu = new HashSet<>();
 
 	@EventHandler(priority = EventPriority.LOW)
 	public void inventoryClickEvent(InventoryClickEvent event) {
@@ -94,7 +95,7 @@ public class LootChestsInInventory implements Listener {
 				inventory.addItem(lootItem);
 			}
 		}
-		lootMen.add(player);
+		mLootMenu.add(player.getUniqueId());
 		player.closeInventory(Reason.OPEN_NEW);
 		player.openInventory(inventory);
 		ItemStack emptyChest = new ItemStack(Material.CHEST);
@@ -110,7 +111,7 @@ public class LootChestsInInventory implements Listener {
 	@EventHandler(priority = EventPriority.LOW)
 	public void inventoryCloseEvent(InventoryCloseEvent event) {
 		//Only drop the items if a bunch of things that hopefully only should be true if you are in a loot chest inventory. Otherwise you should just remove yourself from the list.
-		if (lootMen.contains(event.getPlayer()) && event.getInventory().getHolder() == null && event.getView().getTopInventory().getType().equals(InventoryType.CHEST)
+		if (mLootMenu.contains(event.getPlayer().getUniqueId()) && event.getInventory().getHolder() == null && event.getView().getTopInventory().getType().equals(InventoryType.CHEST)
 				&& event.getView().getTopInventory().getSize() == 27) {
 			ItemStack[] items = event.getView().getTopInventory().getContents();
 			for (ItemStack item : items) {
@@ -119,24 +120,24 @@ public class LootChestsInInventory implements Listener {
 					droppedItem.setPickupDelay(0);
 				}
 			}
-			lootMen.remove(event.getPlayer());
-		} else if (lootMen.contains(event.getPlayer()) && !event.getReason().equals(InventoryCloseEvent.Reason.OPEN_NEW)) {
-			lootMen.remove(event.getPlayer());
+			mLootMenu.remove(event.getPlayer().getUniqueId());
+		} else if (mLootMenu.contains(event.getPlayer().getUniqueId()) && !event.getReason().equals(InventoryCloseEvent.Reason.OPEN_NEW)) {
+			mLootMenu.remove(event.getPlayer().getUniqueId());
 		}
 	}
 
 	//Failsafes
 	@EventHandler(priority = EventPriority.LOW)
 	public void playerJoinEvent(PlayerJoinEvent event) {
-		if (lootMen.contains(event.getPlayer())) {
-			lootMen.remove(event.getPlayer());
+		if (mLootMenu.contains(event.getPlayer().getUniqueId())) {
+			mLootMenu.remove(event.getPlayer().getUniqueId());
 		}
 	}
 
 	@EventHandler(priority = EventPriority.LOW)
 	public void playerQuitEvent(PlayerQuitEvent event) {
-		if (lootMen.contains(event.getPlayer())) {
-			lootMen.remove(event.getPlayer());
+		if (mLootMenu.contains(event.getPlayer().getUniqueId())) {
+			mLootMenu.remove(event.getPlayer().getUniqueId());
 		}
 	}
 }

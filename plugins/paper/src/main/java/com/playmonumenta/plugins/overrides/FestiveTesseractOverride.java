@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.overrides;
 
 import java.util.HashMap;
+import java.util.UUID;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.bosses.BossManager;
@@ -29,7 +30,7 @@ public class FestiveTesseractOverride extends BaseOverride {
 	private static final Particle.DustOptions FESTIVE_RED_COLOR = new Particle.DustOptions(Color.fromRGB(255, 98, 71), 1.0f);
 	private static final Particle.DustOptions FESTIVE_GREEN_COLOR = new Particle.DustOptions(Color.fromRGB(75, 200, 0), 1.0f);
 	private static final int COOLDOWN = 60 * 20 * 5;
-	private static HashMap<Player, Integer> PLAYERS_ON_COOLDOWN = null;
+	private static HashMap<UUID, Integer> PLAYERS_ON_COOLDOWN = null;
 
 	@Override
 	public boolean leftClickItemInteraction(Plugin plugin, Player player, Action action, ItemStack item, Block block) {
@@ -57,7 +58,7 @@ public class FestiveTesseractOverride extends BaseOverride {
 			PLAYERS_ON_COOLDOWN = new HashMap<>();
 		}
 
-		Integer cooldownEnds = PLAYERS_ON_COOLDOWN.get(player);
+		Integer cooldownEnds = PLAYERS_ON_COOLDOWN.get(player.getUniqueId());
 		if (cooldownEnds != null) {
 			// On cooldown
 			int secondsLeft = (cooldownEnds - Bukkit.getServer().getCurrentTick())/20;
@@ -144,9 +145,9 @@ public class FestiveTesseractOverride extends BaseOverride {
 			}
 		}
 
-		PLAYERS_ON_COOLDOWN.put(player, Bukkit.getServer().getCurrentTick() + COOLDOWN);
+		PLAYERS_ON_COOLDOWN.put(player.getUniqueId(), Bukkit.getServer().getCurrentTick() + COOLDOWN);
 		Bukkit.getScheduler().runTaskLater(plugin, () -> {
-			PLAYERS_ON_COOLDOWN.remove(player);
+			PLAYERS_ON_COOLDOWN.remove(player.getUniqueId());
 
 			if (player.isOnline() && player.isValid()) {
 				MessagingUtils.sendActionBarMessage(plugin, player, "Your Tesseract of Festivity is off cooldown");

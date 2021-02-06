@@ -62,9 +62,14 @@ public class Relentless extends DelveModifier {
 	public Relentless(Plugin plugin, Player player) {
 		super(plugin, player, Modifier.RELENTLESS);
 
-		int rank = DelvesUtils.getDelveInfo(player).getRank(Modifier.RELENTLESS);
-		mKBRModifier = KBR_MODIFIER[rank - 1];
-		mBlockBreakChance = BLOCK_BREAK_CHANCE[rank - 1];
+		if (player != null) {
+			int rank = DelvesUtils.getDelveInfo(player).getRank(Modifier.RELENTLESS);
+			mKBRModifier = KBR_MODIFIER[rank - 1];
+			mBlockBreakChance = BLOCK_BREAK_CHANCE[rank - 1];
+		} else {
+			mKBRModifier = 0;
+			mBlockBreakChance = 0;
+		}
 	}
 
 	@Override

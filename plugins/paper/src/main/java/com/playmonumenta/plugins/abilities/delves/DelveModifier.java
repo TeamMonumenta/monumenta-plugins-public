@@ -47,7 +47,7 @@ public class DelveModifier extends Ability {
 	}
 
 	public static boolean canUse(Player player, Modifier modifier) {
-		return DelvesUtils.getDelveInfo(player).getRank(modifier) > 0;
+		return player != null && DelvesUtils.getDelveInfo(player).getRank(modifier) > 0;
 	}
 
 	@Override

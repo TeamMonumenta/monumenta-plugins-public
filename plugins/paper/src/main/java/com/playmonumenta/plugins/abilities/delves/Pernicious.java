@@ -44,8 +44,12 @@ public class Pernicious extends DelveModifier {
 	public Pernicious(Plugin plugin, Player player) {
 		super(plugin, player, Modifier.PERNICIOUS);
 
-		int rank = DelvesUtils.getDelveInfo(player).getRank(Modifier.PERNICIOUS);
-		mSpawnChance = SPAWN_CHANCE[rank - 1];
+		if (player != null) {
+			int rank = DelvesUtils.getDelveInfo(player).getRank(Modifier.PERNICIOUS);
+			mSpawnChance = SPAWN_CHANCE[rank - 1];
+		} else {
+			mSpawnChance = 0;
+		}
 	}
 
 	@Override

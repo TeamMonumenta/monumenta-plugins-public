@@ -1,7 +1,13 @@
 package com.playmonumenta.plugins.inventories;
 
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.UUID;
+
+import com.playmonumenta.plugins.point.Raycast;
+import com.playmonumenta.plugins.point.RaycastData;
+import com.playmonumenta.scriptedquests.utils.InventoryUtils;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -21,13 +27,9 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 
-import com.playmonumenta.plugins.point.Raycast;
-import com.playmonumenta.plugins.point.RaycastData;
-import com.playmonumenta.scriptedquests.utils.InventoryUtils;
-
 public class PlayerInventoryView implements Listener {
 	private static final String PERMISSION = "monumenta.peb.inventoryview";
-	private static List<Player> players = new ArrayList<>();
+	private static Set<UUID> mPlayers = new HashSet<>();
 
 	@EventHandler(priority = EventPriority.LOW)
 	public void playerInteractEvent(PlayerInteractEvent event) {
@@ -68,7 +70,7 @@ public class PlayerInventoryView implements Listener {
 	//This handles clicking, shift clicking, double clicking, etc.
 	@EventHandler(priority = EventPriority.LOW)
 	public void inventoryClickEvent(InventoryClickEvent event) {
-		if (players.contains(event.getWhoClicked())) {
+		if (mPlayers.contains(event.getWhoClicked().getUniqueId())) {
 			event.setCancelled(true);
 			return;
 		}
@@ -77,7 +79,7 @@ public class PlayerInventoryView implements Listener {
 	//Just as a precaution
 	@EventHandler(priority = EventPriority.LOW)
 	public void inventoryDragEvent(InventoryDragEvent event) {
-		if (players.contains(event.getWhoClicked())) {
+		if (mPlayers.contains(event.getWhoClicked().getUniqueId())) {
 			event.setCancelled(true);
 			return;
 		}
@@ -86,15 +88,15 @@ public class PlayerInventoryView implements Listener {
 	//Make sure they can eventually move stuff
 	@EventHandler(priority = EventPriority.LOW)
 	public void inventoryCloseEvent(InventoryCloseEvent event) {
-		if (players.contains(event.getPlayer())) {
-			players.remove(event.getPlayer());
+		if (mPlayers.contains(event.getPlayer().getUniqueId())) {
+			mPlayers.remove(event.getPlayer().getUniqueId());
 		}
 	}
 
 	@EventHandler(priority = EventPriority.LOW)
 	public void playerLoginEvent(PlayerLoginEvent event) {
-		if (players.contains(event.getPlayer())) {
-			players.remove(event.getPlayer());
+		if (mPlayers.contains(event.getPlayer().getUniqueId())) {
+			mPlayers.remove(event.getPlayer().getUniqueId());
 		}
 	}
 
@@ -105,7 +107,7 @@ public class PlayerInventoryView implements Listener {
 			return;
 		}
 		//Added for tracking to prevent them from clicking on stuff
-		players.add(player);
+		mPlayers.add(player.getUniqueId());
 
 		PlayerInventory playInv = clickedPlayer.getInventory();
 		Inventory openInv = Bukkit.createInventory(null, 18, clickedPlayer.getDisplayName() + "'s Inventory");

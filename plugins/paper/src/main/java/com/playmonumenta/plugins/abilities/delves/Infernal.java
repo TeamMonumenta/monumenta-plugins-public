@@ -100,10 +100,16 @@ public class Infernal extends DelveModifier {
 	public Infernal(Plugin plugin, Player player) {
 		super(plugin, player, Modifier.INFERNAL);
 
-		int rank = DelvesUtils.getDelveInfo(player).getRank(Modifier.INFERNAL);
-		mEnvironmentalDamageTakenMultiplier = ENVIRONMENTAL_DAMAGE_TAKEN_MULTIPLIER[rank - 1];
-		mBurningDamageTakenMultiplier = BURNING_DAMAGE_TAKEN_MULTIPLIER[rank - 1];
-		mAbilityChance = ABILITY_CHANCE[rank - 1];
+		if (player != null) {
+			int rank = DelvesUtils.getDelveInfo(player).getRank(Modifier.INFERNAL);
+			mEnvironmentalDamageTakenMultiplier = ENVIRONMENTAL_DAMAGE_TAKEN_MULTIPLIER[rank - 1];
+			mBurningDamageTakenMultiplier = BURNING_DAMAGE_TAKEN_MULTIPLIER[rank - 1];
+			mAbilityChance = ABILITY_CHANCE[rank - 1];
+		} else {
+			mEnvironmentalDamageTakenMultiplier = 0;
+			mBurningDamageTakenMultiplier = 0;
+			mAbilityChance = 0;
+		}
 	}
 
 	@Override

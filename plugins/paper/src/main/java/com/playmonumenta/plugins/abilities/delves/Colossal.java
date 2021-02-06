@@ -48,8 +48,12 @@ public class Colossal extends DelveModifier {
 	public Colossal(Plugin plugin, Player player) {
 		super(plugin, player, Modifier.COLOSSAL);
 
-		int rank = DelvesUtils.getDelveInfo(player).getRank(Modifier.COLOSSAL);
-		mSpawnChance = SPAWN_CHANCE[rank - 1];
+		if (player != null) {
+			int rank = DelvesUtils.getDelveInfo(player).getRank(Modifier.COLOSSAL);
+			mSpawnChance = SPAWN_CHANCE[rank - 1];
+		} else {
+			mSpawnChance = 0;
+		}
 	}
 
 	@Override

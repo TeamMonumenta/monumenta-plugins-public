@@ -35,8 +35,12 @@ public class Bloodthirsty extends DelveModifier {
 	public Bloodthirsty(Plugin plugin, Player player) {
 		super(plugin, player, Modifier.BLOODTHIRSTY);
 
-		int rank = DelvesUtils.getDelveInfo(player).getRank(Modifier.BLOODTHIRSTY);
-		mBloodthirstyChance = BLOODTHIRSTY_CHANCE[rank - 1];
+		if (player != null) {
+			int rank = DelvesUtils.getDelveInfo(player).getRank(Modifier.BLOODTHIRSTY);
+			mBloodthirstyChance = BLOODTHIRSTY_CHANCE[rank - 1];
+		} else {
+			mBloodthirstyChance = 0;
+		}
 	}
 
 	@Override

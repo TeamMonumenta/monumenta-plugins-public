@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.enchantments;
 import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
@@ -24,7 +25,7 @@ public class Festive implements BaseEnchantment {
 	private static final int TICK_PERIOD = 5;
 	private static final Particle.DustOptions FESTIVE_RED_COLOR = new Particle.DustOptions(Color.fromRGB(255, 98, 71), 1.0f);
 	private static final Particle.DustOptions FESTIVE_GREEN_COLOR = new Particle.DustOptions(Color.fromRGB(75, 200, 0), 1.0f);
-	private static final Set<Player> NO_SELF_PARTICLES = new HashSet<Player>();
+	private static final Set<UUID> NO_SELF_PARTICLES = new HashSet<>();
 
 	@Override
 	public String getProperty() {
@@ -49,9 +50,9 @@ public class Festive implements BaseEnchantment {
 	@Override
 	public int getLevelFromItem(ItemStack item, Player player) {
 		if (player.getScoreboardTags().contains("noSelfParticles")) {
-			NO_SELF_PARTICLES.add(player);
+			NO_SELF_PARTICLES.add(player.getUniqueId());
 		} else {
-			NO_SELF_PARTICLES.remove(player);
+			NO_SELF_PARTICLES.remove(player.getUniqueId());
 		}
 		return getLevelFromItem(item);
 	}
@@ -59,7 +60,7 @@ public class Festive implements BaseEnchantment {
 	@Override
 	public void tick(Plugin plugin, Player player, int level) {
 		final Location loc = player.getLocation().add(0, 1, 0);
-		if (NO_SELF_PARTICLES.contains(player)) {
+		if (NO_SELF_PARTICLES.contains(player.getUniqueId())) {
 			for (Player other : PlayerUtils.playersInRange(player, 30, false)) {
 				other.spawnParticle(Particle.REDSTONE, loc, Math.max(6, 2 + level), 0.4, 0.4, 0.4, FESTIVE_RED_COLOR);
 				other.spawnParticle(Particle.REDSTONE, loc, Math.max(6, 2 + level), 0.4, 0.4, 0.4, FESTIVE_GREEN_COLOR);

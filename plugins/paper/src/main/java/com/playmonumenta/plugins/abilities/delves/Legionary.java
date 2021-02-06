@@ -45,8 +45,12 @@ public class Legionary extends DelveModifier {
 	public Legionary(Plugin plugin, Player player) {
 		super(plugin, player, Modifier.LEGIONARY);
 
-		int rank = DelvesUtils.getDelveInfo(player).getRank(Modifier.LEGIONARY);
-		mSpawnChance = SPAWN_CHANCE[rank - 1];
+		if (player != null) {
+			int rank = DelvesUtils.getDelveInfo(player).getRank(Modifier.LEGIONARY);
+			mSpawnChance = SPAWN_CHANCE[rank - 1];
+		} else {
+			mSpawnChance = 0;
+		}
 	}
 
 	@Override

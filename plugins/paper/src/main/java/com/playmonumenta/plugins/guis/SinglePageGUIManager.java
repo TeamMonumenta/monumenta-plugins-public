@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.guis;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
@@ -20,10 +21,10 @@ public class SinglePageGUIManager implements Listener {
 		new ExampleSinglePageGUI(null, null).registerCommand();
 	}
 
-	private static final Map<Player, SinglePageGUI> GUI_MAPPINGS = new HashMap<>();
+	private static final Map<UUID, SinglePageGUI> GUI_MAPPINGS = new HashMap<>();
 
 	public static void openGUI(Player player, SinglePageGUI gui) {
-		GUI_MAPPINGS.put(player, gui);
+		GUI_MAPPINGS.put(player.getUniqueId(), gui);
 		gui.openGUI();
 	}
 
@@ -32,7 +33,7 @@ public class SinglePageGUIManager implements Listener {
 		if (entity instanceof Player) {
 			Player player = (Player) entity;
 
-			SinglePageGUI gui = GUI_MAPPINGS.get(player);
+			SinglePageGUI gui = GUI_MAPPINGS.get(player.getUniqueId());
 			if (gui != null && gui.contains(event.getInventory())) {
 				return gui;
 			}
@@ -59,7 +60,7 @@ public class SinglePageGUIManager implements Listener {
 
 	@EventHandler
 	public void inventoryCloseEvent(InventoryCloseEvent event) {
-		GUI_MAPPINGS.remove(event.getPlayer());
+		GUI_MAPPINGS.remove(event.getPlayer().getUniqueId());
 	}
 
 }

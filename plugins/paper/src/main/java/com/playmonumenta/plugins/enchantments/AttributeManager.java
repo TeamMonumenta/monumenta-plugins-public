@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -32,7 +33,7 @@ public class AttributeManager {
 		}
 
 		private class Node {
-			public Map<Player, AttributeInfo> mAttributeInfoMappings;
+			public Map<UUID, AttributeInfo> mAttributeInfoMappings;
 			public Node[] mChildren = new Node[ALPHABET_SIZE];
 		}
 
@@ -54,14 +55,14 @@ public class AttributeManager {
 				current = current.mChildren[index];
 			}
 
-			current.mAttributeInfoMappings = new HashMap<Player, AttributeInfo>();
+			current.mAttributeInfoMappings = new HashMap<UUID, AttributeInfo>();
 		}
 
 		// Resets attributes for the specified player, should be called before adds
 		//If isMainHand, reset arrow attribute anyway, in case player changed to non-arrow projectile launcher
 		public void reset(Player player, boolean resetMainHandOnly) {
 			for (BaseAttribute attribute : mAttributes) {
-				AttributeInfo attributeInfo = get(attribute.getProperty()).mAttributeInfoMappings.get(player);
+				AttributeInfo attributeInfo = get(attribute.getProperty()).mAttributeInfoMappings.get(player.getUniqueId());
 
 				if (attributeInfo == null) {
 					attributeInfo = new AttributeInfo();
@@ -86,10 +87,10 @@ public class AttributeManager {
 			Node node = get(key);
 
 			if (node != null) {
-				AttributeInfo attributeInfo = node.mAttributeInfoMappings.get(player);
+				AttributeInfo attributeInfo = node.mAttributeInfoMappings.get(player.getUniqueId());
 				if (attributeInfo == null) {
 					attributeInfo = new AttributeInfo();
-					node.mAttributeInfoMappings.put(player, attributeInfo);
+					node.mAttributeInfoMappings.put(player.getUniqueId(), attributeInfo);
 				}
 
 				if (isMultiplier) {
@@ -112,10 +113,10 @@ public class AttributeManager {
 			Node node = get(key);
 
 			if (node != null) {
-				AttributeInfo attributeInfo = node.mAttributeInfoMappings.get(player);
+				AttributeInfo attributeInfo = node.mAttributeInfoMappings.get(player.getUniqueId());
 				if (attributeInfo == null) {
 					attributeInfo = new AttributeInfo();
-					node.mAttributeInfoMappings.put(player, attributeInfo);
+					node.mAttributeInfoMappings.put(player.getUniqueId(), attributeInfo);
 				}
 
 				if (isMultiplier) {
@@ -128,7 +129,7 @@ public class AttributeManager {
 
 		public void resetArrow(Player player) {
 			for (BaseAttribute attribute : mAttributes) {
-				AttributeInfo attributeInfo = get(attribute.getProperty()).mAttributeInfoMappings.get(player);
+				AttributeInfo attributeInfo = get(attribute.getProperty()).mAttributeInfoMappings.get(player.getUniqueId());
 
 				if (attributeInfo == null) {
 					attributeInfo = new AttributeInfo();
@@ -145,7 +146,7 @@ public class AttributeManager {
 			Node node = get(key);
 
 			if (node != null) {
-				AttributeInfo attributeInfo = node.mAttributeInfoMappings.get(player);
+				AttributeInfo attributeInfo = node.mAttributeInfoMappings.get(player.getUniqueId());
 				if (attributeInfo != null) {
 					//Include attributes of arrow when shot
 					return attributeInfo.getValue();

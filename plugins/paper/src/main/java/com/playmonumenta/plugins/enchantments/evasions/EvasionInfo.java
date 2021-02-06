@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.enchantments.evasions;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -31,7 +32,7 @@ public class EvasionInfo {
 		EVASION_DAMAGE_REDUCTION.put(THRESHOLD_INTERVAL * 1, DAMAGE_REDUCTION_INTERVAL * 1);
 	}
 
-	private static final Map<Player, EvasionInfo> EVASION_INFOS = new HashMap<Player, EvasionInfo>();
+	private static final Map<UUID, EvasionInfo> EVASION_INFOS = new HashMap<>();
 
 	private int mStacks = 0;
 
@@ -64,10 +65,10 @@ public class EvasionInfo {
 	}
 
 	private static EvasionInfo getInfo(Player player) {
-		EvasionInfo info = EVASION_INFOS.get(player);
+		EvasionInfo info = EVASION_INFOS.get(player.getUniqueId());
 		if (info == null) {
 			info = new EvasionInfo();
-			EVASION_INFOS.put(player, info);
+			EVASION_INFOS.put(player.getUniqueId(), info);
 		}
 
 		return info;

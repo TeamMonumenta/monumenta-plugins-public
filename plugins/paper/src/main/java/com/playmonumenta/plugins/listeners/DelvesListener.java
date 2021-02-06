@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
@@ -116,15 +117,15 @@ public class DelvesListener implements Listener {
 
 
 
-	private static final Map<Player, DelveModifierSelectionGUI> GUI_MAPPINGS = new HashMap<>();
+	private static final Map<UUID, DelveModifierSelectionGUI> GUI_MAPPINGS = new HashMap<>();
 
 	public static void openGUI(Player player, DelveModifierSelectionGUI gui) {
-		GUI_MAPPINGS.put(player, gui);
+		GUI_MAPPINGS.put(player.getUniqueId(), gui);
 		gui.openGUI();
 	}
 
 	public static void closeGUI(Player player) {
-		GUI_MAPPINGS.remove(player);
+		GUI_MAPPINGS.remove(player.getUniqueId());
 		player.closeInventory();
 	}
 
@@ -133,7 +134,7 @@ public class DelvesListener implements Listener {
 		if (entity instanceof Player) {
 			Player player = (Player) entity;
 
-			DelveModifierSelectionGUI gui = GUI_MAPPINGS.get(player);
+			DelveModifierSelectionGUI gui = GUI_MAPPINGS.get(player.getUniqueId());
 			if (gui != null && gui.contains(event.getInventory())) {
 				return gui;
 			}
@@ -157,5 +158,4 @@ public class DelvesListener implements Listener {
 			event.setCancelled(true);
 		}
 	}
-
 }

@@ -47,8 +47,12 @@ public class Spectral extends DelveModifier {
 	public Spectral(Plugin plugin, Player player) {
 		super(plugin, player, Modifier.SPECTRAL);
 
-		int rank = DelvesUtils.getDelveInfo(player).getRank(Modifier.SPECTRAL);
-		mSpawnChance = SPAWN_CHANCE[rank - 1];
+		if (player != null) {
+			int rank = DelvesUtils.getDelveInfo(player).getRank(Modifier.SPECTRAL);
+			mSpawnChance = SPAWN_CHANCE[rank - 1];
+		} else {
+			mSpawnChance = 0;
+		}
 	}
 
 	@Override
