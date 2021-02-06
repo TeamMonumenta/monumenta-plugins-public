@@ -1,9 +1,7 @@
 package com.playmonumenta.plugins.inventories;
 
-import java.util.HashSet;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
-import java.util.UUID;
 
 import com.playmonumenta.plugins.point.Raycast;
 import com.playmonumenta.plugins.point.RaycastData;
@@ -23,13 +21,15 @@ import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 
 public class PlayerInventoryView implements Listener {
 	private static final String PERMISSION = "monumenta.peb.inventoryview";
-	private static Set<UUID> mPlayers = new HashSet<>();
+	private static List<Player> mPlayers = new ArrayList<>(10);
+	private static List<Inventory> mInventories = new ArrayList<>(10);
 
 	@EventHandler(priority = EventPriority.LOW)
 	public void playerInteractEvent(PlayerInteractEvent event) {
@@ -58,7 +58,7 @@ public class PlayerInventoryView implements Listener {
 				//Below if check is almost certainly not necessary, but always be careful
 				if (data.getEntities().get(0) instanceof Player) {
 					Player clickedPlayer = (Player)data.getEntities().get(0);
-					if (!(clickedPlayer).getUniqueId().equals(player.getUniqueId())) {
+					if (!(clickedPlayer).equals(player)) {
 						inventoryView(event.getPlayer(), clickedPlayer);
 					}
 				}
@@ -70,34 +70,35 @@ public class PlayerInventoryView implements Listener {
 	//This handles clicking, shift clicking, double clicking, etc.
 	@EventHandler(priority = EventPriority.LOW)
 	public void inventoryClickEvent(InventoryClickEvent event) {
-		if (mPlayers.contains(event.getWhoClicked().getUniqueId())) {
+		if (mPlayers.contains(event.getWhoClicked())
+		    || mInventories.contains(event.getClickedInventory())
+		    || mInventories.contains(event.getInventory())) {
 			event.setCancelled(true);
-			return;
 		}
 	}
 
 	//Just as a precaution
 	@EventHandler(priority = EventPriority.LOW)
 	public void inventoryDragEvent(InventoryDragEvent event) {
-		if (mPlayers.contains(event.getWhoClicked().getUniqueId())) {
+		if (mPlayers.contains(event.getWhoClicked()) || mInventories.contains(event.getInventory())) {
 			event.setCancelled(true);
-			return;
 		}
 	}
 
-	//Make sure they can eventually move stuff
 	@EventHandler(priority = EventPriority.LOW)
 	public void inventoryCloseEvent(InventoryCloseEvent event) {
-		if (mPlayers.contains(event.getPlayer().getUniqueId())) {
-			mPlayers.remove(event.getPlayer().getUniqueId());
-		}
+		mPlayers.remove(event.getPlayer());
+		mInventories.remove(event.getInventory());
 	}
 
 	@EventHandler(priority = EventPriority.LOW)
 	public void playerLoginEvent(PlayerLoginEvent event) {
-		if (mPlayers.contains(event.getPlayer().getUniqueId())) {
-			mPlayers.remove(event.getPlayer().getUniqueId());
-		}
+		mPlayers.remove(event.getPlayer());
+	}
+
+	@EventHandler(priority = EventPriority.LOW)
+	public void playerQuitEvent(PlayerQuitEvent event) {
+		mPlayers.remove(event.getPlayer());
 	}
 
 	public void inventoryView(Player player, Player clickedPlayer) {
@@ -107,10 +108,11 @@ public class PlayerInventoryView implements Listener {
 			return;
 		}
 		//Added for tracking to prevent them from clicking on stuff
-		mPlayers.add(player.getUniqueId());
+		mPlayers.add(player);
 
 		PlayerInventory playInv = clickedPlayer.getInventory();
 		Inventory openInv = Bukkit.createInventory(null, 18, clickedPlayer.getDisplayName() + "'s Inventory");
+		mInventories.add(openInv);
 
 		//Set the fake inventory's top row to be the armor and offhand of the player
 		openInv.setItem(0, playInv.getHelmet());
