@@ -17,23 +17,29 @@ import me.lucko.luckperms.api.MessagingService;
 import me.lucko.luckperms.api.Node;
 
 public class LuckPermsIntegration {
+	protected static LuckPermsApi LP = null;
+
 	public LuckPermsIntegration(Plugin plugin) {
 		plugin.getLogger().info("Enabling LuckPerms integration");
-		LuckPermsApi lp = LuckPerms.getApi();
+		LP = LuckPerms.getApi();
 
-		CreateGuild.register(plugin, lp);
-		JoinGuild.register(plugin, lp);
-		PromoteGuild.register(lp);
-		LeaveGuild.register(plugin, lp);
-		TestGuild.register(plugin, lp);
-		TeleportGuild.register(lp);
-		SetGuildTeleport.register(plugin, lp);
+		CreateGuild.register(plugin);
+		JoinGuild.register(plugin);
+		PromoteGuild.register();
+		LeaveGuild.register(plugin);
+		TestGuild.register(plugin);
+		TeleportGuild.register();
+		SetGuildTeleport.register(plugin);
 	}
 
-	public static Group getGuild(LuckPermsApi lp, Player player) {
-		for (Node userNode : lp.getUser(player.getUniqueId()).getOwnNodes()) {
+	public static Group getGuild(Player player) {
+		if (LuckPermsIntegration.LP == null) {
+			return null;
+		}
+
+		for (Node userNode : LP.getUser(player.getUniqueId()).getOwnNodes()) {
 			if (userNode.isGroupNode()) {
-				Group group = lp.getGroup(userNode.getGroupName());
+				Group group = LP.getGroup(userNode.getGroupName());
 				for (Node groupChildNode : group.getNodes().values()) {
 					if (groupChildNode.isMeta()) {
 						Entry<String, String> meta = groupChildNode.getMeta();
@@ -65,7 +71,7 @@ public class LuckPermsIntegration {
 		return null;
 	}
 
-	public static void setGuildTp(LuckPermsApi lp, Group group, Plugin plugin, Location loc) {
+	public static void setGuildTp(Group group, Plugin plugin, Location loc) {
 		// Remove all the other guildtp meta nodes
 		for (Node groupChildNode : group.getNodes().values()) {
 			if (groupChildNode.isMeta()) {
@@ -76,19 +82,19 @@ public class LuckPermsIntegration {
 			}
 		}
 
-		group.setPermission(lp.getNodeFactory().makeMetaNode("guildtp", LocationUtils.locationToString(loc)).build());
+		group.setPermission(LP.getNodeFactory().makeMetaNode("guildtp", LocationUtils.locationToString(loc)).build());
 
 		new BukkitRunnable() {
 			@Override
 			public void run() {
-				lp.getGroupManager().saveGroup(group);
-				lp.runUpdateTask();
-				lp.getMessagingService().ifPresent(MessagingService::pushUpdate);
+				LP.getGroupManager().saveGroup(group);
+				LP.runUpdateTask();
+				LP.getMessagingService().ifPresent(MessagingService::pushUpdate);
 			}
 		}.runTaskAsynchronously(plugin);
 	}
 
-	public static Location getGuildTp(LuckPermsApi lp, World world, Group group) {
+	public static Location getGuildTp(World world, Group group) {
 		try {
 			for (Node groupChildNode : group.getNodes().values()) {
 				if (groupChildNode.isMeta()) {

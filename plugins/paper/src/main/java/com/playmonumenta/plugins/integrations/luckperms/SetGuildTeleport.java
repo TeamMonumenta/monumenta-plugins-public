@@ -16,10 +16,9 @@ import dev.jorel.commandapi.arguments.Argument;
 import dev.jorel.commandapi.arguments.TextArgument;
 import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
 import me.lucko.luckperms.api.Group;
-import me.lucko.luckperms.api.LuckPermsApi;
 
 public class SetGuildTeleport {
-	public static void register(Plugin plugin, LuckPermsApi lp) {
+	public static void register(Plugin plugin) {
 		// setguildteleport <guildname>
 		CommandPermission perms = CommandPermission.fromString("monumenta.command.setguildteleport");
 
@@ -30,12 +29,12 @@ public class SetGuildTeleport {
 			.withPermission(perms)
 			.withArguments(arguments)
 			.executes((sender, args) -> {
-				run(plugin, lp, sender, (String)args[0]);
+				run(plugin, sender, (String)args[0]);
 			})
 			.register();
 	}
 
-	private static void run(Plugin plugin, LuckPermsApi lp, CommandSender sender,
+	private static void run(Plugin plugin, CommandSender sender,
 	                        String guildName) throws WrapperCommandSyntaxException {
 
 		if (!(sender instanceof Player)) {
@@ -48,14 +47,14 @@ public class SetGuildTeleport {
 		String cleanGuildName = LuckPermsIntegration.getCleanGuildName(guildName);
 
 		//TODO: Better lookup of guild name?
-		Group group = lp.getGroup(cleanGuildName);
+		Group group = LuckPermsIntegration.LP.getGroup(cleanGuildName);
 		if (group == null) {
 			CommandAPI.fail("The luckperms group '" + cleanGuildName + "' does not exist");
 		}
 
 		Location loc = player.getLocation();
 
-		LuckPermsIntegration.setGuildTp(lp, group, plugin, loc);
+		LuckPermsIntegration.setGuildTp(group, plugin, loc);
 
 		player.sendMessage(ChatColor.GOLD + "Guild teleport set to your location");
 	}

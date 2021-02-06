@@ -15,10 +15,9 @@ import dev.jorel.commandapi.arguments.EntitySelectorArgument.EntitySelector;
 import dev.jorel.commandapi.arguments.TextArgument;
 import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
 import me.lucko.luckperms.api.Group;
-import me.lucko.luckperms.api.LuckPermsApi;
 
 public class TestGuild {
-	public static void register(Plugin plugin, LuckPermsApi lp) {
+	public static void register(Plugin plugin) {
 
 		// testguild <playername>
 		CommandPermission perms = CommandPermission.fromString("monumenta.command.testguild");
@@ -31,13 +30,13 @@ public class TestGuild {
 			.withPermission(perms)
 			.withArguments(arguments)
 			.executes((sender, args) -> {
-				run(lp, (String) args[1], (Player) args[0]);
+				run((String) args[1], (Player) args[0]);
 			})
 			.register();
 	}
 
-	private static void run(LuckPermsApi lp, String guildName, Player player) throws WrapperCommandSyntaxException {
-		Group currentGuild = LuckPermsIntegration.getGuild(lp, player);
+	private static void run(String guildName, Player player) throws WrapperCommandSyntaxException {
+		Group currentGuild = LuckPermsIntegration.getGuild(player);
 		String currentGuildName = LuckPermsIntegration.getGuildName(currentGuild);
 
 		if (currentGuildName == null) {

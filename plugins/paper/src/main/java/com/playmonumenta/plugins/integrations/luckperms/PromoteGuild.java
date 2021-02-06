@@ -17,10 +17,9 @@ import dev.jorel.commandapi.arguments.EntitySelectorArgument;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument.EntitySelector;
 import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
 import me.lucko.luckperms.api.Group;
-import me.lucko.luckperms.api.LuckPermsApi;
 
 public class PromoteGuild {
-	public static void register(LuckPermsApi lp) {
+	public static void register() {
 		// promoteguild <playername>
 		CommandPermission perms = CommandPermission.fromString("monumenta.command.promoteguild");
 
@@ -31,13 +30,13 @@ public class PromoteGuild {
 			.withPermission(perms)
 			.withArguments(arguments)
 			.executes((sender, args) -> {
-				run(lp, (Player) args[0]);
+				run((Player) args[0]);
 			})
 			.register();
 	}
 
-	private static void run(LuckPermsApi lp, Player player) throws WrapperCommandSyntaxException {
-		Group currentGuild = LuckPermsIntegration.getGuild(lp, player);
+	private static void run(Player player) throws WrapperCommandSyntaxException {
+		Group currentGuild = LuckPermsIntegration.getGuild(player);
 		String currentGuildName = LuckPermsIntegration.getGuildName(currentGuild);
 		if (currentGuild == null || currentGuildName == null) {
 			String err = ChatColor.RED + "You are not in a guild";
@@ -53,7 +52,7 @@ public class PromoteGuild {
 
 		// Check for nearby founder
 		for (Player p : PlayerUtils.playersInRange(player, 1, false)) {
-			Group nearbyPlayerGroup = LuckPermsIntegration.getGuild(lp, p);
+			Group nearbyPlayerGroup = LuckPermsIntegration.getGuild(p);
 			String nearbyPlayerGroupName = LuckPermsIntegration.getGuildName(nearbyPlayerGroup);
 			if (nearbyPlayerGroup != null && nearbyPlayerGroupName != null &&
 			    nearbyPlayerGroupName.equalsIgnoreCase(currentGuildName) &&

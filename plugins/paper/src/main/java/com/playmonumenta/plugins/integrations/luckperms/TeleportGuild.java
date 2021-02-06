@@ -16,13 +16,12 @@ import dev.jorel.commandapi.arguments.EntitySelectorArgument.EntitySelector;
 import dev.jorel.commandapi.arguments.TextArgument;
 import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
 import me.lucko.luckperms.api.Group;
-import me.lucko.luckperms.api.LuckPermsApi;
 
 public class TeleportGuild {
 	private static final String COMMAND = "teleportguild";
 
 	@SuppressWarnings("unchecked")
-	public static void register(LuckPermsApi lp) {
+	public static void register() {
 		// teleportguild <guildname> <player>
 		CommandPermission perms = CommandPermission.fromString("monumenta.command.teleportguild");
 
@@ -34,7 +33,7 @@ public class TeleportGuild {
 			.withArguments(arguments)
 			.executes((sender, args) -> {
 				for (Player player : (List<Player>)args[0]) {
-					run(lp, player, null);
+					run(player, null);
 				}
 			})
 			.register();
@@ -45,19 +44,19 @@ public class TeleportGuild {
 			.withArguments(arguments)
 			.executes((sender, args) -> {
 				for (Player player : (List<Player>)args[0]) {
-					run(lp, player, (String)args[1]);
+					run(player, (String)args[1]);
 				}
 			})
 			.register();
 	}
 
-	private static void run(LuckPermsApi lp, Player player, String guildName) throws WrapperCommandSyntaxException {
+	private static void run(Player player, String guildName) throws WrapperCommandSyntaxException {
 
 		Group group = null;
 
 		if (guildName == null) {
 			// Look up the player's guild
-			group = LuckPermsIntegration.getGuild(lp, player);
+			group = LuckPermsIntegration.getGuild(player);
 			if (group == null) {
 				String err = ChatColor.RED + "You are not in a guild!";
 				player.sendMessage(err);
@@ -73,13 +72,13 @@ public class TeleportGuild {
 			//TODO: Better lookup of guild name?
 			String cleanGuildName = LuckPermsIntegration.getCleanGuildName(guildName);
 
-			group = lp.getGroup(cleanGuildName);
+			group = LuckPermsIntegration.LP.getGroup(cleanGuildName);
 			if (group == null) {
 				CommandAPI.fail("The luckperms group '" + cleanGuildName + "' does not exist");
 			}
 		}
 
-		Location loc = LuckPermsIntegration.getGuildTp(lp, player.getWorld(), group);
+		Location loc = LuckPermsIntegration.getGuildTp(player.getWorld(), group);
 
 		if (loc == null) {
 			player.sendMessage(ChatColor.RED + "The teleport for your guild is not set up");

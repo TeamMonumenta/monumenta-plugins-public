@@ -22,14 +22,13 @@ import dev.jorel.commandapi.arguments.EntitySelectorArgument;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument.EntitySelector;
 import dev.jorel.commandapi.arguments.TextArgument;
 import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
-import me.lucko.luckperms.api.LuckPermsApi;
 import me.lucko.luckperms.api.MessagingService;
 import me.lucko.luckperms.api.User;
 
 public class CreateGuild {
 
 	@SuppressWarnings("unchecked")
-	public static void register(Plugin plugin, LuckPermsApi lp) {
+	public static void register(Plugin plugin) {
 		// createguild <guildname> <guild tag>
 		CommandPermission perms = CommandPermission.fromString("monumenta.command.createguild");
 
@@ -43,19 +42,19 @@ public class CreateGuild {
 			.withPermission(perms)
 			.withArguments(arguments)
 			.executes((sender, args) -> {
-				run(plugin, lp, sender, (String) args[0], (String) args[1], (Collection<Player>) args[2]);
+				run(plugin, sender, (String) args[0], (String) args[1], (Collection<Player>) args[2]);
 			})
 			.register();
 	}
 
-	private static void run(Plugin plugin, LuckPermsApi lp, CommandSender sender,
+	private static void run(Plugin plugin, CommandSender sender,
 	                        String guildName, String guildTag, Collection<Player> founders) throws WrapperCommandSyntaxException {
 
 		// Guild name sanitization for command usage
 		String cleanGuildName = LuckPermsIntegration.getCleanGuildName(guildName);
 
 		//TODO: Better lookup of guild name?
-		if (lp.getGroup(cleanGuildName) != null) {
+		if (LuckPermsIntegration.LP.getGroup(cleanGuildName) != null) {
 			CommandAPI.fail("The luckperms group '" + cleanGuildName + "' already exists!");
 		}
 
@@ -63,7 +62,7 @@ public class CreateGuild {
 		boolean hasEnoughPrestige = true;
 		boolean inGuildAlready = false;
 		for (Player founder : founders) {
-			if (LuckPermsIntegration.getGuild(lp, founder) != null) {
+			if (LuckPermsIntegration.getGuild(founder) != null) {
 				sender.sendMessage(ChatColor.DARK_RED + "" + ChatColor.ITALIC + "Player "
 				                   + founder.getName() + " is already in a guild!");
 				inGuildAlready = true;
@@ -111,19 +110,19 @@ public class CreateGuild {
 
 		// Sort out permissions
 		Executor executor = runnable -> Bukkit.getScheduler().runTask(plugin, runnable);
-		lp.getGroupManager().createAndLoadGroup(cleanGuildName).thenAcceptAsync(
+		LuckPermsIntegration.LP.getGroupManager().createAndLoadGroup(cleanGuildName).thenAcceptAsync(
 			group -> {
-				group.setPermission(lp.getNodeFactory().makePrefixNode(1, guildTag).build());
-				group.setPermission(lp.getNodeFactory().makeMetaNode("hoverprefix", guildName).build());
-				group.setPermission(lp.getNodeFactory().makeMetaNode("guildname", guildName).build());
+				group.setPermission(LuckPermsIntegration.LP.getNodeFactory().makePrefixNode(1, guildTag).build());
+				group.setPermission(LuckPermsIntegration.LP.getNodeFactory().makeMetaNode("hoverprefix", guildName).build());
+				group.setPermission(LuckPermsIntegration.LP.getNodeFactory().makeMetaNode("guildname", guildName).build());
 				for (Player founder : founders) {
-					User user = lp.getUser(founder.getUniqueId());
-					user.setPermission(lp.getNodeFactory().makeGroupNode(group).build());
-					lp.getUserManager().saveUser(user);
+					User user = LuckPermsIntegration.LP.getUser(founder.getUniqueId());
+					user.setPermission(LuckPermsIntegration.LP.getNodeFactory().makeGroupNode(group).build());
+					LuckPermsIntegration.LP.getUserManager().saveUser(user);
 				}
-				lp.getGroupManager().saveGroup(group);
-				lp.runUpdateTask();
-				lp.getMessagingService().ifPresent(MessagingService::pushUpdate);
+				LuckPermsIntegration.LP.getGroupManager().saveGroup(group);
+				LuckPermsIntegration.LP.runUpdateTask();
+				LuckPermsIntegration.LP.getMessagingService().ifPresent(MessagingService::pushUpdate);
 			}, executor
 		);
 	}

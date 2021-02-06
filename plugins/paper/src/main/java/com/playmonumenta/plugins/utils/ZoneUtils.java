@@ -9,6 +9,7 @@ import org.bukkit.util.Vector;
 public class ZoneUtils {
 	public enum ZoneProperty {
 		PLOTS_POSSIBLE("Plots Possible"),
+		SHOPS_POSSIBLE("Shops Possible"),
 		NO_MOBILITY_ABILITIES("No Mobility Abilities"),
 		NO_PORTABLE_STORAGE("No Portable Storage"),
 		SPECTATE_AVAILABLE("Spectate Available"),

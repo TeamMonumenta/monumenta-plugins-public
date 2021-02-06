@@ -18,13 +18,12 @@ import dev.jorel.commandapi.arguments.EntitySelectorArgument;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument.EntitySelector;
 import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
 import me.lucko.luckperms.api.Group;
-import me.lucko.luckperms.api.LuckPermsApi;
 import me.lucko.luckperms.api.MessagingService;
 import me.lucko.luckperms.api.Node;
 import me.lucko.luckperms.api.User;
 
 public class LeaveGuild {
-	public static void register(Plugin plugin, LuckPermsApi lp) {
+	public static void register(Plugin plugin) {
 
 		// leaveguild <playername>
 		CommandPermission perms = CommandPermission.fromString("monumenta.command.leaveguild");
@@ -36,18 +35,18 @@ public class LeaveGuild {
 			.withPermission(perms)
 			.withArguments(arguments)
 			.executes((sender, args) -> {
-				run(plugin, lp, (Player) args[0]);
+				run(plugin, (Player) args[0]);
 			})
 			.register();
 	}
 
-	private static void run(Plugin plugin, LuckPermsApi lp, Player player) throws WrapperCommandSyntaxException {
+	private static void run(Plugin plugin, Player player) throws WrapperCommandSyntaxException {
 		// Set scores and permissions
 		ScoreboardUtils.setScoreboardValue(player, "Founder", 0);
 
-		for (Node userNode : lp.getUser(player.getUniqueId()).getOwnNodes()) {
+		for (Node userNode : LuckPermsIntegration.LP.getUser(player.getUniqueId()).getOwnNodes()) {
 			if (userNode.isGroupNode()) {
-				Group group = lp.getGroup(userNode.getGroupName());
+				Group group = LuckPermsIntegration.LP.getGroup(userNode.getGroupName());
 				boolean guildFound = false;
 				String guildName = "";
 
@@ -66,11 +65,11 @@ public class LeaveGuild {
 					new BukkitRunnable() {
 						@Override
 						public void run() {
-							User user = lp.getUser(player.getUniqueId());
+							User user = LuckPermsIntegration.LP.getUser(player.getUniqueId());
 							user.unsetPermission(userNode);
-							lp.getUserManager().saveUser(user);
-							lp.runUpdateTask();
-							lp.getMessagingService().ifPresent(MessagingService::pushUpdate);
+							LuckPermsIntegration.LP.getUserManager().saveUser(user);
+							LuckPermsIntegration.LP.runUpdateTask();
+							LuckPermsIntegration.LP.getMessagingService().ifPresent(MessagingService::pushUpdate);
 						}
 					}.runTaskAsynchronously(plugin);
 

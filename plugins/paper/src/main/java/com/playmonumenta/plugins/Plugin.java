@@ -92,6 +92,7 @@ import com.playmonumenta.plugins.listeners.ZonePropertyListener;
 import com.playmonumenta.plugins.network.HttpManager;
 import com.playmonumenta.plugins.overrides.ItemOverrides;
 import com.playmonumenta.plugins.plots.PlotAccessManager;
+import com.playmonumenta.plugins.plots.ShopManager;
 import com.playmonumenta.plugins.potion.PotionManager;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.server.reset.DailyReset;
@@ -195,6 +196,7 @@ public class Plugin extends JavaPlugin {
 		/* If this is the plots shard, register /plotaccess functions and enable functionality */
 		if (ServerProperties.getShardName().equals("plots")) {
 			new PlotAccessManager(getLogger(), getDataFolder() + File.separator + "plot_access.json");
+			ShopManager.registerCommands();
 		}
 
 		mEnchantmentManager = new EnchantmentManager(this);
@@ -239,6 +241,11 @@ public class Plugin extends JavaPlugin {
 		// These are both a command and an event listener
 		manager.registerEvents(new Spectate(this), this);
 		manager.registerEvents(new SpectateBot(this), this);
+
+		/* If this is the plots shard, register /plotaccess functions and enable functionality */
+		if (ServerProperties.getShardName().equals("plots")) {
+			manager.registerEvents(new ShopManager(), this);
+		}
 
 		if (ServerProperties.getAuditMessagesEnabled()) {
 			manager.registerEvents(new AuditListener(getLogger()), this);

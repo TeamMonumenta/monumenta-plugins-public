@@ -19,12 +19,11 @@ import dev.jorel.commandapi.arguments.EntitySelectorArgument;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument.EntitySelector;
 import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
 import me.lucko.luckperms.api.Group;
-import me.lucko.luckperms.api.LuckPermsApi;
 import me.lucko.luckperms.api.MessagingService;
 import me.lucko.luckperms.api.User;
 
 public class JoinGuild {
-	public static void register(Plugin plugin, LuckPermsApi lp) {
+	public static void register(Plugin plugin) {
 		// joinguild <playername>
 		CommandPermission perms = CommandPermission.fromString("monumenta.command.joinguild");
 
@@ -35,13 +34,13 @@ public class JoinGuild {
 			.withPermission(perms)
 			.withArguments(arguments)
 			.executes((sender, args) -> {
-				run(plugin, lp, (Player) args[0]);
+				run(plugin, (Player) args[0]);
 			})
 			.register();
 	}
 
-	private static void run(Plugin plugin, LuckPermsApi lp, Player player) throws WrapperCommandSyntaxException {
-		Group currentGuild = LuckPermsIntegration.getGuild(lp, player);
+	private static void run(Plugin plugin, Player player) throws WrapperCommandSyntaxException {
+		Group currentGuild = LuckPermsIntegration.getGuild(player);
 		String currentGuildName = LuckPermsIntegration.getGuildName(currentGuild);
 		if (currentGuildName != null) {
 			String err = ChatColor.RED + "You are already in the guild '" + currentGuildName + "' !";
@@ -53,7 +52,7 @@ public class JoinGuild {
 		for (Player p : PlayerUtils.playersInRange(player, 1, false)) {
 			if (ScoreboardUtils.getScoreboardValue(p, "Founder") == 1) {
 				/* Nearby player is a founder - join to that guild */
-				Group group = LuckPermsIntegration.getGuild(lp, p);
+				Group group = LuckPermsIntegration.getGuild(p);
 				if (group == null) {
 					continue;
 				} else {
@@ -62,11 +61,11 @@ public class JoinGuild {
 					new BukkitRunnable() {
 						@Override
 						public void run() {
-							User user = lp.getUser(player.getUniqueId());
-							user.setPermission(lp.getNodeFactory().makeGroupNode(group).build());
-							lp.getUserManager().saveUser(user);
-							lp.runUpdateTask();
-							lp.getMessagingService().ifPresent(MessagingService::pushUpdate);
+							User user = LuckPermsIntegration.LP.getUser(player.getUniqueId());
+							user.setPermission(LuckPermsIntegration.LP.getNodeFactory().makeGroupNode(group).build());
+							LuckPermsIntegration.LP.getUserManager().saveUser(user);
+							LuckPermsIntegration.LP.runUpdateTask();
+							LuckPermsIntegration.LP.getMessagingService().ifPresent(MessagingService::pushUpdate);
 						}
 					}.runTaskAsynchronously(plugin);
 
