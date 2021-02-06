@@ -3,20 +3,15 @@ package com.playmonumenta.plugins.integrations;
 import java.util.UUID;
 import java.util.logging.Logger;
 
-import org.bukkit.ChatColor;
-import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
-import org.bukkit.event.Listener;
-
 import com.google.gson.JsonObject;
 import com.playmonumenta.networkrelay.NetworkRelayAPI;
 import com.playmonumenta.networkrelay.NetworkRelayMessageEvent;
-import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.commands.ClaimRaffle;
 import com.playmonumenta.plugins.commands.RedeemVoteRewards;
-import com.playmonumenta.plugins.utils.InventoryUtils;
-import com.playmonumenta.redissync.event.PlayerServerTransferEvent;
+
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.Listener;
 
 public class MonumentaNetworkRelayIntegration implements Listener {
 	public static final String AUDIT_LOG_CHANNEL = "Monumenta.Automation.AuditLog";
@@ -30,22 +25,6 @@ public class MonumentaNetworkRelayIntegration implements Listener {
 		logger.info("Enabling MonumentaNetworkRelay integration");
 		mLogger = logger;
 		INSTANCE = this;
-	}
-
-	@EventHandler(priority = EventPriority.HIGH)
-	public void playerServerTransferEvent(PlayerServerTransferEvent event) {
-		Player player = event.getPlayer();
-		mLogger.info("PlayerTransferEvent: Player: " + player + "   Target: " + event.getTarget());
-		Plugin.getInstance().mEffectManager.clearEffects(player);
-
-		player.closeInventory();
-
-		int dropped = InventoryUtils.removeSpecialItems(player, false);
-		if (dropped == 1) {
-			player.sendMessage(ChatColor.RED + "The dungeon key you were carrying was dropped!");
-		} else if (dropped > 1) {
-			player.sendMessage(ChatColor.RED + "The dungeon keys you were carrying were dropped!");
-		}
 	}
 
 	@EventHandler(priority = EventPriority.LOW)
