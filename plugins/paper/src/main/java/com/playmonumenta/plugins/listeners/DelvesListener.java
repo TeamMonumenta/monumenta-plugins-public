@@ -19,6 +19,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntitySpawnEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryInteractEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.util.BoundingBox;
 
 import com.playmonumenta.plugins.abilities.AbilityManager;
@@ -113,6 +114,15 @@ public class DelvesListener implements Listener {
 		}
 
 		return null;
+	}
+
+
+
+	@EventHandler
+	public void playerQuitEvent(PlayerQuitEvent event) {
+		Player player = event.getPlayer();
+		DelvesUtils.removeDelveInfo(player);
+		GUI_MAPPINGS.remove(player.getUniqueId());
 	}
 
 

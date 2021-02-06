@@ -416,6 +416,10 @@ public class DelvesUtils {
 		return info;
 	}
 
+	public static DelveInfo removeDelveInfo(Player player) {
+		return DELVE_INFO_MAPPINGS.remove(player.getUniqueId());
+	}
+
 	/*
 	 * This should only be called when the player is not on the the dungeon
 	 * shard itself (e.g. modifier selection). As such, it doesn't make

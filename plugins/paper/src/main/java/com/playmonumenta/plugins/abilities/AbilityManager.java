@@ -85,7 +85,6 @@ import com.playmonumenta.plugins.abilities.delves.StatMultiplier;
 import com.playmonumenta.plugins.abilities.delves.Transcendent;
 import com.playmonumenta.plugins.abilities.delves.Twisted;
 import com.playmonumenta.plugins.abilities.mage.ArcaneStrike;
-import com.playmonumenta.plugins.abilities.mage.ThunderStep;
 import com.playmonumenta.plugins.abilities.mage.ElementalArrows;
 import com.playmonumenta.plugins.abilities.mage.FrostNova;
 import com.playmonumenta.plugins.abilities.mage.MagePassive;
@@ -93,6 +92,7 @@ import com.playmonumenta.plugins.abilities.mage.MagmaShield;
 import com.playmonumenta.plugins.abilities.mage.ManaLance;
 import com.playmonumenta.plugins.abilities.mage.PrismaticShield;
 import com.playmonumenta.plugins.abilities.mage.Spellshock;
+import com.playmonumenta.plugins.abilities.mage.ThunderStep;
 import com.playmonumenta.plugins.abilities.mage.arcanist.ArcaneBarrage;
 import com.playmonumenta.plugins.abilities.mage.arcanist.FlashSword;
 import com.playmonumenta.plugins.abilities.mage.arcanist.Overload;
@@ -175,6 +175,7 @@ import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.AbsorptionUtils;
+import com.playmonumenta.plugins.utils.DelvesUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MetadataUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
@@ -503,6 +504,9 @@ public class AbilityManager {
 		player.setInvulnerable(false);
 		// The absorption tracker may lose track of the player when doing things like shard transfers, so reset absorption
 		AbsorptionUtils.setAbsorption(player, 0, -1);
+
+		// Reset the DelveInfo mapping so a new one is generated
+		DelvesUtils.removeDelveInfo(player);
 
 		/* Get the old ability list and run invalidate() on all of them to clean up lingering runnables */
 		if (mAbilities.containsKey(player.getUniqueId())) {
