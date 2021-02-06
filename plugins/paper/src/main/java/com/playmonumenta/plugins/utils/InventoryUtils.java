@@ -374,13 +374,7 @@ public class InventoryUtils {
 	}
 
 	private static boolean containsSpecialLore(final ItemStack item) {
-		return  testForItemWithLore(item, "D4 Key") ||
-		        testForItemWithLore(item, "D5 Key") ||
-		        testForItemWithLore(item, "D6 Key") ||
-		        testForItemWithLore(item, "D11 Key") ||
-		        testForItemWithLore(item, "DT Key") ||
-		        testForItemWithLore(item, "DN Key") ||
-		        testForItemWithLore(item, "Taking this item outside of the dungeon");
+		return testForItemWithLore(item, "Taking this item outside of the dungeon");
 	}
 
 	public static String itemStackArrayToBase64(final ItemStack[] items) throws IllegalStateException {

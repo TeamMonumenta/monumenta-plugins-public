@@ -13,6 +13,7 @@ import org.bukkit.event.player.PlayerQuitEvent;
 
 import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.redissync.MonumentaRedisSyncAPI;
 import com.playmonumenta.redissync.event.PlayerSaveEvent;
@@ -38,11 +39,13 @@ public class MonumentaRedisSyncIntegration implements Listener {
 
 		player.closeInventory();
 
-		int dropped = InventoryUtils.removeSpecialItems(player, false);
-		if (dropped == 1) {
-			player.sendMessage(ChatColor.RED + "The dungeon key you were carrying was dropped!");
-		} else if (dropped > 1) {
-			player.sendMessage(ChatColor.RED + "The dungeon keys you were carrying were dropped!");
+		if (ServerProperties.getPreventDungeonItemTransfer()) {
+			int dropped = InventoryUtils.removeSpecialItems(player, false);
+			if (dropped == 1) {
+				player.sendMessage(ChatColor.RED + "The dungeon key you were carrying was dropped!");
+			} else if (dropped > 1) {
+				player.sendMessage(ChatColor.RED + "The dungeon keys you were carrying were dropped!");
+			}
 		}
 	}
 

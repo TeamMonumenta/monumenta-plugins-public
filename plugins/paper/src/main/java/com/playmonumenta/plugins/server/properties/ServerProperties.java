@@ -35,6 +35,7 @@ public class ServerProperties {
 	private boolean mClassSpecializationsEnabled = false;
 	private boolean mAuditMessagesEnabled = true;
 	private boolean mRepairExplosions = false;
+	private boolean mPreventDungeonItemTransfer = true;
 	private int mHTTPStatusPort = 8000;
 
 	private String mShardName = "default_settings";
@@ -103,6 +104,11 @@ public class ServerProperties {
 	public static boolean getRepairExplosions() {
 		ensureInstance();
 		return INSTANCE.mRepairExplosions;
+	}
+
+	public static boolean getPreventDungeonItemTransfer() {
+		ensureInstance();
+		return INSTANCE.mPreventDungeonItemTransfer;
 	}
 
 	public static int getHTTPStatusPort() {
@@ -184,6 +190,7 @@ public class ServerProperties {
 					mClassSpecializationsEnabled = getPropertyValueBool(plugin, object, "classSpecializationsEnabled", mClassSpecializationsEnabled);
 					mAuditMessagesEnabled        = getPropertyValueBool(plugin, object, "auditMessagesEnabled", mAuditMessagesEnabled);
 					mRepairExplosions            = getPropertyValueBool(plugin, object, "repairExplosions", mRepairExplosions);
+					mPreventDungeonItemTransfer  = getPropertyValueBool(plugin, object, "preventDungeonItemTransfer", mPreventDungeonItemTransfer);
 					mHTTPStatusPort              = getPropertyValueInt(plugin, object, "httpStatusPort", mHTTPStatusPort);
 
 					mShardName                   = getPropertyValueString(plugin, object, "shardName", mShardName);
