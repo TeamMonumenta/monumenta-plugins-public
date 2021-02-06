@@ -12,12 +12,9 @@ import org.bukkit.entity.Trident;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.metadata.FixedMetadataValue;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
-import com.playmonumenta.plugins.utils.PotionUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 
 public class IceAspect implements BaseEnchantment {
@@ -37,7 +34,7 @@ public class IceAspect implements BaseEnchantment {
 
 	@Override
 	public void onAttack(Plugin plugin, Player player, int level, LivingEntity target, EntityDamageByEntityEvent event) {
-		EntityUtils.applySlow(plugin, (int)(ICE_ASPECT_DURATION * player.getCooledAttackStrength(0)), level * 10, target);
+		EntityUtils.applySlow(plugin, (int)(ICE_ASPECT_DURATION * player.getCooledAttackStrength(0)), level * 0.1, target);
 		player.getWorld().spawnParticle(Particle.SNOWBALL, target.getLocation().add(0, 1, 0), 8, 0.5, 0.5, 0.5, 0.001);
 
 		if (target instanceof Blaze) {

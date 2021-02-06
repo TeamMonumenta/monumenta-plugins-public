@@ -79,7 +79,7 @@ public class Sharpshooter extends Ability {
 
 	public static double getDamageMultiplier(Player player) {
 		Sharpshooter ss = AbilityManager.getManager().getPlayerAbility(player, Sharpshooter.class);
-		return ss == null ? 1 : ((1 + ss.mStacks) * PERCENT_DAMAGE_PER_STACK);
+		return ss == null ? 1 : (1 + ss.mStacks * PERCENT_DAMAGE_PER_STACK);
 	}
 
 }
