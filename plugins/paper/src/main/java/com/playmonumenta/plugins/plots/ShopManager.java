@@ -287,6 +287,11 @@ public class ShopManager implements Listener {
 		private boolean isGuildShop() {
 			return Math.abs(mMax.getBlockX() - mMin.getBlockX()) >= GUILD_SHOP_WIDTH;
 		}
+
+		private BoundingBox getBoundingBox() {
+			return new BoundingBox(mMin.getX(), mMin.getY() - SHOP_DEPTH - 1, mMin.getZ(),
+			                       mMax.getX(), mMax.getY() + SHOP_HEIGHT + 1, mMax.getZ());
+		}
 	}
 
 	public static void registerCommands() {
@@ -451,17 +456,18 @@ public class ShopManager implements Listener {
 		Location entityLoc = startLoc.clone();
 		if (minXD <= minZD && minXD <= maxXD && minXD <= maxZD) {
 			entityLoc.setX(minX - 1);
-			entityLoc.setZ((maxZ + minZ) / 2);
+			entityLoc.setZ((int)((maxZ + minZ) / 2));
 		} else if (minZD <= minXD && minZD <= maxXD && minZD <= maxZD) {
 			entityLoc.setZ(minZ - 1);
-			entityLoc.setX((maxX + minX) / 2);
+			entityLoc.setX((int)((maxX + minX) / 2));
 		} else if (maxXD <= minXD && maxXD <= minZD && maxXD <= maxZD) {
 			entityLoc.setX(maxX + 1);
-			entityLoc.setZ((maxZ + minZ) / 2);
+			entityLoc.setZ((int)((maxZ + minZ) / 2));
 		} else {
 			entityLoc.setZ(maxZ + 1);
-			entityLoc.setX((maxX + minX) / 2);
+			entityLoc.setX((int)((maxX + minX) / 2));
 		}
+		entityLoc.add(0.5, 0, 0.5);
 
 		Material originalEntityMat = entityLoc.getBlock().getType();
 		entityLoc.getBlock().setType(Material.AIR);
@@ -534,6 +540,10 @@ public class ShopManager implements Listener {
 		/* Make sure the player (if any) is allowed to change the lock */
 		checkAllowedToChangeLock(shop, player);
 
+		if (player != null) {
+			player.sendMessage(ChatColor.WHITE + "Your shop has been locked.");
+		}
+
 		shop.iterArea((Location plat) -> {
 			plat.add(0, 1, 0);
 			plat.getWorld().spawnParticle(Particle.VILLAGER_HAPPY, plat, 1, 0.1, 0.1, 0.1);
@@ -555,8 +565,7 @@ public class ShopManager implements Listener {
 		});
 
 		/* Lock regular entities */
-		for (Entity entity : shop.mMin.getWorld().getNearbyEntities(new BoundingBox(shop.mMin.getX(), shop.mMin.getY(), shop.mMin.getZ(),
-		                                                                            shop.mMax.getX(), shop.mMax.getY(), shop.mMax.getZ()))) {
+		for (Entity entity : shop.mMin.getWorld().getNearbyEntities(shop.getBoundingBox())) {
 			if (entity instanceof ItemFrame) {
 				entity.setInvulnerable(true);
 			} else if (entity instanceof ArmorStand) {
@@ -575,6 +584,10 @@ public class ShopManager implements Listener {
 
 		/* Make sure the player (if any) is allowed to change the lock */
 		checkAllowedToChangeLock(shop, player);
+
+		if (player != null) {
+			player.sendMessage(ChatColor.WHITE + "Your shop has been unlocked.");
+		}
 
 		shopEntity.getWorld().playSound(shopEntity.getLocation(), Sound.BLOCK_CHEST_LOCKED, SoundCategory.PLAYERS, 1.0f, 0.9f);
 
@@ -599,8 +612,7 @@ public class ShopManager implements Listener {
 		});
 
 		/* Lock regular entities */
-		for (Entity entity : shop.mMin.getWorld().getNearbyEntities(new BoundingBox(shop.mMin.getX(), shop.mMin.getY(), shop.mMin.getZ(),
-		                                                                            shop.mMax.getX(), shop.mMax.getY(), shop.mMax.getZ()))) {
+		for (Entity entity : shop.mMin.getWorld().getNearbyEntities(shop.getBoundingBox())) {
 			if (entity instanceof ItemFrame) {
 				entity.setInvulnerable(false);
 			} else if (entity instanceof ArmorStand) {
@@ -619,6 +631,10 @@ public class ShopManager implements Listener {
 
 		/* Make sure the player (if any) is allowed to change the lock */
 		checkAllowedToChangeLock(shop, player);
+
+		if (player != null) {
+			player.sendMessage(ChatColor.WHITE + "Your shop has been reset.");
+		}
 
 		shop.iterArea((Location plat) -> {
 			/* Replace platform area */
@@ -647,8 +663,7 @@ public class ShopManager implements Listener {
 		});
 
 		/* Remove entities */
-		for (Entity entity : shop.mMin.getWorld().getNearbyEntities(new BoundingBox(shop.mMin.getX(), shop.mMin.getY(), shop.mMin.getZ(),
-		                                                                            shop.mMax.getX(), shop.mMax.getY(), shop.mMax.getZ()))) {
+		for (Entity entity : shop.mMin.getWorld().getNearbyEntities(shop.getBoundingBox())) {
 			if (entity instanceof ItemFrame || entity instanceof Painting || entity instanceof ArmorStand) {
 				entity.remove();
 			}
