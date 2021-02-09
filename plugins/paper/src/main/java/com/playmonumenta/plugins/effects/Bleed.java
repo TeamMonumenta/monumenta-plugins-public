@@ -7,17 +7,18 @@ import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import com.playmonumenta.plugins.Plugin;
 
 public class Bleed extends Effect {
-	
+
 	private static final Particle.DustOptions COLOR = new Particle.DustOptions(Color.fromRGB(210, 44, 44), 1.0f);
-	
+
 	private static final String PERCENT_SPEED_EFFECT_NAME = "BleedPercentSpeed";
 	private static final String PERCENT_DAMAGE_DEALT_EFFECT_NAME = "BleedPercentDamageDealt";
 	private static final double EFFECT_AMOUNT_PER_LEVEL = -0.1;
-	
+
 	private final int mLevel;
 	private final Plugin mPlugin;
 
@@ -41,10 +42,16 @@ public class Bleed extends Effect {
 				World world = loc.getWorld();
 				world.spawnParticle(Particle.REDSTONE, loc, 4, 0.3, 0.6, 0.3, COLOR);
 				if (oneHertz) {
-					mPlugin.mEffectManager.addEffect(le, PERCENT_SPEED_EFFECT_NAME,
-							new PercentSpeed(20, mLevel * EFFECT_AMOUNT_PER_LEVEL, PERCENT_SPEED_EFFECT_NAME));
-					mPlugin.mEffectManager.addEffect(le, PERCENT_DAMAGE_DEALT_EFFECT_NAME,
-							new PercentDamageDealt(20, mLevel * EFFECT_AMOUNT_PER_LEVEL));
+					// Delay this call to later since this method runs inside of a loop iterating over the player's effects
+					new BukkitRunnable() {
+						@Override
+						public void run() {
+							mPlugin.mEffectManager.addEffect(le, PERCENT_SPEED_EFFECT_NAME,
+									new PercentSpeed(20, mLevel * EFFECT_AMOUNT_PER_LEVEL, PERCENT_SPEED_EFFECT_NAME));
+							mPlugin.mEffectManager.addEffect(le, PERCENT_DAMAGE_DEALT_EFFECT_NAME,
+									new PercentDamageDealt(20, mLevel * EFFECT_AMOUNT_PER_LEVEL));
+						}
+					}.runTaskLater(mPlugin, 0);
 				}
 			}
 		}
