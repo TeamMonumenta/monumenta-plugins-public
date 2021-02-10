@@ -45,9 +45,6 @@ import com.playmonumenta.plugins.commands.Spectate;
 import com.playmonumenta.plugins.commands.SpectateBot;
 import com.playmonumenta.plugins.commands.TeleportAsync;
 import com.playmonumenta.plugins.commands.TeleportByScore;
-import com.playmonumenta.plugins.cooking.CookingCommand;
-import com.playmonumenta.plugins.cooking.CookingTableInventoryManager;
-import com.playmonumenta.plugins.cooking.CookingTableListeners;
 import com.playmonumenta.plugins.effects.EffectManager;
 import com.playmonumenta.plugins.enchantments.AttributeManager;
 import com.playmonumenta.plugins.enchantments.EnchantmentManager;
@@ -122,7 +119,6 @@ public class Plugin extends JavaPlugin {
 	public SpawnZoneManager mZoneManager;
 	public AbilityManager mAbilityManager;
 	public ShulkerInventoryManager mShulkerInventoryManager;
-	public CookingTableInventoryManager mCookingTableInventoryManager;
 	private BossManager mBossManager;
 	public ItemManager mItemManager;
 	public IndexInventoryManager mIndexInventoryManager;
@@ -171,7 +167,6 @@ public class Plugin extends JavaPlugin {
 		SpellDetectionCircle.registerCommand(this);
 		SkillDescription.register(this);
 		SkillSummary.register(this);
-		CookingCommand.register(this);
 		ItemIndexCommand.register();
 		TeleportAsync.register();
 		TeleportByScore.register();
@@ -229,7 +224,6 @@ public class Plugin extends JavaPlugin {
 		mZoneManager = new SpawnZoneManager(this);
 		mAbilityManager = new AbilityManager(this);
 		mShulkerInventoryManager = new ShulkerInventoryManager(this);
-		mCookingTableInventoryManager = new CookingTableInventoryManager(this);
 		mBossManager = new BossManager(this);
 		mEffectManager = new EffectManager(this);
 
@@ -269,7 +263,6 @@ public class Plugin extends JavaPlugin {
 		manager.registerEvents(mJunkItemsListener, this);
 		manager.registerEvents(mBossManager, this);
 		manager.registerEvents(mEffectManager, this);
-		manager.registerEvents(new CookingTableListeners(this), this);
 		manager.registerEvents(new IndexInventoryListeners(), this);
 		manager.registerEvents(new DelvesListener(), this);
 		manager.registerEvents(new SpawnerListener(this), this);

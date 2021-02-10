@@ -834,14 +834,6 @@ public class PlayerListener implements Listener {
 		Player player = event.getPlayer();
 		AbilityManager.getManager().playerItemConsumeEvent(player, event);
 
-		//MUST FIX: MAKES INFINITY CONSUMABLES WITH LORE NOT WORK WHEN ENABLED
-		// cooking
-//		String json = CookingUtils.extractItemDataFromFirstLoreLine(event.getItem());
-//		CookingItemObject item = CookingUtils.cookingItemObjectFromJson(json);
-//		if (item != null) {
-//			item.consumeItem(player);
-//		}
-
 		/* Don't let players consume shattered items */
 		if (ItemUtils.isItemShattered(event.getItem())) {
 			event.setCancelled(true);
