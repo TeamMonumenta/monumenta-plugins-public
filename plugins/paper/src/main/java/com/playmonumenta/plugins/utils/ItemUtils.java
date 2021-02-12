@@ -604,7 +604,8 @@ public class ItemUtils {
 		} else if (item.containsEnchantment(Enchantment.VANISHING_CURSE)) {
 			return ItemDeathResult.SHATTER_NOW;
 		} else if (item.getType().equals(Material.COMPASS) ||
-		           ShulkerShortcutListener.isEnderExpansion(item)) {
+		           ShulkerShortcutListener.isEnderExpansion(item) ||
+		           isItemDeathless(item)) {
 			return ItemDeathResult.KEEP;
 		}
 		switch (getItemRegion(item)) {
@@ -863,6 +864,16 @@ public class ItemUtils {
 						return true;
 					}
 				}
+			}
+		}
+		return false;
+	}
+
+	public static boolean isItemDeathless(ItemStack item) {
+		if (item != null) {
+			String deathlessIdentifier = ChatColor.GRAY + "Deathless";
+			if (InventoryUtils.testForItemWithLore(item, deathlessIdentifier)) {
+				return true;
 			}
 		}
 		return false;
