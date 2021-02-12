@@ -9,8 +9,6 @@ import java.util.concurrent.ConcurrentSkipListSet;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import com.playmonumenta.plugins.utils.CommandUtils;
-
 import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
@@ -18,6 +16,8 @@ import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import org.bukkit.util.Vector;
+
+import com.playmonumenta.plugins.utils.CommandUtils;
 
 import dev.jorel.commandapi.CommandAPI;
 import dev.jorel.commandapi.CommandAPICommand;
@@ -258,7 +258,7 @@ public class TeleportAsync extends GenericCommand {
 		facingVec.subtract(dstVec);
 
 		Location workLoc = dst.clone();
-		workLoc.setDirection​(facingVec);
+		workLoc.setDirection(facingVec);
 
 		return new Rotation(workLoc.getPitch(), workLoc.getYaw());
 	}

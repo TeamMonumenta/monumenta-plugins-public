@@ -17,6 +17,7 @@ import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Evoker;
+import org.bukkit.entity.Fireball;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
@@ -156,6 +157,29 @@ public class MobListener implements Listener {
 							ItemMeta meta = mainhand.getItemMeta();
 							if (meta != null && meta.hasAttributeModifiers()) {
 								Collection<AttributeModifier> modifiers = meta.getAttributeModifiers(Attribute.GENERIC_ATTACK_DAMAGE);
+								if (modifiers != null) {
+									for (AttributeModifier modifier : modifiers) {
+										if (modifier.getOperation() == Operation.ADD_NUMBER) {
+											event.setDamage(modifier.getAmount() + 1);
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			} else if (damager instanceof Fireball) {
+				//Custom damage of fireball set by the horse jump strength attribute in the mainhand of the mob
+				ProjectileSource source = ((Projectile) damager).getShooter();
+				if (source instanceof LivingEntity) {
+					EntityEquipment equipment = ((LivingEntity) source).getEquipment();
+					if (equipment != null) {
+						ItemStack mainhand = equipment.getItemInMainHand();
+
+						if (mainhand != null) {
+							ItemMeta meta = mainhand.getItemMeta();
+							if (meta != null && meta.hasAttributeModifiers()) {
+								Collection<AttributeModifier> modifiers = meta.getAttributeModifiers(Attribute.HORSE_JUMP_STRENGTH);
 								if (modifiers != null) {
 									for (AttributeModifier modifier : modifiers) {
 										if (modifier.getOperation() == Operation.ADD_NUMBER) {
