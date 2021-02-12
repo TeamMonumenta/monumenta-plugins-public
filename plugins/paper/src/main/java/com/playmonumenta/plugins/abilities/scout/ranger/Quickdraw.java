@@ -29,7 +29,7 @@ public class Quickdraw extends Ability {
 	private static final int QUICKDRAW_1_COOLDOWN = 20 * 15;
 	private static final int QUICKDRAW_2_COOLDOWN = 20 * 7;
 	private static final int QUICKDRAW_SLOWNESS_DURATION = 20 * 2;
-	private static final int QUICKDRAW_SLOWNESS_LEVEL = 2;
+	private static final int QUICKDRAW_SLOWNESS_LEVEL = 1;
 	private static final int QUICKDRAW_PIERCING_BONUS = 1;
 
 	public Quickdraw(Plugin plugin, Player player) {
@@ -37,7 +37,7 @@ public class Quickdraw extends Ability {
 		mInfo.mLinkedSpell = Spells.QUICKDRAW;
 		mInfo.mScoreboardId = "Quickdraw";
 		mInfo.mShorthandName = "Qd";
-		mInfo.mDescriptions.add("Left-clicking with a bow instantly fires a fully charged arrow with +1 Piercing that afflicts Slowness 3 for 2 seconds. Cooldown: 15s.");
+		mInfo.mDescriptions.add("Left-clicking with a bow instantly fires a fully charged arrow with +1 Piercing that afflicts Slowness 2 for 2 seconds. Cooldown: 15s.");
 		mInfo.mDescriptions.add("Cooldown: 7s.");
 		mInfo.mCooldown = getAbilityScore() == 1 ? QUICKDRAW_1_COOLDOWN : QUICKDRAW_2_COOLDOWN;
 		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;

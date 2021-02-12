@@ -51,7 +51,7 @@ public class AlchemistPotions extends Ability implements KillTriggeredAbility {
 
 	private static final double EXTRA_POTION_CHANCE = 0.5;
 	private static final double DAMAGE_PER_SKILL_POINT = 0.5;
-	private static final double DAMAGE_PER_SPEC_POINT = 0.5;
+	private static final double DAMAGE_PER_SPEC_POINT = 1;
 
 	private final KillTriggeredAbilityTracker mTracker;
 

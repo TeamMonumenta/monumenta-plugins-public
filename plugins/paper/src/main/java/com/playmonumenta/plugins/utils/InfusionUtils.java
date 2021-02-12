@@ -308,7 +308,9 @@ public class InfusionUtils {
 		for (InfusionSelection sel : InfusionSelection.values()) {
 			InventoryUtils.removeCustomEnchant(item, sel.getEnchantName());
 		}
-		giveMaterials(player, region, refundMaterials);
+		if (refundMaterials > 0) {
+			giveMaterials(player, region, refundMaterials);
+		}
 
 		int xp = ExperienceUtils.getTotalExperience(player);
 		switch (ItemUtils.getItemTier(item)) {
