@@ -27,6 +27,7 @@ public class FestiveTesseractSnowmanBoss extends BossAbilityGroup {
 	}
 
 	public FestiveTesseractSnowmanBoss(Plugin plugin, LivingEntity boss) {
+		super(plugin, identityTag, boss);
 		List<Spell> passiveSpells = Arrays.asList(
 			new SpellRunAction(() -> {
 				mTicksLived += 5;
@@ -42,6 +43,6 @@ public class FestiveTesseractSnowmanBoss extends BossAbilityGroup {
 			})
 		);
 
-		super.constructBoss(plugin, identityTag, boss, null, passiveSpells, detectionRange, null);
+		super.constructBoss(null, passiveSpells, detectionRange, null);
 	}
 }

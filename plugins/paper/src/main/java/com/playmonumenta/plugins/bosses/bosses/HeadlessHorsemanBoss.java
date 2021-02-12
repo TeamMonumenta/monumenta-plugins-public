@@ -100,7 +100,6 @@ public class HeadlessHorsemanBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_horseman";
 	public static final int detectionRange = 22;
 
-	private final LivingEntity mBoss;
 	private final Location mSpawnLoc;
 	private final Location mEndLoc;
 
@@ -119,7 +118,7 @@ public class HeadlessHorsemanBoss extends BossAbilityGroup {
 	}
 
 	public HeadlessHorsemanBoss(Plugin plugin, LivingEntity boss, Location spawnLoc, Location endLoc) {
-		mBoss = boss;
+		super(plugin, identityTag, boss);
 		mSpawnLoc = spawnLoc;
 		mEndLoc = endLoc;
 		mShieldsUp = false;
@@ -211,7 +210,7 @@ public class HeadlessHorsemanBoss extends BossAbilityGroup {
 
 		BossBarManager bossBar = new BossBarManager(plugin, boss, detectionRange*2, BarColor.RED, BarStyle.SEGMENTED_10, events);
 
-		super.constructBoss(plugin, identityTag, mBoss, phase1Spells, phase1Passives, detectionRange, bossBar);
+		super.constructBoss(phase1Spells, phase1Passives, detectionRange, bossBar);
 	}
 
 	public Location getSpawnLocation() {

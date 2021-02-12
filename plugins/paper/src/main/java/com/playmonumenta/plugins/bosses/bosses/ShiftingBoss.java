@@ -12,19 +12,17 @@ public class ShiftingBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_shifting";
 	public static final int detectionRange = 30;
 
-	LivingEntity mBoss;
-
 	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
 		return new ShiftingBoss(plugin, boss);
 	}
 
 	public ShiftingBoss(Plugin plugin, LivingEntity boss) {
-		mBoss = boss;
+		super(plugin, identityTag, boss);
 
 		SpellManager activeSpells = new SpellManager(Arrays.asList(
-			new SpellShiftingSpeed(mBoss)
+			new SpellShiftingSpeed(boss)
 		));
 
-		super.constructBoss(plugin, identityTag, mBoss, activeSpells, null, detectionRange, null);
+		super.constructBoss(activeSpells, null, detectionRange, null);
 	}
 }

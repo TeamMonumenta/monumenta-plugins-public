@@ -135,8 +135,10 @@ public class EffectManager implements Listener {
 
 	private final Map<Entity, Effects> mEntities = new HashMap<Entity, Effects>();
 	private final BukkitRunnable mTimer;
+	private static EffectManager INSTANCE = null;
 
 	public EffectManager(Plugin plugin) {
+		INSTANCE = this;
 		/*
 		 * This timer also ticks down for offline players. Keeping it like this for now since most custom effects we
 		 * want to apply are short (no more than 30 seconds, e.g. class abilities) and already function this way.
@@ -215,6 +217,10 @@ public class EffectManager implements Listener {
 		};
 
 		mTimer.runTaskTimer(plugin, 0, PERIOD);
+	}
+
+	public static EffectManager getInstance() {
+		return INSTANCE;
 	}
 
 	/**

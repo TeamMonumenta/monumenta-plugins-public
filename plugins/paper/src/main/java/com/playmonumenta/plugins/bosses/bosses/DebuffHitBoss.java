@@ -17,7 +17,8 @@ public class DebuffHitBoss extends BossAbilityGroup {
 	}
 
 	public DebuffHitBoss(Plugin plugin, LivingEntity boss) throws Exception {
-		super.constructBoss(plugin, identityTag, boss, null, null, detectionRange, null);
+		super(plugin, identityTag, boss);
+		super.constructBoss(null, null, detectionRange, null);
 	}
 
 	public void bossDamagedEntity(EntityDamageByEntityEvent event) {

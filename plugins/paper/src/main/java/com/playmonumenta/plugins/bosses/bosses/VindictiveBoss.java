@@ -32,19 +32,17 @@ public class VindictiveBoss extends BossAbilityGroup {
 
 	public static final int RANGE = 12;
 
-	LivingEntity mBoss;
-
 	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
 		return new VindictiveBoss(plugin, boss);
 	}
 
 	public VindictiveBoss(Plugin plugin, LivingEntity boss) {
-		mBoss = boss;
+		super(plugin, identityTag, boss);
 		List<Spell> passiveSpells = Arrays.asList(
-			new SpellVindictiveParticle(mBoss)
+			new SpellVindictiveParticle(boss)
 		);
 
-		super.constructBoss(plugin, identityTag, mBoss, null, passiveSpells, detectionRange, null);
+		super.constructBoss(null, passiveSpells, detectionRange, null);
 	}
 
 	@Override

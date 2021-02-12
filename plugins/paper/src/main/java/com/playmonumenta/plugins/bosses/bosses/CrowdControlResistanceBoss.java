@@ -22,8 +22,9 @@ public class CrowdControlResistanceBoss extends BossAbilityGroup {
 
 
 	public CrowdControlResistanceBoss(Plugin plugin, LivingEntity boss) {
+		super(plugin, identityTag, boss);
 		List<Spell> passive = Arrays.asList(new SpellCrowdControlClear(boss, CLEAR_TIME));
 
-		super.constructBoss(plugin, identityTag, boss, null, passive, detectionRange, null);
+		super.constructBoss(null, passive, detectionRange, null);
 	}
 }

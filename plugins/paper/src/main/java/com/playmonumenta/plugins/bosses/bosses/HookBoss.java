@@ -34,14 +34,12 @@ public class HookBoss extends BossAbilityGroup {
 	private static final boolean LINGERS = true;
 	private static final int DAMAGE = 30;
 
-	LivingEntity mBoss;
-
 	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
 		return new HookBoss(plugin, boss);
 	}
 
 	public HookBoss(Plugin plugin, LivingEntity boss) {
-		mBoss = boss;
+		super(plugin, identityTag, boss);
 
 		SpellManager activeSpells = new SpellManager(Arrays.asList(
 			new SpellBaseSeekingProjectile(plugin, boss, detectionRange, SINGLE_TARGET, LAUNCH_TRACKING, COOLDOWN, DELAY,
@@ -75,6 +73,6 @@ public class HookBoss extends BossAbilityGroup {
 					}
 			)));
 
-		super.constructBoss(plugin, identityTag, mBoss, activeSpells, null, detectionRange, null);
+		super.constructBoss(activeSpells, null, detectionRange, null);
 	}
 }

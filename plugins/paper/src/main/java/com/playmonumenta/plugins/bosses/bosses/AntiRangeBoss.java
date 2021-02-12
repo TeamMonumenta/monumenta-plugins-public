@@ -17,16 +17,14 @@ public class AntiRangeBoss extends BossAbilityGroup {
 
 	private static final int ANTI_RANGE_DISTANCE = 6;
 
-	LivingEntity mBoss;
-
 	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
 		return new AntiRangeBoss(plugin, boss);
 	}
 
 	public AntiRangeBoss(Plugin plugin, LivingEntity boss) {
-		mBoss = boss;
+		super(plugin, identityTag, boss);
 
-		super.constructBoss(plugin, identityTag, mBoss, null, null, detectionRange, null);
+		super.constructBoss(null, null, detectionRange, null);
 	}
 
 	@Override

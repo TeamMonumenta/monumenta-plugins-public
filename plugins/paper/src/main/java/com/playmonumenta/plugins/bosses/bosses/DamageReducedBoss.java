@@ -12,16 +12,13 @@ public class DamageReducedBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_damage_reduced";
 	public static final int detectionRange = 50;
 
-	private final LivingEntity mBoss;
-
 	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
 		return new DamageReducedBoss(plugin, boss);
 	}
 
 	public DamageReducedBoss(Plugin plugin, LivingEntity boss) throws Exception {
-		mBoss = boss;
-
-		super.constructBoss(plugin, identityTag, boss, null, null, detectionRange, null);
+		super(plugin, identityTag, boss);
+		super.constructBoss(null, null, detectionRange, null);
 	}
 
 	public void bossDamagedByEntity(EntityDamageByEntityEvent event) {

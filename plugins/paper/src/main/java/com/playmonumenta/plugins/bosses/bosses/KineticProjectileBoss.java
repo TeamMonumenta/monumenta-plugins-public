@@ -39,21 +39,19 @@ public class KineticProjectileBoss extends BossAbilityGroup {
 	private static final double RADIUS = 2.5;
 	private static final float KNOCKBACK_SPEED = 0.5f;
 
-	LivingEntity mBoss;
-
 	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
 		return new KineticProjectileBoss(plugin, boss);
 	}
 
 	public KineticProjectileBoss(Plugin plugin, LivingEntity boss) {
-		mBoss = boss;
+		super(plugin, identityTag, boss);
 
 		SpellManager activeSpells = new SpellManager(Arrays.asList(
 			new SpellBaseSeekingProjectile(plugin, boss, detectionRange, SINGLE_TARGET, LAUNCH_TRACKING, COOLDOWN, DELAY,
 					SPEED, TURN_RADIUS, LIFETIME_TICKS, HITBOX_LENGTH, COLLIDES_WITH_BLOCKS, LINGERS,
 					// Initiate Aesthetic
 					(World world, Location loc, int ticks) -> {
-						PotionUtils.applyPotion(null, mBoss, new PotionEffect(PotionEffectType.GLOWING, DELAY, 0));
+						PotionUtils.applyPotion(null, boss, new PotionEffect(PotionEffectType.GLOWING, DELAY, 0));
 					},
 					// Launch Aesthetic
 					(World world, Location loc, int ticks) -> {
@@ -84,6 +82,6 @@ public class KineticProjectileBoss extends BossAbilityGroup {
 					})
 		));
 
-		super.constructBoss(plugin, identityTag, mBoss, activeSpells, null, detectionRange, null);
+		super.constructBoss(activeSpells, null, detectionRange, null);
 	}
 }

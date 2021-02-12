@@ -23,11 +23,12 @@ public class DreadlingBoss extends BossAbilityGroup {
 	}
 
 	public DreadlingBoss(Plugin plugin, LivingEntity boss) throws Exception {
+		super(plugin, identityTag, boss);
 		List<Spell> passiveSpells = Arrays.asList(
 			new SpellDreadlingParticle(boss)
 		);
 
-		super.constructBoss(plugin, identityTag, boss, null, passiveSpells, detectionRange, null);
+		super.constructBoss(null, passiveSpells, detectionRange, null);
 	}
 
 	@Override

@@ -15,19 +15,17 @@ public class HungerCloudBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_hungercloud";
 	public static final int detectionRange = 100;
 
-	LivingEntity mBoss;
-
 	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
 		return new HungerCloudBoss(plugin, boss);
 	}
 
 	public HungerCloudBoss(Plugin plugin, LivingEntity boss) {
-		mBoss = boss;
+		super(plugin, identityTag, boss);
 
 		List<Spell> passiveSpells = Arrays.asList(
-			new SpellMobEffect(mBoss, new PotionEffect(PotionEffectType.HUNGER, 600, 99, false, false))
+			new SpellMobEffect(boss, new PotionEffect(PotionEffectType.HUNGER, 600, 99, false, false))
 		);
 
-		super.constructBoss(plugin, identityTag, mBoss, null, passiveSpells, detectionRange, null);
+		super.constructBoss(null, passiveSpells, detectionRange, null);
 	}
 }

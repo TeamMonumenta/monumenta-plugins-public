@@ -36,7 +36,6 @@ public class CShuraPhaseTwo extends BossAbilityGroup {
 	public static final String identityTag = "boss_cshura_2";
 	public static final int detectionRange = 50;
 
-	private final LivingEntity mBoss;
 	private final Location mSpawnLoc;
 	private final Location mEndLoc;
 
@@ -53,7 +52,7 @@ public class CShuraPhaseTwo extends BossAbilityGroup {
 	}
 
 	public CShuraPhaseTwo(Plugin plugin, LivingEntity boss, Location spawnLoc, Location endLoc) {
-		mBoss = boss;
+		super(plugin, identityTag, boss);
 		mSpawnLoc = spawnLoc;
 		mEndLoc = endLoc;
 		mBoss.setRemoveWhenFarAway(false);
@@ -83,7 +82,7 @@ public class CShuraPhaseTwo extends BossAbilityGroup {
 
 		BossBarManager bossBar = new BossBarManager(plugin, mBoss, detectionRange, BarColor.RED, BarStyle.SOLID, events);
 
-		super.constructBoss(plugin, identityTag, mBoss, activeSpells, passiveSpells, detectionRange, bossBar);
+		super.constructBoss(activeSpells, passiveSpells, detectionRange, bossBar);
 	}
 
 	@Override

@@ -24,8 +24,6 @@ public class AvengerBoss extends BossAbilityGroup {
 	private static final double SPEED_PERCENT_INCREMENT = 0.06;		// Capped at x1.6 Speed
 	private static final double DAMAGE_PERCENT_INCREMENT = 0.2;		// Capped at x3 Damage
 
-	private final LivingEntity mBoss;
-
 	private int mStacks = 0;
 
 	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
@@ -33,8 +31,8 @@ public class AvengerBoss extends BossAbilityGroup {
 	}
 
 	public AvengerBoss(Plugin plugin, LivingEntity boss) {
-		mBoss = boss;
-		super.constructBoss(plugin, identityTag, mBoss, null, null, detectionRange, null);
+		super(plugin, identityTag, boss);
+		super.constructBoss(null, null, detectionRange, null);
 	}
 
 	// Use this instead of the attribute to catch ability damage, ranged damage, etc.

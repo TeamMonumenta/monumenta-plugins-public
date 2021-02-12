@@ -43,7 +43,6 @@ public class Azacor extends BossAbilityGroup {
 	public static final String identityTag = "boss_azacor";
 	public static final int detectionRange = 50;
 
-	private final LivingEntity mBoss;
 	private final Location mSpawnLoc;
 	private final Location mEndLoc;
 
@@ -59,7 +58,7 @@ public class Azacor extends BossAbilityGroup {
 	}
 
 	public Azacor(Plugin plugin, LivingEntity boss, Location spawnLoc, Location endLoc) {
-		mBoss = boss;
+		super(plugin, identityTag, boss);
 		mSpawnLoc = spawnLoc;
 		mEndLoc = endLoc;
 
@@ -143,7 +142,7 @@ public class Azacor extends BossAbilityGroup {
 		});
 		BossBarManager bossBar = new BossBarManager(plugin, boss, detectionRange, BarColor.RED, BarStyle.SEGMENTED_10, events);
 
-		super.constructBoss(plugin, identityTag, mBoss, activeSpells, passiveSpells, detectionRange, bossBar);
+		super.constructBoss(activeSpells, passiveSpells, detectionRange, bossBar);
 	}
 
 	private void randomMinion(String tellraw) {

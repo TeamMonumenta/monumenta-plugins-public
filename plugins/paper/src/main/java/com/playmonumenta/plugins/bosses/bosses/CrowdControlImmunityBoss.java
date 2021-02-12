@@ -16,20 +16,18 @@ public class CrowdControlImmunityBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_ccimmune";
 	public static final int detectionRange = 45;
 
-	LivingEntity mBoss;
-
 	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
 		return new CrowdControlImmunityBoss(plugin, boss);
 	}
 
 	public CrowdControlImmunityBoss(Plugin plugin, LivingEntity boss) {
-		mBoss = boss;
+		super(plugin, identityTag, boss);
 
 		List<Spell> passiveSpells = Arrays.asList(
-			new CrowdControlImmunity(mBoss)
+			new CrowdControlImmunity(boss)
 		);
 
-		super.constructBoss(plugin, identityTag, mBoss, null, passiveSpells, detectionRange, null);
+		super.constructBoss(null, passiveSpells, detectionRange, null);
 	}
 
 	@Override

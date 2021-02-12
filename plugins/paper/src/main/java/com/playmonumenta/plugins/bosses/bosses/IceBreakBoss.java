@@ -18,9 +18,10 @@ public class IceBreakBoss extends BossAbilityGroup {
 	}
 
 	public IceBreakBoss(Plugin plugin, LivingEntity boss) {
+		super(plugin, identityTag, boss);
 		List<Spell> passiveSpells = Arrays.asList(new SpellIceBreak(boss));
 
 		boss.setRemoveWhenFarAway(false);
-		super.constructBoss(plugin, identityTag, boss, null, passiveSpells, detectionRange, null);
+		super.constructBoss(null, passiveSpells, detectionRange, null);
 	}
 }

@@ -29,6 +29,7 @@ public class PlayerTargetBoss extends BossAbilityGroup {
 	}
 
 	public PlayerTargetBoss(Plugin plugin, LivingEntity boss) throws Exception {
+		super(plugin, identityTag, boss);
 		if (!(boss instanceof Mob)) {
 			throw new Exception(identityTag + " only works on mobs!");
 		}
@@ -51,7 +52,7 @@ public class PlayerTargetBoss extends BossAbilityGroup {
 			})
 		));
 
-		super.constructBoss(plugin, identityTag, mBoss, activeSpells, null, detectionRange, null);
+		super.constructBoss(activeSpells, null, detectionRange, null);
 	}
 
 	/* Only allow mobs with this ability to target players */

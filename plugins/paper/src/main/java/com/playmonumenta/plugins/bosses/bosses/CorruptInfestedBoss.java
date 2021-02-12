@@ -19,23 +19,19 @@ public class CorruptInfestedBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_corruptinfested";
 	public static final int detectionRange = 30;
 
-	LivingEntity mBoss;
-	Plugin mPlugin;
-
 	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
 		return new CorruptInfestedBoss(plugin, boss);
 	}
 
 	public CorruptInfestedBoss(Plugin plugin, LivingEntity boss) {
-		mBoss = boss;
-		mPlugin = plugin;
+		super(plugin, identityTag, boss);
 
 		List<Spell> passiveSpells = Arrays.asList(
-			new SpellRunAction(() -> mBoss.getLocation().getWorld().spawnParticle(Particle.VILLAGER_ANGRY, mBoss.getLocation(), 1, 0.2, 0.2, 0.2, 0))
+			new SpellRunAction(() -> boss.getLocation().getWorld().spawnParticle(Particle.VILLAGER_ANGRY, boss.getLocation(), 1, 0.2, 0.2, 0.2, 0))
 		);
 
 		// Boss effectively does nothing
-		super.constructBoss(plugin, identityTag, mBoss, null, passiveSpells, detectionRange, null);
+		super.constructBoss(null, passiveSpells, detectionRange, null);
 	}
 
 	@Override

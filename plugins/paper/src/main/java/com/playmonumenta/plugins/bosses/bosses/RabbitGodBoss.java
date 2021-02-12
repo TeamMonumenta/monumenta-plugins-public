@@ -47,8 +47,6 @@ public class RabbitGodBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_rabbitgod";
 	public static final int detectionRange = 30;
 
-	private final Plugin mPlugin;
-	private final LivingEntity mBoss;
 	private final Location mSpawnLoc;
 	private final Location mEndLoc;
 
@@ -66,8 +64,7 @@ public class RabbitGodBoss extends BossAbilityGroup {
 	}
 
 	public RabbitGodBoss(Plugin plugin, LivingEntity boss, Location spawnLoc, Location endLoc) {
-		mPlugin = plugin;
-		mBoss = boss;
+		super(plugin, identityTag, boss);
 		mSpawnLoc = spawnLoc;
 		mEndLoc = endLoc;
 		mPhase2 = false;
@@ -383,7 +380,7 @@ public class RabbitGodBoss extends BossAbilityGroup {
 
 		BossBarManager bossBar = new BossBarManager(plugin, boss, detectionRange, BarColor.RED, BarStyle.SEGMENTED_10, events);
 
-		super.constructBoss(plugin, identityTag, mBoss, phase1Spells, passiveSpells, detectionRange, bossBar, 20 * 15);
+		super.constructBoss(phase1Spells, passiveSpells, detectionRange, bossBar, 20 * 15);
 	}
 
 	private void knockback(Plugin plugin, double r) {

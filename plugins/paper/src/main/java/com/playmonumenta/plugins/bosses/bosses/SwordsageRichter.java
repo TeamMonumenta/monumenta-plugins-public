@@ -46,7 +46,6 @@ public class SwordsageRichter extends BossAbilityGroup {
 	public static final int detectionRange = 60;
 	private static final Particle.DustOptions BOLT_COLOR = new Particle.DustOptions(Color.fromRGB(255, 255, 255), 1.0f);
 
-	private final LivingEntity mBoss;
 	private final Location mSpawnLoc;
 	private final Location mEndLoc;
 
@@ -62,7 +61,7 @@ public class SwordsageRichter extends BossAbilityGroup {
 	}
 
 	public SwordsageRichter(Plugin plugin, LivingEntity boss, Location spawnLoc, Location endLoc) {
-		mBoss = boss;
+		super(plugin, identityTag, boss);
 		mSpawnLoc = spawnLoc;
 		mEndLoc = endLoc;
 		mBoss.setRemoveWhenFarAway(false);
@@ -205,7 +204,7 @@ public class SwordsageRichter extends BossAbilityGroup {
 		});
 		BossBarManager bossBar = new BossBarManager(plugin, boss, detectionRange, BarColor.RED, BarStyle.SEGMENTED_10, events);
 
-		super.constructBoss(plugin, identityTag, mBoss, activeSpells, passiveSpells, detectionRange, bossBar);
+		super.constructBoss(activeSpells, passiveSpells, detectionRange, bossBar);
 	}
 
 	@Override

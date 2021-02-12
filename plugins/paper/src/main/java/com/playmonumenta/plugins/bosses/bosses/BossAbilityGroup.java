@@ -37,9 +37,10 @@ public abstract class BossAbilityGroup {
 		void run(LivingEntity entity);
 	}
 
-	protected Plugin mPlugin;
-	private LivingEntity mBoss;
-	private String mIdentityTag;
+	protected final Plugin mPlugin;
+	protected final LivingEntity mBoss;
+	private final String mIdentityTag;
+
 	private BossBarManager mBossBar;
 	private SpellManager mActiveSpells;
 	private List<Spell> mPassiveSpells;
@@ -48,6 +49,13 @@ public abstract class BossAbilityGroup {
 	private boolean mUnloaded = false;
 	private Integer mNextActiveTimer = 0;
 	public boolean mDead = false;
+
+	protected BossAbilityGroup(Plugin plugin, String identityTag, LivingEntity boss) {
+		mPlugin = plugin;
+		mBoss = boss;
+		mIdentityTag = identityTag;
+		mBoss.addScoreboardTag(mIdentityTag);
+	}
 
 	public void changePhase(SpellManager activeSpells,
 	                        List<Spell> passiveSpells, PhaseAction action) {
@@ -64,21 +72,16 @@ public abstract class BossAbilityGroup {
 		mPassiveSpells = passiveSpells;
 	}
 
-	public void constructBoss(Plugin plugin, String identityTag, LivingEntity boss, SpellManager activeSpells,
+	public void constructBoss(SpellManager activeSpells,
 	                          List<Spell> passiveSpells, int detectionRange, BossBarManager bossBar) {
-		constructBoss(plugin, identityTag, boss, activeSpells, passiveSpells, detectionRange, bossBar, 100);
+		constructBoss(activeSpells, passiveSpells, detectionRange, bossBar, 100);
 	}
 
-	public void constructBoss(Plugin plugin, String identityTag, LivingEntity boss, SpellManager activeSpells,
+	public void constructBoss(SpellManager activeSpells,
 	                          List<Spell> passiveSpells, int detectionRange, BossBarManager bossBar, long spellDelay) {
-		mPlugin = plugin;
-		mBoss = boss;
-		mIdentityTag = identityTag;
 		mBossBar = bossBar;
 		mActiveSpells = activeSpells;
 		mPassiveSpells = passiveSpells;
-
-		mBoss.addScoreboardTag(identityTag);
 
 		BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
 		Runnable passive = new Runnable() {
@@ -100,7 +103,7 @@ public abstract class BossAbilityGroup {
 				}
 			}
 		};
-		mTaskIDpassive = scheduler.scheduleSyncRepeatingTask(plugin, passive, 1L, 5L);
+		mTaskIDpassive = scheduler.scheduleSyncRepeatingTask(mPlugin, passive, 1L, 5L);
 
 		Runnable active = new Runnable() {
 			private boolean mDisabled = true;
@@ -163,7 +166,7 @@ public abstract class BossAbilityGroup {
 				}
 			}
 		};
-		mTaskIDactive = scheduler.scheduleSyncRepeatingTask(plugin, active, spellDelay, 2L);
+		mTaskIDactive = scheduler.scheduleSyncRepeatingTask(mPlugin, active, spellDelay, 2L);
 	}
 
 	public void forceCastSpell(Class<? extends Spell> spell) {

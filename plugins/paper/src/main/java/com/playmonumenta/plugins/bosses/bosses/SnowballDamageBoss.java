@@ -14,20 +14,18 @@ public class SnowballDamageBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_snowballdamage";
 	public static final int detectionRange = 50;
 
-	private final LivingEntity mBoss;
-
 	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
 		return new SnowballDamageBoss(plugin, boss);
 	}
 
 	public SnowballDamageBoss(Plugin plugin, LivingEntity boss) throws Exception {
-		mBoss = boss;
+		super(plugin, identityTag, boss);
 
 		if (!(boss instanceof Snowman)) {
 			throw new Exception("boss_snowballdamage only works on snowmen!");
 		}
 
-		super.constructBoss(plugin, identityTag, mBoss, null, null, detectionRange, null);
+		super.constructBoss(null, null, detectionRange, null);
 	}
 
 

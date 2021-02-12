@@ -65,14 +65,12 @@ public class PrimordialElementalKaulBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_kaulprimoridal";
 	public static final int detectionRange = 100;
 
-	private LivingEntity mBoss;
-
 	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
 		return new PrimordialElementalKaulBoss(plugin, boss);
 	}
 
 	public PrimordialElementalKaulBoss(Plugin plugin, LivingEntity boss) {
-		mBoss = boss;
+		super(plugin, identityTag, boss);
 		mBoss.setRemoveWhenFarAway(false);
 		Location spawnLoc = mBoss.getLocation();
 		World world = mBoss.getWorld();
@@ -119,7 +117,7 @@ public class PrimordialElementalKaulBoss extends BossAbilityGroup {
 
 		BossBarManager bossBar = new BossBarManager(plugin, boss, detectionRange, BarColor.GREEN, BarStyle.SEGMENTED_10, events);
 
-		super.constructBoss(plugin, identityTag, mBoss, activeSpells, passiveSpells, detectionRange, bossBar);
+		super.constructBoss(activeSpells, passiveSpells, detectionRange, bossBar);
 	}
 
 	@Override

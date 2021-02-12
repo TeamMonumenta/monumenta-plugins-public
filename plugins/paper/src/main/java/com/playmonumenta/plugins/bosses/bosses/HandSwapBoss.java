@@ -20,6 +20,7 @@ public class HandSwapBoss extends BossAbilityGroup {
 	}
 
 	public HandSwapBoss(Plugin plugin, LivingEntity boss) throws Exception {
+		super(plugin, identityTag, boss);
 		if (!(boss instanceof Mob)) {
 			throw new Exception("boss_handswap only works on mobs!");
 		}
@@ -30,6 +31,6 @@ public class HandSwapBoss extends BossAbilityGroup {
 		    new SpellHandSwap(mBoss)
 		));
 
-		super.constructBoss(plugin, identityTag, mBoss, activeSpells, null, detectionRange, null);
+		super.constructBoss(activeSpells, null, detectionRange, null);
 	}
 }

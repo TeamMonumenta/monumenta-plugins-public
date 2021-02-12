@@ -17,7 +17,8 @@ public class OnlyGlowByCommandsBoss extends BossAbilityGroup {
 	}
 
 	public OnlyGlowByCommandsBoss(Plugin plugin, LivingEntity boss) {
-		super.constructBoss(plugin, identityTag, boss, null, null, detectionRange, null);
+		super(plugin, identityTag, boss);
+		super.constructBoss(null, null, detectionRange, null);
 	}
 
 	@Override

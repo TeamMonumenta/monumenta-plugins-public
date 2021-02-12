@@ -21,6 +21,7 @@ public class VolatileBoss extends BossAbilityGroup {
 	}
 
 	public VolatileBoss(Plugin plugin, LivingEntity boss) throws Exception {
+		super(plugin, identityTag, boss);
 		if (!(boss instanceof Creeper)) {
 			throw new Exception("Attempted to give non-creeper the " + identityTag + " ability: " + boss.toString());
 		}
@@ -28,7 +29,7 @@ public class VolatileBoss extends BossAbilityGroup {
 		mBoss = (Creeper)boss;
 
 		// Boss effectively does nothing
-		super.constructBoss(plugin, identityTag, mBoss, null, null, detectionRange, null);
+		super.constructBoss(null, null, detectionRange, null);
 	}
 
 	@Override

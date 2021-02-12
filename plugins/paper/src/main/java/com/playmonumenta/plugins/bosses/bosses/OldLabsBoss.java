@@ -33,7 +33,6 @@ public class OldLabsBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_oldlabs";
 	public static final int detectionRange = 32;
 
-	private final LivingEntity mBoss;
 	private final Location mSpawnLoc;
 	private final Location mEndLoc;
 
@@ -60,8 +59,7 @@ public class OldLabsBoss extends BossAbilityGroup {
 	}
 
 	public OldLabsBoss(Plugin plugin, LivingEntity boss, Location spawnLoc, Location endLoc, boolean newBoss) {
-
-		mBoss = boss;
+		super(plugin, identityTag, boss);
 		mSpawnLoc = spawnLoc;
 		mEndLoc = endLoc;
 
@@ -162,7 +160,7 @@ public class OldLabsBoss extends BossAbilityGroup {
 		});
 
 		BossBarManager bossBar = new BossBarManager(plugin, boss, detectionRange, BarColor.BLUE, BarStyle.SEGMENTED_10, events);
-		constructBoss(plugin, identityTag, mBoss, phase1Spells, null, detectionRange, bossBar);
+		constructBoss(phase1Spells, null, detectionRange, bossBar);
 	}
 
 	@Override

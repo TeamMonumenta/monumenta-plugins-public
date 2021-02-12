@@ -23,13 +23,14 @@ public class TrainingDummyBoss extends BossAbilityGroup {
 	}
 
 	public TrainingDummyBoss(Plugin plugin, LivingEntity boss) throws Exception {
+		super(plugin, identityTag, boss);
 		SpellManager activeSpells = new SpellManager(Arrays.asList(
 			new SpellRunAction(() -> {
 				boss.setHealth(boss.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue());
 			}, 60 * 20)
 		));
 
-		super.constructBoss(plugin, identityTag, boss, activeSpells, null, detectionRange, null);
+		super.constructBoss(activeSpells, null, detectionRange, null);
 		boss.setRemoveWhenFarAway(false);
 	}
 

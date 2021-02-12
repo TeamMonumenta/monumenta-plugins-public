@@ -20,6 +20,7 @@ public class ShieldSwitchBoss extends BossAbilityGroup {
 	}
 
 	public ShieldSwitchBoss(Plugin plugin, LivingEntity boss) throws Exception {
+		super(plugin, identityTag, boss);
 		if (!(boss instanceof Mob)) {
 			throw new Exception("boss_shieldswitch only works on mobs!");
 		}
@@ -30,6 +31,6 @@ public class ShieldSwitchBoss extends BossAbilityGroup {
 			new SpellShieldSwitch(mBoss, plugin)
 		));
 
-		super.constructBoss(plugin, identityTag, mBoss, activeSpells, null, detectionRange, null);
+		super.constructBoss(activeSpells, null, detectionRange, null);
 	}
 }

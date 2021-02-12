@@ -18,7 +18,6 @@ public class AuraLargeFatigueBoss extends BossAbilityGroup {
 	public static final String identityTag = "FatigueAura";
 	public static final int detectionRange = 45;
 
-	LivingEntity mBoss;
 	private static final Particle.DustOptions FATIGUE_COLOR = new Particle.DustOptions(Color.fromRGB(255, 232, 160), 2f);
 
 	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
@@ -26,16 +25,16 @@ public class AuraLargeFatigueBoss extends BossAbilityGroup {
 	}
 
 	public AuraLargeFatigueBoss(Plugin plugin, LivingEntity boss) {
-		mBoss = boss;
+		super(plugin, identityTag, boss);
 
 		List<Spell> passiveSpells = Arrays.asList(
-			new SpellBaseAura(mBoss, 35, 20, 35, 20, Particle.REDSTONE, FATIGUE_COLOR,
+			new SpellBaseAura(boss, 35, 20, 35, 20, Particle.REDSTONE, FATIGUE_COLOR,
 			                  (Player player) -> {
 			                      player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW_DIGGING, 60, 1, true, true));
 			                  })
 		);
 
-		mBoss.setRemoveWhenFarAway(false);
-		super.constructBoss(plugin, identityTag, mBoss, null, passiveSpells, detectionRange, null);
+		boss.setRemoveWhenFarAway(false);
+		super.constructBoss(null, passiveSpells, detectionRange, null);
 	}
 }

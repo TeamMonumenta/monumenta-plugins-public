@@ -27,7 +27,6 @@ public class Virius extends BossAbilityGroup {
 	public static final String identityTag = "boss_virius";
 	public static final int detectionRange = 50;
 
-	private final LivingEntity mBoss;
 	private final Location mSpawnLoc;
 	private final Location mEndLoc;
 
@@ -43,7 +42,7 @@ public class Virius extends BossAbilityGroup {
 	}
 
 	public Virius(Plugin plugin, LivingEntity boss, Location spawnLoc, Location endLoc) {
-		mBoss = boss;
+		super(plugin, identityTag, boss);
 		mSpawnLoc = spawnLoc;
 		mEndLoc = endLoc;
 		mBoss.setRemoveWhenFarAway(false);
@@ -78,7 +77,7 @@ public class Virius extends BossAbilityGroup {
 
 		BossBarManager bossBar = new BossBarManager(plugin, mBoss, detectionRange, BarColor.RED, BarStyle.SOLID, null);
 
-		super.constructBoss(plugin, identityTag, mBoss, activeSpells, null, detectionRange, bossBar);
+		super.constructBoss(activeSpells, null, detectionRange, bossBar);
 	}
 
 	@Override

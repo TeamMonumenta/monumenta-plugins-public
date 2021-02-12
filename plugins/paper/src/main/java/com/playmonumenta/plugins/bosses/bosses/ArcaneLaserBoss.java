@@ -19,14 +19,12 @@ public class ArcaneLaserBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_arcanelaser";
 	public static final int detectionRange = 30;
 
-	LivingEntity mBoss;
-
 	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
 		return new ArcaneLaserBoss(plugin, boss);
 	}
 
 	public ArcaneLaserBoss(Plugin plugin, LivingEntity boss) {
-		mBoss = boss;
+		super(plugin, identityTag, boss);
 
 		SpellManager activeSpells = new SpellManager(Arrays.asList(
 			new SpellBaseLaser(plugin, boss, detectionRange, 100, false, false, 240,
@@ -54,6 +52,6 @@ public class ArcaneLaserBoss extends BossAbilityGroup {
 					})
 		));
 
-		super.constructBoss(plugin, identityTag, mBoss, activeSpells, null, detectionRange, null);
+		super.constructBoss(activeSpells, null, detectionRange, null);
 	}
 }

@@ -48,8 +48,6 @@ public class VarcosasLastBreathBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_varcosa_breath";
 	public static final int detectionRange = 50;
 	private static String[] mSpeak = {"Arr, I be killin' ye myself then. I shan't be stopped twice...", "The air be growin' stale. I shan't let me end be this!"};
-	private final Plugin mPlugin;
-	private final LivingEntity mBoss;
 	private final Location mSpawnLoc;
 	private final Location mEndLoc;
 	private Location mCenter = null;
@@ -67,8 +65,7 @@ public class VarcosasLastBreathBoss extends BossAbilityGroup {
 	}
 
 	public VarcosasLastBreathBoss(Plugin plugin, LivingEntity boss, Location spawnLoc, Location endLoc) {
-		mPlugin = plugin;
-		mBoss = boss;
+		super(plugin, identityTag, boss);
 		mSpawnLoc = spawnLoc;
 		mEndLoc = endLoc;
 		mBoss.setRemoveWhenFarAway(false);
@@ -119,7 +116,7 @@ public class VarcosasLastBreathBoss extends BossAbilityGroup {
 		events.put(10, mBoss -> forceCastSpell(SpellGhostlyCannons.class));
 		BossBarManager bossBar = new BossBarManager(mPlugin, mBoss, detectionRange + 20, BarColor.RED, BarStyle.SEGMENTED_10, events);
 
-		super.constructBoss(plugin, identityTag, boss, spells, passiveSpells, detectionRange, bossBar);
+		super.constructBoss(spells, passiveSpells, detectionRange, bossBar);
 	}
 
 	@Override

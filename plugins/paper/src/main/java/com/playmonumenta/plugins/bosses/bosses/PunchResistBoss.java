@@ -12,16 +12,13 @@ public class PunchResistBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_punchresist";
 	public static final int detectionRange = 100;
 
-	private final LivingEntity mBoss;
-
 	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
 		return new PunchResistBoss(plugin, boss);
 	}
 
 	public PunchResistBoss(Plugin plugin, LivingEntity boss) {
-		mBoss = boss;
-
-		super.constructBoss(plugin, identityTag, boss, null, null, detectionRange, null);
+		super(plugin, identityTag, boss);
+		super.constructBoss(null, null, detectionRange, null);
 	}
 
 	@Override

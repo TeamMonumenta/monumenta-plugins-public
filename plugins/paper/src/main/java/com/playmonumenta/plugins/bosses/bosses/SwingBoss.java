@@ -29,14 +29,12 @@ public class SwingBoss extends BossAbilityGroup {
 	private static final int COOLDOWN = 20 * 8;
 	private static final Particle.DustOptions REDSTONE_COLOR = new Particle.DustOptions(Color.fromRGB(255, 255, 255), 1.0f);
 
-	private LivingEntity mBoss;
-
 	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
 		return new SwingBoss(plugin, boss);
 	}
 
 	public SwingBoss(Plugin plugin, LivingEntity boss) {
-		mBoss = boss;
+		super(plugin, identityTag, boss);
 
 		SpellManager activeSpells = new SpellManager(Arrays.asList(
 				new SpellBaseAoE(plugin, boss, RADIUS, DURATION, COOLDOWN, false, Sound.ENTITY_PLAYER_ATTACK_SWEEP,
@@ -60,6 +58,6 @@ public class SwingBoss extends BossAbilityGroup {
 							}
 						})));
 
-		super.constructBoss(plugin, identityTag, mBoss, activeSpells, null, detectionRange, null);
+		super.constructBoss(activeSpells, null, detectionRange, null);
 	}
 }

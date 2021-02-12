@@ -36,14 +36,12 @@ public class ImmortalElementalKaulBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_kaulimmortal";
 	public static final int detectionRange = 100;
 
-	private LivingEntity mBoss;
-
 	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
 		return new ImmortalElementalKaulBoss(plugin, boss);
 	}
 
 	public ImmortalElementalKaulBoss(Plugin plugin, LivingEntity boss) {
-		mBoss = boss;
+		super(plugin, identityTag, boss);
 		mBoss.setRemoveWhenFarAway(false);
 
 		Location spawnLoc = mBoss.getLocation();
@@ -113,7 +111,7 @@ public class ImmortalElementalKaulBoss extends BossAbilityGroup {
 		                             || b.getLocation().getBlock().getType() == Material.WATER));
 
 
-		super.constructBoss(plugin, identityTag, mBoss, activeSpells, passiveSpells, detectionRange, null);
+		super.constructBoss(activeSpells, passiveSpells, detectionRange, null);
 	}
 
 	@Override

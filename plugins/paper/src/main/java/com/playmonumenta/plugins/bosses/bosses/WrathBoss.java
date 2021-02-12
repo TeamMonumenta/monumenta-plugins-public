@@ -38,15 +38,12 @@ public class WrathBoss extends BossAbilityGroup {
 	private static final int ULTIMATE_EYE_DISTANCE = 6;
 	private static final double DODGE_CHANCE = 0.3;
 
-
-	LivingEntity mBoss;
-
 	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
 		return new WrathBoss(plugin, boss);
 	}
 
 	public WrathBoss(Plugin plugin, LivingEntity boss) {
-		mBoss = boss;
+		super(plugin, identityTag, boss);
 
 		SpellManager activeSpells = new SpellManager(Arrays.asList(
 			new SpellBaseLeapAttack(plugin, boss, detectionRange, MIN_RANGE, RUN_DISTANCE, COOLDOWN, VELOCITY_MULTIPLIER,
@@ -134,7 +131,7 @@ public class WrathBoss extends BossAbilityGroup {
 			}
 		}.runTaskLater(plugin, 1);
 
-		super.constructBoss(plugin, identityTag, mBoss, activeSpells, null, detectionRange, null);
+		super.constructBoss(activeSpells, null, detectionRange, null);
 	}
 
 	@Override

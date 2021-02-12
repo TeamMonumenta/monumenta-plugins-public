@@ -27,8 +27,6 @@ public class DreadnaughtParticleBoss extends BossAbilityGroup {
 
 	private static final int DAMAGE_IMMUNE_DISTANCE = 6;
 
-	LivingEntity mBoss;
-
 	private double mDamageCounter = 0;
 
 	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
@@ -36,12 +34,12 @@ public class DreadnaughtParticleBoss extends BossAbilityGroup {
 	}
 
 	public DreadnaughtParticleBoss(Plugin plugin, LivingEntity boss) {
-		mBoss = boss;
+		super(plugin, identityTag, boss);
 		List<Spell> passiveSpells = Arrays.asList(
-			new SpellDreadnaughtParticle(mBoss)
+			new SpellDreadnaughtParticle(boss)
 		);
 
-		super.constructBoss(plugin, identityTag, mBoss, null, passiveSpells, detectionRange, null);
+		super.constructBoss(null, passiveSpells, detectionRange, null);
 	}
 
 	@Override

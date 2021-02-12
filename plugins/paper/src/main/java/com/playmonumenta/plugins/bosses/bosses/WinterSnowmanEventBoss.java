@@ -24,23 +24,19 @@ public class WinterSnowmanEventBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_winter_snowman";
 	public static final int detectionRange = 50;
 
-	private final LivingEntity mBoss;
-	private final Plugin mPlugin;
-
 	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
 		return new WinterSnowmanEventBoss(plugin, boss);
 	}
 
 	public WinterSnowmanEventBoss(Plugin plugin, LivingEntity boss) throws Exception {
-		mBoss = boss;
-		mPlugin = plugin;
+		super(plugin, identityTag, boss);
 		mBoss.setRemoveWhenFarAway(false);
 
 		if (!(boss instanceof Snowman)) {
 			throw new Exception("boss_winter_snowman only works on snowmen!");
 		}
 
-		super.constructBoss(plugin, identityTag, mBoss, null, null, detectionRange, null);
+		super.constructBoss(null, null, detectionRange, null);
 	}
 
 	@Override

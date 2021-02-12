@@ -14,7 +14,8 @@ public class BlastResistBoss extends BossAbilityGroup {
 	}
 
 	public BlastResistBoss(Plugin plugin, LivingEntity boss) {
-		super.constructBoss(plugin, identityTag, boss, null, null, detectionRange, null);
+		super(plugin, identityTag, boss);
+		super.constructBoss(null, null, detectionRange, null);
 	}
 
 	@Override

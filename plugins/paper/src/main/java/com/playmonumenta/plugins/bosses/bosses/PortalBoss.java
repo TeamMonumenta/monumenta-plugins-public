@@ -18,7 +18,6 @@ import com.playmonumenta.plugins.portals.PortalManager;
 public class PortalBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_portal";
 
-	LivingEntity mBoss;
 	PortalEntityCheck mRunnable;
 	Location mPastPosition1;
 	Location mPastPosition2;
@@ -29,8 +28,8 @@ public class PortalBoss extends BossAbilityGroup {
 	}
 
 	public PortalBoss(Plugin plugin, LivingEntity boss) {
-		mBoss = boss;
-		super.constructBoss(plugin, identityTag, mBoss, null, null, 20, null);
+		super(plugin, identityTag, boss);
+		super.constructBoss(null, null, 20, null);
 		mRunnable = new PortalEntityCheck();
 		mRunnable.runTaskTimer(mPlugin, 0, 1);
 	}

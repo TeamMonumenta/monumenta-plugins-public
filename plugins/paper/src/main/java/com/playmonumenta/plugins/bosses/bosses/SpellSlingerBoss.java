@@ -33,14 +33,13 @@ public class SpellSlingerBoss extends BossAbilityGroup {
 	private static final int DAMAGE = 16;
 	private static final float KNOCKBACK_SPEED = 0.5f;
 
-	LivingEntity mBoss;
 
 	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
 		return new SpellSlingerBoss(plugin, boss);
 	}
 
 	public SpellSlingerBoss(Plugin plugin, LivingEntity boss) {
-		mBoss = boss;
+		super(plugin, identityTag, boss);
 
 		SpellManager activeSpells = new SpellManager(Arrays.asList(
 				new SpellBaseSeekingProjectile(plugin, boss, detectionRange, SINGLE_TARGET, LAUNCH_TRACKING, COOLDOWN, DELAY,
@@ -68,7 +67,7 @@ public class SpellSlingerBoss extends BossAbilityGroup {
 						})
 		));
 
-		super.constructBoss(plugin, identityTag, mBoss, activeSpells, null, detectionRange, null);
+		super.constructBoss(activeSpells, null, detectionRange, null);
 	}
 
 }

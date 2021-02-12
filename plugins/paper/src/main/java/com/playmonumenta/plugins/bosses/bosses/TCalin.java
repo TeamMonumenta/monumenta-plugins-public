@@ -41,7 +41,6 @@ public class TCalin extends BossAbilityGroup {
 	public static final String identityTag = "boss_tcalin";
 	public static final int detectionRange = 60;
 
-	private final LivingEntity mBoss;
 	private final Location mSpawnLoc;
 	private final Location mEndLoc;
 
@@ -55,7 +54,7 @@ public class TCalin extends BossAbilityGroup {
 	}
 
 	public TCalin(Plugin plugin, LivingEntity boss, Location spawnLoc, Location endLoc) {
-		mBoss = boss;
+		super(plugin, identityTag, boss);
 		mSpawnLoc = spawnLoc;
 		mEndLoc = endLoc;
 		mBoss.setRemoveWhenFarAway(false);
@@ -260,7 +259,7 @@ public class TCalin extends BossAbilityGroup {
 
 		BossBarManager bossBar = new BossBarManager(plugin, boss, detectionRange, BarColor.GREEN, BarStyle.SEGMENTED_10, events);
 
-		super.constructBoss(plugin, identityTag, mBoss, activeSpells, null, detectionRange, bossBar);
+		super.constructBoss(activeSpells, null, detectionRange, bossBar);
 	}
 
 	private void knockback(Plugin plugin, double r) {

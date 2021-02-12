@@ -14,16 +14,14 @@ public class GraySummoned extends BossAbilityGroup {
 	public static final String identityTag = "boss_gray_summoned";
 	public static final int detectionRange = 40;
 
-	private final LivingEntity mBoss;
-
 	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
 		return new GraySummoned(plugin, boss);
 	}
 
 	public GraySummoned(Plugin plugin, LivingEntity boss) {
-		mBoss = boss;
+		super(plugin, identityTag, boss);
 
-		super.constructBoss(plugin, identityTag, boss, null, null, detectionRange, null);
+		super.constructBoss(null, null, detectionRange, null);
 	}
 
 	@Override

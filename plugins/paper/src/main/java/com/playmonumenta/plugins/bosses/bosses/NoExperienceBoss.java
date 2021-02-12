@@ -8,19 +8,15 @@ public class NoExperienceBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_no_exp";
 	public static final int detectionRange = 30;
 
-	LivingEntity mBoss;
-	Plugin mPlugin;
-
 	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
 		return new NoExperienceBoss(plugin, boss);
 	}
 
 	public NoExperienceBoss(Plugin plugin, LivingEntity boss) {
-		mBoss = boss;
-		mPlugin = plugin;
+		super(plugin, identityTag, boss);
 
 		// Boss effectively does nothing
-		super.constructBoss(plugin, identityTag, mBoss, null, null, detectionRange, null);
+		super.constructBoss(null, null, detectionRange, null);
 	}
 
 	@Override

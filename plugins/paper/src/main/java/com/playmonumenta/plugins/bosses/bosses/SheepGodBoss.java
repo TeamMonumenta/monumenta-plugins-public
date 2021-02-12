@@ -25,8 +25,6 @@ public class SheepGodBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_sheepgod";
 	public static final int detectionRange = 30;
 
-	private final Plugin mPlugin;
-	private final LivingEntity mBoss;
 	private final Location mSpawnLoc;
 	private final Location mEndLoc;
 
@@ -44,12 +42,12 @@ public class SheepGodBoss extends BossAbilityGroup {
 	}
 
 	public SheepGodBoss(Plugin plugin, LivingEntity boss, Location spawnLoc, Location endLoc) {
-		mPlugin = plugin;
-		mBoss = boss;
+		super(plugin, identityTag, boss);
 		mSpawnLoc = spawnLoc;
 		mEndLoc = endLoc;
 		mPhase2 = false;
-		mBoss.setRemoveWhenFarAway(false);
+		boss.setRemoveWhenFarAway(false);
+		constructBoss(null, null, 20, null);
 	}
 
 	@Override

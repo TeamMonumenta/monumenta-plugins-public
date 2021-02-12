@@ -14,18 +14,16 @@ public class ShadeParticleBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_shadeparticle";
 	public static final int detectionRange = 16;
 
-	LivingEntity mBoss;
-
 	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
 		return new ShadeParticleBoss(plugin, boss);
 	}
 
 	public ShadeParticleBoss(Plugin plugin, LivingEntity boss) {
-		mBoss = boss;
+		super(plugin, identityTag, boss);
 		List<Spell> passiveSpells = Arrays.asList(
-			new SpellShadeParticle(mBoss)
+			new SpellShadeParticle(boss)
 		);
 
-		super.constructBoss(plugin, identityTag, mBoss, null, passiveSpells, detectionRange, null);
+		super.constructBoss(null, passiveSpells, detectionRange, null);
 	}
 }

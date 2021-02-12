@@ -46,8 +46,6 @@ import com.playmonumenta.plugins.utils.SerializationUtils;
 public class VarcosaLingeringWillBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_varcosa_will";
 	public static final int detectionRange = 50;
-	private final Plugin mPlugin;
-	private final LivingEntity mBoss;
 	private final Location mSpawnLoc;
 	private final Location mEndLoc;
 	private Location mCenter = null;
@@ -66,8 +64,7 @@ public class VarcosaLingeringWillBoss extends BossAbilityGroup {
 	}
 
 	public VarcosaLingeringWillBoss(Plugin plugin, LivingEntity boss, Location spawnLoc, Location endLoc) {
-		mPlugin = plugin;
-		mBoss = boss;
+		super(plugin, identityTag, boss);
 		mSpawnLoc = spawnLoc;
 		mEndLoc = endLoc;
 		mBoss.setRemoveWhenFarAway(false);
@@ -117,7 +114,7 @@ public class VarcosaLingeringWillBoss extends BossAbilityGroup {
 		events.put(10, mBoss -> forceCastSpell(SpellGhostlyCannons.class));
 		BossBarManager bossBar = new BossBarManager(mPlugin, mBoss, detectionRange + 20, BarColor.RED, BarStyle.SEGMENTED_10, events);
 
-		super.constructBoss(plugin, identityTag, boss, spells, passiveSpells, detectionRange, bossBar);
+		super.constructBoss(spells, passiveSpells, detectionRange, bossBar);
 	}
 
 	@Override

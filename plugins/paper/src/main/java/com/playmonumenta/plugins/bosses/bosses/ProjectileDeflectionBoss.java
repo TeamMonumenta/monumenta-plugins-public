@@ -13,18 +13,16 @@ public class ProjectileDeflectionBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_projdeflect";
 	public static final int detectionRange = 40;
 
-	LivingEntity mBoss;
-
 	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
 		return new LivingBladeBoss(plugin, boss);
 	}
 
 	public ProjectileDeflectionBoss(Plugin plugin, LivingEntity boss) {
-		mBoss = boss;
+		super(plugin, identityTag, boss);
 		List<Spell> passiveSpells = Arrays.asList(
-			new SpellProjectileDeflection(mBoss)
+			new SpellProjectileDeflection(boss)
 		);
 
-		super.constructBoss(plugin, identityTag, mBoss, null, passiveSpells, detectionRange, null);
+		super.constructBoss(null, passiveSpells, detectionRange, null);
 	}
 }

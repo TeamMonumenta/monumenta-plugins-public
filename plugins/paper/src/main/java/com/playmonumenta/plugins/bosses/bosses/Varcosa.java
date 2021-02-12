@@ -40,7 +40,6 @@ public class Varcosa extends BossAbilityGroup {
 	public static final String identityTag = "boss_varcosa";
 	public static final int detectionRange = 110;
 
-	private final LivingEntity mBoss;
 	private final Location mSpawnLoc;
 	private final Location mEndLoc;
 
@@ -56,16 +55,16 @@ public class Varcosa extends BossAbilityGroup {
 	}
 
 	public Varcosa(Plugin plugin, LivingEntity boss, Location spawnLoc, Location endLoc) {
-		mBoss = boss;
+		super(plugin, identityTag, boss);
 		mSpawnLoc = spawnLoc;
 		mEndLoc = endLoc;
-		mBoss.setRemoveWhenFarAway(false);
+		boss.setRemoveWhenFarAway(false);
 
-		mBoss.addScoreboardTag("Boss");
+		boss.addScoreboardTag("Boss");
 
 		SpellManager activeSpells = new SpellManager(Arrays.asList(
-			new SpellGenericCharge(plugin, mBoss, detectionRange, 15.0F),
-			new SpellTpSwapPlaces(plugin, mBoss, 5),
+			new SpellGenericCharge(plugin, boss, detectionRange, 15.0F),
+			new SpellTpSwapPlaces(plugin, boss, 5),
 			new SpellBaseLaser(plugin, boss, detectionRange, 100, false, false, 160,
 
 					// Tick action per player
@@ -97,31 +96,31 @@ public class Varcosa extends BossAbilityGroup {
 					})));
 
 		List<Spell> passiveSpells = Arrays.asList(
-			new SpellBlockBreak(mBoss),
+			new SpellBlockBreak(boss),
 			// Weaponswap
-			new SpellWeaponSwitch((Mob) mBoss),
+			new SpellWeaponSwitch((Mob) boss),
 			// Teleport the boss to spawnLoc if he is stuck in bedrock
-			new SpellConditionalTeleport(mBoss, spawnLoc, b -> b.getLocation().getBlock().getType() == Material.BEDROCK ||
+			new SpellConditionalTeleport(boss, spawnLoc, b -> b.getLocation().getBlock().getType() == Material.BEDROCK ||
 			                                                   b.getLocation().add(0, 1, 0).getBlock().getType() == Material.BEDROCK ||
 			                                                   b.getLocation().getBlock().getType() == Material.LAVA)
 		);
 
 		Map<Integer, BossHealthAction> events = new HashMap<Integer, BossHealthAction>();
-		events.put(100, mBoss -> {
+		events.put(100, (mob) -> {
 			PlayerUtils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"" + ChatColor.GOLD + "[Captain Varcosa] " + ChatColor.WHITE + "Yarharhar! Thank ye fer comin’ and seein’ me, but now this will be ye grave as well!\",\"color\":\"purple\"}]");
 		});
-		events.put(50, (mBoss) -> {
+		events.put(50, (mob) -> {
 			PlayerUtils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"" + ChatColor.GOLD + "[Captain Varcosa] " + ChatColor.WHITE + "I will hang ye out to dry!\",\"color\":\"purple\"}]");
 		});
-		events.put(25, (mBoss) -> {
+		events.put(25, (mob) -> {
 			PlayerUtils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"" + ChatColor.GOLD + "[Captain Varcosa] " + ChatColor.WHITE + "Yarharhar! Do ye feel it as well? That holy fleece? It be waitin’ fer me!\",\"color\":\"purple\"}]");
 		});
-		events.put(10, (mBoss) -> {
+		events.put(10, (mob) -> {
 			PlayerUtils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"" + ChatColor.GOLD + "[Captain Varcosa] " + ChatColor.WHITE + "I be too close ter be stoppin’ now! Me greed will never die!\",\"color\":\"purple\"}]");
 		});
 		BossBarManager bossBar = new BossBarManager(plugin, boss, detectionRange, BarColor.RED, BarStyle.SEGMENTED_10, events);
 
-		super.constructBoss(plugin, identityTag, mBoss, activeSpells, passiveSpells, detectionRange, bossBar);
+		super.constructBoss(activeSpells, passiveSpells, detectionRange, bossBar);
 	}
 
 	@Override

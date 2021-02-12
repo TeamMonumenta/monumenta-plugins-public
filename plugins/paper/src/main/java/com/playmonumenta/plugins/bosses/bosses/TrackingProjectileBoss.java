@@ -33,21 +33,19 @@ public class TrackingProjectileBoss extends BossAbilityGroup {
 	private static final boolean LINGERS = true;
 	private static final int DAMAGE = 24;
 
-	LivingEntity mBoss;
-
 	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
 		return new TrackingProjectileBoss(plugin, boss);
 	}
 
 	public TrackingProjectileBoss(Plugin plugin, LivingEntity boss) {
-		mBoss = boss;
+		super(plugin, identityTag, boss);
 
 		SpellManager activeSpells = new SpellManager(Arrays.asList(
 			new SpellBaseSeekingProjectile(plugin, boss, detectionRange, SINGLE_TARGET, LAUNCH_TRACKING, COOLDOWN, DELAY,
 					SPEED, TURN_RADIUS, LIFETIME_TICKS, HITBOX_LENGTH, COLLIDES_WITH_BLOCKS, LINGERS,
 					// Initiate Aesthetic
 					(World world, Location loc, int ticks) -> {
-						PotionUtils.applyPotion(null, mBoss, new PotionEffect(PotionEffectType.GLOWING, DELAY, 0));
+						PotionUtils.applyPotion(null, boss, new PotionEffect(PotionEffectType.GLOWING, DELAY, 0));
 						world.playSound(loc, Sound.BLOCK_BEACON_POWER_SELECT, 1f, 0.5f);
 					},
 					// Launch Aesthetic
@@ -73,6 +71,6 @@ public class TrackingProjectileBoss extends BossAbilityGroup {
 					})
 		));
 
-		super.constructBoss(plugin, identityTag, mBoss, activeSpells, null, detectionRange, null);
+		super.constructBoss(activeSpells, null, detectionRange, null);
 	}
 }

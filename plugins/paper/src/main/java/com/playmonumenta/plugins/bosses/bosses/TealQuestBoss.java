@@ -61,7 +61,6 @@ public class TealQuestBoss extends BossAbilityGroup {
 	private static final int HITS_TO_BREAK = 1;
 	private static final Particle.DustOptions REDSTONE_COLOR_BARRIER = new Particle.DustOptions(Color.fromRGB(225, 15, 255), 1.0f);
 
-	private LivingEntity mBoss;
 	private Location mEndLoc;
 	private Location mSpawnLoc;
 
@@ -77,7 +76,7 @@ public class TealQuestBoss extends BossAbilityGroup {
     }
 
 	public TealQuestBoss(Plugin plugin, LivingEntity boss, Location spawnLoc, Location endLoc) {
-		mBoss = boss;
+		super(plugin, identityTag, boss);
 		mEndLoc = endLoc;
 		mSpawnLoc = spawnLoc;
 		SpellManager manager = new SpellManager(Arrays.asList(new SpellBaseSlam(plugin, boss, JUMP_HEIGHT, detectionRange, MIN_RANGE, RUN_DISTANCE, COOLDOWN_SLAM, VELOCITY_MULTIPLIER,
@@ -146,7 +145,7 @@ public class TealQuestBoss extends BossAbilityGroup {
 
 		BossBarManager barManager = new BossBarManager(plugin, mBoss, detectionRange, BarColor.BLUE, BarStyle.SOLID, null);
 
-		super.constructBoss(plugin, identityTag, boss, manager, passives, detectionRange, barManager);
+		super.constructBoss(manager, passives, detectionRange, barManager);
 	}
 
 	@Override

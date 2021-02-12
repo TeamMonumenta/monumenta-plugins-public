@@ -22,20 +22,16 @@ public class KamikazeBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_kamikaze";
 	public static final int detectionRange = 30;
 
-	LivingEntity mBoss;
-	Plugin mPlugin;
-
 	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
 		return new KamikazeBoss(plugin, boss);
 	}
 
 	public KamikazeBoss(Plugin plugin, LivingEntity boss) {
-		mBoss = boss;
-		mPlugin = plugin;
+		super(plugin, identityTag, boss);
 		List<Spell> passiveSpells = Arrays.asList(
-				new SpellRunAction(() -> mBoss.getLocation().getWorld().spawnParticle(Particle.SMOKE_NORMAL, mBoss.getLocation().clone().add(new Location(mBoss.getWorld(),0,1,0)), 2, 0.5, 1, 0.5, 0))
+				new SpellRunAction(() -> boss.getLocation().getWorld().spawnParticle(Particle.SMOKE_NORMAL, boss.getLocation().clone().add(new Location(boss.getWorld(),0,1,0)), 2, 0.5, 1, 0.5, 0))
 			);
-		super.constructBoss(plugin, identityTag, mBoss, null, passiveSpells, detectionRange, null);
+		super.constructBoss(null, passiveSpells, detectionRange, null);
 	}
 
 	@Override

@@ -12,15 +12,13 @@ public class IceAspectBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_iceaspect";
 	public static final int detectionRange = 50;
 
-	private final LivingEntity mBoss;
-
 	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
 		return new IceAspectBoss(plugin, boss);
 	}
 
 	public IceAspectBoss(Plugin plugin, LivingEntity boss) throws Exception {
-		super.constructBoss(plugin, identityTag, boss, null, null, detectionRange, null);
-		mBoss = boss;
+		super(plugin, identityTag, boss);
+		super.constructBoss(null, null, detectionRange, null);
 	}
 
 	@Override

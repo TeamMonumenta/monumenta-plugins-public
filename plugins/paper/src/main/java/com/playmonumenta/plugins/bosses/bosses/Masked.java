@@ -56,7 +56,6 @@ public class Masked extends BossAbilityGroup {
 	private static final String TITLE_SUBTITLE_COMMAND = "title @s subtitle {\"text\":\"Harbinger of Shadow\",\"color\":\"light_purple\"}";
 	private static final String TITLE_TITLE_COMMAND = "title @s title {\"text\":\"The Masked Man\",\"bold\":true,\"color\":\"light_purple\"}";
 
-	private final LivingEntity mBoss;
 	private final World mWorld;
 	private final Location mSpawnLoc;
 	private final Location mEndLoc;
@@ -74,9 +73,8 @@ public class Masked extends BossAbilityGroup {
 	}
 
 	public Masked(Plugin plugin, LivingEntity boss, Location spawnLoc, Location endLoc) {
-		mPlugin = plugin;
+		super(plugin, identityTag, boss);
 		mWorld = boss.getWorld();
-		mBoss = boss;
 		mSpawnLoc = spawnLoc;
 		mEndLoc = endLoc;
 
@@ -207,6 +205,6 @@ public class Masked extends BossAbilityGroup {
 		});
 
 		BossBarManager bossBar = new BossBarManager(mPlugin, mBoss, DETECTION_RANGE, BarColor.WHITE, BarStyle.SEGMENTED_10, events);
-		super.constructBoss(mPlugin, identityTag, mBoss, activeSpells1, passiveSpells1, DETECTION_RANGE, bossBar);
+		super.constructBoss(activeSpells1, passiveSpells1, DETECTION_RANGE, bossBar);
 	}
 }

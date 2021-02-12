@@ -17,6 +17,7 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
+import com.playmonumenta.plugins.effects.EffectManager;
 import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.utils.EntityUtils;
 
@@ -34,9 +35,6 @@ public class CoordinatedAttackBoss extends BossAbilityGroup {
 	private static final int COOLDOWN = 20 * 3;
 	private static final int AFFECTED_MOB_CAP = 4;
 
-	private final com.playmonumenta.plugins.Plugin mPlugin;
-	private final LivingEntity mBoss;
-
 	private int mLastTriggered = 0;
 
 	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
@@ -44,10 +42,8 @@ public class CoordinatedAttackBoss extends BossAbilityGroup {
 	}
 
 	public CoordinatedAttackBoss(Plugin plugin, LivingEntity boss) {
-		mPlugin = com.playmonumenta.plugins.Plugin.getInstance();
-		mBoss = boss;
-
-		super.constructBoss(plugin, identityTag, mBoss, null, null, detectionRange, null);
+		super(plugin, identityTag, boss);
+		super.constructBoss(null, null, detectionRange, null);
 	}
 
 	@Override
@@ -89,7 +85,7 @@ public class CoordinatedAttackBoss extends BossAbilityGroup {
 							if (tags == null || !tags.contains(identityTag)) {
 								((Mob) mob).setTarget(mTarget);
 
-								mPlugin.mEffectManager.addEffect(mob, PERCENT_SPEED_EFFECT_NAME,
+								EffectManager.getInstance().addEffect(mob, PERCENT_SPEED_EFFECT_NAME,
 										new PercentSpeed(PERCENT_SPEED_DURATION, PERCENT_SPEED_EFFECT, PERCENT_SPEED_EFFECT_NAME));
 
 								Location loc = mob.getLocation();

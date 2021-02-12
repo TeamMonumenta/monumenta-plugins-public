@@ -26,7 +26,8 @@ public class AbilitySilenceBoss extends BossAbilityGroup {
 	}
 
 	public AbilitySilenceBoss(Plugin plugin, LivingEntity boss) throws Exception {
-		super.constructBoss(plugin, identityTag, boss, null, null, detectionRange, null);
+		super(plugin, identityTag, boss);
+		super.constructBoss(null, null, detectionRange, null);
 	}
 
 	@Override

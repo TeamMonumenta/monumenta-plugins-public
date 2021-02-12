@@ -33,14 +33,12 @@ public class MeteorSlamBoss extends BossAbilityGroup {
 	private static final double DAMAGE_PERCENT = 0.5;
 	private static final int JUMP_HEIGHT = 1;
 
-	LivingEntity mBoss;
-
 	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
 		return new MeteorSlamBoss(plugin, boss);
 	}
 
 	public MeteorSlamBoss(Plugin plugin, LivingEntity boss) {
-		mBoss = boss;
+		super(plugin, identityTag, boss);
 
 		SpellManager manager = new SpellManager(Arrays.asList(new SpellBaseSlam(plugin, boss, JUMP_HEIGHT, detectionRange, MIN_RANGE, RUN_DISTANCE, COOLDOWN, VELOCITY_MULTIPLIER,
 				(World world, Location loc) -> {
@@ -66,13 +64,13 @@ public class MeteorSlamBoss extends BossAbilityGroup {
 					world.spawnParticle(Particle.EXPLOSION_NORMAL, loc, 20, 0F, 0F, 0F, 0.3F);
 					world.spawnParticle(Particle.LAVA, loc, 3 * (int)(DAMAGE_RADIUS * DAMAGE_RADIUS), DAMAGE_RADIUS, 0.25f, DAMAGE_RADIUS, 0);
 					if (player != null) {
-						BossUtils.bossDamagePercent(mBoss, player, DAMAGE_PERCENT);
+						BossUtils.bossDamagePercent(boss, player, DAMAGE_PERCENT);
 						return;
 					}
 					for (Player players : PlayerUtils.playersInRange(loc, DAMAGE_RADIUS)) {
-						BossUtils.bossDamagePercent(mBoss, players, DAMAGE_PERCENT);
+						BossUtils.bossDamagePercent(boss, players, DAMAGE_PERCENT);
 					}
 					})));
-		super.constructBoss(plugin, identityTag, mBoss, manager, null, detectionRange, null);
+		super.constructBoss(manager, null, detectionRange, null);
 	}
 }

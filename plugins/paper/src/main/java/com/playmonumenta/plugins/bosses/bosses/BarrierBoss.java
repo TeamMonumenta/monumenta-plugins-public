@@ -24,16 +24,14 @@ public class BarrierBoss extends BossAbilityGroup {
 	public static final int HITS_TO_BREAK = 1;
 	private static final Particle.DustOptions REDSTONE_COLOR = new Particle.DustOptions(Color.fromRGB(225, 15, 255), 1.0f);
 
-	private LivingEntity mBoss;
-
 	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
 		return new BarrierBoss(plugin, boss);
 	}
 
 	public BarrierBoss(Plugin plugin, LivingEntity boss) {
-		mBoss = boss;
+		super(plugin, identityTag, boss);
 
-		List<Spell> passives = new ArrayList<>(Arrays.asList(new SpellBarrier(plugin, mBoss, detectionRange, RECHARGE_TIME, HITS_TO_BREAK,
+		List<Spell> passives = new ArrayList<>(Arrays.asList(new SpellBarrier(plugin, boss, detectionRange, RECHARGE_TIME, HITS_TO_BREAK,
 				(Location loc) -> {
 					World world = loc.getWorld();
 					world.playSound(loc, Sound.BLOCK_BEACON_ACTIVATE, SoundCategory.HOSTILE, 1, 1);
@@ -44,7 +42,7 @@ public class BarrierBoss extends BossAbilityGroup {
 					World world = loc.getWorld();
 					world.playSound(loc, Sound.ITEM_SHIELD_BREAK, SoundCategory.HOSTILE, 1, 1);
 				})));
-		super.constructBoss(plugin, identityTag, mBoss, null, passives, detectionRange, null);
+		super.constructBoss(null, passives, detectionRange, null);
 	}
 
 }

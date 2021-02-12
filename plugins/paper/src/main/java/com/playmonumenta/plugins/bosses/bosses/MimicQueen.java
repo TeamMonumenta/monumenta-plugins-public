@@ -52,7 +52,6 @@ public class MimicQueen extends BossAbilityGroup {
 	private static final boolean LINGERS = true;
 	private static final int DAMAGE = 35;
 
-	private LivingEntity mBoss;
 	private final Location mSpawnLoc;
 	private final Location mEndLoc;
 
@@ -69,7 +68,7 @@ public class MimicQueen extends BossAbilityGroup {
 
 
 	public MimicQueen(Plugin plugin, LivingEntity boss, Location spawnLoc, Location endLoc) {
-		mBoss = boss;
+		super(plugin, identityTag, boss);
 		mSpawnLoc = spawnLoc;
 		mEndLoc = endLoc;
 
@@ -82,7 +81,7 @@ public class MimicQueen extends BossAbilityGroup {
 						SPEED, TURN_RADIUS, LIFETIME_TICKS, HITBOX_LENGTH, COLLIDES_WITH_BLOCKS, LINGERS,
 						// Initiate Aesthetic
 						(World world, Location loc, int ticks) -> {
-							PotionUtils.applyPotion(null, mBoss, new PotionEffect(PotionEffectType.GLOWING, DELAY, 0));
+							PotionUtils.applyPotion(null, boss, new PotionEffect(PotionEffectType.GLOWING, DELAY, 0));
 							world.playSound(loc, Sound.ENTITY_BLAZE_AMBIENT, SoundCategory.HOSTILE, 1f, 0.5f);
 						},
 						// Launch Aesthetic
@@ -109,14 +108,14 @@ public class MimicQueen extends BossAbilityGroup {
 		));
 
 		List<Spell> passiveSpells = Arrays.asList(
-				new SpellBlockBreak(mBoss),
-				new SpellPurgeNegatives(mBoss, 20 * 6)
+				new SpellBlockBreak(boss),
+				new SpellPurgeNegatives(boss, 20 * 6)
 			);
 
 		Map<Integer, BossHealthAction> events = new HashMap<Integer, BossHealthAction>();
 		BossBarManager bossBar = new BossBarManager(plugin, boss, detectionRange + 30, BarColor.RED, BarStyle.SEGMENTED_10, events);
 
-		super.constructBoss(plugin, identityTag, mBoss, activeSpells, passiveSpells, detectionRange, bossBar);
+		super.constructBoss(activeSpells, passiveSpells, detectionRange, bossBar);
 	}
 
 	@Override

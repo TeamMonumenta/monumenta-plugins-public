@@ -122,8 +122,6 @@ public class Kaul extends BossAbilityGroup {
 	public static final int detectionRange = 50;
 	private static final String primordial = "PrimordialElemental";
 	private static final String immortal = "ImmortalElemental";
-	private final Plugin mPlugin;
-	private final LivingEntity mBoss;
 	private final Location mSpawnLoc;
 	private final Location mEndLoc;
 	private boolean mDefeated = false;
@@ -151,8 +149,7 @@ public class Kaul extends BossAbilityGroup {
 	}
 
 	public Kaul(Plugin plugin, LivingEntity boss, Location spawnLoc, Location endLoc) {
-		mPlugin = plugin;
-		mBoss = boss;
+		super(plugin, identityTag, boss);
 		mSpawnLoc = spawnLoc;
 		mEndLoc = endLoc;
 		mBoss.setRemoveWhenFarAway(false);
@@ -711,7 +708,7 @@ public class Kaul extends BossAbilityGroup {
 
 			@Override
 			public void run() {
-				constructBoss(plugin, identityTag, mBoss, phase1Spells, passiveSpells, detectionRange, bossBar, 20 * 10);
+				constructBoss(phase1Spells, passiveSpells, detectionRange, bossBar, 20 * 10);
 			}
 
 		}.runTaskLater(mPlugin, (20 * 10) + 1);

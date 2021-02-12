@@ -12,19 +12,17 @@ public class TpSwapBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_tpswap";
 	public static final int detectionRange = 20;
 
-	LivingEntity mBoss;
-
 	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
 		return new TpSwapBoss(plugin, boss);
 	}
 
 	public TpSwapBoss(Plugin plugin, LivingEntity boss) {
-		mBoss = boss;
+		super(plugin, identityTag, boss);
 
 		SpellManager activeSpells = new SpellManager(Arrays.asList(
 			new SpellTpSwapPlaces(plugin, boss, 240)));
 
 
-		super.constructBoss(plugin, identityTag, mBoss, activeSpells, null, detectionRange, null);
+		super.constructBoss(activeSpells, null, detectionRange, null);
 	}
 }

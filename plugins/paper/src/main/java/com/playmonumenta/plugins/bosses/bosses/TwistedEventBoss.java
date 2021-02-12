@@ -19,7 +19,6 @@ public class TwistedEventBoss extends BossAbilityGroup {
 	private static final int DELAY_MAX = 20 * 8;
 
 	private final com.playmonumenta.plugins.Plugin mPlugin;
-	private final LivingEntity mBoss;
 	private boolean mTriggered = false;
 
 	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
@@ -27,10 +26,10 @@ public class TwistedEventBoss extends BossAbilityGroup {
 	}
 
 	public TwistedEventBoss(Plugin plugin, LivingEntity boss) {
+		super(plugin, identityTag, boss);
 		mPlugin = com.playmonumenta.plugins.Plugin.getInstance();
-		mBoss = boss;
 
-		super.constructBoss(plugin, identityTag, mBoss, null, null, detectionRange, null);
+		super.constructBoss(null, null, detectionRange, null);
 	}
 
 	@Override

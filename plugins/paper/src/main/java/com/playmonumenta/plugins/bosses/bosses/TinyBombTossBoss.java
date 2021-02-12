@@ -25,17 +25,15 @@ public class TinyBombTossBoss extends BossAbilityGroup {
 	public static final double RADIUS = 3;
 	public static final int POINT_BLANK_DAMAGE = 8;
 
-	LivingEntity mBoss;
-
 	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
 		return new TinyBombTossBoss(plugin, boss);
 	}
 
 	public TinyBombTossBoss(Plugin plugin, LivingEntity boss) {
-		mBoss = boss;
+		super(plugin, identityTag, boss);
 
 		SpellManager activeSpells = new SpellManager(Arrays.asList(
-			new SpellBombToss(plugin, mBoss, detectionRange, LOBS, FUSE,
+			new SpellBombToss(plugin, boss, detectionRange, LOBS, FUSE,
 					(World world, TNTPrimed tnt, Location loc) -> {
 						world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 1f, 1f);
 						world.spawnParticle(Particle.EXPLOSION_LARGE, loc, 1, 0, 0, 0, 0);
@@ -43,12 +41,12 @@ public class TinyBombTossBoss extends BossAbilityGroup {
 						for (Player player : PlayerUtils.playersInRange(loc, RADIUS)) {
 							if (player.hasLineOfSight(tnt)) {
 								double multiplier = (RADIUS - player.getLocation().distance(loc)) / RADIUS;
-								BossUtils.bossDamage(mBoss, player, POINT_BLANK_DAMAGE * multiplier);
+								BossUtils.bossDamage(boss, player, POINT_BLANK_DAMAGE * multiplier);
 							}
 						}
 					})
 		));
 
-		super.constructBoss(plugin, identityTag, mBoss, activeSpells, null, detectionRange, null);
+		super.constructBoss(activeSpells, null, detectionRange, null);
 	}
 }

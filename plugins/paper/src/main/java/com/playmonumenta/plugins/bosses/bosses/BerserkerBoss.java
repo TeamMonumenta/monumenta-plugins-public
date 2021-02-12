@@ -17,11 +17,12 @@ public class BerserkerBoss extends BossAbilityGroup {
 	}
 
 	public BerserkerBoss(Plugin plugin, LivingEntity boss) {
+		super(plugin, identityTag, boss);
 
 		SpellManager activeSpells = new SpellManager(Arrays.asList(
 			new SpellBerserk(boss)
 		));
 
-		super.constructBoss(plugin, identityTag, boss, activeSpells, null, detectionRange, null);
+		super.constructBoss(activeSpells, null, detectionRange, null);
 	}
 }

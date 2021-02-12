@@ -22,19 +22,17 @@ public class ShadePossessedBoss extends BossAbilityGroup {
 
 	private static final String SHADE_OF_DEATH = "ShadeofDeath";
 
-	LivingEntity mBoss;
-
 	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
 		return new ShadePossessedBoss(plugin, boss);
 	}
 
 	public ShadePossessedBoss(Plugin plugin, LivingEntity boss) {
-		mBoss = boss;
+		super(plugin, identityTag, boss);
 		List<Spell> passiveSpells = Arrays.asList(
 			new SpellShadePossessedParticle(mBoss)
 		);
 
-		super.constructBoss(plugin, identityTag, mBoss, null, passiveSpells, detectionRange, null);
+		super.constructBoss(null, passiveSpells, detectionRange, null);
 	}
 
 	@Override

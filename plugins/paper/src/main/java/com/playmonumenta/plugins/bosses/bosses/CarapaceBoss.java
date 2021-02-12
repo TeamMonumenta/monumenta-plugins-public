@@ -37,7 +37,6 @@ public class CarapaceBoss extends BossAbilityGroup {
 	private static final int PERIOD = 20 * 10;
 
 	private final com.playmonumenta.plugins.Plugin mPlugin;
-	private final LivingEntity mBoss;
 	private final double mCarapaceHealth;
 	private final double mSpeedEffect;
 
@@ -52,20 +51,20 @@ public class CarapaceBoss extends BossAbilityGroup {
 	}
 
 	public CarapaceBoss(Plugin plugin, LivingEntity boss) {
+		super(plugin, identityTag, boss);
 		mPlugin = com.playmonumenta.plugins.Plugin.getInstance();
-		mBoss = boss;
 
-		super.constructBoss(plugin, identityTag, mBoss, null, null, detectionRange, null);
+		super.constructBoss(null, null, detectionRange, null);
 
 		double carapaceHealth = 0;
 		double speedEffect = 0;
 
-		for (String tag : mBoss.getScoreboardTags()) {
+		for (String tag : boss.getScoreboardTags()) {
 			if (tag.startsWith(identityTag) && !tag.equals(identityTag)) {
 				try {
 					String[] values = tag.substring(identityTag.length()).split(",");
 
-					AttributeInstance health = mBoss.getAttribute(Attribute.GENERIC_MAX_HEALTH);
+					AttributeInstance health = boss.getAttribute(Attribute.GENERIC_MAX_HEALTH);
 					if (health != null) {
 						carapaceHealth = Integer.parseInt(values[0]) / 100.0 * health.getValue();
 					}

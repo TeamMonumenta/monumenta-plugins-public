@@ -159,9 +159,6 @@ public class FrostGiant extends BossAbilityGroup {
 
 	public static FrostGiant mInstance = null;
 
-	private final Plugin mPlugin;
-	public final LivingEntity mBoss;
-
 	//DO NOT USE - boss spawns 42 blocks above actual arena center
 	private final Location mSpawnLoc;
 
@@ -216,8 +213,7 @@ public class FrostGiant extends BossAbilityGroup {
 	}
 
 	public FrostGiant(Plugin plugin, LivingEntity boss, Location spawnLoc, Location endLoc) {
-		mPlugin = plugin;
-		mBoss = boss;
+		super(plugin, identityTag, boss);
 		mSpawnLoc = spawnLoc;
 		mEndLoc = endLoc;
 		mCooldown = false;
@@ -745,7 +741,7 @@ public class FrostGiant extends BossAbilityGroup {
 										PlayerUtils.executeCommandOnNearbyPlayers(mStartLoc, detectionRange, "title @s subtitle [\"\",{\"text\":\"The Waking Giant\",\"color\":\"blue\",\"bold\":true}]");
 										PlayerUtils.executeCommandOnNearbyPlayers(mStartLoc, detectionRange, "playsound minecraft:entity.wither.spawn master @s ~ ~ ~ 10 0.75");
 										BossBarManager bossBar = new BossBarManager(plugin, boss, detectionRange, BarColor.BLUE, BarStyle.SEGMENTED_10, events, false);
-										constructBoss(plugin, identityTag, mBoss, phase1Spells, phase1PassiveSpells, detectionRange, bossBar, 20 * 10);
+										constructBoss(phase1Spells, phase1PassiveSpells, detectionRange, bossBar, 20 * 10);
 
 										mBoss.setGravity(true);
 										mBoss.setAI(true);

@@ -14,15 +14,13 @@ public class FocusFireBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_focusfire";
 	public static final int detectionRange = 15;
 
-	LivingEntity mBoss;
-
 	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
 		return new FocusFireBoss(plugin, boss);
 	}
 
 	public FocusFireBoss(Plugin plugin, LivingEntity boss) {
-		mBoss = boss;
-		super.constructBoss(plugin, identityTag, mBoss, null, null, detectionRange, null);
+		super(plugin, identityTag, boss);
+		super.constructBoss(null, null, detectionRange, null);
 	}
 
 	@Override

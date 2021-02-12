@@ -21,25 +21,23 @@ public class HiddenBoss extends BossAbilityGroup {
 	public static final int visibleRange = 5;
 	public static final PotionEffect potion = new PotionEffect(PotionEffectType.INVISIBILITY, 10, 0, false, false);
 
-	LivingEntity mBoss;
-
 	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
 		return new HiddenBoss(plugin, boss);
 	}
 
 	public HiddenBoss(Plugin plugin, LivingEntity boss) {
-		mBoss = boss;
+		super(plugin, identityTag, boss);
 
 		// Immediately apply the effect, don't wait
 		Spell invis = new SpellRunAction(() -> {
-			if (BossUtils.getPlayersInRangeForHealthScaling(mBoss, visibleRange) < 1) {
-				mBoss.addPotionEffect(potion);
+			if (BossUtils.getPlayersInRangeForHealthScaling(boss, visibleRange) < 1) {
+				boss.addPotionEffect(potion);
 			}
 		});
 		invis.run();
 
 		List<Spell> passiveSpells = Arrays.asList(invis);
 
-		super.constructBoss(plugin, identityTag, mBoss, null, passiveSpells, detectionRange, null);
+		super.constructBoss(null, passiveSpells, detectionRange, null);
 	}
 }

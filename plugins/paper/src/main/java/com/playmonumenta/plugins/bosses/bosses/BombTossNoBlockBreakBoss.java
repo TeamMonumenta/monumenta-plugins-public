@@ -14,19 +14,17 @@ public class BombTossNoBlockBreakBoss extends BossAbilityGroup {
 
 	private static final int EXPLOSION_RADIUS = 4;
 
-	LivingEntity mBoss;
-
 	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
 		return new BombTossNoBlockBreakBoss(plugin, boss);
 	}
 
 	public BombTossNoBlockBreakBoss(Plugin plugin, LivingEntity boss) {
-		mBoss = boss;
+		super(plugin, identityTag, boss);
 
 		SpellManager activeSpells = new SpellManager(Arrays.asList(
-			new SpellBombToss(plugin, mBoss, detectionRange, EXPLOSION_RADIUS, 1, 50, false, false)
+			new SpellBombToss(plugin, boss, detectionRange, EXPLOSION_RADIUS, 1, 50, false, false)
 		));
 
-		super.constructBoss(plugin, identityTag, mBoss, activeSpells, null, detectionRange, null);
+		super.constructBoss(activeSpells, null, detectionRange, null);
 	}
 }

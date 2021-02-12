@@ -15,14 +15,12 @@ public class FireballBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_fireball";
 	public static final int detectionRange = 20;
 
-	LivingEntity mBoss;
-
 	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
 		return new FireballBoss(plugin, boss);
 	}
 
 	public FireballBoss(Plugin plugin, LivingEntity boss) {
-		mBoss = boss;
+		super(plugin, identityTag, boss);
 
 		SpellManager activeSpells = new SpellManager(Arrays.asList(
 			new SpellFireball(plugin, boss, detectionRange, 30, 1, 160, 2.0f, true, true,
@@ -33,6 +31,6 @@ public class FireballBoss extends BossAbilityGroup {
 			                  })
 		));
 
-		super.constructBoss(plugin, identityTag, mBoss, activeSpells, null, detectionRange, null);
+		super.constructBoss(activeSpells, null, detectionRange, null);
 	}
 }

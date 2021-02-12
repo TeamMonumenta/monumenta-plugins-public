@@ -21,7 +21,6 @@ public class Orangyboi extends BossAbilityGroup {
 	public static final String identityTag = "boss_orangyboi";
 	public static final int detectionRange = 35;
 
-	private final LivingEntity mBoss;
 	private final Location mSpawnLoc;
 	private final Location mEndLoc;
 
@@ -37,7 +36,7 @@ public class Orangyboi extends BossAbilityGroup {
 	}
 
 	public Orangyboi(Plugin plugin, LivingEntity boss, Location spawnLoc, Location endLoc) {
-		mBoss = boss;
+		super(plugin, identityTag, boss);
 		mSpawnLoc = spawnLoc;
 		mEndLoc = endLoc;
 		mBoss.setRemoveWhenFarAway(false);
@@ -50,7 +49,7 @@ public class Orangyboi extends BossAbilityGroup {
 
 		BossBarManager bossBar = new BossBarManager(plugin, mBoss, detectionRange, BarColor.RED, BarStyle.SOLID, null);
 
-		super.constructBoss(plugin, identityTag, mBoss, activeSpells, null, detectionRange, bossBar);
+		super.constructBoss(activeSpells, null, detectionRange, bossBar);
 	}
 
 	@Override

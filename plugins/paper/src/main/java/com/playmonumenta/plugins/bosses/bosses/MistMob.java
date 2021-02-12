@@ -11,16 +11,14 @@ public class MistMob extends BossAbilityGroup {
 	public static final int detectionRange = 20;
 	public static final String identityTag = "MistMob";
 
-	private LivingEntity mBoss;
-
 	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) {
 		return new MistMob(plugin, boss);
 	}
 
 	public MistMob(Plugin plugin, LivingEntity boss) {
-		mBoss = boss;
+		super(plugin, identityTag, boss);
 
-		super.constructBoss(plugin, identityTag, mBoss, null, null, detectionRange, null);
+		super.constructBoss(null, null, detectionRange, null);
 	}
 
 	@Override

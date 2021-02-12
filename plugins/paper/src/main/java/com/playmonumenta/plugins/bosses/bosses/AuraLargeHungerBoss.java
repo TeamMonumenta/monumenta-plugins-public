@@ -18,7 +18,6 @@ public class AuraLargeHungerBoss extends BossAbilityGroup {
 	public static final String identityTag = "HungerAura";
 	public static final int detectionRange = 45;
 
-	LivingEntity mBoss;
 	private static final Particle.DustOptions HUNGER_COLOR = new Particle.DustOptions(Color.fromRGB(58, 160, 25), 2f);
 
 	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
@@ -26,16 +25,17 @@ public class AuraLargeHungerBoss extends BossAbilityGroup {
 	}
 
 	public AuraLargeHungerBoss(Plugin plugin, LivingEntity boss) {
-		mBoss = boss;
+		super(plugin, identityTag, boss);
+		boss = boss;
 
 		List<Spell> passiveSpells = Arrays.asList(
-			new SpellBaseAura(mBoss, 35, 20, 35, 20, Particle.REDSTONE, HUNGER_COLOR,
+			new SpellBaseAura(boss, 35, 20, 35, 20, Particle.REDSTONE, HUNGER_COLOR,
 			                  (Player player) -> {
 			                      player.addPotionEffect(new PotionEffect(PotionEffectType.HUNGER, 60, 0, true, true));
 			                  })
 		);
 
-		mBoss.setRemoveWhenFarAway(false);
-		super.constructBoss(plugin, identityTag, mBoss, null, passiveSpells, detectionRange, null);
+		boss.setRemoveWhenFarAway(false);
+		super.constructBoss(null, passiveSpells, detectionRange, null);
 	}
 }

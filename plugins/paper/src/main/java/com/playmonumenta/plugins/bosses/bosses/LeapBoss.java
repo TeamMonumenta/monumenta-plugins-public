@@ -30,15 +30,12 @@ public class LeapBoss extends BossAbilityGroup {
 	private static final double DAMAGE_RADIUS = 3;
 	private static final int DAMAGE = 30;
 
-
-	LivingEntity mBoss;
-
 	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
 		return new LeapBoss(plugin, boss);
 	}
 
 	public LeapBoss(Plugin plugin, LivingEntity boss) {
-		mBoss = boss;
+		super(plugin, identityTag, boss);
 
 		SpellManager activeSpells = new SpellManager(Arrays.asList(
 			new SpellBaseLeapAttack(plugin, boss, detectionRange, MIN_RANGE, RUN_DISTANCE, COOLDOWN, VELOCITY_MULTIPLIER,
@@ -69,12 +66,12 @@ public class LeapBoss extends BossAbilityGroup {
 						world.spawnParticle(Particle.EXPLOSION_LARGE, loc, 1, 0, 0, 0, 0);
 						world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 1f, 0.5f);
 						for (Player p : PlayerUtils.playersInRange(loc, DAMAGE_RADIUS)) {
-							BossUtils.bossDamage(mBoss, p, DAMAGE);
+							BossUtils.bossDamage(boss, p, DAMAGE);
 						}
 					}, null, null)
 		));
 
-		super.constructBoss(plugin, identityTag, mBoss, activeSpells, null, detectionRange, null);
+		super.constructBoss(activeSpells, null, detectionRange, null);
 	}
 
 }

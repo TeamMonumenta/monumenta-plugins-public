@@ -13,19 +13,17 @@ public class FloatBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_float";
 	private static final int detectionRange = 16;
 
-	LivingEntity mBoss;
-
 	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
 		return new FloatBoss(plugin, boss);
 	}
 
 	public FloatBoss(Plugin plugin, LivingEntity boss) {
-		mBoss = boss;
+		super(plugin, identityTag, boss);
 
 		List<Spell> passiveSpells = Arrays.asList(
-		                                new SpellFloat(mBoss)
+		                                new SpellFloat(boss)
 		                            );
 
-		super.constructBoss(plugin, identityTag, mBoss, null, passiveSpells, detectionRange, null);
+		super.constructBoss(null, passiveSpells, detectionRange, null);
 	}
 }

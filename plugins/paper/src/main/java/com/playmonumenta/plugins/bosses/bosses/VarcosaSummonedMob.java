@@ -18,10 +18,10 @@ public class VarcosaSummonedMob extends BossAbilityGroup {
 	private final VarcosaSummonerBoss mSummoner;
 
 	public VarcosaSummonedMob(Plugin plugin, LivingEntity boss, VarcosaSummonerBoss summoner) {
-		mPlugin = plugin;
+		super(plugin, "boss_varcosa_summoned", boss);
 		mSummoner = summoner;
 
-		super.constructBoss(plugin, "boss_varcosa_summoned", boss, null, null, 100, null);
+		super.constructBoss(null, null, 100, null);
 	}
 
 	@Override

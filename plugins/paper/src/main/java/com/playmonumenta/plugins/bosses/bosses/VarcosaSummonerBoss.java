@@ -38,8 +38,6 @@ public class VarcosaSummonerBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_varcosa_summoner";
 	public static final int detectionRange = 50;
 	public static int mSummonPeriod = 20 * 5;
-	private final Plugin mPlugin;
-	private final LivingEntity mBoss;
 	private List<String> mSummonableMobs = new ArrayList<>();
 	private String[] mSpeak = new String[3];
 	private final int mRadius = 50;
@@ -60,8 +58,7 @@ public class VarcosaSummonerBoss extends BossAbilityGroup {
 	}
 
 	public VarcosaSummonerBoss(Plugin plugin, LivingEntity boss, Location spawnLoc, Location endLoc) {
-		mPlugin = plugin;
-		mBoss = boss;
+		super(plugin, identityTag, boss);
 		mEndLoc = endLoc;
 		mSpawnLoc = spawnLoc;
 
@@ -103,7 +100,7 @@ public class VarcosaSummonerBoss extends BossAbilityGroup {
 
 		BossBarManager bossBar = new BossBarManager(mPlugin, mBoss, detectionRange + 20, BarColor.RED, BarStyle.SEGMENTED_10, events);
 
-		super.constructBoss(plugin, identityTag, boss, activeSpells, passiveSpells, detectionRange, bossBar);
+		super.constructBoss(activeSpells, passiveSpells, detectionRange, bossBar);
 	}
 
 	@Override

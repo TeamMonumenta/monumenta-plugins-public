@@ -23,11 +23,12 @@ public class HalloweenCreeperBoss extends BossAbilityGroup {
 	}
 
 	public HalloweenCreeperBoss(Plugin plugin, LivingEntity boss) throws Exception {
+		super(plugin, identityTag, boss);
 		if (!(boss instanceof Creeper)) {
 			throw new Exception(identityTag + " only works on mobs!");
 		}
 
-		super.constructBoss(plugin, identityTag, boss, null, null, 100, null);
+		super.constructBoss(null, null, 100, null);
 
 		mCreeper = (Creeper)boss;
 		if (mCreeper.isIgnited()) {

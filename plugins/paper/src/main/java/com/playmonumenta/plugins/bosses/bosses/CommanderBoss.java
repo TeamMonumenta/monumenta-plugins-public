@@ -23,8 +23,6 @@ public class CommanderBoss extends BossAbilityGroup {
 
 	private static final int RANGE = 8;
 
-	LivingEntity mBoss;
-
 	boolean mSummonedReinforcements = false;
 
 	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
@@ -32,12 +30,12 @@ public class CommanderBoss extends BossAbilityGroup {
 	}
 
 	public CommanderBoss(Plugin plugin, LivingEntity boss) {
-		mBoss = boss;
+		super(plugin, identityTag, boss);
 		List<Spell> passiveSpells = Arrays.asList(
-			new SpellInspire(com.playmonumenta.plugins.Plugin.getInstance(), mBoss, RANGE)
+			new SpellInspire(com.playmonumenta.plugins.Plugin.getInstance(), boss, RANGE)
 		);
 
-		super.constructBoss(plugin, identityTag, mBoss, null, passiveSpells, detectionRange, null);
+		super.constructBoss(null, passiveSpells, detectionRange, null);
 	}
 
 	@Override

@@ -27,14 +27,12 @@ public class ShadowTrailBoss extends BossAbilityGroup {
 	private static final int HITBOX_LENGTH = 1;
 	private static final int DAMAGE = 15;
 
-	LivingEntity mBoss;
-
 	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
 		return new ShadowTrailBoss(plugin, boss);
 	}
 
 	public ShadowTrailBoss(Plugin plugin, LivingEntity boss) {
-		mBoss = boss;
+		super(plugin, identityTag, boss);
 
 		List<Spell> passiveSpells = Arrays.asList(
 			new SpellBaseTrail(boss, TICK_RATE, TRAIL_RATE, TRAIL_DURATION, TRAIL_GROUND_ONLY, TRAIL_CONSUMED, HITBOX_LENGTH,
@@ -53,6 +51,6 @@ public class ShadowTrailBoss extends BossAbilityGroup {
 					(World world, Location loc) -> { })
 		);
 
-		super.constructBoss(plugin, identityTag, mBoss, null, passiveSpells, detectionRange, null);
+		super.constructBoss(null, passiveSpells, detectionRange, null);
 	}
 }

@@ -32,6 +32,7 @@ public abstract class GrayStrongSummonerBase extends BossAbilityGroup {
 	private static final int MAX_NEARBY_SUMMONS = 15;
 
 	GrayStrongSummonerBase(Plugin plugin, LivingEntity boss, String identityTag, int detectionRange, String mobName) throws Exception {
+		super(plugin, identityTag, boss);
 		if (!(boss instanceof Mob)) {
 			throw new Exception("gray boss tags only work on mobs!");
 		}
@@ -167,6 +168,6 @@ public abstract class GrayStrongSummonerBase extends BossAbilityGroup {
 			)
 		));
 
-		super.constructBoss(plugin, identityTag, boss, activeSpells, null, detectionRange, null);
+		super.constructBoss(activeSpells, null, detectionRange, null);
 	}
 }

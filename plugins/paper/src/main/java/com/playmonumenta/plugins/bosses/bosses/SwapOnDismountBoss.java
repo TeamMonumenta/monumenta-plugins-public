@@ -24,6 +24,7 @@ public class SwapOnDismountBoss extends BossAbilityGroup {
 	}
 
 	public SwapOnDismountBoss(Plugin plugin, LivingEntity boss) throws Exception {
+		super(plugin, identityTag, boss);
 		if (!(boss instanceof Mob)) {
 			throw new Exception("boss_swapondismount only works on mobs!");
 		}
@@ -31,7 +32,7 @@ public class SwapOnDismountBoss extends BossAbilityGroup {
 		mBoss = (Mob)boss;
 		List<Spell> passiveSpells = Arrays.asList(new SpellSwapOnDismount(mBoss));
 
-		super.constructBoss(plugin, identityTag, boss, null, passiveSpells, detectionRange, null);
+		super.constructBoss(null, passiveSpells, detectionRange, null);
 	}
 
 	@Override
