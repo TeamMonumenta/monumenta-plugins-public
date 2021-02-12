@@ -1,6 +1,6 @@
 package com.playmonumenta.plugins.integrations.luckperms;
 
-import java.util.LinkedHashMap;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.bukkit.ChatColor;
@@ -25,9 +25,9 @@ public class TeleportGuild {
 		// teleportguild <guildname> <player>
 		CommandPermission perms = CommandPermission.fromString("monumenta.command.teleportguild");
 
-		LinkedHashMap<String, Argument> arguments = new LinkedHashMap<>();
+		List<Argument> arguments = new ArrayList<>();
 
-		arguments.put("player", new EntitySelectorArgument(EntitySelector.MANY_PLAYERS));
+		arguments.add(new EntitySelectorArgument("player", EntitySelector.MANY_PLAYERS));
 		new CommandAPICommand(COMMAND)
 			.withPermission(perms)
 			.withArguments(arguments)
@@ -38,7 +38,7 @@ public class TeleportGuild {
 			})
 			.register();
 
-		arguments.put("guild name", new TextArgument());
+		arguments.add(new TextArgument("guild name"));
 		new CommandAPICommand(COMMAND)
 			.withPermission(perms)
 			.withArguments(arguments)

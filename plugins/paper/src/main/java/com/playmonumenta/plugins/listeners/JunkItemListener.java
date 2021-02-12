@@ -1,7 +1,6 @@
 package com.playmonumenta.plugins.listeners;
 
 import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.Set;
 import java.util.UUID;
 
@@ -24,7 +23,6 @@ import com.playmonumenta.plugins.server.properties.ServerProperties;
 import dev.jorel.commandapi.CommandAPI;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.CommandPermission;
-import dev.jorel.commandapi.arguments.Argument;
 import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
 
 public class JunkItemListener implements Listener {
@@ -35,10 +33,8 @@ public class JunkItemListener implements Listener {
 	public JunkItemListener() {
 		final CommandPermission perms = CommandPermission.fromString("monumenta.command.pickup");
 
-		LinkedHashMap<String, Argument> arguments = new LinkedHashMap<>();
 		new CommandAPICommand("pickup")
 			.withPermission(perms)
-			.withArguments(arguments)
 			.executes((sender, args) -> {
 				playerToggle(sender);
 			})

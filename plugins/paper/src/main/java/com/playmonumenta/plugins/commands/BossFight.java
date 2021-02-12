@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.commands;
 
-import java.util.LinkedHashMap;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.playmonumenta.plugins.bosses.BossManager;
 import com.playmonumenta.plugins.utils.MessagingUtils;
@@ -26,10 +27,10 @@ public class BossFight {
 	public static void register() {
 		CommandPermission perms = CommandPermission.fromString("monumenta.bossfight");
 		/* First one has just the boss name (stateless) */
-		LinkedHashMap<String, Argument> arguments = new LinkedHashMap<>();
+		List<Argument> arguments = new ArrayList<>();
 
-		arguments.put("entity", new EntitySelectorArgument(EntitySelector.ONE_ENTITY));
-		arguments.put("boss_tag", new StringArgument().overrideSuggestions(
+		arguments.add(new EntitySelectorArgument("entity", EntitySelector.ONE_ENTITY));
+		arguments.add(new StringArgument("boss_tag").overrideSuggestions(
 			(sender) -> {
 				return BossManager.getInstance().listBosses();
 			}
@@ -43,7 +44,7 @@ public class BossFight {
 			.register();
 
 		/* Second one of these includes coordinate arguments */
-		arguments.put("redstone_pos", new LocationArgument());
+		arguments.add(new LocationArgument("redstone_pos"));
 		new CommandAPICommand(COMMAND)
 			.withPermission(perms)
 			.withArguments(arguments)

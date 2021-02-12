@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -30,7 +29,6 @@ import org.bukkit.util.Vector;
 import dev.jorel.commandapi.CommandAPI;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.CommandPermission;
-import dev.jorel.commandapi.arguments.Argument;
 import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
 
 public class SpectateBot extends GenericCommand implements Listener {
@@ -66,12 +64,9 @@ public class SpectateBot extends GenericCommand implements Listener {
 	public BukkitRunnable mRunnable = null;
 
 	public SpectateBot(Plugin plugin) {
-		LinkedHashMap<String, Argument> arguments = new LinkedHashMap<>();
-
 		/* No-argument variant which just is the sender (if they are a player) */
 		new CommandAPICommand("spectatebot")
 			.withPermission(CommandPermission.fromString("monumenta.command.spectatebot"))
-			.withArguments(arguments)
 			.executes((sender, args) -> {
 				if (sender instanceof Player && ((Player)sender).getGameMode().equals(GameMode.SPECTATOR)) {
 				    run(plugin, (Player)sender);

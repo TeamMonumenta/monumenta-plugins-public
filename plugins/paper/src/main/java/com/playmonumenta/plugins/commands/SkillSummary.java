@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.commands;
 
-import java.util.LinkedHashMap;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
@@ -22,16 +23,15 @@ public class SkillSummary extends GenericCommand {
 	public static void register(Plugin plugin) {
 		CommandPermission perms = CommandPermission.fromString("monumenta.command.skillsummary");
 
-		LinkedHashMap<String, Argument> arguments = new LinkedHashMap<>();
 		new CommandAPICommand(COMMAND)
 			.withPermission(perms)
-			.withArguments(arguments)
 			.executes((sender, args) -> {
 				tell(plugin, sender, false);
 			})
 			.register();
 
-		arguments.put("shorthand", new BooleanArgument());
+		List<Argument> arguments = new ArrayList<>();
+		arguments.add(new BooleanArgument("shorthand"));
 		new CommandAPICommand(COMMAND)
 			.withPermission(perms)
 			.withArguments(arguments)

@@ -58,6 +58,18 @@ public class InfusionUtils {
 			mEnchantName = enchantName;
 		}
 
+		public static InfusionSelection getInfusionSelection(String label) {
+			if (label == null) {
+				return null;
+			}
+			for (InfusionSelection selection : InfusionSelection.values()) {
+				if (selection.getLabel().equals(label)) {
+					return selection;
+				}
+			}
+			return null;
+		}
+
 		public String getLabel() {
 			return mLabel;
 		}

@@ -2,7 +2,7 @@ package com.playmonumenta.plugins.commands;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.LinkedHashMap;
+import java.util.List;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.potion.PotionManager;
@@ -25,7 +25,7 @@ import dev.jorel.commandapi.arguments.BooleanArgument;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument.EntitySelector;
 import dev.jorel.commandapi.arguments.IntegerArgument;
-import dev.jorel.commandapi.arguments.LiteralArgument;
+import dev.jorel.commandapi.arguments.MultiLiteralArgument;
 import dev.jorel.commandapi.arguments.PotionEffectArgument;
 
 public class Effect {
@@ -39,71 +39,71 @@ public class Effect {
 		CommandAPI.unregister("effect");
 
 		/* Add effects (/effect give) */
-		LinkedHashMap<String, Argument> arguments = new LinkedHashMap<>();
+		List<Argument> arguments = new ArrayList<>();
 
-		arguments.put("give", new LiteralArgument("give"));
-		arguments.put("entity", new EntitySelectorArgument(EntitySelector.MANY_ENTITIES));
-		arguments.put("effect", new PotionEffectArgument());
+		arguments.add(new MultiLiteralArgument("give"));
+		arguments.add(new EntitySelectorArgument("entity", EntitySelector.MANY_ENTITIES));
+		arguments.add(new PotionEffectArgument("effect"));
 		new CommandAPICommand(COMMAND)
 			.withPermission(perms)
 			.withArguments(arguments)
 			.executes((sender, args) -> {
-				giveEffect(plugin, sender, (Collection<Entity>)args[0],
-						   (PotionEffectType)args[1], 30, 0, false);
+				giveEffect(plugin, sender, (Collection<Entity>)args[1],
+						   (PotionEffectType)args[2], 30, 0, false);
 			})
 			.register();
 
-		arguments.put("seconds", new IntegerArgument(1));
+		arguments.add(new IntegerArgument("seconds", 1));
 		new CommandAPICommand(COMMAND)
 			.withPermission(perms)
 			.withArguments(arguments)
 			.executes((sender, args) -> {
-				giveEffect(plugin, sender, (Collection<Entity>)args[0],
-						   (PotionEffectType)args[1], (Integer)args[2],
+				giveEffect(plugin, sender, (Collection<Entity>)args[1],
+						   (PotionEffectType)args[2], (Integer)args[3],
 						   0, false);
 			})
 			.register();
 
-		arguments.put("amplifier", new IntegerArgument(0));
+		arguments.add(new IntegerArgument("amplifier", 0));
 		new CommandAPICommand(COMMAND)
 			.withPermission(perms)
 			.withArguments(arguments)
 			.executes((sender, args) -> {
-				giveEffect(plugin, sender, (Collection<Entity>)args[0],
-						   (PotionEffectType)args[1], (Integer)args[2],
-						   (Integer)args[3], false);
+				giveEffect(plugin, sender, (Collection<Entity>)args[1],
+						   (PotionEffectType)args[2], (Integer)args[3],
+						   (Integer)args[4], false);
 			})
 			.register();
 
-		arguments.put("hideParticles", new BooleanArgument());
+		arguments.add(new BooleanArgument("hideParticles"));
 		new CommandAPICommand(COMMAND)
 			.withPermission(perms)
 			.withArguments(arguments)
 			.executes((sender, args) -> {
-				giveEffect(plugin, sender, (Collection<Entity>)args[0],
-						   (PotionEffectType)args[1], (Integer)args[2],
-						   (Integer)args[3], (Boolean)args[4]);
+				giveEffect(plugin, sender, (Collection<Entity>)args[1],
+						   (PotionEffectType)args[2], (Integer)args[3],
+						   (Integer)args[4], (Boolean)args[5]);
 			})
 			.register();
 
 		/* Clear effects (/effect clear) */
 		arguments.clear();
-		arguments.put("clear", new LiteralArgument("clear"));
-		arguments.put("entity", new EntitySelectorArgument(EntitySelector.MANY_ENTITIES));
+		arguments.add(new MultiLiteralArgument("clear"));
+		arguments.add(new EntitySelectorArgument("entity", EntitySelector.MANY_ENTITIES));
 		new CommandAPICommand(COMMAND)
 			.withPermission(perms)
 			.withArguments(arguments)
 			.executes((sender, args) -> {
-				clearEffect(plugin, sender, (Collection<Entity>)args[0], null);
+				clearEffect(plugin, sender, (Collection<Entity>)args[1], null);
 			})
 			.register();
 
-		arguments.put("effect", new PotionEffectArgument());
+		arguments.add(new PotionEffectArgument("effect"));
 		new CommandAPICommand(COMMAND)
 			.withPermission(perms)
 			.withArguments(arguments)
 			.executes((sender, args) -> {
-				clearEffect(plugin, sender, (Collection<Entity>)args[0], (PotionEffectType)args[1]);
+				clearEffect(plugin, sender, (Collection<Entity>)args[1], (PotionEffectType)args[2]);
 			})
 			.register();
 	}

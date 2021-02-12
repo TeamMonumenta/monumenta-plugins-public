@@ -1,7 +1,8 @@
 package com.playmonumenta.plugins.commands;
 
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.logging.Logger;
@@ -55,11 +56,11 @@ public class RedeemVoteRewards extends GenericCommand {
 	private static final Map<UUID, PendingRewardContext> mPendingRewards = new HashMap<UUID, PendingRewardContext>();
 
 	public static void register(Logger logger) {
-		LinkedHashMap<String, Argument> arguments = new LinkedHashMap<>();
+		List<Argument> arguments = new ArrayList<>();
 
-		arguments.put("player", new EntitySelectorArgument(EntitySelector.ONE_PLAYER));
-		arguments.put("scoreboard", new StringArgument());
-		arguments.put("function", new FunctionArgument());
+		arguments.add(new EntitySelectorArgument("player", EntitySelector.ONE_PLAYER));
+		arguments.add(new StringArgument("scoreboard"));
+		arguments.add(new FunctionArgument("function"));
 
 		new CommandAPICommand("redeemvoterewards")
 			.withPermission(CommandPermission.fromString("monumenta.command.redeemvoterewards"))

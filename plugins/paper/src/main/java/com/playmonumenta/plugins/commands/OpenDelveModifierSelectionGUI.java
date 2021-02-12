@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.commands;
 
-import java.util.LinkedHashMap;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -20,9 +21,9 @@ public class OpenDelveModifierSelectionGUI extends GenericCommand {
 	public static void register() {
 		CommandPermission perms = CommandPermission.fromString("monumenta.command.opendmsgui");
 
-		LinkedHashMap<String, Argument> arguments = new LinkedHashMap<>();
-		arguments.put("player", new EntitySelectorArgument(EntitySelector.ONE_ENTITY));
-		arguments.put("dungeon", new StringArgument());
+		List<Argument> arguments = new ArrayList<>();
+		arguments.add(new EntitySelectorArgument("player", EntitySelector.ONE_ENTITY));
+		arguments.add(new StringArgument("dungeon"));
 
 		new CommandAPICommand("opendmsgui")
 			.withPermission(perms)

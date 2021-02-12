@@ -4,7 +4,6 @@ import java.io.FileNotFoundException;
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -32,11 +31,10 @@ import org.bukkit.entity.Player;
 import dev.jorel.commandapi.CommandAPI;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.CommandPermission;
-import dev.jorel.commandapi.arguments.Argument;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument.EntitySelector;
-import dev.jorel.commandapi.arguments.LiteralArgument;
 import dev.jorel.commandapi.arguments.LocationArgument;
+import dev.jorel.commandapi.arguments.MultiLiteralArgument;
 import dev.jorel.commandapi.arguments.StringArgument;
 import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
 
@@ -160,88 +158,78 @@ public class PlotAccessManager {
 	}
 
 	private void registerCommands() {
-		LinkedHashMap<String, Argument> arguments = new LinkedHashMap<>();
-
 		/********************* help *********************/
-		arguments.clear();
 		new CommandAPICommand("plotaccess")
 			.withPermission(CommandPermission.NONE)
-			.withArguments(arguments)
 			.executes((sender, args) -> {
 				help(sender);
 			})
 			.register();
-		arguments.put("help", new LiteralArgument("help"));
 		new CommandAPICommand("plotaccess")
 			.withPermission(CommandPermission.NONE)
-			.withArguments(arguments)
+			.withArguments(new MultiLiteralArgument("help"))
 			.executes((sender, args) -> {
 				help(sender);
 			})
 			.register();
 
 		/********************* LIST *********************/
-		arguments.clear();
-		arguments.put("list", new LiteralArgument("list"));
 		new CommandAPICommand("plotaccess")
 			.withPermission(CommandPermission.NONE)
-			.withArguments(arguments)
+			.withArguments(new MultiLiteralArgument("list"))
 			.executes((sender, args) -> {
 				list(getSenderPlayer(sender));
 			})
 			.register();
 
 		/********************* ADD *********************/
-		arguments.clear();
-		arguments.put("add", new LiteralArgument("add"));
-		arguments.put("name", new StringArgument().overrideSuggestions((sender) -> {
-			return Bukkit.getOnlinePlayers().stream().map((player) -> player.getName()).toArray(String[]::new);
-		}));
 		new CommandAPICommand("plotaccess")
 			.withPermission(CommandPermission.NONE)
-			.withArguments(arguments)
+			.withArguments(new MultiLiteralArgument("add"))
+			.withArguments(new StringArgument("name").overrideSuggestions((sender) -> {
+				return Bukkit.getOnlinePlayers().stream().map((player) -> player.getName()).toArray(String[]::new);
+			}))
 			.executes((sender, args) -> {
-				add(getSenderPlayer(sender), (String)args[0], null);
+				add(getSenderPlayer(sender), (String)args[1], null);
 			})
 			.register();
-		arguments.put("duration", new StringArgument());
 		new CommandAPICommand("plotaccess")
 			.withPermission(CommandPermission.NONE)
-			.withArguments(arguments)
+			.withArguments(new MultiLiteralArgument("add"))
+			.withArguments(new StringArgument("name").overrideSuggestions((sender) -> {
+				return Bukkit.getOnlinePlayers().stream().map((player) -> player.getName()).toArray(String[]::new);
+			}))
+			.withArguments(new StringArgument("duration"))
 			.executes((sender, args) -> {
-				add(getSenderPlayer(sender), (String)args[0], (String)args[1]);
+				add(getSenderPlayer(sender), (String)args[1], (String)args[2]);
 			})
 			.register();
 
 		/********************* REMOVE *********************/
-		arguments.clear();
-		arguments.put("remove", new LiteralArgument("remove"));
-		arguments.put("name", new StringArgument().overrideSuggestions((sender) -> getRemoveSuggestions(sender)));
 		new CommandAPICommand("plotaccess")
 			.withPermission(CommandPermission.NONE)
-			.withArguments(arguments)
+			.withArguments(new MultiLiteralArgument("remove"))
+			.withArguments(new StringArgument("name").overrideSuggestions((sender) -> getRemoveSuggestions(sender)))
 			.executes((sender, args) -> {
-				remove(getSenderPlayer(sender), (String)args[0]);
+				remove(getSenderPlayer(sender), (String)args[1]);
 			})
 			.register();
 
 		/********************* TEST *********************/
-		arguments.clear();
-		arguments.put("test", new LiteralArgument("test"));
-		arguments.put("location", new LocationArgument());
-		arguments.put("player", new EntitySelectorArgument(EntitySelector.ONE_PLAYER));
 		new CommandAPICommand("plotaccess")
 			.withPermission(CommandPermission.fromString("monumenta.plotaccess.test"))
-			.withArguments(arguments)
+			.withArguments(new MultiLiteralArgument("test"))
+			.withArguments(new LocationArgument("location"))
+			.withArguments(new EntitySelectorArgument("player", EntitySelector.ONE_PLAYER))
 			.executes((sender, args) -> {
-				PlotEntry plot = mPlots.get(getPlotCoordsKey((Location)args[0]));
+				PlotEntry plot = mPlots.get(getPlotCoordsKey((Location)args[1]));
 				if (plot == null) {
 					// No plot at these coordinates with an access list
 					return 0;
 				}
 
 				/* Returns 0 if no access, 1 if on the approved access list */
-				return plot.hasAccess(((Player)args[1]).getUniqueId()) ? 1 : 0;
+				return plot.hasAccess(((Player)args[2]).getUniqueId()) ? 1 : 0;
 			})
 			.register();
 	}

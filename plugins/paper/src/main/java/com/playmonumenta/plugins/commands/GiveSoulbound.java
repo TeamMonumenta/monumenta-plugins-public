@@ -2,7 +2,6 @@ package com.playmonumenta.plugins.commands;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.LinkedHashMap;
 import java.util.List;
 
 import com.playmonumenta.plugins.utils.InventoryUtils;
@@ -31,9 +30,9 @@ public class GiveSoulbound extends GenericCommand {
 	public static void register() {
 		CommandPermission perms = CommandPermission.fromString("monumenta.command.givesoulbound");
 
-		LinkedHashMap<String, Argument> arguments = new LinkedHashMap<>();
-		arguments.put("players", new EntitySelectorArgument(EntitySelector.MANY_PLAYERS));
-		arguments.put("item", new ItemStackArgument());
+		List<Argument> arguments = new ArrayList<>();
+		arguments.add(new EntitySelectorArgument("players", EntitySelector.MANY_PLAYERS));
+		arguments.add(new ItemStackArgument("item"));
 		new CommandAPICommand("givesoulbound")
 			.withPermission(perms)
 			.withArguments(arguments)

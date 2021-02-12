@@ -1,6 +1,5 @@
 package com.playmonumenta.plugins.plots;
 
-import java.util.LinkedHashMap;
 import java.util.Set;
 import java.util.UUID;
 import java.util.function.Consumer;
@@ -55,10 +54,9 @@ import org.bukkit.util.BoundingBox;
 import dev.jorel.commandapi.CommandAPI;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.CommandPermission;
-import dev.jorel.commandapi.arguments.Argument;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument.EntitySelector;
-import dev.jorel.commandapi.arguments.LiteralArgument;
+import dev.jorel.commandapi.arguments.MultiLiteralArgument;
 import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
 
 public class ShopManager implements Listener {
@@ -295,77 +293,70 @@ public class ShopManager implements Listener {
 	}
 
 	public static void registerCommands() {
-		LinkedHashMap<String, Argument> arguments = new LinkedHashMap<>();
-
 		/********************* NEW *********************/
-		arguments.clear();
-		arguments.put("new", new LiteralArgument("new"));
-		arguments.put("player", new EntitySelectorArgument(EntitySelector.ONE_PLAYER));
 		new CommandAPICommand("monumentashop")
 			.withPermission(CommandPermission.fromString("monumenta.shop"))
-			.withArguments(arguments)
+			.withArguments(new MultiLiteralArgument("new"))
+			.withArguments(new EntitySelectorArgument("player", EntitySelector.ONE_PLAYER))
 			.executes((sender, args) -> {
-				shopNew((Player)args[0]);
+				shopNew((Player)args[1]);
 			})
 			.register();
 
 		/********************* LOCK *********************/
-		arguments.clear();
-		arguments.put("lock", new LiteralArgument("lock"));
-		arguments.put("entity", new EntitySelectorArgument(EntitySelector.ONE_ENTITY));
 		new CommandAPICommand("monumentashop")
 			.withPermission(CommandPermission.fromString("monumenta.shop"))
-			.withArguments(arguments)
+			.withArguments(new MultiLiteralArgument("lock"))
+			.withArguments(new EntitySelectorArgument("entity", EntitySelector.ONE_ENTITY))
 			.executes((sender, args) -> {
-				shopLock((Entity)args[0], null);
+				shopLock((Entity)args[1], null);
 			})
 			.register();
-		arguments.put("player", new EntitySelectorArgument(EntitySelector.ONE_PLAYER));
 		new CommandAPICommand("monumentashop")
 			.withPermission(CommandPermission.fromString("monumenta.shop"))
-			.withArguments(arguments)
+			.withArguments(new MultiLiteralArgument("lock"))
+			.withArguments(new EntitySelectorArgument("entity", EntitySelector.ONE_ENTITY))
+			.withArguments(new EntitySelectorArgument("player", EntitySelector.ONE_PLAYER))
 			.executes((sender, args) -> {
-				shopLock((Entity)args[0], (Player)args[1]);
+				shopLock((Entity)args[1], (Player)args[2]);
 			})
 			.register();
 
 		/********************* UNLOCK *********************/
-		arguments.clear();
-		arguments.put("unlock", new LiteralArgument("unlock"));
-		arguments.put("entity", new EntitySelectorArgument(EntitySelector.ONE_ENTITY));
 		new CommandAPICommand("monumentashop")
 			.withPermission(CommandPermission.fromString("monumenta.shop"))
-			.withArguments(arguments)
+			.withArguments(new MultiLiteralArgument("unlock"))
+			.withArguments(new EntitySelectorArgument("entity", EntitySelector.ONE_ENTITY))
 			.executes((sender, args) -> {
-				shopUnlock((Entity)args[0], null);
+				shopUnlock((Entity)args[1], null);
 			})
 			.register();
-		arguments.put("player", new EntitySelectorArgument(EntitySelector.ONE_PLAYER));
 		new CommandAPICommand("monumentashop")
 			.withPermission(CommandPermission.fromString("monumenta.shop"))
-			.withArguments(arguments)
+			.withArguments(new MultiLiteralArgument("unlock"))
+			.withArguments(new EntitySelectorArgument("entity", EntitySelector.ONE_ENTITY))
+			.withArguments(new EntitySelectorArgument("player", EntitySelector.ONE_PLAYER))
 			.executes((sender, args) -> {
-				shopUnlock((Entity)args[0], (Player)args[1]);
+				shopUnlock((Entity)args[1], (Player)args[2]);
 			})
 			.register();
 
 		/********************* RESET *********************/
-		arguments.clear();
-		arguments.put("reset", new LiteralArgument("reset"));
-		arguments.put("entity", new EntitySelectorArgument(EntitySelector.ONE_ENTITY));
 		new CommandAPICommand("monumentashop")
 			.withPermission(CommandPermission.fromString("monumenta.shop"))
-			.withArguments(arguments)
+			.withArguments(new MultiLiteralArgument("reset"))
+			.withArguments(new EntitySelectorArgument("entity", EntitySelector.ONE_ENTITY))
 			.executes((sender, args) -> {
-				shopReset((Entity)args[0], null);
+				shopReset((Entity)args[1], null);
 			})
 			.register();
-		arguments.put("player", new EntitySelectorArgument(EntitySelector.ONE_PLAYER));
 		new CommandAPICommand("monumentashop")
 			.withPermission(CommandPermission.fromString("monumenta.shop"))
-			.withArguments(arguments)
+			.withArguments(new MultiLiteralArgument("reset"))
+			.withArguments(new EntitySelectorArgument("entity", EntitySelector.ONE_ENTITY))
+			.withArguments(new EntitySelectorArgument("player", EntitySelector.ONE_PLAYER))
 			.executes((sender, args) -> {
-				shopReset((Entity)args[0], (Player)args[1]);
+				shopReset((Entity)args[1], (Player)args[2]);
 			})
 			.register();
 	}

@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.integrations.luckperms;
 
-import java.util.LinkedHashMap;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map.Entry;
 
 import com.playmonumenta.plugins.Plugin;
@@ -28,8 +29,8 @@ public class LeaveGuild {
 		// leaveguild <playername>
 		CommandPermission perms = CommandPermission.fromString("monumenta.command.leaveguild");
 
-		LinkedHashMap<String, Argument> arguments = new LinkedHashMap<>();
-		arguments.put("player", new EntitySelectorArgument(EntitySelector.ONE_PLAYER));
+		List<Argument> arguments = new ArrayList<>();
+		arguments.add(new EntitySelectorArgument("player", EntitySelector.ONE_PLAYER));
 
 		new CommandAPICommand("leaveguild")
 			.withPermission(perms)

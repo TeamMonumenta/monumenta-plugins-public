@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.commands;
 
-import java.util.LinkedHashMap;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 
 import com.playmonumenta.plugins.Plugin;
@@ -8,7 +9,7 @@ import com.playmonumenta.plugins.Plugin;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.CommandPermission;
 import dev.jorel.commandapi.arguments.Argument;
-import dev.jorel.commandapi.arguments.LiteralArgument;
+import dev.jorel.commandapi.arguments.MultiLiteralArgument;
 
 public class MonumentaDebug {
 	static final String COMMAND = "monumentadebug";
@@ -16,8 +17,8 @@ public class MonumentaDebug {
 	public static void register(Plugin plugin) {
 		CommandPermission perms = CommandPermission.fromString("monumenta.command.monumentadebug");
 
-		LinkedHashMap<String, Argument> arguments = new LinkedHashMap<>();
-		arguments.put("level", new LiteralArgument("INFO"));
+		List<Argument> arguments = new ArrayList<>();
+		arguments.add(new MultiLiteralArgument("INFO"));
 		new CommandAPICommand(COMMAND)
 			.withPermission(perms)
 			.withArguments(arguments)
@@ -27,7 +28,7 @@ public class MonumentaDebug {
 			.register();
 
 		arguments.clear();
-		arguments.put("level", new LiteralArgument("FINE"));
+		arguments.add(new MultiLiteralArgument("FINE"));
 		new CommandAPICommand(COMMAND)
 			.withPermission(perms)
 			.withArguments(arguments)
@@ -37,7 +38,7 @@ public class MonumentaDebug {
 			.register();
 
 		arguments.clear();
-		arguments.put("level", new LiteralArgument("FINER"));
+		arguments.add(new MultiLiteralArgument("FINER"));
 		new CommandAPICommand(COMMAND)
 			.withPermission(perms)
 			.withArguments(arguments)
@@ -47,7 +48,7 @@ public class MonumentaDebug {
 			.register();
 
 		arguments.clear();
-		arguments.put("level", new LiteralArgument("FINEST"));
+		arguments.add(new MultiLiteralArgument("FINEST"));
 		new CommandAPICommand(COMMAND)
 			.withPermission(perms)
 			.withArguments(arguments)

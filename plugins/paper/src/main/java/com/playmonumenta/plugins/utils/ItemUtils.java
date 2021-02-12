@@ -474,6 +474,7 @@ public class ItemUtils {
 	public static String getItemQuestId(ItemStack item) {
 		if (item != null && item.hasItemMeta() && item.getItemMeta().hasLore()) {
 			for (String loreEntry : item.getItemMeta().getLore()) {
+				loreEntry = ChatColor.stripColor(loreEntry);
 				if (loreEntry.startsWith("#Q")) {
 					return loreEntry;
 				}

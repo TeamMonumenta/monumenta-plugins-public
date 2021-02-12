@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.commands;
 
-import java.util.LinkedHashMap;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.playmonumenta.plugins.utils.CommandUtils;
 
@@ -11,7 +12,7 @@ import dev.jorel.commandapi.CommandPermission;
 import dev.jorel.commandapi.arguments.Argument;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument.EntitySelector;
-import dev.jorel.commandapi.arguments.LiteralArgument;
+import dev.jorel.commandapi.arguments.MultiLiteralArgument;
 
 /*
  * NOTICE!
@@ -21,22 +22,17 @@ import dev.jorel.commandapi.arguments.LiteralArgument;
  * If this does not happen, your changes will NOT persist across weekly updates!
  */
 public class DeBarkifyHeldItem extends GenericCommand {
-	private static void registerType(String selection) {
-		LinkedHashMap<String, Argument> arguments = new LinkedHashMap<>();
+	public static void register() {
+		List<Argument> arguments = new ArrayList<>();
 
-		arguments.put(selection, new LiteralArgument(selection));
-		arguments.put("player", new EntitySelectorArgument(EntitySelector.ONE_PLAYER));
+		arguments.add(new MultiLiteralArgument("Barking", "Debarking"));
+		arguments.add(new EntitySelectorArgument("player", EntitySelector.ONE_PLAYER));
 		new CommandAPICommand("debarkifyhelditem")
 			.withPermission(CommandPermission.fromString("monumenta.command.debarkifyhelditem"))
 			.withArguments(arguments)
 			.executes((sender, args) -> {
-				CommandUtils.deEnchantifyHeldItem(sender, (Player)args[0], selection);
+				CommandUtils.deEnchantifyHeldItem(sender, (Player)args[1], (String)args[0]);
 			})
 			.register();
-	}
-
-	public static void register() {
-		registerType("Barking");
-		registerType("Debarking");
 	}
 }

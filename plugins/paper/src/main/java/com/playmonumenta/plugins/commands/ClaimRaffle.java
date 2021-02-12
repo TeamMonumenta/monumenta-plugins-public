@@ -1,6 +1,5 @@
 package com.playmonumenta.plugins.commands;
 
-import java.util.LinkedHashMap;
 import java.util.UUID;
 
 import com.playmonumenta.plugins.Plugin;
@@ -14,19 +13,15 @@ import org.bukkit.metadata.FixedMetadataValue;
 import dev.jorel.commandapi.CommandAPI;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.CommandPermission;
-import dev.jorel.commandapi.arguments.Argument;
 import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
 
 public class ClaimRaffle {
 	private static final String CONFIRMED_METAKEY = "MonumentaRaffleClaimMetadata";
 
 	public static void register(Plugin plugin) {
-		LinkedHashMap<String, Argument> arguments = new LinkedHashMap<>();
-
 		/* No-argument variant which just is the sender (if they are a player) */
 		new CommandAPICommand("claimRaffle")
 			.withPermission(CommandPermission.fromString("monumenta.command.claimraffle"))
-			.withArguments(arguments)
 			.executes((sender, args) -> {
 				if (sender instanceof Player) {
 					run(plugin, (Player)sender);

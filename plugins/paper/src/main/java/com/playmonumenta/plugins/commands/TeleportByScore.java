@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.commands;
 
-import java.util.LinkedHashMap;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -21,7 +22,7 @@ import dev.jorel.commandapi.arguments.EntitySelectorArgument;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument.EntitySelector;
 import dev.jorel.commandapi.arguments.FloatArgument;
 import dev.jorel.commandapi.arguments.FunctionArgument;
-import dev.jorel.commandapi.arguments.LiteralArgument;
+import dev.jorel.commandapi.arguments.MultiLiteralArgument;
 import dev.jorel.commandapi.arguments.ObjectiveArgument;
 import dev.jorel.commandapi.wrappers.FunctionWrapper;
 
@@ -31,11 +32,11 @@ public class TeleportByScore extends GenericCommand {
 	public static void register() {
 		CommandPermission perms = CommandPermission.fromString("monumenta.command.teleportbyscore");
 
-		LinkedHashMap<String, Argument> arguments = new LinkedHashMap<>();
-		arguments.put("entity", new EntitySelectorArgument(EntitySelector.ONE_ENTITY));
-		arguments.put("x objective", new ObjectiveArgument());
-		arguments.put("y objective", new ObjectiveArgument());
-		arguments.put("z objective", new ObjectiveArgument());
+		List<Argument> arguments = new ArrayList<>();
+		arguments.add(new EntitySelectorArgument("entity", EntitySelector.ONE_ENTITY));
+		arguments.add(new ObjectiveArgument("x objective"));
+		arguments.add(new ObjectiveArgument("y objective"));
+		arguments.add(new ObjectiveArgument("z objective"));
 		new CommandAPICommand(COMMAND)
 			.withPermission(perms)
 			.withArguments(arguments)
@@ -44,8 +45,8 @@ public class TeleportByScore extends GenericCommand {
 			})
 			.register();
 
-		arguments.put("yaw objective", new ObjectiveArgument());
-		arguments.put("pitch objective", new ObjectiveArgument());
+		arguments.add(new ObjectiveArgument("yaw objective"));
+		arguments.add(new ObjectiveArgument("pitch objective"));
 		new CommandAPICommand(COMMAND)
 			.withPermission(perms)
 			.withArguments(arguments)
@@ -54,7 +55,7 @@ public class TeleportByScore extends GenericCommand {
 			})
 			.register();
 
-		arguments.put("scale", new FloatArgument(1));
+		arguments.add(new FloatArgument("scale", 1));
 		new CommandAPICommand(COMMAND)
 			.withPermission(perms)
 			.withArguments(arguments)
@@ -63,13 +64,13 @@ public class TeleportByScore extends GenericCommand {
 			})
 			.register();
 
-		arguments.put("async", new LiteralArgument("async"));
-		arguments.put("function", new FunctionArgument());
+		arguments.add(new MultiLiteralArgument("async"));
+		arguments.add(new FunctionArgument("function"));
 		new CommandAPICommand(COMMAND)
 			.withPermission(perms)
 			.withArguments(arguments)
 			.executes((sender, args) -> {
-				teleport(sender, (Entity)args[0], (String)args[1], (String)args[2], (String)args[3], (String)args[4], (String)args[5], (Float)args[6], (FunctionWrapper[])args[7]);
+				teleport(sender, (Entity)args[0], (String)args[1], (String)args[2], (String)args[3], (String)args[4], (String)args[5], (Float)args[6], (FunctionWrapper[])args[8]);
 			})
 			.register();
 	}

@@ -1,7 +1,8 @@
 package com.playmonumenta.plugins.integrations.luckperms;
 
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.concurrent.Executor;
 
 import com.playmonumenta.plugins.Plugin;
@@ -32,10 +33,10 @@ public class CreateGuild {
 		// createguild <guildname> <guild tag>
 		CommandPermission perms = CommandPermission.fromString("monumenta.command.createguild");
 
-		LinkedHashMap<String, Argument> arguments = new LinkedHashMap<>();
-		arguments.put("guild name", new TextArgument());
-		arguments.put("guild tag", new TextArgument());
-		arguments.put("founders", new EntitySelectorArgument(EntitySelector.MANY_PLAYERS)
+		List<Argument> arguments = new ArrayList<>();
+		arguments.add(new TextArgument("guild name"));
+		arguments.add(new TextArgument("guild tag"));
+		arguments.add(new EntitySelectorArgument("founders", EntitySelector.MANY_PLAYERS)
 		              .overrideSuggestions("@a[x=-770,y=106,z=-128,dx=7,dy=4,dz=13]"));
 
 		new CommandAPICommand("createguild")

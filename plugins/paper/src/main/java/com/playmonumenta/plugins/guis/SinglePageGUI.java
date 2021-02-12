@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.guis;
 
-import java.util.LinkedHashMap;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -45,13 +46,16 @@ public abstract class SinglePageGUI {
 	public void registerCommand(String command, String... potentialStringArgs) {
 		CommandPermission perms = CommandPermission.fromString("monumenta.command." + command);
 
-		LinkedHashMap<String, Argument> arguments = new LinkedHashMap<>();
-		arguments.put("player", new EntitySelectorArgument(EntitySelector.ONE_ENTITY));
+		List<Argument> arguments = new ArrayList<>();
+		arguments.add(new EntitySelectorArgument("player", EntitySelector.ONE_ENTITY));
 		for (String stringArg : potentialStringArgs) {
-			arguments.put(stringArg, new StringArgument());
+			arguments.add(new StringArgument(stringArg));
 		}
 
-		new CommandAPICommand(command).withPermission(perms).withArguments(arguments).executes(
+		new CommandAPICommand(command)
+			.withPermission(perms)
+			.withArguments(arguments)
+			.executes(
 				(sender, args) -> {
 					String[] stringArgs = new String[args.length - 1];
 					for (int i = 0; i < stringArgs.length; i++) {

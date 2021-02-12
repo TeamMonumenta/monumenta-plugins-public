@@ -1,7 +1,5 @@
 package com.playmonumenta.plugins.commands;
 
-import java.util.LinkedHashMap;
-
 import com.playmonumenta.plugins.Plugin;
 
 import org.bukkit.Bukkit;
@@ -17,7 +15,6 @@ public class RestartEmptyCommand {
 	public static void register(Plugin plugin) {
 		new CommandAPICommand("restart-empty")
 			.withPermission(CommandPermission.fromString("monumenta.command.restart-empty"))
-			.withArguments(new LinkedHashMap<>())
 			.executes((sender, args) -> {
 				run(plugin, sender);
 			})

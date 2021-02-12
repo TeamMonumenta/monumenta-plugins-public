@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.integrations.luckperms;
 
-import java.util.LinkedHashMap;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.playmonumenta.plugins.Plugin;
 
@@ -22,8 +23,8 @@ public class SetGuildTeleport {
 		// setguildteleport <guildname>
 		CommandPermission perms = CommandPermission.fromString("monumenta.command.setguildteleport");
 
-		LinkedHashMap<String, Argument> arguments = new LinkedHashMap<>();
-		arguments.put("guild name", new TextArgument());
+		List<Argument> arguments = new ArrayList<>();
+		arguments.add(new TextArgument("guild name"));
 
 		new CommandAPICommand("setguildteleport")
 			.withPermission(perms)

@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.integrations.luckperms;
 
-import java.util.LinkedHashMap;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.utils.PlayerUtils;
@@ -27,8 +28,8 @@ public class JoinGuild {
 		// joinguild <playername>
 		CommandPermission perms = CommandPermission.fromString("monumenta.command.joinguild");
 
-		LinkedHashMap<String, Argument> arguments = new LinkedHashMap<>();
-		arguments.put("player", new EntitySelectorArgument(EntitySelector.ONE_PLAYER));
+		List<Argument> arguments = new ArrayList<>();
+		arguments.add(new EntitySelectorArgument("player", EntitySelector.ONE_PLAYER));
 
 		new CommandAPICommand("joinguild")
 			.withPermission(perms)

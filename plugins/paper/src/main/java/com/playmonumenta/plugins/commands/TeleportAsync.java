@@ -1,7 +1,8 @@
 package com.playmonumenta.plugins.commands;
 
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentSkipListSet;
@@ -26,8 +27,8 @@ import dev.jorel.commandapi.arguments.Argument;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument.EntitySelector;
 import dev.jorel.commandapi.arguments.FunctionArgument;
-import dev.jorel.commandapi.arguments.LiteralArgument;
 import dev.jorel.commandapi.arguments.LocationArgument;
+import dev.jorel.commandapi.arguments.MultiLiteralArgument;
 import dev.jorel.commandapi.arguments.RotationArgument;
 import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
 import dev.jorel.commandapi.wrappers.FunctionWrapper;
@@ -42,9 +43,9 @@ public class TeleportAsync extends GenericCommand {
 	public static void register() {
 		CommandPermission perms = CommandPermission.fromString("monumenta.command.teleportasync");
 
-		LinkedHashMap<String, Argument> arguments = new LinkedHashMap<>();
-		arguments.put("function", new FunctionArgument());
-		arguments.put("destination", new EntitySelectorArgument(EntitySelector.ONE_ENTITY));
+		List<Argument> arguments = new ArrayList<>();
+		arguments.add(new FunctionArgument("function"));
+		arguments.add(new EntitySelectorArgument("destination", EntitySelector.ONE_ENTITY));
 		new CommandAPICommand(COMMAND)
 			.withPermission(perms)
 			.withArguments(arguments)
@@ -54,8 +55,8 @@ public class TeleportAsync extends GenericCommand {
 			.register();
 
 		arguments.clear();
-		arguments.put("function", new FunctionArgument());
-		arguments.put("location", new LocationArgument());
+		arguments.add(new FunctionArgument("function"));
+		arguments.add(new LocationArgument("location"));
 		new CommandAPICommand(COMMAND)
 			.withPermission(perms)
 			.withArguments(arguments)
@@ -65,9 +66,9 @@ public class TeleportAsync extends GenericCommand {
 			.register();
 
 		arguments.clear();
-		arguments.put("function", new FunctionArgument());
-		arguments.put("targets", new EntitySelectorArgument(EntitySelector.MANY_ENTITIES));
-		arguments.put("destination", new EntitySelectorArgument(EntitySelector.ONE_ENTITY));
+		arguments.add(new FunctionArgument("function"));
+		arguments.add(new EntitySelectorArgument("targets", EntitySelector.MANY_ENTITIES));
+		arguments.add(new EntitySelectorArgument("destination", EntitySelector.ONE_ENTITY));
 		new CommandAPICommand(COMMAND)
 			.withPermission(perms)
 			.withArguments(arguments)
@@ -78,9 +79,9 @@ public class TeleportAsync extends GenericCommand {
 			.register();
 
 		arguments.clear();
-		arguments.put("function", new FunctionArgument());
-		arguments.put("targets", new EntitySelectorArgument(EntitySelector.MANY_ENTITIES));
-		arguments.put("location", new LocationArgument());
+		arguments.add(new FunctionArgument("function"));
+		arguments.add(new EntitySelectorArgument("targets", EntitySelector.MANY_ENTITIES));
+		arguments.add(new LocationArgument("location"));
 		new CommandAPICommand(COMMAND)
 			.withPermission(perms)
 			.withArguments(arguments)
@@ -90,40 +91,40 @@ public class TeleportAsync extends GenericCommand {
 			.register();
 
 		arguments.clear();
-		arguments.put("function", new FunctionArgument());
-		arguments.put("targets", new EntitySelectorArgument(EntitySelector.MANY_ENTITIES));
-		arguments.put("location", new LocationArgument());
-		arguments.put("facing", new LiteralArgument("facing"));
-		arguments.put("entity", new LiteralArgument("entity"));
-		arguments.put("facingEntity", new EntitySelectorArgument(EntitySelector.ONE_ENTITY));
+		arguments.add(new FunctionArgument("function"));
+		arguments.add(new EntitySelectorArgument("targets", EntitySelector.MANY_ENTITIES));
+		arguments.add(new LocationArgument("location"));
+		arguments.add(new MultiLiteralArgument("facing"));
+		arguments.add(new MultiLiteralArgument("entity"));
+		arguments.add(new EntitySelectorArgument("facingEntity", EntitySelector.ONE_ENTITY));
 		new CommandAPICommand(COMMAND)
 			.withPermission(perms)
 			.withArguments(arguments)
 			.executes((sender, args) -> {
-				return teleportFacing(sender, (FunctionWrapper[])args[0], (Collection<Entity>)args[1], (Location)args[2], (Entity)args[3]);
+				return teleportFacing(sender, (FunctionWrapper[])args[0], (Collection<Entity>)args[1], (Location)args[2], (Entity)args[5]);
 			})
 			.register();
 		// TODO facing anchors not currently supported by CommandAPI, no support here.
 
 		arguments.clear();
-		arguments.put("function", new FunctionArgument());
-		arguments.put("targets", new EntitySelectorArgument(EntitySelector.MANY_ENTITIES));
-		arguments.put("location", new LocationArgument());
-		arguments.put("facing", new LiteralArgument("facing"));
-		arguments.put("facingLocation", new LocationArgument());
+		arguments.add(new FunctionArgument("function"));
+		arguments.add(new EntitySelectorArgument("targets", EntitySelector.MANY_ENTITIES));
+		arguments.add(new LocationArgument("location"));
+		arguments.add(new MultiLiteralArgument("facing"));
+		arguments.add(new LocationArgument("facingLocation"));
 		new CommandAPICommand(COMMAND)
 			.withPermission(perms)
 			.withArguments(arguments)
 			.executes((sender, args) -> {
-				return teleportFacing(sender, (FunctionWrapper[])args[0], (Collection<Entity>)args[1], (Location)args[2], (Location)args[3]);
+				return teleportFacing(sender, (FunctionWrapper[])args[0], (Collection<Entity>)args[1], (Location)args[2], (Location)args[4]);
 			})
 			.register();
 
 		arguments.clear();
-		arguments.put("function", new FunctionArgument());
-		arguments.put("targets", new EntitySelectorArgument(EntitySelector.MANY_ENTITIES));
-		arguments.put("location", new LocationArgument());
-		arguments.put("Rotation", new RotationArgument());
+		arguments.add(new FunctionArgument("function"));
+		arguments.add(new EntitySelectorArgument("targets", EntitySelector.MANY_ENTITIES));
+		arguments.add(new LocationArgument("location"));
+		arguments.add(new RotationArgument("Rotation"));
 		new CommandAPICommand(COMMAND)
 			.withPermission(perms)
 			.withArguments(arguments)

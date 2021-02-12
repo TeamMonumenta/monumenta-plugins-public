@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.commands;
 
-import java.util.LinkedHashMap;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
@@ -17,10 +18,10 @@ public class Launch extends GenericCommand {
 
 		CommandPermission perms = CommandPermission.fromString("monumenta.command.launch");
 
-		LinkedHashMap<String, Argument> arguments = new LinkedHashMap<>();
-		arguments.put("player", new EntitySelectorArgument(EntitySelector.ONE_PLAYER));
-		arguments.put("horizontal", new DoubleArgument());
-		arguments.put("vertical", new DoubleArgument());
+		List<Argument> arguments = new ArrayList<>();
+		arguments.add(new EntitySelectorArgument("player", EntitySelector.ONE_PLAYER));
+		arguments.add(new DoubleArgument("horizontal"));
+		arguments.add(new DoubleArgument("vertical"));
 
 		new CommandAPICommand("launch")
 			.withPermission(perms)
@@ -35,10 +36,10 @@ public class Launch extends GenericCommand {
 			.register();
 
 		arguments.clear();
-		arguments.put("player", new EntitySelectorArgument(EntitySelector.ONE_PLAYER));
-		arguments.put("x", new DoubleArgument());
-		arguments.put("y", new DoubleArgument());
-		arguments.put("z", new DoubleArgument());
+		arguments.add(new EntitySelectorArgument("player", EntitySelector.ONE_PLAYER));
+		arguments.add(new DoubleArgument("x"));
+		arguments.add(new DoubleArgument("y"));
+		arguments.add(new DoubleArgument("z"));
 
 		new CommandAPICommand("launch")
 		.withPermission(perms)

@@ -1,7 +1,8 @@
 package com.playmonumenta.plugins.commands;
 
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.LinkedHashMap;
+import java.util.List;
 
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
@@ -44,12 +45,11 @@ public class GenericCommand {
 	protected static void registerPlayerCommand(String command, String permission, PlayerCommandExecutor exec) {
 		CommandPermission perms = CommandPermission.fromString(permission);
 
-		LinkedHashMap<String, Argument> arguments = new LinkedHashMap<>();
+		List<Argument> arguments = new ArrayList<>();
 
 		/* No-argument variant which just is the sender (if they are a player) */
 		new CommandAPICommand(command)
 			.withPermission(perms)
-			.withArguments(arguments)
 			.executes((sender, args) -> {
 				if (sender instanceof Player) {
 					exec.run(sender, (Player)sender);
@@ -67,7 +67,7 @@ public class GenericCommand {
 			.register();
 
 		/* Variant with player selector as arguments */
-		arguments.put("players", new EntitySelectorArgument(EntitySelector.MANY_PLAYERS));
+		arguments.add(new EntitySelectorArgument("players", EntitySelector.MANY_PLAYERS));
 		new CommandAPICommand(command)
 			.withPermission(perms)
 			.withArguments(arguments)
@@ -83,8 +83,8 @@ public class GenericCommand {
 	protected static void registerEntityCommand(String command, String permission, EntityCommandExecutor exec) {
 		CommandPermission perms = CommandPermission.fromString(permission);
 
-		LinkedHashMap<String, Argument> arguments = new LinkedHashMap<>();
-		arguments.put("entities", new EntitySelectorArgument(EntitySelector.MANY_ENTITIES));
+		List<Argument> arguments = new ArrayList<>();
+		arguments.add(new EntitySelectorArgument("entities", EntitySelector.MANY_ENTITIES));
 		new CommandAPICommand(command)
 			.withPermission(perms)
 			.withArguments(arguments)

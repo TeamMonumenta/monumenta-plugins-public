@@ -1,7 +1,5 @@
 package com.playmonumenta.plugins.commands;
 
-import java.util.LinkedHashMap;
-
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
@@ -20,7 +18,6 @@ import org.bukkit.metadata.FixedMetadataValue;
 import dev.jorel.commandapi.CommandAPI;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.CommandPermission;
-import dev.jorel.commandapi.arguments.Argument;
 import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
 
 public class Spectate implements Listener {
@@ -56,12 +53,9 @@ public class Spectate implements Listener {
 	public Spectate(Plugin plugin) {
 		mPlugin = plugin;
 
-		LinkedHashMap<String, Argument> arguments = new LinkedHashMap<>();
-
 		/* No-argument variant which just is the sender (if they are a player) */
 		new CommandAPICommand("spectate")
 			.withPermission(CommandPermission.fromString("monumenta.command.spectate"))
-			.withArguments(arguments)
 			.executes((sender, args) -> {
 				if (sender instanceof Player) {
 					run(plugin, (Player)sender);

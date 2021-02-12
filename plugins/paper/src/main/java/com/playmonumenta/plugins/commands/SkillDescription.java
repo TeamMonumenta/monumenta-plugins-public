@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.commands;
 
-import java.util.LinkedHashMap;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
@@ -12,7 +13,7 @@ import org.bukkit.entity.Player;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.CommandPermission;
 import dev.jorel.commandapi.arguments.Argument;
-import dev.jorel.commandapi.arguments.StringArgument;
+import dev.jorel.commandapi.arguments.ObjectiveArgument;
 
 public class SkillDescription extends GenericCommand {
 	private static final String COMMAND = "skilldescription";
@@ -20,8 +21,8 @@ public class SkillDescription extends GenericCommand {
 	public static void register(Plugin plugin) {
 		CommandPermission perms = CommandPermission.fromString("monumenta.command.skilldescription");
 
-		LinkedHashMap<String, Argument> arguments = new LinkedHashMap<>();
-		arguments.put("objective", new StringArgument());
+		List<Argument> arguments = new ArrayList<>();
+		arguments.add(new ObjectiveArgument("objective"));
 		new CommandAPICommand(COMMAND)
 			.withPermission(perms)
 			.withArguments(arguments)
