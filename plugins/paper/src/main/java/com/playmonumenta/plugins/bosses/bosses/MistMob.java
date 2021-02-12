@@ -25,7 +25,7 @@ public class MistMob extends BossAbilityGroup {
 
 	@Override
 	public void death(EntityDeathEvent event) {
-		if (event.getEntity() == null) {
+		if (event == null || event.getEntity() == null) {
 			//If the mob explodes it hits this method, but the event cannot grab the entity, so to prevent null pointers, this is needed
 			return;
 		}

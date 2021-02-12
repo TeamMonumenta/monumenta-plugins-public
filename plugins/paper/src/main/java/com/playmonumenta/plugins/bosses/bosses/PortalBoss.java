@@ -37,7 +37,9 @@ public class PortalBoss extends BossAbilityGroup {
 
 	@Override
 	public void unload() {
-		mRunnable.cancel();
+		if (mRunnable != null) {
+			mRunnable.cancel();
+		}
 		mRunnable = null;
 	}
 
