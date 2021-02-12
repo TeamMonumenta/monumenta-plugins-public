@@ -14,6 +14,8 @@ import org.bukkit.potion.PotionEffect;
 import com.playmonumenta.plugins.utils.LocationUtils;
 
 public class SpellProjectileDeflection extends Spell {
+	private static final double MAX_DEFLECT_VELOCITY = 3.0;
+
 	private LivingEntity mBoss;
 
 	public SpellProjectileDeflection(LivingEntity boss) {
@@ -40,7 +42,7 @@ public class SpellProjectileDeflection extends Spell {
 					}
 
 				}
-				deflected.setVelocity(LocationUtils.getDirectionTo(player.getLocation().add(0, 1.25, 0), deflected.getLocation()).multiply(proj.getVelocity().length()));
+				deflected.setVelocity(LocationUtils.getDirectionTo(player.getLocation().add(0, 1.25, 0), deflected.getLocation()).multiply(Math.max(MAX_DEFLECT_VELOCITY, proj.getVelocity().length())));
 				proj.remove();
 			}
 			mBoss.getWorld().playSound(mBoss.getLocation(), Sound.BLOCK_ANVIL_PLACE, 1, 2);
