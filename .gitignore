@@ -14,5 +14,6 @@ release.properties
 # Eclipse
 .settings/
 .classpath
+.factorypath
 .project
 /bin/

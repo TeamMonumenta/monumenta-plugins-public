@@ -507,15 +507,19 @@ public class EntityUtils {
 
 		List<LivingEntity> mobs = new ArrayList<LivingEntity>(entities.size());
 		for (Entity entity : entities) {
-			if (types == null) {
-				if (types == null && isHostileMob(entity) && !entity.isDead() && entity.isValid()) {
-					mobs.add((LivingEntity)entity);
-				}
-			} else {
-				if (types.contains(entity.getType()) && !entity.isDead() && entity.isValid()) {
-					mobs.add((LivingEntity)entity);
-				}
+			if (entity.isDead() || !entity.isValid()) {
+				continue;
 			}
+
+			if (types == null) { // If no types specified
+				if (!isHostileMob(entity)) { // Only add hostiles. Not hostile = skip
+					continue;
+				}
+			} else if (!types.contains(entity.getType())) { // If types specified, only add those. Not match = skip
+				continue;
+			}
+
+			mobs.add((LivingEntity)entity);
 		}
 
 		return mobs;

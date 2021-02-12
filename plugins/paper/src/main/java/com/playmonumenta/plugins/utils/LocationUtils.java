@@ -32,6 +32,7 @@ import org.bukkit.block.data.type.TrapDoor;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.util.BlockIterator;
+import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
 import com.google.gson.Gson;
@@ -1048,5 +1049,26 @@ public class LocationUtils {
 			}
 		}
 		return blocks;
+	}
+
+	// Returns all block locations the bounding box touches.
+	// Eg for a player, this could be as little as 2 or as many as 12 full blocks,
+	// depending on how offset their bounding box's location is
+	public static ArrayList<Location> getLocationsTouching(BoundingBox boundingBox, World world) {
+		ArrayList<Location> locationsTouching = new ArrayList<Location>();
+		int startX = (int) Math.floor(boundingBox.getMinX());
+		int endX = (int) Math.ceil(boundingBox.getMaxX());
+		int startY = (int) Math.floor(boundingBox.getMinY());
+		int endY = (int) Math.ceil(boundingBox.getMaxY());
+		int startZ = (int) Math.floor(boundingBox.getMinZ());
+		int endZ = (int) Math.ceil(boundingBox.getMaxZ());
+		for (int x = startX; x < endX; x++) {
+			for (int y = startY; y < endY; y++) {
+				for (int z = startZ; z < endZ; z++) {
+					locationsTouching.add(new Location(world, x, y, z));
+				}
+			}
+		}
+		return locationsTouching;
 	}
 }

@@ -9,12 +9,14 @@ import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.attribute.Attribute;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityRegainHealthEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 
+import com.destroystokyo.paper.MaterialSetTag;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.events.AbilityCastEvent;
@@ -123,5 +125,21 @@ public class PlayerUtils {
 	public static void executeCommandOnNearbyPlayers(Location loc, int radius, String command) {
 		Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(),
 		                                   getExecuteCommandOnNearbyPlayers(loc, radius, command));
+	}
+
+	// If player is considered to be in the air
+	public static boolean notOnGround(Player player) {
+		Material playerFeetMaterial = player.getLocation().getBlock().getType();
+		// Accounts for all climbables including 1.16 vines & scaffolding
+		boolean playerInClimbable = MaterialSetTag.CLIMBABLE.isTagged(playerFeetMaterial);
+
+		// Use Entity#isOnGround() value calculated by the server
+		// instead of deprecated Player#isOnGround() where value is controlled by the client.
+		boolean playerOnGround = ((Entity)player).isOnGround();
+
+		return (
+			!playerInClimbable
+			&& !playerOnGround
+		);
 	}
 }
