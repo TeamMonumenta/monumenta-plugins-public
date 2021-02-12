@@ -8,7 +8,7 @@ import org.bukkit.plugin.Plugin;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 
 public class SilenceOnHitBoss extends BossAbilityGroup {
-	public static final String identityTag = "boss_silence";
+	public static final String identityTag = "boss_silencehit";
 	public static final int detectionRange = 30;
 
 	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) {
