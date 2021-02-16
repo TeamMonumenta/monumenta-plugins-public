@@ -6,10 +6,12 @@ import com.playmonumenta.plugins.utils.ItemUtils;
 
 import org.bukkit.Bukkit;
 import org.bukkit.block.ShulkerBox;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BlockStateMeta;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -137,6 +139,10 @@ public class ShulkerInventory {
 	}
 
 	private boolean isShulkerValid() {
+		InventoryHolder holder = mParentInventory.getHolder();
+		if (holder instanceof Entity && !((Entity) holder).isValid()) {
+			return false;
+		}
 		return mShulkerItem.equals(mParentInventory.getItem(mParentSlot));
 	}
 
