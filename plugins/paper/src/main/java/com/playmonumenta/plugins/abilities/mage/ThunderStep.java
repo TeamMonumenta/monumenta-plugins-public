@@ -35,8 +35,8 @@ import org.bukkit.util.Vector;
 
 
 public class ThunderStep extends Ability {
-	private static final Particle.DustOptions COLORYELLOW = new Particle.DustOptions(Color.YELLOW, 0.75f);
-	private static final Particle.DustOptions COLORAQUA = new Particle.DustOptions(Color.AQUA, 0.75f);
+	private static final Particle.DustOptions COLOR_YELLOW = new Particle.DustOptions(Color.YELLOW, 0.75f);
+	private static final Particle.DustOptions COLOR_AQUA = new Particle.DustOptions(Color.AQUA, 0.75f);
 
 	/*
 	 * Cloud's standardised constant order:
@@ -48,9 +48,9 @@ public class ThunderStep extends Ability {
 	private static final int DAMAGE_2 = 10;
 	private static final int SIZE = 3;
 	private static final int DISTANCE = 8;
-	private static final double CHECKINCREMENT = 0.1;
-	private static final int COOLDOWNSECONDS = 24;
-	private static final int COOLDOWN = COOLDOWNSECONDS * 20;
+	private static final double CHECK_INCREMENT = 0.1;
+	private static final int COOLDOWN_SECONDS = 24;
+	private static final int COOLDOWN = COOLDOWN_SECONDS * 20;
 
 	private final int mLevelDamage;
 
@@ -59,14 +59,15 @@ public class ThunderStep extends Ability {
 
 		mInfo.mLinkedSpell = Spells.THUNDER_STEP;
 		//TODO with the next balance change, update these two old Channeling values and tell players to reselect skills like what's happened in the past?
+		// ScriptedQuests stuff for class selection & the Spec NPC will also need updating, possibly the class selection command blocks as well
 		mInfo.mScoreboardId = "Channeling";
 		mInfo.mShorthandName = "Ch";
 		mInfo.mDescriptions.add(
 			String.format(
-				"While sneaking in mid-air, right-clicking with a wand materialises a flash of thunder, dealing %s damage to all enemies in a 3-block cube around you. The next moment, you are teleported towards where you're looking, travelling up to %s blocks or until you hit a solid block, and repeating your thunder attack at your destination. Cooldown: %ss.",
+				"While sneaking in mid-air, right-clicking with a wand materializes a flash of thunder, dealing %s damage to all enemies in a 3-block cube around you. The next moment, you are teleported towards where you're looking, travelling up to %s blocks or until you hit a solid block, and repeating your thunder attack at your destination. Cooldown: %ss.",
 				DAMAGE_1,
 				SIZE,
-				COOLDOWNSECONDS
+				COOLDOWN_SECONDS
 			)
 		);
 		mInfo.mDescriptions.add(
@@ -89,7 +90,7 @@ public class ThunderStep extends Ability {
 		Location playerLocationStart = mPlayer.getLocation();
 		BoundingBox potentialPlayerBox = mPlayer.getBoundingBox();
 		Location potentialPlayerLocation = playerLocationStart.clone();
-		Vector vectorIncrement = playerLocationStart.getDirection().normalize().multiply(CHECKINCREMENT);
+		Vector vectorIncrement = playerLocationStart.getDirection().normalize().multiply(CHECK_INCREMENT);
 
 		doDamage(
 			SpellDamage.getSpellDamage(mPlayer, mLevelDamage),
@@ -97,7 +98,7 @@ public class ThunderStep extends Ability {
 		);
 
 		loopMaxGoodDistance:
-		for (int i = 0; i < DISTANCE / CHECKINCREMENT * 1.1; i++) {
+		for (int i = 0; i < DISTANCE / CHECK_INCREMENT * 1.1; i++) {
 			potentialPlayerLocation.add(vectorIncrement);
 			if (playerLocationStart.distanceSquared(potentialPlayerLocation) > DISTANCE * DISTANCE) {
 				// Gone too far, stop processing
@@ -140,8 +141,8 @@ public class ThunderStep extends Ability {
 	private void doDamage(float spellDamage, Location loc) {
 		World world = mPlayer.getWorld();
 		world.playSound(loc, Sound.ENTITY_LIGHTNING_BOLT_THUNDER, SoundCategory.PLAYERS, 1f, 1.5f);
-		world.spawnParticle(Particle.REDSTONE, loc, 100, 2.5, 2.5, 2.5, 3, COLORYELLOW);
-		world.spawnParticle(Particle.REDSTONE, loc, 100, 2.5, 2.5, 2.5, 3, COLORAQUA);
+		world.spawnParticle(Particle.REDSTONE, loc, 100, 2.5, 2.5, 2.5, 3, COLOR_YELLOW);
+		world.spawnParticle(Particle.REDSTONE, loc, 100, 2.5, 2.5, 2.5, 3, COLOR_AQUA);
 		world.spawnParticle(Particle.FLASH, loc.clone().add(loc.getDirection()), 1, 0, 0, 0, 10);
 
 		List<LivingEntity> enemies = EntityUtils.getNearbyMobs(loc, SIZE, mPlayer); // Does not return the getter (player)
