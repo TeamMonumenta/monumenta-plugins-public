@@ -75,7 +75,7 @@ public class GraveUtils {
 							// TODO: [LOW] If the player is offline, queue the message to be sent to them when they return.
 						} else {
 							// TODO: [MED] Add graves information to /deathhelp and edit this message to point users to the command.
-							player.sendMessage(ChatColor.RED + "Some of your items were destroyed! They have been shattered, but placed in a chest near to where you died.");
+							player.sendMessage(ChatColor.RED + "Some of your items were destroyed! They have been shattered and placed in a chest near where they were dropped.");
 						}
 					}
 				}

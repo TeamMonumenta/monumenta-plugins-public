@@ -10,5 +10,5 @@ fi
 
 echo "Plugin version: $plugin"
 
-scp -P 9922 $plugin epic@build.playmonumenta.com:/home/epic/project_epic/server_config/plugins/
-ssh -p 9922 epic@build.playmonumenta.com "cd /home/epic/project_epic/server_config/plugins && rm -f Monumenta.jar ; ln -s $plugin Monumenta.jar"
+scp -P 9922 $plugin epic@admin.playmonumenta.com:/home/epic/project_epic/server_config/plugins/
+ssh -p 9922 epic@admin.playmonumenta.com "cd /home/epic/project_epic/server_config/plugins && rm -f Monumenta.jar ; ln -s $plugin Monumenta.jar"

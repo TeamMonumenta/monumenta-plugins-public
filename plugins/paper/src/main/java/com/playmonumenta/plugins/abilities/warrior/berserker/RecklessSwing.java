@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.abilities.warrior.berserker;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -40,7 +41,7 @@ public class RecklessSwing extends Ability {
 		mInfo.mLinkedSpell = Spells.RECKLESS_SWING;
 		mInfo.mScoreboardId = "RecklessSwing";
 		mInfo.mShorthandName = "RS";
-		mInfo.mDescriptions.add("Passively, every 4 health you fall below your maximum health, gain +5% damage (capped at +25%) on sword and axe hits. Sneak left click with an axe or a sword without hitting a mob to deal 12 damage in a 3.5 block radius, while also taking 4 health of damage (not reduced by any kind of damage resistance, bypasses absorption).");
+		mInfo.mDescriptions.add("Passively, every 4 health you fall below your maximum health, gain +5% damage (capped at +25%) on sword and axe hits. Sneak left click with an axe or a sword (including when attacking enemies) to deal 12 damage in a 3.5 block radius at the cost of taking 4 damage (not reduced by any kind of damage resistance, bypasses absorption).");
 		mInfo.mDescriptions.add("Gain +10% damage (capped at +50%) instead. Damage from the active increased to 24.");
 		mInfo.mIgnoreCooldown = true;
 		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;
@@ -54,7 +55,6 @@ public class RecklessSwing extends Ability {
 		if (event.getCause() == DamageCause.ENTITY_ATTACK) {
 			int missingHealthChunks = (int)((mPlayer.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue() - mPlayer.getHealth()) / DAMAGE_INCREMENT_THRESHOLD_HEALTH);
 			event.setDamage(event.getDamage() * (1 + Math.min(mMaxDamagePercent, mDamagePercentPer4Health * missingHealthChunks)));
-			cast(Action.LEFT_CLICK_AIR);
 		}
 
 		return true;
@@ -63,22 +63,25 @@ public class RecklessSwing extends Ability {
 	@Override
 	public void cast(Action action) {
 		if (mPlayer.isSneaking()) {
-			if (mPlayer.getHealth() <= SELF_DAMAGE) {
-				mPlayer.damage(9001);
-			} else {
-				mPlayer.setHealth(Math.min(mPlayer.getHealth() - SELF_DAMAGE, mPlayer.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue()));
-				mPlayer.damage(0);
-			}
+			// Run at the end of this tick so it'll apply after any damage dealt to mobs
+			Bukkit.getScheduler().runTask(mPlugin, () -> {
+				if (mPlayer.getHealth() <= SELF_DAMAGE) {
+					mPlayer.damage(9001);
+				} else {
+					mPlayer.setHealth(Math.min(mPlayer.getHealth() - SELF_DAMAGE, mPlayer.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue()));
+					mPlayer.damage(0);
+				}
 
-			Location loc = mPlayer.getLocation();
-			World world = mPlayer.getWorld();
-			world.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1, 1);
-			world.spawnParticle(Particle.SWEEP_ATTACK, loc, 25, 2, 0, 2, 0);
+				Location loc = mPlayer.getLocation();
+				World world = mPlayer.getWorld();
+				world.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1, 1);
+				world.spawnParticle(Particle.SWEEP_ATTACK, loc, 25, 2, 0, 2, 0);
 
-			for (LivingEntity mob : EntityUtils.getNearbyMobs(loc, RADIUS)) {
-				mob.setNoDamageTicks(0);
-				EntityUtils.damageEntity(mPlugin, mob, mDamage, mPlayer);
-			}
+				for (LivingEntity mob : EntityUtils.getNearbyMobs(loc, RADIUS)) {
+					mob.setNoDamageTicks(0);
+					EntityUtils.damageEntity(mPlugin, mob, mDamage, mPlayer);
+				}
+			});
 		}
 	}
 

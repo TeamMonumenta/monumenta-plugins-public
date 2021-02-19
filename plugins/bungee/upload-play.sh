@@ -10,5 +10,5 @@ fi
 
 echo "Plugin version: $plugin"
 
-scp -P 9922 $plugin epic@build.playmonumenta.com:/home/epic/play/project_epic/server_config/plugins/
-ssh -p 9922 epic@build.playmonumenta.com "cd /home/epic/play/project_epic/server_config/plugins && rm -f Monumenta-Bungee-Plugins.jar ; ln -s $plugin Monumenta-Bungee-Plugins.jar"
+scp -P 9922 $plugin epic@admin.playmonumenta.com:/home/epic/play/project_epic/server_config/plugins/
+ssh -p 9922 epic@admin.playmonumenta.com "cd /home/epic/play/project_epic/server_config/plugins && rm -f Monumenta-Bungee-Plugins.jar ; ln -s $plugin Monumenta-Bungee-Plugins.jar"

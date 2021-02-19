@@ -23,6 +23,7 @@ import com.playmonumenta.plugins.enchantments.BaseAbilityEnchantment;
 import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
 
@@ -68,9 +69,9 @@ public class EnfeeblingElixir extends Ability {
 
 	@Override
 	public void cast(Action action) {
-		ItemStack mHand = mPlayer.getInventory().getItemInMainHand();
+		ItemStack hand = mPlayer.getInventory().getItemInMainHand();
 
-		if (mHand.getType() != Material.BOW && mHand.getType() != Material.SPLASH_POTION) {
+		if (!InventoryUtils.isBowItem(hand) && hand.getType() != Material.SPLASH_POTION) {
 			for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), ENFEEBLING_RADIUS, mPlayer)) {
 				MovementUtils.knockAway(mPlayer, mob, mKnockbackSpeed);
 				PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(PotionEffectType.WEAKNESS, mDuration, mWeaknessAmp, true, false));

@@ -10,5 +10,5 @@ fi
 
 echo "Plugin version: $plugin"
 
-ssh -p 8822 epic@build.playmonumenta.com "cd /home/epic/dev2_shard_plugins && rm -f Monumenta*.jar"
-scp -P 8822 $plugin epic@build.playmonumenta.com:/home/epic/dev2_shard_plugins/
+ssh -p 8822 epic@admin.playmonumenta.com "cd /home/epic/dev2_shard_plugins && rm -f Monumenta*.jar"
+scp -P 8822 $plugin epic@admin.playmonumenta.com:/home/epic/dev2_shard_plugins/

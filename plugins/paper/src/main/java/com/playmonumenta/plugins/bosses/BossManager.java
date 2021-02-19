@@ -38,6 +38,7 @@ import org.bukkit.event.entity.EntityPotionEffectEvent;
 import org.bukkit.event.entity.EntityTargetEvent;
 import org.bukkit.event.entity.LingeringPotionSplashEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.entity.PlayerLeashEntityEvent;
 import org.bukkit.event.entity.PotionSplashEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
@@ -694,6 +695,13 @@ public class BossManager implements Listener {
 					}
 				}
 			}
+		}
+	}
+
+	@EventHandler(priority = EventPriority.NORMAL)
+	public void playerLeashEntityEvent(PlayerLeashEntityEvent event) {
+		if (!event.isCancelled() && mBosses.get(event.getEntity().getUniqueId()) != null) {
+			event.setCancelled(true);
 		}
 	}
 

@@ -3,6 +3,13 @@ package com.playmonumenta.plugins.listeners;
 import java.util.Map;
 import java.util.TreeMap;
 
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.enchantments.CurseOfEphemerality;
+import com.playmonumenta.plugins.overrides.FirmamentOverride;
+import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.ZoneUtils;
+
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -22,12 +29,6 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.BlockStateMeta;
-
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.enchantments.CurseOfEphemerality;
-import com.playmonumenta.plugins.overrides.FirmamentOverride;
-import com.playmonumenta.plugins.utils.InventoryUtils;
-import com.playmonumenta.plugins.utils.ItemUtils;
 
 public class ShulkerEquipmentListener implements Listener {
 	private static final String LOCK_STRING = "AdminEquipmentTool";
@@ -89,6 +90,13 @@ public class ShulkerEquipmentListener implements Listener {
 		}
 
 		Player player = (Player)event.getWhoClicked();
+
+		if (ZoneUtils.hasZoneProperty(player, ZoneUtils.ZoneProperty.NO_PORTABLE_STORAGE)) {
+			player.sendMessage(ChatColor.RED + "You can't use this here");
+			player.playSound(player.getLocation(), Sound.BLOCK_ENDER_CHEST_CLOSE, SoundCategory.PLAYERS, 1.0f, 0.6f);
+			return;
+		}
+
 		PlayerInventory pInv = player.getInventory();
 		ItemStack sboxItem = event.getCurrentItem();
 

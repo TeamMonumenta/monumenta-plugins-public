@@ -103,13 +103,14 @@ public class CarapaceBoss extends BossAbilityGroup {
 		double remainingCarapaceHealth = mCarapaceHealth - mDamageCounterPeriod;
 
 		if (remainingCarapaceHealth > 0) {
-			world.playSound(loc, Sound.BLOCK_ANVIL_PLACE, 0.05f, 2f);
-			world.playSound(loc, Sound.BLOCK_GRASS_PLACE, 0.05f, 0.5f);
 
 			double newDamage = damage - remainingCarapaceHealth;
 			if (newDamage > 0) {
+				world.playSound(loc, Sound.BLOCK_GLASS_BREAK, 0.3f, 0.2f);
 				event.setDamage(newDamage);
 			} else {
+				world.playSound(loc, Sound.BLOCK_ANVIL_PLACE, 0.05f, 2f);
+				world.playSound(loc, Sound.BLOCK_GRASS_PLACE, 0.05f, 0.5f);
 				event.setDamage(0);
 			}
 		}
@@ -131,8 +132,6 @@ public class CarapaceBoss extends BossAbilityGroup {
 
 			NavigableSet<Effect> effects = mPlugin.mEffectManager.getEffects(mBoss, SPEED_EFFECT_NAME);
 			if (effects == null) {
-				world.playSound(loc, Sound.BLOCK_GLASS_BREAK, 0.3f, 0.2f);
-
 				if (mSpeedEffect > 0) {
 					mPlugin.mEffectManager.addEffect(mBoss, SPEED_EFFECT_NAME, new PercentSpeed(duration, mSpeedEffect, SPEED_EFFECT_NAME));
 				}

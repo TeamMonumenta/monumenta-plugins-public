@@ -162,7 +162,7 @@ public class Volley extends Ability {
 
 	@Override
 	public boolean livingEntityShotByPlayerEvent(Projectile proj, LivingEntity le, EntityDamageByEntityEvent event) {
-		if (proj instanceof Arrow && ((Arrow) proj).hasMetadata(VOLLEY_METAKEY)) {
+		if (proj instanceof AbstractArrow && ((AbstractArrow) proj).hasMetadata(VOLLEY_METAKEY)) {
 			if (MetadataUtils.checkOnceThisTick(mPlugin, le, VOLLEY_HIT_METAKEY)) {
 				double damageMultiplier = getAbilityScore() == 1 ? VOLLEY_1_DAMAGE_MULTIPLIER : VOLLEY_2_DAMAGE_MULTIPLIER;
 				damageMultiplier = VolleyMultiplierEnchantment.getMultiplier(mPlayer, (float) damageMultiplier);

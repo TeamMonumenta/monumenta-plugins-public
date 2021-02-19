@@ -1,14 +1,12 @@
 package com.playmonumenta.plugins.bosses.bosses.gray;
 
-import org.bukkit.entity.Entity;
+import com.playmonumenta.plugins.bosses.bosses.BossAbilityGroup;
+
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.entity.AreaEffectCloudApplyEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-import org.bukkit.projectiles.ProjectileSource;
-
-import com.playmonumenta.plugins.bosses.bosses.BossAbilityGroup;
 
 public class GraySummoned extends BossAbilityGroup {
 	public static final String identityTag = "boss_gray_summoned";
@@ -27,13 +25,7 @@ public class GraySummoned extends BossAbilityGroup {
 	@Override
 	public void areaEffectAppliedToBoss(AreaEffectCloudApplyEvent event) {
 		if (event.getEntity() != null && event.getEntity().hasMetadata("MonumentaBossesGrayExorcism")) {
-			ProjectileSource source = event.getEntity().getSource();
-			if (source != null && source instanceof Entity) {
-				mBoss.damage(15, (Entity)source);
-			} else {
-				mBoss.damage(15);
-
-			}
+			mBoss.damage(15);
 			mBoss.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 40, 2, false, true));
 		}
 	}

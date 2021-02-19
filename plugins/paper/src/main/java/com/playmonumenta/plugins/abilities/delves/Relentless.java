@@ -39,19 +39,19 @@ public class Relentless extends DelveModifier {
 
 	public static final String[][] RANK_DESCRIPTIONS = {
 			{
-				"Enemies gain " + KBR_MODIFIER[0] + " Knockback Resistance.",
+				"Enemies gain " + Math.round(KBR_MODIFIER[0] * 100) + "% Knockback Resistance.",
 				"Enemies have a " + Math.round(BLOCK_BREAK_CHANCE[0] * 100) + "% chance to have Block Break."
 			}, {
-				"Enemies gain " + KBR_MODIFIER[1] + " Knockback Resistance.",
+				"Enemies gain " + Math.round(KBR_MODIFIER[1] * 100) + "% Knockback Resistance.",
 				"Enemies have a " + Math.round(BLOCK_BREAK_CHANCE[1] * 100) + "% chance to have Block Break."
 			}, {
-				"Enemies gain " + KBR_MODIFIER[2] + " Knockback Resistance.",
+				"Enemies gain " + Math.round(KBR_MODIFIER[2] * 100) + "% Knockback Resistance.",
 				"Enemies have a " + Math.round(BLOCK_BREAK_CHANCE[2] * 100) + "% chance to have Block Break."
 			}, {
-				"Enemies gain " + KBR_MODIFIER[3] + " Knockback Resistance.",
+				"Enemies gain " + Math.round(KBR_MODIFIER[3] * 100) + "% Knockback Resistance.",
 				"Enemies have a " + Math.round(BLOCK_BREAK_CHANCE[3] * 100) + "% chance to have Block Break."
 			}, {
-				"Enemies gain " + KBR_MODIFIER[4] + " Knockback Resistance.",
+				"Enemies gain " + Math.round(KBR_MODIFIER[4] * 100) + "% Knockback Resistance.",
 				"Enemies have a " + Math.round(BLOCK_BREAK_CHANCE[4] * 100) + "% chance to have Block Break."
 			}
 	};

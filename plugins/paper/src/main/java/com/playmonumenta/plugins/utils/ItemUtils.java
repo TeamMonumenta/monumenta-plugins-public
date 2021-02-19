@@ -155,7 +155,6 @@ public class ItemUtils {
 		Material.BROWN_BED,
 		Material.BROWN_SHULKER_BOX,
 		Material.CAKE,
-		Material.CAULDRON,
 		Material.CHAIN_COMMAND_BLOCK,
 		Material.CHEST,
 		Material.CHIPPED_ANVIL,
