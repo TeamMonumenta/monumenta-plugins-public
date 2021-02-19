@@ -136,6 +136,7 @@ import com.playmonumenta.plugins.utils.PotionUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
+import com.playmonumenta.scriptedquests.utils.MetadataUtils;
 
 public class PlayerListener implements Listener {
 	Plugin mPlugin = null;
@@ -1112,15 +1113,19 @@ public class PlayerListener implements Listener {
 		}
 	}
 
+	private static final String PLAYER_LEFT_BED_TICK_METAKEY = "PlayerLeftBedTick";
+
 	/*
 	 * Prevent players from passing through 1-thick barriers using beds
 	 */
 	@EventHandler(priority = EventPriority.HIGHEST)
 	public void playerBedLeaveEvent(PlayerBedLeaveEvent event) {
 		Player player = event.getPlayer();
-		Block bed = event.getBed();
-		Location loc = bed.getLocation();
-		player.teleport(loc.add(0.5, 1, 0.5));
+		if (MetadataUtils.checkOnceThisTick(mPlugin, player, PLAYER_LEFT_BED_TICK_METAKEY)) {
+			Block bed = event.getBed();
+			Location loc = bed.getLocation();
+			player.teleport(loc.add(0.5, 1, 0.5));
+		}
 	}
 
 	public static Set<Material> POTION_TYPES = EnumSet.of(Material.POTION, Material.SPLASH_POTION,
