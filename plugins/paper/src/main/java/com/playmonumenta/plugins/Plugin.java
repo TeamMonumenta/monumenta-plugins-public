@@ -8,6 +8,7 @@ import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.bosses.BossManager;
 import com.playmonumenta.plugins.bosses.spells.SpellDetectionCircle;
 import com.playmonumenta.plugins.commands.BarkifyHeldItem;
+import com.playmonumenta.plugins.commands.BossDebug;
 import com.playmonumenta.plugins.commands.BossFight;
 import com.playmonumenta.plugins.commands.CalculateReforge;
 import com.playmonumenta.plugins.commands.ClaimRaffle;
@@ -155,6 +156,7 @@ public class Plugin extends JavaPlugin {
 		ReforgeHeldItem.register();
 		ReforgeInventory.register();
 		DebugInfo.register(this);
+		BossDebug.register();
 		RefreshClass.register(this);
 		Effect.register(this);
 		RemoveTags.register();

@@ -108,7 +108,6 @@ public abstract class BossAbilityGroup {
 		Runnable active = new Runnable() {
 			private boolean mDisabled = true;
 
-
 			@Override
 			public void run() {
 				mNextActiveTimer -= 2;
@@ -127,7 +126,7 @@ public abstract class BossAbilityGroup {
 					}
 				}
 				if (bossCheck) {
-					mPlugin.getLogger().warning("Boss is missing but still registered as an active boss. Unloading...");
+					mPlugin.getLogger().warning("Boss " + mIdentityTag + " is missing but still registered as an active boss. Unloading...");
 					BossManager mgr = BossManager.getInstance();
 					if (mgr != null) {
 						BossManager.getInstance().unload(mBoss, false);
@@ -182,6 +181,10 @@ public abstract class BossAbilityGroup {
 		} else {
 			mPlugin.getLogger().severe("Warning: Boss '" + mIdentityTag + "' attempted to force cast '" + spell.toString() + "' but there are no active spells!");
 		}
+	}
+
+	public String getIdentityTag() {
+		return mIdentityTag;
 	}
 
 	/********************************************************************************

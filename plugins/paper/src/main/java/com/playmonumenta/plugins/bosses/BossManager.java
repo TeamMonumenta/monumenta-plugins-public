@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.bosses;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -448,6 +449,7 @@ public class BossManager implements Listener {
 				boss.death(event);
 				if (((LivingEntity) entity).getHealth() <= 0) {
 					boss.unload(false);
+					mBosses.remove(entity.getUniqueId());
 
 					/*
 					 * Remove special serialization data from drops. Should not be
@@ -463,7 +465,7 @@ public class BossManager implements Listener {
 	public void entityExplodeEvent(EntityExplodeEvent event) {
 		Entity entity = event.getEntity();
 		if (!event.isCancelled() && entity != null && entity instanceof Creeper) {
-			Boss boss = mBosses.get(entity.getUniqueId());
+			Boss boss = mBosses.remove(entity.getUniqueId());
 			if (boss != null) {
 				boss.death(null);
 				boss.unload(false);
@@ -855,6 +857,30 @@ public class BossManager implements Listener {
 					}
 				}
 			}
+		}
+	}
+
+	public void sendBossDebugInfo(CommandSender sender) {
+		sender.sendMessage("");
+		sender.sendMessage("Total number of loaded bosses: " + mBosses.size());
+
+		Map<String, Integer> bossCounts = new HashMap<>();
+		for (Boss boss : mBosses.values()) {
+			String tags = String.join(" ", boss.getIdentityTags());
+			Integer count = bossCounts.get(tags);
+			if (count == null) {
+				count = 1;
+			} else {
+				count += 1;
+			}
+			bossCounts.put(tags, count);
+		}
+
+		List<Map.Entry<String, Integer>> list = new ArrayList<>(bossCounts.entrySet());
+        list.sort(Map.Entry.comparingByValue());
+
+		for (Map.Entry<String, Integer> entry : list) {
+			sender.sendMessage("  " + entry.getKey() + ": " + entry.getValue());
 		}
 	}
 

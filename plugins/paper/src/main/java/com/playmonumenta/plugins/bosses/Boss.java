@@ -1,7 +1,9 @@
 package com.playmonumenta.plugins.bosses;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.bukkit.entity.Entity;
 import org.bukkit.event.entity.AreaEffectCloudApplyEvent;
@@ -276,5 +278,11 @@ public class Boss {
 
 	public void setLastHitBy(Entity getLastHitBy) {
 		this.mLastHitBy = getLastHitBy;
+	}
+
+	public List<String> getIdentityTags() {
+		List<String> tags = mAbilities.stream().map(ability -> ability.getIdentityTag()).collect(Collectors.toList());
+		Collections.sort(tags);
+		return tags;
 	}
 }
