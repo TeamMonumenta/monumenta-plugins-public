@@ -197,6 +197,9 @@ public class FrostGiant extends BossAbilityGroup {
 
 	private UltimateSeismicRuin mRuin;
 
+	//Default: 3f, phase 3: 1f, phase 4: 0.5f
+	private float mMeleeKnockback = 3f;
+
 	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
 		return SerializationUtils.statefulBossDeserializer(boss, identityTag, (spawnLoc, endLoc) -> {
 			return new FrostGiant(plugin, boss, spawnLoc, endLoc);
@@ -329,19 +332,30 @@ public class FrostGiant extends BossAbilityGroup {
 						}.runTaskLater(mPlugin, 20);
 						//Damages and knocks back player
 						if (target instanceof Player) {
-							BossUtils.bossDamagePercent(mBoss, (Player) target, 0.6);
+							BossUtils.bossDamagePercent(mBoss, (Player) target, 0.5);
 						} else {
 							target.damage(mAttackDamage, mBoss);
 						}
-						MovementUtils.knockAway(mBoss.getLocation(), target, 2f, 1f, false);
+						//Lessknockback = true for phases 3 and onward
+						MovementUtils.knockAway(mBoss.getLocation(), target, mMeleeKnockback, 0.1f, false);
+
 						world.playSound(mBoss.getLocation(), Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, SoundCategory.HOSTILE, 2, 0.1f);
 						world.playSound(mBoss.getLocation(), Sound.ENTITY_GENERIC_HURT, SoundCategory.HOSTILE, 3, 0.5f);
 						world.spawnParticle(Particle.EXPLOSION_NORMAL, target.getLocation(), 50, 2, 0.1, 2, 0.1);
 						world.spawnParticle(Particle.LAVA, target.getLocation(), 15, 2, 0.1, 2, 0.1);
 						world.spawnParticle(Particle.BLOCK_DUST, target.getLocation(), 40, 2, 0.35, 2, 0.25, Material.COARSE_DIRT.createBlockData());
+
+						//List is farthest players in the beginning, and nearest players at the end
+						for (Player p : EntityUtils.getNearestPlayers(mStartLoc, detectionRange)) {
+							if (p.getGameMode() == GameMode.SURVIVAL) {
+								c.setTarget(p);
+								break;
+							}
+						}
 					}
 				} else {
-					for (Player p : PlayerUtils.playersInRange(mStartLoc, detectionRange)) {
+					//List is farthest players in the beginning, and nearest players at the end
+					for (Player p : EntityUtils.getNearestPlayers(mStartLoc, detectionRange)) {
 						if (p.getGameMode() == GameMode.SURVIVAL) {
 							c.setTarget(p);
 							break;
@@ -381,7 +395,8 @@ public class FrostGiant extends BossAbilityGroup {
 							if (mTicks >= 10) {
 								mT = 0;
 
-								List<Player> players = PlayerUtils.playersInRange(mTargeted.getLocation(), fighterRange);
+								//List is farthest players in the beginning, and nearest players at the end
+								List<Player> players = EntityUtils.getNearestPlayers(mStartLoc, detectionRange);
 								if (players == null || players.size() < 0) {
 									return;
 								}
@@ -432,13 +447,13 @@ public class FrostGiant extends BossAbilityGroup {
 
 		SpellManager phase1Spells = new SpellManager(Arrays.asList(
 				new SpellAirGolemStrike(mPlugin, mBoss, mStartLoc),
-				new Shatter(mPlugin, mBoss, 4f),
+				new Shatter(mPlugin, mBoss, 2.5f),
 				new SpellGlacialPrison(mPlugin, mBoss, fighterRange, mStartLoc),
 				new RingOfFrost(mPlugin, mBoss, 12, mStartLoc)
 				));
 
 		SpellManager phase2Spells = new SpellManager(Arrays.asList(
-				new Shatter(mPlugin, mBoss, 4f),
+				new Shatter(mPlugin, mBoss, 2.5f),
 				new SpellAirGolemStrike(mPlugin, mBoss, mStartLoc),
 				new SpellGreatswordSlam(mPlugin, mBoss, 60, 90),
 				new SpellGreatswordSlam(mPlugin, mBoss, 60, 90),
@@ -447,14 +462,14 @@ public class FrostGiant extends BossAbilityGroup {
 				));
 
 		SpellManager phase3Spells = new SpellManager(Arrays.asList(
-				new Shatter(mPlugin, mBoss, 4f),
+				new Shatter(mPlugin, mBoss, 2f),
 				new SpellTitanicRupture(mPlugin, mBoss, mStartLoc),
 				new SpellFrostRift(mPlugin, mBoss, mStartLoc),
 				new SpellGreatswordSlam(mPlugin, mBoss, 60, 90)
 				));
 
 		SpellManager phase4Spells = new SpellManager(Arrays.asList(
-				new Shatter(mPlugin, mBoss, 2f),
+				new Shatter(mPlugin, mBoss, 1f),
 				new SpellTitanicRupture(mPlugin, mBoss, mStartLoc),
 				new SpellFrostRift(mPlugin, mBoss, mStartLoc),
 				new SpellGreatswordSlam(mPlugin, mBoss, 30, 60)
@@ -464,7 +479,7 @@ public class FrostGiant extends BossAbilityGroup {
 				new ArmorOfFrost(mPlugin, mBoss, this, 3),
 				new SpellPurgeNegatives(mBoss, 20 * 4),
 				new SpellFrostGiantBlockBreak(mBoss, 5, 15, 5, mStartLoc),
-				new SpellHailstorm(mPlugin, mBoss, 24, mStartLoc),
+				new SpellHailstorm(mPlugin, mBoss, 16, mStartLoc),
 				new SpellFrostbite(mPlugin, mBoss, mStartLoc)
 				);
 
@@ -472,7 +487,7 @@ public class FrostGiant extends BossAbilityGroup {
 				new ArmorOfFrost(mPlugin, mBoss, this, 2),
 				new SpellPurgeNegatives(mBoss, 20 * 3),
 				new SpellFrostGiantBlockBreak(mBoss, 5, 15, 5, mStartLoc),
-				new SpellHailstorm(mPlugin, mBoss, 24, mStartLoc),
+				new SpellHailstorm(mPlugin, mBoss, 16, mStartLoc),
 				new SpellFrostbite(mPlugin, mBoss, mStartLoc),
 				new SpellFrostedIceBreak(mBoss)
 				);
@@ -480,7 +495,7 @@ public class FrostGiant extends BossAbilityGroup {
 				new ArmorOfFrost(mPlugin, mBoss, this, 1),
 				new SpellPurgeNegatives(mBoss, 20 * 2),
 				new SpellFrostGiantBlockBreak(mBoss, 5, 15, 5, mStartLoc),
-				new SpellHailstorm(mPlugin, mBoss, 24, mStartLoc),
+				new SpellHailstorm(mPlugin, mBoss, 16, mStartLoc),
 				new SpellFrostbite(mPlugin, mBoss, mStartLoc),
 				new SpellFrostedIceBreak(mBoss)
 				);
@@ -489,7 +504,7 @@ public class FrostGiant extends BossAbilityGroup {
 				new ArmorOfFrost(mPlugin, mBoss, this, 1, false),
 				new SpellPurgeNegatives(mBoss, 20 * 2),
 				new SpellFrostGiantBlockBreak(mBoss, 5, 15, 5, mStartLoc),
-				new SpellHailstorm(mPlugin, mBoss, 24, mStartLoc),
+				new SpellHailstorm(mPlugin, mBoss, 16, mStartLoc),
 				new SpellFrostbite(mPlugin, mBoss, mStartLoc),
 				new SpellFrostedIceBreak(mBoss)
 				);
@@ -540,6 +555,8 @@ public class FrostGiant extends BossAbilityGroup {
 
 		//Phase 3
 		events.put(33, mBoss -> {
+			mMeleeKnockback = 1;
+
 			PlayerUtils.executeCommandOnNearbyPlayers(mStartLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"THE SONG WILL PREVAIL... ALL WILL SUCCUMB TO THE BITTER COLD...\",\"color\":\"dark_aqua\"}]");
 			//Manually cancel Armor of Frost's cooldown mechanic
 			for (Spell sp : phase2PassiveSpells) {
@@ -566,6 +583,7 @@ public class FrostGiant extends BossAbilityGroup {
 
 		//Third and fourth seismic ruin
 		events.put(10, mBoss -> {
+
 			PlayerUtils.executeCommandOnNearbyPlayers(mStartLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"I... WILL NOT... BE THE END... OF THE SONG!\",\"color\":\"dark_aqua\"}]");
 			mFrostArmorActive = true;
 			changePhase(phase4Spells, phase4PassiveSpells, null);
@@ -599,12 +617,12 @@ public class FrostGiant extends BossAbilityGroup {
 					double radian = Math.toRadians(degree);
 					double cos = FastUtils.cos(radian);
 					double sin = FastUtils.sin(radian);
-					loc.add(cos * (24 + 5), 2.5, sin * (24 + 5));
+					loc.add(cos * (18 + 5), 2.5, sin * (18 + 5));
 					world.spawnParticle(Particle.CLOUD, loc, 3, 3, 1, 4, 0.075);
 					world.spawnParticle(Particle.CLOUD, loc, 3, 3, 4, 4, 0.075);
 					world.spawnParticle(Particle.REDSTONE, loc, 3, 3, 4, 4, 0.075, BLUE_COLOR);
 					world.spawnParticle(Particle.REDSTONE, loc, 3, 3, 1, 4, 0.075, BLUE_COLOR);
-					loc.subtract(cos * (24 + 5), 2.5, sin * (24 + 5));
+					loc.subtract(cos * (18 + 5), 2.5, sin * (18 + 5));
 				}
 
 				for (double degree = 0; degree < 360; degree++) {
@@ -612,9 +630,9 @@ public class FrostGiant extends BossAbilityGroup {
 						double radian = Math.toRadians(degree);
 						double cos = FastUtils.cos(radian);
 						double sin = FastUtils.sin(radian);
-						loc.add(cos * (24 + 2), 0.5, sin * (24 + 2));
+						loc.add(cos * (18 + 2), 0.5, sin * (18 + 2));
 						world.spawnParticle(Particle.REDSTONE, loc, 1, 0, 0, 0, LIGHT_BLUE_COLOR);
-						loc.subtract(cos * (24 + 2), 0.5, sin * (24 + 2));
+						loc.subtract(cos * (18 + 2), 0.5, sin * (18 + 2));
 					}
 				}
 
@@ -1079,13 +1097,21 @@ public class FrostGiant extends BossAbilityGroup {
 		world.spawnParticle(Particle.FIREWORKS_SPARK, mBoss.getLocation().add(0, 1, 0), 70, 0.25, 0.45, 0.25, 0.15);
 		world.spawnParticle(Particle.SMOKE_LARGE, mBoss.getLocation().add(0, 1, 0), 35, 0.1, 0.45, 0.1, 0.15);
 		world.spawnParticle(Particle.EXPLOSION_NORMAL, mBoss.getLocation(), 25, 0.2, 0, 0.2, 0.1);
+
+		if (getPassives() != null) {
+			for (Spell sp : getPassives()) {
+				if (sp instanceof SpellHailstorm) {
+					((SpellHailstorm) sp).delayDamage();
+				}
+			}
+		}
 	}
 
 	@Override
 	public void init() {
 		int bossTargetHp = 0;
 		int playerCount = PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange).size();
-		int hpDel = 5012;
+		int hpDel = 7012;
 		int armor = (int)(Math.sqrt(playerCount * 2) - 1);
 
 		/*

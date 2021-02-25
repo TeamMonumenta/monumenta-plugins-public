@@ -34,6 +34,9 @@ import com.playmonumenta.plugins.utils.PlayerUtils;
  */
 public class SpellHailstorm extends Spell {
 
+	//Used when the boss teleports, prevent from doing damage
+	private boolean mDoDamage = true;
+
 	private Plugin mPlugin;
 	private LivingEntity mBoss;
 	private Location mStartLoc;
@@ -91,13 +94,13 @@ public class SpellHailstorm extends Spell {
 		}
 
 		for (Player player : PlayerUtils.playersInRange(loc, FrostGiant.fighterRange)) {
-			if (!player.getLocation().toVector().isInSphere(mBoss.getLocation().toVector(), mRadius) && player.getGameMode() != GameMode.CREATIVE && !mDamage.containsKey(player) && mStartLoc.distance(player.getLocation()) <= FrostGiant.fighterRange) {
+			if (mDoDamage && !player.getLocation().toVector().isInSphere(mBoss.getLocation().toVector(), mRadius) && player.getGameMode() != GameMode.CREATIVE && !mDamage.containsKey(player) && mStartLoc.distance(player.getLocation()) <= FrostGiant.fighterRange) {
 				BukkitRunnable runnable = new BukkitRunnable() {
 					int mTicks = 0;
 					float mPitch = 1;
 					@Override
 					public void run() {
-						if (mTicks <= 20) {
+						if (mTicks <= 10) {
 							player.playSound(player.getLocation(), Sound.ENTITY_SNOW_GOLEM_HURT, SoundCategory.HOSTILE, 1, mPitch);
 						}
 
@@ -108,13 +111,13 @@ public class SpellHailstorm extends Spell {
 
 						}
 
-						if (mTicks >= 20 && mTicks % 10 == 0) {
+						if (mTicks >= 10 && mTicks % 10 == 0) {
 							if (player.isDead() || mBoss.isDead() || !mBoss.isValid() || player.getGameMode() == GameMode.CREATIVE) {
 								mDamage.remove(player);
 								this.cancel();
 							}
 
-							if (!player.getLocation().toVector().isInSphere(mBoss.getLocation().toVector(), mRadius)) {
+							if (!player.getLocation().toVector().isInSphere(mBoss.getLocation().toVector(), mRadius) && mDoDamage) {
 								Vector vel = player.getVelocity();
 								BossUtils.bossDamagePercent(mBoss, player, 0.1, loc);
 								player.setVelocity(vel);
@@ -138,6 +141,16 @@ public class SpellHailstorm extends Spell {
 			}
 		}
 		mAttack = false;
+	}
+
+	public void delayDamage() {
+		mDoDamage = false;
+		new BukkitRunnable() {
+			@Override
+			public void run() {
+				mDoDamage = true;
+			}
+		}.runTaskLater(mPlugin, 30);
 	}
 
 	@Override

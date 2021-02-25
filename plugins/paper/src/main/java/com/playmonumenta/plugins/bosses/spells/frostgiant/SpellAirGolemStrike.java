@@ -59,7 +59,7 @@ public class SpellAirGolemStrike extends Spell {
 		}.runTaskLater(mPlugin, 20 * 24);
 
 		int count = 0;
-		//List is sorted with nearest players earlier in the list, and farthest players at the end
+		//List is farthest players in the beginning, and nearest players at the end
 		List<Player> players = EntityUtils.getNearestPlayers(mBoss.getLocation(), FrostGiant.detectionRange);
 		players.removeIf(p -> p.getGameMode() == GameMode.SPECTATOR || mStartLoc.distance(p.getLocation()) > FrostGiant.fighterRange);
 		if (players.size() < 3) {
@@ -225,7 +225,7 @@ public class SpellAirGolemStrike extends Spell {
 
 	@Override
 	public int duration() {
-		return 20 * 8;
+		return 20 * 5;
 	}
 
 	@Override

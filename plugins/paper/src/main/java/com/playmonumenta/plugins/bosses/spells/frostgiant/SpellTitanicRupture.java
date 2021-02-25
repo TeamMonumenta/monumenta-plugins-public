@@ -195,7 +195,7 @@ public class SpellTitanicRupture extends Spell {
 
 	@Override
 	public int duration() {
-		return 20 * 12;
+		return 20 * 7;
 	}
 
 }

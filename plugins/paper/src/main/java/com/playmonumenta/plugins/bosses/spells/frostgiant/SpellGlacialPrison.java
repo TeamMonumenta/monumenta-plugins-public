@@ -201,7 +201,7 @@ public class SpellGlacialPrison extends Spell {
 
 	@Override
 	public int duration() {
-		return 20 * 10;
+		return 20 * 8;
 	}
 
 	@Override

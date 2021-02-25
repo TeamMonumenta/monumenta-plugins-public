@@ -60,7 +60,7 @@ public class SpellFrostbite extends Spell {
 				return;
 			}
 
-			if (playerLoc.getY() - mStartLoc.getY() >= 3 && (player.getGameMode() == GameMode.SURVIVAL || player.getLocation().distance(mStartLoc) < FrostGiant.fighterRange) && player.isOnGround()) {
+			if (playerLoc.getY() - mStartLoc.getY() >= 4 && (player.getGameMode() == GameMode.SURVIVAL || player.getLocation().distance(mStartLoc) < FrostGiant.fighterRange)) {
 				BossUtils.bossDamagePercent(mBoss, player, 0.1, mBoss.getLocation());
 
 				world.playSound(playerLoc, Sound.BLOCK_GLASS_BREAK, SoundCategory.HOSTILE, 1, 1);
@@ -70,7 +70,7 @@ public class SpellFrostbite extends Spell {
 					player.sendMessage(ChatColor.RED + "The upper air is freezing!");
 					mWarned.add(player);
 				}
-			} else if (playerLoc.getY() - mStartLoc.getY() <= -3) {
+			} else if (playerLoc.getY() - mStartLoc.getY() <= -4) {
 				BossUtils.bossDamagePercent(mBoss, player, 0.1, mBoss.getLocation());
 
 				world.playSound(playerLoc, Sound.BLOCK_GLASS_BREAK, SoundCategory.HOSTILE, 1, 1);

@@ -67,6 +67,8 @@ public class SpellGreatswordSlam extends Spell {
 
 		pathfinder.stopPathfinding();
 
+		Vector bossDir = mBoss.getLocation().getDirection();
+
 		//Saves locations for places to convert from frosted ice back to its original block
 		Map<Location, Material> oldBlocks = new HashMap<>();
 		Map<Location, BlockData> oldData = new HashMap<>();
@@ -77,8 +79,9 @@ public class SpellGreatswordSlam extends Spell {
 			int mT = 0;
 			@Override
 			public void run() {
+
 				mT += 10;
-				if (mT > 20 * 4) {
+				if (mT > 20 * 6) {
 					this.cancel();
 				}
 
@@ -94,23 +97,27 @@ public class SpellGreatswordSlam extends Spell {
 						world.spawnParticle(Particle.END_ROD, l, 1, 0.25, 0.25, 0.25, 0);
 					}
 				}
+
+				if (mT <= 70) {
+					mBoss.teleport(mBoss.getLocation().setDirection(bossDir));
+				}
 			}
 		}.runTaskTimer(mPlugin, 0, 10);
 
 		BukkitRunnable runnable = new BukkitRunnable() {
 			int mT = 0;
+			List<Player> mHitPlayers = new ArrayList<>();
 			@Override
 			public void run() {
 				mT += 2;
 
-				if (mT <= 20 && mT >= 10) {
+				if (mT <= 40 && mT >= 30) {
 					//Initiates the jump upwards
-					mBoss.setVelocity(new Vector(0, 2, 0));
-				}
-				if (mT >= 20) {
+					mBoss.setVelocity(new Vector(0, 1.5, 0));
+				} else if (mT >= 40) {
 					if (!mBoss.isOnGround()) {
 						//Initiates the slam down
-						mBoss.setVelocity(new Vector(0, -2, 0));
+						mBoss.setVelocity(new Vector(0, -1.5, 0));
 					} else {
 						//Creates the giant 30 degree cone rift of damage
 						world.playSound(loc, Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, SoundCategory.HOSTILE, 1, 0);
@@ -118,6 +125,9 @@ public class SpellGreatswordSlam extends Spell {
 							int mRadius = 0;
 							@Override
 							public void run() {
+
+								mBoss.setVelocity(new Vector(0, 0, 0));
+								pathfinder.stopPathfinding();
 
 								if (mRadius >= 30) {
 									this.cancel();
@@ -148,29 +158,35 @@ public class SpellGreatswordSlam extends Spell {
 									if (l.getBlock().getType() == Material.BEDROCK || l.getBlock().getType() == Material.BARRIER) {
 										l.add(0, 1, 0);
 									}
-									Location tempLoc = l.clone();
-									for (int y = 1; y <= 5; y++) {
-										tempLoc.setY(l.getY() + y);
-										tempLoc.getBlock().setType(Material.AIR);
-									}
 									if (l.getBlock().getType() != Material.FROSTED_ICE) {
 										oldBlocks.put(l, l.getBlock().getType());
 										oldData.put(l, l.getBlock().getBlockData());
 									}
 									l.getBlock().setType(Material.FROSTED_ICE);
-									world.spawnParticle(Particle.SPELL_INSTANT, l, 3, 0.45, 6, 0.45, 0, null, true);
 									Ageable age = (Ageable) l.getBlock().getBlockData();
 									age.setAge(1 + FastUtils.RANDOM.nextInt(3));
 									l.getBlock().setBlockData(age);
 
-									//1.65 -> 15
-									BoundingBox box = BoundingBox.of(l, 1, 15, 1);
+									//15 -> 3.65 lol
+									BoundingBox box = BoundingBox.of(l, 1, 3.65, 1);
 									boxes.add(box);
 
-									FallingBlock fallBlock = world.spawnFallingBlock(l, Bukkit.createBlockData(Material.BLUE_ICE));
+									FallingBlock fallBlock = world.spawnFallingBlock(l.add(0, 0.4, 0), Bukkit.createBlockData(Material.BLUE_ICE));
 									fallBlock.setDropItem(false);
-									fallBlock.setVelocity(new Vector(0, 0.2, 0));
+									fallBlock.setVelocity(new Vector(0, 0.4, 0));
 									fallBlock.setHurtEntities(false);
+
+									new BukkitRunnable() {
+										@Override
+										public void run() {
+											if (!fallBlock.isDead() || fallBlock.isValid()) {
+												fallBlock.remove();
+												if (fallBlock.getLocation().getBlock().getType() == Material.BLUE_ICE) {
+													fallBlock.getLocation().getBlock().setType(Material.AIR);
+												}
+											}
+										}
+									}.runTaskLater(mPlugin, 10);
 
 									world.spawnParticle(Particle.CLOUD, l, 2, 0.15, 0.15, 0.15, 0.125);
 									world.spawnParticle(Particle.CRIT, l, 8, 0.15, 0.15, 0.15, 0.7);
@@ -181,21 +197,24 @@ public class SpellGreatswordSlam extends Spell {
 								}
 								for (Player player : PlayerUtils.playersInRange(loc, 40)) {
 									for (BoundingBox box : boxes) {
-										if (player.getBoundingBox().overlaps(box) &&
-										    (player.getLocation().getBlock().getRelative(BlockFace.DOWN).getType() != Material.AIR || player.getLocation().getBlock().getType() != Material.AIR)) {
-											BossUtils.bossDamagePercent(mBoss, player, 0.4);
+										if (player.getBoundingBox().overlaps(box) && !mHitPlayers.contains(player)) {
+											BossUtils.bossDamagePercent(mBoss, player, 0.3);
 											AbilityUtils.silencePlayer(player, 20 * 5);
-											MovementUtils.knockAway(loc, player, 3f, 1f, false);
+											MovementUtils.knockAway(loc, player, 0f, 1.5f, false);
+											mHitPlayers.add(player);
 											break;
 										}
 									}
 								}
 								mRadius++;
 							}
-						}.runTaskTimer(mPlugin, 0, 2);
+						}.runTaskTimer(mPlugin, 0, 1);
 						FrostGiant.unfreezeGolems(mBoss);
 						this.cancel();
 					}
+				} else {
+					mBoss.setVelocity(new Vector(0, 0, 0));
+					pathfinder.stopPathfinding();
 				}
 			}
 		};
@@ -271,7 +290,7 @@ public class SpellGreatswordSlam extends Spell {
 
 	@Override
 	public int duration() {
-		return 20 * 8;
+		return 20 * 6;
 	}
 
 }

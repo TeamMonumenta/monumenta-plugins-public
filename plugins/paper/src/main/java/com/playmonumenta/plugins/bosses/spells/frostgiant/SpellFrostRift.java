@@ -68,6 +68,7 @@ public class SpellFrostRift extends Spell {
 
 		List<Player> players = PlayerUtils.playersInRange(mStartLoc, FrostGiant.fighterRange);
 		List<Player> targets = new ArrayList<Player>();
+		List<Location> locs = new ArrayList<Location>();
 		if (players.size() >= 2) {
 			int cap = (int) Math.ceil(players.size() / 2);
 			if (cap >= 3) {
@@ -77,6 +78,7 @@ public class SpellFrostRift extends Spell {
 				Player player = players.get(FastUtils.RANDOM.nextInt(players.size()));
 				if (!targets.contains(player)) {
 					targets.add(player);
+					locs.add(player.getLocation());
 				} else {
 					cap++;
 				}
@@ -84,6 +86,7 @@ public class SpellFrostRift extends Spell {
 		} else {
 			for (Player p : players) {
 				targets.add(p);
+				locs.add(p.getLocation());
 			}
 		}
 
@@ -107,8 +110,8 @@ public class SpellFrostRift extends Spell {
 				if (mT >= 20 * 2.5) {
 					this.cancel();
 
-					for (Player player : targets) {
-						createRift(player, players);
+					for (Location l : locs) {
+						createRift(l, players);
 					}
 				}
 			}
@@ -116,9 +119,9 @@ public class SpellFrostRift extends Spell {
 
 	}
 
-	private void createRift(Player target, List<Player> players) {
+	private void createRift(Location loc, List<Player> players) {
 		List<Location> locs = new ArrayList<Location>();
-		World world = target.getWorld();
+		World world = mBoss.getWorld();
 
 		Map<Location, Material> oldBlocks = new HashMap<>();
 		Map<Location, BlockData> oldData = new HashMap<>();
@@ -126,7 +129,7 @@ public class SpellFrostRift extends Spell {
 		new BukkitRunnable() {
 			Location mLoc = mBoss.getLocation().add(0, 0.5, 0);
 			World mWorld = mLoc.getWorld();
-			Vector mDir = LocationUtils.getDirectionTo(target.getLocation(), mLoc).setY(0).normalize();
+			Vector mDir = LocationUtils.getDirectionTo(loc, mLoc).setY(0).normalize();
 			BoundingBox mBox = BoundingBox.of(mLoc, 0.85, 0.35, 0.85);
 			Location mOgLoc = mLoc.clone();
 			@Override
@@ -228,7 +231,7 @@ public class SpellFrostRift extends Spell {
 
 	@Override
 	public int duration() {
-		return 20 * 12;
+		return 20 * 7;
 	}
 
 }

@@ -259,6 +259,6 @@ public class Shatter extends Spell {
 
 	@Override
 	public int duration() {
-		return 20 * 10;
+		return 20 * 7;
 	}
 }

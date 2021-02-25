@@ -237,7 +237,7 @@ public class SpellSpinDown extends Spell {
 
 	@Override
 	public int duration() {
-		return 20 * 8;
+		return 20 * 7;
 	}
 
 	@Override
