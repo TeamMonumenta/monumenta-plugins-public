@@ -333,7 +333,7 @@ public class Plugin extends JavaPlugin {
 
 		// Hook into JeffChestSort for custom chest sorting if present
 		if (Bukkit.getPluginManager().isPluginEnabled("ChestSort")) {
-			manager.registerEvents(new ChestSortIntegration(this.getLogger()), this);
+			manager.registerEvents(new ChestSortIntegration(this), this);
 		}
 
 		// Hook into Monumenta Redis Sync for server transfers if available

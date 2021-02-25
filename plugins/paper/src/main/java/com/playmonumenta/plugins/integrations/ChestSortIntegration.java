@@ -1,19 +1,32 @@
 package com.playmonumenta.plugins.integrations;
 
+import java.util.HashSet;
 import java.util.Map;
-import java.util.logging.Logger;
+import java.util.Set;
+import java.util.UUID;
+
+import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.ZoneUtils;
+import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.inventory.ClickType;
+import org.bukkit.event.inventory.InventoryAction;
+import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryCloseEvent;
+import org.bukkit.event.inventory.InventoryOpenEvent;
+import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.plugin.Plugin;
-
-import com.playmonumenta.plugins.utils.ItemUtils;
 
 import de.jeff_media.ChestSort.ChestSortPlugin;
 import de.jeff_media.ChestSortAPI.ChestSortAPI;
@@ -22,9 +35,12 @@ import de.jeff_media.ChestSortAPI.ChestSortEvent;
 public class ChestSortIntegration implements Listener {
 	private static boolean checkedForPlugin = false;
 	private static ChestSortAPI chestSortAPI = null;
+	private final com.playmonumenta.plugins.Plugin mPlugin;
+	private final Set<UUID> mClicked = new HashSet<>();
 
-	public ChestSortIntegration(Logger logger) {
-		logger.info("Enabling ChestSort integration");
+	public ChestSortIntegration(com.playmonumenta.plugins.Plugin plugin) {
+		mPlugin = plugin;
+		plugin.getLogger().info("Enabling ChestSort integration");
 	}
 
 	private static void checkForPlugin() {
@@ -44,12 +60,82 @@ public class ChestSortIntegration implements Listener {
 	}
 
 	public static void sortInventory(Inventory inventory) {
-		if (isPresent()) {
-			if (inventory instanceof PlayerInventory) {
-				chestSortAPI.sortInventory(inventory, 9, 35);
-			} else {
-				chestSortAPI.sortInventory(inventory);
+		if (!isPresent()) {
+			return;
+		}
+
+		if (inventory instanceof PlayerInventory) {
+			chestSortAPI.sortInventory(inventory, 9, 35);
+		} else {
+			chestSortAPI.sortInventory(inventory);
+		}
+	}
+
+	@EventHandler(priority = EventPriority.HIGH)
+	public void inventoryClickEvent(InventoryClickEvent event) {
+		if (event.isCancelled() || !isPresent()) {
+			return;
+		}
+		if (event.getWhoClicked() instanceof Player) {
+			Player player = (Player) event.getWhoClicked();
+			InventoryUtils.scheduleDelayedEquipmentCheck(mPlugin, player, event);
+			Inventory inventory = event.getClickedInventory();
+			if (inventory == null) {
+				return;
 			}
+
+			if (!(inventory instanceof PlayerInventory) && ZoneUtils.hasZoneProperty(player, ZoneProperty.SHOPS_POSSIBLE)) {
+				/* Don't sort market chests */
+				return;
+			}
+
+			if (event.getClick() != null
+				&& event.getClick().equals(ClickType.RIGHT)
+				&& inventory.getItem(event.getSlot()) == null
+				&& event.getAction().equals(InventoryAction.NOTHING)
+				&& event.getSlotType() != InventoryType.SlotType.CRAFTING) {
+
+				// Player right clicked a non-crafting empty space and nothing happened
+				// Check if the last thing the player did was also the same thing.
+				// If so, sort the chest
+				if (mClicked.contains(player.getUniqueId())) {
+					ChestSortIntegration.sortInventory(inventory);
+					player.updateInventory();
+					mClicked.remove(player.getUniqueId());
+
+					// Just in case we sorted an item on top of where the player was clicking
+					event.setCancelled(true);
+				} else {
+					// Mark the player as having right clicked an empty slot
+					mClicked.add(player.getUniqueId());
+				}
+			} else {
+				// Player did something else with this inventory - clear the marker
+				mClicked.remove(player.getUniqueId());
+			}
+		}
+	}
+
+	@EventHandler(priority = EventPriority.HIGH)
+	public void inventoryOpenEvent(InventoryOpenEvent event) {
+		if (event.isCancelled() || !isPresent()) {
+			return;
+		}
+
+		if (event.getPlayer() instanceof Player) {
+			mClicked.remove(event.getPlayer().getUniqueId());
+		}
+	}
+
+	@EventHandler(priority = EventPriority.HIGH)
+	public void inventoryCloseEvent(InventoryCloseEvent event) {
+		if (!isPresent()) {
+			return;
+		}
+
+		InventoryHolder holder = event.getInventory().getHolder();
+		if (holder != null && holder instanceof Player) {
+			mClicked.remove(((Player) holder).getUniqueId());
 		}
 	}
 
