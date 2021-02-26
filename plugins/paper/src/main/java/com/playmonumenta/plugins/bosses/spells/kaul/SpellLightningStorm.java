@@ -29,7 +29,7 @@ public class SpellLightningStorm extends Spell {
 	private LivingEntity mBoss;
 	private double mRange;
 	private static final String LIGHTNING_STORM_TAG = "KaulLightningStormTag";
-	private LivingEntity mCenter;
+	private Location mCenter;
 	private List<Player> mWarnedPlayers = new ArrayList<Player>();
 	private static final Particle.DustOptions YELLOW_1_COLOR = new Particle.DustOptions(Color.fromRGB(255, 255, 20), 1.0f);
 	private static final Particle.DustOptions YELLOW_2_COLOR = new Particle.DustOptions(Color.fromRGB(255, 255, 120), 1.0f);
@@ -39,7 +39,7 @@ public class SpellLightningStorm extends Spell {
 		mRange = range;
 		for (Entity e : boss.getWorld().getEntities()) {
 			if (e.getScoreboardTags().contains(LIGHTNING_STORM_TAG) && e instanceof LivingEntity) {
-				mCenter = (LivingEntity) e;
+				mCenter = e.getLocation();
 				break;
 			}
 		}
@@ -50,16 +50,28 @@ public class SpellLightningStorm extends Spell {
 		mTicks--;
 		if (mTicks <= 0) {
 			mTicks = 6;
-			for (Player player : PlayerUtils.playersInRange(mCenter.getLocation(), mRange)) {
-				Location loc = player.getLocation();
-				if (player.isOnGround()) {
-					if (loc.getY() - mCenter.getLocation().getY() >= 2) {
-						lightning(player);
-					}
-				} else {
-					if (!loc.subtract(0, 5, 0).getBlock().getType().isSolid() && loc.getY() > 9.9) {
-						lightning(player);
-					}
+
+			double arenaSurfaceY = mCenter.getY(); // This should be 8.0 based on the armour stand placement
+			for (Player player : PlayerUtils.playersInRange(mCenter, mRange)) {
+				double playerY = player.getLocation().getY();
+
+				// If standing on heightened ground or going up a climbable to cheese,
+				// enforce stricter 2-block threshold.
+				// Eg disallow pillaring up
+				int yThreshold = 2;
+
+				// If truly in the air (not on ground and not climbing - like the Thunder Step requirement),
+				// have relaxed 5-block threshold.
+				// Eg recoil, jump boost, Primordial yeet
+				if (PlayerUtils.notOnGround(player)) {
+					// When the player is > 5 blocks above the arena surface,
+					// the block Y-5 below them is above the surface level of the arena.
+					// This would usually not be solid, similar to the previous implementation's !isSolid() check
+					yThreshold = 5;
+				}
+
+				if (playerY >= arenaSurfaceY + yThreshold) {
+					lightning(player);
 				}
 			}
 		}
