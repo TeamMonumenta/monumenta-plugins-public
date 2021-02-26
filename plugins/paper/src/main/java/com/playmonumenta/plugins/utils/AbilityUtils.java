@@ -24,6 +24,7 @@ import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.ThrownPotion;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.potion.PotionData;
@@ -145,18 +146,22 @@ public class AbilityUtils {
 	}
 
 	private static ItemStack getAlchemistPotion() {
-		ItemStack stack = new ItemStack(Material.SPLASH_POTION, 1);
+		ItemStack itemStack = new ItemStack(Material.SPLASH_POTION, 1);
+		PotionMeta potionMeta = (PotionMeta) itemStack.getItemMeta();
 
-		PotionMeta meta = (PotionMeta)stack.getItemMeta();
-		meta.setBasePotionData(new PotionData(PotionType.MUNDANE));
-		meta.setColor(Color.WHITE);
-		meta.setDisplayName(ChatColor.AQUA + "Alchemist's Potion");
-		List<String> lore = Arrays.asList(new String[] {
-			ChatColor.GRAY + "A unique potion for Alchemists",
-		});
-		meta.setLore(lore);
-		stack.setItemMeta(meta);
-		return stack;
+		potionMeta.setBasePotionData(new PotionData(PotionType.MUNDANE));
+		potionMeta.addItemFlags(ItemFlag.HIDE_POTION_EFFECTS); // Hide "No Effects" vanilla potion effect lore
+		potionMeta.setColor(Color.WHITE);
+		String plainName = "Alchemist's Potion";
+		potionMeta.setDisplayName(ChatColor.AQUA + plainName); // OG Alchemist's Potion item name colour of &b
+
+		List<String> loreList = Arrays.asList(
+			ChatColor.DARK_GRAY + "A unique potion for Alchemists." // Standard Monumenta lore text colour of &8
+		);
+		potionMeta.setLore(loreList);
+
+		itemStack.setItemMeta(potionMeta);
+		return ItemUtils.setPlainName(itemStack, plainName); // Support for resource pack textures like with other items & mechanisms
 	}
 
 	public static void addAlchemistPotions(Player player, int numAddedPotions) {

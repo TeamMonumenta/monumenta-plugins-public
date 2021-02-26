@@ -11,6 +11,9 @@ release.properties
 *.ipr
 *.iws
 
+# VSCode
+.vscode/
+
 # Eclipse
 .settings/
 .classpath

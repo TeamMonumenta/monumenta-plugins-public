@@ -27,6 +27,8 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.potion.PotionType;
 
+import de.tr7zw.nbtapi.NBTItem;
+
 import com.playmonumenta.plugins.enchantments.Colossal;
 import com.playmonumenta.plugins.itemindex.Attribute;
 import com.playmonumenta.plugins.listeners.ShulkerShortcutListener;
@@ -1057,5 +1059,18 @@ public class ItemUtils {
 			}
 		}
 		return strList.toArray(new String[0]);
+	}
+
+	public static ItemStack setPlainName(ItemStack itemStack, String plainName) {
+		final String PLAIN_KEY = "plain";
+		final String DISPLAY_KEY = "display";
+		final String NAME_KEY = "Name";
+
+		NBTItem nbtItem = new NBTItem(itemStack);
+		if (nbtItem.hasKey(PLAIN_KEY)) {
+			nbtItem.removeKey(PLAIN_KEY);
+		}
+		nbtItem.addCompound(PLAIN_KEY).addCompound(DISPLAY_KEY).setString(NAME_KEY, plainName);
+		return nbtItem.getItem();
 	}
 }

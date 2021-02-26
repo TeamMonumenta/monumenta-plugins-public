@@ -8,6 +8,34 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.playmonumenta.plugins.bosses.BossBarManager;
+import com.playmonumenta.plugins.bosses.BossBarManager.BossHealthAction;
+import com.playmonumenta.plugins.bosses.SpellManager;
+import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.bosses.spells.SpellPurgeNegatives;
+import com.playmonumenta.plugins.bosses.spells.frostgiant.ArmorOfFrost;
+import com.playmonumenta.plugins.bosses.spells.frostgiant.RingOfFrost;
+import com.playmonumenta.plugins.bosses.spells.frostgiant.Shatter;
+import com.playmonumenta.plugins.bosses.spells.frostgiant.SpellAirGolemStrike;
+import com.playmonumenta.plugins.bosses.spells.frostgiant.SpellFrostGiantBlockBreak;
+import com.playmonumenta.plugins.bosses.spells.frostgiant.SpellFrostRift;
+import com.playmonumenta.plugins.bosses.spells.frostgiant.SpellFrostbite;
+import com.playmonumenta.plugins.bosses.spells.frostgiant.SpellFrostedIceBreak;
+import com.playmonumenta.plugins.bosses.spells.frostgiant.SpellGlacialPrison;
+import com.playmonumenta.plugins.bosses.spells.frostgiant.SpellGreatswordSlam;
+import com.playmonumenta.plugins.bosses.spells.frostgiant.SpellHailstorm;
+import com.playmonumenta.plugins.bosses.spells.frostgiant.SpellSpinDown;
+import com.playmonumenta.plugins.bosses.spells.frostgiant.SpellTitanicRupture;
+import com.playmonumenta.plugins.bosses.spells.frostgiant.UltimateSeismicRuin;
+import com.playmonumenta.plugins.effects.PercentSpeed;
+import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.MovementUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.utils.SerializationUtils;
+
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.GameMode;
@@ -44,34 +72,6 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
-import com.playmonumenta.plugins.bosses.BossBarManager;
-import com.playmonumenta.plugins.bosses.BossBarManager.BossHealthAction;
-import com.playmonumenta.plugins.bosses.SpellManager;
-import com.playmonumenta.plugins.bosses.spells.Spell;
-import com.playmonumenta.plugins.bosses.spells.SpellPurgeNegatives;
-import com.playmonumenta.plugins.bosses.spells.frostgiant.ArmorOfFrost;
-import com.playmonumenta.plugins.bosses.spells.frostgiant.RingOfFrost;
-import com.playmonumenta.plugins.bosses.spells.frostgiant.Shatter;
-import com.playmonumenta.plugins.bosses.spells.frostgiant.SpellAirGolemStrike;
-import com.playmonumenta.plugins.bosses.spells.frostgiant.SpellFrostGiantBlockBreak;
-import com.playmonumenta.plugins.bosses.spells.frostgiant.SpellFrostRift;
-import com.playmonumenta.plugins.bosses.spells.frostgiant.SpellFrostbite;
-import com.playmonumenta.plugins.bosses.spells.frostgiant.SpellFrostedIceBreak;
-import com.playmonumenta.plugins.bosses.spells.frostgiant.SpellGlacialPrison;
-import com.playmonumenta.plugins.bosses.spells.frostgiant.SpellGreatswordSlam;
-import com.playmonumenta.plugins.bosses.spells.frostgiant.SpellHailstorm;
-import com.playmonumenta.plugins.bosses.spells.frostgiant.SpellSpinDown;
-import com.playmonumenta.plugins.bosses.spells.frostgiant.SpellTitanicRupture;
-import com.playmonumenta.plugins.bosses.spells.frostgiant.UltimateSeismicRuin;
-import com.playmonumenta.plugins.effects.PercentSpeed;
-import com.playmonumenta.plugins.utils.BossUtils;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.FastUtils;
-import com.playmonumenta.plugins.utils.MovementUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.plugins.utils.SerializationUtils;
-
-import de.tr7zw.nbtapi.NBTItem;
 import net.md_5.bungee.api.ChatColor;
 
 /* WARNING: Basically all the spell info in the comments is outdated.
@@ -1009,12 +1009,7 @@ public class FrostGiant extends BossAbilityGroup {
 		im.setDisplayName(colors + newName);
 		item.setItemMeta(im);
 
-		NBTItem nbti = new NBTItem(item);
-		if (nbti.hasKey("plain")) {
-			nbti.removeKey("plain");
-		}
-		nbti.addCompound("plain").addCompound("display").setString("Name", newName);
-		return nbti.getItem();
+		return ItemUtils.setPlainName(item, newName);
 	}
 
 	@Override

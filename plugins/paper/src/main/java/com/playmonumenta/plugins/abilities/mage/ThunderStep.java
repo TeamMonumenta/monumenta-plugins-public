@@ -61,9 +61,10 @@ public class ThunderStep extends Ability {
 		mInfo.mShorthandName = "Ch";
 		mInfo.mDescriptions.add(
 			String.format(
-				"While sneaking in mid-air, right-clicking with a wand materializes a flash of thunder, dealing %s damage to all enemies in a 3-block cube around you. The next moment, you are teleported towards where you're looking, travelling up to %s blocks or until you hit a solid block, and repeating your thunder attack at your destination. Cooldown: %ss.",
+				"While sneaking in mid-air, right-clicking with a wand materializes a flash of thunder, dealing %s damage to all enemies in a %s-block cube around you and knocking them away. The next moment, you are teleported towards where you're looking, travelling up to %s blocks or until you hit a solid block, and repeating your thunder attack at your destination. Cooldown: %ss.",
 				DAMAGE_1,
 				SIZE,
+				DISTANCE,
 				COOLDOWN_SECONDS
 			)
 		);
