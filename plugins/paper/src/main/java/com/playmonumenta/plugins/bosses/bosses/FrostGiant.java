@@ -197,6 +197,9 @@ public class FrostGiant extends BossAbilityGroup {
 
 	private UltimateSeismicRuin mRuin;
 
+	//Melee does damage
+	private boolean mDoDamage = true;
+
 	//Default: 3f, phase 3: 1f, phase 4: 0.5f
 	private float mMeleeKnockback = 3f;
 
@@ -320,7 +323,7 @@ public class FrostGiant extends BossAbilityGroup {
 			public void run() {
 				if (c.getTarget() != null && mCutsceneDone) {
 					LivingEntity target = c.getTarget();
-					if (target.getBoundingBox().overlaps(mBoss.getBoundingBox().expand(0.5, 0, 0.5)) && !mCooldown) {
+					if (target.getBoundingBox().overlaps(mBoss.getBoundingBox().expand(0.5, 0, 0.5)) && !mCooldown && mDoDamage) {
 						mCooldown = true;
 						new BukkitRunnable() {
 
@@ -1098,6 +1101,11 @@ public class FrostGiant extends BossAbilityGroup {
 		world.spawnParticle(Particle.SMOKE_LARGE, mBoss.getLocation().add(0, 1, 0), 35, 0.1, 0.45, 0.1, 0.15);
 		world.spawnParticle(Particle.EXPLOSION_NORMAL, mBoss.getLocation(), 25, 0.2, 0, 0.2, 0.1);
 
+		//Both abilities delayed by 1.5s
+		//Delays damage for melee
+		delayDamage();
+
+		//Delays damage for hailstorm
 		if (getPassives() != null) {
 			for (Spell sp : getPassives()) {
 				if (sp instanceof SpellHailstorm) {
@@ -1105,6 +1113,16 @@ public class FrostGiant extends BossAbilityGroup {
 				}
 			}
 		}
+	}
+
+	public void delayDamage() {
+		mDoDamage = false;
+		new BukkitRunnable() {
+			@Override
+			public void run() {
+				mDoDamage = true;
+			}
+		}.runTaskLater(mPlugin, 30);
 	}
 
 	@Override

@@ -13,6 +13,8 @@ import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import com.playmonumenta.plugins.bosses.bosses.FrostGiant;
@@ -60,7 +62,9 @@ public class SpellFrostbite extends Spell {
 				return;
 			}
 
-			if (playerLoc.getY() - mStartLoc.getY() >= 4 && (player.getGameMode() == GameMode.SURVIVAL || player.getLocation().distance(mStartLoc) < FrostGiant.fighterRange)) {
+			PotionEffect effect = player.getPotionEffect(PotionEffectType.JUMP);
+
+			if (playerLoc.getY() - mStartLoc.getY() >= 4 && (effect == null || effect.getAmplifier() < 3) && (player.getGameMode() == GameMode.SURVIVAL || player.getLocation().distance(mStartLoc) < FrostGiant.fighterRange)) {
 				BossUtils.bossDamagePercent(mBoss, player, 0.1, mBoss.getLocation());
 
 				world.playSound(playerLoc, Sound.BLOCK_GLASS_BREAK, SoundCategory.HOSTILE, 1, 1);

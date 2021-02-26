@@ -15,6 +15,8 @@ import org.bukkit.entity.Creature;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 
@@ -199,7 +201,10 @@ public class SpellAirGolemStrike extends Spell {
 				Creature c = (Creature) golem;
 				if (c.getTarget() != null) {
 					LivingEntity target = c.getTarget();
-					if (target.getBoundingBox().overlaps(golem.getBoundingBox().expand(0.4, 0, 0.4)) && !mCooldown) {
+
+					PotionEffect effect = golem.getPotionEffect(PotionEffectType.GLOWING);
+
+					if (target.getBoundingBox().overlaps(golem.getBoundingBox().expand(0.4, 0, 0.4)) && !mCooldown && effect == null) {
 						mCooldown = true;
 						new BukkitRunnable() {
 
