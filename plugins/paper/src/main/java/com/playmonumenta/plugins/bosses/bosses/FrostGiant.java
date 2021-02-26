@@ -8,34 +8,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.playmonumenta.plugins.bosses.BossBarManager;
-import com.playmonumenta.plugins.bosses.BossBarManager.BossHealthAction;
-import com.playmonumenta.plugins.bosses.SpellManager;
-import com.playmonumenta.plugins.bosses.spells.Spell;
-import com.playmonumenta.plugins.bosses.spells.SpellPurgeNegatives;
-import com.playmonumenta.plugins.bosses.spells.frostgiant.ArmorOfFrost;
-import com.playmonumenta.plugins.bosses.spells.frostgiant.RingOfFrost;
-import com.playmonumenta.plugins.bosses.spells.frostgiant.Shatter;
-import com.playmonumenta.plugins.bosses.spells.frostgiant.SpellAirGolemStrike;
-import com.playmonumenta.plugins.bosses.spells.frostgiant.SpellFrostGiantBlockBreak;
-import com.playmonumenta.plugins.bosses.spells.frostgiant.SpellFrostRift;
-import com.playmonumenta.plugins.bosses.spells.frostgiant.SpellFrostbite;
-import com.playmonumenta.plugins.bosses.spells.frostgiant.SpellFrostedIceBreak;
-import com.playmonumenta.plugins.bosses.spells.frostgiant.SpellGlacialPrison;
-import com.playmonumenta.plugins.bosses.spells.frostgiant.SpellGreatswordSlam;
-import com.playmonumenta.plugins.bosses.spells.frostgiant.SpellHailstorm;
-import com.playmonumenta.plugins.bosses.spells.frostgiant.SpellSpinDown;
-import com.playmonumenta.plugins.bosses.spells.frostgiant.SpellTitanicRupture;
-import com.playmonumenta.plugins.bosses.spells.frostgiant.UltimateSeismicRuin;
-import com.playmonumenta.plugins.effects.PercentSpeed;
-import com.playmonumenta.plugins.utils.BossUtils;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.FastUtils;
-import com.playmonumenta.plugins.utils.ItemUtils;
-import com.playmonumenta.plugins.utils.MovementUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.plugins.utils.SerializationUtils;
-
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.GameMode;
@@ -71,6 +43,34 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
+
+import com.playmonumenta.plugins.bosses.BossBarManager;
+import com.playmonumenta.plugins.bosses.BossBarManager.BossHealthAction;
+import com.playmonumenta.plugins.bosses.SpellManager;
+import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.bosses.spells.SpellPurgeNegatives;
+import com.playmonumenta.plugins.bosses.spells.frostgiant.ArmorOfFrost;
+import com.playmonumenta.plugins.bosses.spells.frostgiant.RingOfFrost;
+import com.playmonumenta.plugins.bosses.spells.frostgiant.Shatter;
+import com.playmonumenta.plugins.bosses.spells.frostgiant.SpellAirGolemStrike;
+import com.playmonumenta.plugins.bosses.spells.frostgiant.SpellFrostGiantBlockBreak;
+import com.playmonumenta.plugins.bosses.spells.frostgiant.SpellFrostRift;
+import com.playmonumenta.plugins.bosses.spells.frostgiant.SpellFrostbite;
+import com.playmonumenta.plugins.bosses.spells.frostgiant.SpellFrostedIceBreak;
+import com.playmonumenta.plugins.bosses.spells.frostgiant.SpellGlacialPrison;
+import com.playmonumenta.plugins.bosses.spells.frostgiant.SpellGreatswordSlam;
+import com.playmonumenta.plugins.bosses.spells.frostgiant.SpellHailstorm;
+import com.playmonumenta.plugins.bosses.spells.frostgiant.SpellSpinDown;
+import com.playmonumenta.plugins.bosses.spells.frostgiant.SpellTitanicRupture;
+import com.playmonumenta.plugins.bosses.spells.frostgiant.UltimateSeismicRuin;
+import com.playmonumenta.plugins.effects.PercentSpeed;
+import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.MovementUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.utils.SerializationUtils;
 
 import net.md_5.bungee.api.ChatColor;
 
@@ -458,8 +458,8 @@ public class FrostGiant extends BossAbilityGroup {
 		SpellManager phase2Spells = new SpellManager(Arrays.asList(
 				new Shatter(mPlugin, mBoss, 2.5f),
 				new SpellAirGolemStrike(mPlugin, mBoss, mStartLoc),
-				new SpellGreatswordSlam(mPlugin, mBoss, 60, 90),
-				new SpellGreatswordSlam(mPlugin, mBoss, 60, 90),
+				new SpellGreatswordSlam(mPlugin, mBoss, 20, 90),
+				new SpellGreatswordSlam(mPlugin, mBoss, 20, 90),
 				new SpellSpinDown(mPlugin, mBoss, mStartLoc),
 				new SpellSpinDown(mPlugin, mBoss, mStartLoc)
 				));
@@ -468,21 +468,21 @@ public class FrostGiant extends BossAbilityGroup {
 				new Shatter(mPlugin, mBoss, 2f),
 				new SpellTitanicRupture(mPlugin, mBoss, mStartLoc),
 				new SpellFrostRift(mPlugin, mBoss, mStartLoc),
-				new SpellGreatswordSlam(mPlugin, mBoss, 60, 90)
+				new SpellGreatswordSlam(mPlugin, mBoss, 20, 90)
 				));
 
 		SpellManager phase4Spells = new SpellManager(Arrays.asList(
 				new Shatter(mPlugin, mBoss, 1f),
 				new SpellTitanicRupture(mPlugin, mBoss, mStartLoc),
 				new SpellFrostRift(mPlugin, mBoss, mStartLoc),
-				new SpellGreatswordSlam(mPlugin, mBoss, 30, 60)
+				new SpellGreatswordSlam(mPlugin, mBoss, 20, 60)
 				));
 
 		List<Spell> phase1PassiveSpells = Arrays.asList(
 				new ArmorOfFrost(mPlugin, mBoss, this, 3),
 				new SpellPurgeNegatives(mBoss, 20 * 4),
 				new SpellFrostGiantBlockBreak(mBoss, 5, 15, 5, mStartLoc),
-				new SpellHailstorm(mPlugin, mBoss, 16, mStartLoc),
+				new SpellHailstorm(mPlugin, mBoss, 18, mStartLoc),
 				new SpellFrostbite(mPlugin, mBoss, mStartLoc)
 				);
 
@@ -490,7 +490,7 @@ public class FrostGiant extends BossAbilityGroup {
 				new ArmorOfFrost(mPlugin, mBoss, this, 2),
 				new SpellPurgeNegatives(mBoss, 20 * 3),
 				new SpellFrostGiantBlockBreak(mBoss, 5, 15, 5, mStartLoc),
-				new SpellHailstorm(mPlugin, mBoss, 16, mStartLoc),
+				new SpellHailstorm(mPlugin, mBoss, 18, mStartLoc),
 				new SpellFrostbite(mPlugin, mBoss, mStartLoc),
 				new SpellFrostedIceBreak(mBoss)
 				);
@@ -498,7 +498,7 @@ public class FrostGiant extends BossAbilityGroup {
 				new ArmorOfFrost(mPlugin, mBoss, this, 1),
 				new SpellPurgeNegatives(mBoss, 20 * 2),
 				new SpellFrostGiantBlockBreak(mBoss, 5, 15, 5, mStartLoc),
-				new SpellHailstorm(mPlugin, mBoss, 16, mStartLoc),
+				new SpellHailstorm(mPlugin, mBoss, 18, mStartLoc),
 				new SpellFrostbite(mPlugin, mBoss, mStartLoc),
 				new SpellFrostedIceBreak(mBoss)
 				);
@@ -507,7 +507,7 @@ public class FrostGiant extends BossAbilityGroup {
 				new ArmorOfFrost(mPlugin, mBoss, this, 1, false),
 				new SpellPurgeNegatives(mBoss, 20 * 2),
 				new SpellFrostGiantBlockBreak(mBoss, 5, 15, 5, mStartLoc),
-				new SpellHailstorm(mPlugin, mBoss, 16, mStartLoc),
+				new SpellHailstorm(mPlugin, mBoss, 18, mStartLoc),
 				new SpellFrostbite(mPlugin, mBoss, mStartLoc),
 				new SpellFrostedIceBreak(mBoss)
 				);
