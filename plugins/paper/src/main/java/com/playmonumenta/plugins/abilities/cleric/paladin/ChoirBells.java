@@ -1,5 +1,12 @@
 package com.playmonumenta.plugins.abilities.cleric.paladin;
 
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.abilities.AbilityTrigger;
+import com.playmonumenta.plugins.classes.Spells;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.ParticleUtils;
+
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -7,18 +14,8 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
-
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.abilities.AbilityTrigger;
-import com.playmonumenta.plugins.classes.Spells;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.ParticleUtils;
-import com.playmonumenta.plugins.utils.PotionUtils;
 
 public class ChoirBells extends Ability {
 
@@ -78,7 +75,7 @@ public class ChoirBells extends Ability {
 			Vector toMobDirection = mob.getLocation().subtract(mPlayer.getLocation()).toVector().setY(0).normalize();
 			if (playerDirection.dot(toMobDirection) > CHOIR_BELLS_CONICAL_THRESHOLD) {
 				EntityUtils.applySlow(mPlugin, DURATION, mSlownessAmount, mob);
-				
+
 				if (EntityUtils.isUndead(mob)) {
 					EntityUtils.applyWeaken(mPlugin, DURATION, mWeakenEffect, mob);
 					EntityUtils.applyVulnerability(mPlugin, DURATION, mVulnerabilityEffect, mob);

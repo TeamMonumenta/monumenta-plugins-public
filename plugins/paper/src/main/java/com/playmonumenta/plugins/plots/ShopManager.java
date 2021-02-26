@@ -514,8 +514,6 @@ public class ShopManager implements Listener {
 
 			/* Enable survival mode */
 			/* To make it easier to see the sponge */
-			plat.setY(11);
-			plat.getBlock().setType(Material.YELLOW_STAINED_GLASS);
 			plat.setY(10);
 			plat.getBlock().setType(Material.SPONGE);
 		});

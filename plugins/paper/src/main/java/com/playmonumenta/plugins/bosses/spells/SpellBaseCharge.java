@@ -7,6 +7,7 @@ import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -228,6 +229,7 @@ public class SpellBaseCharge extends Spell {
 			start.run(target);
 		}
 
+		Player switchAggro = target;
 		boolean chargeHitsPlayer = false;
 		boolean cancel = false;
 		BoundingBox box = charger.getBoundingBox();
@@ -269,6 +271,7 @@ public class SpellBaseCharge extends Spell {
 				if (player.getLocation().distance(endLoc) < 1.8F) {
 					// Hit player - mark this and continue
 					chargeHitsPlayer = true;
+					switchAggro = player;
 
 					if (hitPlayer != null) {
 						hitPlayer.run(player);
@@ -287,6 +290,10 @@ public class SpellBaseCharge extends Spell {
 
 		if (teleBoss) {
 			charger.teleport(endLoc);
+		}
+
+		if (switchAggro != null && charger instanceof Mob) {
+			((Mob)charger).setTarget(switchAggro);
 		}
 
 		if (end != null) {

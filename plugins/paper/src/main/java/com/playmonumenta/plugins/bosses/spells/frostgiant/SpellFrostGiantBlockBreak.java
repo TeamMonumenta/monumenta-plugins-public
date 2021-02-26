@@ -12,11 +12,13 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.block.Block;
+import org.bukkit.block.data.type.TrapDoor;
 import org.bukkit.entity.Entity;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.loot.Lootable;
 
 import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.utils.ItemUtils;
 
 public class SpellFrostGiantBlockBreak extends Spell {
 	private Entity mLauncher;
@@ -84,7 +86,7 @@ public class SpellFrostGiantBlockBreak extends Spell {
 							loc.getWorld().spawnParticle(Particle.EXPLOSION_NORMAL, loc, 6, 1, 1, 1, 0.03);
 						}
 					} else if ((!mIgnoredMats.contains(material)) && !mNoBreak.contains(material) &&
-						(material.isSolid() || material.equals(Material.COBWEB)) &&
+						(material.isSolid() || material.equals(Material.COBWEB) || block.getBlockData() instanceof TrapDoor || ItemUtils.carpet.contains(material)) &&
 						(!(block.getState() instanceof Lootable) || !((Lootable)block.getState()).hasLootTable())) {
 						badBlockList.add(block);
 					}

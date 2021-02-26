@@ -73,8 +73,15 @@ public class AzacorNormal extends BossAbilityGroup {
 			new SpellBaseLaser(plugin, boss, detectionRange, 100, false, false, 160,
 			                   // Tick action per player
 			                   (Player player, int ticks, boolean blocked) -> {
-			                       player.playSound(player.getLocation(), Sound.UI_TOAST_IN, SoundCategory.HOSTILE, 0.75f, 0.5f + (ticks / 80f) * 1.5f);
-			                       boss.getLocation().getWorld().playSound(boss.getLocation(), Sound.UI_TOAST_IN, SoundCategory.HOSTILE, 1.0f, 0.5f + (ticks / 80f) * 1.5f);
+								   if (ticks % 8 == 0) {
+									   player.playSound(player.getLocation(), Sound.UI_TOAST_IN, SoundCategory.HOSTILE, 0.75f, 0.5f + (ticks / 80f) * 1.5f);
+								   } else if (ticks % 8 == 2) {
+									   boss.getLocation().getWorld().playSound(boss.getLocation(), Sound.UI_TOAST_IN, SoundCategory.HOSTILE, 1.0f, 0.5f + (ticks / 80f) * 1.5f);
+								   } else if (ticks % 8 == 4) {
+									   player.playSound(player.getLocation(), Sound.ENTITY_WITHER_SPAWN, SoundCategory.HOSTILE, 0.75f, 0.5f + (ticks / 100f) * 1.5f);
+								   } else if (ticks % 8 == 6) {
+									   boss.getLocation().getWorld().playSound(boss.getLocation(), Sound.UI_TOAST_IN, SoundCategory.HOSTILE, 1.0f, 0.5f + (ticks / 100f) * 1.5f);
+								   }
 			                       if (ticks == 0) {
 			                           boss.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 110, 4));
 			                       }

@@ -60,11 +60,15 @@ public class SpellSmokeBomb extends Spell {
 		BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
 
 		Runnable animLoop = new Runnable() {
+			int mSound = 0;
 			@Override
 			public void run() {
 				Location centerLoc = new Location(loc.getWorld(), loc.getX(), loc.getY() + 1, loc.getZ());
 				mLauncher.teleport(new Location(loc.getWorld(), loc.getX(), loc.getY(), loc.getZ()));
-				centerLoc.getWorld().playSound(centerLoc, Sound.UI_TOAST_IN, (float)mRadius / 7, (float)(0.5 + FastUtils.RANDOM.nextInt(150) / 100));
+				if (mSound % 4 == 0) {
+					centerLoc.getWorld().playSound(centerLoc, Sound.UI_TOAST_IN, (float)mRadius / 7, (float)(0.5 + FastUtils.RANDOM.nextInt(150) / 100));
+				}
+				mSound++;
 				centerLoc.getWorld().spawnParticle(Particle.SMOKE_NORMAL, centerLoc, 10, 1, 1, 1, 0.01);
 			}
 		};

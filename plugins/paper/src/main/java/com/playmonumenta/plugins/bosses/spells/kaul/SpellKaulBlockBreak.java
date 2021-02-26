@@ -18,6 +18,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.entity.EntityExplodeEvent;
 
 import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.utils.ItemUtils;
 
 public class SpellKaulBlockBreak extends Spell {
 	private final LivingEntity mBoss;
@@ -82,7 +83,7 @@ public class SpellKaulBlockBreak extends Spell {
 					testloc.setZ(l.getZ());
 					Block block = testloc.getBlock();
 					Material mat = block.getType();
-					if (mat == Material.COBWEB || block.getBlockData() instanceof TrapDoor) {
+					if (mat == Material.COBWEB || block.getBlockData() instanceof TrapDoor || ItemUtils.carpet.contains(mat)) {
 						/* Break cobwebs immediately, don't add them to the bad block list */
 						EntityExplodeEvent event = new EntityExplodeEvent(mBoss, mBoss.getLocation(), Arrays.asList(block), 0f);
 						Bukkit.getServer().getPluginManager().callEvent(event);

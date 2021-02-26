@@ -42,7 +42,7 @@ public class TOVUtils {
 		if (blockState instanceof Chest) {
 			Chest chest = (Chest) blockState;
 			String name = ((Chest) blockState).getCustomName();
-			if (UNOPENED_CACHE_NAME.equals(name) || OPENED_CACHE_NAME.equals(name)) {
+			if (UNOPENED_CACHE_NAME.equals(name)) {
 				if (!canOpen(plugin, player)) {
 					return false;
 				}

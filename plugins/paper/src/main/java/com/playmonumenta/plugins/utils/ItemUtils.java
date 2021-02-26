@@ -257,6 +257,25 @@ public class ItemUtils {
 		Material.COMPOSTER
 	);
 
+	public static final Set<Material> carpet = EnumSet.of(
+		Material.WHITE_CARPET,
+		Material.ORANGE_CARPET,
+		Material.MAGENTA_CARPET,
+		Material.LIGHT_BLUE_CARPET,
+		Material.YELLOW_CARPET,
+		Material.LIME_CARPET,
+		Material.PINK_CARPET,
+		Material.GRAY_CARPET,
+		Material.LIGHT_GRAY_CARPET,
+		Material.CYAN_CARPET,
+		Material.PURPLE_CARPET,
+		Material.BLUE_CARPET,
+		Material.BROWN_CARPET,
+		Material.GREEN_CARPET,
+		Material.RED_CARPET,
+		Material.BLACK_CARPET
+	);
+
 	public static final Set<Material> shulkerBoxes = EnumSet.of(
 		Material.SHULKER_BOX,
 		Material.WHITE_SHULKER_BOX,

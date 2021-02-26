@@ -83,31 +83,32 @@ public class JunkItemListener implements Listener {
 	public void pickupItem(EntityPickupItemEvent event) {
 		if (!event.isCancelled() && (event.getEntity() instanceof Player)) {
 			ItemStack item = event.getItem().getItemStack();
-			Player p = (Player) event.getEntity();
-			PlayerInventory inv = p.getInventory();
-			Set<Material> hotbar = new HashSet<Material>();
+
+			if (!mPlayers.contains(event.getEntity().getUniqueId()) || item.getType().isAir()) {
+				return;
+			}
+
+			PlayerInventory inv = ((Player)event.getEntity()).getInventory();
 
 			// Allow collection of any items on the hotbar
 			for (int i = 0; i <= 8; i++) {
 				ItemStack hotbarItem = inv.getItem(i);
-				if (hotbarItem != null) {
-					Material material = hotbarItem.getType();
-					if (!material.isAir()) {
-						hotbar.add(material);
-					}
+				if (hotbarItem != null && hotbarItem.getType().equals(item.getType()) && hotbarItem.isSimilar(item)) {
+					// This is the same as something on the player's hotbar, definitely don't want to cancel pickup
+					return;
 				}
 			}
 
-			if (mPlayers.contains(event.getEntity().getUniqueId()) && !isInteresting(item, hotbar)) {
+			// Cancel pickup of non-interesting items that aren't on the player's hotbar
+			if (!isInteresting(item)) {
 				event.setCancelled(true);
 			}
 		}
 	}
 
-	private boolean isInteresting(ItemStack item, Set<Material> hotbar) {
+	private boolean isInteresting(ItemStack item) {
 		return item.getAmount() >= JUNK_ITEM_SIZE_THRESHOLD
 		       || ServerProperties.getAlwaysPickupMats().contains(item.getType())
-		       || hotbar.contains(item.getType())
 		       || (item.hasItemMeta() && (item.getItemMeta().hasLore() ||
 					                      (item.getItemMeta().hasDisplayName()
 										   && ServerProperties.getNamedPickupMats().contains(item.getType()))));

@@ -1,10 +1,12 @@
 package com.playmonumenta.plugins.inventories;
 
 import java.util.Collection;
-import java.util.HashSet;
-import java.util.Random;
-import java.util.Set;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
+
+import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.InventoryUtils;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -12,6 +14,7 @@ import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.Chest;
+import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -32,14 +35,12 @@ import org.bukkit.loot.LootContext;
 import org.bukkit.loot.LootContext.Builder;
 import org.bukkit.loot.LootTable;
 
-import com.playmonumenta.plugins.utils.InventoryUtils;
-
 import de.tr7zw.nbtapi.NBTCompound;
 import de.tr7zw.nbtapi.NBTItem;
 import net.md_5.bungee.api.ChatColor;
 
 public class LootChestsInInventory implements Listener {
-	private static Set<UUID> mLootMenu = new HashSet<>();
+	private final Map<UUID, Integer> mLootMenu = new HashMap<>();
 
 	@EventHandler(priority = EventPriority.LOW)
 	public void inventoryClickEvent(InventoryClickEvent event) {
@@ -85,9 +86,8 @@ public class LootChestsInInventory implements Listener {
 		}
 		//Make an inventory and do some good ol roundabout population of the loot
 		Inventory inventory = Bukkit.createInventory(null, 27, item.getItemMeta().getDisplayName());
-		Random random = new Random();
 		Builder builder = new LootContext.Builder(player.getLocation());
-		Collection<ItemStack> loot = table.populateLoot(random, builder.build());
+		Collection<ItemStack> loot = table.populateLoot(FastUtils.RANDOM, builder.build());
 		item.subtract();
 		//I hate this, but its the only way for it to work :(
 		for (ItemStack lootItem : loot) {
@@ -95,7 +95,7 @@ public class LootChestsInInventory implements Listener {
 				inventory.addItem(lootItem);
 			}
 		}
-		mLootMenu.add(player.getUniqueId());
+		addOrInitializePlayer(player);
 		player.closeInventory(Reason.OPEN_NEW);
 		player.openInventory(inventory);
 		ItemStack emptyChest = new ItemStack(Material.CHEST);
@@ -110,34 +110,61 @@ public class LootChestsInInventory implements Listener {
 	//Drop the items upon closing the inventory
 	@EventHandler(priority = EventPriority.LOW)
 	public void inventoryCloseEvent(InventoryCloseEvent event) {
-		//Only drop the items if a bunch of things that hopefully only should be true if you are in a loot chest inventory. Otherwise you should just remove yourself from the list.
-		if (mLootMenu.contains(event.getPlayer().getUniqueId()) && event.getInventory().getHolder() == null && event.getView().getTopInventory().getType().equals(InventoryType.CHEST)
-				&& event.getView().getTopInventory().getSize() == 27) {
-			ItemStack[] items = event.getView().getTopInventory().getContents();
-			for (ItemStack item : items) {
-				if (item != null) {
-					Item droppedItem = event.getPlayer().getWorld().dropItem(event.getPlayer().getLocation(), item);
-					droppedItem.setPickupDelay(0);
+		if (event.getInventory().getHolder() == null && event.getView().getTopInventory().getType().equals(InventoryType.CHEST) && event.getView().getTopInventory().getSize() == 27) {
+			/* Right type of inventory - check if the player is in the map */
+			HumanEntity player = event.getPlayer();
+
+			/* Check if the player had a loot table chest open, and if so, decrement the count by 1. If it decrements to 0, remove from the map */
+			boolean hadLootInventoryOpen = decrementOrClearPlayer(player);
+			if (hadLootInventoryOpen) {
+				/* Player did have a virtual loot inventory open - drop everything from it */
+				ItemStack[] items = event.getView().getTopInventory().getContents();
+				for (ItemStack item : items) {
+					if (item != null && !item.getType().isAir()) {
+						Item droppedItem = player.getWorld().dropItem(player.getLocation(), item);
+						droppedItem.setPickupDelay(0);
+					}
 				}
+				/* Make sure the source container is cleared, since it won't be reachable anymore anyway */
+				event.getView().getTopInventory().clear();
 			}
-			mLootMenu.remove(event.getPlayer().getUniqueId());
-		} else if (mLootMenu.contains(event.getPlayer().getUniqueId()) && !event.getReason().equals(InventoryCloseEvent.Reason.OPEN_NEW)) {
-			mLootMenu.remove(event.getPlayer().getUniqueId());
 		}
 	}
 
 	//Failsafes
 	@EventHandler(priority = EventPriority.LOW)
 	public void playerJoinEvent(PlayerJoinEvent event) {
-		if (mLootMenu.contains(event.getPlayer().getUniqueId())) {
-			mLootMenu.remove(event.getPlayer().getUniqueId());
-		}
+		mLootMenu.remove(event.getPlayer().getUniqueId());
 	}
 
 	@EventHandler(priority = EventPriority.LOW)
 	public void playerQuitEvent(PlayerQuitEvent event) {
-		if (mLootMenu.contains(event.getPlayer().getUniqueId())) {
-			mLootMenu.remove(event.getPlayer().getUniqueId());
+		mLootMenu.remove(event.getPlayer().getUniqueId());
+	}
+
+	private void addOrInitializePlayer(HumanEntity player) {
+		Integer value = mLootMenu.get(player.getUniqueId());
+		if (value == null) {
+			value = 1;
+		} else {
+			value += 1;
+		}
+		mLootMenu.put(player.getUniqueId(), value);
+	}
+
+	/* Returns whether or not the player was in the map to begin with */
+	private boolean decrementOrClearPlayer(HumanEntity player) {
+		Integer value = mLootMenu.get(player.getUniqueId());
+		if (value == null) {
+			return false;
+		} else {
+			if (value > 1) {
+				value--;
+				mLootMenu.put(player.getUniqueId(), value);
+			} else {
+				mLootMenu.remove(player.getUniqueId());
+			}
+			return true;
 		}
 	}
 }

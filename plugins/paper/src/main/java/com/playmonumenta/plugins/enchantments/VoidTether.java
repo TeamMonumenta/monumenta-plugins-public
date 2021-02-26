@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import org.bukkit.ChatColor;
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -86,7 +87,7 @@ public class VoidTether implements BaseEnchantment {
 			if (!player.isOnGround()) {
 				/* Player really is going to die and is not on the ground - put them on a block */
 				Location saveLoc = new Location(ploc.getWorld(), ploc.getBlockX(), Math.max(0, ploc.getBlockY() - 1), ploc.getBlockZ());
-				if (saveLoc.getBlock().isPassable()) {
+				if (saveLoc.getBlock().isPassable() && player.getGameMode().equals(GameMode.SURVIVAL)) {
 					/* Since they're not dying in the void, only set the block if it's already not solid */
 					saveLoc.getBlock().setType(Material.OBSIDIAN);
 				}

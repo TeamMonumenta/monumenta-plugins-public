@@ -5,6 +5,8 @@ import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.List;
 
+import com.playmonumenta.plugins.utils.ItemUtils;
+
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -82,8 +84,10 @@ public class SpellBlockBreak extends Spell {
 						}
 					} else if (y > 0 &&
 					           (!mIgnoredMats.contains(material)) && !mNoBreak.contains(material) &&
-					           material.isSolid() &&
-					           (!(block.getState() instanceof Lootable) || !((Lootable)block.getState()).hasLootTable())) {
+					           (material.isSolid() || ItemUtils.carpet.contains(material)) &&
+					           (!(block.getState() instanceof Lootable)
+								|| (!((Lootable)block.getState()).hasLootTable()
+								    && !block.getLocation().subtract(0, 1, 0).getBlock().getType().equals(Material.BEDROCK)))) {
 						badBlockList.add(block);
 					}
 				}
