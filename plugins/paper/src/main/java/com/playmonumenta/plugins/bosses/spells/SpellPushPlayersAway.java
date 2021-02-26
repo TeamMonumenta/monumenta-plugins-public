@@ -49,7 +49,7 @@ public class SpellPushPlayersAway extends Spell {
 	}
 
 	@Override
-	public int duration() {
+	public int cooldownTicks() {
 		return 1;
 	}
 }

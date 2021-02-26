@@ -258,7 +258,7 @@ public class Shatter extends Spell {
 	}
 
 	@Override
-	public int duration() {
-		return 20 * 7;
+	public int cooldownTicks() {
+		return 7 * 20;
 	}
 }

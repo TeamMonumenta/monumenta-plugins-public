@@ -43,7 +43,7 @@ public class SpellBaseSlam extends SpellBaseLeapAttack {
 	}
 
 	@Override
-	public int castTime() {
+	public int castTicks() {
 		return 20 * 2;
 	}
 }

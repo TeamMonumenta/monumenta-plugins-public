@@ -192,12 +192,12 @@ public class SpellVolcanicDemise extends Spell {
 	}
 
 	@Override
-	public int castTime() {
+	public int castTicks() {
 		return 20 * 17;
 	}
 
 	@Override
-	public int duration() {
+	public int cooldownTicks() {
 		return 20 * 35;
 	}
 

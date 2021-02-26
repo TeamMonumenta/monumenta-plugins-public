@@ -119,7 +119,7 @@ public class SpellFireball extends Spell {
 	}
 
 	@Override
-	public int duration() {
+	public int cooldownTicks() {
 		return mDuration;
 	}
 

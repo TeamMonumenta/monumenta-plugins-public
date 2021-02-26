@@ -128,7 +128,7 @@ public class SpellBladeDance extends Spell {
 	}
 
 	@Override
-	public int duration() {
+	public int cooldownTicks() {
 		return 20 * 5;
 	}
 

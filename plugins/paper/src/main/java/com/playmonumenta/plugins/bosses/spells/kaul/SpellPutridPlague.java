@@ -207,12 +207,12 @@ public class SpellPutridPlague extends Spell {
 	}
 
 	@Override
-	public int duration() {
+	public int cooldownTicks() {
 		return mTime + (20 * 12);
 	}
 
 	@Override
-	public int castTime() {
+	public int castTicks() {
 		return mTime;
 	}
 

@@ -37,7 +37,7 @@ public class SpellAxtalTntThrow extends Spell {
 	}
 
 	@Override
-	public int duration() {
+	public int cooldownTicks() {
 		return 160; // 8 seconds
 	}
 
@@ -94,4 +94,3 @@ public class SpellAxtalTntThrow extends Spell {
 		}
 	}
 }
-

@@ -93,7 +93,7 @@ public class SpellShadowGlade extends Spell {
 	}
 
 	@Override
-	public int duration() {
+	public int cooldownTicks() {
 		return 200; // 10 seconds
 	}
 }

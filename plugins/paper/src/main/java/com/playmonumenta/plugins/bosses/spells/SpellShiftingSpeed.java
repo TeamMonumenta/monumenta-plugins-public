@@ -29,7 +29,7 @@ public class SpellShiftingSpeed extends Spell {
 	}
 
 	@Override
-	public int duration() {
+	public int cooldownTicks() {
 		//Mob has speed for 2.5 seconds then normal speed for 2.5 seconds.
 		return 100;
 	}

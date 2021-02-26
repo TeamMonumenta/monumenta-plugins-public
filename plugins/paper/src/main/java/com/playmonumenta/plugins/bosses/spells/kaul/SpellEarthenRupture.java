@@ -68,7 +68,7 @@ public class SpellEarthenRupture extends Spell {
 	}
 
 	@Override
-	public int duration() {
+	public int cooldownTicks() {
 		// TODO Auto-generated method stub
 		return 20 * 15;
 	}

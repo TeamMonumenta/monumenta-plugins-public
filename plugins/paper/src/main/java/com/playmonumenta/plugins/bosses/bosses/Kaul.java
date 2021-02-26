@@ -867,7 +867,7 @@ public class Kaul extends BossAbilityGroup {
 	@Override
 	public void bossCastAbility(SpellCastEvent event) {
 		Spell spell = event.getSpell();
-		if (spell != null && spell.castTime() > 0) {
+		if (spell != null && spell.castTicks() > 0) {
 			mBoss.setInvulnerable(true);
 			mBoss.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 20 * 9999, 12));
 			mBoss.setAI(false);
@@ -894,7 +894,7 @@ public class Kaul extends BossAbilityGroup {
 							}
 						}
 
-					}.runTaskLater(mPlugin, spell.castTime());
+					}.runTaskLater(mPlugin, spell.castTicks());
 				}
 
 			}.runTaskLater(mPlugin, 1);

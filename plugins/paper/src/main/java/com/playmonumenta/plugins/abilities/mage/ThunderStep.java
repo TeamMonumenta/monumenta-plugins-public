@@ -1,6 +1,5 @@
 package com.playmonumenta.plugins.abilities.mage;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import com.playmonumenta.plugins.Plugin;
@@ -18,12 +17,10 @@ import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
 
 import org.bukkit.Color;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.World;
-import org.bukkit.block.Block;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
@@ -87,40 +84,29 @@ public class ThunderStep extends Ability {
 	public void cast(Action action) {
 		putOnCooldown();
 
-		Location playerLocationStart = mPlayer.getLocation();
-		BoundingBox potentialPlayerBox = mPlayer.getBoundingBox();
-		Location potentialPlayerLocation = playerLocationStart.clone();
-		Vector vectorIncrement = playerLocationStart.getDirection().normalize().multiply(CHECK_INCREMENT);
-
+		Location playerStartLocation = mPlayer.getLocation();
 		doDamage(
 			SpellDamage.getSpellDamage(mPlayer, mLevelDamage),
-			playerLocationStart
+			playerStartLocation
 		);
 
-		loopMaxGoodDistance:
-		for (int i = 0; i < DISTANCE / CHECK_INCREMENT * 1.1; i++) {
-			potentialPlayerLocation.add(vectorIncrement);
-			if (playerLocationStart.distanceSquared(potentialPlayerLocation) > DISTANCE * DISTANCE) {
-				// Gone too far, stop processing
-				break;
-			}
-
-			potentialPlayerBox.shift(vectorIncrement);
-			ArrayList<Location> locationsTouching = LocationUtils.getLocationsTouching(potentialPlayerBox, mPlayer.getWorld());
-			for (Location location : locationsTouching) {
-				Block block = location.getBlock();
-				BoundingBox blockBoxEstimate = block.getBoundingBox();
-				Material blockMaterial = block.getType();
-				if (blockBoxEstimate.overlaps(potentialPlayerBox)) { // Seems liquids have empty bounding boxes similar to air, so they won't count as overlapping
-					if (blockMaterial.isSolid()) {
-						// The player's potential bounding box now hits a block after shifting,
-						// the teleport can go no further; exhausted eligible teleport locations
-						break loopMaxGoodDistance;
-					}
-				}
-			}
-		}
-		potentialPlayerLocation.subtract(vectorIncrement); // Undo the last increment, it was either too far or hit a solid block
+		World world = mPlayer.getWorld();
+		BoundingBox movingPlayerBox = mPlayer.getBoundingBox();
+		Vector vector = playerStartLocation.getDirection();
+		LocationUtils.travelTillObstructed(
+			world,
+			movingPlayerBox,
+			DISTANCE,
+			vector,
+			CHECK_INCREMENT
+		);
+		Location playerEndLocation = movingPlayerBox
+			.getCenter()
+			.setY(
+				movingPlayerBox.getMinY()
+			)
+			.toLocation(world)
+			.setDirection(vector);
 
 		new BukkitRunnable() {
 			@Override
@@ -129,10 +115,10 @@ public class ThunderStep extends Ability {
 					this.cancel();
 				}
 
-				mPlayer.teleport(potentialPlayerLocation);
+				mPlayer.teleport(playerEndLocation);
 				doDamage(
 					SpellDamage.getSpellDamage(mPlayer, mLevelDamage), // Recalculate damage for this second AoE, player spell power may have changed since first AoE
-					potentialPlayerLocation
+					playerEndLocation
 				);
 			}
 		}.runTaskLater(Plugin.getInstance(), 1);

@@ -78,7 +78,7 @@ public class SpellManager {
 				mCooldownSpells.add(spell);
 				iterator.remove();
 				/* Return how much time the spell takes */
-				return spell.duration();
+				return spell.cooldownTicks();
 			}
 		}
 
@@ -96,7 +96,7 @@ public class SpellManager {
 			sp.run();
 			mLastCasted = sp;
 			mCooldownSpells.add(sp);
-			return sp.duration();
+			return sp.cooldownTicks();
 		}
 		/* None of these spells can run - wait a second before trying again */
 		return 20;
@@ -115,4 +115,3 @@ public class SpellManager {
 		}
 	}
 }
-

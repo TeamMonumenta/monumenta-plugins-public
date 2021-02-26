@@ -19,7 +19,7 @@ public class SpellHandSwap extends Spell {
 	}
 
 	@Override
-	public int duration() {
+	public int cooldownTicks() {
 		return 140;
 	}
 }

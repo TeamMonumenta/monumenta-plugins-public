@@ -200,8 +200,8 @@ public class SpellGlacialPrison extends Spell {
 	}
 
 	@Override
-	public int duration() {
-		return 20 * 8;
+	public int cooldownTicks() {
+		return 8 * 20;
 	}
 
 	@Override

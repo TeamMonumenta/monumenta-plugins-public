@@ -258,12 +258,12 @@ public class SpellKaulsJudgement extends Spell implements Listener {
 	}
 
 	@Override
-	public int duration() {
+	public int cooldownTicks() {
 		return 20 * 16;
 	}
 
 	@Override
-	public int castTime() {
+	public int castTicks() {
 		return 20 * 4;
 	}
 

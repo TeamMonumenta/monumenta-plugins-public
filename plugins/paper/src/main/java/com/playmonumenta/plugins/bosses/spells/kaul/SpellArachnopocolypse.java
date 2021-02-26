@@ -113,12 +113,12 @@ public class SpellArachnopocolypse extends Spell {
 	}
 
 	@Override
-	public int duration() {
+	public int cooldownTicks() {
 		return 20 * 20;
 	}
 
 	@Override
-	public int castTime() {
+	public int castTicks() {
 		return 20 * 5;
 	}
 

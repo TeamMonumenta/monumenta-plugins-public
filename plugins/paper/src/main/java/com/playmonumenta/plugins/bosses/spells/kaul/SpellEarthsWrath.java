@@ -91,7 +91,7 @@ public class SpellEarthsWrath extends Spell {
 
 
 	@Override
-	public int duration() {
+	public int cooldownTicks() {
 		return 20 * 12;
 	}
 

@@ -51,7 +51,7 @@ public class SpellWeaponSwitch extends Spell {
 	}
 
 	@Override
-	public int duration() {
+	public int cooldownTicks() {
 		return 10;
 	}
 }

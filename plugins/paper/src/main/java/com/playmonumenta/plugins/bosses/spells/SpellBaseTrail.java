@@ -134,7 +134,7 @@ public class SpellBaseTrail extends Spell {
 	}
 
 	@Override
-	public int duration() {
+	public int cooldownTicks() {
 		return mTickRate;
 	}
 

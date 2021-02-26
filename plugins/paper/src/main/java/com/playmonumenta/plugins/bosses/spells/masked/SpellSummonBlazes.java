@@ -89,7 +89,7 @@ public class SpellSummonBlazes extends Spell {
 	}
 
 	@Override
-	public int duration() {
+	public int cooldownTicks() {
 		return DURATION;
 	}
 }

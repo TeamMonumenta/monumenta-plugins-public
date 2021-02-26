@@ -229,8 +229,8 @@ public class SpellAirGolemStrike extends Spell {
 	}
 
 	@Override
-	public int duration() {
-		return 20 * 5;
+	public int cooldownTicks() {
+		return 5 * 20;
 	}
 
 	@Override

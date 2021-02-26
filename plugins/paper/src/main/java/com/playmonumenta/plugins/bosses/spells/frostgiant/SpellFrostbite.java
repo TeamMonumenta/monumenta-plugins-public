@@ -98,7 +98,7 @@ public class SpellFrostbite extends Spell {
 	}
 
 	@Override
-	public int duration() {
+	public int cooldownTicks() {
 		return 0;
 	}
 

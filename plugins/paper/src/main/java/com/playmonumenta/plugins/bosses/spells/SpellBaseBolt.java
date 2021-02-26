@@ -224,7 +224,7 @@ public class SpellBaseBolt extends Spell {
 
 	/* If there are players in range of the attack, put it on cooldown. Otherwise, skip and move on*/
 	@Override
-	public int duration() {
+	public int cooldownTicks() {
 		if (PlayerUtils.playersInRange(mCaster.getLocation(), mDetectRange).size() > 0) {
 			return mDelay + (20 * 5);
 		} else {

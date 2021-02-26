@@ -38,12 +38,12 @@ public class SpellMulti extends Spell {
 	 * Duration is that of longest spell
 	 */
 	@Override
-	public int duration() {
+	public int cooldownTicks() {
 		int longestDuration = 1;
 
 		for (Spell spell : mSpells) {
-			if (longestDuration < spell.duration()) {
-				longestDuration = spell.duration();
+			if (longestDuration < spell.cooldownTicks()) {
+				longestDuration = spell.cooldownTicks();
 			}
 		}
 

@@ -120,7 +120,7 @@ public class ArmorOfFrost extends Spell {
 	}
 
 	@Override
-	public int duration() {
+	public int cooldownTicks() {
 		return 0;
 	}
 

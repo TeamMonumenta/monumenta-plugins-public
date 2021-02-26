@@ -1,11 +1,15 @@
 package com.playmonumenta.plugins.bosses.spells;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.LocationUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.utils.LocationUtils.TravelAction;
+
 import org.bukkit.Location;
-import org.bukkit.block.Block;
+import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
@@ -13,120 +17,146 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.FastUtils;
-import com.playmonumenta.plugins.utils.LocationUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
+
 
 public class SpellBaseLaser extends Spell {
-	@FunctionalInterface
-	public interface TickAction {
-		/**
-		 * User function called once every two ticks while laser is running
-		 * @param player  Player being targeted
-		 * @param tick    Number of ticks since start of attack
-		 *      NOTE - Only even numbers are returned here!
-		 * @param blocked Whether the laser is obstructed (true) or hits the player (false)
-		 */
-		void run(Player player, int tick, boolean blocked);
-	}
-
-	@FunctionalInterface
-	public interface ParticleAction {
-		/**
-		 * User function called many times per tick with the location where
-		 * a laser particle should be spawned
-		 * @param loc Location to spawn a particle
-		 */
-		void run(Location loc);
-	}
-
-	@FunctionalInterface
-	public interface FinishAction {
-		/**
-		 * User function called once every two ticks while laser is running
-		 * @param player  Player being targeted
-		 * @param loc     Location where the laser ends (either at player or occluding block)
-		 * @param blocked Whether the laser is obstructed (true) or hits the player (false)
-		 */
-		void run(Player player, Location loc, boolean blocked);
-	}
+	private static final double BOX_SIZE = 0.5;
+	private static final double CHECK_INCREMENT = 0.2;
 
 	private final Plugin mPlugin;
 	private final LivingEntity mBoss;
 	private final int mRange;
-	private final int mNumTicks;
+	private final int mDuration;
 	private final boolean mStopWhenBlocked;
 	private final boolean mSingleTarget;
 	private final int mCooldown;
 	private final TickAction mTickAction;
 	private final ParticleAction mParticleAction;
+	private final int mParticleFrequency;
+	private final int mParticleChance;
 	private final FinishAction mFinishAction;
 
 	/**
 	 * @param plugin          Plugin
-	 * @param boss            Boss
+	 * @param boss            LivingEntity casting this laser
 	 * @param range           Range within which players may be targeted
-	 * @param numTicks        Total duration of the spell
-	 * @param stopWhenBlocked Whether the spell should abort if line of sight is broken
-	 * @param singleTarget    Target random player (true) or all players (false)
-	 * @param cooldown        How often this spell can be cast
-	 * @param tickAction      Called once every two ticks for targeted player(s)
-	 * @param particleAction  Called many times per tick to generate particles for laser
-	 * @param finishAction    Called when the spell numTicks have elapsed
+	 * @param duration        Duration of laser in ticks till detonation
+	 * @param stopWhenBlocked Whether laser should cancel itself
+	 *                        to stop early if line of sight is broken/if stunned.
+	 *                        Does not shorten Spell's cooldownTicks or castTicks
+	 * @param singleTarget    Target 1 random player (true) or all players (false)
+	 * @param cooldown        Cooldown in ticks including laser duration
+	 *                        till boss can use next spell
+	 * @param tickAction      Code to run every 2 ticks while laser is active
+	 * @param particleAction  Code spawning laser particles at Location to determine appearance
+	 * @param finishAction    Code to run when laser detonates
 	 */
-	public SpellBaseLaser(Plugin plugin, LivingEntity boss, int range, int numTicks, boolean stopWhenBlocked, boolean singleTarget, int cooldown,
-	                      TickAction tickAction, ParticleAction particleAction, FinishAction finishAction) {
+	public SpellBaseLaser(
+		Plugin plugin,
+		LivingEntity boss,
+		int range,
+		int duration,
+		boolean stopWhenBlocked,
+		boolean singleTarget,
+		int cooldown,
+		TickAction tickAction,
+		ParticleAction particleAction,
+		FinishAction finishAction
+	) {
+		this(
+			plugin,
+			boss,
+			range,
+			duration,
+			stopWhenBlocked,
+			singleTarget,
+			cooldown,
+			tickAction,
+			particleAction,
+			1,
+			6,
+			finishAction
+		);
+	}
+
+	public SpellBaseLaser(
+		Plugin plugin,
+		LivingEntity boss,
+		int range,
+		int duration,
+		boolean stopWhenBlocked,
+		boolean singleTarget,
+		int cooldown,
+		TickAction tickAction,
+		ParticleAction particleAction,
+		int particleFrequency,
+		int particleChance,
+		FinishAction finishAction
+	) {
 		mPlugin = plugin;
 		mBoss = boss;
 		mRange = range;
-		mNumTicks = numTicks;
+		mDuration = duration;
 		mStopWhenBlocked = stopWhenBlocked;
 		mSingleTarget = singleTarget;
 		mCooldown = cooldown;
 		mTickAction = tickAction;
 		mParticleAction = particleAction;
+		mParticleFrequency = particleFrequency;
+		mParticleChance = particleChance;
 		mFinishAction = finishAction;
 	}
 
 	@Override
 	public void run() {
-		List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), mRange);
-		if (!players.isEmpty()) {
-			if (mSingleTarget) {
-				// Single target chooses a random player within range
-				Collections.shuffle(players);
-				for (Player player : players) {
-					if (LocationUtils.hasLineOfSight(mBoss, player)) {
-						launch(player);
-						return;
-					}
-				}
-			} else {
-				// Otherwise target all players within range
-				for (Player player : players) {
-					launch(player);
+		List<Player> potentialTargets = PlayerUtils.playersInRange(mBoss.getLocation(), mRange);
+
+		// Single-target laser chooses 1 player
+		if (mSingleTarget) {
+			// Shuffle so whoever checks succeed on first is random
+			Collections.shuffle(potentialTargets);
+
+			// Pick first player in sight
+			// canRun() ensures there is at least 1 in sight
+			for (Player target : potentialTargets) {
+				if (LocationUtils.hasLineOfSight(mBoss, target)) {
+					launch(target);
+					return;
 				}
 			}
 		}
+		// Group laser chooses all players
+		else {
+			for (Player target : potentialTargets) {
+				launch(target);
+			}
+		}
+
+		// If no potential targets, nothing happens
 	}
 
 	@Override
 	public boolean canRun() {
-		List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), mRange);
-		if (!players.isEmpty()) {
-			for (Player player : players) {
-				if (LocationUtils.hasLineOfSight(mBoss, player)) {
-					return true;
-				}
+		List<Player> potentialTargets = PlayerUtils.playersInRange(mBoss.getLocation(), mRange);
+
+		for (Player target : potentialTargets) {
+			// A different kind of line check than the laser itself
+			if (LocationUtils.hasLineOfSight(mBoss, target)) {
+				return true;
 			}
 		}
+
 		return false;
 	}
 
 	@Override
-	public int duration() {
+	public int cooldownTicks() {
 		return mCooldown;
+	}
+
+	@Override
+	public int castTicks() {
+		return mDuration;
 	}
 
 	private void launch(Player target) {
@@ -135,62 +165,31 @@ public class SpellBaseLaser extends Spell {
 
 			@Override
 			public void run() {
-				Location launLoc = mBoss.getEyeLocation();
-				Location tarLoc = target.getLocation();
-				tarLoc.add(target.getEyeLocation().subtract(tarLoc).multiply(0.5));
-				Location endLoc = launLoc;
-				BoundingBox box = BoundingBox.of(endLoc, 0.5, 0.5, 0.5);
+				Location startLocation = mBoss.getEyeLocation();
+				Location targetedLocation = target.getLocation().add(0, target.getEyeHeight() / 2, 0);
 
-				Vector baseVect = new Vector(tarLoc.getX() - launLoc.getX(), tarLoc.getY() - launLoc.getY(), tarLoc.getZ() - launLoc.getZ());
-				baseVect = baseVect.normalize().multiply(0.5);
+				World world = mBoss.getWorld();
+				BoundingBox movingLaserBox = BoundingBox.of(startLocation, BOX_SIZE, BOX_SIZE, BOX_SIZE);
+				Vector vector = new Vector(
+					targetedLocation.getX() - startLocation.getX(),
+					targetedLocation.getY() - startLocation.getY(),
+					targetedLocation.getZ() - startLocation.getZ()
+				);
 
-				boolean blocked = false;
-				for (int i = 0; i < 200; i++) {
-					box.shift(baseVect);
-					endLoc = box.getCenter().toLocation(mBoss.getWorld());
+				boolean blocked = LocationUtils.travelTillObstructed(
+					world,
+					movingLaserBox,
+					startLocation.distance(targetedLocation),
+					vector,
+					CHECK_INCREMENT,
+					mParticleAction,
+					mParticleFrequency,
+					mParticleChance
+				);
 
-					if (mParticleAction != null && FastUtils.RANDOM.nextInt(3) == 0) {
-						mParticleAction.run(endLoc);
-					}
-					List<Block> blocks = new ArrayList<Block>();
-					for (int x = -1; x < 1; x++) {
-						for (int y = -1; y < 1; y++) {
-							for (int z = -1; z < 1; z++) {
-								blocks.add(endLoc.clone().add(x, y, z).getBlock());
-							}
-						}
-					}
-
-					boolean cancel = false;
-					for (Block block : blocks) {
-						if (block.getBoundingBox().overlaps(box) && !block.isLiquid()) {
-							cancel = true;
-							break;
-						}
-					}
-
-					if (cancel) {
-						blocked = true;
-						break;
-					}
-					if (endLoc.getBlock().getType().isSolid()) {
-						blocked = true;
-						break;
-					} else if (launLoc.distance(endLoc) > launLoc.distance(tarLoc)) {
-						break;
-					} else if (tarLoc.distance(endLoc) < 0.5) {
-						break;
-					}
-				}
-
-				if (!blocked) {
-					// Really check to make sure it's not blocked
-					// This takes into account block shapes!
-					blocked = !(LocationUtils.hasLineOfSight(launLoc, tarLoc));
-				}
-
-				if ((blocked && mStopWhenBlocked) || EntityUtils.isStunned(mBoss)) {
+				if ((mStopWhenBlocked && blocked) || EntityUtils.isStunned(mBoss)) {
 					mBoss.setAI(true);
+
 					this.cancel();
 					mActiveRunnables.remove(this);
 					return;
@@ -200,16 +199,15 @@ public class SpellBaseLaser extends Spell {
 					mTickAction.run(target, mTicks, blocked);
 				}
 
-				if (mTicks >= mNumTicks) {
+				if (mTicks >= mDuration) {
 					if (mFinishAction != null) {
-						mFinishAction.run(target, endLoc, blocked);
+						mFinishAction.run(target, movingLaserBox.getCenter().toLocation(world), blocked);
 					}
 
 					this.cancel();
 					mActiveRunnables.remove(this);
 					return;
 				}
-
 				mTicks += 2;
 			}
 		};
@@ -218,4 +216,43 @@ public class SpellBaseLaser extends Spell {
 		mActiveRunnables.add(runnable);
 	}
 
+
+
+	@FunctionalInterface
+	public interface TickAction {
+		/**
+		 * Called once every 2 ticks while laser is active.
+		 * Useful for things like player sound cues
+		 * or initial effects when tick == 0
+		 *
+		 * @param player  Player being targeted
+		 * @param tick    Number of ticks since start of laser.
+		 *                NOTE: Only even numbers are returned here!
+		 * @param blocked Whether the laser is obstructed (true) or hits the player (false)
+		 */
+		void run(Player player, int tick, boolean blocked);
+	}
+
+	@FunctionalInterface
+	public interface ParticleAction extends TravelAction {
+		/**
+		 * Called many times every 2 ticks with each Location
+		 * where laser particles should be spawned
+		 *
+		 * @param location Location to use for your particles
+		 */
+		void run(Location location);
+	}
+
+	@FunctionalInterface
+	public interface FinishAction {
+		/**
+		 * Called at the end once when the laser detonates
+		 *
+		 * @param player      Player being targeted
+		 * @param endLocation Location where the laser ends (either at player or obstructing block)
+		 * @param blocked     Whether the laser is obstructed (true) or hits the player (false)
+		 */
+		void run(Player player, Location endLocation, boolean blocked);
+	}
 }

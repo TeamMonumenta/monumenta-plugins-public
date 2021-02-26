@@ -32,7 +32,7 @@ public class SpellDreadnaughtParticle extends Spell {
 	}
 
 	@Override
-	public int duration() {
+	public int cooldownTicks() {
 		// This is the period of run()
 		return 5;
 	}

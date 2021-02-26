@@ -289,8 +289,8 @@ public class SpellGreatswordSlam extends Spell {
 	}
 
 	@Override
-	public int duration() {
-		return 20 * 6;
+	public int cooldownTicks() {
+		return 6 * 20;
 	}
 
 }

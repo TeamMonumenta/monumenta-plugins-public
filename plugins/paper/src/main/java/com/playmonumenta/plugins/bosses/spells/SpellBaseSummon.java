@@ -150,12 +150,12 @@ public class SpellBaseSummon extends Spell {
 	}
 
 	@Override
-	public int castTime() {
+	public int castTicks() {
 		return mCastTime;
 	}
 
 	@Override
-	public int duration() {
+	public int cooldownTicks() {
 		return mDuration;
 	}
 

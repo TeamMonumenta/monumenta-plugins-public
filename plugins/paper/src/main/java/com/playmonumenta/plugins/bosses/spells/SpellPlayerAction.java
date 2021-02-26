@@ -61,7 +61,7 @@ public class SpellPlayerAction extends Spell {
 	}
 
 	@Override
-	public int duration() {
+	public int cooldownTicks() {
 		// TODO Auto-generated method stub
 		return 0;
 	}

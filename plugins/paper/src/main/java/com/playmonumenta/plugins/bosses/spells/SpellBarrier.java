@@ -131,12 +131,12 @@ public class SpellBarrier extends Spell {
 	}
 
 	@Override
-	public int castTime() {
+	public int castTicks() {
 		return mRechargeTime;
 	}
 
 	@Override
-	public int duration() {
+	public int cooldownTicks() {
 		return 0;
 	}
 }

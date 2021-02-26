@@ -72,7 +72,7 @@ public class UltimateSeismicRuin extends Spell {
 	}
 
 	@Override
-	public int duration() {
+	public int cooldownTicks() {
 		return 20 * 8;
 	}
 

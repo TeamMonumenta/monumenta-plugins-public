@@ -196,7 +196,7 @@ public class SpellBaseAoE extends Spell {
 	}
 
 	@Override
-	public int duration() {
+	public int cooldownTicks() {
 		return 160 + mCooldown;
 	}
 

@@ -154,12 +154,12 @@ public class SpellGhostlyCannons extends Spell {
 	}
 
 	@Override
-	public int castTime() {
+	public int castTicks() {
 		return 20 * 18;
 	}
 
 	@Override
-	public int duration() {
+	public int cooldownTicks() {
 		return 20 * 40;
 	}
 }

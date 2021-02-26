@@ -206,12 +206,12 @@ public class SpellRaiseJungle extends Spell {
 	}
 
 	@Override
-	public int duration() {
+	public int cooldownTicks() {
 		return mSummonTime + (20 * 18);
 	}
 
 	@Override
-	public int castTime() {
+	public int castTicks() {
 		return mSummonTime;
 	}
 

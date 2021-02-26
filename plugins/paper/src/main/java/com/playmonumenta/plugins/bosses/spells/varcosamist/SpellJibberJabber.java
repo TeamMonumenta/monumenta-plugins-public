@@ -30,7 +30,7 @@ public class SpellJibberJabber extends Spell {
 	}
 
 	@Override
-	public int duration() {
+	public int cooldownTicks() {
 		return 0;
 	}
 }

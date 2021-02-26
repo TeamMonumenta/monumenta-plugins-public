@@ -65,7 +65,7 @@ public class SpellProjectileDeflection extends Spell {
 	}
 
 	@Override
-	public int duration() {
+	public int cooldownTicks() {
 		return 0;
 	}
 

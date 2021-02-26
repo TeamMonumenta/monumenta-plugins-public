@@ -144,7 +144,7 @@ public class SpellBatBombs extends Spell {
 	}
 
 	@Override
-	public int duration() {
+	public int cooldownTicks() {
 		return 20 * 10;
 	}
 

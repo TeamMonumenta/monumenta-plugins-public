@@ -43,11 +43,16 @@ public abstract class Spell implements Cloneable {
 		}
 	}
 
-	/* How long this spell takes to cast (in ticks) */
-	public abstract int duration();
+	/**
+	 * @return How long boss must wait/cooldown in ticks
+	 * between start (not end!) of this spell and start of next spell
+	 */
+	public abstract int cooldownTicks();
 
-	/* How long the cast time is. The duration() method is more of a "cooldown before the next ability" */
-	public int castTime() {
+	/**
+	 * @return How long boss takes in ticks to complete casting process of this spell
+	 */
+	public int castTicks() {
 		return 0;
 	}
 

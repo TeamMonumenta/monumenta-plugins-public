@@ -169,13 +169,14 @@ public class LocationUtils {
 			while (bi.hasNext()) {
 				Block b = bi.next();
 
-				//  If we want to check Line of sight we want to make sure the the blocks are transparent.
+				// If block is occluding (shouldn't include transparent blocks, liquids etc),
+				// line of sight is broken, return false
 				if (LocationUtils.isLosBlockingBlock(b.getType())) {
 					return false;
 				}
 			}
 		} catch (IllegalStateException e) {
-			/* Sometimes when chunks aren't loaded at exactly the right time this can happen */
+			// Thrown sometimes when chunks aren't loaded at exactly the right time
 			return false;
 		}
 
@@ -1070,5 +1071,87 @@ public class LocationUtils {
 			}
 		}
 		return locationsTouching;
+	}
+
+	public static boolean travelTillObstructed(
+		World world,
+		BoundingBox movingBoundingBox,
+		double maxDistance,
+		Vector vector,
+		double increment
+	) {
+		return travelTillObstructed(world, movingBoundingBox, maxDistance, vector, increment, null, -7050, 1);
+	}
+
+	public static boolean travelTillObstructed(
+		World world,
+		BoundingBox movingBoundingBox,
+		double maxDistance,
+		Vector vector,
+		double increment,
+		TravelAction travelAction,
+		int actionFrequency,
+		int actionChance
+	) {
+		Vector start = movingBoundingBox.getCenter(); // For checking if exceeded maxDistance
+		Vector vectorIncrement = vector.clone().normalize().multiply(increment);
+		Vector reverseVectorIncrement = vectorIncrement.clone().multiply(-1);
+		int frequencyTracker = actionFrequency; // For deciding whether to run travelAction for this interval
+
+		double maxIterations = maxDistance / increment * 1.1;
+		for (int i = 0; i < maxIterations; i++) {
+			movingBoundingBox.shift(vectorIncrement);
+			Vector potentialBoxCentre = movingBoundingBox.getCenter();
+
+			if (start.distanceSquared(potentialBoxCentre) > maxDistance * maxDistance) {
+				// Gone too far
+				movingBoundingBox.shift(reverseVectorIncrement);
+				return false;
+			}
+
+			ArrayList<Location> locationsTouching = LocationUtils.getLocationsTouching(movingBoundingBox, world);
+			for (Location location : locationsTouching) {
+				Block block = location.getBlock();
+				BoundingBox blockBoxEstimate = block.getBoundingBox();
+				Material blockMaterial = block.getType();
+				if (blockBoxEstimate.overlaps(movingBoundingBox)) { // Seems liquids have empty bounding boxes similar to air, so they won't count as overlapping
+					if (blockMaterial.isSolid()) { // Allow passing through non-solids like signs, grass, vines etc
+						// Obstructed by solid block
+						movingBoundingBox.shift(reverseVectorIncrement);
+						return true;
+					}
+				}
+			}
+
+			// The central location of the bounding box is valid;
+			// it was not reverse shifted. Run travelAction if frequency is right
+			if (travelAction != null) {
+				if (frequencyTracker >= actionFrequency) {
+					actionFrequency = 1;
+
+					if (FastUtils.RANDOM.nextInt(actionChance) == 0) {
+						travelAction.run(potentialBoxCentre.toLocation(world));
+					}
+				} else {
+					actionFrequency++;
+				}
+			}
+		}
+
+		// Neither went too far nor got obstructed (this should not happen)
+		return false;
+	}
+
+
+
+	@FunctionalInterface
+	public interface TravelAction {
+		/**
+		 * Depending on accompanying actionFrequency & actionChance,
+		 * gets called along valid Location intervals while travelling
+		 *
+		 * @param location Valid Location interval to run your code off
+		 */
+		void run(Location location);
 	}
 }
