@@ -16,6 +16,7 @@ import org.bukkit.event.entity.PotionSplashEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitScheduler;
 
 import com.destroystokyo.paper.event.entity.EntityPathfindEvent;
@@ -44,8 +45,8 @@ public abstract class BossAbilityGroup {
 	private BossBarManager mBossBar;
 	private SpellManager mActiveSpells;
 	private List<Spell> mPassiveSpells;
-	private int mTaskIDpassive = -1;
-	private int mTaskIDactive = -1;
+	private BukkitRunnable mTaskPassive = null;
+	private BukkitRunnable mTaskActive = null;
 	private boolean mUnloaded = false;
 	private Integer mNextActiveTimer = 0;
 	public boolean mDead = false;
@@ -83,12 +84,30 @@ public abstract class BossAbilityGroup {
 		mActiveSpells = activeSpells;
 		mPassiveSpells = passiveSpells;
 
-		BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
-		Runnable passive = new Runnable() {
+		mTaskPassive = new BukkitRunnable() {
+			private int mMissingTicks = 0;
+
 			@Override
 			public void run() {
 				if (mBossBar != null && !mDead) {
 					mBossBar.update();
+				}
+
+				mMissingTicks += 5;
+				if (mMissingTicks > 100) {
+					mMissingTicks = 0;
+					/* Check if somehow the boss entity is missing even though this is still running */
+					if (isBossMissing()) {
+						mPlugin.getLogger().warning("Boss " + mIdentityTag + " is missing but still registered as an active boss. Unloading...");
+						this.cancel();
+						BossManager mgr = BossManager.getInstance();
+						if (mgr != null) {
+							BossManager.getInstance().unload(mBoss, false);
+						}
+						// Just in case for some reason the boss is no longer registered with the manager...
+						unload();
+						return;
+					}
 				}
 
 				/* Don't run abilities if players aren't present */
@@ -103,37 +122,36 @@ public abstract class BossAbilityGroup {
 				}
 			}
 		};
-		mTaskIDpassive = scheduler.scheduleSyncRepeatingTask(mPlugin, passive, 1L, 5L);
+		mTaskPassive.runTaskTimer(mPlugin, 1L, 5L);
 
-		Runnable active = new Runnable() {
+		mTaskActive = new BukkitRunnable() {
 			private boolean mDisabled = true;
+			private int mMissingTicks = 0;
 
 			@Override
 			public void run() {
 				mNextActiveTimer -= 2;
+				mMissingTicks += 2;
 
 				if (mNextActiveTimer > 0) {
 					// Still waiting for the current spell to finish
 					return;
 				}
 
-				/* Check if somehow the boss entity is missing even though this is still running */
-				boolean bossCheck = true;
-				Location bossLoc = mBoss.getLocation();
-				for (Entity entity : bossLoc.getWorld().getNearbyEntities(bossLoc, 4, 4, 4)) {
-					if (entity.getUniqueId().equals(mBoss.getUniqueId())) {
-						bossCheck = false;
+				if (mMissingTicks > 100) {
+					mMissingTicks = 0;
+					/* Check if somehow the boss entity is missing even though this is still running */
+					if (isBossMissing()) {
+						mPlugin.getLogger().warning("Boss " + mIdentityTag + " is missing but still registered as an active boss. Unloading...");
+						this.cancel();
+						BossManager mgr = BossManager.getInstance();
+						if (mgr != null) {
+							BossManager.getInstance().unload(mBoss, false);
+						}
+						// Just in case for some reason the boss is no longer registered with the manager...
+						unload();
+						return;
 					}
-				}
-				if (bossCheck) {
-					mPlugin.getLogger().warning("Boss " + mIdentityTag + " is missing but still registered as an active boss. Unloading...");
-					BossManager mgr = BossManager.getInstance();
-					if (mgr != null) {
-						BossManager.getInstance().unload(mBoss, false);
-					}
-					// Just in case for some reason the boss is no longer registered with the manager...
-					unload();
-					return;
 				}
 
 				/* Don't progress if players aren't present */
@@ -165,7 +183,7 @@ public abstract class BossAbilityGroup {
 				}
 			}
 		};
-		mTaskIDactive = scheduler.scheduleSyncRepeatingTask(mPlugin, active, spellDelay, 2L);
+		mTaskActive.runTaskTimer(mPlugin, spellDelay, 2L);
 	}
 
 	public void forceCastSpell(Class<? extends Spell> spell) {
@@ -330,7 +348,15 @@ public abstract class BossAbilityGroup {
 	 * via super.unload()
 	 */
 	public void unload() {
-		/* Make sure we don't accidentally unload twice */
+		/* Even if we unload twice, really cancel these tasks */
+		if (mTaskPassive != null && !mTaskPassive.isCancelled()) {
+			mTaskPassive.cancel();
+		}
+		if (mTaskActive != null && !mTaskActive.isCancelled()) {
+			mTaskActive.cancel();
+		}
+
+		/* Make sure we don't accidentally call the main unload sequence twice */
 		if (!mUnloaded) {
 			mUnloaded = true;
 
@@ -338,13 +364,6 @@ public abstract class BossAbilityGroup {
 				mActiveSpells.cancelAll();
 			}
 
-			BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
-			if (mTaskIDpassive != -1) {
-				scheduler.cancelTask(mTaskIDpassive);
-			}
-			if (mTaskIDactive != -1) {
-				scheduler.cancelTask(mTaskIDactive);
-			}
 			if (mBossBar != null) {
 				mBossBar.remove();
 			}
@@ -360,5 +379,16 @@ public abstract class BossAbilityGroup {
 				}
 			}
 		}
+	}
+
+	/* Check if somehow the boss entity is missing even though this is still running */
+	private boolean isBossMissing() {
+		Location bossLoc = mBoss.getLocation();
+		for (Entity entity : bossLoc.getWorld().getNearbyEntities(bossLoc, 4, 4, 4)) {
+			if (entity.getUniqueId().equals(mBoss.getUniqueId())) {
+				return false;
+			}
+		}
+		return true;
 	}
 }
