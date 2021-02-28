@@ -119,7 +119,7 @@ public class SpellHailstorm extends Spell {
 
 							if (!player.getLocation().toVector().isInSphere(mBoss.getLocation().toVector(), mRadius) && mDoDamage) {
 								Vector vel = player.getVelocity();
-								BossUtils.bossDamagePercent(mBoss, player, 0.1, loc);
+								BossUtils.bossDamagePercent(mBoss, player, 0.15, loc);
 								player.setVelocity(vel);
 								player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 2, 0));
 							} else {

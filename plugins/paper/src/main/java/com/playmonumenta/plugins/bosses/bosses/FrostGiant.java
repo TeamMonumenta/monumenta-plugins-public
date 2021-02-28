@@ -153,6 +153,8 @@ the Frost Giant explodes dealing 60 damage in an 8 block radius. High CD, High D
 public class FrostGiant extends BossAbilityGroup {
 	public static final String identityTag = "boss_frostgiant";
 	public static final int detectionRange = 80;
+	public static final int hailstormRadius = 16;
+	public static final int frostedIceDuration = 30;
 
 	//Range of those who are actively in the fight from the center of the arena
 	public static final int fighterRange = 36;
@@ -450,29 +452,29 @@ public class FrostGiant extends BossAbilityGroup {
 
 		SpellManager phase1Spells = new SpellManager(Arrays.asList(
 				new SpellAirGolemStrike(mPlugin, mBoss, mStartLoc),
-				new Shatter(mPlugin, mBoss, 2.5f),
+				new Shatter(mPlugin, mBoss, 3f),
 				new SpellGlacialPrison(mPlugin, mBoss, fighterRange, mStartLoc),
 				new RingOfFrost(mPlugin, mBoss, 12, mStartLoc)
 				));
 
 		SpellManager phase2Spells = new SpellManager(Arrays.asList(
-				new Shatter(mPlugin, mBoss, 2.5f),
+				new Shatter(mPlugin, mBoss, 3f),
 				new SpellAirGolemStrike(mPlugin, mBoss, mStartLoc),
-				new SpellGreatswordSlam(mPlugin, mBoss, 20, 90),
-				new SpellGreatswordSlam(mPlugin, mBoss, 20, 90),
+				new SpellGreatswordSlam(mPlugin, mBoss, frostedIceDuration, 90),
+				new SpellGreatswordSlam(mPlugin, mBoss, frostedIceDuration, 90),
 				new SpellSpinDown(mPlugin, mBoss, mStartLoc),
 				new SpellSpinDown(mPlugin, mBoss, mStartLoc)
 				));
 
 		SpellManager phase3Spells = new SpellManager(Arrays.asList(
-				new Shatter(mPlugin, mBoss, 2f),
+				new Shatter(mPlugin, mBoss, 3f),
 				new SpellTitanicRupture(mPlugin, mBoss, mStartLoc),
 				new SpellFrostRift(mPlugin, mBoss, mStartLoc),
 				new SpellGreatswordSlam(mPlugin, mBoss, 20, 90)
 				));
 
 		SpellManager phase4Spells = new SpellManager(Arrays.asList(
-				new Shatter(mPlugin, mBoss, 1f),
+				new Shatter(mPlugin, mBoss, 3f),
 				new SpellTitanicRupture(mPlugin, mBoss, mStartLoc),
 				new SpellFrostRift(mPlugin, mBoss, mStartLoc),
 				new SpellGreatswordSlam(mPlugin, mBoss, 20, 60)
@@ -482,7 +484,7 @@ public class FrostGiant extends BossAbilityGroup {
 				new ArmorOfFrost(mPlugin, mBoss, this, 3),
 				new SpellPurgeNegatives(mBoss, 20 * 4),
 				new SpellFrostGiantBlockBreak(mBoss, 5, 15, 5, mStartLoc),
-				new SpellHailstorm(mPlugin, mBoss, 18, mStartLoc),
+				new SpellHailstorm(mPlugin, mBoss, hailstormRadius, mStartLoc),
 				new SpellFrostbite(mPlugin, mBoss, mStartLoc)
 				);
 
@@ -490,7 +492,7 @@ public class FrostGiant extends BossAbilityGroup {
 				new ArmorOfFrost(mPlugin, mBoss, this, 2),
 				new SpellPurgeNegatives(mBoss, 20 * 3),
 				new SpellFrostGiantBlockBreak(mBoss, 5, 15, 5, mStartLoc),
-				new SpellHailstorm(mPlugin, mBoss, 18, mStartLoc),
+				new SpellHailstorm(mPlugin, mBoss, hailstormRadius, mStartLoc),
 				new SpellFrostbite(mPlugin, mBoss, mStartLoc),
 				new SpellFrostedIceBreak(mBoss)
 				);
@@ -498,7 +500,7 @@ public class FrostGiant extends BossAbilityGroup {
 				new ArmorOfFrost(mPlugin, mBoss, this, 1),
 				new SpellPurgeNegatives(mBoss, 20 * 2),
 				new SpellFrostGiantBlockBreak(mBoss, 5, 15, 5, mStartLoc),
-				new SpellHailstorm(mPlugin, mBoss, 18, mStartLoc),
+				new SpellHailstorm(mPlugin, mBoss, hailstormRadius, mStartLoc),
 				new SpellFrostbite(mPlugin, mBoss, mStartLoc),
 				new SpellFrostedIceBreak(mBoss)
 				);
@@ -507,7 +509,7 @@ public class FrostGiant extends BossAbilityGroup {
 				new ArmorOfFrost(mPlugin, mBoss, this, 1, false),
 				new SpellPurgeNegatives(mBoss, 20 * 2),
 				new SpellFrostGiantBlockBreak(mBoss, 5, 15, 5, mStartLoc),
-				new SpellHailstorm(mPlugin, mBoss, 18, mStartLoc),
+				new SpellHailstorm(mPlugin, mBoss, hailstormRadius, mStartLoc),
 				new SpellFrostbite(mPlugin, mBoss, mStartLoc),
 				new SpellFrostedIceBreak(mBoss)
 				);
@@ -620,12 +622,12 @@ public class FrostGiant extends BossAbilityGroup {
 					double radian = Math.toRadians(degree);
 					double cos = FastUtils.cos(radian);
 					double sin = FastUtils.sin(radian);
-					loc.add(cos * (18 + 5), 2.5, sin * (18 + 5));
+					loc.add(cos * (hailstormRadius + 5), 2.5, sin * (hailstormRadius + 5));
 					world.spawnParticle(Particle.CLOUD, loc, 3, 3, 1, 4, 0.075);
 					world.spawnParticle(Particle.CLOUD, loc, 3, 3, 4, 4, 0.075);
 					world.spawnParticle(Particle.REDSTONE, loc, 3, 3, 4, 4, 0.075, BLUE_COLOR);
 					world.spawnParticle(Particle.REDSTONE, loc, 3, 3, 1, 4, 0.075, BLUE_COLOR);
-					loc.subtract(cos * (18 + 5), 2.5, sin * (18 + 5));
+					loc.subtract(cos * (hailstormRadius + 5), 2.5, sin * (hailstormRadius + 5));
 				}
 
 				for (double degree = 0; degree < 360; degree++) {
@@ -633,9 +635,9 @@ public class FrostGiant extends BossAbilityGroup {
 						double radian = Math.toRadians(degree);
 						double cos = FastUtils.cos(radian);
 						double sin = FastUtils.sin(radian);
-						loc.add(cos * (18 + 2), 0.5, sin * (18 + 2));
+						loc.add(cos * (hailstormRadius + 2), 0.5, sin * (hailstormRadius + 2));
 						world.spawnParticle(Particle.REDSTONE, loc, 1, 0, 0, 0, LIGHT_BLUE_COLOR);
-						loc.subtract(cos * (18 + 2), 0.5, sin * (18 + 2));
+						loc.subtract(cos * (hailstormRadius + 2), 0.5, sin * (hailstormRadius + 2));
 					}
 				}
 

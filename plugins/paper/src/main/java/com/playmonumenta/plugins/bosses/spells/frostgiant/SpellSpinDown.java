@@ -175,7 +175,7 @@ public class SpellSpinDown extends Spell {
 			public void run() {
 
 				//Stop running after 20 seconds
-				if (mTicks >= 20 * 20 || mBoss.isDead() || !mBoss.isValid()) {
+				if (mTicks >= 20 * FrostGiant.frostedIceDuration || mBoss.isDead() || !mBoss.isValid()) {
 					new BukkitRunnable() {
 						int mTicks = 0;
 						Iterator<Map.Entry<Location, Material>> mBlocks = oldBlocks.entrySet().iterator();

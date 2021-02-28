@@ -111,10 +111,10 @@ public class SpellGreatswordSlam extends Spell {
 			public void run() {
 				mT += 2;
 
-				if (mT <= 40 && mT >= 30) {
+				if (mT <= 30 && mT >= 20) {
 					//Initiates the jump upwards
 					mBoss.setVelocity(new Vector(0, 1.5, 0));
-				} else if (mT >= 40) {
+				} else if (mT >= 30) {
 					if (!mBoss.isOnGround()) {
 						//Initiates the slam down
 						mBoss.setVelocity(new Vector(0, -1.5, 0));

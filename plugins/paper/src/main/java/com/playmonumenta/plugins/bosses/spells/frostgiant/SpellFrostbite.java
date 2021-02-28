@@ -59,13 +59,13 @@ public class SpellFrostbite extends Spell {
 			Location playerLoc = player.getLocation();
 
 			if (player.getGameMode() == GameMode.CREATIVE) {
-				return;
+				continue;
 			}
 
 			PotionEffect effect = player.getPotionEffect(PotionEffectType.JUMP);
 
 			if (playerLoc.getY() - mStartLoc.getY() >= 4 && (effect == null || effect.getAmplifier() < 3) && (player.getGameMode() == GameMode.SURVIVAL || player.getLocation().distance(mStartLoc) < FrostGiant.fighterRange)) {
-				BossUtils.bossDamagePercent(mBoss, player, 0.1, mBoss.getLocation());
+				BossUtils.bossDamagePercent(mBoss, player, 0.15, mBoss.getLocation());
 
 				world.playSound(playerLoc, Sound.BLOCK_GLASS_BREAK, SoundCategory.HOSTILE, 1, 1);
 				world.spawnParticle(Particle.FIREWORKS_SPARK, playerLoc.add(0, 1, 0), 15, 0.4, 0.4, 0.4, 0.15);
@@ -75,7 +75,7 @@ public class SpellFrostbite extends Spell {
 					mWarned.add(player);
 				}
 			} else if (playerLoc.getY() - mStartLoc.getY() <= -4) {
-				BossUtils.bossDamagePercent(mBoss, player, 0.1, mBoss.getLocation());
+				BossUtils.bossDamagePercent(mBoss, player, 0.15, mBoss.getLocation());
 
 				world.playSound(playerLoc, Sound.BLOCK_GLASS_BREAK, SoundCategory.HOSTILE, 1, 1);
 				world.spawnParticle(Particle.FIREWORKS_SPARK, playerLoc.add(0, 1, 0), 15, 0.4, 0.4, 0.4, 0.15);
