@@ -76,23 +76,14 @@ public class PotionConsumeListener implements Listener {
 		    !(event.getCurrentItem().getType().equals(Material.POTION) ||
 		      event.getCurrentItem().getType().equals(Material.GLASS_BOTTLE)) ||
 		     //Can not quick drink while potion is on cooldown
-		    checkPotionCooldown(event.getWhoClicked())) {
+		    (event.getCurrentItem().getType().equals(Material.POTION) && checkPotionCooldown(event.getWhoClicked()))
+		    ) {
 			// Nope!
 			return;
 		}
 
 		Player player = (Player)event.getWhoClicked();
 		ItemStack item = event.getCurrentItem();
-
-		if (item.containsEnchantment(Enchantment.ARROW_INFINITE)) {
-			player.sendMessage(ChatColor.RED + "Infinite potions can not be quick drinked!");
-
-			float pitch = ((float)FastUtils.RANDOM.nextDouble() - 0.5f) * 0.05f;
-			player.getWorld().playSound(player.getLocation(), Sound.BLOCK_GLASS_BREAK, 1.0f, 1.0f + pitch);
-
-			event.setCancelled(true);
-			return;
-		}
 
 		Set<String> tags = player.getScoreboardTags();
 		BukkitRunnable runnable = mRunnables.get(player.getUniqueId());
@@ -134,6 +125,17 @@ public class PotionConsumeListener implements Listener {
 			return;
 		}
 
+		if (item.containsEnchantment(Enchantment.ARROW_INFINITE)) {
+			player.sendMessage(ChatColor.RED + "Infinite potions can not be quick drinked!");
+
+			float pitch = ((float)FastUtils.RANDOM.nextDouble() - 0.5f) * 0.05f;
+			player.getWorld().playSound(player.getLocation(), Sound.BLOCK_GLASS_BREAK, 1.0f, 1.0f + pitch);
+
+			event.setCancelled(true);
+			return;
+		}
+
+
 		PotionMeta meta = (PotionMeta)event.getCurrentItem().getItemMeta();
 		int instantDrinkLevel = InventoryUtils.getCustomEnchantLevel(item, InstantDrink.PROPERTY_NAME, false);
 
@@ -145,15 +147,15 @@ public class PotionConsumeListener implements Listener {
 			return;
 		}
 
+		InventoryType invType = event.getClickedInventory().getType();
+		if (invType == InventoryType.PLAYER || invType == InventoryType.ENDER_CHEST || invType == InventoryType.SHULKER_BOX) {
+			setPotionCooldown(player);
+		}
+
 		//If instant drink enchantment, instantly apply potion, otherwise imitate potion drinking
 		if (instantDrinkLevel != 0) {
 			player.getWorld().playSound(player.getLocation(), Sound.ENTITY_GENERIC_DRINK, 1.0f, 1.0f);
 			PotionUtils.applyPotion(mPlugin, player, meta);
-
-			InventoryType invType = event.getClickedInventory().getType();
-			if (invType == InventoryType.PLAYER || invType == InventoryType.ENDER_CHEST || invType == InventoryType.SHULKER_BOX) {
-				setPotionCooldown(player);
-			}
 		} else {
 			//Gives slowness IV to emulate the slow walking of drinking, extra 5 ticks to match delay of drinking
 			mPlugin.mPotionManager.addPotion(player, PotionID.ITEM, new PotionEffect(PotionEffectType.SLOW, DRINK_DURATION + 5, 3, true, false));
@@ -188,11 +190,6 @@ public class PotionConsumeListener implements Listener {
 							if (invItem != null && invItem.getType().equals(Material.GLASS_BOTTLE) && !invItem.hasItemMeta()) {
 								inv.setItem(slot, null);
 							}
-						}
-
-						InventoryType invType = event.getClickedInventory().getType();
-						if (invType == InventoryType.PLAYER || invType == InventoryType.ENDER_CHEST || invType == InventoryType.SHULKER_BOX) {
-							setPotionCooldown(player);
 						}
 
 						this.cancel();
