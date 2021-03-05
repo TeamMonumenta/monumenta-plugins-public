@@ -32,8 +32,9 @@ import org.bukkit.util.Vector;
 
 
 public class ThunderStep extends Ability {
-	private static final Particle.DustOptions COLOR_YELLOW = new Particle.DustOptions(Color.YELLOW, 0.75f);
-	private static final Particle.DustOptions COLOR_AQUA = new Particle.DustOptions(Color.AQUA, 0.75f);
+	public static final String NAME = "Thunder Step";
+	public static final Particle.DustOptions COLOR_YELLOW = new Particle.DustOptions(Color.YELLOW, 0.75f);
+	public static final Particle.DustOptions COLOR_AQUA = new Particle.DustOptions(Color.AQUA, 0.75f);
 
 	/*
 	 * Cloud's standardised constant order:
@@ -41,24 +42,22 @@ public class ThunderStep extends Ability {
 	 *
 	 * For pairs of values where one is used to calculate the other, like seconds or hearts, the resulting value goes second
 	 */
-	private static final int DAMAGE_1 = 5;
-	private static final int DAMAGE_2 = 10;
-	private static final int SIZE = 3;
-	private static final int DISTANCE = 8;
-	private static final double CHECK_INCREMENT = 0.1;
-	private static final int COOLDOWN_SECONDS = 24;
-	private static final int COOLDOWN = COOLDOWN_SECONDS * 20;
+	public static final int DAMAGE_1 = 5;
+	public static final int DAMAGE_2 = 10;
+	public static final int SIZE = 3;
+	public static final int DISTANCE = 8;
+	public static final double CHECK_INCREMENT = 0.1;
+	public static final int COOLDOWN_SECONDS = 24;
+	public static final int COOLDOWN = COOLDOWN_SECONDS * 20;
 
 	private final int mLevelDamage;
 
 	public ThunderStep(Plugin plugin, Player player) {
-		super(plugin, player, "Thunder Step");
+		super(plugin, player, NAME);
 
 		mInfo.mLinkedSpell = Spells.THUNDER_STEP;
-		//TODO with the next balance change, update these two old Channeling values and tell players to reselect skills like what's happened in the past?
-		// ScriptedQuests stuff for class selection & the Spec NPC will also need updating, possibly the class selection command blocks as well
-		mInfo.mScoreboardId = "Channeling";
-		mInfo.mShorthandName = "Ch";
+		mInfo.mScoreboardId = "ThunderStep";
+		mInfo.mShorthandName = "TS";
 		mInfo.mDescriptions.add(
 			String.format(
 				"While sneaking in mid-air, right-clicking with a wand materializes a flash of thunder, dealing %s damage to all enemies in a %s-block cube around you and knocking them away. The next moment, you are teleported towards where you're looking, travelling up to %s blocks or until you hit a solid block, and repeating your thunder attack at your destination. Cooldown: %ss.",

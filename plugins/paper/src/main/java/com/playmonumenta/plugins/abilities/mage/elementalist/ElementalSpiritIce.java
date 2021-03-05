@@ -3,16 +3,6 @@ package com.playmonumenta.plugins.abilities.mage.elementalist;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
-import org.bukkit.World;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
-import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.util.Vector;
-
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityManager;
@@ -25,152 +15,173 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
+import org.bukkit.World;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
+import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.util.Vector;
+
+
 
 public class ElementalSpiritIce extends Ability {
+	public static final int DAMAGE_1 = 4;
+	public static final int DAMAGE_2 = 6;
+	public static final int SIZE = 3;
+	public static final double BOW_MULTIPLIER = 0.1;
+	public static final int BOW_PERCENTAGE = (int) (BOW_MULTIPLIER * 100);
+	public static final int PULSE_INTERVAL = 20;
+	public static final int PULSES = 3;
 
-	private static final int ES_ICE_COOLDOWN = 20 * 12;
-	private static final int ES_ICE_1_DAMAGE = 4;
-	private static final int ES_ICE_2_DAMAGE = 6;
-	private static final int ES_ICE_RADIUS = 3;
-	private static final int ES_ICE_PULSES = 3;
-	private static final int ES_ICE_PULSE_INTERVAL = 20;
+	private final Set<LivingEntity> mEnemiesAffected = new HashSet<>();
+	private final int mLevelDamage;
 
-	private final int mDamage;
-	private final Set<LivingEntity> mMobsDamaged = new HashSet<>();
-	private BukkitRunnable mMobsDamagedParser;
-	private BukkitRunnable mParticleGenerator;
 	private ElementalArrows mElementalArrows;
+	private BukkitRunnable mEnemiesAffectedProcessor;
+	private BukkitRunnable mPlayerParticlesGenerator;
 
 	public ElementalSpiritIce(Plugin plugin, Player player) {
-		/* NOTE: Display name is null so this variant will be ignored by the tesseract.
-		 * This variant also does not have a description */
+		/* NOTE
+		 * Display name is null so this variant will be ignored by the tesseract.
+		 * This variant also does not have a description
+		 */
 		super(plugin, player, null);
-		mInfo.mScoreboardId = "ElementalSpirit";
-		mInfo.mLinkedSpell = Spells.ELEMENTAL_SPIRIT_ICE;
-		mInfo.mCooldown = ES_ICE_COOLDOWN;
-		mDamage = getAbilityScore() == 1 ? ES_ICE_1_DAMAGE : ES_ICE_2_DAMAGE;
 
-		// Needs to wait for the entire AbilityCollection to be initialized
-				Bukkit.getScheduler().runTask(plugin, () -> {
-					if (player != null) {
-						mElementalArrows = AbilityManager.getManager().getPlayerAbility(mPlayer, ElementalArrows.class);
-					}
-				});
+		mInfo.mLinkedSpell = Spells.ELEMENTAL_SPIRIT_ICE;
+		mInfo.mScoreboardId = "ElementalSpirit";
+		mInfo.mCooldown = ElementalSpiritFire.COOLDOWN;
+
+		mLevelDamage = getAbilityScore() == 1 ? DAMAGE_1 : DAMAGE_2;
+		Bukkit.getScheduler().runTask(plugin, () -> {
+			if (player != null) {
+				mElementalArrows = AbilityManager.getManager().getPlayerAbility(mPlayer, ElementalArrows.class);
+			}
+		});
 	}
 
 	@Override
 	public void playerDealtCustomDamageEvent(CustomDamageEvent event) {
 		if (event.getMagicType() == MagicType.ICE && event.getSpell() != null && !event.getSpell().equals(mInfo.mLinkedSpell)) {
-			mMobsDamaged.add(event.getDamaged());
-
-			// We make 1 runnable that processes everything 1 tick later, so all the mob information is in.
-			if (mMobsDamagedParser == null) {
-				mMobsDamagedParser = new BukkitRunnable() {
+			mEnemiesAffected.add(event.getDamaged());
+			if (mEnemiesAffectedProcessor == null) {
+				mEnemiesAffectedProcessor = new BukkitRunnable() {
 					@Override
 					public void run() {
-						LivingEntity closestMob = null;
-						double closestDistance = 9001;
+						mEnemiesAffectedProcessor = null;
 
-						for (LivingEntity mob : mMobsDamaged) {
-							if (mob.isValid() && !mob.isDead()) {
-								double distance = mPlayer.getLocation().distanceSquared(mob.getLocation());
-								if (distance < closestDistance) {
-									closestDistance = distance;
-									closestMob = mob;
+						Location playerLocation = mPlayer.getLocation();
+						LivingEntity closestEnemy = null;
+						double closestDistanceSquared = 7050;
+
+						for (LivingEntity enemy : mEnemiesAffected) {
+							if (enemy.isValid()) {
+								double distanceSquared = playerLocation.distanceSquared(enemy.getLocation());
+								if (distanceSquared < closestDistanceSquared) {
+									closestDistanceSquared = distanceSquared;
+									closestEnemy = enemy;
 								}
 							}
 						}
+						mEnemiesAffected.clear();
 
-						if (closestMob != null) {
-							Location loc = closestMob.getLocation();
+						if (closestEnemy != null) {
+							putOnCooldown();
 
+							Location damageCentre = closestEnemy.getLocation();
+							Location particleCentre = damageCentre.clone().add(0, closestEnemy.getHeight() / 2, 0);
 							new BukkitRunnable() {
-								final Location mLoc = loc.add(0, 1, 0);
-								int mPulses = 0;
+								int mPulses = 1; // The current pulse for this run
 
 								@Override
 								public void run() {
 									World world = mPlayer.getWorld();
-									world.spawnParticle(Particle.SNOWBALL, mLoc, 150, 2, 0.25, 2, 0.1);
-									world.spawnParticle(Particle.FIREWORKS_SPARK, mLoc, 30, 2, 0.25, 2, 0.1);
-									world.playSound(mLoc, Sound.ENTITY_TURTLE_HURT_BABY, 1, 0.2f);
-									world.playSound(mLoc, Sound.BLOCK_GLASS_BREAK, 0.5f, 0.05f);
-									float damage = SpellDamage.getSpellDamage(mPlayer, mDamage);
-									for (LivingEntity mob : EntityUtils.getNearbyMobs(mLoc, ES_ICE_RADIUS)) {
-										mob.setNoDamageTicks(0);
+									world.spawnParticle(Particle.SNOWBALL, particleCentre, 150, SIZE / 2, 0.25, SIZE / 2, 0.1);
+									world.spawnParticle(Particle.FIREWORKS_SPARK, particleCentre, 30, SIZE / 2, 0.25, SIZE / 2, 0.1);
+									world.playSound(particleCentre, Sound.ENTITY_TURTLE_HURT_BABY, 1, 0.2f);
+									world.playSound(particleCentre, Sound.BLOCK_GLASS_BREAK, 0.5f, 0.05f);
+
+									float spellDamage = SpellDamage.getSpellDamage(mPlayer, mLevelDamage);
+									for (LivingEntity mob : EntityUtils.getNearbyMobs(damageCentre, SIZE)) {
+										float finalDamage = spellDamage;
 										if (event.getSpell().equals(Spells.ELEMENTAL_ARROWS) && mElementalArrows != null) {
-											EntityUtils.damageEntity(mPlugin, mob, mElementalArrows.getLastDamage() * 0.1, mPlayer, MagicType.ICE, true, mInfo.mLinkedSpell);
-										} else {
-											EntityUtils.damageEntity(mPlugin, mob, damage, mPlayer, MagicType.ICE, true, mInfo.mLinkedSpell);
+											finalDamage += mElementalArrows.getLastDamage() * BOW_MULTIPLIER;
 										}
+
+										//TODO true damage bypass instead of iframe reset - https://discord.com/channels/186225508562763776/186225918086217729/816701492000981014
+										mob.setNoDamageTicks(0);
+										EntityUtils.damageEntity(mPlugin, mob, finalDamage, mPlayer, MagicType.ICE, true, mInfo.mLinkedSpell);
 										mob.setVelocity(new Vector(0, 0, 0));
 									}
 
-									mPulses++;
-									if (mPulses >= ES_ICE_PULSES) {
+									if (mPulses >= PULSES) {
 										this.cancel();
+									} else {
+										mPulses++;
 									}
 								}
-							}.runTaskTimer(mPlugin, ES_ICE_PULSE_INTERVAL, ES_ICE_PULSE_INTERVAL);
-
-							putOnCooldown();
+							}.runTaskTimer(mPlugin, 0, PULSE_INTERVAL);
 						}
-
-						this.cancel();
-						mMobsDamagedParser = null;
-						mMobsDamaged.clear();
 					}
 				};
-
-				mMobsDamagedParser.runTaskLater(mPlugin, 1);
+				mEnemiesAffectedProcessor.runTaskLater(mPlugin, 1);
 			}
 		}
 	}
 
 	@Override
 	public void periodicTrigger(boolean fourHertz, boolean twoHertz, boolean oneSecond, int ticks) {
-		if (mParticleGenerator == null) {
-			mParticleGenerator = new BukkitRunnable() {
-				float mVertAngle = 0f;
-				double mRotation = 0;
+		if (mPlayerParticlesGenerator == null) {
+			mPlayerParticlesGenerator = new BukkitRunnable() {
+				double mVerticalAngle = 0;
+				double mRotationAngle = 180;
 
 				@Override
 				public void run() {
-					Location loc = mPlayer.getLocation().add(0, 1, 0);
-					mVertAngle -= 0.1f;
-					mRotation += 10;
-					double radian1 = Math.toRadians(mRotation);
-					loc.add(FastUtils.cos(radian1), FastUtils.sin(mVertAngle) * 0.5, FastUtils.sin(radian1));
+					mVerticalAngle -= 5.5;
+					mRotationAngle -= 10;
+					mVerticalAngle %= -360;
+					mRotationAngle %= -360;
 
-					// Don't display particles to player if they're in their face
-					if (loc.clone().subtract(mPlayer.getLocation().add(0, 1, 0)).toVector().normalize().dot(mPlayer.getEyeLocation().getDirection()) > 0.25) {
-						for (Player other : PlayerUtils.playersInRange(mPlayer, 30, false)) {
-							other.spawnParticle(Particle.SNOWBALL, loc, 3, 0, 0, 0, 0);
+					Location particleLocation = mPlayer.getLocation().add(0, mPlayer.getHeight() / 2, 0);
+					particleLocation.add(
+						FastUtils.cos(Math.toRadians(mRotationAngle)),
+						FastUtils.sin(Math.toRadians(mVerticalAngle)) * 0.5,
+						FastUtils.sin(Math.toRadians(mRotationAngle))
+					);
+
+					Location eyeLocation = mPlayer.getEyeLocation();
+					Vector particleVector = particleLocation.clone().subtract(eyeLocation).toVector();
+					Vector lookVector = eyeLocation.getDirection();
+					if (particleVector.dot(lookVector) > 0.25) {
+						// Don't display particles to player if they're in their face
+						for (Player otherPlayer : PlayerUtils.playersInRange(mPlayer, 30, false)) {
+							otherPlayer.spawnParticle(Particle.SNOWBALL, particleLocation, 3, 0, 0, 0, 0);
 						}
 					} else {
-						mPlayer.getWorld().spawnParticle(Particle.SNOWBALL, loc, 3, 0, 0, 0, 0);
+						mPlayer.getWorld().spawnParticle(Particle.SNOWBALL, particleLocation, 3, 0, 0, 0, 0);
 					}
 
-					if (AbilityManager.getManager().getPlayerAbility(mPlayer, ElementalSpiritIce.class) == null
-					    || !mPlayer.isOnline()
-					    || mPlayer.isDead()
-					    || mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), Spells.ELEMENTAL_SPIRIT_ICE)) {
+					if (
+						mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), Spells.ELEMENTAL_SPIRIT_FIRE)
+						|| AbilityManager.getManager().getPlayerAbility(mPlayer, ElementalSpiritFire.class) == null
+						|| !mPlayer.isValid() // Ensure player is not dead, is still online?
+					) {
 						this.cancel();
+						mPlayerParticlesGenerator = null;
 					}
-
-					loc.subtract(FastUtils.cos(radian1), FastUtils.sin(mVertAngle) * 0.5, FastUtils.sin(radian1));
 				}
-
 			};
-
-			mParticleGenerator.runTaskTimer(mPlugin, 0, 1);
+			mPlayerParticlesGenerator.runTaskTimer(mPlugin, 0, 1);
 		}
 	}
 
 	@Override
 	public void invalidate() {
-		if (mParticleGenerator != null) {
-			mParticleGenerator.cancel();
+		if (mPlayerParticlesGenerator != null) {
+			mPlayerParticlesGenerator.cancel();
 		}
 	}
 }

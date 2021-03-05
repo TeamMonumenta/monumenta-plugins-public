@@ -1,5 +1,11 @@
 package com.playmonumenta.plugins.abilities.mage;
 
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.classes.Spells;
+import com.playmonumenta.plugins.classes.magic.MagicType;
+import com.playmonumenta.plugins.utils.EntityUtils;
+
 import org.bukkit.Particle;
 import org.bukkit.entity.AbstractArrow;
 import org.bukkit.entity.Arrow;
@@ -10,28 +16,23 @@ import org.bukkit.entity.Projectile;
 import org.bukkit.entity.Stray;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.metadata.FixedMetadataValue;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.classes.Spells;
-import com.playmonumenta.plugins.classes.magic.MagicType;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.PotionUtils;
+
 
 public class ElementalArrows extends Ability {
+	public static final String NAME = "Elemental Arrows";
 
-	private static final double DAMAGE_MULTIPLIER_1 = 0.1;
-	private static final double DAMAGE_MULTIPLIER_2 = 0.2;
-	private static final int ELEMENTAL_ARROWS_BONUS_DAMAGE = 8;
-	private static final int ELEMENTAL_ARROWS_DURATION = 20 * 6;
-	private static final double ELEMENTAL_ARROWS_RADIUS = 3.0;
+	public static final double DAMAGE_MULTIPLIER_1 = 0.1;
+	public static final double DAMAGE_MULTIPLIER_2 = 0.2;
+	public static final int ELEMENTAL_ARROWS_BONUS_DAMAGE = 8;
+	public static final int ELEMENTAL_ARROWS_DURATION = 20 * 6;
+	public static final double ELEMENTAL_ARROWS_RADIUS = 3.0;
+	public static final double SLOW_AMPLIFIER = 0.2;
+
 	private double mLastDamage = 0;
-	private static final double SLOW_AMPLIFIER = 0.2;
 
 	public ElementalArrows(Plugin plugin, Player player) {
-		super(plugin, player, "Elemental Arrows");
+		super(plugin, player, NAME);
 		mInfo.mLinkedSpell = Spells.ELEMENTAL_ARROWS;
 		mInfo.mScoreboardId = "Elemental";
 		mInfo.mShorthandName = "EA";

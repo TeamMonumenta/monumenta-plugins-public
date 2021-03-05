@@ -5,17 +5,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
-import org.bukkit.World;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
-import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.util.BoundingBox;
-import org.bukkit.util.Vector;
-
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityManager;
@@ -28,31 +17,71 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
+import org.bukkit.World;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
+import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.util.BoundingBox;
+import org.bukkit.util.Vector;
+
+
 
 public class ElementalSpiritFire extends Ability {
+	public static final String NAME = "Elemental Spirits";
 
-	private static final int ES_FIRE_COOLDOWN = 20 * 12;
-	private static final int ES_FIRE_1_DAMAGE = 10;
-	private static final int ES_FIRE_2_DAMAGE = 15;
-	private static final double ES_FIRE_SIZE = 1.5;
+	public static final int DAMAGE_1 = 10;
+	public static final int DAMAGE_2 = 15;
+	public static final double SIZE = 1.5;
+	public static final double BOW_MULTIPLIER = 0.25;
+	public static final int BOW_PERCENTAGE = (int) (BOW_MULTIPLIER * 100);
+	public static final int COOLDOWN_SECONDS = 12;
+	public static final int COOLDOWN = COOLDOWN_SECONDS * 20;
 
-	private final int mDamage;
-	private final Set<LivingEntity> mMobsDamaged = new HashSet<>();
-	private BukkitRunnable mMobsDamagedParser;
-	private BukkitRunnable mParticleGenerator;
+	private final Set<LivingEntity> mEnemiesAffected = new HashSet<>();
+	private final int mLevelDamage;
+
 	private ElementalArrows mElementalArrows;
+	private BukkitRunnable mEnemiesAffectedProcessor;
+	private BukkitRunnable mPlayerParticlesGenerator;
 
 	public ElementalSpiritFire(Plugin plugin, Player player) {
-		super(plugin, player, "Elemental Spirit");
+		super(plugin, player, NAME);
+
+		mInfo.mLinkedSpell = Spells.ELEMENTAL_SPIRIT_FIRE;
 		mInfo.mScoreboardId = "ElementalSpirit";
 		mInfo.mShorthandName = "ES";
-		mInfo.mDescriptions.add("You are accompanied a spirit of fire and a spirit of ice. Upon using a fire spell, the fire spirit will rush towards the farthest enemy hit with the spell, damaging all enemies along the way by 10 (25 percent of bow damage if using elemental arrows). Upon using an ice spell, the ice spirit will rush towards the closest enemy hit with the spell, damaging mobs in a 3 block radius by 4 per second (10% of bow damage if using elemental arrows) for 3 seconds. Each spirit operates on its own cooldown of 12s.");
-		mInfo.mDescriptions.add("Damage dealt by the fire spirit is increased to 15, and damage dealt by the ice spirit is increased to 6. The elemental arrows damage remains unchanged.");
-		mInfo.mLinkedSpell = Spells.ELEMENTAL_SPIRIT_FIRE;
-		mInfo.mCooldown = ES_FIRE_COOLDOWN;
-		mDamage = getAbilityScore() == 1 ? ES_FIRE_1_DAMAGE : ES_FIRE_2_DAMAGE;
+		//TODO update, is 21 tick wait for ice spirit intended? Description does not mention it
+		mInfo.mDescriptions.add(
+			String.format(
+				"Two spirits accompany you - one of fire and one of ice. The next moment after you cast a fire spell, the fire spirit instantly dashes from you towards the farthest enemy that spell hit, dealing %s damage to all enemies in a %s-block cube around it along its path. The next moment after you cast an ice spell, the ice spirit warps to the closest enemy that spell hit, dealing %s damage to all enemies in a %s-block cube around it every second for %s seconds. If the spell was %s, the fire spirit does an additional %s%% of the bow's original damage, and for the ice spirit, an additional %s%%. Each spirit has an independent cooldown, and their damage ignores iframes. Cooldown: %ss.",
+				DAMAGE_1,
+				SIZE,
+				ElementalSpiritIce.DAMAGE_1,
+				ElementalSpiritIce.SIZE,
+				ElementalSpiritIce.PULSES,
+				ElementalArrows.NAME,
+				BOW_PERCENTAGE,
+				ElementalSpiritIce.BOW_PERCENTAGE,
+				COOLDOWN_SECONDS
+			) // Ice pulse interval of 20 ticks hardcoded to say "every second"
+		);
+		mInfo.mDescriptions.add(
+			String.format(
+				"Fire spirit damage is increased from %s to %s. Ice spirit damage is increased from %s to %s.",
+				DAMAGE_1,
+				DAMAGE_2,
+				ElementalSpiritIce.DAMAGE_1,
+				ElementalSpiritIce.DAMAGE_2
+			)
+		);
+		mInfo.mCooldown = COOLDOWN;
 
-		// Needs to wait for the entire AbilityCollection to be initialized
+		mLevelDamage = getAbilityScore() == 1 ? DAMAGE_1 : DAMAGE_2;
+		// Task runs on the next server tick. Need to wait for entire AbilityCollection to be initialised to properly getPlayerAbility()
 		Bukkit.getScheduler().runTask(plugin, () -> {
 			if (player != null) {
 				mElementalArrows = AbilityManager.getManager().getPlayerAbility(mPlayer, ElementalArrows.class);
@@ -63,116 +92,138 @@ public class ElementalSpiritFire extends Ability {
 	@Override
 	public void playerDealtCustomDamageEvent(CustomDamageEvent event) {
 		if (event.getMagicType() == MagicType.FIRE && event.getSpell() != null && !event.getSpell().equals(mInfo.mLinkedSpell)) {
-			mMobsDamaged.add(event.getDamaged());
-			// We make 1 runnable that processes everything 1 tick later, so all the mob information is in.
-			if (mMobsDamagedParser == null) {
-				mMobsDamagedParser = new BukkitRunnable() {
+			mEnemiesAffected.add(event.getDamaged());
+			// 1 runnable processes everything 1 tick later, so all enemies to affect are in
+			if (mEnemiesAffectedProcessor == null) {
+				mEnemiesAffectedProcessor = new BukkitRunnable() {
 					@Override
 					public void run() {
-						Location loc = mPlayer.getLocation();
-						LivingEntity farthestMob = null;
-						double farthestDistance = -1;
+						mEnemiesAffectedProcessor = null;
 
-						for (LivingEntity mob : mMobsDamaged) {
-							if (mob.isValid() && !mob.isDead()) {
-								double distance = loc.distanceSquared(mob.getLocation());
-								if (distance > farthestDistance) {
-									farthestDistance = distance;
-									farthestMob = mob;
+						Location playerLocation = mPlayer.getLocation();
+						LivingEntity farthestEnemy = null;
+						double farthestDistanceSquared = 0;
+
+						for (LivingEntity enemy : mEnemiesAffected) {
+							if (enemy.isValid()) { // If not dead or has despawned
+								double distanceSquared = playerLocation.distanceSquared(enemy.getLocation());
+								if (distanceSquared > farthestDistanceSquared) {
+									farthestEnemy = enemy;
+									farthestDistanceSquared = distanceSquared;
 								}
 							}
 						}
+						mEnemiesAffected.clear();
 
-						if (farthestMob != null) {
-							farthestDistance = Math.sqrt(farthestDistance);
-							List<LivingEntity> mobs = EntityUtils.getNearbyMobs(loc, farthestDistance + 1);
-							Vector dir = farthestMob.getLocation().subtract(loc).toVector().normalize();
-							BoundingBox fireSpirit = BoundingBox.of(mPlayer.getEyeLocation(), ES_FIRE_SIZE, ES_FIRE_SIZE, ES_FIRE_SIZE);
+						if (farthestEnemy != null) {
+							putOnCooldown();
+
+							Location startLocation = mPlayer.getLocation().add(0, mPlayer.getHeight() / 2, 0);
+							Location endLocation = farthestEnemy.getLocation().add(0, farthestEnemy.getHeight() / 2, 0);
 
 							World world = mPlayer.getWorld();
-							world.playSound(loc, Sound.ENTITY_BLAZE_AMBIENT, 1, 0.5f);
+							BoundingBox movingSpiritBox = BoundingBox.of(mPlayer.getEyeLocation(), SIZE, SIZE, SIZE);
+							double maxDistance = startLocation.distance(endLocation);
+							Vector vector = endLocation.clone().subtract(startLocation).toVector();
+							double increment = 0.2;
 
-							float damage = SpellDamage.getSpellDamage(mPlayer, mDamage);
+							world.playSound(playerLocation, Sound.ENTITY_BLAZE_AMBIENT, 1, 0.5f);
 
-							for (int i = 0; i < (int)(farthestDistance + 1); i++) {
-								Iterator<LivingEntity> iter = mobs.iterator();
-								while (iter.hasNext()) {
-									LivingEntity mob = iter.next();
-									if (mob.getBoundingBox().overlaps(fireSpirit)) {
-										mob.setNoDamageTicks(0);
+							List<LivingEntity> potentialTargets = EntityUtils.getNearbyMobs(playerLocation, maxDistance + 1);
+							float spellDamage = SpellDamage.getSpellDamage(mPlayer, mLevelDamage);
+							Vector vectorIncrement = vector.normalize().multiply(increment);
+
+							double maxIterations = maxDistance / increment * 1.1;
+							for (int i = 0; i < maxIterations; i++) {
+								Iterator<LivingEntity> iterator = potentialTargets.iterator();
+								while (iterator.hasNext()) {
+									LivingEntity potentialTarget = iterator.next();
+									if (potentialTarget.getBoundingBox().overlaps(movingSpiritBox)) {
+										float finalDamage = spellDamage;
 										if (event.getSpell().equals(Spells.ELEMENTAL_ARROWS) && mElementalArrows != null) {
-											EntityUtils.damageEntity(mPlugin, mob, mElementalArrows.getLastDamage() * 0.25, mPlayer, MagicType.FIRE, true, mInfo.mLinkedSpell);
-										} else {
-											EntityUtils.damageEntity(mPlugin, mob, damage, mPlayer, MagicType.FIRE, true, mInfo.mLinkedSpell);
+											finalDamage += mElementalArrows.getLastDamage() * BOW_MULTIPLIER;
 										}
-										iter.remove();
+
+										//TODO true damage bypass instead of iframe reset - https://discord.com/channels/186225508562763776/186225918086217729/816701492000981014
+										potentialTarget.setNoDamageTicks(0);
+										EntityUtils.damageEntity(mPlugin, potentialTarget, finalDamage, mPlayer, MagicType.FIRE, true, mInfo.mLinkedSpell);
+										iterator.remove();
 									}
 								}
 
-								fireSpirit.shift(dir);
-								world.spawnParticle(Particle.FLAME, fireSpirit.getCenterX(), fireSpirit.getCenterY(), fireSpirit.getCenterZ(), 20, 0.4, 0.4, 0.4, 0.01);
-								world.spawnParticle(Particle.SMOKE_LARGE, fireSpirit.getCenterX(), fireSpirit.getCenterY(), fireSpirit.getCenterZ(), 10, 0.4, 0.4, 0.4, 0.01);
+								// The first shift happens after the first damage attempt,
+								// unlike something like LocationUtils.travelTillObstructed().
+								// The spirit starts at the player's eyes so this could damage enemies right beside/behind the player
+								movingSpiritBox.shift(vectorIncrement);
+								Location newPotentialLocation = movingSpiritBox.getCenter().toLocation(world);
+								if (playerLocation.distanceSquared(newPotentialLocation) > maxDistance * maxDistance) {
+									break;
+								} else {
+									// Else spawn particles at the new location and continue doing damage at this place the next tick
+									// These particles skip the first damage attempt
+									world.spawnParticle(Particle.FLAME, newPotentialLocation, 4, 0.4, 0.4, 0.4, 0.1);
+									world.spawnParticle(Particle.SMOKE_LARGE, newPotentialLocation, 4, 0.4, 0.4, 0.4, 0.1);
+								}
 							}
-
-							putOnCooldown();
 						}
-
-						this.cancel();
-						mMobsDamagedParser = null;
-						mMobsDamaged.clear();
 					}
 				};
-
-				mMobsDamagedParser.runTaskLater(mPlugin, 1);
+				mEnemiesAffectedProcessor.runTaskLater(mPlugin, 1);
 			}
 		}
 	}
 
 	@Override
 	public void periodicTrigger(boolean fourHertz, boolean twoHertz, boolean oneSecond, int ticks) {
-		if (mParticleGenerator == null) {
-			mParticleGenerator = new BukkitRunnable() {
-				float mVertAngle = 0f;
-				double mRotation = 0;
+		if (mPlayerParticlesGenerator == null) {
+			mPlayerParticlesGenerator = new BukkitRunnable() {
+				double mVerticalAngle = 0;
+				double mRotationAngle = 0;
 
 				@Override
 				public void run() {
-					Location loc = mPlayer.getLocation().add(0, 1, 0);
-					mVertAngle += 0.1f;
-					mRotation += 10;
-					double radian1 = Math.toRadians(mRotation);
-					loc.add(FastUtils.cos(radian1), FastUtils.sin(mVertAngle) * 0.5, FastUtils.sin(radian1));
+					mVerticalAngle += 5.5;
+					mRotationAngle += 10;
+					mVerticalAngle %= 360;
+					mRotationAngle %= 360;
 
-					// Don't display particles to player if they're in their face
-					if (loc.clone().subtract(mPlayer.getLocation().add(0, 1, 0)).toVector().normalize().dot(mPlayer.getEyeLocation().getDirection()) > 0.25) {
-						for (Player other : PlayerUtils.playersInRange(mPlayer, 30, false)) {
-							other.spawnParticle(Particle.FLAME, loc, 1, 0, 0, 0, 0.01);
+					Location particleLocation = mPlayer.getLocation().add(0, mPlayer.getHeight() / 2, 0);
+					particleLocation.add(
+						FastUtils.cos(Math.toRadians(mRotationAngle)),
+						FastUtils.sin(Math.toRadians(mVerticalAngle)) * 0.5,
+						FastUtils.sin(Math.toRadians(mRotationAngle))
+					);
+
+					Location eyeLocation = mPlayer.getEyeLocation();
+					Vector particleVector = particleLocation.clone().subtract(eyeLocation).toVector();
+					Vector lookVector = eyeLocation.getDirection();
+					if (particleVector.dot(lookVector) > 0.25) {
+						// Don't display particles to player if they're in their face
+						for (Player otherPlayer : PlayerUtils.playersInRange(mPlayer, 30, false)) {
+							otherPlayer.spawnParticle(Particle.FLAME, particleLocation, 1, 0, 0, 0, 0.01);
 						}
 					} else {
-						mPlayer.getWorld().spawnParticle(Particle.FLAME, loc, 1, 0, 0, 0, 0.01);
+						mPlayer.getWorld().spawnParticle(Particle.FLAME, particleLocation, 1, 0, 0, 0, 0.01);
 					}
 
-					if (AbilityManager.getManager().getPlayerAbility(mPlayer, ElementalSpiritFire.class) == null
-					    || !mPlayer.isOnline()
-					    || mPlayer.isDead()
-					    || mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), Spells.ELEMENTAL_SPIRIT_FIRE)) {
+					if (
+						mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), Spells.ELEMENTAL_SPIRIT_FIRE)
+						|| AbilityManager.getManager().getPlayerAbility(mPlayer, ElementalSpiritFire.class) == null
+						|| !mPlayer.isValid() // Ensure player is not dead, is still online?
+					) {
 						this.cancel();
-						mParticleGenerator = null;
+						mPlayerParticlesGenerator = null;
 					}
-
-					loc.subtract(FastUtils.cos(radian1), FastUtils.sin(mVertAngle) * 0.5, FastUtils.sin(radian1));
 				}
-
 			};
-
-			mParticleGenerator.runTaskTimer(mPlugin, 0, 1);
+			mPlayerParticlesGenerator.runTaskTimer(mPlugin, 0, 1);
 		}
 	}
 
 	@Override
 	public void invalidate() {
-		if (mParticleGenerator != null) {
-			mParticleGenerator.cancel();
+		if (mPlayerParticlesGenerator != null) {
+			mPlayerParticlesGenerator.cancel();
 		}
 	}
 }

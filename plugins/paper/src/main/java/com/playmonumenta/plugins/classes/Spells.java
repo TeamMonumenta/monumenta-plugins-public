@@ -17,8 +17,8 @@ public enum Spells {
 	//--Elementalist Spec.
 	BLIZZARD("Blizzard"),
 	STARFALL("Starfall"),
-	ELEMENTAL_SPIRIT_FIRE("Elemental Spirit (Fire)"),
-	ELEMENTAL_SPIRIT_ICE("Elemental Spirit (Ice)"),
+	ELEMENTAL_SPIRIT_FIRE("Fire Elemental Spirit"),
+	ELEMENTAL_SPIRIT_ICE("Ice Elemental Spirit"),
 
 	//--Arcanist Spec.
 	ARCANE_BARRAGE("Arcane Barrage"),
