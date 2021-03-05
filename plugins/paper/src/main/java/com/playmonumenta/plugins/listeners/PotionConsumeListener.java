@@ -5,16 +5,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.cleric.NonClericProvisionsPassive;
-import com.playmonumenta.plugins.enchantments.InstantDrink;
-import com.playmonumenta.plugins.integrations.CoreProtectIntegration;
-import com.playmonumenta.plugins.potion.PotionManager.PotionID;
-import com.playmonumenta.plugins.utils.FastUtils;
-import com.playmonumenta.plugins.utils.InventoryUtils;
-import com.playmonumenta.plugins.utils.ItemUtils;
-import com.playmonumenta.plugins.utils.PotionUtils;
-
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -23,6 +13,7 @@ import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.ThrownPotion;
 import org.bukkit.event.EventHandler;
@@ -32,13 +23,23 @@ import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.scheduler.BukkitTask;
+
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.cleric.NonClericProvisionsPassive;
+import com.playmonumenta.plugins.enchantments.InstantDrink;
+import com.playmonumenta.plugins.integrations.CoreProtectIntegration;
+import com.playmonumenta.plugins.potion.PotionManager.PotionID;
+import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.PotionUtils;
 
 public class PotionConsumeListener implements Listener {
 	private static final int DRINK_TICK_DELAY = 4; //How many ticks between each slurp sound
@@ -73,14 +74,25 @@ public class PotionConsumeListener implements Listener {
 		    event.getCurrentItem() == null ||
 		    ItemUtils.isItemShattered(event.getCurrentItem()) ||
 		    !(event.getCurrentItem().getType().equals(Material.POTION) ||
-		      event.getCurrentItem().getType().equals(Material.GLASS_BOTTLE))
-		) {
+		      event.getCurrentItem().getType().equals(Material.GLASS_BOTTLE)) ||
+		     //Can not quick drink while potion is on cooldown
+		    checkPotionCooldown(event.getWhoClicked())) {
 			// Nope!
 			return;
 		}
 
 		Player player = (Player)event.getWhoClicked();
 		ItemStack item = event.getCurrentItem();
+
+		if (item.containsEnchantment(Enchantment.ARROW_INFINITE)) {
+			player.sendMessage(ChatColor.RED + "Infinite potions can not be quick drinked!");
+
+			float pitch = ((float)FastUtils.RANDOM.nextDouble() - 0.5f) * 0.05f;
+			player.getWorld().playSound(player.getLocation(), Sound.BLOCK_GLASS_BREAK, 1.0f, 1.0f + pitch);
+
+			event.setCancelled(true);
+			return;
+		}
 
 		Set<String> tags = player.getScoreboardTags();
 		BukkitRunnable runnable = mRunnables.get(player.getUniqueId());
@@ -137,6 +149,11 @@ public class PotionConsumeListener implements Listener {
 		if (instantDrinkLevel != 0) {
 			player.getWorld().playSound(player.getLocation(), Sound.ENTITY_GENERIC_DRINK, 1.0f, 1.0f);
 			PotionUtils.applyPotion(mPlugin, player, meta);
+
+			InventoryType invType = event.getClickedInventory().getType();
+			if (invType == InventoryType.PLAYER || invType == InventoryType.ENDER_CHEST || invType == InventoryType.SHULKER_BOX) {
+				setPotionCooldown(player);
+			}
 		} else {
 			//Gives slowness IV to emulate the slow walking of drinking, extra 5 ticks to match delay of drinking
 			mPlugin.mPotionManager.addPotion(player, PotionID.ITEM, new PotionEffect(PotionEffectType.SLOW, DRINK_DURATION + 5, 3, true, false));
@@ -163,7 +180,21 @@ public class PotionConsumeListener implements Listener {
 							} else {
 								inv.addItem(potion);
 							}
+						} else {
+							//Remove glass bottle from inventory once drinked
+							Inventory inv = event.getClickedInventory();
+							int slot = event.getSlot();
+							ItemStack invItem = inv.getItem(slot);
+							if (invItem != null && invItem.getType().equals(Material.GLASS_BOTTLE) && !invItem.hasItemMeta()) {
+								inv.setItem(slot, null);
+							}
 						}
+
+						InventoryType invType = event.getClickedInventory().getType();
+						if (invType == InventoryType.PLAYER || invType == InventoryType.ENDER_CHEST || invType == InventoryType.SHULKER_BOX) {
+							setPotionCooldown(player);
+						}
+
 						this.cancel();
 					}
 					float pitch = ((float)FastUtils.RANDOM.nextDouble() - 0.5f) * 0.05f; //Emulate drinking variation of pitch
@@ -186,7 +217,8 @@ public class PotionConsumeListener implements Listener {
 				if (item.getAmount() == 0) {
 					event.getClickedInventory().setItem(event.getSlot(), new ItemStack(Material.GLASS_BOTTLE));
 				} else {
-					player.getInventory().addItem(new ItemStack(Material.GLASS_BOTTLE));
+					//Re-enable if we ever want stacked non-instant drink potions to be cancellable (can't remove the bottle though)
+//					player.getInventory().addItem(new ItemStack(Material.GLASS_BOTTLE));
 				}
 			}
 		}
@@ -214,8 +246,9 @@ public class PotionConsumeListener implements Listener {
 		    event.getCurrentItem() == null ||
 			ItemUtils.isItemShattered(event.getCurrentItem()) ||
 		    !(event.getCurrentItem().getType().equals(Material.SPLASH_POTION) ||
-		      event.getCurrentItem().getType().equals(Material.LINGERING_POTION))
-		) {
+		      event.getCurrentItem().getType().equals(Material.LINGERING_POTION)) ||
+		      //Can not quick splash while potions are on cooldown
+		      checkPotionCooldown(event.getWhoClicked())) {
 			// Nope!
 			return;
 		}
@@ -252,6 +285,25 @@ public class PotionConsumeListener implements Listener {
 		//Remove item
 		item.setAmount(item.getAmount() - 1);
 
+		InventoryType invType = event.getClickedInventory().getType();
+		if (invType == InventoryType.PLAYER || invType == InventoryType.ENDER_CHEST || invType == InventoryType.SHULKER_BOX) {
+			setPotionCooldown(player);
+		}
+
 		event.setCancelled(true);
+	}
+
+	//Set cooldown to prevent spam
+	private void setPotionCooldown(Player player) {
+		int cd = 5;
+		player.setCooldown(Material.SPLASH_POTION, 20 * cd);
+		player.setCooldown(Material.LINGERING_POTION, 20 * cd);
+		player.setCooldown(Material.POTION, 20 * cd);
+	}
+
+	//Returns true if potion cooldown is up right now
+	//False if no cooldowns and the quick drink is activatable now
+	private boolean checkPotionCooldown(HumanEntity player) {
+		return player.getCooldown(Material.SPLASH_POTION) > 0 || player.getCooldown(Material.LINGERING_POTION) > 0 || player.getCooldown(Material.POTION) > 0;
 	}
 }
