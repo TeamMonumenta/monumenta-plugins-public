@@ -55,7 +55,14 @@ public class EnchantmentManager implements Listener {
 
 	public static final List<BaseEnchantment> CROSS_REGION_PROPERTIES = Arrays.asList(
 			new RegionScalingDamageDealt(),
-			new Recoil()
+			new Recoil(),
+			new Starvation(),
+			new TwoHanded(),
+			new CurseOfAnemia(),
+			new CurseOfCorruption(),
+			new CurseOfCrippling(),
+			new CurseOfEphemerality(),
+			new CurseOfShrapnel()
 	);
 
 	/*
