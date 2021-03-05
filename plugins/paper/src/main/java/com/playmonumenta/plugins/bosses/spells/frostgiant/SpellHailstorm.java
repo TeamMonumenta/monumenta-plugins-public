@@ -93,8 +93,14 @@ public class SpellHailstorm extends Spell {
 			return;
 		}
 
-		for (Player player : PlayerUtils.playersInRange(loc, FrostGiant.fighterRange)) {
-			if (mDoDamage && !player.getLocation().toVector().isInSphere(mBoss.getLocation().toVector(), mRadius) && player.getGameMode() != GameMode.CREATIVE && !mDamage.containsKey(player) && mStartLoc.distance(player.getLocation()) <= FrostGiant.fighterRange) {
+		for (Player player : PlayerUtils.playersInRange(loc, FrostGiant.detectionRange)) {
+
+			//This location sets player's y location to the mBoss' y location to compute location ignoring the y level
+			//Essentially distance in terms of x and z only
+			Location pLocY = player.getLocation();
+			pLocY.setY(loc.getY());
+
+			if (mDoDamage && pLocY.distanceSquared(loc) > mRadius * mRadius && player.getGameMode() != GameMode.CREATIVE && !mDamage.containsKey(player) && mStartLoc.distance(player.getLocation()) <= FrostGiant.fighterRange && player.getLocation().getY() - mStartLoc.getY() <= 45) {
 				BukkitRunnable runnable = new BukkitRunnable() {
 					int mTicks = 0;
 					float mPitch = 1;
@@ -117,7 +123,11 @@ public class SpellHailstorm extends Spell {
 								this.cancel();
 							}
 
-							if (!player.getLocation().toVector().isInSphere(mBoss.getLocation().toVector(), mRadius) && mDoDamage) {
+							Location loc = mBoss.getLocation();
+							Location pLocY = player.getLocation();
+							pLocY.setY(loc.getY());
+
+							if (pLocY.distanceSquared(loc) > mRadius * mRadius && mDoDamage) {
 								Vector vel = player.getVelocity();
 								BossUtils.bossDamagePercent(mBoss, player, 0.15, loc);
 								player.setVelocity(vel);

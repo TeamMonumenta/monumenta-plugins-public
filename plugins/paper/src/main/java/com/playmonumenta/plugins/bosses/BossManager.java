@@ -9,6 +9,8 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.logging.Level;
 
+import javax.annotation.Nonnull;
+
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -28,6 +30,7 @@ import org.bukkit.entity.ThrownPotion;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.entity.AreaEffectCloudApplyEvent;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
@@ -371,6 +374,8 @@ public class BossManager implements Listener {
 	 *******************************************************************************/
 	private final Plugin mPlugin;
 	private final Map<UUID, Boss> mBosses;
+	private boolean mNearbyEntityDeathEnabled = false;
+	private boolean mNearbyBlockBreakEnabled = false;
 
 	public BossManager(Plugin plugin) {
 		mInstance = this;
@@ -437,10 +442,16 @@ public class BossManager implements Listener {
 			if (!(entity instanceof LivingEntity)) {
 				return;
 			}
-			for (LivingEntity m : EntityUtils.getNearbyMobs(entity.getLocation(), 12.0)) {
-				Boss boss = mBosses.get(m.getUniqueId());
-				if (boss != null) {
-					boss.nearbyEntityDeath(event);
+
+			if (mNearbyEntityDeathEnabled) {
+				/* For performance reasons this check is only enabled when there is a loaded
+				 * boss that is using this feature
+				 */
+				for (LivingEntity m : EntityUtils.getNearbyMobs(entity.getLocation(), 12.0)) {
+					Boss boss = mBosses.get(m.getUniqueId());
+					if (boss != null) {
+						boss.nearbyEntityDeath(event);
+					}
 				}
 			}
 
@@ -448,7 +459,7 @@ public class BossManager implements Listener {
 			if (boss != null) {
 				boss.death(event);
 				if (((LivingEntity) entity).getHealth() <= 0) {
-					boss.unload(false);
+					unload(boss, false);
 					mBosses.remove(entity.getUniqueId());
 
 					/*
@@ -462,13 +473,30 @@ public class BossManager implements Listener {
 	}
 
 	@EventHandler(priority = EventPriority.MONITOR)
+	public void blockBreakEvent(BlockBreakEvent event) {
+		if (!event.isCancelled()) {
+			if (mNearbyBlockBreakEnabled) {
+				/* For performance reasons this check is only enabled when there is a loaded
+				 * boss that is using this feature
+				 */
+				for (LivingEntity m : EntityUtils.getNearbyMobs(event.getBlock().getLocation(), 62.0)) {
+					Boss boss = mBosses.get(m.getUniqueId());
+					if (boss != null) {
+						boss.nearbyBlockBreak(event);
+					}
+				}
+			}
+		}
+	}
+
+	@EventHandler(priority = EventPriority.MONITOR)
 	public void entityExplodeEvent(EntityExplodeEvent event) {
 		Entity entity = event.getEntity();
 		if (!event.isCancelled() && entity != null && entity instanceof Creeper) {
 			Boss boss = mBosses.remove(entity.getUniqueId());
 			if (boss != null) {
 				boss.death(null);
-				boss.unload(false);
+				unload(boss, false);
 			}
 		}
 	}
@@ -739,16 +767,27 @@ public class BossManager implements Listener {
 	 * Public Methods
 	 *******************************************************************************/
 
+	/*
+	 * Every way to unload a boss needs to bounce through this function to ensure
+	 * state is updated correctly!
+	 */
+	private void unload(@Nonnull Boss boss, boolean shuttingDown) {
+		if (!shuttingDown) {
+			checkDisablePerformanceEvents(boss);
+		}
+		boss.unload(shuttingDown);
+	}
+
 	public void unload(LivingEntity entity, boolean shuttingDown) {
 		Boss boss = mBosses.remove(entity.getUniqueId());
 		if (boss != null) {
-			boss.unload(shuttingDown);
+			unload(boss, shuttingDown);
 		}
 	}
 
 	public void unloadAll(boolean shuttingDown) {
 		for (Map.Entry<UUID, Boss> entry : mBosses.entrySet()) {
-			entry.getValue().unload(shuttingDown);
+			unload(entry.getValue(), shuttingDown);
 		}
 		mBosses.clear();
 	}
@@ -810,9 +849,75 @@ public class BossManager implements Listener {
 	 * Private Methods
 	 *******************************************************************************/
 
+	/*
+	 * This function should be called whenever an ability is loaded to enable events
+	 * that are more performance sensative (if applicable)
+	 */
+	private void checkEnablePerformanceEvents(BossAbilityGroup ability) {
+		if (ability.hasNearbyEntityDeathTrigger()) {
+			mNearbyEntityDeathEnabled = true;
+		}
+
+		if (ability.hasNearbyBlockBreakTrigger()) {
+			mNearbyBlockBreakEnabled = true;
+		}
+	}
+
+	/*
+	 * This function should be called whenever a boss is unloaded to disable events
+	 * that are more performance sensative (if applicable)
+	 */
+	private void checkDisablePerformanceEvents(Boss boss) {
+		if (boss.hasNearbyEntityDeathTrigger()) {
+			if (mNearbyEntityDeathEnabled == false) {
+				mPlugin.getLogger().log(Level.WARNING, "Unloaded Boss with hasNearbyEntityDeathTrigger but feature was not enabled. Definitely a bug!");
+				return;
+			}
+
+			/*
+			 * This boss was at least contributing to keeping this feature enabled
+			 *
+			 * Need to check all other loaded bosses to see if it still needs to be enabled
+			 */
+			for (Boss testBoss : mBosses.values()) {
+				if (testBoss.hasNearbyEntityDeathTrigger()) {
+					/* Still at least one other boss that needs this - don't turn off yet */
+					return;
+				}
+			}
+
+			/* No bosses still loaded that need this feature - turn it off */
+			mNearbyEntityDeathEnabled = false;
+		}
+
+		if (boss.hasNearbyBlockBreakTrigger()) {
+			if (mNearbyBlockBreakEnabled == false) {
+				mPlugin.getLogger().log(Level.WARNING, "Unloaded Boss with hasNearbyBlockBreakTrigger but feature was not enabled. Definitely a bug!");
+				return;
+			}
+
+			/*
+			 * This boss was at least contributing to keeping this feature enabled
+			 *
+			 * Need to check all other loaded bosses to see if it still needs to be enabled
+			 */
+			for (Boss testBoss : mBosses.values()) {
+				if (testBoss.hasNearbyBlockBreakTrigger()) {
+					/* Still at least one other boss that needs this - don't turn off yet */
+					return;
+				}
+			}
+
+			/* No bosses still loaded that need this feature - turn it off */
+			mNearbyBlockBreakEnabled = false;
+		}
+	}
+
 	private void createBossInternal(LivingEntity targetEntity, BossAbilityGroup ability) throws Exception {
 		/* Set up boss health / armor / etc */
 		ability.init();
+
+		checkEnablePerformanceEvents(ability);
 
 		Boss boss = mBosses.get(targetEntity.getUniqueId());
 		if (boss == null) {
@@ -849,6 +954,8 @@ public class BossManager implements Listener {
 						continue;
 					}
 
+					checkEnablePerformanceEvents(ability);
+
 					if (boss == null) {
 						boss = new Boss(mPlugin, ability);
 						mBosses.put(entity.getUniqueId(), boss);
@@ -863,6 +970,8 @@ public class BossManager implements Listener {
 	public void sendBossDebugInfo(CommandSender sender) {
 		sender.sendMessage("");
 		sender.sendMessage("Total number of loaded bosses: " + mBosses.size());
+		sender.sendMessage("mNearbyEntityDeathEnabled: " + mNearbyEntityDeathEnabled);
+		sender.sendMessage("mNearbyBlockBreakEnabled: " + mNearbyBlockBreakEnabled);
 
 		Map<String, Integer> bossCounts = new HashMap<>();
 		for (Boss boss : mBosses.values()) {
@@ -885,6 +994,8 @@ public class BossManager implements Listener {
 	}
 
 	public void manuallyRegisterBoss(LivingEntity entity, BossAbilityGroup ability) {
+		checkEnablePerformanceEvents(ability);
+
 		Boss boss = mBosses.get(entity.getUniqueId());
 		if (boss == null) {
 			boss = new Boss(mPlugin, ability);

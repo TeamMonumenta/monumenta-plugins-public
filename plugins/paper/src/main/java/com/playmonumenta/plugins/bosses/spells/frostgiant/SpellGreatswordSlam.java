@@ -46,11 +46,14 @@ public class SpellGreatswordSlam extends Spell {
 	private static final Particle.DustOptions BLUE_COLOR = new Particle.DustOptions(Color.fromRGB(66, 185, 245), 1.0f);
 	private static final Particle.DustOptions GRAY_COLOR = new Particle.DustOptions(Color.fromRGB(156, 156, 156), 1.0f);
 
-	public SpellGreatswordSlam(Plugin plugin, LivingEntity boss, int dur, double deg) {
+	private Location mStartLoc;
+
+	public SpellGreatswordSlam(Plugin plugin, LivingEntity boss, int dur, double deg, Location startLoc) {
 		mPlugin = plugin;
 		mBoss = boss;
 		mDuration = dur;
 		mDeg = deg;
+		mStartLoc = startLoc;
 	}
 
 	@Override
@@ -75,7 +78,7 @@ public class SpellGreatswordSlam extends Spell {
 
 		Location loc = mBoss.getLocation();
 
-		new BukkitRunnable() {
+		BukkitRunnable runnable1 = new BukkitRunnable() {
 			int mT = 0;
 			@Override
 			public void run() {
@@ -102,9 +105,11 @@ public class SpellGreatswordSlam extends Spell {
 					mBoss.teleport(mBoss.getLocation().setDirection(bossDir));
 				}
 			}
-		}.runTaskTimer(mPlugin, 0, 10);
+		};
+		runnable1.runTaskTimer(mPlugin, 0, 10);
+		mActiveRunnables.add(runnable1);
 
-		BukkitRunnable runnable = new BukkitRunnable() {
+		BukkitRunnable runnable2 = new BukkitRunnable() {
 			int mT = 0;
 			List<Player> mHitPlayers = new ArrayList<>();
 			@Override
@@ -121,7 +126,7 @@ public class SpellGreatswordSlam extends Spell {
 					} else {
 						//Creates the giant 30 degree cone rift of damage
 						world.playSound(loc, Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, SoundCategory.HOSTILE, 1, 0);
-						new BukkitRunnable() {
+						BukkitRunnable runnable = new BukkitRunnable() {
 							int mRadius = 0;
 							@Override
 							public void run() {
@@ -196,6 +201,10 @@ public class SpellGreatswordSlam extends Spell {
 									}
 								}
 								for (Player player : PlayerUtils.playersInRange(loc, 40)) {
+									if (player.getLocation().distance(mStartLoc) > FrostGiant.fighterRange) {
+										continue;
+									}
+
 									for (BoundingBox box : boxes) {
 										if (player.getBoundingBox().overlaps(box) && !mHitPlayers.contains(player)) {
 											BossUtils.bossDamagePercent(mBoss, player, 0.3);
@@ -208,7 +217,10 @@ public class SpellGreatswordSlam extends Spell {
 								}
 								mRadius++;
 							}
-						}.runTaskTimer(mPlugin, 0, 1);
+						};
+						runnable.runTaskTimer(mPlugin, 0, 1);
+						mActiveRunnables.add(runnable);
+
 						FrostGiant.unfreezeGolems(mBoss);
 						this.cancel();
 					}
@@ -218,8 +230,8 @@ public class SpellGreatswordSlam extends Spell {
 				}
 			}
 		};
-		runnable.runTaskTimer(mPlugin, 0, 2);
-		mActiveRunnables.add(runnable);
+		runnable2.runTaskTimer(mPlugin, 0, 2);
+		mActiveRunnables.add(runnable2);
 
 
 		//Revert frosted ice after 60 seconds, and also damage players that step on it during that

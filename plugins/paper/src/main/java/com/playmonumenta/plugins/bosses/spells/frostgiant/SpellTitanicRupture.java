@@ -148,7 +148,7 @@ public class SpellTitanicRupture extends Spell {
 						}
 					}
 					//The particles that damage after 2 seconds, in the larger hitbox
-					BoundingBox box = BoundingBox.of(loc, 5, 20, 5);
+					BoundingBox box = BoundingBox.of(loc, 4, 20, 4);
 					for (Player player : players) {
 						if (box.overlaps(player.getBoundingBox())) {
 							BossUtils.bossDamagePercent(mBoss, player, 0.8);
@@ -178,7 +178,7 @@ public class SpellTitanicRupture extends Spell {
 					if (FastUtils.RANDOM.nextDouble() > 0.4) {
 						double cos = FastUtils.cos(deg);
 						double sin = FastUtils.sin(deg);
-						world.spawnParticle(Particle.REDSTONE, loc.clone().add(7 * cos, 0, 7 * sin), 1, 0.15, 0.15, 0.15, RED_COLOR);
+						world.spawnParticle(Particle.REDSTONE, loc.clone().add(8 * cos, 0, 8 * sin), 1, 0.15, 0.15, 0.15, RED_COLOR);
 						world.spawnParticle(Particle.REDSTONE, loc.clone().add(4 * cos, 0, 4 * sin), 1, 0.15, 0.15, 0.15, RED_COLOR);
 						world.spawnParticle(Particle.REDSTONE, loc.clone().add(2 * cos, 0, 2 * sin), 2, 0.15, 0.15, 0.15, RED_COLOR);
 					}

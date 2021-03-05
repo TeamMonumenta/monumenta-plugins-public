@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.bukkit.entity.Entity;
+import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.entity.AreaEffectCloudApplyEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
@@ -264,6 +265,30 @@ public class Boss {
 		for (BossAbilityGroup ability : mAbilities) {
 			ability.nearbyEntityDeath(event);
 		}
+	}
+
+	public boolean hasNearbyEntityDeathTrigger() {
+		for (BossAbilityGroup ability : mAbilities) {
+			if (ability.hasNearbyEntityDeathTrigger()) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public void nearbyBlockBreak(BlockBreakEvent event) {
+		for (BossAbilityGroup ability : mAbilities) {
+			ability.nearbyBlockBreak(event);
+		}
+	}
+
+	public boolean hasNearbyBlockBreakTrigger() {
+		for (BossAbilityGroup ability : mAbilities) {
+			if (ability.hasNearbyBlockBreakTrigger()) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	public void entityPotionEffectEvent(EntityPotionEffectEvent event) {

@@ -51,10 +51,13 @@ public class Shatter extends Spell {
 	private Map<Location, Material> mOldBlocks = new HashMap<>();
 	private Map<Location, BlockData> mOldData = new HashMap<>();
 
-	public Shatter(Plugin plugin, LivingEntity boss, float knock) {
+	private Location mStartLoc;
+
+	public Shatter(Plugin plugin, LivingEntity boss, float knock, Location startLoc) {
 		mPlugin = plugin;
 		mBoss = boss;
 		mKnockback = knock;
+		mStartLoc = startLoc;
 	}
 
 	@Override
@@ -201,6 +204,10 @@ public class Shatter extends Spell {
 
 					//Damage player by 35 in cone after warning is over (2 seconds) and knock player away
 					for (Player player : PlayerUtils.playersInRange(loc, 40)) {
+						if (player.getLocation().distance(mStartLoc) > FrostGiant.fighterRange) {
+							continue;
+						}
+
 						for (BoundingBox box : boxes) {
 							if (player.getBoundingBox().overlaps(box)) {
 								BossUtils.bossDamage(mBoss, player, 35, null);

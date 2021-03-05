@@ -28,6 +28,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
+import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.EntityDeathEvent;
@@ -325,6 +326,16 @@ public class FrostGiant extends BossAbilityGroup {
 			public void run() {
 				if (c.getTarget() != null && mCutsceneDone) {
 					LivingEntity target = c.getTarget();
+					if (c.getTarget().getLocation().distance(mStartLoc) > fighterRange) {
+						//List is farthest players in the beginning, and nearest players at the end
+						for (Player p : EntityUtils.getNearestPlayers(mStartLoc, fighterRange)) {
+							if (p.getGameMode() == GameMode.SURVIVAL) {
+								c.setTarget(p);
+								break;
+							}
+						}
+					}
+
 					if (target.getBoundingBox().overlaps(mBoss.getBoundingBox().expand(0.5, 0, 0.5)) && !mCooldown && mDoDamage) {
 						mCooldown = true;
 						new BukkitRunnable() {
@@ -351,7 +362,7 @@ public class FrostGiant extends BossAbilityGroup {
 						world.spawnParticle(Particle.BLOCK_DUST, target.getLocation(), 40, 2, 0.35, 2, 0.25, Material.COARSE_DIRT.createBlockData());
 
 						//List is farthest players in the beginning, and nearest players at the end
-						for (Player p : EntityUtils.getNearestPlayers(mStartLoc, detectionRange)) {
+						for (Player p : EntityUtils.getNearestPlayers(mStartLoc, fighterRange)) {
 							if (p.getGameMode() == GameMode.SURVIVAL) {
 								c.setTarget(p);
 								break;
@@ -360,7 +371,7 @@ public class FrostGiant extends BossAbilityGroup {
 					}
 				} else {
 					//List is farthest players in the beginning, and nearest players at the end
-					for (Player p : EntityUtils.getNearestPlayers(mStartLoc, detectionRange)) {
+					for (Player p : EntityUtils.getNearestPlayers(mStartLoc, fighterRange)) {
 						if (p.getGameMode() == GameMode.SURVIVAL) {
 							c.setTarget(p);
 							break;
@@ -452,32 +463,32 @@ public class FrostGiant extends BossAbilityGroup {
 
 		SpellManager phase1Spells = new SpellManager(Arrays.asList(
 				new SpellAirGolemStrike(mPlugin, mBoss, mStartLoc),
-				new Shatter(mPlugin, mBoss, 3f),
+				new Shatter(mPlugin, mBoss, 3f, mStartLoc),
 				new SpellGlacialPrison(mPlugin, mBoss, fighterRange, mStartLoc),
 				new RingOfFrost(mPlugin, mBoss, 12, mStartLoc)
 				));
 
 		SpellManager phase2Spells = new SpellManager(Arrays.asList(
-				new Shatter(mPlugin, mBoss, 3f),
+				new Shatter(mPlugin, mBoss, 3f, mStartLoc),
 				new SpellAirGolemStrike(mPlugin, mBoss, mStartLoc),
-				new SpellGreatswordSlam(mPlugin, mBoss, frostedIceDuration, 90),
-				new SpellGreatswordSlam(mPlugin, mBoss, frostedIceDuration, 90),
+				new SpellGreatswordSlam(mPlugin, mBoss, frostedIceDuration, 90, mStartLoc),
+				new SpellGreatswordSlam(mPlugin, mBoss, frostedIceDuration, 90, mStartLoc),
 				new SpellSpinDown(mPlugin, mBoss, mStartLoc),
 				new SpellSpinDown(mPlugin, mBoss, mStartLoc)
 				));
 
 		SpellManager phase3Spells = new SpellManager(Arrays.asList(
-				new Shatter(mPlugin, mBoss, 3f),
+				new Shatter(mPlugin, mBoss, 3f, mStartLoc),
 				new SpellTitanicRupture(mPlugin, mBoss, mStartLoc),
 				new SpellFrostRift(mPlugin, mBoss, mStartLoc),
-				new SpellGreatswordSlam(mPlugin, mBoss, 20, 90)
+				new SpellGreatswordSlam(mPlugin, mBoss, 20, 90, mStartLoc)
 				));
 
 		SpellManager phase4Spells = new SpellManager(Arrays.asList(
-				new Shatter(mPlugin, mBoss, 3f),
+				new Shatter(mPlugin, mBoss, 3f, mStartLoc),
 				new SpellTitanicRupture(mPlugin, mBoss, mStartLoc),
 				new SpellFrostRift(mPlugin, mBoss, mStartLoc),
-				new SpellGreatswordSlam(mPlugin, mBoss, 20, 60)
+				new SpellGreatswordSlam(mPlugin, mBoss, 20, 60, mStartLoc)
 				));
 
 		List<Spell> phase1PassiveSpells = Arrays.asList(
@@ -1085,6 +1096,32 @@ public class FrostGiant extends BossAbilityGroup {
 		}
 	}
 
+	@Override
+	public void nearbyBlockBreak(BlockBreakEvent event) {
+		if (event.getBlock().getType() == Material.FROSTED_ICE) {
+			Location loc = event.getBlock().getLocation();
+			Location tempLoc = loc.clone();
+			for (int z = -1; z <= 1; z++) {
+				for (int y = -1; y <= 1; y++) {
+					for (int x = -1; x <= 1; x++) {
+						tempLoc.set(loc.getX() + x, loc.getY() + y, loc.getZ() + z);
+
+						if (tempLoc.getBlock().getType() == Material.FROSTED_ICE) {
+							tempLoc.getBlock().setType(Material.CRACKED_STONE_BRICKS);
+						}
+					}
+				}
+			}
+
+			event.setCancelled(true);
+		}
+	}
+
+	@Override
+	public boolean hasNearbyBlockBreakTrigger() {
+		return true;
+	}
+
 	//Teleport with special effects
 	private void teleport(Location loc) {
 		World world = loc.getWorld();
@@ -1126,7 +1163,7 @@ public class FrostGiant extends BossAbilityGroup {
 	public void init() {
 		int bossTargetHp = 0;
 		int playerCount = PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange).size();
-		int hpDel = 7012;
+		int hpDel = 5012;
 		int armor = (int)(Math.sqrt(playerCount * 2) - 1);
 
 		/*

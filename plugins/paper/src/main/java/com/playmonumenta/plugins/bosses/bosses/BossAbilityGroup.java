@@ -7,6 +7,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.entity.AreaEffectCloudApplyEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
@@ -17,7 +18,6 @@ import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.scheduler.BukkitScheduler;
 
 import com.destroystokyo.paper.event.entity.EntityPathfindEvent;
 import com.playmonumenta.plugins.bosses.BossBarManager;
@@ -328,8 +328,30 @@ public abstract class BossAbilityGroup {
 
 	/*
 	 * Called when nearby enemy dies within 12 blocks
+	 *
+	 * For performance reasons any boss that uses this MUST also override
+	 * hasNearbyEntityDeathTrigger to return true
 	 */
 	public void nearbyEntityDeath(EntityDeathEvent event) {}
+
+	public boolean hasNearbyEntityDeathTrigger() {
+		return false;
+	}
+
+	/*
+	 * Called when a player breaks a block within 60 blocks
+	 *
+	 * For performance reasons any boss that uses this MUST also override
+	 * hasNearbyBlockBreakTrigger to return true
+	 *
+	 * WARNING: VERY PERFORMANCE INTENSIVE
+	 */
+	public void nearbyBlockBreak(BlockBreakEvent event) {}
+
+	public boolean hasNearbyBlockBreakTrigger() {
+		return false;
+	}
+
 
 	/*
 	 * Called when the mob is unloading and we need to save its metadata

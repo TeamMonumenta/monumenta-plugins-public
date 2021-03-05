@@ -64,7 +64,7 @@ public class SpellFrostbite extends Spell {
 
 			PotionEffect effect = player.getPotionEffect(PotionEffectType.JUMP);
 
-			if (playerLoc.getY() - mStartLoc.getY() >= 4 && (effect == null || effect.getAmplifier() < 3) && (player.getGameMode() == GameMode.SURVIVAL || player.getLocation().distance(mStartLoc) < FrostGiant.fighterRange)) {
+			if (playerLoc.getY() - mStartLoc.getY() >= 4 && (effect == null || effect.getAmplifier() < 3) && (player.getGameMode() == GameMode.SURVIVAL || player.getLocation().distance(mStartLoc) < FrostGiant.fighterRange) && player.getLocation().getY() - mStartLoc.getY() <= 45) {
 				BossUtils.bossDamagePercent(mBoss, player, 0.15, mBoss.getLocation());
 
 				world.playSound(playerLoc, Sound.BLOCK_GLASS_BREAK, SoundCategory.HOSTILE, 1, 1);
