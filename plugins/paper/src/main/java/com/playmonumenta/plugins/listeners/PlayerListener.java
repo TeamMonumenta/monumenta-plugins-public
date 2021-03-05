@@ -112,6 +112,8 @@ import com.playmonumenta.plugins.enchantments.Slayer;
 import com.playmonumenta.plugins.enchantments.Sniper;
 import com.playmonumenta.plugins.enchantments.Spark;
 import com.playmonumenta.plugins.enchantments.Thunder;
+import com.playmonumenta.plugins.enchantments.Bleeding;
+import com.playmonumenta.plugins.enchantments.Decay;
 import com.playmonumenta.plugins.enchantments.evasions.EvasionInfo;
 import com.playmonumenta.plugins.enchantments.infusions.Focus;
 import com.playmonumenta.plugins.events.AbilityCastEvent;
@@ -1279,6 +1281,8 @@ public class PlayerListener implements Listener {
 					if (damager instanceof Trident) {
 						IceAspect.onShootAttack(mPlugin, proj, le, event);
 						Thunder.onShootAttack(mPlugin, proj, le, event);
+						Bleeding.onShootAttack(mPlugin, proj, le, event);
+						Decay.onShootAttack(mPlugin, proj, le, event);
 						HexEater.onShootAttack(mPlugin, proj, le, event);
 						Slayer.onShootAttack(mPlugin, proj, le, event);
 						Duelist.onShootAttack(mPlugin, proj, le, event);

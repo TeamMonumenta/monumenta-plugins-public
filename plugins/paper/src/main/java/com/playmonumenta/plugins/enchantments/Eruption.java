@@ -31,8 +31,10 @@ public class Eruption implements BaseEnchantment {
 	private static final String ICE_NAME = ChatColor.GRAY + "Ice Aspect";
 	private static final String THUNDER_NAME = ChatColor.GRAY + "Thunder Aspect";
 	private static final String DECAY_NAME = ChatColor.GRAY + "Decay";
+	private static final String BLEED_NAME = ChatColor.GRAY + "Bleeding";
 	private static final Particle.DustOptions YELLOW_1_COLOR = new Particle.DustOptions(Color.fromRGB(255, 255, 20), 1.0f);
 	private static final Particle.DustOptions YELLOW_2_COLOR = new Particle.DustOptions(Color.fromRGB(255, 255, 120), 1.0f);
+	private static final Particle.DustOptions BLEED_COLOR = new Particle.DustOptions(Color.fromRGB(210, 44, 44), 1.0f);
 
 
 	@Override
@@ -56,6 +58,7 @@ public class Eruption implements BaseEnchantment {
 			int ice = InventoryUtils.getCustomEnchantLevel(item, ICE_NAME, true);
 			int thunder = InventoryUtils.getCustomEnchantLevel(item, THUNDER_NAME, true);
 			int decay = InventoryUtils.getCustomEnchantLevel(item, DECAY_NAME, true);
+			int bleed = InventoryUtils.getCustomEnchantLevel(item, BLEED_NAME, true);
 
 
 			//Damage any mobs in the area
@@ -72,6 +75,9 @@ public class Eruption implements BaseEnchantment {
 				}
 				if (decay > 0) {
 					PotionUtils.applyPotion(player, mob, new PotionEffect(PotionEffectType.WITHER, 80, decay - 1, false, true));
+				}
+				if (bleed > 0) {
+					EntityUtils.applyBleed(plugin, 100, level, mob);
 				}
 			}
 
@@ -95,7 +101,10 @@ public class Eruption implements BaseEnchantment {
 				BlockData fallingDustData = Material.ANVIL.createBlockData();
 				player.getWorld().spawnParticle(Particle.FALLING_DUST, event.getBlock().getLocation(), 25, 1.5, 1.5, 1.5, fallingDustData);
 			}
-
+			if (bleed > 0) {
+				player.playSound(player.getLocation(), Sound.ENTITY_SLIME_SQUISH, 0.7f, 0.7f);
+				player.getWorld().spawnParticle(Particle.REDSTONE, event.getBlock().getLocation(), 25, 1.5, 1.5, 1.5, BLEED_COLOR);
+			}
 		}
 	}
 }

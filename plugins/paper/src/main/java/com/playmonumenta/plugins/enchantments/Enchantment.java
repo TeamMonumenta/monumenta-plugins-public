@@ -83,6 +83,7 @@ public enum Enchantment {
 	ERUPTION(new Eruption()),
 	RETRIEVAL(new Retrieval()),
 	SECOND_WIND(new SecondWind()),
+	BLEEDING(new Bleeding()),
 
 	// armor protections
 	PROTECTION(ChatColor.GRAY + "Protection", org.bukkit.enchantments.Enchantment.PROTECTION_ENVIRONMENTAL),
@@ -135,6 +136,7 @@ public enum Enchantment {
 	CURSE_VANISHING(ChatColor.RED + "Curse of Vanishing", org.bukkit.enchantments.Enchantment.VANISHING_CURSE),
 	CURSE_ANEMIA(new CurseOfAnemia()),
 	TWO_HANDED(new TwoHanded()),
+	STARVATION(new Starvation())
 	;
 
 	String mReadableString;
