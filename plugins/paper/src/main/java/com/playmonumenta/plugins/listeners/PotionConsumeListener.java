@@ -50,6 +50,8 @@ public class PotionConsumeListener implements Listener {
 	private final Map<UUID, BukkitRunnable> mRunnables = new HashMap<UUID, BukkitRunnable>();
 	private Map<UUID, ItemStack> mPotionsConsumed = new HashMap<UUID, ItemStack>();
 
+	private Map<UUID, BukkitRunnable> mCooldowns = new HashMap<UUID, BukkitRunnable>();
+
 	public PotionConsumeListener(Plugin plugin) {
 		mPlugin = plugin;
 	}
@@ -74,9 +76,7 @@ public class PotionConsumeListener implements Listener {
 		    event.getCurrentItem() == null ||
 		    ItemUtils.isItemShattered(event.getCurrentItem()) ||
 		    !(event.getCurrentItem().getType().equals(Material.POTION) ||
-		      event.getCurrentItem().getType().equals(Material.GLASS_BOTTLE)) ||
-		     //Can not quick drink while potion is on cooldown
-		    (event.getCurrentItem().getType().equals(Material.POTION) && checkPotionCooldown(event.getWhoClicked()))
+		      event.getCurrentItem().getType().equals(Material.GLASS_BOTTLE))
 		    ) {
 			// Nope!
 			return;
@@ -122,6 +122,14 @@ public class PotionConsumeListener implements Listener {
 		           runnable != null && !runnable.isCancelled()) {
 
 			//Return time
+			return;
+		}
+
+		if (checkPotionCooldown(player)) {
+			player.sendMessage(ChatColor.RED + "Quick drink is still on cooldown!");
+			player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1.0f, 1.0f);
+
+			event.setCancelled(true);
 			return;
 		}
 
@@ -243,9 +251,8 @@ public class PotionConsumeListener implements Listener {
 		    event.getCurrentItem() == null ||
 			ItemUtils.isItemShattered(event.getCurrentItem()) ||
 		    !(event.getCurrentItem().getType().equals(Material.SPLASH_POTION) ||
-		      event.getCurrentItem().getType().equals(Material.LINGERING_POTION)) ||
-		      //Can not quick splash while potions are on cooldown
-		      checkPotionCooldown(event.getWhoClicked())) {
+		      event.getCurrentItem().getType().equals(Material.LINGERING_POTION))
+				) {
 			// Nope!
 			return;
 		}
@@ -257,6 +264,14 @@ public class PotionConsumeListener implements Listener {
 
 		if (!tags.contains(INVENTORY_DRINK_TAG) || InventoryUtils.testForItemWithName(item, "Alchemist's Potion")) {
 			//Needs this tag to work and cannot be an Alchemist Potion
+			return;
+		}
+
+		if (checkPotionCooldown(player)) {
+			player.sendMessage(ChatColor.RED + "Quick drink is still on cooldown!");
+			player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1.0f, 1.0f);
+
+			event.setCancelled(true);
 			return;
 		}
 
@@ -292,15 +307,25 @@ public class PotionConsumeListener implements Listener {
 
 	//Set cooldown to prevent spam
 	private void setPotionCooldown(Player player) {
-		int cd = 5;
-		player.setCooldown(Material.SPLASH_POTION, 20 * cd);
-		player.setCooldown(Material.LINGERING_POTION, 20 * cd);
-		player.setCooldown(Material.POTION, 20 * cd);
+		BukkitRunnable runnable = mCooldowns.remove(player.getUniqueId());
+		if (runnable != null) {
+			runnable.cancel();
+		}
+		runnable = new BukkitRunnable() {
+			@Override
+			public void run() {
+				//Don't need to put anything here - method checks if BukkitRunnable is active
+				mCooldowns.remove(player.getUniqueId());
+				this.cancel();
+			}
+		};
+		runnable.runTaskLater(mPlugin, 20 * 5);
+		mCooldowns.put(player.getUniqueId(), runnable);
 	}
 
 	//Returns true if potion cooldown is up right now
 	//False if no cooldowns and the quick drink is activatable now
 	private boolean checkPotionCooldown(HumanEntity player) {
-		return player.getCooldown(Material.SPLASH_POTION) > 0 || player.getCooldown(Material.LINGERING_POTION) > 0 || player.getCooldown(Material.POTION) > 0;
+		return mCooldowns.containsKey(player.getUniqueId()) && !mCooldowns.get(player.getUniqueId()).isCancelled();
 	}
 }
