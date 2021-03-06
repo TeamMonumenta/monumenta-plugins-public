@@ -128,7 +128,7 @@ public class Shatter extends Spell {
 								l.subtract(0, 1, 0);
 								//Spawns crimson hyphae as a warning at a 1/3 rate, will try to climb 1 block up or down if needed
 								if (l.getBlock().getType() != Material.CRIMSON_HYPHAE) {
-									if (FastUtils.RANDOM.nextInt(3) == 0) {
+									if (FastUtils.RANDOM.nextInt(3) == 0 || mT == 20 * 2) {
 										if (l.getBlock().getRelative(BlockFace.UP).getType() != Material.AIR) {
 											l.add(0, 1, 0);
 										}
@@ -136,10 +136,8 @@ public class Shatter extends Spell {
 											l.subtract(0, 1, 0);
 										}
 										//Once it leaves the arena, stop iterating
-										if (l.getBlock().getRelative(BlockFace.UP).getType() == Material.AIR && l.getBlock().getRelative(BlockFace.DOWN).getType() == Material.AIR) {
-											break;
-										}
-										if (l.getBlock().getType() == Material.AIR) {
+										if (l.getBlock().getRelative(BlockFace.UP).getType() == Material.AIR && l.getBlock().getRelative(BlockFace.DOWN).getType() == Material.AIR
+												|| l.distance(mStartLoc) > FrostGiant.fighterRange) {
 											continue;
 										}
 										//Move up one block if on barrier or bedrock level
