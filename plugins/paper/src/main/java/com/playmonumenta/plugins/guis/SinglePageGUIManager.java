@@ -13,12 +13,14 @@ import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryInteractEvent;
 
 import com.playmonumenta.plugins.guis.singlepageguis.ExampleSinglePageGUI;
+import com.playmonumenta.plugins.guis.singlepageguis.OrinSinglePageGUI;
 
 public class SinglePageGUIManager implements Listener {
 
 	public SinglePageGUIManager() {
 		// Whenever you make a SinglePageGUI, it must be registered here
 		new ExampleSinglePageGUI(null, null).registerCommand();
+		new OrinSinglePageGUI(null, null).registerCommand();
 	}
 
 	private static final Map<UUID, SinglePageGUI> GUI_MAPPINGS = new HashMap<>();
