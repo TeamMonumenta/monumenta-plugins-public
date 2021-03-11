@@ -96,26 +96,26 @@ public class OrinSinglePageGUI extends SinglePageGUI {
 		LOCATIONS_PAGE.add(new TeleportEntry(36, "Guild Plot", null, "Click to teleport!", Material.YELLOW_BANNER, "teleportguild @S"));
 
 		LOCATIONS_PAGE.add(new TeleportEntry(3, "Sierhaven", null, "Click to teleport!", Material.GREEN_CONCRETE, "transferserver region_1 -2456.0 56.5 1104.0 90 0"));
-		LOCATIONS_PAGE.add(new TeleportEntry(20, "Labs", "D0Access", "Click to teleport!", Material.GLASS_BOTTLE, "transferserver labs -2456.0 56.5 1104.0 90 0"));
-		LOCATIONS_PAGE.add(new TeleportEntry(21, "White", "D1Access", "Click to teleport!", Material.WHITE_WOOL, "transferserver white -2456.0 56.5 1104.0 90 0"));
-		LOCATIONS_PAGE.add(new TeleportEntry(22, "Orange", "D2Access", "Click to teleport!", Material.ORANGE_WOOL, "transferserver orange -2456.0 56.5 1104.0 90 0"));
-		LOCATIONS_PAGE.add(new TeleportEntry(29, "Magenta", "D3Access", "Click to teleport!", Material.MAGENTA_WOOL, "transferserver magenta -2456.0 56.5 1104.0 90 0"));
-		LOCATIONS_PAGE.add(new TeleportEntry(30, "Light Blue", "D4Access", "Click to teleport!", Material.LIGHT_BLUE_WOOL, "transferserver lightblue -2456.0 56.5 1104.0 90 0"));
-		LOCATIONS_PAGE.add(new TeleportEntry(31, "Yellow", "D5Access", "Click to teleport!", Material.YELLOW_WOOL, "transferserver yellow -2456.0 56.5 1104.0 90 0"));
-		LOCATIONS_PAGE.add(new TeleportEntry(38, "Willows", "DB1Access", "Click to teleport!", Material.JUNGLE_LEAVES, "transferserver willows -2456.0 56.5 1104.0 90 0"));
-		LOCATIONS_PAGE.add(new TeleportEntry(39, "Reverie", "DCAccess", "Click to teleport!", Material.FIRE_CORAL, "transferserver reverie -2456.0 56.5 1104.0 90 0"));
-		LOCATIONS_PAGE.add(new TeleportEntry(40, "Sanctum", "DS1Access", "Click to teleport!", Material.GRASS_BLOCK, "transferserver sanctum -2456.0 56.5 1104.0 90 0"));
+		LOCATIONS_PAGE.add(new TeleportEntry(20, "Labs", "D0Access", "Click to teleport!", Material.GLASS_BOTTLE, "execute as @S run function monumenta:lobbies/send_one/d0"));
+		LOCATIONS_PAGE.add(new TeleportEntry(21, "White", "D1Access", "Click to teleport!", Material.WHITE_WOOL, "execute as @S run function monumenta:lobbies/send_one/d1"));
+		LOCATIONS_PAGE.add(new TeleportEntry(22, "Orange", "D2Access", "Click to teleport!", Material.ORANGE_WOOL, "execute as @S run function monumenta:lobbies/send_one/d2"));
+		LOCATIONS_PAGE.add(new TeleportEntry(29, "Magenta", "D3Access", "Click to teleport!", Material.MAGENTA_WOOL, "execute as @S run function monumenta:lobbies/send_one/d3"));
+		LOCATIONS_PAGE.add(new TeleportEntry(30, "Light Blue", "D4Access", "Click to teleport!", Material.LIGHT_BLUE_WOOL, "execute as @S run function monumenta:lobbies/send_one/d4"));
+		LOCATIONS_PAGE.add(new TeleportEntry(31, "Yellow", "D5Access", "Click to teleport!", Material.YELLOW_WOOL, "execute as @S run function monumenta:lobbies/send_one/d5"));
+		LOCATIONS_PAGE.add(new TeleportEntry(38, "Willows", "DB1Access", "Click to teleport!", Material.JUNGLE_LEAVES, "execute as @S run function monumenta:lobbies/send_one/db1"));
+		LOCATIONS_PAGE.add(new TeleportEntry(39, "Reverie", "DCAccess", "Click to teleport!", Material.FIRE_CORAL, "execute as @S run function monumenta:lobbies/send_one/dc"));
+		LOCATIONS_PAGE.add(new TeleportEntry(40, "Sanctum", "DS1Access", "Click to teleport!", Material.GRASS_BLOCK, "execute as @S run function monumenta:lobbies/send_one/ds1"));
 
 		LOCATIONS_PAGE.add(new TeleportEntry(7, "Mistport", "Quest101", "Click to teleport!", Material.SAND, "transferserver region_2 -2456.0 56.5 1104.0 90 0", 12));
-		LOCATIONS_PAGE.add(new TeleportEntry(24, "Lime", "D6Access", "Click to teleport!", Material.LIME_WOOL, "transferserver lime -2456.0 56.5 1104.0 90 0"));
-		LOCATIONS_PAGE.add(new TeleportEntry(25, "Pink", "D7Access", "Click to teleport!", Material.PINK_WOOL, "transferserver pink -2456.0 56.5 1104.0 90 0"));
-		LOCATIONS_PAGE.add(new TeleportEntry(26, "Gray", "D8Access", "Click to teleport!", Material.GRAY_WOOL, "transferserver gray -2456.0 56.5 1104.0 90 0"));
-		LOCATIONS_PAGE.add(new TeleportEntry(33, "Light Gray", "D9Access", "Click to teleport!", Material.LIGHT_GRAY_WOOL, "transferserver lightgray -2456.0 56.5 1104.0 90 0"));
-		LOCATIONS_PAGE.add(new TeleportEntry(34, "Cyan", "D10Access", "Click to teleport!", Material.CYAN_WOOL, "transferserver cyan -2456.0 56.5 1104.0 90 0"));
-		LOCATIONS_PAGE.add(new TeleportEntry(35, "Purple", "D11Access", "Click to teleport!", Material.PURPLE_WOOL, "transferserver purple -2456.0 56.5 1104.0 90 0"));
-		LOCATIONS_PAGE.add(new TeleportEntry(42, "Teal", "DTLAccess", "Click to teleport!", Material.CYAN_CONCRETE_POWDER, "transferserver teal -2456.0 56.5 1104.0 90 0"));
-		LOCATIONS_PAGE.add(new TeleportEntry(43, "Shifting City", "DRL2Access", "Click to teleport!", Material.PRISMARINE_BRICKS, "transferserver shiftingcity -2456.0 56.5 1104.0 90 0"));
-		LOCATIONS_PAGE.add(new TeleportEntry(44, "The Fallen Forum", "DFFAccess", "Click to teleport!", Material.BOOKSHELF, "transferserver forum -2456.0 56.5 1104.0 90 0")); //TODO: access token for TFF
+		LOCATIONS_PAGE.add(new TeleportEntry(24, "Lime", "D6Access", "Click to teleport!", Material.LIME_WOOL, "execute as @S run function monumenta:lobbies/send_one/d6"));
+		LOCATIONS_PAGE.add(new TeleportEntry(25, "Pink", "D7Access", "Click to teleport!", Material.PINK_WOOL, "execute as @S run function monumenta:lobbies/send_one/d7"));
+		LOCATIONS_PAGE.add(new TeleportEntry(26, "Gray", "D8Access", "Click to teleport!", Material.GRAY_WOOL, "execute as @S run function monumenta:lobbies/send_one/d8"));
+		LOCATIONS_PAGE.add(new TeleportEntry(33, "Light Gray", "D9Access", "Click to teleport!", Material.LIGHT_GRAY_WOOL, "execute as @S run function monumenta:lobbies/send_one/d9"));
+		LOCATIONS_PAGE.add(new TeleportEntry(34, "Cyan", "D10Access", "Click to teleport!", Material.CYAN_WOOL, "execute as @S run function monumenta:lobbies/send_one/d10"));
+		LOCATIONS_PAGE.add(new TeleportEntry(35, "Purple", "D11Access", "Click to teleport!", Material.PURPLE_WOOL, "execute as @S run function monumenta:lobbies/send_one/d11"));
+		LOCATIONS_PAGE.add(new TeleportEntry(42, "Teal", "DTLAccess", "Click to teleport!", Material.CYAN_CONCRETE_POWDER, "execute as @S run function monumenta:lobbies/send_one/dtl"));
+		LOCATIONS_PAGE.add(new TeleportEntry(43, "Shifting City", "DRL2Access", "Click to teleport!", Material.PRISMARINE_BRICKS, "execute as @S run function monumenta:lobbies/send_one/drl2"));
+		LOCATIONS_PAGE.add(new TeleportEntry(44, "The Fallen Forum", "DFFAccess", "Click to teleport!", Material.BOOKSHELF, "execute as @S run function monumenta:lobbies/send_one/dff")); //TODO: access token for TFF
 	}
 
 	private static ArrayList<TeleportEntry> LOCATIONS_TREE = new ArrayList<>();
@@ -137,28 +137,28 @@ public class OrinSinglePageGUI extends SinglePageGUI {
 		LOCATIONS_TREE.add(new TeleportEntry(8, "Switch to Page Layout", null, "", Material.PISTON, "switch", 1, 3));
 		LOCATIONS_TREE.add(new TeleportEntry(0, "Back to Main Menu", null, "", Material.OBSERVER, "", 1, 3));
 		LOCATIONS_TREE.add(new TeleportEntry(4, "Sierhaven", null, "Click to teleport!", Material.GREEN_CONCRETE, "transferserver region_1 -2456.0 56.5 1104.0 90 0", 1, 3));
-		LOCATIONS_TREE.add(new TeleportEntry(23, "Labs", "D0Access", "Click to teleport!", Material.GLASS_BOTTLE, "transferserver labs -2456.0 56.5 1104.0 90 0", 1, 3));
-		LOCATIONS_TREE.add(new TeleportEntry(20, "White", "D1Access", "Click to teleport!", Material.WHITE_WOOL, "transferserver white -2456.0 56.5 1104.0 90 0", 1, 3));
-		LOCATIONS_TREE.add(new TeleportEntry(21, "Orange", "D2Access", "Click to teleport!", Material.ORANGE_WOOL, "transferserver orange -2456.0 56.5 1104.0 90 0", 1, 3));
-		LOCATIONS_TREE.add(new TeleportEntry(29, "Magenta", "D3Access", "Click to teleport!", Material.MAGENTA_WOOL, "transferserver magenta -2456.0 56.5 1104.0 90 0", 1, 3));
-		LOCATIONS_TREE.add(new TeleportEntry(30, "Light Blue", "D4Access", "Click to teleport!", Material.LIGHT_BLUE_WOOL, "transferserver lightblue -2456.0 56.5 1104.0 90 0", 1, 3));
-		LOCATIONS_TREE.add(new TeleportEntry(38, "Yellow", "D5Access", "Click to teleport!", Material.YELLOW_WOOL, "transferserver yellow -2456.0 56.5 1104.0 90 0", 1, 3));
-		LOCATIONS_TREE.add(new TeleportEntry(24, "Willows", "DB1Access", "Click to teleport!", Material.JUNGLE_LEAVES, "transferserver willows -2456.0 56.5 1104.0 90 0", 1, 3));
-		LOCATIONS_TREE.add(new TeleportEntry(32, "Reverie", "DCAccess", "Click to teleport!", Material.FIRE_CORAL, "transferserver reverie -2456.0 56.5 1104.0 90 0", 1, 3));
-		LOCATIONS_TREE.add(new TeleportEntry(33, "Sanctum", "DS1Access", "Click to teleport!", Material.GRASS_BLOCK, "transferserver sanctum -2456.0 56.5 1104.0 90 0", 1, 3));
+		LOCATIONS_TREE.add(new TeleportEntry(23, "Labs", "D0Access", "Click to teleport!", Material.GLASS_BOTTLE, "execute as @S run function monumenta:lobbies/send_one/d0", 1, 3));
+		LOCATIONS_TREE.add(new TeleportEntry(20, "White", "D1Access", "Click to teleport!", Material.WHITE_WOOL, "execute as @S run function monumenta:lobbies/send_one/d1", 1, 3));
+		LOCATIONS_TREE.add(new TeleportEntry(21, "Orange", "D2Access", "Click to teleport!", Material.ORANGE_WOOL, "execute as @S run function monumenta:lobbies/send_one/d2", 1, 3));
+		LOCATIONS_TREE.add(new TeleportEntry(29, "Magenta", "D3Access", "Click to teleport!", Material.MAGENTA_WOOL, "execute as @S run function monumenta:lobbies/send_one/d3", 1, 3));
+		LOCATIONS_TREE.add(new TeleportEntry(30, "Light Blue", "D4Access", "Click to teleport!", Material.LIGHT_BLUE_WOOL, "execute as @S run function monumenta:lobbies/send_one/d4", 1, 3));
+		LOCATIONS_TREE.add(new TeleportEntry(38, "Yellow", "D5Access", "Click to teleport!", Material.YELLOW_WOOL, "execute as @S run function monumenta:lobbies/send_one/d5", 1, 3));
+		LOCATIONS_TREE.add(new TeleportEntry(24, "Willows", "DB1Access", "Click to teleport!", Material.JUNGLE_LEAVES, "execute as @S run function monumenta:lobbies/send_one/db1", 1, 3));
+		LOCATIONS_TREE.add(new TeleportEntry(32, "Reverie", "DCAccess", "Click to teleport!", Material.FIRE_CORAL, "execute as @S run function monumenta:lobbies/send_one/dc", 1, 3));
+		LOCATIONS_TREE.add(new TeleportEntry(33, "Sanctum", "DS1Access", "Click to teleport!", Material.GRASS_BLOCK, "execute as @S run function monumenta:lobbies/send_one/ds1", 1, 3));
 
 		LOCATIONS_TREE.add(new TeleportEntry(8, "Switch to Page Layout", null, "", Material.PISTON, "switch", 1, 4));
 		LOCATIONS_TREE.add(new TeleportEntry(0, "Back to Main Menu", null, "", Material.OBSERVER, "", 1, 4));
 		LOCATIONS_TREE.add(new TeleportEntry(4, "Mistport", "Quest101", "Click to teleport!", Material.SAND, "transferserver region_2 -2456.0 56.5 1104.0 90 0", 12, 4));
-		LOCATIONS_TREE.add(new TeleportEntry(20, "Lime", "D6Access", "Click to teleport!", Material.LIME_WOOL, "transferserver lime -2456.0 56.5 1104.0 90 0", 1, 4));
-		LOCATIONS_TREE.add(new TeleportEntry(21, "Pink", "D7Access", "Click to teleport!", Material.PINK_WOOL, "transferserver pink -2456.0 56.5 1104.0 90 0", 1, 4));
-		LOCATIONS_TREE.add(new TeleportEntry(29, "Gray", "D8Access", "Click to teleport!", Material.GRAY_WOOL, "transferserver gray -2456.0 56.5 1104.0 90 0", 1, 4));
-		LOCATIONS_TREE.add(new TeleportEntry(30, "Light Gray", "D9Access", "Click to teleport!", Material.LIGHT_GRAY_WOOL, "transferserver lightgray -2456.0 56.5 1104.0 90 0", 1, 4));
-		LOCATIONS_TREE.add(new TeleportEntry(38, "Cyan", "D10Access", "Click to teleport!", Material.CYAN_WOOL, "transferserver cyan -2456.0 56.5 1104.0 90 0", 1, 4));
-		LOCATIONS_TREE.add(new TeleportEntry(39, "Purple", "D11Access", "Click to teleport!", Material.PURPLE_WOOL, "transferserver purple -2456.0 56.5 1104.0 90 0", 1, 4));
-		LOCATIONS_TREE.add(new TeleportEntry(23, "Teal", "DTLAccess", "Click to teleport!", Material.CYAN_CONCRETE_POWDER, "transferserver teal -2456.0 56.5 1104.0 90 0", 1, 4));
-		LOCATIONS_TREE.add(new TeleportEntry(24, "Shifting City", "DRL2Access", "Click to teleport!", Material.PRISMARINE_BRICKS, "transferserver shiftingcity -2456.0 56.5 1104.0 90 0", 1, 4));
-		LOCATIONS_TREE.add(new TeleportEntry(32, "The Fallen Forum", "DFFAccess", "Click to teleport!", Material.BOOKSHELF, "transferserver forum -2456.0 56.5 1104.0 90 0", 1, 4));
+		LOCATIONS_TREE.add(new TeleportEntry(20, "Lime", "D6Access", "Click to teleport!", Material.LIME_WOOL, "execute as @S run function monumenta:lobbies/send_one/d6", 1, 4));
+		LOCATIONS_TREE.add(new TeleportEntry(21, "Pink", "D7Access", "Click to teleport!", Material.PINK_WOOL, "execute as @S run function monumenta:lobbies/send_one/d7", 1, 4));
+		LOCATIONS_TREE.add(new TeleportEntry(29, "Gray", "D8Access", "Click to teleport!", Material.GRAY_WOOL, "execute as @S run function monumenta:lobbies/send_one/d8", 1, 4));
+		LOCATIONS_TREE.add(new TeleportEntry(30, "Light Gray", "D9Access", "Click to teleport!", Material.LIGHT_GRAY_WOOL, "execute as @S run function monumenta:lobbies/send_one/d9", 1, 4));
+		LOCATIONS_TREE.add(new TeleportEntry(38, "Cyan", "D10Access", "Click to teleport!", Material.CYAN_WOOL, "execute as @S run function monumenta:lobbies/send_one/d10", 1, 4));
+		LOCATIONS_TREE.add(new TeleportEntry(39, "Purple", "D11Access", "Click to teleport!", Material.PURPLE_WOOL, "execute as @S run function monumenta:lobbies/send_one/d11", 1, 4));
+		LOCATIONS_TREE.add(new TeleportEntry(23, "Teal", "DTLAccess", "Click to teleport!", Material.CYAN_CONCRETE_POWDER, "execute as @S run function monumenta:lobbies/send_one/dtl", 1, 4));
+		LOCATIONS_TREE.add(new TeleportEntry(24, "Shifting City", "DRL2Access", "Click to teleport!", Material.PRISMARINE_BRICKS, "execute as @S run function monumenta:lobbies/send_one/drl2", 1, 4));
+		LOCATIONS_TREE.add(new TeleportEntry(32, "The Fallen Forum", "DFFAccess", "Click to teleport!", Material.BOOKSHELF, "execute as @S run function monumenta:lobbies/send_one/dff", 1, 4));
 		
 		//LOCATIONS_TREE.add(new TeleportEntry(8, "Switch to Page Layout", null, "", Material.PISTON, "switch", 1, 5));
 		//LOCATIONS_TREE.add(new TeleportEntry(0, "Back to Main Menu", null, "", Material.OBSERVER, "", 1, 5));
@@ -232,7 +232,6 @@ public class OrinSinglePageGUI extends SinglePageGUI {
 		int activeTreeInv = ScoreboardUtils.getScoreboardValue(player, "OrinPage");
 
 		if (clickedItem != null && clickedItem.getType() != Material.BLACK_STAINED_GLASS_PANE && !event.isShiftClick()) {
-
 			int chosenSlot = event.getSlot();
 			if (activeTreeInv == 0) {
 				for (TeleportEntry location : LOCATIONS_PAGE) {
