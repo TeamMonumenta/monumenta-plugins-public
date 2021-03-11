@@ -471,8 +471,8 @@ public class FrostGiant extends BossAbilityGroup {
 		SpellManager phase2Spells = new SpellManager(Arrays.asList(
 				new Shatter(mPlugin, mBoss, 3f, mStartLoc),
 				new SpellAirGolemStrike(mPlugin, mBoss, mStartLoc),
-				new SpellGreatswordSlam(mPlugin, mBoss, frostedIceDuration, 90, mStartLoc),
-				new SpellGreatswordSlam(mPlugin, mBoss, frostedIceDuration, 90, mStartLoc),
+				new SpellGreatswordSlam(mPlugin, mBoss, frostedIceDuration - 5, 90, mStartLoc),
+				new SpellGreatswordSlam(mPlugin, mBoss, frostedIceDuration - 5, 90, mStartLoc),
 				new SpellSpinDown(mPlugin, mBoss, mStartLoc),
 				new SpellSpinDown(mPlugin, mBoss, mStartLoc)
 				));

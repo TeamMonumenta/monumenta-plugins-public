@@ -164,14 +164,18 @@ public class SpellGreatswordSlam extends Spell {
 									if (l.getBlock().getType() == Material.BEDROCK || l.getBlock().getType() == Material.BARRIER) {
 										l.add(0, 1, 0);
 									}
-									if (l.getBlock().getType() != Material.FROSTED_ICE) {
-										oldBlocks.put(l, l.getBlock().getType());
-										oldData.put(l, l.getBlock().getBlockData());
+
+									//Put less frosted ice than the entire cone
+									if (degree % 10 == 0) {
+										if (l.getBlock().getType() != Material.FROSTED_ICE) {
+											oldBlocks.put(l, l.getBlock().getType());
+											oldData.put(l, l.getBlock().getBlockData());
+										}
+										l.getBlock().setType(Material.FROSTED_ICE);
+										Ageable age = (Ageable) l.getBlock().getBlockData();
+										age.setAge(1 + FastUtils.RANDOM.nextInt(3));
+										l.getBlock().setBlockData(age);
 									}
-									l.getBlock().setType(Material.FROSTED_ICE);
-									Ageable age = (Ageable) l.getBlock().getBlockData();
-									age.setAge(1 + FastUtils.RANDOM.nextInt(3));
-									l.getBlock().setBlockData(age);
 
 									//15 -> 3.65 lol
 									BoundingBox box = BoundingBox.of(l, 1, 3.65, 1);
@@ -208,7 +212,7 @@ public class SpellGreatswordSlam extends Spell {
 
 									for (BoundingBox box : boxes) {
 										if (player.getBoundingBox().overlaps(box) && !mHitPlayers.contains(player)) {
-											BossUtils.bossDamagePercent(mBoss, player, 0.3);
+											BossUtils.bossDamagePercent(mBoss, player, 0.15);
 											AbilityUtils.silencePlayer(player, 20 * 5);
 											MovementUtils.knockAway(loc, player, 0f, 1.5f, false);
 											mHitPlayers.add(player);
