@@ -35,6 +35,7 @@ public class JunkItemListener implements Listener {
 
 		new CommandAPICommand("pickup")
 			.withPermission(perms)
+			.withAliases("pu")
 			.executes((sender, args) -> {
 				playerToggle(sender);
 			})

@@ -36,7 +36,7 @@ public class CurseOfCorruption implements BaseEnchantment {
 	public void applyProperty(Plugin plugin, Player player, int level) {
 		if (level > 1) {
 			if (!ZoneUtils.hasZoneProperty(player, ZoneProperty.PLOTS_POSSIBLE)) {
-				if (player.getGameMode() != GameMode.CREATIVE) {
+				if (player.getGameMode() != GameMode.CREATIVE && player.getGameMode() != GameMode.SPECTATOR) {
 					plugin.mPotionManager.addPotion(player, PotionID.ITEM, new PotionEffect(PotionEffectType.BLINDNESS, 1000000, 0, true, false));
 				}
 				plugin.mPotionManager.addPotion(player, PotionID.ITEM, new PotionEffect(PotionEffectType.SLOW, 1000000, level - 2, true, false));
