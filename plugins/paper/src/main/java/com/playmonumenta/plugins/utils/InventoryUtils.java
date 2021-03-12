@@ -373,6 +373,46 @@ public class InventoryUtils {
 		return dropped;
 	}
 
+	public static int removeNamedItems(Player player, String name) {
+		int dropped = removeNamedItemsFromInventory(player.getInventory(), name);
+		dropped += removeNamedItemsFromInventory(player.getEnderChest(), name);
+		return dropped;
+	}
+
+	private static int removeNamedItemsFromInventory(final Inventory inventory, final String name) {
+		int dropped = 0;
+		ItemStack[] items = inventory.getContents();
+
+		for (int i = 0; i < items.length; i++) {
+			if (items[i] != null) {
+				if (items[i].hasItemMeta() && items[i].getItemMeta().getDisplayName().equals(name)) {
+					items[i] = null;
+				} else {
+					if (items[i].hasItemMeta() && items[i].getItemMeta() instanceof BlockStateMeta) {
+						final BlockStateMeta meta = (BlockStateMeta)items[i].getItemMeta();
+						if (meta.getBlockState() instanceof ShulkerBox) {
+							final ShulkerBox shulker = (ShulkerBox)meta.getBlockState();
+							ItemStack[] shulkerItems = shulker.getInventory().getContents();
+							for (int j = 0; j < shulkerItems.length; j++) {
+								if (shulkerItems[j] != null && shulkerItems[j].hasItemMeta() && shulkerItems[j].getItemMeta().getDisplayName().equals(name)) {
+									shulkerItems[j] = null;
+								}
+							}
+
+							shulker.getInventory().setContents(shulkerItems);
+							meta.setBlockState(shulker);
+							items[i].setItemMeta(meta);
+						}
+					}
+				}
+			}
+		}
+
+		inventory.setContents(items);
+
+		return dropped;
+	}
+
 	private static boolean containsSpecialLore(final ItemStack item) {
 		return testForItemWithLore(item, "Taking this item outside of the dungeon");
 	}

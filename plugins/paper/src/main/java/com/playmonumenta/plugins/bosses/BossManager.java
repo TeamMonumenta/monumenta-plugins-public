@@ -210,6 +210,7 @@ public class BossManager implements Listener {
 		mStatelessBosses.put(AntiRangeBoss.identityTag, (Plugin p, LivingEntity e) -> new AntiRangeBoss(p,e));
 		mStatelessBosses.put(ImmortalMountBoss.identityTag, (Plugin p, LivingEntity e) -> new ImmortalMountBoss(p,e));
 		mStatelessBosses.put(SilenceOnHitBoss.identityTag, (Plugin p, LivingEntity e) -> new SilenceOnHitBoss(p, e));
+		mStatelessBosses.put(FalseSpiritPortal.identityTag, (Plugin p, LivingEntity e) -> new FalseSpiritPortal(p, e));
 		mStatelessBosses.put(TffBookSummonBoss.identityTag, (Plugin p, LivingEntity e) -> new TffBookSummonBoss(p, e));
 		mStatelessBosses.put(ArcaneProjectileBoss.identityTag, (Plugin p, LivingEntity e) -> new ArcaneProjectileBoss(p, e));
 		mStatelessBosses.put(JumpBoss.identityTag, (Plugin p, LivingEntity e) -> new JumpBoss(p, e));
@@ -240,6 +241,7 @@ public class BossManager implements Listener {
 		mStatefulBosses.put(VarcosasLastBreathBoss.identityTag, (Plugin p, LivingEntity e, Location s, Location l) -> new VarcosasLastBreathBoss(p, e, s, l));
 		mStatefulBosses.put(VarcosaLingeringWillBoss.identityTag, (Plugin p, LivingEntity e, Location s, Location l) -> new VarcosaLingeringWillBoss(p, e, s, l));
 		mStatefulBosses.put(MimicQueen.identityTag, (Plugin p, LivingEntity e, Location s, Location l) -> new MimicQueen(p, e, s, l));
+		mStatefulBosses.put(FalseSpirit.identityTag, (Plugin p, LivingEntity e, Location s, Location l) -> new FalseSpirit(p, e, s, l));
 
 
 		/* All bosses have a deserializer which gives the boss back their abilities when chunks re-load */
@@ -371,6 +373,8 @@ public class BossManager implements Listener {
 		mBossDeserializers.put(AntiRangeBoss.identityTag, (Plugin p, LivingEntity e) -> AntiRangeBoss.deserialize(p, e));
 		mBossDeserializers.put(ImmortalMountBoss.identityTag, (Plugin p, LivingEntity e) -> ImmortalMountBoss.deserialize(p, e));
 		mBossDeserializers.put(SilenceOnHitBoss.identityTag, (Plugin p, LivingEntity e) -> SilenceOnHitBoss.deserialize(p, e));
+		mBossDeserializers.put(FalseSpirit.identityTag, (Plugin p, LivingEntity e) -> FalseSpirit.deserialize(p, e));
+		mBossDeserializers.put(FalseSpiritPortal.identityTag, (Plugin p, LivingEntity e) -> FalseSpiritPortal.deserialize(p, e));
 		mBossDeserializers.put(TffBookSummonBoss.identityTag, (Plugin p, LivingEntity e) -> TffBookSummonBoss.deserialize(p, e));
 		mBossDeserializers.put(ArcaneProjectileBoss.identityTag, (Plugin p, LivingEntity e) -> ArcaneProjectileBoss.deserialize(p, e));
 		mBossDeserializers.put(JumpBoss.identityTag, (Plugin p, LivingEntity e) -> JumpBoss.deserialize(p, e));

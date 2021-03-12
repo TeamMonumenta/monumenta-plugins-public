@@ -37,7 +37,8 @@ public class SpellEarthshake extends SpellBaseAoE {
             Material.BEDROCK,
 			Material.BARRIER,
             Material.SPAWNER,
-            Material.CHEST
+            Material.CHEST,
+            Material.END_PORTAL
         );
 	private static Location targetLocation;
 	private static boolean targeted = false;

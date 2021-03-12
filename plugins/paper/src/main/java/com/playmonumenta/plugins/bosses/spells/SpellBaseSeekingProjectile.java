@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.playmonumenta.plugins.utils.FastUtils;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Block;
@@ -16,6 +15,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
+import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 
@@ -176,7 +176,7 @@ public class SpellBaseSeekingProjectile extends Spell {
 		return mCooldown;
 	}
 
-	private void launch(Player target, Location targetLoc) {
+	public void launch(Player target, Location targetLoc) {
 		mLaunchAesthetic.run(mWorld, mBoss.getEyeLocation(), 0);
 
 		BukkitRunnable runnable = new BukkitRunnable() {
@@ -190,7 +190,7 @@ public class SpellBaseSeekingProjectile extends Spell {
 			public void run() {
 				mTicks++;
 
-				if (!mTarget.isOnline() || mTarget.isDead()) {
+				if (mTarget != null && (!mTarget.isOnline() || mTarget.isDead())) {
 					this.cancel();
 					if (!mLingers) {
 						mActiveRunnables.remove(this);
@@ -198,29 +198,31 @@ public class SpellBaseSeekingProjectile extends Spell {
 					return;
 				}
 
-				Vector newDirection = mTarget.getEyeLocation().subtract(mLocation).toVector();
-				if (newDirection.length() > 2 * mRange) {
-					this.cancel();
-					if (!mLingers) {
-						mActiveRunnables.remove(this);
+				if (mTarget != null) {
+					Vector newDirection = mTarget.getEyeLocation().subtract(mLocation).toVector();
+					if (newDirection.length() > 2 * mRange) {
+						this.cancel();
+						if (!mLingers) {
+							mActiveRunnables.remove(this);
+						}
+						return;
 					}
-					return;
-				}
-				newDirection.normalize();
+					newDirection.normalize();
 
-				// Because of double rounding errors, the dot product could be something stupid like 1.0000000000000002 (true story), so pre-process it before taking acos()
-				double newAngle = Math.acos(Math.max(-1, Math.min(1, mDirection.dot(newDirection))));
+					// Because of double rounding errors, the dot product could be something stupid like 1.0000000000000002 (true story), so pre-process it before taking acos()
+					double newAngle = Math.acos(Math.max(-1, Math.min(1, mDirection.dot(newDirection))));
 
-				// This is some weird trigonometry stuff but I'm pretty sure it works
-				if (newAngle < mTurnRadius) {
-					mDirection = newDirection;
-				} else {
-					double halfEndpointDistance = FastUtils.sin(newAngle / 2);
+					// This is some weird trigonometry stuff but I'm pretty sure it works
+					if (newAngle < mTurnRadius) {
+						mDirection = newDirection;
+					} else {
+						double halfEndpointDistance = FastUtils.sin(newAngle / 2);
 
-					// Only do calculations if there's actually a direction change
-					if (halfEndpointDistance != 0) {
-						double scalar = (halfEndpointDistance + FastUtils.sin(mTurnRadius - newAngle / 2)) / (2 * halfEndpointDistance);
-						mDirection.add(newDirection.subtract(mDirection).multiply(scalar)).normalize();
+						// Only do calculations if there's actually a direction change
+						if (halfEndpointDistance != 0) {
+							double scalar = (halfEndpointDistance + FastUtils.sin(mTurnRadius - newAngle / 2)) / (2 * halfEndpointDistance);
+							mDirection.add(newDirection.subtract(mDirection).multiply(scalar)).normalize();
+						}
 					}
 				}
 
