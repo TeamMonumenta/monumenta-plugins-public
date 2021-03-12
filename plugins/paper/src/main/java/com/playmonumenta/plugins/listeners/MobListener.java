@@ -17,6 +17,7 @@ import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Evoker;
+import org.bukkit.entity.EvokerFangs;
 import org.bukkit.entity.Fireball;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -185,6 +186,28 @@ public class MobListener implements Listener {
 										if (modifier.getOperation() == Operation.ADD_NUMBER) {
 											event.setDamage(modifier.getAmount() + 1);
 										}
+									}
+								}
+							}
+						}
+					}
+				}
+			} else if (damager instanceof EvokerFangs) {
+				//Custom damage for evoker fangs, tied to main hand damage of evoker.
+				LivingEntity source = ((EvokerFangs) damager).getOwner();
+
+				EntityEquipment equipment = source.getEquipment();
+				if (equipment != null) {
+					ItemStack mainhand = equipment.getItemInMainHand();
+
+					if (mainhand != null) {
+						ItemMeta meta = mainhand.getItemMeta();
+						if (meta != null && meta.hasAttributeModifiers()) {
+							Collection<AttributeModifier> modifiers = meta.getAttributeModifiers(Attribute.GENERIC_ATTACK_DAMAGE);
+							if (modifiers != null) {
+								for (AttributeModifier modifier : modifiers) {
+									if (modifier.getOperation() == Operation.ADD_NUMBER) {
+										event.setDamage(modifier.getAmount() + 1);
 									}
 								}
 							}

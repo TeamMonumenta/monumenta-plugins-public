@@ -3,6 +3,8 @@ package com.playmonumenta.plugins.bosses.spells;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.potion.PotionEffectType;
 
+import com.playmonumenta.plugins.utils.EntityUtils;
+
 public class SpellPurgeNegatives extends Spell {
 	private int mCooldown = 0;
 	private LivingEntity mBoss;
@@ -34,6 +36,12 @@ public class SpellPurgeNegatives extends Spell {
 			mCooldown = mTimer;
 			for (PotionEffectType type : NEGATIVE_EFFECTS) {
 				mBoss.removePotionEffect(type);
+			}
+			if (EntityUtils.isSlowed(com.playmonumenta.plugins.Plugin.getInstance(), mBoss)) {
+				EntityUtils.setSlowTicks(com.playmonumenta.plugins.Plugin.getInstance(), mBoss, 0);
+			}
+			if (EntityUtils.isBleeding(com.playmonumenta.plugins.Plugin.getInstance(), mBoss)) {
+				EntityUtils.setBleedTicks(com.playmonumenta.plugins.Plugin.getInstance(), mBoss, 0);
 			}
 		}
 	}
