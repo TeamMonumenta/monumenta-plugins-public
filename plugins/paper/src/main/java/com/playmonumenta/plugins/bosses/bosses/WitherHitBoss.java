@@ -1,10 +1,14 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+
+import com.playmonumenta.plugins.utils.BossUtils;
 
 public class WitherHitBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_witherhit";
@@ -22,6 +26,12 @@ public class WitherHitBoss extends BossAbilityGroup {
 	@Override
 	public void bossDamagedEntity(EntityDamageByEntityEvent event) {
 		LivingEntity target = (LivingEntity) event.getEntity();
+		if (target instanceof Player) {
+			Player player = (Player)target;
+			if (BossUtils.bossDamageBlocked(player, event.getDamage(), event.getDamager().getLocation()) && event.getCause() != DamageCause.MAGIC) {
+				return;
+			}
+		}
 		target.addPotionEffect(new PotionEffect(PotionEffectType.WITHER, 80, 1, false, true));
 	}
 }
