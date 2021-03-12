@@ -84,6 +84,7 @@ public enum Enchantment {
 	RETRIEVAL(new Retrieval()),
 	SECOND_WIND(new SecondWind()),
 	BLEEDING(new Bleeding()),
+	QUAKE(new Quake()),
 
 	// armor protections
 	PROTECTION(ChatColor.GRAY + "Protection", org.bukkit.enchantments.Enchantment.PROTECTION_ENVIRONMENTAL),
@@ -118,6 +119,7 @@ public enum Enchantment {
 	MULTITOOL(new Multitool()),
 	RIPTIDE(ChatColor.GRAY + "Riptide", org.bukkit.enchantments.Enchantment.RIPTIDE),
 	JUNGLE_NOURISHMENT(new JunglesNourishment()),
+	RAGE_OF_THE_KETER(new RageOfTheKeter()),
 
 	// durability
 	UNBREAKING(ChatColor.GRAY + "Unbreaking", org.bukkit.enchantments.Enchantment.DURABILITY),

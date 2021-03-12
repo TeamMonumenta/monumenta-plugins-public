@@ -23,7 +23,7 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 
 public class Thunder implements BaseEnchantment {
-	private static final String PROPERTY_NAME = ChatColor.GRAY + "Thunder Aspect";
+	public static final String PROPERTY_NAME = ChatColor.GRAY + "Thunder Aspect";
 	private static final Particle.DustOptions YELLOW_1_COLOR = new Particle.DustOptions(Color.fromRGB(255, 255, 20), 1.0f);
 	private static final Particle.DustOptions YELLOW_2_COLOR = new Particle.DustOptions(Color.fromRGB(255, 255, 120), 1.0f);
 	private static final String LEVEL_METAKEY = "ThunderAspectLevelMetakey";

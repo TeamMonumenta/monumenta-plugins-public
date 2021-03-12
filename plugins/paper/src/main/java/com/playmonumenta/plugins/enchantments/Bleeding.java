@@ -19,7 +19,7 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 
 public class Bleeding implements BaseEnchantment {
 	private static final int DURATION = 20 * 5;
-	private static final String PROPERTY_NAME = ChatColor.GRAY + "Bleeding";
+	public static final String PROPERTY_NAME = ChatColor.GRAY + "Bleeding";
 	private static final String LEVEL_METAKEY = "BleedingLevelMetakey";
 	private static final Particle.DustOptions COLOR = new Particle.DustOptions(Color.fromRGB(210, 44, 44), 1.0f);
 

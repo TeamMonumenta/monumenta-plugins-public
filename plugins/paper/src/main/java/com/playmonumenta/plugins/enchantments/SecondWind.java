@@ -9,6 +9,7 @@ import org.bukkit.attribute.Attribute;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
 import com.playmonumenta.plugins.effects.PercentDamageReceived;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
 
 public class SecondWind implements BaseEnchantment {
 	private static String PROPERTY_NAME = ChatColor.GRAY + "Second Wind";
@@ -25,12 +26,13 @@ public class SecondWind implements BaseEnchantment {
 	public EnumSet<ItemSlot> validSlots() {
 		return EnumSet.of(ItemSlot.MAINHAND, ItemSlot.ARMOR, ItemSlot.OFFHAND);
 	}
-
+	
 	@Override
-	public void tick(Plugin plugin, Player player, int level) {
+	public void onHurtByEntity(Plugin plugin, Player player, int level, EntityDamageByEntityEvent event) {
 		double hp = player.getHealth() / player.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue();
 		if (hp <= HEALTH_LIMIT) {
-			plugin.mEffectManager.addEffect(player, DAMAGE_RESIST_NAME, new PercentDamageReceived(20, DAMAGE_RESIST * level));
+			event.setDamage(event.getDamage() * Math.pow(1 - DAMAGE_RESIST, level));
 		}
 	}
+	
 }

@@ -19,7 +19,7 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 
 public class IceAspect implements BaseEnchantment {
 	private static final int ICE_ASPECT_DURATION = 20 * 5;
-	private static final String PROPERTY_NAME = ChatColor.GRAY + "Ice Aspect";
+	public static final String PROPERTY_NAME = ChatColor.GRAY + "Ice Aspect";
 	private static final String LEVEL_METAKEY = "IceAspectLevelMetakey";
 
 	@Override

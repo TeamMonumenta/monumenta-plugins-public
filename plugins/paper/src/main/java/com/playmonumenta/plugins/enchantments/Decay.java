@@ -21,7 +21,7 @@ import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
 import com.playmonumenta.plugins.utils.PotionUtils;
 
 public class Decay implements BaseEnchantment {
-	private static final String PROPERTY_NAME = ChatColor.GRAY + "Decay";
+	public static final String PROPERTY_NAME = ChatColor.GRAY + "Decay";
 	private static final int DURATION = 20 * 4;
 	private static final String LEVEL_METAKEY = "DecayLevelMetakey";
 
