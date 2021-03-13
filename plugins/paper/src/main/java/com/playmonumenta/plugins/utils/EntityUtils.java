@@ -172,6 +172,8 @@ public class EntityUtils {
 			EntityType.SNOWMAN
 	);
 
+	private static final String COOLING_ATTR_NAME = "CoolingSlownessAttr";
+	private static final String STUN_ATTR_NAME = "StunSlownessAttr";
 	private static final Map<LivingEntity, Integer> COOLING_MOBS = new HashMap<LivingEntity, Integer>();
 	private static final Map<LivingEntity, Integer> STUNNED_MOBS = new HashMap<LivingEntity, Integer>();
 	private static final Map<LivingEntity, Integer> CONFUSED_MOBS = new HashMap<LivingEntity, Integer>();
@@ -199,7 +201,14 @@ public class EntityUtils {
 					COOLING_MOBS.put(mob, cooling.getValue() - 1);
 
 					if (cooling.getValue() <= 0 || mob.isDead() || !mob.isValid()) {
-						mob.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).setBaseValue(mob.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).getBaseValue() + 10);
+						AttributeInstance ai = mob.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED);
+						if (ai != null) {
+							for (AttributeModifier mod : ai.getModifiers()) {
+								if (mod != null && mod.getName().equals(COOLING_ATTR_NAME)) {
+									ai.removeModifier(mod);
+								}
+							}
+						}
 
 						if (mob instanceof Mob) {
 							((Mob) mob).setTarget(getNearestPlayer(mob.getLocation(), mob.getAttribute(Attribute.GENERIC_FOLLOW_RANGE).getValue()));
@@ -220,7 +229,14 @@ public class EntityUtils {
 					mob.getWorld().spawnParticle(Particle.REDSTONE, l, 5, 0, 0, 0, STUN_COLOR);
 
 					if (stunned.getValue() <= 0 || mob.isDead() || !mob.isValid()) {
-						mob.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).setBaseValue(mob.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).getBaseValue() + 10);
+						AttributeInstance ai = mob.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED);
+						if (ai != null) {
+							for (AttributeModifier mod : ai.getModifiers()) {
+								if (mod != null && mod.getName().equals(STUN_ATTR_NAME)) {
+									ai.removeModifier(mod);
+								}
+							}
+						}
 						stunnedIter.remove();
 					}
 				}
@@ -889,7 +905,9 @@ public class EntityUtils {
 	}
 
 	public static void removeCooling(LivingEntity mob) {
-		COOLING_MOBS.put(mob, 0);
+		if (COOLING_MOBS.containsKey(mob)) {
+			COOLING_MOBS.put(mob, 0);
+		}
 	}
 
 	// Used when a mob is rendered immobile as a result of its own actions, e.g. TP-Behind; behaves similarly to stun
@@ -909,7 +927,9 @@ public class EntityUtils {
 		// Only reduce speed if mob is not already in map. We can avoid storing original speed by just +/- 10.
 		Integer t = COOLING_MOBS.get(mob);
 		if (t == null) {
-			mob.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).setBaseValue(mob.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).getBaseValue() - 10);
+			AttributeInstance speed = mob.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED);
+			AttributeModifier mod = new AttributeModifier(COOLING_ATTR_NAME, -10, AttributeModifier.Operation.ADD_NUMBER);
+			speed.addModifier(mod);
 		}
 		if (t == null || t < ticks) {
 			COOLING_MOBS.put(mob, ticks);
@@ -947,7 +967,9 @@ public class EntityUtils {
 		// Only reduce speed if mob is not already in map. We can avoid storing original speed by just +/- 10.
 		Integer t = STUNNED_MOBS.get(mob);
 		if (t == null) {
-			mob.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).setBaseValue(mob.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).getBaseValue() - 10);
+			AttributeInstance speed = mob.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED);
+			AttributeModifier mod = new AttributeModifier(STUN_ATTR_NAME, -10, AttributeModifier.Operation.ADD_NUMBER);
+			speed.addModifier(mod);
 		}
 		if (t == null || t < ticks) {
 			STUNNED_MOBS.put(mob, ticks);
@@ -959,7 +981,9 @@ public class EntityUtils {
 	}
 
 	public static void removeConfusion(LivingEntity mob) {
-		CONFUSED_MOBS.put(mob, 0);
+		if (CONFUSED_MOBS.containsKey(mob)) {
+			CONFUSED_MOBS.put(mob, 0);
+		}
 	}
 
 	public static void applyConfusion(Plugin plugin, int ticks, LivingEntity mob) {
