@@ -81,7 +81,7 @@ public class MeteorSlam extends Ability {
 					|| !player.isValid()
 					|| AbilityManager.getManager().getPlayerAbility(player, MeteorSlam.class) == null) {
 					// If silenced, don't cancel the runnable, but don't run it either.
-					if (!AbilityManager.getManager().getPlayerAbilities(player).isSilenced()) {
+					if (player == null || !AbilityManager.getManager().getPlayerAbilities(player).isSilenced()) {
 						this.cancel();
 					}
 					return;
