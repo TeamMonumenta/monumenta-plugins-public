@@ -20,7 +20,7 @@ public class TffBookSummonBoss extends BossAbilityGroup {
 		super(plugin, identityTag, boss);
 
 		SpellManager activeSpells = new SpellManager(Arrays.asList(
-		                                                 new SpellTffBookSummon(boss)
+		                                                 new SpellTffBookSummon(plugin, boss)
 		                                             ));
 
 		super.constructBoss(activeSpells, null, detectionRange, null);
