@@ -71,4 +71,7 @@ public class AbilityCollection {
 		mIsSilenced = false;
 	}
 
+	public boolean isSilenced() {
+		return mIsSilenced;
+	}
 }
