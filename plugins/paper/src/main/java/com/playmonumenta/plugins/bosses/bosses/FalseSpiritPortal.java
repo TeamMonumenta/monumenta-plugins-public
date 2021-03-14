@@ -17,7 +17,6 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.World;
-import org.bukkit.attribute.Attribute;
 import org.bukkit.block.Block;
 import org.bukkit.entity.AbstractArrow.PickupStatus;
 import org.bukkit.entity.ArmorStand;
@@ -40,8 +39,10 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.util.BoundingBox;
 
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
+import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
@@ -257,11 +258,9 @@ public class FalseSpiritPortal extends BossAbilityGroup {
 							e.teleport(loc);
 						}
 
-						if (e instanceof LivingEntity && e.getLocation().getBlock().getType() == Material.LAVA) {
+						if (e instanceof LivingEntity && e.getLocation().getY() <= 3) {
 							Location loc = mGates.get(FastUtils.RANDOM.nextInt(mGates.size())).getLocation();
 							e.teleport(loc);
-							double max = ((LivingEntity) e).getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue();
-							((LivingEntity) e).setHealth(max);
 						}
 					}
 				}
@@ -374,7 +373,16 @@ public class FalseSpiritPortal extends BossAbilityGroup {
 					}
 				}
 			}
-			mBoss.getWorld().createExplosion(as.getLocation(), 5, false, false);
+			World world = mBoss.getWorld();
+			world.spawnParticle(Particle.EXPLOSION_HUGE, as.getLocation(), 1, 0, 0, 0);
+			world.playSound(as.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 3, 1);
+
+			BoundingBox box = BoundingBox.of(as.getLocation(), 3, 3, 3);
+			for (Player p : PlayerUtils.playersInRange(as.getLocation(), 5)) {
+				if (box.overlaps(p.getBoundingBox())) {
+					BossUtils.bossDamage(mBoss, p, 30);
+				}
+			}
 		}
 
 		PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), 75, "tellraw @s [\"\",{\"text\":\"[Bhairavi]\",\"color\":\"gold\"},{\"text\":\" That's it! Head back to the fight!\",\"color\":\"white\"}]");

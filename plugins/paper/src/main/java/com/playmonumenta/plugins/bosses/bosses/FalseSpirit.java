@@ -246,6 +246,15 @@ public class FalseSpirit extends BossAbilityGroup {
 				} else {
 					mTicks = 0;
 				}
+			}
+		}.runTaskTimer(mPlugin, 0, 10);
+
+		new BukkitRunnable() {
+			@Override
+			public void run() {
+				if (mBoss.isDead() || !mBoss.isValid()) {
+					this.cancel();
+				}
 
 				//Damage players below the arena
 				List<Player> players = PlayerUtils.playersInRange(mSpawnLoc, detectionRange);
@@ -253,7 +262,7 @@ public class FalseSpirit extends BossAbilityGroup {
 				for (Player p : players) {
 					if (p.getLocation().getY() <= 3 && mGroundMats.contains(p.getLocation().add(0, -1, 0).getBlock().getType())) {
 						Vector vel = p.getVelocity();
-						BossUtils.bossDamagePercent(mBoss, p, 0.15);
+						BossUtils.bossDamagePercent(mBoss, p, 0.1);
 						p.setVelocity(vel);
 
 						p.playSound(p.getLocation(), Sound.ENTITY_PLAYER_HURT_ON_FIRE, SoundCategory.PLAYERS, 1, 0.5f);
@@ -261,7 +270,7 @@ public class FalseSpirit extends BossAbilityGroup {
 					}
 				}
 			}
-		}.runTaskTimer(mPlugin, 0, 10);
+		}.runTaskTimer(mPlugin, 0, 20);
 
 		PlayerUtils.executeCommandOnNearbyPlayers(mSpawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"I am deeper than the power of Malkus... I shall take you into the nothingness from which you came.\",\"color\":\"dark_red\"}]");
 

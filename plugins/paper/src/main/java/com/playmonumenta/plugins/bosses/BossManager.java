@@ -215,6 +215,7 @@ public class BossManager implements Listener {
 		mStatelessBosses.put(ArcaneProjectileBoss.identityTag, (Plugin p, LivingEntity e) -> new ArcaneProjectileBoss(p, e));
 		mStatelessBosses.put(JumpBoss.identityTag, (Plugin p, LivingEntity e) -> new JumpBoss(p, e));
 		mStatelessBosses.put(RebornBoss.identityTag, (Plugin p, LivingEntity e) -> new RebornBoss(p, e));
+		mStatelessBosses.put(NoFireBoss.identityTag, (Plugin p, LivingEntity e) -> new NoFireBoss(p, e));
 
 
 		/* Stateful bosses have a remembered spawn location and end location where a redstone block is set when they die */
@@ -379,6 +380,8 @@ public class BossManager implements Listener {
 		mBossDeserializers.put(ArcaneProjectileBoss.identityTag, (Plugin p, LivingEntity e) -> ArcaneProjectileBoss.deserialize(p, e));
 		mBossDeserializers.put(JumpBoss.identityTag, (Plugin p, LivingEntity e) -> JumpBoss.deserialize(p, e));
 		mBossDeserializers.put(RebornBoss.identityTag, (Plugin p, LivingEntity e) -> RebornBoss.deserialize(p, e));
+		mBossDeserializers.put(NoFireBoss.identityTag, (Plugin p, LivingEntity e) -> NoFireBoss.deserialize(p, e));
+
 
 	}
 
