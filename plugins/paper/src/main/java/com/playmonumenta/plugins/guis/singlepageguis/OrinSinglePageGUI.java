@@ -95,7 +95,7 @@ public class OrinSinglePageGUI extends SinglePageGUI {
 		LOCATIONS_PAGE.add(new TeleportEntry(27, "Personal Plot", null, "Click to teleport!", Material.GRASS_BLOCK, "execute as @S run function plot:plot/home"));
 		LOCATIONS_PAGE.add(new TeleportEntry(36, "Guild Plot", null, "Click to teleport!", Material.YELLOW_BANNER, "teleportguild @S"));
 
-		LOCATIONS_PAGE.add(new TeleportEntry(3, "Sierhaven", null, "Click to teleport!", Material.GREEN_CONCRETE, "transferserver region_1 -2456.0 56.5 1104.0 90 0"));
+		LOCATIONS_PAGE.add(new TeleportEntry(3, "Sierhaven", null, "Click to teleport!", Material.GREEN_CONCRETE, "execute as @S run function monumenta:mechanisms/teleporters/tp/plots_to_region_1"));
 		LOCATIONS_PAGE.add(new TeleportEntry(20, "Labs", "D0Access", "Click to teleport!", Material.GLASS_BOTTLE, "execute as @S run function monumenta:lobbies/send_one/d0"));
 		LOCATIONS_PAGE.add(new TeleportEntry(21, "White", "D1Access", "Click to teleport!", Material.WHITE_WOOL, "execute as @S run function monumenta:lobbies/send_one/d1"));
 		LOCATIONS_PAGE.add(new TeleportEntry(22, "Orange", "D2Access", "Click to teleport!", Material.ORANGE_WOOL, "execute as @S run function monumenta:lobbies/send_one/d2"));
@@ -106,7 +106,7 @@ public class OrinSinglePageGUI extends SinglePageGUI {
 		LOCATIONS_PAGE.add(new TeleportEntry(39, "Reverie", "DCAccess", "Click to teleport!", Material.FIRE_CORAL, "execute as @S run function monumenta:lobbies/send_one/dc"));
 		LOCATIONS_PAGE.add(new TeleportEntry(40, "Sanctum", "DS1Access", "Click to teleport!", Material.GRASS_BLOCK, "execute as @S run function monumenta:lobbies/send_one/ds1"));
 
-		LOCATIONS_PAGE.add(new TeleportEntry(7, "Mistport", "Quest101", "Click to teleport!", Material.SAND, "transferserver region_2 -2456.0 56.5 1104.0 90 0", 12));
+		LOCATIONS_PAGE.add(new TeleportEntry(7, "Mistport", "Quest101", "Click to teleport!", Material.SAND, "execute as @S run function monumenta:mechanisms/teleporters/tp/plots_to_region_2", 13));
 		LOCATIONS_PAGE.add(new TeleportEntry(24, "Lime", "D6Access", "Click to teleport!", Material.LIME_WOOL, "execute as @S run function monumenta:lobbies/send_one/d6"));
 		LOCATIONS_PAGE.add(new TeleportEntry(25, "Pink", "D7Access", "Click to teleport!", Material.PINK_WOOL, "execute as @S run function monumenta:lobbies/send_one/d7"));
 		LOCATIONS_PAGE.add(new TeleportEntry(26, "Gray", "D8Access", "Click to teleport!", Material.GRAY_WOOL, "execute as @S run function monumenta:lobbies/send_one/d8"));
@@ -115,7 +115,7 @@ public class OrinSinglePageGUI extends SinglePageGUI {
 		LOCATIONS_PAGE.add(new TeleportEntry(35, "Purple", "D11Access", "Click to teleport!", Material.PURPLE_WOOL, "execute as @S run function monumenta:lobbies/send_one/d11"));
 		LOCATIONS_PAGE.add(new TeleportEntry(42, "Teal", "DTLAccess", "Click to teleport!", Material.CYAN_CONCRETE_POWDER, "execute as @S run function monumenta:lobbies/send_one/dtl"));
 		LOCATIONS_PAGE.add(new TeleportEntry(43, "Shifting City", "DRL2Access", "Click to teleport!", Material.PRISMARINE_BRICKS, "execute as @S run function monumenta:lobbies/send_one/drl2"));
-		LOCATIONS_PAGE.add(new TeleportEntry(44, "The Fallen Forum", "DFFAccess", "Click to teleport!", Material.BOOKSHELF, "execute as @S run function monumenta:lobbies/send_one/dff")); //TODO: access token for TFF
+		LOCATIONS_PAGE.add(new TeleportEntry(44, "The Fallen Forum", "DFFAccess", "Click to teleport!", Material.BOOKSHELF, "execute as @S run function monumenta:lobbies/send_one/dff"));
 	}
 
 	private static ArrayList<TeleportEntry> LOCATIONS_TREE = new ArrayList<>();
@@ -136,7 +136,7 @@ public class OrinSinglePageGUI extends SinglePageGUI {
 
 		LOCATIONS_TREE.add(new TeleportEntry(8, "Switch to Page Layout", null, "", Material.PISTON, "switch", 1, 3));
 		LOCATIONS_TREE.add(new TeleportEntry(0, "Back to Main Menu", null, "", Material.OBSERVER, "", 1, 3));
-		LOCATIONS_TREE.add(new TeleportEntry(4, "Sierhaven", null, "Click to teleport!", Material.GREEN_CONCRETE, "transferserver region_1 -2456.0 56.5 1104.0 90 0", 1, 3));
+		LOCATIONS_TREE.add(new TeleportEntry(4, "Sierhaven", null, "Click to teleport!", Material.GREEN_CONCRETE, "execute as @S run function monumenta:mechanisms/teleporters/tp/plots_to_region_1", 1, 3));
 		LOCATIONS_TREE.add(new TeleportEntry(23, "Labs", "D0Access", "Click to teleport!", Material.GLASS_BOTTLE, "execute as @S run function monumenta:lobbies/send_one/d0", 1, 3));
 		LOCATIONS_TREE.add(new TeleportEntry(20, "White", "D1Access", "Click to teleport!", Material.WHITE_WOOL, "execute as @S run function monumenta:lobbies/send_one/d1", 1, 3));
 		LOCATIONS_TREE.add(new TeleportEntry(21, "Orange", "D2Access", "Click to teleport!", Material.ORANGE_WOOL, "execute as @S run function monumenta:lobbies/send_one/d2", 1, 3));
@@ -149,7 +149,7 @@ public class OrinSinglePageGUI extends SinglePageGUI {
 
 		LOCATIONS_TREE.add(new TeleportEntry(8, "Switch to Page Layout", null, "", Material.PISTON, "switch", 1, 4));
 		LOCATIONS_TREE.add(new TeleportEntry(0, "Back to Main Menu", null, "", Material.OBSERVER, "", 1, 4));
-		LOCATIONS_TREE.add(new TeleportEntry(4, "Mistport", "Quest101", "Click to teleport!", Material.SAND, "transferserver region_2 -2456.0 56.5 1104.0 90 0", 12, 4));
+		LOCATIONS_TREE.add(new TeleportEntry(4, "Mistport", "Quest101", "Click to teleport!", Material.SAND, "execute as @S run function monumenta:mechanisms/teleporters/tp/plots_to_region_2", 13, 4));
 		LOCATIONS_TREE.add(new TeleportEntry(20, "Lime", "D6Access", "Click to teleport!", Material.LIME_WOOL, "execute as @S run function monumenta:lobbies/send_one/d6", 1, 4));
 		LOCATIONS_TREE.add(new TeleportEntry(21, "Pink", "D7Access", "Click to teleport!", Material.PINK_WOOL, "execute as @S run function monumenta:lobbies/send_one/d7", 1, 4));
 		LOCATIONS_TREE.add(new TeleportEntry(29, "Gray", "D8Access", "Click to teleport!", Material.GRAY_WOOL, "execute as @S run function monumenta:lobbies/send_one/d8", 1, 4));
