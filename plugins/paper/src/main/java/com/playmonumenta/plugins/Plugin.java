@@ -46,6 +46,7 @@ import com.playmonumenta.plugins.commands.Spectate;
 import com.playmonumenta.plugins.commands.SpectateBot;
 import com.playmonumenta.plugins.commands.TeleportAsync;
 import com.playmonumenta.plugins.commands.TeleportByScore;
+import com.playmonumenta.plugins.commands.UnsignBook;
 import com.playmonumenta.plugins.effects.EffectManager;
 import com.playmonumenta.plugins.enchantments.AttributeManager;
 import com.playmonumenta.plugins.enchantments.EnchantmentManager;
@@ -180,6 +181,7 @@ public class Plugin extends JavaPlugin {
 		GetDepthPoints.register();
 		Magnetize.register();
 		SetViewDistance.register();
+		UnsignBook.register();
 
 		try {
 			mHttpManager = new HttpManager(this);
