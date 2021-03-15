@@ -1,9 +1,5 @@
 package com.playmonumenta.plugins.commands;
 
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.utils.ZoneUtils;
-import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
-
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -15,6 +11,12 @@ import org.bukkit.event.player.PlayerGameModeChangeEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.metadata.FixedMetadataValue;
 
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.server.properties.ServerProperties;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.ZoneUtils;
+import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
+
 import dev.jorel.commandapi.CommandAPI;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.CommandPermission;
@@ -22,6 +24,7 @@ import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
 
 public class Spectate implements Listener {
 	public static final String SPECTATE_METAKEY = "MonumentaSpectateMetakey";
+	public static final int MOB_CANCEL_RADIUS = 20;
 
 	private Plugin mPlugin;
 
@@ -74,13 +77,14 @@ public class Spectate implements Listener {
 			} else {
 				CommandAPI.fail(ChatColor.RED + "You can not use this command in spectator mode");
 			}
-		} else if (ZoneUtils.hasZoneProperty(player, ZoneProperty.SPECTATE_AVAILABLE)) {
+			//Success condition- either in a safezone OR on a dungeon shard with no nearby mobs
+		} else if (ZoneUtils.hasZoneProperty(player, ZoneProperty.SPECTATE_AVAILABLE) || (ServerProperties.getPreventDungeonItemTransfer() && EntityUtils.getNearbyMobs(player.getLocation(), MOB_CANCEL_RADIUS).size() == 0)) {
 			// Move player to spectator, remember coordinates
 			new SpectateContext(plugin, player);
 			// Succeeded in making this player a spectator
 			return true;
 		} else {
-			CommandAPI.fail(ChatColor.RED + "You can only use this command from within a safezone");
+			CommandAPI.fail(ChatColor.RED + "You can only use this command from within a safezone or dungeon with no nearby mobs");
 		}
 		return false;
 	}

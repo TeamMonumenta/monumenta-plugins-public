@@ -99,7 +99,9 @@ import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.enchantments.AttributeProjectileDamage;
+import com.playmonumenta.plugins.enchantments.Bleeding;
 import com.playmonumenta.plugins.enchantments.CurseOfEphemerality;
+import com.playmonumenta.plugins.enchantments.Decay;
 import com.playmonumenta.plugins.enchantments.Duelist;
 import com.playmonumenta.plugins.enchantments.Frost;
 import com.playmonumenta.plugins.enchantments.HexEater;
@@ -112,8 +114,6 @@ import com.playmonumenta.plugins.enchantments.Slayer;
 import com.playmonumenta.plugins.enchantments.Sniper;
 import com.playmonumenta.plugins.enchantments.Spark;
 import com.playmonumenta.plugins.enchantments.Thunder;
-import com.playmonumenta.plugins.enchantments.Bleeding;
-import com.playmonumenta.plugins.enchantments.Decay;
 import com.playmonumenta.plugins.enchantments.evasions.EvasionInfo;
 import com.playmonumenta.plugins.enchantments.infusions.Focus;
 import com.playmonumenta.plugins.events.AbilityCastEvent;
@@ -425,8 +425,10 @@ public class PlayerListener implements Listener {
 				event.setCancelled(true);
 				return;
 			}
-
-			InventoryUtils.scheduleDelayedEquipmentCheck(mPlugin, player, event);
+			// If the item contains lore, schedule an equipment update
+			if (event.getItem().getItemStack().getItemMeta().hasLore()) {
+				InventoryUtils.scheduleDelayedEquipmentCheck(mPlugin, player, event);
+			}
 
 			/* Mark the item so it won't get shattered later */
 			event.getItem().addScoreboardTag("ShatterProcessed");
