@@ -85,7 +85,7 @@ public class LootChestsInInventory implements Listener {
 			return;
 		}
 		//Make an inventory and do some good ol roundabout population of the loot
-		Inventory inventory = Bukkit.createInventory(null, 27, item.getItemMeta().getDisplayName());
+		Inventory inventory = Bukkit.createInventory(null, 27, item.getItemMeta().displayName());
 		Builder builder = new LootContext.Builder(player.getLocation());
 		Collection<ItemStack> loot = table.populateLoot(FastUtils.RANDOM, builder.build());
 		item.subtract();
@@ -101,7 +101,7 @@ public class LootChestsInInventory implements Listener {
 		ItemStack emptyChest = new ItemStack(Material.CHEST);
 		ItemMeta emptyChestMeta = emptyChest.getItemMeta();
 		if (item2.hasItemMeta() && item2.getItemMeta().hasDisplayName()) {
-			emptyChestMeta.setDisplayName(item2.getItemMeta().getDisplayName());
+			emptyChestMeta.displayName(item2.getItemMeta().displayName());
 		}
 		emptyChest.setItemMeta(emptyChestMeta);
 		InventoryUtils.giveItem(player, emptyChest);
