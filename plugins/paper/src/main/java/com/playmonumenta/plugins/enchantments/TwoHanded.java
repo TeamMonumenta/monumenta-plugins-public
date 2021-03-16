@@ -8,6 +8,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
@@ -28,9 +29,9 @@ public class TwoHanded implements BaseEnchantment {
 
 	private static final String PERCENT_SPEED_EFFECT_NAME = "TwoHandedPercentSpeedEffect";
 	private static final int PERCENT_SPEED_DURATION = 1000000;
-	private static final double PERCENT_SPEED = -0.3;
+	private static final double PERCENT_SPEED = -0.4;
 
-	private static final double PERCENT_DAMAGE_REDUCTION = 0.4;
+	private static final double PERCENT_DAMAGE_REDUCTION = 0.6;
 
 
 	@Override
@@ -96,6 +97,13 @@ public class TwoHanded implements BaseEnchantment {
 	@Override
 	public void onAttack(Plugin plugin, Player player, int level, LivingEntity target, EntityDamageByEntityEvent event) {
 		if (checkForOffhand(player)) {
+			event.setDamage(event.getDamage() * (1 - PERCENT_DAMAGE_REDUCTION));
+		}
+	}
+	
+	@Override
+	public void onDamage(Plugin plugin, Player player, int level, LivingEntity target, EntityDamageByEntityEvent event) {
+		if (checkForOffhand(player) && event.getCause() == DamageCause.CUSTOM) {
 			event.setDamage(event.getDamage() * (1 - PERCENT_DAMAGE_REDUCTION));
 		}
 	}

@@ -19,8 +19,8 @@ import com.playmonumenta.plugins.effects.PercentSpeed;
 public class CurseOfCrippling implements BaseEnchantment {
 	private static String PROPERTY_NAME = ChatColor.RED + "Curse of Crippling";
 	private static final String PERCENT_SPEED_EFFECT_NAME = "CripplingPercentSpeedEffect";
-	private static final int DURATION = 5 * 20;
-	private static final double PERCENT_SPEED = 0.3;
+	private static final int DURATION = 3 * 20;
+	private static final double PERCENT_SPEED = -0.3;
 
 	@Override
 	public String getProperty() {

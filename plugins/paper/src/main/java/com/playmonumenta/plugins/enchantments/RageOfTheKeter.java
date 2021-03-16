@@ -11,6 +11,9 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.Location;
+import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
@@ -30,7 +33,9 @@ public class RageOfTheKeter implements BaseEnchantment {
 	private static final String ATTR_NAME = "KeterExtraSpeedAttr";
 	private static final EnumSet<DamageCause> AFFECTED_DAMAGE_CAUSES = EnumSet.of(
 			DamageCause.ENTITY_ATTACK,
-			DamageCause.ENTITY_SWEEP_ATTACK
+			DamageCause.ENTITY_SWEEP_ATTACK,
+			DamageCause.CUSTOM,
+			DamageCause.PROJECTILE
 	);
 	
 	private static final Particle.DustOptions OLIVE_COLOR = new Particle.DustOptions(Color.fromRGB(128, 128, 0), 1.0f);
@@ -51,11 +56,10 @@ public class RageOfTheKeter implements BaseEnchantment {
 		return EnumSet.of(ItemSlot.MAINHAND, ItemSlot.OFFHAND);
 	}
 
+	@EventHandler(priority = EventPriority.HIGHEST)
 	@Override
 	public void onConsume(Plugin plugin, Player player, PlayerItemConsumeEvent event, int level) {
 		if (InventoryUtils.testForItemWithLore(event.getItem(), "Rage of the Keter")) {
-			player.setCooldown(event.getItem().getType(), COOLDOWN);
-			event.setCancelled(true);
 			World world = player.getWorld();
 			plugin.mEffectManager.addEffect(player, "KeterExtraDamage", new PercentDamageDealt(DURATION, DAMAGE_PERCENT, AFFECTED_DAMAGE_CAUSES));
 			plugin.mEffectManager.addEffect(player, "KeterExtraSpeed", new PercentSpeed(DURATION, SPEED_PERCENT, ATTR_NAME));
@@ -83,6 +87,12 @@ public class RageOfTheKeter implements BaseEnchantment {
 			world.spawnParticle(Particle.REDSTONE, player.getLocation().add(0, 1, 0), 25, 0.5, 0.45, 0.25, 1, GREEN_COLOR);
 			world.playSound(player.getLocation(), Sound.ENTITY_STRIDER_EAT, 1, 0.85f);
 			
+			new BukkitRunnable() {
+				@Override
+				public void run() {
+					player.setCooldown(event.getItem().getType(), COOLDOWN);
+				}
+			}.runTaskLater(plugin, 1);
 		}
 	}
 }
