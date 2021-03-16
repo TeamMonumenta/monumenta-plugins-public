@@ -47,6 +47,7 @@ public class DelvesListener implements Listener {
 		DUNGEONS.add("cyan");
 		DUNGEONS.add("purple");
 		DUNGEONS.add("teal");
+		DUNGEONS.add("forum");
 		DUNGEONS.add("shiftingcity");
 		DUNGEONS.add("dev1");
 		DUNGEONS.add("dev2");

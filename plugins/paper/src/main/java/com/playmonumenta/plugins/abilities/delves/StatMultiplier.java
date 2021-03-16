@@ -35,8 +35,8 @@ public class StatMultiplier extends DelveModifier {
 	private static final double DELVE_MOB_STAT_MULTIPLIER_R2 = 1;
 
 	static {
-		STAT_COMPENSATION_MAPPINGS.put("white", 1.7);
-		STAT_COMPENSATION_MAPPINGS.put("orange", 1.7);
+		STAT_COMPENSATION_MAPPINGS.put("white", 1.8);
+		STAT_COMPENSATION_MAPPINGS.put("orange", 1.6);
 		STAT_COMPENSATION_MAPPINGS.put("magenta", 1.5);
 		STAT_COMPENSATION_MAPPINGS.put("lightblue", 1.2);
 		STAT_COMPENSATION_MAPPINGS.put("yellow", 1.1);
@@ -49,6 +49,7 @@ public class StatMultiplier extends DelveModifier {
 		STAT_COMPENSATION_MAPPINGS.put("cyan", 1.2);
 		STAT_COMPENSATION_MAPPINGS.put("purple", 1.1);
 		STAT_COMPENSATION_MAPPINGS.put("teal", 1.0);
+		STAT_COMPENSATION_MAPPINGS.put("forum", 1.0);
 		STAT_COMPENSATION_MAPPINGS.put("shiftingcity", 1.0);
 		STAT_COMPENSATION_MAPPINGS.put("dev1", 1.0);
 		STAT_COMPENSATION_MAPPINGS.put("dev2", 1.0);

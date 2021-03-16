@@ -494,6 +494,8 @@ public class AbilityManager {
 				if (!name.equals("Modifier")
 						&& !name.startsWith("minecraft:generic.")
 						&& !name.startsWith("effect.minecraft.")
+						&& !name.startsWith("Armor ")
+						&& !name.startsWith("Weapon ")
 						&& !name.equals(Vitality.MODIFIER)) {
 					instance.removeModifier(mod);
 				}
