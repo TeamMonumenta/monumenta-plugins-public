@@ -351,52 +351,57 @@ public class ItemUtils {
 	);
 
 	public static final Set<Material> GOOD_OCCLUDERS = EnumSet.of(
-			Material.RED_STAINED_GLASS,
-			Material.GREEN_STAINED_GLASS,
-			Material.PURPLE_STAINED_GLASS,
-			Material.CYAN_STAINED_GLASS,
-			Material.LIGHT_GRAY_STAINED_GLASS,
-			Material.GRAY_STAINED_GLASS,
-			Material.PINK_STAINED_GLASS,
-			Material.LIME_STAINED_GLASS,
-			Material.YELLOW_STAINED_GLASS,
-			Material.BLUE_STAINED_GLASS,
-			Material.LIGHT_BLUE_STAINED_GLASS,
-			Material.MAGENTA_STAINED_GLASS,
-			Material.ORANGE_STAINED_GLASS,
-			Material.BROWN_STAINED_GLASS,
-			Material.BLACK_STAINED_GLASS,
-			Material.WHITE_STAINED_GLASS,
-			Material.GLASS,
-			Material.SPRUCE_LEAVES,
-			Material.OAK_LEAVES,
-			Material.DARK_OAK_LEAVES,
-			Material.JUNGLE_LEAVES,
-			Material.BIRCH_LEAVES,
-			Material.ACACIA_LEAVES,
-			Material.SEA_LANTERN,
-			Material.GLOWSTONE
-		);
+		Material.RED_STAINED_GLASS,
+		Material.GREEN_STAINED_GLASS,
+		Material.PURPLE_STAINED_GLASS,
+		Material.CYAN_STAINED_GLASS,
+		Material.LIGHT_GRAY_STAINED_GLASS,
+		Material.GRAY_STAINED_GLASS,
+		Material.PINK_STAINED_GLASS,
+		Material.LIME_STAINED_GLASS,
+		Material.YELLOW_STAINED_GLASS,
+		Material.BLUE_STAINED_GLASS,
+		Material.LIGHT_BLUE_STAINED_GLASS,
+		Material.MAGENTA_STAINED_GLASS,
+		Material.ORANGE_STAINED_GLASS,
+		Material.BROWN_STAINED_GLASS,
+		Material.BLACK_STAINED_GLASS,
+		Material.WHITE_STAINED_GLASS,
+		Material.GLASS,
+		Material.SPRUCE_LEAVES,
+		Material.OAK_LEAVES,
+		Material.DARK_OAK_LEAVES,
+		Material.JUNGLE_LEAVES,
+		Material.BIRCH_LEAVES,
+		Material.ACACIA_LEAVES,
+		Material.SEA_LANTERN,
+		Material.GLOWSTONE
+	);
 
 	public static final Set<Material> strippables = EnumSet.of(
-			Material.BIRCH_LOG,
-			Material.SPRUCE_LOG,
-			Material.JUNGLE_LOG,
-			Material.DARK_OAK_LOG,
-			Material.ACACIA_LOG,
-			Material.OAK_LOG,
-			Material.CRIMSON_HYPHAE,
-			Material.CRIMSON_STEM,
-			Material.BIRCH_WOOD,
-			Material.SPRUCE_WOOD,
-			Material.JUNGLE_WOOD,
-			Material.DARK_OAK_WOOD,
-			Material.ACACIA_WOOD,
-			Material.OAK_WOOD,
-			Material.WARPED_STEM,
-			Material.WARPED_HYPHAE
-			);
+		Material.BIRCH_LOG,
+		Material.SPRUCE_LOG,
+		Material.JUNGLE_LOG,
+		Material.DARK_OAK_LOG,
+		Material.ACACIA_LOG,
+		Material.OAK_LOG,
+		Material.CRIMSON_HYPHAE,
+		Material.CRIMSON_STEM,
+		Material.BIRCH_WOOD,
+		Material.SPRUCE_WOOD,
+		Material.JUNGLE_WOOD,
+		Material.DARK_OAK_WOOD,
+		Material.ACACIA_WOOD,
+		Material.OAK_WOOD,
+		Material.WARPED_STEM,
+		Material.WARPED_HYPHAE
+	);
 
+	// list of blocks that are supposedly used as limits to player movements
+	public static final Set<Material> noPassthrough = EnumSet.of(
+		Material.BARRIER,
+		Material.BEDROCK
+	);
 
 	public static String buildAttributeLoreLine(com.playmonumenta.plugins.itemindex.EquipmentSlot slot, Attribute attribute, AttributeModifier.Operation operation, Double amount) {
 		ChatColor color = ChatColor.BLUE;
