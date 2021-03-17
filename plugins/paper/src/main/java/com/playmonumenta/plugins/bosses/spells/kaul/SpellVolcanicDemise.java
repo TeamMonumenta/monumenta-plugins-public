@@ -3,6 +3,14 @@ package com.playmonumenta.plugins.bosses.spells.kaul;
 import java.util.Collections;
 import java.util.List;
 
+import com.playmonumenta.plugins.bosses.ChargeUpManager;
+import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.LocationUtils;
+import com.playmonumenta.plugins.utils.MovementUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
+
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -10,19 +18,14 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.block.Block;
+import org.bukkit.boss.BarColor;
+import org.bukkit.boss.BarStyle;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
-
-import com.playmonumenta.plugins.bosses.spells.Spell;
-import com.playmonumenta.plugins.utils.BossUtils;
-import com.playmonumenta.plugins.utils.FastUtils;
-import com.playmonumenta.plugins.utils.LocationUtils;
-import com.playmonumenta.plugins.utils.MovementUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
 
 /*
  * Volcanic Demise:
@@ -32,27 +35,27 @@ import com.playmonumenta.plugins.utils.PlayerUtils;
  * Each Meteor deals 42 damage in a 4 block radius on collision with the ground.
  * This ability lasts X seconds and continues spawning meteors until the ability duration runs out.
  * Kaul is immune to damage during the channel of this ability.
- *
- *
- *
- *
- *
- *
  */
 public class SpellVolcanicDemise extends Spell {
 
 	private static final int DAMAGE = 42;
+	private static final int METEOR_COUNT = 25;
+	private static final int METEOR_RATE = 10;
 
 	private LivingEntity mBoss;
 	private Plugin mPlugin;
 	private double mRange;
 	private Location mCenter;
+	private ChargeUpManager mChargeUp;
 
 	public SpellVolcanicDemise(Plugin plugin, LivingEntity boss, double range, Location center) {
 		mPlugin = plugin;
 		mBoss = boss;
 		mRange = range;
 		mCenter = center;
+
+		mChargeUp = new ChargeUpManager(mBoss, 20 * 2, ChatColor.GREEN + "Charging " + ChatColor.DARK_RED + "" + ChatColor.BOLD + "Volcanic Demise...",
+			BarColor.RED, BarStyle.SEGMENTED_10, 60);
 	}
 
 	@Override
@@ -65,53 +68,71 @@ public class SpellVolcanicDemise extends Spell {
 		}
 
 		BukkitRunnable runnable = new BukkitRunnable() {
-			int mTicks = 0;
+
 			@Override
 			public void run() {
-				mTicks += 2;
-				float fTick = mTicks;
+				float fTick = mChargeUp.getTime();
 				float ft = fTick / 25;
 				world.spawnParticle(Particle.LAVA, mBoss.getLocation(), 4, 0.35, 0, 0.35, 0.005);
 				world.spawnParticle(Particle.FLAME, mBoss.getLocation().add(0, 1, 0), 3, 0.3, 0, 0.3, 0.125);
 				world.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_SPAWN, 10, 0.5f + ft);
-				if (mTicks >= 20 * 2) {
+				if (mChargeUp.nextTick(2)) {
 					this.cancel();
 					mActiveRunnables.remove(this);
 					world.playSound(mBoss.getLocation(), Sound.ENTITY_BLAZE_SHOOT, 1, 0.5f);
+					world.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_AMBIENT, 1, 0.7f);
+
+					mChargeUp.setTitle(ChatColor.GREEN + "Unleashing " + ChatColor.DARK_RED + "" + ChatColor.BOLD + "Volcanic Demise...");
 					BukkitRunnable runnable = new BukkitRunnable() {
 
+						@Override
+						public void cancel() {
+							super.cancel();
+							mChargeUp.reset();
+							mChargeUp.setTitle(ChatColor.GREEN + "Charging " + ChatColor.DARK_RED + "" + ChatColor.BOLD + "Volcanic Demise...");
+						}
+
 						int mI = 0;
+
+						int mMeteors = 0;
 						@Override
 						public void run() {
 							mI++;
-							List<Player> players = PlayerUtils.playersInRange(mCenter, 50);
-							players.removeIf(p -> p.getLocation().getY() >= 61);
-							Collections.shuffle(players);
-							for (Player player : players) {
-								Vector loc = player.getLocation().toVector();
-								if (player.getLocation().getBlock().isLiquid() || !loc.isInSphere(mCenter.toVector(), 42)) {
-									rainMeteor(player.getLocation(), players, 10);
+
+							mChargeUp.setProgress(1 - ((double) mI / (double) (METEOR_COUNT * METEOR_RATE)));
+
+							if (mI % METEOR_RATE == 0) {
+								mMeteors++;
+								List<Player> players = PlayerUtils.playersInRange(mCenter, 50);
+								players.removeIf(p -> p.getLocation().getY() >= 61);
+								Collections.shuffle(players);
+								for (Player player : players) {
+									Vector loc = player.getLocation().toVector();
+									if (player.getLocation().getBlock().isLiquid() || !loc.isInSphere(mCenter.toVector(), 42)) {
+										rainMeteor(player.getLocation(), players, 10);
+									}
+								}
+								for (int j = 0; j < 4; j++) {
+									rainMeteor(mCenter.clone().add(FastUtils.randomDoubleInRange(-mRange, mRange), 0, FastUtils.randomDoubleInRange(-mRange, mRange)), players, 40);
+								}
+
+								// Target one random player. Have a meteor rain nearby them.
+								if (players.size() >= 1) {
+									Player rPlayer = players.get(FastUtils.RANDOM.nextInt(players.size()));
+									Location loc = rPlayer.getLocation();
+									rainMeteor(loc.add(FastUtils.randomDoubleInRange(-8, 8), 0, FastUtils.randomDoubleInRange(-8, 8)), players, 40);
+								}
+
+								if (mMeteors >= METEOR_COUNT) {
+									this.cancel();
+									mActiveRunnables.remove(this);
 								}
 							}
-							for (int j = 0; j < 4; j++) {
-								rainMeteor(mCenter.clone().add(FastUtils.randomDoubleInRange(-mRange, mRange), 0, FastUtils.randomDoubleInRange(-mRange, mRange)), players, 40);
-							}
 
-							// Target one random player. Have a meteor rain nearby them.
-							if (players.size() >= 1) {
-								Player rPlayer = players.get(FastUtils.RANDOM.nextInt(players.size()));
-								Location loc = rPlayer.getLocation();
-								rainMeteor(loc.add(FastUtils.randomDoubleInRange(-8, 8), 0, FastUtils.randomDoubleInRange(-8, 8)), players, 40);
-							}
-
-							if (mI >= 25) {
-								this.cancel();
-								mActiveRunnables.remove(this);
-							}
 						}
 
 					};
-					runnable.runTaskTimer(mPlugin, 0, 10);
+					runnable.runTaskTimer(mPlugin, 0, 1);
 					mActiveRunnables.add(runnable);
 				}
 			}

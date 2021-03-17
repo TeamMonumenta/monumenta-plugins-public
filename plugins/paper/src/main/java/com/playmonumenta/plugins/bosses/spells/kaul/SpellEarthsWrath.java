@@ -1,15 +1,12 @@
 package com.playmonumenta.plugins.bosses.spells.kaul;
 
-import com.playmonumenta.plugins.utils.FastUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.plugins.utils.LocationUtils;
-import com.playmonumenta.plugins.utils.BossUtils;
-import com.playmonumenta.plugins.utils.MovementUtils;
-
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
+import org.bukkit.boss.BarColor;
+import org.bukkit.boss.BarStyle;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
@@ -19,17 +16,27 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
+import com.playmonumenta.plugins.bosses.ChargeUpManager;
 import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.LocationUtils;
+import com.playmonumenta.plugins.utils.MovementUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 
 public class SpellEarthsWrath extends Spell {
 	private Plugin mPlugin;
 	private LivingEntity mBoss;
 	private double mY;
 
+	private ChargeUpManager mChargeUp;
 	public SpellEarthsWrath(Plugin plugin, LivingEntity boss, double y) {
 		mPlugin = plugin;
 		mBoss = boss;
 		mY = y;
+
+		mChargeUp = new ChargeUpManager(mBoss, (int) (20 * 2.15), ChatColor.GREEN + "Charging " + ChatColor.DARK_GREEN + "Earths Wrath...",
+			BarColor.GREEN, BarStyle.SEGMENTED_10, 50);
 	}
 
 	@Override
@@ -38,16 +45,17 @@ public class SpellEarthsWrath extends Spell {
 		Location centerLoc = mBoss.getLocation();
 
 		new BukkitRunnable() {
-			int mTicks = 0;
+
 			@Override
 			public void run() {
-				mTicks++;
-				if (mTicks % 2 == 0) {
+
+				if (mChargeUp.getTime() % 2 == 0) {
 					world.playSound(mBoss.getLocation(), Sound.ENTITY_IRON_GOLEM_HURT, 2, 1);
 				}
 				world.spawnParticle(Particle.SMOKE_LARGE, mBoss.getLocation(), 2, 0.25, 0.1, 0.25, 0.25);
-				if (mTicks >= 20 * 2.15) {
+				if (mChargeUp.nextTick()) {
 					this.cancel();
+					mChargeUp.reset();
 					world.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_SHOOT, 2, 1);
 					Location loc = mBoss.getLocation().add(0, 0.25, 0);
 					loc.setY(mY);

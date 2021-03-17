@@ -13,6 +13,8 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
+import org.bukkit.boss.BarColor;
+import org.bukkit.boss.BarStyle;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -26,6 +28,7 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.bosses.ChargeUpManager;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import com.playmonumenta.plugins.utils.PlayerUtils;
@@ -62,6 +65,7 @@ public class SpellKaulsJudgement extends Spell implements Listener {
 	private final List<Player> mJudgedPlayers = new ArrayList<Player>();
 	private final HashMap<Player, Location> mOrigPlayerLocs = new HashMap<Player, Location>();
 
+	private ChargeUpManager mChargeUp;
 	private SpellKaulsJudgement(Location bossLoc) {
 		mBossLoc = bossLoc;
 		for (Entity e : bossLoc.getWorld().getEntities()) {
@@ -71,6 +75,8 @@ public class SpellKaulsJudgement extends Spell implements Listener {
 			}
 		}
 
+		mChargeUp = new ChargeUpManager(mBossLoc, null, (int) (20 * 2), ChatColor.GREEN + "Charging " + ChatColor.DARK_GREEN + "" + ChatColor.BOLD + "Kaul's Judgement...",
+			BarColor.GREEN, BarStyle.SEGMENTED_10, 75);
 		/* Register this instance as an event handler so it can catch player events */
 		mPlugin.getServer().getPluginManager().registerEvents(this, mPlugin);
 	}
@@ -167,13 +173,16 @@ public class SpellKaulsJudgement extends Spell implements Listener {
 			public void run() {
 				t++;
 
+
 				if (t < 20 * 2) {
+					mChargeUp.nextTick();
 					/* pre-judgement particles */
 					for (Player player : mJudgedPlayers) {
 						world.spawnParticle(Particle.SPELL_WITCH, player.getLocation().add(0, 1.5, 0), 2, 0.4, 0.4, 0.4, 0);
 						world.spawnParticle(Particle.SPELL_MOB, player.getLocation().add(0, 1.5, 0), 3, 0.4, 0.4, 0.4, 0);
 					}
 				} else if (t == 20 * 2) {
+					mChargeUp.reset();
 					/* Start judgement */
 					for (Player player : mJudgedPlayers) {
 						player.addScoreboardTag(KAULS_JUDGEMENT_TAG);

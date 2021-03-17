@@ -4,23 +4,27 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import com.playmonumenta.plugins.bosses.ChargeUpManager;
+import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
+import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.MovementUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
+
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.BlockData;
+import org.bukkit.boss.BarColor;
+import org.bukkit.boss.BarStyle;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
-
-import com.playmonumenta.plugins.bosses.spells.Spell;
-import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
-import com.playmonumenta.plugins.utils.FastUtils;
-import com.playmonumenta.plugins.utils.MovementUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
 
 /*
  * Raise Jungle/Earth Elementals (dirt): In random spots in the arena,
@@ -47,15 +51,10 @@ public class SpellRaiseJungle extends Spell {
 
 	private int mCooldown;
 	private boolean onCooldown = false;
+	private ChargeUpManager mChargeUp;
 
 	public SpellRaiseJungle(Plugin plugin, LivingEntity boss, double summonRange, double detectRange, int summonTime, int cooldown) {
-		mPlugin = plugin;
-		mBoss = boss;
-		mSummonRange = summonRange;
-		mDetectRange = detectRange;
-		mSummonTime = summonTime;
-		mCooldown = cooldown;
-		mY = -1;
+		this(plugin, boss, summonRange, detectRange, summonTime, cooldown, -1);
 	}
 
 	public SpellRaiseJungle(Plugin plugin, LivingEntity boss, double summonRange, double detectRange, int summonTime, int cooldown, double y) {
@@ -66,6 +65,9 @@ public class SpellRaiseJungle extends Spell {
 		mSummonTime = summonTime;
 		mCooldown = cooldown;
 		mY = y;
+
+		mChargeUp = new ChargeUpManager(mBoss, mSummonTime, ChatColor.GREEN + "Channeling " + ChatColor.DARK_GREEN + "Raise Jungle...",
+			BarColor.GREEN, BarStyle.SEGMENTED_10, 50);
 	}
 
 	@Override
@@ -159,17 +161,23 @@ public class SpellRaiseJungle extends Spell {
 					}
 				}
 				new BukkitRunnable() {
-					int t = 0;
+
+					@Override
+					public void cancel() {
+						super.cancel();
+						mChargeUp.reset();
+					}
+
 					@Override
 					public void run() {
-						t++;
-						if (t % 5 == 0) {
+						mChargeUp.nextTick();
+						if (mChargeUp.getTime() % 5 == 0) {
 							for (Player player : players) {
 								player.playSound(player.getLocation(), Sound.BLOCK_GRAVEL_HIT, 1f, 0.5f);
 							}
 						}
 
-						if (mSummonTime <= t && !mSummoned.isEmpty()) {
+						if (mSummonTime <= mChargeUp.getTime() && !mSummoned.isEmpty()) {
 							for (Player player : players) {
 								player.playSound(player.getLocation(), Sound.BLOCK_GRAVEL_BREAK, 1, 1f);
 							}

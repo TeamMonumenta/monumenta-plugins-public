@@ -19,7 +19,6 @@ import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 
-
 /*
  * Lightning Strike (Always Active, does not use minecraft lighting).
  * Creates a patch of electrically charged ground (particle effects)
@@ -56,7 +55,7 @@ public class SpellLightningStrike extends Spell {
 	@Override
 	public void run() {
 		if (SpellPutridPlague.getPlagueActive()) {
-		    return;
+			return;
 		}
 
 		mCooldown--;
@@ -156,29 +155,32 @@ public class SpellLightningStrike extends Spell {
 	}
 
 	public void lingeringDamage(World world, Location loc) {
-        new BukkitRunnable() {
-            int mTicks = 0;
-            @Override
-            public void run() {
-                mTicks += 2;
-                world.spawnParticle(Particle.FIREWORKS_SPARK, loc, 12, 1.5, 0.15, 1.5, 0.05);
-                world.spawnParticle(Particle.DRAGON_BREATH, loc, 4, 1.5, 0.15, 1.5, 0.025);
+		new BukkitRunnable() {
+			int mTicks = 0;
+			@Override
+			public void run() {
+				mTicks += 2;
 
-                if (mTicks % 10 == 0) {
-                    for (Player player : PlayerUtils.playersInRange(loc, 4)) {
-                        if (loc.distance(player.getLocation()) < Kaul.detectionRange) {
-                            BossUtils.bossDamagePercent(mBoss, player, 0.1, (Location)null);
-                            player.setFireTicks(20 * 3);
-                        }
-                    }
-                }
+				for (double deg = 0; deg < 360; deg += 15) {
+					world.spawnParticle(Particle.FLAME, loc.clone().add(FastUtils.cos(deg) * 4, 0, FastUtils.sin(deg) * 4), 1, 0.15, 0.15, 0.15, 0.05);
+				}
+				world.spawnParticle(Particle.REDSTONE, loc, 10, 2, 0.3, 2, YELLOW_1_COLOR);
+				world.spawnParticle(Particle.REDSTONE, loc, 10, 2, 0.3, 2, YELLOW_2_COLOR);
+				if (mTicks % 10 == 0) {
+					for (Player player : PlayerUtils.playersInRange(loc, 4)) {
+						if (loc.distance(player.getLocation()) < Kaul.detectionRange) {
+							BossUtils.bossDamagePercent(mBoss, player, 0.1, (Location)null);
+							player.setFireTicks(20 * 3);
+						}
+					}
+				}
 
-                if (mTicks >= 20 * 5) {
-                    this.cancel();
-                }
-            }
+				if (mTicks >= 20 * 5) {
+					this.cancel();
+				}
+			}
 
-        }.runTaskTimer(mPlugin, 5, 2);
-        this.cancel();
+		}.runTaskTimer(mPlugin, 5, 2);
+		this.cancel();
 	}
 }

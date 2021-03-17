@@ -4,11 +4,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
+import org.bukkit.boss.BarColor;
+import org.bukkit.boss.BarStyle;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
@@ -19,6 +22,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
+import com.playmonumenta.plugins.bosses.ChargeUpManager;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
@@ -31,10 +35,14 @@ public class SpellGroundSurge extends Spell {
 	private LivingEntity mBoss;
 	private double mRange;
 
+	private ChargeUpManager mChargeUp;
 	public SpellGroundSurge(Plugin plugin, LivingEntity boss, double range) {
 		mPlugin = plugin;
 		mBoss = boss;
 		mRange = range;
+
+		mChargeUp = new ChargeUpManager(mBoss, (int) (20 * 2.5), ChatColor.GREEN + "Charging " + ChatColor.DARK_GREEN + "Ground Surge...",
+			BarColor.GREEN, BarStyle.SEGMENTED_10, 50);
 	}
 
 	@Override
@@ -45,21 +53,21 @@ public class SpellGroundSurge extends Spell {
 		List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), mRange);
 		players.removeIf(p -> p.getLocation().getY() >= 61);
 		new BukkitRunnable() {
-			int mTicks = 0;
 			float mPitch = 0;
 			@Override
 			public void run() {
-				mTicks++;
+
 				Location loc = mBoss.getLocation();
 				mPitch += 0.025;
-				if (mTicks % 2 == 0) {
+				if (mChargeUp.getTime() % 2 == 0) {
 					world.playSound(loc, Sound.ENTITY_ENDER_DRAGON_HURT, 3, mPitch);
 				}
 				world.spawnParticle(Particle.BLOCK_DUST, loc, 8, 0.4, 0.1, 0.4, 0.25, Material.COARSE_DIRT.createBlockData());
 				world.spawnParticle(Particle.SMOKE_LARGE, loc, 2, 0.25, 0.1, 0.25, 0.25);
 
-				if (mTicks >= 20 * 2.5) {
+				if (mChargeUp.nextTick()) {
 					this.cancel();
+					mChargeUp.reset();
 					final int targets;
 					if (players.size() == 0) {
 						return;

@@ -2,20 +2,24 @@ package com.playmonumenta.plugins.bosses.spells.kaul;
 
 import java.util.List;
 
+import com.playmonumenta.plugins.bosses.ChargeUpManager;
+import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
+import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
+
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
+import org.bukkit.boss.BarColor;
+import org.bukkit.boss.BarStyle;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
-
-import com.playmonumenta.plugins.bosses.spells.Spell;
-import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
-import com.playmonumenta.plugins.utils.FastUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
 
 public class SpellArachnopocolypse extends Spell {
 	private Plugin mPlugin;
@@ -23,12 +27,15 @@ public class SpellArachnopocolypse extends Spell {
 	private Location mLoc;
 	private double mDetectRange;
 	private boolean mCooldown = false;
+	private ChargeUpManager mChargeUp;
 
 	public SpellArachnopocolypse(Plugin plugin, LivingEntity boss, Location loc, double detectRange) {
 		mPlugin = plugin;
 		mBoss = boss;
 		mLoc = loc;
 		mDetectRange = detectRange;
+		mChargeUp = new ChargeUpManager(mBoss, 45, ChatColor.GREEN + "Channeling " + ChatColor.DARK_GREEN + "Arachnopocalypse...",
+			BarColor.GREEN, BarStyle.SEGMENTED_10, 50);
 	}
 
 	@Override
@@ -59,16 +66,18 @@ public class SpellArachnopocolypse extends Spell {
 					amount = 18;
 				}
 				int a = amount;
+				mChargeUp.setChargeTime(a);
 				world.playSound(mBoss.getLocation(), Sound.ENTITY_EVOKER_PREPARE_SUMMON, 10, 1);
 				world.spawnParticle(Particle.EXPLOSION_NORMAL, mBoss.getLocation(), 50, 0.5, 0.25, 0.5, 0);
 				new BukkitRunnable() {
-					int mTicks = 0;
+
 					@Override
 					public void run() {
-						mTicks++;
+
 						riseSpider(getRandomLocation(mLoc, 32));
-						if (mTicks >= a) {
+						if (mChargeUp.nextTick()) {
 							this.cancel();
+							mChargeUp.reset();
 						}
 					}
 

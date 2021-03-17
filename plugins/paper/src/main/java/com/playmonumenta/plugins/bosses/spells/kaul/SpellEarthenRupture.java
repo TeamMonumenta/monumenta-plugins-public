@@ -1,10 +1,13 @@
 package com.playmonumenta.plugins.bosses.spells.kaul;
 
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
+import org.bukkit.boss.BarColor;
+import org.bukkit.boss.BarStyle;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
@@ -12,6 +15,7 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import com.playmonumenta.plugins.bosses.ChargeUpManager;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
@@ -25,9 +29,12 @@ public class SpellEarthenRupture extends Spell {
 	private Plugin mPlugin;
 	private LivingEntity mBoss;
 
+	private ChargeUpManager mChargeUp;
 	public SpellEarthenRupture(Plugin plugin, LivingEntity boss) {
 		mPlugin = plugin;
 		mBoss = boss;
+		mChargeUp = new ChargeUpManager(mBoss, 45, ChatColor.GREEN + "Charging " + ChatColor.DARK_GREEN + "Earthen Rupture...",
+			BarColor.GREEN, BarStyle.SEGMENTED_10, 50);
 	}
 
 	@Override
@@ -36,12 +43,12 @@ public class SpellEarthenRupture extends Spell {
 		mBoss.removePotionEffect(PotionEffectType.SLOW);
 		mBoss.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 50, 1));
 		new BukkitRunnable() {
-			int mTicks = 0;
+
 			@Override
 			public void run() {
-				mTicks++;
+
 				Location loc = mBoss.getLocation();
-				if (mTicks % 2 == 0) {
+				if (mChargeUp.getTime() % 2 == 0) {
 					world.playSound(loc, Sound.BLOCK_GRAVEL_HIT, 2, 0.9f);
 				}
 
@@ -50,8 +57,9 @@ public class SpellEarthenRupture extends Spell {
 				if (mBoss.isDead() || !mBoss.isValid()) {
 					this.cancel();
 				}
-				if (mTicks >= 45) {
+				if (mChargeUp.nextTick()) {
 					this.cancel();
+					mChargeUp.reset();
 					world.playSound(loc, Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, 1.5f, 0.9f);
 					world.spawnParticle(Particle.BLOCK_DUST, loc, 250, 3, 0.1, 3, 0.25, Material.COARSE_DIRT.createBlockData());
 					world.spawnParticle(Particle.LAVA, loc, 100, 3, 0.1, 3, 0.25);
