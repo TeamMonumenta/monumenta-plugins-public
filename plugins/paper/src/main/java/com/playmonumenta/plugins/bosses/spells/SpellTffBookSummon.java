@@ -1,10 +1,9 @@
 package com.playmonumenta.plugins.bosses.spells;
 
+import java.util.EnumSet;
 import java.util.List;
 
 import org.bukkit.Sound;
-import org.bukkit.entity.Creature;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
@@ -13,14 +12,19 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
+import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
 
 public class SpellTffBookSummon extends Spell {
 	private Plugin mPlugin;
 	private static final int PLAYER_RANGE = 16;
 	private static final int MAX_NEARBY_SUMMONS = 8;
 	private final LivingEntity mBoss;
+	private final int mCoolDown = 20 * 20;
+	private final EnumSet<EntityType> mTypes = EnumSet.of(
+			EntityType.VEX
+			);
+	private int mT = 5 * 20;
 
 	public SpellTffBookSummon(Plugin plugin, LivingEntity boss) {
 		mPlugin = plugin;
@@ -29,6 +33,24 @@ public class SpellTffBookSummon extends Spell {
 
 	@Override
 	public void run() {
+		mT -= 5;
+		if (mT <= 0) {
+			//check max mob count
+			List<LivingEntity> nearbyEntities = EntityUtils.getNearbyMobs(mBoss.getLocation(), PLAYER_RANGE, mTypes);
+			if (nearbyEntities.size() < MAX_NEARBY_SUMMONS) {
+				//check target
+				if (((mBoss instanceof Mob) && (((Mob)mBoss).getTarget() != null) && (((Mob)mBoss).getTarget() instanceof Player))) {
+					//check line of sight
+					if (LocationUtils.hasLineOfSight(mBoss, ((Mob)mBoss).getTarget())) {
+						mT = mCoolDown;
+						summon();
+					}
+				}
+			}
+		}
+	}
+
+	private void summon() {
 		mBoss.getWorld().playSound(mBoss.getLocation(), Sound.ENTITY_EVOKER_PREPARE_SUMMON, 1f, 0.75f);
 		new BukkitRunnable() {
 
@@ -44,31 +66,7 @@ public class SpellTffBookSummon extends Spell {
 	}
 
 	@Override
-	public boolean canRun() {
-		List<Entity> nearbyEntities = mBoss.getNearbyEntities(PLAYER_RANGE, PLAYER_RANGE, PLAYER_RANGE);
-		if (nearbyEntities.stream().filter(
-				e -> e.getType().equals(EntityType.VEX)
-			).count() > MAX_NEARBY_SUMMONS) {
-			return false;
-		}
-
-		if (((Creature)mBoss).getTarget() == null) {
-			return false;
-		}
-
-		if (((mBoss instanceof Mob) && (((Mob)mBoss).getTarget() instanceof Player))) {
-			for (Player player : PlayerUtils.playersInRange(mBoss.getEyeLocation(), PLAYER_RANGE)) {
-				if (LocationUtils.hasLineOfSight(mBoss, player)) {
-					return true;
-				}
-			}
-		}
-
-		return false;
-	}
-
-	@Override
 	public int cooldownTicks() {
-		return 20 * 20; //20 seconds
+		return 1;
 	}
 }

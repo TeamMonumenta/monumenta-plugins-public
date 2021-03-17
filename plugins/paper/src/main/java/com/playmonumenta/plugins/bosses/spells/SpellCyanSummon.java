@@ -1,20 +1,24 @@
 package com.playmonumenta.plugins.bosses.spells;
 
+import java.util.EnumSet;
 import java.util.List;
 
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
 
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
+import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 
 public class SpellCyanSummon extends Spell {
 	private static final int PLAYER_RANGE = 16;
 	private static final int MAX_NEARBY_SUMMONS = 12;
+	private final EnumSet<EntityType> mTypes = EnumSet.of(
+			EntityType.ZOMBIFIED_PIGLIN
+			);
 
 	private final LivingEntity mBoss;
 
@@ -31,11 +35,9 @@ public class SpellCyanSummon extends Spell {
 
 	@Override
 	public boolean canRun() {
-		List<Entity> nearbyEntities = mBoss.getNearbyEntities(PLAYER_RANGE, PLAYER_RANGE, PLAYER_RANGE);
+		List<LivingEntity> nearbyEntities = EntityUtils.getNearbyMobs(mBoss.getLocation(), PLAYER_RANGE, mTypes);
 
-		if (nearbyEntities.stream().filter(
-				e -> e.getType().equals(EntityType.ZOMBIFIED_PIGLIN)
-			).count() > MAX_NEARBY_SUMMONS) {
+		if (nearbyEntities.size() > MAX_NEARBY_SUMMONS) {
 			return false;
 
 		}

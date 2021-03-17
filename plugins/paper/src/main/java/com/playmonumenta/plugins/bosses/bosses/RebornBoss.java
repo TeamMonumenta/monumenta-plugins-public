@@ -42,8 +42,12 @@ public class RebornBoss extends BossAbilityGroup {
 			if (EntityUtils.isSlowed(com.playmonumenta.plugins.Plugin.getInstance(), mBoss)) {
 				EntityUtils.setSlowTicks(com.playmonumenta.plugins.Plugin.getInstance(), mBoss, 0);
 			}
-			EntityUtils.removeConfusion(mBoss);
-			EntityUtils.removeStun(mBoss);
+			if (EntityUtils.isConfused(mBoss)) {
+				EntityUtils.removeConfusion(mBoss);
+			}
+			if (EntityUtils.isStunned(mBoss)) {
+				EntityUtils.removeStun(mBoss);
+			}
 			new BukkitRunnable() {
 				int mT = 0;
 				@Override
