@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.List;
 
 import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.utils.ItemUtils;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -62,6 +63,7 @@ public class GiveSoulbound extends GenericCommand {
 		lore.add("* Soulbound to " + player.getName() + " *");
 		meta.setLore(lore);
 		stack.setItemMeta(meta);
+		stack = ItemUtils.setPlainLore(stack);
 		InventoryUtils.giveItem(player, stack);
 	}
 }

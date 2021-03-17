@@ -331,6 +331,7 @@ public class PlayerListener implements Listener {
 						mapLore.add(ChatColor.GOLD + "* Official Map *");
 						mapMeta.setLore(mapLore);
 						giveMap.setItemMeta(mapMeta);
+						giveMap = ItemUtils.setPlainLore(giveMap);
 						InventoryUtils.giveItem(player, giveMap);
 					}
 				}

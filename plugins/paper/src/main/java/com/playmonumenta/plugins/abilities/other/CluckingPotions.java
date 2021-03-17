@@ -18,6 +18,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.utils.ItemUtils;
 
 /* TODO:
  * There is no reason this should be a player ability - it doesn't need a unique object per player
@@ -83,6 +84,7 @@ public class CluckingPotions extends Ability {
 							newLore.add(ChatColor.GRAY + "Clucking");
 							meta.setLore(newLore);
 							item.setItemMeta(meta);
+							item = ItemUtils.setPlainLore(item);
 							break;
 						}
 					}

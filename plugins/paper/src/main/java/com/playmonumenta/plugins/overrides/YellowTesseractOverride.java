@@ -23,6 +23,7 @@ import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
@@ -124,6 +125,7 @@ public class YellowTesseractOverride extends BaseOverride {
 		meta.setLore(lore);
 		meta.setDisplayName(ChatColor.YELLOW.toString() + ChatColor.BOLD + TESSERACT_NAME);
 		item.setItemMeta(meta);
+		item = ItemUtils.setPlainTag(item);
 
 		Location pLoc = player.getLocation();
 		pLoc.setY(pLoc.getY() + player.getEyeHeight() - 0.5);
@@ -263,6 +265,7 @@ public class YellowTesseractOverride extends BaseOverride {
 		meta.setLore(lore);
 		meta.setDisplayName(ChatColor.YELLOW.toString() + ChatColor.BOLD + TESSERACT_NAME + CONFIG);
 		item.setItemMeta(meta);
+		item = ItemUtils.setPlainTag(item);
 
 		Location pLoc = player.getLocation();
 		pLoc.setY(pLoc.getY() + player.getEyeHeight() - 0.5);

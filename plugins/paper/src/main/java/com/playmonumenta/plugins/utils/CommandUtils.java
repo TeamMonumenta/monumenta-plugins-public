@@ -214,6 +214,7 @@ public class CommandUtils {
 
 		meta.setLore(newLore);
 		item.setItemMeta(meta);
+		item = ItemUtils.setPlainLore(item);
 
 		sender.sendMessage("Succesfully added " + enchantment + " to player's held item");
 	}
@@ -248,6 +249,7 @@ public class CommandUtils {
 		} else {
 			meta.setLore(newLore);
 			item.setItemMeta(meta);
+			item = ItemUtils.setPlainLore(item);
 
 			sender.sendMessage("Successfully removed " + enchantment + " from the player's held item");
 		}

@@ -161,7 +161,8 @@ public class AbilityUtils {
 		potionMeta.setLore(loreList);
 
 		itemStack.setItemMeta(potionMeta);
-		return ItemUtils.setPlainName(itemStack, plainName); // Support for resource pack textures like with other items & mechanisms
+		itemStack = ItemUtils.setPlainTag(itemStack); // Support for resource pack textures like with other items & mechanisms
+		return itemStack;
 	}
 
 	public static void addAlchemistPotions(Player player, int numAddedPotions) {

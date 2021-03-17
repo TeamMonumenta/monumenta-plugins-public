@@ -176,6 +176,7 @@ public class InventoryUtils {
 					}
 					meta.setLore(newLore);
 					item.setItemMeta(meta);
+					ItemUtils.setPlainLore(item);
 				}
 			}
 		}

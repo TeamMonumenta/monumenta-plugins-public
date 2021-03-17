@@ -19,6 +19,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.utils.ItemUtils;
 
 /*
  * Ashes of Eternity - When held, acts as a normal totem but does not shatter or break when life is saved.
@@ -64,6 +65,7 @@ public class AshesOfEternity extends VoidTether {
 			lore.removeIf((String loreEntry) -> loreEntry.contains(PROPERTY_NAME));
 			meta.setLore(lore);
 			item.setItemMeta(meta);
+			item = ItemUtils.setPlainLore(item);
 
 			plugin.mPotionManager.clearAllPotions(player);
 

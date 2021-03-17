@@ -7,6 +7,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Pattern;
+
+import net.kyori.adventure.text.Component;
 
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.Color;
@@ -27,7 +30,9 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.potion.PotionType;
 
+import de.tr7zw.nbtapi.NBTCompound;
 import de.tr7zw.nbtapi.NBTItem;
+import de.tr7zw.nbtapi.NBTList;
 
 import com.playmonumenta.plugins.enchantments.Colossal;
 import com.playmonumenta.plugins.itemindex.Attribute;
@@ -38,6 +43,8 @@ import com.playmonumenta.plugins.utils.PotionUtils.PotionInfo;
 import net.md_5.bungee.api.ChatColor;
 
 public class ItemUtils {
+	private static final Pattern NON_PLAIN_REGEX = Pattern.compile("[^ -~]");
+
 	public static final Set<Material> armors = EnumSet.of(
 		Material.LEATHER_BOOTS,
 		Material.LEATHER_CHESTPLATE,
@@ -846,6 +853,7 @@ public class ItemUtils {
 		meta.addCustomEffect(new PotionEffect(type, duration, amplifier), true);
 		meta.setColor(type.getColor());
 		stack.setItemMeta(meta);
+		stack = ItemUtils.setPlainName(stack);
 
 		return stack;
 	}
@@ -861,6 +869,7 @@ public class ItemUtils {
 		meta.setDisplayName("�r" + name);
 		meta.setColor(color);
 		potion.setItemMeta(meta);
+		potion = ItemUtils.setPlainName(potion);
 	}
 
 	// Check if item has the "* Shattered *" lore entry
@@ -917,6 +926,7 @@ public class ItemUtils {
 				lore.add(ChatColor.DARK_RED + "Maybe a Master Repairman");
 				lore.add(ChatColor.DARK_RED + "could reforge it...");
 				item.setLore(lore);
+				item = ItemUtils.setPlainLore(item);
 				return true;
 			}
 		}
@@ -945,6 +955,7 @@ public class ItemUtils {
 				}
 			}
 		}
+		item = ItemUtils.setPlainLore(item);
 		return reforged;
 	}
 
@@ -1066,16 +1077,127 @@ public class ItemUtils {
 		return strList.toArray(new String[0]);
 	}
 
+	public static ItemStack setPlainTag(ItemStack itemStack) {
+		itemStack = setPlainName(itemStack);
+		itemStack = setPlainLore(itemStack);
+		return itemStack;
+	}
+
+	public static ItemStack setPlainName(ItemStack itemStack) {
+		String itemName = null;
+		if (itemStack.hasItemMeta()) {
+			ItemMeta itemMeta = itemStack.getItemMeta();
+			if (itemMeta.hasDisplayName()) {
+				itemName = toPlainTagText(itemMeta.displayName());
+			}
+		}
+		return setPlainName(itemStack, itemName);
+	}
+
 	public static ItemStack setPlainName(ItemStack itemStack, String plainName) {
 		final String PLAIN_KEY = "plain";
 		final String DISPLAY_KEY = "display";
 		final String NAME_KEY = "Name";
 
-		NBTItem nbtItem = new NBTItem(itemStack);
-		if (nbtItem.hasKey(PLAIN_KEY)) {
-			nbtItem.removeKey(PLAIN_KEY);
+		if (itemStack == null || itemStack.getType() == Material.AIR) {
+			return itemStack;
 		}
-		nbtItem.addCompound(PLAIN_KEY).addCompound(DISPLAY_KEY).setString(NAME_KEY, plainName);
-		return nbtItem.getItem();
+
+		NBTItem nbtItem = new NBTItem(itemStack);
+		if (plainName != null) {
+			// addComponent effectively runs:
+			// if (key exists) { return tag(key) } else { return new tag(key) }
+			nbtItem.addCompound(PLAIN_KEY).addCompound(DISPLAY_KEY).setString(NAME_KEY, plainName);
+		} else {
+			if (nbtItem.hasKey(PLAIN_KEY)) {
+				NBTCompound plain = nbtItem.getCompound(PLAIN_KEY);
+
+				if (plain.hasKey(DISPLAY_KEY)) {
+					NBTCompound display = plain.getCompound(DISPLAY_KEY);
+
+					if (display.hasKey(NAME_KEY)) {
+						display.removeKey(NAME_KEY);
+
+						if (display.getKeys().size() == 0) {
+							plain.removeKey(DISPLAY_KEY);
+
+							if (plain.getKeys().size() == 0) {
+								nbtItem.removeKey(PLAIN_KEY);
+							}
+						}
+					}
+				}
+			}
+		}
+		ItemStack updatedItemStack = nbtItem.getItem();
+		if (updatedItemStack.hasItemMeta()) {
+			itemStack.setItemMeta(updatedItemStack.getItemMeta());
+		} else {
+			itemStack.setItemMeta(null);
+		}
+		return itemStack;
+	}
+
+	public static ItemStack setPlainLore(ItemStack itemStack) {
+		List<String> plainLore = null;
+		if (itemStack.hasItemMeta()) {
+			ItemMeta itemMeta = itemStack.getItemMeta();
+			if (itemMeta.hasLore()) {
+				plainLore = new ArrayList<>();
+				for (Component loreLine : itemMeta.lore()) {
+					plainLore.add(toPlainTagText(loreLine));
+				}
+			}
+		}
+		return setPlainLore(itemStack, plainLore);
+	}
+
+	public static ItemStack setPlainLore(ItemStack itemStack, List<String> plainLore) {
+		final String PLAIN_KEY = "plain";
+		final String DISPLAY_KEY = "display";
+		final String LORE_KEY = "Lore";
+
+		NBTItem nbtItem = new NBTItem(itemStack);
+		if (plainLore != null && plainLore.size() > 0) {
+			// addComponent effectively runs:
+			// if (key exists) { return tag(key) } else { return new tag(key) }
+			NBTList<String> loreList = nbtItem.addCompound(PLAIN_KEY).addCompound(DISPLAY_KEY).getStringList(LORE_KEY);
+			loreList.clear();
+			for (String loreLine : plainLore) {
+				loreList.add(loreLine);
+			}
+		} else {
+			if (nbtItem.hasKey(PLAIN_KEY)) {
+				NBTCompound plain = nbtItem.getCompound(PLAIN_KEY);
+
+				if (plain.hasKey(DISPLAY_KEY)) {
+					NBTCompound display = plain.getCompound(DISPLAY_KEY);
+
+					if (display.hasKey(LORE_KEY)) {
+						display.removeKey(LORE_KEY);
+
+						if (display.getKeys().size() == 0) {
+							plain.removeKey(DISPLAY_KEY);
+
+							if (plain.getKeys().size() == 0) {
+								nbtItem.removeKey(PLAIN_KEY);
+							}
+						}
+					}
+				}
+			}
+		}
+		ItemStack updatedItemStack = nbtItem.getItem();
+		if (updatedItemStack.hasItemMeta()) {
+			itemStack.setItemMeta(updatedItemStack.getItemMeta());
+		} else {
+			itemStack.setItemMeta(null);
+		}
+		return itemStack;
+	}
+
+	public static String toPlainTagText(Component formattedText) {
+		String plainText = MessagingUtils.plainText(formattedText);
+		return NON_PLAIN_REGEX.matcher(plainText).replaceAll("").trim();
 	}
 }

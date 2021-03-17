@@ -10,6 +10,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import com.playmonumenta.plugins.guis.SinglePageGUI;
+import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.redissync.MonumentaRedisSyncAPI;
 import com.playmonumenta.scriptedquests.Plugin;
 import com.playmonumenta.scriptedquests.utils.ScoreboardUtils;
@@ -318,6 +319,7 @@ public class OrinSinglePageGUI extends SinglePageGUI {
 		}
 		meta.setLore(lore);
 		newItem.setItemMeta(meta);
+		newItem = ItemUtils.setPlainTag(newItem);
 		return newItem;
 	}
 	

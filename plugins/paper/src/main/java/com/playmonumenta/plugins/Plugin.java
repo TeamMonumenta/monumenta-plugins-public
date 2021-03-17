@@ -47,6 +47,7 @@ import com.playmonumenta.plugins.commands.SpectateBot;
 import com.playmonumenta.plugins.commands.TeleportAsync;
 import com.playmonumenta.plugins.commands.TeleportByScore;
 import com.playmonumenta.plugins.commands.UnsignBook;
+import com.playmonumenta.plugins.commands.UpdateHeldItem;
 import com.playmonumenta.plugins.effects.EffectManager;
 import com.playmonumenta.plugins.enchantments.AttributeManager;
 import com.playmonumenta.plugins.enchantments.EnchantmentManager;
@@ -173,6 +174,7 @@ public class Plugin extends JavaPlugin {
 		ItemIndexCommand.register();
 		TeleportAsync.register();
 		TeleportByScore.register();
+		UpdateHeldItem.register();
 		Portal1.register();
 		Portal2.register();
 		ClearPortals.register();

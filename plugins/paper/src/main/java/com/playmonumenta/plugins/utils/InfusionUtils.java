@@ -96,6 +96,7 @@ public class InfusionUtils {
 			}
 		}
 		item.setLore(newLore);
+		item = ItemUtils.setPlainLore(item);
 
 		ItemRegion region = ItemUtils.getItemRegion(item);
 		int payment = calcPaymentValue(paymentFrames, region);
@@ -197,6 +198,7 @@ public class InfusionUtils {
 				}
 			}
 			item.setLore(newLore);
+			item = ItemUtils.setPlainLore(item);
 		}
 
 
@@ -248,6 +250,7 @@ public class InfusionUtils {
 			}
 		}
 		item.setLore(newLore);
+		item = ItemUtils.setPlainLore(item);
 
 		if (isPreUpdate) {
 			ItemRegion region = ItemUtils.getItemRegion(item);

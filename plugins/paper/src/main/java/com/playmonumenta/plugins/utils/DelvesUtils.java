@@ -800,6 +800,7 @@ public class DelvesUtils {
 					String name = meta.getDisplayName();
 					meta.setDisplayName(ChatColor.GOLD + "Rank " + name.charAt(name.length() - 1));
 					item.setItemMeta(meta);
+					item = ItemUtils.setPlainName(item);
 
 					current += COLUMNS;
 				}
@@ -815,6 +816,7 @@ public class DelvesUtils {
 					String name = meta.getDisplayName();
 					meta.setDisplayName(ChatColor.GRAY + "Rank " + name.charAt(name.length() - 1));
 					item.setItemMeta(meta);
+					item = ItemUtils.setPlainName(item);
 				}
 			}
 
@@ -915,6 +917,7 @@ public class DelvesUtils {
 			meta.setLore(lore);
 
 			item.setItemMeta(meta);
+			item = ItemUtils.setPlainTag(item);
 
 			return item;
 		}
@@ -946,6 +949,7 @@ public class DelvesUtils {
 			meta.setLore(lore);
 
 			item.setItemMeta(meta);
+			item = ItemUtils.setPlainTag(item);
 
 			return item;
 		}
@@ -956,6 +960,7 @@ public class DelvesUtils {
 			ItemMeta meta = item.getItemMeta();
 			meta.setDisplayName("" + ChatColor.WHITE + ChatColor.BOLD + "Reset Modifiers");
 			item.setItemMeta(meta);
+			item = ItemUtils.setPlainName(item);
 
 			return item;
 		}
@@ -966,6 +971,7 @@ public class DelvesUtils {
 			ItemMeta meta = item.getItemMeta();
 			meta.setDisplayName("" + ChatColor.WHITE + ChatColor.BOLD + "Select All Modifiers");
 			item.setItemMeta(meta);
+			item = ItemUtils.setPlainName(item);
 
 			return item;
 		}
@@ -976,6 +982,7 @@ public class DelvesUtils {
 			ItemMeta meta = item.getItemMeta();
 			meta.setDisplayName("" + ChatColor.WHITE + ChatColor.BOLD + "Next Page");
 			item.setItemMeta(meta);
+			item = ItemUtils.setPlainName(item);
 
 			return item;
 		}
@@ -986,6 +993,7 @@ public class DelvesUtils {
 			ItemMeta meta = item.getItemMeta();
 			meta.setDisplayName("" + ChatColor.WHITE + ChatColor.BOLD + "Previous Page");
 			item.setItemMeta(meta);
+			item = ItemUtils.setPlainName(item);
 
 			return item;
 		}
@@ -1013,6 +1021,7 @@ public class DelvesUtils {
 				meta.setLore(lore);
 
 				item.setItemMeta(meta);
+				item = ItemUtils.setPlainTag(item);
 
 				modifierItems.add(item);
 			}
@@ -1031,6 +1040,7 @@ public class DelvesUtils {
 				meta.setLore(lore);
 
 				item.setItemMeta(meta);
+				item = ItemUtils.setPlainTag(item);
 
 				modifierItems.add(item);
 			}
@@ -1051,6 +1061,7 @@ public class DelvesUtils {
 			}
 
 			item.setItemMeta(meta);
+			item = ItemUtils.setPlainTag(item);
 
 			modifierItems.add(item);
 
