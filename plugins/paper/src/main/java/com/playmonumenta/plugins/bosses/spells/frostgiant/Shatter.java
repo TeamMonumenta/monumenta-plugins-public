@@ -87,7 +87,7 @@ public class Shatter extends Spell {
 
 		Location loc = mBoss.getLocation();
 
-		new BukkitRunnable() {
+		BukkitRunnable runnable = new BukkitRunnable() {
 			int mT = 0;
 			float mPitch = 0;
 			@Override
@@ -259,7 +259,10 @@ public class Shatter extends Spell {
 				}
 			}
 
-		}.runTaskTimer(mPlugin, 0, 2);
+		};
+
+		runnable.runTaskTimer(mPlugin, 0, 2);
+		mActiveRunnables.add(runnable);
 	}
 
 	@Override

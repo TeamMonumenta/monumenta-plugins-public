@@ -202,6 +202,7 @@ public class FrostGiant extends BossAbilityGroup {
 
 	//Melee does damage
 	private boolean mDoDamage = true;
+	private BukkitRunnable mDelay;
 
 	//Default: 3f, phase 3: 1f, phase 4: 0.5f
 	private float mMeleeKnockback = 3f;
@@ -338,14 +339,21 @@ public class FrostGiant extends BossAbilityGroup {
 
 					if (target.getBoundingBox().overlaps(mBoss.getBoundingBox().expand(0.5, 0, 0.5)) && !mCooldown && mDoDamage) {
 						mCooldown = true;
-						new BukkitRunnable() {
+
+						if (mDelay != null && !mDelay.isCancelled()) {
+							mDelay.cancel();
+						}
+
+						mDelay = new BukkitRunnable() {
 
 							@Override
 							public void run() {
 								mCooldown = false;
 							}
 
-						}.runTaskLater(mPlugin, 20);
+						};
+						mDelay.runTaskLater(mPlugin, 20 * 4);
+
 						//Damages and knocks back player
 						if (target instanceof Player) {
 							BossUtils.bossDamagePercent(mBoss, (Player) target, 0.5);
@@ -1138,25 +1146,37 @@ public class FrostGiant extends BossAbilityGroup {
 		//Both abilities delayed by 1.5s
 		//Delays damage for melee
 		delayDamage();
-
-		//Delays damage for hailstorm
-		if (getPassives() != null) {
-			for (Spell sp : getPassives()) {
-				if (sp instanceof SpellHailstorm) {
-					((SpellHailstorm) sp).delayDamage();
-				}
-			}
-		}
+		delayHailstormDamage();
 	}
 
 	public void delayDamage() {
+		if (mDelay != null && !mDelay.isCancelled()) {
+			mDelay.cancel();
+		}
+
 		mDoDamage = false;
-		new BukkitRunnable() {
+		mDelay = new BukkitRunnable() {
 			@Override
 			public void run() {
 				mDoDamage = true;
 			}
-		}.runTaskLater(mPlugin, 30);
+		};
+		mDelay.runTaskLater(mPlugin, 20 * 4);
+	}
+
+	public static boolean delayHailstormDamage() {
+		//Delays damage for hailstorm
+		if (mInstance != null) {
+			if (mInstance.getPassives() != null) {
+				for (Spell sp : mInstance.getPassives()) {
+					if (sp instanceof SpellHailstorm) {
+						((SpellHailstorm) sp).delayDamage();
+						return true;
+					}
+				}
+			}
+		}
+		return false;
 	}
 
 	@Override
@@ -1164,7 +1184,6 @@ public class FrostGiant extends BossAbilityGroup {
 		int bossTargetHp = 0;
 		int playerCount = PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange).size();
 		int hpDel = 5012;
-		int armor = (int)(Math.sqrt(playerCount * 2) - 1);
 
 		/*
 		 * New boss mechanic: The more players there are,
@@ -1178,7 +1197,6 @@ public class FrostGiant extends BossAbilityGroup {
 		}
 		mBoss.setMaximumNoDamageTicks(mBoss.getMaximumNoDamageTicks() - noDamageTicksTake);
 		bossTargetHp = (int) (hpDel * (1 + (1 - 1/Math.E) * Math.log(playerCount)));
-		mBoss.getAttribute(Attribute.GENERIC_ARMOR).setBaseValue(armor);
 		mBoss.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(bossTargetHp);
 		mBoss.getAttribute(Attribute.GENERIC_FOLLOW_RANGE).setBaseValue(detectionRange);
 		mBoss.getAttribute(Attribute.GENERIC_KNOCKBACK_RESISTANCE).setBaseValue(1);

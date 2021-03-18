@@ -45,6 +45,8 @@ public class SpellHailstorm extends Spell {
 	private List<Player> mWarned = new ArrayList<Player>();
 	private Map<Player, BukkitRunnable> mDamage = new HashMap<>();
 
+	private BukkitRunnable mDelay;
+
 	private static final Particle.DustOptions BLUE_COLOR = new Particle.DustOptions(Color.fromRGB(66, 185, 245), 1.0f);
 	private static final Particle.DustOptions LIGHT_BLUE_COLOR = new Particle.DustOptions(Color.fromRGB(0, 255, 247), 1.0f);
 
@@ -69,14 +71,17 @@ public class SpellHailstorm extends Spell {
 	public void run() {
 		Location loc = mBoss.getLocation();
 		World world = mBoss.getWorld();
-		for (double degree = 0; degree < 360; degree += 8) {
-			double radian = Math.toRadians(degree);
-			loc.add(FastUtils.cos(radian) * (mRadius + 5), 2.5, FastUtils.sin(radian) * (mRadius + 5));
-			world.spawnParticle(Particle.CLOUD, loc, 2, 2, 1, 3, 0.075);
-			world.spawnParticle(Particle.CLOUD, loc, 2, 2, 4, 3, 0.075);
-			world.spawnParticle(Particle.REDSTONE, loc, 3, 2, 4, 3, 0.075, BLUE_COLOR);
-			world.spawnParticle(Particle.REDSTONE, loc, 3, 2, 1, 3, 0.075, BLUE_COLOR);
-			loc.subtract(FastUtils.cos(radian) * (mRadius + 5), 2.5, FastUtils.sin(radian) * (mRadius + 5));
+
+		if (mDoDamage) {
+			for (double degree = 0; degree < 360; degree += 8) {
+				double radian = Math.toRadians(degree);
+				loc.add(FastUtils.cos(radian) * (mRadius + 5), 2.5, FastUtils.sin(radian) * (mRadius + 5));
+				world.spawnParticle(Particle.CLOUD, loc, 2, 2, 1, 3, 0.075);
+				world.spawnParticle(Particle.CLOUD, loc, 2, 2, 4, 3, 0.075);
+				world.spawnParticle(Particle.REDSTONE, loc, 3, 2, 4, 3, 0.075, BLUE_COLOR);
+				world.spawnParticle(Particle.REDSTONE, loc, 3, 2, 1, 3, 0.075, BLUE_COLOR);
+				loc.subtract(FastUtils.cos(radian) * (mRadius + 5), 2.5, FastUtils.sin(radian) * (mRadius + 5));
+			}
 		}
 
 		for (double degree = 0; degree < 360; degree++) {
@@ -154,13 +159,18 @@ public class SpellHailstorm extends Spell {
 	}
 
 	public void delayDamage() {
+		if (mDelay != null && !mDelay.isCancelled()) {
+			mDelay.cancel();
+		}
+
 		mDoDamage = false;
-		new BukkitRunnable() {
+		mDelay = new BukkitRunnable() {
 			@Override
 			public void run() {
 				mDoDamage = true;
 			}
-		}.runTaskLater(mPlugin, 30);
+		};
+		mDelay.runTaskLater(mPlugin, 20 * 4);
 	}
 
 	@Override

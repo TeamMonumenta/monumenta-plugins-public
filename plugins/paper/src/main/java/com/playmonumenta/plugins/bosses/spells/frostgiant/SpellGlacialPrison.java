@@ -47,6 +47,7 @@ public class SpellGlacialPrison extends Spell {
 	@Override
 	public void run() {
 		FrostGiant.freezeGolems(mBoss);
+		FrostGiant.delayHailstormDamage();
 		//Glacial Prison can not be cast whithin 60 seconds of the previous cast of it
 		mCooldown = true;
 		new BukkitRunnable() {
@@ -140,6 +141,9 @@ public class SpellGlacialPrison extends Spell {
 
 						player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW_DIGGING, 20 * 4, 1));
 
+						//Only lasts 4 seconds, needs to be done more than once
+						FrostGiant.delayHailstormDamage();
+
 						new BukkitRunnable() {
 							int mTicks = 0;
 							float mPitch = 0;
@@ -168,6 +172,10 @@ public class SpellGlacialPrison extends Spell {
 
 								if (mTicks % 10 == 0) {
 									world.playSound(center, Sound.ENTITY_ELDER_GUARDIAN_HURT, SoundCategory.HOSTILE, 1, mPitch);
+								}
+
+								if (mTicks == 20 * 2) {
+									FrostGiant.delayHailstormDamage();
 								}
 
 								//If player did not escape within 4 seconds, damage by 80% of health and remove the ice prison
