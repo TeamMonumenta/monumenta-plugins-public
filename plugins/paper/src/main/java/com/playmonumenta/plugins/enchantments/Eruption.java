@@ -98,8 +98,7 @@ public class Eruption implements BaseEnchantment {
 			}
 			if (decay > 0) {
 				player.playSound(player.getLocation(), Sound.ENTITY_WITHER_SHOOT, 0.4f, 0.7f);
-				BlockData fallingDustData = Material.ANVIL.createBlockData();
-				player.getWorld().spawnParticle(Particle.FALLING_DUST, event.getBlock().getLocation(), 25, 1.5, 1.5, 1.5, fallingDustData);
+				player.getWorld().spawnParticle(Particle.SQUID_INK, event.getBlock().getLocation(), 25, 1.5, 1.5, 1.5);
 			}
 			if (bleed > 0) {
 				player.playSound(player.getLocation(), Sound.ENTITY_SLIME_SQUISH, 0.7f, 0.7f);

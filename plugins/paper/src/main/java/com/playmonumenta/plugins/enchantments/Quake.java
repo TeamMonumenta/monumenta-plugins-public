@@ -99,8 +99,7 @@ public class Quake implements BaseEnchantment {
 			}
 			if (decay > 0) {
 				player.playSound(player.getLocation(), Sound.ENTITY_WITHER_SHOOT, 0.4f, 0.7f);
-				BlockData fallingDustData = Material.ANVIL.createBlockData();
-				player.getWorld().spawnParticle(Particle.FALLING_DUST, target.getLocation(), 25, 1.5, 1.5, 1.5, fallingDustData);
+				player.getWorld().spawnParticle(Particle.SQUID_INK, target.getLocation(), 25, 1.5, 1.5, 1.5);
 			}
 			if (bleed > 0) {
 				player.playSound(player.getLocation(), Sound.BLOCK_SLIME_BLOCK_BREAK, 0.7f, 1.0f);

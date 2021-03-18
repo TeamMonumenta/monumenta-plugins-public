@@ -38,8 +38,7 @@ public class Decay implements BaseEnchantment {
 	@Override
 	public void onAttack(Plugin plugin, Player player, int level, LivingEntity target, EntityDamageByEntityEvent event) {
 		PotionUtils.applyPotion(player, target, new PotionEffect(PotionEffectType.WITHER, (int)(DURATION * player.getCooledAttackStrength(0)), level - 1, false, true));
-		BlockData fallingDustData = Material.ANVIL.createBlockData();
-		player.getWorld().spawnParticle(Particle.FALLING_DUST, target.getLocation().add(0, 1, 0), 4, 0.4, 0.5, 0.4, fallingDustData);
+		player.getWorld().spawnParticle(Particle.SQUID_INK, target.getLocation().add(0, 1, 0), 4, 0.4, 0.5, 0.4);
 	}
 	
 	// Thrown trident damage handling
@@ -56,8 +55,7 @@ public class Decay implements BaseEnchantment {
 			int level = proj.getMetadata(LEVEL_METAKEY).get(0).asInt();
 			Player player = (Player)proj.getShooter();
 			PotionUtils.applyPotion(player, target, new PotionEffect(PotionEffectType.WITHER, DURATION, level - 1, false, true));
-			BlockData fallingDustData = Material.ANVIL.createBlockData();
-			player.getWorld().spawnParticle(Particle.FALLING_DUST, target.getLocation().add(0, 1, 0), 4, 0.4, 0.5, 0.4, fallingDustData);
+			player.getWorld().spawnParticle(Particle.SQUID_INK, target.getLocation().add(0, 1, 0), 4, 0.4, 0.5, 0.4);
 		}
 	}
 
