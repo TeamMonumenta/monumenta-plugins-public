@@ -44,6 +44,10 @@ public class GatesOfHell extends Spell {
 	}
 
 	private void openGate(LivingEntity portal) {
+		if (portal == null) {
+			return;
+		}
+
 		mOpenPortals.add(portal);
 		Entity portalEntity = LibraryOfSoulsIntegration.summon(portal.getLocation(), "PortalGate");
 		portalEntity.addScoreboardTag("PortalNum" + mNum);
@@ -73,8 +77,8 @@ public class GatesOfHell extends Spell {
 		BukkitRunnable runnable = new BukkitRunnable() {
 			@Override
 			public void run() {
-				if (mBoss.isDead() || !mBoss.isValid() || portalEntity.isDead() || !portalEntity.isValid()) {
-					if (!portalEntity.isDead()) {
+				if (mBoss.isDead() || !mBoss.isValid() || portalEntity == null || portalEntity.isDead() || !portalEntity.isValid()) {
+					if (portalEntity != null && !portalEntity.isDead()) {
 						portalEntity.remove();
 					}
 					mOpenPortals.remove(portal);

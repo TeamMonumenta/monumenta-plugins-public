@@ -50,6 +50,7 @@ import com.playmonumenta.plugins.bosses.spells.falsespirit.SpellMultiEarthshake;
 import com.playmonumenta.plugins.bosses.spells.falsespirit.TriplicateSlash;
 import com.playmonumenta.plugins.bosses.spells.falsespirit.UltimateBulletMania;
 import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.DelvesUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.SerializationUtils;
@@ -61,6 +62,9 @@ public class FalseSpirit extends BossAbilityGroup {
 
 	private final Plugin mPlugin;
 	public final LivingEntity mBoss;
+
+	//If delves is enabled in instance, turn on delves mode
+	private boolean mDelve = false;
 
 	private final Location mSpawnLoc;
 	private final Location mEndLoc;
@@ -104,6 +108,16 @@ public class FalseSpirit extends BossAbilityGroup {
 		mSpawnLoc = spawnLoc;
 		mEndLoc = endLoc;
 
+		//Look to see if delves is enabled
+		List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), 100);
+		for (Player player : players) {
+			if (DelvesUtils.getDelveInfo(player).getDepthPoints() > 0) {
+				mDelve = true;
+
+				break;
+			}
+		}
+
 		mMania = new UltimateBulletMania(boss, plugin);
 
 		List<LivingEntity> portals = new ArrayList<>(24);
@@ -129,6 +143,18 @@ public class FalseSpirit extends BossAbilityGroup {
 		mHell = new GatesOfHell(plugin, boss, portals, 1);
 		mCeilingHell = new GatesOfHell(plugin, boss, new ArrayList<>(Arrays.asList(ceilingPortal)), 5);
 
+		int multiEarthshakeDuration = 50;
+
+		int passiveCooldown = 20 * 8;
+		double passiveSpeed = .25;
+
+		if (mDelve) {
+			multiEarthshakeDuration = 30;
+
+			passiveCooldown = 20 * 6;
+			passiveSpeed = .3;
+		}
+
 		SpellManager phase1Spells = new SpellManager(Arrays.asList(
 				new SpellForceTwo(plugin, boss, 5, 20 * 2),
 				new TriplicateSlash(plugin, boss)
@@ -137,15 +163,17 @@ public class FalseSpirit extends BossAbilityGroup {
 		SpellManager activeSpells = new SpellManager(Arrays.asList(
 				new SpellForceTwo(plugin, boss, 5, 20 * 2),
 				new TriplicateSlash(plugin, boss),
-				new SpellMultiEarthshake(plugin, boss, 1, 50, mSpawnLoc),
-				new SpellFlamethrower(plugin, boss)
+				new SpellMultiEarthshake(plugin, boss, 1, multiEarthshakeDuration, mDelve, mSpawnLoc),
+				new SpellFlamethrower(plugin, boss, mDelve)
 				));
+
+
 
 		List<Spell> passiveSpells = Arrays.asList(
 				new SpellPurgeNegatives(boss, 20 * 5),
 				new DamageBlocker(plugin, boss, mHell, mCeilingHell),
 				new SpellBlockBreak(boss, 2, 3, 2),
-				new PassiveSeekingProjectile(plugin, boss, 20 * 8)
+				new PassiveSeekingProjectile(plugin, boss, passiveCooldown, passiveSpeed, mDelve)
 			);
 
 		Map<Integer, BossHealthAction> events = new HashMap<Integer, BossHealthAction>();

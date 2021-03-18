@@ -1,9 +1,9 @@
 package com.playmonumenta.plugins.bosses.spells.falsespirit;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -20,6 +20,7 @@ import org.bukkit.util.Vector;
 import com.playmonumenta.plugins.bosses.bosses.FalseSpirit;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
@@ -34,22 +35,20 @@ public class SpellFlamethrower extends Spell {
 	private final int mCooldown = 20 * 15;
 	private Location mLoc = null;
 
-	public SpellFlamethrower(Plugin plugin, LivingEntity boss) {
+	private boolean mDelve = false;
+
+	public SpellFlamethrower(Plugin plugin, LivingEntity boss, boolean delve) {
 		mPlugin = plugin;
 		mBoss = boss;
+		mDelve = delve;
 	}
 
 	@Override
 	public void run() {
-		List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), mRange);
-		if (!players.isEmpty()) {
-			Collections.shuffle(players);
-			launch(players.get(0));
-			if (players.size() >= 5) {
-				launch(players.get(1));
-			}
-		}
-
+		//List is sorted with nearest players further in the list, and farthest players at the beginning
+		List<Player> players = EntityUtils.getNearestPlayers(mBoss.getLocation(), FalseSpirit.detectionRange);
+		players.removeIf(p -> p.getGameMode() == GameMode.SPECTATOR);
+		launch(players.get(0));
 	}
 
 	@Override
@@ -68,7 +67,7 @@ public class SpellFlamethrower extends Spell {
 			private int mTicks = 0;
 			@Override
 			public void run() {
-				if (mTicks % 6 == 0 && mLoc.distance(target.getEyeLocation()) > 0.5) {
+				if ((!mDelve && mTicks % 6 == 0 || mDelve && mTicks % 4 == 0) && mLoc.distance(target.getEyeLocation()) > 0.5) {
 					mLoc.add(target.getEyeLocation().toVector().subtract(mLoc.toVector()).normalize());
 				}
 
@@ -147,7 +146,7 @@ public class SpellFlamethrower extends Spell {
 								mActiveRunnables.remove(this);
 							}
 
-							if (mT % 6 == 0 && mLoc.distance(target.getEyeLocation()) > 0.5) {
+							if ((!mDelve && mT % 6 == 0 || mDelve && mT % 4 == 0) && mLoc.distance(target.getEyeLocation()) > 0.5) {
 								mLoc.add(target.getEyeLocation().toVector().subtract(mLoc.toVector()).normalize());
 							}
 
@@ -177,7 +176,11 @@ public class SpellFlamethrower extends Spell {
 									for (Player player : players) {
 										if (box.overlaps(player.getBoundingBox()) && !mHitPlayers.contains(player)) {
 											endLoc.getWorld().playSound(endLoc, Sound.BLOCK_FIRE_EXTINGUISH, SoundCategory.HOSTILE, 1, 1);
-											BossUtils.bossDamagePercent(mBoss, player, 0.2);
+											if (mDelve) {
+												BossUtils.bossDamagePercent(mBoss, player, 0.25);
+											} else {
+												BossUtils.bossDamagePercent(mBoss, player, 0.2);
+											}
 											mHitPlayers.add(player);
 										}
 									}

@@ -44,6 +44,8 @@ public class SpellMultiEarthshake extends Spell {
 
 	private List<Player> mNoTarget = new ArrayList<>();
 
+	private boolean mDelve;
+
 	private static final EnumSet<Material> mIgnoredMats = EnumSet.of(
             Material.AIR,
             Material.COMMAND_BLOCK,
@@ -56,7 +58,7 @@ public class SpellMultiEarthshake extends Spell {
             Material.END_PORTAL
         );
 
-	public SpellMultiEarthshake(Plugin plugin, LivingEntity launcher, int radius, int duration, Location spawnLoc) {
+	public SpellMultiEarthshake(Plugin plugin, LivingEntity launcher, int radius, int duration, boolean delve, Location spawnLoc) {
 		mSpawnLoc = spawnLoc;
 
 		mBoss = launcher;
@@ -64,6 +66,8 @@ public class SpellMultiEarthshake extends Spell {
 
 		mRadius = radius;
 		mDuration = duration;
+
+		mDelve = delve;
 	}
 
 	@Override
@@ -203,10 +207,18 @@ public class SpellMultiEarthshake extends Spell {
 							mWorld.playSound(p.getLocation(), Sound.ENTITY_WITHER_BREAK_BLOCK, 1.0f, 1.0f);
 							if (p.getLocation().distance(loc) <= mRadius) {
 								p.setVelocity(p.getVelocity().add(new Vector(0.0, 1.5, 0.0)));
-								BossUtils.bossDamage(mBoss, p, 40.0);
+								if (mDelve) {
+									BossUtils.bossDamage(mBoss, p, 45.0);
+								} else {
+									BossUtils.bossDamage(mBoss, p, 40.0);
+								}
 							} else {
 								p.setVelocity(p.getVelocity().add(new Vector(0.0, 1.0, 0.0)));
-								BossUtils.bossDamage(mBoss, p, 40.0);
+								if (mDelve) {
+									BossUtils.bossDamage(mBoss, p, 45.0);
+								} else {
+									BossUtils.bossDamage(mBoss, p, 40.0);
+								}
 							}
 						}
 						//Knock up other mobs because it's fun

@@ -43,6 +43,7 @@ import org.bukkit.util.BoundingBox;
 
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.DelvesUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
@@ -53,6 +54,7 @@ public class FalseSpiritPortal extends BossAbilityGroup {
 
 	private static final List<String> mobs = Arrays.asList("IncompleteSpirit", "ImperfectKeterCore", "HalludHornet", "BarklessEnt", "PiercingEnt", "SpiritoftheValley");
 	private static final List<String> ceilingMobs = Arrays.asList("IncompleteSpirit", "ImperfectKeterCore", "BarklessEnt", "PiercingEnt", "SpiritoftheValley");
+	private static final String delveMiniboss = "IncompleteAberration";
 
 	private int mMobsKilled = 0;
 
@@ -76,6 +78,9 @@ public class FalseSpiritPortal extends BossAbilityGroup {
 
 	private String mPortalNumTag = "";
 
+	//If delves is enabled in the instance
+	private boolean mDelve = false;
+
 	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) {
 		return new FalseSpiritPortal(plugin, boss);
 	}
@@ -89,9 +94,12 @@ public class FalseSpiritPortal extends BossAbilityGroup {
 		World world = mBoss.getWorld();
 		mBoss.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 20 * 60 * 27, 3));
 
-		mPlayerCount = PlayerUtils.playersInRange(mBoss.getLocation(), 75).size();
+		List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), 75);
+		mPlayerCount = players.size();
 		if (mPlayerCount < 1) {
 			mPlayerCount = 1;
+		} else if (DelvesUtils.getDelveInfo(players.get(0)).getDepthPoints() > 0) {
+			mDelve = true;
 		}
 
 		//Wait until scoreboard tag is assigned first
@@ -192,11 +200,24 @@ public class FalseSpiritPortal extends BossAbilityGroup {
 			}
 		}
 
-		world.playSound(mBoss.getLocation(), Sound.ENTITY_ENDER_DRAGON_GROWL, SoundCategory.HOSTILE, 10, 2);
+		List<Entity> mMobs = new ArrayList<>();
+
+		if (mDelve) {
+			ArmorStand as = mGates.get(FastUtils.RANDOM.nextInt(mGates.size()));
+			Entity mob = LibraryOfSoulsIntegration.summon(as.getLocation().add(FastUtils.randomDoubleInRange(-1, 1), 0, FastUtils.randomDoubleInRange(-1, 1)), delveMiniboss);
+			mMobs.add(mob);
+
+			world.spawnParticle(Particle.SPELL_WITCH, as.getLocation(), 30, 0.25, 0.45, 0.25, 1);
+			world.spawnParticle(Particle.SMOKE_LARGE, as.getLocation(), 12, 0, 0.45, 0, 0.125);
+			world.playSound(as.getLocation(), Sound.ENTITY_ENDERMAN_TELEPORT, 3f, 0.7f);
+
+			world.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_SPAWN, SoundCategory.HOSTILE, 10, 2);
+		} else {
+			world.playSound(mBoss.getLocation(), Sound.ENTITY_ENDER_DRAGON_GROWL, SoundCategory.HOSTILE, 10, 2);
+		}
 
 		new BukkitRunnable() {
 			int mTicks = 0;
-			List<Entity> mMobs = new ArrayList<>();
 			@Override
 			public void run() {
 				if (mBoss.isDead() || !mBoss.isValid()) {
@@ -206,7 +227,9 @@ public class FalseSpiritPortal extends BossAbilityGroup {
 
 				//Scales with playercount to summon mobs
 				//No more than 15 mobs from one portal can be out at a time
-				if (mTicks % (100 / mPlayerCount) == 0 && mMobs.size() <= 15) {
+				//Custom spawn rate for delves, 50% faster for normal portals and 25% faster for the ceiling portal
+				if ((!mDelve && mTicks % (100 / mPlayerCount) == 0 || mDelve && mCeilingGate != null && mTicks % (80 / mPlayerCount) == 0 || mDelve && mCeilingGate == null && mTicks % (67 / mPlayerCount) == 0)
+						&& mMobs.size() <= 15) {
 					ArmorStand as = mGates.get(FastUtils.RANDOM.nextInt(mGates.size()));
 					String mobName;
 
@@ -247,7 +270,7 @@ public class FalseSpiritPortal extends BossAbilityGroup {
 					while (mobs.hasNext()) {
 						Entity e = mobs.next();
 
-						if (e.isDead() || !e.isValid()) {
+						if (e == null || e.isDead() || !e.isValid()) {
 							mobs.remove();
 							mMobsKilled++;
 						}
@@ -265,7 +288,7 @@ public class FalseSpiritPortal extends BossAbilityGroup {
 					}
 				}
 
-				if (mMobsKilled >= 5 * mPlayerCount) {
+				if (!mDelve && mMobsKilled >= 5 * mPlayerCount || mDelve && mMobsKilled >= 6 * mPlayerCount) {
 					//Spawns trident and resets kills (to spawn trident again)
 
 
@@ -310,9 +333,9 @@ public class FalseSpiritPortal extends BossAbilityGroup {
 					}.runTaskTimer(mPlugin, 0, 2);
 				}
 
-				mTicks += 2;
+				mTicks += 1;
 			}
-		}.runTaskTimer(mPlugin, 20 * 5, 2);
+		}.runTaskTimer(mPlugin, 20 * 5, 1);
 	}
 
 	@Override
