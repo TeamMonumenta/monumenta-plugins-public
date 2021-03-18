@@ -4,6 +4,12 @@ import java.io.File;
 import java.io.IOException;
 import java.util.UUID;
 
+import org.bukkit.Bukkit;
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
+import org.bukkit.plugin.PluginManager;
+import org.bukkit.plugin.java.JavaPlugin;
+
 import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.bosses.BossManager;
 import com.playmonumenta.plugins.bosses.spells.SpellDetectionCircle;
@@ -21,6 +27,7 @@ import com.playmonumenta.plugins.commands.DebugInfo;
 import com.playmonumenta.plugins.commands.Effect;
 import com.playmonumenta.plugins.commands.FestiveHeldItem;
 import com.playmonumenta.plugins.commands.GetDepthPoints;
+import com.playmonumenta.plugins.commands.GetScoreCommand;
 import com.playmonumenta.plugins.commands.GildifyHeldItem;
 import com.playmonumenta.plugins.commands.GiveSoulbound;
 import com.playmonumenta.plugins.commands.HopeifyHeldItem;
@@ -102,12 +109,6 @@ import com.playmonumenta.plugins.timers.ProjectileEffectTimers;
 import com.playmonumenta.plugins.tracking.TrackingManager;
 import com.playmonumenta.plugins.utils.MetadataUtils;
 
-import org.bukkit.Bukkit;
-import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
-import org.bukkit.plugin.PluginManager;
-import org.bukkit.plugin.java.JavaPlugin;
-
 public class Plugin extends JavaPlugin {
 	public CooldownTimers mTimers = null;
 	public ProjectileEffectTimers mProjectileEffectTimers = null;
@@ -184,6 +185,7 @@ public class Plugin extends JavaPlugin {
 		Magnetize.register();
 		SetViewDistance.register();
 		UnsignBook.register();
+		GetScoreCommand.register(this);
 
 		try {
 			mHttpManager = new HttpManager(this);
