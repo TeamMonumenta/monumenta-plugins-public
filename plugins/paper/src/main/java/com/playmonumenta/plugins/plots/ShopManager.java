@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.plots;
 
+import java.util.Collection;
 import java.util.Set;
 import java.util.UUID;
 import java.util.function.Consumer;
@@ -190,8 +191,8 @@ public class ShopManager implements Listener {
 			int y = loc.getBlockY();
 			loc.setY(10);
 			Material mat = loc.getBlock().getType();
-			// Sponge or (wet sponge below y = 53) allows building
-			return mat.equals(Material.SPONGE) || (mat.equals(Material.WET_SPONGE) && y < 53);
+			// Sponge or (wet sponge below y = 53) allows building non-container inventories
+			return mat.equals(Material.SPONGE) || (mat.equals(Material.WET_SPONGE) && y < 53 && !(block.getState() instanceof Lockable));
 		}
 		// Allow otherwise - not in the zone, not a block, in creative, etc.
 		return true;
@@ -270,10 +271,21 @@ public class ShopManager implements Listener {
 			return new Shop(new Location(shopEntity.getWorld(), x1, y1, z1), new Location(shopEntity.getWorld(), x2, y2, z2), (Shulker) shopEntity, ownerName, ownerGuildName, ownerUUID, originalEntityMat);
 		}
 
+		/* Calls func(Location) for each shop platform block, plus a 1-block border */
+		private void iterExpandedArea(Consumer<Location> func) {
+			iterArea(1, func);
+		}
+
+		/* Calls func(Location) for each shop platform block */
 		private void iterArea(Consumer<Location> func) {
+			iterArea(0, func);
+		}
+
+		/* Calls func(Location) for each shop platform block, plus an additional border */
+		private void iterArea(int extraWidth, Consumer<Location> func) {
 			Location loc = mEntity.getLocation().clone();
-			for (int x = mMin.getBlockX(); x <= mMax.getBlockX(); x++) {
-				for (int z = mMin.getBlockZ(); z <= mMax.getBlockZ(); z++) {
+			for (int x = mMin.getBlockX() - extraWidth; x <= mMax.getBlockX() + extraWidth; x++) {
+				for (int z = mMin.getBlockZ() - extraWidth; z <= mMax.getBlockZ() + extraWidth; z++) {
 					loc.setX(x);
 					loc.setY(mMin.getBlockY());
 					loc.setZ(z);
@@ -282,13 +294,49 @@ public class ShopManager implements Listener {
 			}
 		}
 
+		private void particles() {
+			iterArea((Location plat) -> {
+				plat.add(0, 1, 0);
+				plat.getWorld().spawnParticle(Particle.VILLAGER_HAPPY, plat, 1, 0.1, 0.1, 0.1);
+			});
+		}
+
+		private void enableSurvival() {
+			iterExpandedArea((Location plat) -> {
+				/*
+				 * Enable editing the walls of the shop
+				 * This sets the entire area to WET_SPONGE,
+				 * then the next step will set the core back to SPONGE
+				 */
+				plat.setY(10);
+				plat.getBlock().setType(Material.WET_SPONGE);
+			});
+
+			iterArea((Location plat) -> {
+				/* Enable survival mode directly under the platform */
+				plat.setY(10);
+				plat.getBlock().setType(Material.SPONGE);
+			});
+		}
+
+		private void disableSurvival() {
+			iterExpandedArea((Location plat) -> {
+				plat.setY(10);
+				plat.getBlock().setType(Material.RED_CONCRETE);
+			});
+		}
+
 		private boolean isGuildShop() {
 			return Math.abs(mMax.getBlockX() - mMin.getBlockX()) >= GUILD_SHOP_WIDTH;
 		}
 
-		private BoundingBox getBoundingBox() {
-			return new BoundingBox(mMin.getX(), mMin.getY() - SHOP_DEPTH - 1, mMin.getZ(),
-			                       mMax.getX(), mMax.getY() + SHOP_HEIGHT + 1, mMax.getZ());
+		private BoundingBox getExpandedBoundingBox() {
+			return new BoundingBox(mMin.getX() - 1, mMin.getY() - SHOP_DEPTH - 1, mMin.getZ() - 1,
+			                       mMax.getX() + 1, mMax.getY() + SHOP_HEIGHT + 1, mMax.getZ() + 1);
+		}
+
+		private Collection<Entity> getEntities() {
+			return mMin.getWorld().getNearbyEntities(getExpandedBoundingBox());
 		}
 	}
 
@@ -498,24 +546,22 @@ public class ShopManager implements Listener {
 
 		shopEntity.getWorld().playSound(shopEntity.getLocation(), Sound.BLOCK_ANVIL_PLACE, SoundCategory.PLAYERS, 1.0f, 1.3f);
 
+		shop.particles();
+		shop.enableSurvival();
+
 		shop.iterArea((Location plat) -> {
 			/* Replace platform area */
 			plat.getBlock().setType(SHOP_PURCHASED_MAT);
-			plat.add(0, 1, 0);
-			plat.getWorld().spawnParticle(Particle.VILLAGER_HAPPY, plat, 1, 0.1, 0.1, 0.1);
 
 			/* Add a ceiling */
-			plat.add(0, SHOP_HEIGHT, 0);
+			plat.add(0, SHOP_HEIGHT + 1, 0);
 			plat.getBlock().setType(Material.BARRIER);
+		});
 
+		shop.iterExpandedArea((Location plat) -> {
 			/* Add a celler floor */
-			plat.subtract(0, SHOP_HEIGHT + SHOP_DEPTH + 2, 0);
+			plat.subtract(0, SHOP_DEPTH + 1, 0);
 			plat.getBlock().setType(Material.BEDROCK);
-
-			/* Enable survival mode */
-			/* To make it easier to see the sponge */
-			plat.setY(10);
-			plat.getBlock().setType(Material.SPONGE);
 		});
 	}
 
@@ -533,28 +579,25 @@ public class ShopManager implements Listener {
 			player.sendMessage(ChatColor.WHITE + "Your shop has been locked.");
 		}
 
-		shop.iterArea((Location plat) -> {
-			plat.add(0, 1, 0);
-			plat.getWorld().spawnParticle(Particle.VILLAGER_HAPPY, plat, 1, 0.1, 0.1, 0.1);
+		shopEntity.getWorld().playSound(shopEntity.getLocation(), Sound.BLOCK_CHEST_LOCKED, SoundCategory.PLAYERS, 1.0f, 0.9f);
+		shop.particles();
+		shop.disableSurvival();
 
+		shop.iterExpandedArea((Location plat) -> {
 			/* Lock tile entities */
-			plat.subtract(0, 1 + SHOP_DEPTH, 0);
+			plat.subtract(0, SHOP_DEPTH, 0);
 			for (int y = 0; y <= SHOP_HEIGHT + SHOP_DEPTH + 2; y++) {
 				BlockState state = plat.getBlock().getState();
-				if (state instanceof Lockable) {
+				if (state instanceof Lockable && (((Lockable)state).getLock() == null || ((Lockable)state).getLock().isEmpty())) {
 					((Lockable)state).setLock("* Soulbound to " + shop.mOwnerName + " *");
 					state.update();
 				}
 				plat.add(0, 1, 0);
 			}
-
-			/* Disable survival mode */
-			plat.setY(10);
-			plat.getBlock().setType(Material.RED_CONCRETE);
 		});
 
 		/* Lock regular entities */
-		for (Entity entity : shop.mMin.getWorld().getNearbyEntities(shop.getBoundingBox())) {
+		for (Entity entity : shop.getEntities()) {
 			if (entity instanceof ItemFrame) {
 				entity.setInvulnerable(true);
 			} else if (entity instanceof ArmorStand) {
@@ -578,30 +621,27 @@ public class ShopManager implements Listener {
 			player.sendMessage(ChatColor.WHITE + "Your shop has been unlocked.");
 		}
 
-		shopEntity.getWorld().playSound(shopEntity.getLocation(), Sound.BLOCK_CHEST_LOCKED, SoundCategory.PLAYERS, 1.0f, 0.9f);
+		shopEntity.getWorld().playSound(shopEntity.getLocation(), Sound.BLOCK_CHEST_LOCKED, SoundCategory.PLAYERS, 1.0f, 0.5f);
+		shop.particles();
+		shop.enableSurvival();
 
-		shop.iterArea((Location plat) -> {
-			plat.add(0, 1, 0);
-			plat.getWorld().spawnParticle(Particle.VILLAGER_HAPPY, plat, 1, 0.1, 0.1, 0.1);
-
+		shop.iterExpandedArea((Location plat) -> {
 			/* Unlock tile entities */
-			plat.subtract(0, 1 + SHOP_DEPTH, 0);
+			plat.subtract(0, SHOP_DEPTH, 0);
 			for (int y = 0; y <= SHOP_HEIGHT + SHOP_DEPTH + 2; y++) {
 				BlockState state = plat.getBlock().getState();
 				if (state instanceof Lockable) {
-					((Lockable)state).setLock(null);
-					state.update();
+					if (((Lockable)state).getLock() != null && ((Lockable)state).getLock().startsWith("* Soulbound to")) {
+						((Lockable)state).setLock(null);
+						state.update();
+					}
 				}
 				plat.add(0, 1, 0);
 			}
-
-			/* Enable survival mode */
-			plat.setY(10);
-			plat.getBlock().setType(Material.SPONGE);
 		});
 
-		/* Lock regular entities */
-		for (Entity entity : shop.mMin.getWorld().getNearbyEntities(shop.getBoundingBox())) {
+		/* Unlock regular entities */
+		for (Entity entity : shop.getEntities()) {
 			if (entity instanceof ItemFrame) {
 				entity.setInvulnerable(false);
 			} else if (entity instanceof ArmorStand) {
@@ -625,34 +665,33 @@ public class ShopManager implements Listener {
 			player.sendMessage(ChatColor.WHITE + "Your shop has been reset.");
 		}
 
+		shop.particles();
+		shop.disableSurvival();
+
 		shop.iterArea((Location plat) -> {
 			/* Replace platform area */
 			plat.getBlock().setType(SHOP_EMPTY_MAT);
-			plat.add(0, 1, 0);
-			plat.getWorld().spawnParticle(Particle.VILLAGER_HAPPY, plat, 1, 0.1, 0.1, 0.1);
 
 			/* Delete above platform */
 			for (int y = 0; y <= SHOP_HEIGHT; y++) {
+				plat.add(0, 1, 0);
 				clearContainer(plat.getBlock());
 				plat.getBlock().setType(Material.AIR);
-				plat.add(0, 1, 0);
 			}
+		});
 
+		shop.iterExpandedArea((Location plat) -> {
 			/* Delete below platform */
-			plat.subtract(0, SHOP_HEIGHT + SHOP_DEPTH + 3, 0);
-			for (int y = 0; y <= SHOP_DEPTH; y++) {
+			plat.subtract(0, SHOP_DEPTH, 0);
+			for (int y = 0; y < SHOP_DEPTH; y++) {
 				clearContainer(plat.getBlock());
 				plat.getBlock().setType(Material.SAND);
 				plat.add(0, 1, 0);
 			}
-
-			/* Disable survival mode */
-			plat.setY(10);
-			plat.getBlock().setType(Material.RED_CONCRETE);
 		});
 
 		/* Remove entities */
-		for (Entity entity : shop.mMin.getWorld().getNearbyEntities(shop.getBoundingBox())) {
+		for (Entity entity : shop.getEntities()) {
 			if (entity instanceof ItemFrame || entity instanceof Painting || entity instanceof ArmorStand) {
 				entity.remove();
 			}

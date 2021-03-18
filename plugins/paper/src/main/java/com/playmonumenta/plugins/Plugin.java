@@ -197,7 +197,10 @@ public class Plugin extends JavaPlugin {
 		ServerProperties.load(this, null);
 
 		/* If this is the plots shard, register /plotaccess functions and enable functionality */
-		if (ServerProperties.getShardName().equals("plots")) {
+		if (ServerProperties.getShardName().equals("plots")
+			|| ServerProperties.getShardName().equals("mobs")
+			|| ServerProperties.getShardName().equals("dev1")
+			|| ServerProperties.getShardName().equals("dev2")) {
 			new PlotAccessManager(getLogger(), getDataFolder() + File.separator + "plot_access.json");
 			ShopManager.registerCommands();
 		}
@@ -245,7 +248,10 @@ public class Plugin extends JavaPlugin {
 		manager.registerEvents(new SpectateBot(this), this);
 
 		/* If this is the plots shard, register /plotaccess functions and enable functionality */
-		if (ServerProperties.getShardName().equals("plots")) {
+		if (ServerProperties.getShardName().equals("plots")
+			|| ServerProperties.getShardName().equals("mobs")
+			|| ServerProperties.getShardName().equals("dev1")
+			|| ServerProperties.getShardName().equals("dev2")) {
 			manager.registerEvents(new ShopManager(), this);
 		}
 

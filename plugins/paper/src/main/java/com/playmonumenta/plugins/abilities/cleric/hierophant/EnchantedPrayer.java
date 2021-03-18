@@ -8,10 +8,8 @@ import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
-import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
-import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 
@@ -19,8 +17,6 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.classes.Spells;
-import com.playmonumenta.plugins.classes.magic.MagicType;
-import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.effects.EnchantedPrayerAoE;
 
@@ -49,7 +45,7 @@ public class EnchantedPrayer extends Ability {
 			DamageCause.ENTITY_ATTACK,
 			DamageCause.PROJECTILE
 	);
-	
+
 	private final int mDamage;
 	private final int mHeal;
 
@@ -97,11 +93,10 @@ public class EnchantedPrayer extends Ability {
 			}
 
 		}.runTaskTimer(mPlugin, 0, 1);
-		int enchantedPrayer = getAbilityScore();
 		for (Player p : PlayerUtils.playersInRange(mPlayer, ENCHANTED_PRAYER_RANGE, true)) {
 			p.playSound(p.getLocation(), Sound.ENTITY_ILLUSIONER_PREPARE_MIRROR, 1.2f, 1.0f);
 			world.spawnParticle(Particle.SPELL_INSTANT, mPlayer.getLocation(), 50, 0.25, 0, 0.25, 0.01);
-			mPlugin.mEffectManager.addEffect(p, "EnchantedPrayerEffect", 
+			mPlugin.mEffectManager.addEffect(p, "EnchantedPrayerEffect",
 					new EnchantedPrayerAoE(mPlugin, ENCHANTED_PRAYER_COOLDOWN, mDamage, mHeal, p, AFFECTED_DAMAGE_CAUSES));
 		}
 	}
