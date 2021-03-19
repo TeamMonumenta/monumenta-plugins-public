@@ -12,6 +12,7 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityPotionEffectEvent;
 import org.bukkit.event.entity.EntityTargetEvent;
+import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.entity.PotionSplashEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
@@ -285,6 +286,21 @@ public class Boss {
 	public boolean hasNearbyBlockBreakTrigger() {
 		for (BossAbilityGroup ability : mAbilities) {
 			if (ability.hasNearbyBlockBreakTrigger()) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public void nearbyPlayerDeath(PlayerDeathEvent event) {
+		for (BossAbilityGroup ability : mAbilities) {
+			ability.nearbyPlayerDeath(event);
+		}
+	}
+
+	public boolean hasNearbyPlayerDeathTrigger() {
+		for (BossAbilityGroup ability : mAbilities) {
+			if (ability.hasNearbyPlayerDeathTrigger()) {
 				return true;
 			}
 		}

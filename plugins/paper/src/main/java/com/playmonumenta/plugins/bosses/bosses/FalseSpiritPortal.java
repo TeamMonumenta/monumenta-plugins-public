@@ -81,6 +81,8 @@ public class FalseSpiritPortal extends BossAbilityGroup {
 	//If delves is enabled in the instance
 	private boolean mDelve = false;
 
+	private List<Player> mWarned = new ArrayList<>();
+
 	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) {
 		return new FalseSpiritPortal(plugin, boss);
 	}
@@ -359,8 +361,9 @@ public class FalseSpiritPortal extends BossAbilityGroup {
 			if (mainhand != null && equalsTrident(mainhand)) {
 				event.setCancelled(true);
 				player.sendMessage(ChatColor.GOLD + "[Bhairavi]" + ChatColor.WHITE + " It needs to be travelling faster than that! Throw the Spear!");
-			} else {
+			} else if (!mWarned.contains(player)) {
 				player.sendMessage(ChatColor.GOLD + "[Bhairavi]" + ChatColor.WHITE + " Don’t attack the portal with your weapons! Kill the creatures, then hit the portal with the charged spear!");
+				mWarned.add(player);
 			}
 		}
 	}

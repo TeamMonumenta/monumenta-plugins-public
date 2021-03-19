@@ -392,6 +392,7 @@ public class BossManager implements Listener {
 	private final Map<UUID, Boss> mBosses;
 	private boolean mNearbyEntityDeathEnabled = false;
 	private boolean mNearbyBlockBreakEnabled = false;
+	private boolean mNearbyPlayerDeathEnabled = false;
 
 	public BossManager(Plugin plugin) {
 		mInstance = this;
@@ -732,6 +733,20 @@ public class BossManager implements Listener {
 			event.setDeathMessage(player.getName() + " was snowballed by " + player.getMetadata(WinterSnowmanEventBoss.deathMetakey).get(0).asString());
 			player.removeMetadata(WinterSnowmanEventBoss.deathMetakey, mPlugin);
 		}
+
+		if (!event.isCancelled()) {
+			if (mNearbyPlayerDeathEnabled) {
+				/* For performance reasons this check is only enabled when there is a loaded
+				 * boss that is using this feature
+				 */
+				for (LivingEntity m : EntityUtils.getNearbyMobs(player.getLocation(), 75.0)) {
+					Boss boss = mBosses.get(m.getUniqueId());
+					if (boss != null) {
+						boss.nearbyPlayerDeath(event);
+					}
+				}
+			}
+		}
 	}
 
 	/* Another weird one - used for exorcism potion */
@@ -888,6 +903,10 @@ public class BossManager implements Listener {
 		if (ability.hasNearbyBlockBreakTrigger()) {
 			mNearbyBlockBreakEnabled = true;
 		}
+
+		if (ability.hasNearbyPlayerDeathTrigger()) {
+			mNearbyPlayerDeathEnabled = true;
+		}
 	}
 
 	/*
@@ -937,6 +956,28 @@ public class BossManager implements Listener {
 
 			/* No bosses still loaded that need this feature - turn it off */
 			mNearbyBlockBreakEnabled = false;
+		}
+
+		if (boss.hasNearbyPlayerDeathTrigger()) {
+			if (mNearbyBlockBreakEnabled == false) {
+				mPlugin.getLogger().log(Level.WARNING, "Unloaded Boss with hasNearbyPlayerDeathTrigger but feature was not enabled. Definitely a bug!");
+				return;
+			}
+
+			/*
+			 * This boss was at least contributing to keeping this feature enabled
+			 *
+			 * Need to check all other loaded bosses to see if it still needs to be enabled
+			 */
+			for (Boss testBoss : mBosses.values()) {
+				if (testBoss.hasNearbyPlayerDeathTrigger()) {
+					/* Still at least one other boss that needs this - don't turn off yet */
+					return;
+				}
+			}
+
+			/* No bosses still loaded that need this feature - turn it off */
+			mNearbyPlayerDeathEnabled = false;
 		}
 	}
 
@@ -999,6 +1040,7 @@ public class BossManager implements Listener {
 		sender.sendMessage("Total number of loaded bosses: " + mBosses.size());
 		sender.sendMessage("mNearbyEntityDeathEnabled: " + mNearbyEntityDeathEnabled);
 		sender.sendMessage("mNearbyBlockBreakEnabled: " + mNearbyBlockBreakEnabled);
+		sender.sendMessage("mNearbyPlayerDeathEnabled: " + mNearbyPlayerDeathEnabled);
 
 		Map<String, Integer> bossCounts = new HashMap<>();
 		for (Boss boss : mBosses.values()) {

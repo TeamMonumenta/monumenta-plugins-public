@@ -22,11 +22,13 @@ import org.bukkit.boss.BarStyle;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Fireball;
+import org.bukkit.entity.Item;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Trident;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.Plugin;
@@ -314,6 +316,7 @@ public class FalseSpirit extends BossAbilityGroup {
 			Fireball ball = (Fireball) event.getEntity();
 			ball.setIsIncendiary(false);
 			ball.setYield(0f);
+			ball.setFireTicks(0);
 			mBoss.getWorld().playSound(mBoss.getLocation(), Sound.ENTITY_BLAZE_SHOOT, SoundCategory.HOSTILE, 1, 1);
 		}
 	}
@@ -356,6 +359,24 @@ public class FalseSpirit extends BossAbilityGroup {
 			}
 		}
 	}
+
+	@Override
+	public void nearbyPlayerDeath(PlayerDeathEvent event) {
+		new BukkitRunnable() {
+			@Override
+			public void run() {
+				for (Item item : mBoss.getWorld().getNearbyEntitiesByType(Item.class, event.getEntity().getLocation(), 10)) {
+					item.setInvulnerable(true);
+				}
+			}
+		}.runTaskLater(mPlugin, 0);
+	}
+
+	@Override
+	public boolean hasNearbyPlayerDeathTrigger() {
+		return true;
+	}
+
 
 	//Teleport with special effects
 	private void teleport(Location loc) {

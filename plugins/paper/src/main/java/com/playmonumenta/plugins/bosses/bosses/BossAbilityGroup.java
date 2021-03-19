@@ -13,6 +13,7 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityPotionEffectEvent;
 import org.bukkit.event.entity.EntityTargetEvent;
+import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.entity.PotionSplashEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
@@ -349,6 +350,19 @@ public abstract class BossAbilityGroup {
 	public void nearbyBlockBreak(BlockBreakEvent event) {}
 
 	public boolean hasNearbyBlockBreakTrigger() {
+		return false;
+	}
+
+	/*
+	 * Called when a player dies within 75 blocks
+	 *
+	 * For performance reasons any boss that uses this MUST also override
+	 * hasNearbyPlayerDeathTrigger to return true
+	 *
+	 */
+	public void nearbyPlayerDeath(PlayerDeathEvent event) {}
+
+	public boolean hasNearbyPlayerDeathTrigger() {
 		return false;
 	}
 

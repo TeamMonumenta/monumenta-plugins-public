@@ -27,6 +27,7 @@ public class NoFireBoss extends BossAbilityGroup {
 			Fireball ball = (Fireball) event.getEntity();
 			ball.setIsIncendiary(false);
 			ball.setYield(0f);
+			ball.setFireTicks(0);
 		}
 	}
 }
