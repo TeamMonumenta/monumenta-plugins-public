@@ -22,6 +22,7 @@ import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.spells.SpellBaseLeapAttack;
 import com.playmonumenta.plugins.bosses.spells.SpellDuelist;
 import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 
@@ -45,82 +46,82 @@ public class WrathBoss extends BossAbilityGroup {
 	public WrathBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
 
-		SpellManager activeSpells = new SpellManager(Arrays.asList(
-			new SpellBaseLeapAttack(plugin, boss, detectionRange, MIN_RANGE, RUN_DISTANCE, COOLDOWN, VELOCITY_MULTIPLIER,
-					// Initiate Aesthetic
-					(World world, Location loc) -> {
-						world.spawnParticle(Particle.VILLAGER_ANGRY, loc, 10, 0.5, 0.5, 0.5, 0);
-						world.playSound(loc, Sound.ENTITY_VINDICATOR_HURT, 1f, 0.5f);
-					},
-					// Leap Aesthetic
-					(World world, Location loc) -> {
-						world.spawnParticle(Particle.CLOUD, loc, 20, 0.1, 0.1, 0.1, 0.1);
-						world.playSound(loc, Sound.ENTITY_BLAZE_SHOOT, 1f, 0.5f);
-					},
-					// Leaping Aesthetic
-					(World world, Location loc) -> {
-						world.spawnParticle(Particle.FLAME, loc, 3, 0, 0, 0, 0.1);
-						world.spawnParticle(Particle.VILLAGER_ANGRY, loc, 1, 0.25, 0.25, 0.25, 0);
-					},
-					// Hit Action
-					(World world, Player player, Location loc, Vector dir) -> {
-						new BukkitRunnable() {
-							World mWorld = world;
-							Location mLocation = loc;
-							Vector mDirection = dir;
-							int mTime = 0;
+		SpellManager activeSpells = new SpellManager(Arrays.asList(new SpellBaseLeapAttack(plugin, boss, detectionRange,
+				MIN_RANGE, RUN_DISTANCE, COOLDOWN, VELOCITY_MULTIPLIER,
+				// Initiate Aesthetic
+				(World world, Location loc) -> {
+					world.spawnParticle(Particle.VILLAGER_ANGRY, loc, 10, 0.5, 0.5, 0.5, 0);
+					world.playSound(loc, Sound.ENTITY_VINDICATOR_HURT, 1f, 0.5f);
+				},
+				// Leap Aesthetic
+				(World world, Location loc) -> {
+					world.spawnParticle(Particle.CLOUD, loc, 20, 0.1, 0.1, 0.1, 0.1);
+					world.playSound(loc, Sound.ENTITY_BLAZE_SHOOT, 1f, 0.5f);
+				},
+				// Leaping Aesthetic
+				(World world, Location loc) -> {
+					world.spawnParticle(Particle.FLAME, loc, 3, 0, 0, 0, 0.1);
+					world.spawnParticle(Particle.VILLAGER_ANGRY, loc, 1, 0.25, 0.25, 0.25, 0);
+				},
+				// Hit Action
+				(World world, Player player, Location loc, Vector dir) -> {
+					new BukkitRunnable() {
+						World mWorld = world;
+						Location mLocation = loc;
+						Vector mDirection = dir;
+						int mTime = 0;
 
-							@Override
-							public void run() {
-								mTime++;
+						@Override
+						public void run() {
+							mTime++;
 
-								if (mTime <= 5) {
-									Location locParticle = mBoss.getLocation().add(0, 1.5, 0);
-									Vector sideways = new Vector(mDirection.getZ(), 1, -mDirection.getX()).multiply(3);
-									Vector forward = mDirection.clone().multiply(3);
-									locParticle.subtract(sideways.clone().multiply(0.5));
-									locParticle.subtract(forward.clone().multiply(0.5));
-									locParticle.add(forward.clone().multiply(Math.sin(Math.PI / 10 * mTime)));
-									locParticle.add(sideways.clone().multiply(Math.cos(Math.PI / 10 * mTime)));
-									mWorld.spawnParticle(Particle.SWEEP_ATTACK, locParticle, 4, 0.5, 0.5, 0.5, 0);
+							if (mTime <= 5) {
+								Location locParticle = mBoss.getLocation().add(0, 1.5, 0);
+								Vector sideways = new Vector(mDirection.getZ(), 1, -mDirection.getX()).multiply(3);
+								Vector forward = mDirection.clone().multiply(3);
+								locParticle.subtract(sideways.clone().multiply(0.5));
+								locParticle.subtract(forward.clone().multiply(0.5));
+								locParticle.add(forward.clone().multiply(Math.sin(Math.PI / 10 * mTime)));
+								locParticle.add(sideways.clone().multiply(Math.cos(Math.PI / 10 * mTime)));
+								mWorld.spawnParticle(Particle.SWEEP_ATTACK, locParticle, 4, 0.5, 0.5, 0.5, 0);
 
-									if (mTime == 2) {
-										mWorld.spawnParticle(Particle.CRIT, mLocation, 100, 0, 0, 0, 0.5);
-										mWorld.spawnParticle(Particle.CRIT_MAGIC, mLocation, 100, 2, 2, 2, 0);
-										mWorld.playSound(mLocation, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1f, 1f);
-										mWorld.playSound(mLocation, Sound.ITEM_SHIELD_BREAK, 1f, 1f);
-										for (Player p : PlayerUtils.playersInRange(mLocation.add(mDirection), DAMAGE_RADIUS)) {
-											BossUtils.bossDamage(mBoss, p, DAMAGE);
-										}
+								if (mTime == 2) {
+									mWorld.spawnParticle(Particle.CRIT, mLocation, 100, 0, 0, 0, 0.5);
+									mWorld.spawnParticle(Particle.CRIT_MAGIC, mLocation, 100, 2, 2, 2, 0);
+									mWorld.playSound(mLocation, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1f, 1f);
+									mWorld.playSound(mLocation, Sound.ITEM_SHIELD_BREAK, 1f, 1f);
+									for (Player p : PlayerUtils.playersInRange(mLocation.add(mDirection),
+											DAMAGE_RADIUS)) {
+										BossUtils.bossDamage(mBoss, p, DAMAGE);
 									}
-								} else if (mTime <= 10) {
-									Location locParticle = mBoss.getLocation().add(0, 1.5, 0);
-									Vector sideways = new Vector(-mDirection.getZ(), 1, mDirection.getX()).multiply(3);
-									Vector forward = mDirection.clone().multiply(3);
-									locParticle.subtract(sideways.clone().multiply(0.5));
-									locParticle.subtract(forward.clone().multiply(0.5));
-									locParticle.add(forward.clone().multiply(Math.sin(Math.PI / 10 * (mTime - 5))));
-									locParticle.add(sideways.clone().multiply(Math.cos(Math.PI / 10 * (mTime - 5))));
-									mWorld.spawnParticle(Particle.SWEEP_ATTACK, locParticle, 4, 0.5, 0.5, 0.5, 0);
-
-									if (mTime == 7) {
-										mWorld.spawnParticle(Particle.CRIT, mLocation, 200, 0, 0, 0, 1);
-										mWorld.spawnParticle(Particle.CRIT_MAGIC, mLocation, 200, 2, 2, 2, 0);
-										mWorld.playSound(mLocation, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1f, 1f);
-										mWorld.playSound(mLocation, Sound.ITEM_SHIELD_BREAK, 1f, 1f);
-										for (Player p : PlayerUtils.playersInRange(mLocation.add(mDirection), DAMAGE_RADIUS)) {
-											p.setNoDamageTicks(0);
-											BossUtils.bossDamage(mBoss, p, DAMAGE);
-										}
-									}
-								} else {
-									this.cancel();
 								}
+							} else if (mTime <= 10) {
+								Location locParticle = mBoss.getLocation().add(0, 1.5, 0);
+								Vector sideways = new Vector(-mDirection.getZ(), 1, mDirection.getX()).multiply(3);
+								Vector forward = mDirection.clone().multiply(3);
+								locParticle.subtract(sideways.clone().multiply(0.5));
+								locParticle.subtract(forward.clone().multiply(0.5));
+								locParticle.add(forward.clone().multiply(Math.sin(Math.PI / 10 * (mTime - 5))));
+								locParticle.add(sideways.clone().multiply(Math.cos(Math.PI / 10 * (mTime - 5))));
+								mWorld.spawnParticle(Particle.SWEEP_ATTACK, locParticle, 4, 0.5, 0.5, 0.5, 0);
+
+								if (mTime == 7) {
+									mWorld.spawnParticle(Particle.CRIT, mLocation, 200, 0, 0, 0, 1);
+									mWorld.spawnParticle(Particle.CRIT_MAGIC, mLocation, 200, 2, 2, 2, 0);
+									mWorld.playSound(mLocation, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1f, 1f);
+									mWorld.playSound(mLocation, Sound.ITEM_SHIELD_BREAK, 1f, 1f);
+									for (Player p : PlayerUtils.playersInRange(mLocation.add(mDirection),
+											DAMAGE_RADIUS)) {
+										p.setNoDamageTicks(0);
+										BossUtils.bossDamage(mBoss, p, DAMAGE);
+									}
+								}
+							} else {
+								this.cancel();
 							}
-						}.runTaskTimer(mPlugin, 0, 1);
-					}, null, null),
-			new SpellDuelist(plugin, boss, COOLDOWN, DAMAGE)
-		));
+						}
+					}.runTaskTimer(mPlugin, 0, 1);
+				}, null, null), new SpellDuelist(plugin, boss, COOLDOWN, DAMAGE)));
 
 		new BukkitRunnable() {
 			@Override
@@ -147,10 +148,14 @@ public class WrathBoss extends BossAbilityGroup {
 
 		if (damager instanceof LivingEntity) {
 			if (loc.distance(damager.getLocation()) > ULTIMATE_EYE_DISTANCE) {
-				dodge(event);
+				if (!EntityUtils.isStunned(mBoss)) {
+					dodge(event);
+				}
 			} else {
 				if (FastUtils.RANDOM.nextDouble() < DODGE_CHANCE) {
-					dodge(event);
+					if (!EntityUtils.isStunned(mBoss)) {
+						dodge(event);
+					}
 				}
 			}
 		}

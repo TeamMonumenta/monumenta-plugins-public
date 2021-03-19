@@ -19,6 +19,7 @@ import org.bukkit.util.Vector;
 
 import com.playmonumenta.plugins.effects.EffectManager;
 import com.playmonumenta.plugins.effects.PercentSpeed;
+import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 
 public class CoordinatedAttackBoss extends BossAbilityGroup {
@@ -80,33 +81,37 @@ public class CoordinatedAttackBoss extends BossAbilityGroup {
 					int i = 0;
 					for (LivingEntity mob : EntityUtils.getNearbyMobs(locTarget, TARGET_RADIUS)) {
 						if (mob instanceof Mob && mob.hasLineOfSight(mTarget)) {
-							Set<String> tags = mob.getScoreboardTags();
-							// Don't set target of mobs with this ability, or else infinite loop
-							if (tags == null || !tags.contains(identityTag)) {
-								((Mob) mob).setTarget(mTarget);
+							if (!AbilityUtils.isStealthed(mTarget)) {
+								Set<String> tags = mob.getScoreboardTags();
+								// Don't set target of mobs with this ability, or else infinite loop
+								if (tags == null || !tags.contains(identityTag)) {
+									((Mob) mob).setTarget(mTarget);
 
-								EffectManager.getInstance().addEffect(mob, PERCENT_SPEED_EFFECT_NAME,
-										new PercentSpeed(PERCENT_SPEED_DURATION, PERCENT_SPEED_EFFECT, PERCENT_SPEED_EFFECT_NAME));
+									EffectManager.getInstance().addEffect(mob, PERCENT_SPEED_EFFECT_NAME,
+											new PercentSpeed(PERCENT_SPEED_DURATION, PERCENT_SPEED_EFFECT,
+													PERCENT_SPEED_EFFECT_NAME));
 
-								Location loc = mob.getLocation();
-								double distance = loc.distance(locTarget);
-								Vector velocity = locTarget.clone().subtract(loc).toVector().multiply(0.19);
-								velocity.setY(velocity.getY() * 0.5 + distance * 0.08);
-								mob.setVelocity(velocity);
+									Location loc = mob.getLocation();
+									double distance = loc.distance(locTarget);
+									Vector velocity = locTarget.clone().subtract(loc).toVector().multiply(0.19);
+									velocity.setY(velocity.getY() * 0.5 + distance * 0.08);
+									mob.setVelocity(velocity);
 
-								world.spawnParticle(Particle.CLOUD, loc, 10, 0.1, 0.1, 0.1, 0.1);
-								world.spawnParticle(Particle.VILLAGER_ANGRY, mob.getEyeLocation(), 5, 0.3, 0.3, 0.3, 0);
+									world.spawnParticle(Particle.CLOUD, loc, 10, 0.1, 0.1, 0.1, 0.1);
+									world.spawnParticle(Particle.VILLAGER_ANGRY, mob.getEyeLocation(), 5, 0.3, 0.3, 0.3,
+											0);
 
-								i++;
-								if (i >= AFFECTED_MOB_CAP) {
-									break;
+									i++;
+									if (i >= AFFECTED_MOB_CAP) {
+										break;
+									}
 								}
 							}
 						}
 					}
 				}
 			}.runTaskLater(mPlugin, DELAY);
+
 		}
 	}
-
 }
