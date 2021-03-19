@@ -5,9 +5,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-import com.playmonumenta.plugins.utils.FastUtils;
-import com.playmonumenta.plugins.utils.InventoryUtils;
-
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -34,6 +31,10 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.loot.LootContext;
 import org.bukkit.loot.LootContext.Builder;
 import org.bukkit.loot.LootTable;
+
+import com.playmonumenta.plugins.utils.ChestUtils;
+import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.InventoryUtils;
 
 import de.tr7zw.nbtapi.NBTCompound;
 import de.tr7zw.nbtapi.NBTItem;
@@ -90,11 +91,8 @@ public class LootChestsInInventory implements Listener {
 		Collection<ItemStack> loot = table.populateLoot(FastUtils.RANDOM, builder.build());
 		item.subtract();
 		//I hate this, but its the only way for it to work :(
-		for (ItemStack lootItem : loot) {
-			if (lootItem != null) {
-				inventory.addItem(lootItem);
-			}
-		}
+		ChestUtils.generateLootInventory(loot, inventory, player);
+
 		addOrInitializePlayer(player);
 		player.closeInventory(Reason.OPEN_NEW);
 		player.openInventory(inventory);

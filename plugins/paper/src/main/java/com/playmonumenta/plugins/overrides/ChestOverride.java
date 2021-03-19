@@ -140,8 +140,8 @@ public class ChestOverride extends BaseOverride {
 			}
 		}
 
-		ChestUtils.chestScalingLuck(plugin, player, block);
 		DelvesUtils.setDelveLootTable(player, block);
+		ChestUtils.generateContainerLootWithScaling(player, block, plugin);
 		return TOVUtils.canBreak(plugin, player, block, event);
 	}
 
