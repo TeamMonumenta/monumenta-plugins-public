@@ -11,23 +11,39 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryInteractEvent;
+import org.bukkit.scheduler.BukkitRunnable;
 
+import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.guis.singlepageguis.ExampleSinglePageGUI;
 import com.playmonumenta.plugins.guis.singlepageguis.OrinSinglePageGUI;
 
 public class SinglePageGUIManager implements Listener {
 
-	public SinglePageGUIManager() {
+	protected static Plugin mPlugin;
+
+	public SinglePageGUIManager(Plugin plugin) {
 		// Whenever you make a SinglePageGUI, it must be registered here
 		new ExampleSinglePageGUI(null, null).registerCommand();
 		new OrinSinglePageGUI(null, null).registerCommand();
+		mPlugin = plugin;
 	}
 
 	private static final Map<UUID, SinglePageGUI> GUI_MAPPINGS = new HashMap<>();
 
 	public static void openGUI(Player player, SinglePageGUI gui) {
-		GUI_MAPPINGS.put(player.getUniqueId(), gui);
-		gui.openGUI();
+		UUID uuid = player.getUniqueId();
+        if (!GUI_MAPPINGS.containsKey(uuid)) {
+            GUI_MAPPINGS.put(uuid, gui);
+            gui.openGUI();
+            new BukkitRunnable() {
+				@Override
+				public void run() {
+					if (player.getOpenInventory() == null || player.getOpenInventory().getTopInventory() == null) {
+						GUI_MAPPINGS.remove(player.getUniqueId());
+					}
+				}
+            }.runTaskLater(mPlugin, 20);
+        }
 	}
 
 	private SinglePageGUI getGUI(InventoryInteractEvent event) {

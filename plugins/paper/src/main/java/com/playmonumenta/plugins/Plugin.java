@@ -285,7 +285,7 @@ public class Plugin extends JavaPlugin {
 		manager.registerEvents(new ShatterCoinInInventory(this), this);
 		manager.registerEvents(new LootChestsInInventory(), this);
 		manager.registerEvents(new ArrowListener(this), this);
-		manager.registerEvents(new SinglePageGUIManager(), this);
+		manager.registerEvents(new SinglePageGUIManager(this), this);
 
 		//  Move the logic out of Plugin and into it's own class that derives off Runnable, a Timer class of some type.
 		getServer().getScheduler().scheduleSyncRepeatingTask(this, new Runnable() {
