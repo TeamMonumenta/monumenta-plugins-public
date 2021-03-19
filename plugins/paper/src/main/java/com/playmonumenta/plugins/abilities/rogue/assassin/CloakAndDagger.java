@@ -31,6 +31,8 @@ public class CloakAndDagger extends Ability implements KillTriggeredAbility {
 	private static final int CLOAK_2_MAX_STACKS = 12;
 	private static final int CLOAK_MIN_STACKS = 5;
 	private static final int CLOAK_STACKS_ON_ELITE_KILL = 5;
+	public static final double PASSIVE_DAMAGE_ELITE_MODIFIER = 2.0;
+	public static final double PASSIVE_DAMAGE_BOSS_MODIFIER = 1.25;
 
 	private final KillTriggeredAbilityTracker mTracker;
 
@@ -75,7 +77,14 @@ public class CloakAndDagger extends Ability implements KillTriggeredAbility {
 		if (event.getCause() == DamageCause.ENTITY_ATTACK && mActive
 				&& InventoryUtils.rogueTriggerCheck(mPlayer.getInventory().getItemInMainHand(), mPlayer.getInventory().getItemInOffHand())) {
 			AbilityUtils.removeStealth(mPlugin, mPlayer, false);
-			event.setDamage(event.getDamage() + mCloakOnActivation * mDamageMultiplier);
+			LivingEntity damagee = (LivingEntity) event.getEntity();
+			double eliteScaling = 1.0;
+			if (EntityUtils.isElite(damagee)) {
+				eliteScaling = PASSIVE_DAMAGE_ELITE_MODIFIER;
+			} else if (EntityUtils.isBoss(damagee)) {
+				eliteScaling = PASSIVE_DAMAGE_BOSS_MODIFIER;
+			}
+			event.setDamage((event.getDamage() + mCloakOnActivation * mDamageMultiplier) * eliteScaling);
 
 			Location loc = event.getEntity().getLocation();
 

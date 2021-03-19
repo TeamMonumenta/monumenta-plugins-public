@@ -33,10 +33,10 @@ public class ArcaneStrike extends Ability {
 
 	private static final float RADIUS = 4.0f;
 	private static final int DAMAGE_1 = 4;
-	private static final int DAMAGE_2 = 6;
+	private static final int DAMAGE_2 = 7;
 	private static final int BONUS_DAMAGE_1 = 2;
 	private static final int BONUS_DAMAGE_2 = 3;
-	private static final int COOLDOWN = 6 * 20;
+	private static final int COOLDOWN = 5 * 20;
 
 	private final int mDamageBonus;
 	private final int mDamageBonusAffected;
@@ -46,8 +46,8 @@ public class ArcaneStrike extends Ability {
 		mInfo.mLinkedSpell = Spells.ARCANE_STRIKE;
 		mInfo.mScoreboardId = "ArcaneStrike";
 		mInfo.mShorthandName = "AS";
-		mInfo.mDescriptions.add("When you attack an enemy with a wand, you unleash an arcane explosion dealing 4 damage to all mobs in a 4 block radius around the target. Enemies that are on fire or slowed take 2 extra damage. Arcane strike can not trigger Spellshock's static. Cooldown: 6s.");
-		mInfo.mDescriptions.add("The damage is increased to 6. Mobs that are on fire or slowed take 3 additional damage.");
+		mInfo.mDescriptions.add("When you attack an enemy with a wand, you unleash an arcane explosion dealing 4 damage to all mobs in a 4 block radius around the target. Enemies that are on fire or slowed take 2 extra damage. Arcane strike can not trigger Spellshock's static. Cooldown: 5s.");
+		mInfo.mDescriptions.add("The damage is increased to 7. Mobs that are on fire or slowed take 3 additional damage.");
 		mInfo.mCooldown = COOLDOWN;
 		mDamageBonus = getAbilityScore() == 1 ? DAMAGE_1 : DAMAGE_2;
 		mDamageBonusAffected = getAbilityScore() == 1 ? BONUS_DAMAGE_1 : BONUS_DAMAGE_2;

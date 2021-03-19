@@ -20,6 +20,7 @@ import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.player.PlayerAnimationEvent;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.event.player.PlayerItemDamageEvent;
+import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.inventory.ItemStack;
 
 import com.playmonumenta.plugins.Plugin;
@@ -224,6 +225,10 @@ public abstract class Ability {
 
 	public void playerItemDamageEvent(PlayerItemDamageEvent event) {
 
+	}
+	
+	public void playerSwapHandItemsEvent(PlayerSwapHandItemsEvent event) {
+		
 	}
 
 	//---------------------------------------------------------------------------------------------------------------

@@ -858,6 +858,18 @@ public class EntityUtils {
 			slow.setDuration(ticks);
 		}
 	}
+	
+	private static final String ASTRAL_NAME = "AstralOmenStacks";
+	
+	public static int getAstralStacks(Plugin plugin, LivingEntity mob) {
+		NavigableSet<Effect> stacks = plugin.mEffectManager.getEffects(mob, ASTRAL_NAME);
+		if (stacks != null) {
+			Effect omen = stacks.last();
+			return (int) omen.getMagnitude();
+		} else {
+			return 0;
+		}
+	}
 
 	private static final String WEAKEN_EFFECT_NAME = "WeakenEffect";
 

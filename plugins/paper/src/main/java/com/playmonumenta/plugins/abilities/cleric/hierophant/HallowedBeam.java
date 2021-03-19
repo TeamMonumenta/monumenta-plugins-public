@@ -11,6 +11,7 @@ import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.AbstractArrow.PickupStatus;
 import org.bukkit.entity.Arrow;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
@@ -33,6 +34,8 @@ import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.abilities.cleric.Crusade;
+import com.playmonumenta.plugins.abilities.AbilityManager;
 
 public class HallowedBeam extends MultipleChargeAbility {
 
@@ -48,6 +51,9 @@ public class HallowedBeam extends MultipleChargeAbility {
 	private static final int HALLOWED_UNDEAD_STUN = 10; // 20 * 0.5
 	private static final int HALLOWED_LIVING_STUN = 20 * 2;
 	private static final int CAST_RANGE = 30;
+	
+	private Crusade mCrusade;
+	private boolean mCountsHumanoids = false;
 
 	public HallowedBeam(Plugin plugin, Player player) {
 		super(plugin, player, "Hallowed Beam", HALLOWED_1_MAX_CHARGES, HALLOWED_2_MAX_CHARGES);
@@ -59,6 +65,15 @@ public class HallowedBeam extends MultipleChargeAbility {
 		mInfo.mCooldown = getAbilityScore() == 1 ? HALLOWED_1_COOLDOWN : HALLOWED_2_COOLDOWN;
 		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;
 		mInfo.mIgnoreCooldown = true;
+		
+		Bukkit.getScheduler().runTask(plugin, () -> {
+			if (player != null) {
+				mCrusade = AbilityManager.getManager().getPlayerAbility(mPlayer, Crusade.class);
+				if (mCrusade != null) {
+					mCountsHumanoids = mCrusade.getAbilityScore() == 2;
+				}
+			}
+		});
 	}
 
 	@Override
@@ -104,8 +119,19 @@ public class HallowedBeam extends MultipleChargeAbility {
 							break;
 						}
 					}
-					if (e instanceof Player && ((Player) e).getGameMode() != GameMode.SPECTATOR) {
-						Player pe = (Player) e;
+					LivingEntity applyE = e;
+					//Check if heal should override damage
+					for (Entity en : e.getNearbyEntities(1.5, 1.5, 1.5)) {
+						if (en instanceof Player && ((Player) e).getGameMode() != GameMode.SPECTATOR && en.getUniqueId() != mPlayer.getUniqueId()) {
+							Player newP = EntityUtils.getNearestPlayer(en.getLocation(), 1.5);
+							// Don't count if the caster is the closest, can't do a self-heal
+							if (newP.getUniqueId() != mPlayer.getUniqueId()) {
+								applyE = newP;
+							}
+						}
+					}
+					if ((applyE instanceof Player && ((Player) applyE).getGameMode() != GameMode.SPECTATOR)) {
+						Player pe = (Player) applyE;
 						Location eLoc = pe.getLocation().add(0, pe.getHeight() / 2, 0);
 						world.spawnParticle(Particle.SPELL_INSTANT, pe.getLocation(), 500, 2.5, 0.15f, 2.5, 1);
 						world.spawnParticle(Particle.VILLAGER_HAPPY, pe.getLocation(), 150, 2.55, 0.15f, 2.5, 1);
@@ -120,7 +146,7 @@ public class HallowedBeam extends MultipleChargeAbility {
 						for (LivingEntity le : EntityUtils.getNearbyMobs(eLoc, HALLOWED_RADIUS)) {
 							MovementUtils.knockAway(pe, le, 0.65f);
 						}
-					} else if (EntityUtils.isUndead(e)) {
+					} else if (EntityUtils.isUndead(applyE) || (mCountsHumanoids && EntityUtils.isHumanoid(applyE))) {
 						Arrow arrow = mPlayer.launchProjectile(Arrow.class);
 						if (inMainHand.containsEnchantment(Enchantment.ARROW_FIRE)) {
 							arrow.setFireTicks(20 * 5);
@@ -131,8 +157,8 @@ public class HallowedBeam extends MultipleChargeAbility {
 						ProjectileLaunchEvent eventLaunch = new ProjectileLaunchEvent(arrow);
 						Bukkit.getPluginManager().callEvent(eventLaunch);
 
-						EntityUtils.applyStun(mPlugin, HALLOWED_UNDEAD_STUN, e);
-						Location eLoc = e.getLocation().add(0, e.getHeight() / 2, 0);
+						EntityUtils.applyStun(mPlugin, HALLOWED_UNDEAD_STUN, applyE);
+						Location eLoc = applyE.getLocation().add(0, applyE.getHeight() / 2, 0);
 						world.spawnParticle(Particle.SPIT, eLoc, 40, 0, 0, 0, 0.25f);
 						world.spawnParticle(Particle.FIREWORKS_SPARK, eLoc, 75, 0, 0, 0, 0.3f);
 
@@ -143,12 +169,12 @@ public class HallowedBeam extends MultipleChargeAbility {
 						if ((damageable.getDamage() >= inMainHand.getType().getMaxDurability()) && !ItemUtils.isItemShattered(inMainHand)) {
 							inMainHand.setAmount(0);
 						}
-					} else if (EntityUtils.isHostileMob(e)) {
-						EntityUtils.applyStun(mPlugin, HALLOWED_LIVING_STUN, e);
+					} else if (EntityUtils.isHostileMob(applyE)) {
+						EntityUtils.applyStun(mPlugin, HALLOWED_LIVING_STUN, applyE);
 						if (inMainHand.containsEnchantment(Enchantment.ARROW_FIRE)) {
-							EntityUtils.applyFire(mPlugin, 20 * 15, e, player);
+							EntityUtils.applyFire(mPlugin, 20 * 15, applyE, player);
 						}
-						Location eLoc = e.getLocation().add(0, e.getHeight() / 2, 0);
+						Location eLoc = applyE.getLocation().add(0, applyE.getHeight() / 2, 0);
 						world.spawnParticle(Particle.SPIT, eLoc, 40, 0, 0, 0, 0.25f);
 						world.spawnParticle(Particle.CRIT_MAGIC, loc, 30, 1, 1, 1, 0.25);
 					}

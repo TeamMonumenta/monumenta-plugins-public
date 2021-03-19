@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.abilities.cleric.paladin;
 
 import java.util.List;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -25,6 +26,8 @@ import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.abilities.cleric.Crusade;
+import com.playmonumenta.plugins.abilities.AbilityManager;
 
 public class LuminousInfusion extends Ability {
 
@@ -38,6 +41,9 @@ public class LuminousInfusion extends Ability {
 	private static final float KNOCKBACK_SPEED = 0.7f;
 
 	private boolean mActive = false;
+	
+	private Crusade mCrusade;
+	private boolean mCountsHumanoids = false;
 
 	public LuminousInfusion(Plugin plugin, Player player) {
 		super(plugin, player, "Luminous Infusion");
@@ -50,6 +56,15 @@ public class LuminousInfusion extends Ability {
 		mInfo.mIgnoreCooldown = true;
 		mInfo.mIgnoreTriggerCap = true;
 		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
+		
+		Bukkit.getScheduler().runTask(plugin, () -> {
+			if (player != null) {
+				mCrusade = AbilityManager.getManager().getPlayerAbility(mPlayer, Crusade.class);
+				if (mCrusade != null) {
+					mCountsHumanoids = mCrusade.getAbilityScore() == 2;
+				}
+			}
+		});
 	}
 
 	@Override
@@ -98,10 +113,16 @@ public class LuminousInfusion extends Ability {
 	public boolean livingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
 		LivingEntity mob = (LivingEntity) event.getEntity();
 
-		if (getAbilityScore() > 1 && EntityUtils.isUndead(mob)) {
+		if (getAbilityScore() > 1 && (EntityUtils.isUndead(mob) || (mCountsHumanoids && EntityUtils.isHumanoid(mob)))) {
 			EntityUtils.applyFire(mPlugin, FIRE_DURATION_2, mob, mPlayer);
+			double bonusDamage = 0.0;
+			if (mCrusade != null) {
+				if (mCrusade.getAbilityScore() > 0) {
+					bonusDamage = PASSIVE_UNDEAD_DAMAGE_2 * 0.33;
+				}
+			}
 			if (event.getCause() == DamageCause.ENTITY_ATTACK) {
-				event.setDamage(event.getDamage() + PASSIVE_UNDEAD_DAMAGE_2);
+				event.setDamage(event.getDamage() + PASSIVE_UNDEAD_DAMAGE_2 + bonusDamage);
 			}
 		}
 
@@ -114,11 +135,11 @@ public class LuminousInfusion extends Ability {
 
 	@Override
 	public boolean livingEntityShotByPlayerEvent(Projectile proj, LivingEntity damagee, EntityDamageByEntityEvent event) {
-		if (getAbilityScore() > 1 && EntityUtils.isUndead(damagee)) {
+		if (getAbilityScore() > 1 && (EntityUtils.isUndead(damagee) || (mCountsHumanoids && EntityUtils.isHumanoid(damagee)))) {
 			EntityUtils.applyFire(mPlugin, FIRE_DURATION_2, damagee, mPlayer);
 		}
 
-		if (mActive && EntityUtils.isUndead(damagee)) {
+		if (mActive && EntityUtils.isUndead(damagee) || (mCountsHumanoids && EntityUtils.isHumanoid(damagee))) {
 			execute(damagee, event);
 		}
 
@@ -145,7 +166,7 @@ public class LuminousInfusion extends Ability {
 			world.spawnParticle(Particle.FIREWORKS_SPARK, loc, 10, 0.05f, 0.05f, 0.05f, 0.1);
 			world.spawnParticle(Particle.FLAME, loc, 7, 0.05f, 0.05f, 0.05f, 0.1);
 
-			if (EntityUtils.isUndead(e)) {
+			if (EntityUtils.isUndead(e) || (mCountsHumanoids && EntityUtils.isHumanoid(e))) {
 				EntityUtils.damageEntity(mPlugin, e, UNDEAD_DAMAGE, mPlayer, MagicType.HOLY, true, mInfo.mLinkedSpell);
 
 				/*

@@ -20,8 +20,6 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
-import com.playmonumenta.plugins.abilities.mage.arcanist.ArcaneBarrage;
-import com.playmonumenta.plugins.abilities.mage.elementalist.Starfall;
 import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.classes.magic.MagicType;
 import com.playmonumenta.plugins.enchantments.BaseAbilityEnchantment;
@@ -110,13 +108,6 @@ public class ManaLance extends Ability {
 
 	@Override
 	public boolean runCheck() {
-		// Must not have triggered Starfall or Arcane Barrage
-		Starfall starfall = AbilityManager.getManager().getPlayerAbility(mPlayer, Starfall.class);
-		ArcaneBarrage barrage = AbilityManager.getManager().getPlayerAbility(mPlayer, ArcaneBarrage.class);
-		if (starfall != null && starfall.shouldCancelManaLance() || barrage != null && barrage.shouldCancelManaLance()) {
-			return false;
-		}
-
 		ItemStack mainHand = mPlayer.getInventory().getItemInMainHand();
 		return !mPlayer.isSneaking() && InventoryUtils.isWandItem(mainHand);
 	}

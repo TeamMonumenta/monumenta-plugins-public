@@ -13,10 +13,6 @@ import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 
-/*
- * All players can use this ability! It is used to generate potions for nearby
- * alchemists if they have Brutal or Gruesome Alchemy
- */
 public class NonClericProvisionsPassive extends Ability {
 	private static final int PROVISIONS_RANGE = 30;
 	private static final float PROVISIONS_1_CHANCE = 0.2f;

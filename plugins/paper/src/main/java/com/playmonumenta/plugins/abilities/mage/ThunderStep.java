@@ -28,7 +28,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
-
+import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 
 
 public class ThunderStep extends Ability {
@@ -43,14 +43,18 @@ public class ThunderStep extends Ability {
 	 * For pairs of values where one is used to calculate the other, like seconds or hearts, the resulting value goes second
 	 */
 	public static final int DAMAGE_1 = 5;
-	public static final int DAMAGE_2 = 10;
-	public static final int SIZE = 3;
-	public static final int DISTANCE = 8;
+	public static final int DAMAGE_2 = 8;
+	public static final int SIZE = 4;
+	public static final int DISTANCE_1 = 8;
+	public static final int DISTANCE_2 = 10;
 	public static final double CHECK_INCREMENT = 0.1;
-	public static final int COOLDOWN_SECONDS = 24;
+	public static final int COOLDOWN_SECONDS = 22;
 	public static final int COOLDOWN = COOLDOWN_SECONDS * 20;
+	public static final int STUN_SECONDS = 1;
+	public static final int STUN_DURATION = STUN_SECONDS * 20;
 
 	private final int mLevelDamage;
+	private final int mDistance;
 
 	public ThunderStep(Plugin plugin, Player player) {
 		super(plugin, player, NAME);
@@ -60,68 +64,26 @@ public class ThunderStep extends Ability {
 		mInfo.mShorthandName = "TS";
 		mInfo.mDescriptions.add(
 			String.format(
-				"While sneaking in mid-air, right-clicking with a wand materializes a flash of thunder, dealing %s damage to all enemies in a %s-block cube around you and knocking them away. The next moment, you are teleported towards where you're looking, travelling up to %s blocks or until you hit a solid block, and repeating your thunder attack at your destination. Cooldown: %ss.",
+				"Pressing the swap key while sneaking with a wand in your hand materializes a flash of thunder, dealing %s damage to all enemies in a %s-block cube around you and knocking them away. The next moment, you are teleported towards where you're looking, travelling up to %s blocks or until you hit a solid block, and repeating your thunder attack at your destination. Cooldown: %ss.",
 				DAMAGE_1,
 				SIZE,
-				DISTANCE,
+				DISTANCE_1,
 				COOLDOWN_SECONDS
 			)
 		);
 		mInfo.mDescriptions.add(
 			String.format(
-				"Damage is increased from %s to %s.",
-				DAMAGE_1,
-				DAMAGE_2
+				"Damage is increased to %s and teleport distance is increased to %s blocks. Additionally, stun all mobs within the damage radius for %s second.",
+				DAMAGE_2,
+				DISTANCE_2,
+				STUN_SECONDS
 			)
 		);
-		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
 		mInfo.mCooldown = COOLDOWN;
+		mInfo.mIgnoreCooldown = true;
 
 		mLevelDamage = getAbilityScore() == 1 ? DAMAGE_1 : DAMAGE_2;
-	}
-
-	@Override
-	public void cast(Action action) {
-		putOnCooldown();
-
-		Location playerStartLocation = mPlayer.getLocation();
-		doDamage(
-			SpellDamage.getSpellDamage(mPlayer, mLevelDamage),
-			playerStartLocation
-		);
-
-		World world = mPlayer.getWorld();
-		BoundingBox movingPlayerBox = mPlayer.getBoundingBox();
-		Vector vector = playerStartLocation.getDirection();
-		LocationUtils.travelTillObstructed(
-			world,
-			movingPlayerBox,
-			DISTANCE,
-			vector,
-			CHECK_INCREMENT
-		);
-		Location playerEndLocation = movingPlayerBox
-			.getCenter()
-			.setY(
-				movingPlayerBox.getMinY()
-			)
-			.toLocation(world)
-			.setDirection(vector);
-
-		new BukkitRunnable() {
-			@Override
-			public void run() {
-				if (mPlayer == null || mPlayer.isDead() || !mPlayer.isValid()) {
-					this.cancel();
-				}
-
-				mPlayer.teleport(playerEndLocation);
-				doDamage(
-					SpellDamage.getSpellDamage(mPlayer, mLevelDamage), // Recalculate damage for this second AoE, player spell power may have changed since first AoE
-					playerEndLocation
-				);
-			}
-		}.runTaskLater(Plugin.getInstance(), 1);
+		mDistance = getAbilityScore() == 1 ? DISTANCE_1 : DISTANCE_2;
 	}
 
 	private void doDamage(float spellDamage, Location loc) {
@@ -140,20 +102,63 @@ public class ThunderStep extends Ability {
 
 		for (LivingEntity enemy : enemies) {
 			EntityUtils.damageEntity(mPlugin, enemy, spellDamage, mPlayer, MagicType.ARCANE, true, mInfo.mLinkedSpell); // Can both apply & trigger Spellshock by default
-
+			if (getAbilityScore() > 1) {
+				EntityUtils.applyStun(mPlugin, STUN_DURATION, enemy);
+			}
 			world.spawnParticle(Particle.CLOUD, enemy.getLocation().add(0, 1, 0), mobParticles, 0.5, 0.5, 0.5, 0.5);
 			world.spawnParticle(Particle.END_ROD, enemy.getLocation().add(0, 1, 0), mobParticles, 0.5, 0.5, 0.5, 0.5);
 		}
 	}
-
+	
 	@Override
-	public boolean runCheck() {
+	public void playerSwapHandItemsEvent(PlayerSwapHandItemsEvent event) {
 		ItemStack mainHandItem = mPlayer.getInventory().getItemInMainHand();
-		return (
-			InventoryUtils.isWandItem(mainHandItem)
-			&& mPlayer.isSneaking()
-			&& PlayerUtils.notOnGround(mPlayer)
-			&& !ZoneUtils.hasZoneProperty(mPlayer, ZoneProperty.NO_MOBILITY_ABILITIES)
-		);
+		if (InventoryUtils.isWandItem(mainHandItem) && mPlayer.isSneaking() && !ZoneUtils.hasZoneProperty(mPlayer, ZoneProperty.NO_MOBILITY_ABILITIES)) {
+			event.setCancelled(true);
+			if (mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.mLinkedSpell)) {
+				return;
+			}
+			putOnCooldown();
+
+			Location playerStartLocation = mPlayer.getLocation();
+			doDamage(
+				SpellDamage.getSpellDamage(mPlayer, mLevelDamage),
+				playerStartLocation
+			);
+
+			World world = mPlayer.getWorld();
+			BoundingBox movingPlayerBox = mPlayer.getBoundingBox();
+			Vector vector = playerStartLocation.getDirection();
+			vector.setY(Math.max(vector.getY(), 0));
+			LocationUtils.travelTillObstructed(
+				world,
+				movingPlayerBox,
+				mDistance,
+				vector,
+				CHECK_INCREMENT
+			);
+			Location playerEndLocation = movingPlayerBox
+				.getCenter()
+				.setY(
+					movingPlayerBox.getMinY()
+				)
+				.toLocation(world)
+				.setDirection(vector);
+
+			new BukkitRunnable() {
+				@Override
+				public void run() {
+					if (mPlayer == null || mPlayer.isDead() || !mPlayer.isValid()) {
+						this.cancel();
+					}
+
+					mPlayer.teleport(playerEndLocation);
+					doDamage(
+						SpellDamage.getSpellDamage(mPlayer, mLevelDamage), // Recalculate damage for this second AoE, player spell power may have changed since first AoE
+						playerEndLocation
+					);
+				}
+			}.runTaskLater(Plugin.getInstance(), 1);
+		}
 	}
 }

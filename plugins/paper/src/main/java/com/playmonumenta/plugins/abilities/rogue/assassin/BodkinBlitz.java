@@ -32,6 +32,7 @@ public class BodkinBlitz extends MultipleChargeAbility {
 
 	private static final int BODKINBLITZ_1_COOLDOWN = 20 * 20;
 	private static final int BODKINBLITZ_2_COOLDOWN = 20 * 18;
+	private static final int BODKINBLITZ_1_BONUS_DMG = 10;
 	private static final int BODKINBLITZ_2_BONUS_DMG = 20;
 	private static final int BODKINBLITZ_1_STEALTH_DURATION = 20;
 	private static final int BODKINBLITZ_2_STEALTH_DURATION = 30;
@@ -40,6 +41,7 @@ public class BodkinBlitz extends MultipleChargeAbility {
 	private static final int BODKINBLITZ_MAX_CHARGES = 2;
 
 	private final int mStealthDuration;
+	private final int mBonusDmg;
 
 	private BukkitRunnable mRunnable = null;
 	private boolean mTeleporting = false;
@@ -50,13 +52,14 @@ public class BodkinBlitz extends MultipleChargeAbility {
 		mInfo.mLinkedSpell = Spells.BODKIN_BLITZ;
 		mInfo.mScoreboardId = "BodkinBlitz";
 		mInfo.mShorthandName = "BB";
-		mInfo.mDescriptions.add("Sneak right click while holding two swords to teleport 10 blocks forwards. Gain 1 second of Stealth upon teleporting. This ability cannot be used in safe zones. Cooldown: 20s. Charges: 2.");
+		mInfo.mDescriptions.add("Sneak right click while holding two swords to teleport 10 blocks forwards. Gain 1 second of Stealth upon teleporting. Upon teleporting, your next melee attack deals 10 bonus damage if your target is not focused on you. This ability cannot be used in safe zones. Cooldown: 20s. Charges: 2.");
 		mInfo.mDescriptions.add("Range increased to 14 blocks, Stealth increased to 1.5 seconds. Upon teleporting, your next melee attack deals 20 bonus damage if your target is not focused on you. Cooldown: 18s.");
 		mInfo.mCooldown = getAbilityScore() == 1 ? BODKINBLITZ_1_COOLDOWN : BODKINBLITZ_2_COOLDOWN;
 		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
 		mInfo.mIgnoreCooldown = true;
 
 		mStealthDuration = getAbilityScore() == 1 ? BODKINBLITZ_1_STEALTH_DURATION : BODKINBLITZ_2_STEALTH_DURATION;
+		mBonusDmg = getAbilityScore() == 1 ? BODKINBLITZ_1_BONUS_DMG : BODKINBLITZ_2_BONUS_DMG;
 	}
 
 	@Override
@@ -221,7 +224,7 @@ public class BodkinBlitz extends MultipleChargeAbility {
 					world.spawnParticle(Particle.FALLING_DUST, entityLoc, 35, 0.35, 0.5, 0.35, Bukkit.createBlockData("gray_concrete"));
 					world.spawnParticle(Particle.BLOCK_CRACK, entityLoc, 20, 0.25, 0.25, 0.25, 1, Bukkit.createBlockData("redstone_block"));
 
-					event.setDamage(event.getDamage() + BODKINBLITZ_2_BONUS_DMG);
+					event.setDamage(event.getDamage() + mBonusDmg);
 				}
 			}
 		}

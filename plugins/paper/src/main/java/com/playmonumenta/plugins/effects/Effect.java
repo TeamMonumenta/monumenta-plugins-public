@@ -28,7 +28,11 @@ public abstract class Effect implements Comparable<Effect> {
 	public double getMagnitude() {
 		return 0;
 	}
-
+	
+	public void clearEffect() {
+		mDuration = 0;
+	}
+	
 	@Override
 	public int compareTo(Effect otherEffect) {
 		if (getMagnitude() > otherEffect.getMagnitude()) {

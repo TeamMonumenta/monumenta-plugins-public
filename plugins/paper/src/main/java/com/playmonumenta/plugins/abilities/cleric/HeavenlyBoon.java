@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.abilities.cleric;
 
 import java.util.Collection;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -24,6 +25,7 @@ import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
 import com.playmonumenta.plugins.utils.PotionUtils.PotionInfo;
+import com.playmonumenta.plugins.abilities.AbilityManager;
 
 public class HeavenlyBoon extends Ability implements KillTriggeredAbility {
 
@@ -34,6 +36,9 @@ public class HeavenlyBoon extends Ability implements KillTriggeredAbility {
 
 	private final KillTriggeredAbilityTracker mTracker;
 	private final double mChance;
+	
+	private Crusade mCrusade;
+	private boolean mCountsHumanoids = false;
 
 	public HeavenlyBoon(Plugin plugin, Player player) {
 		super(plugin, player, "Heavenly Boon");
@@ -43,6 +48,15 @@ public class HeavenlyBoon extends Ability implements KillTriggeredAbility {
 		mInfo.mDescriptions.add("The chance to be splashed upon killing an Undead increases to 16%, the effect potions can now also be Strength and Resistance, and the durations of each are greater.");
 		mTracker = new KillTriggeredAbilityTracker(this);
 		mChance = getAbilityScore() == 1 ? HEAVENLY_BOON_1_CHANCE : HEAVENLY_BOON_2_CHANCE;
+		
+		Bukkit.getScheduler().runTask(plugin, () -> {
+			if (player != null) {
+				mCrusade = AbilityManager.getManager().getPlayerAbility(mPlayer, Crusade.class);
+				if (mCrusade != null) {
+					mCountsHumanoids = mCrusade.getAbilityScore() == 2;
+				}
+			}
+		});
 	}
 
 	/*
@@ -108,7 +122,7 @@ public class HeavenlyBoon extends Ability implements KillTriggeredAbility {
 
 	@Override
 	public void triggerOnKill(LivingEntity mob) {
-		if (EntityUtils.isUndead(mob) && FastUtils.RANDOM.nextDouble() < mChance) {
+		if ((EntityUtils.isUndead(mob) || (mCountsHumanoids && EntityUtils.isHumanoid(mob))) && FastUtils.RANDOM.nextDouble() < mChance) {
 			ItemStack potions;
 
 			if (getAbilityScore() == 1) {

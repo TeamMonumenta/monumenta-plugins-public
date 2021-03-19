@@ -12,11 +12,16 @@ import com.playmonumenta.plugins.utils.InventoryUtils;
 
 public class WeaponryMastery extends Ability {
 
-	private static final double WEAPON_MASTERY_AXE_1_DAMAGE = 3;
-	private static final double WEAPON_MASTERY_AXE_2_DAMAGE = 6;
-	private static final double WEAPON_MASTERY_SWORD_2_DAMAGE = 2;
+	private static final double AXE_1_DAMAGE_FLAT = 2;
+	private static final double AXE_2_DAMAGE_FLAT = 4;
+	private static final double SWORD_2_DAMAGE_FLAT = 1;
+	private static final double AXE_1_DAMAGE = 0.05;
+	private static final double AXE_2_DAMAGE = 0.1;
+	private static final double SWORD_2_DAMAGE = 0.1;
 	private static final double WEAPON_MASTERY_SWORD_DAMAGE_RESISTANCE = 0.1;
 
+	private final double mDamageBonusAxeFlat;
+	private final double mDamageBonusSwordFlat;
 	private final double mDamageBonusAxe;
 	private final double mDamageBonusSword;
 
@@ -24,10 +29,12 @@ public class WeaponryMastery extends Ability {
 		super(plugin, player, "Weapon Mastery");
 		mInfo.mScoreboardId = "WeaponMastery";
 		mInfo.mShorthandName = "WM";
-		mInfo.mDescriptions.add("You gain 10% damage resistance while holding a sword. Deal +3 damage while using an axe.");
-		mInfo.mDescriptions.add("Instead deal +6 damage with an axe and gain an additional +2 damage while using a sword.");
-		mDamageBonusAxe = getAbilityScore() == 1 ? WEAPON_MASTERY_AXE_1_DAMAGE : WEAPON_MASTERY_AXE_2_DAMAGE;
-		mDamageBonusSword = getAbilityScore() == 1 ? 0 : WEAPON_MASTERY_SWORD_2_DAMAGE;
+		mInfo.mDescriptions.add("You gain 10% damage resistance while holding a sword. Additionally, your axe damage is increased by +2 plus 5% of final damage done.");
+		mInfo.mDescriptions.add("Increase axe damage by +4 plus 10% of final damage done and increase sword damage by +1 plus 10% of final damage done.");
+		mDamageBonusAxeFlat = getAbilityScore() == 1 ? AXE_1_DAMAGE_FLAT : AXE_2_DAMAGE_FLAT;
+		mDamageBonusSwordFlat = getAbilityScore() == 1 ? 0 : SWORD_2_DAMAGE_FLAT;
+		mDamageBonusAxe = getAbilityScore() == 1 ? AXE_1_DAMAGE : AXE_2_DAMAGE;
+		mDamageBonusSword = getAbilityScore() == 1 ? 0 : SWORD_2_DAMAGE;
 	}
 
 	@Override
@@ -36,9 +43,9 @@ public class WeaponryMastery extends Ability {
 			ItemStack mainHand = mPlayer.getInventory().getItemInMainHand();
 
 			if (InventoryUtils.isAxeItem(mainHand)) {
-				event.setDamage(event.getDamage() + mDamageBonusAxe);
+				event.setDamage((event.getDamage() + mDamageBonusAxeFlat) * (1 + mDamageBonusAxe));
 			} else if (InventoryUtils.isSwordItem(mainHand)) {
-				event.setDamage(event.getDamage() + mDamageBonusSword);
+				event.setDamage((event.getDamage() + mDamageBonusSwordFlat) * (1 + mDamageBonusSword));
 			}
 		}
 

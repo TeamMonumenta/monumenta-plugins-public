@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.abilities.mage;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -23,6 +24,7 @@ import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.VectorUtils;
+import com.playmonumenta.plugins.abilities.mage.elementalist.Blizzard;
 
 public class MagmaShield extends Ability {
 
@@ -33,8 +35,12 @@ public class MagmaShield extends Ability {
 	private static final int DAMAGE_2 = 12;
 	private static final float KNOCKBACK_SPEED = 0.5f;
 	private static final double DOT_ANGLE = 0.33;
+	private static final double BLIZZARD_ANGLE = 50.0;
 
 	private final int mDamage;
+	
+	private Blizzard mBlizzard;
+	private boolean mBlizzardAngle = false;
 
 	public MagmaShield(Plugin plugin, Player player) {
 		super(plugin, player, "Magma Shield");
@@ -46,6 +52,11 @@ public class MagmaShield extends Ability {
 		mInfo.mCooldown = COOLDOWN;
 		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
 		mDamage = getAbilityScore() == 1 ? DAMAGE_1 : DAMAGE_2;
+		Bukkit.getScheduler().runTask(plugin, () -> {
+			if (player != null) {
+				mBlizzard = AbilityManager.getManager().getPlayerAbility(mPlayer, Blizzard.class);
+			}
+		});
 	}
 
 	@Override
@@ -102,11 +113,14 @@ public class MagmaShield extends Ability {
 
 	@Override
 	public boolean runCheck() {
+		if (mBlizzard != null) {
+			mBlizzardAngle = true;
+		}
 		ItemStack mainHand = mPlayer.getInventory().getItemInMainHand();
-		ThunderStep thunder = AbilityManager.getManager().getPlayerAbility(mPlayer, ThunderStep.class);
+		double pitch = mPlayer.getLocation().getPitch();
 		if (InventoryUtils.isWandItem(mainHand)) {
-			if (thunder != null) {
-				return (mPlayer.isSneaking() && mPlayer.isOnGround());
+			if (mBlizzardAngle) {
+				return mPlayer.isSneaking() && pitch > -BLIZZARD_ANGLE;
 			}
 			return mPlayer.isSneaking();
 		}

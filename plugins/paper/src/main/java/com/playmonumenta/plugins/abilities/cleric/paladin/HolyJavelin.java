@@ -28,6 +28,7 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.abilities.cleric.DivineJustice;
+import com.playmonumenta.plugins.abilities.cleric.Crusade;
 
 public class HolyJavelin extends Ability {
 
@@ -40,15 +41,22 @@ public class HolyJavelin extends Ability {
 	private static final int DAMAGE_2 = 12;
 	private static final int FIRE_DURATION = 5 * 20;
 	private static final int COOLDOWN = 12 * 20;
-	private static final int DIVINE_JUSTICE_1_BONUS = 5;
+	private static final int DIVINE_JUSTICE_1_BONUS = 4;
+	private static final double DIVINE_JUSTICE_2_SCALING = 0.15;
 	private static final int DIVINE_JUSTICE_2_BONUS = 8;
 	private static final int LUMINOUS_2_BONUS = 4;
 
 	private final int mDamage;
 	private final int mUndeadDamage;
 
-	private int mBonusCritDamage = 0;
+	private double mBonusCritDamage = 0;
 	private int mBonusLumDamage = 0;
+	private double mBonusCrusadeDamage = 0.0;
+	
+	private Crusade mCrusade;
+	private boolean mCountsHumanoids = false;
+	private DivineJustice mDivineJustice;
+	private LuminousInfusion mLuminousInfusion;
 
 	public HolyJavelin(Plugin plugin, Player player) {
 		super(plugin, player, "Holy Javelin");
@@ -65,13 +73,25 @@ public class HolyJavelin extends Ability {
 		// Needs to wait for the entire AbilityCollection to be initialized
 		Bukkit.getScheduler().runTask(plugin, () -> {
 			if (player != null) {
-				DivineJustice mDivineJustice = AbilityManager.getManager().getPlayerAbility(mPlayer, DivineJustice.class);
-				LuminousInfusion mLuminousInfusion = AbilityManager.getManager().getPlayerAbility(mPlayer, LuminousInfusion.class);
+				mDivineJustice = AbilityManager.getManager().getPlayerAbility(mPlayer, DivineJustice.class);
+				mLuminousInfusion = AbilityManager.getManager().getPlayerAbility(mPlayer, LuminousInfusion.class);
+				mCrusade = AbilityManager.getManager().getPlayerAbility(mPlayer, Crusade.class);
+				if (mCrusade != null) {
+					mCountsHumanoids = mCrusade.getAbilityScore() == 2;
+				}
 				if (mDivineJustice != null) {
-					mBonusCritDamage = mDivineJustice.getAbilityScore() == 1 ? DIVINE_JUSTICE_1_BONUS : DIVINE_JUSTICE_2_BONUS;
+					mBonusCritDamage = DIVINE_JUSTICE_1_BONUS;
+					if (mCrusade != null) {
+						mBonusCrusadeDamage += mBonusCritDamage * 0.33;
+					}
 				}
 				if (mLuminousInfusion != null) {
 					mBonusLumDamage = mLuminousInfusion.getAbilityScore() == 1 ? 0 : LUMINOUS_2_BONUS;
+					if (mCrusade != null) {
+						if (mCrusade.getAbilityScore() > 0) {
+							mBonusCrusadeDamage += mBonusLumDamage * 0.33;
+						}
+					}
 				}
 			}
 		});
@@ -83,7 +103,7 @@ public class HolyJavelin extends Ability {
 		return mPlayer.isSprinting() && !mPlayer.isSneaking() && !InventoryUtils.isPickaxeItem(mainHand);
 	}
 
-	public void execute(int bonusDamage) {
+	public void execute(double bonusDamage) {
 		World world = mPlayer.getWorld();
 		world.playSound(mPlayer.getLocation(), Sound.ENTITY_SHULKER_SHOOT, 1, 1.75f);
 		world.playSound(mPlayer.getLocation(), Sound.ITEM_TRIDENT_THROW, 1, 0.9f);
@@ -105,7 +125,7 @@ public class HolyJavelin extends Ability {
 			while (iter.hasNext()) {
 				LivingEntity mob = iter.next();
 				if (mob.getBoundingBox().overlaps(box)) {
-					if (EntityUtils.isUndead(mob)) {
+					if (EntityUtils.isUndead(mob) || (mCountsHumanoids && EntityUtils.isHumanoid(mob))) {
 						EntityUtils.damageEntity(mPlugin, mob, mUndeadDamage + bonusDamage, mPlayer, MagicType.HOLY, true, mInfo.mLinkedSpell);
 					} else {
 						EntityUtils.damageEntity(mPlugin, mob, mDamage + bonusDamage, mPlayer, MagicType.HOLY, true, mInfo.mLinkedSpell);
@@ -135,8 +155,12 @@ public class HolyJavelin extends Ability {
 	public boolean livingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
 		if (event.getCause().equals(DamageCause.ENTITY_ATTACK)) {
 			LivingEntity damagee = (LivingEntity) event.getEntity();
-			if (EntityUtils.isUndead(damagee)) {
-				execute(mBonusLumDamage + (PlayerUtils.isCritical(mPlayer) ? mBonusCritDamage : 0));
+			if (EntityUtils.isUndead(damagee) || (mCountsHumanoids && EntityUtils.isHumanoid(damagee))) {
+				double divineCritScaling = 1;
+				if (mDivineJustice != null) {
+					divineCritScaling = mDivineJustice.getAbilityScore() > 1 ? 1 + DIVINE_JUSTICE_2_SCALING : 1;
+				}
+				execute(mBonusCrusadeDamage + (double) (mBonusLumDamage + (PlayerUtils.isCritical(mPlayer) ? mBonusCritDamage : 0)) * (PlayerUtils.isCritical(mPlayer) ? divineCritScaling : 1));
 			} else {
 				execute(0);
 			}

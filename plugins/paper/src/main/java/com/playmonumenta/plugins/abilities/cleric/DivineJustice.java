@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.abilities.cleric;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -15,28 +16,37 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.abilities.AbilityManager;
 
 public class DivineJustice extends Ability {
 
-	private static final int CRITICAL_UNDEAD_DAMAGE_1 = 5;
-	private static final int CRITICAL_UNDEAD_DAMAGE_2 = 8;
-
-	private final int mCriticalUndeadDamage;
+	private static final int CRITICAL_UNDEAD_DAMAGE = 4;
+	private static final double CRITICAL_SCALING = 0.15;
+	private static final int RADIUS = 12;
+	
+	private final double mCriticalScaling;
+	
+	private Crusade mCrusade;
 
 	public DivineJustice(Plugin plugin, Player player) {
 		super(plugin, player, "Divine Justice");
 		mInfo.mScoreboardId = "DivineJustice";
 		mInfo.mShorthandName = "DJ";
-		mInfo.mDescriptions.add("Your critical strikes deal +5 damage to undead enemies.");
-		mInfo.mDescriptions.add("Your critical strikes deal +8 damage to undead enemies. Additionally, heal 10% of your max health whenever you kill an undead enemy.");
-		mCriticalUndeadDamage = getAbilityScore() == 1 ? CRITICAL_UNDEAD_DAMAGE_1 : CRITICAL_UNDEAD_DAMAGE_2;
+		mInfo.mDescriptions.add("Your critical strikes deal +4 damage to undead enemies.");
+		mInfo.mDescriptions.add("Additionally, your critical strikes deal +15% damage to undead enemies, calculated from the final damage of the critical strike. Additionally, heal 10% of your max health and 5% of other players' max health within 12 blocks whenever you kill an undead enemy.");
+		mCriticalScaling = getAbilityScore() == 1 ? 0 : CRITICAL_SCALING;
+		Bukkit.getScheduler().runTask(plugin, () -> {
+			if (player != null) {
+				mCrusade = AbilityManager.getManager().getPlayerAbility(mPlayer, Crusade.class);
+			}
+		});
 	}
 
 	@Override
 	public boolean livingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
 		if (event.getCause() == DamageCause.ENTITY_ATTACK && PlayerUtils.isCritical(mPlayer)) {
 			LivingEntity damagee = (LivingEntity) event.getEntity();
-			if (EntityUtils.isUndead(damagee)) {
+			if (EntityUtils.isUndead(damagee) || (mCrusade.getAbilityScore() == 2 && EntityUtils.isHumanoid(damagee))) {
 				Location loc = damagee.getLocation().add(0, damagee.getHeight() / 2, 0);
 				double xz = damagee.getWidth() / 2 + 0.1;
 				double y = damagee.getHeight() / 3;
@@ -45,7 +55,16 @@ public class DivineJustice extends Ability {
 				world.spawnParticle(Particle.FLAME, loc, 6, xz, y, xz, 0.05);
 				world.playSound(loc, Sound.BLOCK_ANVIL_LAND, 0.15f, 1.5f);
 
-				event.setDamage(event.getDamage() + mCriticalUndeadDamage);
+				double bonusDamage = 0.0;
+				double bonusScaling = 0.0;
+				if (mCrusade != null) {
+					if (mCrusade.getAbilityScore() > 0) {
+						bonusDamage = CRITICAL_UNDEAD_DAMAGE * 0.33;
+						bonusScaling = mCriticalScaling * 0.33;
+						world.spawnParticle(Particle.CRIT_MAGIC, damagee.getEyeLocation(), 10, 0.25, 0.5, 0.25, 0);
+					}
+				}
+				event.setDamage((event.getDamage() + CRITICAL_UNDEAD_DAMAGE + bonusDamage) * (1 + mCriticalScaling + bonusScaling));
 			}
 		}
 		return true;
@@ -53,9 +72,14 @@ public class DivineJustice extends Ability {
 
 	@Override
 	public void entityDeathEvent(EntityDeathEvent event, boolean shouldGenDrops) {
-		if (EntityUtils.isUndead(event.getEntity())) {
+		LivingEntity mob = (LivingEntity) event.getEntity();
+		if (EntityUtils.isUndead(mob) || (mCrusade.getAbilityScore() == 2 && EntityUtils.isHumanoid(mob))) {
 			double percentMaxHealth = mPlayer.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue() * 0.1;
 			PlayerUtils.healPlayer(mPlayer, percentMaxHealth);
+			for (Player p : PlayerUtils.playersInRange(mPlayer, RADIUS, true)) {
+				percentMaxHealth = p.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue() * 0.1;
+				PlayerUtils.healPlayer(p, percentMaxHealth);
+			}
 		}
 	}
 

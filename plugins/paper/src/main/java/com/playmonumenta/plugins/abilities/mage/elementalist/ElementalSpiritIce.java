@@ -31,13 +31,16 @@ public class ElementalSpiritIce extends Ability {
 	public static final int DAMAGE_1 = 4;
 	public static final int DAMAGE_2 = 6;
 	public static final int SIZE = 3;
-	public static final double BOW_MULTIPLIER = 0.1;
-	public static final int BOW_PERCENTAGE = (int) (BOW_MULTIPLIER * 100);
+	public static final double BOW_MULTIPLIER_1 = 0.1;
+	public static final double BOW_MULTIPLIER_2 = 0.15;
+	public static final int BOW_PERCENTAGE_1 = (int) (BOW_MULTIPLIER_1 * 100);
+	public static final int BOW_PERCENTAGE_2 = (int) (BOW_MULTIPLIER_2 * 100);
 	public static final int PULSE_INTERVAL = 20;
 	public static final int PULSES = 3;
 
 	private final Set<LivingEntity> mEnemiesAffected = new HashSet<>();
 	private final int mLevelDamage;
+	private final double mElementalArrowsBowDamage;
 
 	private ElementalArrows mElementalArrows;
 	private BukkitRunnable mEnemiesAffectedProcessor;
@@ -55,6 +58,7 @@ public class ElementalSpiritIce extends Ability {
 		mInfo.mCooldown = ElementalSpiritFire.COOLDOWN;
 
 		mLevelDamage = getAbilityScore() == 1 ? DAMAGE_1 : DAMAGE_2;
+		mElementalArrowsBowDamage = getAbilityScore() == 1 ? BOW_MULTIPLIER_1 : BOW_MULTIPLIER_2;
 		Bukkit.getScheduler().runTask(plugin, () -> {
 			if (player != null) {
 				mElementalArrows = AbilityManager.getManager().getPlayerAbility(mPlayer, ElementalArrows.class);
@@ -107,7 +111,7 @@ public class ElementalSpiritIce extends Ability {
 									for (LivingEntity mob : EntityUtils.getNearbyMobs(damageCentre, SIZE)) {
 										float finalDamage = spellDamage;
 										if (event.getSpell().equals(Spells.ELEMENTAL_ARROWS) && mElementalArrows != null) {
-											finalDamage += mElementalArrows.getLastDamage() * BOW_MULTIPLIER;
+											finalDamage += mElementalArrows.getLastDamage() * mElementalArrowsBowDamage;
 										}
 
 										//TODO true damage bypass instead of iframe reset - https://discord.com/channels/186225508562763776/186225918086217729/816701492000981014

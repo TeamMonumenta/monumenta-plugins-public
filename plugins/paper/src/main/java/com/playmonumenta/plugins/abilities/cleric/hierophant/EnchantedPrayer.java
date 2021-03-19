@@ -12,6 +12,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
+import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
@@ -53,11 +54,11 @@ public class EnchantedPrayer extends Ability {
 		super(plugin, player, "Enchanted Prayer");
 		mInfo.mScoreboardId = "EPrayer";
 		mInfo.mShorthandName = "EP";
-		mInfo.mDescriptions.add("Left-clicking in the air while shifted enchants the weapons of all players in a 15 block radius with holy magic. Their next melee or projectile attack deals an additional 7 damage in a 3-block radius while healing the player for 2 hp. Cooldown: 18s.");
+		mInfo.mDescriptions.add("Pressing the swap key while shifted enchants the weapons of all players in a 15 block radius with holy magic. Their next melee or projectile attack deals an additional 7 damage in a 3-block radius while healing the player for 2 hp. Cooldown: 18s.");
 		mInfo.mDescriptions.add("Damage is increased to 12. Healing is increased to 4 hp.");
 		mInfo.mLinkedSpell = Spells.ENCHANTED_PRAYER;
-		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;
 		mInfo.mCooldown = ENCHANTED_PRAYER_COOLDOWN;
+		mInfo.mIgnoreCooldown = true;
 		mDamage = getAbilityScore() == 1 ? ENCHANTED_PRAYER_1_DAMAGE : ENCHANTED_PRAYER_2_DAMAGE;
 		mHeal = getAbilityScore() == 1 ? ENCHANTED_PRAYER_1_HEAL : ENCHANTED_PRAYER_2_HEAL;
 	}
@@ -65,44 +66,45 @@ public class EnchantedPrayer extends Ability {
 	public static final String ENCHANTED_PRAYER_METAKEY = "EnchantedPrayerMetakey";
 
 	@Override
-	public void cast(Action action) {
-		World world = mPlayer.getWorld();
-		world.playSound(mPlayer.getLocation(), Sound.ENTITY_EVOKER_PREPARE_SUMMON, 1.5f, 1);
-		putOnCooldown();
-		new BukkitRunnable() {
-			double mRotation = 0;
-			final Location mLoc = mPlayer.getLocation();
-			double mRadius = 0;
-
-			@Override
-			public void run() {
-
-				mRadius += 0.25;
-				for (int i = 0; i < 36; i += 1) {
-					mRotation += 10;
-					double radian1 = Math.toRadians(mRotation);
-					mLoc.add(FastUtils.cos(radian1) * mRadius, 0.15, FastUtils.sin(radian1) * mRadius);
-					world.spawnParticle(Particle.SPELL_INSTANT, mLoc, 2, 0.15, 0.15, 0.15, 0);
-					mLoc.subtract(FastUtils.cos(radian1) * mRadius, 0.15, FastUtils.sin(radian1) * mRadius);
-
-				}
-				if (mRadius >= 5) {
-					this.cancel();
-				}
-
+	public void playerSwapHandItemsEvent(PlayerSwapHandItemsEvent event) {
+		if (mPlayer.isSneaking()) {
+			event.setCancelled(true);
+			if (mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.mLinkedSpell)) {
+				return;
 			}
+			
+			World world = mPlayer.getWorld();
+			world.playSound(mPlayer.getLocation(), Sound.ENTITY_EVOKER_PREPARE_SUMMON, 1.5f, 1);
+			putOnCooldown();
+			new BukkitRunnable() {
+				double mRotation = 0;
+				final Location mLoc = mPlayer.getLocation();
+				double mRadius = 0;
 
-		}.runTaskTimer(mPlugin, 0, 1);
-		for (Player p : PlayerUtils.playersInRange(mPlayer, ENCHANTED_PRAYER_RANGE, true)) {
-			p.playSound(p.getLocation(), Sound.ENTITY_ILLUSIONER_PREPARE_MIRROR, 1.2f, 1.0f);
-			world.spawnParticle(Particle.SPELL_INSTANT, mPlayer.getLocation(), 50, 0.25, 0, 0.25, 0.01);
-			mPlugin.mEffectManager.addEffect(p, "EnchantedPrayerEffect",
-					new EnchantedPrayerAoE(mPlugin, ENCHANTED_PRAYER_COOLDOWN, mDamage, mHeal, p, AFFECTED_DAMAGE_CAUSES));
+				@Override
+				public void run() {
+
+					mRadius += 0.25;
+					for (int i = 0; i < 36; i += 1) {
+						mRotation += 10;
+						double radian1 = Math.toRadians(mRotation);
+						mLoc.add(FastUtils.cos(radian1) * mRadius, 0.15, FastUtils.sin(radian1) * mRadius);
+						world.spawnParticle(Particle.SPELL_INSTANT, mLoc, 2, 0.15, 0.15, 0.15, 0);
+						mLoc.subtract(FastUtils.cos(radian1) * mRadius, 0.15, FastUtils.sin(radian1) * mRadius);
+
+					}
+					if (mRadius >= 5) {
+						this.cancel();
+					}
+
+				}
+			}.runTaskTimer(mPlugin, 0, 1);
+			for (Player p : PlayerUtils.playersInRange(mPlayer, ENCHANTED_PRAYER_RANGE, true)) {
+				p.playSound(p.getLocation(), Sound.ENTITY_ILLUSIONER_PREPARE_MIRROR, 1.2f, 1.0f);
+				world.spawnParticle(Particle.SPELL_INSTANT, mPlayer.getLocation(), 50, 0.25, 0, 0.25, 0.01);
+				mPlugin.mEffectManager.addEffect(p, "EnchantedPrayerEffect", 
+						new EnchantedPrayerAoE(mPlugin, ENCHANTED_PRAYER_COOLDOWN, mDamage, mHeal, p, AFFECTED_DAMAGE_CAUSES));
+			}
 		}
-	}
-
-	@Override
-	public boolean runCheck() {
-		return mPlayer.isSneaking() && !mPlayer.isOnGround();
 	}
 }

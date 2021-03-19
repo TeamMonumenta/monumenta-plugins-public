@@ -15,6 +15,7 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
+import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
@@ -63,11 +64,10 @@ public class MeteorSlam extends Ability {
 		mInfo.mLinkedSpell = Spells.METEOR_SLAM;
 		mInfo.mScoreboardId = "MeteorSlam";
 		mInfo.mShorthandName = "MS";
-		mInfo.mDescriptions.add("Hitting an enemy with an axe or sword while falling removes fall damage and does 3 extra damage for each block fallen (up to eight blocks) and 2 extra damage for each block fallen after that to all mobs within 2 blocks. If you fall more than 3 blocks but do not hit a mob, this effect still activates, but you do not negate fall damage. In addition right-clicking twice quickly grants you 2s of Jump Boost 4. Jump Boost Cooldown: 8s.");
-		mInfo.mDescriptions.add("Damage increases to 4 per block for the first eight blocks and 2.5 for each block after that to all enemies within 3 blocks. Right-clicking twice quickly now gives 2s of Jump Boost 5. Jump Boost Cooldown: 6s.");
+		mInfo.mDescriptions.add("Hitting an enemy with an axe or sword while falling removes fall damage and does 3 extra damage for each block fallen (up to eight blocks) and 2 extra damage for each block fallen after that to all mobs within 2 blocks. If you fall more than 3 blocks but do not hit a mob, this effect still activates, but you do not negate fall damage. In addition, pressing the swap key while shifted grants you 2s of Jump Boost 4. Jump Boost Cooldown: 8s.");
+		mInfo.mDescriptions.add("Damage increases to 4 per block for the first eight blocks and 2.5 for each block after that to all enemies within 3 blocks. Pressing the swap key while shifted now gives 2s of Jump Boost 5. Jump Boost Cooldown: 6s.");
 		mInfo.mCooldown = getAbilityScore() == 1 ? COOLDOWN_1 : COOLDOWN_2;
 		mInfo.mIgnoreCooldown = true;
-		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
 		mDamageLow = getAbilityScore() == 1 ? DAMAGE_LOW_1 : DAMAGE_LOW_2;
 		mDamageHigh = getAbilityScore() == 1 ? DAMAGE_HIGH_1 : DAMAGE_HIGH_2;
 		mRadius = getAbilityScore() == 1 ? RADIUS_1 : RADIUS_2;
@@ -118,38 +118,18 @@ public class MeteorSlam extends Ability {
 
 		return true;
 	}
-
-	private int mRightClicks = 0;
-
+	
 	@Override
-	public void cast(Action action) {
-		ItemStack inMainHand = mPlayer.getInventory().getItemInMainHand();
-		ItemStack inOffHand = mPlayer.getInventory().getItemInOffHand();
-		if (ZoneUtils.hasZoneProperty(mPlayer, ZoneProperty.NO_MOBILITY_ABILITIES) ||
-		    InventoryUtils.isBowItem(inMainHand) || InventoryUtils.isBowItem(inOffHand) ||
-		    InventoryUtils.isPotionItem(inMainHand) || inMainHand.getType().isBlock() ||
-		    inMainHand.getType().isEdible()) {
+	public void playerSwapHandItemsEvent(PlayerSwapHandItemsEvent event) {
+		if (ZoneUtils.hasZoneProperty(mPlayer, ZoneProperty.NO_MOBILITY_ABILITIES)) {
 			return;
 		}
-
-		if (!mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), Spells.METEOR_SLAM)) { //cooldown check because of the ignore cooldown flag
-			if (MetadataUtils.checkOnceThisTick(mPlugin, mPlayer, CHECK_ONCE_THIS_TICK_METAKEY)) {
-				mRightClicks++;
-				new BukkitRunnable() {
-					@Override
-					public void run() {
-						if (mRightClicks > 0) {
-							mRightClicks--;
-						}
-						this.cancel();
-					}
-				}.runTaskLater(mPlugin, 5);
-			}
-			if (mRightClicks < 2) {
+		if (mPlayer.isSneaking()) {
+			event.setCancelled(true);
+			if (mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.mLinkedSpell)) {
 				return;
 			}
-			mRightClicks = 0;
-
+			
 			mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.JUMP, DURATION, mJumpBoostAmplifier, true, false));
 			putOnCooldown();
 			World world = mPlayer.getWorld();

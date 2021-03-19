@@ -11,6 +11,7 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.attribute.Attribute;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
@@ -21,6 +22,7 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.effects.PercentDamageReceived;
 
 public class Rampage extends Ability {
 
@@ -30,8 +32,9 @@ public class Rampage extends Ability {
 	private static final int RAMPAGE_1_STACK_LIMIT = 15;
 	private static final int RAMPAGE_2_STACK_LIMIT = 20;
 	private static final double RAMPAGE_DAMAGE_RESISTANCE_STACK_RATIO = 1.0;
-	private static final double RAMPAGE_HEAL_STACK_RATIO = 1.0 / 4;
 	private static final double RAMPAGE_RADIUS = 4;
+	private static final double HEAL_PERCENT = 0.05;
+	private static final String PERCENT_DAMAGE_RESIST_EFFECT_NAME = "RampagePercentDamageResistEffect";
 
 	private final int mDamagePerStack;
 	private final int mStackLimit;
@@ -39,6 +42,7 @@ public class Rampage extends Ability {
 	private int mStacks = 0;
 	private int mRemainderDamage = 0;
 	private int mTimeToStackDecay = 0;
+	private int mTimer = 0;
 
 	public Rampage(Plugin plugin, Player player) {
 		super(plugin, player, "Rampage");
@@ -47,7 +51,7 @@ public class Rampage extends Ability {
 		mInfo.mScoreboardId = "Rampage";
 		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
 		mInfo.mShorthandName = "Rmp";
-		mInfo.mDescriptions.add("Gain a stack of rage for each 40 melee damage dealt. Stacks decay by 1 every 5 seconds of not dealing melee damage and cap at 15. Passively gain 1% damage resistance for each stack. When at 10 or more stacks, right click while looking down to consume all stacks and damage mobs in a 4 block radius by stacks consumed and heal self by 1/4 stacks consumed.");
+		mInfo.mDescriptions.add("Gain a stack of rage for each 40 melee damage dealt. Stacks decay by 1 every 5 seconds of not dealing melee damage and cap at 15. Passively gain 1% damage resistance for each stack. When at 10 or more stacks, right click while looking down to consume all stacks and damage mobs in a 4 block radius by stacks consumed. For the next (stacks consumed / 2) seconds, heal 5% of max health per second and keep your passive damage reduction.");
 		mInfo.mDescriptions.add("Gain a stack of rage for each 25 melee damage dealt, with stacks capping at 20.");
 		mDamagePerStack = getAbilityScore() == 1 ? RAMPAGE_1_DAMAGE_PER_STACK : RAMPAGE_2_DAMAGE_PER_STACK;
 		mStackLimit = getAbilityScore() == 1 ? RAMPAGE_1_STACK_LIMIT : RAMPAGE_2_STACK_LIMIT;
@@ -69,8 +73,9 @@ public class Rampage extends Ability {
 				EntityUtils.damageEntity(mPlugin, mob, mStacks, mPlayer, MagicType.PHYSICAL, true, mInfo.mLinkedSpell);
 				world.spawnParticle(Particle.VILLAGER_ANGRY, mob.getLocation(), 5, 0, 0, 0, 0.1);
 			}
-
-			PlayerUtils.healPlayer(mPlayer, mStacks * RAMPAGE_HEAL_STACK_RATIO);
+			
+			mTimer = mStacks / 2;
+			mPlugin.mEffectManager.addEffect(mPlayer, PERCENT_DAMAGE_RESIST_EFFECT_NAME, new PercentDamageReceived(mTimer, mStacks / -100.0));
 			world.spawnParticle(Particle.EXPLOSION_HUGE, loc, 3, 0.2, 0.2, 0.2, 0);
 			world.spawnParticle(Particle.SWEEP_ATTACK, loc.clone().add(0, 1, 0), 50, 3, 1, 3, 0);
 			world.playSound(loc, Sound.ENTITY_IRON_GOLEM_HURT, mStacks * 0.4f, 0.5f);
@@ -91,6 +96,15 @@ public class Rampage extends Ability {
 				mTimeToStackDecay = 0;
 				mStacks--;
 				MessagingUtils.sendActionBarMessage(mPlugin, mPlayer, "Rage: " + mStacks);
+			}
+		}
+		
+		if (oneSecond) {
+			if (mTimer > 0) {
+				mTimer--;
+				double maxHealth = mPlayer.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue();
+				PlayerUtils.healPlayer(mPlayer, HEAL_PERCENT * maxHealth);
+				mPlayer.getWorld().spawnParticle(Particle.HEART, (mPlayer.getLocation()).add(0, 2, 0), 1, 0.07, 0.07, 0.07, 0.001);
 			}
 		}
 	}

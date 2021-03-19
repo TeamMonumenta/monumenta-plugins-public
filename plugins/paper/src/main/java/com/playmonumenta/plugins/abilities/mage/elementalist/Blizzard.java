@@ -33,20 +33,34 @@ public class Blizzard extends Ability {
 
 	private static final int BLIZZARD_1_RADIUS = 6;
 	private static final int BLIZZARD_2_RADIUS = 8;
-	private static final float BLIZZARD_1_DAMAGE = 1.5f;
-	private static final float BLIZZARD_2_DAMAGE = 3.0f;
+	private static final float BLIZZARD_1_DAMAGE = 2.0f;
+	private static final float BLIZZARD_2_DAMAGE = 4.0f;
 	private static final int BLIZZARD_1_COOLDOWN = 30;
 	private static final int BLIZZARD_2_COOLDOWN = 25;
+	private static final int SLOW_DURATION = 5 * 20;
+	private static final double SLOW_1_A = 0.1;
+	private static final double SLOW_1_B = 0.2;
+	private static final double SLOW_1_C = 0.4;
+	private static final double SLOW_2_A = 0.2;
+	private static final double SLOW_2_B = 0.3;
+	private static final double SLOW_2_C = 0.4;
+	
+	private final double mSlowA;
+	private final double mSlowB;
+	private final double mSlowC;
 
 	public Blizzard(Plugin plugin, Player player) {
 		super(plugin, player, "Blizzard");
 		mInfo.mScoreboardId = "Blizzard";
 		mInfo.mShorthandName = "Bl";
-		mInfo.mDescriptions.add("Shift Right Clicking while looking up creates an aura of ice and snow in a radius of 6 blocks that lasts 10 seconds and stays centered on the user. Mobs that enter the aura get 10% Slowness. After three seconds in the aura they get 20% Slowness. After six seconds in the aura enemies are given 40% Slowness (bosses remain at 20%). Enemies take 1.5 damage a second while in the aura. Entities that are on fire within the aura are extinguished. This spell can trigger Spellshock but cannot apply it. Cooldown: 30s (starting after cast).");
-		mInfo.mDescriptions.add("The radius is increased to 8 blocks. Mobs take 3 damage a second. Cooldown: 25s.");
+		mInfo.mDescriptions.add("Shift Right Clicking while looking up creates an aura of ice and snow in a radius of 6 blocks that lasts 10 seconds and stays centered on the user. Mobs that enter the aura are given 10% Slowness. After three seconds in the aura they get 20% Slowness. After six seconds in the aura enemies are given 40% Slowness (bosses remain at 20%). Enemies take 2 damage per second while in the aura. Players that are on fire within the aura are extinguished. This spell can trigger Spellshock but cannot apply it. Cooldown: 30s (starting after cast).");
+		mInfo.mDescriptions.add("The radius is increased to 8 blocks. Mobs that enter the aura take 4 damage per second and are given 20% Slowness, increasing to 30% after three seconds and 40% after six seconds (bosses remain at 30%). Cooldown: 25s.");
 		mInfo.mLinkedSpell = Spells.BLIZZARD;
 		mInfo.mCooldown = getAbilityScore() == 1 ? 20 * BLIZZARD_1_COOLDOWN : 20 * BLIZZARD_2_COOLDOWN;
 		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
+		mSlowA = getAbilityScore() == 1 ? SLOW_1_A : SLOW_2_A;
+		mSlowB = getAbilityScore() == 1 ? SLOW_1_B : SLOW_2_B;
+		mSlowC = getAbilityScore() == 1 ? SLOW_1_C : SLOW_2_C;
 	}
 
 	private final Map<UUID, Integer> mAffected = new HashMap<>();
@@ -80,14 +94,14 @@ public class Blizzard extends Ability {
 					}
 					for (LivingEntity mob : mobs) {
 						if (!mAffected.containsKey(mob.getUniqueId())) {
-							EntityUtils.applySlow(mPlugin, 20 * 5, 0.1, mob);
+							EntityUtils.applySlow(mPlugin, SLOW_DURATION, mSlowA, mob);
 							mAffected.put(mob.getUniqueId(), 1);
 						} else {
 							int duration = mAffected.get(mob.getUniqueId());
 							if (duration >= 12 && !EntityUtils.isBoss(mob)) {
-								EntityUtils.applySlow(mPlugin, 20 * 5, 0.4, mob);
+								EntityUtils.applySlow(mPlugin, SLOW_DURATION, mSlowC, mob);
 							} else if (duration >= 6) {
-								EntityUtils.applySlow(mPlugin, 20 * 5, 0.2, mob);
+								EntityUtils.applySlow(mPlugin, SLOW_DURATION, mSlowB, mob);
 							}
 							mAffected.put(mob.getUniqueId(), duration + 1);
 						}

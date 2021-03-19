@@ -574,6 +574,7 @@ public class PlayerListener implements Listener {
 		if (event.isCancelled()) {
 			return;
 		}
+		AbilityManager.getManager().playerSwapHandItemsEvent(event.getPlayer(), event);
 		InventoryUtils.scheduleDelayedEquipmentCheck(mPlugin, event.getPlayer(), event);
 	}
 

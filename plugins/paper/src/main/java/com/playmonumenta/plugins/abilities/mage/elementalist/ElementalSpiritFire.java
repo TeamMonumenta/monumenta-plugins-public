@@ -36,13 +36,16 @@ public class ElementalSpiritFire extends Ability {
 	public static final int DAMAGE_1 = 10;
 	public static final int DAMAGE_2 = 15;
 	public static final double SIZE = 1.5;
-	public static final double BOW_MULTIPLIER = 0.25;
-	public static final int BOW_PERCENTAGE = (int) (BOW_MULTIPLIER * 100);
-	public static final int COOLDOWN_SECONDS = 12;
+	public static final double BOW_MULTIPLIER_1 = 0.25;
+	public static final double BOW_MULTIPLIER_2 = 0.4;
+	public static final int BOW_PERCENTAGE_1 = (int) (BOW_MULTIPLIER_1 * 100);
+	public static final int BOW_PERCENTAGE_2 = (int) (BOW_MULTIPLIER_2 * 100);
+	public static final int COOLDOWN_SECONDS = 10;
 	public static final int COOLDOWN = COOLDOWN_SECONDS * 20;
 
 	private final Set<LivingEntity> mEnemiesAffected = new HashSet<>();
 	private final int mLevelDamage;
+	private final double mElementalArrowsBowDamage;
 
 	private ElementalArrows mElementalArrows;
 	private BukkitRunnable mEnemiesAffectedProcessor;
@@ -64,23 +67,27 @@ public class ElementalSpiritFire extends Ability {
 				ElementalSpiritIce.SIZE,
 				ElementalSpiritIce.PULSES,
 				ElementalArrows.NAME,
-				BOW_PERCENTAGE,
-				ElementalSpiritIce.BOW_PERCENTAGE,
+				BOW_PERCENTAGE_1,
+				ElementalSpiritIce.BOW_PERCENTAGE_1,
 				COOLDOWN_SECONDS
 			) // Ice pulse interval of 20 ticks hardcoded to say "every second"
 		);
 		mInfo.mDescriptions.add(
 			String.format(
-				"Fire spirit damage is increased from %s to %s. Ice spirit damage is increased from %s to %s.",
+				"Fire spirit damage is increased from %s to %s. Ice spirit damage is increased from %s to %s. The damage bonus from %s is increased to %s%% for the fire spirit, and %s%% for the ice spirit.",
 				DAMAGE_1,
 				DAMAGE_2,
 				ElementalSpiritIce.DAMAGE_1,
-				ElementalSpiritIce.DAMAGE_2
+				ElementalSpiritIce.DAMAGE_2,
+				ElementalArrows.NAME,
+				BOW_PERCENTAGE_2,
+				ElementalSpiritIce.BOW_PERCENTAGE_2
 			)
 		);
 		mInfo.mCooldown = COOLDOWN;
 
 		mLevelDamage = getAbilityScore() == 1 ? DAMAGE_1 : DAMAGE_2;
+		mElementalArrowsBowDamage = getAbilityScore() == 1 ? BOW_MULTIPLIER_1 : BOW_MULTIPLIER_2;
 		// Task runs on the next server tick. Need to wait for entire AbilityCollection to be initialised to properly getPlayerAbility()
 		Bukkit.getScheduler().runTask(plugin, () -> {
 			if (player != null) {
@@ -141,7 +148,8 @@ public class ElementalSpiritFire extends Ability {
 									if (potentialTarget.getBoundingBox().overlaps(movingSpiritBox)) {
 										float finalDamage = spellDamage;
 										if (event.getSpell().equals(Spells.ELEMENTAL_ARROWS) && mElementalArrows != null) {
-											finalDamage += mElementalArrows.getLastDamage() * BOW_MULTIPLIER;
+											
+											finalDamage += mElementalArrows.getLastDamage() * mElementalArrowsBowDamage;
 										}
 
 										//TODO true damage bypass instead of iframe reset - https://discord.com/channels/186225508562763776/186225918086217729/816701492000981014

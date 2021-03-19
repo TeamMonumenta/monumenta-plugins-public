@@ -17,7 +17,7 @@ import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.effects.Effect;
 import com.playmonumenta.plugins.effects.PercentAttackSpeed;
 import com.playmonumenta.plugins.effects.PercentDamageDealt;
-import com.playmonumenta.plugins.effects.PercentHeal;
+import com.playmonumenta.plugins.effects.ThuribleBonusHealing;
 import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
@@ -47,8 +47,8 @@ public class ThuribleProcession extends Ability {
 		super(plugin, player, "Thurible Procession");
 		mInfo.mScoreboardId = "Thurible";
 		mInfo.mShorthandName = "TP";
-		mInfo.mDescriptions.add("The Hierophant passively builds up buffs when other players are within 30 blocks, which are applied to all players in the radius. Buffs end and the buildup resets upon a melee attack on a hostile mob, unless the full set of buffs have been obtained. Then all players (including the Hierophant) get 8 seconds of all built-up buffs. After these 8 seconds the timer resets and the Procession begins anew. Progression - +10% Attack Speed (after 4s of no melee), +10% Speed (after 8s of no melee), +10% Attack and Projectile Damage (after 12s of no melee), +10% Healing (after 16s of no melee)");
-		mInfo.mDescriptions.add("Progression - +15% Attack Speed (after 4s of no melee), +15% Speed (after 8s of no melee), +15% Attack and Projectile Damage (after 12s of no melee), +15% Healing (after 16s of no melee)");
+		mInfo.mDescriptions.add("The Hierophant passively builds up buffs when other players are within 30 blocks, which are applied to all players in the radius. Buffs end and the buildup resets upon a melee attack on a hostile mob, unless the full set of buffs have been obtained. Then all players (including the Hierophant) get 8 seconds of all built-up buffs. After these 8 seconds the timer resets and the Procession begins anew. Progression - +10% Attack Speed (after 4s of no melee), +10% Speed (after 8s of no melee), +10% Attack and Projectile Damage (after 12s of no melee), Cleric's passive heal is doubled, to 10% of max health every 5s (after 16s of no melee)");
+		mInfo.mDescriptions.add("Progression - +15% Attack Speed (after 4s of no melee), +15% Speed (after 8s of no melee), +15% Attack and Projectile Damage (after 12s of no melee), Cleric's passive heal is tripled, to 15% of max health every 5s (after 16s of no melee)");
 		mInfo.mCooldown = 20 * THURIBLE_COOLDOWN;
 		mInfo.mLinkedSpell = Spells.THURIBLE_PROCESSION;
 	}
@@ -127,8 +127,8 @@ public class ThuribleProcession extends Ability {
 	}
 
 	private Effect[] getEffectArray() {
-		Effect[] effects = getAbilityScore() == 1 ? new Effect[] {new PercentAttackSpeed(EFFECTS_DURATION, EFFECT_PERCENT_1, PERCENT_ATTACK_SPEED_EFFECT_NAME), new PercentSpeed(EFFECTS_DURATION, EFFECT_PERCENT_1, PERCENT_SPEED_EFFECT_NAME), new PercentDamageDealt(EFFECTS_DURATION, EFFECT_PERCENT_1, ALLOWED_DAMAGE_CAUSES), new PercentHeal(EFFECTS_DURATION, EFFECT_PERCENT_1)}
-		: new Effect[] {new PercentAttackSpeed(EFFECTS_DURATION, EFFECT_PERCENT_2, PERCENT_ATTACK_SPEED_EFFECT_NAME), new PercentSpeed(EFFECTS_DURATION, EFFECT_PERCENT_2, PERCENT_SPEED_EFFECT_NAME), new PercentDamageDealt(EFFECTS_DURATION, EFFECT_PERCENT_2, ALLOWED_DAMAGE_CAUSES), new PercentHeal(EFFECTS_DURATION, EFFECT_PERCENT_2)};
+		Effect[] effects = getAbilityScore() == 1 ? new Effect[] {new PercentAttackSpeed(EFFECTS_DURATION, EFFECT_PERCENT_1, PERCENT_ATTACK_SPEED_EFFECT_NAME), new PercentSpeed(EFFECTS_DURATION, EFFECT_PERCENT_1, PERCENT_SPEED_EFFECT_NAME), new PercentDamageDealt(EFFECTS_DURATION, EFFECT_PERCENT_1, ALLOWED_DAMAGE_CAUSES), new ThuribleBonusHealing(EFFECTS_DURATION, EFFECT_PERCENT_1)}
+		: new Effect[] {new PercentAttackSpeed(EFFECTS_DURATION, EFFECT_PERCENT_2, PERCENT_ATTACK_SPEED_EFFECT_NAME), new PercentSpeed(EFFECTS_DURATION, EFFECT_PERCENT_2, PERCENT_SPEED_EFFECT_NAME), new PercentDamageDealt(EFFECTS_DURATION, EFFECT_PERCENT_2, ALLOWED_DAMAGE_CAUSES), new ThuribleBonusHealing(EFFECTS_DURATION, EFFECT_PERCENT_2)};
 		return effects;
 	}
 

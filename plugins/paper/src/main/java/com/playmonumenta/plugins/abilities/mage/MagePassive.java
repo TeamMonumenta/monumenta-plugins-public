@@ -2,20 +2,22 @@ package com.playmonumenta.plugins.abilities.mage;
 
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
+import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
+import org.bukkit.inventory.ItemStack;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
+import com.playmonumenta.plugins.events.AbilityCastEvent;
+import com.playmonumenta.plugins.utils.InventoryUtils;
+
+
 
 public class MagePassive extends Ability {
 
-	private static final int TIME_TO_FIRE_RESISTANCE = 20 * 2;
-	private static final int FIRE_RESISTANCE_DURATION = 20 * 4;
+	private static final double PERCENT_MELEE_INCREASE = 0.2;
 
-	private int mTicksOnFire = 0;
+	private boolean mCast = false;
 
 	public MagePassive(Plugin plugin, Player player) {
 		super(plugin, player, null);
@@ -27,24 +29,22 @@ public class MagePassive extends Ability {
 	}
 
 	@Override
-	public void periodicTrigger(boolean fourHertz, boolean twoHertz, boolean oneSecond, int ticks) {
-		if (mTicksOnFire > TIME_TO_FIRE_RESISTANCE) {
-			mTicksOnFire = 0;
-			mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF,
-					new PotionEffect(PotionEffectType.FIRE_RESISTANCE, FIRE_RESISTANCE_DURATION, 0, false, true));
-		}
-
-		if (mPlayer.getFireTicks() > 0 && mPlayer.getPotionEffect(PotionEffectType.FIRE_RESISTANCE) == null) {
-			mTicksOnFire += 5;
-		}
-	}
-
-	@Override
-	public boolean playerDamagedByLivingEntityEvent(EntityDamageByEntityEvent event) {
-		if (event.getDamager() instanceof Player) {
-			event.setDamage(event.getDamage() * 1.15);
+	public boolean abilityCastEvent(AbilityCastEvent event) {
+		if (!mCast) {
+			mCast = true;
 		}
 		return true;
 	}
-
+	
+	@Override
+	public boolean livingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
+		if (event.getCause() == DamageCause.ENTITY_ATTACK) {
+			ItemStack mainHand = mPlayer.getInventory().getItemInMainHand();
+			if (InventoryUtils.isWandItem(mainHand) && mCast) {
+				event.setDamage((event.getDamage() * (1 + PERCENT_MELEE_INCREASE)));
+				mCast = false;
+			}
+		}
+		return true;
+	}
 }

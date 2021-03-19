@@ -32,6 +32,7 @@ import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.player.PlayerAnimationEvent;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.event.player.PlayerItemDamageEvent;
+import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.inventory.ItemStack;
 
 import com.google.gson.JsonElement;
@@ -60,7 +61,7 @@ import com.playmonumenta.plugins.abilities.cleric.DivineJustice;
 import com.playmonumenta.plugins.abilities.cleric.HandOfLight;
 import com.playmonumenta.plugins.abilities.cleric.HeavenlyBoon;
 import com.playmonumenta.plugins.abilities.cleric.NonClericProvisionsPassive;
-import com.playmonumenta.plugins.abilities.cleric.Rejuvenation;
+import com.playmonumenta.plugins.abilities.cleric.Crusade;
 import com.playmonumenta.plugins.abilities.cleric.SacredProvisions;
 import com.playmonumenta.plugins.abilities.cleric.Sanctified;
 import com.playmonumenta.plugins.abilities.cleric.hierophant.EnchantedPrayer;
@@ -93,9 +94,9 @@ import com.playmonumenta.plugins.abilities.mage.ManaLance;
 import com.playmonumenta.plugins.abilities.mage.PrismaticShield;
 import com.playmonumenta.plugins.abilities.mage.Spellshock;
 import com.playmonumenta.plugins.abilities.mage.ThunderStep;
-import com.playmonumenta.plugins.abilities.mage.arcanist.ArcaneBarrage;
-import com.playmonumenta.plugins.abilities.mage.arcanist.FlashSword;
-import com.playmonumenta.plugins.abilities.mage.arcanist.Overload;
+import com.playmonumenta.plugins.abilities.mage.arcanist.SpatialShatter;
+import com.playmonumenta.plugins.abilities.mage.arcanist.AstralOmen;
+import com.playmonumenta.plugins.abilities.mage.arcanist.SagesInsight;
 import com.playmonumenta.plugins.abilities.mage.elementalist.Blizzard;
 import com.playmonumenta.plugins.abilities.mage.elementalist.ElementalSpiritFire;
 import com.playmonumenta.plugins.abilities.mage.elementalist.ElementalSpiritIce;
@@ -205,11 +206,7 @@ public class AbilityManager {
 		List<Ability> specAbilitiesPriority = Arrays.asList(
 				                           // Damage multiplying skills must come before damage bonus skills
 			                               new RecklessSwing(mPlugin, null),
-			                               new DarkPact(mPlugin, null),
-
-			                               // Starfall and Arcane Barrage need to come before Mana Lance
-			                               new Starfall(mPlugin, null),
-			                               new ArcaneBarrage(mPlugin, null)
+			                               new DarkPact(mPlugin, null)
 			                           );
 
 		if (ServerProperties.getClassSpecializationsEnabled()) {
@@ -282,7 +279,7 @@ public class AbilityManager {
 		                               new ClericPassive(mPlugin, null),
 		                               new DivineJustice(mPlugin, null),
 		                               new HeavenlyBoon(mPlugin, null),
-		                               new Rejuvenation(mPlugin, null),
+		                               new Crusade(mPlugin, null),
 		                               new Sanctified(mPlugin, null),
 		                               new SacredProvisions(mPlugin, null),
 
@@ -316,11 +313,12 @@ public class AbilityManager {
                 new ElementalSpiritFire(mPlugin, null),
                 new ElementalSpiritIce(mPlugin, null),
                 new Blizzard(mPlugin, null),
+                new Starfall(mPlugin, null),
 
                 // ARCANIST
-                new FlashSword(mPlugin, null),
-                new Overload(mPlugin, null),
-                	//Arcane Barrage up above
+                new SpatialShatter(mPlugin, null),
+                new AstralOmen(mPlugin, null),
+                new SagesInsight(mPlugin, null),
 
                 //********** ROGUE **********//
                 // SWORDSAGE
@@ -756,6 +754,10 @@ public class AbilityManager {
 
 	public void playerAnimationEvent(Player player, PlayerAnimationEvent event) {
 		conditionalCast(player, (ability) -> ability.playerAnimationEvent(event));
+	}
+	
+	public void playerSwapHandItemsEvent(Player player, PlayerSwapHandItemsEvent event) {
+		conditionalCast(player, (ability) -> ability.playerSwapHandItemsEvent(event));
 	}
 
 	public void playerInteractEvent(Player player, Action action, ItemStack itemInHand, Material blockClicked) {

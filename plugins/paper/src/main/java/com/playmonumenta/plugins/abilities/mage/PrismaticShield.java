@@ -78,7 +78,7 @@ public class PrismaticShield extends Ability {
 	@Override
 	public boolean playerDamagedEvent(EntityDamageEvent event) {
 		// Do not process cancelled damage events
-		if (event.isCancelled() || event instanceof EntityDamageByEntityEvent) {
+		if (event.isCancelled() || event instanceof EntityDamageByEntityEvent || mPlayer.isBlocking()) {
 			return true;
 		}
 

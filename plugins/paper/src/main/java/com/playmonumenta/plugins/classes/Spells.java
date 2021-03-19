@@ -21,8 +21,9 @@ public enum Spells {
 	ELEMENTAL_SPIRIT_ICE("Ice Elemental Spirit"),
 
 	//--Arcanist Spec.
-	ARCANE_BARRAGE("Arcane Barrage"),
 	FSWORD("Flash Sword"),
+	SPATIAL_SHATTER("Spatial Shatter"),
+	ASTRAL_OMEN("Astral Omen"),
 
 	//Rogue
 
