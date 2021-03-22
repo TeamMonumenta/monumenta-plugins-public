@@ -33,7 +33,6 @@ public class GetScoreCommand {
 			run(sender, (String)args[0], (String)args[1]);
 		})
 		.register();
-
 		new CommandAPICommand("getscore")
 		.withPermission(CommandPermission.fromString("monumenta.command.getscore"))
 		.withArguments(new EntitySelectorArgument("targets",EntitySelector.MANY_ENTITIES))

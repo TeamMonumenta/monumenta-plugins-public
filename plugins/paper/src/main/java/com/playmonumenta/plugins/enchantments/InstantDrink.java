@@ -16,6 +16,7 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
@@ -52,7 +53,11 @@ public class InstantDrink implements BaseEnchantment {
 				PotionMeta meta = (PotionMeta) item.getItemMeta();
 				if (meta.hasCustomEffects()) {
 					for (PotionEffect effect : meta.getCustomEffects()) {
-						plugin.mPotionManager.addPotion(player, PotionID.APPLIED_POTION, effect);
+						if (effect.getType().equals(PotionEffectType.HEAL) || effect.getType().equals(PotionEffectType.HARM)) {
+							PotionUtils.apply(player, new PotionInfo(effect.getType(), effect.getDuration() + 1, effect.getAmplifier(),false, false));
+						} else {
+							plugin.mPotionManager.addPotion(player, PotionID.APPLIED_POTION, effect);
+						}
 					}
 				} else {
 					PotionInfo info = PotionUtils.getPotionInfo(meta.getBasePotionData(), 1);
