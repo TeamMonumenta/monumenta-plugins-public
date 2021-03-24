@@ -28,7 +28,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.plugin.Plugin;
 
-import de.jeff_media.ChestSort.ChestSortPlugin;
+import de.jeff_media.ChestSortAPI.ChestSort;
 import de.jeff_media.ChestSortAPI.ChestSortAPI;
 import de.jeff_media.ChestSortAPI.ChestSortEvent;
 
@@ -45,8 +45,8 @@ public class ChestSortIntegration implements Listener {
 
 	private static void checkForPlugin() {
 		Plugin plugin = Bukkit.getServer().getPluginManager().getPlugin("ChestSort");
-		if (plugin instanceof ChestSortPlugin) {
-			chestSortAPI = ((ChestSortPlugin)plugin).getAPI();
+		if (plugin instanceof ChestSort) {
+			chestSortAPI = ((ChestSort)plugin).getAPI();
 		}
 		checkedForPlugin = true;
 	}
