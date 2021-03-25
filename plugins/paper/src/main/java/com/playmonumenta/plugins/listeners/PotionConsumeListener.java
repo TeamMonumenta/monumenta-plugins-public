@@ -110,6 +110,7 @@ public class PotionConsumeListener implements Listener {
 				event.getClickedInventory().addItem(prevPotion);
 			}
 			mPotionsConsumed.put(player.getUniqueId(), null);
+			mCooldowns.remove(player.getUniqueId());
 			runnable.cancel();
 			event.setCancelled(true);
 			return;
