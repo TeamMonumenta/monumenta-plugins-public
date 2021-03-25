@@ -17,16 +17,19 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.abilities.AbilityManager;
+import com.playmonumenta.plugins.abilities.cleric.paladin.LuminousInfusion;
 
 public class DivineJustice extends Ability {
 
 	private static final int CRITICAL_UNDEAD_DAMAGE = 4;
 	private static final double CRITICAL_SCALING = 0.15;
 	private static final int RADIUS = 12;
+	private static final double LUMINOUS_BONUS = 4;
 	
 	private final double mCriticalScaling;
 	
 	private Crusade mCrusade;
+	private LuminousInfusion mLuminous;
 
 	public DivineJustice(Plugin plugin, Player player) {
 		super(plugin, player, "Divine Justice");
@@ -38,6 +41,7 @@ public class DivineJustice extends Ability {
 		Bukkit.getScheduler().runTask(plugin, () -> {
 			if (player != null) {
 				mCrusade = AbilityManager.getManager().getPlayerAbility(mPlayer, Crusade.class);
+				mLuminous = AbilityManager.getManager().getPlayerAbility(mPlayer, LuminousInfusion.class);
 			}
 		});
 	}
@@ -57,14 +61,21 @@ public class DivineJustice extends Ability {
 
 				double bonusDamage = 0.0;
 				double bonusScaling = 0.0;
+				double baseDamage = CRITICAL_UNDEAD_DAMAGE;
+				if (mLuminous != null) {
+					if (mLuminous.getAbilityScore() == 2) {
+						baseDamage += LUMINOUS_BONUS;
+					}
+				}
 				if (mCrusade != null) {
 					if (mCrusade.getAbilityScore() > 0) {
-						bonusDamage = CRITICAL_UNDEAD_DAMAGE * 0.33;
+						bonusDamage = baseDamage * 0.33;
 						bonusScaling = mCriticalScaling * 0.33;
 						world.spawnParticle(Particle.CRIT_MAGIC, damagee.getEyeLocation(), 10, 0.25, 0.5, 0.25, 0);
 					}
 				}
-				event.setDamage((event.getDamage() + CRITICAL_UNDEAD_DAMAGE + bonusDamage) * (1 + mCriticalScaling + bonusScaling));
+				
+				event.setDamage((event.getDamage() + baseDamage + bonusDamage) * (1 + mCriticalScaling + bonusScaling));
 			}
 		}
 		return true;

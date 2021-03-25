@@ -126,7 +126,7 @@ public class LuminousInfusion extends Ability {
 			}
 		}
 
-		if (mActive && EntityUtils.isUndead(mob)) {
+		if (mActive && (EntityUtils.isUndead(mob) || (mCountsHumanoids && EntityUtils.isHumanoid(mob)))) {
 			execute(mob, event);
 		}
 
@@ -139,7 +139,7 @@ public class LuminousInfusion extends Ability {
 			EntityUtils.applyFire(mPlugin, FIRE_DURATION_2, damagee, mPlayer);
 		}
 
-		if (mActive && EntityUtils.isUndead(damagee) || (mCountsHumanoids && EntityUtils.isHumanoid(damagee))) {
+		if (mActive && (EntityUtils.isUndead(damagee) || (mCountsHumanoids && EntityUtils.isHumanoid(damagee)))) {
 			execute(damagee, event);
 		}
 

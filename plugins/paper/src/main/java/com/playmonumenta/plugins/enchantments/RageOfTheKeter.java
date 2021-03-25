@@ -28,7 +28,7 @@ public class RageOfTheKeter implements BaseEnchantment {
 
 	private static final double DAMAGE_PERCENT = 0.15;
 	private static final double SPEED_PERCENT = 0.15;
-	private static final int DURATION = 20 * 10;
+	private static final int DURATION = 20 * 15;
 	private static final int COOLDOWN = 20 * 25;
 	private static final String ATTR_NAME = "KeterExtraSpeedAttr";
 	private static final EnumSet<DamageCause> AFFECTED_DAMAGE_CAUSES = EnumSet.of(
@@ -80,8 +80,8 @@ public class RageOfTheKeter implements BaseEnchantment {
 				})
 			);
 			
-			player.setFoodLevel(Math.min(20, player.getFoodLevel() + 6));
-			player.setSaturation(Math.min(player.getFoodLevel(), player.getSaturation() + 6));
+			player.setFoodLevel(Math.min(20, player.getFoodLevel() + 2));
+			player.setSaturation(Math.min(player.getFoodLevel(), Math.min(player.getSaturation() + 3.6f, 12.8f)));
 			
 			world.spawnParticle(Particle.REDSTONE, player.getLocation().add(0, 1, 0), 20, 0.25, 0.5, 0.25, 1, OLIVE_COLOR);
 			world.spawnParticle(Particle.REDSTONE, player.getLocation().add(0, 1, 0), 25, 0.5, 0.45, 0.25, 1, GREEN_COLOR);
