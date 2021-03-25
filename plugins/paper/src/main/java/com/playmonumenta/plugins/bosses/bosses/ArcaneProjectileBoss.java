@@ -24,7 +24,7 @@ public class ArcaneProjectileBoss extends BossAbilityGroup {
 	private static final int COOLDOWN = 20 * 8;
 	private static final int DELAY = 20 * 1;
 	private static final double SPEED = 0.8;
-	private static final double TURN_RADIUS = Math.PI / 60;
+	private static final double TURN_RADIUS = Math.PI / 75;
 	private static final int DISTANCE = 32;
 	private static final int LIFETIME_TICKS = (int)(DISTANCE / SPEED);
 	private static final double HITBOX_LENGTH = 0.5;

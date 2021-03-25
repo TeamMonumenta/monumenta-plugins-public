@@ -22,7 +22,7 @@ public class MagicArrowBoss extends BossAbilityGroup {
 	public static final int detectionRange = 24;
 
 	private static final boolean SINGLE_TARGET = true;
-	private static final boolean LAUNCH_TRACKING = false;
+	private static final boolean LAUNCH_TRACKING = true;
 	private static final int COOLDOWN = 20 * 8;
 	private static final int DELAY = 20 * 1;
 	private static final double SPEED = 0.8;
