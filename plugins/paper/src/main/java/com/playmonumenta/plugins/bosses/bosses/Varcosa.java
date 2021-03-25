@@ -14,7 +14,6 @@ import org.bukkit.attribute.Attribute;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
 import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
@@ -31,7 +30,6 @@ import com.playmonumenta.plugins.bosses.spells.SpellBlockBreak;
 import com.playmonumenta.plugins.bosses.spells.SpellConditionalTeleport;
 import com.playmonumenta.plugins.bosses.spells.SpellGenericCharge;
 import com.playmonumenta.plugins.bosses.spells.SpellTpSwapPlaces;
-import com.playmonumenta.plugins.bosses.spells.SpellWeaponSwitch;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.SerializationUtils;
@@ -97,8 +95,6 @@ public class Varcosa extends BossAbilityGroup {
 
 		List<Spell> passiveSpells = Arrays.asList(
 			new SpellBlockBreak(boss),
-			// Weaponswap
-			new SpellWeaponSwitch((Mob) boss),
 			// Teleport the boss to spawnLoc if he is stuck in bedrock
 			new SpellConditionalTeleport(boss, spawnLoc, b -> b.getLocation().getBlock().getType() == Material.BEDROCK ||
 			                                                   b.getLocation().add(0, 1, 0).getBlock().getType() == Material.BEDROCK ||

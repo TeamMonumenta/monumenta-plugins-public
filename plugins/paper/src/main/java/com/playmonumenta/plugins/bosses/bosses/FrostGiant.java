@@ -1149,19 +1149,21 @@ public class FrostGiant extends BossAbilityGroup {
 		delayHailstormDamage();
 	}
 
-	public void delayDamage() {
-		if (mDelay != null && !mDelay.isCancelled()) {
-			mDelay.cancel();
-		}
-
-		mDoDamage = false;
-		mDelay = new BukkitRunnable() {
-			@Override
-			public void run() {
-				mDoDamage = true;
+	public static void delayDamage() {
+		if (mInstance != null) {
+			if (mInstance.mDelay != null && !mInstance.mDelay.isCancelled()) {
+				mInstance.mDelay.cancel();
 			}
-		};
-		mDelay.runTaskLater(mPlugin, 20 * 4);
+
+			mInstance.mDoDamage = false;
+			mInstance.mDelay = new BukkitRunnable() {
+				@Override
+				public void run() {
+					mInstance.mDoDamage = true;
+				}
+			};
+			mInstance.mDelay.runTaskLater(mInstance.mPlugin, 20 * 4);
+		}
 	}
 
 	public static boolean delayHailstormDamage() {

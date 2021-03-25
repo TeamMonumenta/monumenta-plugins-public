@@ -216,7 +216,7 @@ public class Shatter extends Spell {
 					}
 
 					if (!mOldBlocks.isEmpty()) {
-						new BukkitRunnable() {
+						BukkitRunnable runnable = new BukkitRunnable() {
 							int mTicks = 0;
 							Iterator<Map.Entry<Location,Material>> mBlocks = mOldBlocks.entrySet().iterator();
 							@Override
@@ -254,7 +254,9 @@ public class Shatter extends Spell {
 									}
 								}
 							}
-						}.runTaskTimer(mPlugin, 0, 1);
+						};
+						runnable.runTaskTimer(mPlugin, 0, 1);
+						mActiveRunnables.add(runnable);
 					}
 				}
 			}
@@ -263,6 +265,50 @@ public class Shatter extends Spell {
 
 		runnable.runTaskTimer(mPlugin, 0, 2);
 		mActiveRunnables.add(runnable);
+	}
+
+	@Override
+	public void cancel() {
+		super.cancel();
+
+		new BukkitRunnable() {
+			int mTicks = 0;
+			Iterator<Map.Entry<Location,Material>> mBlocks = mOldBlocks.entrySet().iterator();
+			@Override
+			public void run() {
+				mTicks++;
+
+				if (mTicks >= 20 * 2 || !mBlocks.hasNext()) {
+					while (mBlocks.hasNext()) {
+						Map.Entry<Location, Material> e = mBlocks.next();
+						if (e.getKey().getBlock().getType() == Material.CRIMSON_HYPHAE) {
+							e.getKey().getBlock().setType(e.getValue());
+							if (mOldData.containsKey(e.getKey())) {
+								e.getKey().getBlock().setBlockData(mOldData.get(e.getKey()));
+							}
+						}
+						mBlocks.remove();
+					}
+
+					this.cancel();
+				} else {
+					//Remove 100 blocks per tick
+					for (int i = 0; i < 100; i++) {
+						if (!mBlocks.hasNext()) {
+							break;
+						}
+						Map.Entry<Location, Material> e = mBlocks.next();
+						if (e.getKey().getBlock().getType() == Material.CRIMSON_HYPHAE) {
+							e.getKey().getBlock().setType(e.getValue());
+							if (mOldData.containsKey(e.getKey())) {
+								e.getKey().getBlock().setBlockData(mOldData.get(e.getKey()));
+							}
+						}
+						mBlocks.remove();
+					}
+				}
+			}
+		}.runTaskTimer(mPlugin, 0, 1);
 	}
 
 	@Override

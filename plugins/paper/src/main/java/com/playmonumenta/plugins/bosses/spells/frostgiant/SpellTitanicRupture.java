@@ -35,6 +35,9 @@ public class SpellTitanicRupture extends Spell {
 	private boolean mCooldown = false;
 	private static final Particle.DustOptions RED_COLOR = new Particle.DustOptions(Color.fromRGB(255, 0, 0), 1.0f);
 
+	//Used to store locations of icicle blocks to delete them
+	private List<Location> mLocs = new ArrayList<>();
+
 
 	public SpellTitanicRupture(Plugin plugin, LivingEntity boss, Location loc) {
 		mPlugin = plugin;
@@ -59,7 +62,7 @@ public class SpellTitanicRupture extends Spell {
 		world.playSound(mBoss.getLocation(), Sound.ENTITY_ELDER_GUARDIAN_CURSE, SoundCategory.HOSTILE, 5, 1);
 		PlayerUtils.executeCommandOnNearbyPlayers(mStartLoc, FrostGiant.detectionRange, "tellraw @s [\"\",{\"text\":\"CRUMBLE UNDER THE WEIGHT OF THE MOUNTAIN.\",\"color\":\"dark_red\"}]");
 
-		new BukkitRunnable() {
+		BukkitRunnable runnable = new BukkitRunnable() {
 			int mT = 0;
 			@Override
 			public void run() {
@@ -84,8 +87,9 @@ public class SpellTitanicRupture extends Spell {
 					}
 				}
 			}
-		}.runTaskTimer(mPlugin, 0, 1);
-
+		};
+		runnable.runTaskTimer(mPlugin, 0, 1);
+		mActiveRunnables.add(runnable);
 	}
 
 	private void createTitanicIcicles(Player target, List<Player> players) {
@@ -110,7 +114,9 @@ public class SpellTitanicRupture extends Spell {
 		}
 		List<FallingBlock> ices = new ArrayList<>(1500);
 
-		new BukkitRunnable() {
+		mLocs.add(loc);
+
+		BukkitRunnable runnable = new BukkitRunnable() {
 			int mT = 0;
 			float mPitch = 1;
 			@Override
@@ -167,6 +173,8 @@ public class SpellTitanicRupture extends Spell {
 					}
 					FrostGiant.unfreezeGolems(mBoss);
 					this.cancel();
+
+					mLocs.remove(loc);
 				}
 
 				if (mT % 10 == 0) {
@@ -181,11 +189,43 @@ public class SpellTitanicRupture extends Spell {
 						world.spawnParticle(Particle.REDSTONE, loc.clone().add(8 * cos, 0, 8 * sin), 1, 0.15, 0.15, 0.15, RED_COLOR);
 						world.spawnParticle(Particle.REDSTONE, loc.clone().add(4 * cos, 0, 4 * sin), 1, 0.15, 0.15, 0.15, RED_COLOR);
 						world.spawnParticle(Particle.REDSTONE, loc.clone().add(2 * cos, 0, 2 * sin), 2, 0.15, 0.15, 0.15, RED_COLOR);
+
+						world.spawnParticle(Particle.DRAGON_BREATH, loc.clone().add(8 * cos, 1, 8 * sin), 1, 0.15, 0.15, 0.15, 0.05);
+						world.spawnParticle(Particle.DRAGON_BREATH, loc.clone().add(4 * cos, 1, 4 * sin), 1, 0.15, 0.15, 0.15, 0.05);
+						world.spawnParticle(Particle.DRAGON_BREATH, loc.clone().add(2 * cos, 1, 2 * sin), 2, 0.15, 0.15, 0.15, 0.05);
+
+						world.spawnParticle(Particle.REDSTONE, loc.clone().add(8 * cos, 2, 8 * sin), 1, 0.15, 0.15, 0.15, RED_COLOR);
+						world.spawnParticle(Particle.REDSTONE, loc.clone().add(4 * cos, 2, 4 * sin), 1, 0.15, 0.15, 0.15, RED_COLOR);
+						world.spawnParticle(Particle.REDSTONE, loc.clone().add(2 * cos, 2, 2 * sin), 2, 0.15, 0.15, 0.15, RED_COLOR);
 					}
 				}
 				mT += 5;
 			}
-		}.runTaskTimer(mPlugin, 0, 5);
+		};
+
+		runnable.runTaskTimer(mPlugin, 0, 5);
+		mActiveRunnables.add(runnable);
+	}
+
+	@Override
+	public void cancel() {
+		super.cancel();
+
+		for (Location loc : mLocs) {
+			Location l = loc.clone();
+			//Deletes icicles in air once cancelled
+			for (int y = -15; y <= 0; y++) {
+				for (int x = -6; x < 6; x++) {
+					for (int z = -6; z < 6; z++) {
+						l.set(loc.getX() + x, loc.getY() + y + 20, loc.getZ() + z);
+						Block b = l.getBlock();
+						if (b.getType() == Material.BLUE_ICE || b.getType() == Material.SNOW_BLOCK) {
+							b.setType(Material.AIR);
+						}
+					}
+				}
+			}
+		}
 	}
 
 	@Override

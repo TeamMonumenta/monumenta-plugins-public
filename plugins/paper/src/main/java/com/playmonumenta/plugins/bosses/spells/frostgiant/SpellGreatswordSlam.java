@@ -48,6 +48,9 @@ public class SpellGreatswordSlam extends Spell {
 
 	private Location mStartLoc;
 
+	//Starts deleting ice immediately when this is true
+	private boolean mDeleteIce = false;
+
 	public SpellGreatswordSlam(Plugin plugin, LivingEntity boss, int dur, double deg, Location startLoc) {
 		mPlugin = plugin;
 		mBoss = boss;
@@ -246,7 +249,7 @@ public class SpellGreatswordSlam extends Spell {
 			public void run() {
 
 				//Stop running after duration seconds
-				if (mT >= 20 * mDuration || mBoss.isDead() || !mBoss.isValid()) {
+				if (mT >= 20 * mDuration || mBoss.isDead() || !mBoss.isValid() || mDeleteIce) {
 					new BukkitRunnable() {
 						int mTicks = 0;
 						Iterator<Map.Entry<Location, Material>> mBlocks = oldBlocks.entrySet().iterator();
@@ -303,6 +306,13 @@ public class SpellGreatswordSlam extends Spell {
 				mT += 10;
 			}
 		}.runTaskTimer(mPlugin, 0, 10); //Every 0.5 seconds, check if player is on cone area damage
+	}
+
+	@Override
+	public void cancel() {
+		super.cancel();
+
+		mDeleteIce = true;
 	}
 
 	@Override

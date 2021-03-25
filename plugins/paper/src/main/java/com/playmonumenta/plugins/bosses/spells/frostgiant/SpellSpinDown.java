@@ -37,6 +37,7 @@ public class SpellSpinDown extends Spell {
 	private Location mStartLoc;
 
 	private boolean mCooldown = false;
+	private boolean mDeleteIce = false;
 
 	public SpellSpinDown(Plugin plugin, LivingEntity boss, Location loc) {
 		mPlugin = plugin;
@@ -79,7 +80,7 @@ public class SpellSpinDown extends Spell {
 		}
 
 		final float vel = 45f;
-		new BukkitRunnable() {
+		BukkitRunnable runnable = new BukkitRunnable() {
 			int mTicks = 0;
 			float mPitch = 0;
 
@@ -97,6 +98,7 @@ public class SpellSpinDown extends Spell {
 				Location loc = mBoss.getLocation();
 				loc.setYaw(loc.getYaw() + vel);
 				mBoss.teleport(loc);
+				FrostGiant.delayDamage();
 
 				if (mTicks % 2 == 0 && mTicks <= 20 * 3) {
 					world.playSound(mBoss.getLocation(), Sound.ENTITY_IRON_GOLEM_ATTACK, SoundCategory.HOSTILE, 4, mPitch);
@@ -166,7 +168,10 @@ public class SpellSpinDown extends Spell {
 
 				mTicks += 1;
 			}
-		}.runTaskTimer(mPlugin, 0, 1);
+		};
+
+		runnable.runTaskTimer(mPlugin, 0, 1);
+		mActiveRunnables.add(runnable);
 
 		//Revert frosted ice after 60 seconds, and also damage players that step on it during that
 		new BukkitRunnable() {
@@ -175,7 +180,7 @@ public class SpellSpinDown extends Spell {
 			public void run() {
 
 				//Stop running after 20 seconds
-				if (mTicks >= 20 * FrostGiant.frostedIceDuration || mBoss.isDead() || !mBoss.isValid()) {
+				if (mTicks >= 20 * FrostGiant.frostedIceDuration || mBoss.isDead() || !mBoss.isValid() || mDeleteIce) {
 					new BukkitRunnable() {
 						int mTicks = 0;
 						Iterator<Map.Entry<Location, Material>> mBlocks = oldBlocks.entrySet().iterator();
@@ -233,6 +238,13 @@ public class SpellSpinDown extends Spell {
 				mTicks += 10;
 			}
 		}.runTaskTimer(mPlugin, 0, 10); //Every 0.5 seconds, check if player is on cone area damage
+	}
+
+	@Override
+	public void cancel() {
+		super.cancel();
+
+		mDeleteIce = true;
 	}
 
 	@Override

@@ -266,30 +266,6 @@ public class FalseSpiritPortal extends BossAbilityGroup {
 					}.runTaskLater(mPlugin, 20 * 60);
 				}
 
-				//Teleports mobs out of lava
-				if (mTicks % 100 == 0) {
-					Iterator<Entity> mobs = mMobs.iterator();
-					while (mobs.hasNext()) {
-						Entity e = mobs.next();
-
-						if (e == null || e.isDead() || !e.isValid()) {
-							mobs.remove();
-							mMobsKilled++;
-						}
-
-						//Teleport bees back that go too high
-						if (e instanceof Bee && (e.getLocation().getY() - mBoss.getLocation().getY() > 3 || e.getLocation().getY() - mBoss.getLocation().getY() < -5)) {
-							Location loc = mGates.get(FastUtils.RANDOM.nextInt(mGates.size())).getLocation();
-							e.teleport(loc);
-						}
-
-						if (e instanceof LivingEntity && e.getLocation().getY() <= 3) {
-							Location loc = mGates.get(FastUtils.RANDOM.nextInt(mGates.size())).getLocation();
-							e.teleport(loc);
-						}
-					}
-				}
-
 				if (!mDelve && mMobsKilled >= 5 * mPlayerCount || mDelve && mMobsKilled >= 6 * mPlayerCount) {
 					//Spawns trident and resets kills (to spawn trident again)
 
@@ -338,6 +314,45 @@ public class FalseSpiritPortal extends BossAbilityGroup {
 				mTicks += 1;
 			}
 		}.runTaskTimer(mPlugin, 20 * 5, 1);
+
+		//Teleports mobs out of lower area
+		new BukkitRunnable() {
+			@Override
+			public void run() {
+				//Removes once portal and all the mobs are gone
+				if (mMobs.isEmpty() && (mBoss.isDead() || !mBoss.isValid())) {
+					this.cancel();
+				}
+
+				Iterator<Entity> mobs = mMobs.iterator();
+				while (mobs.hasNext()) {
+					Entity e = mobs.next();
+
+					if (e == null || e.isDead() || !e.isValid()) {
+						mobs.remove();
+						mMobsKilled++;
+					}
+
+					//Teleport bees back that go too high
+					if (e instanceof Bee && (e.getLocation().getY() - mBoss.getLocation().getY() > 3 || e.getLocation().getY() - mBoss.getLocation().getY() < -5)) {
+						Location loc = mGates.get(FastUtils.RANDOM.nextInt(mGates.size())).getLocation();
+						e.teleport(loc);
+					}
+
+					//If in "null space", teleport back to gate
+					if (e instanceof LivingEntity && e.getLocation().getY() <= 7) {
+						Location loc = mGates.get(FastUtils.RANDOM.nextInt(mGates.size())).getLocation();
+						List<Entity> passengers = e.getPassengers();
+						e.teleport(loc);
+
+						//Passengers do not teleport, have to be manually moved (and gets disconnected)
+						for (Entity passenger : passengers) {
+							passenger.teleport(loc);
+						}
+					}
+				}
+			}
+		}.runTaskTimer(mPlugin, 20 * 5, 20 * 5);
 	}
 
 	@Override

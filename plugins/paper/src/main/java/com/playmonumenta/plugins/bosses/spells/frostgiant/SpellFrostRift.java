@@ -44,6 +44,9 @@ public class SpellFrostRift extends Spell {
 	private Location mStartLoc;
 	private boolean mCooldown = false;
 
+	//Removes frost rift lines, used in cancelling spell
+	private boolean mRemoveLines = false;
+
 	private static final Particle.DustOptions BLACK_COLOR = new Particle.DustOptions(Color.fromRGB(0, 0, 0), 1.0f);
 
 	public SpellFrostRift(Plugin plugin, LivingEntity boss, Location loc) {
@@ -126,7 +129,7 @@ public class SpellFrostRift extends Spell {
 		Map<Location, Material> oldBlocks = new HashMap<>();
 		Map<Location, BlockData> oldData = new HashMap<>();
 
-		new BukkitRunnable() {
+		BukkitRunnable runnable  = new BukkitRunnable() {
 			Location mLoc = mBoss.getLocation().add(0, 0.5, 0);
 			World mWorld = mLoc.getWorld();
 			Vector mDir = LocationUtils.getDirectionTo(loc, mLoc).setY(0).normalize();
@@ -182,10 +185,13 @@ public class SpellFrostRift extends Spell {
 				}
 			}
 
-		}.runTaskTimer(mPlugin, 0, 1);
+		};
+
+		runnable.runTaskTimer(mPlugin, 0, 1);
+		mActiveRunnables.add(runnable);
 
 		//If touching the "line" of particles, get debuffed and take damaged. Can be blocked over
-		BukkitRunnable runnable = new BukkitRunnable() {
+		new BukkitRunnable() {
 			int mT = 0;
 			@Override
 			public void run() {
@@ -206,7 +212,7 @@ public class SpellFrostRift extends Spell {
 					}
 				}
 
-				if (mT >= 20 * 18) {
+				if (mT >= 20 * 18 || mRemoveLines) {
 					this.cancel();
 					for (Map.Entry<Location, Material> e : oldBlocks.entrySet()) {
 						e.getKey().getBlock().setType(e.getValue());
@@ -218,10 +224,14 @@ public class SpellFrostRift extends Spell {
 				}
 			}
 
-		};
+		}.runTaskTimer(mPlugin, 0, 5);
+	}
 
-		runnable.runTaskTimer(mPlugin, 0, 5);
-		mActiveRunnables.add(runnable);
+	@Override
+	public void cancel() {
+		super.cancel();
+
+		mRemoveLines = true;
 	}
 
 	@Override
