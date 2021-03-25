@@ -474,6 +474,13 @@ public class AbilityManager {
 		 *
 		 * As a side note, we should only really ever be adding modifiers to KBR, Speed, and
 		 * Health, but check all of them here just in case.
+		 *
+		 *
+		 *
+		 * TODO:
+		 *
+		 * Replace this overzealous catch-all with calls to invalidate() in all relevant
+		 * abilities like Swiftness and Toughness.
 		 */
 		AttributeInstance[] instances = {
 				knockbackResistance,

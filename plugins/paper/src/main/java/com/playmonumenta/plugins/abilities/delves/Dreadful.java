@@ -56,7 +56,7 @@ public class Dreadful extends DelveModifier {
 	}
 
 	@Override
-	public void entityDeathEvent(EntityDeathEvent event, boolean shouldGenDrops) {
+	public void entityDeathEvent(EntityDeathEvent event) {
 		Entity mob = event.getEntity();
 		if (EntityUtils.isElite(mob) && !DelvesUtils.isDelveMob(mob)) {
 			if (FastUtils.RANDOM.nextDouble() < mSpawnChance) {

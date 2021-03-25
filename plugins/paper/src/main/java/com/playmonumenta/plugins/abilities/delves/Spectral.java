@@ -56,7 +56,7 @@ public class Spectral extends DelveModifier {
 	}
 
 	@Override
-	public void entityDeathEvent(EntityDeathEvent event, boolean shouldGenDrops) {
+	public void entityDeathEvent(EntityDeathEvent event) {
 		LivingEntity mob = event.getEntity();
 
 		if (!EntityUtils.isElite(mob) && !DelvesUtils.isDelveMob(mob)) {
