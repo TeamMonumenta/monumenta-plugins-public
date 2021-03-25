@@ -24,6 +24,7 @@ import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.inventory.ItemStack;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.events.AbilityCastEvent;
 import com.playmonumenta.plugins.events.CustomDamageEvent;
 import com.playmonumenta.plugins.events.PotionEffectApplyEvent;
@@ -79,9 +80,23 @@ public abstract class Ability {
 	}
 
 	public boolean isOnCooldown() {
-		AbilityInfo info = getInfo();
-		if (info.mLinkedSpell != null && !info.mIgnoreCooldown) {
-			return mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), info.mLinkedSpell);
+		AbilityInfo abilityInfo = getInfo();
+		if (!abilityInfo.mIgnoreCooldown) {
+			// If not ignoring cooldowns, go by timer
+			return isTimerActive();
+		}
+		// Otherwise, never say on cooldown
+		return false;
+	}
+
+	// Whether skill is on cooldown, without factoring in mIgnoreCooldown
+	public boolean isTimerActive() {
+		return isTimerActive(getInfo().mLinkedSpell);
+	}
+
+	public boolean isTimerActive(Spells spell) {
+		if (spell != null) {
+			return mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), spell);
 		}
 		return false;
 	}
@@ -226,9 +241,9 @@ public abstract class Ability {
 	public void playerItemDamageEvent(PlayerItemDamageEvent event) {
 
 	}
-	
+
 	public void playerSwapHandItemsEvent(PlayerSwapHandItemsEvent event) {
-		
+
 	}
 
 	//---------------------------------------------------------------------------------------------------------------

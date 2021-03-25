@@ -12,6 +12,20 @@ import java.util.NavigableSet;
 import java.util.Set;
 import java.util.UUID;
 
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.AbilityManager;
+import com.playmonumenta.plugins.bosses.BossManager;
+import com.playmonumenta.plugins.bosses.bosses.CrowdControlImmunityBoss;
+import com.playmonumenta.plugins.classes.Spells;
+import com.playmonumenta.plugins.classes.magic.MagicType;
+import com.playmonumenta.plugins.effects.Bleed;
+import com.playmonumenta.plugins.effects.Effect;
+import com.playmonumenta.plugins.effects.PercentDamageDealt;
+import com.playmonumenta.plugins.effects.PercentDamageReceived;
+import com.playmonumenta.plugins.effects.PercentSpeed;
+import com.playmonumenta.plugins.enchantments.Inferno;
+import com.playmonumenta.plugins.events.CustomDamageEvent;
+
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Location;
@@ -65,19 +79,7 @@ import org.bukkit.util.BlockIterator;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.AbilityManager;
-import com.playmonumenta.plugins.bosses.BossManager;
-import com.playmonumenta.plugins.bosses.bosses.CrowdControlImmunityBoss;
-import com.playmonumenta.plugins.classes.Spells;
-import com.playmonumenta.plugins.classes.magic.MagicType;
-import com.playmonumenta.plugins.effects.Bleed;
-import com.playmonumenta.plugins.effects.Effect;
-import com.playmonumenta.plugins.effects.PercentDamageDealt;
-import com.playmonumenta.plugins.effects.PercentDamageReceived;
-import com.playmonumenta.plugins.effects.PercentSpeed;
-import com.playmonumenta.plugins.enchantments.Inferno;
-import com.playmonumenta.plugins.events.CustomDamageEvent;
+
 
 public class EntityUtils {
 
@@ -692,47 +694,83 @@ public class EntityUtils {
 		return calculateDamageAfterArmor(damage, armor, toughness) * (1 - Math.min(20.0, protection) / 25) * (1 - Math.min(5, resistance) / 5) * (1 + 0.05 * vulnerability);
 	}
 
-	public static void damageEntity(Plugin plugin, LivingEntity target, double damage, Entity damager) {
-		damageEntity(plugin, target, damage, damager, null);
+	public static void damageEntity(Plugin plugin, LivingEntity target, double damage, Entity attacker) {
+		damageEntity(plugin, target, damage, attacker, null);
 	}
 
-	public static void damageEntity(Plugin plugin, LivingEntity target, double damage, Entity damager, MagicType magicType) {
-		damageEntity(plugin, target, damage, damager, magicType, true);
+	public static void damageEntity(Plugin plugin, LivingEntity target, double damage, Entity attacker, MagicType magicType) {
+		damageEntity(plugin, target, damage, attacker, magicType, true);
 	}
 
-	public static void damageEntity(Plugin plugin, LivingEntity target, double damage, Entity damager, MagicType magicType, boolean callEvent) {
-		damageEntity(plugin, target, damage, damager, magicType, callEvent, null);
+	public static void damageEntity(Plugin plugin, LivingEntity target, double damage, Entity attacker, MagicType magicType, boolean registerEvent) {
+		damageEntity(plugin, target, damage, attacker, magicType, registerEvent, null);
 	}
 
-	public static void damageEntity(Plugin plugin, LivingEntity target, double damage, Entity damager, MagicType magicType, boolean callEvent, Spells spell) {
-		damageEntity(plugin, target, damage, damager, magicType, callEvent, spell, true, true);
+	public static void damageEntity(Plugin plugin, LivingEntity target, double damage, Entity attacker, MagicType magicType, boolean registerEvent, Spells spell) {
+		damageEntity(plugin, target, damage, attacker, magicType, registerEvent, spell, true, true);
 	}
 
-	public static void damageEntity(Plugin plugin, LivingEntity target, double damage, Entity damager, MagicType magicType, boolean callEvent, Spells spell, boolean applySpellshock, boolean triggerSpellshock) {
-		if (!target.isDead() && !target.isInvulnerable()) {
-			CustomDamageEvent event = new CustomDamageEvent(damager, target, damage, magicType, callEvent, spell, applySpellshock, triggerSpellshock);
+	public static void damageEntity(Plugin plugin, LivingEntity target, double damage, Entity attacker, MagicType magicType, boolean registerEvent, Spells spell, boolean applySpellshock, boolean triggerSpellshock) {
+		damageEntity(plugin, target, damage, attacker, magicType, registerEvent, spell, applySpellshock, triggerSpellshock, false);
+	}
+
+	public static void damageEntity(Plugin plugin, LivingEntity target, double damage, Entity attacker, MagicType magicType, boolean registerEvent, Spells spell, boolean applySpellshock, boolean triggerSpellshock, boolean bypassIFrames) {
+		damageEntity(plugin, target, damage, attacker, magicType, registerEvent, spell, applySpellshock, triggerSpellshock, bypassIFrames, false);
+	}
+
+	public static void damageEntity(
+		Plugin plugin,
+		LivingEntity target,
+		double damage,
+		Entity attacker,
+		MagicType magicType,
+		boolean registerEvent,
+		Spells spell,
+		boolean applySpellshock,
+		boolean triggerSpellshock,
+		// Usual damage iframe behaviour would be like setting to false.
+		// Set to true to easily, properly ignore iframes without messing up last damage or resetting aka further extending iframes
+		boolean bypassIFrames,
+		// Usual damage knockback behaviour would be like setting to false.
+		// Set to true to easily set back velocity from before the damage
+		boolean restoreVelocity
+	) {
+		if (target.isValid() && !target.isInvulnerable()) {
+			CustomDamageEvent event = new CustomDamageEvent(attacker, target, damage, magicType, registerEvent, spell, applySpellshock, triggerSpellshock);
 			Bukkit.getPluginManager().callEvent(event);
 			if (event.isCancelled()) {
 				return;
 			}
-			damage = event.getDamage();
 
-			if (target.getNoDamageTicks() == target.getMaximumNoDamageTicks()) {
+			int originalIFrames = target.getNoDamageTicks();
+			double originalLastDamage = target.getLastDamage();
+			Vector originalVelocity = target.getVelocity();
+			if (bypassIFrames) {
 				target.setNoDamageTicks(0);
 			}
 
-			if (!(damager instanceof Player)) {
-				// Applies DamageCause.ENTITY_ATTACK
-				target.damage(damage, damager);
-			} else if (damager instanceof Player) {
-				if (magicType != null && !magicType.equals(MagicType.PHYSICAL) && !magicType.equals(MagicType.NONE)) {
-					MetadataUtils.checkOnceThisTick(plugin, damager, "LastMagicUseTime");
+			double actualDamage = event.getDamage();
+			if (attacker instanceof Player) {
+				if (
+					magicType != null
+					&& magicType != MagicType.NONE
+					&& magicType != MagicType.PHYSICAL
+				) {
+					MetadataUtils.checkOnceThisTick(plugin, attacker, "LastMagicUseTime");
 				}
 				// Applies DamageCause.CUSTOM
-				NmsUtils.customDamageEntity(target, damage, (Player) damager, "magic");
+				NmsUtils.customDamageEntity(target, actualDamage, (Player)attacker, "magic");
 			} else {
-				// Applies DamageCause.GENERIC
-				target.damage(damage);
+				// Applies DamageCause.ENTITY_ATTACK
+				target.damage(actualDamage, attacker);
+			}
+
+			if (bypassIFrames) {
+				target.setNoDamageTicks(originalIFrames);
+				target.setLastDamage(originalLastDamage);
+			}
+			if (restoreVelocity) {
+				target.setVelocity(originalVelocity);
 			}
 		}
 	}
@@ -858,18 +896,6 @@ public class EntityUtils {
 			slow.setDuration(ticks);
 		}
 	}
-	
-	private static final String ASTRAL_NAME = "AstralOmenStacks";
-	
-	public static int getAstralStacks(Plugin plugin, LivingEntity mob) {
-		NavigableSet<Effect> stacks = plugin.mEffectManager.getEffects(mob, ASTRAL_NAME);
-		if (stacks != null) {
-			Effect omen = stacks.last();
-			return (int) omen.getMagnitude();
-		} else {
-			return 0;
-		}
-	}
 
 	private static final String WEAKEN_EFFECT_NAME = "WeakenEffect";
 
@@ -882,34 +908,25 @@ public class EntityUtils {
 		plugin.mEffectManager.addEffect(mob, WEAKEN_EFFECT_NAME, new PercentDamageDealt(ticks, -amount, WEAKEN_EFFECT_AFFECTED_DAMAGE_CAUSES));
 	}
 
-	public static void applyFire(Plugin plugin, int ticks, LivingEntity mob, Player player) {
-		mob.setMetadata(Inferno.SET_FIRE_TICK_METAKEY, new FixedMetadataValue(plugin, mob.getTicksLived()));
-		mob.setMetadata(Inferno.FIRE_TICK_METAKEY, new FixedMetadataValue(plugin, mob.getTicksLived()));
-		mob.setFireTicks(ticks);
+	public static void applyFire(Plugin plugin, int fireTicks, LivingEntity target, Player player) {
+		target.setMetadata(Inferno.SET_FIRE_TICK_METAKEY, new FixedMetadataValue(plugin, target.getTicksLived()));
+		target.setMetadata(Inferno.FIRE_TICK_METAKEY, new FixedMetadataValue(plugin, target.getTicksLived()));
+		target.setFireTicks(fireTicks);
 
-		// Inferno detects a damage event (since it can light fire resistant mobs "on fire"), so do some damage
-		// We need to do this even for abilities that deal damage, since the damage events might not occur due to iFrames
-		int iFrames = mob.getNoDamageTicks();
-		Vector velocity = mob.getVelocity();
-		mob.setNoDamageTicks(0);
-		EntityUtils.damageEntity(plugin, mob, 0.001, player, MagicType.FIRE, false, null, false, false);
-		mob.setNoDamageTicks(iFrames);
-		mob.setVelocity(velocity);
+		// Inferno detects a damage event (since it can light fire resistant mobs "on fire"), so do some damage.
+		// We need to do this even for abilities that deal damage, since the damage events might not occur due to iframes.
+		// This damage will always bypass iframes & doesn't affect velocity
+		damageEntity(plugin, target, 0.001, player, MagicType.FIRE, false, null, false, false, true, true);
 	}
 
-	public static void applyTaunt(Plugin plugin, LivingEntity mob, Player player) {
-		World world = player.getWorld();
-		Mob m = (Mob) mob;
-		m.setTarget(player);
-		world.spawnParticle(Particle.REDSTONE, mob.getEyeLocation().add(0, 0.5, 0), 12, 0.4, 0.5, 0.4, TAUNT_COLOR);
+	public static void applyTaunt(Plugin plugin, LivingEntity tauntedEntity, Player targetedPlayer) {
+		Mob tauntedMob = (Mob)tauntedEntity;
+		tauntedMob.setTarget(targetedPlayer);
+		targetedPlayer.getWorld().spawnParticle(Particle.REDSTONE, tauntedEntity.getEyeLocation().add(0, 0.5, 0), 12, 0.4, 0.5, 0.4, TAUNT_COLOR);
 
-		//Damage the entity to keep focus on the player who casted the taunt. Make sure it casts through iFrames and has no knockback.
-		int iFrames = m.getNoDamageTicks();
-		Vector velocity = m.getVelocity();
-		m.setNoDamageTicks(0);
-		EntityUtils.damageEntity(plugin, m, 0.001, player, MagicType.HOLY, false, null, false, false);
-		m.setNoDamageTicks(iFrames);
-		m.setVelocity(velocity);
+		// Damage the taunted enemy to keep focus on the player who casted the taunt.
+		// Damage bypasses iframes & doesn't affect velocity
+		damageEntity(plugin, tauntedMob, 0.001, targetedPlayer, MagicType.HOLY, false, null, false, false, true, true);
 	}
 
 	public static boolean isCooling(Entity mob) {

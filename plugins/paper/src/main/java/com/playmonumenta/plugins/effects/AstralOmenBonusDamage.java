@@ -1,6 +1,5 @@
 package com.playmonumenta.plugins.effects;
 
-import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -11,9 +10,10 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 
-public class AstralOmenBonusDamage extends Effect {
 
-	private static final Particle.DustOptions COLOR = new Particle.DustOptions(Color.fromRGB(100, 50, 170), 1.0f);
+
+public class AstralOmenBonusDamage extends Effect {
+	public static final Particle.DustOptions COLOR_PURPLE = AstralOmenStacks.COLOR_PURPLE;
 
 	private final double mAmount;
 	private final Player mPlayer;
@@ -40,7 +40,7 @@ public class AstralOmenBonusDamage extends Effect {
 				world.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_CRIT, 1f, 1.25f);
 				world.playSound(loc, Sound.ENTITY_SHULKER_SHOOT, 1f, 1.75f);
 				world.spawnParticle(Particle.CRIT, loc, 8, 0.25, 0.5, 0.25, 0.4);
-				world.spawnParticle(Particle.REDSTONE, loc, 8, 0.2, 0.2, 0.2, 0.1, COLOR);
+				world.spawnParticle(Particle.REDSTONE, loc, 8, 0.2, 0.2, 0.2, 0.1, COLOR_PURPLE);
 				event.setDamage(event.getDamage() * (1 + mAmount));
 			}
 		}
@@ -52,7 +52,7 @@ public class AstralOmenBonusDamage extends Effect {
 		if (fourHertz) {
 			World world = entity.getWorld();
 			Location loc = entity.getLocation().add(0, 1, 0);
-			world.spawnParticle(Particle.REDSTONE, loc, 8, 0.2, 0.2, 0.2, 0.1, COLOR);
+			world.spawnParticle(Particle.REDSTONE, loc, 8, 0.2, 0.2, 0.2, 0.1, COLOR_PURPLE);
 		}
 	}
 

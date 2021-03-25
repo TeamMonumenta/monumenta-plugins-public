@@ -3,6 +3,12 @@ package com.playmonumenta.plugins.utils;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.destroystokyo.paper.MaterialSetTag;
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.classes.Spells;
+import com.playmonumenta.plugins.events.AbilityCastEvent;
+import com.playmonumenta.plugins.potion.PotionManager.PotionID;
+
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
@@ -16,11 +22,7 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 
-import com.destroystokyo.paper.MaterialSetTag;
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.classes.Spells;
-import com.playmonumenta.plugins.events.AbilityCastEvent;
-import com.playmonumenta.plugins.potion.PotionManager.PotionID;
+
 
 public class PlayerUtils {
 
@@ -128,7 +130,7 @@ public class PlayerUtils {
 	}
 
 	// If player is considered to be in the air
-	public static boolean notOnGround(Player player) {
+	public static boolean isAirborne(Player player) {
 		Material playerFeetMaterial = player.getLocation().getBlock().getType();
 		// Accounts for all climbables including 1.16 vines & scaffolding
 		boolean playerInClimbable = MaterialSetTag.CLIMBABLE.isTagged(playerFeetMaterial);

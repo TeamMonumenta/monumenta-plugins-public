@@ -2,6 +2,12 @@ package com.playmonumenta.plugins.bosses.spells.varcosamist;
 
 import java.util.Collection;
 
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.bosses.spells.SpellPlayerAction;
+import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.scriptedquests.utils.MetadataUtils;
+
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -10,11 +16,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.bosses.spells.SpellPlayerAction;
-import com.playmonumenta.plugins.utils.BossUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.scriptedquests.utils.MetadataUtils;
+
 
 public class SpellActions {
 	//Not technically a spell - just putting the repeated actions in a seperate class
@@ -46,7 +48,7 @@ public class SpellActions {
 			// If truly in the air (not on ground and not climbing - like the Thunder Step requirement),
 			// have relaxed 5-block threshold.
 			// Eg riptide, recoil, jump boost, knocked upwards
-			if (PlayerUtils.notOnGround(player)) {
+			if (PlayerUtils.isAirborne(player)) {
 				yThreshold = 5;
 			}
 

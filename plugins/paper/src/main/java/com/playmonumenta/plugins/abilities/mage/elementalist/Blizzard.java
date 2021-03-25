@@ -5,6 +5,19 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.abilities.AbilityManager;
+import com.playmonumenta.plugins.abilities.AbilityTrigger;
+import com.playmonumenta.plugins.abilities.mage.MagmaShield;
+import com.playmonumenta.plugins.abilities.mage.Spellshock;
+import com.playmonumenta.plugins.classes.Spells;
+import com.playmonumenta.plugins.classes.magic.MagicType;
+import com.playmonumenta.plugins.enchantments.SpellDamage;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
+
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -12,59 +25,100 @@ import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.util.Vector;
 
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.abilities.AbilityTrigger;
-import com.playmonumenta.plugins.classes.Spells;
-import com.playmonumenta.plugins.classes.magic.MagicType;
-import com.playmonumenta.plugins.enchantments.SpellDamage;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.InventoryUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.plugins.utils.PotionUtils;
+
 
 public class Blizzard extends Ability {
+	public static final String NAME = "Blizzard";
+	public static final Spells SPELL = Spells.BLIZZARD;
 
-	private static final int BLIZZARD_1_RADIUS = 6;
-	private static final int BLIZZARD_2_RADIUS = 8;
-	private static final float BLIZZARD_1_DAMAGE = 2.0f;
-	private static final float BLIZZARD_2_DAMAGE = 4.0f;
-	private static final int BLIZZARD_1_COOLDOWN = 30;
-	private static final int BLIZZARD_2_COOLDOWN = 25;
-	private static final int SLOW_DURATION = 5 * 20;
-	private static final double SLOW_1_A = 0.1;
-	private static final double SLOW_1_B = 0.2;
-	private static final double SLOW_1_C = 0.4;
-	private static final double SLOW_2_A = 0.2;
-	private static final double SLOW_2_B = 0.3;
-	private static final double SLOW_2_C = 0.4;
-	
-	private final double mSlowA;
-	private final double mSlowB;
-	private final double mSlowC;
+	public static final int DAMAGE_1 = 2;
+	public static final int DAMAGE_2 = 4;
+	public static final int SIZE_1 = 6;
+	public static final int SIZE_2 = 8;
+	public static final double SLOW_MULTIPLIER_A_1 = 0.1;
+	public static final int SLOW_PERCENTAGE_A_1 = (int)(SLOW_MULTIPLIER_A_1 * 100);
+	public static final double SLOW_MULTIPLIER_A_2 = 0.2;
+	public static final int SLOW_PERCENTAGE_A_2 = (int)(SLOW_MULTIPLIER_A_2 * 100);
+	public static final double SLOW_MULTIPLIER_B_1 = SLOW_MULTIPLIER_A_2;
+	public static final int SLOW_PERCENTAGE_B_1 = SLOW_PERCENTAGE_A_2;
+	public static final double SLOW_MULTIPLIER_B_2 = 0.3;
+	public static final int SLOW_PERCENTAGE_B_2 = (int)(SLOW_MULTIPLIER_B_2 * 100);
+	public static final double SLOW_MULTIPLIER_C = 0.4;
+	public static final int SLOW_PERCENTAGE_C = (int)(SLOW_MULTIPLIER_C * 100);
+	public static final int DAMAGE_INTERVAL = 20;
+	public static final int SLOW_INTERVAL = 10;
+	public static final int DURATION_SECONDS = 10;
+	public static final int DURATION_TICKS = DURATION_SECONDS * 20;
+	public static final int SLOW_SECONDS = 5;
+	public static final int SLOW_TICKS = SLOW_SECONDS * 20;
+	public static final int B_THRESHOLD_SECONDS = 3;
+	public static final int B_THRESHOLD = (int)(B_THRESHOLD_SECONDS / (SLOW_INTERVAL / 20d)); // Slowness amount goes up every 0.5s, so if threshold seconds is 3, threshold amount is 6
+	public static final int C_THRESHOLD_SECONDS = 6;
+	public static final int C_THRESHOLD = (int)(C_THRESHOLD_SECONDS / (SLOW_INTERVAL / 20d));
+	public static final int ANGLE = -45; // Looking straight up is -90. This is 45 degrees of pitch allowance
+	public static final int COOLDOWN_SECONDS_1 = 30;
+	public static final int COOLDOWN_TICKS_1 = COOLDOWN_SECONDS_1 * 20;
+	public static final int COOLDOWN_SECONDS_2 = 25;
+	public static final int COOLDOWN_TICKS_2 = COOLDOWN_SECONDS_2 * 20;
+
+	private final int mLevelDamage;
+	private final int mLevelSize;
+	private final double mLevelSlowMultiplierA;
+	private final double mLevelSlowMultiplierB;
 
 	public Blizzard(Plugin plugin, Player player) {
-		super(plugin, player, "Blizzard");
-		mInfo.mScoreboardId = "Blizzard";
+		super(plugin, player, NAME);
+		mInfo.mLinkedSpell = SPELL;
+
+		mInfo.mScoreboardId = NAME;
 		mInfo.mShorthandName = "Bl";
-		mInfo.mDescriptions.add("Shift Right Clicking while looking up creates an aura of ice and snow in a radius of 6 blocks that lasts 10 seconds and stays centered on the user. Mobs that enter the aura are given 10% Slowness. After three seconds in the aura they get 20% Slowness. After six seconds in the aura enemies are given 40% Slowness (bosses remain at 20%). Enemies take 2 damage per second while in the aura. Players that are on fire within the aura are extinguished. This spell can trigger Spellshock but cannot apply it. Cooldown: 30s (starting after cast).");
-		mInfo.mDescriptions.add("The radius is increased to 8 blocks. Mobs that enter the aura take 4 damage per second and are given 20% Slowness, increasing to 30% after three seconds and 40% after six seconds (bosses remain at 30%). Cooldown: 25s.");
-		mInfo.mLinkedSpell = Spells.BLIZZARD;
-		mInfo.mCooldown = getAbilityScore() == 1 ? 20 * BLIZZARD_1_COOLDOWN : 20 * BLIZZARD_2_COOLDOWN;
+		mInfo.mDescriptions.add(
+			String.format(
+				"While sneaking and looking upwards, right-clicking with a wand creates an aura of ice and snow, dealing %s damage to all enemies in a %s-block cube around you every second for %ss. The aura chills enemies in it, afflicting them with %s%% slowness for %ss. After %ss in the aura, the slowness is increased to %s%%, and after %ss, to %s%%. Bosses cannot reach the last tier of slowness and players in the aura are extinguished if they're on fire. The damage ignores iframes and cannot apply but can trigger %s. You can no longer cast %s while looking upwards. Cooldown: %ss.",
+				DAMAGE_1,
+				SIZE_1,
+				DURATION_SECONDS,
+				SLOW_PERCENTAGE_A_1,
+				SLOW_SECONDS,
+				B_THRESHOLD_SECONDS,
+				SLOW_PERCENTAGE_B_1,
+				C_THRESHOLD_SECONDS,
+				SLOW_PERCENTAGE_C,
+				Spellshock.NAME,
+				MagmaShield.NAME,
+				COOLDOWN_SECONDS_1
+			) // Damage interval of 20 ticks hardcoded to say "every second"
+		);
+		mInfo.mDescriptions.add(
+			String.format(
+				"Damage is increased from %s to %s. Aura size is increased from %s to %s blocks. Base slowness is increased from %s%% to %s%%, and from %s%% to %s%% for the second tier. Cooldown is reduced from %ss to %ss.",
+				DAMAGE_1,
+				DAMAGE_2,
+				SIZE_1,
+				SIZE_2,
+				SLOW_PERCENTAGE_A_1,
+				SLOW_PERCENTAGE_A_2,
+				SLOW_PERCENTAGE_B_1,
+				SLOW_PERCENTAGE_B_2,
+				COOLDOWN_SECONDS_1,
+				COOLDOWN_SECONDS_2
+			)
+		);
 		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
-		mSlowA = getAbilityScore() == 1 ? SLOW_1_A : SLOW_2_A;
-		mSlowB = getAbilityScore() == 1 ? SLOW_1_B : SLOW_2_B;
-		mSlowC = getAbilityScore() == 1 ? SLOW_1_C : SLOW_2_C;
+
+		boolean isUpgraded = getAbilityScore() == 2;
+		mInfo.mCooldown = isUpgraded ? COOLDOWN_TICKS_2 : COOLDOWN_TICKS_1;
+
+		mLevelDamage = isUpgraded ? DAMAGE_2 : DAMAGE_1;
+		mLevelSize = isUpgraded ? SIZE_2 : SIZE_1;
+		mLevelSlowMultiplierA = isUpgraded ? SLOW_MULTIPLIER_A_2 : SLOW_MULTIPLIER_A_1;
+		mLevelSlowMultiplierB = isUpgraded ? SLOW_MULTIPLIER_B_2 : SLOW_MULTIPLIER_B_1;
 	}
 
-	private final Map<UUID, Integer> mAffected = new HashMap<>();
 	private boolean mActive = false;
+	private final Map<UUID, Integer> mAffected = new HashMap<>();
 
 	@Override
 	public void cast(Action action) {
@@ -72,70 +126,75 @@ public class Blizzard extends Ability {
 			return;
 		}
 
-		mActive = true;
 		putOnCooldown();
+		mActive = true;
 
 		World world = mPlayer.getWorld();
 		world.playSound(mPlayer.getLocation(), Sound.ENTITY_BLAZE_SHOOT, 1, 2);
 		world.playSound(mPlayer.getLocation(), Sound.BLOCK_GLASS_BREAK, 1, 0.75f);
-		float damage = SpellDamage.getSpellDamage(mPlayer, getAbilityScore() == 1 ? BLIZZARD_1_DAMAGE : BLIZZARD_2_DAMAGE);
-		double radius = getAbilityScore() == 1 ? BLIZZARD_1_RADIUS : BLIZZARD_2_RADIUS;
+
+		float spellDamage = SpellDamage.getSpellDamage(mPlayer, mLevelDamage);
 		new BukkitRunnable() {
-			int mT = 0;
+			int mTicks = 0;
 
 			@Override
 			public void run() {
 				Location loc = mPlayer.getLocation();
-				List<LivingEntity> mobs = EntityUtils.getNearbyMobs(loc, radius, mPlayer);
-				mT++;
-				if (mT % 10 == 0) {
-					for (Player p : PlayerUtils.playersInRange(loc, radius)) {
-						p.setFireTicks(-10);
+				List<LivingEntity> mobs = EntityUtils.getNearbyMobs(loc, mLevelSize, mPlayer);
+				mTicks++;
+				if (mTicks % SLOW_INTERVAL == 0) {
+					for (Player p : PlayerUtils.playersInRange(loc, mLevelSize)) {
+						if (p.getFireTicks() > 1) {
+							p.setFireTicks(1);
+						}
 					}
 					for (LivingEntity mob : mobs) {
 						if (!mAffected.containsKey(mob.getUniqueId())) {
-							EntityUtils.applySlow(mPlugin, SLOW_DURATION, mSlowA, mob);
+							EntityUtils.applySlow(mPlugin, SLOW_TICKS, mLevelSlowMultiplierA, mob);
 							mAffected.put(mob.getUniqueId(), 1);
 						} else {
 							int duration = mAffected.get(mob.getUniqueId());
-							if (duration >= 12 && !EntityUtils.isBoss(mob)) {
-								EntityUtils.applySlow(mPlugin, SLOW_DURATION, mSlowC, mob);
-							} else if (duration >= 6) {
-								EntityUtils.applySlow(mPlugin, SLOW_DURATION, mSlowB, mob);
+							mAffected.put(mob.getUniqueId(), ++duration);
+
+							if (duration >= C_THRESHOLD && !EntityUtils.isBoss(mob)) {
+								EntityUtils.applySlow(mPlugin, SLOW_TICKS, SLOW_MULTIPLIER_C, mob);
+							} else if (duration >= B_THRESHOLD) {
+								EntityUtils.applySlow(mPlugin, SLOW_TICKS, mLevelSlowMultiplierB, mob);
 							}
-							mAffected.put(mob.getUniqueId(), duration + 1);
 						}
 					}
 				}
 
-				if (mT % 20 == 0) {
+				if (mTicks % DAMAGE_INTERVAL == 0) {
 					for (LivingEntity mob : mobs) {
-						Vector v = mob.getVelocity();
-						mob.setNoDamageTicks(0);
-						double lastDamage = mob.getLastDamage();
-						EntityUtils.damageEntity(mPlugin, mob, damage, mPlayer, MagicType.ICE, true, mInfo.mLinkedSpell, false, true);
-						mob.setLastDamage(lastDamage + damage);
-						mob.setVelocity(v);
+						EntityUtils.damageEntity(mPlugin, mob, spellDamage, mPlayer, MagicType.ICE, true, mInfo.mLinkedSpell, false, true, true, true);
 					}
 				}
 
 				world.spawnParticle(Particle.SNOWBALL, loc, 6, 2, 2, 2, 0.1);
 				world.spawnParticle(Particle.CLOUD, loc, 4, 2, 2, 2, 0.05);
 				world.spawnParticle(Particle.CLOUD, loc, 3, 0.1, 0.1, 0.1, 0.15);
-				if (mT >= 20 * 10 || mPlayer.isDead() || !mPlayer.isValid()) {
+				if (
+					mTicks >= DURATION_TICKS
+					|| AbilityManager.getManager().getPlayerAbility(mPlayer, Blizzard.class) == null
+					|| !mPlayer.isValid() // Ensure player is not dead, is still online?
+				) {
 					this.cancel();
 					mAffected.clear();
 					mActive = false;
 				}
 			}
-
 		}.runTaskTimer(mPlugin, 0, 1);
 	}
 
 	@Override
 	public boolean runCheck() {
-		ItemStack mHand = mPlayer.getInventory().getItemInMainHand();
-		return !mActive && mPlayer.isSneaking() && mPlayer.getLocation().getPitch() < -50 && (InventoryUtils.isWandItem(mHand));
+		return (
+			InventoryUtils.isWandItem(
+				mPlayer.getInventory().getItemInMainHand()
+			)
+			&& mPlayer.isSneaking()
+			&& mPlayer.getLocation().getPitch() < ANGLE
+		);
 	}
-
 }

@@ -68,11 +68,11 @@ public class MovementUtils {
 		}
 	}
 
-	public static void pullTowards(Entity awayFromEntity, LivingEntity target, float speed) {
+	public static void pullTowards(Entity towardsEntity, LivingEntity target, float speed) {
 		if (EntityUtils.isBoss(target)) {
 			return;
 		}
-		Vector dir = target.getLocation().subtract(awayFromEntity.getLocation().toVector()).toVector().multiply(-speed);
+		Vector dir = target.getLocation().subtract(towardsEntity.getLocation().toVector()).toVector().multiply(-speed);
 		if (dir.getY() < 0) {
 			dir.setY(0.5f);
 		}

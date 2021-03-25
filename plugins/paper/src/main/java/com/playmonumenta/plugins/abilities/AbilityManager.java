@@ -204,10 +204,10 @@ public class AbilityManager {
 		mDisabledAbilities = new ArrayList<Ability>();
 
 		List<Ability> specAbilitiesPriority = Arrays.asList(
-				                           // Damage multiplying skills must come before damage bonus skills
-			                               new RecklessSwing(mPlugin, null),
-			                               new DarkPact(mPlugin, null)
-			                           );
+			// Damage multiplying skills must come before damage bonus skills
+			new RecklessSwing(mPlugin, null),
+			new DarkPact(mPlugin, null)
+		);
 
 		if (ServerProperties.getClassSpecializationsEnabled()) {
 			mReferenceAbilities.addAll(specAbilitiesPriority);
@@ -216,176 +216,176 @@ public class AbilityManager {
 		}
 
 		mReferenceAbilities.addAll(Arrays.asList(
-		                               // ALL (CLUCKING POTIONS)
-		                               new CluckingPotions(mPlugin, null),
+			// ALL (CLUCKING POTIONS)
+			new CluckingPotions(mPlugin, null),
 
-		                               // ALL PLAYERS (but technically for Alchemist)
-		                               new NonAlchemistPotionPassive(mPlugin, null),
-		                               // ALL PLAYERS (but technically for Cleric)
-		                               new NonClericProvisionsPassive(mPlugin, null),
+			// ALL PLAYERS (but technically for Alchemist)
+			new NonAlchemistPotionPassive(mPlugin, null),
+			// ALL PLAYERS (but technically for Cleric)
+			new NonClericProvisionsPassive(mPlugin, null),
 
-		                               // All other non-class abilities
-		                               new PvP(mPlugin, null),
-		                               new PatreonWhite(mPlugin, null),
-		                               new PatreonGreen(mPlugin, null),
-		                               new PatreonPurple(mPlugin, null),
-		                               new PatreonRed(mPlugin, null),
+			// All other non-class abilities
+			new PvP(mPlugin, null),
+			new PatreonWhite(mPlugin, null),
+			new PatreonGreen(mPlugin, null),
+			new PatreonPurple(mPlugin, null),
+			new PatreonRed(mPlugin, null),
 
-		                               //********** MAGE **********//
-		                               new ArcaneStrike(mPlugin, null),
-		                               new ThunderStep(mPlugin, null),
-		                               new ElementalArrows(mPlugin, null),
-		                               new FrostNova(mPlugin, null),
-		                               new MagePassive(mPlugin, null),
-		                               new MagmaShield(mPlugin, null),
-		                               new ManaLance(mPlugin, null),
-		                               new Spellshock(mPlugin, null),
+			//********** MAGE **********//
+			new ArcaneStrike(mPlugin, null),
+			new ThunderStep(mPlugin, null),
+			new ElementalArrows(mPlugin, null),
+			new FrostNova(mPlugin, null),
+			new MagePassive(mPlugin, null),
+			new MagmaShield(mPlugin, null),
+			new ManaLance(mPlugin, null),
+			new Spellshock(mPlugin, null),
 
-		                               //********** ROGUE **********//
-		                               new AdvancingShadows(mPlugin, null),
-		                               new ByMyBlade(mPlugin, null),
-		                               new DaggerThrow(mPlugin, null),
-		                               new Dodging(mPlugin, null),
-		                               new RoguePassive(mPlugin, null),
-		                               new Smokescreen(mPlugin, null),
-		                               new ViciousCombos(mPlugin, null),
-		                               new Skirmisher(mPlugin, null),
+			//********** ROGUE **********//
+			new AdvancingShadows(mPlugin, null),
+			new ByMyBlade(mPlugin, null),
+			new DaggerThrow(mPlugin, null),
+			new Dodging(mPlugin, null),
+			new RoguePassive(mPlugin, null),
+			new Smokescreen(mPlugin, null),
+			new ViciousCombos(mPlugin, null),
+			new Skirmisher(mPlugin, null),
 
-		                               //********** SCOUT **********//
-		                               new Agility(mPlugin, null),
-		                               new BowMastery(mPlugin, null),
-		                               new Volley(mPlugin, null),
-		                               new Swiftness(mPlugin, null),
-		                               new EagleEye(mPlugin, null),
-		                               new ScoutPassive(mPlugin, null),
-		                               new SwiftCuts(mPlugin, null),
-		                               new Sharpshooter(mPlugin, null),
+			//********** SCOUT **********//
+			new Agility(mPlugin, null),
+			new BowMastery(mPlugin, null),
+			new Volley(mPlugin, null),
+			new Swiftness(mPlugin, null),
+			new EagleEye(mPlugin, null),
+			new ScoutPassive(mPlugin, null),
+			new SwiftCuts(mPlugin, null),
+			new Sharpshooter(mPlugin, null),
 
-		                               //********** WARRIOR **********//
-		                               new BruteForce(mPlugin, null),
-		                               new CounterStrike(mPlugin, null),
-		                               new DefensiveLine(mPlugin, null),
-		                               new Frenzy(mPlugin, null),
-		                               new Riposte(mPlugin, null),
-		                               new ShieldBash(mPlugin, null),
-		                               new Toughness(mPlugin, null),
-		                               new WarriorPassive(mPlugin, null),
-		                               new WeaponryMastery(mPlugin, null),
+			//********** WARRIOR **********//
+			new BruteForce(mPlugin, null),
+			new CounterStrike(mPlugin, null),
+			new DefensiveLine(mPlugin, null),
+			new Frenzy(mPlugin, null),
+			new Riposte(mPlugin, null),
+			new ShieldBash(mPlugin, null),
+			new Toughness(mPlugin, null),
+			new WarriorPassive(mPlugin, null),
+			new WeaponryMastery(mPlugin, null),
 
-		                               //********** CLERIC **********//
-		                               new Celestial(mPlugin, null),
-		                               new CleansingRain(mPlugin, null),
-		                               new HandOfLight(mPlugin, null),
-		                               new ClericPassive(mPlugin, null),
-		                               new DivineJustice(mPlugin, null),
-		                               new HeavenlyBoon(mPlugin, null),
-		                               new Crusade(mPlugin, null),
-		                               new Sanctified(mPlugin, null),
-		                               new SacredProvisions(mPlugin, null),
+			//********** CLERIC **********//
+			new Celestial(mPlugin, null),
+			new CleansingRain(mPlugin, null),
+			new HandOfLight(mPlugin, null),
+			new ClericPassive(mPlugin, null),
+			new DivineJustice(mPlugin, null),
+			new HeavenlyBoon(mPlugin, null),
+			new Crusade(mPlugin, null),
+			new Sanctified(mPlugin, null),
+			new SacredProvisions(mPlugin, null),
 
-		                               //********** WARLOCK **********//
-		                               new AmplifyingHex(mPlugin, null),
-		                               new BlasphemousAura(mPlugin, null),
-		                               new ConsumingFlames(mPlugin, null),
-		                               new CursedWound(mPlugin, null),
-		                               new GraspingClaws(mPlugin, null),
-		                               new WarlockPassive(mPlugin, null),
-		                               new Harvester(mPlugin, null),
-		                               new SoulRend(mPlugin, null),
-		                               new Exorcism(mPlugin, null),
+			//********** WARLOCK **********//
+			new AmplifyingHex(mPlugin, null),
+			new BlasphemousAura(mPlugin, null),
+			new ConsumingFlames(mPlugin, null),
+			new CursedWound(mPlugin, null),
+			new GraspingClaws(mPlugin, null),
+			new WarlockPassive(mPlugin, null),
+			new Harvester(mPlugin, null),
+			new SoulRend(mPlugin, null),
+			new Exorcism(mPlugin, null),
 
-		                               //********** ALCHEMIST **********//
-		                               new AlchemicalArtillery(mPlugin, null),
-		                               new BasiliskPoison(mPlugin, null),
-		                               new UnstableArrows(mPlugin, null),
-		                               new PowerInjection(mPlugin, null),
-		                               new IronTincture(mPlugin, null),
-		                               new GruesomeAlchemy(mPlugin, null),
-		                               new BrutalAlchemy(mPlugin, null),
-		                               new EnfeeblingElixir(mPlugin, null),
-		                               new AlchemistPotions(mPlugin, null)
-		                           ));
+			//********** ALCHEMIST **********//
+			new AlchemicalArtillery(mPlugin, null),
+			new BasiliskPoison(mPlugin, null),
+			new UnstableArrows(mPlugin, null),
+			new PowerInjection(mPlugin, null),
+			new IronTincture(mPlugin, null),
+			new GruesomeAlchemy(mPlugin, null),
+			new BrutalAlchemy(mPlugin, null),
+			new EnfeeblingElixir(mPlugin, null),
+			new AlchemistPotions(mPlugin, null)
+		));
 
 		List<Ability> specAbilities = Arrays.asList(
-                //********** MAGE **********//
-                // ELEMENTALIST
+				//********** MAGE **********//
+				// ELEMENTALIST
 				   // Starfall up above
-                new ElementalSpiritFire(mPlugin, null),
-                new ElementalSpiritIce(mPlugin, null),
-                new Blizzard(mPlugin, null),
-                new Starfall(mPlugin, null),
+				new ElementalSpiritFire(mPlugin, null),
+				new ElementalSpiritIce(mPlugin, null),
+				new Blizzard(mPlugin, null),
+				new Starfall(mPlugin, null),
 
-                // ARCANIST
-                new SpatialShatter(mPlugin, null),
-                new AstralOmen(mPlugin, null),
-                new SagesInsight(mPlugin, null),
+				// ARCANIST
+				new SpatialShatter(mPlugin, null),
+				new AstralOmen(mPlugin, null),
+				new SagesInsight(mPlugin, null),
 
-                //********** ROGUE **********//
-                // SWORDSAGE
-                new WindWalk(mPlugin, null),
-                new BladeDance(mPlugin, null),
-                new DeadlyRonde(mPlugin, null),
+				//********** ROGUE **********//
+				// SWORDSAGE
+				new WindWalk(mPlugin, null),
+				new BladeDance(mPlugin, null),
+				new DeadlyRonde(mPlugin, null),
 
-                // ASSASSIN
-                new BodkinBlitz(mPlugin, null),
-                new CloakAndDagger(mPlugin, null),
-                new CoupDeGrace(mPlugin, null),
+				// ASSASSIN
+				new BodkinBlitz(mPlugin, null),
+				new CloakAndDagger(mPlugin, null),
+				new CoupDeGrace(mPlugin, null),
 
-                //********** SCOUT **********//
-                // RANGER
-                new TacticalManeuver(mPlugin, null),
-                new Reflexes(mPlugin, null),
-                new Quickdraw(mPlugin, null),
+				//********** SCOUT **********//
+				// RANGER
+				new TacticalManeuver(mPlugin, null),
+				new Reflexes(mPlugin, null),
+				new Quickdraw(mPlugin, null),
 
-                // HUNTER
-                new EnchantedShot(mPlugin, null),
-                new PinningShot(mPlugin, null),
-                new SplitArrow(mPlugin, null),
+				// HUNTER
+				new EnchantedShot(mPlugin, null),
+				new PinningShot(mPlugin, null),
+				new SplitArrow(mPlugin, null),
 
-                //********** WARRIOR **********//
-                // BERSERKER
-                new MeteorSlam(mPlugin, null),
-                new Rampage(mPlugin, null),
+				//********** WARRIOR **********//
+				// BERSERKER
+				new MeteorSlam(mPlugin, null),
+				new Rampage(mPlugin, null),
 
-                // GUARDIAN
-                new ShieldWall(mPlugin, null),
-                new Challenge(mPlugin, null),
-                new Bodyguard(mPlugin, null),
+				// GUARDIAN
+				new ShieldWall(mPlugin, null),
+				new Challenge(mPlugin, null),
+				new Bodyguard(mPlugin, null),
 
-                //********** CLERIC **********//
-                // PALADIN
-                new HolyJavelin(mPlugin, null),
-                new ChoirBells(mPlugin, null),
-                new LuminousInfusion(mPlugin, null),
+				//********** CLERIC **********//
+				// PALADIN
+				new HolyJavelin(mPlugin, null),
+				new ChoirBells(mPlugin, null),
+				new LuminousInfusion(mPlugin, null),
 
-                // HIEROPHANT
-                new EnchantedPrayer(mPlugin, null),
-                new HallowedBeam(mPlugin, null),
-                new ThuribleProcession(mPlugin, null),
+				// HIEROPHANT
+				new EnchantedPrayer(mPlugin, null),
+				new HallowedBeam(mPlugin, null),
+				new ThuribleProcession(mPlugin, null),
 
-                //********** WARLOCK **********//
-                // REAPER
-                new DeathsTouch(mPlugin, null),
-                new GhoulishTaunt(mPlugin, null),
-                new DeathsTouchNonReaper(mPlugin, null),
+				//********** WARLOCK **********//
+				// REAPER
+				new DeathsTouch(mPlugin, null),
+				new GhoulishTaunt(mPlugin, null),
+				new DeathsTouchNonReaper(mPlugin, null),
 
-                // TENEBRIST
-                new EerieEminence(mPlugin, null),
-                new FractalEnervation(mPlugin, null),
-                new WitheringGaze(mPlugin, null),
+				// TENEBRIST
+				new EerieEminence(mPlugin, null),
+				new FractalEnervation(mPlugin, null),
+				new WitheringGaze(mPlugin, null),
 
-                //********** ALCHEMIST **********//
-                // HARBINGER
-                new ScorchedEarth(mPlugin, null),
-                new NightmarishAlchemy(mPlugin, null),
-                new PurpleHaze(mPlugin, null),
+				//********** ALCHEMIST **********//
+				// HARBINGER
+				new ScorchedEarth(mPlugin, null),
+				new NightmarishAlchemy(mPlugin, null),
+				new PurpleHaze(mPlugin, null),
 
-                // APOTHECARY
-                new AlchemicalAmalgam(mPlugin, null),
-                new InvigoratingOdor(mPlugin, null),
-                new WardingRemedy(mPlugin, null),
-                new WardingRemedyNonApothecary(mPlugin, null)
-            );
+				// APOTHECARY
+				new AlchemicalAmalgam(mPlugin, null),
+				new InvigoratingOdor(mPlugin, null),
+				new WardingRemedy(mPlugin, null),
+				new WardingRemedyNonApothecary(mPlugin, null)
+			);
 
 		if (ServerProperties.getClassSpecializationsEnabled()) {
 			mReferenceAbilities.addAll(specAbilities);
@@ -395,27 +395,27 @@ public class AbilityManager {
 
 		// These abilities should trigger after all event damage is calculated
 		mReferenceAbilities.addAll(Arrays.asList(
-									   //********** DELVES **********//
-                                       new StatMultiplier(mPlugin, null),
-		                               new Relentless(mPlugin, null),
-		                               new Arcanic(mPlugin, null),
-		                               new Infernal(mPlugin, null),
-		                               new Transcendent(mPlugin, null),
-		                               new Spectral(mPlugin, null),
-		                               new Dreadful(mPlugin, null),
-		                               new Colossal(mPlugin, null),
-		                               new Chivalrous(mPlugin, null),
-		                               new Pernicious(mPlugin, null),
-		                               new Legionary(mPlugin, null),
-		                               new Bloodthirsty(mPlugin, null),
-		                               new Carapace(mPlugin, null),
-		                               new Entropy(mPlugin, null),
-		                               new Twisted(mPlugin, null),
+			//********** DELVES **********//
+			new StatMultiplier(mPlugin, null),
+			new Relentless(mPlugin, null),
+			new Arcanic(mPlugin, null),
+			new Infernal(mPlugin, null),
+			new Transcendent(mPlugin, null),
+			new Spectral(mPlugin, null),
+			new Dreadful(mPlugin, null),
+			new Colossal(mPlugin, null),
+			new Chivalrous(mPlugin, null),
+			new Pernicious(mPlugin, null),
+			new Legionary(mPlugin, null),
+			new Bloodthirsty(mPlugin, null),
+			new Carapace(mPlugin, null),
+			new Entropy(mPlugin, null),
+			new Twisted(mPlugin, null),
 
-		                               new FinishingBlow(mPlugin, null),
-									   new PrismaticShield(mPlugin, null),
-		                               new EscapeDeath(mPlugin, null)
-		                           ));
+			new FinishingBlow(mPlugin, null),
+			new PrismaticShield(mPlugin, null),
+			new EscapeDeath(mPlugin, null)
+		));
 	}
 
 	public static AbilityManager getManager() {
@@ -607,8 +607,8 @@ public class AbilityManager {
 				// Do not allow any skills with no cooldown to apply damage more than once
 				// Always allow sweep attacks to go through for things like Deadly Ronde
 				if (event.getCause() != DamageCause.ENTITY_SWEEP_ATTACK && !abil.getInfo().mIgnoreTriggerCap
-				    && (abil.getInfo().mCooldown == 0 || abil.getInfo().mIgnoreCooldown)
-				    && !MetadataUtils.checkOnceThisTick(mPlugin, player, i + "LivingEntityDamagedByPlayerEventTickTriggered")) {
+					&& (abil.getInfo().mCooldown == 0 || abil.getInfo().mIgnoreCooldown)
+					&& !MetadataUtils.checkOnceThisTick(mPlugin, player, i + "LivingEntityDamagedByPlayerEventTickTriggered")) {
 					return true;
 				}
 				if (!abil.livingEntityDamagedByPlayerEvent(event)) {
@@ -684,12 +684,12 @@ public class AbilityManager {
 	}
 
 	public boolean playerSplashPotionEvent(Player player, Collection<LivingEntity> affectedEntities,
-	                                       ThrownPotion potion, PotionSplashEvent event) {
+										   ThrownPotion potion, PotionSplashEvent event) {
 		return conditionalCastCancellable(player, (ability) -> ability.playerSplashPotionEvent(affectedEntities, potion, event));
 	}
 
 	public boolean playerSplashedByPotionEvent(Player player, Collection<LivingEntity> affectedEntities,
-	                                           ThrownPotion potion, PotionSplashEvent event) {
+											   ThrownPotion potion, PotionSplashEvent event) {
 		return conditionalCastCancellable(player, (ability) -> ability.playerSplashedByPotionEvent(affectedEntities, potion, event));
 	}
 
@@ -762,7 +762,7 @@ public class AbilityManager {
 	public void playerAnimationEvent(Player player, PlayerAnimationEvent event) {
 		conditionalCast(player, (ability) -> ability.playerAnimationEvent(event));
 	}
-	
+
 	public void playerSwapHandItemsEvent(Player player, PlayerSwapHandItemsEvent event) {
 		conditionalCast(player, (ability) -> ability.playerSwapHandItemsEvent(event));
 	}
@@ -770,38 +770,43 @@ public class AbilityManager {
 	public void playerInteractEvent(Player player, Action action, ItemStack itemInHand, Material blockClicked) {
 		// Right clicking sometimes counts as two clicks, so make sure this can only be triggered once per tick
 		if (MetadataUtils.checkOnceThisTick(mPlugin, player, CLICK_TICK_METAKEY)) {
-			for (Ability abil : getPlayerAbilities(player).getAbilities()) {
-				AbilityInfo info = abil.getInfo();
-				if (info.mTrigger != null) {
-					if (info.mTrigger == AbilityTrigger.LEFT_CLICK) {
-						if (action == Action.LEFT_CLICK_AIR || action == Action.LEFT_CLICK_BLOCK) {
-							if (abil.runCheck() && !abil.isOnCooldown()) {
-								abil.cast(action);
+			for (Ability ability : getPlayerAbilities(player).getAbilities()) {
+				AbilityInfo abilityInfo = ability.getInfo();
+				if (abilityInfo.mTrigger != null) {
+					if (abilityInfo.mTrigger == AbilityTrigger.LEFT_CLICK) {
+						if (
+							action == Action.LEFT_CLICK_AIR
+							|| action == Action.LEFT_CLICK_BLOCK
+						) {
+							if (ability.canCast()) {
+								ability.cast(action);
 							}
 						}
-					} else if (info.mTrigger == AbilityTrigger.RIGHT_CLICK) {
-						if (action == Action.RIGHT_CLICK_AIR
-						    || (action == Action.RIGHT_CLICK_BLOCK && !ItemUtils.interactableBlocks.contains(blockClicked))) {
-							if (abil.runCheck() && !abil.isOnCooldown()) {
-								abil.cast(action);
+					} else if (abilityInfo.mTrigger == AbilityTrigger.RIGHT_CLICK) {
+						if (
+							action == Action.RIGHT_CLICK_AIR
+							|| (action == Action.RIGHT_CLICK_BLOCK && !ItemUtils.interactableBlocks.contains(blockClicked))
+						) {
+							if (ability.canCast()) {
+								ability.cast(action);
 							}
 						}
-					} else if (info.mTrigger == AbilityTrigger.LEFT_CLICK_AIR) {
+					} else if (abilityInfo.mTrigger == AbilityTrigger.LEFT_CLICK_AIR) {
 						if (action == Action.LEFT_CLICK_AIR) {
-							if (abil.runCheck() && !abil.isOnCooldown()) {
-								abil.cast(action);
+							if (ability.canCast()) {
+								ability.cast(action);
 							}
 						}
-					} else if (info.mTrigger == AbilityTrigger.RIGHT_CLICK_AIR) {
+					} else if (abilityInfo.mTrigger == AbilityTrigger.RIGHT_CLICK_AIR) {
 						if (action == Action.RIGHT_CLICK_AIR) {
-							if (abil.runCheck() && !abil.isOnCooldown()) {
-								abil.cast(action);
+							if (ability.canCast()) {
+								ability.cast(action);
 							}
 						}
-					} else if (info.mTrigger == AbilityTrigger.ALL) {
-						if (abil.runCheck() && !abil.isOnCooldown()) {
-                            abil.cast(action);
-                       }
+					} else if (abilityInfo.mTrigger == AbilityTrigger.ALL) {
+						if (ability.canCast()) {
+							ability.cast(action);
+						}
 					}
 				}
 			}

@@ -28,19 +28,22 @@ import org.bukkit.util.Vector;
 
 
 public class ElementalSpiritIce extends Ability {
+	public static final Spells SPELL = Spells.ELEMENTAL_SPIRIT_ICE;
+
 	public static final int DAMAGE_1 = 4;
 	public static final int DAMAGE_2 = 6;
 	public static final int SIZE = 3;
 	public static final double BOW_MULTIPLIER_1 = 0.1;
+	public static final int BOW_PERCENTAGE_1 = (int)(BOW_MULTIPLIER_1 * 100);
 	public static final double BOW_MULTIPLIER_2 = 0.15;
-	public static final int BOW_PERCENTAGE_1 = (int) (BOW_MULTIPLIER_1 * 100);
-	public static final int BOW_PERCENTAGE_2 = (int) (BOW_MULTIPLIER_2 * 100);
+	public static final int BOW_PERCENTAGE_2 = (int)(BOW_MULTIPLIER_2 * 100);
 	public static final int PULSE_INTERVAL = 20;
 	public static final int PULSES = 3;
+	public static final int COOLDOWN_TICKS = ElementalSpiritFire.COOLDOWN_TICKS;
 
-	private final Set<LivingEntity> mEnemiesAffected = new HashSet<>();
 	private final int mLevelDamage;
-	private final double mElementalArrowsBowDamage;
+	private final double mLevelBowMultiplier;
+	private final Set<LivingEntity> mEnemiesAffected = new HashSet<>();
 
 	private ElementalArrows mElementalArrows;
 	private BukkitRunnable mEnemiesAffectedProcessor;
@@ -52,13 +55,15 @@ public class ElementalSpiritIce extends Ability {
 		 * This variant also does not have a description
 		 */
 		super(plugin, player, null);
+		mInfo.mLinkedSpell = SPELL;
 
-		mInfo.mLinkedSpell = Spells.ELEMENTAL_SPIRIT_ICE;
 		mInfo.mScoreboardId = "ElementalSpirit";
-		mInfo.mCooldown = ElementalSpiritFire.COOLDOWN;
+		mInfo.mCooldown = COOLDOWN_TICKS;
 
-		mLevelDamage = getAbilityScore() == 1 ? DAMAGE_1 : DAMAGE_2;
-		mElementalArrowsBowDamage = getAbilityScore() == 1 ? BOW_MULTIPLIER_1 : BOW_MULTIPLIER_2;
+		boolean isUpgraded = getAbilityScore() == 2;
+		mLevelDamage = isUpgraded ? DAMAGE_2 : DAMAGE_1;
+		mLevelBowMultiplier = isUpgraded ? BOW_MULTIPLIER_2 : BOW_MULTIPLIER_1;
+
 		Bukkit.getScheduler().runTask(plugin, () -> {
 			if (player != null) {
 				mElementalArrows = AbilityManager.getManager().getPlayerAbility(mPlayer, ElementalArrows.class);
@@ -96,6 +101,7 @@ public class ElementalSpiritIce extends Ability {
 
 							Location damageCentre = closestEnemy.getLocation();
 							Location particleCentre = damageCentre.clone().add(0, closestEnemy.getHeight() / 2, 0);
+							float spellDamage = SpellDamage.getSpellDamage(mPlayer, mLevelDamage);
 							new BukkitRunnable() {
 								int mPulses = 1; // The current pulse for this run
 
@@ -107,17 +113,14 @@ public class ElementalSpiritIce extends Ability {
 									world.playSound(particleCentre, Sound.ENTITY_TURTLE_HURT_BABY, 1, 0.2f);
 									world.playSound(particleCentre, Sound.BLOCK_GLASS_BREAK, 0.5f, 0.05f);
 
-									float spellDamage = SpellDamage.getSpellDamage(mPlayer, mLevelDamage);
 									for (LivingEntity mob : EntityUtils.getNearbyMobs(damageCentre, SIZE)) {
 										float finalDamage = spellDamage;
 										if (event.getSpell().equals(Spells.ELEMENTAL_ARROWS) && mElementalArrows != null) {
-											finalDamage += mElementalArrows.getLastDamage() * mElementalArrowsBowDamage;
+											finalDamage += mElementalArrows.getLastDamage() * mLevelBowMultiplier;
 										}
 
-										//TODO true damage bypass instead of iframe reset - https://discord.com/channels/186225508562763776/186225918086217729/816701492000981014
-										mob.setNoDamageTicks(0);
-										EntityUtils.damageEntity(mPlugin, mob, finalDamage, mPlayer, MagicType.ICE, true, mInfo.mLinkedSpell);
-										mob.setVelocity(new Vector(0, 0, 0));
+										EntityUtils.damageEntity(mPlugin, mob, finalDamage, mPlayer, MagicType.ICE, true, mInfo.mLinkedSpell, true, true, true);
+										mob.setVelocity(new Vector());
 									}
 
 									if (mPulses >= PULSES) {
@@ -169,7 +172,7 @@ public class ElementalSpiritIce extends Ability {
 					}
 
 					if (
-						mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), Spells.ELEMENTAL_SPIRIT_FIRE)
+						isTimerActive(ElementalSpiritFire.SPELL)
 						|| AbilityManager.getManager().getPlayerAbility(mPlayer, ElementalSpiritFire.class) == null
 						|| !mPlayer.isValid() // Ensure player is not dead, is still online?
 					) {

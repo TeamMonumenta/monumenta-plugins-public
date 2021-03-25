@@ -4,6 +4,10 @@ package com.playmonumenta.plugins.bosses.spells.kaul;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
+
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.Location;
@@ -14,9 +18,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
-import com.playmonumenta.plugins.bosses.spells.Spell;
-import com.playmonumenta.plugins.utils.BossUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
+
 
 /*
  * Lighting Storm : if a player is higher than 2 blocks
@@ -63,7 +65,7 @@ public class SpellLightningStorm extends Spell {
 				// If truly in the air (not on ground and not climbing - like the Thunder Step requirement),
 				// have relaxed 5-block threshold.
 				// Eg recoil, jump boost, Primordial yeet
-				if (PlayerUtils.notOnGround(player)) {
+				if (PlayerUtils.isAirborne(player)) {
 					// When the player is > 5 blocks above the arena surface,
 					// the block Y-5 below them is above the surface level of the arena.
 					// This would usually not be solid, similar to the previous implementation's !isSolid() check

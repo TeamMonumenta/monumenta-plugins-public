@@ -21,6 +21,7 @@ import org.bukkit.metadata.FixedMetadataValue;
 
 public class ElementalArrows extends Ability {
 	public static final String NAME = "Elemental Arrows";
+	public static final Spells SPELL = Spells.ELEMENTAL_ARROWS;
 
 	public static final double DAMAGE_MULTIPLIER_1 = 0.1;
 	public static final double DAMAGE_MULTIPLIER_2 = 0.2;
@@ -33,7 +34,8 @@ public class ElementalArrows extends Ability {
 
 	public ElementalArrows(Plugin plugin, Player player) {
 		super(plugin, player, NAME);
-		mInfo.mLinkedSpell = Spells.ELEMENTAL_ARROWS;
+		mInfo.mLinkedSpell = SPELL;
+
 		mInfo.mScoreboardId = "Elemental";
 		mInfo.mShorthandName = "EA";
 		mInfo.mDescriptions.add("Your arrows are set on fire. If you are shooting an arrow while sneaking, it turns into an ice arrow instead, afflicting the target with 20% Slowness for 6 seconds. Fire and Ice arrows deal 10% extra damage. Ice arrows deal 8 extra damage to Blazes. Fire arrows deal 8 extra damage to strays. This skill can not apply Spellshock.");

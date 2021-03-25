@@ -1,7 +1,8 @@
 package com.playmonumenta.plugins.classes.magic;
 
-public enum MagicType {
 
+
+public enum MagicType {
 	ARCANE,
 	FIRE,
 	ICE,
@@ -11,6 +12,4 @@ public enum MagicType {
 	ALCHEMY,
 	NONE,
 	HOLY;
-
-
 }

@@ -9,15 +9,6 @@ import java.util.ListIterator;
 import java.util.NavigableSet;
 import java.util.Set;
 
-import org.bukkit.Location;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
-import org.bukkit.World;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.util.Vector;
-
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.classes.Spells;
@@ -33,6 +24,17 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.scriptedquests.utils.MetadataUtils;
 
+import org.bukkit.Location;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
+import org.bukkit.World;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.util.Vector;
+
+
+
 public class Spellshock extends Ability {
 	public static class SpellshockRadiusEnchantment extends BaseAbilityEnchantment {
 		public SpellshockRadiusEnchantment() {
@@ -46,27 +48,30 @@ public class Spellshock extends Ability {
 		}
 	}
 
-	private static final String DAMAGED_THIS_TICK_METAKEY = "SpellShockDamagedThisTick";
+	public static final String NAME = "Spellshock";
+	public static final Spells SPELL = Spells.SPELLSHOCK;
+	public static final String DAMAGED_THIS_TICK_METAKEY = "SpellShockDamagedThisTick";
+	public static final String SPELL_SHOCK_STATIC_EFFECT_NAME = "SpellShockStaticEffect";
+	public static final String PERCENT_SPEED_EFFECT_NAME = "SpellShockPercentSpeedEffect";
 
-	private static final String SPELL_SHOCK_STATIC_EFFECT_NAME = "SpellShockStaticEffect";
-	private static final String PERCENT_SPEED_EFFECT_NAME = "SpellShockPercentSpeedEffect";
-	private static final int DURATION = 6 * 20;
-	private static final double PERCENT_SPEED_EFFECT_2 = 0.15;
+	public static final float DAMAGE_1 = 2.5f;
+	public static final float DAMAGE_2 = 4.0f;
+	public static final int SIZE = 3;
+	public static final double SPEED_MULTIPLIER = 0.15;
+	public static final int DURATION_TICKS = 6 * 20;
 
-	private static final float DAMAGE_1 = 2.5f;
-	private static final float DAMAGE_2 = 4.0f;
-	private static final int RADIUS = 3;
-
-	private final float mDamage;
+	private final float mLevelDamage;
 
 	public Spellshock(Plugin plugin, Player player) {
-		super(plugin, player, "Spellshock");
-		mInfo.mLinkedSpell = Spells.SPELLSHOCK;
+		super(plugin, player, NAME);
+		mInfo.mLinkedSpell = SPELL;
+
 		mInfo.mScoreboardId = "SpellShock";
 		mInfo.mShorthandName = "SS";
 		mInfo.mDescriptions.add("Hitting an enemy with a wand or spell inflicts static for 6 seconds. If an enemy with static is hit by another spell, a spellshock centered on the enemy deals 2.5 damage to all mobs in a 3 block radius. Spellshock can cause a chain reaction on enemies with static. An enemy can only be hit by a spellshock once per tick.");
 		mInfo.mDescriptions.add("Damage is increased to 4. Additionally, gain +15% speed for 6 seconds whenever a spellshock is triggered.");
-		mDamage = getAbilityScore() == 1 ? DAMAGE_1 : DAMAGE_2;
+
+		mLevelDamage = getAbilityScore() == 2 ? DAMAGE_2 : DAMAGE_1;
 	}
 
 	@Override
@@ -85,7 +90,7 @@ public class Spellshock extends Ability {
 				effectOriginal.trigger();
 
 				if (getAbilityScore() > 1) {
-					mPlugin.mEffectManager.addEffect(mPlayer, PERCENT_SPEED_EFFECT_NAME, new PercentSpeed(DURATION, PERCENT_SPEED_EFFECT_2, PERCENT_SPEED_EFFECT_NAME));
+					mPlugin.mEffectManager.addEffect(mPlayer, PERCENT_SPEED_EFFECT_NAME, new PercentSpeed(DURATION_TICKS, SPEED_MULTIPLIER, PERCENT_SPEED_EFFECT_NAME));
 				}
 
 				Location loc = mob.getLocation().add(0, 1, 0);
@@ -102,8 +107,8 @@ public class Spellshock extends Ability {
 				List<LivingEntity> triggeredMobs = new LinkedList<LivingEntity>();
 				triggeredMobs.add(mob);
 
-				int radius = (int) SpellshockRadiusEnchantment.getRadius(mPlayer, RADIUS, SpellshockRadiusEnchantment.class);
-				float damage = mDamage + SpellshockDamageEnchantment.getExtraDamage(mPlayer, SpellshockDamageEnchantment.class);
+				int radius = (int) SpellshockRadiusEnchantment.getRadius(mPlayer, SIZE, SpellshockRadiusEnchantment.class);
+				float damage = mLevelDamage + SpellshockDamageEnchantment.getExtraDamage(mPlayer, SpellshockDamageEnchantment.class);
 				damage = SpellDamage.getSpellDamage(mPlayer, damage);
 				/*
 				 * Loop through triggeredMobs, and check distances to each in nearbyMobs. If in range,
@@ -161,17 +166,17 @@ public class Spellshock extends Ability {
 			if (effectGroup != null) {
 				SpellShockStatic effect = (SpellShockStatic) effectGroup.last();
 				if (!effect.isTriggered()) {
-					effect.setDuration(DURATION);
+					effect.setDuration(DURATION_TICKS);
 				}
 			} else {
-				mPlugin.mEffectManager.addEffect(mob, SPELL_SHOCK_STATIC_EFFECT_NAME, new SpellShockStatic(DURATION));
+				mPlugin.mEffectManager.addEffect(mob, SPELL_SHOCK_STATIC_EFFECT_NAME, new SpellShockStatic(DURATION_TICKS));
 			}
 		}
 	}
 
 	@Override
 	public boolean livingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
-		mPlugin.mEffectManager.addEffect(event.getEntity(), SPELL_SHOCK_STATIC_EFFECT_NAME, new SpellShockStatic(DURATION));
+		mPlugin.mEffectManager.addEffect(event.getEntity(), SPELL_SHOCK_STATIC_EFFECT_NAME, new SpellShockStatic(DURATION_TICKS));
 		return true;
 	}
 
@@ -179,5 +184,4 @@ public class Spellshock extends Ability {
 	public boolean runCheck() {
 		return InventoryUtils.isWandItem(mPlayer.getInventory().getItemInMainHand());
 	}
-
 }

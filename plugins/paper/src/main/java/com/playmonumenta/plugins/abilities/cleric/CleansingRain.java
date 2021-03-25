@@ -2,6 +2,16 @@ package com.playmonumenta.plugins.abilities.cleric;
 
 import java.util.EnumSet;
 
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.abilities.AbilityTrigger;
+import com.playmonumenta.plugins.classes.Spells;
+import com.playmonumenta.plugins.enchantments.BaseAbilityEnchantment;
+import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
+import com.playmonumenta.plugins.potion.PotionManager.PotionID;
+import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.utils.PotionUtils;
+
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -13,18 +23,9 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.abilities.AbilityTrigger;
-import com.playmonumenta.plugins.classes.Spells;
-import com.playmonumenta.plugins.enchantments.BaseAbilityEnchantment;
-import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
-import com.playmonumenta.plugins.potion.PotionManager.PotionID;
-import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.plugins.utils.PotionUtils;
+
 
 public class CleansingRain extends Ability {
-
 	public static class CleansingRainCooldownEnchantment extends BaseAbilityEnchantment {
 		public CleansingRainCooldownEnchantment() {
 			super("Cleansing Rain Cooldown", EnumSet.of(ItemSlot.ARMOR));
@@ -44,7 +45,7 @@ public class CleansingRain extends Ability {
 	private static final int CLEANSING_RADIUS = 4;
 	private static final int CLEANSING_1_COOLDOWN = 45 * 20;
 	private static final int CLEANSING_2_COOLDOWN = 30 * 20;
-	private static final double CLEANSING_ANGLE = 50.0;
+	private static final int ANGLE = -45; // Looking straight up is -90. This is 45 degrees of pitch allowance
 
 	public CleansingRain(Plugin plugin, Player player) {
 		super(plugin, player, "Cleansing Rain");
@@ -103,9 +104,8 @@ public class CleansingRain extends Ability {
 		ItemStack offHand = mPlayer.getInventory().getItemInOffHand();
 		ItemStack mainHand = mPlayer.getInventory().getItemInMainHand();
 		return mPlayer.isSneaking()
-				&& mPlayer.getLocation().getPitch() < -CLEANSING_ANGLE
+				&& mPlayer.getLocation().getPitch() < ANGLE
 				&& mainHand.getType() != Material.BOW
 				&& offHand.getType() != Material.BOW;
 	}
-
 }

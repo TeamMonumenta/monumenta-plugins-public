@@ -28,11 +28,11 @@ public abstract class Effect implements Comparable<Effect> {
 	public double getMagnitude() {
 		return 0;
 	}
-	
+
 	public void clearEffect() {
 		mDuration = 0;
 	}
-	
+
 	@Override
 	public int compareTo(Effect otherEffect) {
 		if (getMagnitude() > otherEffect.getMagnitude()) {
@@ -62,6 +62,10 @@ public abstract class Effect implements Comparable<Effect> {
 
 	public void entityLoseEffect(Entity entity) { }
 
+	/**
+	 * @param ticks Ticks passed since the last time this method was called to check duration expiry
+	 * @return Returns true if effect has expired and should be removed by the EffectManager
+	 */
 	public boolean tick(int ticks) {
 		mDuration -= ticks;
 		return mDuration <= 0;

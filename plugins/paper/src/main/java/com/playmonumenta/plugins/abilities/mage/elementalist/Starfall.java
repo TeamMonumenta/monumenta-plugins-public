@@ -1,78 +1,104 @@
 package com.playmonumenta.plugins.abilities.mage.elementalist;
 
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.classes.Spells;
+import com.playmonumenta.plugins.classes.magic.MagicType;
+import com.playmonumenta.plugins.enchantments.SpellDamage;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.utils.MovementUtils;
+
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.block.Action;
-import org.bukkit.inventory.ItemStack;
+import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
-import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.abilities.AbilityManager;
-import com.playmonumenta.plugins.abilities.AbilityTrigger;
-import com.playmonumenta.plugins.classes.Spells;
-import com.playmonumenta.plugins.classes.magic.MagicType;
-import com.playmonumenta.plugins.enchantments.SpellDamage;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.InventoryUtils;
-import com.playmonumenta.plugins.utils.MessagingUtils;
-import com.playmonumenta.plugins.utils.MovementUtils;
+
 
 public class Starfall extends Ability {
-	private static final double STARFALL_ANGLE = 70.0;
+	public static final String NAME = "Starfall";
+	public static final Spells SPELL = Spells.STARFALL;
 
-	private static final int STARFALL_COOLDOWN = 20 * 18;
-	private static final int STARFALL_1_DAMAGE = 15;
-	private static final int STARFALL_2_DAMAGE = 27;
-	private static final int STARFALL_FIRE_DURATION = 20 * 3;
-	private static final double STARFALL_RADIUS = 5;
-	private static final float STARFALL_KNOCKAWAY_SPEED = 0.7f;
+	public static final int DAMAGE_1 = 15;
+	public static final int DAMAGE_2 = 27;
+	public static final int SIZE = 5;
+	public static final int DISTANCE = 25;
+	public static final int FIRE_SECONDS = 3;
+	public static final int FIRE_TICKS = FIRE_SECONDS * 20;
+	public static final float KNOCKBACK = 0.7f;
+	public static final int COOLDOWN_SECONDS = 18;
+	public static final int COOLDOWN_TICKS = COOLDOWN_SECONDS * 20;
 
-	private final int mDamage;
-
-	/* The player's getTicksLived() when the skill was last primed or cast */
-	private int mPrimedTick = -1;
+	private final int mLevelDamage;
 
 	public Starfall(Plugin plugin, Player player) {
-		super(plugin, player, "Starfall");
-		mInfo.mLinkedSpell = Spells.STARFALL;
-		mInfo.mScoreboardId = "Starfall";
+		super(plugin, player, NAME);
+		mInfo.mLinkedSpell = SPELL;
+
+		mInfo.mScoreboardId = NAME;
 		mInfo.mShorthandName = "SF";
-		mInfo.mDescriptions.add("Press the swap key while holding a wand to summon a meteor where the player is looking (up to 25 blocks). It deals 15 damage in a 5 block radius and sets enemies on fire for 3 seconds. Cooldown: 18s.");
-		mInfo.mDescriptions.add("Damage is increased to 27.");
-		mInfo.mCooldown = STARFALL_COOLDOWN;
-		mDamage = getAbilityScore() == 1 ? STARFALL_1_DAMAGE : STARFALL_2_DAMAGE;
+		mInfo.mDescriptions.add(
+			String.format(
+				"While holding a wand, pressing the swap key marks where you're looking, up to %s blocks away. You summon a falling meteor above the mark that lands strongly, dealing %s damage to all enemies in a %s-block cube around it, setting them on fire for %ss, and knocking them away. Swapping hands while holding a wand no longer does its vanilla function. Cooldown: %ss.",
+				DISTANCE,
+				DAMAGE_1,
+				SIZE,
+				FIRE_SECONDS,
+				COOLDOWN_SECONDS
+			)
+		);
+		mInfo.mDescriptions.add(
+			String.format(
+				"Damage is increased from %s to %s.",
+				DAMAGE_1,
+				DAMAGE_2
+			)
+		);
+		mInfo.mCooldown = COOLDOWN_TICKS;
+		mInfo.mIgnoreCooldown = true;
+
+		mLevelDamage = getAbilityScore() == 2 ? DAMAGE_2 : DAMAGE_1;
 	}
-	
+
 	@Override
 	public void playerSwapHandItemsEvent(PlayerSwapHandItemsEvent event) {
-		ItemStack mainHandItem = mPlayer.getInventory().getItemInMainHand();
-		if (InventoryUtils.isWandItem(mainHandItem) && !mPlayer.isSneaking()) {
+		if (
+			InventoryUtils.isWandItem(
+				mPlayer.getInventory().getItemInMainHand()
+			)
+		) {
 			event.setCancelled(true);
-			
-			Location loc = mPlayer.getEyeLocation();
-			World world = mPlayer.getWorld();
-			world.playSound(mPlayer.getLocation(), Sound.ENTITY_BLAZE_SHOOT, 1, 0.85f);
-			world.spawnParticle(Particle.LAVA, mPlayer.getLocation(), 15, 0.25f, 0.1f, 0.25f);
-			world.spawnParticle(Particle.FLAME, mPlayer.getLocation(), 30, 0.25f, 0.1f, 0.25f, 0.15f);
-			Vector dir = loc.getDirection().normalize();
-			for (int i = 0; i < 25; i++) {
-				loc.add(dir);
 
-				mPlayer.spawnParticle(Particle.FLAME, loc, 1, 0, 0, 0, 0);
-				int size = EntityUtils.getNearbyMobs(loc, 2, mPlayer).size();
-				if (loc.getBlock().getType().isSolid() || i >= 24 || size > 0) {
-					launchMeteor(mPlayer, loc);
-					break;
+			if (
+				!isTimerActive()
+				&& !mPlayer.isSneaking()
+			) {
+				putOnCooldown();
+
+				Location loc = mPlayer.getEyeLocation();
+				World world = mPlayer.getWorld();
+				world.playSound(mPlayer.getLocation(), Sound.ENTITY_BLAZE_SHOOT, 1, 0.85f);
+				world.spawnParticle(Particle.LAVA, mPlayer.getLocation(), 15, 0.25f, 0.1f, 0.25f);
+				world.spawnParticle(Particle.FLAME, mPlayer.getLocation(), 30, 0.25f, 0.1f, 0.25f, 0.15f);
+				Vector dir = loc.getDirection().normalize();
+				for (int i = 0; i < DISTANCE; i++) {
+					loc.add(dir);
+
+					mPlayer.spawnParticle(Particle.FLAME, loc, 1, 0, 0, 0, 0);
+					int size = EntityUtils.getNearbyMobs(loc, 2, mPlayer).size();
+					if (loc.getBlock().getType().isSolid() || i >= 24 || size > 0) {
+						launchMeteor(mPlayer, loc);
+						break;
+					}
 				}
 			}
-			
+
 			putOnCooldown();
 		}
 	}
@@ -96,12 +122,12 @@ public class Starfall extends Ability {
 							world.spawnParticle(Particle.EXPLOSION_NORMAL, loc, 50, 0, 0, 0, 0.2F);
 							this.cancel();
 
-							float damage = SpellDamage.getSpellDamage(mPlayer, mDamage);
+							float damage = SpellDamage.getSpellDamage(mPlayer, mLevelDamage);
 
-							for (LivingEntity e : EntityUtils.getNearbyMobs(loc, STARFALL_RADIUS, mPlayer)) {
+							for (LivingEntity e : EntityUtils.getNearbyMobs(loc, SIZE, mPlayer)) {
 								EntityUtils.damageEntity(mPlugin, e, damage, player, MagicType.FIRE, true, mInfo.mLinkedSpell);
-								EntityUtils.applyFire(mPlugin, STARFALL_FIRE_DURATION, e, mPlayer);
-								MovementUtils.knockAway(loc, e, STARFALL_KNOCKAWAY_SPEED);
+								EntityUtils.applyFire(mPlugin, FIRE_TICKS, e, mPlayer);
+								MovementUtils.knockAway(loc, e, KNOCKBACK);
 							}
 							break;
 						}
