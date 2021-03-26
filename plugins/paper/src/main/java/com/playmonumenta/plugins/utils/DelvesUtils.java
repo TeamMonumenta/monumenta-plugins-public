@@ -935,6 +935,8 @@ public class DelvesUtils {
 			if (depthPoints < MINIMUM_DEPTH_POINTS) {
 				lore.add(ChatColor.RED + "- Requires " + MINIMUM_DEPTH_POINTS + " Depth Points to begin");
 				mCanBeginDelve = false;
+			} else {
+				mCanBeginDelve = true;
 			}
 
 			meta.setLore(lore);
