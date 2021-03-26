@@ -26,7 +26,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 
 public class GraveManager {
-	private static final String KEY_PLUGIN_DATA = "MonumentaGraves";
+	private static final String KEY_PLUGIN_DATA = "MonumentaGravesV2";
 	private static final String KEY_GRAVES = "graves";
 	private static final String KEY_THROWN_ITEMS = "thrown_items";
 	private static final HashMap<UUID,GraveManager> INSTANCES = new HashMap<>();
@@ -131,13 +131,16 @@ public class GraveManager {
 	}
 
 	public static void onChunkLoad(ChunkLoadEvent event) {
-		for (Grave grave : getUnloadedGraves(event.getChunk().getChunkKey())) {
+		HashSet<Grave> graves = new HashSet<>(getUnloadedGraves(event.getChunk().getChunkKey()));
+		for (Grave grave : graves) {
 			grave.onChunkLoad();
 		}
-		for (GraveItem item : getUnloadedGraveItems(event.getChunk().getChunkKey())) {
+		HashSet<GraveItem> graveItems = new HashSet<>(getUnloadedGraveItems(event.getChunk().getChunkKey()));
+		for (GraveItem item : graveItems) {
 			item.onChunkLoad();
 		}
-		for (ThrownItem item : getUnloadedThrownItems(event.getChunk().getChunkKey())) {
+		HashSet<ThrownItem> thrownItems = new HashSet<>(getUnloadedThrownItems(event.getChunk().getChunkKey()));
+		for (ThrownItem item : thrownItems) {
 			item.onChunkLoad();
 		}
 	}

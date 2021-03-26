@@ -389,8 +389,8 @@ public class GraveItem {
 	}
 
 	void onChunkUnload() {
-		remove(mStatus);
-		if (mLocation != null) {
+		if (mStatus == Status.DROPPED) {
+			remove(Status.DROPPED);
 			mManager.addUnloadedItem(Chunk.getChunkKey(mLocation), this);
 		}
 	}

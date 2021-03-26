@@ -56,6 +56,8 @@ public class Grave {
 	private static final String KEY_X = "x";
 	private static final String KEY_Y = "y";
 	private static final String KEY_Z = "z";
+	private static final String KEY_YAW = "yaw";
+	private static final String KEY_PITCH = "pitch";
 	private static final List<String> KEYS_POSE_PARTS = Arrays.asList(KEY_POSE_HEAD, KEY_POSE_BODY, KEY_POSE_LEFT_ARM, KEY_POSE_RIGHT_ARM, KEY_POSE_LEFT_LEG, KEY_POSE_RIGHT_LEG);
 	private static final List<String> KEYS_EQUIPMENT_PARTS = Arrays.asList(KEY_EQUIPMENT_HEAD, KEY_EQUIPMENT_BODY, KEY_EQUIPMENT_LEGS, KEY_EQUIPMENT_FEET, KEY_EQUIPMENT_HAND, KEY_EQUIPMENT_OFF_HAND);
 
@@ -360,6 +362,7 @@ public class Grave {
 
 	void onChunkUnload() {
 		remove();
+		mManager.addUnloadedGrave(Chunk.getChunkKey(mLocation), this);
 	}
 
 	void onDeath() {
@@ -564,7 +567,9 @@ public class Grave {
 			double x = loc.get(KEY_X).getAsDouble();
 			double y = loc.get(KEY_Y).getAsDouble();
 			double z = loc.get(KEY_Z).getAsDouble();
-			location = new Location(null,x,y,z);
+			float yaw = loc.get(KEY_YAW).getAsFloat();
+			float pitch = loc.get(KEY_PITCH).getAsFloat();
+			location = new Location(null,x,y,z, yaw, pitch);
 		}
 		if (data.has(KEY_POSE) && data.get(KEY_POSE).isJsonObject()) {
 			JsonObject poseData = data.getAsJsonObject(KEY_POSE);
@@ -613,6 +618,8 @@ public class Grave {
 			location.addProperty(KEY_X, mLocation.getX());
 			location.addProperty(KEY_Y, mLocation.getY());
 			location.addProperty(KEY_Z, mLocation.getZ());
+			location.addProperty(KEY_YAW, mLocation.getYaw());
+			location.addProperty(KEY_PITCH, mLocation.getPitch());
 			data.add(KEY_LOCATION, location);
 		}
 
