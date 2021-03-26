@@ -427,17 +427,15 @@ public class Grave {
 			}
 			if (collected > 0) {
 				player.sendMessage(Component.text("You collected ", NamedTextColor.AQUA)
-					.append(Component.text(collected == 1 ? "1 item" : collected + " items"))
-					.append(Component.text(" from your grave"))
+					.append(Component.text(collected == 1 ? "1 item from the grave" : collected + " items from the grave"))
 					.append(Component.text(collectedShattered == 0 ? "." : "; "))
-					.append(Component.text(collectedShattered == 1 ? "it was shattered." : ""))
+					.append(Component.text(collectedShattered == 1 ? (collected == 1 ? "it was shattered." : "1 of them was shattered.") : ""))
 					.append(Component.text(collectedShattered > 1 ? (collectedShattered == collected ? "they were all shattered." : collectedShattered + " of them were shattered.") : ""))
 				);
 			}
 			if (remaining > 0) {
 				player.sendMessage(Component.text("There ", NamedTextColor.AQUA)
-					.append(Component.text(remaining == 1 ? "is 1 item" : "are " + remaining + " items"))
-					.append(Component.text(" remaining in the grave"))
+					.append(Component.text(remaining == 1 ? "is 1 item remaining in the grave" : "are " + remaining + " items remaining in the grave"))
 					.append(Component.text(remainingShattered == 0 ? "." : "; "))
 					.append(Component.text(remainingShattered == 1 ? "it was shattered." : ""))
 					.append(Component.text(remainingShattered > 1 ? (remainingShattered == remaining ? "they were all shattered." : remainingShattered + " of them were shattered.") : ""))
@@ -445,15 +443,12 @@ public class Grave {
 			}
 			if (dropped > 0) {
 				player.sendMessage(Component.text("There ", NamedTextColor.AQUA)
-					.append(Component.text(dropped == 1 ? "is 1 item" : "are " + dropped + " items"))
-					.append(Component.text(" left on the ground; "))
-					.append(Component.text(dropped == 1 ? "it will now glow." : "they will now glow"))
+					.append(Component.text(dropped == 1 ? "is 1 item left on the ground; it will now glow." : "are " + dropped + " items left on the ground; they will now glow"))
 				);
 			}
 			if (lost > 0) {
 				player.sendMessage(Component.text("There ", NamedTextColor.AQUA)
-					.append(Component.text(lost == 1 ? "was 1 item" : "were " + lost + " items"))
-					.append(Component.text(" lost due to dying in limbo."))
+					.append(Component.text(lost == 1 ? "was 1 item lost due to dying in limbo." : "were " + lost + " items lost due to dying in limbo."))
 				);
 			}
 		} else {
