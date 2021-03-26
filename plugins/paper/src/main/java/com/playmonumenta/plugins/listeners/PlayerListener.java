@@ -396,13 +396,6 @@ public class PlayerListener implements Listener {
 			return;
 		}
 		InventoryUtils.scheduleDelayedEquipmentCheck(mPlugin, event.getPlayer(), event);
-
-		Item droppedItem = event.getItemDrop();
-		if (!ZoneUtils.hasZoneProperty(droppedItem.getLocation(), ZoneProperty.ADVENTURE_MODE)) {
-			/* Not in an adventure mode area */
-			/* Drop the item as if it was dropped on death, applying grave settings & explosion resistance */
-			setDroppedItemGraveProperties(droppedItem, player, player.getLocation(), ItemUtils.getItemDeathResult(droppedItem.getItemStack()));
-		}
 	}
 
 	// An entity picked up an item
@@ -440,18 +433,6 @@ public class PlayerListener implements Listener {
 	@EventHandler(priority = EventPriority.HIGH)
 	public void playerItemBreakEvent(PlayerItemBreakEvent event) {
 		InventoryUtils.scheduleDelayedEquipmentCheck(mPlugin, event.getPlayer(), event);
-
-		// If an item breaks, attempt to shatter it
-		ItemStack iStack = event.getBrokenItem();
-		ItemUtils.shatterItem(iStack);
-		if (ItemUtils.isItemShattered(iStack)) {
-			// If the item shatters, drop it on the player with instant pickup, if inv full for some reason - grave the item
-			Player player = event.getPlayer();
-			Location location = player.getLocation();
-			Item item = player.getWorld().dropItemNaturally(location, iStack);
-			GraveUtils.setGraveScoreboard(item, player, location);
-			item.setPickupDelay(0);
-		}
 	}
 
 	// If an inventory interaction happened.
@@ -578,18 +559,17 @@ public class PlayerListener implements Listener {
 		InventoryUtils.scheduleDelayedEquipmentCheck(mPlugin, event.getPlayer(), event);
 	}
 
-	private static final List<Integer> KEEP_EQUIPPED_SLOTS =
-	    Arrays.asList(0, 1, 2, 3, 4, 5, 6, 7, 8, 36, 37, 38, 39, 40);
-
-	private static final double KEPT_ITEM_DURABILITY_DAMAGE_PERCENT = 0.1;
-
 	// The player has died
-	@EventHandler(priority = EventPriority.HIGHEST)
+	@EventHandler(priority = EventPriority.HIGH)
 	public void playerDeathEvent(PlayerDeathEvent event) {
 		Player player = event.getEntity();
 
+		if (event.isCancelled()) {
+			return;
+		}
+
 		mPlugin.mTrackingManager.mPlayers.onDeath(mPlugin, player, event);
-		AbilityManager.getManager().playerDeathEvent(player, event);
+		mPlugin.mAbilityManager.playerDeathEvent(player, event);
 
 		if (player.getHealth() > 0) {
 			return;
@@ -603,143 +583,18 @@ public class PlayerListener implements Listener {
 			}
 		}
 
-		if (!event.getKeepInventory()) {
-			/* Monumenta-custom keep inventory
-			 *
-			 * Keep armor and hotbar items if they meet some conditions (_isKeptItemOnDeath)
-			 *
-			 * The player always gets keepinv set on them to prevent relog bugs - so items must
-			 * be manually dropped here if they don't meet the conditions.
-			 *
-			 * Items dropped are invulnerable for a short while to prevent double-creepering
-			 */
-			event.setKeepInventory(true);
-			event.getDrops().clear();
-			event.setKeepLevel(false);
-
-			List<Item> droppedItems = new ArrayList<Item>();
-
-			PlayerInventory inv = player.getInventory();
-			for (int slot = 0; slot <= 40; slot++) {
-				ItemStack item = inv.getItem(slot);
-				if (item == null) {
-					continue;
-				}
-				ItemDeathResult result = ItemUtils.getItemDeathResult(item);
-				if (result == ItemDeathResult.SHATTER_NOW) {
-					// Item has Curse of Vanishing 1. It should be shattered
-					ItemUtils.shatterItem(item);
-					// Then treat it like a normal item
-					dropAndMarkItem(player, droppedItems, inv, slot, item, result);
-				} else if (result == ItemDeathResult.DESTROY) {
-					// Item has Curse of Vanishing 2, destroy item
-					inv.setItem(slot, null);
-				} else if (result == ItemDeathResult.KEEP) {
-					// Item is kept with no durability loss
-					// This empty if statement is intentional so it's not included in "else".
-				} else if (result == ItemDeathResult.KEEP_DAMAGED
-				           || (result == ItemDeathResult.KEEP_EQUIPPED && KEEP_EQUIPPED_SLOTS.contains(slot))) {
-					ItemUtils.damageItemPercent(item, KEPT_ITEM_DURABILITY_DAMAGE_PERCENT, false);
-				} else {
-					// Migrated normal item treatment to a method so Curse of Vanishing items can be treated the same way
-					dropAndMarkItem(player, droppedItems, inv, slot, item, result);
-				}
-			}
-
-			if (droppedItems.size() > 0) {
-				player.sendMessage(ChatColor.RED + "Some of your items were dropped! See /deathhelp for info");
-			}
-		} else {
-			//Remove Curse of Vanishing 2 Items even if Keep Inventory is on
-			PlayerInventory inv = player.getInventory();
-			for (int slot = 0; slot <= 40; slot++) {
-				ItemStack item = inv.getItem(slot);
-				if (ItemUtils.isItemCurseOfVanishingII(item)) {
-					inv.setItem(slot, null);
-				}
-			}
-		}
-
-
 		// Give the player a NewDeath score of 1 so the city guides will give items again
 		ScoreboardUtils.setScoreboardValue(player, "NewDeath", 1);
 
-		if (ScoreboardUtils.getScoreboardValue(player, Constants.SCOREBOARD_DEATH_MESSAGE) != 0) {
+		if (event.getDeathMessage() != null && ScoreboardUtils.getScoreboardValue(player, Constants.SCOREBOARD_DEATH_MESSAGE) != 0) {
 			player.sendMessage(event.getDeathMessage());
 			player.sendMessage(ChatColor.AQUA + "Only you saw this message. Change this with /deathmsg");
-			event.setDeathMessage("");
+			event.setDeathMessage(null);
 		}
 
 		// Clear effects
 		mPlugin.mPotionManager.clearAllPotions(player);
 		mPlugin.mAbilityManager.updatePlayerAbilities(player);
-	}
-
-	private void dropAndMarkItem(Player player, List<Item> droppedItems, PlayerInventory inv, int slot, ItemStack item,
-			ItemDeathResult result) {
-		// Item is dropped, decide what to do with it.
-		Location location = player.getLocation();
-		Item droppedItem = player.getWorld().dropItemNaturally(location, item);
-		// Make sure items don't float away unless they're in water
-		new BukkitRunnable() {
-			int mNumTicks = 0;
-
-			@Override
-			public void run() {
-				if (droppedItem != null && droppedItem.isValid()) {
-					Location dLoc = droppedItem.getLocation();
-					// Check the item's location and the next block down for water, just in case it bobs out of the water.
-					// Should fix the weird bug with hoped items no longer floating?
-					if (!(dLoc.getBlock().isLiquid() || dLoc.clone().subtract(0, 1, 0).getBlock().isLiquid())
-							&& dLoc.getY() > location.getY() + 2) {
-						droppedItem.teleport(location);
-					} else if (dLoc.getBlock().getType() == Material.LAVA) {
-						//Force hoped items upwards if they're in lava.
-						droppedItem.setVelocity(new Vector(0,0.4,0));
-					}
-				} else {
-					this.cancel();
-				}
-
-				// Very infrequently check if the item is still actually there
-				mNumTicks++;
-				if (mNumTicks > 30) {
-					mNumTicks = 0;
-					if (!EntityUtils.isStillLoaded(droppedItem)) {
-						this.cancel();
-					}
-				}
-			}
-		}.runTaskTimer(Plugin.getInstance(), 1 * 20, 1 * 20);
-
-		// Tag the dropped item so it will create a grave. Includes logic to not tag items that should not grave
-		setDroppedItemGraveProperties(droppedItem, player, location, result);
-
-		droppedItems.add(droppedItem);
-		inv.clear(slot);
-	}
-
-	private void setDroppedItemGraveProperties(Item droppedItem, Player player, Location location, ItemDeathResult result) {
-		if (InventoryUtils.getCustomEnchantLevel(droppedItem.getItemStack(), Hope.PROPERTY_NAME, false) > 0) {
-			droppedItem.setInvulnerable(true);
-		} else {
-			// Make item invulnerable to explosions for 5 seconds
-			droppedItem.addScoreboardTag("ExplosionImmune");
-			new BukkitRunnable() {
-				@Override
-				public void run() {
-					if (droppedItem != null && droppedItem.isValid()) {
-						droppedItem.removeScoreboardTag("ExplosionImmune");
-					}
-				}
-			}.runTaskLater(Plugin.getInstance(), 5 * 20);
-		}
-		droppedItem.addScoreboardTag("DeathDroppedBy;" + player.getName());
-		droppedItem.addScoreboardTag("DeathDroppedBy;" + player.getUniqueId());
-		if ((result == ItemDeathResult.SAFE || result == ItemDeathResult.SHATTER || result == ItemDeathResult.SHATTER_NOW)
-		    && !player.getScoreboardTags().contains("DisableGraves")) {
-			GraveUtils.setGraveScoreboard(droppedItem, player, location);
-		}
 	}
 
 	// The player has respawned.

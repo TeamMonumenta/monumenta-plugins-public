@@ -18,16 +18,14 @@ public class Magnetize extends GenericCommand {
 	public static void register() {
 
 		registerPlayerCommand("magnetize", "monumenta.command.magnetize",
-		                      (sender, player) -> {
-		                          run(player);
-		                      });
+		                      (sender, player) -> run(player));
 	}
 
 	private static void run(Player player) {
 
 		Collection<Item> nearbyItems = player.getLocation().getNearbyEntitiesByType(Item.class, PICKUP_RADIUS);
 
-		if (nearbyItems == null) {
+		if (nearbyItems.isEmpty()) {
 			player.sendMessage("No nearby death pile items found!");
 			return;
 		}
@@ -35,19 +33,17 @@ public class Magnetize extends GenericCommand {
 		List<LivingEntity> nearbyMobs = EntityUtils.getNearbyMobs(player.getLocation(), MOB_RADIUS + PICKUP_RADIUS);
 		//Total count of items restored
 		int restored = 0;
-		//Death tag to search for
-		String tag = "DeathDroppedBy;" + player.getUniqueId();
 		//Loop through nearby items and send them to player if they match their death pile
 		for (Item i : nearbyItems) {
 
 			ItemStack stack = i.getItemStack();
 
-			if (stack == null || stack.getType().isAir() || !i.getScoreboardTags().contains(tag)) {
+			if (stack.getType().isAir() || !player.getUniqueId().equals(i.getOwner())) {
 				continue;
 			}
 
 			//Check to see if any of the mobs around the player are too close to the item
-			if (nearbyMobs != null == nearbyMobs.size() > 0) {
+			if (nearbyMobs.size() > 0) {
 				boolean closeMob = false;
 				for (LivingEntity mob : nearbyMobs) {
 					if (mob.getLocation().distanceSquared(i.getLocation()) < MOB_RADIUS * MOB_RADIUS) {
@@ -68,7 +64,7 @@ public class Magnetize extends GenericCommand {
 		ItemStack mainhand = player.getInventory().getItemInMainHand();
 
 		//If we restored items, consume item in mainhand
-		if (restored > 0 && mainhand != null && mainhand.getAmount() > 0) {
+		if (restored > 0 && mainhand.getAmount() > 0) {
 			mainhand.setAmount(mainhand.getAmount() - 1);
 		} else {
 			player.sendMessage("No nearby death pile items found! They might be near mobs!");
