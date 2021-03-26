@@ -30,7 +30,6 @@ import com.playmonumenta.plugins.commands.GetDepthPoints;
 import com.playmonumenta.plugins.commands.GetScoreCommand;
 import com.playmonumenta.plugins.commands.GildifyHeldItem;
 import com.playmonumenta.plugins.commands.GiveSoulbound;
-import com.playmonumenta.plugins.commands.Grave;
 import com.playmonumenta.plugins.commands.HopeifyHeldItem;
 import com.playmonumenta.plugins.commands.InfuseHeldItem;
 import com.playmonumenta.plugins.commands.Launch;
@@ -83,7 +82,6 @@ import com.playmonumenta.plugins.listeners.DeathItemListener;
 import com.playmonumenta.plugins.listeners.DelvesListener;
 import com.playmonumenta.plugins.listeners.EntityListener;
 import com.playmonumenta.plugins.listeners.ExceptionListener;
-import com.playmonumenta.plugins.listeners.GraveListener;
 import com.playmonumenta.plugins.listeners.JunkItemListener;
 import com.playmonumenta.plugins.listeners.MobListener;
 import com.playmonumenta.plugins.listeners.PlayerListener;
@@ -188,7 +186,6 @@ public class Plugin extends JavaPlugin {
 		SetViewDistance.register();
 		UnsignBook.register();
 		GetScoreCommand.register(this);
-		Grave.register();
 
 		try {
 			mHttpManager = new HttpManager(this);
@@ -289,7 +286,6 @@ public class Plugin extends JavaPlugin {
 		manager.registerEvents(new LootChestsInInventory(), this);
 		manager.registerEvents(new ArrowListener(this), this);
 		manager.registerEvents(new SinglePageGUIManager(this), this);
-		manager.registerEvents(new GraveListener(this), this);
 
 		//  Move the logic out of Plugin and into it's own class that derives off Runnable, a Timer class of some type.
 		getServer().getScheduler().scheduleSyncRepeatingTask(this, new Runnable() {
