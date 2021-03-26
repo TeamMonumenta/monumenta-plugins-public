@@ -16,6 +16,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.guis.singlepageguis.ExampleSinglePageGUI;
 import com.playmonumenta.plugins.guis.singlepageguis.OrinSinglePageGUI;
+import com.playmonumenta.plugins.guis.singlepageguis.PebGui;
 
 public class SinglePageGUIManager implements Listener {
 
@@ -25,6 +26,7 @@ public class SinglePageGUIManager implements Listener {
 		// Whenever you make a SinglePageGUI, it must be registered here
 		new ExampleSinglePageGUI(null, null).registerCommand();
 		new OrinSinglePageGUI(null, null).registerCommand();
+		new PebGui(null,null).registerCommand();
 		mPlugin = plugin;
 	}
 

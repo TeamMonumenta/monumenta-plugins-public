@@ -304,6 +304,9 @@ public class ItemOverrides {
 		mItems.put(Material.GREEN_SHULKER_BOX, firmamentOverride);
 		mItems.put(Material.RED_SHULKER_BOX, firmamentOverride);
 		mItems.put(Material.BLACK_SHULKER_BOX, firmamentOverride);
+
+		BaseOverride writtenBookOverride = new WrittenBookOverride();
+		mItems.put(Material.WRITTEN_BOOK, writtenBookOverride);
 	}
 
 	public boolean rightClickInteraction(Plugin plugin, Player player, Action action, ItemStack item, Block block, PlayerInteractEvent event) {
