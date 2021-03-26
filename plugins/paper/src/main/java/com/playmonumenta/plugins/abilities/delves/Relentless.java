@@ -6,7 +6,6 @@ import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.attribute.AttributeModifier.Operation;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.entity.Vex;
 import org.bukkit.event.entity.EntitySpawnEvent;
 
 import com.playmonumenta.plugins.Plugin;
@@ -80,7 +79,7 @@ public class Relentless extends DelveModifier {
 					new AttributeModifier(KBR_MODIFIER_NAME, mKBRModifier, Operation.ADD_NUMBER));
 		}
 
-		if (!(mob instanceof Vex) && FastUtils.RANDOM.nextDouble() < mBlockBreakChance) {
+		if (FastUtils.RANDOM.nextDouble() < mBlockBreakChance) {
 			mob.addScoreboardTag(BlockBreakBoss.identityTag);
 		}
 	}

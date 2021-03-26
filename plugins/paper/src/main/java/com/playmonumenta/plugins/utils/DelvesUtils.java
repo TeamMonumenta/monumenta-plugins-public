@@ -569,7 +569,7 @@ public class DelvesUtils {
 		new DelveLootTableGroup("r2/delves/purple/base_temple", "r2/delves/purple/dmat_temple", "r2/delves/purple/cmat_temple", "r2/dungeons/purple/chesttemple").mapDelveLootTables(DELVE_LOOT_TABLE_REPLACEMENT_MAPPINGS);
 		new DelveLootTableGroup("r2/delves/purple/base_final", "r2/delves/purple/dmat_final", "r2/delves/purple/cmat_final", "r2/dungeons/purple/final_chest").mapDelveLootTables(DELVE_LOOT_TABLE_REPLACEMENT_MAPPINGS);
 
-		new DelveLootTableGroup("r2/delves/teal/base_chest", "r2/delves/teal/dmat_chest", "r2/delves/teal/cmat_chest", "r2/dungeons/teal/ruined", "r2/dungeons/teal/eroded", "r2/dungeons/teal/pristine", "r2/dungeons/teal/colosseum").mapDelveLootTables(DELVE_LOOT_TABLE_REPLACEMENT_MAPPINGS);
+		new DelveLootTableGroup("r2/delves/teal/base_chest", "r2/delves/teal/dmat_chest", "r2/delves/teal/cmat_chest", "r2/dungeons/teal/ruined", "r2/dungeons/teal/eroded", "r2/dungeons/teal/pristine", "r2/dungeons/delves/teal/colosseum").mapDelveLootTables(DELVE_LOOT_TABLE_REPLACEMENT_MAPPINGS);
 		new DelveLootTableGroup("r2/delves/teal/base_escape", "r2/delves/teal/dmat_escape", "r2/delves/teal/cmat_escape", "r2/dungeons/teal/escape").mapDelveLootTables(DELVE_LOOT_TABLE_REPLACEMENT_MAPPINGS);
 		new DelveLootTableGroup("r2/delves/teal/base_final", "r2/delves/teal/dmat_final", "r2/delves/teal/cmat_final", "r2/dungeons/teal/final").mapDelveLootTables(DELVE_LOOT_TABLE_REPLACEMENT_MAPPINGS);
 
@@ -935,6 +935,15 @@ public class DelvesUtils {
 			if (depthPoints < MINIMUM_DEPTH_POINTS) {
 				lore.add(ChatColor.RED + "- Requires " + MINIMUM_DEPTH_POINTS + " Depth Points to begin");
 				mCanBeginDelve = false;
+			} else {
+				int rank = mDelveInfo.getRank(Modifier.ENTROPY);
+				int required = rank == 0 ? 0 : Entropy.getTotalDepthPointsRequired(rank);
+				if (depthPoints < required) {
+					lore.add(ChatColor.RED + "- Requires " + required + " Depth Points to begin with Entropy");
+					mCanBeginDelve = false;
+				} else {
+					mCanBeginDelve = true;
+				}
 			}
 
 			meta.setLore(lore);

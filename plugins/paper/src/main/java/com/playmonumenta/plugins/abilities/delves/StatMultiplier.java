@@ -22,8 +22,6 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 
 public class StatMultiplier extends DelveModifier {
 
-	private static final String DELVES_PLAYER_TAG = "DelvesPlayer";
-
 	private static final String HEALTH_MODIFIER_NAME = "DelveHealthModifier";
 	private static final String SPEED_MODIFIER_NAME = "DelveSpeedModifier";
 
@@ -74,22 +72,14 @@ public class StatMultiplier extends DelveModifier {
 				? DELVE_MOB_STAT_MULTIPLIER_R2 : DELVE_MOB_STAT_MULTIPLIER_R1;
 
 		if (player != null) {
-			int points = DelvesUtils.getDelveInfo(player).getDepthPoints();
-			mDamageMultiplier = getDamageMultiplier(points);
-			mHealthMultiplier = getHealthMultiplier(points);
-			mSpeedMultiplier = getSpeedMultiplier(points);
-
-			player.addScoreboardTag(DELVES_PLAYER_TAG);
+			mDamageMultiplier = getDamageMultiplier(DelvesUtils.getDelveInfo(player).getDepthPoints());
+			mHealthMultiplier = getHealthMultiplier(DelvesUtils.getDelveInfo(player).getDepthPoints());
+			mSpeedMultiplier = getSpeedMultiplier(DelvesUtils.getDelveInfo(player).getDepthPoints());
 		} else {
 			mDamageMultiplier = 0;
 			mHealthMultiplier = 0;
 			mSpeedMultiplier = 0;
 		}
-	}
-
-	@Override
-	public void invalidate() {
-		mPlayer.removeScoreboardTag(DELVES_PLAYER_TAG);
 	}
 
 	public static double getStatCompensation(String dungeon) {

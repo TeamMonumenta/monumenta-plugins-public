@@ -8,7 +8,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
-import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntitySpawnEvent;
 import org.bukkit.event.entity.SpawnerSpawnEvent;
 import org.bukkit.potion.PotionEffect;
@@ -56,14 +55,10 @@ public class DelveModifier extends Ability {
 		return canUse(player, mModifier);
 	}
 
-	private boolean shouldApplyModifiers(Entity mob) {
-		Set<String> tags = mob.getScoreboardTags();
-		return tags == null || !tags.contains(AVOID_MODIFIERS);
-	}
-
 	@Override
 	public boolean playerDamagedByLivingEntityEvent(EntityDamageByEntityEvent event) {
-		if (shouldApplyModifiers(event.getDamager())) {
+		Set<String> tags = event.getDamager().getScoreboardTags();
+		if (tags == null || !tags.contains(AVOID_MODIFIERS)) {
 			if (event.getCause() == DamageCause.CUSTOM) {
 				playerTookCustomDamageEvent(event);
 			} else {
@@ -84,22 +79,13 @@ public class DelveModifier extends Ability {
 
 		Entity entity = (Entity) source;
 
-		if (shouldApplyModifiers(entity)) {
+		Set<String> tags = entity.getScoreboardTags();
+		if (tags == null || !tags.contains(AVOID_MODIFIERS)) {
 			playerTookProjectileDamageEvent(entity, event);
 		}
 
 		return true;
 	}
-
-	@Override
-	public void entityDeathEvent(EntityDeathEvent event, boolean shouldGenDrops) {
-		if (shouldApplyModifiers(event.getEntity())) {
-			entityDeathEvent(event);
-		}
-	}
-	
-	/* This version is only called when the event should apply modifiers! */
-	protected void entityDeathEvent(EntityDeathEvent event) { }
 
 	public void applyOnSpawnModifiers(LivingEntity mob, EntitySpawnEvent event) {
 		if (EntityUtils.isHostileMob(mob)) {
