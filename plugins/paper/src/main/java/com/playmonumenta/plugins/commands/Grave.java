@@ -13,9 +13,9 @@ import com.playmonumenta.plugins.graves.GraveManager;
 
 import dev.jorel.commandapi.CommandAPI;
 import dev.jorel.commandapi.CommandAPICommand;
+import dev.jorel.commandapi.arguments.EntitySelectorArgument;
 import dev.jorel.commandapi.arguments.IntegerArgument;
 import dev.jorel.commandapi.arguments.LocationArgument;
-import dev.jorel.commandapi.arguments.PlayerArgument;
 import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
 import dev.jorel.commandapi.executors.CommandExecutor;
 import dev.jorel.commandapi.executors.PlayerCommandExecutor;
@@ -34,11 +34,11 @@ public class Grave {
 			.withSubcommand(new CommandAPICommand("permission")
 				.withPermission("monumenta.command.grave.permission")
 				.withSubcommand(new CommandAPICommand("grant")
-					.withArguments(new PlayerArgument("player"))
+					.withArguments(new EntitySelectorArgument("player", EntitySelectorArgument.EntitySelector.ONE_PLAYER))
 					.executesPlayer((PlayerCommandExecutor) (player, args) -> permissionGrantPlayer(player, (Player) args[0]))
 				)
 				.withSubcommand(new CommandAPICommand("revoke")
-					.withArguments(new PlayerArgument("player"))
+					.withArguments(new EntitySelectorArgument("player", EntitySelectorArgument.EntitySelector.ONE_PLAYER))
 					.executesPlayer((PlayerCommandExecutor) (player, args) -> permissionRevokePlayer(player, (Player) args[0]))
 				)
 			)
@@ -53,19 +53,19 @@ public class Grave {
 			)
 			.withSubcommand(new CommandAPICommand("list")
 				.withPermission("monumenta.command.grave.list.other")
-				.withArguments(new PlayerArgument("player"))
+				.withArguments(new EntitySelectorArgument("player", EntitySelectorArgument.EntitySelector.ONE_PLAYER))
 				.executesPlayer((PlayerCommandExecutor) (player, args) -> listGravesOther(player, (Player) args[0], 1))
 			)
 			.withSubcommand(new CommandAPICommand("list")
 				.withPermission("monumenta.command.grave.list.other")
-				.withArguments(new PlayerArgument("player"))
+				.withArguments(new EntitySelectorArgument("player", EntitySelectorArgument.EntitySelector.ONE_PLAYER))
 				.withArguments(new IntegerArgument("page"))
 				.executesPlayer((PlayerCommandExecutor) (player, args) -> listGravesOther(player, (Player) args[0], (int) args[1]))
 			)
 			.withSubcommand(new CommandAPICommand("summon")
 				.withSubcommand(new CommandAPICommand("list")
 					.withPermission("monumenta.command.grave.summon.list")
-					.withArguments(new PlayerArgument("player"))
+					.withArguments(new EntitySelectorArgument("player", EntitySelectorArgument.EntitySelector.ONE_PLAYER))
 					.withArguments(new LocationArgument("location"))
 					.executes((CommandExecutor) (sender, args) -> summonGraveList((Player) args[0], (Location) args[1]))
 				)
@@ -92,7 +92,7 @@ public class Grave {
 			)
 			.withSubcommand(new CommandAPICommand("summon")
 				.withPermission("monumenta.command.grave.summon.other")
-				.withArguments(new PlayerArgument("player"))
+				.withArguments(new EntitySelectorArgument("player", EntitySelectorArgument.EntitySelector.ONE_PLAYER))
 				.withArguments(new LocationArgument("location"))
 				.withArguments(new IntegerArgument("grave"))
 				.executesPlayer((PlayerCommandExecutor) (player, args) -> summonGraveOther(player, (Player) args[0], (Location) args[1], (int) args[2]))
