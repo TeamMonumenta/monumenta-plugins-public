@@ -31,12 +31,15 @@ import org.bukkit.event.world.ChunkUnloadEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import com.destroystokyo.paper.event.entity.EntityRemoveFromWorldEvent;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.graves.GraveManager;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.redissync.event.PlayerSaveEvent;
+
+import de.tr7zw.nbtapi.NBTEntity;
 
 @SuppressWarnings("unused")
 public class GraveListener implements Listener {
@@ -157,8 +160,22 @@ public class GraveListener implements Listener {
 		ItemStack item = entity.getItemStack();
 		ItemUtils.ItemDeathResult result = ItemUtils.getItemDeathResult(item);
 		if (result == ItemUtils.ItemDeathResult.SHATTER || result == ItemUtils.ItemDeathResult.SHATTER_NOW
-		    || result == ItemUtils.ItemDeathResult.SAFE || result == ItemUtils.ItemDeathResult.KEEP) {
-			GraveManager.onDropItem(player, entity);
+			|| result == ItemUtils.ItemDeathResult.SAFE || result == ItemUtils.ItemDeathResult.KEEP) {
+			if (entity.getThrower() == player.getUniqueId()) {
+				GraveManager.onDropItem(player, entity);
+			} else {
+				new BukkitRunnable() {
+					@Override
+					public void run() {
+						if (entity.isValid()) {
+							NBTEntity nbte = new NBTEntity(entity);
+							if (nbte.getShort("Age") < 11999) {
+								GraveManager.onDropItem(player, entity);
+							}
+						}
+					}
+				}.runTask(mPlugin);
+			}
 		}
 	}
 
