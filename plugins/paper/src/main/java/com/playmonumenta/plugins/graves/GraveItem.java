@@ -175,6 +175,7 @@ public class GraveItem {
 
 	private void startTracking() {
 		if (mRunnable == null) {
+			GraveItem item = this;
 			mRunnable = new BukkitRunnable() {
 				@Override
 				public void run() {
@@ -190,6 +191,10 @@ public class GraveItem {
 							mEntity.setVelocity(new Vector(0,0.4,0));
 						}
 					} else {
+						if (mStatus == Status.DROPPED) {
+							delete();
+							mGrave.removeItem(item);
+						}
 						stopTracking();
 					}
 				}

@@ -155,7 +155,7 @@ public class ThrownItem {
 							mEntity.setVelocity(new Vector(0,0.4,0));
 						}
 					} else {
-						stopTracking();
+						delete();
 					}
 				}
 			};
