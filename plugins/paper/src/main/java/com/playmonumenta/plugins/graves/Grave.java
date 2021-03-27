@@ -643,7 +643,13 @@ public class Grave {
 		if (mItems != null && !mItems.isEmpty()) {
 			JsonArray items = new JsonArray();
 			for (GraveItem item : mItems) {
-				items.add(item.serialize());
+				JsonObject itemData = item.serialize();
+				if (itemData != null) {
+					items.add(itemData);
+				}
+			}
+			if (items.size() == 0) {
+				return null;
 			}
 			data.add(KEY_ITEMS, items);
 		}

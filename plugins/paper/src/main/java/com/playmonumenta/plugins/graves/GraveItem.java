@@ -280,11 +280,15 @@ public class GraveItem {
 	}
 
 	private void update() {
-		if (mEntity != null && mEntity.isValid()) {
-			mLocation = mEntity.getLocation();
-			mVelocity = mEntity.getVelocity();
-			NBTEntity nbt = new NBTEntity(mEntity);
-			mAge = nbt.getShort(KEY_AGE);
+		if (mEntity != null) {
+			if (mEntity.isValid()) {
+				mLocation = mEntity.getLocation();
+				mVelocity = mEntity.getVelocity();
+				NBTEntity nbt = new NBTEntity(mEntity);
+				mAge = nbt.getShort(KEY_AGE);
+			} else if (mStatus == Status.DROPPED) {
+				delete();
+			}
 		}
 	}
 
@@ -439,6 +443,9 @@ public class GraveItem {
 
 	JsonObject serialize() {
 		update();
+		if (mStatus == Status.COLLECTED) {
+			return null;
+		}
 		JsonObject data = new JsonObject();
 		data.addProperty(KEY_NBT, NBTItem.convertItemtoNBT(mItem).toString());
 		data.addProperty(KEY_STATUS, mStatus.toString());
