@@ -219,10 +219,14 @@ public class ThrownItem {
 	}
 
 	private void update() {
-		if (mEntity != null && mEntity.isValid()) {
-			mLocation = mEntity.getLocation();
-			mVelocity = mEntity.getVelocity();
-			mAge = new NBTEntity(mEntity).getShort(KEY_AGE);
+		if (mEntity != null) {
+			if (mEntity.isValid()) {
+				mLocation = mEntity.getLocation();
+				mVelocity = mEntity.getVelocity();
+				mAge = new NBTEntity(mEntity).getShort(KEY_AGE);
+			} else {
+				delete();
+			}
 		}
 	}
 
@@ -265,6 +269,9 @@ public class ThrownItem {
 
 	JsonObject serialize() {
 		update();
+		if (!mValid) {
+			return null;
+		}
 		JsonObject data = new JsonObject();
 		data.addProperty(KEY_NBT, NBTItem.convertItemtoNBT(mItem).toString());
 		data.addProperty(KEY_WORLD, mWorldName);

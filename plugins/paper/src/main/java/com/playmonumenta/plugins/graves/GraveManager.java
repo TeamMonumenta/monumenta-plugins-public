@@ -109,7 +109,10 @@ public class GraveManager {
 					iterGraves.remove();
 				} else {
 					grave.onSave();
-					graves.add(grave.serialize());
+					JsonObject graveData = grave.serialize();
+					if (graveData != null) {
+						graves.add(graveData);
+					}
 				}
 			}
 			Iterator<ThrownItem> iterThrownItems = manager.mThrownItems.iterator();
@@ -117,7 +120,10 @@ public class GraveManager {
 				ThrownItem item = iterThrownItems.next();
 				if (item.isValid()) {
 					item.onSave();
-					thrownItems.add(item.serialize());
+					JsonObject itemData = item.serialize();
+					if (itemData != null) {
+						thrownItems.add(itemData);
+					}
 				} else {
 					item.delete();
 					iterThrownItems.remove();
