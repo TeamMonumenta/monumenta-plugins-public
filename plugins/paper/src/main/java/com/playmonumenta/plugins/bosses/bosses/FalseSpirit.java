@@ -30,7 +30,7 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
-import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -54,6 +54,7 @@ import com.playmonumenta.plugins.bosses.spells.falsespirit.UltimateBulletMania;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.DelvesUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.SerializationUtils;
 
@@ -351,9 +352,9 @@ public class FalseSpirit extends BossAbilityGroup {
 		//Do not take damage to the gate closer trident
 		if (event.getEntity() instanceof Trident) {
 			Trident trident = (Trident) event.getEntity();
-			ItemMeta im = trident.getItemStack().getItemMeta();
+			ItemStack item = trident.getItemStack();
 
-			if (im != null && im.getDisplayName().contains("Gate Closer")) {
+			if (item != null && ItemUtils.getPlainName(item).contains("Gate Closer")) {
 				event.setCancelled(true);
 				return;
 			}

@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.ShulkerBox;
@@ -23,6 +22,9 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.io.BukkitObjectInputStream;
 import org.bukkit.util.io.BukkitObjectOutputStream;
 import org.yaml.snakeyaml.external.biz.base64Coder.Base64Coder;
+
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityManager;
@@ -68,17 +70,18 @@ public class InventoryUtils {
 			return true;
 		}
 
-		if (item != null) {
-			final ItemMeta meta = item.getItemMeta();
-			if (meta != null) {
-				final List<String> lore = meta.getLore();
-				if (lore != null && !lore.isEmpty()) {
-					for (final String loreEntry : lore) {
-						if (loreEntry.contains(loreText)) {
-							return true;
-						}
-					}
-				}
+		if (item == null) {
+			return false;
+		}
+
+		final List<String> lore = ItemUtils.getPlainLore(item);
+		if (lore == null || lore.isEmpty()) {
+			return false;
+		}
+
+		for (final String loreEntry : lore) {
+			if (loreEntry.contains(loreText)) {
+				return true;
 			}
 		}
 
@@ -111,50 +114,51 @@ public class InventoryUtils {
 			return 0;
 		}
 
-		if (item != null) {
-			final ItemMeta meta = item.getItemMeta();
-			if (meta != null) {
-				final List<String> lore = meta.getLore();
-				if (lore != null && !lore.isEmpty()) {
-					for (final String loreEntry : lore) {
-						if (loreEntry.startsWith(nameText)) {
-							if (useLevel) {
-								int offset = 1;
-								int level = 0;
-								while (true) {
-									final char c = loreEntry.charAt(loreEntry.length() - offset);
-									if (c == 'I') {
-										level += 1;
-									} else if (c == 'V') {
-										final char cn = loreEntry.charAt(loreEntry.length() - offset - 1);
-										if (cn == 'I') {
-											level += 4;
-											offset += 1;
-										} else {
-											level += 5;
-										}
-									} else if (c == 'X') {
-										final char cn = loreEntry.charAt(loreEntry.length() - offset - 1);
-										if (cn == 'I') {
-											level += 9;
-											offset += 1;
-										} else {
-											level += 10;
-										}
-									} else if (c == ' ') {
-										break;
-									} else {
-										level = 1;
-										break;
-									}
-									offset += 1;
-								}
-								return level;
+		if (item == null) {
+			return 0;
+		}
+
+		final List<String> lore = ItemUtils.getPlainLore(item);
+		if (lore == null || lore.isEmpty()) {
+			return 0;
+		}
+
+		for (final String loreEntry : lore) {
+			if (loreEntry.startsWith(nameText)) {
+				if (useLevel) {
+					int offset = 1;
+					int level = 0;
+					while (true) {
+						final char c = loreEntry.charAt(loreEntry.length() - offset);
+						if (c == 'I') {
+							level += 1;
+						} else if (c == 'V') {
+							final char cn = loreEntry.charAt(loreEntry.length() - offset - 1);
+							if (cn == 'I') {
+								level += 4;
+								offset += 1;
 							} else {
-								return 1;
+								level += 5;
 							}
+						} else if (c == 'X') {
+							final char cn = loreEntry.charAt(loreEntry.length() - offset - 1);
+							if (cn == 'I') {
+								level += 9;
+								offset += 1;
+							} else {
+								level += 10;
+							}
+						} else if (c == ' ') {
+							break;
+						} else {
+							level = 1;
+							break;
 						}
+						offset += 1;
 					}
+					return level;
+				} else {
+					return 1;
 				}
 			}
 		}
@@ -242,18 +246,18 @@ public class InventoryUtils {
 	}
 
 	public static boolean isWandItem(final ItemStack item) {
-		if (item != null) {
-			final ItemMeta meta = item.getItemMeta();
-			if (meta != null && meta.hasLore()) {
-				final List<String> lore = meta.getLore();
+		if (item == null) {
+			return false;
+		}
 
-				if (!lore.isEmpty()) {
-					for (int i = 0; i < lore.size(); i++) {
-						if (lore.get(i).contains("Magic Wand")) {
-							return true;
-						}
-					}
-				}
+		final List<String> lore = ItemUtils.getPlainLore(item);
+		if (lore == null || lore.isEmpty()) {
+			return false;
+		}
+
+		for (final String loreEntry : lore) {
+			if (loreEntry.contains("Magic Wand")) {
+				return true;
 			}
 		}
 
@@ -477,7 +481,7 @@ public class InventoryUtils {
 		if (inv.firstEmpty() == -1) {
 			final Location ploc = player.getLocation();
 			ploc.getWorld().dropItem(ploc, item);
-			player.sendMessage(ChatColor.RED + "Your inventory is full! Some items were dropped on the ground!");
+			player.sendMessage(Component.text("Your inventory is full! Some items were dropped on the ground!", NamedTextColor.RED));
 		} else {
 			inv.addItem(item);
 		}

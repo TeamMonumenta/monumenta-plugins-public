@@ -54,6 +54,8 @@ import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.projectiles.ProjectileSource;
 
+import net.kyori.adventure.text.Component;
+
 import com.destroystokyo.paper.event.entity.EntityPathfindEvent;
 import com.playmonumenta.plugins.bosses.bosses.*;
 import com.playmonumenta.plugins.bosses.bosses.gray.GrayBookSummoner;
@@ -730,7 +732,11 @@ public class BossManager implements Listener {
 	public void playerDeathEvent(PlayerDeathEvent event) {
 		Player player = event.getEntity();
 		if (player.hasMetadata(WinterSnowmanEventBoss.deathMetakey)) {
-			event.setDeathMessage(player.getName() + " was snowballed by " + player.getMetadata(WinterSnowmanEventBoss.deathMetakey).get(0).asString());
+			Component deathMessage = Component.text("")
+			    .append(Component.selector(player.getName()))
+			    .append(Component.text(" was snowballed by "))
+			    .append(Component.selector(player.getMetadata(WinterSnowmanEventBoss.deathMetakey).get(0).asString()));
+			event.deathMessage(deathMessage);
 			player.removeMetadata(WinterSnowmanEventBoss.deathMetakey, mPlugin);
 		}
 

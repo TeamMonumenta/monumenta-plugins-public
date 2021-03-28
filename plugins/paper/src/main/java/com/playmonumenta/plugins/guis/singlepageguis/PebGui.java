@@ -9,6 +9,9 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+
 import com.playmonumenta.plugins.guis.SinglePageGUI;
 import com.playmonumenta.scriptedquests.utils.ScoreboardUtils;
 
@@ -239,7 +242,7 @@ public class PebGui extends SinglePageGUI {
 
 		//Create inventory and call the builder
 
-		baseInventory = Bukkit.createInventory(null, ROWS*COLUMNS, player.getDisplayName() + "'s P.E.B.");
+		baseInventory = Bukkit.createInventory(null, ROWS*COLUMNS, Component.text(player.getName() + "'s P.E.B."));
 
 		setLayout(1, player, baseInventory);
 
@@ -315,7 +318,7 @@ public class PebGui extends SinglePageGUI {
 			newItem.setItemMeta(meta);
 		}
 		ItemMeta meta = newItem.getItemMeta();
-		meta.setDisplayName(ChatColor.WHITE + item.mName);
+		meta.displayName(Component.text(item.mName, NamedTextColor.WHITE));
 		if (item.mLore != "") {
 			splitLoreLine(meta, item.mLore, 30, ChatColor.LIGHT_PURPLE);
 		}
