@@ -11,6 +11,7 @@ import org.bukkit.inventory.meta.SkullMeta;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 
 import com.playmonumenta.plugins.guis.SinglePageGUI;
 import com.playmonumenta.scriptedquests.utils.ScoreboardUtils;
@@ -50,9 +51,15 @@ public class PebGui extends SinglePageGUI {
 		//Common items for all but main menu are "page 0"
 		PEB_ITEMS.add(new PebItem(0, 0, "Back to Main Menu", ChatColor.GOLD + "Returns you to page 1.", Material.OBSERVER, "page 1"));
 		PEB_ITEMS.add(new PebItem(0, 8, "Exit PEB", ChatColor.GOLD + "Exits this menu.", Material.COD_BUCKET, "exit"));
+		PEB_ITEMS.add(new PebItem(0, 45, "Delete P.E.B.s ✗",
+				ChatColor.LIGHT_PURPLE + "Click to remove P.E.B.s from your inventory.",
+				Material.FLINT_AND_STEEL, "clickable peb_delete"));
+		PEB_ITEMS.add(new PebItem(0, 53, "Kick someone!",
+				ChatColor.LIGHT_PURPLE + "Kicks someone from the server.",
+				Material.RABBIT_FOOT, "kick @S You really thought I'd let you kick someone other than yourself?"));
 
 		//page 1: main menu
-		PEB_ITEMS.add(new PebItem(1, 0, "", "", Material.BLACK_STAINED_GLASS_PANE, ""));
+		PEB_ITEMS.add(new PebItem(1, 0, "", "", Material.GRAY_STAINED_GLASS_PANE, ""));
 		PEB_ITEMS.add(new PebItem(1, 11, "Player Information",
 				ChatColor.LIGHT_PURPLE + "Details about Housing, Prestige, and other player-focused options.",
 				Material.PLAYER_HEAD, "page 2"));
@@ -65,6 +72,7 @@ public class PebGui extends SinglePageGUI {
 		PEB_ITEMS.add(new PebItem(1, 42, "Book Skins",
 				ChatColor.LIGHT_PURPLE + "Inventory Sort, Filtered Pickup, and more toggleable choices.",
 				Material.ENCHANTED_BOOK, "page 5"));
+
 
 		//page 2: Player Info
 		PEB_ITEMS.add(new PebItem(2, 4, "Player Information",
@@ -125,16 +133,13 @@ public class PebGui extends SinglePageGUI {
 		PEB_ITEMS.add(new PebItem(4, 4, "Server Information",
 				"",
 				Material.DISPENSER, ""));
-		PEB_ITEMS.add(new PebItem(4, 19, "P.E.B. Introduction",
+		PEB_ITEMS.add(new PebItem(4, 20, "P.E.B. Introduction",
 				ChatColor.LIGHT_PURPLE + "Click to hear the P.E.B. Introduction.",
 				Material.ENCHANTED_BOOK, "clickable peb_intro"));
-		PEB_ITEMS.add(new PebItem(4, 21, "Get Shrine Buffs",
+		PEB_ITEMS.add(new PebItem(4, 22, "Get Shrine Buffs",
 				ChatColor.LIGHT_PURPLE + "Click to recieve buffs from the " + ChatColor.GOLD + "Patreon Shrine" + ChatColor.LIGHT_PURPLE + " if any are active.",
 				Material.GLOWSTONE_DUST, "clickable peb_pbuff"));
-		PEB_ITEMS.add(new PebItem(4, 23, "Delete P.E.B.s ✗",
-				ChatColor.LIGHT_PURPLE + "Click to remove P.E.B.s from your inventory.",
-				Material.FLINT_AND_STEEL, "clickable peb_delete"));
-		PEB_ITEMS.add(new PebItem(4, 25, "Get a random tip!",
+		PEB_ITEMS.add(new PebItem(4, 24, "Get a random tip!",
 				ChatColor.LIGHT_PURPLE + "Click to get a random tip!",
 				Material.REDSTONE_TORCH, "clickable peb_tip"));
 
@@ -307,6 +312,9 @@ public class PebGui extends SinglePageGUI {
 		if (command.startsWith("clickable") || command.equals("pickup")) {
 			player.performCommand(command);
 			return;
+		} else {
+			String finalCommand = command.replace("@S", player.getName());
+			Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), finalCommand);
 		}
 	}
 
@@ -318,7 +326,8 @@ public class PebGui extends SinglePageGUI {
 			newItem.setItemMeta(meta);
 		}
 		ItemMeta meta = newItem.getItemMeta();
-		meta.displayName(Component.text(item.mName, NamedTextColor.WHITE));
+		meta.displayName(Component.text(item.mName, NamedTextColor.WHITE)
+				.decoration(TextDecoration.ITALIC, false));
 		if (item.mLore != "") {
 			splitLoreLine(meta, item.mLore, 30, ChatColor.LIGHT_PURPLE);
 		}
@@ -360,7 +369,7 @@ public class PebGui extends SinglePageGUI {
 
 		for (int i = 0; i < (ROWS*COLUMNS); i++) {
 			if (inventory.getItem(i) == null) {
-				inventory.setItem(i,new ItemStack(Material.BLACK_STAINED_GLASS_PANE, 1));
+				inventory.setItem(i,new ItemStack(Material.GRAY_STAINED_GLASS_PANE, 1));
 			}
 		}
 		com.playmonumenta.plugins.utils.ScoreboardUtils.setScoreboardValue(player, "PEBPage", page);

@@ -11,6 +11,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 
 import com.playmonumenta.plugins.guis.SinglePageGUI;
 import com.playmonumenta.plugins.utils.ItemUtils;
@@ -315,7 +316,8 @@ public class OrinSinglePageGUI extends SinglePageGUI {
 	public ItemStack createCustomItem(TeleportEntry location) {
 		ItemStack newItem = new ItemStack(location.mType, 1);
 		ItemMeta meta = newItem.getItemMeta();
-		meta.displayName(Component.text(location.mName, NamedTextColor.GOLD));
+		meta.displayName(Component.text(location.mName, NamedTextColor.GOLD)
+				.decoration(TextDecoration.ITALIC, false));
 		ArrayList<String> lore = new ArrayList<String>();
 		if (location.mLore != "") {
 			lore.add(location.mLore);
@@ -340,7 +342,7 @@ public class OrinSinglePageGUI extends SinglePageGUI {
 
 			for (int i = 0; i < (ROWS*COLUMNS); i++) {
 				if (inventory.getItem(i) == null) {
-					inventory.setItem(i,new ItemStack(Material.BLACK_STAINED_GLASS_PANE, 1));
+					inventory.setItem(i,new ItemStack(Material.GRAY_STAINED_GLASS_PANE, 1));
 				}
 			}
 			com.playmonumenta.plugins.utils.ScoreboardUtils.setScoreboardValue(player, "OrinPage", 0);
