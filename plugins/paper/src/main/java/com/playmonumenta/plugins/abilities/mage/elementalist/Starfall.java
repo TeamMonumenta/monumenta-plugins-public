@@ -98,8 +98,6 @@ public class Starfall extends Ability {
 					}
 				}
 			}
-
-			putOnCooldown();
 		}
 	}
 
