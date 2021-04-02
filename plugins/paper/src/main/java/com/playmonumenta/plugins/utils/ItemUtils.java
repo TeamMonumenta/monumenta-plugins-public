@@ -1185,6 +1185,9 @@ public class ItemUtils {
 	}
 
 	public static List<String> getPlainLore(ItemStack itemStack, boolean refresh) {
+		if (itemStack == null) {
+			return null;
+		}
 		if (refresh) {
 			setPlainLore(itemStack);
 		}
