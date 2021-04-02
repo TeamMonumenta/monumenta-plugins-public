@@ -657,9 +657,9 @@ public class FrostGiant extends BossAbilityGroup {
 						double radian = Math.toRadians(degree);
 						double cos = FastUtils.cos(radian);
 						double sin = FastUtils.sin(radian);
-						loc.add(cos * (hailstormRadius + 2), 0.5, sin * (hailstormRadius + 2));
+						loc.add(cos * (hailstormRadius), 0.5, sin * (hailstormRadius));
 						world.spawnParticle(Particle.REDSTONE, loc, 1, 0, 0, 0, LIGHT_BLUE_COLOR);
-						loc.subtract(cos * (hailstormRadius + 2), 0.5, sin * (hailstormRadius + 2));
+						loc.subtract(cos * (hailstormRadius), 0.5, sin * (hailstormRadius));
 					}
 				}
 

@@ -72,6 +72,9 @@ public class SpellSpinDown extends Spell {
 		world.spawnParticle(Particle.SMOKE_LARGE, secondLoc, 35, 0.1, 0.45, 0.1, 0.15);
 		world.spawnParticle(Particle.EXPLOSION_NORMAL, bossLoc, 25, 0.2, 0, 0.2, 0.1);
 
+		FrostGiant.delayHailstormDamage();
+		FrostGiant.delayDamage();
+
 		Map<Location, Material> oldBlocks = new HashMap<>();
 		Map<Location, BlockData> oldData = new HashMap<>();
 

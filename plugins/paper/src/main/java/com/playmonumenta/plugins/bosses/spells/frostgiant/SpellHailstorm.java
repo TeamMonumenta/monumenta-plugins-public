@@ -87,9 +87,9 @@ public class SpellHailstorm extends Spell {
 		for (double degree = 0; degree < 360; degree++) {
 			if (FastUtils.RANDOM.nextDouble() < 0.4) {
 				double radian = Math.toRadians(degree);
-				loc.add(FastUtils.cos(radian) * (mRadius + 2), 0.5, FastUtils.sin(radian) * (mRadius + 2));
+				loc.add(FastUtils.cos(radian) * (mRadius), 0.5, FastUtils.sin(radian) * (mRadius));
 				world.spawnParticle(Particle.REDSTONE, loc, 1, 0, 0, 0, LIGHT_BLUE_COLOR);
-				loc.subtract(FastUtils.cos(radian) * (mRadius + 2), 0.5, FastUtils.sin(radian) * (mRadius + 2));
+				loc.subtract(FastUtils.cos(radian) * (mRadius), 0.5, FastUtils.sin(radian) * (mRadius));
 			}
 		}
 
