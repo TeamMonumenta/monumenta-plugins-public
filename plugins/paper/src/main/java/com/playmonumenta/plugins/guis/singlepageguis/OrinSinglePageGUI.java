@@ -27,6 +27,7 @@ public class OrinSinglePageGUI extends SinglePageGUI {
 
 	private static final int ROWS = 6;
 	private static final int COLUMNS = 9;
+	private static final Material FILLER = Material.GRAY_STAINED_GLASS_PANE;
 
 	//Layout, with P_x being plots, R1S as sierhaven,
 	//R2M as mistport, and the rest matching access code
@@ -236,7 +237,7 @@ public class OrinSinglePageGUI extends SinglePageGUI {
 		}
 		int activeTreeInv = ScoreboardUtils.getScoreboardValue(player, "OrinPage");
 
-		if (clickedItem != null && clickedItem.getType() != Material.BLACK_STAINED_GLASS_PANE && !event.isShiftClick()) {
+		if (clickedItem != null && clickedItem.getType() != FILLER && !event.isShiftClick()) {
 			int chosenSlot = event.getSlot();
 			if (activeTreeInv == 0) {
 				for (TeleportEntry location : LOCATIONS_PAGE) {
@@ -342,7 +343,7 @@ public class OrinSinglePageGUI extends SinglePageGUI {
 
 			for (int i = 0; i < (ROWS*COLUMNS); i++) {
 				if (inventory.getItem(i) == null) {
-					inventory.setItem(i,new ItemStack(Material.GRAY_STAINED_GLASS_PANE, 1));
+					inventory.setItem(i,new ItemStack(FILLER, 1));
 				}
 			}
 			com.playmonumenta.plugins.utils.ScoreboardUtils.setScoreboardValue(player, "OrinPage", 0);

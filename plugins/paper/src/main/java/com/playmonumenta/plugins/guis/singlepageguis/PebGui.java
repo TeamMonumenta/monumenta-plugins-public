@@ -25,6 +25,7 @@ public class PebGui extends SinglePageGUI {
 
 	private static final int ROWS = 6;
 	private static final int COLUMNS = 9;
+	private static final Material FILLER = Material.GRAY_STAINED_GLASS_PANE;
 
 	public static class PebItem {
 		int mPage = 1;
@@ -61,7 +62,7 @@ public class PebGui extends SinglePageGUI {
 				Material.RABBIT_FOOT, "kick @S You really thought I'd let you kick someone other than yourself?"));
 
 		//page 1: main menu
-		PEB_ITEMS.add(new PebItem(1, 0, "", "", ChatColor.LIGHT_PURPLE, Material.GRAY_STAINED_GLASS_PANE, ""));
+		PEB_ITEMS.add(new PebItem(1, 0, "", "", ChatColor.LIGHT_PURPLE, FILLER, ""));
 		PEB_ITEMS.add(new PebItem(1, 11, "Player Information",
 				"Details about Housing, Prestige, and other player-focused options.", ChatColor.LIGHT_PURPLE,
 				Material.PLAYER_HEAD, "page 2"));
@@ -269,7 +270,7 @@ public class PebGui extends SinglePageGUI {
 		}
 		int newPageValue;
 		int currentPage = ScoreboardUtils.getScoreboardValue(player, "PEBPage");
-		if (clickedItem != null && clickedItem.getType() != Material.BLACK_STAINED_GLASS_PANE && !event.isShiftClick()) {
+		if (clickedItem != null && clickedItem.getType() != FILLER && !event.isShiftClick()) {
 
 			int chosenSlot = event.getSlot();
 			for (PebItem item : PEB_ITEMS) {
@@ -372,7 +373,7 @@ public class PebGui extends SinglePageGUI {
 
 		for (int i = 0; i < (ROWS*COLUMNS); i++) {
 			if (inventory.getItem(i) == null) {
-				inventory.setItem(i,new ItemStack(Material.GRAY_STAINED_GLASS_PANE, 1));
+				inventory.setItem(i,new ItemStack(FILLER, 1));
 			}
 		}
 		com.playmonumenta.plugins.utils.ScoreboardUtils.setScoreboardValue(player, "PEBPage", page);
