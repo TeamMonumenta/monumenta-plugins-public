@@ -5,6 +5,7 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Guardian;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
@@ -44,7 +45,8 @@ public class Riposte extends Ability {
 	public boolean playerDamagedByLivingEntityEvent(EntityDamageByEntityEvent event) {
 		if (EntityUtils.getRealFinalDamage(event) > 0) {
 			LivingEntity damager = (LivingEntity) event.getDamager();
-			if (event.getCause() == DamageCause.ENTITY_ATTACK) {
+			if (event.getCause() == DamageCause.ENTITY_ATTACK
+					 && !(damager instanceof Guardian)) {
 				ItemStack mainHand = mPlayer.getInventory().getItemInMainHand();
 				MovementUtils.knockAway(mPlayer, damager, RIPOSTE_KNOCKBACK_SPEED);
 
