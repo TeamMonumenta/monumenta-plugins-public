@@ -187,7 +187,7 @@
     </dependencies>
 
     <build>
-        <finalName>Monumenta_1.16.4_${project.version}_${maven.build.timestamp}</finalName>
+        <finalName>Monumenta_1.16.5_${project.version}_${maven.build.timestamp}</finalName>
         <pluginManagement>
             <plugins>
                 <plugin>
