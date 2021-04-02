@@ -8,9 +8,6 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import com.playmonumenta.plugins.integrations.MonumentaNetworkRelayIntegration;
-import com.playmonumenta.plugins.utils.MessagingUtils;
-
-import net.kyori.adventure.text.Component;
 
 import org.bukkit.GameMode;
 import org.bukkit.Material;
@@ -202,10 +199,10 @@ public class AuditListener implements Listener {
 		if (item.hasItemMeta()) {
 			ItemMeta meta = item.getItemMeta();
 			if (meta != null) {
-				Component displayName = meta.displayName();
-				if (displayName != null) {
+				String displayName = meta.getDisplayName();
+				if (displayName != null && !displayName.isEmpty()) {
 					/* Has display name */
-					retStr += " \"" + MessagingUtils.plainText(displayName) + "\"";
+					retStr += " \"" + displayName + "\"";
 				}
 
 				if (meta instanceof BlockStateMeta) {

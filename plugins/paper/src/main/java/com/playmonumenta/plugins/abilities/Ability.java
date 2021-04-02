@@ -31,7 +31,7 @@ import com.playmonumenta.plugins.events.PotionEffectApplyEvent;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 
-import net.kyori.adventure.text.Component;
+import net.md_5.bungee.api.chat.ComponentBuilder;
 
 public abstract class Ability {
 	protected final Plugin mPlugin;
@@ -298,7 +298,7 @@ public abstract class Ability {
 		return 0;
 	}
 
-	public Component getLevelHover(boolean useShorthand) {
+	public ComponentBuilder getLevelHover(boolean useShorthand) {
 		return mInfo.getLevelHover(getAbilityScore(), useShorthand);
 	}
 

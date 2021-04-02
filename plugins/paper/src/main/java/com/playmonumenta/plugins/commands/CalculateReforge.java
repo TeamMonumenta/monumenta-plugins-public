@@ -54,7 +54,7 @@ public class CalculateReforge extends GenericCommand {
 			LootContext context = new LootContext.Builder(player.getLocation()).build();
 			ItemStack[] dummy = new ItemStack[0];
 			if (mCXP == null) {
-				NamespacedKey key = NamespacedKey.fromString("epic:r1/items/currency/concentrated_experience");
+				NamespacedKey key = new NamespacedKey("epic", "r1/items/currency/concentrated_experience");
 				LootTable table = Bukkit.getLootTable(key);
 				if (table != null) {
 					Collection<ItemStack> loot = table.populateLoot(FastUtils.RANDOM, context);
@@ -64,7 +64,7 @@ public class CalculateReforge extends GenericCommand {
 				}
 			}
 			if (mHXP == null) {
-				NamespacedKey key = NamespacedKey.fromString("epic:r1/items/currency/hyper_experience");
+				NamespacedKey key = new NamespacedKey("epic", "r1/items/currency/hyper_experience");
 				LootTable table = Bukkit.getLootTable(key);
 				if (table != null) {
 					Collection<ItemStack> loot = table.populateLoot(FastUtils.RANDOM, context);
@@ -74,7 +74,7 @@ public class CalculateReforge extends GenericCommand {
 				}
 			}
 			if (mCCS == null) {
-				NamespacedKey key = NamespacedKey.fromString("epic:r2/items/currency/compressed_crystalline_shard");
+				NamespacedKey key = new NamespacedKey("epic", "r2/items/currency/compressed_crystalline_shard");
 				LootTable table = Bukkit.getLootTable(key);
 				if (table != null) {
 					Collection<ItemStack> loot = table.populateLoot(FastUtils.RANDOM, context);
@@ -84,7 +84,7 @@ public class CalculateReforge extends GenericCommand {
 				}
 			}
 			if (mHCS == null) {
-				NamespacedKey key = NamespacedKey.fromString("epic:r2/items/currency/hyper_crystalline_shard");
+				NamespacedKey key = new NamespacedKey("epic", "r2/items/currency/hyper_crystalline_shard");
 				LootTable table = Bukkit.getLootTable(key);
 				if (table != null) {
 					Collection<ItemStack> loot = table.populateLoot(FastUtils.RANDOM, context);

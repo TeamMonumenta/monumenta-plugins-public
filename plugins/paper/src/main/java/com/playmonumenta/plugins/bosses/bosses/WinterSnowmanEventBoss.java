@@ -73,7 +73,7 @@ public class WinterSnowmanEventBoss extends BossAbilityGroup {
 				loc.getWorld().spawnParticle(Particle.CLOUD, loc, 100, 1, 1, 1, 0.1);
 				if (AbsorptionUtils.getAbsorption(player) <= 0) {
 					if (mBoss.getCustomName() != null) {
-						player.setMetadata(deathMetakey, new FixedMetadataValue(mPlugin, mBoss.getUniqueId().toString()));
+						player.setMetadata(deathMetakey, new FixedMetadataValue(mPlugin, mBoss.getCustomName()));
 					}
 					player.setHealth(0);
 				}

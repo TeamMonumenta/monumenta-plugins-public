@@ -49,7 +49,7 @@ public class TOVUtils {
 
 				if (UNOPENED_CACHE_NAME.equals(name)) {
 					chest.setCustomName(OPENED_CACHE_NAME);
-					chest.setLootTable(Bukkit.getLootTable(NamespacedKey.fromString("epic:" + CACHE_LOOT_TABLE)));
+					chest.setLootTable(Bukkit.getLootTable(new NamespacedKey("epic", CACHE_LOOT_TABLE)));
 					chest.update();
 				}
 			}

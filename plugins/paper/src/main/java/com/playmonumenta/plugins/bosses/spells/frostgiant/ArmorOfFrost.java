@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -14,19 +15,15 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
-import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
-
 import com.playmonumenta.plugins.bosses.bosses.FrostGiant;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.utils.FastUtils;
-import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 
 /*
@@ -90,15 +87,15 @@ public class ArmorOfFrost extends Spell {
 			if (event.getDamager() instanceof Player) {
 
 				//Debug purposes
-				ItemStack item = ((Player)event.getDamager()).getInventory().getItemInMainHand();
-				if (item != null && ItemUtils.getPlainName(item).equals("Frost Giant Damager")) {
+				ItemMeta im = ((Player)event.getDamager()).getInventory().getItemInMainHand().getItemMeta();
+				if (im != null && im.getDisplayName().equals("Frost Giant Damager")) {
 					return;
 				}
 
 				Player player = (Player) event.getDamager();
 				player.playSound(player.getLocation(), Sound.ITEM_SHIELD_BLOCK, SoundCategory.HOSTILE, 3, 0);
 				if (!mWarned.contains(player)) {
-					player.sendMessage(Component.text("The armor absorbs the damage you dealt.", NamedTextColor.GOLD));
+					player.sendMessage(ChatColor.GOLD + "The armor absorbs the damage you dealt.");
 					mWarned.add(player);
 				}
 
@@ -115,7 +112,7 @@ public class ArmorOfFrost extends Spell {
 				Player player = (Player) event.getEntity().getShooter();
 				player.playSound(player.getLocation(), Sound.ITEM_SHIELD_BLOCK, SoundCategory.HOSTILE, 3, 0);
 				if (!mWarned.contains(player)) {
-					player.sendMessage(Component.text("The armor absorbs the damage you dealt.", NamedTextColor.GOLD));
+					player.sendMessage(ChatColor.GOLD + "The armor absorbs the damage you dealt.");
 					mWarned.add(player);
 				}
 			}

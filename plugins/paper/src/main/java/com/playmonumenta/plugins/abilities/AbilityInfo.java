@@ -9,9 +9,9 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.classes.Spells;
 
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.format.TextDecoration;
+import net.md_5.bungee.api.ChatColor;
+import net.md_5.bungee.api.chat.ComponentBuilder;
+import net.md_5.bungee.api.chat.HoverEvent;
 
 /**
  * The AbilityInfo class contains the small information bits
@@ -51,7 +51,7 @@ public class AbilityInfo {
 	 */
 	public boolean mIgnoreTriggerCap = false;
 
-	public Component getFormattedDescription(int skillLevel) throws IndexOutOfBoundsException {
+	public ComponentBuilder getFormattedDescription(int skillLevel) throws IndexOutOfBoundsException {
 		String strDescription = mDescriptions.get(skillLevel - 1);
 		if (strDescription == null) {
 			strDescription = "NULL! Set description properly!";
@@ -60,29 +60,27 @@ public class AbilityInfo {
 		String skillHeader;
 		skillHeader = "[" + mDisplayName.toUpperCase() + " Level " + skillLevel + "] : ";
 
-		return Component.text("")
-			.append(Component.text(skillHeader, NamedTextColor.GREEN, TextDecoration.BOLD))
-			.append(Component.text(strDescription, NamedTextColor.YELLOW));
+		return new ComponentBuilder(skillHeader).color(ChatColor.GREEN).bold(true)
+		           .append(strDescription).color(ChatColor.GREEN).bold(false);
 	}
 
-	public Component getFormattedDescriptions() {
+	public ComponentBuilder getFormattedDescriptions() {
 		if (mDescriptions.size() == 0) {
-			return Component.text("No descriptions found for " + mDisplayName + "!", NamedTextColor.RED);
+			return new ComponentBuilder("No descriptions found for " + mDisplayName + "!").color(ChatColor.RED);
 		}
 
-		Component component = Component.text("");
-		component.append(getFormattedDescription(1));
+		ComponentBuilder componentBuilder = new ComponentBuilder(getFormattedDescription(1));
 		for (int skillLevel = 2; skillLevel <= mDescriptions.size(); skillLevel++) {
-			component.append(Component.text("\n"));
-			component.append(getFormattedDescription(skillLevel));
+			componentBuilder.append("\n");
+			componentBuilder.append(getFormattedDescription(skillLevel).create());
 		}
-		return component;
+		return componentBuilder;
 	}
 
 	/*
 	 * Returns null if a hover message could not be created
 	 */
-	public Component getLevelHover(int skillLevel, boolean useShorthand) {
+	public ComponentBuilder getLevelHover(int skillLevel, boolean useShorthand) {
 		String hoverableString;
 		if (useShorthand) {
 			if (mShorthandName == null) {
@@ -95,12 +93,15 @@ public class AbilityInfo {
 			}
 			hoverableString = mDisplayName.toUpperCase() + " Level " + skillLevel;
 		}
-		return Component.text(hoverableString, NamedTextColor.YELLOW)
-		.hoverEvent(getFormattedDescriptions());
+		ComponentBuilder componentBuilder = new ComponentBuilder(hoverableString).color(ChatColor.YELLOW);
+
+		HoverEvent hover = new HoverEvent(HoverEvent.Action.SHOW_TEXT, getFormattedDescriptions().create());
+
+		return componentBuilder.event(hover);
 	}
 
 	public void sendDescriptions(CommandSender sender) {
-		sender.sendMessage(getFormattedDescriptions());
+		sender.sendMessage(getFormattedDescriptions().create());
 	}
 
 	public JsonObject getAsJsonObject() {

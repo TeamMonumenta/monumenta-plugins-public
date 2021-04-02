@@ -7,8 +7,6 @@ import com.playmonumenta.plugins.point.Raycast;
 import com.playmonumenta.plugins.point.RaycastData;
 import com.playmonumenta.scriptedquests.utils.InventoryUtils;
 
-import net.kyori.adventure.text.Component;
-
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -113,7 +111,7 @@ public class PlayerInventoryView implements Listener {
 		mPlayers.add(player);
 
 		PlayerInventory playInv = clickedPlayer.getInventory();
-		Inventory openInv = Bukkit.createInventory(null, 18, Component.text(clickedPlayer.getName() + "'s Inventory"));
+		Inventory openInv = Bukkit.createInventory(null, 18, clickedPlayer.getDisplayName() + "'s Inventory");
 		mInventories.add(openInv);
 
 		//Set the fake inventory's top row to be the armor and offhand of the player

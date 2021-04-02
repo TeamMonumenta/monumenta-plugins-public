@@ -75,9 +75,9 @@ public class ShulkerInventory {
 		mShulkerMeta = (BlockStateMeta) mShulkerItem.getItemMeta();
 		mShulkerState = (ShulkerBox) mShulkerMeta.getBlockState();
 		if (mShulkerState.getCustomName() != null) {
-			mInventory = Bukkit.createInventory(mPlayer, InventoryType.SHULKER_BOX, mShulkerState.customName());
+			mInventory = Bukkit.createInventory(mPlayer, InventoryType.SHULKER_BOX, mShulkerState.getCustomName());
 		} else if (ShulkerShortcutListener.isEnderExpansion(mShulkerItem)) {
-			mInventory = Bukkit.createInventory(mPlayer, InventoryType.SHULKER_BOX, mShulkerItem.getItemMeta().displayName());
+			mInventory = Bukkit.createInventory(mPlayer, InventoryType.SHULKER_BOX, mShulkerItem.getItemMeta().getDisplayName());
 		} else {
 			mInventory = Bukkit.createInventory(mPlayer, InventoryType.SHULKER_BOX);
 		}

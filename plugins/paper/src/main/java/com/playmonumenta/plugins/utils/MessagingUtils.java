@@ -42,7 +42,7 @@ public class MessagingUtils {
 		message = translatePlayerName(player, message);
 		message = message.replace('&', '§');
 		TextComponent formattedMessage = LEGACY_SERIALIZER.deserialize(message);
-		player.sendMessage(formattedMessage);
+		player.sendMessage(Identity.nil(), formattedMessage, MessageType.SYSTEM);
 	}
 
 	public static void sendStackTrace(CommandSender sender, Exception e) {
@@ -64,7 +64,7 @@ public class MessagingUtils {
 
 		TextComponent textStackTrace = Component.text(sStackTrace.replace("\t", "  "), NamedTextColor.RED);
 		formattedMessage.hoverEvent(textStackTrace);
-		sender.sendMessage(formattedMessage);
+		sender.sendMessage(Identity.nil(), formattedMessage, MessageType.SYSTEM);
 
 		e.printStackTrace();
 	}
