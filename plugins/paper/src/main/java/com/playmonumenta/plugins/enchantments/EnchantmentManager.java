@@ -63,9 +63,11 @@ public class EnchantmentManager implements Listener {
 			new CurseOfCrippling(),
 			new CurseOfEphemerality(),
 			new CurseOfShrapnel(),
+
 			//Utility Enchants
 			new Recoil(),
-			new RageOfTheKeter()
+			new RageOfTheKeter(),
+			new Retrieval()
 	);
 
 	/*

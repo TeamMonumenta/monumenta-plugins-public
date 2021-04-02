@@ -24,7 +24,7 @@ public class Sapper implements BaseEnchantment {
 
 	@Override
 	public EnumSet<ItemSlot> validSlots() {
-		return EnumSet.of(ItemSlot.MAINHAND, ItemSlot.ARMOR);
+		return EnumSet.of(ItemSlot.MAINHAND, ItemSlot.ARMOR, ItemSlot.OFFHAND);
 	}
 
 	@Override

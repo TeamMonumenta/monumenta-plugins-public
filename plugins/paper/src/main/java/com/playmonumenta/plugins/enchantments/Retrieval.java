@@ -1,5 +1,7 @@
 package com.playmonumenta.plugins.enchantments;
 
+import java.util.EnumSet;
+
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
@@ -14,6 +16,7 @@ import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.entity.EntityType;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 
@@ -27,8 +30,13 @@ public class Retrieval implements BaseEnchantment {
 	}
 
 	@Override
+	public EnumSet<ItemSlot> validSlots() {
+		return EnumSet.of(ItemSlot.MAINHAND, ItemSlot.ARMOR, ItemSlot.OFFHAND);
+	}
+
+	@Override
 	public void onLaunchProjectile(Plugin plugin, Player player, int level, Projectile proj, ProjectileLaunchEvent event) {
-		if (proj.getType() == EntityType.ARROW) {
+		if (proj.getType() == EntityType.ARROW || proj.getType() == EntityType.SPECTRAL_ARROW) {
 			AbstractArrow arrow = (AbstractArrow)proj;
 			ItemStack mainHand = player.getInventory().getItemInMainHand();
 			ItemStack offHand = player.getInventory().getItemInOffHand();
@@ -41,19 +49,32 @@ public class Retrieval implements BaseEnchantment {
 					Inventory playerInv = player.getInventory();
 					int firstArrow = playerInv.first(Material.ARROW);
 					int firstTippedArrow = playerInv.first(Material.TIPPED_ARROW);
+					int firstSpectralArrow = playerInv.first(Material.SPECTRAL_ARROW);
 
 					final int arrowSlot;
-					if (firstArrow == -1 && firstTippedArrow > -1) {
+					if (firstArrow == -1 && firstTippedArrow > -1 && firstSpectralArrow == -1) {
 						arrowSlot = firstTippedArrow;
-					} else if (firstArrow > - 1 && firstTippedArrow == -1) {
+					} else if (firstArrow > - 1 && firstTippedArrow == -1 && firstSpectralArrow == -1) {
 						arrowSlot = firstArrow;
+					} else if (firstArrow == -1 && firstTippedArrow == -1 && firstSpectralArrow > -1) {
+						arrowSlot = firstSpectralArrow;
 					} else if (firstArrow > - 1 && firstTippedArrow > -1) {
 						arrowSlot = Math.min(firstArrow, firstTippedArrow);
+					} else if (firstArrow > -1 && firstSpectralArrow > -1) {
+						arrowSlot = Math.min(firstArrow, firstTippedArrow);
+					} else if (firstTippedArrow > -1 && firstSpectralArrow > -1) {
+						arrowSlot = Math.min(firstSpectralArrow, firstTippedArrow);
+					} else if (firstTippedArrow > -1 && firstSpectralArrow > -1 && firstArrow > -1) {
+						arrowSlot = Math.min(firstSpectralArrow, Math.min(firstSpectralArrow, firstArrow));
 					} else {
 						return;
 					}
 					arrow.setPickupStatus(Arrow.PickupStatus.DISALLOWED);
-					playerInv.setItem(arrowSlot, playerInv.getItem(arrowSlot));
+					if (arrow.isShotFromCrossbow()) {
+						playerInv.getItem(arrowSlot).setAmount(playerInv.getItem(arrowSlot).getAmount() + 1);
+					} else {
+						playerInv.setItem(arrowSlot, playerInv.getItem(arrowSlot));
+					}
 				}
 			}
 		}

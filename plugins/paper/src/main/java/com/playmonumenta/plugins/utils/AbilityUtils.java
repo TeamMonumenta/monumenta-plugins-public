@@ -244,23 +244,35 @@ public class AbilityUtils {
 					Inventory playerInv = player.getInventory();
 					int firstArrow = playerInv.first(Material.ARROW);
 					int firstTippedArrow = playerInv.first(Material.TIPPED_ARROW);
+					int firstSpectralArrow = playerInv.first(Material.SPECTRAL_ARROW);
 
 					final int arrowSlot;
-					if (firstArrow == -1 && firstTippedArrow > -1) {
+					if (firstArrow == -1 && firstTippedArrow > -1 && firstSpectralArrow == -1) {
 						arrowSlot = firstTippedArrow;
-					} else if (firstArrow > - 1 && firstTippedArrow == -1) {
+					} else if (firstArrow > - 1 && firstTippedArrow == -1 && firstSpectralArrow == -1) {
 						arrowSlot = firstArrow;
+					} else if (firstArrow == -1 && firstTippedArrow == -1 && firstSpectralArrow > -1) {
+						arrowSlot = firstSpectralArrow;
 					} else if (firstArrow > - 1 && firstTippedArrow > -1) {
 						arrowSlot = Math.min(firstArrow, firstTippedArrow);
+					} else if (firstArrow > -1 && firstSpectralArrow > -1) {
+						arrowSlot = Math.min(firstArrow, firstTippedArrow);
+					} else if (firstTippedArrow > -1 && firstSpectralArrow > -1) {
+						arrowSlot = Math.min(firstSpectralArrow, firstTippedArrow);
+					} else if (firstTippedArrow > -1 && firstSpectralArrow > -1 && firstArrow > -1) {
+						arrowSlot = Math.min(firstSpectralArrow, Math.min(firstSpectralArrow, firstArrow));
 					} else {
-						/* Player shot their last arrow - abort here */
 						return;
 					}
 
 					// Make sure the duplicate arrow can't be picked up
 					arrow.setPickupStatus(Arrow.PickupStatus.DISALLOWED);
 					// I'm not sure why this works, but it does.
-					playerInv.setItem(arrowSlot, playerInv.getItem(arrowSlot));
+					if (arrow.isShotFromCrossbow()) {
+						playerInv.getItem(arrowSlot).setAmount(playerInv.getItem(arrowSlot).getAmount() + 1);
+					} else {
+						playerInv.setItem(arrowSlot, playerInv.getItem(arrowSlot));
+					}
 				}
 			}
 		}
