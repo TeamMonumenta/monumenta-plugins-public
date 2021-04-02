@@ -1,11 +1,14 @@
 package com.playmonumenta.plugins.enchantments;
 
+import java.util.EnumSet;
+
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
+import com.playmonumenta.plugins.utils.InventoryUtils;
+
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Item;
 import org.bukkit.inventory.ItemStack;
-
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.utils.InventoryUtils;
 
 public class CurseOfEphemerality implements BaseEnchantment {
 
@@ -14,6 +17,11 @@ public class CurseOfEphemerality implements BaseEnchantment {
 	@Override
 	public String getProperty() {
 		return PROPERTY_NAME;
+	}
+
+	@Override
+	public EnumSet<ItemSlot> validSlots() {
+		return EnumSet.noneOf(ItemSlot.class);
 	}
 
 	@Override

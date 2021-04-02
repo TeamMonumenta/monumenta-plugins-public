@@ -33,6 +33,11 @@ public interface BaseEnchantment {
 	String getProperty();
 
 	/*
+	 * Required - describes which slots this property is valid in
+	 */
+	EnumSet<ItemSlot> validSlots();
+
+	/*
 	 * Returns whether the property can have negative values (attributes)
 	 */
 	default boolean negativeLevelsAllowed() {
@@ -46,13 +51,6 @@ public interface BaseEnchantment {
 	 */
 	default boolean useEnchantLevels() {
 		return true;
-	}
-
-	/*
-	 * Describes which slots this property is valid in
-	 */
-	default EnumSet<ItemSlot> validSlots() {
-		return EnumSet.noneOf(ItemSlot.class);
 	}
 
 	/*

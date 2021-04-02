@@ -1,15 +1,17 @@
 package com.playmonumenta.plugins.enchantments;
 
 import java.lang.reflect.Field;
+import java.util.EnumSet;
+
+import com.playmonumenta.plugins.Constants;
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
+import com.playmonumenta.plugins.utils.EntityUtils;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Particle;
 import org.bukkit.entity.Item;
 import org.bukkit.scheduler.BukkitRunnable;
-
-import com.playmonumenta.plugins.Constants;
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.utils.EntityUtils;
 
 public class Hope implements BaseEnchantment {
 	public static String PROPERTY_NAME = ChatColor.GRAY + "Hope";
@@ -21,6 +23,11 @@ public class Hope implements BaseEnchantment {
 	@Override
 	public String getProperty() {
 		return PROPERTY_NAME;
+	}
+
+	@Override
+	public EnumSet<ItemSlot> validSlots() {
+		return EnumSet.noneOf(ItemSlot.class);
 	}
 
 	@Override
