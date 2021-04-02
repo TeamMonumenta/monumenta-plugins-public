@@ -5,6 +5,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Flying;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.SpawnerSpawnEvent;
 
 import com.playmonumenta.plugins.Plugin;
@@ -50,6 +51,14 @@ public class Chivalrous extends DelveModifier {
 			mSpawnChance = SPAWN_CHANCE[rank - 1];
 		} else {
 			mSpawnChance = 0;
+		}
+	}
+
+	@Override
+	public void playerTookMeleeDamageEvent(EntityDamageByEntityEvent event) {
+		// Can't make magma cubes do 0 damage in Vanilla using attributes or Weakness
+		if (MOUNTS[1].equals(event.getEntity().getCustomName())) {
+			event.setDamage(0);
 		}
 	}
 
