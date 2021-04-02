@@ -33,14 +33,16 @@ public class PebGui extends SinglePageGUI {
 		String mLore;
 		Material mType;
 		String mCommand;
+		ChatColor mChatColor = null;
 
-		public PebItem(int pg, int sl, String n, String l, Material t, String cmd) {
+		public PebItem(int pg, int sl, String n, String l, ChatColor cc, Material t, String cmd) {
 			mSlot = sl;
 			mName = n;
 			mLore = l;
 			mType = t;
 			mCommand = cmd;
 			mPage = pg;
+			mChatColor = cc;
 		}
 
 	}
@@ -49,174 +51,172 @@ public class PebGui extends SinglePageGUI {
 
 	static {
 		//Common items for all but main menu are "page 0"
-		PEB_ITEMS.add(new PebItem(0, 0, "Back to Main Menu", ChatColor.GOLD + "Returns you to page 1.", Material.OBSERVER, "page 1"));
-		PEB_ITEMS.add(new PebItem(0, 8, "Exit PEB", ChatColor.GOLD + "Exits this menu.", Material.COD_BUCKET, "exit"));
+		PEB_ITEMS.add(new PebItem(0, 0, "Back to Main Menu", "Returns you to page 1.", ChatColor.GOLD, Material.OBSERVER, "page 1"));
+		PEB_ITEMS.add(new PebItem(0, 8, "Exit PEB", "Exits this menu.", ChatColor.GOLD, Material.COD_BUCKET, "exit"));
 		PEB_ITEMS.add(new PebItem(0, 45, "Delete P.E.B.s ✗",
-				ChatColor.LIGHT_PURPLE + "Click to remove P.E.B.s from your inventory.",
+				"Click to remove P.E.B.s from your inventory.", ChatColor.LIGHT_PURPLE,
 				Material.FLINT_AND_STEEL, "clickable peb_delete"));
 		PEB_ITEMS.add(new PebItem(0, 53, "Kick someone!",
-				ChatColor.LIGHT_PURPLE + "Kicks someone from the server.",
+				"Kicks someone from the server.", ChatColor.LIGHT_PURPLE,
 				Material.RABBIT_FOOT, "kick @S You really thought I'd let you kick someone other than yourself?"));
 
 		//page 1: main menu
-		PEB_ITEMS.add(new PebItem(1, 0, "", "", Material.GRAY_STAINED_GLASS_PANE, ""));
+		PEB_ITEMS.add(new PebItem(1, 0, "", "", ChatColor.LIGHT_PURPLE, Material.GRAY_STAINED_GLASS_PANE, ""));
 		PEB_ITEMS.add(new PebItem(1, 11, "Player Information",
-				ChatColor.LIGHT_PURPLE + "Details about Housing, Prestige, and other player-focused options.",
+				"Details about Housing, Prestige, and other player-focused options.", ChatColor.LIGHT_PURPLE,
 				Material.PLAYER_HEAD, "page 2"));
 		PEB_ITEMS.add(new PebItem(1, 15, "Toggle-able Options",
-				ChatColor.LIGHT_PURPLE + "Inventory Sort, Filtered Pickup, and more toggleable choices.",
+				"Inventory Sort, Filtered Pickup, and more toggleable choices.", ChatColor.LIGHT_PURPLE,
 				Material.LEVER, "page 3"));
 		PEB_ITEMS.add(new PebItem(1, 38, "Server Information",
-				ChatColor.LIGHT_PURPLE + "Information such as how to use the PEB, current shrine buffs, and random tips.",
+				"Information such as how to use the PEB, current shrine buffs, and random tips.", ChatColor.LIGHT_PURPLE,
 				Material.DISPENSER, "page 4"));
 		PEB_ITEMS.add(new PebItem(1, 42, "Book Skins",
-				ChatColor.LIGHT_PURPLE + "Inventory Sort, Filtered Pickup, and more toggleable choices.",
+				"Inventory Sort, Filtered Pickup, and more toggleable choices.", ChatColor.LIGHT_PURPLE,
 				Material.ENCHANTED_BOOK, "page 5"));
 
 
 		//page 2: Player Info
 		PEB_ITEMS.add(new PebItem(2, 4, "Player Information",
-				"",
+				"", ChatColor.LIGHT_PURPLE,
 				Material.PLAYER_HEAD, ""));
 		PEB_ITEMS.add(new PebItem(2, 19, "Housing",
-				ChatColor.LIGHT_PURPLE + "Click to view housing information.",
+				"Click to view housing information.", ChatColor.LIGHT_PURPLE,
 				Material.OAK_DOOR, "clickable peb_housing"));
 		PEB_ITEMS.add(new PebItem(2, 21, "Prestige",
-				ChatColor.LIGHT_PURPLE + "Click to view prestige and related unlocks.",
+				"Click to view prestige and related unlocks.", ChatColor.LIGHT_PURPLE,
 				Material.BRICK, "clickable peb_prestige"));
 		PEB_ITEMS.add(new PebItem(2, 23, "Class",
-				ChatColor.LIGHT_PURPLE + "Click to view your class and skills.",
+				"Click to view your class and skills.", ChatColor.LIGHT_PURPLE,
 				Material.STONE_SWORD, "clickable peb_class"));
 		PEB_ITEMS.add(new PebItem(2, 25, "Dungeon Instances",
-				ChatColor.LIGHT_PURPLE + "Click to view what dungeon instances you have open, and how old they are.",
+				"Click to view what dungeon instances you have open, and how old they are.", ChatColor.LIGHT_PURPLE,
 				Material.WHITE_WOOL, "clickable peb_dungeoninfo"));
 		PEB_ITEMS.add(new PebItem(2, 37, "Patreon Shrine",
-				ChatColor.LIGHT_PURPLE + "Click to view what buffs are active on the " + ChatColor.GOLD + "Patreon Shrine" + ChatColor.LIGHT_PURPLE + " and your settings.",
+				"Click to view what buffs are active on the " + ChatColor.GOLD + "Patreon Shrine" + ChatColor.LIGHT_PURPLE + " and your settings.", ChatColor.LIGHT_PURPLE,
 				Material.LANTERN, "clickable peb_shrineinfo"));
 		PEB_ITEMS.add(new PebItem(2, 39, "Patron",
-				ChatColor.LIGHT_PURPLE + "Click to view patron information. Use /donate to learn about donating.",
+				"Click to view patron information. Use /donate to learn about donating.", ChatColor.LIGHT_PURPLE,
 				Material.GLOWSTONE_DUST, "clickable peb_patroninfo"));
 		PEB_ITEMS.add(new PebItem(2, 41, "Dailies",
-				ChatColor.LIGHT_PURPLE + "Click to see what daily content you have and haven't done today.",
+				"Click to see what daily content you have and haven't done today.", ChatColor.LIGHT_PURPLE,
 				Material.ACACIA_BOAT, "clickable peb_dailies"));
 
 		//page 3: Toggle-able Options
 		PEB_ITEMS.add(new PebItem(3, 4, "Toggleable Options",
-				"",
+				"", ChatColor.LIGHT_PURPLE,
 				Material.LEVER, ""));
 		PEB_ITEMS.add(new PebItem(3, 19, "Self Particles",
-				ChatColor.LIGHT_PURPLE + "Click to toggle self particles.",
+				"Click to toggle self particles.", ChatColor.LIGHT_PURPLE,
 				Material.FIREWORK_STAR, "clickable peb_selfparticles"));
 		PEB_ITEMS.add(new PebItem(3, 21, "UA Rocket Jumping",
-				ChatColor.LIGHT_PURPLE + "Click to toggle rocket jumping with Unstable Arrows.",
+				"Click to toggle rocket jumping with Unstable Arrows.", ChatColor.LIGHT_PURPLE,
 				Material.FIREWORK_ROCKET, "clickable peb_uarj"));
 		PEB_ITEMS.add(new PebItem(3, 23, "Show name on patron buff announcement.",
-				ChatColor.LIGHT_PURPLE + "Toggles whether the player has their IGN in the buff announcement when they activate " + ChatColor.GOLD + "Patreon " + ChatColor.LIGHT_PURPLE + "buffs.",
+				"Toggles whether the player has their IGN in the buff announcement when they"
+				+ " activate " + ChatColor.GOLD + "Patreon " + ChatColor.LIGHT_PURPLE + "buffs.", ChatColor.LIGHT_PURPLE,
 				Material.LANTERN, "clickable toggle_patron_buff_thank"));
 		PEB_ITEMS.add(new PebItem(3, 25, "Filtered Pickup",
-				ChatColor.LIGHT_PURPLE + "Click to toggle the pickup of uninteresting items.",
+				"Click to toggle the pickup of uninteresting items.", ChatColor.LIGHT_PURPLE,
 				Material.DIRT, "pickup"));
 		PEB_ITEMS.add(new PebItem(3, 26, "Filtered Pickup information",
-				ChatColor.LIGHT_PURPLE + "Click to explain filtered pickup.",
+				"Click to explain filtered pickup.", ChatColor.LIGHT_PURPLE,
 				Material.BOOK, "clickable peb_filteredinfo"));
 		PEB_ITEMS.add(new PebItem(3, 37, "Inventory Drink",
-				ChatColor.LIGHT_PURPLE + "Click to toggle drinking potions with a right click in any inventory.",
+				"Click to toggle drinking potions with a right click in any inventory.", ChatColor.LIGHT_PURPLE,
 				Material.GLASS_BOTTLE, "clickable peb_tid"));
 		PEB_ITEMS.add(new PebItem(3, 39, "Compass Particles",
-				ChatColor.LIGHT_PURPLE + "Click to toggle a trail of guiding particles when following the quest compass.",
+				"Click to toggle a trail of guiding particles when following the quest compass.", ChatColor.LIGHT_PURPLE,
 				Material.COMPASS, "clickable peb_comp_particles"));
 		PEB_ITEMS.add(new PebItem(3, 41, "Death Sort",
-				ChatColor.LIGHT_PURPLE + "Click to toggle death sorting, which attempts to return items dropped on death to the slot they were in prior to death.",
+				"Click to toggle death sorting, which attempts to return items dropped on death to the slot they were in prior to death.", ChatColor.LIGHT_PURPLE,
 				Material.CHEST, "clickable peb_toggle_dso"));
 
 		//page 4: Server Info
 		PEB_ITEMS.add(new PebItem(4, 4, "Server Information",
-				"",
+				"", ChatColor.LIGHT_PURPLE,
 				Material.DISPENSER, ""));
 		PEB_ITEMS.add(new PebItem(4, 20, "P.E.B. Introduction",
-				ChatColor.LIGHT_PURPLE + "Click to hear the P.E.B. Introduction.",
+				"Click to hear the P.E.B. Introduction.", ChatColor.LIGHT_PURPLE,
 				Material.ENCHANTED_BOOK, "clickable peb_intro"));
-		PEB_ITEMS.add(new PebItem(4, 22, "Get Shrine Buffs",
-				ChatColor.LIGHT_PURPLE + "Click to recieve buffs from the " + ChatColor.GOLD + "Patreon Shrine" + ChatColor.LIGHT_PURPLE + " if any are active.",
-				Material.GLOWSTONE_DUST, "clickable peb_pbuff"));
 		PEB_ITEMS.add(new PebItem(4, 24, "Get a random tip!",
-				ChatColor.LIGHT_PURPLE + "Click to get a random tip!",
+				"Click to get a random tip!", ChatColor.LIGHT_PURPLE,
 				Material.REDSTONE_TORCH, "clickable peb_tip"));
 
 		//page 5: Book Skins
 		PEB_ITEMS.add(new PebItem(5, 4, "Book Skins",
-				"",
+				"", ChatColor.LIGHT_PURPLE,
 				Material.ENCHANTED_BOOK, ""));
 		PEB_ITEMS.add(new PebItem(5, 40, "Wool Colors",
-				ChatColor.LIGHT_PURPLE + "Click to jump to a page of wool colors.",
+				"Click to jump to a page of wool colors.", ChatColor.LIGHT_PURPLE,
 				Material.WHITE_WOOL, "page 6"));
 		PEB_ITEMS.add(new PebItem(5, 19, "Enchanted Book",
-				ChatColor.LIGHT_PURPLE + "Click to change skin to Enchanted Book. (Default)",
+				"Click to change skin to Enchanted Book. (Default)", ChatColor.LIGHT_PURPLE,
 				Material.ENCHANTED_BOOK, "clickable peb_skin_enchantedbook"));
 		PEB_ITEMS.add(new PebItem(5, 21, "Regal",
-				ChatColor.LIGHT_PURPLE + "Click to change skin to Regal.",
+				"Click to change skin to Regal.", ChatColor.LIGHT_PURPLE,
 				Material.YELLOW_CONCRETE, "clickable peb_skin_regal"));
 		PEB_ITEMS.add(new PebItem(5, 23, "Crimson King",
-				ChatColor.DARK_RED + "Upon the ancient powers creep...",
+				"Upon the ancient powers creep...", ChatColor.DARK_RED,
 				Material.RED_TERRACOTTA, "clickable peb_skin_ck"));
 		PEB_ITEMS.add(new PebItem(5, 25, "Rose",
-				ChatColor.RED + "Red like roses!",
+				"Red like roses!", ChatColor.RED,
 				Material.RED_CONCRETE, "clickable peb_skin_rose"));
 
 		//page 6
 		PEB_ITEMS.add(new PebItem(6, 9, "Back to Book Skins",
-				"",
+				"", ChatColor.LIGHT_PURPLE,
 				Material.ENCHANTED_BOOK, "page 5"));
 		PEB_ITEMS.add(new PebItem(6, 4, "Wool Skins",
-				"",
+				"", ChatColor.LIGHT_PURPLE,
 				Material.ENCHANTED_BOOK, ""));
 		PEB_ITEMS.add(new PebItem(6, 11, "White",
-				ChatColor.LIGHT_PURPLE + "Click to change skin to White.",
+				"Click to change skin to White.", ChatColor.LIGHT_PURPLE,
 				Material.WHITE_WOOL, "clickable peb_skin_white"));
 		PEB_ITEMS.add(new PebItem(6, 12, "Orange",
-				ChatColor.LIGHT_PURPLE + "Click to change skin to Orange.",
+				"Click to change skin to Orange.", ChatColor.LIGHT_PURPLE,
 				Material.ORANGE_WOOL, "clickable peb_skin_orange"));
 		PEB_ITEMS.add(new PebItem(6, 20, "Magenta",
-				ChatColor.LIGHT_PURPLE + "Click to change skin to Magenta.",
+				"Click to change skin to Magenta.", ChatColor.LIGHT_PURPLE,
 				Material.MAGENTA_WOOL, "clickable peb_skin_magenta"));
 		PEB_ITEMS.add(new PebItem(6, 21, "Light Blue",
-				ChatColor.LIGHT_PURPLE + "Click to change skin to Light Blue.",
+				"Click to change skin to Light Blue.", ChatColor.LIGHT_PURPLE,
 				Material.LIGHT_BLUE_WOOL, "clickable peb_skin_lightblue"));
 		PEB_ITEMS.add(new PebItem(6, 29, "Yellow",
-				ChatColor.LIGHT_PURPLE + "Click to change skin to Yellow.",
+				"Click to change skin to Yellow.", ChatColor.LIGHT_PURPLE,
 				Material.YELLOW_WOOL, "clickable peb_skin_yellow"));
 		PEB_ITEMS.add(new PebItem(6, 30, "Lime",
-				ChatColor.LIGHT_PURPLE + "Click to change skin to Lime.",
+				"Click to change skin to Lime.", ChatColor.LIGHT_PURPLE,
 				Material.LIME_WOOL, "clickable peb_skin_lime"));
 		PEB_ITEMS.add(new PebItem(6, 38, "Pink",
-				ChatColor.LIGHT_PURPLE + "Click to change skin to Pink.",
+				"Click to change skin to Pink.", ChatColor.LIGHT_PURPLE,
 				Material.PINK_WOOL, "clickable peb_skin_pink"));
 		PEB_ITEMS.add(new PebItem(6, 39, "Gray",
-				ChatColor.LIGHT_PURPLE + "Click to change skin to Gray.",
+				"Click to change skin to Gray.", ChatColor.LIGHT_PURPLE,
 				Material.GRAY_WOOL, "clickable peb_skin_gray"));
 		PEB_ITEMS.add(new PebItem(6, 14, "Light Gray",
-				ChatColor.LIGHT_PURPLE + "Click to change skin to Light Gray.",
+				"Click to change skin to Light Gray.", ChatColor.LIGHT_PURPLE,
 				Material.LIGHT_GRAY_WOOL, "clickable peb_skin_lightgray"));
 		PEB_ITEMS.add(new PebItem(6, 15, "Cyan",
-				ChatColor.LIGHT_PURPLE + "Click to change skin to Cyan.",
+				"Click to change skin to Cyan.", ChatColor.LIGHT_PURPLE,
 				Material.CYAN_WOOL, "clickable peb_skin_cyan"));
 		PEB_ITEMS.add(new PebItem(6, 23, "Purple",
-				ChatColor.LIGHT_PURPLE + "Click to change skin to Purple.",
+				"Click to change skin to Purple.", ChatColor.LIGHT_PURPLE,
 				Material.PURPLE_WOOL, "clickable peb_skin_purple"));
 		PEB_ITEMS.add(new PebItem(6, 24, "Blue",
-				ChatColor.LIGHT_PURPLE + "Click to change skin to Blue.",
+				"Click to change skin to Blue.", ChatColor.LIGHT_PURPLE,
 				Material.BLUE_WOOL, "clickable peb_skin_blue"));
 		PEB_ITEMS.add(new PebItem(6, 32, "Brown",
-				ChatColor.LIGHT_PURPLE + "Click to change skin to Brown.",
+				"Click to change skin to Brown.", ChatColor.LIGHT_PURPLE,
 				Material.BROWN_WOOL, "clickable peb_skin_brown"));
 		PEB_ITEMS.add(new PebItem(6, 33, "Green",
-				ChatColor.LIGHT_PURPLE + "Click to change skin to Green.",
+				"Click to change skin to Green.", ChatColor.LIGHT_PURPLE,
 				Material.GREEN_WOOL, "clickable peb_skin_green"));
 		PEB_ITEMS.add(new PebItem(6, 41, "Red",
-				ChatColor.LIGHT_PURPLE + "Click to change skin to Red.",
+				"Click to change skin to Red.", ChatColor.LIGHT_PURPLE,
 				Material.RED_WOOL, "clickable peb_skin_red"));
 		PEB_ITEMS.add(new PebItem(6, 42, "Black",
-				ChatColor.LIGHT_PURPLE + "Click to change skin to Black.",
+				"Click to change skin to Black.", ChatColor.LIGHT_PURPLE,
 				Material.BLACK_WOOL, "clickable peb_skin_black"));
 	}
 
@@ -326,10 +326,13 @@ public class PebGui extends SinglePageGUI {
 			newItem.setItemMeta(meta);
 		}
 		ItemMeta meta = newItem.getItemMeta();
-		meta.displayName(Component.text(item.mName, NamedTextColor.WHITE)
-				.decoration(TextDecoration.ITALIC, false));
+		if (item.mName != "") {
+			meta.displayName(Component.text(item.mName, NamedTextColor.WHITE)
+					.decoration(TextDecoration.ITALIC, false));
+		}
+		ChatColor defaultColor = (item.mChatColor != null) ? item.mChatColor : ChatColor.LIGHT_PURPLE;
 		if (item.mLore != "") {
-			splitLoreLine(meta, item.mLore, 30, ChatColor.LIGHT_PURPLE);
+			splitLoreLine(meta, item.mLore, 30, defaultColor);
 		}
 		newItem.setItemMeta(meta);
 		return newItem;
@@ -337,7 +340,7 @@ public class PebGui extends SinglePageGUI {
 	
 	public void splitLoreLine(ItemMeta meta, String lore, int maxLength, ChatColor defaultColor) {
 		String[] splitLine = lore.split(" ");
-		String currentString = "";
+		String currentString = defaultColor + "";
 		List<String> finalLines = new ArrayList<String>();
 		int currentLength = 0;
 		for (String word : splitLine) {
