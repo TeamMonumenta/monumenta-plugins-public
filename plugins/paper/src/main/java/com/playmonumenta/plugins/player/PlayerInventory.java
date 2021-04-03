@@ -33,6 +33,8 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.inventory.ItemStack;
 
+import net.kyori.adventure.text.Component;
+
 import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.enchantments.BaseAttribute;
@@ -65,7 +67,7 @@ public class PlayerInventory {
 	private boolean mNeedsUpdate = false;
 
 	public PlayerInventory(Plugin plugin, Player player) {
-		InventoryUtils.scheduleDelayedEquipmentCheck(plugin, player, new PlayerJoinEvent(player, ""));	// Just a dummy event
+		InventoryUtils.scheduleDelayedEquipmentCheck(plugin, player, new PlayerJoinEvent(player, Component.text(""))); // Just a dummy event
 	}
 
 	public void tick(Plugin plugin, Player player) {

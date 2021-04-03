@@ -8,7 +8,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -59,6 +58,7 @@ import org.bukkit.event.player.PlayerArmorStandManipulateEvent;
 import org.bukkit.event.player.PlayerBedEnterEvent;
 import org.bukkit.event.player.PlayerBedLeaveEvent;
 import org.bukkit.event.player.PlayerChangedMainHandEvent;
+import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerExpChangeEvent;
 import org.bukkit.event.player.PlayerFishEvent;
@@ -94,6 +94,10 @@ import org.bukkit.potion.PotionType;
 import org.bukkit.projectiles.ProjectileSource;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
+
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
@@ -244,14 +248,14 @@ public class PlayerListener implements Listener {
 								}
 							}
 						}
-						MessagingUtils.sendActionBarMessage(mPlugin, player, String.format("Retrieved %d items from the grave. %d items remain.", itemsMoved, itemsLeftBehind));
+						player.sendActionBar(Component.text(String.format("Retrieved %d items from the grave. %d items remain.", itemsMoved, itemsLeftBehind)));
 						if (itemsLeftBehind == 0) {
 							block.setType(Material.AIR);
 						}
 						event.setUseInteractedBlock(Event.Result.DENY);
 					} else {
 						// Player does not have permission to access this grave.
-						MessagingUtils.sendActionBarMessage(mPlugin, player, "You cannot open " + ChatColor.stripColor(grave.getCustomName()));
+						player.sendActionBar(Component.text("You cannot open ").append(grave.customName()));
 						event.setUseInteractedBlock(Event.Result.DENY);
 					}
 				}
@@ -290,7 +294,7 @@ public class PlayerListener implements Listener {
 		}
 
 		//Prevent feeding special item lore items to animals (specifically horses)
-		if (clickedEntity instanceof Animals && itemInHand != null && itemInHand.getLore() != null) {
+		if (clickedEntity instanceof Animals && itemInHand != null && itemInHand.hasItemMeta() && itemInHand.getItemMeta().hasLore()) {
 			event.setCancelled(true);
 			return;
 		} else if (clickedEntity instanceof ItemFrame) {
@@ -305,7 +309,7 @@ public class PlayerListener implements Listener {
 
 			if (frame.isInvulnerable()) {
 				if (player.getGameMode().equals(GameMode.CREATIVE)) {
-					player.sendMessage(ChatColor.GOLD + "This item frame is invulnerable / creative only");
+					player.sendMessage(Component.text("This item frame is invulnerable / creative only", NamedTextColor.GOLD));
 				} else {
 					event.setCancelled(true);
 				}
@@ -315,7 +319,7 @@ public class PlayerListener implements Listener {
 					if (player.getGameMode().equals(GameMode.ADVENTURE)) {
 						ItemStack giveMap = frameItem.clone();
 						ItemMeta mapMeta;
-						List<String> mapLore;
+						List<Component> mapLore;
 
 						if (giveMap.hasItemMeta()) {
 							mapMeta = giveMap.getItemMeta();
@@ -324,12 +328,12 @@ public class PlayerListener implements Listener {
 						}
 
 						if (mapMeta.hasLore()) {
-							mapLore = mapMeta.getLore();
+							mapLore = mapMeta.lore();
 						} else {
-							mapLore = new ArrayList<String>(1);
+							mapLore = new ArrayList<Component>(1);
 						}
-						mapLore.add(ChatColor.GOLD + "* Official Map *");
-						mapMeta.setLore(mapLore);
+						mapLore.add(Component.text("* Official Map *", NamedTextColor.GOLD));
+						mapMeta.lore(mapLore);
 						giveMap.setItemMeta(mapMeta);
 						giveMap = ItemUtils.setPlainLore(giveMap);
 						InventoryUtils.giveItem(player, giveMap);
@@ -543,6 +547,34 @@ public class PlayerListener implements Listener {
 		}
 	}
 
+	// Player ran a command
+	@EventHandler(priority = EventPriority.LOW)
+	public void playerCommandPreprocessEvent(PlayerCommandPreprocessEvent event) {
+		final String NBT_EDITOR_OPTIONAL_PREFIX = "nbteditor:";
+
+		Player player = event.getPlayer();
+		String command = event.getMessage().substring(1);
+
+		if (command.startsWith(NBT_EDITOR_OPTIONAL_PREFIX)) {
+			command = command.substring(NBT_EDITOR_OPTIONAL_PREFIX.length());
+		}
+
+		if (command.startsWith("nbte")
+		    || command.startsWith("nbti")
+		    || command.startsWith("nbtp")) {
+			new BukkitRunnable() {
+				@Override
+				public void run() {
+					ItemStack item = player.getEquipment().getItemInMainHand();
+					if (item != null && item.getAmount() > 0) {
+						ItemUtils.setPlainTag(item);
+						player.getEquipment().setItemInMainHand(item, true);
+					}
+				}
+			}.runTaskLater(mPlugin, 0);
+		}
+	}
+
 	// Player changed hand items
 	@EventHandler(priority = EventPriority.HIGH)
 	public void playerChangedMainHandEvent(PlayerChangedMainHandEvent event) {
@@ -587,8 +619,8 @@ public class PlayerListener implements Listener {
 		ScoreboardUtils.setScoreboardValue(player, "NewDeath", 1);
 
 		if (event.getDeathMessage() != null && ScoreboardUtils.getScoreboardValue(player, Constants.SCOREBOARD_DEATH_MESSAGE) != 0) {
-			player.sendMessage(event.getDeathMessage());
-			player.sendMessage(ChatColor.AQUA + "Only you saw this message. Change this with /deathmsg");
+			player.sendMessage(event.deathMessage());
+			player.sendMessage(Component.text("Only you saw this message. Change this with /deathmsg", NamedTextColor.AQUA));
 			event.setDeathMessage(null);
 		}
 
@@ -656,7 +688,7 @@ public class PlayerListener implements Listener {
 			if (PotionUtils.isLuckPotion((PotionMeta) event.getItem().getItemMeta())) {
 				Location loc = player.getLocation();
 				loc.getWorld().playSound(loc, Sound.ENTITY_HORSE_DEATH, SoundCategory.PLAYERS, 1.0f, 1.0f);
-				player.sendMessage(ChatColor.RED + "" + ChatColor.BOLD + "Luck potions can no longer be consumed");
+				player.sendMessage(Component.text("Luck potions can no longer be consumed", NamedTextColor.RED, TextDecoration.BOLD));
 				event.setCancelled(true);
 				return;
 			}
@@ -688,7 +720,7 @@ public class PlayerListener implements Listener {
 					effect.getType().equals(PotionEffectType.SLOW_FALLING) &&
 					player.getGameMode().equals(GameMode.ADVENTURE)) {
 				//Remove Slow Falling effects in Adventure mode areas (#947)
-				player.sendMessage(ChatColor.RED + "You cannot apply slow falling potion effects in adventure mode areas, other effects were still applied.");
+				player.sendMessage(Component.text("You cannot apply slow falling potion effects in adventure mode areas, other effects were still applied.", NamedTextColor.RED));
 				player.getServer().getScheduler().scheduleSyncDelayedTask(mPlugin, new Runnable() {
 					@Override
 					public void run() {
@@ -859,8 +891,8 @@ public class PlayerListener implements Listener {
 
 				String[] split = str.split(" ");
 				if (split.length != 5) {
-					player.sendMessage(ChatColor.RED + "Command block should be of the format 'x y z pitch yaw'");
-					player.sendMessage(ChatColor.RED + "Relative and absolute coordinates accepted");
+					player.sendMessage(Component.text("Command block should be of the format 'x y z pitch yaw'", NamedTextColor.RED));
+					player.sendMessage(Component.text("Relative and absolute coordinates accepted", NamedTextColor.RED));
 					continue;
 				}
 

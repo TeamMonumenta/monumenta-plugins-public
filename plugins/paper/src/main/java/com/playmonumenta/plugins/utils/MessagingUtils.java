@@ -42,7 +42,7 @@ public class MessagingUtils {
 		message = translatePlayerName(player, message);
 		message = message.replace('&', '§');
 		TextComponent formattedMessage = LEGACY_SERIALIZER.deserialize(message);
-		player.sendMessage(Identity.nil(), formattedMessage, MessageType.SYSTEM);
+		player.sendMessage(formattedMessage);
 	}
 
 	public static void sendStackTrace(CommandSender sender, Exception e) {
@@ -64,7 +64,7 @@ public class MessagingUtils {
 
 		TextComponent textStackTrace = Component.text(sStackTrace.replace("\t", "  "), NamedTextColor.RED);
 		formattedMessage.hoverEvent(textStackTrace);
-		sender.sendMessage(Identity.nil(), formattedMessage, MessageType.SYSTEM);
+		sender.sendMessage(formattedMessage);
 
 		e.printStackTrace();
 	}
@@ -80,7 +80,12 @@ public class MessagingUtils {
 	}
 
 	public static String plainText(Component formattedText) {
+		// This is only legacy text because we have a bunch of section symbols lying around that need to be updated.
 		String legacyText = PLAIN_SERIALIZER.serialize(formattedText);
+		return plainFromLegacy(legacyText);
+	}
+
+	public static String plainFromLegacy(String legacyText) {
 		return PLAIN_SERIALIZER.serialize(LEGACY_SERIALIZER.deserialize(legacyText));
 	}
 }

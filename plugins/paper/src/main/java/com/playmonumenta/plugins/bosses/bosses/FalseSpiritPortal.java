@@ -114,22 +114,22 @@ public class FalseSpiritPortal extends BossAbilityGroup {
 					}
 				}
 
-				NamespacedKey key = new NamespacedKey("epic", "r2/dungeons/forum/ex_nihilo");
+				NamespacedKey key = NamespacedKey.fromString("epic:r2/dungeons/forum/ex_nihilo");
 				switch (mPortalNumTag) {
 					case "PortalNum1":
-						key = new NamespacedKey("epic", "r2/dungeons/forum/ex_nihilo_hallud");
+						key = NamespacedKey.fromString("epic:r2/dungeons/forum/ex_nihilo_hallud");
 						break;
 					case "PortalNum2":
-						key = new NamespacedKey("epic", "r2/dungeons/forum/ex_nihilo_chasom");
+						key = NamespacedKey.fromString("epic:r2/dungeons/forum/ex_nihilo_chasom");
 						break;
 					case "PortalNum3":
-						key = new NamespacedKey("epic", "r2/dungeons/forum/ex_nihilo_midat");
+						key = NamespacedKey.fromString("epic:r2/dungeons/forum/ex_nihilo_midat");
 						break;
 					case "PortalNum4":
-						key = new NamespacedKey("epic", "r2/dungeons/forum/ex_nihilo_daath");
+						key = NamespacedKey.fromString("epic:r2/dungeons/forum/ex_nihilo_daath");
 						break;
 					case "PortalNum5":
-						key = new NamespacedKey("epic", "r2/dungeons/forum/ex_nihilo_keter");
+						key = NamespacedKey.fromString("epic:r2/dungeons/forum/ex_nihilo_keter");
 						break;
 					default:
 						break;

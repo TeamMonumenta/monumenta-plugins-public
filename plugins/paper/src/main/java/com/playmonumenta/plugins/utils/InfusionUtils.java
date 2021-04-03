@@ -402,9 +402,9 @@ public class InfusionUtils {
 	private static void giveMaterials(Player player, ItemRegion region, int refundMaterials) throws WrapperCommandSyntaxException {
 		NamespacedKey key;
 		if (region.equals(ItemRegion.KINGS_VALLEY)) {
-			key = new NamespacedKey("epic", "r1/items/currency/pulsating_gold");
+			key = NamespacedKey.fromString("epic:r1/items/currency/pulsating_gold");
 		} else if (region.equals(ItemRegion.CELSIAN_ISLES) || region.equals(ItemRegion.MONUMENTA)) {
-			key = new NamespacedKey("epic", "r2/items/currency/pulsating_emerald");
+			key = NamespacedKey.fromString("epic:r2/items/currency/pulsating_emerald");
 		} else {
 			CommandAPI.fail("Item must have a Region tag!");
 			return;
