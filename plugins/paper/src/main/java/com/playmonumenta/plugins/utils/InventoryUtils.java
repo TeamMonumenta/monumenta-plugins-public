@@ -65,7 +65,14 @@ public class InventoryUtils {
 		}.runTaskLater(plugin, 0);
 	}
 
-	public static boolean testForItemWithLore(final ItemStack item, final String loreText) {
+	public static boolean testForItemWithLore(final ItemStack item, final String legacyLoreText) {
+		// TODO START Remove this block when all legacy text is updated to use Adventure or plain text.
+		if (legacyLoreText == null || legacyLoreText.isEmpty()) {
+			return true;
+		}
+		final String loreText = MessagingUtils.plainFromLegacy(legacyLoreText);
+		// TODO END
+
 		if (loreText == null || loreText.isEmpty()) {
 			return true;
 		}

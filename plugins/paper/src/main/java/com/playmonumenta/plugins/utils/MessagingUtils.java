@@ -27,8 +27,7 @@ public class MessagingUtils {
 
 	public static void sendActionBarMessage(Plugin plugin, Player player, String message) {
 		message = translatePlayerName(player, message);
-		TextComponent formattedMessage = LEGACY_SERIALIZER.deserialize(message);
-		formattedMessage.color(NamedTextColor.YELLOW);
+		TextComponent formattedMessage = Component.text(message, NamedTextColor.YELLOW);
 		player.sendActionBar​(formattedMessage);
 	}
 
