@@ -42,38 +42,40 @@ public class Retrieval implements BaseEnchantment {
 			ItemStack offHand = player.getInventory().getItemInOffHand();
 			if (InventoryUtils.isBowItem(mainHand) || InventoryUtils.isBowItem(offHand)) {
 				int infLevel = Math.max(mainHand.getEnchantmentLevel(Enchantment.ARROW_INFINITE), offHand.getEnchantmentLevel(Enchantment.ARROW_INFINITE));
-				if (infLevel == 0 && FastUtils.RANDOM.nextDouble() < RETRIEVAL_CHANCE * level) {
-					player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ARROW_HIT_PLAYER, 0.3f, 1.0f);
-
-					arrow.setPickupStatus(Arrow.PickupStatus.ALLOWED);
-					Inventory playerInv = player.getInventory();
-					int firstArrow = playerInv.first(Material.ARROW);
-					int firstTippedArrow = playerInv.first(Material.TIPPED_ARROW);
-					int firstSpectralArrow = playerInv.first(Material.SPECTRAL_ARROW);
-
-					final int arrowSlot;
-					if (firstArrow == -1 && firstTippedArrow > -1 && firstSpectralArrow == -1) {
-						arrowSlot = firstTippedArrow;
-					} else if (firstArrow > - 1 && firstTippedArrow == -1 && firstSpectralArrow == -1) {
-						arrowSlot = firstArrow;
-					} else if (firstArrow == -1 && firstTippedArrow == -1 && firstSpectralArrow > -1) {
-						arrowSlot = firstSpectralArrow;
-					} else if (firstArrow > - 1 && firstTippedArrow > -1) {
-						arrowSlot = Math.min(firstArrow, firstTippedArrow);
-					} else if (firstArrow > -1 && firstSpectralArrow > -1) {
-						arrowSlot = Math.min(firstArrow, firstTippedArrow);
-					} else if (firstTippedArrow > -1 && firstSpectralArrow > -1) {
-						arrowSlot = Math.min(firstSpectralArrow, firstTippedArrow);
-					} else if (firstTippedArrow > -1 && firstSpectralArrow > -1 && firstArrow > -1) {
-						arrowSlot = Math.min(firstSpectralArrow, Math.min(firstSpectralArrow, firstArrow));
-					} else {
-						return;
-					}
-					arrow.setPickupStatus(Arrow.PickupStatus.DISALLOWED);
-					if (arrow.isShotFromCrossbow()) {
-						playerInv.getItem(arrowSlot).setAmount(playerInv.getItem(arrowSlot).getAmount() + 1);
-					} else {
-						playerInv.setItem(arrowSlot, playerInv.getItem(arrowSlot));
+				if (arrow.getPickupStatus() == Arrow.PickupStatus.ALLOWED) {
+					if (infLevel == 0 && FastUtils.RANDOM.nextDouble() < RETRIEVAL_CHANCE * level) {
+						player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ARROW_HIT_PLAYER, 0.3f, 1.0f);
+	
+						arrow.setPickupStatus(Arrow.PickupStatus.ALLOWED);
+						Inventory playerInv = player.getInventory();
+						int firstArrow = playerInv.first(Material.ARROW);
+						int firstTippedArrow = playerInv.first(Material.TIPPED_ARROW);
+						int firstSpectralArrow = playerInv.first(Material.SPECTRAL_ARROW);
+	
+						final int arrowSlot;
+						if (firstArrow == -1 && firstTippedArrow > -1 && firstSpectralArrow == -1) {
+							arrowSlot = firstTippedArrow;
+						} else if (firstArrow > - 1 && firstTippedArrow == -1 && firstSpectralArrow == -1) {
+							arrowSlot = firstArrow;
+						} else if (firstArrow == -1 && firstTippedArrow == -1 && firstSpectralArrow > -1) {
+							arrowSlot = firstSpectralArrow;
+						} else if (firstArrow > - 1 && firstTippedArrow > -1) {
+							arrowSlot = Math.min(firstArrow, firstTippedArrow);
+						} else if (firstArrow > -1 && firstSpectralArrow > -1) {
+							arrowSlot = Math.min(firstArrow, firstTippedArrow);
+						} else if (firstTippedArrow > -1 && firstSpectralArrow > -1) {
+							arrowSlot = Math.min(firstSpectralArrow, firstTippedArrow);
+						} else if (firstTippedArrow > -1 && firstSpectralArrow > -1 && firstArrow > -1) {
+							arrowSlot = Math.min(firstSpectralArrow, Math.min(firstSpectralArrow, firstArrow));
+						} else {
+							return;
+						}
+						arrow.setPickupStatus(Arrow.PickupStatus.DISALLOWED);
+						if (arrow.isShotFromCrossbow()) {
+							playerInv.getItem(arrowSlot).setAmount(playerInv.getItem(arrowSlot).getAmount() + 1);
+						} else {
+							playerInv.setItem(arrowSlot, playerInv.getItem(arrowSlot));
+						}
 					}
 				}
 			}
