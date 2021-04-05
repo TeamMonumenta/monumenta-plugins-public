@@ -15,6 +15,7 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
@@ -98,6 +99,7 @@ public class Grave {
 			mItems.add(GraveItem.deserialize(mManager, this, mPlayer, data));
 		}
 		if (isInThisWorld()) {
+			updateInstance();
 			mManager.addUnloadedGrave(Chunk.getChunkKey(mLocation), this);
 		}
 	}
@@ -208,15 +210,6 @@ public class Grave {
 
 	private void spawn() {
 		if (canSpawn()) {
-			if (mDungeonInstance != null) {
-				int instance = ScoreboardUtils.getScoreboardValue(mPlayer, "DAccess");
-				if (instance != 0 && instance != mDungeonInstance) {
-					int x = 512 * ((instance / 1000) - (mDungeonInstance / 1000));
-					int z = 512 * ((instance % 1000) - (mDungeonInstance % 1000));
-					mLocation.add(x, 0, z);
-					mDungeonInstance = instance;
-				}
-			}
 			mEntity = (ArmorStand) mPlayer.getWorld().spawnEntity(mLocation, EntityType.ARMOR_STAND);
 			mEntity.setSmall(mSmall);
 			mEntity.setArms(true);
@@ -302,13 +295,15 @@ public class Grave {
 		}
 	}
 
-	private boolean collectItem(Player player, GraveItem item) {
+	private int collectItem(Player player, GraveItem item) {
 		int slot = player.getInventory().firstEmpty();
 		if (slot != -1) {
-			player.getInventory().setItem(slot, item.collect());
-			return true;
+			Item entity = player.getWorld().dropItem(getLocation(), item.getItem());
+			int remaining = Plugin.getInstance().mDeathItemListener.pickupItem(player, entity);
+			item.collect(remaining);
+			return remaining;
 		}
-		return false;
+		return item.mItem.getAmount();
 	}
 
 	void summon(Location location) {
@@ -407,19 +402,30 @@ public class Grave {
 					item.save();
 				}
 				if (item.mStatus == GraveItem.Status.SAFE) {
-					if (collectItem(player, item)) {
+					int amountBefore = item.mItem.getAmount();
+					int amountRemaining = collectItem(player, item);
+					if (amountRemaining == 0) {
 						items.remove();
 						collected++;
 					} else {
+						if (amountRemaining != amountBefore) {
+							collected++;
+						}
 						remaining++;
 					}
 				}
 				if (item.mStatus == GraveItem.Status.SHATTERED) {
-					if (collectItem(player, item)) {
+					int amountBefore = item.mItem.getAmount();
+					int amountRemaining = collectItem(player, item);
+					if (amountRemaining == 0) {
 						items.remove();
 						collected++;
 						collectedShattered++;
 					} else {
+						if (amountRemaining != amountBefore) {
+							collected++;
+							collectedShattered++;
+						}
 						remaining++;
 						remainingShattered++;
 					}
@@ -437,7 +443,7 @@ public class Grave {
 				player.sendMessage(Component.text("There ", NamedTextColor.AQUA)
 					.append(Component.text(remaining == 1 ? "is 1 item remaining in the grave" : "are " + remaining + " items remaining in the grave"))
 					.append(Component.text(remainingShattered == 0 ? "." : "; "))
-					.append(Component.text(remainingShattered == 1 ? "it was shattered." : ""))
+					.append(Component.text(remainingShattered == 1 ? (remaining == 1 ? "it is shattered." : "1 of them is shattered.") : ""))
 					.append(Component.text(remainingShattered > 1 ? (remainingShattered == remaining ? "they were all shattered." : remainingShattered + " of them were shattered.") : ""))
 				);
 			}
@@ -525,6 +531,18 @@ public class Grave {
 			mPose.put(KEY_POSE_LEFT_LEG, mEntity.getLeftLegPose());
 			mPose.put(KEY_POSE_RIGHT_LEG, mEntity.getRightLegPose());
 			mLocation = mEntity.getLocation().clone();
+		}
+	}
+
+	private void updateInstance() {
+		if (isInThisWorld() && mDungeonInstance != null) {
+			int instance = ScoreboardUtils.getScoreboardValue(mPlayer, "DAccess");
+			if (instance != 0 && instance != mDungeonInstance) {
+				int x = 512 * ((instance / 1000) - (mDungeonInstance / 1000));
+				int z = 512 * ((instance % 1000) - (mDungeonInstance % 1000));
+				mLocation.add(x, 0, z);
+				mDungeonInstance = instance;
+			}
 		}
 	}
 

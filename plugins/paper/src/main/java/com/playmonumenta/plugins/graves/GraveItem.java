@@ -118,6 +118,7 @@ public class GraveItem {
 		mAge = age;
 		mDungeonInstance = instance;
 		if (mStatus == Status.DROPPED && isInThisWorld()) {
+			updateInstance();
 			mManager.addUnloadedItem(Chunk.getChunkKey(mLocation), this);
 		}
 	}
@@ -138,11 +139,6 @@ public class GraveItem {
 		mDungeonInstance = grave.mDungeonInstance;
 		mLocation = grave.getLocation();
 		mVelocity = null;
-		if (InventoryUtils.getCustomEnchantLevel(mItem, Hope.PROPERTY_NAME, false) > 0) {
-			mAge = -6000;
-		} else {
-			mAge = 0;
-		}
 		if (mStatus == Status.DROPPED && isInThisWorld()) {
 			mManager.addUnloadedItem(Chunk.getChunkKey(mLocation), this);
 			spawn();
@@ -227,15 +223,6 @@ public class GraveItem {
 			if (mLocation == null || mVelocity == null) {
 				mEntity = mPlayer.getWorld().dropItemNaturally(mGrave.getLocation(), mItem);
 			} else {
-				if (mDungeonInstance != null) {
-					int instance = ScoreboardUtils.getScoreboardValue(mPlayer, "DAccess");
-					if (instance != 0 && instance != mDungeonInstance) {
-						int x = 512 * ((instance / 1000) - (mDungeonInstance / 1000));
-						int z = 512 * ((instance % 1000) - (mDungeonInstance % 1000));
-						mLocation.add(x, 0, z);
-						mDungeonInstance = instance;
-					}
-				}
 				mEntity = mPlayer.getWorld().dropItem(mLocation, mItem);
 				mEntity.setVelocity(mVelocity);
 			}
@@ -246,9 +233,10 @@ public class GraveItem {
 			if (InventoryUtils.getCustomEnchantLevel(mItem, Hope.PROPERTY_NAME, false) > 0) {
 				mEntity.setInvulnerable(true);
 			}
-			NBTEntity nbt = new NBTEntity(mEntity);
-			nbt.setShort("Age", mAge);
-			if (mAge == 0) {
+			if (mAge != null) {
+				NBTEntity nbt = new NBTEntity(mEntity);
+				nbt.setShort("Age", mAge);
+			} else {
 				// Item dropping for first time, make immune to explosions for 5 seconds.
 				// This prevents shattering due to double-creepers and TNT traps.
 				mEntity.addScoreboardTag("ExplosionImmune");
@@ -292,6 +280,18 @@ public class GraveItem {
 		}
 	}
 
+	private void updateInstance() {
+		if (isInThisWorld() && mDungeonInstance != null) {
+			int instance = ScoreboardUtils.getScoreboardValue(mPlayer, "DAccess");
+			if (instance != 0 && instance != mDungeonInstance) {
+				int x = 512 * ((instance / 1000) - (mDungeonInstance / 1000));
+				int z = 512 * ((instance % 1000) - (mDungeonInstance % 1000));
+				mLocation.add(x, 0, z);
+				mDungeonInstance = instance;
+			}
+		}
+	}
+
 	void respawn() {
 		remove(Status.DROPPED);
 		mLocation = mGrave.getLocation();
@@ -309,12 +309,22 @@ public class GraveItem {
 		remove(Status.SAFE);
 	}
 
-	ItemStack collect() {
+	ItemStack getItem() {
 		if (mStatus == Status.SHATTERED) {
 			ItemUtils.shatterItem(mItem);
 		}
-		remove(Status.COLLECTED);
 		return mItem;
+	}
+
+	void collect(int remaining) {
+		if (remaining == 0) {
+			remove(Status.COLLECTED);
+		} else {
+			mItem.setAmount(remaining);
+			if (mEntity != null && mEntity.isValid()) {
+				mEntity.setItemStack(mItem);
+			}
+		}
 	}
 
 	void delete() {

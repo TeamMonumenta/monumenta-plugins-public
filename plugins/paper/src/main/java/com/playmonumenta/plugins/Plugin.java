@@ -130,6 +130,8 @@ public class Plugin extends JavaPlugin {
 	public IndexInventoryManager mIndexInventoryManager;
 	public EffectManager mEffectManager;
 
+	public DeathItemListener mDeathItemListener;
+
 	public ItemOverrides mItemOverrides;
 
 	private static Plugin INSTANCE = null;
@@ -240,6 +242,7 @@ public class Plugin extends JavaPlugin {
 		mShulkerInventoryManager = new ShulkerInventoryManager(this);
 		mBossManager = new BossManager(this);
 		mEffectManager = new EffectManager(this);
+		mDeathItemListener = new DeathItemListener(this);
 
 		DailyReset.startTimer(this);
 
@@ -272,7 +275,7 @@ public class Plugin extends JavaPlugin {
 		manager.registerEvents(new PortableEnderListener(), this);
 		manager.registerEvents(new ShatteredEquipmentListener(this), this);
 		manager.registerEvents(new PotionConsumeListener(this), this);
-		manager.registerEvents(new DeathItemListener(this), this);
+		manager.registerEvents(mDeathItemListener, this);
 		manager.registerEvents(new ZonePropertyListener(), this);
 		manager.registerEvents(new TridentListener(), this);
 		manager.registerEvents(new CrossbowListener(this), this);
