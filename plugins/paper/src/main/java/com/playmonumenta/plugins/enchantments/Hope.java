@@ -1,6 +1,5 @@
 package com.playmonumenta.plugins.enchantments;
 
-import java.lang.reflect.Field;
 import java.util.EnumSet;
 
 import com.playmonumenta.plugins.Constants;
@@ -12,6 +11,8 @@ import org.bukkit.ChatColor;
 import org.bukkit.Particle;
 import org.bukkit.entity.Item;
 import org.bukkit.scheduler.BukkitRunnable;
+
+import de.tr7zw.nbtapi.NBTEntity;
 
 public class Hope implements BaseEnchantment {
 	public static String PROPERTY_NAME = ChatColor.GRAY + "Hope";
@@ -43,28 +44,8 @@ public class Hope implements BaseEnchantment {
 	@Override
 	public void onSpawn(Plugin plugin, Item item, int level) {
 		item.setInvulnerable(true);
-
-		/*
-		 * Use reflection to modify the item entity's age field directly.
-		 * This is because setTicksLived() doesn't seem to affect despawn time
-		 * Basically an exact copy of code from here:
-		 * https://www.spigotmc.org/threads/settickslived-not-working.240140/
-		 */
-		try {
-			Field itemField = item.getClass().getDeclaredField("item");
-			Field ageField;
-			Object entityItem;
-
-			itemField.setAccessible(true);
-			entityItem = itemField.get(item);
-
-			ageField = entityItem.getClass().getDeclaredField("age");
-			ageField.setAccessible(true);
-
-			ageField.set(entityItem, -1 * EXTRA_MINUTES_PER_LEVEL * Constants.TICKS_PER_MINUTE * level);
-		} catch (NoSuchFieldException | IllegalAccessException e) {
-			e.printStackTrace();
-		}
+		NBTEntity nbt = new NBTEntity(item);
+		nbt.setShort("Age", (short) (-1 * EXTRA_MINUTES_PER_LEVEL * Constants.TICKS_PER_MINUTE * level));
 
 		new BukkitRunnable() {
 			int mNumTicks = 0;
@@ -72,7 +53,7 @@ public class Hope implements BaseEnchantment {
 			@Override
 			public void run() {
 				item.getWorld().spawnParticle(Particle.SPELL_INSTANT, item.getLocation(), 3, 0.2, 0.2, 0.2, 0);
-				if (item == null || item.isDead() || !item.isValid()) {
+				if (item.isDead() || !item.isValid()) {
 					this.cancel();
 				}
 

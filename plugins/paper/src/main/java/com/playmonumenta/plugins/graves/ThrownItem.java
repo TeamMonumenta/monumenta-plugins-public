@@ -55,6 +55,7 @@ public class ThrownItem {
 		mAge = age;
 		mValid = true;
 		if (isInThisWorld()) {
+			updateInstance();
 			mManager.addUnloadedItem(Chunk.getChunkKey(mLocation), this);
 		}
 	}
@@ -104,15 +105,6 @@ public class ThrownItem {
 
 	private void spawn() {
 		if (canSpawn()) {
-			if (mDungeonInstance != null) {
-				int instance = ScoreboardUtils.getScoreboardValue(mPlayer, "DAccess");
-				if (instance != 0 && instance != mDungeonInstance) {
-					int x = 512 * ((instance / 1000) - (mDungeonInstance / 1000));
-					int z = 512 * ((instance % 1000) - (mDungeonInstance % 1000));
-					mLocation.add(x, 0, z);
-					mDungeonInstance = instance;
-				}
-			}
 			mEntity = mPlayer.getWorld().dropItem(mLocation, mItem);
 			mEntity.setVelocity(mVelocity);
 			mEntity.setCanMobPickup(false);
@@ -226,6 +218,18 @@ public class ThrownItem {
 				mAge = new NBTEntity(mEntity).getShort(KEY_AGE);
 			} else {
 				delete();
+			}
+		}
+	}
+
+	private void updateInstance() {
+		if (isInThisWorld() && mDungeonInstance != null) {
+			int instance = ScoreboardUtils.getScoreboardValue(mPlayer, "DAccess");
+			if (instance != 0 && instance != mDungeonInstance) {
+				int x = 512 * ((instance / 1000) - (mDungeonInstance / 1000));
+				int z = 512 * ((instance % 1000) - (mDungeonInstance % 1000));
+				mLocation.add(x, 0, z);
+				mDungeonInstance = instance;
 			}
 		}
 	}
