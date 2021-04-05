@@ -4,12 +4,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.UUID;
 
-import org.bukkit.Bukkit;
-import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
-import org.bukkit.plugin.PluginManager;
-import org.bukkit.plugin.java.JavaPlugin;
-
 import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.bosses.BossManager;
 import com.playmonumenta.plugins.bosses.spells.SpellDetectionCircle;
@@ -66,6 +60,7 @@ import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import com.playmonumenta.plugins.integrations.MonumentaNetworkRelayIntegration;
 import com.playmonumenta.plugins.integrations.MonumentaRedisSyncIntegration;
 import com.playmonumenta.plugins.integrations.PlaceholderAPIIntegration;
+import com.playmonumenta.plugins.integrations.PremiumVanishIntegration;
 import com.playmonumenta.plugins.integrations.luckperms.LuckPermsIntegration;
 import com.playmonumenta.plugins.inventories.AnvilFixInInventory;
 import com.playmonumenta.plugins.inventories.LootChestsInInventory;
@@ -110,6 +105,12 @@ import com.playmonumenta.plugins.timers.CooldownTimers;
 import com.playmonumenta.plugins.timers.ProjectileEffectTimers;
 import com.playmonumenta.plugins.tracking.TrackingManager;
 import com.playmonumenta.plugins.utils.MetadataUtils;
+
+import org.bukkit.Bukkit;
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
+import org.bukkit.plugin.PluginManager;
+import org.bukkit.plugin.java.JavaPlugin;
 
 public class Plugin extends JavaPlugin {
 	public CooldownTimers mTimers = null;
@@ -383,6 +384,11 @@ public class Plugin extends JavaPlugin {
 		// Register luckperms commands if LuckPerms is present
 		if (Bukkit.getPluginManager().isPluginEnabled("LuckPerms")) {
 			new LuckPermsIntegration(this);
+		}
+
+		// Hook into PremiumVanish if present
+		if (Bukkit.getPluginManager().isPluginEnabled("PremiumVanish")) {
+			new PremiumVanishIntegration(this.getLogger());
 		}
 
 		// Register the explosion repair mechanism if BKCommonLib is present
