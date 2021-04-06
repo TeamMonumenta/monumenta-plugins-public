@@ -183,14 +183,11 @@ public class GraveManager {
 		manager.mThrownItems.add(new ThrownItem(manager, player, entity));
 	}
 
-	// Called when a player left or right clicks any entity
-	// Returns true if the entity was a grave, in which case the event should be cancelled
-	public static boolean onInteract(Player player, Entity entity) {
+	// Called when a player left or right clicks a grave
+	public static void onInteract(Player player, Entity entity) {
 		if (GRAVES.containsKey(entity.getUniqueId())) {
 			GRAVES.get(entity.getUniqueId()).onInteract(player);
-			return true;
 		}
-		return false;
 	}
 
 	// Called when any player is within pickup range of any item
@@ -213,22 +210,24 @@ public class GraveManager {
 			GRAVE_ITEMS.get(entity.getUniqueId()).onDestroyItem();
 		} else if (THROWN_ITEMS.containsKey(entity.getUniqueId())) {
 			ThrownItem item = THROWN_ITEMS.remove(entity.getUniqueId());
-			item.onDestroyItem();
-			item.mManager.mGraves.add(new Grave(item));
+			if (item.isValid()) {
+				item.onDestroyItem();
+				item.mManager.mGraves.add(new Grave(item));
+			}
 			item.mManager.mThrownItems.remove(item);
 		}
 	}
 
 	public static boolean isGrave(Entity entity) {
-		return GRAVES.containsKey(entity.getUniqueId());
+		return entity.getScoreboardTags().contains("Grave") || GRAVES.containsKey(entity.getUniqueId());
 	}
 
 	public static boolean isGraveItem(Entity entity) {
-		return GRAVE_ITEMS.containsKey(entity.getUniqueId());
+		return entity.getScoreboardTags().contains("GraveItem") || GRAVE_ITEMS.containsKey(entity.getUniqueId());
 	}
 
 	public static boolean isThrownItem(Entity entity) {
-		return THROWN_ITEMS.containsKey(entity.getUniqueId());
+		return entity.getScoreboardTags().contains("ThrownItem") || THROWN_ITEMS.containsKey(entity.getUniqueId());
 	}
 
 	private static HashSet<Grave> getUnloadedGraves(Long key) {

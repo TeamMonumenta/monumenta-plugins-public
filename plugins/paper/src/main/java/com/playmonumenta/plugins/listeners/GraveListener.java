@@ -74,21 +74,24 @@ public class GraveListener implements Listener {
 
 	@EventHandler(priority = EventPriority.HIGH)
 	public void playerInteractEntity(PlayerInteractEntityEvent event) {
-		if (GraveManager.onInteract(event.getPlayer(), event.getRightClicked())) {
+		if (GraveManager.isGrave(event.getRightClicked())) {
+			GraveManager.onInteract(event.getPlayer(), event.getRightClicked());
 			event.setCancelled(true);
 		}
 	}
 
 	@EventHandler(priority = EventPriority.HIGH)
 	public void playerArmorStandManipulate(PlayerArmorStandManipulateEvent event) {
-		if (GraveManager.onInteract(event.getPlayer(), event.getRightClicked())) {
+		if (GraveManager.isGrave(event.getRightClicked())) {
+			GraveManager.onInteract(event.getPlayer(), event.getRightClicked());
 			event.setCancelled(true);
 		}
 	}
 
 	@EventHandler(priority = EventPriority.HIGH)
 	public void playerInteractAtEntity(PlayerInteractAtEntityEvent event) {
-		if (GraveManager.onInteract(event.getPlayer(), event.getRightClicked())) {
+		if (GraveManager.isGrave(event.getRightClicked())) {
+			GraveManager.onInteract(event.getPlayer(), event.getRightClicked());
 			event.setCancelled(true);
 		}
 	}
@@ -96,7 +99,8 @@ public class GraveListener implements Listener {
 	@EventHandler(priority = EventPriority.HIGH)
 	public void entityDamageByEntity(EntityDamageByEntityEvent event) {
 		if (event.getDamager() instanceof Player && event.getEntityType() == EntityType.ARMOR_STAND) {
-			if (GraveManager.onInteract((Player) event.getDamager(), event.getEntity())) {
+			if (GraveManager.isGrave(event.getEntity())) {
+				GraveManager.onInteract((Player) event.getDamager(), event.getEntity());
 				event.setCancelled(true);
 			}
 		}
@@ -144,7 +148,15 @@ public class GraveListener implements Listener {
 	public void entityDamage(EntityDamageEvent event) {
 		if (!event.isCancelled()) {
 			if (event.getEntityType() == EntityType.DROPPED_ITEM) {
-				GraveManager.onDestroyItem((Item) event.getEntity());
+				Item entity = (Item) event.getEntity();
+				EntityDamageEvent.DamageCause cause = event.getCause();
+				if (entity.isInvulnerable()
+				    || (entity.getScoreboardTags().contains("ExplosionImmune")
+				        && (cause == EntityDamageEvent.DamageCause.ENTITY_EXPLOSION || cause == EntityDamageEvent.DamageCause.BLOCK_EXPLOSION))) {
+					event.setCancelled(true);
+					return;
+				}
+				GraveManager.onDestroyItem(entity);
 			} else if (event.getEntityType() == EntityType.ARMOR_STAND) {
 				if (GraveManager.isGrave(event.getEntity())) {
 					event.setCancelled(true);
@@ -159,22 +171,24 @@ public class GraveListener implements Listener {
 		Item entity = event.getItemDrop();
 		ItemStack item = entity.getItemStack();
 		ItemUtils.ItemDeathResult result = ItemUtils.getItemDeathResult(item);
-		if (result == ItemUtils.ItemDeathResult.SHATTER || result == ItemUtils.ItemDeathResult.SHATTER_NOW
-			|| result == ItemUtils.ItemDeathResult.SAFE || result == ItemUtils.ItemDeathResult.KEEP) {
-			if (entity.getThrower() == player.getUniqueId()) {
-				GraveManager.onDropItem(player, entity);
-			} else {
-				new BukkitRunnable() {
-					@Override
-					public void run() {
-						if (entity.isValid()) {
-							NBTEntity nbte = new NBTEntity(entity);
-							if (nbte.getShort("Age") < 11999) {
-								GraveManager.onDropItem(player, entity);
+		if (!player.getScoreboardTags().contains("DisableGraves")) {
+			if (result == ItemUtils.ItemDeathResult.SHATTER || result == ItemUtils.ItemDeathResult.SHATTER_NOW
+				|| result == ItemUtils.ItemDeathResult.SAFE || result == ItemUtils.ItemDeathResult.KEEP) {
+				if (entity.getThrower() == player.getUniqueId()) {
+					GraveManager.onDropItem(player, entity);
+				} else {
+					new BukkitRunnable() {
+						@Override
+						public void run() {
+							if (entity.isValid()) {
+								NBTEntity nbte = new NBTEntity(entity);
+								if (nbte.getShort("Age") < 11999) {
+									GraveManager.onDropItem(player, entity);
+								}
 							}
 						}
-					}
-				}.runTask(mPlugin);
+					}.runTask(mPlugin);
+				}
 			}
 		}
 	}
@@ -190,7 +204,9 @@ public class GraveListener implements Listener {
 			Location location = player.getLocation();
 			Item entity = player.getWorld().dropItemNaturally(location, item);
 			entity.setPickupDelay(0);
-			GraveManager.onDropItem(player, entity);
+			if (!player.getScoreboardTags().contains("DisableGraves")) {
+				GraveManager.onDropItem(player, entity);
+			}
 		}
 	}
 

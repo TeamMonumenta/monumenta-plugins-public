@@ -8,6 +8,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ProxiedCommandSender;
+import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -18,6 +19,7 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 
+import com.playmonumenta.plugins.graves.GraveManager;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 
 import dev.jorel.commandapi.CommandAPI;
@@ -83,7 +85,8 @@ public class JunkItemListener implements Listener {
 	@EventHandler(priority = EventPriority.LOWEST)
 	public void pickupItem(EntityPickupItemEvent event) {
 		if (!event.isCancelled() && (event.getEntity() instanceof Player)) {
-			ItemStack item = event.getItem().getItemStack();
+			Item entity = event.getItem();
+			ItemStack item = entity.getItemStack();
 
 			if (!mPlayers.contains(event.getEntity().getUniqueId()) || item.getType().isAir()) {
 				return;
@@ -98,6 +101,11 @@ public class JunkItemListener implements Listener {
 					// This is the same as something on the player's hotbar, definitely don't want to cancel pickup
 					return;
 				}
+			}
+
+			// Allow collection of death piles and valuable player-dropped items
+			if (GraveManager.isGraveItem(entity) || GraveManager.isThrownItem(entity)) {
+				return;
 			}
 
 			// Cancel pickup of non-interesting items that aren't on the player's hotbar
