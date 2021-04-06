@@ -27,13 +27,14 @@ public class MessagingUtils {
 
 	public static void sendActionBarMessage(Plugin plugin, Player player, String message) {
 		message = translatePlayerName(player, message);
-		TextComponent formattedMessage = Component.text(message, NamedTextColor.YELLOW);
+		TextComponent formattedMessage = LEGACY_SERIALIZER.deserialize(message)
+			.color(NamedTextColor.YELLOW);
 		player.sendActionBar​(formattedMessage);
 	}
 
 	public static void sendAbilityTriggeredMessage(Plugin plugin, Player player, String message) {
-		TextComponent formattedMessage = LEGACY_SERIALIZER.deserialize(message);
-		formattedMessage.color(NamedTextColor.RED);
+		TextComponent formattedMessage = LEGACY_SERIALIZER.deserialize(message)
+			.color(NamedTextColor.RED);
 		player.sendActionBar​(formattedMessage);
 	}
 
@@ -52,7 +53,7 @@ public class MessagingUtils {
 		} else {
 			formattedMessage = Component.text("An error occured without a set message. Hover for stack trace.");
 		}
-		formattedMessage.color(NamedTextColor.RED);
+		formattedMessage = formattedMessage.color(NamedTextColor.RED);
 
 		// Get the first 300 characters of the stacktrace and send them to the player
 		StringWriter sw = new StringWriter();
@@ -62,7 +63,7 @@ public class MessagingUtils {
 		sStackTrace = sStackTrace.substring(0, Math.min(sStackTrace.length(), 300));
 
 		TextComponent textStackTrace = Component.text(sStackTrace.replace("\t", "  "), NamedTextColor.RED);
-		formattedMessage.hoverEvent(textStackTrace);
+		formattedMessage = formattedMessage.hoverEvent(textStackTrace);
 		sender.sendMessage(formattedMessage);
 
 		e.printStackTrace();

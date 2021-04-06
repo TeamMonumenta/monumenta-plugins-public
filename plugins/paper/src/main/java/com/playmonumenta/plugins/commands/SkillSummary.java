@@ -75,8 +75,8 @@ public class SkillSummary extends GenericCommand {
 				}
 				abilityHover = ability.getLevelHover(useShorthand);
 				if (abilityHover != null) {
-					component.append(Component.text(" "));
-					component.append(abilityHover);
+					component = component.append(Component.text(" "))
+						.append(abilityHover);
 				}
 			}
 			player.sendMessage(component);

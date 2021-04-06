@@ -73,8 +73,8 @@ public class AbilityInfo {
 		Component component = Component.text("");
 		component.append(getFormattedDescription(1));
 		for (int skillLevel = 2; skillLevel <= mDescriptions.size(); skillLevel++) {
-			component.append(Component.text("\n"));
-			component.append(getFormattedDescription(skillLevel));
+			component = component.append(Component.newline())
+				.append(getFormattedDescription(skillLevel));
 		}
 		return component;
 	}
@@ -96,7 +96,7 @@ public class AbilityInfo {
 			hoverableString = mDisplayName.toUpperCase() + " Level " + skillLevel;
 		}
 		return Component.text(hoverableString, NamedTextColor.YELLOW)
-		.hoverEvent(getFormattedDescriptions());
+			.hoverEvent(getFormattedDescriptions());
 	}
 
 	public void sendDescriptions(CommandSender sender) {
