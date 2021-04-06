@@ -361,10 +361,12 @@ public class GraveItem {
 	}
 
 	void onDestroyItem() {
-		remove(Status.LIMBO);
-		if (!mGrave.mAlertedLimbo) {
-			mGrave.mAlertedLimbo = true;
-			mPlayer.sendMessage(Component.text("Some of the items you died with were destroyed, but don't worry! If you can get back without dying again, you can get them back! (/deathhelp for more info)", NamedTextColor.RED));
+		if (mStatus == Status.DROPPED) {
+			remove(Status.LIMBO);
+			if (!mGrave.mAlertedLimbo) {
+				mGrave.mAlertedLimbo = true;
+				mPlayer.sendMessage(Component.text("Some of the items you died with were destroyed, but don't worry! If you can get back without dying again, you can get them back! (/deathhelp for more info)", NamedTextColor.RED));
+			}
 		}
 	}
 

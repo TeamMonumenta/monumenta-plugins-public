@@ -402,7 +402,8 @@ public class EntityListener implements Listener {
 				}
 			}
 		} else if (damagee instanceof Item) {
-			if (!damagee.getScoreboardTags().contains("ShatterProcessed")) {
+			//TODO Part of old graves, remove in a couple weeks
+			if (damagee.getScoreboardTags().contains("PlayerDeath") && !damagee.getScoreboardTags().contains("ShatterProcessed")) {
 				damagee.addScoreboardTag("ShatterProcessed");
 				damagee.addScoreboardTag("ShatteringNoPickup");
 				GraveUtils.destroyItemEntity((Item) damagee);
