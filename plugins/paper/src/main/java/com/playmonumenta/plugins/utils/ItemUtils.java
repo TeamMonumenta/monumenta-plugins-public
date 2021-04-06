@@ -1114,6 +1114,9 @@ public class ItemUtils {
 		if (refresh) {
 			setPlainName(itemStack);
 		}
+		if (itemStack == null || !itemStack.hasItemMeta()) {
+			return null;
+		}
 		NBTItem nbtItem = new NBTItem(itemStack);
 		if (!nbtItem.hasKey(PLAIN_KEY)) {
 			return null;
@@ -1190,6 +1193,9 @@ public class ItemUtils {
 		}
 		if (refresh) {
 			setPlainLore(itemStack);
+		}
+		if (!itemStack.hasItemMeta()) {
+			return null;
 		}
 		NBTItem nbtItem = new NBTItem(itemStack);
 		if (!nbtItem.hasKey(PLAIN_KEY)) {
