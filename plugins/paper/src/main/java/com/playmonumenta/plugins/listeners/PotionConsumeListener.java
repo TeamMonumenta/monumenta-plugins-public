@@ -157,7 +157,7 @@ public class PotionConsumeListener implements Listener {
 		}
 
 		InventoryType invType = event.getClickedInventory().getType();
-		if (invType == InventoryType.PLAYER || invType == InventoryType.ENDER_CHEST || invType == InventoryType.SHULKER_BOX) {
+		if (invType == InventoryType.PLAYER || invType == InventoryType.ENDER_CHEST || invType == InventoryType.SHULKER_BOX || invType == InventoryType.CRAFTING) {
 			setPotionCooldown(player);
 		}
 
@@ -299,7 +299,7 @@ public class PotionConsumeListener implements Listener {
 		item.setAmount(item.getAmount() - 1);
 
 		InventoryType invType = event.getClickedInventory().getType();
-		if (invType == InventoryType.PLAYER || invType == InventoryType.ENDER_CHEST || invType == InventoryType.SHULKER_BOX) {
+		if (invType == InventoryType.PLAYER || invType == InventoryType.ENDER_CHEST || invType == InventoryType.SHULKER_BOX || invType == InventoryType.CRAFTING) {
 			setPotionCooldown(player);
 		}
 
