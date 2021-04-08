@@ -118,21 +118,21 @@ public class StatMultiplier extends DelveModifier {
 	}
 
 	@Override
-	protected void playerTookCustomDamageEvent(EntityDamageByEntityEvent event) {
-		modifyDamage(event.getDamager(), event);
+	protected boolean playerTookCustomDamageEvent(EntityDamageByEntityEvent event) {
+		return modifyDamage(event.getDamager(), event);
 	}
 
 	@Override
-	protected void playerTookMeleeDamageEvent(EntityDamageByEntityEvent event) {
-		modifyDamage(event.getDamager(), event);
+	protected boolean playerTookMeleeDamageEvent(EntityDamageByEntityEvent event) {
+		return modifyDamage(event.getDamager(), event);
 	}
 
 	@Override
-	protected void playerTookProjectileDamageEvent(Entity source, EntityDamageByEntityEvent event) {
-		modifyDamage(source, event);
+	protected boolean playerTookProjectileDamageEvent(Entity source, EntityDamageByEntityEvent event) {
+		return modifyDamage(source, event);
 	}
 
-	private void modifyDamage(Entity source, EntityDamageByEntityEvent event) {
+	private boolean modifyDamage(Entity source, EntityDamageByEntityEvent event) {
 		if (DelvesUtils.isDelveMob(source) || event.getCause() == DamageCause.CUSTOM) {
 			event.setDamage(event.getDamage() * mDelveMobStatMultiplier);
 		} else {
@@ -140,6 +140,8 @@ public class StatMultiplier extends DelveModifier {
 		}
 
 		event.setDamage(EntityUtils.getDamageApproximation(event, mDamageMultiplier));
+
+		return true;
 	}
 
 	@Override

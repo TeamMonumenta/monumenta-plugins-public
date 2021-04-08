@@ -21,7 +21,7 @@ public class SpellSlingerBoss extends BossAbilityGroup {
 
 	private static final boolean SINGLE_TARGET = true;
 	private static final boolean LAUNCH_TRACKING = false;
-	private static final int COOLDOWN = 20 * 1;
+	private static final int COOLDOWN = (int)(20 * 1.25);
 	private static final int DELAY = 10;
 	private static final double SPEED = 0.6;
 	private static final double TURN_RADIUS = Math.PI / 60;

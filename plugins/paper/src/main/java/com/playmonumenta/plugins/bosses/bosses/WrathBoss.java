@@ -35,7 +35,7 @@ public class WrathBoss extends BossAbilityGroup {
 	private static final int RUN_DISTANCE = 2;
 	private static final int VELOCITY_MULTIPLIER = 1;
 	private static final double DAMAGE_RADIUS = 2.5;
-	private static final int DAMAGE = 20;
+	private static final int DAMAGE = 18;
 	private static final int ULTIMATE_EYE_DISTANCE = 6;
 	private static final double DODGE_CHANCE = 0.3;
 

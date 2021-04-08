@@ -80,8 +80,9 @@ public class Arcanic extends DelveModifier {
 	}
 
 	@Override
-	public void playerTookCustomDamageEvent(EntityDamageByEntityEvent event) {
+	public boolean playerTookCustomDamageEvent(EntityDamageByEntityEvent event) {
 		event.setDamage(EntityUtils.getDamageApproximation(event, mCustomDamageTakenMultiplier));
+		return true;
 	}
 
 	@Override

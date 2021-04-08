@@ -65,9 +65,9 @@ public class DelveModifier extends Ability {
 	public boolean playerDamagedByLivingEntityEvent(EntityDamageByEntityEvent event) {
 		if (shouldApplyModifiers(event.getDamager())) {
 			if (event.getCause() == DamageCause.CUSTOM) {
-				playerTookCustomDamageEvent(event);
+				return playerTookCustomDamageEvent(event);
 			} else {
-				playerTookMeleeDamageEvent(event);
+				return playerTookMeleeDamageEvent(event);
 			}
 		}
 
@@ -85,7 +85,7 @@ public class DelveModifier extends Ability {
 		Entity entity = (Entity) source;
 
 		if (shouldApplyModifiers(entity)) {
-			playerTookProjectileDamageEvent(entity, event);
+			return playerTookProjectileDamageEvent(entity, event);
 		}
 
 		return true;
@@ -97,7 +97,7 @@ public class DelveModifier extends Ability {
 			entityDeathEvent(event);
 		}
 	}
-	
+
 	/* This version is only called when the event should apply modifiers! */
 	protected void entityDeathEvent(EntityDeathEvent event) { }
 
@@ -121,10 +121,16 @@ public class DelveModifier extends Ability {
 
 	protected void applyModifiers(LivingEntity mob, SpawnerSpawnEvent event) { }
 
-	protected void playerTookCustomDamageEvent(EntityDamageByEntityEvent event) { }
+	protected boolean playerTookCustomDamageEvent(EntityDamageByEntityEvent event) {
+		return true;
+	}
 
-	protected void playerTookMeleeDamageEvent(EntityDamageByEntityEvent event) { }
+	protected boolean playerTookMeleeDamageEvent(EntityDamageByEntityEvent event) {
+		return true;
+	}
 
-	protected void playerTookProjectileDamageEvent(Entity source, EntityDamageByEntityEvent event) { }
+	protected boolean playerTookProjectileDamageEvent(Entity source, EntityDamageByEntityEvent event) {
+		return true;
+	}
 
 }

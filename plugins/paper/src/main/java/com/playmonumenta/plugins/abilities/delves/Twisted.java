@@ -96,25 +96,27 @@ public class Twisted extends DelveModifier {
 	}
 
 	@Override
-	protected void playerTookCustomDamageEvent(EntityDamageByEntityEvent event) {
-		modifyDamageDealt(event);
+	protected boolean playerTookCustomDamageEvent(EntityDamageByEntityEvent event) {
+		return modifyDamageDealt(event);
 	}
 
 	@Override
-	protected void playerTookMeleeDamageEvent(EntityDamageByEntityEvent event) {
-		modifyDamageDealt(event);
+	protected boolean playerTookMeleeDamageEvent(EntityDamageByEntityEvent event) {
+		return modifyDamageDealt(event);
 	}
 
 	@Override
-	protected void playerTookProjectileDamageEvent(Entity source, EntityDamageByEntityEvent event) {
-		modifyDamageDealt(event);
+	protected boolean playerTookProjectileDamageEvent(Entity source, EntityDamageByEntityEvent event) {
+		return modifyDamageDealt(event);
 	}
 
-	private void modifyDamageDealt(EntityDamageByEntityEvent event) {
+	private boolean modifyDamageDealt(EntityDamageByEntityEvent event) {
 		Set<String> tags = event.getEntity().getScoreboardTags();
 		if (tags != null && tags.contains(SHADE_OF_CORRUPTION_TAG)) {
 			event.setDamage(EntityUtils.getDamageApproximation(event, CORRUPTION_DAMAGE_DEALT_MULTIPLIER));
 		}
+
+		return true;
 	}
 
 	@Override

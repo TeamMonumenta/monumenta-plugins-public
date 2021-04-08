@@ -11,40 +11,46 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryInteractEvent;
-import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.event.player.PlayerQuitEvent;
 
-import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.guis.singlepageguis.ExampleSinglePageGUI;
 import com.playmonumenta.plugins.guis.singlepageguis.OrinSinglePageGUI;
 import com.playmonumenta.plugins.guis.singlepageguis.PebGui;
+import com.playmonumenta.scriptedquests.utils.MessagingUtils;
 
 public class SinglePageGUIManager implements Listener {
 
-	protected static Plugin mPlugin;
+	private static final Map<UUID, SinglePageGUI> GUI_MAPPINGS = new HashMap<>();
+	private static final Map<UUID, Integer> LAST_TICK_OPENED = new HashMap<>();
 
-	public SinglePageGUIManager(Plugin plugin) {
+	private static final int TIMEOUT = 20 * 1;
+
+	public SinglePageGUIManager() {
 		// Whenever you make a SinglePageGUI, it must be registered here
 		new ExampleSinglePageGUI(null, null).registerCommand();
 		new OrinSinglePageGUI(null, null).registerCommand();
-		new PebGui(null,null).registerCommand();
-		mPlugin = plugin;
+		new PebGui(null, null).registerCommand();
 	}
-
-	private static final Map<UUID, SinglePageGUI> GUI_MAPPINGS = new HashMap<>();
 
 	public static void openGUI(Player player, SinglePageGUI gui) {
 		UUID uuid = player.getUniqueId();
+
+		Integer lastTickOpened = LAST_TICK_OPENED.get(uuid);
+		int currentTickOpened = player.getTicksLived();
+		if (lastTickOpened != null) {
+			if (currentTickOpened - lastTickOpened >= 0 && currentTickOpened - lastTickOpened < TIMEOUT) {
+				MessagingUtils.sendActionBarMessage(player, "Please wait one second before trying to open the GUI again.");
+				return;
+			}
+		}
+
+		LAST_TICK_OPENED.put(uuid, currentTickOpened);
+
         if (!GUI_MAPPINGS.containsKey(uuid)) {
             GUI_MAPPINGS.put(uuid, gui);
-            gui.openGUI();
-            new BukkitRunnable() {
-				@Override
-				public void run() {
-					if (player.getOpenInventory() == null || player.getOpenInventory().getTopInventory() == null) {
-						GUI_MAPPINGS.remove(player.getUniqueId());
-					}
-				}
-            }.runTaskLater(mPlugin, 20);
+            gui.openGUI(GUI_MAPPINGS);
+        } else {
+        	MessagingUtils.sendActionBarMessage(player, "GUI opening canceled. If this problem persists, try relogging.");
         }
 	}
 
@@ -80,6 +86,16 @@ public class SinglePageGUIManager implements Listener {
 
 	@EventHandler
 	public void inventoryCloseEvent(InventoryCloseEvent event) {
+		UUID uuid = event.getPlayer().getUniqueId();
+		SinglePageGUI gui = GUI_MAPPINGS.get(uuid);
+
+		if (gui != null && gui.contains(event.getInventory())) {
+			GUI_MAPPINGS.remove(uuid);
+		}
+	}
+
+	@EventHandler
+	public void playerQuitEvent(PlayerQuitEvent event) {
 		GUI_MAPPINGS.remove(event.getPlayer().getUniqueId());
 	}
 

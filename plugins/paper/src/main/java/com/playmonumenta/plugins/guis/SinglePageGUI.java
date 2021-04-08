@@ -2,6 +2,8 @@ package com.playmonumenta.plugins.guis;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -79,7 +81,7 @@ public abstract class SinglePageGUI {
 	// Return the inventory that will be used for the GUI
 	public abstract Inventory getInventory(Player player, String[] args);
 
-	public void openGUI() {
+	public void openGUI(Map<UUID, SinglePageGUI> tracker) {
 		mPlayer.openInventory(mInventory);
 	}
 

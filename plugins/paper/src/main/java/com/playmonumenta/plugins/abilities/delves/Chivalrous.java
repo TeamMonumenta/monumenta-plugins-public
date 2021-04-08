@@ -9,7 +9,7 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.SpawnerSpawnEvent;
 
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.bosses.bosses.AntiRangeBoss;
+import com.playmonumenta.plugins.bosses.bosses.AntiRangeChivalrousBoss;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import com.playmonumenta.plugins.utils.DelvesUtils;
 import com.playmonumenta.plugins.utils.DelvesUtils.Modifier;
@@ -27,6 +27,11 @@ public class Chivalrous extends DelveModifier {
 	private static final String[] MOUNTS = {
 			"SlimeMount",
 			"MagmaCubeMount"
+	};
+
+	public static final String[] MOUNT_NAMES = {
+			"Slime Mount",
+			"Magma Cube Mount"
 	};
 
 	public static final String DESCRIPTION = "Enemies become Knights of Slime.";
@@ -55,11 +60,9 @@ public class Chivalrous extends DelveModifier {
 	}
 
 	@Override
-	public void playerTookMeleeDamageEvent(EntityDamageByEntityEvent event) {
+	public boolean playerTookMeleeDamageEvent(EntityDamageByEntityEvent event) {
 		// Can't make magma cubes do 0 damage in Vanilla using attributes or Weakness
-		if (MOUNTS[1].equals(event.getEntity().getCustomName())) {
-			event.setDamage(0);
-		}
+		return !MOUNT_NAMES[1].equals(event.getDamager().getCustomName());
 	}
 
 	@Override
@@ -68,7 +71,7 @@ public class Chivalrous extends DelveModifier {
 				&& FastUtils.RANDOM.nextDouble() < mSpawnChance) {
 			Entity mount = LibraryOfSoulsIntegration.summon(mob.getLocation(), MOUNTS[FastUtils.RANDOM.nextInt(MOUNTS.length)]);
 			mount.addPassenger(mob);
-			mob.addScoreboardTag(AntiRangeBoss.identityTag);
+			mob.addScoreboardTag(AntiRangeChivalrousBoss.identityTag);
 
 			if (mob instanceof Creeper) {
 				Creeper creeper = (Creeper) mob;

@@ -59,20 +59,20 @@ public class DelvesUtils {
 
 	public enum Modifier {
 
-		RELENTLESS(Relentless.class, 1, Material.DIAMOND_PICKAXE, Component.text("Relentless", NamedTextColor.AQUA, TextDecoration.BOLD), Relentless.DESCRIPTION, Relentless.RANK_DESCRIPTIONS),
-		ARCANIC(Arcanic.class, 2, Material.NETHER_STAR, Component.text("Arcanic", NamedTextColor.LIGHT_PURPLE, TextDecoration.BOLD), Arcanic.DESCRIPTION, Arcanic.RANK_DESCRIPTIONS),
-		INFERNAL(Infernal.class, 3, Material.LAVA_BUCKET, Component.text("Infernal", NamedTextColor.GOLD, TextDecoration.BOLD), Infernal.DESCRIPTION, Infernal.RANK_DESCRIPTIONS),
-		TRANSCENDENT(Transcendent.class, 4, Material.ENDER_EYE, Component.text("Transcendent", NamedTextColor.GREEN, TextDecoration.BOLD), Transcendent.DESCRIPTION, Transcendent.RANK_DESCRIPTIONS),
-		SPECTRAL(Spectral.class, 5, Material.PHANTOM_MEMBRANE, Component.text("Spectral", NamedTextColor.WHITE, TextDecoration.BOLD), Spectral.DESCRIPTION, Spectral.RANK_DESCRIPTIONS),
-		DREADFUL(Dreadful.class, 6, Material.BONE, Component.text("Dreadful", NamedTextColor.DARK_GRAY, TextDecoration.BOLD), Dreadful.DESCRIPTION, Dreadful.RANK_DESCRIPTIONS),
-		COLOSSAL(Colossal.class, 7, Material.IRON_BARS, Component.text("Colossal", NamedTextColor.DARK_BLUE, TextDecoration.BOLD), Colossal.DESCRIPTION, Colossal.RANK_DESCRIPTIONS),
-		CHIVALROUS(Chivalrous.class, 10, Material.MAGMA_CREAM, Component.text("Chivalrous", NamedTextColor.DARK_GREEN, TextDecoration.BOLD), Chivalrous.DESCRIPTION, Chivalrous.RANK_DESCRIPTIONS),
-		BLOODTHIRSTY(Bloodthirsty.class, 11, Material.ROTTEN_FLESH, Component.text("Bloodthirsty", NamedTextColor.RED, TextDecoration.BOLD), Bloodthirsty.DESCRIPTION, Bloodthirsty.RANK_DESCRIPTIONS),
-		PERNICIOUS(Pernicious.class, 12, Material.MUSIC_DISC_11, Component.text("Pernicious", NamedTextColor.DARK_AQUA, TextDecoration.BOLD), Pernicious.DESCRIPTION, Pernicious.RANK_DESCRIPTIONS),
-		LEGIONARY(Legionary.class, 13, Material.IRON_SWORD, Component.text("Legionary", NamedTextColor.YELLOW, TextDecoration.BOLD), Legionary.DESCRIPTION, Legionary.RANK_DESCRIPTIONS),
-		CARAPACE(Carapace.class, 14, Material.NETHERITE_HELMET, Component.text("Carapace", NamedTextColor.DARK_PURPLE, TextDecoration.BOLD), Carapace.DESCRIPTION, Carapace.RANK_DESCRIPTIONS),
-		ENTROPY(Entropy.class, 15, Material.STRUCTURE_VOID, Component.text("Entropy", NamedTextColor.BLUE, TextDecoration.BOLD), Entropy.DESCRIPTION, Entropy.RANK_DESCRIPTIONS),
-		TWISTED(Twisted.class, 16, Material.TIPPED_ARROW, Component.text("Twisted", NamedTextColor.DARK_RED, TextDecoration.BOLD), Twisted.DESCRIPTION, Twisted.RANK_DESCRIPTIONS);
+		RELENTLESS(Relentless.class, 1, Material.DIAMOND_PICKAXE, Component.text("Relentless", NamedTextColor.AQUA, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false), Relentless.DESCRIPTION, Relentless.RANK_DESCRIPTIONS),
+		ARCANIC(Arcanic.class, 2, Material.NETHER_STAR, Component.text("Arcanic", NamedTextColor.LIGHT_PURPLE, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false), Arcanic.DESCRIPTION, Arcanic.RANK_DESCRIPTIONS),
+		INFERNAL(Infernal.class, 3, Material.LAVA_BUCKET, Component.text("Infernal", NamedTextColor.GOLD, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false), Infernal.DESCRIPTION, Infernal.RANK_DESCRIPTIONS),
+		TRANSCENDENT(Transcendent.class, 4, Material.ENDER_EYE, Component.text("Transcendent", NamedTextColor.GREEN, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false), Transcendent.DESCRIPTION, Transcendent.RANK_DESCRIPTIONS),
+		SPECTRAL(Spectral.class, 5, Material.PHANTOM_MEMBRANE, Component.text("Spectral", NamedTextColor.WHITE, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false), Spectral.DESCRIPTION, Spectral.RANK_DESCRIPTIONS),
+		DREADFUL(Dreadful.class, 6, Material.BONE, Component.text("Dreadful", NamedTextColor.DARK_GRAY, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false), Dreadful.DESCRIPTION, Dreadful.RANK_DESCRIPTIONS),
+		COLOSSAL(Colossal.class, 7, Material.IRON_BARS, Component.text("Colossal", NamedTextColor.DARK_BLUE, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false), Colossal.DESCRIPTION, Colossal.RANK_DESCRIPTIONS),
+		CHIVALROUS(Chivalrous.class, 10, Material.MAGMA_CREAM, Component.text("Chivalrous", NamedTextColor.DARK_GREEN, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false), Chivalrous.DESCRIPTION, Chivalrous.RANK_DESCRIPTIONS),
+		BLOODTHIRSTY(Bloodthirsty.class, 11, Material.ROTTEN_FLESH, Component.text("Bloodthirsty", NamedTextColor.RED, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false), Bloodthirsty.DESCRIPTION, Bloodthirsty.RANK_DESCRIPTIONS),
+		PERNICIOUS(Pernicious.class, 12, Material.MUSIC_DISC_11, Component.text("Pernicious", NamedTextColor.DARK_AQUA, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false), Pernicious.DESCRIPTION, Pernicious.RANK_DESCRIPTIONS),
+		LEGIONARY(Legionary.class, 13, Material.IRON_SWORD, Component.text("Legionary", NamedTextColor.YELLOW, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false), Legionary.DESCRIPTION, Legionary.RANK_DESCRIPTIONS),
+		CARAPACE(Carapace.class, 14, Material.NETHERITE_HELMET, Component.text("Carapace", NamedTextColor.DARK_PURPLE, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false), Carapace.DESCRIPTION, Carapace.RANK_DESCRIPTIONS),
+		ENTROPY(Entropy.class, 15, Material.STRUCTURE_VOID, Component.text("Entropy", NamedTextColor.BLUE, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false), Entropy.DESCRIPTION, Entropy.RANK_DESCRIPTIONS),
+		TWISTED(Twisted.class, 16, Material.TIPPED_ARROW, Component.text("Twisted", NamedTextColor.DARK_RED, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false), Twisted.DESCRIPTION, Twisted.RANK_DESCRIPTIONS);
 
 		private static final Modifier[] MODIFIER_COLUMN_MAPPINGS = new Modifier[18];
 

@@ -1,5 +1,7 @@
 package com.playmonumenta.plugins.guis.singlepageguis;
 
+import java.util.ArrayList;
+
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -9,19 +11,15 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.format.TextDecoration;
-
 import com.playmonumenta.plugins.guis.SinglePageGUI;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.redissync.MonumentaRedisSyncAPI;
 import com.playmonumenta.scriptedquests.Plugin;
 import com.playmonumenta.scriptedquests.utils.ScoreboardUtils;
 
-import net.md_5.bungee.api.ChatColor;
-
-import java.util.ArrayList;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 
 public class OrinSinglePageGUI extends SinglePageGUI {
 
@@ -165,12 +163,12 @@ public class OrinSinglePageGUI extends SinglePageGUI {
 		LOCATIONS_TREE.add(new TeleportEntry(23, "Teal", "DTLAccess", "Click to teleport!", Material.CYAN_CONCRETE_POWDER, "execute as @S run function monumenta:lobbies/send_one/dtl", 1, 4));
 		LOCATIONS_TREE.add(new TeleportEntry(24, "Shifting City", "DRL2Access", "Click to teleport!", Material.PRISMARINE_BRICKS, "execute as @S run function monumenta:lobbies/send_one/drl2", 1, 4));
 		LOCATIONS_TREE.add(new TeleportEntry(32, "The Fallen Forum", "DFFAccess", "Click to teleport!", Material.BOOKSHELF, "execute as @S run function monumenta:lobbies/send_one/dff", 1, 4));
-		
+
 		//LOCATIONS_TREE.add(new TeleportEntry(8, "Switch to Page Layout", null, "", Material.PISTON, "switch", 1, 5));
 		//LOCATIONS_TREE.add(new TeleportEntry(0, "Back to Main Menu", null, "", Material.OBSERVER, "", 1, 5));
 		//LOCATIONS_TREE.add(new TeleportEntry(31, "Bih you thought", null, "Click to teleport!", Material.BARRIER, "nice try", 1, 5));
 	}
-	
+
 
 
 	public OrinSinglePageGUI(Player player, String[] args) {
@@ -194,7 +192,7 @@ public class OrinSinglePageGUI extends SinglePageGUI {
 	@Override
 	public Inventory getInventory(Player player, String[] args) {
 		Inventory baseInventory;
-		
+
 		//in case of someone messing with the score, this should fix it to the correct init values
 		int scoreboardFixer = ScoreboardUtils.getScoreboardValue(player, "OrinPage");
 		switch (scoreboardFixer) {
@@ -285,7 +283,7 @@ public class OrinSinglePageGUI extends SinglePageGUI {
 
 		}
 	}
-	
+
 	public void completeCommand(Player player, String command) {
 		if (command.startsWith("transferserver")) {
 			//input format should be "transferserver <shard_name> x, y, z, yaw, pitch"
@@ -328,7 +326,7 @@ public class OrinSinglePageGUI extends SinglePageGUI {
 		newItem = ItemUtils.setPlainTag(newItem);
 		return newItem;
 	}
-	
+
 	public Inventory setLayout(int layout, Player player, Inventory inventory) {
 		if (layout != 0) {
 			setTreeInventory(1, player, inventory);
@@ -370,6 +368,6 @@ public class OrinSinglePageGUI extends SinglePageGUI {
 		com.playmonumenta.plugins.utils.ScoreboardUtils.setScoreboardValue(player, "OrinPage", page);
 		return inventory;
 	}
-	
+
 
 }

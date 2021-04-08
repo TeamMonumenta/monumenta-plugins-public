@@ -73,6 +73,8 @@ public class CarapaceBoss extends BossAbilityGroup {
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
+
+				break;
 			}
 		}
 

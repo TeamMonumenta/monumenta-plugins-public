@@ -57,11 +57,11 @@ import com.playmonumenta.plugins.abilities.alchemist.harbinger.ScorchedEarth;
 import com.playmonumenta.plugins.abilities.cleric.Celestial;
 import com.playmonumenta.plugins.abilities.cleric.CleansingRain;
 import com.playmonumenta.plugins.abilities.cleric.ClericPassive;
+import com.playmonumenta.plugins.abilities.cleric.Crusade;
 import com.playmonumenta.plugins.abilities.cleric.DivineJustice;
 import com.playmonumenta.plugins.abilities.cleric.HandOfLight;
 import com.playmonumenta.plugins.abilities.cleric.HeavenlyBoon;
 import com.playmonumenta.plugins.abilities.cleric.NonClericProvisionsPassive;
-import com.playmonumenta.plugins.abilities.cleric.Crusade;
 import com.playmonumenta.plugins.abilities.cleric.SacredProvisions;
 import com.playmonumenta.plugins.abilities.cleric.Sanctified;
 import com.playmonumenta.plugins.abilities.cleric.hierophant.EnchantedPrayer;
@@ -94,9 +94,9 @@ import com.playmonumenta.plugins.abilities.mage.ManaLance;
 import com.playmonumenta.plugins.abilities.mage.PrismaticShield;
 import com.playmonumenta.plugins.abilities.mage.Spellshock;
 import com.playmonumenta.plugins.abilities.mage.ThunderStep;
-import com.playmonumenta.plugins.abilities.mage.arcanist.SpatialShatter;
 import com.playmonumenta.plugins.abilities.mage.arcanist.AstralOmen;
 import com.playmonumenta.plugins.abilities.mage.arcanist.SagesInsight;
+import com.playmonumenta.plugins.abilities.mage.arcanist.SpatialShatter;
 import com.playmonumenta.plugins.abilities.mage.elementalist.Blizzard;
 import com.playmonumenta.plugins.abilities.mage.elementalist.ElementalSpiritFire;
 import com.playmonumenta.plugins.abilities.mage.elementalist.ElementalSpiritIce;
@@ -397,6 +397,8 @@ public class AbilityManager {
 		mReferenceAbilities.addAll(Arrays.asList(
 			//********** DELVES **********//
 			new StatMultiplier(mPlugin, null),
+			new Legionary(mPlugin, null),
+			new Pernicious(mPlugin, null),
 			new Relentless(mPlugin, null),
 			new Arcanic(mPlugin, null),
 			new Infernal(mPlugin, null),
@@ -405,8 +407,6 @@ public class AbilityManager {
 			new Dreadful(mPlugin, null),
 			new Colossal(mPlugin, null),
 			new Chivalrous(mPlugin, null),
-			new Pernicious(mPlugin, null),
-			new Legionary(mPlugin, null),
 			new Bloodthirsty(mPlugin, null),
 			new Carapace(mPlugin, null),
 			new Entropy(mPlugin, null),
