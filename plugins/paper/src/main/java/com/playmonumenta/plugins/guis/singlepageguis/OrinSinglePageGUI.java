@@ -362,7 +362,7 @@ public class OrinSinglePageGUI extends SinglePageGUI {
 		}
 		for (int i = 0; i < (ROWS*COLUMNS); i++) {
 			if (inventory.getItem(i) == null) {
-				inventory.setItem(i,new ItemStack(Material.BLACK_STAINED_GLASS_PANE, 1));
+				inventory.setItem(i,new ItemStack(FILLER, 1));
 			}
 		}
 		com.playmonumenta.plugins.utils.ScoreboardUtils.setScoreboardValue(player, "OrinPage", page);

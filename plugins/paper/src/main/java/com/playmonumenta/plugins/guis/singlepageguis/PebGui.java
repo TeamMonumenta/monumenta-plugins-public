@@ -52,14 +52,14 @@ public class PebGui extends SinglePageGUI {
 
 	static {
 		//Common items for all but main menu are "page 0"
+		//Page 1 is the top level menu, 2-9 saved for the next level of menus.
+		//Pages 10 and beyond are used for implementation of specialized menus.
+
 		PEB_ITEMS.add(new PebItem(0, 0, "Back to Main Menu", "Returns you to page 1.", ChatColor.GOLD, Material.OBSERVER, "page 1"));
-		PEB_ITEMS.add(new PebItem(0, 8, "Exit PEB", "Exits this menu.", ChatColor.GOLD, Material.COD_BUCKET, "exit"));
+		PEB_ITEMS.add(new PebItem(0, 8, "Exit PEB", "Exits this menu.", ChatColor.GOLD, Material.RED_CONCRETE, "exit"));
 		PEB_ITEMS.add(new PebItem(0, 45, "Delete P.E.B.s ✗",
 				"Click to remove P.E.B.s from your inventory.", ChatColor.LIGHT_PURPLE,
 				Material.FLINT_AND_STEEL, "clickable peb_delete"));
-		PEB_ITEMS.add(new PebItem(0, 53, "Kick someone!",
-				"Kicks someone from the server.", ChatColor.LIGHT_PURPLE,
-				Material.RABBIT_FOOT, "kick @S You really thought I'd let you kick someone other than yourself?"));
 
 		//page 1: main menu
 		PEB_ITEMS.add(new PebItem(1, 0, "", "", ChatColor.LIGHT_PURPLE, FILLER, ""));
@@ -150,7 +150,7 @@ public class PebGui extends SinglePageGUI {
 				Material.ENCHANTED_BOOK, ""));
 		PEB_ITEMS.add(new PebItem(5, 40, "Wool Colors",
 				"Click to jump to a page of wool colors.", ChatColor.LIGHT_PURPLE,
-				Material.WHITE_WOOL, "page 6"));
+				Material.WHITE_WOOL, "page 10"));
 		PEB_ITEMS.add(new PebItem(5, 19, "Enchanted Book",
 				"Click to change skin to Enchanted Book. (Default)", ChatColor.LIGHT_PURPLE,
 				Material.ENCHANTED_BOOK, "clickable peb_skin_enchantedbook"));
@@ -164,59 +164,59 @@ public class PebGui extends SinglePageGUI {
 				"Red like roses!", ChatColor.RED,
 				Material.RED_CONCRETE, "clickable peb_skin_rose"));
 
-		//page 6
-		PEB_ITEMS.add(new PebItem(6, 9, "Back to Book Skins",
+		//page 10
+		PEB_ITEMS.add(new PebItem(10, 9, "Back to Book Skins",
 				"", ChatColor.LIGHT_PURPLE,
 				Material.ENCHANTED_BOOK, "page 5"));
-		PEB_ITEMS.add(new PebItem(6, 4, "Wool Skins",
+		PEB_ITEMS.add(new PebItem(10, 4, "Wool Skins",
 				"", ChatColor.LIGHT_PURPLE,
 				Material.ENCHANTED_BOOK, ""));
-		PEB_ITEMS.add(new PebItem(6, 11, "White",
+		PEB_ITEMS.add(new PebItem(10, 11, "White",
 				"Click to change skin to White.", ChatColor.LIGHT_PURPLE,
 				Material.WHITE_WOOL, "clickable peb_skin_white"));
-		PEB_ITEMS.add(new PebItem(6, 12, "Orange",
+		PEB_ITEMS.add(new PebItem(10, 12, "Orange",
 				"Click to change skin to Orange.", ChatColor.LIGHT_PURPLE,
 				Material.ORANGE_WOOL, "clickable peb_skin_orange"));
-		PEB_ITEMS.add(new PebItem(6, 20, "Magenta",
+		PEB_ITEMS.add(new PebItem(10, 20, "Magenta",
 				"Click to change skin to Magenta.", ChatColor.LIGHT_PURPLE,
 				Material.MAGENTA_WOOL, "clickable peb_skin_magenta"));
-		PEB_ITEMS.add(new PebItem(6, 21, "Light Blue",
+		PEB_ITEMS.add(new PebItem(10, 21, "Light Blue",
 				"Click to change skin to Light Blue.", ChatColor.LIGHT_PURPLE,
 				Material.LIGHT_BLUE_WOOL, "clickable peb_skin_lightblue"));
-		PEB_ITEMS.add(new PebItem(6, 29, "Yellow",
+		PEB_ITEMS.add(new PebItem(10, 29, "Yellow",
 				"Click to change skin to Yellow.", ChatColor.LIGHT_PURPLE,
 				Material.YELLOW_WOOL, "clickable peb_skin_yellow"));
-		PEB_ITEMS.add(new PebItem(6, 30, "Lime",
+		PEB_ITEMS.add(new PebItem(10, 30, "Lime",
 				"Click to change skin to Lime.", ChatColor.LIGHT_PURPLE,
 				Material.LIME_WOOL, "clickable peb_skin_lime"));
-		PEB_ITEMS.add(new PebItem(6, 38, "Pink",
+		PEB_ITEMS.add(new PebItem(10, 38, "Pink",
 				"Click to change skin to Pink.", ChatColor.LIGHT_PURPLE,
 				Material.PINK_WOOL, "clickable peb_skin_pink"));
-		PEB_ITEMS.add(new PebItem(6, 39, "Gray",
+		PEB_ITEMS.add(new PebItem(10, 39, "Gray",
 				"Click to change skin to Gray.", ChatColor.LIGHT_PURPLE,
 				Material.GRAY_WOOL, "clickable peb_skin_gray"));
-		PEB_ITEMS.add(new PebItem(6, 14, "Light Gray",
+		PEB_ITEMS.add(new PebItem(10, 14, "Light Gray",
 				"Click to change skin to Light Gray.", ChatColor.LIGHT_PURPLE,
 				Material.LIGHT_GRAY_WOOL, "clickable peb_skin_lightgray"));
-		PEB_ITEMS.add(new PebItem(6, 15, "Cyan",
+		PEB_ITEMS.add(new PebItem(10, 15, "Cyan",
 				"Click to change skin to Cyan.", ChatColor.LIGHT_PURPLE,
 				Material.CYAN_WOOL, "clickable peb_skin_cyan"));
-		PEB_ITEMS.add(new PebItem(6, 23, "Purple",
+		PEB_ITEMS.add(new PebItem(10, 23, "Purple",
 				"Click to change skin to Purple.", ChatColor.LIGHT_PURPLE,
 				Material.PURPLE_WOOL, "clickable peb_skin_purple"));
-		PEB_ITEMS.add(new PebItem(6, 24, "Blue",
+		PEB_ITEMS.add(new PebItem(10, 24, "Blue",
 				"Click to change skin to Blue.", ChatColor.LIGHT_PURPLE,
 				Material.BLUE_WOOL, "clickable peb_skin_blue"));
-		PEB_ITEMS.add(new PebItem(6, 32, "Brown",
+		PEB_ITEMS.add(new PebItem(10, 32, "Brown",
 				"Click to change skin to Brown.", ChatColor.LIGHT_PURPLE,
 				Material.BROWN_WOOL, "clickable peb_skin_brown"));
-		PEB_ITEMS.add(new PebItem(6, 33, "Green",
+		PEB_ITEMS.add(new PebItem(10, 33, "Green",
 				"Click to change skin to Green.", ChatColor.LIGHT_PURPLE,
 				Material.GREEN_WOOL, "clickable peb_skin_green"));
-		PEB_ITEMS.add(new PebItem(6, 41, "Red",
+		PEB_ITEMS.add(new PebItem(10, 41, "Red",
 				"Click to change skin to Red.", ChatColor.LIGHT_PURPLE,
 				Material.RED_WOOL, "clickable peb_skin_red"));
-		PEB_ITEMS.add(new PebItem(6, 42, "Black",
+		PEB_ITEMS.add(new PebItem(10, 42, "Black",
 				"Click to change skin to Black.", ChatColor.LIGHT_PURPLE,
 				Material.BLACK_WOOL, "clickable peb_skin_black"));
 	}
