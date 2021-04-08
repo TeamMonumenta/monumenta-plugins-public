@@ -53,6 +53,7 @@ import org.bukkit.event.entity.EntityInteractEvent;
 import org.bukkit.event.entity.EntityResurrectEvent;
 import org.bukkit.event.entity.EntitySpawnEvent;
 import org.bukkit.event.entity.EntityTargetLivingEntityEvent;
+import org.bukkit.event.entity.ExplosionPrimeEvent;
 import org.bukkit.event.entity.ItemDespawnEvent;
 import org.bukkit.event.entity.PotionSplashEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
@@ -76,7 +77,6 @@ import com.destroystokyo.paper.event.entity.EntityRemoveFromWorldEvent;
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityManager;
-import com.playmonumenta.plugins.abilities.cleric.hierophant.EnchantedPrayer;
 import com.playmonumenta.plugins.enchantments.AttributeProjectileDamage;
 import com.playmonumenta.plugins.enchantments.Inferno;
 import com.playmonumenta.plugins.enchantments.ThrowingKnife;
@@ -774,6 +774,14 @@ public class EntityListener implements Listener {
 			    !mPlugin.mItemOverrides.blockExplodeInteraction(mPlugin, block)) {
 				iter.remove();
 			}
+		}
+	}
+
+	// Reset creeper explosions on stun
+	@EventHandler(priority = EventPriority.LOW)
+	public void explosionPrimeEvent(ExplosionPrimeEvent event) {
+		if (EntityUtils.isStunned(event.getEntity())) {
+			event.setCancelled(true);
 		}
 	}
 
