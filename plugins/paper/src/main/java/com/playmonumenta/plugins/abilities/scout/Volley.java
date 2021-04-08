@@ -114,6 +114,8 @@ public class Volley extends Ability {
 				// Store PotionData from the original arrow only if it is weakness or slowness
 				PotionData tArrowData = null;
 
+				float arrowSpeed = (float) (arrow.getVelocity().length());
+
 				if (arrow instanceof Arrow) {
 					Arrow regularArrow = (Arrow) arrow;
 					if (regularArrow.hasCustomEffects()) {
@@ -124,12 +126,10 @@ public class Volley extends Ability {
 						}
 					}
 
-					projectiles = EntityUtils.spawnArrowVolley(mPlugin, mPlayer, numArrows, 1.75, 5, Arrow.class);
+					projectiles = EntityUtils.spawnArrowVolley(mPlugin, mPlayer, numArrows, arrowSpeed, 5, Arrow.class);
 				} else {
-					projectiles = EntityUtils.spawnArrowVolley(mPlugin, mPlayer, numArrows, 1.75, 5, SpectralArrow.class);
+					projectiles = EntityUtils.spawnArrowVolley(mPlugin, mPlayer, numArrows, arrowSpeed, 5, SpectralArrow.class);
 				}
-
-
 
 				for (Projectile proj : projectiles) {
 					AbstractArrow projArrow = (AbstractArrow) proj;

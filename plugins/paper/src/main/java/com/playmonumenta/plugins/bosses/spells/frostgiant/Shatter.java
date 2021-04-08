@@ -110,7 +110,6 @@ public class Shatter extends Spell {
 							for (double r = 0; r < 30; r++) {
 								double radian1 = Math.toRadians(degree);
 								vec = new Vector(FastUtils.cos(radian1) * r, 0, FastUtils.sin(radian1) * r);
-								vec = VectorUtils.rotateXAxis(vec, 0);
 								vec = VectorUtils.rotateYAxis(vec, loc.getYaw() + dir);
 
 								//Spawns particles
@@ -185,7 +184,6 @@ public class Shatter extends Spell {
 							for (double degree = 60; degree < 120; degree += 5) {
 								double radian1 = Math.toRadians(degree);
 								vec = new Vector(FastUtils.cos(radian1) * r, 0, FastUtils.sin(radian1) * r);
-								vec = VectorUtils.rotateXAxis(vec, 0);
 								vec = VectorUtils.rotateYAxis(vec, loc.getYaw() + dir);
 
 								Location l = loc.clone().add(vec);

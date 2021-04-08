@@ -126,7 +126,7 @@ public class FlashSword extends Ability {
 									double radian1 = Math.toRadians(degree);
 									vec = new Vector(FastUtils.cos(radian1) * r, 0, FastUtils.sin(radian1) * r);
 									vec = VectorUtils.rotateZAxis(vec, mRoll);
-									vec = VectorUtils.rotateXAxis(vec, -origin.getPitch());
+									vec = VectorUtils.rotateXAxis(vec, origin.getPitch());
 									vec = VectorUtils.rotateYAxis(vec, origin.getYaw());
 
 									Location l = origin.clone().add(0, 1.25, 0).add(vec);
@@ -143,7 +143,7 @@ public class FlashSword extends Ability {
 									double radian1 = Math.toRadians(degree);
 									vec = new Vector(FastUtils.cos(radian1) * r, 0, FastUtils.sin(radian1) * r);
 									vec = VectorUtils.rotateZAxis(vec, mRoll);
-									vec = VectorUtils.rotateXAxis(vec, -origin.getPitch());
+									vec = VectorUtils.rotateXAxis(vec, origin.getPitch());
 									vec = VectorUtils.rotateYAxis(vec, origin.getYaw());
 
 									Location l = origin.clone().add(0, 1.25, 0).add(vec);

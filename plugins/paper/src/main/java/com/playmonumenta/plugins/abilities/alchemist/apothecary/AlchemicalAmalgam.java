@@ -121,7 +121,7 @@ public class AlchemicalAmalgam extends Ability {
 				for (int i = 0; i < 2; i++) {
 					double radian1 = Math.toRadians(mDegree + (i * 180));
 					vec = new Vector(FastUtils.cos(radian1) * 0.325, 0, FastUtils.sin(radian1) * 0.325);
-					vec = VectorUtils.rotateXAxis(vec, -mLoc.getPitch() + 90);
+					vec = VectorUtils.rotateXAxis(vec, mLoc.getPitch() - 90);
 					vec = VectorUtils.rotateYAxis(vec, mLoc.getYaw());
 
 					Location l = mLoc.clone().add(vec);

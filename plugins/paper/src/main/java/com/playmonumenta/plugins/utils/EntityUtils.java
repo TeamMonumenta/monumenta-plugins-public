@@ -445,29 +445,35 @@ public class EntityUtils {
 		return null;
 	}
 
-	public static Projectile spawnArrow(Plugin plugin, Player player, Vector rotation, Vector offset, Vector speed, Class<? extends AbstractArrow> arrowClass) {
+	public static Projectile spawnArrow(Plugin plugin, Player player, double yawOffset, double pitchOffset, Vector offset, float speed, Class<? extends AbstractArrow> arrowClass) {
 		Location loc = player.getEyeLocation();
 		loc.add(offset);
-		loc.setPitch(loc.getPitch() + (float)rotation.getX());
-		loc.setYaw(loc.getYaw() + (float)rotation.getY());
-		Vector vel = new Vector(loc.getDirection().getX() * speed.getX(), loc.getDirection().getY() * speed.getY(), loc.getDirection().getZ() * speed.getZ());
+
+		// Start with the assumption the player is facing due South (yaw 0.0, pitch 0.0, no offset, speed of 1.0
+		Vector dir = new Vector(0.0, 0.0, 1.0);
+		// Apply pitch/yaw offset to get arrow pattern
+		dir = VectorUtils.rotateXAxis(dir, pitchOffset);
+		dir = VectorUtils.rotateYAxis(dir, yawOffset);
+		// Apply player pitch/yaw to rotate that pattern to match the player's direction
+		dir = VectorUtils.rotateXAxis(dir, loc.getPitch());
+		dir = VectorUtils.rotateYAxis(dir, loc.getYaw());
+
+		// Change the location's direction to match the arrow's direction
+		loc.setDirection(dir);
 
 		World world = player.getWorld();
-		AbstractArrow arrow = world.spawnArrow(loc, vel, 0.6f, 12.0f, arrowClass);
 
+		// Spawn the arrow at the specified location, direction, and speed
+		AbstractArrow arrow = world.spawnArrow(loc, dir, speed, 0.0f, arrowClass);
 		arrow.setShooter(player);
-		arrow.setVelocity(vel);
-
 		return arrow;
 	}
 
-	public static List<Projectile> spawnArrowVolley(Plugin plugin, Player player, int numProjectiles, double speedModifier, double spacing, Class<? extends AbstractArrow> arrowClass) {
+	public static List<Projectile> spawnArrowVolley(Plugin plugin, Player player, int numProjectiles, float speed, double spacing, Class<? extends AbstractArrow> arrowClass) {
 		List<Projectile> projectiles = new ArrayList<Projectile>();
 
-		Vector speed = new Vector(1.75 * speedModifier, 2 * speedModifier, 1.75 * speedModifier);
-
 		for (double yaw = -spacing * (numProjectiles / 2); yaw < spacing * ((numProjectiles / 2) + 1); yaw += spacing) {
-			Projectile proj = spawnArrow(plugin, player, new Vector(0, yaw, 0), new Vector(0, 0, 0), speed, arrowClass);
+			Projectile proj = spawnArrow(plugin, player, yaw, 0.0, new Vector(0, 0, 0), speed, arrowClass);
 			if (proj != null) {
 				projectiles.add(proj);
 			}

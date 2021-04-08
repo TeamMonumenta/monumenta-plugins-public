@@ -133,7 +133,6 @@ public class DamageBlocker extends Spell {
 				for (double degree = 0; degree < 360; degree += 40) {
 					double radian1 = Math.toRadians(degree);
 					vec = new Vector(FastUtils.cos(radian1) * 1, y, FastUtils.sin(radian1) * 1);
-					vec = VectorUtils.rotateXAxis(vec, 0);
 					vec = VectorUtils.rotateYAxis(vec, bossLoc.getYaw());
 
 					Location l = bossLoc.clone().add(vec);
@@ -149,7 +148,6 @@ public class DamageBlocker extends Spell {
 						for (double degree = 0; degree < 360; degree += 40) {
 							double radian1 = Math.toRadians(degree);
 							vec = new Vector(FastUtils.cos(radian1) * 1, y, FastUtils.sin(radian1) * 1);
-							vec = VectorUtils.rotateXAxis(vec, 0);
 							vec = VectorUtils.rotateYAxis(vec, bossLoc.getYaw());
 
 							Location l = bossLoc.clone().add(vec);

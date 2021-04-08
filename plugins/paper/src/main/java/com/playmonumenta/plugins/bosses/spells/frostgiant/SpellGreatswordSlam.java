@@ -95,7 +95,6 @@ public class SpellGreatswordSlam extends Spell {
 					for (double degree = 90 - mDeg/2; degree <= 90 + mDeg/2; degree += 5) {
 						double radian1 = Math.toRadians(degree);
 						Vector vec = new Vector(FastUtils.cos(radian1) * r, 0, FastUtils.sin(radian1) * r);
-						vec = VectorUtils.rotateXAxis(vec, 0);
 						vec = VectorUtils.rotateYAxis(vec, loc.getYaw());
 
 						Location l = loc.clone().add(vec);
@@ -149,7 +148,6 @@ public class SpellGreatswordSlam extends Spell {
 
 									double radian1 = Math.toRadians(degree);
 									vec = new Vector(FastUtils.cos(radian1) * mRadius, 0, FastUtils.sin(radian1) * mRadius);
-									vec = VectorUtils.rotateXAxis(vec, 0);
 									vec = VectorUtils.rotateYAxis(vec, loc.getYaw());
 
 									//Also have to clone location because of use in HashMap, can not optimize

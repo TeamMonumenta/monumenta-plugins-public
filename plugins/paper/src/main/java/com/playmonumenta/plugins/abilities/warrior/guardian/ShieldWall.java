@@ -117,7 +117,6 @@ public class ShieldWall extends Ability {
 						for (double degree = 0; degree < 180; degree += 10) {
 							double radian1 = Math.toRadians(degree);
 							vec = new Vector(FastUtils.cos(radian1) * 4, y, FastUtils.sin(radian1) * 4);
-							vec = VectorUtils.rotateXAxis(vec, 0);
 							vec = VectorUtils.rotateYAxis(vec, mLoc.getYaw());
 
 							Location l = mLoc.clone().add(vec);

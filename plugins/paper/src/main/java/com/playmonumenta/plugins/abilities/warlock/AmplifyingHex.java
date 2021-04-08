@@ -111,7 +111,7 @@ public class AmplifyingHex extends Ability {
 				for (double degree = 30; degree <= 150; degree += 10) {
 					double radian1 = Math.toRadians(degree);
 					vec = new Vector(FastUtils.cos(radian1) * mRadius, 0.15, FastUtils.sin(radian1) * mRadius);
-					vec = VectorUtils.rotateXAxis(vec, -mLoc.getPitch());
+					vec = VectorUtils.rotateXAxis(vec, mLoc.getPitch());
 					vec = VectorUtils.rotateYAxis(vec, mLoc.getYaw());
 
 					Location l = mLoc.clone().clone().add(0, 0.15, 0).add(vec);

@@ -15,37 +15,33 @@ public class VectorUtils {
 
 	// rotate vector "position" by angle "degrees" on the x-z-(2D)-plane (yaw; compass direction)
 	public static Vector rotateYAxis(Vector position, double degrees) {
-		double radians = Math.toRadians(degrees);
 		double x = position.getX();
 		double y = position.getY();
 		double z = position.getZ();
-		double cos = FastUtils.cos(radians);
-		double sin = FastUtils.sin(radians);
+		double cos = FastUtils.cosDeg(degrees);
+		double sin = FastUtils.sinDeg(degrees);
 		return (new Vector(x * cos - z * sin, y, z * cos + x * sin));
 	}
 
 	// rotate vector "position" by angle "degrees" on the y-z-(2D)-plane (pitch; looking up/down)
 	public static Vector rotateXAxis(Vector position, double degrees) {
-		// Angle is offset, since:
-		// In Minecraft,     0 is straight ahead, -90 is straight up, and  90 is straight down
-		// In this formula, 90 is straight ahead,   0 is straight up, and 180 is straight down
-		double radians = Math.toRadians(degrees);
+		// Angle is negative, since:
+		// This is 1:1 with Minecraft; -90 is up, 90 is down, 0 is straight ahead.
 		double x = position.getX();
 		double y = position.getY();
 		double z = position.getZ();
-		double cos = FastUtils.cos(radians);
-		double sin = FastUtils.sin(radians);
-		return (new Vector(x, y * cos + z * sin, z * cos - y * sin));
+		double cos = FastUtils.cosDeg(degrees);
+		double sin = FastUtils.sinDeg(degrees);
+		return (new Vector(x, y * cos - z * sin, z * cos + y * sin));
 	}
 
 	// rotate vector "position" by angle "degrees" on the x-y-(2D)-plane (roll; turn your screen, basically)
 	public static Vector rotateZAxis(Vector position, double degrees) {
-		double radians = Math.toRadians(degrees);
 		double x = position.getX();
 		double y = position.getY();
 		double z = position.getZ();
-		double cos = FastUtils.cos(radians);
-		double sin = FastUtils.sin(radians);
+		double cos = FastUtils.cosDeg(degrees);
+		double sin = FastUtils.sinDeg(degrees);
 		return (new Vector(x * cos + y * sin, y * cos - x * sin, z));
 	}
 

@@ -73,7 +73,6 @@ public class WitheringGaze extends Ability {
 				for (double degree = 0; degree < 150; degree += 10) {
 					double radian1 = Math.toRadians(degree);
 					vec = new Vector(FastUtils.cos(radian1) * mR, 0, FastUtils.sin(radian1) * mR);
-					vec = VectorUtils.rotateXAxis(vec, 0);
 					vec = VectorUtils.rotateYAxis(vec, loc.getYaw());
 
 					Location l = loc.clone().add(vec);

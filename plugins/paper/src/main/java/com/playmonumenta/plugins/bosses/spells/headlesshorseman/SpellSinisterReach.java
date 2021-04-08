@@ -100,7 +100,7 @@ public class SpellSinisterReach extends Spell {
 							float yaw1 = yaw + 90;
 							vec = new Vector(FastUtils.cos(radian1) * r, 0, FastUtils.sin(radian1) * r);
 							vec = VectorUtils.rotateYAxis(vec, yaw1);
-							vec = VectorUtils.rotateXAxis(vec, -mTloc.getPitch());
+							vec = VectorUtils.rotateXAxis(vec, mTloc.getPitch());
 
 							Location l = mTloc.clone().add(vec);
 							world.spawnParticle(Particle.CRIT, l, 1, 0.5, 0.5, 0.5, 0.05);
@@ -132,7 +132,7 @@ public class SpellSinisterReach extends Spell {
 								float yaw = mTloc.getYaw();
 								float yaw2 = yaw + 90;
 								vec = new Vector(FastUtils.cos(radian1) * r, 0, FastUtils.sin(radian1) * r);
-								vec = VectorUtils.rotateXAxis(vec, -mTloc.getPitch());
+								vec = VectorUtils.rotateXAxis(vec, mTloc.getPitch());
 								vec = VectorUtils.rotateYAxis(vec, yaw2);
 								Location l = mTloc.clone().add(vec);
 								world.spawnParticle(Particle.FLAME, l, 2, 0.1, 0.1, 0.1, 0.065);

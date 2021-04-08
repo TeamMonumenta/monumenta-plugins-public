@@ -46,8 +46,8 @@ public class FastUtils {
 
 	/**
 	 * Fast, reduced-accuracy sin implementation
-	 * @param rad Degree measure in radians
-	 * @return Length of opposite, non-hypotenuse side (from the perspective of a right triangle)
+	 * @param rad Angle measure in radians
+	 * @return Opposite length divided by hypotenuse
 	 */
 
 	public static double sin(double rad) {
@@ -55,11 +55,30 @@ public class FastUtils {
 	}
 
 	/**
+	 * Fast, reduced-accuracy sin implementation
+	 * @param deg Angle measure in degrees
+	 * @return Opposite length divided by hypotenuse
+	 */
+
+	public static double sinDeg(double deg) {
+		return sin[(int) (deg * degToIndex) & SIN_MASK];
+	}
+
+	/**
 	 * Fast, reduced-accuracy cos implementation
-	 * @param rad Degree measure in radians
-	 * @return Length of nearest, non-hypotenuse side (from the perspective of a right triangle)
+	 * @param rad Angle measure in radians
+	 * @return Adjacent length divided by hypotenuse
 	 */
 	public static double cos(double rad) {
 		return cos[(int) (rad * radToIndex) & SIN_MASK];
+	}
+
+	/**
+	 * Fast, reduced-accuracy cos implementation
+	 * @param deg Angle measure in degrees
+	 * @return Adjacent length divided by hypotenuse
+	 */
+	public static double cosDeg(double deg) {
+		return cos[(int) (deg * degToIndex) & SIN_MASK];
 	}
 }

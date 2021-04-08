@@ -97,7 +97,7 @@ public class ArcaneStrike extends Ability {
 						double sin = FastUtils.sin(radian1);
 						for (double r = 1; r < 4; r += 0.5) {
 							vec = new Vector(cos * r, 1, sin * r);
-							vec = VectorUtils.rotateXAxis(vec, -loc.getPitch());
+							vec = VectorUtils.rotateXAxis(vec, loc.getPitch());
 							vec = VectorUtils.rotateYAxis(vec, loc.getYaw());
 
 							Location l = loc.clone().add(vec);

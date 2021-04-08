@@ -98,7 +98,7 @@ public class CounterStrike extends Ability {
 							double radian1 = Math.toRadians(degree);
 							vec = new Vector(FastUtils.cos(radian1) * r, 0.75, FastUtils.sin(radian1) * r);
 							vec = VectorUtils.rotateZAxis(vec, 20);
-							vec = VectorUtils.rotateXAxis(vec, -loc.getPitch() + 20);
+							vec = VectorUtils.rotateXAxis(vec, loc.getPitch() - 20);
 							vec = VectorUtils.rotateYAxis(vec, loc.getYaw());
 
 							Location l = loc.clone().add(vec);
