@@ -35,6 +35,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import com.destroystokyo.paper.event.entity.EntityRemoveFromWorldEvent;
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.commands.Grave;
 import com.playmonumenta.plugins.graves.GraveManager;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.redissync.event.PlayerSaveEvent;
@@ -59,6 +60,7 @@ public class GraveListener implements Listener {
 
 	@EventHandler
 	public void playerJoin(PlayerJoinEvent event) {
+		Grave.removeSummonListTag(event.getPlayer());
 		GraveManager.onLogin(event.getPlayer());
 	}
 

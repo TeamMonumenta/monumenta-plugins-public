@@ -43,47 +43,46 @@ public class Grave {
 				)
 			)
 			.withSubcommand(new CommandAPICommand("list")
-				.withPermission("monumenta.command.grave.list.self")
+				.withPermission("monumenta.command.grave.list")
 				.executesPlayer((PlayerCommandExecutor) (player, args) -> listGravesSelf(player, 1))
 			)
 			.withSubcommand(new CommandAPICommand("list")
-				.withPermission("monumenta.command.grave.list.self")
+				.withPermission("monumenta.command.grave.list")
 				.withArguments(new IntegerArgument("page"))
 				.executesPlayer((PlayerCommandExecutor) (player, args) -> listGravesSelf(player, (int) args[0]))
 			)
 			.withSubcommand(new CommandAPICommand("list")
-				.withPermission("monumenta.command.grave.list.other")
-				.withArguments(new EntitySelectorArgument("player", EntitySelectorArgument.EntitySelector.ONE_PLAYER))
+				.withPermission("monumenta.command.grave.list")
+				.withArguments(new EntitySelectorArgument("player", EntitySelectorArgument.EntitySelector.ONE_PLAYER).withPermission("monumenta.command.grave.list.other"))
 				.executesPlayer((PlayerCommandExecutor) (player, args) -> listGravesOther(player, (Player) args[0], 1))
 			)
 			.withSubcommand(new CommandAPICommand("list")
-				.withPermission("monumenta.command.grave.list.other")
-				.withArguments(new EntitySelectorArgument("player", EntitySelectorArgument.EntitySelector.ONE_PLAYER))
+				.withPermission("monumenta.command.grave.list")
+				.withArguments(new EntitySelectorArgument("player", EntitySelectorArgument.EntitySelector.ONE_PLAYER).withPermission("monumenta.command.grave.list.other"))
 				.withArguments(new IntegerArgument("page"))
 				.executesPlayer((PlayerCommandExecutor) (player, args) -> listGravesOther(player, (Player) args[0], (int) args[1]))
 			)
 			.withSubcommand(new CommandAPICommand("summon")
 				.withSubcommand(new CommandAPICommand("list")
-					.withPermission("monumenta.command.grave.summon.list")
-					.withArguments(new EntitySelectorArgument("player", EntitySelectorArgument.EntitySelector.ONE_PLAYER))
+					.withArguments(new EntitySelectorArgument("player", EntitySelectorArgument.EntitySelector.ONE_PLAYER).withPermission("monumenta.command.grave.summon.list"))
 					.withArguments(new LocationArgument("location"))
 					.executes((CommandExecutor) (sender, args) -> summonGraveList((Player) args[0], (Location) args[1]))
 				)
 				.withSubcommand(new CommandAPICommand("list")
 					.withSubcommand(new CommandAPICommand("page")
-						.withPermission("monumenta.command.grave.summon.list.page")
+						.withRequirement((sender -> ((Player) sender).getScoreboardTags().contains(SUMMON_LIST_TAG)))
 						.withArguments(new LocationArgument("location"))
 						.withArguments(new IntegerArgument("page"))
 						.executesPlayer((PlayerCommandExecutor) (player, args) -> summonGraveListPage(player, (Location) args[0], (int) args[1]))
 					)
 					.withSubcommand(new CommandAPICommand("select")
-						.withPermission("monumenta.command.grave.summon.list.select")
+						.withRequirement((sender -> ((Player) sender).getScoreboardTags().contains(SUMMON_LIST_TAG)))
 						.withArguments(new LocationArgument("location"))
 						.withArguments(new IntegerArgument("grave"))
 						.executesPlayer((PlayerCommandExecutor) (player, args) -> summonGraveListSelect(player, (Location) args[0], (int) args[1]))
 					)
 					.withSubcommand(new CommandAPICommand("confirm")
-						.withPermission("monumenta.command.grave.summon.list.confirm")
+						.withRequirement((sender -> ((Player) sender).getScoreboardTags().contains(SUMMON_LIST_TAG)))
 						.withArguments(new LocationArgument("location"))
 						.withArguments(new IntegerArgument("grave"))
 						.executesPlayer((PlayerCommandExecutor) (player, args) -> summonGraveListConfirm(player, (Location) args[0], (int) args[1]))
@@ -91,8 +90,7 @@ public class Grave {
 				)
 			)
 			.withSubcommand(new CommandAPICommand("summon")
-				.withPermission("monumenta.command.grave.summon.other")
-				.withArguments(new EntitySelectorArgument("player", EntitySelectorArgument.EntitySelector.ONE_PLAYER))
+				.withArguments(new EntitySelectorArgument("player", EntitySelectorArgument.EntitySelector.ONE_PLAYER).withPermission("monumenta.command.grave.summon.other"))
 				.withArguments(new LocationArgument("location"))
 				.withArguments(new IntegerArgument("grave"))
 				.executesPlayer((PlayerCommandExecutor) (player, args) -> summonGraveOther(player, (Player) args[0], (Location) args[1], (int) args[2]))
@@ -364,24 +362,26 @@ public class Grave {
 		BukkitRunnable runnable = new BukkitRunnable() {
 			@Override
 			public void run() {
-				if (player.isValid() && player.getScoreboardTags().contains(SUMMON_LIST_TAG)) {
-					player.removeScoreboardTag(SUMMON_LIST_TAG);
-				}
+				removeSummonListTag(player);
 			}
 		};
 		SUMMON_LIST_RUNNABLES.put(player.getUniqueId(), runnable);
 		runnable.runTaskLater(Plugin.getInstance(), 30 * 20);
 		player.addScoreboardTag(SUMMON_LIST_TAG);
+		CommandAPI.updateRequirements(player);
 	}
 
-	private static boolean removeSummonListTag(Player player) {
-		if (SUMMON_LIST_RUNNABLES.containsKey(player.getUniqueId())) {
-			BukkitRunnable runnable = SUMMON_LIST_RUNNABLES.remove(player.getUniqueId());
-			runnable.cancel();
-		}
-		if (player.getScoreboardTags().contains(SUMMON_LIST_TAG)) {
-			player.removeScoreboardTag(SUMMON_LIST_TAG);
-			return true;
+	public static boolean removeSummonListTag(Player player) {
+		if (player != null) {
+			if (SUMMON_LIST_RUNNABLES.containsKey(player.getUniqueId())) {
+				BukkitRunnable runnable = SUMMON_LIST_RUNNABLES.remove(player.getUniqueId());
+				runnable.cancel();
+			}
+			if (player.getScoreboardTags().contains(SUMMON_LIST_TAG)) {
+				player.removeScoreboardTag(SUMMON_LIST_TAG);
+				CommandAPI.updateRequirements(player);
+				return true;
+			}
 		}
 		return false;
 	}
