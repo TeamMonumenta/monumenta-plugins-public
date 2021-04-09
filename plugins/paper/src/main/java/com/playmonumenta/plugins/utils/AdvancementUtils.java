@@ -36,7 +36,7 @@ public class AdvancementUtils {
 			for (Map.Entry<String, JsonElement> entry : object.entrySet()) {
 				JsonArray awardedCriteria = entry.getValue().getAsJsonArray();
 				String[] keys = entry.getKey().split(":", 2);
-				Advancement advancement = Bukkit.getAdvancement(NamespacedKey.fromString(keys[0] + ":" + keys[1]));
+				Advancement advancement = Bukkit.getAdvancement(new NamespacedKey(keys[0], keys[1]));
 				if (advancement != null) {
 					AdvancementProgress progress = player.getAdvancementProgress(advancement);
 					for (String criteria : advancement.getCriteria()) {

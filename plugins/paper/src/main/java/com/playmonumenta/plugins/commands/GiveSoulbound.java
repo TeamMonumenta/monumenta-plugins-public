@@ -12,8 +12,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import net.kyori.adventure.text.Component;
-
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.CommandPermission;
 import dev.jorel.commandapi.arguments.Argument;
@@ -55,15 +53,15 @@ public class GiveSoulbound extends GenericCommand {
 			meta = Bukkit.getServer().getItemFactory().getItemMeta(stack.getType());
 		}
 
-		List<Component> lore = null;
+		List<String> lore = null;
 		if (meta.hasLore()) {
-			lore = meta.lore();
+			lore = meta.getLore();
 		} else {
-			lore = new ArrayList<>();
+			lore = new ArrayList<String>();
 		}
 
-		lore.add(Component.text("* Soulbound to " + player.getName() + " *"));
-		meta.lore(lore);
+		lore.add("* Soulbound to " + player.getName() + " *");
+		meta.setLore(lore);
 		stack.setItemMeta(meta);
 		stack = ItemUtils.setPlainLore(stack);
 		InventoryUtils.giveItem(player, stack);

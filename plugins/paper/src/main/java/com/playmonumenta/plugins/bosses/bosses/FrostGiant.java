@@ -45,11 +45,6 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.format.TextColor;
-import net.kyori.adventure.text.format.TextDecoration;
-
 import com.playmonumenta.plugins.bosses.BossBarManager;
 import com.playmonumenta.plugins.bosses.BossBarManager.BossHealthAction;
 import com.playmonumenta.plugins.bosses.SpellManager;
@@ -77,6 +72,8 @@ import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.SerializationUtils;
+
+import net.md_5.bungee.api.ChatColor;
 
 /* WARNING: Basically all the spell info in the comments is outdated.
  * Please use the Frost Giant Formal Write-up for up to date spell descriptions.
@@ -461,7 +458,7 @@ public class FrostGiant extends BossAbilityGroup {
 					if (player.isSleeping() && player.getGameMode() != GameMode.ADVENTURE) {
 						BossUtils.bossDamage(mBoss, player, 22);
 						player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 15, 1));
-						player.sendMessage(Component.text("YOU DARE MOCK OUR BATTLE?", NamedTextColor.DARK_AQUA));
+						player.sendMessage(ChatColor.DARK_AQUA + "YOU DARE MOCK OUR BATTLE?");
 						player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ELDER_GUARDIAN_DEATH, 1, 0.85f);
 					}
 				}
@@ -547,7 +544,7 @@ public class FrostGiant extends BossAbilityGroup {
 			if (mBoss.getEquipment().getItemInMainHand() != null && mBoss.getEquipment().getItemInMainHand().getType() != Material.AIR) {
 				wand = mBoss.getEquipment().getItemInMainHand();
 			} else {
-				wand = modifyItemName(wand, "Frost Giant's Staff", NamedTextColor.AQUA, true);
+				wand = modifyItemName(wand, "Frost Giant's Staff", ChatColor.AQUA + "" + ChatColor.BOLD + "" + ChatColor.UNDERLINE);
 			}
 			ItemMeta im = wand.getItemMeta();
 			im.addAttributeModifier(Attribute.GENERIC_ATTACK_DAMAGE, new AttributeModifier("generic.attack_damage", -100, AttributeModifier.Operation.ADD_NUMBER));
@@ -573,7 +570,7 @@ public class FrostGiant extends BossAbilityGroup {
 			PlayerUtils.executeCommandOnNearbyPlayers(mStartLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"The permafrost shield reforms around the giant, blocking damage dealt once more.\",\"color\":\"aqua\"}]");
 
 			//Changes held weapon to iron sword
-			ItemStack sword = modifyItemName(new ItemStack(Material.IRON_SWORD), "Frost Giant's Greatsword", NamedTextColor.AQUA, true);
+			ItemStack sword = modifyItemName(new ItemStack(Material.IRON_SWORD), "Frost Giant's Greatsword", ChatColor.AQUA + "" + ChatColor.BOLD + "" + ChatColor.UNDERLINE);
 			ItemMeta im = sword.getItemMeta();
 			im.addAttributeModifier(Attribute.GENERIC_ATTACK_DAMAGE, new AttributeModifier("generic.attack_damage", -100, AttributeModifier.Operation.ADD_NUMBER));
 			sword.setItemMeta(im);
@@ -601,7 +598,7 @@ public class FrostGiant extends BossAbilityGroup {
 			PlayerUtils.executeCommandOnNearbyPlayers(mStartLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"The permafrost shield once more reforms.\",\"color\":\"aqua\"}]");
 
 			//Changes held weapon to iron axe
-			ItemStack axe =  modifyItemName(new ItemStack(Material.IRON_AXE), "Frost Giant's Crusher", NamedTextColor.AQUA, true);
+			ItemStack axe =  modifyItemName(new ItemStack(Material.IRON_AXE), "Frost Giant's Crusher", ChatColor.AQUA + "" + ChatColor.BOLD + "" + ChatColor.UNDERLINE);
 			ItemMeta im = axe.getItemMeta();
 			im.addAttributeModifier(Attribute.GENERIC_ATTACK_DAMAGE, new AttributeModifier("generic.attack_damage", -100, AttributeModifier.Operation.ADD_NUMBER));
 			axe.setItemMeta(im);
@@ -626,7 +623,7 @@ public class FrostGiant extends BossAbilityGroup {
 			teleport(mStartLoc);
 
 			//Changes held weapon to iron scythe
-			ItemStack scythe =  modifyItemName(new ItemStack(Material.IRON_HOE), "Frost Giant's Crescent", NamedTextColor.AQUA, true);
+			ItemStack scythe =  modifyItemName(new ItemStack(Material.IRON_HOE), "Frost Giant's Crescent", ChatColor.AQUA + "" + ChatColor.BOLD + "" + ChatColor.UNDERLINE);
 			ItemMeta im = scythe.getItemMeta();
 			im.addAttributeModifier(Attribute.GENERIC_ATTACK_DAMAGE, new AttributeModifier("generic.attack_damage", -100, AttributeModifier.Operation.ADD_NUMBER));
 			scythe.setItemMeta(im);
@@ -1018,21 +1015,19 @@ public class FrostGiant extends BossAbilityGroup {
 	//If cracked = false, convert armor to uncracked variant
 	public static void changeArmorPhase(EntityEquipment equip, boolean cracked) {
 		if (cracked) {
-			equip.setChestplate(modifyItemName(equip.getChestplate(), "Cracked Frost Giant's Courage", NamedTextColor.AQUA, false));
-			equip.setLeggings(modifyItemName(equip.getLeggings(), "Cracked Frost Giant's Leggings", NamedTextColor.AQUA, false));
-			equip.setBoots(modifyItemName(equip.getBoots(), "Cracked Frost Giant's Boots", NamedTextColor.AQUA, false));
+			equip.setChestplate(modifyItemName(equip.getChestplate(), "Cracked Frost Giant's Courage", ChatColor.AQUA + "" + ChatColor.BOLD + ""));
+			equip.setLeggings(modifyItemName(equip.getLeggings(), "Cracked Frost Giant's Leggings", ChatColor.AQUA + "" + ChatColor.BOLD + ""));
+			equip.setBoots(modifyItemName(equip.getBoots(), "Cracked Frost Giant's Boots", ChatColor.AQUA + "" + ChatColor.BOLD + ""));
 		} else {
-			equip.setChestplate(modifyItemName(equip.getChestplate(), "Frost Giant's Courage", NamedTextColor.AQUA, false));
-			equip.setLeggings(modifyItemName(equip.getLeggings(), "Frost Giant's Leggings", NamedTextColor.AQUA, false));
-			equip.setBoots(modifyItemName(equip.getBoots(), "Frost Giant's Boots", NamedTextColor.AQUA, false));
+			equip.setChestplate(modifyItemName(equip.getChestplate(), "Frost Giant's Courage", ChatColor.AQUA + "" + ChatColor.BOLD + ""));
+			equip.setLeggings(modifyItemName(equip.getLeggings(), "Frost Giant's Leggings", ChatColor.AQUA + "" + ChatColor.BOLD + ""));
+			equip.setBoots(modifyItemName(equip.getBoots(), "Frost Giant's Boots", ChatColor.AQUA + "" + ChatColor.BOLD + ""));
 		}
 	}
 
-	private static ItemStack modifyItemName(ItemStack item, String newName, TextColor color, boolean isUnderlined) {
+	private static ItemStack modifyItemName(ItemStack item, String newName, String colors) {
 		ItemMeta im = item.getItemMeta();
-		im.displayName(Component.text(newName, color, TextDecoration.BOLD)
-			.decoration(TextDecoration.ITALIC, false)
-			.decoration(TextDecoration.UNDERLINED, isUnderlined));
+		im.setDisplayName(colors + newName);
 		item.setItemMeta(im);
 
 		return ItemUtils.setPlainName(item, newName);

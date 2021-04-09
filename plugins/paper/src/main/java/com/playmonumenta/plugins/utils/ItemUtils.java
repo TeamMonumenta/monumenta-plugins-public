@@ -10,8 +10,6 @@ import java.util.Set;
 import java.util.regex.Pattern;
 
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.format.TextDecoration;
 
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.Color;
@@ -45,10 +43,6 @@ import com.playmonumenta.plugins.utils.PotionUtils.PotionInfo;
 import net.md_5.bungee.api.ChatColor;
 
 public class ItemUtils {
-	private static final String PLAIN_KEY = "plain";
-	private static final String DISPLAY_KEY = "display";
-	private static final String LORE_KEY = "Lore";
-	private static final String NAME_KEY = "Name";
 	private static final Pattern NON_PLAIN_REGEX = Pattern.compile("[^ -~]");
 
 	public static final Set<Material> armors = EnumSet.of(
@@ -510,16 +504,12 @@ public class ItemUtils {
 
 	// Return the quest ID string, which is assumed to start with "#Q", or null
 	public static String getItemQuestId(ItemStack item) {
-		if (item == null) {
-			return null;
-		}
-		List<String> loreEntries = getPlainLore(item);
-		if (loreEntries == null) {
-			return null;
-		}
-		for (String loreEntry : loreEntries) {
-			if (loreEntry.startsWith("#Q")) {
-				return loreEntry;
+		if (item != null && item.hasItemMeta() && item.getItemMeta().hasLore()) {
+			for (String loreEntry : item.getItemMeta().getLore()) {
+				loreEntry = ChatColor.stripColor(loreEntry);
+				if (loreEntry.startsWith("#Q")) {
+					return loreEntry;
+				}
 			}
 		}
 		return null;
@@ -925,59 +915,46 @@ public class ItemUtils {
 	}
 
 	public static boolean shatterItem(ItemStack item) {
-		if (item == null
-		    || !((getItemDeathResult(item) == ItemDeathResult.SHATTER
-		        || getItemDeathResult(item) == ItemDeathResult.SHATTER_NOW)
-		        && !isItemShattered(item))) {
-			return false;
+		if (item != null) {
+			List<String> lore = item.getLore();
+			if ((getItemDeathResult(item) == ItemDeathResult.SHATTER || getItemDeathResult(item) == ItemDeathResult.SHATTER_NOW)
+					&& !isItemShattered(item)) {
+				if (lore == null) {
+					lore = new ArrayList<String>();
+				}
+				lore.add(ChatColor.DARK_RED + "" + ChatColor.BOLD + "* SHATTERED *");
+				lore.add(ChatColor.DARK_RED + "Maybe a Master Repairman");
+				lore.add(ChatColor.DARK_RED + "could reforge it...");
+				item.setLore(lore);
+				item = ItemUtils.setPlainLore(item);
+				return true;
+			}
 		}
-		ItemMeta itemMeta = item.getItemMeta();
-		if (itemMeta == null) {
-			return false;
-		}
-		List<Component> lore = itemMeta.lore();
-		if (lore == null) {
-			lore = new ArrayList<>();
-		}
-		lore.add(Component.text("* SHATTERED *", NamedTextColor.DARK_RED, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false));
-		lore.add(Component.text("Maybe a Master Repairman", NamedTextColor.DARK_RED).decoration(TextDecoration.ITALIC, false));
-		lore.add(Component.text("could reforge it...", NamedTextColor.DARK_RED).decoration(TextDecoration.ITALIC, false));
-		itemMeta.lore(lore);
-		item.setItemMeta(itemMeta);
-		item = ItemUtils.setPlainLore(item);
-		return true;
+		return false;
 	}
 
 	public static boolean reforgeItem(ItemStack item) {
 		boolean reforged = false;
-		if (item == null) {
-			return reforged;
-		}
-		ItemMeta itemMeta = item.getItemMeta();
-		if (itemMeta == null) {
-			return reforged;
-		}
-		List<String> oldPlainLore = getPlainLore(item, true);
-		List<Component> oldLore = itemMeta.lore();
-		List<Component> newLore = new ArrayList<>();
-		if (oldLore != null && isItemShattered(item)) {
-			for (int i = 0; i < oldLore.size(); i++) {
-				String line = oldPlainLore.get(i);
-				if (line.equals("* SHATTERED *") ||
-				    line.equals("Maybe a Master Repairman") ||
-				    line.equals("could reforge it...")) {
-					reforged = true;
+		if (item != null) {
+			List<String> oldLore = item.getLore();
+			List<String> newLore = new ArrayList<>();
+			if (oldLore != null && isItemShattered(item)) {
+				for (String line : oldLore) {
+					if (line.equals(ChatColor.DARK_RED + "" + ChatColor.BOLD + "* SHATTERED *") ||
+					    line.equals(ChatColor.DARK_RED + "Maybe a Master Repairman") ||
+					    line.equals(ChatColor.DARK_RED + "could reforge it...")) {
+						reforged = true;
+					} else {
+						newLore.add(line);
+					}
+				}
+				if (newLore.isEmpty()) {
+					item.setLore(null);
 				} else {
-					newLore.add(oldLore.get(i));
+					item.setLore(newLore);
 				}
 			}
-			if (newLore.isEmpty()) {
-				itemMeta.lore(null);
-			} else {
-				itemMeta.lore(newLore);
-			}
 		}
-		item.setItemMeta(itemMeta);
 		item = ItemUtils.setPlainLore(item);
 		return reforged;
 	}
@@ -1106,32 +1083,6 @@ public class ItemUtils {
 		return itemStack;
 	}
 
-	public static String getPlainName(ItemStack itemStack) {
-		return getPlainName(itemStack, false);
-	}
-
-	public static String getPlainName(ItemStack itemStack, boolean refresh) {
-		if (refresh) {
-			setPlainName(itemStack);
-		}
-		if (itemStack == null || !itemStack.hasItemMeta()) {
-			return null;
-		}
-		NBTItem nbtItem = new NBTItem(itemStack);
-		if (!nbtItem.hasKey(PLAIN_KEY)) {
-			return null;
-		}
-		NBTCompound plain = nbtItem.getCompound(PLAIN_KEY);
-		if (!plain.hasKey(DISPLAY_KEY)) {
-			return null;
-		}
-		NBTCompound display = plain.getCompound(DISPLAY_KEY);
-		if (!display.hasKey(NAME_KEY)) {
-			return null;
-		}
-		return display.getString(NAME_KEY);
-	}
-
 	public static ItemStack setPlainName(ItemStack itemStack) {
 		String itemName = null;
 		if (itemStack.hasItemMeta()) {
@@ -1144,6 +1095,10 @@ public class ItemUtils {
 	}
 
 	public static ItemStack setPlainName(ItemStack itemStack, String plainName) {
+		final String PLAIN_KEY = "plain";
+		final String DISPLAY_KEY = "display";
+		final String NAME_KEY = "Name";
+
 		if (itemStack == null || itemStack.getType() == Material.AIR) {
 			return itemStack;
 		}
@@ -1183,35 +1138,6 @@ public class ItemUtils {
 		return itemStack;
 	}
 
-	public static List<String> getPlainLore(ItemStack itemStack) {
-		return getPlainLore(itemStack, false);
-	}
-
-	public static List<String> getPlainLore(ItemStack itemStack, boolean refresh) {
-		if (itemStack == null) {
-			return null;
-		}
-		if (refresh) {
-			setPlainLore(itemStack);
-		}
-		if (!itemStack.hasItemMeta()) {
-			return null;
-		}
-		NBTItem nbtItem = new NBTItem(itemStack);
-		if (!nbtItem.hasKey(PLAIN_KEY)) {
-			return null;
-		}
-		NBTCompound plain = nbtItem.getCompound(PLAIN_KEY);
-		if (!plain.hasKey(DISPLAY_KEY)) {
-			return null;
-		}
-		NBTCompound display = plain.getCompound(DISPLAY_KEY);
-		if (!display.hasKey(LORE_KEY)) {
-			return null;
-		}
-		return new ArrayList<String>(display.getStringList(LORE_KEY));
-	}
-
 	public static ItemStack setPlainLore(ItemStack itemStack) {
 		List<String> plainLore = null;
 		if (itemStack.hasItemMeta()) {
@@ -1227,6 +1153,10 @@ public class ItemUtils {
 	}
 
 	public static ItemStack setPlainLore(ItemStack itemStack, List<String> plainLore) {
+		final String PLAIN_KEY = "plain";
+		final String DISPLAY_KEY = "display";
+		final String LORE_KEY = "Lore";
+
 		NBTItem nbtItem = new NBTItem(itemStack);
 		if (plainLore != null && plainLore.size() > 0) {
 			// addComponent effectively runs:

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import org.bukkit.ChatColor;
 import org.bukkit.Particle;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -12,10 +13,6 @@ import org.bukkit.event.entity.PotionSplashEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.metadata.FixedMetadataValue;
-
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.format.TextDecoration;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
@@ -69,25 +66,23 @@ public class CluckingPotions extends Ability {
 							cluckingCandidates.remove(idx);
 
 							ItemMeta meta = item.getItemMeta();
-							List<Component> lore = meta.lore();
-							List<String> plainLore = ItemUtils.getPlainLore(item);
+							List<String> lore = meta.getLore();
 
-							List<Component> newLore = new ArrayList<>();
-							if (plainLore != null) {
-								for (int i = 0; i < lore.size(); i++) {
-									String plainEntry = plainLore.get(i);
-									if (plainEntry.contains("Clucking")) {
+							List<String> newLore = new ArrayList<>();
+							if (lore != null) {
+								for (String loreEntry : lore) {
+									if (loreEntry.contains("Clucking")) {
 										// Already has clucking, don't touch this item
 										continue loop;
 									}
 
-									newLore.add(lore.get(i));
+									newLore.add(loreEntry);
 								}
 							}
 
 							// This is an item without clucking - success!
-							newLore.add(Component.text("Clucking", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false));
-							meta.lore(newLore);
+							newLore.add(ChatColor.GRAY + "Clucking");
+							meta.setLore(newLore);
 							item.setItemMeta(meta);
 							item = ItemUtils.setPlainLore(item);
 							break;

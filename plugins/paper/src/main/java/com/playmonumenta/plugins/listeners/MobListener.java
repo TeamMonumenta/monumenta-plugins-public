@@ -303,22 +303,22 @@ public class MobListener implements Listener {
 			ListIterator<ItemStack> iter = event.getDrops().listIterator();
 			while (iter.hasNext()) {
 				ItemStack item = iter.next();
-				if (item == null) {
-					continue;
-				}
-				List<String> lore = ItemUtils.getPlainLore(item);
-				if (lore != null && !lore.isEmpty()) {
-					for (String loreEntry : lore) {
-						if (loreEntry.contains("Quest Item")) {
-							//Scales based off player count in a 20 meter radius, drops at least one quest item
-							int count = PlayerUtils.playersInRange(entity.getLocation(), 20).size();
-							if (count < 1) {
-								count = 1;
+				ItemMeta meta = item.getItemMeta();
+				if (meta != null) {
+					List<String> lore = meta.getLore();
+					if (lore != null && !lore.isEmpty()) {
+						for (String loreEntry : lore) {
+							if (loreEntry.contains("Quest Item")) {
+								//Scales based off player count in a 20 meter radius, drops at least one quest item
+								int count = PlayerUtils.playersInRange(entity.getLocation(), 20).size();
+								if (count < 1) {
+									count = 1;
+								}
+								if (count > item.getAmount()) {
+									item.setAmount(count);
+								}
+								return;
 							}
-							if (count > item.getAmount()) {
-								item.setAmount(count);
-							}
-							return;
 						}
 					}
 				}

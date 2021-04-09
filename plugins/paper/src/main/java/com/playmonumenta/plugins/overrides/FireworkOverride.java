@@ -10,7 +10,6 @@ import org.bukkit.potion.PotionEffectType;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
-import com.playmonumenta.plugins.utils.ItemUtils;
 
 public class FireworkOverride extends BaseOverride {
 	@Override
@@ -19,7 +18,7 @@ public class FireworkOverride extends BaseOverride {
 			if (!block.getType().isInteractable()) {
 				ItemMeta meta = item.getItemMeta();
 				if (meta != null) {
-					if (meta.hasDisplayName() && ItemUtils.getPlainName(item).contains("Signal Flare")) {
+					if (meta.hasDisplayName() && meta.getDisplayName().contains("Signal Flare")) {
 						plugin.mPotionManager.addPotion(player, PotionID.APPLIED_POTION, new PotionEffect(PotionEffectType.GLOWING, 10 * 20, 0));
 					}
 				}

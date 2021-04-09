@@ -31,7 +31,7 @@ public class ReforgeHeldItem extends GenericCommand {
 		ItemStack item = player.getInventory().getItemInMainHand();
 		// If the player is in creative, reforge for free.
 		if (player.getGameMode() == GameMode.CREATIVE) {
-			if (item == null || !item.hasItemMeta() || !item.getItemMeta().hasLore()) {
+			if (item == null || item.getLore() == null) {
 				CommandAPI.fail("Player must have a Shattered item in their main hand!");
 			} else if (ItemUtils.isItemShattered(item)) {
 				ItemUtils.reforgeItem(item);
@@ -44,7 +44,7 @@ public class ReforgeHeldItem extends GenericCommand {
 		}
 		if (player.hasMetadata("PlayerCanReforge")) {
 			player.removeMetadata("PlayerCanReforge", Plugin.getInstance());
-			if (item == null || !item.hasItemMeta() || !item.getItemMeta().hasLore()) {
+			if (item == null || item.getLore() == null) {
 				CommandAPI.fail("Player must have a Shattered item in their main hand!");
 			} else if (ItemUtils.isItemShattered(item)) {
 				ItemRegion region = ItemUtils.getItemRegion(item);
