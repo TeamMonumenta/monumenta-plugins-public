@@ -160,34 +160,43 @@ public class Grave {
 		GraveManager manager = GraveManager.getInstance(player);
 		if (manager != null && manager.getGravesCount() > 0) {
 			int pages = manager.getGravesPageCount();
-			if (page <= pages) {
-				int index = (page - 1) * 5;
-				ArrayList<Component> entries = manager.getGravesList(page);
-				Component message = Component.text("List of ", NamedTextColor.AQUA)
-					.append(player.displayName().hoverEvent(player))
-					.append(Component.text(player.displayName().toString().endsWith("s") ? "' Graves" : "'s Graves"));
-				for (Component entry : entries) {
-					message = message.append(Component.newline()
-						.append(Component.text("[", NamedTextColor.GRAY))
-						.append(Component.text(index, NamedTextColor.WHITE))
-						.append(Component.text("] ", NamedTextColor.GRAY))
-						.append(entry)
-					);
-					index++;
-				}
-				message = message.append(Component.newline()
-					.append(Component.text("<< ")
-						.color(page == 1 ? NamedTextColor.GRAY : NamedTextColor.GOLD)
-						.clickEvent(page == 1 ? null : ClickEvent.runCommand("/grave list " + (page - 1))))
-					.append(Component.text("Page " + page + "/" + pages))
-					.append(Component.text(" >>")
-						.color(page == pages ? NamedTextColor.GRAY : NamedTextColor.GOLD)
-						.clickEvent(page == pages ? null : ClickEvent.runCommand("/grave list " + (page + 1))))
-				);
-				player.sendMessage(message);
-			} else {
-				CommandAPI.fail("You don't have that many graves. Max page is " + pages);
+			if (page > pages || page < 1) {
+				page = pages;
 			}
+			int index = (page - 1) * 5;
+			ArrayList<Component> entries = manager.getGravesList(page);
+			Component message = Component.text("List of ", NamedTextColor.AQUA)
+				.append(player.displayName().hoverEvent(player))
+				.append(Component.text(player.displayName().toString().endsWith("s") ? "' Graves" : "'s Graves"));
+			for (Component entry : entries) {
+				message = message.append(Component.newline()
+					.append(Component.text("[", NamedTextColor.GRAY))
+					.append(Component.text(index, NamedTextColor.WHITE))
+					.append(Component.text("] ", NamedTextColor.GRAY))
+					.append(entry)
+				);
+				index++;
+			}
+			message = message.append(Component.newline()
+				.append(Component.text("<<<")
+					.color(page == 1 ? NamedTextColor.GRAY : NamedTextColor.GOLD)
+					.hoverEvent(HoverEvent.showText(Component.text("First Page")))
+					.clickEvent(page == 1 ? null : ClickEvent.runCommand("/grave list 1")))
+				.append(Component.text(" << ")
+					.color(page == 1 ? NamedTextColor.GRAY : NamedTextColor.GOLD)
+					.hoverEvent(HoverEvent.showText(Component.text("Previous Page")))
+					.clickEvent(page == 1 ? null : ClickEvent.runCommand("/grave list " + (page - 1))))
+				.append(Component.text("Page " + page + "/" + pages))
+				.append(Component.text(" >> ")
+					.color(page == pages ? NamedTextColor.GRAY : NamedTextColor.GOLD)
+					.hoverEvent(HoverEvent.showText(Component.text("Next Page")))
+					.clickEvent(page == pages ? null : ClickEvent.runCommand("/grave list " + (page + 1))))
+				.append(Component.text(">>>")
+					.color(page == pages ? NamedTextColor.GRAY : NamedTextColor.GOLD)
+					.hoverEvent(HoverEvent.showText(Component.text("Last Page")))
+					.clickEvent(page == pages ? null : ClickEvent.runCommand("/grave list " + pages)))
+			);
+			player.sendMessage(message);
 		} else {
 			CommandAPI.fail("You don't have any graves");
 		}
@@ -195,36 +204,46 @@ public class Grave {
 
 	private static void listGravesOther(Player sender, Player player, int page) throws WrapperCommandSyntaxException {
 		GraveManager manager = GraveManager.getInstance(player);
+		String name = player.getName();
 		if (manager != null && manager.getGravesCount() > 0) {
 			int pages = manager.getGravesPageCount();
-			if (page <= pages) {
-				int index = (page - 1) * 5;
-				ArrayList<Component> entries = manager.getGravesList(page);
-				Component message = Component.text("List of ", NamedTextColor.AQUA)
-					.append(player.displayName().hoverEvent(player))
-					.append(Component.text(player.displayName().toString().endsWith("s") ? "' Graves" : "'s Graves"));
-				for (Component entry : entries) {
-					message = message.append(Component.newline()
-						.append(Component.text("[", NamedTextColor.GRAY))
-						.append(Component.text(index, NamedTextColor.WHITE))
-						.append(Component.text("] ", NamedTextColor.GRAY))
-						.append(entry)
-					);
-					index++;
-				}
-				message = message.append(Component.newline()
-					.append(Component.text("<< ")
-						.color(page == 1 ? NamedTextColor.GRAY : NamedTextColor.GOLD)
-						.clickEvent(page == 1 ? null : ClickEvent.runCommand("/grave list " + (page - 1))))
-					.append(Component.text("Page " + page + "/" + pages))
-					.append(Component.text(" >>")
-						.color(page == pages ? NamedTextColor.GRAY : NamedTextColor.GOLD)
-						.clickEvent(page == pages ? null : ClickEvent.runCommand("/grave list " + (page + 1))))
-				);
-				sender.sendMessage(message);
-			} else {
-				CommandAPI.fail(player.getName() + " doesn't have that many graves. Max page is " + pages);
+			if (page > pages || page < 1) {
+				page = pages;
 			}
+			int index = (page - 1) * 5;
+			ArrayList<Component> entries = manager.getGravesList(page);
+			Component message = Component.text("List of ", NamedTextColor.AQUA)
+				.append(player.displayName().hoverEvent(player))
+				.append(Component.text(player.displayName().toString().endsWith("s") ? "' Graves" : "'s Graves"));
+			for (Component entry : entries) {
+				message = message.append(Component.newline()
+					.append(Component.text("[", NamedTextColor.GRAY))
+					.append(Component.text(index, NamedTextColor.WHITE))
+					.append(Component.text("] ", NamedTextColor.GRAY))
+					.append(entry)
+				);
+				index++;
+			}
+			message = message.append(Component.newline()
+				.append(Component.text("<<<")
+					.color(page == 1 ? NamedTextColor.GRAY : NamedTextColor.GOLD)
+					.hoverEvent(HoverEvent.showText(Component.text("First Page")))
+					.clickEvent(page == 1 ? null : ClickEvent.runCommand("/grave list " + name + " 1")))
+				.append(Component.text(" << ")
+					.color(page == 1 ? NamedTextColor.GRAY : NamedTextColor.GOLD)
+					.hoverEvent(HoverEvent.showText(Component.text("Previous Page")))
+					.clickEvent(page == 1 ? null : ClickEvent.runCommand("/grave list " + name + " " + (page - 1))))
+				.append(Component.text("Page " + page + "/" + pages))
+				.append(Component.text(" >> ")
+					.color(page == pages ? NamedTextColor.GRAY : NamedTextColor.GOLD)
+					.hoverEvent(HoverEvent.showText(Component.text("Next Page")))
+					.clickEvent(page == pages ? null : ClickEvent.runCommand("/grave list " + name + " " + (page + 1))))
+				.append(Component.text(">>>")
+					.color(page == pages ? NamedTextColor.GRAY : NamedTextColor.GOLD)
+					.hoverEvent(HoverEvent.showText(Component.text("Last Page")))
+					.clickEvent(page == pages ? null : ClickEvent.runCommand("/grave list " + name + " " + pages)))
+			);
+			sender.sendMessage(message);
 		} else {
 			CommandAPI.fail(player.getName() + " doesn't have any graves");
 		}
@@ -240,40 +259,49 @@ public class Grave {
 		if (removeSummonListTag(player)) {
 			if (manager != null && manager.getGravesCount() > 0) {
 				int pages = manager.getGravesPageCount();
-				if (page <= pages) {
-					int index = (page - 1) * 5;
-					String coordinates = String.format("%s %s %s", location.getX(), location.getY(), location.getZ());
-					ArrayList<Component> entries = manager.getGravesList(page);
-					Component message = Component.text("List of ", NamedTextColor.AQUA)
-						.append(player.displayName().hoverEvent(player))
-						.append(Component.text(player.displayName().toString().endsWith("s") ? "' Graves" : "'s Graves"))
-						.append(Component.newline())
-						.append(Component.text("Click the number on the left to select", NamedTextColor.GOLD));
-					for (Component entry : entries) {
-						message = message.append(Component.newline()
-							.append(Component.text("[", NamedTextColor.GRAY)
-								.append(Component.text(index, NamedTextColor.GOLD))
-								.append(Component.text("] ", NamedTextColor.GRAY))
-								.hoverEvent(HoverEvent.showText(Component.text("Click to summon")))
-								.clickEvent(ClickEvent.runCommand("/grave summon list select " + coordinates + " " + index)))
-							.append(entry)
-						);
-						index++;
-					}
-					message = message.append(Component.newline()
-						.append(Component.text("<< ")
-							.color(page == 1 ? NamedTextColor.GRAY : NamedTextColor.GOLD)
-							.clickEvent(page == 1 ? null : ClickEvent.runCommand("/grave summon list page " + coordinates + " " + (page - 1))))
-						.append(Component.text("Page " + page + "/" + pages))
-						.append(Component.text(" >>")
-							.color(page == pages ? NamedTextColor.GRAY : NamedTextColor.GOLD)
-							.clickEvent(page == pages ? null : ClickEvent.runCommand("/grave summon list page " + coordinates + " " + (page + 1))))
-					);
-					player.sendMessage(message);
-					addSummonListTag(player);
-				} else {
-					CommandAPI.fail("You don't have that many graves. Max page is " + pages);
+				if (page > pages || page < 1) {
+					page = pages;
 				}
+				int index = (page - 1) * 5;
+				String coordinates = String.format("%s %s %s", location.getX(), location.getY(), location.getZ());
+				ArrayList<Component> entries = manager.getGravesList(page);
+				Component message = Component.text("List of ", NamedTextColor.AQUA)
+					.append(player.displayName().hoverEvent(player))
+					.append(Component.text(player.displayName().toString().endsWith("s") ? "' Graves" : "'s Graves"))
+					.append(Component.newline())
+					.append(Component.text("Click the number on the left to select", NamedTextColor.GOLD));
+				for (Component entry : entries) {
+					message = message.append(Component.newline()
+						.append(Component.text("[", NamedTextColor.GRAY)
+							.append(Component.text(index, NamedTextColor.GOLD))
+							.append(Component.text("] ", NamedTextColor.GRAY))
+							.hoverEvent(HoverEvent.showText(Component.text("Click to summon")))
+							.clickEvent(ClickEvent.runCommand("/grave summon list select " + coordinates + " " + index)))
+						.append(entry)
+					);
+					index++;
+				}
+				message = message.append(Component.newline()
+					.append(Component.text("<<<")
+						.color(page == 1 ? NamedTextColor.GRAY : NamedTextColor.GOLD)
+						.hoverEvent(HoverEvent.showText(Component.text("First Page")))
+						.clickEvent(page == 1 ? null : ClickEvent.runCommand("/grave summon list page " + coordinates + " 1")))
+					.append(Component.text(" << ")
+						.color(page == 1 ? NamedTextColor.GRAY : NamedTextColor.GOLD)
+						.hoverEvent(HoverEvent.showText(Component.text("Previous Page")))
+						.clickEvent(page == 1 ? null : ClickEvent.runCommand("/grave summon list page " + coordinates + " " + (page - 1))))
+					.append(Component.text("Page " + page + "/" + pages))
+					.append(Component.text(" >> ")
+						.color(page == pages ? NamedTextColor.GRAY : NamedTextColor.GOLD)
+						.hoverEvent(HoverEvent.showText(Component.text("Next Page")))
+						.clickEvent(page == pages ? null : ClickEvent.runCommand("/grave summon list page " + coordinates + " " + (page + 1))))
+					.append(Component.text(">>>")
+						.color(page == pages ? NamedTextColor.GRAY : NamedTextColor.GOLD)
+						.hoverEvent(HoverEvent.showText(Component.text("Next Page")))
+						.clickEvent(page == pages ? null : ClickEvent.runCommand("/grave summon list page " + coordinates + " " + pages)))
+				);
+				player.sendMessage(message);
+				addSummonListTag(player);
 			} else {
 				CommandAPI.fail("You don't have any graves");
 			}
