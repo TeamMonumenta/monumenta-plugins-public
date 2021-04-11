@@ -736,6 +736,8 @@ public class PlayerListener implements Listener {
 		Location loc = player.getLocation();
 		//Manually forces the player in place during the riptide if they use it out of water (in rain)
 		if (!mPlugin.mItemOverrides.playerRiptide(mPlugin, player, event)) {
+			player.teleport(loc);
+			player.setCooldown(Material.TRIDENT, 15*20);
 			new BukkitRunnable() {
 				@Override
 				public void run() {
@@ -743,7 +745,7 @@ public class PlayerListener implements Listener {
 						this.cancel();
 						return;
 					}
-					player.teleport(loc);
+					player.setVelocity(player.getVelocity().multiply(0));
 				}
 			}.runTaskTimer(mPlugin, 0, 2);
 		}

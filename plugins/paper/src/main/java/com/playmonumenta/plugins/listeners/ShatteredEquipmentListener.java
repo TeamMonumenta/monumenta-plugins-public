@@ -3,6 +3,8 @@ package com.playmonumenta.plugins.listeners;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
+
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
@@ -37,7 +39,7 @@ public class ShatteredEquipmentListener implements Listener {
 		if (event.useItemInHand() != Event.Result.DENY) {
 			Player player = event.getPlayer();
 			ItemStack item = event.getItem();
-			if (ItemUtils.isItemShattered(item)) {
+			if (ItemUtils.isItemShattered(item) && !item.containsEnchantment(Enchantment.RIPTIDE)) {
 				MessagingUtils.sendActionBarMessage(mPlugin, player, "Shattered items must be reforged before use");
 				event.setUseItemInHand(Event.Result.DENY);
 				event.setCancelled(true);

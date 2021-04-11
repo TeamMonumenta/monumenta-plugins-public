@@ -1,12 +1,15 @@
 package com.playmonumenta.plugins.overrides;
 
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerRiptideEvent;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
+import com.playmonumenta.plugins.utils.MessagingUtils;
 
 public class TridentOverride extends BaseOverride {
 	@Override
@@ -14,8 +17,16 @@ public class TridentOverride extends BaseOverride {
 		if (player == null) {
 			return true;
 		}
+		if (ItemUtils.isItemShattered(event.getItem())) {
+			MessagingUtils.sendActionBarMessage(plugin, player, "Shattered items must be reforged before use");
+			return false;
+		}
+		if (player.getInventory().getItemInMainHand().getType() != Material.TRIDENT &&
+				player.getInventory().getItemInOffHand().getType() != Material.TRIDENT) {
+			return false;
+		}
 
-		if (event.getItem().getEnchantmentLevel(Enchantment.RIPTIDE) > 0 && player.getWorld().hasStorm()) {
+		if (event.getItem().getEnchantmentLevel(Enchantment.RIPTIDE) > 0) {
 			//Checks in a 3x3 around the player's eye location for water
 			Location eyeLoc = player.getEyeLocation();
 			int radius = 1;
@@ -43,7 +54,6 @@ public class TridentOverride extends BaseOverride {
 
 			return false;
 		}
-
-		return true;
+		return false;
 	}
 }
