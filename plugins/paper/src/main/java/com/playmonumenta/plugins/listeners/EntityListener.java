@@ -514,7 +514,7 @@ public class EntityListener implements Listener {
 			/*
 			 * Too many bugs arise as a result of being able to shoot things from offhand.
 			 */
-			if (ItemUtils.isShootableItem(player.getInventory().getItemInOffHand())) {
+			if (ItemUtils.isShootableItem(player.getInventory().getItemInOffHand()) && player.getInventory().getItemInOffHand().getType() != Material.FIREWORK_ROCKET) {
 				event.setCancelled(true);
 				return;
 			}

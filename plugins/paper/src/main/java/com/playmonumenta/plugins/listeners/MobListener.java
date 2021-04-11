@@ -19,6 +19,7 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Evoker;
 import org.bukkit.entity.EvokerFangs;
 import org.bukkit.entity.Fireball;
+import org.bukkit.entity.Firework;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
@@ -143,6 +144,12 @@ public class MobListener implements Listener {
 	@EventHandler(priority = EventPriority.LOWEST)
 	public void entityDamageByEntityEvent(EntityDamageByEntityEvent event) {
 		// Set base custom damage of crossbows and tridents before other modifications
+		// No firework damage!
+		if (event.getDamager() instanceof Firework) {
+			event.setCancelled(true);
+			return;
+		}
+
 		if (event.getEntity() instanceof Player) {
 			Entity damager = event.getDamager();
 			if (damager instanceof AbstractArrow) {
