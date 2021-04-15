@@ -71,7 +71,7 @@ public class AbilityInfo {
 		}
 
 		Component component = Component.text("");
-		component.append(getFormattedDescription(1));
+		component = component.append(getFormattedDescription(1));
 		for (int skillLevel = 2; skillLevel <= mDescriptions.size(); skillLevel++) {
 			component = component.append(Component.newline())
 				.append(getFormattedDescription(skillLevel));
