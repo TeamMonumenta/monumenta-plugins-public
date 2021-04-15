@@ -14,7 +14,7 @@ import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 
 public class Radiant implements BaseEnchantment {
-	private static String PROPERTY_NAME = ChatColor.GRAY + "Radiant";
+	private static final String PROPERTY_NAME = ChatColor.GRAY + "Radiant";
 	private static final String NIGHTVISION_DISABLED_TAG = "RadiantDarksightDisabled";
 
 

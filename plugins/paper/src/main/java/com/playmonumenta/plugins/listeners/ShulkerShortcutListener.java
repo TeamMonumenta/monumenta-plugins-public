@@ -273,6 +273,7 @@ public class ShulkerShortcutListener implements Listener {
 		return item != null &&
 		       ItemUtils.isShulkerBox(item.getType()) &&
 			   item.hasItemMeta() &&
-			   item.getItemMeta().getDisplayName().contains("Ender Chest Expansion");
+			   item.getItemMeta().hasDisplayName() &&
+			   ItemUtils.getPlainName(item).contains("Ender Chest Expansion");
 	}
 }

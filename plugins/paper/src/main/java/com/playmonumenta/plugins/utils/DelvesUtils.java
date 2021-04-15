@@ -12,7 +12,6 @@ import java.util.Set;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -60,20 +59,20 @@ public class DelvesUtils {
 
 	public enum Modifier {
 
-		RELENTLESS(Relentless.class, 1, Material.DIAMOND_PICKAXE, "" + ChatColor.AQUA + ChatColor.BOLD + "Relentless", Relentless.DESCRIPTION, Relentless.RANK_DESCRIPTIONS),
-		ARCANIC(Arcanic.class, 2, Material.NETHER_STAR, "" + ChatColor.LIGHT_PURPLE + ChatColor.BOLD + "Arcanic", Arcanic.DESCRIPTION, Arcanic.RANK_DESCRIPTIONS),
-		INFERNAL(Infernal.class, 3, Material.LAVA_BUCKET, "" + ChatColor.GOLD + ChatColor.BOLD + "Infernal", Infernal.DESCRIPTION, Infernal.RANK_DESCRIPTIONS),
-		TRANSCENDENT(Transcendent.class, 4, Material.ENDER_EYE, "" + ChatColor.GREEN + ChatColor.BOLD + "Transcendent", Transcendent.DESCRIPTION, Transcendent.RANK_DESCRIPTIONS),
-		SPECTRAL(Spectral.class, 5, Material.PHANTOM_MEMBRANE, "" + ChatColor.WHITE + ChatColor.BOLD + "Spectral", Spectral.DESCRIPTION, Spectral.RANK_DESCRIPTIONS),
-		DREADFUL(Dreadful.class, 6, Material.BONE, "" + ChatColor.DARK_GRAY + ChatColor.BOLD + "Dreadful", Dreadful.DESCRIPTION, Dreadful.RANK_DESCRIPTIONS),
-		COLOSSAL(Colossal.class, 7, Material.IRON_BARS, "" + ChatColor.DARK_BLUE + ChatColor.BOLD + "Colossal", Colossal.DESCRIPTION, Colossal.RANK_DESCRIPTIONS),
-		CHIVALROUS(Chivalrous.class, 10, Material.MAGMA_CREAM, "" + ChatColor.DARK_GREEN + ChatColor.BOLD + "Chivalrous", Chivalrous.DESCRIPTION, Chivalrous.RANK_DESCRIPTIONS),
-		BLOODTHIRSTY(Bloodthirsty.class, 11, Material.ROTTEN_FLESH, "" + ChatColor.RED + ChatColor.BOLD + "Bloodthirsty", Bloodthirsty.DESCRIPTION, Bloodthirsty.RANK_DESCRIPTIONS),
-		PERNICIOUS(Pernicious.class, 12, Material.MUSIC_DISC_11, "" + ChatColor.DARK_AQUA + ChatColor.BOLD + "Pernicious", Pernicious.DESCRIPTION, Pernicious.RANK_DESCRIPTIONS),
-		LEGIONARY(Legionary.class, 13, Material.IRON_SWORD, "" + ChatColor.YELLOW + ChatColor.BOLD + "Legionary", Legionary.DESCRIPTION, Legionary.RANK_DESCRIPTIONS),
-		CARAPACE(Carapace.class, 14, Material.NETHERITE_HELMET, "" + ChatColor.DARK_PURPLE + ChatColor.BOLD + "Carapace", Carapace.DESCRIPTION, Carapace.RANK_DESCRIPTIONS),
-		ENTROPY(Entropy.class, 15, Material.STRUCTURE_VOID, "" + ChatColor.BLUE + ChatColor.BOLD + "Entropy", Entropy.DESCRIPTION, Entropy.RANK_DESCRIPTIONS),
-		TWISTED(Twisted.class, 16, Material.TIPPED_ARROW, "" + ChatColor.DARK_RED + ChatColor.BOLD + "Twisted", Twisted.DESCRIPTION, Twisted.RANK_DESCRIPTIONS);
+		RELENTLESS(Relentless.class, 1, Material.DIAMOND_PICKAXE, Component.text("Relentless", NamedTextColor.AQUA, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false), Relentless.DESCRIPTION, Relentless.RANK_DESCRIPTIONS),
+		ARCANIC(Arcanic.class, 2, Material.NETHER_STAR, Component.text("Arcanic", NamedTextColor.LIGHT_PURPLE, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false), Arcanic.DESCRIPTION, Arcanic.RANK_DESCRIPTIONS),
+		INFERNAL(Infernal.class, 3, Material.LAVA_BUCKET, Component.text("Infernal", NamedTextColor.GOLD, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false), Infernal.DESCRIPTION, Infernal.RANK_DESCRIPTIONS),
+		TRANSCENDENT(Transcendent.class, 4, Material.ENDER_EYE, Component.text("Transcendent", NamedTextColor.GREEN, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false), Transcendent.DESCRIPTION, Transcendent.RANK_DESCRIPTIONS),
+		SPECTRAL(Spectral.class, 5, Material.PHANTOM_MEMBRANE, Component.text("Spectral", NamedTextColor.WHITE, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false), Spectral.DESCRIPTION, Spectral.RANK_DESCRIPTIONS),
+		DREADFUL(Dreadful.class, 6, Material.BONE, Component.text("Dreadful", NamedTextColor.DARK_GRAY, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false), Dreadful.DESCRIPTION, Dreadful.RANK_DESCRIPTIONS),
+		COLOSSAL(Colossal.class, 7, Material.IRON_BARS, Component.text("Colossal", NamedTextColor.DARK_BLUE, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false), Colossal.DESCRIPTION, Colossal.RANK_DESCRIPTIONS),
+		CHIVALROUS(Chivalrous.class, 10, Material.MAGMA_CREAM, Component.text("Chivalrous", NamedTextColor.DARK_GREEN, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false), Chivalrous.DESCRIPTION, Chivalrous.RANK_DESCRIPTIONS),
+		BLOODTHIRSTY(Bloodthirsty.class, 11, Material.ROTTEN_FLESH, Component.text("Bloodthirsty", NamedTextColor.RED, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false), Bloodthirsty.DESCRIPTION, Bloodthirsty.RANK_DESCRIPTIONS),
+		PERNICIOUS(Pernicious.class, 12, Material.MUSIC_DISC_11, Component.text("Pernicious", NamedTextColor.DARK_AQUA, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false), Pernicious.DESCRIPTION, Pernicious.RANK_DESCRIPTIONS),
+		LEGIONARY(Legionary.class, 13, Material.IRON_SWORD, Component.text("Legionary", NamedTextColor.YELLOW, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false), Legionary.DESCRIPTION, Legionary.RANK_DESCRIPTIONS),
+		CARAPACE(Carapace.class, 14, Material.NETHERITE_HELMET, Component.text("Carapace", NamedTextColor.DARK_PURPLE, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false), Carapace.DESCRIPTION, Carapace.RANK_DESCRIPTIONS),
+		ENTROPY(Entropy.class, 15, Material.STRUCTURE_VOID, Component.text("Entropy", NamedTextColor.BLUE, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false), Entropy.DESCRIPTION, Entropy.RANK_DESCRIPTIONS),
+		TWISTED(Twisted.class, 16, Material.TIPPED_ARROW, Component.text("Twisted", NamedTextColor.DARK_RED, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false), Twisted.DESCRIPTION, Twisted.RANK_DESCRIPTIONS);
 
 		private static final Modifier[] MODIFIER_COLUMN_MAPPINGS = new Modifier[18];
 
@@ -86,11 +85,11 @@ public class DelvesUtils {
 		private Class<? extends DelveModifier> mClass;
 		private int mColumn;
 		private Material mIcon;
-		private String mName;
+		private Component mName;
 		private String mDescription;
 		private String[][] mRankDescriptions;
 
-		Modifier(Class<? extends DelveModifier> cls, int column, Material icon, String name, String description, String[][] rankDescriptions) {
+		Modifier(Class<? extends DelveModifier> cls, int column, Material icon, Component name, String description, String[][] rankDescriptions) {
 			mClass = cls;
 			mColumn = column;
 			mIcon = icon;
@@ -111,7 +110,7 @@ public class DelvesUtils {
 			return mIcon;
 		}
 
-		public String getName() {
+		public Component getName() {
 			return mName;
 		}
 
@@ -605,7 +604,7 @@ public class DelvesUtils {
 			if (group != null) {
 				String newPath = group.getDelveLootTable(depthPoints, playerCount);
 				if (newPath != null) {
-					chest.setLootTable(Bukkit.getLootTable(new NamespacedKey("epic", newPath)));
+					chest.setLootTable(Bukkit.getLootTable(NamespacedKey.fromString("epic:" + newPath)));
 					chest.update();
 				}
 			}
@@ -650,8 +649,8 @@ public class DelvesUtils {
 		private final Player mPlayer;
 		private final String mDungeon;
 		private final DelveInfo mDelveInfo;
-		private final Inventory mInventory1 = Bukkit.createInventory(null, ROWS * COLUMNS, "Delve Modifier Selection");
-		private final Inventory mInventory2 = Bukkit.createInventory(null, ROWS * COLUMNS, "Delve Modifier Selection");
+		private final Inventory mInventory1 = Bukkit.createInventory(null, ROWS * COLUMNS, Component.text("Delve Modifier Selection"));
+		private final Inventory mInventory2 = Bukkit.createInventory(null, ROWS * COLUMNS, Component.text("Delve Modifier Selection"));
 
 		private boolean mCanBeginDelve = false;
 
@@ -801,8 +800,8 @@ public class DelvesUtils {
 					item.setType(Material.ORANGE_STAINED_GLASS_PANE);
 
 					ItemMeta meta = item.getItemMeta();
-					String name = meta.getDisplayName();
-					meta.setDisplayName(ChatColor.GOLD + "Rank " + name.charAt(name.length() - 1));
+					String name = ItemUtils.getPlainName(item);
+					meta.displayName(Component.text("Rank " + name.charAt(name.length() - 1), NamedTextColor.GOLD));
 					item.setItemMeta(meta);
 					item = ItemUtils.setPlainName(item);
 
@@ -817,8 +816,8 @@ public class DelvesUtils {
 					item.setType(Material.RED_STAINED_GLASS_PANE);
 
 					ItemMeta meta = item.getItemMeta();
-					String name = meta.getDisplayName();
-					meta.setDisplayName(ChatColor.GRAY + "Rank " + name.charAt(name.length() - 1));
+					String name = ItemUtils.getPlainName(item);
+					meta.displayName(Component.text("Rank " + name.charAt(name.length() - 1), NamedTextColor.GRAY));
 					item.setItemMeta(meta);
 					item = ItemUtils.setPlainName(item);
 				}
@@ -836,43 +835,41 @@ public class DelvesUtils {
 			ItemStack item = new ItemStack(Material.SOUL_LANTERN, Math.max(1, depthPoints));
 
 			ItemMeta meta = item.getItemMeta();
-			meta.setDisplayName("" + ChatColor.GOLD + ChatColor.BOLD + "Delve Summary");
+			meta.displayName(Component.text("Delve Summary", NamedTextColor.GOLD, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false));
 			meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
 
-			List<String> lore = new ArrayList<>();
+			List<Component> lore = new ArrayList<>();
 
-			lore.add(ChatColor.WHITE + "" + mDelveInfo.getDepthPoints() + " Depth Points Assigned");
+			lore.add(Component.text(String.format("%d Depth Points Assigned", mDelveInfo.getDepthPoints()), NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, false));
 
-			lore.add(ChatColor.RESET + "");
+			lore.add(Component.text(""));
 
-			lore.add(ChatColor.WHITE + "Stat Multipliers from Depth Points:");
+			lore.add(Component.text("Stat Multipliers from Depth Points:", NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, false));
 			double damageMultiplier = StatMultiplier.getDamageMultiplier(depthPoints);
 			double healthMultiplier = StatMultiplier.getHealthMultiplier(depthPoints);
 			double speedMultiplier = StatMultiplier.getSpeedMultiplier(depthPoints);
+			NamedTextColor damageMultiplierColor;
 			if (damageMultiplier >= 1.75) {
-				lore.add(String.format(ChatColor.DARK_RED + "- Damage Multiplier: x%.2f", damageMultiplier));
-				lore.add(String.format(ChatColor.DARK_RED + "- Health Multiplier: x%.2f", healthMultiplier));
-				lore.add(String.format(ChatColor.DARK_RED + "- Speed Multiplier: x%.2f", speedMultiplier));
+				damageMultiplierColor = NamedTextColor.DARK_RED;
 			} else if (damageMultiplier >= 1.45) {
-				lore.add(String.format(ChatColor.RED + "- Damage Multiplier: x%.2f", damageMultiplier));
-				lore.add(String.format(ChatColor.RED + "- Health Multiplier: x%.2f", healthMultiplier));
-				lore.add(String.format(ChatColor.RED + "- Speed Multiplier: x%.2f", speedMultiplier));
+				damageMultiplierColor = NamedTextColor.RED;
 			} else {
-				lore.add(String.format(ChatColor.GRAY + "- Damage Multiplier: x%.2f", damageMultiplier));
-				lore.add(String.format(ChatColor.GRAY + "- Health Multiplier: x%.2f", healthMultiplier));
-				lore.add(String.format(ChatColor.GRAY + "- Speed Multiplier: x%.2f", speedMultiplier));
+				damageMultiplierColor = NamedTextColor.GRAY;
 			}
+			lore.add(Component.text(String.format("- Damage Multiplier: x%.2f", damageMultiplier), damageMultiplierColor).decoration(TextDecoration.ITALIC, false));
+			lore.add(Component.text(String.format("- Health Multiplier: x%.2f", healthMultiplier), damageMultiplierColor).decoration(TextDecoration.ITALIC, false));
+			lore.add(Component.text(String.format("- Speed Multiplier: x%.2f", speedMultiplier), damageMultiplierColor).decoration(TextDecoration.ITALIC, false));
 
-			lore.add(ChatColor.RESET + "");
+			lore.add(Component.text(""));
 
 			double dungeonMultiplier = StatMultiplier.getStatCompensation(mDungeon);
-			lore.add(ChatColor.WHITE + "Stat Multipliers from Base Dungeon:");
-			lore.add(String.format(ChatColor.GRAY + "- Damage Multiplier: x%.2f", dungeonMultiplier));
-			lore.add(String.format(ChatColor.GRAY + "- Health Multiplier: x%.2f", dungeonMultiplier));
+			lore.add(Component.text("Stat Multipliers from Base Dungeon:", NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, false));
+			lore.add(Component.text(String.format("- Damage Multiplier: x%.2f", dungeonMultiplier), NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false));
+			lore.add(Component.text(String.format("- Health Multiplier: x%.2f", dungeonMultiplier), NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false));
 
-			lore.add(ChatColor.RESET + "");
+			lore.add(Component.text(""));
 
-			lore.add(ChatColor.WHITE + "Delve Material Multipliers (Not Counting Loot Scaling):");
+			lore.add(Component.text("Delve Material Multipliers (Not Counting Loot Scaling):", NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, false));
 			double baseAmount = DelveLootTableGroup.getDelveMaterialTableChance(MINIMUM_DEPTH_POINTS, 9001);
 			double delveMaterialMultiplierSolo = DelveLootTableGroup.getDelveMaterialTableChance(depthPoints, 1) / baseAmount;
 			double delveMaterialMultiplierDuo = DelveLootTableGroup.getDelveMaterialTableChance(depthPoints, 2) / baseAmount;
@@ -881,44 +878,44 @@ public class DelvesUtils {
 
 			if (delveMaterialMultiplier > 0) {
 				if (delveMaterialMultiplierSolo == DelveLootTableGroup.getDelveMaterialTableChance(9001, 1) / baseAmount) {
-					lore.add(String.format(ChatColor.YELLOW + "- 1 Player: x%.2f (Capped)", delveMaterialMultiplierSolo));
+					lore.add(Component.text(String.format("- 1 Player: x%.2f (Capped)", delveMaterialMultiplierSolo), NamedTextColor.YELLOW).decoration(TextDecoration.ITALIC, false));
 				} else {
-					lore.add(String.format(ChatColor.GRAY + "- 1 Player: x%.2f", delveMaterialMultiplierSolo));
+					lore.add(Component.text(String.format("- 1 Player: x%.2f", delveMaterialMultiplierSolo), NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false));
 				}
 
 				if (delveMaterialMultiplierDuo == DelveLootTableGroup.getDelveMaterialTableChance(9001, 2) / baseAmount) {
-					lore.add(String.format(ChatColor.YELLOW + "- 2 Players: x%.2f (Capped)", delveMaterialMultiplierDuo));
+					lore.add(Component.text(String.format("- 2 Players: x%.2f (Capped)", delveMaterialMultiplierDuo), NamedTextColor.YELLOW).decoration(TextDecoration.ITALIC, false));
 				} else {
-					lore.add(String.format(ChatColor.GRAY + "- 2 Players: x%.2f", delveMaterialMultiplierDuo));
+					lore.add(Component.text(String.format("- 2 Players: x%.2f", delveMaterialMultiplierDuo), NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false));
 				}
 
 				if (delveMaterialMultiplierTrio == DelveLootTableGroup.getDelveMaterialTableChance(9001, 3) / baseAmount) {
-					lore.add(String.format(ChatColor.YELLOW + "- 3 Players: x%.2f (Capped)", delveMaterialMultiplierTrio));
+					lore.add(Component.text(String.format("- 3 Players: x%.2f (Capped)", delveMaterialMultiplierTrio), NamedTextColor.YELLOW).decoration(TextDecoration.ITALIC, false));
 				} else {
-					lore.add(String.format(ChatColor.GRAY + "- 3 Players: x%.2f", delveMaterialMultiplierTrio));
+					lore.add(Component.text(String.format("- 3 Players: x%.2f", delveMaterialMultiplierTrio), NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false));
 				}
 
 				if (delveMaterialMultiplier == DelveLootTableGroup.getDelveMaterialTableChance(9001, 9001) / baseAmount) {
-					lore.add(String.format(ChatColor.YELLOW + "- 4+ Players: x%.2f (Capped)", delveMaterialMultiplier));
+					lore.add(Component.text(String.format("- 4+ Players: x%.2f (Capped)", delveMaterialMultiplier), NamedTextColor.YELLOW).decoration(TextDecoration.ITALIC, false));
 				} else {
-					lore.add(String.format(ChatColor.GRAY + "- 4+ Players: x%.2f", delveMaterialMultiplier));
+					lore.add(Component.text(String.format("- 4+ Players: x%.2f", delveMaterialMultiplier), NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false));
 				}
 			} else {
-				lore.add(String.format(ChatColor.DARK_GRAY + "  - 1 Player: x%.2f", delveMaterialMultiplierSolo));
-				lore.add(String.format(ChatColor.DARK_GRAY + "  - 2 Players: x%.2f", delveMaterialMultiplierDuo));
-				lore.add(String.format(ChatColor.DARK_GRAY + "  - 3 Players: x%.2f", delveMaterialMultiplierTrio));
-				lore.add(String.format(ChatColor.DARK_GRAY + "  - 4+ Players: x%.2f", delveMaterialMultiplier));
+				lore.add(Component.text(String.format("  - 1 Player: x%.2f", delveMaterialMultiplierSolo), NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false));
+				lore.add(Component.text(String.format("  - 2 Players: x%.2f", delveMaterialMultiplierDuo), NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false));
+				lore.add(Component.text(String.format("  - 3 Players: x%.2f", delveMaterialMultiplierTrio), NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false));
+				lore.add(Component.text(String.format("  - 4+ Players: x%.2f", delveMaterialMultiplier), NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false));
 			}
 
-			lore.add(ChatColor.RESET + "");
+			lore.add(Component.text(""));
 
 			if (depthPoints == DelveInfo.getMaxDepthPoints()) {
-				lore.add(ChatColor.GOLD + "- All Modifiers Advancement Granted upon Completion");
+				lore.add(Component.text("- All Modifiers Advancement Granted upon Completion", NamedTextColor.GOLD).decoration(TextDecoration.ITALIC, false));
 			} else {
-				lore.add(ChatColor.DARK_GRAY + "- All Modifiers Advancement Granted upon Completion");
+				lore.add(Component.text("- All Modifiers Advancement Granted upon Completion", NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false));
 			}
 
-			meta.setLore(lore);
+			meta.lore(lore);
 
 			item.setItemMeta(meta);
 			item = ItemUtils.setPlainTag(item);
@@ -930,20 +927,20 @@ public class DelvesUtils {
 			ItemStack item = new ItemStack(Material.OBSERVER, 1);
 
 			ItemMeta meta = item.getItemMeta();
-			meta.setDisplayName("" + ChatColor.GOLD + ChatColor.BOLD + "Begin Delve");
+			meta.displayName(Component.text("Begin Delve", NamedTextColor.GOLD, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false));
 
-			List<String> lore = new ArrayList<>();
+			List<Component> lore = new ArrayList<>();
 
 			int depthPoints = mDelveInfo.getDepthPoints();
 
 			if (depthPoints < MINIMUM_DEPTH_POINTS) {
-				lore.add(ChatColor.RED + "- Requires " + MINIMUM_DEPTH_POINTS + " Depth Points to begin");
+				lore.add(Component.text("- Requires " + MINIMUM_DEPTH_POINTS + " Depth Points to begin", NamedTextColor.RED).decoration(TextDecoration.ITALIC, false));
 				mCanBeginDelve = false;
 			} else {
 				mCanBeginDelve = true;
 			}
 
-			meta.setLore(lore);
+			meta.lore(lore);
 
 			item.setItemMeta(meta);
 			item = ItemUtils.setPlainTag(item);
@@ -955,7 +952,7 @@ public class DelvesUtils {
 			ItemStack item = new ItemStack(Material.BARRIER, 1);
 
 			ItemMeta meta = item.getItemMeta();
-			meta.setDisplayName("" + ChatColor.WHITE + ChatColor.BOLD + "Reset Modifiers");
+			meta.displayName(Component.text("Reset Modifiers", NamedTextColor.WHITE, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false));
 			item.setItemMeta(meta);
 			item = ItemUtils.setPlainName(item);
 
@@ -966,7 +963,7 @@ public class DelvesUtils {
 			ItemStack item = new ItemStack(Material.ENCHANTED_GOLDEN_APPLE, 1);
 
 			ItemMeta meta = item.getItemMeta();
-			meta.setDisplayName("" + ChatColor.WHITE + ChatColor.BOLD + "Select All Modifiers");
+			meta.displayName(Component.text("Select All Modifiers", NamedTextColor.WHITE, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false));
 			item.setItemMeta(meta);
 			item = ItemUtils.setPlainName(item);
 
@@ -977,7 +974,7 @@ public class DelvesUtils {
 			ItemStack item = new ItemStack(Material.ARROW, 1);
 
 			ItemMeta meta = item.getItemMeta();
-			meta.setDisplayName("" + ChatColor.WHITE + ChatColor.BOLD + "Next Page");
+			meta.displayName(Component.text("Next Page", NamedTextColor.WHITE, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false));
 			item.setItemMeta(meta);
 			item = ItemUtils.setPlainName(item);
 
@@ -988,7 +985,7 @@ public class DelvesUtils {
 			ItemStack item = new ItemStack(Material.ARROW, 1);
 
 			ItemMeta meta = item.getItemMeta();
-			meta.setDisplayName("" + ChatColor.WHITE + ChatColor.BOLD + "Previous Page");
+			meta.displayName(Component.text("Previous Page", NamedTextColor.WHITE, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false));
 			item.setItemMeta(meta);
 			item = ItemUtils.setPlainName(item);
 
@@ -1008,14 +1005,14 @@ public class DelvesUtils {
 				ItemStack item = new ItemStack(Material.RED_STAINED_GLASS_PANE, 1);
 				ItemMeta meta = item.getItemMeta();
 
-				meta.setDisplayName(ChatColor.GRAY + "Rank " + row);
+				meta.displayName(Component.text("Rank " + row, NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false));
 
-				List<String> lore = new ArrayList<>();
+				List<Component> lore = new ArrayList<>();
 				for (int i = 0; i < rankDescriptions[row - 1].length; i++) {
-					lore.add(ChatColor.WHITE + rankDescriptions[row - 1][i]);
+					lore.add(Component.text(rankDescriptions[row - 1][i], NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, false));
 				}
 
-				meta.setLore(lore);
+				meta.lore(lore);
 
 				item.setItemMeta(meta);
 				item = ItemUtils.setPlainTag(item);
@@ -1027,14 +1024,14 @@ public class DelvesUtils {
 				ItemStack item = new ItemStack(Material.ORANGE_STAINED_GLASS_PANE, 1);
 				ItemMeta meta = item.getItemMeta();
 
-				meta.setDisplayName(ChatColor.GOLD + "Rank " + row);
+				meta.displayName(Component.text("Rank " + row, NamedTextColor.GOLD).decoration(TextDecoration.ITALIC, false));
 
-				List<String> lore = new ArrayList<>();
+				List<Component> lore = new ArrayList<>();
 				for (int i = 0; i < rankDescriptions[row - 1].length; i++) {
-					lore.add(ChatColor.WHITE + rankDescriptions[row - 1][i]);
+					lore.add(Component.text(rankDescriptions[row - 1][i], NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, false));
 				}
 
-				meta.setLore(lore);
+				meta.lore(lore);
 
 				item.setItemMeta(meta);
 				item = ItemUtils.setPlainTag(item);
@@ -1045,8 +1042,8 @@ public class DelvesUtils {
 			ItemStack item = new ItemStack(modifier.getIcon());
 
 			ItemMeta meta = item.getItemMeta();
-			meta.setDisplayName(modifier.getName());
-			meta.setLore(Arrays.asList(ChatColor.WHITE + modifier.getDescription()));
+			meta.displayName(modifier.getName());
+			meta.lore(Arrays.asList(Component.text(modifier.getDescription(), NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, false)));
 
 			if (modifier == Modifier.PERNICIOUS) {
 				meta.addItemFlags(ItemFlag.HIDE_POTION_EFFECTS);

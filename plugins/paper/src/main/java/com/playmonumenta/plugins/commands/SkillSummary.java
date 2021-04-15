@@ -14,8 +14,9 @@ import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.CommandPermission;
 import dev.jorel.commandapi.arguments.Argument;
 import dev.jorel.commandapi.arguments.BooleanArgument;
-import net.md_5.bungee.api.ChatColor;
-import net.md_5.bungee.api.chat.ComponentBuilder;
+
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 
 public class SkillSummary extends GenericCommand {
 	private static final String COMMAND = "skillsummary";
@@ -61,28 +62,33 @@ public class SkillSummary extends GenericCommand {
 			return;
 		}
 
-		ComponentBuilder componentBuilder = new ComponentBuilder(player.getDisplayName()).color(ChatColor.AQUA)
-		                                        .append("'s Skills:").color(ChatColor.GREEN);
-		ComponentBuilder abilityHover;
+		Component component = Component.text("")
+		.append(Component.selector(player.getName())
+			.color(NamedTextColor.AQUA))
+		.append(Component.text("'s Skills:", NamedTextColor.GREEN));
+
+		Component abilityHover;
 		if (useShorthand) {
 			for (Ability ability : plugin.mAbilityManager.getPlayerAbilities(player).getAbilities()) {
-				if (ability != null) {
-					abilityHover = ability.getLevelHover(useShorthand);
-					if (abilityHover != null) {
-						componentBuilder.append(" ");
-						componentBuilder.append(abilityHover.create());
-					}
+				if (ability == null) {
+					continue;
+				}
+				abilityHover = ability.getLevelHover(useShorthand);
+				if (abilityHover != null) {
+					component = component.append(Component.text(" "))
+						.append(abilityHover);
 				}
 			}
-			player.sendMessage(componentBuilder.create());
+			player.sendMessage(component);
 		} else {
-			player.sendMessage(componentBuilder.create());
+			player.sendMessage(component);
 			for (Ability ability : plugin.mAbilityManager.getPlayerAbilities(player).getAbilities()) {
-				if (ability != null) {
-					abilityHover = ability.getLevelHover(useShorthand);
-					if (abilityHover != null) {
-						player.sendMessage(abilityHover.create());
-					}
+				if (ability == null) {
+					continue;
+				}
+				abilityHover = ability.getLevelHover(useShorthand);
+				if (abilityHover != null) {
+					player.sendMessage(abilityHover);
 				}
 			}
 		}

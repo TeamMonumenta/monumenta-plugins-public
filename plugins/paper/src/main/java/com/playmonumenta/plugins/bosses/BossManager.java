@@ -736,7 +736,11 @@ public class BossManager implements Listener {
 	public void playerDeathEvent(PlayerDeathEvent event) {
 		Player player = event.getEntity();
 		if (player.hasMetadata(WinterSnowmanEventBoss.deathMetakey)) {
-			event.setDeathMessage(player.getName() + " was snowballed by " + player.getMetadata(WinterSnowmanEventBoss.deathMetakey).get(0).asString());
+			Component deathMessage = Component.text("")
+			    .append(Component.selector(player.getName()))
+			    .append(Component.text(" was snowballed by "))
+			    .append(Component.selector(player.getMetadata(WinterSnowmanEventBoss.deathMetakey).get(0).asString()));
+			event.deathMessage(deathMessage);
 			player.removeMetadata(WinterSnowmanEventBoss.deathMetakey, mPlugin);
 		}
 

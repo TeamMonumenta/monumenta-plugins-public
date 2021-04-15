@@ -27,14 +27,14 @@ public class MessagingUtils {
 
 	public static void sendActionBarMessage(Plugin plugin, Player player, String message) {
 		message = translatePlayerName(player, message);
-		TextComponent formattedMessage = LEGACY_SERIALIZER.deserialize(message);
-		formattedMessage.color(NamedTextColor.YELLOW);
+		TextComponent formattedMessage = LEGACY_SERIALIZER.deserialize(message)
+			.color(NamedTextColor.YELLOW);
 		player.sendActionBar​(formattedMessage);
 	}
 
 	public static void sendAbilityTriggeredMessage(Plugin plugin, Player player, String message) {
-		TextComponent formattedMessage = LEGACY_SERIALIZER.deserialize(message);
-		formattedMessage.color(NamedTextColor.RED);
+		TextComponent formattedMessage = LEGACY_SERIALIZER.deserialize(message)
+			.color(NamedTextColor.RED);
 		player.sendActionBar​(formattedMessage);
 	}
 
@@ -42,7 +42,7 @@ public class MessagingUtils {
 		message = translatePlayerName(player, message);
 		message = message.replace('&', '§');
 		TextComponent formattedMessage = LEGACY_SERIALIZER.deserialize(message);
-		player.sendMessage(Identity.nil(), formattedMessage, MessageType.SYSTEM);
+		player.sendMessage(formattedMessage);
 	}
 
 	public static void sendStackTrace(CommandSender sender, Exception e) {
@@ -53,7 +53,7 @@ public class MessagingUtils {
 		} else {
 			formattedMessage = Component.text("An error occured without a set message. Hover for stack trace.");
 		}
-		formattedMessage.color(NamedTextColor.RED);
+		formattedMessage = formattedMessage.color(NamedTextColor.RED);
 
 		// Get the first 300 characters of the stacktrace and send them to the player
 		StringWriter sw = new StringWriter();
@@ -63,8 +63,8 @@ public class MessagingUtils {
 		sStackTrace = sStackTrace.substring(0, Math.min(sStackTrace.length(), 300));
 
 		TextComponent textStackTrace = Component.text(sStackTrace.replace("\t", "  "), NamedTextColor.RED);
-		formattedMessage.hoverEvent(textStackTrace);
-		sender.sendMessage(Identity.nil(), formattedMessage, MessageType.SYSTEM);
+		formattedMessage = formattedMessage.hoverEvent(textStackTrace);
+		sender.sendMessage(formattedMessage);
 
 		e.printStackTrace();
 	}
@@ -80,7 +80,12 @@ public class MessagingUtils {
 	}
 
 	public static String plainText(Component formattedText) {
+		// This is only legacy text because we have a bunch of section symbols lying around that need to be updated.
 		String legacyText = PLAIN_SERIALIZER.serialize(formattedText);
+		return plainFromLegacy(legacyText);
+	}
+
+	public static String plainFromLegacy(String legacyText) {
 		return PLAIN_SERIALIZER.serialize(LEGACY_SERIALIZER.deserialize(legacyText));
 	}
 }

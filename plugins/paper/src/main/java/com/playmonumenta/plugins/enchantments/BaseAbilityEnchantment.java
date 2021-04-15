@@ -10,6 +10,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 
 import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
 import com.playmonumenta.plugins.tracking.PlayerTracking;
+import com.playmonumenta.plugins.utils.ItemUtils;
 
 public abstract class BaseAbilityEnchantment implements BaseEnchantment {
 	private final String mPropertyName;
@@ -19,7 +20,6 @@ public abstract class BaseAbilityEnchantment implements BaseEnchantment {
 		mPropertyName = propertyName;
 		mSlots = validSlots;
 	}
-
 
 	@Override
 	public String getProperty() {
@@ -39,14 +39,11 @@ public abstract class BaseAbilityEnchantment implements BaseEnchantment {
 	@Override
 	public int getLevelFromItem(ItemStack item) {
 		if (item != null) {
-			ItemMeta meta = item.getItemMeta();
-			if (meta != null) {
-				List<String> lore = meta.getLore();
-				if (lore != null && !lore.isEmpty()) {
-					for (String loreEntry : lore) {
-						if (loreEntry.contains(mPropertyName)) {
-							return parseValue(loreEntry);
-						}
+			List<String> lore = ItemUtils.getPlainLore(item);
+			if (lore != null && !lore.isEmpty()) {
+				for (String loreEntry : lore) {
+					if (loreEntry.contains(mPropertyName)) {
+						return parseValue(loreEntry);
 					}
 				}
 			}
