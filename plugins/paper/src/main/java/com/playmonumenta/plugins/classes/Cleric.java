@@ -35,6 +35,7 @@ public class Cleric extends PlayerClass {
 		mAbilities.add(new SacredProvisions(plugin, player));
 		mAbilities.add(new Sanctified(plugin, player));
 		mClass = 3;
+		mClassName = "Cleric";
 
 		mSpecOne.mAbilities.add(new ChoirBells(plugin, player));
 		mSpecOne.mAbilities.add(new HolyJavelin(plugin, player));

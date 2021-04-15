@@ -4,6 +4,8 @@ import java.util.ArrayList;
 
 import org.bukkit.entity.Player;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.scriptedquests.utils.ScoreboardUtils;
 
@@ -11,6 +13,7 @@ public class PlayerClass {
 	
 	public ArrayList<Ability> mAbilities = new ArrayList<Ability>();
 	public int mClass;
+	public String mClassName;
 
 	PlayerSpec mSpecOne = new PlayerSpec();
 	PlayerSpec mSpecTwo = new PlayerSpec();
@@ -37,5 +40,25 @@ public class PlayerClass {
 			return true;
 		}
 		return false;
+	}
+
+	public JsonObject toJson() {
+		JsonArray abilities = new JsonArray();
+		for (Ability ability : mAbilities) {
+			if (ability != null) {
+				abilities.add(ability.getInfo().toJson());
+			}
+		}
+
+		JsonArray specs = new JsonArray();
+		specs.add(mSpecOne.toJson());
+		specs.add(mSpecTwo.toJson());
+
+		JsonObject info = new JsonObject();
+		info.addProperty("classId", mClass);
+		info.addProperty("className", mClassName);
+		info.add("skills", abilities);
+		info.add("specs", specs);
+		return info;
 	}
 }

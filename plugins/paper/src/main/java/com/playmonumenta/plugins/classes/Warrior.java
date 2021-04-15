@@ -34,6 +34,7 @@ public class Warrior extends PlayerClass {
 		mAbilities.add(new Toughness(plugin, player));
 		mAbilities.add(new WeaponryMastery(plugin, player));
 		mClass = 2;
+		mClassName = "Warrior";
 
 		mSpecOne.mAbilities.add(new MeteorSlam(plugin, player));
 		mSpecOne.mAbilities.add(new Rampage(plugin, player));

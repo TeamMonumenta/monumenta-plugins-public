@@ -31,6 +31,7 @@ public class Scout extends PlayerClass {
 		mAbilities.add(new Swiftness(plugin, player));
 		mAbilities.add(new Volley(plugin, player));
 		mClass = 6;
+		mClassName = "Scout";
 
 		mSpecOne.mAbilities.add(new Quickdraw(plugin, player));
 		mSpecOne.mAbilities.add(new Reflexes(plugin, player));

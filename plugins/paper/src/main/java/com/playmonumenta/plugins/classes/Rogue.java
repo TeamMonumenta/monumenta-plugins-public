@@ -34,6 +34,7 @@ public class Rogue extends PlayerClass {
 		mAbilities.add(new Smokescreen(plugin, player));
 		mAbilities.add(new ViciousCombos(plugin, player));
 		mClass = 4;
+		mClassName = "Rogue";
 
 		mSpecOne.mAbilities.add(new BladeDance(plugin, player));
 		mSpecOne.mAbilities.add(new DeadlyRonde(plugin, player));

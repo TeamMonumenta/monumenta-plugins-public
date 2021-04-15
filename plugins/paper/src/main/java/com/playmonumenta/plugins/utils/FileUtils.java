@@ -13,6 +13,10 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+import com.google.gson.stream.JsonWriter;
+
 public class FileUtils {
 	public static String readFile(String fileName) throws Exception, FileNotFoundException {
 		// Do not attempt to catch exceptions here - let them propagate to the caller
@@ -109,5 +113,33 @@ public class FileUtils {
 		});
 
 		return matchedFiles;
+	}
+
+	public static void writeJson(String fileName, JsonObject json) throws IOException {
+		// Do not attempt to catch exceptions here - let them propagate to the caller
+		File file = new File(fileName);
+
+		if (!file.exists()) {
+			file.getParentFile().mkdirs();
+			file.createNewFile();
+		}
+
+		OutputStreamWriter writer = null;
+		JsonWriter jsonWriter = null;
+		Gson gson;
+		try {
+			writer = new OutputStreamWriter(new FileOutputStream(fileName), StandardCharsets.UTF_8);
+			gson = new Gson();
+			jsonWriter = gson.newJsonWriter(writer);
+			jsonWriter.setIndent("    ");
+			gson.toJson(json, jsonWriter);
+		} finally {
+			if (jsonWriter != null) {
+				jsonWriter.close();
+			}
+			if (writer != null) {
+				writer.close();
+			}
+		}
 	}
 }

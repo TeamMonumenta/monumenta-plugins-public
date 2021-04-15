@@ -34,6 +34,7 @@ public class Warlock extends PlayerClass {
 		mAbilities.add(new Harvester(plugin, player));
 		mAbilities.add(new SoulRend(plugin, player));
 		mClass = 7;
+		mClassName = "Warlock";
 
 		mSpecOne.mAbilities.add(new EerieEminence(plugin, player));
 		mSpecOne.mAbilities.add(new FractalEnervation(plugin, player));

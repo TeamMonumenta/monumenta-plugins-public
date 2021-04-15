@@ -103,11 +103,7 @@ public class AbilityInfo {
 		sender.sendMessage(getFormattedDescriptions());
 	}
 
-	public JsonObject getAsJsonObject() {
-		return getAsJsonObject(false);
-	}
-
-	public JsonObject getAsJsonObject(boolean fullDetails) {
+	public JsonObject toJson() {
 		JsonObject info = new JsonObject();
 		if (mScoreboardId != null) {
 			info.addProperty("scoreboardId", mScoreboardId);
@@ -115,20 +111,18 @@ public class AbilityInfo {
 		if (mLinkedSpell != null) {
 			info.addProperty("name", mLinkedSpell.getName());
 		}
-		if (fullDetails) {
-			if (mDisplayName != null) {
-				info.addProperty("displayName", mDisplayName);
+		if (mDisplayName != null) {
+			info.addProperty("displayName", mDisplayName);
+		}
+		if (mShorthandName != null) {
+			info.addProperty("shortName", mShorthandName);
+		}
+		if (mDescriptions.size() != 0) {
+			JsonArray descriptions = new JsonArray();
+			for (String strDescription : mDescriptions) {
+				descriptions.add(strDescription);
 			}
-			if (mShorthandName != null) {
-				info.addProperty("shortName", mShorthandName);
-			}
-			if (mDescriptions.size() != 0) {
-				JsonArray descriptions = new JsonArray();
-				for (String strDescription : mDescriptions) {
-					descriptions.add(strDescription);
-				}
-				info.add("descriptions", descriptions);
-			}
+			info.add("descriptions", descriptions);
 		}
 		if (mTrigger != null) {
 			info.addProperty("trigger", mTrigger.toString());

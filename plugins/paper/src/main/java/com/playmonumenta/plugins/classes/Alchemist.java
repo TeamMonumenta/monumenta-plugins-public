@@ -33,6 +33,7 @@ public class Alchemist extends PlayerClass {
 		mAbilities.add(new EnfeeblingElixir(plugin, player));
 		mAbilities.add(new AlchemicalArtillery(plugin, player));
 		mClass = 5;
+		mClassName = "Alchemist";
 
 		mSpecOne.mAbilities.add(new PurpleHaze(plugin, player));
 		mSpecOne.mAbilities.add(new ScorchedEarth(plugin, player));

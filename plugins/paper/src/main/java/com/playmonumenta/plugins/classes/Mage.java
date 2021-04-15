@@ -35,6 +35,7 @@ public class Mage extends PlayerClass {
 		mAbilities.add(new ThunderStep(plugin, player));
 		mAbilities.add(new PrismaticShield(plugin, player));
 		mClass = 1;
+		mClassName = "Mage";
 
 		mSpecOne.mAbilities.add(new AstralOmen(plugin, player));
 		mSpecOne.mAbilities.add(new SpatialShatter(plugin, player));

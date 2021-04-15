@@ -7,6 +7,7 @@ import java.util.UUID;
 import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.bosses.BossManager;
 import com.playmonumenta.plugins.bosses.spells.SpellDetectionCircle;
+import com.playmonumenta.plugins.classes.MonumentaClasses;
 import com.playmonumenta.plugins.commands.BarkifyHeldItem;
 import com.playmonumenta.plugins.commands.BossDebug;
 import com.playmonumenta.plugins.commands.BossFight;
@@ -104,6 +105,7 @@ import com.playmonumenta.plugins.spawnzone.SpawnZoneManager;
 import com.playmonumenta.plugins.timers.CooldownTimers;
 import com.playmonumenta.plugins.timers.ProjectileEffectTimers;
 import com.playmonumenta.plugins.tracking.TrackingManager;
+import com.playmonumenta.plugins.utils.FileUtils;
 import com.playmonumenta.plugins.utils.MetadataUtils;
 
 import org.bukkit.Bukkit;
@@ -394,6 +396,16 @@ public class Plugin extends JavaPlugin {
 		// Register the explosion repair mechanism if BKCommonLib is present
 		if (Bukkit.getPluginManager().isPluginEnabled("BKCommonLib")) {
 			manager.registerEvents(new RepairExplosionsListener(this), this);
+		}
+
+		// Export class/skill info
+		try {
+			String skillExportPath = getDataFolder() + File.separator + "exported_skills.json";
+			MonumentaClasses classes = new MonumentaClasses(this, (Player) null);
+			FileUtils.writeJson(skillExportPath, classes.toJson());
+		} catch (Exception e) {
+			// Failed to export skills to json, non-critical error.
+			getLogger().warning("Failed to export skills.");
 		}
 	}
 
