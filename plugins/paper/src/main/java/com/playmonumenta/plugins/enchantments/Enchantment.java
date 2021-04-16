@@ -27,6 +27,10 @@ public enum Enchantment {
 	ACUMEN(new Acumen()),
 	PERSPICACITY(new Perspicacity()),
 
+
+	//Stat tracking
+	STATTRACK(new StatTrack()),
+
 	// on hit damage
 	SHARPNESS(ChatColor.GRAY + "Sharpness", org.bukkit.enchantments.Enchantment.DAMAGE_ALL),
 	SMITE(ChatColor.GRAY + "Smite", org.bukkit.enchantments.Enchantment.DAMAGE_UNDEAD),

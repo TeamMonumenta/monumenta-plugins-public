@@ -47,6 +47,7 @@ import com.playmonumenta.plugins.commands.SkillDescription;
 import com.playmonumenta.plugins.commands.SkillSummary;
 import com.playmonumenta.plugins.commands.Spectate;
 import com.playmonumenta.plugins.commands.SpectateBot;
+import com.playmonumenta.plugins.commands.StatTrackItem;
 import com.playmonumenta.plugins.commands.TeleportAsync;
 import com.playmonumenta.plugins.commands.TeleportByScore;
 import com.playmonumenta.plugins.commands.UnsignBook;
@@ -194,6 +195,7 @@ public class Plugin extends JavaPlugin {
 		UnsignBook.register();
 		GetScoreCommand.register(this);
 		Grave.register();
+		StatTrackItem.register();
 
 		try {
 			mHttpManager = new HttpManager(this);

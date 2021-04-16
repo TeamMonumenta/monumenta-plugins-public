@@ -5,9 +5,6 @@ import java.util.List;
 
 import javax.annotation.Nullable;
 
-import com.playmonumenta.plugins.point.AreaBounds;
-import com.playmonumenta.plugins.point.Point;
-
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -18,6 +15,9 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+
+import com.playmonumenta.plugins.point.AreaBounds;
+import com.playmonumenta.plugins.point.Point;
 
 import dev.jorel.commandapi.CommandAPI;
 import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
@@ -216,7 +216,9 @@ public class CommandUtils {
 		item.setItemMeta(meta);
 		item = ItemUtils.setPlainLore(item);
 
-		sender.sendMessage("Succesfully added " + enchantment + " to player's held item");
+		if (sender != null) {
+			sender.sendMessage("Successfully added " + enchantment + " to player's held item");
+		}
 	}
 
 	public static void deEnchantifyHeldItem(CommandSender sender, Player player, String enchantment) throws WrapperCommandSyntaxException {

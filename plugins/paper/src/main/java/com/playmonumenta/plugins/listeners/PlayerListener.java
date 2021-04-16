@@ -1,7 +1,6 @@
 package com.playmonumenta.plugins.listeners;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
@@ -25,7 +24,6 @@ import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Animals;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.Item;
 import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -109,7 +107,6 @@ import com.playmonumenta.plugins.enchantments.Decay;
 import com.playmonumenta.plugins.enchantments.Duelist;
 import com.playmonumenta.plugins.enchantments.Frost;
 import com.playmonumenta.plugins.enchantments.HexEater;
-import com.playmonumenta.plugins.enchantments.Hope;
 import com.playmonumenta.plugins.enchantments.IceAspect;
 import com.playmonumenta.plugins.enchantments.Inferno;
 import com.playmonumenta.plugins.enchantments.PointBlank;
@@ -117,6 +114,8 @@ import com.playmonumenta.plugins.enchantments.RegionScalingDamageDealt;
 import com.playmonumenta.plugins.enchantments.Slayer;
 import com.playmonumenta.plugins.enchantments.Sniper;
 import com.playmonumenta.plugins.enchantments.Spark;
+import com.playmonumenta.plugins.enchantments.StatTrack.StatTrackOptions;
+import com.playmonumenta.plugins.enchantments.StatTrackManager;
 import com.playmonumenta.plugins.enchantments.Thunder;
 import com.playmonumenta.plugins.enchantments.evasions.EvasionInfo;
 import com.playmonumenta.plugins.enchantments.infusions.Focus;
@@ -133,7 +132,6 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.GraveUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
-import com.playmonumenta.plugins.utils.ItemUtils.ItemDeathResult;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
@@ -701,6 +699,8 @@ public class PlayerListener implements Listener {
 
 		if (event.getItem().containsEnchantment(Enchantment.ARROW_INFINITE)) {
 			event.setReplacement(event.getItem());
+			//Stat tracker for consuming infinity items
+			StatTrackManager.incrementStat(event.getItem(), player, StatTrackOptions.TIMES_CONSUMED, 1);
 		}
 		mPlugin.mTrackingManager.mPlayers.onConsume(mPlugin, player, event);
 
