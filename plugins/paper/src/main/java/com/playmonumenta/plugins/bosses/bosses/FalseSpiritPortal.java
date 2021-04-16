@@ -260,6 +260,13 @@ public class FalseSpiritPortal extends BossAbilityGroup {
 							mMobs.remove(mob);
 
 							if (!mob.isDead() || mob.isValid()) {
+								List<Entity> passengers = mob.getPassengers();
+
+								//Passengers do not teleport, have to be manually removed
+								for (Entity passenger : passengers) {
+									passenger.remove();
+								}
+
 								mob.remove();
 							}
 						}
@@ -343,12 +350,13 @@ public class FalseSpiritPortal extends BossAbilityGroup {
 					if (e instanceof LivingEntity && e.getLocation().getY() <= 7) {
 						Location loc = mGates.get(FastUtils.RANDOM.nextInt(mGates.size())).getLocation();
 						List<Entity> passengers = e.getPassengers();
-						e.teleport(loc);
 
-						//Passengers do not teleport, have to be manually moved (and gets disconnected)
+						//Passengers do not teleport, have to be manually removed
 						for (Entity passenger : passengers) {
-							passenger.teleport(loc);
+							passenger.remove();
 						}
+
+						e.teleport(loc);
 					}
 				}
 			}
