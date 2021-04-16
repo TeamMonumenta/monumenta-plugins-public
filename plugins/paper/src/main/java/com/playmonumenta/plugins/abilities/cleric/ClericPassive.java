@@ -25,9 +25,9 @@ public class ClericPassive extends Ability {
 	private static final int HEAL_INTERVAL = 20 * 5;
 	private static final double PERCENT_HEAL = 0.05;
 	private static final double HEALTH_LIMIT = 0.5;
-	
+
 	private static final String PERCENT_HEAL_EFFECT_NAME = "ThuribleProcessionPercentHealEffect";
-	
+
 	private static final Map<UUID, Integer> LAST_HEAL_TICK = new HashMap<>();
 
 	private int mTimer = 0;
@@ -42,7 +42,7 @@ public class ClericPassive extends Ability {
 	}
 
 	@Override
-	public void periodicTrigger(boolean fourHertz, boolean twoHertz, boolean oneSecond, int ticks) {
+	public void periodicTrigger(boolean twoHertz, boolean oneSecond, int ticks) {
 		if (oneSecond && !mPlayer.isDead()) {
 			mTimer += 20;
 			if (mTimer % HEAL_INTERVAL == 0) {
@@ -51,7 +51,7 @@ public class ClericPassive extends Ability {
 					if (player.getScoreboardTags().contains("disable_class") || AbilityManager.getManager().isPvPEnabled(player)) {
 						continue;
 					}
-					
+
 					double healPercent = PERCENT_HEAL;
 					NavigableSet<Effect> effectGroup = mPlugin.mEffectManager.getEffects(player, PERCENT_HEAL_EFFECT_NAME);
 					if (effectGroup != null) {

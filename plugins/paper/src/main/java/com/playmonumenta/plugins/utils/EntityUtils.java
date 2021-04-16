@@ -1318,4 +1318,17 @@ public class EntityUtils {
 		}
 	}
 
+	// Adds part or all of y height above feet location, based on multiplier. Player height 1.8, player sneaking height 1.5.
+	public static Location getHeightLocation(Entity entity, double heightMultiplier) {
+		return entity.getLocation().add(0, entity.getHeight() * heightMultiplier, 0);
+	}
+
+	public static Location getHalfHeightLocation(Entity entity) {
+		return getHeightLocation(entity, 0.5);
+	}
+
+	// Player eye height 1.62 when not sneaking.
+	public static Location getHalfEyeLocation(LivingEntity entity) {
+		return entity.getLocation().add(0, entity.getEyeHeight() / 2, 0);
+	}
 }

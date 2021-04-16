@@ -116,7 +116,7 @@ public class ElementalSpiritFire extends Ability {
 						double farthestDistanceSquared = 0;
 
 						for (LivingEntity enemy : mEnemiesAffected) {
-							if (enemy.isValid()) { // If not dead or has despawned
+							if (enemy.isValid()) { // If neither dead nor despawned
 								double distanceSquared = playerLocation.distanceSquared(enemy.getLocation());
 								if (distanceSquared > farthestDistanceSquared) {
 									farthestEnemy = enemy;
@@ -183,7 +183,7 @@ public class ElementalSpiritFire extends Ability {
 	}
 
 	@Override
-	public void periodicTrigger(boolean fourHertz, boolean twoHertz, boolean oneSecond, int ticks) {
+	public void periodicTrigger(boolean twoHertz, boolean oneSecond, int ticks) {
 		if (mPlayerParticlesGenerator == null) {
 			mPlayerParticlesGenerator = new BukkitRunnable() {
 				double mVerticalAngle = 0;

@@ -117,7 +117,7 @@ public class CloakAndDagger extends Ability implements KillTriggeredAbility {
 	}
 
 	@Override
-	public void periodicTrigger(boolean fourHertz, boolean twoHertz, boolean oneSecond, int ticks) {
+	public void periodicTrigger(boolean twoHertz, boolean oneSecond, int ticks) {
 		if (mActive) {
 			if (!AbilityUtils.isStealthed(mPlayer)) {
 				mActive = false;

@@ -127,7 +127,7 @@ public class MeteorSlam extends Ability {
 					return;
 				}
 
-				if (!((Entity)player).isOnGround()) {
+				if (!player.isOnGround()) {
 					updateFallFrom(); // Vanilla fall distance would be 0 if on ground
 				} else {
 					// Currently on ground

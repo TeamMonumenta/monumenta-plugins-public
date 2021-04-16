@@ -19,6 +19,7 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.event.player.PlayerItemDamageEvent;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.NotNull;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
@@ -206,7 +207,7 @@ public interface BaseEnchantment {
 		return false;
 	}
 
-	default void onSpawn(Plugin plugin, Item item, int level) {
+	default void onSpawn(Plugin plugin, @NotNull Item item, int level) {
 
 	}
 

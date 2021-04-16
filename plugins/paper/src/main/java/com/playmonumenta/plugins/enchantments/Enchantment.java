@@ -110,7 +110,6 @@ public enum Enchantment {
 	BARKING(new Barking()),
 	ETHERAL(new Ethereal()),
 	STYLISH(new Stylish()),
-	COLORFUL(new Colorful()),
 	FESTIVE(new Festive()),
 	DIVINE_AURA(new DivineAura()),
 	GILDED(new Gilded()),
@@ -218,7 +217,6 @@ public enum Enchantment {
 			case STYLISH:
 			case CLOAKING:
 			case CLUCKING:
-			case COLORFUL:
 			case INFINITY:
 			case DARKSIGHT:
 			case INTUITION:

@@ -88,7 +88,7 @@ public class Rampage extends Ability {
 	}
 
 	@Override
-	public void periodicTrigger(boolean fourHertz, boolean twoHertz, boolean oneSecond, int ticks) {
+	public void periodicTrigger(boolean twoHertz, boolean oneSecond, int ticks) {
 		if (mStacks > 0) {
 			mTimeToStackDecay += 5;
 
@@ -153,4 +153,3 @@ public class Rampage extends Ability {
 	}
 
 }
-

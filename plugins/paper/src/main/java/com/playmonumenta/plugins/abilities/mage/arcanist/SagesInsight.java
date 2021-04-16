@@ -27,14 +27,14 @@ public class SagesInsight extends Ability {
 	private static final String ATTR_NAME = "SagesExtraSpeedAttr";
 	private static final int ABILITIES_COUNT_1 = 2;
 	private static final int ABILITIES_COUNT_2 = 3;
-	
+
 	private static final float[] PITCHES = {1.6f, 1.8f, 1.6f, 1.8f, 2f};
 	private static final Particle.DustOptions COLOR = new Particle.DustOptions(Color.fromRGB(222, 219, 36), 1.0f);
 
 	private final int mResetSize;
 	private Spells[] mResets;
 	private final double mSpeed;
-	
+
 	private HashMap<Spells, Boolean> mStacksMap;
 
 	public SagesInsight(Plugin plugin, Player player) {
@@ -55,7 +55,7 @@ public class SagesInsight extends Ability {
 	private int mArraySize = 0;
 
 	@Override
-	public void periodicTrigger(boolean fourHertz, boolean twoHertz, boolean oneSecond, int ticks) {
+	public void periodicTrigger(boolean twoHertz, boolean oneSecond, int ticks) {
 		if (mStacks > 0) {
 			mTicksToStackDecay -= 5;
 
@@ -66,7 +66,7 @@ public class SagesInsight extends Ability {
 			}
 		}
 	}
-	
+
 	@Override
 	public void playerDealtCustomDamageEvent(CustomDamageEvent event) {
 		Spells spell = event.getSpell();
@@ -94,7 +94,7 @@ public class SagesInsight extends Ability {
 							}
 						}.runTaskLater(mPlugin, i);
 					}
-					
+
 					mStacks = 0;
 					mArraySize = 0;
 					for (Spells s : mResets) {
@@ -108,7 +108,7 @@ public class SagesInsight extends Ability {
 			}
 		}
 	}
-	
+
 	@Override
 	public boolean abilityCastEvent(AbilityCastEvent event) {
 		Spells cast = event.getAbility();

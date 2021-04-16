@@ -82,7 +82,7 @@ public class ThuribleProcession extends Ability {
 	}
 
 	@Override
-	public void periodicTrigger(boolean fourHertz, boolean twoHertz, boolean oneSecond, int ticks) {
+	public void periodicTrigger(boolean twoHertz, boolean oneSecond, int ticks) {
 		List<Player> players = PlayerUtils.playersInRange(mPlayer, THURIBLE_RADIUS, true);
 		if (!canCast()) {
 			return;

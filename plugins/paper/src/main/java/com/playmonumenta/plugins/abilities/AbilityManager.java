@@ -8,33 +8,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import org.bukkit.GameMode;
-import org.bukkit.Material;
-import org.bukkit.attribute.Attribute;
-import org.bukkit.attribute.AttributeInstance;
-import org.bukkit.attribute.AttributeModifier;
-import org.bukkit.entity.AbstractArrow;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
-import org.bukkit.entity.Projectile;
-import org.bukkit.entity.ThrownPotion;
-import org.bukkit.event.block.Action;
-import org.bukkit.event.block.BlockBreakEvent;
-import org.bukkit.event.entity.EntityCombustByEntityEvent;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
-import org.bukkit.event.entity.EntityDeathEvent;
-import org.bukkit.event.entity.EntityTargetLivingEntityEvent;
-import org.bukkit.event.entity.PlayerDeathEvent;
-import org.bukkit.event.entity.PotionSplashEvent;
-import org.bukkit.event.entity.ProjectileHitEvent;
-import org.bukkit.event.player.PlayerAnimationEvent;
-import org.bukkit.event.player.PlayerItemConsumeEvent;
-import org.bukkit.event.player.PlayerItemDamageEvent;
-import org.bukkit.event.player.PlayerSwapHandItemsEvent;
-import org.bukkit.inventory.ItemStack;
-
 import com.google.gson.JsonElement;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.alchemist.Bezoar;
@@ -102,10 +75,10 @@ import com.playmonumenta.plugins.abilities.mage.elementalist.ElementalSpiritFire
 import com.playmonumenta.plugins.abilities.mage.elementalist.ElementalSpiritIce;
 import com.playmonumenta.plugins.abilities.mage.elementalist.Starfall;
 import com.playmonumenta.plugins.abilities.other.CluckingPotions;
-import com.playmonumenta.plugins.abilities.other.PatreonGreen;
-import com.playmonumenta.plugins.abilities.other.PatreonPurple;
-import com.playmonumenta.plugins.abilities.other.PatreonRed;
-import com.playmonumenta.plugins.abilities.other.PatreonWhite;
+import com.playmonumenta.plugins.abilities.other.PatronGreen;
+import com.playmonumenta.plugins.abilities.other.PatronPurple;
+import com.playmonumenta.plugins.abilities.other.PatronRed;
+import com.playmonumenta.plugins.abilities.other.PatronWhite;
 import com.playmonumenta.plugins.abilities.other.PvP;
 import com.playmonumenta.plugins.abilities.rogue.AdvancingShadows;
 import com.playmonumenta.plugins.abilities.rogue.ByMyBlade;
@@ -180,6 +153,35 @@ import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MetadataUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 
+import org.bukkit.GameMode;
+import org.bukkit.Material;
+import org.bukkit.attribute.Attribute;
+import org.bukkit.attribute.AttributeInstance;
+import org.bukkit.attribute.AttributeModifier;
+import org.bukkit.entity.AbstractArrow;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
+import org.bukkit.entity.ThrownPotion;
+import org.bukkit.event.block.Action;
+import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.entity.EntityCombustByEntityEvent;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
+import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.event.entity.EntityTargetLivingEntityEvent;
+import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.entity.PotionSplashEvent;
+import org.bukkit.event.entity.ProjectileHitEvent;
+import org.bukkit.event.player.PlayerAnimationEvent;
+import org.bukkit.event.player.PlayerItemConsumeEvent;
+import org.bukkit.event.player.PlayerItemDamageEvent;
+import org.bukkit.event.player.PlayerSwapHandItemsEvent;
+import org.bukkit.inventory.ItemStack;
+
+
+
 public class AbilityManager {
 
 	private static final String CLICK_TICK_METAKEY = "ClickedThisTickMetakey";
@@ -225,10 +227,10 @@ public class AbilityManager {
 
 			// All other non-class abilities
 			new PvP(mPlugin, null),
-			new PatreonWhite(mPlugin, null),
-			new PatreonGreen(mPlugin, null),
-			new PatreonPurple(mPlugin, null),
-			new PatreonRed(mPlugin, null),
+			new PatronWhite(mPlugin, null),
+			new PatronGreen(mPlugin, null),
+			new PatronPurple(mPlugin, null),
+			new PatronRed(mPlugin, null),
 
 			//********** MAGE **********//
 			new ArcaneStrike(mPlugin, null),
@@ -727,8 +729,8 @@ public class AbilityManager {
 		conditionalCast(player, (ability) -> ability.playerHitByProjectileEvent(event));
 	}
 
-	public void periodicTrigger(Player player, boolean fourHertz, boolean twoHertz, boolean oneSecond, int ticks) {
-		conditionalCast(player, (ability) -> ability.periodicTrigger(fourHertz, twoHertz, oneSecond, ticks));
+	public void periodicTrigger(Player player, boolean twoHertz, boolean oneSecond, int ticks) {
+		conditionalCast(player, (ability) -> ability.periodicTrigger(twoHertz, oneSecond, ticks));
 	}
 
 	public void playerDealtCustomDamageEvent(Player player, CustomDamageEvent event) {

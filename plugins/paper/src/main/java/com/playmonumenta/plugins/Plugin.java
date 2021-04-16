@@ -322,18 +322,16 @@ public class Plugin extends JavaPlugin {
 					}
 				}
 
+				//  4 times a second.
 				if (fourHertz) {
 					for (Player player : mTrackingManager.mPlayers.getPlayers()) {
 						try {
-							mAbilityManager.periodicTrigger(player, fourHertz, twoHertz, oneHertz, mTicks);
+							mAbilityManager.periodicTrigger(player, twoHertz, oneHertz, mTicks);
 						} catch (Exception e) {
 							e.printStackTrace();
 						}
 					}
-				}
 
-				//  4 times a second.
-				if (fourHertz) {
 					try {
 						mTrackingManager.update(Constants.QUARTER_TICKS_PER_SECOND);
 					} catch (Exception e) {

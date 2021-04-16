@@ -14,13 +14,15 @@ import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.Particle;
 import org.bukkit.attribute.Attribute;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityRegainHealthEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 
 
@@ -69,7 +71,7 @@ public class PlayerUtils {
 		return playersInRange(player, radius, includeSourcePlayer, false);
 	}
 
-	public static List<Player> playersInRange(Player player, double radius, boolean includeSourcePlayer, boolean includeNonTargetable) {
+	public static List<Player> playersInRange(@NotNull Player player, @NotNull double radius, @NotNull boolean includeSourcePlayer, @NotNull boolean includeNonTargetable) {
 		List<Player> players = playersInRange(player.getLocation(), radius, includeNonTargetable);
 		if (!includeSourcePlayer) {
 			players.removeIf(p -> (p == player));
@@ -135,13 +137,177 @@ public class PlayerUtils {
 		// Accounts for all climbables including 1.16 vines & scaffolding
 		boolean playerInClimbable = MaterialSetTag.CLIMBABLE.isTagged(playerFeetMaterial);
 
-		// Use Entity#isOnGround() value calculated by the server
-		// instead of deprecated Player#isOnGround() where value is controlled by the client.
-		boolean playerOnGround = ((Entity)player).isOnGround();
-
 		return (
 			!playerInClimbable
-			&& !playerOnGround
+			&& !player.isOnGround()
 		);
+	}
+
+	public static boolean isNoSelfParticles(@Nullable Player player) {
+		if (player == null) {
+			return false;
+		}
+		return player.getScoreboardTags().contains("noSelfParticles");
+	}
+
+	public static void spawnHideableParticles(
+		boolean noSelfParticles,
+		@NotNull Player player,
+		@NotNull Particle particle,
+		@NotNull Location location,
+		int count,
+		double offset,
+		double extra
+	) {
+		spawnHideableParticles(
+			noSelfParticles,
+			player,
+			particle,
+			location,
+			count,
+			offset,
+			offset,
+			offset,
+			extra
+		);
+	}
+
+	public static <T> void spawnHideableParticles(
+		boolean noSelfParticles,
+		@NotNull Player player,
+		@NotNull Particle particle,
+		@NotNull Location location,
+		int count,
+		double offset,
+		T data
+	) {
+		spawnHideableParticles(
+			noSelfParticles,
+			player,
+			particle,
+			location,
+			count,
+			offset,
+			offset,
+			offset,
+			data
+		);
+	}
+
+	public static <T> void spawnHideableParticles(
+		boolean noSelfParticles,
+		@NotNull Player player,
+		@NotNull Particle particle,
+		@NotNull Location location,
+		int count,
+		double offset,
+		double extra,
+		T data
+	) {
+		spawnHideableParticles(
+			noSelfParticles,
+			player,
+			particle,
+			location,
+			count,
+			offset,
+			offset,
+			offset,
+			extra,
+			data
+		);
+	}
+
+	public static void spawnHideableParticles(
+		boolean noSelfParticles,
+		@NotNull Player player,
+		@NotNull Particle particle,
+		@NotNull Location location,
+		int count,
+		double offsetX,
+		double offsetY,
+		double offsetZ,
+		double extra
+	) {
+		spawnHideableParticles(
+			noSelfParticles,
+			player,
+			particle,
+			location,
+			count,
+			offsetX,
+			offsetY,
+			offsetZ,
+			extra,
+			null
+		);
+	}
+
+	public static <T> void spawnHideableParticles(
+		boolean noSelfParticles,
+		@NotNull Player player,
+		@NotNull Particle particle,
+		@NotNull Location location,
+		int count,
+		double offsetX,
+		double offsetY,
+		double offsetZ,
+		T data
+	) {
+		spawnHideableParticles(
+			noSelfParticles,
+			player,
+			particle,
+			location,
+			count,
+			offsetX,
+			offsetY,
+			offsetZ,
+			1, // Default extra is 1 - https://hub.spigotmc.org/stash/projects/SPIGOT/repos/craftbukkit/browse/src/main/java/org/bukkit/craftbukkit/CraftWorld.java#2284
+			data
+		);
+	}
+
+	// Player width 0.6, offset goes both positive & negative direction
+	public static <T> void spawnHideableParticles(
+		boolean noSelfParticles,
+		@NotNull Player player,
+		@NotNull Particle particle,
+		@NotNull Location location,
+		int count,
+		double offsetX,
+		double offsetY,
+		double offsetZ,
+		double extra,
+		@Nullable T data
+	) {
+		if (noSelfParticles) {
+			for (Player otherPlayer : playersInRange(player, 30, false)) {
+				// For each other nearby player, do random offset spawn just for them
+				// This way, the source player cannot see them
+				otherPlayer.spawnParticle(
+					particle,
+					location,
+					count,
+					offsetX,
+					offsetY,
+					offsetZ,
+					extra,
+					data
+				);
+			}
+		} else {
+			// Else just spawn particle for everyone
+			player.getWorld().spawnParticle(
+				particle,
+				location,
+				count,
+				offsetX,
+				offsetY,
+				offsetZ,
+				extra,
+				data
+			);
+		}
 	}
 }

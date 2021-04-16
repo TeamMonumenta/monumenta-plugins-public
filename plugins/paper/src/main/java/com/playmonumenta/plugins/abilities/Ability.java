@@ -22,6 +22,7 @@ import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.event.player.PlayerItemDamageEvent;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.Nullable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.classes.Spells;
@@ -39,7 +40,7 @@ public abstract class Ability {
 	protected final Player mPlayer;
 	private Integer mScore = null;
 
-	public Ability(Plugin plugin, Player player, String displayName) {
+	public Ability(Plugin plugin, @Nullable Player player, String displayName) {
 		mPlugin = plugin;
 		mPlayer = player;
 		mInfo = new AbilityInfo();
@@ -271,7 +272,8 @@ public abstract class Ability {
 		return false;
 	}
 
-	public void periodicTrigger(boolean fourHertz, boolean twoHertz, boolean oneSecond, int ticks) {
+	// Called by Plugin every 5 ticks (4Hz), same as BaseEnchantment.tick()
+	public void periodicTrigger(boolean twoHertz, boolean oneSecond, int ticks) {
 
 	}
 
