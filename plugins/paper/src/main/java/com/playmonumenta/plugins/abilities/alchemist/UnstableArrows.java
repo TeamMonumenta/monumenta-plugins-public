@@ -26,12 +26,13 @@ import com.playmonumenta.plugins.utils.ZoneUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
 
 public class UnstableArrows extends Ability {
-	private static final int UNSTABLE_ARROWS_COOLDOWN = 16 * 20;
+	private static final int UNSTABLE_ARROWS_1_COOLDOWN = 20 * 20;
+	private static final int UNSTABLE_ARROWS_2_COOLDOWN = 16 * 20;
 	private static final int UNSTABLE_ARROWS_DURATION = 3 * 20;
 	private static final int UNSTABLE_ARROWS_PARTICLE_PERIOD = 3;
 	private static final float UNSTABLE_ARROWS_KNOCKBACK_SPEED = 2.5f;
-	private static final int UNSTABLE_ARROWS_1_DAMAGE = 15;
-	private static final int UNSTABLE_ARROWS_2_DAMAGE = 24;
+	private static final double UNSTABLE_ARROWS_1_DAMAGE = 12.0;
+	private static final double UNSTABLE_ARROWS_2_DAMAGE = 20.0;
 	private static final int UNSTABLE_ARROWS_RADIUS = 4;
 
 	private AbstractArrow mUnstableArrow = null;
@@ -41,12 +42,12 @@ public class UnstableArrows extends Ability {
 		mInfo.mLinkedSpell = Spells.UNSTABLE_ARROWS;
 		mInfo.mScoreboardId = "BombArrow";
 		mInfo.mShorthandName = "UA";
-		mInfo.mDescriptions.add("When you crouch and fire an arrow it will begin to hiss on landing. 3s later it explodes, dealing 15 damage to mobs within a four block radius. If you have skill points in Basilisk Poison enemies caught in the explosion will be affected by it. Cooldown: 16 seconds. You can toggle whether the explosion will apply knockback to you or not in the P.E.B.");
-		mInfo.mDescriptions.add("The damage is increased to 24");
+		mInfo.mDescriptions.add(" When you crouch and fire an arrow it will begin to hiss upon landing. 3s later it explodes, dealing 12 damage to mobs within a four block radius and spawning an Alchemist Potion at the location. Cooldown: 20 seconds. You can toggle whether the explosion will apply knockback to you or not in the P.E.B.");
+		mInfo.mDescriptions.add("The damage is increased to 20 and the cooldown is reduced to 16s.");
 		if (player != null && ScoreboardUtils.getScoreboardValue(player, "RocketJumper") == 9001) {
 			mInfo.mCooldown = 0;
 		} else {
-			mInfo.mCooldown = UNSTABLE_ARROWS_COOLDOWN;
+			mInfo.mCooldown = getAbilityScore() == 1 ? UNSTABLE_ARROWS_1_COOLDOWN : UNSTABLE_ARROWS_2_COOLDOWN;
 		}
 	}
 
@@ -81,16 +82,18 @@ public class UnstableArrows extends Ability {
 							world.spawnParticle(Particle.FLAME, mLoc, 115, 0.02, 0.02, 0.02, 0.2);
 							world.spawnParticle(Particle.SMOKE_LARGE, mLoc, 40, 0.02, 0.02, 0.02, 0.35);
 							world.spawnParticle(Particle.EXPLOSION_NORMAL, mLoc, 40, 0.02, 0.02, 0.02, 0.35);
-							BasiliskPoison bp = AbilityManager.getManager().getPlayerAbility(mPlayer, BasiliskPoison.class);
 
-							int baseDamage = (getAbilityScore() == 1) ? UNSTABLE_ARROWS_1_DAMAGE : UNSTABLE_ARROWS_2_DAMAGE;
+							double baseDamage = (getAbilityScore() == 1) ? UNSTABLE_ARROWS_1_DAMAGE : UNSTABLE_ARROWS_2_DAMAGE;
+							AlchemistPotions ap = AbilityManager.getManager().getPlayerAbility(mPlayer, AlchemistPotions.class);
+							double potDamage = ap.getDamage();
 
 							for (LivingEntity mob : EntityUtils.getNearbyMobs(mLoc, UNSTABLE_ARROWS_RADIUS, mPlayer)) {
-								EntityUtils.damageEntity(mPlugin, mob, baseDamage, mPlayer, MagicType.ALCHEMY, true, mInfo.mLinkedSpell);
-								MovementUtils.knockAwayRealistic(mLoc, mob, UNSTABLE_ARROWS_KNOCKBACK_SPEED, 0.5f);
-								if (bp != null) {
-									bp.apply(mob);
+								EntityUtils.damageEntity(mPlugin, mob, baseDamage + potDamage, mPlayer, MagicType.ALCHEMY, true, mInfo.mLinkedSpell);
+								if (ap != null) {
+									ap.apply(mob);
 								}
+
+								MovementUtils.knockAwayRealistic(mLoc, mob, UNSTABLE_ARROWS_KNOCKBACK_SPEED, 0.5f);
 							}
 
 							// Custom knockback function because this is unreliable as is with weird arrow location calculations

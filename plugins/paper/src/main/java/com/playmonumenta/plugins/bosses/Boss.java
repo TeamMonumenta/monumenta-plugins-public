@@ -24,6 +24,7 @@ import com.playmonumenta.plugins.bosses.bosses.BossAbilityGroup;
 import com.playmonumenta.plugins.bosses.events.SpellCastEvent;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.events.CustomEffectApplyEvent;
+import com.playmonumenta.plugins.utils.EntityUtils;
 
 public class Boss {
 	private final Plugin mPlugin;
@@ -171,6 +172,10 @@ public class Boss {
 	}
 
 	public void bossCastAbility(SpellCastEvent event) {
+		if (EntityUtils.isSilenced(event.getBoss())) {
+			event.setCancelled(true);
+			return;
+		}
 		for (BossAbilityGroup ability : mAbilities) {
 			ability.bossCastAbility(event);
 			if (ability.getPassives() != null && !ability.getPassives().isEmpty()) {
@@ -220,6 +225,15 @@ public class Boss {
 	public void bossConfused() {
 		for (BossAbilityGroup ability : mAbilities) {
 			ability.bossConfused();
+		}
+	}
+
+	/*
+	 * Boss was silenced by a player. Mobs with the "Boss" tag can't be silenced
+	 */
+	public void bossSilenced() {
+		for (BossAbilityGroup ability : mAbilities) {
+			ability.bossSilenced();
 		}
 	}
 

@@ -41,6 +41,17 @@ public class MultipleChargeAbility extends Ability {
 		return false;
 	}
 
+	protected boolean incrementCharge() {
+		if (mCharges < mMaxCharges) {
+			mCharges++;
+			MessagingUtils.sendActionBarMessage(mPlayer, mInfo.mLinkedSpell.getName() + " Charges: " + mCharges);
+
+			return true;
+		}
+
+		return false;
+	}
+
 	// This must be manually called if PeriodicTrigger is overridden by the superclass
 	protected void manageChargeCooldowns() {
 		boolean onCooldown = mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.mLinkedSpell);

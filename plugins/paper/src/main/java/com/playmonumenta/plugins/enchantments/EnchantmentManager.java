@@ -31,7 +31,8 @@ import com.playmonumenta.plugins.abilities.rogue.ByMyBlade.ByMyBladeCooldownEnch
 import com.playmonumenta.plugins.abilities.rogue.Dodging.DodgingCooldownEnchantment;
 import com.playmonumenta.plugins.abilities.scout.Volley.VolleyCooldownEnchantment;
 import com.playmonumenta.plugins.abilities.warlock.AmplifyingHex.AmplifyingHexCooldownEnchantment;
-import com.playmonumenta.plugins.abilities.warlock.ConsumingFlames.ConsumingFlamesCooldownEnchantment;
+import com.playmonumenta.plugins.abilities.warlock.AmplifyingHex.AmplifyingHexDamageEnchantment;
+import com.playmonumenta.plugins.abilities.warlock.CholericFlames.CholericFlamesCooldownEnchantment;
 import com.playmonumenta.plugins.abilities.warrior.BruteForce.BruteForceDamageEnchantment;
 import com.playmonumenta.plugins.abilities.warrior.ShieldBash.ShieldBashCooldownEnchantment;
 import com.playmonumenta.plugins.abilities.warrior.ShieldBash.ShieldBashDamageEnchantment;
@@ -143,9 +144,9 @@ public class EnchantmentManager implements Listener {
 		init.add(new EnfeeblingElixirCooldownEnchantment());
 
 		//Warlock
-		//init.add(new AmplifyingHexDamageEnchantment());
+		init.add(new AmplifyingHexDamageEnchantment());
 		init.add(new AmplifyingHexCooldownEnchantment());
-		init.add(new ConsumingFlamesCooldownEnchantment());
+		init.add(new CholericFlamesCooldownEnchantment());
 
 
 		// Tesseracts (not actually items a player can get enchants from)

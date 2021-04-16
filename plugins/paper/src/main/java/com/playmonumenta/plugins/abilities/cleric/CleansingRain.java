@@ -2,16 +2,6 @@ package com.playmonumenta.plugins.abilities.cleric;
 
 import java.util.EnumSet;
 
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.abilities.AbilityTrigger;
-import com.playmonumenta.plugins.classes.Spells;
-import com.playmonumenta.plugins.enchantments.BaseAbilityEnchantment;
-import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
-import com.playmonumenta.plugins.potion.PotionManager.PotionID;
-import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.plugins.utils.PotionUtils;
-
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -23,6 +13,15 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.abilities.AbilityTrigger;
+import com.playmonumenta.plugins.classes.Spells;
+import com.playmonumenta.plugins.enchantments.BaseAbilityEnchantment;
+import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
+import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.utils.PotionUtils;
+import com.playmonumenta.plugins.effects.PercentDamageReceived;
 
 
 public class CleansingRain extends Ability {
@@ -39,13 +38,14 @@ public class CleansingRain extends Ability {
 	}
 
 	private static final int CLEANSING_DURATION = 15 * 20;
-	private static final int CLEANSING_RESIST_LEVEL = 0;
+	private static final double PERCENT_DAMAGE_RESIST = -0.2;
 	private static final int CLEANSING_EFFECT_DURATION = 3 * 20;
 	private static final int CLEANSING_APPLY_PERIOD = 1;
 	private static final int CLEANSING_RADIUS = 4;
 	private static final int CLEANSING_1_COOLDOWN = 45 * 20;
 	private static final int CLEANSING_2_COOLDOWN = 30 * 20;
 	private static final int ANGLE = -45; // Looking straight up is -90. This is 45 degrees of pitch allowance
+	private static final String PERCENT_DAMAGE_RESIST_EFFECT_NAME = "CleansingPercentDamageResistEffect";
 
 	public CleansingRain(Plugin plugin, Player player) {
 		super(plugin, player, "Cleansing Rain");
@@ -53,7 +53,7 @@ public class CleansingRain extends Ability {
 		mInfo.mScoreboardId = "Cleansing";
 		mInfo.mShorthandName = "CR";
 		mInfo.mDescriptions.add("Right click while sneaking and looking upwards to summon a \"cleansing rain\" that follows you, removing negative effects from players within 4 blocks, including yourself, and lasts for 15 seconds. (Cooldown: 45 seconds)");
-		mInfo.mDescriptions.add("Additionally grants Resistance I. Cooldown: 30s.");
+		mInfo.mDescriptions.add("Additionally grants 20% Damage Reduction to all players in the radius. Cooldown: 30s.");
 		mInfo.mCooldown = getAbilityScore() == 1 ? CLEANSING_1_COOLDOWN : CLEANSING_2_COOLDOWN;
 		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
 	}
@@ -87,7 +87,7 @@ public class CleansingRain extends Ability {
 					}
 
 					if (cleansing > 1) {
-						mPlugin.mPotionManager.addPotion(player, PotionID.APPLIED_POTION, new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, CLEANSING_EFFECT_DURATION, CLEANSING_RESIST_LEVEL, true, true));
+						mPlugin.mEffectManager.addEffect(player, PERCENT_DAMAGE_RESIST_EFFECT_NAME, new PercentDamageReceived(CLEANSING_EFFECT_DURATION, PERCENT_DAMAGE_RESIST));
 					}
 				}
 

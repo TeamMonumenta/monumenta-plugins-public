@@ -87,7 +87,7 @@ public class AlchemistPotions extends Ability implements KillTriggeredAbility {
 					classAbilities[4] = AbilityManager.getManager().getPlayerAbility(mPlayer, PowerInjection.class);
 					classAbilities[5] = AbilityManager.getManager().getPlayerAbility(mPlayer, UnstableArrows.class);
 					classAbilities[6] = AbilityManager.getManager().getPlayerAbility(mPlayer, EnfeeblingElixir.class);
-					classAbilities[7] = AbilityManager.getManager().getPlayerAbility(mPlayer, AlchemicalArtillery.class);
+					classAbilities[7] = AbilityManager.getManager().getPlayerAbility(mPlayer, Bezoar.class);
 					specializationAbilities[0] = AbilityManager.getManager().getPlayerAbility(mPlayer, PurpleHaze.class);
 					specializationAbilities[1] = AbilityManager.getManager().getPlayerAbility(mPlayer, NightmarishAlchemy.class);
 					specializationAbilities[2] = AbilityManager.getManager().getPlayerAbility(mPlayer, ScorchedEarth.class);
@@ -197,6 +197,10 @@ public class AlchemistPotions extends Ability implements KillTriggeredAbility {
 	@Override
 	public void triggerOnKill(LivingEntity mob) {
 		AbilityUtils.addAlchemistPotions(mPlayer, FastUtils.RANDOM.nextDouble() < EXTRA_POTION_CHANCE ? 2 : 1);
+	}
+
+	public double getDamage() {
+		return mDamage;
 	}
 
 }

@@ -51,10 +51,10 @@ import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.event.world.ChunkUnloadEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
-import org.bukkit.plugin.Plugin;
 import org.bukkit.projectiles.ProjectileSource;
 
 import com.destroystokyo.paper.event.entity.EntityPathfindEvent;
+import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.bosses.bosses.*;
 import com.playmonumenta.plugins.bosses.bosses.gray.GrayBookSummoner;
 import com.playmonumenta.plugins.bosses.bosses.gray.GrayDemonSummoner;
@@ -673,7 +673,7 @@ public class BossManager implements Listener {
 	public void spellCastEvent(SpellCastEvent event) {
 		LivingEntity boss = event.getBoss();
 		Boss b = mBosses.get(boss.getUniqueId());
-		if (b != null) {
+		if (b != null && !EntityUtils.isSilenced(boss)) {
 			b.bossCastAbility(event);
 		}
 	}
@@ -728,6 +728,15 @@ public class BossManager implements Listener {
 		Boss boss = mBosses.get(entity.getUniqueId());
 		if (boss != null) {
 			boss.bossConfused();
+		}
+	}
+
+	/* Not actually an event handler - must be called by EntityUtils applySilence() */
+	/* TODO: Probably make this an actual event? */
+	public void entitySilenced(Entity entity) {
+		Boss boss = mBosses.get(entity.getUniqueId());
+		if (boss != null) {
+			boss.bossSilenced();
 		}
 	}
 

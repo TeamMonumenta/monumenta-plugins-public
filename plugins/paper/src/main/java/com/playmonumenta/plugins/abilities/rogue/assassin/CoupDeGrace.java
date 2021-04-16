@@ -16,6 +16,8 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.events.CustomDamageEvent;
+import com.playmonumenta.plugins.classes.magic.MagicType;
 
 /*
  * Coup De Grâce: If you melee attack a normal enemy and that attack
@@ -46,7 +48,7 @@ public class CoupDeGrace extends Ability {
 
 	@Override
 	public boolean livingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
-		if (event.getCause() == DamageCause.ENTITY_ATTACK && event.getEntity() instanceof LivingEntity) {
+		if ((event.getCause() == DamageCause.ENTITY_ATTACK || event.getCause() == DamageCause.ENTITY_SWEEP_ATTACK) && event.getEntity() instanceof LivingEntity) {
 			LivingEntity le = (LivingEntity) event.getEntity();
 			AttributeInstance maxHealth = le.getAttribute(Attribute.GENERIC_MAX_HEALTH);
 			if (maxHealth != null) {
@@ -66,8 +68,41 @@ public class CoupDeGrace extends Ability {
 		return true;
 	}
 
+	@Override
+	public void playerDealtCustomDamageEvent(CustomDamageEvent event) {
+		if (event.getDamaged() instanceof LivingEntity && event.getMagicType() == MagicType.ENCHANTMENT) {
+			LivingEntity le = (LivingEntity) event.getDamaged();
+			AttributeInstance maxHealth = le.getAttribute(Attribute.GENERIC_MAX_HEALTH);
+			if (maxHealth != null) {
+				double maxHealthValue = maxHealth.getValue();
+				if (EntityUtils.isElite(le)) {
+					if (le.getHealth() - (event.getDamage() * EntityUtils.vulnerabilityMult(le)) < maxHealthValue * mEliteThreshold) {
+						execute(event);
+					}
+				} else if (!EntityUtils.isBoss(le)) {
+					if (le.getHealth() - (event.getDamage() * EntityUtils.vulnerabilityMult(le)) < maxHealthValue * mNormalThreshold) {
+						execute(event);
+					}
+				}
+			}
+		}
+	}
+
 	private void execute(EntityDamageByEntityEvent event) {
 		LivingEntity le = (LivingEntity) event.getEntity();
+		event.setDamage(event.getDamage() + 9001);
+		World world = mPlayer.getWorld();
+		world.playSound(le.getLocation(), Sound.ENTITY_PLAYER_HURT, 0.75f, 0.75f);
+		world.playSound(le.getLocation(), Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, 0.5f, 1.5f);
+		world.spawnParticle(Particle.BLOCK_DUST, le.getLocation().add(0, le.getHeight() / 2, 0), 20, le.getWidth() / 2, le.getHeight() / 3, le.getWidth() / 2, 0.65, Material.REDSTONE_WIRE.createBlockData());
+		if (getAbilityScore() > 1) {
+			world.spawnParticle(Particle.SPELL_WITCH, le.getLocation().add(0, le.getHeight() / 2, 0), 10, le.getWidth() / 2, le.getHeight() / 3, le.getWidth() / 2, 0.65);
+			world.spawnParticle(Particle.BLOCK_DUST, le.getLocation().add(0, le.getHeight() / 2, 0), 20, le.getWidth() / 2, le.getHeight() / 3, le.getWidth() / 2, 0.65, Material.REDSTONE_BLOCK.createBlockData());
+		}
+	}
+
+	private void execute(CustomDamageEvent event) {
+		LivingEntity le = (LivingEntity) event.getDamaged();
 		event.setDamage(event.getDamage() + 9001);
 		World world = mPlayer.getWorld();
 		world.playSound(le.getLocation(), Sound.ENTITY_PLAYER_HURT, 0.75f, 0.75f);

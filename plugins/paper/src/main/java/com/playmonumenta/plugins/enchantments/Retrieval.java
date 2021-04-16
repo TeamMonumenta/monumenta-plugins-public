@@ -45,13 +45,13 @@ public class Retrieval implements BaseEnchantment {
 				if (arrow.getPickupStatus() == Arrow.PickupStatus.ALLOWED) {
 					if (infLevel == 0 && FastUtils.RANDOM.nextDouble() < RETRIEVAL_CHANCE * level) {
 						player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ARROW_HIT_PLAYER, 0.3f, 1.0f);
-	
+
 						arrow.setPickupStatus(Arrow.PickupStatus.ALLOWED);
 						Inventory playerInv = player.getInventory();
 						int firstArrow = playerInv.first(Material.ARROW);
 						int firstTippedArrow = playerInv.first(Material.TIPPED_ARROW);
 						int firstSpectralArrow = playerInv.first(Material.SPECTRAL_ARROW);
-	
+
 						final int arrowSlot;
 						if (firstArrow == -1 && firstTippedArrow > -1 && firstSpectralArrow == -1) {
 							arrowSlot = firstTippedArrow;

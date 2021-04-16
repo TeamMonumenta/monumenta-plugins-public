@@ -10,14 +10,14 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.scriptedquests.utils.ScoreboardUtils;
 
 public class PlayerClass {
-	
+
 	public ArrayList<Ability> mAbilities = new ArrayList<Ability>();
 	public int mClass;
 	public String mClassName;
 
 	PlayerSpec mSpecOne = new PlayerSpec();
 	PlayerSpec mSpecTwo = new PlayerSpec();
-	
+
 	public Boolean getClassAccessPerms(Player player) {
 		return true;
 	}

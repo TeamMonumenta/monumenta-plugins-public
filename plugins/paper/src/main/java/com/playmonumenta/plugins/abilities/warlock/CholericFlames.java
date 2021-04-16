@@ -25,28 +25,28 @@ import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
 
-public class ConsumingFlames extends Ability {
-	public static class ConsumingFlamesCooldownEnchantment extends BaseAbilityEnchantment {
-		public ConsumingFlamesCooldownEnchantment() {
-			super("Consuming Flames Cooldown", EnumSet.of(ItemSlot.ARMOR));
+public class CholericFlames extends Ability {
+	public static class CholericFlamesCooldownEnchantment extends BaseAbilityEnchantment {
+		public CholericFlamesCooldownEnchantment() {
+			super("Choleric Flames Cooldown", EnumSet.of(ItemSlot.ARMOR));
 		}
 	}
 
 	private static final int RADIUS = 8;
-	private static final int DAMAGE_1 = 1;
-	private static final int DAMAGE_2 = 4;
+	private static final int DAMAGE_1 = 3;
+	private static final int DAMAGE_2 = 5;
 	private static final int DURATION = 7 * 20;
 	private static final int COOLDOWN = 10 * 20;
 
 	private final int mDamage;
 
-	public ConsumingFlames(Plugin plugin, Player player) {
-		super(plugin, player, "Consuming Flames");
-		mInfo.mScoreboardId = "ConsumingFlames";
+	public CholericFlames(Plugin plugin, Player player) {
+		super(plugin, player, "Choleric Flames");
+		mInfo.mScoreboardId = "CholericFlames";
 		mInfo.mShorthandName = "CF";
-		mInfo.mDescriptions.add("Sneaking and right-clicking while not looking down while holding a scythe knocks back and ignites mobs within 8 blocks of you for 7s, additionally dealing 1 damage. Amplifying Hex now counts fire as a debuff, and levels of inferno as extra debuff levels. Cooldown: 10s.");
-		mInfo.mDescriptions.add("The damage is increased to 4, and also afflict mobs with Weakness I.");
-		mInfo.mLinkedSpell = Spells.CONSUMING_FLAMES;
+		mInfo.mDescriptions.add("Sneaking and right-clicking while not looking down while holding a scythe knocks back and ignites mobs within 8 blocks of you for 7s, additionally dealing 3 damage. Cooldown: 10s.");
+		mInfo.mDescriptions.add("The damage is increased to 5, and also afflict mobs with Poison II.");
+		mInfo.mLinkedSpell = Spells.CHOLERIC_FLAMES;
 		mInfo.mCooldown = COOLDOWN;
 		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
 		mDamage = getAbilityScore() == 1 ? DAMAGE_1 : DAMAGE_2;
@@ -67,7 +67,8 @@ public class ConsumingFlames extends Ability {
 					double radian1 = Math.toRadians(j);
 					mLoc.add(FastUtils.cos(radian1) * mRadius, 0.15, FastUtils.sin(radian1) * mRadius);
 					world.spawnParticle(Particle.FLAME, mLoc, 2, 0, 0, 0, 0.125);
-					world.spawnParticle(Particle.SMOKE_NORMAL, mLoc, 3, 0, 0, 0, 0.15);
+					world.spawnParticle(Particle.SOUL_FIRE_FLAME, mLoc, 2, 0, 0, 0, 0.125);
+					world.spawnParticle(Particle.SMOKE_NORMAL, mLoc, 1, 0, 0, 0, 0.15);
 					mLoc.subtract(FastUtils.cos(radian1) * mRadius, 0.15, FastUtils.sin(radian1) * mRadius);
 				}
 
@@ -87,11 +88,11 @@ public class ConsumingFlames extends Ability {
 			EntityUtils.applyFire(mPlugin, DURATION, mob, mPlayer);
 
 			if (getAbilityScore() > 1) {
-				PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(PotionEffectType.WEAKNESS, DURATION, 0, false, true));
+				PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(PotionEffectType.POISON, DURATION, 1, false, true));
 			}
 		}
 
-		mInfo.mCooldown = (int) ConsumingFlamesCooldownEnchantment.getCooldown(mPlayer, COOLDOWN, ConsumingFlamesCooldownEnchantment.class);
+		mInfo.mCooldown = (int) CholericFlamesCooldownEnchantment.getCooldown(mPlayer, COOLDOWN, CholericFlamesCooldownEnchantment.class);
 		putOnCooldown();
 	}
 

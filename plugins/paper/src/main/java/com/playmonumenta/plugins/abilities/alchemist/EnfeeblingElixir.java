@@ -26,6 +26,7 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
+import com.playmonumenta.plugins.effects.PercentSpeed;
 
 public class EnfeeblingElixir extends Ability {
 
@@ -35,21 +36,22 @@ public class EnfeeblingElixir extends Ability {
 		}
 	}
 
-	private static final int COOLDOWN = 20 * 20;
+	private static final int COOLDOWN = 16 * 20;
 	private static final int DURATION_1 = 7 * 20;
 	private static final int DURATION_2 = 10 * 20;
 	private static final float KNOCKBACK_SPEED_1 = 0.35f;
 	private static final float KNOCKBACK_SPEED_2 = 0.5f;
-	private static final int WEAKNESS_AMPLIFIER_1 = 0;
-	private static final int WEAKNESS_AMPLIFIER_2 = 1;
-	private static final int SPEED_AMPLIFIER_1 = 0;
-	private static final int SPEED_AMPLIFIER_2 = 1;
+	private static final double WEAKEN_AMPLIFIER_1 = 0.15;
+	private static final double WEAKEN_AMPLIFIER_2 = 0.3;
+	private static final double SPEED_AMPLIFIER_1 = 0.2;
+	private static final double SPEED_AMPLIFIER_2 = 0.4;
+	private static final String PERCENT_SPEED_EFFECT_NAME = "EEPercentSpeedEffect";
 	private static final int JUMP_LEVEL = 1;
 	private static final int ENFEEBLING_RADIUS = 3;
 
 	private final int mDuration;
-	private final int mWeaknessAmp;
-	private final int mSpeedAmp;
+	private final double mWeakenEffect;
+	private final double mSpeedAmp;
 	private final float mKnockbackSpeed;
 
 	public EnfeeblingElixir(Plugin plugin, Player player) {
@@ -57,12 +59,12 @@ public class EnfeeblingElixir extends Ability {
 		mInfo.mLinkedSpell = Spells.ENFEEBLING_ELIXIR;
 		mInfo.mScoreboardId = "EnfeeblingElixir";
 		mInfo.mShorthandName = "EE";
-		mInfo.mDescriptions.add("When you crouch and attack a mob or left click, all mobs within 3 blocks are knocked back several blocks and gain Weakness I for 7s. You gain Jump Boost II and Speed 1 for 7s. Cooldown: 20s.");
-		mInfo.mDescriptions.add("The knockback increases by 50%, Weakness I and Speed I are both increased to II, and the duration of buffs and debuffs is increased to 10s.");
+		mInfo.mDescriptions.add("When you crouch and attack a mob or left click, all mobs within 3 blocks are knocked back several blocks and gain 15% Weaken for 7s. You gain Jump Boost II and +20% Speed for 7s. Cooldown: 16s.");
+		mInfo.mDescriptions.add("The knockback increases by 50%, you apply 30% Weaken to mobs and are given +40% Speed, and the duration of buffs and debuffs is increased to 10s.");
 		mInfo.mCooldown = COOLDOWN;
 		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;
 		mDuration = getAbilityScore() == 1 ? DURATION_1 : DURATION_2;
-		mWeaknessAmp = getAbilityScore() == 1 ? WEAKNESS_AMPLIFIER_1 : WEAKNESS_AMPLIFIER_2;
+		mWeakenEffect = getAbilityScore() == 1 ? WEAKEN_AMPLIFIER_1 : WEAKEN_AMPLIFIER_2;
 		mSpeedAmp = getAbilityScore() == 1 ? SPEED_AMPLIFIER_1 : SPEED_AMPLIFIER_2;
 		mKnockbackSpeed = getAbilityScore() == 1 ? KNOCKBACK_SPEED_1 : KNOCKBACK_SPEED_2;
 	}
@@ -74,11 +76,11 @@ public class EnfeeblingElixir extends Ability {
 		if (!InventoryUtils.isBowItem(hand) && hand.getType() != Material.SPLASH_POTION) {
 			for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), ENFEEBLING_RADIUS, mPlayer)) {
 				MovementUtils.knockAway(mPlayer, mob, mKnockbackSpeed);
-				PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(PotionEffectType.WEAKNESS, mDuration, mWeaknessAmp, true, false));
+				EntityUtils.applyWeaken(mPlugin, mDuration, mWeakenEffect, mob);
 			}
 
-			mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF,
-			                                 new PotionEffect(PotionEffectType.SPEED, mDuration, mSpeedAmp));
+			mPlugin.mEffectManager.addEffect(mPlayer, PERCENT_SPEED_EFFECT_NAME,
+					new PercentSpeed(mDuration, mSpeedAmp, PERCENT_SPEED_EFFECT_NAME));
 			mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF,
 			                                 new PotionEffect(PotionEffectType.JUMP, mDuration, JUMP_LEVEL));
 

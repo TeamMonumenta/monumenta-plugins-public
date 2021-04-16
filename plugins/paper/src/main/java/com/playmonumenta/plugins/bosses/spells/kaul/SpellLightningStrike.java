@@ -162,12 +162,12 @@ public class SpellLightningStrike extends Spell {
 				mTicks += 2;
 
 				for (double deg = 0; deg < 360; deg += 15) {
-					world.spawnParticle(Particle.FLAME, loc.clone().add(FastUtils.cos(deg) * 4, 0, FastUtils.sin(deg) * 4), 1, 0.15, 0.15, 0.15, 0.05);
+					world.spawnParticle(Particle.FLAME, loc.clone().add(FastUtils.cos(deg) * 3, 0, FastUtils.sin(deg) * 3), 1, 0.15, 0.15, 0.15, 0.05);
 				}
 				world.spawnParticle(Particle.REDSTONE, loc, 10, 2, 0.3, 2, YELLOW_1_COLOR);
 				world.spawnParticle(Particle.REDSTONE, loc, 10, 2, 0.3, 2, YELLOW_2_COLOR);
 				if (mTicks % 10 == 0) {
-					for (Player player : PlayerUtils.playersInRange(loc, 4)) {
+					for (Player player : PlayerUtils.playersInRange(loc, 3)) {
 						if (loc.distance(player.getLocation()) < Kaul.detectionRange) {
 							BossUtils.bossDamagePercent(mBoss, player, 0.1, (Location)null);
 							player.setFireTicks(20 * 3);

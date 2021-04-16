@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.listeners;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.List;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
@@ -134,7 +135,10 @@ public class PotionConsumeListener implements Listener {
 			return;
 		}
 
-		if (item.containsEnchantment(Enchantment.ARROW_INFINITE)) {
+		PotionMeta meta = (PotionMeta) item.getItemMeta();
+		List<PotionEffect> effects = PotionUtils.getEffects(meta);
+
+		if (item.containsEnchantment(Enchantment.ARROW_INFINITE) && !(effects.size() == 1 && effects.get(0).getType().equals(PotionEffectType.GLOWING))) {
 			player.sendMessage(ChatColor.RED + "Infinite potions can not be quick drinked!");
 
 			float pitch = ((float)FastUtils.RANDOM.nextDouble() - 0.5f) * 0.05f;
@@ -144,8 +148,6 @@ public class PotionConsumeListener implements Listener {
 			return;
 		}
 
-
-		PotionMeta meta = (PotionMeta)event.getCurrentItem().getItemMeta();
 		int instantDrinkLevel = InventoryUtils.getCustomEnchantLevel(item, InstantDrink.PROPERTY_NAME, false);
 
 		if (PotionUtils.isLuckPotion(meta)) {

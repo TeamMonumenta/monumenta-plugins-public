@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.bosses.spells;
 
 import org.bukkit.entity.LivingEntity;
+import com.playmonumenta.plugins.utils.EntityUtils;
 
 public class SpellBaseParticleAura extends Spell {
 
@@ -30,6 +31,9 @@ public class SpellBaseParticleAura extends Spell {
 		mEffectIter++;
 		if (mEffectIter >= mTicksPerIteration) {
 			mEffectIter = 0;
+			if (EntityUtils.isStunned(mBoss) || EntityUtils.isSilenced(mBoss) || EntityUtils.isConfused(mBoss)) {
+				return;
+			}
 			for (ParticleEffect effect : mEffects) {
 				effect.run(mBoss);
 			}

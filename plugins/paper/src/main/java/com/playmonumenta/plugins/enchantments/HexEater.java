@@ -54,15 +54,23 @@ public class HexEater implements BaseEnchantment {
 		if (EntityUtils.isConfused(target)) {
 			effects++;
 		}
-		
+
+		if (EntityUtils.isSilenced(target)) {
+			effects++;
+		}
+
 		if (EntityUtils.isBleeding(plugin, target)) {
 			effects++;
 		}
-		
+
 		if (EntityUtils.isSlowed(plugin, target) && !e.contains(PotionEffectType.SLOW)) {
 			effects++;
 		}
-		
+
+		if (EntityUtils.isWeakened(plugin, target) && !e.contains(PotionEffectType.WEAKNESS)) {
+			effects++;
+		}
+
 		if (target.getFireTicks() > 0 || Inferno.getMobInfernoLevel(plugin, target) > 0) {
 			effects++;
 		}

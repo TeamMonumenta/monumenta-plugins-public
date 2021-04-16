@@ -21,6 +21,7 @@ import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.classes.magic.MagicType;
 
 public class ArcaneThrust implements BaseEnchantment {
 	private static final String PROPERTY_NAME = ChatColor.GRAY + "Arcane Thrust";
@@ -61,7 +62,7 @@ public class ArcaneThrust implements BaseEnchantment {
 					LivingEntity mob = iter.next();
 					if (box.overlaps(mob.getBoundingBox())) {
 						if (mob != target) {
-							EntityUtils.damageEntity(plugin, mob, damage, player);
+							EntityUtils.damageEntity(plugin, mob, damage, player, MagicType.ENCHANTMENT);
 							MovementUtils.knockAway(player.getLocation(), mob, 0.25f, 0.25f);
 						}
 						iter.remove();

@@ -11,5 +11,6 @@ public enum MagicType {
 	DARK_MAGIC,
 	ALCHEMY,
 	NONE,
-	HOLY;
+	HOLY,
+	ENCHANTMENT;
 }

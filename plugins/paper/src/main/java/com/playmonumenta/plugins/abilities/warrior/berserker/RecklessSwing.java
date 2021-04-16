@@ -16,6 +16,7 @@ import org.bukkit.inventory.ItemStack;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
+import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
@@ -36,18 +37,25 @@ public class RecklessSwing extends Ability {
 	private final double mMaxDamagePercent;
 	private final int mDamage;
 
+	private Rampage mRampage;
+
 	public RecklessSwing(Plugin plugin, Player player) {
 		super(plugin, player, "Reckless Swing");
 		mInfo.mLinkedSpell = Spells.RECKLESS_SWING;
 		mInfo.mScoreboardId = "RecklessSwing";
 		mInfo.mShorthandName = "RS";
-		mInfo.mDescriptions.add("Passively, every 4 health you fall below your maximum health, gain +5% damage (capped at +25%) on sword and axe hits. Sneak left click with an axe or a sword (including when attacking enemies) to deal 12 damage in a 3.5 block radius at the cost of taking 4 damage (not reduced by any kind of damage resistance, bypasses absorption).");
+		mInfo.mDescriptions.add("Passively, every 4 health you fall below your maximum health, gain +5% damage (capped at +25%) on sword and axe hits. Sneak left click with an axe or a sword (including when attacking enemies) to deal 12 damage in a 3.5 block radius at the cost of taking 4 damage (not reduced by any kind of damage resistance, bypasses absorption). Reckless Swing damage counts towards Rampage stacks.");
 		mInfo.mDescriptions.add("Gain +10% damage (capped at +50%) instead. Damage from the active increased to 24.");
 		mInfo.mIgnoreCooldown = true;
 		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;
 		mDamagePercentPer4Health = getAbilityScore() == 1 ? DAMAGE_PERCENT_PER_4_HEALTH_1 : DAMAGE_PERCENT_PER_4_HEALTH_2;
 		mMaxDamagePercent = getAbilityScore() == 1 ? MAX_DAMAGE_PERCENT_1 : MAX_DAMAGE_PERCENT_2;
 		mDamage = getAbilityScore() == 1 ? DAMAGE_1 : DAMAGE_2;
+		Bukkit.getScheduler().runTask(plugin, () -> {
+			if (player != null) {
+				mRampage = AbilityManager.getManager().getPlayerAbility(mPlayer, Rampage.class);
+			}
+		});
 	}
 
 	@Override
@@ -56,7 +64,6 @@ public class RecklessSwing extends Ability {
 			int missingHealthChunks = (int)((mPlayer.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue() - mPlayer.getHealth()) / DAMAGE_INCREMENT_THRESHOLD_HEALTH);
 			event.setDamage(event.getDamage() * (1 + Math.min(mMaxDamagePercent, mDamagePercentPer4Health * missingHealthChunks)));
 		}
-
 		return true;
 	}
 
@@ -80,6 +87,9 @@ public class RecklessSwing extends Ability {
 				for (LivingEntity mob : EntityUtils.getNearbyMobs(loc, RADIUS)) {
 					mob.setNoDamageTicks(0);
 					EntityUtils.damageEntity(mPlugin, mob, mDamage, mPlayer);
+					if (mRampage != null) {
+						mRampage.customRecklessSwingInteraction(mDamage);
+					}
 				}
 			});
 		}
@@ -90,5 +100,4 @@ public class RecklessSwing extends Ability {
 		ItemStack mainhand = mPlayer.getInventory().getItemInMainHand();
 		return InventoryUtils.isSwordItem(mainhand) || InventoryUtils.isAxeItem(mainhand);
 	}
-
 }

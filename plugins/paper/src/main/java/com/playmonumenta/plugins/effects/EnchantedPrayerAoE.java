@@ -6,6 +6,8 @@ import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
+import org.bukkit.attribute.Attribute;
+import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -22,11 +24,11 @@ public class EnchantedPrayerAoE extends Effect {
 
 	private final Plugin mPlugin;
 	private final int mDamageAmount;
-	private final int mHealAmount;
+	private final double mHealAmount;
 	private final Player mPlayer;
 	private final EnumSet<EntityDamageEvent.DamageCause> mAffectedDamageCauses;
 
-	public EnchantedPrayerAoE(Plugin plugin, int duration, int damageAmount, int healAmount, Player player, EnumSet<EntityDamageEvent.DamageCause> affectedDamageCauses) {
+	public EnchantedPrayerAoE(Plugin plugin, int duration, int damageAmount, double healAmount, Player player, EnumSet<EntityDamageEvent.DamageCause> affectedDamageCauses) {
 		super(duration);
 		mPlugin = plugin;
 		mDamageAmount = damageAmount;
@@ -58,7 +60,8 @@ public class EnchantedPrayerAoE extends Effect {
 			for (LivingEntity le : EntityUtils.getNearbyMobs(damagee.getLocation(), 3.5)) {
 				EntityUtils.damageEntity(mPlugin, le, mDamageAmount, mPlayer, MagicType.HOLY, true, Spells.ENCHANTED_PRAYER);
 			}
-			PlayerUtils.healPlayer(mPlayer, mHealAmount);
+			AttributeInstance maxHealth = mPlayer.getAttribute(Attribute.GENERIC_MAX_HEALTH);
+			PlayerUtils.healPlayer(mPlayer, maxHealth.getValue() * mHealAmount);
 			setDuration(0);
 		}
 

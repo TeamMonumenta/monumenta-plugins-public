@@ -15,7 +15,7 @@ import com.playmonumenta.plugins.abilities.scout.hunter.EnchantedShot;
 import com.playmonumenta.plugins.abilities.scout.hunter.PinningShot;
 import com.playmonumenta.plugins.abilities.scout.hunter.SplitArrow;
 import com.playmonumenta.plugins.abilities.scout.ranger.Quickdraw;
-import com.playmonumenta.plugins.abilities.scout.ranger.Reflexes;
+import com.playmonumenta.plugins.abilities.scout.ranger.WhirlingBlade;
 import com.playmonumenta.plugins.abilities.scout.ranger.TacticalManeuver;
 
 
@@ -34,7 +34,7 @@ public class Scout extends PlayerClass {
 		mClassName = "Scout";
 
 		mSpecOne.mAbilities.add(new Quickdraw(plugin, player));
-		mSpecOne.mAbilities.add(new Reflexes(plugin, player));
+		mSpecOne.mAbilities.add(new WhirlingBlade(plugin, player));
 		mSpecOne.mAbilities.add(new TacticalManeuver(plugin, player));
 		mSpecOne.mSpecQuestScoreboard = "Quest103e";
 		mSpecOne.mSpecialization = 11;

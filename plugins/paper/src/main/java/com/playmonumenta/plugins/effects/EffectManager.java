@@ -15,6 +15,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityRegainHealthEvent;
 import org.bukkit.projectiles.ProjectileSource;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -319,6 +320,22 @@ public class EffectManager implements Listener {
 	}
 
 	@EventHandler(priority = EventPriority.NORMAL)
+	public boolean entityDeathEvent(EntityDeathEvent event) {
+		Effects effects = mEntities.get(event.getEntity());
+		if (effects != null) {
+			for (Map<String, NavigableSet<Effect>> priorityEffects : effects.mPriorityMap.values()) {
+				for (NavigableSet<Effect> effectGroup : priorityEffects.values()) {
+					if (!effectGroup.last().entityKilledEvent(event)) {
+						return false;
+					}
+				}
+			}
+		}
+
+		return true;
+	}
+
+	@EventHandler(priority = EventPriority.NORMAL)
 	public boolean entityDamageByEntityEvent(EntityDamageByEntityEvent event) {
 		Entity damager = event.getDamager();
 		if (damager instanceof Projectile) {
@@ -332,7 +349,7 @@ public class EffectManager implements Listener {
 		if (effects != null) {
 			for (Map<String, NavigableSet<Effect>> priorityEffects : effects.mPriorityMap.values()) {
 				for (NavigableSet<Effect> effectGroup : priorityEffects.values()) {
-					if (!effectGroup.last().entityDealDamageEvent(event)) {
+					if (!effectGroup.last().entityDealDamageEvent(event) && !effectGroup.last().entityReceiveDamageFromEntityEvent(event)) {
 						return false;
 					}
 				}

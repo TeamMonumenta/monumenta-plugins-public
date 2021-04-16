@@ -41,7 +41,6 @@ public class WeaponryMastery extends Ability {
 	public boolean livingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
 		if (event.getCause() == DamageCause.ENTITY_ATTACK) {
 			ItemStack mainHand = mPlayer.getInventory().getItemInMainHand();
-
 			if (InventoryUtils.isAxeItem(mainHand)) {
 				event.setDamage((event.getDamage() + mDamageBonusAxeFlat) * (1 + mDamageBonusAxe));
 			} else if (InventoryUtils.isSwordItem(mainHand)) {

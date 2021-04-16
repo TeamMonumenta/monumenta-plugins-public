@@ -7,6 +7,7 @@ import org.bukkit.entity.Player;
 
 import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.scriptedquests.utils.MessagingUtils;
+import com.playmonumenta.plugins.bosses.events.SpellCastEvent;
 
 import net.md_5.bungee.api.ChatColor;
 
@@ -22,6 +23,12 @@ public class AbilitySilence extends Effect {
 	public double getMagnitude() {
 		// This is useful so that the "active" effect is always the correct duration
 		return getDuration();
+	}
+
+	@Override
+	public boolean entityCastSpellEvent(SpellCastEvent event) {
+		event.setCancelled(true);
+		return true;
 	}
 
 	@Override

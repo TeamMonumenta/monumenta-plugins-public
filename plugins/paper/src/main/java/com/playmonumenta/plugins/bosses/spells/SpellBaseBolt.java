@@ -15,6 +15,7 @@ import org.bukkit.util.Vector;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
 
 /**
  * This is the base spell for a bolt spell.
@@ -133,7 +134,7 @@ public class SpellBaseBolt extends Spell {
 					mTicks++;
 					mTickAction.run(mCaster, mTicks);
 
-					if (mCaster == null || mCaster.isDead()) {
+					if (mCaster == null || mCaster.isDead() || EntityUtils.isStunned(mCaster) || EntityUtils.isSilenced(mCaster) || EntityUtils.isConfused(mCaster)) {
 						this.cancel();
 						return;
 					}

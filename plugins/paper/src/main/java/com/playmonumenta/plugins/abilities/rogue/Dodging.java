@@ -10,6 +10,7 @@ import com.playmonumenta.plugins.enchantments.BaseAbilityEnchantment;
 import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.effects.PercentSpeed;
 
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -56,7 +57,8 @@ public class Dodging extends Ability {
 	 */
 
 	private static final int DODGING_SPEED_EFFECT_DURATION = 15 * 20;
-	private static final int DODGING_SPEED_EFFECT_LEVEL = 0;
+	private static final double PERCENT_SPEED = 0.2;
+	private static final String ATTR_NAME = "DodgingExtraSpeed";
 	private static final int DODGING_COOLDOWN_1 = 12 * 20;
 	private static final int DODGING_COOLDOWN_2 = 10 * 20;
 
@@ -164,11 +166,8 @@ public class Dodging extends Ability {
 		World world = mPlayer.getWorld();
 		int dodging = getAbilityScore();
 		if (dodging > 1) {
-			mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF,
-			                                 new PotionEffect(PotionEffectType.SPEED,
-			                                                  DODGING_SPEED_EFFECT_DURATION,
-			                                                  DODGING_SPEED_EFFECT_LEVEL,
-			                                                  true, true));
+			mPlugin.mEffectManager.addEffect(mPlayer, ATTR_NAME,
+					new PercentSpeed(DODGING_SPEED_EFFECT_DURATION, PERCENT_SPEED, ATTR_NAME));
 			world.spawnParticle(Particle.EXPLOSION_NORMAL, loc, 20, 0.25, 0.45, 0.25, 0.15);
 			world.playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_LAUNCH, 1, 1.35f);
 		}

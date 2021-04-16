@@ -28,6 +28,7 @@ import com.playmonumenta.plugins.bosses.events.SpellCastEvent;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.events.CustomEffectApplyEvent;
 import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.SerializationUtils;
 
 public abstract class BossAbilityGroup {
@@ -116,7 +117,7 @@ public abstract class BossAbilityGroup {
 					return;
 				}
 
-				if (mPassiveSpells != null) {
+				if (mPassiveSpells != null && !EntityUtils.isSilenced(mBoss)) {
 					for (Spell spell : mPassiveSpells) {
 						spell.run();
 					}
@@ -171,7 +172,7 @@ public abstract class BossAbilityGroup {
 				/* Some spells might have been run - so when this next deactivates they need to be cancelled */
 				mDisabled = false;
 
-				if (mActiveSpells != null) {
+				if (mActiveSpells != null && !EntityUtils.isSilenced(mBoss)) {
 					// Run the next spell and store how long before the next spell can run
 					mNextActiveTimer = mActiveSpells.runNextSpell();
 
@@ -304,6 +305,15 @@ public abstract class BossAbilityGroup {
 	 * Boss was confused by a player. Mobs with the "Boss" tag can't be confused
 	 */
 	public void bossConfused() {
+		if (mActiveSpells != null) {
+			mActiveSpells.cancelAll();
+		}
+	}
+
+	/*
+	 * Boss was silenced by a player. Mobs with the "Boss" tag can't be silenced
+	 */
+	public void bossSilenced() {
 		if (mActiveSpells != null) {
 			mActiveSpells.cancelAll();
 		}

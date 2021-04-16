@@ -29,14 +29,14 @@ public class ViciousCombos extends Ability {
 	private static final int VICIOUS_COMBOS_COOL_2 = 2 * 20;
 	private static final int VICIOUS_COMBOS_CRIPPLE_DURATION = 5 * 20;
 	private static final int VICIOUS_COMBOS_CRIPPLE_VULN_LEVEL = 3;
-	private static final int VICIOUS_COMBOS_CRIPPLE_WEAKNESS_LEVEL = 0;
+	private static final double VICIOUS_COMBOS_CRIPPLE_WEAKNESS_LEVEL = 0.15;
 
 	public ViciousCombos(Plugin plugin, Player player) {
 		super(plugin, player, "Vicious Combos");
 		mInfo.mScoreboardId = "ViciousCombos";
 		mInfo.mShorthandName = "VC";
 		mInfo.mDescriptions.add("Passively, killing an enemy refreshes the cooldown of your abilities by 1 second. Killing an Elite enemy instead resets the cooldown of your abilities.");
-		mInfo.mDescriptions.add("Killing an enemy now refreshes your ability cooldowns by 2 seconds. Killing an Elite enemy inflicts nearby enemies within 5 blocks with Weakness I and 15% Vulnerability for 5 seconds.");
+		mInfo.mDescriptions.add("Killing an enemy now refreshes your ability cooldowns by 2 seconds. Killing an Elite enemy inflicts nearby enemies within 5 blocks with 15% weaken and 15% Vulnerability for 5 seconds.");
 	}
 
 	@Override
@@ -67,7 +67,7 @@ public class ViciousCombos extends Ability {
 							for (LivingEntity mob : EntityUtils.getNearbyMobs(loc, VICIOUS_COMBOS_RANGE, mPlayer)) {
 								world.spawnParticle(Particle.SPELL_MOB, mob.getLocation().clone().add(0, 1, 0), 10, 0.35, 0.5, 0.35, 0);
 								PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(PotionEffectType.UNLUCK, VICIOUS_COMBOS_CRIPPLE_DURATION, VICIOUS_COMBOS_CRIPPLE_VULN_LEVEL, true, false));
-								PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(PotionEffectType.WEAKNESS, VICIOUS_COMBOS_CRIPPLE_DURATION, VICIOUS_COMBOS_CRIPPLE_WEAKNESS_LEVEL, true, false));
+								EntityUtils.applyWeaken(mPlugin, VICIOUS_COMBOS_CRIPPLE_DURATION, VICIOUS_COMBOS_CRIPPLE_WEAKNESS_LEVEL, mob);
 							}
 						}
 

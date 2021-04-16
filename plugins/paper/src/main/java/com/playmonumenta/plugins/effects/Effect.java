@@ -4,6 +4,8 @@ import org.bukkit.entity.Entity;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityRegainHealthEvent;
+import org.bukkit.event.entity.EntityDeathEvent;
+import com.playmonumenta.plugins.bosses.events.SpellCastEvent;
 
 public abstract class Effect implements Comparable<Effect> {
 
@@ -53,6 +55,18 @@ public abstract class Effect implements Comparable<Effect> {
 	}
 
 	public boolean entityReceiveDamageEvent(EntityDamageEvent event) {
+		return true;
+	}
+
+	public boolean entityReceiveDamageFromEntityEvent(EntityDamageByEntityEvent event) {
+		return true;
+	}
+
+	public boolean entityKilledEvent(EntityDeathEvent event) {
+		return true;
+	}
+
+	public boolean entityCastSpellEvent(SpellCastEvent event) {
 		return true;
 	}
 

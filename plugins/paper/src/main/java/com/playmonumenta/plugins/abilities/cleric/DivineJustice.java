@@ -25,9 +25,9 @@ public class DivineJustice extends Ability {
 	private static final double CRITICAL_SCALING = 0.15;
 	private static final int RADIUS = 12;
 	private static final double LUMINOUS_BONUS = 4;
-	
+
 	private final double mCriticalScaling;
-	
+
 	private Crusade mCrusade;
 	private LuminousInfusion mLuminous;
 
@@ -74,7 +74,7 @@ public class DivineJustice extends Ability {
 						world.spawnParticle(Particle.CRIT_MAGIC, damagee.getEyeLocation(), 10, 0.25, 0.5, 0.25, 0);
 					}
 				}
-				
+
 				event.setDamage((event.getDamage() + baseDamage + bonusDamage) * (1 + mCriticalScaling + bonusScaling));
 			}
 		}
@@ -87,8 +87,8 @@ public class DivineJustice extends Ability {
 		if (EntityUtils.isUndead(mob) || (mCrusade.getAbilityScore() == 2 && EntityUtils.isHumanoid(mob))) {
 			double percentMaxHealth = mPlayer.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue() * 0.1;
 			PlayerUtils.healPlayer(mPlayer, percentMaxHealth);
-			for (Player p : PlayerUtils.playersInRange(mPlayer, RADIUS, true)) {
-				percentMaxHealth = p.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue() * 0.1;
+			for (Player p : PlayerUtils.playersInRange(mPlayer, RADIUS, false)) {
+				percentMaxHealth = p.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue() * 0.05;
 				PlayerUtils.healPlayer(p, percentMaxHealth);
 			}
 		}

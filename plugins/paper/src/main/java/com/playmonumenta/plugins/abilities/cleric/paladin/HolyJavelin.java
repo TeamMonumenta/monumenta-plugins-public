@@ -44,15 +44,15 @@ public class HolyJavelin extends Ability {
 	private static final int DIVINE_JUSTICE_1_BONUS = 4;
 	private static final double DIVINE_JUSTICE_2_SCALING = 0.15;
 	private static final int DIVINE_JUSTICE_2_BONUS = 8;
-	private static final int LUMINOUS_2_BONUS = 4;
+	private static final double LUMINOUS_2_BONUS = 0.2;
 
 	private final int mDamage;
 	private final int mUndeadDamage;
 
 	private double mBonusCritDamage = 0;
-	private int mBonusLumDamage = 0;
+	private double mBonusLumDamage = 0.0;
 	private double mBonusCrusadeDamage = 0.0;
-	
+
 	private Crusade mCrusade;
 	private boolean mCountsHumanoids = false;
 	private DivineJustice mDivineJustice;
@@ -86,12 +86,7 @@ public class HolyJavelin extends Ability {
 					}
 				}
 				if (mLuminousInfusion != null) {
-					mBonusLumDamage = mLuminousInfusion.getAbilityScore() == 1 ? 0 : LUMINOUS_2_BONUS;
-					if (mCrusade != null) {
-						if (mCrusade.getAbilityScore() > 0) {
-							mBonusCrusadeDamage += mBonusLumDamage * 0.33;
-						}
-					}
+					mBonusLumDamage = mLuminousInfusion.getAbilityScore() == 1 ? 0 : LUMINOUS_2_BONUS * mUndeadDamage;
 				}
 			}
 		});
@@ -156,11 +151,11 @@ public class HolyJavelin extends Ability {
 		if (event.getCause().equals(DamageCause.ENTITY_ATTACK)) {
 			LivingEntity damagee = (LivingEntity) event.getEntity();
 			if (EntityUtils.isUndead(damagee) || (mCountsHumanoids && EntityUtils.isHumanoid(damagee))) {
-				double divineCritScaling = 1;
+				double divineCritScaling = 0;
 				if (mDivineJustice != null) {
-					divineCritScaling = mDivineJustice.getAbilityScore() > 1 ? 1 + DIVINE_JUSTICE_2_SCALING : 1;
+					divineCritScaling = mDivineJustice.getAbilityScore() > 1 ? DIVINE_JUSTICE_2_SCALING : 0;
 				}
-				execute(mBonusCrusadeDamage + (double) (mBonusLumDamage + (PlayerUtils.isCritical(mPlayer) ? mBonusCritDamage : 0)) * (PlayerUtils.isCritical(mPlayer) ? divineCritScaling : 1));
+				execute(((double) (PlayerUtils.isCritical(mPlayer) ? mBonusCritDamage + mBonusCrusadeDamage : 0) + mBonusLumDamage) * (PlayerUtils.isCritical(mPlayer) ? 1 + divineCritScaling : 1) + (mUndeadDamage * (PlayerUtils.isCritical(mPlayer) ? divineCritScaling : 0)));
 			} else {
 				execute(0);
 			}

@@ -178,10 +178,12 @@ public class EntityUtils {
 	private static final String STUN_ATTR_NAME = "StunSlownessAttr";
 	private static final Map<LivingEntity, Integer> COOLING_MOBS = new HashMap<LivingEntity, Integer>();
 	private static final Map<LivingEntity, Integer> STUNNED_MOBS = new HashMap<LivingEntity, Integer>();
+	private static final Map<LivingEntity, Integer> SILENCED_MOBS = new HashMap<LivingEntity, Integer>();
 	private static final Map<LivingEntity, Integer> CONFUSED_MOBS = new HashMap<LivingEntity, Integer>();
 	private static BukkitRunnable mobsTracker = null;
 
 	private static final Particle.DustOptions STUN_COLOR = new Particle.DustOptions(Color.fromRGB(255, 255, 100), 1.0f);
+	private static final Particle.DustOptions SILENCE_COLOR = new Particle.DustOptions(Color.fromRGB(13, 13, 13), 1.0f);
 	private static final Particle.DustOptions CONFUSION_COLOR = new Particle.DustOptions(Color.fromRGB(62, 0, 102), 1.0f);
 	private static final Particle.DustOptions TAUNT_COLOR = new Particle.DustOptions(Color.fromRGB(200, 0, 0), 1.0f);
 
@@ -195,6 +197,7 @@ public class EntityUtils {
 
 				Iterator<Map.Entry<LivingEntity, Integer>> coolingIter = COOLING_MOBS.entrySet().iterator();
 				Iterator<Map.Entry<LivingEntity, Integer>> stunnedIter = STUNNED_MOBS.entrySet().iterator();
+				Iterator<Map.Entry<LivingEntity, Integer>> silencedIter = SILENCED_MOBS.entrySet().iterator();
 				Iterator<Map.Entry<LivingEntity, Integer>> confusedIter = CONFUSED_MOBS.entrySet().iterator();
 
 				while (coolingIter.hasNext()) {
@@ -240,6 +243,21 @@ public class EntityUtils {
 							}
 						}
 						stunnedIter.remove();
+					}
+				}
+
+				while (silencedIter.hasNext()) {
+					Map.Entry<LivingEntity, Integer> silenced = silencedIter.next();
+					LivingEntity mob = silenced.getKey();
+					SILENCED_MOBS.put(mob, silenced.getValue() - 1);
+
+					double angle = Math.toRadians(mRotation);
+					Location l = mob.getLocation();
+					l.add(FastUtils.cos(angle) * 0.5, mob.getHeight(), FastUtils.sin(angle) * 0.5);
+					mob.getWorld().spawnParticle(Particle.REDSTONE, l, 5, 0, 0, 0, SILENCE_COLOR);
+
+					if (silenced.getValue() <= 0 || mob.isDead() || !mob.isValid()) {
+						silencedIter.remove();
 					}
 				}
 
@@ -590,6 +608,33 @@ public class EntityUtils {
 		return mobsInLine;
 	}
 
+	public static List<Player> getPlayersInLine(Location loc, Vector direction, double range, double halfHitboxLength, Player self) {
+		Set<Player> nearbyPlayers = new HashSet<Player>(PlayerUtils.playersInRange(loc, range));
+		List<Player> playersInLine = new ArrayList<Player>();
+
+		Vector shift = direction.normalize().multiply(halfHitboxLength);
+		BoundingBox hitbox = BoundingBox.of(loc, halfHitboxLength * 2, halfHitboxLength * 2, halfHitboxLength * 2);
+
+		for (double r = 0; r < range; r += halfHitboxLength) {
+			Iterator<Player> iter = nearbyPlayers.iterator();
+			while (iter.hasNext()) {
+				Player p = iter.next();
+				if (p.getName() == self.getName()) {
+					iter.remove();
+					continue;
+				}
+				if (p.getBoundingBox().overlaps(hitbox)) {
+					playersInLine.add(p);
+					iter.remove();
+				}
+			}
+
+			hitbox.shift(shift);
+		}
+
+		return playersInLine;
+	}
+
 	public static LivingEntity getNearestMob(Location loc, double radius, LivingEntity getter) {
 		return getNearestMob(loc, getNearbyMobs(loc, radius, getter));
 	}
@@ -908,10 +953,46 @@ public class EntityUtils {
 	private static final EnumSet<DamageCause> WEAKEN_EFFECT_AFFECTED_DAMAGE_CAUSES = EnumSet.of(
 			DamageCause.ENTITY_ATTACK,
 			DamageCause.PROJECTILE
-	);
+		);
 
 	public static void applyWeaken(Plugin plugin, int ticks, double amount, LivingEntity mob) {
 		plugin.mEffectManager.addEffect(mob, WEAKEN_EFFECT_NAME, new PercentDamageDealt(ticks, -amount, WEAKEN_EFFECT_AFFECTED_DAMAGE_CAUSES));
+	}
+
+	public static boolean isWeakened(Plugin plugin, LivingEntity mob) {
+		NavigableSet<Effect> weaks = plugin.mEffectManager.getEffects(mob, WEAKEN_EFFECT_NAME);
+		if (weaks != null) {
+			return true;
+		}
+		return false;
+	}
+
+	public static double getWeakenAmount(Plugin plugin, LivingEntity mob) {
+		NavigableSet<Effect> weaks = plugin.mEffectManager.getEffects(mob, WEAKEN_EFFECT_NAME);
+		if (weaks != null) {
+			Effect weak = weaks.last();
+			return weak.getMagnitude();
+		} else {
+			return 0;
+		}
+	}
+
+	public static int getWeakenTicks(Plugin plugin, LivingEntity mob) {
+		NavigableSet<Effect> weaks = plugin.mEffectManager.getEffects(mob, WEAKEN_EFFECT_NAME);
+		if (weaks != null) {
+			Effect weak = weaks.last();
+			return weak.getDuration();
+		} else {
+			return 0;
+		}
+	}
+
+	public static void setWeakenTicks(Plugin plugin, LivingEntity mob, int ticks) {
+		NavigableSet<Effect> weaks = plugin.mEffectManager.getEffects(mob, WEAKEN_EFFECT_NAME);
+		if (weaks != null) {
+			Effect weak = weaks.last();
+			weak.setDuration(ticks);
+		}
 	}
 
 	public static void applyFire(Plugin plugin, int fireTicks, LivingEntity target, Player player) {
@@ -1008,6 +1089,32 @@ public class EntityUtils {
 		}
 		if (t == null || t < ticks) {
 			STUNNED_MOBS.put(mob, ticks);
+		}
+	}
+
+	public static boolean isSilenced(Entity mob) {
+		return SILENCED_MOBS.containsKey(mob);
+	}
+
+	public static void removeSilence(LivingEntity mob) {
+		SILENCED_MOBS.put(mob, 0);
+	}
+
+	public static void applySilence(Plugin plugin, int ticks, LivingEntity mob) {
+		if (isBoss(mob)) {
+			return;
+		}
+
+		if (mobsTracker == null || mobsTracker.isCancelled()) {
+			startTracker(plugin);
+		}
+
+		/* Fake "event" so bosses can handle being silenced if they need to */
+		BossManager.getInstance().entitySilenced(mob);
+
+		Integer t = SILENCED_MOBS.get(mob);
+		if (t == null || t < ticks) {
+			SILENCED_MOBS.put(mob, ticks);
 		}
 	}
 

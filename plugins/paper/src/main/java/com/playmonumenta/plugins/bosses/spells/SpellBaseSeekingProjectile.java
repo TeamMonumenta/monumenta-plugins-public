@@ -18,6 +18,7 @@ import org.bukkit.util.Vector;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
 
 public class SpellBaseSeekingProjectile extends Spell {
 
@@ -160,6 +161,9 @@ public class SpellBaseSeekingProjectile extends Spell {
 
 	@Override
 	public boolean canRun() {
+		if (EntityUtils.isStunned(mBoss) || EntityUtils.isSilenced(mBoss) || EntityUtils.isConfused(mBoss)) {
+			return false;
+		}
 		List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), mRange);
 		if (!players.isEmpty()) {
 			for (Player player : players) {

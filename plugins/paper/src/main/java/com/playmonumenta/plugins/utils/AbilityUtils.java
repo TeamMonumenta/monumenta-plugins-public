@@ -245,7 +245,6 @@ public class AbilityUtils {
 					int firstArrow = playerInv.first(Material.ARROW);
 					int firstTippedArrow = playerInv.first(Material.TIPPED_ARROW);
 					int firstSpectralArrow = playerInv.first(Material.SPECTRAL_ARROW);
-
 					final int arrowSlot;
 					if (firstArrow == -1 && firstTippedArrow > -1 && firstSpectralArrow == -1) {
 						arrowSlot = firstTippedArrow;
@@ -256,11 +255,11 @@ public class AbilityUtils {
 					} else if (firstArrow > - 1 && firstTippedArrow > -1) {
 						arrowSlot = Math.min(firstArrow, firstTippedArrow);
 					} else if (firstArrow > -1 && firstSpectralArrow > -1) {
-						arrowSlot = Math.min(firstArrow, firstTippedArrow);
+						arrowSlot = Math.min(firstArrow, firstSpectralArrow);
 					} else if (firstTippedArrow > -1 && firstSpectralArrow > -1) {
 						arrowSlot = Math.min(firstSpectralArrow, firstTippedArrow);
 					} else if (firstTippedArrow > -1 && firstSpectralArrow > -1 && firstArrow > -1) {
-						arrowSlot = Math.min(firstSpectralArrow, Math.min(firstSpectralArrow, firstArrow));
+						arrowSlot = Math.min(firstTippedArrow, Math.min(firstSpectralArrow, firstArrow));
 					} else {
 						return;
 					}

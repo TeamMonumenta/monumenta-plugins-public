@@ -73,7 +73,7 @@ public class Rampage extends Ability {
 				EntityUtils.damageEntity(mPlugin, mob, mStacks, mPlayer, MagicType.PHYSICAL, true, mInfo.mLinkedSpell);
 				world.spawnParticle(Particle.VILLAGER_ANGRY, mob.getLocation(), 5, 0, 0, 0, 0.1);
 			}
-			
+
 			mTimer = mStacks / 2;
 			mPlugin.mEffectManager.addEffect(mPlayer, PERCENT_DAMAGE_RESIST_EFFECT_NAME, new PercentDamageReceived(mTimer, mStacks / -100.0));
 			world.spawnParticle(Particle.EXPLOSION_HUGE, loc, 3, 0.2, 0.2, 0.2, 0);
@@ -98,7 +98,7 @@ public class Rampage extends Ability {
 				MessagingUtils.sendActionBarMessage(mPlugin, mPlayer, "Rage: " + mStacks);
 			}
 		}
-		
+
 		if (oneSecond) {
 			if (mTimer > 0) {
 				mTimer--;
@@ -125,6 +125,19 @@ public class Rampage extends Ability {
 		}
 
 		return true;
+	}
+
+	public void customRecklessSwingInteraction(double swingDamage) {
+		mTimeToStackDecay = 0;
+
+		mRemainderDamage += swingDamage;
+		int newStacks = mRemainderDamage / mDamagePerStack;
+		mRemainderDamage %= mDamagePerStack;
+
+		if (newStacks > 0) {
+			mStacks = Math.min(mStackLimit, mStacks + newStacks);
+			MessagingUtils.sendActionBarMessage(mPlugin, mPlayer, "Rage: " + mStacks);
+		}
 	}
 
 	@Override

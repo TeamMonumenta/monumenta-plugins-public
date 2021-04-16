@@ -3,7 +3,7 @@ package com.playmonumenta.plugins.classes;
 import org.bukkit.entity.Player;
 
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.alchemist.AlchemicalArtillery;
+import com.playmonumenta.plugins.abilities.alchemist.Bezoar;
 import com.playmonumenta.plugins.abilities.alchemist.BasiliskPoison;
 import com.playmonumenta.plugins.abilities.alchemist.BrutalAlchemy;
 import com.playmonumenta.plugins.abilities.alchemist.EnfeeblingElixir;
@@ -31,7 +31,7 @@ public class Alchemist extends PlayerClass {
 		mAbilities.add(new PowerInjection(plugin, player));
 		mAbilities.add(new UnstableArrows(plugin, player));
 		mAbilities.add(new EnfeeblingElixir(plugin, player));
-		mAbilities.add(new AlchemicalArtillery(plugin, player));
+		mAbilities.add(new Bezoar(plugin, player));
 		mClass = 5;
 		mClassName = "Alchemist";
 

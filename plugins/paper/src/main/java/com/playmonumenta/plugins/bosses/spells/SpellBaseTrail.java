@@ -11,6 +11,8 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.util.BoundingBox;
 
+import com.playmonumenta.plugins.utils.EntityUtils;
+
 public class SpellBaseTrail extends Spell {
 
 	private class TrailNode {
@@ -94,6 +96,9 @@ public class SpellBaseTrail extends Spell {
 
 	@Override
 	public void run() {
+		if (EntityUtils.isStunned(mBoss) || EntityUtils.isSilenced(mBoss) || EntityUtils.isConfused(mBoss)) {
+			return;
+		}
 		mTicks += mTickRate;
 		if (mTicks >= mTrailRate) {
 			if (!mTrailGroundOnly || mBoss.isOnGround()) {

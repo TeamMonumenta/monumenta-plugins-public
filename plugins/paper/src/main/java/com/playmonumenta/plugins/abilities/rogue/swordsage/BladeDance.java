@@ -27,21 +27,29 @@ import com.playmonumenta.plugins.utils.PotionUtils;
 
 public class BladeDance extends Ability {
 
-	private static final int DANCE_1_DAMAGE = 12;
-	private static final int DANCE_2_DAMAGE = 18;
+	private static final int DANCE_1_DAMAGE = 14;
+	private static final int DANCE_2_DAMAGE = 24;
+	private static final double SLOWNESS_AMPLIFIER = 0.4;
+	private static final double WEAKEN_AMP_1 = 0.5;
+	private static final double WEAKEN_AMP_2 = 0.7;
+	private static final int DURATION = 20 * 5;
 	private static final int DANCE_RADIUS = 4;
 	private static final float DANCE_KNOCKBACK_SPEED = 0.2f;
+	private static final int COOLDOWN = 16 * 20;
 	private static final Particle.DustOptions SWORDSAGE_COLOR = new Particle.DustOptions(Color.fromRGB(150, 0, 0), 1.0f);
+
+	private final double mWeakenAmp;
 
 	public BladeDance(Plugin plugin, Player player) {
 		super(plugin, player, "Blade Dance");
 		mInfo.mScoreboardId = "BladeDance";
 		mInfo.mShorthandName = "BD";
-		mInfo.mDescriptions.add("When holding two swords, right-click while looking down to enter a defensive stance, parrying all attacks and becoming invulnerable for 0.75 seconds. Afterwards, unleash a powerful attack that deals 12 damage to and afflicts Weakness III to all enemies in a 4 block radius for 5 seconds. Cooldown: 20s.");
-		mInfo.mDescriptions.add("The area attack now deals 18 damage and afflicts Weakness IV.");
+		mInfo.mDescriptions.add("When holding two swords, right-click while looking down to enter a defensive stance, parrying all attacks and becoming invulnerable for 0.75 seconds. Afterwards, unleash a powerful attack that deals 14 damage to and afflicts 40% Slowness and 50% Weaken to all enemies in a 4 block radius for 5 seconds. Cooldown: 16s.");
+		mInfo.mDescriptions.add("The area attack now deals 24 damage and afflicts 70% Weaken.");
 		mInfo.mLinkedSpell = Spells.BLADE_DANCE;
-		mInfo.mCooldown = 20 * 15;
+		mInfo.mCooldown = COOLDOWN;
 		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
+		mWeakenAmp = getAbilityScore() == 1 ? WEAKEN_AMP_1 : WEAKEN_AMP_2;
 
 		/*
 		 * NOTE! Because BladeDance has two events (cast and damage), we need both
@@ -67,9 +75,6 @@ public class BladeDance extends Ability {
 		world.spawnParticle(Particle.CLOUD, mPlayer.getLocation().clone().add(0, 1, 0), 20, 0.25, 0.5, 0.25, 0.15);
 		world.spawnParticle(Particle.REDSTONE, mPlayer.getLocation().clone().add(0, 1, 0), 6, 0.45, 0.5, 0.45, 0, SWORDSAGE_COLOR);
 		mPlayer.setInvulnerable(true);
-		if (getAbilityScore() >= 2) {
-			mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.SPEED, 20 * 2, 1, true, false));
-		}
 		new BukkitRunnable() {
 			int mTicks = 0;
 			float mPitch = 0.5f;
@@ -103,7 +108,8 @@ public class BladeDance extends Ability {
 						MovementUtils.knockAway(mPlayer, mob, DANCE_KNOCKBACK_SPEED);
 
 						int amplifier = getAbilityScore() == 1 ? 2 : 3;
-						PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(PotionEffectType.WEAKNESS, 100, amplifier, true, true));
+						EntityUtils.applySlow(mPlugin, DURATION, SLOWNESS_AMPLIFIER, mob);
+						EntityUtils.applyWeaken(mPlugin, DURATION, mWeakenAmp, mob);
 
 						Location mobLoc = mob.getLocation().add(0, 1, 0);
 						world.spawnParticle(Particle.SWEEP_ATTACK, mobLoc, 5, 0.35, 0.5, 0.35, 0);

@@ -39,7 +39,7 @@ public class ChoirBells extends Ability {
 	private final double mSlownessAmount;
 	private final double mWeakenEffect;
 	private final double mVulnerabilityEffect;
-	
+
 	private Crusade mCrusade;
 	private boolean mCountsHumanoids = false;
 
@@ -48,14 +48,14 @@ public class ChoirBells extends Ability {
 		mInfo.mLinkedSpell = Spells.CHOIR_BELLS;
 		mInfo.mScoreboardId = "ChoirBells";
 		mInfo.mShorthandName = "CB";
-		mInfo.mDescriptions.add("Pressing the swap key while shifted causes the Cleric to become the target of any undead within a ten-block-long cone in front of them. All mobs are afflicted with 10% Slowness for 8 seconds, and undead are afflicted with 20% Weaken and 20% Vulnerability for 8 seconds. Cooldown: 20s.");
+		mInfo.mDescriptions.add("Pressing the swap key while not sneaking causes the Cleric to become the target of any undead within a ten-block-long cone in front of them. All mobs are afflicted with 10% Slowness for 8 seconds, and undead are afflicted with 20% Weaken and 20% Vulnerability for 8 seconds. Cooldown: 20s.");
 		mInfo.mDescriptions.add("Slowness increased to 20% and Weaken and Vulnerability increased to 35%.");
 		mInfo.mCooldown = COOLDOWN;
 		mInfo.mIgnoreCooldown = true;
 		mSlownessAmount = getAbilityScore() == 1 ? SLOWNESS_AMPLIFIER_1 : SLOWNESS_AMPLIFIER_2;
 		mWeakenEffect = getAbilityScore() == 1 ? WEAKEN_EFFECT_1 : WEAKEN_EFFECT_2;
 		mVulnerabilityEffect = getAbilityScore() == 1 ? VULNERABILITY_EFFECT_1 : VULNERABILITY_EFFECT_2;
-		
+
 		Bukkit.getScheduler().runTask(plugin, () -> {
 			if (player != null) {
 				mCrusade = AbilityManager.getManager().getPlayerAbility(mPlayer, Crusade.class);
@@ -65,15 +65,15 @@ public class ChoirBells extends Ability {
 			}
 		});
 	}
-	
+
 	@Override
 	public void playerSwapHandItemsEvent(PlayerSwapHandItemsEvent event) {
-		if (mPlayer.isSneaking()) {
+		if (!mPlayer.isSneaking()) {
 			event.setCancelled(true);
 			if (mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.mLinkedSpell)) {
 				return;
 			}
-			
+
 			ParticleUtils.explodingConeEffect(mPlugin, mPlayer, 10, Particle.VILLAGER_HAPPY, 0.5f, Particle.SPELL_INSTANT, 0.5f, 0.33);
 
 			for (int i = 0; i < CHOIR_BELLS_PITCHES.length; i++) {

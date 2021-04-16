@@ -14,24 +14,25 @@ public class Agility extends Ability {
 
 	private static final int AGILITY_1_EFFECT_LVL = 0;
 	private static final int AGILITY_2_EFFECT_LVL = 1;
-	private static final int AGILITY_1_DAMAGE_BONUS = 1;
-	private static final int AGILITY_2_DAMAGE_BONUS = 2;
-
-	private final int mDamageBonus;
+	private static final int AGILITY_BONUS_DAMAGE = 1;
+	private static final double SCALING_DAMAGE = 0.1;
 
 	public Agility(Plugin plugin, Player player) {
 		super(plugin, player, "Agility");
 		mInfo.mScoreboardId = "Agility";
 		mInfo.mShorthandName = "Agl";
 		mInfo.mDescriptions.add("You gain permanent Haste I. Your melee attacks deal +1 extra damage.");
-		mInfo.mDescriptions.add("You gain permanent Haste II. Your melee attacks deal +2 extra damage.");
-		mDamageBonus = getAbilityScore() == 1 ? AGILITY_1_DAMAGE_BONUS : AGILITY_2_DAMAGE_BONUS;
+		mInfo.mDescriptions.add("You gain permanent Haste II. Increase melee damage by +1 plus 10% of final damage done.");
 	}
 
 	@Override
 	public boolean livingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
 		if (event.getCause() ==  DamageCause.ENTITY_ATTACK) {
-			event.setDamage(event.getDamage() + mDamageBonus);
+			if (getAbilityScore() > 1) {
+				event.setDamage((event.getDamage() + AGILITY_BONUS_DAMAGE) * (1 + SCALING_DAMAGE));
+			} else {
+				event.setDamage(event.getDamage() + AGILITY_BONUS_DAMAGE);
+			}
 		}
 
 		return true;

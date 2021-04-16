@@ -144,7 +144,7 @@ public class SpellBaseAoE extends Spell {
 			public void run() {
 				Location loc = mLauncher.getLocation();
 
-				if (mLauncher.isDead() || !mLauncher.isValid() || EntityUtils.isStunned(mLauncher)) {
+				if (mLauncher.isDead() || !mLauncher.isValid() || EntityUtils.isStunned(mLauncher) || EntityUtils.isSilenced(mLauncher) || EntityUtils.isConfused(mLauncher)) {
 					if (mLauncher instanceof LivingEntity) {
 						((LivingEntity) mLauncher).setAI(true);
 					}

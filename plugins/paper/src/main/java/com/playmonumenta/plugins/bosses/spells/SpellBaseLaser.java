@@ -187,7 +187,7 @@ public class SpellBaseLaser extends Spell {
 					mParticleChance
 				);
 
-				if ((mStopWhenBlocked && blocked) || EntityUtils.isStunned(mBoss)) {
+				if ((mStopWhenBlocked && blocked) || EntityUtils.isStunned(mBoss) || EntityUtils.isSilenced(mBoss) || EntityUtils.isConfused(mBoss)) {
 					mBoss.setAI(true);
 
 					this.cancel();

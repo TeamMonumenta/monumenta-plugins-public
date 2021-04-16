@@ -28,7 +28,6 @@ import com.playmonumenta.plugins.classes.magic.MagicType;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
-import com.playmonumenta.plugins.utils.PotionUtils;
 
 public class ScorchedEarth extends MultipleChargeAbility {
 
@@ -39,7 +38,7 @@ public class ScorchedEarth extends MultipleChargeAbility {
 	private static final int SCORCHED_EARTH_1_CHARGES = 1;
 	private static final int SCORCHED_EARTH_2_CHARGES = 2;
 	private static final int SCORCHED_EARTH_DURATION = 20 * 15;
-	private static final int SCORCHED_EARTH_WEAKNESS_AMP = 0;
+	private static final double WEAKEN_AMP = 0.15;
 	private static final int SCORCHED_EARTH_BONUS_DAMAGE = 3;
 	private static final double SCORCHED_EARTH_RADIUS = 5;
 	private static final Color SCORCHED_EARTH_COLOR_LIGHT = Color.fromRGB(230, 134, 0);
@@ -67,7 +66,7 @@ public class ScorchedEarth extends MultipleChargeAbility {
 		mInfo.mLinkedSpell = Spells.SCORCHED_EARTH;
 		mInfo.mScoreboardId = "ScorchedEarth";
 		mInfo.mShorthandName = "SE";
-		mInfo.mDescriptions.add("Shift right click with an Alchemist Potion to deploy a 5 block radius zone that lasts 15 seconds where the potion lands. Mobs in this zone are afflicted with Weakness I and are dealt 3 extra damage whenever taking damage. Cooldown: 30s.");
+		mInfo.mDescriptions.add("Shift right click with an Alchemist Potion to deploy a 5 block radius zone that lasts 15 seconds where the potion lands. Mobs in this zone are afflicted with 15% Weaken and are dealt 3 extra damage whenever taking damage. Cooldown: 30s.");
 		mInfo.mDescriptions.add("Cooldown reduced to 25s, and two charges of this ability can be stored at once.");
 		mInfo.mCooldown = getAbilityScore() == 1 ? SCORCHED_EARTH_1_COOLDOWN : SCORCHED_EARTH_2_COOLDOWN;
 		mInfo.mIgnoreCooldown = true;
@@ -120,9 +119,7 @@ public class ScorchedEarth extends MultipleChargeAbility {
 								// We'll put the health of the mobs to be damaged in the new map after we damage them
 								newMobHealths.put(mob, mob.getHealth());
 							}
-
-							PotionUtils.applyPotion(mPlayer, mob,
-									new PotionEffect(PotionEffectType.WEAKNESS, 30, SCORCHED_EARTH_WEAKNESS_AMP, false, true));
+							EntityUtils.applyWeaken(mPlugin, 30, WEAKEN_AMP, mob);
 						}
 					}
 

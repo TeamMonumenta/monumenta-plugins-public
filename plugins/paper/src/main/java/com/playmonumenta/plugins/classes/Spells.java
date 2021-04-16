@@ -69,33 +69,36 @@ public enum Spells {
 	VOLLEY("Volley"),
 	EAGLE_EYE("Eagle Eye"),
 
-	//--Camper/Sniper
+	//--Hunter
 	ENCHANTED_ARROW("Enchanted Arrow"),
 	SPLIT_ARROW("Split Arrow"),
 
 	//--Ranger
 	QUICKDRAW("Quickdraw"),
 	TACTICAL_MANEUVER("Tactical Maneuver"),
-	REFLEXES("Reflexes"),
+	WHIRLING_BLADE("Whirling Blade"),
 
 	//Warlock
 
 	//--Core Abilities
 	AMPLIFYING("Amplifying Hex"),
-	BLASPHEMY("Blasphemous Aura"),
+	PHLEGMATIC_RESOLVE("Phlegmatic Resolve"),
 	SOUL_REND("Soul Rend"),
-	CONSUMING_FLAMES("Consuming Flames"),
+	CHOLERIC_FLAMES("Choleric Flames"),
+	SANGUINE_HARVEST("Sanguine Harvest"),
+	MELANCHOLIC_LAMENT("Melancholic Lament"),
 	GRASPING_CLAWS("Grasping Claws"),
 	EXORCISM("Exorcism"),
 
 	//--Reaper
-	GHOULISH_TAUNT("Ghoulish Taunt"),
-	DEATHS_TOUCH("Death's Touch"),
+	VOODOO_BONDS("Voodoo Bonds"),
+	JUDGEMENT_CHAIN("Judgement Chain"),
 	DARK_PACT("Dark Pact"),
 
 	//--Tenebrist
-	FRACTAL_ENERVATION("Fractal Enervation"),
 	WITHERING_GAZE("Withering Gaze"),
+	HAUNTING_SHADES("Haunting Shades"),
+	UMBRAL_WAIL("Umbral Wail"),
 
 	//Warrior
 
@@ -123,7 +126,7 @@ public enum Spells {
 	IRON_TINCTURE("Iron Tincture"),
 	ENFEEBLING_ELIXIR("Enfeebling Elixir"),
 	UNSTABLE_ARROWS("Unstable Arrows"),
-	ALCHEMICAL_ARTILLERY("Alchemical Artillery"),
+	BEZOAR("Bezoar"),
 
 	//Harbinger
 	NIGHTMARISH_ALCHEMY("Nightmarish Alchemy"),

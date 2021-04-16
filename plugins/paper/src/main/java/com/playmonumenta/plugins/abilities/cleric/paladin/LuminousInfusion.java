@@ -14,6 +14,7 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import com.playmonumenta.plugins.Plugin;
@@ -35,13 +36,13 @@ public class LuminousInfusion extends Ability {
 	private static final double RADIUS = 4;
 	private static final int DAMAGE = 10;
 	private static final int UNDEAD_DAMAGE = 20;
-	private static final int PASSIVE_UNDEAD_DAMAGE_2 = 4;
+	private static final double PASSIVE_UNDEAD_DAMAGE_2 = 0.2;
 	private static final int FIRE_DURATION_2 = 20 * 3;
 	private static final int COOLDOWN = 20 * 14;
 	private static final float KNOCKBACK_SPEED = 0.7f;
 
 	private boolean mActive = false;
-	
+
 	private Crusade mCrusade;
 	private boolean mCountsHumanoids = false;
 
@@ -50,13 +51,13 @@ public class LuminousInfusion extends Ability {
 		mInfo.mLinkedSpell = Spells.LUMINOUS_INFUSION;
 		mInfo.mScoreboardId = "LuminousInfusion";
 		mInfo.mShorthandName = "LI";
-		mInfo.mDescriptions.add("Sneak and right-click while looking at the ground to charge your weapon with holy light. Your next attack (melee, ranged, magic, etc.) on an undead mob triggers an explosion with a 4 block radius, knocking enemies away. Undead take 20 damage and all other mobs take 10 damage. Cooldown: 14s.");
-		mInfo.mDescriptions.add("Additionally, melee attacks against undead passively deal +4 damage, and any attack lights undead on fire for 3 seconds.");
+		mInfo.mDescriptions.add("Swap while shifted to charge your weapon with holy light. Your next attack (melee, ranged, magic, etc.) on an undead mob triggers an explosion with a 4 block radius, knocking enemies away. Undead take 20 damage and all other mobs take 10 damage. Cooldown: 14s.");
+		mInfo.mDescriptions.add("Additionally, melee attacks against undead passively deal 20% final damage as bonus damage, and any attack lights undead on fire for 3 seconds.");
 		mInfo.mCooldown = COOLDOWN;
 		mInfo.mIgnoreCooldown = true;
 		mInfo.mIgnoreTriggerCap = true;
 		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
-		
+
 		Bukkit.getScheduler().runTask(plugin, () -> {
 			if (player != null) {
 				mCrusade = AbilityManager.getManager().getPlayerAbility(mPlayer, Crusade.class);
@@ -67,15 +68,13 @@ public class LuminousInfusion extends Ability {
 		});
 	}
 
-	@Override
-	public void cast(Action action) {
-		if (mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.mLinkedSpell)) {
-			return;
-		}
-
-		ItemStack mainHand = mPlayer.getInventory().getItemInMainHand();
-		if (!mPlayer.isSneaking() || InventoryUtils.isBowItem(mainHand)
-		    || mPlayer.getLocation().getPitch() < 50) {
+	public void playerSwapHandItemsEvent(PlayerSwapHandItemsEvent event) {
+		if (mPlayer.isSneaking()) {
+			event.setCancelled(true);
+			if (mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.mLinkedSpell)) {
+				return;
+			}
+		} else {
 			return;
 		}
 
@@ -118,11 +117,11 @@ public class LuminousInfusion extends Ability {
 			double bonusDamage = 0.0;
 			if (mCrusade != null) {
 				if (mCrusade.getAbilityScore() > 0) {
-					bonusDamage = PASSIVE_UNDEAD_DAMAGE_2 * 0.33;
+					bonusDamage = (event.getDamage() * PASSIVE_UNDEAD_DAMAGE_2) * 0.33;
 				}
 			}
 			if (event.getCause() == DamageCause.ENTITY_ATTACK) {
-				event.setDamage(event.getDamage() + PASSIVE_UNDEAD_DAMAGE_2 + bonusDamage);
+				event.setDamage((event.getDamage() * (1 + PASSIVE_UNDEAD_DAMAGE_2)) + bonusDamage);
 			}
 		}
 

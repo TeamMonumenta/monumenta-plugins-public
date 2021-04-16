@@ -16,6 +16,7 @@ import org.bukkit.util.Vector;
 
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
 
 public class SpellBaseLeapAttack extends Spell {
 
@@ -133,7 +134,7 @@ public class SpellBaseLeapAttack extends Spell {
 			}
 		}
 
-		if (locTarget == null || targetPlayer == null) {
+		if (locTarget == null || targetPlayer == null || EntityUtils.isStunned(mBoss) || EntityUtils.isSilenced(mBoss) || EntityUtils.isConfused(mBoss)) {
 			return;
 		}
 
