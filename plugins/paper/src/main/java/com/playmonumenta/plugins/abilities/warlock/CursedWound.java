@@ -59,6 +59,7 @@ public class CursedWound extends Ability {
 				                     (damagee.getWidth() / 2) + 0.1, damagee.getHeight() / 3, (damagee.getWidth() / 2) + 0.1, fallingDustData);
 				world.spawnParticle(Particle.SPELL_MOB, damagee.getLocation().add(0, damagee.getHeight() / 2, 0), 6,
 				                     (damagee.getWidth() / 2) + 0.1, damagee.getHeight() / 3, (damagee.getWidth() / 2) + 0.1, 0);
+				// *TO DO* - Move to constructor
 				Ability[] abilities = new Ability[12];
 				abilities[0] = AbilityManager.getManager().getPlayerAbility(mPlayer, AmplifyingHex.class);
 				abilities[1] = AbilityManager.getManager().getPlayerAbility(mPlayer, CholericFlames.class);

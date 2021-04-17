@@ -75,6 +75,7 @@ public class DarkPact extends Ability {
 	public void playerSwapHandItemsEvent(PlayerSwapHandItemsEvent event) {
 		if (InventoryUtils.isScytheItem(mPlayer.getInventory().getItemInMainHand())) {
 			event.setCancelled(true);
+			// *TO DO* - Turn into boolean in constructor -or- look at changing trigger entirely
 			if (mPlayer.isOnGround() || mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.mLinkedSpell) || (mPlayer.isSneaking() && mJudgementChain != null && mPlayer.getLocation().getPitch() < -50.0)) {
 				return;
 			}

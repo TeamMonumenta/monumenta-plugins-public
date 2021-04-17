@@ -31,7 +31,7 @@ public class MelancholicLament extends Ability {
 
 	private static final int DURATION = 20 * 8;
 	private static final double WEAKEN_EFFECT_1 = 0.2;
-	private static final double WEAKEN_EFFECT_2 = 0.2;
+	private static final double WEAKEN_EFFECT_2 = 0.3;
 	private static final int COOLDOWN = 20 * 16;
 	private static final int RADIUS = 7;
 	private static final int CLEANSE_REDUCTION = 20 * 10;
@@ -68,6 +68,7 @@ public class MelancholicLament extends Ability {
 		ItemStack mainHandItem = mPlayer.getInventory().getItemInMainHand();
 		if (InventoryUtils.isScytheItem(mainHandItem)) {
 			event.setCancelled(true);
+			// *TO DO* - Turn into boolean in constructor -or- look at changing trigger entirely
 			if (!mPlayer.isSneaking() || (!mPlayer.isOnGround() && mDarkPact != null) || (mPlayer.isSneaking() && mJudgementChain != null && mPlayer.getLocation().getPitch() < -50.0)
 					|| (mPlayer.isSprinting() && mUmbral != null)) {
 				return;

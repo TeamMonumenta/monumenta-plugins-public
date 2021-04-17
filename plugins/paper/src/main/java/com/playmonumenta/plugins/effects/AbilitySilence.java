@@ -6,10 +6,10 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
 import com.playmonumenta.plugins.abilities.AbilityManager;
-import com.playmonumenta.scriptedquests.utils.MessagingUtils;
 import com.playmonumenta.plugins.bosses.events.SpellCastEvent;
 
-import net.md_5.bungee.api.ChatColor;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.Component;
 
 public class AbilitySilence extends Effect {
 
@@ -34,9 +34,7 @@ public class AbilitySilence extends Effect {
 	@Override
 	public void entityGainEffect(Entity entity) {
 		if (entity instanceof Player) {
-			MessagingUtils.sendActionBarMessage((Player) entity, ChatColor.DARK_RED, false,
-					"You are silenced! You cannot use abilities for " + getDuration() / 20 + "s");
-
+			entity.sendActionBar(Component.text("You are silenced! You cannot use abilities for " + getDuration() / 20 + "s", NamedTextColor.DARK_RED));
 			AbilityManager.getManager().getPlayerAbilities((Player) entity).silence();
 		}
 	}
@@ -52,8 +50,7 @@ public class AbilitySilence extends Effect {
 	public void entityTickEffect(Entity entity, boolean fourHertz, boolean twoHertz, boolean oneHertz) {
 		if (oneHertz) {
 			if (entity instanceof Player) {
-				MessagingUtils.sendActionBarMessage((Player) entity, ChatColor.DARK_RED, false,
-						"You are silenced! You cannot use abilities for " + getDuration() / 20 + "s");
+				entity.sendActionBar(Component.text("You are silenced! You cannot use abilities for " + getDuration() / 20 + "s", NamedTextColor.DARK_RED));
 			}
 		}
 

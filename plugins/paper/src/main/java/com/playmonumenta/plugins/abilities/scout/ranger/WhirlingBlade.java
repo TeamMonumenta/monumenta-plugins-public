@@ -29,8 +29,8 @@ public class WhirlingBlade extends MultipleChargeAbility {
 
 	private static final int BLADE_1_DAMAGE = 10;
 	private static final int BLADE_2_DAMAGE = 15;
-	private static final float BLADE_1_KNOCKBACK = 0.1f;
-	private static final float BLADE_2_KNOCKBACK = 1f;
+	private static final float BLADE_1_KNOCKBACK = 0.4f;
+	private static final float BLADE_2_KNOCKBACK = 1.2f;
 	private static final double THROW_RADIUS = 3;
 	private static final double BLADE_RADIUS = 1;
 	private static final int BLADE_1_MAX_CHARGES = 2;
@@ -99,11 +99,10 @@ public class WhirlingBlade extends MultipleChargeAbility {
 				Vector direction = new Vector(Math.cos(mStartAngle - Math.PI*mIncrementDegrees/180), 0, Math.sin(mStartAngle - Math.PI*mIncrementDegrees/180));
 				Location mLoc = mPlayer.getEyeLocation().add(0, -0.5, 0).add(direction.multiply(THROW_RADIUS));
 				BoundingBox mBox = BoundingBox.of(mLoc, BLADE_RADIUS, BLADE_RADIUS, BLADE_RADIUS);
-				BoundingBox mPlayerBox = BoundingBox.of(mPlayer.getLocation().add(0, 1, 0), 0.5, 1.0, 0.5);
 				Iterator<LivingEntity> mobIter = mMobs.iterator();
 				while (mobIter.hasNext()) {
 					LivingEntity mob = mobIter.next();
-					if (mBox.overlaps(mob.getBoundingBox()) || mPlayerBox.overlaps(mob.getBoundingBox())) {
+					if (mBox.overlaps(mob.getBoundingBox())) {
 						EntityUtils.damageEntity(mPlugin, mob, mDamage, mPlayer, MagicType.PHYSICAL, true, mInfo.mLinkedSpell);
 						MovementUtils.knockAway(mPlayer, mob, mKnockback);
 						mobIter.remove();

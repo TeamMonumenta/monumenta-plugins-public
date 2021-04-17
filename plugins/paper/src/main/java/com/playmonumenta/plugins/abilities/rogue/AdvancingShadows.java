@@ -178,6 +178,7 @@ public class AdvancingShadows extends Ability {
 		ItemStack offHand = mPlayer.getInventory().getItemInOffHand();
 		if (InventoryUtils.rogueTriggerCheck(mainHand, offHand)) {
 			if (!mPlayer.isSneaking()) {
+				// *TO DO* - Turn into boolean in constructor -or- look at changing trigger entirely
 				if (mBladeDance != null && mPlayer.getLocation().getPitch() >= 50) {
 					return false;
 				}

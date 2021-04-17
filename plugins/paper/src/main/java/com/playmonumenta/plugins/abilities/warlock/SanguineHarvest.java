@@ -78,6 +78,7 @@ public class SanguineHarvest extends Ability {
 		ItemStack mainHandItem = mPlayer.getInventory().getItemInMainHand();
 		if (InventoryUtils.isScytheItem(mainHandItem)) {
 			event.setCancelled(true);
+			// *TO DO* - Turn into boolean in constructor -or- look at changing trigger entirely
 			if (mPlayer.isSneaking() || (!mPlayer.isOnGround() && mDarkPact != null) || (mPlayer.isSprinting() && mUmbral != null)) {
 				return;
 			}

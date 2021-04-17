@@ -57,16 +57,18 @@ public class VoodooBondsOtherPlayer extends Effect {
 		double damage = event.getFinalDamage();
 		double maxHealth = p.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue();
 		double percentDamage = damage / maxHealth;
+
 		mPlugin.mEffectManager.addEffect(mPlayer, SEND_EFFECT_NAME, new VoodooBondsReaper(duration, mPlayer, event.getDamage(), percentDamage, mPlugin));
 
-		EntityDamageByEntityEvent entityEvent = (EntityDamageByEntityEvent) event;
-		if (entityEvent.getDamager() != null) {
+		if (event instanceof EntityDamageByEntityEvent) {
+			EntityDamageByEntityEvent entityEvent = (EntityDamageByEntityEvent) event;
 			if (EntityUtils.isBoss(entityEvent.getDamager())) {
 				event.setDamage(event.getDamage() / 2);
-				MovementUtils.knockAway(mPlayer.getLocation(), (LivingEntity) entityEvent.getDamager(), 0.3f, 0.15f);
 			} else {
 				event.setDamage(0);
-				MovementUtils.knockAway(mPlayer.getLocation(), (LivingEntity) entityEvent.getDamager(), 0.3f, 0.15f);
+				if (entityEvent.getDamager() instanceof LivingEntity) {
+					MovementUtils.knockAway(mPlayer.getLocation(), (LivingEntity) entityEvent.getDamager(), 0.3f, 0.15f);
+				}
 			}
 		} else {
 			event.setDamage(0);

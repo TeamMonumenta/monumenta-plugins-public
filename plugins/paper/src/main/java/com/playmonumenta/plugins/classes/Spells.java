@@ -121,6 +121,7 @@ public enum Spells {
 
 	//Alchemist
 	ALCHEMIST_POTION("Alchemist Potion"),
+	BASILISK_POISON("Basilisk Poison"),
 	BRUTAL_ALCHEMY("Brutal Alchemy"),
 	POWER_INJECTION("Power Injection"),
 	IRON_TINCTURE("Iron Tincture"),

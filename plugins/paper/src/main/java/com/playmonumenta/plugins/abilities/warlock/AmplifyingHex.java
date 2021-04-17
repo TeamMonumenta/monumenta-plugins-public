@@ -118,7 +118,7 @@ public class AmplifyingHex extends Ability {
 		}.runTaskTimer(mPlugin, 0, 1);
 
 		float effectDamage = getAbilityScore() == 1 ? EFFECT_DAMAGE_1 : EFFECT_DAMAGE_2;
-		world.playSound(mPlayer.getLocation(), Sound.ENTITY_POLAR_BEAR_WARNING, 1.0f, 0.65f);
+		world.playSound(mPlayer.getLocation(), Sound.ENTITY_BLAZE_DEATH, 1.0f, 0.7f);
 		world.playSound(mPlayer.getLocation(), Sound.ENTITY_BLAZE_SHOOT, 1.0f, 0.65f);
 		Vector playerDir = mPlayer.getEyeLocation().getDirection().setY(0).normalize();
 

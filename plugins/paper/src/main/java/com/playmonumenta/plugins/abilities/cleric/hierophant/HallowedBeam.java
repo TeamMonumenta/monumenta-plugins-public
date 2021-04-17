@@ -101,14 +101,14 @@ public class HallowedBeam extends MultipleChargeAbility {
 						Location loc = player.getEyeLocation();
 						Vector dir = loc.getDirection();
 						World world = mPlayer.getWorld();
-						world.playSound(loc, Sound.BLOCK_BUBBLE_COLUMN_WHIRLPOOL_INSIDE, 1, 0.85f);
-						world.playSound(loc, Sound.ENTITY_ARROW_SHOOT, 1, 0.9f);
 
 						if (e == null) {
 							for (int i = 0; i < CAST_RANGE; i++) {
 								loc.add(dir);
 								world.spawnParticle(Particle.VILLAGER_HAPPY, loc, 5, 0.25, 0.25, 0.25, 0);
 								world.spawnParticle(Particle.EXPLOSION_NORMAL, loc, 2, 0.05f, 0.05f, 0.05f, 0.025f);
+								world.playSound(loc, Sound.BLOCK_BUBBLE_COLUMN_WHIRLPOOL_INSIDE, 1, 0.85f);
+								world.playSound(loc, Sound.ENTITY_ARROW_SHOOT, 1, 0.9f);
 							}
 							this.cancel();
 							return;
@@ -131,6 +131,8 @@ public class HallowedBeam extends MultipleChargeAbility {
 								this.cancel();
 								return;
 							}
+							world.playSound(loc, Sound.BLOCK_BUBBLE_COLUMN_WHIRLPOOL_INSIDE, 1, 0.85f);
+							world.playSound(loc, Sound.ENTITY_ARROW_SHOOT, 1, 0.9f);
 							for (int i = 0; i < CAST_RANGE; i++) {
 								loc.add(dir);
 								world.spawnParticle(Particle.VILLAGER_HAPPY, loc, 5, 0.25, 0.25, 0.25, 0);
@@ -162,6 +164,8 @@ public class HallowedBeam extends MultipleChargeAbility {
 								this.cancel();
 								return;
 							}
+							world.playSound(loc, Sound.BLOCK_BUBBLE_COLUMN_WHIRLPOOL_INSIDE, 1, 0.85f);
+							world.playSound(loc, Sound.ENTITY_ARROW_SHOOT, 1, 0.9f);
 							for (int i = 0; i < CAST_RANGE; i++) {
 								loc.add(dir);
 								world.spawnParticle(Particle.VILLAGER_HAPPY, loc, 5, 0.25, 0.25, 0.25, 0);
@@ -200,6 +204,8 @@ public class HallowedBeam extends MultipleChargeAbility {
 								this.cancel();
 								return;
 							}
+							world.playSound(loc, Sound.BLOCK_BUBBLE_COLUMN_WHIRLPOOL_INSIDE, 1, 0.85f);
+							world.playSound(loc, Sound.ENTITY_ARROW_SHOOT, 1, 0.9f);
 							for (int i = 0; i < CAST_RANGE; i++) {
 								loc.add(dir);
 								world.spawnParticle(Particle.VILLAGER_HAPPY, loc, 5, 0.25, 0.25, 0.25, 0);

@@ -58,7 +58,7 @@ public class HauntingShades extends MultipleChargeAbility {
 	private int mRightClicks = 0;
 
 	public HauntingShades(Plugin plugin, Player player) {
-		super(plugin, player, "HauntingShades", SHADES_CHARGES_1, SHADES_CHARGES_2);
+		super(plugin, player, "Haunting Shades", SHADES_CHARGES_1, SHADES_CHARGES_2);
 		mInfo.mLinkedSpell = Spells.HAUNTING_SHADES;
 		mInfo.mScoreboardId = "HauntingShades";
 		mInfo.mShorthandName = "HS";
@@ -105,7 +105,7 @@ public class HauntingShades extends MultipleChargeAbility {
 			box.shift(direction);
 
 			World world = mPlayer.getWorld();
-			world.playSound(loc, Sound.ENTITY_BLAZE_DEATH, 1, 0.7f);
+			world.playSound(mPlayer.getLocation(), Sound.ENTITY_POLAR_BEAR_WARNING, 1.0f, 0.65f);
 
 			Set<LivingEntity> nearbyMobs = new HashSet<LivingEntity>(EntityUtils.getNearbyMobs(loc, RANGE));
 
@@ -140,7 +140,7 @@ public class HauntingShades extends MultipleChargeAbility {
 
 	private void placeShade(Location bLoc) {
 		World world = mPlayer.getWorld();
-
+		bLoc.setDirection(mPlayer.getLocation().toVector().subtract(bLoc.toVector()).normalize());
 		ArmorStand mStand = (ArmorStand) LibraryOfSoulsIntegration.summon(bLoc, "HauntingShade");
 		mStand.setDisabledSlots(EquipmentSlot.HEAD, EquipmentSlot.CHEST, EquipmentSlot.LEGS, EquipmentSlot.FEET, EquipmentSlot.HAND, EquipmentSlot.OFF_HAND);
 		mStand.setGravity(false);

@@ -38,6 +38,7 @@ public class PhlegmaticResolve extends Ability {
 	@Override
 	public void periodicTrigger(boolean twoHertz, boolean oneSecond, int ticks) {
 		//Triggers four times a second
+		// *TO DO* - move into constructor
 		Ability[] abilities = new Ability[12];
 		abilities[0] = AbilityManager.getManager().getPlayerAbility(mPlayer, AmplifyingHex.class);
 		abilities[1] = AbilityManager.getManager().getPlayerAbility(mPlayer, CholericFlames.class);
