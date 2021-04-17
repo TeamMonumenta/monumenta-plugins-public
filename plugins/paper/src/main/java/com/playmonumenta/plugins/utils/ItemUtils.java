@@ -1111,25 +1111,45 @@ public class ItemUtils {
 	}
 
 	public static String getPlainName(ItemStack itemStack, boolean refresh) {
-		if (refresh) {
+		if (itemStack == null || !itemStack.hasItemMeta() || !itemStack.getItemMeta().hasDisplayName()) {
+			return "";
+		}
+		if (refresh || !hasPlainName(itemStack)) {
 			setPlainName(itemStack);
 		}
+		return getPlainNameIfExists(itemStack);
+	}
+
+	public static String getPlainNameIfExists(ItemStack itemStack) {
 		if (itemStack == null || !itemStack.hasItemMeta()) {
-			return null;
+			return "";
 		}
 		NBTItem nbtItem = new NBTItem(itemStack);
 		if (!nbtItem.hasKey(PLAIN_KEY)) {
-			return null;
+			return "";
 		}
 		NBTCompound plain = nbtItem.getCompound(PLAIN_KEY);
 		if (!plain.hasKey(DISPLAY_KEY)) {
-			return null;
+			return "";
 		}
 		NBTCompound display = plain.getCompound(DISPLAY_KEY);
-		if (!display.hasKey(NAME_KEY)) {
-			return null;
+		return display.hasKey(NAME_KEY) ? display.getString(NAME_KEY) : "";
+	}
+
+	public static boolean hasPlainName(ItemStack itemStack) {
+		if (itemStack == null || !itemStack.hasItemMeta()) {
+			return false;
 		}
-		return display.getString(NAME_KEY);
+		NBTItem nbtItem = new NBTItem(itemStack);
+		if (!nbtItem.hasKey(PLAIN_KEY)) {
+			return false;
+		}
+		NBTCompound plain = nbtItem.getCompound(PLAIN_KEY);
+		if (!plain.hasKey(DISPLAY_KEY)) {
+			return false;
+		}
+		NBTCompound display = plain.getCompound(DISPLAY_KEY);
+		return display.hasKey(NAME_KEY);
 	}
 
 	public static ItemStack setPlainName(ItemStack itemStack) {
@@ -1174,12 +1194,7 @@ public class ItemUtils {
 				}
 			}
 		}
-		ItemStack updatedItemStack = nbtItem.getItem();
-		if (updatedItemStack.hasItemMeta()) {
-			itemStack.setItemMeta(updatedItemStack.getItemMeta());
-		} else {
-			itemStack.setItemMeta(null);
-		}
+		itemStack.setItemMeta(nbtItem.getItem().getItemMeta());
 		return itemStack;
 	}
 
@@ -1188,28 +1203,46 @@ public class ItemUtils {
 	}
 
 	public static List<String> getPlainLore(ItemStack itemStack, boolean refresh) {
-		if (itemStack == null) {
-			return null;
+		if (itemStack == null || !itemStack.hasItemMeta() || !itemStack.getItemMeta().hasLore()) {
+			return new ArrayList<>();
 		}
-		if (refresh) {
+		if (refresh || !hasPlainLore(itemStack)) {
 			setPlainLore(itemStack);
 		}
-		if (!itemStack.hasItemMeta()) {
-			return null;
+
+		return getPlainLoreIfExists(itemStack);
+	}
+
+	private static List<String> getPlainLoreIfExists(ItemStack itemStack) {
+		if (itemStack == null || !itemStack.hasItemMeta()) {
+			return new ArrayList<>();
 		}
 		NBTItem nbtItem = new NBTItem(itemStack);
 		if (!nbtItem.hasKey(PLAIN_KEY)) {
-			return null;
+			return new ArrayList<>();
 		}
 		NBTCompound plain = nbtItem.getCompound(PLAIN_KEY);
 		if (!plain.hasKey(DISPLAY_KEY)) {
-			return null;
+			return new ArrayList<>();
 		}
 		NBTCompound display = plain.getCompound(DISPLAY_KEY);
-		if (!display.hasKey(LORE_KEY)) {
-			return null;
+		return display.hasKey(LORE_KEY) ? display.getStringList(LORE_KEY) : new ArrayList<>();
+	}
+
+	public static boolean hasPlainLore(ItemStack itemStack) {
+		if (itemStack == null || !itemStack.hasItemMeta()) {
+			return false;
 		}
-		return new ArrayList<String>(display.getStringList(LORE_KEY));
+		NBTItem nbtItem = new NBTItem(itemStack);
+		if (!nbtItem.hasKey(PLAIN_KEY)) {
+			return false;
+		}
+		NBTCompound plain = nbtItem.getCompound(PLAIN_KEY);
+		if (!plain.hasKey(DISPLAY_KEY)) {
+			return false;
+		}
+		NBTCompound display = plain.getCompound(DISPLAY_KEY);
+		return display.hasKey(LORE_KEY);
 	}
 
 	public static ItemStack setPlainLore(ItemStack itemStack) {
@@ -1257,12 +1290,7 @@ public class ItemUtils {
 				}
 			}
 		}
-		ItemStack updatedItemStack = nbtItem.getItem();
-		if (updatedItemStack.hasItemMeta()) {
-			itemStack.setItemMeta(updatedItemStack.getItemMeta());
-		} else {
-			itemStack.setItemMeta(null);
-		}
+		itemStack.setItemMeta(nbtItem.getItem().getItemMeta());
 		return itemStack;
 	}
 
