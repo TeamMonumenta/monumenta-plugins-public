@@ -54,13 +54,13 @@ public class FirmamentOverride extends BaseOverride {
 			block.getWorld().playSound(block.getLocation(), Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1.0f, 1.0f);
 			return false;
 		}
-		return true;
+		return false; // TODO SHULKER DUPE
 	}
 
 	private boolean placeBlock(Player player, ItemStack item, BlockPlaceEvent event) {
 		if (!isFirmamentItem(item)) {
 			//Somehow triggered when it wasn't the right item - shouldn't prevent the event to be safe - hopefully other shulkers with lore wont get placed
-			return true;
+			return false; // TODO SHULKER DUPE
 		}
 		if (!player.hasPermission("monumenta.firmament")) {
 			player.sendMessage(ChatColor.RED + "You don't have permission to use this item. Please ask a moderator to fix this.");
