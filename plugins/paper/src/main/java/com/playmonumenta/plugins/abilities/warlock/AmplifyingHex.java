@@ -172,7 +172,7 @@ public class AmplifyingHex extends Ability {
 				}
 
 				if (debuffCount > 0) {
-					float finalDamage = (float) AmplifyingHexDamageEnchantment.getSpellDamage(mPlayer, debuffCount * effectDamage + amplifierCount * mAmplifierDamage);
+					float finalDamage = (float) AmplifyingHexDamageEnchantment.getExtraPercentDamage(mPlayer, AmplifyingHexDamageEnchantment.class, debuffCount * effectDamage + amplifierCount * mAmplifierDamage);
 					EntityUtils.damageEntity(mPlugin, mob, finalDamage, mPlayer, MagicType.DARK_MAGIC, true, mInfo.mLinkedSpell);
 					MovementUtils.knockAway(mPlayer, mob, KNOCKBACK_SPEED);
 				}

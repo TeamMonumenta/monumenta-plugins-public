@@ -30,8 +30,6 @@ import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.events.CustomDamageEvent;
 import com.playmonumenta.plugins.effects.SanguineMark;
 import com.playmonumenta.plugins.abilities.warlock.reaper.DarkPact;
-import com.playmonumenta.plugins.abilities.warlock.tenebrist.UmbralWail;
-
 
 public class SanguineHarvest extends Ability {
 
@@ -51,7 +49,6 @@ public class SanguineHarvest extends Ability {
 	private final int mRadius;
 	private final int mBleedLevel;
 	private DarkPact mDarkPact;
-	private UmbralWail mUmbral;
 
 	public SanguineHarvest(Plugin plugin, Player player) {
 		super(plugin, player, "Sanguine Harvest");
@@ -68,7 +65,6 @@ public class SanguineHarvest extends Ability {
 		Bukkit.getScheduler().runTask(plugin, () -> {
 			if (player != null) {
 				mDarkPact = AbilityManager.getManager().getPlayerAbility(mPlayer, DarkPact.class);
-				mUmbral = AbilityManager.getManager().getPlayerAbility(mPlayer, UmbralWail.class);
 			}
 		});
 	}
@@ -79,7 +75,7 @@ public class SanguineHarvest extends Ability {
 		if (InventoryUtils.isScytheItem(mainHandItem)) {
 			event.setCancelled(true);
 			// *TO DO* - Turn into boolean in constructor -or- look at changing trigger entirely
-			if (mPlayer.isSneaking() || (!mPlayer.isOnGround() && mDarkPact != null) || (mPlayer.isSprinting() && mUmbral != null)) {
+			if (mPlayer.isSneaking() || (!mPlayer.isOnGround() && mDarkPact != null)) {
 				return;
 			}
 			if (mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.mLinkedSpell)) {

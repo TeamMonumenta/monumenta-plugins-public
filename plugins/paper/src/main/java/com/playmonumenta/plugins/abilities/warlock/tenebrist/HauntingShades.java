@@ -33,6 +33,8 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
+import com.playmonumenta.plugins.utils.ZoneUtils;
+import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
 
 public class HauntingShades extends MultipleChargeAbility {
 
@@ -72,6 +74,9 @@ public class HauntingShades extends MultipleChargeAbility {
 
 	@Override
 	public boolean runCheck() {
+		if (ZoneUtils.hasZoneProperty(mPlayer, ZoneProperty.NO_MOBILITY_ABILITIES)) {
+			return false;
+		}
 		return (InventoryUtils.isScytheItem(mPlayer.getInventory().getItemInMainHand()) && !mPlayer.isSneaking() && !mPlayer.isSprinting());
 	}
 

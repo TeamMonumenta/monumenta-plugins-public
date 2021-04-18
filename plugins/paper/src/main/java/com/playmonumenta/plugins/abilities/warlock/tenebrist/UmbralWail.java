@@ -45,7 +45,7 @@ public class UmbralWail extends Ability {
 	private final int mDuration;
 
 	public UmbralWail(Plugin plugin, Player player) {
-		super(plugin, player, "UmbralWail");
+		super(plugin, player, "Umbral Wail");
 		mInfo.mLinkedSpell = Spells.UMBRAL_WAIL;
 		mInfo.mScoreboardId = "UmbralWail";
 		mInfo.mShorthandName = "UW";

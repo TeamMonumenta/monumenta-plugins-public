@@ -92,6 +92,11 @@ public abstract class BaseAbilityEnchantment implements BaseEnchantment {
 		int level = PlayerTracking.getInstance().getPlayerCustomEnchantLevel(player, c);
 		return level * 20;
 	}
+	
+	public static float getExtraPercentDamage(Player player, Class<? extends BaseEnchantment> c, float baseDamage) {
+		int percentage = PlayerTracking.getInstance().getPlayerCustomEnchantLevel(player, c);
+		return baseDamage * (1 + (percentage / 100f));
+	}
 
 	public static float getCooldown(Player player, float baseCooldown, Class<? extends BaseEnchantment> c) {
 		int level = PlayerTracking.getInstance().getPlayerCustomEnchantLevel(player, c);
