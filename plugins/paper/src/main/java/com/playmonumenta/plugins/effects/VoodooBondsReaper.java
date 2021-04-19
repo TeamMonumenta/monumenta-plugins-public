@@ -14,6 +14,7 @@ import org.bukkit.Location;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.utils.AbsorptionUtils;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.abilities.warlock.reaper.VoodooBonds;
@@ -74,7 +75,19 @@ public class VoodooBondsReaper extends Effect {
 	@Override
 	public void entityLoseEffect(Entity entity) {
 		if (!mDone) {
-			mPlayer.setHealth(Math.max(mPlayer.getHealth() - mPlayer.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue() * mDamagePercent, 1));
+			double absorbHealth = AbsorptionUtils.getAbsorption(mPlayer);
+			if (absorbHealth <= 0) {
+				mPlayer.setHealth(Math.max(mPlayer.getHealth() - mPlayer.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue() * mDamagePercent, 1));
+			} else {
+				if (mPlayer.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue() * mDamagePercent >= absorbHealth) {
+					double leftoverHealth = mPlayer.getHealth() + absorbHealth - mPlayer.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue() * mDamagePercent;
+					AbsorptionUtils.subtractAbsorption(mPlayer, absorbHealth);
+					mPlayer.setHealth(Math.max(leftoverHealth, 1));
+				} else {
+					AbsorptionUtils.subtractAbsorption(mPlayer, absorbHealth);
+				}
+			}
+			
 			Location loc = mPlayer.getLocation();
 			World world = loc.getWorld();
 			world.spawnParticle(Particle.SPELL_WITCH, loc, 60, 0.5, 0.5, 0.5, 0.001);

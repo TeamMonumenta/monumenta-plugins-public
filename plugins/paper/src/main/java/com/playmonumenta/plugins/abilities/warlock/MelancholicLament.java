@@ -69,8 +69,7 @@ public class MelancholicLament extends Ability {
 		if (InventoryUtils.isScytheItem(mainHandItem)) {
 			event.setCancelled(true);
 			// *TO DO* - Turn into boolean in constructor -or- look at changing trigger entirely
-			if (!mPlayer.isSneaking() || (!mPlayer.isOnGround() && mDarkPact != null) || (mPlayer.isSneaking() && mJudgementChain != null && mPlayer.getLocation().getPitch() < -50.0)
-					|| (mPlayer.isSprinting() && mUmbral != null)) {
+			if (!mPlayer.isSneaking() || (!mPlayer.isOnGround() && mDarkPact != null) || (mPlayer.isSneaking() && mJudgementChain != null && mPlayer.getLocation().getPitch() < -50.0)) {
 				return;
 			}
 			if (mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.mLinkedSpell)) {

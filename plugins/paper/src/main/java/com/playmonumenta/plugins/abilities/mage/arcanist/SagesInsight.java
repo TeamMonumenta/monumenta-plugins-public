@@ -78,7 +78,8 @@ public class SagesInsight extends Ability {
 		Location loc = mPlayer.getLocation();
 		Location locD = event.getDamaged().getLocation().add(0, 1, 0);
 		if (mStacks < MAX_STACKS) {
-			if (mStacksMap.get(spell)) {
+			Boolean bool = mStacksMap.get(spell);
+			if (bool != null && bool) {
 				mStacks++;
 				mStacksMap.put(spell, false);
 				if (mStacks == MAX_STACKS) {
