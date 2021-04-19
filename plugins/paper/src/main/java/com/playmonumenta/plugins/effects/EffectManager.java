@@ -158,7 +158,12 @@ public class EffectManager implements Listener {
 				for (Map.Entry<Entity, Effects> entry : mEntities.entrySet()) {
 					for (Map<String, NavigableSet<Effect>> priorityEffects : entry.getValue().mPriorityMap.values()) {
 						for (NavigableSet<Effect> effectGroup : priorityEffects.values()) {
-							effectGroup.last().entityTickEffect(entry.getKey(), fourHertz, twoHertz, oneHertz);
+							try {
+								effectGroup.last().entityTickEffect(entry.getKey(), fourHertz, twoHertz, oneHertz);
+							} catch (Exception ex) {
+								Plugin.getInstance().getLogger().severe("Error in effect manager entityTickEffect: " + ex.getMessage());
+								ex.printStackTrace();
+							}
 						}
 					}
 				}
@@ -192,13 +197,32 @@ public class EffectManager implements Listener {
 								Effect effect = effectGroupIter.next();
 
 								if (currentEffectRemoved) {
-									effect.entityGainEffect(entity);
+									try {
+										effect.entityGainEffect(entity);
+									} catch (Exception ex) {
+										Plugin.getInstance().getLogger().severe("Error in effect manager entityGainEffect: " + ex.getMessage());
+										ex.printStackTrace();
+									}
 									currentEffectRemoved = false;
 								}
 
-								if (effect.tick(PERIOD)) {
+								boolean tickResult;
+								try {
+									tickResult = effect.tick(PERIOD);
+								} catch (Exception ex) {
+									Plugin.getInstance().getLogger().severe("Error in effect manager tick: " + ex.getMessage());
+									ex.printStackTrace();
+									/* If ticking throws an exception (i.e. NPE) remove it */
+									tickResult = false;
+								}
+								if (tickResult) {
 									if (effect == currentEffect) {
-										effect.entityLoseEffect(entity);
+										try {
+											effect.entityLoseEffect(entity);
+										} catch (Exception ex) {
+											Plugin.getInstance().getLogger().severe("Error in effect manager entityLoseEffect: " + ex.getMessage());
+											ex.printStackTrace();
+										}
 										currentEffectRemoved = true;
 									}
 
