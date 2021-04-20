@@ -73,7 +73,7 @@ public class PebGui extends SinglePageGUI {
 				"Information such as how to use the PEB, current shrine buffs, and random tips.", ChatColor.LIGHT_PURPLE,
 				Material.DISPENSER, "page 4"));
 		PEB_ITEMS.add(new PebItem(1, 42, "Book Skins",
-				"Inventory Sort, Filtered Pickup, and more toggleable choices.", ChatColor.LIGHT_PURPLE,
+				"Change the color of the cover on your P.E.B.", ChatColor.LIGHT_PURPLE,
 				Material.ENCHANTED_BOOK, "page 5"));
 
 
