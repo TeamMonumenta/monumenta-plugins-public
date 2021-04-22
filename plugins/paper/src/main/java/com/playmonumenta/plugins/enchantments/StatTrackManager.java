@@ -57,6 +57,10 @@ public class StatTrackManager {
 	 * @param amount the amount to increment the stat
 	 */
 	public void scheduleDelayedStatUpdate(ItemStack item, Player player, StatTrackOptions enchant, int amount) {
+		//Make sure the item has a display name we can use
+		if (!item.hasItemMeta() || !item.getItemMeta().hasDisplayName()) {
+			return;
+		}
 		//Check if the player that is updating the stat is the same one
 		if (mStatUpdates.contains(item.getItemMeta().displayName().toString(), player.getUniqueId())) {
 			//The item is in the system, so we add our increment to the amount waiting to be updated
@@ -198,7 +202,7 @@ public class StatTrackManager {
 	public static ItemStack getStatTrackItemFromInventory(Player player, String name, StatTrackOptions stat) {
 		Inventory i = player.getInventory();
 		for (ItemStack item : i.getContents()) {
-			if (item == null || !item.hasItemMeta()) {
+			if (item == null || !item.hasItemMeta() || !item.getItemMeta().hasDisplayName()) {
 				continue;
 			}
 			if (item.getItemMeta().displayName().toString().equals(name) && getTrackingType(item) == stat) {
@@ -229,36 +233,49 @@ public class StatTrackManager {
 
 		@Override
 		public void run() {
-			if (mItemName == null) {
-				this.cancel();
-				return;
-			}
-			//Check if the player has switched items
-			ItemStack currentItem = mPlayer.getInventory().getItemInMainHand();
-			//If the player is not holding an item or is offline, update the item
-			if (!currentItem.hasItemMeta() || !mPlayer.isOnline()) {
-				//Not holding an item- go straight to success
-				StatTrackManager.getInstance().incrementStatInternal(mItemName, mEnchant, mPlayer);
-				StatTrackManager.getInstance().mStatRunnables.remove(mItemName, mPlayer.getUniqueId());
-				this.cancel();
-				return;
-			}
+			try {
+				if (mItemName == null) {
+					this.cancel();
+					return;
+				}
+				//Check if the player has switched items
+				ItemStack currentItem = mPlayer.getInventory().getItemInMainHand();
+				//If the player is not holding an item or is offline, update the item
+				if (!currentItem.hasItemMeta() || !currentItem.getItemMeta().hasDisplayName() || !mPlayer.isOnline()) {
+					//Not holding an item- go straight to success
+					StatTrackManager.getInstance().incrementStatInternal(mItemName, mEnchant, mPlayer);
+					StatTrackManager.getInstance().mStatRunnables.remove(mItemName, mPlayer.getUniqueId());
+					this.cancel();
+					return;
+				}
 
-			if (currentItem.getItemMeta().displayName().toString().equals(mItemName)) {
-				//The player is still using the item, so we'll try again later
-				mRetries++;
-				if (mRetries > StatTrackManager.NUM_RETRIES) {
-					//Time to give up if we've been doing this for too long
-					StatTrackManager.getInstance().mStatUpdates.remove(mItemName, mPlayer.getUniqueId());
+				if (currentItem.getItemMeta().displayName().toString().equals(mItemName)) {
+					//The player is still using the item, so we'll try again later
+					mRetries++;
+					if (mRetries > StatTrackManager.NUM_RETRIES) {
+						//Time to give up if we've been doing this for too long
+						tearDown();
+					}
+				} else {
+					//It's safe to update the item
+					StatTrackManager.getInstance().incrementStatInternal(mItemName, mEnchant, mPlayer);
 					StatTrackManager.getInstance().mStatRunnables.remove(mItemName, mPlayer.getUniqueId());
 					this.cancel();
 				}
-			} else {
-				//It's safe to update the item
-				StatTrackManager.getInstance().incrementStatInternal(mItemName, mEnchant, mPlayer);
-				StatTrackManager.getInstance().mStatRunnables.remove(mItemName, mPlayer.getUniqueId());
-				this.cancel();
+			} catch (Exception e) {
+				//Log exception
+				Plugin.getInstance().getLogger().severe("Error in stat tracking: " + e.getMessage());
+				e.printStackTrace();
+				//Something broke, let's kill the process gracefully so they can use their item again later
+				tearDown();
 			}
+		}
+
+		//Remove the item from the system
+		public void tearDown() {
+			StatTrackManager.getInstance().mStatUpdates.remove(mItemName, mPlayer.getUniqueId());
+			StatTrackManager.getInstance().mStatRunnables.remove(mItemName, mPlayer.getUniqueId());
+			this.cancel();
 		}
 	}
 }

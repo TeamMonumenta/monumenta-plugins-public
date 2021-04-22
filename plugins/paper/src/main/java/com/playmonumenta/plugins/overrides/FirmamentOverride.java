@@ -21,6 +21,8 @@ import org.bukkit.inventory.meta.BlockStateMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.enchantments.StatTrack.StatTrackOptions;
+import com.playmonumenta.plugins.enchantments.StatTrackManager;
 import com.playmonumenta.plugins.integrations.CoreProtectIntegration;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
@@ -116,6 +118,8 @@ public class FirmamentOverride extends BaseOverride {
 						state.setBlockData(blockData);
 					}
 				}
+				//Stat tracking for firmament
+				StatTrackManager.incrementStat(item, player, StatTrackOptions.BLOCKS_PLACED, 1);
 				//Log the placement of the blocks
 				CoreProtectIntegration.logPlacement(player, event.getBlock().getLocation(), currentItem.getType(), blockData);
 				// Forcibly update the new block state and apply physics
