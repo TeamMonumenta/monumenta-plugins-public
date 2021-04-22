@@ -10,14 +10,13 @@ import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.block.Action;
+import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.MultipleChargeAbility;
 import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.classes.magic.MagicType;
@@ -32,7 +31,7 @@ public class WhirlingBlade extends MultipleChargeAbility {
 	private static final float BLADE_1_KNOCKBACK = 0.4f;
 	private static final float BLADE_2_KNOCKBACK = 1.2f;
 	private static final double THROW_RADIUS = 3;
-	private static final double BLADE_RADIUS = 1;
+	private static final double BLADE_RADIUS = THROW_RADIUS/3;
 	private static final int BLADE_1_MAX_CHARGES = 2;
 	private static final int BLADE_2_MAX_CHARGES = 2;
 	private static final int BLADE_1_COOLDOWN = 20 * 8;
@@ -47,10 +46,9 @@ public class WhirlingBlade extends MultipleChargeAbility {
 		super(plugin, player, "Whirling Blade",  BLADE_1_MAX_CHARGES, BLADE_2_MAX_CHARGES);
 		mInfo.mScoreboardId = "WhirlingBlade";
 		mInfo.mShorthandName = "WB";
-		mInfo.mDescriptions.add("Right click with a weapon to throw a whirling blade that circles around you, knocking back and dealing 10 damage to enemies it hits. Cooldown: 8s. Charges: 2.");
+		mInfo.mDescriptions.add("Use the swap key while holding a weapon to throw a whirling blade that circles around you, knocking back and dealing 10 damage to enemies it hits. Cooldown: 8s. Charges: 2.");
 		mInfo.mDescriptions.add("The damage is increased to 15 and the knockback is greatly increased.");
 		mInfo.mLinkedSpell = Spells.WHIRLING_BLADE;
-		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
 		mDamage = getAbilityScore() == 1 ? BLADE_1_DAMAGE : BLADE_2_DAMAGE;
 		mKnockback = getAbilityScore() == 1 ? BLADE_1_KNOCKBACK : BLADE_2_KNOCKBACK;
 		mInfo.mCooldown = getAbilityScore() == 1 ? BLADE_1_COOLDOWN : BLADE_2_COOLDOWN;
@@ -58,17 +56,16 @@ public class WhirlingBlade extends MultipleChargeAbility {
 	}
 
 	@Override
-	public void cast(Action action) {
+	public void playerSwapHandItemsEvent(PlayerSwapHandItemsEvent event) {
 
-		if (mPlayer.isSprinting() || mPlayer.isSneaking()) {
-			return;
-		}
 		ItemStack inMainHand = mPlayer.getInventory().getItemInMainHand();
 		ItemStack inOffHand = mPlayer.getInventory().getItemInOffHand();
 		if (InventoryUtils.isBowItem(inMainHand) || InventoryUtils.isBowItem(inOffHand) || InventoryUtils.isPotionItem(inMainHand) || inMainHand.getType().isBlock()
 				|| inMainHand.getType().isEdible() || inMainHand.getType() == Material.TRIDENT || inMainHand.getType() == Material.COMPASS || inMainHand.getType() == Material.SHIELD) {
 			return;
 		}
+
+		event.setCancelled(true);
 
 		int ticks = mPlayer.getTicksLived();
 		// Prevent double casting on accident. Also, strange bug, this seems to trigger twice when right clicking, but not the
@@ -96,20 +93,25 @@ public class WhirlingBlade extends MultipleChargeAbility {
 					}
 					mStartAngle += Math.PI*90/180;
 				}
+				Location mLoc = mPlayer.getEyeLocation().add(0, -0.5, 0);
 				Vector direction = new Vector(Math.cos(mStartAngle - Math.PI*mIncrementDegrees/180), 0, Math.sin(mStartAngle - Math.PI*mIncrementDegrees/180));
-				Location mLoc = mPlayer.getEyeLocation().add(0, -0.5, 0).add(direction.multiply(THROW_RADIUS));
-				BoundingBox mBox = BoundingBox.of(mLoc, BLADE_RADIUS, BLADE_RADIUS, BLADE_RADIUS);
+				Location bladeLoc1 = mLoc.clone().add(direction.clone().multiply(THROW_RADIUS));
+				Location bladeLoc2 = mLoc.clone().add(direction.clone().multiply(THROW_RADIUS/2));
+				Location bladeLoc3 = mLoc.clone().add(direction.clone().multiply(THROW_RADIUS/4));
+				BoundingBox mBox1 = BoundingBox.of(bladeLoc1, BLADE_RADIUS, BLADE_RADIUS, BLADE_RADIUS);
+				BoundingBox mBox2 = BoundingBox.of(bladeLoc2, BLADE_RADIUS/2, BLADE_RADIUS/2, BLADE_RADIUS/2);
+				BoundingBox mBox3 = BoundingBox.of(bladeLoc3, BLADE_RADIUS/4, BLADE_RADIUS/4, BLADE_RADIUS/4);
 				Iterator<LivingEntity> mobIter = mMobs.iterator();
 				while (mobIter.hasNext()) {
 					LivingEntity mob = mobIter.next();
-					if (mBox.overlaps(mob.getBoundingBox())) {
+					if (mBox1.overlaps(mob.getBoundingBox()) || mBox2.overlaps(mob.getBoundingBox()) || mBox3.overlaps(mob.getBoundingBox())) {
 						EntityUtils.damageEntity(mPlugin, mob, mDamage, mPlayer, MagicType.PHYSICAL, true, mInfo.mLinkedSpell);
 						MovementUtils.knockAway(mPlayer, mob, mKnockback);
 						mobIter.remove();
 					}
 				}
 
-				mWorld.spawnParticle(Particle.SWEEP_ATTACK, mLoc, 3, 0.35, 0, 0.35, 1);
+				mWorld.spawnParticle(Particle.SWEEP_ATTACK, bladeLoc1, 3, 0.35, 0, 0.35, 1);
 
 				mIncrementDegrees += 30;
 				if (mIncrementDegrees > 360) {
