@@ -55,7 +55,8 @@ public class SpellMultiEarthshake extends Spell {
             Material.BARRIER,
             Material.SPAWNER,
             Material.CHEST,
-            Material.END_PORTAL
+            Material.END_PORTAL,
+            Material.END_PORTAL_FRAME
         );
 
 	public SpellMultiEarthshake(Plugin plugin, LivingEntity launcher, int radius, int duration, boolean delve, Location spawnLoc) {
