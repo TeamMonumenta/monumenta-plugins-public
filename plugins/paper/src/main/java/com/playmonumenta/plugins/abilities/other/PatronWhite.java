@@ -4,12 +4,13 @@ import com.playmonumenta.plugins.Plugin;
 
 import org.bukkit.Particle;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 
 
-public class PatronWhite extends PatronParticles<Object> {
-	public PatronWhite(Plugin plugin, @Nullable Player player) {
+public class PatronWhite extends PatronParticles {
+	public PatronWhite(@NotNull Plugin plugin, @Nullable Player player) {
 		super(
 			plugin,
 			player,

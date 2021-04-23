@@ -29,13 +29,13 @@ public class MessagingUtils {
 		message = translatePlayerName(player, message);
 		TextComponent formattedMessage = LEGACY_SERIALIZER.deserialize(message)
 			.color(NamedTextColor.YELLOW);
-		player.sendActionBar​(formattedMessage);
+		player.sendActionBar(formattedMessage);
 	}
 
 	public static void sendAbilityTriggeredMessage(Plugin plugin, Player player, String message) {
 		TextComponent formattedMessage = LEGACY_SERIALIZER.deserialize(message)
 			.color(NamedTextColor.RED);
-		player.sendActionBar​(formattedMessage);
+		player.sendActionBar(formattedMessage);
 	}
 
 	public static void sendRawMessage(Player player, String message) {

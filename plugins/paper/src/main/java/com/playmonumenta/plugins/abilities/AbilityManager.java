@@ -286,14 +286,14 @@ public class AbilityManager {
 
 			//********** WARLOCK **********//
 			new AmplifyingHex(mPlugin, null),
-		    new PhlegmaticResolve(mPlugin, null),
-		    new CholericFlames(mPlugin, null),
+			new PhlegmaticResolve(mPlugin, null),
+			new CholericFlames(mPlugin, null),
 			new CursedWound(mPlugin, null),
-		    new GraspingClaws(mPlugin, null),
-		    new WarlockPassive(mPlugin, null),
-		    new SanguineHarvest(mPlugin, null),
-		    new SoulRend(mPlugin, null),
-		    new MelancholicLament(mPlugin, null),
+			new GraspingClaws(mPlugin, null),
+			new WarlockPassive(mPlugin, null),
+			new SanguineHarvest(mPlugin, null),
+			new SoulRend(mPlugin, null),
+			new MelancholicLament(mPlugin, null),
 
 			//********** ALCHEMIST **********//
 			new Bezoar(mPlugin, null),
@@ -310,7 +310,6 @@ public class AbilityManager {
 		List<Ability> specAbilities = Arrays.asList(
 				//********** MAGE **********//
 				// ELEMENTALIST
-				   // Starfall up above
 				new ElementalSpiritFire(mPlugin, null),
 				new ElementalSpiritIce(mPlugin, null),
 				new Blizzard(mPlugin, null),

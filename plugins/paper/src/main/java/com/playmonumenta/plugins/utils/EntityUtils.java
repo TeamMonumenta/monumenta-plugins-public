@@ -745,87 +745,6 @@ public class EntityUtils {
 		return calculateDamageAfterArmor(damage, armor, toughness) * (1 - Math.min(20.0, protection) / 25) * (1 - Math.min(5, resistance) / 5) * (1 + 0.05 * vulnerability);
 	}
 
-	public static void damageEntity(Plugin plugin, LivingEntity target, double damage, Entity attacker) {
-		damageEntity(plugin, target, damage, attacker, null);
-	}
-
-	public static void damageEntity(Plugin plugin, LivingEntity target, double damage, Entity attacker, MagicType magicType) {
-		damageEntity(plugin, target, damage, attacker, magicType, true);
-	}
-
-	public static void damageEntity(Plugin plugin, LivingEntity target, double damage, Entity attacker, MagicType magicType, boolean registerEvent) {
-		damageEntity(plugin, target, damage, attacker, magicType, registerEvent, null);
-	}
-
-	public static void damageEntity(Plugin plugin, LivingEntity target, double damage, Entity attacker, MagicType magicType, boolean registerEvent, Spells spell) {
-		damageEntity(plugin, target, damage, attacker, magicType, registerEvent, spell, true, true);
-	}
-
-	public static void damageEntity(Plugin plugin, LivingEntity target, double damage, Entity attacker, MagicType magicType, boolean registerEvent, Spells spell, boolean applySpellshock, boolean triggerSpellshock) {
-		damageEntity(plugin, target, damage, attacker, magicType, registerEvent, spell, applySpellshock, triggerSpellshock, false);
-	}
-
-	public static void damageEntity(Plugin plugin, LivingEntity target, double damage, Entity attacker, MagicType magicType, boolean registerEvent, Spells spell, boolean applySpellshock, boolean triggerSpellshock, boolean bypassIFrames) {
-		damageEntity(plugin, target, damage, attacker, magicType, registerEvent, spell, applySpellshock, triggerSpellshock, bypassIFrames, false);
-	}
-
-	public static void damageEntity(
-		Plugin plugin,
-		LivingEntity target,
-		double damage,
-		Entity attacker,
-		MagicType magicType,
-		boolean registerEvent,
-		Spells spell,
-		boolean applySpellshock,
-		boolean triggerSpellshock,
-		// Usual damage iframe behaviour would be like setting to false.
-		// Set to true to easily, properly ignore iframes without messing up last damage or resetting aka further extending iframes
-		boolean bypassIFrames,
-		// Usual damage knockback behaviour would be like setting to false.
-		// Set to true to easily set back velocity from before the damage
-		boolean restoreVelocity
-	) {
-		if (target.isValid() && !target.isInvulnerable()) {
-			CustomDamageEvent event = new CustomDamageEvent(attacker, target, damage, magicType, registerEvent, spell, applySpellshock, triggerSpellshock);
-			Bukkit.getPluginManager().callEvent(event);
-			if (event.isCancelled()) {
-				return;
-			}
-
-			int originalIFrames = target.getNoDamageTicks();
-			double originalLastDamage = target.getLastDamage();
-			Vector originalVelocity = target.getVelocity();
-			if (bypassIFrames) {
-				target.setNoDamageTicks(0);
-			}
-
-			double actualDamage = event.getDamage();
-			if (attacker instanceof Player) {
-				if (
-					magicType != null
-					&& magicType != MagicType.NONE
-					&& magicType != MagicType.PHYSICAL
-				) {
-					MetadataUtils.checkOnceThisTick(plugin, attacker, "LastMagicUseTime");
-				}
-				// Applies DamageCause.CUSTOM
-				NmsUtils.customDamageEntity(target, actualDamage, (Player)attacker, "magic");
-			} else {
-				// Applies DamageCause.ENTITY_ATTACK
-				target.damage(actualDamage, attacker);
-			}
-
-			if (bypassIFrames) {
-				target.setNoDamageTicks(originalIFrames);
-				target.setLastDamage(originalLastDamage);
-			}
-			if (restoreVelocity) {
-				target.setVelocity(originalVelocity);
-			}
-		}
-	}
-
 	public static double vulnerabilityMult(LivingEntity target) {
 		PotionEffect unluck = target.getPotionEffect(PotionEffectType.UNLUCK);
 		if (unluck != null) {
@@ -1318,7 +1237,94 @@ public class EntityUtils {
 		}
 	}
 
-	// Adds part or all of y height above feet location, based on multiplier. Player height 1.8, player sneaking height 1.5.
+	// Skip magic type, register event, spell, spellshock, iframes, velocity
+	public static void damageEntity(Plugin plugin, LivingEntity target, double damage, Entity attacker) {
+		damageEntity(plugin, target, damage, attacker, null);
+	}
+
+	// Skip register event, spell, spellshock, iframes, velocity
+	public static void damageEntity(Plugin plugin, LivingEntity target, double damage, Entity attacker, MagicType magicType) {
+		damageEntity(plugin, target, damage, attacker, magicType, true);
+	}
+
+	// Skip spell, spellshock, iframes, velocity
+	public static void damageEntity(Plugin plugin, LivingEntity target, double damage, Entity attacker, MagicType magicType, boolean registerEvent) {
+		damageEntity(plugin, target, damage, attacker, magicType, registerEvent, null);
+	}
+
+	// Skip spellshock, iframes, velocity
+	public static void damageEntity(Plugin plugin, LivingEntity target, double damage, Entity attacker, MagicType magicType, boolean registerEvent, Spells spell) {
+		damageEntity(plugin, target, damage, attacker, magicType, registerEvent, spell, true, true);
+	}
+
+	// Skip iframes, velocity
+	public static void damageEntity(Plugin plugin, LivingEntity target, double damage, Entity attacker, MagicType magicType, boolean registerEvent, Spells spell, boolean applySpellshock, boolean triggerSpellshock) {
+		damageEntity(plugin, target, damage, attacker, magicType, registerEvent, spell, applySpellshock, triggerSpellshock, false);
+	}
+
+	// Skip velocity
+	public static void damageEntity(Plugin plugin, LivingEntity target, double damage, Entity attacker, MagicType magicType, boolean registerEvent, Spells spell, boolean applySpellshock, boolean triggerSpellshock, boolean bypassIFrames) {
+		damageEntity(plugin, target, damage, attacker, magicType, registerEvent, spell, applySpellshock, triggerSpellshock, bypassIFrames, false);
+	}
+
+	public static void damageEntity(
+		Plugin plugin,
+		LivingEntity target,
+		double damage,
+		Entity attacker,
+		MagicType magicType,
+		boolean registerEvent,
+		Spells spell,
+		boolean applySpellshock,
+		boolean triggerSpellshock,
+		// Usual damage iframe behaviour would be like setting to false.
+		// Set to true to easily, properly ignore iframes without messing up last damage or resetting aka further extending iframes
+		boolean bypassIFrames,
+		// Usual damage knockback behaviour would be like setting to false.
+		// Set to true to easily set back velocity from before the damage
+		boolean restoreVelocity
+	) {
+		if (target.isValid() && !target.isInvulnerable()) {
+			CustomDamageEvent event = new CustomDamageEvent(attacker, target, damage, magicType, registerEvent, spell, applySpellshock, triggerSpellshock);
+			Bukkit.getPluginManager().callEvent(event);
+			if (event.isCancelled()) {
+				return;
+			}
+
+			int originalIFrames = target.getNoDamageTicks();
+			double originalLastDamage = target.getLastDamage();
+			Vector originalVelocity = target.getVelocity();
+			if (bypassIFrames) {
+				target.setNoDamageTicks(0);
+			}
+
+			double actualDamage = event.getDamage();
+			if (attacker instanceof Player) {
+				if (
+					magicType != null
+					&& magicType != MagicType.NONE
+					&& magicType != MagicType.PHYSICAL
+				) {
+					MetadataUtils.checkOnceThisTick(plugin, attacker, "LastMagicUseTime");
+				}
+				// Applies DamageCause.CUSTOM
+				NmsUtils.customDamageEntity(target, actualDamage, (Player)attacker, "magic");
+			} else {
+				// Applies DamageCause.ENTITY_ATTACK
+				target.damage(actualDamage, attacker);
+			}
+
+			if (bypassIFrames) {
+				target.setNoDamageTicks(originalIFrames);
+				target.setLastDamage(originalLastDamage);
+			}
+			if (restoreVelocity) {
+				target.setVelocity(originalVelocity);
+			}
+		}
+	}
+
+	// Adds part or all of y height above feet location, based on multiplier. Player height 1.8, player sneaking height 1.5
 	public static Location getHeightLocation(Entity entity, double heightMultiplier) {
 		return entity.getLocation().add(0, entity.getHeight() * heightMultiplier, 0);
 	}
@@ -1327,7 +1333,7 @@ public class EntityUtils {
 		return getHeightLocation(entity, 0.5);
 	}
 
-	// Player eye height 1.62 when not sneaking.
+	// Player eye height 1.62 when not sneaking
 	public static Location getHalfEyeLocation(LivingEntity entity) {
 		return entity.getLocation().add(0, entity.getEyeHeight() / 2, 0);
 	}

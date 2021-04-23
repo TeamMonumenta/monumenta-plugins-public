@@ -3,6 +3,13 @@ package com.playmonumenta.plugins.commands;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.enchantments.StatTrack.StatTrackOptions;
+import com.playmonumenta.plugins.enchantments.StatTrackManager;
+import com.playmonumenta.plugins.player.PlayerData;
+import com.playmonumenta.plugins.utils.CommandUtils;
+import com.playmonumenta.plugins.utils.InventoryUtils;
+
 import org.bukkit.Color;
 import org.bukkit.FireworkEffect;
 import org.bukkit.Location;
@@ -14,13 +21,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.enchantments.StatTrack.StatTrackOptions;
-import com.playmonumenta.plugins.enchantments.StatTrackManager;
-import com.playmonumenta.plugins.utils.CommandUtils;
-import com.playmonumenta.plugins.utils.InventoryUtils;
-import com.playmonumenta.plugins.utils.ScoreboardUtils;
-
 import dev.jorel.commandapi.CommandAPI;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.CommandPermission;
@@ -31,6 +31,8 @@ import dev.jorel.commandapi.arguments.IntegerArgument;
 import dev.jorel.commandapi.arguments.MultiLiteralArgument;
 import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
 import net.md_5.bungee.api.ChatColor;
+
+
 
 /*
  * NOTICE!
@@ -104,7 +106,9 @@ public class StatTrackItem extends GenericCommand {
 	private static void run(CommandSender sender, Player player, StatTrackOptions option) throws WrapperCommandSyntaxException {
 
 		//Check to see if the player is a patron
-		if (ScoreboardUtils.getScoreboardValue(player, "Patreon") < StatTrackManager.PATRON_TIER) {
+		if (
+			new PlayerData(player).checkPatreonDollars() < StatTrackManager.PATRON_TIER
+		) {
 			player.sendMessage("You must be an active $5 patron or higher to infuse items with stat tracking!");
 			return;
 		}

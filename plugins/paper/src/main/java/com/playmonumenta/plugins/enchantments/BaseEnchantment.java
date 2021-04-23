@@ -2,6 +2,12 @@ package com.playmonumenta.plugins.enchantments;
 
 import java.util.EnumSet;
 
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
+import com.playmonumenta.plugins.events.CustomDamageEvent;
+import com.playmonumenta.plugins.events.EvasionEvent;
+import com.playmonumenta.plugins.utils.InventoryUtils;
+
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.LivingEntity;
@@ -19,13 +25,8 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.event.player.PlayerItemDamageEvent;
 import org.bukkit.inventory.ItemStack;
-import org.jetbrains.annotations.NotNull;
 
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
-import com.playmonumenta.plugins.events.CustomDamageEvent;
-import com.playmonumenta.plugins.events.EvasionEvent;
-import com.playmonumenta.plugins.utils.InventoryUtils;
+
 
 public interface BaseEnchantment {
 	/*
@@ -207,8 +208,7 @@ public interface BaseEnchantment {
 		return false;
 	}
 
-	default void onSpawn(Plugin plugin, @NotNull Item item, int level) {
-
+	default void onSpawn(Plugin plugin, Item item, int level) {
 	}
 
 	/*

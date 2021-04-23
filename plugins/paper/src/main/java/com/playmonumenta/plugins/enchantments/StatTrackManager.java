@@ -6,17 +6,19 @@ import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.google.common.collect.HashBasedTable;
+import com.google.common.collect.Table;
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.enchantments.StatTrack.StatTrackOptions;
+import com.playmonumenta.plugins.player.PlayerData;
+
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import com.google.common.collect.HashBasedTable;
-import com.google.common.collect.Table;
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.enchantments.StatTrack.StatTrackOptions;
-import com.playmonumenta.plugins.utils.ScoreboardUtils;
+
 
 public class StatTrackManager {
 
@@ -64,7 +66,11 @@ public class StatTrackManager {
 		//Check if the player that is updating the stat is the same one
 		if (mStatUpdates.contains(item.getItemMeta().displayName().toString(), player.getUniqueId())) {
 			//The item is in the system, so we add our increment to the amount waiting to be updated
-			mStatUpdates.put(item.getItemMeta().displayName().toString(), player.getUniqueId(), new Integer(mStatUpdates.get(item.getItemMeta().displayName().toString(), player.getUniqueId()).intValue() + amount));
+			mStatUpdates.put(
+				item.getItemMeta().displayName().toString(),
+				player.getUniqueId(),
+				mStatUpdates.get(item.getItemMeta().displayName().toString(), player.getUniqueId()).intValue() + amount
+			);
 			//Reset the timeout timer on the runnable
 			StatDelayedUpdateCheck runnable = mStatRunnables.get(item.getItemMeta().displayName().toString(), player.getUniqueId());
 			if (runnable != null) {
@@ -77,7 +83,11 @@ public class StatTrackManager {
 			//Run check every second
 			delayedUpdate.runTaskTimer(Plugin.getInstance(), 0, 20);
 			//Add number to update to the map
-			mStatUpdates.put(item.getItemMeta().displayName().toString(), player.getUniqueId(), new Integer(amount));
+			mStatUpdates.put(
+				item.getItemMeta().displayName().toString(),
+				player.getUniqueId(),
+				amount
+			);
 		}
 	}
 
@@ -149,7 +159,11 @@ public class StatTrackManager {
 	public static void incrementStat(ItemStack item, Player player, StatTrackOptions enchant, int amount) {
 
 		//Check that the player is a patron and the item has their name on it and that it has the right enchant type
-		if (ScoreboardUtils.getScoreboardValue(player, "Patreon") < PATRON_TIER || !isPlayersItem(item, player) || !(getTrackingType(item).equals(enchant))) {
+		if (
+			new PlayerData(player).checkPatreonDollars() < PATRON_TIER
+			|| !isPlayersItem(item, player)
+			|| !(getTrackingType(item).equals(enchant))
+		) {
 			return;
 		}
 		//Call the manager to update the stat when the player is done using the item

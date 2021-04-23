@@ -11,8 +11,10 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
-public class ParticleUtils {
 
+
+public class ParticleUtils {
+	// TODO use Consumer?
 	@FunctionalInterface
 	public interface SpawnParticleAction {
 		/**

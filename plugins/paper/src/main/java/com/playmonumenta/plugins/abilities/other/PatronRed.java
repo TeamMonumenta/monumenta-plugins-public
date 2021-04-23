@@ -5,12 +5,13 @@ import com.playmonumenta.plugins.Plugin;
 import org.bukkit.Color;
 import org.bukkit.Particle;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 
 
-public class PatronRed extends PatronParticles<Particle.DustOptions> {
-	public PatronRed(Plugin plugin, @Nullable Player player) {
+public class PatronRed extends PatronParticles {
+	public PatronRed(@NotNull Plugin plugin, @Nullable Player player) {
 		super(
 			plugin,
 			player,

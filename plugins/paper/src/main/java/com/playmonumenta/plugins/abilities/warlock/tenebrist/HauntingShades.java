@@ -208,7 +208,3 @@ public class HauntingShades extends MultipleChargeAbility {
 		}.runTaskTimer(mPlugin, 0, 1);
 	}
 }
-
-
-
-

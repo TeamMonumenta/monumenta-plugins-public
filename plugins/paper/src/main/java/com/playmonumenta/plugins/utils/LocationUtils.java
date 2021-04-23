@@ -1144,6 +1144,7 @@ public class LocationUtils {
 
 
 
+	// TODO use Consumer?
 	@FunctionalInterface
 	public interface TravelAction {
 		/**

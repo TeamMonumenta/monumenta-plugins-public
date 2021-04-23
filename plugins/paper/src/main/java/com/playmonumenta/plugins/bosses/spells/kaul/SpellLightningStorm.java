@@ -20,12 +20,6 @@ import org.bukkit.entity.Player;
 
 
 
-/*
- * Lighting Storm : if a player is higher than 2 blocks
- * from the ground, they get hit by thunders each 2s
- * (always active) (First time offenders should get some
- * form of chat message as a warning)
- */
 public class SpellLightningStorm extends Spell {
 	private int mTicks = 0;
 	private LivingEntity mBoss;
@@ -51,9 +45,13 @@ public class SpellLightningStorm extends Spell {
 	public void run() {
 		mTicks--;
 		if (mTicks <= 0) {
-			mTicks = 6;
+			//TODO For now, increased interval a bit to avoid getting lightninged multiple times while unable to descend any faster, especially during lag spikes.
+			// Still have to fix players getting missed (becomes matter of luck on when the check runs).
+			// Instead, could check more frequently but add them to an anti-lightning list for about 2s as a per-player cooldown
+			mTicks = 10;
 
 			double arenaSurfaceY = mCenter.getY(); // This should be 8.0 based on the armour stand placement
+			//TODO Fix spherical check missing players (bug #8731)
 			for (Player player : PlayerUtils.playersInRange(mCenter, mRange)) {
 				double playerY = player.getLocation().getY();
 
@@ -63,16 +61,13 @@ public class SpellLightningStorm extends Spell {
 				int yThreshold = 2;
 
 				// If truly in the air (not on ground and not climbing - like the Thunder Step requirement),
-				// have relaxed 5-block threshold.
+				// have relaxed 8-block threshold.
 				// Eg recoil, jump boost, Primordial yeet
 				if (PlayerUtils.isAirborne(player)) {
-					// When the player is > 5 blocks above the arena surface,
-					// the block Y-5 below them is above the surface level of the arena.
-					// This would usually not be solid, similar to the previous implementation's !isSolid() check
-					yThreshold = 5;
+					yThreshold = 8;
 				}
 
-				if (playerY >= arenaSurfaceY + yThreshold) {
+				if (playerY > arenaSurfaceY + yThreshold) {
 					lightning(player);
 				}
 			}

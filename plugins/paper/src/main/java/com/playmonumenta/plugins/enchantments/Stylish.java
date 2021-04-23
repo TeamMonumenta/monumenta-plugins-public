@@ -1,24 +1,25 @@
 package com.playmonumenta.plugins.enchantments;
 
 import java.util.EnumSet;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
 
+import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
+import com.playmonumenta.plugins.player.PartialParticle;
 import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Particle;
+import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
+import org.bukkit.scheduler.BukkitRunnable;
+import org.jetbrains.annotations.NotNull;
 
 
 
 public class Stylish implements BaseEnchantment {
-	private static final Set<UUID> NO_SELF_PARTICLES = new HashSet<>();
+	@NotNull public static final Particle PARTICLE = Particle.SMOKE_NORMAL;
+	public static final double PARTICLE_EXTRA = 0;
 
 	@Override
 	public String getProperty() {
@@ -36,27 +37,45 @@ public class Stylish implements BaseEnchantment {
 	}
 
 	@Override
-	public int getLevelFromItem(ItemStack item, Player player) {
-		UUID playerUuid = player.getUniqueId();
-		if (PlayerUtils.isNoSelfParticles(player)) {
-			NO_SELF_PARTICLES.add(playerUuid);
-		} else {
-			NO_SELF_PARTICLES.remove(playerUuid);
-		}
-
-		return getLevelFromItem(item);
+	public void tick(Plugin plugin, Player player, int level) {
+		double width = player.getWidth() / 2 * 1.25;
+		new PartialParticle(
+			PARTICLE,
+			EntityUtils.getHeightLocation(player, 0.75),
+			Constants.QUARTER_TICKS_PER_SECOND,
+			width,
+			player.getHeight() / 4,
+			width,
+			PARTICLE_EXTRA
+		).spawnHideable(player);
 	}
 
 	@Override
-	public void tick(Plugin plugin, Player player, int level) {
-		PlayerUtils.spawnHideableParticles(
-			NO_SELF_PARTICLES.contains(player.getUniqueId()),
-			player,
-			Particle.SMOKE_NORMAL,
-			EntityUtils.getHeightLocation(player, 0.75),
-			5,
-			0.4,
-			0
+	public boolean hasOnSpawn() {
+		return true;
+	}
+
+	@Override
+	public void onSpawn(Plugin plugin, Item item, int level) {
+		new BukkitRunnable() {
+			@Override
+			public void run() {
+				if (!item.isValid()) {
+					this.cancel();
+				}
+
+				new PartialParticle(
+					PARTICLE,
+					EntityUtils.getHalfHeightLocation(item),
+					1,
+					item.getWidth() / 2,
+					PARTICLE_EXTRA
+				).spawn();
+			}
+		}.runTaskTimer(
+			plugin,
+			Constants.QUARTER_TICKS_PER_SECOND,
+			Constants.QUARTER_TICKS_PER_SECOND
 		);
 	}
 }

@@ -1,31 +1,26 @@
 package com.playmonumenta.plugins.enchantments;
 
 import java.util.EnumSet;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
 
+import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
+import com.playmonumenta.plugins.player.PartialParticle;
 import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.Particle;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.NotNull;
 
 
 
 public class Gilded implements BaseEnchantment {
-	private static final Set<UUID> NO_SELF_PARTICLES = new HashSet<>();
-
-	private static final Particle.DustOptions COLOUR_GOLD = new Particle.DustOptions(Color.fromRGB(221, 214, 5), 1f);
-
+	@NotNull public static final Particle PARTICLE = Particle.REDSTONE;
+	public static final Particle.DustOptions COLOUR_GOLD = new Particle.DustOptions(Color.fromRGB(221, 214, 5), 1f);
 
 	@Override
 	public String getProperty() {
@@ -43,30 +38,17 @@ public class Gilded implements BaseEnchantment {
 	}
 
 	@Override
-	public int getLevelFromItem(ItemStack item, Player player) {
-		UUID playerUuid = player.getUniqueId();
-		if (PlayerUtils.isNoSelfParticles(player)) {
-			NO_SELF_PARTICLES.add(playerUuid);
-		} else {
-			NO_SELF_PARTICLES.remove(playerUuid);
-		}
-
-		return getLevelFromItem(item);
-	}
-
-	@Override
 	public void tick(Plugin plugin, Player player, int level) {
-		PlayerUtils.spawnHideableParticles(
-			NO_SELF_PARTICLES.contains(player.getUniqueId()),
-			player,
-			Particle.REDSTONE,
+		double halfWidth = player.getWidth() / 2;
+		new PartialParticle(
+			PARTICLE,
 			EntityUtils.getHalfEyeLocation(player),
-			4 + Math.max(10, level),
-			0.3,
-			0.5,
-			0.3,
+			Constants.QUARTER_TICKS_PER_SECOND - 1 + Math.max(10, level), // Count of 5 at level 1 like other enchants/patron (1 for each game tick), scaling to 15 at level 10 cap
+			halfWidth,
+			player.getHeight() / 4,
+			halfWidth,
 			COLOUR_GOLD
-		);
+		).spawnHideable(player);
 	}
 
 	@Override
@@ -75,7 +57,7 @@ public class Gilded implements BaseEnchantment {
 	}
 
 	@Override
-	public void onSpawn(Plugin plugin, @NotNull Item item, int level) {
+	public void onSpawn(Plugin plugin, Item item, int level) {
 		new BukkitRunnable() {
 			@Override
 			public void run() {
@@ -83,8 +65,18 @@ public class Gilded implements BaseEnchantment {
 					this.cancel();
 				}
 
-				item.getWorld().spawnParticle(Particle.REDSTONE, EntityUtils.getHalfHeightLocation(item), 1, 0.1, 0.1, 0.1, COLOUR_GOLD);
+				new PartialParticle(
+					PARTICLE,
+					EntityUtils.getHalfHeightLocation(item),
+					1,
+					item.getWidth() / 2, // Dropped items 0.25 size cube, offsets like vanilla /particle
+					COLOUR_GOLD
+				).spawn();
 			}
-		}.runTaskTimer(plugin, 10, 6);
+		}.runTaskTimer(
+			plugin,
+			Constants.QUARTER_TICKS_PER_SECOND,
+			Constants.QUARTER_TICKS_PER_SECOND
+		);
 	}
 }

@@ -17,6 +17,8 @@ import org.bukkit.entity.Projectile;
 import org.bukkit.entity.SpectralArrow;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 
+
+
 public class BasiliskPoison extends Ability {
 
 	private static final double BASILISK_POISON_1_PERCENT_DAMAGE = 0.05;
