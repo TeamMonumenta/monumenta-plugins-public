@@ -863,7 +863,7 @@ public class ItemUtils {
 		meta.addCustomEffect(new PotionEffect(type, duration, amplifier), true);
 		meta.setColor(type.getColor());
 		stack.setItemMeta(meta);
-		stack = ItemUtils.setPlainName(stack);
+		ItemUtils.setPlainName(stack);
 
 		return stack;
 	}
@@ -879,7 +879,7 @@ public class ItemUtils {
 		meta.setDisplayName("�r" + name);
 		meta.setColor(color);
 		potion.setItemMeta(meta);
-		potion = ItemUtils.setPlainName(potion);
+		ItemUtils.setPlainName(potion);
 	}
 
 	// Check if item has the "* Shattered *" lore entry
@@ -944,7 +944,7 @@ public class ItemUtils {
 		lore.add(Component.text("could reforge it...", NamedTextColor.DARK_RED).decoration(TextDecoration.ITALIC, false));
 		itemMeta.lore(lore);
 		item.setItemMeta(itemMeta);
-		item = ItemUtils.setPlainLore(item);
+		ItemUtils.setPlainLore(item);
 		return true;
 	}
 
@@ -978,7 +978,7 @@ public class ItemUtils {
 			}
 		}
 		item.setItemMeta(itemMeta);
-		item = ItemUtils.setPlainLore(item);
+		ItemUtils.setPlainLore(item);
 		return reforged;
 	}
 
@@ -1100,10 +1100,9 @@ public class ItemUtils {
 		return strList.toArray(new String[0]);
 	}
 
-	public static ItemStack setPlainTag(ItemStack itemStack) {
-		itemStack = setPlainName(itemStack);
-		itemStack = setPlainLore(itemStack);
-		return itemStack;
+	public static void setPlainTag(ItemStack itemStack) {
+		setPlainName(itemStack);
+		setPlainLore(itemStack);
 	}
 
 	public static String getPlainName(ItemStack itemStack) {
@@ -1152,7 +1151,7 @@ public class ItemUtils {
 		return display.hasKey(NAME_KEY);
 	}
 
-	public static ItemStack setPlainName(ItemStack itemStack) {
+	public static void setPlainName(ItemStack itemStack) {
 		String itemName = null;
 		if (itemStack.hasItemMeta()) {
 			ItemMeta itemMeta = itemStack.getItemMeta();
@@ -1160,12 +1159,12 @@ public class ItemUtils {
 				itemName = toPlainTagText(itemMeta.displayName());
 			}
 		}
-		return setPlainName(itemStack, itemName);
+		setPlainName(itemStack, itemName);
 	}
 
-	public static ItemStack setPlainName(ItemStack itemStack, String plainName) {
+	public static void setPlainName(ItemStack itemStack, String plainName) {
 		if (itemStack == null || itemStack.getType() == Material.AIR) {
-			return itemStack;
+			return;
 		}
 
 		NBTItem nbtItem = new NBTItem(itemStack);
@@ -1195,7 +1194,6 @@ public class ItemUtils {
 			}
 		}
 		itemStack.setItemMeta(nbtItem.getItem().getItemMeta());
-		return itemStack;
 	}
 
 	public static List<String> getPlainLore(ItemStack itemStack) {
@@ -1245,7 +1243,7 @@ public class ItemUtils {
 		return display.hasKey(LORE_KEY);
 	}
 
-	public static ItemStack setPlainLore(ItemStack itemStack) {
+	public static void setPlainLore(ItemStack itemStack) {
 		List<String> plainLore = null;
 		if (itemStack.hasItemMeta()) {
 			ItemMeta itemMeta = itemStack.getItemMeta();
@@ -1256,10 +1254,10 @@ public class ItemUtils {
 				}
 			}
 		}
-		return setPlainLore(itemStack, plainLore);
+		setPlainLore(itemStack, plainLore);
 	}
 
-	public static ItemStack setPlainLore(ItemStack itemStack, List<String> plainLore) {
+	public static void setPlainLore(ItemStack itemStack, List<String> plainLore) {
 		NBTItem nbtItem = new NBTItem(itemStack);
 		if (plainLore != null && plainLore.size() > 0) {
 			// addComponent effectively runs:
@@ -1291,7 +1289,6 @@ public class ItemUtils {
 			}
 		}
 		itemStack.setItemMeta(nbtItem.getItem().getItemMeta());
-		return itemStack;
 	}
 
 	public static String toPlainTagText(String formattedText) {

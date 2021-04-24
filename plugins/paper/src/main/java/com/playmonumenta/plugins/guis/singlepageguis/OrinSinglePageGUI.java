@@ -323,7 +323,7 @@ public class OrinSinglePageGUI extends SinglePageGUI {
 		}
 		meta.setLore(lore);
 		newItem.setItemMeta(meta);
-		newItem = ItemUtils.setPlainTag(newItem);
+		ItemUtils.setPlainTag(newItem);
 		return newItem;
 	}
 

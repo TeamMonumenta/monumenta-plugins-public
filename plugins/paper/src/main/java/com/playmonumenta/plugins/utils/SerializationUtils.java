@@ -77,7 +77,7 @@ public class SerializationUtils {
 		}
 
 		item.setItemMeta(meta);
-		item = ItemUtils.setPlainTag(item);
+		ItemUtils.setPlainTag(item);
 		equip.setItemInOffHand(item);
 	}
 

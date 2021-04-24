@@ -89,7 +89,7 @@ public class CluckingPotions extends Ability {
 							newLore.add(Component.text("Clucking", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false));
 							meta.lore(newLore);
 							item.setItemMeta(meta);
-							item = ItemUtils.setPlainLore(item);
+							ItemUtils.setPlainLore(item);
 							break;
 						}
 					}

@@ -161,7 +161,7 @@ public class AbilityUtils {
 		potionMeta.setLore(loreList);
 
 		itemStack.setItemMeta(potionMeta);
-		itemStack = ItemUtils.setPlainTag(itemStack); // Support for resource pack textures like with other items & mechanisms
+		ItemUtils.setPlainTag(itemStack); // Support for resource pack textures like with other items & mechanisms
 		return itemStack;
 	}
 

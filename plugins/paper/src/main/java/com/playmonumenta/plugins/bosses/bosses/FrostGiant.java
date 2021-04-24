@@ -1034,8 +1034,9 @@ public class FrostGiant extends BossAbilityGroup {
 			.decoration(TextDecoration.ITALIC, false)
 			.decoration(TextDecoration.UNDERLINED, isUnderlined));
 		item.setItemMeta(im);
+		ItemUtils.setPlainName(item, newName);
 
-		return ItemUtils.setPlainName(item, newName);
+		return item;
 	}
 
 	@Override

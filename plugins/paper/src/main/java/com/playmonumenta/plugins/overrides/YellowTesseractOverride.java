@@ -125,7 +125,7 @@ public class YellowTesseractOverride extends BaseOverride {
 		meta.setLore(lore);
 		meta.setDisplayName(ChatColor.YELLOW.toString() + ChatColor.BOLD + TESSERACT_NAME);
 		item.setItemMeta(meta);
-		item = ItemUtils.setPlainTag(item);
+		ItemUtils.setPlainTag(item);
 
 		Location pLoc = player.getLocation();
 		pLoc.setY(pLoc.getY() + player.getEyeHeight() - 0.5);
@@ -265,7 +265,7 @@ public class YellowTesseractOverride extends BaseOverride {
 		meta.setLore(lore);
 		meta.setDisplayName(ChatColor.YELLOW.toString() + ChatColor.BOLD + TESSERACT_NAME + CONFIG);
 		item.setItemMeta(meta);
-		item = ItemUtils.setPlainTag(item);
+		ItemUtils.setPlainTag(item);
 
 		Location pLoc = player.getLocation();
 		pLoc.setY(pLoc.getY() + player.getEyeHeight() - 0.5);

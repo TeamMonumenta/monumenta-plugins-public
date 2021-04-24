@@ -333,7 +333,7 @@ public class PlayerListener implements Listener {
 						mapLore.add(Component.text("* Official Map *", NamedTextColor.GOLD));
 						mapMeta.lore(mapLore);
 						giveMap.setItemMeta(mapMeta);
-						giveMap = ItemUtils.setPlainLore(giveMap);
+						ItemUtils.setPlainLore(giveMap);
 						InventoryUtils.giveItem(player, giveMap);
 					}
 				}

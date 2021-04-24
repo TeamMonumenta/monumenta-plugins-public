@@ -803,7 +803,7 @@ public class DelvesUtils {
 					String name = ItemUtils.getPlainName(item);
 					meta.displayName(Component.text("Rank " + name.charAt(name.length() - 1), NamedTextColor.GOLD));
 					item.setItemMeta(meta);
-					item = ItemUtils.setPlainName(item);
+					ItemUtils.setPlainName(item);
 
 					current += COLUMNS;
 				}
@@ -819,7 +819,7 @@ public class DelvesUtils {
 					String name = ItemUtils.getPlainName(item);
 					meta.displayName(Component.text("Rank " + name.charAt(name.length() - 1), NamedTextColor.GRAY));
 					item.setItemMeta(meta);
-					item = ItemUtils.setPlainName(item);
+					ItemUtils.setPlainName(item);
 				}
 			}
 
@@ -918,7 +918,7 @@ public class DelvesUtils {
 			meta.lore(lore);
 
 			item.setItemMeta(meta);
-			item = ItemUtils.setPlainTag(item);
+			ItemUtils.setPlainTag(item);
 
 			return item;
 		}
@@ -943,7 +943,7 @@ public class DelvesUtils {
 			meta.lore(lore);
 
 			item.setItemMeta(meta);
-			item = ItemUtils.setPlainTag(item);
+			ItemUtils.setPlainTag(item);
 
 			return item;
 		}
@@ -954,7 +954,7 @@ public class DelvesUtils {
 			ItemMeta meta = item.getItemMeta();
 			meta.displayName(Component.text("Reset Modifiers", NamedTextColor.WHITE, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false));
 			item.setItemMeta(meta);
-			item = ItemUtils.setPlainName(item);
+			ItemUtils.setPlainName(item);
 
 			return item;
 		}
@@ -965,7 +965,7 @@ public class DelvesUtils {
 			ItemMeta meta = item.getItemMeta();
 			meta.displayName(Component.text("Select All Modifiers", NamedTextColor.WHITE, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false));
 			item.setItemMeta(meta);
-			item = ItemUtils.setPlainName(item);
+			ItemUtils.setPlainName(item);
 
 			return item;
 		}
@@ -976,7 +976,7 @@ public class DelvesUtils {
 			ItemMeta meta = item.getItemMeta();
 			meta.displayName(Component.text("Next Page", NamedTextColor.WHITE, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false));
 			item.setItemMeta(meta);
-			item = ItemUtils.setPlainName(item);
+			ItemUtils.setPlainName(item);
 
 			return item;
 		}
@@ -987,7 +987,7 @@ public class DelvesUtils {
 			ItemMeta meta = item.getItemMeta();
 			meta.displayName(Component.text("Previous Page", NamedTextColor.WHITE, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false));
 			item.setItemMeta(meta);
-			item = ItemUtils.setPlainName(item);
+			ItemUtils.setPlainName(item);
 
 			return item;
 		}
@@ -1015,7 +1015,7 @@ public class DelvesUtils {
 				meta.lore(lore);
 
 				item.setItemMeta(meta);
-				item = ItemUtils.setPlainTag(item);
+				ItemUtils.setPlainTag(item);
 
 				modifierItems.add(item);
 			}
@@ -1034,7 +1034,7 @@ public class DelvesUtils {
 				meta.lore(lore);
 
 				item.setItemMeta(meta);
-				item = ItemUtils.setPlainTag(item);
+				ItemUtils.setPlainTag(item);
 
 				modifierItems.add(item);
 			}
@@ -1055,7 +1055,7 @@ public class DelvesUtils {
 			}
 
 			item.setItemMeta(meta);
-			item = ItemUtils.setPlainTag(item);
+			ItemUtils.setPlainTag(item);
 
 			modifierItems.add(item);
 

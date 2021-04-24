@@ -169,7 +169,7 @@ public class FirmamentOverride extends BaseOverride {
 		ItemMeta meta = item.getItemMeta();
 		meta.setLore(newLore);
 		item.setItemMeta(meta);
-		item = ItemUtils.setPlainLore(item);
+		ItemUtils.setPlainLore(item);
 		player.playSound(player.getLocation(), Sound.BLOCK_SHULKER_BOX_CLOSE, SoundCategory.BLOCKS, 1, 1);
 		return true;
 	}

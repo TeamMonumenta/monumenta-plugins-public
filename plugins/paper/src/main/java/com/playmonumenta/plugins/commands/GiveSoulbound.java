@@ -65,7 +65,7 @@ public class GiveSoulbound extends GenericCommand {
 		lore.add(Component.text("* Soulbound to " + player.getName() + " *"));
 		meta.lore(lore);
 		stack.setItemMeta(meta);
-		stack = ItemUtils.setPlainLore(stack);
+		ItemUtils.setPlainTag(stack);
 		InventoryUtils.giveItem(player, stack);
 	}
 }

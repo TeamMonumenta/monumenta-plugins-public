@@ -73,6 +73,7 @@ import com.playmonumenta.plugins.itemindex.IndexInventoryListeners;
 import com.playmonumenta.plugins.itemindex.IndexInventoryManager;
 import com.playmonumenta.plugins.itemindex.ItemIndexCommand;
 import com.playmonumenta.plugins.itemindex.ItemManager;
+import com.playmonumenta.plugins.itemupdater.ItemUpdateManager;
 import com.playmonumenta.plugins.listeners.ArrowListener;
 import com.playmonumenta.plugins.listeners.AuditListener;
 import com.playmonumenta.plugins.listeners.CrossbowListener;
@@ -298,6 +299,7 @@ public class Plugin extends JavaPlugin {
 		manager.registerEvents(new ArrowListener(this), this);
 		manager.registerEvents(new SinglePageGUIManager(), this);
 		manager.registerEvents(new GraveListener(this), this);
+		manager.registerEvents(new ItemUpdateManager(this), this);
 
 		//  Move the logic out of Plugin and into it's own class that derives off Runnable, a Timer class of some type.
 		getServer().getScheduler().scheduleSyncRepeatingTask(this, new Runnable() {

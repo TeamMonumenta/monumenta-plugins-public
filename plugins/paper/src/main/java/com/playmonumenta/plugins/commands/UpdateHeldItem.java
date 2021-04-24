@@ -19,7 +19,7 @@ public class UpdateHeldItem extends GenericCommand {
 		if (item == null || item.getAmount() <= 0) {
 			CommandAPI.fail("Player must have a valid item in their main hand!");
 		}
-		item = ItemUtils.setPlainTag(item);
+		ItemUtils.setPlainTag(item);
 		player.getEquipment().setItemInMainHand(item, true);
 	}
 }

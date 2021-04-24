@@ -65,7 +65,7 @@ public class AshesOfEternity extends VoidTether {
 			lore.removeIf((String loreEntry) -> loreEntry.contains(PROPERTY_NAME));
 			meta.setLore(lore);
 			item.setItemMeta(meta);
-			item = ItemUtils.setPlainLore(item);
+			ItemUtils.setPlainLore(item);
 
 			plugin.mPotionManager.clearAllPotions(player);
 
