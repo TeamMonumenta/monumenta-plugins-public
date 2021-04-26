@@ -84,7 +84,7 @@ public class DivineJustice extends Ability {
 	@Override
 	public void entityDeathEvent(EntityDeathEvent event, boolean shouldGenDrops) {
 		LivingEntity mob = (LivingEntity) event.getEntity();
-		if (EntityUtils.isUndead(mob) || (mCrusade.getAbilityScore() == 2 && EntityUtils.isHumanoid(mob))) {
+		if (EntityUtils.isUndead(mob) || (mCrusade != null && mCrusade.getAbilityScore() == 2 && EntityUtils.isHumanoid(mob))) {
 			double percentMaxHealth = mPlayer.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue() * 0.1;
 			PlayerUtils.healPlayer(mPlayer, percentMaxHealth);
 			for (Player p : PlayerUtils.playersInRange(mPlayer, RADIUS, false)) {

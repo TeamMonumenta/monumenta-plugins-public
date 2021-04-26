@@ -117,7 +117,7 @@ public class HallowedBeam extends MultipleChargeAbility {
 						LivingEntity applyE = e;
 						//Check if heal should override damage
 						for (Entity en : e.getNearbyEntities(1.5, 1.5, 1.5)) {
-							if (en instanceof Player && ((Player) e).getGameMode() != GameMode.SPECTATOR && en.getUniqueId() != mPlayer.getUniqueId()) {
+							if (en instanceof Player && ((Player) en).getGameMode() != GameMode.SPECTATOR && en.getUniqueId() != mPlayer.getUniqueId()) {
 								Player newP = EntityUtils.getNearestPlayer(en.getLocation(), 1.5);
 								// Don't count if the caster is the closest, can't do a self-heal
 								if (newP.getUniqueId() != mPlayer.getUniqueId()) {

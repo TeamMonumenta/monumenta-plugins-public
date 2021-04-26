@@ -67,14 +67,14 @@ public class EscapeDeath extends Ability {
 			return true;
 		}
 		if (event.getCause() == DamageCause.ENTITY_EXPLOSION || event.getCause() == DamageCause.CUSTOM) {
-			execute((EntityDamageByEntityEvent) event);
+			execute(event);
 			return true;
 		}
 		return true;
 	}
 
 	// *TO DO* - Turn this into function called by both this skill and Prismatic Shield
-	private void execute(EntityDamageByEntityEvent event) {
+	private void execute(EntityDamageEvent event) {
 		double newHealth = mPlayer.getHealth() + AbsorptionUtils.getAbsorption(mPlayer) - EntityUtils.getRealFinalDamage(event);
 		boolean dealDamageLater = newHealth < 0 && newHealth > -8 && getAbilityScore() > 1;
 		if (newHealth <= TRIGGER_THRESHOLD_HEALTH && (newHealth > 0 || dealDamageLater)) {

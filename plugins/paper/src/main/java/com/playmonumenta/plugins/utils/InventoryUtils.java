@@ -372,15 +372,23 @@ public class InventoryUtils {
 				} else if (CurseOfEphemerality.isEphemeral(items[i])) {
 					items[i] = null;
 				} else {
-					if (items[i].hasItemMeta() && items[i].getItemMeta() instanceof BlockStateMeta) {
-						final BlockStateMeta meta = (BlockStateMeta)items[i].getItemMeta();
-						if (meta.getBlockState() instanceof ShulkerBox) {
-							final ShulkerBox shulker = (ShulkerBox)meta.getBlockState();
-							dropped += removeSpecialItemsFromInventory(shulker.getInventory(), loc, ephemeralOnly);
+					try {
+						if (items[i].hasItemMeta() && items[i].getItemMeta() instanceof BlockStateMeta) {
+							final BlockStateMeta meta = (BlockStateMeta)items[i].getItemMeta();
+							if (meta.getBlockState() instanceof ShulkerBox) {
+								final ShulkerBox shulker = (ShulkerBox)meta.getBlockState();
+								dropped += removeSpecialItemsFromInventory(shulker.getInventory(), loc, ephemeralOnly);
 
-							meta.setBlockState(shulker);
-							items[i].setItemMeta(meta);
+								meta.setBlockState(shulker);
+								items[i].setItemMeta(meta);
+							}
 						}
+					} catch (Exception ex) {
+						/* There's a weird exception within Paper here that sometimes happens
+						 * Need to make sure this doesn't cause item dropping to fail
+						 */
+						Plugin.getInstance().getLogger().warning("Caught exception trying to remove special items from inventory: " + ex.getMessage());
+						ex.printStackTrace();
 					}
 				}
 			}

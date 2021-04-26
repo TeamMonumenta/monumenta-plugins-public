@@ -45,13 +45,13 @@ public class Quake implements BaseEnchantment {
 	public EnumSet<ItemSlot> validSlots() {
 		return EnumSet.of(ItemSlot.MAINHAND);
 	}
-	
+
 	@Override
 	public void onKill(Plugin plugin, Player player, int level, Entity target, EntityDeathEvent event) {
 		EntityDamageEvent e = target.getLastDamageCause();
 		if (e != null && (e.getCause() == DamageCause.ENTITY_ATTACK)) {
 			List<LivingEntity> mobs = EntityUtils.getNearbyMobs(target.getLocation(), RADIUS);
-			
+
 			//Get enchant levels on weapon
 			ItemStack item = player.getInventory().getItemInMainHand();
 			int fire = item.getEnchantmentLevel(Enchantment.FIRE_ASPECT);
@@ -59,7 +59,7 @@ public class Quake implements BaseEnchantment {
 			int thunder = InventoryUtils.getCustomEnchantLevel(item, Thunder.PROPERTY_NAME, true);
 			int decay = InventoryUtils.getCustomEnchantLevel(item, Decay.PROPERTY_NAME, true);
 			int bleed = InventoryUtils.getCustomEnchantLevel(item, Bleeding.PROPERTY_NAME, true);
-			
+
 			//Damage any mobs in the area
 			for (LivingEntity mob : mobs) {
 				EntityUtils.damageEntity(plugin, mob, e.getDamage() * DAMAGE_MODIFIER_PER_LEVEL * level, player);
@@ -79,10 +79,9 @@ public class Quake implements BaseEnchantment {
 					EntityUtils.applyBleed(plugin, 100, level, mob);
 				}
 			}
-			
+
 			if (fire + ice + thunder + decay + bleed == 0) {
 				player.playSound(player.getLocation(), Sound.ENTITY_ZOMBIE_ATTACK_WOODEN_DOOR, 1.5f, 0.5f);
-				player.getWorld().spawnParticle(Particle.BLOCK_CRACK, target.getLocation(), 25, 1.5, 1.5, 1.5);
 			}
 			if (fire > 0) {
 				player.playSound(player.getLocation(), Sound.BLOCK_LAVA_POP, 0.6f, 0.9f);
