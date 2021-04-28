@@ -3,6 +3,8 @@ package com.playmonumenta.plugins.itemupdater;
 import java.time.Instant;
 import java.util.List;
 
+import net.kyori.adventure.text.Component;
+
 import org.bukkit.block.BlockState;
 import org.bukkit.block.Jukebox;
 import org.bukkit.entity.AbstractArrow;
@@ -149,6 +151,17 @@ public class ItemUpdateManager implements Listener {
 	public static void updateNested(ItemStack item) {
 		if (item == null || !item.hasItemMeta()) {
 			return;
+		}
+
+		if (item.hasItemMeta()) {
+			ItemMeta itemMeta = item.getItemMeta();
+			if (itemMeta.hasLore()) {
+				for (Component loreLine : itemMeta.lore()) {
+					if (ItemUtils.toPlainTagText(loreLine).contains("This is a placeholder item.")) {
+						return;
+					}
+				}
+			}
 		}
 
 		ItemUtils.setPlainTag(item);
