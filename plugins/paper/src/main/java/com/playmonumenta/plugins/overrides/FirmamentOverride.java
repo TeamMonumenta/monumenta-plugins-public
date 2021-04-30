@@ -24,12 +24,14 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.enchantments.StatTrack.StatTrackOptions;
 import com.playmonumenta.plugins.enchantments.StatTrackManager;
 import com.playmonumenta.plugins.integrations.CoreProtectIntegration;
+import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.ItemUtils.ItemTier;
 
 public class FirmamentOverride extends BaseOverride {
+	private static final String CAN_PLACE_SHULKER_PERM = "monumenta.canplaceshulker";
 
 	private static final String PRISMARINE_ENABLED = ChatColor.AQUA + "Prismarine " + ChatColor.GREEN + "Enabled";
 	private static final String PRISMARINE_DISABLED = ChatColor.AQUA + "Prismarine " + ChatColor.RED + "Disabled";
@@ -56,13 +58,20 @@ public class FirmamentOverride extends BaseOverride {
 			block.getWorld().playSound(block.getLocation(), Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1.0f, 1.0f);
 			return false;
 		}
-		return false; // TODO SHULKER DUPE
+
+		Player nearbyPlayer = EntityUtils.getNearestPlayer(block.getLocation(), 10);
+		if (nearbyPlayer != null) {
+			// Check permission to enable placing shulkers, just so this can be turned off via perms if needed
+			return nearbyPlayer.hasPermission(CAN_PLACE_SHULKER_PERM);
+		}
+		return false; // Don't allow shulkers to be placed by dispensers if no player is nearby
 	}
 
 	private boolean placeBlock(Player player, ItemStack item, BlockPlaceEvent event) {
 		if (!isFirmamentItem(item)) {
 			//Somehow triggered when it wasn't the right item - shouldn't prevent the event to be safe - hopefully other shulkers with lore wont get placed
-			return false; // TODO SHULKER DUPE
+			// Check permission to enable placing shulkers, just so this can be turned off via perms if needed
+			return player.hasPermission(CAN_PLACE_SHULKER_PERM);
 		}
 		if (!player.hasPermission("monumenta.firmament")) {
 			player.sendMessage(ChatColor.RED + "You don't have permission to use this item. Please ask a moderator to fix this.");
