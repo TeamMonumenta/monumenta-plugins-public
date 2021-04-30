@@ -1099,9 +1099,6 @@ public class EntityUtils {
 		return proj.getLocation();
 	}
 
-	private static final double MARGIN_OF_ERROR = 0.001;
-	private static final int MAXIMUM_ITERATIONS = (int)(Math.log(MARGIN_OF_ERROR) / Math.log(0.5) * 2);
-
 	/**
 	 * Returns the raw damage needed to achieve a final damage multiplied by some constant, undershoots to the margin of error.
 	 * <p>
@@ -1116,40 +1113,23 @@ public class EntityUtils {
 	 * @return           the raw damage needed to achieve the desired multiplier for final damage
 	 */
 	public static double getDamageApproximation(double armor, double toughness, double damage, double multiplier) {
-		double rawDamageLowerBound;
-		double rawDamageUpperBound;
-
-		if (multiplier > 1) {
-			rawDamageLowerBound = damage;
-			rawDamageUpperBound = rawDamageLowerBound * multiplier;
-		} else if (multiplier < 1) {
-			rawDamageUpperBound = damage;
-			rawDamageLowerBound = 0;	// Since armor gets better at lower damage, there's no good lower bound
-		} else {
-			return damage;
+		armor = Math.min(30, armor);
+		toughness = Math.min(20, toughness);
+		
+		double A = multiplier * calculateDamageAfterArmor(damage, armor, toughness);
+		double B = armor / 25.0 - 1.0;
+		double C = 25.0 * (toughness / 4.0 + 2);
+		
+		double result = 0.5 * C * (B + Math.sqrt(4.0 * A / C + B * B));
+		
+		double D = B + 1.0 - result / C; 
+		if (D > 0.8) {
+			result = A * 5.0;
+		} else if (D < armor / 125.0) {
+			result = A / (1.0 - armor / 125.0);
 		}
-
-		double finalDamageBaseline = calculateDamageAfterArmor(damage, armor, toughness);
-
-		// Infinite loop safe this in case of bugs
-		for (int i = 0; i < MAXIMUM_ITERATIONS; i++) {
-			// No need to worry about double overflow
-			double rawDamageMiddle = (rawDamageLowerBound + rawDamageUpperBound) / 2;
-			// Protection is constant, evasion is already factored in
-			double damageRatio = calculateDamageAfterArmor(rawDamageMiddle, armor, toughness) / finalDamageBaseline;
-
-			if (damageRatio <= multiplier) {
-				if (damageRatio > multiplier * (1 - MARGIN_OF_ERROR)) {
-					return rawDamageMiddle;
-				}
-				rawDamageLowerBound = rawDamageMiddle;
-			} else {
-				rawDamageUpperBound = rawDamageMiddle;
-			}
-		}
-
-		// Can only reach because of bug, so return a very noticeable fail case
-		return 0;
+		
+		return result;
 	}
 
 	public static double getDamageApproximation(EntityDamageByEntityEvent event, double multiplier) {
