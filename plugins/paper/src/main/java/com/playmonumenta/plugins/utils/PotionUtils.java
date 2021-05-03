@@ -386,12 +386,12 @@ public class PotionUtils {
 				types.add(effect.getType());
 			}
 		}
-		
+
 		NavigableSet<Effect> slows = plugin.mEffectManager.getEffects((Entity) le, "SlowEffect");
 		if (slows != null  && !types.contains(PotionEffectType.SLOW)) {
 			types.add(PotionEffectType.SLOW);
 		}
-		
+
 		return types;
 	}
 

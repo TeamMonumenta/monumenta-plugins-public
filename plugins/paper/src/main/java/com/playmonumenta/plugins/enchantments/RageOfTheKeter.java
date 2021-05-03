@@ -37,10 +37,10 @@ public class RageOfTheKeter implements BaseEnchantment {
 			DamageCause.CUSTOM,
 			DamageCause.PROJECTILE
 	);
-	
+
 	private static final Particle.DustOptions OLIVE_COLOR = new Particle.DustOptions(Color.fromRGB(128, 128, 0), 1.0f);
 	private static final Particle.DustOptions GREEN_COLOR = new Particle.DustOptions(Color.fromRGB(64, 128, 0), 1.0f);
-	
+
 	@Override
 	public String getProperty() {
 		return PROPERTY_NAME;
@@ -79,14 +79,14 @@ public class RageOfTheKeter implements BaseEnchantment {
 					world.spawnParticle(Particle.REDSTONE, loc, 2, 0.5, 0.5, 0.5, 0.1, OLIVE_COLOR);
 				})
 			);
-			
+
 			player.setFoodLevel(Math.min(20, player.getFoodLevel() + 2));
 			player.setSaturation(Math.min(player.getFoodLevel(), Math.min(player.getSaturation() + 3.6f, 12.8f)));
-			
+
 			world.spawnParticle(Particle.REDSTONE, player.getLocation().add(0, 1, 0), 20, 0.25, 0.5, 0.25, 1, OLIVE_COLOR);
 			world.spawnParticle(Particle.REDSTONE, player.getLocation().add(0, 1, 0), 25, 0.5, 0.45, 0.25, 1, GREEN_COLOR);
 			world.playSound(player.getLocation(), Sound.ENTITY_STRIDER_EAT, 1, 0.85f);
-			
+
 			new BukkitRunnable() {
 				@Override
 				public void run() {

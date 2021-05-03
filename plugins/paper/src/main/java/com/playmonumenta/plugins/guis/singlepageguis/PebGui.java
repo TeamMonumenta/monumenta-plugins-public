@@ -308,7 +308,7 @@ public class PebGui extends SinglePageGUI {
 			}
 		}
 	}
-	
+
 	public void completeCommand(Player player, String command) {
 		if (command.startsWith("clickable") || command.equals("pickup")) {
 			player.performCommand(command);
@@ -338,7 +338,7 @@ public class PebGui extends SinglePageGUI {
 		newItem.setItemMeta(meta);
 		return newItem;
 	}
-	
+
 	public void splitLoreLine(ItemMeta meta, String lore, int maxLength, ChatColor defaultColor) {
 		String[] splitLine = lore.split(" ");
 		String currentString = defaultColor + "";
@@ -360,7 +360,7 @@ public class PebGui extends SinglePageGUI {
 	}
 
 	public Inventory setLayout(int page, Player player, Inventory inventory) {
-		
+
 		inventory.clear();
 		for (PebItem item : PEB_ITEMS) {
 			if (item.mPage == 0) {
@@ -373,11 +373,11 @@ public class PebGui extends SinglePageGUI {
 
 		for (int i = 0; i < (ROWS*COLUMNS); i++) {
 			if (inventory.getItem(i) == null) {
-				inventory.setItem(i,new ItemStack(FILLER, 1));
+				inventory.setItem(i, new ItemStack(FILLER, 1));
 			}
 		}
 		com.playmonumenta.plugins.utils.ScoreboardUtils.setScoreboardValue(player, "PEBPage", page);
-	
+
 		return inventory;
 	}
 

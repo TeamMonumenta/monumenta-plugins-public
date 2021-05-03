@@ -49,7 +49,7 @@ public class EnchantmentManager implements Listener {
 	public enum ItemSlot {
 		MAINHAND,
 		OFFHAND,
-		ARMOR,     // Does NOT include offhand!
+		ARMOR, // Does NOT include offhand!
 		INVENTORY, // Includes everything, including armor, offhand, and hotbar
 		NONE,
 	}

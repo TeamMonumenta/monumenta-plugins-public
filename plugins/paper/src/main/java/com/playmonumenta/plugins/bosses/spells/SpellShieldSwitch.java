@@ -72,7 +72,7 @@ public class SpellShieldSwitch extends Spell {
 					int mTicks = 0;
 					@Override
 					public void run() {
-						mLauncher.setVelocity(new Vector(0,0,0));
+						mLauncher.setVelocity(new Vector(0, 0, 0));
 						mTicks += 1;
 						if (mTicks > 2) {
 							this.cancel();

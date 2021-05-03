@@ -83,7 +83,7 @@ public class Spark implements BaseEnchantment {
 			if (target instanceof Guardian || target instanceof IronGolem) {
 				event.setDamage(event.getDamage() + 1.0);
 			}
-			
+
 			double rand = FastUtils.RANDOM.nextDouble();
 
 			//50% chance for 0.5 second stun

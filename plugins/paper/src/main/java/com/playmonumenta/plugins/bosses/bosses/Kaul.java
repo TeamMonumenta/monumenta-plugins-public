@@ -523,7 +523,7 @@ public class Kaul extends BossAbilityGroup {
 		});
 
 		//Force-cast Kaul's Judgement if it hasn't been casted yet.
-		events.put(40,  mBoss -> {
+		events.put(40, mBoss -> {
 			forceCastSpell(SpellKaulsJudgement.class);
 		});
 
@@ -682,7 +682,7 @@ public class Kaul extends BossAbilityGroup {
 
 
 		//Force-cast Kaul's Judgement if it hasn't been casted yet.
-		events.put(25,  mBoss -> {
+		events.put(25, mBoss -> {
 			forceCastSpell(SpellKaulsJudgement.class);
 		});
 

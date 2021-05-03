@@ -29,7 +29,7 @@ public class GetScoreCommand {
 		.withPermission(CommandPermission.fromString("monumenta.command.getscore"))
 		.withArguments(new TextArgument("name"))
 		.withArguments(new ObjectiveArgument("objective"))
-		.executes((sender,args) -> {
+		.executes((sender, args) -> {
 			run(sender, (String)args[0], (String)args[1]);
 		})
 		.register();

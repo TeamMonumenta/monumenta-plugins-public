@@ -398,7 +398,7 @@ public class OrinSinglePageGUI extends SinglePageGUI {
 
 			for (int i = 0; i < (ROWS*COLUMNS); i++) {
 				if (inventory.getItem(i) == null) {
-					inventory.setItem(i,new ItemStack(FILLER, 1));
+					inventory.setItem(i, new ItemStack(FILLER, 1));
 				}
 			}
 			com.playmonumenta.plugins.utils.ScoreboardUtils.setScoreboardValue(player, "OrinPage", 0);
@@ -419,7 +419,7 @@ public class OrinSinglePageGUI extends SinglePageGUI {
 		}
 		for (int i = 0; i < (ROWS*COLUMNS); i++) {
 			if (inventory.getItem(i) == null) {
-				inventory.setItem(i,new ItemStack(FILLER, 1));
+				inventory.setItem(i, new ItemStack(FILLER, 1));
 			}
 		}
 		com.playmonumenta.plugins.utils.ScoreboardUtils.setScoreboardValue(player, "OrinPage", page);
@@ -449,7 +449,7 @@ public class OrinSinglePageGUI extends SinglePageGUI {
 		}
 		for (int i = 0; i < (ROWS*COLUMNS); i++) {
 			if (inventory.getItem(i) == null) {
-				inventory.setItem(i,new ItemStack(FILLER, 1));
+				inventory.setItem(i, new ItemStack(FILLER, 1));
 			}
 		}
 		return inventory;

@@ -144,7 +144,7 @@ public class ThrownItem {
 							mEntity.teleport(mLocation);
 						} else if (loc.getBlock().getType() == Material.LAVA) {
 							//Force hoped items upwards if they're in lava.
-							mEntity.setVelocity(new Vector(0,0.4,0));
+							mEntity.setVelocity(new Vector(0, 0.4, 0));
 						}
 					} else {
 						delete();
@@ -258,14 +258,14 @@ public class ThrownItem {
 			double x = loc.get(KEY_X).getAsDouble();
 			double y = loc.get(KEY_Y).getAsDouble();
 			double z = loc.get(KEY_Z).getAsDouble();
-			location = new Location(null,x,y,z);
+			location = new Location(null, x, y, z);
 		}
 		if (data.has(KEY_VELOCITY) && data.get(KEY_VELOCITY).isJsonObject()) {
 			JsonObject loc = data.getAsJsonObject(KEY_VELOCITY);
 			double x = loc.get(KEY_X).getAsDouble();
 			double y = loc.get(KEY_Y).getAsDouble();
 			double z = loc.get(KEY_Z).getAsDouble();
-			velocity = new Vector(x,y,z);
+			velocity = new Vector(x, y, z);
 		}
 
 		return new ThrownItem(manager, player, item, world, location, velocity, instance, age);

@@ -341,7 +341,7 @@ public class FalseSpirit extends BossAbilityGroup {
 					mBoss.setHealth(hp);
 				}
 				world.playSound(loc, Sound.ENTITY_ILLUSIONER_CAST_SPELL, SoundCategory.HOSTILE, 1, 1.25f);
-				world.playSound(loc, Sound.ENTITY_ZOMBIE_VILLAGER_CONVERTED,SoundCategory.HOSTILE,  1, 2f);
+				world.playSound(loc, Sound.ENTITY_ZOMBIE_VILLAGER_CONVERTED, SoundCategory.HOSTILE, 1, 2f);
 				world.spawnParticle(Particle.REDSTONE, loc.clone().add(0, 1, 0), 5, 0.15, 0.15, 0.15, RED_COLOR);
 			}
 		}

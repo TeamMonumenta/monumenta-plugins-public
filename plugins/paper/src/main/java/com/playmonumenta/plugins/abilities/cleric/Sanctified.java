@@ -32,7 +32,7 @@ public class Sanctified extends Ability {
 	private static final float KNOCKBACK_SPEED = 0.4f;
 
 	private final double mPercentDamageReturned;
-	
+
 	private Crusade mCrusade;
 	private boolean mCountsHumanoids = false;
 
@@ -44,7 +44,7 @@ public class Sanctified extends Ability {
 		mInfo.mDescriptions.add("Whenever a non-boss undead enemy hits you with a melee or projectile attack, it takes 1.5 times the final damage you took and is knocked away from you.");
 		mInfo.mDescriptions.add("Deal 2.5 times the final damage instead, and the undead enemy is also afflicted with 20% Slowness for 3 seconds (even if you are blocking).");
 		mPercentDamageReturned = getAbilityScore() == 1 ? PERCENT_DAMAGE_RETURNED_1 : PERCENT_DAMAGE_RETURNED_2;
-		
+
 		Bukkit.getScheduler().runTask(plugin, () -> {
 			if (player != null) {
 				mCrusade = AbilityManager.getManager().getPlayerAbility(mPlayer, Crusade.class);

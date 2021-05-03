@@ -43,7 +43,7 @@ public class WhirlingBlade extends MultipleChargeAbility {
 	private int mLastCastTicks = 0;
 
 	public WhirlingBlade(Plugin plugin, Player player) {
-		super(plugin, player, "Whirling Blade",  BLADE_1_MAX_CHARGES, BLADE_2_MAX_CHARGES);
+		super(plugin, player, "Whirling Blade", BLADE_1_MAX_CHARGES, BLADE_2_MAX_CHARGES);
 		mInfo.mScoreboardId = "WhirlingBlade";
 		mInfo.mShorthandName = "WB";
 		mInfo.mDescriptions.add("Use the swap key while holding a weapon to throw a whirling blade that circles around you, knocking back and dealing 10 damage to enemies it hits. Cooldown: 8s. Charges: 2.");

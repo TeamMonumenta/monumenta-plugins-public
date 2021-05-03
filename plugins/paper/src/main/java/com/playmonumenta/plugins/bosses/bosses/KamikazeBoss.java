@@ -29,7 +29,7 @@ public class KamikazeBoss extends BossAbilityGroup {
 	public KamikazeBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
 		List<Spell> passiveSpells = Arrays.asList(
-				new SpellRunAction(() -> boss.getLocation().getWorld().spawnParticle(Particle.SMOKE_NORMAL, boss.getLocation().clone().add(new Location(boss.getWorld(),0,1,0)), 2, 0.5, 1, 0.5, 0))
+				new SpellRunAction(() -> boss.getLocation().getWorld().spawnParticle(Particle.SMOKE_NORMAL, boss.getLocation().clone().add(new Location(boss.getWorld(), 0, 1, 0)), 2, 0.5, 1, 0.5, 0))
 			);
 		super.constructBoss(null, passiveSpells, detectionRange, null);
 	}

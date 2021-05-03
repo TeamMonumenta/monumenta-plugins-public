@@ -499,12 +499,12 @@ public class Grave {
 
 	private void generateNewPose() {
 		mPose = new HashMap<String, EulerAngle>() {{
-			put(KEY_POSE_HEAD, new EulerAngle(0,0,0));
-			put(KEY_POSE_BODY, new EulerAngle(0,0,0));
-			put(KEY_POSE_LEFT_ARM, new EulerAngle(0,0,0));
-			put(KEY_POSE_RIGHT_ARM, new EulerAngle(0,0,0));
-			put(KEY_POSE_LEFT_LEG, new EulerAngle(0,0,0));
-			put(KEY_POSE_RIGHT_LEG, new EulerAngle(0,0,0));
+			put(KEY_POSE_HEAD, new EulerAngle(0, 0, 0));
+			put(KEY_POSE_BODY, new EulerAngle(0, 0, 0));
+			put(KEY_POSE_LEFT_ARM, new EulerAngle(0, 0, 0));
+			put(KEY_POSE_RIGHT_ARM, new EulerAngle(0, 0, 0));
+			put(KEY_POSE_LEFT_LEG, new EulerAngle(0, 0, 0));
+			put(KEY_POSE_RIGHT_LEG, new EulerAngle(0, 0, 0));
 		}};
 		//TODO Actually generate a randomized pose
 	}
@@ -582,7 +582,7 @@ public class Grave {
 			double z = loc.get(KEY_Z).getAsDouble();
 			float yaw = loc.get(KEY_YAW).getAsFloat();
 			float pitch = loc.get(KEY_PITCH).getAsFloat();
-			location = new Location(null,x,y,z, yaw, pitch);
+			location = new Location(null, x, y, z, yaw, pitch);
 		}
 		if (data.has(KEY_POSE) && data.get(KEY_POSE).isJsonObject()) {
 			JsonObject poseData = data.getAsJsonObject(KEY_POSE);

@@ -23,7 +23,7 @@ public class PunchResistBoss extends BossAbilityGroup {
 
 	@Override
 	public void bossHitByProjectile(ProjectileHitEvent event) {
-		mBoss.setVelocity(new Vector(0,0,0));
+		mBoss.setVelocity(new Vector(0, 0, 0));
 	}
 
 	@Override
@@ -33,7 +33,7 @@ public class PunchResistBoss extends BossAbilityGroup {
 				int mTicks = 0;
 				@Override
 				public void run() {
-					mBoss.setVelocity(new Vector(0,0,0));
+					mBoss.setVelocity(new Vector(0, 0, 0));
 					mTicks += 1;
 					if (mTicks > 2) {
 						this.cancel();

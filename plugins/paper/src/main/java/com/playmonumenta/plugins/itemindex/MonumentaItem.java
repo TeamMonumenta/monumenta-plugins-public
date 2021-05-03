@@ -590,7 +590,7 @@ public class MonumentaItem {
 			out.append(String.format("%sUnbreakable:%s %s\n", editable, reset, this.getUnbreakable()));
 		}
 		if (this.getDurability() != null) {
-			out.append(String.format("%s%sDurability:%s %s\n", editable, this.getUnbreakable() != null && this.getUnbreakable() ? unused : "",  reset, this.getUnbreakable()));
+			out.append(String.format("%s%sDurability:%s %s\n", editable, this.getUnbreakable() != null && this.getUnbreakable() ? unused : "", reset, this.getUnbreakable()));
 		}
 		if (this.getOldName() != null) {
 			out.append(String.format("%sOld Name:%s %s\n", readOnly, reset, this.getOldName()));

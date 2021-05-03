@@ -29,13 +29,13 @@ public class GraveManager {
 	private static final String KEY_PLUGIN_DATA = "MonumentaGravesV2";
 	private static final String KEY_GRAVES = "graves";
 	private static final String KEY_THROWN_ITEMS = "thrown_items";
-	private static final HashMap<UUID,GraveManager> INSTANCES = new HashMap<>();
-	private static final HashMap<UUID,Grave> GRAVES = new HashMap<>();
-	private static final HashMap<UUID,GraveItem> GRAVE_ITEMS = new HashMap<>();
-	private static final HashMap<UUID,ThrownItem> THROWN_ITEMS = new HashMap<>();
-	private static final HashMap<Long,HashSet<Grave>> UNLOADED_GRAVES = new HashMap<>();
-	private static final HashMap<Long,HashSet<GraveItem>> UNLOADED_GRAVE_ITEMS = new HashMap<>();
-	private static final HashMap<Long,HashSet<ThrownItem>> UNLOADED_THROWN_ITEMS = new HashMap<>();
+	private static final HashMap<UUID, GraveManager> INSTANCES = new HashMap<>();
+	private static final HashMap<UUID, Grave> GRAVES = new HashMap<>();
+	private static final HashMap<UUID, GraveItem> GRAVE_ITEMS = new HashMap<>();
+	private static final HashMap<UUID, ThrownItem> THROWN_ITEMS = new HashMap<>();
+	private static final HashMap<Long, HashSet<Grave>> UNLOADED_GRAVES = new HashMap<>();
+	private static final HashMap<Long, HashSet<GraveItem>> UNLOADED_GRAVE_ITEMS = new HashMap<>();
+	private static final HashMap<Long, HashSet<ThrownItem>> UNLOADED_THROWN_ITEMS = new HashMap<>();
 	private final ArrayList<ThrownItem> mThrownItems = new ArrayList<>();
 	private final ArrayList<Grave> mGraves = new ArrayList<>();
 	private final HashSet<UUID> mAllowed = new HashSet<>();
@@ -69,7 +69,7 @@ public class GraveManager {
 
 	public static void onLogin(Player player) {
 		GraveManager manager = new GraveManager(player);
-		INSTANCES.put(player.getUniqueId(),manager);
+		INSTANCES.put(player.getUniqueId(), manager);
 		for (Grave grave : manager.mGraves) {
 			grave.onLogin();
 		}

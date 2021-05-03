@@ -40,7 +40,7 @@ public class Decay implements BaseEnchantment {
 		PotionUtils.applyPotion(player, target, new PotionEffect(PotionEffectType.WITHER, (int)(DURATION * player.getCooledAttackStrength(0)), level - 1, false, true));
 		player.getWorld().spawnParticle(Particle.SQUID_INK, target.getLocation().add(0, 1, 0), 4, 0.4, 0.5, 0.4);
 	}
-	
+
 	// Thrown trident damage handling
 	@Override
 	public void onLaunchProjectile(Plugin plugin, Player player, int level, Projectile proj, ProjectileLaunchEvent event) {

@@ -100,7 +100,7 @@ public class TwoHanded implements BaseEnchantment {
 			event.setDamage(event.getDamage() * (1 - PERCENT_DAMAGE_REDUCTION));
 		}
 	}
-	
+
 	@Override
 	public void onDamage(Plugin plugin, Player player, int level, LivingEntity target, EntityDamageByEntityEvent event) {
 		if (checkForOffhand(player) && event.getCause() == DamageCause.CUSTOM) {

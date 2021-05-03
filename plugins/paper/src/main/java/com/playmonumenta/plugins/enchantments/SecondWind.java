@@ -27,7 +27,7 @@ public class SecondWind implements BaseEnchantment {
 	public EnumSet<ItemSlot> validSlots() {
 		return EnumSet.of(ItemSlot.MAINHAND, ItemSlot.ARMOR, ItemSlot.OFFHAND);
 	}
-	
+
 	@Override
 	public void onHurtByEntity(Plugin plugin, Player player, int level, EntityDamageByEntityEvent event) {
 		double currHealth = player.getHealth();
@@ -41,5 +41,5 @@ public class SecondWind implements BaseEnchantment {
 			event.setDamage(event.getDamage() * (1 - proportion) + event.getDamage() * proportion * Math.pow(1 - DAMAGE_RESIST, level));
 		}
 	}
-	
+
 }

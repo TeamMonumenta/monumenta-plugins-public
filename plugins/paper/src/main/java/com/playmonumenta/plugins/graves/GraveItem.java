@@ -184,7 +184,7 @@ public class GraveItem {
 							respawn();
 						} else if (loc.getBlock().getType() == Material.LAVA) {
 							//Force hoped items upwards if they're in lava.
-							mEntity.setVelocity(new Vector(0,0.4,0));
+							mEntity.setVelocity(new Vector(0, 0.4, 0));
 						}
 					} else {
 						if (mStatus == Status.DROPPED) {
@@ -440,14 +440,14 @@ public class GraveItem {
 			double x = loc.get(KEY_X).getAsDouble();
 			double y = loc.get(KEY_Y).getAsDouble();
 			double z = loc.get(KEY_Z).getAsDouble();
-			location = new Location(null,x,y,z);
+			location = new Location(null, x, y, z);
 		}
 		if (data.has(KEY_VELOCITY) && data.get(KEY_VELOCITY).isJsonObject()) {
 			JsonObject loc = data.getAsJsonObject(KEY_VELOCITY);
 			double x = loc.get(KEY_X).getAsDouble();
 			double y = loc.get(KEY_Y).getAsDouble();
 			double z = loc.get(KEY_Z).getAsDouble();
-			velocity = new Vector(x,y,z);
+			velocity = new Vector(x, y, z);
 		}
 
 		return new GraveItem(manager, grave, player, item, status, instance, location, velocity, age);
@@ -469,14 +469,14 @@ public class GraveItem {
 			location.addProperty(KEY_X, mLocation.getX());
 			location.addProperty(KEY_Y, mLocation.getY());
 			location.addProperty(KEY_Z, mLocation.getZ());
-			data.add(KEY_LOCATION,location);
+			data.add(KEY_LOCATION, location);
 		}
 		if (mVelocity != null) {
 			JsonObject velocity = new JsonObject();
 			velocity.addProperty(KEY_X, mVelocity.getX());
 			velocity.addProperty(KEY_Y, mVelocity.getY());
 			velocity.addProperty(KEY_Z, mVelocity.getZ());
-			data.add(KEY_VELOCITY,velocity);
+			data.add(KEY_VELOCITY, velocity);
 		}
 		return data;
 	}

@@ -8,7 +8,7 @@ public class ThuribleBonusHealing extends Effect {
 		super(duration);
 		mLevel = level;
 	}
-	
+
 	@Override
 	public double getMagnitude() {
 		return mLevel;

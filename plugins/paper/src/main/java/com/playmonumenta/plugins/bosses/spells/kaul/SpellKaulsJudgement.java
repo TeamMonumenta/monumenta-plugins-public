@@ -224,7 +224,7 @@ public class SpellKaulsJudgement extends Spell implements Listener {
 	}
 
 	private void fail(Player player) {
-		PotionUtils.applyPotion(mPlugin, player, new PotionEffect(PotionEffectType.HEALTH_BOOST,60 * 20, -2));
+		PotionUtils.applyPotion(mPlugin, player, new PotionEffect(PotionEffectType.HEALTH_BOOST, 60 * 20, -2));
 		PotionUtils.applyPotion(mPlugin, player, new PotionEffect(PotionEffectType.SLOW, 60 * 20, 1));
 		player.getWorld().playSound(player.getLocation(), Sound.ENTITY_WITHER_SHOOT, 1, 0);
 		player.getWorld().playSound(player.getLocation(), Sound.ENTITY_BLAZE_DEATH, 1, 0.2f);

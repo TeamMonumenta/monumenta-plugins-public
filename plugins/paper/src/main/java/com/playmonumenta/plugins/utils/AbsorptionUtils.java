@@ -64,7 +64,7 @@ public class AbsorptionUtils {
 		double absorption = getAbsorption(entity);
 		double newAbsorption = Math.max(absorption - amount, 0);
 		if (newAbsorption < absorption) {
-			
+
 			setAbsorption(entity, newAbsorption, -1);
 		}
 	}

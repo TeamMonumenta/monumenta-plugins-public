@@ -87,7 +87,7 @@ public class VoodooBondsReaper extends Effect {
 					AbsorptionUtils.subtractAbsorption(mPlayer, absorbHealth);
 				}
 			}
-			
+
 			Location loc = mPlayer.getLocation();
 			World world = loc.getWorld();
 			world.spawnParticle(Particle.SPELL_WITCH, loc, 60, 0.5, 0.5, 0.5, 0.001);

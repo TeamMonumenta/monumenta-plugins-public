@@ -35,7 +35,7 @@ public class MagePassive extends Ability {
 		}
 		return true;
 	}
-	
+
 	@Override
 	public boolean livingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
 		if (event.getCause() == DamageCause.ENTITY_ATTACK) {

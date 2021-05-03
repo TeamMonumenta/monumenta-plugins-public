@@ -16,7 +16,7 @@ import com.playmonumenta.plugins.utils.InventoryUtils;
 public class Starvation implements BaseEnchantment {
 
 	private static final String PROPERTY_NAME = ChatColor.RED + "Starvation";
-	
+
 	@Override
 	public String getProperty() {
 		return PROPERTY_NAME;

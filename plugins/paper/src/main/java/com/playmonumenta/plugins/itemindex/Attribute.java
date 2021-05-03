@@ -14,7 +14,7 @@ public enum Attribute {
 	//attributes are showing up in the order they are declared
 	//so... main stats first
 	ATTACK_DAMAGE(org.bukkit.attribute.Attribute.GENERIC_ATTACK_DAMAGE, " Attack Damage"),
-	ATTACK_SPEED(org.bukkit.attribute.Attribute.GENERIC_ATTACK_SPEED,  " Attack Speed"),
+	ATTACK_SPEED(org.bukkit.attribute.Attribute.GENERIC_ATTACK_SPEED, " Attack Speed"),
 	RANGED_DAMAGE(new AttributeProjectileDamage()),
 	PROJECTILE_SPEED(new AttributeProjectileSpeed()),
 	THROW_RATE(new AttributeThrowRate()),

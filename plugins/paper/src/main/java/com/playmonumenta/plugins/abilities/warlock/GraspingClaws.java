@@ -88,7 +88,7 @@ public class GraspingClaws extends Ability {
 				MovementUtils.pullTowards(proj, mob, PULL_SPEED);
 				EntityUtils.applySlow(mPlugin, DURATION, mAmplifier, mob);
 			}
-			
+
 			proj.remove();
 		}
 	}

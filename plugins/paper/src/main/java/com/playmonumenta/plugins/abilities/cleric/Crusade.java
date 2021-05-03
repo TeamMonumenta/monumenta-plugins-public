@@ -19,7 +19,7 @@ public class Crusade extends Ability {
 		mInfo.mDescriptions.add("All ability damage against undead is increased by 33%.");
 		mInfo.mDescriptions.add("Humanoid enemies (anything affected by Duelist) count as Undead for Cleric skills.");
 	}
-	
+
 	@Override
 	public void playerDealtCustomDamageEvent(CustomDamageEvent event) {
 		LivingEntity mob = (LivingEntity) event.getDamaged();

@@ -213,9 +213,9 @@ public class SpellBaseCharge extends Spell {
 	                               ParticleAction particle, HitPlayerAction hitPlayer, EndAction end, boolean teleBoss, boolean stopOnFirstHit, double yStartAdd) {
 		final Location launLoc;
 		if (charger instanceof LivingEntity) {
-			launLoc = ((LivingEntity)charger).getEyeLocation().add(0,yStartAdd,0);
+			launLoc = ((LivingEntity)charger).getEyeLocation().add(0, yStartAdd, 0);
 		} else {
-			launLoc = charger.getLocation().add(0,yStartAdd,0);
+			launLoc = charger.getLocation().add(0, yStartAdd, 0);
 		}
 
 		/* Test locations that are iterated in the loop */

@@ -206,12 +206,12 @@ public class BossManager implements Listener {
 		mStatelessBosses.put(AbilitySilenceBoss.identityTag, (Plugin p, LivingEntity e) -> new AbilitySilenceBoss(p, e));
 		mStatelessBosses.put(ShiftingBoss.identityTag, (Plugin p, LivingEntity e) -> new ShiftingBoss(p, e));
 		mStatelessBosses.put(CarapaceBoss.identityTag, (Plugin p, LivingEntity e) -> new CarapaceBoss(p, e));
-		mStatelessBosses.put(KamikazeBoss.identityTag, (Plugin p, LivingEntity e) -> new KamikazeBoss(p,e));
-		mStatelessBosses.put(PortalBoss.identityTag, (Plugin p, LivingEntity e) -> new PortalBoss(p,e));
-		mStatelessBosses.put(TinyBombTossBoss.identityTag, (Plugin p, LivingEntity e) -> new TinyBombTossBoss(p,e));
-		mStatelessBosses.put(AntiRangeBoss.identityTag, (Plugin p, LivingEntity e) -> new AntiRangeBoss(p,e));
-		mStatelessBosses.put(AntiRangeChivalrousBoss.identityTag, (Plugin p, LivingEntity e) -> new AntiRangeChivalrousBoss(p,e));
-		mStatelessBosses.put(ImmortalMountBoss.identityTag, (Plugin p, LivingEntity e) -> new ImmortalMountBoss(p,e));
+		mStatelessBosses.put(KamikazeBoss.identityTag, (Plugin p, LivingEntity e) -> new KamikazeBoss(p, e));
+		mStatelessBosses.put(PortalBoss.identityTag, (Plugin p, LivingEntity e) -> new PortalBoss(p, e));
+		mStatelessBosses.put(TinyBombTossBoss.identityTag, (Plugin p, LivingEntity e) -> new TinyBombTossBoss(p, e));
+		mStatelessBosses.put(AntiRangeBoss.identityTag, (Plugin p, LivingEntity e) -> new AntiRangeBoss(p, e));
+		mStatelessBosses.put(AntiRangeChivalrousBoss.identityTag, (Plugin p, LivingEntity e) -> new AntiRangeChivalrousBoss(p, e));
+		mStatelessBosses.put(ImmortalMountBoss.identityTag, (Plugin p, LivingEntity e) -> new ImmortalMountBoss(p, e));
 		mStatelessBosses.put(SilenceOnHitBoss.identityTag, (Plugin p, LivingEntity e) -> new SilenceOnHitBoss(p, e));
 		mStatelessBosses.put(FalseSpiritPortal.identityTag, (Plugin p, LivingEntity e) -> new FalseSpiritPortal(p, e));
 		mStatelessBosses.put(TffBookSummonBoss.identityTag, (Plugin p, LivingEntity e) -> new TffBookSummonBoss(p, e));

@@ -216,7 +216,7 @@ public class Shatter extends Spell {
 					if (!mOldBlocks.isEmpty()) {
 						BukkitRunnable runnable = new BukkitRunnable() {
 							int mTicks = 0;
-							Iterator<Map.Entry<Location,Material>> mBlocks = mOldBlocks.entrySet().iterator();
+							Iterator<Map.Entry<Location, Material>> mBlocks = mOldBlocks.entrySet().iterator();
 							@Override
 							public void run() {
 								mTicks++;
@@ -271,7 +271,7 @@ public class Shatter extends Spell {
 
 		new BukkitRunnable() {
 			int mTicks = 0;
-			Iterator<Map.Entry<Location,Material>> mBlocks = mOldBlocks.entrySet().iterator();
+			Iterator<Map.Entry<Location, Material>> mBlocks = mOldBlocks.entrySet().iterator();
 			@Override
 			public void run() {
 				mTicks++;

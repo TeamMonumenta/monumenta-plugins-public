@@ -179,6 +179,15 @@
              value="COMMA, SEMI, POST_INC, POST_DEC, DOT, ELLIPSIS, METHOD_REF"/>
             <property name="allowLineBreaks" value="true"/>
         </module>
+        <module name="WhitespaceAfter">
+            <property name="tokens" value="COMMA, SEMI"/>
+        </module>
+        <module name="Regexp">
+            <property name="format" value="[ \t]+$"/>
+            <property name="illegalPattern" value="true"/>
+            <property name="message" value="Trailing whitespace"/>
+        </module>
+        <module name="SingleSpaceSeparator"/>
         <module name="ParenPad"/>
         <module name="AnnotationLocation">
             <property name="id" value="AnnotationLocationMostCases"/>
