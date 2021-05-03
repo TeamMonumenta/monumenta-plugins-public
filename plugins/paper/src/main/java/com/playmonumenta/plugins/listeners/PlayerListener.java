@@ -991,6 +991,9 @@ public class PlayerListener implements Listener {
 					} else if (ingred.getType() == Material.TURTLE_HELMET) {
 						malfunction = true;
 						break;
+					} else if (ingred.getType() == Material.PHANTOM_MEMBRANE) {
+						malfunction = true;
+						break;
 					} else if (ingred.getType() == Material.FERMENTED_SPIDER_EYE) {
 						PotionMeta meta = (PotionMeta) i.getItemMeta();
 						PotionData data = meta.getBasePotionData();
