@@ -12,6 +12,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import com.playmonumenta.plugins.guis.SinglePageGUI;
+import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.redissync.MonumentaRedisSyncAPI;
 import com.playmonumenta.scriptedquests.Plugin;
@@ -98,6 +99,7 @@ public class OrinSinglePageGUI extends SinglePageGUI {
 		LOCATIONS_PAGE.add(new TeleportEntry(18, "Market", null, "Click to teleport!", Material.BARREL, "execute as @S run function monumenta:mechanisms/teleporters/enter_new_market"));
 		LOCATIONS_PAGE.add(new TeleportEntry(27, "Personal Plot", null, "Click to teleport!", Material.GRASS_BLOCK, "execute as @S run function plot:plot/home"));
 		LOCATIONS_PAGE.add(new TeleportEntry(36, "Guild Plot", null, "Click to teleport!", Material.YELLOW_BANNER, "teleportguild @S"));
+		LOCATIONS_PAGE.add(new TeleportEntry(45, "Build Server", null, "Click to teleport!", Material.STONE_PICKAXE, "transferserver build -2456.0 56.5 1104.0 90 0"));
 
 		LOCATIONS_PAGE.add(new TeleportEntry(3, "Sierhaven", null, "Click to teleport!", Material.GREEN_CONCRETE, "execute as @S run function monumenta:mechanisms/teleporters/tp/plots_to_region_1"));
 		LOCATIONS_PAGE.add(new TeleportEntry(20, "Labs", "D0Access", "Click to teleport!", Material.GLASS_BOTTLE, "execute as @S run function monumenta:lobbies/send_one/d0"));
@@ -129,6 +131,7 @@ public class OrinSinglePageGUI extends SinglePageGUI {
 		LOCATIONS_TREE.add(new TeleportEntry(11, "Plots", null, "", Material.LIGHT_BLUE_CONCRETE, "2", 1, 1));
 		LOCATIONS_TREE.add(new TeleportEntry(15, "Region 1", null, "", Material.GREEN_CONCRETE, "3", 1, 1));
 		LOCATIONS_TREE.add(new TeleportEntry(38, "Region 2", null, "", Material.SAND, "4", 1, 1));
+		LOCATIONS_TREE.add(new TeleportEntry(42, "Build Server", null, "Click to teleport!", Material.STONE_PICKAXE, "transferserver build -2456.0 56.5 1104.0 90 0"));
 		//LOCATIONS_TREE.add(new TeleportEntry(42, "Region 3 LUL", null, "", Material.PAPER, "5", 1, 1));
 
 		LOCATIONS_TREE.add(new TeleportEntry(8, "Switch to Page Layout", null, "", Material.PISTON, "switch", 1, 2));
@@ -169,6 +172,41 @@ public class OrinSinglePageGUI extends SinglePageGUI {
 		//LOCATIONS_TREE.add(new TeleportEntry(31, "Bih you thought", null, "Click to teleport!", Material.BARRIER, "nice try", 1, 5));
 	}
 
+	private static ArrayList<TeleportEntry> LOCATIONS_REGION1 = new ArrayList<>();
+
+	static {
+		LOCATIONS_REGION1.add(new TeleportEntry(9, "Docks", null, "Click to teleport!", Material.LIGHT_BLUE_CONCRETE, "execute as @S run function monumenta:mechanisms/teleporters/tp/sierhaven_to_plots"));
+		LOCATIONS_REGION1.add(new TeleportEntry(36, "Build Server", null, "Click to teleport!", Material.STONE_PICKAXE, "transferserver build -765.5 106.0625 70.5 180 0"));
+
+		LOCATIONS_REGION1.add(new TeleportEntry(5, "Sierhaven", null, "Click to teleport!", Material.GREEN_CONCRETE, "tp @S -765.5 106.0625 70.5 180 0"));
+		LOCATIONS_REGION1.add(new TeleportEntry(20, "Labs", "D0Access", "Click to teleport!", Material.GLASS_BOTTLE, "execute as @S run function monumenta:lobbies/send_one/d0"));
+		LOCATIONS_REGION1.add(new TeleportEntry(22, "White", "D1Access", "Click to teleport!", Material.WHITE_WOOL, "execute as @S run function monumenta:lobbies/send_one/d1"));
+		LOCATIONS_REGION1.add(new TeleportEntry(24, "Orange", "D2Access", "Click to teleport!", Material.ORANGE_WOOL, "execute as @S run function monumenta:lobbies/send_one/d2"));
+		LOCATIONS_REGION1.add(new TeleportEntry(26, "Magenta", "D3Access", "Click to teleport!", Material.MAGENTA_WOOL, "execute as @S run function monumenta:lobbies/send_one/d3"));
+		LOCATIONS_REGION1.add(new TeleportEntry(38, "Light Blue", "D4Access", "Click to teleport!", Material.LIGHT_BLUE_WOOL, "execute as @S run function monumenta:lobbies/send_one/d4"));
+		LOCATIONS_REGION1.add(new TeleportEntry(40, "Yellow", "D5Access", "Click to teleport!", Material.YELLOW_WOOL, "execute as @S run function monumenta:lobbies/send_one/d5"));
+		LOCATIONS_REGION1.add(new TeleportEntry(42, "Willows", "DB1Access", "Click to teleport!", Material.JUNGLE_LEAVES, "execute as @S run function monumenta:lobbies/send_one/db1"));
+		LOCATIONS_REGION1.add(new TeleportEntry(44, "Reverie", "DCAccess", "Click to teleport!", Material.FIRE_CORAL, "execute as @S run function monumenta:lobbies/send_one/dc"));
+		LOCATIONS_REGION1.add(new TeleportEntry(50, "Sanctum", "DS1Access", "Click to teleport!", Material.GRASS_BLOCK, "execute as @S run function monumenta:lobbies/send_one/ds1"));
+	}
+
+	private static ArrayList<TeleportEntry> LOCATIONS_REGION2 = new ArrayList<>();
+
+	static {
+		LOCATIONS_REGION2.add(new TeleportEntry(9, "Docks", null, "Click to teleport!", Material.LIGHT_BLUE_CONCRETE, "execute as @S run function monumenta:mechanisms/teleporters/tp/mistport_to_plots"));
+		LOCATIONS_REGION2.add(new TeleportEntry(36, "Build Server", null, "Click to teleport!", Material.STONE_PICKAXE, "transferserver build -762.5 70.1 1344.5 180 0"));
+
+		LOCATIONS_REGION2.add(new TeleportEntry(5, "Mistport", "Quest101", "Click to teleport!", Material.SAND, "tp @S -762.5 70.1 1344.5 180 0", 13));
+		LOCATIONS_REGION2.add(new TeleportEntry(20, "Lime", "D6Access", "Click to teleport!", Material.LIME_WOOL, "execute as @S run function monumenta:lobbies/send_one/d6"));
+		LOCATIONS_REGION2.add(new TeleportEntry(22, "Pink", "D7Access", "Click to teleport!", Material.PINK_WOOL, "execute as @S run function monumenta:lobbies/send_one/d7"));
+		LOCATIONS_REGION2.add(new TeleportEntry(24, "Gray", "D8Access", "Click to teleport!", Material.GRAY_WOOL, "execute as @S run function monumenta:lobbies/send_one/d8"));
+		LOCATIONS_REGION2.add(new TeleportEntry(26, "Light Gray", "D9Access", "Click to teleport!", Material.LIGHT_GRAY_WOOL, "execute as @S run function monumenta:lobbies/send_one/d9"));
+		LOCATIONS_REGION2.add(new TeleportEntry(38, "Cyan", "D10Access", "Click to teleport!", Material.CYAN_WOOL, "execute as @S run function monumenta:lobbies/send_one/d10"));
+		LOCATIONS_REGION2.add(new TeleportEntry(40, "Purple", "D11Access", "Click to teleport!", Material.PURPLE_WOOL, "execute as @S run function monumenta:lobbies/send_one/d11"));
+		LOCATIONS_REGION2.add(new TeleportEntry(42, "Teal", "DTLAccess", "Click to teleport!", Material.CYAN_CONCRETE_POWDER, "execute as @S run function monumenta:lobbies/send_one/dtl"));
+		LOCATIONS_REGION2.add(new TeleportEntry(44, "Shifting City", "DRL2Access", "Click to teleport!", Material.PRISMARINE_BRICKS, "execute as @S run function monumenta:lobbies/send_one/drl2"));
+		LOCATIONS_REGION2.add(new TeleportEntry(50, "The Fallen Forum", "DFFAccess", "Click to teleport!", Material.BOOKSHELF, "execute as @S run function monumenta:lobbies/send_one/dff"));
+	}
 
 
 	public OrinSinglePageGUI(Player player, String[] args) {
@@ -192,31 +230,33 @@ public class OrinSinglePageGUI extends SinglePageGUI {
 	@Override
 	public Inventory getInventory(Player player, String[] args) {
 		Inventory baseInventory;
-
-		//in case of someone messing with the score, this should fix it to the correct init values
-		int scoreboardFixer = ScoreboardUtils.getScoreboardValue(player, "OrinPage");
-		switch (scoreboardFixer) {
-		case 0:
-		case 1:
-			break;
-		case 2:
-		case 3:
-		case 4:
-		case 5:
-			ScoreboardUtils.setScoreboardValue(player, "OrinPage", 1);
-			break;
-		default:
-			ScoreboardUtils.setScoreboardValue(player, "OrinPage", 0);
-		}
-		int pageChoice = ScoreboardUtils.getScoreboardValue(player, "OrinPage");
-
-
-		//Create inventory and call the builder
-
 		baseInventory = Bukkit.createInventory(null, ROWS*COLUMNS, "Teleportation Choices");
+		String currentShardName = ServerProperties.getShardName();
+		player.sendMessage(currentShardName);
+		if (currentShardName.contains("valley") || currentShardName.contains("region_1")) {
+			setRegionalInventory(1, player, baseInventory);
+		} else if (currentShardName.contains("isles") || currentShardName.contains("region_2")) {
+			setRegionalInventory(2, player, baseInventory);
+		} else {
+			//in case of someone messing with the score, this should fix it to the correct init values
+			int scoreboardFixer = ScoreboardUtils.getScoreboardValue(player, "OrinPage");
+			switch (scoreboardFixer) {
+			case 0:
+			case 1:
+				break;
+			case 2:
+			case 3:
+			case 4:
+			case 5:
+				ScoreboardUtils.setScoreboardValue(player, "OrinPage", 1);
+				break;
+			default:
+				ScoreboardUtils.setScoreboardValue(player, "OrinPage", 0);
+			}
+			int pageChoice = ScoreboardUtils.getScoreboardValue(player, "OrinPage");
 
-		setLayout(pageChoice, player, baseInventory);
-
+			setLayout(pageChoice, player, baseInventory);
+		}
 		return baseInventory;
 	}
 
@@ -234,53 +274,70 @@ public class OrinSinglePageGUI extends SinglePageGUI {
 			return;
 		}
 		int activeTreeInv = ScoreboardUtils.getScoreboardValue(player, "OrinPage");
+		String currentShardName = ServerProperties.getShardName();
 
 		if (clickedItem != null && clickedItem.getType() != FILLER && !event.isShiftClick()) {
 			int chosenSlot = event.getSlot();
-			if (activeTreeInv == 0) {
-				for (TeleportEntry location : LOCATIONS_PAGE) {
+			if (currentShardName.contains("valley") || currentShardName.contains("region_1")) {
+				for (TeleportEntry location : LOCATIONS_REGION1) {
 					if (location.mSlot == chosenSlot) {
-						if (location.mCommand == "switch") {
-							setLayout(1, player, inventory);
-							return;
-						} else {
-							completeCommand(player, location.mCommand);
-							player.closeInventory();
-							return;
-						}
-					}
-				}
-			}
-			if (activeTreeInv >= 1 && activeTreeInv <= 5) {
-				for (TeleportEntry location : LOCATIONS_TREE) {
-					if (location.mSlot == chosenSlot && location.mPage == activeTreeInv && location.mPage == 1) {
-						if (location.mCommand == "switch") {
-							setLayout(0, player, inventory);
-							return;
-						}
-						setTreeInventory(Integer.parseInt(location.mCommand), player, inventory);
+						completeCommand(player, location.mCommand);
+						player.closeInventory();
 						return;
 					}
-
-					if (location.mPage == activeTreeInv) {
+				}
+			} else if (currentShardName.contains("isles") || currentShardName.contains("region_2")) {
+				for (TeleportEntry location : LOCATIONS_REGION2) {
+					if (location.mSlot == chosenSlot) {
+						completeCommand(player, location.mCommand);
+						player.closeInventory();
+						return;
+					}
+				}
+			} else {
+				if (activeTreeInv == 0) {
+					for (TeleportEntry location : LOCATIONS_PAGE) {
 						if (location.mSlot == chosenSlot) {
-							if (location.mSlot == 0) {
-								setTreeInventory(1, player, inventory);
+							if (location.mCommand == "switch") {
+								setLayout(1, player, inventory);
 								return;
-							} else if (location.mCommand == "switch") {
-								setLayout(0, player, inventory);
 							} else {
 								completeCommand(player, location.mCommand);
 								player.closeInventory();
-								com.playmonumenta.plugins.utils.ScoreboardUtils.setScoreboardValue(player, "OrinPage", 1);
 								return;
 							}
 						}
+					}
+				}
+				if (activeTreeInv >= 1 && activeTreeInv <= 5) {
+					for (TeleportEntry location : LOCATIONS_TREE) {
+						if (location.mSlot == chosenSlot && location.mPage == activeTreeInv && location.mPage == 1) {
+							if (location.mCommand == "switch") {
+								setLayout(0, player, inventory);
+								return;
+							}
+							setTreeInventory(Integer.parseInt(location.mCommand), player, inventory);
+							return;
+						}
 
+						if (location.mPage == activeTreeInv) {
+							if (location.mSlot == chosenSlot) {
+								if (location.mSlot == 0) {
+									setTreeInventory(1, player, inventory);
+									return;
+								} else if (location.mCommand == "switch") {
+									setLayout(0, player, inventory);
+								} else {
+									completeCommand(player, location.mCommand);
+									player.closeInventory();
+									com.playmonumenta.plugins.utils.ScoreboardUtils.setScoreboardValue(player, "OrinPage", 1);
+									return;
+								}
+							}
+						}
 					}
 				}
 			}
-
 		}
 	}
 
@@ -366,6 +423,35 @@ public class OrinSinglePageGUI extends SinglePageGUI {
 			}
 		}
 		com.playmonumenta.plugins.utils.ScoreboardUtils.setScoreboardValue(player, "OrinPage", page);
+		return inventory;
+	}
+
+	public Inventory setRegionalInventory(int region, Player player, Inventory inventory) {
+		switch (region) {
+		case 1:
+			for (TeleportEntry location : LOCATIONS_REGION1) {
+				if (location.mScoreboard == null || ScoreboardUtils.getScoreboardValue(player, location.mScoreboard) >= location.mScoreRequired) {
+					ItemStack newItem = createCustomItem(location);
+					inventory.setItem(location.mSlot, newItem);
+				}
+			}
+			break;
+		case 2:
+			for (TeleportEntry location : LOCATIONS_REGION2) {
+				if (location.mScoreboard == null || ScoreboardUtils.getScoreboardValue(player, location.mScoreboard) >= location.mScoreRequired) {
+					ItemStack newItem = createCustomItem(location);
+					inventory.setItem(location.mSlot, newItem);
+				}
+			}
+			break;
+		default:
+			break;
+		}
+		for (int i = 0; i < (ROWS*COLUMNS); i++) {
+			if (inventory.getItem(i) == null) {
+				inventory.setItem(i,new ItemStack(FILLER, 1));
+			}
+		}
 		return inventory;
 	}
 
