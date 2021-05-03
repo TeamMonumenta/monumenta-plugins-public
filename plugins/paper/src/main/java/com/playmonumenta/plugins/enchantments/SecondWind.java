@@ -14,7 +14,7 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 
 public class SecondWind implements BaseEnchantment {
 	private static String PROPERTY_NAME = ChatColor.GRAY + "Second Wind";
-	private static final String DAMAGE_RESIST_NAME =  "SecondWindDamageReduction";
+	private static final String DAMAGE_RESIST_NAME = "SecondWindDamageReduction";
 	private static final double DAMAGE_RESIST = 0.1;
 	private static final double HEALTH_LIMIT = 0.5;
 

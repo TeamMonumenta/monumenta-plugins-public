@@ -180,27 +180,27 @@ public class ServerProperties {
 				//  Load the file - if it exists, then let's start parsing it.
 				JsonObject object = gson.fromJson(content, JsonObject.class);
 				if (object != null) {
-					mDailyResetEnabled           = getPropertyValueBool(plugin, object, "dailyResetEnabled", mDailyResetEnabled);
-					mJoinMessagesEnabled         = getPropertyValueBool(plugin, object, "joinMessagesEnabled", mJoinMessagesEnabled);
-					mIsTownWorld                 = getPropertyValueBool(plugin, object, "isTownWorld", mIsTownWorld);
-					mPlotSurvivalMinHeight       = getPropertyValueInt(plugin, object, "plotSurvivalMinHeight", mPlotSurvivalMinHeight);
+					mDailyResetEnabled = getPropertyValueBool(plugin, object, "dailyResetEnabled", mDailyResetEnabled);
+					mJoinMessagesEnabled = getPropertyValueBool(plugin, object, "joinMessagesEnabled", mJoinMessagesEnabled);
+					mIsTownWorld = getPropertyValueBool(plugin, object, "isTownWorld", mIsTownWorld);
+					mPlotSurvivalMinHeight = getPropertyValueInt(plugin, object, "plotSurvivalMinHeight", mPlotSurvivalMinHeight);
 
-					mIsSleepingEnabled           = getPropertyValueBool(plugin, object, "isSleepingEnabled", mIsSleepingEnabled);
-					mKeepLowTierInventory        = getPropertyValueBool(plugin, object, "keepLowTierInventory", mKeepLowTierInventory);
+					mIsSleepingEnabled = getPropertyValueBool(plugin, object, "isSleepingEnabled", mIsSleepingEnabled);
+					mKeepLowTierInventory = getPropertyValueBool(plugin, object, "keepLowTierInventory", mKeepLowTierInventory);
 					mClassSpecializationsEnabled = getPropertyValueBool(plugin, object, "classSpecializationsEnabled", mClassSpecializationsEnabled);
-					mAuditMessagesEnabled        = getPropertyValueBool(plugin, object, "auditMessagesEnabled", mAuditMessagesEnabled);
-					mRepairExplosions            = getPropertyValueBool(plugin, object, "repairExplosions", mRepairExplosions);
-					mPreventDungeonItemTransfer  = getPropertyValueBool(plugin, object, "preventDungeonItemTransfer", mPreventDungeonItemTransfer);
-					mHTTPStatusPort              = getPropertyValueInt(plugin, object, "httpStatusPort", mHTTPStatusPort);
+					mAuditMessagesEnabled = getPropertyValueBool(plugin, object, "auditMessagesEnabled", mAuditMessagesEnabled);
+					mRepairExplosions = getPropertyValueBool(plugin, object, "repairExplosions", mRepairExplosions);
+					mPreventDungeonItemTransfer = getPropertyValueBool(plugin, object, "preventDungeonItemTransfer", mPreventDungeonItemTransfer);
+					mHTTPStatusPort = getPropertyValueInt(plugin, object, "httpStatusPort", mHTTPStatusPort);
 
-					mShardName                   = getPropertyValueString(plugin, object, "shardName", mShardName);
-					mRabbitHost                  = getPropertyValueString(plugin, object, "rabbitHost", mRabbitHost);
+					mShardName = getPropertyValueString(plugin, object, "shardName", mShardName);
+					mRabbitHost = getPropertyValueString(plugin, object, "rabbitHost", mRabbitHost);
 
-					mForbiddenItemLore           = getPropertyValueStringSet(plugin, object, "forbiddenItemLore");
+					mForbiddenItemLore = getPropertyValueStringSet(plugin, object, "forbiddenItemLore");
 
-					mUnbreakableBlocks           = getPropertyValueMaterialList(plugin, object, "unbreakableBlocks", sender);
-					mAlwaysPickupMats            = getPropertyValueMaterialList(plugin, object, "alwaysPickupMaterials", sender);
-					mNamedPickupMats             = getPropertyValueMaterialList(plugin, object, "namedPickupMaterials", sender);
+					mUnbreakableBlocks = getPropertyValueMaterialList(plugin, object, "unbreakableBlocks", sender);
+					mAlwaysPickupMats = getPropertyValueMaterialList(plugin, object, "alwaysPickupMaterials", sender);
+					mNamedPickupMats = getPropertyValueMaterialList(plugin, object, "namedPickupMaterials", sender);
 
 					if (sender != null) {
 						sender.sendMessage(ChatColor.GOLD + "Successfully reloaded monumenta configuration");

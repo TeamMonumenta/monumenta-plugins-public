@@ -601,7 +601,7 @@ public class FrostGiant extends BossAbilityGroup {
 			PlayerUtils.executeCommandOnNearbyPlayers(mStartLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"The permafrost shield once more reforms.\",\"color\":\"aqua\"}]");
 
 			//Changes held weapon to iron axe
-			ItemStack axe =  modifyItemName(new ItemStack(Material.IRON_AXE), "Frost Giant's Crusher", NamedTextColor.AQUA, true);
+			ItemStack axe = modifyItemName(new ItemStack(Material.IRON_AXE), "Frost Giant's Crusher", NamedTextColor.AQUA, true);
 			ItemMeta im = axe.getItemMeta();
 			im.addAttributeModifier(Attribute.GENERIC_ATTACK_DAMAGE, new AttributeModifier("generic.attack_damage", -100, AttributeModifier.Operation.ADD_NUMBER));
 			axe.setItemMeta(im);
@@ -626,7 +626,7 @@ public class FrostGiant extends BossAbilityGroup {
 			teleport(mStartLoc);
 
 			//Changes held weapon to iron scythe
-			ItemStack scythe =  modifyItemName(new ItemStack(Material.IRON_HOE), "Frost Giant's Crescent", NamedTextColor.AQUA, true);
+			ItemStack scythe = modifyItemName(new ItemStack(Material.IRON_HOE), "Frost Giant's Crescent", NamedTextColor.AQUA, true);
 			ItemMeta im = scythe.getItemMeta();
 			im.addAttributeModifier(Attribute.GENERIC_ATTACK_DAMAGE, new AttributeModifier("generic.attack_damage", -100, AttributeModifier.Operation.ADD_NUMBER));
 			scythe.setItemMeta(im);

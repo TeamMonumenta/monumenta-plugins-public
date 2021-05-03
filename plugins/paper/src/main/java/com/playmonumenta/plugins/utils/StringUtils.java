@@ -23,7 +23,7 @@ public class StringUtils {
 		romanMap.put(4, "IV");
 		romanMap.put(1, "I");
 
-		int l =  romanMap.floorKey(number);
+		int l = romanMap.floorKey(number);
 		if (number == l) {
 			return romanMap.get(number);
 		}

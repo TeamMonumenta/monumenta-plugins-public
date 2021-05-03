@@ -129,7 +129,7 @@ public class SpellFrostRift extends Spell {
 		Map<Location, Material> oldBlocks = new HashMap<>();
 		Map<Location, BlockData> oldData = new HashMap<>();
 
-		BukkitRunnable runnable  = new BukkitRunnable() {
+		BukkitRunnable runnable = new BukkitRunnable() {
 			Location mLoc = mBoss.getLocation().add(0, 0.5, 0);
 			World mWorld = mLoc.getWorld();
 			Vector mDir = LocationUtils.getDirectionTo(loc, mLoc).setY(0).normalize();

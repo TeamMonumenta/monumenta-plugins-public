@@ -103,7 +103,7 @@ public class ThuribleProcession extends Ability {
 	private void updateBuffs() {
 
 		//Convert time into number of buffs and cap to maximum effect index for that level
-		mBuffs =  mSeconds / 4;
+		mBuffs = mSeconds / 4;
 
 		//Cap to 4 effects
 		if (mBuffs > 4) {
