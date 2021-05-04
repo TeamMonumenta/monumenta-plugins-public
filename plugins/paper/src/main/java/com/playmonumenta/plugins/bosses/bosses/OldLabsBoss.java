@@ -36,7 +36,7 @@ public class OldLabsBoss extends BossAbilityGroup {
 	private final Location mSpawnLoc;
 	private final Location mEndLoc;
 
-	private String[] dio = new String[] {
+	private String[] mDio = new String[] {
 		"Well, this is very peculiar...",
 		"The rats causing such a ruckus down here are mere commoners? How feeble are those bandits?",
 		"Now as a noble, I'm supposed to take pity on you. Where's the fun in that when I can cut you down instead?",
@@ -78,14 +78,14 @@ public class OldLabsBoss extends BossAbilityGroup {
 
 			PlayerUtils.executeCommandOnNearbyPlayers(mSpawnLoc, detectionRange, "playsound minecraft:entity.witch.ambient master @s ~ ~ ~ 10 0.6");
 			new BukkitRunnable() {
-				int index = 0;
+				int mIdx = 0;
 				@Override
 				public void run() {
-					String line = dio[index];
+					String line = mDio[mIdx];
 
-					if (index < 3) {
+					if (mIdx < 3) {
 						PlayerUtils.executeCommandOnNearbyPlayers(mSpawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"[???] \",\"color\":\"gold\"},{\"text\":\"" + line + "\",\"color\":\"white\"}]");
-						index += 1;
+						mIdx += 1;
 					} else {
 						this.cancel();
 						Location loc = mSpawnLoc.clone().add(0, 1, 0);

@@ -168,8 +168,8 @@ public class HeadlessHorsemanBoss extends BossAbilityGroup {
 		events.put(50, mBoss -> {
 			mShieldsUp = true;
 			new BukkitRunnable() {
-				int t = 0;
-				World world = mBoss.getWorld();
+				int mTicks = 0;
+				World mWorld = mBoss.getWorld();
 				@Override
 				public void run() {
 
@@ -179,17 +179,17 @@ public class HeadlessHorsemanBoss extends BossAbilityGroup {
 					}
 
 					if (!mShieldsUp) {
-						t = 0;
+						mTicks = 0;
 						return;
 					}
 
-					t++;
+					mTicks++;
 
-					world.spawnParticle(Particle.FLAME, mBoss.getLocation().add(0, 1.5, 0), 8, 0.4, 0.4, 0.4, 0.025);
-					world.spawnParticle(Particle.SMOKE_NORMAL, mBoss.getLocation().add(0, 1.5, 0), 5, 0.4, 0.4, 0.4, 0.05);
-					world.spawnParticle(Particle.SMOKE_LARGE, mBoss.getLocation().add(0, 1.5, 0), 1, 0.4, 0.4, 0.4, 0.025);
+					mWorld.spawnParticle(Particle.FLAME, mBoss.getLocation().add(0, 1.5, 0), 8, 0.4, 0.4, 0.4, 0.025);
+					mWorld.spawnParticle(Particle.SMOKE_NORMAL, mBoss.getLocation().add(0, 1.5, 0), 5, 0.4, 0.4, 0.4, 0.05);
+					mWorld.spawnParticle(Particle.SMOKE_LARGE, mBoss.getLocation().add(0, 1.5, 0), 1, 0.4, 0.4, 0.4, 0.025);
 
-					if (t % 20 == 0) {
+					if (mTicks % 20 == 0) {
 						for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), 4)) {
 							BossUtils.bossDamagePercent(boss, player, 0.075);
 							player.setFireTicks(20 * 5);

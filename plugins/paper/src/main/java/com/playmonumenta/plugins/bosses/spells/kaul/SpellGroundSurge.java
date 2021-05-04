@@ -160,7 +160,7 @@ public class SpellGroundSurge extends Spell {
 										}
 										Player tPlayer = rPlayer;
 										new BukkitRunnable() {
-											Player _tPlayer = tPlayer;
+											Player mTPlayer = tPlayer;
 											BoundingBox mBox = BoundingBox.of(bLoc, 0.4, 0.4, 0.4);
 											int mTicks = 0;
 											int mHits = 0;
@@ -169,7 +169,7 @@ public class SpellGroundSurge extends Spell {
 											public void run() {
 												mTicks++;
 												Location innerBoxLoc = mBox.getCenter().toLocation(world);
-												Vector dir = LocationUtils.getDirectionTo(_tPlayer.getLocation(), innerBoxLoc).setY(0).normalize();
+												Vector dir = LocationUtils.getDirectionTo(mTPlayer.getLocation(), innerBoxLoc).setY(0).normalize();
 												mBox.shift(dir.clone().multiply(0.7));
 												if (innerBoxLoc.getBlock().getType().isSolid()) {
 													innerBoxLoc.add(0, 1, 0);
@@ -210,13 +210,13 @@ public class SpellGroundSurge extends Spell {
 														mTicks = 0;
 														if (mHits < players.size() && mHits <= 2) {
 															int attempts = 0;
-															_tPlayer = players.get(FastUtils.RANDOM.nextInt(players.size()));
-															while (mHit.contains(_tPlayer.getUniqueId())) {
+															mTPlayer = players.get(FastUtils.RANDOM.nextInt(players.size()));
+															while (mHit.contains(mTPlayer.getUniqueId())) {
 																//A rare case can occur where the loop has gone through all of the possible
 																//players, but they have been hit. Add an attempt integer to make sure that
 																//it does not cause an infinite loop.
 																if (attempts < 5) {
-																	_tPlayer = players.get(FastUtils.RANDOM.nextInt(players.size()));
+																	mTPlayer = players.get(FastUtils.RANDOM.nextInt(players.size()));
 																	attempts++;
 																} else {
 																	this.cancel();

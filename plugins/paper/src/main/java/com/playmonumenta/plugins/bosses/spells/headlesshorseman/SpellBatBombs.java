@@ -117,7 +117,7 @@ public class SpellBatBombs extends Spell {
 		world.spawnParticle(Particle.SMOKE_NORMAL, mBoss.getLocation().add(0, 1, 0), 20, 0.4, .4, .4, 0.1);
 		new BukkitRunnable() {
 			int mTicks = 0;
-			Location loc = mBoss.getLocation().add(0, 1, 0);
+			Location mLoc = mBoss.getLocation().add(0, 1, 0);
 			@Override
 			public void run() {
 				mTicks++;
@@ -127,7 +127,7 @@ public class SpellBatBombs extends Spell {
 					return;
 				}
 
-				world.spawnParticle(Particle.SMOKE_NORMAL, loc, 5, 0.4, .4, .4, 0.025);
+				world.spawnParticle(Particle.SMOKE_NORMAL, mLoc, 5, 0.4, .4, .4, 0.025);
 				if (mTicks >= 30) {
 					this.cancel();
 					world.spawnParticle(Particle.FLAME, mBoss.getLocation().add(0, 1, 0), 5, 0.4, .4, .4, 0.125);

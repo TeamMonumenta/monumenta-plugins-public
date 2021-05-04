@@ -18,7 +18,6 @@ public class AuraSmallWeaknessBoss extends BossAbilityGroup {
 	public static final String identityTag = "aura_weakness";
 	public static final int detectionRange = 40;
 
-	LivingEntity boss;
 	private static final Particle.DustOptions WEAKNESS_COLOR = new Particle.DustOptions(Color.fromRGB(255, 0, 0), 2f);
 
 	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {

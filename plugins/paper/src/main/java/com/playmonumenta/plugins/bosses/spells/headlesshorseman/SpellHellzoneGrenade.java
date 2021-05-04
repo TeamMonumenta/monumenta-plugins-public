@@ -94,18 +94,18 @@ public class SpellHellzoneGrenade extends Spell {
 			fallingBlock.setVelocity(vect);
 
 			new BukkitRunnable() {
-				World world = mBoss.getWorld();
+				World mWorld = mBoss.getWorld();
 				@Override
 				public void run() {
-					world.spawnParticle(Particle.FLAME, fallingBlock.getLocation().add(0, fallingBlock.getHeight() / 2, 0), 3, 0.25, .25, .25, 0.025);
-					world.spawnParticle(Particle.SMOKE_NORMAL, fallingBlock.getLocation().add(0, fallingBlock.getHeight() / 2, 0), 2, 0.25, .25, .25, 0.025);
+					mWorld.spawnParticle(Particle.FLAME, fallingBlock.getLocation().add(0, fallingBlock.getHeight() / 2, 0), 3, 0.25, .25, .25, 0.025);
+					mWorld.spawnParticle(Particle.SMOKE_NORMAL, fallingBlock.getLocation().add(0, fallingBlock.getHeight() / 2, 0), 2, 0.25, .25, .25, 0.025);
 					if (fallingBlock.isOnGround() || !fallingBlock.isValid()) {
 						fallingBlock.remove();
 						fallingBlock.getLocation().getBlock().setType(Material.AIR);
-						world.spawnParticle(Particle.FLAME, fallingBlock.getLocation(), 150, 0, 0, 0, 0.165);
-						world.spawnParticle(Particle.SMOKE_LARGE, fallingBlock.getLocation(), 65, 0, 0, 0, 0.1);
-						world.spawnParticle(Particle.EXPLOSION_LARGE, fallingBlock.getLocation(), 1, 0, 0, 0, 0);
-						world.playSound(fallingBlock.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 2, 0.85f);
+						mWorld.spawnParticle(Particle.FLAME, fallingBlock.getLocation(), 150, 0, 0, 0, 0.165);
+						mWorld.spawnParticle(Particle.SMOKE_LARGE, fallingBlock.getLocation(), 65, 0, 0, 0, 0.1);
+						mWorld.spawnParticle(Particle.EXPLOSION_LARGE, fallingBlock.getLocation(), 1, 0, 0, 0, 0);
+						mWorld.playSound(fallingBlock.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 2, 0.85f);
 
 						for (Player player : PlayerUtils.playersInRange(fallingBlock.getLocation(), 4)) {
 							if (mCenter.distance(player.getLocation()) < HeadlessHorsemanBoss.detectionRange) {
@@ -118,12 +118,12 @@ public class SpellHellzoneGrenade extends Spell {
 
 						new BukkitRunnable() {
 							int mTicks = 0;
-							Location loc = fallingBlock.getLocation();
+							Location mLoc = fallingBlock.getLocation();
 							@Override
 							public void run() {
 								mTicks += 2;
-								world.spawnParticle(Particle.FLAME, loc, 12, 1.5, 0.15, 1.5, 0.05);
-								world.spawnParticle(Particle.SMOKE_LARGE, loc, 4, 1.5, 0.15, 1.5, 0.025);
+								mWorld.spawnParticle(Particle.FLAME, mLoc, 12, 1.5, 0.15, 1.5, 0.05);
+								mWorld.spawnParticle(Particle.SMOKE_LARGE, mLoc, 4, 1.5, 0.15, 1.5, 0.025);
 
 								if (mTicks % 10 == 0) {
 									for (Player player : PlayerUtils.playersInRange(fallingBlock.getLocation(), 4)) {

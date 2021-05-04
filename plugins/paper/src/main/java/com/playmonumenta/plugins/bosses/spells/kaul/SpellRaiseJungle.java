@@ -50,7 +50,7 @@ public class SpellRaiseJungle extends Spell {
 	private List<UUID> mSummoned = new ArrayList<UUID>();
 
 	private int mCooldown;
-	private boolean onCooldown = false;
+	private boolean mOnCooldown = false;
 	private ChargeUpManager mChargeUp;
 
 	public SpellRaiseJungle(Plugin plugin, LivingEntity boss, double summonRange, double detectRange, int summonTime, int cooldown) {
@@ -72,7 +72,7 @@ public class SpellRaiseJungle extends Spell {
 
 	@Override
 	public void run() {
-		onCooldown = true;
+		mOnCooldown = true;
 		Location loc = mBoss.getLocation();
 		if (mY > 0) {
 			loc.setY(mY);
@@ -110,22 +110,22 @@ public class SpellRaiseJungle extends Spell {
 						mSummoned.add(ele.getUniqueId());
 						ele.setAI(false);
 						new BukkitRunnable() {
-							int t = 0;
-							Location pLoc = scLoc;
-							double yinc = 1.6 / ((mSummonTime));
-							boolean raised = false;
+							int mTicks = 0;
+							Location mPLoc = scLoc;
+							double mYInc = 1.6 / ((mSummonTime));
+							boolean mRaised = false;
 							@Override
 							public void run() {
-								t++;
+								mTicks++;
 
-								if (!raised) {
-									ele.teleport(ele.getLocation().add(0, yinc, 0));
+								if (!mRaised) {
+									ele.teleport(ele.getLocation().add(0, mYInc, 0));
 								}
 
-								if (t >= mSummonTime && !raised) {
-									raised = true;
+								if (mTicks >= mSummonTime && !mRaised) {
+									mRaised = true;
 									ele.setAI(true);
-									pLoc.getWorld().spawnParticle(Particle.BLOCK_DUST, pLoc, 6, 0.25, 0.1, 0.25, 0.25, PARTICLE_DATA);
+									mPLoc.getWorld().spawnParticle(Particle.BLOCK_DUST, mPLoc, 6, 0.25, 0.1, 0.25, 0.25, PARTICLE_DATA);
 								}
 
 								if (mBoss.isDead() || !mBoss.isValid()) {
@@ -134,7 +134,7 @@ public class SpellRaiseJungle extends Spell {
 									return;
 								}
 
-								if (raised) {
+								if (mRaised) {
 									Block block = ele.getLocation().getBlock();
 									if (block.getType().isSolid() || block.isLiquid()) {
 										MovementUtils.knockAway(mBoss.getLocation(), ele, -2.25f, 0.7f);
@@ -149,7 +149,7 @@ public class SpellRaiseJungle extends Spell {
 
 											@Override
 											public void run() {
-												onCooldown = false;
+												mOnCooldown = false;
 											}
 
 										}.runTaskLater(mPlugin, mCooldown);
@@ -210,7 +210,7 @@ public class SpellRaiseJungle extends Spell {
 
 	@Override
 	public boolean canRun() {
-		return mSummoned.size() <= 0 && !onCooldown;
+		return mSummoned.size() <= 0 && !mOnCooldown;
 	}
 
 	@Override

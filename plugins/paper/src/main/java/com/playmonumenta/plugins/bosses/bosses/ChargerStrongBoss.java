@@ -14,8 +14,6 @@ public class ChargerStrongBoss extends BossAbilityGroup {
 
 	private static final int DAMAGE = 25;
 
-	LivingEntity boss;
-
 	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
 		return new ChargerStrongBoss(plugin, boss);
 	}

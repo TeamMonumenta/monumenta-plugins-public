@@ -34,11 +34,11 @@ public class SpellOmegaLeap extends Spell {
 		world.playSound(mBoss.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 1.5f, 0.9f);
 		world.playSound(mBoss.getLocation(), Sound.ENTITY_ENDER_DRAGON_GROWL, 1.5f, 0f);
 		new BukkitRunnable() {
-			int t = 0;
+			int mTicks = 0;
 			@Override
 			public void run() {
-				t++;
-				if (t >= 5 && mBoss.isOnGround() && !mBoss.isDead() && mBoss.isValid()) {
+				mTicks++;
+				if (mTicks >= 5 && mBoss.isOnGround() && !mBoss.isDead() && mBoss.isValid()) {
 					this.cancel();
 					Location loc = mBoss.getLocation();
 					world.spawnParticle(Particle.EXPLOSION_NORMAL, loc, 50, 0.02, 0.02, 0.02, 0);

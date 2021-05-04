@@ -167,29 +167,28 @@ public class SpellKaulsJudgement extends Spell implements Listener {
 
 	private void judge() {
 		new BukkitRunnable() {
-			World world = mBossLoc.getWorld();
-			int t = 0;
+			World mWorld = mBossLoc.getWorld();
+			int mTicks = 0;
 
 			@Override
 			public void run() {
-				t++;
+				mTicks++;
 
-
-				if (t < 20 * 2) {
+				if (mTicks < 20 * 2) {
 					mChargeUp.nextTick();
 					/* pre-judgement particles */
 					for (Player player : mJudgedPlayers) {
-						world.spawnParticle(Particle.SPELL_WITCH, player.getLocation().add(0, 1.5, 0), 2, 0.4, 0.4, 0.4, 0);
-						world.spawnParticle(Particle.SPELL_MOB, player.getLocation().add(0, 1.5, 0), 3, 0.4, 0.4, 0.4, 0);
+						mWorld.spawnParticle(Particle.SPELL_WITCH, player.getLocation().add(0, 1.5, 0), 2, 0.4, 0.4, 0.4, 0);
+						mWorld.spawnParticle(Particle.SPELL_MOB, player.getLocation().add(0, 1.5, 0), 3, 0.4, 0.4, 0.4, 0);
 					}
-				} else if (t == 20 * 2) {
+				} else if (mTicks == 20 * 2) {
 					mChargeUp.reset();
 					/* Start judgement */
 					for (Player player : mJudgedPlayers) {
 						player.addScoreboardTag(KAULS_JUDGEMENT_TAG);
-						world.playSound(player.getLocation(), Sound.ENTITY_ILLUSIONER_MIRROR_MOVE, 1, 1);
-						world.spawnParticle(Particle.SPELL_WITCH, player.getLocation().add(0, 1, 0), 60, 0, 0.4, 0, 1);
-						world.spawnParticle(Particle.SMOKE_LARGE, player.getLocation().add(0, 1, 0), 20, 0, 0.4, 0, 0.15);
+						mWorld.playSound(player.getLocation(), Sound.ENTITY_ILLUSIONER_MIRROR_MOVE, 1, 1);
+						mWorld.spawnParticle(Particle.SPELL_WITCH, player.getLocation().add(0, 1, 0), 60, 0, 0.4, 0, 1);
+						mWorld.spawnParticle(Particle.SMOKE_LARGE, player.getLocation().add(0, 1, 0), 20, 0, 0.4, 0, 0.15);
 						player.teleport(mTp);
 						player.playSound(mTp.getLocation(), Sound.ENTITY_ILLUSIONER_MIRROR_MOVE, 1, 1);
 						player.spawnParticle(Particle.SPELL_WITCH, player.getLocation().add(0, 1, 0), 60, 0, 0.4, 0, 1);
@@ -197,13 +196,13 @@ public class SpellKaulsJudgement extends Spell implements Listener {
 						player.sendMessage(ChatColor.AQUA + "What happened!? You need to find your way out of here quickly!");
 						player.sendTitle(ChatColor.RED + "" + ChatColor.BOLD + "ESCAPE", "", 1, 20 * 3, 1);
 					}
-				} else if (t < KAULS_JUDGEMENT_TIME) {
+				} else if (mTicks < KAULS_JUDGEMENT_TIME) {
 					/* Judgement ticks - anyone who loses the tag early must have succeeded */
 					Iterator<Player> iter = mJudgedPlayers.iterator();
 					while (iter.hasNext()) {
 						Player player = iter.next();
 
-						world.spawnParticle(Particle.SPELL_WITCH, player.getLocation().add(0, 1.5, 0), 1, 0.4, 0.4, 0.4, 0);
+						mWorld.spawnParticle(Particle.SPELL_WITCH, player.getLocation().add(0, 1.5, 0), 1, 0.4, 0.4, 0.4, 0);
 						if (!player.getScoreboardTags().contains(KAULS_JUDGEMENT_TAG)) {
 							iter.remove();
 							succeed(player);
