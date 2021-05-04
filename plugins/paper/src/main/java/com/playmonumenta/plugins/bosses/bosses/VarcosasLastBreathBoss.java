@@ -176,7 +176,7 @@ public class VarcosasLastBreathBoss extends BossAbilityGroup {
 		}
 
 		changePhase(null, null, null);
-		String dio = "Yarr... why be this hurtin’? I shan’t go!";
+		String dio = "Yarr... why be this hurtin'? I shan't go!";
 		PlayerUtils.executeCommandOnNearbyPlayers(mSpawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"" + dio + "\",\"color\":\"red\"}]");
 
 		new BukkitRunnable() {

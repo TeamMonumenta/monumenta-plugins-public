@@ -279,7 +279,7 @@ public class MonumentaItem {
 		}
 
 		// name
-		meta.setDisplayName(this.getName() + "§r");
+		meta.setDisplayName(this.getName() + ChatColor.RESET);
 
 		// book things
 		if (meta instanceof BookMeta) {

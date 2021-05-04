@@ -859,7 +859,7 @@ public class ItemUtils {
 
 		PotionMeta meta = (PotionMeta)stack.getItemMeta();
 
-		meta.setDisplayName("�r" + name);
+		meta.setDisplayName(ChatColor.RESET + name);
 		meta.addCustomEffect(new PotionEffect(type, duration, amplifier), true);
 		meta.setColor(type.getColor());
 		stack.setItemMeta(meta);
@@ -876,7 +876,7 @@ public class ItemUtils {
 
 	public static void setPotionMeta(ItemStack potion, String name, Color color) {
 		PotionMeta meta = (PotionMeta)potion.getItemMeta();
-		meta.setDisplayName("�r" + name);
+		meta.setDisplayName(ChatColor.RESET + name);
 		meta.setColor(color);
 		potion.setItemMeta(meta);
 		ItemUtils.setPlainName(potion);

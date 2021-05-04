@@ -385,7 +385,7 @@ public class FalseSpiritPortal extends BossAbilityGroup {
 				event.setCancelled(true);
 				player.sendMessage(ChatColor.GOLD + "[Bhairavi]" + ChatColor.WHITE + " It needs to be travelling faster than that! Throw the Spear!");
 			} else if (!mWarned.contains(player)) {
-				player.sendMessage(ChatColor.GOLD + "[Bhairavi]" + ChatColor.WHITE + " Don’t attack the portal with your weapons! Kill the creatures, then hit the portal with the charged spear!");
+				player.sendMessage(ChatColor.GOLD + "[Bhairavi]" + ChatColor.WHITE + " Don't attack the portal with your weapons! Kill the creatures, then hit the portal with the charged spear!");
 				mWarned.add(player);
 			}
 		}

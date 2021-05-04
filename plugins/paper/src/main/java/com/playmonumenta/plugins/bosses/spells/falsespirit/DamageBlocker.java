@@ -94,7 +94,7 @@ public class DamageBlocker extends Spell {
 						player.sendMessage(ChatColor.DARK_RED + "Foolish. I am made of nothing. Your attacks shall do nothing to me while my gates are powered.");
 						mWarned.add(player);
 					} else if (!mWarned.contains(player)) {
-						player.sendMessage(ChatColor.GOLD + "[Bhairavi]" + ChatColor.WHITE + " You must get closer! It’s turning your attacks to nothing!");
+						player.sendMessage(ChatColor.GOLD + "[Bhairavi]" + ChatColor.WHITE + " You must get closer! It's turning your attacks to nothing!");
 						mWarned.add(player);
 					}
 					event.setCancelled(true);
@@ -111,7 +111,7 @@ public class DamageBlocker extends Spell {
 					player.sendMessage(ChatColor.DARK_RED + "Foolish. I am made of nothing. Your attacks shall do nothing to me while my gates are powered.");
 					mWarned.add(player);
 				} else if (!mWarned.contains(player)) {
-					player.sendMessage(ChatColor.GOLD + "[Bhairavi]" + ChatColor.WHITE + " You must get closer! It’s turning your attacks to nothing!");
+					player.sendMessage(ChatColor.GOLD + "[Bhairavi]" + ChatColor.WHITE + " You must get closer! It's turning your attacks to nothing!");
 					mWarned.add(player);
 				}
 				event.setCancelled(true);
