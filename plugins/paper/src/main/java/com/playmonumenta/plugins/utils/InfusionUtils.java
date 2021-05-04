@@ -461,7 +461,7 @@ public class InfusionUtils {
 
 	private static int getInfuseLevel(ItemStack item) {
 		return InventoryUtils.getCustomEnchantLevel(item, Acumen.PROPERTY_NAME, true) + InventoryUtils.getCustomEnchantLevel(item, Focus.PROPERTY_NAME, true)
-		 		+ InventoryUtils.getCustomEnchantLevel(item, Perspicacity.PROPERTY_NAME, true) + InventoryUtils.getCustomEnchantLevel(item, Tenacity.PROPERTY_NAME, true)
+				+ InventoryUtils.getCustomEnchantLevel(item, Perspicacity.PROPERTY_NAME, true) + InventoryUtils.getCustomEnchantLevel(item, Tenacity.PROPERTY_NAME, true)
 				+ InventoryUtils.getCustomEnchantLevel(item, Vigor.PROPERTY_NAME, true) + InventoryUtils.getCustomEnchantLevel(item, Vitality.PROPERTY_NAME, true);
 	}
 
@@ -518,49 +518,49 @@ public class InfusionUtils {
 		switch (costMult) {
 			case 2:
 				switch (level) {
-					case 0:				// Infuse Level 0 Rare
-						return 1395;	// Exp Level 30
-					case 1:				// Infuse Level 1 Rare
-						return 2920;    // Exp Level 40
-					case 2:				// Infuse Level 2 Rare
-						return 5345;    // Exp Level 50
-					case 3:				// Infuse Level 3 Rare
-						return 8670;	// Exp Level 60
-					default:			// Infuse Level 4 Rare
+					case 0:              // Infuse Level 0 Rare
+						return 1395;     // Exp Level 30
+					case 1:              // Infuse Level 1 Rare
+						return 2920;     // Exp Level 40
+					case 2:              // Infuse Level 2 Rare
+						return 5345;     // Exp Level 50
+					case 3:              // Infuse Level 3 Rare
+						return 8670;     // Exp Level 60
+					default:             // Infuse Level 4 Rare
 						CommandAPI.fail("ERROR while calculating experience cost (invalid score multiplier). Please contact a moderator if you see this message!");
-						return 99999999;// Exp Level 9000 (but not really)
+						return 99999999; // Exp Level 9000 (but not really)
 				}
 			case 3:
 				switch (level) {
-					case 0:				// Infuse Level 0 Artifact
-						return 2920;    // Exp Level 40
-					case 1:				// Infuse Level 1 Artifact
-						return 5345;    // Exp Level 50
-					case 2:				// Infuse Level 2 Artifact
-						return 8670;	// Exp Level 60
-					case 3:				// Infuse Level 3 Artifact
-						return 12895;	// Exp Level 70
-					default:			// Infuse Level 4 Artifact
+					case 0:              // Infuse Level 0 Artifact
+						return 2920;     // Exp Level 40
+					case 1:              // Infuse Level 1 Artifact
+						return 5345;     // Exp Level 50
+					case 2:              // Infuse Level 2 Artifact
+						return 8670;     // Exp Level 60
+					case 3:              // Infuse Level 3 Artifact
+						return 12895;    // Exp Level 70
+					default:             // Infuse Level 4 Artifact
 						CommandAPI.fail("ERROR while calculating experience cost (invalid score multiplier). Please contact a moderator if you see this message!");
-						return 99999999;// Exp Level 9000 (but not really)
+						return 99999999; // Exp Level 9000 (but not really)
 				}
 			case 6:
 				switch (level) {
-					case 0:				// Infuse Level 0 Epic
-						return 5345;    // Exp Level 50
-					case 1:				// Infuse Level 1 Epic
-						return 8670;	// Exp Level 60
-					case 2:				// Infuse Level 2 Epic
-						return 12895;	// Exp Level 70
-					case 3:				// Infuse Level 3 Epic
-						return 18020;	// Exp Level 80
-					default:			// Infuse Level 4 Epic
+					case 0:              // Infuse Level 0 Epic
+						return 5345;     // Exp Level 50
+					case 1:              // Infuse Level 1 Epic
+						return 8670;     // Exp Level 60
+					case 2:              // Infuse Level 2 Epic
+						return 12895;    // Exp Level 70
+					case 3:              // Infuse Level 3 Epic
+						return 18020;    // Exp Level 80
+					default:             // Infuse Level 4 Epic
 						CommandAPI.fail("ERROR while calculating experience cost (invalid score multiplier). Please contact a moderator if you see this message!");
-						return 99999999;// Exp Level 9000 (but not really)
+						return 99999999; // Exp Level 9000 (but not really)
 				}
-			default:					// Infuse level What even happened?
+			default:                     // Infuse level What even happened?
 				CommandAPI.fail("ERROR while calculating experience cost (invalid score multiplier). Please contact a moderator if you see this message!");
-				return 99999999;		// Exp Level How did you hit this code?
+				return 99999999;         // Exp Level How did you hit this code?
 		}
 	}
 }

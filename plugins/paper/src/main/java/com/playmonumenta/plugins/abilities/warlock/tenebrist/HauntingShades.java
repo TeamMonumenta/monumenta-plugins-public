@@ -167,7 +167,7 @@ public class HauntingShades extends MultipleChargeAbility {
 						mPlugin.mEffectManager.addEffect(p, "HauntingShadesExtraSpeed", new PercentSpeed(EFFECT_DURATION, EXTRA_SPEED, ATTR_NAME));
 				    }
 				    for (LivingEntity m : affectedMobs) {
-				    	PotionUtils.applyPotion(mPlayer, m, new PotionEffect(PotionEffectType.UNLUCK, EFFECT_DURATION, mVuln, true, false));
+						PotionUtils.applyPotion(mPlayer, m, new PotionEffect(PotionEffectType.UNLUCK, EFFECT_DURATION, mVuln, true, false));
 				    }
 				}
 

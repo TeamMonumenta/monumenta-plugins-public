@@ -26,7 +26,7 @@ public class ChestUtils {
 
 	public static final int CHEST_LUCK_RADIUS = 128;
 	private static final double[] BONUS_ITEMS = {
-			0,		// Dummy value, this is a player count indexed array
+			0, // Dummy value, this is a player count indexed array
 			0.5,
 			1.7,
 			2.6,

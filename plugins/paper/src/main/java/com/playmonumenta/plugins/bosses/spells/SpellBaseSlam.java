@@ -7,7 +7,7 @@ import org.bukkit.util.Vector;
 public class SpellBaseSlam extends SpellBaseLeapAttack {
 	/**
 	 * @param plugin              Plugin
-	 * @param jumpHeight		  Height of the jump
+	 * @param jumpHeight          Height of the jump
 	 * @param boss                Boss
 	 * @param range               Range within which players may be targeted
 	 * @param minRange            Minimum range for the attack to initiate
@@ -21,7 +21,7 @@ public class SpellBaseSlam extends SpellBaseLeapAttack {
 	 */
 	public SpellBaseSlam(Plugin plugin, LivingEntity boss, int jumpHeight, int range, int minRange, int runDistance,
 	                     int cooldown, double velocityMultiplier, AestheticAction initiateAesthetic,
-						 AestheticAction leapAesthetic, AestheticAction leapingAesthetic, HitAction hitAction) {
+	                     AestheticAction leapAesthetic, AestheticAction leapingAesthetic, HitAction hitAction) {
 		super(plugin, boss, range, minRange, runDistance, cooldown,
 				velocityMultiplier, initiateAesthetic, leapAesthetic,
 				leapingAesthetic, hitAction,

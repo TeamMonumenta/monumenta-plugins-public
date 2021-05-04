@@ -22,9 +22,9 @@ import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
 public class SpellTpBehindTargetedPlayer extends Spell {
 	private static final int MAX_RANGE = 20;
 	private static final int TP_DELAY = 50;
-	private static final int TP_STUN = 10;					// Time after teleporting that the mob cannot perform actions
-	private static final int TP_STUN_CREEPER = 30;			// Increased time for creepers
-	private static final int DISTANCE_TO_PLAYER = 2 * 4;	// How many half-blocks behind the player maximum
+	private static final int TP_STUN = 10; // Time after teleporting that the mob cannot perform actions
+	private static final int TP_STUN_CREEPER = 30; // Increased time for creepers
+	private static final int DISTANCE_TO_PLAYER = 2 * 4; // How many half-blocks behind the player maximum
 	private static final int VERTICAL_DISTANCE_TO_PLAYER = 3;
 
 	private final Plugin mPlugin;

@@ -183,6 +183,11 @@
             <property name="tokens" value="COMMA, SEMI"/>
         </module>
         <module name="RegexpSinglelineJava">
+            <property name="format" value="[^\t]\t"/>
+            <property name="message" value="Tabs should only be used at the beginning of lines"/>
+            <property name="ignoreComments" value="false"/>
+        </module>
+        <module name="RegexpSinglelineJava">
             <property name="format" value="^  *[^ ]"/>
             <property name="message" value="Indent must use tab characters"/>
             <property name="ignoreComments" value="true"/>

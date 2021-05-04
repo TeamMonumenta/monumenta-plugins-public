@@ -1141,7 +1141,7 @@ public class EntityUtils {
 	 * <p>
 	 * IMPORTANT: do not use this method if the damage taken is not reduced by armor.
 	 *
-	 * @param armor	     the armor of the damagee
+	 * @param armor      the armor of the damagee
 	 * @param toughness  the armor toughness of the damagee
 	 * @param damage     the initial raw damage
 	 * @param multiplier the desired multiplier for the final damage
@@ -1156,7 +1156,7 @@ public class EntityUtils {
 			rawDamageUpperBound = rawDamageLowerBound * multiplier;
 		} else if (multiplier < 1) {
 			rawDamageUpperBound = damage;
-			rawDamageLowerBound = 0;	// Since armor gets better at lower damage, there's no good lower bound
+			rawDamageLowerBound = 0; // Since armor gets better at lower damage, there's no good lower bound
 		} else {
 			return damage;
 		}

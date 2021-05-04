@@ -219,7 +219,7 @@ public class DelvesUtils {
 				Modifier modifier = entry.getKey();
 				int cap = entry.getValue();
 
-				int rank = (int)(delveScore & 0x7);	// Bit mask the last 3 bits
+				int rank = (int)(delveScore & 0x7); // Bit mask the last 3 bits
 				if (rank > cap) {
 					return false;
 				}
@@ -231,7 +231,7 @@ public class DelvesUtils {
 			// Zero scores have no entropy, and non-zero scores should be finalized
 			computeDepthPoints(true);
 
-			delveScore &= 0xFF;	// Get rid of the flag for the all modifiers active advancement
+			delveScore &= 0xFF; // Get rid of the flag for the all modifiers active advancement
 
 			if (delveScore != getDepthPoints() || delveScore > MAX_DEPTH_POINTS) {
 				return false;
@@ -398,13 +398,13 @@ public class DelvesUtils {
 
 		long msb = ScoreboardUtils.getScoreboardValue(player, prefix + 1);
 		long lsb = ScoreboardUtils.getScoreboardValue(player, prefix + 2);
-		return (msb << 31) + lsb;	// Shift MSB by only 31 bits because treating ints as 31 bit unsigned ints
+		return (msb << 31) + lsb; // Shift MSB by only 31 bits because treating ints as 31 bit unsigned ints
 	}
 
 	public static void setDelveScore(Player player, String dungeon, long score) {
 		String prefix = SHARD_SCOREBOARD_PREFIX_MAPPINGS.get(dungeon);
 		long msb = score >> 31;
-		long lsb = score & 0x7FFFFFFFL;	// Bit mask the last 31 bits
+		long lsb = score & 0x7FFFFFFFL; // Bit mask the last 31 bits
 
 		ScoreboardUtils.setScoreboardValue(player, prefix + 1, (int) msb);
 		ScoreboardUtils.setScoreboardValue(player, prefix + 2, (int) lsb);

@@ -37,7 +37,7 @@ public class AttributeManager {
 			public Node[] mChildren = new Node[ALPHABET_SIZE];
 		}
 
-		private static final int ALPHABET_SIZE = 27;	// Lowercase alphabet and space
+		private static final int ALPHABET_SIZE = 27; // Lowercase alphabet and space
 
 		private final Node mRoot = new Node();
 

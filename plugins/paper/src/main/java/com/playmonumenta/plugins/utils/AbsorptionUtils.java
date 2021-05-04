@@ -44,7 +44,7 @@ public class AbsorptionUtils {
 	}
 
 	private static final Map<LivingEntity, AbsorptionInstances> ABSORPTION_INFO_MAPPINGS = new HashMap<LivingEntity, AbsorptionInstances>();
-	private static BukkitRunnable ABSORPTION_INFO_TRACKER;		// Effectively final
+	private static BukkitRunnable ABSORPTION_INFO_TRACKER; // Effectively final
 
 	private static final int TRACKER_PERIOD = 20;
 

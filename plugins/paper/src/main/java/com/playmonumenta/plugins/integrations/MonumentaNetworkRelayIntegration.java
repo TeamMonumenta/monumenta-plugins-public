@@ -102,12 +102,12 @@ public class MonumentaNetworkRelayIntegration implements Listener {
 
 	/*
 	 * Server -> Bungee
-	 * 	claimReward = false -> This is just a test to see if the player is eligible (raffle rewards > 0)
-	 * 	claimReward = true -> Bungee should subtract 1 from the player's raffle rewards score
-	 * 	eligible = true -> Player previously tried to claim a raffle but item wasn't eligible - add back the raffle point
-	 * 	eligible = false -> Regular request
+	 *  claimReward = false -> This is just a test to see if the player is eligible (raffle rewards > 0)
+	 *  claimReward = true -> Bungee should subtract 1 from the player's raffle rewards score
+	 *  eligible = true -> Player previously tried to claim a raffle but item wasn't eligible - add back the raffle point
+	 *  eligible = false -> Regular request
 	 *
-	 * 	eligible == true && claimReward == true -> Undefined
+	 *  eligible == true && claimReward == true -> Undefined
 	 *
 	 * Bungee -> Server
 	 *  claimReward same as request
@@ -134,7 +134,7 @@ public class MonumentaNetworkRelayIntegration implements Listener {
 	 *   if votesUnclaimed == 0, request the count of eligible voting rewards
 	 *   if votesUnclaimed > 0, return these votes back to bungee for storage
 	 * For Bungee -> Server
-	 * 	 Decrement storage, and send votes as votesUnclaimed
+	 *   Decrement storage, and send votes as votesUnclaimed
 	 */
 	public static void sendGetVotesUnclaimedPacket(UUID playerUUID, int count) {
 		if (INSTANCE != null) {

@@ -21,8 +21,8 @@ public class AvengerBoss extends BossAbilityGroup {
 	private static final int MAX_STACKS = 10;
 	private static final int RADIUS = 8;
 	private static final double HEAL_PERCENT = .1;
-	private static final double SPEED_PERCENT_INCREMENT = 0.06;		// Capped at x1.6 Speed
-	private static final double DAMAGE_PERCENT_INCREMENT = 0.2;		// Capped at x3 Damage
+	private static final double SPEED_PERCENT_INCREMENT = 0.06; // Capped at x1.6 Speed
+	private static final double DAMAGE_PERCENT_INCREMENT = 0.2; // Capped at x3 Damage
 
 	private int mStacks = 0;
 
