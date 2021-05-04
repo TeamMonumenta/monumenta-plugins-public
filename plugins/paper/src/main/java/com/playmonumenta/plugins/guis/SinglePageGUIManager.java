@@ -46,12 +46,12 @@ public class SinglePageGUIManager implements Listener {
 
 		LAST_TICK_OPENED.put(uuid, currentTickOpened);
 
-        if (!GUI_MAPPINGS.containsKey(uuid)) {
-            GUI_MAPPINGS.put(uuid, gui);
-            gui.openGUI(GUI_MAPPINGS);
-        } else {
-        	MessagingUtils.sendActionBarMessage(player, "GUI opening canceled. If this problem persists, try relogging.");
-        }
+		if (!GUI_MAPPINGS.containsKey(uuid)) {
+			GUI_MAPPINGS.put(uuid, gui);
+			gui.openGUI(GUI_MAPPINGS);
+		} else {
+			MessagingUtils.sendActionBarMessage(player, "GUI opening canceled. If this problem persists, try relogging.");
+		}
 	}
 
 	private SinglePageGUI getGUI(InventoryInteractEvent event) {
@@ -75,7 +75,7 @@ public class SinglePageGUIManager implements Listener {
 			gui.registerClick(event);
 			event.setCancelled(true);
 		}
-    }
+	}
 
 	@EventHandler
 	public void inventoryInteractEvent(InventoryInteractEvent event) {

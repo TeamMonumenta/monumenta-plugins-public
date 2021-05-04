@@ -94,7 +94,7 @@ public class SpellSummonConstantly extends Spell {
 					int rand = FastUtils.RANDOM.nextInt(mMobNames.size());
 					try {
 						LivingEntity summoned = (LivingEntity)LibraryOfSoulsIntegration.summon(loc, mMobNames.get(rand));
-						if (summoned != null && mSummoner instanceof VarcosaSummonerBoss)  {
+						if (summoned != null && mSummoner instanceof VarcosaSummonerBoss) {
 							// If this is the first phase of varcosa mob spawning, add a fake boss ability to this mob so the summone is damaged when it dies
 							BossManager.getInstance().manuallyRegisterBoss(summoned, new VarcosaSummonedMob(Plugin.getInstance(), summoned, (VarcosaSummonerBoss)mSummoner));
 						}

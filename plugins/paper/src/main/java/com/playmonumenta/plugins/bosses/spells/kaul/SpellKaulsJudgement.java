@@ -66,6 +66,7 @@ public class SpellKaulsJudgement extends Spell implements Listener {
 	private final HashMap<Player, Location> mOrigPlayerLocs = new HashMap<Player, Location>();
 
 	private ChargeUpManager mChargeUp;
+
 	private SpellKaulsJudgement(Location bossLoc) {
 		mBossLoc = bossLoc;
 		for (Entity e : bossLoc.getWorld().getEntities()) {

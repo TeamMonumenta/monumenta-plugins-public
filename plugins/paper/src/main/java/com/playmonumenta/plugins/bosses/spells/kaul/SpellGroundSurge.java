@@ -36,6 +36,7 @@ public class SpellGroundSurge extends Spell {
 	private double mRange;
 
 	private ChargeUpManager mChargeUp;
+
 	public SpellGroundSurge(Plugin plugin, LivingEntity boss, double range) {
 		mPlugin = plugin;
 		mBoss = boss;

@@ -30,6 +30,7 @@ public class SpellEarthenRupture extends Spell {
 	private LivingEntity mBoss;
 
 	private ChargeUpManager mChargeUp;
+
 	public SpellEarthenRupture(Plugin plugin, LivingEntity boss) {
 		mPlugin = plugin;
 		mBoss = boss;

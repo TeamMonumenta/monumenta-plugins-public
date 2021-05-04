@@ -53,9 +53,9 @@ public class NmsUtils {
 	}
 
 	public static void customDamageEntity(@Nonnull LivingEntity entity, double amount, @Nonnull Player damager, @Nullable String killedUsingMsg) {
-        DamageSource reason = new CustomDamageSource(((CraftHumanEntity) damager).getHandle(), killedUsingMsg);
+		DamageSource reason = new CustomDamageSource(((CraftHumanEntity) damager).getHandle(), killedUsingMsg);
 
-        ((CraftLivingEntity)entity).getHandle().damageEntity(reason, (float) amount);
+		((CraftLivingEntity)entity).getHandle().damageEntity(reason, (float) amount);
 	}
 
 	private static class UnblockableEntityDamageSource extends EntityDamageSource {
@@ -77,9 +77,9 @@ public class NmsUtils {
 	}
 
 	public static void unblockableEntityDamageEntity(@Nonnull LivingEntity damagee, double amount, @Nonnull LivingEntity damager) {
-        DamageSource reason = new UnblockableEntityDamageSource(damager == null ? null : ((CraftLivingEntity) damager).getHandle());
+		DamageSource reason = new UnblockableEntityDamageSource(damager == null ? null : ((CraftLivingEntity) damager).getHandle());
 
-        ((CraftLivingEntity)damagee).getHandle().damageEntity(reason, (float) amount);
+		((CraftLivingEntity)damagee).getHandle().damageEntity(reason, (float) amount);
 	}
 
 	@SuppressWarnings("unchecked")

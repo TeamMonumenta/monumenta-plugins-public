@@ -124,9 +124,8 @@ public class SpellBaseLaser extends Spell {
 					return;
 				}
 			}
-		}
-		// Group laser chooses all players
-		else {
+		} else {
+			// Group laser chooses all players
 			for (Player target : potentialTargets) {
 				launch(target);
 			}

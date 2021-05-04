@@ -17,7 +17,6 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.World;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
@@ -218,7 +217,7 @@ public class MeteorSlam extends Ability {
 
 	private void doSlamAttack(Location location) {
 		double fallDistance = calculateFallDistance();
-        double slamDamage = Math.min(REDUCED_THRESHOLD, fallDistance) * mLevelDamage + Math.max(0, (fallDistance - REDUCED_THRESHOLD)) * mLevelReducedDamage;
+		double slamDamage = Math.min(REDUCED_THRESHOLD, fallDistance) * mLevelDamage + Math.max(0, (fallDistance - REDUCED_THRESHOLD)) * mLevelReducedDamage;
 
 		for (LivingEntity enemy : EntityUtils.getNearbyMobs(location, mLevelSize)) {
 			EntityUtils.damageEntity(mPlugin, enemy, slamDamage, mPlayer, MagicType.PHYSICAL, true, mInfo.mLinkedSpell);

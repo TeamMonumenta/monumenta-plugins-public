@@ -113,7 +113,7 @@ public class PlayerInventory {
 				|| invClickEvent.isShiftClick() || invClickEvent.getSlot() == -1) {
 				mNeedsUpdate = true;
 				return;
-			} else if (invClickEvent.isRightClick() && ShulkerEquipmentListener.isEquipmentBox(invClickEvent.getCurrentItem()))  {
+			} else if (invClickEvent.isRightClick() && ShulkerEquipmentListener.isEquipmentBox(invClickEvent.getCurrentItem())) {
 				for (int i = 0; i <= 8; i++) {
 					// Update hotbar
 					plugin.mEnchantmentManager.updateItemProperties(i, mCurrentProperties, mInventoryProperties, player, plugin);
@@ -392,15 +392,15 @@ public class PlayerInventory {
 	}
 
 	public int getEnchantmentLevel(Plugin plugin, Class<? extends BaseEnchantment> cls) {
-        BaseEnchantment enchant = plugin.mEnchantmentManager.getEnchantmentHandle(cls);
-        if (enchant != null && mCurrentProperties != null) {
-            Integer level = mCurrentProperties.get(enchant);
-            if (level != null) {
-                return level;
-            }
-        }
-        return 0;
-    }
+		BaseEnchantment enchant = plugin.mEnchantmentManager.getEnchantmentHandle(cls);
+		if (enchant != null && mCurrentProperties != null) {
+			Integer level = mCurrentProperties.get(enchant);
+			if (level != null) {
+				return level;
+			}
+		}
+		return 0;
+	}
 
 	public JsonObject getAsJsonObject() {
 		JsonObject ret = new JsonObject();

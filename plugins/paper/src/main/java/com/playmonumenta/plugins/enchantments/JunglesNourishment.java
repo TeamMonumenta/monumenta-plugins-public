@@ -45,7 +45,7 @@ public class JunglesNourishment implements BaseEnchantment {
 		if (InventoryUtils.testForItemWithLore(event.getItem(), "Jungle's Nourishment")) {
 			PlayerUtils.healPlayer(player, HEAL);
 			plugin.mPotionManager.addPotion(player, PotionID.ITEM,
-                    new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, DURATION, 0, true, true));
+					new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, DURATION, 0, true, true));
 			player.setCooldown(event.getItem().getType(), COOLDOWN);
 			player.setFoodLevel(24);
 			World world = player.getWorld();

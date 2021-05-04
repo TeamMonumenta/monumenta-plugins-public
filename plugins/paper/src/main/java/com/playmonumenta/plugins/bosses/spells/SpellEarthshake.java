@@ -30,17 +30,17 @@ public class SpellEarthshake extends SpellBaseAoE {
 	public static final String FALLING_BLOCK_COMMAND2 = "\"},Time:1,Motion:[";
 
 	private static final EnumSet<Material> mIgnoredMats = EnumSet.of(
-            Material.AIR,
-            Material.COMMAND_BLOCK,
-            Material.CHAIN_COMMAND_BLOCK,
-            Material.REPEATING_COMMAND_BLOCK,
-            Material.BEDROCK,
-			Material.BARRIER,
-            Material.SPAWNER,
-            Material.CHEST,
-            Material.END_PORTAL,
-            Material.END_PORTAL_FRAME
-        );
+		Material.AIR,
+		Material.COMMAND_BLOCK,
+		Material.CHAIN_COMMAND_BLOCK,
+		Material.REPEATING_COMMAND_BLOCK,
+		Material.BEDROCK,
+		Material.BARRIER,
+		Material.SPAWNER,
+		Material.CHEST,
+		Material.END_PORTAL,
+		Material.END_PORTAL_FRAME
+	);
 	private static Location targetLocation;
 	private static boolean targeted = false;
 	private static int particleCounter1 = 0;

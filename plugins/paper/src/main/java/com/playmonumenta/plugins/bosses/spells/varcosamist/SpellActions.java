@@ -69,7 +69,7 @@ public class SpellActions {
 				}
 				Collection<LivingEntity> entities = center.getNearbyLivingEntities(25, 20);
 				for (LivingEntity e : entities) {
-					if (!(e instanceof Player) && (e.getLocation().getBlock().getType() == Material.WATER  || e.getLocation().getBlockY() <= center.getY() - 3)) {
+					if (!(e instanceof Player) && (e.getLocation().getBlock().getType() == Material.WATER || e.getLocation().getBlockY() <= center.getY() - 3)) {
 						e.teleport(center);
 					}
 				}

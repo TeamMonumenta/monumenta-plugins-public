@@ -1074,7 +1074,7 @@ public class BossManager implements Listener {
 		}
 
 		List<Map.Entry<String, Integer>> list = new ArrayList<>(bossCounts.entrySet());
-        list.sort(Map.Entry.comparingByValue());
+		list.sort(Map.Entry.comparingByValue());
 
 		for (Map.Entry<String, Integer> entry : list) {
 			sender.sendMessage("  " + entry.getKey() + ": " + entry.getValue());

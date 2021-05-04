@@ -74,9 +74,9 @@ public class MessagingUtils {
 		Duration remaining = Duration.ofSeconds(time - java.time.Instant.now().getEpochSecond());
 
 		return remaining.toString()
-            .substring(2)
-            .replaceAll("(\\d[HMS])(?!$)", "$1 ")
-            .toLowerCase();
+			.substring(2)
+			.replaceAll("(\\d[HMS])(?!$)", "$1 ")
+			.toLowerCase();
 	}
 
 	public static String plainText(Component formattedText) {

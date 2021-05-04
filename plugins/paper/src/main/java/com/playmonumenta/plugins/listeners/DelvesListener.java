@@ -161,7 +161,7 @@ public class DelvesListener implements Listener {
 			gui.registerClick(event);
 			event.setCancelled(true);
 		}
-    }
+	}
 
 	@EventHandler
 	public void inventoryInteractEvent(InventoryInteractEvent event) {

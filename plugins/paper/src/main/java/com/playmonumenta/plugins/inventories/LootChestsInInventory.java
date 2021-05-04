@@ -67,7 +67,7 @@ public class LootChestsInInventory implements Listener {
 		if (tag == null) {
 			return;
 		}
-		tag.setString("id","minecraft:chest");
+		tag.setString("id", "minecraft:chest");
 		ItemStack item2 = nbti.getItem();
 
 		//Classic turning an item into a blockstate

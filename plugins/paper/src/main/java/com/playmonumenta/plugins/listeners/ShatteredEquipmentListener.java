@@ -66,7 +66,7 @@ public class ShatteredEquipmentListener implements Listener {
 	// One entity attacks another
 	@EventHandler(priority = EventPriority.LOWEST)
 	public void entityDamageByEntityEvent(EntityDamageByEntityEvent event) {
-		if (event.getDamager() instanceof  Player) {
+		if (event.getDamager() instanceof Player) {
 			Player player = (Player) event.getDamager();
 			if (ItemUtils.isItemShattered(player.getInventory().getItemInMainHand())) {
 				MessagingUtils.sendActionBarMessage(mPlugin, player, "Shattered items must be reforged before use");

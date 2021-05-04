@@ -365,13 +365,13 @@ public class AbilityManager {
 
 				//********** WARLOCK **********//
                 // REAPER
-                new JudgementChain(mPlugin, null),
-                new VoodooBonds(mPlugin, null),
+				new JudgementChain(mPlugin, null),
+				new VoodooBonds(mPlugin, null),
 
-                // TENEBRIST
-                new WitheringGaze(mPlugin, null),
-                new HauntingShades(mPlugin, null),
-                new UmbralWail(mPlugin, null),
+				// TENEBRIST
+				new WitheringGaze(mPlugin, null),
+				new HauntingShades(mPlugin, null),
+				new UmbralWail(mPlugin, null),
 
 				//********** ALCHEMIST **********//
 				// HARBINGER

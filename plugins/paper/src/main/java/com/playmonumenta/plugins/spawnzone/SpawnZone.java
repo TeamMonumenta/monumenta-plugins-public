@@ -28,9 +28,9 @@ public class SpawnZone {
 	}
 
 	public boolean withinZone(Point point) {
-		return  point.mX >= mLowerCorner.mX && point.mX <= mUpperCorner.mX &&
-		        point.mY >= mLowerCorner.mY && point.mY <= mUpperCorner.mY &&
-		        point.mZ >= mLowerCorner.mZ && point.mZ <= mUpperCorner.mZ;
+		return point.mX >= mLowerCorner.mX && point.mX <= mUpperCorner.mX &&
+		       point.mY >= mLowerCorner.mY && point.mY <= mUpperCorner.mY &&
+		       point.mZ >= mLowerCorner.mZ && point.mZ <= mUpperCorner.mZ;
 	}
 
 	public int getZoneShardID() {

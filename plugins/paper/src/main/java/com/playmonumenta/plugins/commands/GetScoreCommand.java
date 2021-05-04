@@ -35,7 +35,7 @@ public class GetScoreCommand {
 		.register();
 		new CommandAPICommand("getscore")
 		.withPermission(CommandPermission.fromString("monumenta.command.getscore"))
-		.withArguments(new EntitySelectorArgument("targets",EntitySelector.MANY_ENTITIES))
+		.withArguments(new EntitySelectorArgument("targets", EntitySelector.MANY_ENTITIES))
 		.withArguments(new ObjectiveArgument("objective"))
 		.executes((sender, args) -> {
 			for (Entity entity : (Collection<Entity>)args[0]) {

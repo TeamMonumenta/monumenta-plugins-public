@@ -420,10 +420,6 @@ public class DelvesUtils {
 		return info;
 	}
 
-	public static DelveInfo removeDelveInfo(Player player) {
-		return DELVE_INFO_MAPPINGS.remove(player.getUniqueId());
-	}
-
 	/*
 	 * This should only be called when the player is not on the the dungeon
 	 * shard itself (e.g. modifier selection). As such, it doesn't make
@@ -432,6 +428,10 @@ public class DelvesUtils {
 	 */
 	public static DelveInfo getDelveInfo(Player player, String dungeon) {
 		return new DelveInfo(player, dungeon);
+	}
+
+	public static DelveInfo removeDelveInfo(Player player) {
+		return DELVE_INFO_MAPPINGS.remove(player.getUniqueId());
 	}
 
 	public static void duplicateLibraryOfSoulsMob(LivingEntity mob) {

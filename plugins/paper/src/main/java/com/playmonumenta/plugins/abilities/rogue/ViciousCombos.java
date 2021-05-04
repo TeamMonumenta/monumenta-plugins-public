@@ -1,4 +1,4 @@
- package com.playmonumenta.plugins.abilities.rogue;
+package com.playmonumenta.plugins.abilities.rogue;
 
 import org.bukkit.Location;
 import org.bukkit.Particle;

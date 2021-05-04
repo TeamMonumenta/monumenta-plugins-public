@@ -65,15 +65,15 @@ public class TealQuestBoss extends BossAbilityGroup {
 	private Location mSpawnLoc;
 
 	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
-        return SerializationUtils.statefulBossDeserializer(boss, identityTag, (spawnLoc, endLoc) -> {
-            return new Varcosa(plugin, boss, spawnLoc, endLoc);
-        });
-    }
+		return SerializationUtils.statefulBossDeserializer(boss, identityTag, (spawnLoc, endLoc) -> {
+			return new Varcosa(plugin, boss, spawnLoc, endLoc);
+		});
+	}
 
-    @Override
-    public String serialize() {
-        return SerializationUtils.statefulBossSerializer(mSpawnLoc, mEndLoc);
-    }
+	@Override
+	public String serialize() {
+		return SerializationUtils.statefulBossSerializer(mSpawnLoc, mEndLoc);
+	}
 
 	public TealQuestBoss(Plugin plugin, LivingEntity boss, Location spawnLoc, Location endLoc) {
 		super(plugin, identityTag, boss);

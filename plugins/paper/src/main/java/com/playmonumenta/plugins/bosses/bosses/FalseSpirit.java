@@ -86,11 +86,11 @@ public class FalseSpirit extends BossAbilityGroup {
 
 	//The material that the g round that should damage you is made out of
 	private static final EnumSet<Material> mGroundMats = EnumSet.of(
-            Material.BLACK_CONCRETE_POWDER,
-            Material.GRAY_CONCRETE_POWDER,
-            Material.BLACKSTONE,
-            Material.BASALT
-        );
+		Material.BLACK_CONCRETE_POWDER,
+		Material.GRAY_CONCRETE_POWDER,
+		Material.BLACKSTONE,
+		Material.BASALT
+	);
 
 	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
 		return SerializationUtils.statefulBossDeserializer(boss, identityTag, (spawnLoc, endLoc) -> {

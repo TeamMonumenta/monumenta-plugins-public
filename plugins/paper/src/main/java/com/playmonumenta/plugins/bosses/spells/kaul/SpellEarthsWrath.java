@@ -28,8 +28,8 @@ public class SpellEarthsWrath extends Spell {
 	private Plugin mPlugin;
 	private LivingEntity mBoss;
 	private double mY;
-
 	private ChargeUpManager mChargeUp;
+
 	public SpellEarthsWrath(Plugin plugin, LivingEntity boss, double y) {
 		mPlugin = plugin;
 		mBoss = boss;

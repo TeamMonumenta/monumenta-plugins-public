@@ -47,17 +47,17 @@ public class SpellMultiEarthshake extends Spell {
 	private boolean mDelve;
 
 	private static final EnumSet<Material> mIgnoredMats = EnumSet.of(
-            Material.AIR,
-            Material.COMMAND_BLOCK,
-            Material.CHAIN_COMMAND_BLOCK,
-            Material.REPEATING_COMMAND_BLOCK,
-            Material.BEDROCK,
-            Material.BARRIER,
-            Material.SPAWNER,
-            Material.CHEST,
-            Material.END_PORTAL,
-            Material.END_PORTAL_FRAME
-        );
+		Material.AIR,
+		Material.COMMAND_BLOCK,
+		Material.CHAIN_COMMAND_BLOCK,
+		Material.REPEATING_COMMAND_BLOCK,
+		Material.BEDROCK,
+		Material.BARRIER,
+		Material.SPAWNER,
+		Material.CHEST,
+		Material.END_PORTAL,
+		Material.END_PORTAL_FRAME
+	);
 
 	public SpellMultiEarthshake(Plugin plugin, LivingEntity launcher, int radius, int duration, boolean delve, Location spawnLoc) {
 		mSpawnLoc = spawnLoc;

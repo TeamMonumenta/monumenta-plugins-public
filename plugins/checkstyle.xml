@@ -182,6 +182,11 @@
         <module name="WhitespaceAfter">
             <property name="tokens" value="COMMA, SEMI"/>
         </module>
+        <module name="RegexpSinglelineJava">
+            <property name="format" value="^  *[^ ]"/>
+            <property name="message" value="Indent must use tab characters"/>
+            <property name="ignoreComments" value="true"/>
+        </module>
         <module name="Regexp">
             <property name="format" value="[ \t]+$"/>
             <property name="illegalPattern" value="true"/>

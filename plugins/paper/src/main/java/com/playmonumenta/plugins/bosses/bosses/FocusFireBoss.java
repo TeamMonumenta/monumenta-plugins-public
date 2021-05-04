@@ -25,19 +25,18 @@ public class FocusFireBoss extends BossAbilityGroup {
 
 	@Override
 	public void bossDamagedEntity(EntityDamageByEntityEvent event) {
-        //If we hit a player
-        if (event.getEntity() instanceof Player) {
-            Player player = (Player) event.getEntity();
-            //Set all nearby mobs to target them
-            for (LivingEntity mob : EntityUtils.getNearbyMobs(mBoss.getLocation(), detectionRange)) {
-                if (mob instanceof Mob) {
-                    ((Mob) mob).setTarget(player);
-                }
-            }
-            //Let the players know something happened
-            player.playSound(player.getLocation(), Sound.ENTITY_ELDER_GUARDIAN_CURSE, 0.3f, 0.9f);
-            player.getWorld().spawnParticle(Particle.VILLAGER_ANGRY, player.getLocation(), 25, 1.5, 1.5, 1.5);
-        }
-    }
-
+		//If we hit a player
+		if (event.getEntity() instanceof Player) {
+			Player player = (Player) event.getEntity();
+			//Set all nearby mobs to target them
+			for (LivingEntity mob : EntityUtils.getNearbyMobs(mBoss.getLocation(), detectionRange)) {
+				if (mob instanceof Mob) {
+					((Mob) mob).setTarget(player);
+				}
+			}
+			//Let the players know something happened
+			player.playSound(player.getLocation(), Sound.ENTITY_ELDER_GUARDIAN_CURSE, 0.3f, 0.9f);
+			player.getWorld().spawnParticle(Particle.VILLAGER_ANGRY, player.getLocation(), 25, 1.5, 1.5, 1.5);
+		}
+	}
 }
