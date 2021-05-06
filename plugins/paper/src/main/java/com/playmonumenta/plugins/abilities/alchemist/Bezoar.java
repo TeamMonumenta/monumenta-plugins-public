@@ -30,7 +30,7 @@ public class Bezoar extends Ability {
 	private static final int FREQUENCY = 5;
 	private static final int LINGER_TIME = 10 * 20;
 	private static final int DEBUFF_REDUCTION = 10 * 20;
-	private static final int HEAL_DURATION = 3 * 20;
+	private static final int HEAL_DURATION = 2 * 20;
 	private static final double HEAL_PERCENT = 0.05;
 	private static final int DAMAGE_DURATION = 8 * 20;
 	private static final double DAMAGE_PERCENT = 0.15;
@@ -45,7 +45,7 @@ public class Bezoar extends Ability {
 		mInfo.mLinkedSpell = Spells.BEZOAR;
 		mInfo.mScoreboardId = "Bezoar";
 		mInfo.mShorthandName = "BZ";
-		mInfo.mDescriptions.add("Every 5th mob killed within 16 blocks of the Alchemist spawns a Bezoar that lingers for 10s. Picking up a Bezoar will grant the Alchemist an additional Alchemist Potion, and will grant both the player who picks it up and the Alchemist a custom healing effect that regenerates 5% of max health every second for 3 seconds and reduces the duration of all current potion debuffs by 10s.");
+		mInfo.mDescriptions.add("Every 5th mob killed within 16 blocks of the Alchemist spawns a Bezoar that lingers for 10s. Picking up a Bezoar will grant the Alchemist an additional Alchemist Potion, and will grant both the player who picks it up and the Alchemist a custom healing effect that regenerates 5% of max health every second for 2 seconds and reduces the duration of all current potion debuffs by 10s.");
 		mInfo.mDescriptions.add("The Bezoar now additionally grants +15% ability damage for 8s.");
 	}
 
@@ -66,7 +66,7 @@ public class Bezoar extends Ability {
 				mT++;
 				world.spawnParticle(Particle.FALLING_DUST, item.getLocation(), 1, 0.2, 0.2, 0.2, mFallingDustData);
 				//Other player
-				for (Player p : PlayerUtils.playersInRange(item.getLocation(), 0.75)) {
+				for (Player p : PlayerUtils.playersInRange(item.getLocation(), 1)) {
 					if (!p.getName().equals(mPlayer.getName())) {
 						for (PotionEffectType effectType : PotionUtils.getNegativeEffects(mPlugin, p)) {
 							PotionEffect effect = p.getPotionEffect(effectType);

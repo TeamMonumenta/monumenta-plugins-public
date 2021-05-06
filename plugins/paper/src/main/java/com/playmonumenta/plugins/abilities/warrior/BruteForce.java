@@ -47,9 +47,9 @@ public class BruteForce extends Ability {
 	}
 
 	private static final float BRUTE_FORCE_RADIUS = 2.0f;
-	private static final int BRUTE_FORCE_DAMAGE = 3;
-	private static final double SCALING_DAMAGE = 0.15;
-	private static final double BRUTE_FORCE_2_DAMAGE = 5;
+	private static final int BRUTE_FORCE_DAMAGE = 2;
+	private static final double SCALING_DAMAGE = 0.10;
+	private static final double BRUTE_FORCE_2_DAMAGE = 3;
 	private static final float BRUTE_FORCE_KNOCKBACK_SPEED = 0.7f;
 
 
@@ -58,14 +58,14 @@ public class BruteForce extends Ability {
 		mInfo.mLinkedSpell = Spells.BRUTE_FORCE;
 		mInfo.mScoreboardId = "BruteForce";
 		mInfo.mShorthandName = "BF";
-		mInfo.mDescriptions.add("When you critically strike, you deal 3 damage to all enemies near your target and knock them back.");
-		mInfo.mDescriptions.add("The damage is increased to include 15% of the damage done by the crit.");
+		mInfo.mDescriptions.add("When you critically strike, you deal 2 damage to all enemies near your target and knock them back.");
+		mInfo.mDescriptions.add("The damage is increased to 3 + 15% of the damage done by the crit.");
 	}
 
 	@Override
 	public boolean livingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
 		if (PlayerUtils.isCritical(mPlayer) && event.getCause() == DamageCause.ENTITY_ATTACK) {
-			double damageBonus = getAbilityScore() == 1 ? BRUTE_FORCE_DAMAGE : BRUTE_FORCE_DAMAGE + event.getDamage() * SCALING_DAMAGE;
+			double damageBonus = getAbilityScore() == 1 ? BRUTE_FORCE_DAMAGE : BRUTE_FORCE_2_DAMAGE + event.getDamage() * SCALING_DAMAGE;
 			damageBonus += BruteForceDamageEnchantment.getExtraDamage(mPlayer, BruteForceDamageEnchantment.class);
 			event.setDamage(event.getDamage() + damageBonus);
 

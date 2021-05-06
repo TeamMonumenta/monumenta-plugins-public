@@ -13,6 +13,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 
 import com.playmonumenta.plugins.Plugin;
@@ -24,7 +26,7 @@ import com.playmonumenta.plugins.enchantments.BaseAbilityEnchantment;
 import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
 import com.playmonumenta.plugins.point.Raycast;
 import com.playmonumenta.plugins.point.RaycastData;
-import com.playmonumenta.plugins.effects.FlatAttributeDamageDealt;
+import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.tracking.PlayerTracking;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
@@ -74,9 +76,8 @@ public class AdvancingShadows extends Ability {
 	private static final float ADVANCING_SHADOWS_AOE_KNOCKBACKS_RANGE = 4;
 	private static final double ADVANCING_SHADOWS_OFFSET = 2.7;
 	private static final int DURATION = 5 * 20;
-	private static final double BONUS_DAMAGE = 6;
+	private static final int EFFECT_LEVEL = 1;
 	private static final int ADVANCING_SHADOWS_COOLDOWN = 20 * 20;
-	private static final String PERCENT_DAMAGE_DEALT_EFFECT_NAME = "AdvancingShadowsFlatDamageDealtEffect";
 
 	private LivingEntity mTarget = null;
 	private BladeDance mBladeDance;
@@ -87,7 +88,7 @@ public class AdvancingShadows extends Ability {
 		mInfo.mScoreboardId = "AdvancingShadows";
 		mInfo.mCooldown = ADVANCING_SHADOWS_COOLDOWN;
 		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
-		mInfo.mDescriptions.add("While holding two swords and not sneaking, right click to teleport to the target hostile enemy within 10 blocks and gain +6 melee damage for 5 seconds. Cooldown: 20s.");
+		mInfo.mDescriptions.add("While holding two swords and not sneaking, right click to teleport to the target hostile enemy within 10 blocks and gain strength 2 for 5 seconds. Cooldown: 20s.");
 		mInfo.mDescriptions.add("Teleport range is increased to 15 blocks and all hostile non-target mobs within 4 blocks are knocked away from the target.");
 		Bukkit.getScheduler().runTask(plugin, () -> {
 			if (player != null) {
@@ -152,7 +153,7 @@ public class AdvancingShadows extends Ability {
 
 			mPlayer.teleport(loc, TeleportCause.UNKNOWN);
 
-			mPlugin.mEffectManager.addEffect(mPlayer, PERCENT_DAMAGE_DEALT_EFFECT_NAME, new FlatAttributeDamageDealt(DURATION, BONUS_DAMAGE, PERCENT_DAMAGE_DEALT_EFFECT_NAME));
+			mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.INCREASE_DAMAGE, DURATION, EFFECT_LEVEL, true, false));
 			float range = AdvancingShadowsKnockbackRadiusEnchantment.getKnockbackRadius(mPlayer, ADVANCING_SHADOWS_AOE_KNOCKBACKS_RANGE);
 			float speed = AdvancingShadowsKnockbackSpeedEnchantment.getKnockbackSpeed(mPlayer, ADVANCING_SHADOWS_AOE_KNOCKBACKS_SPEED);
 			if (advancingShadows > 1) {
