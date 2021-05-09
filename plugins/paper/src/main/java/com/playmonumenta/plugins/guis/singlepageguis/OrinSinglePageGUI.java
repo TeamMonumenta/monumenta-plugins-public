@@ -131,15 +131,15 @@ public class OrinSinglePageGUI extends SinglePageGUI {
 		LOCATIONS_TREE.add(new TeleportEntry(11, "Plots", null, "", Material.LIGHT_BLUE_CONCRETE, "2", 1, 1));
 		LOCATIONS_TREE.add(new TeleportEntry(15, "Region 1", null, "", Material.GREEN_CONCRETE, "3", 1, 1));
 		LOCATIONS_TREE.add(new TeleportEntry(38, "Region 2", null, "", Material.SAND, "4", 1, 1));
-		LOCATIONS_TREE.add(new TeleportEntry(42, "Build Server", null, "Click to teleport!", Material.STONE_PICKAXE, "transferserver build -2456.0 56.5 1104.0 90 0"));
 		//LOCATIONS_TREE.add(new TeleportEntry(42, "Region 3 LUL", null, "", Material.PAPER, "5", 1, 1));
 
 		LOCATIONS_TREE.add(new TeleportEntry(8, "Switch to Page Layout", null, "", Material.PISTON, "switch", 1, 2));
 		LOCATIONS_TREE.add(new TeleportEntry(0, "Back to Main Menu", null, "", Material.OBSERVER, "", 1, 2));
 		LOCATIONS_TREE.add(new TeleportEntry(4, "Docks", null, "Click to teleport!", Material.LIGHT_BLUE_CONCRETE, "tp @S -2456.0 56.5 1104.0 90 0", 1, 2));
-		LOCATIONS_TREE.add(new TeleportEntry(29, "Market", null, "Click to teleport!", Material.BARREL, "execute as @S run function monumenta:mechanisms/teleporters/enter_new_market", 1, 2));
-		LOCATIONS_TREE.add(new TeleportEntry(31, "Personal Plot", null, "Click to teleport!", Material.GRASS_BLOCK, "execute as @S run function plot:plot/home", 1, 2));
-		LOCATIONS_TREE.add(new TeleportEntry(33, "Guild Plot", null, "Click to teleport!", Material.YELLOW_BANNER, "teleportguild @S", 1, 2));
+		LOCATIONS_TREE.add(new TeleportEntry(28, "Market", null, "Click to teleport!", Material.BARREL, "execute as @S run function monumenta:mechanisms/teleporters/enter_new_market", 1, 2));
+		LOCATIONS_TREE.add(new TeleportEntry(30, "Personal Plot", null, "Click to teleport!", Material.GRASS_BLOCK, "execute as @S run function plot:plot/home", 1, 2));
+		LOCATIONS_TREE.add(new TeleportEntry(32, "Guild Plot", null, "Click to teleport!", Material.YELLOW_BANNER, "teleportguild @S", 1, 2));
+		LOCATIONS_TREE.add(new TeleportEntry(34, "Build Server", null, "Click to teleport!", Material.STONE_PICKAXE, "transferserver build -2456.0 56.5 1104.0 90 0", 1, 2));
 
 		LOCATIONS_TREE.add(new TeleportEntry(8, "Switch to Page Layout", null, "", Material.PISTON, "switch", 1, 3));
 		LOCATIONS_TREE.add(new TeleportEntry(0, "Back to Main Menu", null, "", Material.OBSERVER, "", 1, 3));
@@ -232,7 +232,6 @@ public class OrinSinglePageGUI extends SinglePageGUI {
 		Inventory baseInventory;
 		baseInventory = Bukkit.createInventory(null, ROWS*COLUMNS, "Teleportation Choices");
 		String currentShardName = ServerProperties.getShardName();
-		player.sendMessage(currentShardName);
 		if (currentShardName.contains("valley") || currentShardName.contains("region_1")) {
 			setRegionalInventory(1, player, baseInventory);
 		} else if (currentShardName.contains("isles") || currentShardName.contains("region_2")) {
