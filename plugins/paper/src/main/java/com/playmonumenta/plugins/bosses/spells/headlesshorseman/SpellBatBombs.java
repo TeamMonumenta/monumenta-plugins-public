@@ -93,23 +93,11 @@ public class SpellBatBombs extends Spell {
 		for (int i = 0; i < 20; i++) {
 			Location loc = new Location(
 			    world,
-			    mBoss.getLocation().getX() + FastUtils.randomDoubleInRange(-15, 15),
-			    mBoss.getLocation().getY() + FastUtils.randomDoubleInRange(1, 3),
-			    mBoss.getLocation().getZ() + FastUtils.randomDoubleInRange(-15, 15)
+			    mHorseman.getSpawnLocation().getX() + FastUtils.randomDoubleInRange(-15, 15),
+			    mHorseman.getSpawnLocation().getY() + FastUtils.randomDoubleInRange(1, 3),
+			    mHorseman.getSpawnLocation().getZ() + FastUtils.randomDoubleInRange(-15, 15)
 			);
-			while (loc.getBlock().getType().isSolid()) {
-				loc = new Location(
-				    world,
-				    mBoss.getLocation().getX() + FastUtils.randomDoubleInRange(-15, 15),
-				    mBoss.getLocation().getY() + FastUtils.randomDoubleInRange(1, 3),
-				    mBoss.getLocation().getZ() + FastUtils.randomDoubleInRange(-15, 15)
-				);
-			}
-			if (mHorseman.getSpawnLocation().distance(loc) < HeadlessHorsemanBoss.detectionRange) {
-				spawnBat(loc);
-			} else {
-				i--;
-			}
+			spawnBat(loc);
 		}
 
 		world.playSound(mBoss.getLocation(), Sound.ENTITY_ILLUSIONER_PREPARE_MIRROR, 3, 1.1f);
