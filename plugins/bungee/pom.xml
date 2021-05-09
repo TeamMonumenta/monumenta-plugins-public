@@ -38,12 +38,11 @@
         </repository>
         <repository>
             <id>codecrafter47-repo</id>
-            <url>http://nexus.codecrafter47.de/content/repositories/public/</url>
+            <url>https://nexus.codecrafter47.de/content/repositories/public/</url>
         </repository>
         <repository>
-            <id>nuvotifier</id>
-            <name>NuVotifier Repo</name>
-            <url>https://dl.bintray.com/nuvotifier/maven/</url>
+            <id>nuvotifier-repo</id>
+            <url>https://raw.githubusercontent.com/TeamMonumenta/NuVotifier/master/mvn-repo/</url>
         </repository>
     </repositories>
 
@@ -77,7 +76,7 @@
         <dependency>
             <groupId>com.vexsoftware</groupId>
             <artifactId>nuvotifier-universal</artifactId>
-            <version>2.3.4</version>
+            <version>2.7.2</version>
             <scope>provided</scope>
         </dependency>
 
