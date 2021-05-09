@@ -16,6 +16,7 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import com.playmonumenta.plugins.guis.singlepageguis.ExampleSinglePageGUI;
 import com.playmonumenta.plugins.guis.singlepageguis.OrinSinglePageGUI;
 import com.playmonumenta.plugins.guis.singlepageguis.PebGui;
+import com.playmonumenta.plugins.guis.singlepageguis.ParrotGUI;
 import com.playmonumenta.scriptedquests.utils.MessagingUtils;
 
 public class SinglePageGUIManager implements Listener {
@@ -30,6 +31,7 @@ public class SinglePageGUIManager implements Listener {
 		new ExampleSinglePageGUI(null, null).registerCommand();
 		new OrinSinglePageGUI(null, null).registerCommand();
 		new PebGui(null, null).registerCommand();
+		new ParrotGUI(null, null).registerCommand();
 	}
 
 	public static void openGUI(Player player, SinglePageGUI gui) {

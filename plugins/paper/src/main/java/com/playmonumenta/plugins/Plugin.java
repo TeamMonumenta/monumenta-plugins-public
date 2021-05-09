@@ -98,6 +98,7 @@ import com.playmonumenta.plugins.listeners.WorldListener;
 import com.playmonumenta.plugins.listeners.ZonePropertyListener;
 import com.playmonumenta.plugins.network.HttpManager;
 import com.playmonumenta.plugins.overrides.ItemOverrides;
+import com.playmonumenta.plugins.parrots.ParrotManager;
 import com.playmonumenta.plugins.plots.PlotAccessManager;
 import com.playmonumenta.plugins.plots.ShopManager;
 import com.playmonumenta.plugins.potion.PotionManager;
@@ -134,6 +135,7 @@ public class Plugin extends JavaPlugin {
 	public ItemManager mItemManager;
 	public IndexInventoryManager mIndexInventoryManager;
 	public EffectManager mEffectManager;
+	public ParrotManager mParrotManager;
 
 	public DeathItemListener mDeathItemListener;
 
@@ -249,6 +251,7 @@ public class Plugin extends JavaPlugin {
 		mBossManager = new BossManager(this);
 		mEffectManager = new EffectManager(this);
 		mDeathItemListener = new DeathItemListener(this);
+		mParrotManager = new ParrotManager(this);
 
 		DailyReset.startTimer(this);
 
@@ -289,6 +292,7 @@ public class Plugin extends JavaPlugin {
 		manager.registerEvents(mJunkItemsListener, this);
 		manager.registerEvents(mBossManager, this);
 		manager.registerEvents(mEffectManager, this);
+		manager.registerEvents(mParrotManager, this);
 		manager.registerEvents(new IndexInventoryListeners(), this);
 		manager.registerEvents(new DelvesListener(), this);
 		manager.registerEvents(new SpawnerListener(this), this);

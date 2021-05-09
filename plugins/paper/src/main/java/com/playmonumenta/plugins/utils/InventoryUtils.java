@@ -4,10 +4,13 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.block.ShulkerBox;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -18,6 +21,8 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.BlockStateMeta;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.loot.LootContext;
+import org.bukkit.loot.LootTable;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.io.BukkitObjectInputStream;
 import org.bukkit.util.io.BukkitObjectOutputStream;
@@ -208,7 +213,7 @@ public class InventoryUtils {
 		if (item != null) {
 			final Material mat = item.getType();
 			return mat == Material.WOODEN_AXE || mat == Material.STONE_AXE || mat == Material.GOLDEN_AXE
-			       || mat == Material.IRON_AXE || mat == Material.DIAMOND_AXE;
+				   || mat == Material.IRON_AXE || mat == Material.DIAMOND_AXE;
 		}
 
 		return false;
@@ -227,7 +232,7 @@ public class InventoryUtils {
 		if (item != null) {
 			final Material mat = item.getType();
 			return mat == Material.WOODEN_SWORD || mat == Material.STONE_SWORD || mat == Material.GOLDEN_SWORD
-			       || mat == Material.IRON_SWORD || mat == Material.DIAMOND_SWORD;
+				   || mat == Material.IRON_SWORD || mat == Material.DIAMOND_SWORD;
 		}
 
 		return false;
@@ -237,7 +242,7 @@ public class InventoryUtils {
 		if (item != null) {
 			final Material mat = item.getType();
 			return mat == Material.WOODEN_PICKAXE || mat == Material.STONE_PICKAXE || mat == Material.GOLDEN_PICKAXE
-			       || mat == Material.IRON_PICKAXE || mat == Material.DIAMOND_PICKAXE;
+				   || mat == Material.IRON_PICKAXE || mat == Material.DIAMOND_PICKAXE;
 		}
 
 		return false;
@@ -247,7 +252,7 @@ public class InventoryUtils {
 		if (item != null) {
 			final Material mat = item.getType();
 			return mat == Material.WOODEN_HOE || mat == Material.STONE_HOE || mat == Material.GOLDEN_HOE
-			       || mat == Material.IRON_HOE || mat == Material.DIAMOND_HOE;
+				   || mat == Material.IRON_HOE || mat == Material.DIAMOND_HOE;
 		}
 
 		return false;
@@ -257,7 +262,7 @@ public class InventoryUtils {
 		if (item != null) {
 			final Material mat = item.getType();
 			return mat == Material.WOODEN_SHOVEL || mat == Material.STONE_SHOVEL || mat == Material.GOLDEN_SHOVEL
-			       || mat == Material.IRON_SHOVEL || mat == Material.DIAMOND_SHOVEL;
+				   || mat == Material.IRON_SHOVEL || mat == Material.DIAMOND_SHOVEL;
 		}
 
 		return false;
@@ -489,7 +494,7 @@ public class InventoryUtils {
 
 	public static boolean isArmorSlotFromId(final int slotId) {
 		return slotId == OFFHAND_SLOT || slotId == HELMET_SLOT || slotId == CHESTPLATE_SLOT
-		       || slotId == LEGGINGS_SLOT || slotId == BOOTS_SLOT;
+			   || slotId == LEGGINGS_SLOT || slotId == BOOTS_SLOT;
 	}
 
 	static void shuffleArray(final int[] ar) {
@@ -520,5 +525,19 @@ public class InventoryUtils {
 			return true;
 		}
 		return false;
+	}
+
+	public static ItemStack getItemFromLootTable(final Player player, NamespacedKey key) {
+		ItemStack result = null;
+		LootContext context = new LootContext.Builder(player.getLocation()).build();
+		ItemStack[] dummy = new ItemStack[0];
+		LootTable table = Bukkit.getLootTable(key);
+		if (table != null) {
+			Collection<ItemStack> loot = table.populateLoot(FastUtils.RANDOM, context);
+			if (!loot.isEmpty()) {
+				result = loot.toArray(dummy)[0];
+			}
+		}
+		return result;
 	}
 }
