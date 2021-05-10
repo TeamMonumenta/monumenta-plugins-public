@@ -482,7 +482,7 @@ public class Grave {
 			}
 			if (saved > 0) {
 				player.sendMessage(Component.text("Thank you for saving ", NamedTextColor.AQUA)
-					.append(Component.text(saved == 1 ? "an item that was in limbo!" : dropped + " items that were in limbo!"))
+					.append(Component.text(saved == 1 ? "an item that was in limbo!" : saved + " items that were in limbo!"))
 				);
 				mPlayer.sendMessage(Component.text().color(NamedTextColor.AQUA)
 					.append(player.displayName().hoverEvent(player))
