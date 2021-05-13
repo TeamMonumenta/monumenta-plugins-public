@@ -51,16 +51,21 @@ public class ParrotGUI extends SinglePageGUI {
 	private static Map<Integer, GuiItem> mInvMapping = new HashMap<>();
 
 	public void loadItem() {
-		//getting the 4 differents currency from loottable
+
+		//getting the currencies from loottable
 		ItemStack mHCS = null;
 		ItemStack mHXP = null;
 		ItemStack mPPe = null;
 		ItemStack mPGo = null;
+		ItemStack mKS = null;
+		ItemStack mFG = null;
 
 		mHCS = InventoryUtils.getItemFromLootTable(mPlayer, NamespacedKey.fromString("epic:r2/items/currency/hyper_crystalline_shard"));
 		mHXP = InventoryUtils.getItemFromLootTable(mPlayer, NamespacedKey.fromString("epic:r1/items/currency/hyper_experience"));
-		mPPe = InventoryUtils.getItemFromLootTable(mPlayer, NamespacedKey.fromString("epic:r1/items/currency/pulsating_gold"));
-		mPGo = InventoryUtils.getItemFromLootTable(mPlayer, NamespacedKey.fromString("epic:r2/items/currency/pulsating_emerald"));
+		mPGo = InventoryUtils.getItemFromLootTable(mPlayer, NamespacedKey.fromString("epic:r1/items/currency/pulsating_gold"));
+		mPPe = InventoryUtils.getItemFromLootTable(mPlayer, NamespacedKey.fromString("epic:r2/items/currency/pulsating_emerald"));
+		mKS = InventoryUtils.getItemFromLootTable(mPlayer, NamespacedKey.fromString("epic:r1/kaul/crownshard"));
+		mFG = InventoryUtils.getItemFromLootTable(mPlayer, NamespacedKey.fromString("epic:r2/eldrask/materials/epic_material"));
 		//we got the currencies, now populating the list
 
 
@@ -68,11 +73,11 @@ public class ParrotGUI extends SinglePageGUI {
 		//setting lore R2
 		List<String> lore = new ArrayList<>();
 		lore.add("Click to buy!");
-		lore.add("64HCS");
+		lore.add("48HCS");
 
 		ItemStack buyRed = buildItem(Material.RED_WOOL, "Buy Scarlet Macaw", lore);
 		Map<ItemStack, Integer> cost = new HashMap<>();
-		cost.put(mHCS, 64);
+		cost.put(mHCS, 48);
 		GUI_ITEMS.add(new GuiItem(0, 0, buyRed, new HashMap<>(cost), (player, inv) -> {
 			return ScoreboardUtils.getScoreboardValue(player, "ParrotBought1") == 0; }, (player, inv) -> {
 								ScoreboardUtils.setScoreboardValue(player, "ParrotBought1", (int) Instant.now().getEpochSecond());
@@ -93,10 +98,11 @@ public class ParrotGUI extends SinglePageGUI {
 									return true; }));
 
 		//setting lore R1 & cost
-		lore.remove("64HCS");
-		lore.add("64HXP");
+		lore.remove("48HCS");
+		lore.add("48HXP");
 		cost.clear();
-		cost.put(mHXP, 64);
+		cost.put(mHXP, 48);
+
 
 		ItemStack buyGreen = buildItem(Material.GREEN_WOOL, "Buy Green Parakeet", lore);
 		GUI_ITEMS.add(new GuiItem(0, 3, buyGreen, new HashMap<>(cost), (player, inv) -> {
@@ -399,7 +405,91 @@ public class ParrotGUI extends SinglePageGUI {
 								ParrotManager.updateParrot(player, ParrotVariant.PIRATE, "RIGHT");
 								return true; }));
 
+		//Kaul!
+		lore.clear();
+		lore.add("Required 50 kaul wins to buy");
+		int currentWins = ScoreboardUtils.getScoreboardValue(mPlayer, "KaulWins");
+		lore.add("you still need " + (50 - currentWins) + " wins");
+		ItemStack winKaul = buildItem(Material.JUNGLE_LEAVES, "Blackroot Kakapo", lore);
+		GUI_ITEMS.add(new GuiItem(0, 9, winKaul, new HashMap<>(), (player, inv) -> {
+			return ScoreboardUtils.getScoreboardValue(player, "KaulWins") < 50;
+		}));
 
+		lore.clear();
+		lore.add("Click to buy!");
+		lore.add("80 Shard of the Mantle");
+		cost.clear();
+		cost.put(mKS, 80);
+		ItemStack buyKaul = buildItem(Material.JUNGLE_LEAVES, "Blackroot Kakapo", lore);
+		GUI_ITEMS.add(new GuiItem(0, 9, buyKaul, new HashMap<>(cost), (player, inv) -> {
+			return ScoreboardUtils.getScoreboardValue(player, "KaulWins") >= 50;
+		}, (player, inv) -> {
+			ScoreboardUtils.setScoreboardValue(player, "ParrotBought10", (int) Instant.now().getEpochSecond());
+			return true;
+		}));
+
+		lore.clear();
+		lore.add("Owned");
+		lore.add((new Date((long)ScoreboardUtils.getScoreboardValue(mPlayer, "ParrotBought10")*1000).toString()));
+		ItemStack boughtKaul = buildItem(Material.JUNGLE_LEAVES, "Blackroot Kakapo", lore);
+		GUI_ITEMS.add(new GuiItem(0, 9, boughtKaul, new HashMap<>(), (player, inv) -> {
+			return ScoreboardUtils.getScoreboardValue(player, "ParrotBought10") > 0;
+		}));
+		GUI_ITEMS.add(new GuiItem(1, 9, boughtKaul, new HashMap<>(), (player, inv) -> {
+			return ScoreboardUtils.getScoreboardValue(player, "ParrotBought10") > 0;
+		}, (player, inv) -> {
+			ParrotManager.updateParrot(player, ParrotVariant.KAUL, "LEFT");
+			return true;
+		}));
+		GUI_ITEMS.add(new GuiItem(2, 9, boughtKaul, new HashMap<>(), (player, inv) -> {
+			return ScoreboardUtils.getScoreboardValue(player, "ParrotBought10") > 0;
+		}, (player, inv) -> {
+			ParrotManager.updateParrot(player, ParrotVariant.KAUL, "RIGHT");
+			return true;
+		}));
+
+		//Eldrask!
+		lore.clear();
+		lore.add("Required 50 Eldrask wins to buy");
+		currentWins = ScoreboardUtils.getScoreboardValue(mPlayer, "FGWins");
+		lore.add("you still need " + (50 - currentWins) + " wins");
+		ItemStack winEldrask = buildItem(Material.BLUE_ICE, "Permafrost Kea", lore);
+		GUI_ITEMS.add(new GuiItem(0, 10, winEldrask, new HashMap<>(), (player, inv) -> {
+			return ScoreboardUtils.getScoreboardValue(player, "EldraskWins") < 50;
+		}));
+
+		lore.clear();
+		lore.add("Click to buy!");
+		lore.add("80 Titanic Knowledge");
+		cost.clear();
+		cost.put(mFG, 80);
+		ItemStack buyEldrask = buildItem(Material.BLUE_ICE, "Permafrost Kea", lore);
+		GUI_ITEMS.add(new GuiItem(0, 10, buyEldrask, new HashMap<>(cost), (player, inv) -> {
+			return ScoreboardUtils.getScoreboardValue(player, "FGWins") >= 50;
+		}, (player, inv) -> {
+			ScoreboardUtils.setScoreboardValue(player, "ParrotBought11", (int) Instant.now().getEpochSecond());
+			return true;
+		}));
+
+		lore.clear();
+		lore.add("Owned");
+		lore.add((new Date((long)ScoreboardUtils.getScoreboardValue(mPlayer, "ParrotBought11")*1000).toString()));
+		ItemStack boughtEldrask = buildItem(Material.BLUE_ICE, "Permafrost Kea", lore);
+		GUI_ITEMS.add(new GuiItem(0, 10, boughtEldrask, new HashMap<>(), (player, inv) -> {
+			return ScoreboardUtils.getScoreboardValue(player, "ParrotBought11") > 0;
+		}));
+		GUI_ITEMS.add(new GuiItem(1, 10, boughtEldrask, new HashMap<>(), (player, inv) -> {
+			return ScoreboardUtils.getScoreboardValue(player, "ParrotBought11") > 0;
+		}, (player, inv) -> {
+			ParrotManager.updateParrot(player, ParrotVariant.ELDRASK, "LEFT");
+			return true;
+		}));
+		GUI_ITEMS.add(new GuiItem(2, 10, boughtEldrask, new HashMap<>(), (player, inv) -> {
+			return ScoreboardUtils.getScoreboardValue(player, "ParrotBought11") > 0;
+		}, (player, inv) -> {
+			ParrotManager.updateParrot(player, ParrotVariant.ELDRASK, "RIGHT");
+			return true;
+		}));
 	}
 
 
@@ -517,10 +607,11 @@ public class ParrotGUI extends SinglePageGUI {
 				gItem.afterClick(whoClicked, inventory);
 				updateInventory(inventory);
 			} else {
-				whoClicked.sendMessage("Error! please contact a mod! fail with purchasing");
+				whoClicked.sendMessage(Component.text("[SYSTEM]", NamedTextColor.RED).decoration(TextDecoration.BOLD, true)
+				.append(Component.text(" Error! please contact a mod! fail with purchasing.", NamedTextColor.RED).decoration(TextDecoration.BOLD, false)));
 			}
 		} else {
-			whoClicked.sendMessage("You don't have enought currency to pay for this item");
+			whoClicked.sendMessage(Component.text("You don't have enought currency to pay for this item.", NamedTextColor.RED));
 		}
 
 	}

@@ -3,14 +3,19 @@ package com.playmonumenta.plugins.parrots;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 
+import org.bukkit.GameMode;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Parrot;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntitySpawnEvent;
 import org.bukkit.event.player.PlayerBedLeaveEvent;
+import org.bukkit.event.player.PlayerGameModeChangeEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.event.player.PlayerToggleFlightEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -28,15 +33,13 @@ public class ParrotManager implements Listener {
 		PATREON("Patreon Parakeet", 6, Parrot.Variant.RED),
 		PULSATING_GOLD("Golden Conure", 7, Parrot.Variant.CYAN),
 		PULSATING_EMERALD("Emerald Conure", 8, Parrot.Variant.GREEN),
-		PIRATE("Scoundrel Macaw", 9, Parrot.Variant.BLUE);
+		PIRATE("Scoundrel Macaw", 9, Parrot.Variant.BLUE),
+		KAUL("Blackroot Kakapo", 10, Parrot.Variant.GREEN),
+		ELDRASK("Permafrost Kea", 11, Parrot.Variant.CYAN);
 
 		private String mName;
 		private int mNumber;
 		private Parrot.Variant mVariant;
-
-		ParrotVariant() {
-
-		}
 
 		ParrotVariant(String name, int num, Parrot.Variant variant) {
 			this.mName = name;
@@ -213,7 +216,7 @@ public class ParrotManager implements Listener {
 
 	@EventHandler
 	public void onCFlight(PlayerToggleFlightEvent e) {
-		Player player = e.getPlayer();
+		final Player player = e.getPlayer();
 		int visible = ScoreboardUtils.getScoreboardValue(player, SCOREBOARD_PARROT_VISIBLE);
 		if (visible != 0 && player.isFlying()) {
 			new BukkitRunnable() {
@@ -229,18 +232,41 @@ public class ParrotManager implements Listener {
 
 	@EventHandler
 	public void onLeaveBed(PlayerBedLeaveEvent e) {
-		Player player = e.getPlayer();
+		final Player player = e.getPlayer();
 		int visible = ScoreboardUtils.getScoreboardValue(player, SCOREBOARD_PARROT_VISIBLE);
 		if (visible != 0) {
 			new BukkitRunnable() {
 				@Override
 				public void run() {
-					updateAllParrot(player);
+					updateAllIfVisible(player);
 				}
-			}.runTaskLater(mPlugin, 5);
+			}.runTaskLater(mPlugin, 5L);
 		}
 
 	}
 
+
+	//this two methods are for fixing a bug with optifine that doesn't show the skins
+	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+	public void onPlayerJoin(PlayerJoinEvent e) {
+		//this function is called each time a player change shard or connect to the server
+		final Player player = e.getPlayer();
+		updateAllIfVisible(player);
+	}
+
+	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+	public void onPlayerRespawn(PlayerRespawnEvent e) {
+		final Player player = e.getPlayer();
+		updateAllIfVisible(player);
+	}
+
+	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+	public void onGamemodeChange(PlayerGameModeChangeEvent e) {
+		final GameMode gameMode = e.getNewGameMode();
+		final Player player = e.getPlayer();
+		if (gameMode != GameMode.SPECTATOR && gameMode != GameMode.CREATIVE) {
+			updateAllIfVisible(player);
+		}
+	}
 
 }

@@ -150,7 +150,8 @@ public class GuiItem {
 	 * @return a copy of this object
 	 */
 	public GuiItem copy() {
-		return new GuiItem(mPage, mSlot, mShowedItem, mCost, mCondition);
+		return new GuiItem(mPage, mSlot, mShowedItem, mCost, mCondition, mAfterClickFunction);
+
 	}
 
 	@FunctionalInterface
