@@ -251,13 +251,21 @@ public class ParrotManager implements Listener {
 	public void onPlayerJoin(PlayerJoinEvent e) {
 		//this function is called each time a player change shard or connect to the server
 		final Player player = e.getPlayer();
-		updateAllIfVisible(player);
+		new BukkitRunnable() {
+			public void run() {
+				updateAllIfVisible(player);
+			}
+		}.runTaskLater(mPlugin, 40L);
 	}
 
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void onPlayerRespawn(PlayerRespawnEvent e) {
 		final Player player = e.getPlayer();
-		updateAllIfVisible(player);
+		new BukkitRunnable() {
+			public void run() {
+				updateAllIfVisible(player);
+			}
+		}.runTaskLater(mPlugin, 20L);
 	}
 
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
@@ -265,7 +273,11 @@ public class ParrotManager implements Listener {
 		final GameMode gameMode = e.getNewGameMode();
 		final Player player = e.getPlayer();
 		if (gameMode != GameMode.SPECTATOR && gameMode != GameMode.CREATIVE) {
-			updateAllIfVisible(player);
+			new BukkitRunnable() {
+				public void run() {
+					updateAllIfVisible(player);
+				}
+			}.runTaskLater(mPlugin, 20L);
 		}
 	}
 

@@ -161,14 +161,14 @@ public class ParrotGUI extends SinglePageGUI {
 								return true; }));
 
 		//start loading funtional items
-		ItemStack shoulderLeft = buildItem(Material.COOKIE, "Shoulder left", new ArrayList<>());
+		ItemStack shoulderLeft = buildItem(Material.COOKIE, "Shoulder Left", new ArrayList<>());
 		GUI_ITEMS.add(new GuiItem(0, 18, shoulderLeft, (player, inv) -> {
 						return true; },
 							(player, inv) -> {
 								ScoreboardUtils.setScoreboardValue(player, SCOREBOARD_GUI_PAGE, 1);
 								return true; }));
 
-		ItemStack shoulderRight = buildItem(Material.COOKIE, "Shoulder right", new ArrayList<>());
+		ItemStack shoulderRight = buildItem(Material.COOKIE, "Shoulder Right", new ArrayList<>());
 		GUI_ITEMS.add(new GuiItem(0, 19, shoulderRight, (player, inv) -> {
 						return true; },
 							(player, inv) -> {
@@ -229,13 +229,13 @@ public class ParrotGUI extends SinglePageGUI {
 								ScoreboardUtils.setScoreboardValue(player, SCOREBOARD_GUI_PAGE, 0);
 								return true; }));
 
-		ItemStack leftShoulder = buildItem(Material.BRICK, "Left shoulder selected", lore);
+		ItemStack leftShoulder = buildItem(Material.BRICK, "Left Shoulder Selected", lore);
 		GUI_ITEMS.add(new GuiItem(1, 18, leftShoulder, new HashMap<>(), (player, inv) -> {
 						return true; },
 							(player, inv) -> {
 								return true; }));
 
-		ItemStack rightShoulder = buildItem(Material.BRICK, "Right shoulder selected", lore);
+		ItemStack rightShoulder = buildItem(Material.BRICK, "Right Shoulder Selected", lore);
 		GUI_ITEMS.add(new GuiItem(2, 19, rightShoulder, new HashMap<>(), (player, inv) -> {
 						return true; },
 							(player, inv) -> {
@@ -407,9 +407,9 @@ public class ParrotGUI extends SinglePageGUI {
 
 		//Kaul!
 		lore.clear();
-		lore.add("Required 50 kaul wins to buy");
+		lore.add("Requires 50 kaul wins to buy");
 		int currentWins = ScoreboardUtils.getScoreboardValue(mPlayer, "KaulWins");
-		lore.add("you still need " + (50 - currentWins) + " wins");
+		lore.add("You still need " + (50 - currentWins) + " wins");
 		ItemStack winKaul = buildItem(Material.JUNGLE_LEAVES, "Blackroot Kakapo", lore);
 		GUI_ITEMS.add(new GuiItem(0, 9, winKaul, new HashMap<>(), (player, inv) -> {
 			return ScoreboardUtils.getScoreboardValue(player, "KaulWins") < 50;
@@ -450,9 +450,9 @@ public class ParrotGUI extends SinglePageGUI {
 
 		//Eldrask!
 		lore.clear();
-		lore.add("Required 50 Eldrask wins to buy");
+		lore.add("Requires 50 Eldrask wins to buy");
 		currentWins = ScoreboardUtils.getScoreboardValue(mPlayer, "FGWins");
-		lore.add("you still need " + (50 - currentWins) + " wins");
+		lore.add("You still need " + (50 - currentWins) + " wins");
 		ItemStack winEldrask = buildItem(Material.BLUE_ICE, "Permafrost Kea", lore);
 		GUI_ITEMS.add(new GuiItem(0, 10, winEldrask, new HashMap<>(), (player, inv) -> {
 			return ScoreboardUtils.getScoreboardValue(player, "EldraskWins") < 50;
