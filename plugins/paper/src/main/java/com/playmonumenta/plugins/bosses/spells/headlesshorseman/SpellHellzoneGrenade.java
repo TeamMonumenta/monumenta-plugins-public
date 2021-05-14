@@ -18,6 +18,7 @@ import org.bukkit.util.Vector;
 import com.playmonumenta.plugins.bosses.bosses.HeadlessHorsemanBoss;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 
@@ -50,10 +51,11 @@ public class SpellHellzoneGrenade extends Spell {
 
 	@Override
 	public void run() {
-		mHorseman.disableShield();
 		World world = mBoss.getWorld();
 		// Choose random player within range that has line of sight to boss
 		List<Player> players = PlayerUtils.playersInRange(mCenter, mRange);
+		players.removeIf(player -> player.getLocation().distance(mCenter) <= 5);
+
 
 		new BukkitRunnable() {
 			int mTicks = 0;
@@ -72,7 +74,7 @@ public class SpellHellzoneGrenade extends Spell {
 						break;
 					}
 				}
-				if (mTicks >= 5) {
+				if (mTicks >= 4) {
 					this.cancel();
 				}
 			}
@@ -122,12 +124,15 @@ public class SpellHellzoneGrenade extends Spell {
 							@Override
 							public void run() {
 								mTicks += 2;
-								mWorld.spawnParticle(Particle.FLAME, mLoc, 12, 1.5, 0.15, 1.5, 0.05);
+								//mWorld.spawnParticle(Particle.FLAME, mLoc, 12, 1.5, 0.15, 1.5, 0.05);
 								mWorld.spawnParticle(Particle.SMOKE_LARGE, mLoc, 4, 1.5, 0.15, 1.5, 0.025);
+								for (double deg = 0; deg < 360; deg += 6) {
+									mWorld.spawnParticle(Particle.FLAME, mLoc.clone().add(3 * FastUtils.cos(deg), 0, 3 * FastUtils.sin(deg)), 1, 0.15, 0.15, 0.15, 0);
+								}
 
 								if (mTicks % 10 == 0) {
-									for (Player player : PlayerUtils.playersInRange(fallingBlock.getLocation(), 4)) {
-										if (mCenter.distance(player.getLocation()) < HeadlessHorsemanBoss.detectionRange) {
+									for (Player player : PlayerUtils.playersInRange(fallingBlock.getLocation(), 3)) {
+										if (mCenter.distance(player.getLocation()) < HeadlessHorsemanBoss.detectionRange && LocationUtils.hasLineOfSight(mBoss, player)) {
 											/* Fire aura can not be blocked */
 											BossUtils.bossDamagePercent(mBoss, player, 0.1, (Location)null);
 											player.setFireTicks(20 * 3);
@@ -135,7 +140,7 @@ public class SpellHellzoneGrenade extends Spell {
 									}
 								}
 
-								if (mTicks >= 20 * 5) {
+								if (mBoss.isDead() || mTicks >= 20 * 60 + 30) {
 									this.cancel();
 								}
 							}

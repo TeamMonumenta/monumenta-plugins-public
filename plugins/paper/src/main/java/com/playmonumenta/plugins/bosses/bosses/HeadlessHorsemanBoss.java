@@ -103,7 +103,6 @@ public class HeadlessHorsemanBoss extends BossAbilityGroup {
 	private final Location mSpawnLoc;
 	private final Location mEndLoc;
 
-	public boolean mShieldsUp;
 	private boolean mCooldown = false;
 
 	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
@@ -119,22 +118,21 @@ public class HeadlessHorsemanBoss extends BossAbilityGroup {
 
 	public HeadlessHorsemanBoss(Plugin plugin, LivingEntity boss, Location spawnLoc, Location endLoc) {
 		super(plugin, identityTag, boss);
-		mSpawnLoc = spawnLoc;
+		mSpawnLoc = spawnLoc.subtract(0, 4, 0);
 		mEndLoc = endLoc;
-		mShieldsUp = false;
 		mBoss.setRemoveWhenFarAway(false);
 
 		SpellManager phase1Spells = new SpellManager(Arrays.asList(
 				new SpellHellzoneGrenade(plugin, boss, mSpawnLoc, detectionRange, this),
 				new SpellBatBombs(plugin, boss, this),
-				new SpellSinisterReach(plugin, boss, this),
+				//new SpellSinisterReach(plugin, boss, this),
 				new SpellBurningVengence(plugin, boss, this)
 				));
 
 		SpellManager phase2Spells = new SpellManager(Arrays.asList(
 				new SpellHellzoneGrenade(plugin, boss, mSpawnLoc, detectionRange, this),
 				new SpellBatBombs(plugin, boss, this),
-				new SpellSinisterReach(plugin, boss, this),
+				//new SpellSinisterReach(plugin, boss, this),
 				new SpellBurningVengence(plugin, boss, this),
 				new SpellHallowsEnd(plugin, boss, this),
 				new SpellReaperOfLife(plugin, boss, mSpawnLoc, detectionRange)
@@ -166,46 +164,19 @@ public class HeadlessHorsemanBoss extends BossAbilityGroup {
 		});
 
 		events.put(50, mBoss -> {
-			mShieldsUp = true;
-			new BukkitRunnable() {
-				int mTicks = 0;
-				World mWorld = mBoss.getWorld();
-				@Override
-				public void run() {
-
-					if (mBoss.isDead() || !mBoss.isValid()) {
-						this.cancel();
-						return;
-					}
-
-					if (!mShieldsUp) {
-						mTicks = 0;
-						return;
-					}
-
-					mTicks++;
-
-					mWorld.spawnParticle(Particle.FLAME, mBoss.getLocation().add(0, 1.5, 0), 8, 0.4, 0.4, 0.4, 0.025);
-					mWorld.spawnParticle(Particle.SMOKE_NORMAL, mBoss.getLocation().add(0, 1.5, 0), 5, 0.4, 0.4, 0.4, 0.05);
-					mWorld.spawnParticle(Particle.SMOKE_LARGE, mBoss.getLocation().add(0, 1.5, 0), 1, 0.4, 0.4, 0.4, 0.025);
-
-					if (mTicks % 20 == 0) {
-						for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), 4)) {
-							BossUtils.bossDamagePercent(boss, player, 0.075);
-							player.setFireTicks(20 * 5);
-						}
-					}
-
-				}
-
-			}.runTaskTimer(mPlugin, 0, 1);
 			changePhase(phase2Spells, phase2Passives, null);
 			PlayerUtils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"[The Horseman] \",\"color\":\"dark_red\"},{\"text\":\"Ha ha ha! I haven't felt this alive for what feels like eternity! \",\"color\":\"gold\"},{\"text\":\"We'll \",\"color\":\"dark_red\"},{\"text\":\"have to go all out.\",\"color\":\"gold\"}]");
+			forceCastSpell(SpellReaperOfLife.class);
 		});
 
 		events.put(10, mBoss -> {
 			PlayerUtils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"[The Horseman] \",\"color\":\"dark_red\"},{\"text\":\"Meet your hallow end mortal!\",\"color\":\"gold\"}]");
-			forceCastSpell(SpellReaperOfLife.class);
+			forceCastSpell(SpellHellzoneGrenade.class);
+		});
+
+		events.put(5, mBoss -> {
+			PlayerUtils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"[The Horseman] \",\"color\":\"dark_red\"},{\"text\":\"Meet your hallow end mortal!\",\"color\":\"gold\"}]");
+			forceCastSpell(SpellHellzoneGrenade.class);
 		});
 
 		BossBarManager bossBar = new BossBarManager(plugin, boss, detectionRange*2, BarColor.RED, BarStyle.SEGMENTED_10, events);
@@ -299,36 +270,6 @@ public class HeadlessHorsemanBoss extends BossAbilityGroup {
 		}
 	}
 
-	public void disableShield() {
-		if (mShieldsUp) {
-			World world = mBoss.getWorld();
-			world.spawnParticle(Particle.FLAME, mBoss.getLocation().add(0, 1.5, 0), 35, 0.4, 0.4, 0.4, 0.075);
-			world.spawnParticle(Particle.SMOKE_NORMAL, mBoss.getLocation().add(0, 1.5, 0), 18, 0.4, 0.4, 0.4, 0.065);
-			world.spawnParticle(Particle.SMOKE_LARGE, mBoss.getLocation().add(0, 1.5, 0), 10, 0.4, 0.4, 0.4, 0.025);
-			world.playSound(mBoss.getLocation(), Sound.ENTITY_BLAZE_DEATH, 2, 0.25f);
-			world.playSound(mBoss.getLocation(), Sound.BLOCK_BUBBLE_COLUMN_WHIRLPOOL_INSIDE, 2, 0f);
-			mShieldsUp = false;
-
-			new BukkitRunnable() {
-
-				@Override
-				public void run() {
-					if (mBoss.isDead() || !mBoss.isValid()) {
-						this.cancel();
-						return;
-					}
-					world.spawnParticle(Particle.FLAME, mBoss.getLocation().add(0, 1.5, 0), 35, 0.4, 0.4, 0.4, 0.075);
-					world.spawnParticle(Particle.SMOKE_NORMAL, mBoss.getLocation().add(0, 1.5, 0), 18, 0.4, 0.4, 0.4, 0.065);
-					world.spawnParticle(Particle.SMOKE_LARGE, mBoss.getLocation().add(0, 1.5, 0), 10, 0.4, 0.4, 0.4, 0.025);
-					world.playSound(mBoss.getLocation(), Sound.BLOCK_BEACON_POWER_SELECT, 2, 0.85f);
-					world.playSound(mBoss.getLocation(), Sound.BLOCK_BEACON_ACTIVATE, 2, 1f);
-					mShieldsUp = true;
-				}
-
-			}.runTaskLater(mPlugin, 20 * 8);
-		}
-	}
-
 	public LivingEntity getEntity() {
 		return mBoss;
 	}
@@ -339,11 +280,8 @@ public class HeadlessHorsemanBoss extends BossAbilityGroup {
 		int playerCount = BossUtils.getPlayersInRangeForHealthScaling(mSpawnLoc, detectionRange);
 		int hpDelta = 2500;
 		int armor = (int)(Math.sqrt(playerCount * 2) - 1);
-		while (playerCount > 0) {
-			bossTargetHp = bossTargetHp + hpDelta;
-			hpDelta = (int)Math.floor(hpDelta / 1.5 + 32);
-			playerCount--;
-		}
+
+		bossTargetHp = (int) (hpDelta * (1 + (1 - 1/Math.E) * Math.log(playerCount)));
 		mBoss.getAttribute(Attribute.GENERIC_ARMOR).setBaseValue(armor);
 		mBoss.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(bossTargetHp);
 		mBoss.setHealth(bossTargetHp);

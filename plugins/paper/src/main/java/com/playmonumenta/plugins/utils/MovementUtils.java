@@ -83,4 +83,19 @@ public class MovementUtils {
 			target.setVelocity(dir);
 		}
 	}
+
+	public static void pullTowardsByUnit(Entity towardsEntity, LivingEntity target, float speed) {
+		if (EntityUtils.isBoss(target)) {
+			return;
+		}
+		Vector dir = target.getLocation().subtract(towardsEntity.getLocation()).toVector().normalize().multiply(-speed);
+		if (dir.getY() < 0) {
+			dir.setY(0.5f);
+		}
+		double mult = 1 - target.getAttribute(Attribute.GENERIC_KNOCKBACK_RESISTANCE).getValue();
+		if (mult > 0) {
+			dir.multiply(mult);
+			target.setVelocity(dir);
+		}
+	}
 }

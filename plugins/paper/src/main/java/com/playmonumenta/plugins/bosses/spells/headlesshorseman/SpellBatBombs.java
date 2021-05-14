@@ -12,6 +12,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import com.playmonumenta.plugins.bosses.bosses.HeadlessHorsemanBoss;
 import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
@@ -48,8 +49,7 @@ public class SpellBatBombs extends Spell {
 					this.cancel();
 					world.spawnParticle(Particle.SMOKE_NORMAL, loc, 25, 0.15, .15, .15, 0.125);
 
-					LivingEntity bat = (LivingEntity) world.spawnEntity(loc, EntityType.BAT);
-					bat.setCustomName("A Spooky Bat");
+					LivingEntity bat = (LivingEntity) LibraryOfSoulsIntegration.summon(loc, "ExplosiveDrone");
 					new BukkitRunnable() {
 						int mTicks = 0;
 						@Override

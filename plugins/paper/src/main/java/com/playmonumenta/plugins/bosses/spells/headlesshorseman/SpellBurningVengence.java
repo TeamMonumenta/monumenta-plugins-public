@@ -5,6 +5,7 @@ import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Horse;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -52,7 +53,6 @@ public class SpellBurningVengence extends Spell {
 
 		if (mBoss.getVehicle() != null) {
 			if (mBoss.getVehicle() instanceof LivingEntity) {
-				mHorseman.disableShield();
 				LivingEntity h = (LivingEntity) mBoss.getVehicle();
 				new BukkitRunnable() {
 					double mRadius = 16;
@@ -87,10 +87,9 @@ public class SpellBurningVengence extends Spell {
 
 							for (Player player : PlayerUtils.playersInRange(loc, 0.75)) {
 								if (mHorseman.getSpawnLocation().distance(player.getLocation()) < HeadlessHorsemanBoss.detectionRange) {
-									BossUtils.bossDamage(mBoss, player, 10);
+									BossUtils.bossDamage(mBoss, player, 4);
 									player.setFireTicks(20 * 5);
-									Vector direction = player.getLocation().toVector().subtract(loc.toVector()).normalize();
-									player.setVelocity(direction.multiply(-0.7));
+									MovementUtils.pullTowardsByUnit((Entity)mBoss, (LivingEntity)player, (float)0.5);
 								}
 							}
 							if (reduce) {
@@ -111,8 +110,8 @@ public class SpellBurningVengence extends Spell {
 							world.spawnParticle(Particle.EXPLOSION_NORMAL, loc, 15, 0, 0, 0, 0.125);
 							for (Player player : PlayerUtils.playersInRange(loc, 5)) {
 								if (mHorseman.getSpawnLocation().distance(player.getLocation()) < HeadlessHorsemanBoss.detectionRange) {
-									BossUtils.bossDamagePercent(mBoss, player, 1.0);
-									MovementUtils.knockAway(loc, player, 0.7f);
+									BossUtils.bossDamagePercent(mBoss, player, 0.5);
+									MovementUtils.knockAway(loc, player, 3.0f);
 								}
 							}
 						}

@@ -64,15 +64,15 @@ public class SpellReaperOfLife extends Spell {
 			world.spawnParticle(Particle.SMOKE_NORMAL, fallingBlock.getLocation().add(0, fallingBlock.getHeight() / 2, 0), 2, 0.25, .25, .25, 0.025);
 			PlayerUtils.executeCommandOnNearbyPlayers(mCenter, range, "tellraw @s [{\"text\":\"[The Horseman] \",\"color\":\"dark_red\",\"bold\":\"false\",\"italic\":\"false\"},{\"text\":\"May your life force fuel \",\"color\":\"gold\"},{\"text\":\"our \",\"color\":\"dark_red\"},{\"text\":\"existence.\",\"color\":\"gold\"}]");
 			List<Player> players = PlayerUtils.playersInRange(mCenter, mRange);
-			if (players.size() == 0) {
-				return;
-			}
-			for (Player player : PlayerUtils.playersInRange(mCenter, mRange)) {
-				if (!mWarnedPlayers.contains(player)) {
-					mWarnedPlayers.add(player);
-					player.sendMessage(ChatColor.AQUA + "Seems like the Horseman threw a bomb to the center of the arena. Maybe you can disarm it?");
+			if (players.size() != 0) {
+				for (Player player : players) {
+					if (!mWarnedPlayers.contains(player)) {
+						mWarnedPlayers.add(player);
+						player.sendMessage(ChatColor.AQUA + "Seems like the Horseman threw a bomb to the center of the arena. Maybe you can disarm it?");
+					}
 				}
 			}
+
 
 			new BukkitRunnable() {
 				double mN = 0;
@@ -155,7 +155,7 @@ public class SpellReaperOfLife extends Spell {
 					world.playSound(mCenter, Sound.ENTITY_GENERIC_EXPLODE, 3, 1f);
 					world.spawnParticle(Particle.EXPLOSION_NORMAL, mCenter, 250, 21, 0.3, 21, 0.1);
 					for (Player player : PlayerUtils.playersInRange(mCenter, mRange)) {
-						if (mCenter.distance(player.getLocation()) < HeadlessHorsemanBoss.detectionRange) {
+						if (mCenter.distance(player.getLocation()) < mRange) {
 							int mNDT = player.getNoDamageTicks();
 							player.setNoDamageTicks(0);
 							BossUtils.bossDamagePercent(mBoss, player, 0.85, (Location)null);

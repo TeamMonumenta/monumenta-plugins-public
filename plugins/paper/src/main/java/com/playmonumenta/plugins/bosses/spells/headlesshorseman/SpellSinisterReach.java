@@ -104,6 +104,7 @@ public class SpellSinisterReach extends Spell {
 
 							Location l = mTloc.clone().add(vec);
 							world.spawnParticle(Particle.CRIT, l, 1, 0.5, 0.5, 0.5, 0.05);
+							world.spawnParticle(Particle.CRIT, l, 1, 1.5, 0.5, 0.5, 0.05);
 						}
 					}
 
