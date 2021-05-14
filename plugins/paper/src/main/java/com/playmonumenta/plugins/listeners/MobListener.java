@@ -84,6 +84,7 @@ public class MobListener implements Listener {
 		    event.getSpawnReason() != CreatureSpawnEvent.SpawnReason.SPAWNER_EGG &&
 		    event.getSpawnReason() != CreatureSpawnEvent.SpawnReason.SPAWNER &&
 		    event.getSpawnReason() != CreatureSpawnEvent.SpawnReason.DEFAULT &&
+		    event.getSpawnReason() != CreatureSpawnEvent.SpawnReason.COMMAND &&
 		    EntityUtils.isHostileMob(entity)) {
 			if (ZoneUtils.hasZoneProperty(entity, ZoneProperty.NO_NATURAL_SPAWNS)) {
 				// Cancel spawning unless this is from a dispenser in a plot
