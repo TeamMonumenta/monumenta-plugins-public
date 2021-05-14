@@ -14,7 +14,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import de.tr7zw.nbtapi.NBTEntity;
 
-public class Hope implements BaseEnchantment {
+public class Hope implements BaseSpawnableItemEnchantment {
 	public static String PROPERTY_NAME = ChatColor.GRAY + "Hope";
 
 	/* How much longer an item lasts per level */
@@ -27,18 +27,13 @@ public class Hope implements BaseEnchantment {
 	}
 
 	@Override
-	public EnumSet<ItemSlot> validSlots() {
+	public EnumSet<ItemSlot> getValidSlots() {
 		return EnumSet.noneOf(ItemSlot.class);
 	}
 
 	@Override
-	public boolean useEnchantLevels() {
+	public boolean isMultiLevel() {
 		return false;
-	}
-
-	@Override
-	public boolean hasOnSpawn() {
-		return true;
 	}
 
 	@Override

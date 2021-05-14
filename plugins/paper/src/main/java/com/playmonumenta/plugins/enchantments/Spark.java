@@ -2,13 +2,22 @@ package com.playmonumenta.plugins.enchantments;
 
 import java.util.EnumSet;
 
-import org.bukkit.ChatColor;
+import com.playmonumenta.plugins.Constants;
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
+import com.playmonumenta.plugins.player.PartialParticle;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.LocationUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
+
 import org.bukkit.Color;
-import org.bukkit.Material;
+import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
-import org.bukkit.entity.EntityType;
+import org.bukkit.entity.AbstractArrow;
 import org.bukkit.entity.Guardian;
 import org.bukkit.entity.IronGolem;
 import org.bukkit.entity.LivingEntity;
@@ -17,58 +26,63 @@ import org.bukkit.entity.Projectile;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.metadata.FixedMetadataValue;
+import org.jetbrains.annotations.NotNull;
 
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.FastUtils;
+
 
 public class Spark implements BaseEnchantment {
-	private static final String PROPERTY_NAME = ChatColor.GRAY + "Spark";
-	private static final String LEVEL_METAKEY = "SparkLevelMetakey";
-	private static final EnumSet<EntityType> ALLOWED_PROJECTILES = EnumSet.of(EntityType.ARROW, EntityType.SPECTRAL_ARROW);
-	private static final Particle.DustOptions YELLOW_1_COLOR = new Particle.DustOptions(Color.fromRGB(255, 255, 20), 1.0f);
-	private static final Particle.DustOptions YELLOW_2_COLOR = new Particle.DustOptions(Color.fromRGB(255, 255, 120), 1.0f);
-	// Bow velocity comes out at around 2.95 to 3.05
-	private static final double ARROW_VELOCITY_SCALE = 3;
+	private static final String METADATA_SPARK_KEY = "spark_arrow";
+	private static final String METADATA_STUN_KEY = "spark_stun_arrow";
+
+	private static final Particle.DustOptions COLOUR_YELLOW
+		= new Particle.DustOptions(Color.fromRGB(251, 231, 30), 1f);
+	private static final Particle.DustOptions COLOUR_FAINT_YELLOW
+		= new Particle.DustOptions(Color.fromRGB(255, 241, 110), 1f);
 
 	@Override
-	public String getProperty() {
-		return PROPERTY_NAME;
+	public @NotNull String getProperty() {
+		return "Spark";
 	}
 
 	@Override
-	public boolean useEnchantLevels() {
+	public @NotNull EnumSet<ItemSlot> getValidSlots() {
+		return EnumSet.of(ItemSlot.MAINHAND);
+	}
+
+	@Override
+	public boolean isMultiLevel() {
 		return false;
 	}
 
 	@Override
-	public EnumSet<ItemSlot> validSlots() {
-		return EnumSet.of(ItemSlot.MAINHAND, ItemSlot.OFFHAND);
-	}
+	public void onLaunchProjectile(
+		@NotNull Plugin plugin,
+		@NotNull Player player,
+		int level,
+		@NotNull Projectile projectile,
+		@NotNull ProjectileLaunchEvent projectileLaunchEvent
+	) {
+		if (EntityUtils.isSomeArrow(projectile)) {
+			// Eligible arrow is always a Spark arrow for extra damage
+			projectile.setMetadata(METADATA_SPARK_KEY, new FixedMetadataValue(plugin, 1));
 
-	@Override
-	public void onLaunchProjectile(Plugin plugin, Player player, int level, Projectile proj, ProjectileLaunchEvent event) {
-		if (ALLOWED_PROJECTILES.contains(proj.getType())) {
-			int mainHandLevel = this.getLevelFromItem(player.getInventory().getItemInMainHand());
-			int offHandLevel = this.getLevelFromItem(player.getInventory().getItemInOffHand());
+			//TODO change event in EntityListener, from ProjectileLaunchEvent.
+			// Then can safely & accurately check if bow or crossbow.
+			// Crossbows just happen to have the right chance here due to higher arrow launch speed
 
-			if (mainHandLevel > 0 && offHandLevel > 0
-				&& player.getInventory().getItemInMainHand().getType().equals(Material.BOW)
-				&& player.getInventory().getItemInOffHand().getType().equals(Material.BOW)) {
-				/* If we're trying to cheat by dual-wielding this enchant, subtract the lower of the two levels */
-				level -= mainHandLevel < offHandLevel ? mainHandLevel : offHandLevel;
-			}
-
-			double rand = FastUtils.RANDOM.nextDouble();
-			double randChance = Math.min(1, proj.getVelocity().length() / ARROW_VELOCITY_SCALE / AttributeProjectileSpeed.getProjectileSpeedModifier(proj));
-
-			if (rand < randChance) {
-				proj.setMetadata(LEVEL_METAKEY, new FixedMetadataValue(plugin, level));
+			// Whether Spark arrow is also stun arrow, scaling to 50% with bow draw.
+			// Need to precalculate bow draw based on launch velocity, velocity will change later
+			double bowDraw = PlayerUtils.calculateBowDraw((AbstractArrow)projectile);
+			if (bowDraw / 2 > FastUtils.RANDOM.nextDouble()) {
+				// Spark only supports a single level. It does not use enchant levels,
+				// & attempting to offhand double Spark as a higher level should be ignored
+				projectile.setMetadata(METADATA_STUN_KEY, new FixedMetadataValue(plugin, 1));
 			}
 		}
 	}
 
+	//TODO some kind of onProjectileDamage() as part of PlayerListener for these numerous manual
+	// onShootAttack() calls
 	/*
 	 * TODO: This needs some kind of better registration than expecting it to be called directly
 	 *
@@ -76,31 +90,73 @@ public class Spark implements BaseEnchantment {
 	 *
 	 * This works this way because you might have the enchantment when you fire the arrow, but switch to a different item before it hits
 	 */
-	public static void onShootAttack(Plugin plugin, Projectile proj, LivingEntity target, EntityDamageByEntityEvent event) {
-		if (proj.hasMetadata(LEVEL_METAKEY)) {
-			// Level isn't actually used currently
-
-			if (target instanceof Guardian || target instanceof IronGolem) {
-				event.setDamage(event.getDamage() + 1.0);
+	public static void onShootAttack(
+		@NotNull Plugin plugin,
+		@NotNull Projectile projectile,
+		@NotNull LivingEntity enemy,
+		@NotNull EntityDamageByEntityEvent entityDamageByEntityEvent
+	) {
+		if (projectile.hasMetadata(METADATA_SPARK_KEY)) {
+			boolean doEffects = false;
+			if (enemy instanceof Guardian || enemy instanceof IronGolem) {
+				doEffects = true;
+				entityDamageByEntityEvent.setDamage(entityDamageByEntityEvent.getDamage() + 1);
+			}
+			if (
+				projectile.hasMetadata(METADATA_STUN_KEY)
+				&& !(EntityUtils.isElite(enemy) || EntityUtils.isBoss(enemy))
+			) {
+				doEffects = true;
+				EntityUtils.applyStun(plugin, Constants.TICKS_PER_SECOND / 2, enemy);
 			}
 
-			double rand = FastUtils.RANDOM.nextDouble();
+			if (doEffects) {
+				@NotNull Location halfHeightLocation = LocationUtils.getHalfHeightLocation(enemy);
+				double widerWidthDelta = PartialParticle.getWidthDelta(enemy) * 1.5;
+				//TODO pass in the shooter of the projectile,
+				// then can safely spawn as that player's own active
+				// /particle dust 1 0.945 0.431 1 7053 78.9 7069 0.225 0.45 0.225 0 10
+				PartialParticle partialParticle = new PartialParticle(
+					Particle.REDSTONE,
+					halfHeightLocation,
+					10,
+					widerWidthDelta,
+					PartialParticle.getHeightDelta(enemy),
+					widerWidthDelta,
+					0,
+					COLOUR_FAINT_YELLOW
+				).spawnAsEnemy();
+				// /particle dust 0.984 0.906 0.118 1 7053 78.9 7069 0.225 0.45 0.225 0 10
+				partialParticle.mExtra = 1;
+				partialParticle.mData = COLOUR_YELLOW;
+				partialParticle.spawnAsEnemy();
+				// /particle firework 7053 78.9 7069 0.225 0.45 0.225 0.5 0
+				partialParticle.mParticle = Particle.FIREWORKS_SPARK;
+				partialParticle.mCount = 15;
+				partialParticle.mExtra = 0.4;
+				partialParticle.mData = null;
+				partialParticle.mIsDirectional = true;
+				partialParticle.mExtraVariance = 0.1;
+				partialParticle.spawnAsEnemy();
 
-			//50% chance for 0.5 second stun
-			if (rand < 0.5) {
-				if (!EntityUtils.isBoss(target) && !EntityUtils.isElite(target)) {
-					EntityUtils.applyStun(plugin, 10, target);
-				}
-			} else {
-				return;
+				@NotNull World world = enemy.getWorld();
+				// /playsound entity.firework_rocket.twinkle_far master @p ~ ~ ~ 0.3 1.2
+				world.playSound(
+					enemy.getLocation(),
+					Sound.ENTITY_FIREWORK_ROCKET_TWINKLE_FAR,
+					SoundCategory.PLAYERS,
+					0.3f,
+					1f
+				);
+				// /playsound entity.firework_rocket.twinkle master @p ~ ~ ~ 0.3 1.5
+				world.playSound(
+					enemy.getLocation(),
+					Sound.ENTITY_FIREWORK_ROCKET_TWINKLE,
+					SoundCategory.PLAYERS,
+					0.3f,
+					1.5f
+				);
 			}
-
-			World world = proj.getWorld();
-
-			world.spawnParticle(Particle.REDSTONE, target.getLocation().add(0, 1, 0), 12, 0.5, 0.5, 0.5, YELLOW_1_COLOR);
-			world.spawnParticle(Particle.REDSTONE, target.getLocation().add(0, 1, 0), 12, 0.5, 0.5, 0.5, YELLOW_2_COLOR);
-			world.spawnParticle(Particle.FIREWORKS_SPARK, target.getLocation().add(0, 1, 0), 15, 0, 0, 0, 0.15);
-			world.playSound(target.getLocation(), Sound.ENTITY_FIREWORK_ROCKET_TWINKLE, 0.65f, 1.5f);
 		}
 	}
 }

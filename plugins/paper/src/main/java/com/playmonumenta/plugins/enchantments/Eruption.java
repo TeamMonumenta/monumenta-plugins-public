@@ -43,7 +43,7 @@ public class Eruption implements BaseEnchantment {
 	}
 
 	@Override
-	public EnumSet<ItemSlot> validSlots() {
+	public EnumSet<ItemSlot> getValidSlots() {
 		return EnumSet.of(ItemSlot.MAINHAND);
 	}
 

@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.abilities.other;
 
+import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 
 import org.bukkit.Particle;
@@ -16,7 +17,7 @@ public class PatronGreen extends PatronParticles {
 			player,
 			Particle.VILLAGER_HAPPY,
 			"ShinyGreen",
-			20
+			Constants.PATREON_TIER_4
 		);
 	}
 }

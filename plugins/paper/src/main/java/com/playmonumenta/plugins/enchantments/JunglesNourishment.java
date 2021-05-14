@@ -31,12 +31,12 @@ public class JunglesNourishment implements BaseEnchantment {
 	}
 
 	@Override
-	public boolean useEnchantLevels() {
+	public boolean isMultiLevel() {
 		return false;
 	}
 
 	@Override
-	public EnumSet<ItemSlot> validSlots() {
+	public EnumSet<ItemSlot> getValidSlots() {
 		return EnumSet.of(ItemSlot.MAINHAND, ItemSlot.OFFHAND);
 	}
 

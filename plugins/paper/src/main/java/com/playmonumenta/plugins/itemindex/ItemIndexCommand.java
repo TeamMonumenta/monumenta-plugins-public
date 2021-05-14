@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import javax.annotation.Nullable;
 
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.enchantments.Enchantment;
 import com.playmonumenta.plugins.utils.CommandUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 
@@ -450,26 +449,26 @@ public class ItemIndexCommand {
 
 	private static void registerEditEnchant() {
 		//mi edit enchant <enchant_id> <level>
-		new CommandAPICommand(COMMAND)
-			.withPermission(CommandPermission.fromString("monumenta.mi"))
-			.withArguments(new MultiLiteralArgument("edit"))
-			.withArguments(new MultiLiteralArgument("enchant"))
-			.withArguments(new StringArgument("id").overrideSuggestions(Enchantment.valuesLowerCase()))
-			.withArguments(new IntegerArgument("value", 0))
-			.executes((sender, args) -> {
-				Player p = commandSecurities(sender);
-				if (p == null) {
-					return;
-				}
-				MonumentaItem item = itemSecurities(p);
-				if (item == null) {
-					return;
-				}
-				Enchantment ench = Enchantment.valueOf(((String)args[2]).toUpperCase());
-				item.edit().setEnchantLevel(ench, (int)args[3]);
-				updateItemInHand(item, p);
-			})
-			.register();
+		// new CommandAPICommand(COMMAND)
+		// 	.withPermission(CommandPermission.fromString("monumenta.mi"))
+		// 	.withArguments(new MultiLiteralArgument("edit"))
+		// 	.withArguments(new MultiLiteralArgument("enchant"))
+		// 	.withArguments(new StringArgument("id").overrideSuggestions(CustomEnchantment.valuesLowerCase()))
+		// 	.withArguments(new IntegerArgument("value", 0))
+		// 	.executes((sender, args) -> {
+		// 		Player p = commandSecurities(sender);
+		// 		if (p == null) {
+		// 			return;
+		// 		}
+		// 		MonumentaItem item = itemSecurities(p);
+		// 		if (item == null) {
+		// 			return;
+		// 		}
+		// 		CustomEnchantment ench = CustomEnchantment.valueOf(((String)args[2]).toUpperCase());
+		// 		item.edit().setEnchantLevel(ench, (int)args[3]);
+		// 		updateItemInHand(item, p);
+		// 	})
+		// 	.register();
 	}
 
 	private static void registerEditColor() {

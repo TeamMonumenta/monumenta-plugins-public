@@ -23,7 +23,7 @@ public class Regicide implements BaseEnchantment {
 	}
 
 	@Override
-	public EnumSet<ItemSlot> validSlots() {
+	public EnumSet<ItemSlot> getValidSlots() {
 		return EnumSet.of(ItemSlot.ARMOR, ItemSlot.MAINHAND, ItemSlot.OFFHAND);
 	}
 

@@ -146,6 +146,7 @@ public class AbilityUtils {
 	}
 
 	private static ItemStack getAlchemistPotion() {
+		//TODO get from loot tables instead
 		ItemStack itemStack = new ItemStack(Material.SPLASH_POTION, 1);
 		PotionMeta potionMeta = (PotionMeta) itemStack.getItemMeta();
 

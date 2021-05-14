@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.UUID;
 
 import com.playmonumenta.plugins.abilities.AbilityManager;
+import com.playmonumenta.plugins.attributes.AttributeManager;
 import com.playmonumenta.plugins.bosses.BossManager;
 import com.playmonumenta.plugins.bosses.spells.SpellDetectionCircle;
 import com.playmonumenta.plugins.classes.MonumentaClasses;
@@ -53,7 +54,6 @@ import com.playmonumenta.plugins.commands.TeleportByScore;
 import com.playmonumenta.plugins.commands.UnsignBook;
 import com.playmonumenta.plugins.commands.UpdateHeldItem;
 import com.playmonumenta.plugins.effects.EffectManager;
-import com.playmonumenta.plugins.enchantments.AttributeManager;
 import com.playmonumenta.plugins.enchantments.EnchantmentManager;
 import com.playmonumenta.plugins.guis.SinglePageGUIManager;
 import com.playmonumenta.plugins.integrations.ChestSortIntegration;
@@ -76,6 +76,7 @@ import com.playmonumenta.plugins.itemindex.ItemManager;
 import com.playmonumenta.plugins.itemupdater.ItemUpdateManager;
 import com.playmonumenta.plugins.listeners.ArrowListener;
 import com.playmonumenta.plugins.listeners.AuditListener;
+import com.playmonumenta.plugins.listeners.BrewingListener;
 import com.playmonumenta.plugins.listeners.CrossbowListener;
 import com.playmonumenta.plugins.listeners.DeathItemListener;
 import com.playmonumenta.plugins.listeners.DelvesListener;
@@ -116,6 +117,8 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
+
+
 
 public class Plugin extends JavaPlugin {
 	public CooldownTimers mTimers = null;
@@ -303,9 +306,10 @@ public class Plugin extends JavaPlugin {
 		manager.registerEvents(new ArrowListener(this), this);
 		manager.registerEvents(new SinglePageGUIManager(), this);
 		manager.registerEvents(new GraveListener(this), this);
+		manager.registerEvents(new BrewingListener(), this);
 		manager.registerEvents(new ItemUpdateManager(this), this);
 
-		//  Move the logic out of Plugin and into it's own class that derives off Runnable, a Timer class of some type.
+		//TODO Move the logic out of Plugin and into it's own class that derives off Runnable, a Timer class of some type.
 		getServer().getScheduler().scheduleSyncRepeatingTask(this, new Runnable() {
 			int mTicks = 0;
 
@@ -314,11 +318,8 @@ public class Plugin extends JavaPlugin {
 				final boolean oneHertz = (mTicks % 20) == 0;
 				final boolean twoHertz = (mTicks % 10) == 0;
 				final boolean fourHertz = (mTicks % 5) == 0;
-				final boolean twentyHertz = true;
 
-				// NOW IT'S TWICE A SECOND MOTHAFUCKAAAASSSSSSSSS!!!!!!!!!!
-				// FREQUENCY ANARCHY HAPPENING UP IN HERE
-
+				// Every 10 ticks - 2 times a second
 				if (twoHertz) {
 					//  Update cooldowns.
 					try {
@@ -328,7 +329,7 @@ public class Plugin extends JavaPlugin {
 					}
 				}
 
-				//  4 times a second.
+				// Every 5 ticks - 4 times a second
 				if (fourHertz) {
 					for (Player player : mTrackingManager.mPlayers.getPlayers()) {
 						try {
@@ -345,14 +346,12 @@ public class Plugin extends JavaPlugin {
 					}
 				}
 
-				//  Every tick.
-				if (twentyHertz) {
-					//  Update cooldowns.
-					try {
-						mProjectileEffectTimers.update();
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
+				// Every tick - 20 times a second
+				// Update cooldowns
+				try {
+					mProjectileEffectTimers.update();
+				} catch (Exception e) {
+					e.printStackTrace();
 				}
 
 				mTicks = (mTicks + 1) % Constants.TICKS_PER_SECOND;

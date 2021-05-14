@@ -7,7 +7,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.enchantments.Enchantment;
+import com.playmonumenta.plugins.enchantments.CustomEnchantment;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.StringUtils;
 import de.tr7zw.nbtapi.NBTItem;
@@ -52,7 +52,7 @@ public class MonumentaItem {
 	private ItemTier mTier;
 	private ItemLocation mLoc;
 	private TreeMap<Integer, String> mLoreMap;
-	private TreeMap<Enchantment, Integer> mEnchantMap;
+	private TreeMap<CustomEnchantment, Integer> mEnchantMap;
 	private int[] mColor;
 	private String mLastEditedBy;
 	private Long mLastEditedTimestamp;
@@ -87,7 +87,7 @@ public class MonumentaItem {
 			out.mLoreMap = (TreeMap<Integer, String>)this.mLoreMap.clone();
 		}
 		if (this.mEnchantMap != null) {
-			out.mEnchantMap = (TreeMap<Enchantment, Integer>)this.mEnchantMap.clone();
+			out.mEnchantMap = (TreeMap<CustomEnchantment, Integer>)this.mEnchantMap.clone();
 		}
 		if (this.mColor != null) {
 			out.mColor = this.mColor.clone();
@@ -172,7 +172,7 @@ public class MonumentaItem {
 				}
 			}
 			if (e.mEnchantMap != null) {
-				for (Map.Entry<Enchantment, Integer> entry : e.getEnchantMap().entrySet()) {
+				for (Map.Entry<CustomEnchantment, Integer> entry : e.getEnchantMap().entrySet()) {
 					this.setEnchantLevel(entry.getKey(), entry.getValue());
 				}
 			}
@@ -321,23 +321,23 @@ public class MonumentaItem {
 		}
 
 		// enchants
-		if (this.mEnchantMap != null) {
-			for (Enchantment e : Enchantment.values()) {
-				if (this.mEnchantMap.containsKey(e)) {
-					Integer v = this.mEnchantMap.get(e);
-					if (v > 0) {
-						String toAdd = e.getReadableString();
-						if (!e.ignoresLevels()) {
-							toAdd += " " + StringUtils.toRoman(v);
-						}
-						loreLines.add(toAdd);
-						if (e.isBukkitEnchant()) {
-							meta.addEnchant(e.getBukkitEnchantment(), v, true);
-						}
-					}
-				}
-			}
-		}
+		// if (this.mEnchantMap != null) {
+		// 	for (CustomEnchantment e : CustomEnchantment.values()) {
+		// 		if (this.mEnchantMap.containsKey(e)) {
+		// 			Integer v = this.mEnchantMap.get(e);
+		// 			if (v > 0) {
+		// 				String toAdd = e.getName();
+		// 				if (!e.usesLevels()) {
+		// 					toAdd += " " + StringUtils.toRoman(v);
+		// 				}
+		// 				loreLines.add(toAdd);
+		// 				if (e.isBukkitEnchantment()) {
+		// 					meta.addEnchant(e.getBukkitEnchantment(), v, true);
+		// 				}
+		// 			}
+		// 		}
+		// 	}
+		// }
 
 		// magic wand
 		if (this.mIsMagicWand != null && this.mIsMagicWand) {
@@ -695,11 +695,11 @@ public class MonumentaItem {
 	}
 
 	@Nullable
-	public Map<Enchantment, Integer> getEnchantMap() {
+	public Map<CustomEnchantment, Integer> getEnchantMap() {
 		return this.mEnchantMap;
 	}
 
-	public int getEnchantLevel(Enchantment enchant) {
+	public int getEnchantLevel(CustomEnchantment enchant) {
 		if (this.getEnchantMap() == null) {
 			return 0;
 		}
@@ -893,14 +893,14 @@ public class MonumentaItem {
 		this.mLoreMap.put(index, str);
 	}
 
-	public void setEnchantLevel(Enchantment enchant, int level) {
+	public void setEnchantLevel(CustomEnchantment enchant, int level) {
 		if (this.getEnchantMap() == null) {
 			this.mEnchantMap = new TreeMap<>();
 		}
 		this.mEnchantMap.put(enchant, level);
 	}
 
-	public void setEnchantMap(TreeMap<Enchantment, Integer> enchantMap) {
+	public void setEnchantMap(TreeMap<CustomEnchantment, Integer> enchantMap) {
 		this.mEnchantMap = enchantMap;
 	}
 

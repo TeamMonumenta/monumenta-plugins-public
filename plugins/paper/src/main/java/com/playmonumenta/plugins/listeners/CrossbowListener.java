@@ -1,5 +1,8 @@
 package com.playmonumenta.plugins.listeners;
 
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.utils.EntityUtils;
+
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
@@ -7,14 +10,13 @@ import org.bukkit.entity.AbstractArrow;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.entity.Trident;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.inventory.ItemStack;
 
-import com.playmonumenta.plugins.Plugin;
+
 
 public class CrossbowListener implements Listener {
 
@@ -27,10 +29,11 @@ public class CrossbowListener implements Listener {
 	@EventHandler(priority = EventPriority.HIGH)
 	public void projectileLaunchEvent(ProjectileLaunchEvent event) {
 		//Has to be an arrow
-		if (event.isCancelled()
-				|| !(event.getEntity() instanceof AbstractArrow)
-				|| event.getEntity() instanceof Trident
-				|| !(event.getEntity().getShooter() instanceof LivingEntity)) {
+		if (
+			event.isCancelled()
+			|| !EntityUtils.isSomeArrow(event.getEntity())
+			|| !(event.getEntity().getShooter() instanceof LivingEntity)
+		) {
 			return;
 		}
 

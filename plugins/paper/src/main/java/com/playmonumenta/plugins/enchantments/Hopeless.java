@@ -17,7 +17,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 
-public class Hopeless implements BaseEnchantment {
+public class Hopeless implements BaseSpawnableItemEnchantment {
 	private static final Particle.DustOptions DARK_RED_PARTICLE_COLOR = new Particle.DustOptions(Color.fromRGB(150, 0, 0), 1.0f);
 	private static String PROPERTY_NAME = ChatColor.GRAY + "Hopeless";
 	private static final Set<UUID> NO_SELF_PARTICLES = new HashSet<>();
@@ -30,31 +30,35 @@ public class Hopeless implements BaseEnchantment {
 	}
 
 	@Override
-	public boolean useEnchantLevels() {
+	public boolean isMultiLevel() {
 		return false;
 	}
 
 	@Override
-	public boolean hasOnSpawn() {
-		return true;
-	}
-
-	@Override
-	public int getLevelFromItem(ItemStack item, Player player) {
-		if (getLevelFromItem(item) == 0) {
-			return 0;
-		}
+	public int getPlayerItemLevel(ItemStack itemStack, Player player, ItemSlot itemSlot) {
 		if (player.getScoreboardTags().contains("noSelfParticles")) {
 			NO_SELF_PARTICLES.add(player.getUniqueId());
 		} else {
 			NO_SELF_PARTICLES.remove(player.getUniqueId());
 		}
-		return 1;
+		return BaseSpawnableItemEnchantment.super.getPlayerItemLevel(itemStack, player, itemSlot);
 	}
 
 	@Override
-	public EnumSet<ItemSlot> validSlots() {
+	public EnumSet<ItemSlot> getValidSlots() {
 		return EnumSet.of(ItemSlot.MAINHAND, ItemSlot.OFFHAND, ItemSlot.ARMOR);
+	}
+
+	@Override
+	public void tick(Plugin plugin, Player player, int level) {
+		//Runs dark red particles while wearing, subject to no self particle PEB option
+		if (NO_SELF_PARTICLES.contains(player.getUniqueId())) {
+			for (Player other : PlayerUtils.playersInRange(player, 30, false)) {
+				other.spawnParticle(Particle.REDSTONE, player.getLocation().add(0, 1.5, 0), 3, 0.4, 0.4, 0.4, 0, DARK_RED_PARTICLE_COLOR);
+			}
+		} else {
+			player.getWorld().spawnParticle(Particle.REDSTONE, player.getLocation().add(0, 1.5, 0), 3, 0.4, 0.4, 0.4, 0, DARK_RED_PARTICLE_COLOR);
+		}
 	}
 
 	@Override
@@ -71,17 +75,5 @@ public class Hopeless implements BaseEnchantment {
 				}
 			}
 		}.runTaskTimer(plugin, 10, TICK_PERIOD);
-	}
-
-	@Override
-	public void tick(Plugin plugin, Player player, int level) {
-		//Runs dark red particles while wearing, subject to no self particle PEB option
-		if (NO_SELF_PARTICLES.contains(player.getUniqueId())) {
-			for (Player other : PlayerUtils.playersInRange(player, 30, false)) {
-				other.spawnParticle(Particle.REDSTONE, player.getLocation().add(0, 1.5, 0), 3, 0.4, 0.4, 0.4, 0, DARK_RED_PARTICLE_COLOR);
-			}
-		} else {
-			player.getWorld().spawnParticle(Particle.REDSTONE, player.getLocation().add(0, 1.5, 0), 3, 0.4, 0.4, 0.4, 0, DARK_RED_PARTICLE_COLOR);
-		}
 	}
 }

@@ -1,16 +1,53 @@
 package com.playmonumenta.plugins.listeners;
 
 import java.util.ArrayList;
-import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
+
+import com.playmonumenta.plugins.Constants;
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.attributes.AttributeProjectileDamage;
+import com.playmonumenta.plugins.enchantments.Bleeding;
+import com.playmonumenta.plugins.enchantments.Decay;
+import com.playmonumenta.plugins.enchantments.Duelist;
+import com.playmonumenta.plugins.enchantments.Frost;
+import com.playmonumenta.plugins.enchantments.HexEater;
+import com.playmonumenta.plugins.enchantments.IceAspect;
+import com.playmonumenta.plugins.enchantments.Inferno;
+import com.playmonumenta.plugins.enchantments.PointBlank;
+import com.playmonumenta.plugins.enchantments.RegionScalingDamageDealt;
+import com.playmonumenta.plugins.enchantments.Slayer;
+import com.playmonumenta.plugins.enchantments.Sniper;
+import com.playmonumenta.plugins.enchantments.Spark;
+import com.playmonumenta.plugins.enchantments.StatTrack.StatTrackOptions;
+import com.playmonumenta.plugins.enchantments.StatTrackManager;
+import com.playmonumenta.plugins.enchantments.ThunderAspect;
+import com.playmonumenta.plugins.enchantments.curses.CurseOfEphemerality;
+import com.playmonumenta.plugins.enchantments.evasions.EvasionInfo;
+import com.playmonumenta.plugins.enchantments.infusions.Focus;
+import com.playmonumenta.plugins.events.AbilityCastEvent;
+import com.playmonumenta.plugins.events.EvasionEvent;
+import com.playmonumenta.plugins.point.Point;
+import com.playmonumenta.plugins.portals.PortalManager;
+import com.playmonumenta.plugins.potion.PotionManager.PotionID;
+import com.playmonumenta.plugins.server.properties.ServerProperties;
+import com.playmonumenta.plugins.server.reset.DailyReset;
+import com.playmonumenta.plugins.utils.ChestUtils;
+import com.playmonumenta.plugins.utils.CommandUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.GraveUtils;
+import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.PotionUtils;
+import com.playmonumenta.plugins.utils.ScoreboardUtils;
+import com.playmonumenta.plugins.utils.ZoneUtils;
+import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
+import com.playmonumenta.scriptedquests.utils.MetadataUtils;
 
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.World;
@@ -43,7 +80,6 @@ import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.entity.EntityRegainHealthEvent;
 import org.bukkit.event.entity.EntityShootBowEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
-import org.bukkit.event.inventory.BrewEvent;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
@@ -76,7 +112,6 @@ import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import org.bukkit.event.player.PlayerToggleSneakEvent;
-import org.bukkit.inventory.BrewerInventory;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
@@ -85,59 +120,16 @@ import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.metadata.FixedMetadataValue;
-import org.bukkit.potion.PotionData;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-import org.bukkit.potion.PotionType;
 import org.bukkit.projectiles.ProjectileSource;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.util.Vector;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 
-import com.playmonumenta.plugins.Constants;
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.AbilityManager;
-import com.playmonumenta.plugins.enchantments.AttributeProjectileDamage;
-import com.playmonumenta.plugins.enchantments.Bleeding;
-import com.playmonumenta.plugins.enchantments.CurseOfEphemerality;
-import com.playmonumenta.plugins.enchantments.Decay;
-import com.playmonumenta.plugins.enchantments.Duelist;
-import com.playmonumenta.plugins.enchantments.Frost;
-import com.playmonumenta.plugins.enchantments.HexEater;
-import com.playmonumenta.plugins.enchantments.IceAspect;
-import com.playmonumenta.plugins.enchantments.Inferno;
-import com.playmonumenta.plugins.enchantments.PointBlank;
-import com.playmonumenta.plugins.enchantments.RegionScalingDamageDealt;
-import com.playmonumenta.plugins.enchantments.Slayer;
-import com.playmonumenta.plugins.enchantments.Sniper;
-import com.playmonumenta.plugins.enchantments.Spark;
-import com.playmonumenta.plugins.enchantments.StatTrack.StatTrackOptions;
-import com.playmonumenta.plugins.enchantments.StatTrackManager;
-import com.playmonumenta.plugins.enchantments.Thunder;
-import com.playmonumenta.plugins.enchantments.evasions.EvasionInfo;
-import com.playmonumenta.plugins.enchantments.infusions.Focus;
-import com.playmonumenta.plugins.events.AbilityCastEvent;
-import com.playmonumenta.plugins.events.EvasionEvent;
-import com.playmonumenta.plugins.point.Point;
-import com.playmonumenta.plugins.portals.PortalManager;
-import com.playmonumenta.plugins.potion.PotionManager.PotionID;
-import com.playmonumenta.plugins.server.properties.ServerProperties;
-import com.playmonumenta.plugins.server.reset.DailyReset;
-import com.playmonumenta.plugins.utils.ChestUtils;
-import com.playmonumenta.plugins.utils.CommandUtils;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.GraveUtils;
-import com.playmonumenta.plugins.utils.InventoryUtils;
-import com.playmonumenta.plugins.utils.ItemUtils;
-import com.playmonumenta.plugins.utils.MessagingUtils;
-import com.playmonumenta.plugins.utils.PotionUtils;
-import com.playmonumenta.plugins.utils.ScoreboardUtils;
-import com.playmonumenta.plugins.utils.ZoneUtils;
-import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
-import com.playmonumenta.scriptedquests.utils.MetadataUtils;
+
 
 public class PlayerListener implements Listener {
 	Plugin mPlugin = null;
@@ -190,7 +182,7 @@ public class PlayerListener implements Listener {
 		Block block = event.getClickedBlock();
 
 		Material mat = (block != null) ? block.getType() : Material.AIR;
-		AbilityManager.getManager().playerInteractEvent(player, action, item, mat);
+		mPlugin.mAbilityManager.playerInteractEvent(player, action, item, mat);
 		mPlugin.mTrackingManager.mPlayers.onPlayerInteract(mPlugin, player, event);
 
 		// Overrides
@@ -509,7 +501,7 @@ public class PlayerListener implements Listener {
 			ItemStack mainHand = player.getInventory().getItemInMainHand();
 			ItemStack offHand = player.getInventory().getItemInOffHand();
 
-			AbilityManager.getManager().playerItemHeldEvent(player, mainHand, offHand);
+			mPlugin.mAbilityManager.playerItemHeldEvent(player, mainHand, offHand);
 		} else if (holder instanceof Chest) {
 			Chest chest = (Chest) holder;
 			// Break empty graves or halloween creeper chests in safe zones automatically when closed
@@ -585,7 +577,7 @@ public class PlayerListener implements Listener {
 		if (event.isCancelled()) {
 			return;
 		}
-		AbilityManager.getManager().playerSwapHandItemsEvent(event.getPlayer(), event);
+		mPlugin.mAbilityManager.playerSwapHandItemsEvent(event.getPlayer(), event);
 		InventoryUtils.scheduleDelayedEquipmentCheck(mPlugin, event.getPlayer(), event);
 	}
 
@@ -644,7 +636,7 @@ public class PlayerListener implements Listener {
 				ItemStack mainHand = player.getInventory().getItemInMainHand();
 				ItemStack offHand = player.getInventory().getItemInOffHand();
 
-				AbilityManager.getManager().playerItemHeldEvent(player, mainHand, offHand);
+				mPlugin.mAbilityManager.playerItemHeldEvent(player, mainHand, offHand);
 				InventoryUtils.scheduleDelayedEquipmentCheck(mPlugin, player, event);
 			}
 		}, 0);
@@ -667,14 +659,10 @@ public class PlayerListener implements Listener {
 		}
 	}
 
-	@EventHandler(priority = EventPriority.LOW)
+	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	public void playerItemConsumeEvent(PlayerItemConsumeEvent event) {
-		if (event.isCancelled()) {
-			return;
-		}
-
 		Player player = event.getPlayer();
-		AbilityManager.getManager().playerItemConsumeEvent(player, event);
+		mPlugin.mAbilityManager.playerItemConsumeEvent(player, event);
 
 		/* Don't let players consume shattered items */
 		if (ItemUtils.isItemShattered(event.getItem())) {
@@ -741,7 +729,7 @@ public class PlayerListener implements Listener {
 		}
 
 		ItemStack item = event.getItem();
-		AbilityManager.getManager().playerItemDamageEvent(event.getPlayer(), event);
+		mPlugin.mAbilityManager.playerItemDamageEvent(event.getPlayer(), event);
 
 		int damage = event.getDamage();
 
@@ -973,60 +961,6 @@ public class PlayerListener implements Listener {
 		}
 	}
 
-	public static Set<Material> POTION_TYPES = EnumSet.of(Material.POTION, Material.SPLASH_POTION,
-	                                                      Material.LINGERING_POTION);
-
-	@EventHandler(priority = EventPriority.LOW)
-	public void brewEvent(BrewEvent event) {
-		BrewerInventory inv = event.getContents();
-		ItemStack ingred = inv.getIngredient();
-		ItemStack[] cont = inv.getStorageContents();
-		boolean malfunction = false;
-		for (ItemStack i : cont) {
-			if (i != null) {
-				if (POTION_TYPES.contains(i.getType())) {
-					if (ingred.getType() == Material.MAGMA_CREAM) {
-						malfunction = true;
-						break;
-					} else if (ingred.getType() == Material.TURTLE_HELMET) {
-						malfunction = true;
-						break;
-					} else if (ingred.getType() == Material.PHANTOM_MEMBRANE) {
-						malfunction = true;
-						break;
-					} else if (ingred.getType() == Material.FERMENTED_SPIDER_EYE) {
-						PotionMeta meta = (PotionMeta) i.getItemMeta();
-						PotionData data = meta.getBasePotionData();
-						if (data.getType() == PotionType.NIGHT_VISION) {
-							malfunction = true;
-							break;
-						}
-					}
-				}
-			}
-		}
-		if (malfunction) {
-			Block block = event.getBlock();
-			Location loc = block.getLocation().add(0.5, 0.5, 0.5);
-			loc.getWorld().spawnParticle(Particle.EXPLOSION_LARGE, loc, 1, 0, 0, 0, 0);
-			loc.getWorld().spawnParticle(Particle.FLAME, loc, 100, 0, 0, 0, 0.25);
-			loc.getWorld().spawnParticle(Particle.SMOKE_LARGE, loc, 50, 0, 0, 0, 0.1);
-			loc.getWorld().playSound(loc, Sound.ENTITY_ENDERMAN_DEATH, 1, 0);
-			loc.getWorld().playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 1, 1);
-			loc.getBlock().setType(Material.AIR);
-			event.setCancelled(true);
-			for (Entity e : loc.getWorld().getNearbyEntities(loc, 3, 3, 3)) {
-				if (e instanceof Player) {
-					Player player = (Player) e;
-					Vector v = player.getLocation().toVector().subtract(loc.toVector()).normalize();
-					// Create the vector.
-					v.add(new Vector(0, 0.5, 0));
-					player.setVelocity(v.multiply(1)); // Set the velocity.
-				}
-			}
-		}
-	}
-
 	@EventHandler(priority = EventPriority.LOW)
 	public void playerToggleSneakEvent(PlayerToggleSneakEvent event) {
 		Player player = event.getPlayer();
@@ -1041,7 +975,7 @@ public class PlayerListener implements Listener {
 			 */
 			int taskId = Bukkit.getScheduler().scheduleSyncDelayedTask(mPlugin,
 					() -> {
-						AbilityManager.getManager().playerExtendedSneakEvent(player);
+						mPlugin.mAbilityManager.playerExtendedSneakEvent(player);
 						player.removeMetadata(Constants.PLAYER_SNEAKING_TASK_METAKEY, mPlugin);
 					}, 20);
 
@@ -1071,7 +1005,7 @@ public class PlayerListener implements Listener {
 				new BukkitRunnable() {
 					@Override
 					public void run() {
-						AbilityManager.getManager().updatePlayerAbilities(player);
+						mPlugin.mAbilityManager.updatePlayerAbilities(player);
 					}
 				}.runTaskLater(mPlugin, 0);
 			}
@@ -1094,7 +1028,7 @@ public class PlayerListener implements Listener {
 	@EventHandler
 	public void abilityCastEvent(AbilityCastEvent event) {
 		Player player = event.getCaster();
-		AbilityManager.getManager().abilityCastEvent(player, event);
+		mPlugin.mAbilityManager.abilityCastEvent(player, event);
 	}
 
 	@EventHandler
@@ -1123,7 +1057,7 @@ public class PlayerListener implements Listener {
 	public void playerAnimationEvent(PlayerAnimationEvent event) {
 		Player player = event.getPlayer();
 		if (event.getAnimationType().equals(PlayerAnimationType.ARM_SWING)) {
-			AbilityManager.getManager().playerAnimationEvent(player, event);
+			mPlugin.mAbilityManager.playerAnimationEvent(player, event);
 		}
 	}
 
@@ -1176,7 +1110,7 @@ public class PlayerListener implements Listener {
 
 					if (damager instanceof Trident) {
 						IceAspect.onShootAttack(mPlugin, proj, le, event);
-						Thunder.onShootAttack(mPlugin, proj, le, event);
+						ThunderAspect.onShootAttack(mPlugin, proj, le, event);
 						Bleeding.onShootAttack(mPlugin, proj, le, event);
 						Decay.onShootAttack(mPlugin, proj, le, event);
 						HexEater.onShootAttack(mPlugin, proj, le, event);

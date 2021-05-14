@@ -252,15 +252,15 @@ public class MobListener implements Listener {
 
 	@EventHandler(priority = EventPriority.HIGH)
 	public void entityDeathEvent(EntityDeathEvent event) {
-		Entity entity = event.getEntity();
+		LivingEntity livingEntity = event.getEntity();
 		boolean shouldGenDrops = true;
 
 		// Check if this mob was likely spawned by a grinder spawner
-		if (entity.hasMetadata(Constants.SPAWNER_COUNT_METAKEY)) {
+		if (livingEntity.hasMetadata(Constants.SPAWNER_COUNT_METAKEY)) {
 			int spawnCount = 0;
 
 			// There should only be one value - just use the latest one
-			for (MetadataValue value : entity.getMetadata(Constants.SPAWNER_COUNT_METAKEY)) {
+			for (MetadataValue value : livingEntity.getMetadata(Constants.SPAWNER_COUNT_METAKEY)) {
 				spawnCount = value.asInt();
 			}
 
@@ -280,57 +280,53 @@ public class MobListener implements Listener {
 			}
 		}
 
-		if (entity instanceof LivingEntity) {
-			LivingEntity livingEntity = (LivingEntity)entity;
-			Player player = livingEntity.getKiller();
-			if (player != null && EntityUtils.isHostileMob(entity)) {
-				//  Player kills a mob
-				mPlugin.mTrackingManager.mPlayers.onKill(mPlugin, player, entity, event);
-				AbilityManager.getManager().entityDeathEvent(player, event, shouldGenDrops);
-				for (Player p : PlayerUtils.playersInRange(livingEntity.getLocation(), 20)) {
-					AbilityManager.getManager().entityDeathRadiusEvent(p, event, shouldGenDrops);
-				}
+		Player player = livingEntity.getKiller();
+		if (player != null && EntityUtils.isHostileMob(livingEntity)) {
+			//  Player kills a mob
+			mPlugin.mTrackingManager.mPlayers.onKill(mPlugin, player, livingEntity, event);
+			AbilityManager.getManager().entityDeathEvent(player, event, shouldGenDrops);
+			for (Player p : PlayerUtils.playersInRange(livingEntity.getLocation(), 20)) {
+				AbilityManager.getManager().entityDeathRadiusEvent(p, event, shouldGenDrops);
 			}
+		}
 
-			//Do not run below if it is the death of a player
-			if (livingEntity instanceof Player) {
-				return;
-			}
+		//Do not run below if it is the death of a player
+		if (livingEntity instanceof Player) {
+			return;
+		}
 
-			//Give wither to vexes spawned from the evoker that died so they die over time
-			if (livingEntity instanceof Evoker) {
-				List<LivingEntity> vexes = EntityUtils.getNearbyMobs(livingEntity.getLocation(), 30, EnumSet.of(EntityType.VEX));
-				for (LivingEntity vex : vexes) {
-					if (vex instanceof Vex && ((Vex) vex).getSummoner() != null && ((Vex)vex).getSummoner().equals(livingEntity)) {
-						vex.addPotionEffect(new PotionEffect(PotionEffectType.WITHER, 9999, 3));
-					}
+		//Give wither to vexes spawned from the evoker that died so they die over time
+		if (livingEntity instanceof Evoker) {
+			List<LivingEntity> vexes = EntityUtils.getNearbyMobs(livingEntity.getLocation(), 30, EnumSet.of(EntityType.VEX));
+			for (LivingEntity vex : vexes) {
+				if (vex instanceof Vex && ((Vex) vex).getSummoner() != null && ((Vex)vex).getSummoner().equals(livingEntity)) {
+					vex.addPotionEffect(new PotionEffect(PotionEffectType.WITHER, 9999, 3));
 				}
 			}
-			//If the item has meta, run through the lore to check if it has quest item in the lore list
-			ListIterator<ItemStack> iter = event.getDrops().listIterator();
-			while (iter.hasNext()) {
-				ItemStack item = iter.next();
-				if (item == null) {
-					continue;
-				}
-				List<String> lore = ItemUtils.getPlainLore(item);
-				if (lore != null && !lore.isEmpty()) {
-					for (String loreEntry : lore) {
-						if (loreEntry.contains("Quest Item")) {
-							//Scales based off player count in a 20 meter radius, drops at least one quest item
-							int count = PlayerUtils.playersInRange(entity.getLocation(), 20).size();
-							if (count < 1) {
-								count = 1;
-							}
-							if (count > item.getAmount()) {
-								item.setAmount(count);
-							}
-							return;
+		}
+		//If the item has meta, run through the lore to check if it has quest item in the lore list
+		ListIterator<ItemStack> iter = event.getDrops().listIterator();
+		while (iter.hasNext()) {
+			ItemStack item = iter.next();
+			if (item == null) {
+				continue;
+			}
+			List<String> lore = ItemUtils.getPlainLore(item);
+			if (lore != null && !lore.isEmpty()) {
+				for (String loreEntry : lore) {
+					if (loreEntry.contains("Quest Item")) {
+						//Scales based off player count in a 20 meter radius, drops at least one quest item
+						int count = PlayerUtils.playersInRange(livingEntity.getLocation(), 20).size();
+						if (count < 1) {
+							count = 1;
 						}
+						if (count > item.getAmount()) {
+							item.setAmount(count);
+						}
+						return;
 					}
 				}
 			}
-
 		}
 	}
 

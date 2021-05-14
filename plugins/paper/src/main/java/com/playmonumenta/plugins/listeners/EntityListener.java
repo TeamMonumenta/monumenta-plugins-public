@@ -77,7 +77,7 @@ import com.destroystokyo.paper.event.entity.EntityRemoveFromWorldEvent;
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityManager;
-import com.playmonumenta.plugins.enchantments.AttributeProjectileDamage;
+import com.playmonumenta.plugins.attributes.AttributeProjectileDamage;
 import com.playmonumenta.plugins.enchantments.Inferno;
 import com.playmonumenta.plugins.enchantments.ThrowingKnife;
 import com.playmonumenta.plugins.events.CustomDamageEvent;
@@ -366,7 +366,9 @@ public class EntityListener implements Listener {
 				event.setCancelled(true);
 			}
 
-			// If this is an EntityDamageByEntityEvent, we'll intercept it in that method, since it's important this triggers after all other damage modifiers run
+			// If this is an EntityDamageByEntityEvent, we'll handle it in entityDamageByEntityEvent(),
+			// letting that decide whether to call mPlayers.onFatalHurt() on its own,
+			// since changes to damage need to run there before it decides
 			if (!(event instanceof EntityDamageByEntityEvent)) {
 				// Damage triggering logic in PlayerInventory.java
 				mPlugin.mTrackingManager.mPlayers.onFatalHurt(mPlugin, player, event);
@@ -499,6 +501,7 @@ public class EntityListener implements Listener {
 	}
 
 	// Player shoots an arrow.
+	//TODO PlayerLaunchProjectileEvent to access ItemStack
 	@EventHandler(priority = EventPriority.HIGH)
 	public void projectileLaunchEvent(ProjectileLaunchEvent event) {
 		if (event.isCancelled()) {

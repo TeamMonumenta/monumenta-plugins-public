@@ -42,7 +42,7 @@ public class Quake implements BaseEnchantment {
 	}
 
 	@Override
-	public EnumSet<ItemSlot> validSlots() {
+	public EnumSet<ItemSlot> getValidSlots() {
 		return EnumSet.of(ItemSlot.MAINHAND);
 	}
 
@@ -56,7 +56,7 @@ public class Quake implements BaseEnchantment {
 			ItemStack item = player.getInventory().getItemInMainHand();
 			int fire = item.getEnchantmentLevel(Enchantment.FIRE_ASPECT);
 			int ice = InventoryUtils.getCustomEnchantLevel(item, IceAspect.PROPERTY_NAME, true);
-			int thunder = InventoryUtils.getCustomEnchantLevel(item, Thunder.PROPERTY_NAME, true);
+			int thunder = InventoryUtils.getCustomEnchantLevel(item, ThunderAspect.PROPERTY_NAME, true);
 			int decay = InventoryUtils.getCustomEnchantLevel(item, Decay.PROPERTY_NAME, true);
 			int bleed = InventoryUtils.getCustomEnchantLevel(item, Bleeding.PROPERTY_NAME, true);
 

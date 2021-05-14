@@ -13,7 +13,7 @@ import com.playmonumenta.plugins.abilities.mage.MagmaShield;
 import com.playmonumenta.plugins.abilities.mage.Spellshock;
 import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.classes.magic.MagicType;
-import com.playmonumenta.plugins.enchantments.SpellDamage;
+import com.playmonumenta.plugins.enchantments.abilities.SpellPower;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
@@ -133,7 +133,7 @@ public class Blizzard extends Ability {
 		world.playSound(mPlayer.getLocation(), Sound.ENTITY_BLAZE_SHOOT, 1, 2);
 		world.playSound(mPlayer.getLocation(), Sound.BLOCK_GLASS_BREAK, 1, 0.75f);
 
-		float spellDamage = SpellDamage.getSpellDamage(mPlayer, mLevelDamage);
+		float spellDamage = SpellPower.getSpellDamage(mPlayer, mLevelDamage);
 		new BukkitRunnable() {
 			int mTicks = 0;
 

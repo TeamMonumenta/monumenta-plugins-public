@@ -8,6 +8,7 @@ import java.util.regex.Pattern;
 
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
+import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.enchantments.StatTrack.StatTrackOptions;
 import com.playmonumenta.plugins.player.PlayerData;
@@ -25,7 +26,7 @@ public class StatTrackManager {
 	//The system will attempt to update the item for one minute after it's first used
 	public static final int NUM_RETRIES = 60;
 
-	public static final int PATRON_TIER = 5;
+	public static final int PATRON_TIER = Constants.PATREON_TIER_2;
 
 	private static StatTrackManager mInstance;
 
@@ -160,7 +161,7 @@ public class StatTrackManager {
 
 		//Check that the player is a patron and the item has their name on it and that it has the right enchant type
 		if (
-			new PlayerData(player).checkPatreonDollars() < PATRON_TIER
+			PlayerData.getPatreonDollars(player) < PATRON_TIER
 			|| !isPlayersItem(item, player)
 			|| !(getTrackingType(item).equals(enchant))
 		) {

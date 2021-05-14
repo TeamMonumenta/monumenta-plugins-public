@@ -11,7 +11,7 @@ import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.classes.magic.MagicType;
-import com.playmonumenta.plugins.enchantments.SpellDamage;
+import com.playmonumenta.plugins.enchantments.abilities.SpellPower;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
@@ -151,7 +151,7 @@ public class SpatialShatter extends Ability {
 	}
 
 	private void explode(Location loc) {
-		double damage = SpellDamage.getSpellDamage(mPlayer, mLevelDamage);
+		double damage = SpellPower.getSpellDamage(mPlayer, mLevelDamage);
 		boolean cdr = true;
 		World world = mPlayer.getWorld();
 		world.spawnParticle(Particle.CLOUD, loc, 25, 0, 0, 0, 0.125);

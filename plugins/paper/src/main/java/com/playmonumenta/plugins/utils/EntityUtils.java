@@ -64,6 +64,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BlockIterator;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.NotNull;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityManager;
@@ -919,7 +920,16 @@ public class EntityUtils {
 		target.setMetadata(Inferno.FIRE_TICK_METAKEY, new FixedMetadataValue(plugin, target.getTicksLived()));
 		target.setFireTicks(fireTicks);
 
-		// Inferno detects a damage event (since it can light fire resistant mobs "on fire"), so do some damage.
+		//TODO this 0.001 damage can get affected by abilities/enchants,
+		// becoming high enough (> 0.01) to be displayed by training dummies.
+		// Perhaps it's possible to trigger Inferno's "on fire" effect using its class directly,
+		// instead of sending damage through?
+		// Then if damage does indeed happen after, it should not retrigger Inferno
+		//
+		// Also unsure if the change hotbar slot exploit works when it gets mainhand item -
+		// hitting an enemy without fire aspect and then switching to a fire aspect item for the check
+
+		// Inferno detects a damage event (since it can light fire-resistant mobs "on fire"), so do some damage.
 		// We need to do this even for abilities that deal damage, since the damage events might not occur due to iframes.
 		// This damage will always bypass iframes & doesn't affect velocity
 		damageEntity(plugin, target, 0.001, player, MagicType.FIRE, false, null, false, false, true, true);
@@ -1324,17 +1334,15 @@ public class EntityUtils {
 		}
 	}
 
-	// Adds part or all of y height above feet location, based on multiplier. Player height 1.8, player sneaking height 1.5
-	public static Location getHeightLocation(Entity entity, double heightMultiplier) {
-		return entity.getLocation().add(0, entity.getHeight() * heightMultiplier, 0);
+	public static boolean isSomeArrow(@NotNull Projectile projectile) {
+		return isSomeArrow(projectile.getType());
 	}
 
-	public static Location getHalfHeightLocation(Entity entity) {
-		return getHeightLocation(entity, 0.5);
-	}
-
-	// Player eye height 1.62 when not sneaking
-	public static Location getHalfEyeLocation(LivingEntity entity) {
-		return entity.getLocation().add(0, entity.getEyeHeight() / 2, 0);
+	public static boolean isSomeArrow(@NotNull EntityType entityType) {
+		// TippedArrow is deprecated
+		return (
+			entityType == EntityType.ARROW
+			|| entityType == EntityType.SPECTRAL_ARROW
+		);
 	}
 }

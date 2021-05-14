@@ -29,7 +29,7 @@ public class Bleeding implements BaseEnchantment {
 	}
 
 	@Override
-	public EnumSet<ItemSlot> validSlots() {
+	public EnumSet<ItemSlot> getValidSlots() {
 		return EnumSet.of(ItemSlot.MAINHAND);
 	}
 
@@ -48,6 +48,13 @@ public class Bleeding implements BaseEnchantment {
 	}
 
 	//Trident hit effect
+	/*
+	 * TODO: This needs some kind of better registration than expecting it to be called directly
+	 *
+	 * IF YOU COPY THIS YOU MUST PUT A CORRESPONDING CALL IN EntityDamageByEntityEvent !
+	 *
+	 * This works this way because you might have the enchantment when you fire the arrow, but switch to a different item before it hits
+	 */
 	public static void onShootAttack(Plugin plugin, Projectile proj, LivingEntity target, EntityDamageByEntityEvent event) {
 		if (proj.hasMetadata(LEVEL_METAKEY) && proj instanceof Trident && proj.getShooter() instanceof Player) {
 			int level = proj.getMetadata(LEVEL_METAKEY).get(0).asInt();

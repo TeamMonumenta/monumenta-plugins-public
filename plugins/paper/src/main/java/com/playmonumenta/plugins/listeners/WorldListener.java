@@ -174,14 +174,6 @@ public class WorldListener implements Listener {
 	// Block Dispense Armor Event
 	@EventHandler(priority = EventPriority.HIGH)
 	public void blockDispenseArmorEvent(BlockDispenseArmorEvent event) {
-		// Cancel dispensers equipping shattered armor to a player
-		if (ItemUtils.isItemShattered(event.getItem())) {
-			if (event.getTargetEntity() instanceof Player) {
-				MessagingUtils.sendActionBarMessage(mPlugin, (Player) event.getTargetEntity(), "Shattered items must be repaired before use");
-			}
-			event.setCancelled(true);
-			return;
-		}
 		if (event.getTargetEntity() instanceof Player) {
 			InventoryUtils.scheduleDelayedEquipmentCheck(mPlugin, (Player) event.getTargetEntity(), event);
 		}

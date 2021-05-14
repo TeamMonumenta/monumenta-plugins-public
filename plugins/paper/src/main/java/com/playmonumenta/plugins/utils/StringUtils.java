@@ -86,21 +86,7 @@ public class StringUtils {
 		return time;
 	}
 
-	public static String convertToInvisibleLoreLine(String s) {
-		StringBuilder hidden = new StringBuilder();
-		for (char c : s.toCharArray()) {
-			hidden.append("§");
-			hidden.append(c);
-		}
-		return hidden.toString();
-	}
-
-	public static String convertToVisibleLoreLine(String s) {
-		return s.replace("§", "");
-	}
-
 	public static String getAttributeName(Attribute attribute) {
-		//WARNING THIS IS GONNA NEED A CHANGE WHEN GOING 1.16 (attribute names should change)
 		switch (attribute) {
 			case GENERIC_ATTACK_SPEED:
 				return "generic.attackSpeed";

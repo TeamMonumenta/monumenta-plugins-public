@@ -1,9 +1,7 @@
 package com.playmonumenta.plugins.itemindex;
 
 import com.google.common.collect.Multimap;
-import com.playmonumenta.plugins.enchantments.Enchantment;
 import com.playmonumenta.plugins.utils.ItemUtils;
-import com.playmonumenta.plugins.utils.StringUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.attribute.Attribute;
@@ -19,7 +17,6 @@ import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.potion.PotionEffect;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -186,27 +183,27 @@ public class ItemStackParser {
 	}
 
 	private void parseEnchants() {
-		ArrayList<Enchantment> customEnchants = new ArrayList<>();
-		for (Enchantment ench : Enchantment.values()) {
-			if (ench.isBukkitEnchant()) {
-				this.mMonumentaItem.setEnchantLevel(ench, this.mItemStack.getEnchantmentLevel(ench.getBukkitEnchantment()));
-			} else {
-				customEnchants.add(ench);
-			}
-		}
-		for (String s : this.mItemStack.getItemMeta().getLore()) {
-			for (Enchantment ench : customEnchants) {
-				if (s.startsWith(ench.getReadableString())) {
-					int level = 1;
-					if (!ench.ignoresLevels()) {
-						String[] split = s.split(" ");
-						String roman = split[split.length - 1];
-						level = StringUtils.toArabic(roman);
-					}
-					this.mMonumentaItem.setEnchantLevel(ench, level);
-				}
-			}
-		}
+		// ArrayList<CustomEnchantment> customEnchants = new ArrayList<>();
+		// for (CustomEnchantment ench : CustomEnchantment.values()) {
+		// 	if (ench.isBukkitEnchantment()) {
+		// 		this.mMonumentaItem.setEnchantLevel(ench, this.mItemStack.getEnchantmentLevel(ench.getBukkitEnchantment()));
+		// 	} else {
+		// 		customEnchants.add(ench);
+		// 	}
+		// }
+		// for (String s : this.mItemStack.getItemMeta().getLore()) {
+		// 	for (CustomEnchantment ench : customEnchants) {
+		// 		if (s.startsWith(ench.getName())) {
+		// 			int level = 1;
+		// 			if (!ench.usesLevels()) {
+		// 				String[] split = s.split(" ");
+		// 				String roman = split[split.length - 1];
+		// 				level = StringUtils.toArabic(roman);
+		// 			}
+		// 			this.mMonumentaItem.setEnchantLevel(ench, level);
+		// 		}
+		// 	}
+		// }
 	}
 
 	private void parseLore() {

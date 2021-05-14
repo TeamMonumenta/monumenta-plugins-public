@@ -420,13 +420,13 @@ public class ItemOverrides {
 
 		BaseOverride override = mItems.get(block.getType());
 		if (override != null) {
-			eventCancelled |= !override.blockBreakInteraction(plugin, player, block, event);
+			eventCancelled = !override.blockBreakInteraction(plugin, player, block, event);
 		}
 
 		// Don't allow blocks to break if they're on the server's list of unbreakable blocks
 		if (!eventCancelled && player.getGameMode() != GameMode.CREATIVE &&
 		    ServerProperties.getUnbreakableBlocks().contains(block.getType())) {
-			eventCancelled |= true;
+			eventCancelled = true;
 		}
 
 		// NOTE: This is disabled because, while functionally nicer, players don't like it

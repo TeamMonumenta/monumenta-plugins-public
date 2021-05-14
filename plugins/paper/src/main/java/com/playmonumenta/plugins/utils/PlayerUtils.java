@@ -4,7 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.destroystokyo.paper.MaterialSetTag;
+import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.attributes.AttributeProjectileSpeed;
 import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.events.AbilityCastEvent;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
@@ -15,11 +17,13 @@ import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.attribute.Attribute;
+import org.bukkit.entity.AbstractArrow;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityRegainHealthEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.NotNull;
 
 
 
@@ -136,6 +140,20 @@ public class PlayerUtils {
 		return (
 			!playerInClimbable
 			&& !player.isOnGround()
+		);
+	}
+
+	// How far back the player drew their bow,
+	// vs what its max launch speed would be.
+	// Launch velocity used to calculate is specifically for PLAYERS shooting BOWS!
+	// Returns between 0 to 1, with 1 being full draw
+	public static double calculateBowDraw(@NotNull AbstractArrow arrowlike) {
+		double currentSpeed = arrowlike.getVelocity().length();
+		double maxLaunchSpeed = Constants.PLAYER_BOW_INITIAL_SPEED * AttributeProjectileSpeed.getProjectileSpeedModifier(arrowlike);
+
+		return Math.min(
+			1,
+			currentSpeed / maxLaunchSpeed
 		);
 	}
 }

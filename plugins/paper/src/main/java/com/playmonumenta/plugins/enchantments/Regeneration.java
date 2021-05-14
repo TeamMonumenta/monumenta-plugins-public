@@ -1,62 +1,55 @@
 package com.playmonumenta.plugins.enchantments;
 
 import java.util.EnumSet;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
-
-import org.bukkit.ChatColor;
-import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
-import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 
+import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
+
+
+
+// When there is Regeneration,
+// this class also handles Mainhand Regeneration effects.
+// When there is only Mainhand Regeneration,
+// that class works through using this class.
+// This is the "lead" class of the two.
 public class Regeneration implements BaseEnchantment {
-	private static String REGEN = ChatColor.GRAY + "Regeneration";
-	private static String MAINHAND_REGEN = ChatColor.GRAY + "Mainhand Regeneration";
-	private static final double BASE_HEAL_RATE = 1.0 / 3 / 4; // Divide by 4 because tick() triggers 4 times a second
+	// Level 1 heals 1 health total every 3s.
+	// Divide by 4 because tick() is called 4 times per second
+	private static final double TICK_HEALING_1 = 1d / 3 / 4;
 
-	private Map<UUID, Double> mRegenerationTracker = new HashMap<UUID, Double>();
-
-	/*
-	 * This is only used by the default get level from item implementation
-	 * It is garbage here because there's no way to express both Regeneration and Mainhand Regeneration
-	 */
 	@Override
-	public String getProperty() {
-		return "THIS IS A BUG";
+	public @NotNull String getProperty() {
+		return "Regeneration";
 	}
 
 	@Override
-	public int getLevelFromItem(ItemStack item, Player player, ItemSlot slot) {
-		if (slot.equals(ItemSlot.MAINHAND)) {
-			return InventoryUtils.getCustomEnchantLevel(item, MAINHAND_REGEN, useEnchantLevels());
-		} else {
-			return InventoryUtils.getCustomEnchantLevel(item, REGEN, useEnchantLevels());
-		}
+	public @NotNull EnumSet<ItemSlot> getValidSlots() {
+		return EnumSet.of(ItemSlot.OFFHAND, ItemSlot.ARMOR);
 	}
 
 	@Override
-	public EnumSet<ItemSlot> validSlots() {
-		return EnumSet.of(ItemSlot.MAINHAND, ItemSlot.ARMOR, ItemSlot.OFFHAND);
+	public void tick(
+		@NotNull Plugin plugin,
+		@NotNull Player player,
+		int level
+	) {
+		doHeal(
+			player,
+			level + plugin.mTrackingManager.mPlayers.getPlayerCustomEnchantLevel(
+				player,
+				MainhandRegeneration.class
+			)
+		);
 	}
 
-	// This seems to trigger 4 times a second despite BaseEnchantment claiming it triggers once a second
-	@Override
-	public void tick(Plugin plugin, Player player, int level) {
-		if (!mRegenerationTracker.containsKey(player.getUniqueId())) {
-			mRegenerationTracker.put(player.getUniqueId(), 0.0);
-		} else {
-			double newAmount = mRegenerationTracker.get(player.getUniqueId()) + BASE_HEAL_RATE * Math.sqrt(level);
-			if (newAmount >= 1) {
-				PlayerUtils.healPlayer(player, 1);
-				newAmount--;
-			}
-
-			mRegenerationTracker.put(player.getUniqueId(), newAmount);
-		}
+	public static void doHeal(@NotNull Player player, int level) {
+		PlayerUtils.healPlayer(
+			player,
+			TICK_HEALING_1 * Math.sqrt(level)
+		);
 	}
 }

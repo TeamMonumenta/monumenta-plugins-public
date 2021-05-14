@@ -9,7 +9,7 @@ import com.playmonumenta.plugins.classes.magic.MagicType;
 import com.playmonumenta.plugins.effects.AstralOmenBonusDamage;
 import com.playmonumenta.plugins.effects.AstralOmenStacks;
 import com.playmonumenta.plugins.effects.Effect;
-import com.playmonumenta.plugins.enchantments.SpellDamage;
+import com.playmonumenta.plugins.enchantments.abilities.SpellPower;
 import com.playmonumenta.plugins.events.CustomDamageEvent;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
@@ -98,7 +98,7 @@ public class AstralOmen extends Ability {
 
 		if (level >= STACK_THRESHOLD - 1) { // Adding 1 more stack would hit threshold, which removes all stacks anyway, so don't bother adding then removing
 			World world = target.getWorld();
-			float spellDamage = SpellDamage.getSpellDamage(mPlayer, DAMAGE);
+			float spellDamage = SpellPower.getSpellDamage(mPlayer, DAMAGE);
 			for (LivingEntity enemy : EntityUtils.getNearbyMobs(target.getLocation(), SIZE)) {
 				EntityUtils.damageEntity(mPlugin, enemy, spellDamage, mPlayer, MagicType.ARCANE, true, mInfo.mLinkedSpell, true, true, true);
 				if (mDoPull) {

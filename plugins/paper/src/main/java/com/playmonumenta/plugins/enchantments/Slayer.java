@@ -27,7 +27,7 @@ public class Slayer implements BaseEnchantment {
 	}
 
 	@Override
-	public EnumSet<ItemSlot> validSlots() {
+	public EnumSet<ItemSlot> getValidSlots() {
 		return EnumSet.of(ItemSlot.MAINHAND);
 	}
 
@@ -46,6 +46,13 @@ public class Slayer implements BaseEnchantment {
 		}
 	}
 
+	/*
+	 * TODO: This needs some kind of better registration than expecting it to be called directly
+	 *
+	 * IF YOU COPY THIS YOU MUST PUT A CORRESPONDING CALL IN EntityDamageByEntityEvent !
+	 *
+	 * This works this way because you might have the enchantment when you fire the arrow, but switch to a different item before it hits
+	 */
 	public static void onShootAttack(Plugin plugin, Projectile proj, LivingEntity target, EntityDamageByEntityEvent event) {
 		if (EntityUtils.isBeast(target)) {
 			if (proj.hasMetadata(LEVEL_METAKEY)) {

@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.abilities.other;
 
+import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 
 import org.bukkit.Particle;
@@ -16,7 +17,7 @@ public class PatronPurple extends PatronParticles {
 			player,
 			Particle.DRAGON_BREATH,
 			"ShinyPurple",
-			10
+			Constants.PATREON_TIER_3
 		);
 	}
 }

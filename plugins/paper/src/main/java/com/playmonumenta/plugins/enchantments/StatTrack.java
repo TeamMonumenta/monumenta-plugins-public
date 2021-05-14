@@ -27,13 +27,13 @@ public class StatTrack implements BaseEnchantment {
 	}
 
 	@Override
-	public boolean useEnchantLevels() {
+	public boolean isMultiLevel() {
 		return false;
 	}
 
 	//For now only mainhand, but could be refactored into all slots eventually
 	@Override
-	public EnumSet<ItemSlot> validSlots() {
+	public EnumSet<ItemSlot> getValidSlots() {
 		return EnumSet.of(ItemSlot.MAINHAND);
 	}
 

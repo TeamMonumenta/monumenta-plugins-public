@@ -10,11 +10,12 @@ import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.abilities.mage.ElementalArrows;
 import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.classes.magic.MagicType;
-import com.playmonumenta.plugins.enchantments.SpellDamage;
+import com.playmonumenta.plugins.enchantments.abilities.SpellPower;
 import com.playmonumenta.plugins.events.CustomDamageEvent;
 import com.playmonumenta.plugins.player.PartialParticle;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.LocationUtils;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -47,12 +48,12 @@ public class ElementalSpiritIce extends Ability {
 
 	private final int mLevelDamage;
 	private final double mLevelBowMultiplier;
-	@NotNull private final Set<LivingEntity> mEnemiesAffected = new HashSet<>();
+	private final @NotNull Set<LivingEntity> mEnemiesAffected = new HashSet<>();
 
-	@Nullable private ElementalArrows mElementalArrows;
-	@Nullable private BukkitTask mPlayerParticlesGenerator;
-	@Nullable private BukkitTask mEnemiesAffectedProcessor;
-	@Nullable private BukkitTask mSpiritPulser;
+	private @Nullable ElementalArrows mElementalArrows;
+	private @Nullable BukkitTask mPlayerParticlesGenerator;
+	private @Nullable BukkitTask mEnemiesAffectedProcessor;
+	private @Nullable BukkitTask mSpiritPulser;
 
 	public ElementalSpiritIce(Plugin plugin, Player player) {
 		/* NOTE
@@ -107,8 +108,8 @@ public class ElementalSpiritIce extends Ability {
 						if (closestEnemy != null) {
 							putOnCooldown();
 
-							@NotNull Location centre = EntityUtils.getHalfHeightLocation(closestEnemy);
-							float spellDamage = SpellDamage.getSpellDamage(mPlayer, mLevelDamage);
+							@NotNull Location centre = LocationUtils.getHalfHeightLocation(closestEnemy);
+							float spellDamage = SpellPower.getSpellDamage(mPlayer, mLevelDamage);
 							@NotNull World world = mPlayer.getWorld();
 							mSpiritPulser = new BukkitRunnable() {
 								int mPulses = 1; // The current pulse for this run
@@ -130,20 +131,17 @@ public class ElementalSpiritIce extends Ability {
 									}
 
 									// Ice spirit effects
-									new PartialParticle(
+									@NotNull PartialParticle partialParticle = new PartialParticle(
 										Particle.SNOWBALL,
 										centre,
 										150,
-										SIZE / 4.0,
+										PartialParticle.getWidthDelta(SIZE),
 										0.1
-									).spawn();
-									new PartialParticle(
-										Particle.FIREWORKS_SPARK,
-										centre,
-										30,
-										SIZE / 4.0,
-										0.1
-									).spawn();
+									).spawnAsPlayer(mPlayer);
+									//TODO falling dust
+									partialParticle.mParticle = Particle.FIREWORKS_SPARK;
+									partialParticle.mCount = 30;
+									partialParticle.spawnAsPlayer(mPlayer);
 									world.playSound(centre, Sound.ENTITY_TURTLE_HURT_BABY, 1, 0.2f);
 									world.playSound(centre, Sound.BLOCK_GLASS_BREAK, 0.5f, 0.05f);
 
@@ -185,7 +183,7 @@ public class ElementalSpiritIce extends Ability {
 
 					new PartialParticle(
 						Particle.SNOWBALL,
-						EntityUtils
+						LocationUtils
 							.getHalfHeightLocation(mPlayer)
 							.add(
 								FastUtils.cos(Math.toRadians(mRotationAngle)),
@@ -195,7 +193,7 @@ public class ElementalSpiritIce extends Ability {
 						3,
 						0,
 						0
-					).spawnHideable(mPlayer);
+					).spawnAsPlayer(mPlayer, true);
 				}
 			}.runTaskTimer(mPlugin, 0, 1);
 		}

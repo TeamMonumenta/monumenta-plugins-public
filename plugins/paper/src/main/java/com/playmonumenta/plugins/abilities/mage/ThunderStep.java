@@ -6,7 +6,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.classes.magic.MagicType;
-import com.playmonumenta.plugins.enchantments.SpellDamage;
+import com.playmonumenta.plugins.enchantments.abilities.SpellPower;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
@@ -97,7 +97,7 @@ public class ThunderStep extends Ability {
 	 * and we also mIgnoreCooldown above.
 	 * We run the actual cast condition and cooldown checks within this method,
 	 * and can always decide whether to cancel the event
-	*/
+	 */
 	@Override
 	public void playerSwapHandItemsEvent(PlayerSwapHandItemsEvent event) {
 		if (
@@ -115,7 +115,7 @@ public class ThunderStep extends Ability {
 				putOnCooldown();
 
 				Location playerStartLocation = mPlayer.getLocation();
-				float spellDamage = SpellDamage.getSpellDamage(mPlayer, mLevelDamage);
+				float spellDamage = SpellPower.getSpellDamage(mPlayer, mLevelDamage);
 				doDamage(playerStartLocation, spellDamage, false);
 
 				World world = mPlayer.getWorld();

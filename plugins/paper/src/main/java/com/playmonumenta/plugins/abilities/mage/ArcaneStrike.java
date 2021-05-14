@@ -19,7 +19,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.classes.magic.MagicType;
-import com.playmonumenta.plugins.enchantments.SpellDamage;
+import com.playmonumenta.plugins.enchantments.abilities.SpellPower;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
@@ -61,19 +61,17 @@ public class ArcaneStrike extends Ability {
 			LivingEntity damagee = (LivingEntity) event.getEntity();
 
 			for (LivingEntity mob : EntityUtils.getNearbyMobs(damagee.getLocation(), RADIUS, mPlayer)) {
-				float dmg = SpellDamage.getSpellDamage(mPlayer, mDamageBonus);
+				float dmg = SpellPower.getSpellDamage(mPlayer, mDamageBonus);
 
 				// Arcane Strike extra damage if on fire or slowed (but effect not applied this tick)
 				if (EntityUtils.isSlowed(mPlugin, mob) || ((mob.hasPotionEffect(PotionEffectType.SLOW)
 				     && !MetadataUtils.happenedThisTick(mPlugin, mob, Constants.ENTITY_SLOWED_NONCE_METAKEY, 0)))
 				    || (mob.getFireTicks() > 0
 				        && !MetadataUtils.happenedThisTick(mPlugin, mob, Constants.ENTITY_COMBUST_NONCE_METAKEY, 0))) {
-					dmg += SpellDamage.getSpellDamage(mPlayer, mDamageBonusAffected);
+					dmg += SpellPower.getSpellDamage(mPlayer, mDamageBonusAffected);
 				}
 
-				Vector velocity = mob.getVelocity();
-				EntityUtils.damageEntity(mPlugin, mob, dmg, mPlayer, MagicType.ARCANE, true, mInfo.mLinkedSpell, true, false);
-				mob.setVelocity(velocity);
+				EntityUtils.damageEntity(mPlugin, mob, dmg, mPlayer, MagicType.ARCANE, true, mInfo.mLinkedSpell, true, false, false, true);
 			}
 
 			Location locD = damagee.getLocation().add(0, 1, 0);

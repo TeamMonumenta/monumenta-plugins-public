@@ -8,6 +8,7 @@ import org.bukkit.event.entity.EntityRegainHealthEvent;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
+import com.playmonumenta.plugins.enchantments.curses.CurseOfAnemia;
 
 //Sustenance - Increases all healing by 10% for each level
 public class Sustenance implements BaseEnchantment {
@@ -19,7 +20,7 @@ public class Sustenance implements BaseEnchantment {
 	}
 
 	@Override
-	public EnumSet<ItemSlot> validSlots() {
+	public EnumSet<ItemSlot> getValidSlots() {
 		return EnumSet.of(ItemSlot.MAINHAND, ItemSlot.OFFHAND, ItemSlot.ARMOR);
 	}
 

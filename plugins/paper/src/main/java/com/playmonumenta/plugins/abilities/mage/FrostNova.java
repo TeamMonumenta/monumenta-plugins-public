@@ -5,7 +5,7 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.classes.magic.MagicType;
-import com.playmonumenta.plugins.enchantments.SpellDamage;
+import com.playmonumenta.plugins.enchantments.abilities.SpellPower;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
@@ -80,14 +80,14 @@ public class FrostNova extends Ability {
 	@Override
 	public void cast(Action action) {
 		putOnCooldown();
-		float damage = SpellDamage.getSpellDamage(mPlayer, mLevelDamage);
+		float damage = SpellPower.getSpellDamage(mPlayer, mLevelDamage);
 		for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), SIZE, mPlayer)) {
-			EntityUtils.damageEntity(mPlugin, mob, damage, mPlayer, MagicType.ICE, true, mInfo.mLinkedSpell, true, true, true, true);
 			if (EntityUtils.isElite(mob) || EntityUtils.isBoss(mob)) {
 				EntityUtils.applySlow(mPlugin, DURATION_TICKS, mLevelSlowMultiplier - REDUCTION_MULTIPLIER, mob);
 			} else {
 				EntityUtils.applySlow(mPlugin, DURATION_TICKS, mLevelSlowMultiplier, mob);
 			}
+			EntityUtils.damageEntity(mPlugin, mob, damage, mPlayer, MagicType.ICE, true, mInfo.mLinkedSpell, true, true, true, true);
 
 			if (mob.getFireTicks() > 1) {
 				mob.setFireTicks(1);

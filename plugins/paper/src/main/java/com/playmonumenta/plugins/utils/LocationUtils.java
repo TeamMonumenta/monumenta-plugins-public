@@ -34,6 +34,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.util.BlockIterator;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.NotNull;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
@@ -1140,6 +1141,28 @@ public class LocationUtils {
 
 		// Neither went too far nor got obstructed (this should not happen)
 		return false;
+	}
+
+	// Adds part or all of y height above feet location, based on multiplier. Player height 1.8, player sneaking height 1.5
+	public static @NotNull Location getHeightLocation(@NotNull Entity entity, double heightMultiplier) {
+		return entity.getLocation().add(0, entity.getHeight() * heightMultiplier, 0);
+	}
+
+	public static @NotNull Location getHalfHeightLocation(@NotNull Entity entity) {
+		return getHeightLocation(entity, 0.5);
+	}
+
+	// Player eye height 1.62 when not sneaking
+	public static @NotNull Location getHalfEyeLocation(@NotNull LivingEntity entity) {
+		return entity.getLocation().add(0, entity.getEyeHeight() / 2, 0);
+	}
+
+	public static @NotNull Location getLocationCentre(@NotNull Block block) {
+		return getLocationCentre(block.getLocation());
+	}
+
+	public static @NotNull Location getLocationCentre(@NotNull Location location) {
+		return location.add(0.5, 0.5, 0.5);
 	}
 
 

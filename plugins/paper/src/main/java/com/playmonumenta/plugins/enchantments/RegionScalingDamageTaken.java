@@ -27,17 +27,17 @@ public class RegionScalingDamageTaken implements BaseEnchantment {
 	}
 
 	@Override
-	public int getLevelFromItem(ItemStack item) {
-		return ServerProperties.getClassSpecializationsEnabled() ? 0 : BaseEnchantment.super.getLevelFromItem(item);
+	public int getPlayerItemLevel(ItemStack itemStack, Player player, ItemSlot itemSlot) {
+		return ServerProperties.getClassSpecializationsEnabled() ? 0 : BaseEnchantment.super.getPlayerItemLevel(itemStack, player, itemSlot);
 	}
 
 	@Override
-	public boolean useEnchantLevels() {
+	public boolean isMultiLevel() {
 		return false;
 	}
 
 	@Override
-	public EnumSet<ItemSlot> validSlots() {
+	public EnumSet<ItemSlot> getValidSlots() {
 		return EnumSet.of(ItemSlot.OFFHAND, ItemSlot.ARMOR);
 	}
 

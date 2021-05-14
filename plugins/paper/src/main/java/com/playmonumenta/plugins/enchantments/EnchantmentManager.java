@@ -36,6 +36,16 @@ import com.playmonumenta.plugins.abilities.warlock.CholericFlames.CholericFlames
 import com.playmonumenta.plugins.abilities.warrior.BruteForce.BruteForceDamageEnchantment;
 import com.playmonumenta.plugins.abilities.warrior.ShieldBash.ShieldBashCooldownEnchantment;
 import com.playmonumenta.plugins.abilities.warrior.ShieldBash.ShieldBashDamageEnchantment;
+import com.playmonumenta.plugins.enchantments.abilities.SpellPower;
+import com.playmonumenta.plugins.enchantments.curses.CurseOfAnemia;
+import com.playmonumenta.plugins.enchantments.curses.CurseOfCorruption;
+import com.playmonumenta.plugins.enchantments.curses.CurseOfCrippling;
+import com.playmonumenta.plugins.enchantments.curses.CurseOfEphemerality;
+import com.playmonumenta.plugins.enchantments.curses.CurseOfShrapnel;
+import com.playmonumenta.plugins.enchantments.curses.Starvation;
+import com.playmonumenta.plugins.enchantments.curses.TwoHanded;
+import com.playmonumenta.plugins.enchantments.other.ForbiddenItem;
+import com.playmonumenta.plugins.enchantments.other.PestilenceTesseract;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.ItemUtils;
 
@@ -51,7 +61,7 @@ public class EnchantmentManager implements Listener {
 		OFFHAND,
 		ARMOR, // Does NOT include offhand!
 		INVENTORY, // Includes everything, including armor, offhand, and hotbar
-		NONE,
+		NONE;
 	}
 
 	public static final List<BaseEnchantment> CROSS_REGION_PROPERTIES = Arrays.asList(
@@ -77,9 +87,9 @@ public class EnchantmentManager implements Listener {
 	 * Most items only apply to armor or mainhand, and we don't need to check every single item in the
 	 * player's inventory * against these properties every time the player's inventory changes
 	 */
-	private final Map<Class<? extends BaseEnchantment>, BaseEnchantment> mEnchantLocator = new HashMap<Class<? extends BaseEnchantment>, BaseEnchantment>();
-	private final Map<ItemSlot, List<BaseEnchantment>> mProperties = new EnumMap<ItemSlot, List<BaseEnchantment>>(ItemSlot.class);
-	private final List<BaseEnchantment> mSpawnedProperties = new ArrayList<BaseEnchantment>();
+	private final Map<Class<? extends BaseEnchantment>, BaseEnchantment> mEnchantLocator = new HashMap<>();
+	private final Map<ItemSlot, List<BaseEnchantment>> mProperties = new EnumMap<>(ItemSlot.class);
+	private final List<BaseSpawnableItemEnchantment> mSpawnedProperties = new ArrayList<>();
 	private final Plugin mPlugin;
 
 	public EnchantmentManager(Plugin plugin) {
@@ -90,14 +100,10 @@ public class EnchantmentManager implements Listener {
 		mProperties.clear();
 		mSpawnedProperties.clear();
 
-		final List<BaseEnchantment> init = new ArrayList<BaseEnchantment>();
+		final List<BaseEnchantment> init = new ArrayList<>();
 
-		// in order to add a new enchant to the manager, add it as an enum value in the Enchantment enum
-		for (Enchantment e : Enchantment.values()) {
-			// Don't double count regen; this is a crappy fix but the manager will be phased out soon anyways, so meh
-			if (e.isCustomEnchant() && e != Enchantment.MAINHAND_REGENERATION) {
-				init.add(e.getEnchantClass());
-			}
+		for (CustomEnchantment e : CustomEnchantment.values()) {
+			init.add(e.getEnchantment());
 		}
 
 		// Ability Enchantments
@@ -105,7 +111,7 @@ public class EnchantmentManager implements Listener {
 		//init.add(new ManaLanceDamageEnchantment());
 		init.add(new ManaLanceCooldownEnchantment());
 		init.add(new SpellshockDamageEnchantment());
-		init.add(new SpellDamage());
+		init.add(new SpellPower());
 		//init.add(new SpellshockRadiusEnchantment());
 
 		//Rogue
@@ -164,7 +170,7 @@ public class EnchantmentManager implements Listener {
 		/* Build the map of which slots have which properties */
 		for (BaseEnchantment property : init) {
 			mEnchantLocator.put(property.getClass(), property);
-			for (ItemSlot slot : property.validSlots()) {
+			for (ItemSlot slot : property.getValidSlots()) {
 				List<BaseEnchantment> slotList = mProperties.get(slot);
 				if (slotList == null) {
 					slotList = new ArrayList<BaseEnchantment>();
@@ -173,8 +179,8 @@ public class EnchantmentManager implements Listener {
 				mProperties.put(slot, slotList);
 			}
 
-			if (property.hasOnSpawn()) {
-				mSpawnedProperties.add(property);
+			if (property instanceof BaseSpawnableItemEnchantment) {
+				mSpawnedProperties.add((BaseSpawnableItemEnchantment)property);
 			}
 		}
 	}
@@ -233,7 +239,7 @@ public class EnchantmentManager implements Listener {
 					int newLevel = propertyMap.get(enchant.getKey()) - enchant.getValue();
 					propertyMap.remove(enchant.getKey());
 					enchant.getKey().removeProperty(plugin, player);
-					if (newLevel > 0 || (enchant.getKey().negativeLevelsAllowed() && newLevel < 0)) {
+					if (newLevel > 0 || (enchant.getKey().canNegativeLevel() && newLevel < 0)) {
 						propertyMap.put(enchant.getKey(), newLevel);
 						enchant.getKey().applyProperty(plugin, player, newLevel);
 					}
@@ -241,7 +247,7 @@ public class EnchantmentManager implements Listener {
 
 				//Clears stored custom enchants at that index in inventoryMap
 				inventoryMap.remove(index);
-				inventoryMap.put(index, new HashMap<BaseEnchantment, Integer>());
+				inventoryMap.put(index, new HashMap<>());
 			}
 
 			//If enum matches a slot (hand/armor), runs through those enchantments
@@ -261,7 +267,7 @@ public class EnchantmentManager implements Listener {
 		// Prevent mainhand custom enchants from registering for R2 items in R1
 		RegionScalingDamageDealt regionScaling = new RegionScalingDamageDealt();
 		if (slot == ItemSlot.MAINHAND && !ServerProperties.getClassSpecializationsEnabled()
-				&& regionScaling.getLevelFromItem(item, player) > 0) {
+				&& regionScaling.getPlayerItemLevel(item, player, slot) > 0) {
 			for (BaseEnchantment property : CROSS_REGION_PROPERTIES) {
 				updateItem(plugin, index, slot, item, player, property, propertyMap, inventoryMap);
 			}
@@ -283,8 +289,8 @@ public class EnchantmentManager implements Listener {
 	                               Player player, BaseEnchantment property,
 	                               Map<BaseEnchantment, Integer> propertyMap,
 	                               Map<Integer, Map<BaseEnchantment, Integer>> inventoryMap) {
-		int level = property.getLevelFromItem(item, player, slot);
-		if (level > 0 || (property.negativeLevelsAllowed() && level < 0)) {
+		int level = property.getPlayerItemLevel(item, player, slot);
+		if (level > 0 || (property.canNegativeLevel() && level < 0)) {
 			Integer currentLevel = propertyMap.get(property);
 			if (currentLevel != null) {
 				currentLevel += level;
@@ -329,8 +335,8 @@ public class EnchantmentManager implements Listener {
 								continue;
 							}
 
-							int level = property.getLevelFromItem(item, player, slot);
-							if (level > 0 || (property.negativeLevelsAllowed() && level < 0)) {
+							int level = property.getPlayerItemLevel(item, player, slot);
+							if (level > 0 || (property.canNegativeLevel() && level < 0)) {
 								Integer currentLevel = propertyMap.get(property);
 								if (currentLevel != null) {
 									currentLevel += level;
@@ -352,9 +358,9 @@ public class EnchantmentManager implements Listener {
 		if (item != null) {
 			ItemStack stack = item.getItemStack();
 			if (stack != null) {
-				for (BaseEnchantment property : mSpawnedProperties) {
-					int level = property.getLevelFromItem(stack);
-					if (level > 0 || (property.negativeLevelsAllowed() && level < 0)) {
+				for (BaseSpawnableItemEnchantment property : mSpawnedProperties) {
+					int level = property.getItemLevel(stack);
+					if (level > 0 || (property.canNegativeLevel() && level < 0)) {
 						property.onSpawn(mPlugin, item, level);
 					}
 				}

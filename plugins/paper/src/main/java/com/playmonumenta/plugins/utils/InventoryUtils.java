@@ -33,8 +33,8 @@ import net.kyori.adventure.text.format.NamedTextColor;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityManager;
-import com.playmonumenta.plugins.enchantments.CurseOfEphemerality;
-import com.playmonumenta.plugins.enchantments.TwoHanded;
+import com.playmonumenta.plugins.enchantments.curses.CurseOfEphemerality;
+import com.playmonumenta.plugins.enchantments.curses.TwoHanded;
 
 public class InventoryUtils {
 	private static int OFFHAND_SLOT = 40;
@@ -43,6 +43,7 @@ public class InventoryUtils {
 	private static int LEGGINGS_SLOT = 37;
 	private static int BOOTS_SLOT = 36;
 
+	//TODO Fix exploit where changing hotbar slots and then firing a projectile uses the old slot's attributes
 	public static void scheduleDelayedEquipmentCheck(final Plugin plugin, final Player player, final Event event) {
 		new BukkitRunnable() {
 			@Override
@@ -151,6 +152,7 @@ public class InventoryUtils {
 				if (useLevel) {
 					int offset = 1;
 					int level = 0;
+					// Does not account for L (50) or higher symbols, which some items have for non-custom enchants
 					while (true) {
 						final char c = loreEntry.charAt(loreEntry.length() - offset);
 						if (c == 'I') {

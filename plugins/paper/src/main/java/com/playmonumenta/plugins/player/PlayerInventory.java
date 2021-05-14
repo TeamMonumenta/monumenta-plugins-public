@@ -32,14 +32,16 @@ import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import net.kyori.adventure.text.Component;
 
 import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.enchantments.BaseAttribute;
+import com.playmonumenta.plugins.attributes.BaseAttribute;
 import com.playmonumenta.plugins.enchantments.BaseEnchantment;
-import com.playmonumenta.plugins.enchantments.Enchantment;
+import com.playmonumenta.plugins.enchantments.CustomEnchantment;
 import com.playmonumenta.plugins.events.CustomDamageEvent;
 import com.playmonumenta.plugins.events.EvasionEvent;
 import com.playmonumenta.plugins.listeners.ShulkerEquipmentListener;
@@ -59,9 +61,9 @@ public class PlayerInventory {
 	 * Needs to be ordered so that trigger orders are correct
 	 */
 
-	private Map<Integer, Map<BaseEnchantment, Integer>> mInventoryProperties = new LinkedHashMap<Integer, Map<BaseEnchantment, Integer>>();
-	private Map<BaseEnchantment, Integer> mCurrentProperties = new LinkedHashMap<BaseEnchantment, Integer>();
-	private Map<BaseEnchantment, Integer> mPreviousProperties = new LinkedHashMap<BaseEnchantment, Integer>();
+	private Map<Integer, Map<BaseEnchantment, Integer>> mInventoryProperties = new LinkedHashMap<>();
+	private Map<BaseEnchantment, Integer> mCurrentProperties = new LinkedHashMap<>();
+	private Map<BaseEnchantment, Integer> mPreviousProperties = new LinkedHashMap<>();
 
 	//Set true when player shift clicks items in inventory so it only runs after inventory is closed
 	private boolean mNeedsUpdate = false;
@@ -72,16 +74,30 @@ public class PlayerInventory {
 
 	public void tick(Plugin plugin, Player player) {
 		// Players in spectator do not have ticking effects
-		// TODO: Add vanish hook here also
+		// TODO Add vanish hook here also
 		if (player.getGameMode().equals(GameMode.SPECTATOR)) {
 			return;
 		}
 
-		for (Map.Entry<BaseEnchantment, Integer> iter : mCurrentProperties.entrySet()) {
-			BaseEnchantment property = iter.getKey();
-			Integer level = iter.getValue();
+		for (
+			@NotNull Map.Entry<@Nullable BaseEnchantment, @Nullable Integer> currentProperty
+				: mCurrentProperties.entrySet()
+		) {
+			//TODO room for refactoring?
+			// Below, args passed are Integer but param already is of type int (assumptions).
+			// BaseEnchantment could have its methods static,
+			// using .class to set ordering (similar to plans for null player Abilities),
+			// while creating BaseEnchant objects with int (not Integer) properties to store data?
+			@Nullable BaseEnchantment baseEnchantment = currentProperty.getKey();
+			@Nullable Integer level = currentProperty.getValue();
 
-			property.tick(plugin, player, level);
+			if (baseEnchantment != null) {
+				baseEnchantment.tick(
+					plugin,
+					player,
+					(level == null) ? 0 : level
+				);
+			}
 		}
 	}
 
@@ -91,12 +107,10 @@ public class PlayerInventory {
 	}
 
 	public void updateEquipmentProperties(Plugin plugin, Player player, Event event) {
-		// If the player transferred shards (join event), clear all properties and re-apply the relevant ones
+		// If the player transferred shards (join event), clear most types of custom enchants and re-apply the relevant ones
 		if (event instanceof PlayerJoinEvent) {
-			for (Enchantment e : Enchantment.values()) {
-				if (e.isCustomEnchant()) {
-					e.getEnchantClass().removeProperty(plugin, player);
-				}
+			for (CustomEnchantment e : CustomEnchantment.values()) {
+				e.getEnchantment().removeProperty(plugin, player);
 			}
 
 			for (Map.Entry<BaseEnchantment, Integer> iter : mCurrentProperties.entrySet()) {
@@ -163,18 +177,13 @@ public class PlayerInventory {
 				mNeedsUpdate = false;
 			}
 
-			// Swap current and previous lists
-			mPreviousProperties = new LinkedHashMap<BaseEnchantment, Integer>();
-			Map<BaseEnchantment, Integer> temp = mPreviousProperties;
-			mPreviousProperties = mCurrentProperties;
-			mCurrentProperties = temp;
-
 			for (int i = 0; i <= 40; i++) {
-				mInventoryProperties.put(i, new LinkedHashMap<BaseEnchantment, Integer>());
+				mInventoryProperties.put(i, new LinkedHashMap<>());
 			}
 
-			// Clear the current map and update it with current properties
-			mCurrentProperties.clear();
+			// Current properties becomes previous, update current properties
+			mPreviousProperties = mCurrentProperties;
+			mCurrentProperties = new LinkedHashMap<>();
 			try {
 				plugin.mEnchantmentManager.getItemProperties(mCurrentProperties, mInventoryProperties, player);
 			} catch (Exception e) {
@@ -215,7 +224,8 @@ public class PlayerInventory {
 		}
 
 		// Attributes
-		// Since they're parsed more efficiently than enchants (and this is temporary anyways), not worried about maximizing efficiency of every case
+		// Room for optimisation,
+		// see TODO above BaseEnchantment#negativeLevelsAllowed
 		if (event instanceof PlayerItemHeldEvent || event instanceof PlayerDropItemEvent) {
 			plugin.mAttributeManager.updateAttributeTrie(plugin, player, true);
 		} else {
@@ -392,13 +402,14 @@ public class PlayerInventory {
 	}
 
 	public int getEnchantmentLevel(Plugin plugin, Class<? extends BaseEnchantment> cls) {
-		BaseEnchantment enchant = plugin.mEnchantmentManager.getEnchantmentHandle(cls);
+		@Nullable BaseEnchantment enchant = plugin.mEnchantmentManager.getEnchantmentHandle(cls);
 		if (enchant != null && mCurrentProperties != null) {
-			Integer level = mCurrentProperties.get(enchant);
+			@Nullable Integer level = mCurrentProperties.get(enchant);
 			if (level != null) {
 				return level;
 			}
 		}
+
 		return 0;
 	}
 

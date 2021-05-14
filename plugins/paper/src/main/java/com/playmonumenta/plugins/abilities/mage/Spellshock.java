@@ -16,9 +16,9 @@ import com.playmonumenta.plugins.classes.magic.MagicType;
 import com.playmonumenta.plugins.effects.Effect;
 import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.effects.SpellShockStatic;
-import com.playmonumenta.plugins.enchantments.BaseAbilityEnchantment;
 import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
-import com.playmonumenta.plugins.enchantments.SpellDamage;
+import com.playmonumenta.plugins.enchantments.abilities.BaseAbilityEnchantment;
+import com.playmonumenta.plugins.enchantments.abilities.SpellPower;
 import com.playmonumenta.plugins.events.CustomDamageEvent;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
@@ -109,7 +109,7 @@ public class Spellshock extends Ability {
 
 				int radius = (int) SpellshockRadiusEnchantment.getRadius(mPlayer, SIZE, SpellshockRadiusEnchantment.class);
 				float damage = mLevelDamage + SpellshockDamageEnchantment.getExtraDamage(mPlayer, SpellshockDamageEnchantment.class);
-				damage = SpellDamage.getSpellDamage(mPlayer, damage);
+				damage = SpellPower.getSpellDamage(mPlayer, damage);
 				/*
 				 * Loop through triggeredMobs, and check distances to each in nearbyMobs. If in range,
 				 * deal damage. If the mob can be triggered, trigger it, adding it before the iteration
@@ -131,7 +131,6 @@ public class Spellshock extends Ability {
 							if (nearbyMob.getLocation().distanceSquared(triggeredMob.getLocation()) < (radius * radius)) {
 								// Only damage a mob once per tick
 								if (MetadataUtils.checkOnceThisTick(mPlugin, nearbyMob, DAMAGED_THIS_TICK_METAKEY)) {
-									Vector velocity = nearbyMob.getVelocity();
 									/*
 									 * We should probably call the CustomDamageEvent, but historically that's caused problems with
 									 * "passives" like SpellShock triggering all sorts of things it shouldn't be triggering. I
@@ -139,9 +138,10 @@ public class Spellshock extends Ability {
 									 * Overload has been reworked and there's a SpellShock specific parameter (which should also
 									 * probably be restructured and removed)), but I don't have the time currently to verify that
 									 * nothing explodes
+									 *
+									 * (registerEvent set to true instead of false below)
 									 */
-									EntityUtils.damageEntity(mPlugin, nearbyMob, damage, mPlayer, MagicType.ARCANE, false, mInfo.mLinkedSpell);
-									nearbyMob.setVelocity(velocity);
+									EntityUtils.damageEntity(mPlugin, nearbyMob, damage, mPlayer, MagicType.ARCANE, false, mInfo.mLinkedSpell, false, false, false, true);
 								}
 
 								NavigableSet<Effect> effectGroup = mPlugin.mEffectManager.getEffects(mob, SPELL_SHOCK_STATIC_EFFECT_NAME);

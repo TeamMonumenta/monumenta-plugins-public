@@ -22,12 +22,12 @@ public class Perspicacity implements BaseEnchantment {
 	}
 
 	@Override
-	public EnumSet<ItemSlot> validSlots() {
+	public EnumSet<ItemSlot> getValidSlots() {
 		return EnumSet.of(ItemSlot.MAINHAND, ItemSlot.OFFHAND, ItemSlot.ARMOR);
 	}
 
 	@Override
-	public void onAbility(Plugin plugin, Player player, Integer level, LivingEntity target, CustomDamageEvent event) {
+	public void onAbility(Plugin plugin, Player player, int level, LivingEntity target, CustomDamageEvent event) {
 		if (event.getSpell() == null) {
 			return;
 		}

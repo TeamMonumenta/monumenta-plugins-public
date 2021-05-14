@@ -5,7 +5,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.player.PartialParticle;
 import com.playmonumenta.plugins.player.PlayerData;
-import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 
 import org.bukkit.Particle;
@@ -16,9 +16,9 @@ import org.jetbrains.annotations.Nullable;
 
 
 public abstract class PatronParticles extends Ability {
-	@NotNull private final Particle mParticle;
-	@NotNull private final Object mParticleData;
-	@NotNull private final String mParticleObjectiveName;
+	private final @NotNull Particle mParticle;
+	private final @NotNull Object mParticleData;
+	private final @NotNull String mParticleObjectiveName;
 	private final int mMinimumPatreonScore;
 
 	// Skip particle data
@@ -44,17 +44,17 @@ public abstract class PatronParticles extends Ability {
 
 	@Override
 	public void periodicTrigger(boolean twoHertz, boolean oneSecond, int ticks) {
-		double width = mPlayer.getWidth() / 4;
+		double widthDelta = PartialParticle.getWidthDelta(mPlayer);
 		new PartialParticle(
 			mParticle,
-			EntityUtils.getHeightLocation(mPlayer, 0.25),
+			LocationUtils.getHeightLocation(mPlayer, 0.25),
 			Constants.QUARTER_TICKS_PER_SECOND,
-			width,
-			mPlayer.getHeight() / 8,
-			width,
+			widthDelta,
+			PartialParticle.getHeightDelta(mPlayer) / 2,
+			widthDelta,
 			0.01,
 			mParticleData
-		).spawnHideable(mPlayer);
+		).spawnAsPlayer(mPlayer, true);
 	}
 
 	// AbilityManager creates Ability objects in a specific order with player as null, just for reference.
@@ -69,7 +69,7 @@ public abstract class PatronParticles extends Ability {
 		int particleScore = ScoreboardUtils.getScoreboardValue(player, mParticleObjectiveName);
 		return (
 			particleScore > 0
-			&& new PlayerData(player).checkPatreonDollars() >= mMinimumPatreonScore
+			&& PlayerData.getPatreonDollars(player) >= mMinimumPatreonScore
 		);
 	}
 }

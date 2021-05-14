@@ -107,7 +107,7 @@ public class StatTrackItem extends GenericCommand {
 
 		//Check to see if the player is a patron
 		if (
-			new PlayerData(player).checkPatreonDollars() < StatTrackManager.PATRON_TIER
+			PlayerData.getPatreonDollars(player) < StatTrackManager.PATRON_TIER
 		) {
 			player.sendMessage("You must be an active $5 patron or higher to infuse items with stat tracking!");
 			return;

@@ -272,7 +272,8 @@ public abstract class Ability {
 		return false;
 	}
 
-	// Called by Plugin every 5 ticks (4Hz), same as BaseEnchantment.tick()
+	// Every 5 ticks - 4 times a second.
+	// Same rate as BaseEnchantment
 	public void periodicTrigger(boolean twoHertz, boolean oneSecond, int ticks) {
 
 	}

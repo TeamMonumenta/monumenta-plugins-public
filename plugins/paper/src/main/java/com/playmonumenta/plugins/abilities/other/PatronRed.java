@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.abilities.other;
 
+import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 
 import org.bukkit.Color;
@@ -18,7 +19,7 @@ public class PatronRed extends PatronParticles {
 			Particle.REDSTONE,
 			new Particle.DustOptions(Color.RED, 1f),
 			"ShinyRed",
-			30
+			Constants.PATREON_TIER_5
 		);
 	}
 }

@@ -31,7 +31,7 @@ public class Multitool implements BaseEnchantment {
 	}
 
 	@Override
-	public EnumSet<ItemSlot> validSlots() {
+	public EnumSet<ItemSlot> getValidSlots() {
 		return EnumSet.of(ItemSlot.MAINHAND);
 	}
 
@@ -49,7 +49,7 @@ public class Multitool implements BaseEnchantment {
 			}
 			// You can swap your itemslot in the same tick, the event will begin when you right click the multitool item
 			// and then perform actions on the swapped to item. Re-get the level for the item being changed to safeguard this.
-			level = this.getLevelFromItem(item);
+			level = this.getPlayerItemLevel(item, player, ItemSlot.MAINHAND);
 			if (level > 0) {
 				if (MetadataUtils.checkOnceThisTick(plugin, player, "MultitoolMutex")) {
 					String[] str = item.getType().toString().split("_");

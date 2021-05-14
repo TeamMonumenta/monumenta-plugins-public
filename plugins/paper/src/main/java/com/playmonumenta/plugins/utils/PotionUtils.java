@@ -8,7 +8,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.NavigableSet;
 
+import com.google.gson.JsonObject;
+import com.playmonumenta.plugins.Constants;
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.effects.Effect;
+import com.playmonumenta.plugins.events.PotionEffectApplyEvent;
+import com.playmonumenta.plugins.potion.PotionManager.PotionID;
+
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -19,13 +27,9 @@ import org.bukkit.potion.PotionData;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.potion.PotionType;
+import org.jetbrains.annotations.NotNull;
 
-import com.google.gson.JsonObject;
-import com.playmonumenta.plugins.Constants;
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.events.PotionEffectApplyEvent;
-import com.playmonumenta.plugins.potion.PotionManager.PotionID;
-import com.playmonumenta.plugins.effects.Effect;
+
 
 public class PotionUtils {
 	private static final int SECONDS_1 = 20;
@@ -323,9 +327,14 @@ public class PotionUtils {
 
 	public static void applyPotion(Entity applier, LivingEntity applied, PotionEffect effect) {
 		if (applied.hasPotionEffect(effect.getType())) {
-			if (applied.getPotionEffect(effect.getType()).getAmplifier() < effect.getAmplifier()
-			    || applied.getPotionEffect(effect.getType()).getAmplifier() == effect.getAmplifier()
-			    && applied.getPotionEffect(effect.getType()).getDuration() < effect.getDuration()) {
+			PotionEffect targetPotionEffect = applied.getPotionEffect(effect.getType());
+			if (
+				targetPotionEffect.getAmplifier() < effect.getAmplifier()
+				|| (
+					targetPotionEffect.getAmplifier() == effect.getAmplifier()
+					&& targetPotionEffect.getDuration() < effect.getDuration()
+				)
+			) {
 				PotionEffectApplyEvent event = new PotionEffectApplyEvent(applier, applied, effect);
 				Bukkit.getPluginManager().callEvent(event);
 				if (!event.isCancelled()) {
@@ -413,5 +422,17 @@ public class PotionUtils {
 		}
 
 		return isLuckPotion;
+	}
+
+	public static boolean isSomePotion(@NotNull ItemStack itemStack) {
+		return isSomePotion(itemStack.getType());
+	}
+
+	public static boolean isSomePotion(@NotNull Material material) {
+		return (
+			material == Material.POTION
+			|| material == Material.SPLASH_POTION
+			|| material == Material.LINGERING_POTION
+		);
 	}
 }

@@ -34,8 +34,13 @@ public class ThrowingKnife implements BaseEnchantment {
 	}
 
 	@Override
-	public EnumSet<ItemSlot> validSlots() {
+	public EnumSet<ItemSlot> getValidSlots() {
 		return EnumSet.of(ItemSlot.MAINHAND, ItemSlot.OFFHAND);
+	}
+
+	@Override
+	public boolean isMultiLevel() {
+		return false;
 	}
 
 	public static boolean isThrowingKnife(Arrow arrow) {

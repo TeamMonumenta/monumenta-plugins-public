@@ -3,6 +3,8 @@ package com.playmonumenta.plugins;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
+
+
 public class Constants {
 	public static final int TICKS_PER_SECOND = 20;
 	public static final int HALF_TICKS_PER_SECOND = (int)(TICKS_PER_SECOND / 2.0);
@@ -46,4 +48,58 @@ public class Constants {
 
 	// The max distance for spells that detected nearby damaged allies/enemies.
 	public static final double ABILITY_ENTITY_DAMAGE_BY_ENTITY_RADIUS = 15;
+
+	// NMS ItemBow:
+	// entityarrow.a(entityhuman, entityhuman.pitch, entityhuman.yaw, 0.0F, f * 3.0F, 1.0F);
+	public static final int PLAYER_BOW_INITIAL_SPEED = 3;
+	// NMS ItemCrossbow:
+	// return itemstack.getItem() == Items.CROSSBOW && a(itemstack, Items.FIREWORK_ROCKET) ? 1.6F : 3.15F;
+	public static final double PLAYER_CROSSBOW_ARROW_INITIAL_SPEED = 3.15;
+	public static final double PLAYER_CROSSBOW_ROCKET_INITIAL_SPEED = 1.6;
+	// NMS EntitySkeletonAbstract:
+	// entityarrow.shoot(d0, d1 + d3 * 0.20000000298023224D, d2, 1.6F, (float)(14 - this.world.getDifficulty().a() * 4));
+	public static final double SKELETON_SHOOT_INITIAL_SPEED = 1.6;
+	// NMS EntityPillager:
+	// this.a(this, entityliving, iprojectile, f, 1.6F);
+	public static final double PILLAGER_SHOOT_INITIAL_SPEED = 1.6;
+	// NMS EntityPiglin:
+	// this.a(this, var0, var2, var3, 1.6F);
+	public static final double PIGLIN_SHOOT_INITIAL_SPEED = 1.6;
+
+	// + Discord channel
+	// + In-game rank
+	// + Plots iron block
+	// + Castle head
+	public static final int PATREON_TIER_1 = 1;
+	// + White particles
+	// + Stat tracking
+	// + Shrine heads
+	// + Hope skins
+	public static final int PATREON_TIER_2 = 5;
+	// + 1 daily buff
+	// + Purple particles
+	// Plots iron → gold block
+	public static final int PATREON_TIER_3 = 10;
+	// 1 → 2 daily buffs
+	// + Green particles
+	public static final int PATREON_TIER_4 = 20;
+	// 2 → 3 daily buffs
+	// + Red particles
+	// Plots gold → diamond block
+	public static final int PATREON_TIER_5 = 30;
+
+	public static class Objectives {
+		// PartialParticle
+		public static final String PARTICLES_OWN_PASSIVE = "ParticlesOwnPassive";
+		public static final String PARTICLES_OWN_ACTIVE = "ParticlesOwnActive";
+		public static final String PARTICLES_OTHER_PASSIVE = "ParticlesOtherPassive";
+		public static final String PARTICLES_OTHER_ACTIVE = "ParticlesOtherActive";
+		public static final String PARTICLES_ENEMY = "ParticlesEnemy";
+		public static final String PARTICLES_BOSS = "ParticlesBoss";
+
+
+		// PlayerData
+		public static final String NO_SELF_PARTICLES = "noSelfParticles";
+		public static final String PATREON_DOLLARS = "Patreon";
+	}
 }

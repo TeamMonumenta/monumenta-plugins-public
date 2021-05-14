@@ -15,6 +15,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.jetbrains.annotations.Nullable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
@@ -194,7 +195,7 @@ public class YellowTesseractOverride extends BaseOverride {
 		int totalSkillsAdded = 0;
 		// Check Reference abilities for enabled skills
 		for (Ability reference : AbilityManager.getManager().getReferenceAbilities()) {
-			Integer level = targetSkills.get(reference.getDisplayName());
+			@Nullable Integer level = targetSkills.get(reference.getDisplayName());
 			if (level != null) {
 				ScoreboardUtils.setScoreboardValue(player, reference.getScoreboard(), level);
 				totalSkillsAdded += level;
@@ -203,7 +204,7 @@ public class YellowTesseractOverride extends BaseOverride {
 
 		// Check DisabledAbilities for disabled skills to be added (makes sure we get the spec skills even in R1)
 		for (Ability reference : AbilityManager.getManager().getDisabledAbilities()) {
-			Integer level = targetSkills.get(reference.getDisplayName());
+			@Nullable Integer level = targetSkills.get(reference.getDisplayName());
 			if (level != null) {
 				ScoreboardUtils.setScoreboardValue(player, reference.getScoreboard(), level);
 				totalSkillsAdded += level;
