@@ -586,6 +586,10 @@ public class ParrotGUI extends SinglePageGUI {
 
 	@Override
 	public void processClick(InventoryClickEvent event) {
+		if (event.isShiftClick()) {
+			return;
+		}
+
 		if (!mInventory.equals(event.getClickedInventory())) {
 			return;
 		}
@@ -611,7 +615,7 @@ public class ParrotGUI extends SinglePageGUI {
 				.append(Component.text(" Error! please contact a mod! fail with purchasing.", NamedTextColor.RED).decoration(TextDecoration.BOLD, false)));
 			}
 		} else {
-			whoClicked.sendMessage(Component.text("You don't have enought currency to pay for this item.", NamedTextColor.RED));
+			whoClicked.sendMessage(Component.text("You don't have enough currency to pay for this item.", NamedTextColor.RED));
 		}
 
 	}
