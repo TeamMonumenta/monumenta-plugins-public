@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -32,9 +33,10 @@ import org.bukkit.attribute.Attribute;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
 import org.bukkit.entity.Creature;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.entity.Projectile;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.EntityDeathEvent;
@@ -42,8 +44,6 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
-
-
 
 /*
  * Barrier of Flames - (Hard mode only) When the boss enters phase 2 he gains a shield of
@@ -100,6 +100,8 @@ public class HeadlessHorsemanBoss extends BossAbilityGroup {
 
 	public static final String identityTag = "boss_horseman";
 	public static final int detectionRange = 22;
+	public static final int arenaSize = 45;
+	public int mCooldownTicks = 10 * 20;
 
 	private final Location mSpawnLoc;
 	private final Location mEndLoc;
@@ -123,20 +125,44 @@ public class HeadlessHorsemanBoss extends BossAbilityGroup {
 		mEndLoc = endLoc;
 		mBoss.setRemoveWhenFarAway(false);
 
+		new BukkitRunnable() {
+			Creature mHorse = null;
+			@Override
+			public void run() {
+				if (!mBoss.isValid() || mBoss.isDead()) {
+					this.cancel();
+					return;
+				}
+				if (mHorse == null) {
+					List<Entity> findHorse = mBoss.getNearbyEntities(mBoss.getLocation().getX(), mBoss.getLocation().getY(), mBoss.getLocation().getZ());
+					for (Entity entity : findHorse) {
+						if (entity.getType() == EntityType.SKELETON_HORSE) {
+							mHorse = (Creature) entity;
+						}
+					}
+				} else {
+					List<Player> players = PlayerUtils.playersInRange(mSpawnLoc, detectionRange);
+					if (players != null && players.size() > 0) {
+						Collections.shuffle(players);
+						mHorse.setTarget(players.get(0));
+					}
+				}
+			}
+
+		}.runTaskTimer(mPlugin, 0, 15 * 20);
+
 		SpellManager phase1Spells = new SpellManager(Arrays.asList(
-				new SpellHellzoneGrenade(plugin, boss, mSpawnLoc, detectionRange, this),
-				new SpellBatBombs(plugin, boss, this),
-				//new SpellSinisterReach(plugin, boss, this),
-				new SpellBurningVengence(plugin, boss, this)
+				new SpellHellzoneGrenade(plugin, boss, mSpawnLoc, detectionRange, mCooldownTicks),
+				new SpellBatBombs(plugin, boss, mCooldownTicks, this),
+				new SpellBurningVengence(plugin, boss, mCooldownTicks, this)
 				));
 
 		SpellManager phase2Spells = new SpellManager(Arrays.asList(
-				new SpellHellzoneGrenade(plugin, boss, mSpawnLoc, detectionRange, this),
-				new SpellBatBombs(plugin, boss, this),
-				//new SpellSinisterReach(plugin, boss, this),
-				new SpellBurningVengence(plugin, boss, this),
-				new SpellHallowsEnd(plugin, boss, this),
-				new SpellReaperOfLife(plugin, boss, mSpawnLoc, detectionRange)
+				new SpellHellzoneGrenade(plugin, boss, mSpawnLoc, detectionRange, mCooldownTicks),
+				new SpellBatBombs(plugin, boss, mCooldownTicks, this),
+				new SpellBurningVengence(plugin, boss, mCooldownTicks, this),
+				new SpellHallowsEnd(plugin, boss, mCooldownTicks, this),
+				new SpellReaperOfLife(plugin, boss, mSpawnLoc, detectionRange, mCooldownTicks)
 				));
 
 		List<Spell> phase1Passives = Arrays.asList(
@@ -165,18 +191,25 @@ public class HeadlessHorsemanBoss extends BossAbilityGroup {
 		});
 
 		events.put(50, mBoss -> {
+			mCooldownTicks = 8 * 20;
 			changePhase(phase2Spells, phase2Passives, null);
-			PlayerUtils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"[The Horseman] \",\"color\":\"dark_red\"},{\"text\":\"Ha ha ha! I haven't felt this alive for what feels like eternity! \",\"color\":\"gold\"},{\"text\":\"We'll \",\"color\":\"dark_red\"},{\"text\":\"have to go all out.\",\"color\":\"gold\"}]");
+			PlayerUtils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"[The Horseman] \",\"color\":\"dark_red\"},{\"text\":\"Ha ha ha! I haven't felt this alive for what feels like eternity! \",\"color\":\"gold\"},{\"text\":\"We'll \",\"color\":\"dark_red\"},{\"text\":\"have to speed this up!.\",\"color\":\"gold\"}]");
 			forceCastSpell(SpellReaperOfLife.class);
 		});
 
+		events.put(30, mBoss -> {
+			mCooldownTicks = 5 * 20;
+			//to enforce the new cooldown
+			changePhase(phase2Spells, phase2Passives, null);
+			PlayerUtils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"[The Horseman] \",\"color\":\"dark_red\"},{\"text\":\"Let's speed this up just a bit more!\",\"color\":\"gold\"}]");
+		});
+
 		events.put(10, mBoss -> {
-			PlayerUtils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"[The Horseman] \",\"color\":\"dark_red\"},{\"text\":\"Meet your hallow end mortal!\",\"color\":\"gold\"}]");
+			PlayerUtils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"[The Horseman] \",\"color\":\"dark_red\"},{\"text\":\"Ready or not, here they come!\",\"color\":\"gold\"}]");
 			forceCastSpell(SpellHellzoneGrenade.class);
 		});
 
 		events.put(5, mBoss -> {
-			PlayerUtils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"[The Horseman] \",\"color\":\"dark_red\"},{\"text\":\"Meet your hallow end mortal!\",\"color\":\"gold\"}]");
 			forceCastSpell(SpellHellzoneGrenade.class);
 		});
 
@@ -189,34 +222,9 @@ public class HeadlessHorsemanBoss extends BossAbilityGroup {
 		return mSpawnLoc;
 	}
 
-	private boolean mAggro = true;
-
 	@Override
 	public void bossDamagedByEntity(EntityDamageByEntityEvent event) {
-		if (mAggro) {
-			mAggro = false;
-			new BukkitRunnable() {
 
-				@Override
-				public void run() {
-					mAggro = true;
-				}
-
-			}.runTaskLater(mPlugin, 20 * 6);
-
-			if (event.getDamager() instanceof Player) {
-				Player player = (Player) event.getDamager();
-
-				((Creature) mBoss).setTarget(player);
-			} else if (event.getDamager() instanceof Projectile) {
-				Projectile proj = (Projectile) event.getDamager();
-				if (proj.getShooter() instanceof Player) {
-					Player player = (Player) proj.getShooter();
-
-					((Creature) mBoss).setTarget(player);
-				}
-			}
-		}
 	}
 
 	@Override

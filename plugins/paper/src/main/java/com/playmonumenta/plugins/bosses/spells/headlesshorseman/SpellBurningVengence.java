@@ -34,11 +34,13 @@ public class SpellBurningVengence extends Spell {
 	private Plugin mPlugin;
 	private LivingEntity mBoss;
 	private HeadlessHorsemanBoss mHorseman;
+	private int mCooldownTicks;
 
-	public SpellBurningVengence(Plugin plugin, LivingEntity entity, HeadlessHorsemanBoss horseman) {
+	public SpellBurningVengence(Plugin plugin, LivingEntity entity, int cooldown, HeadlessHorsemanBoss horseman) {
 		mPlugin = plugin;
 		mBoss = entity;
 		mHorseman = horseman;
+		mCooldownTicks = cooldown;
 	}
 
 	@Override
@@ -125,6 +127,6 @@ public class SpellBurningVengence extends Spell {
 
 	@Override
 	public int cooldownTicks() {
-		return 20 * 10;
+		return mCooldownTicks;
 	}
 }

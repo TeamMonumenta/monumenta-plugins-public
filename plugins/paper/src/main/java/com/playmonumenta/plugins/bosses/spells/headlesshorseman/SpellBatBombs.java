@@ -31,11 +31,13 @@ public class SpellBatBombs extends Spell {
 	private Plugin mPlugin;
 	private LivingEntity mBoss;
 	private HeadlessHorsemanBoss mHorseman;
+	private int mCooldownTicks = 0;
 
-	public SpellBatBombs(Plugin plugin, LivingEntity entity, HeadlessHorsemanBoss horseman) {
+	public SpellBatBombs(Plugin plugin, LivingEntity entity, int cooldown, HeadlessHorsemanBoss horseman) {
 		mPlugin = plugin;
 		mBoss = entity;
 		mHorseman = horseman;
+		mCooldownTicks = cooldown;
 	}
 
 	public void spawnBat(Location loc) {
@@ -117,7 +119,7 @@ public class SpellBatBombs extends Spell {
 				}
 
 				world.spawnParticle(Particle.SMOKE_NORMAL, mLoc, 5, 0.4, .4, .4, 0.025);
-				if (mTicks >= 30) {
+				if (mTicks >= 50) {
 					this.cancel();
 					world.spawnParticle(Particle.FLAME, mBoss.getLocation().add(0, 1, 0), 5, 0.4, .4, .4, 0.125);
 					world.spawnParticle(Particle.SMOKE_LARGE, mBoss.getLocation().add(0, 1, 0), 20, 0.4, .4, .4, 0.09);
@@ -134,7 +136,7 @@ public class SpellBatBombs extends Spell {
 
 	@Override
 	public int cooldownTicks() {
-		return 20 * 10;
+		return mCooldownTicks;
 	}
 
 }

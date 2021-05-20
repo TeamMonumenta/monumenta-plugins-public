@@ -39,14 +39,14 @@ public class SpellHellzoneGrenade extends Spell {
 	private LivingEntity mBoss;
 	private double mRange;
 	private Location mCenter;
-	private HeadlessHorsemanBoss mHorseman;
+	private int mCooldownTicks;
 
-	public SpellHellzoneGrenade(Plugin plugin, LivingEntity entity, Location center, double range, HeadlessHorsemanBoss horseman) {
+	public SpellHellzoneGrenade(Plugin plugin, LivingEntity entity, Location center, double range, int cooldown) {
 		mPlugin = plugin;
 		mBoss = entity;
 		mRange = range;
 		mCenter = center;
-		mHorseman = horseman;
+		mCooldownTicks = cooldown;
 	}
 
 	@Override
@@ -132,7 +132,7 @@ public class SpellHellzoneGrenade extends Spell {
 
 								if (mTicks % 10 == 0) {
 									for (Player player : PlayerUtils.playersInRange(fallingBlock.getLocation(), 3)) {
-										if (mCenter.distance(player.getLocation()) < HeadlessHorsemanBoss.detectionRange && LocationUtils.hasLineOfSight(mBoss, player)) {
+										if (mCenter.distance(player.getLocation()) < HeadlessHorsemanBoss.arenaSize && LocationUtils.hasLineOfSight(mBoss, player)) {
 											/* Fire aura can not be blocked */
 											BossUtils.bossDamagePercent(mBoss, player, 0.1, (Location)null);
 											player.setFireTicks(20 * 3);
@@ -161,7 +161,7 @@ public class SpellHellzoneGrenade extends Spell {
 
 	@Override
 	public int cooldownTicks() {
-		return 20 * 10;
+		return mCooldownTicks;
 	}
 
 }

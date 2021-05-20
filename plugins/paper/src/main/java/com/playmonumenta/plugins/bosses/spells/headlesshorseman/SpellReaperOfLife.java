@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+import com.playmonumenta.plugins.bosses.bosses.HeadlessHorsemanBoss;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import com.playmonumenta.plugins.utils.BossUtils;
@@ -36,12 +37,14 @@ public class SpellReaperOfLife extends Spell {
 	private Location mCenter;
 	private Set<UUID> mSummoned = new HashSet<UUID>();
 	private Set<Player> mWarnedPlayers = new HashSet<Player>();
+	private int mCooldownTicks;
 
-	public SpellReaperOfLife(Plugin plugin, LivingEntity entity, Location center, double range) {
+	public SpellReaperOfLife(Plugin plugin, LivingEntity entity, Location center, double range, int cooldown) {
 		mPlugin = plugin;
 		mBoss = entity;
 		mRange = range;
 		mCenter = center;
+		mCooldownTicks = cooldown;
 	}
 
 	@Override
@@ -64,7 +67,7 @@ public class SpellReaperOfLife extends Spell {
 			world.spawnParticle(Particle.FLAME, fallingBlock.getLocation().add(0, fallingBlock.getHeight() / 2, 0), 3, 0.25, .25, .25, 0.025);
 			world.spawnParticle(Particle.SMOKE_NORMAL, fallingBlock.getLocation().add(0, fallingBlock.getHeight() / 2, 0), 2, 0.25, .25, .25, 0.025);
 			PlayerUtils.executeCommandOnNearbyPlayers(mCenter, range, "tellraw @s [{\"text\":\"[The Horseman] \",\"color\":\"dark_red\",\"bold\":\"false\",\"italic\":\"false\"},{\"text\":\"May your life force fuel \",\"color\":\"gold\"},{\"text\":\"our \",\"color\":\"dark_red\"},{\"text\":\"existence.\",\"color\":\"gold\"}]");
-			List<Player> players = PlayerUtils.playersInRange(mCenter, mRange);
+			List<Player> players = PlayerUtils.playersInRange(mCenter, HeadlessHorsemanBoss.arenaSize);
 			if (players.size() != 0) {
 				for (Player player : players) {
 					if (!mWarnedPlayers.contains(player)) {
@@ -174,7 +177,7 @@ public class SpellReaperOfLife extends Spell {
 
 	@Override
 	public int cooldownTicks() {
-		return 20 * 15;
+		return mCooldownTicks + (5 * 20);
 	}
 
 }

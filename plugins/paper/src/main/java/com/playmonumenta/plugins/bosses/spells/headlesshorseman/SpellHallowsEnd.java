@@ -33,14 +33,16 @@ public class SpellHallowsEnd extends Spell {
 	private LivingEntity mBoss;
 	private boolean mHit;
 	private boolean mCooldown;
+	private int mCooldownTicks;
 	private HeadlessHorsemanBoss mHorseman;
 
-	public SpellHallowsEnd(Plugin plugin, LivingEntity entity, HeadlessHorsemanBoss horseman) {
+	public SpellHallowsEnd(Plugin plugin, LivingEntity entity, int cooldown, HeadlessHorsemanBoss horseman) {
 		mPlugin = plugin;
 		mBoss = entity;
 		mHit = false;
 		mCooldown = false;
 		mHorseman = horseman;
+		mCooldownTicks = cooldown;
 	}
 
 	private void pillar(Location loc, boolean bounce) {
@@ -153,7 +155,7 @@ public class SpellHallowsEnd extends Spell {
 	@Override
 	public int cooldownTicks() {
 		// TODO Auto-generated method stub
-		return 20 * 12;
+		return mCooldownTicks;
 	}
 
 	@Override
