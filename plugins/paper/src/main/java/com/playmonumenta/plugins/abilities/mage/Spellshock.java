@@ -11,7 +11,7 @@ import java.util.Set;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.classes.Spells;
+import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.classes.magic.MagicType;
 import com.playmonumenta.plugins.effects.Effect;
 import com.playmonumenta.plugins.effects.PercentSpeed;
@@ -31,7 +31,6 @@ import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.util.Vector;
 
 
 
@@ -49,7 +48,7 @@ public class Spellshock extends Ability {
 	}
 
 	public static final String NAME = "Spellshock";
-	public static final Spells SPELL = Spells.SPELLSHOCK;
+	public static final ClassAbility ABILITY = ClassAbility.SPELLSHOCK;
 	public static final String DAMAGED_THIS_TICK_METAKEY = "SpellShockDamagedThisTick";
 	public static final String SPELL_SHOCK_STATIC_EFFECT_NAME = "SpellShockStaticEffect";
 	public static final String PERCENT_SPEED_EFFECT_NAME = "SpellShockPercentSpeedEffect";
@@ -64,7 +63,7 @@ public class Spellshock extends Ability {
 
 	public Spellshock(Plugin plugin, Player player) {
 		super(plugin, player, NAME);
-		mInfo.mLinkedSpell = SPELL;
+		mInfo.mLinkedSpell = ABILITY;
 
 		mInfo.mScoreboardId = "SpellShock";
 		mInfo.mShorthandName = "SS";

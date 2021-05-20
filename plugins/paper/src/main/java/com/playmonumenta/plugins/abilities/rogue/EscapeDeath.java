@@ -14,7 +14,7 @@ import org.bukkit.event.entity.EntityDamageEvent;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.classes.Spells;
+import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.utils.AbsorptionUtils;
@@ -35,7 +35,7 @@ public class EscapeDeath extends Ability {
 
 	public EscapeDeath(Plugin plugin, Player player) {
 		super(plugin, player, "Escape Death");
-		mInfo.mLinkedSpell = Spells.ESCAPE_DEATH;
+		mInfo.mLinkedSpell = ClassAbility.ESCAPE_DEATH;
 		mInfo.mScoreboardId = "EscapeDeath";
 		mInfo.mShorthandName = "ED";
 		mInfo.mDescriptions.add("When taking damage from a mob leaves you below 5 hearts, throw a paralyzing grenade that stuns all enemies within 5 blocks for 3 seconds. Cooldown: 90s.");

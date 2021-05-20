@@ -6,6 +6,11 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Queue;
 
+import com.playmonumenta.plugins.Constants;
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.utils.ItemUtils;
+
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -24,11 +29,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.util.Vector;
 
-import com.playmonumenta.plugins.Constants;
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.utils.InventoryUtils;
-import com.playmonumenta.plugins.utils.ItemUtils;
-import com.playmonumenta.plugins.utils.MessagingUtils;
+
 
 public class WorldListener implements Listener {
 	Plugin mPlugin;

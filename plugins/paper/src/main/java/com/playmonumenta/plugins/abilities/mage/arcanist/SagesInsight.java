@@ -13,7 +13,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.utils.MessagingUtils;
-import com.playmonumenta.plugins.classes.Spells;
+import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.events.AbilityCastEvent;
 import com.playmonumenta.plugins.events.CustomDamageEvent;
 import com.playmonumenta.plugins.effects.PercentSpeed;
@@ -32,10 +32,10 @@ public class SagesInsight extends Ability {
 	private static final Particle.DustOptions COLOR = new Particle.DustOptions(Color.fromRGB(222, 219, 36), 1.0f);
 
 	private final int mResetSize;
-	private Spells[] mResets;
+	private ClassAbility[] mResets;
 	private final double mSpeed;
 
-	private HashMap<Spells, Boolean> mStacksMap;
+	private HashMap<ClassAbility, Boolean> mStacksMap;
 
 	public SagesInsight(Plugin plugin, Player player) {
 		super(plugin, player, "Sage's Insight");
@@ -45,7 +45,7 @@ public class SagesInsight extends Ability {
 		mInfo.mDescriptions.add("Sage's Insight now grants 30% Speed and refreshes the cooldowns of your previous three spells upon activating.");
 		mInfo.mIgnoreTriggerCap = true;
 		mResetSize = getAbilityScore() == 1 ? ABILITIES_COUNT_1 : ABILITIES_COUNT_2;
-		mResets = new Spells[mResetSize];
+		mResets = new ClassAbility[mResetSize];
 		mSpeed = getAbilityScore() == 1 ? SPEED_1 : SPEED_2;
 		mStacksMap = new HashMap<>();
 	}
@@ -69,7 +69,7 @@ public class SagesInsight extends Ability {
 
 	@Override
 	public void playerDealtCustomDamageEvent(CustomDamageEvent event) {
-		Spells spell = event.getSpell();
+		ClassAbility spell = event.getSpell();
 		if (spell == null) {
 			return;
 		}
@@ -98,7 +98,7 @@ public class SagesInsight extends Ability {
 
 					mStacks = 0;
 					mArraySize = 0;
-					for (Spells s : mResets) {
+					for (ClassAbility s : mResets) {
 						mPlugin.mTimers.removeCooldown(mPlayer.getUniqueId(), s);
 					}
 				} else {
@@ -112,7 +112,7 @@ public class SagesInsight extends Ability {
 
 	@Override
 	public boolean abilityCastEvent(AbilityCastEvent event) {
-		Spells cast = event.getAbility();
+		ClassAbility cast = event.getAbility();
 		mStacksMap.put(cast, true);
 		mArraySize = Math.min(mArraySize + 1, mResetSize);
 		if (mArraySize == 0) {

@@ -21,7 +21,7 @@ import org.bukkit.util.Vector;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
-import com.playmonumenta.plugins.classes.Spells;
+import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.classes.magic.MagicType;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
@@ -47,7 +47,7 @@ public class DaggerThrow extends Ability {
 
 	public DaggerThrow(Plugin plugin, Player player) {
 		super(plugin, player, "Dagger Throw");
-		mInfo.mLinkedSpell = Spells.DAGGER_THROW;
+		mInfo.mLinkedSpell = ClassAbility.DAGGER_THROW;
 		mInfo.mScoreboardId = "DaggerThrow";
 		mInfo.mShorthandName = "DT";
 		mInfo.mDescriptions.add("Sneak left click while holding two swords to throw three daggers which deal 6 damage and gives each target 20% Vulnerability for 10 seconds. Cooldown: 15s.");

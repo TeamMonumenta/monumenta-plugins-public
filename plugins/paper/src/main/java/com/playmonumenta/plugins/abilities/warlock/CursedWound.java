@@ -1,5 +1,20 @@
 package com.playmonumenta.plugins.abilities.warlock;
 
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.abilities.AbilityManager;
+import com.playmonumenta.plugins.abilities.warlock.reaper.DarkPact;
+import com.playmonumenta.plugins.abilities.warlock.reaper.JudgementChain;
+import com.playmonumenta.plugins.abilities.warlock.reaper.VoodooBonds;
+import com.playmonumenta.plugins.abilities.warlock.tenebrist.HauntingShades;
+import com.playmonumenta.plugins.abilities.warlock.tenebrist.UmbralWail;
+import com.playmonumenta.plugins.abilities.warlock.tenebrist.WitheringGaze;
+import com.playmonumenta.plugins.events.CustomDamageEvent;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.utils.PotionUtils;
+
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -10,23 +25,10 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
-import org.bukkit.potion.PotionEffectType;
 import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.abilities.AbilityManager;
-import com.playmonumenta.plugins.abilities.warlock.reaper.DarkPact;
-import com.playmonumenta.plugins.abilities.warlock.reaper.JudgementChain;
-import com.playmonumenta.plugins.abilities.warlock.reaper.VoodooBonds;
-import com.playmonumenta.plugins.abilities.warlock.tenebrist.HauntingShades;
-import com.playmonumenta.plugins.abilities.warlock.tenebrist.WitheringGaze;
-import com.playmonumenta.plugins.abilities.warlock.tenebrist.UmbralWail;
-import com.playmonumenta.plugins.events.CustomDamageEvent;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.InventoryUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.plugins.utils.PotionUtils;
+
 
 public class CursedWound extends Ability {
 
@@ -42,9 +44,8 @@ public class CursedWound extends Ability {
 		super(plugin, player, "Cursed Wound");
 		mInfo.mScoreboardId = "CursedWound";
 		mInfo.mShorthandName = "CW";
-		mInfo.mDescriptions.add("Critical strikes with a scythe apply 6s of Wither II to all mobs within a 3 block radius of the hit mob. Additionally, for each skill on cooldown, melee attacks are increased by 0.5 damage, capped at +3.");
-		mInfo.mDescriptions.add("The damage cap is increased to +5, and critical strikes increase the duration of all debuffs applied to mobs in the radius by 2s.");
-
+		mInfo.mDescriptions.add("Attacking an enemy with a cooled down falling scythe attack passively afflicts it and all enemies in a 3-block cube around it with Wither 2 for 6s. Your melee attacks passively deal 0.5 more damage per ability on cooldown, capped at 3 damage.");
+		mInfo.mDescriptions.add("Cooled down falling attacks now also extend all enemies' debuffs by 2s. Damage cap is increased from 3 to 5.");
 	}
 
 	@Override
@@ -85,7 +86,7 @@ public class CursedWound extends Ability {
 				Bukkit.getPluginManager().callEvent(customDamageEvent);
 			}
 
-			if (PlayerUtils.isCritical(mPlayer)) {
+			if (PlayerUtils.isFallingAttack(mPlayer)) {
 				world.playSound(mPlayer.getLocation(), Sound.BLOCK_BELL_USE, 1.0f, 0.75f);
 				for (LivingEntity mob : EntityUtils.getNearbyMobs(damagee.getLocation(), CURSED_WOUND_RADIUS, mPlayer)) {
 					world.spawnParticle(Particle.FALLING_DUST, mob.getLocation().add(0, mob.getHeight() / 2, 0), 3,
@@ -126,5 +127,4 @@ public class CursedWound extends Ability {
 	public boolean runCheck() {
 		return InventoryUtils.isScytheItem(mPlayer.getInventory().getItemInMainHand());
 	}
-
 }

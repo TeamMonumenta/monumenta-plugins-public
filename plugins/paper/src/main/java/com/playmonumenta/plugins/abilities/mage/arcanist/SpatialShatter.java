@@ -5,16 +5,18 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityManager;
-import com.playmonumenta.plugins.classes.Spells;
+import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.classes.magic.MagicType;
 import com.playmonumenta.plugins.enchantments.abilities.SpellPower;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
+import com.playmonumenta.plugins.utils.StringUtils;
 
 import org.bukkit.Color;
 import org.bukkit.Location;
@@ -33,7 +35,7 @@ import org.bukkit.util.Vector;
 
 public class SpatialShatter extends Ability {
 	public static final String NAME = "Spatial Shatter";
-	public static final Spells SPELL = Spells.SPATIAL_SHATTER;
+	public static final ClassAbility ABILITY = ClassAbility.SPATIAL_SHATTER;
 	public static final Particle.DustOptions COLOR_BLUE = new Particle.DustOptions(Color.fromRGB(16, 144, 192), 1.0f);
 
 	public static final int DAMAGE_1 = 9;
@@ -41,17 +43,12 @@ public class SpatialShatter extends Ability {
 	public static final int SIZE = 4;
 	public static final int DISTANCE = 8;
 	public static final double REDUCTION_MULTIPLIER_1 = 0.15;
-	public static final int REDUCTION_PERCENTAGE_1 = (int)(REDUCTION_MULTIPLIER_1 * 100);
-	public static final double CAP_SECONDS_1 = 1.5;
-	public static final int CAP_TICKS_1 = (int)(CAP_SECONDS_1 * 20);
+	public static final int CAP_TICKS_1 = (int)(1.5 * Constants.TICKS_PER_SECOND);
 	public static final double REDUCTION_MULTIPLIER_2 = 0.2;
-	public static final int REDUCTION_PERCENTAGE_2 = (int)(REDUCTION_MULTIPLIER_2 * 100);
-	public static final int CAP_SECONDS_2 = 2;
-	public static final int CAP_TICKS_2 = CAP_SECONDS_2 * 20;
+	public static final int CAP_TICKS_2 = 2 * Constants.TICKS_PER_SECOND;
 	public static final float KNOCKBACK = 0.3f;
 	public static final double HITBOX = 0.55;
-	public static final int COOLDOWN_SECONDS = 6;
-	public static final int COOLDOWN_TICKS = COOLDOWN_SECONDS * 20;
+	public static final int COOLDOWN_TICKS = 6 * Constants.TICKS_PER_SECOND;
 
 	private final int mLevelDamage;
 	private final double mLevelReduction;
@@ -59,19 +56,19 @@ public class SpatialShatter extends Ability {
 
 	public SpatialShatter(Plugin plugin, Player player) {
 		super(plugin, player, NAME);
-		mInfo.mLinkedSpell = SPELL;
+		mInfo.mLinkedSpell = ABILITY;
 
 		mInfo.mScoreboardId = "SpatialShatter";
 		mInfo.mShorthandName = "SpSh";
 		mInfo.mDescriptions.add(
 			String.format(
-				"While holding a wand, pressing the swap key fires a burst of magic, instantly travelling up to %s blocks. If this projectile hits a solid block or enemy, it explodes, dealing %s damage to all enemies in a %s-block cube around it and reducing all your other skill cooldowns by %s%%, capped at %ss. Swapping hands while holding a wand no longer does its vanilla function. Cooldown: %ss.",
+				"While holding a wand, pressing the swap key fires a burst of magic, instantly travelling up to %s blocks. If this projectile hits a solid block or enemy, it explodes, dealing %s arcane damage to all enemies in a %s-block cube around it and reducing all your other skill cooldowns by %s%%, capped at %ss. Swapping hands while holding a wand no longer does its vanilla function. Cooldown: %ss.",
 				DISTANCE,
 				DAMAGE_1,
 				SIZE,
-				REDUCTION_PERCENTAGE_1,
-				CAP_SECONDS_1,
-				COOLDOWN_SECONDS
+				StringUtils.multiplierToPercentage(REDUCTION_MULTIPLIER_1),
+				StringUtils.ticksToSeconds(CAP_TICKS_1),
+				StringUtils.ticksToSeconds(COOLDOWN_TICKS)
 			)
 		);
 		mInfo.mDescriptions.add(
@@ -79,10 +76,10 @@ public class SpatialShatter extends Ability {
 				"Damage is increased from %s to %s. Cooldown reduction is increased from %s%% to %s%%, capped at %ss instead of %ss.",
 				DAMAGE_1,
 				DAMAGE_2,
-				REDUCTION_PERCENTAGE_1,
-				REDUCTION_PERCENTAGE_2,
-				CAP_SECONDS_2,
-				CAP_SECONDS_1
+				StringUtils.multiplierToPercentage(REDUCTION_MULTIPLIER_1),
+				StringUtils.multiplierToPercentage(REDUCTION_MULTIPLIER_2),
+				StringUtils.ticksToSeconds(CAP_TICKS_2),
+				StringUtils.ticksToSeconds(CAP_TICKS_1)
 			)
 		);
 		mInfo.mCooldown = COOLDOWN_TICKS;

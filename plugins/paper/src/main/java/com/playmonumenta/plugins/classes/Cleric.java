@@ -3,14 +3,14 @@ package com.playmonumenta.plugins.classes;
 import org.bukkit.entity.Player;
 
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.cleric.Celestial;
+import com.playmonumenta.plugins.abilities.cleric.CelestialBlessing;
 import com.playmonumenta.plugins.abilities.cleric.CleansingRain;
 import com.playmonumenta.plugins.abilities.cleric.DivineJustice;
 import com.playmonumenta.plugins.abilities.cleric.HandOfLight;
 import com.playmonumenta.plugins.abilities.cleric.HeavenlyBoon;
 import com.playmonumenta.plugins.abilities.cleric.Crusade;
 import com.playmonumenta.plugins.abilities.cleric.SacredProvisions;
-import com.playmonumenta.plugins.abilities.cleric.Sanctified;
+import com.playmonumenta.plugins.abilities.cleric.SanctifiedArmor;
 
 import com.playmonumenta.plugins.abilities.cleric.hierophant.EnchantedPrayer;
 import com.playmonumenta.plugins.abilities.cleric.hierophant.HallowedBeam;
@@ -26,14 +26,14 @@ import com.playmonumenta.plugins.abilities.cleric.paladin.LuminousInfusion;
 public class Cleric extends PlayerClass {
 
 	Cleric(Plugin plugin, Player player) {
-		mAbilities.add(new Celestial(plugin, player));
+		mAbilities.add(new CelestialBlessing(plugin, player));
 		mAbilities.add(new CleansingRain(plugin, player));
 		mAbilities.add(new DivineJustice(plugin, player));
 		mAbilities.add(new HandOfLight(plugin, player));
 		mAbilities.add(new HeavenlyBoon(plugin, player));
 		mAbilities.add(new Crusade(plugin, player));
 		mAbilities.add(new SacredProvisions(plugin, player));
-		mAbilities.add(new Sanctified(plugin, player));
+		mAbilities.add(new SanctifiedArmor(plugin, player));
 		mClass = 3;
 		mClassName = "Cleric";
 

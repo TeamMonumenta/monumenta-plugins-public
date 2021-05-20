@@ -15,7 +15,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
-import com.playmonumenta.plugins.classes.Spells;
+import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
@@ -31,7 +31,7 @@ public class EagleEye extends Ability {
 
 	public EagleEye(Plugin plugin, Player player) {
 		super(plugin, player, "Eagle Eye");
-		mInfo.mLinkedSpell = Spells.EAGLE_EYE;
+		mInfo.mLinkedSpell = ClassAbility.EAGLE_EYE;
 		mInfo.mScoreboardId = "Tinkering"; // lmao
 		mInfo.mShorthandName = "EE";
 		mInfo.mDescriptions.add("When you left-click while sneaking you reveal all enemies in a 20 block radius, giving them the glowing effect for 10 seconds. Affected enemies have 20% Vulnerability. If a mob under the effect of Eagle Eye dies the cooldown of Eagle Eye is reduced by 2 seconds. This skill can not be activated if you have a pickaxe in your mainhand. Cooldown: 24s.");
@@ -69,7 +69,7 @@ public class EagleEye extends Ability {
 				public void run() {
 					mTicks++;
 					if (mob.isDead() || !mob.isValid()) {
-						mPlugin.mTimers.updateCooldown(mPlayer, Spells.EAGLE_EYE, 20 * 2);
+						mPlugin.mTimers.updateCooldown(mPlayer, ClassAbility.EAGLE_EYE, 20 * 2);
 						this.cancel();
 					}
 					if (mTicks >= EAGLE_EYE_DURATION) {

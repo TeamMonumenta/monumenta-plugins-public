@@ -17,7 +17,7 @@ import org.bukkit.util.Vector;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityManager;
-import com.playmonumenta.plugins.classes.Spells;
+import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.classes.magic.MagicType;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
@@ -39,7 +39,7 @@ public class UnstableArrows extends Ability {
 
 	public UnstableArrows(Plugin plugin, Player player) {
 		super(plugin, player, "Unstable Arrows");
-		mInfo.mLinkedSpell = Spells.UNSTABLE_ARROWS;
+		mInfo.mLinkedSpell = ClassAbility.UNSTABLE_ARROWS;
 		mInfo.mScoreboardId = "BombArrow";
 		mInfo.mShorthandName = "UA";
 		mInfo.mDescriptions.add(" When you crouch and fire an arrow it will begin to hiss upon landing. 3s later it explodes, dealing 12 damage to mobs within a four block radius and spawning an Alchemist Potion at the location. Cooldown: 20 seconds. You can toggle whether the explosion will apply knockback to you or not in the P.E.B.");

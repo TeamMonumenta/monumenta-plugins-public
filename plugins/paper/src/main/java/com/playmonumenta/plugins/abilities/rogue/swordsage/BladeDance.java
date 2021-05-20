@@ -1,5 +1,15 @@
 package com.playmonumenta.plugins.abilities.rogue.swordsage;
 
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.abilities.AbilityTrigger;
+import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.classes.magic.MagicType;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.utils.MovementUtils;
+
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -8,22 +18,10 @@ import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.abilities.AbilityTrigger;
-import com.playmonumenta.plugins.classes.Spells;
-import com.playmonumenta.plugins.classes.magic.MagicType;
-import com.playmonumenta.plugins.potion.PotionManager.PotionID;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.FastUtils;
-import com.playmonumenta.plugins.utils.InventoryUtils;
-import com.playmonumenta.plugins.utils.MovementUtils;
-import com.playmonumenta.plugins.utils.PotionUtils;
+
 
 public class BladeDance extends Ability {
 
@@ -46,7 +44,7 @@ public class BladeDance extends Ability {
 		mInfo.mShorthandName = "BD";
 		mInfo.mDescriptions.add("When holding two swords, right-click while looking down to enter a defensive stance, parrying all attacks and becoming invulnerable for 0.75 seconds. Afterwards, unleash a powerful attack that deals 14 damage to and afflicts 40% Slowness and 50% Weaken to all enemies in a 4 block radius for 2 seconds. Cooldown: 16s.");
 		mInfo.mDescriptions.add("The area attack now deals 24 damage and afflicts 70% Weaken.");
-		mInfo.mLinkedSpell = Spells.BLADE_DANCE;
+		mInfo.mLinkedSpell = ClassAbility.BLADE_DANCE;
 		mInfo.mCooldown = COOLDOWN;
 		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
 		mWeakenAmp = getAbilityScore() == 1 ? WEAKEN_AMP_1 : WEAKEN_AMP_2;
@@ -61,7 +59,7 @@ public class BladeDance extends Ability {
 
 	@Override
 	public void cast(Action action) {
-		if (mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), Spells.BLADE_DANCE)
+		if (mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), ClassAbility.BLADE_DANCE)
 				|| mPlayer.getLocation().getPitch() < 50 || mPlayer.isSneaking()
 				|| !InventoryUtils.rogueTriggerCheck(mPlayer.getInventory().getItemInMainHand(), mPlayer.getInventory().getItemInOffHand())) {
 			return;

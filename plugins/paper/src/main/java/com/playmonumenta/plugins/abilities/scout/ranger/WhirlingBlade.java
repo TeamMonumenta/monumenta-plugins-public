@@ -18,7 +18,7 @@ import org.bukkit.util.Vector;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.MultipleChargeAbility;
-import com.playmonumenta.plugins.classes.Spells;
+import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.classes.magic.MagicType;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
@@ -48,7 +48,7 @@ public class WhirlingBlade extends MultipleChargeAbility {
 		mInfo.mShorthandName = "WB";
 		mInfo.mDescriptions.add("Use the swap key while holding a weapon to throw a whirling blade that circles around you, knocking back and dealing 10 damage to enemies it hits. Cooldown: 8s. Charges: 2.");
 		mInfo.mDescriptions.add("The damage is increased to 15 and the knockback is greatly increased.");
-		mInfo.mLinkedSpell = Spells.WHIRLING_BLADE;
+		mInfo.mLinkedSpell = ClassAbility.WHIRLING_BLADE;
 		mDamage = getAbilityScore() == 1 ? BLADE_1_DAMAGE : BLADE_2_DAMAGE;
 		mKnockback = getAbilityScore() == 1 ? BLADE_1_KNOCKBACK : BLADE_2_KNOCKBACK;
 		mInfo.mCooldown = getAbilityScore() == 1 ? BLADE_1_COOLDOWN : BLADE_2_COOLDOWN;

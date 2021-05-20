@@ -4,8 +4,10 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
+import com.playmonumenta.plugins.graves.GraveManager;
+import com.playmonumenta.plugins.server.properties.ServerProperties;
+
 import org.bukkit.ChatColor;
-import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ProxiedCommandSender;
 import org.bukkit.entity.Item;
@@ -19,13 +21,12 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 
-import com.playmonumenta.plugins.graves.GraveManager;
-import com.playmonumenta.plugins.server.properties.ServerProperties;
-
 import dev.jorel.commandapi.CommandAPI;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.CommandPermission;
 import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
+
+
 
 public class JunkItemListener implements Listener {
 	private static final String NO_JUNK_ITEMS_TAG = "NoJunkItemsPickup";

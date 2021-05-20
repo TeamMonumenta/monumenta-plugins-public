@@ -6,7 +6,7 @@ import java.util.NavigableSet;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityManager;
-import com.playmonumenta.plugins.classes.Spells;
+import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.effects.Aesthetics;
 import com.playmonumenta.plugins.effects.Effect;
 import com.playmonumenta.plugins.effects.PercentAttackSpeed;
@@ -60,7 +60,7 @@ public class DarkPact extends Ability {
 		mInfo.mDescriptions.add("Swapping while airborne and holding a scythe causes a dark aura to form around you. For the next 10 seconds, you gain 10% damage reduction, +10% attack speed, and deal +40% melee damage. Each kill during this time increases the duration of your aura by 1 second and gives 1 absorption health (capped at 6) for the duration of the aura. However, the player cannot heal for 10 seconds. Cooldown: 20s.");
 		mInfo.mDescriptions.add("You gain +20% attack speed and deal +100% melee damage, and Soul Rend bypasses the healing prevention, healing the player by +2/+4 HP, depending on the level of Soul Rend. Nearby players are still healed as normal.");
 		mInfo.mCooldown = COOLDOWN;
-		mInfo.mLinkedSpell = Spells.DARK_PACT;
+		mInfo.mLinkedSpell = ClassAbility.DARK_PACT;
 		mInfo.mIgnoreCooldown = true;
 		mPercentDamageDealt = getAbilityScore() == 1 ? PERCENT_DAMAGE_DEALT_1 : PERCENT_DAMAGE_DEALT_2;
 		mPercentAtks = getAbilityScore() == 1 ? PERCENT_ATKS_1 : PERCENT_ATKS_2;

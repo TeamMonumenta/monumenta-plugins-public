@@ -20,7 +20,7 @@ import org.bukkit.potion.PotionEffectType;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
-import com.playmonumenta.plugins.classes.Spells;
+import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 
@@ -34,7 +34,7 @@ public class Quickdraw extends Ability {
 
 	public Quickdraw(Plugin plugin, Player player) {
 		super(plugin, player, "Quickdraw");
-		mInfo.mLinkedSpell = Spells.QUICKDRAW;
+		mInfo.mLinkedSpell = ClassAbility.QUICKDRAW;
 		mInfo.mScoreboardId = "Quickdraw";
 		mInfo.mShorthandName = "Qd";
 		mInfo.mDescriptions.add("Left-clicking with a bow instantly fires a fully charged arrow with +1 Piercing that afflicts Slowness 2 for 2 seconds. Cooldown: 15s.");

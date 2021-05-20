@@ -8,7 +8,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.abilities.mage.ElementalArrows;
-import com.playmonumenta.plugins.classes.Spells;
+import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.classes.magic.MagicType;
 import com.playmonumenta.plugins.enchantments.abilities.SpellPower;
 import com.playmonumenta.plugins.events.CustomDamageEvent;
@@ -33,15 +33,13 @@ import org.jetbrains.annotations.Nullable;
 
 
 public class ElementalSpiritIce extends Ability {
-	@NotNull public static final Spells SPELL = Spells.ELEMENTAL_SPIRIT_ICE;
+	@NotNull public static final ClassAbility ABILITY = ClassAbility.ELEMENTAL_SPIRIT_ICE;
 
 	public static final int DAMAGE_1 = 4;
 	public static final int DAMAGE_2 = 6;
 	public static final int SIZE = 3;
 	public static final double BOW_MULTIPLIER_1 = 0.1;
-	public static final int BOW_PERCENTAGE_1 = (int)(BOW_MULTIPLIER_1 * 100);
 	public static final double BOW_MULTIPLIER_2 = 0.15;
-	public static final int BOW_PERCENTAGE_2 = (int)(BOW_MULTIPLIER_2 * 100);
 	public static final int PULSE_INTERVAL = Constants.TICKS_PER_SECOND;
 	public static final int PULSES = 3;
 	public static final int COOLDOWN_TICKS = ElementalSpiritFire.COOLDOWN_TICKS;
@@ -61,7 +59,7 @@ public class ElementalSpiritIce extends Ability {
 		 * This variant also does not have a description
 		 */
 		super(plugin, player, null);
-		mInfo.mLinkedSpell = SPELL;
+		mInfo.mLinkedSpell = ABILITY;
 
 		mInfo.mScoreboardId = "ElementalSpirit";
 		mInfo.mCooldown = COOLDOWN_TICKS;
@@ -81,7 +79,7 @@ public class ElementalSpiritIce extends Ability {
 	public void playerDealtCustomDamageEvent(CustomDamageEvent event) {
 		if (
 			event.getMagicType() == MagicType.ICE
-			&& event.getSpell() != null && !event.getSpell().equals(SPELL)
+			&& event.getSpell() != ABILITY
 		) {
 			mEnemiesAffected.add(event.getDamaged());
 			if (mEnemiesAffectedProcessor == null) {
@@ -120,13 +118,13 @@ public class ElementalSpiritIce extends Ability {
 									for (LivingEntity mob : EntityUtils.getNearbyMobs(centre, SIZE)) {
 										float finalDamage = spellDamage;
 										if (
-											event.getSpell().equals(Spells.ELEMENTAL_ARROWS)
+											event.getSpell() == ClassAbility.ELEMENTAL_ARROWS
 											&& mElementalArrows != null
 										) {
 											finalDamage += mElementalArrows.getLastDamage() * mLevelBowMultiplier;
 										}
 
-										EntityUtils.damageEntity(mPlugin, mob, finalDamage, mPlayer, MagicType.ICE, true, SPELL, true, true, true);
+										EntityUtils.damageEntity(mPlugin, mob, finalDamage, mPlayer, MagicType.ICE, true, ABILITY, true, true, true);
 										mob.setVelocity(new Vector()); // Wipe velocity, extreme local climate
 									}
 
@@ -169,7 +167,7 @@ public class ElementalSpiritIce extends Ability {
 				@Override
 				public void run() {
 					if (
-						isTimerActive(SPELL)
+						isTimerActive(ABILITY)
 						|| !mPlayer.isValid() // Ensure player is not dead, is still online?
 					) {
 						this.cancel();

@@ -11,6 +11,7 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 
 import org.bukkit.Color;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -132,9 +133,10 @@ public class Frost implements BaseEnchantment {
 			partialParticle.spawnAsEnemy();
 
 			@NotNull World world = enemy.getWorld();
+			@NotNull Location enemyLocation = enemy.getLocation();
 			// /playsound block.soul_sand.place master @p ~ ~ ~ 1 0.5
 			world.playSound(
-				enemy.getLocation(),
+				enemyLocation,
 				Sound.BLOCK_SOUL_SAND_PLACE,
 				SoundCategory.PLAYERS,
 				1f,
@@ -142,7 +144,7 @@ public class Frost implements BaseEnchantment {
 			);
 			// /playsound block.glass.break master @p ~ ~ ~ 0.75 1.1
 			world.playSound(
-				enemy.getLocation(),
+				enemyLocation,
 				Sound.BLOCK_GLASS_BREAK,
 				SoundCategory.PLAYERS,
 				0.75f,
@@ -150,7 +152,7 @@ public class Frost implements BaseEnchantment {
 			);
 			// /playsound block.glass.break master @p ~ ~ ~ 0.5 1.3
 			world.playSound(
-				enemy.getLocation(),
+				enemyLocation,
 				Sound.BLOCK_GLASS_BREAK,
 				SoundCategory.PLAYERS,
 				0.5f,

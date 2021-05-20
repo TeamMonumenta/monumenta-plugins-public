@@ -2,6 +2,17 @@ package com.playmonumenta.plugins.abilities.rogue;
 
 import java.util.EnumSet;
 
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
+import com.playmonumenta.plugins.enchantments.abilities.BaseAbilityEnchantment;
+import com.playmonumenta.plugins.potion.PotionManager.PotionID;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.utils.MovementUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
+
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -14,16 +25,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.classes.Spells;
-import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
-import com.playmonumenta.plugins.enchantments.abilities.BaseAbilityEnchantment;
-import com.playmonumenta.plugins.potion.PotionManager.PotionID;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.InventoryUtils;
-import com.playmonumenta.plugins.utils.MovementUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
+
 
 public class ByMyBlade extends Ability {
 
@@ -62,11 +64,11 @@ public class ByMyBlade extends Ability {
 
 	public ByMyBlade(Plugin plugin, Player player) {
 		super(plugin, player, "By My Blade");
-		mInfo.mLinkedSpell = Spells.BY_MY_BLADE;
+		mInfo.mLinkedSpell = ClassAbility.BY_MY_BLADE;
 		mInfo.mScoreboardId = "ByMyBlade";
 		mInfo.mShorthandName = "BmB";
-		mInfo.mDescriptions.add("While holding two swords, your next critical strike grants Haste II for 4 seconds and deals 12 additional damage. Cooldown: 10s.");
-		mInfo.mDescriptions.add("This buff is increased to Haste IV and critical strikes deal 24 additional damage instead.");
+		mInfo.mDescriptions.add("While holding two swords, attacking an enemy with a cooled down falling attack deals 12 more damage, and grants you Haste 2 for 4s. Cooldown: 10s.");
+		mInfo.mDescriptions.add("Damage is increased from 12 to 24. Haste level is increased from 2 to 4.");
 		mInfo.mCooldown = BY_MY_BLADE_COOLDOWN;
 		mDamageBonus = getAbilityScore() == 1 ? BY_MY_BLADE_1_DAMAGE : BY_MY_BLADE_2_DAMAGE;
 	}
@@ -117,12 +119,11 @@ public class ByMyBlade extends Ability {
 
 	@Override
 	public boolean runCheck() {
-		if (PlayerUtils.isCritical(mPlayer)) {
+		if (PlayerUtils.isFallingAttack(mPlayer)) {
 			ItemStack mainHand = mPlayer.getInventory().getItemInMainHand();
 			ItemStack offHand = mPlayer.getInventory().getItemInOffHand();
 			return InventoryUtils.rogueTriggerCheck(mainHand, offHand);
 		}
 		return false;
 	}
-
 }

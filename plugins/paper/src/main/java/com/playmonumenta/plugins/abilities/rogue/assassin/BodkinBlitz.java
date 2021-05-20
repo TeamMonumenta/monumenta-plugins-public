@@ -21,7 +21,7 @@ import org.bukkit.util.Vector;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.MultipleChargeAbility;
-import com.playmonumenta.plugins.classes.Spells;
+import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
@@ -49,7 +49,7 @@ public class BodkinBlitz extends MultipleChargeAbility {
 
 	public BodkinBlitz(Plugin plugin, Player player) {
 		super(plugin, player, "Bodkin Blitz", BODKINBLITZ_MAX_CHARGES, BODKINBLITZ_MAX_CHARGES);
-		mInfo.mLinkedSpell = Spells.BODKIN_BLITZ;
+		mInfo.mLinkedSpell = ClassAbility.BODKIN_BLITZ;
 		mInfo.mScoreboardId = "BodkinBlitz";
 		mInfo.mShorthandName = "BB";
 		mInfo.mDescriptions.add("Sneak right click while holding two swords to teleport 10 blocks forwards. Gain 1 second of Stealth upon teleporting. Upon teleporting, your next melee attack deals 10 bonus damage if your target is not focused on you. This ability cannot be used in safe zones. Cooldown: 20s. Charges: 2.");

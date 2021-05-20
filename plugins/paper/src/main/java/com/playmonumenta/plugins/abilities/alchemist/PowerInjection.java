@@ -18,7 +18,7 @@ import org.bukkit.util.Vector;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
-import com.playmonumenta.plugins.classes.Spells;
+import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.effects.FlatDamageDealt;
 import com.playmonumenta.plugins.effects.PercentDamageDealt;
 import com.playmonumenta.plugins.effects.PercentSpeed;
@@ -53,7 +53,7 @@ public class PowerInjection extends Ability {
 
 	public PowerInjection(Plugin plugin, Player player) {
 		super(plugin, player, "Power Injection");
-		mInfo.mLinkedSpell = Spells.POWER_INJECTION;
+		mInfo.mLinkedSpell = ClassAbility.POWER_INJECTION;
 		mInfo.mScoreboardId = "PowerInjection";
 		mInfo.mShorthandName = "PI";
 		mInfo.mDescriptions.add("Left-clicking while holding an Alchemist Potion gives you +15% speed, +1 melee damage, and +15% melee damage for 15 seconds. If you were looking at another player, also give that player the effects. Cooldown: 30s.");

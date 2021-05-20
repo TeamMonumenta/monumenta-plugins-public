@@ -5,12 +5,11 @@ import java.util.EnumSet;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.classes.Spells;
+import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
 import com.playmonumenta.plugins.enchantments.abilities.BaseAbilityEnchantment;
-import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.effects.PercentSpeed;
 
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -26,9 +25,9 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.PotionSplashEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.potion.PotionData;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 import org.bukkit.potion.PotionType;
+
+
 
 public class Dodging extends Ability {
 
@@ -66,7 +65,7 @@ public class Dodging extends Ability {
 
 	public Dodging(Plugin plugin, Player player) {
 		super(plugin, player, "Dodging");
-		mInfo.mLinkedSpell = Spells.DODGING;
+		mInfo.mLinkedSpell = ClassAbility.DODGING;
 		mInfo.mScoreboardId = "Dodging";
 		mInfo.mShorthandName = "Dg";
 		mInfo.mDescriptions.add("Blocks an arrow or blaze fireball that would have hit you. Cooldown: 12s.");

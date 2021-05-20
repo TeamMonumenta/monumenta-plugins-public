@@ -2,6 +2,16 @@ package com.playmonumenta.plugins.abilities.warlock;
 
 import java.util.NavigableSet;
 
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.abilities.AbilityManager;
+import com.playmonumenta.plugins.abilities.warlock.reaper.DarkPact;
+import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.effects.Effect;
+import com.playmonumenta.plugins.effects.PercentHeal;
+import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
+
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -11,15 +21,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.abilities.warlock.reaper.DarkPact;
-import com.playmonumenta.plugins.classes.Spells;
-import com.playmonumenta.plugins.utils.InventoryUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.plugins.abilities.AbilityManager;
-import com.playmonumenta.plugins.effects.Effect;
-import com.playmonumenta.plugins.effects.PercentHeal;
+
 
 public class SoulRend extends Ability {
 
@@ -37,9 +39,9 @@ public class SoulRend extends Ability {
 		super(plugin, player, "Soul Rend");
 		mInfo.mScoreboardId = "SoulRend";
 		mInfo.mShorthandName = "SR";
-		mInfo.mDescriptions.add("Getting a critical hit with a scythe heals you for 2 hp + 20% of the damage dealt, capped at 10 HP. Cooldown: 6s.");
-		mInfo.mDescriptions.add("The healing increases to 4 hp + 20% of the damage dealt and nearby allies are healed as well.");
-		mInfo.mLinkedSpell = Spells.SOUL_REND;
+		mInfo.mDescriptions.add("Attacking an enemy with a cooled down falling scythe attack heals you for 2 health and 20% of the melee damage dealt, capped at 10 total health. Cooldown: 6s.");
+		mInfo.mDescriptions.add("Players within 7 blocks of you are now also healed. Flat healing is increased from 2 to 4 health.");
+		mInfo.mLinkedSpell = ClassAbility.SOUL_REND;
 		mInfo.mCooldown = COOLDOWN;
 		mHeal = getAbilityScore() == 1 ? HEAL_1 : HEAL_2;
 		Bukkit.getScheduler().runTask(plugin, () -> {
@@ -108,7 +110,6 @@ public class SoulRend extends Ability {
 
 	@Override
 	public boolean runCheck() {
-		return PlayerUtils.isCritical(mPlayer) && InventoryUtils.isScytheItem(mPlayer.getInventory().getItemInMainHand());
+		return PlayerUtils.isFallingAttack(mPlayer) && InventoryUtils.isScytheItem(mPlayer.getInventory().getItemInMainHand());
 	}
-
 }

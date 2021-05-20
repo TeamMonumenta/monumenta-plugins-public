@@ -4,7 +4,20 @@ import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.List;
 
-import org.bukkit.Bukkit;
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.abilities.AbilityTrigger;
+import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.classes.magic.MagicType;
+import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
+import com.playmonumenta.plugins.enchantments.Inferno;
+import com.playmonumenta.plugins.enchantments.abilities.BaseAbilityEnchantment;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.utils.MovementUtils;
+import com.playmonumenta.plugins.utils.VectorUtils;
+
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -17,20 +30,7 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.abilities.AbilityManager;
-import com.playmonumenta.plugins.abilities.AbilityTrigger;
-import com.playmonumenta.plugins.classes.Spells;
-import com.playmonumenta.plugins.classes.magic.MagicType;
-import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
-import com.playmonumenta.plugins.enchantments.abilities.BaseAbilityEnchantment;
-import com.playmonumenta.plugins.enchantments.Inferno;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.FastUtils;
-import com.playmonumenta.plugins.utils.InventoryUtils;
-import com.playmonumenta.plugins.utils.MovementUtils;
-import com.playmonumenta.plugins.utils.VectorUtils;
+
 
 public class AmplifyingHex extends Ability {
 	public static class AmplifyingHexDamageEnchantment extends BaseAbilityEnchantment {
@@ -76,7 +76,7 @@ public class AmplifyingHex extends Ability {
 		mInfo.mShorthandName = "AH";
 		mInfo.mDescriptions.add("Left-click while sneaking with a scythe to fire a magic cone up to 8 blocks in front of you, dealing 5 damage to each enemy per debuff (potion effects like Weakness or Wither, as well as Fire and custom effects like Bleed) they have, and an extra +1 damage per extra level of debuff, capped at 2 extra levels. 10% Slowness, Weaken, etc. count as one level. Cooldown: 10s.");
 		mInfo.mDescriptions.add("The damage is increased to 6.5 damage per debuff, and extra damage increased to +2 per extra level.");
-		mInfo.mLinkedSpell = Spells.AMPLIFYING;
+		mInfo.mLinkedSpell = ClassAbility.AMPLIFYING;
 		mInfo.mCooldown = (getAbilityScore() == 1) ? COOLDOWN_1 : COOLDOWN_2;
 		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;
 		mAmplifierDamage = getAbilityScore() == 1 ? AMPLIFIER_DAMAGE_1 : AMPLIFIER_DAMAGE_2;

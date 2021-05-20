@@ -22,7 +22,7 @@ import org.bukkit.inventory.PlayerInventory;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.alchemist.AlchemistPotions.AlchemistPotionsDamageEnchantment;
 import com.playmonumenta.plugins.abilities.alchemist.EnfeeblingElixir.EnfeeblingElixirCooldownEnchantment;
-import com.playmonumenta.plugins.abilities.cleric.Celestial.CelestialCooldownEnchantment;
+import com.playmonumenta.plugins.abilities.cleric.CelestialBlessing.CelestialCooldownEnchantment;
 import com.playmonumenta.plugins.abilities.cleric.CleansingRain.CleansingRainCooldownEnchantment;
 import com.playmonumenta.plugins.abilities.mage.ManaLance.ManaLanceCooldownEnchantment;
 import com.playmonumenta.plugins.abilities.mage.Spellshock.SpellshockDamageEnchantment;

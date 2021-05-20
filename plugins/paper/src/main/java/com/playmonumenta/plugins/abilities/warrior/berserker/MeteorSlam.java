@@ -3,7 +3,7 @@ package com.playmonumenta.plugins.abilities.warrior.berserker;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityManager;
-import com.playmonumenta.plugins.classes.Spells;
+import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.classes.magic.MagicType;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -30,7 +30,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 public class MeteorSlam extends Ability {
 	public static final String NAME = "Meteor Slam";
-	public static final Spells SPELL = Spells.METEOR_SLAM;
+	public static final ClassAbility ABILITY = ClassAbility.METEOR_SLAM;
 	private static final String SLAM_ONCE_THIS_TICK_METAKEY = "MeteorSlamTickSlammed";
 
 	public static final int DAMAGE_1 = 3;
@@ -63,38 +63,38 @@ public class MeteorSlam extends Ability {
 
 	public MeteorSlam(Plugin plugin, Player player) {
 		super(plugin, player, NAME);
-		mInfo.mLinkedSpell = SPELL;
+		mInfo.mLinkedSpell = ABILITY;
 
 		mInfo.mScoreboardId = "MeteorSlam";
 		mInfo.mShorthandName = "MS";
 		mInfo.mDescriptions.add(
 			String.format(
-				"Falling more than %s blocks generates a slam when you land, dealing %s damage to all enemies in a %s-block cube around you per block fallen, with damage reduced to %s per block after the first %s blocks. Falling more than %s blocks and attacking an enemy also generates a slam at that enemy, and resets your fall damage. The damage does not impact your melee attack. | Pressing the swap key grants you Jump Boost %ss for %ss instead of doing its vanilla function. Jump Boost cooldown: %ss.",
+				"Pressing the swap key grants you Jump Boost %ss for %ss instead of doing its vanilla function. Cooldown: %ss. | Falling more than %s blocks passively generates a slam when you land, dealing %s physical damage to all enemies in a %s-block cube around you per block fallen for the first %s blocks, and %s damage per block thereafter. Falling more than %s blocks and attacking an enemy also passively generates a slam at that enemy, and resets your blocks fallen and fall damage.",
+				JUMP_LEVEL_1,
+				DURATION_SECONDS,
+				COOLDOWN_SECONDS_1,
 				AUTOMATIC_THRESHOLD,
 				DAMAGE_1,
 				SIZE_1,
-				REDUCED_DAMAGE_1,
 				REDUCED_THRESHOLD,
-				MANUAL_THRESHOLD,
-				JUMP_LEVEL_1,
-				DURATION_SECONDS,
-				COOLDOWN_SECONDS_1
+				REDUCED_DAMAGE_1,
+				MANUAL_THRESHOLD
 			)
 		);
 		mInfo.mDescriptions.add(
 			String.format(
-				"Damage is increased from %s to %s per block for the first %s blocks, and from %s to %s per block thereafter. Damage size is increased from %s to %s blocks. | Jump Boost level is increased from %s to %s. Jump Boost cooldown is reduced from %ss to %ss.",
+				"Jump Boost level is increased from %s to %s. Cooldown is reduced from %ss to %ss. | Damage is increased from %s to %s per block fallen for the first %s blocks, and from %s to %s per block thereafter. Damage size is increased from %s to %s blocks.",
+				JUMP_LEVEL_1,
+				JUMP_LEVEL_2,
+				COOLDOWN_SECONDS_1,
+				COOLDOWN_SECONDS_2,
 				DAMAGE_1,
 				DAMAGE_2,
 				REDUCED_THRESHOLD,
 				REDUCED_DAMAGE_1,
 				REDUCED_DAMAGE_2,
 				SIZE_1,
-				SIZE_2,
-				JUMP_LEVEL_1,
-				JUMP_LEVEL_2,
-				COOLDOWN_SECONDS_1,
-				COOLDOWN_SECONDS_2
+				SIZE_2
 			)
 		);
 		mInfo.mIgnoreCooldown = true;

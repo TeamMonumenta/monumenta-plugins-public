@@ -8,7 +8,7 @@ import org.bukkit.entity.Player;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.alchemist.PotionAbility;
-import com.playmonumenta.plugins.classes.Spells;
+import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 
@@ -23,7 +23,7 @@ public class NightmarishAlchemy extends PotionAbility {
 
 	public NightmarishAlchemy(Plugin plugin, Player player) {
 		super(plugin, player, "Nightmarish Alchemy", NIGHTMARISH_ALCHEMY_1_DAMAGE, NIGHTMARISH_ALCHEMY_2_DAMAGE);
-		mInfo.mLinkedSpell = Spells.NIGHTMARISH_ALCHEMY;
+		mInfo.mLinkedSpell = ClassAbility.NIGHTMARISH_ALCHEMY;
 		mInfo.mScoreboardId = "Nightmarish";
 		mInfo.mShorthandName = "Nm";
 		mInfo.mDescriptions.add("Your Alchemist Potions deal +2 damage. Non-boss enemies hit have a 10% chance to attack other enemies for 4s.");

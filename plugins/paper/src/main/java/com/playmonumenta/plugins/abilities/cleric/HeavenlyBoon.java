@@ -2,6 +2,18 @@ package com.playmonumenta.plugins.abilities.cleric;
 
 import java.util.Collection;
 
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.abilities.AbilityManager;
+import com.playmonumenta.plugins.abilities.KillTriggeredAbilityTracker;
+import com.playmonumenta.plugins.abilities.KillTriggeredAbilityTracker.KillTriggeredAbility;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.utils.PotionUtils;
+import com.playmonumenta.plugins.utils.PotionUtils.PotionInfo;
+
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.LivingEntity;
@@ -15,17 +27,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.abilities.KillTriggeredAbilityTracker;
-import com.playmonumenta.plugins.abilities.KillTriggeredAbilityTracker.KillTriggeredAbility;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.FastUtils;
-import com.playmonumenta.plugins.utils.ItemUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.plugins.utils.PotionUtils;
-import com.playmonumenta.plugins.utils.PotionUtils.PotionInfo;
-import com.playmonumenta.plugins.abilities.AbilityManager;
+
 
 public class HeavenlyBoon extends Ability implements KillTriggeredAbility {
 
@@ -38,7 +40,6 @@ public class HeavenlyBoon extends Ability implements KillTriggeredAbility {
 	private final double mChance;
 
 	private Crusade mCrusade;
-	private boolean mCountsHumanoids = false;
 
 	public HeavenlyBoon(Plugin plugin, Player player) {
 		super(plugin, player, "Heavenly Boon");
@@ -52,9 +53,6 @@ public class HeavenlyBoon extends Ability implements KillTriggeredAbility {
 		Bukkit.getScheduler().runTask(plugin, () -> {
 			if (player != null) {
 				mCrusade = AbilityManager.getManager().getPlayerAbility(mPlayer, Crusade.class);
-				if (mCrusade != null) {
-					mCountsHumanoids = mCrusade.getAbilityScore() == 2;
-				}
 			}
 		});
 	}
@@ -122,7 +120,10 @@ public class HeavenlyBoon extends Ability implements KillTriggeredAbility {
 
 	@Override
 	public void triggerOnKill(LivingEntity mob) {
-		if ((EntityUtils.isUndead(mob) || (mCountsHumanoids && EntityUtils.isHumanoid(mob))) && FastUtils.RANDOM.nextDouble() < mChance) {
+		if (
+			Crusade.enemyTriggersAbilities(mob, mCrusade)
+			&& FastUtils.RANDOM.nextDouble() < mChance
+		) {
 			ItemStack potions;
 
 			if (getAbilityScore() == 1) {
@@ -163,5 +164,4 @@ public class HeavenlyBoon extends Ability implements KillTriggeredAbility {
 			EntityUtils.spawnCustomSplashPotion(mPlayer, potions, pos);
 		}
 	}
-
 }

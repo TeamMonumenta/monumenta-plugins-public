@@ -18,7 +18,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.classes.magic.MagicType;
-import com.playmonumenta.plugins.classes.Spells;
+import com.playmonumenta.plugins.classes.ClassAbility;
 
 public class EnchantedPrayerAoE extends Effect {
 
@@ -58,7 +58,7 @@ public class EnchantedPrayerAoE extends Effect {
 			world.spawnParticle(Particle.SPELL_INSTANT, damagee.getLocation().add(0, damagee.getHeight() / 2, 0), 100, 0.25f, 0.3f, 0.25f, 1);
 			world.spawnParticle(Particle.FIREWORKS_SPARK, damagee.getLocation().add(0, damagee.getHeight() / 2, 0), 75, 0, 0, 0, 0.3);
 			for (LivingEntity le : EntityUtils.getNearbyMobs(damagee.getLocation(), 3.5)) {
-				EntityUtils.damageEntity(mPlugin, le, mDamageAmount, mPlayer, MagicType.HOLY, true, Spells.ENCHANTED_PRAYER);
+				EntityUtils.damageEntity(mPlugin, le, mDamageAmount, mPlayer, MagicType.HOLY, true, ClassAbility.ENCHANTED_PRAYER);
 			}
 			AttributeInstance maxHealth = mPlayer.getAttribute(Attribute.GENERIC_MAX_HEALTH);
 			PlayerUtils.healPlayer(mPlayer, maxHealth.getValue() * mHealAmount);

@@ -5,6 +5,11 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
+import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
+
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -21,11 +26,7 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
-import com.playmonumenta.plugins.bosses.bosses.HeadlessHorsemanBoss;
-import com.playmonumenta.plugins.bosses.spells.Spell;
-import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
-import com.playmonumenta.plugins.utils.BossUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
+
 
 public class SpellReaperOfLife extends Spell {
 

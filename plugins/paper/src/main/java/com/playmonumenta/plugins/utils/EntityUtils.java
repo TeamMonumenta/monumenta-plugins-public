@@ -70,7 +70,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.bosses.BossManager;
 import com.playmonumenta.plugins.bosses.bosses.CrowdControlImmunityBoss;
-import com.playmonumenta.plugins.classes.Spells;
+import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.classes.magic.MagicType;
 import com.playmonumenta.plugins.effects.Bleed;
 import com.playmonumenta.plugins.effects.Effect;
@@ -163,16 +163,20 @@ public class EntityUtils {
 			EntityType.SHEEP
 	);
 
+	// This list is hardcoded for Crusade description & Duelist advancement
 	private static final EnumSet<EntityType> HUMANOID_MOBS = EnumSet.of(
-			EntityType.VINDICATOR,
-			EntityType.ILLUSIONER,
-			EntityType.EVOKER,
-			EntityType.VEX,
-			EntityType.WITCH,
-			EntityType.IRON_GOLEM,
-			EntityType.GIANT,
-			EntityType.PILLAGER,
-			EntityType.SNOWMAN
+		EntityType.EVOKER,
+		EntityType.ILLUSIONER,
+		EntityType.PILLAGER,
+		EntityType.VINDICATOR,
+		EntityType.VEX,
+
+		EntityType.IRON_GOLEM,
+		EntityType.SNOWMAN,
+
+		EntityType.WITCH,
+
+		EntityType.GIANT
 	);
 
 	private static final String COOLING_ATTR_NAME = "CoolingSlownessAttr";
@@ -915,6 +919,7 @@ public class EntityUtils {
 		}
 	}
 
+	//TODO this likely overwrites longer fire tick amounts, such as from Fire Aspect
 	public static void applyFire(Plugin plugin, int fireTicks, LivingEntity target, Player player) {
 		target.setMetadata(Inferno.SET_FIRE_TICK_METAKEY, new FixedMetadataValue(plugin, target.getTicksLived()));
 		target.setMetadata(Inferno.FIRE_TICK_METAKEY, new FixedMetadataValue(plugin, target.getTicksLived()));
@@ -1263,17 +1268,17 @@ public class EntityUtils {
 	}
 
 	// Skip spellshock, iframes, velocity
-	public static void damageEntity(Plugin plugin, LivingEntity target, double damage, Entity attacker, MagicType magicType, boolean registerEvent, Spells spell) {
+	public static void damageEntity(Plugin plugin, LivingEntity target, double damage, Entity attacker, MagicType magicType, boolean registerEvent, ClassAbility spell) {
 		damageEntity(plugin, target, damage, attacker, magicType, registerEvent, spell, true, true);
 	}
 
 	// Skip iframes, velocity
-	public static void damageEntity(Plugin plugin, LivingEntity target, double damage, Entity attacker, MagicType magicType, boolean registerEvent, Spells spell, boolean applySpellshock, boolean triggerSpellshock) {
+	public static void damageEntity(Plugin plugin, LivingEntity target, double damage, Entity attacker, MagicType magicType, boolean registerEvent, ClassAbility spell, boolean applySpellshock, boolean triggerSpellshock) {
 		damageEntity(plugin, target, damage, attacker, magicType, registerEvent, spell, applySpellshock, triggerSpellshock, false);
 	}
 
 	// Skip velocity
-	public static void damageEntity(Plugin plugin, LivingEntity target, double damage, Entity attacker, MagicType magicType, boolean registerEvent, Spells spell, boolean applySpellshock, boolean triggerSpellshock, boolean bypassIFrames) {
+	public static void damageEntity(Plugin plugin, LivingEntity target, double damage, Entity attacker, MagicType magicType, boolean registerEvent, ClassAbility spell, boolean applySpellshock, boolean triggerSpellshock, boolean bypassIFrames) {
 		damageEntity(plugin, target, damage, attacker, magicType, registerEvent, spell, applySpellshock, triggerSpellshock, bypassIFrames, false);
 	}
 
@@ -1284,7 +1289,7 @@ public class EntityUtils {
 		Entity attacker,
 		MagicType magicType,
 		boolean registerEvent,
-		Spells spell,
+		ClassAbility spell,
 		boolean applySpellshock,
 		boolean triggerSpellshock,
 		// Usual damage iframe behaviour would be like setting to false.

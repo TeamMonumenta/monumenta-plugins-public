@@ -1,27 +1,26 @@
 package com.playmonumenta.plugins.abilities.cleric.hierophant;
 
-import com.playmonumenta.plugins.utils.FastUtils;
-
 import java.util.EnumSet;
+
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.effects.EnchantedPrayerAoE;
+import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
-import org.bukkit.event.block.Action;
-import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.scheduler.BukkitRunnable;
 
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.abilities.AbilityTrigger;
-import com.playmonumenta.plugins.classes.Spells;
-import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.plugins.effects.EnchantedPrayerAoE;
-import com.playmonumenta.plugins.utils.InventoryUtils;
+
 
 /*
  * Enchanted Prayer: Jump and shift right-click to enchant the
@@ -58,7 +57,7 @@ public class EnchantedPrayer extends Ability {
 		mInfo.mShorthandName = "EP";
 		mInfo.mDescriptions.add("Swapping while shifted enchants the weapons of all players in a 15 block radius with holy magic. Their next melee or projectile attack deals an additional 7 damage in a 3-block radius while healing the player for 10% of max health. Cooldown: 18s.");
 		mInfo.mDescriptions.add("Damage is increased to 12. Healing is increased to 20% of max health.");
-		mInfo.mLinkedSpell = Spells.ENCHANTED_PRAYER;
+		mInfo.mLinkedSpell = ClassAbility.ENCHANTED_PRAYER;
 		mInfo.mCooldown = ENCHANTED_PRAYER_COOLDOWN;
 		mInfo.mIgnoreCooldown = true;
 		mDamage = getAbilityScore() == 1 ? ENCHANTED_PRAYER_1_DAMAGE : ENCHANTED_PRAYER_2_DAMAGE;

@@ -5,19 +5,19 @@ import java.util.Map;
 import java.util.NavigableSet;
 import java.util.UUID;
 
-import org.bukkit.Particle;
-import org.bukkit.World;
-import org.bukkit.entity.Player;
-import org.bukkit.attribute.Attribute;
-
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.utils.MetadataUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.effects.Effect;
 import com.playmonumenta.plugins.effects.ThuribleBonusHealing;
+import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.utils.ScoreboardUtils;
+
+import org.bukkit.Particle;
+import org.bukkit.attribute.Attribute;
+import org.bukkit.entity.Player;
+
+
 
 public class ClericPassive extends Ability {
 

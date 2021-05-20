@@ -2,6 +2,18 @@ package com.playmonumenta.plugins.abilities.alchemist;
 
 import java.util.EnumSet;
 
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.abilities.AbilityTrigger;
+import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.effects.PercentSpeed;
+import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
+import com.playmonumenta.plugins.enchantments.abilities.BaseAbilityEnchantment;
+import com.playmonumenta.plugins.potion.PotionManager.PotionID;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.utils.MovementUtils;
+
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -15,18 +27,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.abilities.AbilityTrigger;
-import com.playmonumenta.plugins.classes.Spells;
-import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
-import com.playmonumenta.plugins.enchantments.abilities.BaseAbilityEnchantment;
-import com.playmonumenta.plugins.potion.PotionManager.PotionID;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.InventoryUtils;
-import com.playmonumenta.plugins.utils.MovementUtils;
-import com.playmonumenta.plugins.utils.PotionUtils;
-import com.playmonumenta.plugins.effects.PercentSpeed;
+
 
 public class EnfeeblingElixir extends Ability {
 
@@ -56,7 +57,7 @@ public class EnfeeblingElixir extends Ability {
 
 	public EnfeeblingElixir(Plugin plugin, Player player) {
 		super(plugin, player, "Enfeebling Elixir");
-		mInfo.mLinkedSpell = Spells.ENFEEBLING_ELIXIR;
+		mInfo.mLinkedSpell = ClassAbility.ENFEEBLING_ELIXIR;
 		mInfo.mScoreboardId = "EnfeeblingElixir";
 		mInfo.mShorthandName = "EE";
 		mInfo.mDescriptions.add("When you crouch and attack a mob or left click, all mobs within 3 blocks are knocked back several blocks and gain 15% Weaken for 7s. You gain Jump Boost II and +20% Speed for 7s. Cooldown: 16s.");

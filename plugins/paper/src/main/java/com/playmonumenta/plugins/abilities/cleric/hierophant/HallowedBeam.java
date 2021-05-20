@@ -1,5 +1,19 @@
 package com.playmonumenta.plugins.abilities.cleric.hierophant;
 
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.AbilityManager;
+import com.playmonumenta.plugins.abilities.AbilityTrigger;
+import com.playmonumenta.plugins.abilities.MultipleChargeAbility;
+import com.playmonumenta.plugins.abilities.cleric.Crusade;
+import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.effects.PercentDamageReceived;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.MovementUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.scriptedquests.utils.MessagingUtils;
+
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -18,26 +32,14 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
+import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
-import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.AbilityTrigger;
-import com.playmonumenta.plugins.abilities.MultipleChargeAbility;
-import com.playmonumenta.plugins.classes.Spells;
-import com.playmonumenta.plugins.effects.PercentDamageReceived;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.InventoryUtils;
-import com.playmonumenta.plugins.utils.ItemUtils;
-import com.playmonumenta.plugins.utils.MovementUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.plugins.abilities.cleric.Crusade;
-import com.playmonumenta.plugins.abilities.AbilityManager;
-import com.playmonumenta.scriptedquests.utils.MessagingUtils;
+
 
 public class HallowedBeam extends MultipleChargeAbility {
 
@@ -55,7 +57,6 @@ public class HallowedBeam extends MultipleChargeAbility {
 	private static final int CAST_RANGE = 30;
 
 	private Crusade mCrusade;
-	private boolean mCountsHumanoids = false;
 
 	private int mMode = 0;
 
@@ -65,7 +66,7 @@ public class HallowedBeam extends MultipleChargeAbility {
 		mInfo.mShorthandName = "HB";
 		mInfo.mDescriptions.add("Left-click the air with a bow or crossbow while looking directly at a player or mob to shoot a beam of light. If aimed at a player, the beam instantly heals them for 20% of their max health, knocking back enemies within 4 blocks. If aimed at an Undead, it instantly deals the equipped projectile weapon's damage to the target, and stuns them for half a second. If aimed at a non-undead mob, it instantly stuns them for 2s. Two charges. Pressing Swap while holding a bow will change the mode of Hallowed Beam between 'Default' (default), 'Healing' (only heals players, does not work on mobs), and 'Attack' (only applies mob effects, does not heal). Cooldown: 16s each charge.");
 		mInfo.mDescriptions.add("Hallowed Beam gains a third charge, the cooldown is reduced to 12 seconds, and players healed by it gain 10% damage resistance for 5 seconds.");
-		mInfo.mLinkedSpell = Spells.HALLOWED_BEAM;
+		mInfo.mLinkedSpell = ClassAbility.HALLOWED_BEAM;
 		mInfo.mCooldown = getAbilityScore() == 1 ? HALLOWED_1_COOLDOWN : HALLOWED_2_COOLDOWN;
 		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;
 		mInfo.mIgnoreCooldown = true;
@@ -73,9 +74,6 @@ public class HallowedBeam extends MultipleChargeAbility {
 		Bukkit.getScheduler().runTask(plugin, () -> {
 			if (player != null) {
 				mCrusade = AbilityManager.getManager().getPlayerAbility(mPlayer, Crusade.class);
-				if (mCrusade != null) {
-					mCountsHumanoids = mCrusade.getAbilityScore() == 2;
-				}
 			}
 		});
 	}
@@ -158,7 +156,8 @@ public class HallowedBeam extends MultipleChargeAbility {
 							for (LivingEntity le : EntityUtils.getNearbyMobs(eLoc, HALLOWED_RADIUS)) {
 								MovementUtils.knockAway(pe, le, 0.65f);
 							}
-						} else if (EntityUtils.isUndead(applyE) || (mCountsHumanoids && EntityUtils.isHumanoid(applyE))) {
+
+						} else if (Crusade.enemyTriggersAbilities(applyE, mCrusade)) {
 							if (mMode == 1) {
 								incrementCharge();
 								this.cancel();

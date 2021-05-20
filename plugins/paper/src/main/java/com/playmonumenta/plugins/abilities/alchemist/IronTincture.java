@@ -17,7 +17,7 @@ import org.bukkit.util.Vector;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
-import com.playmonumenta.plugins.classes.Spells;
+import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
 import com.playmonumenta.plugins.enchantments.abilities.BaseAbilityEnchantment;
 import com.playmonumenta.plugins.utils.AbsorptionUtils;
@@ -49,7 +49,7 @@ public class IronTincture extends Ability {
 
 	public IronTincture(Plugin plugin, Player player) {
 		super(plugin, player, "Iron Tincture");
-		mInfo.mLinkedSpell = Spells.IRON_TINCTURE;
+		mInfo.mLinkedSpell = ClassAbility.IRON_TINCTURE;
 		mInfo.mScoreboardId = "IronTincture";
 		mInfo.mShorthandName = "IT";
 		mInfo.mDescriptions.add("Crouch and right-click to throw a tincture. If you walk over the tincture, gain 8 absorption health for 50 seconds, up to 8 absorption health. If an ally walks over it, or is hit by it, you both gain the effect. If it isn't grabbed before it disappears it will quickly come off cooldown. Cooldown: 50s.");

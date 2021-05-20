@@ -19,7 +19,7 @@ import org.bukkit.inventory.ItemStack;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
-import com.playmonumenta.plugins.classes.Spells;
+import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.classes.magic.MagicType;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
@@ -46,7 +46,7 @@ public class UmbralWail extends Ability {
 
 	public UmbralWail(Plugin plugin, Player player) {
 		super(plugin, player, "Umbral Wail");
-		mInfo.mLinkedSpell = Spells.UMBRAL_WAIL;
+		mInfo.mLinkedSpell = ClassAbility.UMBRAL_WAIL;
 		mInfo.mScoreboardId = "UmbralWail";
 		mInfo.mShorthandName = "UW";
 		mInfo.mDescriptions.add("Right-click while sprinting and holding a scythe to unleash a chilling shadow in the direction you are looking. This shadow travels for 10 blocks and deals 10 damage to all mobs it passes through, afflicting them with 5s of Silence. Silence prevents mobs from using spells, but does not work on Bosses. Cooldown: 20s.");

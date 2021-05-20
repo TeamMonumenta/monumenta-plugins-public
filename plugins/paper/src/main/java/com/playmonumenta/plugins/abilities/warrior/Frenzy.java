@@ -1,15 +1,14 @@
 package com.playmonumenta.plugins.abilities.warrior;
 
-import org.bukkit.entity.Player;
-import org.bukkit.event.entity.EntityDeathEvent;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
-
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.effects.PercentAttackSpeed;
 import com.playmonumenta.plugins.effects.PercentSpeed;
-import com.playmonumenta.plugins.potion.PotionManager.PotionID;
+
+import org.bukkit.entity.Player;
+import org.bukkit.event.entity.EntityDeathEvent;
+
+
 
 public class Frenzy extends Ability {
 

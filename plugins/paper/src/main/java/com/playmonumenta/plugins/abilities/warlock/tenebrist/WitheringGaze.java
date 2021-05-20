@@ -19,7 +19,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
-import com.playmonumenta.plugins.classes.Spells;
+import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.events.CustomDamageEvent;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
@@ -43,7 +43,7 @@ public class WitheringGaze extends Ability {
 		mInfo.mShorthandName = "WG";
 		mInfo.mDescriptions.add("Sprint left-clicking unleashes a 9 block long cone in the direction the player is facing. Enemies in its path are stunned for 3 seconds (elites and bosses are given 30% Slowness instead) and given Wither 3 for 6 seconds. Cooldown: 30s.");
 		mInfo.mDescriptions.add("Your Wither lasts for 8 seconds. Cooldown: 20s.");
-		mInfo.mLinkedSpell = Spells.WITHERING_GAZE;
+		mInfo.mLinkedSpell = ClassAbility.WITHERING_GAZE;
 		mInfo.mCooldown = getAbilityScore() == 1 ? WITHERING_GAZE_1_COOLDOWN : WITHERING_GAZE_2_COOLDOWN;
 		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;
 		mWitherDuration = getAbilityScore() == 1 ? WITHERING_GAZE_WITHER_DURATION_1 : WITHERING_GAZE_WITHER_DURATION_2;

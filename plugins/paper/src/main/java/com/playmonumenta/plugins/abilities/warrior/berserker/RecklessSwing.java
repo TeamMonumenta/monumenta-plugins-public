@@ -17,7 +17,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityManager;
-import com.playmonumenta.plugins.classes.Spells;
+import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 
@@ -41,7 +41,7 @@ public class RecklessSwing extends Ability {
 
 	public RecklessSwing(Plugin plugin, Player player) {
 		super(plugin, player, "Reckless Swing");
-		mInfo.mLinkedSpell = Spells.RECKLESS_SWING;
+		mInfo.mLinkedSpell = ClassAbility.RECKLESS_SWING;
 		mInfo.mScoreboardId = "RecklessSwing";
 		mInfo.mShorthandName = "RS";
 		mInfo.mDescriptions.add("Passively, every 4 health you fall below your maximum health, gain +5% damage (capped at +25%) on sword and axe hits. Sneak left click with an axe or a sword (including when attacking enemies) to deal 12 damage in a 3.5 block radius at the cost of taking 4 damage (not reduced by any kind of damage resistance, bypasses absorption). Reckless Swing damage counts towards Rampage stacks.");

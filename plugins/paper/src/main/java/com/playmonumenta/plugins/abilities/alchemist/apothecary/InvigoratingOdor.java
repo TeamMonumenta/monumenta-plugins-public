@@ -11,7 +11,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.alchemist.PotionAbility;
-import com.playmonumenta.plugins.classes.Spells;
+import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.effects.PercentDamageReceived;
@@ -29,7 +29,7 @@ public class InvigoratingOdor extends PotionAbility {
 
 	public InvigoratingOdor(Plugin plugin, Player player) {
 		super(plugin, player, "Invigorating Odor", INVIGORATING_1_DAMAGE, INVIGORATING_2_DAMAGE);
-		mInfo.mLinkedSpell = Spells.INVIGORATING_ODOR;
+		mInfo.mLinkedSpell = ClassAbility.INVIGORATING_ODOR;
 		mInfo.mScoreboardId = "InvigoratingOdor";
 		mInfo.mShorthandName = "IO";
 		mInfo.mDescriptions.add("Alchemist Potions deal +1 damage and leave an aura for 3 seconds where they hit. The aura provides Speed I and Haste I to players within it for 5 seconds. The 50% chance for a potion on ally kills is increased to 75%.");

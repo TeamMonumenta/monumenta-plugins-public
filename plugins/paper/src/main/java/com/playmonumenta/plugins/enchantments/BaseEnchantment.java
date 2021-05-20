@@ -73,7 +73,7 @@ public interface BaseEnchantment {
 	 * This method is here for BaseAbilityEnchant,
 	 * which can calculate & return negative levels in getItemLevel().
 	 * Perhaps make ability "enchants" true BaseAttributes that really follow
-	 * their "When in Off Hand" etc ore, rather than having fixed valid slots in
+	 * their "When in Off Hand" etc lore, rather than having fixed valid slots in
 	 * the code like custom enchants do?
 	 * Could BaseEnchant and BaseAttribute extend a same ItemProperty and call
 	 * shared events together in PlayerInventory?
@@ -287,7 +287,7 @@ public interface BaseEnchantment {
 
 	/*
 	 * When this enchant is considered present,
-	 * Called when the player interacts with an object or air,
+	 * called when the player interacts with an object or air,
 	 * potentially once for each hand.
 	 *
 	 * Event may already be in the cancelled state when called,

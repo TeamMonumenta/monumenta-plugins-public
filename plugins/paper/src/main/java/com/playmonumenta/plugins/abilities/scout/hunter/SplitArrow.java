@@ -16,7 +16,7 @@ import org.bukkit.util.Vector;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.classes.Spells;
+import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.classes.magic.MagicType;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
@@ -33,7 +33,7 @@ public class SplitArrow extends Ability {
 
 	public SplitArrow(Plugin plugin, Player player) {
 		super(plugin, player, "Split Arrow");
-		mInfo.mLinkedSpell = Spells.SPLIT_ARROW;
+		mInfo.mLinkedSpell = ClassAbility.SPLIT_ARROW;
 		mInfo.mScoreboardId = "SplitArrow";
 		mInfo.mShorthandName = "SA";
 		mInfo.mDescriptions.add("When you hit an enemy with an arrow, the next nearest enemy within 5 blocks takes 40% of the original arrow damage (ignores invulnerability frames).");

@@ -17,7 +17,7 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.KillTriggeredAbilityTracker;
 import com.playmonumenta.plugins.abilities.KillTriggeredAbilityTracker.KillTriggeredAbility;
-import com.playmonumenta.plugins.classes.Spells;
+import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
@@ -48,7 +48,7 @@ public class CloakAndDagger extends Ability implements KillTriggeredAbility {
 		mInfo.mShorthandName = "CnD";
 		mInfo.mDescriptions.add("When you kill an enemy you gain a stack of cloak. Elite kills and Boss \"kills\" give you five stacks. Stacks are capped at 8. When you sneak left click while looking up with dual wielded swords, you lose your cloak stacks and gain X seconds of Stealth and (1.5)(X) extra damage on your next stealth attack, where X is the number of stacks you had at activation. You must have at least 5 stacks to activate this.");
 		mInfo.mDescriptions.add("Cloak stacks are now capped at 12 and bonus damage is increased to (2.5)(X) where X is the number of stacks you have upon activating this skill.");
-		mInfo.mLinkedSpell = Spells.CLOAK_AND_DAGGER;
+		mInfo.mLinkedSpell = ClassAbility.CLOAK_AND_DAGGER;
 		mInfo.mCooldown = 0;
 		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;
 		mDamageMultiplier = getAbilityScore() == 1 ? CLOAK_1_DAMAGE_MULTIPLIER : CLOAK_2_DAMAGE_MULTIPLIER;

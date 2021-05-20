@@ -10,7 +10,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.abilities.mage.ElementalArrows;
-import com.playmonumenta.plugins.classes.Spells;
+import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.classes.magic.MagicType;
 import com.playmonumenta.plugins.enchantments.abilities.SpellPower;
 import com.playmonumenta.plugins.events.CustomDamageEvent;
@@ -18,6 +18,7 @@ import com.playmonumenta.plugins.player.PartialParticle;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
+import com.playmonumenta.plugins.utils.StringUtils;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -37,17 +38,14 @@ import org.jetbrains.annotations.Nullable;
 
 public class ElementalSpiritFire extends Ability {
 	@NotNull public static final String NAME = "Elemental Spirits";
-	@NotNull public static final Spells SPELL = Spells.ELEMENTAL_SPIRIT_FIRE;
+	@NotNull public static final ClassAbility ABILITY = ClassAbility.ELEMENTAL_SPIRIT_FIRE;
 
 	public static final int DAMAGE_1 = 10;
 	public static final int DAMAGE_2 = 15;
 	public static final double BOW_MULTIPLIER_1 = 0.25;
-	public static final int BOW_PERCENTAGE_1 = (int)(BOW_MULTIPLIER_1 * 100);
 	public static final double BOW_MULTIPLIER_2 = 0.4;
-	public static final int BOW_PERCENTAGE_2 = (int)(BOW_MULTIPLIER_2 * 100);
 	public static final double HITBOX = 1.5;
-	public static final int COOLDOWN_SECONDS = 10;
-	public static final int COOLDOWN_TICKS = COOLDOWN_SECONDS * Constants.TICKS_PER_SECOND;
+	public static final int COOLDOWN_TICKS = 10 * Constants.TICKS_PER_SECOND;
 
 	private final int mLevelDamage;
 	private final double mLevelBowMultiplier;
@@ -59,22 +57,22 @@ public class ElementalSpiritFire extends Ability {
 
 	public ElementalSpiritFire(Plugin plugin, Player player) {
 		super(plugin, player, NAME);
-		mInfo.mLinkedSpell = SPELL;
+		mInfo.mLinkedSpell = ABILITY;
 
 		mInfo.mScoreboardId = "ElementalSpirit";
 		mInfo.mShorthandName = "ES";
 		mInfo.mDescriptions.add(
 			String.format(
-				"Two spirits accompany you - one of fire and one of ice. The next moment after you cast a fire spell, the fire spirit instantly dashes from you towards the farthest enemy that spell hit, dealing %s damage to all enemies in a %s-block cube around it along its path. The next moment after you cast an ice spell, the ice spirit warps to the closest enemy that spell hit and induces an extreme local climate, dealing %s damage to all enemies in a %s-block cube around it every second for %ss. If the spell was %s, the fire spirit does an additional %s%% of the bow's original damage, and for the ice spirit, an additional %s%%. Each spirit has an independent cooldown, and their damage ignores iframes. Cooldown: %ss.",
+				"Two spirits accompany you - one of fire and one of ice. The next moment after you deal fire damage, the fire spirit instantly dashes from you towards the farthest enemy that spell hit, dealing %s fire damage to all enemies in a %s-block cube around it along its path. The next moment after you deal ice damage, the ice spirit warps to the closest enemy that spell hit and induces an extreme local climate, dealing %s ice damage to all enemies in a %s-block cube around it every second for %ss. If the spell was %s, the fire spirit does an additional %s%% of the bow's original damage, and for the ice spirit, an additional %s%%. The spirits' damage ignores iframes. Independent cooldown: %ss.",
 				DAMAGE_1,
 				HITBOX,
 				ElementalSpiritIce.DAMAGE_1,
 				ElementalSpiritIce.SIZE,
 				ElementalSpiritIce.PULSES,
 				ElementalArrows.NAME,
-				BOW_PERCENTAGE_1,
-				ElementalSpiritIce.BOW_PERCENTAGE_1,
-				COOLDOWN_SECONDS
+				StringUtils.multiplierToPercentage(BOW_MULTIPLIER_1),
+				StringUtils.multiplierToPercentage(ElementalSpiritIce.BOW_MULTIPLIER_1),
+				StringUtils.ticksToSeconds(COOLDOWN_TICKS)
 			) // Ice pulse interval of 20 ticks hardcoded to say "every second"
 		);
 		mInfo.mDescriptions.add(
@@ -85,10 +83,10 @@ public class ElementalSpiritFire extends Ability {
 				ElementalSpiritIce.DAMAGE_1,
 				ElementalSpiritIce.DAMAGE_2,
 				ElementalArrows.NAME,
-				BOW_PERCENTAGE_1,
-				BOW_PERCENTAGE_2,
-				ElementalSpiritIce.BOW_PERCENTAGE_1,
-				ElementalSpiritIce.BOW_PERCENTAGE_2
+				StringUtils.multiplierToPercentage(BOW_MULTIPLIER_1),
+				StringUtils.multiplierToPercentage(BOW_MULTIPLIER_2),
+				StringUtils.multiplierToPercentage(ElementalSpiritIce.BOW_MULTIPLIER_1),
+				StringUtils.multiplierToPercentage(ElementalSpiritIce.BOW_MULTIPLIER_2)
 			)
 		);
 		mInfo.mCooldown = COOLDOWN_TICKS;
@@ -109,7 +107,7 @@ public class ElementalSpiritFire extends Ability {
 	public void playerDealtCustomDamageEvent(CustomDamageEvent event) {
 		if (
 			event.getMagicType() == MagicType.FIRE
-			&& event.getSpell() != null && !event.getSpell().equals(SPELL)
+			&& event.getSpell() != ABILITY
 		) {
 			mEnemiesAffected.add(event.getDamaged());
 			// 1 runnable processes everything 1 tick later, so all enemies to affect are in
@@ -147,7 +145,7 @@ public class ElementalSpiritFire extends Ability {
 							@NotNull Vector vector = endLocation.clone().subtract(startLocation).toVector();
 							double increment = 0.2;
 
-							@NotNull List<LivingEntity> potentialTargets = EntityUtils.getNearbyMobs(playerLocation, maxDistance + 1);
+							@NotNull List<LivingEntity> potentialTargets = EntityUtils.getNearbyMobs(playerLocation, maxDistance + HITBOX);
 							float spellDamage = SpellPower.getSpellDamage(mPlayer, mLevelDamage);
 							@NotNull Vector vectorIncrement = vector.normalize().multiply(increment);
 
@@ -163,13 +161,13 @@ public class ElementalSpiritFire extends Ability {
 									if (potentialTarget.getBoundingBox().overlaps(movingSpiritBox)) {
 										float finalDamage = spellDamage;
 										if (
-											event.getSpell().equals(Spells.ELEMENTAL_ARROWS)
+											event.getSpell() == ClassAbility.ELEMENTAL_ARROWS
 											&& mElementalArrows != null
 										) {
 											finalDamage += mElementalArrows.getLastDamage() * mLevelBowMultiplier;
 										}
 
-										EntityUtils.damageEntity(mPlugin, potentialTarget, finalDamage, mPlayer, MagicType.FIRE, true, SPELL, true, true, true);
+										EntityUtils.damageEntity(mPlugin, potentialTarget, finalDamage, mPlayer, MagicType.FIRE, true, ABILITY, true, true, true);
 										iterator.remove();
 									}
 								}

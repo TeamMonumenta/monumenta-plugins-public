@@ -5,7 +5,7 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.mage.elementalist.Blizzard;
-import com.playmonumenta.plugins.classes.Spells;
+import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.classes.magic.MagicType;
 import com.playmonumenta.plugins.enchantments.abilities.SpellPower;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -29,7 +29,7 @@ import org.bukkit.util.Vector;
 
 public class MagmaShield extends Ability {
 	public static final String NAME = "Magma Shield";
-	public static final Spells SPELL = Spells.MAGMA_SHIELD;
+	public static final ClassAbility ABILITY = ClassAbility.MAGMA_SHIELD;
 
 	public static final int DAMAGE_1 = 6;
 	public static final int DAMAGE_2 = 12;
@@ -37,8 +37,8 @@ public class MagmaShield extends Ability {
 	public static final int FIRE_SECONDS = 4;
 	public static final int FIRE_TICKS = FIRE_SECONDS * 20;
 	public static final float KNOCKBACK = 0.5f;
-	public static final double DOT_ANGLE = 0.33;
-	public static final double ANGLE = Blizzard.ANGLE; // Looking up is -90. This is 40 degrees of pitch allowance
+	public static final double DOT_ANGLE = 1d / 3; // 0.66 dot allowance on each side, so 120° total
+	public static final double ANGLE = Blizzard.ANGLE;
 	public static final int COOLDOWN_SECONDS = 12;
 	public static final int COOLDOWN_TICKS = COOLDOWN_SECONDS * 20;
 
@@ -48,13 +48,13 @@ public class MagmaShield extends Ability {
 
 	public MagmaShield(Plugin plugin, Player player) {
 		super(plugin, player, NAME);
-		mInfo.mLinkedSpell = SPELL;
+		mInfo.mLinkedSpell = ABILITY;
 
 		mInfo.mScoreboardId = "Magma";
 		mInfo.mShorthandName = "MS";
 		mInfo.mDescriptions.add(
 			String.format(
-				"While sneaking, right-clicking with a wand summons a torrent of flames, dealing %s damage to all enemies in front of you within a %s-block cube around you, setting them on fire for %ss, and knocking them away. The damage ignores iframes. Cooldown: %ss.",
+				"While sneaking, right-clicking with a wand summons a torrent of flames, dealing %s fire damage to all enemies in front of you within a %s-block cube around you, setting them on fire for %ss, and knocking them away. The damage ignores iframes. Cooldown: %ss.",
 				DAMAGE_1,
 				SIZE,
 				FIRE_SECONDS,

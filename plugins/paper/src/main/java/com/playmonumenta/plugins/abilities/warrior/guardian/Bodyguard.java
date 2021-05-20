@@ -19,7 +19,7 @@ import org.bukkit.inventory.ItemStack;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
-import com.playmonumenta.plugins.classes.Spells;
+import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
@@ -49,7 +49,7 @@ public class Bodyguard extends Ability {
 		mInfo.mShorthandName = "Bg";
 		mInfo.mDescriptions.add("Left-click the air twice while looking directly at another player within 25 blocks to charge to them (cannot be used in safezones). Upon arriving, knock away all mobs within 4 blocks. Both you and the other player gain Absorption II for 10 seconds. Left-click twice while looking down to cast on yourself. Cooldown: 30s.");
 		mInfo.mDescriptions.add("Absorption increased to III. Additionally, affected mobs are stunned for 3 seconds.");
-		mInfo.mLinkedSpell = Spells.BODYGUARD;
+		mInfo.mLinkedSpell = ClassAbility.BODYGUARD;
 		mInfo.mCooldown = COOLDOWN;
 		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;
 		mInfo.mIgnoreCooldown = true;

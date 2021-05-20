@@ -17,7 +17,7 @@ import org.bukkit.util.Vector;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.classes.Spells;
+import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.classes.magic.MagicType;
 import com.playmonumenta.plugins.events.AbilityCastEvent;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
@@ -52,7 +52,7 @@ public class DeadlyRonde extends Ability {
 
 	public DeadlyRonde(Plugin plugin, Player player) {
 		super(plugin, player, "Deadly Ronde");
-		mInfo.mLinkedSpell = Spells.RONDE;
+		mInfo.mLinkedSpell = ClassAbility.DEADLY_RONDE;
 		mInfo.mScoreboardId = "DeadlyRonde";
 		mInfo.mShorthandName = "DR";
 		mInfo.mDescriptions.add("After casting a skill, gain a stack of Deadly Ronde for 5 seconds, stacking up to 2 times. While Deadly Ronde is active, you gain Speed I, and your next melee attack consumes a stack to fire a flurry of blades, that fire in a cone with a radius of 4 blocks and deal 5 damage to all enemies they hit.");

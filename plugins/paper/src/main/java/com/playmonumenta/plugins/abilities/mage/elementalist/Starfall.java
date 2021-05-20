@@ -2,7 +2,7 @@ package com.playmonumenta.plugins.abilities.mage.elementalist;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.classes.Spells;
+import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.classes.magic.MagicType;
 import com.playmonumenta.plugins.enchantments.abilities.SpellPower;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -23,7 +23,7 @@ import org.bukkit.util.Vector;
 
 public class Starfall extends Ability {
 	public static final String NAME = "Starfall";
-	public static final Spells SPELL = Spells.STARFALL;
+	public static final ClassAbility ABILITY = ClassAbility.STARFALL;
 
 	public static final int DAMAGE_1 = 15;
 	public static final int DAMAGE_2 = 27;
@@ -39,13 +39,13 @@ public class Starfall extends Ability {
 
 	public Starfall(Plugin plugin, Player player) {
 		super(plugin, player, NAME);
-		mInfo.mLinkedSpell = SPELL;
+		mInfo.mLinkedSpell = ABILITY;
 
 		mInfo.mScoreboardId = NAME;
 		mInfo.mShorthandName = "SF";
 		mInfo.mDescriptions.add(
 			String.format(
-				"While holding a wand, pressing the swap key marks where you're looking, up to %s blocks away. You summon a falling meteor above the mark that lands strongly, dealing %s damage to all enemies in a %s-block cube around it, setting them on fire for %ss, and knocking them away. Swapping hands while holding a wand no longer does its vanilla function. Cooldown: %ss.",
+				"While holding a wand, pressing the swap key marks where you're looking, up to %s blocks away. You summon a falling meteor above the mark that lands strongly, dealing %s fire damage to all enemies in a %s-block cube around it, setting them on fire for %ss, and knocking them away. Swapping hands while holding a wand no longer does its vanilla function. Cooldown: %ss.",
 				DISTANCE,
 				DAMAGE_1,
 				SIZE,

@@ -1,7 +1,7 @@
 package com.playmonumenta.plugins.effects;
 
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.classes.Spells;
+import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.classes.magic.MagicType;
 import com.playmonumenta.plugins.utils.EntityUtils;
 
@@ -15,11 +15,11 @@ public class CustomDamageOverTime extends Effect {
 	private final double mDamage;
 	private final Plugin mPlugin;
 	private final Player mPlayer;
-	private final Spells mSpell;
+	private final ClassAbility mSpell;
 	private final MagicType mMagic;
 	private final Particle mParticle;
 
-	public CustomDamageOverTime(int duration, double damage, Player player, MagicType magic, Spells spell, Particle particle, Plugin plugin) {
+	public CustomDamageOverTime(int duration, double damage, Player player, MagicType magic, ClassAbility spell, Particle particle, Plugin plugin) {
 		super(duration);
 		mDamage = damage;
 		mPlayer = player;

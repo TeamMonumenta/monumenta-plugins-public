@@ -20,7 +20,7 @@ import org.bukkit.attribute.Attribute;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.classes.Spells;
+import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
@@ -42,7 +42,7 @@ public class Bezoar extends Ability {
 
 	public Bezoar(Plugin plugin, Player player) {
 		super(plugin, player, "Bezoar");
-		mInfo.mLinkedSpell = Spells.BEZOAR;
+		mInfo.mLinkedSpell = ClassAbility.BEZOAR;
 		mInfo.mScoreboardId = "Bezoar";
 		mInfo.mShorthandName = "BZ";
 		mInfo.mDescriptions.add("Every 5th mob killed within 16 blocks of the Alchemist spawns a Bezoar that lingers for 10s. Picking up a Bezoar will grant the Alchemist an additional Alchemist Potion, and will grant both the player who picks it up and the Alchemist a custom healing effect that regenerates 5% of max health every second for 2 seconds and reduces the duration of all current potion debuffs by 10s.");

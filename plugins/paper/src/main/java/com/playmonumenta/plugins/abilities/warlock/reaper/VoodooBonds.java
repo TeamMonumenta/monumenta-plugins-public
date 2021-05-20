@@ -17,7 +17,7 @@ import org.bukkit.entity.EntityType;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
-import com.playmonumenta.plugins.classes.Spells;
+import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.classes.magic.MagicType;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
@@ -39,7 +39,7 @@ public class VoodooBonds extends Ability {
 
 	public VoodooBonds(Plugin plugin, Player player) {
 		super(plugin, player, "Voodoo Bonds");
-		mInfo.mLinkedSpell = Spells.VOODOO_BONDS;
+		mInfo.mLinkedSpell = ClassAbility.VOODOO_BONDS;
 		mInfo.mScoreboardId = "VoodooBonds";
 		mInfo.mShorthandName = "VB";
 		mInfo.mDescriptions.add("Melee strikes to a mob apply 20% of the damage to all mobs of the same type within 3 blocks. Additionally, Right-click while looking down to cast a protective spell on all players within an 8 block radius. The next hit every player (including the Reaper) takes has all damage ignored (or 50% if attack is from a Boss), but that damage will transfer to the Reaper in 5s unless it is passed on again. Passing that damage requires a melee strike, in which 33% of the initial damage blocked is added to the damage of the strike (Bosses are immune to this bonus). The damage directed to the Reaper is calculated by the percentage of health the initial hit would have taken from that player, and can never kill you, only leave you at 1 HP. Cooldown: 15s.");

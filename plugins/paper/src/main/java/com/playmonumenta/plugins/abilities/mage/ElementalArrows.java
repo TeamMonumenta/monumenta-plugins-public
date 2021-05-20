@@ -2,7 +2,7 @@ package com.playmonumenta.plugins.abilities.mage;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.classes.Spells;
+import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.classes.magic.MagicType;
 import com.playmonumenta.plugins.utils.EntityUtils;
 
@@ -21,7 +21,7 @@ import org.bukkit.metadata.FixedMetadataValue;
 
 public class ElementalArrows extends Ability {
 	public static final String NAME = "Elemental Arrows";
-	public static final Spells SPELL = Spells.ELEMENTAL_ARROWS;
+	public static final ClassAbility ABILITY = ClassAbility.ELEMENTAL_ARROWS;
 
 	public static final double DAMAGE_MULTIPLIER_1 = 0.1;
 	public static final double DAMAGE_MULTIPLIER_2 = 0.2;
@@ -34,7 +34,7 @@ public class ElementalArrows extends Ability {
 
 	public ElementalArrows(Plugin plugin, Player player) {
 		super(plugin, player, NAME);
-		mInfo.mLinkedSpell = SPELL;
+		mInfo.mLinkedSpell = ABILITY;
 
 		mInfo.mScoreboardId = "Elemental";
 		mInfo.mShorthandName = "EA";

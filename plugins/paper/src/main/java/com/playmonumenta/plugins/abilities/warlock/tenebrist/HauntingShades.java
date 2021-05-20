@@ -24,7 +24,7 @@ import org.bukkit.inventory.EquipmentSlot;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.MultipleChargeAbility;
-import com.playmonumenta.plugins.classes.Spells;
+import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.MetadataUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
@@ -61,7 +61,7 @@ public class HauntingShades extends MultipleChargeAbility {
 
 	public HauntingShades(Plugin plugin, Player player) {
 		super(plugin, player, "Haunting Shades", SHADES_CHARGES_1, SHADES_CHARGES_2);
-		mInfo.mLinkedSpell = Spells.HAUNTING_SHADES;
+		mInfo.mLinkedSpell = ClassAbility.HAUNTING_SHADES;
 		mInfo.mScoreboardId = "HauntingShades";
 		mInfo.mShorthandName = "HS";
 		mInfo.mDescriptions.add("Double right-click while with a scythe to conjure a Shade at the target block or mob location. Mobs within 6 blocks of a Shade are afflicted with 10% Vulnerability, and players within 6 blocks of the shade are given 10% speed. A Shade fades back into darkness after 8 seconds. Cooldown: 15s. Charges: 2.");

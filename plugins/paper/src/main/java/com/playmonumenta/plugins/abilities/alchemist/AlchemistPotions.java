@@ -28,7 +28,7 @@ import com.playmonumenta.plugins.abilities.alchemist.apothecary.WardingRemedy;
 import com.playmonumenta.plugins.abilities.alchemist.harbinger.NightmarishAlchemy;
 import com.playmonumenta.plugins.abilities.alchemist.harbinger.PurpleHaze;
 import com.playmonumenta.plugins.abilities.alchemist.harbinger.ScorchedEarth;
-import com.playmonumenta.plugins.classes.Spells;
+import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.classes.magic.MagicType;
 import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
 import com.playmonumenta.plugins.enchantments.abilities.BaseAbilityEnchantment;
@@ -60,7 +60,7 @@ public class AlchemistPotions extends Ability implements KillTriggeredAbility {
 
 	public AlchemistPotions(Plugin plugin, Player player) {
 		super(plugin, player, null);
-		mInfo.mLinkedSpell = Spells.ALCHEMIST_POTION;
+		mInfo.mLinkedSpell = ClassAbility.ALCHEMIST_POTION;
 		mTracker = new KillTriggeredAbilityTracker(this);
 
 		if (player == null) {

@@ -23,7 +23,7 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.scout.BowMastery;
 import com.playmonumenta.plugins.abilities.scout.Sharpshooter;
-import com.playmonumenta.plugins.classes.Spells;
+import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.classes.magic.MagicType;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
@@ -47,7 +47,7 @@ public class EnchantedShot extends Ability {
 		mInfo.mShorthandName = "EA";
 		mInfo.mDescriptions.add("Left-clicking with a bow while not sneaking, will prime an enchanted arrow that unprimes after 5 seconds. When you fire a critical arrow, it will instantaneously travel in a straight line for up to 30 blocks or until it hits a block. All targets hit take 25 damage, affected by Bow Mastery and Sharpshooter. Hit targets contribute to Sharpshooter stacks. Cooldown: 20s.");
 		mInfo.mDescriptions.add("Every enemy hit takes 40 damage instead. Cooldown: 16s.");
-		mInfo.mLinkedSpell = Spells.ENCHANTED_ARROW;
+		mInfo.mLinkedSpell = ClassAbility.ENCHANTED_ARROW;
 		mInfo.mCooldown = getAbilityScore() == 1 ? ENCHANTED_1_COOLDOWN : ENCHANTED_2_COOLDOWN;
 		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;
 		mInfo.mIgnoreCooldown = true;
@@ -57,7 +57,7 @@ public class EnchantedShot extends Ability {
 
 	@Override
 	public void cast(Action action) {
-		if (!mActive && !mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), Spells.ENCHANTED_ARROW)) {
+		if (!mActive && !mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), ClassAbility.ENCHANTED_ARROW)) {
 			ItemStack mainHand = mPlayer.getInventory().getItemInMainHand();
 			if (InventoryUtils.isBowItem(mainHand)) {
 				Player player = mPlayer;

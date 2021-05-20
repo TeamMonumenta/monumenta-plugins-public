@@ -16,7 +16,7 @@ import org.bukkit.attribute.Attribute;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
-import com.playmonumenta.plugins.classes.Spells;
+import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.classes.magic.MagicType;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
@@ -46,7 +46,7 @@ public class Rampage extends Ability {
 
 	public Rampage(Plugin plugin, Player player) {
 		super(plugin, player, "Rampage");
-		mInfo.mLinkedSpell = Spells.RAMPAGE;
+		mInfo.mLinkedSpell = ClassAbility.RAMPAGE;
 		mInfo.mCooldown = 0;
 		mInfo.mScoreboardId = "Rampage";
 		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;

@@ -15,7 +15,7 @@ import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
-import com.playmonumenta.plugins.classes.Spells;
+import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.effects.Aesthetics;
 import com.playmonumenta.plugins.effects.PercentDamageDealt;
 import com.playmonumenta.plugins.effects.PercentSpeed;
@@ -24,7 +24,7 @@ import com.playmonumenta.plugins.enchantments.abilities.BaseAbilityEnchantment;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 
-public class Celestial extends Ability {
+public class CelestialBlessing extends Ability {
 
 	public static class CelestialCooldownEnchantment extends BaseAbilityEnchantment {
 		public CelestialCooldownEnchantment() {
@@ -46,9 +46,9 @@ public class Celestial extends Ability {
 			DamageCause.PROJECTILE
 	);
 
-	public Celestial(Plugin plugin, Player player) {
+	public CelestialBlessing(Plugin plugin, Player player) {
 		super(plugin, player, "Celestial Blessing");
-		mInfo.mLinkedSpell = Spells.CELESTIAL_BLESSING;
+		mInfo.mLinkedSpell = ClassAbility.CELESTIAL_BLESSING;
 		mInfo.mScoreboardId = "Celestial";
 		mInfo.mShorthandName = "CB";
 		mInfo.mDescriptions.add("When you strike while sneaking (regardless of whether you hit anything), while on the ground, you and all other players in a 12 block radius gain +20% melee and bow damage and +20% speed for 10 s. Cooldown: 40s.");

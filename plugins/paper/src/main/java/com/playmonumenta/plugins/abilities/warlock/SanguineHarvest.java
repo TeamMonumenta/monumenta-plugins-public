@@ -23,7 +23,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
-import com.playmonumenta.plugins.classes.Spells;
+import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
@@ -56,7 +56,7 @@ public class SanguineHarvest extends Ability {
 		mInfo.mShorthandName = "SH";
 		mInfo.mDescriptions.add("Enemies you damage with an ability are afflicted with Bleed I for 10 seconds. Bleed gives mobs 10% Slowness and 10% Weaken per level if the mob is below 50% Max Health. Additionally, pressing the swap key while holding a scythe fires a burst of darkness. This projectile travels up to 8 blocks and upon contact with a surface or an enemy, it explodes, knocking back and marking all mobs within 3 blocks of the explosion for a harvest. Any player that kills a marked mob is healed for 5% of max health. Cooldown: 20s.");
 		mInfo.mDescriptions.add("Increase passive Bleed level to II, and increase the radius to 4 blocks.");
-		mInfo.mLinkedSpell = Spells.SANGUINE_HARVEST;
+		mInfo.mLinkedSpell = ClassAbility.SANGUINE_HARVEST;
 		mInfo.mCooldown = COOLDOWN;
 		mInfo.mTrigger = AbilityTrigger.ALL;
 		mInfo.mIgnoreCooldown = true;

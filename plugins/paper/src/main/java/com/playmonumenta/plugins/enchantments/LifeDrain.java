@@ -1,22 +1,19 @@
 package com.playmonumenta.plugins.enchantments;
 
-import java.util.Collection;
 import java.util.EnumSet;
 
+import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Particle;
-import org.bukkit.attribute.Attribute;
-import org.bukkit.attribute.AttributeModifier;
-import org.bukkit.attribute.AttributeModifier.Operation;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.inventory.EquipmentSlot;
-import org.bukkit.inventory.meta.ItemMeta;
+
+
 
 public class LifeDrain implements BaseEnchantment {
 
@@ -36,33 +33,22 @@ public class LifeDrain implements BaseEnchantment {
 
 	@Override
 	public void onAttack(Plugin plugin, Player player, int level, LivingEntity target, EntityDamageByEntityEvent event) {
-		if (PlayerUtils.isCritical(player)) {
+		if (PlayerUtils.isFallingAttack(player)) {
 			PlayerUtils.healPlayer(player, LIFE_DRAIN_CRIT_HEAL * Math.sqrt(level));
 			player.getWorld().spawnParticle(Particle.HEART, target.getEyeLocation(), 3, 0.1, 0.1, 0.1, 0.001);
 		} else {
-			double attackSpeed = 4;
-			double multiplier = 1;
-			if (player.getInventory().getItemInMainHand() != null && player.getInventory().getItemInMainHand().hasItemMeta()) {
-				ItemMeta meta = player.getInventory().getItemInMainHand().getItemMeta();
-				if (meta.hasAttributeModifiers()) {
-					Collection<AttributeModifier> modifiers = meta.getAttributeModifiers(Attribute.GENERIC_ATTACK_SPEED);
-					if (modifiers != null) {
-						for (AttributeModifier modifier : modifiers) {
-							if (modifier.getSlot() == EquipmentSlot.HAND) {
-								if (modifier.getOperation() == Operation.ADD_NUMBER) {
-									attackSpeed += modifier.getAmount();
-								} else if (modifier.getOperation() == Operation.ADD_SCALAR) {
-									multiplier += modifier.getAmount();
-								}
-							}
-						}
-					}
-				}
-			}
+			PlayerUtils.healPlayer(
+				player,
+				LIFE_DRAIN_NONCRIT_HEAL_MULTIPLIER
+					* Math.sqrt(level)
+					// This is * √(attack rate seconds)
+					// The same as / √(1 / attack rate seconds)
+					// Advancement simply says / √(attack speed)
+					* Math.sqrt(player.getCooldownPeriod() / Constants.TICKS_PER_SECOND)
+					* player.getCooledAttackStrength(0)
+			);
 
-			PlayerUtils.healPlayer(player, LIFE_DRAIN_NONCRIT_HEAL_MULTIPLIER / Math.sqrt(attackSpeed * multiplier) * Math.sqrt(level) * player.getCooledAttackStrength(0));
 			player.getWorld().spawnParticle(Particle.HEART, target.getEyeLocation(), 1, 0.1, 0.1, 0.1, 0.001);
 		}
 	}
-
 }

@@ -1,5 +1,13 @@
 package com.playmonumenta.plugins.abilities.cleric;
 
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.abilities.AbilityManager;
+import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.classes.magic.MagicType;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.MovementUtils;
+
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -10,20 +18,11 @@ import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 import org.bukkit.projectiles.ProjectileSource;
 
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.classes.Spells;
-import com.playmonumenta.plugins.classes.magic.MagicType;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.MovementUtils;
-import com.playmonumenta.plugins.utils.PotionUtils;
-import com.playmonumenta.plugins.abilities.AbilityManager;
 
-public class Sanctified extends Ability {
+
+public class SanctifiedArmor extends Ability {
 
 	private static final double PERCENT_DAMAGE_RETURNED_1 = 1.5;
 	private static final double PERCENT_DAMAGE_RETURNED_2 = 2.5;
@@ -34,11 +33,10 @@ public class Sanctified extends Ability {
 	private final double mPercentDamageReturned;
 
 	private Crusade mCrusade;
-	private boolean mCountsHumanoids = false;
 
-	public Sanctified(Plugin plugin, Player player) {
+	public SanctifiedArmor(Plugin plugin, Player player) {
 		super(plugin, player, "Sanctified Armor");
-		mInfo.mLinkedSpell = Spells.SANCTIFIED;
+		mInfo.mLinkedSpell = ClassAbility.SANCTIFIED_ARMOR;
 		mInfo.mScoreboardId = "Sanctified";
 		mInfo.mShorthandName = "Sa";
 		mInfo.mDescriptions.add("Whenever a non-boss undead enemy hits you with a melee or projectile attack, it takes 1.5 times the final damage you took and is knocked away from you.");
@@ -48,9 +46,6 @@ public class Sanctified extends Ability {
 		Bukkit.getScheduler().runTask(plugin, () -> {
 			if (player != null) {
 				mCrusade = AbilityManager.getManager().getPlayerAbility(mPlayer, Crusade.class);
-				if (mCrusade != null) {
-					mCountsHumanoids = mCrusade.getAbilityScore() == 2;
-				}
 			}
 		});
 	}
@@ -70,7 +65,10 @@ public class Sanctified extends Ability {
 		ProjectileSource source = ((Projectile) event.getDamager()).getShooter();
 		if (source instanceof LivingEntity) {
 			LivingEntity mob = (LivingEntity) source;
-			if ((EntityUtils.isUndead(mob) || (mCountsHumanoids && EntityUtils.isHumanoid(mob))) && !EntityUtils.isBoss(mob)) {
+			if (
+				Crusade.enemyTriggersAbilities(mob, mCrusade)
+				&& !EntityUtils.isBoss(mob)
+			) {
 				trigger(mob, event);
 			}
 		}
@@ -93,5 +91,4 @@ public class Sanctified extends Ability {
 			EntityUtils.applySlow(mPlugin, SLOWNESS_DURATION, SLOWNESS_AMPLIFIER_2, mob);
 		}
 	}
-
 }

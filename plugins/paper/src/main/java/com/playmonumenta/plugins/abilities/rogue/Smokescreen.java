@@ -14,7 +14,7 @@ import org.bukkit.potion.PotionEffectType;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
-import com.playmonumenta.plugins.classes.Spells;
+import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
@@ -32,7 +32,7 @@ public class Smokescreen extends Ability {
 
 	public Smokescreen(Plugin plugin, Player player) {
 		super(plugin, player, "Smoke Screen");
-		mInfo.mLinkedSpell = Spells.SMOKESCREEN;
+		mInfo.mLinkedSpell = ClassAbility.SMOKESCREEN;
 		mInfo.mScoreboardId = "SmokeScreen";
 		mInfo.mShorthandName = "Smk";
 		mInfo.mDescriptions.add("When holding two swords, right-click while sneaking and looking down to release a cloud of smoke, afflicting all enemies in a 6 block radius with 8 s of Weakness I and 20% Slowness. Cooldown: 20s.");

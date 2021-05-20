@@ -19,7 +19,7 @@ import org.bukkit.util.Vector;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
-import com.playmonumenta.plugins.classes.Spells;
+import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.classes.magic.MagicType;
 import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
 import com.playmonumenta.plugins.enchantments.abilities.BaseAbilityEnchantment;
@@ -49,7 +49,7 @@ public class ManaLance extends Ability {
 
 	public ManaLance(Plugin plugin, Player player) {
 		super(plugin, player, "Mana Lance");
-		mInfo.mLinkedSpell = Spells.MANA_LANCE;
+		mInfo.mLinkedSpell = ClassAbility.MANA_LANCE;
 		mInfo.mScoreboardId = "ManaLance";
 		mInfo.mShorthandName = "ML";
 		mInfo.mDescriptions.add("Right clicking with a wand fires forth a piercing beam of Mana going 8 blocks, dealing 6 damage to enemies in the path of the beam. This beam will not go through solid blocks. Cooldown: 5s.");

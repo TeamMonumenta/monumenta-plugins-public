@@ -19,7 +19,7 @@ import org.bukkit.util.Vector;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.MultipleChargeAbility;
-import com.playmonumenta.plugins.classes.Spells;
+import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
@@ -45,7 +45,7 @@ public class WindWalk extends MultipleChargeAbility {
 
 	public WindWalk(Plugin plugin, Player player) {
 		super(plugin, player, "Wind Walk", WIND_WALK_MAX_CHARGES, WIND_WALK_MAX_CHARGES);
-		mInfo.mLinkedSpell = Spells.WIND_WALK;
+		mInfo.mLinkedSpell = ClassAbility.WIND_WALK;
 		mInfo.mScoreboardId = "WindWalk";
 		mInfo.mShorthandName = "WW";
 		mInfo.mDescriptions.add("Left-click twice without hitting a mob while sprinting to dash in the target direction, stunning and levitating enemies for 2 seconds. Elites are not levitated. Cooldown: 25s. Charges: 2.");

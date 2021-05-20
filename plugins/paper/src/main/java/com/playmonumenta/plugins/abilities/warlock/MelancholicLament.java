@@ -3,7 +3,7 @@ package com.playmonumenta.plugins.abilities.warlock;
 import org.bukkit.Bukkit;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.classes.Spells;
+import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
@@ -46,7 +46,7 @@ public class MelancholicLament extends Ability {
 
 	public MelancholicLament(Plugin plugin, Player player) {
 		super(plugin, player, "Melancholic Lament");
-		mInfo.mLinkedSpell = Spells.MELANCHOLIC_LAMENT;
+		mInfo.mLinkedSpell = ClassAbility.MELANCHOLIC_LAMENT;
 		mInfo.mScoreboardId = "Melancholic";
 		mInfo.mShorthandName = "MLa";
 		mInfo.mDescriptions.add("Press the swap key while shifted to recite a haunting song, causing all mobs within 7 blocks to target the user and afflicting them with 20% Weaken for 8 seconds. Cooldown: 16s");

@@ -12,7 +12,7 @@ import org.bukkit.potion.PotionEffectType;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.classes.Spells;
+import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.utils.AbsorptionUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -37,7 +37,7 @@ public class PrismaticShield extends Ability {
 
 	public PrismaticShield(Plugin plugin, Player player) {
 		super(plugin, player, "Prismatic Shield");
-		mInfo.mLinkedSpell = Spells.PRISMATIC_SHIELD;
+		mInfo.mLinkedSpell = ClassAbility.PRISMATIC_SHIELD;
 		mInfo.mScoreboardId = "Prismatic";
 		mInfo.mShorthandName = "PS";
 		mInfo.mDescriptions.add("When your health drops below 3 hearts (including if the attack would've killed you), you receive an Absorption II shield (4 hearts) which lasts up to 12 s. In addition enemies within four blocks are knocked back. Cooldown: 90s.");

@@ -2,9 +2,10 @@ package com.playmonumenta.plugins.abilities.mage.arcanist;
 
 import java.util.NavigableSet;
 
+import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.classes.Spells;
+import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.classes.magic.MagicType;
 import com.playmonumenta.plugins.effects.AstralOmenBonusDamage;
 import com.playmonumenta.plugins.effects.AstralOmenStacks;
@@ -13,6 +14,7 @@ import com.playmonumenta.plugins.enchantments.abilities.SpellPower;
 import com.playmonumenta.plugins.events.CustomDamageEvent;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
+import com.playmonumenta.plugins.utils.StringUtils;
 
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -24,7 +26,7 @@ import org.bukkit.entity.Player;
 
 public class AstralOmen extends Ability {
 	public static final String NAME = "Astral Omen";
-	public static final Spells SPELL = Spells.ASTRAL_OMEN;
+	public static final ClassAbility ABILITY = ClassAbility.ASTRAL_OMEN;
 	public static final String STACKS_SOURCE = "AstralOmenStacks";
 	public static final String BONUS_DAMAGE_SOURCE = "AstralOmenBonusDamage";
 	private static final Particle.DustOptions COLOR_PURPLE = AstralOmenStacks.COLOR_PURPLE;
@@ -32,17 +34,11 @@ public class AstralOmen extends Ability {
 	public static final int DAMAGE = 6;
 	public static final int SIZE = 3;
 	public static final double BONUS_MULTIPLIER_1 = 0.2;
-	public static final int BONUS_PERCENTAGE_1 = (int)(BONUS_MULTIPLIER_1 * 100);
 	public static final double BONUS_MULTIPLIER_2 = 0.3;
-	public static final int BONUS_PERCENTAGE_2 = (int)(BONUS_MULTIPLIER_2 * 100);
 	public static final double SLOW_MULTIPLIER = 0.1;
-	public static final int SLOW_PERCENTAGE = (int)(SLOW_MULTIPLIER * 100);
-	public static final int STACK_SECONDS = 10;
-	public static final int STACK_TICKS = STACK_SECONDS * 20;
-	public static final int BONUS_SECONDS = 8;
-	public static final int BONUS_TICKS = BONUS_SECONDS * 20;
-	public static final int SLOW_SECONDS = 8;
-	public static final int SLOW_TICKS = SLOW_SECONDS * 20;
+	public static final int STACK_TICKS = 10 * Constants.TICKS_PER_SECOND;
+	public static final int BONUS_TICKS = 8 * Constants.TICKS_PER_SECOND;
+	public static final int SLOW_TICKS = 8 * Constants.TICKS_PER_SECOND;
 	public static final float PULL_SPEED = 0.175f;
 	public static final int STACK_THRESHOLD = 3;
 
@@ -51,28 +47,28 @@ public class AstralOmen extends Ability {
 
 	public AstralOmen(Plugin plugin, Player player) {
 		super(plugin, player, NAME);
-		mInfo.mLinkedSpell = SPELL;
+		mInfo.mLinkedSpell = ABILITY;
 
 		mInfo.mScoreboardId = "AstralOmen";
 		mInfo.mShorthandName = "AO";
 		mInfo.mDescriptions.add(
 			String.format(
-				"Attacking an enemy with a spell marks its fate, giving it an astral omen. If an enemy hits %s omens, its fate is sealed, clearing its omens and causing a magical implosion that deals %s damage to it and all enemies in a %s-block cube around it. It then takes %s%% more damage from you for %ss. An enemy loses all its omens after %ss of it not gaining another omen. The implosion's damage ignores iframes and itself cannot apply omens.",
+				"Dealing spell damage to an enemy marks its fate, giving it an astral omen. If an enemy hits %s omens, its fate is sealed, clearing its omens and causing a magical implosion that deals %s arcane damage to it and all enemies in a %s-block cube around it. It then takes %s%% more damage from you for %ss. An enemy loses all its omens after %ss of it not gaining another omen. That implosion's damage ignores iframes and itself cannot apply omens.",
 				STACK_THRESHOLD,
 				DAMAGE,
 				SIZE,
-				BONUS_PERCENTAGE_1,
-				BONUS_SECONDS,
-				STACK_SECONDS
+				StringUtils.multiplierToPercentage(BONUS_MULTIPLIER_1),
+				StringUtils.ticksToSeconds(BONUS_TICKS),
+				StringUtils.ticksToSeconds(STACK_TICKS)
 			)
 		);
 		mInfo.mDescriptions.add(
 			String.format(
 				"The implosion now pulls all enemies inwards and afflicts them with %s%% slowness for %ss. Bonus damage taken is increased from %s%% to %s%%.",
-				SLOW_PERCENTAGE,
-				SLOW_SECONDS,
-				BONUS_PERCENTAGE_1,
-				BONUS_PERCENTAGE_2
+				StringUtils.multiplierToPercentage(SLOW_MULTIPLIER),
+				StringUtils.ticksToSeconds(SLOW_TICKS),
+				StringUtils.multiplierToPercentage(BONUS_MULTIPLIER_1),
+				StringUtils.multiplierToPercentage(BONUS_MULTIPLIER_2)
 			)
 		);
 

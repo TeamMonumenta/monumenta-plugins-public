@@ -1,6 +1,12 @@
 package com.playmonumenta.plugins.bosses.spells.headlesshorseman;
 
+import com.playmonumenta.plugins.bosses.bosses.HeadlessHorsemanBoss;
+import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.MovementUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
+
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -13,13 +19,8 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.util.Vector;
 
-import com.playmonumenta.plugins.bosses.bosses.HeadlessHorsemanBoss;
-import com.playmonumenta.plugins.bosses.spells.Spell;
-import com.playmonumenta.plugins.utils.BossUtils;
-import com.playmonumenta.plugins.utils.MovementUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
+
 
 /*
  * Burning Vengeance - The horseman after 0.5 seconds summons a ring of flames at the edge of a 16 block

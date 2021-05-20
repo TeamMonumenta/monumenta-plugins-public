@@ -27,7 +27,7 @@ import com.playmonumenta.plugins.abilities.alchemist.apothecary.WardingRemedyNon
 import com.playmonumenta.plugins.abilities.alchemist.harbinger.NightmarishAlchemy;
 import com.playmonumenta.plugins.abilities.alchemist.harbinger.PurpleHaze;
 import com.playmonumenta.plugins.abilities.alchemist.harbinger.ScorchedEarth;
-import com.playmonumenta.plugins.abilities.cleric.Celestial;
+import com.playmonumenta.plugins.abilities.cleric.CelestialBlessing;
 import com.playmonumenta.plugins.abilities.cleric.CleansingRain;
 import com.playmonumenta.plugins.abilities.cleric.ClericPassive;
 import com.playmonumenta.plugins.abilities.cleric.Crusade;
@@ -36,7 +36,7 @@ import com.playmonumenta.plugins.abilities.cleric.HandOfLight;
 import com.playmonumenta.plugins.abilities.cleric.HeavenlyBoon;
 import com.playmonumenta.plugins.abilities.cleric.NonClericProvisionsPassive;
 import com.playmonumenta.plugins.abilities.cleric.SacredProvisions;
-import com.playmonumenta.plugins.abilities.cleric.Sanctified;
+import com.playmonumenta.plugins.abilities.cleric.SanctifiedArmor;
 import com.playmonumenta.plugins.abilities.cleric.hierophant.EnchantedPrayer;
 import com.playmonumenta.plugins.abilities.cleric.hierophant.HallowedBeam;
 import com.playmonumenta.plugins.abilities.cleric.hierophant.ThuribleProcession;
@@ -274,14 +274,14 @@ public class AbilityManager {
 			new BruteForce(mPlugin, null),
 
 			//********** CLERIC **********//
-			new Celestial(mPlugin, null),
+			new CelestialBlessing(mPlugin, null),
 			new CleansingRain(mPlugin, null),
 			new HandOfLight(mPlugin, null),
 			new ClericPassive(mPlugin, null),
 			new DivineJustice(mPlugin, null),
 			new HeavenlyBoon(mPlugin, null),
 			new Crusade(mPlugin, null),
-			new Sanctified(mPlugin, null),
+			new SanctifiedArmor(mPlugin, null),
 			new SacredProvisions(mPlugin, null),
 
 			//********** WARLOCK **********//
@@ -354,9 +354,13 @@ public class AbilityManager {
 
 				//********** CLERIC **********//
 				// PALADIN
-				new HolyJavelin(mPlugin, null),
-				new ChoirBells(mPlugin, null),
+				// LI needs to run first to process its passive melee damage
 				new LuminousInfusion(mPlugin, null),
+				// HJ runs afterwards and can use that value in the same event,
+				// sharing it to its Javelin AoE
+				new HolyJavelin(mPlugin, null),
+
+				new ChoirBells(mPlugin, null),
 
 				// HIEROPHANT
 				new EnchantedPrayer(mPlugin, null),

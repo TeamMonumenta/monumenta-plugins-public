@@ -2,6 +2,16 @@ package com.playmonumenta.plugins.abilities.cleric;
 
 import java.util.EnumSet;
 
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.abilities.AbilityTrigger;
+import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.effects.PercentDamageReceived;
+import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
+import com.playmonumenta.plugins.enchantments.abilities.BaseAbilityEnchantment;
+import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.utils.PotionUtils;
+
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -9,19 +19,8 @@ import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.abilities.AbilityTrigger;
-import com.playmonumenta.plugins.classes.Spells;
-import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
-import com.playmonumenta.plugins.enchantments.abilities.BaseAbilityEnchantment;
-import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.plugins.utils.PotionUtils;
-import com.playmonumenta.plugins.effects.PercentDamageReceived;
 
 
 public class CleansingRain extends Ability {
@@ -49,7 +48,7 @@ public class CleansingRain extends Ability {
 
 	public CleansingRain(Plugin plugin, Player player) {
 		super(plugin, player, "Cleansing Rain");
-		mInfo.mLinkedSpell = Spells.CLEANSING;
+		mInfo.mLinkedSpell = ClassAbility.CLEANSING_RAIN;
 		mInfo.mScoreboardId = "Cleansing";
 		mInfo.mShorthandName = "CR";
 		mInfo.mDescriptions.add("Right click while sneaking and looking upwards to summon a \"cleansing rain\" that follows you, removing negative effects from players within 4 blocks, including yourself, and lasts for 15 seconds. (Cooldown: 45 seconds)");

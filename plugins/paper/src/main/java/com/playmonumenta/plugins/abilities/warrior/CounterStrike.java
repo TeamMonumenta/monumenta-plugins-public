@@ -2,7 +2,7 @@ package com.playmonumenta.plugins.abilities.warrior;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.classes.Spells;
+import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.classes.magic.MagicType;
 import com.playmonumenta.plugins.events.AbilityCastEvent;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -42,7 +42,7 @@ public class CounterStrike extends Ability {
 		mInfo.mShorthandName = "CS";
 		mInfo.mDescriptions.add("Hitting a mob within 2s of successfully blocking an attack with either a shield or with Riposte deals 6 damage in an AoE cone 7 blocks in front of you. Cooldown: 8s. In addition, when you are hit you have a 15% chance to deal 6 damage to all enemies in a 5 block radius when you are hit by a melee attack (Even if you block).");
 		mInfo.mDescriptions.add("Damage is increased to 12. The passive part of the skill's damage is increased to 12.");
-		mInfo.mLinkedSpell = Spells.COUNTER_STRIKE;
+		mInfo.mLinkedSpell = ClassAbility.COUNTER_STRIKE;
 		mInfo.mCooldown = COUNTER_STRIKE_COOLDOWN;
 		mInfo.mIgnoreCooldown = true;
 	}
@@ -70,7 +70,7 @@ public class CounterStrike extends Ability {
 			}
 
 			// Active trigger if blocking, Riposte check is done separately through AbilityCastEvent
-			if (!mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), Spells.COUNTER_STRIKE)) {
+			if (!mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), ClassAbility.COUNTER_STRIKE)) {
 				if (mPlayer.isBlocking()) {
 					mPlayer.spawnParticle(Particle.CRIT, mPlayer.getLocation(), 10, 0, 0, 0, 1);
 					activate();
@@ -137,7 +137,7 @@ public class CounterStrike extends Ability {
 
 	@Override
 	public boolean abilityCastEvent(AbilityCastEvent event) {
-		if (event.getAbility() == Spells.RIPOSTE) {
+		if (event.getAbility() == ClassAbility.RIPOSTE) {
 			activate();
 		}
 

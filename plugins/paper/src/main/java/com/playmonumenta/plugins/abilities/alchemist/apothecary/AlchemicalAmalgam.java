@@ -19,7 +19,7 @@ import org.bukkit.util.Vector;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
-import com.playmonumenta.plugins.classes.Spells;
+import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.classes.magic.MagicType;
 import com.playmonumenta.plugins.utils.AbsorptionUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -54,7 +54,7 @@ public class AlchemicalAmalgam extends Ability {
 		mInfo.mDescriptions.add("Shift left click with a Bow to shoot a mixture that deals 8 damage to every enemy touched and adds 2 absorption health to players (including yourself), lasting 30 seconds, maximum 12. After hitting a block or traveling 10 blocks, the mixture traces and returns to you, able to damage enemies and shield allies a second time. Cooldown: 30s.");
 		mInfo.mDescriptions.add("Absorption health added is increased to 3 and damage is increased to 16.");
 		mInfo.mCooldown = 20 * 30;
-		mInfo.mLinkedSpell = Spells.ALCHEMICAL_AMALGAM;
+		mInfo.mLinkedSpell = ClassAbility.ALCHEMICAL_AMALGAM;
 		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;
 		mDamage = getAbilityScore() == 1 ? AMALGAM_1_DAMAGE : AMALGAM_2_DAMAGE;
 		mShield = getAbilityScore() == 1 ? AMALGAM_1_SHIELD : AMALGAM_2_SHIELD;

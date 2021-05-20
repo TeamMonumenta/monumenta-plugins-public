@@ -2,6 +2,14 @@ package com.playmonumenta.plugins.abilities;
 
 import java.util.Collection;
 
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.events.AbilityCastEvent;
+import com.playmonumenta.plugins.events.CustomDamageEvent;
+import com.playmonumenta.plugins.events.PotionEffectApplyEvent;
+import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.utils.ScoreboardUtils;
+
 import org.bukkit.entity.AbstractArrow;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -22,17 +30,12 @@ import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.event.player.PlayerItemDamageEvent;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.classes.Spells;
-import com.playmonumenta.plugins.events.AbilityCastEvent;
-import com.playmonumenta.plugins.events.CustomDamageEvent;
-import com.playmonumenta.plugins.events.PotionEffectApplyEvent;
-import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.plugins.utils.ScoreboardUtils;
-
 import net.kyori.adventure.text.Component;
+
+
 
 public abstract class Ability {
 	protected final Plugin mPlugin;
@@ -92,14 +95,18 @@ public abstract class Ability {
 
 	// Whether skill is on cooldown, without factoring in mIgnoreCooldown
 	public boolean isTimerActive() {
-		return isTimerActive(getInfo().mLinkedSpell);
-	}
-
-	public boolean isTimerActive(Spells spell) {
-		if (spell != null) {
-			return mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), spell);
+		@Nullable AbilityInfo abilityInfo = getInfo();
+		if (abilityInfo != null) {
+			@Nullable ClassAbility spell = abilityInfo.mLinkedSpell;
+			if (spell != null) {
+				return isTimerActive(spell);
+			}
 		}
 		return false;
+	}
+
+	public boolean isTimerActive(@NotNull ClassAbility spell) {
+		return mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), spell);
 	}
 
 	public void putOnCooldown() {

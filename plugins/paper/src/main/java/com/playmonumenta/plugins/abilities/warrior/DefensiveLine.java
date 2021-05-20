@@ -17,7 +17,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
-import com.playmonumenta.plugins.classes.Spells;
+import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.effects.PercentDamageReceived;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
@@ -41,7 +41,7 @@ public class DefensiveLine extends Ability {
 
 	public DefensiveLine(Plugin plugin, Player player) {
 		super(plugin, player, "Defensive Line");
-		mInfo.mLinkedSpell = Spells.DEFENSIVE_LINE;
+		mInfo.mLinkedSpell = ClassAbility.DEFENSIVE_LINE;
 		mInfo.mScoreboardId = "DefensiveLine";
 		mInfo.mShorthandName = "DL";
 		mInfo.mDescriptions.add("When you block while sneaking, you and your allies in an 8 block radius gain 20% Resistance for 10 seconds. Upon activating this skill mobs in a 3 block radius of you and your allies are knocked back. Cooldown: 30s.");

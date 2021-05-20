@@ -39,11 +39,11 @@ public class ArcaneThrust implements BaseEnchantment {
 
 	@Override
 	public void onAttack(Plugin plugin, Player player, int level, LivingEntity target, EntityDamageByEntityEvent event) {
-		if (!PlayerUtils.isCritical(player) && player.getCooledAttackStrength(0) == 1) {
-			double damage = 1 + (event.getDamage() * ((double) level / (level + 1)));
+		if (PlayerUtils.isNonFallingAttack(player, event.getEntity())) {
+			double damage = 1 + (event.getDamage() * ((double)level / (level + 1)));
 
 			Location loc = player.getEyeLocation();
-			BoundingBox box = BoundingBox.of(loc, 0.55, 0.55, 0.55);
+			BoundingBox box = BoundingBox.of(loc, 0.6, 0.6, 0.6);
 			Vector dir = loc.getDirection();
 			box.shift(dir);
 			List<LivingEntity> mobs = EntityUtils.getNearbyMobs(player.getLocation(), 10, player);

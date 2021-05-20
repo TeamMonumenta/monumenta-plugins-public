@@ -24,7 +24,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.classes.Spells;
+import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
 import com.playmonumenta.plugins.enchantments.abilities.BaseAbilityEnchantment;
 import com.playmonumenta.plugins.tracking.PlayerTracking;
@@ -76,7 +76,7 @@ public class Volley extends Ability {
 
 	public Volley(Plugin plugin, Player player) {
 		super(plugin, player, "Volley");
-		mInfo.mLinkedSpell = Spells.VOLLEY;
+		mInfo.mLinkedSpell = ClassAbility.VOLLEY;
 		mInfo.mScoreboardId = "Volley";
 		mInfo.mShorthandName = "Vly";
 		mInfo.mDescriptions.add("When you shoot an arrow while sneaking, you shoot a volley consisting of 7 arrows instead. Only one arrow is consumed, and each arrow deals 30% bonus damage. Cooldown: 15s.");

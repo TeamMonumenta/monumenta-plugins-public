@@ -4,7 +4,7 @@ import java.util.List;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.classes.Spells;
+import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.classes.magic.MagicType;
 import com.playmonumenta.plugins.enchantments.abilities.SpellPower;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -27,17 +27,22 @@ import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
 
+
 public class ThunderStep extends Ability {
 	public static final String NAME = "Thunder Step";
-	public static final Spells SPELL = Spells.THUNDER_STEP;
+	public static final ClassAbility ABILITY = ClassAbility.THUNDER_STEP;
 	public static final Particle.DustOptions COLOR_YELLOW = new Particle.DustOptions(Color.YELLOW, 0.75f);
 	public static final Particle.DustOptions COLOR_AQUA = new Particle.DustOptions(Color.AQUA, 0.75f);
 
 	/*
 	 * Cloud's standardised constant order:
-	 * damage/extra damage/bonus damage, size/distance, amplifiers/multipliers, durations, other skill technicalities eg knockback, cooldowns
 	 *
-	 * For pairs of values where one is used to calculate the other, like seconds or hearts, the resulting value goes second
+	 * Damage/additional damage/bonus damage/healing,
+	 * size/distance,
+	 * amplifiers/multipliers,
+	 * durations,
+	 * other skill technicalities eg knockback,
+	 * cooldowns
 	 */
 	public static final int DAMAGE_1 = 5;
 	public static final int DAMAGE_2 = 8;
@@ -56,13 +61,13 @@ public class ThunderStep extends Ability {
 
 	public ThunderStep(Plugin plugin, Player player) {
 		super(plugin, player, NAME);
-		mInfo.mLinkedSpell = SPELL;
+		mInfo.mLinkedSpell = ABILITY;
 
 		mInfo.mScoreboardId = "ThunderStep";
 		mInfo.mShorthandName = "TS";
 		mInfo.mDescriptions.add(
 			String.format(
-				"While holding a wand and sneaking, pressing the swap key materializes a flash of thunder, dealing %s damage to all enemies in a %s-block cube around you and knocking them away. The next moment, you teleport towards where you're looking, travelling up to %s blocks or until you hit a solid block and repeating the thunder attack at your destination. This second attack ignores iframes. Swapping hands while holding a wand no longer does its vanilla function. Cooldown: %ss.",
+				"While holding a wand and sneaking, pressing the swap key materializes a flash of thunder, dealing %s arcane damage to all enemies in a %s-block cube around you and knocking them away. The next moment, you teleport towards where you're looking, travelling up to %s blocks or until you hit a solid block, and repeat the thunder attack at your destination, ignoring iframes. Swapping hands while holding a wand no longer does its vanilla function. Cooldown: %ss.",
 				DAMAGE_1,
 				SIZE,
 				DISTANCE_1,
@@ -71,7 +76,7 @@ public class ThunderStep extends Ability {
 		);
 		mInfo.mDescriptions.add(
 			String.format(
-				"The thunder attacks now stun all non-boss enemies they damage for %ss. Damage is increased from %s to %s. Teleport range is increased from %s to %s blocks.",
+				"The thunder attacks now also stun all non-boss enemies for %ss. Damage is increased from %s to %s. Teleport range is increased from %s to %s blocks.",
 				STUN_SECONDS,
 				DAMAGE_1,
 				DAMAGE_2,
@@ -166,7 +171,7 @@ public class ThunderStep extends Ability {
 		);
 
 		for (LivingEntity enemy : enemies) {
-			EntityUtils.damageEntity(mPlugin, enemy, spellDamage, mPlayer, MagicType.ARCANE, true, mInfo.mLinkedSpell, true, true, bypassIFrames);
+			EntityUtils.damageEntity(mPlugin, enemy, spellDamage, mPlayer, MagicType.ARCANE, true, ABILITY, true, true, bypassIFrames);
 			if (mDoStun && !EntityUtils.isBoss(enemy)) {
 				EntityUtils.applyStun(mPlugin, STUN_TICKS, enemy);
 			}

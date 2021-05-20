@@ -19,7 +19,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
-import com.playmonumenta.plugins.classes.Spells;
+import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
 import com.playmonumenta.plugins.enchantments.abilities.BaseAbilityEnchantment;
 import com.playmonumenta.plugins.point.Raycast;
@@ -48,7 +48,7 @@ public class ShieldBash extends Ability {
 
 	public ShieldBash(Plugin plugin, Player player) {
 		super(plugin, player, "Shield Bash");
-		mInfo.mLinkedSpell = Spells.SHIELD_BASH;
+		mInfo.mLinkedSpell = ClassAbility.SHIELD_BASH;
 		mInfo.mScoreboardId = "ShieldBash";
 		mInfo.mShorthandName = "SB";
 		mInfo.mDescriptions.add("Block while looking at an enemy within 4 blocks to deal 5 damage and stun them for 1 second. Cooldown: 8s.");

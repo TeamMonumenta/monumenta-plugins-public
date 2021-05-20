@@ -16,7 +16,7 @@ import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
-import com.playmonumenta.plugins.classes.Spells;
+import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.effects.PercentDamageDealt;
 import com.playmonumenta.plugins.utils.AbsorptionUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -51,7 +51,7 @@ public class Challenge extends Ability {
 		mInfo.mDescriptions.add("You gain 2 Absorption per affected mob (up to 8 Absorption) and +30% melee damage instead.");
 		mInfo.mCooldown = COOLDOWN;
 		mInfo.mIgnoreCooldown = true;
-		mInfo.mLinkedSpell = Spells.CHALLENGE;
+		mInfo.mLinkedSpell = ClassAbility.CHALLENGE;
 		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;
 		mPercentDamageDealtEffect = getAbilityScore() == 1 ? PERCENT_DAMAGE_DEALT_EFFECT_1 : PERCENT_DAMAGE_DEALT_EFFECT_2;
 		mAbsorptionPerMob = getAbilityScore() == 1 ? ABSORPTION_PER_MOB_1 : ABSORPTION_PER_MOB_2;

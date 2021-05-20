@@ -6,6 +6,19 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.abilities.AbilityManager;
+import com.playmonumenta.plugins.abilities.AbilityTrigger;
+import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.classes.magic.MagicType;
+import com.playmonumenta.plugins.point.Raycast;
+import com.playmonumenta.plugins.point.RaycastData;
+import com.playmonumenta.plugins.utils.AbilityUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.utils.LocationUtils;
+
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -15,24 +28,10 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.abilities.AbilityManager;
-import com.playmonumenta.plugins.abilities.AbilityTrigger;
-import com.playmonumenta.plugins.classes.Spells;
-import com.playmonumenta.plugins.classes.magic.MagicType;
-import com.playmonumenta.plugins.point.Raycast;
-import com.playmonumenta.plugins.point.RaycastData;
-import com.playmonumenta.plugins.utils.AbilityUtils;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.InventoryUtils;
-import com.playmonumenta.plugins.utils.LocationUtils;
-import com.playmonumenta.plugins.utils.PotionUtils;
+
 
 /*
  * Shift+LClick with a bow to afflict the mob you're looking at (within 32 blocks)
@@ -81,7 +80,7 @@ public class PurpleHaze extends Ability {
 
 	public PurpleHaze(Plugin plugin, Player player) {
 		super(plugin, player, "Purple Haze");
-		mInfo.mLinkedSpell = Spells.PURPLE_HAZE;
+		mInfo.mLinkedSpell = ClassAbility.PURPLE_HAZE;
 		mInfo.mScoreboardId = "PurpleHaze";
 		mInfo.mShorthandName = "PH";
 		mInfo.mDescriptions.add("Left-clicking while shifted with a bow while looking at a mob within 32 blocks deals 3 damage per second and gives 30% Slowness for 8 seconds to that mob. If the target dies, the user gains an additional Alchemist's Potion and the effects transfer to up to 2 mob up to 5 blocks from the target that died. The maximum number of times effects can spread is a chain 2 mobs deep. Cooldown: 35s.");

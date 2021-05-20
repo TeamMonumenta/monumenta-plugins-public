@@ -15,7 +15,7 @@ import org.bukkit.util.Vector;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.MultipleChargeAbility;
-import com.playmonumenta.plugins.classes.Spells;
+import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.classes.magic.MagicType;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
@@ -39,7 +39,7 @@ public class TacticalManeuver extends MultipleChargeAbility {
 
 	public TacticalManeuver(Plugin plugin, Player player) {
 		super(plugin, player, "Tactical Maneuver", TACTICAL_MANEUVER_1_MAX_CHARGES, TACTICAL_MANEUVER_2_MAX_CHARGES);
-		mInfo.mLinkedSpell = Spells.TACTICAL_MANEUVER;
+		mInfo.mLinkedSpell = ClassAbility.TACTICAL_MANEUVER;
 		mInfo.mScoreboardId = "TacticalManeuver";
 		mInfo.mShorthandName = "TM";
 		mInfo.mDescriptions.add("Sprint right click to dash forward, dealing the first enemy hit 16 damage, and stunning it and all enemies in a 3 block radius for 1 second. Shift right click to leap backwards, dealing enemies in a 3 block radius 8 damage and knocking them away. Only triggers with non-trident melee weapons. Cooldown: 12s. Charges: 2.");

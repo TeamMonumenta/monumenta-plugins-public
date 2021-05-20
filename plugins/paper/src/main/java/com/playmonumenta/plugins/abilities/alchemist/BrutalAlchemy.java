@@ -6,7 +6,7 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.classes.Spells;
+import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.utils.PotionUtils;
 
 public class BrutalAlchemy extends PotionAbility {
@@ -20,7 +20,7 @@ public class BrutalAlchemy extends PotionAbility {
 
 	public BrutalAlchemy(Plugin plugin, Player player) {
 		super(plugin, player, "Brutal Alchemy", BRUTAL_ALCHEMY_1_DAMAGE, BRUTAL_ALCHEMY_2_DAMAGE);
-		mInfo.mLinkedSpell = Spells.BRUTAL_ALCHEMY;
+		mInfo.mLinkedSpell = ClassAbility.BRUTAL_ALCHEMY;
 		mInfo.mScoreboardId = "BrutalAlchemy";
 		mInfo.mShorthandName = "BA";
 		mInfo.mDescriptions.add("Your Alchemist's Potions deal 1 damage and 10% Vulnerability for 8 seconds.");

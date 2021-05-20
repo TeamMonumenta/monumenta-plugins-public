@@ -16,7 +16,7 @@ import org.bukkit.util.Vector;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.classes.Spells;
+import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
@@ -33,7 +33,7 @@ public class Riposte extends Ability {
 
 	public Riposte(Plugin plugin, Player player) {
 		super(plugin, player, "Riposte");
-		mInfo.mLinkedSpell = Spells.RIPOSTE;
+		mInfo.mLinkedSpell = ClassAbility.RIPOSTE;
 		mInfo.mScoreboardId = "Obliteration";
 		mInfo.mShorthandName = "Rip";
 		mInfo.mDescriptions.add("While wielding a sword or axe, you block a melee attack that would have hit you. Cooldown: 10s.");

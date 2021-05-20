@@ -7,7 +7,7 @@ import org.bukkit.command.CommandSender;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import com.playmonumenta.plugins.classes.Spells;
+import com.playmonumenta.plugins.classes.ClassAbility;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -31,7 +31,7 @@ public class AbilityInfo {
 	// If the ability does not require a scoreboardID and just a classId, leave this as null.
 	public String mScoreboardId = null;
 
-	public Spells mLinkedSpell = null;
+	public ClassAbility mLinkedSpell = null;
 	public AbilityTrigger mTrigger = null;
 
 	//This is in ticks

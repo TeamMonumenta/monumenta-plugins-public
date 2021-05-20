@@ -17,7 +17,7 @@ import org.bukkit.util.Vector;
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.classes.Spells;
+import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.classes.magic.MagicType;
 import com.playmonumenta.plugins.enchantments.abilities.SpellPower;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -43,7 +43,7 @@ public class ArcaneStrike extends Ability {
 
 	public ArcaneStrike(Plugin plugin, Player player) {
 		super(plugin, player, "Arcane Strike");
-		mInfo.mLinkedSpell = Spells.ARCANE_STRIKE;
+		mInfo.mLinkedSpell = ClassAbility.ARCANE_STRIKE;
 		mInfo.mScoreboardId = "ArcaneStrike";
 		mInfo.mShorthandName = "AS";
 		mInfo.mDescriptions.add("When you attack an enemy with a wand, you unleash an arcane explosion dealing 4 damage to all mobs in a 4 block radius around the target. Enemies that are on fire or slowed take 2 extra damage. Arcane strike can not trigger Spellshock's static. Cooldown: 5s.");

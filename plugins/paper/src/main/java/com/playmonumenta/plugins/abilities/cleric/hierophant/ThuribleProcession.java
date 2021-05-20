@@ -13,7 +13,7 @@ import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.classes.Spells;
+import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.effects.Effect;
 import com.playmonumenta.plugins.effects.PercentAttackSpeed;
 import com.playmonumenta.plugins.effects.PercentDamageDealt;
@@ -50,7 +50,7 @@ public class ThuribleProcession extends Ability {
 		mInfo.mDescriptions.add("The Hierophant passively builds up buffs when other players are within 30 blocks, which are applied to all players in the radius. Buffs end and the buildup resets upon a melee attack on a hostile mob, unless the full set of buffs have been obtained. Then all players (including the Hierophant) get 8 seconds of all built-up buffs. After these 8 seconds the timer resets and the Procession begins anew. Progression - +10% Attack Speed (after 4s of no melee), +10% Speed (after 8s of no melee), +10% Attack and Projectile Damage (after 12s of no melee), Cleric's passive heal is doubled, to 10% of max health every 5s (after 16s of no melee)");
 		mInfo.mDescriptions.add("Progression - +15% Attack Speed (after 4s of no melee), +15% Speed (after 8s of no melee), +15% Attack and Projectile Damage (after 12s of no melee), Cleric's passive heal is tripled, to 15% of max health every 5s (after 16s of no melee)");
 		mInfo.mCooldown = 20 * THURIBLE_COOLDOWN;
-		mInfo.mLinkedSpell = Spells.THURIBLE_PROCESSION;
+		mInfo.mLinkedSpell = ClassAbility.THURIBLE_PROCESSION;
 	}
 
 	@Override

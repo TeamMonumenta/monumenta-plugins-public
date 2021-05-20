@@ -24,7 +24,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
-import com.playmonumenta.plugins.classes.Spells;
+import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.classes.magic.MagicType;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
@@ -59,7 +59,7 @@ public class ShieldWall extends Ability {
 		mInfo.mDescriptions.add("Blocking and then blocking again within .25s creates a 180 degree arc of particles 5 blocks high and 4 blocks wide in front of the user. This blocks all enemy projectiles (Ghast fireballs explode on the wall) and deals 6 damage to enemies that pass through the wall. The shield lasts 8 seconds. Cooldown: 30s.");
 		mInfo.mDescriptions.add("The shield lasts 10 seconds instead. Additionally, the shield knocks back enemies that try to go through it. Cooldown: 20s.");
 		mInfo.mCooldown = getAbilityScore() == 1 ? SHIELD_WALL_1_COOLDOWN : SHIELD_WALL_2_COOLDOWN;
-		mInfo.mLinkedSpell = Spells.SHIELD_WALL;
+		mInfo.mLinkedSpell = ClassAbility.SHIELD_WALL;
 		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
 	}
 

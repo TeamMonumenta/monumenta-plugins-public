@@ -25,7 +25,7 @@ import org.bukkit.inventory.ItemStack;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
-import com.playmonumenta.plugins.classes.Spells;
+import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.classes.magic.MagicType;
 import com.playmonumenta.plugins.enchantments.Inferno;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -62,7 +62,7 @@ public class JudgementChain extends Ability {
 
 	public JudgementChain(Plugin plugin, Player player) {
 		super(plugin, player, "Judgement Chain");
-		mInfo.mLinkedSpell = Spells.JUDGEMENT_CHAIN;
+		mInfo.mLinkedSpell = ClassAbility.JUDGEMENT_CHAIN;
 		mInfo.mScoreboardId = "JudgementChain";
 		mInfo.mShorthandName = "JC";
 		mInfo.mDescriptions.add("Double right-click while looking at a non-boss hostile mob to conjure an unbreakable chain, linking the soul of the Reaper and the mob. The mob becomes immortal (as long as there is another mob within 8 blocks) for the next 20 seconds and will only target the Reaper it is chained to, but it is slowed by 25% and deals 50% less damage to the Reaper, and no damage to all other players. All debuffs on the chained mob are inverted to their positive counterpart and transferred to the Reaper for 10s, capped at level 1. Bosses cannot be chained. Shift + Swap while looking up, or move more than 16 blocks away from the mob, to break the chain and cancel the immortality on the mob, dealing 20 damage to it. Cooldown: 25s.");

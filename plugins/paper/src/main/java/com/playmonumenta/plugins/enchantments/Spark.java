@@ -140,9 +140,10 @@ public class Spark implements BaseEnchantment {
 				partialParticle.spawnAsEnemy();
 
 				@NotNull World world = enemy.getWorld();
+				@NotNull Location enemyLocation = enemy.getLocation();
 				// /playsound entity.firework_rocket.twinkle_far master @p ~ ~ ~ 0.3 1.2
 				world.playSound(
-					enemy.getLocation(),
+					enemyLocation,
 					Sound.ENTITY_FIREWORK_ROCKET_TWINKLE_FAR,
 					SoundCategory.PLAYERS,
 					0.3f,
@@ -150,7 +151,7 @@ public class Spark implements BaseEnchantment {
 				);
 				// /playsound entity.firework_rocket.twinkle master @p ~ ~ ~ 0.3 1.5
 				world.playSound(
-					enemy.getLocation(),
+					enemyLocation,
 					Sound.ENTITY_FIREWORK_ROCKET_TWINKLE,
 					SoundCategory.PLAYERS,
 					0.3f,

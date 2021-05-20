@@ -5,7 +5,7 @@ import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
-import com.playmonumenta.plugins.classes.Spells;
+import com.playmonumenta.plugins.classes.ClassAbility;
 
 public class AbilityCastEvent extends Event implements Cancellable {
 
@@ -14,9 +14,9 @@ public class AbilityCastEvent extends Event implements Cancellable {
 	private boolean mIsCancelled;
 
 	private final Player mCaster;
-	private final Spells mSpell;
+	private final ClassAbility mSpell;
 
-	public AbilityCastEvent(Player caster, Spells spell) {
+	public AbilityCastEvent(Player caster, ClassAbility spell) {
 		mCaster = caster;
 		mSpell = spell;
 	}
@@ -25,7 +25,7 @@ public class AbilityCastEvent extends Event implements Cancellable {
 		return mCaster;
 	}
 
-	public Spells getAbility() {
+	public ClassAbility getAbility() {
 		return mSpell;
 	}
 

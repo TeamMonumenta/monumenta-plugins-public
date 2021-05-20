@@ -73,6 +73,7 @@ public class Constants {
 	public static final int PATREON_TIER_1 = 1;
 	// + White particles
 	// + Stat tracking
+	// + Patreon Parakeet
 	// + Shrine heads
 	// + Hope skins
 	public static final int PATREON_TIER_2 = 5;
@@ -97,9 +98,45 @@ public class Constants {
 		public static final String PARTICLES_ENEMY = "ParticlesEnemy";
 		public static final String PARTICLES_BOSS = "ParticlesBoss";
 
+		// PlayerData
+		public static final String PATREON_DOLLARS = "Patreon";
+	}
 
+	public static class Tags {
 		// PlayerData
 		public static final String NO_SELF_PARTICLES = "noSelfParticles";
-		public static final String PATREON_DOLLARS = "Patreon";
+	}
+
+	// Note blocks
+	public static class NotePitches {
+		public static final float FS0 = calculatePitch(0);
+		public static final float G1 = calculatePitch(1);
+		public static final float GS2 = calculatePitch(2);
+		public static final float A3 = calculatePitch(3);
+		public static final float AS4 = calculatePitch(4);
+		public static final float B5 = calculatePitch(5);
+		public static final float C6 = calculatePitch(6);
+		public static final float CS7 = calculatePitch(7);
+		public static final float D8 = calculatePitch(8);
+		public static final float DS9 = calculatePitch(9);
+		public static final float E10 = calculatePitch(10);
+		public static final float F11 = calculatePitch(11);
+		public static final float FS12 = calculatePitch(12);
+		public static final float G13 = calculatePitch(13);
+		public static final float GS14 = calculatePitch(14);
+		public static final float A15 = calculatePitch(15);
+		public static final float AS16 = calculatePitch(16);
+		public static final float B17 = calculatePitch(17);
+		public static final float C18 = calculatePitch(18);
+		public static final float CS19 = calculatePitch(19);
+		public static final float D20 = calculatePitch(20);
+		public static final float DS21 = calculatePitch(21);
+		public static final float E22 = calculatePitch(22);
+		public static final float F23 = calculatePitch(23);
+		public static final float FS24 = calculatePitch(24);
+
+		public static float calculatePitch(int clicks) {
+			return 0.5f * (float)Math.pow(2, (clicks / 12d));
+		}
 	}
 }

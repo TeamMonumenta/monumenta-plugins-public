@@ -2,7 +2,7 @@ package com.playmonumenta.plugins.abilities.alchemist;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.classes.Spells;
+import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.classes.magic.MagicType;
 import com.playmonumenta.plugins.effects.CustomDamageOverTime;
 
@@ -35,7 +35,7 @@ public class BasiliskPoison extends Ability {
 		mInfo.mShorthandName = "BP";
 		mInfo.mDescriptions.add("Equips your arrows with a damage over time that deals 5% of your bow shot every 1s for 6s.");
 		mInfo.mDescriptions.add("Damage over time is improved to 8%");
-		mInfo.mLinkedSpell = Spells.BASILISK_POISON;
+		mInfo.mLinkedSpell = ClassAbility.BASILISK_POISON;
 		mPercent = getAbilityScore() == 1 ? BASILISK_POISON_1_PERCENT_DAMAGE : BASILISK_POISON_2_PERCENT_DAMAGE;
 	}
 
@@ -43,7 +43,7 @@ public class BasiliskPoison extends Ability {
 	public boolean livingEntityShotByPlayerEvent(Projectile proj, LivingEntity damagee, EntityDamageByEntityEvent event) {
 		if (proj instanceof Arrow || proj instanceof SpectralArrow) {
 			World world = mPlayer.getWorld();
-			mPlugin.mEffectManager.addEffect(damagee, DAMAGE_EFFECT_NAME, new CustomDamageOverTime(DURATION, event.getDamage() * mPercent, mPlayer, MagicType.ALCHEMY, Spells.BASILISK_POISON, Particle.TOTEM, mPlugin));
+			mPlugin.mEffectManager.addEffect(damagee, DAMAGE_EFFECT_NAME, new CustomDamageOverTime(DURATION, event.getDamage() * mPercent, mPlayer, MagicType.ALCHEMY, ClassAbility.BASILISK_POISON, Particle.TOTEM, mPlugin));
 			world.spawnParticle(Particle.TOTEM, damagee.getLocation().add(0, 1.6, 0), 12, 0.4, 0.4, 0.4, 0.1);
 			world.playSound(damagee.getLocation(), Sound.ENTITY_CREEPER_HURT, 1, 1.6f);
 		}

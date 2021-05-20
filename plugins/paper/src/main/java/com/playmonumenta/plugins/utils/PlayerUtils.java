@@ -7,7 +7,7 @@ import com.destroystokyo.paper.MaterialSetTag;
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.attributes.AttributeProjectileSpeed;
-import com.playmonumenta.plugins.classes.Spells;
+import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.events.AbilityCastEvent;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 
@@ -18,6 +18,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.AbstractArrow;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityRegainHealthEvent;
 import org.bukkit.potion.PotionEffect;
@@ -28,21 +29,7 @@ import org.jetbrains.annotations.NotNull;
 
 
 public class PlayerUtils {
-	public static boolean isFullyCooled(Player player) {
-		return player.getCooledAttackStrength(0) == 1;
-	}
-
-	public static boolean isCritical(Player player) {
-		return isFullyCooled(player) &&
-			   player.getFallDistance() > 0.0F &&
-		       !player.isOnGround() &&
-		       !player.isInsideVehicle() &&
-		       !player.hasPotionEffect(PotionEffectType.BLINDNESS) &&
-		       player.getLocation().getBlock().getType() != Material.LADDER &&
-		       player.getLocation().getBlock().getType() != Material.VINE;
-	}
-
-	public static void callAbilityCastEvent(Player player, Spells spell) {
+	public static void callAbilityCastEvent(Player player, ClassAbility spell) {
 		AbilityCastEvent event = new AbilityCastEvent(player, spell);
 		Bukkit.getPluginManager().callEvent(event);
 	}
@@ -131,18 +118,6 @@ public class PlayerUtils {
 		                                   getExecuteCommandOnNearbyPlayers(loc, radius, command));
 	}
 
-	// If player is considered to be in the air
-	public static boolean isAirborne(Player player) {
-		Material playerFeetMaterial = player.getLocation().getBlock().getType();
-		// Accounts for all climbables including 1.16 vines & scaffolding
-		boolean playerInClimbable = MaterialSetTag.CLIMBABLE.isTagged(playerFeetMaterial);
-
-		return (
-			!playerInClimbable
-			&& !player.isOnGround()
-		);
-	}
-
 	// How far back the player drew their bow,
 	// vs what its max launch speed would be.
 	// Launch velocity used to calculate is specifically for PLAYERS shooting BOWS!
@@ -154,6 +129,101 @@ public class PlayerUtils {
 		return Math.min(
 			1,
 			currentSpeed / maxLaunchSpeed
+		);
+	}
+
+	/*
+	 * Whether the player meets the conditions for a critical hit,
+	 * emulating the vanilla check in full (no critting while sprinting).
+	 */
+	public static boolean isCriticalAttack(@NotNull Player player) {
+		// NMS EntityHuman:
+		// float f2 = this.getAttackCooldown(0.5F);
+		// boolean flag = f2 > 0.9F;
+		// boolean flag2 = flag && this.fallDistance > 0.0F && !this.onGround && !this.isClimbing() && !this.isInWater() && !this.hasEffect(MobEffects.BLINDNESS) && !this.isPassenger() && entity instanceof EntityLiving;
+		// flag2 = flag2 && !this.isSprinting();
+		return (
+			isFallingAttack(player)
+			&& !player.isSprinting()
+		);
+	}
+
+	/*
+	 * Whether the player meets the conditions for a critical hit,
+	 * emulating the vanilla check,
+	 * except this does not check whether they are sprinting.
+	 * This is used because MM has historically had a non-exact crit check that
+	 * allowed crit-triggered abilities to trigger off non-crit melee damage
+	 * while sprinting.
+	 */
+	public static boolean isFallingAttack(@NotNull Player player) {
+		return (
+			player.getCooledAttackStrength(0.5f) > 0.9
+			&& player.getFallDistance() > 0
+			&& isAirborne(player)
+			&& !player.isInWater()
+			&& !player.hasPotionEffect(PotionEffectType.BLINDNESS)
+			&& !player.isInsideVehicle()
+			//TODO pass in the Entity in question to check if LivingEntity
+		);
+	}
+
+	// Whether player is considered to be in the air
+	public static boolean isAirborne(Player player) {
+		if (!player.isOnGround()) {
+			Material playerFeetMaterial = player.getLocation().getBlock().getType();
+			// Accounts for vines, ladders, nether vines, scaffolding etc
+			if (!MaterialSetTag.CLIMBABLE.isTagged(playerFeetMaterial)) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	/*
+	 * Whether the player meets the conditions for a sweep attack,
+	 * emulating the vanilla check, except the sword or proximity requirements.
+	 * This also does not require them to be on the ground.
+	 */
+	public static boolean isNonFallingAttack(
+		@NotNull Player player,
+		@NotNull Entity enemy
+	) {
+		return (
+			player.getCooledAttackStrength(0.5f) > 0.9
+			&& !isCriticalAttack(player)
+			&& !player.isSprinting()
+			// Last check on horizontal "speed" requires an internal vanilla
+			// collision adjustment Vec3D,
+			// it is not simply player.getVelocity() (that is used elsewhere)
+		);
+	}
+
+	/*
+	 * Whether the player meets the conditions for a sweep attack,
+	 * emulating the vanilla check, except the sword or proximity requirements.
+	 */
+	public static boolean isSweepingAttack(
+		@NotNull Player player,
+		@NotNull Entity enemy
+	) {
+		// NMS Entity:
+		// this.z = this.A;
+		// this.A = (float)((double)this.A + (double)MathHelper.sqrt(c(vec3d1)) * 0.6D);
+		// public static double c(Vec3D vec3d) {
+		//     return vec3d.x * vec3d.x + vec3d.z * vec3d.z;
+		// }
+		//
+		// NMS EntityHuman:
+		// if (this.isSprinting() && flag) {
+		//     flag1 = true;
+		// }
+		// double d0 = (double)(this.A - this.z);
+		// if (flag && !flag2 && !flag1 && this.onGround && d0 < (double)this.dN()) {
+		return (
+			isNonFallingAttack(player, enemy)
+			&& player.isOnGround()
 		);
 	}
 }

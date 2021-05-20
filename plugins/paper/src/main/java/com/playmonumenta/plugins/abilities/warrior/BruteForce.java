@@ -2,6 +2,17 @@ package com.playmonumenta.plugins.abilities.warrior;
 
 import java.util.EnumSet;
 
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.classes.magic.MagicType;
+import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
+import com.playmonumenta.plugins.enchantments.abilities.BaseAbilityEnchantment;
+import com.playmonumenta.plugins.tracking.PlayerTracking;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.MovementUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
+
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.World;
@@ -10,16 +21,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.classes.Spells;
-import com.playmonumenta.plugins.classes.magic.MagicType;
-import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
-import com.playmonumenta.plugins.enchantments.abilities.BaseAbilityEnchantment;
-import com.playmonumenta.plugins.tracking.PlayerTracking;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.MovementUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
+
 
 public class BruteForce extends Ability {
 
@@ -55,16 +57,16 @@ public class BruteForce extends Ability {
 
 	public BruteForce(Plugin plugin, Player player) {
 		super(plugin, player, "Brute Force");
-		mInfo.mLinkedSpell = Spells.BRUTE_FORCE;
+		mInfo.mLinkedSpell = ClassAbility.BRUTE_FORCE;
 		mInfo.mScoreboardId = "BruteForce";
 		mInfo.mShorthandName = "BF";
-		mInfo.mDescriptions.add("When you critically strike, you deal 2 damage to all enemies near your target and knock them back.");
-		mInfo.mDescriptions.add("The damage is increased to 3 + 15% of the damage done by the crit.");
+		mInfo.mDescriptions.add("Attacking an enemy with a cooled down falling attack passively deals 2 more damage to it, 2 physical damage to all enemies in a 2-block cube around it, and knocks all non-boss enemies away from you.");
+		mInfo.mDescriptions.add("Damage is increased from 2, to 15% and then 3.");
 	}
 
 	@Override
 	public boolean livingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
-		if (PlayerUtils.isCritical(mPlayer) && event.getCause() == DamageCause.ENTITY_ATTACK) {
+		if (PlayerUtils.isFallingAttack(mPlayer) && event.getCause() == DamageCause.ENTITY_ATTACK) {
 			double damageBonus = getAbilityScore() == 1 ? BRUTE_FORCE_DAMAGE : BRUTE_FORCE_2_DAMAGE + event.getDamage() * SCALING_DAMAGE;
 			damageBonus += BruteForceDamageEnchantment.getExtraDamage(mPlayer, BruteForceDamageEnchantment.class);
 			event.setDamage(event.getDamage() + damageBonus);

@@ -16,7 +16,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
-import com.playmonumenta.plugins.classes.Spells;
+import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.classes.magic.MagicType;
 import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
 import com.playmonumenta.plugins.enchantments.abilities.BaseAbilityEnchantment;
@@ -46,7 +46,7 @@ public class CholericFlames extends Ability {
 		mInfo.mShorthandName = "CF";
 		mInfo.mDescriptions.add("Sneaking and right-clicking while not looking down while holding a scythe knocks back and ignites mobs within 8 blocks of you for 7s, additionally dealing 3 damage. Cooldown: 10s.");
 		mInfo.mDescriptions.add("The damage is increased to 5, and also afflict mobs with Poison II.");
-		mInfo.mLinkedSpell = Spells.CHOLERIC_FLAMES;
+		mInfo.mLinkedSpell = ClassAbility.CHOLERIC_FLAMES;
 		mInfo.mCooldown = COOLDOWN;
 		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
 		mDamage = getAbilityScore() == 1 ? DAMAGE_1 : DAMAGE_2;

@@ -20,7 +20,7 @@ import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.cleric.hierophant.EnchantedPrayer;
 import com.playmonumenta.plugins.abilities.cleric.paladin.LuminousInfusion;
-import com.playmonumenta.plugins.classes.Spells;
+import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.enchantments.Multitool;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.utils.InventoryUtils;
@@ -36,7 +36,7 @@ public class HandOfLight extends Ability {
 
 	public HandOfLight(Plugin plugin, Player player) {
 		super(plugin, player, "Hand of Light");
-		mInfo.mLinkedSpell = Spells.HEALING;
+		mInfo.mLinkedSpell = ClassAbility.HAND_OF_LIGHT;
 		mInfo.mScoreboardId = "Healing";
 		mInfo.mShorthandName = "HoL";
 		mInfo.mDescriptions.add("Right click while holding a weapon or tool to heal all OTHER players in a 12 block range in front of you or within 2 blocks of you for 2 hearts + 10% of their max health and gives them regen 2 for 4 seconds. If holding a shield, the trigger is changed to crouch + right click. Cooldown: 14s.");

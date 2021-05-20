@@ -2,15 +2,16 @@ package com.playmonumenta.plugins.enchantments;
 
 import java.util.EnumSet;
 
-import org.bukkit.ChatColor;
-import org.bukkit.entity.Player;
-import org.bukkit.attribute.Attribute;
-
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
-import com.playmonumenta.plugins.effects.PercentDamageReceived;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import com.playmonumenta.plugins.utils.EntityUtils;
+
+import org.bukkit.ChatColor;
+import org.bukkit.attribute.Attribute;
+import org.bukkit.entity.Player;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
+
+
 
 public class SecondWind implements BaseEnchantment {
 	private static String PROPERTY_NAME = ChatColor.GRAY + "Second Wind";

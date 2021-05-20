@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.player;
 
 import com.playmonumenta.plugins.Constants.Objectives;
+import com.playmonumenta.plugins.Constants.Tags;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 
 import org.bukkit.entity.Player;
@@ -15,7 +16,7 @@ public class PlayerData {
 			case OWN_PASSIVE:
 				// For now, this is the only setting players can change via existing PEB toggle
 				// Scrap this in the future for the sliders mentioned above, maybe scoreboard from 0-100 per source
-				return player.getScoreboardTags().contains(Objectives.NO_SELF_PARTICLES) ? 0 : 1;
+				return player.getScoreboardTags().contains(Tags.NO_SELF_PARTICLES) ? 0 : 1;
 			case OWN_ACTIVE:
 			case OTHER_PASSIVE:
 			case OTHER_ACTIVE:

@@ -6,6 +6,14 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.MultipleChargeAbility;
+import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.classes.magic.MagicType;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.InventoryUtils;
+
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -16,18 +24,10 @@ import org.bukkit.entity.Player;
 import org.bukkit.entity.ThrownPotion;
 import org.bukkit.event.entity.PotionSplashEvent;
 import org.bukkit.metadata.FixedMetadataValue;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.MultipleChargeAbility;
-import com.playmonumenta.plugins.classes.Spells;
-import com.playmonumenta.plugins.classes.magic.MagicType;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.FastUtils;
-import com.playmonumenta.plugins.utils.InventoryUtils;
+
 
 public class ScorchedEarth extends MultipleChargeAbility {
 
@@ -63,7 +63,7 @@ public class ScorchedEarth extends MultipleChargeAbility {
 
 	public ScorchedEarth(Plugin plugin, Player player) {
 		super(plugin, player, "Scorched Earth", SCORCHED_EARTH_1_CHARGES, SCORCHED_EARTH_2_CHARGES);
-		mInfo.mLinkedSpell = Spells.SCORCHED_EARTH;
+		mInfo.mLinkedSpell = ClassAbility.SCORCHED_EARTH;
 		mInfo.mScoreboardId = "ScorchedEarth";
 		mInfo.mShorthandName = "SE";
 		mInfo.mDescriptions.add("Shift right click with an Alchemist Potion to deploy a 5 block radius zone that lasts 15 seconds where the potion lands. Mobs in this zone are afflicted with 15% Weaken and are dealt 3 extra damage whenever taking damage. Cooldown: 30s.");
