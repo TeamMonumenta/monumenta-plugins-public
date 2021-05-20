@@ -8,13 +8,17 @@ import org.bukkit.plugin.Plugin;
 
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.bosses.spells.SpellCrowdControlClear;
+import com.playmonumenta.plugins.utils.BossUtils;
 
 public class CrowdControlResistanceBoss extends BossAbilityGroup {
 
 	public static final String identityTag = "boss_cleanse";
-	public static final int detectionRange = 100;
 
-	private static final int CLEAR_TIME = 20 * 4;
+	public static class Parameters {
+		public int CLEAR_TIME = 20 * 4;
+		public int DETECTION = 100;
+	}
+
 
 	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
 		return new CrowdControlResistanceBoss(plugin, boss);
@@ -23,8 +27,11 @@ public class CrowdControlResistanceBoss extends BossAbilityGroup {
 
 	public CrowdControlResistanceBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
-		List<Spell> passive = Arrays.asList(new SpellCrowdControlClear(boss, CLEAR_TIME));
 
-		super.constructBoss(null, passive, detectionRange, null);
+		Parameters p = BossUtils.getParameters(boss, identityTag, new Parameters());
+
+		List<Spell> passive = Arrays.asList(new SpellCrowdControlClear(boss, p.CLEAR_TIME));
+
+		super.constructBoss(null, passive, p.DETECTION, null);
 	}
 }

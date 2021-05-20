@@ -12,7 +12,11 @@ import com.playmonumenta.plugins.utils.BossUtils;
 
 public class SpellGenericCharge extends SpellBaseCharge {
 	public SpellGenericCharge(Plugin plugin, LivingEntity boss, int range, float damage) {
-		super(plugin, boss, range, 25, false,
+		this(plugin, boss, range, damage, 160);
+	}
+
+	public SpellGenericCharge(Plugin plugin, LivingEntity boss, int range, float damage, int cooldown) {
+		super(plugin, boss, range, cooldown, 25, false,
 		      // Warning sound/particles at boss location and slow boss
 		      (Player player) -> {
 		          boss.getWorld().spawnParticle(Particle.VILLAGER_ANGRY, boss.getLocation(), 50, 2, 2, 2, 0);

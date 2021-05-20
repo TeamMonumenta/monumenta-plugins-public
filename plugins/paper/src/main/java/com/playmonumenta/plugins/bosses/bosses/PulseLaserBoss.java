@@ -18,6 +18,16 @@ import com.playmonumenta.plugins.utils.BossUtils;
 
 public class PulseLaserBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_pulselaser";
+
+	public static class Parameters {
+		public int DAMAGE = 18;
+		public int DELAY = 100;
+		public int DETECTION = 30;
+		public int DURATION = 5 * 20;
+		public int COOLDOWN = 12 * 20;
+		public boolean SINGLE_TARGET = false;
+	}
+
 	public static final int detectionRange = 30;
 
 	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
@@ -27,8 +37,10 @@ public class PulseLaserBoss extends BossAbilityGroup {
 	public PulseLaserBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
 
+		Parameters p = BossUtils.getParameters(boss, identityTag, new Parameters());
+
 		SpellManager activeSpells = new SpellManager(Arrays.asList(
-			new SpellBaseLaser(plugin, boss, detectionRange, 100, false, false, 240,
+			new SpellBaseLaser(plugin, boss, p.DETECTION, p.DURATION, false, p.SINGLE_TARGET, p.COOLDOWN,
 					// Tick action per player
 					(Player player, int ticks, boolean blocked) -> {
 						player.playSound(player.getLocation(), Sound.UI_TOAST_IN, 0.8f, 0.5f + (ticks / 80f) * 1.5f);
@@ -50,11 +62,11 @@ public class PulseLaserBoss extends BossAbilityGroup {
 						loc.getWorld().playSound(loc, Sound.ENTITY_DRAGON_FIREBALL_EXPLODE, 0.6f, 1.5f);
 						loc.getWorld().spawnParticle(Particle.EXPLOSION_NORMAL, loc, 35, 0, 0, 0, 0.25);
 						if (!blocked) {
-							BossUtils.bossDamage(boss, player, 18);
+							BossUtils.bossDamage(boss, player, p.DAMAGE);
 						}
 					})
 		));
 
-		super.constructBoss(activeSpells, null, detectionRange, null);
+		super.constructBoss(activeSpells, null, detectionRange, null, p.DELAY);
 	}
 }

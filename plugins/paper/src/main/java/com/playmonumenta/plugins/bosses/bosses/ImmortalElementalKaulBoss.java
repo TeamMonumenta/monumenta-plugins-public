@@ -62,7 +62,7 @@ public class ImmortalElementalKaulBoss extends BossAbilityGroup {
 		mBoss.setHealth(bossTargetHp);
 
 		SpellManager activeSpells = new SpellManager(Arrays.asList(
-			new SpellBaseCharge(plugin, mBoss, 20, 20, true,
+			new SpellBaseCharge(plugin, mBoss, 20, 20, 160, true,
 				(Player player) -> {
 					boss.getWorld().spawnParticle(Particle.VILLAGER_ANGRY, boss.getLocation(), 50, 2, 2, 2, 0);
 					boss.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 40, 4));

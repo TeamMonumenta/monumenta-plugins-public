@@ -17,22 +17,28 @@ import com.playmonumenta.plugins.utils.ZoneUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
 
 public class SpellTpSwapPlaces extends Spell {
-	private static final int MAX_RANGE = 16;
-	private static final int TP_DELAY = 50;
 
 	private final Plugin mPlugin;
 	private final Entity mLauncher;
+	private final int mCooldown;
+	private final int mRANGE;
 	private final int mDuration;
 
-	public SpellTpSwapPlaces(Plugin plugin, Entity launcher, int duration) {
+	public SpellTpSwapPlaces(Plugin plugin, Entity launcher, int cooldown) {
+		this(plugin, launcher, cooldown, 16, 50);
+	}
+
+	public SpellTpSwapPlaces(Plugin plugin, Entity launcher, int cooldown, int range, int duration) {
 		mPlugin = plugin;
 		mLauncher = launcher;
+		mCooldown = cooldown;
+		mRANGE = range;
 		mDuration = duration;
 	}
 
 	@Override
 	public void run() {
-		List<Player> players = PlayerUtils.playersInRange(mLauncher.getLocation(), MAX_RANGE);
+		List<Player> players = PlayerUtils.playersInRange(mLauncher.getLocation(), mRANGE);
 		while (!players.isEmpty()) {
 			Player target = players.get(FastUtils.RANDOM.nextInt(players.size()));
 
@@ -50,14 +56,14 @@ public class SpellTpSwapPlaces extends Spell {
 
 	@Override
 	public int cooldownTicks() {
-		return mDuration;
+		return mCooldown;
 	}
 
 	private void launch(Player target) {
 		new BukkitRunnable() {
 			@Override
 			public void run() {
-				if (target.getLocation().distance(mLauncher.getLocation()) > MAX_RANGE) {
+				if (target.getLocation().distance(mLauncher.getLocation()) > mRANGE) {
 					return;
 				}
 
@@ -77,7 +83,7 @@ public class SpellTpSwapPlaces extends Spell {
 				world.spawnParticle(Particle.SMOKE_LARGE, targetLoc.clone().add(0, mLauncher.getHeight() / 2, 0), 12, 0, 0.45, 0, 0.125);
 				mLauncher.getWorld().playSound(mLauncher.getLocation(), Sound.ENTITY_ENDERMAN_TELEPORT, 3f, 0.7f);
 			}
-		}.runTaskLater(mPlugin, TP_DELAY);
+		}.runTaskLater(mPlugin, mDuration);
 	}
 
 	private void animation(Player target) {
@@ -92,10 +98,11 @@ public class SpellTpSwapPlaces extends Spell {
 				Location particleLoc = mLauncher.getLocation().add(new Location(mLauncher.getWorld(), -0.5f, 0f, 0.5f));
 				particleLoc.getWorld().spawnParticle(Particle.PORTAL, particleLoc, 10, 1, 1, 1, 0.03);
 
-				if (mTicks > TP_DELAY) {
+				if (mTicks > mDuration) {
 					this.cancel();
 				}
 			}
 		}.runTaskTimer(mPlugin, 0, 1);
 	}
+
 }

@@ -1,11 +1,19 @@
 package com.playmonumenta.plugins.utils;
 
+import java.lang.reflect.Field;
+import java.util.HashMap;
+import java.util.Map;
+
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import com.playmonumenta.plugins.Plugin;
+
+import org.bukkit.Color;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.attribute.Attribute;
@@ -152,5 +160,86 @@ public class BossUtils {
 
 	public static int getPlayersInRangeForHealthScaling(Location loc, double radius) {
 		return PlayerUtils.playersInRange(loc, radius, true).size();
+	}
+
+	/**
+	 * @param s a string like "[damage=10, cooldown=60, detectionrange=80, singletarget=true....]
+	 * @param map the map where the values ​​will be added
+	 */
+	public static void addModifiersFromString(Map<String, String> map, String s) {
+		if (!s.startsWith("[")) {
+			return;
+		}
+		s = s.replace("[", "").replace("]", "").replace(" ", "");
+		String[] toMap;
+		for (String mod : s.split(",")) {
+			toMap = mod.split("=");
+			if (toMap.length == 2) {
+				map.put(toMap[0], toMap[1]);
+			} else {
+				Plugin.getInstance().getLogger().warning("Fail to load: " + mod + ". Illegal declaration");
+			}
+		}
+	}
+
+	public static Map<String, String> getModifiersFromIdentityTag(LivingEntity boss, String idTag) {
+		String modTag = idTag + "[";
+		Map<String, String> map = new HashMap<>();
+
+		for (String tag : boss.getScoreboardTags()) {
+			if (tag.startsWith(modTag)) {
+				String found = tag.replace(idTag, "").toLowerCase();
+				addModifiersFromString(map, found);
+			}
+		}
+
+		return map;
+	}
+
+	private static String translateFieldNameToTag(String fieldName) {
+		return fieldName.toLowerCase().replaceAll("[^a-z0-9]", "");
+	}
+
+	public static <T> T getParameters(LivingEntity boss, String identityTag, T parameters) {
+		Map<String, String> modMap = BossUtils.getModifiersFromIdentityTag(boss, identityTag);
+
+		for (Field field : parameters.getClass().getFields()) {
+			Class<?> t = field.getType();
+			String fieldName = field.getName();
+
+			try {
+				String fieldValueOrDefault;
+				if (t.equals(Color.class)) {
+					fieldValueOrDefault = modMap.getOrDefault(translateFieldNameToTag(fieldName), "" + ((Color) field.get(parameters)).asRGB());
+					//didn't found an easy way to fix this
+				} else {
+					fieldValueOrDefault = modMap.getOrDefault(translateFieldNameToTag(fieldName), field.get(parameters).toString());
+				}
+
+				if (t.equals(boolean.class)) {
+					field.set(parameters, Boolean.parseBoolean(fieldValueOrDefault));
+				} else if (t.equals(int.class)) {
+					field.set(parameters, Integer.parseInt(fieldValueOrDefault));
+				} else if (t.equals(long.class)) {
+					field.set(parameters, Long.parseLong(fieldValueOrDefault));
+				} else if (t.equals(float.class)) {
+					field.set(parameters, Float.parseFloat(fieldValueOrDefault));
+				} else if (t.equals(double.class)) {
+					field.set(parameters, Double.parseDouble(fieldValueOrDefault));
+				} else if (t.equals(PotionEffectType.class)) {
+					field.set(parameters, PotionEffectType.getByName(fieldValueOrDefault.toUpperCase()));
+				} else if (t.equals(Color.class)) {
+					field.set(parameters, Color.fromRGB(Integer.parseInt(fieldValueOrDefault)));
+				} else if (t.equals(Particle.class)) {
+					field.set(parameters, Particle.valueOf(fieldValueOrDefault.toUpperCase()));
+				} else if (t.equals(Sound.class)) {
+					field.set(parameters, Sound.valueOf(fieldValueOrDefault.toUpperCase()));
+				}
+			} catch (Exception ex) {
+				Plugin.getInstance().getLogger().warning("Failed to parse boss argument field " + fieldName + " for boss " + identityTag);
+			}
+		}
+
+		return parameters;
 	}
 }

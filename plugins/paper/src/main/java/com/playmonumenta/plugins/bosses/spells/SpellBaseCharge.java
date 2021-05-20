@@ -91,6 +91,7 @@ public class SpellBaseCharge extends Spell {
 	private Plugin mPlugin;
 	private LivingEntity mBoss;
 	private int mRange;
+	private int mCooldown;
 	private int mChargeTicks;
 	private WarningAction mWarningAction;
 	private ParticleAction mWarnParticleAction;
@@ -107,28 +108,34 @@ public class SpellBaseCharge extends Spell {
 	public SpellBaseCharge(Plugin plugin, LivingEntity boss, int range, int chargeTicks,
 	                       WarningAction warning, ParticleAction warnParticles, StartAction start,
 	                       HitPlayerAction hitPlayer, ParticleAction particle, EndAction end) {
-		this(plugin, boss, range, chargeTicks, false, 0, 0, 0, warning, warnParticles, start, hitPlayer, particle, end);
+		this(plugin, boss, range, 160, chargeTicks, false, 0, 0, 0, warning, warnParticles, start, hitPlayer, particle, end);
 	}
 
-	public SpellBaseCharge(Plugin plugin, LivingEntity boss, int range, int chargeTicks, boolean stopOnFirstHit,
+	public SpellBaseCharge(Plugin plugin, LivingEntity boss, int range, int cooldown, int chargeTicks,
 	                       WarningAction warning, ParticleAction warnParticles, StartAction start,
 	                       HitPlayerAction hitPlayer, ParticleAction particle, EndAction end) {
-		this(plugin, boss, range, chargeTicks, stopOnFirstHit, 0, 0, 0, warning, warnParticles, start, hitPlayer, particle, end);
+		this(plugin, boss, range, cooldown, chargeTicks, false, 0, 0, 0, warning, warnParticles, start, hitPlayer, particle, end);
 	}
 
-	public SpellBaseCharge(Plugin plugin, LivingEntity boss, int range, int chargeTicks, boolean stopOnFirstHit,
+	public SpellBaseCharge(Plugin plugin, LivingEntity boss, int range, int cooldown, int chargeTicks, boolean stopOnFirstHit,
+	                       WarningAction warning, ParticleAction warnParticles, StartAction start,
+	                       HitPlayerAction hitPlayer, ParticleAction particle, EndAction end) {
+		this(plugin, boss, range, cooldown, chargeTicks, stopOnFirstHit, 0, 0, 0, warning, warnParticles, start, hitPlayer, particle, end);
+	}
+
+	public SpellBaseCharge(Plugin plugin, LivingEntity boss, int range, int cooldown, int chargeTicks, boolean stopOnFirstHit,
 			int charges, int rate, WarningAction warning, ParticleAction warnParticles, StartAction start,
 			HitPlayerAction hitPlayer, ParticleAction particle, EndAction end) {
-		this(plugin, boss, range, chargeTicks, stopOnFirstHit, charges, rate, 0, warning, warnParticles, start, hitPlayer, particle, end);
+		this(plugin, boss, range, cooldown, chargeTicks, stopOnFirstHit, charges, rate, 0, warning, warnParticles, start, hitPlayer, particle, end);
 	}
 
-	public SpellBaseCharge(Plugin plugin, LivingEntity boss, int range, int chargeTicks, boolean stopOnFirstHit, int charges, int rate, double yStartAdd,
+	public SpellBaseCharge(Plugin plugin, LivingEntity boss, int range, int cooldown, int chargeTicks, boolean stopOnFirstHit, int charges, int rate, double yStartAdd,
 	                       WarningAction warning, ParticleAction warnParticles, StartAction start,
 	                       HitPlayerAction hitPlayer, ParticleAction particle, EndAction end) {
-		this(plugin, boss, range, chargeTicks, stopOnFirstHit, charges, rate, yStartAdd, false, warning, warnParticles, start, hitPlayer, particle, end);
+		this(plugin, boss, range, cooldown, chargeTicks, stopOnFirstHit, charges, rate, yStartAdd, false, warning, warnParticles, start, hitPlayer, particle, end);
 	}
 
-	public SpellBaseCharge(Plugin plugin, LivingEntity boss, int range, int chargeTicks, boolean stopOnFirstHit,
+	public SpellBaseCharge(Plugin plugin, LivingEntity boss, int range, int cooldown, int chargeTicks, boolean stopOnFirstHit,
 			int charges, int rate, double yStartAdd, boolean targetFurthest, WarningAction warning,
 			ParticleAction warnParticles, StartAction start, HitPlayerAction hitPlayer, ParticleAction particle,
 			EndAction end) {
@@ -147,6 +154,7 @@ public class SpellBaseCharge extends Spell {
 		mRate = rate;
 		mYStartAdd = yStartAdd;
 		mTargetFurthest = targetFurthest;
+		mCooldown = cooldown;
 	}
 
 	@Override
@@ -192,7 +200,7 @@ public class SpellBaseCharge extends Spell {
 
 	@Override
 	public int cooldownTicks() {
-		return 160; // 8 seconds
+		return mCooldown; // 8 seconds
 	}
 
 	/**

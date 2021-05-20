@@ -16,7 +16,7 @@ import com.playmonumenta.plugins.utils.PlayerUtils;
 public class SpellAxtalWitherAoe extends SpellBaseAoE {
 
 	public SpellAxtalWitherAoe(Plugin plugin, LivingEntity launcher, int radius, float maxDamage, float minDamage) {
-		super(plugin, launcher, radius, 80, 0, true, Sound.ENTITY_CAT_HISS,
+		super(plugin, launcher, radius, 80, 160, true, Sound.ENTITY_CAT_HISS,
 			(Location loc) -> {
 				World world = loc.getWorld();
 				world.spawnParticle(Particle.SPELL_WITCH, loc, 25, 6, 3, 6);

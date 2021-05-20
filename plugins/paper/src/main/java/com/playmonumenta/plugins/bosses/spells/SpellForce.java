@@ -15,8 +15,8 @@ import com.playmonumenta.plugins.utils.PlayerUtils;
 
 public class SpellForce extends SpellBaseAoE {
 
-	public SpellForce(Plugin plugin, LivingEntity launcher, int radius, int time) {
-		super(plugin, launcher, radius, time, 0, true, Sound.ENTITY_IRON_GOLEM_ATTACK,
+	public SpellForce(Plugin plugin, LivingEntity launcher, int radius, int time, int cooldown) {
+		super(plugin, launcher, radius, time, cooldown, true, Sound.ENTITY_IRON_GOLEM_ATTACK,
 			(Location loc) -> {
 				World world = loc.getWorld();
 				world.spawnParticle(Particle.SMOKE_LARGE, loc, 1, ((double) radius) / 2, ((double) radius) / 2, ((double) radius) / 2, 0.05);
@@ -55,5 +55,9 @@ public class SpellForce extends SpellBaseAoE {
 				}
 			}
 		);
+	}
+
+	public SpellForce(Plugin plugin, LivingEntity launcher, int radius, int time) {
+		this(plugin, launcher, radius, time, 160);
 	}
 }

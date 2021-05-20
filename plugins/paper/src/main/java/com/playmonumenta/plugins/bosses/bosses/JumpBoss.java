@@ -16,18 +16,22 @@ import org.bukkit.util.Vector;
 
 import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.spells.SpellBaseSlam;
+import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.ParticleUtils;
 import com.playmonumenta.plugins.utils.ParticleUtils.SpawnParticleAction;
 
 public class JumpBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_jump";
-	public static final int detectionRange = 32;
 
-	public static final int COOLDOWN = 20 * 8;
-	private static final int MIN_RANGE = 0;
-	private static final int RUN_DISTANCE = 0;
-	private static final double VELOCITY_MULTIPLIER = 0.45;
-	private static final int JUMP_HEIGHT = 1;
+	public static class Parameters {
+		public int DELAY = 100;
+		public int MIN_RANGE = 0;
+		public int DETECTION = 32;
+		public int JUMP_HEIGHT = 1;
+		public int RUN_DISTANCE = 0;
+		public int COOLDOWN = 20 * 8;
+		public double VELOCITY_MULTIPLIER = 0.45;
+	}
 
 	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
 		return new JumpBoss(plugin, boss);
@@ -36,7 +40,9 @@ public class JumpBoss extends BossAbilityGroup {
 	public JumpBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
 
-		SpellManager manager = new SpellManager(Arrays.asList(new SpellBaseSlam(plugin, boss, JUMP_HEIGHT, detectionRange, MIN_RANGE, RUN_DISTANCE, COOLDOWN, VELOCITY_MULTIPLIER,
+		Parameters p = BossUtils.getParameters(boss, identityTag, new Parameters());
+
+		SpellManager manager = new SpellManager(Arrays.asList(new SpellBaseSlam(plugin, boss, p.JUMP_HEIGHT, p.DETECTION, p.MIN_RANGE, p.RUN_DISTANCE, p.COOLDOWN, p.VELOCITY_MULTIPLIER,
 				(World world, Location loc) -> {
 					world.playSound(loc, Sound.ENTITY_PILLAGER_CELEBRATE, SoundCategory.PLAYERS, 1f, 1.1f);
 					world.spawnParticle(Particle.CLOUD, loc, 15, 1, 0f, 1, 0);
@@ -58,6 +64,6 @@ public class JumpBoss extends BossAbilityGroup {
 					world.spawnParticle(Particle.CLOUD, loc, 60, 0F, 0F, 0F, 0.2F);
 					world.spawnParticle(Particle.EXPLOSION_NORMAL, loc, 20, 0F, 0F, 0F, 0.3F);
 					})));
-		super.constructBoss(manager, null, detectionRange, null);
+		super.constructBoss(manager, null, p.DETECTION, null, p.DELAY);
 	}
 }

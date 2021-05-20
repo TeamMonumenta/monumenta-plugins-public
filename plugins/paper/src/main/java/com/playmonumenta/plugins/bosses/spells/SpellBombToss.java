@@ -42,6 +42,7 @@ public class SpellBombToss extends Spell {
 	private final boolean mSetFire;
 	private final boolean mBreakBlocks;
 	private final ExplodeAction mExplodeAction;
+	private final int mCooldown;
 
 	private final List<TNTPrimed> mTNTList = new ArrayList<TNTPrimed>();
 
@@ -59,9 +60,14 @@ public class SpellBombToss extends Spell {
 		mSetFire = setFire;
 		mBreakBlocks = breakBlocks;
 		mExplodeAction = null;
+		mCooldown = 160;
 	}
 
 	public SpellBombToss(Plugin plugin, LivingEntity boss, int range, int lobs, int fuse, ExplodeAction explodeAction) {
+		this(plugin, boss, range, lobs, fuse, 160, explodeAction);
+	}
+
+	public SpellBombToss(Plugin plugin, LivingEntity boss, int range, int lobs, int fuse, int cooldown, ExplodeAction explodeAction) {
 		mPlugin = plugin;
 		mBoss = boss;
 		mRange = range;
@@ -71,6 +77,7 @@ public class SpellBombToss extends Spell {
 		mSetFire = false;
 		mBreakBlocks = false;
 		mExplodeAction = explodeAction;
+		mCooldown = cooldown;
 	}
 
 	@Override
@@ -106,7 +113,7 @@ public class SpellBombToss extends Spell {
 
 	@Override
 	public int cooldownTicks() {
-		return 160; //8 seconds
+		return mCooldown;
 	}
 
 	@Override

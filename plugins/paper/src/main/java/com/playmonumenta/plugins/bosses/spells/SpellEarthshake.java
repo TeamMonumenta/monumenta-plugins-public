@@ -46,16 +46,16 @@ public class SpellEarthshake extends SpellBaseAoE {
 	private static int particleCounter1 = 0;
 	private static int particleCounter2 = 0;
 
-	public SpellEarthshake(Plugin plugin, LivingEntity launcher, int radius, int time) {
-		super(plugin, launcher, radius * 2, time, 0, true, Sound.BLOCK_ENDER_CHEST_OPEN,
+	public SpellEarthshake(Plugin plugin, LivingEntity launcher, int radius, int time, int damage, int cooldown, int range, double knockUpSpeed, boolean lineOfSight, boolean flyingBlocks) {
+		super(plugin, launcher, radius * 2, time, cooldown, true, lineOfSight, Sound.BLOCK_ENDER_CHEST_OPEN,
 			(Location loc) -> {
-				List<Player> players = PlayerUtils.playersInRange(launcher.getLocation(), 12.0);
+				List<Player> players = PlayerUtils.playersInRange(launcher.getLocation(), range);
 				if (!players.isEmpty() && !targeted) {
 
 					// Single target chooses a random player within range
 					Collections.shuffle(players);
 					for (Player player : players) {
-						if (LocationUtils.hasLineOfSight(launcher, player)) {
+						if (LocationUtils.hasLineOfSight(launcher, player) || !lineOfSight) {
 							targetLocation = player.getLocation().clone();
 							targeted = true;
 							player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ELDER_GUARDIAN_CURSE, 1f, 0.75f);
@@ -163,20 +163,22 @@ public class SpellEarthshake extends SpellBaseAoE {
 						}
 					}
 
-					//Make the blocks go flying
-					for (Block b: blocks) {
-						if (b == null) {
-							continue;
-						}
+					if (flyingBlocks) {
+						//Make the blocks go flying
+						for (Block b: blocks) {
+							if (b == null) {
+								continue;
+							}
 
-						Material material = b.getType();
-						if (!mIgnoredMats.contains(material) && FastUtils.RANDOM.nextInt(4) > 1) {
-							double x = (FastUtils.RANDOM.nextInt(5) - 2) / 10.0;
-							double z = (FastUtils.RANDOM.nextInt(5) - 2) / 10.0;
+							Material material = b.getType();
+							if (!mIgnoredMats.contains(material) && FastUtils.RANDOM.nextInt(4) > 1) {
+								double x = (FastUtils.RANDOM.nextInt(5) - 2) / 10.0;
+								double z = (FastUtils.RANDOM.nextInt(5) - 2) / 10.0;
 
-							FallingBlock block = world.spawnFallingBlock(b.getLocation(), b.getBlockData());
-							block.setVelocity(new Vector(x, 1.0, z));
-							world.getBlockAt(b.getLocation()).setType(Material.AIR);
+								FallingBlock block = world.spawnFallingBlock(b.getLocation(), b.getBlockData());
+								block.setVelocity(new Vector(x, 1.0, z));
+								world.getBlockAt(b.getLocation()).setType(Material.AIR);
+							}
 						}
 					}
 
@@ -184,17 +186,17 @@ public class SpellEarthshake extends SpellBaseAoE {
 					for (Player p : PlayerUtils.playersInRange(loc, radius * 2)) {
 						world.playSound(p.getLocation(), Sound.ENTITY_WITHER_BREAK_BLOCK, 1.0f, 1.0f);
 						if (p.getLocation().distance(loc) <= radius) {
-							p.setVelocity(p.getVelocity().add(new Vector(0.0, 1.5, 0.0)));
-							BossUtils.bossDamage(launcher, p, 35.0);
+							BossUtils.bossDamage(launcher, p, damage);
+							p.setVelocity(p.getVelocity().add(new Vector(0.0, knockUpSpeed + 0.5, 0.0)));
 						} else {
-							p.setVelocity(p.getVelocity().add(new Vector(0.0, 1.0, 0.0)));
-							BossUtils.bossDamage(launcher, p, 35.0);
+							BossUtils.bossDamage(launcher, p, damage);
+							p.setVelocity(p.getVelocity().add(new Vector(0.0, knockUpSpeed, 0.0)));
 						}
 					}
 					//Knock up other mobs because it's fun
 					List<LivingEntity> mobs = EntityUtils.getNearbyMobs(loc, radius * 2);
 					for (LivingEntity mob : mobs) {
-						mob.setVelocity(mob.getVelocity().add(new Vector(0.0, 2.0, 0.0)));
+						mob.setVelocity(mob.getVelocity().add(new Vector(0.0, knockUpSpeed + 1.0, 0.0)));
 					}
 				}
 
@@ -203,5 +205,9 @@ public class SpellEarthshake extends SpellBaseAoE {
 				particleCounter2 = 0;
 			}
 		);
+	}
+
+	public SpellEarthshake(Plugin plugin, LivingEntity launcher, int radius, int time) {
+		this(plugin, launcher, radius, time, 160, 35, 12, 1.0, true, true);
 	}
 }

@@ -19,20 +19,22 @@ import com.playmonumenta.plugins.utils.PotionUtils;
 
 public class SeekingProjectileBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_seekingprojectile";
-	public static final int detectionRange = 24;
 
-	private static final boolean SINGLE_TARGET = true;
-	private static final boolean LAUNCH_TRACKING = false;
-	private static final int COOLDOWN = 20 * 12;
-	private static final int DELAY = 20 * 1;
-	private static final double SPEED = 0.4;
-	private static final double TURN_RADIUS = Math.PI / 30;
-	private static final int LIFETIME_TICKS = 20 * 8;
-	private static final double HITBOX_LENGTH = 0.5;
-	private static final boolean COLLIDES_WITH_BLOCKS = true;
-	private static final boolean LINGERS = true;
-	private static final int DAMAGE = 20;
-	private static final int FIRE_DURATION = 20 * 5;
+	public static class Parameters {
+		public int DAMAGE = 20;
+		public int DISTANCE = 64;
+		public double SPEED = 0.4;
+		public int DETECTION = 24;
+		public int DELAY = 20 * 1;
+		public int COOLDOWN = 20 * 12;
+		public boolean LINGERS = true;
+		public double HITBOX_LENGTH = 0.5;
+		public int FIRE_DURATION = 20 * 5;
+		public boolean SINGLE_TARGET = true;
+		public boolean LAUNCH_TRACKING = false;
+		public double TURN_RADIUS = Math.PI / 30;
+		public boolean COLLIDES_WITH_BLOCKS = true;
+	}
 
 	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
 		return new SeekingProjectileBoss(plugin, boss);
@@ -41,12 +43,16 @@ public class SeekingProjectileBoss extends BossAbilityGroup {
 	public SeekingProjectileBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
 
+		Parameters p = BossUtils.getParameters(boss, identityTag, new Parameters());
+
+		int lifetimeTicks = (int) (p.DISTANCE/p.SPEED);
+
 		SpellManager activeSpells = new SpellManager(Arrays.asList(
-			new SpellBaseSeekingProjectile(plugin, boss, detectionRange, SINGLE_TARGET, LAUNCH_TRACKING, COOLDOWN, DELAY,
-					SPEED, TURN_RADIUS, LIFETIME_TICKS, HITBOX_LENGTH, COLLIDES_WITH_BLOCKS, LINGERS,
+			new SpellBaseSeekingProjectile(plugin, boss, p.DETECTION, p.SINGLE_TARGET, p.LAUNCH_TRACKING, p.COOLDOWN, p.DELAY,
+					p.SPEED, p.TURN_RADIUS, lifetimeTicks, p.HITBOX_LENGTH, p.COLLIDES_WITH_BLOCKS, p.LINGERS,
 					// Initiate Aesthetic
 					(World world, Location loc, int ticks) -> {
-						PotionUtils.applyPotion(null, boss, new PotionEffect(PotionEffectType.GLOWING, DELAY, 0));
+						PotionUtils.applyPotion(null, boss, new PotionEffect(PotionEffectType.GLOWING, p.DELAY, 0));
 						world.playSound(loc, Sound.ENTITY_BLAZE_AMBIENT, 1f, 0.5f);
 					},
 					// Launch Aesthetic
@@ -67,12 +73,12 @@ public class SeekingProjectileBoss extends BossAbilityGroup {
 						world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 0.5f, 0.5f);
 						world.spawnParticle(Particle.FLAME, loc, 50, 0, 0, 0, 0.25);
 						if (player != null) {
-							BossUtils.bossDamage(boss, player, DAMAGE);
-							player.setFireTicks(FIRE_DURATION);
+							BossUtils.bossDamage(boss, player, p.DAMAGE);
+							player.setFireTicks(p.FIRE_DURATION);
 						}
 					})
 		));
 
-		super.constructBoss(activeSpells, null, detectionRange, null);
+		super.constructBoss(activeSpells, null, p.DETECTION, null);
 	}
 }

@@ -17,7 +17,7 @@ public class SpellRage extends SpellBaseAoE {
 	public static boolean isCasting = false;
 
 	public SpellRage(Plugin plugin, LivingEntity launcher, int radius, int time) {
-		super(plugin, launcher, radius, time, 0, false, Sound.UI_TOAST_OUT,
+		super(plugin, launcher, radius, time, 160, false, Sound.UI_TOAST_OUT,
 			(Location loc) -> {
 				World world = loc.getWorld();
 

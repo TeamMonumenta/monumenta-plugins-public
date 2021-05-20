@@ -19,9 +19,7 @@ import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 
-/*
- * About damn time someone fixed this crappy ability.
- */
+
 public class SpellBaseAoE extends Spell {
 
 	@FunctionalInterface
@@ -83,6 +81,15 @@ public class SpellBaseAoE extends Spell {
 	private final DealDamageAction mDealDamageAction;
 	private final float mSoundVolume;
 	private final int mSoundDensity;
+	private final boolean mLineOfSight;
+
+	public SpellBaseAoE(Plugin plugin, Entity launcher, int radius, int duration, int cooldown, boolean canMoveWhileCasting, boolean needLineOfSight,
+	                    Sound chargeSound, ChargeAuraAction chargeAuraAction, ChargeCircleAction chargeCircleAction,
+	                    OutburstAction outburstAction, CircleOutburstAction circleOutburstAction, DealDamageAction dealDamageAction) {
+
+		this(plugin, launcher, radius, duration, cooldown, canMoveWhileCasting, needLineOfSight, chargeSound, 1f, 1, chargeAuraAction, chargeCircleAction, outburstAction,
+		     circleOutburstAction, dealDamageAction);
+	}
 
 	public SpellBaseAoE(Plugin plugin, Entity launcher, int radius, int duration, int cooldown, boolean canMoveWhileCasting,
 	                    Sound chargeSound, ChargeAuraAction chargeAuraAction, ChargeCircleAction chargeCircleAction,
@@ -93,6 +100,14 @@ public class SpellBaseAoE extends Spell {
 	}
 
 	public SpellBaseAoE(Plugin plugin, Entity launcher, int radius, int duration, int cooldown, boolean canMoveWhileCasting,
+	                    Sound chargeSound, float soundVolume, int soundDensity, ChargeAuraAction chargeAuraAction, ChargeCircleAction chargeCircleAction,
+	                    OutburstAction outburstAction, CircleOutburstAction circleOutburstAction, DealDamageAction dealDamageAction) {
+
+		this(plugin, launcher, radius, duration, cooldown, canMoveWhileCasting, true, chargeSound, soundVolume, soundDensity, chargeAuraAction,
+		 chargeCircleAction, outburstAction, circleOutburstAction, dealDamageAction);
+	}
+
+	public SpellBaseAoE(Plugin plugin, Entity launcher, int radius, int duration, int cooldown, boolean canMoveWhileCasting, boolean needLineOfSight,
 	                    Sound chargeSound, float soundVolume, int soundDensity, ChargeAuraAction chargeAuraAction, ChargeCircleAction chargeCircleAction,
 	                    OutburstAction outburstAction, CircleOutburstAction circleOutburstAction, DealDamageAction dealDamageAction) {
 
@@ -110,20 +125,23 @@ public class SpellBaseAoE extends Spell {
 		mDealDamageAction = dealDamageAction;
 		mSoundVolume = soundVolume;
 		mSoundDensity = soundDensity;
+		mLineOfSight = needLineOfSight;
 	}
 
 	@Override
 	public void run() {
-		// Don't cast if no player in sight, e.g. should not initiate cast through a wall
-		boolean hasLineOfSight = false;
-		for (Player player : PlayerUtils.playersInRange(mLauncher.getLocation(), mRadius * 4)) {
-			if (LocationUtils.hasLineOfSight(mLauncher, player)) {
-				hasLineOfSight = true;
-				break;
+		if (mLineOfSight) {
+			// Don't cast if no player in sight, e.g. should not initiate cast through a wall
+			boolean hasLineOfSight = false;
+			for (Player player : PlayerUtils.playersInRange(mLauncher.getLocation(), mRadius * 4)) {
+				if (LocationUtils.hasLineOfSight(mLauncher, player)) {
+					hasLineOfSight = true;
+					break;
+				}
 			}
-		}
-		if (!hasLineOfSight) {
-			return;
+			if (!hasLineOfSight) {
+				return;
+			}
 		}
 
 		if (!mCanMoveWhileCasting) {
@@ -197,7 +215,7 @@ public class SpellBaseAoE extends Spell {
 
 	@Override
 	public int cooldownTicks() {
-		return 160 + mCooldown;
+		return mCooldown;
 	}
 
 	private boolean shouldHeal() {

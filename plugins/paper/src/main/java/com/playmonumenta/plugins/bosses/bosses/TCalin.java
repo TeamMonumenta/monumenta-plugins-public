@@ -60,7 +60,7 @@ public class TCalin extends BossAbilityGroup {
 		mBoss.setRemoveWhenFarAway(false);
 		World world = mSpawnLoc.getWorld();
 		mBoss.addScoreboardTag("Boss");
-		SpellBaseCharge charge = new SpellBaseCharge(plugin, mBoss, 20, 25, true,
+		SpellBaseCharge charge = new SpellBaseCharge(plugin, mBoss, 20, 25, 160, true,
 			(Player player) -> {
 				boss.getWorld().spawnParticle(Particle.VILLAGER_ANGRY, boss.getLocation(), 50, 2, 2, 2, 0);
 				boss.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 40, 4));

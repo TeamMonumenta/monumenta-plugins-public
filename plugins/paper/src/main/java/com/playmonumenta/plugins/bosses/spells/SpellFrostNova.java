@@ -15,8 +15,8 @@ import com.playmonumenta.plugins.utils.PlayerUtils;
 
 public class SpellFrostNova extends SpellBaseAoE {
 
-	public SpellFrostNova(Plugin plugin, LivingEntity launcher, int radius, float maxDamage, float minDamage) {
-		super(plugin, launcher, radius, 80, 0, false, Sound.ENTITY_SNOWBALL_THROW,
+	public SpellFrostNova(Plugin plugin, LivingEntity launcher, int radius, float maxDamage, float minDamage, int duration, int cooldown) {
+		super(plugin, launcher, radius, duration, cooldown, false, Sound.ENTITY_SNOWBALL_THROW,
 			(Location loc) -> {
 				World world = loc.getWorld();
 				world.spawnParticle(Particle.CLOUD, loc, 7, ((double) radius) / 2, ((double) radius) / 2, ((double) radius) / 2, 0.05);
@@ -44,5 +44,9 @@ public class SpellFrostNova extends SpellBaseAoE {
 				}
 			}
 		);
+	}
+
+	public SpellFrostNova(Plugin plugin, LivingEntity launcher, int radius, float maxDamage, float minDamage) {
+		this(plugin, launcher, radius, maxDamage, minDamage, 80, 160);
 	}
 }

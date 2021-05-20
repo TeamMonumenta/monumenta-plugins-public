@@ -18,7 +18,7 @@ import com.playmonumenta.plugins.utils.MovementUtils;
 public class SpellAGoshDamnAirCombo extends SpellBaseCharge {
 
 	public SpellAGoshDamnAirCombo(Plugin plugin, LivingEntity boss, int range, int chargeTicks) {
-		super(plugin, boss, range, chargeTicks, true,
+		super(plugin, boss, range, 160, chargeTicks, true,
 
 		// Warning sound/particles at boss location and slow boss
 		(Player player) -> {

@@ -11,15 +11,19 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.plugin.Plugin;
 
 import com.playmonumenta.plugins.utils.AbilityUtils;
+import com.playmonumenta.plugins.utils.BossUtils;
 
 public class AbilitySilenceBoss extends BossAbilityGroup {
 
 	public static final String identityTag = "boss_abilitysilence";
-	public static final int detectionRange = 32;
 
-	private static final Particle.DustOptions COLOR = new Particle.DustOptions(Color.fromRGB(127, 0, 0), 1.0f);
+	public static class Parameters {
+		public int DETECTION = 32;
+		public int DURATION = 20 * 3;
+		public Particle.DustOptions COLOR = new Particle.DustOptions(Color.fromRGB(127, 0, 0), 1.0f);
+	}
 
-	private static final int DURATION = 20 * 3;
+	private final Parameters mParams;
 
 	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
 		return new AbilitySilenceBoss(plugin, boss);
@@ -27,7 +31,10 @@ public class AbilitySilenceBoss extends BossAbilityGroup {
 
 	public AbilitySilenceBoss(Plugin plugin, LivingEntity boss) throws Exception {
 		super(plugin, identityTag, boss);
-		super.constructBoss(null, null, detectionRange, null);
+
+		mParams = BossUtils.getParameters(boss, identityTag, new Parameters());
+
+		super.constructBoss(null, null, mParams.DETECTION, null);
 	}
 
 	@Override
@@ -42,9 +49,9 @@ public class AbilitySilenceBoss extends BossAbilityGroup {
 			World world = target.getWorld();
 			Location loc = target.getLocation().add(0, 1, 0);
 			world.playSound(loc, Sound.BLOCK_PORTAL_TRIGGER, 0.25f, 2f);
-			world.spawnParticle(Particle.REDSTONE, loc, 100, 0, 0, 0, 0.5, COLOR);
+			world.spawnParticle(Particle.REDSTONE, loc, 100, 0, 0, 0, 0.5, mParams.COLOR);
 
-			AbilityUtils.silencePlayer((Player) target, DURATION);
+			AbilityUtils.silencePlayer((Player) target, mParams.DURATION);
 		}
 	}
 }

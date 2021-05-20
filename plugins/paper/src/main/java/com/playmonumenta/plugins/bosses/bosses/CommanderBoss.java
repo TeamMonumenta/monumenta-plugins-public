@@ -13,16 +13,20 @@ import org.bukkit.plugin.Plugin;
 
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.bosses.spells.SpellInspire;
+import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.DelvesUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 
 public class CommanderBoss extends BossAbilityGroup {
 
 	public static final String identityTag = "boss_commander";
-	public static final int detectionRange = 24;
 
-	private static final int RANGE = 8;
+	public static class Parameters {
+		public int DETECTION = 24;
+		private int RANGE = 8;
+	}
 
+	private final Parameters mParams;
 	boolean mSummonedReinforcements = false;
 
 	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
@@ -31,11 +35,13 @@ public class CommanderBoss extends BossAbilityGroup {
 
 	public CommanderBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
+
+		mParams = BossUtils.getParameters(boss, identityTag, new Parameters());
 		List<Spell> passiveSpells = Arrays.asList(
-			new SpellInspire(com.playmonumenta.plugins.Plugin.getInstance(), boss, RANGE)
+			new SpellInspire(com.playmonumenta.plugins.Plugin.getInstance(), boss, mParams.RANGE)
 		);
 
-		super.constructBoss(null, passiveSpells, detectionRange, null);
+		super.constructBoss(null, passiveSpells, mParams.DETECTION, null);
 	}
 
 	@Override
@@ -48,7 +54,7 @@ public class CommanderBoss extends BossAbilityGroup {
 			world.playSound(loc, Sound.ENTITY_HORSE_ANGRY, 1f, 2f);
 			world.playSound(loc, Sound.ENTITY_HORSE_DEATH, 1f, 0.5f);
 
-			for (LivingEntity mob : EntityUtils.getNearbyMobs(mBoss.getLocation(), RANGE, mBoss)) {
+			for (LivingEntity mob : EntityUtils.getNearbyMobs(mBoss.getLocation(), mParams.RANGE, mBoss)) {
 				if (!EntityUtils.isBoss(mob)) {
 					DelvesUtils.duplicateLibraryOfSoulsMob(mob);
 				}

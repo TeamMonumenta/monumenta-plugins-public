@@ -13,7 +13,14 @@ import com.playmonumenta.plugins.utils.PotionUtils;
 
 public class IceAspectBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_iceaspect";
-	public static final int detectionRange = 50;
+
+	public static class Parameters {
+		public int DETECTION = 50;
+		public int SLOW_AMPLIFIER = 1;
+		public int SLOW_DURATION = 80;
+	}
+
+	private final Parameters mParams;
 
 	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
 		return new IceAspectBoss(plugin, boss);
@@ -21,7 +28,9 @@ public class IceAspectBoss extends BossAbilityGroup {
 
 	public IceAspectBoss(Plugin plugin, LivingEntity boss) throws Exception {
 		super(plugin, identityTag, boss);
-		super.constructBoss(null, null, detectionRange, null);
+
+		mParams = BossUtils.getParameters(boss, identityTag, new Parameters());
+		super.constructBoss(null, null, mParams.DETECTION, null);
 	}
 
 	@Override
@@ -32,6 +41,6 @@ public class IceAspectBoss extends BossAbilityGroup {
 				return;
 			}
 		}
-		PotionUtils.applyPotion(mBoss, (LivingEntity) event.getEntity(), new PotionEffect(PotionEffectType.SLOW, 80, 1, false, true));
+		PotionUtils.applyPotion(mBoss, (LivingEntity) event.getEntity(), new PotionEffect(PotionEffectType.SLOW, mParams.SLOW_DURATION, mParams.SLOW_AMPLIFIER, false, true));
 	}
 }

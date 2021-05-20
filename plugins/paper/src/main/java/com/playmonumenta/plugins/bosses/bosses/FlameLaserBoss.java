@@ -17,7 +17,16 @@ import com.playmonumenta.plugins.utils.BossUtils;
 
 public class FlameLaserBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_flamelaser";
-	public static final int detectionRange = 30;
+
+	public static class Parameters {
+		public int DAMAGE = 19;
+		public int DELAY = 100;
+		public int DETECTION = 30;
+		public int COOLDOWN = 8 * 20;
+		public int FUSE_TIME = 5 * 20;
+		public int FIRE_DURATION = 4 * 20;
+		public boolean SINGLE_TARGET = true;
+	}
 
 	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
 		return new FlameLaserBoss(plugin, boss);
@@ -26,8 +35,10 @@ public class FlameLaserBoss extends BossAbilityGroup {
 	public FlameLaserBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
 
+		Parameters p = BossUtils.getParameters(boss, identityTag, new Parameters());
+
 		SpellManager activeSpells = new SpellManager(Arrays.asList(
-			new SpellBaseLaser(plugin, boss, detectionRange, 100, false, false, 160,
+			new SpellBaseLaser(plugin, boss, p.DETECTION, p.FUSE_TIME, false, p.SINGLE_TARGET, p.COOLDOWN,
 					// Tick action per player
 					(Player player, int ticks, boolean blocked) -> {
 						player.playSound(player.getLocation(), Sound.UI_TOAST_IN, 0.5f, 0.5f + (ticks / 80f) * 1.5f);
@@ -46,13 +57,13 @@ public class FlameLaserBoss extends BossAbilityGroup {
 						loc.getWorld().playSound(loc, Sound.ENTITY_DRAGON_FIREBALL_EXPLODE, 1f, 1.5f);
 						loc.getWorld().spawnParticle(Particle.FIREWORKS_SPARK, loc, 300, 0.8, 0.8, 0.8, 0);
 						if (!blocked) {
-							BossUtils.bossDamage(boss, player, 19);
+							BossUtils.bossDamage(boss, player, p.DAMAGE);
 							// Shields don't stop fire!
-							player.setFireTicks(4 * 20);
+							player.setFireTicks(p.FIRE_DURATION);
 						}
 					})
 		));
 
-		super.constructBoss(activeSpells, null, detectionRange, null);
+		super.constructBoss(activeSpells, null, p.DETECTION, null, p.DELAY);
 	}
 }

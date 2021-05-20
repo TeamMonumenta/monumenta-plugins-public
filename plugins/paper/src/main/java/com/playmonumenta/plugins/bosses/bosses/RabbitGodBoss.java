@@ -71,7 +71,7 @@ public class RabbitGodBoss extends BossAbilityGroup {
 		mBoss.setRemoveWhenFarAway(false);
 		World world = mBoss.getWorld();
 
-		SpellBaseCharge charge = new SpellBaseCharge(plugin, mBoss, 25, 10, false, 12, 6,
+		SpellBaseCharge charge = new SpellBaseCharge(plugin, mBoss, 25, 10, 160, false, 12, 6,
 			(Player player) -> {
 				boss.getWorld().spawnParticle(Particle.VILLAGER_ANGRY, boss.getLocation(), 50, 2, 2, 2, 0);
 				boss.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 40, 4));

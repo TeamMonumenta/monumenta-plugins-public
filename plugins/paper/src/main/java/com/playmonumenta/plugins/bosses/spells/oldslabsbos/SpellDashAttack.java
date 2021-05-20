@@ -16,7 +16,7 @@ import com.playmonumenta.plugins.utils.BossUtils;
 public class SpellDashAttack extends SpellBaseCharge {
 
 	public SpellDashAttack(Plugin plugin, LivingEntity boss, int range, float damage) {
-		super(plugin, boss, range, 30, false,
+		super(plugin, boss, range, 160, 30, false,
 		      // Warning sound/particles at boss location and slow boss
 		      (Player player) -> {
 		          boss.getWorld().spawnParticle(Particle.VILLAGER_ANGRY, boss.getLocation(), 50, 2, 2, 2, 0);

@@ -13,8 +13,8 @@ import com.playmonumenta.plugins.utils.PlayerUtils;
 
 public class SpellFlameNova extends SpellBaseAoE {
 
-	public SpellFlameNova(Plugin plugin, LivingEntity launcher, int radius, int time) {
-		super(plugin, launcher, radius, time, 0, false, Sound.BLOCK_FIRE_AMBIENT,
+	public SpellFlameNova(Plugin plugin, LivingEntity launcher, int radius, int time, int cooldown, int damage, int fireTicks) {
+		super(plugin, launcher, radius, time, cooldown, false, Sound.BLOCK_FIRE_AMBIENT,
 			(Location loc) -> {
 				World world = loc.getWorld();
 				world.spawnParticle(Particle.LAVA, loc, 1, ((double) radius) / 2, ((double) radius) / 2, ((double) radius) / 2, 0.05);
@@ -34,10 +34,14 @@ public class SpellFlameNova extends SpellBaseAoE {
 			},
 			(Location loc) -> {
 				for (Player player : PlayerUtils.playersInRange(launcher.getLocation(), radius)) {
-					BossUtils.bossDamage(launcher, player, 17);
-					player.setFireTicks(80);
+					BossUtils.bossDamage(launcher, player, damage);
+					player.setFireTicks(fireTicks);
 				}
 			}
 		);
+	}
+
+	public SpellFlameNova(Plugin plugin, LivingEntity launcher, int radius, int time) {
+		this(plugin, launcher, radius, time, 160, 17, 80);
 	}
 }

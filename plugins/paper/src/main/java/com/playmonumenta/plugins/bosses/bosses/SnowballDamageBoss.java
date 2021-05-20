@@ -12,7 +12,13 @@ import com.playmonumenta.plugins.utils.BossUtils;
 
 public class SnowballDamageBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_snowballdamage";
-	public static final int detectionRange = 50;
+
+	public static class Parameters {
+		public int DETECTION = 50;
+		public int DAMAGE = 8;
+	}
+
+	private final Parameters mParams;
 
 	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
 		return new SnowballDamageBoss(plugin, boss);
@@ -25,7 +31,9 @@ public class SnowballDamageBoss extends BossAbilityGroup {
 			throw new Exception("boss_snowballdamage only works on snowmen!");
 		}
 
-		super.constructBoss(null, null, detectionRange, null);
+		mParams = BossUtils.getParameters(boss, identityTag, new Parameters());
+
+		super.constructBoss(null, null, mParams.DETECTION, null);
 	}
 
 
@@ -33,7 +41,7 @@ public class SnowballDamageBoss extends BossAbilityGroup {
 		if (event.getHitEntity() != null && event.getHitEntity() instanceof Player) {
 			Player player = (Player)event.getHitEntity();
 			if ((player.getGameMode().equals(GameMode.SURVIVAL) || player.getGameMode().equals(GameMode.ADVENTURE)) && !player.isDead() && player.getHealth() > 0) {
-				BossUtils.bossDamage(mBoss, player, 2);
+				BossUtils.bossDamage(mBoss, player, mParams.DAMAGE);
 			}
 		}
 	}

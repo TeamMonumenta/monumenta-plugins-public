@@ -14,10 +14,8 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 
 public class SpellMobHealAoE extends SpellBaseAoE {
 
-	private static final int HEALTH_HEALED = 25;
-
-	public SpellMobHealAoE(Plugin plugin, Entity launcher) {
-		super(plugin, launcher, 14, 80, 20 * 7, false, Sound.ITEM_TRIDENT_RETURN, 0.8f, 2,
+	public SpellMobHealAoE(Plugin plugin, Entity launcher, int healthHealed, int radius, int duration, int cooldown) {
+		super(plugin, launcher, radius, duration, cooldown, false, Sound.ITEM_TRIDENT_RETURN, 0.8f, 2,
 			(Location loc) -> {
 				World world = loc.getWorld();
 				world.spawnParticle(Particle.SPELL_INSTANT, loc, 3, 3.5, 3.5, 3.5);
@@ -39,15 +37,15 @@ public class SpellMobHealAoE extends SpellBaseAoE {
 				world.spawnParticle(Particle.FIREWORKS_SPARK, loc, 2, 0.25, 0.25, 0.25, 0.15, null, true);
 			},
 			(Location loc) -> {
-				for (Entity e : loc.getWorld().getNearbyEntities(loc, 14, 7, 14)) {
+				for (Entity e : loc.getWorld().getNearbyEntities(loc, radius, 7, radius)) {
 					if (e instanceof LivingEntity && EntityUtils.isHostileMob(e) && !e.isDead()) {
 						LivingEntity le = (LivingEntity) e;
-						double hp = le.getHealth() + HEALTH_HEALED;
+						double hp = le.getHealth() + healthHealed;
 						double max = le.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue();
 						if (hp >= max) {
 							int missing = (int) (hp - max);
 							le.setHealth(max);
-							AbsorptionUtils.addAbsorption(le, missing, HEALTH_HEALED, -1);
+							AbsorptionUtils.addAbsorption(le, missing, healthHealed, -1);
 						} else {
 							le.setHealth(hp);
 						}
@@ -58,6 +56,11 @@ public class SpellMobHealAoE extends SpellBaseAoE {
 				}
 			}
 		);
+	}
+
+
+	public SpellMobHealAoE(Plugin plugin, Entity launcher) {
+		this(plugin, launcher, 25, 14, 80, 20 * 15);
 	}
 
 

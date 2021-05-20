@@ -52,7 +52,7 @@ public class TealQuestBoss extends BossAbilityGroup {
 	//Reckless Swing
 	private static final int RADIUS = 5;
 	private static final int DURATION = 20;
-	private static final int COOLDOWN_SWING = 20 * 6;
+	private static final int COOLDOWN_SWING = 20 * 14;
 	private static final Particle.DustOptions REDSTONE_COLOR_SWING = new Particle.DustOptions(Color.fromRGB(255, 255, 255), 1.0f);
 	//Crowd Control Resistance
 	private static final int CLEAR_TIME = 20 * 4;

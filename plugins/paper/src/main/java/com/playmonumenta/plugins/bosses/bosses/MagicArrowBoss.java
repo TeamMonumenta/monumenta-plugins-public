@@ -19,20 +19,21 @@ import com.playmonumenta.plugins.utils.PotionUtils;
 
 public class MagicArrowBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_magicarrow";
-	public static final int detectionRange = 24;
 
-	private static final boolean SINGLE_TARGET = true;
-	private static final boolean LAUNCH_TRACKING = true;
-	private static final int COOLDOWN = 20 * 8;
-	private static final int DELAY = 20 * 1;
-	private static final double SPEED = 0.8;
-	private static final double TURN_RADIUS = 0;
-	private static final int DISTANCE = 32;
-	private static final int LIFETIME_TICKS = (int)(DISTANCE / SPEED);
-	private static final double HITBOX_LENGTH = 0.5;
-	private static final boolean COLLIDES_WITH_BLOCKS = true;
-	private static final boolean LINGERS = true;
-	private static final int DAMAGE = 20;
+	public static class Parameters {
+		public int DAMAGE = 20;
+		public int DISTANCE = 32;
+		public int DETECTION = 24;
+		public int DELAY = 20 * 1;
+		public double SPEED = 0.8;
+		public int COOLDOWN = 20 * 8;
+		public double TURN_RADIUS = 0;
+		public boolean LINGERS = true;
+		public double HITBOX_LENGTH = 0.5;
+		public boolean SINGLE_TARGET = true;
+		public boolean LAUNCH_TRACKING = true;
+		public boolean COLLIDES_WITH_BLOCKS = true;
+	}
 
 	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
 		return new MagicArrowBoss(plugin, boss);
@@ -41,12 +42,16 @@ public class MagicArrowBoss extends BossAbilityGroup {
 	public MagicArrowBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
 
+		Parameters p = BossUtils.getParameters(boss, identityTag, new Parameters());
+
+		int lifeTimeTicks = (int) (p.DISTANCE/p.SPEED);
+
 		SpellManager activeSpells = new SpellManager(Arrays.asList(
-			new SpellBaseSeekingProjectile(plugin, boss, detectionRange, SINGLE_TARGET, LAUNCH_TRACKING, COOLDOWN, DELAY,
-					SPEED, TURN_RADIUS, LIFETIME_TICKS, HITBOX_LENGTH, COLLIDES_WITH_BLOCKS, LINGERS,
+			new SpellBaseSeekingProjectile(plugin, boss, p.DETECTION, p.SINGLE_TARGET, p.LAUNCH_TRACKING, p.COOLDOWN, p.DELAY,
+					p.SPEED, p.TURN_RADIUS, lifeTimeTicks, p.HITBOX_LENGTH, p.COLLIDES_WITH_BLOCKS, p.LINGERS,
 					// Initiate Aesthetic
 					(World world, Location loc, int ticks) -> {
-						PotionUtils.applyPotion(null, boss, new PotionEffect(PotionEffectType.GLOWING, DELAY, 0));
+						PotionUtils.applyPotion(null, boss, new PotionEffect(PotionEffectType.GLOWING, p.DELAY, 0));
 					},
 					// Launch Aesthetic
 					(World world, Location loc, int ticks) -> {
@@ -62,11 +67,11 @@ public class MagicArrowBoss extends BossAbilityGroup {
 						world.playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_TWINKLE, 0.5f, 1.5f);
 						world.spawnParticle(Particle.FIREWORKS_SPARK, loc, 30, 0, 0, 0, 0.25);
 						if (player != null) {
-							BossUtils.bossDamage(boss, player, DAMAGE);
+							BossUtils.bossDamage(boss, player, p.DAMAGE);
 						}
 					})
 		));
 
-		super.constructBoss(activeSpells, null, detectionRange, null);
+		super.constructBoss(activeSpells, null, p.DETECTION, null);
 	}
 }
