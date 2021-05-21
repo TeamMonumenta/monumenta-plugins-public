@@ -32,7 +32,7 @@ public class ChargerStrongBoss extends BossAbilityGroup {
 		super(plugin, identityTag, boss);
 
 		SpellManager activeSpells = new SpellManager(Arrays.asList(
-			new SpellGenericCharge(plugin, boss, detectionRange, DAMAGE, 160)
+			new SpellGenericCharge(plugin, boss, detectionRange, DAMAGE)
 		));
 
 		super.constructBoss(activeSpells, null, detectionRange, null);

@@ -211,7 +211,6 @@ public class BossUtils {
 				String fieldValueOrDefault;
 				if (t.equals(Color.class)) {
 					fieldValueOrDefault = modMap.getOrDefault(translateFieldNameToTag(fieldName), "" + ((Color) field.get(parameters)).asRGB());
-					//didn't found an easy way to fix this
 				} else {
 					fieldValueOrDefault = modMap.getOrDefault(translateFieldNameToTag(fieldName), field.get(parameters).toString());
 				}

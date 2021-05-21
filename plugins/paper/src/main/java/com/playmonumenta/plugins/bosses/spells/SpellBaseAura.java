@@ -67,7 +67,7 @@ public class SpellBaseAura extends Spell {
 		Location bossLoc = mBoss.getLocation();
 
 		for (Player player : mParticlePlayers) {
-			if (mParticleArg != null) {
+			if (mParticle.equals(Particle.REDSTONE)) {
 				// Generate particles in area
 				player.spawnParticle(mParticle, bossLoc, mNumParticles, mParticleDX, mParticleDY, mParticleDZ, mParticleArg);
 				// Generate particles immediately around boss

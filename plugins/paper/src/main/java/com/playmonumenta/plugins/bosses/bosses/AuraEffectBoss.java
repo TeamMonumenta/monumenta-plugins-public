@@ -15,8 +15,6 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
-import net.kyori.adventure.text.Component;
-
 public class AuraEffectBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_auraeffect";
 
@@ -29,9 +27,14 @@ public class AuraEffectBoss extends BossAbilityGroup {
 		public int PARTICEL_NUMBER = 20;
 		public int EFFECT_DURATION = 3 * 20;
 		public boolean EFFECT_AMBIENT = true;
-		public Color DUST_COLOR = Color.WHITE;
+		public Color COLOR = Color.WHITE;
+		//to customize the colors use a number between (16777216 - 0)
+		public Particle PARTICLE = Particle.REDSTONE;
+		//use the same name of the spigot api to change the value
+		//if you change the particles to something other than redstone then you will not use COLOR
 		public boolean EFFECT_PARTICLE = false;
-		public PotionEffectType EFFECT = PotionEffectType.LUCK;
+		public PotionEffectType EFFECT = PotionEffectType.BLINDNESS;
+		//use the same name of the spigot api to change the value
 	}
 
 
@@ -42,10 +45,9 @@ public class AuraEffectBoss extends BossAbilityGroup {
 	public AuraEffectBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
 		Parameters p = BossUtils.getParameters(boss, identityTag, new Parameters());
-		boss.getWorld().sendMessage(Component.text(p.DUST_COLOR.toString()));
 
 		List<Spell> passiveSpells = Arrays.asList(
-			new SpellBaseAura(boss, p.RADIUS, p.HEIGHT, p.RADIUS, p.PARTICEL_NUMBER, Particle.REDSTONE, new Particle.DustOptions(p.DUST_COLOR, 2f),
+			new SpellBaseAura(boss, p.RADIUS, p.HEIGHT, p.RADIUS, p.PARTICEL_NUMBER, p.PARTICLE, new Particle.DustOptions(p.COLOR, p.DUST_SIZE),
 			                  (Player player) -> {
 								  if (p.EFFECT != null) {
 									  player.addPotionEffect(new PotionEffect(p.EFFECT, p.EFFECT_DURATION, p.EFFECT_LEVEL, p.EFFECT_AMBIENT, p.EFFECT_PARTICLE));

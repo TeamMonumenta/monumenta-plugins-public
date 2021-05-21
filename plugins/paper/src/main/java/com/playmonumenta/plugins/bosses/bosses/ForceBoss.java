@@ -14,7 +14,7 @@ public class ForceBoss extends BossAbilityGroup {
 
 	public static class Parameters {
 		public int DETECTION = 20;
-		public int COOLDOWN = 20;
+		public int COOLDOWN = 20 * 8;
 		public int DURATION = 70;
 		public int RADIUS = 5;
 		public int DELAY = 100;
