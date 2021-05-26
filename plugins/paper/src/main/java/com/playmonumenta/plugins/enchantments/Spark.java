@@ -31,8 +31,8 @@ import org.jetbrains.annotations.NotNull;
 
 
 public class Spark implements BaseEnchantment {
-	private static final String METADATA_SPARK_KEY = "spark_arrow";
-	private static final String METADATA_STUN_KEY = "spark_stun_arrow";
+	private static final String METADATA_KEY = "spark_arrow";
+	private static final String METADATA_KEY_STUN = "spark_stun_arrow";
 
 	private static final Particle.DustOptions COLOUR_YELLOW
 		= new Particle.DustOptions(Color.fromRGB(251, 231, 30), 1f);
@@ -64,7 +64,7 @@ public class Spark implements BaseEnchantment {
 	) {
 		if (EntityUtils.isSomeArrow(projectile)) {
 			// Eligible arrow is always a Spark arrow for extra damage
-			projectile.setMetadata(METADATA_SPARK_KEY, new FixedMetadataValue(plugin, 1));
+			projectile.setMetadata(METADATA_KEY, new FixedMetadataValue(plugin, 1));
 
 			//TODO change event in EntityListener, from ProjectileLaunchEvent.
 			// Then can safely & accurately check if bow or crossbow.
@@ -76,7 +76,7 @@ public class Spark implements BaseEnchantment {
 			if (bowDraw / 2 > FastUtils.RANDOM.nextDouble()) {
 				// Spark only supports a single level. It does not use enchant levels,
 				// & attempting to offhand double Spark as a higher level should be ignored
-				projectile.setMetadata(METADATA_STUN_KEY, new FixedMetadataValue(plugin, 1));
+				projectile.setMetadata(METADATA_KEY_STUN, new FixedMetadataValue(plugin, 1));
 			}
 		}
 	}
@@ -96,14 +96,14 @@ public class Spark implements BaseEnchantment {
 		@NotNull LivingEntity enemy,
 		@NotNull EntityDamageByEntityEvent entityDamageByEntityEvent
 	) {
-		if (projectile.hasMetadata(METADATA_SPARK_KEY)) {
+		if (projectile.hasMetadata(METADATA_KEY)) {
 			boolean doEffects = false;
 			if (enemy instanceof Guardian || enemy instanceof IronGolem) {
 				doEffects = true;
 				entityDamageByEntityEvent.setDamage(entityDamageByEntityEvent.getDamage() + 1);
 			}
 			if (
-				projectile.hasMetadata(METADATA_STUN_KEY)
+				projectile.hasMetadata(METADATA_KEY_STUN)
 				&& !(EntityUtils.isElite(enemy) || EntityUtils.isBoss(enemy))
 			) {
 				doEffects = true;

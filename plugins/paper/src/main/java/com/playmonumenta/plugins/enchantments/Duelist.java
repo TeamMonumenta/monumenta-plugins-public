@@ -32,7 +32,7 @@ public class Duelist implements BaseEnchantment {
 
 	@Override
 	public void onAttack(Plugin plugin, Player player, int level, LivingEntity target, EntityDamageByEntityEvent event) {
-		if (EntityUtils.isHumanoid(target)) {
+		if (EntityUtils.isHumanlike(target)) {
 			event.setDamage(event.getDamage() + DAMAGE_PER_LEVEL * level * player.getCooledAttackStrength(0));
 		}
 	}
@@ -53,7 +53,7 @@ public class Duelist implements BaseEnchantment {
 	 * This works this way because you might have the enchantment when you fire the arrow, but switch to a different item before it hits
 	 */
 	public static void onShootAttack(Plugin plugin, Projectile proj, LivingEntity target, EntityDamageByEntityEvent event) {
-		if (EntityUtils.isHumanoid(target)) {
+		if (EntityUtils.isHumanlike(target)) {
 			if (proj.hasMetadata(LEVEL_METAKEY)) {
 				int level = proj.getMetadata(LEVEL_METAKEY).get(0).asInt();
 				event.setDamage(event.getDamage() + level * DAMAGE_PER_LEVEL);

@@ -69,7 +69,7 @@ public class DivineJustice extends Ability {
 				StringUtils.multiplierToPercentage(HEALING_MULTIPLIER_OTHER),
 				DAMAGE_1,
 				DAMAGE_1,
-				DAMAGE_MULTIPLIER_2
+				StringUtils.multiplierToPercentage(DAMAGE_MULTIPLIER_2)
 			)
 		);
 

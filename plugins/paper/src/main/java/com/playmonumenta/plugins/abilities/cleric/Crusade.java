@@ -20,7 +20,7 @@ public class Crusade extends Ability {
 
 	public static final double DAMAGE_MULTIPLIER = 1d / 3;
 
-	private final boolean mCountsHumanoids;
+	private final boolean mCountsHumanlikes;
 
 	public Crusade(
 		@NotNull Plugin plugin,
@@ -37,10 +37,10 @@ public class Crusade extends Ability {
 			)
 		);
 		mInfo.mDescriptions.add(
-			"Your abilities that work against undead enemies now also work against humanoid enemies (illagers, vexes, golems, witches and giants)."
-		); // List of humanoids hardcoded
+			"Your abilities that work against undead enemies now also work against human-like enemies - illagers, vexes, golems, witches and giants."
+		); // List of human-likes hardcoded
 
-		mCountsHumanoids = getAbilityScore() == 2;
+		mCountsHumanlikes = getAbilityScore() == 2;
 	}
 
 	@Override
@@ -81,8 +81,8 @@ public class Crusade extends Ability {
 			EntityUtils.isUndead(enemy)
 			|| (
 				crusade != null
-				&& crusade.mCountsHumanoids
-				&& EntityUtils.isHumanoid(enemy)
+				&& crusade.mCountsHumanlikes
+				&& EntityUtils.isHumanlike(enemy)
 			)
 		);
 	}

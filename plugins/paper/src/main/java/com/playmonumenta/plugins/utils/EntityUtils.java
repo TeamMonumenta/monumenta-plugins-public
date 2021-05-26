@@ -164,7 +164,7 @@ public class EntityUtils {
 	);
 
 	// This list is hardcoded for Crusade description & Duelist advancement
-	private static final EnumSet<EntityType> HUMANOID_MOBS = EnumSet.of(
+	private static final EnumSet<EntityType> HUMANLIKE_MOBS = EnumSet.of(
 		EntityType.EVOKER,
 		EntityType.ILLUSIONER,
 		EntityType.PILLAGER,
@@ -312,8 +312,8 @@ public class EntityUtils {
 	}
 
 	// Affected by Duelist
-	public static boolean isHumanoid(LivingEntity mob) {
-		return HUMANOID_MOBS.contains(mob.getType());
+	public static boolean isHumanlike(LivingEntity mob) {
+		return HUMANLIKE_MOBS.contains(mob.getType());
 	}
 
 	public static boolean isElite(Entity entity) {

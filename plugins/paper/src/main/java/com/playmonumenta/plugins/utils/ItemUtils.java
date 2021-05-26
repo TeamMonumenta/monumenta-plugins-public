@@ -104,12 +104,13 @@ public class ItemUtils {
 		Material.DIAMOND_HELMET,
 		Material.DIAMOND_LEGGINGS,
 
-		Material.PUMPKIN,
+		Material.PLAYER_HEAD,
 		Material.CREEPER_HEAD,
 		Material.SKELETON_SKULL,
 		Material.WITHER_SKELETON_SKULL,
 		Material.ZOMBIE_HEAD,
-		Material.PLAYER_HEAD
+
+		Material.CARVED_PUMPKIN
 	);
 
 	// List of materials that trees can replace when they grow

@@ -54,7 +54,7 @@ public class BrewingListener implements Listener {
 						malfunction = true;
 						break;
 					} else if (ingredientMaterial == Material.FERMENTED_SPIDER_EYE) {
-						@Nullable ItemMeta itemMeta = potentialPotion.getItemMeta();
+						ItemMeta itemMeta = potentialPotion.getItemMeta();
 						if (itemMeta instanceof PotionMeta) {
 							@NotNull PotionData potionData
 								= ((PotionMeta)itemMeta).getBasePotionData();
@@ -83,11 +83,11 @@ public class BrewingListener implements Listener {
 
 				// Eject ingredient & refund
 				brewerInventory.setIngredient(null);
-				World world = blockCentre.getWorld();
+				@NotNull World world = blockCentre.getWorld();
 				world.dropItemNaturally(blockCentre, ingredient);
 
 				// Effects
-				PartialParticle partialParticle = new PartialParticle(
+				@NotNull PartialParticle partialParticle = new PartialParticle(
 					Particle.EXPLOSION_LARGE,
 					blockCentre,
 					2,
