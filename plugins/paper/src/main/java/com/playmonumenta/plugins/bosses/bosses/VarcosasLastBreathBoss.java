@@ -20,6 +20,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -133,6 +134,13 @@ public class VarcosasLastBreathBoss extends BossAbilityGroup {
 			//Let the players know something happened
 			player.playSound(player.getLocation(), Sound.BLOCK_BELL_RESONATE, SoundCategory.HOSTILE, 0.3f, 0.9f);
 			player.getWorld().spawnParticle(Particle.VILLAGER_ANGRY, player.getLocation(), 25, 1.5, 1.5, 1.5);
+		}
+
+		if (event.getEntity() instanceof Player && event.getCause().equals(DamageCause.ENTITY_ATTACK)) {
+			Player player = (Player) event.getEntity();
+			if (player.isBlocking()) {
+				player.setCooldown(Material.SHIELD, 20 * 6);
+			}
 		}
 	}
 

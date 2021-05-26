@@ -16,6 +16,7 @@ import org.bukkit.boss.BarStyle;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
@@ -117,6 +118,16 @@ public class Varcosa extends BossAbilityGroup {
 		BossBarManager bossBar = new BossBarManager(plugin, boss, detectionRange, BarColor.RED, BarStyle.SEGMENTED_10, events);
 
 		super.constructBoss(activeSpells, passiveSpells, detectionRange, bossBar);
+	}
+
+	@Override
+	public void bossDamagedEntity(EntityDamageByEntityEvent event) {
+		if (event.getEntity() instanceof Player && event.getCause().equals(DamageCause.ENTITY_ATTACK)) {
+			Player player = (Player) event.getEntity();
+			if (player.isBlocking()) {
+				player.setCooldown(Material.SHIELD, 20 * 6);
+			}
+		}
 	}
 
 	@Override
