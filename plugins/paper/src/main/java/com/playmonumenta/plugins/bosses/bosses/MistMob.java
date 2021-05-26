@@ -28,6 +28,6 @@ public class MistMob extends BossAbilityGroup {
 			return;
 		}
 		Location loc = event.getEntity().getLocation();
-		Bukkit.getConsoleSender().getServer().dispatchCommand(Bukkit.getConsoleSender(), "execute positioned " + loc.getX() + " " + loc.getY() + " " + loc.getZ() + " run function monumenta:black_mist/mob_death");
+		Bukkit.getConsoleSender().getServer().dispatchCommand(Bukkit.getConsoleSender(), "execute positioned " + loc.getX() + " " + loc.getY() + " " + loc.getZ() + " run function monumenta:dungeons/mist/mob_death");
 	}
 }
