@@ -136,6 +136,7 @@ public class GuiItem {
 			}
 			itemStack.setAmount(amount);
 			player.getInventory().removeItem(itemStack);
+			itemStack.setAmount(1);
 		}
 
 		return true;

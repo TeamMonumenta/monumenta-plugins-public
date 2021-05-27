@@ -63,6 +63,7 @@ import com.playmonumenta.plugins.bosses.bosses.gray.GrayScarabSummoner;
 import com.playmonumenta.plugins.bosses.bosses.gray.GraySummoned;
 import com.playmonumenta.plugins.bosses.events.SpellCastEvent;
 import com.playmonumenta.plugins.events.CustomEffectApplyEvent;
+import com.playmonumenta.plugins.parrots.RainbowParrot;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.SerializationUtils;
@@ -222,6 +223,7 @@ public class BossManager implements Listener {
 		mStatelessBosses.put(DistanceCloserBoss.identityTag, (Plugin p, LivingEntity e) -> new DistanceCloserBoss(p, e));
 		mStatelessBosses.put(WeakHookBoss.identityTag, (Plugin p, LivingEntity e) -> new WeakHookBoss(p, e));
 		mStatelessBosses.put(AuraEffectBoss.identityTag, (Plugin p, LivingEntity e) -> new AuraEffectBoss(p, e));
+		mStatelessBosses.put(RainbowParrot.identityTag, (Plugin p, LivingEntity e) -> new RainbowParrot(p, e));
 
 
 		/* Stateful bosses have a remembered spawn location and end location where a redstone block is set when they die */
@@ -391,7 +393,7 @@ public class BossManager implements Listener {
 		mBossDeserializers.put(DistanceCloserBoss.identityTag, (Plugin p, LivingEntity e) -> DistanceCloserBoss.deserialize(p, e));
 		mBossDeserializers.put(WeakHookBoss.identityTag, (Plugin p, LivingEntity e) -> WeakHookBoss.deserialize(p, e));
 		mBossDeserializers.put(AuraEffectBoss.identityTag, (Plugin p, LivingEntity e) -> AuraEffectBoss.deserialize(p, e));
-
+		mBossDeserializers.put(RainbowParrot.identityTag, (Plugin p, LivingEntity e) -> RainbowParrot.deserialize(p, e));
 	}
 
 	/********************************************************************************

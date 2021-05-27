@@ -59,6 +59,7 @@ public class ParrotGUI extends SinglePageGUI {
 		ItemStack mPGo = null;
 		ItemStack mKS = null;
 		ItemStack mFG = null;
+		ItemStack mUP = null;
 
 		mHCS = InventoryUtils.getItemFromLootTable(mPlayer, NamespacedKey.fromString("epic:r2/items/currency/hyper_crystalline_shard"));
 		mHXP = InventoryUtils.getItemFromLootTable(mPlayer, NamespacedKey.fromString("epic:r1/items/currency/hyper_experience"));
@@ -66,6 +67,7 @@ public class ParrotGUI extends SinglePageGUI {
 		mPPe = InventoryUtils.getItemFromLootTable(mPlayer, NamespacedKey.fromString("epic:r2/items/currency/pulsating_emerald"));
 		mKS = InventoryUtils.getItemFromLootTable(mPlayer, NamespacedKey.fromString("epic:r1/kaul/crownshard"));
 		mFG = InventoryUtils.getItemFromLootTable(mPlayer, NamespacedKey.fromString("epic:r2/eldrask/materials/epic_material"));
+		mUP = InventoryUtils.getItemFromLootTable(mPlayer, NamespacedKey.fromString("epic:r1/dungeons/4/static_uncommons/unicorn_puke"));
 		//we got the currencies, now populating the list
 
 
@@ -122,7 +124,7 @@ public class ParrotGUI extends SinglePageGUI {
 		lore.clear();
 		lore.add("Become a Tier 2 patreon to unlock");
 		ItemStack buyPatreon = buildItem(Material.ORANGE_WOOL, "Patron Parakeet", lore);
-		GUI_ITEMS.add(new GuiItem(0, 5, buyPatreon, new HashMap<>(), (player, inv) -> {
+		GUI_ITEMS.add(new GuiItem(0, 6, buyPatreon, new HashMap<>(), (player, inv) -> {
 						return ScoreboardUtils.getScoreboardValue(player, "Patreon") < 5; }));
 
 		//setting lore & cost
@@ -132,7 +134,7 @@ public class ParrotGUI extends SinglePageGUI {
 		cost.clear();
 		cost.put(mPGo, 64);
 		ItemStack buyGolden = buildItem(Material.YELLOW_CONCRETE, "Buy Golden Conure", lore);
-		GUI_ITEMS.add(new GuiItem(0, 6, buyGolden, new HashMap<>(cost), (player, inv) -> {
+		GUI_ITEMS.add(new GuiItem(0, 7, buyGolden, new HashMap<>(cost), (player, inv) -> {
 						return ScoreboardUtils.getScoreboardValue(player, "ParrotBought7") == 0; },
 							(player, inv) -> {
 								ScoreboardUtils.setScoreboardValue(player, "ParrotBought7", (int) Instant.now().getEpochSecond());
@@ -143,7 +145,7 @@ public class ParrotGUI extends SinglePageGUI {
 		cost.clear();
 		cost.put(mPPe, 64);
 		ItemStack buyEmerald = buildItem(Material.GREEN_CONCRETE, "Buy Emerald Conure", lore);
-		GUI_ITEMS.add(new GuiItem(0, 7, buyEmerald, new HashMap<>(cost), (player, inv) -> {
+		GUI_ITEMS.add(new GuiItem(0, 8, buyEmerald, new HashMap<>(cost), (player, inv) -> {
 						return ScoreboardUtils.getScoreboardValue(player, "ParrotBought8") == 0; },
 							(player, inv) -> {
 								ScoreboardUtils.setScoreboardValue(player, "ParrotBought8", (int) Instant.now().getEpochSecond());
@@ -154,7 +156,7 @@ public class ParrotGUI extends SinglePageGUI {
 		cost.clear();
 		cost.put(mHCS, 80);
 		ItemStack buyPirate = buildItem(Material.PURPLE_WOOL, "Buy Scoundrel Macaw", lore);
-		GUI_ITEMS.add(new GuiItem(0, 8, buyPirate, new HashMap<>(cost), (player, inv) -> {
+		GUI_ITEMS.add(new GuiItem(0, 9, buyPirate, new HashMap<>(cost), (player, inv) -> {
 						return ScoreboardUtils.getScoreboardValue(player, "ParrotBought9") == 0; },
 						(player, inv) -> {
 								ScoreboardUtils.setScoreboardValue(player, "ParrotBought9", (int) Instant.now().getEpochSecond());
@@ -201,7 +203,7 @@ public class ParrotGUI extends SinglePageGUI {
 		lore.add("64HCS");
 		cost.clear();
 		cost.put(mHCS, 64);
-		ItemStack bothShoulders = buildItem(Material.INK_SAC, "Buy Both shoulders", lore);
+		ItemStack bothShoulders = buildItem(Material.INK_SAC, "Buy Both Shoulders", lore);
 		GUI_ITEMS.add(new GuiItem(0, 26, bothShoulders, new HashMap<>(cost), (player, inv) -> {
 						return !ParrotManager.hasDoubleShoulders(player); },
 							(player, inv) -> {
@@ -211,7 +213,7 @@ public class ParrotGUI extends SinglePageGUI {
 		lore.clear();
 		lore.add("Owned");
 		lore.add((new Date((long)ScoreboardUtils.getScoreboardValue(mPlayer, SCOREBOARD_BOUGHT_SHOULDERS)*1000).toString()));
-		ItemStack boughtShoulders = buildItem(Material.INK_SAC, "Both shoulders", lore);
+		ItemStack boughtShoulders = buildItem(Material.INK_SAC, "Both Shoulders", lore);
 		GUI_ITEMS.add(new GuiItem(0, 26, boughtShoulders, new HashMap<>(), (player, inv) -> {
 						return ParrotManager.hasDoubleShoulders(player); }));
 
@@ -338,14 +340,14 @@ public class ParrotGUI extends SinglePageGUI {
 		lore.add("Owned");
 		//lore.add((new Date((long)ScoreboardUtils.getScoreboardValue(mPlayer, "--------")*1000).toString()));   //the patreon parrot item don't have a date
 		ItemStack boughPatreon = buildItem(Material.ORANGE_WOOL, "Patreon Parakeet", lore);
-		GUI_ITEMS.add(new GuiItem(0, 5, boughPatreon, new HashMap<>(), (player, inv) -> {
+		GUI_ITEMS.add(new GuiItem(0, 6, boughPatreon, new HashMap<>(), (player, inv) -> {
 						return ScoreboardUtils.getScoreboardValue(player, "Patreon") >= 5; }));
-		GUI_ITEMS.add(new GuiItem(1, 5, boughPatreon, new HashMap<>(), (player, inv) -> {
+		GUI_ITEMS.add(new GuiItem(1, 6, boughPatreon, new HashMap<>(), (player, inv) -> {
 						return ScoreboardUtils.getScoreboardValue(player, "Patreon") >= 5; },
 							(player, inv) -> {
 								ParrotManager.updateParrot(player, ParrotVariant.PATREON, "LEFT");
 								return true; }));
-		GUI_ITEMS.add(new GuiItem(2, 5, boughPatreon, new HashMap<>(), (player, inv) -> {
+		GUI_ITEMS.add(new GuiItem(2, 6, boughPatreon, new HashMap<>(), (player, inv) -> {
 						return ScoreboardUtils.getScoreboardValue(player, "Patreon") >= 5; },
 							(player, inv) -> {
 								ParrotManager.updateParrot(player, ParrotVariant.PATREON, "RIGHT");
@@ -356,14 +358,14 @@ public class ParrotGUI extends SinglePageGUI {
 		lore.add("Owned");
 		lore.add((new Date((long)ScoreboardUtils.getScoreboardValue(mPlayer, "ParrotBought7")*1000).toString()));
 		ItemStack boughGolden = buildItem(Material.YELLOW_CONCRETE, "Golden Conure", lore);
-		GUI_ITEMS.add(new GuiItem(0, 6, boughGolden, new HashMap<>(), (player, inv) -> {
+		GUI_ITEMS.add(new GuiItem(0, 7, boughGolden, new HashMap<>(), (player, inv) -> {
 						return ScoreboardUtils.getScoreboardValue(player, "ParrotBought7") > 0; }));
-		GUI_ITEMS.add(new GuiItem(1, 6, boughGolden, new HashMap<>(), (player, inv) -> {
+		GUI_ITEMS.add(new GuiItem(1, 7, boughGolden, new HashMap<>(), (player, inv) -> {
 						return ScoreboardUtils.getScoreboardValue(player, "ParrotBought7") > 0; },
 							(player, inv) -> {
 								ParrotManager.updateParrot(player, ParrotVariant.PULSATING_GOLD, "LEFT");
 								return true; }));
-		GUI_ITEMS.add(new GuiItem(2, 6, boughGolden, new HashMap<>(), (player, inv) -> {
+		GUI_ITEMS.add(new GuiItem(2, 7, boughGolden, new HashMap<>(), (player, inv) -> {
 						return ScoreboardUtils.getScoreboardValue(player, "ParrotBought7") > 0; },
 							(player, inv) -> {
 								ParrotManager.updateParrot(player, ParrotVariant.PULSATING_GOLD, "RIGHT");
@@ -374,14 +376,14 @@ public class ParrotGUI extends SinglePageGUI {
 		lore.add("Owned");
 		lore.add((new Date((long)ScoreboardUtils.getScoreboardValue(mPlayer, "ParrotBought8")*1000).toString()));
 		ItemStack boughEmerald = buildItem(Material.GREEN_CONCRETE, "Emerald Conure", lore);
-		GUI_ITEMS.add(new GuiItem(0, 7, boughEmerald, new HashMap<>(), (player, inv) -> {
+		GUI_ITEMS.add(new GuiItem(0, 8, boughEmerald, new HashMap<>(), (player, inv) -> {
 						return ScoreboardUtils.getScoreboardValue(player, "ParrotBought8") > 0; }));
-		GUI_ITEMS.add(new GuiItem(1, 7, boughEmerald, new HashMap<>(), (player, inv) -> {
+		GUI_ITEMS.add(new GuiItem(1, 8, boughEmerald, new HashMap<>(), (player, inv) -> {
 						return ScoreboardUtils.getScoreboardValue(player, "ParrotBought8") > 0; },
 							(player, inv) -> {
 								ParrotManager.updateParrot(player, ParrotVariant.PULSATING_EMERALD, "LEFT");
 								return true; }));
-		GUI_ITEMS.add(new GuiItem(2, 7, boughEmerald, new HashMap<>(), (player, inv) -> {
+		GUI_ITEMS.add(new GuiItem(2, 8, boughEmerald, new HashMap<>(), (player, inv) -> {
 						return ScoreboardUtils.getScoreboardValue(player, "ParrotBought8") > 0; },
 							(player, inv) -> {
 								ParrotManager.updateParrot(player, ParrotVariant.PULSATING_EMERALD, "RIGHT");
@@ -392,14 +394,14 @@ public class ParrotGUI extends SinglePageGUI {
 		lore.add("Owned");
 		lore.add((new Date((long)ScoreboardUtils.getScoreboardValue(mPlayer, "ParrotBought9")*1000).toString()));
 		ItemStack boughPirate = buildItem(Material.PURPLE_WOOL, "Scoundrel Macaw", lore);
-		GUI_ITEMS.add(new GuiItem(0, 8, boughPirate, new HashMap<>(), (player, inv) -> {
+		GUI_ITEMS.add(new GuiItem(0, 9, boughPirate, new HashMap<>(), (player, inv) -> {
 						return ScoreboardUtils.getScoreboardValue(player, "ParrotBought9") > 0; }));
-		GUI_ITEMS.add(new GuiItem(1, 8, boughPirate, new HashMap<>(), (player, inv) -> {
+		GUI_ITEMS.add(new GuiItem(1, 9, boughPirate, new HashMap<>(), (player, inv) -> {
 						return ScoreboardUtils.getScoreboardValue(player, "ParrotBought9") > 0; },
 							(player, inv) -> {
 								ParrotManager.updateParrot(player, ParrotVariant.PIRATE, "LEFT");
 								return true; }));
-		GUI_ITEMS.add(new GuiItem(2, 8, boughPirate, new HashMap<>(), (player, inv) -> {
+		GUI_ITEMS.add(new GuiItem(2, 9, boughPirate, new HashMap<>(), (player, inv) -> {
 						return ScoreboardUtils.getScoreboardValue(player, "ParrotBought9") > 0; },
 							(player, inv) -> {
 								ParrotManager.updateParrot(player, ParrotVariant.PIRATE, "RIGHT");
@@ -407,11 +409,11 @@ public class ParrotGUI extends SinglePageGUI {
 
 		//Kaul!
 		lore.clear();
-		lore.add("Requires 50 kaul wins to buy");
+		lore.add("Requires 50 Kaul wins to buy");
 		int currentWins = ScoreboardUtils.getScoreboardValue(mPlayer, "KaulWins");
 		lore.add("You still need " + (50 - currentWins) + " wins");
 		ItemStack winKaul = buildItem(Material.JUNGLE_LEAVES, "Blackroot Kakapo", lore);
-		GUI_ITEMS.add(new GuiItem(0, 9, winKaul, new HashMap<>(), (player, inv) -> {
+		GUI_ITEMS.add(new GuiItem(0, 10, winKaul, new HashMap<>(), (player, inv) -> {
 			return ScoreboardUtils.getScoreboardValue(player, "KaulWins") < 50;
 		}));
 
@@ -421,7 +423,7 @@ public class ParrotGUI extends SinglePageGUI {
 		cost.clear();
 		cost.put(mKS, 80);
 		ItemStack buyKaul = buildItem(Material.JUNGLE_LEAVES, "Blackroot Kakapo", lore);
-		GUI_ITEMS.add(new GuiItem(0, 9, buyKaul, new HashMap<>(cost), (player, inv) -> {
+		GUI_ITEMS.add(new GuiItem(0, 10, buyKaul, new HashMap<>(cost), (player, inv) -> {
 			return ScoreboardUtils.getScoreboardValue(player, "KaulWins") >= 50;
 		}, (player, inv) -> {
 			ScoreboardUtils.setScoreboardValue(player, "ParrotBought10", (int) Instant.now().getEpochSecond());
@@ -432,16 +434,16 @@ public class ParrotGUI extends SinglePageGUI {
 		lore.add("Owned");
 		lore.add((new Date((long)ScoreboardUtils.getScoreboardValue(mPlayer, "ParrotBought10")*1000).toString()));
 		ItemStack boughtKaul = buildItem(Material.JUNGLE_LEAVES, "Blackroot Kakapo", lore);
-		GUI_ITEMS.add(new GuiItem(0, 9, boughtKaul, new HashMap<>(), (player, inv) -> {
+		GUI_ITEMS.add(new GuiItem(0, 10, boughtKaul, new HashMap<>(), (player, inv) -> {
 			return ScoreboardUtils.getScoreboardValue(player, "ParrotBought10") > 0;
 		}));
-		GUI_ITEMS.add(new GuiItem(1, 9, boughtKaul, new HashMap<>(), (player, inv) -> {
+		GUI_ITEMS.add(new GuiItem(1, 10, boughtKaul, new HashMap<>(), (player, inv) -> {
 			return ScoreboardUtils.getScoreboardValue(player, "ParrotBought10") > 0;
 		}, (player, inv) -> {
 			ParrotManager.updateParrot(player, ParrotVariant.KAUL, "LEFT");
 			return true;
 		}));
-		GUI_ITEMS.add(new GuiItem(2, 9, boughtKaul, new HashMap<>(), (player, inv) -> {
+		GUI_ITEMS.add(new GuiItem(2, 10, boughtKaul, new HashMap<>(), (player, inv) -> {
 			return ScoreboardUtils.getScoreboardValue(player, "ParrotBought10") > 0;
 		}, (player, inv) -> {
 			ParrotManager.updateParrot(player, ParrotVariant.KAUL, "RIGHT");
@@ -454,7 +456,7 @@ public class ParrotGUI extends SinglePageGUI {
 		currentWins = ScoreboardUtils.getScoreboardValue(mPlayer, "FGWins");
 		lore.add("You still need " + (50 - currentWins) + " wins");
 		ItemStack winEldrask = buildItem(Material.BLUE_ICE, "Permafrost Kea", lore);
-		GUI_ITEMS.add(new GuiItem(0, 10, winEldrask, new HashMap<>(), (player, inv) -> {
+		GUI_ITEMS.add(new GuiItem(0, 11, winEldrask, new HashMap<>(), (player, inv) -> {
 			return ScoreboardUtils.getScoreboardValue(player, "EldraskWins") < 50;
 		}));
 
@@ -464,7 +466,7 @@ public class ParrotGUI extends SinglePageGUI {
 		cost.clear();
 		cost.put(mFG, 80);
 		ItemStack buyEldrask = buildItem(Material.BLUE_ICE, "Permafrost Kea", lore);
-		GUI_ITEMS.add(new GuiItem(0, 10, buyEldrask, new HashMap<>(cost), (player, inv) -> {
+		GUI_ITEMS.add(new GuiItem(0, 11, buyEldrask, new HashMap<>(cost), (player, inv) -> {
 			return ScoreboardUtils.getScoreboardValue(player, "FGWins") >= 50;
 		}, (player, inv) -> {
 			ScoreboardUtils.setScoreboardValue(player, "ParrotBought11", (int) Instant.now().getEpochSecond());
@@ -475,21 +477,108 @@ public class ParrotGUI extends SinglePageGUI {
 		lore.add("Owned");
 		lore.add((new Date((long)ScoreboardUtils.getScoreboardValue(mPlayer, "ParrotBought11")*1000).toString()));
 		ItemStack boughtEldrask = buildItem(Material.BLUE_ICE, "Permafrost Kea", lore);
-		GUI_ITEMS.add(new GuiItem(0, 10, boughtEldrask, new HashMap<>(), (player, inv) -> {
+		GUI_ITEMS.add(new GuiItem(0, 11, boughtEldrask, new HashMap<>(), (player, inv) -> {
 			return ScoreboardUtils.getScoreboardValue(player, "ParrotBought11") > 0;
 		}));
-		GUI_ITEMS.add(new GuiItem(1, 10, boughtEldrask, new HashMap<>(), (player, inv) -> {
+		GUI_ITEMS.add(new GuiItem(1, 11, boughtEldrask, new HashMap<>(), (player, inv) -> {
 			return ScoreboardUtils.getScoreboardValue(player, "ParrotBought11") > 0;
 		}, (player, inv) -> {
 			ParrotManager.updateParrot(player, ParrotVariant.ELDRASK, "LEFT");
 			return true;
 		}));
-		GUI_ITEMS.add(new GuiItem(2, 10, boughtEldrask, new HashMap<>(), (player, inv) -> {
+		GUI_ITEMS.add(new GuiItem(2, 11, boughtEldrask, new HashMap<>(), (player, inv) -> {
 			return ScoreboardUtils.getScoreboardValue(player, "ParrotBought11") > 0;
 		}, (player, inv) -> {
 			ParrotManager.updateParrot(player, ParrotVariant.ELDRASK, "RIGHT");
 			return true;
 		}));
+
+
+		//PRIDE PARROT!
+		lore.clear();
+		lore.add("You have to unlock these parrots");
+		lore.add("before being able to purchase this one:");
+		if (ScoreboardUtils.getScoreboardValue(mPlayer, "ParrotBought1") == 0) {
+			lore.add("Scarlet Macaw");
+		} else {
+			lore.add("##Scarlet Macaw");
+		}
+		if (ScoreboardUtils.getScoreboardValue(mPlayer, "ParrotBought2") == 0) {
+			lore.add("Hyacinth Macaw");
+		} else {
+			lore.add("##Hyacinth Macaw");
+		}
+		if (ScoreboardUtils.getScoreboardValue(mPlayer, "ParrotBought3") == 0) {
+			lore.add("Blue-Yellow Macaw");
+		} else {
+			lore.add("##Blue-Yellow Macaw");
+		}
+		if (ScoreboardUtils.getScoreboardValue(mPlayer, "ParrotBought4") == 0) {
+			lore.add("Green Parakeet");
+		} else {
+			lore.add("##Green Parakeet");
+		}
+		if (ScoreboardUtils.getScoreboardValue(mPlayer, "ParrotBought5") == 0) {
+			lore.add("Gray Cockatiel");
+		} else {
+			lore.add("##Gray Cockatiel");
+		}
+		ItemStack prideParrot = buildItem(Material.YELLOW_GLAZED_TERRACOTTA, "Rainbow Parrot", lore);
+		GUI_ITEMS.add(new GuiItem(0, 5, prideParrot, new HashMap<>(), (player, inv) -> {
+			return ScoreboardUtils.getScoreboardValue(player, "ParrotBought1") == 0 ||
+			ScoreboardUtils.getScoreboardValue(player, "ParrotBought2") == 0 ||
+			ScoreboardUtils.getScoreboardValue(player, "ParrotBought3") == 0 ||
+			ScoreboardUtils.getScoreboardValue(player, "ParrotBought4") == 0 ||
+			ScoreboardUtils.getScoreboardValue(player, "ParrotBought5") == 0;
+		}, (player, inv) -> {
+			return true;
+		}));
+
+		lore.clear();
+		lore.add("Click to buy!");
+		lore.add("32 HXP");
+		lore.add("32 HCS");
+		lore.add("1 Unicorn Puke");
+		cost.clear();
+		cost.put(mHCS, 32);
+		cost.put(mHXP, 32);
+		cost.put(mUP, 1);
+		ItemStack buyPrideParrot = buildItem(Material.YELLOW_GLAZED_TERRACOTTA, "Rainbow Parrot", lore);
+		GUI_ITEMS.add(new GuiItem(0, 5, buyPrideParrot, new HashMap<>(cost), (player, inv) -> {
+			return ScoreboardUtils.getScoreboardValue(player, "ParrotBought1") > 0 &&
+			ScoreboardUtils.getScoreboardValue(player, "ParrotBought2") > 0 &&
+			ScoreboardUtils.getScoreboardValue(player, "ParrotBought3") > 0 &&
+			ScoreboardUtils.getScoreboardValue(player, "ParrotBought4") > 0 &&
+			ScoreboardUtils.getScoreboardValue(player, "ParrotBought5") > 0;
+		}, (player, inv) -> {
+			ScoreboardUtils.setScoreboardValue(player, "ParrotBought12", (int) Instant.now().getEpochSecond());
+			return true;
+		}));
+
+		lore.clear();
+		lore.add("Owned");
+		lore.add((new Date((long)ScoreboardUtils.getScoreboardValue(mPlayer, "ParrotBought12")*1000).toString()));
+		ItemStack boughtPrideParrot = buildItem(Material.YELLOW_GLAZED_TERRACOTTA, "Rainbow Parrot", lore);
+		GUI_ITEMS.add(new GuiItem(0, 5, boughtPrideParrot, new HashMap<>(), (player, inv) -> {
+			return ScoreboardUtils.getScoreboardValue(player, "ParrotBought12") > 0;
+		}, (player, inv) -> {
+			return true;
+		}));
+
+		GUI_ITEMS.add(new GuiItem(1, 5, boughtPrideParrot, new HashMap<>(), (player, inv) -> {
+			return ScoreboardUtils.getScoreboardValue(player, "ParrotBought12") > 0;
+		}, (player, inv) -> {
+			ParrotManager.updateParrot(player, ParrotVariant.RAINBOW, "LEFT");
+			return true;
+		}));
+
+		GUI_ITEMS.add(new GuiItem(2, 5, boughtPrideParrot, new HashMap<>(), (player, inv) -> {
+			return ScoreboardUtils.getScoreboardValue(player, "ParrotBought12") > 0;
+		}, (player, inv) -> {
+			ParrotManager.updateParrot(player, ParrotVariant.RAINBOW, "RIGHT");
+			return true;
+		}));
+
 	}
 
 
@@ -503,7 +592,13 @@ public class ParrotGUI extends SinglePageGUI {
 		if (!lore.isEmpty()) {
 			List<Component> mLore = new ArrayList<Component>();
 			for (String sLore : lore) {
-				mLore.add(Component.text(sLore, NamedTextColor.AQUA).decoration(TextDecoration.ITALIC, false));
+				if (!sLore.contains("1970")) {
+					if (sLore.startsWith("##")) {
+						mLore.add(Component.text(sLore.substring(2), NamedTextColor.AQUA).decoration(TextDecoration.ITALIC, false).decoration(TextDecoration.STRIKETHROUGH, true));
+					} else {
+						mLore.add(Component.text(sLore, NamedTextColor.AQUA).decoration(TextDecoration.ITALIC, false));
+					}
+				}
 			}
 			meta.lore(mLore);
 		}
@@ -586,6 +681,8 @@ public class ParrotGUI extends SinglePageGUI {
 
 	@Override
 	public void processClick(InventoryClickEvent event) {
+		event.setCancelled(true);
+
 		if (event.isShiftClick()) {
 			return;
 		}
