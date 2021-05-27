@@ -107,31 +107,40 @@ public class PebGui extends SinglePageGUI {
 		PEB_ITEMS.add(new PebItem(3, 4, "Toggleable Options",
 				"", ChatColor.LIGHT_PURPLE,
 				Material.LEVER, ""));
-		PEB_ITEMS.add(new PebItem(3, 19, "Self Particles",
+		PEB_ITEMS.add(new PebItem(3, 20, "Self Particles",
 				"Click to toggle self particles.", ChatColor.LIGHT_PURPLE,
 				Material.FIREWORK_STAR, "clickable peb_selfparticles"));
 		PEB_ITEMS.add(new PebItem(3, 21, "UA Rocket Jumping",
 				"Click to toggle rocket jumping with Unstable Arrows.", ChatColor.LIGHT_PURPLE,
 				Material.FIREWORK_ROCKET, "clickable peb_uarj"));
-		PEB_ITEMS.add(new PebItem(3, 23, "Show name on patron buff announcement.",
+		PEB_ITEMS.add(new PebItem(3, 22, "Show name on patron buff announcement.",
 				"Toggles whether the player has their IGN in the buff announcement when they"
 				+ " activate " + ChatColor.GOLD + "Patreon " + ChatColor.LIGHT_PURPLE + "buffs.", ChatColor.LIGHT_PURPLE,
-				Material.LANTERN, "clickable toggle_patron_buff_thank"));
-		PEB_ITEMS.add(new PebItem(3, 25, "Filtered Pickup",
-				"Click to toggle the pickup of uninteresting items.", ChatColor.LIGHT_PURPLE,
-				Material.DIRT, "pickup"));
-		PEB_ITEMS.add(new PebItem(3, 26, "Filtered Pickup information",
-				"Click to explain filtered pickup.", ChatColor.LIGHT_PURPLE,
-				Material.BOOK, "clickable peb_filteredinfo"));
-		PEB_ITEMS.add(new PebItem(3, 37, "Inventory Drink",
+				Material.GLOWSTONE, "clickable toggle_patron_buff_thank"));
+		PEB_ITEMS.add(new PebItem(3, 23, "Inventory Drink",
 				"Click to toggle drinking potions with a right click in any inventory.", ChatColor.LIGHT_PURPLE,
 				Material.GLASS_BOTTLE, "clickable peb_tid"));
-		PEB_ITEMS.add(new PebItem(3, 39, "Compass Particles",
+		PEB_ITEMS.add(new PebItem(3, 24, "Filtered Pickup",
+				"Click to toggle the pickup of uninteresting items.", ChatColor.LIGHT_PURPLE,
+				Material.DIRT, "pickup"));
+		PEB_ITEMS.add(new PebItem(3, 25, "Filtered Pickup information",
+				"Click to explain filtered pickup.", ChatColor.LIGHT_PURPLE,
+				Material.BOOK, "clickable peb_filteredinfo"));
+		PEB_ITEMS.add(new PebItem(3, 38, "Compass Particles",
 				"Click to toggle a trail of guiding particles when following the quest compass.", ChatColor.LIGHT_PURPLE,
 				Material.COMPASS, "clickable peb_comp_particles"));
-		PEB_ITEMS.add(new PebItem(3, 41, "Death Sort",
+		PEB_ITEMS.add(new PebItem(3, 39, "Death Sort",
 				"Click to toggle death sorting, which attempts to return items dropped on death to the slot they were in prior to death.", ChatColor.LIGHT_PURPLE,
 				Material.CHEST, "clickable peb_toggle_dso"));
+		PEB_ITEMS.add(new PebItem(3, 40, "Toggle Darksight",
+				"Click to toggle whether Darksight provides Night Vision", ChatColor.LIGHT_PURPLE,
+				Material.LANTERN, "execute as @S run function monumenta:mechanisms/darksight_toggle"));
+		PEB_ITEMS.add(new PebItem(3, 41, "Toggle Radiant",
+				"Click to toggle whether Radiant provides Night Vision.", ChatColor.LIGHT_PURPLE,
+				Material.SOUL_LANTERN, "execute as @S run function monumenta:mechanisms/radiant_toggle"));
+		PEB_ITEMS.add(new PebItem(3, 42, "Offhand Swapping",
+				"Click to toggle whether pressing your swap key will be fully cancelled or only cancelled when a spellcast does so", ChatColor.LIGHT_PURPLE,
+				Material.SHIELD, "toggleswap"));
 
 		//page 4: Server Info
 		PEB_ITEMS.add(new PebItem(4, 4, "Server Information",
@@ -310,7 +319,9 @@ public class PebGui extends SinglePageGUI {
 	}
 
 	public void completeCommand(Player player, String command) {
-		if (command.startsWith("clickable") || command.equals("pickup")) {
+		if (command.startsWith("clickable") ||
+				command.equals("pickup") ||
+				command.equals("toggleswap")) {
 			player.performCommand(command);
 			return;
 		} else {
