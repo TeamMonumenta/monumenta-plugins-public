@@ -107,7 +107,7 @@ public class VarcosaLingeringWillBoss extends BossAbilityGroup {
 				new SpellJibberJabber(mBoss, mSpeak, detectionRange),
 				new SpellPurgeNegatives(mBoss, 2),
 				new SpellPurgeGlowing(mBoss, 20 * 15),
-				new SpellKaulBlockBreak(mBoss, 52),
+				new SpellKaulBlockBreak(mBoss, 175),
 				action, tooHighAction
 				);
 

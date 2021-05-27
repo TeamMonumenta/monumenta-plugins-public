@@ -70,18 +70,18 @@ public class SpellGhostlyCannons extends Spell {
 							for (Player player : players) {
 								Vector loc = player.getLocation().toVector();
 								if (player.getLocation().getBlock().isLiquid() || !loc.isInSphere(mCenter.toVector(), 50)) {
-									rainCannons(player.getLocation(), players, mCenter.getY() + 10);
+									rainCannons(player.getLocation(), players);
 								}
 							}
 							for (int j = 0; j < 4; j++) {
-								rainCannons(mCenter.clone().add(FastUtils.randomDoubleInRange(-mRange, mRange), 0, FastUtils.randomDoubleInRange(-mRange, mRange)), players, mCenter.getY() + 10);
+								rainCannons(mCenter.clone().add(FastUtils.randomDoubleInRange(-mRange, mRange), 0, FastUtils.randomDoubleInRange(-mRange, mRange)), players);
 							}
 
 							// Target one random player. Have a meteor rain nearby them.
 							if (players.size() >= 1) {
 								Player rPlayer = players.get(FastUtils.RANDOM.nextInt(players.size()));
 								Location loc = rPlayer.getLocation();
-								rainCannons(loc.add(FastUtils.randomDoubleInRange(-2, 2), 0, FastUtils.randomDoubleInRange(-2, 2)), players, mCenter.getY() + 10);
+								rainCannons(loc.add(FastUtils.randomDoubleInRange(-2, 2), 0, FastUtils.randomDoubleInRange(-2, 2)), players);
 							}
 
 							if (mI >= (mPhaseThree ? 30 : 25)) {
@@ -101,21 +101,21 @@ public class SpellGhostlyCannons extends Spell {
 		mActiveRunnables.add(runnable);
 	}
 
-	private void rainCannons(Location locInput, List<Player> players, double spawnY) {
+	private void rainCannons(Location locInput, List<Player> players) {
 		if (locInput.distance(mCenter) > 24) {
 			// Somehow tried to spawn a meteor too far away from the center point
 			return;
 		}
 
 		BukkitRunnable runnable = new BukkitRunnable() {
-			double mY = spawnY;
 			Location mLoc = locInput.clone();
 			World mWorld = locInput.getWorld();
+			int mTicks = 60;
 			@Override
 			public void run() {
+				mTicks--;
 				players.removeIf(p -> p.getLocation().distance(mCenter) > 30);
-				mY -= 1;
-				if (mY % 2 == 0) {
+				if (mTicks % 2 == 0) {
 					for (Player player : players) {
 						// Player gets more particles the closer they are to the landing area
 						double dist = player.getLocation().distance(mLoc);
@@ -125,13 +125,13 @@ public class SpellGhostlyCannons extends Spell {
 						}
 					}
 				}
-				Location particle = mLoc.clone().add(0, mY, 0);
+				Location particle = mLoc.clone().add(0, mTicks / 3, 0);
 				mWorld.spawnParticle(Particle.SMOKE_NORMAL, particle, 3, 0.2f, 0.2f, 0.2f, 0.05, null, true);
 				if (FastUtils.RANDOM.nextBoolean()) {
 					mWorld.spawnParticle(Particle.CRIT, particle, 1, 0, 0, 0, 0, null, true);
 				}
 				mWorld.playSound(particle, Sound.ENTITY_ARROW_SHOOT, 1, 1);
-				if (mY <= 0) {
+				if (mTicks <= 0) {
 					this.cancel();
 					mActiveRunnables.remove(this);
 					mWorld.spawnParticle(Particle.EXPLOSION_NORMAL, mLoc, 15, 0, 0, 0, 0.175, null, false);

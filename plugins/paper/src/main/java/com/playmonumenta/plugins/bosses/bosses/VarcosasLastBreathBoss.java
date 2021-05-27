@@ -106,7 +106,7 @@ public class VarcosasLastBreathBoss extends BossAbilityGroup {
 				new SpellConditionalTeleport(mBoss, mSpawnLoc, b -> b.getLocation().getBlock().getType() == Material.WATER),
 				new SpellJibberJabber(mBoss, mSpeak, detectionRange),
 				new SpellPurgeNegatives(mBoss, 20 * 3),
-				new SpellKaulBlockBreak(mBoss, 52),
+				new SpellKaulBlockBreak(mBoss, 175),
 				action, tooHighAction
 				);
 
