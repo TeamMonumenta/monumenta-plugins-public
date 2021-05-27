@@ -51,6 +51,7 @@ import com.playmonumenta.plugins.commands.SpectateBot;
 import com.playmonumenta.plugins.commands.StatTrackItem;
 import com.playmonumenta.plugins.commands.TeleportAsync;
 import com.playmonumenta.plugins.commands.TeleportByScore;
+import com.playmonumenta.plugins.commands.ToggleSwap;
 import com.playmonumenta.plugins.commands.UnsignBook;
 import com.playmonumenta.plugins.commands.UpdateHeldItem;
 import com.playmonumenta.plugins.effects.EffectManager;
@@ -202,6 +203,7 @@ public class Plugin extends JavaPlugin {
 		GetScoreCommand.register(this);
 		Grave.register();
 		StatTrackItem.register();
+		ToggleSwap.register(this);
 
 		try {
 			mHttpManager = new HttpManager(this);

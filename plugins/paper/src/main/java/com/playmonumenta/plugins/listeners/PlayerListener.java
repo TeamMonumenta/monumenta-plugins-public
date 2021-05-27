@@ -7,6 +7,7 @@ import java.util.Map;
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.attributes.AttributeProjectileDamage;
+import com.playmonumenta.plugins.commands.ToggleSwap;
 import com.playmonumenta.plugins.enchantments.Bleeding;
 import com.playmonumenta.plugins.enchantments.Decay;
 import com.playmonumenta.plugins.enchantments.Duelist;
@@ -578,6 +579,9 @@ public class PlayerListener implements Listener {
 			return;
 		}
 		mPlugin.mAbilityManager.playerSwapHandItemsEvent(event.getPlayer(), event);
+		if (event.getPlayer().getScoreboardTags().contains(ToggleSwap.SWAP_TAG)) {
+			event.setCancelled(true);
+		}
 		InventoryUtils.scheduleDelayedEquipmentCheck(mPlugin, event.getPlayer(), event);
 	}
 
