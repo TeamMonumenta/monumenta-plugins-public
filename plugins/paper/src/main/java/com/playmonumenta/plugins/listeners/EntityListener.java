@@ -225,6 +225,10 @@ public class EntityListener implements Listener {
 			if (damagee instanceof Villager) {
 				event.setCancelled(true);
 			}
+			// Don't allow creepers to destroy items if either is in water
+			if (damager instanceof Creeper && damagee instanceof Item && (damager.isInWater() || damagee.isInWater())) {
+				event.setCancelled(true);
+			}
 			// Don't trigger class effects if the event was already cancelled (NPCs, etc.)
 			if (event.isCancelled() || damagee instanceof ArmorStand || damagee.isInvulnerable()) {
 				return;
