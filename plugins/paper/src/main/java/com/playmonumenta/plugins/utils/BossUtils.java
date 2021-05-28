@@ -233,6 +233,8 @@ public class BossUtils {
 					field.set(parameters, Particle.valueOf(fieldValueOrDefault.toUpperCase()));
 				} else if (t.equals(Sound.class)) {
 					field.set(parameters, Sound.valueOf(fieldValueOrDefault.toUpperCase()));
+				} else if (t.equals(String.class)) {
+					field.set(parameters, fieldValueOrDefault);
 				}
 			} catch (Exception ex) {
 				Plugin.getInstance().getLogger().warning("Failed to parse boss argument field " + fieldName + " for boss " + identityTag);

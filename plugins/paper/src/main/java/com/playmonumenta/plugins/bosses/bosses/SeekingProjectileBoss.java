@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
+
 import java.util.Arrays;
 
 import org.bukkit.Location;
@@ -14,6 +15,7 @@ import org.bukkit.potion.PotionEffectType;
 
 import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.spells.SpellBaseSeekingProjectile;
+import com.playmonumenta.plugins.effects.PercentHeal;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
 
@@ -34,6 +36,13 @@ public class SeekingProjectileBoss extends BossAbilityGroup {
 		public boolean LAUNCH_TRACKING = false;
 		public double TURN_RADIUS = Math.PI / 30;
 		public boolean COLLIDES_WITH_BLOCKS = true;
+		public PotionEffectType EFFECT = PotionEffectType.UNLUCK;
+		public int EFFECT_AMPLIFIER = 1;
+		public int EFFECT_DURATION = 0;
+		public PotionEffectType EFFECT_TWO = PotionEffectType.UNLUCK;
+		public int EFFECT_AMPLIFIER_TWO = 1;
+		public int EFFECT_DURATION_TWO = 0;
+		public int ANTIHEAL_DURATION = 0;
 	}
 
 	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
@@ -44,7 +53,7 @@ public class SeekingProjectileBoss extends BossAbilityGroup {
 		super(plugin, identityTag, boss);
 
 		Parameters p = BossUtils.getParameters(boss, identityTag, new Parameters());
-
+		com.playmonumenta.plugins.Plugin customEffectInstance = com.playmonumenta.plugins.Plugin.getInstance();
 		int lifetimeTicks = (int) (p.DISTANCE/p.SPEED);
 
 		SpellManager activeSpells = new SpellManager(Arrays.asList(
@@ -74,7 +83,19 @@ public class SeekingProjectileBoss extends BossAbilityGroup {
 						world.spawnParticle(Particle.FLAME, loc, 50, 0, 0, 0, 0.25);
 						if (player != null) {
 							BossUtils.bossDamage(boss, player, p.DAMAGE);
-							player.setFireTicks(p.FIRE_DURATION);
+							if (p.FIRE_DURATION != 0) {
+								player.setFireTicks(p.FIRE_DURATION);
+							}
+							if (p.EFFECT_DURATION != 0) {
+								player.addPotionEffect(new PotionEffect(p.EFFECT, p.EFFECT_DURATION, p.EFFECT_AMPLIFIER, true, true));
+							}
+							if (p.EFFECT_DURATION_TWO != 0) {
+								player.addPotionEffect(new PotionEffect(p.EFFECT_TWO, p.EFFECT_DURATION_TWO, p.EFFECT_AMPLIFIER_TWO, true, true));
+							}
+							if (p.ANTIHEAL_DURATION != 0) {
+								customEffectInstance.mEffectManager.addEffect(player, "BossPercentHealEffect", new PercentHeal(p.ANTIHEAL_DURATION, 0.5));
+								player.addPotionEffect(new PotionEffect(PotionEffectType.BAD_OMEN, p.ANTIHEAL_DURATION, 1, true, true));
+							}
 						}
 					})
 		));
