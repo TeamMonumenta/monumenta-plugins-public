@@ -41,6 +41,7 @@ import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.redissync.event.PlayerSaveEvent;
 
 import de.tr7zw.nbtapi.NBTEntity;
+import net.md_5.bungee.api.ChatColor;
 
 @SuppressWarnings("unused")
 public class GraveListener implements Listener {
@@ -209,6 +210,7 @@ public class GraveListener implements Listener {
 			if (!player.getScoreboardTags().contains("DisableGraves")) {
 				GraveManager.onDropItem(player, entity);
 			}
+			player.sendMessage(ChatColor.RED + "An item shattered because it ran out of durability");
 		}
 	}
 
