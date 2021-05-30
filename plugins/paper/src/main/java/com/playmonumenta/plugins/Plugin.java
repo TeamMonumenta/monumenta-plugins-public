@@ -64,6 +64,7 @@ import com.playmonumenta.plugins.integrations.MonumentaNetworkRelayIntegration;
 import com.playmonumenta.plugins.integrations.MonumentaRedisSyncIntegration;
 import com.playmonumenta.plugins.integrations.PlaceholderAPIIntegration;
 import com.playmonumenta.plugins.integrations.PremiumVanishIntegration;
+import com.playmonumenta.plugins.integrations.ProtocolLibIntegration;
 import com.playmonumenta.plugins.integrations.luckperms.LuckPermsIntegration;
 import com.playmonumenta.plugins.inventories.AnvilFixInInventory;
 import com.playmonumenta.plugins.inventories.LootChestsInInventory;
@@ -398,6 +399,11 @@ public class Plugin extends JavaPlugin {
 		// Hook into PremiumVanish if present
 		if (Bukkit.getPluginManager().isPluginEnabled("PremiumVanish")) {
 			new PremiumVanishIntegration(this.getLogger());
+		}
+
+		// Hook into ProtocolLib if present
+		if (Bukkit.getPluginManager().isPluginEnabled("ProtocolLib")) {
+			new ProtocolLibIntegration(this);
 		}
 
 		// Register the explosion repair mechanism if BKCommonLib is present
