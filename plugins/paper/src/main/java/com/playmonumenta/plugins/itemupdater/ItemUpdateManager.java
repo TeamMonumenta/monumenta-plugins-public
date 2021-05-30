@@ -166,6 +166,7 @@ public class ItemUpdateManager implements Listener {
 
 		ItemUtils.setPlainTag(item);
 
+		/* Updating containers nested in items disabled for now to improve performance.
 		if (item.hasItemMeta()) {
 			ItemMeta itemMeta = item.getItemMeta();
 			if (itemMeta instanceof BlockStateMeta) {
@@ -178,6 +179,7 @@ public class ItemUpdateManager implements Listener {
 
 			// TODO Spawn eggs don't expose their contained entity NBT - now what?
 		}
+		*/
 	}
 
 	public static void updateNested(BlockState blockState) {
