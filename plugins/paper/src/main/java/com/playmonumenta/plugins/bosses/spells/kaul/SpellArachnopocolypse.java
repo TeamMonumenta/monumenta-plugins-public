@@ -96,21 +96,10 @@ public class SpellArachnopocolypse extends Spell {
 	};
 
 	public void riseSpider(Location loc) {
-	    new BukkitRunnable() {
-	        int mTicks = 0;
-	        @Override
-	        public void run() {
-	            mTicks++;
-	            World world = loc.getWorld();
-	            world.spawnParticle(Particle.BLOCK_DUST, loc, 2, 0.4, 0.1, 0.4, 0.25, Material.DIRT.createBlockData());
-	            if (mTicks >= 20) {
-	                this.cancel();
-	                world.playSound(loc, Sound.BLOCK_GRAVEL_BREAK, 1, 1f);
-	                world.spawnParticle(Particle.BLOCK_DUST, loc, 16, 0.25, 0.1, 0.25, 0.25, Material.DIRT.createBlockData());
-	                LibraryOfSoulsIntegration.summon(loc.clone().add(0, 1, 0), SPIDER_SUMMONS[FastUtils.RANDOM.nextInt(SPIDER_SUMMONS.length)]);
-	            }
-	        }
-	    }.runTaskTimer(mPlugin, 0, 1);
+		World world = loc.getWorld();
+		world.playSound(loc, Sound.BLOCK_GRAVEL_BREAK, 1, 1f);
+		world.spawnParticle(Particle.BLOCK_DUST, loc, 16, 0.25, 0.1, 0.25, 0.25, Material.DIRT.createBlockData());
+		LibraryOfSoulsIntegration.summon(loc.clone().add(0, 1, 0), SPIDER_SUMMONS[FastUtils.RANDOM.nextInt(SPIDER_SUMMONS.length)]);
 	}
 
 	private Location getRandomLocation(Location origin, double range) {
