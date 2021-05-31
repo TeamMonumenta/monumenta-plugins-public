@@ -5,16 +5,16 @@ import java.util.List;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.utils.CommandUtils;
 
 import org.bukkit.command.CommandSender;
-import org.bukkit.command.ProxiedCommandSender;
 import org.bukkit.entity.Player;
 
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.CommandPermission;
 import dev.jorel.commandapi.arguments.Argument;
 import dev.jorel.commandapi.arguments.BooleanArgument;
-
+import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 
@@ -42,25 +42,8 @@ public class SkillSummary extends GenericCommand {
 			.register();
 	}
 
-	private static void tell(Plugin plugin, CommandSender sender, boolean useShorthand) {
-		Player player;
-		if (sender instanceof ProxiedCommandSender) {
-			if (((ProxiedCommandSender) sender).getCallee() instanceof Player) {
-				player = (Player) ((ProxiedCommandSender) sender).getCallee();
-			} else {
-				error(sender, "Command must be run as a player.");
-				return;
-			}
-		} else if (sender instanceof Player) {
-			player = (Player) sender;
-		} else {
-			error(sender, "Command must be run as a player.");
-			return;
-		}
-		if (player == null) {
-			error(sender, "Command must be run as a player.");
-			return;
-		}
+	private static void tell(Plugin plugin, CommandSender sender, boolean useShorthand) throws WrapperCommandSyntaxException {
+		Player player = CommandUtils.getPlayerFromSender(sender);
 
 		Component component = Component.text("")
 		.append(Component.selector(player.getName())

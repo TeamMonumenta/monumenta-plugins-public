@@ -5,6 +5,9 @@ import java.util.List;
 
 import javax.annotation.Nullable;
 
+import com.playmonumenta.plugins.point.AreaBounds;
+import com.playmonumenta.plugins.point.Point;
+
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -15,9 +18,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-
-import com.playmonumenta.plugins.point.AreaBounds;
-import com.playmonumenta.plugins.point.Point;
+import org.jetbrains.annotations.NotNull;
 
 import dev.jorel.commandapi.CommandAPI;
 import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
@@ -264,7 +265,7 @@ public class CommandUtils {
 	// returns the sender as Player, if that sender is a player instance, or a proxied player
 	// returns null otherwise
 	@Nullable
-	public static Player getPlayerFromSender(CommandSender sender) {
+	public static @NotNull Player getPlayerFromSender(CommandSender sender) throws WrapperCommandSyntaxException {
 		if (sender instanceof Player) {
 			return ((Player)sender);
 		} else if (sender instanceof ProxiedCommandSender) {
@@ -273,6 +274,7 @@ public class CommandUtils {
 				return ((Player)callee);
 			}
 		}
-		return null;
+		CommandAPI.fail("This command must be run by/as a player");
+		return null; // This can never happen but is required by the compiler
 	}
 }

@@ -4,14 +4,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.playmonumenta.plugins.Constants;
+import com.playmonumenta.plugins.utils.CommandUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
-import org.bukkit.command.ProxiedCommandSender;
 import org.bukkit.entity.Player;
 
-import dev.jorel.commandapi.CommandAPI;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.CommandPermission;
 import dev.jorel.commandapi.arguments.Argument;
@@ -92,17 +91,7 @@ public class DeathMsg {
 	}
 
 	private static void run(CommandSender sender, DeathMessageState newState) throws WrapperCommandSyntaxException {
-		Player player = null;
-
-		if (sender instanceof ProxiedCommandSender) {
-			sender = ((ProxiedCommandSender)sender).getCallee();
-		}
-
-		if (sender instanceof Player) {
-			player = (Player)sender;
-		} else {
-			CommandAPI.fail("This command must be run by/as a player!");
-		}
+		Player player = CommandUtils.getPlayerFromSender(sender);
 
 		if (newState != null) {
 			// If a value was given, then update

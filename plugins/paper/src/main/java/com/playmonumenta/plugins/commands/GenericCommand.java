@@ -4,13 +4,13 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import com.playmonumenta.plugins.utils.CommandUtils;
+
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
-import org.bukkit.command.ProxiedCommandSender;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
-import dev.jorel.commandapi.CommandAPI;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.CommandPermission;
 import dev.jorel.commandapi.arguments.Argument;
@@ -51,18 +51,7 @@ public class GenericCommand {
 		new CommandAPICommand(command)
 			.withPermission(perms)
 			.executes((sender, args) -> {
-				if (sender instanceof Player) {
-					exec.run(sender, (Player)sender);
-				} else if (sender instanceof ProxiedCommandSender) {
-					ProxiedCommandSender s = (ProxiedCommandSender)sender;
-					if (s.getCallee() instanceof Player) {
-					  exec.run(sender, (Player)s.getCallee());
-					} else {
-					  CommandAPI.fail(ChatColor.RED + "This command must be run by/as a player!");
-					}
-				} else {
-					CommandAPI.fail(ChatColor.RED + "This command must be run by/as a player!");
-				}
+				exec.run(sender, CommandUtils.getPlayerFromSender(sender));
 			})
 			.register();
 

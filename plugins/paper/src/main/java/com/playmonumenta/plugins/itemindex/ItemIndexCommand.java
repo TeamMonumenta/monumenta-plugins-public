@@ -26,6 +26,7 @@ import dev.jorel.commandapi.arguments.GreedyStringArgument;
 import dev.jorel.commandapi.arguments.IntegerArgument;
 import dev.jorel.commandapi.arguments.MultiLiteralArgument;
 import dev.jorel.commandapi.arguments.StringArgument;
+import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
 
 public class ItemIndexCommand {
 	private static final String COMMAND = "mi";
@@ -821,17 +822,13 @@ public class ItemIndexCommand {
 	}
 
 	@Nullable
-	private static Player commandSecurities(CommandSender sender) {
+	private static Player commandSecurities(CommandSender sender) throws WrapperCommandSyntaxException {
 		return commandSecurities(sender, true);
 	}
 
 	@Nullable
-	private static Player commandSecurities(CommandSender sender, boolean requiresItem) {
+	private static Player commandSecurities(CommandSender sender, boolean requiresItem) throws WrapperCommandSyntaxException {
 		Player p = CommandUtils.getPlayerFromSender(sender);
-		if (p == null) {
-			sender.sendMessage("Command must be launched from a Player");
-			return null;
-		}
 		ItemStack item = p.getInventory().getItemInMainHand();
 		if (requiresItem && (item.getType() == Material.AIR || item.getAmount() == 0)) {
 			p.sendMessage("You must hold an item in hand to use /mi edit");

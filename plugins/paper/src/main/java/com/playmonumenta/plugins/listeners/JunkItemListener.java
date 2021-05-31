@@ -6,10 +6,11 @@ import java.util.UUID;
 
 import com.playmonumenta.plugins.graves.GraveManager;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
+import com.playmonumenta.plugins.utils.CommandUtils;
+import com.playmonumenta.plugins.utils.ScoreboardUtils;
 
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
-import org.bukkit.command.ProxiedCommandSender;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -21,42 +22,44 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 
-import dev.jorel.commandapi.CommandAPI;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.CommandPermission;
+import dev.jorel.commandapi.arguments.IntegerArgument;
 import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
 
 
 
 public class JunkItemListener implements Listener {
 	private static final String NO_JUNK_ITEMS_TAG = "NoJunkItemsPickup";
+	private static final String PICKUP_MIN_OBJ_NAME = "PickupMin";
 	private static final int JUNK_ITEM_SIZE_THRESHOLD = 17;
+	private static final int MAX_POSSIBLE_STACK = 64;
 	private final Set<UUID> mPlayers = new HashSet<>();
 
 	public JunkItemListener() {
 		final CommandPermission perms = CommandPermission.fromString("monumenta.command.pickup");
 
-		new CommandAPICommand("pickup")
+		new CommandAPICommand("pickup") // Only toggles
 			.withPermission(perms)
 			.withAliases("pu")
 			.executes((sender, args) -> {
 				playerToggle(sender);
 			})
 			.register();
+
+		new CommandAPICommand("pickup") // Sets PickupMin, and always turns pickup on
+		.withPermission(perms)
+		.withArguments(new IntegerArgument("threshold"))
+		.withAliases("pu")
+		.executes((sender, args) -> {
+			playerSetMin(sender, (int)args[0]);
+		})
+		.register();
+
 	}
 
 	private void playerToggle(CommandSender sender) throws WrapperCommandSyntaxException {
-		Player player = null;
-
-		if (sender instanceof ProxiedCommandSender) {
-			sender = ((ProxiedCommandSender)sender).getCallee();
-		}
-
-		if (sender instanceof Player) {
-			player = (Player)sender;
-		} else {
-			CommandAPI.fail("This command must be run by/as a player!");
-		}
+		Player player = CommandUtils.getPlayerFromSender(sender);
 
 		Set<String> tags = player.getScoreboardTags();
 		if (tags.contains(NO_JUNK_ITEMS_TAG)) {
@@ -67,6 +70,24 @@ public class JunkItemListener implements Listener {
 			tags.add(NO_JUNK_ITEMS_TAG);
 			mPlayers.add(player.getUniqueId());
 			player.sendMessage(ChatColor.GOLD + "" + ChatColor.BOLD + "You will no longer pick up uninteresting items");
+		}
+	}
+
+	private void playerSetMin(CommandSender sender, int newMin) throws WrapperCommandSyntaxException {
+		Player player = CommandUtils.getPlayerFromSender(sender);
+
+		ScoreboardUtils.setScoreboardValue(player, PICKUP_MIN_OBJ_NAME, newMin);
+
+		Set<String> tags = player.getScoreboardTags();
+		if (!tags.contains(NO_JUNK_ITEMS_TAG)) { // Only need to toggle if set to pick up all; does not call playerToggle to avoid redundant messages
+			tags.add(NO_JUNK_ITEMS_TAG);
+			mPlayers.add(player.getUniqueId());
+		}
+
+		if (newMin > MAX_POSSIBLE_STACK) {
+			player.sendMessage(ChatColor.GOLD + "" + ChatColor.BOLD + "You will no longer pick up uninteresting items");
+		} else {
+			player.sendMessage(ChatColor.GOLD + "" + ChatColor.BOLD + "You will no longer pick up uninteresting items in stacks less than " + newMin);
 		}
 	}
 
@@ -93,7 +114,8 @@ public class JunkItemListener implements Listener {
 				return;
 			}
 
-			PlayerInventory inv = ((Player)event.getEntity()).getInventory();
+			Player player = (Player)event.getEntity();
+			PlayerInventory inv = player.getInventory();
 
 			// Allow collection of any items on the hotbar
 			for (int i = 0; i <= 8; i++) {
@@ -109,15 +131,21 @@ public class JunkItemListener implements Listener {
 				return;
 			}
 
+			int minStack = ScoreboardUtils.getScoreboardValue(player, PICKUP_MIN_OBJ_NAME);
+			if (minStack <= 0) { // Initializes PickupMin at JUNK_ITEM_SIZE_THRESHOLD; removes useless PickupMin values
+				minStack = JUNK_ITEM_SIZE_THRESHOLD;
+				ScoreboardUtils.setScoreboardValue(player, PICKUP_MIN_OBJ_NAME, minStack);
+			}
+
 			// Cancel pickup of non-interesting items that aren't on the player's hotbar
-			if (!isInteresting(item)) {
+			if (!isInteresting(item, minStack)) {
 				event.setCancelled(true);
 			}
 		}
 	}
 
-	private boolean isInteresting(ItemStack item) {
-		return item.getAmount() >= JUNK_ITEM_SIZE_THRESHOLD
+	private boolean isInteresting(ItemStack item, int minStack) {
+		return item.getAmount() >= minStack
 		       || ServerProperties.getAlwaysPickupMats().contains(item.getType())
 		       || (item.hasItemMeta() && (item.getItemMeta().hasLore() ||
 					                      (item.getItemMeta().hasDisplayName()
