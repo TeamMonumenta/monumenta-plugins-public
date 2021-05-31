@@ -12,6 +12,8 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.World;
+import org.bukkit.attribute.Attribute;
+import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.block.Block;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.AbstractArrow;
@@ -36,6 +38,7 @@ import org.bukkit.entity.Sheep;
 import org.bukkit.entity.Snowball;
 import org.bukkit.entity.ThrownPotion;
 import org.bukkit.entity.Villager;
+import org.bukkit.entity.Witch;
 import org.bukkit.entity.Wither;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -74,6 +77,7 @@ import org.bukkit.util.Vector;
 import org.spigotmc.event.entity.EntityDismountEvent;
 
 import com.destroystokyo.paper.event.entity.EntityRemoveFromWorldEvent;
+import com.destroystokyo.paper.event.entity.WitchThrowPotionEvent;
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityManager;
@@ -424,6 +428,17 @@ public class EntityListener implements Listener {
 		}
 	}
 
+	//changes the potion in the witches mainhand to throw
+	@EventHandler(priority = EventPriority.LOW)
+	public void witchThrowPotionEvent(WitchThrowPotionEvent event) {
+		Witch witch = event.getEntity();
+		ItemStack potion = event.getPotion();
+		if (witch.getEquipment().getItemInMainHand() != null && witch.getEquipment().getItemInMainHand().getType() == Material.SPLASH_POTION) {
+			potion = witch.getEquipment().getItemInMainHand();
+		}
+		event.setPotion(potion);
+	}
+
 	// Entity interacts with something
 	@EventHandler(priority = EventPriority.LOWEST)
 	public void entityInteractEvent(EntityInteractEvent event) {
@@ -660,6 +675,14 @@ public class EntityListener implements Listener {
 						}
 					}, 1);
 				}
+			} //does damage to user equal to witch's attack statistic
+			if (source instanceof Witch) {
+				AttributeInstance damage = ((Witch) source).getAttribute(Attribute.GENERIC_ATTACK_DAMAGE);
+				double dam = 1.0;
+				if (damage != null) {
+					dam = Math.max(dam, damage.getBaseValue());
+				}
+				p.damage(dam);
 			}
 		}
 	}
