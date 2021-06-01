@@ -4,6 +4,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.enchantments.Locked;
 import com.playmonumenta.plugins.enchantments.curses.CurseOfEphemerality;
 import com.playmonumenta.plugins.overrides.FirmamentOverride;
 import com.playmonumenta.plugins.utils.InventoryUtils;
@@ -168,6 +169,8 @@ public class ShulkerEquipmentListener implements Listener {
 				//Does not swap if armor equipped has curse of binding on it
 			} else if (pInv.getItem(slot.getKey()) != null && InventoryUtils.getCustomEnchantLevel(pInv.getItem(slot.getKey()), CurseOfEphemerality.PROPERTY_NAME, false) != 0) {
 				//Doesn't swap with curse of ephemerality either
+			} else if (pInv.getItem(slot.getKey()) != null && InventoryUtils.getCustomEnchantLevel(pInv.getItem(slot.getKey()), Locked.PROPERTY_NAME, false) != 0) {
+				//Doesn't swap with Locked either
 			} else {
 				swapItem(pInv, sInv, slot.getKey(), slot.getValue());
 			}

@@ -30,6 +30,7 @@ import com.playmonumenta.plugins.commands.Grave;
 import com.playmonumenta.plugins.commands.HopeifyHeldItem;
 import com.playmonumenta.plugins.commands.InfuseHeldItem;
 import com.playmonumenta.plugins.commands.Launch;
+import com.playmonumenta.plugins.commands.LockedHeldItem;
 import com.playmonumenta.plugins.commands.Magnetize;
 import com.playmonumenta.plugins.commands.MonumentaDebug;
 import com.playmonumenta.plugins.commands.MonumentaReload;
@@ -51,6 +52,7 @@ import com.playmonumenta.plugins.commands.SpectateBot;
 import com.playmonumenta.plugins.commands.StatTrackItem;
 import com.playmonumenta.plugins.commands.TeleportAsync;
 import com.playmonumenta.plugins.commands.TeleportByScore;
+import com.playmonumenta.plugins.commands.UnlockHeldItem;
 import com.playmonumenta.plugins.commands.ToggleSwap;
 import com.playmonumenta.plugins.commands.UnsignBook;
 import com.playmonumenta.plugins.commands.UpdateHeldItem;
@@ -204,6 +206,8 @@ public class Plugin extends JavaPlugin {
 		GetScoreCommand.register(this);
 		Grave.register();
 		StatTrackItem.register();
+		LockedHeldItem.register();
+		UnlockHeldItem.register();
 		ToggleSwap.register(this);
 
 		try {
