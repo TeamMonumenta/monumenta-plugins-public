@@ -16,6 +16,16 @@ import com.playmonumenta.plugins.bosses.spells.SpellBaseSeekingProjectile;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
 
+/**
+ * @deprecated use boss_projectile instead, like this:
+ * <blockquote><pre>
+ * /bos var Tags add boss_projectile
+ * /bos var Tags add boss_projectile[damage=20,distance=32,speed=0.8,delay=20,cooldown=160,launchTraking=true,turnRadius=0.042]
+ * /bos var Tags add boss_projectile[SoundStart=BLOCK_ENCHANTMENT_TABLE_USE,SoundLaunch=ENTITY_FIREWORK_ROCKET_LAUNCH,ParticleProjectileMain=SOUL_FIRE_FLAME]
+ * /bos var Tags add boss_projectile[ParticleProjectileSecond=SMOKE_LARGE,SoundProjectile=ENTITY_BLAZE_BURN,SoundHit=ENTITY_GENERIC_EXPLODE,ParticleHit=SOUL_FIRE_FLAME]
+ * </pre></blockquote>
+ * @G3m1n1Boy
+ */
 public class ArcaneProjectileBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_arcaneprojectile";
 

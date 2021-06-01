@@ -14,6 +14,14 @@ import org.bukkit.potion.PotionEffectType;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.bosses.spells.SpellBaseAura;
 
+/**
+ * @deprecated use boss_auraeffect instead, like this:
+ * <blockquote><pre>
+ * /bos var Tags add boss_auraeffect
+ * /bos var Tags add boss_auraeffect[effect=SLOW_DIGGING,RADIUS=8,HEIGHT=5,particleNumber=14,COLORRED=255,COLORGREEN=232,COLORBLUE=160]
+ * </pre></blockquote>
+ * @G3m1n1Boy
+ */
 public class AuraSmallFatigueBoss extends BossAbilityGroup {
 	public static final String identityTag = "aura_fatigue";
 	public static final int detectionRange = 40;

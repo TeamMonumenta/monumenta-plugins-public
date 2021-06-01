@@ -14,6 +14,14 @@ import org.bukkit.potion.PotionEffectType;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.bosses.spells.SpellBaseAura;
 
+/**
+ * @deprecated use boss_auraeffect instead, like this:
+ * <blockquote><pre>
+ * /bos var Tags add boss_auraeffect
+ * /bos var Tags add boss_auraeffect[effect=HUNGER,RADIUS=12,HEIGHT=7,particleNumber=16,COLORRED=58,COLORGREEN=160,COLORBLUE=25]]
+ * </pre></blockquote>
+ * @G3m1n1Boy
+ */
 public class AuraSmallHungerBoss extends BossAbilityGroup {
 	public static final String identityTag = "aura_hunger";
 	public static final int detectionRange = 40;

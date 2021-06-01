@@ -11,7 +11,10 @@ import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
 
-public class SpellTpBehindRandomPlayer extends SpellTpBehindTargetedPlayer {
+/**
+ * @deprecated look inside SpellTpBehindPlayer
+ */
+public class SpellTpBehindRandomPlayer extends SpellTpBehindPlayer {
 	private static final int MAX_RANGE = 80;
 
 	public SpellTpBehindRandomPlayer(Plugin plugin, Entity launcher, int duration) {

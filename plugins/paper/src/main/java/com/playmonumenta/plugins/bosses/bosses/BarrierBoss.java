@@ -24,7 +24,11 @@ public class BarrierBoss extends BossAbilityGroup {
 		public int DETECTION = 100;
 		public int COOLDOWN = 5 * 20;
 		public int HITS_TO_BREAK = 1;
-		public Particle.DustOptions REDSTONE_COLOR = new Particle.DustOptions(Color.fromRGB(225, 15, 255), 1.0f);
+
+		/**Color of the particle */
+		public Color PARTICLE_COLOR = Color.WHITE;
+		public Particle PARTICLE = Particle.REDSTONE;
+		public float DUST_SIZE = 2f;
 	}
 
 	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
@@ -42,7 +46,7 @@ public class BarrierBoss extends BossAbilityGroup {
 					world.playSound(loc, Sound.BLOCK_BEACON_ACTIVATE, SoundCategory.HOSTILE, 1, 1);
 				}, (Location loc) -> {
 					World world = loc.getWorld();
-					world.spawnParticle(Particle.REDSTONE, loc, 4, 0, 1, 0, p.REDSTONE_COLOR);
+					world.spawnParticle(Particle.REDSTONE, loc, 4, 0, 1, 0, new Particle.DustOptions(p.PARTICLE_COLOR, p.DUST_SIZE));
 				}, (Location loc) -> {
 					World world = loc.getWorld();
 					world.playSound(loc, Sound.ITEM_SHIELD_BREAK, SoundCategory.HOSTILE, 1, 1);

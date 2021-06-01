@@ -223,8 +223,13 @@ public class BossManager implements Listener {
 		mStatelessBosses.put(DistanceCloserBoss.identityTag, (Plugin p, LivingEntity e) -> new DistanceCloserBoss(p, e));
 		mStatelessBosses.put(WeakHookBoss.identityTag, (Plugin p, LivingEntity e) -> new WeakHookBoss(p, e));
 		mStatelessBosses.put(AuraEffectBoss.identityTag, (Plugin p, LivingEntity e) -> new AuraEffectBoss(p, e));
+		mStatelessBosses.put(LaserBoss.identityTag, (Plugin p, LivingEntity e) -> new LaserBoss(p, e));
+		mStatelessBosses.put(OnHitBoss.identityTag, (Plugin p, LivingEntity e) -> new OnHitBoss(p, e));
+		mStatelessBosses.put(NovaBoss.identityTag, (Plugin p, LivingEntity e) -> new NovaBoss(p, e));
+		mStatelessBosses.put(ProjectileBoss.identityTag, (Plugin p, LivingEntity e) -> new ProjectileBoss(p, e));
 		mStatelessBosses.put(RainbowParrot.identityTag, (Plugin p, LivingEntity e) -> new RainbowParrot(p, e));
 		mStatelessBosses.put(SpawnMobsBoss.identityTag, (Plugin p, LivingEntity e) -> new SpawnMobsBoss(p, e));
+
 
 		/* Stateful bosses have a remembered spawn location and end location where a redstone block is set when they die */
 		mStatefulBosses = new HashMap<String, StatefulBossConstructor>();
@@ -393,6 +398,10 @@ public class BossManager implements Listener {
 		mBossDeserializers.put(DistanceCloserBoss.identityTag, (Plugin p, LivingEntity e) -> DistanceCloserBoss.deserialize(p, e));
 		mBossDeserializers.put(WeakHookBoss.identityTag, (Plugin p, LivingEntity e) -> WeakHookBoss.deserialize(p, e));
 		mBossDeserializers.put(AuraEffectBoss.identityTag, (Plugin p, LivingEntity e) -> AuraEffectBoss.deserialize(p, e));
+		mBossDeserializers.put(LaserBoss.identityTag, (Plugin p, LivingEntity e) -> LaserBoss.deserialize(p, e));
+		mBossDeserializers.put(OnHitBoss.identityTag, (Plugin p, LivingEntity e) -> OnHitBoss.deserialize(p, e));
+		mBossDeserializers.put(NovaBoss.identityTag, (Plugin p, LivingEntity e) -> NovaBoss.deserialize(p, e));
+		mBossDeserializers.put(ProjectileBoss.identityTag, (Plugin p, LivingEntity e) -> ProjectileBoss.deserialize(p, e));
 		mBossDeserializers.put(RainbowParrot.identityTag, (Plugin p, LivingEntity e) -> RainbowParrot.deserialize(p, e));
 		mBossDeserializers.put(SpawnMobsBoss.identityTag, (Plugin p, LivingEntity e) -> SpawnMobsBoss.deserialize(p, e));
 	}

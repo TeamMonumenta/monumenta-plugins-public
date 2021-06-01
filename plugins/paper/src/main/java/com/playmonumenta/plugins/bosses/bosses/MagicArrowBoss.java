@@ -17,6 +17,16 @@ import com.playmonumenta.plugins.bosses.spells.SpellBaseSeekingProjectile;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
 
+/**
+ * @deprecated use boss_projectile instead, like this:
+ * <blockquote><pre>
+ * /bos var Tags add boss_projectile
+ * /bos var Tags add boss_projectile[damage=20,distance=32,speed=0.8,delay=20,cooldown=160,launchTraking=true,turnRadius=0]
+ * /bos var Tags add boss_projectile[SoundStart=ENTITY_ARMOR_STAND_PLACE,SoundLaunch=ENTITY_FIREWORK_ROCKET_LAUNCH,ParticleProjectileMain=FIREWORKS_SPARK]
+ * /bos var Tags add boss_projectile[ParticleProjectileSecond=CRIT_MAGIC,SoundProjectile=ENTITY_BLAZE_BURN,SoundHit=ENTITY_FIREWORK_ROCKET_TWINKLE,ParticleHit=FIREWORKS_SPARK]
+ * </pre></blockquote>
+ * @G3m1n1Boy
+ */
 public class MagicArrowBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_magicarrow";
 

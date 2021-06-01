@@ -13,6 +13,16 @@ import org.bukkit.plugin.Plugin;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.BossUtils;
 
+/**
+ * @deprecated use boss_onhit instead, like this:
+ *<blockquote><pre>
+ * /boss var Tags add boss_onhit
+ * /boss var Tags add boss_onhit[SilenceTicks=60,COLOR=XXXXX]
+ * we have yet to find a way to look at color
+ * </pre></blockquote>
+ * @G3m1n1Boy
+ *
+*/
 public class AbilitySilenceBoss extends BossAbilityGroup {
 
 	public static final String identityTag = "boss_abilitysilence";

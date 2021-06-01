@@ -10,6 +10,16 @@ import org.bukkit.potion.PotionEffectType;
 
 import com.playmonumenta.plugins.utils.BossUtils;
 
+/**
+ * @deprecated use boss_onhit instead, like this:
+ *<blockquote><pre>
+ * /boss var Tags add boss_onhit
+ * /boss var Tags add boss_onhit[effect=WITHER,effectDuration=80,effectAmplified=1]
+ * CARE this ability has some particle & sound, fix those too if you don't want the default values
+ * </pre></blockquote>
+ * @G3m1n1Boy
+ *
+*/
 public class WitherHitBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_witherhit";
 	public static final int detectionRange = 20;

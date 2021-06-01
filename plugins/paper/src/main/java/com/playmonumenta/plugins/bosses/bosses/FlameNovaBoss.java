@@ -9,6 +9,17 @@ import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.spells.SpellFlameNova;
 import com.playmonumenta.plugins.utils.BossUtils;
 
+/**
+ * @deprecated use boss_nova instead, like this:
+ * <blockquote><pre>
+ * /bos var Tags add boss_nova
+ * /bos var Tags add boss_nova[damage=17,duration=70,detection=20]
+ * /bos var Tags add boss_nova[fireticks=80]
+ * /bos var Tags add boss_nova[ParticleAir=lava,soundCharge=BLOCK_FIRE_AMBIENT,ParticleAirNumber=2,ParticleLoad=flame,ParticleExplodeMain=flame,ParticleExplodeSecond=smoke_normal,SoundCast=ENTITY_WITHER_SHOOT]
+ *  you can use multiple raw if needed
+ * </pre></blockquote>
+ * @G3m1n1Boy
+ */
 public class FlameNovaBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_flamenova";
 

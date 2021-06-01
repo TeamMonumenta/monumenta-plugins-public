@@ -208,12 +208,7 @@ public class BossUtils {
 			String fieldName = field.getName();
 
 			try {
-				String fieldValueOrDefault;
-				if (t.equals(Color.class)) {
-					fieldValueOrDefault = modMap.getOrDefault(translateFieldNameToTag(fieldName), "" + ((Color) field.get(parameters)).asRGB());
-				} else {
-					fieldValueOrDefault = modMap.getOrDefault(translateFieldNameToTag(fieldName), field.get(parameters).toString());
-				}
+				String fieldValueOrDefault = modMap.getOrDefault(translateFieldNameToTag(fieldName), field.get(parameters).toString());
 
 				if (t.equals(boolean.class)) {
 					field.set(parameters, Boolean.parseBoolean(fieldValueOrDefault));
@@ -227,12 +222,12 @@ public class BossUtils {
 					field.set(parameters, Double.parseDouble(fieldValueOrDefault));
 				} else if (t.equals(PotionEffectType.class)) {
 					field.set(parameters, PotionEffectType.getByName(fieldValueOrDefault.toUpperCase()));
-				} else if (t.equals(Color.class)) {
-					field.set(parameters, Color.fromRGB(Integer.parseInt(fieldValueOrDefault)));
 				} else if (t.equals(Particle.class)) {
 					field.set(parameters, Particle.valueOf(fieldValueOrDefault.toUpperCase()));
 				} else if (t.equals(Sound.class)) {
 					field.set(parameters, Sound.valueOf(fieldValueOrDefault.toUpperCase()));
+				} else if (t.equals(Color.class)) {
+					field.set(parameters, colorFromString(fieldValueOrDefault));
 				} else if (t.equals(String.class)) {
 					field.set(parameters, fieldValueOrDefault);
 				}
@@ -242,5 +237,43 @@ public class BossUtils {
 		}
 
 		return parameters;
+	}
+
+	public static final Map<String, Color> COLOR_MAP = new HashMap<>();
+
+	static {
+		//this is just because Color don't have the fuctions values() and getName()...
+		COLOR_MAP.put("AQUA", Color.AQUA);
+		COLOR_MAP.put("BLACK", Color.BLACK);
+		COLOR_MAP.put("BLUE", Color.BLUE);
+		COLOR_MAP.put("FUCHSIA", Color.FUCHSIA);
+		COLOR_MAP.put("GRAY", Color.GRAY);
+		COLOR_MAP.put("GREEN", Color.GREEN);
+		COLOR_MAP.put("LIME", Color.LIME);
+		COLOR_MAP.put("MAROON", Color.MAROON);
+		COLOR_MAP.put("NAVY", Color.NAVY);
+		COLOR_MAP.put("OLIVE", Color.OLIVE);
+		COLOR_MAP.put("ORANGE", Color.ORANGE);
+		COLOR_MAP.put("PURPLE", Color.PURPLE);
+		COLOR_MAP.put("RED", Color.RED);
+		COLOR_MAP.put("SILVER", Color.SILVER);
+		COLOR_MAP.put("TEAL", Color.TEAL);
+		COLOR_MAP.put("WHITE", Color.WHITE);
+		COLOR_MAP.put("YELLOW", Color.YELLOW);
+	}
+
+	public static Color colorFromString(String hexStringOrName) throws Exception {
+		Color color = COLOR_MAP.get(hexStringOrName);
+		if (color == null) {
+			if (hexStringOrName.startsWith("#")) {
+				hexStringOrName = hexStringOrName.substring(1);
+			}
+			color = Color.fromRGB(Integer.parseInt(hexStringOrName, 16));
+		}
+
+		if (color == null) {
+			throw new Exception("Unable to parse color: " + hexStringOrName);
+		}
+		return color;
 	}
 }

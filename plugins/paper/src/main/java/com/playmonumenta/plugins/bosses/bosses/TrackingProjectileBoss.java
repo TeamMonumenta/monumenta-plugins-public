@@ -17,21 +17,31 @@ import com.playmonumenta.plugins.bosses.spells.SpellBaseSeekingProjectile;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
 
+/**
+ * @deprecated use boss_projectile instead, like this:
+ * <blockquote><pre>
+ * /bos var Tags add boss_projectile
+ * /bos var Tags add boss_projectile[damage=24,speed=0.2,delay=20,cooldown=320,launchTraking=true,turnRadius=3.141]
+ * /bos var Tags add boss_projectile[SoundStart=BLOCK_BEACON_POWER_SELECT,ParticleLaunch=SPELL_WITCH,SoundLaunch=ENTITY_EVOKER_CAST_SPELL,ParticleProjectileMain=SPELL_WITCH]
+ * /bos var Tags add boss_projectile[ParticleProjectileSecond=SMOKE_LARGE,SoundProjectile=BLOCK_BEACON_POWER_SELECT,SoundHit=BLOCK_BEACON_DEACTIVATE,ParticleHit=SPELL_WITCH]
+ * </pre></blockquote>
+ * @G3m1n1Boy
+ */
 public class TrackingProjectileBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_trackingprojectile";
 	public static final int detectionRange = 24;
 
-	private static final boolean SINGLE_TARGET = true;
-	private static final boolean LAUNCH_TRACKING = true;
-	private static final int COOLDOWN = 20 * 16;
+	private static final int DAMAGE = 24;
 	private static final int DELAY = 20 * 1;
 	private static final double SPEED = 0.2;
-	private static final double TURN_RADIUS = Math.PI;
-	private static final int LIFETIME_TICKS = 20 * 16;
-	private static final double HITBOX_LENGTH = 0.5;
-	private static final boolean COLLIDES_WITH_BLOCKS = true;
+	private static final int COOLDOWN = 20 * 16;
 	private static final boolean LINGERS = true;
-	private static final int DAMAGE = 24;
+	private static final double HITBOX_LENGTH = 0.5;
+	private static final int LIFETIME_TICKS = 20 * 16;
+	private static final double TURN_RADIUS = Math.PI;
+	private static final boolean SINGLE_TARGET = true;
+	private static final boolean LAUNCH_TRACKING = true;
+	private static final boolean COLLIDES_WITH_BLOCKS = true;
 
 	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
 		return new TrackingProjectileBoss(plugin, boss);

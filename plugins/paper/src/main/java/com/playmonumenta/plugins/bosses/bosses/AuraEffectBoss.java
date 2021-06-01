@@ -22,19 +22,22 @@ public class AuraEffectBoss extends BossAbilityGroup {
 		public int RADIUS = 35;
 		public int HEIGHT = 20;
 		public int DETECTION = 45;
-		public int EFFECT_LEVEL = 1;
+		public int EFFECT_AMPLIFIER = 1;
 		public float DUST_SIZE = 2f;
 		public int PARTICEL_NUMBER = 20;
 		public int EFFECT_DURATION = 3 * 20;
 		public boolean EFFECT_AMBIENT = true;
-		public Color COLOR = Color.WHITE;
-		//to customize the colors use a number between (16777216 - 0)
+
+		//Particle!
+		/**Color of the particle */
+		public Color PARTICLE_COLOR = Color.WHITE;
+
+		/** if you change the particles to something other than redstone then you will not use COLOR */
 		public Particle PARTICLE = Particle.REDSTONE;
-		//use the same name of the spigot api to change the value
-		//if you change the particles to something other than redstone then you will not use COLOR
+		/** show the effect particle to the player*/
 		public boolean EFFECT_PARTICLE = false;
+		/* use the same name of the spigot api to change the value */
 		public PotionEffectType EFFECT = PotionEffectType.BLINDNESS;
-		//use the same name of the spigot api to change the value
 	}
 
 
@@ -47,10 +50,10 @@ public class AuraEffectBoss extends BossAbilityGroup {
 		Parameters p = BossUtils.getParameters(boss, identityTag, new Parameters());
 
 		List<Spell> passiveSpells = Arrays.asList(
-			new SpellBaseAura(boss, p.RADIUS, p.HEIGHT, p.RADIUS, p.PARTICEL_NUMBER, p.PARTICLE, new Particle.DustOptions(p.COLOR, p.DUST_SIZE),
+			new SpellBaseAura(boss, p.RADIUS, p.HEIGHT, p.RADIUS, p.PARTICEL_NUMBER, p.PARTICLE, new Particle.DustOptions(p.PARTICLE_COLOR, p.DUST_SIZE),
 			                  (Player player) -> {
 								  if (p.EFFECT != null) {
-									  player.addPotionEffect(new PotionEffect(p.EFFECT, p.EFFECT_DURATION, p.EFFECT_LEVEL, p.EFFECT_AMBIENT, p.EFFECT_PARTICLE));
+									  player.addPotionEffect(new PotionEffect(p.EFFECT, p.EFFECT_DURATION, p.EFFECT_AMPLIFIER, p.EFFECT_AMBIENT, p.EFFECT_PARTICLE));
 								  }
 								})
 		);

@@ -18,6 +18,16 @@ import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
 
+/**
+ * @deprecated use boss_projectile instead, like this:
+ * <blockquote><pre>
+ * /bos var Tags add boss_projectile
+ * /bos var Tags add boss_projectile[damage=30,distance=128,speed=0.8,delay=20,cooldown=160,launchTraking=true,turnRadius=0.035,HookForce=1]
+ * /bos var Tags add boss_projectile[SoundStart=ITEM_CROSSBOW_LOADING_MIDDLE,ParticleLaunch=SMOKE_NORMAL,SoundLaunch=ITEM_CROSSBOW_SHOOT,ParticleProjectileMain=CRIT]
+ * /bos var Tags add boss_projectile[ParticleProjectileSecond=SMOKE_LARGE,SoundProjectile=ENTITY_ARROW_SHOOT,SoundHit=ENTITY_ARMOR_STAND_BREAK,ParticleHit=CRIT]
+ * </pre></blockquote>
+ * @G3m1n1Boy
+ */
 public class HookBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_hook";
 

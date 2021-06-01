@@ -6,10 +6,25 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.plugin.Plugin;
 
 import com.playmonumenta.plugins.bosses.SpellManager;
-import com.playmonumenta.plugins.bosses.spells.SpellTpBehindRandomPlayer;
+import com.playmonumenta.plugins.bosses.spells.SpellTpBehindPlayer;
+import com.playmonumenta.plugins.utils.BossUtils;
 
 public class TpBehindBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_tpbehind";
+
+	public static class Parameters {
+		public int STUN = 10;
+		public int RANGE = 80;
+		public int DELAY = 50;
+		public int DETECTION = 20;
+
+		/*Choose if the player should chosen random, or the mob target */
+		public boolean RANDOM = true;
+
+		public int COOLDOWN = 12 * 20;
+
+	}
+
 	public static final int detectionRange = 20;
 
 	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
@@ -19,8 +34,11 @@ public class TpBehindBoss extends BossAbilityGroup {
 	public TpBehindBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
 
+		Parameters p = BossUtils.getParameters(boss, identityTag, new Parameters());
+
 		SpellManager activeSpells = new SpellManager(Arrays.asList(
-			new SpellTpBehindRandomPlayer(plugin, boss, 240)));
+			new SpellTpBehindPlayer(plugin, boss, p.COOLDOWN, p.RANGE, p.DELAY, p.STUN, p.RANDOM)
+		));
 
 
 		super.constructBoss(activeSpells, null, detectionRange, null);
