@@ -79,6 +79,7 @@ public enum CustomEnchantment {
 	SAPPER(new Sapper()),
 	SECOND_WIND(new SecondWind()),
 	SUSTENANCE(new Sustenance()),
+	WEIGHTLESS(new Weightless()),
 
 	// Protections
 	ABILITY_EVASION(new AbilityEvasion()),

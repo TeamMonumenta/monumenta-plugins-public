@@ -19,6 +19,8 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.enchantments.BaseEnchantment;
 import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
+import com.playmonumenta.plugins.enchantments.Weightless;
+import com.playmonumenta.plugins.utils.InventoryUtils;
 
 public class TwoHanded implements BaseEnchantment {
 	//Two Handed: If holding an item in offhand, melee damage is reduced by 40% and speed is reduced by 30% (Non-cleansable).
@@ -57,7 +59,8 @@ public class TwoHanded implements BaseEnchantment {
 
 	public boolean checkForOffhand(Player player) {
 		PlayerInventory inventory = player.getInventory();
-		if (inventory.getItemInOffHand().getType() != Material.AIR && inventory.getItemInMainHand().getType() != Material.AIR) {
+		if (inventory.getItemInOffHand().getType() != Material.AIR && inventory.getItemInMainHand().getType() != Material.AIR
+				&& !(InventoryUtils.getCustomEnchantLevel(inventory.getItemInOffHand(), Weightless.PROPERTY_NAME, false) > 0 || InventoryUtils.getCustomEnchantLevel(inventory.getItemInMainHand(), Weightless.PROPERTY_NAME, false) > 0)) {
 			return true;
 		}
 		return false;
