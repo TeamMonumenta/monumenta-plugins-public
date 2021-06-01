@@ -35,12 +35,17 @@ public class WeakHookBoss extends BossAbilityGroup {
 	private static final boolean LINGERS = true;
 	private static final int DAMAGE = 30;
 
+	public static class Parameters {
+		public float MULTIPLIER = 3;
+	}
+
 	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
 		return new WeakHookBoss(plugin, boss);
 	}
 
 	public WeakHookBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
+		Parameters p = BossUtils.getParameters(boss, identityTag, new Parameters());
 
 		SpellManager activeSpells = new SpellManager(Arrays.asList(
 			new SpellBaseSeekingProjectile(plugin, boss, detectionRange, SINGLE_TARGET, LAUNCH_TRACKING, COOLDOWN, DELAY,
@@ -69,7 +74,7 @@ public class WeakHookBoss extends BossAbilityGroup {
 						world.spawnParticle(Particle.CRIT, loc, 50, 0, 0, 0, 0.25);
 						if (player != null) {
 							BossUtils.bossDamage(boss, player, DAMAGE);
-							MovementUtils.pullTowardsByUnit((Entity)boss, (LivingEntity)player, (float)3);
+							MovementUtils.pullTowardsByUnit((Entity)boss, (LivingEntity)player, p.MULTIPLIER);
 						}
 					}
 			)));
