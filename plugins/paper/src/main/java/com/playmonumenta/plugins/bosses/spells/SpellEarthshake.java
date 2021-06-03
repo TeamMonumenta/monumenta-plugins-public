@@ -12,6 +12,7 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.block.Block;
+import org.bukkit.block.data.type.Bed;
 import org.bukkit.entity.FallingBlock;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -171,7 +172,7 @@ public class SpellEarthshake extends SpellBaseAoE {
 							}
 
 							Material material = b.getType();
-							if (!mIgnoredMats.contains(material) && FastUtils.RANDOM.nextInt(4) > 1) {
+							if (!mIgnoredMats.contains(material) && !LocationUtils.containsWater(b) && !(b.getBlockData() instanceof Bed) && FastUtils.RANDOM.nextInt(4) > 1) {
 								double x = (FastUtils.RANDOM.nextInt(5) - 2) / 10.0;
 								double z = (FastUtils.RANDOM.nextInt(5) - 2) / 10.0;
 

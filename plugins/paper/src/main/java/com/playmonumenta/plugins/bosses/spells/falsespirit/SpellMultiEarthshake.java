@@ -13,6 +13,7 @@ import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.block.Block;
+import org.bukkit.block.data.type.Bed;
 import org.bukkit.entity.FallingBlock;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -26,6 +27,7 @@ import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 
 public class SpellMultiEarthshake extends Spell {
@@ -193,7 +195,7 @@ public class SpellMultiEarthshake extends Spell {
 							}
 
 							Material material = b.getType();
-							if (!mIgnoredMats.contains(material) && FastUtils.RANDOM.nextInt(4) > 1) {
+							if (!mIgnoredMats.contains(material) && !LocationUtils.containsWater(b) && !(b.getBlockData() instanceof Bed) && FastUtils.RANDOM.nextInt(4) > 1) {
 								double x = (FastUtils.RANDOM.nextInt(5) - 2) / 10.0;
 								double z = (FastUtils.RANDOM.nextInt(5) - 2) / 10.0;
 
