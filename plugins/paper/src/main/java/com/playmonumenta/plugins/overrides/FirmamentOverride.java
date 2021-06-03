@@ -11,6 +11,7 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.ShulkerBox;
 import org.bukkit.block.data.BlockData;
+import org.bukkit.block.data.type.Leaves;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockPlaceEvent;
@@ -96,6 +97,8 @@ public class FirmamentOverride extends BaseOverride {
 			ItemMeta meta = currentItem.getItemMeta();
 			// No known way to preserve BlockStateMeta - so check that it's either null or simple BlockDataMeta
 			if (currentItem.getType().isBlock() && (meta == null || meta instanceof BlockDataMeta)) {
+				//Stat tracking for firmament
+				StatTrackManager.incrementStat(item, player, StatTrackOptions.BLOCKS_PLACED, 1);
 				BlockState state = event.getBlockReplacedState();
 				if (FastUtils.RANDOM.nextBoolean() && item.getItemMeta().hasLore() && item.getItemMeta().getLore().contains(ChatColor.AQUA + "Prismarine " + ChatColor.GREEN + "Enabled")) {
 					// Place a prismarine block instead of the block from the shulker
@@ -112,6 +115,9 @@ public class FirmamentOverride extends BaseOverride {
 				}
 
 				BlockData blockData = currentItem.getType().createBlockData();
+				if (blockData instanceof Leaves) {
+					((Leaves)blockData).setPersistent(true);
+				}
 
 				if (meta == null) {
 					// If no block data (simple block), create default
@@ -127,8 +133,6 @@ public class FirmamentOverride extends BaseOverride {
 						state.setBlockData(blockData);
 					}
 				}
-				//Stat tracking for firmament
-				StatTrackManager.incrementStat(item, player, StatTrackOptions.BLOCKS_PLACED, 1);
 				//Log the placement of the blocks
 				CoreProtectIntegration.logPlacement(player, event.getBlock().getLocation(), currentItem.getType(), blockData);
 				// Forcibly update the new block state and apply physics
@@ -163,23 +167,28 @@ public class FirmamentOverride extends BaseOverride {
 		for (String loreEntry : lore) {
 			if (loreEntry.equals(PRISMARINE_ENABLED) && !foundLine) {
 				newLore.add(PRISMARINE_DISABLED);
+				player.sendMessage(PRISMARINE_DISABLED);
+				player.playSound(player.getLocation(), Sound.BLOCK_SHULKER_BOX_CLOSE, SoundCategory.BLOCKS, 1, 1);
 				foundLine = true;
 				continue;
 			} else if (loreEntry.equals(PRISMARINE_DISABLED) && !foundLine) {
 				newLore.add(PRISMARINE_ENABLED);
+				player.sendMessage(PRISMARINE_ENABLED);
+				player.playSound(player.getLocation(), Sound.BLOCK_SHULKER_BOX_OPEN, SoundCategory.BLOCKS, 1, 1);
 				foundLine = true;
 				continue;
 			}
 			newLore.add(loreEntry);
 			if (loreEntry.equals(lore.get(lore.size() - 1)) && !foundLine) {
 				newLore.add(PRISMARINE_ENABLED);
+				player.sendMessage(PRISMARINE_ENABLED);
+				player.playSound(player.getLocation(), Sound.BLOCK_SHULKER_BOX_OPEN, SoundCategory.BLOCKS, 1, 1);
 			}
 		}
 		ItemMeta meta = item.getItemMeta();
 		meta.setLore(newLore);
 		item.setItemMeta(meta);
 		ItemUtils.setPlainLore(item);
-		player.playSound(player.getLocation(), Sound.BLOCK_SHULKER_BOX_CLOSE, SoundCategory.BLOCKS, 1, 1);
 		return true;
 	}
 
