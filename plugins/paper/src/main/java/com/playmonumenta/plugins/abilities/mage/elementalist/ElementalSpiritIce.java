@@ -78,8 +78,8 @@ public class ElementalSpiritIce extends Ability {
 	@Override
 	public void playerDealtCustomDamageEvent(CustomDamageEvent event) {
 		if (
-			event.getMagicType() == MagicType.ICE
-			&& event.getSpell() != ABILITY
+			MagicType.ICE.equals(event.getMagicType())
+			&& !ABILITY.equals(event.getSpell())
 		) {
 			mEnemiesAffected.add(event.getDamaged());
 			if (mEnemiesAffectedProcessor == null) {
@@ -118,7 +118,7 @@ public class ElementalSpiritIce extends Ability {
 									for (LivingEntity mob : EntityUtils.getNearbyMobs(centre, SIZE)) {
 										float finalDamage = spellDamage;
 										if (
-											event.getSpell() == ClassAbility.ELEMENTAL_ARROWS
+											ClassAbility.ELEMENTAL_ARROWS.equals(event.getSpell())
 											&& mElementalArrows != null
 										) {
 											finalDamage += mElementalArrows.getLastDamage() * mLevelBowMultiplier;

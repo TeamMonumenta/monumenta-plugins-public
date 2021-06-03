@@ -4,7 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.Nullable;
+
 import com.playmonumenta.plugins.Constants;
+import com.playmonumenta.plugins.Constants.Colors;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.attributes.AttributeProjectileDamage;
 import com.playmonumenta.plugins.commands.ToggleSwap;
@@ -125,6 +128,7 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.projectiles.ProjectileSource;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.jetbrains.annotations.NotNull;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -999,36 +1003,6 @@ public class PlayerListener implements Listener {
 		}
 	}
 
-	@EventHandler(priority = EventPriority.MONITOR)
-	public void playerGameModeChangeEvent(PlayerGameModeChangeEvent event) {
-		if (!event.isCancelled()) {
-			Player player = event.getPlayer();
-
-			if (player.getGameMode().equals(GameMode.SPECTATOR) || event.getNewGameMode().equals(GameMode.SPECTATOR)) {
-				/* Refresh class abilities when switching to/from spectator */
-				new BukkitRunnable() {
-					@Override
-					public void run() {
-						mPlugin.mAbilityManager.updatePlayerAbilities(player);
-					}
-				}.runTaskLater(mPlugin, 0);
-			}
-			boolean isTownWorld = ServerProperties.getIsTownWorld();
-			if (event.getNewGameMode().equals(GameMode.SURVIVAL)
-			    && ZoneUtils.hasZoneProperty(player, ZoneProperty.ADVENTURE_MODE)
-			    && !ZoneUtils.inPlot(player, isTownWorld)) {
-				event.setCancelled(true);
-				player.setGameMode(GameMode.ADVENTURE);
-			}
-			if (event.getNewGameMode().equals(GameMode.ADVENTURE)
-			    && (!ZoneUtils.hasZoneProperty(player, ZoneProperty.ADVENTURE_MODE)
-			        || ZoneUtils.inPlot(player, isTownWorld))) {
-				event.setCancelled(true);
-				player.setGameMode(GameMode.SURVIVAL);
-			}
-		}
-	}
-
 	@EventHandler
 	public void abilityCastEvent(AbilityCastEvent event) {
 		Player player = event.getCaster();
@@ -1145,4 +1119,107 @@ public class PlayerListener implements Listener {
 		}
 	}
 
+	/*
+	 * Pick survival or adventure as appropriate for zone properties when
+	 * switching into either gamemode.
+	 */
+	@EventHandler(ignoreCancelled = true)
+	public void gamemodeCorrection(@NotNull PlayerGameModeChangeEvent event) {
+		@NotNull GameMode newGameMode = event.getNewGameMode();
+		@NotNull Player player = event.getPlayer();
+		boolean shouldBeAdventure = (
+			ZoneUtils.hasZoneProperty(player, ZoneProperty.ADVENTURE_MODE)
+			&& !ZoneUtils.isInPlot(player)
+		);
+
+		//NOTE Once we update Paper version more,
+		// replace the event's generic failure message via
+		// event.cancelMessage(),
+		// instead of doing player.sendMessage() separately
+		if (GameMode.SURVIVAL.equals(newGameMode) && shouldBeAdventure) {
+			// event.cancelMessage(
+			// 	Component
+			// 		.text("Set own game mode to ", Colors.GREENISH_BLUE)
+			// 		.append(
+			// 			Component.text("Adventure Mode ", Colors.GREENISH_BLUE_DARK)
+			// 		)
+			// 		.append(
+			// 			Component.text(
+			// 				"instead of Survival due to zone.",
+			// 				Colors.GREENISH_BLUE
+			// 			)
+			// 		)
+			// );
+			event.setCancelled(true);
+			player.setGameMode(GameMode.ADVENTURE);
+			player.sendMessage(
+				Component
+					.text("Set own game mode to ", Colors.GREENISH_BLUE)
+					.append(
+						Component.text("Adventure Mode ", Colors.GREENISH_BLUE_DARK)
+					)
+					.append(
+						Component.text(
+							"instead of Survival due to zone.",
+							Colors.GREENISH_BLUE
+						)
+					)
+			);
+		} else if (GameMode.ADVENTURE.equals(newGameMode) && !shouldBeAdventure) {
+			// event.cancelMessage(
+			// 	Component
+			// 		.text("Set own game mode to ", Colors.GREENISH_BLUE)
+			// 		.append(
+			// 			Component.text("Survival Mode ", Colors.GREENISH_BLUE_DARK)
+			// 		)
+			// 		.append(
+			// 			Component.text(
+			// 				"instead of Adventure due to zone.",
+			// 				Colors.GREENISH_BLUE
+			// 			)
+			// 		)
+			// );
+			event.setCancelled(true);
+			player.setGameMode(GameMode.SURVIVAL);
+			player.sendMessage(
+				Component
+					.text("Set own game mode to ", Colors.GREENISH_BLUE)
+					.append(
+						Component.text("Survival Mode ", Colors.GREENISH_BLUE_DARK)
+					)
+					.append(
+						Component.text(
+							"instead of Adventure due to zone.",
+							Colors.GREENISH_BLUE
+						)
+					)
+			);
+		}
+	}
+
+	/*
+	 * Refresh class abilities after event (end of tick)
+	 * when switching to/from spectator.
+	 */
+	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+	public void spectatorAbilityRefresh(@NotNull PlayerGameModeChangeEvent event) {
+		@NotNull Player player = event.getPlayer();
+		@NotNull GameMode oldGameMode = player.getGameMode();
+		@NotNull GameMode newGameMode = event.getNewGameMode();
+
+		if (
+			GameMode.SPECTATOR.equals(oldGameMode)
+			|| GameMode.SPECTATOR.equals(newGameMode)
+		) {
+			@Nullable Plugin plugin = Plugin.getInstance();
+			if (plugin != null) {
+				new BukkitRunnable() {
+					@Override
+					public void run() {
+						plugin.mAbilityManager.updatePlayerAbilities(player);
+					}
+				}.runTaskLater(plugin, 0);
+			}
+		}
+	}
 }

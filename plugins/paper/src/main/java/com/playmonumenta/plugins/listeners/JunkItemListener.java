@@ -30,6 +30,9 @@ import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
 
 
 public class JunkItemListener implements Listener {
+	public static final String COMMAND = "pickup";
+	public static final String ALIAS = "pu";
+
 	private static final String NO_JUNK_ITEMS_TAG = "NoJunkItemsPickup";
 	private static final String PICKUP_MIN_OBJ_NAME = "PickupMin";
 	private static final int JUNK_ITEM_SIZE_THRESHOLD = 17;
@@ -39,9 +42,9 @@ public class JunkItemListener implements Listener {
 	public JunkItemListener() {
 		final CommandPermission perms = CommandPermission.fromString("monumenta.command.pickup");
 
-		new CommandAPICommand("pickup") // Only toggles
+		new CommandAPICommand(COMMAND)
 			.withPermission(perms)
-			.withAliases("pu")
+			.withAliases(ALIAS)
 			.executes((sender, args) -> {
 				playerToggle(sender);
 			})

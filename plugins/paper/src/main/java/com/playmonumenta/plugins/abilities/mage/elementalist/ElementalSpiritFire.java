@@ -106,8 +106,8 @@ public class ElementalSpiritFire extends Ability {
 	@Override
 	public void playerDealtCustomDamageEvent(CustomDamageEvent event) {
 		if (
-			event.getMagicType() == MagicType.FIRE
-			&& event.getSpell() != ABILITY
+			MagicType.FIRE.equals(event.getMagicType())
+			&& !ABILITY.equals(event.getSpell())
 		) {
 			mEnemiesAffected.add(event.getDamaged());
 			// 1 runnable processes everything 1 tick later, so all enemies to affect are in
@@ -161,7 +161,7 @@ public class ElementalSpiritFire extends Ability {
 									if (potentialTarget.getBoundingBox().overlaps(movingSpiritBox)) {
 										float finalDamage = spellDamage;
 										if (
-											event.getSpell() == ClassAbility.ELEMENTAL_ARROWS
+											ClassAbility.ELEMENTAL_ARROWS.equals(event.getSpell())
 											&& mElementalArrows != null
 										) {
 											finalDamage += mElementalArrows.getLastDamage() * mLevelBowMultiplier;

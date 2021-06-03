@@ -88,7 +88,7 @@ public class HolyJavelin extends Ability {
 		//TODO pass in casted entities for events like these
 		LivingEntity enemy = (LivingEntity)event.getEntity();
 
-		if (event.getCause() == DamageCause.ENTITY_ATTACK) {
+		if (DamageCause.ENTITY_ATTACK.equals(event.getCause())) {
 			double sharedPassiveDamage = 0;
 			if (mLuminousInfusion != null) {
 				sharedPassiveDamage += mLuminousInfusion.mLastPassiveMeleeDamage;

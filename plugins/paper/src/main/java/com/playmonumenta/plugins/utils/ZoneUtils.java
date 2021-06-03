@@ -1,10 +1,14 @@
 package com.playmonumenta.plugins.utils;
 
+import com.playmonumenta.plugins.server.properties.ServerProperties;
+
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.NotNull;
 
 public class ZoneUtils {
 	public enum ZoneProperty {
@@ -35,6 +39,14 @@ public class ZoneUtils {
 		}
 	}
 
+	public static boolean isInPlot(@NotNull Player player) {
+		return inPlot(player.getLocation(), ServerProperties.getIsTownWorld());
+	}
+
+	public static boolean inPlot(Entity entity, boolean isTownWorld) {
+		return inPlot(entity.getLocation(), isTownWorld);
+	}
+
 	public static boolean inPlot(Location loc, boolean isTownWorld) {
 		if (!isTownWorld &&
 		    !hasZoneProperty(loc, ZoneProperty.PLOTS_POSSIBLE)) {
@@ -43,10 +55,6 @@ public class ZoneUtils {
 
 		Material mat = loc.getWorld().getBlockAt(loc.getBlockX(), 10, loc.getBlockZ()).getType();
 		return mat == Material.SPONGE;
-	}
-
-	public static boolean inPlot(Entity entity, boolean isTownWorld) {
-		return inPlot(entity.getLocation(), isTownWorld);
 	}
 
 	public static boolean hasZoneProperty(Entity entity, ZoneProperty property) {

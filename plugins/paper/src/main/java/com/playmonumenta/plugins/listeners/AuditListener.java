@@ -1,16 +1,14 @@
 package com.playmonumenta.plugins.listeners;
 
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import java.util.regex.Pattern;
 
 import com.playmonumenta.plugins.integrations.MonumentaNetworkRelayIntegration;
 import com.playmonumenta.plugins.utils.MessagingUtils;
-
-import net.kyori.adventure.text.Component;
 
 import org.bukkit.GameMode;
 import org.bukkit.Material;
@@ -35,37 +33,46 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BlockStateMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.loot.Lootable;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import net.kyori.adventure.text.Component;
+
+
 
 public class AuditListener implements Listener {
+	private static final List<@NotNull Pattern> IGNORED_COMMAND_REGEX = Arrays.asList(
+		// ScriptedQuests
+		exactOptionalArguments("(scriptedquests:)?questtrigger"),
+		exactOptionalArguments("clickable"),
+
+		// VentureChat
+		exactOptionalArguments("(venturechat:)?(msg|v?message)"),
+		exactOptionalArguments("(venturechat:)?(w(hisper)?|vwhisper)"),
+		exactOptionalArguments("(venturechat:)?v?tell"),
+		exactOptionalArguments("(venturechat:)?pm"),
+		exactOptionalArguments("(venturechat:)?(r(eply)?|vreply)"),
+		exactOptionalArguments("(venturechat:)?v?me"),
+
+		// CoreProtect
+		exactOptionalArguments("(coreprotect:)?co i(nspect)?"),
+		exactOptionalArguments("(coreprotect:)?co l(ookup)?"),
+		exactOptionalArguments("(coreprotect:)?co near"),
+
+		// Common commands
+		exactOptionalArguments(String.format(
+			"(%s|%s)",
+			JunkItemListener.COMMAND,
+			JunkItemListener.ALIAS
+		)),
+		exactOptionalArguments("peb")
+	);
+
 	private final Map<HumanEntity, ItemStack> mLastCreativeDestroy = new HashMap<HumanEntity, ItemStack>();
 	private final Logger mLogger;
 
 	public AuditListener(Logger logger) {
 		mLogger = logger;
-	}
-
-	@EventHandler(priority = EventPriority.MONITOR)
-	public void gamemode(PlayerGameModeChangeEvent event) {
-		if (event.isCancelled()) {
-			return;
-		}
-
-		Player player = event.getPlayer();
-		if (!player.isOp()) {
-			return;
-		}
-
-		GameMode curMode = player.getGameMode();
-		GameMode newMode = event.getNewGameMode();
-		if ((curMode.equals(GameMode.SURVIVAL) && newMode.equals(GameMode.ADVENTURE))
-		    || (curMode.equals(GameMode.ADVENTURE) && newMode.equals(GameMode.SURVIVAL))) {
-			// Don't log normal game mode changes
-			return;
-		}
-
-		log("GameMode: " + player.getName() + " " + curMode.toString() + " -> " + newMode.toString());
-
-		checkDestroy(player);
 	}
 
 	@EventHandler(priority = EventPriority.MONITOR)
@@ -77,35 +84,6 @@ public class AuditListener implements Listener {
 		Player player = event.getEntity();
 
 		log("Death: " + player.getName() + " " + event.getDeathMessage());
-
-		checkDestroy(player);
-	}
-
-	@EventHandler(priority = EventPriority.MONITOR)
-	public void command(PlayerCommandPreprocessEvent event) {
-		if (event.isCancelled()) {
-			return;
-		}
-
-		Player player = event.getPlayer();
-		if (!player.isOp()) {
-			return;
-		}
-
-		String cmd = event.getMessage();
-		if (cmd.startsWith("/questtrigger ")
-		    || cmd.startsWith("/clickable ")
-		    || cmd.startsWith("/r ")
-		    || cmd.startsWith("/vtell ")
-		    || cmd.startsWith("/pickup ")
-		    || cmd.startsWith("/vmessage ")
-		    || cmd.startsWith("/vwhisper ")
-		    || cmd.startsWith("/peb")
-		    || cmd.startsWith("/msg ")) {
-			return;
-		}
-
-		log("Command: " + player.getName() + " " + cmd);
 
 		checkDestroy(player);
 	}
@@ -252,7 +230,11 @@ public class AuditListener implements Listener {
 		return retStr + ")";
 	}
 
-	/* Checks that a destroyed item gets logged if the player doesn't place it again immediately */
+	private void log(@NotNull String message) {
+		mLogger.info("Audit | " + message);
+		MonumentaNetworkRelayIntegration.sendAuditLogMessage(message);
+	}
+
 	private void checkDestroy(HumanEntity player) {
 		ItemStack lastItem = mLastCreativeDestroy.get(player);
 		if (lastItem != null) {
@@ -261,8 +243,65 @@ public class AuditListener implements Listener {
 		}
 	}
 
-	private void log(@Nonnull String message) {
-		mLogger.info("Audit:" + message);
-		MonumentaNetworkRelayIntegration.sendAuditLogMessage(message);
+	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+	public void playerGameModeChangeEvent(PlayerGameModeChangeEvent event) {
+		@NotNull Player player = event.getPlayer();
+		if (!player.isOp()) {
+			return;
+		}
+
+		// Don't log normal gamemode changes, eg changing zones
+		@NotNull GameMode oldGameMode = player.getGameMode();
+		@NotNull GameMode newGameMode = event.getNewGameMode();
+		if (
+			(
+				GameMode.SURVIVAL.equals(oldGameMode)
+				|| GameMode.ADVENTURE.equals(oldGameMode)
+			) && (
+				GameMode.SURVIVAL.equals(newGameMode)
+				|| GameMode.ADVENTURE.equals(newGameMode)
+			)
+		) {
+			return;
+		}
+
+		log(String.format(
+			"GameMode: %s | %s → %s",
+			player.getName(),
+			oldGameMode,
+			newGameMode
+		));
+
+		checkDestroy(player);
+	}
+
+	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+	public void playerCommandPreprocessEvent(@NotNull PlayerCommandPreprocessEvent event) {
+		@NotNull Player player = event.getPlayer();
+		if (!player.isOp()) {
+			return;
+		}
+
+		@NotNull String command = event.getMessage();
+		for (@NotNull Pattern pattern : IGNORED_COMMAND_REGEX) {
+			if (pattern.matcher(command).find()) {
+				return;
+			}
+		}
+
+		log(String.format(
+			"Command: %s | %s",
+			player.getName(),
+			command
+		));
+	}
+
+	/*
+	 * Returns a regex pattern for the specified exact command
+	 * (eg "r" won't match "restart" as well),
+	 * either with or without arguments after it.
+	 */
+	private static @NotNull Pattern exactOptionalArguments(@NotNull String command) {
+		return Pattern.compile("^\\/" + command + "($| )");
 	}
 }

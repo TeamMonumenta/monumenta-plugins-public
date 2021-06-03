@@ -202,15 +202,13 @@ public class SpectateBot extends GenericCommand implements Listener {
 		}
 	}
 
-	@EventHandler(priority = EventPriority.MONITOR)
+	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void playerGameModeChangeEvent(PlayerGameModeChangeEvent event) {
-		if (!event.isCancelled()) {
-			Player player = event.getPlayer();
+		Player player = event.getPlayer();
 
-			// If the player switches out of spectator remove them from the list
-			if (!event.getNewGameMode().equals(GameMode.SPECTATOR)) {
-				mSpectators.remove(player.getUniqueId());
-			}
+		// If the player switches out of spectator remove them from the list
+		if (!event.getNewGameMode().equals(GameMode.SPECTATOR)) {
+			mSpectators.remove(player.getUniqueId());
 		}
 	}
 

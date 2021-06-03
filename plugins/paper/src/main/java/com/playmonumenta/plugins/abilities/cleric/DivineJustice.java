@@ -33,8 +33,8 @@ public class DivineJustice extends Ability {
 	public static final String NAME = "Divine Justice";
 	public static final ClassAbility ABILITY = ClassAbility.DIVINE_JUSTICE;
 
-	public static final int DAMAGE_1 = 4;
-	public static final double DAMAGE_MULTIPLIER_2 = 0.15;
+	public static final int DAMAGE = 4;
+	public static final double DAMAGE_MULTIPLIER = 0.15;
 	public static final double HEALING_MULTIPLIER_OWN = 0.1;
 	public static final double HEALING_MULTIPLIER_OTHER = 0.05;
 	public static final int RADIUS = 12;
@@ -58,7 +58,7 @@ public class DivineJustice extends Ability {
 		mInfo.mDescriptions.add(
 			String.format(
 				"Your cooled down falling attacks passively deal %s holy damage to undead enemies, ignoring iframes.",
-				DAMAGE_1
+				DAMAGE
 			)
 		);
 		mInfo.mDescriptions.add(
@@ -67,9 +67,9 @@ public class DivineJustice extends Ability {
 				StringUtils.multiplierToPercentage(HEALING_MULTIPLIER_OWN),
 				RADIUS,
 				StringUtils.multiplierToPercentage(HEALING_MULTIPLIER_OTHER),
-				DAMAGE_1,
-				DAMAGE_1,
-				StringUtils.multiplierToPercentage(DAMAGE_MULTIPLIER_2)
+				DAMAGE,
+				DAMAGE,
+				StringUtils.multiplierToPercentage(DAMAGE_MULTIPLIER)
 			)
 		);
 
@@ -93,10 +93,10 @@ public class DivineJustice extends Ability {
 			&& Crusade.enemyTriggersAbilities(enemy, mCrusade)
 		) {
 			double originalDamage = entityDamageByEntityEvent.getDamage();
-			double damage = DAMAGE_1;
+			double damage = DAMAGE;
 			if (mDoHealingAndMultiplier) {
 				// Use the whole melee damage here
-				damage += (originalDamage + damage) * DAMAGE_MULTIPLIER_2;
+				damage += (originalDamage + damage) * DAMAGE_MULTIPLIER;
 			}
 
 			mLastPassiveDamage = damage;

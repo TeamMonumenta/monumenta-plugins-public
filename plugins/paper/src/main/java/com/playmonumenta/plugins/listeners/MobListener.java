@@ -14,6 +14,7 @@ import org.bukkit.block.Block;
 import org.bukkit.block.CreatureSpawner;
 import org.bukkit.entity.AbstractArrow;
 import org.bukkit.entity.ArmorStand;
+import org.bukkit.entity.Bat;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Evoker;
@@ -62,7 +63,7 @@ public class MobListener implements Listener {
 		mPlugin = plugin;
 	}
 
-	@EventHandler(priority = EventPriority.HIGH)
+	@EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
 	void creatureSpawnEvent(CreatureSpawnEvent event) {
 		Entity entity = event.getEntity();
 
@@ -73,7 +74,11 @@ public class MobListener implements Listener {
 			return;
 		}
 
-		if (entity instanceof Slime && event.getSpawnReason().equals(CreatureSpawnEvent.SpawnReason.NATURAL)) {
+		// No natural bat or slime spawning
+		if (
+			(entity instanceof Bat || entity instanceof Slime)
+			&& event.getSpawnReason().equals(CreatureSpawnEvent.SpawnReason.NATURAL)
+		) {
 			event.setCancelled(true);
 			return;
 		}

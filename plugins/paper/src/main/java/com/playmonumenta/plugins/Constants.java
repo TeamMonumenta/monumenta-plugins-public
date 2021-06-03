@@ -2,6 +2,9 @@ package com.playmonumenta.plugins;
 
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.jetbrains.annotations.NotNull;
+
+import net.kyori.adventure.text.format.TextColor;
 
 
 
@@ -138,5 +141,10 @@ public class Constants {
 		public static float calculatePitch(int clicks) {
 			return 0.5f * (float)Math.pow(2, (clicks / 12d));
 		}
+	}
+
+	public static class Colors {
+		public static final @NotNull TextColor GREENISH_BLUE = TextColor.color(85, 255, 170);
+		public static final @NotNull TextColor GREENISH_BLUE_DARK = TextColor.color(76, 230, 153);
 	}
 }
