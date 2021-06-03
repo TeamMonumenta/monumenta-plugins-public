@@ -2,14 +2,6 @@ package com.playmonumenta.plugins.abilities;
 
 import java.util.Collection;
 
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.classes.ClassAbility;
-import com.playmonumenta.plugins.events.AbilityCastEvent;
-import com.playmonumenta.plugins.events.CustomDamageEvent;
-import com.playmonumenta.plugins.events.PotionEffectApplyEvent;
-import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.plugins.utils.ScoreboardUtils;
-
 import org.bukkit.entity.AbstractArrow;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -32,6 +24,14 @@ import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.events.AbilityCastEvent;
+import com.playmonumenta.plugins.events.CustomDamageEvent;
+import com.playmonumenta.plugins.events.PotionEffectApplyEvent;
+import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.utils.ScoreboardUtils;
 
 import net.kyori.adventure.text.Component;
 
@@ -315,6 +315,19 @@ public abstract class Ability {
 	@Override
 	public String toString() {
 		return String.format("%s: %d", this.getClass().getName().replaceAll("com.playmonumenta.plugins.abilities.", ""), getAbilityScore());
+	}
+
+	/*
+	 * This is called when a player's class is refreshed REGARDLESS OF WHETHER THE PLAYER HAS
+	 * THE ABILITY, so any effects of the ability that persist outside of the plugin, like
+	 * attributes or tags, should be removed here.
+	 *
+	 * Treat this as a static method (i.e. use the player argument, not mPlayer nor any other
+	 * instance variable) because it is called from the reference abilities list, not the
+	 * actual ability object associated with the player.
+	 */
+	public void remove(Player player) {
+
 	}
 
 	/* When called, the ability is no longer applicable to the player and any active runnables should be cancelled */

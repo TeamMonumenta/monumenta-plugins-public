@@ -28,8 +28,8 @@ public class StatMultiplier extends DelveModifier {
 	private static final String SPEED_MODIFIER_NAME = "DelveSpeedModifier";
 
 	private static final double DAMAGE_MULTIPLIER_INCREMENT = 0.03;
-	private static final double HEALTH_MULTIPLIER_INCREMENT = 0.02;
-	private static final double SPEED_MULTIPLIER_INCREMENT = 0.01;
+	private static final double HEALTH_MULTIPLIER_INCREMENT = 0.012;
+	private static final double SPEED_MULTIPLIER_INCREMENT = 0.004;
 
 	private static final Map<String, Double> STAT_COMPENSATION_MAPPINGS = new HashMap<>();
 
@@ -88,8 +88,8 @@ public class StatMultiplier extends DelveModifier {
 	}
 
 	@Override
-	public void invalidate() {
-		mPlayer.removeScoreboardTag(DELVES_PLAYER_TAG);
+	public void remove(Player player) {
+		player.removeScoreboardTag(DELVES_PLAYER_TAG);
 	}
 
 	public static double getStatCompensation(String dungeon) {

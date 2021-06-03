@@ -8,11 +8,38 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import org.bukkit.GameMode;
+import org.bukkit.Material;
+import org.bukkit.attribute.Attribute;
+import org.bukkit.attribute.AttributeInstance;
+import org.bukkit.attribute.AttributeModifier;
+import org.bukkit.entity.AbstractArrow;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
+import org.bukkit.entity.ThrownPotion;
+import org.bukkit.event.block.Action;
+import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.entity.EntityCombustByEntityEvent;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
+import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.event.entity.EntityTargetLivingEntityEvent;
+import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.entity.PotionSplashEvent;
+import org.bukkit.event.entity.ProjectileHitEvent;
+import org.bukkit.event.player.PlayerAnimationEvent;
+import org.bukkit.event.player.PlayerItemConsumeEvent;
+import org.bukkit.event.player.PlayerItemDamageEvent;
+import org.bukkit.event.player.PlayerSwapHandItemsEvent;
+import org.bukkit.inventory.ItemStack;
+
 import com.google.gson.JsonElement;
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.alchemist.Bezoar;
 import com.playmonumenta.plugins.abilities.alchemist.AlchemistPotions;
 import com.playmonumenta.plugins.abilities.alchemist.BasiliskPoison;
+import com.playmonumenta.plugins.abilities.alchemist.Bezoar;
 import com.playmonumenta.plugins.abilities.alchemist.BrutalAlchemy;
 import com.playmonumenta.plugins.abilities.alchemist.EnfeeblingElixir;
 import com.playmonumenta.plugins.abilities.alchemist.GruesomeAlchemy;
@@ -108,14 +135,14 @@ import com.playmonumenta.plugins.abilities.scout.hunter.EnchantedShot;
 import com.playmonumenta.plugins.abilities.scout.hunter.PinningShot;
 import com.playmonumenta.plugins.abilities.scout.hunter.SplitArrow;
 import com.playmonumenta.plugins.abilities.scout.ranger.Quickdraw;
-import com.playmonumenta.plugins.abilities.scout.ranger.WhirlingBlade;
 import com.playmonumenta.plugins.abilities.scout.ranger.TacticalManeuver;
+import com.playmonumenta.plugins.abilities.scout.ranger.WhirlingBlade;
 import com.playmonumenta.plugins.abilities.warlock.AmplifyingHex;
-import com.playmonumenta.plugins.abilities.warlock.PhlegmaticResolve;
 import com.playmonumenta.plugins.abilities.warlock.CholericFlames;
 import com.playmonumenta.plugins.abilities.warlock.CursedWound;
-import com.playmonumenta.plugins.abilities.warlock.MelancholicLament;
 import com.playmonumenta.plugins.abilities.warlock.GraspingClaws;
+import com.playmonumenta.plugins.abilities.warlock.MelancholicLament;
+import com.playmonumenta.plugins.abilities.warlock.PhlegmaticResolve;
 import com.playmonumenta.plugins.abilities.warlock.SanguineHarvest;
 import com.playmonumenta.plugins.abilities.warlock.SoulRend;
 import com.playmonumenta.plugins.abilities.warlock.WarlockPassive;
@@ -123,8 +150,8 @@ import com.playmonumenta.plugins.abilities.warlock.reaper.DarkPact;
 import com.playmonumenta.plugins.abilities.warlock.reaper.JudgementChain;
 import com.playmonumenta.plugins.abilities.warlock.reaper.VoodooBonds;
 import com.playmonumenta.plugins.abilities.warlock.tenebrist.HauntingShades;
-import com.playmonumenta.plugins.abilities.warlock.tenebrist.WitheringGaze;
 import com.playmonumenta.plugins.abilities.warlock.tenebrist.UmbralWail;
+import com.playmonumenta.plugins.abilities.warlock.tenebrist.WitheringGaze;
 import com.playmonumenta.plugins.abilities.warrior.BruteForce;
 import com.playmonumenta.plugins.abilities.warrior.CounterStrike;
 import com.playmonumenta.plugins.abilities.warrior.DefensiveLine;
@@ -152,33 +179,6 @@ import com.playmonumenta.plugins.utils.DelvesUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MetadataUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
-
-import org.bukkit.GameMode;
-import org.bukkit.Material;
-import org.bukkit.attribute.Attribute;
-import org.bukkit.attribute.AttributeInstance;
-import org.bukkit.attribute.AttributeModifier;
-import org.bukkit.entity.AbstractArrow;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
-import org.bukkit.entity.Projectile;
-import org.bukkit.entity.ThrownPotion;
-import org.bukkit.event.block.Action;
-import org.bukkit.event.block.BlockBreakEvent;
-import org.bukkit.event.entity.EntityCombustByEntityEvent;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
-import org.bukkit.event.entity.EntityDeathEvent;
-import org.bukkit.event.entity.EntityTargetLivingEntityEvent;
-import org.bukkit.event.entity.PlayerDeathEvent;
-import org.bukkit.event.entity.PotionSplashEvent;
-import org.bukkit.event.entity.ProjectileHitEvent;
-import org.bukkit.event.player.PlayerAnimationEvent;
-import org.bukkit.event.player.PlayerItemConsumeEvent;
-import org.bukkit.event.player.PlayerItemDamageEvent;
-import org.bukkit.event.player.PlayerSwapHandItemsEvent;
-import org.bukkit.inventory.ItemStack;
 
 
 
@@ -480,10 +480,7 @@ public class AbilityManager {
 		 *
 		 *
 		 *
-		 * TODO:
-		 *
-		 * Replace this overzealous catch-all with calls to invalidate() in all relevant
-		 * abilities like Swiftness and Toughness.
+		 * TODO: This should be replaced with calls to remove() in each respective ability.
 		 */
 		AttributeInstance[] instances = {
 				knockbackResistance,
@@ -523,6 +520,11 @@ public class AbilityManager {
 			for (Ability abil : getPlayerAbilities(player).getAbilities()) {
 				abil.invalidate();
 			}
+		}
+
+		// Removes things like attributes/tags applied by abilities
+		for (Ability ability : mReferenceAbilities) {
+			ability.remove(player);
 		}
 
 		List<Ability> abilities = new ArrayList<>();

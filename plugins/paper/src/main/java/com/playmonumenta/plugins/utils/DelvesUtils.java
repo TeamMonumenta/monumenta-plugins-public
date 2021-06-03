@@ -856,16 +856,16 @@ public class DelvesUtils {
 			} else {
 				damageMultiplierColor = NamedTextColor.GRAY;
 			}
-			lore.add(Component.text(String.format("- Damage Multiplier: x%.2f", damageMultiplier), damageMultiplierColor).decoration(TextDecoration.ITALIC, false));
-			lore.add(Component.text(String.format("- Health Multiplier: x%.2f", healthMultiplier), damageMultiplierColor).decoration(TextDecoration.ITALIC, false));
-			lore.add(Component.text(String.format("- Speed Multiplier: x%.2f", speedMultiplier), damageMultiplierColor).decoration(TextDecoration.ITALIC, false));
+			lore.add(Component.text(String.format("- Damage Multiplier: x%.3f", damageMultiplier), damageMultiplierColor).decoration(TextDecoration.ITALIC, false));
+			lore.add(Component.text(String.format("- Health Multiplier: x%.3f", healthMultiplier), damageMultiplierColor).decoration(TextDecoration.ITALIC, false));
+			lore.add(Component.text(String.format("- Speed Multiplier: x%.3f", speedMultiplier), damageMultiplierColor).decoration(TextDecoration.ITALIC, false));
 
 			lore.add(Component.text(""));
 
 			double dungeonMultiplier = StatMultiplier.getStatCompensation(mDungeon);
 			lore.add(Component.text("Stat Multipliers from Base Dungeon:", NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, false));
-			lore.add(Component.text(String.format("- Damage Multiplier: x%.2f", dungeonMultiplier), NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false));
-			lore.add(Component.text(String.format("- Health Multiplier: x%.2f", dungeonMultiplier), NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false));
+			lore.add(Component.text(String.format("- Damage Multiplier: x%.3f", dungeonMultiplier), NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false));
+			lore.add(Component.text(String.format("- Health Multiplier: x%.3f", dungeonMultiplier), NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false));
 
 			lore.add(Component.text(""));
 
