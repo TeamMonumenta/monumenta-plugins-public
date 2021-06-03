@@ -43,6 +43,7 @@ import com.playmonumenta.plugins.commands.ReforgeInventory;
 import com.playmonumenta.plugins.commands.RefreshClass;
 import com.playmonumenta.plugins.commands.RemoveTags;
 import com.playmonumenta.plugins.commands.RestartEmptyCommand;
+import com.playmonumenta.plugins.commands.RunRegion;
 import com.playmonumenta.plugins.commands.SetViewDistance;
 import com.playmonumenta.plugins.commands.ShatterHeldItem;
 import com.playmonumenta.plugins.commands.SkillDescription;
@@ -188,6 +189,7 @@ public class Plugin extends JavaPlugin {
 		RedeemVoteRewards.register(this.getLogger());
 		BossFight.register();
 		SpellDetectionCircle.registerCommand(this);
+		RunRegion.register();
 		SkillDescription.register(this);
 		SkillSummary.register(this);
 		ItemIndexCommand.register();
