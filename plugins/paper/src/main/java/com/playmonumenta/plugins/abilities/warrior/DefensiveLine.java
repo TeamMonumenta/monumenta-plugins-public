@@ -21,6 +21,7 @@ import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.effects.PercentDamageReceived;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 
@@ -134,7 +135,7 @@ public class DefensiveLine extends Ability {
 		ItemStack offHand = mPlayer.getInventory().getItemInOffHand();
 		ItemStack mainHand = mPlayer.getInventory().getItemInMainHand();
 		return mPlayer.isSneaking()
-		       && ((mainHand.getType() == Material.SHIELD && offHand.getType() != Material.BOW)
-		           || (offHand.getType() == Material.SHIELD && mainHand.getType() != Material.BOW));
+		       && !InventoryUtils.isBowItem(mainHand)
+		       && (mainHand.getType() == Material.SHIELD || offHand.getType() == Material.SHIELD);
 	}
 }

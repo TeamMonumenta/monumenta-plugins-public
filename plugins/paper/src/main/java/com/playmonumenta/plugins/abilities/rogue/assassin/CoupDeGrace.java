@@ -11,6 +11,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
@@ -50,6 +52,11 @@ public class CoupDeGrace extends Ability {
 	public boolean livingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
 		if ((event.getCause() == DamageCause.ENTITY_ATTACK || event.getCause() == DamageCause.ENTITY_SWEEP_ATTACK) && event.getEntity() instanceof LivingEntity) {
 			LivingEntity le = (LivingEntity) event.getEntity();
+			for (PotionEffect effect : le.getActivePotionEffects()) {
+				if (effect.getType() == PotionEffectType.DAMAGE_RESISTANCE && effect.getAmplifier() >= 4) {
+					return true;
+				}
+			}
 			AttributeInstance maxHealth = le.getAttribute(Attribute.GENERIC_MAX_HEALTH);
 			if (maxHealth != null) {
 				double maxHealthValue = maxHealth.getValue();

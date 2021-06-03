@@ -25,6 +25,7 @@ import com.playmonumenta.plugins.enchantments.abilities.BaseAbilityEnchantment;
 import com.playmonumenta.plugins.point.Raycast;
 import com.playmonumenta.plugins.point.RaycastData;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.InventoryUtils;
 
 public class ShieldBash extends Ability {
 
@@ -118,6 +119,6 @@ public class ShieldBash extends Ability {
 	public boolean runCheck() {
 		ItemStack offHand = mPlayer.getInventory().getItemInOffHand();
 		ItemStack mainHand = mPlayer.getInventory().getItemInMainHand();
-		return offHand.getType() == Material.SHIELD || mainHand.getType() == Material.SHIELD;
+		return !InventoryUtils.isBowItem(mainHand) && (offHand.getType() == Material.SHIELD || mainHand.getType() == Material.SHIELD);
 	}
 }

@@ -252,6 +252,10 @@ public class InventoryUtils {
 
 	public static boolean isScytheItem(final ItemStack item) {
 		if (item != null) {
+			if (ItemUtils.isItemShattered(item)) {
+				return false;
+			}
+
 			final Material mat = item.getType();
 			return mat == Material.WOODEN_HOE || mat == Material.STONE_HOE || mat == Material.GOLDEN_HOE
 				   || mat == Material.IRON_HOE || mat == Material.DIAMOND_HOE;
@@ -277,6 +281,10 @@ public class InventoryUtils {
 
 		final List<String> lore = ItemUtils.getPlainLore(item);
 		if (lore == null || lore.isEmpty()) {
+			return false;
+		}
+
+		if (ItemUtils.isItemShattered(item)) {
 			return false;
 		}
 

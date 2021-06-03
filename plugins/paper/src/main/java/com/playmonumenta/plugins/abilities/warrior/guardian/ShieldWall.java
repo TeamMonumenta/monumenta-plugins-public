@@ -28,6 +28,7 @@ import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.classes.magic.MagicType;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.MetadataUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
@@ -207,7 +208,7 @@ public class ShieldWall extends Ability {
 	public boolean runCheck() {
 		ItemStack mHand = mPlayer.getInventory().getItemInMainHand();
 		ItemStack oHand = mPlayer.getInventory().getItemInOffHand();
-		return mHand.getType() != Material.BOW && (mHand.getType() == Material.SHIELD || oHand.getType() == Material.SHIELD);
+		return !InventoryUtils.isBowItem(mHand) && (mHand.getType() == Material.SHIELD || oHand.getType() == Material.SHIELD);
 	}
 
 }
