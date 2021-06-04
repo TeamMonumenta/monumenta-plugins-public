@@ -66,6 +66,7 @@ public class SpellTpBehindPlayer extends Spell {
 						players.remove(target);
 					} else {
 						targetPlayer = (Player) target;
+						break;
 					}
 				}
 			} else {
