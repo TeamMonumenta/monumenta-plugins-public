@@ -28,6 +28,8 @@ import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.world.ChunkUnloadEvent;
 import org.bukkit.plugin.Plugin;
 
+
+
 /*
  * if ServerProperties.getRepairExplosions() == true, this listener will:
  *
@@ -37,40 +39,82 @@ import org.bukkit.plugin.Plugin;
  */
 public class RepairExplosionsListener implements Listener {
 	private static final Set<Material> NO_REPAIR_MATS = EnumSet.of(
+		// [Gems]
+
+		// Ores
 		Material.COAL_ORE,
 		Material.IRON_ORE,
 		Material.GOLD_ORE,
-		Material.DIAMOND_ORE,
+		Material.GILDED_BLACKSTONE,
+		Material.NETHER_GOLD_ORE,
 		Material.REDSTONE_ORE,
 		Material.LAPIS_ORE,
+		Material.NETHER_QUARTZ_ORE,
+		Material.DIAMOND_ORE,
 		Material.EMERALD_ORE,
+		Material.ANCIENT_DEBRIS,
+
+		// Blocks
 		Material.COAL_BLOCK,
 		Material.IRON_BLOCK,
 		Material.GOLD_BLOCK,
-		Material.DIAMOND_BLOCK,
 		Material.REDSTONE_BLOCK,
 		Material.LAPIS_BLOCK,
+		Material.DIAMOND_BLOCK,
 		Material.EMERALD_BLOCK,
-		Material.CONDUIT,
-		Material.PLAYER_HEAD,
-		Material.CREEPER_HEAD,
-		Material.SKELETON_SKULL,
-		Material.DRAGON_HEAD,
-		Material.PLAYER_WALL_HEAD,
-		Material.CREEPER_WALL_HEAD,
-		Material.SKELETON_WALL_SKULL,
-		Material.DRAGON_WALL_HEAD,
-		Material.BEACON,
+		Material.NETHERITE_BLOCK,
+
+		// [Useful]
+		Material.BONE_BLOCK,
+		Material.DRAGON_EGG,
+		Material.DRIED_KELP_BLOCK,
+		Material.HAY_BLOCK,
+		Material.SLIME_BLOCK,
+
+		// Special
+		Material.ANVIL,
 		Material.CHIPPED_ANVIL,
 		Material.DAMAGED_ANVIL,
-		Material.ANVIL,
+
+		Material.SPAWNER,
+
+		// Improbable
+		Material.CRYING_OBSIDIAN,
 		Material.ENCHANTING_TABLE,
 		Material.ENDER_CHEST,
-		Material.HOPPER,
+		Material.OBSIDIAN,
+		Material.RESPAWN_ANCHOR,
+		Material.TNT,
+
+		// Weird
+		Material.LADDER,
 		Material.SCAFFOLDING,
-		Material.GILDED_BLACKSTONE,
-		Material.ANCIENT_DEBRIS,
-		Material.NETHERITE_BLOCK
+		Material.TWISTING_VINES,
+		Material.TWISTING_VINES_PLANT,
+		Material.VINE,
+		Material.WEEPING_VINES,
+		Material.WEEPING_VINES_PLANT,
+
+		Material.CONDUIT,
+
+		// Heads
+		Material.PLAYER_HEAD,
+		Material.CREEPER_HEAD,
+		Material.DRAGON_HEAD,
+		Material.SKELETON_SKULL,
+		Material.WITHER_SKELETON_SKULL,
+		Material.ZOMBIE_HEAD,
+
+		Material.PLAYER_WALL_HEAD,
+		Material.CREEPER_WALL_HEAD,
+		Material.DRAGON_WALL_HEAD,
+		Material.SKELETON_WALL_SKULL,
+		Material.WITHER_SKELETON_WALL_SKULL,
+		Material.ZOMBIE_WALL_HEAD,
+
+		// [#banned List]
+		Material.BEACON,
+		Material.HOPPER
 	);
 
 	/* A hash table that stores the list of blocks to restore for each chunk */

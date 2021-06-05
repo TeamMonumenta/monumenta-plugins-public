@@ -693,14 +693,6 @@ public class FrostGiant extends BossAbilityGroup {
 					world.spawnParticle(Particle.CLOUD, mLoc, 4, 1, 1, 1, 0.35);
 					mLoc.subtract(FastUtils.cos(radian) * mRadius, 1, FastUtils.sin(radian) * mRadius);
 				}
-				for (Player player : mPlayers) {
-					if (player.getLocation().toVector().isInSphere(mLoc.toVector(), mRadius)) {
-						player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 9999, 1));
-						if (player.getGameMode() != GameMode.CREATIVE && player.getGameMode() != GameMode.SPECTATOR) {
-							player.setGameMode(GameMode.ADVENTURE);
-						}
-					}
-				}
 				if (mRadius >= 40) {
 					this.cancel();
 
@@ -802,14 +794,6 @@ public class FrostGiant extends BossAbilityGroup {
 										world.spawnParticle(Particle.CLOUD, mLoc, 4, 1, 1, 1, 0.35);
 										mLoc.subtract(FastUtils.cos(radian) * mR, 1, FastUtils.sin(radian) * mR);
 									}
-									for (Player player : mPlayers) {
-										if (player.getLocation().toVector().isInSphere(mLoc.toVector(), mR)) {
-											if (player.getGameMode() != GameMode.CREATIVE && player.getGameMode() != GameMode.SPECTATOR) {
-												player.setGameMode(GameMode.SURVIVAL);
-											}
-											player.removePotionEffect(PotionEffectType.SLOW);
-										}
-									}
 									if (mR >= 40) {
 										this.cancel();
 
@@ -854,9 +838,6 @@ public class FrostGiant extends BossAbilityGroup {
 			player.removePotionEffect(PotionEffectType.DAMAGE_RESISTANCE);
 			player.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 20 * 40, 10));
 			player.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, 20 * 40, 1));
-			if (player.getGameMode() != GameMode.CREATIVE) {
-				player.setGameMode(GameMode.ADVENTURE);
-			}
 		}
 
 		Location loc = mBoss.getLocation().clone();
@@ -990,9 +971,6 @@ public class FrostGiant extends BossAbilityGroup {
 					for (Player player : players) {
 						player.removePotionEffect(PotionEffectType.DAMAGE_RESISTANCE);
 						player.removePotionEffect(PotionEffectType.REGENERATION);
-						if (player.getGameMode() != GameMode.CREATIVE) {
-							player.setGameMode(GameMode.SURVIVAL);
-						}
 					}
 				}
 				mTicks += 1;

@@ -250,7 +250,7 @@ public class AuditListener implements Listener {
 			return;
 		}
 
-		// Don't log normal gamemode changes, eg changing zones
+		// Don't log normal game mode changes, eg changing zones
 		@NotNull GameMode oldGameMode = player.getGameMode();
 		@NotNull GameMode newGameMode = event.getNewGameMode();
 		if (

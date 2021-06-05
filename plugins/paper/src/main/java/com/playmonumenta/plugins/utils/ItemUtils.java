@@ -106,6 +106,7 @@ public class ItemUtils {
 
 		Material.PLAYER_HEAD,
 		Material.CREEPER_HEAD,
+		Material.DRAGON_HEAD,
 		Material.SKELETON_SKULL,
 		Material.WITHER_SKELETON_SKULL,
 		Material.ZOMBIE_HEAD,
