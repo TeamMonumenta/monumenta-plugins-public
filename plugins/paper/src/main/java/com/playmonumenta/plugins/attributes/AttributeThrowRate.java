@@ -52,7 +52,7 @@ public class AttributeThrowRate implements BaseAttribute {
 			 */
 			//Check for Two Handed Curse.
 			if (InventoryUtils.testForItemWithLore(mainhand, TwoHanded.PROPERTY_NAME) || InventoryUtils.testForItemWithLore(offhand, TwoHanded.PROPERTY_NAME)) {
-				if (offhand.getType() != Material.AIR && mainhand.getType() != Material.AIR) {
+				if (TwoHanded.checkForOffhand(player)) {
 					return;
 				}
 			}

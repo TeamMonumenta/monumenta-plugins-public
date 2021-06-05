@@ -57,7 +57,7 @@ public class TwoHanded implements BaseEnchantment {
 		plugin.mEffectManager.clearEffects(player, PERCENT_SPEED_EFFECT_NAME);
 	}
 
-	public boolean checkForOffhand(Player player) {
+	public static boolean checkForOffhand(Player player) {
 		PlayerInventory inventory = player.getInventory();
 		if (inventory.getItemInOffHand().getType() != Material.AIR && inventory.getItemInMainHand().getType() != Material.AIR
 				&& !(InventoryUtils.getCustomEnchantLevel(inventory.getItemInOffHand(), Weightless.PROPERTY_NAME, false) > 0 || InventoryUtils.getCustomEnchantLevel(inventory.getItemInMainHand(), Weightless.PROPERTY_NAME, false) > 0)) {
