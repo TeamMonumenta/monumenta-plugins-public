@@ -141,6 +141,7 @@ public class EntityUtils {
 			EntityType.ENDER_DRAGON,
 			EntityType.WOLF,
 			EntityType.OCELOT,
+			EntityType.HOGLIN,
 			EntityType.RAVAGER,
 			EntityType.SLIME,
 			EntityType.MAGMA_CUBE,
@@ -160,6 +161,7 @@ public class EntityUtils {
 			EntityType.PARROT,
 			EntityType.PIG,
 			EntityType.RABBIT,
+			EntityType.RAVAGER,
 			EntityType.SHEEP
 	);
 
@@ -176,7 +178,10 @@ public class EntityUtils {
 
 		EntityType.WITCH,
 
-		EntityType.GIANT
+		EntityType.GIANT,
+		
+		EntityType.PIGLIN,
+		EntityType.PIGLIN_BRUTE
 	);
 
 	private static final String COOLING_ATTR_NAME = "CoolingSlownessAttr";
