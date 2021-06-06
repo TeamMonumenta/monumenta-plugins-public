@@ -141,6 +141,9 @@ public class PebGui extends SinglePageGUI {
 		PEB_ITEMS.add(new PebItem(3, 42, "Offhand Swapping",
 				"Click to toggle whether pressing your swap key will be fully cancelled or only cancelled when a spellcast does so", ChatColor.LIGHT_PURPLE,
 				Material.SHIELD, "toggleswap"));
+		PEB_ITEMS.add(new PebItem(3, 43, "Spawner Equipment",
+				"Click to toggle whether mob equipment is displayed in spawners (significantly decreases FPS in many areas)", ChatColor.LIGHT_PURPLE,
+				Material.IRON_CHESTPLATE, "clickable peb_spawnerequipment"));
 
 		//page 4: Server Info
 		PEB_ITEMS.add(new PebItem(4, 4, "Server Information",

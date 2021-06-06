@@ -43,25 +43,28 @@ public class ProtocolLibIntegration implements Listener {
 													PacketType.Play.Server.MAP_CHUNK) {
 			@Override
 			public void onPacketSending(PacketEvent event) {
+				if (event.getPacketType().equals(PacketType.Play.Server.TILE_ENTITY_DATA) ||
+					event.getPacketType().equals(PacketType.Play.Server.MAP_CHUNK)) {
 
-				if (event.getPacketType().equals(PacketType.Play.Server.TILE_ENTITY_DATA)) {
-					// mLogger.info("GOT TILE_ENTITY_DATA");
-					// mLogger.info(event.getPacket().toString());
-					PacketContainer packet = event.getPacket();
-					for (NbtBase<?> base : packet.getNbtModifier().getValues()) {
-						stripNBT(NbtFactory.asCompound(base));
+					if (event.getPlayer().getScoreboardTags().contains("displaySpawnerEquipment")) {
+						return;
 					}
-					event.setPacket(packet);
-				} else if (event.getPacketType().equals(PacketType.Play.Server.MAP_CHUNK)) {
-					// mLogger.info("GOT MAP_CHUNK PACKET");
-					// mLogger.info(event.getPacket().toString());
-					PacketContainer packet = event.getPacket();
-					for (List<NbtBase<?>> listNBT : packet.getListNbtModifier().getValues()) {
-						for (NbtBase<?> base : listNBT) {
+
+					if (event.getPacketType().equals(PacketType.Play.Server.TILE_ENTITY_DATA)) {
+						PacketContainer packet = event.getPacket();
+						for (NbtBase<?> base : packet.getNbtModifier().getValues()) {
 							stripNBT(NbtFactory.asCompound(base));
 						}
+						event.setPacket(packet);
+					} else if (event.getPacketType().equals(PacketType.Play.Server.MAP_CHUNK)) {
+						PacketContainer packet = event.getPacket();
+						for (List<NbtBase<?>> listNBT : packet.getListNbtModifier().getValues()) {
+							for (NbtBase<?> base : listNBT) {
+								stripNBT(NbtFactory.asCompound(base));
+							}
+						}
+						event.setPacket(packet);
 					}
-					event.setPacket(packet);
 				}
 			}
 		});
