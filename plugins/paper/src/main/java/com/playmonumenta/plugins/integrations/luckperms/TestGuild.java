@@ -15,7 +15,7 @@ import dev.jorel.commandapi.arguments.EntitySelectorArgument;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument.EntitySelector;
 import dev.jorel.commandapi.arguments.TextArgument;
 import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
-import me.lucko.luckperms.api.Group;
+import net.luckperms.api.model.group.Group;
 
 public class TestGuild {
 	public static void register(Plugin plugin) {

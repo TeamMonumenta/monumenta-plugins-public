@@ -23,8 +23,10 @@ import dev.jorel.commandapi.arguments.EntitySelectorArgument;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument.EntitySelector;
 import dev.jorel.commandapi.arguments.TextArgument;
 import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
-import me.lucko.luckperms.api.MessagingService;
-import me.lucko.luckperms.api.User;
+import net.luckperms.api.model.user.User;
+import net.luckperms.api.node.types.InheritanceNode;
+import net.luckperms.api.node.types.MetaNode;
+import net.luckperms.api.node.types.PrefixNode;
 
 public class CreateGuild {
 
@@ -55,7 +57,7 @@ public class CreateGuild {
 		String cleanGuildName = LuckPermsIntegration.getCleanGuildName(guildName);
 
 		//TODO: Better lookup of guild name?
-		if (LuckPermsIntegration.LP.getGroup(cleanGuildName) != null) {
+		if (LuckPermsIntegration.GM.getGroup(cleanGuildName) != null) {
 			CommandAPI.fail("The luckperms group '" + cleanGuildName + "' already exists!");
 		}
 
@@ -111,19 +113,18 @@ public class CreateGuild {
 
 		// Sort out permissions
 		Executor executor = runnable -> Bukkit.getScheduler().runTask(plugin, runnable);
-		LuckPermsIntegration.LP.getGroupManager().createAndLoadGroup(cleanGuildName).thenAcceptAsync(
+		LuckPermsIntegration.GM.createAndLoadGroup(cleanGuildName).thenAcceptAsync(
 			group -> {
-				group.setPermission(LuckPermsIntegration.LP.getNodeFactory().makePrefixNode(1, guildTag).build());
-				group.setPermission(LuckPermsIntegration.LP.getNodeFactory().makeMetaNode("hoverprefix", guildName).build());
-				group.setPermission(LuckPermsIntegration.LP.getNodeFactory().makeMetaNode("guildname", guildName).build());
+				group.data().add(PrefixNode.builder(guildTag, 1).build());
+				group.data().add(MetaNode.builder("hoverprefix", guildName).build());
+				group.data().add(MetaNode.builder("guildname", guildName).build());
 				for (Player founder : founders) {
-					User user = LuckPermsIntegration.LP.getUser(founder.getUniqueId());
-					user.setPermission(LuckPermsIntegration.LP.getNodeFactory().makeGroupNode(group).build());
-					LuckPermsIntegration.LP.getUserManager().saveUser(user);
+					User user = LuckPermsIntegration.UM.getUser(founder.getUniqueId());
+					user.data().add(InheritanceNode.builder(group).build());
+					LuckPermsIntegration.UM.saveUser(user);
 				}
-				LuckPermsIntegration.LP.getGroupManager().saveGroup(group);
-				LuckPermsIntegration.LP.runUpdateTask();
-				LuckPermsIntegration.LP.getMessagingService().ifPresent(MessagingService::pushUpdate);
+				LuckPermsIntegration.GM.saveGroup(group);
+				LuckPermsIntegration.pushUpdate();
 			}, executor
 		);
 	}

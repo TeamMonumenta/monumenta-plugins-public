@@ -129,9 +129,9 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>me.lucko.luckperms</groupId>
-            <artifactId>luckperms-api</artifactId>
-            <version>4.4</version>
+            <groupId>net.luckperms</groupId>
+            <artifactId>api</artifactId>
+            <version>5.3</version>
             <scope>provided</scope>
         </dependency>
         <dependency>

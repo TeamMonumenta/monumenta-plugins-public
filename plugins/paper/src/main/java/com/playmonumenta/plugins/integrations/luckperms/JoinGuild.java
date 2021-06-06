@@ -19,9 +19,9 @@ import dev.jorel.commandapi.arguments.Argument;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument.EntitySelector;
 import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
-import me.lucko.luckperms.api.Group;
-import me.lucko.luckperms.api.MessagingService;
-import me.lucko.luckperms.api.User;
+import net.luckperms.api.model.group.Group;
+import net.luckperms.api.model.user.User;
+import net.luckperms.api.node.types.InheritanceNode;
 
 public class JoinGuild {
 	public static void register(Plugin plugin) {
@@ -56,31 +56,29 @@ public class JoinGuild {
 				Group group = LuckPermsIntegration.getGuild(p);
 				if (group == null) {
 					continue;
-				} else {
-					String guildName = LuckPermsIntegration.getGuildName(group);
-					// Add user to guild
-					new BukkitRunnable() {
-						@Override
-						public void run() {
-							User user = LuckPermsIntegration.LP.getUser(player.getUniqueId());
-							user.setPermission(LuckPermsIntegration.LP.getNodeFactory().makeGroupNode(group).build());
-							LuckPermsIntegration.LP.getUserManager().saveUser(user);
-							LuckPermsIntegration.LP.runUpdateTask();
-							LuckPermsIntegration.LP.getMessagingService().ifPresent(MessagingService::pushUpdate);
-						}
-					}.runTaskAsynchronously(plugin);
-
-					// Success indicators
-					player.sendMessage(ChatColor.GOLD + "Congratulations! You have joined " + guildName + "!");
-					p.sendMessage(ChatColor.WHITE + player.getName() + ChatColor.GOLD + " has joined your guild");
-					Bukkit.dispatchCommand(Bukkit.getConsoleSender(),
-					                       "execute at " + player.getName()
-					                       + " run summon minecraft:firework_rocket ~ ~1 ~ "
-					                       + "{LifeTime:0,FireworksItem:{id:firework_rocket,Count:1,tag:{Fireworks:{Explosions:[{Type:1,Colors:[I;16528693],FadeColors:[I;16777215]}]}}}}");
-
-					// All done
-					return;
 				}
+				String guildName = LuckPermsIntegration.getGuildName(group);
+				// Add user to guild
+				new BukkitRunnable() {
+					@Override
+					public void run() {
+						User user = LuckPermsIntegration.UM.getUser(player.getUniqueId());
+						user.data().add(InheritanceNode.builder(group).build());
+						LuckPermsIntegration.UM.saveUser(user);
+						LuckPermsIntegration.pushUserUpdate(user);
+					}
+				}.runTaskAsynchronously(plugin);
+
+				// Success indicators
+				player.sendMessage(ChatColor.GOLD + "Congratulations! You have joined " + guildName + "!");
+				p.sendMessage(ChatColor.WHITE + player.getName() + ChatColor.GOLD + " has joined your guild");
+				Bukkit.dispatchCommand(Bukkit.getConsoleSender(),
+				                       "execute at " + player.getName()
+				                       + " run summon minecraft:firework_rocket ~ ~1 ~ "
+				                       + "{LifeTime:0,FireworksItem:{id:firework_rocket,Count:1,tag:{Fireworks:{Explosions:[{Type:1,Colors:[I;16528693],FadeColors:[I;16777215]}]}}}}");
+
+				// All done
+				return;
 			}
 		}
 

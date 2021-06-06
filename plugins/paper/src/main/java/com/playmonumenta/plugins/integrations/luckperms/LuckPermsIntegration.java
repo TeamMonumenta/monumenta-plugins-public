@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.integrations.luckperms;
 
+import java.util.Optional;
 import java.util.Map.Entry;
 
 import org.bukkit.Location;
@@ -10,18 +11,27 @@ import org.bukkit.scheduler.BukkitRunnable;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.utils.LocationUtils;
 
-import me.lucko.luckperms.LuckPerms;
-import me.lucko.luckperms.api.Group;
-import me.lucko.luckperms.api.LuckPermsApi;
-import me.lucko.luckperms.api.MessagingService;
-import me.lucko.luckperms.api.Node;
+import net.luckperms.api.LuckPerms;
+import net.luckperms.api.LuckPermsProvider;
+import net.luckperms.api.messaging.MessagingService;
+import net.luckperms.api.model.group.Group;
+import net.luckperms.api.model.group.GroupManager;
+import net.luckperms.api.model.user.User;
+import net.luckperms.api.model.user.UserManager;
+import net.luckperms.api.node.NodeType;
+import net.luckperms.api.node.types.MetaNode;
+import net.luckperms.api.query.QueryOptions;
 
 public class LuckPermsIntegration {
-	protected static LuckPermsApi LP = null;
+	protected static LuckPerms LP = null;
+	protected static UserManager UM = null;
+	protected static GroupManager GM = null;
 
 	public LuckPermsIntegration(Plugin plugin) {
 		plugin.getLogger().info("Enabling LuckPerms integration");
-		LP = LuckPerms.getApi();
+		LP = LuckPermsProvider.get();
+		UM = LP.getUserManager();
+		GM = LP.getGroupManager();
 
 		CreateGuild.register(plugin);
 		JoinGuild.register(plugin);
@@ -33,20 +43,11 @@ public class LuckPermsIntegration {
 	}
 
 	public static Group getGuild(Player player) {
-		if (LuckPermsIntegration.LP == null) {
-			return null;
-		}
-
-		for (Node userNode : LP.getUser(player.getUniqueId()).getOwnNodes()) {
-			if (userNode.isGroupNode()) {
-				Group group = LP.getGroup(userNode.getGroupName());
-				for (Node groupChildNode : group.getNodes().values()) {
-					if (groupChildNode.isMeta()) {
-						Entry<String, String> meta = groupChildNode.getMeta();
-						if (meta.getKey().equals("guildname")) {
-							return group;
-						}
-					}
+		User user = UM.getUser(player.getUniqueId());
+		for (Group group : user.getInheritedGroups(QueryOptions.nonContextual())) {
+			for (MetaNode node : group.getNodes(NodeType.META)) {
+				if (node.getMetaKey().equals("guildname")) {
+					return group;
 				}
 			}
 		}
@@ -59,12 +60,9 @@ public class LuckPermsIntegration {
 			return null;
 		}
 
-		for (Node groupChildNode : group.getNodes().values()) {
-			if (groupChildNode.isMeta()) {
-				Entry<String, String> meta = groupChildNode.getMeta();
-				if (meta.getKey().equals("guildname")) {
-					return meta.getValue();
-				}
+		for (MetaNode node : group.getNodes(NodeType.META)) {
+			if (node.getMetaKey().equals("guildname")) {
+				return node.getMetaValue();
 			}
 		}
 
@@ -73,35 +71,28 @@ public class LuckPermsIntegration {
 
 	public static void setGuildTp(Group group, Plugin plugin, Location loc) {
 		// Remove all the other guildtp meta nodes
-		for (Node groupChildNode : group.getNodes().values()) {
-			if (groupChildNode.isMeta()) {
-				Entry<String, String> meta = groupChildNode.getMeta();
-				if (meta.getKey().equals("guildtp")) {
-					group.unsetPermission(groupChildNode);
-				}
+		for (MetaNode node : group.getNodes(NodeType.META)) {
+			if (node.getMetaKey().equals("guildtp")) {
+				group.data().remove(node);
 			}
 		}
 
-		group.setPermission(LP.getNodeFactory().makeMetaNode("guildtp", LocationUtils.locationToString(loc)).build());
+		group.data().add(MetaNode.builder("guildtp", LocationUtils.locationToString(loc)).build());
 
 		new BukkitRunnable() {
 			@Override
 			public void run() {
-				LP.getGroupManager().saveGroup(group);
-				LP.runUpdateTask();
-				LP.getMessagingService().ifPresent(MessagingService::pushUpdate);
+				GM.saveGroup(group);
+				pushUpdate();
 			}
 		}.runTaskAsynchronously(plugin);
 	}
 
 	public static Location getGuildTp(World world, Group group) {
 		try {
-			for (Node groupChildNode : group.getNodes().values()) {
-				if (groupChildNode.isMeta()) {
-					Entry<String, String> meta = groupChildNode.getMeta();
-					if (meta.getKey().equals("guildtp")) {
-						return LocationUtils.locationFromString(world, meta.getValue());
-					}
+			for (MetaNode node : group.getNodes(NodeType.META)) {
+				if (node.getMetaKey().equals("guildtp")) {
+					return LocationUtils.locationFromString(world, node.getMetaValue());
 				}
 			}
 		} catch (Exception e) {
@@ -114,5 +105,19 @@ public class LuckPermsIntegration {
 	public static String getCleanGuildName(String guildName) {
 		// Guild name sanitization for command usage
 		return guildName.toLowerCase().replace(" ", "_");
+	}
+
+	public static void pushUpdate() {
+		Optional<MessagingService> mso = LP.getMessagingService();
+		if (mso.isPresent()) {
+			mso.get().pushUpdate();
+		}
+	}
+
+	public static void pushUserUpdate(User user) {
+		Optional<MessagingService> mso = LP.getMessagingService();
+		if (mso.isPresent()) {
+			mso.get().pushUserUpdate(user);
+		}
 	}
 }

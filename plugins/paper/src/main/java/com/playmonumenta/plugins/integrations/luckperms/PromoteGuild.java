@@ -17,7 +17,7 @@ import dev.jorel.commandapi.arguments.Argument;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument.EntitySelector;
 import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
-import me.lucko.luckperms.api.Group;
+import net.luckperms.api.model.group.Group;
 
 public class PromoteGuild {
 	public static void register() {

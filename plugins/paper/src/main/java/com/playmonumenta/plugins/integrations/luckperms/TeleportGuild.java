@@ -15,7 +15,7 @@ import dev.jorel.commandapi.arguments.EntitySelectorArgument;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument.EntitySelector;
 import dev.jorel.commandapi.arguments.TextArgument;
 import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
-import me.lucko.luckperms.api.Group;
+import net.luckperms.api.model.group.Group;
 
 public class TeleportGuild {
 	private static final String COMMAND = "teleportguild";
@@ -72,7 +72,7 @@ public class TeleportGuild {
 			//TODO: Better lookup of guild name?
 			String cleanGuildName = LuckPermsIntegration.getCleanGuildName(guildName);
 
-			group = LuckPermsIntegration.LP.getGroup(cleanGuildName);
+			group = LuckPermsIntegration.GM.getGroup(cleanGuildName);
 			if (group == null) {
 				CommandAPI.fail("The luckperms group '" + cleanGuildName + "' does not exist");
 			}

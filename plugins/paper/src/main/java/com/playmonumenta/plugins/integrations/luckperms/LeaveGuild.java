@@ -18,10 +18,10 @@ import dev.jorel.commandapi.arguments.Argument;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument.EntitySelector;
 import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
-import me.lucko.luckperms.api.Group;
-import me.lucko.luckperms.api.MessagingService;
-import me.lucko.luckperms.api.Node;
-import me.lucko.luckperms.api.User;
+import net.luckperms.api.model.group.Group;
+import net.luckperms.api.model.user.User;
+import net.luckperms.api.node.NodeType;
+import net.luckperms.api.node.types.InheritanceNode;
 
 public class LeaveGuild {
 	public static void register(Plugin plugin) {
@@ -45,43 +45,29 @@ public class LeaveGuild {
 		// Set scores and permissions
 		ScoreboardUtils.setScoreboardValue(player, "Founder", 0);
 
-		for (Node userNode : LuckPermsIntegration.LP.getUser(player.getUniqueId()).getOwnNodes()) {
-			if (userNode.isGroupNode()) {
-				Group group = LuckPermsIntegration.LP.getGroup(userNode.getGroupName());
-				boolean guildFound = false;
-				String guildName = "";
-
-				for (Node groupChildNode : group.getNodes().values()) {
-					if (groupChildNode.isMeta()) {
-						Entry<String, String> meta = groupChildNode.getMeta();
-						if (meta.getKey().equals("guildname")) {
-							guildName = meta.getValue();
-							guildFound = true;
-							break;
-						}
-					}
-				}
-				if (guildFound) {
-					// Remove user from guild
-					new BukkitRunnable() {
-						@Override
-						public void run() {
-							User user = LuckPermsIntegration.LP.getUser(player.getUniqueId());
-							user.unsetPermission(userNode);
-							LuckPermsIntegration.LP.getUserManager().saveUser(user);
-							LuckPermsIntegration.LP.runUpdateTask();
-							LuckPermsIntegration.LP.getMessagingService().ifPresent(MessagingService::pushUpdate);
-						}
-					}.runTaskAsynchronously(plugin);
-
-					player.sendMessage(ChatColor.GOLD + "You have left the guild '" + guildName + "'");
-					return;
-				}
-			}
+		Group group = LuckPermsIntegration.getGuild(player);
+		if (group == null) {
+			String err = ChatColor.RED + "You are not in a guild";
+			player.sendMessage(err);
+			CommandAPI.fail(err);
 		}
 
-		String err = ChatColor.RED + "You are not in a guild";
-		player.sendMessage(err);
-		CommandAPI.fail(err);
+		String guildName = LuckPermsIntegration.getGuildName(group);
+
+		new BukkitRunnable() {
+			@Override
+			public void run() {
+				User user = LuckPermsIntegration.UM.getUser(player.getUniqueId());
+				for (InheritanceNode node : user.getNodes(NodeType.INHERITANCE)) {
+					if (node.getGroupName().equals(group.getName())) {
+						user.data().remove(node);
+					}
+				}
+				LuckPermsIntegration.UM.saveUser(user);
+				LuckPermsIntegration.pushUserUpdate(user);
+			}
+		}.runTaskAsynchronously(plugin);
+
+		player.sendMessage(ChatColor.GOLD + "You have left the guild '" + guildName + "'");
 	}
 }
