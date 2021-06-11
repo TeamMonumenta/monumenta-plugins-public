@@ -19,6 +19,7 @@ import com.playmonumenta.plugins.bosses.spells.headlesshorseman.SpellHellzoneGre
 import com.playmonumenta.plugins.bosses.spells.headlesshorseman.SpellPhantomOfTheOpera;
 import com.playmonumenta.plugins.bosses.spells.headlesshorseman.SpellReaperOfLife;
 import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.SerializationUtils;
 
@@ -36,6 +37,7 @@ import org.bukkit.entity.Creature;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Phantom;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
@@ -309,6 +311,11 @@ public class HeadlessHorsemanBoss extends BossAbilityGroup {
 			player.playSound(player.getLocation(), Sound.ENTITY_HORSE_DEATH, SoundCategory.MASTER, 1.0f, 0.1f);
 			player.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, 20 * 10, 2));
 			player.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 20 * 10, 4));
+		}
+		for (LivingEntity mob : EntityUtils.getNearbyMobs(mSpawnLoc, arenaSize)) {
+			if (mob instanceof Phantom) {
+				mob.setHealth(0);
+			}
 		}
 		mEndLoc.getBlock().setType(Material.REDSTONE_BLOCK);
 	}

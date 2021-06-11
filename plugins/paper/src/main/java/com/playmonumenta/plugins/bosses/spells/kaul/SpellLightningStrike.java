@@ -36,6 +36,9 @@ public class SpellLightningStrike extends Spell {
 	private int mTimer;
 	private int mDivisor;
 	private Location mLoc;
+	private static final double HITBOX_HEIGHT = 10;
+	private static final double HITBOX_RADIUS = 3;
+	private static final double HITBOX_MAX_DIST = Math.sqrt(HITBOX_HEIGHT * HITBOX_HEIGHT + HITBOX_RADIUS * HITBOX_RADIUS);
 	private static final Particle.DustOptions YELLOW_1_COLOR = new Particle.DustOptions(Color.fromRGB(255, 255, 20), 1.0f);
 	private static final Particle.DustOptions YELLOW_2_COLOR = new Particle.DustOptions(Color.fromRGB(255, 255, 120), 1.0f);
 
@@ -61,7 +64,7 @@ public class SpellLightningStrike extends Spell {
 		mCooldown--;
 		if (mCooldown <= 0) {
 			mCooldown = (mTimer / 5);
-			List<Player> players = PlayerUtils.playersInRange(mLoc, mRange);
+			List<Player> players = PlayerUtils.playersInRange(mLoc, mRange, true);
 			if (players.size() > 2) {
 				List<Player> toHit = new ArrayList<Player>();
 				int cap = players.size() / mDivisor;
@@ -117,8 +120,15 @@ public class SpellLightningStrike extends Spell {
 					world.spawnParticle(Particle.SMOKE_LARGE, loc, 10, 0, 0, 0, 0.25);
 					world.playSound(loc, Sound.ENTITY_LIGHTNING_BOLT_THUNDER, 1, 1);
 					world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 1, 0.9f);
-					for (Player p : PlayerUtils.playersInRange(loc, 3)) {
-						multiHit(p);
+					List<Player> potentialHits = PlayerUtils.playersInRange(loc, HITBOX_MAX_DIST, true);
+					for (Player p : potentialHits) {
+						Location pLoc = player.getLocation();
+						if (!(pLoc.getY() > loc.getY() + HITBOX_HEIGHT || pLoc.getY() < loc.getY() - HITBOX_HEIGHT)) {
+							Location flattenedLoc = new Location(world, pLoc.getX(), loc.getY(), pLoc.getZ());
+							if (flattenedLoc.distance(loc) < HITBOX_RADIUS) {
+								multiHit(p);
+							}
+						}
 					}
 					lingeringDamage(world, loc);
 				}

@@ -44,7 +44,7 @@ public class SpellEarthsWrath extends Spell {
 		World world = mBoss.getWorld();
 		Location centerLoc = mBoss.getLocation();
 
-		new BukkitRunnable() {
+		BukkitRunnable runnable = new BukkitRunnable() {
 
 			@Override
 			public void run() {
@@ -61,7 +61,7 @@ public class SpellEarthsWrath extends Spell {
 					loc.setY(mY);
 					for (int i = 0; i < 48; i++) {
 						int j = i;
-						new BukkitRunnable() {
+						BukkitRunnable runnable = new BukkitRunnable() {
 							final BoundingBox mBox = BoundingBox.of(loc, 0.75, 0.4, 0.75);
 							final double mRadian1 = Math.toRadians((7.5 * j));
 							final Location mPoint = loc.clone().add(FastUtils.cos(mRadian1) * 0.5, 0, FastUtils.sin(mRadian1) * 0.5);
@@ -87,13 +87,17 @@ public class SpellEarthsWrath extends Spell {
 								}
 							}
 
-						}.runTaskTimer(mPlugin, 5, 1);
+						};
+						runnable.runTaskTimer(mPlugin, 5, 1);
+						mActiveRunnables.add(runnable);
 
 					}
 				}
 			}
 
-		}.runTaskTimer(mPlugin, 1, 1);
+		};
+		runnable.runTaskTimer(mPlugin, 1, 1);
+		mActiveRunnables.add(runnable);
 	}
 
 

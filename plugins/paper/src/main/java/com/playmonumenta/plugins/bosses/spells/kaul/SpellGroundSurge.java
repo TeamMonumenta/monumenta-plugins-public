@@ -53,7 +53,7 @@ public class SpellGroundSurge extends Spell {
 		mBoss.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, (int)(20 * 2.75), 1));
 		List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), mRange);
 		players.removeIf(p -> p.getLocation().getY() >= 61);
-		new BukkitRunnable() {
+		BukkitRunnable runnable = new BukkitRunnable() {
 			float mPitch = 0;
 			@Override
 			public void run() {
@@ -103,7 +103,7 @@ public class SpellGroundSurge extends Spell {
 					for (Player target : toHit) {
 						Vector dir = LocationUtils.getDirectionTo(target.getLocation(), nloc).setY(0).normalize().multiply(1.1);
 
-						new BukkitRunnable() {
+						BukkitRunnable runnable = new BukkitRunnable() {
 							int mInnerTicks = 0;
 							BoundingBox mBox = BoundingBox.of(nloc, 0.65, 0.65, 0.65);
 
@@ -159,7 +159,7 @@ public class SpellGroundSurge extends Spell {
 											rPlayer = players.get(FastUtils.RANDOM.nextInt(players.size()));
 										}
 										Player tPlayer = rPlayer;
-										new BukkitRunnable() {
+										BukkitRunnable runnable = new BukkitRunnable() {
 											Player mTPlayer = tPlayer;
 											BoundingBox mBox = BoundingBox.of(bLoc, 0.4, 0.4, 0.4);
 											int mTicks = 0;
@@ -233,13 +233,17 @@ public class SpellGroundSurge extends Spell {
 												}
 											}
 
-										}.runTaskTimer(mPlugin, 0, 1);
+										};
+										runnable.runTaskTimer(mPlugin, 0, 1);
+										mActiveRunnables.add(runnable);
 										break;
 									}
 								}
 							}
 
-						}.runTaskTimer(mPlugin, 0, 1);
+						};
+						runnable.runTaskTimer(mPlugin, 0, 1);
+						mActiveRunnables.add(runnable);
 					}
 				}
 				if (mBoss.isDead() || !mBoss.isValid()) {
@@ -247,7 +251,9 @@ public class SpellGroundSurge extends Spell {
 				}
 			}
 
-		}.runTaskTimer(mPlugin, 0, 1);
+		};
+		runnable.runTaskTimer(mPlugin, 0, 1);
+		mActiveRunnables.add(runnable);
 	}
 
 	@Override

@@ -40,6 +40,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 public class SpellRaiseJungle extends Spell {
 	private static final BlockData PARTICLE_DATA = Material.COARSE_DIRT.createBlockData();
+	private static final int ARENA_FLOOR = 8;
 
 	private Plugin mPlugin;
 	private LivingEntity mBoss;
@@ -77,7 +78,7 @@ public class SpellRaiseJungle extends Spell {
 		if (mY > 0) {
 			loc.setY(mY);
 		}
-		List<Player> players = PlayerUtils.playersInRange(loc, mDetectRange);
+		List<Player> players = PlayerUtils.playersInRange(loc, mDetectRange, true);
 		players.removeIf(p -> p.getLocation().getY() >= 61);
 		int num = 0;
 		if (players.size() == 1) {
@@ -97,13 +98,15 @@ public class SpellRaiseJungle extends Spell {
 				for (int i = 0; i < amt; i++) {
 					double x = FastUtils.randomDoubleInRange(-mSummonRange, mSummonRange);
 					double z = FastUtils.randomDoubleInRange(-mSummonRange, mSummonRange);
-					Location sLoc = loc.clone().add(x, 0.25, z);
-					while (sLoc.getBlock().getType().isSolid() || sLoc.getBlock().isLiquid()) {
+					Location sLoc = loc.clone().add(x, 0, z);
+					sLoc.setY(ARENA_FLOOR + 0.25); //so that they do not summon midair if Kaul/Primordial happens to be above the floor
+					while (sLoc.getBlock().getType().isSolid() || sLoc.getBlock().isLiquid()) { // cannot spawn in a location where after raising is in a block or a liquid
 						x = FastUtils.randomDoubleInRange(-mSummonRange, mSummonRange);
 						z = FastUtils.randomDoubleInRange(-mSummonRange, mSummonRange);
-						sLoc = loc.clone().add(x, 0.25, z);
+						sLoc = loc.clone().add(x, 0, z);
+						sLoc.setY(ARENA_FLOOR + 0.25);
 					}
-					Location spawn = sLoc.clone().subtract(0, 1.75, 0);
+					Location spawn = sLoc.clone().subtract(0, 1.75, 0); // should end up 1.5 blocks below the arena floor
 					LivingEntity ele = (LivingEntity)LibraryOfSoulsIntegration.summon(spawn, "EarthElemental");
 					Location scLoc = sLoc.clone();
 					if (ele != null && !mSummoned.contains(ele.getUniqueId())) {
