@@ -9,7 +9,7 @@ import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
 
 public class UnlockHeldItem extends GenericCommand {
 	public static void register() {
-		registerPlayerCommand("unlockhelditem", "monumenta.command.unlockhelditem", LockedHeldItem::run);
+		registerPlayerCommand("unlockhelditem", "monumenta.command.unlockhelditem", UnlockHeldItem::run);
 	}
 
 	public static void run(CommandSender sender, Player player) throws WrapperCommandSyntaxException {
