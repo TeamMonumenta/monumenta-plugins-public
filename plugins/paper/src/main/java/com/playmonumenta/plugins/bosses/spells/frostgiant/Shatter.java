@@ -68,7 +68,7 @@ public class Shatter extends Spell {
 
 		mBoss.setAI(false);
 		World world = mBoss.getWorld();
-		List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), 50);
+		List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), 50, true);
 		players.removeIf(p -> p.getGameMode() != GameMode.SURVIVAL);
 		Player target = null;
 
@@ -160,7 +160,7 @@ public class Shatter extends Spell {
 				if (mT >= 20 * 2.5) {
 					mBoss.setAI(true);
 					Mob mob = (Mob) mBoss;
-					List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), FrostGiant.detectionRange);
+					List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), FrostGiant.detectionRange, true);
 					players.removeIf(p -> p.getGameMode() != GameMode.SURVIVAL);
 					if (players.size() > 1) {
 						Player player = players.get(FastUtils.RANDOM.nextInt(players.size()));

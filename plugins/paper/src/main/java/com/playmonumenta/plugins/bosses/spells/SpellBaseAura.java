@@ -66,17 +66,19 @@ public class SpellBaseAura extends Spell {
 	public void run() {
 		Location bossLoc = mBoss.getLocation();
 
-		for (Player player : mParticlePlayers) {
-			if (mParticle.equals(Particle.REDSTONE)) {
-				// Generate particles in area
-				player.spawnParticle(mParticle, bossLoc, mNumParticles, mParticleDX, mParticleDY, mParticleDZ, mParticleArg);
-				// Generate particles immediately around boss
-				player.spawnParticle(mParticle, bossLoc.clone().add(0, 1, 0), 2, 1, 1, 1, mParticleArg);
-			} else {
-				// Generate particles in area
-				player.spawnParticle(mParticle, bossLoc, mNumParticles, mParticleDX, mParticleDY, mParticleDZ);
-				// Generate particles immediately around boss
-				player.spawnParticle(mParticle, bossLoc.clone().add(0, 1, 0), 2, 1, 1, 1);
+		if (mParticle != null) {
+			for (Player player : mParticlePlayers) {
+				if (mParticleArg != null) {
+					// Generate particles in area
+					player.spawnParticle(mParticle, bossLoc, mNumParticles, mParticleDX, mParticleDY, mParticleDZ, mParticleArg);
+					// Generate particles immediately around boss
+					player.spawnParticle(mParticle, bossLoc.clone().add(0, 1, 0), 2, 1, 1, 1, mParticleArg);
+				} else {
+					// Generate particles in area
+					player.spawnParticle(mParticle, bossLoc, mNumParticles, mParticleDX, mParticleDY, mParticleDZ);
+					// Generate particles immediately around boss
+					player.spawnParticle(mParticle, bossLoc.clone().add(0, 1, 0), 2, 1, 1, 1);
+				}
 			}
 		}
 
@@ -97,23 +99,25 @@ public class SpellBaseAura extends Spell {
 		}
 
 		// Update the group of nearby players who can see the particles every 5s
-		mParticleIter++;
-		if (mParticleIter >= 20) {
-			mParticleIter = 0;
+		if (mParticle != null) {
+			mParticleIter++;
+			if (mParticleIter >= 20) {
+				mParticleIter = 0;
 
-			// Loop through all nearby players and put the ones that don't have
-			// the noAuraParticles tag on a list to send particles to them
-			mParticlePlayers.clear();
-			for (Player player : PlayerUtils.playersInRange(bossLoc, 80)) {
-				boolean particlesOk = true;
-				for (String tag : player.getScoreboardTags()) {
-					if (tag.equals("noAuraParticles")) {
-						particlesOk = false;
-						break;
+				// Loop through all nearby players and put the ones that don't have
+				// the noAuraParticles tag on a list to send particles to them
+				mParticlePlayers.clear();
+				for (Player player : PlayerUtils.playersInRange(bossLoc, 80)) {
+					boolean particlesOk = true;
+					for (String tag : player.getScoreboardTags()) {
+						if (tag.equals("noAuraParticles")) {
+							particlesOk = false;
+							break;
+						}
 					}
-				}
-				if (particlesOk) {
-					mParticlePlayers.add(player);
+					if (particlesOk) {
+						mParticlePlayers.add(player);
+					}
 				}
 			}
 		}

@@ -23,10 +23,12 @@ import com.playmonumenta.plugins.bosses.bosses.FrostGiant;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 
 public class SpellFallingIcicle extends Spell {
+	private static final int RESPAWN_DURATION = 20 * 3;
 
 	private Plugin mPlugin;
 	private LivingEntity mBoss;
-	BoundingBox mBox;
+	private BoundingBox mBox;
+	private boolean mCurrentlyRespawning = false;
 
 
 	public SpellFallingIcicle(Plugin plugin, LivingEntity boss) {
@@ -38,6 +40,11 @@ public class SpellFallingIcicle extends Spell {
 
 	@Override
 	public void run() {
+		if (mCurrentlyRespawning) {
+			/* No arrow checks while still respawning */
+			return;
+		}
+
 		Location loc = mBoss.getLocation();
 		World world = mBoss.getWorld();
 		Collection<AbstractArrow> projectiles = world.getNearbyEntitiesByType(AbstractArrow.class, mBoss.getLocation(), 25);
@@ -176,29 +183,31 @@ public class SpellFallingIcicle extends Spell {
 		return 0;
 	}
 
-	//Respawns block by block every tick, then all of them after 15 seconds
 	private void runIcicleRespawn(List<Location> icicle) {
 		if (icicle.size() > 0) {
+			mCurrentlyRespawning = true;
+
 			BukkitRunnable runnable = new BukkitRunnable() {
 				int mTicks = 0;
 				int mCount = 0;
 				@Override
 				public void run() {
-					if (mTicks >= 20 * 15) {
-						for (int i = 0; i < ((icicle.size() - 1) / (20 * 15)) + 1; i++) {
-							icicle.get(mCount).getBlock().setType(Material.ICE);
-							mCount++;
-							if (mCount >= icicle.size()) {
-								this.cancel();
-								return;
+					/* Replace a slice of blocks every tick, so that all blocks are replaced over the duration */
+					for (; mCount < (((icicle.size() - 1) * mTicks) / (RESPAWN_DURATION)) + 1; mCount++) {
+						icicle.get(mCount).getBlock().setType(Material.ICE);
+					}
+					if (mCount >= icicle.size()) {
+						mCurrentlyRespawning = false;
+
+						/* Remove any arrows that had already been stuck in the ice while it was respawning */
+						for (AbstractArrow proj : mBoss.getWorld().getNearbyEntitiesByType(AbstractArrow.class, mBoss.getLocation(), 25)) {
+							if (proj.getBoundingBox().overlaps(mBox)) {
+								proj.remove();
 							}
 						}
-					}
-					if (icicle.size() > mCount) {
-						icicle.get(mCount).getBlock().setType(Material.ICE);
-						mCount++;
-					} else {
+
 						this.cancel();
+						return;
 					}
 					mTicks++;
 				}

@@ -161,7 +161,7 @@ public class ArmorOfFrost extends Spell {
 			}
 		} else {
 			//If permafrost shield already down, do normal damage and reset countdown for permafrost armor
-			mBoss.damage(40);
+			mBoss.damage(70);
 			mBoss.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 3, 1));
 			runCooldown();
 		}

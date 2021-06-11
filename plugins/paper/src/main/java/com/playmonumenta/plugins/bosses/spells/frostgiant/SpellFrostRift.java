@@ -58,6 +58,7 @@ public class SpellFrostRift extends Spell {
 	@Override
 	public void run() {
 		mCooldown = true;
+
 		new BukkitRunnable() {
 
 			@Override
@@ -69,7 +70,7 @@ public class SpellFrostRift extends Spell {
 		World world = mBoss.getWorld();
 		world.playSound(mBoss.getLocation(), Sound.ENTITY_ENDER_DRAGON_GROWL, SoundCategory.HOSTILE, 3, 0.5f);
 
-		List<Player> players = PlayerUtils.playersInRange(mStartLoc, FrostGiant.fighterRange);
+		List<Player> players = PlayerUtils.playersInRange(mStartLoc, FrostGiant.fighterRange, true);
 		List<Player> targets = new ArrayList<Player>();
 		List<Location> locs = new ArrayList<Location>();
 		if (players.size() >= 2) {
@@ -92,30 +93,39 @@ public class SpellFrostRift extends Spell {
 				locs.add(p.getLocation());
 			}
 		}
+		mBoss.setAI(false);
 
 		new BukkitRunnable() {
 			int mT = 0;
 			float mPitch = 1;
+			Location mLoc = mBoss.getLocation().add(0, 0.5, 0);
+
 			@Override
 			public void run() {
 				mT += 2;
-				Location loc = mBoss.getLocation();
 				mPitch += 0.025;
 
-				for (Player p : targets) {
-					p.playSound(loc, Sound.UI_TOAST_IN, SoundCategory.HOSTILE, 2f, mPitch + 0.5f);
+				for (Location p : locs) {
+					Vector line = LocationUtils.getDirectionTo(p, mLoc).setY(0).normalize();
+					Location point = mLoc;
+					for (int i = 1; i < 40; i++) {
+						point = point.add(line);
+						//world.spawnParticle(Particle.BARRIER, particleLine, 1, 0, 0, 0);
+						world.spawnParticle(Particle.SQUID_INK, point, 1, 0.25, 0.25, 0.25, 0);
+					}
 				}
-				world.playSound(loc, Sound.BLOCK_ANVIL_LAND, SoundCategory.HOSTILE, 0.5f, mPitch);
-				world.spawnParticle(Particle.CLOUD, loc, 8, 1, 0.1, 1, 0.25);
-				world.spawnParticle(Particle.SMOKE_LARGE, loc, 5, 1, 0.1, 1, 0.25);
+				world.playSound(mLoc, Sound.BLOCK_ANVIL_LAND, SoundCategory.HOSTILE, 0.5f, mPitch);
+				world.spawnParticle(Particle.CLOUD, mLoc, 8, 1, 0.1, 1, 0.25);
+				world.spawnParticle(Particle.SMOKE_LARGE, mLoc, 5, 1, 0.1, 1, 0.25);
 
 				//Has a max of 3 rifts
-				if (mT >= 20 * 2.5) {
+				if (mT >= 20 * 2) {
 					this.cancel();
 
 					for (Location l : locs) {
 						createRift(l, players);
 					}
+					mBoss.setAI(true);
 				}
 			}
 		}.runTaskTimer(mPlugin, 0, 2);
@@ -202,10 +212,10 @@ public class SpellFrostRift extends Spell {
 					world.spawnParticle(Particle.REDSTONE, loc, 1, 0.5, 0.5, 0.5, 0.075, BLACK_COLOR);
 					world.spawnParticle(Particle.EXPLOSION_NORMAL, loc, 1, 0.5, 0.5, 0.5, 0.1);
 					world.spawnParticle(Particle.DAMAGE_INDICATOR, loc, 1, 0.5, 0.5, 0.5, 0.1);
-					BoundingBox box = BoundingBox.of(loc, 0.85, 1.5, 0.85);
+					BoundingBox box = BoundingBox.of(loc, 0.85, 1.2, 0.85);
 					for (Player player : players) {
 						if (player.getBoundingBox().overlaps(box)) {
-							BossUtils.bossDamage(mBoss, player, 20, null);
+							BossUtils.bossDamage(mBoss, player, 25, null);
 							player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 6, 2));
 							player.addPotionEffect(new PotionEffect(PotionEffectType.HUNGER, 20 * 6, 49));
 						}

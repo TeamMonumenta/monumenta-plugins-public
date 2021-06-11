@@ -87,7 +87,7 @@ public class SpellGreatswordSlam extends Spell {
 			public void run() {
 
 				mT += 10;
-				if (mT > 20 * 6) {
+				if (mT > 20 * 3.5) {
 					this.cancel();
 				}
 
@@ -206,7 +206,7 @@ public class SpellGreatswordSlam extends Spell {
 										world.playSound(l, Sound.BLOCK_GLASS_BREAK, SoundCategory.HOSTILE, 3, 0);
 									}
 								}
-								for (Player player : PlayerUtils.playersInRange(loc, 40)) {
+								for (Player player : PlayerUtils.playersInRange(loc, 40, true)) {
 									if (player.getLocation().distance(mStartLoc) > FrostGiant.fighterRange) {
 										continue;
 									}

@@ -73,7 +73,6 @@ public class SpellSpinDown extends Spell {
 		world.spawnParticle(Particle.EXPLOSION_NORMAL, bossLoc, 25, 0.2, 0, 0.2, 0.1);
 
 		FrostGiant.delayHailstormDamage();
-		FrostGiant.delayDamage();
 
 		Map<Location, Material> oldBlocks = new HashMap<>();
 		Map<Location, BlockData> oldData = new HashMap<>();
@@ -101,7 +100,6 @@ public class SpellSpinDown extends Spell {
 				Location loc = mBoss.getLocation();
 				loc.setYaw(loc.getYaw() + vel);
 				mBoss.teleport(loc);
-				FrostGiant.delayDamage();
 
 				if (mTicks % 2 == 0 && mTicks <= 20 * 3) {
 					world.playSound(mBoss.getLocation(), Sound.ENTITY_IRON_GOLEM_ATTACK, SoundCategory.HOSTILE, 4, mPitch);

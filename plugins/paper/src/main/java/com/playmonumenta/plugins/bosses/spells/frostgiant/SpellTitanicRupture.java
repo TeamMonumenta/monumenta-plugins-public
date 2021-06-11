@@ -70,7 +70,7 @@ public class SpellTitanicRupture extends Spell {
 
 				if (mT >= 20 * 2.5) {
 					this.cancel();
-					List<Player> players = PlayerUtils.playersInRange(mStartLoc, FrostGiant.fighterRange);
+					List<Player> players = PlayerUtils.playersInRange(mStartLoc, FrostGiant.fighterRange, true);
 					List<Player> targets = new ArrayList<Player>();
 					if (players.size() >= 3) {
 						while (targets.size() < 3) {

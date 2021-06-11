@@ -26,8 +26,6 @@ public class AuraSmallSlownessBoss extends BossAbilityGroup {
 	public static final String identityTag = "aura_slowness";
 	public static final int detectionRange = 40;
 
-	private static final Particle.DustOptions SLOWNESS_COLOR = new Particle.DustOptions(Color.fromRGB(0, 0, 0), 2f);
-
 	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
 		return new AuraSmallSlownessBoss(plugin, boss);
 	}
@@ -36,9 +34,9 @@ public class AuraSmallSlownessBoss extends BossAbilityGroup {
 		super(plugin, identityTag, boss);
 
 		List<Spell> passiveSpells = Arrays.asList(
-			new SpellBaseAura(boss, 8, 5, 8, 14, Particle.REDSTONE, SLOWNESS_COLOR,
+			new SpellBaseAura(boss, 8, 5, 8, 14, null, null,
 			                  (Player player) -> {
-			                      player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 60, 1, true, true));
+			                      player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20, 1, true, true));
 			                  })
 		);
 

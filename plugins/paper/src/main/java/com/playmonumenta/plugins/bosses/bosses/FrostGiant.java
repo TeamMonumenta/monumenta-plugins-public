@@ -56,6 +56,7 @@ import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.bosses.spells.SpellPurgeNegatives;
 import com.playmonumenta.plugins.bosses.spells.frostgiant.ArmorOfFrost;
+import com.playmonumenta.plugins.bosses.spells.frostgiant.GiantStomp;
 import com.playmonumenta.plugins.bosses.spells.frostgiant.RingOfFrost;
 import com.playmonumenta.plugins.bosses.spells.frostgiant.Shatter;
 import com.playmonumenta.plugins.bosses.spells.frostgiant.SpellAirGolemStrike;
@@ -159,6 +160,7 @@ public class FrostGiant extends BossAbilityGroup {
 	public static final int detectionRange = 80;
 	public static final int hailstormRadius = 16;
 	public static final int frostedIceDuration = 30;
+	public static Boolean castStomp = true;
 
 	//Range of those who are actively in the fight from the center of the arena
 	public static final int fighterRange = 36;
@@ -169,10 +171,8 @@ public class FrostGiant extends BossAbilityGroup {
 	private final Location mSpawnLoc;
 
 	private final Location mEndLoc;
-	private boolean mCooldown;
 	private static final String START_TAG = "FrostGiantStart";
 	//Giants hitboxes are huge as hell. We need a custom melee method
-	private double mAttackDamage = 30;
 	private LivingEntity mStart;
 	private Location mStartLoc;
 	private boolean mCutsceneDone = false;
@@ -204,11 +204,8 @@ public class FrostGiant extends BossAbilityGroup {
 	private UltimateSeismicRuin mRuin;
 
 	//Melee does damage
-	private boolean mDoDamage = true;
 	private BukkitRunnable mDelay;
 
-	//Default: 3f, phase 3: 1f, phase 4: 0.5f
-	private float mMeleeKnockback = 3f;
 
 	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
 		return SerializationUtils.statefulBossDeserializer(boss, identityTag, (spawnLoc, endLoc) -> {
@@ -229,7 +226,6 @@ public class FrostGiant extends BossAbilityGroup {
 		super(plugin, identityTag, boss);
 		mSpawnLoc = spawnLoc;
 		mEndLoc = endLoc;
-		mCooldown = false;
 		World world = boss.getWorld();
 		mBoss.addScoreboardTag("Boss");
 		mBoss.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, 20 * 9999, 0));
@@ -319,82 +315,7 @@ public class FrostGiant extends BossAbilityGroup {
 
 		}.runTaskTimer(mPlugin, 20 * 5, 5);
 
-		//Custom Attack Method
-		//Default Damage for Giant is 50
-		//This one does 60% of the player's health and knocks them back
-		//The ability also knocks back and damages players nearby
 		Creature c = (Creature) mBoss;
-		new BukkitRunnable() {
-
-			@Override
-			public void run() {
-				if (c.getTarget() != null && mCutsceneDone) {
-					LivingEntity target = c.getTarget();
-					if (c.getTarget().getLocation().distance(mStartLoc) > fighterRange) {
-						//List is farthest players in the beginning, and nearest players at the end
-						for (Player p : EntityUtils.getNearestPlayers(mStartLoc, fighterRange)) {
-							if (p.getGameMode() == GameMode.SURVIVAL) {
-								c.setTarget(p);
-								break;
-							}
-						}
-					}
-
-					if (target.getBoundingBox().overlaps(mBoss.getBoundingBox().expand(0.5, 0, 0.5)) && !mCooldown && mDoDamage) {
-						mCooldown = true;
-
-						if (mDelay != null && !mDelay.isCancelled()) {
-							mDelay.cancel();
-						}
-
-						mDelay = new BukkitRunnable() {
-
-							@Override
-							public void run() {
-								mCooldown = false;
-							}
-
-						};
-						mDelay.runTaskLater(mPlugin, 20 * 4);
-
-						//Damages and knocks back player
-						if (target instanceof Player) {
-							BossUtils.bossDamagePercent(mBoss, (Player) target, 0.5);
-						} else {
-							target.damage(mAttackDamage, mBoss);
-						}
-						//Lessknockback = true for phases 3 and onward
-						MovementUtils.knockAway(mBoss.getLocation(), target, mMeleeKnockback, 0.1f, false);
-
-						world.playSound(mBoss.getLocation(), Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, SoundCategory.HOSTILE, 2, 0.1f);
-						world.playSound(mBoss.getLocation(), Sound.ENTITY_GENERIC_HURT, SoundCategory.HOSTILE, 3, 0.5f);
-						world.spawnParticle(Particle.EXPLOSION_NORMAL, target.getLocation(), 50, 2, 0.1, 2, 0.1);
-						world.spawnParticle(Particle.LAVA, target.getLocation(), 15, 2, 0.1, 2, 0.1);
-						world.spawnParticle(Particle.BLOCK_DUST, target.getLocation(), 40, 2, 0.35, 2, 0.25, Material.COARSE_DIRT.createBlockData());
-
-						//List is farthest players in the beginning, and nearest players at the end
-						for (Player p : EntityUtils.getNearestPlayers(mStartLoc, fighterRange)) {
-							if (p.getGameMode() == GameMode.SURVIVAL) {
-								c.setTarget(p);
-								break;
-							}
-						}
-					}
-				} else {
-					//List is farthest players in the beginning, and nearest players at the end
-					for (Player p : EntityUtils.getNearestPlayers(mStartLoc, fighterRange)) {
-						if (p.getGameMode() == GameMode.SURVIVAL) {
-							c.setTarget(p);
-							break;
-						}
-					}
-				}
-				if (mBoss.isDead() || !mBoss.isValid()) {
-					this.cancel();
-				}
-			}
-
-		}.runTaskTimer(plugin, 0, 2);
 
 		//Targetting system
 		//Forcefully targets a nearby player if no target
@@ -503,11 +424,12 @@ public class FrostGiant extends BossAbilityGroup {
 				));
 
 		List<Spell> phase1PassiveSpells = Arrays.asList(
-				new ArmorOfFrost(mPlugin, mBoss, this, 3),
+				new ArmorOfFrost(mPlugin, mBoss, this, 2),
 				new SpellPurgeNegatives(mBoss, 20 * 4),
 				new SpellFrostGiantBlockBreak(mBoss, 5, 15, 5, mStartLoc),
 				new SpellHailstorm(mPlugin, mBoss, hailstormRadius, mStartLoc),
-				new SpellFrostbite(mPlugin, mBoss, mStartLoc)
+				new SpellFrostbite(mPlugin, mBoss, mStartLoc),
+				new GiantStomp(mPlugin, mBoss)
 				);
 
 		List<Spell> phase2PassiveSpells = Arrays.asList(
@@ -516,7 +438,8 @@ public class FrostGiant extends BossAbilityGroup {
 				new SpellFrostGiantBlockBreak(mBoss, 5, 15, 5, mStartLoc),
 				new SpellHailstorm(mPlugin, mBoss, hailstormRadius, mStartLoc),
 				new SpellFrostbite(mPlugin, mBoss, mStartLoc),
-				new SpellFrostedIceBreak(mBoss)
+				new SpellFrostedIceBreak(mBoss),
+				new GiantStomp(mPlugin, mBoss)
 				);
 		List<Spell> phase3PassiveSpells = Arrays.asList(
 				new ArmorOfFrost(mPlugin, mBoss, this, 1),
@@ -524,7 +447,8 @@ public class FrostGiant extends BossAbilityGroup {
 				new SpellFrostGiantBlockBreak(mBoss, 5, 15, 5, mStartLoc),
 				new SpellHailstorm(mPlugin, mBoss, hailstormRadius, mStartLoc),
 				new SpellFrostbite(mPlugin, mBoss, mStartLoc),
-				new SpellFrostedIceBreak(mBoss)
+				new SpellFrostedIceBreak(mBoss),
+				new GiantStomp(mPlugin, mBoss)
 				);
 
 		List<Spell> phase4PassiveSpells = Arrays.asList(
@@ -533,7 +457,8 @@ public class FrostGiant extends BossAbilityGroup {
 				new SpellFrostGiantBlockBreak(mBoss, 5, 15, 5, mStartLoc),
 				new SpellHailstorm(mPlugin, mBoss, hailstormRadius, mStartLoc),
 				new SpellFrostbite(mPlugin, mBoss, mStartLoc),
-				new SpellFrostedIceBreak(mBoss)
+				new SpellFrostedIceBreak(mBoss),
+				new GiantStomp(mPlugin, mBoss)
 				);
 
 		Map<Integer, BossHealthAction> events = new HashMap<Integer, BossHealthAction>();
@@ -582,8 +507,6 @@ public class FrostGiant extends BossAbilityGroup {
 
 		//Phase 3
 		events.put(33, mBoss -> {
-			mMeleeKnockback = 1;
-
 			PlayerUtils.executeCommandOnNearbyPlayers(mStartLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"THE SONG WILL PREVAIL... ALL WILL SUCCUMB TO THE BITTER COLD...\",\"color\":\"dark_aqua\"}]");
 			//Manually cancel Armor of Frost's cooldown mechanic
 			for (Spell sp : phase2PassiveSpells) {
@@ -609,7 +532,7 @@ public class FrostGiant extends BossAbilityGroup {
 		});
 
 		//Third and fourth seismic ruin
-		events.put(10, mBoss -> {
+		events.put(15, mBoss -> {
 
 			PlayerUtils.executeCommandOnNearbyPlayers(mStartLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"I... WILL NOT... BE THE END... OF THE SONG!\",\"color\":\"dark_aqua\"}]");
 			mFrostArmorActive = true;
@@ -1039,10 +962,7 @@ public class FrostGiant extends BossAbilityGroup {
 	@Override
 	public void bossDamagedEntity(EntityDamageByEntityEvent event) {
 		if (event.getEntity() instanceof Player && event.getCause().equals(DamageCause.ENTITY_ATTACK)) {
-			Player player = (Player) event.getEntity();
-			if (player.isBlocking()) {
-				player.setCooldown(Material.SHIELD, 20 * 30);
-			}
+			event.setCancelled(true);
 		}
 		//The "default" Giant attacks need to be cancelled so it does not trigger evasion
 		if (event.getDamage() <= 0) {
@@ -1129,25 +1049,7 @@ public class FrostGiant extends BossAbilityGroup {
 
 		//Both abilities delayed by 1.5s
 		//Delays damage for melee
-		delayDamage();
 		delayHailstormDamage();
-	}
-
-	public static void delayDamage() {
-		if (mInstance != null) {
-			if (mInstance.mDelay != null && !mInstance.mDelay.isCancelled()) {
-				mInstance.mDelay.cancel();
-			}
-
-			mInstance.mDoDamage = false;
-			mInstance.mDelay = new BukkitRunnable() {
-				@Override
-				public void run() {
-					mInstance.mDoDamage = true;
-				}
-			};
-			mInstance.mDelay.runTaskLater(mInstance.mPlugin, 20 * 4);
-		}
 	}
 
 	public static boolean delayHailstormDamage() {
@@ -1209,6 +1111,7 @@ public class FrostGiant extends BossAbilityGroup {
 
 	//Golem Stun on certain ability casts from boss.
 	public static void freezeGolems(LivingEntity mBoss) {
+		castStomp = false;
 		mBoss.addScoreboardTag("GolemFreeze");
 		Location loc = mBoss.getLocation();
 		for (LivingEntity mob : EntityUtils.getNearbyMobs(loc, FrostGiant.detectionRange)) {
@@ -1221,6 +1124,7 @@ public class FrostGiant extends BossAbilityGroup {
 	}
 
 	public static void unfreezeGolems(LivingEntity mBoss) {
+		castStomp = true;
 		if (mBoss.getScoreboardTags().contains("GolemFreeze")) {
 			Location loc = mBoss.getLocation();
 			mBoss.removeScoreboardTag("GolemFreeze");

@@ -98,7 +98,7 @@ public class SpellHailstorm extends Spell {
 			return;
 		}
 
-		for (Player player : PlayerUtils.playersInRange(loc, FrostGiant.detectionRange)) {
+		for (Player player : PlayerUtils.playersInRange(loc, FrostGiant.detectionRange, true)) {
 
 			//This location sets player's y location to the mBoss' y location to compute location ignoring the y level
 			//Essentially distance in terms of x and z only
