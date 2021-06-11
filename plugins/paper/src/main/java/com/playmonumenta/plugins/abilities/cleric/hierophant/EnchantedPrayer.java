@@ -7,7 +7,7 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.effects.EnchantedPrayerAoE;
 import com.playmonumenta.plugins.utils.FastUtils;
-import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 
 import org.bukkit.Location;
@@ -22,19 +22,6 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 
 
-/*
- * Enchanted Prayer: Jump and shift right-click to enchant the
- * weapons of all players in a 15-block radius (including
- * yourself) with holy magic, making their next melee attack
- * release light energy. The amplified attack deals additional
- * 7 / 12 damage in a 3.5 block radius around the target,
- * while healing the player for 2 / 4 hearts. (Cooldown: 18 s)
- *
- * TODO: The enchanting portion of this ability is not currently very
- * organized/efficient with our current systems setup. A workaround
- * will be used for now but I recommend we get some sort of Custom Effect
- * system implemented for current and future effects like this. - Fire
- */
 public class EnchantedPrayer extends Ability {
 
 	private static final int ENCHANTED_PRAYER_COOLDOWN = 20 * 18;
@@ -77,7 +64,7 @@ public class EnchantedPrayer extends Ability {
 		}
 
 		ItemStack mainHand = mPlayer.getInventory().getItemInMainHand();
-		if (InventoryUtils.isBowItem(mainHand)) {
+		if (ItemUtils.isSomeBow(mainHand)) {
 			return;
 		}
 

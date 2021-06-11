@@ -423,16 +423,4 @@ public class PotionUtils {
 
 		return isLuckPotion;
 	}
-
-	public static boolean isSomePotion(@NotNull ItemStack itemStack) {
-		return isSomePotion(itemStack.getType());
-	}
-
-	public static boolean isSomePotion(@NotNull Material material) {
-		return (
-			material == Material.POTION
-			|| material == Material.SPLASH_POTION
-			|| material == Material.LINGERING_POTION
-		);
-	}
 }

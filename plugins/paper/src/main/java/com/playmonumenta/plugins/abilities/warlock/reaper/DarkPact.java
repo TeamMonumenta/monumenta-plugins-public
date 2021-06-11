@@ -14,7 +14,7 @@ import com.playmonumenta.plugins.effects.PercentDamageDealt;
 import com.playmonumenta.plugins.effects.PercentDamageReceived;
 import com.playmonumenta.plugins.effects.PercentHeal;
 import com.playmonumenta.plugins.utils.AbsorptionUtils;
-import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.utils.ItemUtils;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Particle;
@@ -73,7 +73,7 @@ public class DarkPact extends Ability {
 
 	@Override
 	public void playerSwapHandItemsEvent(PlayerSwapHandItemsEvent event) {
-		if (InventoryUtils.isScytheItem(mPlayer.getInventory().getItemInMainHand())) {
+		if (ItemUtils.isHoe(mPlayer.getInventory().getItemInMainHand())) {
 			event.setCancelled(true);
 			// *TO DO* - Turn into boolean in constructor -or- look at changing trigger entirely
 			if (mPlayer.isOnGround() || mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.mLinkedSpell) || (mPlayer.isSneaking() && mJudgementChain != null && mPlayer.getLocation().getPitch() < -50.0)) {

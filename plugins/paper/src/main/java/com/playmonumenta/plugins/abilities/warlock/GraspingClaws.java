@@ -6,7 +6,6 @@ import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.classes.magic.MagicType;
 import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 
@@ -58,7 +57,7 @@ public class GraspingClaws extends Ability {
 	@Override
 	public void cast(Action action) {
 		ItemStack inMainHand = mPlayer.getInventory().getItemInMainHand();
-		if (!mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), ClassAbility.GRASPING_CLAWS) && mPlayer.isSneaking() && InventoryUtils.isBowItem(inMainHand) && !ItemUtils.isItemShattered(inMainHand)) {
+		if (!mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), ClassAbility.GRASPING_CLAWS) && mPlayer.isSneaking() && ItemUtils.isSomeBow(inMainHand) && !ItemUtils.isItemShattered(inMainHand)) {
 			mArrow = mPlayer.launchProjectile(Arrow.class);
 			mArrow.setDamage(0);
 			mArrow.setVelocity(mPlayer.getLocation().getDirection().multiply(1.5));
@@ -91,5 +90,4 @@ public class GraspingClaws extends Ability {
 			proj.remove();
 		}
 	}
-
 }

@@ -171,17 +171,17 @@ public class EntityUtils {
 		EntityType.ILLUSIONER,
 		EntityType.PILLAGER,
 		EntityType.VINDICATOR,
+
 		EntityType.VEX,
+		EntityType.WITCH,
+
+		EntityType.PIGLIN,
+		EntityType.PIGLIN_BRUTE,
 
 		EntityType.IRON_GOLEM,
 		EntityType.SNOWMAN,
 
-		EntityType.WITCH,
-
-		EntityType.GIANT,
-		
-		EntityType.PIGLIN,
-		EntityType.PIGLIN_BRUTE
+		EntityType.GIANT
 	);
 
 	private static final String COOLING_ATTR_NAME = "CoolingSlownessAttr";

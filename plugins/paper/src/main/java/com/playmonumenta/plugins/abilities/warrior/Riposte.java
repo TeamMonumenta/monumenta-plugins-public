@@ -1,11 +1,20 @@
 package com.playmonumenta.plugins.abilities.warrior;
 
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.potion.PotionManager.PotionID;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.LocationUtils;
+import com.playmonumenta.plugins.utils.MovementUtils;
+
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
-import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Guardian;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
@@ -14,14 +23,7 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.classes.ClassAbility;
-import com.playmonumenta.plugins.potion.PotionManager.PotionID;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.InventoryUtils;
-import com.playmonumenta.plugins.utils.LocationUtils;
-import com.playmonumenta.plugins.utils.MovementUtils;
+
 
 public class Riposte extends Ability {
 
@@ -50,13 +52,13 @@ public class Riposte extends Ability {
 				ItemStack mainHand = mPlayer.getInventory().getItemInMainHand();
 				MovementUtils.knockAway(mPlayer, damager, RIPOSTE_KNOCKBACK_SPEED);
 
-				if (InventoryUtils.isAxeItem(mainHand) || InventoryUtils.isSwordItem(mainHand)) {
+				if (ItemUtils.isAxe(mainHand) || ItemUtils.isSword(mainHand)) {
 					if (getAbilityScore() > 1) {
-						if (InventoryUtils.isSwordItem(mainHand)) {
+						if (ItemUtils.isSword(mainHand)) {
 							mPlugin.mPotionManager.addPotion(mPlayer, PotionID.APPLIED_POTION,
 							                                 new PotionEffect(PotionEffectType.INCREASE_DAMAGE, RIPOSTE_SWORD_DURATION,
 							                                                  RIPOSTE_SWORD_EFFECT_LEVEL, true, true));
-						} else if (InventoryUtils.isAxeItem(mainHand)) {
+						} else if (ItemUtils.isAxe(mainHand)) {
 							if (!EntityUtils.isBoss(damager)) {
 								EntityUtils.applyStun(mPlugin, RIPOSTE_AXE_DURATION, damager);
 							}

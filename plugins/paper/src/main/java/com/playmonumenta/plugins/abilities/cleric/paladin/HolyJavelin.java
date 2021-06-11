@@ -12,7 +12,7 @@ import com.playmonumenta.plugins.abilities.cleric.DivineJustice;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.classes.magic.MagicType;
 import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.utils.ItemUtils;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
@@ -75,7 +75,7 @@ public class HolyJavelin extends Ability {
 	@Override
 	public boolean runCheck() {
 		ItemStack mainHand = mPlayer.getInventory().getItemInMainHand();
-		return mPlayer.isSprinting() && !mPlayer.isSneaking() && !InventoryUtils.isPickaxeItem(mainHand);
+		return mPlayer.isSprinting() && !mPlayer.isSneaking() && !ItemUtils.isPickaxe(mainHand);
 	}
 
 	@Override

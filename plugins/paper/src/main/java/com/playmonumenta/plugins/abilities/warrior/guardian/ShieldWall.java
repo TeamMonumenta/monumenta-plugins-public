@@ -3,6 +3,20 @@ package com.playmonumenta.plugins.abilities.warrior.guardian;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.abilities.AbilityManager;
+import com.playmonumenta.plugins.abilities.AbilityTrigger;
+import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.classes.magic.MagicType;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.MetadataUtils;
+import com.playmonumenta.plugins.utils.MovementUtils;
+import com.playmonumenta.plugins.utils.PotionUtils;
+import com.playmonumenta.plugins.utils.VectorUtils;
+
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -20,29 +34,8 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.abilities.AbilityManager;
-import com.playmonumenta.plugins.abilities.AbilityTrigger;
-import com.playmonumenta.plugins.classes.ClassAbility;
-import com.playmonumenta.plugins.classes.magic.MagicType;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.FastUtils;
-import com.playmonumenta.plugins.utils.InventoryUtils;
-import com.playmonumenta.plugins.utils.MetadataUtils;
-import com.playmonumenta.plugins.utils.MovementUtils;
-import com.playmonumenta.plugins.utils.PotionUtils;
-import com.playmonumenta.plugins.utils.VectorUtils;
 
-/*
- * Shield Wall: Blocking and then blocking again within 0.25s
- * Creates a 180 degree arc of particles with a height of 5 blocks
- * and width of 4 blocks in front of the user, blocking all enemy
- * projectiles and dealing 6 damage to enemies who pass through the
- * wall. The shield lasts 8/10 seconds. At level 2, this shield knocks
- * back enemies as well. (Ghast fireballs explode on the wall)
- * Cooldown: 30/20 seconds
- */
+
 public class ShieldWall extends Ability {
 
 	private static final String CHECK_ONCE_THIS_TICK_METAKEY = "ShieldWallTickRightClicked";
@@ -208,7 +201,6 @@ public class ShieldWall extends Ability {
 	public boolean runCheck() {
 		ItemStack mHand = mPlayer.getInventory().getItemInMainHand();
 		ItemStack oHand = mPlayer.getInventory().getItemInOffHand();
-		return !InventoryUtils.isBowItem(mHand) && (mHand.getType() == Material.SHIELD || oHand.getType() == Material.SHIELD);
+		return !ItemUtils.isSomeBow(mHand) && (mHand.getType() == Material.SHIELD || oHand.getType() == Material.SHIELD);
 	}
-
 }

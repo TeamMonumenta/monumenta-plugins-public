@@ -9,9 +9,12 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.format.TextDecoration;
+import com.playmonumenta.plugins.Constants.Materials;
+import com.playmonumenta.plugins.enchantments.Colossal;
+import com.playmonumenta.plugins.itemindex.Attribute;
+import com.playmonumenta.plugins.listeners.ShulkerShortcutListener;
+import com.playmonumenta.plugins.server.properties.ServerProperties;
+import com.playmonumenta.plugins.utils.PotionUtils.PotionInfo;
 
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.Color;
@@ -31,18 +34,17 @@ import org.bukkit.potion.PotionData;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.potion.PotionType;
+import org.jetbrains.annotations.NotNull;
 
 import de.tr7zw.nbtapi.NBTCompound;
 import de.tr7zw.nbtapi.NBTItem;
 import de.tr7zw.nbtapi.NBTList;
-
-import com.playmonumenta.plugins.enchantments.Colossal;
-import com.playmonumenta.plugins.itemindex.Attribute;
-import com.playmonumenta.plugins.listeners.ShulkerShortcutListener;
-import com.playmonumenta.plugins.server.properties.ServerProperties;
-import com.playmonumenta.plugins.utils.PotionUtils.PotionInfo;
-
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import net.md_5.bungee.api.ChatColor;
+
+
 
 public class ItemUtils {
 	private static final String PLAIN_KEY = "plain";
@@ -50,69 +52,6 @@ public class ItemUtils {
 	private static final String LORE_KEY = "Lore";
 	private static final String NAME_KEY = "Name";
 	private static final Pattern NON_PLAIN_REGEX = Pattern.compile("[^ -~]");
-
-	public static final Set<Material> armors = EnumSet.of(
-		Material.LEATHER_BOOTS,
-		Material.LEATHER_CHESTPLATE,
-		Material.LEATHER_HELMET,
-		Material.LEATHER_LEGGINGS,
-
-		Material.CHAINMAIL_BOOTS,
-		Material.CHAINMAIL_CHESTPLATE,
-		Material.CHAINMAIL_HELMET,
-		Material.CHAINMAIL_LEGGINGS,
-
-		Material.GOLDEN_BOOTS,
-		Material.GOLDEN_CHESTPLATE,
-		Material.GOLDEN_HELMET,
-		Material.GOLDEN_LEGGINGS,
-
-		Material.IRON_BOOTS,
-		Material.IRON_CHESTPLATE,
-		Material.IRON_HELMET,
-		Material.IRON_LEGGINGS,
-
-		Material.DIAMOND_BOOTS,
-		Material.DIAMOND_CHESTPLATE,
-		Material.DIAMOND_HELMET,
-		Material.DIAMOND_LEGGINGS
-	);
-
-	public static final Set<Material> wearable = EnumSet.of(
-		Material.LEATHER_BOOTS,
-		Material.LEATHER_CHESTPLATE,
-		Material.LEATHER_HELMET,
-		Material.LEATHER_LEGGINGS,
-
-		Material.CHAINMAIL_BOOTS,
-		Material.CHAINMAIL_CHESTPLATE,
-		Material.CHAINMAIL_HELMET,
-		Material.CHAINMAIL_LEGGINGS,
-
-		Material.GOLDEN_BOOTS,
-		Material.GOLDEN_CHESTPLATE,
-		Material.GOLDEN_HELMET,
-		Material.GOLDEN_LEGGINGS,
-
-		Material.IRON_BOOTS,
-		Material.IRON_CHESTPLATE,
-		Material.IRON_HELMET,
-		Material.IRON_LEGGINGS,
-
-		Material.DIAMOND_BOOTS,
-		Material.DIAMOND_CHESTPLATE,
-		Material.DIAMOND_HELMET,
-		Material.DIAMOND_LEGGINGS,
-
-		Material.PLAYER_HEAD,
-		Material.CREEPER_HEAD,
-		Material.DRAGON_HEAD,
-		Material.SKELETON_SKULL,
-		Material.WITHER_SKELETON_SKULL,
-		Material.ZOMBIE_HEAD,
-
-		Material.CARVED_PUMPKIN
-	);
 
 	// List of materials that trees can replace when they grow
 	public static final Set<Material> notAllowedTreeReplace = EnumSet.of(
@@ -984,16 +923,6 @@ public class ItemUtils {
 		return reforged;
 	}
 
-	// Check if item is a wearable with the "* Shattered *" lore entry
-	public static boolean isWearableItemShattered(ItemStack item) {
-		return item != null && isWearable(item.getType()) && isItemShattered(item);
-	}
-
-	// Check if item is armor with the "* Shattered *" lore entry
-	public static boolean isArmorItemShattered(ItemStack item) {
-		return item != null && isArmorItem(item.getType()) && isItemShattered(item);
-	}
-
 	public static boolean isShootableItem(ItemStack item) {
 		Material mat = item.getType();
 		if (mat == Material.TRIDENT) {
@@ -1001,14 +930,6 @@ public class ItemUtils {
 		} else {
 			return SHOOTABLES.contains(mat);
 		}
-	}
-
-	public static boolean isArmorItem(Material mat) {
-		return armors.contains(mat);
-	}
-
-	public static boolean isWearable(Material mat) {
-		return wearable.contains(mat);
 	}
 
 	public static boolean isAllowedTreeReplace(Material item) {
@@ -1300,5 +1221,70 @@ public class ItemUtils {
 	public static String toPlainTagText(Component formattedText) {
 		String plainText = MessagingUtils.plainText(formattedText);
 		return NON_PLAIN_REGEX.matcher(plainText).replaceAll("").trim();
+	}
+
+	public static boolean isArmor(@NotNull ItemStack itemStack) {
+		return Materials.ARMOR.contains(itemStack.getType());
+	}
+
+	public static boolean isWearable(@NotNull ItemStack itemStack) {
+		return Materials.WEARABLE.contains(itemStack.getType());
+	}
+
+	public static boolean isShatteredWearable(@NotNull ItemStack itemStack) {
+		return isWearable(itemStack) && isItemShattered(itemStack);
+	}
+
+	public static boolean isSword(@NotNull ItemStack itemStack) {
+		return Materials.SWORDS.contains(itemStack.getType());
+	}
+
+	public static boolean isSomeBow(@NotNull ItemStack itemStack) {
+		return Materials.BOWS.contains(itemStack.getType());
+	}
+
+	/*
+	 * Does not count shattered hoes.
+	 */
+	public static boolean isHoe(@NotNull ItemStack itemStack) {
+		if (isItemShattered(itemStack)) {
+			return false;
+		}
+
+		return Materials.HOES.contains(itemStack.getType());
+	}
+
+	/*
+	 * Does not count shattered wands.
+	 */
+	public static boolean isWand(@NotNull ItemStack itemStack) {
+		if (isItemShattered(itemStack)) {
+			return false;
+		}
+
+		@NotNull List<@NotNull String> loreLines = getPlainLore(itemStack);
+		for (@NotNull String loreLine : loreLines) {
+			if (loreLine.contains("* Magic Wand *")) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	public static boolean isPickaxe(@NotNull ItemStack itemStack) {
+		return Materials.PICKAXES.contains(itemStack.getType());
+	}
+
+	public static boolean isAxe(@NotNull ItemStack itemStack) {
+		return Materials.AXES.contains(itemStack.getType());
+	}
+
+	public static boolean isShovel(@NotNull ItemStack itemStack) {
+		return Materials.SHOVELS.contains(itemStack.getType());
+	}
+
+	public static boolean isSomePotion(@NotNull ItemStack itemStack) {
+		return Materials.POTIONS.contains(itemStack.getType());
 	}
 }

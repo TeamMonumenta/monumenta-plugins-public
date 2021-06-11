@@ -6,7 +6,7 @@ import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.classes.magic.MagicType;
 import com.playmonumenta.plugins.enchantments.abilities.SpellPower;
 import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 
 import org.bukkit.Location;
@@ -69,7 +69,7 @@ public class Starfall extends Ability {
 	@Override
 	public void playerSwapHandItemsEvent(PlayerSwapHandItemsEvent event) {
 		if (
-			InventoryUtils.isWandItem(
+			ItemUtils.isWand(
 				mPlayer.getInventory().getItemInMainHand()
 			)
 		) {

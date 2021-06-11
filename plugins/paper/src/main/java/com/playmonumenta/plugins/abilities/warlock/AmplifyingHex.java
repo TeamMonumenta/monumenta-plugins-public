@@ -14,7 +14,7 @@ import com.playmonumenta.plugins.enchantments.Inferno;
 import com.playmonumenta.plugins.enchantments.abilities.BaseAbilityEnchantment;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
-import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.VectorUtils;
 
@@ -185,6 +185,6 @@ public class AmplifyingHex extends Ability {
 	public boolean runCheck() {
 		double pitch = mPlayer.getLocation().getPitch();
 		return (mPlayer.isSneaking() && pitch < 50 && pitch > -50
-				&& InventoryUtils.isScytheItem(mPlayer.getInventory().getItemInMainHand()));
+				&& ItemUtils.isHoe(mPlayer.getInventory().getItemInMainHand()));
 	}
 }

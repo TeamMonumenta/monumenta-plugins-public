@@ -3,6 +3,16 @@ package com.playmonumenta.plugins.abilities.scout.hunter;
 import java.util.Iterator;
 import java.util.List;
 
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.abilities.AbilityTrigger;
+import com.playmonumenta.plugins.abilities.scout.BowMastery;
+import com.playmonumenta.plugins.abilities.scout.Sharpshooter;
+import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.classes.magic.MagicType;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.ItemUtils;
+
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Location;
@@ -18,15 +28,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.abilities.AbilityTrigger;
-import com.playmonumenta.plugins.abilities.scout.BowMastery;
-import com.playmonumenta.plugins.abilities.scout.Sharpshooter;
-import com.playmonumenta.plugins.classes.ClassAbility;
-import com.playmonumenta.plugins.classes.magic.MagicType;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.InventoryUtils;
+
 
 public class EnchantedShot extends Ability {
 
@@ -59,7 +61,7 @@ public class EnchantedShot extends Ability {
 	public void cast(Action action) {
 		if (!mActive && !mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), ClassAbility.ENCHANTED_ARROW)) {
 			ItemStack mainHand = mPlayer.getInventory().getItemInMainHand();
-			if (InventoryUtils.isBowItem(mainHand)) {
+			if (ItemUtils.isSomeBow(mainHand)) {
 				Player player = mPlayer;
 				mActive = true;
 				World world = mPlayer.getWorld();
@@ -157,5 +159,4 @@ public class EnchantedShot extends Ability {
 	public boolean runCheck() {
 		return !mPlayer.isSneaking();
 	}
-
 }

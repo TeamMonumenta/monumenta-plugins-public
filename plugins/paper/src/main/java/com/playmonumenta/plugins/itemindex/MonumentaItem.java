@@ -7,6 +7,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.Constants.Materials;
 import com.playmonumenta.plugins.enchantments.CustomEnchantment;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.StringUtils;
@@ -945,7 +946,7 @@ public class MonumentaItem {
 	}
 
 	public void computeArmorMaterial() {
-		if (!ItemUtils.wearable.contains(this.mMaterial)) {
+		if (!Materials.WEARABLE.contains(this.mMaterial)) {
 			this.mArmorMaterial = ArmorMaterial.NONE;
 			return;
 		}

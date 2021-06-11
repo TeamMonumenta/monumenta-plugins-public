@@ -276,7 +276,7 @@ public class EnchantmentManager implements Listener {
 		}
 
 		// Prevents armor items being held in mainhand / offhand counting towards enchantment level
-		if ((slot == ItemSlot.OFFHAND || slot == ItemSlot.MAINHAND) && item != null && ItemUtils.isWearable(item.getType())) {
+		if ((slot == ItemSlot.OFFHAND || slot == ItemSlot.MAINHAND) && item != null && ItemUtils.isWearable(item)) {
 			return;
 		}
 
@@ -330,7 +330,7 @@ public class EnchantmentManager implements Listener {
 					if (item != null) {
 						/* Step over the properties that apply to that slot */
 						for (BaseEnchantment property : slotProperties) {
-							if ((slot == ItemSlot.OFFHAND || slot == ItemSlot.MAINHAND) && ItemUtils.isWearable(item.getType())) {
+							if ((slot == ItemSlot.OFFHAND || slot == ItemSlot.MAINHAND) && ItemUtils.isWearable(item)) {
 								// Prevents armor items being held in mainhand / offhand counting towards enchantment level
 								continue;
 							}

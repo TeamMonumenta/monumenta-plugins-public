@@ -1,14 +1,16 @@
 package com.playmonumenta.plugins.abilities.warrior;
 
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.ItemUtils;
+
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.inventory.ItemStack;
 
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.InventoryUtils;
+
 
 public class WeaponryMastery extends Ability {
 
@@ -41,9 +43,9 @@ public class WeaponryMastery extends Ability {
 	public boolean livingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
 		if (event.getCause() == DamageCause.ENTITY_ATTACK) {
 			ItemStack mainHand = mPlayer.getInventory().getItemInMainHand();
-			if (InventoryUtils.isAxeItem(mainHand)) {
+			if (ItemUtils.isAxe(mainHand)) {
 				event.setDamage((event.getDamage() + mDamageBonusAxeFlat) * (1 + mDamageBonusAxe));
-			} else if (InventoryUtils.isSwordItem(mainHand)) {
+			} else if (ItemUtils.isSword(mainHand)) {
 				event.setDamage((event.getDamage() + mDamageBonusSwordFlat) * (1 + mDamageBonusSword));
 			}
 		}
@@ -53,11 +55,10 @@ public class WeaponryMastery extends Ability {
 
 	@Override
 	public boolean playerDamagedByLivingEntityEvent(EntityDamageByEntityEvent event) {
-		if (InventoryUtils.isSwordItem(mPlayer.getInventory().getItemInMainHand())) {
+		if (ItemUtils.isSword(mPlayer.getInventory().getItemInMainHand())) {
 			event.setDamage(EntityUtils.getDamageApproximation(event, 1 - WEAPON_MASTERY_SWORD_DAMAGE_RESISTANCE));
 		}
 
 		return true;
 	}
-
 }

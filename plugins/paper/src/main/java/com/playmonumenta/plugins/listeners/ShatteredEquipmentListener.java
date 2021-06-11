@@ -124,10 +124,10 @@ public class ShatteredEquipmentListener implements Listener {
 		if (event.getWhoClicked() instanceof Player) {
 			Player player = (Player) event.getWhoClicked();
 			// Check if the player tried to be sneaky and drag shattered armor into a slot
-			if (ItemUtils.isWearableItemShattered(event.getNewItems().getOrDefault(5, null)) || // Head  Slot
-				ItemUtils.isWearableItemShattered(event.getNewItems().getOrDefault(6, null)) || // Chest Slot
-				ItemUtils.isWearableItemShattered(event.getNewItems().getOrDefault(7, null)) || // Legs  Slot
-				ItemUtils.isWearableItemShattered(event.getNewItems().getOrDefault(8, null)) || // Feet  Slot
+			if (ItemUtils.isShatteredWearable(event.getNewItems().getOrDefault(5, null)) || // Head  Slot
+				ItemUtils.isShatteredWearable(event.getNewItems().getOrDefault(6, null)) || // Chest Slot
+				ItemUtils.isShatteredWearable(event.getNewItems().getOrDefault(7, null)) || // Legs  Slot
+				ItemUtils.isShatteredWearable(event.getNewItems().getOrDefault(8, null)) || // Feet  Slot
 				ItemUtils.isItemShattered(event.getNewItems().getOrDefault(45, null))) { // Offhand Slot
 				event.setCancelled(true);
 				MessagingUtils.sendActionBarMessage(mPlugin, player, "Shattered items must be reforged before use");

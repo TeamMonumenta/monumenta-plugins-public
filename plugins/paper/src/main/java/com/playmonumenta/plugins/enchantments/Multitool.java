@@ -2,6 +2,11 @@ package com.playmonumenta.plugins.enchantments;
 
 import java.util.EnumSet;
 
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
+import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.MetadataUtils;
+
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -10,11 +15,7 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
-import com.playmonumenta.plugins.utils.InventoryUtils;
-import com.playmonumenta.plugins.utils.ItemUtils;
-import com.playmonumenta.plugins.utils.MetadataUtils;
+
 
 /*
  * Multitool - Level one allows you to swap the tool
@@ -53,10 +54,10 @@ public class Multitool implements BaseEnchantment {
 			if (level > 0) {
 				if (MetadataUtils.checkOnceThisTick(plugin, player, "MultitoolMutex")) {
 					String[] str = item.getType().toString().split("_");
-					if (InventoryUtils.isAxeItem(item)) {
+					if (ItemUtils.isAxe(item)) {
 						Material mat = Material.valueOf(str[0] + "_" + "SHOVEL");
 						item.setType(mat);
-					} else if (InventoryUtils.isShovelItem(item)) {
+					} else if (ItemUtils.isShovel(item)) {
 						if (level > 1) {
 							Material mat = Material.valueOf(str[0] + "_" + "PICKAXE");
 							item.setType(mat);
@@ -64,7 +65,7 @@ public class Multitool implements BaseEnchantment {
 							Material mat = Material.valueOf(str[0] + "_" + "AXE");
 							item.setType(mat);
 						}
-					} else if (InventoryUtils.isPickaxeItem(item)) {
+					} else if (ItemUtils.isPickaxe(item)) {
 						Material mat = Material.valueOf(str[0] + "_" + "AXE");
 						item.setType(mat);
 					}
@@ -77,5 +78,4 @@ public class Multitool implements BaseEnchantment {
 			}
 		}
 	}
-
 }

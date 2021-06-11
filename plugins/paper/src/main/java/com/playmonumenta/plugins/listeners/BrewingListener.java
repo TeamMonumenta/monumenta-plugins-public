@@ -3,10 +3,10 @@ package com.playmonumenta.plugins.listeners;
 import java.util.List;
 
 import com.playmonumenta.plugins.player.PartialParticle;
+import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.plugins.utils.PotionUtils;
 
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -40,7 +40,7 @@ public class BrewingListener implements Listener {
 			// Individual items may be null
 			// https://papermc.io/javadocs/paper/1.16/org/bukkit/inventory/Inventory.html#getStorageContents--
 			for (@Nullable ItemStack potentialPotion : brewerInventory.getStorageContents()) {
-				if (potentialPotion != null && PotionUtils.isSomePotion(potentialPotion)) {
+				if (potentialPotion != null && ItemUtils.isSomePotion(potentialPotion)) {
 					@NotNull Material ingredientMaterial = ingredient.getType();
 					if (
 						// Slow falling + Recoil enchant essentially allows flight,

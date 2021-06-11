@@ -11,7 +11,7 @@ import com.playmonumenta.plugins.abilities.warlock.tenebrist.UmbralWail;
 import com.playmonumenta.plugins.abilities.warlock.tenebrist.WitheringGaze;
 import com.playmonumenta.plugins.events.CustomDamageEvent;
 import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
 
@@ -125,6 +125,6 @@ public class CursedWound extends Ability {
 
 	@Override
 	public boolean runCheck() {
-		return InventoryUtils.isScytheItem(mPlayer.getInventory().getItemInMainHand());
+		return ItemUtils.isHoe(mPlayer.getInventory().getItemInMainHand());
 	}
 }

@@ -206,7 +206,7 @@ public class PlayerListener implements Listener {
 
 		// Item Interactions
 		if (event.useItemInHand() != Event.Result.DENY) {
-			if (item != null && ItemUtils.isArmorItem(item.getType())) {
+			if (item != null && ItemUtils.isArmor(item)) {
 				InventoryUtils.scheduleDelayedEquipmentCheck(mPlugin, player, event);
 			}
 		}
@@ -741,7 +741,7 @@ public class PlayerListener implements Listener {
 
 		int damage = event.getDamage();
 
-		if (ItemUtils.isArmorItem(item.getType())) {
+		if (ItemUtils.isArmor(item)) {
 			// Players that get resistance from safezones don't take armor damage
 			if (damage < 0 || ZoneUtils.hasZoneProperty(event.getPlayer(), ZoneProperty.NO_EQUIPMENT_DAMAGE)) {
 				damage = 0;

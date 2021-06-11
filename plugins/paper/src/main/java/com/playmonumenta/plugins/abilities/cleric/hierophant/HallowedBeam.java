@@ -8,7 +8,6 @@ import com.playmonumenta.plugins.abilities.cleric.Crusade;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.effects.PercentDamageReceived;
 import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
@@ -87,7 +86,7 @@ public class HallowedBeam extends MultipleChargeAbility {
 			PlayerInventory inventory = mPlayer.getInventory();
 			ItemStack inMainHand = inventory.getItemInMainHand();
 
-			if (InventoryUtils.isBowItem(inMainHand) && !ItemUtils.isShootableItem(inventory.getItemInOffHand()) && !ItemUtils.isItemShattered(inMainHand)) {
+			if (ItemUtils.isSomeBow(inMainHand) && !ItemUtils.isShootableItem(inventory.getItemInOffHand()) && !ItemUtils.isItemShattered(inMainHand)) {
 				if (!consumeCharge()) {
 					return;
 				}
@@ -244,7 +243,7 @@ public class HallowedBeam extends MultipleChargeAbility {
 		PlayerInventory inventory = mPlayer.getInventory();
 		ItemStack inMainHand = inventory.getItemInMainHand();
 
-		if (InventoryUtils.isBowItem(inMainHand) && !mPlayer.isSneaking()) {
+		if (ItemUtils.isSomeBow(inMainHand) && !mPlayer.isSneaking()) {
 			event.setCancelled(true);
 			if (mMode == 0) {
 				mMode = 1;

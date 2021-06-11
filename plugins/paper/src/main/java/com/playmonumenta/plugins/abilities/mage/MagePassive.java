@@ -1,15 +1,15 @@
 package com.playmonumenta.plugins.abilities.mage;
 
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.events.AbilityCastEvent;
+import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.ScoreboardUtils;
+
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.inventory.ItemStack;
-
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.utils.ScoreboardUtils;
-import com.playmonumenta.plugins.events.AbilityCastEvent;
-import com.playmonumenta.plugins.utils.InventoryUtils;
 
 
 
@@ -40,7 +40,7 @@ public class MagePassive extends Ability {
 	public boolean livingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
 		if (event.getCause() == DamageCause.ENTITY_ATTACK) {
 			ItemStack mainHand = mPlayer.getInventory().getItemInMainHand();
-			if (InventoryUtils.isWandItem(mainHand) && mCast) {
+			if (ItemUtils.isWand(mainHand) && mCast) {
 				event.setDamage((event.getDamage() * (1 + PERCENT_MELEE_INCREASE)));
 				mCast = false;
 			}

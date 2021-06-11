@@ -16,7 +16,7 @@ import com.playmonumenta.plugins.point.Raycast;
 import com.playmonumenta.plugins.point.RaycastData;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 
 import org.bukkit.Bukkit;
@@ -32,13 +32,6 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
 
-
-/*
- * Shift+LClick with a bow to afflict the mob you're looking at (within 32 blocks)
- * with a plague that slows the target with slowness 3 and deals 3 DPS for 8 / 10 seconds.
- * If a mob with the plague is killed you gain an extra alch potion, and the plague
- * transfers to 2 nearby mobs within 5 blocks, up to a chain of 2 mobs. Cooldown: 35 / 20 seconds.
- */
 
 public class PurpleHaze extends Ability {
 
@@ -196,7 +189,7 @@ public class PurpleHaze extends Ability {
 	public boolean runCheck() {
 		if (mPlayer.isSneaking()) {
 			ItemStack mainHand = mPlayer.getInventory().getItemInMainHand();
-			if (InventoryUtils.isBowItem(mainHand)) {
+			if (ItemUtils.isSomeBow(mainHand)) {
 
 				// Basically makes sure if the target is in LoS and if there is a path.
 				Location eyeLoc = mPlayer.getEyeLocation();

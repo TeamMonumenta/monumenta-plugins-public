@@ -2,6 +2,11 @@ package com.playmonumenta.plugins.enchantments;
 
 import java.util.EnumSet;
 
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
+import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.ItemUtils;
+
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -15,10 +20,7 @@ import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
-import com.playmonumenta.plugins.utils.InventoryUtils;
-import com.playmonumenta.plugins.utils.FastUtils;
+
 
 public class Retrieval implements BaseEnchantment {
 	private static final String PROPERTY_NAME = ChatColor.GRAY + "Retrieval";
@@ -40,7 +42,7 @@ public class Retrieval implements BaseEnchantment {
 			AbstractArrow arrow = (AbstractArrow)proj;
 			ItemStack mainHand = player.getInventory().getItemInMainHand();
 			ItemStack offHand = player.getInventory().getItemInOffHand();
-			if (InventoryUtils.isBowItem(mainHand) || InventoryUtils.isBowItem(offHand)) {
+			if (ItemUtils.isSomeBow(mainHand) || ItemUtils.isSomeBow(offHand)) {
 				int infLevel = Math.max(mainHand.getEnchantmentLevel(Enchantment.ARROW_INFINITE), offHand.getEnchantmentLevel(Enchantment.ARROW_INFINITE));
 				if (arrow.getPickupStatus() == Arrow.PickupStatus.ALLOWED) {
 					if (infLevel == 0 && FastUtils.RANDOM.nextDouble() < RETRIEVAL_CHANCE * level) {
@@ -81,5 +83,4 @@ public class Retrieval implements BaseEnchantment {
 			}
 		}
 	}
-
 }

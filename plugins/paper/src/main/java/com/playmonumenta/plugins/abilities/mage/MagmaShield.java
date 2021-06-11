@@ -10,7 +10,7 @@ import com.playmonumenta.plugins.classes.magic.MagicType;
 import com.playmonumenta.plugins.enchantments.abilities.SpellPower;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
-import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.VectorUtils;
 
@@ -134,7 +134,7 @@ public class MagmaShield extends Ability {
 
 	@Override
 	public boolean runCheck() {
-		if (InventoryUtils.isWandItem(
+		if (ItemUtils.isWand(
 			mPlayer.getInventory().getItemInMainHand()
 		)) {
 			boolean lookingTooHigh = false;

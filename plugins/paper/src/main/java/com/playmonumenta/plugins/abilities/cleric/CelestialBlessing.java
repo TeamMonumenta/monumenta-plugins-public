@@ -3,15 +3,6 @@ package com.playmonumenta.plugins.abilities.cleric;
 import java.util.EnumSet;
 import java.util.List;
 
-import org.bukkit.Location;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
-import org.bukkit.World;
-import org.bukkit.entity.Player;
-import org.bukkit.event.block.Action;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
-
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
@@ -21,8 +12,19 @@ import com.playmonumenta.plugins.effects.PercentDamageDealt;
 import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
 import com.playmonumenta.plugins.enchantments.abilities.BaseAbilityEnchantment;
-import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
+
+import org.bukkit.Location;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
+import org.bukkit.World;
+import org.bukkit.entity.Player;
+import org.bukkit.event.block.Action;
+import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
+import org.bukkit.inventory.ItemStack;
+
+
 
 public class CelestialBlessing extends Ability {
 
@@ -105,7 +107,7 @@ public class CelestialBlessing extends Ability {
 	public boolean runCheck() {
 		if (mPlayer.isOnGround()) {
 			ItemStack mainHand = mPlayer.getInventory().getItemInMainHand();
-			return (mPlayer.isSneaking() && !InventoryUtils.isPickaxeItem(mainHand));
+			return (mPlayer.isSneaking() && !ItemUtils.isPickaxe(mainHand));
 		}
 		return false;
 	}

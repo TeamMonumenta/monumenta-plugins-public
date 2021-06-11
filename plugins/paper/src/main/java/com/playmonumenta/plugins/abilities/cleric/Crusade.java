@@ -37,7 +37,7 @@ public class Crusade extends Ability {
 			)
 		);
 		mInfo.mDescriptions.add(
-			"Your abilities that work against undead enemies now also work against human-like enemies - illagers, vexes, golems, witches and giants."
+			"Your abilities that work against undead enemies now also work against human-like enemies - illagers, vexes, witches, piglins, piglin brutes, golems and giants."
 		); // List of human-likes hardcoded
 
 		mCountsHumanlikes = getAbilityScore() == 2;

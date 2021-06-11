@@ -19,17 +19,21 @@ import org.bukkit.event.player.PlayerRiptideEvent;
 import org.bukkit.inventory.ItemStack;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.Constants.Materials;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
 
+
+
 public class ItemOverrides {
 	/*
-	 * List of materials that are allowed to be placed by
-	 * players in survival even if they have lore text
+	 * Exceptions for materials that players in survival can place,
+	 * or use to perform right-click interactions like
+	 * tilling/stripping/making paths, even when the item has lore.
 	 */
-	public static EnumSet<Material> ALLOW_LORE_MATS = EnumSet.of(
+	public static final EnumSet<Material> EXCEPTION_LORED_MATERIALS = EnumSet.of(
 			Material.ANVIL,
 			Material.CHEST,
 			Material.FLINT_AND_STEEL,
@@ -67,26 +71,18 @@ public class ItemOverrides {
 			Material.BROWN_WOOL,
 			Material.GREEN_WOOL,
 			Material.RED_WOOL,
-			Material.BLACK_WOOL,
-
-			Material.WOODEN_HOE,
-			Material.STONE_HOE,
-			Material.GOLDEN_HOE,
-			Material.IRON_HOE,
-			Material.DIAMOND_HOE,
-
-			Material.WOODEN_SHOVEL,
-			Material.STONE_SHOVEL,
-			Material.GOLDEN_SHOVEL,
-			Material.IRON_SHOVEL,
-			Material.DIAMOND_SHOVEL
+			Material.BLACK_WOOL
 		);
 
-	public static EnumMap<Material, String> ALLOW_PRECISE_LORE_MATS = new EnumMap<>(Material.class);
+	public static final EnumMap<Material, String> EXCEPTION_PRECISE_LORED_MATERIALS = new EnumMap<>(Material.class);
 
 	static {
-		ALLOW_PRECISE_LORE_MATS.put(Material.MAGMA_BLOCK, "Turns into lava when");
-		ALLOW_PRECISE_LORE_MATS.put(Material.PACKED_ICE, "Turns into water when");
+		EXCEPTION_LORED_MATERIALS.addAll(Materials.HOES);
+		EXCEPTION_LORED_MATERIALS.addAll(Materials.AXES);
+		EXCEPTION_LORED_MATERIALS.addAll(Materials.SHOVELS);
+
+		EXCEPTION_PRECISE_LORED_MATERIALS.put(Material.MAGMA_BLOCK, "Turns into lava when");
+		EXCEPTION_PRECISE_LORED_MATERIALS.put(Material.PACKED_ICE, "Turns into water when");
 	}
 
 	public ItemOverrides() {
@@ -386,9 +382,9 @@ public class ItemOverrides {
 		if (item.hasItemMeta()
 		    && item.getItemMeta().hasLore()
 		    && player.getGameMode() != GameMode.CREATIVE
-		    && !(ALLOW_LORE_MATS.contains(item.getType())
-		         || (ALLOW_PRECISE_LORE_MATS.containsKey(item.getType())
-			         && InventoryUtils.testForItemWithLore(item, ALLOW_PRECISE_LORE_MATS.get(item.getType()))))) {
+		    && !(EXCEPTION_LORED_MATERIALS.contains(item.getType())
+		         || (EXCEPTION_PRECISE_LORED_MATERIALS.containsKey(item.getType())
+			         && InventoryUtils.testForItemWithLore(item, EXCEPTION_PRECISE_LORED_MATERIALS.get(item.getType()))))) {
 			eventCancelled |= true;
 		}
 

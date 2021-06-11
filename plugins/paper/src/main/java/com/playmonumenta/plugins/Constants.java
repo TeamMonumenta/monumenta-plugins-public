@@ -1,5 +1,8 @@
 package com.playmonumenta.plugins;
 
+import java.util.EnumSet;
+
+import org.bukkit.Material;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.jetbrains.annotations.NotNull;
@@ -92,6 +95,10 @@ public class Constants {
 	// Plots gold → diamond block
 	public static final int PATREON_TIER_5 = 30;
 
+	static {
+		Materials.WEARABLE.addAll(Materials.ARMOR);
+	}
+
 	public static class Objectives {
 		// PartialParticle
 		public static final String PARTICLES_OWN_PASSIVE = "ParticlesOwnPassive";
@@ -146,5 +153,101 @@ public class Constants {
 	public static class Colors {
 		public static final @NotNull TextColor GREENISH_BLUE = TextColor.color(85, 255, 170);
 		public static final @NotNull TextColor GREENISH_BLUE_DARK = TextColor.color(76, 230, 153);
+	}
+
+	public static class Materials {
+		public static final EnumSet<Material> ARMOR = EnumSet.of(
+			Material.LEATHER_HELMET,
+			Material.LEATHER_CHESTPLATE,
+			Material.LEATHER_LEGGINGS,
+			Material.LEATHER_BOOTS,
+
+			Material.GOLDEN_HELMET,
+			Material.GOLDEN_CHESTPLATE,
+			Material.GOLDEN_LEGGINGS,
+			Material.GOLDEN_BOOTS,
+
+			Material.CHAINMAIL_HELMET,
+			Material.CHAINMAIL_CHESTPLATE,
+			Material.CHAINMAIL_LEGGINGS,
+			Material.CHAINMAIL_BOOTS,
+
+			Material.IRON_HELMET,
+			Material.IRON_CHESTPLATE,
+			Material.IRON_LEGGINGS,
+			Material.IRON_BOOTS,
+
+			Material.DIAMOND_HELMET,
+			Material.DIAMOND_CHESTPLATE,
+			Material.DIAMOND_LEGGINGS,
+			Material.DIAMOND_BOOTS,
+
+			Material.NETHERITE_HELMET,
+			Material.NETHERITE_CHESTPLATE,
+			Material.NETHERITE_LEGGINGS,
+			Material.NETHERITE_BOOTS
+		);
+
+		// ARMOR is added in static {}
+		public static final EnumSet<Material> WEARABLE = EnumSet.of(
+			Material.PLAYER_HEAD,
+			Material.CREEPER_HEAD,
+			Material.DRAGON_HEAD,
+			Material.SKELETON_SKULL,
+			Material.WITHER_SKELETON_SKULL,
+			Material.ZOMBIE_HEAD,
+
+			Material.CARVED_PUMPKIN
+		);
+
+		public static final EnumSet<Material> SWORDS = EnumSet.of(
+			Material.WOODEN_SWORD,
+			Material.STONE_SWORD,
+			Material.GOLDEN_SWORD,
+			Material.IRON_SWORD,
+			Material.DIAMOND_SWORD,
+			Material.NETHERITE_SWORD
+		);
+		public static final EnumSet<Material> BOWS = EnumSet.of(
+			Material.BOW,
+			Material.CROSSBOW
+		);
+		public static final EnumSet<Material> HOES = EnumSet.of(
+			Material.WOODEN_HOE,
+			Material.STONE_HOE,
+			Material.GOLDEN_HOE,
+			Material.IRON_HOE,
+			Material.DIAMOND_HOE,
+			Material.NETHERITE_HOE
+		);
+		public static final EnumSet<Material> PICKAXES = EnumSet.of(
+			Material.WOODEN_PICKAXE,
+			Material.STONE_PICKAXE,
+			Material.GOLDEN_PICKAXE,
+			Material.IRON_PICKAXE,
+			Material.DIAMOND_PICKAXE,
+			Material.NETHERITE_PICKAXE
+		);
+		public static final EnumSet<Material> AXES = EnumSet.of(
+			Material.WOODEN_AXE,
+			Material.STONE_AXE,
+			Material.GOLDEN_AXE,
+			Material.IRON_AXE,
+			Material.DIAMOND_AXE,
+			Material.NETHERITE_AXE
+		);
+		public static final EnumSet<Material> SHOVELS = EnumSet.of(
+			Material.WOODEN_SHOVEL,
+			Material.STONE_SHOVEL,
+			Material.GOLDEN_SHOVEL,
+			Material.IRON_SHOVEL,
+			Material.NETHERITE_SHOVEL
+		);
+
+		public static final EnumSet<Material> POTIONS = EnumSet.of(
+			Material.POTION,
+			Material.SPLASH_POTION,
+			Material.LINGERING_POTION
+		);
 	}
 }

@@ -21,7 +21,7 @@ import com.playmonumenta.plugins.enchantments.abilities.BaseAbilityEnchantment;
 import com.playmonumenta.plugins.enchantments.abilities.SpellPower;
 import com.playmonumenta.plugins.events.CustomDamageEvent;
 import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.scriptedquests.utils.MetadataUtils;
 
 import org.bukkit.Location;
@@ -181,6 +181,6 @@ public class Spellshock extends Ability {
 
 	@Override
 	public boolean runCheck() {
-		return InventoryUtils.isWandItem(mPlayer.getInventory().getItemInMainHand());
+		return ItemUtils.isWand(mPlayer.getInventory().getItemInMainHand());
 	}
 }

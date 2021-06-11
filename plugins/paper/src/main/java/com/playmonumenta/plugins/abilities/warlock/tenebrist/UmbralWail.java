@@ -3,19 +3,6 @@ package com.playmonumenta.plugins.abilities.warlock.tenebrist;
 import java.util.Iterator;
 import java.util.List;
 
-import org.bukkit.Location;
-import org.bukkit.Particle;
-import org.bukkit.Color;
-import org.bukkit.Sound;
-import org.bukkit.World;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
-import org.bukkit.event.block.Action;
-import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.util.Vector;
-import org.bukkit.util.BoundingBox;
-import org.bukkit.inventory.ItemStack;
-
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
@@ -23,8 +10,22 @@ import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.classes.magic.MagicType;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
-import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.VectorUtils;
+
+import org.bukkit.Color;
+import org.bukkit.Location;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
+import org.bukkit.World;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
+import org.bukkit.event.block.Action;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.util.BoundingBox;
+import org.bukkit.util.Vector;
+
 
 
 public class UmbralWail extends Ability {
@@ -123,7 +124,6 @@ public class UmbralWail extends Ability {
 	@Override
 	public boolean runCheck() {
 		ItemStack mHand = mPlayer.getInventory().getItemInMainHand();
-		return mPlayer.isSprinting() && InventoryUtils.isScytheItem(mHand);
+		return mPlayer.isSprinting() && ItemUtils.isHoe(mHand);
 	}
-
 }

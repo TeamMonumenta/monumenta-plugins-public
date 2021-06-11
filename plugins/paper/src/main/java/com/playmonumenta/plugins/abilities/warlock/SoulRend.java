@@ -9,7 +9,7 @@ import com.playmonumenta.plugins.abilities.warlock.reaper.DarkPact;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.effects.Effect;
 import com.playmonumenta.plugins.effects.PercentHeal;
-import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 
 import org.bukkit.Bukkit;
@@ -110,6 +110,6 @@ public class SoulRend extends Ability {
 
 	@Override
 	public boolean runCheck() {
-		return PlayerUtils.isFallingAttack(mPlayer) && InventoryUtils.isScytheItem(mPlayer.getInventory().getItemInMainHand());
+		return PlayerUtils.isFallingAttack(mPlayer) && ItemUtils.isHoe(mPlayer.getInventory().getItemInMainHand());
 	}
 }

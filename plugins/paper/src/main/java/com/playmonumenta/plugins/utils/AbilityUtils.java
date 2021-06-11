@@ -8,6 +8,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.effects.AbilitySilence;
+import com.playmonumenta.plugins.potion.PotionManager.PotionID;
+
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
@@ -33,9 +37,7 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.potion.PotionType;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.effects.AbilitySilence;
-import com.playmonumenta.plugins.potion.PotionManager.PotionID;
+
 
 public class AbilityUtils {
 
@@ -66,7 +68,7 @@ public class AbilityUtils {
 						if (entry.getValue() <= 0) {
 							// Run after this loop is complete to avoid concurrent modification
 							Bukkit.getScheduler().runTask(plugin, () -> removeStealth(plugin, player, false));
-						} else if (item == null || item.getType().isAir() || (!InventoryUtils.isAxeItem(item) && !InventoryUtils.isSwordItem(item) && !InventoryUtils.isScytheItem(item))) {
+						} else if (item == null || item.getType().isAir() || (!ItemUtils.isAxe(item) && !ItemUtils.isSword(item) && !ItemUtils.isHoe(item))) {
 							// Run after this loop is complete to avoid concurrent modification
 							Bukkit.getScheduler().runTask(plugin, () -> removeStealth(plugin, player, true));
 						} else {
@@ -238,7 +240,7 @@ public class AbilityUtils {
 		ItemStack offHand = player.getInventory().getItemInOffHand();
 		//Only refund arrow once
 		if (MetadataUtils.checkOnceThisTick(Plugin.getInstance(), player, ARROW_REFUNDED_METAKEY)) {
-			if (InventoryUtils.isBowItem(mainHand) || InventoryUtils.isBowItem(offHand)) {
+			if (ItemUtils.isSomeBow(mainHand) || ItemUtils.isSomeBow(offHand)) {
 				int infLevel = Math.max(mainHand.getEnchantmentLevel(Enchantment.ARROW_INFINITE), offHand.getEnchantmentLevel(Enchantment.ARROW_INFINITE));
 				if (infLevel == 0) {
 					arrow.setPickupStatus(Arrow.PickupStatus.ALLOWED);
