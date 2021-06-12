@@ -52,6 +52,7 @@ public class SinglePageGUIManager implements Listener {
 			GUI_MAPPINGS.put(uuid, gui);
 			gui.openGUI(GUI_MAPPINGS);
 		} else {
+			GUI_MAPPINGS.remove(uuid);
 			MessagingUtils.sendActionBarMessage(player, "GUI opening canceled. If this problem persists, try relogging.");
 		}
 	}
@@ -68,6 +69,14 @@ public class SinglePageGUIManager implements Listener {
 		}
 
 		return null;
+	}
+
+	public static void rejectLoad(Player player, String reason) {
+		player.closeInventory();
+		MessagingUtils.sendActionBarMessage(player, reason);
+		if (GUI_MAPPINGS.containsKey(player.getUniqueId())) {
+			GUI_MAPPINGS.remove(player.getUniqueId());
+		}
 	}
 
 	@EventHandler
