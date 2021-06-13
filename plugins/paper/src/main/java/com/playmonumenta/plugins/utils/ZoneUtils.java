@@ -24,6 +24,9 @@ public class ZoneUtils {
 		MASK_JUMP_BOOST("Mask Jump Boost"),
 		NO_EQUIPMENT_DAMAGE("No Equipment Damage"),
 		NO_NATURAL_SPAWNS("No Natural Spawns"),
+		NO_TRAPDOOR_CLICKS("No Trapdoor Clicks"),
+		BIG_DOOR_DOWN_CCW("Big Door Down is CCW"),
+		BIG_DOOR_DOWN_CW("Big Door Down is CW"),
 		NO_VEHICLES("No Vehicles"),
 		ADVENTURE_MODE("Adventure Mode"),
 		RESTRICTED("Restricted");

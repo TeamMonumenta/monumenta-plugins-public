@@ -252,6 +252,15 @@ public class ItemOverrides {
 		mItems.put(Material.CRIMSON_SIGN, signOverride);
 		mItems.put(Material.CRIMSON_WALL_SIGN, signOverride);
 
+		mItems.put(Material.ACACIA_TRAPDOOR, new TrapdoorOverride());
+		mItems.put(Material.BIRCH_TRAPDOOR, new TrapdoorOverride());
+		mItems.put(Material.CRIMSON_TRAPDOOR, new TrapdoorOverride());
+		mItems.put(Material.DARK_OAK_TRAPDOOR, new TrapdoorOverride());
+		mItems.put(Material.JUNGLE_TRAPDOOR, new TrapdoorOverride());
+		mItems.put(Material.OAK_TRAPDOOR, new TrapdoorOverride());
+		mItems.put(Material.SPRUCE_TRAPDOOR, new TrapdoorOverride());
+		mItems.put(Material.WARPED_TRAPDOOR, new TrapdoorOverride());
+
 
 		BaseOverride unbreakableOverride = new UnbreakableOnBedrockOverride();
 		mItems.put(Material.SPAWNER, unbreakableOverride);
