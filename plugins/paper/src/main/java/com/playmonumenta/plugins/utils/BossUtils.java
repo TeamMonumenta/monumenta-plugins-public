@@ -144,7 +144,7 @@ public class BossUtils {
 					if (target.getHealth() - toTake > target.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue()) {
 						target.setHealth(target.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue());
 					} else {
-						target.setHealth(target.getHealth() - toTake);
+						target.setHealth(Math.max(target.getHealth() - toTake, 1));
 					}
 				}
 				NmsUtils.unblockableEntityDamageEntity(target, 1, boss);
