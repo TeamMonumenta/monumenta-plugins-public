@@ -26,7 +26,6 @@ import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
 import net.luckperms.api.model.user.User;
 import net.luckperms.api.node.types.InheritanceNode;
 import net.luckperms.api.node.types.MetaNode;
-import net.luckperms.api.node.types.PermissionNode;
 import net.luckperms.api.node.types.PrefixNode;
 
 public class CreateGuild {
@@ -119,7 +118,6 @@ public class CreateGuild {
 				group.data().add(PrefixNode.builder(guildTag, 1).build());
 				group.data().add(MetaNode.builder("hoverprefix", guildName).build());
 				group.data().add(MetaNode.builder("guildname", guildName).build());
-				group.data().add(PermissionNode.builder("group." + cleanGuildName).build());
 				for (Player founder : founders) {
 					User user = LuckPermsIntegration.UM.getUser(founder.getUniqueId());
 					user.data().add(InheritanceNode.builder(group).build());
