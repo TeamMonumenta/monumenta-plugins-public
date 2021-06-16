@@ -33,7 +33,7 @@ public class ProjectileBoss extends BossAbilityGroup {
 		public double HITBOX_LENGTH = 0.5;
 		public boolean SINGLE_TARGET = true;
 		public double DAMAGE_PERCENTAGE = 0.0;
-		public boolean LAUNCH_TRACKING = false;
+		public boolean LAUNCH_TRACKING = true;
 		public double TURN_RADIUS = Math.PI / 30;
 		public boolean COLLIDES_WITH_BLOCKS = true;
 

@@ -5,12 +5,13 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.SpawnerSpawnEvent;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.bosses.bosses.ChargerStrongBoss;
-import com.playmonumenta.plugins.bosses.bosses.MagicArrowBoss;
+import com.playmonumenta.plugins.bosses.bosses.ChargerBoss;
 import com.playmonumenta.plugins.bosses.bosses.RejuvenationBoss;
-import com.playmonumenta.plugins.bosses.bosses.TpBehindTargetedBoss;
-import com.playmonumenta.plugins.bosses.bosses.TrackingProjectileBoss;
+import com.playmonumenta.plugins.bosses.bosses.TpBehindBoss;
 import com.playmonumenta.plugins.utils.DelvesUtils;
 import com.playmonumenta.plugins.utils.DelvesUtils.Modifier;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -34,13 +35,39 @@ public class Arcanic extends DelveModifier {
 			0.3
 	};
 
-	private static final String[] ABILITY_POOL = {
-		RejuvenationBoss.identityTag,
-		TrackingProjectileBoss.identityTag,
-		TpBehindTargetedBoss.identityTag,
-		ChargerStrongBoss.identityTag,
-		MagicArrowBoss.identityTag
-	};
+	private static final List<List<String>> ABILITY_POOL;
+
+
+	static {
+		ABILITY_POOL = new ArrayList<>();
+
+		//RejuvenationBoss
+		List<String> rejuvenation = new ArrayList<>();
+		rejuvenation.add(RejuvenationBoss.identityTag);
+		ABILITY_POOL.add(rejuvenation);
+
+		//TrackingProjectileBoss  //notes this will be deprecated! use ProjectileBoss
+		List<String> trackingProjectile = new ArrayList<>();
+		trackingProjectile.add(RejuvenationBoss.identityTag);
+		ABILITY_POOL.add(trackingProjectile);
+
+		//TpBehindTargetedBoss
+		List<String> tpBehind = new ArrayList<>();
+		tpBehind.add(TpBehindBoss.identityTag);
+		tpBehind.add(TpBehindBoss.identityTag + "[range=50,random=false]");
+		ABILITY_POOL.add(tpBehind);
+
+		//ChargerStrongBoss
+		List<String> charger = new ArrayList<>();
+		charger.add(ChargerBoss.identityTag);
+		charger.add(ChargerBoss.identityTag + "[damage=25]");
+		ABILITY_POOL.add(charger);
+
+		//MagicArrowBoss    //notes this will be deprecated! use ProjectileBoss
+		List<String> magicArrow = new ArrayList<>();
+		magicArrow.add(RejuvenationBoss.identityTag);
+		ABILITY_POOL.add(magicArrow);
+	}
 
 	public static final String DESCRIPTION = "Enemies gain magical abilities.";
 
@@ -89,7 +116,10 @@ public class Arcanic extends DelveModifier {
 	public void applyModifiers(LivingEntity mob, SpawnerSpawnEvent event) {
 		if (FastUtils.RANDOM.nextDouble() < mAbilityChance) {
 			// This runs prior to BossManager parsing, so we can just add tags directly
-			mob.addScoreboardTag(ABILITY_POOL[FastUtils.RANDOM.nextInt(ABILITY_POOL.length)]);
+			List<String> ability = ABILITY_POOL.get(FastUtils.RANDOM.nextInt(ABILITY_POOL.size()));
+			for (String abilityTag: ability) {
+				mob.addScoreboardTag(abilityTag);
+			}
 		}
 	}
 

@@ -3,18 +3,16 @@ package com.playmonumenta.plugins.bosses.bosses;
 import java.util.Arrays;
 
 import org.bukkit.Location;
-import org.bukkit.Particle;
 import org.bukkit.Sound;
-import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 
 import com.playmonumenta.plugins.bosses.SpellManager;
+import com.playmonumenta.plugins.bosses.parameters.EffectsList;
+import com.playmonumenta.plugins.bosses.parameters.ParticlesList;
+import com.playmonumenta.plugins.bosses.parameters.SoundsList;
 import com.playmonumenta.plugins.bosses.spells.SpellBaseNova;
-import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 
@@ -31,33 +29,22 @@ public class NovaBoss extends BossAbilityGroup {
 		public boolean CAN_MOVE = false;
 		public double DAMAGE_PERCENTAGE = 0.0;
 
-
-		//this effects are given to the player after he recive the damage
-		public int FIRE_TICKS = 0;
-		public int SILENCE_TICKS = 0;
-		public int EFFECT_DURATION = 0;
-		public int EFFECT_AMPLIFIER = 0;
-		public PotionEffectType EFFECT = PotionEffectType.BLINDNESS;
+		public EffectsList EFFECTS = EffectsList.EMPTY;
 
 		//particle & sound used!
+		/**Particle summon on the air */
+		public ParticlesList PARTICLE_AIR = ParticlesList.fromString("[(cloud,5)]");
 		/**Sound used when charging the ability */
 		public Sound SOUND_CHARGE = Sound.ENTITY_WITCH_CELEBRATE;
 
-		/*Particle summon arround the boss in the air */
-		public Particle PARTICLE_AIR = Particle.CLOUD;
-		/*Number of particle summon arround the boss in the air */
-		public int PARTICLE_AIR_NUMBER = 5;
-
 		/**Particle summon arround the boss when loading the spell */
-		public Particle PARTICLE_LOAD = Particle.CRIT;
+		public ParticlesList PARTICLE_LOAD = ParticlesList.fromString("[(crit,1)]");
 
 		/**Sound used when the spell is casted (when explode) */
-		public Sound SOUND_CAST = Sound.ENTITY_WITCH_DRINK;
+		public SoundsList SOUND_CAST = SoundsList.fromString("[(ENTITY_WITCH_DRINK,1.5,0.65),(ENTITY_WITCH_DRINK,1.5,0.55)]");
 
 		/**Particle summoned when the spell explode */
-		public Particle PARTICLE_EXPLODE_MAIN = Particle.CRIT;
-		/**Particle summoned when the spell explode */
-		public Particle PARTICLE_EXPLODE_SECOND = Particle.CRIT_MAGIC;
+		public ParticlesList PARTICLE_EXPLODE = ParticlesList.fromString("[(CRIT,1,0.1,0.1,0.1,0.3),(CRIT_MAGIC,0.25,0.25,0.25,0.1)]");
 	}
 
 	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
@@ -72,22 +59,16 @@ public class NovaBoss extends BossAbilityGroup {
 		SpellManager activeSpells = new SpellManager(Arrays.asList(
 			new SpellBaseNova(plugin, boss, p.RADIUS, p.DURATION, p.COOLDOWN, p.CAN_MOVE, p.SOUND_CHARGE,
 			(Location loc) -> {
-				World world = loc.getWorld();
-				world.spawnParticle(p.PARTICLE_AIR, loc, p.PARTICLE_AIR_NUMBER, ((double) p.RADIUS) / 2, ((double) p.RADIUS) / 2, ((double) p.RADIUS) / 2, 0.05);
+				p.PARTICLE_AIR.spawn(loc, ((double) p.RADIUS) / 2, ((double) p.RADIUS) / 2, ((double) p.RADIUS) / 2, 0.05);
 			},
 			(Location loc) -> {
-				World world = loc.getWorld();
-				world.spawnParticle(p.PARTICLE_LOAD, loc, 1, 0.25, 0.25, 0.25, 0);
+				p.PARTICLE_LOAD.spawn(loc, 0.25d, 0.25d, 0.25d, (double) 0.0d);
 			},
 			(Location loc) -> {
-				World world = loc.getWorld();
-				world.playSound(loc, p.SOUND_CAST, 1.5f, 0.65F);
-				world.playSound(loc, p.SOUND_CAST, 1.5f, 0.55F);
+				p.SOUND_CAST.play(loc, 1.5f, 0.65f);
 			},
 			(Location loc) -> {
-				World world = loc.getWorld();
-				world.spawnParticle(p.PARTICLE_EXPLODE_MAIN, loc, 1, 0.1, 0.1, 0.1, 0.3);
-				world.spawnParticle(p.PARTICLE_EXPLODE_SECOND, loc, 2, 0.25, 0.25, 0.25, 0.1);
+				p.PARTICLE_EXPLODE.spawn(loc, 0.2, 0.2, 0.2, 0.2);
 			},
 			(Location loc) -> {
 				for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), p.RADIUS)) {
@@ -99,18 +80,7 @@ public class NovaBoss extends BossAbilityGroup {
 					if (p.DAMAGE_PERCENTAGE > 0.0) {
 						BossUtils.bossDamagePercent(mBoss, player, p.DAMAGE_PERCENTAGE);
 					}
-
-					if (p.EFFECT_DURATION > 0) {
-						player.addPotionEffect(new PotionEffect(p.EFFECT, p.EFFECT_DURATION, p.EFFECT_AMPLIFIER));
-					}
-
-					if (p.FIRE_TICKS > 0) {
-						player.setFireTicks(p.FIRE_TICKS);
-					}
-
-					if (p.SILENCE_TICKS > 0) {
-						AbilityUtils.silencePlayer(player, p.SILENCE_TICKS);
-					}
+					p.EFFECTS.apply(player, mBoss);
 				}
 			})));
 

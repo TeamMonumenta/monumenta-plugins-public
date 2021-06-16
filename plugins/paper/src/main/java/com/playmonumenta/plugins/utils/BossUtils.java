@@ -1,13 +1,18 @@
 package com.playmonumenta.plugins.utils;
 
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.bosses.parameters.EffectsList;
+import com.playmonumenta.plugins.bosses.parameters.ParticlesList;
+import com.playmonumenta.plugins.bosses.parameters.SoundsList;
 
 import org.bukkit.Color;
 import org.bukkit.GameMode;
@@ -170,15 +175,54 @@ public class BossUtils {
 		if (!s.startsWith("[")) {
 			return;
 		}
-		s = s.replace("[", "").replace("]", "").replace(" ", "");
+		s = s.replace(" ", "").substring(1);
+
+		if (s.endsWith("]")) {
+			s = s.substring(0, s.length() - 1);
+		}
 		String[] toMap;
-		for (String mod : s.split(",")) {
-			toMap = mod.split("=");
+		int lastSplitIndex = 0;
+		int squareBrackets = 0;
+		int roundBrackets = 0;
+		char charAtI;
+
+		for (int i = 0; i < s.length(); i++) {
+			charAtI = s.charAt(i);
+			switch (charAtI) {
+				case '[':
+					squareBrackets++;
+					break;
+				case ']':
+					squareBrackets--;
+					break;
+				case '(':
+					roundBrackets++;
+					break;
+				case ')':
+					roundBrackets--;
+					break;
+				default:
+			}
+			if (squareBrackets == 0 && roundBrackets == 0 && charAtI == ',') {
+				toMap = s.substring(lastSplitIndex, i).split("=");
+				if (toMap.length == 2) {
+					map.put(toMap[0], toMap[1]);
+				} else {
+					Plugin.getInstance().getLogger().warning("Fail to load: " + s.substring(lastSplitIndex, i) + ". Illegal declaration");
+				}
+				lastSplitIndex = i + 1;
+			}
+		}
+
+		if (squareBrackets == 0 && roundBrackets == 0 && lastSplitIndex != s.length()) {
+			toMap = s.substring(lastSplitIndex, s.length()).split("=");
 			if (toMap.length == 2) {
 				map.put(toMap[0], toMap[1]);
 			} else {
-				Plugin.getInstance().getLogger().warning("Fail to load: " + mod + ". Illegal declaration");
+				Plugin.getInstance().getLogger().warning("Fail to load: " + toMap + ". Illegal declaration");
 			}
+		} else {
+			Plugin.getInstance().getLogger().warning("Fail too many brackets inside: " + s);
 		}
 	}
 
@@ -208,7 +252,12 @@ public class BossUtils {
 			String fieldName = field.getName();
 
 			try {
-				String fieldValueOrDefault = modMap.getOrDefault(translateFieldNameToTag(fieldName), field.get(parameters).toString());
+				String fieldValueOrDefault;
+				if (!t.equals(Color.class)) {
+					fieldValueOrDefault = modMap.getOrDefault(translateFieldNameToTag(fieldName), field.get(parameters).toString());
+				} else {
+					fieldValueOrDefault = modMap.getOrDefault(translateFieldNameToTag(fieldName), "#" + Integer.toHexString(((Color) field.get(parameters)).asRGB()));
+				}
 
 				if (t.equals(boolean.class)) {
 					field.set(parameters, Boolean.parseBoolean(fieldValueOrDefault));
@@ -230,6 +279,12 @@ public class BossUtils {
 					field.set(parameters, colorFromString(fieldValueOrDefault));
 				} else if (t.equals(String.class)) {
 					field.set(parameters, fieldValueOrDefault);
+				} else if (t.equals(EffectsList.class)) {
+					field.set(parameters, EffectsList.fromString(fieldValueOrDefault));
+				} else if (t.equals(SoundsList.class)) {
+					field.set(parameters, SoundsList.fromString(fieldValueOrDefault));
+				} else if (t.equals(ParticlesList.class)) {
+					field.set(parameters, ParticlesList.fromString(fieldValueOrDefault));
 				}
 			} catch (Exception ex) {
 				Plugin.getInstance().getLogger().warning("Failed to parse boss argument field " + fieldName + " for boss " + identityTag);
@@ -275,5 +330,46 @@ public class BossUtils {
 			throw new Exception("Unable to parse color: " + hexStringOrName);
 		}
 		return color;
+	}
+
+
+	public static List<String> splitByCommasUsingBrackets(String string) {
+		if (string.startsWith("[")) {
+			string = string.substring(1);
+		}
+		if (string.endsWith("]")) {
+			string = string.substring(0, string.length() - 1);
+		}
+
+		List<String> splitted = new ArrayList<String>();
+		int lastSplitIndex = 0;
+		int brackets = 0;
+
+		char charAtI;
+
+		for (int i = 0; i < string.length(); i++) {
+			charAtI = string.charAt(i);
+			switch (charAtI) {
+				case '(':
+					brackets++;
+					break;
+				case ')':
+					brackets--;
+					break;
+				default:
+			}
+			if (brackets == 0 && charAtI == ',') {
+				splitted.add(string.substring(lastSplitIndex, i));
+				lastSplitIndex = i + 1;
+			}
+		}
+
+		if (brackets == 0 && lastSplitIndex != string.length()) {
+			splitted.add(string.substring(lastSplitIndex, string.length()));
+		} else {
+			Plugin.getInstance().getLogger().warning("Failed to parse string: " + string + " too many brackets");
+		}
+
+		return splitted;
 	}
 }
