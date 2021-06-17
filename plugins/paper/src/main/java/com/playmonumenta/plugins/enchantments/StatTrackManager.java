@@ -6,18 +6,19 @@ import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.bukkit.ChatColor;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.scheduler.BukkitRunnable;
+
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.enchantments.StatTrack.StatTrackOptions;
 import com.playmonumenta.plugins.player.PlayerData;
-
-import org.bukkit.ChatColor;
-import org.bukkit.entity.Player;
-import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.scheduler.BukkitRunnable;
+import com.playmonumenta.plugins.utils.ItemUtils;
 
 
 
@@ -125,6 +126,7 @@ public class StatTrackManager {
 			newLore.add(line);
 		}
 		item.setLore(newLore);
+		ItemUtils.setPlainLore(item);
 
 		//Remove the item from the system
 		mStatUpdates.remove(item.getItemMeta().displayName().toString(), player.getUniqueId());
@@ -196,6 +198,9 @@ public class StatTrackManager {
 	 * @return whether the player owns the item's tracking
 	 */
 	public static boolean isPlayersItem(ItemStack item, Player player) {
+		if (player == null || item == null || !item.hasItemMeta() || !item.getItemMeta().hasLore()) {
+			return false;
+		}
 		List<String> lore = item.getLore();
 
 		for (String line : lore) {
