@@ -10,6 +10,7 @@ import org.bukkit.World;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
@@ -22,8 +23,14 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.utils.AbilityUtils;
+import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
+
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
+
 import com.playmonumenta.plugins.effects.PercentDamageDealt;
 
 public class Bezoar extends Ability {
@@ -53,8 +60,13 @@ public class Bezoar extends Ability {
 		mKills = 0;
 		World world = event.getEntity().getWorld();
 		Location loc = event.getEntity().getLocation().add(0, 0.25, 0);
-		Item item = world.dropItemNaturally(loc, new ItemStack(Material.LIME_CONCRETE));
-		item.setCustomName("Bezoar");
+		ItemStack itemBezoar = new ItemStack(Material.SPLASH_POTION);
+		ItemMeta bezoarMeta = itemBezoar.getItemMeta();
+		bezoarMeta.displayName(Component.text("Bezoar", NamedTextColor.WHITE)
+				.decoration(TextDecoration.ITALIC, false));
+		itemBezoar.setItemMeta(bezoarMeta);
+		ItemUtils.setPlainName(itemBezoar, "Bezoar");
+		Item item = world.dropItemNaturally(loc, itemBezoar);
 		item.setGlowing(true);
 		item.setPickupDelay(Integer.MAX_VALUE);
 

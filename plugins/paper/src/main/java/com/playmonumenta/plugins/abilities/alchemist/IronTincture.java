@@ -13,6 +13,10 @@ import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
+
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -22,6 +26,7 @@ import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
@@ -71,6 +76,11 @@ public class IronTincture extends Ability {
 	public void cast(Action action) {
 		Location loc = mPlayer.getEyeLocation();
 		ItemStack itemTincture = new ItemStack(Material.SPLASH_POTION);
+		ItemMeta tinctMeta = itemTincture.getItemMeta();
+		tinctMeta.displayName(Component.text("Iron Tincture", NamedTextColor.WHITE)
+				.decoration(TextDecoration.ITALIC, false));
+		itemTincture.setItemMeta(tinctMeta);
+		ItemUtils.setPlainName(itemTincture, "Iron Tincture");
 		World world = mPlayer.getWorld();
 		world.playSound(loc, Sound.ENTITY_SNOWBALL_THROW, 1, 0.15f);
 		Item tincture = world.dropItem(loc, itemTincture);
