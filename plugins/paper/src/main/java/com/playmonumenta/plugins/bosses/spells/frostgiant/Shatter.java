@@ -118,17 +118,11 @@ public class Shatter extends Spell {
 									world.spawnParticle(Particle.FLAME, l, 1, 0.1, 0.2, 0.1, 0.1);
 								}
 
-								Location tempLoc = l.clone();
-								for (int y = 0; y <= 5; y++) {
-									tempLoc.setY(l.getY() + y);
-									tempLoc.getBlock().setType(Material.AIR);
-								}
-
 								l.subtract(0, 1, 0);
 								//Spawns crimson hyphae as a warning at a 1/3 rate, will try to climb 1 block up or down if needed
 								if (l.getBlock().getType() != Material.CRIMSON_HYPHAE) {
 									if (FastUtils.RANDOM.nextInt(3) == 0 || mT == 20 * 2) {
-										if (l.getBlock().getRelative(BlockFace.UP).getType() != Material.AIR) {
+										while (l.getBlock().getRelative(BlockFace.UP).getType() != Material.AIR && l.getBlockY() <= mStartLoc.getBlockY() + 3) {
 											l.add(0, 1, 0);
 										}
 										if (l.getBlock().getType() == Material.AIR && l.getBlock().getRelative(BlockFace.DOWN).getType().isSolid()) {

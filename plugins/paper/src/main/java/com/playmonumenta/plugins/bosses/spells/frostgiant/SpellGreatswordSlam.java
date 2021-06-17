@@ -98,6 +98,9 @@ public class SpellGreatswordSlam extends Spell {
 						vec = VectorUtils.rotateYAxis(vec, loc.getYaw());
 
 						Location l = loc.clone().add(vec);
+						while (l.getBlock().getType() != Material.AIR && l.getBlockY() <= mStartLoc.getBlockY() + 3) {
+							l.add(0, 1, 0);
+						}
 						world.spawnParticle(Particle.SPELL_WITCH, l, 1, 0.25, 0.25, 0.25, 0);
 						world.spawnParticle(Particle.END_ROD, l, 1, 0.25, 0.25, 0.25, 0);
 					}
