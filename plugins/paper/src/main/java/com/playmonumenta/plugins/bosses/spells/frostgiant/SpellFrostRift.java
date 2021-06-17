@@ -96,9 +96,12 @@ public class SpellFrostRift extends Spell {
 		mBoss.setAI(false);
 
 		new BukkitRunnable() {
-			int mT = 0;
+			double mT = 0;
 			float mPitch = 1;
 			Location mLoc = mBoss.getLocation().add(0, 0.5, 0);
+			double mBossX = mLoc.getX();
+			double mBossY = mLoc.getY();
+			double mBossZ = mLoc.getZ();
 
 			@Override
 			public void run() {
@@ -106,12 +109,13 @@ public class SpellFrostRift extends Spell {
 				mPitch += 0.025;
 
 				for (Location p : locs) {
-					Vector line = LocationUtils.getDirectionTo(p, mLoc).setY(0).normalize();
-					Location point = mLoc;
-					for (int i = 1; i < 40; i++) {
-						point = point.add(line);
+					Vector line = LocationUtils.getDirectionTo(p, mLoc).setY(0);
+					double xloc = line.getX();
+					double yloc = line.getY();
+					double zloc = line.getZ();
+					for (int i = 1; i < 30; i++) {
 						//world.spawnParticle(Particle.BARRIER, particleLine, 1, 0, 0, 0);
-						world.spawnParticle(Particle.SQUID_INK, point, 1, 0.25, 0.25, 0.25, 0);
+						world.spawnParticle(Particle.SQUID_INK, mBossX + (xloc * i), mBossY + (yloc * i), mBossZ + (zloc * i), 1, 0.25, 0.25, 0.25, 0);
 					}
 				}
 				world.playSound(mLoc, Sound.BLOCK_ANVIL_LAND, SoundCategory.HOSTILE, 0.5f, mPitch);
@@ -225,9 +229,11 @@ public class SpellFrostRift extends Spell {
 				if (mT >= 20 * 18 || mRemoveLines) {
 					this.cancel();
 					for (Map.Entry<Location, Material> e : oldBlocks.entrySet()) {
-						e.getKey().getBlock().setType(e.getValue());
-						if (oldData.containsKey(e.getKey())) {
-							e.getKey().getBlock().setBlockData(oldData.get(e.getKey()));
+						if (e.getKey().getBlock().getType() != Material.AIR) {
+							e.getKey().getBlock().setType(e.getValue());
+							if (oldData.containsKey(e.getKey())) {
+								e.getKey().getBlock().setBlockData(oldData.get(e.getKey()));
+							}
 						}
 					}
 					locs.clear();

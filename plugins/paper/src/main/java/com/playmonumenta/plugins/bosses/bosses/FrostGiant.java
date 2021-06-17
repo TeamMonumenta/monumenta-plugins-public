@@ -919,10 +919,12 @@ public class FrostGiant extends BossAbilityGroup {
 	//If cracked = false, convert armor to uncracked variant
 	public static void changeArmorPhase(EntityEquipment equip, boolean cracked) {
 		if (cracked) {
-			equip.setChestplate(modifyItemName(equip.getChestplate(), "Cracked Frost Giant's Courage", NamedTextColor.AQUA, false));
-			equip.setLeggings(modifyItemName(equip.getLeggings(), "Cracked Frost Giant's Leggings", NamedTextColor.AQUA, false));
-			equip.setBoots(modifyItemName(equip.getBoots(), "Cracked Frost Giant's Boots", NamedTextColor.AQUA, false));
+			equip.setHelmet(modifyItemName(equip.getHelmet(), "Cracked Giant's Crown", NamedTextColor.AQUA, false));
+			equip.setChestplate(modifyItemName(equip.getChestplate(), "Cracked Giant's Courage", NamedTextColor.AQUA, false));
+			equip.setLeggings(modifyItemName(equip.getLeggings(), "Cracked Giant's Leggings", NamedTextColor.AQUA, false));
+			equip.setBoots(modifyItemName(equip.getBoots(), "Cracked Giant's Boots", NamedTextColor.AQUA, false));
 		} else {
+			equip.setHelmet(modifyItemName(equip.getHelmet(), "Frost Giant's Crown", NamedTextColor.AQUA, false));
 			equip.setChestplate(modifyItemName(equip.getChestplate(), "Frost Giant's Courage", NamedTextColor.AQUA, false));
 			equip.setLeggings(modifyItemName(equip.getLeggings(), "Frost Giant's Leggings", NamedTextColor.AQUA, false));
 			equip.setBoots(modifyItemName(equip.getBoots(), "Frost Giant's Boots", NamedTextColor.AQUA, false));

@@ -66,7 +66,7 @@ public class GiantStomp extends Spell {
 								vec = new Vector(FastUtils.cos(radian1) * i, 0, FastUtils.sin(radian1) * i);
 								vec = VectorUtils.rotateYAxis(vec, 5);
 								Location l = loc.clone().add(vec);
-								world.spawnParticle(Particle.REDSTONE, l, 1, 0.1, 1, 0.1, 0.1, BLUE_COLOR);
+								world.spawnParticle(Particle.REDSTONE, l, 5, 0.1, 1, 0.1, 0.1, BLUE_COLOR);
 							}
 						}
 
