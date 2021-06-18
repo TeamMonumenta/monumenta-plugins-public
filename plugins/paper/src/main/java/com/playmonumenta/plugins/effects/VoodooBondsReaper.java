@@ -45,13 +45,16 @@ public class VoodooBondsReaper extends Effect {
 		Bukkit.getScheduler().runTask(mPlugin, () -> {
 			if (mPlayer != null) {
 				mVoodooBonds = AbilityManager.getManager().getPlayerAbility(mPlayer, VoodooBonds.class);
-				mScore = mVoodooBonds.getAbilityScore();
+				mScore = mVoodooBonds != null ? mVoodooBonds.getAbilityScore() : 0;
 			}
 		});
 	}
 
 	@Override
 	public boolean entityDealDamageEvent(EntityDamageByEntityEvent event) {
+		if (mScore == 0) {
+			return true;
+		}
 		double percent = mScore == 1 ? PERCENT_1 : PERCENT_2;
 		if (!EntityUtils.isBoss(event.getEntity())) {
 			event.setDamage(event.getDamage() + mDamageTaken * percent);
@@ -77,7 +80,7 @@ public class VoodooBondsReaper extends Effect {
 		if (!mDone) {
 			double absorbHealth = AbsorptionUtils.getAbsorption(mPlayer);
 			if (absorbHealth <= 0) {
-				mPlayer.setHealth(Math.max(mPlayer.getHealth() - mPlayer.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue() * mDamagePercent, 1));
+				mPlayer.setHealth(Math.max(Math.min(mPlayer.getHealth() - mPlayer.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue() * mDamagePercent, mPlayer.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue()), 1));
 			} else {
 				if (mPlayer.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue() * mDamagePercent >= absorbHealth) {
 					double leftoverHealth = mPlayer.getHealth() + absorbHealth - mPlayer.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue() * mDamagePercent;

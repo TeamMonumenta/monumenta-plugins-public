@@ -193,7 +193,7 @@ public class PlayerListener implements Listener {
 		// Overrides
 		// TODO: Rewrite overrides system to handle item/block interactions separately
 		if (action == Action.LEFT_CLICK_AIR || action == Action.LEFT_CLICK_BLOCK) {
-			if (!mPlugin.mItemOverrides.leftClickInteraction(mPlugin, player, action, item, block)) {
+			if (item != null && !mPlugin.mItemOverrides.leftClickInteraction(mPlugin, player, action, item, block)) {
 				event.setCancelled(true);
 				return;
 			}

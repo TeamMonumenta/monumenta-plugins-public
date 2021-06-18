@@ -208,19 +208,20 @@ public class MobListener implements Listener {
 			} else if (damager instanceof EvokerFangs) {
 				//Custom damage for evoker fangs, tied to main hand damage of evoker.
 				LivingEntity source = ((EvokerFangs) damager).getOwner();
+				if (source != null) {
+					EntityEquipment equipment = source.getEquipment();
+					if (equipment != null) {
+						ItemStack mainhand = equipment.getItemInMainHand();
 
-				EntityEquipment equipment = source.getEquipment();
-				if (equipment != null) {
-					ItemStack mainhand = equipment.getItemInMainHand();
-
-					if (mainhand != null) {
-						ItemMeta meta = mainhand.getItemMeta();
-						if (meta != null && meta.hasAttributeModifiers()) {
-							Collection<AttributeModifier> modifiers = meta.getAttributeModifiers(Attribute.GENERIC_ATTACK_DAMAGE);
-							if (modifiers != null) {
-								for (AttributeModifier modifier : modifiers) {
-									if (modifier.getOperation() == Operation.ADD_NUMBER) {
-										event.setDamage(modifier.getAmount() + 1);
+						if (mainhand != null) {
+							ItemMeta meta = mainhand.getItemMeta();
+							if (meta != null && meta.hasAttributeModifiers()) {
+								Collection<AttributeModifier> modifiers = meta.getAttributeModifiers(Attribute.GENERIC_ATTACK_DAMAGE);
+								if (modifiers != null) {
+									for (AttributeModifier modifier : modifiers) {
+										if (modifier.getOperation() == Operation.ADD_NUMBER) {
+											event.setDamage(modifier.getAmount() + 1);
+										}
 									}
 								}
 							}
