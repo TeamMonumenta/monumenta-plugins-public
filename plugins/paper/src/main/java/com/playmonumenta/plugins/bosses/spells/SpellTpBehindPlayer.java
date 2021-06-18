@@ -76,8 +76,10 @@ public class SpellTpBehindPlayer extends Spell {
 					targetPlayer = (Player) target;
 				}
 			}
-			launch(targetPlayer, mRange);
-			animation(targetPlayer);
+			if (targetPlayer != null) {
+				launch(targetPlayer, mRange);
+				animation(targetPlayer);
+			}
 		}
 	}
 
