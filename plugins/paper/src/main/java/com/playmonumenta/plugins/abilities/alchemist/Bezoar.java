@@ -60,7 +60,7 @@ public class Bezoar extends Ability {
 		mKills = 0;
 		World world = event.getEntity().getWorld();
 		Location loc = event.getEntity().getLocation().add(0, 0.25, 0);
-		ItemStack itemBezoar = new ItemStack(Material.SPLASH_POTION);
+		ItemStack itemBezoar = new ItemStack(Material.LIME_CONCRETE);
 		ItemMeta bezoarMeta = itemBezoar.getItemMeta();
 		bezoarMeta.displayName(Component.text("Bezoar", NamedTextColor.WHITE)
 				.decoration(TextDecoration.ITALIC, false));
