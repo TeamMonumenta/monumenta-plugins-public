@@ -62,7 +62,7 @@ Once the elemental is dead, Kaul returns to the fight. The elemental will meld i
 
  */
 public class PrimordialElementalKaulBoss extends BossAbilityGroup {
-	public static final String identityTag = "boss_kaulprimoridal";
+	public static final String identityTag = "boss_kaulprimordial";
 	public static final int detectionRange = 100;
 
 	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {

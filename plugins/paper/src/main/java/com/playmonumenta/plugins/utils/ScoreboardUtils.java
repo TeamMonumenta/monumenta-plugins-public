@@ -6,9 +6,12 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Score;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+
 
 public class ScoreboardUtils {
-
 	/**
 	 * Get scoreboard value for player.
 	 *
@@ -63,4 +66,29 @@ public class ScoreboardUtils {
 		}
 	}
 
+	public static boolean checkTag(
+		@NotNull Player player,
+		@NotNull String tag
+	) {
+		return player.getScoreboardTags().contains(tag);
+	}
+
+	//TODO combine implementation with getScoreboardValue() above
+	/*
+	 * Gets the value of the specified objective for the specified player.
+	 * If the player has no value set for that objective,
+	 * the specified defaultValue is returned instead.
+	 */
+	public static int getValue(
+		@NotNull Player player,
+		@NotNull String objectiveName,
+		int defaultValue
+	) {
+		@Nullable Objective objective = player.getScoreboard().getObjective(objectiveName);
+		if (objective == null) {
+			return defaultValue;
+		} else {
+			return objective.getScore(player.getName()).getScore();
+		}
+	}
 }

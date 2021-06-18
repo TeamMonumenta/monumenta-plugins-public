@@ -152,6 +152,8 @@ public class BossUtils {
 						target.setHealth(Math.max(target.getHealth() - toTake, 1));
 					}
 				}
+				//TODO B#9334: test if this is doing more damage than the provided percentage - the intended amount
+				// Also test if iframes can eat this part of the damage and prevent events from triggering
 				NmsUtils.unblockableEntityDamageEntity(target, 1, boss);
 			}
 		}

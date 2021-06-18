@@ -6,6 +6,7 @@ import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
 import com.playmonumenta.plugins.player.PartialParticle;
+import com.playmonumenta.plugins.player.PartialParticle.DeltaVarianceGroup;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
@@ -135,27 +136,30 @@ public class Spark implements BaseEnchantment {
 				partialParticle.mCount = 15;
 				partialParticle.mExtra = 0.4;
 				partialParticle.mData = null;
-				partialParticle.mIsDirectional = true;
+				partialParticle.mDirectionalMode = true;
 				partialParticle.mExtraVariance = 0.1;
+				partialParticle.setDeltaVariance(DeltaVarianceGroup.VARY_X, true);
+				partialParticle.setDeltaVariance(DeltaVarianceGroup.VARY_Z, true);
+				partialParticle.mVaryPositiveY = true;
 				partialParticle.spawnAsEnemy();
 
 				@NotNull World world = enemy.getWorld();
 				@NotNull Location enemyLocation = enemy.getLocation();
-				// /playsound entity.firework_rocket.twinkle_far master @p ~ ~ ~ 0.3 1.2
-				world.playSound(
-					enemyLocation,
-					Sound.ENTITY_FIREWORK_ROCKET_TWINKLE_FAR,
-					SoundCategory.PLAYERS,
-					0.3f,
-					1f
-				);
-				// /playsound entity.firework_rocket.twinkle master @p ~ ~ ~ 0.3 1.5
+				// /playsound entity.firework_rocket.twinkle master @p ~ ~ ~ 0.5 1.5
 				world.playSound(
 					enemyLocation,
 					Sound.ENTITY_FIREWORK_ROCKET_TWINKLE,
 					SoundCategory.PLAYERS,
-					0.3f,
+					0.5f,
 					1.5f
+				);
+				// /playsound entity.firework_rocket.twinkle_far master @p ~ ~ ~ 0.5 1.2
+				world.playSound(
+					enemyLocation,
+					Sound.ENTITY_FIREWORK_ROCKET_TWINKLE_FAR,
+					SoundCategory.PLAYERS,
+					0.5f,
+					1.2f
 				);
 			}
 		}

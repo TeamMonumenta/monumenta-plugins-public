@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.utils;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import com.destroystokyo.paper.MaterialSetTag;
@@ -225,5 +226,86 @@ public class PlayerUtils {
 			isNonFallingAttack(player, enemy)
 			&& player.isOnGround()
 		);
+	}
+
+	public static boolean checkPlayer(@NotNull Player player) {
+		return player.isValid() && !GameMode.SPECTATOR.equals(player.getGameMode());
+	}
+
+	/*
+	 * Returns players within a bounding box of the specified dimensions.
+	 *
+	 * Does not include dead players or spectators
+	 */
+	public static @NotNull Collection<@NotNull Player> playersInBox(
+		@NotNull Location boxCenter,
+		double totalWidth,
+		double totalHeight
+	) {
+		return boxCenter.getNearbyPlayers(
+			totalWidth / 2,
+			totalHeight / 2,
+			PlayerUtils::checkPlayer
+		);
+	}
+
+	/*
+	 * Returns players within a cube of the specified dimensions.
+	 *
+	 * Does not include dead players or spectators
+	 */
+	public static @NotNull Collection<@NotNull Player> playersInCube(
+		@NotNull Location cubeCenter,
+		double sideLength
+	) {
+		return playersInBox(cubeCenter, sideLength, sideLength);
+	}
+
+	/*
+	 * Returns players within a sphere of the specified dimensions.
+	 *
+	 * Measures based on feet location.
+	 * Does not include dead players or spectators
+	 */
+	public static @NotNull Collection<@NotNull Player> playersInSphere(
+		@NotNull Location sphereCenter,
+		double radius
+	) {
+		@NotNull Collection<@NotNull Player> spherePlayers = playersInCube(sphereCenter, radius * 2);
+		double radiusSquared = radius * radius;
+		spherePlayers.removeIf((@NotNull Player player) -> {
+			if (sphereCenter.distanceSquared(player.getLocation()) > radiusSquared) {
+				return true;
+			} else {
+				return false;
+			}
+		});
+
+		return spherePlayers;
+	}
+
+	/*
+	 * Returns players within an upright cylinder of the specified dimensions.
+	 *
+	 * Does not include dead players or spectators
+	 */
+	public static @NotNull Collection<@NotNull Player> playersInCylinder(
+		@NotNull Location cylinderCenter,
+		double radius,
+		double totalHeight
+	) {
+		@NotNull Collection<@NotNull Player> cylinderPlayers = playersInBox(cylinderCenter, radius * 2, totalHeight);
+		double centerY = cylinderCenter.getY();
+		cylinderPlayers.removeIf((@NotNull Player player) -> {
+			@NotNull Location flattenedLocation = player.getLocation();
+			flattenedLocation.setY(centerY);
+			if (cylinderCenter.distanceSquared(flattenedLocation) > radius * radius) {
+				return true;
+			} else {
+				return false;
+			}
+		});
+
+		return cylinderPlayers;
 	}
 }

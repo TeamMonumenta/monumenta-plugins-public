@@ -1,196 +1,551 @@
 package com.playmonumenta.plugins.bosses.spells.kaul;
 
 import java.util.ArrayList;
-import java.util.List;
+import java.util.Collection;
+import java.util.Collections;
+
+import com.playmonumenta.plugins.Constants;
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.bosses.bosses.BossAbilityGroup;
+import com.playmonumenta.plugins.bosses.bosses.Kaul;
+import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.player.PPGroundCircle;
+import com.playmonumenta.plugins.player.PPLightning;
+import com.playmonumenta.plugins.player.PPPillar;
+import com.playmonumenta.plugins.player.PartialParticle;
+import com.playmonumenta.plugins.player.PartialParticle.DeltaVarianceGroup;
+import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.LocationUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
+import org.bukkit.Particle.DustOptions;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
-import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import com.playmonumenta.plugins.bosses.bosses.Kaul;
-import com.playmonumenta.plugins.bosses.spells.Spell;
-import com.playmonumenta.plugins.utils.BossUtils;
-import com.playmonumenta.plugins.utils.FastUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
 
-/*
- * Lightning Strike (Always Active, does not use minecraft lighting).
- * Creates a patch of electrically charged ground (particle effects)
- * below 1/3 (Based on player count) random players. 2 seconds later,
- * lighting strikes over the charged ground. This delay gives players
- * the chance to dodge the lighting strike if they are fast enough.
- * ( 22s cd )
- */
+
 public class SpellLightningStrike extends Spell {
+	public static final DustOptions DUST_GRAY_LARGE = new DustOptions(Color.fromRGB(51, 51, 51), 5);
+	public static final DustOptions DUST_YELLOW_LARGE = new DustOptions(Color.fromRGB(255, 255, 64), 1.25f);
+	public static final DustOptions DUST_YELLOW_SMALL = new DustOptions(DUST_YELLOW_LARGE.getColor(), 0.75f);
+	public static final DustOptions DUST_LIGHT_YELLOW_SMALL = new DustOptions(Color.fromRGB(255, 255, 128), 0.75f);
 
-	private int mCooldown = 0;
-	private LivingEntity mBoss;
-	private Plugin mPlugin;
-	private double mRange;
-	private int mTimer;
-	private int mDivisor;
-	private Location mLoc;
-	private static final double HITBOX_HEIGHT = 10;
-	private static final double HITBOX_RADIUS = 3;
-	private static final double HITBOX_MAX_DIST = Math.sqrt(HITBOX_HEIGHT * HITBOX_HEIGHT + HITBOX_RADIUS * HITBOX_RADIUS);
-	private static final Particle.DustOptions YELLOW_1_COLOR = new Particle.DustOptions(Color.fromRGB(255, 255, 20), 1.0f);
-	private static final Particle.DustOptions YELLOW_2_COLOR = new Particle.DustOptions(Color.fromRGB(255, 255, 120), 1.0f);
+	// Fraction of arena participants to strike
+	private static final int TARGETS_DIVISOR = 3;
 
-	public SpellLightningStrike(Plugin plugin, LivingEntity boss, Location loc, double range, int timer, int divisor) {
-		mPlugin = plugin;
-		mBoss = boss;
-		mRange = range;
-		mTimer = timer;
-		mDivisor = divisor;
-		mLoc = loc;
+	// Lightning shock
+	private static final double SHOCK_DAMAGE_MULTIPLIER = 0.05;
+	// Cylindrical dimensions from centre
+	// (total height is twice of vertical range)
+	private static final int SHOCK_RADIUS = 3;
+	private static final int SHOCK_VERTICAL_RANGE = 10;
+	private static final int SHOCK_INTERVAL_TICKS = 2;
+	private static final int SHOCK_DELAY_TICKS = (int)(1.75 * Constants.TICKS_PER_SECOND);
+	private static final int SHOCK_COUNT = 10;
 
-		if (mTimer == 20 * 18) {
-			mCooldown = mTimer / 5;
+	// Lingering fire
+	private static final double FIRE_DAMAGE_MULTIPLIER = 0.1;
+	private static final int FIRE_RADIUS = SHOCK_RADIUS;
+	private static final int FIRE_DURATION_TICKS = (int)(5.25 * Constants.TICKS_PER_SECOND);
+	private static final int FIRE_INTERVAL_TICKS = (int)(0.5 * Constants.TICKS_PER_SECOND);
+	private static final int FIRE_DELAY_TICKS = (int)(0.25 * Constants.TICKS_PER_SECOND);
+	private static final int FIRE_ALIGHT_TICKS = 3 * Constants.TICKS_PER_SECOND;
+
+	private @NotNull Kaul mKaul;
+	private int mCooldownTicks;
+	private int mRemainingCooldownTicks;
+
+	public SpellLightningStrike(
+		@NotNull Kaul kaul,
+		int cooldownSeconds,
+		boolean startCooledDown
+	) {
+		mKaul = kaul;
+		mCooldownTicks = cooldownSeconds * Constants.TICKS_PER_SECOND;
+
+		if (startCooledDown) {
+			mRemainingCooldownTicks = 0;
+		} else {
+			mRemainingCooldownTicks = mCooldownTicks;
 		}
 	}
 
 	@Override
 	public void run() {
+		// Cooldown fully pauses if totems are active
 		if (SpellPutridPlague.getPlagueActive()) {
 			return;
 		}
 
-		mCooldown--;
-		if (mCooldown <= 0) {
-			mCooldown = (mTimer / 5);
-			List<Player> players = PlayerUtils.playersInRange(mLoc, mRange, true);
-			if (players.size() > 2) {
-				List<Player> toHit = new ArrayList<Player>();
-				int cap = players.size() / mDivisor;
-				for (int i = 0; i < cap; i++) {
-					Player player = players.get(FastUtils.RANDOM.nextInt(players.size()));
-					if (!toHit.contains(player)) {
-						toHit.add(player);
-					} else {
-						cap++;
-					}
-				}
+		// Count of the tick this run, first being mCooldownTicks, last being 1.
+		// If previous run was the last tick of cooldown (now tick #0),
+		// cast and reset as this is now first mCooldownTicks tick
+		if (mRemainingCooldownTicks <= 0) {
+			mRemainingCooldownTicks = mCooldownTicks;
+			@NotNull Collection<@NotNull Player> arenaParticipants = mKaul.getArenaParticipants();
+			@NotNull Collection<@NotNull Player> targetPlayers = Collections.emptyList();
 
-				for (Player player : toHit) {
-					lightning(player);
-				}
+			int targetCount = arenaParticipants.size() / TARGETS_DIVISOR;
+			if (targetCount < 1) {
+				// Integer division by TARGETS_DIVISOR.
+				// < TARGETS_DIVISOR players means everyone targeted
+				targetPlayers = arenaParticipants;
 			} else {
-				for (Player player : players) {
-					lightning(player);
-				}
+				@NotNull ArrayList<@NotNull Player> shuffledArenaParticipants = new ArrayList<>(arenaParticipants);
+				Collections.shuffle(shuffledArenaParticipants);
+				targetPlayers = shuffledArenaParticipants.subList(0, targetCount);
 			}
+
+			targetPlayers.forEach((@NotNull Player targetPlayer) -> startStrike(targetPlayer));
 		}
-	}
 
-	public void lightning(Player player) {
-		World world = player.getWorld();
-		world.playSound(player.getLocation(), Sound.ENTITY_FIREWORK_ROCKET_TWINKLE, 1, 1.25f);
-		Location loc = player.getLocation();
-
-		new BukkitRunnable() {
-			int mTicks = 0;
-
-			@Override
-			public void run() {
-				mTicks++;
-				world.spawnParticle(Particle.REDSTONE, loc, 12, 1.5, 0.1, 1.5, YELLOW_1_COLOR);
-				world.spawnParticle(Particle.REDSTONE, loc, 12, 1.5, 0.1, 1.5, YELLOW_2_COLOR);
-				world.spawnParticle(Particle.FIREWORKS_SPARK, loc.clone().add(0, 1, 0), 3, 1.5, 0.5, 1.5, 0.05);
-				Location prestrike = loc.clone().add(0, 10, 0);
-				for (int i = 0; i < 10; i++) {
-					prestrike.subtract(0, 1, 0);
-					world.spawnParticle(Particle.FLAME, prestrike, 1, 0, 0, 0, 0.05);
-				}
-				if (mTicks >= 20 * 1.25) {
-					this.cancel();
-					Location strike = loc.clone().add(0, 10, 0);
-					for (int i = 0; i < 10; i++) {
-						strike.subtract(0, 1, 0);
-						world.spawnParticle(Particle.REDSTONE, strike, 10, 0.3, 0.3, 0.3, YELLOW_1_COLOR);
-						world.spawnParticle(Particle.REDSTONE, strike, 10, 0.3, 0.3, 0.3, YELLOW_2_COLOR);
-					}
-					world.spawnParticle(Particle.FIREWORKS_SPARK, loc, 10, 0, 0, 0, 0.25);
-					world.spawnParticle(Particle.FLAME, loc, 30, 0, 0, 0, 0.175);
-					world.spawnParticle(Particle.SMOKE_LARGE, loc, 10, 0, 0, 0, 0.25);
-					world.playSound(loc, Sound.ENTITY_LIGHTNING_BOLT_THUNDER, 1, 1);
-					world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 1, 0.9f);
-					List<Player> potentialHits = PlayerUtils.playersInRange(loc, HITBOX_MAX_DIST, true);
-					for (Player p : potentialHits) {
-						Location pLoc = player.getLocation();
-						if (!(pLoc.getY() > loc.getY() + HITBOX_HEIGHT || pLoc.getY() < loc.getY() - HITBOX_HEIGHT)) {
-							Location flattenedLoc = new Location(world, pLoc.getX(), loc.getY(), pLoc.getZ());
-							if (flattenedLoc.distance(loc) < HITBOX_RADIUS) {
-								multiHit(p);
-							}
-						}
-					}
-					lingeringDamage(world, loc);
-				}
-			}
-
-		}.runTaskTimer(mPlugin, 10, 1);
+		// Count of the tick next run
+		mRemainingCooldownTicks -= BossAbilityGroup.PASSIVE_RUN_INTERVAL;
 	}
 
 	@Override
 	public int cooldownTicks() {
+		// We want to always run,
+		// and manage cooldown ourselves (for startCooledDown logic)
 		return 0;
 	}
 
-	public void multiHit(Player p) {
-		new BukkitRunnable() {
-			int mNDT = p.getNoDamageTicks();
-			int mInc = 0;
+	public void startStrike(@NotNull Player targetPlayer) {
+		@NotNull World world = targetPlayer.getWorld();
+		@NotNull Location strikeLocation = targetPlayer.getLocation();
+
+		// P: Danger, tall markers
+		@NotNull PPPillar abovegroundMarker = new PPPillar(
+			Particle.REDSTONE,
+			strikeLocation,
+			2 * SHOCK_VERTICAL_RANGE,
+			0,
+			0,
+			DUST_YELLOW_SMALL
+		);
+		abovegroundMarker.init(SHOCK_VERTICAL_RANGE);
+		abovegroundMarker.spawnAsBoss();
+		@NotNull PPPillar undergroundMarker = new PPPillar(
+			Particle.FIREWORKS_SPARK,
+			strikeLocation.clone().subtract(0, SHOCK_VERTICAL_RANGE, 0),
+			2 * SHOCK_VERTICAL_RANGE,
+			0,
+			0
+		);
+		undergroundMarker.init(SHOCK_VERTICAL_RANGE);
+		undergroundMarker.spawnAsBoss();
+
+
+		// S: Thunder & distant sparks
+		// /playsound entity.lightning_bolt.thunder master @p ~ ~ ~ 1 1.25
+		world.playSound(
+			strikeLocation,
+			Sound.ENTITY_LIGHTNING_BOLT_THUNDER,
+			SoundCategory.HOSTILE,
+			1,
+			1.25f
+		);
+		// /playsound entity.lightning_bolt.thunder master @p ~ ~ ~ 0.75 1.5
+		world.playSound(
+			strikeLocation,
+			Sound.ENTITY_LIGHTNING_BOLT_THUNDER,
+			SoundCategory.HOSTILE,
+			0.75f,
+			1.5f
+		);
+		// /playsound entity.lightning_bolt.thunder master @p ~ ~ ~ 1 1.75
+		world.playSound(
+			strikeLocation,
+			Sound.ENTITY_LIGHTNING_BOLT_THUNDER,
+			SoundCategory.HOSTILE,
+			1,
+			1.75f
+		);
+		// /playsound entity.firework_rocket.twinkle_far master @p ~ ~ ~ 0.75 1.75
+		world.playSound(
+			strikeLocation,
+			Sound.ENTITY_FIREWORK_ROCKET_TWINKLE_FAR,
+			SoundCategory.HOSTILE,
+			0.75f,
+			1.75f
+		);
+
+		// /particle dust 0.2 0.2 0.2 5 ~ ~10 ~ 1.5 0.25 1.5 0 5
+		@NotNull PartialParticle stormClouds = new PartialParticle(
+			Particle.REDSTONE,
+			strikeLocation.clone().add(0, SHOCK_VERTICAL_RANGE, 0),
+			5,
+			1.5,
+			0.25,
+			1.5,
+			0,
+			DUST_GRAY_LARGE
+		);
+
+		// /particle dust 1 1 0.25 1 ~ ~ ~ 0.75 0.25 0.75 0 5
+		int electricRingMarkerCount = 8;
+		@NotNull PPGroundCircle electricRingMarker = new PPGroundCircle(
+			Particle.REDSTONE,
+			strikeLocation,
+			5 * electricRingMarkerCount,
+			0,
+			0.25,
+			0,
+			0,
+			DUST_YELLOW_LARGE
+		);
+		electricRingMarker.init(SHOCK_RADIUS, true);
+
+		@NotNull BukkitRunnable lightningRunnable = new BukkitRunnable() {
+			int mCountdownTicks = SHOCK_DELAY_TICKS;
+
+			@Nullable BukkitRunnable mInternalParticleRunnable;
+
 			@Override
 			public void run() {
-				World world = mBoss.getWorld();
-				mInc++;
-				if (mInc < 22 && mInc % 2 == 0) {
-					p.setNoDamageTicks(0);
-					world.spawnParticle(Particle.CRIT_MAGIC, p.getLocation(), 30, 0.1, 0.1, 0.1, 0.75);
-					BossUtils.bossDamagePercent(mBoss, p, 0.05, (Location)null);
-					// Doesn't matter if the player is blocking, there are 18 hits and only one can be blocked
+				// P: Dark storm clouds gather
+				stormClouds.spawnAsBoss();
+
+				// P: Danger, yellow electric ring marker
+				if (mCountdownTicks != SHOCK_DELAY_TICKS) {
+					electricRingMarker.mCount = electricRingMarkerCount;
 				}
-				if (mInc >= 20) {
-					p.setNoDamageTicks(mNDT);
-					this.cancel();
+				electricRingMarker.spawnAsBoss();
+
+				// Count of the tick this run, last being 1
+				if (mCountdownTicks == PPLightning.ANIMATION_TICKS) {
+					// P: Lightning starts
+					@NotNull PPLightning lightning = new PPLightning(
+						Particle.END_ROD,
+						strikeLocation,
+						8,
+						0,
+						0
+					);
+					lightning.init(SHOCK_VERTICAL_RANGE, 2.5, 0.3, 0.15);
+					lightning.spawnAsBoss();
+					mInternalParticleRunnable = lightning.mRunnable;
+					if (mInternalParticleRunnable != null) {
+						mActiveRunnables.add(mInternalParticleRunnable);
+					}
+
+					// S: Electricity courses
+					// /playsound entity.firework_rocket.twinkle master @p ~ ~ ~ 1 1.25
+					world.playSound(
+						strikeLocation,
+						Sound.ENTITY_FIREWORK_ROCKET_TWINKLE,
+						SoundCategory.PLAYERS,
+						1,
+						1.25f
+					);
+					// /playsound entity.firework_rocket.twinkle_far master @p ~ ~ ~ 1 1.5
+					world.playSound(
+						strikeLocation,
+						Sound.ENTITY_FIREWORK_ROCKET_TWINKLE_FAR,
+						SoundCategory.PLAYERS,
+						1,
+						1.5f
+					);
+				}
+
+				// Count of the tick next run.
+				// If next run would be tick #0
+				if (--mCountdownTicks < 1) {
+					mActiveRunnables.remove(this);
+					if (mInternalParticleRunnable != null) {
+						mActiveRunnables.remove(mInternalParticleRunnable);
+					}
+					cancel();
+
+					@NotNull Collection<@NotNull Player> shockPlayers = PlayerUtils.playersInCylinder(
+						strikeLocation,
+						SHOCK_RADIUS,
+						2 * SHOCK_VERTICAL_RANGE
+					);
+					shockPlayers.forEach((@NotNull Player player) -> strikeShock(strikeLocation, player));
+
+					startFire(strikeLocation);
+
+					// P: Lightning hits & sparks
+					// /particle firework ~ ~ ~ 0.9 1.8 0.9 0.3 0
+					@NotNull PartialParticle sparks = new PartialParticle(
+						Particle.FIREWORKS_SPARK,
+						strikeLocation,
+						20,
+						0.9,
+						1.8,
+						0.9,
+						0.25,
+						null,
+						true,
+						0.05
+					);
+					sparks.setDeltaVariance(DeltaVarianceGroup.VARY_X, true);
+					sparks.setDeltaVariance(DeltaVarianceGroup.VARY_Z, true);
+					sparks.mVaryPositiveY = true;
+					sparks.spawnAsBoss();
+					// /particle lava ~ ~ ~ 0 0 0 0 10
+					new PartialParticle(
+						Particle.LAVA,
+						strikeLocation,
+						20,
+						0,
+						0
+					).spawnAsBoss();
+					// /particle dust 1 1 0.5 0.75 ~ ~ ~ 1.5 1.5 1.5 0 100
+					new PartialParticle(
+						Particle.REDSTONE,
+						strikeLocation,
+						100,
+						1.5,
+						0,
+						DUST_LIGHT_YELLOW_SMALL
+					).spawnAsBoss();
+
+					// S: Booms & fire ignites
+					// /playsound entity.lightning_bolt.impact master @p ~ ~ ~ 0.75 0.5
+					world.playSound(
+						strikeLocation,
+						Sound.ENTITY_LIGHTNING_BOLT_IMPACT,
+						SoundCategory.HOSTILE,
+						0.75f,
+						0.5f
+					);
+					// /playsound entity.lightning_bolt.impact master @p ~ ~ ~ 0.75 0.75
+					world.playSound(
+						strikeLocation,
+						Sound.ENTITY_LIGHTNING_BOLT_IMPACT,
+						SoundCategory.HOSTILE,
+						0.75f,
+						0.75f
+					);
+					// /playsound entity.blaze.shoot master @p ~ ~ ~ 1 0.75
+					world.playSound(
+						strikeLocation,
+						Sound.ENTITY_BLAZE_SHOOT,
+						SoundCategory.HOSTILE,
+						1,
+						0.75f
+					);
+					// /playsound entity.blaze.shoot master @p ~ ~ ~ 1 1
+					world.playSound(
+						strikeLocation,
+						Sound.ENTITY_BLAZE_SHOOT,
+						SoundCategory.HOSTILE,
+						1,
+						1
+					);
 				}
 			}
-		}.runTaskTimer(mPlugin, 0, 1);
+		};
+		lightningRunnable.runTaskTimer(Plugin.getInstance(), 0, 1);
+		mActiveRunnables.add(lightningRunnable);
 	}
 
-	public void lingeringDamage(World world, Location loc) {
-		new BukkitRunnable() {
-			int mTicks = 0;
+	public void strikeShock(
+		@NotNull Location strikeLocation,
+		@NotNull Player player
+	) {
+		// /particle dust 1 1 0.5 0.75 ~ ~ ~ 0.225 0.45 0.225 0 5
+		double widerWidthDelta = PartialParticle.getWidthDelta(player) * 1.5;
+		@NotNull PartialParticle shockLightning = new PartialParticle(
+			Particle.REDSTONE,
+			LocationUtils.getHalfHeightLocation(player),
+			5,
+			widerWidthDelta,
+			PartialParticle.getHeightDelta(player),
+			widerWidthDelta,
+			0,
+			DUST_LIGHT_YELLOW_SMALL
+		);
+		// Initial location already calculated as part of making object
+
+		@NotNull BukkitRunnable shockRunnable = new BukkitRunnable() {
+			boolean mInitialLocationUsed = false;
+			int mShockTracker = 0;
+
 			@Override
 			public void run() {
-				mTicks += 2;
+				//TODO B#9334: true iframe bypass via edited bossDamagePercent(),
+				// similar to bypassIFrames in entity utils, instead of overwriting
+				// last damage to a small amount with every shock
+				player.setNoDamageTicks(0);
+				BossUtils.bossDamagePercent(mKaul.getBoss(), player, SHOCK_DAMAGE_MULTIPLIER, strikeLocation);
 
-				for (double deg = 0; deg < 360; deg += 15) {
-					world.spawnParticle(Particle.FLAME, loc.clone().add(FastUtils.cos(deg) * 3, 0, FastUtils.sin(deg) * 3), 1, 0.15, 0.15, 0.15, 0.05);
+				if (mInitialLocationUsed) {
+					shockLightning.mLocation = LocationUtils.getHalfHeightLocation(player);
 				}
-				world.spawnParticle(Particle.REDSTONE, loc, 10, 2, 0.3, 2, YELLOW_1_COLOR);
-				world.spawnParticle(Particle.REDSTONE, loc, 10, 2, 0.3, 2, YELLOW_2_COLOR);
-				if (mTicks % 10 == 0) {
-					for (Player player : PlayerUtils.playersInRange(loc, 3)) {
-						if (loc.distance(player.getLocation()) < Kaul.detectionRange) {
-							BossUtils.bossDamagePercent(mBoss, player, 0.1, (Location)null);
-							player.setFireTicks(20 * 3);
-						}
-					}
+				shockLightning.spawnAsBoss();
+
+				// Count of the shock this run.
+				// Once shocked SHOCK_COUNT times
+				if (++mShockTracker >= SHOCK_COUNT) {
+					mActiveRunnables.remove(this);
+					cancel();
+				} else {
+					mInitialLocationUsed = true;
+				}
+			}
+		};
+		shockRunnable.runTaskTimer(Plugin.getInstance(), 0, SHOCK_INTERVAL_TICKS);
+		mActiveRunnables.add(shockRunnable);
+	}
+
+	// Starts in the next tick
+	public void startFire(@NotNull Location fireLocation) {
+		@NotNull World world = fireLocation.getWorld();
+
+		// /particle dust 1 1 0.25 1 ~ ~ ~ 0.75 0.25 0.75 0 5
+		@NotNull PPGroundCircle fireRingMarker = new PPGroundCircle(
+			Particle.FLAME,
+			fireLocation,
+			5,
+			0,
+			0.25,
+			0,
+			0
+		);
+		fireRingMarker.init(FIRE_RADIUS, true);
+
+		// /particle flame ~ ~ ~ 0.1 1 0.1 0.1 0
+		int risingFlamesCount = 5;
+		@NotNull PPGroundCircle risingFlames = new PPGroundCircle(
+			Particle.FLAME,
+			fireLocation,
+			3 * risingFlamesCount,
+			0.1,
+			1,
+			0.1,
+			0.075,
+			null,
+			true,
+			0.025
+		);
+		risingFlames.init(FIRE_RADIUS);
+		risingFlames.setDeltaVariance(DeltaVarianceGroup.VARY_X, true);
+		risingFlames.setDeltaVariance(DeltaVarianceGroup.VARY_Z, true);
+		risingFlames.mVaryPositiveY = true;
+
+		// /particle smoke ~ ~ ~ 0.75 0 0.75 0.01 5
+		// /particle large_smoke ~ ~ ~ 0.75 0 0.75 0.01 2
+		int smallSmokeCount = 4;
+		int largeSmokeCount = 2;
+		@NotNull PPGroundCircle smoke = new PPGroundCircle(
+			Particle.SMOKE_NORMAL,
+			fireLocation,
+			5,
+			0,
+			0.005,
+			null,
+			false,
+			0.005
+		);
+		smoke.init(FIRE_RADIUS);
+
+		int fireSoundLastThreshold = 3 * Constants.TICKS_PER_SECOND;
+		@NotNull BukkitRunnable fireRunnable = new BukkitRunnable() {
+			int mRemainingTicks = FIRE_DURATION_TICKS;
+
+			@Override
+			public void run() {
+				double diminishingCountFactor = mRemainingTicks / (double)FIRE_DURATION_TICKS;
+
+				// P: Danger, fire ring marker
+				fireRingMarker.spawnAsBoss();
+
+				// P: Rising flames
+				if (mRemainingTicks != FIRE_DURATION_TICKS) {
+					risingFlames.mCount = (int)Math.ceil(risingFlamesCount * diminishingCountFactor);
+				}
+				risingFlames.spawnAsBoss();
+
+				// P: Large smoke transitions to small
+				smoke.mCount = (int)Math.ceil(smallSmokeCount * diminishingCountFactor);
+				smoke.spawnAsBoss();
+				if (mRemainingTicks > FIRE_DURATION_TICKS / 2) {
+					smoke.mParticle = Particle.SMOKE_LARGE;
+					smoke.mCount = (int)Math.ceil(largeSmokeCount * diminishingCountFactor / 2);
+					smoke.spawnAsBoss();
+					smoke.mParticle = Particle.SMOKE_NORMAL;
 				}
 
-				if (mTicks >= 20 * 5) {
-					this.cancel();
+				// S: Flames burn
+				if (mRemainingTicks == FIRE_DURATION_TICKS) {
+					// /playsound entity.blaze.burn master @p ~ ~ ~ 1 0
+					world.playSound(
+						fireLocation,
+						Sound.ENTITY_BLAZE_BURN,
+						SoundCategory.HOSTILE,
+						1,
+						0
+					);
+					// /playsound entity.blaze.burn master @p ~ ~ ~ 1 1
+					world.playSound(
+						fireLocation,
+						Sound.ENTITY_BLAZE_BURN,
+						SoundCategory.HOSTILE,
+						1,
+						1
+					);
+					// /playsound entity.blaze.burn master @p ~ ~ ~ 1 1.5f
+					world.playSound(
+						fireLocation,
+						Sound.ENTITY_BLAZE_BURN,
+						SoundCategory.HOSTILE,
+						1,
+						1.5f
+					);
+				} else if (
+					mRemainingTicks >= fireSoundLastThreshold
+					&& mRemainingTicks % 3 == 0
+				) {
+					world.playSound(
+						fireLocation,
+						Sound.ENTITY_BLAZE_BURN,
+						SoundCategory.HOSTILE,
+						1,
+						(float)FastUtils.randomDoubleInRange(0, 1.5)
+					);
+				}
+
+				if (
+					mRemainingTicks <= FIRE_DURATION_TICKS - FIRE_DELAY_TICKS
+					&& mRemainingTicks % FIRE_INTERVAL_TICKS == 0
+				) {
+					@NotNull Collection<@NotNull Player> burnPlayers = PlayerUtils.playersInSphere(
+						fireLocation,
+						FIRE_RADIUS
+					);
+					burnPlayers.forEach((@NotNull Player player) -> {
+						player.setFireTicks(FIRE_ALIGHT_TICKS);
+
+						//TODO B#9334: true iframe bypass via edited bossDamagePercent(),
+						// similar to bypassIFrames in entity utils, instead of overwriting
+						// last damage to a small amount with every shock
+						player.setNoDamageTicks(0);
+						BossUtils.bossDamagePercent(mKaul.getBoss(), player, FIRE_DAMAGE_MULTIPLIER, fireLocation);
+					});
+				}
+
+				// Count of the tick next run.
+				// If next run would be tick #0
+				if (--mRemainingTicks < 1) {
+					mActiveRunnables.remove(this);
+					cancel();
 				}
 			}
 
-		}.runTaskTimer(mPlugin, 5, 2);
-		this.cancel();
+		};
+		fireRunnable.runTaskTimer(Plugin.getInstance(), 1, 1);
+		mActiveRunnables.add(fireRunnable);
 	}
 }

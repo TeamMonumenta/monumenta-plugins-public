@@ -3,6 +3,18 @@ package com.playmonumenta.plugins.bosses.bosses;
 import java.util.List;
 import java.util.logging.Level;
 
+import com.destroystokyo.paper.event.entity.EntityPathfindEvent;
+import com.playmonumenta.plugins.Constants;
+import com.playmonumenta.plugins.bosses.BossBarManager;
+import com.playmonumenta.plugins.bosses.BossManager;
+import com.playmonumenta.plugins.bosses.SpellManager;
+import com.playmonumenta.plugins.bosses.events.SpellCastEvent;
+import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.events.CustomEffectApplyEvent;
+import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.SerializationUtils;
+
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
@@ -20,16 +32,7 @@ import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import com.destroystokyo.paper.event.entity.EntityPathfindEvent;
-import com.playmonumenta.plugins.bosses.BossBarManager;
-import com.playmonumenta.plugins.bosses.BossManager;
-import com.playmonumenta.plugins.bosses.SpellManager;
-import com.playmonumenta.plugins.bosses.events.SpellCastEvent;
-import com.playmonumenta.plugins.bosses.spells.Spell;
-import com.playmonumenta.plugins.events.CustomEffectApplyEvent;
-import com.playmonumenta.plugins.utils.BossUtils;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.SerializationUtils;
+
 
 public abstract class BossAbilityGroup {
 	@FunctionalInterface
@@ -39,6 +42,8 @@ public abstract class BossAbilityGroup {
 		 */
 		void run(LivingEntity entity);
 	}
+
+	public static final int PASSIVE_RUN_INTERVAL = Constants.QUARTER_TICKS_PER_SECOND;
 
 	protected final Plugin mPlugin;
 	protected final LivingEntity mBoss;
@@ -95,7 +100,7 @@ public abstract class BossAbilityGroup {
 					mBossBar.update();
 				}
 
-				mMissingTicks += 5;
+				mMissingTicks += PASSIVE_RUN_INTERVAL;
 				if (mMissingTicks > 100) {
 					mMissingTicks = 0;
 					/* Check if somehow the boss entity is missing even though this is still running */
@@ -124,7 +129,7 @@ public abstract class BossAbilityGroup {
 				}
 			}
 		};
-		mTaskPassive.runTaskTimer(mPlugin, 1L, 5L);
+		mTaskPassive.runTaskTimer(mPlugin, 1, PASSIVE_RUN_INTERVAL);
 
 		mTaskActive = new BukkitRunnable() {
 			private boolean mDisabled = true;

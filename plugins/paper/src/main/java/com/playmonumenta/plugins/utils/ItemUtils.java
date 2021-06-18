@@ -434,7 +434,6 @@ public class ItemUtils {
 		EPIC(ChatColor.GOLD + "" + ChatColor.BOLD + "Patron Made"),
 		UNIQUE(ChatColor.DARK_PURPLE + "Unique"),
 		UNIQUE_EVENT(ChatColor.DARK_PURPLE + "Unique Event"),
-		DISH(ChatColor.GREEN + "Dish"),
 		SHULKER_BOX("Shulker Box"),
 		QUEST_COMPASS("Quest Compass");
 
@@ -567,8 +566,6 @@ public class ItemUtils {
 						return ItemTier.UNIQUE;
 					} else if (stripped.endsWith(": Unique Event")) {
 						return ItemTier.UNIQUE_EVENT;
-					} else if (stripped.endsWith(": Dish")) {
-						return ItemTier.DISH;
 					}
 				}
 			}

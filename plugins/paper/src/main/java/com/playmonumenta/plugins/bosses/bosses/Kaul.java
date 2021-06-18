@@ -2,10 +2,39 @@ package com.playmonumenta.plugins.bosses.bosses;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+
+import com.playmonumenta.plugins.bosses.BossBarManager;
+import com.playmonumenta.plugins.bosses.BossBarManager.BossHealthAction;
+import com.playmonumenta.plugins.bosses.SpellManager;
+import com.playmonumenta.plugins.bosses.events.SpellCastEvent;
+import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.bosses.spells.SpellBaseParticleAura;
+import com.playmonumenta.plugins.bosses.spells.SpellConditionalTeleport;
+import com.playmonumenta.plugins.bosses.spells.SpellPlayerAction;
+import com.playmonumenta.plugins.bosses.spells.SpellPurgeNegatives;
+import com.playmonumenta.plugins.bosses.spells.kaul.SpellArachnopocolypse;
+import com.playmonumenta.plugins.bosses.spells.kaul.SpellEarthsWrath;
+import com.playmonumenta.plugins.bosses.spells.kaul.SpellGroundSurge;
+import com.playmonumenta.plugins.bosses.spells.kaul.SpellKaulBlockBreak;
+import com.playmonumenta.plugins.bosses.spells.kaul.SpellKaulsJudgement;
+import com.playmonumenta.plugins.bosses.spells.kaul.SpellLightningStorm;
+import com.playmonumenta.plugins.bosses.spells.kaul.SpellLightningStrike;
+import com.playmonumenta.plugins.bosses.spells.kaul.SpellPutridPlague;
+import com.playmonumenta.plugins.bosses.spells.kaul.SpellRaiseJungle;
+import com.playmonumenta.plugins.bosses.spells.kaul.SpellVolcanicDemise;
+import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
+import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.LocationUtils;
+import com.playmonumenta.plugins.utils.MovementUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.utils.SerializationUtils;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -35,33 +64,10 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import com.playmonumenta.plugins.bosses.BossBarManager;
-import com.playmonumenta.plugins.bosses.BossBarManager.BossHealthAction;
-import com.playmonumenta.plugins.bosses.SpellManager;
-import com.playmonumenta.plugins.bosses.events.SpellCastEvent;
-import com.playmonumenta.plugins.bosses.spells.Spell;
-import com.playmonumenta.plugins.bosses.spells.SpellBaseParticleAura;
-import com.playmonumenta.plugins.bosses.spells.SpellConditionalTeleport;
-import com.playmonumenta.plugins.bosses.spells.SpellPlayerAction;
-import com.playmonumenta.plugins.bosses.spells.SpellPurgeNegatives;
-import com.playmonumenta.plugins.bosses.spells.kaul.SpellArachnopocolypse;
-import com.playmonumenta.plugins.bosses.spells.kaul.SpellEarthsWrath;
-import com.playmonumenta.plugins.bosses.spells.kaul.SpellGroundSurge;
-import com.playmonumenta.plugins.bosses.spells.kaul.SpellKaulBlockBreak;
-import com.playmonumenta.plugins.bosses.spells.kaul.SpellKaulsJudgement;
-import com.playmonumenta.plugins.bosses.spells.kaul.SpellLightningStorm;
-import com.playmonumenta.plugins.bosses.spells.kaul.SpellLightningStrike;
-import com.playmonumenta.plugins.bosses.spells.kaul.SpellPutridPlague;
-import com.playmonumenta.plugins.bosses.spells.kaul.SpellRaiseJungle;
-import com.playmonumenta.plugins.bosses.spells.kaul.SpellVolcanicDemise;
-import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
-import com.playmonumenta.plugins.utils.BossUtils;
-import com.playmonumenta.plugins.utils.FastUtils;
-import com.playmonumenta.plugins.utils.LocationUtils;
-import com.playmonumenta.plugins.utils.MovementUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.plugins.utils.SerializationUtils;
+
 
 /* Woah it's Kaul! */
 
@@ -118,6 +124,19 @@ The elemental will lose his “Raise Jungle” ability, but will still possess t
  */
 
 public class Kaul extends BossAbilityGroup {
+	public static final int ARENA_WIDTH = 111;
+	// Barrier layer is from Y 62.0 to 64.0
+	public static final int ARENA_MAX_Y = 62;
+
+	private static final int LIGHTNING_STRIKE_COOLDOWN_SECONDS_1 = 18;
+	private static final int LIGHTNING_STRIKE_COOLDOWN_SECONDS_2 = 12;
+	private static final int LIGHTNING_STRIKE_COOLDOWN_SECONDS_3 = 10;
+	private static final int LIGHTNING_STRIKE_COOLDOWN_SECONDS_4 = 6;
+
+	// At the centre of the Kaul shrine,
+	// upon the height of most of the arena's surface
+	private @Nullable LivingEntity mShrineMarker;
+
 	public static final String identityTag = "boss_kaul";
 	public static final int detectionRange = 50;
 	private static final String primordial = "PrimordialElemental";
@@ -135,7 +154,6 @@ public class Kaul extends BossAbilityGroup {
 	private static final String PUTRID_PLAGUE_TAG_YELLOW = "KaulPutridPlagueYellow";
 	private static final String PUTRID_PLAGUE_TAG_GREEN = "KaulPutridPlagueGreen";
 	private static final Particle.DustOptions RED_COLOR = new Particle.DustOptions(Color.fromRGB(200, 0, 0), 1.0f);
-	private LivingEntity mCenter;
 
 	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
 		return SerializationUtils.statefulBossDeserializer(boss, identityTag, (spawnLoc, endLoc) -> {
@@ -157,7 +175,7 @@ public class Kaul extends BossAbilityGroup {
 		mBoss.addScoreboardTag("Boss");
 		for (Entity e : boss.getWorld().getEntities()) {
 			if (e.getScoreboardTags().contains(LIGHTNING_STORM_TAG) && e instanceof LivingEntity) {
-				mCenter = (LivingEntity) e;
+				mShrineMarker = (LivingEntity) e;
 				break;
 			}
 		}
@@ -180,33 +198,33 @@ public class Kaul extends BossAbilityGroup {
 
 		}.runTaskTimer(mPlugin, 0, 5);
 		SpellManager phase1Spells = new SpellManager(
-		    Arrays.asList(new SpellRaiseJungle(mPlugin, mBoss, 10, detectionRange, 20 * 9, 20 * 10, mCenter.getLocation().getY()),
-		                  new SpellPutridPlague(mPlugin, mBoss, detectionRange, false, mCenter.getLocation()),
-		                  new SpellEarthsWrath(mPlugin, mBoss, mCenter.getLocation().getY()),
-		                  new SpellArachnopocolypse(mPlugin, mBoss, mCenter.getLocation(), detectionRange)));
+		    Arrays.asList(new SpellRaiseJungle(mPlugin, mBoss, 10, detectionRange, 20 * 9, 20 * 10, mShrineMarker.getLocation().getY()),
+		                  new SpellPutridPlague(mPlugin, mBoss, detectionRange, false, mShrineMarker.getLocation()),
+		                  new SpellEarthsWrath(mPlugin, mBoss, mShrineMarker.getLocation().getY()),
+		                  new SpellArachnopocolypse(mPlugin, mBoss, mShrineMarker.getLocation(), detectionRange)));
 
 		Spell judgement = SpellKaulsJudgement.getInstance(mSpawnLoc);
 
 		SpellManager phase2Spells = new SpellManager(
-		    Arrays.asList(new SpellPutridPlague(mPlugin, mBoss, detectionRange / 2, false, mCenter.getLocation()),
-		                  new SpellEarthsWrath(mPlugin, mBoss, mCenter.getLocation().getY()),
-		                  new SpellRaiseJungle(mPlugin, mBoss, 10, detectionRange, 20 * 8, 20 * 10, mCenter.getLocation().getY()),
+		    Arrays.asList(new SpellPutridPlague(mPlugin, mBoss, detectionRange / 2, false, mShrineMarker.getLocation()),
+		                  new SpellEarthsWrath(mPlugin, mBoss, mShrineMarker.getLocation().getY()),
+		                  new SpellRaiseJungle(mPlugin, mBoss, 10, detectionRange, 20 * 8, 20 * 10, mShrineMarker.getLocation().getY()),
 		                  new SpellGroundSurge(mPlugin, mBoss, detectionRange),
 		                  judgement));
 
 		List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange);
 
 		SpellManager phase3Spells = new SpellManager(
-		    Arrays.asList(new SpellPutridPlague(mPlugin, mBoss, detectionRange / 2, true, mCenter.getLocation()),
-		                  new SpellEarthsWrath(mPlugin, mBoss, mCenter.getLocation().getY()),
-		                  new SpellVolcanicDemise(plugin, mBoss, 40D, mCenter.getLocation()),
+		    Arrays.asList(new SpellPutridPlague(mPlugin, mBoss, detectionRange / 2, true, mShrineMarker.getLocation()),
+		                  new SpellEarthsWrath(mPlugin, mBoss, mShrineMarker.getLocation().getY()),
+		                  new SpellVolcanicDemise(plugin, mBoss, 40D, mShrineMarker.getLocation()),
 		                  new SpellGroundSurge(mPlugin, mBoss, detectionRange),
 		                  judgement));
 
 		SpellManager phase4Spells = new SpellManager(
-			    Arrays.asList(new SpellPutridPlague(mPlugin, mBoss, detectionRange / 2, true, mCenter.getLocation()),
-			                  new SpellEarthsWrath(mPlugin, mBoss, mCenter.getLocation().getY()),
-			                  new SpellVolcanicDemise(plugin, mBoss, 40D, mCenter.getLocation()),
+			    Arrays.asList(new SpellPutridPlague(mPlugin, mBoss, detectionRange / 2, true, mShrineMarker.getLocation()),
+			                  new SpellEarthsWrath(mPlugin, mBoss, mShrineMarker.getLocation().getY()),
+			                  new SpellVolcanicDemise(plugin, mBoss, 40D, mShrineMarker.getLocation()),
 			                  new SpellGroundSurge(mPlugin, mBoss, detectionRange)));
 
 		List<UUID> hit = new ArrayList<UUID>();
@@ -214,7 +232,7 @@ public class Kaul extends BossAbilityGroup {
 		List<UUID> cd = new ArrayList<UUID>();
 		SpellPlayerAction action = new SpellPlayerAction(mBoss, detectionRange, (Player player) -> {
 			Vector loc = player.getLocation().toVector();
-			if (player.getLocation().getBlock().isLiquid() || !loc.isInSphere(mCenter.getLocation().toVector(), 42)) {
+			if (player.getLocation().getBlock().isLiquid() || !loc.isInSphere(mShrineMarker.getLocation().toVector(), 42)) {
 				if (player.getLocation().getY() >= 61 || cd.contains(player.getUniqueId())) {
 					return;
 				}
@@ -237,7 +255,7 @@ public class Kaul extends BossAbilityGroup {
 						hit.add(player.getUniqueId());
 						player.sendMessage(ChatColor.AQUA + "That hurt! It seems like the water is extremely corrosive. Best to stay out of it.");
 					}
-				} else if (!loc.isInSphere(mCenter.getLocation().toVector(), 42)) {
+				} else if (!loc.isInSphere(mShrineMarker.getLocation().toVector(), 42)) {
 					player.sendMessage(ChatColor.AQUA + "You feel a powerful force pull you back in fiercely. It seems there's no escape from this fight.");
 				}
 			}
@@ -249,7 +267,7 @@ public class Kaul extends BossAbilityGroup {
 				world.spawnParticle(Particle.FALLING_DUST, mBoss.getLocation().add(0, mBoss.getHeight() / 2, 0), 8, 0.35,
 				0.45, 0.35, Material.GREEN_CONCRETE.createBlockData());
 			}),
-			new SpellLightningStrike(plugin, boss, mCenter.getLocation(), detectionRange, 20 * 18, 3),
+			new SpellLightningStrike(this, LIGHTNING_STRIKE_COOLDOWN_SECONDS_1, false),
 			new SpellLightningStorm(boss, detectionRange),
 			new SpellPurgeNegatives(mBoss, 20 * 6),
 			new SpellConditionalTeleport(mBoss, spawnLoc,
@@ -265,7 +283,7 @@ public class Kaul extends BossAbilityGroup {
 				world.spawnParticle(Particle.FALLING_DUST, mBoss.getLocation().add(0, mBoss.getHeight() / 2, 0), 8, 0.35,
 				0.45, 0.35, Material.GREEN_CONCRETE.createBlockData());
 			}),
-			new SpellLightningStrike(plugin, boss, mCenter.getLocation(), detectionRange, 20 * 12, 3),
+			new SpellLightningStrike(this, LIGHTNING_STRIKE_COOLDOWN_SECONDS_2, true),
 			new SpellLightningStorm(boss, detectionRange),
 			new SpellPurgeNegatives(mBoss, 20 * 3),
 			new SpellConditionalTeleport(mBoss, spawnLoc,
@@ -287,7 +305,7 @@ public class Kaul extends BossAbilityGroup {
 				world.spawnParticle(Particle.FALLING_DUST, mBoss.getLocation().add(0, mBoss.getHeight() / 2, 0), 2, 0.35,
 				0.45, 0.35, Material.BLUE_WOOL.createBlockData());
 			}),
-			new SpellLightningStrike(plugin, boss, mCenter.getLocation(), detectionRange, 20 * 10, 2),
+			new SpellLightningStrike(this, LIGHTNING_STRIKE_COOLDOWN_SECONDS_3, true),
 			new SpellLightningStorm(boss, detectionRange),
 			new SpellPurgeNegatives(mBoss, 2),
 			new SpellConditionalTeleport(mBoss, spawnLoc,
@@ -309,7 +327,7 @@ public class Kaul extends BossAbilityGroup {
 				world.spawnParticle(Particle.FALLING_DUST, mBoss.getLocation().add(0, mBoss.getHeight() / 2, 0), 2, 0.35,
 				0.45, 0.35, Material.BLUE_WOOL.createBlockData());
 			}),
-			new SpellLightningStrike(plugin, boss, mCenter.getLocation(), detectionRange, 20 * 6, 2),
+			new SpellLightningStrike(this, LIGHTNING_STRIKE_COOLDOWN_SECONDS_4, true),
 			new SpellLightningStorm(boss, detectionRange),
 			new SpellPurgeNegatives(mBoss, 2),
 			new SpellConditionalTeleport(mBoss, spawnLoc,
@@ -363,7 +381,7 @@ public class Kaul extends BossAbilityGroup {
 								Material.COARSE_DIRT.createBlockData());
 								mLoc.subtract(FastUtils.cos(radian1) * mRadius, 0, FastUtils.sin(radian1) * mRadius);
 							}
-							world.spawnParticle(Particle.SPELL_WITCH, mCenter.getLocation().add(0, 3, 0), 20, 8, 5, 8,
+							world.spawnParticle(Particle.SPELL_WITCH, mShrineMarker.getLocation().add(0, 3, 0), 20, 8, 5, 8,
 							                    0);
 							mRotation += 8;
 							mRadius -= 0.25;
@@ -374,7 +392,7 @@ public class Kaul extends BossAbilityGroup {
 
 							if (mRadius <= 0) {
 								this.cancel();
-								Location loc = mCenter.getLocation().subtract(0, 0.5, 0);
+								Location loc = mShrineMarker.getLocation().subtract(0, 0.5, 0);
 								changePhase(null, phase2PassiveSpells, null);
 								new BukkitRunnable() {
 									int mT = 0;
@@ -385,8 +403,8 @@ public class Kaul extends BossAbilityGroup {
 									public void run() {
 										mT++;
 										mRadius = mT;
-										world.spawnParticle(Particle.SPELL_WITCH, mCenter.getLocation().add(0, 3, 0), 20, 8, 5, 8, 0);
-										world.spawnParticle(Particle.SMOKE_NORMAL, mCenter.getLocation().add(0, 3, 0), 10, 8, 5, 8, 0);
+										world.spawnParticle(Particle.SPELL_WITCH, mShrineMarker.getLocation().add(0, 3, 0), 20, 8, 5, 8, 0);
+										world.spawnParticle(Particle.SMOKE_NORMAL, mShrineMarker.getLocation().add(0, 3, 0), 10, 8, 5, 8, 0);
 										for (int i = 0; i < 36; i++) {
 											double radian1 = Math.toRadians(mRotation + (10 * i));
 											loc.add(FastUtils.cos(radian1) * mRadius, 1, FastUtils.sin(radian1) * mRadius);
@@ -561,9 +579,9 @@ public class Kaul extends BossAbilityGroup {
 								public void run() {
 									mT++;
 									if (mT % 2 == 0) {
-										world.spawnParticle(Particle.SPELL_WITCH, mCenter.getLocation().add(0, 3, 0), 10, 8, 5, 9, 0);
+										world.spawnParticle(Particle.SPELL_WITCH, mShrineMarker.getLocation().add(0, 3, 0), 10, 8, 5, 9, 0);
 									}
-									world.spawnParticle(Particle.FLAME, mCenter.getLocation().add(0, 3, 0), 10, 8, 5, 9, 0);
+									world.spawnParticle(Particle.FLAME, mShrineMarker.getLocation().add(0, 3, 0), 10, 8, 5, 9, 0);
 									world.spawnParticle(Particle.SPELL_WITCH, mBoss.getLocation().add(0, 1.25, 0), 16, 0.35, 0.45, 0.35, 0);
 									world.spawnParticle(Particle.SMOKE_LARGE, mBoss.getLocation().add(0, 1.25, 0), 1, 0.35, 0.45, 0.35, 0);
 									if (mT == 1) {
@@ -597,8 +615,8 @@ public class Kaul extends BossAbilityGroup {
 
 									if (mHits >= 4) {
 										this.cancel();
-										world.spawnParticle(Particle.SPELL_WITCH, mCenter.getLocation().add(0, 3, 0), 25, 6, 5, 6, 1);
-										world.spawnParticle(Particle.FLAME, mCenter.getLocation().add(0, 3, 0), 40, 6, 5, 6, 0.1);
+										world.spawnParticle(Particle.SPELL_WITCH, mShrineMarker.getLocation().add(0, 3, 0), 25, 6, 5, 6, 1);
+										world.spawnParticle(Particle.FLAME, mShrineMarker.getLocation().add(0, 3, 0), 40, 6, 5, 6, 0.1);
 										mBoss.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).setBaseValue(mBoss.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).getBaseValue() + 0.02);
 										mBoss.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE, 20 * 9999, 0));
 										changePhase(null, phase3PassiveSpells, null);
@@ -609,7 +627,7 @@ public class Kaul extends BossAbilityGroup {
 										world.playSound(mBoss.getLocation().add(0, 1, 0), Sound.ENTITY_ENDER_DRAGON_GROWL, 5, 0f);
 
 										new BukkitRunnable() {
-											Location mLoc = mCenter.getLocation().subtract(0, 0.5, 0);
+											Location mLoc = mShrineMarker.getLocation().subtract(0, 0.5, 0);
 											double mRotation = 0;
 											double mRadius = 0;
 											int mT = 0;
@@ -933,7 +951,7 @@ public class Kaul extends BossAbilityGroup {
 			}
 		}
 		new BukkitRunnable() {
-			Location mLoc = mCenter.getLocation().subtract(0, 0.5, 0);
+			Location mLoc = mShrineMarker.getLocation().subtract(0, 0.5, 0);
 			double mRotation = 0;
 			double mRadius = 0;
 			int mT = 0;
@@ -1105,5 +1123,20 @@ public class Kaul extends BossAbilityGroup {
 			}
 
 		}.runTaskLater(mPlugin, 1);
+	}
+
+	public @NotNull Collection<@NotNull Player> getArenaParticipants() {
+		if (mShrineMarker == null) {
+			return Collections.emptyList();
+		}
+
+		@NotNull Location arenaCenter = mShrineMarker.getLocation();
+		arenaCenter.setY(ARENA_MAX_Y / 2d);
+
+		return PlayerUtils.playersInBox(arenaCenter, ARENA_WIDTH, ARENA_MAX_Y);
+	}
+
+	public @NotNull LivingEntity getBoss() {
+		return mBoss;
 	}
 }

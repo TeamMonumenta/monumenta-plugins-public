@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.player;
 
 import java.util.function.Consumer;
 
+import com.destroystokyo.paper.ParticleBuilder;
 import com.playmonumenta.plugins.Constants.Objectives;
 import com.playmonumenta.plugins.utils.FastUtils;
 
@@ -27,32 +28,44 @@ public class PartialParticle {
 	public @Nullable Object mData;
 
 	/*
-	 * By default, this PartialParticle gets spawned normally,
-	 * starting varied from mLocation based on the mDeltas,
-	 * and drifting based on mExtra (particle must support setting a speed).
-	 * Set to true to use the mDelta for each axis to randomise between -mDelta
-	 * and +mDelta for directional movement instead,
-	 * meaning the particles spawn at mLocation,
-	 * individually moving in the direction of varied X, Y and Z values.
-	 * Higher mDeltas or mExtras would cause faster and further movement.
-	 *
-	 * This is done by making use of MC's exception when particle count is 0,
-	 * and spawning the calculated number of particles each player should see
-	 * one by one.
+	 * Set to true to use mDelta values to move particles specifically in that
+	 * relative direction.
+	 * Set to false to use mDeltas for normal location randomisation.
 	 */
-	public boolean mIsDirectional;
+	public boolean mDirectionalMode;
 
 	/*
-	 * When using directional movement,
-	 * this randomises between -mExtraVariance and +mExtraVariance,
-	 * applied to mExtra to individually vary values.
+	 * Set to non-0 to randomly vary individual particles' mExtra values,
+	 * by +- mExtraVariance.
 	 */
 	public double mExtraVariance;
 
 	/*
+	 * Set to true for players to always see at least 1 particle if their
+	 * particle multiplier setting is not completely off
+	 * (eg for 20% multipler against 3 mCount, that player would see 1 particle).
+	 * Set to false to determine by precise chance whether or not < 1 count
+	 * spawns 1 particle (eg 20% of 3 mCount would be 0.6,
+	 * player has 60% chance to see 1 particle, 40% chance for nothing).
+	 */
+	public boolean mMinimumMultiplier;
+
+	/*
+	 * Whether to randomise between negative mDelta or 0, and 0 or mDelta,
+	 * for each axis, for individual particles' mDelta values.
+	 */
+	public boolean mVaryPositiveX = false;
+	public boolean mVaryPositiveY = false;
+	public boolean mVaryPositiveZ = false;
+	public boolean mVaryNegativeX = false;
+	public boolean mVaryNegativeY = false;
+	public boolean mVaryNegativeZ = false;
+
+	/*
 	 * Share the same delta for X, Y and Z.
 	 * Use default data.
-	 * Use default directional args.
+	 * Use default directional/variance settings.
+	 * Use default multiplier mode.
 	 */
 	public PartialParticle(@NotNull Particle particle, @NotNull Location location, int count, double delta, double extra) {
 		this(particle, location, count, delta, delta, delta, extra);
@@ -60,7 +73,8 @@ public class PartialParticle {
 
 	/*
 	 * Share the same delta for X, Y and Z.
-	 * Use default directional args.
+	 * Use default directional/variance settings.
+	 * Use default multiplier mode.
 	 */
 	public PartialParticle(@NotNull Particle particle, @NotNull Location location, int count, double delta, double extra, @Nullable Object data) {
 		this(particle, location, count, delta, delta, delta, extra, data);
@@ -68,57 +82,72 @@ public class PartialParticle {
 
 	/*
 	 * Share the same delta for X, Y and Z.
+	 * Use default multiplier mode.
 	 */
-	public PartialParticle(@NotNull Particle particle, @NotNull Location location, int count, double delta, double extra, @Nullable Object data, boolean isDirectional, double extraVariance) {
-		this(particle, location, count, delta, delta, delta, extra, data, isDirectional, extraVariance);
+	public PartialParticle(@NotNull Particle particle, @NotNull Location location, int count, double delta, double extra, @Nullable Object data, boolean directionalMode, double extraVariance) {
+		this(particle, location, count, delta, delta, delta, extra, data, directionalMode, extraVariance);
+	}
+
+	/*
+	 * Share the same delta for X, Y and Z.
+	 */
+	public PartialParticle(@NotNull Particle particle, @NotNull Location location, int count, double delta, double extra, @Nullable Object data, boolean directionalMode, double extraVariance, boolean minimumMultiplier) {
+		this(particle, location, count, delta, delta, delta, extra, data, directionalMode, extraVariance, minimumMultiplier);
 	}
 
 	/*
 	 * Use default data.
-	 * Use default directional args.
+	 * Use default directional/variance settings.
+	 * Use default multiplier mode.
 	 */
 	public PartialParticle(@NotNull Particle particle, @NotNull Location location, int count, double deltaX, double deltaY, double deltaZ, double extra) {
 		this(particle, location, count, deltaX, deltaY, deltaZ, extra, null);
 	}
 
 	/*
-	 * Use default directional args.
+	 * Use default directional/variance settings.
+	 * Use default multiplier mode.
 	 */
 	public PartialParticle(@NotNull Particle particle, @NotNull Location location, int count, double deltaX, double deltaY, double deltaZ, double extra, @Nullable Object data) {
 		this(particle, location, count, deltaX, deltaY, deltaZ, extra, data, false, 0);
+	}
+
+	/*
+	 * Use default multiplier mode.
+	 */
+	public PartialParticle(@NotNull Particle particle, @NotNull Location location, int count, double deltaX, double deltaY, double deltaZ, double extra, @Nullable Object data, boolean directionalMode, double extraVariance) {
+		this(particle, location, count, deltaX, deltaY, deltaZ, extra, data, directionalMode, extraVariance, true);
 	}
 
 	public PartialParticle(
 		@NotNull Particle particle,
 		@NotNull Location location,
 		int count,
-		double offsetX,
-		double offsetY,
-		double offsetZ,
+		double deltaX,
+		double deltaY,
+		double deltaZ,
 		double extra,
 		@Nullable Object data,
-		boolean isDirectional,
-		double extraVariance
+		boolean directionalMode,
+		double extraVariance,
+		boolean minimumMultiplier
 	) {
 		mParticle = particle;
 		mLocation = location;
 		mCount = count;
-		mDeltaX = offsetX;
-		mDeltaY = offsetY;
-		mDeltaZ = offsetZ;
+		mDeltaX = deltaX;
+		mDeltaY = deltaY;
+		mDeltaZ = deltaZ;
 		mExtra = extra;
 		mData = data;
-		mIsDirectional = isDirectional;
+		mDirectionalMode = directionalMode;
 		mExtraVariance = extraVariance;
+		mMinimumMultiplier = minimumMultiplier;
 	}
 
 	/*
 	 * Returns a good value to use for the X and Z deltas,
 	 * if you want most particles to start within the specified entity's width.
-	 *
-	 * When spawning normally,
-	 * particle deltas use Gaussian distribution to vary from mLocation,
-	 * up to delta * 8 away, but mostly within the closer half.
 	 */
 	public static double getWidthDelta(@NotNull Entity entity) {
 		return getWidthDelta(entity.getWidth());
@@ -129,7 +158,7 @@ public class PartialParticle {
 	 * if you want most particles to start within the specified width.
 	 */
 	public static double getWidthDelta(double entityWidth) {
-		return entityWidth / 4;
+		return getDelta(entityWidth);
 	}
 
 	/*
@@ -145,7 +174,84 @@ public class PartialParticle {
 	 * if you want most particles to start within the specified height.
 	 */
 	public static double getHeightDelta(double entityHeight) {
-		return entityHeight / 4;
+		return getDelta(entityHeight);
+	}
+
+	/*
+	 * Returns a good value to use for a delta,
+	 * if you want most particles to start within the specified length.
+	 */
+	public static double getDelta(double length) {
+		// When spawning normally, particles randomly vary their location
+		// following Gaussian distribution, up to delta * 8 away,
+		// but mostly within the closer half.
+		return length / 4;
+	}
+
+	/*
+	 * Use default delta variance group.
+	 */
+	public void setDeltaVariance(
+		boolean deltaVariance
+	) {
+		setDeltaVariance(DeltaVarianceGroup.VARY_ALL, deltaVariance);
+	}
+
+	/*
+	 * Convenience method to update multiple mVary settings at once.
+	 */
+	public void setDeltaVariance(
+		@NotNull DeltaVarianceGroup deltaVarianceGroup,
+		boolean deltaVariance
+	) {
+		boolean setAll = DeltaVarianceGroup.VARY_ALL.equals(deltaVarianceGroup);
+		if (setAll || DeltaVarianceGroup.VARY_X.equals(deltaVarianceGroup)) {
+			mVaryPositiveX = deltaVariance;
+			mVaryNegativeX = deltaVariance;
+		}
+		if (setAll || DeltaVarianceGroup.VARY_Y.equals(deltaVarianceGroup)) {
+			mVaryPositiveY = deltaVariance;
+			mVaryNegativeY = deltaVariance;
+		}
+		if (setAll || DeltaVarianceGroup.VARY_Z.equals(deltaVarianceGroup)) {
+			mVaryPositiveZ = deltaVariance;
+			mVaryNegativeZ = deltaVariance;
+		}
+	}
+
+	/*
+	 * Whether extra variance has been enabled.
+	 */
+	public boolean isExtraVaried() {
+		return mExtraVariance != 0;
+	}
+
+	/*
+	 * Use default delta variance group.
+	 */
+	public boolean isDeltaVaried() {
+		return isDeltaVaried(DeltaVarianceGroup.VARY_ALL);
+	}
+
+	/*
+	 * Whether delta variance for the specified group has been enabled.
+	 */
+	public boolean isDeltaVaried(@NotNull DeltaVarianceGroup deltaVarianceGroup) {
+		if (DeltaVarianceGroup.VARY_ALL.equals(deltaVarianceGroup)) {
+			return (
+				isDeltaVaried(DeltaVarianceGroup.VARY_X)
+				|| isDeltaVaried(DeltaVarianceGroup.VARY_Y)
+				|| isDeltaVaried(DeltaVarianceGroup.VARY_Z)
+			);
+		} else if (DeltaVarianceGroup.VARY_X.equals(deltaVarianceGroup)) {
+			return mVaryNegativeX || mVaryPositiveX;
+		} else if (DeltaVarianceGroup.VARY_Y.equals(deltaVarianceGroup)) {
+			return mVaryNegativeY || mVaryPositiveY;
+		} else if (DeltaVarianceGroup.VARY_Z.equals(deltaVarianceGroup)) {
+			return mVaryNegativeZ || mVaryPositiveZ;
+		} else {
+			return false;
+		}
 	}
 
 	/*
@@ -158,7 +264,7 @@ public class PartialParticle {
 	}
 
 	/*
-	 * Spawns particles at mLocation for each nearby player,
+	 * Spawns particles for each nearby player,
 	 * based on individual particle multiplier settings.
 	 *
 	 * Specify a sourcePlayer so we know which multiplier to use on each player;
@@ -194,7 +300,7 @@ public class PartialParticle {
 	}
 
 	/*
-	 * Spawns particles at mLocation for each nearby player,
+	 * Spawns particles for each nearby player,
 	 * based on individual enemy particle multiplier settings.
 	 */
 	public @NotNull PartialParticle spawnAsEnemy() {
@@ -202,7 +308,7 @@ public class PartialParticle {
 	}
 
 	/*
-	 * Spawns particles at mLocation for each nearby player,
+	 * Spawns particles for each nearby player,
 	 * based on individual boss particle multiplier settings.
 	 */
 	public @NotNull PartialParticle spawnAsBoss() {
@@ -210,27 +316,90 @@ public class PartialParticle {
 	}
 
 	/*
-	 * Spawns particles at mLocation for each nearby player,
+	 * Spawns particles for each nearby player,
 	 * with no partial multiplier applied
 	 * (always spawns the full mCount amount).
 	 */
 	public @NotNull PartialParticle spawnFull() {
-		forEachSpawn(
-			(@NotNull PartialParticle referenceData) -> {
-				mLocation.getWorld().spawnParticle(
-					referenceData.mParticle,
-					referenceData.mLocation,
-					referenceData.mCount,
-					referenceData.mDeltaX,
-					referenceData.mDeltaY,
-					referenceData.mDeltaZ,
-					referenceData.mExtra,
-					referenceData.mData
-				);
-			}
-		);
+		return spawnForPlayers(Source.FULL);
+	}
 
-		return this;
+	/*
+	 * Called once per nearby player,
+	 * with packaged up values for you to use them to spawn particles in your
+	 * desired pattern.
+	 *
+	 * This is likely the method you wish to override when subclassing.
+	 * You have the chance to apply custom logic and then call
+	 * spawnUsingSettings() with differnt packagedValues,
+	 * as many times as needed
+	 */
+	protected void doSpawn(@NotNull ParticleBuilder packagedValues) {
+		spawnUsingSettings(packagedValues);
+	}
+
+	/*
+	 * Spawns the specified packagedValues normally,
+	 * or if directional mode and/or delta/extra variance are enabled,
+	 * applies them to a clone of the specified packagedValues,
+	 * looping internally as needed.
+	 */
+	protected void spawnUsingSettings(
+		@NotNull ParticleBuilder packagedValues
+	) {
+		if (!(mDirectionalMode || isDeltaVaried() || isExtraVaried())) {
+			packagedValues.spawn();
+		} else {
+			@NotNull ParticleBuilder variedClone = new ParticleBuilder(packagedValues.particle());
+			variedClone.location(packagedValues.location());
+			variedClone.extra(packagedValues.extra());
+			variedClone.data(packagedValues.data());
+			variedClone.receivers(packagedValues.receivers());
+
+			int loops = packagedValues.count();
+			if (mDirectionalMode) {
+				// If directional mode, need to spawn one by one.
+				// We set count to 0 to use MC's directional movement exception
+				variedClone.count(0);
+			} else {
+				// Otherwise, if want to vary delta or extra,
+				// also need to loop to spawn 1 each time
+				variedClone.count(1);
+			}
+
+			for (int i = 0; i < loops; i++) {
+				double variedDeltaX = packagedValues.offsetX();
+				double variedDeltaY = packagedValues.offsetY();
+				double variedDeltaZ = packagedValues.offsetZ();
+				if (isDeltaVaried(DeltaVarianceGroup.VARY_X)) {
+					variedDeltaX = FastUtils.randomDoubleInRange(
+						mVaryNegativeX ? -variedDeltaX : 0,
+						mVaryPositiveX ? variedDeltaX : 0
+					);
+				}
+				if (isDeltaVaried(DeltaVarianceGroup.VARY_Y)) {
+					variedDeltaY = FastUtils.randomDoubleInRange(
+						mVaryNegativeY ? -variedDeltaY : 0,
+						mVaryPositiveY ? variedDeltaY : 0
+					);
+				}
+				if (isDeltaVaried(DeltaVarianceGroup.VARY_Z)) {
+					variedDeltaZ = FastUtils.randomDoubleInRange(
+						mVaryNegativeZ ? -variedDeltaZ : 0,
+						mVaryPositiveZ ? variedDeltaZ : 0
+					);
+				}
+				variedClone.offset(variedDeltaX, variedDeltaY, variedDeltaZ);
+
+				if (isExtraVaried()) {
+					variedClone.extra(
+						packagedValues.extra() + FastUtils.randomDoubleInRange(-mExtraVariance, mExtraVariance)
+					);
+				}
+
+				variedClone.spawn();
+			}
+		}
 	}
 
 	private @NotNull PartialParticle spawnForPlayers(
@@ -242,97 +411,59 @@ public class PartialParticle {
 	}
 
 	private @NotNull PartialParticle forEachNearbyPlayer(
-		@NotNull Consumer<@NotNull Player> consumer
+		@NotNull Consumer<@NotNull Player> playerAction
 	) {
-		for (@NotNull Player player : mLocation.getNearbyPlayers(30)) {
-			consumer.accept(player);
+		for (@NotNull Player player : mLocation.getNearbyPlayers(100)) {
+			playerAction.accept(player);
 		}
 
 		return this;
 	}
 
-	private @NotNull PartialParticle spawnForPlayer(
+	private void spawnForPlayer(
 		@NotNull Player player,
 		@NotNull Source source
 	) {
-		// Ceil so that when count & multiplier are above 0, players will always see at least 1 particle
-		int partialCount = (int)Math.ceil(
-			mCount * PlayerData.getParticleMultiplier(player, source)
-		);
-		forEachSpawn(
-			partialCount,
-			(@NotNull PartialParticle referenceData) -> {
-				player.spawnParticle(
-					referenceData.mParticle,
-					referenceData.mLocation,
-					referenceData.mCount,
-					referenceData.mDeltaX,
-					referenceData.mDeltaY,
-					referenceData.mDeltaZ,
-					referenceData.mExtra,
-					referenceData.mData
-				);
-			}
-		);
-
-		return this;
-	}
-
-	private @NotNull PartialParticle forEachSpawn(
-		@NotNull Consumer<@NotNull PartialParticle> consumer
-	) {
-		return forEachSpawn(mCount, consumer);
-	}
-
-	private @NotNull PartialParticle forEachSpawn(
-		int amountToSpawn,
-		@NotNull Consumer<@NotNull PartialParticle> consumer
-	) {
-		PartialParticle consumerReferenceData = new PartialParticle(
-			mParticle,
-			mLocation,
-			amountToSpawn,
-			mDeltaX,
-			mDeltaY,
-			mDeltaZ,
-			mExtra,
-			mData
-		);
-		// No need to also copy mIsDirectional & mExtraVariance,
-		// this is just for the consumer to easily use each loop's modified
-		// values without messing with temporarily modifying this object itself
-
-		// When not using directional movement,
-		// just need to spawn normally 1 time in the world - the amountToSpawn
-		// - unless amountToSpawn is 0, eg multiplier to hide all.
-		// All players will see it & MC will handle the variance/drift
-		int loops = (amountToSpawn == 0) ? 0 : 1;
-		if (mIsDirectional) {
-			// When using directional movement,
-			// we need to loop amountToSpawn times to spawn amountToSpawn
-			// particles in the world, one by one.
-			// We set the mCount to 0 to use the MC exception,
-			// and provide new random mDeltas (& mExtras) with each loop
-			loops = amountToSpawn;
-			consumerReferenceData.mCount = 0;
+		double multipliedCount = mCount * PlayerData.getParticleMultiplier(player, source);
+		if (multipliedCount == 0) {
+			return;
 		}
 
-		for (int i = 0; i < loops; i++) {
-			if (mIsDirectional) {
-				consumerReferenceData.mDeltaX = FastUtils.randomDoubleInRange(-mDeltaX, mDeltaX);
-				consumerReferenceData.mDeltaY = FastUtils.randomDoubleInRange(-mDeltaY, mDeltaY);
-				consumerReferenceData.mDeltaZ = FastUtils.randomDoubleInRange(-mDeltaZ, mDeltaZ);
-				if (mExtraVariance != 0) {
-					consumerReferenceData.mExtra = mExtra + FastUtils.randomDoubleInRange(-mExtraVariance, mExtraVariance);
-				}
+		int partialCount;
+		if (mMinimumMultiplier || multipliedCount >= 1) {
+			partialCount = (int)Math.ceil(multipliedCount);
+		} else {
+			// If don't want minimum multiplier (don't assume ceil 1 particle),
+			// and count is a double under 1,
+			// we randomise whether to see that 1 particle
+			if (FastUtils.RANDOM.nextDouble() < multipliedCount) {
+				partialCount = 1;
+			} else {
+				// partialCount of 0
+				return;
 			}
-			consumer.accept(consumerReferenceData);
 		}
 
-		return this;
+		@NotNull ParticleBuilder packagedValues = new ParticleBuilder(mParticle);
+		packagedValues.location(mLocation);
+		packagedValues.count(partialCount);
+		packagedValues.offset(mDeltaX, mDeltaY, mDeltaZ);
+		packagedValues.extra(mExtra);
+		packagedValues.data(mData);
+
+		packagedValues.receivers(player);
+
+		doSpawn(packagedValues);
 	}
 
 
+
+	public enum DeltaVarianceGroup {
+		VARY_ALL,
+		VARY_X,
+		VARY_Y,
+		VARY_Z;
+	}
 
 	public enum Source {
 		OWN_PASSIVE(Objectives.PARTICLES_OWN_PASSIVE),
@@ -340,11 +471,12 @@ public class PartialParticle {
 		OTHER_PASSIVE(Objectives.PARTICLES_OTHER_PASSIVE),
 		OTHER_ACTIVE(Objectives.PARTICLES_OTHER_ACTIVE),
 		ENEMY(Objectives.PARTICLES_ENEMY),
-		BOSS(Objectives.PARTICLES_BOSS);
+		BOSS(Objectives.PARTICLES_BOSS),
+		FULL(null);
 
-		public @NotNull final String mObjectiveName;
+		public @Nullable final String mObjectiveName;
 
-		Source(@NotNull String objectiveName) {
+		Source(@Nullable String objectiveName) {
 			mObjectiveName = objectiveName;
 		}
 	}

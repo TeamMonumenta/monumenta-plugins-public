@@ -77,10 +77,6 @@ public class ItemOverrides {
 	public static final EnumMap<Material, String> EXCEPTION_PRECISE_LORED_MATERIALS = new EnumMap<>(Material.class);
 
 	static {
-		EXCEPTION_LORED_MATERIALS.addAll(Materials.HOES);
-		EXCEPTION_LORED_MATERIALS.addAll(Materials.AXES);
-		EXCEPTION_LORED_MATERIALS.addAll(Materials.SHOVELS);
-
 		EXCEPTION_PRECISE_LORED_MATERIALS.put(Material.MAGMA_BLOCK, "Turns into lava when");
 		EXCEPTION_PRECISE_LORED_MATERIALS.put(Material.PACKED_ICE, "Turns into water when");
 	}

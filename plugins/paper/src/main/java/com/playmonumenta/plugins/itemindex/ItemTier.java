@@ -21,7 +21,6 @@ public enum ItemTier {
 	EPIC(ChatColor.GOLD + "" + ChatColor.BOLD + "Patron Made"),
 	UNIQUE(ChatColor.DARK_PURPLE + "Unique"),
 	UNIQUE_EVENT(ChatColor.DARK_PURPLE + "Unique Event"),
-	DISH(ChatColor.GREEN + "Dish"),
 	INJECTOR_POTION(ChatColor.YELLOW + "Injector Potion"),
 	KEY(ChatColor.AQUA + "Key"),
 	DEV(ChatColor.LIGHT_PURPLE + "Dev Item"),
