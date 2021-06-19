@@ -180,7 +180,9 @@ public class GraveManager {
 	// Called only when an item is dropped that, when destroyed, would result in a grave
 	public static void onDropItem(Player player, Item entity) {
 		GraveManager manager = INSTANCES.get(player.getUniqueId());
-		manager.mThrownItems.add(new ThrownItem(manager, player, entity));
+		if (player != null && entity != null && manager != null) {
+			manager.mThrownItems.add(new ThrownItem(manager, player, entity));
+		}
 	}
 
 	// Called when a player left or right clicks a grave

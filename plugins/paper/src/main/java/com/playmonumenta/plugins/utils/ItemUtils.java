@@ -1221,67 +1221,113 @@ public class ItemUtils {
 	}
 
 	public static boolean isArmor(@NotNull ItemStack itemStack) {
-		return Materials.ARMOR.contains(itemStack.getType());
+		if (itemStack != null) {
+			return Materials.ARMOR.contains(itemStack.getType());
+		} else {
+			return false;
+		}
 	}
 
 	public static boolean isWearable(@NotNull ItemStack itemStack) {
-		return Materials.WEARABLE.contains(itemStack.getType());
+		if (itemStack != null) {
+			return Materials.WEARABLE.contains(itemStack.getType());
+		} else {
+			return false;
+		}
+
 	}
 
 	public static boolean isShatteredWearable(@NotNull ItemStack itemStack) {
-		return isWearable(itemStack) && isItemShattered(itemStack);
+		if (itemStack != null) {
+			return isWearable(itemStack) && isItemShattered(itemStack);
+		} else {
+			return false;
+		}
 	}
 
 	public static boolean isSword(@NotNull ItemStack itemStack) {
-		return Materials.SWORDS.contains(itemStack.getType());
+		if (itemStack != null) {
+			return Materials.SWORDS.contains(itemStack.getType());
+		} else {
+			return false;
+		}
 	}
 
 	public static boolean isSomeBow(@NotNull ItemStack itemStack) {
-		return Materials.BOWS.contains(itemStack.getType());
+		if (itemStack != null) {
+			return Materials.BOWS.contains(itemStack.getType());
+		} else {
+			return false;
+		}
 	}
 
 	/*
 	 * Does not count shattered hoes.
 	 */
 	public static boolean isHoe(@NotNull ItemStack itemStack) {
-		if (isItemShattered(itemStack)) {
+		if (itemStack != null) {
+			if (isItemShattered(itemStack)) {
+				return false;
+			}
+
+			return Materials.HOES.contains(itemStack.getType());
+		} else {
 			return false;
 		}
-
-		return Materials.HOES.contains(itemStack.getType());
 	}
 
 	/*
 	 * Does not count shattered wands.
 	 */
 	public static boolean isWand(@NotNull ItemStack itemStack) {
-		if (isItemShattered(itemStack)) {
+		if (itemStack != null) {
+			if (isItemShattered(itemStack)) {
+				return false;
+			}
+
+			@NotNull List<@NotNull String> loreLines = getPlainLore(itemStack);
+			for (@NotNull String loreLine : loreLines) {
+				if (loreLine.contains("* Magic Wand *")) {
+					return true;
+				}
+			}
+
+			return false;
+		} else {
 			return false;
 		}
 
-		@NotNull List<@NotNull String> loreLines = getPlainLore(itemStack);
-		for (@NotNull String loreLine : loreLines) {
-			if (loreLine.contains("* Magic Wand *")) {
-				return true;
-			}
-		}
-
-		return false;
 	}
 
 	public static boolean isPickaxe(@NotNull ItemStack itemStack) {
-		return Materials.PICKAXES.contains(itemStack.getType());
+		if (itemStack != null) {
+			return Materials.PICKAXES.contains(itemStack.getType());
+		} else {
+			return false;
+		}
 	}
 
 	public static boolean isAxe(@NotNull ItemStack itemStack) {
-		return Materials.AXES.contains(itemStack.getType());
+		if (itemStack != null) {
+			return Materials.AXES.contains(itemStack.getType());
+		} else {
+			return false;
+		}
 	}
 
 	public static boolean isShovel(@NotNull ItemStack itemStack) {
-		return Materials.SHOVELS.contains(itemStack.getType());
+		if (itemStack != null) {
+			return Materials.SHOVELS.contains(itemStack.getType());
+		} else {
+			return false;
+		}
 	}
 
 	public static boolean isSomePotion(@NotNull ItemStack itemStack) {
-		return Materials.POTIONS.contains(itemStack.getType());
+		if (itemStack != null) {
+			return Materials.POTIONS.contains(itemStack.getType());
+		} else {
+			return false;
+		}
 	}
 }

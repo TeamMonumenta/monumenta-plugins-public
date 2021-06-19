@@ -298,7 +298,10 @@ public class EnchantmentManager implements Listener {
 				currentLevel = level;
 			}
 			propertyMap.put(property, currentLevel);
-			inventoryMap.get(index).put(property, level);
+			Map<BaseEnchantment, Integer> getMapIndex = inventoryMap.get(index);
+			if (getMapIndex != null) {
+				getMapIndex.put(property, level);
+			}
 			property.applyProperty(plugin, player, currentLevel);
 		}
 	}
