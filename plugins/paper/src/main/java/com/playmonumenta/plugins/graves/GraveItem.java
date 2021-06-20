@@ -159,6 +159,8 @@ public class GraveItem {
 			default:
 				mStatus = Status.LIMBO;
 		}
+		mDungeonInstance = grave.mDungeonInstance;
+		mLocation = grave.getLocation();
 	}
 
 	public UUID getUniqueId() {
@@ -425,6 +427,10 @@ public class GraveItem {
 		Vector velocity = null;
 		if (data.has(KEY_NBT) && data.get(KEY_NBT).isJsonPrimitive() && data.getAsJsonPrimitive(KEY_NBT).isString()) {
 			item = NBTItem.convertNBTtoItem(new NBTContainer(data.getAsJsonPrimitive(KEY_NBT).getAsString()));
+		}
+		if (ItemUtils.getItemDeathResult(item) == ItemUtils.ItemDeathResult.KEEP_NOGRAVE) {
+			// Item should not exist, delete it
+			return null;
 		}
 		if (data.has(KEY_STATUS) && data.get(KEY_STATUS).isJsonPrimitive() && data.getAsJsonPrimitive(KEY_STATUS).isString()) {
 			status = GraveItem.Status.fromString(data.getAsJsonPrimitive(KEY_STATUS).getAsString());

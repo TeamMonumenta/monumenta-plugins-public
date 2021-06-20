@@ -275,7 +275,8 @@ public class GraveListener implements Listener {
 					|| (result == ItemUtils.ItemDeathResult.KEEP_EQUIPPED && KEEP_EQUIPPED_SLOTS.contains(slot))) {
 					// Item is kept, but damaged
 					ItemUtils.damageItemPercent(item, KEPT_ITEM_DURABILITY_DAMAGE_PERCENT, false);
-				} else if (result != ItemUtils.ItemDeathResult.KEEP) {
+				} else if (result != ItemUtils.ItemDeathResult.KEEP
+				           && result != ItemUtils.ItemDeathResult.KEEP_NOGRAVE) {
 					droppedItems.add(item);
 					inv.setItem(slot, null);
 				}

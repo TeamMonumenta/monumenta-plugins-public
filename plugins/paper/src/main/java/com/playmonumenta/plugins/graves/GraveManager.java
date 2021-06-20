@@ -50,7 +50,10 @@ public class GraveManager {
 				JsonArray gravesData = graveManagerData.getAsJsonArray(KEY_GRAVES);
 				for (JsonElement graveData : gravesData) {
 					JsonObject data = graveData.getAsJsonObject();
-					mGraves.add(Grave.deserialize(this, mPlayer, data));
+					Grave grave = Grave.deserialize(this, mPlayer, data);
+					if (!grave.isEmpty()) {
+						mGraves.add(grave);
+					}
 				}
 			}
 			if (graveManagerData.has(KEY_THROWN_ITEMS) && graveManagerData.get(KEY_THROWN_ITEMS).isJsonArray()) {

@@ -469,6 +469,7 @@ public class ItemUtils {
 		KEEP, // Item is kept in inventory on death, takes no damage
 		KEEP_DAMAGED, // Item is kept on death, with a durability loss
 		KEEP_EQUIPPED, // Item is kept on death if it's in an armor/offhand/hotbar slot, with durability loss
+		KEEP_NOGRAVE, // Item is kept on death. If it somehow drops, it won't be placed in grave when destroyed.
 		LOSE, // Item is dropped on death, lost when destroyed
 		SAFE, // Item is dropped on death, placed in grave when destroyed, does not shatter
 		SHATTER, // Item is dropped on death, placed in grave when destroyed, does shatter
@@ -584,10 +585,17 @@ public class ItemUtils {
 			return ItemDeathResult.DESTROY;
 		} else if (item.containsEnchantment(Enchantment.VANISHING_CURSE)) {
 			return ItemDeathResult.SHATTER_NOW;
-		} else if (item.getType().equals(Material.COMPASS) ||
-		           ShulkerShortcutListener.isEnderExpansion(item) ||
+		} else if (ShulkerShortcutListener.isEnderExpansion(item) ||
 		           isItemDeathless(item)) {
 			return ItemDeathResult.KEEP;
+		} else if (item.getType().equals(Material.COMPASS)) {
+			switch (getPlainName(item)) {
+				case "": // Vanilla compass
+				case "Quest Compass": // Free quest compass
+					return ItemDeathResult.KEEP_NOGRAVE;
+				default:
+					return ItemDeathResult.KEEP;
+			}
 		}
 		switch (getItemRegion(item)) {
 		case KINGS_VALLEY:

@@ -96,9 +96,12 @@ public class Grave {
 		mItems = new HashSet<>();
 		for (JsonElement itemData : items) {
 			JsonObject data = itemData.getAsJsonObject();
-			mItems.add(GraveItem.deserialize(mManager, this, mPlayer, data));
+			GraveItem item = GraveItem.deserialize(mManager, this, mPlayer, data);
+			if (item != null) {
+				mItems.add(item);
+			}
 		}
-		if (isInThisWorld()) {
+		if (isInThisWorld() && !isEmpty()) {
 			updateInstance();
 			mManager.addUnloadedGrave(Chunk.getChunkKey(mLocation), this);
 		}
@@ -278,6 +281,9 @@ public class Grave {
 									item.respawn();
 								}
 							}
+						}
+						if (mEntity.getScoreboardTags().contains("Delete")) {
+							delete();
 						}
 					} else {
 						stopTracking();
