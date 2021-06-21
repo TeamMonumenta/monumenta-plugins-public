@@ -25,6 +25,7 @@ import org.bukkit.util.EulerAngle;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 
@@ -544,8 +545,8 @@ public class Grave {
 		if (isInThisWorld() && mDungeonInstance != null) {
 			int instance = ScoreboardUtils.getScoreboardValue(mPlayer, "DAccess");
 			if (instance != 0 && instance != mDungeonInstance) {
-				int x = 512 * ((instance / 1000) - (mDungeonInstance / 1000));
-				int z = 512 * ((instance % 1000) - (mDungeonInstance % 1000));
+				int x = 512 * ((instance / Constants.DUNGEON_INSTANCE_MODULUS) - (mDungeonInstance / Constants.DUNGEON_INSTANCE_MODULUS));
+				int z = 512 * ((instance % Constants.DUNGEON_INSTANCE_MODULUS) - (mDungeonInstance % Constants.DUNGEON_INSTANCE_MODULUS));
 				mLocation.add(x, 0, z);
 				mDungeonInstance = instance;
 			}
