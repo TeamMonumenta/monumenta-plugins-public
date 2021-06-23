@@ -257,6 +257,9 @@ public class BossManager implements Listener {
 		mStatefulBosses.put(VarcosaLingeringWillBoss.identityTag, (Plugin p, LivingEntity e, Location s, Location l) -> new VarcosaLingeringWillBoss(p, e, s, l));
 		mStatefulBosses.put(MimicQueen.identityTag, (Plugin p, LivingEntity e, Location s, Location l) -> new MimicQueen(p, e, s, l));
 		mStatefulBosses.put(FalseSpirit.identityTag, (Plugin p, LivingEntity e, Location s, Location l) -> new FalseSpirit(p, e, s, l));
+		mStatefulBosses.put(Ghalkor.identityTag, (Plugin p, LivingEntity e, Location s, Location l) -> new Ghalkor(p, e, s, l));
+		mStatefulBosses.put(Svalgot.identityTag, (Plugin p, LivingEntity e, Location s, Location l) -> new Svalgot(p, e, s, l));
+		mStatefulBosses.put(BeastOfTheBlackFlame.identityTag, (Plugin p, LivingEntity e, Location s, Location l) -> new BeastOfTheBlackFlame(p, e, s, l));
 
 
 		/* All bosses have a deserializer which gives the boss back their abilities when chunks re-load */
@@ -396,6 +399,9 @@ public class BossManager implements Listener {
 		mBossDeserializers.put(JumpBoss.identityTag, (Plugin p, LivingEntity e) -> JumpBoss.deserialize(p, e));
 		mBossDeserializers.put(RebornBoss.identityTag, (Plugin p, LivingEntity e) -> RebornBoss.deserialize(p, e));
 		mBossDeserializers.put(NoFireBoss.identityTag, (Plugin p, LivingEntity e) -> NoFireBoss.deserialize(p, e));
+		mBossDeserializers.put(Ghalkor.identityTag, (Plugin p, LivingEntity e) -> Ghalkor.deserialize(p, e));
+		mBossDeserializers.put(Svalgot.identityTag, (Plugin p, LivingEntity e) -> Svalgot.deserialize(p, e));
+		mBossDeserializers.put(BeastOfTheBlackFlame.identityTag, (Plugin p, LivingEntity e) -> BeastOfTheBlackFlame.deserialize(p, e));
 		mBossDeserializers.put(DistanceCloserBoss.identityTag, (Plugin p, LivingEntity e) -> DistanceCloserBoss.deserialize(p, e));
 		mBossDeserializers.put(WeakHookBoss.identityTag, (Plugin p, LivingEntity e) -> WeakHookBoss.deserialize(p, e));
 		mBossDeserializers.put(AuraEffectBoss.identityTag, (Plugin p, LivingEntity e) -> AuraEffectBoss.deserialize(p, e));

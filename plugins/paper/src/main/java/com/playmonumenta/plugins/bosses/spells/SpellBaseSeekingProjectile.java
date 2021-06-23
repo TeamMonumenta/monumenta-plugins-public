@@ -15,10 +15,10 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
+import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.plugins.utils.EntityUtils;
 
 public class SpellBaseSeekingProjectile extends Spell {
 
@@ -199,6 +199,7 @@ public class SpellBaseSeekingProjectile extends Spell {
 					if (!mLingers) {
 						mActiveRunnables.remove(this);
 					}
+					onEndAction(mLocation, mHitbox);
 					return;
 				}
 
@@ -209,6 +210,7 @@ public class SpellBaseSeekingProjectile extends Spell {
 						if (!mLingers) {
 							mActiveRunnables.remove(this);
 						}
+						onEndAction(mLocation, mHitbox);
 						return;
 					}
 					newDirection.normalize();
@@ -276,6 +278,7 @@ public class SpellBaseSeekingProjectile extends Spell {
 					if (!mLingers) {
 						mActiveRunnables.remove(this);
 					}
+					onEndAction(mLocation, mHitbox);
 				}
 			}
 		};
@@ -284,5 +287,10 @@ public class SpellBaseSeekingProjectile extends Spell {
 		if (!mLingers) {
 			mActiveRunnables.add(runnable);
 		}
+	}
+
+	//Does not run if the projectile hits/collides
+	protected void onEndAction(Location projLoc, BoundingBox projHitbox) {
+		//Do nothing, must be overriden in subclasses to be used
 	}
 }
