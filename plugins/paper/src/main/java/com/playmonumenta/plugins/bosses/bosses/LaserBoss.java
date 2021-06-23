@@ -31,19 +31,17 @@ public class LaserBoss extends BossAbilityGroup {
 		public boolean SINGLE_TARGET = false;
 		public double DAMAGE_PERCENTAGE = 0.0;
 
-		/**Effects apply to player after the laser end */
+		/*Effects apply to player after the laser end */
 		public EffectsList EFFECTS = EffectsList.EMPTY;
 
 		//particle & sound used!
-		/**Sound used atch tick on each player */
+		/** Sound used atch tick on each player */
 		public SoundsList SOUND_TICKS = SoundsList.fromString("[(ENTITY_SHULKER_BULLET_HIT)]");
-
-		/**Particle used for the laser */
+		/** Particle used for the laser */
 		public ParticlesList PARTICLE_LASER = ParticlesList.fromString("[(crit,1),(crit_magic,1)]");
-
-		/**Particle used when the cast is over */
+		/** Particle used when the cast is over */
 		public ParticlesList PARTICLE_END = ParticlesList.fromString("[(EXPLOSION_NORMAL,35)]");
-		/**Sound used when the cast is over */
+		/** Sound used when the cast is over */
 		public SoundsList SOUND_END = SoundsList.fromString("[(ENTITY_DRAGON_FIREBALL_EXPLODE,0.6,1.5)]");
 
 		public int PARTICLE_FREQUENCY = 1;

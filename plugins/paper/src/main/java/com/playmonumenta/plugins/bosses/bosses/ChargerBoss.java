@@ -3,18 +3,15 @@ package com.playmonumenta.plugins.bosses.bosses;
 import java.util.Arrays;
 
 import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 
 import com.playmonumenta.plugins.bosses.SpellManager;
+import com.playmonumenta.plugins.bosses.parameters.EffectsList;
+import com.playmonumenta.plugins.bosses.parameters.ParticlesList;
+import com.playmonumenta.plugins.bosses.parameters.SoundsList;
 import com.playmonumenta.plugins.bosses.spells.SpellBaseCharge;
-import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.BossUtils;
 
 public class ChargerBoss extends BossAbilityGroup {
@@ -32,24 +29,24 @@ public class ChargerBoss extends BossAbilityGroup {
 		public boolean TARGET_FURTHEST = false;
 
 		//other stats not used by the defaults ones
-		public int FIRE_TICKS = 0;
-		public int SILENCE_TICKS = 0;
-		public int EFFECT_DURATION = 0;
-		public int EFFECT_AMPLIFIED = 0;
 		public double DAMAGE_PERCENTAGE = 0.0;
-		public PotionEffectType EFFECT = PotionEffectType.BLINDNESS;
+		public EffectsList EFFECTS = EffectsList.EMPTY;
 
 		//Particle & Sounds!
-		/** particle & sound summoned at boss location when starting the ability */
-		public Particle PARTICLE_WARNING = Particle.VILLAGER_ANGRY;
-		public Sound SOUND_WARNING = Sound.ENTITY_ELDER_GUARDIAN_CURSE;
-		/** particle to show the player where the boss want to charge */
-		public Particle PARTICLE_TELL = Particle.CRIT;
-		/** particle & Particle summoned at the start and end of the charge */
-		public Particle PARTICLE_ROAR = Particle.SMOKE_LARGE;
-		public Sound SOUND_ROAR = Sound.ENTITY_ENDER_DRAGON_GROWL;
-		/** particle summoned when the charge hit a player*/
-		public Particle PARTICLE_ATTACK = Particle.FLAME;
+		/** Particle summoned at boss location when starting the ability */
+		public ParticlesList PARTICLE_WARNING = ParticlesList.fromString("[(VILLAGER_ANGRY,50)]");
+		/** Sound summoned at boss location when starting the ability */
+		public SoundsList SOUND_WARNING = SoundsList.fromString("[(ENTITY_ELDER_GUARDIAN_CURSE,1,1.5)]");
+		/** Particle to show the player where the boss want to charge */
+		public ParticlesList PARTICLE_TELL = ParticlesList.fromString("[(CRIT,2)]");
+		/** Particle summon when the ability hit a player */
+		public ParticlesList PARTICLE_HIT = ParticlesList.fromString("[(BLOCK_CRACK,5,0.4,0.4,0.4,0.4,REDSTONE_BLOCK),(BLOCK_CRACK,12,0.4,0.4,0.4,0.4,REDSTONE_WIRE)]");
+		/** Particle summoned at the start and end of the charge */
+		public ParticlesList PARTICLE_ROAR = ParticlesList.fromString("[(SMOKE_LARGE,125)]");
+		/** Sound summoned at the start and end of the charge */
+		public SoundsList SOUND_ROAR = SoundsList.fromString("[(ENTITY_ENDER_DRAGON_GROWL,1,1.5)]");
+		/** Particle summoned when the charge hit a player*/
+		public ParticlesList PARTICLE_ATTACK = ParticlesList.fromString("[(FLAME,4,0.5,0.5,0.5,0.075),(CRIT,8,0.5,0.5,0.5,0.75)]");
 
 	}
 
@@ -67,23 +64,22 @@ public class ChargerBoss extends BossAbilityGroup {
 			0, 0, 0, p.TARGET_FURTHEST,
 			// Warning sound/particles at boss location and slow boss
 			(Player player) -> {
-				boss.getWorld().spawnParticle(p.PARTICLE_WARNING, boss.getLocation(), 50, 2, 2, 2, 0);
-				boss.getWorld().playSound(boss.getLocation(), p.SOUND_WARNING, 1f, 1.5f);
+				p.PARTICLE_WARNING.spawn(boss.getLocation(), 2d, 2d, 2d);
+				p.SOUND_WARNING.play(boss.getLocation(), 1f, 1.5f);
 				boss.setAI(false);
 			},
 			// Warning particles
 			(Location loc) -> {
-				loc.getWorld().spawnParticle(p.PARTICLE_TELL, loc, 2, 0.65, 0.65, 0.65, 0);
+				p.PARTICLE_TELL.spawn(loc, 0.65d, 0.65d, 0.65d);
 			},
 			// Charge attack sound/particles at boss location
 			(Player player) -> {
-				boss.getWorld().spawnParticle(p.PARTICLE_ROAR, boss.getLocation(), 125, 0.3, 0.3, 0.3, 0.15);
-				boss.getWorld().playSound(boss.getLocation(), p.SOUND_ROAR, 1f, 1.5f);
+				p.PARTICLE_ROAR.spawn(boss.getLocation(), 0.3d, 0.3d, 0.3d, 0.15d);
+				p.SOUND_ROAR.play(boss.getLocation(), 1f, 1.5f);
 			},
 			// Attack hit a player
 			(Player player) -> {
-				player.getWorld().spawnParticle(Particle.BLOCK_CRACK, player.getLocation().add(0, 1, 0), 5, 0.4, 0.4, 0.4, 0.4, Material.REDSTONE_BLOCK.createBlockData());
-				player.getWorld().spawnParticle(Particle.BLOCK_CRACK, player.getLocation().add(0, 1, 0), 12, 0.4, 0.4, 0.4, 0.4, Material.REDSTONE_WIRE.createBlockData());
+				p.PARTICLE_HIT.spawn(player.getLocation().add(0, 1, 0), 0.4d, 0.4d, 0.4d, 0.4d);
 				if (p.DAMAGE > 0) {
 					BossUtils.bossDamage(boss, player, p.DAMAGE);
 				}
@@ -92,27 +88,16 @@ public class ChargerBoss extends BossAbilityGroup {
 					BossUtils.bossDamagePercent(mBoss, player, p.DAMAGE_PERCENTAGE);
 				}
 
-				if (p.EFFECT_DURATION > 0) {
-					player.addPotionEffect(new PotionEffect(p.EFFECT, p.EFFECT_DURATION, p.EFFECT_AMPLIFIED));
-				}
-
-				if (p.FIRE_TICKS > 0) {
-					player.setFireTicks(p.FIRE_TICKS);
-				}
-
-				if (p.SILENCE_TICKS > 0) {
-					AbilityUtils.silencePlayer(player, p.SILENCE_TICKS);
-				}
+				p.EFFECTS.apply(player, mBoss);
 			},
 			// Attack particles
 			(Location loc) -> {
-				loc.getWorld().spawnParticle(p.PARTICLE_ATTACK, loc, 4, 0.5, 0.5, 0.5, 0.075);
-				loc.getWorld().spawnParticle(p.PARTICLE_TELL, loc, 8, 0.5, 0.5, 0.5, 0.75);
+				p.PARTICLE_ATTACK.spawn(loc);
 			},
 			// Ending particles on boss
 			() -> {
-				boss.getWorld().spawnParticle(p.PARTICLE_ROAR, boss.getLocation(), 125, 0.3, 0.3, 0.3, 0.15);
-				boss.getWorld().playSound(boss.getLocation(), p.SOUND_ROAR, 1f, 1.5f);
+				p.PARTICLE_ROAR.spawn(boss.getLocation(), 0.3, 0.3, 0.3, 0.15);
+				p.SOUND_ROAR.play(boss.getLocation(), 1f, 1.5f);
 				boss.setAI(true);
 			})
 		));

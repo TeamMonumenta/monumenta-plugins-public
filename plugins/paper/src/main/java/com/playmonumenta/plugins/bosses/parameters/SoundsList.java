@@ -150,7 +150,7 @@ public class SoundsList {
 	}
 
 	public static SoundsList fromString(String string) throws RuntimeException {
-		return new SoundsList(string);
+		return new SoundsList(string.replace(" ", ""));
 	}
 
 	private static class SoundNotFoundException extends RuntimeException {

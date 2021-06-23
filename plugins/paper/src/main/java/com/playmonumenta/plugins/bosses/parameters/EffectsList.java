@@ -66,7 +66,7 @@ public class EffectsList {
 
 		@Override
 		public String toString() {
-			return "(" + mName + ", " + mDuration + ", " + mLevel + ")";
+			return "(" + mName + "," + mDuration + "," + mLevel + ")";
 		}
 
 		public static Effect fromString(String value) throws Exception {
@@ -90,9 +90,9 @@ public class EffectsList {
 			} else {
 				if (EFFECT_RUNNER.keySet().contains(split[0])) {
 					if (split.length == 3) {
-						return new Effect(effect, Float.valueOf(split[1]), Integer.parseInt(split[2]));
+						return new Effect(split[0], Float.valueOf(split[1]), Integer.parseInt(split[2]));
 					} else if (split.length == 2) {
-						return new Effect(effect, Float.valueOf(split[1]));
+						return new Effect(split[0], Float.valueOf(split[1]));
 					} else {
 						throw new IllegalFormatException("Fail loading custom sound. Object of size " + split.length);
 					}
@@ -109,7 +109,7 @@ public class EffectsList {
 	}
 
 	private List<Effect> mEffectList;
-	public static final EffectsList EMPTY = EffectsList.fromString("[()]");
+	public static final EffectsList EMPTY = EffectsList.fromString("");
 
 	public EffectsList(String values) {
 		mEffectList = new ArrayList<>();
@@ -146,7 +146,7 @@ public class EffectsList {
 	}
 
 	public static EffectsList fromString(String string) {
-		return new EffectsList(string);
+		return new EffectsList(string.replace(" ", ""));
 	}
 
 	private static class EffectNotFoundException extends RuntimeException {

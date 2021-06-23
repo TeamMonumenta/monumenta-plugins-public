@@ -3,15 +3,14 @@ package com.playmonumenta.plugins.bosses.bosses;
 import java.util.Arrays;
 
 import com.playmonumenta.plugins.bosses.SpellManager;
+import com.playmonumenta.plugins.bosses.parameters.EffectsList;
+import com.playmonumenta.plugins.bosses.parameters.ParticlesList;
+import com.playmonumenta.plugins.bosses.parameters.SoundsList;
 import com.playmonumenta.plugins.bosses.spells.SpellBaseSeekingProjectile;
-import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.BossUtils;
-import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
 
 import org.bukkit.Location;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -37,35 +36,24 @@ public class ProjectileBoss extends BossAbilityGroup {
 		public double TURN_RADIUS = Math.PI / 30;
 		public boolean COLLIDES_WITH_BLOCKS = true;
 
-		//this effects are given to the player after he recive the damage
-		public int FIRE_TICKS = 0;
-		public int SILENCE_TICKS = 0;
-		public float HOOK_FORCE = 0.0f;
-		public int EFFECT_DURATION = 0;
-		public int EFFECT_AMPLIFIER = 0;
-		public PotionEffectType EFFECT = PotionEffectType.BLINDNESS;
+		/*Effects applied to the player when he got hit */
+		public EffectsList EFFECTS = EffectsList.EMPTY;
 
 		//particle & sound used!
-		/**Sound used at the start */
-		public Sound SOUND_START = Sound.ENTITY_BLAZE_AMBIENT;
-
-		/**Particle used when launching the projectile */
-		public Particle PARTICLE_LAUNCH = Particle.EXPLOSION_LARGE;
-		/**Sound used when launching the projectile */
-		public Sound SOUND_LAUNCH = Sound.ENTITY_BLAZE_SHOOT;
-
-		/**Particle used for the projectile*/
-		public Particle PARTICLE_PROJECTILE_MAIN = Particle.FLAME;
-		/**Particle used for the projectile*/
-		public Particle PARTICLE_PROJECTILE_SECOND = Particle.SMOKE_LARGE;
-
-		/**Sound summoned every 2 sec on the projectile location */
-		public Sound SOUND_PROJECTILE = Sound.ENTITY_BLAZE_BURN;
-
-		/**Particle used when the projectile hit something */
-		public Particle PARTICLE_HIT = Particle.CLOUD;
-		/**Sound used when the projectile hit something */
-		public Sound SOUND_HIT = Sound.ENTITY_GENERIC_DEATH;
+		/** Sound played at the start */
+		public SoundsList SOUND_START = SoundsList.fromString("[(ENTITY_BLAZE_AMBIENT,1.5,1)]");
+		/** Particle used when launching the projectile */
+		public ParticlesList PARTICLE_LAUNCH = ParticlesList.fromString("[(EXPLOSION_LARGE,1)]");
+		/** Sound used when launching the projectile */
+		public SoundsList SOUND_LAUNCH = SoundsList.fromString("[(ENTITY_BLAZE_SHOOT,0.5,0.5)]");
+		/** Particle used for the projectile*/
+		public ParticlesList PARTICLE_PROJECTILE = ParticlesList.fromString("[(FLAME, 4, 0.05, 0.05, 0.05, 0.1),(SMOKE_LARGE, 3, 0.25, 0.25, 0.25)]");
+		/** Sound summoned every 2 sec on the projectile location */
+		public SoundsList SOUND_PROJECTILE = SoundsList.fromString("[(ENTITY_BLAZE_BURN,0.5,0.2)]");
+		/** Particle used when the projectile hit something */
+		public ParticlesList PARTICLE_HIT = ParticlesList.fromString("[(CLOUD,50,0,0,0,0.25)]");
+		/** Sound used when the projectile hit something */
+		public SoundsList SOUND_HIT = SoundsList.fromString("[(ENTITY_GENERIC_DEATH,0.5,0.5)]");
 
 	}
 
@@ -87,25 +75,24 @@ public class ProjectileBoss extends BossAbilityGroup {
 					// Initiate Aesthetic
 					(World world, Location loc, int ticks) -> {
 						PotionUtils.applyPotion(null, boss, new PotionEffect(PotionEffectType.GLOWING, p.DELAY, 0));
-						world.playSound(loc, p.SOUND_START, 1.5f, 1f);
+						p.SOUND_START.play(loc);
 					},
 					// Launch Aesthetic
 					(World world, Location loc, int ticks) -> {
-						world.spawnParticle(p.PARTICLE_LAUNCH, loc, 1, 0, 0, 0, 0);
-						world.playSound(loc, p.SOUND_LAUNCH, 0.5f, 0.5f);
+						p.PARTICLE_LAUNCH.spawn(loc);
+						p.SOUND_LAUNCH.play(loc);
 					},
 					// Projectile Aesthetic
 					(World world, Location loc, int ticks) -> {
-						world.spawnParticle(p.PARTICLE_PROJECTILE_MAIN, loc, 4, 0.05, 0.05, 0.05, 0.1);
-						world.spawnParticle(p.PARTICLE_PROJECTILE_SECOND, loc, 3, 0.25, 0.25, 0.25, 0);
+						p.PARTICLE_PROJECTILE.spawn(loc, 0.1, 0.1, 0.1, 0.1);
 						if (ticks % 40 == 0) {
-							world.playSound(loc, p.SOUND_PROJECTILE, 0.5f, 0.2f);
+							p.SOUND_PROJECTILE.play(loc);
 						}
 					},
 					// Hit Action
 					(World world, Player player, Location loc) -> {
-						world.playSound(loc, p.SOUND_HIT, 0.5f, 0.5f);
-						world.spawnParticle(p.PARTICLE_HIT, loc, 50, 0, 0, 0, 0.25);
+						p.SOUND_HIT.play(loc, 0.5f, 0.5f);
+						p.PARTICLE_HIT.spawn(loc, 0d, 0d, 0d, 0.25d);
 						if (player != null) {
 							if (p.DAMAGE > 0) {
 								BossUtils.bossDamage(boss, player, p.DAMAGE);
@@ -114,22 +101,7 @@ public class ProjectileBoss extends BossAbilityGroup {
 							if (p.DAMAGE_PERCENTAGE > 0.0) {
 								BossUtils.bossDamagePercent(mBoss, player, p.DAMAGE_PERCENTAGE);
 							}
-
-							if (p.EFFECT_DURATION > 0) {
-								player.addPotionEffect(new PotionEffect(p.EFFECT, p.EFFECT_DURATION, p.EFFECT_AMPLIFIER));
-							}
-
-							if (p.FIRE_TICKS > 0) {
-								player.setFireTicks(p.FIRE_TICKS);
-							}
-
-							if (p.SILENCE_TICKS > 0) {
-								AbilityUtils.silencePlayer(player, p.SILENCE_TICKS);
-							}
-
-							if (p.HOOK_FORCE > 0) {
-								MovementUtils.pullTowards(boss, player, p.HOOK_FORCE);
-							}
+							p.EFFECTS.apply(player, boss);
 
 						}
 					})

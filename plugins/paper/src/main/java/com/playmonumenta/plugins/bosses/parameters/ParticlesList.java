@@ -12,6 +12,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Particle.DustOptions;
+import org.bukkit.block.data.BlockData;
 import org.bukkit.inventory.ItemStack;
 
 public class ParticlesList {
@@ -54,6 +55,10 @@ public class ParticlesList {
 				String color = "#" + Integer.toHexString(((DustOptions) mExtra1).getColor().asRGB());
 				String size = Float.toString(((DustOptions) mExtra1).getSize());
 				return "(" + mParticle.name() + "," + mCount + "," + mDx + "," + mDy + "," + mDz + "," + color + "," + size + ")";
+			} else if (mExtra2 instanceof BlockData) {
+				return "(" + mParticle.name() + "," + mCount + "," + mDx + "," + mDy + "," + mDz + "," + mExtra1 + "," + ((BlockData) mExtra2).getMaterial().name() + ")";
+			} else if (mExtra2 instanceof ItemStack) {
+				return "(" + mParticle.name() + "," + mCount + "," + mDx + "," + mDy + "," + mDz + "," + mExtra1 + "," + ((ItemStack) mExtra2).getType().name() + ")";
 			}
 			return "(" + mParticle.name() + "," + mCount + "," + mDx + "," + mDy + "," + mDz + "," + mExtra1 + "," + mExtra2 + ")";
 		}
@@ -108,7 +113,7 @@ public class ParticlesList {
 			} else if (split.length == 1) {
 				return new CParticle<>(particle, 0);
 			} else {
-				throw new IllegalFormatException("Fail loading custom sound. Object of size " + split.length);
+				throw new IllegalFormatException("Fail loading custom particle. Object of size " + split.length);
 			}
 		}
 
@@ -130,11 +135,11 @@ public class ParticlesList {
 				if (mParticle.equals(Particle.REDSTONE)) {
 					new PartialParticle(mParticle, loc, mCount, dx, dy, dz, 0.0, extra1).spawnAsBoss();
 				} else if (PARTICLE_MATERIALS.contains(mParticle)) {
-					new PartialParticle(mParticle, loc, mCount, dx, dy, dz, Double.class.cast(extra1).doubleValue(), extra2).spawnAsBoss();
+					new PartialParticle(mParticle, loc, mCount, dx, dy, dz, ((Double) extra1).doubleValue(), extra2).spawnAsBoss();
 				} else if (extra1 != null) {
-					new PartialParticle(mParticle, loc, mCount, dx, dy, dz, Double.class.cast(extra1).doubleValue()).spawnAsBoss();
+					new PartialParticle(mParticle, loc, mCount, dx, dy, dz, ((Double) extra1).doubleValue()).spawnAsBoss();
 				} else {
-					new PartialParticle(mParticle, loc, mCount, dx, dy, dz).spawnAsBoss();
+					new PartialParticle(mParticle, loc, mCount, dx, dy, dz, 0.0).spawnAsBoss();
 				}
 			} catch (Exception e) {
 				Plugin.getInstance().getLogger().warning("Failed to spawn a particle at loc. Reason: " + e.getMessage());
@@ -163,7 +168,11 @@ public class ParticlesList {
 	}
 
 	public void spawn(Location loc) {
-		spawn(loc, 0, 0, 0, null);
+		spawn(loc, 0, 0, 0);
+	}
+
+	public void spawn(Location loc, double dx, double dy, double dz) {
+		spawn(loc, dx, dy, dz, null);
 	}
 
 	public <F> void spawn(Location loc, double dx, double dy, double dz, F extra1) {
@@ -186,7 +195,7 @@ public class ParticlesList {
 	}
 
 	public static ParticlesList fromString(String string) throws RuntimeException {
-		return new ParticlesList(string);
+		return new ParticlesList(string.replace(" ", ""));
 	}
 
 

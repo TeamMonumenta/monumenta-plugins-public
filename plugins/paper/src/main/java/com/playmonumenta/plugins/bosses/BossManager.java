@@ -230,6 +230,7 @@ public class BossManager implements Listener {
 		mStatelessBosses.put(RainbowParrot.identityTag, (Plugin p, LivingEntity e) -> new RainbowParrot(p, e));
 		mStatelessBosses.put(SpawnMobsBoss.identityTag, (Plugin p, LivingEntity e) -> new SpawnMobsBoss(p, e));
 		mStatelessBosses.put(LandSlowBoss.identityTag, (Plugin p, LivingEntity e) -> new LandSlowBoss(p, e));
+		mStatelessBosses.put(PounceBoss.identityTag, (Plugin p, LivingEntity e) -> new PounceBoss(p, e));
 
 
 		/* Stateful bosses have a remembered spawn location and end location where a redstone block is set when they die */
@@ -412,6 +413,7 @@ public class BossManager implements Listener {
 		mBossDeserializers.put(RainbowParrot.identityTag, (Plugin p, LivingEntity e) -> RainbowParrot.deserialize(p, e));
 		mBossDeserializers.put(SpawnMobsBoss.identityTag, (Plugin p, LivingEntity e) -> SpawnMobsBoss.deserialize(p, e));
 		mBossDeserializers.put(LandSlowBoss.identityTag, (Plugin p, LivingEntity e) -> LandSlowBoss.deserialize(p, e));
+		mBossDeserializers.put(PounceBoss.identityTag, (Plugin p, LivingEntity e) -> PounceBoss.deserialize(p, e));
 	}
 
 	/********************************************************************************

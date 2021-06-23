@@ -20,6 +20,11 @@ public class SpellBaseAura extends Spell {
 		void run(Player player);
 	}
 
+	@FunctionalInterface
+	public interface SummonParticles {
+		void run(Entity boss);
+	}
+
 	private final Entity mBoss;
 	private final double mDX;
 	private final double mDY;
@@ -31,6 +36,7 @@ public class SpellBaseAura extends Spell {
 	private final Particle mParticle;
 	private final Object mParticleArg;
 	private final ApplyAuraEffect mAuraEffect;
+	private final SummonParticles mParticlesSummoner;
 
 	private final int mRadius; // Computed maximum of mDX, mDY, mDZ
 	private int mEffectIter; // Number of effect iterations - rolls around between 0 and 2
@@ -52,6 +58,27 @@ public class SpellBaseAura extends Spell {
 		mParticleArg = particleArg;
 		mAuraEffect = auraEffect;
 		mParticlePlayers = new ArrayList<Player>();
+		mParticlesSummoner = null;
+
+		mRadius = (int)Math.max(mDX, Math.max(mDY, mDZ));
+		mEffectIter = 0;
+	}
+
+	public SpellBaseAura(Entity boss, double dx, double dy, double dz, SummonParticles particlesSummoner, ApplyAuraEffect auraEffect) {
+		mBoss = boss;
+		// The "radius" thing is just... a mystery. Dividing by 2 is slightly better?
+		mDX = dx;
+		mDY = dy;
+		mDZ = dz;
+		mParticleDX = dx / 2 - 1;
+		mParticleDY = dy / 2 - 1;
+		mParticleDZ = dz / 2 - 1;
+		mNumParticles = 0;
+		mParticle = null;
+		mParticleArg = null;
+		mAuraEffect = auraEffect;
+		mParticlePlayers = new ArrayList<Player>();
+		mParticlesSummoner = particlesSummoner;
 
 		mRadius = (int)Math.max(mDX, Math.max(mDY, mDZ));
 		mEffectIter = 0;
@@ -80,6 +107,9 @@ public class SpellBaseAura extends Spell {
 					player.spawnParticle(mParticle, bossLoc.clone().add(0, 1, 0), 2, 1, 1, 1);
 				}
 			}
+		} else if (mParticlesSummoner != null) {
+			//new version using particlesSummoner
+			mParticlesSummoner.run(mBoss);
 		}
 
 		// Apply effects every other pulse (2 Hz)

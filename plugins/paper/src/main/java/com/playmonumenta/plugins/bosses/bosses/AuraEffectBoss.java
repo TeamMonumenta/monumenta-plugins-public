@@ -3,17 +3,16 @@ package com.playmonumenta.plugins.bosses.bosses;
 import java.util.Arrays;
 import java.util.List;
 
+import com.playmonumenta.plugins.bosses.parameters.EffectsList;
+import com.playmonumenta.plugins.bosses.parameters.ParticlesList;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.bosses.spells.SpellBaseAura;
 import com.playmonumenta.plugins.utils.BossUtils;
 
-import org.bukkit.Color;
-import org.bukkit.Particle;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 
 public class AuraEffectBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_auraeffect";
@@ -22,22 +21,14 @@ public class AuraEffectBoss extends BossAbilityGroup {
 		public int RADIUS = 35;
 		public int HEIGHT = 20;
 		public int DETECTION = 45;
-		public int EFFECT_AMPLIFIER = 1;
-		public float DUST_SIZE = 2f;
-		public int PARTICEL_NUMBER = 20;
-		public int EFFECT_DURATION = 3 * 20;
-		public boolean EFFECT_AMBIENT = true;
 
-		//Particle!
-		/**Color of the particle */
-		public Color PARTICLE_COLOR = Color.WHITE;
+		/** Particles summoned in the air */
+		public ParticlesList PARTICLE = ParticlesList.fromString("[(redstone,20,0,0,0,#ffffff,2.0)]");
+		/** Particles summoned near the boss */
+		public ParticlesList PARTICLE_MOB = ParticlesList.fromString("[(redstone,2,1,1,1,#ffffff,2.0)]");
 
-		/** if you change the particles to something other than redstone then you will not use COLOR */
-		public Particle PARTICLE = Particle.REDSTONE;
-		/** show the effect particle to the player*/
-		public boolean EFFECT_PARTICLE = false;
-		/* use the same name of the spigot api to change the value */
-		public PotionEffectType EFFECT = PotionEffectType.BLINDNESS;
+		/** Effects applied to the player when inside the range*/
+		public EffectsList EFFECTS = EffectsList.EMPTY;
 	}
 
 
@@ -50,11 +41,12 @@ public class AuraEffectBoss extends BossAbilityGroup {
 		Parameters p = BossUtils.getParameters(boss, identityTag, new Parameters());
 
 		List<Spell> passiveSpells = Arrays.asList(
-			new SpellBaseAura(boss, p.RADIUS, p.HEIGHT, p.RADIUS, p.PARTICEL_NUMBER, p.PARTICLE, new Particle.DustOptions(p.PARTICLE_COLOR, p.DUST_SIZE),
-			                  (Player player) -> {
-								  if (p.EFFECT != null) {
-									  player.addPotionEffect(new PotionEffect(p.EFFECT, p.EFFECT_DURATION, p.EFFECT_AMPLIFIER, p.EFFECT_AMBIENT, p.EFFECT_PARTICLE));
-								  }
+			new SpellBaseAura(boss, p.RADIUS, p.HEIGHT, p.RADIUS,
+							(Entity entity) -> {
+								p.PARTICLE.spawn(entity.getLocation(), p.RADIUS / 2, p.HEIGHT / 2, p.RADIUS / 2);
+								p.PARTICLE_MOB.spawn(entity.getLocation().clone().add(0, 1, 0));
+							}, (Player player) -> {
+									p.EFFECTS.apply(player, mBoss);
 								})
 		);
 		super.constructBoss(null, passiveSpells, p.DETECTION, null);

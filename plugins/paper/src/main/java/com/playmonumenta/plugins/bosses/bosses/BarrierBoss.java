@@ -4,15 +4,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.bukkit.Color;
 import org.bukkit.Location;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
-import org.bukkit.SoundCategory;
-import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.plugin.Plugin;
 
+import com.playmonumenta.plugins.bosses.parameters.ParticlesList;
+import com.playmonumenta.plugins.bosses.parameters.SoundsList;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.bosses.spells.SpellBarrier;
 import com.playmonumenta.plugins.utils.BossUtils;
@@ -25,10 +22,12 @@ public class BarrierBoss extends BossAbilityGroup {
 		public int COOLDOWN = 5 * 20;
 		public int HITS_TO_BREAK = 1;
 
-		/**Color of the particle */
-		public Color PARTICLE_COLOR = Color.WHITE;
-		public Particle PARTICLE = Particle.REDSTONE;
-		public float DUST_SIZE = 2f;
+		/** Particle*/
+		public ParticlesList PARTICLE = ParticlesList.fromString("[(REDSTONE,4,0,1,0,#ffffff,2)]");
+		/** Sound played when the barrier refresh */
+		public SoundsList SOUND_REFRESH = SoundsList.fromString("[(BLOCK_BEACON_ACTIVATE,1,1)]");
+		/** Sound played when the barrier break */
+		public SoundsList SOUND_BREAK = SoundsList.fromString("[(ITEM_SHIELD_BREAK,1,1)]");
 	}
 
 	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
@@ -42,14 +41,11 @@ public class BarrierBoss extends BossAbilityGroup {
 
 		List<Spell> passives = new ArrayList<>(Arrays.asList(new SpellBarrier(plugin, boss, p.DETECTION, p.COOLDOWN, p.HITS_TO_BREAK,
 				(Location loc) -> {
-					World world = loc.getWorld();
-					world.playSound(loc, Sound.BLOCK_BEACON_ACTIVATE, SoundCategory.HOSTILE, 1, 1);
+					p.SOUND_REFRESH.play(loc);
 				}, (Location loc) -> {
-					World world = loc.getWorld();
-					world.spawnParticle(Particle.REDSTONE, loc, 4, 0, 1, 0, new Particle.DustOptions(p.PARTICLE_COLOR, p.DUST_SIZE));
+					p.PARTICLE.spawn(loc, 0, 1, 0);
 				}, (Location loc) -> {
-					World world = loc.getWorld();
-					world.playSound(loc, Sound.ITEM_SHIELD_BREAK, SoundCategory.HOSTILE, 1, 1);
+					p.SOUND_BREAK.play(loc);
 				})));
 		super.constructBoss(null, passives, p.DETECTION, null);
 	}

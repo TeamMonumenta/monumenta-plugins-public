@@ -32,19 +32,16 @@ public class NovaBoss extends BossAbilityGroup {
 		public EffectsList EFFECTS = EffectsList.EMPTY;
 
 		//particle & sound used!
-		/**Particle summon on the air */
+		/** Particle summon on the air */
 		public ParticlesList PARTICLE_AIR = ParticlesList.fromString("[(cloud,5)]");
-		/**Sound used when charging the ability */
+		/** Sound used when charging the ability */
 		public Sound SOUND_CHARGE = Sound.ENTITY_WITCH_CELEBRATE;
-
-		/**Particle summon arround the boss when loading the spell */
+		/** Particle summon arround the boss when loading the spell */
 		public ParticlesList PARTICLE_LOAD = ParticlesList.fromString("[(crit,1)]");
-
-		/**Sound used when the spell is casted (when explode) */
+		/** Sound used when the spell is casted (when explode) */
 		public SoundsList SOUND_CAST = SoundsList.fromString("[(ENTITY_WITCH_DRINK,1.5,0.65),(ENTITY_WITCH_DRINK,1.5,0.55)]");
-
-		/**Particle summoned when the spell explode */
-		public ParticlesList PARTICLE_EXPLODE = ParticlesList.fromString("[(CRIT,1,0.1,0.1,0.1,0.3),(CRIT_MAGIC,0.25,0.25,0.25,0.1)]");
+		/*Particle summoned when the spell explode */
+		public ParticlesList PARTICLE_EXPLODE = ParticlesList.fromString("[(CRIT,1,0.1,0.1,0.1,0.3),(CRIT_MAGIC,1,0.25,0.25,0.25,0.1)]");
 	}
 
 	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
