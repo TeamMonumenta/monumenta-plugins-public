@@ -74,6 +74,15 @@ public class PlaceholderAPIIntegration extends PlaceholderExpansion {
 			return Integer.toString(ScoreboardUtils.getScoreboardValue(player, "TotalLevel"));
 		}
 
+		if (identifier.equalsIgnoreCase("shard")) {
+			String toCut = player.getWorld().getName();
+			String mask = "Project_Epic-";
+			if (toCut.length() > mask.length()) {
+				String finalString = toCut.substring(mask.length(), toCut.length());
+				return finalString;
+			}
+		}
+
 		return null;
 	}
 }
