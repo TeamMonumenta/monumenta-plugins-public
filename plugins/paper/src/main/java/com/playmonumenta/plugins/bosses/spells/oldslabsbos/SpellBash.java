@@ -1,12 +1,5 @@
 package com.playmonumenta.plugins.bosses.spells.oldslabsbos;
 
-import com.playmonumenta.plugins.utils.FastUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.plugins.utils.VectorUtils;
-import com.playmonumenta.plugins.utils.LocationUtils;
-import com.playmonumenta.plugins.utils.BossUtils;
-import com.playmonumenta.plugins.utils.MovementUtils;
-
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -21,6 +14,12 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
 import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.LocationUtils;
+import com.playmonumenta.plugins.utils.MovementUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.utils.VectorUtils;
 
 public class SpellBash extends Spell {
 
@@ -84,7 +83,7 @@ public class SpellBash extends Spell {
 
 					}.runTaskTimer(mPlugin, 0, 1);
 
-					for (Player player : PlayerUtils.playersInRange(loc, 4)) {
+					for (Player player : PlayerUtils.playersInRange(loc, 4, true)) {
 						Vector toPlayerVector = player.getLocation().toVector().subtract(loc.toVector()).normalize();
 						if (direction.dot(toPlayerVector) > 0.33f) {
 							BossUtils.bossDamage(mBoss, player, 6);

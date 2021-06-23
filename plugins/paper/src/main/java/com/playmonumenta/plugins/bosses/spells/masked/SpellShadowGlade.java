@@ -52,7 +52,7 @@ public class SpellShadowGlade extends Spell {
 
 	private void run(Location zoneStart) {
 		final int PERIOD = 4;
-		List<Player> pList = PlayerUtils.playersInRange(zoneStart, 40);
+		List<Player> pList = PlayerUtils.playersInRange(zoneStart, 40, true);
 
 		BukkitRunnable loop = new BukkitRunnable() {
 			private int mJ = 0;

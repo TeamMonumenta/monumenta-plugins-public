@@ -14,9 +14,9 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
+import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.plugins.utils.EntityUtils;
 
 public class SpellBaseLeapAttack extends Spell {
 
@@ -121,7 +121,7 @@ public class SpellBaseLeapAttack extends Spell {
 		Player targetPlayer = null;
 		Location loc = mBoss.getLocation();
 		Location locTarget = null;
-		List<Player> players = PlayerUtils.playersInRange(loc, mRange);
+		List<Player> players = PlayerUtils.playersInRange(loc, mRange, false);
 		if (!players.isEmpty()) {
 			Collections.shuffle(players);
 			for (Player player : players) {
@@ -230,7 +230,7 @@ public class SpellBaseLeapAttack extends Spell {
 	@Override
 	public boolean canRun() {
 		Location loc = mBoss.getLocation();
-		List<Player> players = PlayerUtils.playersInRange(loc, mRange);
+		List<Player> players = PlayerUtils.playersInRange(loc, mRange, false);
 		if (!players.isEmpty()) {
 			for (Player player : players) {
 				if (LocationUtils.hasLineOfSight(mBoss, player) && loc.distance(player.getLocation()) > mMinRange) {

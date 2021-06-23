@@ -28,7 +28,7 @@ public class SpellPushPlayersAway extends Spell {
 
 	@Override
 	public void run() {
-		for (Player player : PlayerUtils.playersInRange(mLauncher.getLocation(), mRadius * 4)) {
+		for (Player player : PlayerUtils.playersInRange(mLauncher.getLocation(), mRadius * 4, true)) {
 			Integer nearTime = 0;
 			Location pLoc = player.getLocation();
 			if (pLoc.distance(mLauncher.getLocation()) < mRadius) {

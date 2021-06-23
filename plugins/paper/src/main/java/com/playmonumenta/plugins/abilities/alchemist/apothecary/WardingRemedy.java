@@ -1,6 +1,5 @@
 package com.playmonumenta.plugins.abilities.alchemist.apothecary;
 
-import com.playmonumenta.plugins.utils.FastUtils;
 import org.bukkit.Color;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -13,6 +12,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.utils.AbsorptionUtils;
+import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 
@@ -79,7 +79,7 @@ public class WardingRemedy extends Ability {
 					world.spawnParticle(Particle.REDSTONE, mPlayer.getLocation(), 40, 2.8, 2.8, 2.8, new Particle.DustOptions(APOTHECARY_LIGHT_COLOR, 1.5f));
 					world.spawnParticle(Particle.CLOUD, mPlayer.getLocation(), 20, 2.8, 2.8, 2.8, 0);
 
-					for (Player p : PlayerUtils.playersInRange(mPlayer, WARDING_REMEDY_ACTIVE_RADIUS, true)) {
+					for (Player p : PlayerUtils.playersInRange(mPlayer.getLocation(), WARDING_REMEDY_ACTIVE_RADIUS, true)) {
 						AbsorptionUtils.addAbsorption(p, 1, WARDING_REMEDY_MAX_ABSORPTION, WARDING_REMEDY_ABSORPTION_DURATION);
 
 						world.spawnParticle(Particle.REDSTONE, p.getLocation().clone().add(0, 0.5, 0), 10, 0.35, 0.15, 0.35, new Particle.DustOptions(APOTHECARY_LIGHT_COLOR, 1.0f));

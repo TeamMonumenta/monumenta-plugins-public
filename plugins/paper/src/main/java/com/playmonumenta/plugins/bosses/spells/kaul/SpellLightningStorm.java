@@ -4,10 +4,6 @@ package com.playmonumenta.plugins.bosses.spells.kaul;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.playmonumenta.plugins.bosses.spells.Spell;
-import com.playmonumenta.plugins.utils.BossUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
-
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.Location;
@@ -17,6 +13,10 @@ import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+
+import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 
 
 
@@ -52,7 +52,7 @@ public class SpellLightningStorm extends Spell {
 
 			double arenaSurfaceY = mCenter.getY(); // This should be 8.0 based on the armour stand placement
 			//TODO Fix spherical check missing players (bug #8731)
-			for (Player player : PlayerUtils.playersInRange(mCenter, mRange)) {
+			for (Player player : PlayerUtils.playersInRange(mCenter, mRange, true)) {
 				double playerY = player.getLocation().getY();
 
 				// If standing on heightened ground or going up a climbable to cheese,

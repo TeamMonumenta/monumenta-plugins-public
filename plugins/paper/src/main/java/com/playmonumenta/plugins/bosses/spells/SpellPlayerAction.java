@@ -50,7 +50,7 @@ public class SpellPlayerAction extends Spell {
 
 	@Override
 	public void run() {
-		for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), mRange)) {
+		for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), mRange, true)) {
 			if (mTickAction != null) {
 				mTicks += 2;
 				mTickAction.run(player, mTicks);

@@ -70,7 +70,7 @@ public class KineticProjectileBoss extends BossAbilityGroup {
 						hitbox.shift(loc);
 						hitbox.expand(RADIUS);
 
-						for (Player p : PlayerUtils.playersInRange(loc, RADIUS * 3)) {
+						for (Player p : PlayerUtils.playersInRange(loc, RADIUS * 3, true)) {
 							if (hitbox.overlaps(p.getBoundingBox())) {
 								BossUtils.bossDamage(boss, p, DAMAGE);
 

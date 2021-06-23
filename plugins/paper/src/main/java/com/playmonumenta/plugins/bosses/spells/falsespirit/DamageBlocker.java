@@ -141,7 +141,7 @@ public class DamageBlocker extends Spell {
 			}
 		} else {
 			//Show particles when player is further than 7 blocks to indicate no damage will be done
-			for (Player player : PlayerUtils.playersInRange(bossLoc, FalseSpirit.detectionRange)) {
+			for (Player player : PlayerUtils.playersInRange(bossLoc, FalseSpirit.detectionRange, true)) {
 				if (bossLoc.distance(player.getLocation()) > 7) {
 					Vector vec;
 					for (int y = 0; y < 2; y++) {

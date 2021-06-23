@@ -5,12 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.playmonumenta.plugins.utils.FastUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.plugins.utils.BossUtils;
-import com.playmonumenta.plugins.utils.MovementUtils;
-import com.playmonumenta.plugins.utils.SerializationUtils;
-
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -36,6 +30,11 @@ import com.playmonumenta.plugins.bosses.spells.SpellBaseAura;
 import com.playmonumenta.plugins.bosses.spells.SpellBaseBolt;
 import com.playmonumenta.plugins.bosses.spells.SpellBaseCharge;
 import com.playmonumenta.plugins.bosses.spells.SpellDelayedAction;
+import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.MovementUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.utils.SerializationUtils;
 
 public class TCalin extends BossAbilityGroup {
 	public static final String identityTag = "boss_tcalin";
@@ -172,7 +171,7 @@ public class TCalin extends BossAbilityGroup {
 				world.spawnParticle(Particle.SMOKE_LARGE, mBoss.getLocation().add(0, 1, 0), 75, 0, 0, 0, 0.25);
 				world.spawnParticle(Particle.EXPLOSION_NORMAL, mBoss.getLocation().add(0, 1, 0), 75, 0, 0, 0, 0.25);
 				knockback(plugin, 5);
-				for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), 5)) {
+				for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), 5, true)) {
 					BossUtils.bossDamage(mBoss, player, 16);
 				}
 			}
@@ -266,7 +265,7 @@ public class TCalin extends BossAbilityGroup {
 		World world = mBoss.getWorld();
 		world.playSound(mBoss.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 2, 1);
 		world.playSound(mBoss.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 2, 0.5f);
-		for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), r)) {
+		for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), r, true)) {
 			MovementUtils.knockAway(mBoss.getLocation(), player, 0.4f);
 		}
 		new BukkitRunnable() {

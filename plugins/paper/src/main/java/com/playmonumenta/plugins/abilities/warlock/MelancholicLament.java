@@ -1,5 +1,19 @@
 package com.playmonumenta.plugins.abilities.warlock;
 
+import org.bukkit.Bukkit;
+import org.bukkit.Color;
+import org.bukkit.Location;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
+import org.bukkit.World;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
+import org.bukkit.event.player.PlayerSwapHandItemsEvent;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
+
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityManager;
@@ -11,21 +25,6 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
-
-import org.bukkit.Bukkit;
-import org.bukkit.Color;
-import org.bukkit.Location;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
-import org.bukkit.SoundCategory;
-import org.bukkit.World;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Mob;
-import org.bukkit.entity.Player;
-import org.bukkit.event.player.PlayerSwapHandItemsEvent;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 
 
 
@@ -90,11 +89,11 @@ public class MelancholicLament extends Ability {
 
 			for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), RADIUS, mPlayer)) {
 				EntityUtils.applyWeaken(mPlugin, DURATION, mWeakenEffect, mob);
-				EntityUtils.applyTaunt(mPlugin, (Mob) mob, mPlayer);
+				EntityUtils.applyTaunt(mPlugin, mob, mPlayer);
 			}
 
 			if (getAbilityScore() > 1) {
-				for (Player player : PlayerUtils.playersInRange(mPlayer, RADIUS, true)) {
+				for (Player player : PlayerUtils.playersInRange(mPlayer.getLocation(), RADIUS, true)) {
 					world.spawnParticle(Particle.REDSTONE, player.getLocation(), 13, 0.25, 2, 0.25, 0.125, COLOR);
 					world.spawnParticle(Particle.ENCHANTMENT_TABLE, player.getLocation(), 13, 0.25, 2, 0.25, 0.125);
 					for (PotionEffectType effectType : PotionUtils.getNegativeEffects(mPlugin, player)) {

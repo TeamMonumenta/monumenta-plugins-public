@@ -1,18 +1,6 @@
 package com.playmonumenta.plugins.abilities.cleric;
 
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.abilities.AbilityManager;
-import com.playmonumenta.plugins.abilities.AbilityTrigger;
-import com.playmonumenta.plugins.abilities.cleric.hierophant.EnchantedPrayer;
-import com.playmonumenta.plugins.abilities.cleric.paladin.LuminousInfusion;
-import com.playmonumenta.plugins.classes.ClassAbility;
-import com.playmonumenta.plugins.enchantments.Multitool;
-import com.playmonumenta.plugins.potion.PotionManager.PotionID;
-import com.playmonumenta.plugins.utils.InventoryUtils;
-import com.playmonumenta.plugins.utils.ItemUtils;
-import com.playmonumenta.plugins.utils.ParticleUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
+import java.util.List;
 
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -27,6 +15,20 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
+
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.abilities.AbilityManager;
+import com.playmonumenta.plugins.abilities.AbilityTrigger;
+import com.playmonumenta.plugins.abilities.cleric.hierophant.EnchantedPrayer;
+import com.playmonumenta.plugins.abilities.cleric.paladin.LuminousInfusion;
+import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.enchantments.Multitool;
+import com.playmonumenta.plugins.potion.PotionManager.PotionID;
+import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.ParticleUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 
 
 
@@ -66,7 +68,13 @@ public class HandOfLight extends Ability {
 		Vector playerDir = mPlayer.getEyeLocation().getDirection().setY(0).normalize();
 		World world = mPlayer.getWorld();
 		boolean healCaster = AbilityManager.getManager().isPvPEnabled(mPlayer);
-		for (Player p : PlayerUtils.playersInRange(mPlayer, HEALING_RADIUS, healCaster)) {
+		List<Player> playersToHeal;
+		if (healCaster) {
+			playersToHeal = PlayerUtils.playersInRange(mPlayer.getLocation(), HEALING_RADIUS, true);
+		} else {
+			playersToHeal = PlayerUtils.otherPlayersInRange(mPlayer, HEALING_RADIUS, true);
+		}
+		for (Player p : playersToHeal) {
 			Vector toMobVector = p.getLocation().toVector().subtract(mPlayer.getLocation().toVector()).setY(0).normalize();
 
 			// Only heal players in the correct direction

@@ -122,7 +122,7 @@ public class PrimordialElementalKaulBoss extends BossAbilityGroup {
 
 	@Override
 	public void bossCastAbility(SpellCastEvent event) {
-		List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange);
+		List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true);
 		if (players.size() > 0) {
 			Player newTarget = players.get(FastUtils.RANDOM.nextInt(players.size()));
 			((Mob) mBoss).setTarget(newTarget);
@@ -193,7 +193,7 @@ public class PrimordialElementalKaulBoss extends BossAbilityGroup {
 					player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 15, 1));
 					player.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, 20 * 15, 0));
 				} else {
-					for (Player p : PlayerUtils.playersInRange(loc, 2.5)) {
+					for (Player p : PlayerUtils.playersInRange(loc, 2.5, true)) {
 						if (p.getLocation().getY() <= 60) {
 							BossUtils.bossDamage(boss, p, 16);
 							MovementUtils.knockAway(loc, p, 0.3f);

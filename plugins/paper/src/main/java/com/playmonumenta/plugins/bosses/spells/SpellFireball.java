@@ -71,7 +71,7 @@ public class SpellFireball extends Spell {
 		BukkitRunnable runnable = new BukkitRunnable() {
 			private int mTicks = 0;
 			private int mLaunches = 0;
-			private List<Player> mPlayers = PlayerUtils.playersInRange(mBoss.getLocation(), mRange);
+			private List<Player> mPlayers = PlayerUtils.playersInRange(mBoss.getLocation(), mRange, true);
 
 			@Override
 			public void run() {
@@ -85,7 +85,7 @@ public class SpellFireball extends Spell {
 					mLaunches++;
 					mTicks = 0;
 
-					mPlayers = PlayerUtils.playersInRange(mBoss.getLocation(), mRange);
+					mPlayers = PlayerUtils.playersInRange(mBoss.getLocation(), mRange, false);
 					if (mSingleTarget) {
 						// Single target chooses a random player within range that has line of sight
 						Collections.shuffle(mPlayers);

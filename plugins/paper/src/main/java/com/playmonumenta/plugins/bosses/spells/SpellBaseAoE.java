@@ -133,7 +133,7 @@ public class SpellBaseAoE extends Spell {
 		if (mLineOfSight) {
 			// Don't cast if no player in sight, e.g. should not initiate cast through a wall
 			boolean hasLineOfSight = false;
-			for (Player player : PlayerUtils.playersInRange(mLauncher.getLocation(), mRadius * 4)) {
+			for (Player player : PlayerUtils.playersInRange(mLauncher.getLocation(), mRadius * 4, true)) {
 				if (LocationUtils.hasLineOfSight(mLauncher, player)) {
 					hasLineOfSight = true;
 					break;

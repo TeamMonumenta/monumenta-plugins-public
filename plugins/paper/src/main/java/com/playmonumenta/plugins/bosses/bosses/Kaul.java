@@ -9,33 +9,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import com.playmonumenta.plugins.bosses.BossBarManager;
-import com.playmonumenta.plugins.bosses.BossBarManager.BossHealthAction;
-import com.playmonumenta.plugins.bosses.SpellManager;
-import com.playmonumenta.plugins.bosses.events.SpellCastEvent;
-import com.playmonumenta.plugins.bosses.spells.Spell;
-import com.playmonumenta.plugins.bosses.spells.SpellBaseParticleAura;
-import com.playmonumenta.plugins.bosses.spells.SpellConditionalTeleport;
-import com.playmonumenta.plugins.bosses.spells.SpellPlayerAction;
-import com.playmonumenta.plugins.bosses.spells.SpellPurgeNegatives;
-import com.playmonumenta.plugins.bosses.spells.kaul.SpellArachnopocolypse;
-import com.playmonumenta.plugins.bosses.spells.kaul.SpellEarthsWrath;
-import com.playmonumenta.plugins.bosses.spells.kaul.SpellGroundSurge;
-import com.playmonumenta.plugins.bosses.spells.kaul.SpellKaulBlockBreak;
-import com.playmonumenta.plugins.bosses.spells.kaul.SpellKaulsJudgement;
-import com.playmonumenta.plugins.bosses.spells.kaul.SpellLightningStorm;
-import com.playmonumenta.plugins.bosses.spells.kaul.SpellLightningStrike;
-import com.playmonumenta.plugins.bosses.spells.kaul.SpellPutridPlague;
-import com.playmonumenta.plugins.bosses.spells.kaul.SpellRaiseJungle;
-import com.playmonumenta.plugins.bosses.spells.kaul.SpellVolcanicDemise;
-import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
-import com.playmonumenta.plugins.utils.BossUtils;
-import com.playmonumenta.plugins.utils.FastUtils;
-import com.playmonumenta.plugins.utils.LocationUtils;
-import com.playmonumenta.plugins.utils.MovementUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.plugins.utils.SerializationUtils;
-
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
@@ -66,6 +39,33 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import com.playmonumenta.plugins.bosses.BossBarManager;
+import com.playmonumenta.plugins.bosses.BossBarManager.BossHealthAction;
+import com.playmonumenta.plugins.bosses.SpellManager;
+import com.playmonumenta.plugins.bosses.events.SpellCastEvent;
+import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.bosses.spells.SpellBaseParticleAura;
+import com.playmonumenta.plugins.bosses.spells.SpellConditionalTeleport;
+import com.playmonumenta.plugins.bosses.spells.SpellPlayerAction;
+import com.playmonumenta.plugins.bosses.spells.SpellPurgeNegatives;
+import com.playmonumenta.plugins.bosses.spells.kaul.SpellArachnopocolypse;
+import com.playmonumenta.plugins.bosses.spells.kaul.SpellEarthsWrath;
+import com.playmonumenta.plugins.bosses.spells.kaul.SpellGroundSurge;
+import com.playmonumenta.plugins.bosses.spells.kaul.SpellKaulBlockBreak;
+import com.playmonumenta.plugins.bosses.spells.kaul.SpellKaulsJudgement;
+import com.playmonumenta.plugins.bosses.spells.kaul.SpellLightningStorm;
+import com.playmonumenta.plugins.bosses.spells.kaul.SpellLightningStrike;
+import com.playmonumenta.plugins.bosses.spells.kaul.SpellPutridPlague;
+import com.playmonumenta.plugins.bosses.spells.kaul.SpellRaiseJungle;
+import com.playmonumenta.plugins.bosses.spells.kaul.SpellVolcanicDemise;
+import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
+import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.LocationUtils;
+import com.playmonumenta.plugins.utils.MovementUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.utils.SerializationUtils;
 
 
 
@@ -183,7 +183,7 @@ public class Kaul extends BossAbilityGroup {
 		new BukkitRunnable() {
 			@Override
 			public void run() {
-				for (Player player : PlayerUtils.playersInRange(mSpawnLoc, detectionRange)) {
+				for (Player player : PlayerUtils.playersInRange(mSpawnLoc, detectionRange, true)) {
 					if (player.isSleeping()) {
 						BossUtils.bossDamage(mBoss, player, 22);
 						player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 15, 1));
@@ -212,7 +212,7 @@ public class Kaul extends BossAbilityGroup {
 		                  new SpellGroundSurge(mPlugin, mBoss, detectionRange),
 		                  judgement));
 
-		List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange);
+		List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true);
 
 		SpellManager phase3Spells = new SpellManager(
 		    Arrays.asList(new SpellPutridPlague(mPlugin, mBoss, detectionRange / 2, true, mShrineMarker.getLocation()),
@@ -427,7 +427,7 @@ public class Kaul extends BossAbilityGroup {
 									}
 
 								}.runTaskTimer(mPlugin, 0, 1);
-								for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange)) {
+								for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true)) {
 									player.playSound(player.getLocation(), Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, 1,
 									                 0.75f);
 								}
@@ -708,7 +708,7 @@ public class Kaul extends BossAbilityGroup {
 		// Phase 3.5
 		//Summons another Immortal Elemental at 20% HP if players are more than 15.
 		events.put(20, mBoss -> {
-			List<Player> playersInRange = PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange);
+			List<Player> playersInRange = PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true);
 			if (playersInRange.size() >= 15) {
 				summonImmortal(plugin, world);
 			}
@@ -787,7 +787,7 @@ public class Kaul extends BossAbilityGroup {
 		world.playSound(mBoss.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 2, 1);
 		world.playSound(mBoss.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 2, 0.5f);
 		world.playSound(mBoss.getLocation(), Sound.ENTITY_ENDER_DRAGON_GROWL, 2, 0f);
-		for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), r)) {
+		for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), r, true)) {
 			MovementUtils.knockAway(mBoss.getLocation(), player, 0.55f);
 			player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 5, 1));
 		}
@@ -852,7 +852,7 @@ public class Kaul extends BossAbilityGroup {
 					}
 				}.runTaskLater(mPlugin, 20);
 				UUID uuid = event.getEntity().getUniqueId();
-				for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), 4)) {
+				for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), 4, true)) {
 					if (!player.getUniqueId().equals(uuid)) {
 						BossUtils.bossDamage(mBoss, player, event.getDamage());
 					}
@@ -904,7 +904,7 @@ public class Kaul extends BossAbilityGroup {
 								mBoss.setAI(true);
 								mBoss.removePotionEffect(PotionEffectType.DAMAGE_RESISTANCE);
 								teleport(mSpawnLoc);
-								List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange);
+								List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true);
 								if (players.size() > 0) {
 									Player newTarget = players.get(FastUtils.RANDOM.nextInt(players.size()));
 									((Mob) mBoss).setTarget(newTarget);
@@ -921,7 +921,7 @@ public class Kaul extends BossAbilityGroup {
 
 	@Override
 	public void death(EntityDeathEvent event) {
-		List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange);
+		List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true);
 		if (players.size() <= 0) {
 			return;
 		}

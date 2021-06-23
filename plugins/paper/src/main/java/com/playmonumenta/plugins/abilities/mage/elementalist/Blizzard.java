@@ -134,7 +134,7 @@ public class Blizzard extends Ability {
 				List<LivingEntity> mobs = EntityUtils.getNearbyMobs(loc, mLevelSize, mPlayer);
 				mTicks++;
 				if (mTicks % SLOW_INTERVAL == 0) {
-					for (Player p : PlayerUtils.playersInRange(loc, mLevelSize)) {
+					for (Player p : PlayerUtils.playersInRange(loc, mLevelSize, true)) {
 						if (p.getFireTicks() > 1) {
 							p.setFireTicks(1);
 						}

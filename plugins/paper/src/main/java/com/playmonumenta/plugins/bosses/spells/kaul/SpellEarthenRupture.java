@@ -65,7 +65,7 @@ public class SpellEarthenRupture extends Spell {
 					world.spawnParticle(Particle.BLOCK_DUST, loc, 250, 3, 0.1, 3, 0.25, Material.COARSE_DIRT.createBlockData());
 					world.spawnParticle(Particle.LAVA, loc, 100, 3, 0.1, 3, 0.25);
 					world.spawnParticle(Particle.EXPLOSION_NORMAL, loc, 75, 3, 0.1, 3, 0.25);
-					for (Player player : PlayerUtils.playersInRange(loc, 6)) {
+					for (Player player : PlayerUtils.playersInRange(loc, 6, true)) {
 						BossUtils.bossDamage(mBoss, player, 23);
 						MovementUtils.knockAway(loc, player, 0.50f, 1.5f);
 						player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 10, 2));

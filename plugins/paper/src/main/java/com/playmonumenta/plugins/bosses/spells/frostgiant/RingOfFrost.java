@@ -51,7 +51,7 @@ public class RingOfFrost extends Spell {
 		world.playSound(mBoss.getLocation(), Sound.ENTITY_BLAZE_SHOOT, SoundCategory.HOSTILE, 3, 1.5f);
 		world.playSound(mBoss.getLocation(), Sound.ENTITY_POLAR_BEAR_WARNING, SoundCategory.HOSTILE, 5, 0);
 		world.playSound(mBoss.getLocation(), Sound.ENTITY_ENDER_DRAGON_GROWL, SoundCategory.HOSTILE, 3, 0);
-		for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), FrostGiant.detectionRange)) {
+		for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), FrostGiant.detectionRange, true)) {
 			player.sendMessage(ChatColor.DARK_PURPLE + "The air away from the giant starts to freeze!");
 		}
 		BukkitRunnable runnable = new BukkitRunnable() {
@@ -102,7 +102,7 @@ public class RingOfFrost extends Spell {
 					world.playSound(mBoss.getLocation(), Sound.ENTITY_BLAZE_SHOOT, SoundCategory.HOSTILE, 3, 1.5f);
 					world.playSound(mBoss.getLocation(), Sound.BLOCK_GLASS_BREAK, SoundCategory.HOSTILE, 3, 0.65f);
 					Vector vec = loc.toVector();
-					for (Player player : PlayerUtils.playersInRange(loc, 50)) {
+					for (Player player : PlayerUtils.playersInRange(loc, 50, true)) {
 						if (!player.getLocation().toVector().isInSphere(vec, mCurrentRadius) && mStartLoc.distance(player.getLocation()) <= FrostGiant.fighterRange) {
 							BossUtils.bossDamage(mBoss, player, 40, null);
 							world.spawnParticle(Particle.EXPLOSION_NORMAL, player.getLocation().add(0, 1, 0), 30, 0.25, 0.45, 0.25, 0.2);

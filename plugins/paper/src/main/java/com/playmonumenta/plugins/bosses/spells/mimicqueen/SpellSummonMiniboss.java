@@ -41,7 +41,7 @@ public class SpellSummonMiniboss extends Spell {
 		mBoss.getWorld().playSound(loc, Sound.ENTITY_WITHER_SHOOT, SoundCategory.HOSTILE, 5, 0);
 		mBoss.getWorld().spawnParticle(Particle.FIREWORKS_SPARK, loc, 6, 0, 0, 0, 0.5, null, true);
 
-		List<Player> players = PlayerUtils.playersInRange(loc, MimicQueen.detectionRange);
+		List<Player> players = PlayerUtils.playersInRange(loc, MimicQueen.detectionRange, true);
 		final int playerCount = ((players.size() > 1) ? players.size() : 1);
 
 		new BukkitRunnable() {

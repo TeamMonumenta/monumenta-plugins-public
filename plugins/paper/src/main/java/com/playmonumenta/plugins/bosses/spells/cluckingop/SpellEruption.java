@@ -30,7 +30,7 @@ public class SpellEruption extends Spell {
 	@Override
 	public void run() {
 		World world = mBoss.getWorld();
-		List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), 30);
+		List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), 30, true);
 		new BukkitRunnable() {
 			int mT = 0;
 			@Override

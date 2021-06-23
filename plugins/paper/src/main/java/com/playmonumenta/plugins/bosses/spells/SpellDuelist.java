@@ -50,7 +50,7 @@ public class SpellDuelist extends Spell {
 		Location loc = mBoss.getLocation();
 		LivingEntity target = ((Mob) mBoss).getTarget();
 		if (!(target instanceof Player && LocationUtils.hasLineOfSight(mBoss, target))) {
-			List<Player> players = PlayerUtils.playersInRange(loc, RANGE);
+			List<Player> players = PlayerUtils.playersInRange(loc, RANGE, false);
 			for (Player player : players) {
 				if (LocationUtils.hasLineOfSight(mBoss, player) && loc.distance(player.getLocation()) < RANGE) {
 					target = player;
@@ -79,7 +79,7 @@ public class SpellDuelist extends Spell {
 			}
 
 			BukkitRunnable attack = new BukkitRunnable() {
-				List<Player> mPlayers = PlayerUtils.playersInRange(mBoss.getLocation(), RANGE * 4);
+				List<Player> mPlayers = PlayerUtils.playersInRange(mBoss.getLocation(), RANGE * 4, true);
 				int mTime = 0;
 
 				@Override
@@ -132,7 +132,7 @@ public class SpellDuelist extends Spell {
 			}
 
 			BukkitRunnable attack = new BukkitRunnable() {
-				List<Player> mPlayers = PlayerUtils.playersInRange(mBoss.getLocation(), RANGE * 4);
+				List<Player> mPlayers = PlayerUtils.playersInRange(mBoss.getLocation(), RANGE * 4, true);
 				int mTime = 0;
 				Vector mDirection = direction;
 
@@ -177,7 +177,7 @@ public class SpellDuelist extends Spell {
 			}
 
 			BukkitRunnable attack = new BukkitRunnable() {
-				List<Player> mPlayers = PlayerUtils.playersInRange(mBoss.getLocation(), RANGE * 4);
+				List<Player> mPlayers = PlayerUtils.playersInRange(mBoss.getLocation(), RANGE * 4, true);
 				int mTime = 0;
 
 				@Override
@@ -227,7 +227,7 @@ public class SpellDuelist extends Spell {
 	@Override
 	public boolean canRun() {
 		Location loc = mBoss.getLocation();
-		List<Player> players = PlayerUtils.playersInRange(loc, RANGE);
+		List<Player> players = PlayerUtils.playersInRange(loc, RANGE, false);
 		if (!players.isEmpty()) {
 			for (Player player : players) {
 				if (LocationUtils.hasLineOfSight(mBoss, player)) {

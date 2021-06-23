@@ -2,6 +2,19 @@ package com.playmonumenta.plugins.abilities.cleric;
 
 import java.util.List;
 
+import org.bukkit.Bukkit;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
+import org.bukkit.attribute.Attribute;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
+import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.scheduler.BukkitRunnable;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
@@ -13,19 +26,6 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.StringUtils;
-
-import org.bukkit.Bukkit;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
-import org.bukkit.attribute.Attribute;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
-import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.event.entity.EntityDeathEvent;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 
 
@@ -148,7 +148,7 @@ public class DivineJustice extends Ability {
 				mPlayer,
 				mPlayer.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue() * HEALING_MULTIPLIER_OWN
 			);
-			@NotNull List<@NotNull Player> players = PlayerUtils.playersInRange(mPlayer, RADIUS, false);
+			@NotNull List<@NotNull Player> players = PlayerUtils.otherPlayersInRange(mPlayer, RADIUS, true);
 			for (@NotNull Player otherPlayer : players) {
 				PlayerUtils.healPlayer(
 					otherPlayer,

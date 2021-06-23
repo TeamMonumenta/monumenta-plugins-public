@@ -4,14 +4,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import com.destroystokyo.paper.MaterialSetTag;
-import com.playmonumenta.plugins.Constants;
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.attributes.AttributeProjectileSpeed;
-import com.playmonumenta.plugins.classes.ClassAbility;
-import com.playmonumenta.plugins.events.AbilityCastEvent;
-import com.playmonumenta.plugins.potion.PotionManager.PotionID;
-
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
@@ -26,6 +18,14 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
+
+import com.destroystokyo.paper.MaterialSetTag;
+import com.playmonumenta.plugins.Constants;
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.attributes.AttributeProjectileSpeed;
+import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.events.AbilityCastEvent;
+import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 
 
 
@@ -55,26 +55,6 @@ public class PlayerUtils {
 		player.teleport(player.getWorld().getSpawnLocation());
 	}
 
-	public static List<Player> playersInRange(Player player, double radius, boolean includeSourcePlayer) {
-		return playersInRange(player, radius, includeSourcePlayer, false);
-	}
-
-	public static List<Player> playersInRange(Player player, double radius, boolean includeSourcePlayer, boolean includeNonTargetable) {
-		List<Player> players = playersInRange(player.getLocation(), radius, includeNonTargetable);
-		if (!includeSourcePlayer) {
-			players.removeIf(p -> (p == player));
-		} else {
-			if (!players.contains(player)) {
-				players.add(player);
-			}
-		}
-		return players;
-	}
-
-	public static List<Player> playersInRange(Location loc, double range) {
-		return playersInRange(loc, range, false);
-	}
-
 	public static List<Player> playersInRange(Location loc, double range, boolean includeNonTargetable) {
 		List<Player> players = new ArrayList<Player>();
 
@@ -86,6 +66,12 @@ public class PlayerUtils {
 			}
 		}
 
+		return players;
+	}
+
+	public static List<Player> otherPlayersInRange(Player player, double radius, boolean includeNonTargetable) {
+		List<Player> players = playersInRange(player.getLocation(), radius, includeNonTargetable);
+		players.removeIf(p -> (p == player));
 		return players;
 	}
 

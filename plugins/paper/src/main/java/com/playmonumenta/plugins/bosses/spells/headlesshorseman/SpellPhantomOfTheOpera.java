@@ -54,7 +54,7 @@ public class SpellPhantomOfTheOpera extends Spell {
 			int num = 0;
 
 			//set amount of phantoms spawn
-			List<Player> players = PlayerUtils.playersInRange(mCenter, mRange);
+			List<Player> players = PlayerUtils.playersInRange(mCenter, mRange, true);
 			if (players.size() == 0) {
 				return;
 			}
@@ -102,7 +102,7 @@ public class SpellPhantomOfTheOpera extends Spell {
 							world.spawnParticle(Particle.EXPLOSION_NORMAL, sLoc, 20, 0.3, 0.3, 0.3, 0.1);
 							LibraryOfSoulsIntegration.summon(sLoc, "NightTerror");
 
-							List<Player> players = PlayerUtils.playersInRange(mCenter, mRange);
+							List<Player> players = PlayerUtils.playersInRange(mCenter, mRange, true);
 							if (players.size() == 0) {
 							      return;
 							}

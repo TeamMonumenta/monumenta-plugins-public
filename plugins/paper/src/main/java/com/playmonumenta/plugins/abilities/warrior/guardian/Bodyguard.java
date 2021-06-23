@@ -72,7 +72,7 @@ public class Bodyguard extends Ability {
 		World world = mPlayer.getWorld();
 		boolean lookingDown = oLoc.getPitch() > 50;
 		Vector dir = oLoc.getDirection();
-		List<Player> players = PlayerUtils.playersInRange(mPlayer.getEyeLocation(), RANGE);
+		List<Player> players = PlayerUtils.playersInRange(mPlayer.getEyeLocation(), RANGE, true);
 		players.remove(mPlayer);
 		for (int i = 0; i < RANGE; i++) {
 			box.shift(dir);

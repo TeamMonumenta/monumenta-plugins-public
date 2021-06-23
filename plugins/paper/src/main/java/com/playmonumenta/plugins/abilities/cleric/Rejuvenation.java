@@ -40,7 +40,7 @@ public class Rejuvenation extends Ability {
 		if (oneSecond && !mPlayer.isDead()) {
 			mTimer += 20;
 			if (mTimer % mHealInterval == 0) {
-				for (Player player : PlayerUtils.playersInRange(mPlayer, RADIUS, true)) {
+				for (Player player : PlayerUtils.playersInRange(mPlayer.getLocation(), RADIUS, true)) {
 					// Don't buff players that have their class disabled or who have PvP enabled
 					if (player.getScoreboardTags().contains("disable_class") || AbilityManager.getManager().isPvPEnabled(player)) {
 						continue;

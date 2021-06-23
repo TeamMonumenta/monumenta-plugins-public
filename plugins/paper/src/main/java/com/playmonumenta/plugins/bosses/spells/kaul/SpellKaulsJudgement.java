@@ -76,7 +76,7 @@ public class SpellKaulsJudgement extends Spell implements Listener {
 			}
 		}
 
-		mChargeUp = new ChargeUpManager(mBossLoc, null, (int) (20 * 2), ChatColor.GREEN + "Charging " + ChatColor.DARK_GREEN + "" + ChatColor.BOLD + "Kaul's Judgement...",
+		mChargeUp = new ChargeUpManager(mBossLoc, null, 20 * 2, ChatColor.GREEN + "Charging " + ChatColor.DARK_GREEN + "" + ChatColor.BOLD + "Kaul's Judgement...",
 			BarColor.GREEN, BarStyle.SEGMENTED_10, 75);
 		/* Register this instance as an event handler so it can catch player events */
 		mPlugin.getServer().getPluginManager().registerEvents(this, mPlugin);
@@ -138,7 +138,7 @@ public class SpellKaulsJudgement extends Spell implements Listener {
 			}
 		}.runTaskLater(mPlugin, KAULS_JUDGEMENT_TIME);
 
-		List<Player> players = PlayerUtils.playersInRange(mBossLoc, KAULS_JUDGEMENT_RANGE);
+		List<Player> players = PlayerUtils.playersInRange(mBossLoc, KAULS_JUDGEMENT_RANGE, true);
 		players.removeIf(p -> p.getLocation().getY() >= 61);
 		for (Player player : players) {
 			player.sendMessage(ChatColor.DARK_GREEN + "IT IS TIME FOR JUDGEMENT TO COME.");

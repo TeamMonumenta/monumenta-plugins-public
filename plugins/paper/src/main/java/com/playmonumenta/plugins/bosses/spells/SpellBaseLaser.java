@@ -3,11 +3,6 @@ package com.playmonumenta.plugins.bosses.spells;
 import java.util.Collections;
 import java.util.List;
 
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.LocationUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.plugins.utils.LocationUtils.TravelAction;
-
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
@@ -16,6 +11,11 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
+
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.LocationUtils;
+import com.playmonumenta.plugins.utils.LocationUtils.TravelAction;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 
 
 
@@ -109,7 +109,7 @@ public class SpellBaseLaser extends Spell {
 
 	@Override
 	public void run() {
-		List<Player> potentialTargets = PlayerUtils.playersInRange(mBoss.getLocation(), mRange);
+		List<Player> potentialTargets = PlayerUtils.playersInRange(mBoss.getLocation(), mRange, false);
 
 		// Single-target laser chooses 1 player
 		if (mSingleTarget) {
@@ -136,7 +136,7 @@ public class SpellBaseLaser extends Spell {
 
 	@Override
 	public boolean canRun() {
-		List<Player> potentialTargets = PlayerUtils.playersInRange(mBoss.getLocation(), mRange);
+		List<Player> potentialTargets = PlayerUtils.playersInRange(mBoss.getLocation(), mRange, false);
 
 		for (Player target : potentialTargets) {
 			// A different kind of line check than the laser itself
@@ -240,6 +240,7 @@ public class SpellBaseLaser extends Spell {
 		 *
 		 * @param location Location to use for your particles
 		 */
+		@Override
 		void run(Location location);
 	}
 

@@ -40,7 +40,7 @@ public class ShieldOfFrost extends Spell {
 	@Override
 	public void run() {
 		World world = mBoss.getWorld();
-		List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), 50);
+		List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), 50, true);
 		world.playSound(mBoss.getLocation(), Sound.BLOCK_GLASS_BREAK, 3, 0.5f);
 		world.playSound(mBoss.getLocation(), Sound.ENTITY_BLAZE_SHOOT, 3, 1.5f);
 		mBoss.addPotionEffect(new PotionEffect(PotionEffectType.ABSORPTION, 20 * 15, 37 + (players.size() * 3)));
@@ -102,7 +102,7 @@ public class ShieldOfFrost extends Spell {
 					world.playSound(mBoss.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 3, 0.5f);
 					world.playSound(mBoss.getLocation(), Sound.ENTITY_ENDER_DRAGON_GROWL, 3, 0.5f);
 					mBoss.removePotionEffect(PotionEffectType.ABSORPTION);
-					for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), 18)) {
+					for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), 18, true)) {
 						player.damage(24, mBoss);
 						player.removePotionEffect(PotionEffectType.SLOW);
 						player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 15, 2));

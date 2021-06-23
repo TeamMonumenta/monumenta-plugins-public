@@ -3,12 +3,6 @@ package com.playmonumenta.plugins.bosses.spells.headlesshorseman;
 import java.util.Collections;
 import java.util.List;
 
-import com.playmonumenta.plugins.utils.FastUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.plugins.utils.VectorUtils;
-import com.playmonumenta.plugins.utils.LocationUtils;
-import com.playmonumenta.plugins.utils.BossUtils;
-
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -24,6 +18,11 @@ import org.bukkit.util.Vector;
 
 import com.playmonumenta.plugins.bosses.bosses.HeadlessHorsemanBoss;
 import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.LocationUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.utils.VectorUtils;
 
 /*
  * Sinister Reach - The horseman pauses momentarily for 0.8 seconds, afterwards the swing forward
@@ -58,7 +57,7 @@ public class SpellSinisterReach extends Spell {
 		}
 
 		if (target == null) {
-			List<Player> players = PlayerUtils.playersInRange(mHorseman.getSpawnLocation(), HeadlessHorsemanBoss.detectionRange);
+			List<Player> players = PlayerUtils.playersInRange(mHorseman.getSpawnLocation(), HeadlessHorsemanBoss.detectionRange, true);
 			Collections.shuffle(players);
 			if (players.size() > 0) {
 				target = players.get(0);
@@ -119,7 +118,7 @@ public class SpellSinisterReach extends Spell {
 						world.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_BREAK_BLOCK, 3, 0.75f);
 						world.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_SHOOT, 3, 1.65f);
 
-						for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), 4)) {
+						for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), 4, true)) {
 							if (mHorseman.getSpawnLocation().distance(player.getLocation()) < HeadlessHorsemanBoss.detectionRange) {
 								Vector toVector = player.getLocation().toVector().subtract(mBoss.getLocation().toVector()).normalize();
 								if (mDir.dot(toVector) > 0.06) {

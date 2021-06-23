@@ -117,7 +117,7 @@ public class SpellBaseAura extends Spell {
 		if (mEffectIter >= 2 && mAuraEffect != null) {
 			mEffectIter = 0;
 
-			for (Player player : PlayerUtils.playersInRange(bossLoc, mRadius)) {
+			for (Player player : PlayerUtils.playersInRange(bossLoc, mRadius, true)) {
 				Location playerLoc = player.getLocation();
 				if (Math.abs(playerLoc.getX() - bossLoc.getX()) < mDX &&
 				        Math.abs(playerLoc.getX() - bossLoc.getX()) < mDX &&
@@ -137,7 +137,7 @@ public class SpellBaseAura extends Spell {
 				// Loop through all nearby players and put the ones that don't have
 				// the noAuraParticles tag on a list to send particles to them
 				mParticlePlayers.clear();
-				for (Player player : PlayerUtils.playersInRange(bossLoc, 80)) {
+				for (Player player : PlayerUtils.playersInRange(bossLoc, 80, true)) {
 					boolean particlesOk = true;
 					for (String tag : player.getScoreboardTags()) {
 						if (tag.equals("noAuraParticles")) {

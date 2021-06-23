@@ -193,7 +193,7 @@ public class Shatter extends Spell {
 					}
 
 					//Damage player by 35 in cone after warning is over (2 seconds) and knock player away
-					for (Player player : PlayerUtils.playersInRange(loc, 40)) {
+					for (Player player : PlayerUtils.playersInRange(loc, 40, true)) {
 						if (player.getLocation().distance(mStartLoc) > FrostGiant.fighterRange) {
 							continue;
 						}

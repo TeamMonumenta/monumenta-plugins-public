@@ -3,14 +3,6 @@ package com.playmonumenta.plugins.bosses.spells.kaul;
 import java.util.Collections;
 import java.util.List;
 
-import com.playmonumenta.plugins.bosses.ChargeUpManager;
-import com.playmonumenta.plugins.bosses.spells.Spell;
-import com.playmonumenta.plugins.utils.BossUtils;
-import com.playmonumenta.plugins.utils.FastUtils;
-import com.playmonumenta.plugins.utils.LocationUtils;
-import com.playmonumenta.plugins.utils.MovementUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
-
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -26,6 +18,14 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
+
+import com.playmonumenta.plugins.bosses.ChargeUpManager;
+import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.LocationUtils;
+import com.playmonumenta.plugins.utils.MovementUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 
 /*
  * Volcanic Demise:
@@ -61,7 +61,7 @@ public class SpellVolcanicDemise extends Spell {
 	@Override
 	public void run() {
 		World world = mBoss.getWorld();
-		List<Player> players = PlayerUtils.playersInRange(mCenter, 50);
+		List<Player> players = PlayerUtils.playersInRange(mCenter, 50, true);
 		players.removeIf(p -> p.getLocation().getY() >= 61);
 		for (Player player : players) {
 			player.sendMessage(ChatColor.GREEN + "SCATTER, INSECTS.");
@@ -103,7 +103,7 @@ public class SpellVolcanicDemise extends Spell {
 
 							if (mI % METEOR_RATE == 0) {
 								mMeteors++;
-								List<Player> players = PlayerUtils.playersInRange(mCenter, 50);
+								List<Player> players = PlayerUtils.playersInRange(mCenter, 50, true);
 								players.removeIf(p -> p.getLocation().getY() >= 61);
 								Collections.shuffle(players);
 								for (Player player : players) {
@@ -182,7 +182,7 @@ public class SpellVolcanicDemise extends Spell {
 					mWorld.playSound(mLoc, Sound.ENTITY_GENERIC_EXPLODE, 1.5f, 0.9f);
 					BoundingBox death = BoundingBox.of(mLoc, 1.5, 1.5, 1.5);
 					BoundingBox box = BoundingBox.of(mLoc, 4, 4, 4);
-					for (Player player : PlayerUtils.playersInRange(mLoc, 4)) {
+					for (Player player : PlayerUtils.playersInRange(mLoc, 4, true)) {
 						BoundingBox pBox = player.getBoundingBox();
 						if (pBox.overlaps(death)) {
 							BossUtils.bossDamage(mBoss, player, 1000, mLoc);

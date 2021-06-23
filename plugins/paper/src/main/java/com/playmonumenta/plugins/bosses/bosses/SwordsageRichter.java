@@ -141,7 +141,7 @@ public class SwordsageRichter extends BossAbilityGroup {
 
 		events.put(8, mBoss -> {
 			PlayerUtils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"[Richter] \",\"color\":\"gold\"},{\"text\":\"DAMN YOU! This match ends here! I won't allow myself to be beaten like this! NEVER!\",\"color\":\"white\"}]");
-			List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange);
+			List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true);
 			mBoss.setAI(false);
 			mBoss.setInvulnerable(true);
 
@@ -277,7 +277,7 @@ public class SwordsageRichter extends BossAbilityGroup {
 		World world = mBoss.getWorld();
 		world.playSound(mBoss.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 2, 1);
 		world.playSound(mBoss.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 2, 0.5f);
-		for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), r)) {
+		for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), r, true)) {
 			MovementUtils.knockAway(mBoss.getLocation(), player, 0.45f);
 		}
 		new BukkitRunnable() {

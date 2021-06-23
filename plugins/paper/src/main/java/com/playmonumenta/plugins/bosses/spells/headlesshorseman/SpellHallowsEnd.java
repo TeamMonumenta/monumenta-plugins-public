@@ -71,7 +71,7 @@ public class SpellHallowsEnd extends Spell {
 					world.spawnParticle(Particle.SMOKE_LARGE, loc, 25, 0, 0, 0, 0.1);
 					world.spawnParticle(Particle.SMOKE_NORMAL, loc, 50, 0, 0, 0, 0.15);
 					world.spawnParticle(Particle.EXPLOSION_LARGE, loc, 1, 0, 0, 0, 0);
-					for (Player player : PlayerUtils.playersInRange(loc, 3.5)) {
+					for (Player player : PlayerUtils.playersInRange(loc, 3.5, true)) {
 						if (mHorseman.getSpawnLocation().distance(player.getLocation()) < HeadlessHorsemanBoss.detectionRange) {
 							int mNDT = player.getNoDamageTicks();
 							player.setNoDamageTicks(0);
@@ -115,7 +115,7 @@ public class SpellHallowsEnd extends Spell {
 
 				if (!mInit) {
 					mInit = true;
-					List<Player> players = PlayerUtils.playersInRange(mHorseman.getSpawnLocation(), HeadlessHorsemanBoss.detectionRange);
+					List<Player> players = PlayerUtils.playersInRange(mHorseman.getSpawnLocation(), HeadlessHorsemanBoss.detectionRange, true);
 					Collections.shuffle(players);
 
 					int amt = players.size() / 3;
@@ -132,7 +132,7 @@ public class SpellHallowsEnd extends Spell {
 					mHit = false;
 					mTicks = 0;
 					mHits++;
-					List<Player> players = PlayerUtils.playersInRange(mHorseman.getSpawnLocation(), HeadlessHorsemanBoss.detectionRange);
+					List<Player> players = PlayerUtils.playersInRange(mHorseman.getSpawnLocation(), HeadlessHorsemanBoss.detectionRange, true);
 					Collections.shuffle(players);
 
 					int amt = players.size() / 3 + 2;

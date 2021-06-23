@@ -75,7 +75,7 @@ public class SpellMultiEarthshake extends Spell {
 
 	@Override
 	public void run() {
-		List<Player> targets = PlayerUtils.playersInRange(mSpawnLoc, 40);
+		List<Player> targets = PlayerUtils.playersInRange(mSpawnLoc, 40, false);
 		targets.removeIf(p -> p.getGameMode() == GameMode.SPECTATOR);
 		List<Location> locs = new ArrayList<>(targets.size());
 
@@ -206,7 +206,7 @@ public class SpellMultiEarthshake extends Spell {
 						}
 
 						//Knock up player
-						for (Player p : PlayerUtils.playersInRange(loc, mRadius * 2)) {
+						for (Player p : PlayerUtils.playersInRange(loc, mRadius * 2, true)) {
 							mWorld.playSound(p.getLocation(), Sound.ENTITY_WITHER_BREAK_BLOCK, 1.0f, 1.0f);
 							if (p.getLocation().distance(loc) <= mRadius) {
 								p.setVelocity(p.getVelocity().add(new Vector(0.0, 1.5, 0.0)));

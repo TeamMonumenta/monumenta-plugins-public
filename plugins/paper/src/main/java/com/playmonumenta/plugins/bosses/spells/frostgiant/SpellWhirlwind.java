@@ -101,7 +101,7 @@ public class SpellWhirlwind extends Spell {
 								loc.subtract(FastUtils.cos(radian) * mRadius, 6 + (FastUtils.sin(mSin) * 6), FastUtils.sin(radian) * mRadius);
 							}
 							if (mTicks % 10 == 0) {
-								for (Player player : PlayerUtils.playersInRange(loc, 8)) {
+								for (Player player : PlayerUtils.playersInRange(loc, 8, true)) {
 									BossUtils.bossDamage(mBoss, player, 28);
 								}
 							}

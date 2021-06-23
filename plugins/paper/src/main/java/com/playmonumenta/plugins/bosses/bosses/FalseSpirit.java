@@ -112,7 +112,7 @@ public class FalseSpirit extends BossAbilityGroup {
 		mEndLoc = endLoc;
 
 		//Look to see if delves is enabled
-		List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), 100);
+		List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), 100, true);
 		for (Player player : players) {
 			if (DelvesUtils.getDelveInfo(player).getDepthPoints() > 0) {
 				mDelve = true;
@@ -288,7 +288,7 @@ public class FalseSpirit extends BossAbilityGroup {
 				}
 
 				//Damage players below the arena
-				List<Player> players = PlayerUtils.playersInRange(mSpawnLoc, detectionRange);
+				List<Player> players = PlayerUtils.playersInRange(mSpawnLoc, detectionRange, true);
 				players.removeIf(p -> p.getGameMode() == GameMode.SPECTATOR);
 				for (Player p : players) {
 					if (p.getLocation().getY() <= 3 && mGroundMats.contains(p.getLocation().add(0, -1, 0).getBlock().getType())) {
@@ -446,7 +446,7 @@ public class FalseSpirit extends BossAbilityGroup {
 	@Override
 	public void init() {
 		int bossTargetHp = 0;
-		int playerCount = PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange).size();
+		int playerCount = PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true).size();
 		int hpDel = 3012;
 		int armor = (int)(Math.sqrt(playerCount * 2) - 1);
 

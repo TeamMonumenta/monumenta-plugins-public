@@ -96,7 +96,7 @@ public class FalseSpiritPortal extends BossAbilityGroup {
 		World world = mBoss.getWorld();
 		mBoss.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 20 * 60 * 27, 3));
 
-		List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), 75);
+		List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), 75, true);
 		mPlayerCount = players.size();
 		if (mPlayerCount < 1) {
 			mPlayerCount = 1;
@@ -427,7 +427,7 @@ public class FalseSpiritPortal extends BossAbilityGroup {
 			world.playSound(as.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 3, 1);
 
 			BoundingBox box = BoundingBox.of(as.getLocation(), 3, 3, 3);
-			for (Player p : PlayerUtils.playersInRange(as.getLocation(), 5)) {
+			for (Player p : PlayerUtils.playersInRange(as.getLocation(), 5, true)) {
 				if (box.overlaps(p.getBoundingBox())) {
 					BossUtils.bossDamage(mBoss, p, 30);
 				}

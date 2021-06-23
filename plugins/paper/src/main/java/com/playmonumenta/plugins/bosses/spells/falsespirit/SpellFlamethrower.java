@@ -57,7 +57,7 @@ public class SpellFlamethrower extends Spell {
 	}
 
 	private void launch(Player target) {
-		List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), mRange);
+		List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), mRange, true);
 
 		mLoc = target.getEyeLocation();
 		World world = mBoss.getWorld();

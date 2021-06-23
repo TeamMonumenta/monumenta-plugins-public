@@ -83,7 +83,7 @@ public class UltimateBulletMania extends Spell {
 		World world = mBoss.getWorld();
 		world.playSound(mBoss.getLocation(), Sound.ENTITY_RAVAGER_ROAR, 5, 0.5f);
 
-		List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), FalseSpirit.detectionRange);
+		List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), FalseSpirit.detectionRange, true);
 
 		new BukkitRunnable() {
 			int mTicks = 0;

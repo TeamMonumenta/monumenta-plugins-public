@@ -71,7 +71,7 @@ public class SpellBarrier extends Spell {
 	public void run() {
 		// Might as well not activate it outside of line of sight
 		boolean hasLineOfSight = false;
-		for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), mActivationRadius * 4)) {
+		for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), mActivationRadius * 4, true)) {
 			if (LocationUtils.hasLineOfSight(mBoss, player)) {
 				hasLineOfSight = true;
 				break;

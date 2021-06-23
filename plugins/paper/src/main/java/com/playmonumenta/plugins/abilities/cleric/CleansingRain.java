@@ -2,6 +2,15 @@ package com.playmonumenta.plugins.abilities.cleric;
 
 import java.util.EnumSet;
 
+import org.bukkit.Material;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
+import org.bukkit.World;
+import org.bukkit.entity.Player;
+import org.bukkit.event.block.Action;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.scheduler.BukkitRunnable;
+
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
@@ -11,15 +20,6 @@ import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
 import com.playmonumenta.plugins.enchantments.abilities.BaseAbilityEnchantment;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
-
-import org.bukkit.Material;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
-import org.bukkit.World;
-import org.bukkit.entity.Player;
-import org.bukkit.event.block.Action;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.scheduler.BukkitRunnable;
 
 
 
@@ -78,7 +78,7 @@ public class CleansingRain extends Ability {
 
 				float radius = CleansingRainRadiusEnchantment.getRadius(mPlayer, CLEANSING_RADIUS, CleansingRainRadiusEnchantment.class);
 
-				for (Player player : PlayerUtils.playersInRange(mPlayer, radius, true)) {
+				for (Player player : PlayerUtils.playersInRange(mPlayer.getLocation(), radius, true)) {
 					PotionUtils.clearNegatives(mPlugin, player);
 
 					if (player.getFireTicks() > 1) {

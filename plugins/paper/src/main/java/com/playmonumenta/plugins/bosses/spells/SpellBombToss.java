@@ -83,7 +83,7 @@ public class SpellBombToss extends Spell {
 	@Override
 	public void run() {
 		// Choose random player within range that has line of sight to boss
-		List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), mRange);
+		List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), mRange, false);
 
 		BukkitRunnable task = new BukkitRunnable() {
 			int mTicks = 0;

@@ -63,7 +63,7 @@ public class SpellMultihitHeal extends Spell {
 								world.spawnParticle(Particle.SWEEP_ATTACK, loc.clone().add(3 * FastUtils.cos(deg), 0, 3 * FastUtils.sin(deg)), 3, 1, 1.5, 1, 0);
 							}
 
-							for (Player player : PlayerUtils.playersInRange(loc, 4)) {
+							for (Player player : PlayerUtils.playersInRange(loc, 4, true)) {
 								player.damage(15, mBoss);
 
 								//Heal Mimic Queen by 15 health on hit

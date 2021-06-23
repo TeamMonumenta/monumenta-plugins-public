@@ -183,7 +183,7 @@ public class DivineAura implements BaseEnchantment {
 			}
 			final Location loc = player.getLocation().add(0, 1, 0);
 			if (NO_SELF_PARTICLES.contains(player.getUniqueId())) {
-				for (Player other : PlayerUtils.playersInRange(player, 30, false)) {
+				for (Player other : PlayerUtils.otherPlayersInRange(player, 30, true)) {
 					other.spawnParticle(Particle.SPELL_INSTANT, loc, 5, 0.4, 0.4, 0.4, 0);
 				}
 			} else {

@@ -38,7 +38,7 @@ public class SpellSummonBlazes extends Spell {
 	@Override
 	public boolean canRun() {
 		return EntityUtils.getNearbyMobs(mLauncher.getLocation(), Masked.DETECTION_RANGE, EnumSet.of(EntityType.BLAZE)).size()
-		       < PlayerUtils.playersInRange(mLauncher.getLocation(), Masked.DETECTION_RANGE).size() * MAX_NEARBY_BLAZES_MULTIPLIER;
+		       < PlayerUtils.playersInRange(mLauncher.getLocation(), Masked.DETECTION_RANGE, true).size() * MAX_NEARBY_BLAZES_MULTIPLIER;
 	}
 
 	@Override
@@ -49,7 +49,7 @@ public class SpellSummonBlazes extends Spell {
 			final Location mLoc = mLauncher.getLocation();
 
 			int mCountdown = DEFAULT_COUNTDOWN;
-			int mCount = Math.min(MAX_BLAZES_PER_SPAWN, PlayerUtils.playersInRange(mLoc, Masked.DETECTION_RANGE).size());
+			int mCount = Math.min(MAX_BLAZES_PER_SPAWN, PlayerUtils.playersInRange(mLoc, Masked.DETECTION_RANGE, true).size());
 			int mWavesLeft = SPAWN_CYCLES;
 
 			@Override

@@ -38,7 +38,7 @@ public class SpellTpSwapPlaces extends Spell {
 
 	@Override
 	public void run() {
-		List<Player> players = PlayerUtils.playersInRange(mLauncher.getLocation(), mRANGE);
+		List<Player> players = PlayerUtils.playersInRange(mLauncher.getLocation(), mRANGE, false);
 		while (!players.isEmpty()) {
 			Player target = players.get(FastUtils.RANDOM.nextInt(players.size()));
 

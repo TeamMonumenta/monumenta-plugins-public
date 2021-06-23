@@ -73,7 +73,7 @@ public class ForceBoss extends BossAbilityGroup {
 				p.PARTICLE_CIRCLE_EXPLODE.spawn(loc, 0.2, 0.2, 0.2, 0.2);
 			},
 			(Location loc) -> {
-				for (Player player : PlayerUtils.playersInRange(boss.getLocation(), p.RADIUS)) {
+				for (Player player : PlayerUtils.playersInRange(boss.getLocation(), p.RADIUS, true)) {
 
 					double distance = player.getLocation().distance(loc);
 					if (distance < p.RADIUS / 3.0) {

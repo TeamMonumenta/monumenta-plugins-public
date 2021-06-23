@@ -90,8 +90,7 @@ public class WrathBoss extends BossAbilityGroup {
 									mWorld.spawnParticle(Particle.CRIT_MAGIC, mLocation, 100, 2, 2, 2, 0);
 									mWorld.playSound(mLocation, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1f, 1f);
 									mWorld.playSound(mLocation, Sound.ITEM_SHIELD_BREAK, 1f, 1f);
-									for (Player p : PlayerUtils.playersInRange(mLocation.add(mDirection),
-											DAMAGE_RADIUS)) {
+									for (Player p : PlayerUtils.playersInRange(mLocation.add(mDirection), DAMAGE_RADIUS, true)) {
 										BossUtils.bossDamage(mBoss, p, DAMAGE);
 									}
 								}
@@ -110,8 +109,7 @@ public class WrathBoss extends BossAbilityGroup {
 									mWorld.spawnParticle(Particle.CRIT_MAGIC, mLocation, 200, 2, 2, 2, 0);
 									mWorld.playSound(mLocation, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1f, 1f);
 									mWorld.playSound(mLocation, Sound.ITEM_SHIELD_BREAK, 1f, 1f);
-									for (Player p : PlayerUtils.playersInRange(mLocation.add(mDirection),
-											DAMAGE_RADIUS)) {
+									for (Player p : PlayerUtils.playersInRange(mLocation.add(mDirection), DAMAGE_RADIUS, true)) {
 										p.setNoDamageTicks(0);
 										BossUtils.bossDamage(mBoss, p, DAMAGE);
 									}

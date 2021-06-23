@@ -46,7 +46,7 @@ public class SpellCyanSummon extends Spell {
 			return true;
 		}
 
-		for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), PLAYER_RANGE)) {
+		for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), PLAYER_RANGE, true)) {
 			if (LocationUtils.hasLineOfSight(mBoss, player)) {
 				return true;
 			}

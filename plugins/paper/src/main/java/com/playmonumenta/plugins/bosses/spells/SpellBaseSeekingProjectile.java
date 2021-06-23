@@ -105,7 +105,7 @@ public class SpellBaseSeekingProjectile extends Spell {
 	public void run() {
 		mInitiateAesthetic.run(mWorld, mBoss.getEyeLocation(), 0);
 
-		List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), mRange);
+		List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), mRange, false);
 
 		Map<Player, Location> locations = new HashMap<Player, Location>();
 		if (!mLaunchTracking) {
@@ -164,7 +164,7 @@ public class SpellBaseSeekingProjectile extends Spell {
 		if (EntityUtils.isStunned(mBoss) || EntityUtils.isSilenced(mBoss) || EntityUtils.isConfused(mBoss)) {
 			return false;
 		}
-		List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), mRange);
+		List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), mRange, false);
 		if (!players.isEmpty()) {
 			for (Player player : players) {
 				if (LocationUtils.hasLineOfSight(mBoss, player)) {
@@ -262,7 +262,7 @@ public class SpellBaseSeekingProjectile extends Spell {
 				mProjectileAesthetic.run(mWorld, mLocation, mTicks);
 
 				// Grab all players that could have overlapping bounding boxes
-				for (Player player : PlayerUtils.playersInRange(mLocation, mHitboxLength + 2)) {
+				for (Player player : PlayerUtils.playersInRange(mLocation, mHitboxLength + 2, true)) {
 					if (mHitbox.overlaps(player.getBoundingBox())) {
 						mHitAction.run(mWorld, player, mLocation);
 						this.cancel();

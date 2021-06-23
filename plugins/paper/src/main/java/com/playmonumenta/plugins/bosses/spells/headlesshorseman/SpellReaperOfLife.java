@@ -67,7 +67,7 @@ public class SpellReaperOfLife extends Spell {
 			world.spawnParticle(Particle.FLAME, fallingBlock.getLocation().add(0, fallingBlock.getHeight() / 2, 0), 3, 0.25, .25, .25, 0.025);
 			world.spawnParticle(Particle.SMOKE_NORMAL, fallingBlock.getLocation().add(0, fallingBlock.getHeight() / 2, 0), 2, 0.25, .25, .25, 0.025);
 			PlayerUtils.executeCommandOnNearbyPlayers(mCenter, range, "tellraw @s [{\"text\":\"[The Horseman] \",\"color\":\"dark_red\",\"bold\":\"false\",\"italic\":\"false\"},{\"text\":\"May your life force fuel \",\"color\":\"gold\"},{\"text\":\"our \",\"color\":\"dark_red\"},{\"text\":\"existence.\",\"color\":\"gold\"}]");
-			List<Player> players = PlayerUtils.playersInRange(mCenter, HeadlessHorsemanBoss.arenaSize);
+			List<Player> players = PlayerUtils.playersInRange(mCenter, HeadlessHorsemanBoss.arenaSize, true);
 			if (players.size() != 0) {
 				for (Player player : players) {
 					if (!mWarnedPlayers.contains(player)) {
@@ -87,7 +87,7 @@ public class SpellReaperOfLife extends Spell {
 						fallingBlock.remove();
 						fallingBlock.getLocation().getBlock().setType(Material.AIR);
 
-						List<Player> players = PlayerUtils.playersInRange(mCenter, mRange);
+						List<Player> players = PlayerUtils.playersInRange(mCenter, mRange, true);
 						if (players.size() == 0) {
 						      return;
 						}
@@ -158,7 +158,7 @@ public class SpellReaperOfLife extends Spell {
 					world.playSound(mCenter, Sound.ENTITY_WITHER_SPAWN, 3, 1f);
 					world.playSound(mCenter, Sound.ENTITY_GENERIC_EXPLODE, 3, 1f);
 					world.spawnParticle(Particle.EXPLOSION_NORMAL, mCenter, 250, 21, 0.3, 21, 0.1);
-					for (Player player : PlayerUtils.playersInRange(mCenter, mRange)) {
+					for (Player player : PlayerUtils.playersInRange(mCenter, mRange, true)) {
 						if (mCenter.distance(player.getLocation()) < mRange) {
 							int mNDT = player.getNoDamageTicks();
 							player.setNoDamageTicks(0);

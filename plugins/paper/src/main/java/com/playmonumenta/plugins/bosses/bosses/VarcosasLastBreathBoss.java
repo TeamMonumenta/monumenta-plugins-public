@@ -177,7 +177,7 @@ public class VarcosasLastBreathBoss extends BossAbilityGroup {
 
 	@Override
 	public void death(EntityDeathEvent event) {
-		List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange);
+		List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true);
 
 		if (players.size() <= 0) {
 			return;

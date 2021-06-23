@@ -126,7 +126,7 @@ public class ImmortalElementalKaulBoss extends BossAbilityGroup {
 
 	@Override
 	public void bossCastAbility(SpellCastEvent event) {
-		List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange);
+		List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true);
 		if (players.size() > 0) {
 			Player newTarget = players.get(FastUtils.RANDOM.nextInt(players.size()));
 			((Mob) mBoss).setTarget(newTarget);

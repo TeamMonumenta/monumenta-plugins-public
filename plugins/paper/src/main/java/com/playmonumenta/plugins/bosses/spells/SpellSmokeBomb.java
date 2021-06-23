@@ -46,7 +46,7 @@ public class SpellSmokeBomb extends Spell {
 		Runnable dealer = new Runnable() {
 			@Override
 			public void run() {
-				for (Player player : PlayerUtils.playersInRange(mLauncher.getLocation(), mRadius)) {
+				for (Player player : PlayerUtils.playersInRange(mLauncher.getLocation(), mRadius, true)) {
 					BossUtils.bossDamage(mLauncher, player, 2);
 					player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 60, 1));
 					player.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 60, 0));

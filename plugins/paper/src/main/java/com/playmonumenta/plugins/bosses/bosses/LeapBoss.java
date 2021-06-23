@@ -65,7 +65,7 @@ public class LeapBoss extends BossAbilityGroup {
 						);
 						world.spawnParticle(Particle.EXPLOSION_LARGE, loc, 1, 0, 0, 0, 0);
 						world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 1f, 0.5f);
-						for (Player p : PlayerUtils.playersInRange(loc, DAMAGE_RADIUS)) {
+						for (Player p : PlayerUtils.playersInRange(loc, DAMAGE_RADIUS, true)) {
 							BossUtils.bossDamage(boss, p, DAMAGE);
 						}
 					}, null, null)

@@ -68,7 +68,7 @@ public class SwingBoss extends BossAbilityGroup {
 						}, (Location loc) -> {
 							p.PARTICLE_CIRCLE_EXPLODE.spawn(loc, 0.2, 0.2, 0.2, 0.2);
 						}, (Location loc) -> {
-							for (Player player : PlayerUtils.playersInRange(boss.getLocation(), p.RADIUS)) {
+							for (Player player : PlayerUtils.playersInRange(boss.getLocation(), p.RADIUS, true)) {
 								if (p.DAMAGE > 0) {
 									BossUtils.bossDamage(boss, player, p.DAMAGE);
 								}

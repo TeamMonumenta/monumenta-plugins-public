@@ -74,7 +74,7 @@ public class TriplicateSlash extends Spell {
 						}
 					}
 
-					for (Player player : PlayerUtils.playersInRange(loc, 40)) {
+					for (Player player : PlayerUtils.playersInRange(loc, 40, true)) {
 						for (BoundingBox box : boxes) {
 							if (player.getBoundingBox().overlaps(box)) {
 								BossUtils.bossDamage(mBoss, player, 30, null);
@@ -124,7 +124,7 @@ public class TriplicateSlash extends Spell {
 
 	@Override
 	public boolean canRun() {
-		for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), FalseSpirit.detectionRange)) {
+		for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), FalseSpirit.detectionRange, true)) {
 			if (mBoss.getLocation().distance(player.getLocation()) < FalseSpirit.meleeRange) {
 				return true;
 			}

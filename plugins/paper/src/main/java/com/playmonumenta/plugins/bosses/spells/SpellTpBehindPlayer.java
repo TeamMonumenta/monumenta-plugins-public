@@ -1,5 +1,7 @@
 package com.playmonumenta.plugins.bosses.spells;
 
+import java.util.List;
+
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -14,8 +16,6 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
-
-import java.util.List;
 
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
@@ -57,7 +57,7 @@ public class SpellTpBehindPlayer extends Spell {
 		if (mLauncher instanceof Mob) {
 			Player targetPlayer = null;
 			if (mRandom) {
-				List<Player> players = PlayerUtils.playersInRange(mLauncher.getLocation(), mRange);
+				List<Player> players = PlayerUtils.playersInRange(mLauncher.getLocation(), mRange, false);
 				while (!players.isEmpty()) {
 					LivingEntity target = players.get(FastUtils.RANDOM.nextInt(players.size()));
 					/* Do not teleport to players in safezones */

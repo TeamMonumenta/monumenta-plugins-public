@@ -72,7 +72,7 @@ public class SpellAxtalTntThrow extends Spell {
 		Runnable singleLaunch = new Runnable() {
 			@Override
 			public void run() {
-				List<Player> plist = PlayerUtils.playersInRange(mLauncher.getLocation(), 100);
+				List<Player> plist = PlayerUtils.playersInRange(mLauncher.getLocation(), 100, true);
 				if (plist.size() >= 1) {
 					Player target = plist.get(FastUtils.RANDOM.nextInt(plist.size()));
 					Location sLoc = mLauncher.getLocation();

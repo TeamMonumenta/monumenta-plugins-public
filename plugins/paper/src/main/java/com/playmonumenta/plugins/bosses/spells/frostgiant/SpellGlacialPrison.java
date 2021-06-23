@@ -62,7 +62,7 @@ public class SpellGlacialPrison extends Spell {
 		//Plays warning sound and chooses 1/3 of players to target randomly
 		World world = mBoss.getWorld();
 		world.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_AMBIENT, SoundCategory.HOSTILE, 3, 0.5f);
-		List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), mRange);
+		List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), mRange, true);
 		List<Player> targets = new ArrayList<Player>();
 		if (players.size() >= 2) {
 			int cap = (int) Math.ceil(players.size() / 2);

@@ -32,7 +32,7 @@ public class SpellFluffPools extends Spell {
 
 	@Override
 	public void run() {
-		List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), mRange);
+		List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), mRange, true);
 		List<Player> targets;
 		if (players.size() <= 3) {
 			targets = players;
@@ -67,7 +67,7 @@ public class SpellFluffPools extends Spell {
 						@Override
 						public void run() {
 							mInnerTicks += 2;
-							for (Player player : PlayerUtils.playersInRange(loc, 3)) {
+							for (Player player : PlayerUtils.playersInRange(loc, 3, true)) {
 								BossUtils.bossDamage(mBoss, player, 1);
 								player.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, 20 * 5, -6));
 							}

@@ -78,7 +78,7 @@ public class Bezoar extends Ability {
 				mT++;
 				world.spawnParticle(Particle.FALLING_DUST, item.getLocation(), 1, 0.2, 0.2, 0.2, mFallingDustData);
 				//Other player
-				for (Player p : PlayerUtils.playersInRange(item.getLocation(), 1)) {
+				for (Player p : PlayerUtils.playersInRange(item.getLocation(), 1, true)) {
 					if (!p.getName().equals(mPlayer.getName())) {
 						for (PotionEffectType effectType : PotionUtils.getNegativeEffects(mPlugin, p)) {
 							PotionEffect effect = p.getPotionEffect(effectType);

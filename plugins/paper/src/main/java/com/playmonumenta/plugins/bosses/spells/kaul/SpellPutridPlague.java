@@ -3,12 +3,6 @@ package com.playmonumenta.plugins.bosses.spells.kaul;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.playmonumenta.plugins.bosses.ChargeUpManager;
-import com.playmonumenta.plugins.bosses.spells.Spell;
-import com.playmonumenta.plugins.utils.BossUtils;
-import com.playmonumenta.plugins.utils.FastUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
-
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -26,6 +20,12 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
+
+import com.playmonumenta.plugins.bosses.ChargeUpManager;
+import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 
 /*
  * Putrid Plague (Holds one of four colored wools reflecting a pillar):
@@ -95,7 +95,7 @@ public class SpellPutridPlague extends Spell {
 				Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "team modify kaul color blue");
 				mChargeUp.setTitle(ChatColor.GREEN + "Charging " + ChatColor.BLUE + "Putrid Plague...");
 				mChargeUp.setColor(BarColor.BLUE);
-				for (Player player : PlayerUtils.playersInRange(loc, mRange)) {
+				for (Player player : PlayerUtils.playersInRange(loc, mRange, true)) {
 					if (!mPhase3) {
 						player.sendMessage(ChatColor.BLUE + "The water begins to ripple...");
 					} else {
@@ -106,7 +106,7 @@ public class SpellPutridPlague extends Spell {
 				Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "team modify kaul color red");
 				mChargeUp.setTitle(ChatColor.GREEN + "Charging " + ChatColor.RED + "Putrid Plague...");
 				mChargeUp.setColor(BarColor.RED);
-				for (Player player : PlayerUtils.playersInRange(loc, mRange)) {
+				for (Player player : PlayerUtils.playersInRange(loc, mRange, true)) {
 					if (!mPhase3) {
 						player.sendMessage(ChatColor.RED + "Your blood begins to shiver slightly...");
 					} else {
@@ -117,7 +117,7 @@ public class SpellPutridPlague extends Spell {
 				Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "team modify kaul color yellow");
 				mChargeUp.setTitle(ChatColor.GREEN + "Charging " + ChatColor.YELLOW + "Putrid Plague...");
 				mChargeUp.setColor(BarColor.YELLOW);
-				for (Player player : PlayerUtils.playersInRange(loc, mRange)) {
+				for (Player player : PlayerUtils.playersInRange(loc, mRange, true)) {
 					if (!mPhase3) {
 						player.sendMessage(ChatColor.YELLOW + "You feel the temperature rise significantly...");
 					} else {
@@ -128,7 +128,7 @@ public class SpellPutridPlague extends Spell {
 				Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "team modify kaul color green");
 				mChargeUp.setTitle(ChatColor.GREEN + "Charging " + ChatColor.DARK_GREEN + "Putrid Plague...");
 				mChargeUp.setColor(BarColor.GREEN);
-				for (Player player : PlayerUtils.playersInRange(loc, mRange)) {
+				for (Player player : PlayerUtils.playersInRange(loc, mRange, true)) {
 					if (!mPhase3) {
 						player.sendMessage(ChatColor.GREEN + "The ground begins to vibrate...");
 					} else {
@@ -136,7 +136,7 @@ public class SpellPutridPlague extends Spell {
 					}
 				}
 			}
-			List<Player> players = PlayerUtils.playersInRange(mCenter, mRange);
+			List<Player> players = PlayerUtils.playersInRange(mCenter, mRange, true);
 			players.removeIf(p -> p.getLocation().getY() >= 61);
 			new BukkitRunnable() {
 				Location mPoint1 = point.getLocation().add(4, 6, 4);
@@ -170,8 +170,8 @@ public class SpellPutridPlague extends Spell {
 						this.cancel();
 						mChargeUp.reset();
 						Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "team modify kaul color white");
-						List<Player> safe = PlayerUtils.playersInRange(point.getLocation(), 8);
-						List<Player> ps = PlayerUtils.playersInRange(mCenter, mRange);
+						List<Player> safe = PlayerUtils.playersInRange(point.getLocation(), 8, true);
+						List<Player> ps = PlayerUtils.playersInRange(mCenter, mRange, true);
 						ps.removeIf(p -> p.getLocation().getY() >= 61);
 						for (Player player : ps) {
 							if (!safe.contains(player)) {

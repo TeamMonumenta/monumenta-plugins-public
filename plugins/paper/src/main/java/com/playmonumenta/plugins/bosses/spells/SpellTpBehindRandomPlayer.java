@@ -14,6 +14,7 @@ import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
 /**
  * @deprecated look inside SpellTpBehindPlayer
  */
+@Deprecated
 public class SpellTpBehindRandomPlayer extends SpellTpBehindPlayer {
 	private static final int MAX_RANGE = 80;
 
@@ -23,7 +24,7 @@ public class SpellTpBehindRandomPlayer extends SpellTpBehindPlayer {
 
 	@Override
 	public void run() {
-		List<Player> players = PlayerUtils.playersInRange(mLauncher.getLocation(), MAX_RANGE);
+		List<Player> players = PlayerUtils.playersInRange(mLauncher.getLocation(), MAX_RANGE, false);
 		while (!players.isEmpty()) {
 			Player target = players.get(FastUtils.RANDOM.nextInt(players.size()));
 

@@ -42,7 +42,7 @@ public class SpellForceTwo extends SpellBaseAoE {
 				world.spawnParticle(Particle.SMOKE_NORMAL, loc, 2, 0.25, 0.25, 0.25, 0.1);
 			},
 			(Location loc) -> {
-				for (Player player : PlayerUtils.playersInRange(launcher.getLocation(), radius)) {
+				for (Player player : PlayerUtils.playersInRange(launcher.getLocation(), radius, true)) {
 
 					double distance = player.getLocation().distance(loc);
 					if (distance < radius) {
@@ -65,7 +65,7 @@ public class SpellForceTwo extends SpellBaseAoE {
 
 	@Override
 	public boolean canRun() {
-		for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), FalseSpirit.detectionRange)) {
+		for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), FalseSpirit.detectionRange, true)) {
 			if (mBoss.getLocation().distance(player.getLocation()) < FalseSpirit.meleeRange) {
 				return true;
 			}

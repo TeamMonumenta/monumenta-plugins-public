@@ -378,7 +378,7 @@ public class FrostGiant extends BossAbilityGroup {
 		new BukkitRunnable() {
 			@Override
 			public void run() {
-				for (Player player : PlayerUtils.playersInRange(mStartLoc, detectionRange)) {
+				for (Player player : PlayerUtils.playersInRange(mStartLoc, detectionRange, true)) {
 					if (player.isSleeping() && player.getGameMode() != GameMode.ADVENTURE) {
 						BossUtils.bossDamage(mBoss, player, 22);
 						player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 15, 1));
@@ -606,7 +606,7 @@ public class FrostGiant extends BossAbilityGroup {
 		new BukkitRunnable() {
 			double mRadius = 0;
 			Location mLoc = mStartLoc.clone();
-			List<Player> mPlayers = PlayerUtils.playersInRange(mLoc, detectionRange);
+			List<Player> mPlayers = PlayerUtils.playersInRange(mLoc, detectionRange, true);
 			@Override
 			public void run() {
 				mRadius += 1.5;
@@ -674,7 +674,7 @@ public class FrostGiant extends BossAbilityGroup {
 							new BukkitRunnable() {
 								double mR = 0;
 								Location mLoc = mStartLoc.clone();
-								List<Player> mPlayers = PlayerUtils.playersInRange(mLoc, detectionRange);
+								List<Player> mPlayers = PlayerUtils.playersInRange(mLoc, detectionRange, true);
 								@Override
 								public void run() {
 									if (mR == 0) {
@@ -732,7 +732,7 @@ public class FrostGiant extends BossAbilityGroup {
 
 	@Override
 	public void death(EntityDeathEvent event) {
-		List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange);
+		List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true);
 		if (players.size() <= 0) {
 			return;
 		}
@@ -1072,7 +1072,7 @@ public class FrostGiant extends BossAbilityGroup {
 	@Override
 	public void init() {
 		int bossTargetHp = 0;
-		int playerCount = PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange).size();
+		int playerCount = PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true).size();
 		int hpDel = 5012;
 
 		/*

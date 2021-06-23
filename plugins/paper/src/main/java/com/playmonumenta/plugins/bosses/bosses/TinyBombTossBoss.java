@@ -38,7 +38,7 @@ public class TinyBombTossBoss extends BossAbilityGroup {
 						world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 1f, 1f);
 						world.spawnParticle(Particle.EXPLOSION_LARGE, loc, 1, 0, 0, 0, 0);
 
-						for (Player player : PlayerUtils.playersInRange(loc, RADIUS)) {
+						for (Player player : PlayerUtils.playersInRange(loc, RADIUS, true)) {
 							if (player.hasLineOfSight(tnt)) {
 								double multiplier = (RADIUS - player.getLocation().distance(loc)) / RADIUS;
 								BossUtils.bossDamage(boss, player, POINT_BLANK_DAMAGE * multiplier);

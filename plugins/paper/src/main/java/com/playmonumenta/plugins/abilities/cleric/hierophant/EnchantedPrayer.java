@@ -2,14 +2,6 @@ package com.playmonumenta.plugins.abilities.cleric.hierophant;
 
 import java.util.EnumSet;
 
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.classes.ClassAbility;
-import com.playmonumenta.plugins.effects.EnchantedPrayerAoE;
-import com.playmonumenta.plugins.utils.FastUtils;
-import com.playmonumenta.plugins.utils.ItemUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
-
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -19,6 +11,14 @@ import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
+
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.effects.EnchantedPrayerAoE;
+import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 
 
 
@@ -53,6 +53,7 @@ public class EnchantedPrayer extends Ability {
 
 	public static final String ENCHANTED_PRAYER_METAKEY = "EnchantedPrayerMetakey";
 
+	@Override
 	public void playerSwapHandItemsEvent(PlayerSwapHandItemsEvent event) {
 		if (mPlayer.isSneaking()) {
 			event.setCancelled(true);
@@ -93,7 +94,7 @@ public class EnchantedPrayer extends Ability {
 
 			}
 		}.runTaskTimer(mPlugin, 0, 1);
-		for (Player p : PlayerUtils.playersInRange(mPlayer, ENCHANTED_PRAYER_RANGE, true)) {
+		for (Player p : PlayerUtils.playersInRange(mPlayer.getLocation(), ENCHANTED_PRAYER_RANGE, true)) {
 			p.playSound(p.getLocation(), Sound.ENTITY_ILLUSIONER_PREPARE_MIRROR, 1.2f, 1.0f);
 			world.spawnParticle(Particle.SPELL_INSTANT, mPlayer.getLocation(), 50, 0.25, 0, 0.25, 0.01);
 			mPlugin.mEffectManager.addEffect(p, "EnchantedPrayerEffect",

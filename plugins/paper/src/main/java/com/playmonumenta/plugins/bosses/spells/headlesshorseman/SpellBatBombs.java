@@ -72,7 +72,7 @@ public class SpellBatBombs extends Spell {
 								world.spawnParticle(Particle.EXPLOSION_LARGE, loc, 1, 0, 0, 0, 0);
 								world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 0.65f, 1);
 
-								for (Player player : PlayerUtils.playersInRange(loc, 5.5)) {
+								for (Player player : PlayerUtils.playersInRange(loc, 5.5, true)) {
 									if (mHorseman.getSpawnLocation().distance(player.getLocation()) < HeadlessHorsemanBoss.detectionRange) {
 										BossUtils.bossDamage(mHorseman.getEntity(), player, DAMAGE, loc);
 										if (!BossUtils.bossDamageBlocked(player, DAMAGE, loc)) {

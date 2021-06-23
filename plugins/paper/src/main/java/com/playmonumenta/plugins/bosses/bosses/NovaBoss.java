@@ -68,7 +68,7 @@ public class NovaBoss extends BossAbilityGroup {
 				p.PARTICLE_EXPLODE.spawn(loc, 0.2, 0.2, 0.2, 0.2);
 			},
 			(Location loc) -> {
-				for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), p.RADIUS)) {
+				for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), p.RADIUS, true)) {
 
 					if (p.DAMAGE > 0) {
 						BossUtils.bossDamage(boss, player, p.DAMAGE);

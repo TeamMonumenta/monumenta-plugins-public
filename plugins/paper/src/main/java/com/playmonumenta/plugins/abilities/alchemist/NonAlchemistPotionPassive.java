@@ -55,7 +55,7 @@ public class NonAlchemistPotionPassive extends Ability implements KillTriggeredA
 	@Override
 	public void triggerOnKill(LivingEntity mob) {
 		Ability ap;
-		for (Player player : PlayerUtils.playersInRange(mPlayer, 12, false)) {
+		for (Player player : PlayerUtils.otherPlayersInRange(mPlayer, 12, true)) {
 			if ((ap = AbilityManager.getManager().getPlayerAbility(player, AlchemistPotions.class)) != null
 					&& ap.canUse(player)) {
 				// Nearby player has one of the alchemist skills - chance to give them a potion

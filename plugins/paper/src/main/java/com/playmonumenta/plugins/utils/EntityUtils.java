@@ -619,7 +619,7 @@ public class EntityUtils {
 	}
 
 	public static List<Player> getPlayersInLine(Location loc, Vector direction, double range, double halfHitboxLength, Player self) {
-		Set<Player> nearbyPlayers = new HashSet<Player>(PlayerUtils.playersInRange(loc, range));
+		Set<Player> nearbyPlayers = new HashSet<Player>(PlayerUtils.playersInRange(loc, range, true));
 		List<Player> playersInLine = new ArrayList<Player>();
 
 		Vector shift = direction.normalize().multiply(halfHitboxLength);
@@ -669,7 +669,7 @@ public class EntityUtils {
 	}
 
 	public static Player getNearestPlayer(Location loc, double radius) {
-		List<Player> nearbyPlayers = PlayerUtils.playersInRange(loc, radius);
+		List<Player> nearbyPlayers = PlayerUtils.playersInRange(loc, radius, true);
 		if (nearbyPlayers.size() == 0) {
 			return null;
 		}
@@ -683,7 +683,7 @@ public class EntityUtils {
 	// i.e. The player 20 blocks away is closer to the front of the list than the player 10 blocks away
 	// If you want to find the closest players, use the end of the list, the farthest, use the beginning
 	public static List<Player> getNearestPlayers(Location loc, double radius) {
-		List<Player> nearbyPlayers = PlayerUtils.playersInRange(loc, radius);
+		List<Player> nearbyPlayers = PlayerUtils.playersInRange(loc, radius, true);
 		nearbyPlayers.sort((e1, e2) -> e1.getLocation().distance(loc) <= e2.getLocation().distance(loc) ? 1 : -1);
 		return nearbyPlayers;
 	}

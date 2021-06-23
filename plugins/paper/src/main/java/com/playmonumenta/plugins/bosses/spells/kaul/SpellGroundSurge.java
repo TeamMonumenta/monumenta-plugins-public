@@ -51,7 +51,7 @@ public class SpellGroundSurge extends Spell {
 		World world = mBoss.getWorld();
 		mBoss.removePotionEffect(PotionEffectType.SLOW);
 		mBoss.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, (int)(20 * 2.75), 1));
-		List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), mRange);
+		List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), mRange, true);
 		players.removeIf(p -> p.getLocation().getY() >= 61);
 		BukkitRunnable runnable = new BukkitRunnable() {
 			float mPitch = 0;

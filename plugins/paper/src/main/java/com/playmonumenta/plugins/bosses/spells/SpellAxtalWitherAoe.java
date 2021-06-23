@@ -37,7 +37,7 @@ public class SpellAxtalWitherAoe extends SpellBaseAoE {
 				world.spawnParticle(Particle.SMOKE_NORMAL, loc, 4, 0.25, 0.25, 0.25, 0.35, null, true);
 			},
 			(Location loc) -> {
-				for (Player player : PlayerUtils.playersInRange(launcher.getLocation(), radius)) {
+				for (Player player : PlayerUtils.playersInRange(launcher.getLocation(), radius, true)) {
 					double distance = player.getLocation().distance(launcher.getLocation());
 					BossUtils.bossDamage(launcher, player, ((maxDamage - minDamage) * ((radius - distance) / radius)) + minDamage);
 					player.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 30, 1));

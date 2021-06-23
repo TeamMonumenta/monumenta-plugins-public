@@ -42,7 +42,7 @@ public class SpellForce extends SpellBaseAoE {
 			world.spawnParticle(Particle.SMOKE_NORMAL, loc, 2, 0.25, 0.25, 0.25, 0.1);
 		},
 		(Location loc) -> {
-			for (Player player : PlayerUtils.playersInRange(launcher.getLocation(), radius)) {
+			for (Player player : PlayerUtils.playersInRange(launcher.getLocation(), radius, true)) {
 
 				double distance = player.getLocation().distance(loc);
 				if (distance < radius / 3.0) {

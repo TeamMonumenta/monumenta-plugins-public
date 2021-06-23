@@ -3,6 +3,13 @@ package com.playmonumenta.plugins.bosses.bosses;
 import java.util.AbstractMap;
 import java.util.Arrays;
 
+import org.bukkit.Location;
+import org.bukkit.World;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
+import org.bukkit.plugin.Plugin;
+import org.bukkit.util.Vector;
+
 import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.parameters.EffectsList;
 import com.playmonumenta.plugins.bosses.parameters.ParticlesList;
@@ -10,15 +17,8 @@ import com.playmonumenta.plugins.bosses.parameters.SoundsList;
 import com.playmonumenta.plugins.bosses.spells.SpellBaseSlam;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.ParticleUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.ParticleUtils.SpawnParticleAction;
-
-import org.bukkit.Location;
-import org.bukkit.World;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
-import org.bukkit.plugin.Plugin;
-import org.bukkit.util.Vector;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 
 //general version of bossMeteorSlam
 public class PounceBoss extends BossAbilityGroup {
@@ -98,7 +98,7 @@ public class PounceBoss extends BossAbilityGroup {
 
 						return;
 					}
-					for (Player players : PlayerUtils.playersInRange(loc, p.DAMAGE_RADIUS)) {
+					for (Player players : PlayerUtils.playersInRange(loc, p.DAMAGE_RADIUS, true)) {
 						if (p.DAMAGE > 0) {
 							BossUtils.bossDamage(boss, players, p.DAMAGE);
 						}

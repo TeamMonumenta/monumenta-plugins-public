@@ -590,7 +590,7 @@ public class DelvesUtils {
 		BlockState blockState = block.getState();
 		if (blockState instanceof Chest) {
 			setDelveLootTable(DelvesUtils.getDelveInfo(player).getDepthPoints(),
-					PlayerUtils.playersInRange(player.getLocation(), ChestUtils.CHEST_LUCK_RADIUS).size(),
+					PlayerUtils.playersInRange(player.getLocation(), ChestUtils.CHEST_LUCK_RADIUS, true).size(),
 					(Chest) blockState);
 		}
 	}

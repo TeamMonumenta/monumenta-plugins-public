@@ -76,7 +76,7 @@ public class BrewingListener implements Listener {
 				// Knock players back
 				@NotNull Block block = brewEvent.getBlock();
 				@NotNull Location blockCentre = LocationUtils.getLocationCentre(block);
-				List<Player> nearbyPlayers = PlayerUtils.playersInRange(blockCentre, 3);
+				List<Player> nearbyPlayers = PlayerUtils.playersInRange(blockCentre, 3, true);
 				for (Player player : nearbyPlayers) {
 					MovementUtils.knockAway(blockCentre, player, 1);
 				}

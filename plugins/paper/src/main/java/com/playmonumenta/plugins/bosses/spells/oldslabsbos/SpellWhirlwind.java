@@ -65,7 +65,7 @@ public class SpellWhirlwind extends Spell {
 				if (mTicks >= 25) {
 					this.cancel();
 
-					List<Player> playersNearby = PlayerUtils.playersInRange(loc, 40);
+					List<Player> playersNearby = PlayerUtils.playersInRange(loc, 40, true);
 
 					mWorld.playSound(mBoss.getLocation(), Sound.ITEM_TRIDENT_THROW, 1.5f, 0.85f);
 					new BukkitRunnable() {

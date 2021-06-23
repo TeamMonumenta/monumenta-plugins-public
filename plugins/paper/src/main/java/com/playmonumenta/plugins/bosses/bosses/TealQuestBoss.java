@@ -106,7 +106,7 @@ public class TealQuestBoss extends BossAbilityGroup {
 						BossUtils.bossDamagePercent(mBoss, player, DAMAGE_PERCENT);
 						return;
 					}
-					for (Player players : PlayerUtils.playersInRange(loc, DAMAGE_RADIUS)) {
+					for (Player players : PlayerUtils.playersInRange(loc, DAMAGE_RADIUS, true)) {
 						BossUtils.bossDamagePercent(mBoss, players, DAMAGE_PERCENT);
 					}
 					}),
@@ -126,7 +126,7 @@ public class TealQuestBoss extends BossAbilityGroup {
 							world.spawnParticle(Particle.SWEEP_ATTACK, loc, 1, 0.1, 0.1, 0.1, 0.3);
 							world.spawnParticle(Particle.REDSTONE, loc, 2, 0.25, 0.25, 0.25, 0.1, REDSTONE_COLOR_SWING);
 						}, (Location loc) -> {
-							for (Player player : PlayerUtils.playersInRange(boss.getLocation(), RADIUS)) {
+							for (Player player : PlayerUtils.playersInRange(boss.getLocation(), RADIUS, false)) {
 								BossUtils.bossDamage(boss, player, 35);
 							}
 						})));

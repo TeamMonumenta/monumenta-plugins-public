@@ -87,7 +87,7 @@ public class SheepGodBoss extends BossAbilityGroup {
 					world.playSound(mBoss.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 1.5f, 0.5f);
 					world.playSound(mBoss.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 1.5f, 1f);
 					world.playSound(mBoss.getLocation(), Sound.ENTITY_ENDERMAN_DEATH, 1.5f, 0f);
-					for (Player player : PlayerUtils.playersInRange(mSpawnLoc, detectionRange)) {
+					for (Player player : PlayerUtils.playersInRange(mSpawnLoc, detectionRange, true)) {
 						player.removePotionEffect(PotionEffectType.HEALTH_BOOST);
 						player.removePotionEffect(PotionEffectType.ABSORPTION);
 						if (player.hasPotionEffect(PotionEffectType.SPEED)) {

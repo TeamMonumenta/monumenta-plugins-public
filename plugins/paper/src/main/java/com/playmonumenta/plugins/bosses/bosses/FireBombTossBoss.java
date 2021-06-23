@@ -46,7 +46,7 @@ public class FireBombTossBoss extends BossAbilityGroup {
 						world.spawnParticle(Particle.EXPLOSION_LARGE, loc, 1, 0, 0, 0, 0);
 						world.spawnParticle(Particle.FLAME, loc, 100, 0, 0, 0, 0.4);
 
-						for (Player player : PlayerUtils.playersInRange(loc, p.RADIUS)) {
+						for (Player player : PlayerUtils.playersInRange(loc, p.RADIUS, true)) {
 							if (player.hasLineOfSight(tnt)) {
 								double multiplier = (p.RADIUS - player.getLocation().distance(loc)) / p.RADIUS;
 								BossUtils.bossDamage(boss, player, p.DAMAGE * multiplier);

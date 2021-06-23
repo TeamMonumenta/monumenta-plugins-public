@@ -73,7 +73,7 @@ public class MeteorSlamBoss extends BossAbilityGroup {
 						BossUtils.bossDamagePercent(boss, player, p.DAMAGE_PERCENT);
 						return;
 					}
-					for (Player players : PlayerUtils.playersInRange(loc, p.DAMAGE_RADIUS)) {
+					for (Player players : PlayerUtils.playersInRange(loc, p.DAMAGE_RADIUS, true)) {
 						BossUtils.bossDamagePercent(boss, players, p.DAMAGE_PERCENT);
 					}
 					})));

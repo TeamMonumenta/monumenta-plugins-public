@@ -65,7 +65,7 @@ public class SpellGhostlyCannons extends Spell {
 						@Override
 						public void run() {
 							mI++;
-							List<Player> players = PlayerUtils.playersInRange(mCenter, 24);
+							List<Player> players = PlayerUtils.playersInRange(mCenter, 24, true);
 							Collections.shuffle(players);
 							for (Player player : players) {
 								Vector loc = player.getLocation().toVector();
@@ -138,7 +138,7 @@ public class SpellGhostlyCannons extends Spell {
 					mWorld.spawnParticle(Particle.CRIT, mLoc, 10, 0, 0, 0, 0.25, null, false);
 					mWorld.playSound(mLoc, Sound.ENTITY_GENERIC_EXPLODE, 1.5f, 0.9f);
 					BoundingBox box = BoundingBox.of(mLoc, 3, 3, 3);
-					for (Player player : PlayerUtils.playersInRange(mLoc, 3)) {
+					for (Player player : PlayerUtils.playersInRange(mLoc, 3, true)) {
 						BoundingBox pBox = player.getBoundingBox();
 						if (pBox.overlaps(box)) {
 							BossUtils.bossDamage(mBoss, player, 45, mLoc);

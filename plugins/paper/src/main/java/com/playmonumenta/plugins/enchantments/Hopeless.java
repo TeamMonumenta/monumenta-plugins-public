@@ -53,7 +53,7 @@ public class Hopeless implements BaseSpawnableItemEnchantment {
 	public void tick(Plugin plugin, Player player, int level) {
 		//Runs dark red particles while wearing, subject to no self particle PEB option
 		if (NO_SELF_PARTICLES.contains(player.getUniqueId())) {
-			for (Player other : PlayerUtils.playersInRange(player, 30, false)) {
+			for (Player other : PlayerUtils.otherPlayersInRange(player, 30, true)) {
 				other.spawnParticle(Particle.REDSTONE, player.getLocation().add(0, 1.5, 0), 3, 0.4, 0.4, 0.4, 0, DARK_RED_PARTICLE_COLOR);
 			}
 		} else {

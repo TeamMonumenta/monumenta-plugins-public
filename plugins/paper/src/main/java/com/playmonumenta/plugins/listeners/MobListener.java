@@ -292,7 +292,7 @@ public class MobListener implements Listener {
 			//  Player kills a mob
 			mPlugin.mTrackingManager.mPlayers.onKill(mPlugin, player, livingEntity, event);
 			AbilityManager.getManager().entityDeathEvent(player, event, shouldGenDrops);
-			for (Player p : PlayerUtils.playersInRange(livingEntity.getLocation(), 20)) {
+			for (Player p : PlayerUtils.playersInRange(livingEntity.getLocation(), 20, true)) {
 				AbilityManager.getManager().entityDeathRadiusEvent(p, event, shouldGenDrops);
 			}
 		}
@@ -323,7 +323,7 @@ public class MobListener implements Listener {
 				for (String loreEntry : lore) {
 					if (loreEntry.contains("Quest Item")) {
 						//Scales based off player count in a 20 meter radius, drops at least one quest item
-						int count = PlayerUtils.playersInRange(livingEntity.getLocation(), 20).size();
+						int count = PlayerUtils.playersInRange(livingEntity.getLocation(), 20, true).size();
 						if (count < 1) {
 							count = 1;
 						}

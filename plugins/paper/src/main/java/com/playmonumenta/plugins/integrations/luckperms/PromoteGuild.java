@@ -3,12 +3,12 @@ package com.playmonumenta.plugins.integrations.luckperms;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.plugins.utils.ScoreboardUtils;
-
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
+
+import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.utils.ScoreboardUtils;
 
 import dev.jorel.commandapi.CommandAPI;
 import dev.jorel.commandapi.CommandAPICommand;
@@ -52,7 +52,7 @@ public class PromoteGuild {
 		}
 
 		// Check for nearby founder
-		for (Player p : PlayerUtils.playersInRange(player, 1, false)) {
+		for (Player p : PlayerUtils.otherPlayersInRange(player, 1, true)) {
 			Group nearbyPlayerGroup = LuckPermsIntegration.getGuild(p);
 			String nearbyPlayerGroupName = LuckPermsIntegration.getGuildName(nearbyPlayerGroup);
 			if (nearbyPlayerGroup != null && nearbyPlayerGroupName != null &&

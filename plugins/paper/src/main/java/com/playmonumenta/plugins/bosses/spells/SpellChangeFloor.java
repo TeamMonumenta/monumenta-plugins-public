@@ -54,7 +54,7 @@ public class SpellChangeFloor extends Spell {
 
 	@Override
 	public void run() {
-		List<Player> players = PlayerUtils.playersInRange(mCenterLoc, mRange);
+		List<Player> players = PlayerUtils.playersInRange(mCenterLoc, mRange, true);
 		if (!players.isEmpty()) {
 			launch(players.get(FastUtils.RANDOM.nextInt(players.size())));
 		}

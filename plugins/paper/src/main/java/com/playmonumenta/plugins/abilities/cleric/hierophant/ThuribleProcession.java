@@ -17,8 +17,8 @@ import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.effects.Effect;
 import com.playmonumenta.plugins.effects.PercentAttackSpeed;
 import com.playmonumenta.plugins.effects.PercentDamageDealt;
-import com.playmonumenta.plugins.effects.ThuribleBonusHealing;
 import com.playmonumenta.plugins.effects.PercentSpeed;
+import com.playmonumenta.plugins.effects.ThuribleBonusHealing;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 
@@ -83,7 +83,7 @@ public class ThuribleProcession extends Ability {
 
 	@Override
 	public void periodicTrigger(boolean twoHertz, boolean oneSecond, int ticks) {
-		List<Player> players = PlayerUtils.playersInRange(mPlayer, THURIBLE_RADIUS, true);
+		List<Player> players = PlayerUtils.playersInRange(mPlayer.getLocation(), THURIBLE_RADIUS, true);
 		if (!canCast()) {
 			return;
 		}
@@ -115,7 +115,7 @@ public class ThuribleProcession extends Ability {
 	private void applyBuffs(int duration) {
 
 		//Give everyone buffs from the array
-		List<Player> players = PlayerUtils.playersInRange(mPlayer, THURIBLE_RADIUS, true);
+		List<Player> players = PlayerUtils.playersInRange(mPlayer.getLocation(), THURIBLE_RADIUS, true);
 		if (players.size() > 1) {
 			for (Player pl : players) {
 				Effect[] effects = getEffectArray();

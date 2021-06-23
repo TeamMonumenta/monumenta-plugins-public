@@ -50,7 +50,7 @@ public class SpellEarthshake extends SpellBaseAoE {
 	public SpellEarthshake(Plugin plugin, LivingEntity launcher, int radius, int time, int damage, int cooldown, int range, double knockUpSpeed, boolean lineOfSight, boolean flyingBlocks) {
 		super(plugin, launcher, radius * 2, time, cooldown, true, lineOfSight, Sound.BLOCK_ENDER_CHEST_OPEN,
 			(Location loc) -> {
-				List<Player> players = PlayerUtils.playersInRange(launcher.getLocation(), range);
+				List<Player> players = PlayerUtils.playersInRange(launcher.getLocation(), range, false);
 				if (!players.isEmpty() && !targeted) {
 
 					// Single target chooses a random player within range
@@ -184,7 +184,7 @@ public class SpellEarthshake extends SpellBaseAoE {
 					}
 
 					//Knock up player
-					for (Player p : PlayerUtils.playersInRange(loc, radius * 2)) {
+					for (Player p : PlayerUtils.playersInRange(loc, radius * 2, true)) {
 						world.playSound(p.getLocation(), Sound.ENTITY_WITHER_BREAK_BLOCK, 1.0f, 1.0f);
 						if (p.getLocation().distance(loc) <= radius) {
 							BossUtils.bossDamage(launcher, p, damage);

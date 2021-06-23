@@ -53,7 +53,7 @@ public class SpellHellzoneGrenade extends Spell {
 	public void run() {
 		World world = mBoss.getWorld();
 		// Choose random player within range that has line of sight to boss
-		List<Player> players = PlayerUtils.playersInRange(mCenter, mRange);
+		List<Player> players = PlayerUtils.playersInRange(mCenter, mRange, false);
 		players.removeIf(player -> player.getLocation().distance(mCenter) <= 5);
 
 
@@ -109,7 +109,7 @@ public class SpellHellzoneGrenade extends Spell {
 						mWorld.spawnParticle(Particle.EXPLOSION_LARGE, fallingBlock.getLocation(), 1, 0, 0, 0, 0);
 						mWorld.playSound(fallingBlock.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 2, 0.85f);
 
-						for (Player player : PlayerUtils.playersInRange(fallingBlock.getLocation(), 4)) {
+						for (Player player : PlayerUtils.playersInRange(fallingBlock.getLocation(), 4, true)) {
 							if (mCenter.distance(player.getLocation()) < HeadlessHorsemanBoss.detectionRange) {
 								BossUtils.bossDamage(mBoss, player, 35);
 								// Shields don'mTicks stop fire!
@@ -131,7 +131,7 @@ public class SpellHellzoneGrenade extends Spell {
 								}
 
 								if (mTicks % 10 == 0) {
-									for (Player player : PlayerUtils.playersInRange(fallingBlock.getLocation(), 3)) {
+									for (Player player : PlayerUtils.playersInRange(fallingBlock.getLocation(), 3, true)) {
 										if (mCenter.distance(player.getLocation()) < HeadlessHorsemanBoss.arenaSize && LocationUtils.hasLineOfSight(mBoss, player)) {
 											/* Fire aura can not be blocked */
 											BossUtils.bossDamagePercent(mBoss, player, 0.1, (Location)null);

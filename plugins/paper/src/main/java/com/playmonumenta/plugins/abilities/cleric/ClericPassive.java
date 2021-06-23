@@ -5,6 +5,10 @@ import java.util.Map;
 import java.util.NavigableSet;
 import java.util.UUID;
 
+import org.bukkit.Particle;
+import org.bukkit.attribute.Attribute;
+import org.bukkit.entity.Player;
+
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityManager;
@@ -12,10 +16,6 @@ import com.playmonumenta.plugins.effects.Effect;
 import com.playmonumenta.plugins.effects.ThuribleBonusHealing;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
-
-import org.bukkit.Particle;
-import org.bukkit.attribute.Attribute;
-import org.bukkit.entity.Player;
 
 
 
@@ -46,7 +46,7 @@ public class ClericPassive extends Ability {
 		if (oneSecond && !mPlayer.isDead()) {
 			mTimer += 20;
 			if (mTimer % HEAL_INTERVAL == 0) {
-				for (Player player : PlayerUtils.playersInRange(mPlayer, RADIUS, true)) {
+				for (Player player : PlayerUtils.playersInRange(mPlayer.getLocation(), RADIUS, true)) {
 					// Don't buff players that have their class disabled or who have PvP enabled
 					if (player.getScoreboardTags().contains("disable_class") || AbilityManager.getManager().isPvPEnabled(player)) {
 						continue;

@@ -234,7 +234,7 @@ public class RabbitGodBoss extends BossAbilityGroup {
 			world.spawnParticle(Particle.SPELL_WITCH, to, 70, 0.25, 0.45, 0.25, 0.15);
 			world.spawnParticle(Particle.SMOKE_LARGE, to, 35, 0.1, 0.45, 0.1, 0.15);
 			world.spawnParticle(Particle.EXPLOSION_NORMAL, to, 25, 0.2, 0, 0.2, 0.1);
-			for (Player player : PlayerUtils.playersInRange(mSpawnLoc, detectionRange)) {
+			for (Player player : PlayerUtils.playersInRange(mSpawnLoc, detectionRange, true)) {
 				player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 9999, 20));
 				player.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, 20 * 9999, -5));
 			}
@@ -312,7 +312,7 @@ public class RabbitGodBoss extends BossAbilityGroup {
 
 													@Override
 													public void run() {
-														for (Player player : PlayerUtils.playersInRange(mSpawnLoc, detectionRange)) {
+														for (Player player : PlayerUtils.playersInRange(mSpawnLoc, detectionRange, true)) {
 															world.spawnParticle(Particle.SPELL_INSTANT, player.getLocation().add(0, 0.25, 0), 1, 0.3, 0.3, 0.3, 0);
 														}
 														mRadius -= 0.2;
@@ -332,7 +332,7 @@ public class RabbitGodBoss extends BossAbilityGroup {
 															world.playSound(chicken.getLocation(), Sound.ENTITY_CHICKEN_DEATH, 2, 0.5f);
 															chicken.remove();
 															changePhase(null, passive2Spells, null);
-															for (Player player : PlayerUtils.playersInRange(mSpawnLoc, detectionRange)) {
+															for (Player player : PlayerUtils.playersInRange(mSpawnLoc, detectionRange, true)) {
 																world.spawnParticle(Particle.FIREWORKS_SPARK, player.getLocation().add(0, 1, 0), 100, 0, 0, 0, 0.4f);
 																player.removePotionEffect(PotionEffectType.SLOW);
 																if (player.hasPotionEffect(PotionEffectType.JUMP)) {
@@ -458,7 +458,7 @@ public class RabbitGodBoss extends BossAbilityGroup {
 					world.playSound(mBoss.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 1.5f, 0.5f);
 					world.playSound(mBoss.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 1.5f, 1f);
 					world.playSound(mBoss.getLocation(), Sound.ENTITY_ENDERMAN_DEATH, 1.5f, 0f);
-					for (Player player : PlayerUtils.playersInRange(mSpawnLoc, detectionRange)) {
+					for (Player player : PlayerUtils.playersInRange(mSpawnLoc, detectionRange, true)) {
 						player.removePotionEffect(PotionEffectType.HEALTH_BOOST);
 						player.removePotionEffect(PotionEffectType.ABSORPTION);
 						if (player.hasPotionEffect(PotionEffectType.SPEED)) {

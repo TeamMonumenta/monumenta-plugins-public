@@ -49,7 +49,7 @@ public class SpellKnockAway extends Spell {
 		Runnable dealer = new Runnable() {
 			@Override
 			public void run() {
-				for (Player player : PlayerUtils.playersInRange(mLauncher.getLocation(), mRadius)) {
+				for (Player player : PlayerUtils.playersInRange(mLauncher.getLocation(), mRadius, true)) {
 					BossUtils.bossDamage(mLauncher, player, 9.0f);
 					player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 80, 4));
 					player.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, 200, 1));

@@ -143,7 +143,7 @@ public class HeadlessHorsemanBoss extends BossAbilityGroup {
 						}
 					}
 				} else {
-					List<Player> players = PlayerUtils.playersInRange(mSpawnLoc, detectionRange);
+					List<Player> players = PlayerUtils.playersInRange(mSpawnLoc, detectionRange, false);
 					if (players != null && players.size() > 0) {
 						Collections.shuffle(players);
 						mHorse.setTarget(players.get(0));
@@ -241,7 +241,7 @@ public class HeadlessHorsemanBoss extends BossAbilityGroup {
 					}
 				}.runTaskLater(mPlugin, 20);
 				UUID uuid = event.getEntity().getUniqueId();
-				for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), 4)) {
+				for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), 4, true)) {
 					if (!player.getUniqueId().equals(uuid)) {
 						BossUtils.bossDamage(mBoss, player, event.getDamage());
 					}
@@ -254,7 +254,7 @@ public class HeadlessHorsemanBoss extends BossAbilityGroup {
 		}
 
 		if (event.getEntity().getLocation().distance(mBoss.getLocation()) < 2.5) {
-			List<Player> players = PlayerUtils.playersInRange(mSpawnLoc, detectionRange);
+			List<Player> players = PlayerUtils.playersInRange(mSpawnLoc, detectionRange, false);
 			if (players.contains(event.getEntity())) {
 				players.remove(event.getEntity());
 			}

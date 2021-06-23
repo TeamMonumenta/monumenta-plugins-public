@@ -55,7 +55,7 @@ public class Pernicious extends DelveModifier {
 	@Override
 	public void applyModifiers(LivingEntity mob, SpawnerSpawnEvent event) {
 		if (FastUtils.RANDOM.nextDouble() < mSpawnChance) {
-			for (Player player : PlayerUtils.playersInRange(mob.getEyeLocation(), 16)) {
+			for (Player player : PlayerUtils.playersInRange(mob.getEyeLocation(), 16, true)) {
 				if (player.hasLineOfSight(mob)) {
 					Location loc = getSpawnLocationBehindPlayer(mob, player);
 					if (loc != null) {
@@ -87,7 +87,7 @@ public class Pernicious extends DelveModifier {
 					.add(directionBackwards.clone().multiply(distanceBackwards))
 					.add(directionSideways.clone().multiply(distanceSideways));
 
-			if (PlayerUtils.playersInRange(loc, 4).size() > 0) {
+			if (PlayerUtils.playersInRange(loc, 4, true).size() > 0) {
 				continue;
 			}
 

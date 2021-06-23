@@ -3,19 +3,6 @@ package com.playmonumenta.plugins.abilities.alchemist.apothecary;
 import java.util.Iterator;
 import java.util.List;
 
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.abilities.AbilityTrigger;
-import com.playmonumenta.plugins.classes.ClassAbility;
-import com.playmonumenta.plugins.classes.magic.MagicType;
-import com.playmonumenta.plugins.utils.AbsorptionUtils;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.FastUtils;
-import com.playmonumenta.plugins.utils.ItemUtils;
-import com.playmonumenta.plugins.utils.LocationUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.plugins.utils.VectorUtils;
-
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -28,6 +15,19 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
+
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.abilities.AbilityTrigger;
+import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.classes.magic.MagicType;
+import com.playmonumenta.plugins.utils.AbsorptionUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.LocationUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.utils.VectorUtils;
 
 
 
@@ -81,7 +81,7 @@ public class AlchemicalAmalgam extends Ability {
 
 			// Convoluted range parameter makes sure we grab all possible entities to be hit without recalculating manually
 			List<LivingEntity> mMobs = EntityUtils.getNearbyMobs(mLoc, AMALGAM_MOVE_SPEED * AMALGAM_MAX_DURATION + 2, mPlayer);
-			List<Player> mPlayers = PlayerUtils.playersInRange(mPlayer, AMALGAM_MOVE_SPEED * AMALGAM_MAX_DURATION + 2, false);
+			List<Player> mPlayers = PlayerUtils.otherPlayersInRange(mPlayer, AMALGAM_MOVE_SPEED * AMALGAM_MAX_DURATION + 2, true);
 
 			int mTicks = 0;
 			int mReverseTick = 0;
@@ -135,7 +135,7 @@ public class AlchemicalAmalgam extends Ability {
 
 				if (!mReverse && (LocationUtils.collidesWithSolid(mLoc, mLoc.getBlock()) || mTicks >= AMALGAM_MAX_DURATION)) {
 					mMobs = EntityUtils.getNearbyMobs(mLoc, (0.3 + AMALGAM_MOVE_SPEED) * AMALGAM_MAX_DURATION + 2, mPlayer);
-					mPlayers = PlayerUtils.playersInRange(mPlayer, (0.3 + AMALGAM_MOVE_SPEED) * AMALGAM_MAX_DURATION + 2, false);
+					mPlayers = PlayerUtils.otherPlayersInRange(mPlayer, (0.3 + AMALGAM_MOVE_SPEED) * AMALGAM_MAX_DURATION + 2, true);
 					mReverse = true;
 					mReverseTick = mTicks;
 				}

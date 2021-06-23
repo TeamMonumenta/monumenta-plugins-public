@@ -39,7 +39,7 @@ public class SpellSwitcheroo extends Spell {
 
 	@Override
 	public void run() {
-		List<Player> players = PlayerUtils.playersInRange(mLauncher.getLocation(), MAX_RANGE);
+		List<Player> players = PlayerUtils.playersInRange(mLauncher.getLocation(), MAX_RANGE, false);
 		while (!players.isEmpty()) {
 			Player target = players.get(FastUtils.RANDOM.nextInt(players.size()));
 
@@ -91,7 +91,7 @@ public class SpellSwitcheroo extends Spell {
 
 				if (mLauncher instanceof LivingEntity) {
 
-					for (Player player : PlayerUtils.playersInRange(targetLoc, 4)) {
+					for (Player player : PlayerUtils.playersInRange(targetLoc, 4, false)) {
 						BossUtils.bossDamage((LivingEntity)mLauncher, player, 35);
 					}
 						new BukkitRunnable() {
@@ -105,7 +105,7 @@ public class SpellSwitcheroo extends Spell {
 							world.spawnParticle(Particle.REDSTONE, mLoc, 4, 1.5, 0.15, 1.5, 0.025, new Particle.DustOptions(Color.fromRGB(255, 0, 0), 1.0f));
 
 							if (mT % 10 == 0) {
-								for (Player player : PlayerUtils.playersInRange(mobLoc, 3)) {
+								for (Player player : PlayerUtils.playersInRange(mobLoc, 3, true)) {
 									BossUtils.bossDamagePercent((LivingEntity)mLauncher, player, 0.05, (Location)null);
 								}
 							}

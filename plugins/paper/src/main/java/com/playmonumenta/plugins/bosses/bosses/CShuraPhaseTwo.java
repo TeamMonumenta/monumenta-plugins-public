@@ -72,7 +72,7 @@ public class CShuraPhaseTwo extends BossAbilityGroup {
 			PlayerUtils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"[\",\"color\":\"gold\"},{\"text\":\"C'Shura\",\"color\":\"dark_red\",\"bold\":true},{\"text\":\"] \",\"color\":\"gold\",\"bold\":false},{\"text\":\"Z'CUN, DIE ALREADY!\",\"color\":\"red\"}]");
 			mBoss.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE, 12000, 0));
 			mBoss.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 12000, 0));
-			for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), 5)) {
+			for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), 5, true)) {
 				Vector dir = player.getLocation().subtract(mBoss.getLocation().toVector()).toVector().multiply(1.0f);
 				dir.setY(0.5f);
 

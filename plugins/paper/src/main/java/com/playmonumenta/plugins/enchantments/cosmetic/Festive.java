@@ -57,7 +57,7 @@ public class Festive implements BaseSpawnableItemEnchantment {
 	public void tick(Plugin plugin, Player player, int level) {
 		final Location loc = player.getLocation().add(0, 1, 0);
 		if (NO_SELF_PARTICLES.contains(player.getUniqueId())) {
-			for (Player other : PlayerUtils.playersInRange(player, 30, false)) {
+			for (Player other : PlayerUtils.otherPlayersInRange(player, 30, true)) {
 				other.spawnParticle(Particle.REDSTONE, loc, Math.max(6, 2 + level), 0.4, 0.4, 0.4, FESTIVE_RED_COLOR);
 				other.spawnParticle(Particle.REDSTONE, loc, Math.max(6, 2 + level), 0.4, 0.4, 0.4, FESTIVE_GREEN_COLOR);
 				other.spawnParticle(Particle.SNOWBALL, loc, Math.max(3, level), 0.4, 0.4, 0.4, 0);

@@ -74,7 +74,7 @@ public class SpellEarthsWrath extends Spell {
 								Location bLoc = mBox.getCenter().toLocation(world);
 								world.spawnParticle(Particle.DAMAGE_INDICATOR, bLoc, 1, 0.25, 0.25, 0.25, 0);
 								world.spawnParticle(Particle.CLOUD, bLoc, 1, 0, 0, 0, 0);
-								for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), 40)) {
+								for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), 40, true)) {
 									if (player.getBoundingBox().overlaps(mBox)) {
 										BossUtils.bossDamage(mBoss, player, 28);
 										MovementUtils.knockAway(centerLoc, player, -0.6f, 0.8f);

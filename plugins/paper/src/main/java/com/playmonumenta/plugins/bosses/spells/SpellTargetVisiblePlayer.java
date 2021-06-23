@@ -86,11 +86,11 @@ public class SpellTargetVisiblePlayer extends Spell {
 			} else {
 				// Potentially find a new target
 				Location bossLoc = mBoss.getEyeLocation();
-				List<Player> potentialTargets = PlayerUtils.playersInRange(bossLoc, mDetectionRange);
+				List<Player> potentialTargets = PlayerUtils.playersInRange(bossLoc, mDetectionRange, false);
 				Collections.sort(potentialTargets, (a, b) -> Double.compare(a.getLocation().distance(bossLoc), b.getLocation().distance(bossLoc)));
 
 				for (Player player : potentialTargets) {
-					if (LocationUtils.hasLineOfSight(mBoss, player) && !AbilityUtils.isStealthed(player)) {
+					if (LocationUtils.hasLineOfSight(mBoss, player)) {
 						mLastTarget = player;
 						mBoss.setTarget(player);
 						mCooldownRemaining = mCooldown;

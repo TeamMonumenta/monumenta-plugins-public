@@ -296,7 +296,7 @@ public class SpellGreatswordSlam extends Spell {
 
 					this.cancel();
 				}
-				for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), 40)) {
+				for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), 40, false)) {
 					if ((player.getLocation().getBlock().getRelative(BlockFace.DOWN).getType() != Material.AIR || player.getLocation().getBlock().getType() != Material.AIR)
 					    && (player.getLocation().getBlock().getRelative(BlockFace.DOWN).getType() == Material.FROSTED_ICE || player.getLocation().getBlock().getType() == Material.FROSTED_ICE)) {
 						Vector vel = player.getVelocity();
