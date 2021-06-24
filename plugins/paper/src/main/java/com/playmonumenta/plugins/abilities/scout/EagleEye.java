@@ -1,9 +1,13 @@
 package com.playmonumenta.plugins.abilities.scout;
 
+import java.util.EnumSet;
+
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
+import com.playmonumenta.plugins.enchantments.abilities.BaseAbilityEnchantment;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
@@ -23,6 +27,11 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 
 public class EagleEye extends Ability {
+	public static class EagleEyeKillRefreshEnchantment extends BaseAbilityEnchantment {
+		public EagleEyeKillRefreshEnchantment() {
+			super("Eagle Eye Kill Refresh", EnumSet.of(ItemSlot.ARMOR));
+		}
+	}
 
 	private static final int EAGLE_EYE_EFFECT_LVL = 0;
 	private static final int EAGLE_EYE_DURATION = 10 * 20;
@@ -71,7 +80,7 @@ public class EagleEye extends Ability {
 				public void run() {
 					mTicks++;
 					if (mob.isDead() || !mob.isValid()) {
-						mPlugin.mTimers.updateCooldown(mPlayer, ClassAbility.EAGLE_EYE, 20 * 2);
+						mPlugin.mTimers.updateCooldown(mPlayer, ClassAbility.EAGLE_EYE, 20 * (2 + (int) EagleEyeKillRefreshEnchantment.getLevel(mPlayer, EagleEyeKillRefreshEnchantment.class)));
 						this.cancel();
 					}
 					if (mTicks >= EAGLE_EYE_DURATION) {

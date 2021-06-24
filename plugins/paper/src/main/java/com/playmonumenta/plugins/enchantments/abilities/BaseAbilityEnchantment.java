@@ -120,4 +120,14 @@ public abstract class BaseAbilityEnchantment implements BaseEnchantment {
 		int percentage = PlayerTracking.getInstance().getPlayerCustomEnchantLevel(player, SpellPower.class);
 		return baseDamage * (1 + (percentage / 100f));
 	}
+
+	public static float getExtraPercentHealing(Player player, Class<? extends BaseEnchantment> c, float baseHealing) {
+		int percentage = PlayerTracking.getInstance().getPlayerCustomEnchantLevel(player, c);
+		return baseHealing * (1 + (percentage / 100f));
+	}
+
+	public static float getExtraPercent(Player player, Class<? extends BaseEnchantment> c, float base) {
+		int percentage = PlayerTracking.getInstance().getPlayerCustomEnchantLevel(player, c);
+		return base * (1 + (percentage / 100f));
+	}
 }

@@ -1,10 +1,14 @@
 package com.playmonumenta.plugins.abilities.cleric;
 
+import java.util.EnumSet;
+
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.classes.magic.MagicType;
+import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
+import com.playmonumenta.plugins.enchantments.abilities.BaseAbilityEnchantment;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 
@@ -23,6 +27,11 @@ import org.bukkit.projectiles.ProjectileSource;
 
 
 public class SanctifiedArmor extends Ability {
+	public static class SanctifiedArmorDamageEnchantment extends BaseAbilityEnchantment {
+		public SanctifiedArmorDamageEnchantment() {
+			super("Sanctified Armor Damage", EnumSet.of(ItemSlot.OFFHAND));
+		}
+	}
 
 	private static final double PERCENT_DAMAGE_RETURNED_1 = 1.5;
 	private static final double PERCENT_DAMAGE_RETURNED_2 = 2.5;
@@ -82,9 +91,11 @@ public class SanctifiedArmor extends Ability {
 		world.spawnParticle(Particle.FIREWORKS_SPARK, loc.add(0, mob.getHeight() / 2, 0), 7, 0.35, 0.35, 0.35, 0.125);
 		world.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_KNOCKBACK, 0.7f, 1.2f);
 
+		double damage = mPercentDamageReturned * EntityUtils.getRealFinalDamage(event);
+		damage = SanctifiedArmorDamageEnchantment.getExtraPercentDamage(mPlayer, SanctifiedArmorDamageEnchantment.class, (float) damage);
 		MovementUtils.knockAway(mPlayer, mob, KNOCKBACK_SPEED, KNOCKBACK_SPEED);
 		if (!mPlayer.isBlocking() || event.getFinalDamage() > 0) {
-			EntityUtils.damageEntity(mPlugin, mob, mPercentDamageReturned * EntityUtils.getRealFinalDamage(event), mPlayer, MagicType.HOLY, true, mInfo.mLinkedSpell);
+			EntityUtils.damageEntity(mPlugin, mob, damage, mPlayer, MagicType.HOLY, true, mInfo.mLinkedSpell);
 		}
 
 		if (getAbilityScore() > 1) {

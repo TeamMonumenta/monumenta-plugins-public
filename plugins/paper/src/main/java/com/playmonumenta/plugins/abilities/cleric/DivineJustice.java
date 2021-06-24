@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.abilities.cleric;
 
+import java.util.EnumSet;
 import java.util.List;
 
 import org.bukkit.Bukkit;
@@ -21,6 +22,8 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.classes.magic.MagicType;
+import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
+import com.playmonumenta.plugins.enchantments.abilities.BaseAbilityEnchantment;
 import com.playmonumenta.plugins.player.PartialParticle;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
@@ -30,6 +33,12 @@ import com.playmonumenta.plugins.utils.StringUtils;
 
 
 public class DivineJustice extends Ability {
+	public static class DivineJusticeAllyHealingEnchantment extends BaseAbilityEnchantment {
+		public DivineJusticeAllyHealingEnchantment() {
+			super("Divine Justice Ally Healing", EnumSet.of(ItemSlot.OFFHAND));
+		}
+	}
+
 	public static final String NAME = "Divine Justice";
 	public static final ClassAbility ABILITY = ClassAbility.DIVINE_JUSTICE;
 
@@ -152,7 +161,7 @@ public class DivineJustice extends Ability {
 			for (@NotNull Player otherPlayer : players) {
 				PlayerUtils.healPlayer(
 					otherPlayer,
-					otherPlayer.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue() * HEALING_MULTIPLIER_OTHER
+					otherPlayer.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue() * DivineJusticeAllyHealingEnchantment.getExtraPercentHealing(mPlayer, DivineJusticeAllyHealingEnchantment.class, (float) HEALING_MULTIPLIER_OTHER)
 				);
 			}
 

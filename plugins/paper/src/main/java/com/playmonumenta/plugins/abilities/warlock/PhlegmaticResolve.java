@@ -2,6 +2,8 @@ package com.playmonumenta.plugins.abilities.warlock;
 
 import org.bukkit.entity.Player;
 
+import java.util.EnumSet;
+
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityManager;
@@ -13,9 +15,17 @@ import com.playmonumenta.plugins.abilities.warlock.tenebrist.UmbralWail;
 import com.playmonumenta.plugins.abilities.warlock.tenebrist.WitheringGaze;
 import com.playmonumenta.plugins.effects.PercentDamageReceived;
 import com.playmonumenta.plugins.effects.PercentKnockbackResist;
+import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
+import com.playmonumenta.plugins.enchantments.abilities.BaseAbilityEnchantment;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 
 public class PhlegmaticResolve extends Ability {
+	public static class PhlegmaticResolveDefenseEnchantment extends BaseAbilityEnchantment {
+		public PhlegmaticResolveDefenseEnchantment() {
+			super("Phlegmatic Resolve Defense", EnumSet.of(ItemSlot.OFFHAND));
+		}
+	}
+
 	private static final String PERCENT_DAMAGE_RESIST_EFFECT_NAME = "PhlegmaticPercentDamageResistEffect";
 	private static final String KNOCKBACK_RESIST_EFFECT_NAME = "PhlegmaticPercentDamageResistEffect";
 	private static final double PERCENT_DAMAGE_RESIST_1 = -0.03;
@@ -59,12 +69,13 @@ public class PhlegmaticResolve extends Ability {
 				cooldowns++;
 			}
 		}
-		mPlugin.mEffectManager.addEffect(mPlayer, PERCENT_DAMAGE_RESIST_EFFECT_NAME, new PercentDamageReceived(6, mPercentDamageResist * cooldowns));
+		double damageResist = PhlegmaticResolveDefenseEnchantment.getExtraPercent(mPlayer, PhlegmaticResolveDefenseEnchantment.class, (float) mPercentDamageResist);
+		mPlugin.mEffectManager.addEffect(mPlayer, PERCENT_DAMAGE_RESIST_EFFECT_NAME, new PercentDamageReceived(6, damageResist * cooldowns));
 		mPlugin.mEffectManager.addEffect(mPlayer, KNOCKBACK_RESIST_EFFECT_NAME, new PercentKnockbackResist(6, PERCENT_KNOCKBACK_RESIST * cooldowns, KNOCKBACK_RESIST_EFFECT_NAME));
 
 		if (getAbilityScore() > 1) {
-			for (Player p : PlayerUtils.otherPlayersInRange(mPlayer, RADIUS, true)) {
-				mPlugin.mEffectManager.addEffect(p, PERCENT_DAMAGE_RESIST_EFFECT_NAME, new PercentDamageReceived(6, mPercentDamageResist * cooldowns / 3.0));
+			for (Player p : PlayerUtils.playersInRange(mPlayer.getLocation(), RADIUS, false)) {
+				mPlugin.mEffectManager.addEffect(p, PERCENT_DAMAGE_RESIST_EFFECT_NAME, new PercentDamageReceived(6, damageResist * cooldowns / 3.0));
 				mPlugin.mEffectManager.addEffect(p, KNOCKBACK_RESIST_EFFECT_NAME, new PercentKnockbackResist(6, PERCENT_KNOCKBACK_RESIST * cooldowns / 3.0, KNOCKBACK_RESIST_EFFECT_NAME));
 			}
 		}

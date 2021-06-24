@@ -1,8 +1,12 @@
 package com.playmonumenta.plugins.abilities.warrior;
 
+import java.util.EnumSet;
+
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
+import com.playmonumenta.plugins.enchantments.abilities.BaseAbilityEnchantment;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
@@ -26,6 +30,11 @@ import org.bukkit.util.Vector;
 
 
 public class Riposte extends Ability {
+	public static class RiposteCooldownEnchantment extends BaseAbilityEnchantment {
+		public RiposteCooldownEnchantment() {
+			super("Riposte Cooldown", EnumSet.of(ItemSlot.ARMOR));
+		}
+	}
 
 	private static final int RIPOSTE_COOLDOWN = 10 * 20;
 	private static final int RIPOSTE_SWORD_EFFECT_LEVEL = 1;
@@ -40,7 +49,7 @@ public class Riposte extends Ability {
 		mInfo.mShorthandName = "Rip";
 		mInfo.mDescriptions.add("While wielding a sword or axe, you block a melee attack that would have hit you. Cooldown: 10s.");
 		mInfo.mDescriptions.add("If you block an attack with Riposte's effect while holding a sword, gain 5s of Strength II. If you block with Riposte's effect while holding an axe, the attacking mob is stunned for 4s.");
-		mInfo.mCooldown = RIPOSTE_COOLDOWN;
+		mInfo.mCooldown = (int) RiposteCooldownEnchantment.getCooldown(player, RIPOSTE_COOLDOWN, RiposteCooldownEnchantment.class);
 	}
 
 	@Override

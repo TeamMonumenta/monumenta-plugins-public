@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.abilities.warrior;
 
+import java.util.EnumSet;
 import java.util.Iterator;
 import java.util.List;
 
@@ -19,6 +20,8 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.effects.PercentDamageReceived;
+import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
+import com.playmonumenta.plugins.enchantments.abilities.BaseAbilityEnchantment;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
@@ -28,6 +31,11 @@ import com.playmonumenta.plugins.utils.PlayerUtils;
 
 
 public class DefensiveLine extends Ability {
+	public static class DefensiveLineCooldownEnchantment extends BaseAbilityEnchantment {
+		public DefensiveLineCooldownEnchantment() {
+			super("Defensive Line Cooldown", EnumSet.of(ItemSlot.ARMOR));
+		}
+	}
 
 	private static final String PERCENT_DAMAGE_RECEIVED_EFFECT_NAME = "DefensiveLinePercentDamageReceivedEffect";
 	private static final double PERCENT_DAMAGE_RECEIVED_EFFECT_1 = -0.20;
@@ -48,7 +56,7 @@ public class DefensiveLine extends Ability {
 		mInfo.mShorthandName = "DL";
 		mInfo.mDescriptions.add("When you block while sneaking, you and your allies in an 8 block radius gain 20% Resistance for 10 seconds. Upon activating this skill mobs in a 3 block radius of you and your allies are knocked back. Cooldown: 30s.");
 		mInfo.mDescriptions.add("The effect is increased to 30% Resistance.");
-		mInfo.mCooldown = COOLDOWN;
+		mInfo.mCooldown = (int) DefensiveLineCooldownEnchantment.getCooldown(player, COOLDOWN, DefensiveLineCooldownEnchantment.class);
 		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
 		mPercentDamageReceived = getAbilityScore() == 1 ? PERCENT_DAMAGE_RECEIVED_EFFECT_1 : PERCENT_DAMAGE_RECEIVED_EFFECT_2;
 	}

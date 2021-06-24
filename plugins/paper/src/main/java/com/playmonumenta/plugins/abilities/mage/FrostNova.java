@@ -1,11 +1,15 @@
 package com.playmonumenta.plugins.abilities.mage;
 
+import java.util.EnumSet;
+
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.classes.magic.MagicType;
+import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
+import com.playmonumenta.plugins.enchantments.abilities.BaseAbilityEnchantment;
 import com.playmonumenta.plugins.enchantments.abilities.SpellPower;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
@@ -25,6 +29,12 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 
 public class FrostNova extends Ability {
+	public static class FrostNovaCooldownEnchantment extends BaseAbilityEnchantment {
+		public FrostNovaCooldownEnchantment() {
+			super("Frost Nova Cooldown", EnumSet.of(ItemSlot.ARMOR));
+		}
+	}
+
 	public static final String NAME = "Frost Nova";
 	public static final ClassAbility ABILITY = ClassAbility.FROST_NOVA;
 
@@ -66,7 +76,7 @@ public class FrostNova extends Ability {
 				StringUtils.multiplierToPercentage(SLOW_MULTIPLIER_2)
 			)
 		);
-		mInfo.mCooldown = COOLDOWN_TICKS;
+		mInfo.mCooldown = (int) FrostNovaCooldownEnchantment.getCooldown(player, COOLDOWN_TICKS, FrostNovaCooldownEnchantment.class);
 		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;
 
 		boolean isUpgraded = getAbilityScore() == 2;

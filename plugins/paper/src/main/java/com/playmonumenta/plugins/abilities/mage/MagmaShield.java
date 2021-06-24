@@ -1,5 +1,7 @@
 package com.playmonumenta.plugins.abilities.mage;
 
+import java.util.EnumSet;
+
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityManager;
@@ -7,6 +9,8 @@ import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.mage.elementalist.Blizzard;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.classes.magic.MagicType;
+import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
+import com.playmonumenta.plugins.enchantments.abilities.BaseAbilityEnchantment;
 import com.playmonumenta.plugins.enchantments.abilities.SpellPower;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
@@ -28,6 +32,12 @@ import org.bukkit.util.Vector;
 
 
 public class MagmaShield extends Ability {
+	public static class MagmaShieldCooldownEnchantment extends BaseAbilityEnchantment {
+		public MagmaShieldCooldownEnchantment() {
+			super("Magma Shield Cooldown", EnumSet.of(ItemSlot.ARMOR));
+		}
+	}
+
 	public static final String NAME = "Magma Shield";
 	public static final ClassAbility ABILITY = ClassAbility.MAGMA_SHIELD;
 
@@ -68,7 +78,7 @@ public class MagmaShield extends Ability {
 				DAMAGE_2
 			)
 		);
-		mInfo.mCooldown = COOLDOWN_TICKS;
+		mInfo.mCooldown = (int) MagmaShieldCooldownEnchantment.getCooldown(player, COOLDOWN_TICKS, MagmaShieldCooldownEnchantment.class);
 		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
 
 		mLevelDamage = getAbilityScore() == 2 ? DAMAGE_2 : DAMAGE_1;

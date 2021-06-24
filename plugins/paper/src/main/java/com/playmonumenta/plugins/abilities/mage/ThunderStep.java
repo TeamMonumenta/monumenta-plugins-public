@@ -1,11 +1,14 @@
 package com.playmonumenta.plugins.abilities.mage;
 
+import java.util.EnumSet;
 import java.util.List;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.classes.magic.MagicType;
+import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
+import com.playmonumenta.plugins.enchantments.abilities.BaseAbilityEnchantment;
 import com.playmonumenta.plugins.enchantments.abilities.SpellPower;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
@@ -29,6 +32,12 @@ import org.bukkit.util.Vector;
 
 
 public class ThunderStep extends Ability {
+	public static class ThunderStepCooldownEnchantment extends BaseAbilityEnchantment {
+		public ThunderStepCooldownEnchantment() {
+			super("Thunder Step Cooldown", EnumSet.of(ItemSlot.ARMOR));
+		}
+	}
+
 	public static final String NAME = "Thunder Step";
 	public static final ClassAbility ABILITY = ClassAbility.THUNDER_STEP;
 	public static final Particle.DustOptions COLOR_YELLOW = new Particle.DustOptions(Color.YELLOW, 0.75f);
@@ -84,7 +93,7 @@ public class ThunderStep extends Ability {
 				DISTANCE_2
 			)
 		);
-		mInfo.mCooldown = COOLDOWN_TICKS;
+		mInfo.mCooldown = (int) ThunderStepCooldownEnchantment.getCooldown(player, COOLDOWN_TICKS, ThunderStepCooldownEnchantment.class);
 		mInfo.mIgnoreCooldown = true;
 
 		boolean isUpgraded = getAbilityScore() == 2;

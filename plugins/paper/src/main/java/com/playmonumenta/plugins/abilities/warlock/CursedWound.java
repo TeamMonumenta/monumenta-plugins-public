@@ -1,5 +1,7 @@
 package com.playmonumenta.plugins.abilities.warlock;
 
+import java.util.EnumSet;
+
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityManager;
@@ -9,6 +11,8 @@ import com.playmonumenta.plugins.abilities.warlock.reaper.VoodooBonds;
 import com.playmonumenta.plugins.abilities.warlock.tenebrist.HauntingShades;
 import com.playmonumenta.plugins.abilities.warlock.tenebrist.UmbralWail;
 import com.playmonumenta.plugins.abilities.warlock.tenebrist.WitheringGaze;
+import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
+import com.playmonumenta.plugins.enchantments.abilities.BaseAbilityEnchantment;
 import com.playmonumenta.plugins.events.CustomDamageEvent;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
@@ -31,6 +35,11 @@ import org.bukkit.potion.PotionEffectType;
 
 
 public class CursedWound extends Ability {
+	public static class CursedWoundDamageEnchantment extends BaseAbilityEnchantment {
+		public CursedWoundDamageEnchantment() {
+			super("Cursed Wound Damage", EnumSet.of(ItemSlot.OFFHAND));
+		}
+	}
 
 	private static final int CURSED_WOUND_EFFECT_LEVEL = 1;
 	private static final int CURSED_WOUND_DURATION = 6 * 20;
@@ -81,7 +90,7 @@ public class CursedWound extends Ability {
 						cooldowns++;
 					}
 				}
-				event.setDamage(event.getDamage() + Math.min(cooldowns * CURSED_WOUND_DAMAGE, cursedWoundCap));
+				event.setDamage(event.getDamage() + CursedWoundDamageEnchantment.getExtraPercentDamage(mPlayer, CursedWoundDamageEnchantment.class, (float) Math.min(cooldowns * CURSED_WOUND_DAMAGE, cursedWoundCap)));
 				CustomDamageEvent customDamageEvent = new CustomDamageEvent(mPlayer, damagee, 0, null);
 				Bukkit.getPluginManager().callEvent(customDamageEvent);
 			}
