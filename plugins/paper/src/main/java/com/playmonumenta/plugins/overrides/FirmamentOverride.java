@@ -37,6 +37,9 @@ public class FirmamentOverride extends BaseOverride {
 	private static final String PRISMARINE_ENABLED = ChatColor.AQUA + "Prismarine " + ChatColor.GREEN + "Enabled";
 	private static final String PRISMARINE_DISABLED = ChatColor.AQUA + "Prismarine " + ChatColor.RED + "Disabled";
 	private static final String ITEM_NAME = "Firmament";
+	private static final String DELVE_SKIN_NAME = "Doorway from Eternity";
+	private static final String BLACKSTONE_ENABLED = ChatColor.GRAY + "Blackstone " + ChatColor.GREEN + "Enabled";
+	private static final String BLACKSTONE_DISABLED = ChatColor.GRAY + "Blackstone " + ChatColor.RED + "Disabled";
 
 	@Override
 	public boolean blockPlaceInteraction(Plugin plugin, Player player, ItemStack item, BlockPlaceEvent event) {
@@ -100,14 +103,27 @@ public class FirmamentOverride extends BaseOverride {
 				//Stat tracking for firmament
 				StatTrackManager.incrementStat(item, player, StatTrackOptions.BLOCKS_PLACED, 1);
 				BlockState state = event.getBlockReplacedState();
-				if (FastUtils.RANDOM.nextBoolean() && item.getItemMeta().hasLore() && item.getItemMeta().getLore().contains(ChatColor.AQUA + "Prismarine " + ChatColor.GREEN + "Enabled")) {
-					// Place a prismarine block instead of the block from the shulker
-					BlockData blockData = Material.PRISMARINE.createBlockData();
-					state.setBlockData(blockData);
+				if (FastUtils.RANDOM.nextBoolean()
+						&& item.getItemMeta().hasLore()
+						&& (item.getItemMeta().getLore().contains(PRISMARINE_ENABLED) || item.getItemMeta().getLore().contains(BLACKSTONE_ENABLED))) {
 
-					// Forcibly update the new block state and apply physics
-					state.update(true, true);
-					state.setType(Material.PRISMARINE);
+					// Place a prismarine block instead of the block from the shulker
+					BlockData blockData = null;
+					if (InventoryUtils.testForItemWithName(item, ITEM_NAME)) {
+						blockData = Material.PRISMARINE.createBlockData();
+						state.setBlockData(blockData);
+
+						// Forcibly update the new block state and apply physics
+						state.update(true, true);
+						state.setType(Material.PRISMARINE);
+					} else {
+						blockData = Material.BLACKSTONE.createBlockData();
+						state.setBlockData(blockData);
+
+						// Forcibly update the new block state and apply physics
+						state.update(true, true);
+						state.setType(Material.BLACKSTONE);
+					}
 					//Log the placement of prismarine
 					CoreProtectIntegration.logPlacement(player, event.getBlock().getLocation(), Material.PRISMARINE, blockData);
 					// No changes needed to the shulker, exit here and cancel the event
@@ -163,26 +179,49 @@ public class FirmamentOverride extends BaseOverride {
 		List<String> lore = item.getItemMeta().getLore();
 		List<String> newLore = new ArrayList<>();
 		boolean foundLine = false;
-
-		for (String loreEntry : lore) {
-			if (loreEntry.equals(PRISMARINE_ENABLED) && !foundLine) {
-				newLore.add(PRISMARINE_DISABLED);
-				player.sendMessage(PRISMARINE_DISABLED);
-				player.playSound(player.getLocation(), Sound.BLOCK_SHULKER_BOX_CLOSE, SoundCategory.BLOCKS, 1, 1);
-				foundLine = true;
-				continue;
-			} else if (loreEntry.equals(PRISMARINE_DISABLED) && !foundLine) {
-				newLore.add(PRISMARINE_ENABLED);
-				player.sendMessage(PRISMARINE_ENABLED);
-				player.playSound(player.getLocation(), Sound.BLOCK_SHULKER_BOX_OPEN, SoundCategory.BLOCKS, 1, 1);
-				foundLine = true;
-				continue;
+		if (InventoryUtils.testForItemWithName(item, ITEM_NAME)) {
+			for (String loreEntry : lore) {
+				if (loreEntry.equals(PRISMARINE_ENABLED) && !foundLine) {
+					newLore.add(PRISMARINE_DISABLED);
+					player.sendMessage(PRISMARINE_DISABLED);
+					player.playSound(player.getLocation(), Sound.BLOCK_SHULKER_BOX_CLOSE, SoundCategory.BLOCKS, 1, 1);
+					foundLine = true;
+					continue;
+				} else if (loreEntry.equals(PRISMARINE_DISABLED) && !foundLine) {
+					newLore.add(PRISMARINE_ENABLED);
+					player.sendMessage(PRISMARINE_ENABLED);
+					player.playSound(player.getLocation(), Sound.BLOCK_SHULKER_BOX_OPEN, SoundCategory.BLOCKS, 1, 1);
+					foundLine = true;
+					continue;
+				}
+				newLore.add(loreEntry);
+				if (loreEntry.equals(lore.get(lore.size() - 1)) && !foundLine) {
+					newLore.add(PRISMARINE_ENABLED);
+					player.sendMessage(PRISMARINE_ENABLED);
+					player.playSound(player.getLocation(), Sound.BLOCK_SHULKER_BOX_OPEN, SoundCategory.BLOCKS, 1, 1);
+				}
 			}
-			newLore.add(loreEntry);
-			if (loreEntry.equals(lore.get(lore.size() - 1)) && !foundLine) {
-				newLore.add(PRISMARINE_ENABLED);
-				player.sendMessage(PRISMARINE_ENABLED);
-				player.playSound(player.getLocation(), Sound.BLOCK_SHULKER_BOX_OPEN, SoundCategory.BLOCKS, 1, 1);
+		} else if (InventoryUtils.testForItemWithName(item, DELVE_SKIN_NAME)) {
+			for (String loreEntry : lore) {
+				if (loreEntry.equals(BLACKSTONE_ENABLED) && !foundLine) {
+					newLore.add(BLACKSTONE_DISABLED);
+					player.sendMessage(BLACKSTONE_DISABLED);
+					player.playSound(player.getLocation(), Sound.BLOCK_SHULKER_BOX_CLOSE, SoundCategory.BLOCKS, 1, 1);
+					foundLine = true;
+					continue;
+				} else if (loreEntry.equals(BLACKSTONE_DISABLED) && !foundLine) {
+					newLore.add(BLACKSTONE_ENABLED);
+					player.sendMessage(BLACKSTONE_ENABLED);
+					player.playSound(player.getLocation(), Sound.BLOCK_SHULKER_BOX_OPEN, SoundCategory.BLOCKS, 1, 1);
+					foundLine = true;
+					continue;
+				}
+				newLore.add(loreEntry);
+				if (loreEntry.equals(lore.get(lore.size() - 1)) && !foundLine) {
+					newLore.add(BLACKSTONE_ENABLED);
+					player.sendMessage(BLACKSTONE_ENABLED);
+					player.playSound(player.getLocation(), Sound.BLOCK_SHULKER_BOX_OPEN, SoundCategory.BLOCKS, 1, 1);
+				}
 			}
 		}
 		ItemMeta meta = item.getItemMeta();
@@ -195,8 +234,8 @@ public class FirmamentOverride extends BaseOverride {
 	public static boolean isFirmamentItem(ItemStack item) {
 		return item != null &&
 		       item.getType() != null &&
-		       InventoryUtils.testForItemWithName(item, ITEM_NAME) &&
-		       InventoryUtils.testForItemWithLore(item, "City of Shifting Waters") &&
+		       (InventoryUtils.testForItemWithName(item, ITEM_NAME) || InventoryUtils.testForItemWithName(item, DELVE_SKIN_NAME)) &&
+		       (InventoryUtils.testForItemWithLore(item, "City of Shifting Waters") || InventoryUtils.testForItemWithLore(item, "Mythic Reliquary")) &&
 		       ItemUtils.getItemTier(item).equals(ItemTier.EPIC) &&
 		       ItemUtils.isShulkerBox(item.getType());
 	}
