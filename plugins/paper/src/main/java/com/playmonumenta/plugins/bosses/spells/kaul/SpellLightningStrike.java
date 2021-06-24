@@ -260,11 +260,11 @@ public class SpellLightningStrike extends Spell {
 				// Count of the tick next run.
 				// If next run would be tick #0
 				if (--mCountdownTicks < 1) {
-					mActiveRunnables.remove(this);
+					cancel();
 					if (mInternalParticleRunnable != null) {
 						mActiveRunnables.remove(mInternalParticleRunnable);
 					}
-					cancel();
+					mActiveRunnables.remove(this);
 
 					@NotNull Collection<@NotNull Player> shockPlayers = PlayerUtils.playersInCylinder(
 						strikeLocation,
@@ -347,8 +347,8 @@ public class SpellLightningStrike extends Spell {
 				}
 			}
 		};
-		lightningRunnable.runTaskTimer(Plugin.getInstance(), 0, 1);
 		mActiveRunnables.add(lightningRunnable);
+		lightningRunnable.runTaskTimer(Plugin.getInstance(), 0, 1);
 	}
 
 	public void strikeShock(
@@ -389,15 +389,15 @@ public class SpellLightningStrike extends Spell {
 				// Count of the shock this run.
 				// Once shocked SHOCK_COUNT times
 				if (++mShockTracker >= SHOCK_COUNT) {
-					mActiveRunnables.remove(this);
 					cancel();
+					mActiveRunnables.remove(this);
 				} else {
 					mInitialLocationUsed = true;
 				}
 			}
 		};
-		shockRunnable.runTaskTimer(Plugin.getInstance(), 0, SHOCK_INTERVAL_TICKS);
 		mActiveRunnables.add(shockRunnable);
+		shockRunnable.runTaskTimer(Plugin.getInstance(), 0, SHOCK_INTERVAL_TICKS);
 	}
 
 	// Starts in the next tick
@@ -539,13 +539,13 @@ public class SpellLightningStrike extends Spell {
 				// Count of the tick next run.
 				// If next run would be tick #0
 				if (--mRemainingTicks < 1) {
-					mActiveRunnables.remove(this);
 					cancel();
+					mActiveRunnables.remove(this);
 				}
 			}
 
 		};
-		fireRunnable.runTaskTimer(Plugin.getInstance(), 1, 1);
 		mActiveRunnables.add(fireRunnable);
+		fireRunnable.runTaskTimer(Plugin.getInstance(), 1, 1);
 	}
 }

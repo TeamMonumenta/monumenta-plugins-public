@@ -5,8 +5,8 @@ import java.util.HashMap;
 
 import com.destroystokyo.paper.ParticleBuilder;
 import com.playmonumenta.plugins.Constants;
+import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.utils.FastUtils;
-import com.playmonumenta.scriptedquests.Plugin;
 
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -130,6 +130,7 @@ public class PPLightning extends PartialParticle {
 				// If this was the last frame of animation
 				if (mAnimationProgress >= ANIMATION_TICKS) {
 					cancel();
+					mRunnable = null;
 				} else {
 					mIndexPointer = targetIndex;
 				}

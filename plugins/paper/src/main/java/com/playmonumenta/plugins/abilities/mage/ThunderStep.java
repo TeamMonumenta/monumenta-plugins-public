@@ -158,7 +158,7 @@ public class ThunderStep extends Ability {
 						}
 
 						mPlayer.teleport(playerEndLocation);
-						doDamage(playerStartLocation, spellDamage, true);
+						doDamage(playerEndLocation, spellDamage, true);
 					}
 				}.runTaskLater(Plugin.getInstance(), 1);
 			}
