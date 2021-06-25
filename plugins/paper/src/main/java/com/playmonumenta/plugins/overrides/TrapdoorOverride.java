@@ -48,9 +48,10 @@ public class TrapdoorOverride extends UnbreakableOnBedrockOverride {
 		Half clickedHalf = clickedData.getHalf();
 		BlockFace clickedFacing = clickedData.getFacing();
 		boolean clickedAlongX = BlockFace.NORTH.equals(clickedFacing) || BlockFace.SOUTH.equals(clickedFacing);
-		boolean clickedCenterPositive = Half.BOTTOM.equals(clickedHalf)
-		    ^ (BlockFace.NORTH.equals(clickedFacing) || BlockFace.EAST.equals(clickedFacing));
 		boolean rotateClockwise = downIsClockwise ^ Half.TOP.equals(clickedHalf);
+		boolean clickedCenterPositive = rotateClockwise
+		    ^ Half.BOTTOM.equals(clickedHalf)
+		    ^ (BlockFace.NORTH.equals(clickedFacing) || BlockFace.EAST.equals(clickedFacing));
 
 		// Get the full door's structure
 		int centerX = (int)loc.getX();
