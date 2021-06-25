@@ -37,7 +37,6 @@ import com.playmonumenta.plugins.bosses.spells.SpellPlayerAction;
 import com.playmonumenta.plugins.bosses.spells.cluckingop.SpellEruption;
 import com.playmonumenta.plugins.bosses.spells.cluckingop.SpellFluffPools;
 import com.playmonumenta.plugins.bosses.spells.cluckingop.SpellFluffingDeath;
-import com.playmonumenta.plugins.bosses.spells.cluckingop.SpellOmegaLeap;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
@@ -130,13 +129,11 @@ public class RabbitGodBoss extends BossAbilityGroup {
 		SpellManager phase1Spells = new SpellManager(Arrays.asList(
 			charge,
 			laser,
-			new SpellOmegaLeap(plugin, mBoss),
 			new SpellEruption(plugin, mBoss)
 		));
 
 		SpellManager phase2Spells = new SpellManager(Arrays.asList(
 			charge,
-			new SpellOmegaLeap(plugin, mBoss),
 			new SpellFluffPools(plugin, mBoss, detectionRange),
 			new SpellFluffingDeath(plugin, mBoss, 15, spawnLoc)
 		));

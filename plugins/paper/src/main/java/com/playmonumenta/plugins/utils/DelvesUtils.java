@@ -497,13 +497,11 @@ public class DelvesUtils {
 				return null;
 			}
 
-			double random = FastUtils.RANDOM.nextDouble();
+			if (FastUtils.RANDOM.nextDouble() < getDelveMaterialTableChance(depthPoints, playerCount)) {
+				if (FastUtils.RANDOM.nextDouble() < getCosmeticMaterialTableChance(depthPoints)) {
+					return mCosmeticMaterialTable;
+				}
 
-			if (random < getCosmeticMaterialTableChance(depthPoints)) {
-				return mCosmeticMaterialTable;
-			}
-
-			if (random < getDelveMaterialTableChance(depthPoints, playerCount)) {
 				return mDelveMaterialTable;
 			}
 
