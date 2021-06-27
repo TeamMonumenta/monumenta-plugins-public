@@ -132,7 +132,7 @@ public class DefensiveLine extends Ability {
 						}
 
 					}.runTaskTimer(mPlugin, 0, 1);
-
+					mInfo.mCooldown = (int) DefensiveLineCooldownEnchantment.getCooldown(mPlayer, COOLDOWN, DefensiveLineCooldownEnchantment.class);
 					putOnCooldown();
 				}
 			}

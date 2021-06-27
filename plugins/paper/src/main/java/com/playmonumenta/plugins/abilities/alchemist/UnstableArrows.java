@@ -1,5 +1,7 @@
 package com.playmonumenta.plugins.abilities.alchemist;
 
+import java.util.EnumSet;
+
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -13,8 +15,6 @@ import org.bukkit.entity.SpectralArrow;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
-
-import java.util.EnumSet;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
@@ -60,7 +60,7 @@ public class UnstableArrows extends Ability {
 		mInfo.mShorthandName = "UA";
 		mInfo.mDescriptions.add(" When you crouch and fire an arrow it will begin to hiss upon landing. 3s later it explodes, dealing 12 damage to mobs within a four block radius and spawning an Alchemist Potion at the location. Cooldown: 20 seconds. You can toggle whether the explosion will apply knockback to you or not in the P.E.B.");
 		mInfo.mDescriptions.add("The damage is increased to 20 and the cooldown is reduced to 16s.");
-		if (player != null && ScoreboardUtils.getScoreboardValue(player, "RocketJumper") == 9001) {
+		if (player == null || ScoreboardUtils.getScoreboardValue(player, "RocketJumper") == 9001) {
 			mInfo.mCooldown = 0;
 		} else {
 			mInfo.mCooldown = (int) UnstableArrowsCooldownEnchantment.getCooldown(player, getAbilityScore() == 1 ? UNSTABLE_ARROWS_1_COOLDOWN : UNSTABLE_ARROWS_2_COOLDOWN, UnstableArrowsCooldownEnchantment.class);
@@ -73,6 +73,11 @@ public class UnstableArrows extends Ability {
 			AbstractArrow arrow = (AbstractArrow) proj;
 			if (mUnstableArrow != null && arrow == mUnstableArrow) {
 				arrow.setPickupStatus(Arrow.PickupStatus.DISALLOWED);
+				if (mPlayer == null || ScoreboardUtils.getScoreboardValue(mPlayer, "RocketJumper") == 9001) {
+					mInfo.mCooldown = 0;
+				} else {
+					mInfo.mCooldown = (int) UnstableArrowsCooldownEnchantment.getCooldown(mPlayer, getAbilityScore() == 1 ? UNSTABLE_ARROWS_1_COOLDOWN : UNSTABLE_ARROWS_2_COOLDOWN, UnstableArrowsCooldownEnchantment.class);
+				}
 				putOnCooldown();
 				mUnstableArrow = null;
 

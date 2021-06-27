@@ -111,7 +111,7 @@ public class DaggerThrow extends Ability {
 				}
 			}
 		}
-
+		mInfo.mCooldown = (int) DaggerThrowCooldownEnchantment.getCooldown(mPlayer, DAGGER_THROW_COOLDOWN, DaggerThrowCooldownEnchantment.class);
 		putOnCooldown();
 	}
 

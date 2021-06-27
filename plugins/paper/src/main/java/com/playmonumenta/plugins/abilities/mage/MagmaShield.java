@@ -2,6 +2,17 @@ package com.playmonumenta.plugins.abilities.mage;
 
 import java.util.EnumSet;
 
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
+import org.bukkit.World;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
+import org.bukkit.event.block.Action;
+import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.util.Vector;
+
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityManager;
@@ -17,17 +28,6 @@ import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.VectorUtils;
-
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
-import org.bukkit.World;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
-import org.bukkit.event.block.Action;
-import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.util.Vector;
 
 
 
@@ -93,6 +93,7 @@ public class MagmaShield extends Ability {
 
 	@Override
 	public void cast(Action action) {
+		mInfo.mCooldown = (int) MagmaShieldCooldownEnchantment.getCooldown(mPlayer, COOLDOWN_TICKS, MagmaShieldCooldownEnchantment.class);
 		putOnCooldown();
 
 		float damage = SpellPower.getSpellDamage(mPlayer, mLevelDamage);

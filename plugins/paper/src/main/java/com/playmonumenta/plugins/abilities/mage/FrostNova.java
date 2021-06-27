@@ -2,6 +2,15 @@ package com.playmonumenta.plugins.abilities.mage;
 
 import java.util.EnumSet;
 
+import org.bukkit.Location;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
+import org.bukkit.World;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
+import org.bukkit.event.block.Action;
+import org.bukkit.scheduler.BukkitRunnable;
+
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
@@ -16,15 +25,6 @@ import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.StringUtils;
-
-import org.bukkit.Location;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
-import org.bukkit.World;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
-import org.bukkit.event.block.Action;
-import org.bukkit.scheduler.BukkitRunnable;
 
 
 
@@ -86,6 +86,7 @@ public class FrostNova extends Ability {
 
 	@Override
 	public void cast(Action action) {
+		mInfo.mCooldown = (int) FrostNovaCooldownEnchantment.getCooldown(mPlayer, COOLDOWN_TICKS, FrostNovaCooldownEnchantment.class);
 		putOnCooldown();
 		float damage = SpellPower.getSpellDamage(mPlayer, mLevelDamage);
 		for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), SIZE, mPlayer)) {
