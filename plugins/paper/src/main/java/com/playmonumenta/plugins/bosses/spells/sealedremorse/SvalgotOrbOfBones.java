@@ -1,5 +1,7 @@
 package com.playmonumenta.plugins.bosses.spells.sealedremorse;
 
+import java.util.List;
+
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -14,9 +16,11 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 
+import com.playmonumenta.plugins.bosses.bosses.BeastOfTheBlackFlame;
 import com.playmonumenta.plugins.bosses.bosses.Svalgot;
 import com.playmonumenta.plugins.bosses.spells.SpellBaseSeekingProjectile;
 import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
 
@@ -97,7 +101,12 @@ public class SvalgotOrbOfBones extends SpellBaseSeekingProjectile {
 
 		}.runTaskLater(mPlugin, 20 * 15);
 
-		super.launch(target, targetLoc);
+		//List is farthest players in the beginning, and nearest players at the end
+		List<Player> players = EntityUtils.getNearestPlayers(mBoss.getLocation(), BeastOfTheBlackFlame.detectionRange);
+		if (players.size() > 0) {
+			Player playerOne = players.get(0);
+			super.launch(playerOne, playerOne.getEyeLocation());
+		}
 	}
 
 	@Override
