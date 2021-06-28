@@ -46,7 +46,7 @@ public class SvalgotOrbOfBones extends SpellBaseSeekingProjectile {
 
 	public SvalgotOrbOfBones(LivingEntity boss, Plugin plugin, Svalgot bossClass) {
 		super(plugin, boss, Svalgot.detectionRange, SINGLE_TARGET, LAUNCH_TRACKING, COOLDOWN, DELAY,
-				SPEED, TURN_RADIUS, LIFETIME_TICKS, HITBOX_LENGTH, COLLIDES_WITH_BLOCKS, LINGERS,
+				SPEED, TURN_RADIUS, LIFETIME_TICKS, HITBOX_LENGTH, COLLIDES_WITH_BLOCKS, LINGERS, 20, true,
 				// Initiate Aesthetic
 				(World world, Location loc, int ticks) -> {
 					PotionUtils.applyPotion(null, boss, new PotionEffect(PotionEffectType.GLOWING, DELAY, 0));
@@ -59,6 +59,7 @@ public class SvalgotOrbOfBones extends SpellBaseSeekingProjectile {
 				// Launch Aesthetic
 				(World world, Location loc, int ticks) -> {
 					world.playSound(loc, Sound.ITEM_FIRECHARGE_USE, SoundCategory.HOSTILE, 3, 0.5f);
+					world.playSound(loc, Sound.ENTITY_GHAST_HURT, SoundCategory.HOSTILE, 5, 1.5f);
 				},
 				// Projectile Aesthetic
 				(World world, Location loc, int ticks) -> {

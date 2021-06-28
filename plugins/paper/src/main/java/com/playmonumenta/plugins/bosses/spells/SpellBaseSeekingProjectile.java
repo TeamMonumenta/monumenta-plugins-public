@@ -58,6 +58,16 @@ public class SpellBaseSeekingProjectile extends Spell {
 	private final AestheticAction mLaunchAesthetic;
 	private final AestheticAction mProjectileAesthetic;
 	private final HitAction mHitAction;
+	private final int mCollisionCheckDelay;
+	private final boolean mCollidesWithOthers;
+
+	public SpellBaseSeekingProjectile(Plugin plugin, LivingEntity boss, int range, boolean singleTarget, boolean launchTracking, int cooldown, int delay,
+			double speed, double turnRadius, int lifetimeTicks, double hitboxLength, boolean collidesWithBlocks, boolean lingers,
+			AestheticAction initiateAesthetic, AestheticAction launchAesthetic, AestheticAction projectileAesthetic, HitAction hitAction) {
+		this(plugin, boss, range, singleTarget, launchTracking, cooldown, delay,
+				speed, turnRadius, lifetimeTicks, hitboxLength, collidesWithBlocks, lingers, 0, false,
+				initiateAesthetic, launchAesthetic, projectileAesthetic, hitAction);
+	}
 
 	/**
 	 * @param plugin              Plugin
@@ -79,7 +89,7 @@ public class SpellBaseSeekingProjectile extends Spell {
 	 * @param hitAction           Called when the projectile intersects a player (or possibly a block)
 	 */
 	public SpellBaseSeekingProjectile(Plugin plugin, LivingEntity boss, int range, boolean singleTarget, boolean launchTracking, int cooldown, int delay,
-			double speed, double turnRadius, int lifetimeTicks, double hitboxLength, boolean collidesWithBlocks, boolean lingers,
+			double speed, double turnRadius, int lifetimeTicks, double hitboxLength, boolean collidesWithBlocks, boolean lingers, int collisionCheckDelay, boolean collidesWithOthers,
 			AestheticAction initiateAesthetic, AestheticAction launchAesthetic, AestheticAction projectileAesthetic, HitAction hitAction) {
 		mPlugin = plugin;
 		mBoss = boss;
@@ -99,6 +109,8 @@ public class SpellBaseSeekingProjectile extends Spell {
 		mLaunchAesthetic = launchAesthetic;
 		mProjectileAesthetic = projectileAesthetic;
 		mHitAction = hitAction;
+		mCollisionCheckDelay = collisionCheckDelay;
+		mCollidesWithOthers = collidesWithOthers;
 	}
 
 	@Override
@@ -189,10 +201,12 @@ public class SpellBaseSeekingProjectile extends Spell {
 			Player mTarget = target;
 			Vector mDirection = targetLoc.subtract(mLocation).toVector().normalize();
 			int mTicks = 0;
+			int mCollisionDelayTicks = mCollisionCheckDelay;
 
 			@Override
 			public void run() {
 				mTicks++;
+				mCollisionDelayTicks--;
 
 				if (mTarget != null && (!mTarget.isOnline() || mTarget.isDead())) {
 					this.cancel();
@@ -236,7 +250,7 @@ public class SpellBaseSeekingProjectile extends Spell {
 				Vector shift = mDirection.clone().multiply(mSpeed);
 
 				Block block = mLocation.getBlock();
-				if (mCollidesWithBlocks) {
+				if (mCollidesWithBlocks && mCollisionDelayTicks <= 0) {
 					if (!block.isLiquid() && mHitbox.overlaps(block.getBoundingBox())) {
 						mHitAction.run(mWorld, null, mLocation.subtract(mDirection.multiply(0.5)));
 						this.cancel();
@@ -261,15 +275,17 @@ public class SpellBaseSeekingProjectile extends Spell {
 				mHitbox.shift(shift);
 				mProjectileAesthetic.run(mWorld, mLocation, mTicks);
 
-				// Grab all players that could have overlapping bounding boxes
-				for (Player player : PlayerUtils.playersInRange(mLocation, mHitboxLength + 2, true)) {
-					if (mHitbox.overlaps(player.getBoundingBox())) {
-						mHitAction.run(mWorld, player, mLocation);
-						this.cancel();
-						if (!mLingers) {
-							mActiveRunnables.remove(this);
+				if (mCollisionDelayTicks <= 0) {
+					// Grab all players that could have overlapping bounding boxes
+					for (Player player : PlayerUtils.playersInRange(mLocation, mHitboxLength + 2, true)) {
+						if (mHitbox.overlaps(player.getBoundingBox()) && (player.equals(mTarget) || !mCollidesWithOthers)) {
+							mHitAction.run(mWorld, player, mLocation);
+							this.cancel();
+							if (!mLingers) {
+								mActiveRunnables.remove(this);
+							}
+							return;
 						}
-						return;
 					}
 				}
 
