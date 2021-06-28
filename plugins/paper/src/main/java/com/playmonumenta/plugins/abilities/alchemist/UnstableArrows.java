@@ -95,7 +95,7 @@ public class UnstableArrows extends Ability {
 							world.playSound(mLoc, Sound.BLOCK_LAVA_EXTINGUISH, 1.6f, 1f + mTicks / 36f);
 							world.spawnParticle(Particle.LAVA, mLoc, 80, UNSTABLE_ARROWS_RADIUS, 0, UNSTABLE_ARROWS_RADIUS, 0);
 						}
-						if (mTicks >= UNSTABLE_ARROWS_DURATION + UnstableArrowsFuseEnchantment.getLevel(mPlayer, UnstableArrowsFuseEnchantment.class)) {
+						if (mTicks >= UNSTABLE_ARROWS_DURATION + 20 * UnstableArrowsFuseEnchantment.getLevel(mPlayer, UnstableArrowsFuseEnchantment.class)) {
 							arrow.remove();
 							world.playSound(mLoc, Sound.ENTITY_GENERIC_EXPLODE, 0.8f, 0f);
 							world.playSound(mLoc, Sound.ENTITY_GENERIC_EXPLODE, 0.8f, 1.25f);
