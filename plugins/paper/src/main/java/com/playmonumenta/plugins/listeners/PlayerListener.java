@@ -85,6 +85,7 @@ import org.bukkit.event.entity.EntityRegainHealthEvent;
 import org.bukkit.event.entity.EntityShootBowEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.inventory.ClickType;
+import org.bukkit.event.inventory.CraftItemEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
@@ -1230,6 +1231,25 @@ public class PlayerListener implements Listener {
 						plugin.mAbilityManager.updatePlayerAbilities(player);
 					}
 				}.runTaskLater(plugin, 0);
+			}
+		}
+	}
+
+	/*
+	 * Prevent crafting with custom items
+	 */
+	@EventHandler(ignoreCancelled = true)
+	public void craftItemEvent(@NotNull CraftItemEvent event) {
+		for (ItemStack item : event.getInventory().getMatrix()) {
+			if (item != null && item.hasItemMeta()) {
+				ItemMeta meta = item.getItemMeta();
+				if (meta.hasLore()) {
+					List<String> lore = ItemUtils.getPlainLore(item);
+					if (!lore.contains("Material")) {
+						event.setCancelled(true);
+						return;
+					}
+				}
 			}
 		}
 	}
