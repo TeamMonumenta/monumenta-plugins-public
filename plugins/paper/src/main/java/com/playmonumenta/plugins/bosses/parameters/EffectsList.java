@@ -58,7 +58,7 @@ public class EffectsList {
 
 		public void apply(Player p, LivingEntity boss) {
 			if (mEffect != null) {
-				p.addPotionEffect(new PotionEffect(mEffect, (int) mDuration, mLevel));
+				p.addPotionEffect(new PotionEffect(mEffect, (int) mDuration, mLevel, true, false));
 			} else {
 				EFFECT_RUNNER.get(mName).apply(p, boss, mDuration, mLevel);
 			}

@@ -23,7 +23,7 @@ public class OnHitBoss extends BossAbilityGroup {
 
 		//Particle & Sounds!
 		/** Particle summoned when the player got hit by the boss */
-		public ParticlesList PARTICLE = ParticlesList.fromString("[(RERDSTONE,20,0,0,0,#ffffff,2)]");
+		public ParticlesList PARTICLE = ParticlesList.fromString("[(REDSTONE,20,0,0,0,#ffffff,2)]");
 		/** Sound played when the player got hit by the boss */
 		public SoundsList SOUND = SoundsList.fromString("[(BLOCK_PORTAL_TRIGGER,0.25,2)]");
 
