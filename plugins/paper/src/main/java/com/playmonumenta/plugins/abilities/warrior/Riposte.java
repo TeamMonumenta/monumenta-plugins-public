@@ -12,8 +12,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
+import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
 import com.playmonumenta.plugins.Plugin;
@@ -21,7 +20,6 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
 import com.playmonumenta.plugins.enchantments.abilities.BaseAbilityEnchantment;
-import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
@@ -36,58 +34,88 @@ public class Riposte extends Ability {
 		}
 	}
 
-	private static final int RIPOSTE_COOLDOWN = 10 * 20;
-	private static final int RIPOSTE_SWORD_EFFECT_LEVEL = 1;
-	private static final int RIPOSTE_SWORD_DURATION = 5 * 20;
+	private static final int RIPOSTE_1_COOLDOWN = 12 * 20;
+	private static final int RIPOSTE_2_COOLDOWN = 10 * 20;
+	private static final int RIPOSTE_SWORD_DURATION = 2 * 20;
 	private static final int RIPOSTE_AXE_DURATION = 3 * 20;
 	private static final float RIPOSTE_KNOCKBACK_SPEED = 0.15f;
+
+	private BukkitRunnable mSwordTimer = null;
 
 	public Riposte(Plugin plugin, Player player) {
 		super(plugin, player, "Riposte");
 		mInfo.mLinkedSpell = ClassAbility.RIPOSTE;
 		mInfo.mScoreboardId = "Obliteration";
 		mInfo.mShorthandName = "Rip";
-		mInfo.mDescriptions.add("While wielding a sword or axe, you block a melee attack that would have hit you. Cooldown: 10s.");
-		mInfo.mDescriptions.add("If you block an attack with Riposte's effect while holding a sword, gain 5s of Strength II. If you block with Riposte's effect while holding an axe, the attacking mob is stunned for 4s.");
-		mInfo.mCooldown = (int) RiposteCooldownEnchantment.getCooldown(player, RIPOSTE_COOLDOWN, RiposteCooldownEnchantment.class);
+		mInfo.mDescriptions.add("While wielding a sword or axe, you block a melee attack that would have hit you. Cooldown: 12s.");
+		mInfo.mDescriptions.add("Cooldown lowered to 10s and if you block an attack with Riposte's effect while holding a sword, your next sword attack within 2s deals double damage. If you block with Riposte's effect while holding an axe, the attacking mob is stunned for 3s.");
+		int cooldown = getAbilityScore() == 1 ? RIPOSTE_1_COOLDOWN : RIPOSTE_2_COOLDOWN;
+		mInfo.mCooldown = (int) RiposteCooldownEnchantment.getCooldown(player, cooldown, RiposteCooldownEnchantment.class);
+		mInfo.mIgnoreCooldown = true;
 	}
 
 	@Override
 	public boolean playerDamagedByLivingEntityEvent(EntityDamageByEntityEvent event) {
-		if (EntityUtils.getRealFinalDamage(event) > 0) {
-			LivingEntity damager = (LivingEntity) event.getDamager();
-			if (event.getCause() == DamageCause.ENTITY_ATTACK
-					 && !(damager instanceof Guardian)) {
-				ItemStack mainHand = mPlayer.getInventory().getItemInMainHand();
-				MovementUtils.knockAway(mPlayer, damager, RIPOSTE_KNOCKBACK_SPEED);
+		if (!isTimerActive()) {
+			if (EntityUtils.getRealFinalDamage(event) > 0) {
+				LivingEntity damager = (LivingEntity) event.getDamager();
+				if (event.getCause() == DamageCause.ENTITY_ATTACK
+						 && !(damager instanceof Guardian)) {
+					ItemStack mainHand = mPlayer.getInventory().getItemInMainHand();
+					MovementUtils.knockAway(mPlayer, damager, RIPOSTE_KNOCKBACK_SPEED);
 
-				if (ItemUtils.isAxe(mainHand) || ItemUtils.isSword(mainHand)) {
-					if (getAbilityScore() > 1) {
-						if (ItemUtils.isSword(mainHand)) {
-							mPlugin.mPotionManager.addPotion(mPlayer, PotionID.APPLIED_POTION,
-							                                 new PotionEffect(PotionEffectType.INCREASE_DAMAGE, RIPOSTE_SWORD_DURATION,
-							                                                  RIPOSTE_SWORD_EFFECT_LEVEL, true, true));
-						} else if (ItemUtils.isAxe(mainHand)) {
-							if (!EntityUtils.isBoss(damager)) {
-								EntityUtils.applyStun(mPlugin, RIPOSTE_AXE_DURATION, damager);
+					if (ItemUtils.isAxe(mainHand) || ItemUtils.isSword(mainHand)) {
+						if (getAbilityScore() > 1) {
+							if (ItemUtils.isSword(mainHand)) {
+								if (mSwordTimer == null) {
+									mSwordTimer = new BukkitRunnable() {
+										int mTimer = 0;
+										public void run() {
+											if (mTimer >= RIPOSTE_SWORD_DURATION) {
+												this.cancel();
+												return;
+											}
+											mTimer += 5;
+										}
+									};
+								}
+								mSwordTimer.runTaskTimer(mPlugin, 0, 5);
+
+							} else if (ItemUtils.isAxe(mainHand)) {
+								if (!EntityUtils.isBoss(damager)) {
+									EntityUtils.applyStun(mPlugin, RIPOSTE_AXE_DURATION, damager);
+								}
 							}
 						}
-					}
 
-					World world = mPlayer.getWorld();
-					world.playSound(mPlayer.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1f, 1.2f);
-					world.playSound(mPlayer.getLocation(), Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, 0.75f, 1.8f);
-					Vector dir = LocationUtils.getDirectionTo(mPlayer.getLocation().add(0, 1, 0), damager.getLocation().add(0, damager.getHeight() / 2, 0));
-					Location loc = mPlayer.getLocation().add(0, 1, 0).subtract(dir);
-					world.spawnParticle(Particle.SWEEP_ATTACK, loc, 8, 0.75, 0.5, 0.75, 0.001);
-					world.spawnParticle(Particle.FIREWORKS_SPARK, loc, 20, 0.75, 0.5, 0.75, 0.1);
-					world.spawnParticle(Particle.CRIT, loc, 75, 0.1, 0.1, 0.1, 0.6);
-					mInfo.mCooldown = (int) RiposteCooldownEnchantment.getCooldown(mPlayer, RIPOSTE_COOLDOWN, RiposteCooldownEnchantment.class);
-					putOnCooldown();
-					return false;
+						World world = mPlayer.getWorld();
+						world.playSound(mPlayer.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1f, 1.2f);
+						world.playSound(mPlayer.getLocation(), Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, 0.75f, 1.8f);
+						Vector dir = LocationUtils.getDirectionTo(mPlayer.getLocation().add(0, 1, 0), damager.getLocation().add(0, damager.getHeight() / 2, 0));
+						Location loc = mPlayer.getLocation().add(0, 1, 0).subtract(dir);
+						world.spawnParticle(Particle.SWEEP_ATTACK, loc, 8, 0.75, 0.5, 0.75, 0.001);
+						world.spawnParticle(Particle.FIREWORKS_SPARK, loc, 20, 0.75, 0.5, 0.75, 0.1);
+						world.spawnParticle(Particle.CRIT, loc, 75, 0.1, 0.1, 0.1, 0.6);
+						int cooldown = getAbilityScore() == 1 ? RIPOSTE_1_COOLDOWN : RIPOSTE_2_COOLDOWN;
+						mInfo.mCooldown = (int) RiposteCooldownEnchantment.getCooldown(mPlayer, cooldown, RiposteCooldownEnchantment.class);
+						putOnCooldown();
+						return false;
+					}
 				}
 			}
 		}
+		return true;
+	}
+
+	public boolean livingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
+		Player player = (Player) event.getDamager();
+		if (ItemUtils.isSword(player.getInventory().getItemInMainHand())) {
+			if (mSwordTimer != null && !mSwordTimer.isCancelled()) {
+				event.setDamage(event.getDamage() * 2);
+				mSwordTimer.cancel();
+			}
+		}
+
 		return true;
 	}
 }

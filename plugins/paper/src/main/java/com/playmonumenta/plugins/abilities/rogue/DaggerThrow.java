@@ -58,7 +58,7 @@ public class DaggerThrow extends Ability {
 		mInfo.mLinkedSpell = ClassAbility.DAGGER_THROW;
 		mInfo.mScoreboardId = "DaggerThrow";
 		mInfo.mShorthandName = "DT";
-		mInfo.mDescriptions.add("Sneak left click while holding two swords to throw three daggers which deal 6 damage and gives each target 20% Vulnerability for 10 seconds. Cooldown: 15s.");
+		mInfo.mDescriptions.add("Sneak left click while holding two swords to throw three daggers which deal 6 damage and gives each target 20% Vulnerability for 10 seconds. Cooldown: 12s.");
 		mInfo.mDescriptions.add("The damage is increased to 12 and the Vulnerability increased to 40%.");
 		mInfo.mCooldown = (int) DaggerThrowCooldownEnchantment.getCooldown(player, DAGGER_THROW_COOLDOWN, DaggerThrowCooldownEnchantment.class);
 		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;

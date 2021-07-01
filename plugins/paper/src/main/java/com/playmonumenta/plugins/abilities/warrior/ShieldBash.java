@@ -20,6 +20,7 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
 import org.bukkit.inventory.ItemStack;
@@ -87,6 +88,10 @@ public class ShieldBash extends Ability {
 								world.spawnParticle(Particle.CLOUD, mobLoc, 5, 0.15, 0.5, 0.15, 0);
 								world.playSound(eyeLoc, Sound.ITEM_SHIELD_BLOCK, 1.5f, 1);
 								world.playSound(eyeLoc, Sound.ENTITY_PLAYER_ATTACK_CRIT, 1.5f, 0.5f);
+								if (mob instanceof Mob) {
+									((Mob) mob).setTarget(mPlayer);
+								}
+
 
 								if (getAbilityScore() == 1) {
 									EntityUtils.damageEntity(mPlugin, mob, damage, mPlayer);
