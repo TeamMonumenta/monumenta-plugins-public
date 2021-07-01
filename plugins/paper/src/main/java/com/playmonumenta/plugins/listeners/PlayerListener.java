@@ -1240,17 +1240,74 @@ public class PlayerListener implements Listener {
 	 */
 	@EventHandler(ignoreCancelled = true)
 	public void craftItemEvent(@NotNull CraftItemEvent event) {
+		ItemStack result = event.getCurrentItem();
+		Material resultMat = result.getType();
+		String resultMatStr = resultMat.getKey().toString();
+
+		boolean cancel = false;
+
+		boolean gotDye = false;
+		boolean resultIsDyed = false;
+		if (resultMat.equals(Material.FIREWORK_STAR)
+		    || resultMatStr.startsWith("minecraft:leather_")
+		    || resultMatStr.endsWith("_banner")
+		    || resultMatStr.endsWith("_shulker_box")) {
+			resultIsDyed = true;
+		}
+
+		boolean gotBanner = false;
+		boolean gotShield = resultMat.equals(Material.SHIELD);
+
 		for (ItemStack item : event.getInventory().getMatrix()) {
-			if (item != null && item.hasItemMeta()) {
-				ItemMeta meta = item.getItemMeta();
-				if (meta.hasLore()) {
-					List<String> lore = ItemUtils.getPlainLore(item);
-					if (!lore.contains("Material")) {
-						event.setCancelled(true);
-						return;
+			if (item != null) {
+				Material mat = item.getType();
+				String matStr = mat.getKey().toString();
+
+				if (item.hasItemMeta()) {
+					ItemMeta meta = item.getItemMeta();
+					if (meta.hasLore()) {
+						List<String> lore = ItemUtils.getPlainLore(item);
+						if (lore.contains("Material")) {
+							if (matStr.endsWith("_dye")) {
+								gotDye = true;
+							}
+							if (matStr.endsWith("_banner")) {
+								gotBanner = true;
+							}
+						} else {
+							cancel = true;
+						}
+					} else { // Has no lore
+						if (matStr.endsWith("_dye")) {
+							gotDye = true;
+						}
+						if (matStr.endsWith("_banner")) {
+							gotBanner = true;
+						}
+					}
+				} else { // Has no meta
+					if (matStr.endsWith("_dye")) {
+						gotDye = true;
+					}
+					if (matStr.endsWith("_banner")) {
+						gotBanner = true;
 					}
 				}
 			}
 		}
+
+		if (gotDye && resultIsDyed) {
+			cancel = false;
+		}
+		if (gotBanner && gotShield) {
+			cancel = false;
+		}
+		if (resultMat.equals(Material.WRITTEN_BOOK)) {
+			cancel = false;
+		}
+		if (resultMat.equals(Material.TIPPED_ARROW)) {
+			cancel = false;
+		}
+		event.setCancelled(cancel);
 	}
 }
