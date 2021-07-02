@@ -17,6 +17,7 @@ import com.comphenix.protocol.wrappers.nbt.NbtBase;
 import com.comphenix.protocol.wrappers.nbt.NbtCompound;
 import com.comphenix.protocol.wrappers.nbt.NbtFactory;
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.server.properties.ServerProperties;
 
 import org.bukkit.event.Listener;
 
@@ -36,6 +37,13 @@ public class ProtocolLibIntegration implements Listener {
 	public ProtocolLibIntegration(Plugin plugin) {
 		mLogger = plugin.getLogger();
 		mLogger.info("Enabling ProtocolLib integration");
+
+		if (!ServerProperties.getReplaceSpawnerEntities()) {
+			mLogger.info("Will not replace spawner entities on this shard");
+			return;
+		} else {
+			mLogger.info("Enabling replacement of spawner entities");
+		}
 
 		ProtocolManager manager = ProtocolLibrary.getProtocolManager();
 		manager.addPacketListener(new PacketAdapter(plugin, ListenerPriority.NORMAL,

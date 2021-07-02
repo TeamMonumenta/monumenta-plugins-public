@@ -1,26 +1,24 @@
 package com.playmonumenta.plugins.server.properties;
 
-import java.io.File;
-import java.io.FileNotFoundException;
+import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
+
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.utils.MessagingUtils;
+import com.playmonumenta.scriptedquests.utils.QuestUtils;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.utils.FileUtils;
-import com.playmonumenta.plugins.utils.MessagingUtils;
-
 public class ServerProperties {
-	private static final String FILE_NAME = "Properties.json";
-
 	/* Only the most recent instance of this is used */
 	private static ServerProperties INSTANCE = null;
 
@@ -36,12 +34,11 @@ public class ServerProperties {
 	private boolean mAuditMessagesEnabled = true;
 	private boolean mRepairExplosions = false;
 	private boolean mPreventDungeonItemTransfer = true;
+	private boolean mReplaceSpawnerEntities = true;
+	private boolean mInfusionsEnabled = true;
 	private int mHTTPStatusPort = 8000;
 
 	private String mShardName = "default_settings";
-	private String mRabbitHost = "rabbitmq";
-
-	private Set<String> mForbiddenItemLore = new HashSet<>();
 
 	private EnumSet<Material> mUnbreakableBlocks = EnumSet.noneOf(Material.class);
 	private EnumSet<Material> mAlwaysPickupMats = EnumSet.noneOf(Material.class);
@@ -111,6 +108,16 @@ public class ServerProperties {
 		return INSTANCE.mPreventDungeonItemTransfer;
 	}
 
+	public static boolean getReplaceSpawnerEntities() {
+		ensureInstance();
+		return INSTANCE.mReplaceSpawnerEntities;
+	}
+
+	public static boolean getInfusionsEnabled() {
+		ensureInstance();
+		return INSTANCE.mInfusionsEnabled;
+	}
+
 	public static int getHTTPStatusPort() {
 		ensureInstance();
 		return INSTANCE.mHTTPStatusPort;
@@ -119,16 +126,6 @@ public class ServerProperties {
 	public static String getShardName() {
 		ensureInstance();
 		return INSTANCE.mShardName;
-	}
-
-	public static String getRabbitHost() {
-		ensureInstance();
-		return INSTANCE.mRabbitHost;
-	}
-
-	public static Set<String> getForbiddenItemLore() {
-		ensureInstance();
-		return INSTANCE.mForbiddenItemLore;
 	}
 
 	public static Set<Material> getUnbreakableBlocks() {
@@ -152,70 +149,68 @@ public class ServerProperties {
 	}
 
 	private void loadInternal(Plugin plugin, CommandSender sender) {
-		final String fileLocation = plugin.getDataFolder() + File.separator + FILE_NAME;
+		QuestUtils.loadScriptedQuests(plugin, ".", sender, (object) -> {
+			mDailyResetEnabled = getPropertyValueBool(plugin, object, "dailyResetEnabled", mDailyResetEnabled);
+			mJoinMessagesEnabled = getPropertyValueBool(plugin, object, "joinMessagesEnabled", mJoinMessagesEnabled);
+			mIsTownWorld = getPropertyValueBool(plugin, object, "isTownWorld", mIsTownWorld);
+			mPlotSurvivalMinHeight = getPropertyValueInt(plugin, object, "plotSurvivalMinHeight", mPlotSurvivalMinHeight);
 
-		try {
-			String content = FileUtils.readFile(fileLocation);
-			if (content != null && content != "") {
-				loadFromString(plugin, content, sender);
-			}
-		} catch (FileNotFoundException e) {
-			plugin.getLogger().info("Properties.json file does not exist - using default values");
-		} catch (Exception e) {
-			plugin.getLogger().severe("Caught exception: " + e);
-			e.printStackTrace();
+			mIsSleepingEnabled = getPropertyValueBool(plugin, object, "isSleepingEnabled", mIsSleepingEnabled);
+			mKeepLowTierInventory = getPropertyValueBool(plugin, object, "keepLowTierInventory", mKeepLowTierInventory);
+			mClassSpecializationsEnabled = getPropertyValueBool(plugin, object, "classSpecializationsEnabled", mClassSpecializationsEnabled);
+			mAuditMessagesEnabled = getPropertyValueBool(plugin, object, "auditMessagesEnabled", mAuditMessagesEnabled);
+			mRepairExplosions = getPropertyValueBool(plugin, object, "repairExplosions", mRepairExplosions);
+			mPreventDungeonItemTransfer = getPropertyValueBool(plugin, object, "preventDungeonItemTransfer", mPreventDungeonItemTransfer);
+			mReplaceSpawnerEntities = getPropertyValueBool(plugin, object, "replaceSpawnerEntities", mReplaceSpawnerEntities);
+			mInfusionsEnabled = getPropertyValueBool(plugin, object, "infusionsEnabled", mInfusionsEnabled);
+			mHTTPStatusPort = getPropertyValueInt(plugin, object, "httpStatusPort", mHTTPStatusPort);
 
+			mShardName = getPropertyValueString(plugin, object, "shardName", mShardName);
+
+			getPropertyValueMaterialList(plugin, object, "unbreakableBlocks", sender, mUnbreakableBlocks);
+			getPropertyValueMaterialList(plugin, object, "alwaysPickupMaterials", sender, mAlwaysPickupMats);
+			getPropertyValueMaterialList(plugin, object, "namedPickupMaterials", sender, mNamedPickupMats);
+
+			return null;
+		});
+
+		plugin.getLogger().info("Properties:");
+		if (sender != null) {
+			sender.sendMessage("Properties:");
+		}
+		for (String str : toDisplay()) {
+			plugin.getLogger().info("  " + str);
 			if (sender != null) {
-				sender.sendMessage(ChatColor.RED + "Properties.json file does not exist - using default values");
-				MessagingUtils.sendStackTrace(sender, e);
+				sender.sendMessage("  " + str);
 			}
 		}
 	}
 
-	private void loadFromString(Plugin plugin, String content, CommandSender sender) throws Exception {
-		if (content != null && content != "") {
-			try {
-				Gson gson = new Gson();
+	private List<String> toDisplay() {
+		List<String> out = new ArrayList<>();
 
-				//  Load the file - if it exists, then let's start parsing it.
-				JsonObject object = gson.fromJson(content, JsonObject.class);
-				if (object != null) {
-					mDailyResetEnabled = getPropertyValueBool(plugin, object, "dailyResetEnabled", mDailyResetEnabled);
-					mJoinMessagesEnabled = getPropertyValueBool(plugin, object, "joinMessagesEnabled", mJoinMessagesEnabled);
-					mIsTownWorld = getPropertyValueBool(plugin, object, "isTownWorld", mIsTownWorld);
-					mPlotSurvivalMinHeight = getPropertyValueInt(plugin, object, "plotSurvivalMinHeight", mPlotSurvivalMinHeight);
+		out.add("dailyResetEnabled = " + mDailyResetEnabled);
+		out.add("joinMessagesEnabled = " + mJoinMessagesEnabled);
+		out.add("isTownWorld = " + mIsTownWorld);
+		out.add("plotSurvivalMinHeight = " + mPlotSurvivalMinHeight);
 
-					mIsSleepingEnabled = getPropertyValueBool(plugin, object, "isSleepingEnabled", mIsSleepingEnabled);
-					mKeepLowTierInventory = getPropertyValueBool(plugin, object, "keepLowTierInventory", mKeepLowTierInventory);
-					mClassSpecializationsEnabled = getPropertyValueBool(plugin, object, "classSpecializationsEnabled", mClassSpecializationsEnabled);
-					mAuditMessagesEnabled = getPropertyValueBool(plugin, object, "auditMessagesEnabled", mAuditMessagesEnabled);
-					mRepairExplosions = getPropertyValueBool(plugin, object, "repairExplosions", mRepairExplosions);
-					mPreventDungeonItemTransfer = getPropertyValueBool(plugin, object, "preventDungeonItemTransfer", mPreventDungeonItemTransfer);
-					mHTTPStatusPort = getPropertyValueInt(plugin, object, "httpStatusPort", mHTTPStatusPort);
+		out.add("isSleepingEnabled = " + mIsSleepingEnabled);
+		out.add("keepLowTierInventory = " + mKeepLowTierInventory);
+		out.add("classSpecializationsEnabled = " + mClassSpecializationsEnabled);
+		out.add("auditMessagesEnabled = " + mAuditMessagesEnabled);
+		out.add("repairExplosions = " + mRepairExplosions);
+		out.add("preventDungeonItemTransfer = " + mPreventDungeonItemTransfer);
+		out.add("replaceSpawnerEntities = " + mReplaceSpawnerEntities);
+		out.add("infusionsEnabled = " + mInfusionsEnabled);
+		out.add("httpStatusPort = " + mHTTPStatusPort);
 
-					mShardName = getPropertyValueString(plugin, object, "shardName", mShardName);
-					mRabbitHost = getPropertyValueString(plugin, object, "rabbitHost", mRabbitHost);
+		out.add("shardName = " + mShardName);
 
-					mForbiddenItemLore = getPropertyValueStringSet(plugin, object, "forbiddenItemLore");
+		out.add("unbreakableBlocks = [" + String.join("  ", mUnbreakableBlocks.stream().map((x) -> x.toString()).collect(Collectors.toList())) + "]");
+		out.add("alwaysPickupMaterials = [" + String.join("  ", mAlwaysPickupMats.stream().map((x) -> x.toString()).collect(Collectors.toList())) + "]");
+		out.add("namedPickupMaterials = [" + String.join("  ", mNamedPickupMats.stream().map((x) -> x.toString()).collect(Collectors.toList())) + "]");
 
-					mUnbreakableBlocks = getPropertyValueMaterialList(plugin, object, "unbreakableBlocks", sender);
-					mAlwaysPickupMats = getPropertyValueMaterialList(plugin, object, "alwaysPickupMaterials", sender);
-					mNamedPickupMats = getPropertyValueMaterialList(plugin, object, "namedPickupMaterials", sender);
-
-					if (sender != null) {
-						sender.sendMessage(ChatColor.GOLD + "Successfully reloaded monumenta configuration");
-					}
-				}
-			} catch (Exception e) {
-				plugin.getLogger().severe("Caught exception: " + e);
-				e.printStackTrace();
-
-				if (sender != null) {
-					sender.sendMessage(ChatColor.RED + "Failed to load configuration!");
-					MessagingUtils.sendStackTrace(sender, e);
-				}
-			}
-		}
+		return out;
 	}
 
 	private boolean getPropertyValueBool(Plugin plugin, JsonObject object, String properyName, boolean defaultVal) {
@@ -225,8 +220,6 @@ public class ServerProperties {
 		if (element != null) {
 			value = element.getAsBoolean();
 		}
-
-		plugin.getLogger().info("Properties: " + properyName + " = " + value);
 
 		return value;
 	}
@@ -239,8 +232,6 @@ public class ServerProperties {
 			value = element.getAsInt();
 		}
 
-		plugin.getLogger().info("Properties: " + properyName + " = " + value);
-
 		return value;
 	}
 
@@ -252,36 +243,14 @@ public class ServerProperties {
 			value = element.getAsString();
 		}
 
-		plugin.getLogger().info("Properties: " + properyName + " = " + value);
-
 		return value;
 	}
 
-	private Set<String> getPropertyValueStringSet(Plugin plugin, JsonObject object, String properyName) {
-		Set<String> value = new HashSet<>();
-
-		JsonElement element = object.get(properyName);
-		if (element != null) {
-			Iterator<JsonElement> targetIter = element.getAsJsonArray().iterator();
-			while (targetIter.hasNext()) {
-				value.add(targetIter.next().getAsString());
-			}
-		}
-
-		if (value.isEmpty()) {
-			plugin.getLogger().info("Properties: " + properyName + " = <all>");
-		} else {
-			plugin.getLogger().info("Properties: " + properyName + " = " + value.toString());
-		}
-
-		return value;
-	}
-
-	private EnumSet<Material> getPropertyValueMaterialList(Plugin plugin, JsonObject object, String propertyName, CommandSender sender) {
-		EnumSet<Material> value = EnumSet.noneOf(Material.class);
-
+	private void getPropertyValueMaterialList(Plugin plugin, JsonObject object, String propertyName, CommandSender sender, Set<Material> set) {
 		JsonElement element = object.get(propertyName);
 		if (element != null) {
+			set.clear();
+
 			Iterator<JsonElement> targetIter = element.getAsJsonArray().iterator();
 			while (targetIter.hasNext()) {
 				JsonElement iter = targetIter.next();
@@ -289,7 +258,7 @@ public class ServerProperties {
 					String blockName = iter.getAsString();
 					Material mat = Material.getMaterial(blockName);
 					if (mat != null) {
-						value.add(mat);
+						set.add(mat);
 					}
 				} catch (Exception e) {
 					plugin.getLogger().severe("Invalid unbreakableBlocks element at: '" + iter.toString() + "'");
@@ -302,13 +271,5 @@ public class ServerProperties {
 				}
 			}
 		}
-
-		if (value.isEmpty()) {
-			plugin.getLogger().info("Properties: " + propertyName + " = []");
-		} else {
-			plugin.getLogger().info("Properties: " + propertyName + " = " + value.toString());
-		}
-
-		return value;
 	}
 }

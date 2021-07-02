@@ -2,14 +2,15 @@ package com.playmonumenta.plugins.enchantments.infusions;
 
 import java.util.EnumSet;
 
-import org.bukkit.ChatColor;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
-
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.enchantments.BaseEnchantment;
 import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
 import com.playmonumenta.plugins.events.CustomDamageEvent;
+import com.playmonumenta.plugins.server.properties.ServerProperties;
+
+import org.bukkit.ChatColor;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
 
 public class Perspicacity implements BaseEnchantment {
 
@@ -23,7 +24,11 @@ public class Perspicacity implements BaseEnchantment {
 
 	@Override
 	public EnumSet<ItemSlot> getValidSlots() {
-		return EnumSet.of(ItemSlot.MAINHAND, ItemSlot.OFFHAND, ItemSlot.ARMOR);
+		if (ServerProperties.getInfusionsEnabled()) {
+			return EnumSet.of(ItemSlot.MAINHAND, ItemSlot.OFFHAND, ItemSlot.ARMOR);
+		} else {
+			return EnumSet.noneOf(ItemSlot.class);
+		}
 	}
 
 	@Override

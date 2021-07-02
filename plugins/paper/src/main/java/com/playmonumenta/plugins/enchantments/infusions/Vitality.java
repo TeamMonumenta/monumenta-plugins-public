@@ -3,15 +3,16 @@ package com.playmonumenta.plugins.enchantments.infusions;
 import java.util.Collection;
 import java.util.EnumSet;
 
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.enchantments.BaseEnchantment;
+import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
+import com.playmonumenta.plugins.server.properties.ServerProperties;
+
 import org.bukkit.ChatColor;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.entity.Player;
-
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.enchantments.BaseEnchantment;
-import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
 
 public class Vitality implements BaseEnchantment {
 
@@ -26,7 +27,11 @@ public class Vitality implements BaseEnchantment {
 
 	@Override
 	public EnumSet<ItemSlot> getValidSlots() {
-		return EnumSet.of(ItemSlot.ARMOR, ItemSlot.OFFHAND, ItemSlot.MAINHAND);
+		if (ServerProperties.getInfusionsEnabled()) {
+			return EnumSet.of(ItemSlot.MAINHAND, ItemSlot.OFFHAND, ItemSlot.ARMOR);
+		} else {
+			return EnumSet.noneOf(ItemSlot.class);
+		}
 	}
 
 	@Override

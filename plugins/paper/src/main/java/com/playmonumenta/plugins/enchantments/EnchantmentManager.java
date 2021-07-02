@@ -58,7 +58,6 @@ import com.playmonumenta.plugins.enchantments.curses.CurseOfEphemerality;
 import com.playmonumenta.plugins.enchantments.curses.CurseOfShrapnel;
 import com.playmonumenta.plugins.enchantments.curses.Starvation;
 import com.playmonumenta.plugins.enchantments.curses.TwoHanded;
-import com.playmonumenta.plugins.enchantments.other.ForbiddenItem;
 import com.playmonumenta.plugins.enchantments.other.PestilenceTesseract;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.ItemUtils;
@@ -110,7 +109,7 @@ public class EnchantmentManager implements Listener {
 		mPlugin = plugin;
 	}
 
-	public void load(Collection<String> forbiddenItemLore) {
+	public void load() {
 		mProperties.clear();
 		mSpawnedProperties.clear();
 
@@ -184,13 +183,6 @@ public class EnchantmentManager implements Listener {
 
 		// Tesseracts (not actually items a player can get enchants from)
 		init.add(new PestilenceTesseract());
-
-		// Forbidden items (dynamically set based on server config)
-		if (forbiddenItemLore != null && !forbiddenItemLore.isEmpty()) {
-			for (String str : forbiddenItemLore) {
-				init.add(new ForbiddenItem(str));
-			}
-		}
 
 		mEnchantLocator.clear();
 

@@ -2,6 +2,11 @@ package com.playmonumenta.plugins.enchantments.infusions;
 
 import java.util.EnumSet;
 
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.enchantments.BaseEnchantment;
+import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
+import com.playmonumenta.plugins.server.properties.ServerProperties;
+
 import org.bukkit.ChatColor;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -9,10 +14,6 @@ import org.bukkit.entity.Projectile;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.metadata.FixedMetadataValue;
-
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.enchantments.BaseEnchantment;
-import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
 
 public class Focus implements BaseEnchantment {
 
@@ -27,7 +28,11 @@ public class Focus implements BaseEnchantment {
 
 	@Override
 	public EnumSet<ItemSlot> getValidSlots() {
-		return EnumSet.of(ItemSlot.ARMOR, ItemSlot.OFFHAND, ItemSlot.MAINHAND);
+		if (ServerProperties.getInfusionsEnabled()) {
+			return EnumSet.of(ItemSlot.MAINHAND, ItemSlot.OFFHAND, ItemSlot.ARMOR);
+		} else {
+			return EnumSet.noneOf(ItemSlot.class);
+		}
 	}
 
 	@Override

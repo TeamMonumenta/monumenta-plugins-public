@@ -231,7 +231,7 @@ public class Plugin extends JavaPlugin {
 		}
 
 		mEnchantmentManager = new EnchantmentManager(this);
-		mEnchantmentManager.load(ServerProperties.getForbiddenItemLore());
+		mEnchantmentManager.load();
 
 		mAttributeManager = new AttributeManager();
 
@@ -447,7 +447,6 @@ public class Plugin extends JavaPlugin {
 	/* Sender will be sent debugging info if non-null */
 	public void reloadMonumentaConfig(CommandSender sender) {
 		ServerProperties.load(this, sender);
-		mEnchantmentManager.load(ServerProperties.getForbiddenItemLore());
 		mItemManager.load();
 	}
 }
