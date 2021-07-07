@@ -17,9 +17,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.playmonumenta.bungeecord.network.SocketManager;
-import com.playmonumenta.bungeecord.packets.BungeeCheckRaffleEligibilityPacket;
-import com.playmonumenta.bungeecord.packets.BungeeGetVotesUnclaimedPacket;
+import com.playmonumenta.bungeecord.integrations.NetworkRelayIntegration;
 import com.playmonumenta.bungeecord.utils.FileUtils;
 
 import net.md_5.bungee.api.ChatColor;
@@ -351,7 +349,7 @@ public class VoteContext {
 			mVotesUnclaimed = votesUnclaimed;
 		} else {
 			mPlugin.getLogger().info("Got vote rewards request message from '" + source + "' for " + uuid.toString());
-			SocketManager.sendPacket(new BungeeGetVotesUnclaimedPacket(source, uuid, mVotesUnclaimed));
+			NetworkRelayIntegration.sendGetVotesUnclaimedPacket(source, uuid, mVotesUnclaimed);
 			mVotesUnclaimed = 0;
 		}
 
@@ -361,14 +359,14 @@ public class VoteContext {
 	protected void gotShardRaffleEligibilityRequest(String source, UUID uuid, boolean claimReward, boolean eligible) {
 		if (!claimReward && !eligible) {
 			/* Request eligibility */
-			SocketManager.sendPacket(new BungeeCheckRaffleEligibilityPacket(source, uuid, claimReward, mRaffleWinsUnclaimed > 0));
+			NetworkRelayIntegration.sendCheckRaffleEligibilityPacket(source, uuid, claimReward, mRaffleWinsUnclaimed > 0);
 		} else if (!claimReward && eligible) {
 			/* Sending back a failed claim */
 			mRaffleWinsUnclaimed++;
 			save();
 		} else if (claimReward && !eligible) {
 			/* Request eligibility */
-			SocketManager.sendPacket(new BungeeCheckRaffleEligibilityPacket(source, uuid, claimReward, mRaffleWinsUnclaimed > 0));
+			NetworkRelayIntegration.sendCheckRaffleEligibilityPacket(source, uuid, claimReward, mRaffleWinsUnclaimed > 0);
 
 			if (mRaffleWinsUnclaimed > 0) {
 				mRaffleWinsUnclaimed--;

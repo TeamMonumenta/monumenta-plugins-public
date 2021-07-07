@@ -5,9 +5,9 @@ import java.io.IOException;
 import java.util.logging.Level;
 
 import com.playmonumenta.bungeecord.commands.Vote;
+import com.playmonumenta.bungeecord.integrations.NetworkRelayIntegration;
 import com.playmonumenta.bungeecord.listeners.EventListener;
 import com.playmonumenta.bungeecord.listeners.NameListener;
-import com.playmonumenta.bungeecord.network.SocketManager;
 import com.playmonumenta.bungeecord.reconnect.MonumentaReconnectHandler;
 import com.playmonumenta.bungeecord.voting.VoteManager;
 
@@ -31,11 +31,10 @@ public class Main extends Plugin {
 		saveConfig();
 
 		PluginManager manager = getProxy().getPluginManager();
-		try {
-			new SocketManager(this, mConfig.get("rabbitHost", "rabbitmq"));
-		} catch (Exception ex) {
-			/* TODO: This is probably a fatal exception! */
-			ex.printStackTrace();
+
+		// Hook into Monumenta Network Relay for message brokering if available
+		if (manager.getPlugin("MonumentaNetworkRelay") != null) {
+			manager.registerListener(this, new NetworkRelayIntegration(this.getLogger()));
 		}
 
 		if (!mConfig.contains("voting")) {

@@ -2,4 +2,4 @@ name: Monumenta-Bungee
 main: com.playmonumenta.bungeecord.Main
 version: 1.0
 author: Combustible
-softdepend: [Votifier, SuperVanish, PremiumVanish, BungeeTabListPlus, LuckPerms]
+softdepend: [MonumentaNetworkRelay, Votifier, SuperVanish, PremiumVanish, BungeeTabListPlus, LuckPerms]
