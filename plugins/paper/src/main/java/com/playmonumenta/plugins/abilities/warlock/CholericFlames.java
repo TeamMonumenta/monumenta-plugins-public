@@ -47,7 +47,7 @@ public class CholericFlames extends Ability {
 		mInfo.mScoreboardId = "CholericFlames";
 		mInfo.mShorthandName = "CF";
 		mInfo.mDescriptions.add("Sneaking and right-clicking while not looking down while holding a scythe knocks back and ignites mobs within 8 blocks of you for 7s, additionally dealing 3 damage. Cooldown: 10s.");
-		mInfo.mDescriptions.add("The damage is increased to 5, and also afflict mobs with Poison II.");
+		mInfo.mDescriptions.add("The damage is increased to 5, and also afflict mobs with Hunger II.");
 		mInfo.mLinkedSpell = ClassAbility.CHOLERIC_FLAMES;
 		mInfo.mCooldown = COOLDOWN;
 		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
@@ -90,7 +90,7 @@ public class CholericFlames extends Ability {
 			EntityUtils.applyFire(mPlugin, DURATION, mob, mPlayer);
 
 			if (getAbilityScore() > 1) {
-				PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(PotionEffectType.POISON, DURATION, 1, false, true));
+				PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(PotionEffectType.HUNGER, DURATION, 1, false, true));
 			}
 		}
 

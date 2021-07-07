@@ -39,8 +39,8 @@ public class UmbralWail extends Ability {
 	private static final double MOVE_SPEED = 0.5;
 	private static final int DURATION_1 = 5 * 20;
 	private static final int DURATION_2 = 8 * 20;
-	private static final int DAMAGE_1 = 10;
-	private static final int DAMAGE_2 = 16;
+	private static final int DAMAGE_1 = 15;
+	private static final int DAMAGE_2 = 20;
 
 	private final int mDamage;
 	private final int mDuration;
@@ -50,8 +50,8 @@ public class UmbralWail extends Ability {
 		mInfo.mLinkedSpell = ClassAbility.UMBRAL_WAIL;
 		mInfo.mScoreboardId = "UmbralWail";
 		mInfo.mShorthandName = "UW";
-		mInfo.mDescriptions.add("Right-click while sprinting and holding a scythe to unleash a chilling shadow in the direction you are looking. This shadow travels for 10 blocks and deals 10 damage to all mobs it passes through, afflicting them with 5s of Silence. Silence prevents mobs from using spells, but does not work on Bosses. Cooldown: 20s.");
-		mInfo.mDescriptions.add("The damage done by the shadow is increased to 16, and the Silence duration is increased to 8s.");
+		mInfo.mDescriptions.add("Right-click while sprinting and holding a scythe to unleash a chilling shadow in the direction you are looking. This shadow travels for 10 blocks and deals 15 damage to all mobs it passes through, afflicting them with 5s of Silence. Silence prevents mobs from using spells, but does not work on Bosses. Cooldown: 20s.");
+		mInfo.mDescriptions.add("The damage done by the shadow is increased to 20 and the Silence duration is increased to 8s.");
 		mInfo.mCooldown = COOLDOWN;
 		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
 		mDamage = getAbilityScore() == 1 ? DAMAGE_1 : DAMAGE_2;

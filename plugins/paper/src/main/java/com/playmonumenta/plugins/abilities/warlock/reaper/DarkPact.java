@@ -37,7 +37,7 @@ public class DarkPact extends Ability {
 	private static final String AESTHETICS_EFFECT_NAME = "DarkPactAestheticsEffect";
 	private static final String PERCENT_DAMAGE_DEALT_EFFECT_NAME = "DarkPactPercentDamageDealtEffect";
 	private static final String PERCENT_ATKS_EFFECT_NAME = "DarkPactPercentAtksEffect";
-	private static final int DURATION = 20 * 10;
+	private static final int DURATION = 20 * 7;
 	private static final int DURATION_INCREASE_ON_KILL = 20 * 1;
 	private static final double PERCENT_DAMAGE_DEALT_1 = 0.4;
 	private static final double PERCENT_DAMAGE_DEALT_2 = 1.0;
@@ -46,7 +46,7 @@ public class DarkPact extends Ability {
 	private static final double PERCENT_ATKS_2 = 0.2;
 	private static final int ABSORPTION_ON_KILL = 1;
 	private static final int MAX_ABSORPTION = 6;
-	private static final int COOLDOWN = 20 * 20;
+	private static final int COOLDOWN = 20 * 14;
 
 	private final double mPercentDamageDealt;
 	private final double mPercentAtks;
@@ -57,7 +57,7 @@ public class DarkPact extends Ability {
 		super(plugin, player, "Dark Pact");
 		mInfo.mScoreboardId = "DarkPact";
 		mInfo.mShorthandName = "DaP";
-		mInfo.mDescriptions.add("Swapping while airborne and holding a scythe causes a dark aura to form around you. For the next 10 seconds, you gain 10% damage reduction, +10% attack speed, and deal +40% melee damage. Each kill during this time increases the duration of your aura by 1 second and gives 1 absorption health (capped at 6) for the duration of the aura. However, the player cannot heal for 10 seconds. Cooldown: 20s.");
+		mInfo.mDescriptions.add("Swapping while airborne and not sneaking and holding a scythe causes a dark aura to form around you. For the next 7 seconds, you gain 10% damage reduction, +10% attack speed, and deal +40% melee damage. Each kill during this time increases the duration of your aura by 1 second and gives 1 absorption health (capped at 6) for the duration of the aura. However, the player cannot heal for 10 seconds. Cooldown: 14s.");
 		mInfo.mDescriptions.add("You gain +20% attack speed and deal +100% melee damage, and Soul Rend bypasses the healing prevention, healing the player by +2/+4 HP, depending on the level of Soul Rend. Nearby players are still healed as normal.");
 		mInfo.mCooldown = COOLDOWN;
 		mInfo.mLinkedSpell = ClassAbility.DARK_PACT;
@@ -76,7 +76,7 @@ public class DarkPact extends Ability {
 		if (ItemUtils.isHoe(mPlayer.getInventory().getItemInMainHand())) {
 			event.setCancelled(true);
 			// *TO DO* - Turn into boolean in constructor -or- look at changing trigger entirely
-			if (mPlayer.isOnGround() || mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.mLinkedSpell) || (mPlayer.isSneaking() && mJudgementChain != null && mPlayer.getLocation().getPitch() < -50.0)) {
+			if (mPlayer.isOnGround() || mPlayer.isSneaking() || mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.mLinkedSpell) || (mPlayer.isSneaking() && mJudgementChain != null && mPlayer.getLocation().getPitch() < -50.0)) {
 				return;
 			}
 

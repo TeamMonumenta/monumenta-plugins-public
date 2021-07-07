@@ -9,6 +9,8 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
+
 
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
@@ -34,6 +36,7 @@ public class Eruption implements BaseEnchantment {
 	private static final String THUNDER_NAME = ChatColor.GRAY + "Thunder Aspect";
 	private static final String DECAY_NAME = ChatColor.GRAY + "Decay";
 	private static final String BLEED_NAME = ChatColor.GRAY + "Bleeding";
+	private static final String SAPPER_NAME = ChatColor.GRAY + "Sapper";
 	private static final Particle.DustOptions YELLOW_1_COLOR = new Particle.DustOptions(Color.fromRGB(255, 255, 20), 1.0f);
 	private static final Particle.DustOptions YELLOW_2_COLOR = new Particle.DustOptions(Color.fromRGB(255, 255, 120), 1.0f);
 	private static final Particle.DustOptions BLEED_COLOR = new Particle.DustOptions(Color.fromRGB(210, 44, 44), 1.0f);
@@ -61,6 +64,7 @@ public class Eruption implements BaseEnchantment {
 			int thunder = InventoryUtils.getCustomEnchantLevel(item, THUNDER_NAME, true);
 			int decay = InventoryUtils.getCustomEnchantLevel(item, DECAY_NAME, true);
 			int bleed = InventoryUtils.getCustomEnchantLevel(item, BLEED_NAME, true);
+			int sapper = InventoryUtils.getCustomEnchantLevel(item, SAPPER_NAME, true);
 
 
 			//Damage any mobs in the area
@@ -80,6 +84,19 @@ public class Eruption implements BaseEnchantment {
 				}
 				if (bleed > 0) {
 					EntityUtils.applyBleed(plugin, 100, level, mob);
+				}
+			}
+
+			//Sapper Interaction
+			if (sapper > 0) {
+				player.playSound(player.getLocation(), Sound.BLOCK_ENCHANTMENT_TABLE_USE, 2.0f, 1.6f);
+				player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 0.05f, 1.0f);
+				player.getWorld().spawnParticle(Particle.HEART, event.getBlock().getLocation().add(0, 1, 0), 25, 1.5, 1.5, 1.5);
+				for (Player p : PlayerUtils.playersInRange(event.getBlock().getLocation(), RADIUS, true)) {
+					if (p == player) {
+						continue;
+					}
+					PlayerUtils.healPlayer(p, sapper);
 				}
 			}
 
