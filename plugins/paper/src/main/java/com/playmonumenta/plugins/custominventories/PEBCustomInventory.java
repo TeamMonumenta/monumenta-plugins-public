@@ -1,30 +1,25 @@
-package com.playmonumenta.plugins.guis.singlepageguis;
+package com.playmonumenta.plugins.custominventories;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 
+import com.goncalomb.bukkit.mylib.utils.CustomInventory;
+import com.playmonumenta.scriptedquests.utils.ScoreboardUtils;
+
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
-
-import com.playmonumenta.plugins.guis.SinglePageGUI;
-import com.playmonumenta.scriptedquests.utils.ScoreboardUtils;
-
 import net.md_5.bungee.api.ChatColor;
 
-import java.util.ArrayList;
-import java.util.List;
-
-public class PebGui extends SinglePageGUI {
-
-	private static final int ROWS = 6;
-	private static final int COLUMNS = 9;
+public class PEBCustomInventory extends CustomInventory {
 	private static final Material FILLER = Material.GRAY_STAINED_GLASS_PANE;
 
 	public static class PebItem {
@@ -233,51 +228,24 @@ public class PebGui extends SinglePageGUI {
 				Material.BLACK_WOOL, "clickable peb_skin_black"));
 	}
 
-	public PebGui(Player player, String[] args) {
-		super(player, args);
-	}
-
-	/*
-	 * You MUST call this method from the SinglePageGUIManager. The example
-	 * call for this example GUI is there for reference.
-	 */
-	@Override
-	public void registerCommand() {
-		registerCommand("openPEB");
-	}
-
-	@Override
-	public SinglePageGUI constructGUI(Player player, String[] args) {
-		return new PebGui(player, args);
-	}
-
-	@Override
-	public Inventory getInventory(Player player, String[] args) {
-		Inventory baseInventory;
-		//in case of someone messing with the score, this should fix it to the correct init values
+	public PEBCustomInventory(Player player) {
+		super(player, 54, player.getName() + "'s P.E.B");
 
 		ScoreboardUtils.setScoreboardValue(player, "PEBPage", 1);
 
-		//Create inventory and call the builder
-
-		baseInventory = Bukkit.createInventory(null, ROWS*COLUMNS, Component.text(player.getName() + "'s P.E.B."));
-
-		setLayout(1, player, baseInventory);
-
-		return baseInventory;
+		setLayout(1, player);
 	}
-
 	@Override
-	public void processClick(InventoryClickEvent event) {
+	protected void inventoryClick(InventoryClickEvent event) {
+		event.setCancelled(true);
 		Player player = null;
-		Inventory inventory = event.getClickedInventory();
 		if (event.getWhoClicked() instanceof Player) {
 			player = (Player) event.getWhoClicked();
 		} else {
 			return;
 		}
 		ItemStack clickedItem = event.getCurrentItem();
-		if (event.getClickedInventory() != mInventory) {
+		if (event.getClickedInventory() != _inventory) {
 			return;
 		}
 		int newPageValue;
@@ -292,7 +260,7 @@ public class PebGui extends SinglePageGUI {
 					}
 					if (item.mCommand.startsWith("page")) {
 						newPageValue = Integer.parseInt(item.mCommand.split(" ")[1]);
-						setLayout(newPageValue, player, inventory);
+						setLayout(newPageValue, player);
 						return;
 					} else if (item.mCommand.startsWith("exit")) {
 						player.closeInventory();
@@ -309,7 +277,7 @@ public class PebGui extends SinglePageGUI {
 					}
 					if (item.mCommand.startsWith("page")) {
 						newPageValue = Integer.parseInt(item.mCommand.split(" ")[1]);
-						setLayout(newPageValue, player, inventory);
+						setLayout(newPageValue, player);
 						return;
 					} else {
 						completeCommand(player, item.mCommand);
@@ -373,26 +341,23 @@ public class PebGui extends SinglePageGUI {
 		meta.setLore(finalLines);
 	}
 
-	public Inventory setLayout(int page, Player player, Inventory inventory) {
+	public void setLayout(int page, Player player) {
 
-		inventory.clear();
+		_inventory.clear();
 		for (PebItem item : PEB_ITEMS) {
 			if (item.mPage == 0) {
-				inventory.setItem(item.mSlot, createCustomItem(item, player));
+				_inventory.setItem(item.mSlot, createCustomItem(item, player));
 			} //intentionally not else, so overrides can happen
 			if (item.mPage == page) {
-				inventory.setItem(item.mSlot, createCustomItem(item, player));
+				_inventory.setItem(item.mSlot, createCustomItem(item, player));
 			}
 		}
 
-		for (int i = 0; i < (ROWS*COLUMNS); i++) {
-			if (inventory.getItem(i) == null) {
-				inventory.setItem(i, new ItemStack(FILLER, 1));
+		for (int i = 0; i < 54; i++) {
+			if (_inventory.getItem(i) == null) {
+				_inventory.setItem(i, new ItemStack(FILLER, 1));
 			}
 		}
-		com.playmonumenta.plugins.utils.ScoreboardUtils.setScoreboardValue(player, "PEBPage", page);
-
-		return inventory;
+		ScoreboardUtils.setScoreboardValue(player, "PEBPage", page);
 	}
-
 }
