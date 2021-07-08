@@ -23,5 +23,13 @@ public class CustomInventoryCommands {
 				new PEBCustomInventory(player).openInventory(player, plugin);
 			})
 			.register();
+
+		new CommandAPICommand("openparrotgui")
+			.withArguments(new EntitySelectorArgument("player", EntitySelector.ONE_PLAYER))
+			.executes((sender, args) -> {
+				Player player = (Player)args[0];
+				new ParrotCustomInventory(player).openInventory(player, plugin);
+			})
+			.register();
 	}
 }
