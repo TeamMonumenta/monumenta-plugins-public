@@ -31,7 +31,7 @@ import com.playmonumenta.plugins.utils.MovementUtils;
 
 public class SpellAirGolemStrike extends Spell {
 
-	private static final String GOLEM_NAME = "PermafrostConstuct";
+	private static final String GOLEM_NAME = "PermafrostConstruct";
 
 	private Plugin mPlugin;
 	private LivingEntity mBoss;

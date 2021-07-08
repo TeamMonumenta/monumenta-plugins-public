@@ -2,6 +2,19 @@ package com.playmonumenta.plugins.abilities.alchemist;
 
 import java.util.EnumSet;
 
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
+import org.bukkit.World;
+import org.bukkit.entity.Item;
+import org.bukkit.entity.Player;
+import org.bukkit.event.block.Action;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.util.Vector;
+
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
@@ -16,19 +29,6 @@ import com.playmonumenta.plugins.utils.PlayerUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
-
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
-import org.bukkit.World;
-import org.bukkit.entity.Item;
-import org.bukkit.entity.Player;
-import org.bukkit.event.block.Action;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.util.Vector;
 
 public class IronTincture extends Ability {
 
@@ -69,7 +69,8 @@ public class IronTincture extends Ability {
 		return mPlayer.isSneaking()
 		       && !ItemUtils.isSomeBow(mainHand)
 		       && mainHand.getType() != Material.SPLASH_POTION
-		       && mainHand.getType() != Material.LINGERING_POTION;
+		       && mainHand.getType() != Material.LINGERING_POTION
+		       && !mainHand.getType().isBlock();
 	}
 
 	@Override

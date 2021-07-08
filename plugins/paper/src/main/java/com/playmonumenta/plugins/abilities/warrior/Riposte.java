@@ -20,6 +20,7 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
 import com.playmonumenta.plugins.enchantments.abilities.BaseAbilityEnchantment;
+import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
@@ -57,7 +58,7 @@ public class Riposte extends Ability {
 	@Override
 	public boolean playerDamagedByLivingEntityEvent(EntityDamageByEntityEvent event) {
 		if (!isTimerActive()) {
-			if (EntityUtils.getRealFinalDamage(event) > 0) {
+			if (!AbilityUtils.isBlocked(event)) {
 				LivingEntity damager = (LivingEntity) event.getDamager();
 				if (event.getCause() == DamageCause.ENTITY_ATTACK
 						 && !(damager instanceof Guardian)) {
@@ -70,9 +71,11 @@ public class Riposte extends Ability {
 								if (mSwordTimer == null) {
 									mSwordTimer = new BukkitRunnable() {
 										int mTimer = 0;
+										@Override
 										public void run() {
 											if (mTimer >= RIPOSTE_SWORD_DURATION) {
 												this.cancel();
+												mSwordTimer = null;
 												return;
 											}
 											mTimer += 5;
@@ -107,12 +110,14 @@ public class Riposte extends Ability {
 		return true;
 	}
 
+	@Override
 	public boolean livingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
 		Player player = (Player) event.getDamager();
 		if (ItemUtils.isSword(player.getInventory().getItemInMainHand())) {
 			if (mSwordTimer != null && !mSwordTimer.isCancelled()) {
 				event.setDamage(event.getDamage() * 2);
 				mSwordTimer.cancel();
+				mSwordTimer = null;
 			}
 		}
 

@@ -20,7 +20,7 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 public class IceAspect implements BaseEnchantment {
 	private static final int ICE_ASPECT_DURATION = 20 * 5;
 	public static final String PROPERTY_NAME = ChatColor.GRAY + "Ice Aspect";
-	private static final String LEVEL_METAKEY = "IceAspectLevelMetakey";
+	public static final String LEVEL_METAKEY = "IceAspectLevelMetakey";
 
 	@Override
 	public String getProperty() {
@@ -42,8 +42,9 @@ public class IceAspect implements BaseEnchantment {
 		}
 	}
 
-	// Thrown trident damage handling
+	// Thrown trident damage handling - DOES NOT WORK, implemented in AttributeThrowRate instead
 	@Override
+	@Deprecated
 	public void onLaunchProjectile(Plugin plugin, Player player, int level, Projectile proj, ProjectileLaunchEvent event) {
 		if (proj instanceof Trident) {
 			proj.setMetadata(LEVEL_METAKEY, new FixedMetadataValue(plugin, level));

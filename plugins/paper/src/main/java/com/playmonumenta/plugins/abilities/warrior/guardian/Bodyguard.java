@@ -2,20 +2,6 @@ package com.playmonumenta.plugins.abilities.warrior.guardian;
 
 import java.util.List;
 
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.abilities.AbilityTrigger;
-import com.playmonumenta.plugins.classes.ClassAbility;
-import com.playmonumenta.plugins.potion.PotionManager.PotionID;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.FastUtils;
-import com.playmonumenta.plugins.utils.ItemUtils;
-import com.playmonumenta.plugins.utils.LocationUtils;
-import com.playmonumenta.plugins.utils.MovementUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.plugins.utils.ZoneUtils;
-import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
-
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -30,7 +16,19 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
-
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.abilities.AbilityTrigger;
+import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.potion.PotionManager.PotionID;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.LocationUtils;
+import com.playmonumenta.plugins.utils.MovementUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.utils.ZoneUtils;
+import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
 
 public class Bodyguard extends Ability {
 	private static final int COOLDOWN = 30 * 20;
@@ -93,7 +91,14 @@ public class Bodyguard extends Ability {
 
 				break;
 			}
+
+			boolean hasTeleported = false;
 			for (Player player : players) {
+				//Prevents bodyguarding to multiple people
+				if (hasTeleported) {
+					break;
+				}
+
 				// If looking at another player, or reached the end of range check and looking down
 				if (player.getBoundingBox().overlaps(box)) {
 					// Double LClick detection
@@ -139,13 +144,15 @@ public class Bodyguard extends Ability {
 						world.spawnParticle(Particle.EXPLOSION_NORMAL, player.getLocation().add(0, 0.15, 0), 0, (float) pdir.getX(), 0f, (float) pdir.getZ(), FastUtils.randomDoubleInRange(0.15, 0.5));
 					}
 
-					if (mPlayer.getLocation().distance(player.getLocation()) > 1) {
-						mPlayer.teleport(player.getLocation().clone().subtract(dir.clone().multiply(0.5)).add(0, 0.5, 0));
+					Location userLoc = mPlayer.getLocation();
+					Location targetLoc = player.getLocation().setDirection(mPlayer.getEyeLocation().getDirection()).subtract(dir.clone().multiply(0.5)).add(0, 0.5, 0);
+					if (userLoc.distance(player.getLocation()) > 1) {
+						mPlayer.teleport(targetLoc);
+						hasTeleported = true;
 					}
 
-					Location tloc = player.getLocation().clone().subtract(dir.clone().multiply(0.5)).add(0, 0.5, 0);
-					world.playSound(tloc, Sound.ENTITY_BLAZE_SHOOT, 1, 0.75f);
-					world.playSound(tloc, Sound.ENTITY_ENDER_DRAGON_HURT, 1, 0.9f);
+					world.playSound(targetLoc, Sound.ENTITY_BLAZE_SHOOT, 0.75f, 0.75f);
+					world.playSound(targetLoc, Sound.ENTITY_ENDER_DRAGON_HURT, 0.75f, 0.9f);
 
 					mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_OTHER,
 							new PotionEffect(PotionEffectType.ABSORPTION, BUFF_DURATION, mAbsorptionAmplifier, false, true));

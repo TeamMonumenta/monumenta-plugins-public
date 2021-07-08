@@ -1,13 +1,5 @@
 package com.playmonumenta.plugins.abilities.warrior.berserker;
 
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.abilities.AbilityManager;
-import com.playmonumenta.plugins.abilities.AbilityTrigger;
-import com.playmonumenta.plugins.classes.ClassAbility;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.ItemUtils;
-
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -20,6 +12,15 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.inventory.ItemStack;
+
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.abilities.AbilityManager;
+import com.playmonumenta.plugins.abilities.AbilityTrigger;
+import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.classes.magic.MagicType;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.ItemUtils;
 
 
 
@@ -87,8 +88,7 @@ public class RecklessSwing extends Ability {
 				world.spawnParticle(Particle.SWEEP_ATTACK, loc, 25, 2, 0, 2, 0);
 
 				for (LivingEntity mob : EntityUtils.getNearbyMobs(loc, RADIUS)) {
-					mob.setNoDamageTicks(0);
-					EntityUtils.damageEntity(mPlugin, mob, mDamage, mPlayer);
+					EntityUtils.damageEntity(mPlugin, mob, mDamage, mPlayer, MagicType.PHYSICAL, true, mInfo.mLinkedSpell, true, true, true, false);
 					if (mRampage != null) {
 						mRampage.customRecklessSwingInteraction(mDamage);
 					}

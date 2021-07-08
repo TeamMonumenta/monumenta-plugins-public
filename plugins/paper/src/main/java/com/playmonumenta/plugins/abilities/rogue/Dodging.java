@@ -3,14 +3,6 @@ package com.playmonumenta.plugins.abilities.rogue;
 import java.util.Collection;
 import java.util.EnumSet;
 
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.classes.ClassAbility;
-import com.playmonumenta.plugins.effects.PercentSpeed;
-import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
-import com.playmonumenta.plugins.enchantments.abilities.BaseAbilityEnchantment;
-import com.playmonumenta.plugins.utils.EntityUtils;
-
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -26,6 +18,14 @@ import org.bukkit.event.entity.PotionSplashEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.potion.PotionData;
 import org.bukkit.potion.PotionType;
+
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.effects.PercentSpeed;
+import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
+import com.playmonumenta.plugins.enchantments.abilities.BaseAbilityEnchantment;
+import com.playmonumenta.plugins.utils.AbilityUtils;
 
 
 
@@ -96,8 +96,7 @@ public class Dodging extends Ability {
 	public boolean playerDamagedByProjectileEvent(EntityDamageByEntityEvent event) {
 		// See if we should dodge. If false, allow the event to proceed normally
 		Projectile proj = (Projectile) event.getDamager();
-		if ((proj.getShooter() != null && proj.getShooter() instanceof Player) ||
-				mPlayer.isBlocking() || EntityUtils.getRealFinalDamage(event) <= 0) {
+		if ((proj.getShooter() != null && proj.getShooter() instanceof Player) || AbilityUtils.isBlocked(event)) {
 			return true;
 		}
 

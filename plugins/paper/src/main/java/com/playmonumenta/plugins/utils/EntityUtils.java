@@ -701,6 +701,7 @@ public class EntityUtils {
 
 	// Manually calculates the real final damage dealt to a player, in case of manual event calls or absorption hearts.
 	// Evasion is not accounted for, as evasion modifies the actual event damage. Works only for players.
+	// Does NOT include blocking, so a separate check (event.getFinalDamage > 0) is needed for that
 	public static double getRealFinalDamage(EntityDamageEvent event) {
 		if (!(event.getEntity() instanceof Player)) {
 			// Give garbage value if being used incorrectly

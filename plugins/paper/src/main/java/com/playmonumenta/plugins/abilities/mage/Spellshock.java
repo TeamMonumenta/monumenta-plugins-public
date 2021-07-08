@@ -9,6 +9,15 @@ import java.util.ListIterator;
 import java.util.NavigableSet;
 import java.util.Set;
 
+import org.bukkit.Location;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
+import org.bukkit.World;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
+
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.classes.ClassAbility;
@@ -23,14 +32,6 @@ import com.playmonumenta.plugins.events.CustomDamageEvent;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.scriptedquests.utils.MetadataUtils;
-
-import org.bukkit.Location;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
-import org.bukkit.World;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
 
 
 
@@ -140,7 +141,7 @@ public class Spellshock extends Ability {
 									 *
 									 * (registerEvent set to true instead of false below)
 									 */
-									EntityUtils.damageEntity(mPlugin, nearbyMob, damage, mPlayer, MagicType.ARCANE, false, mInfo.mLinkedSpell, false, false, false, true);
+									EntityUtils.damageEntity(mPlugin, nearbyMob, damage, mPlayer, MagicType.ARCANE, false, mInfo.mLinkedSpell, false, false, true, true);
 								}
 
 								NavigableSet<Effect> effectGroup = mPlugin.mEffectManager.getEffects(mob, SPELL_SHOCK_STATIC_EFFECT_NAME);
@@ -160,7 +161,8 @@ public class Spellshock extends Ability {
 					}
 				}
 			}
-		} else if (event.appliesSpellshock()) {
+		}
+		if (event.appliesSpellshock()) {
 			NavigableSet<Effect> effectGroup = mPlugin.mEffectManager.getEffects(mob, SPELL_SHOCK_STATIC_EFFECT_NAME);
 			if (effectGroup != null) {
 				SpellShockStatic effect = (SpellShockStatic) effectGroup.last();
@@ -175,7 +177,9 @@ public class Spellshock extends Ability {
 
 	@Override
 	public boolean livingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
-		mPlugin.mEffectManager.addEffect(event.getEntity(), SPELL_SHOCK_STATIC_EFFECT_NAME, new SpellShockStatic(DURATION_TICKS));
+		if (event.getCause() == DamageCause.ENTITY_ATTACK || event.getCause() == DamageCause.ENTITY_SWEEP_ATTACK) {
+			mPlugin.mEffectManager.addEffect(event.getEntity(), SPELL_SHOCK_STATIC_EFFECT_NAME, new SpellShockStatic(DURATION_TICKS));
+		}
 		return true;
 	}
 

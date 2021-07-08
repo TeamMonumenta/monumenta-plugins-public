@@ -12,9 +12,9 @@ import org.bukkit.scheduler.BukkitRunnable;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.alchemist.PotionAbility;
 import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.effects.PercentDamageReceived;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.plugins.effects.PercentDamageReceived;
 
 public class InvigoratingOdor extends PotionAbility {
 
@@ -49,7 +49,7 @@ public class InvigoratingOdor extends PotionAbility {
 			public void run() {
 				world.spawnParticle(Particle.REDSTONE, loc, 3, 0.3, 0.3, 0.3, APOTHECARY_DARK_COLOR);
 				world.spawnParticle(Particle.END_ROD, loc, 1, radius / 2, 0.15, radius / 2, 0.05);
-				world.spawnParticle(Particle.REDSTONE, loc, (int) Math.pow(radius, 2) * 2, radius / 2, 0.15, radius / 2, APOTHECARY_LIGHT_COLOR);
+				world.spawnParticle(Particle.REDSTONE, loc, (int) Math.pow(radius, 2), radius / 2, 0.15, radius / 2, APOTHECARY_LIGHT_COLOR);
 
 				for (Player player : PlayerUtils.playersInRange(loc, radius, true)) {
 					mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_OTHER, new PotionEffect(PotionEffectType.SPEED, INVIGORATING_DURATION, 0, true, true));

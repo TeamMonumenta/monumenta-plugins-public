@@ -10,6 +10,7 @@ import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.enchantments.BaseEnchantment;
 import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
+import com.playmonumenta.plugins.utils.AbilityUtils;
 
 public class MeleeEvasion implements BaseEnchantment {
 
@@ -27,7 +28,7 @@ public class MeleeEvasion implements BaseEnchantment {
 
 	@Override
 	public void onHurtByEntity(Plugin plugin, Player player, int level, EntityDamageByEntityEvent event) {
-		if (event.getCause() == DamageCause.ENTITY_ATTACK) {
+		if (event.getCause() == DamageCause.ENTITY_ATTACK && !AbilityUtils.isBlocked(event)) {
 			EvasionInfo.addStacks(player, 2 * level);
 		}
 	}

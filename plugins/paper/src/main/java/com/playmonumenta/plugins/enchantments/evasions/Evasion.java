@@ -9,6 +9,7 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.enchantments.BaseEnchantment;
 import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
+import com.playmonumenta.plugins.utils.AbilityUtils;
 
 public class Evasion implements BaseEnchantment {
 
@@ -26,7 +27,9 @@ public class Evasion implements BaseEnchantment {
 
 	@Override
 	public void onHurtByEntity(Plugin plugin, Player player, int level, EntityDamageByEntityEvent event) {
-		EvasionInfo.addStacks(player, level);
+		if (!AbilityUtils.isBlocked(event)) {
+			EvasionInfo.addStacks(player, level);
+		}
 	}
 
 }

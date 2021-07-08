@@ -26,7 +26,7 @@ public class ThunderAspect implements BaseEnchantment {
 	public static final String PROPERTY_NAME = ChatColor.GRAY + "Thunder Aspect";
 	private static final Particle.DustOptions YELLOW_1_COLOR = new Particle.DustOptions(Color.fromRGB(255, 255, 20), 1.0f);
 	private static final Particle.DustOptions YELLOW_2_COLOR = new Particle.DustOptions(Color.fromRGB(255, 255, 120), 1.0f);
-	private static final String LEVEL_METAKEY = "ThunderAspectLevelMetakey";
+	public static final String LEVEL_METAKEY = "ThunderAspectLevelMetakey";
 
 	@Override
 	public String getProperty() {
@@ -67,8 +67,9 @@ public class ThunderAspect implements BaseEnchantment {
 		}
 	}
 
-	// Thrown trident damage handling
+	// Thrown trident damage handling - DOES NOT WORK, implemented in AttributeThrowRate instead
 	@Override
+	@Deprecated
 	public void onLaunchProjectile(Plugin plugin, Player player, int level, Projectile proj, ProjectileLaunchEvent event) {
 		if (proj instanceof Trident) {
 			proj.setMetadata(LEVEL_METAKEY, new FixedMetadataValue(plugin, level));

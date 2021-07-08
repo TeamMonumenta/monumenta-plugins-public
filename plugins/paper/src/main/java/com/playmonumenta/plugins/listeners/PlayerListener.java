@@ -6,48 +6,6 @@ import java.util.Map;
 
 import javax.annotation.Nullable;
 
-import com.playmonumenta.plugins.Constants;
-import com.playmonumenta.plugins.Constants.Colors;
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.attributes.AttributeProjectileDamage;
-import com.playmonumenta.plugins.commands.ToggleSwap;
-import com.playmonumenta.plugins.enchantments.Bleeding;
-import com.playmonumenta.plugins.enchantments.Decay;
-import com.playmonumenta.plugins.enchantments.Duelist;
-import com.playmonumenta.plugins.enchantments.Frost;
-import com.playmonumenta.plugins.enchantments.HexEater;
-import com.playmonumenta.plugins.enchantments.IceAspect;
-import com.playmonumenta.plugins.enchantments.Inferno;
-import com.playmonumenta.plugins.enchantments.PointBlank;
-import com.playmonumenta.plugins.enchantments.RegionScalingDamageDealt;
-import com.playmonumenta.plugins.enchantments.Slayer;
-import com.playmonumenta.plugins.enchantments.Sniper;
-import com.playmonumenta.plugins.enchantments.Spark;
-import com.playmonumenta.plugins.enchantments.StatTrack.StatTrackOptions;
-import com.playmonumenta.plugins.enchantments.StatTrackManager;
-import com.playmonumenta.plugins.enchantments.ThunderAspect;
-import com.playmonumenta.plugins.enchantments.curses.CurseOfEphemerality;
-import com.playmonumenta.plugins.enchantments.evasions.EvasionInfo;
-import com.playmonumenta.plugins.enchantments.infusions.Focus;
-import com.playmonumenta.plugins.events.AbilityCastEvent;
-import com.playmonumenta.plugins.events.EvasionEvent;
-import com.playmonumenta.plugins.point.Point;
-import com.playmonumenta.plugins.portals.PortalManager;
-import com.playmonumenta.plugins.potion.PotionManager.PotionID;
-import com.playmonumenta.plugins.server.properties.ServerProperties;
-import com.playmonumenta.plugins.server.reset.DailyReset;
-import com.playmonumenta.plugins.utils.ChestUtils;
-import com.playmonumenta.plugins.utils.CommandUtils;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.GraveUtils;
-import com.playmonumenta.plugins.utils.InventoryUtils;
-import com.playmonumenta.plugins.utils.ItemUtils;
-import com.playmonumenta.plugins.utils.PotionUtils;
-import com.playmonumenta.plugins.utils.ScoreboardUtils;
-import com.playmonumenta.plugins.utils.ZoneUtils;
-import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
-import com.playmonumenta.scriptedquests.utils.MetadataUtils;
-
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -130,6 +88,50 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.projectiles.ProjectileSource;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.NotNull;
+
+import com.playmonumenta.plugins.Constants;
+import com.playmonumenta.plugins.Constants.Colors;
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.attributes.AttributeProjectileDamage;
+import com.playmonumenta.plugins.attributes.AttributeThrowRate;
+import com.playmonumenta.plugins.commands.ToggleSwap;
+import com.playmonumenta.plugins.enchantments.Bleeding;
+import com.playmonumenta.plugins.enchantments.Decay;
+import com.playmonumenta.plugins.enchantments.Duelist;
+import com.playmonumenta.plugins.enchantments.Frost;
+import com.playmonumenta.plugins.enchantments.HexEater;
+import com.playmonumenta.plugins.enchantments.IceAspect;
+import com.playmonumenta.plugins.enchantments.Inferno;
+import com.playmonumenta.plugins.enchantments.PointBlank;
+import com.playmonumenta.plugins.enchantments.Regicide;
+import com.playmonumenta.plugins.enchantments.RegionScalingDamageDealt;
+import com.playmonumenta.plugins.enchantments.Slayer;
+import com.playmonumenta.plugins.enchantments.Sniper;
+import com.playmonumenta.plugins.enchantments.Spark;
+import com.playmonumenta.plugins.enchantments.StatTrack.StatTrackOptions;
+import com.playmonumenta.plugins.enchantments.StatTrackManager;
+import com.playmonumenta.plugins.enchantments.ThunderAspect;
+import com.playmonumenta.plugins.enchantments.curses.CurseOfEphemerality;
+import com.playmonumenta.plugins.enchantments.evasions.EvasionInfo;
+import com.playmonumenta.plugins.enchantments.infusions.Focus;
+import com.playmonumenta.plugins.events.AbilityCastEvent;
+import com.playmonumenta.plugins.events.EvasionEvent;
+import com.playmonumenta.plugins.point.Point;
+import com.playmonumenta.plugins.portals.PortalManager;
+import com.playmonumenta.plugins.potion.PotionManager.PotionID;
+import com.playmonumenta.plugins.server.properties.ServerProperties;
+import com.playmonumenta.plugins.server.reset.DailyReset;
+import com.playmonumenta.plugins.utils.ChestUtils;
+import com.playmonumenta.plugins.utils.CommandUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.GraveUtils;
+import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.PotionUtils;
+import com.playmonumenta.plugins.utils.ScoreboardUtils;
+import com.playmonumenta.plugins.utils.ZoneUtils;
+import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
+import com.playmonumenta.scriptedquests.utils.MetadataUtils;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -1086,6 +1088,7 @@ public class PlayerListener implements Listener {
 					Inferno.onShootAttack(mPlugin, proj, le, event);
 					Focus.onShootAttack(mPlugin, proj, le, event);
 					Spark.onShootAttack(mPlugin, proj, le, event);
+					Regicide.onShootAttack(mPlugin, proj, le, event);
 
 					if (damager instanceof Trident) {
 						IceAspect.onShootAttack(mPlugin, proj, le, event);
@@ -1095,7 +1098,13 @@ public class PlayerListener implements Listener {
 						HexEater.onShootAttack(mPlugin, proj, le, event);
 						Slayer.onShootAttack(mPlugin, proj, le, event);
 						Duelist.onShootAttack(mPlugin, proj, le, event);
-						Focus.onShootAttack(mPlugin, proj, le, event);
+
+						//Fire aspect trident implementation
+						if (damager.hasMetadata(AttributeThrowRate.FIRE_ASPECT_META) && !EntityUtils.isFireResistant(le)) {
+							le.setFireTicks(le.getFireTicks() + 4 * 20 * damager.getMetadata(AttributeThrowRate.FIRE_ASPECT_META).get(0).asInt());
+						}
+
+						Inferno.onShootAttack(mPlugin, proj, le, event);
 
 						/*
 						 * The trident damage from Smite, Bane, Impaling seems to be properly applied, even

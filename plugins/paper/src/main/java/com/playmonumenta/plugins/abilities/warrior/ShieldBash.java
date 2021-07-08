@@ -3,17 +3,6 @@ package com.playmonumenta.plugins.abilities.warrior;
 import java.util.EnumSet;
 import java.util.List;
 
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.abilities.AbilityTrigger;
-import com.playmonumenta.plugins.classes.ClassAbility;
-import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
-import com.playmonumenta.plugins.enchantments.abilities.BaseAbilityEnchantment;
-import com.playmonumenta.plugins.point.Raycast;
-import com.playmonumenta.plugins.point.RaycastData;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.ItemUtils;
-
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -27,6 +16,17 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
+
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.abilities.AbilityTrigger;
+import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
+import com.playmonumenta.plugins.enchantments.abilities.BaseAbilityEnchantment;
+import com.playmonumenta.plugins.point.Raycast;
+import com.playmonumenta.plugins.point.RaycastData;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.ItemUtils;
 
 
 
@@ -55,8 +55,8 @@ public class ShieldBash extends Ability {
 		mInfo.mLinkedSpell = ClassAbility.SHIELD_BASH;
 		mInfo.mScoreboardId = "ShieldBash";
 		mInfo.mShorthandName = "SB";
-		mInfo.mDescriptions.add("Block while looking at an enemy within 4 blocks to deal 5 damage and stun them for 1 second. Cooldown: 8s.");
-		mInfo.mDescriptions.add("Additionally, deal 5 damage and stun for 1 second all enemies in a 2 block radius from the enemy you are looking at.");
+		mInfo.mDescriptions.add("Block while looking at an enemy within 4 blocks to deal 5 damage, stun for 1 second, and taunt. Cooldown: 8s.");
+		mInfo.mDescriptions.add("Additionally, apply damage, stun, and taunt to all enemies in a 2 block radius from the enemy you are looking at.");
 		mInfo.mCooldown = SHIELD_BASH_COOLDOWN;
 		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
 	}
@@ -88,10 +88,6 @@ public class ShieldBash extends Ability {
 								world.spawnParticle(Particle.CLOUD, mobLoc, 5, 0.15, 0.5, 0.15, 0);
 								world.playSound(eyeLoc, Sound.ITEM_SHIELD_BLOCK, 1.5f, 1);
 								world.playSound(eyeLoc, Sound.ENTITY_PLAYER_ATTACK_CRIT, 1.5f, 0.5f);
-								if (mob instanceof Mob) {
-									((Mob) mob).setTarget(mPlayer);
-								}
-
 
 								if (getAbilityScore() == 1) {
 									EntityUtils.damageEntity(mPlugin, mob, damage, mPlayer);
@@ -100,6 +96,9 @@ public class ShieldBash extends Ability {
 									} else {
 										EntityUtils.applyStun(mPlugin, SHIELD_BASH_STUN, mob);
 									}
+									if (mob instanceof Mob) {
+										((Mob) mob).setTarget(mPlayer);
+									}
 								} else {
 									for (LivingEntity le : EntityUtils.getNearbyMobs(mob.getLocation(), SHIELD_BASH_2_RADIUS)) {
 										EntityUtils.damageEntity(mPlugin, le, damage, mPlayer);
@@ -107,6 +106,9 @@ public class ShieldBash extends Ability {
 											le.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, SHIELD_BASH_STUN, 6));
 										} else {
 											EntityUtils.applyStun(mPlugin, SHIELD_BASH_STUN, le);
+										}
+										if (le instanceof Mob) {
+											((Mob) le).setTarget(mPlayer);
 										}
 									}
 								}

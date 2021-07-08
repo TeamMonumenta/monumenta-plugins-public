@@ -8,10 +8,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.effects.AbilitySilence;
-import com.playmonumenta.plugins.potion.PotionManager.PotionID;
-
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
@@ -27,6 +23,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.ThrownPotion;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
@@ -36,6 +33,10 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.potion.PotionType;
 import org.bukkit.scheduler.BukkitRunnable;
+
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.effects.AbilitySilence;
+import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 
 
 
@@ -405,5 +406,9 @@ public class AbilityUtils {
 		default:
 			return 0;
 		}
+	}
+
+	public static boolean isBlocked(EntityDamageEvent event) {
+		return event.getFinalDamage() <= 0;
 	}
 }

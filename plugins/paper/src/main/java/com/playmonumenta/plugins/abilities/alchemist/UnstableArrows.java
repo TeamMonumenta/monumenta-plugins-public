@@ -58,7 +58,7 @@ public class UnstableArrows extends Ability {
 		mInfo.mLinkedSpell = ClassAbility.UNSTABLE_ARROWS;
 		mInfo.mScoreboardId = "BombArrow";
 		mInfo.mShorthandName = "UA";
-		mInfo.mDescriptions.add(" When you crouch and fire an arrow it will begin to hiss upon landing. 3s later it explodes, dealing 12 damage to mobs within a four block radius and spawning an Alchemist Potion at the location. Cooldown: 20 seconds. You can toggle whether the explosion will apply knockback to you or not in the P.E.B.");
+		mInfo.mDescriptions.add("When you crouch and fire an arrow it will begin to hiss upon landing. 3s later it explodes, dealing 12 damage to mobs within a four block radius and spawning an Alchemist Potion at the location. Cooldown: 20 seconds. You can toggle whether the explosion will apply knockback to you or not in the P.E.B.");
 		mInfo.mDescriptions.add("The damage is increased to 20 and the cooldown is reduced to 16s.");
 		if (player == null || ScoreboardUtils.getScoreboardValue(player, "RocketJumper") == 9001) {
 			mInfo.mCooldown = 0;

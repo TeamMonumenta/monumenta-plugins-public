@@ -14,10 +14,16 @@ import org.bukkit.entity.Trident;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.enchantments.IceAspect;
+import com.playmonumenta.plugins.enchantments.Inferno;
+import com.playmonumenta.plugins.enchantments.Regicide;
 import com.playmonumenta.plugins.enchantments.RegionScalingDamageDealt;
+import com.playmonumenta.plugins.enchantments.ThunderAspect;
 import com.playmonumenta.plugins.enchantments.curses.TwoHanded;
+import com.playmonumenta.plugins.enchantments.infusions.Focus;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.NmsUtils;
@@ -25,6 +31,7 @@ import com.playmonumenta.plugins.utils.NmsUtils;
 public class AttributeThrowRate implements BaseAttribute {
 	//Trident attribute only
 	private static final String PROPERTY_NAME = "Throw Rate";
+	public static final String FIRE_ASPECT_META = "FireAspectLevelMetakey";
 
 	@Override
 	public String getProperty() {
@@ -62,12 +69,45 @@ public class AttributeThrowRate implements BaseAttribute {
 				// Make trident unpickupable, set cooldown, damage trident based on Unbreaking enchant
 				player.playSound(player.getLocation(), Sound.ITEM_TRIDENT_THROW, SoundCategory.PLAYERS, 1, 1);
 				player.setCooldown(item.getType(), (int)(20 / value));
+				new BukkitRunnable() {
+					@Override
+					public void run() {
+						player.playSound(player.getLocation(), Sound.ITEM_TRIDENT_RETURN, SoundCategory.PLAYERS, 2.0f, 1);
+					}
+				}.runTaskLater(plugin, (int)(20 / value));
+
 				if (player.getGameMode() != GameMode.CREATIVE) {
 					ItemUtils.damageItemWithUnbreaking(mainhand, 1, false);
 				}
 
 				// Duplicate the entity, then cancel the throw event so the trident doesn't leave inventory
 				Trident newProj = NmsUtils.duplicateEntity(trident);
+
+				// This is super jank and should be made less so. Tried a few ways and had no success
+				int fireAspectLevel = player.getInventory().getItemInMainHand().getEnchantmentLevel(Enchantment.FIRE_ASPECT);
+				if (fireAspectLevel > 0) {
+					newProj.setMetadata(FIRE_ASPECT_META, new FixedMetadataValue(plugin, fireAspectLevel));
+				}
+				int iceAspectLevel = plugin.mTrackingManager.mPlayers.getPlayerCustomEnchantLevel(player, IceAspect.class);
+				if (iceAspectLevel > 0) {
+					newProj.setMetadata(IceAspect.LEVEL_METAKEY, new FixedMetadataValue(plugin, iceAspectLevel));
+				}
+				int thunderAspectLevel = plugin.mTrackingManager.mPlayers.getPlayerCustomEnchantLevel(player, ThunderAspect.class);
+				if (thunderAspectLevel > 0) {
+					newProj.setMetadata(ThunderAspect.LEVEL_METAKEY, new FixedMetadataValue(plugin, thunderAspectLevel));
+				}
+				int focusLevel = plugin.mTrackingManager.mPlayers.getPlayerCustomEnchantLevel(player, Focus.class);
+				if (focusLevel > 0) {
+					newProj.setMetadata(Focus.LEVEL_METAKEY, new FixedMetadataValue(plugin, focusLevel));
+				}
+				int infernoLevel = plugin.mTrackingManager.mPlayers.getPlayerCustomEnchantLevel(player, Inferno.class);
+				if (infernoLevel > 0) {
+					newProj.setMetadata(Inferno.LEVEL_METAKEY, new FixedMetadataValue(plugin, infernoLevel));
+				}
+				int regicideLevel = plugin.mTrackingManager.mPlayers.getPlayerCustomEnchantLevel(player, Regicide.class);
+				if (regicideLevel > 0) {
+					newProj.setMetadata(Regicide.LEVEL_METAKEY, new FixedMetadataValue(plugin, regicideLevel));
+				}
 
 				// Set a bunch of stuff that isn't caught by the entity duplication
 				newProj.setShooter(player);
@@ -80,6 +120,7 @@ public class AttributeThrowRate implements BaseAttribute {
 
 				newProj.setPickupStatus(PickupStatus.CREATIVE_ONLY);
 				trident.setPickupStatus(PickupStatus.CREATIVE_ONLY);
+
 				event.setCancelled(true);
 			}
 		} else if (proj instanceof Snowball) {

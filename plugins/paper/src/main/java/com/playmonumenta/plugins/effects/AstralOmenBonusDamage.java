@@ -7,6 +7,7 @@ import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 
@@ -31,7 +32,8 @@ public class AstralOmenBonusDamage extends Effect {
 
 	@Override
 	public boolean entityReceiveDamageEvent(EntityDamageEvent event) {
-		if (event instanceof EntityDamageByEntityEvent && mPlayer.equals(((EntityDamageByEntityEvent) event).getDamager())) {
+		if (event instanceof EntityDamageByEntityEvent && mPlayer.equals(((EntityDamageByEntityEvent) event).getDamager())
+				|| ((EntityDamageByEntityEvent) event).getDamager() instanceof Projectile && mPlayer.equals(((Projectile)((EntityDamageByEntityEvent) event).getDamager()).getShooter())) {
 			Entity entity = event.getEntity();
 			if (entity instanceof LivingEntity) {
 				LivingEntity mob = (LivingEntity) entity;

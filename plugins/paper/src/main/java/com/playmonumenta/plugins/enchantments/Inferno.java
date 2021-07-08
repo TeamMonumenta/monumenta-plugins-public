@@ -46,7 +46,7 @@ public class Inferno implements BaseEnchantment {
 	public static final String INFERNO_TAG_METAKEY = "InfernoTagMob";
 	public static final String OLD_FIRE_TICKS_METAKEY = "MobFireTicksPreAttack";
 	private static final String PROPERTY_NAME = ChatColor.GRAY + "Inferno";
-	private static final String LEVEL_METAKEY = "InfernoLevelMetakey";
+	public static final String LEVEL_METAKEY = "InfernoLevelMetakey";
 
 	public static final Map<LivingEntity, InfernoMob> sTaggedMobs = new HashMap<LivingEntity, InfernoMob>();
 	private static BukkitRunnable sRunnable = null;

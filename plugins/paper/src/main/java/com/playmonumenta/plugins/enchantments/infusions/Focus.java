@@ -2,11 +2,6 @@ package com.playmonumenta.plugins.enchantments.infusions;
 
 import java.util.EnumSet;
 
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.enchantments.BaseEnchantment;
-import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
-import com.playmonumenta.plugins.server.properties.ServerProperties;
-
 import org.bukkit.ChatColor;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -15,10 +10,15 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.metadata.FixedMetadataValue;
 
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.enchantments.BaseEnchantment;
+import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
+import com.playmonumenta.plugins.server.properties.ServerProperties;
+
 public class Focus implements BaseEnchantment {
 
 	public static final String PROPERTY_NAME = ChatColor.GRAY + "Focus";
-	private static final String LEVEL_METAKEY = "FocusLevelMetakey";
+	public static final String LEVEL_METAKEY = "FocusLevelMetakey";
 	private static final double DAMAGE_PCT_PER_LEVEL = 0.01;
 
 	@Override

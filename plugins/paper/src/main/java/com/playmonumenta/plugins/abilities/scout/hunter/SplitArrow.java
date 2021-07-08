@@ -64,11 +64,11 @@ public class SplitArrow extends Ability {
 				world.spawnParticle(Particle.CRIT_MAGIC, eye, 20, 0, 0, 0, 0.6);
 				world.playSound(eye, Sound.ENTITY_ARROW_HIT, 1, 1.2f);
 
-				nearestMob.setNoDamageTicks(0);
-				double lastDamage = nearestMob.getLastDamage();
-				EntityUtils.damageEntity(mPlugin, nearestMob, event.getDamage() * mDamagePercent, mPlayer, MagicType.PHYSICAL, true, mInfo.mLinkedSpell);
-				nearestMob.setLastDamage(lastDamage + event.getDamage() * mDamagePercent);
+				EntityUtils.damageEntity(mPlugin, nearestMob, event.getDamage() * mDamagePercent, mPlayer, MagicType.PHYSICAL, true, mInfo.mLinkedSpell, true, true, true, false);
 				MovementUtils.knockAway(damagee, nearestMob, 0.125f, 0.35f);
+				if (proj instanceof SpectralArrow) {
+					nearestMob.addPotionEffect(SPECTRAL_ARROW_EFFECT);
+				}
 			}
 		}
 

@@ -14,6 +14,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
+import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.AbsorptionUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
@@ -78,7 +79,7 @@ public class PrismaticShield extends Ability {
 	@Override
 	public boolean playerDamagedEvent(EntityDamageEvent event) {
 		// Do not process cancelled damage events
-		if (event.isCancelled() || event instanceof EntityDamageByEntityEvent || mPlayer.isBlocking()) {
+		if (event.isCancelled() || event instanceof EntityDamageByEntityEvent) {
 			return true;
 		}
 
@@ -87,6 +88,10 @@ public class PrismaticShield extends Ability {
 	}
 
 	private void execute(EntityDamageEvent event) {
+		if (AbilityUtils.isBlocked(event)) {
+			return;
+		}
+
 		// Calculate whether this effect should not be run based on player health.
 		// It is intentional that Prismatic Shield saves you from death if you take a buttload of damage somehow.
 		double healthRemaining = mPlayer.getHealth() + AbsorptionUtils.getAbsorption(mPlayer) - EntityUtils.getRealFinalDamage(event);
