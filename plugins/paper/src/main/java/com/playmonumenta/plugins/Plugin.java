@@ -57,6 +57,7 @@ import com.playmonumenta.plugins.commands.UnlockHeldItem;
 import com.playmonumenta.plugins.commands.ToggleSwap;
 import com.playmonumenta.plugins.commands.UnsignBook;
 import com.playmonumenta.plugins.commands.UpdateHeldItem;
+import com.playmonumenta.plugins.custominventories.CustomInventoryCommands;
 import com.playmonumenta.plugins.effects.EffectManager;
 import com.playmonumenta.plugins.enchantments.EnchantmentManager;
 import com.playmonumenta.plugins.guis.SinglePageGUIManager;
@@ -211,6 +212,7 @@ public class Plugin extends JavaPlugin {
 		LockedHeldItem.register();
 		UnlockHeldItem.register();
 		ToggleSwap.register(this);
+		CustomInventoryCommands.register(this);
 
 		try {
 			mHttpManager = new HttpManager(this);
