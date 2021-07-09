@@ -14,12 +14,12 @@ import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
-import com.playmonumenta.plugins.utils.MetadataUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
 
+import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -28,19 +28,16 @@ import org.bukkit.World;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.block.Action;
 import org.bukkit.inventory.EquipmentSlot;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
-
-
 public class HauntingShades extends MultipleChargeAbility {
 
-	private static final String CHECK_ONCE_THIS_TICK_METAKEY = "HauntingShadesTickRightClicked";
 	private static final String ATTR_NAME = "HauntingShadesExtraSpeedAttr";
 
 	private static final int COOLDOWN = 15 * 20;
@@ -59,17 +56,15 @@ public class HauntingShades extends MultipleChargeAbility {
 
 	private final int mVuln;
 
-	private int mRightClicks = 0;
-
 	public HauntingShades(Plugin plugin, Player player) {
 		super(plugin, player, "Haunting Shades", SHADES_CHARGES_1, SHADES_CHARGES_2);
 		mInfo.mLinkedSpell = ClassAbility.HAUNTING_SHADES;
 		mInfo.mScoreboardId = "HauntingShades";
 		mInfo.mShorthandName = "HS";
-		mInfo.mDescriptions.add("Double right-click while with a scythe to conjure a Shade at the target block or mob location. Mobs within 6 blocks of a Shade are afflicted with 10% Vulnerability, and players within 6 blocks of the shade are given 10% speed. A Shade fades back into darkness after 8 seconds. Cooldown: 15s. Charges: 2.");
+		mInfo.mDescriptions.add("Press the swap key while not sneaking with a scythe to conjure a Shade at the target block or mob location. Mobs within 6 blocks of a Shade are afflicted with 10% Vulnerability, and players within 6 blocks of the shade are given 10% speed. A Shade fades back into darkness after 8 seconds. Cooldown: 15s. Charges: 2.");
 		mInfo.mDescriptions.add("Your number of charges increases to 3 and mobs within 6 blocks of a Shade are afflicted with 20% Vulnerability.");
 		mInfo.mCooldown = COOLDOWN;
-		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
+		mInfo.mTrigger = AbilityTrigger.ALL;
 		mInfo.mIgnoreCooldown = true;
 		mVuln = getAbilityScore() == 1 ? VULN_1 : VULN_2;
 	}
@@ -79,27 +74,18 @@ public class HauntingShades extends MultipleChargeAbility {
 		if (ZoneUtils.hasZoneProperty(mPlayer, ZoneProperty.NO_MOBILITY_ABILITIES)) {
 			return false;
 		}
-		return (ItemUtils.isHoe(mPlayer.getInventory().getItemInMainHand()) && !mPlayer.isSneaking() && !mPlayer.isSprinting());
+		return (ItemUtils.isHoe(mPlayer.getInventory().getItemInMainHand()));
 	}
 
 	@Override
-	public void cast(Action action) {
-		if (MetadataUtils.checkOnceThisTick(mPlugin, mPlayer, CHECK_ONCE_THIS_TICK_METAKEY)) {
-			mRightClicks++;
-			new BukkitRunnable() {
-				@Override
-				public void run() {
-					if (mRightClicks > 0) {
-						mRightClicks--;
-					}
-					this.cancel();
-				}
-			}.runTaskLater(mPlugin, 5);
-		}
-		if (mRightClicks < 2) {
-			return;
-		} else {
-			mRightClicks = 0;
+	public void playerSwapHandItemsEvent(PlayerSwapHandItemsEvent event) {
+		ItemStack mainHandItem = mPlayer.getInventory().getItemInMainHand();
+		if (ItemUtils.isHoe(mainHandItem)) {
+			event.setCancelled(true);
+			// *TO DO* - Turn into boolean in constructor -or- look at changing trigger entirely
+			if (mPlayer.isSneaking() || ZoneUtils.hasZoneProperty(mPlayer, ZoneProperty.NO_MOBILITY_ABILITIES)) {
+				return;
+			}
 
 			if (!consumeCharge()) {
 				return;
