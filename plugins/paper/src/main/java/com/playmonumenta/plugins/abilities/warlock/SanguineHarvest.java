@@ -78,6 +78,9 @@ public class SanguineHarvest extends Ability {
 
 	@Override
 	public void cast(Action action) {
+		if (mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.mLinkedSpell)) {
+			return;
+		}
 		if (MetadataUtils.checkOnceThisTick(mPlugin, mPlayer, CHECK_ONCE_THIS_TICK_METAKEY)) {
 			mRightClicks++;
 			new BukkitRunnable() {

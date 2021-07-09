@@ -59,8 +59,6 @@ public class VoodooBondsOtherPlayer extends Effect {
 		double maxHealth = p.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue();
 		double percentDamage = damage / maxHealth;
 
-		mPlugin.mEffectManager.addEffect(mPlayer, SEND_EFFECT_NAME, new VoodooBondsReaper(duration, mPlayer, event.getDamage(), percentDamage, mPlugin));
-
 		if (event instanceof EntityDamageByEntityEvent) {
 			EntityDamageByEntityEvent entityEvent = (EntityDamageByEntityEvent) event;
 			if (EntityUtils.isBoss(entityEvent.getDamager())) {
@@ -89,6 +87,7 @@ public class VoodooBondsOtherPlayer extends Effect {
 		}
 
 		mTriggerTickParticle = true;
+		mPlugin.mEffectManager.addEffect(mPlayer, SEND_EFFECT_NAME, new VoodooBondsReaper(duration, mPlayer, event.getDamage(), percentDamage, mPlugin));
 
 		Location loc = event.getEntity().getLocation();
 		World world = loc.getWorld();
