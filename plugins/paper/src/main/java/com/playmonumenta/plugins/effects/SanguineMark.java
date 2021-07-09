@@ -15,11 +15,9 @@ import com.playmonumenta.plugins.utils.PlayerUtils;
 public class SanguineMark extends Effect {
 
 	private static final Particle.DustOptions COLOR = new Particle.DustOptions(Color.fromRGB(179, 0, 0), 1.0f);
-	private double mHealPercent;
 
-	public SanguineMark(double healPercent, int duration) {
+	public SanguineMark(int duration) {
 		super(duration);
-		mHealPercent = healPercent;
 	}
 
 	@Override
@@ -38,7 +36,7 @@ public class SanguineMark extends Effect {
 		if (event.getEntity().getKiller() != null) {
 			 Player player = event.getEntity().getKiller();
 			 double maxHealth = player.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue();
-			 PlayerUtils.healPlayer(player, mHealPercent * maxHealth);
+			 PlayerUtils.healPlayer(player, 0.05 * maxHealth);
 			 player.getWorld().playSound(player.getLocation(), Sound.ENTITY_SLIME_SQUISH_SMALL, 1.0f, 0.8f);
 		}
 		return true;

@@ -6,7 +6,6 @@ import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Entity;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.Particle;
 import org.bukkit.Color;
 import org.bukkit.entity.LivingEntity;
@@ -72,19 +71,6 @@ public class VoodooBondsOtherPlayer extends Effect {
 				}
 			}
 		} else {
-			// Ignore DoT damage
-			if (event.getCause() == DamageCause.FIRE
-					|| event.getCause() == DamageCause.WITHER
-					|| event.getCause() == DamageCause.CONTACT
-					|| event.getCause() == DamageCause.DROWNING
-					|| event.getCause() == DamageCause.FIRE_TICK
-					|| event.getCause() == DamageCause.HOT_FLOOR
-					|| event.getCause() == DamageCause.POISON
-					|| event.getCause() == DamageCause.DROWNING
-					|| event.getCause() == DamageCause.STARVATION
-					|| event.getCause() == DamageCause.SUFFOCATION) {
-				return true;
-			}
 			event.setDamage(0);
 		}
 
