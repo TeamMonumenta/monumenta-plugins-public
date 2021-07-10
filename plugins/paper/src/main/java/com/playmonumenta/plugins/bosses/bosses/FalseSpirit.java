@@ -231,13 +231,6 @@ public class FalseSpirit extends BossAbilityGroup {
 			PlayerUtils.executeCommandOnNearbyPlayers(mSpawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"[Bhairavi]\",\"color\":\"gold\"},{\"text\":\" Quickly! Kill those creatures! They will charge the Spear with power and let you claim it!\",\"color\":\"white\"}]");
 		});
 
-		events.put(20, mBoss -> {
-			mHell.run();
-
-			PlayerUtils.executeCommandOnNearbyPlayers(mSpawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"The Gates open once again! Come forth, nithlings!\",\"color\":\"dark_red\"}]");
-			PlayerUtils.executeCommandOnNearbyPlayers(mSpawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"[Bhairavi]\",\"color\":\"gold\"},{\"text\":\" Quickly! Kill those creatures! They will charge the Spear with power and let you claim it!\",\"color\":\"white\"}]");
-		});
-
 		//Last one is the ceiling one
 		events.put(10, mBoss -> {
 			mCeilingHell.run();

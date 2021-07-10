@@ -5,18 +5,19 @@ import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.List;
 
-import com.playmonumenta.plugins.utils.ItemUtils;
-
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.block.Block;
+import org.bukkit.block.data.type.Fence;
 import org.bukkit.block.data.type.TrapDoor;
 import org.bukkit.entity.Entity;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.loot.Lootable;
+
+import com.playmonumenta.plugins.utils.ItemUtils;
 
 public class SpellBlockBreak extends Spell {
 
@@ -72,7 +73,7 @@ public class SpellBlockBreak extends Spell {
 					Block block = testloc.getBlock();
 					Material material = block.getType();
 
-					if (material.equals(Material.COBWEB) || block.getBlockData() instanceof TrapDoor) {
+					if (material.equals(Material.COBWEB) || material.equals(Material.HONEY_BLOCK) || block.getBlockData() instanceof TrapDoor || block.getBlockData() instanceof Fence) {
 						/* Break cobwebs immediately, don't add them to the bad block list */
 						EntityExplodeEvent event = new EntityExplodeEvent(mLauncher, mLauncher.getLocation(), Arrays.asList(block), 0f);
 						Bukkit.getServer().getPluginManager().callEvent(event);
