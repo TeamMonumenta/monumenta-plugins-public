@@ -10,6 +10,7 @@ import dev.jorel.commandapi.arguments.EntitySelectorArgument.EntitySelector;
 public class CustomInventoryCommands {
 	public static void register(Plugin plugin) {
 		new CommandAPICommand("openteleportergui")
+			.withPermission("monumenta.command.openteleportergui")
 			.withArguments(new EntitySelectorArgument("player", EntitySelector.ONE_PLAYER))
 			.executes((sender, args) -> {
 				Player player = (Player)args[0];
@@ -17,6 +18,7 @@ public class CustomInventoryCommands {
 			})
 			.register();
 		new CommandAPICommand("openPEB")
+			.withPermission("monumenta.command.openpeb")
 			.withArguments(new EntitySelectorArgument("player", EntitySelector.ONE_PLAYER))
 			.executes((sender, args) -> {
 				Player player = (Player)args[0];
@@ -25,6 +27,7 @@ public class CustomInventoryCommands {
 			.register();
 
 		new CommandAPICommand("openparrotgui")
+			.withPermission("monumenta.command.openparrotgui")
 			.withArguments(new EntitySelectorArgument("player", EntitySelector.ONE_PLAYER))
 			.executes((sender, args) -> {
 				Player player = (Player)args[0];
