@@ -12,7 +12,9 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.type.Fence;
+import org.bukkit.block.data.type.Gate;
 import org.bukkit.block.data.type.TrapDoor;
+import org.bukkit.block.data.type.Wall;
 import org.bukkit.entity.Entity;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.loot.Lootable;
@@ -28,23 +30,27 @@ public class SpellBlockBreak extends Spell {
 	private int mYRad;
 	private int mZRad;
 
+	//When true, mob breaks blocks at foot level
+	private boolean mFootLevelBreak;
+
 	public SpellBlockBreak(Entity launcher) {
 		this(launcher, 1, 3, 1);
 	}
 
 	public SpellBlockBreak(Entity launcher, Material... noBreak) {
-		this(launcher, 1, 3, 1, noBreak);
+		this(launcher, 1, 3, 1, false, noBreak);
 	}
 
 	public SpellBlockBreak(Entity launcher, int xRad, int yRad, int zRad) {
-		this(launcher, xRad, yRad, zRad, Material.AIR);
+		this(launcher, xRad, yRad, zRad, false, Material.AIR);
 	}
 
-	public SpellBlockBreak(Entity launcher, int xRad, int yRad, int zRad, Material... noBreak) {
+	public SpellBlockBreak(Entity launcher, int xRad, int yRad, int zRad, boolean footLevelBreak, Material... noBreak) {
 		mLauncher = launcher;
 		mXRad = xRad;
 		mYRad = yRad;
 		mZRad = zRad;
+		mFootLevelBreak = footLevelBreak;
 		mNoBreak = Arrays.asList(noBreak);
 	}
 
@@ -73,7 +79,7 @@ public class SpellBlockBreak extends Spell {
 					Block block = testloc.getBlock();
 					Material material = block.getType();
 
-					if (material.equals(Material.COBWEB) || material.equals(Material.HONEY_BLOCK) || block.getBlockData() instanceof TrapDoor || block.getBlockData() instanceof Fence) {
+					if (material.equals(Material.COBWEB) || material.equals(Material.HONEY_BLOCK) || block.getBlockData() instanceof TrapDoor || block.getBlockData() instanceof Fence || block.getBlockData() instanceof Gate || block.getBlockData() instanceof Wall) {
 						/* Break cobwebs immediately, don't add them to the bad block list */
 						EntityExplodeEvent event = new EntityExplodeEvent(mLauncher, mLauncher.getLocation(), Arrays.asList(block), 0f);
 						Bukkit.getServer().getPluginManager().callEvent(event);
@@ -83,7 +89,7 @@ public class SpellBlockBreak extends Spell {
 							loc.getWorld().playSound(loc, Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, 0.3f, 0.9f);
 							loc.getWorld().spawnParticle(Particle.EXPLOSION_NORMAL, loc, 6, 1, 1, 1, 0.03);
 						}
-					} else if (y > 0 &&
+					} else if ((y > 0 || (mFootLevelBreak && y >= 0)) &&
 					           (!mIgnoredMats.contains(material)) && !mNoBreak.contains(material) &&
 					           (material.isSolid() || ItemUtils.carpet.contains(material)) &&
 					           (!(block.getState() instanceof Lootable)

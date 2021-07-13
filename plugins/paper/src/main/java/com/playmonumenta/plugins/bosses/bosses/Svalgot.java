@@ -89,7 +89,7 @@ public class Svalgot extends BossAbilityGroup {
 
 		List<Spell> passiveNormalSpells = Arrays.asList(
 				new SpellPurgeNegatives(boss, 20 * 5),
-				new SpellBlockBreak(boss, 2, 3, 2)
+				new SpellBlockBreak(boss, 2, 3, 2, true, Material.AIR)
 			);
 
 		Map<Integer, BossHealthAction> events = new HashMap<Integer, BossHealthAction>();

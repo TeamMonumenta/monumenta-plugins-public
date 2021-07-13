@@ -7,6 +7,7 @@ import java.util.Map;
 
 import org.bukkit.GameMode;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
@@ -92,7 +93,7 @@ public class Ghalkor extends BossAbilityGroup {
 
 		List<Spell> passiveNormalSpells = Arrays.asList(
 				new SpellPurgeNegatives(boss, 20 * 5),
-				new SpellBlockBreak(boss, 2, 3, 2)
+				new SpellBlockBreak(boss, 2, 3, 2, true, Material.AIR)
 			);
 
 		Map<Integer, BossHealthAction> events = new HashMap<Integer, BossHealthAction>();
