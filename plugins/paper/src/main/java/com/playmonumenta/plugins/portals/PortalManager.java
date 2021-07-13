@@ -338,9 +338,9 @@ public class PortalManager {
 		switch (shard) {
 		case "dev1":
 			return 1;
-		case "region_1":
+		case "valley":
 			return 421;
-		case "region_2":
+		case "isles":
 			return 204;
 		case "build":
 			return 277;

@@ -129,10 +129,10 @@ public class CalculateReforge extends GenericCommand {
 					handCurrency = "CS";
 				} else if (handRegion == ItemRegion.SHULKER_BOX) {
 					// Use the current region to get the currency for the reforge.
-					if (player.getWorld().getName().equals("Project_Epic-region_1")) {
+					if (player.getWorld().getName().equals("Project_Epic-valley")) {
 						// King's Valley: Use XP
 						handCurrency = "XP";
-					} else if (player.getWorld().getName().equals("Project_Epic-region_2")) {
+					} else if (player.getWorld().getName().equals("Project_Epic-isles")) {
 						// Celsian Isles: Use CS
 						handCurrency = "CS";
 					} else {
@@ -160,10 +160,10 @@ public class CalculateReforge extends GenericCommand {
 			if (csb != 0) {
 				// The "Shulker Box" tag does not exist. It is internally used to identify shulker boxes.
 				// Shulker boxes can be reforged with R1 or R2 currency, based on the region you are in.
-				if (player.getWorld().getName().equals("Project_Epic-region_1")) {
+				if (player.getWorld().getName().equals("Project_Epic-valley")) {
 					// King's Valley: Use XP
 					cxp += csb;
-				} else if (player.getWorld().getName().equals("Project_Epic-region_2")) {
+				} else if (player.getWorld().getName().equals("Project_Epic-isles")) {
 					// Celsian Isles: Use CS
 					ccs += csb;
 				} else {

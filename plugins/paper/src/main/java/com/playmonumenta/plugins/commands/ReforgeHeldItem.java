@@ -60,10 +60,10 @@ public class ReforgeHeldItem extends GenericCommand {
 					// ItemRegion.SHULKER_BOX currently only exists to allow shulker boxes to be
 					// reforged with either King's Valley or Celsian Isles currency.
 					// We need to figure out a more permanent solution to this at some point.
-					if (player.getWorld().getName().equals("Project_Epic-region_1")) {
+					if (player.getWorld().getName().equals("Project_Epic-valley")) {
 						// King's Valley: Use XP
 						region = ItemRegion.KINGS_VALLEY;
-					} else if (player.getWorld().getName().equals("Project_Epic-region_2")) {
+					} else if (player.getWorld().getName().equals("Project_Epic-isles")) {
 						// Celsian Isles: Use CS
 						region = ItemRegion.CELSIAN_ISLES;
 					} else {

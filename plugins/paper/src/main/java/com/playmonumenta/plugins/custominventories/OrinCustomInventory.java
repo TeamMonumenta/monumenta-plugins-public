@@ -87,7 +87,7 @@ public class OrinCustomInventory extends CustomInventory {
 		LOCATIONS_PLOTS.add(new TeleportEntry(36, "Guild Plot", null, "Click to teleport!", Material.YELLOW_BANNER, "teleportguild @S"));
 		LOCATIONS_PLOTS.add(new TeleportEntry(45, "Build Server", null, "Click to teleport!", Material.STONE_PICKAXE, "transferserver build -2456.0 56.5 1104.0 90 0"));
 
-		LOCATIONS_PLOTS.add(new TeleportEntry(3, "Sierhaven", null, "Click to teleport!", Material.GREEN_CONCRETE, "execute as @S run function monumenta:mechanisms/teleporters/tp/plots_to_region_1"));
+		LOCATIONS_PLOTS.add(new TeleportEntry(3, "Sierhaven", null, "Click to teleport!", Material.GREEN_CONCRETE, "execute as @S run function monumenta:mechanisms/teleporters/tp/plots_to_valley"));
 		LOCATIONS_PLOTS.add(new TeleportEntry(20, "Labs", "D0Access", "Click to teleport!", Material.GLASS_BOTTLE, "execute as @S run function monumenta:lobbies/send_one/d0"));
 		LOCATIONS_PLOTS.add(new TeleportEntry(21, "White", "D1Access", "Click to teleport!", Material.WHITE_WOOL, "execute as @S run function monumenta:lobbies/send_one/d1"));
 		LOCATIONS_PLOTS.add(new TeleportEntry(22, "Orange", "D2Access", "Click to teleport!", Material.ORANGE_WOOL, "execute as @S run function monumenta:lobbies/send_one/d2"));
@@ -98,7 +98,7 @@ public class OrinCustomInventory extends CustomInventory {
 		LOCATIONS_PLOTS.add(new TeleportEntry(39, "Reverie", "DCAccess", "Click to teleport!", Material.FIRE_CORAL, "execute as @S run function monumenta:lobbies/send_one/dc"));
 		LOCATIONS_PLOTS.add(new TeleportEntry(40, "Sanctum", "DS1Access", "Click to teleport!", Material.GRASS_BLOCK, "execute as @S run function monumenta:lobbies/send_one/ds1"));
 
-		LOCATIONS_PLOTS.add(new TeleportEntry(7, "Mistport", "Quest101", "Click to teleport!", Material.SAND, "execute as @S run function monumenta:mechanisms/teleporters/tp/plots_to_region_2", 13));
+		LOCATIONS_PLOTS.add(new TeleportEntry(7, "Mistport", "Quest101", "Click to teleport!", Material.SAND, "execute as @S run function monumenta:mechanisms/teleporters/tp/plots_to_isles", 13));
 		LOCATIONS_PLOTS.add(new TeleportEntry(24, "Lime", "D6Access", "Click to teleport!", Material.LIME_WOOL, "execute as @S run function monumenta:lobbies/send_one/d6"));
 		LOCATIONS_PLOTS.add(new TeleportEntry(25, "Pink", "D7Access", "Click to teleport!", Material.PINK_WOOL, "execute as @S run function monumenta:lobbies/send_one/d7"));
 		LOCATIONS_PLOTS.add(new TeleportEntry(26, "Gray", "D8Access", "Click to teleport!", Material.GRAY_WOOL, "execute as @S run function monumenta:lobbies/send_one/d8"));
@@ -127,7 +127,7 @@ public class OrinCustomInventory extends CustomInventory {
 		LOCATIONS_REGION1.add(new TeleportEntry(39, "Reverie", "DCAccess", "Click to teleport!", Material.FIRE_CORAL, "execute as @S run function monumenta:lobbies/send_one/dc"));
 		LOCATIONS_REGION1.add(new TeleportEntry(40, "Sanctum", "DS1Access", "Click to teleport!", Material.GRASS_BLOCK, "execute as @S run function monumenta:lobbies/send_one/ds1"));
 
-		LOCATIONS_REGION1.add(new TeleportEntry(7, "Mistport", "Quest101", "Click to teleport!", Material.SAND, "execute as @S run function monumenta:mechanisms/teleporters/tp/sierhaven_to_region_2", 13));
+		LOCATIONS_REGION1.add(new TeleportEntry(7, "Mistport", "Quest101", "Click to teleport!", Material.SAND, "execute as @S run function monumenta:mechanisms/teleporters/tp/sierhaven_to_isles", 13));
 		LOCATIONS_REGION1.add(new TeleportEntry(24, "Lime", "D6Access", "Click to teleport!", Material.LIME_WOOL, "execute as @S run function monumenta:lobbies/send_one/d6"));
 		LOCATIONS_REGION1.add(new TeleportEntry(25, "Pink", "D7Access", "Click to teleport!", Material.PINK_WOOL, "execute as @S run function monumenta:lobbies/send_one/d7"));
 		LOCATIONS_REGION1.add(new TeleportEntry(26, "Gray", "D8Access", "Click to teleport!", Material.GRAY_WOOL, "execute as @S run function monumenta:lobbies/send_one/d8"));
@@ -145,7 +145,7 @@ public class OrinCustomInventory extends CustomInventory {
 		LOCATIONS_REGION2.add(new TeleportEntry(9, "Docks", null, "Click to teleport!", Material.LIGHT_BLUE_CONCRETE, "execute as @S run function monumenta:mechanisms/teleporters/tp/mistport_to_plots"));
 		LOCATIONS_REGION2.add(new TeleportEntry(36, "Build Server", null, "Click to teleport!", Material.STONE_PICKAXE, "transferserver build -762.5 70.1 1344.5 180 0"));
 
-		LOCATIONS_REGION2.add(new TeleportEntry(3, "Sierhaven", null, "Click to teleport!", Material.GREEN_CONCRETE, "execute as @S run function monumenta:mechanisms/teleporters/tp/mistport_to_region_1"));
+		LOCATIONS_REGION2.add(new TeleportEntry(3, "Sierhaven", null, "Click to teleport!", Material.GREEN_CONCRETE, "execute as @S run function monumenta:mechanisms/teleporters/tp/mistport_to_valley"));
 		LOCATIONS_REGION2.add(new TeleportEntry(20, "Labs", "D0Access", "Click to teleport!", Material.GLASS_BOTTLE, "execute as @S run function monumenta:lobbies/send_one/d0"));
 		LOCATIONS_REGION2.add(new TeleportEntry(21, "White", "D1Access", "Click to teleport!", Material.WHITE_WOOL, "execute as @S run function monumenta:lobbies/send_one/d1"));
 		LOCATIONS_REGION2.add(new TeleportEntry(22, "Orange", "D2Access", "Click to teleport!", Material.ORANGE_WOOL, "execute as @S run function monumenta:lobbies/send_one/d2"));
@@ -172,9 +172,9 @@ public class OrinCustomInventory extends CustomInventory {
 		super(player, 54, "Teleportation Choices");
 
 		String currentShardName = ServerProperties.getShardName();
-		if (currentShardName.contains("valley") || currentShardName.contains("region_1")) {
+		if (currentShardName.contains("valley")) {
 			setLayout(REGION1_DEFAULT, player);
-		} else if (currentShardName.contains("isles") || currentShardName.contains("region_2")) {
+		} else if (currentShardName.contains("isles")) {
 			setLayout(REGION2_DEFAULT, player);
 		} else {
 			setLayout(PLOTS_DEFAULT, player);
