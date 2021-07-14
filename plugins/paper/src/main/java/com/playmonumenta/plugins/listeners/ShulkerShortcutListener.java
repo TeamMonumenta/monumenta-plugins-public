@@ -4,10 +4,14 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.enchantments.curses.CurseOfEphemerality;
 import com.playmonumenta.plugins.utils.ItemUtils;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.block.Block;
+import org.bukkit.block.Chest;
+import org.bukkit.block.ShulkerBox;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -26,8 +30,11 @@ import org.bukkit.event.player.PlayerKickEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.BlockStateMeta;
 import org.bukkit.permissions.Permission;
 import org.bukkit.scheduler.BukkitRunnable;
+
+import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 
 /**
  * These listeners work together with ShulkerInventoryManager and ShulkerInventory to
@@ -85,6 +92,14 @@ public class ShulkerShortcutListener implements Listener {
 				// Right clicked an Ender Chest Expansion shulker outside an ender chest
 				player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1.0f, 1.0f);
 				player.sendMessage(ChatColor.RED + "This item only works in an ender chest");
+				event.setCancelled(true);
+			} else if (itemClicked != null &&
+			           click == ClickType.RIGHT &&
+			           isPurpleTesseractContainer(itemClicked) &&
+					   !event.getClickedInventory().getType().equals(InventoryType.ENDER_CHEST)) {
+				// Right clicked a purple tesseract shulker that can't be opened
+				player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1.0f, 1.0f);
+				player.sendMessage(ChatColor.RED + "This container must be placed to access its items");
 				event.setCancelled(true);
 			} else if (itemClicked != null && ItemUtils.isShulkerBox(itemClicked.getType()) &&
 			           !ShulkerEquipmentListener.isEquipmentBox(itemClicked) &&
@@ -218,6 +233,7 @@ public class ShulkerShortcutListener implements Listener {
 		if (!event.isCancelled() &&
 			ItemUtils.isShulkerBox(event.getItem().getType()) &&
 			(mPlugin.mShulkerInventoryManager.isShulkerInUse(event.getItem()) ||
+			 isPurpleTesseractContainer(event.getItem()) ||
 			 isEnderExpansion(event.getItem()))) {
 			event.getBlock().getWorld().playSound(event.getBlock().getLocation(), Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1.0f, 1.0f);
 			event.setCancelled(true);
@@ -235,12 +251,45 @@ public class ShulkerShortcutListener implements Listener {
 		Player player = event.getPlayer();
 		Block block = event.getBlockPlaced();
 		if (!event.isCancelled() &&
-		    ItemUtils.isShulkerBox(block.getType()) &&
-		    mPlugin.mShulkerInventoryManager.isShulkerInUse(block)) {
-			player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1.0f, 1.0f);
-			player.sendMessage(ChatColor.RED + "That shulker is open");
-			event.setCancelled(true);
-			event.setBuild(false);
+		    ItemUtils.isShulkerBox(block.getType())) {
+			if (mPlugin.mShulkerInventoryManager.isShulkerInUse(block)) {
+				player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1.0f, 1.0f);
+				player.sendMessage(ChatColor.RED + "That shulker is open");
+				event.setCancelled(true);
+				event.setBuild(false);
+			} else if (isPurpleTesseractContainer(event.getItemInHand())) {
+				ItemStack item = event.getItemInHand();
+				ShulkerBox sbox = (ShulkerBox)((BlockStateMeta)item.getItemMeta()).getBlockState();
+				ItemStack[] contents = sbox.getInventory().getContents();
+				final String lockStr;
+				if (sbox.isLocked()) {
+					lockStr = sbox.getLock();
+				} else {
+					lockStr = null;
+				}
+
+				// Get the new chest and update that
+				Bukkit.getScheduler().runTask(mPlugin, () -> {
+					// Clears contents
+					block.setType(Material.CHEST);
+
+					if (block.getState() instanceof Chest) {
+						Chest chest = (Chest)block.getState();
+						if (lockStr != null) {
+							chest.setLock(null);
+							chest.customName(GsonComponentSerializer.gson().deserialize(lockStr));
+						}
+						chest.update();
+
+						chest = (Chest)block.getState();
+						chest.getInventory().setContents(contents);
+					}
+				});
+
+				event.setCancelled(true);
+				event.setBuild(false);
+				item.subtract();
+			}
 		}
 	}
 
@@ -267,6 +316,14 @@ public class ShulkerShortcutListener implements Listener {
 				event.setCancelled(true);
 			}
 		}
+	}
+
+	public static boolean isPurpleTesseractContainer(ItemStack item) {
+		return item != null &&
+		       ItemUtils.isShulkerBox(item.getType()) &&
+			   item.hasItemMeta() &&
+			   item.getItemMeta().hasDisplayName() &&
+			   ItemUtils.getPlainName(item).contains("Carrier of Emotion");
 	}
 
 	public static boolean isEnderExpansion(ItemStack item) {
