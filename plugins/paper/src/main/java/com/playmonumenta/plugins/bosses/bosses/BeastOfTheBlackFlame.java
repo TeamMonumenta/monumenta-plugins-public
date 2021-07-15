@@ -90,13 +90,13 @@ public class BeastOfTheBlackFlame extends BossAbilityGroup {
 
 		List<Spell> passiveNormalSpells = Arrays.asList(
 				new SpellPurgeNegatives(boss, 20 * 3),
-				new SpellBlockBreak(boss, 2, 3, 2, true, Material.AIR)
+				new SpellBlockBreak(boss, 2, 3, 2)
 			);
 
 		//Under 50%, adds passive
 		List<Spell> lowHealthPassives = Arrays.asList(
 				new SpellPurgeNegatives(boss, 20 * 3),
-				new SpellBlockBreak(boss, 2, 3, 2, true, Material.AIR),
+				new SpellBlockBreak(boss, 2, 3, 2),
 				new PassiveEarthCrack(boss, plugin, 20 * 9)
 			);
 
