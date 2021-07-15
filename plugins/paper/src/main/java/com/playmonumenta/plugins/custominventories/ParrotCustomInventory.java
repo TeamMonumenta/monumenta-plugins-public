@@ -56,6 +56,7 @@ public class ParrotCustomInventory extends CustomInventory {
 		ItemStack mPGo = null;
 		ItemStack mKS = null;
 		ItemStack mFG = null;
+		ItemStack mDM = null;
 		ItemStack mUP = null;
 
 		mHCS = InventoryUtils.getItemFromLootTable(playerLoad, NamespacedKey.fromString("epic:r2/items/currency/hyper_crystalline_shard"));
@@ -64,7 +65,9 @@ public class ParrotCustomInventory extends CustomInventory {
 		mPPe = InventoryUtils.getItemFromLootTable(playerLoad, NamespacedKey.fromString("epic:r2/items/currency/pulsating_emerald"));
 		mKS = InventoryUtils.getItemFromLootTable(playerLoad, NamespacedKey.fromString("epic:r1/kaul/crownshard"));
 		mFG = InventoryUtils.getItemFromLootTable(playerLoad, NamespacedKey.fromString("epic:r2/eldrask/materials/epic_material"));
+		mDM = InventoryUtils.getItemFromLootTable(playerLoad, NamespacedKey.fromString("epic:r2/depths/loot/voidstained_geode"));
 		mUP = InventoryUtils.getItemFromLootTable(playerLoad, NamespacedKey.fromString("epic:r1/dungeons/4/static_uncommons/unicorn_puke"));
+
 		//we got the currencies, now populating the list
 
 
@@ -615,6 +618,65 @@ public class ParrotCustomInventory extends CustomInventory {
 			return true;
 		}));
 
+
+		//Depths
+		lore.clear();
+		lore.add("Defeat Darkest Depths to learn more about this parrot");
+		ItemStack buyDepths1 = buildItem(Material.RED_GLAZED_TERRACOTTA, "Buy Otherworldly Myiopsitta", lore);
+		GUI_ITEMS.add(new GuiItem(0, 13, buyDepths1, new HashMap<>(), (player, inv) -> {
+			return ScoreboardUtils.getScoreboardValue(player, "ParrotBought14") == 0 && ScoreboardUtils.getScoreboardValue(playerLoad, "DepthsEndless") < 61
+			&& ScoreboardUtils.getScoreboardValue(playerLoad, "Depths") == 0;
+		}, (player, inv) -> {
+			return true;
+		}));
+
+		lore.clear();
+		lore.add("Requires clearing floor 6 from Darkest Depths");
+		int depthsScore = ScoreboardUtils.getScoreboardValue(playerLoad, "DepthsEndless");
+		lore.add("You have cleared floor " + ((depthsScore - 1) / 10));
+		ItemStack buyDepths = buildItem(Material.RED_GLAZED_TERRACOTTA, "Buy Otherworldly Myiopsitta", lore);
+		GUI_ITEMS.add(new GuiItem(0, 13, buyDepths, new HashMap<>(), (player, inv) -> {
+			return ScoreboardUtils.getScoreboardValue(player, "ParrotBought14") == 0 && ScoreboardUtils.getScoreboardValue(playerLoad, "DepthsEndless") < 61
+			&& ScoreboardUtils.getScoreboardValue(playerLoad, "Depths") > 0;
+		}, (player, inv) -> {
+			return true;
+		}));
+
+		cost.clear();
+		cost.put(mDM, 32);
+		lore.clear();
+		lore.add("Click to buy!");
+		lore.add("32 Voidstained Geode");
+		ItemStack canBuyDepths = buildItem(Material.RED_GLAZED_TERRACOTTA, "Otherworldly Myiopsitta", lore);
+		GUI_ITEMS.add(new GuiItem(0, 13, canBuyDepths, new HashMap<>(cost), (player, inv) -> {
+			return ScoreboardUtils.getScoreboardValue(player, "ParrotBought14") == 0 && ScoreboardUtils.getScoreboardValue(playerLoad, "DepthsEndless") >= 61;
+		}, (player, inv) -> {
+			ScoreboardUtils.setScoreboardValue(player, "ParrotBought14", (int) Instant.now().getEpochSecond());
+			return true;
+		}));
+
+		lore.clear();
+		lore.add("Owned");
+		lore.add((new Date((long)ScoreboardUtils.getScoreboardValue(playerLoad, "ParrotBought14")*1000).toString()));
+		ItemStack boughtDepths = buildItem(Material.RED_GLAZED_TERRACOTTA, "Otherworldly Myiopsitta", lore);
+		GUI_ITEMS.add(new GuiItem(0, 13, boughtDepths, new HashMap<>(), (player, inv) -> {
+			return ScoreboardUtils.getScoreboardValue(player, "ParrotBought14") > 0;
+		}, (player, inv) -> {
+			return true;
+		}));
+		GUI_ITEMS.add(new GuiItem(1, 13, boughtDepths, new HashMap<>(), (player, inv) -> {
+			return ScoreboardUtils.getScoreboardValue(player, "ParrotBought14") > 0;
+		}, (player, inv) -> {
+			ParrotManager.updateParrot(player, ParrotVariant.DEPTHS, "LEFT");
+			return true;
+		}));
+
+		GUI_ITEMS.add(new GuiItem(2, 13, boughtDepths, new HashMap<>(), (player, inv) -> {
+			return ScoreboardUtils.getScoreboardValue(player, "ParrotBought14") > 0;
+		}, (player, inv) -> {
+			ParrotManager.updateParrot(player, ParrotVariant.DEPTHS, "RIGHT");
+			return true;
+		}));
 	}
 
 

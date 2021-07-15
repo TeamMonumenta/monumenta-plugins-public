@@ -43,7 +43,9 @@ public class ParrotManager implements Listener {
 		KAUL("Blackroot Kakapo", 10, Parrot.Variant.GREEN),
 		ELDRASK("Permafrost Kea", 11, Parrot.Variant.CYAN),
 		RAINBOW("Rainbow Parrot", 12, Parrot.Variant.CYAN),
-		SNOWY("Snowy Cockatoo", 13, Parrot.Variant.GRAY);
+		SNOWY("Snowy Cockatoo", 13, Parrot.Variant.GRAY),
+		DEPTHS("Otherworldly Myiopsitta", 14, Parrot.Variant.RED);
+
 
 		private String mName;
 		private int mNumber;
