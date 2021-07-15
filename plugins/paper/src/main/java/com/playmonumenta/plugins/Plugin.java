@@ -4,6 +4,12 @@ import java.io.File;
 import java.io.IOException;
 import java.util.UUID;
 
+import org.bukkit.Bukkit;
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
+import org.bukkit.plugin.PluginManager;
+import org.bukkit.plugin.java.JavaPlugin;
+
 import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.attributes.AttributeManager;
 import com.playmonumenta.plugins.bosses.BossManager;
@@ -50,14 +56,19 @@ import com.playmonumenta.plugins.commands.SkillDescription;
 import com.playmonumenta.plugins.commands.SkillSummary;
 import com.playmonumenta.plugins.commands.Spectate;
 import com.playmonumenta.plugins.commands.SpectateBot;
+import com.playmonumenta.plugins.commands.StasisCommand;
 import com.playmonumenta.plugins.commands.StatTrackItem;
 import com.playmonumenta.plugins.commands.TeleportAsync;
 import com.playmonumenta.plugins.commands.TeleportByScore;
-import com.playmonumenta.plugins.commands.UnlockHeldItem;
 import com.playmonumenta.plugins.commands.ToggleSwap;
+import com.playmonumenta.plugins.commands.UnlockHeldItem;
 import com.playmonumenta.plugins.commands.UnsignBook;
 import com.playmonumenta.plugins.commands.UpdateHeldItem;
 import com.playmonumenta.plugins.custominventories.CustomInventoryCommands;
+import com.playmonumenta.plugins.depths.DepthsCommand;
+import com.playmonumenta.plugins.depths.DepthsGUICommands;
+import com.playmonumenta.plugins.depths.DepthsListener;
+import com.playmonumenta.plugins.depths.DepthsManager;
 import com.playmonumenta.plugins.effects.EffectManager;
 import com.playmonumenta.plugins.enchantments.EnchantmentManager;
 import com.playmonumenta.plugins.guis.SinglePageGUIManager;
@@ -118,14 +129,6 @@ import com.playmonumenta.plugins.tracking.TrackingManager;
 import com.playmonumenta.plugins.utils.FileUtils;
 import com.playmonumenta.plugins.utils.MetadataUtils;
 
-import org.bukkit.Bukkit;
-import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
-import org.bukkit.plugin.PluginManager;
-import org.bukkit.plugin.java.JavaPlugin;
-
-
-
 public class Plugin extends JavaPlugin {
 	public CooldownTimers mTimers = null;
 	public ProjectileEffectTimers mProjectileEffectTimers = null;
@@ -163,7 +166,7 @@ public class Plugin extends JavaPlugin {
 		 *
 		 * These need to register immediately on load to prevent function loading errors
 		 */
-
+		StasisCommand.register();
 		GiveSoulbound.register();
 		HopeifyHeldItem.register();
 		ColossalifyHeldItem.register();
@@ -320,6 +323,12 @@ public class Plugin extends JavaPlugin {
 		manager.registerEvents(new BrewingListener(), this);
 		manager.registerEvents(new ItemUpdateManager(this), this);
 
+		if (ServerProperties.getShardName().contains("depths")
+				|| ServerProperties.getShardName().equals("mobs")
+				|| ServerProperties.getShardName().startsWith("dev")) {
+			manager.registerEvents(new DepthsListener(this), this);
+		}
+
 		//TODO Move the logic out of Plugin and into it's own class that derives off Runnable, a Timer class of some type.
 		getServer().getScheduler().scheduleSyncRepeatingTask(this, new Runnable() {
 			int mTicks = 0;
@@ -427,6 +436,15 @@ public class Plugin extends JavaPlugin {
 		} catch (Exception e) {
 			// Failed to export skills to json, non-critical error.
 			getLogger().warning("Failed to export skills.");
+		}
+
+		/* If this is the depths shard, enable depths manager */
+		if (ServerProperties.getShardName().contains("depths")
+			|| ServerProperties.getShardName().equals("mobs")
+			|| ServerProperties.getShardName().startsWith("dev")) {
+			new DepthsManager(this, getLogger(), getDataFolder() + File.separator + "depths");
+			DepthsCommand.register(this);
+			DepthsGUICommands.register(this);
 		}
 	}
 

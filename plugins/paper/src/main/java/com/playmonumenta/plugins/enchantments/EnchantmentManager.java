@@ -2,7 +2,6 @@ package com.playmonumenta.plugins.enchantments;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
@@ -20,23 +19,23 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.alchemist.UnstableArrows.UnstableArrowsCooldownEnchantment;
-import com.playmonumenta.plugins.abilities.alchemist.UnstableArrows.UnstableArrowsFuseEnchantment;
 import com.playmonumenta.plugins.abilities.alchemist.AlchemistPotions.AlchemistPotionsDamageEnchantment;
 import com.playmonumenta.plugins.abilities.alchemist.EnfeeblingElixir.EnfeeblingElixirCooldownEnchantment;
-import com.playmonumenta.plugins.abilities.cleric.SanctifiedArmor.SanctifiedArmorDamageEnchantment;
-import com.playmonumenta.plugins.abilities.cleric.DivineJustice.DivineJusticeAllyHealingEnchantment;
+import com.playmonumenta.plugins.abilities.alchemist.UnstableArrows.UnstableArrowsCooldownEnchantment;
+import com.playmonumenta.plugins.abilities.alchemist.UnstableArrows.UnstableArrowsFuseEnchantment;
 import com.playmonumenta.plugins.abilities.cleric.CelestialBlessing.CelestialCooldownEnchantment;
 import com.playmonumenta.plugins.abilities.cleric.CleansingRain.CleansingRainCooldownEnchantment;
-import com.playmonumenta.plugins.abilities.mage.MagmaShield.MagmaShieldCooldownEnchantment;
-import com.playmonumenta.plugins.abilities.mage.ThunderStep.ThunderStepCooldownEnchantment;
+import com.playmonumenta.plugins.abilities.cleric.DivineJustice.DivineJusticeAllyHealingEnchantment;
+import com.playmonumenta.plugins.abilities.cleric.SanctifiedArmor.SanctifiedArmorDamageEnchantment;
 import com.playmonumenta.plugins.abilities.mage.FrostNova.FrostNovaCooldownEnchantment;
+import com.playmonumenta.plugins.abilities.mage.MagmaShield.MagmaShieldCooldownEnchantment;
 import com.playmonumenta.plugins.abilities.mage.ManaLance.ManaLanceCooldownEnchantment;
 import com.playmonumenta.plugins.abilities.mage.Spellshock.SpellshockDamageEnchantment;
-import com.playmonumenta.plugins.abilities.rogue.DaggerThrow.DaggerThrowCooldownEnchantment;
+import com.playmonumenta.plugins.abilities.mage.ThunderStep.ThunderStepCooldownEnchantment;
 import com.playmonumenta.plugins.abilities.rogue.AdvancingShadows.AdvancingShadowsCooldownEnchantment;
 import com.playmonumenta.plugins.abilities.rogue.ByMyBlade.ByMyBladeCooldownEnchantment;
 import com.playmonumenta.plugins.abilities.rogue.ByMyBlade.ByMyBladeDamageEnchantment;
+import com.playmonumenta.plugins.abilities.rogue.DaggerThrow.DaggerThrowCooldownEnchantment;
 import com.playmonumenta.plugins.abilities.rogue.Dodging.DodgingCooldownEnchantment;
 import com.playmonumenta.plugins.abilities.scout.EagleEye.EagleEyeKillRefreshEnchantment;
 import com.playmonumenta.plugins.abilities.scout.Volley.VolleyCooldownEnchantment;
@@ -45,9 +44,9 @@ import com.playmonumenta.plugins.abilities.warlock.AmplifyingHex.AmplifyingHexDa
 import com.playmonumenta.plugins.abilities.warlock.CholericFlames.CholericFlamesCooldownEnchantment;
 import com.playmonumenta.plugins.abilities.warlock.CursedWound.CursedWoundDamageEnchantment;
 import com.playmonumenta.plugins.abilities.warlock.PhlegmaticResolve.PhlegmaticResolveDefenseEnchantment;
+import com.playmonumenta.plugins.abilities.warrior.BruteForce.BruteForceDamageEnchantment;
 import com.playmonumenta.plugins.abilities.warrior.DefensiveLine.DefensiveLineCooldownEnchantment;
 import com.playmonumenta.plugins.abilities.warrior.Riposte.RiposteCooldownEnchantment;
-import com.playmonumenta.plugins.abilities.warrior.BruteForce.BruteForceDamageEnchantment;
 import com.playmonumenta.plugins.abilities.warrior.ShieldBash.ShieldBashCooldownEnchantment;
 import com.playmonumenta.plugins.abilities.warrior.ShieldBash.ShieldBashDamageEnchantment;
 import com.playmonumenta.plugins.enchantments.abilities.SpellPower;
@@ -91,7 +90,8 @@ public class EnchantmentManager implements Listener {
 			//Utility Enchants
 			new Recoil(),
 			new RageOfTheKeter(),
-			new Retrieval()
+			new Retrieval(),
+			new ProtectionOfDepths()
 	);
 
 	/*

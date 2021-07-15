@@ -383,6 +383,7 @@ public class DelvesUtils {
 		SHARD_SCOREBOARD_PREFIX_MAPPINGS.put("dev1", "DTestDelve");
 		SHARD_SCOREBOARD_PREFIX_MAPPINGS.put("dev2", "DTestDelve");
 		SHARD_SCOREBOARD_PREFIX_MAPPINGS.put("mobs", "DTestDelve");
+		SHARD_SCOREBOARD_PREFIX_MAPPINGS.put("depths", "DDDelve");
 	}
 
 	public static long getDelveScore(Player player, String dungeon) {
@@ -645,6 +646,7 @@ public class DelvesUtils {
 		private static final int SELECT_ALL_MODIFIERS_INDEX = ROWS * COLUMNS - 1;
 
 		private final Player mPlayer;
+		private final Player mRequestingPlayer;
 		private final String mDungeon;
 		private final DelveInfo mDelveInfo;
 		private final Inventory mInventory1 = Bukkit.createInventory(null, ROWS * COLUMNS, Component.text("Delve Modifier Selection"));
@@ -652,12 +654,17 @@ public class DelvesUtils {
 
 		private boolean mCanBeginDelve = false;
 
-		public DelveModifierSelectionGUI(Player player, String dungeon) {
-			mPlayer = player;
+		public DelveModifierSelectionGUI(Player requestingPlayer, Player targetPlayer, String dungeon) {
+			mPlayer = targetPlayer;
+			mRequestingPlayer = requestingPlayer;
 			mDungeon = dungeon;
-			mDelveInfo = getDelveInfo(player, dungeon);
+			mDelveInfo = getDelveInfo(targetPlayer, dungeon);
 
 			generateGUI();
+		}
+
+		public DelveModifierSelectionGUI(Player player, String dungeon) {
+			this(player, player, dungeon);
 		}
 
 		private void generateGUI() {
@@ -692,7 +699,7 @@ public class DelvesUtils {
 		}
 
 		public void openGUI() {
-			mPlayer.openInventory(mInventory1);
+			mRequestingPlayer.openInventory(mInventory1);
 		}
 
 		public void registerClick(InventoryClickEvent event) {
@@ -712,7 +719,7 @@ public class DelvesUtils {
 				nextPage();
 			} else if (mInventory2.getItem(PREVIOUS_PAGE_INDEX).equals(clickedItem)) {
 				previousPage();
-			} else if (mDelveInfo.isEditable()) {
+			} else if (mDelveInfo.isEditable() && mPlayer == mRequestingPlayer) {
 				if (mInventory1.getItem(BEGIN_DELVE_INDEX).equals(clickedItem) || mInventory2.getItem(BEGIN_DELVE_INDEX).equals(clickedItem)) {
 					beginDelve();
 				} else if (mInventory1.getItem(RESET_MODIFIERS_INDEX).equals(clickedItem)) {
@@ -736,18 +743,18 @@ public class DelvesUtils {
 		}
 
 		private void nextPage() {
-			mPlayer.playSound(mPlayer.getLocation(), Sound.ITEM_BOOK_PAGE_TURN, 0.5f, 1f);
+			mRequestingPlayer.playSound(mPlayer.getLocation(), Sound.ITEM_BOOK_PAGE_TURN, 0.5f, 1f);
 
-			mPlayer.openInventory(mInventory2);
+			mRequestingPlayer.openInventory(mInventory2);
 
 			mInventory2.setItem(SUMMARY_INDEX, getSummary());
 			mInventory2.setItem(BEGIN_DELVE_INDEX, getBeginDelve());
 		}
 
 		private void previousPage() {
-			mPlayer.playSound(mPlayer.getLocation(), Sound.ITEM_BOOK_PAGE_TURN, 0.5f, 1f);
+			mRequestingPlayer.playSound(mPlayer.getLocation(), Sound.ITEM_BOOK_PAGE_TURN, 0.5f, 1f);
 
-			mPlayer.openInventory(mInventory1);
+			mRequestingPlayer.openInventory(mInventory1);
 
 			mInventory1.setItem(SUMMARY_INDEX, getSummary());
 			mInventory1.setItem(BEGIN_DELVE_INDEX, getBeginDelve());

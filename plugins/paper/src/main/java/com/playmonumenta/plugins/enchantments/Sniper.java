@@ -22,7 +22,7 @@ public class Sniper implements BaseEnchantment {
 	private static final String PROPERTY_NAME = ChatColor.GRAY + "Sniper";
 	private static final int DISTANCE = 16;
 	private static final int DAMAGE_PER_LEVEL = 2;
-	private static final String LEVEL_METAKEY = "SniperLevelMetakey";
+	public static final String LEVEL_METAKEY = "SniperLevelMetakey";
 	private static final String LOCATION_METAKEY = "SniperLocationMetakey";
 	private static final EnumSet<EntityType> ALLOWED_PROJECTILES = EnumSet.of(EntityType.ARROW, EntityType.SPECTRAL_ARROW);
 

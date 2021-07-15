@@ -90,6 +90,17 @@ public class EffectManager implements Listener {
 			return null;
 		}
 
+		 public boolean hasEffect(String source) {
+	            for (Map<String, NavigableSet<Effect>> priorityEffects : mPriorityMap.values()) {
+	                NavigableSet<Effect> effectGroup = priorityEffects.get(source);
+	                if (effectGroup != null && !effectGroup.isEmpty()) {
+	                    return true;
+	                }
+	            }
+
+	            return false;
+	        }
+
 		public NavigableSet<Effect> clearEffects(String source) {
 			for (Map<String, NavigableSet<Effect>> priorityEffects : mPriorityMap.values()) {
 				NavigableSet<Effect> removedEffectGroup = priorityEffects.remove(source);
@@ -284,6 +295,22 @@ public class EffectManager implements Listener {
 
 		return null;
 	}
+
+	  /**
+     * Returns if an entity has an effect source or not.
+     *
+     * @param  entity the entity being checked
+     * @param  source the source of effects to be checked
+     * @return whether the entity has the effect or not
+     */
+	public boolean hasEffect(Entity entity, String source) {
+		Effects effects = mEntities.get(entity);
+		if (effects != null) {
+			return effects.hasEffect(source);
+		}
+		return false;
+	}
+
 
 	/**
 	 * Clears and returns effects from a given source from an entity.

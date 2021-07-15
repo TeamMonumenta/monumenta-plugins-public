@@ -1,0 +1,96 @@
+package com.playmonumenta.plugins.depths.abilities.frostborn;
+
+import java.util.HashSet;
+
+import org.bukkit.Color;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
+import org.bukkit.World;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
+import org.bukkit.event.player.PlayerSwapHandItemsEvent;
+
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.depths.DepthsTree;
+import com.playmonumenta.plugins.depths.DepthsUtils;
+import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
+import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
+import com.playmonumenta.plugins.utils.EntityUtils;
+
+import net.md_5.bungee.api.ChatColor;
+
+public class Avalanche extends DepthsAbility {
+
+	public static final String ABILITY_NAME = "Avalanche";
+	public static final int[] DAMAGE = {32, 39, 46, 53, 60};
+	public static final int COOLDOWN_TICKS = 20 * 20;
+	public static final int SLOW_DURATION = 3 * 20;
+	public static final double SLOW_MODIFIER = 0.99;
+	public static final int RADIUS = 10;
+	private static final Particle.DustOptions ICE_PARTICLE_COLOR = new Particle.DustOptions(Color.fromRGB(91, 187, 255), 1.0f);
+
+	public Avalanche(Plugin plugin, Player player) {
+		super(plugin, player, ABILITY_NAME);
+		mDisplayItem = Material.SNOW_BLOCK;
+		mTree = DepthsTree.FROSTBORN;
+		mInfo.mCooldown = COOLDOWN_TICKS;
+		mInfo.mIgnoreCooldown = true;
+		mInfo.mLinkedSpell = ClassAbility.AVALANCHE;
+	}
+
+	@Override
+	public void playerSwapHandItemsEvent(PlayerSwapHandItemsEvent event) {
+		event.setCancelled(true);
+		if (!isTimerActive()) {
+			putOnCooldown();
+
+			World world = mPlayer.getWorld();
+			Location loc = mPlayer.getLocation();
+
+			world.playSound(loc, Sound.BLOCK_GLASS_BREAK, 1, 0.95f);
+			world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 1, 0.95f);
+
+			world.playSound(loc, Sound.BLOCK_GLASS_BREAK, 1, 0.75f);
+			world.playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_BLAST, 1, 1.25f);
+
+			world.playSound(loc, Sound.BLOCK_GLASS_BREAK, 0.5f, 1f);
+
+			//Shatter all nearby ice
+			for (Location l : new HashSet<>(DepthsUtils.iceActive.keySet())) {
+				if (l.distance(loc) > RADIUS) {
+					continue;
+				}
+				Location aboveLoc = l.clone().add(0.5, 1, 0.5);
+				//Damage and root mobs
+				for (LivingEntity mob : EntityUtils.getNearbyMobs(aboveLoc, 1.0)) {
+					EntityUtils.applySlow(mPlugin, SLOW_DURATION, SLOW_MODIFIER, mob);
+					EntityUtils.damageEntity(mPlugin, mob, DAMAGE[mRarity - 1], mPlayer);
+				}
+				mPlayer.getWorld().getBlockAt(l).setBlockData(DepthsUtils.iceActive.get(l));
+				DepthsUtils.iceActive.remove(l);
+
+				world.spawnParticle(Particle.REDSTONE, aboveLoc, 15, 0.5, 0.5, 0.5, ICE_PARTICLE_COLOR);
+				world.spawnParticle(Particle.CAMPFIRE_SIGNAL_SMOKE, aboveLoc, 3, 0.5, 0.25, 0.5);
+			}
+		}
+	}
+
+	@Override
+	public String getDescription(int rarity) {
+		return "Swap hands to shatter all ice blocks within a radius of " + RADIUS + ", dealing " + DepthsUtils.getRarityColor(rarity) + DAMAGE[rarity - 1] + ChatColor.WHITE + " damage to enemies on the shattered ice. Affected enemies are rooted for " + (SLOW_DURATION / 20.0) + " seconds. Cooldown: " + COOLDOWN_TICKS / 20 + "s.";
+	}
+
+	@Override
+	public DepthsTree getDepthsTree() {
+		return DepthsTree.FROSTBORN;
+	}
+
+	@Override
+	public DepthsTrigger getTrigger() {
+		return DepthsTrigger.SWAP;
+	}
+}
+

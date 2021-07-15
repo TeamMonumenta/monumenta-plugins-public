@@ -7,11 +7,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.AbilityManager;
-import com.playmonumenta.plugins.enchantments.curses.CurseOfEphemerality;
-import com.playmonumenta.plugins.enchantments.curses.TwoHanded;
-
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -32,6 +27,11 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.io.BukkitObjectInputStream;
 import org.bukkit.util.io.BukkitObjectOutputStream;
 import org.yaml.snakeyaml.external.biz.base64Coder.Base64Coder;
+
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.AbilityManager;
+import com.playmonumenta.plugins.enchantments.curses.CurseOfEphemerality;
+import com.playmonumenta.plugins.enchantments.curses.TwoHanded;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -211,6 +211,92 @@ public class InventoryUtils {
 				}
 			}
 		}
+	}
+
+	public static boolean isAxeItem(final ItemStack item) {
+		if (item != null) {
+			final Material mat = item.getType();
+			return mat == Material.WOODEN_AXE || mat == Material.STONE_AXE || mat == Material.GOLDEN_AXE
+				   || mat == Material.IRON_AXE || mat == Material.DIAMOND_AXE || mat == Material.NETHERITE_AXE;
+		}
+
+		return false;
+	}
+
+	public static boolean isBowItem(final ItemStack item) {
+		if (item != null) {
+			final Material mat = item.getType();
+			return mat == Material.BOW || mat == Material.CROSSBOW;
+		}
+
+		return false;
+	}
+
+	public static boolean isSwordItem(final ItemStack item) {
+		if (item != null) {
+			final Material mat = item.getType();
+			return mat == Material.WOODEN_SWORD || mat == Material.STONE_SWORD || mat == Material.GOLDEN_SWORD
+				   || mat == Material.IRON_SWORD || mat == Material.DIAMOND_SWORD || mat == Material.NETHERITE_SWORD;
+		}
+
+		return false;
+	}
+
+	public static boolean isPickaxeItem(final ItemStack item) {
+		if (item != null) {
+			final Material mat = item.getType();
+			return mat == Material.WOODEN_PICKAXE || mat == Material.STONE_PICKAXE || mat == Material.GOLDEN_PICKAXE
+				   || mat == Material.IRON_PICKAXE || mat == Material.DIAMOND_PICKAXE || mat == Material.NETHERITE_PICKAXE;
+		}
+
+		return false;
+	}
+
+	public static boolean isScytheItem(final ItemStack item) {
+		if (item != null) {
+			if (ItemUtils.isItemShattered(item)) {
+				return false;
+			}
+
+			final Material mat = item.getType();
+			return mat == Material.WOODEN_HOE || mat == Material.STONE_HOE || mat == Material.GOLDEN_HOE
+				   || mat == Material.IRON_HOE || mat == Material.DIAMOND_HOE || mat == Material.NETHERITE_HOE;
+		}
+
+		return false;
+	}
+
+	public static boolean isShovelItem(final ItemStack item) {
+		if (item != null) {
+			final Material mat = item.getType();
+			return mat == Material.WOODEN_SHOVEL || mat == Material.STONE_SHOVEL || mat == Material.GOLDEN_SHOVEL
+				   || mat == Material.IRON_SHOVEL || mat == Material.DIAMOND_SHOVEL;
+		}
+
+		return false;
+	}
+
+	public static boolean isWandItem(final ItemStack item) {
+		if (item == null) {
+			return false;
+		}
+
+		final List<String> lore = ItemUtils.getPlainLore(item);
+		if (lore == null || lore.isEmpty()) {
+			return false;
+		}
+
+		if (ItemUtils.isItemShattered(item)) {
+			return false;
+		}
+
+		for (final String loreEntry : lore) {
+			if (loreEntry.contains("Magic Wand")) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	public static boolean isSoulboundToPlayer(final ItemStack item, final Player player) {

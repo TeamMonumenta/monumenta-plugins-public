@@ -1,5 +1,7 @@
 package com.playmonumenta.plugins.classes;
 
+import org.jetbrains.annotations.NotNull;
+
 import com.playmonumenta.plugins.abilities.cleric.DivineJustice;
 import com.playmonumenta.plugins.abilities.mage.ElementalArrows;
 import com.playmonumenta.plugins.abilities.mage.FrostNova;
@@ -11,8 +13,6 @@ import com.playmonumenta.plugins.abilities.mage.arcanist.SpatialShatter;
 import com.playmonumenta.plugins.abilities.mage.elementalist.Blizzard;
 import com.playmonumenta.plugins.abilities.mage.elementalist.Starfall;
 import com.playmonumenta.plugins.abilities.warrior.berserker.MeteorSlam;
-
-import org.jetbrains.annotations.NotNull;
 
 
 
@@ -143,7 +143,59 @@ public enum ClassAbility {
 	// Harbinger
 	NIGHTMARISH_ALCHEMY("Nightmarish Alchemy"),
 	PURPLE_HAZE("Purple Haze"),
-	SCORCHED_EARTH("Scorched Earth");
+	SCORCHED_EARTH("Scorched Earth"),
+
+	// [DEPTHS ABILITIES]
+
+	// FLAMECALLER
+	FIREBALL("Fireball"),
+	RING_OF_FLAMES("Ring of Flames"),
+	FLAMESTRIKE("Flamestrike"),
+	VOLCANIC_METEOR("Volcanic Meteor"),
+	PYROBLAST("Pyroblast"),
+
+	// STEELSAGE
+	METALMANCY("Metalmancy"),
+	RAPIDFIRE("Rapid Fire"),
+	SIDEARM("Sidearm"),
+	SCRAPSHOT("Scrapshot"),
+	FIREWORKBLAST("Firework Blast"),
+
+	// WINDWALKER
+	SKYHOOK("Skyhook"),
+	SLIPSTREAM("Slipstream"),
+	DISENGAGE("Disengage"),
+	UPDRAFT("Updraft"),
+	WHIRLWIND("Whirlwind"),
+	HOWLINGWINDS("Howling Winds"),
+
+	// SHADOW
+	BLADE_FLURRY("Blade Flurry"),
+	SHADOW_DIVE("Cloak of Shadows"),
+	CHAOS_DAGGER("Chaos Dagger"),
+	DUMMY_DECOY("Dummy Decoy"),
+
+	// SUNLIGHT
+	BOTTLED_SUNLIGHT("Bottled Sunlight"),
+	LIGHTNING_BOTTLE("Lightning Bottle"),
+	RADIANT_BLESSING("Radiant Blessing"),
+	TOTEM_OF_SALVATION("Totem of Salvation"),
+	WARD_OF_LIGHT("Ward of Light"),
+
+	// FROSTBORN
+	ICE_LANCE("Ice Lance"),
+	ICE_WALL("Ice Barrier"),
+	AVALANCHE("Avalanche"),
+	FROST_SPEAR("Piercing Cold"),
+	CRYOBOX("Cryobox"),
+
+	// EARTHBORN
+	BULWARK("Bulwark"),
+	CRUSHING_EARTH("Crushing Earth"),
+	EARTHEN_WRATH("Earthen Wrath"),
+	EARTHQUAKE("Earthquake"),
+	STONE_SKIN("Stone Skin"),
+	TAUNT("Taunt");
 
 	private final @NotNull String mName;
 

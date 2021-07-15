@@ -32,6 +32,22 @@ public class OpenDelveModifierSelectionGUI extends GenericCommand {
 				run((Entity) args[0], (String) args[1]);
 			})
 			.register();
+
+		arguments.clear();
+		arguments.add(new EntitySelectorArgument("moderator", EntitySelector.ONE_ENTITY));
+		arguments.add(new EntitySelectorArgument("target player", EntitySelector.ONE_ENTITY));
+		arguments.add(new StringArgument("dungeon"));
+
+		new CommandAPICommand("openmoderatordmsgui")
+			.withPermission(perms)
+			.withArguments(arguments)
+			.executes((sender, args) -> {
+				if (args[0] instanceof Player && args[1] instanceof Player) {
+					DelveModifierSelectionGUI gui = new DelveModifierSelectionGUI((Player) args[0], (Player) args[1], (String) args[2]);
+					DelvesListener.openGUI((Player) args[0], gui);
+				}
+			})
+			.register();
 	}
 
 	private static void run(Entity entity, String dungeon) {

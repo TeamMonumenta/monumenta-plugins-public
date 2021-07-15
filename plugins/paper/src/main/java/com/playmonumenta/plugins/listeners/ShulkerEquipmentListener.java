@@ -1,15 +1,8 @@
 package com.playmonumenta.plugins.listeners;
 
 import java.util.Map;
+import java.util.NavigableSet;
 import java.util.TreeMap;
-
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.enchantments.Locked;
-import com.playmonumenta.plugins.enchantments.curses.CurseOfEphemerality;
-import com.playmonumenta.plugins.overrides.FirmamentOverride;
-import com.playmonumenta.plugins.utils.InventoryUtils;
-import com.playmonumenta.plugins.utils.ItemUtils;
-import com.playmonumenta.plugins.utils.ZoneUtils;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -30,6 +23,16 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.BlockStateMeta;
+
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.effects.Effect;
+import com.playmonumenta.plugins.effects.Stasis;
+import com.playmonumenta.plugins.enchantments.Locked;
+import com.playmonumenta.plugins.enchantments.curses.CurseOfEphemerality;
+import com.playmonumenta.plugins.overrides.FirmamentOverride;
+import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.ZoneUtils;
 
 public class ShulkerEquipmentListener implements Listener {
 	private static final String LOCK_STRING = "AdminEquipmentTool";
@@ -60,6 +63,11 @@ public class ShulkerEquipmentListener implements Listener {
 
 	@EventHandler(priority = EventPriority.HIGHEST)
 	public void inventoryClickEvent(InventoryClickEvent event) {
+		String s = "Stasis";
+		NavigableSet<Effect> activeEffects = mPlugin.mEffectManager.getEffects(event.getWhoClicked(), s);
+		if (activeEffects != null && activeEffects.contains(new Stasis(120))) {
+			event.setCancelled(true);
+		}
 		if (
 		    // Must not be cancelled
 		    event.isCancelled() ||

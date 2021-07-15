@@ -167,6 +167,7 @@ import com.playmonumenta.plugins.abilities.warrior.berserker.RecklessSwing;
 import com.playmonumenta.plugins.abilities.warrior.guardian.Bodyguard;
 import com.playmonumenta.plugins.abilities.warrior.guardian.Challenge;
 import com.playmonumenta.plugins.abilities.warrior.guardian.ShieldWall;
+import com.playmonumenta.plugins.depths.DepthsManager;
 import com.playmonumenta.plugins.enchantments.infusions.Vitality;
 import com.playmonumenta.plugins.events.AbilityCastEvent;
 import com.playmonumenta.plugins.events.CustomDamageEvent;
@@ -210,7 +211,7 @@ public class AbilityManager {
 			new DarkPact(mPlugin, null)
 		);
 
-		if (ServerProperties.getClassSpecializationsEnabled()) {
+		if (ServerProperties.getClassSpecializationsEnabled() && !ServerProperties.getShardName().contains("depths")) {
 			mReferenceAbilities.addAll(specAbilitiesPriority);
 		} else {
 			mDisabledAbilities.addAll(specAbilitiesPriority);
@@ -230,7 +231,10 @@ public class AbilityManager {
 			new PatronWhite(mPlugin, null),
 			new PatronGreen(mPlugin, null),
 			new PatronPurple(mPlugin, null),
-			new PatronRed(mPlugin, null),
+			new PatronRed(mPlugin, null)
+		));
+
+		List<Ability> classAbilities = Arrays.asList(
 
 			//********** MAGE **********//
 			new ArcaneStrike(mPlugin, null),
@@ -305,99 +309,109 @@ public class AbilityManager {
 			new BrutalAlchemy(mPlugin, null),
 			new EnfeeblingElixir(mPlugin, null),
 			new AlchemistPotions(mPlugin, null)
-		));
+		);
 
 		List<Ability> specAbilities = Arrays.asList(
-				//********** MAGE **********//
-				// ELEMENTALIST
-				new ElementalSpiritFire(mPlugin, null),
-				new ElementalSpiritIce(mPlugin, null),
-				new Blizzard(mPlugin, null),
-				new Starfall(mPlugin, null),
+			//********** MAGE **********//
+			// ELEMENTALIST
+			new ElementalSpiritFire(mPlugin, null),
+			new ElementalSpiritIce(mPlugin, null),
+			new Blizzard(mPlugin, null),
+			new Starfall(mPlugin, null),
 
-				// ARCANIST
-				new SpatialShatter(mPlugin, null),
-				new AstralOmen(mPlugin, null),
-				new SagesInsight(mPlugin, null),
+			// ARCANIST
+			new SpatialShatter(mPlugin, null),
+			new AstralOmen(mPlugin, null),
+			new SagesInsight(mPlugin, null),
 
-				//********** ROGUE **********//
-				// SWORDSAGE
-				new WindWalk(mPlugin, null),
-				new BladeDance(mPlugin, null),
-				new DeadlyRonde(mPlugin, null),
+			//********** ROGUE **********//
+			// SWORDSAGE
+			new WindWalk(mPlugin, null),
+			new BladeDance(mPlugin, null),
+			new DeadlyRonde(mPlugin, null),
 
-				// ASSASSIN
-				new BodkinBlitz(mPlugin, null),
-				new CloakAndDagger(mPlugin, null),
-				new CoupDeGrace(mPlugin, null),
+			// ASSASSIN
+			new BodkinBlitz(mPlugin, null),
+			new CloakAndDagger(mPlugin, null),
+			new CoupDeGrace(mPlugin, null),
 
-				//********** SCOUT **********//
-				// RANGER
-				new TacticalManeuver(mPlugin, null),
-				new WhirlingBlade(mPlugin, null),
-				new Quickdraw(mPlugin, null),
+			//********** SCOUT **********//
+			// RANGER
+			new TacticalManeuver(mPlugin, null),
+			new WhirlingBlade(mPlugin, null),
+			new Quickdraw(mPlugin, null),
 
-				// HUNTER
-				new EnchantedShot(mPlugin, null),
-				new PinningShot(mPlugin, null),
-				new SplitArrow(mPlugin, null),
+			// HUNTER
+			new EnchantedShot(mPlugin, null),
+			new PinningShot(mPlugin, null),
+			new SplitArrow(mPlugin, null),
 
-				//********** WARRIOR **********//
-				// BERSERKER
-				new MeteorSlam(mPlugin, null),
-				new Rampage(mPlugin, null),
+			//********** WARRIOR **********//
+			// BERSERKER
+			new MeteorSlam(mPlugin, null),
+			new Rampage(mPlugin, null),
 
-				// GUARDIAN
-				new ShieldWall(mPlugin, null),
-				new Challenge(mPlugin, null),
-				new Bodyguard(mPlugin, null),
+			// GUARDIAN
+			new ShieldWall(mPlugin, null),
+			new Challenge(mPlugin, null),
+			new Bodyguard(mPlugin, null),
 
-				//********** CLERIC **********//
-				// PALADIN
-				// LI needs to run first to process its passive melee damage
-				new LuminousInfusion(mPlugin, null),
-				// HJ runs afterwards and can use that value in the same event,
-				// sharing it to its Javelin AoE
-				new HolyJavelin(mPlugin, null),
+			//********** CLERIC **********//
+			// PALADIN
+			// LI needs to run first to process its passive melee damage
+			new LuminousInfusion(mPlugin, null),
+			// HJ runs afterwards and can use that value in the same event,
+			// sharing it to its Javelin AoE
+			new HolyJavelin(mPlugin, null),
 
-				new ChoirBells(mPlugin, null),
+			new ChoirBells(mPlugin, null),
 
-				// HIEROPHANT
-				new EnchantedPrayer(mPlugin, null),
-				new HallowedBeam(mPlugin, null),
-				new ThuribleProcession(mPlugin, null),
+			// HIEROPHANT
+			new EnchantedPrayer(mPlugin, null),
+			new HallowedBeam(mPlugin, null),
+			new ThuribleProcession(mPlugin, null),
 
-				//********** WARLOCK **********//
-                // REAPER
-				new JudgementChain(mPlugin, null),
-				new VoodooBonds(mPlugin, null),
+			//********** WARLOCK **********//
+            // REAPER
+			new JudgementChain(mPlugin, null),
+			new VoodooBonds(mPlugin, null),
 
-				// TENEBRIST
-				new WitheringGaze(mPlugin, null),
-				new HauntingShades(mPlugin, null),
-				new UmbralWail(mPlugin, null),
+			// TENEBRIST
+			new WitheringGaze(mPlugin, null),
+			new HauntingShades(mPlugin, null),
+			new UmbralWail(mPlugin, null),
 
-				//********** ALCHEMIST **********//
-				// HARBINGER
-				new ScorchedEarth(mPlugin, null),
-				new NightmarishAlchemy(mPlugin, null),
-				new PurpleHaze(mPlugin, null),
+			//********** ALCHEMIST **********//
+			// HARBINGER
+			new ScorchedEarth(mPlugin, null),
+			new NightmarishAlchemy(mPlugin, null),
+			new PurpleHaze(mPlugin, null),
 
-				// APOTHECARY
-				new AlchemicalAmalgam(mPlugin, null),
-				new InvigoratingOdor(mPlugin, null),
-				new WardingRemedy(mPlugin, null),
-				new WardingRemedyNonApothecary(mPlugin, null)
-			);
+			// APOTHECARY
+			new AlchemicalAmalgam(mPlugin, null),
+			new InvigoratingOdor(mPlugin, null),
+			new WardingRemedy(mPlugin, null),
+			new WardingRemedyNonApothecary(mPlugin, null)
+		);
 
-		if (ServerProperties.getClassSpecializationsEnabled()) {
-			mReferenceAbilities.addAll(specAbilities);
-		} else {
-			mDisabledAbilities.addAll(specAbilities);
+		if (ServerProperties.getShardName().contains("depths") || ServerProperties.getShardName().contains("dev")) {
+			//Depths abilities
+			mReferenceAbilities.addAll(DepthsManager.getAbilities());
+		}
+		if (!ServerProperties.getShardName().contains("depths")) {
+			//Normal class and spec abilities
+			mReferenceAbilities.addAll(classAbilities);
+
+			if (ServerProperties.getClassSpecializationsEnabled()) {
+				mReferenceAbilities.addAll(specAbilities);
+			} else {
+				mDisabledAbilities.addAll(specAbilities);
+			}
 		}
 
+
 		// These abilities should trigger after all event damage is calculated
-		mReferenceAbilities.addAll(Arrays.asList(
+		List<Ability> delveModifiers = Arrays.asList(
 			//********** DELVES **********//
 			new StatMultiplier(mPlugin, null),
 			new Legionary(mPlugin, null),
@@ -413,12 +427,18 @@ public class AbilityManager {
 			new Bloodthirsty(mPlugin, null),
 			new Carapace(mPlugin, null),
 			new Entropy(mPlugin, null),
-			new Twisted(mPlugin, null),
+			new Twisted(mPlugin, null)
+		);
 
+		List<Ability> triggerLastAbilities = Arrays.asList(
 			new FinishingBlow(mPlugin, null),
 			new PrismaticShield(mPlugin, null),
 			new EscapeDeath(mPlugin, null)
-		));
+		);
+		mReferenceAbilities.addAll(delveModifiers);
+		if (!ServerProperties.getShardName().contains("depths")) {
+			mReferenceAbilities.addAll(triggerLastAbilities);
+		}
 	}
 
 	public static AbilityManager getManager() {

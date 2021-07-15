@@ -52,6 +52,7 @@ public class DelvesListener implements Listener {
 		DUNGEONS.add("dev1");
 		DUNGEONS.add("dev2");
 		DUNGEONS.add("mobs");
+		DUNGEONS.add("depths");
 	}
 
 	private static final String HAS_DELVE_MODIFIER_TAG = "DelveModifiersApplied";

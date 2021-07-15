@@ -62,6 +62,9 @@ import com.playmonumenta.plugins.bosses.bosses.gray.GrayGolemSummoner;
 import com.playmonumenta.plugins.bosses.bosses.gray.GrayScarabSummoner;
 import com.playmonumenta.plugins.bosses.bosses.gray.GraySummoned;
 import com.playmonumenta.plugins.bosses.events.SpellCastEvent;
+import com.playmonumenta.plugins.depths.bosses.Davey;
+import com.playmonumenta.plugins.depths.bosses.Hedera;
+import com.playmonumenta.plugins.depths.bosses.Nucleus;
 import com.playmonumenta.plugins.events.CustomEffectApplyEvent;
 import com.playmonumenta.plugins.parrots.RainbowParrot;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -223,6 +226,7 @@ public class BossManager implements Listener {
 		mStatelessBosses.put(DistanceCloserBoss.identityTag, (Plugin p, LivingEntity e) -> new DistanceCloserBoss(p, e));
 		mStatelessBosses.put(WeakHookBoss.identityTag, (Plugin p, LivingEntity e) -> new WeakHookBoss(p, e));
 		mStatelessBosses.put(AuraEffectBoss.identityTag, (Plugin p, LivingEntity e) -> new AuraEffectBoss(p, e));
+		mStatelessBosses.put(DummyDecoyBoss.identityTag, (Plugin p, LivingEntity e) -> new DummyDecoyBoss(p, e));
 		mStatelessBosses.put(LaserBoss.identityTag, (Plugin p, LivingEntity e) -> new LaserBoss(p, e));
 		mStatelessBosses.put(OnHitBoss.identityTag, (Plugin p, LivingEntity e) -> new OnHitBoss(p, e));
 		mStatelessBosses.put(NovaBoss.identityTag, (Plugin p, LivingEntity e) -> new NovaBoss(p, e));
@@ -258,10 +262,12 @@ public class BossManager implements Listener {
 		mStatefulBosses.put(VarcosaLingeringWillBoss.identityTag, (Plugin p, LivingEntity e, Location s, Location l) -> new VarcosaLingeringWillBoss(p, e, s, l));
 		mStatefulBosses.put(MimicQueen.identityTag, (Plugin p, LivingEntity e, Location s, Location l) -> new MimicQueen(p, e, s, l));
 		mStatefulBosses.put(FalseSpirit.identityTag, (Plugin p, LivingEntity e, Location s, Location l) -> new FalseSpirit(p, e, s, l));
+		mStatefulBosses.put(Hedera.identityTag, (Plugin p, LivingEntity e, Location s, Location l) -> new Hedera(p, e, s, l));
+		mStatefulBosses.put(Davey.identityTag, (Plugin p, LivingEntity e, Location s, Location l) -> new Davey(p, e, s, l));
+		mStatefulBosses.put(Nucleus.identityTag, (Plugin p, LivingEntity e, Location s, Location l) -> new Nucleus(p, e, s, l));
 		mStatefulBosses.put(Ghalkor.identityTag, (Plugin p, LivingEntity e, Location s, Location l) -> new Ghalkor(p, e, s, l));
 		mStatefulBosses.put(Svalgot.identityTag, (Plugin p, LivingEntity e, Location s, Location l) -> new Svalgot(p, e, s, l));
 		mStatefulBosses.put(BeastOfTheBlackFlame.identityTag, (Plugin p, LivingEntity e, Location s, Location l) -> new BeastOfTheBlackFlame(p, e, s, l));
-
 
 		/* All bosses have a deserializer which gives the boss back their abilities when chunks re-load */
 		mBossDeserializers = new HashMap<String, BossDeserializer>();
@@ -406,6 +412,10 @@ public class BossManager implements Listener {
 		mBossDeserializers.put(DistanceCloserBoss.identityTag, (Plugin p, LivingEntity e) -> DistanceCloserBoss.deserialize(p, e));
 		mBossDeserializers.put(WeakHookBoss.identityTag, (Plugin p, LivingEntity e) -> WeakHookBoss.deserialize(p, e));
 		mBossDeserializers.put(AuraEffectBoss.identityTag, (Plugin p, LivingEntity e) -> AuraEffectBoss.deserialize(p, e));
+		mBossDeserializers.put(DummyDecoyBoss.identityTag, (Plugin p, LivingEntity e) -> DummyDecoyBoss.deserialize(p, e));
+		mBossDeserializers.put(Hedera.identityTag, (Plugin p, LivingEntity e) -> Hedera.deserialize(p, e));
+		mBossDeserializers.put(Davey.identityTag, (Plugin p, LivingEntity e) -> Davey.deserialize(p, e));
+		mBossDeserializers.put(Nucleus.identityTag, (Plugin p, LivingEntity e) -> Nucleus.deserialize(p, e));
 		mBossDeserializers.put(LaserBoss.identityTag, (Plugin p, LivingEntity e) -> LaserBoss.deserialize(p, e));
 		mBossDeserializers.put(OnHitBoss.identityTag, (Plugin p, LivingEntity e) -> OnHitBoss.deserialize(p, e));
 		mBossDeserializers.put(NovaBoss.identityTag, (Plugin p, LivingEntity e) -> NovaBoss.deserialize(p, e));

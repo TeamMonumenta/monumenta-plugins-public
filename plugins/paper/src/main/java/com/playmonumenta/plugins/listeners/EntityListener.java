@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.EnumSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.NavigableSet;
 import java.util.Set;
 
 import org.bukkit.GameMode;
@@ -82,6 +83,8 @@ import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.attributes.AttributeProjectileDamage;
+import com.playmonumenta.plugins.effects.Effect;
+import com.playmonumenta.plugins.effects.Stasis;
 import com.playmonumenta.plugins.enchantments.Inferno;
 import com.playmonumenta.plugins.enchantments.ThrowingKnife;
 import com.playmonumenta.plugins.events.CustomDamageEvent;
@@ -145,7 +148,10 @@ public class EntityListener implements Listener {
 		if (event.isCancelled()) {
 			return;
 		}
-
+		String s = "Stasis";
+		if (mPlugin.mEffectManager.getEffects(event.getEntity(), s) != null && (mPlugin.mEffectManager.getEffects(event.getEntity(), s)).contains(new Stasis(120))) {
+			event.setCancelled(true);
+		}
 		// Record the time of the player who sets a mob on fire
 		// Used to prevent arcane strike from counting mobs on fire that were
 		// set on fire by the same hit that triggered arcane strike
@@ -179,6 +185,12 @@ public class EntityListener implements Listener {
 
 	@EventHandler
 	public void customDamageEvent(CustomDamageEvent event) {
+		String s = "Stasis";
+		NavigableSet<Effect> damagerEffects = mPlugin.mEffectManager.getEffects(event.getDamager(), s);
+		NavigableSet<Effect> damagedEffects = mPlugin.mEffectManager.getEffects(event.getDamager(), s);
+		if ((damagerEffects != null && damagerEffects.contains(new Stasis(120))) || (damagedEffects != null && damagedEffects.contains(new Stasis(120)))) {
+			event.setCancelled(true);
+		}
 		if (event.getDamager() instanceof Player) {
 			// If the event has a valid spell, call onAbility
 			if (event.getSpell() != null) {
@@ -201,7 +213,11 @@ public class EntityListener implements Listener {
 		}
 		Entity damagee = event.getEntity();
 		Entity damager = event.getDamager();
-
+		String s = "Stasis";
+		if ((mPlugin.mEffectManager.getEffects(damager, s) != null && (mPlugin.mEffectManager.getEffects(event.getDamager(), s)).contains(new Stasis(120))) ||
+				(mPlugin.mEffectManager.getEffects(damagee, s) != null && (mPlugin.mEffectManager.getEffects(damagee, s)).contains(new Stasis(120)))) {
+			event.setCancelled(true);
+		}
 		//  If the entity getting hurt is the player.
 		if (damagee instanceof Player) {
 			Player player = (Player)damagee;
@@ -330,7 +346,10 @@ public class EntityListener implements Listener {
 	public void entityDamageEvent(EntityDamageEvent event) {
 		Entity damagee = event.getEntity();
 		DamageCause source = event.getCause();
-
+		String s = "Stasis";
+		if (mPlugin.mEffectManager.getEffects(event.getEntity(), s) != null && (mPlugin.mEffectManager.getEffects(event.getEntity(), s)).contains(new Stasis(120))) {
+			event.setCancelled(true);
+		}
 		if (event.isCancelled()) {
 			return;
 		}
@@ -436,6 +455,9 @@ public class EntityListener implements Listener {
 		if (witch.getEquipment().getItemInMainHand() != null && witch.getEquipment().getItemInMainHand().getType() == Material.SPLASH_POTION) {
 			potion = witch.getEquipment().getItemInMainHand();
 		}
+		if (witch.isDrinkingPotion()) { //different ideas: something about checking how long the witch is drinking and make this not work until then?
+			event.setCancelled(true);
+		}
 		event.setPotion(potion);
 	}
 
@@ -529,7 +551,10 @@ public class EntityListener implements Listener {
 
 		Projectile proj = event.getEntity();
 		ProjectileSource shooter = proj.getShooter();
-
+		String s = "Stasis";
+		if (mPlugin.mEffectManager.getEffects(event.getEntity(), s) != null && (mPlugin.mEffectManager.getEffects(event.getEntity(), s)).contains(new Stasis(120))) {
+			event.setCancelled(true);
+		}
 		if (shooter instanceof Player) {
 			Player player = (Player)shooter;
 
@@ -610,6 +635,10 @@ public class EntityListener implements Listener {
 	public void potionSplashEvent(PotionSplashEvent event) {
 		if (event.isCancelled()) {
 			return;
+		}
+		String s = "Stasis";
+		if (mPlugin.mEffectManager.getEffects((Entity) event.getPotion().getShooter(), s) != null && (mPlugin.mEffectManager.getEffects((Entity) event.getPotion().getShooter(), s)).contains(new Stasis(120))) {
+			event.setCancelled(true);
 		}
 
 		ThrownPotion potion = event.getPotion();
@@ -693,7 +722,7 @@ public class EntityListener implements Listener {
 		if (event.isCancelled()) {
 			return;
 		}
-
+		event.getAffectedEntities().removeIf((l) -> mPlugin.mEffectManager.hasEffect(l, "Stasis"));
 		AreaEffectCloud cloud = event.getEntity();
 		Collection<LivingEntity> affectedEntities = event.getAffectedEntities();
 
@@ -839,7 +868,10 @@ public class EntityListener implements Listener {
 		Entity entity = event.getHitEntity();
 		Projectile proj = event.getEntity();
 		ProjectileSource source = proj.getShooter();
-
+		String s = "Stasis";
+		if (mPlugin.mEffectManager.getEffects((Entity) source, s) != null && (mPlugin.mEffectManager.getEffects((Entity) source, s)).contains(new Stasis(120))) {
+			event.setCancelled(true);
+		}
 		if (entity != null && entity instanceof Player) {
 			Player player = (Player) entity;
 			mAbilities.playerHitByProjectileEvent(player, event);
@@ -939,7 +971,10 @@ public class EntityListener implements Listener {
 		} else {
 			return;
 		}
-
+		String s = "Stasis";
+		if (mPlugin.mEffectManager.getEffects(applier, s) != null && (mPlugin.mEffectManager.getEffects(applier, s)).contains(new Stasis(120))) {
+			event.setCancelled(true);
+		}
 		/* Mark as applying slowness so arcane strike won't activate this tick */
 		if (applier instanceof Player && !applied.hasPotionEffect(PotionEffectType.SLOW)
 		    && event.getEffect().getType() == PotionEffectType.SLOW) {

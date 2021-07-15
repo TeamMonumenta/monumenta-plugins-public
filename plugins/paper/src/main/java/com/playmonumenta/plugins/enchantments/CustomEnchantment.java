@@ -1,5 +1,8 @@
 package com.playmonumenta.plugins.enchantments;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import com.playmonumenta.plugins.enchantments.cosmetic.Baaing;
 import com.playmonumenta.plugins.enchantments.cosmetic.Barking;
 import com.playmonumenta.plugins.enchantments.cosmetic.Clucking;
@@ -24,9 +27,6 @@ import com.playmonumenta.plugins.enchantments.infusions.Perspicacity;
 import com.playmonumenta.plugins.enchantments.infusions.Tenacity;
 import com.playmonumenta.plugins.enchantments.infusions.Vigor;
 import com.playmonumenta.plugins.enchantments.infusions.Vitality;
-
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 
 
@@ -88,6 +88,7 @@ public enum CustomEnchantment {
 	MELEE_EVASION(new MeleeEvasion()),
 	RESURRECTION(new Resurrection()),
 	VOID_TETHER(new VoidTether()),
+	PROTECTION_OF_THE_DEPTHS(new ProtectionOfDepths()),
 
 	// Durability
 	COLOSSAL(new Colossal()),
