@@ -17,7 +17,7 @@ import com.playmonumenta.plugins.Plugin;
 */
 public class AttributeThornsDamage implements BaseAttribute {
 	private static final String PROPERTY_NAME = "Thorns Damage";
-
+	private static final String STASIS = "Stasis";
 	@Override
 	public String getProperty() {
 		return PROPERTY_NAME;
@@ -26,6 +26,9 @@ public class AttributeThornsDamage implements BaseAttribute {
 	@Override
 	public void onHurtByEntity(Plugin plugin, Player player, double value, EntityDamageByEntityEvent event) {
 		Entity damager = event.getDamager();
+		if (plugin.mEffectManager.hasEffect(player, STASIS)) {
+			return;
+		}
 		//Set damager to shooter of arrow instead of the actual arrow if hit by projectile damage.
 		if (damager instanceof Arrow) {
 			final Arrow arrow = (Arrow) event.getDamager();

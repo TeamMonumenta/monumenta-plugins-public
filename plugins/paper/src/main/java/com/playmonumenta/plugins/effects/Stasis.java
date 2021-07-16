@@ -38,6 +38,7 @@ public class Stasis extends Effect {
 			entity.sendActionBar(Component.text("You are in stasis! You cannot use abilities for " + getDuration() / 20 + "s", NamedTextColor.DARK_RED));
 			((Player)entity).addPotionEffect(new PotionEffect(PotionEffectType.SLOW, mDuration, 100), false);
 			((Player)entity).addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, mDuration, 100), false);
+			((Player)entity).addPotionEffect(new PotionEffect(PotionEffectType.GLOWING, mDuration, 100), false);
 			(entity.getLocation().getWorld()).playSound(entity.getLocation(), Sound.BLOCK_BELL_USE, 1, 1.2f);
 			AbilityManager.getManager().getPlayerAbilities((Player) entity).silence();
 		}
@@ -71,3 +72,5 @@ public class Stasis extends Effect {
 	}
 
 }
+
+

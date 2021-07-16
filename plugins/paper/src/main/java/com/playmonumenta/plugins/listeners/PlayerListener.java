@@ -1127,6 +1127,7 @@ public class PlayerListener implements Listener {
 
 		Entity damagee = event.getEntity();
 		Entity damager = event.getDamager();
+
 		NavigableSet<Effect> effects = mPlugin.mEffectManager.getEffects(damagee, STASIS);
 		if (effects != null && (mPlugin.mEffectManager.getEffects(damager, STASIS) != null && (mPlugin.mEffectManager.getEffects(event.getDamager(), STASIS)).contains(new Stasis(120))) ||
 				(mPlugin.mEffectManager.getEffects(damagee, STASIS) != null && (mPlugin.mEffectManager.getEffects(damagee, STASIS)).contains(new Stasis(120)))) {
