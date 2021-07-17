@@ -686,6 +686,11 @@ public class InfusionUtils {
 			return false;
 		}
 
+		ItemRegion region = ItemUtils.getItemRegion(item);
+		if (region != ItemRegion.KINGS_VALLEY && region != ItemRegion.CELSIAN_ISLES) {
+			return false;
+		}
+
 		switch (ItemUtils.getItemTier(item)) {
 			case MEME:
 			case UNCOMMON:
