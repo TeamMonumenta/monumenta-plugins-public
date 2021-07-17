@@ -152,7 +152,7 @@ public class Hedera extends BossAbilityGroup {
 			new SpellEvolutionSeeds(plugin, mCooldownTicks, mPlants, mPlantTypes)
 		));
 		List<Spell> passiveSpells = Arrays.asList(
-			new SpellBlockBreak(mBoss, 2, 3, 2),
+			new SpellBlockBreak(mBoss, 2, 3, 2, true, Material.AIR),
 			new SpellHederaAnticheese(mBoss, mSpawnLoc),
 			new SpellPassiveGarden(mBoss, mPlantSpawns, mPlants, mPlantTypes, mSpawnLoc)
 		);
