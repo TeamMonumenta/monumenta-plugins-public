@@ -17,6 +17,7 @@ import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
@@ -32,6 +33,9 @@ import com.playmonumenta.plugins.utils.ParticleUtils;
 import com.playmonumenta.plugins.utils.ParticleUtils.SpawnParticleAction;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import net.md_5.bungee.api.ChatColor;
 
 public class TotemOfSalvation extends DepthsAbility {
@@ -69,6 +73,10 @@ public class TotemOfSalvation extends DepthsAbility {
 			Location loc = mPlayer.getEyeLocation();
 			ItemStack itemTincture = new ItemStack(Material.TOTEM_OF_UNDYING);
 			ItemUtils.setPlainName(itemTincture, "Totem of Salvation");
+			ItemMeta sundropMeta = itemTincture.getItemMeta();
+			sundropMeta.displayName(Component.text("Totem of Salvation", NamedTextColor.WHITE)
+	                .decoration(TextDecoration.ITALIC, false));
+			itemTincture.setItemMeta(sundropMeta);
 			World world = mPlayer.getWorld();
 			Item item = world.dropItem(loc, itemTincture);
 			item.setPickupDelay(Integer.MAX_VALUE);

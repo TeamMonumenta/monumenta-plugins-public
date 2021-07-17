@@ -10,6 +10,7 @@ import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -28,6 +29,10 @@ import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
+
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 
 public class BottledSunlight extends DepthsAbility {
 
@@ -56,6 +61,10 @@ public class BottledSunlight extends DepthsAbility {
 		Location loc = mPlayer.getEyeLocation();
 		ItemStack itemTincture = new ItemStack(Material.HONEY_BOTTLE);
 		ItemUtils.setPlainName(itemTincture, "Bottled Sunlight");
+		ItemMeta tinctureMeta = itemTincture.getItemMeta();
+		tinctureMeta.displayName(Component.text("Bottled Sunlight", NamedTextColor.WHITE)
+				.decoration(TextDecoration.ITALIC, false));
+		itemTincture.setItemMeta(tinctureMeta);
 		World world = mPlayer.getWorld();
 		world.playSound(loc, Sound.ENTITY_SNOWBALL_THROW, 1, 0.15f);
 		Item tincture = world.dropItem(loc, itemTincture);

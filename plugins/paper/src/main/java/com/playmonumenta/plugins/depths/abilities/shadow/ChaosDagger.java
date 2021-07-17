@@ -13,6 +13,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
@@ -27,6 +28,9 @@ import com.playmonumenta.plugins.depths.abilities.steelsage.Metalmancy;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import net.md_5.bungee.api.ChatColor;
 
 public class ChaosDagger extends DepthsAbility {
@@ -54,12 +58,17 @@ public class ChaosDagger extends DepthsAbility {
 
 		event.setCancelled(true);
 
-		if ((!isTimerActive() && DepthsUtils.isWeaponItem(mPlayer.getInventory().getItemInMainHand()))) {
+		if ((!isTimerActive() && DepthsUtils.isWeaponItem(mPlayer.getInventory().getItemInMainHand())) &&
+				EntityUtils.getNearestMob(mPlayer.getLocation(), 20.0) != null) {
 			putOnCooldown();
 
 			Location loc = mPlayer.getEyeLocation();
 			ItemStack itemTincture = new ItemStack(Material.NETHERITE_SWORD);
 			ItemUtils.setPlainName(itemTincture, "Chaos Dagger");
+			ItemMeta tinctureMeta = itemTincture.getItemMeta();
+			tinctureMeta.displayName(Component.text("Chaos Dagger", NamedTextColor.WHITE)
+	                .decoration(TextDecoration.ITALIC, false));
+			itemTincture.setItemMeta(tinctureMeta);
 			World world = mPlayer.getWorld();
 			Item tincture = world.dropItem(loc, itemTincture);
 			tincture.setPickupDelay(Integer.MAX_VALUE);
@@ -80,21 +89,30 @@ public class ChaosDagger extends DepthsAbility {
 
 				@Override
 				public void run() {
+					mExpire++;
+					if (mExpire >= 10 * 20) {
+						tincture.remove();
+						// Take the skill off cooldown (by setting to 0)
+						mPlugin.mTimers.addCooldown(mPlayer.getUniqueId(), mInfo.mLinkedSpell, 0);
+						this.cancel();
+					}
 					Location tLoc = tincture.getLocation();
 					mTarget = EntityUtils.getNearestMob(tLoc, 20);
-					// Has to check other mobs if nearest mob is chest slime or decoy
-					if (mTarget.getScoreboardTags().contains(Metalmancy.IGNORE_TAG)) {
-						for (LivingEntity mob : EntityUtils.getNearbyMobs(tLoc, 20)) {
-							if (!mob.getScoreboardTags().contains(Metalmancy.IGNORE_TAG)) {
-								mTarget = mob;
-								break;
-							}
-						}
-					}
 
 					if (mTarget == null) {
 						tincture.remove();
 						this.cancel();
+					}
+					// Has to check other mobs if nearest mob is chest slime or decoy
+					if (mTarget.getScoreboardTags().contains(Metalmancy.IGNORE_TAG)) {
+						for (LivingEntity mob : EntityUtils.getNearbyMobs(tLoc, 20)) {
+							if (mob != null && mob.getScoreboardTags() != null) {
+								if (!mob.getScoreboardTags().contains(Metalmancy.IGNORE_TAG)) {
+									mTarget = mob;
+									break;
+								}
+							}
+						}
 					}
 
 					if (mTarget.getBoundingBox().overlaps(tincture.getBoundingBox())) {
@@ -128,6 +146,8 @@ public class ChaosDagger extends DepthsAbility {
 
 						if (dir.length() < 0.001) {
 							/* If the direction magnitude is too small, escape, rather than divide by zero / infinity */
+							tincture.remove();
+							this.cancel();
 							return;
 						}
 
@@ -140,13 +160,6 @@ public class ChaosDagger extends DepthsAbility {
 						tincture.setVelocity(dir);
 						mLastLocation = tLoc;
 
-					}
-					mExpire++;
-					if (mExpire >= 10 * 20) {
-						tincture.remove();
-						// Take the skill off cooldown (by setting to 0)
-						mPlugin.mTimers.addCooldown(mPlayer.getUniqueId(), mInfo.mLinkedSpell, 0);
-						this.cancel();
 					}
 				}
 			}.runTaskTimer(mPlugin, 0, 1);

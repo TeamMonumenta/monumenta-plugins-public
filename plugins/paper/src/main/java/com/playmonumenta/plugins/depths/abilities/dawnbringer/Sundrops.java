@@ -9,6 +9,7 @@ import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -23,6 +24,9 @@ import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import net.md_5.bungee.api.ChatColor;
 
 public class Sundrops extends DepthsAbility {
@@ -44,7 +48,11 @@ public class Sundrops extends DepthsAbility {
 	public static void summonSundrop(Location loc) {
 		World world = loc.getWorld();
 		ItemStack itemStack = new ItemStack(Material.HONEYCOMB_BLOCK);
-		ItemUtils.setPlainName(itemStack, "Bottled Sunlight");
+		ItemUtils.setPlainName(itemStack, "Sundrop");
+		ItemMeta sundropMeta = itemStack.getItemMeta();
+		sundropMeta.displayName(Component.text("Sundrop", NamedTextColor.WHITE)
+				.decoration(TextDecoration.ITALIC, false));
+		itemStack.setItemMeta(sundropMeta);
 		Item item = world.dropItemNaturally(loc, itemStack);
 		item.setGlowing(true);
 		item.setPickupDelay(Integer.MAX_VALUE);
