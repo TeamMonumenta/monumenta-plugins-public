@@ -95,8 +95,7 @@ public class ShulkerShortcutListener implements Listener {
 				event.setCancelled(true);
 			} else if (itemClicked != null &&
 			           click == ClickType.RIGHT &&
-			           isPurpleTesseractContainer(itemClicked) &&
-					   !event.getClickedInventory().getType().equals(InventoryType.ENDER_CHEST)) {
+			           isPurpleTesseractContainer(itemClicked)) {
 				// Right clicked a purple tesseract shulker that can't be opened
 				player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1.0f, 1.0f);
 				player.sendMessage(ChatColor.RED + "This container must be placed to access its items");
