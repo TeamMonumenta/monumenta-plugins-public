@@ -96,6 +96,7 @@ import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Constants.Colors;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.attributes.AttributeProjectileDamage;
+
 import com.playmonumenta.plugins.attributes.AttributeThrowRate;
 import com.playmonumenta.plugins.commands.ToggleSwap;
 import com.playmonumenta.plugins.effects.Effect;
@@ -1155,6 +1156,7 @@ public class PlayerListener implements Listener {
 					Focus.onShootAttack(mPlugin, proj, le, event);
 					Spark.onShootAttack(mPlugin, proj, le, event);
 					Regicide.onShootAttack(mPlugin, proj, le, event);
+
 
 					if (damager instanceof Trident) {
 						IceAspect.onShootAttack(mPlugin, proj, le, event);

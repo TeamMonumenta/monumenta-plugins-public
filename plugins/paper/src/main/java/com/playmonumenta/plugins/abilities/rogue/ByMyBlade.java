@@ -2,17 +2,6 @@ package com.playmonumenta.plugins.abilities.rogue;
 
 import java.util.EnumSet;
 
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.classes.ClassAbility;
-import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
-import com.playmonumenta.plugins.enchantments.abilities.BaseAbilityEnchantment;
-import com.playmonumenta.plugins.potion.PotionManager.PotionID;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.InventoryUtils;
-import com.playmonumenta.plugins.utils.MovementUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
-
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -24,6 +13,17 @@ import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
+import com.playmonumenta.plugins.enchantments.abilities.BaseAbilityEnchantment;
+import com.playmonumenta.plugins.potion.PotionManager.PotionID;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.utils.MovementUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 
 
 
@@ -76,8 +76,6 @@ public class ByMyBlade extends Ability {
 	@Override
 	public boolean livingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
 		if (event.getCause() == DamageCause.ENTITY_ATTACK) {
-			//Ability enchantments
-			mInfo.mCooldown = (int) ByMyBladeCooldownEnchantment.getCooldown(mPlayer, BY_MY_BLADE_COOLDOWN, ByMyBladeCooldownEnchantment.class);
 			int duration = BY_MY_BLADE_HASTE_DURATION + (int) ByMyBladeDurationEnchantment.getExtraDuration(mPlayer, ByMyBladeDurationEnchantment.class);
 			int hasteAmplifier = getAbilityScore() == 1 ? BY_MY_BLADE_1_HASTE_AMPLIFIER : BY_MY_BLADE_2_HASTE_AMPLIFIER;
 			hasteAmplifier += ByMyBladeHasteEnchantment.getLevel(mPlayer, ByMyBladeHasteEnchantment.class);
@@ -125,5 +123,10 @@ public class ByMyBlade extends Ability {
 			return InventoryUtils.rogueTriggerCheck(mainHand, offHand);
 		}
 		return false;
+	}
+
+	@Override
+	public Class<? extends BaseAbilityEnchantment> getCooldownEnchantment() {
+		return ByMyBladeCooldownEnchantment.class;
 	}
 }

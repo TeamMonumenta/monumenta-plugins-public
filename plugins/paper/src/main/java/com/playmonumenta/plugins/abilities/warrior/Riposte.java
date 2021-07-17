@@ -50,8 +50,7 @@ public class Riposte extends Ability {
 		mInfo.mShorthandName = "Rip";
 		mInfo.mDescriptions.add("While wielding a sword or axe, you block a melee attack that would have hit you. Cooldown: 12s.");
 		mInfo.mDescriptions.add("Cooldown lowered to 10s and if you block an attack with Riposte's effect while holding a sword, your next sword attack within 2s deals double damage. If you block with Riposte's effect while holding an axe, the attacking mob is stunned for 3s.");
-		int cooldown = getAbilityScore() == 1 ? RIPOSTE_1_COOLDOWN : RIPOSTE_2_COOLDOWN;
-		mInfo.mCooldown = (int) RiposteCooldownEnchantment.getCooldown(player, cooldown, RiposteCooldownEnchantment.class);
+		mInfo.mCooldown = getAbilityScore() == 1 ? RIPOSTE_1_COOLDOWN : RIPOSTE_2_COOLDOWN;
 		mInfo.mIgnoreCooldown = true;
 	}
 
@@ -100,7 +99,6 @@ public class Riposte extends Ability {
 						world.spawnParticle(Particle.FIREWORKS_SPARK, loc, 20, 0.75, 0.5, 0.75, 0.1);
 						world.spawnParticle(Particle.CRIT, loc, 75, 0.1, 0.1, 0.1, 0.6);
 						int cooldown = getAbilityScore() == 1 ? RIPOSTE_1_COOLDOWN : RIPOSTE_2_COOLDOWN;
-						mInfo.mCooldown = (int) RiposteCooldownEnchantment.getCooldown(mPlayer, cooldown, RiposteCooldownEnchantment.class);
 						putOnCooldown();
 						return false;
 					}
@@ -122,5 +120,10 @@ public class Riposte extends Ability {
 		}
 
 		return true;
+	}
+
+	@Override
+	public Class<? extends BaseAbilityEnchantment> getCooldownEnchantment() {
+		return RiposteCooldownEnchantment.class;
 	}
 }

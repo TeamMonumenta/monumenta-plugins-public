@@ -61,7 +61,6 @@ public class CelestialBlessing extends Ability {
 
 	@Override
 	public void cast(Action action) {
-		mInfo.mCooldown = (int) CelestialCooldownEnchantment.getCooldown(mPlayer, CELESTIAL_COOLDOWN, CelestialCooldownEnchantment.class);
 		int celestial = getAbilityScore();
 
 		World world = mPlayer.getWorld();
@@ -110,5 +109,10 @@ public class CelestialBlessing extends Ability {
 			return (mPlayer.isSneaking() && !ItemUtils.isPickaxe(mainHand));
 		}
 		return false;
+	}
+
+	@Override
+	public Class<? extends BaseAbilityEnchantment> getCooldownEnchantment() {
+		return CelestialCooldownEnchantment.class;
 	}
 }

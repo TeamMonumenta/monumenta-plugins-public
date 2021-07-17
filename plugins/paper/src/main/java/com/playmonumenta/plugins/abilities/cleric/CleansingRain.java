@@ -59,8 +59,6 @@ public class CleansingRain extends Ability {
 
 	@Override
 	public void cast(Action action) {
-		int cd = getAbilityScore() == 1 ? CLEANSING_1_COOLDOWN : CLEANSING_2_COOLDOWN;
-		mInfo.mCooldown = (int) CleansingRainCooldownEnchantment.getCooldown(mPlayer, cd, CleansingRainCooldownEnchantment.class);
 		World world = mPlayer.getWorld();
 		world.playSound(mPlayer.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1.45f, 0.8f);
 		putOnCooldown();
@@ -106,5 +104,10 @@ public class CleansingRain extends Ability {
 				&& mPlayer.getLocation().getPitch() < ANGLE
 				&& mainHand.getType() != Material.BOW
 				&& offHand.getType() != Material.BOW;
+	}
+
+	@Override
+	public Class<? extends BaseAbilityEnchantment> getCooldownEnchantment() {
+		return CleansingRainCooldownEnchantment.class;
 	}
 }

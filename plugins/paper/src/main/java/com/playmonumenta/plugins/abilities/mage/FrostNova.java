@@ -76,7 +76,7 @@ public class FrostNova extends Ability {
 				StringUtils.multiplierToPercentage(SLOW_MULTIPLIER_2)
 			)
 		);
-		mInfo.mCooldown = (int) FrostNovaCooldownEnchantment.getCooldown(player, COOLDOWN_TICKS, FrostNovaCooldownEnchantment.class);
+		mInfo.mCooldown = COOLDOWN_TICKS;
 		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;
 
 		boolean isUpgraded = getAbilityScore() == 2;
@@ -86,7 +86,6 @@ public class FrostNova extends Ability {
 
 	@Override
 	public void cast(Action action) {
-		mInfo.mCooldown = (int) FrostNovaCooldownEnchantment.getCooldown(mPlayer, COOLDOWN_TICKS, FrostNovaCooldownEnchantment.class);
 		putOnCooldown();
 		float damage = SpellPower.getSpellDamage(mPlayer, mLevelDamage);
 		for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), SIZE, mPlayer)) {
@@ -147,5 +146,10 @@ public class FrostNova extends Ability {
 			)
 			&& mPlayer.isSneaking()
 		);
+	}
+
+	@Override
+	public Class<? extends BaseAbilityEnchantment> getCooldownEnchantment() {
+		return FrostNovaCooldownEnchantment.class;
 	}
 }

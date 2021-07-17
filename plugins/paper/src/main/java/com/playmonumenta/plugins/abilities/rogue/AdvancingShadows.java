@@ -21,6 +21,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
+import com.playmonumenta.plugins.abilities.rogue.swordsage.BladeDance;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
 import com.playmonumenta.plugins.enchantments.abilities.BaseAbilityEnchantment;
@@ -32,7 +33,6 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
-import com.playmonumenta.plugins.abilities.rogue.swordsage.BladeDance;
 
 public class AdvancingShadows extends Ability {
 
@@ -99,9 +99,6 @@ public class AdvancingShadows extends Ability {
 
 	@Override
 	public void cast(Action action) {
-
-		mInfo.mCooldown = (int) AdvancingShadowsCooldownEnchantment.getCooldown(mPlayer, ADVANCING_SHADOWS_COOLDOWN, AdvancingShadowsCooldownEnchantment.class);
-
 		LivingEntity entity = mTarget;
 		if (entity != null) {
 			int advancingShadows = getAbilityScore();
@@ -213,4 +210,8 @@ public class AdvancingShadows extends Ability {
 		return false;
 	}
 
+	@Override
+	public Class<? extends BaseAbilityEnchantment> getCooldownEnchantment() {
+		return AdvancingShadowsCooldownEnchantment.class;
+	}
 }

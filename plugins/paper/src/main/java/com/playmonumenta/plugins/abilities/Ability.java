@@ -27,6 +27,8 @@ import org.jetbrains.annotations.Nullable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.enchantments.abilities.BaseAbilityEnchantment;
+import com.playmonumenta.plugins.enchantments.infusions.delves.Epoch;
 import com.playmonumenta.plugins.events.AbilityCastEvent;
 import com.playmonumenta.plugins.events.CustomDamageEvent;
 import com.playmonumenta.plugins.events.PotionEffectApplyEvent;
@@ -113,7 +115,19 @@ public abstract class Ability {
 		AbilityInfo info = getInfo();
 		if (info.mLinkedSpell != null) {
 			if (!mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), info.mLinkedSpell)) {
-				mPlugin.mTimers.addCooldown(mPlayer.getUniqueId(), info.mLinkedSpell, info.mCooldown);
+				//Epoch and Ability Enchantment implementation
+				//Percents are negative so (1 + percent) is between 0 and 1 in most cases
+				double epochPercent = Epoch.getCooldownPercentage(mPlugin, mPlayer);
+
+				Class<? extends BaseAbilityEnchantment> abilityEnchantment = getCooldownEnchantment();
+				double abilityEnchantmentPercent = 0;
+				if (abilityEnchantment != null) {
+					abilityEnchantmentPercent = mPlugin.mTrackingManager.mPlayers.getPlayerCustomEnchantLevel(mPlayer, abilityEnchantment) / 100.0;
+				}
+
+				int cooldown = (int) (info.mCooldown * (1 + epochPercent) * (1 + abilityEnchantmentPercent));
+
+				mPlugin.mTimers.addCooldown(mPlayer.getUniqueId(), info.mLinkedSpell, cooldown);
 				PlayerUtils.callAbilityCastEvent(mPlayer, info.mLinkedSpell);
 			}
 		}
@@ -310,6 +324,10 @@ public abstract class Ability {
 
 	public Component getLevelHover(boolean useShorthand) {
 		return mInfo.getLevelHover(getAbilityScore(), useShorthand);
+	}
+
+	public Class<? extends BaseAbilityEnchantment> getCooldownEnchantment() {
+		return null;
 	}
 
 	@Override

@@ -609,6 +609,8 @@ public class AbilityManager {
 	//---------------------------------------------------------------------------------------------------------------
 
 	public boolean abilityCastEvent(Player player, AbilityCastEvent event) {
+		//TODO Ensnare implementation
+
 		for (Ability abil : getPlayerAbilities(player).getAbilities()) {
 			if (abil.canCast()) {
 				if (!abil.abilityCastEvent(event)) {

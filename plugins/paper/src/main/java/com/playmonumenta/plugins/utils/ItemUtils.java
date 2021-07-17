@@ -1338,4 +1338,78 @@ public class ItemUtils {
 			return false;
 		}
 	}
+
+	public static void enchantifyItem(@NotNull ItemStack itemStack, String enchantment) throws Exception {
+		enchantifyItem(itemStack, enchantment, null, null);
+	}
+
+	/*
+	 * NOTICE!
+	 * If this method gets changed, make sure someone updates the Python item replacement code to match!
+	 * Constants and new enchantments included!
+	 * This most likely means @NickNackGus or @Combustible
+	 * If this does not happen, your changes will NOT persist across weekly updates!
+	 */
+	public static void enchantifyItem(@NotNull ItemStack itemStack, String enchantment, String ownerPrefix, Player player) throws Exception {
+
+		if (itemStack == null) {
+			throw new Exception("Player must have a valid item in their main hand!");
+		}
+
+		ItemMeta meta = itemStack.getItemMeta();
+		if (meta == null) {
+			throw new Exception("Player must have a valid item in their main hand!");
+		}
+
+		List<String> lore = meta.getLore();
+		if (lore == null || lore.isEmpty()) {
+			throw new Exception("Player must have a valid item in their main hand!");
+		}
+
+		if (itemStack.getAmount() > 1) {
+			throw new Exception("Only one item can be enchanted!");
+		}
+
+		List<String> newLore = new ArrayList<>();
+		boolean enchantmentFound = false;
+		boolean nameAdded = (ownerPrefix == null);
+		for (String loreEntry : lore) {
+			if (loreEntry.contains(ChatColor.GRAY + enchantment)) {
+				enchantmentFound = true;
+			}
+
+			String loreStripped = ChatColor.stripColor(loreEntry).trim();
+			if (!enchantmentFound && (loreStripped.contains("King's Valley :") ||
+			                          loreStripped.contains("Celsian Isles :") ||
+			                          loreStripped.contains("Monumenta :") ||
+			                          loreStripped.contains("Armor") ||
+			                          loreStripped.contains("Magic Wand") ||
+			                          loreStripped.isEmpty())) {
+				newLore.add(ChatColor.GRAY + enchantment);
+				enchantmentFound = true;
+			}
+
+			if (!nameAdded && ChatColor.stripColor(loreEntry).trim().isEmpty()) {
+				newLore.add(ownerPrefix + " " + player.getName());
+				nameAdded = true;
+			}
+
+			newLore.add(loreEntry);
+		}
+
+		if (!enchantmentFound) {
+			throw new Exception("Item must be labeled 'King's Valley', 'Celsian Isles', or 'Monumenta'");
+		}
+
+		if (!nameAdded) {
+			newLore.add(ownerPrefix + " " + player.getName());
+		}
+
+		meta.setLore(newLore);
+		itemStack.setItemMeta(meta);
+		setPlainLore(itemStack);
+
+	}
+
+
 }

@@ -28,8 +28,6 @@ import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 
-
-
 public class DefensiveLine extends Ability {
 	public static class DefensiveLineCooldownEnchantment extends BaseAbilityEnchantment {
 		public DefensiveLineCooldownEnchantment() {
@@ -56,7 +54,7 @@ public class DefensiveLine extends Ability {
 		mInfo.mShorthandName = "DL";
 		mInfo.mDescriptions.add("When you block while sneaking, you and your allies in an 8 block radius gain 20% Resistance for 10 seconds. Upon activating this skill mobs in a 3 block radius of you and your allies are knocked back. Cooldown: 30s.");
 		mInfo.mDescriptions.add("The effect is increased to 30% Resistance.");
-		mInfo.mCooldown = (int) DefensiveLineCooldownEnchantment.getCooldown(player, COOLDOWN, DefensiveLineCooldownEnchantment.class);
+		mInfo.mCooldown = COOLDOWN;
 		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
 		mPercentDamageReceived = getAbilityScore() == 1 ? PERCENT_DAMAGE_RECEIVED_EFFECT_1 : PERCENT_DAMAGE_RECEIVED_EFFECT_2;
 	}
@@ -132,7 +130,6 @@ public class DefensiveLine extends Ability {
 						}
 
 					}.runTaskTimer(mPlugin, 0, 1);
-					mInfo.mCooldown = (int) DefensiveLineCooldownEnchantment.getCooldown(mPlayer, COOLDOWN, DefensiveLineCooldownEnchantment.class);
 					putOnCooldown();
 				}
 			}
@@ -146,5 +143,10 @@ public class DefensiveLine extends Ability {
 		return mPlayer.isSneaking()
 		       && !ItemUtils.isSomeBow(mainHand)
 		       && (mainHand.getType() == Material.SHIELD || offHand.getType() == Material.SHIELD);
+	}
+
+	@Override
+	public Class<? extends BaseAbilityEnchantment> getCooldownEnchantment() {
+		return DefensiveLineCooldownEnchantment.class;
 	}
 }

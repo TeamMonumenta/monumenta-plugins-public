@@ -27,6 +27,22 @@ import com.playmonumenta.plugins.enchantments.infusions.Perspicacity;
 import com.playmonumenta.plugins.enchantments.infusions.Tenacity;
 import com.playmonumenta.plugins.enchantments.infusions.Vigor;
 import com.playmonumenta.plugins.enchantments.infusions.Vitality;
+import com.playmonumenta.plugins.enchantments.infusions.delves.Ardor;
+import com.playmonumenta.plugins.enchantments.infusions.delves.Aura;
+import com.playmonumenta.plugins.enchantments.infusions.delves.Carapace;
+import com.playmonumenta.plugins.enchantments.infusions.delves.Choler;
+import com.playmonumenta.plugins.enchantments.infusions.delves.Empowered;
+import com.playmonumenta.plugins.enchantments.infusions.delves.Epoch;
+import com.playmonumenta.plugins.enchantments.infusions.delves.Execution;
+import com.playmonumenta.plugins.enchantments.infusions.delves.Expedite;
+import com.playmonumenta.plugins.enchantments.infusions.delves.Mitosis;
+import com.playmonumenta.plugins.enchantments.infusions.delves.Natant;
+import com.playmonumenta.plugins.enchantments.infusions.delves.Nutriment;
+import com.playmonumenta.plugins.enchantments.infusions.delves.Pennate;
+import com.playmonumenta.plugins.enchantments.infusions.delves.Reflection;
+import com.playmonumenta.plugins.enchantments.infusions.delves.Understanding;
+import com.playmonumenta.plugins.enchantments.infusions.delves.Usurper;
+
 
 
 
@@ -42,6 +58,23 @@ public enum CustomEnchantment {
 	TENACITY(new Tenacity()),
 	VIGOR(new Vigor()),
 	VITALITY(new Vitality()),
+
+	// Delve infusions
+	PENNATE(new Pennate()),
+	CARAPACE(new Carapace()),
+	AURA(new Aura()),
+	EXPEDITE(new Expedite()),
+	CHOLER(new Choler()),
+	USURPER(new Usurper()),
+	EMPOWERED(new Empowered()),
+	BALANCE(new Nutriment()),
+	EXECUTION(new Execution()),
+	REFLECTION(new Reflection()),
+	MITOSIS(new Mitosis()),
+	ARDOR(new Ardor()),
+	EPOCH(new Epoch()),
+	NATANT(new Natant()),
+	NOTHINGNESS(new Understanding()),
 
 	// On hit damage
 	ARCANE_THRUST(new ArcaneThrust()),

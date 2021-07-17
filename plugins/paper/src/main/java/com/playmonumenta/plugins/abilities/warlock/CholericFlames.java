@@ -2,6 +2,17 @@ package com.playmonumenta.plugins.abilities.warlock;
 
 import java.util.EnumSet;
 
+import org.bukkit.Location;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
+import org.bukkit.World;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
+import org.bukkit.event.block.Action;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
+import org.bukkit.scheduler.BukkitRunnable;
+
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
@@ -13,17 +24,6 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
-
-import org.bukkit.Location;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
-import org.bukkit.World;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
-import org.bukkit.event.block.Action;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
-import org.bukkit.scheduler.BukkitRunnable;
 
 
 
@@ -94,7 +94,6 @@ public class CholericFlames extends Ability {
 			}
 		}
 
-		mInfo.mCooldown = (int) CholericFlamesCooldownEnchantment.getCooldown(mPlayer, COOLDOWN, CholericFlamesCooldownEnchantment.class);
 		putOnCooldown();
 	}
 
@@ -102,5 +101,10 @@ public class CholericFlames extends Ability {
 	public boolean runCheck() {
 		return mPlayer.isSneaking() && ItemUtils.isHoe(mPlayer.getInventory().getItemInMainHand())
 		       && mPlayer.getLocation().getPitch() < 50;
+	}
+
+	@Override
+	public Class<? extends BaseAbilityEnchantment> getCooldownEnchantment() {
+		return CholericFlamesCooldownEnchantment.class;
 	}
 }

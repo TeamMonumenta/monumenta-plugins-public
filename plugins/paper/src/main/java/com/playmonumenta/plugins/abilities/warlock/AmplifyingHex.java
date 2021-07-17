@@ -4,6 +4,18 @@ import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.List;
 
+import org.bukkit.Location;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
+import org.bukkit.World;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
+import org.bukkit.event.block.Action;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
+import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.util.Vector;
+
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
@@ -17,18 +29,6 @@ import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.VectorUtils;
-
-import org.bukkit.Location;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
-import org.bukkit.World;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
-import org.bukkit.event.block.Action;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
-import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.util.Vector;
 
 
 
@@ -85,7 +85,6 @@ public class AmplifyingHex extends Ability {
 	@Override
 	public void cast(Action action) {
 		int cd = (getAbilityScore() == 1) ? COOLDOWN_1 : COOLDOWN_2;
-		mInfo.mCooldown = (int) AmplifyingHexCooldownEnchantment.getCooldown(mPlayer, cd, AmplifyingHexCooldownEnchantment.class);
 
 		World world = mPlayer.getWorld();
 		new BukkitRunnable() {
@@ -172,7 +171,7 @@ public class AmplifyingHex extends Ability {
 				}
 
 				if (debuffCount > 0) {
-					float finalDamage = (float) AmplifyingHexDamageEnchantment.getExtraPercentDamage(mPlayer, AmplifyingHexDamageEnchantment.class, debuffCount * effectDamage + amplifierCount * mAmplifierDamage);
+					float finalDamage = AmplifyingHexDamageEnchantment.getExtraPercentDamage(mPlayer, AmplifyingHexDamageEnchantment.class, debuffCount * effectDamage + amplifierCount * mAmplifierDamage);
 					EntityUtils.damageEntity(mPlugin, mob, finalDamage, mPlayer, MagicType.DARK_MAGIC, true, mInfo.mLinkedSpell);
 					MovementUtils.knockAway(mPlayer, mob, KNOCKBACK_SPEED);
 				}
@@ -186,5 +185,10 @@ public class AmplifyingHex extends Ability {
 		double pitch = mPlayer.getLocation().getPitch();
 		return (mPlayer.isSneaking() && pitch < 50 && pitch > -50
 				&& ItemUtils.isHoe(mPlayer.getInventory().getItemInMainHand()));
+	}
+
+	@Override
+	public Class<? extends BaseAbilityEnchantment> getCooldownEnchantment() {
+		return AmplifyingHexCooldownEnchantment.class;
 	}
 }

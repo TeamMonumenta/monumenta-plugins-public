@@ -60,7 +60,7 @@ public class DaggerThrow extends Ability {
 		mInfo.mShorthandName = "DT";
 		mInfo.mDescriptions.add("Sneak left click while holding two swords to throw three daggers which deal 6 damage and gives each target 20% Vulnerability for 10 seconds. Cooldown: 12s.");
 		mInfo.mDescriptions.add("The damage is increased to 12 and the Vulnerability increased to 40%.");
-		mInfo.mCooldown = (int) DaggerThrowCooldownEnchantment.getCooldown(player, DAGGER_THROW_COOLDOWN, DaggerThrowCooldownEnchantment.class);
+		mInfo.mCooldown = DAGGER_THROW_COOLDOWN;
 		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;
 		mDamage = getAbilityScore() == 1 ? DAGGER_THROW_1_DAMAGE : DAGGER_THROW_2_DAMAGE;
 		mVulnAmplifier = getAbilityScore() == 1 ? DAGGER_THROW_1_VULN : DAGGER_THROW_2_VULN;
@@ -111,7 +111,6 @@ public class DaggerThrow extends Ability {
 				}
 			}
 		}
-		mInfo.mCooldown = (int) DaggerThrowCooldownEnchantment.getCooldown(mPlayer, DAGGER_THROW_COOLDOWN, DaggerThrowCooldownEnchantment.class);
 		putOnCooldown();
 	}
 
@@ -134,4 +133,8 @@ public class DaggerThrow extends Ability {
 		return true;
 	}
 
+	@Override
+	public Class<? extends BaseAbilityEnchantment> getCooldownEnchantment() {
+		return DaggerThrowCooldownEnchantment.class;
+	}
 }

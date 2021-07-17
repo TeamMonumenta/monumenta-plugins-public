@@ -26,6 +26,22 @@ public class CustomInventoryCommands {
 			})
 			.register();
 
+		new CommandAPICommand("openinfusiongui")
+			.withArguments(new EntitySelectorArgument("player", EntitySelector.ONE_PLAYER))
+			.executes((sender, args) -> {
+				Player player = (Player)args[0];
+				new InfusionCustomInventory(player).openInventory(player, plugin);
+			})
+			.register();
+
+		new CommandAPICommand("opendelveinfusiongui")
+			.withArguments(new EntitySelectorArgument("player", EntitySelector.ONE_PLAYER))
+			.executes((sender, args) -> {
+				Player player = (Player)args[0];
+				new DelveInfusionCustomInventory(player).openInventory(player, plugin);
+			})
+			.register();
+
 		new CommandAPICommand("openparrotgui")
 			.withPermission("monumenta.command.openparrotgui")
 			.withArguments(new EntitySelectorArgument("player", EntitySelector.ONE_PLAYER))

@@ -157,7 +157,6 @@ public class Dodging extends Ability {
 		 */
 		mTriggerTick = mPlayer.getTicksLived();
 		int cd = getAbilityScore() == 1 ? DODGING_COOLDOWN_1 : DODGING_COOLDOWN_2;
-		mInfo.mCooldown = (int) DodgingCooldownEnchantment.getCooldown(mPlayer, cd, DodgingCooldownEnchantment.class);
 		putOnCooldown();
 
 		Location loc = mPlayer.getLocation().add(0, 1, 0);
@@ -172,5 +171,10 @@ public class Dodging extends Ability {
 		world.spawnParticle(Particle.SMOKE_NORMAL, loc, 90, 0.25, 0.45, 0.25, 0.1);
 		world.playSound(loc, Sound.ENTITY_BLAZE_SHOOT, 1, 2f);
 		return true;
+	}
+
+	@Override
+	public Class<? extends BaseAbilityEnchantment> getCooldownEnchantment() {
+		return DodgingCooldownEnchantment.class;
 	}
 }

@@ -26,6 +26,7 @@ import com.playmonumenta.plugins.commands.DeBarkifyHeldItem;
 import com.playmonumenta.plugins.commands.DeCluckifyHeldItem;
 import com.playmonumenta.plugins.commands.DeathMsg;
 import com.playmonumenta.plugins.commands.DebugInfo;
+import com.playmonumenta.plugins.commands.DelveInfuseHeldItem;
 import com.playmonumenta.plugins.commands.Effect;
 import com.playmonumenta.plugins.commands.FestiveHeldItem;
 import com.playmonumenta.plugins.commands.GetDepthPoints;
@@ -215,7 +216,9 @@ public class Plugin extends JavaPlugin {
 		LockedHeldItem.register();
 		UnlockHeldItem.register();
 		ToggleSwap.register(this);
+		DelveInfuseHeldItem.register();
 		CustomInventoryCommands.register(this);
+
 
 		try {
 			mHttpManager = new HttpManager(this);

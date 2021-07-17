@@ -93,7 +93,7 @@ public class ThunderStep extends Ability {
 				DISTANCE_2
 			)
 		);
-		mInfo.mCooldown = (int) ThunderStepCooldownEnchantment.getCooldown(player, COOLDOWN_TICKS, ThunderStepCooldownEnchantment.class);
+		mInfo.mCooldown = COOLDOWN_TICKS;
 		mInfo.mIgnoreCooldown = true;
 
 		boolean isUpgraded = getAbilityScore() == 2;
@@ -126,7 +126,6 @@ public class ThunderStep extends Ability {
 				&& mPlayer.isSneaking()
 				&& !ZoneUtils.hasZoneProperty(mPlayer, ZoneProperty.NO_MOBILITY_ABILITIES)
 			) {
-				mInfo.mCooldown = (int) ThunderStepCooldownEnchantment.getCooldown(mPlayer, COOLDOWN_TICKS, ThunderStepCooldownEnchantment.class);
 				putOnCooldown();
 
 				Location playerStartLocation = mPlayer.getLocation();
@@ -190,5 +189,10 @@ public class ThunderStep extends Ability {
 			world.spawnParticle(Particle.CLOUD, enemyParticleLocation, mobParticles, 0.5, 0.5, 0.5, 0.5);
 			world.spawnParticle(Particle.END_ROD, enemyParticleLocation, mobParticles, 0.5, 0.5, 0.5, 0.5);
 		}
+	}
+
+	@Override
+	public Class<? extends BaseAbilityEnchantment> getCooldownEnchantment() {
+		return ThunderStepCooldownEnchantment.class;
 	}
 }

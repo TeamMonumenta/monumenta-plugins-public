@@ -63,7 +63,7 @@ public class UnstableArrows extends Ability {
 		if (player == null || ScoreboardUtils.getScoreboardValue(player, "RocketJumper") == 9001) {
 			mInfo.mCooldown = 0;
 		} else {
-			mInfo.mCooldown = (int) UnstableArrowsCooldownEnchantment.getCooldown(player, getAbilityScore() == 1 ? UNSTABLE_ARROWS_1_COOLDOWN : UNSTABLE_ARROWS_2_COOLDOWN, UnstableArrowsCooldownEnchantment.class);
+			mInfo.mCooldown = getAbilityScore() == 1 ? UNSTABLE_ARROWS_1_COOLDOWN : UNSTABLE_ARROWS_2_COOLDOWN;
 		}
 	}
 
@@ -75,8 +75,6 @@ public class UnstableArrows extends Ability {
 				arrow.setPickupStatus(Arrow.PickupStatus.DISALLOWED);
 				if (mPlayer == null || ScoreboardUtils.getScoreboardValue(mPlayer, "RocketJumper") == 9001) {
 					mInfo.mCooldown = 0;
-				} else {
-					mInfo.mCooldown = (int) UnstableArrowsCooldownEnchantment.getCooldown(mPlayer, getAbilityScore() == 1 ? UNSTABLE_ARROWS_1_COOLDOWN : UNSTABLE_ARROWS_2_COOLDOWN, UnstableArrowsCooldownEnchantment.class);
 				}
 				putOnCooldown();
 				mUnstableArrow = null;
@@ -149,5 +147,10 @@ public class UnstableArrows extends Ability {
 		}
 
 		return true;
+	}
+
+	@Override
+	public Class<? extends BaseAbilityEnchantment> getCooldownEnchantment() {
+		return UnstableArrowsCooldownEnchantment.class;
 	}
 }

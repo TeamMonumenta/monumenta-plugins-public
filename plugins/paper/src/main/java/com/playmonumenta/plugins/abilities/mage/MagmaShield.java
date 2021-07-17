@@ -78,7 +78,7 @@ public class MagmaShield extends Ability {
 				DAMAGE_2
 			)
 		);
-		mInfo.mCooldown = (int) MagmaShieldCooldownEnchantment.getCooldown(player, COOLDOWN_TICKS, MagmaShieldCooldownEnchantment.class);
+		mInfo.mCooldown = COOLDOWN_TICKS;
 		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
 
 		mLevelDamage = getAbilityScore() == 2 ? DAMAGE_2 : DAMAGE_1;
@@ -93,7 +93,6 @@ public class MagmaShield extends Ability {
 
 	@Override
 	public void cast(Action action) {
-		mInfo.mCooldown = (int) MagmaShieldCooldownEnchantment.getCooldown(mPlayer, COOLDOWN_TICKS, MagmaShieldCooldownEnchantment.class);
 		putOnCooldown();
 
 		float damage = SpellPower.getSpellDamage(mPlayer, mLevelDamage);
@@ -156,5 +155,10 @@ public class MagmaShield extends Ability {
 			return mPlayer.isSneaking() && !lookingTooHigh;
 		}
 		return false;
+	}
+
+	@Override
+	public Class<? extends BaseAbilityEnchantment> getCooldownEnchantment() {
+		return MagmaShieldCooldownEnchantment.class;
 	}
 }

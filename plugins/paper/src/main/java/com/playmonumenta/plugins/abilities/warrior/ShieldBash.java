@@ -68,7 +68,6 @@ public class ShieldBash extends Ability {
 			@Override
 			public void run() {
 				if (mPlayer.isHandRaised()) {
-					mInfo.mCooldown = (int) ShieldBashCooldownEnchantment.getCooldown(mPlayer, SHIELD_BASH_COOLDOWN, ShieldBashCooldownEnchantment.class);
 					int damage = (int) ShieldBashDamageEnchantment.getExtraDamage(mPlayer, ShieldBashDamageEnchantment.class) + SHIELD_BASH_DAMAGE;
 					Location eyeLoc = mPlayer.getEyeLocation();
 					Raycast ray = new Raycast(eyeLoc, eyeLoc.getDirection(), SHIELD_BASH_RANGE);
@@ -129,5 +128,10 @@ public class ShieldBash extends Ability {
 		ItemStack offHand = mPlayer.getInventory().getItemInOffHand();
 		ItemStack mainHand = mPlayer.getInventory().getItemInMainHand();
 		return !ItemUtils.isSomeBow(mainHand) && (offHand.getType() == Material.SHIELD || mainHand.getType() == Material.SHIELD);
+	}
+
+	@Override
+	public Class<? extends BaseAbilityEnchantment> getCooldownEnchantment() {
+		return ShieldBashCooldownEnchantment.class;
 	}
 }

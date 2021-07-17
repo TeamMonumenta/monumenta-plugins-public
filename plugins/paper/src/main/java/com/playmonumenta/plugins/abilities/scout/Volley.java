@@ -95,7 +95,6 @@ public class Volley extends Ability {
 		}
 
 		// Start the cooldown first so we don't cause an infinite loop of Volleys
-		mInfo.mCooldown = (int) VolleyCooldownEnchantment.getCooldown(mPlayer, VOLLEY_COOLDOWN, VolleyCooldownEnchantment.class);
 		putOnCooldown();
 		World world = mPlayer.getWorld();
 		world.playSound(mPlayer.getLocation(), Sound.ENTITY_ARROW_SHOOT, 1, 0.75f);
@@ -176,4 +175,8 @@ public class Volley extends Ability {
 		return true;
 	}
 
+	@Override
+	public Class<? extends BaseAbilityEnchantment> getCooldownEnchantment() {
+		return VolleyCooldownEnchantment.class;
+	}
 }
