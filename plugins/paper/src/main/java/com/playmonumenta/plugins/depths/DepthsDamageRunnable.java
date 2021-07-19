@@ -16,11 +16,12 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 
 public class DepthsDamageRunnable extends BukkitRunnable {
 
-	public static final int DAMAGE = 10;
+	public static final float PCT_DAMAGE = 0.1f;
 	public static final List<Material> BAD_BLOCKS = Arrays.asList(Material.BLACK_STAINED_GLASS, Material.BLACK_STAINED_GLASS_PANE, Material.CYAN_STAINED_GLASS);
 
 	@Override
@@ -44,13 +45,12 @@ public class DepthsDamageRunnable extends BukkitRunnable {
 			if (BAD_BLOCKS.contains(loc.getBlock().getRelative(BlockFace.DOWN).getType())) {
 				//Damage player
 				Vector vel = p.getVelocity();
-				EntityUtils.damageEntity(Plugin.getInstance(), p, DAMAGE, null, null, true, null, false, false, false, true);
+				EntityUtils.damageEntity(Plugin.getInstance(), p, 0.1, null, null, true, null, false, false, false, true);
+				BossUtils.bossDamagePercent(p, p, PCT_DAMAGE);
 				p.setVelocity(vel);
 				p.getWorld().playSound(loc, Sound.ENTITY_GENERIC_EXTINGUISH_FIRE, 0.3f, 1.5f);
 			}
-
 		}
-
 	}
 
 }

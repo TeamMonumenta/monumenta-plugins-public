@@ -287,8 +287,8 @@ public class DepthsRoomRepository {
 
 		//Get floor number- +1 if they're in the lobby after beating boss
 		int floor = party.getFloor();
-		if (party.mBeatBoss) {
-			floor += 1;
+		if (party.mRoomNumber % 10 == 0) {
+			floor++;
 		}
 
 		//Give them a boss room if they are on a boss
@@ -388,7 +388,9 @@ public class DepthsRoomRepository {
 
 			Player p = Bukkit.getPlayer(dp.mPlayerId);
 			if (p != null) {
-				p.teleport(new Location(world, party.mFloorLobbyLoadPlayerTpPoint.getX(), party.mFloorLobbyLoadPlayerTpPoint.getY(), party.mFloorLobbyLoadPlayerTpPoint.getZ()));
+				Location l = new Location(world, party.mFloorLobbyLoadPlayerTpPoint.getX(), party.mFloorLobbyLoadPlayerTpPoint.getY(), party.mFloorLobbyLoadPlayerTpPoint.getZ());
+				l.setYaw(270f);
+				p.teleport(l);
 				p.sendMessage(DepthsUtils.DEPTHS_MESSAGE_PREFIX + "Your party earned " + treasure + " treasure score for clearing floor " + party.getFloor() + "! Sending your party to next floor.");
 			}
 		}

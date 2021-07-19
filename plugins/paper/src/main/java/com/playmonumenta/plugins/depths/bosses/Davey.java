@@ -50,7 +50,7 @@ public class Davey extends BossAbilityGroup {
 	public static final String identityTag = "boss_davey";
 	public static final int detectionRange = 50;
 	public static final String DOOR_FILL_TAG = "Door";
-	public static final int DAVEY_HEALTH = 4000;
+	public static final int DAVEY_HEALTH = 3250;
 	public static final String VEX_LOS = "AbyssalSpawn";
 	public static final int SWAP_TARGET_SECONDS = 15;
 

@@ -28,7 +28,7 @@ public class SpellHederaAnticheese extends Spell {
 		//Anticheese
 		if (mTicks % 20 == 0) {
 			for (Player p : PlayerUtils.playersInRange(mBoss.getLocation(), Hedera.detectionRange, true)) {
-				if ((p.getLocation().getY() > mStartLoc.getY() + 11 && p.isOnGround()) || p.getLocation().distance(mStartLoc) > 30) {
+				if ((p.getLocation().getY() > mStartLoc.getY() + 11 && p.isOnGround()) || p.getLocation().distance(mStartLoc) > 35) {
 					BossUtils.bossDamagePercent(mBoss, p, .1);
 					p.sendMessage(ChatColor.RED + "That hurt! Looks like the arena is pulling you down..");
 				}

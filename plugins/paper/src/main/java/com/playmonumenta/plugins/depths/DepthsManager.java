@@ -1166,6 +1166,7 @@ public class DepthsManager {
 			List<DepthsPlayer> playersToLoop = new ArrayList<>(getPartyFromId(dp).mPlayersInParty);
 			for (DepthsPlayer playerInParty : playersToLoop) {
 				Player player = Bukkit.getPlayer(playerInParty.mPlayerId);
+				player.sendMessage(DepthsUtils.DEPTHS_MESSAGE_PREFIX + "Congratulations! Your final treasure score is " + dp.mFinalTreasureScore + "!");
 				getPartyFromId(dp).populateLootRoom(player, false);
 				Bukkit.getServer().dispatchCommand(Bukkit.getServer().getConsoleSender(), "broadcastcommand tellraw @a [\"\",{\"text\":\"" + player.getName() + "\",\"color\":\"gold\",\"bold\":false,\"italic\":true},{\"text\":\" defeated the Darkest Depths!\",\"color\":\"white\",\"italic\":true,\"bold\":false}]");
 				//Set score

@@ -123,7 +123,7 @@ public class SpellVoidGrenades extends Spell {
 								}
 
 								if (mTicks % 10 == 0) {
-									for (Player player : PlayerUtils.playersInRange(fallingBlock.getLocation(), 4, true)) {
+									for (Player player : PlayerUtils.playersInRange(fallingBlock.getLocation(), 3, true)) {
 										/* Fire aura can not be blocked */
 										BossUtils.bossDamagePercent(mBoss, player, 0.1, (Location)null);
 									}
