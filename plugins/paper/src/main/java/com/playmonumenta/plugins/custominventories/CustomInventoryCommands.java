@@ -27,6 +27,7 @@ public class CustomInventoryCommands {
 			.register();
 
 		new CommandAPICommand("openinfusiongui")
+			.withPermission("monumenta.command.openinfusiongui")
 			.withArguments(new EntitySelectorArgument("player", EntitySelector.ONE_PLAYER))
 			.executes((sender, args) -> {
 				Player player = (Player)args[0];
@@ -35,6 +36,7 @@ public class CustomInventoryCommands {
 			.register();
 
 		new CommandAPICommand("opendelveinfusiongui")
+			.withPermission("monumenta.command.opendelveinfusiongui")
 			.withArguments(new EntitySelectorArgument("player", EntitySelector.ONE_PLAYER))
 			.executes((sender, args) -> {
 				Player player = (Player)args[0];
