@@ -19,12 +19,12 @@ import com.playmonumenta.plugins.utils.FastUtils;
 
 public class DepthsLoot {
 
-	//TODO update this and add more depths loot tables
 	public static final NamespacedKey LOOT_TABLE_KEY = NamespacedKey.fromString("epic:r2/depths/loot/reward");
 	public static final NamespacedKey RELIC_KEY = NamespacedKey.fromString("epic:r2/depths/loot/relicroll");
+	public static final NamespacedKey GEODE_KEY = NamespacedKey.fromString("epic:r2/depths/loot/voidstained_geode");
 	public static final NamespacedKey POME_KEY = NamespacedKey.fromString("epic:r2/delves/items/twisted_pome");
 
-	public static final int RELIC_CHANCE = 150;
+	public static final int RELIC_CHANCE = 250;
 
 	public static final Vector LOOT_ROOM_LOOT_OFFSET = new Vector(-21, 5, 0);
 
@@ -50,25 +50,48 @@ public class DepthsLoot {
 						lootOnGround.setGlowing(true);
 					}
 				}
-				ItemStack fillerBlocks = new ItemStack(Material.BLACKSTONE, 2);
-				ItemStack fillerFood = new ItemStack(Material.COOKED_PORKCHOP, 1);
 
-				loc.getWorld().dropItem(loc, fillerBlocks);
-				loc.getWorld().dropItem(loc, fillerFood);
+				if (i < 128) {
+					ItemStack fillerBlocks = new ItemStack(Material.BLACKSTONE, 2);
+					loc.getWorld().dropItem(loc, fillerBlocks);
+				}
 
+				if (i < 64) {
+					ItemStack fillerFood = new ItemStack(Material.COOKED_PORKCHOP, 1);
+					loc.getWorld().dropItem(loc, fillerFood);
+				}
 			}
 		}
 
 		Random r = new Random();
 
-		//Roll for endless mode loot- subtract 30 from treasure score to compensate for base difficulty
+		//Roll for geodes
+		LootTable geodeTable = Bukkit.getLootTable(GEODE_KEY);
+		Collection<ItemStack> loot = geodeTable.populateLoot(FastUtils.RANDOM, context);
+		if (!loot.isEmpty()) {
+			for (int i = treasureScore; i >= 12; i -= 12) {
+				for (ItemStack item : loot) {
+					loc.getWorld().dropItem(loc, item);
+				}
+			}
+			//Get num from 0-7
+			int roll = r.nextInt(12);
+			if (roll < treasureScore) {
+				//Drop an extra geode
+				for (ItemStack item : loot) {
+					loc.getWorld().dropItem(loc, item);
+				}
+			}
+		}
+
+		//Roll for endless mode loot- subtract 54 from treasure score to compensate for base score from 3 boss wins
 
 		LootTable pomeTable = Bukkit.getLootTable(POME_KEY);
 		if (pomeTable != null) {
-			for (int i = 0; i < treasureScore - 30; i++) {
-				// 1/8 chance to drop a pome per treasure score in endless mode
+			for (int i = 0; i < treasureScore - 54; i++) {
+				// 1/24 chance to drop a pome per treasure score in endless mode
 				if (r.nextInt(8) == 0) {
-					Collection<ItemStack> loot = pomeTable.populateLoot(FastUtils.RANDOM, context);
+					loot = pomeTable.populateLoot(FastUtils.RANDOM, context);
 					if (!loot.isEmpty()) {
 						for (ItemStack item : loot) {
 							loc.getWorld().dropItem(loc, item);
@@ -80,7 +103,7 @@ public class DepthsLoot {
 			}
 		}
 
-		//Roll for relics- treasure score / 100 chance (if above 100, guaranteed drop and subtract relic)
+		//Roll for relics- treasure score / 250 chance (if above 250, guaranteed drop and subtract relic)
 
 		LootTable relicTable = Bukkit.getLootTable(RELIC_KEY);
 
@@ -92,7 +115,7 @@ public class DepthsLoot {
 			int roll = r.nextInt(RELIC_CHANCE);
 			if (roll < score) {
 				//Drop random relic
-				Collection<ItemStack> loot = relicTable.populateLoot(FastUtils.RANDOM, context);
+				loot = relicTable.populateLoot(FastUtils.RANDOM, context);
 				if (!loot.isEmpty()) {
 					for (ItemStack item : loot) {
 						Item lootOnGround = loc.getWorld().dropItem(loc, item);

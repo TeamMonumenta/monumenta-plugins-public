@@ -137,11 +137,11 @@ public class DepthsManager {
 	public static final int TREASURE_PER_NORMAL = 3;
 	public static final int TREASURE_PER_ELITE = 5;
 	//Will be multiplied by the current floor number the party is on, ex. f2 is 5 * 2
-	public static final int TREASURE_PER_FLOOR = 5;
+	public static final int TREASURE_PER_FLOOR = 8;
 	//How often the depths data is saved normally
 	public static final int SAVE_INTERVAL = 60 * 5 * 20; //5 min
 	//Max treasure score from a boss clear, to prevent eventual cheese for yielding infinitely scaling rewards
-	public static final int TREASURE_BOSS_CAP = 60;
+	public static final int TREASURE_BOSS_CAP = 100;
 
 	//Boss soul names
 	public static final String HEDERA_LOS = "HederaVenomoftheWaves";
@@ -1158,7 +1158,7 @@ public class DepthsManager {
 			p.sendMessage(DepthsUtils.DEPTHS_MESSAGE_PREFIX + "Player not in depths system!");
 			return;
 		}
-		int treasureScoreIncrease = (Math.min(TREASURE_BOSS_CAP, TREASURE_PER_FLOOR * getPartyFromId(dp).getFloor()));
+		int treasureScoreIncrease = (Math.min(TREASURE_BOSS_CAP, (TREASURE_PER_FLOOR * getPartyFromId(dp).getFloor()) + 2));
 		getPartyFromId(dp).mTreasureScore += treasureScoreIncrease;
 
 		//Check to see if they've finished the run (normal mode) and send to loot rooms
