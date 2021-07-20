@@ -34,10 +34,6 @@
             <url>https://repo.extendedclip.com/content/repositories/placeholderapi/</url>
         </repository>
         <repository>
-            <id>commandapi</id>
-            <url>https://raw.githubusercontent.com/JorelAli/CommandAPI/mvn-repo/</url>
-        </repository>
-        <repository>
             <id>coreprotect</id>
             <url>https://maven.playpro.com/</url>
         </repository>
@@ -111,9 +107,9 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>dev.jorel</groupId>
+            <groupId>dev.jorel.CommandAPI</groupId>
             <artifactId>commandapi-core</artifactId>
-            <version>5.2</version>
+            <version>6.0.0</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
