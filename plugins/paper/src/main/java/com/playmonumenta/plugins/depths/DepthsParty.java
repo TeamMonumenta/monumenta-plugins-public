@@ -297,7 +297,7 @@ public class DepthsParty {
 		mSpawnedReward = false;
 
 		//Logic for entering a new floor
-		if (mRoomNumber % 10 == 0) {
+		if (mRoomNumber % 10 == 1) {
 			for (DepthsPlayer p : mPlayersInParty) {
 				//Reset chaos eligibility
 				p.mUsedChaosThisFloor = false;

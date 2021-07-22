@@ -1,6 +1,8 @@
 package com.playmonumenta.plugins.depths.bosses.spells;
 
 import org.bukkit.Location;
+import org.bukkit.entity.Boat;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
@@ -31,6 +33,12 @@ public class SpellDaveyAnticheese extends Spell {
 				if ((p.getLocation().getY() > mStartLoc.getY() + 3 && p.isOnGround()) || p.getLocation().distance(mStartLoc) > 40) {
 					BossUtils.bossDamagePercent(mBoss, p, .1);
 					p.sendMessage(ChatColor.RED + "That hurt! Looks like the arena is pulling you down..");
+				}
+			}
+
+			for (Entity e : mBoss.getWorld().getNearbyEntities(mBoss.getLocation(), 3, 3, 3)) {
+				if (e instanceof Boat) {
+					e.remove();
 				}
 			}
 		}
