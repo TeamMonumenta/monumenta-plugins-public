@@ -36,7 +36,7 @@ public class IceBurst extends DepthsAbility {
 		if (InventoryUtils.isPickaxeItem(event.getPlayer().getInventory().getItemInMainHand()) && event.getBlock().getType() == Material.SPAWNER) {
 			ArrayList<Block> blocksToIce = new ArrayList<>();
 			Block block = event.getBlock().getRelative(BlockFace.DOWN);
-			if (block.isSolid()) {
+			if (block.isSolid() || block.getType() == Material.WATER) {
 				DepthsUtils.spawnIceTerrain(block.getLocation(), ICE_TICKS[mRarity - 1]);
 			}
 			blocksToIce.add(block.getRelative(BlockFace.NORTH));
@@ -53,14 +53,7 @@ public class IceBurst extends DepthsAbility {
 			blocksToIce.add(block.getRelative(BlockFace.SOUTH).getRelative(BlockFace.EAST));
 
 			for (Block b : blocksToIce) {
-				//Check above block first and see if it is exposed to air
-				if (b.getRelative(BlockFace.UP).isSolid() && !b.getRelative(BlockFace.UP).getRelative(BlockFace.UP).isSolid()) {
-					DepthsUtils.spawnIceTerrain(b.getRelative(BlockFace.UP).getLocation(), ICE_TICKS[mRarity - 1]);
-				} else if (b.isSolid()) {
-					DepthsUtils.spawnIceTerrain(b.getLocation(), ICE_TICKS[mRarity - 1]);
-				} else if (b.getRelative(BlockFace.DOWN).isSolid()) {
-					DepthsUtils.spawnIceTerrain(b.getRelative(BlockFace.DOWN).getLocation(), ICE_TICKS[mRarity - 1]);
-				}
+				DepthsUtils.iceExposedBlock(b, ICE_TICKS[mRarity - 1]);
 			}
 		}
 		return true;

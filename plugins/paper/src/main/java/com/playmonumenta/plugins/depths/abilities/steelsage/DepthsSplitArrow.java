@@ -20,6 +20,7 @@ import com.playmonumenta.plugins.classes.magic.MagicType;
 import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
+import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
@@ -45,7 +46,7 @@ public class DepthsSplitArrow extends DepthsAbility {
 		if ((proj instanceof Arrow || proj instanceof SpectralArrow) && !proj.hasMetadata(DepthsRapidFire.META_DATA_TAG)) {
 			LivingEntity nearestMob = EntityUtils.getNearestMob(damagee.getLocation(), SPLIT_ARROW_CHAIN_RANGE, damagee);
 
-			if (nearestMob != null) {
+			if (nearestMob != null && !nearestMob.getScoreboardTags().contains(AbilityUtils.IGNORE_TAG)) {
 				Location loc = damagee.getEyeLocation();
 				Location eye = nearestMob.getEyeLocation();
 				Vector dir = LocationUtils.getDirectionTo(eye, loc);

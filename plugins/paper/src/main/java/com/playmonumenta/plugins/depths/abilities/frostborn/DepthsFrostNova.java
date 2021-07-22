@@ -97,16 +97,7 @@ public class DepthsFrostNova extends DepthsAbility {
 		blocksToIce.add(block.getRelative(BlockFace.SOUTH).getRelative(BlockFace.EAST).getRelative(BlockFace.EAST));
 
 		for (Block b : blocksToIce) {
-			//Check above block first and see if it is exposed to air
-			if (b.getRelative(BlockFace.UP).isSolid() && !b.getRelative(BlockFace.UP).getRelative(BlockFace.UP).isSolid()) {
-				DepthsUtils.spawnIceTerrain(b.getRelative(BlockFace.UP).getLocation(), ICE_TICKS);
-			} else if (b.isSolid()) {
-				DepthsUtils.spawnIceTerrain(b.getLocation(), ICE_TICKS);
-
-			} else if (b.getRelative(BlockFace.DOWN).isSolid()) {
-				DepthsUtils.spawnIceTerrain(b.getRelative(BlockFace.DOWN).getLocation(), ICE_TICKS);
-
-			}
+			DepthsUtils.iceExposedBlock(b, ICE_TICKS);
 		}
 
 		World world = mPlayer.getWorld();

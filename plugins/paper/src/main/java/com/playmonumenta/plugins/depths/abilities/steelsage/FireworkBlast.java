@@ -89,9 +89,6 @@ public class FireworkBlast extends DepthsAbility {
 						//Deals an extra 5% for every block traveled (distance from player to firework)
 						//Also does 33% less damage for every block from the firework to the enemy after 1 block, minimum damage 0
 						double damage = (mPlayer.getLocation().distance(loc) * DAMAGE_INCREASE_PER_BLOCK + 1) * DAMAGE[mRarity - 1];
-						if (loc.distance(e.getLocation()) > 1) {
-							damage *= Math.max(0, 1 - (loc.distance(e.getLocation()) - 1) * 0.25);
-						}
 
 						//Max damage cap from array
 						EntityUtils.damageEntity(mPlugin, e, Math.min(damage, DAMAGE_CAP[mRarity - 1]), mPlayer, MagicType.PHYSICAL, true, mInfo.mLinkedSpell);

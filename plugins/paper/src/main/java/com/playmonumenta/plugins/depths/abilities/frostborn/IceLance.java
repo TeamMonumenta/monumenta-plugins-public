@@ -31,12 +31,13 @@ import net.md_5.bungee.api.ChatColor;
 public class IceLance extends DepthsAbility {
 
 	public static final String ABILITY_NAME = "Ice Lance";
-	public static final double[] DAMAGE = {10.0, 12.5, 15.0, 17.5, 20.0};
+	public static final double[] DAMAGE = {12.5, 15.0, 17.5, 20.0, 22.5};
 	private static final Particle.DustOptions MANA_LANCE_COLOR = new Particle.DustOptions(Color.fromRGB(194, 224, 249), 1.0f);
 	private static final int COOLDOWN = 6 * 20;
 	private static final int DURATION = 2 * 20;
 	private static final double AMPLIFIER = 0.2;
 	private static final int RANGE = 8;
+	private static final double HITBOX_SIZE = 0.75;
 
 	public IceLance(Plugin plugin, Player player) {
 		super(plugin, player, ABILITY_NAME);
@@ -52,7 +53,7 @@ public class IceLance extends DepthsAbility {
 		putOnCooldown();
 
 		Location loc = mPlayer.getEyeLocation();
-		BoundingBox box = BoundingBox.of(loc, 0.55, 0.55, 0.55);
+		BoundingBox box = BoundingBox.of(loc, HITBOX_SIZE, HITBOX_SIZE, HITBOX_SIZE);
 		Vector dir = loc.getDirection();
 		box.shift(dir);
 		List<LivingEntity> mobs = EntityUtils.getNearbyMobs(mPlayer.getLocation(), 10, mPlayer);

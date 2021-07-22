@@ -23,7 +23,8 @@ import net.md_5.bungee.api.ChatColor;
 public class Frostbreaker extends DepthsAbility {
 
 	public static final String ABILITY_NAME = "Icebreaker";
-	public static final double[] DAMAGE = {1.24, 1.28, 1.32, 1.36, 1.40};
+	public static final double[] ICE_DAMAGE = {1.24, 1.28, 1.32, 1.36, 1.40};
+	public static final double[] EFFECT_DAMAGE = {1.18, 1.21, 1.24, 1.27, 1.30};
 
 	public Frostbreaker(Plugin plugin, Player player) {
 		super(plugin, player, ABILITY_NAME);
@@ -46,10 +47,12 @@ public class Frostbreaker extends DepthsAbility {
 
 	public boolean handleEvent(LivingEntity entity, EntityDamageByEntityEvent event) {
 		List<PotionEffectType> e = PotionUtils.getNegativeEffects(mPlugin, entity);
-		if (e.size() > 0 || EntityUtils.isStunned(entity) || EntityUtils.isConfused(entity) || EntityUtils.isBleeding(mPlugin, entity)
+		if (isOnIce(entity)) {
+			event.setDamage(ICE_DAMAGE[mRarity - 1] * event.getDamage());
+		} else if (e.size() > 0 || EntityUtils.isStunned(entity) || EntityUtils.isConfused(entity) || EntityUtils.isBleeding(mPlugin, entity)
 				|| EntityUtils.isSlowed(mPlugin, entity) || EntityUtils.isWeakened(mPlugin, entity) || EntityUtils.isSilenced(entity) || EntityUtils.vulnerabilityMult(entity) > 1
-				|| entity.getFireTicks() > 0 || Inferno.getMobInfernoLevel(mPlugin, entity) > 0 || isOnIce(entity)) {
-			event.setDamage(DAMAGE[mRarity - 1] * event.getDamage());
+				|| entity.getFireTicks() > 0 || Inferno.getMobInfernoLevel(mPlugin, entity) > 0) {
+			event.setDamage(EFFECT_DAMAGE[mRarity - 1] * event.getDamage());
 		}
 		return true;
 	}
@@ -63,7 +66,7 @@ public class Frostbreaker extends DepthsAbility {
 
 	@Override
 	public String getDescription(int rarity) {
-		return "Damage you deal to mobs that are on ice or debuffed is multiplied by " + DepthsUtils.getRarityColor(rarity) + DAMAGE[rarity - 1] + ChatColor.WHITE + ".";
+		return "Damage you deal to mobs that are on ice is multiplied by " + DepthsUtils.getRarityColor(rarity) + ICE_DAMAGE[rarity - 1] + ChatColor.WHITE + ". Damage you deal to mobs that are debuffed but not on ice is multiplied by " + DepthsUtils.getRarityColor(rarity) + EFFECT_DAMAGE[rarity - 1] + ChatColor.WHITE + ".";
 	}
 
 	@Override

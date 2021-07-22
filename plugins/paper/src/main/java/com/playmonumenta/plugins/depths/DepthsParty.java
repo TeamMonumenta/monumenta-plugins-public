@@ -16,15 +16,14 @@ import org.bukkit.World;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
-import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Slime;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
 import com.playmonumenta.plugins.depths.DepthsRoomType.DepthsRewardType;
-import com.playmonumenta.plugins.depths.abilities.steelsage.Metalmancy;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
+import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.DelvesUtils;
 import com.playmonumenta.plugins.utils.DelvesUtils.Modifier;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
@@ -220,16 +219,9 @@ public class DepthsParty {
 		for (DepthsPlayer dp : mPlayersInParty) {
 
 			Player p = Bukkit.getPlayer(dp.mPlayerId);
-			p.playSound(p.getLocation(), Sound.BLOCK_RESPAWN_ANCHOR_CHARGE, 1.0f, 1.0f);
-			//TODO make this the actually correct method later
-			p.sendActionBar(ChatColor.GOLD + "" + score + " treasure score added to loot room!");
-		}
-
-		Collection<Item> items = l.getWorld().getNearbyEntitiesByType(Item.class, l, 2.0);
-
-		if (items != null && items.size() > 0) {
-			for (Item item : items) {
-				item.remove();
+			if (p != null) {
+				p.playSound(p.getLocation(), Sound.BLOCK_RESPAWN_ANCHOR_CHARGE, 1.0f, 1.0f);
+				p.sendActionBar(ChatColor.GOLD + "" + score + " treasure score added to loot room!");
 			}
 		}
 
@@ -251,7 +243,7 @@ public class DepthsParty {
 				slime.setGlowing(true);
 				slime.setInvulnerable(true);
 				slime.setInvisible(true);
-				slime.addScoreboardTag(Metalmancy.IGNORE_TAG);
+				slime.addScoreboardTag(AbilityUtils.IGNORE_TAG);
 			}
 			itemEffects = new ItemEffects(l, e);
 		}

@@ -24,7 +24,7 @@ import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
-import com.playmonumenta.plugins.depths.abilities.steelsage.Metalmancy;
+import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 
@@ -104,10 +104,10 @@ public class ChaosDagger extends DepthsAbility {
 						this.cancel();
 					}
 					// Has to check other mobs if nearest mob is chest slime or decoy
-					if (mTarget.getScoreboardTags().contains(Metalmancy.IGNORE_TAG)) {
+					if (mTarget.getScoreboardTags().contains(AbilityUtils.IGNORE_TAG)) {
 						for (LivingEntity mob : EntityUtils.getNearbyMobs(tLoc, 20)) {
 							if (mob != null && mob.getScoreboardTags() != null) {
-								if (!mob.getScoreboardTags().contains(Metalmancy.IGNORE_TAG)) {
+								if (!mob.getScoreboardTags().contains(AbilityUtils.IGNORE_TAG)) {
 									mTarget = mob;
 									break;
 								}
@@ -115,7 +115,7 @@ public class ChaosDagger extends DepthsAbility {
 						}
 					}
 
-					if (mTarget.getBoundingBox().overlaps(tincture.getBoundingBox())) {
+					if (mTarget.getBoundingBox().overlaps(tincture.getBoundingBox()) && !mTarget.getScoreboardTags().contains(AbilityUtils.IGNORE_TAG)) {
 						mWorld.spawnParticle(Particle.EXPLOSION_NORMAL, tLoc, 30, 2, 0, 2);
 						world.playSound(tLoc, Sound.ENTITY_GENERIC_EXPLODE, 1, 0.15f);
 						mTarget.addScoreboardTag(DAGGER_TAG);

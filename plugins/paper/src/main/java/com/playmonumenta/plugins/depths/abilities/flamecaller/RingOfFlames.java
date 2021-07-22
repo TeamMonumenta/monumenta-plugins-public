@@ -25,6 +25,8 @@ import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
+import com.playmonumenta.plugins.depths.abilities.shadow.DummyDecoy;
+import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 
@@ -99,6 +101,7 @@ public class RingOfFlames extends DepthsAbility {
 
 				if (mTicks % 20 == 0) {
 					mMobs = EntityUtils.getNearbyMobs(loc, 6);
+					mMobs.removeIf(mob -> mob.getScoreboardTags().contains(AbilityUtils.IGNORE_TAG) && mob.getName() != DummyDecoy.DUMMY_NAME);
 
 					int mobsHitThisTick = 0;
 					for (BoundingBox box : boxes) {

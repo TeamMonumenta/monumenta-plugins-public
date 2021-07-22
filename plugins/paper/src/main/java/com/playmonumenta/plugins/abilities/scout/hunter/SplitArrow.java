@@ -18,6 +18,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.classes.magic.MagicType;
+import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
@@ -48,7 +49,7 @@ public class SplitArrow extends Ability {
 		if (proj instanceof Arrow || proj instanceof SpectralArrow) {
 			LivingEntity nearestMob = EntityUtils.getNearestMob(damagee.getLocation(), SPLIT_ARROW_CHAIN_RANGE, damagee);
 
-			if (nearestMob != null) {
+			if (nearestMob != null && !nearestMob.getScoreboardTags().contains(AbilityUtils.IGNORE_TAG)) {
 				Location loc = damagee.getEyeLocation();
 				Location eye = nearestMob.getEyeLocation();
 				Vector dir = LocationUtils.getDirectionTo(eye, loc);

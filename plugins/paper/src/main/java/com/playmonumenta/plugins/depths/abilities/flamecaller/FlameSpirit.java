@@ -26,7 +26,7 @@ public class FlameSpirit extends DepthsAbility {
 
 	public static final String ABILITY_NAME = "Flame Spirit";
 
-	public static final double[] DAMAGE = {5, 6, 7, 8, 9};
+	public static final int[] DAMAGE = {5, 6, 7, 8, 9};
 	public static final int DAMAGE_COUNT = 3;
 	public static final int FIRE_TICKS = 2 * 20;
 	public static final int RADIUS = 4;
@@ -53,7 +53,7 @@ public class FlameSpirit extends DepthsAbility {
 					for (LivingEntity mob : EntityUtils.getNearbyMobs(centerLoc, RADIUS)) {
 						if (!(mob == null)) {
 							EntityUtils.applyFire(mPlugin, FIRE_TICKS, mob, mPlayer);
-							EntityUtils.damageEntity(mPlugin, mob, DAMAGE[mRarity - 1], mPlayer, MagicType.FIRE, true, mInfo.mLinkedSpell, true, true, true, false);
+							EntityUtils.damageEntity(mPlugin, mob, DAMAGE[mRarity - 1], mPlayer, MagicType.FIRE, true, mInfo.mLinkedSpell, true, true, true, true);
 						}
 					}
 

@@ -18,7 +18,7 @@ import net.md_5.bungee.api.ChatColor;
 public class Dethroner extends DepthsAbility {
 
 	public static final String ABILITY_NAME = "Dethroner";
-	public static final double[] DAMAGE = {1.16, 1.2, 1.24, 1.28, 1.32};
+	public static final double[] DAMAGE = {1.14, 1.175, 1.21, 1.245, 1.28};
 
 	public Dethroner(Plugin plugin, Player player) {
 		super(plugin, player, ABILITY_NAME);

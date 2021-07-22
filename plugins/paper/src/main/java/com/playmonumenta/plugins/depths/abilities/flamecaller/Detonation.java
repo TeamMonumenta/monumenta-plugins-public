@@ -5,6 +5,7 @@ import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDeathEvent;
@@ -14,6 +15,8 @@ import com.playmonumenta.plugins.classes.magic.MagicType;
 import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
+import com.playmonumenta.plugins.depths.abilities.shadow.DummyDecoy;
+import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 
 import net.md_5.bungee.api.ChatColor;
@@ -35,7 +38,11 @@ public class Detonation extends DepthsAbility {
 
 	@Override
 	public void entityDeathRadiusEvent(EntityDeathEvent event, boolean shouldGenDrops) {
-		Location location = event.getEntity().getLocation();
+		Entity entity = event.getEntity();
+		if (entity.getScoreboardTags().contains(AbilityUtils.IGNORE_TAG) && entity.getName() != DummyDecoy.DUMMY_NAME) {
+			return;
+		}
+		Location location = entity.getLocation();
 		World world = mPlayer.getWorld();
 		for (LivingEntity mob : EntityUtils.getNearbyMobs(location, DAMAGE_RADIUS)) {
 			world.spawnParticle(Particle.CAMPFIRE_SIGNAL_SMOKE, mob.getLocation().add(0, 1, 0), 3);

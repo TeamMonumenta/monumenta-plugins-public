@@ -21,11 +21,11 @@ import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
-import com.playmonumenta.plugins.depths.abilities.steelsage.Metalmancy;
 import com.playmonumenta.plugins.effects.EffectManager;
 import com.playmonumenta.plugins.effects.FlatDamageDealt;
 import com.playmonumenta.plugins.point.Raycast;
 import com.playmonumenta.plugins.point.RaycastData;
+import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
@@ -59,7 +59,7 @@ public class DepthsAdvancingShadows extends DepthsAbility {
 	public void cast(Action action) {
 
 		LivingEntity entity = mTarget;
-		if (entity != null && !entity.getScoreboardTags().contains(Metalmancy.IGNORE_TAG) && !entity.getScoreboardTags().contains(Metalmancy.GOLEM_TAG)) {
+		if (entity != null && !entity.getScoreboardTags().contains(AbilityUtils.IGNORE_TAG) && !(mPlayer.getInventory().getItemInOffHand().getType() == Material.SHIELD)) {
 			int advancingShadows = getAbilityScore();
 			Vector dir = LocationUtils.getDirectionTo(entity.getLocation(), mPlayer.getLocation());
 			World world = mPlayer.getWorld();
@@ -103,11 +103,14 @@ public class DepthsAdvancingShadows extends DepthsAbility {
 				loc.setY(Math.max(1.1, loc.getY()));
 			}
 
-			world.spawnParticle(Particle.SPELL_WITCH, mPlayer.getLocation().add(0, 1.1, 0), 50, 0.35, 0.5, 0.35, 1.0);
-			world.spawnParticle(Particle.SMOKE_LARGE, mPlayer.getLocation().add(0, 1.1, 0), 12, 0.35, 0.5, 0.35, 0.05);
+			Location playerLoc = mPlayer.getLocation();
+
+			world.spawnParticle(Particle.SPELL_WITCH, playerLoc.clone().add(0, 1.1, 0), 50, 0.35, 0.5, 0.35, 1.0);
+			world.spawnParticle(Particle.SMOKE_LARGE, playerLoc.clone().add(0, 1.1, 0), 12, 0.35, 0.5, 0.35, 0.05);
 			world.playSound(mPlayer.getLocation(), Sound.ENTITY_ILLUSIONER_MIRROR_MOVE, 1.0f, 1.1f);
 
 			mPlayer.teleport(loc, TeleportCause.UNKNOWN);
+			playerLoc = mPlayer.getLocation();
 
 			EffectManager.getInstance().addEffect(mPlayer, ABILITY_NAME, new FlatDamageDealt(DAMAGE_DURATION, DAMAGE[mRarity - 1]));
 			float range = ADVANCING_SHADOWS_AOE_KNOCKBACKS_RANGE;
@@ -121,9 +124,9 @@ public class DepthsAdvancingShadows extends DepthsAbility {
 				}
 			}
 
-			world.spawnParticle(Particle.SPELL_WITCH, mPlayer.getLocation().add(0, 1.1, 0), 50, 0.35, 0.5, 0.35, 1.0);
-			world.spawnParticle(Particle.SMOKE_LARGE, mPlayer.getLocation().add(0, 1.1, 0), 12, 0.35, 0.5, 0.35, 0.05);
-			world.playSound(mPlayer.getLocation(), Sound.ENTITY_ILLUSIONER_MIRROR_MOVE, 1.0f, 1.1f);
+			world.spawnParticle(Particle.SPELL_WITCH, playerLoc.clone().add(0, 1.1, 0), 50, 0.35, 0.5, 0.35, 1.0);
+			world.spawnParticle(Particle.SMOKE_LARGE, playerLoc.clone().add(0, 1.1, 0), 12, 0.35, 0.5, 0.35, 0.05);
+			world.playSound(playerLoc, Sound.ENTITY_ILLUSIONER_MIRROR_MOVE, 1.0f, 1.1f);
 			mTarget = null;
 			putOnCooldown();
 		}
@@ -165,7 +168,7 @@ public class DepthsAdvancingShadows extends DepthsAbility {
 
 	@Override
 	public String getDescription(int rarity) {
-		return "Right click while holding a weapon to teleport to the target hostile enemy within " + ADVANCING_SHADOWS_RANGE + " blocks and gain " + DepthsUtils.getRarityColor(rarity) + DAMAGE[rarity - 1] + ChatColor.WHITE + " attack damage for " + DAMAGE_DURATION / 20 + " seconds. Cooldown: " + COOLDOWN / 20 + "s.";
+		return "Right click and holding a weapon to teleport to the target hostile enemy within " + ADVANCING_SHADOWS_RANGE + " blocks and gain " + DepthsUtils.getRarityColor(rarity) + DAMAGE[rarity - 1] + ChatColor.WHITE + " attack damage for " + DAMAGE_DURATION / 20 + " seconds. If you are holding a shield in your offhand, you will gain the attack damage but not be teleported. Cooldown: " + COOLDOWN / 20 + "s.";
 	}
 
 	@Override

@@ -32,7 +32,8 @@ public class Cryobox extends DepthsAbility {
 	public static final int[] ABSORPTION = {1, 2, 3, 4, 5};
 	public static final int COOLDOWN = 90 * 20;
 	private static final int TRIGGER_HEALTH = 6;
-	private static final float RADIUS = 4.0f;
+	private static final int KNOCKBACK_RADIUS = 4;
+	private static final int ELEVATE_RADIUS = 2;
 	private static final float KNOCKBACK_SPEED = 0.7f;
 	private static final int DURATION = 12 * 20;
 	private static final int ICE_DURATION = 20 * 20;
@@ -102,17 +103,24 @@ public class Cryobox extends DepthsAbility {
 		// Put on cooldown before processing results to prevent infinite recursion
 		putOnCooldown();
 
+		Location center = mPlayer.getLocation();
+
 		// Conditions match - prismatic shield
-		for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), RADIUS, mPlayer)) {
+		for (LivingEntity mob : EntityUtils.getNearbyMobs(center, KNOCKBACK_RADIUS, mPlayer)) {
 			MovementUtils.knockAway(mPlayer, mob, KNOCKBACK_SPEED);
+		}
+		for (LivingEntity mob : EntityUtils.getNearbyMobs(center, ELEVATE_RADIUS, mPlayer)) {
+			Location mobLoc = mob.getLocation();
+			mobLoc.setY(center.getY() + 3);
+			mob.teleport(mobLoc);
 		}
 
 		mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF,
 		                                 new PotionEffect(PotionEffectType.ABSORPTION, DURATION, ABSORPTION[mRarity - 1], true, true));
 		World world = mPlayer.getWorld();
-		world.spawnParticle(Particle.FIREWORKS_SPARK, mPlayer.getLocation().add(0, 1.15, 0), 150, 0.2, 0.35, 0.2, 0.5);
-		world.spawnParticle(Particle.SPELL_INSTANT, mPlayer.getLocation().add(0, 1.15, 0), 100, 0.2, 0.35, 0.2, 1);
-		world.playSound(mPlayer.getLocation(), Sound.ITEM_TOTEM_USE, 1, 1.35f);
+		world.spawnParticle(Particle.FIREWORKS_SPARK, center.add(0, 1.15, 0), 150, 0.2, 0.35, 0.2, 0.5);
+		world.spawnParticle(Particle.SPELL_INSTANT, center.add(0, 1.15, 0), 100, 0.2, 0.35, 0.2, 1);
+		world.playSound(center, Sound.ITEM_TOTEM_USE, 1, 1.35f);
 		MessagingUtils.sendActionBarMessage(mPlugin, mPlayer, "Cryobox has been activated");
 
 		if (dealDamageLater) {
@@ -121,7 +129,6 @@ public class Cryobox extends DepthsAbility {
 		}
 
 		//Ripped this straight from frost giant, epic
-		Location center = mPlayer.getLocation();
 		Location[] locs = new Location[] {
 			//First Layer
 			center.clone().add(1, 0, 0),

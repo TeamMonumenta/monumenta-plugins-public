@@ -12,6 +12,7 @@ import org.bukkit.FireworkEffect;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Firework;
@@ -52,7 +53,7 @@ public class DepthsUtils {
 	public static final String DEPTHS_MESSAGE_PREFIX = ChatColor.DARK_PURPLE + "[Depths Party] " + ChatColor.LIGHT_PURPLE;
 
 	//Material defined as ice
-	public static final Material ICE_MATERIAL = Material.FROSTED_ICE;
+	public static final Material ICE_MATERIAL = Material.PACKED_ICE;
 
 	//Forbidden blocks for replacing with ice
 	private static final EnumSet<Material> mIgnoredMats = EnumSet.of(
@@ -291,5 +292,16 @@ public class DepthsUtils {
 			return "Boss";
 		}
 		return "";
+	}
+
+	public static void iceExposedBlock(Block b, int iceTicks) {
+		//Check above block first and see if it is exposed to air
+		if (b.getRelative(BlockFace.UP).isSolid() && !(b.getRelative(BlockFace.UP).getRelative(BlockFace.UP).isSolid() || b.getRelative(BlockFace.UP).getRelative(BlockFace.UP).getType() == Material.WATER)) {
+			DepthsUtils.spawnIceTerrain(b.getRelative(BlockFace.UP).getLocation(), iceTicks);
+		} else if (b.isSolid() || b.getType() == Material.WATER) {
+			DepthsUtils.spawnIceTerrain(b.getLocation(), iceTicks);
+		} else if (b.getRelative(BlockFace.DOWN).isSolid() || b.getRelative(BlockFace.DOWN).getType() == Material.WATER) {
+			DepthsUtils.spawnIceTerrain(b.getRelative(BlockFace.DOWN).getLocation(), iceTicks);
+		}
 	}
 }

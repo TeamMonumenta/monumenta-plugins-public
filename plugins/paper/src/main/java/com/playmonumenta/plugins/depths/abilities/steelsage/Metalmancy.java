@@ -23,6 +23,7 @@ import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
+import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 
 public class Metalmancy extends DepthsAbility {
@@ -31,14 +32,13 @@ public class Metalmancy extends DepthsAbility {
 
 	public static final int[] HEALTH = {100, 125, 150, 175, 200};
 	public static final double[] DAMAGE = {10, 12.5, 15, 17.5, 20};
-	public static final int[] DURATION = {8 * 20, 9 * 20, 10 * 20, 11 * 20, 12* 20};
+	public static final int[] DURATION = {10 * 20, 11 * 20, 12 * 20, 13 * 20, 14 * 20};
 	public static final int COOLDOWN = 32 * 20;
 	public static final String GOLEM_NAME = "SteelConstruct";
 	public static final String GOLEM_TAG = "boss_metalmancy";
 	public static final double VELOCITY = 2;
 	public static final int DETECTION_RANGE = 50;
 	public static final int TICK_INTERVAL = 5;
-	public static final String IGNORE_TAG = "metalmancy_ignore";
 
 	private Mob mGolem;
 	private Mob mTarget;
@@ -104,7 +104,7 @@ public class Metalmancy extends DepthsAbility {
 
 					if (mGolem != null && mGolem.getTarget() == null && mTicksElapsed >= TICK_INTERVAL * 2) {
 						LivingEntity nearestMob = EntityUtils.getNearestMob(mGolem.getLocation(), 10, mGolem);
-						if (nearestMob != null && !nearestMob.getScoreboardTags().contains(IGNORE_TAG)) {
+						if (nearestMob != null && !nearestMob.getScoreboardTags().contains(AbilityUtils.IGNORE_TAG)) {
 							mGolem.setTarget(nearestMob);
 						}
 					}

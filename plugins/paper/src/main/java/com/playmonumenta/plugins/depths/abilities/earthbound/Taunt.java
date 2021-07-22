@@ -21,6 +21,7 @@ import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
+import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.AbsorptionUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 
@@ -29,10 +30,10 @@ import net.md_5.bungee.api.ChatColor;
 public class Taunt extends DepthsAbility {
 
 	public static final String ABILITY_NAME = "Taunt";
-	private static final int COOLDOWN = 20 * 14;
+	private static final int COOLDOWN = 20 * 18;
 	private static final double[] ABSORPTION = {1, 1.25, 1.5, 1.75, 2};
 	private static final int CAST_RANGE = 12;
-	private static final int MAX_ABSORB = 8;
+	private static final int MAX_ABSORB = 6;
 	private static final int ABSORPTION_DURATION = 20 * 8;
 
 	public Taunt(Plugin plugin, Player player) {
@@ -50,11 +51,12 @@ public class Taunt extends DepthsAbility {
 		Location loc = mPlayer.getLocation();
 		World world = mPlayer.getWorld();
 		List<LivingEntity> mobs = EntityUtils.getNearbyMobs(loc, CAST_RANGE);
+		mobs.removeIf(mob -> mob.getScoreboardTags().contains(AbilityUtils.IGNORE_TAG));
 
 		if (mobs.size() > 0) {
 			putOnCooldown();
 
-			// add rarity% absorption for each affected mob, up to 4
+			// add rarity% absorption for each affected mob, up to 6
 			AbsorptionUtils.addAbsorption(mPlayer, Math.min(mobs.size(), MAX_ABSORB) * ABSORPTION[mRarity - 1], MAX_ABSORB * ABSORPTION[mRarity - 1], ABSORPTION_DURATION);
 			for (LivingEntity le : mobs) {
 				Mob mob = (Mob) le;

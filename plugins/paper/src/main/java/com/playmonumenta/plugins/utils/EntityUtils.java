@@ -26,6 +26,7 @@ import org.bukkit.block.Block;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.AbstractArrow;
 import org.bukkit.entity.AreaEffectCloud;
+import org.bukkit.entity.Bee;
 import org.bukkit.entity.Blaze;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
@@ -38,6 +39,7 @@ import org.bukkit.entity.Mob;
 import org.bukkit.entity.Monster;
 import org.bukkit.entity.Phantom;
 import org.bukkit.entity.PigZombie;
+import org.bukkit.entity.Piglin;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.PolarBear;
 import org.bukkit.entity.Projectile;
@@ -336,7 +338,8 @@ public class EntityUtils {
 		if (!entity.getScoreboardTags().contains("SkillImmune")) {
 			if (entity instanceof Monster || entity instanceof Slime || entity instanceof Ghast || entity instanceof PolarBear
 					|| entity instanceof Phantom || entity instanceof Shulker || entity instanceof PufferFish
-					|| entity instanceof SkeletonHorse || entity instanceof ZombieHorse || entity instanceof Giant || entity instanceof Hoglin) {
+					|| entity instanceof SkeletonHorse || entity instanceof ZombieHorse || entity instanceof Giant
+					|| entity instanceof Hoglin || entity instanceof Piglin || entity instanceof Bee) {
 				return true;
 			} else if (entity instanceof Wolf) {
 				return ((Wolf) entity).isAngry() || entity.getScoreboardTags().contains("boss_targetplayer");

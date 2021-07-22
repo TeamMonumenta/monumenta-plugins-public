@@ -94,7 +94,7 @@ public class BladeFlurry extends DepthsAbility {
 
 	@Override
 	public String getDescription(int rarity) {
-		return "Right clicking while sneaking and holding a weapon to deal " + DepthsUtils.getRarityColor(rarity) + DAMAGE[rarity - 1] + ChatColor.WHITE + " damage in a " + RADIUS + " block radius around you. Affected mobs are silenced for " + SILENCE_DURATION / 20 + " second and knocked away slightly. Cooldown: " + COOLDOWN / 20 + "s.";
+		return "Right click while sneaking and holding a weapon to deal " + DepthsUtils.getRarityColor(rarity) + DAMAGE[rarity - 1] + ChatColor.WHITE + " damage in a " + RADIUS + " block radius around you. Affected mobs are silenced for " + SILENCE_DURATION / 20 + " second and knocked away slightly. Cooldown: " + COOLDOWN / 20 + "s.";
 	}
 
 	@Override

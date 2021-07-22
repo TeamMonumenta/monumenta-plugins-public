@@ -27,7 +27,6 @@ import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
-import com.playmonumenta.plugins.depths.abilities.steelsage.Metalmancy;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import com.playmonumenta.plugins.utils.EntityUtils;
 
@@ -105,7 +104,6 @@ public class DummyDecoy extends DepthsAbility {
 		LivingEntity e = (LivingEntity) LibraryOfSoulsIntegration.summon(loc, DUMMY_NAME);
 		e.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(HEALTH[mRarity - 1]);
 		e.setHealth(HEALTH[mRarity - 1]);
-		e.addScoreboardTag(Metalmancy.IGNORE_TAG);
 
 		new BukkitRunnable() {
 			@Override

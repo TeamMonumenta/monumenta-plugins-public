@@ -48,6 +48,8 @@ public class AbilityUtils {
 	private static final Map<Player, Integer> INVISIBLE_PLAYERS = new HashMap<Player, Integer>();
 	private static BukkitRunnable invisTracker = null;
 
+	public static final String IGNORE_TAG = "summon_ignore";
+
 	private static void startInvisTracker(Plugin plugin) {
 		invisTracker = new BukkitRunnable() {
 			@Override

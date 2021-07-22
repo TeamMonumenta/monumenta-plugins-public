@@ -166,7 +166,7 @@ public class EarthenWrath extends DepthsAbility {
 
 	@Override
 	public String getDescription(int rarity) {
-		return "Swap while holding a weapon to redirect damage taken by allies to you at a " + DepthsUtils.getRarityColor(rarity) + DepthsUtils.roundPercent(1 - PERCENT_DAMAGE_RECEIVED[rarity - 1]) + "%" + ChatColor.WHITE + " damage reduction for " + DURATION / 20 + " seconds, then do a burst damage in a " + DAMAGE_RADIUS + " block radius around you, dealing " + DepthsUtils.getRarityColor(rarity) + DepthsUtils.roundPercent(PERCENT_DAMAGE_REFLECTED[rarity - 1]) + "%" + ChatColor.WHITE + " of damage absorbed. Cooldown: " + COOLDOWN / 20 + "s.";
+		return "Swap while holding a weapon to redirect damage taken by allies to you at a " + DepthsUtils.getRarityColor(rarity) + DepthsUtils.roundPercent(PERCENT_DAMAGE_RECEIVED[rarity - 1]) + "%" + ChatColor.WHITE + " damage reduction for " + DURATION / 20 + " seconds, then do a burst damage in a " + DAMAGE_RADIUS + " block radius around you, dealing " + DepthsUtils.getRarityColor(rarity) + DepthsUtils.roundPercent(PERCENT_DAMAGE_REFLECTED[rarity - 1]) + "%" + ChatColor.WHITE + " of damage absorbed. Cooldown: " + COOLDOWN / 20 + "s.";
 	}
 
 	@Override

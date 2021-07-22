@@ -126,20 +126,11 @@ public class FrostSpear extends DepthsAbility {
 				blocksToIce.add(centerBlock.getRelative(BlockFace.WEST));
 
 				for (Block b : blocksToIce) {
-					//Check above block first and see if it is exposed to air
-					if (b.getRelative(BlockFace.UP).isSolid() && !b.getRelative(BlockFace.UP).getRelative(BlockFace.UP).isSolid()) {
-						DepthsUtils.spawnIceTerrain(b.getRelative(BlockFace.UP).getLocation(), ICE_TICKS);
-					} else if (b.isSolid()) {
-						DepthsUtils.spawnIceTerrain(b.getLocation(), ICE_TICKS);
-
-					} else if (b.getRelative(BlockFace.DOWN).isSolid()) {
-						DepthsUtils.spawnIceTerrain(b.getRelative(BlockFace.DOWN).getLocation(), ICE_TICKS);
-
-					}
+					DepthsUtils.iceExposedBlock(b, ICE_TICKS);
 				}
 			}
 
-			if (block.getType().isSolid()) {
+			if (block.getType().isSolid() || block.getType() == Material.WATER) {
 				world.spawnParticle(Particle.SMOKE_LARGE, bLoc, 80, 0.1, 0.1, 0.1, 0.2);
 				world.spawnParticle(Particle.CLOUD, bLoc, 80, 0.1, 0.1, 0.1, 0.2);
 				world.spawnParticle(Particle.FIREWORKS_SPARK, bLoc, 50, 0.1, 0.1, 0.1, 0.3);

@@ -10,8 +10,6 @@ import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 
 import com.playmonumenta.plugins.Plugin;
@@ -23,7 +21,6 @@ import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
 import com.playmonumenta.plugins.effects.PercentSpeed;
-import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.utils.ParticleUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 
@@ -32,7 +29,7 @@ import net.md_5.bungee.api.ChatColor;
 public class WardOfLight extends DepthsAbility {
 
 	public static final String ABILITY_NAME = "Ward of Light";
-	public static final double[] HEAL = {0.4, 0.5, 0.6, 0.7, 0.8};
+	public static final double[] HEAL = {0.32, 0.4, 0.48, 0.56, 0.64};
 	private static final int HEALING_RADIUS = 12;
 	private static final double HEALING_DOT_ANGLE = 0.33;
 	private static final int COOLDOWN = 12 * 20;
@@ -73,8 +70,6 @@ public class WardOfLight extends DepthsAbility {
 				}
 
 				Location loc = p.getLocation();
-				mPlugin.mPotionManager.addPotion(p, PotionID.ABILITY_OTHER,
-				                                 new PotionEffect(PotionEffectType.REGENERATION, 20 * 4, 1, true, true));
 				mPlugin.mEffectManager.addEffect(p, ABILITY_NAME, new PercentSpeed(DURATION, PERCENT_SPEED, ABILITY_NAME));
 				world.spawnParticle(Particle.HEART, loc.add(0, 1, 0), 10, 0.7, 0.7, 0.7, 0.001);
 				world.spawnParticle(Particle.END_ROD, loc.add(0, 1, 0), 10, 0.7, 0.7, 0.7, 0.001);

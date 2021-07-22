@@ -13,6 +13,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.depths.bosses.Davey;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
+import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 
@@ -22,6 +23,7 @@ public class SpellLinkBeyondLife extends Spell {
 	private static final String SUMMON_NAME_3 = "DistortedCrewman";
 	private static final int SPAWN_COUNT = 4; // Summon count 4-8 depending on players alive
 	private static final int RANGE = 10;
+	private static final int MAX_MOBS = 15;
 
 	private final LivingEntity mBoss;
 	private int mCooldownTicks;
@@ -91,5 +93,10 @@ public class SpellLinkBeyondLife extends Spell {
 	@Override
 	public int cooldownTicks() {
 		return mCooldownTicks;
+	}
+
+	@Override
+	public boolean canRun() {
+		return EntityUtils.getNearbyMobs(mBoss.getLocation(), Davey.detectionRange).size() < MAX_MOBS;
 	}
 }

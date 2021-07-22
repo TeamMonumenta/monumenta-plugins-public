@@ -18,7 +18,6 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.util.Vector;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.classes.ClassAbility;
@@ -37,7 +36,6 @@ public class Pyroblast extends DepthsAbility {
 
 	public static final int COOLDOWN = 12 * 20;
 	public static final int[] DAMAGE = {20, 25, 30, 35, 40};
-	private static final int PARTICLE_DIST = 16;
 	private static final double RADIUS = 4.0;
 	private static final int DURATION = 4 * 20;
 	public static final String META_DATA_TAG = "PyroblastArrow";
@@ -100,25 +98,6 @@ public class Pyroblast extends DepthsAbility {
 
 	private void explode(AbstractArrow arrow, Location loc) {
 		World world = arrow.getWorld();
-
-		Vector dir = loc.getDirection().normalize();
-		for (int i = 0; i < PARTICLE_DIST; i++) {
-			loc.add(dir);
-
-			if (loc.getBlock().getType().isSolid()) {
-				world.spawnParticle(Particle.EXPLOSION_HUGE, loc, 1, 0, 0, 0);
-				world.spawnParticle(Particle.SOUL_FIRE_FLAME, loc, 25, 2, 2, 2, 0);
-				world.spawnParticle(Particle.FLAME, loc, 25, 2, 2, 2, 0);
-				world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, .75f, 1);
-
-				List<LivingEntity> mobs = EntityUtils.getNearbyMobs(loc, RADIUS);
-				for (LivingEntity e : mobs) {
-					EntityUtils.applyFire(mPlugin, DURATION, e, mPlayer);
-					EntityUtils.damageEntity(mPlugin, e, DAMAGE[mRarity - 1], mPlayer, MagicType.FIRE, true, mInfo.mLinkedSpell);
-				}
-			}
-		}
-		loc = arrow.getLocation();
 		world.spawnParticle(Particle.EXPLOSION_HUGE, loc, 1, 0, 0, 0);
 		world.spawnParticle(Particle.SOUL_FIRE_FLAME, loc, 25, 2, 2, 2, 0);
 		world.spawnParticle(Particle.FLAME, loc, 25, 2, 2, 2, 0);

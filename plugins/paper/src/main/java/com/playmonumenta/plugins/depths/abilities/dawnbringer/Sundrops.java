@@ -10,8 +10,6 @@ import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import com.playmonumenta.plugins.Plugin;
@@ -19,8 +17,8 @@ import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
+import com.playmonumenta.plugins.effects.PercentDamageReceived;
 import com.playmonumenta.plugins.effects.PercentSpeed;
-import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 
@@ -38,6 +36,8 @@ public class Sundrops extends DepthsAbility {
 	private static final int LINGER_TIME = 10 * 20;
 	private static final int DURATION = 8 * 20;
 	private static final double PERCENT_SPEED = .2;
+	private static final String PERCENT_DAMAGE_RECEIVED_EFFECT_NAME = "SundropsPercentDamageReceivedEffect";
+	private static final double PERCENT_DAMAGE_RECEIVED = -0.2;
 
 	public Sundrops(Plugin plugin, Player player) {
 		super(plugin, player, ABILITY_NAME);
@@ -67,10 +67,10 @@ public class Sundrops extends DepthsAbility {
 				//Other player
 				for (Player p : PlayerUtils.playersInRange(item.getLocation(), 1.25, true)) {
 
+					Plugin plugin = Plugin.getInstance();
 					//Give speed and resistance
-					Plugin.getInstance().mPotionManager.addPotion(p, PotionID.ABILITY_OTHER,
-						new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, DURATION, 0, true, true));
-					Plugin.getInstance().mEffectManager.addEffect(p, ABILITY_NAME, new PercentSpeed(DURATION, PERCENT_SPEED, ABILITY_NAME));
+					plugin.mEffectManager.addEffect(p, PERCENT_DAMAGE_RECEIVED_EFFECT_NAME, new PercentDamageReceived(DURATION, PERCENT_DAMAGE_RECEIVED));
+					plugin.mEffectManager.addEffect(p, ABILITY_NAME, new PercentSpeed(DURATION, PERCENT_SPEED, ABILITY_NAME));
 
 					item.remove();
 
@@ -95,7 +95,7 @@ public class Sundrops extends DepthsAbility {
 
 	@Override
 	public String getDescription(int rarity) {
-		return "Whenever a player in your party breaks a spawner, there is a " + DepthsUtils.getRarityColor(rarity) + DROP_CHANCE[rarity - 1] + "%" + ChatColor.WHITE + " chance of spawning a sundrop. Picking up a sundrop gives " + DepthsUtils.roundPercent(PERCENT_SPEED) + "% speed and Resistance I for " + DURATION / 20 + " seconds. Spawn chance stacks with other players in your party who have the skill, up to 100%.";
+		return "Whenever a player in your party breaks a spawner, there is a " + DepthsUtils.getRarityColor(rarity) + DROP_CHANCE[rarity - 1] + "%" + ChatColor.WHITE + " chance of spawning a sundrop. Picking up a sundrop gives " + DepthsUtils.roundPercent(PERCENT_SPEED) + "% speed and " + DepthsUtils.roundPercent(-PERCENT_DAMAGE_RECEIVED) + "% resistance for " + DURATION / 20 + " seconds. Spawn chance stacks with other players in your party who have the skill, up to 100%.";
 	}
 
 	@Override

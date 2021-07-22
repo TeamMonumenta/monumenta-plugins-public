@@ -17,6 +17,7 @@ import org.bukkit.entity.Firework;
 import org.bukkit.entity.IronGolem;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.entity.Slime;
@@ -217,11 +218,13 @@ public class DepthsListener implements Listener {
 		}
 	}
 
-	//Metalmancy logic
 	@EventHandler(priority = EventPriority.LOW)
 	public void entityDamageByEntityEvent(EntityDamageByEntityEvent event) {
 		Entity entity = event.getEntity();
-		if (entity instanceof IronGolem && entity.getScoreboardTags().contains(Metalmancy.GOLEM_TAG) && event.getDamager() instanceof Player) {
+		Entity damager = event.getDamager();
+
+		//Prevent Metalmancy golem getting Decayed
+		if (entity instanceof IronGolem && entity.getScoreboardTags().contains(Metalmancy.GOLEM_TAG) && damager instanceof Player) {
 			new BukkitRunnable() {
 				@Override
 				public void run() {
@@ -232,13 +235,21 @@ public class DepthsListener implements Listener {
 				}
 			}.runTaskLater(mPlugin, 1);
 			event.setCancelled(true);
-		} else if (event.getEntity().getName().contains("Dionaea")) {
+		}
+
+		//Prevent plants from getting hit up
+		if (event.getEntity().getName().contains("Dionaea")) {
 			new BukkitRunnable() {
 				@Override
 				public void run() {
 					entity.setVelocity(new Vector(0, 0, 0));
 				}
 			}.runTaskLater(mPlugin, 1);
+		}
+
+		//Metalmancy golem taunt
+		if (entity instanceof Mob && damager instanceof IronGolem && damager.getScoreboardTags().contains(Metalmancy.GOLEM_TAG)) {
+			((Mob) entity).setTarget((IronGolem) damager);
 		}
 	}
 

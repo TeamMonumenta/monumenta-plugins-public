@@ -93,6 +93,7 @@ import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.tracking.PlayerTracking;
 import com.playmonumenta.plugins.utils.AbilityUtils;
+import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.GraveUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
@@ -452,13 +453,21 @@ public class EntityListener implements Listener {
 	public void witchThrowPotionEvent(WitchThrowPotionEvent event) {
 		Witch witch = event.getEntity();
 		ItemStack potion = event.getPotion();
-		if (witch.getEquipment().getItemInMainHand() != null && witch.getEquipment().getItemInMainHand().getType() == Material.SPLASH_POTION) {
-			potion = witch.getEquipment().getItemInMainHand();
+		ItemStack heldPotion = witch.getEquipment().getItemInOffHand();
+		if (potion != null && potion.getType() == Material.SPLASH_POTION && heldPotion != null) {
+			potion = heldPotion;
 		}
 		if (witch.isDrinkingPotion()) { //different ideas: something about checking how long the witch is drinking and make this not work until then?
 			event.setCancelled(true);
 		}
 		event.setPotion(potion);
+
+		new BukkitRunnable() {
+			@Override
+			public void run() {
+				witch.getEquipment().setItemInMainHand(heldPotion);
+			}
+		}.runTaskLater(mPlugin, 1);
 	}
 
 	// Entity interacts with something
@@ -704,14 +713,15 @@ public class EntityListener implements Listener {
 						}
 					}, 1);
 				}
-			} //does damage to user equal to witch's attack statistic
+			}
+			//does damage to user equal to witch's attack statistic
 			if (source instanceof Witch) {
 				AttributeInstance damage = ((Witch) source).getAttribute(Attribute.GENERIC_ATTACK_DAMAGE);
 				double dam = 1.0;
 				if (damage != null) {
 					dam = Math.max(dam, damage.getBaseValue());
 				}
-				p.damage(dam);
+				BossUtils.bossDamage((Witch) source, p, dam);
 			}
 		}
 	}

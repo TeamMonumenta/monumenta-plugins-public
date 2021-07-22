@@ -47,7 +47,7 @@ public class TotemOfSalvation extends DepthsAbility {
 	public static final int DURATION = 15 * 20;
 	private static final double EFFECT_RADIUS = 5;
 	private static final double PARTICLE_RING_HEIGHT = 1.0;
-	private static final double PERCENT_HEALING = 0.05;
+	private static final double PERCENT_HEALING = 0.08;
 	private static final Particle.DustOptions PARTICLE_COLOR = new Particle.DustOptions(Color.fromRGB(254, 212, 38), 1.0f);
 
 	private static final Collection<Map.Entry<Double, SpawnParticleAction>> PARTICLES =
