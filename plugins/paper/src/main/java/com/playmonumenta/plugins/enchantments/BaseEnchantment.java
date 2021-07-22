@@ -29,7 +29,7 @@ import org.jetbrains.annotations.NotNull;
 
 
 //TODO update method naming from when this class used to be ItemProperty.
-// Update event method naming to be more accurate/precise
+// Update event method naming to be more accurate/precise.
 // Standardise param order
 public interface BaseEnchantment {
 	/*

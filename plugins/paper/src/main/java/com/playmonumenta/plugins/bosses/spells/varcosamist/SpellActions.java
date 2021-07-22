@@ -48,7 +48,7 @@ public class SpellActions {
 			// If truly in the air (not on ground and not climbing - like the Thunder Step requirement),
 			// have relaxed 5-block threshold.
 			// Eg riptide, recoil, jump boost, knocked upwards
-			if (PlayerUtils.isAirborne(player)) {
+			if (PlayerUtils.isFreeFalling(player)) {
 				yThreshold = 5;
 			}
 

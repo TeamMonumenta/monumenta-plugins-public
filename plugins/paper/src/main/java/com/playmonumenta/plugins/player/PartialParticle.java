@@ -332,7 +332,7 @@ public class PartialParticle {
 	 * This is likely the method you wish to override when subclassing.
 	 * You have the chance to apply custom logic and then call
 	 * spawnUsingSettings() with differnt packagedValues,
-	 * as many times as needed
+	 * as many times as needed.
 	 */
 	protected void doSpawn(@NotNull ParticleBuilder packagedValues) {
 		spawnUsingSettings(packagedValues);
@@ -466,12 +466,12 @@ public class PartialParticle {
 	}
 
 	public enum Source {
-		OWN_PASSIVE(Objectives.PARTICLES_OWN_PASSIVE),
-		OWN_ACTIVE(Objectives.PARTICLES_OWN_ACTIVE),
-		OTHER_PASSIVE(Objectives.PARTICLES_OTHER_PASSIVE),
-		OTHER_ACTIVE(Objectives.PARTICLES_OTHER_ACTIVE),
-		ENEMY(Objectives.PARTICLES_ENEMY),
-		BOSS(Objectives.PARTICLES_BOSS),
+		OWN_PASSIVE(Objectives.PP_OWN_PASSIVE),
+		OWN_ACTIVE(Objectives.PP_OWN_ACTIVE),
+		OTHER_PASSIVE(Objectives.PP_OTHER_PASSIVE),
+		OTHER_ACTIVE(Objectives.PP_OTHER_ACTIVE),
+		ENEMY(Objectives.PP_ENEMY),
+		BOSS(Objectives.PP_BOSS),
 		FULL(null);
 
 		public @Nullable final String mObjectiveName;

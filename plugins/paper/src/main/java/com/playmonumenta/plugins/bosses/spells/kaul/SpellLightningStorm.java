@@ -63,7 +63,7 @@ public class SpellLightningStorm extends Spell {
 				// If truly in the air (not on ground and not climbing - like the Thunder Step requirement),
 				// have relaxed 8-block threshold.
 				// Eg recoil, jump boost, Primordial yeet
-				if (PlayerUtils.isAirborne(player)) {
+				if (PlayerUtils.isFreeFalling(player)) {
 					yThreshold = 8;
 				}
 

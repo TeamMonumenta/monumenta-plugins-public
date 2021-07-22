@@ -85,10 +85,13 @@ public class ScoreboardUtils {
 		int defaultValue
 	) {
 		@Nullable Objective objective = player.getScoreboard().getObjective(objectiveName);
-		if (objective == null) {
-			return defaultValue;
-		} else {
-			return objective.getScore(player.getName()).getScore();
+		if (objective != null) {
+			@NotNull Score score = objective.getScore(player.getName());
+			if (score.isScoreSet()) {
+				return score.getScore();
+			}
 		}
+
+		return defaultValue;
 	}
 }

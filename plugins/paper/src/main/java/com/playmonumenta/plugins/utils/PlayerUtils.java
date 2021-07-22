@@ -120,43 +120,54 @@ public class PlayerUtils {
 	}
 
 	/*
-	 * Whether the player meets the conditions for a critical hit,
-	 * emulating the vanilla check in full (no critting while sprinting).
+	 * Whether the player meets the conditions for a crit,
+	 * emulating the vanilla check in full.
+	 *
+	 * Ie, no critting while sprinting.
 	 */
 	public static boolean isCriticalAttack(@NotNull Player player) {
 		// NMS EntityHuman:
+		// float f = (float)this.b((AttributeBase)GenericAttributes.ATTACK_DAMAGE);
+		//     f1 = EnchantmentManager.a(this.getItemInMainHand(), ((EntityLiving)entity).getMonsterType());
 		// float f2 = this.getAttackCooldown(0.5F);
-		// boolean flag = f2 > 0.9F;
-		// boolean flag2 = flag && this.fallDistance > 0.0F && !this.onGround && !this.isClimbing() && !this.isInWater() && !this.hasEffect(MobEffects.BLINDNESS) && !this.isPassenger() && entity instanceof EntityLiving;
-		// flag2 = flag2 && !this.isSprinting();
+		// f *= 0.2F + f2 * f2 * 0.8F;
+		// f1 *= f2;
+		// if (f > 0.0F || f1 > 0.0F) {
+		//     boolean flag = f2 > 0.9F;
+		//     boolean flag2 = flag && this.fallDistance > 0.0F && !this.onGround && !this.isClimbing() && !this.isInWater() && !this.hasEffect(MobEffects.BLINDNESS) && !this.isPassenger() && entity instanceof EntityLiving;
+		//     flag2 = flag2 && !this.isSprinting();
 		return (
 			isFallingAttack(player)
+			&& !player.isInWater()
 			&& !player.isSprinting()
 		);
 	}
 
 	/*
-	 * Whether the player meets the conditions for a critical hit,
+	 * Whether the player meets the conditions for a crit,
 	 * emulating the vanilla check,
-	 * except this does not check whether they are sprinting.
-	 * This is used because MM has historically had a non-exact crit check that
-	 * allowed crit-triggered abilities to trigger off non-crit melee damage
-	 * while sprinting.
+	 * except the not in water and not sprinting requirements.
+	 *
+	 * This is used because MM has historically had a non-exact crit check,
+	 * that allowed things like crit-triggered abilities to trigger off non-crit
+	 * melee damage while sprinting.
 	 */
 	public static boolean isFallingAttack(@NotNull Player player) {
 		return (
 			player.getCooledAttackStrength(0.5f) > 0.9
 			&& player.getFallDistance() > 0
-			&& isAirborne(player)
-			&& !player.isInWater()
+			&& isFreeFalling(player)
 			&& !player.hasPotionEffect(PotionEffectType.BLINDNESS)
 			&& !player.isInsideVehicle()
 			//TODO pass in the Entity in question to check if LivingEntity
 		);
 	}
 
-	// Whether player is considered to be in the air
-	public static boolean isAirborne(Player player) {
+	/*
+	 * Whether the player is considered to be freely falling in air or liquid.
+	 * They cannot be on the ground or climbing.
+	 */
+	public static boolean isFreeFalling(Player player) {
 		if (!player.isOnGround()) {
 			Material playerFeetMaterial = player.getLocation().getBlock().getType();
 			// Accounts for vines, ladders, nether vines, scaffolding etc
@@ -169,9 +180,13 @@ public class PlayerUtils {
 	}
 
 	/*
-	 * Whether the player meets the conditions for a sweep attack,
-	 * emulating the vanilla check, except the sword or proximity requirements.
-	 * This also does not require them to be on the ground.
+	 * Whether the player meets the conditions for a sweeping attack,
+	 * emulating the vanilla check, except the on ground,
+	 * movement increment limit, sword, and proximity requirements.
+	 *
+	 * Used as the custom Arcane Thrust requirement,
+	 * similar to how enchant/ability falling attack requirements are a subset
+	 * of crit requirements.
 	 */
 	public static boolean isNonFallingAttack(
 		@NotNull Player player,
@@ -181,15 +196,16 @@ public class PlayerUtils {
 			player.getCooledAttackStrength(0.5f) > 0.9
 			&& !isCriticalAttack(player)
 			&& !player.isSprinting()
-			// Last check on horizontal "speed" requires an internal vanilla
-			// collision adjustment Vec3D,
-			// it is not simply player.getVelocity() (that is used elsewhere)
+			// Last check on horizontal movement increment requires an internal
+			// vanilla collision adjustment Vec3D.
+			// It is not simply player.getVelocity(); that is used elsewhere
 		);
 	}
 
 	/*
-	 * Whether the player meets the conditions for a sweep attack,
-	 * emulating the vanilla check, except the sword or proximity requirements.
+	 * Whether the player meets the conditions for a sweeping attack,
+	 * emulating the vanilla check, except the movement increment limit, sword,
+	 * and proximity requirements.
 	 */
 	public static boolean isSweepingAttack(
 		@NotNull Player player,
@@ -208,6 +224,9 @@ public class PlayerUtils {
 		// }
 		// double d0 = (double)(this.A - this.z);
 		// if (flag && !flag2 && !flag1 && this.onGround && d0 < (double)this.dN()) {
+		//     ItemStack itemstack = this.b((EnumHand)EnumHand.MAIN_HAND);
+		//     if (itemstack.getItem() instanceof ItemSword) {
+		//     List<EntityLiving> list = this.world.a(EntityLiving.class, entity.getBoundingBox().grow(1.0D, 0.25D, 1.0D));
 		return (
 			isNonFallingAttack(player, enemy)
 			&& player.isOnGround()

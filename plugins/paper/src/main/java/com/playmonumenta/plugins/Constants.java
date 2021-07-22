@@ -103,12 +103,12 @@ public class Constants {
 
 	public static class Objectives {
 		// PartialParticle
-		public static final String PARTICLES_OWN_PASSIVE = "ParticlesOwnPassive";
-		public static final String PARTICLES_OWN_ACTIVE = "ParticlesOwnActive";
-		public static final String PARTICLES_OTHER_PASSIVE = "ParticlesOtherPassive";
-		public static final String PARTICLES_OTHER_ACTIVE = "ParticlesOtherActive";
-		public static final String PARTICLES_ENEMY = "ParticlesEnemy";
-		public static final String PARTICLES_BOSS = "ParticlesBoss";
+		public static final String PP_OWN_PASSIVE = "PPOwnPassive";
+		public static final String PP_OWN_ACTIVE = "PPOwnActive";
+		public static final String PP_OTHER_PASSIVE = "PPOtherPassive";
+		public static final String PP_OTHER_ACTIVE = "PPOtherActive";
+		public static final String PP_ENEMY = "PPEnemy";
+		public static final String PP_BOSS = "PPBoss";
 
 		// PlayerData
 		public static final String PATREON_DOLLARS = "Patreon";
