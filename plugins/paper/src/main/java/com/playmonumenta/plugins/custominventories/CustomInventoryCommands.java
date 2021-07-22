@@ -9,6 +9,19 @@ import dev.jorel.commandapi.arguments.EntitySelectorArgument.EntitySelector;
 
 public class CustomInventoryCommands {
 	public static void register(Plugin plugin) {
+		//Avoid unused arguments, make sure you have a permission tied to the GUI command,
+		//and perform any checks that should reject the player from opening the GUI here.
+		//Once in the constructor for the GUI, it's much more difficult to properly
+		//reject the player.
+		new CommandAPICommand("openexamplecustominvgui")
+		.withPermission("monumenta.command.openexamplecustominvgui")
+		.withArguments(new EntitySelectorArgument("player", EntitySelector.ONE_PLAYER))
+		.executes((sender, args) -> {
+			Player player = (Player)args[0];
+			new ExampleCustomInventory(player).openInventory(player, plugin);
+		})
+		.register();
+
 		new CommandAPICommand("openteleportergui")
 			.withPermission("monumenta.command.openteleportergui")
 			.withArguments(new EntitySelectorArgument("player", EntitySelector.ONE_PLAYER))
