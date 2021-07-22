@@ -121,7 +121,6 @@ public class BossManager implements Listener {
 		mStatelessBosses.put(WeaponSwitchBoss.identityTag, (Plugin p, LivingEntity e) -> new WeaponSwitchBoss(p, e));
 		mStatelessBosses.put(ShieldSwitchBoss.identityTag, (Plugin p, LivingEntity e) -> new ShieldSwitchBoss(p, e));
 		mStatelessBosses.put(ChargerBoss.identityTag, (Plugin p, LivingEntity e) -> new ChargerBoss(p, e));
-		mStatelessBosses.put(ChargerStrongBoss.identityTag, (Plugin p, LivingEntity e) -> new ChargerStrongBoss(p, e));
 		mStatelessBosses.put(BlastResistBoss.identityTag, (Plugin p, LivingEntity e) -> new BlastResistBoss(p, e));
 		mStatelessBosses.put(InfestedBoss.identityTag, (Plugin p, LivingEntity e) -> new InfestedBoss(p, e));
 		mStatelessBosses.put(FireballBoss.identityTag, (Plugin p, LivingEntity e) -> new FireballBoss(p, e));
@@ -282,7 +281,6 @@ public class BossManager implements Listener {
 		mBossDeserializers.put(WeaponSwitchBoss.identityTag, (Plugin p, LivingEntity e) -> WeaponSwitchBoss.deserialize(p, e));
 		mBossDeserializers.put(ShieldSwitchBoss.identityTag, (Plugin p, LivingEntity e) -> ShieldSwitchBoss.deserialize(p, e));
 		mBossDeserializers.put(ChargerBoss.identityTag, (Plugin p, LivingEntity e) -> ChargerBoss.deserialize(p, e));
-		mBossDeserializers.put(ChargerStrongBoss.identityTag, (Plugin p, LivingEntity e) -> ChargerStrongBoss.deserialize(p, e));
 		mBossDeserializers.put(BlastResistBoss.identityTag, (Plugin p, LivingEntity e) -> BlastResistBoss.deserialize(p, e));
 		mBossDeserializers.put(InfestedBoss.identityTag, (Plugin p, LivingEntity e) -> InfestedBoss.deserialize(p, e));
 		mBossDeserializers.put(FireballBoss.identityTag, (Plugin p, LivingEntity e) -> FireballBoss.deserialize(p, e));

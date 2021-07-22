@@ -368,8 +368,8 @@ public class BossUtils {
 
 		if (brackets == 0 && lastSplitIndex != string.length()) {
 			splitted.add(string.substring(lastSplitIndex, string.length()));
-		} else {
-			Plugin.getInstance().getLogger().warning("Failed to parse string: " + string + " too many brackets");
+		} else if (!string.isEmpty()) {
+			Plugin.getInstance().getLogger().warning("Failed to parse string: '" + string + "' too many brackets");
 		}
 
 		return splitted;
