@@ -761,6 +761,34 @@ public class DepthsManager {
 		return abilities;
 	}
 
+	/**
+	 * Returns the abilities the player currently has
+	 * @param p the player to look up
+	 * @return all their active abilities (rarity > 0)
+	 */
+	public List<DepthsAbility> getPlayerAbilities(Player p) {
+
+		DepthsPlayer dp = mPlayers.get(p.getUniqueId());
+
+		// Check if they're in the system
+		if (dp == null) {
+			return null;
+		}
+
+		List<DepthsAbility> abilities = new ArrayList<>();
+
+		// For each ability they have a score for, return the item that says what that ability does
+
+		for (DepthsAbility da : getAbilities()) {
+			Integer rarity = dp.mAbilities.get(da.getDisplayName());
+			if (rarity != null && rarity.intValue() > 0) {
+				abilities.add(da);
+			}
+		}
+
+		return abilities;
+	}
+
 	//Simple boolean check to see if the player is already in the depths system
 	public boolean isInSystem(Player p) {
 		if (mPlayers.get(p.getUniqueId()) == null) {

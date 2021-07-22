@@ -41,7 +41,7 @@ import net.kyori.adventure.text.Component;
 
 public abstract class Ability {
 	protected final Plugin mPlugin;
-	protected final AbilityInfo mInfo;
+	public final AbilityInfo mInfo;
 	protected final Player mPlayer;
 	private Integer mScore = null;
 

@@ -99,6 +99,18 @@ public class DepthsGUICommands {
 
 						new DepthsWeaponAspectGUI(player).openInventory(player, plugin);
 					}))
+			.withSubcommand(new CommandAPICommand("removeability")
+					.withArguments(new EntitySelectorArgument("player", EntitySelector.ONE_PLAYER))
+					.executes((sender, args) -> {
+						Player player = (Player) args[0];
+
+						if (!DepthsManager.getInstance().isInSystem(player) || DepthsManager.getInstance().mPlayers.get(player.getUniqueId()).mUsedAbilityDeletion) {
+							MessagingUtils.sendActionBarMessage(player, "You've already removed your ability for this floor!");
+							return;
+						}
+
+						new DepthsRemoveAbilityGUI(player).openInventory(player, plugin);
+					}))
 			.register();
 	}
 }

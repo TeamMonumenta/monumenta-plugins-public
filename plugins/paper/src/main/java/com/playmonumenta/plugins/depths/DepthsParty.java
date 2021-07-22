@@ -309,6 +309,8 @@ public class DepthsParty {
 			for (DepthsPlayer p : mPlayersInParty) {
 				//Reset chaos eligibility
 				p.mUsedChaosThisFloor = false;
+				//Reset ability removal eligibility
+				p.mUsedAbilityDeletion = false;
 			}
 		}
 
