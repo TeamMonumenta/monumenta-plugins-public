@@ -3,20 +3,21 @@ package com.playmonumenta.plugins.integrations;
 import java.util.UUID;
 import java.util.logging.Logger;
 
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.Listener;
+
 import com.google.gson.JsonObject;
 import com.playmonumenta.networkrelay.NetworkRelayAPI;
 import com.playmonumenta.networkrelay.NetworkRelayMessageEvent;
 import com.playmonumenta.plugins.commands.ClaimRaffle;
 import com.playmonumenta.plugins.commands.RedeemVoteRewards;
 
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
-import org.bukkit.event.Listener;
-
 public class MonumentaNetworkRelayIntegration implements Listener {
 	public static final String AUDIT_LOG_CHANNEL = "Monumenta.Automation.AuditLog";
 	public static final String GET_VOTES_UNCLAIMED_CHANNEL = "Monumenta.Bungee.GetVotesUnclaimed";
 	public static final String CHECK_RAFFLE_ELIGIBILITY_CHANNEL = "Monumenta.Bungee.CheckRaffleEligibility";
+	public static final String ADMIN_ALERT_CHANNEL = "Monumenta.Automation.AdminNotification";
 
 	private final Logger mLogger;
 	private static MonumentaNetworkRelayIntegration INSTANCE = null;
@@ -156,6 +157,19 @@ public class MonumentaNetworkRelayIntegration implements Listener {
 				NetworkRelayAPI.sendBroadcastCommand(command);
 			} catch (Exception ex) {
 				INSTANCE.mLogger.severe("Failed to send broadcast message: " + ex.getMessage());
+				ex.printStackTrace();
+			}
+		}
+	}
+
+	public static void sendAdminMessage(String message) {
+		if (INSTANCE != null) {
+			JsonObject data = new JsonObject();
+			data.addProperty("message", message);
+			try {
+				NetworkRelayAPI.sendMessage("automation-bot", ADMIN_ALERT_CHANNEL, data);
+			} catch (Exception ex) {
+				INSTANCE.mLogger.severe("Failed to send admin alert message: " + ex.getMessage());
 				ex.printStackTrace();
 			}
 		}
