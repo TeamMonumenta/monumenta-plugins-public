@@ -38,14 +38,13 @@ public class DelveInfusionUtils {
 
 	public static final int MAX_LEVEL = 4;
 	public static final int[] MAT_DEPTHS_COST_PER_INFUSION = {2, 4, 8, 16};
-	public static final int[] MAT_COST_PER_INFUSION = {4, 8, 16, 32};
+	public static final int[] MAT_COST_PER_INFUSION = {3, 6, 12, 24};
 	public static final int[] XP_COST_PER_LEVEL = {2920, 5345, 8670, 12895};
 													//40, 50, 60, 70
 
 	public static final NamespacedKey DEPTHS_MAT_LOOT_TABLE = NamespacedKey.fromString("epic:r2/depths/loot/voidstained_geode");
 
 	public enum DelveInfusionSelection {
-		//TODO put more delve infusions here! This is the only place in the file you need to update!
 		PENNATE("pennate", Pennate.PROPERTY_NAME, NamespacedKey.fromString("epic:r1/delves/white/auxiliary/delve_material")),
 		CARAPACE("carapace", Carapace.PROPERTY_NAME, NamespacedKey.fromString("epic:r1/delves/orange/auxiliary/delve_material")),
 		AURA("aura", Aura.PROPERTY_NAME, NamespacedKey.fromString("epic:r1/delves/magenta/auxiliary/delve_material")),
@@ -105,6 +104,17 @@ public class DelveInfusionUtils {
 			return;
 		}
 
+		List<String> newLore = new ArrayList<>();
+		if (item.getLore() != null) {
+			for (String line : item.getLore()) {
+				if (!line.contains("PRE COST ADJUST")) {
+					newLore.add(line);
+				}
+			}
+			item.setLore(newLore);
+			ItemUtils.setPlainLore(item);
+		}
+
 		//Assume the player has already paid for this infusion
 		int prevLvl = InventoryUtils.getCustomEnchantLevel(item, selection.getEnchantName(), true);
 		if (prevLvl > 0) {
@@ -136,20 +146,40 @@ public class DelveInfusionUtils {
 	public static void refundInfusion(ItemStack item, Player player) {
 		DelveInfusionSelection infusion = getCurrentInfusion(item);
 		int level = getInfuseLevel(item) - 1;
+		int levelXp = level;
 
 		InventoryUtils.removeCustomEnchant(item, infusion.getEnchantName());
 
+		boolean found = false;
+		List<String> newLore = new ArrayList<>();
+		if (item.getLore() != null) {
+			for (String line : item.getLore()) {
+				if (!line.contains("PRE COST ADJUST")) {
+					newLore.add(line);
+				} else {
+					found = true;
+				}
+			}
+			item.setLore(newLore);
+			ItemUtils.setPlainLore(item);
+		}
+
 		List<ItemStack> mats = null;
+
+		int[] preCostAdjustment = {4, 8, 16, 32};
 		while (level >= 0) {
 			mats = getCurrenciesCost(item, infusion, level, player);
+			if (found) {
+				mats.get(0).setAmount(preCostAdjustment[level]);
+			}
 			level--;
 			giveMaterials(player, mats);
 			mats.clear();
 		}
 
 		int xp = ExperienceUtils.getTotalExperience(player);
-		for (int i = 0; i < level; i++) {
-			xp += XP_COST_PER_LEVEL[i] / 2;
+		for (int i = 0; i < levelXp; i++) {
+			xp += found ? XP_COST_PER_LEVEL[i] : XP_COST_PER_LEVEL[i] / 2;
 		}
 		ExperienceUtils.setTotalExperience(player, xp);
 	}
