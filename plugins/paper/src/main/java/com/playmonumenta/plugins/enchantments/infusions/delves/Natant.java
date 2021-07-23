@@ -19,7 +19,7 @@ public class Natant implements BaseEnchantment {
 
 	public static final String PROPERTY_NAME = ChatColor.GRAY + "Natant";
 	private static final int DURATION = 10;
-	private static final double PERCENT_SPEED_PER_LEVEL = 0.03;
+	private static final double PERCENT_SPEED_PER_LEVEL = 0.04;
 	private static final String PERCENT_SPEED_EFFECT_NAME = "NatantPercentSpeedEffect";
 
 	@Override

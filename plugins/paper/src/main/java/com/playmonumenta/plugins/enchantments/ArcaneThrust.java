@@ -62,7 +62,7 @@ public class ArcaneThrust implements BaseEnchantment {
 					LivingEntity mob = iter.next();
 					if (box.overlaps(mob.getBoundingBox())) {
 						if (mob != target) {
-							EntityUtils.damageEntity(plugin, mob, damage, player, MagicType.ENCHANTMENT);
+							EntityUtils.damageEntity(plugin, mob, damage, player, MagicType.ENCHANTMENT, true);
 							MovementUtils.knockAway(player.getLocation(), mob, 0.25f, 0.25f);
 						}
 						iter.remove();

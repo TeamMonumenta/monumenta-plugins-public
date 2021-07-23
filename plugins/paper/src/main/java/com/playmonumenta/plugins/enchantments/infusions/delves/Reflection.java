@@ -22,10 +22,9 @@ import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.classes.magic.MagicType;
 
 public class Reflection implements BaseEnchantment {
-	//TODO-rework this
 	public static final String PROPERTY_NAME = ChatColor.GRAY + "Reflection";
-	private static final double REFLECT_PCT_PER_LEVEL = 0.04;
-	private static final int RADIUS = 3;
+	private static final double REFLECT_PCT_PER_LEVEL = 0.06;
+	private static final int RADIUS = 4;
 
 	@Override
 	public String getProperty() {

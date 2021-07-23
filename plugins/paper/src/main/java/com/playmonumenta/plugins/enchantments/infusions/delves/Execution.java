@@ -24,7 +24,7 @@ import org.jetbrains.annotations.NotNull;
 public class Execution implements BaseEnchantment {
 
 	public static final String PROPERTY_NAME = ChatColor.GRAY + "Execution";
-	private static final int DURATION = 2 * 20;
+	private static final int DURATION = 4 * 20;
 	private static final double PERCENT_DAMAGE_PER_LEVEL = 0.015;
 	private static final String PERCENT_DAMAGE_EFFECT_NAME = "ExecutionPercentDamageEffect";
 	private static final EnumSet<DamageCause> AFFECTED_DAMAGE_CAUSES = EnumSet.of(

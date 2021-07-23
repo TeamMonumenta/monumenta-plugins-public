@@ -17,7 +17,7 @@ public class Aura implements BaseEnchantment {
 	public static final String PROPERTY_NAME = ChatColor.GRAY + "Aura";
 	private static final double SLOW_PER_LEVEL = 0.02;
 	private static final int DURATION = 10;
-	private static final int RADIUS = 2;
+	private static final int RADIUS = 3;
 
 	@Override
 	public String getProperty() {

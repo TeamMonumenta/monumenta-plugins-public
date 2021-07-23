@@ -67,7 +67,7 @@ public class DelveInfusionCustomInventory extends CustomInventory {
 		ItemStack whiteItem = new ItemStack(Material.WHITE_WOOL);
 		ItemMeta whiteMeta = whiteItem.getItemMeta();
 		whiteMeta.displayName(Component.text("Pennate", TextColor.fromCSSHexString("#FFFFFF")).decoration(TextDecoration.BOLD, true).decoration(TextDecoration.ITALIC, false));
-		splitLoreLine(whiteMeta, "You receive 5% less fall damage per level.", MAX_LORE_LENGHT, ChatColor.GRAY);
+		splitLoreLine(whiteMeta, "Fall damage is reduced by 5% per level.", MAX_LORE_LENGHT, ChatColor.GRAY);
 		whiteItem.setItemMeta(whiteMeta);
 		mDelvePannelList.add(whiteItem);
 
@@ -75,7 +75,7 @@ public class DelveInfusionCustomInventory extends CustomInventory {
 		ItemStack orangeItem = new ItemStack(Material.ORANGE_WOOL);
 		ItemMeta orangeMeta = orangeItem.getItemMeta();
 		orangeMeta.displayName(Component.text("Carapace", TextColor.fromCSSHexString("#FFAA00")).decoration(TextDecoration.BOLD, true).decoration(TextDecoration.ITALIC, false));
-		splitLoreLine(orangeMeta, "After being hit, gain 1% damage reduction and 0.5 Knockback Resistance per level for 5 seconds, refreshed on being hit.", MAX_LORE_LENGHT, ChatColor.GRAY);
+		splitLoreLine(orangeMeta, "After being hit, you gain 1.25% damage reduction per level for 5s. Being hit again while active refreshes the duration.", MAX_LORE_LENGHT, ChatColor.GRAY);
 		orangeItem.setItemMeta(orangeMeta);
 		mDelvePannelList.add(orangeItem);
 
@@ -83,7 +83,7 @@ public class DelveInfusionCustomInventory extends CustomInventory {
 		ItemStack magentaItem = new ItemStack(Material.MAGENTA_WOOL);
 		ItemMeta magentaMeta = magentaItem.getItemMeta();
 		magentaMeta.displayName(Component.text("Aura", TextColor.fromCSSHexString("#FF55FF")).decoration(TextDecoration.BOLD, true).decoration(TextDecoration.ITALIC, false));
-		splitLoreLine(magentaMeta, "Mobs in a 2 block radius from you are slowed by 2% per level for 0.5 seconds. This is refreshed as long as they are in range.", MAX_LORE_LENGHT, ChatColor.GRAY);
+		splitLoreLine(magentaMeta, "Mobs in a 3 block radius from you are slowed by 2% per level for 0.5 seconds. This is refreshed as long as they are in range.", MAX_LORE_LENGHT, ChatColor.GRAY);
 		magentaItem.setItemMeta(magentaMeta);
 		mDelvePannelList.add(magentaItem);
 
@@ -116,7 +116,7 @@ public class DelveInfusionCustomInventory extends CustomInventory {
 		ItemStack limeItem = new ItemStack(Material.LIME_WOOL);
 		ItemMeta limeMeta = limeItem.getItemMeta();
 		limeMeta.displayName(Component.text("Empowered", TextColor.fromCSSHexString("#55FF55")).decoration(TextDecoration.BOLD, true).decoration(TextDecoration.ITALIC, false));
-		splitLoreLine(limeMeta, "Heal 10% of your max health every (2250 - 250 per level) experience points you gain.", MAX_LORE_LENGHT, ChatColor.GRAY);
+		splitLoreLine(limeMeta, "When you gain XP, you have a 1% chance per XP point per level to repair all currently equipped items by 1% of their max durability.", MAX_LORE_LENGHT, ChatColor.GRAY);
 		limeItem.setItemMeta(limeMeta);
 		mDelvePannelList.add(limeItem);
 
@@ -132,7 +132,7 @@ public class DelveInfusionCustomInventory extends CustomInventory {
 		ItemStack greyItem = new ItemStack(Material.GRAY_WOOL);
 		ItemMeta greyMeta = greyItem.getItemMeta();
 		greyMeta.displayName(Component.text("Execution", TextColor.fromCSSHexString("#555555")).decoration(TextDecoration.BOLD, true).decoration(TextDecoration.ITALIC, false));
-		splitLoreLine(greyMeta, "After killing an enemy, you deal 1.5% extra damage per level for 2 seconds.", MAX_LORE_LENGHT, ChatColor.GRAY);
+		splitLoreLine(greyMeta, "After killing an enemy, you deal 1.5% extra damage per level for 4 seconds.", MAX_LORE_LENGHT, ChatColor.GRAY);
 		greyItem.setItemMeta(greyMeta);
 		mDelvePannelList.add(greyItem);
 
@@ -140,7 +140,7 @@ public class DelveInfusionCustomInventory extends CustomInventory {
 		ItemStack lgItem = new ItemStack(Material.LIGHT_GRAY_WOOL);
 		ItemMeta lgMeta = lgItem.getItemMeta();
 		lgMeta.displayName(Component.text("Reflection", TextColor.fromCSSHexString("#AAAAAA")).decoration(TextDecoration.BOLD, true).decoration(TextDecoration.ITALIC, false));
-		splitLoreLine(lgMeta, "1 second after taking ability damage, deal 4% per level of the spell's damage to all mobs in a 3 block radius.", MAX_LORE_LENGHT, ChatColor.GRAY);
+		splitLoreLine(lgMeta, "1 second after taking ability damage, deal 6% per level of the spell's damage to all mobs in a 4 block radius.", MAX_LORE_LENGHT, ChatColor.GRAY);
 		lgItem.setItemMeta(lgMeta);
 		mDelvePannelList.add(lgItem);
 
@@ -148,7 +148,7 @@ public class DelveInfusionCustomInventory extends CustomInventory {
 		ItemStack cyanItem = new ItemStack(Material.CYAN_WOOL);
 		ItemMeta cyanMeta = cyanItem.getItemMeta();
 		cyanMeta.displayName(Component.text("Mitosis", TextColor.fromCSSHexString("#00AAAA")).decoration(TextDecoration.BOLD, true).decoration(TextDecoration.ITALIC, false));
-		splitLoreLine(cyanMeta, "Mining a spawner debuffs all mob types that spawner could spawn in a 4 block radius with 3.75% per level Weakness for 3 seconds.", MAX_LORE_LENGHT, ChatColor.GRAY);
+		splitLoreLine(cyanMeta, "Mining a spawner debuffs all mobs in a 5 block radius with 3.75% per level Weakness for 3 seconds.", MAX_LORE_LENGHT, ChatColor.GRAY);
 		cyanItem.setItemMeta(cyanMeta);
 		mDelvePannelList.add(cyanItem);
 
@@ -172,7 +172,7 @@ public class DelveInfusionCustomInventory extends CustomInventory {
 		ItemStack shiftingItem = new ItemStack(Material.BLUE_CONCRETE);
 		ItemMeta shiftingMeta = shiftingItem.getItemMeta();
 		shiftingMeta.displayName(Component.text("Natant", TextColor.fromCSSHexString("#7FFFD4")).decoration(TextDecoration.BOLD, true).decoration(TextDecoration.ITALIC, false));
-		splitLoreLine(shiftingMeta, "You move 3% per level faster when in water.", MAX_LORE_LENGHT, ChatColor.GRAY);
+		splitLoreLine(shiftingMeta, "You move 4% per level faster when in water.", MAX_LORE_LENGHT, ChatColor.GRAY);
 		shiftingItem.setItemMeta(shiftingMeta);
 		mDelvePannelList.add(shiftingItem);
 
@@ -180,7 +180,7 @@ public class DelveInfusionCustomInventory extends CustomInventory {
 		ItemStack fallenItem = new ItemStack(Material.BOOKSHELF);
 		ItemMeta fallenMeta = fallenItem.getItemMeta();
 		fallenMeta.displayName(Component.text("Understanding", TextColor.fromCSSHexString("#808000")).decoration(TextDecoration.BOLD, true).decoration(TextDecoration.ITALIC, false));
-		splitLoreLine(fallenMeta, "All other Delve Infusions you are currently benefitting from gain .25 levels per level of this Infusion.", MAX_LORE_LENGHT, ChatColor.GRAY);
+		splitLoreLine(fallenMeta, "All other Delve Infusions you are currently benefiting from gain .25 levels per level of this Infusion.", MAX_LORE_LENGHT, ChatColor.GRAY);
 		fallenItem.setItemMeta(fallenMeta);
 		mDelvePannelList.add(fallenItem);
 
@@ -198,7 +198,7 @@ public class DelveInfusionCustomInventory extends CustomInventory {
 			ItemStack pannel = new ItemStack(Material.WHITE_WOOL, 1);
 			ItemMeta meta = pannel.getItemMeta();
 			meta.displayName(Component.text("Pennate level " + (i + 1), TextColor.fromCSSHexString("#FFFFFF")).decoration(TextDecoration.BOLD, true).decoration(TextDecoration.ITALIC, false));
-			splitLoreLine(meta, "You receive " + 5 * (i + 1) + "% less fall damage", MAX_LORE_LENGHT, ChatColor.GRAY);
+			splitLoreLine(meta, "Fall damage is reduced by " + 5 * (i + 1) + "%.", MAX_LORE_LENGHT, ChatColor.GRAY);
 			pannel.setItemMeta(meta);
 			whiteItems.add(pannel);
 		}
@@ -210,7 +210,7 @@ public class DelveInfusionCustomInventory extends CustomInventory {
 			ItemStack pannel = new ItemStack(Material.ORANGE_WOOL, 1);
 			ItemMeta meta = pannel.getItemMeta();
 			meta.displayName(Component.text("Carapace level " + (i + 1), TextColor.fromCSSHexString("#FFAA00")).decoration(TextDecoration.BOLD, true).decoration(TextDecoration.ITALIC, false));
-			splitLoreLine(meta, "After being hit, gain " + (i + 1) + "% damage reduction and " + 0.5 * (i + 1) + " Knockback Resistance", MAX_LORE_LENGHT, ChatColor.GRAY);
+			splitLoreLine(meta, "After being hit, you gain " + 1.25 * (i + 1) + "% damage reduction for 5s. Being hit again while active refreshes the duration.", MAX_LORE_LENGHT, ChatColor.GRAY);
 			pannel.setItemMeta(meta);
 			orangeItems.add(pannel);
 		}
@@ -222,7 +222,7 @@ public class DelveInfusionCustomInventory extends CustomInventory {
 			ItemStack pannel = new ItemStack(Material.MAGENTA_WOOL, 1);
 			ItemMeta meta = pannel.getItemMeta();
 			meta.displayName(Component.text("Aura level " + (i + 1), TextColor.fromCSSHexString("#FF55FF")).decoration(TextDecoration.BOLD, true).decoration(TextDecoration.ITALIC, false));
-			splitLoreLine(meta, "Mobs in a 2 block radius from you are slowed by " + 2 * (i + 1) + "%", MAX_LORE_LENGHT, ChatColor.GRAY);
+			splitLoreLine(meta, "Mobs in a 3 block radius from you are slowed by " + 2 * (i + 1) + "% for 0.5 seconds. This is refreshed as long as they are in range.", MAX_LORE_LENGHT, ChatColor.GRAY);
 			pannel.setItemMeta(meta);
 			magentaItems.add(pannel);
 		}
@@ -234,7 +234,7 @@ public class DelveInfusionCustomInventory extends CustomInventory {
 			ItemStack pannel = new ItemStack(Material.LIGHT_BLUE_WOOL, 1);
 			ItemMeta meta = pannel.getItemMeta();
 			meta.displayName(Component.text("Expedite level " + (i + 1), TextColor.fromCSSHexString("#4AC2E5")).decoration(TextDecoration.BOLD, true).decoration(TextDecoration.ITALIC, false));
-			splitLoreLine(meta, "Damaging an enemy with an ability increases your movement speed by " + (i + 1) + "% for 5 seconds, stacking up to 3 times.", MAX_LORE_LENGHT, ChatColor.GRAY);
+			splitLoreLine(meta, "Damaging an enemy with an ability increases your movement speed by " + 1 * (i * 1) + "% for 5 seconds, stacking up to 3 times.", MAX_LORE_LENGHT, ChatColor.GRAY);
 			pannel.setItemMeta(meta);
 			lbItems.add(pannel);
 		}
@@ -246,7 +246,7 @@ public class DelveInfusionCustomInventory extends CustomInventory {
 			ItemStack pannel = new ItemStack(Material.YELLOW_WOOL, 1);
 			ItemMeta meta = pannel.getItemMeta();
 			meta.displayName(Component.text("Choler level " + (i + 1), TextColor.fromCSSHexString("#FFFF55")).decoration(TextDecoration.BOLD, true).decoration(TextDecoration.ITALIC, false));
-			splitLoreLine(meta, "Deal " + (i + 1) + "% additional damage to any mob that is on fire, slowed, or stunned.", MAX_LORE_LENGHT, ChatColor.GRAY);
+			splitLoreLine(meta, "Deal " + 1 * (i + 1) + "% additional damage to any mob that is on fire, slowed, or stunned.", MAX_LORE_LENGHT, ChatColor.GRAY);
 			pannel.setItemMeta(meta);
 			yellowItems.add(pannel);
 		}
@@ -258,7 +258,7 @@ public class DelveInfusionCustomInventory extends CustomInventory {
 			ItemStack pannel = new ItemStack(Material.NETHER_WART_BLOCK, 1);
 			ItemMeta meta = pannel.getItemMeta();
 			meta.displayName(Component.text("Usurper level " + (i + 1), TextColor.fromCSSHexString("#8B0000")).decoration(TextDecoration.BOLD, true).decoration(TextDecoration.ITALIC, false));
-			splitLoreLine(meta, "Heal " + 2.5 * (i + 1) + "% of your max health whenever you slay an elite or boss enemy.", MAX_LORE_LENGHT, ChatColor.GRAY);
+			splitLoreLine(meta, "Heal " + 2.5 * (1 + i) + "% of your max health whenever you slay an elite or boss enemy.", MAX_LORE_LENGHT, ChatColor.GRAY);
 			pannel.setItemMeta(meta);
 			reverieItems.add(pannel);
 		}
@@ -271,7 +271,7 @@ public class DelveInfusionCustomInventory extends CustomInventory {
 			ItemStack pannel = new ItemStack(Material.LIME_WOOL, 1);
 			ItemMeta meta = pannel.getItemMeta();
 			meta.displayName(Component.text("Empowered level " + (i + 1), TextColor.fromCSSHexString("#55FF55")).decoration(TextDecoration.BOLD, true).decoration(TextDecoration.ITALIC, false));
-			splitLoreLine(meta, "Heal 10% of your max health every " + (2250 - (250 * (i + 1))) + " experience points you gain", MAX_LORE_LENGHT, ChatColor.GRAY);
+			splitLoreLine(meta, "When you gain XP, you have a " + (i + 1) + "% chance per XP point to repair all currently equipped items by 1% of their max durability.", MAX_LORE_LENGHT, ChatColor.GRAY);
 			pannel.setItemMeta(meta);
 			limeItems.add(pannel);
 		}
@@ -284,7 +284,7 @@ public class DelveInfusionCustomInventory extends CustomInventory {
 			ItemStack pannel = new ItemStack(Material.PINK_WOOL, 1);
 			ItemMeta meta = pannel.getItemMeta();
 			meta.displayName(Component.text("Nutriment level " + (i + 1), TextColor.fromCSSHexString("#FF69B4")).decoration(TextDecoration.BOLD, true).decoration(TextDecoration.ITALIC, false));
-			splitLoreLine(meta, "Gain " + 1.5 * (i + 1) + "% extra healing", MAX_LORE_LENGHT, ChatColor.GRAY);
+			splitLoreLine(meta, "Gain " + 1.5 * (i + 1) + "% extra healing.", MAX_LORE_LENGHT, ChatColor.GRAY);
 			pannel.setItemMeta(meta);
 			pinkItems.add(pannel);
 		}
@@ -297,7 +297,7 @@ public class DelveInfusionCustomInventory extends CustomInventory {
 			ItemStack pannel = new ItemStack(Material.GRAY_WOOL, 1);
 			ItemMeta meta = pannel.getItemMeta();
 			meta.displayName(Component.text("Execution level " + (i + 1), TextColor.fromCSSHexString("#555555")).decoration(TextDecoration.BOLD, true).decoration(TextDecoration.ITALIC, false));
-			splitLoreLine(meta, "After killing an enemy, you deal " + 1.5 * (i + 1) + "% extra damage for 2 seconds", MAX_LORE_LENGHT, ChatColor.GRAY);
+			splitLoreLine(meta, "After killing an enemy, you deal " + 1.5 * (i + 1) + "% extra damage for 4 seconds.", MAX_LORE_LENGHT, ChatColor.GRAY);
 			pannel.setItemMeta(meta);
 			grayItems.add(pannel);
 		}
@@ -310,7 +310,7 @@ public class DelveInfusionCustomInventory extends CustomInventory {
 			ItemStack pannel = new ItemStack(Material.LIGHT_GRAY_WOOL, 1);
 			ItemMeta meta = pannel.getItemMeta();
 			meta.displayName(Component.text("Reflection level " + (i + 1), TextColor.fromCSSHexString("#AAAAAA")).decoration(TextDecoration.BOLD, true).decoration(TextDecoration.ITALIC, false));
-			splitLoreLine(meta, "1 second after taking ability damage, deal " + 4 * (i + 1) + " of the spell's damage to all mobs in a 3 block radius.", MAX_LORE_LENGHT, ChatColor.GRAY);
+			splitLoreLine(meta, "1 second after taking ability damage, deal " + 6 * (1 + i) + "% of the spell's damage to all mobs in a 4 block radius.", MAX_LORE_LENGHT, ChatColor.GRAY);
 			pannel.setItemMeta(meta);
 			lgItems.add(pannel);
 		}
@@ -323,7 +323,7 @@ public class DelveInfusionCustomInventory extends CustomInventory {
 			ItemStack pannel = new ItemStack(Material.CYAN_WOOL, 1);
 			ItemMeta meta = pannel.getItemMeta();
 			meta.displayName(Component.text("Mitosis level " + (i + 1), TextColor.fromCSSHexString("#00AAAA")).decoration(TextDecoration.BOLD, true).decoration(TextDecoration.ITALIC, false));
-			splitLoreLine(meta, "Mining a spawner debuffs all mob types that spawner could spawn in a 4 block radius with " + 3.75 * (i + 1) + "% Weakness for 3 seconds", MAX_LORE_LENGHT, ChatColor.GRAY);
+			splitLoreLine(meta, "Mining a spawner debuffs all mobs in a 5 block radius with " + 3.75 * (i + 1) + "% Weakness for 3 seconds.", MAX_LORE_LENGHT, ChatColor.GRAY);
 			pannel.setItemMeta(meta);
 			cyanItems.add(pannel);
 		}
@@ -336,7 +336,7 @@ public class DelveInfusionCustomInventory extends CustomInventory {
 			ItemStack pannel = new ItemStack(Material.PURPLE_WOOL, 1);
 			ItemMeta meta = pannel.getItemMeta();
 			meta.displayName(Component.text("Ardor level " + (i + 1), TextColor.fromCSSHexString("#AA00AA")).decoration(TextDecoration.BOLD, true).decoration(TextDecoration.ITALIC, false));
-			splitLoreLine(meta, "Mining a spawner outside of water grants you " + 3.75 * (i + 1) + "% speed for 4s. Mining a spawner underwater refreshes " + 0.5 * (i + 1) + " breath", MAX_LORE_LENGHT, ChatColor.GRAY);
+			splitLoreLine(meta, "Mining a spawner outside of water grants you " + 3.75 * (i + 1) + "% speed for 4s. Mining a spawner underwater refreshes 0.5 breath per level.", MAX_LORE_LENGHT, ChatColor.GRAY);
 			pannel.setItemMeta(meta);
 			purpleItems.add(pannel);
 		}
@@ -349,7 +349,7 @@ public class DelveInfusionCustomInventory extends CustomInventory {
 			ItemStack pannel = new ItemStack(Material.CYAN_CONCRETE_POWDER, 1);
 			ItemMeta meta = pannel.getItemMeta();
 			meta.displayName(Component.text("Epoch level " + (i + 1), TextColor.fromCSSHexString("#47B6B5")).decoration(TextDecoration.BOLD, true).decoration(TextDecoration.ITALIC, false));
-			splitLoreLine(meta, "Class abilities cooldowns are reduced by " + 1.25 * (i + 1) + "%", MAX_LORE_LENGHT, ChatColor.GRAY);
+			splitLoreLine(meta, "Class abilities cooldowns are reduced by " + 1.25 * (i + 1) + "%.", MAX_LORE_LENGHT, ChatColor.GRAY);
 			pannel.setItemMeta(meta);
 			tealItems.add(pannel);
 		}
@@ -362,7 +362,7 @@ public class DelveInfusionCustomInventory extends CustomInventory {
 			ItemStack pannel = new ItemStack(Material.BLUE_CONCRETE, 1);
 			ItemMeta meta = pannel.getItemMeta();
 			meta.displayName(Component.text("Natant level " + (i + 1), TextColor.fromCSSHexString("#7FFFD4")).decoration(TextDecoration.BOLD, true).decoration(TextDecoration.ITALIC, false));
-			splitLoreLine(meta, "You move " + 3 * (i + 1) + "% faster when in water", MAX_LORE_LENGHT, ChatColor.GRAY);
+			splitLoreLine(meta, "You move " + 4 * (i + 1) + "% faster when in water.", MAX_LORE_LENGHT, ChatColor.GRAY);
 			pannel.setItemMeta(meta);
 			shiftingItems.add(pannel);
 		}
@@ -375,7 +375,7 @@ public class DelveInfusionCustomInventory extends CustomInventory {
 			ItemStack pannel = new ItemStack(Material.BOOKSHELF, 1);
 			ItemMeta meta = pannel.getItemMeta();
 			meta.displayName(Component.text("Understanding level " + (i + 1), TextColor.fromCSSHexString("#808000")).decoration(TextDecoration.BOLD, true).decoration(TextDecoration.ITALIC, false));
-			splitLoreLine(meta, "All other Delve Infusions you are currently benefitting from gain " + 0.25 * (i + 1) + " levels", MAX_LORE_LENGHT, ChatColor.GRAY);
+			splitLoreLine(meta, "All other Delve Infusions you are currently benefiting from gain " + .25 * (i + 1) + " levels.", MAX_LORE_LENGHT, ChatColor.GRAY);
 			pannel.setItemMeta(meta);
 			forumItems.add(pannel);
 		}

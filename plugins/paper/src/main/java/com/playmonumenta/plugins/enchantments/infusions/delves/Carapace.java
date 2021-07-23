@@ -17,10 +17,8 @@ import com.playmonumenta.plugins.utils.DelveInfusionUtils;
 public class Carapace implements BaseEnchantment {
 
 	public static final String PROPERTY_NAME = ChatColor.GRAY + "Carapace";
-	private static final double DAMAGE_REDUCTION_PER_LEVEL = 0.01;
-	private static final double KBR_PER_LEVEL = 0.5;
+	private static final double DAMAGE_REDUCTION_PER_LEVEL = 0.0125;
 	private static final String DAMAGE_REDUCTION_EFFECT_NAME = "OrangeInfusionDamageReductionEffect";
-	private static final String KBR_EFFECT_NAME = "OrangeInfusionKBREffect";
 	private static final int DURATION = 5 * 20;
 
 	@Override
@@ -41,7 +39,6 @@ public class Carapace implements BaseEnchantment {
 			@Override
 			public void run() {
 				plugin.mEffectManager.addEffect(player, DAMAGE_REDUCTION_EFFECT_NAME, new PercentDamageReceived(DURATION, -DAMAGE_REDUCTION_PER_LEVEL * modifiedLevel));
-				plugin.mEffectManager.addEffect(player, KBR_EFFECT_NAME, new PercentKnockbackResist(DURATION, KBR_PER_LEVEL * modifiedLevel, KBR_EFFECT_NAME));
 			}
 		}.runTaskLater(plugin, 1);
 	}

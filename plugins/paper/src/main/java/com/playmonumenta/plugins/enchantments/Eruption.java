@@ -31,6 +31,7 @@ public class Eruption implements BaseEnchantment {
 
 	private static String PROPERTY_NAME = ChatColor.GRAY + "Eruption";
 	private static final float RADIUS = 5.0f;
+	private static final float SAPPER_RADIUS = 8.0f;
 	private static final float DAMAGE_PER_LEVEL = 4.0f;
 	private static final String ICE_NAME = ChatColor.GRAY + "Ice Aspect";
 	private static final String THUNDER_NAME = ChatColor.GRAY + "Thunder Aspect";
@@ -92,7 +93,8 @@ public class Eruption implements BaseEnchantment {
 				player.playSound(player.getLocation(), Sound.BLOCK_ENCHANTMENT_TABLE_USE, 2.0f, 1.6f);
 				player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 0.05f, 1.0f);
 				player.getWorld().spawnParticle(Particle.HEART, event.getBlock().getLocation().add(0, 1, 0), 25, 1.5, 1.5, 1.5);
-				for (Player p : PlayerUtils.playersInRange(event.getBlock().getLocation(), RADIUS, true)) {
+				for (Player p : PlayerUtils.playersInRange(event.getBlock().getLocation(), SAPPER_RADIUS, true)) {
+					p.getWorld().spawnParticle(Particle.HEART, p.getEyeLocation(), 5, 1, 1, 1);
 					if (p == player) {
 						continue;
 					}
