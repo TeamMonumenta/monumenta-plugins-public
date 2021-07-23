@@ -107,6 +107,7 @@ public class IceWall extends DepthsAbility {
 					world.spawnParticle(Particle.CRIT_MAGIC, b.getLocation(), 15, 0, 0, 0, 0.6f);
 				}
 				world.playSound(mPlayer.getLocation(), Sound.BLOCK_BELL_USE, 2.0f, 2.0f);
+				mPrimedLoc = null;
 			}
 		}
 	}
