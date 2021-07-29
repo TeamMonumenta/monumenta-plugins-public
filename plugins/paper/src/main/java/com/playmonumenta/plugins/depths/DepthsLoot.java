@@ -89,8 +89,8 @@ public class DepthsLoot {
 		LootTable pomeTable = Bukkit.getLootTable(POME_KEY);
 		if (pomeTable != null) {
 			for (int i = 0; i < treasureScore - 54; i++) {
-				// 1/24 chance to drop a pome per treasure score in endless mode
-				if (r.nextInt(8) == 0) {
+				// 1/50 chance to drop a pome per treasure score in endless mode
+				if (r.nextInt(50) == 0) {
 					loot = pomeTable.populateLoot(FastUtils.RANDOM, context);
 					if (!loot.isEmpty()) {
 						for (ItemStack item : loot) {

@@ -43,6 +43,7 @@ import com.playmonumenta.plugins.depths.bosses.spells.SpellVoidBlast;
 import com.playmonumenta.plugins.depths.bosses.spells.SpellVoidGrenades;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.SerializationUtils;
 
@@ -202,6 +203,12 @@ public class Davey extends BossAbilityGroup {
 				vex.remove();
 			}
 		}
+
+		//Kill nearby mobs
+		for (LivingEntity e : EntityUtils.getNearbyMobs(mBoss.getLocation(), 40.0)) {
+			e.damage(10000);
+		}
+
 		mEndLoc.getBlock().setType(Material.REDSTONE_BLOCK);
 
 		DepthsUtils.animate(mBoss.getLocation());

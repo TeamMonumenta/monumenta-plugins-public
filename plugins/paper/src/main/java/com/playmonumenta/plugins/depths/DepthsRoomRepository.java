@@ -7,7 +7,10 @@ import java.util.List;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
+import org.bukkit.block.BlockFace;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
 import com.playmonumenta.plugins.depths.DepthsRoom.RoomDirection;
@@ -89,6 +92,7 @@ public class DepthsRoomRepository {
 		DepthsRoom f1r25 = new DepthsRoom("\"depths/f1r25\"", DepthsRoomType.ABILITY, new Vector(28, 40, 31), new Location(world, 1.0, -22.0, -7.0), 8, RoomDirection.DOWN);
 		DepthsRoom f1r29 = new DepthsRoom("\"depths/f1r29\"", DepthsRoomType.ABILITY, new Vector(44, 22, 23), new Location(world, 1.0, -10.0, -22.0), 12, RoomDirection.EVEN);
 		DepthsRoom f1r30 = new DepthsRoom("\"depths/f1r30\"", DepthsRoomType.ABILITY, new Vector(33, 32, 29), new Location(world, 1.0, -21.0, -6.0), 7, RoomDirection.DOWN);
+		DepthsRoom f1r33 = new DepthsRoom("\"depths/f1r33\"", DepthsRoomType.ABILITY, new Vector(33, 37, 39), new Location(world, 1.0, -28.0, -25.0), 8, RoomDirection.DOWN);
 
 		mF1NormalRooms.add(f1r1);
 		mF1NormalRooms.add(f1r2);
@@ -103,6 +107,7 @@ public class DepthsRoomRepository {
 		mF1NormalRooms.add(f1r25);
 		mF1NormalRooms.add(f1r29);
 		mF1NormalRooms.add(f1r30);
+		mF1NormalRooms.add(f1r33);
 
 
 		//F1 elite rooms
@@ -166,6 +171,7 @@ public class DepthsRoomRepository {
 		DepthsRoom f2r20 = new DepthsRoom("\"depths/f2r20\"", DepthsRoomType.ABILITY, new Vector(57, 37, 61), new Location(world, 1.0, -19.0, -33.0), 9, RoomDirection.DOWN);
 		DepthsRoom f2r21 = new DepthsRoom("\"depths/f2r21\"", DepthsRoomType.ABILITY, new Vector(57, 37, 61), new Location(world, 1.0, -17.0, -26.0), 11, RoomDirection.EVEN);
 		DepthsRoom f2r24 = new DepthsRoom("\"depths/f2r24\"", DepthsRoomType.ABILITY, new Vector(51, 33, 36), new Location(world, 1.0, -4.0, -12.0), 12, RoomDirection.UP);
+		DepthsRoom f2r28 = new DepthsRoom("\"depths/f2r28\"", DepthsRoomType.ABILITY, new Vector(54, 46, 34), new Location(world, 1.0, -17.0, -16.0), 11, RoomDirection.UP);
 
 		mF2NormalRooms.add(f2r2);
 		mF2NormalRooms.add(f2r3);
@@ -178,6 +184,7 @@ public class DepthsRoomRepository {
 		mF2NormalRooms.add(f2r20);
 		mF2NormalRooms.add(f2r21);
 		mF2NormalRooms.add(f2r24);
+		mF2NormalRooms.add(f2r28);
 
 		//F2 elite rooms
 		DepthsRoom f2r1 = new DepthsRoom("\"depths/f2r1\"", DepthsRoomType.ABILITY, new Vector(32, 33, 35), new Location(world, 1.0, -3.0, -18.0), 20, RoomDirection.UP);
@@ -196,7 +203,7 @@ public class DepthsRoomRepository {
 		mF2EliteRooms.add(f2r9);
 		mF2EliteRooms.add(f2r13);
 		mF2EliteRooms.add(f2r15);
-		mF2NormalRooms.add(f2r18);
+		mF2EliteRooms.add(f2r18);
 		mF2EliteRooms.add(f2r22);
 		mF2EliteRooms.add(f2r23);
 		mF2EliteRooms.add(f2r25);
@@ -217,6 +224,7 @@ public class DepthsRoomRepository {
 		DepthsRoom f3r13 = new DepthsRoom("\"depths/f3r13\"", DepthsRoomType.ABILITY, new Vector(52, 27, 44), new Location(world, 1.0, -4.0, -16.0), 17, RoomDirection.EVEN);
 		DepthsRoom f3r15 = new DepthsRoom("\"depths/f3r15\"", DepthsRoomType.ABILITY, new Vector(43, 41, 39), new Location(world, 1.0, -13.0, -19.0), 12, RoomDirection.UP);
 		DepthsRoom f3r26 = new DepthsRoom("\"depths/f3r26\"", DepthsRoomType.ABILITY, new Vector(51, 25, 25), new Location(world, 1.0, -1.0, -12.0), 8, RoomDirection.UP);
+		DepthsRoom f3r27 = new DepthsRoom("\"depths/f3r27\"", DepthsRoomType.ABILITY, new Vector(52, 34, 51), new Location(world, 1.0, -5.0, -7.0), 8, RoomDirection.UP);
 
 		mF3NormalRooms.add(f3r1);
 		mF3NormalRooms.add(f3r2);
@@ -228,6 +236,8 @@ public class DepthsRoomRepository {
 		mF3NormalRooms.add(f3r13);
 		mF3NormalRooms.add(f3r15);
 		mF3NormalRooms.add(f3r26);
+		mF3NormalRooms.add(f3r27);
+
 
 		//F3 elite rooms
 		DepthsRoom f3r5 = new DepthsRoom("\"depths/f3r5\"", DepthsRoomType.ABILITY, new Vector(39, 40, 40), new Location(world, 1.0, -5.0, -19.0), 28, RoomDirection.UP);
@@ -239,6 +249,8 @@ public class DepthsRoomRepository {
 		DepthsRoom f3r22 = new DepthsRoom("\"depths/f3r22\"", DepthsRoomType.ABILITY, new Vector(51, 43, 65), new Location(world, 1.0, -10.0, -8.0), 28, RoomDirection.UP);
 		DepthsRoom f3r23 = new DepthsRoom("\"depths/f3r23\"", DepthsRoomType.ABILITY, new Vector(64, 48, 51), new Location(world, 1.0, -9.0, -14.0), 22, RoomDirection.DOWN);
 		DepthsRoom f3r24 = new DepthsRoom("\"depths/f3r24\"", DepthsRoomType.ABILITY, new Vector(52, 36, 55), new Location(world, 1.0, -22.0, -30.0), 22, RoomDirection.DOWN);
+		DepthsRoom f3r28 = new DepthsRoom("\"depths/f3r28\"", DepthsRoomType.ABILITY, new Vector(45, 44, 37), new Location(world, 1.0, -24.0, -18.0), 15, RoomDirection.DOWN);
+		DepthsRoom f3r29 = new DepthsRoom("\"depths/f3r29\"", DepthsRoomType.ABILITY, new Vector(61, 53, 60), new Location(world, 1.0, -8.0, -46.0), 23, RoomDirection.EVEN);
 
 		mF3EliteRooms.add(f3r5);
 		mF3EliteRooms.add(f3r7);
@@ -249,6 +261,8 @@ public class DepthsRoomRepository {
 		mF3EliteRooms.add(f3r22);
 		mF3EliteRooms.add(f3r23);
 		mF3EliteRooms.add(f3r24);
+		mF3EliteRooms.add(f3r28);
+		mF3EliteRooms.add(f3r29);
 
 		//F3 utility rooms
 		DepthsRoom f3r11 = new DepthsRoom("\"depths/f3r11\"", DepthsRoomType.UTILITY, new Vector(34, 26, 33), new Location(world, 1.0, -6.0, -16.0), 0, RoomDirection.EVEN);
@@ -282,6 +296,19 @@ public class DepthsRoomRepository {
 		room.mRoomType = roomType;
 		//Gets the point in the world to load it and physically summons it
 		Location spawn = spawnPoint.clone().add(room.mEntry);
+
+		//Get box of room and entities to overwrite and remove
+		World w = spawnPoint.getWorld();
+		BoundingBox box = w.getBlockAt(spawn).getBoundingBox();
+		box.expand(BlockFace.EAST, room.mSize.getX());
+		box.expand(BlockFace.UP, room.mSize.getY());
+		box.expand(BlockFace.DOWN, room.mSize.getZ());
+		for (Entity e: w.getNearbyEntities(box)) {
+			if (!(e instanceof Player)) {
+				e.remove();
+			}
+		}
+
 		Plugin.getInstance().getLogger().info("Summoning structure " + room.mLoadPath);
 		Bukkit.getServer().dispatchCommand(Bukkit.getServer().getConsoleSender(), "loadstructure " + room.mLoadPath + " " + spawn.getX() + " " + spawn.getY() + " " + spawn.getZ() + " true");
 		return room;

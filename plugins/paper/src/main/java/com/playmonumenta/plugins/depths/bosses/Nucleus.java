@@ -377,6 +377,11 @@ public class Nucleus extends BossAbilityGroup {
 
 		mEndLoc.getBlock().setType(Material.REDSTONE_BLOCK);
 
+		//Kill nearby mobs
+		for (LivingEntity e : EntityUtils.getNearbyMobs(mBoss.getLocation(), 40.0)) {
+			e.damage(10000);
+		}
+
 		DepthsUtils.animate(mBoss.getLocation());
 		//Send players
 		new BukkitRunnable() {

@@ -398,8 +398,16 @@ public class DepthsParty {
 			//Calculate their treasure score, remove them from the depths system/party, spawn loot into the room
 			int treasureScore = -1;
 			//Remove delve score if applicable
-			DelvesUtils.setDelveScore(p, ServerProperties.getShardName(), 0);
-			DelvesUtils.removeDelveInfo(p);
+			new BukkitRunnable() {
+
+				@Override
+				public void run() {
+					DelvesUtils.setDelveScore(p, ServerProperties.getShardName(), 0);
+					DelvesUtils.removeDelveInfo(p);
+				}
+
+			}.runTaskLater(Plugin.getInstance(), 80);
+
 			p.removeScoreboardTag(DepthsManager.ENDLESS_MODE_STRING);
 			DepthsPlayer dp = DepthsManager.getInstance().mPlayers.get(p.getUniqueId());
 			if (dp != null) {

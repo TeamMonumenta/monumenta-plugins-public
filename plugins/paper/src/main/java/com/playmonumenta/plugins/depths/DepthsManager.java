@@ -21,6 +21,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.World;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
@@ -845,6 +846,12 @@ public class DepthsManager {
 			values.remove(DepthsRoomType.UPGRADE_ELITE);
 		}
 
+		//If the party is in endless mode and on floor 4+, reduce the chance of utility room
+		//66% chance to remove utility room from the pool if so
+		if (party.mRoomNumber >= 30 && mRandom.nextInt(3) > 0) {
+			values.remove(DepthsRoomType.UTILITY);
+		}
+
 		//Pull 4 room types at random. They may or may not be the same, so it is skewed towards fewer options atm.
 		DepthsRoomType e1 = values.get(mRandom.nextInt(values.size()));
 		DepthsRoomType e2 = values.get(mRandom.nextInt(values.size()));
@@ -1217,6 +1224,14 @@ public class DepthsManager {
 		} else if (getPartyFromId(dp).getFloor() == 12) {
 			//Assign twisted at this point
 			DepthsEndlessDifficulty.applyDelvePointsToParty(getPartyFromId(dp).mPlayersInParty, 0, getPartyFromId(dp).mDelveModifiers, true);
+		}
+
+		//Remove all mobs in the player's region
+		List<Entity> mobs = p.getWorld().getEntities();
+		for (Entity e : mobs) {
+			if (EntityUtils.isHostileMob(e) && (e.getLocation().getX() / 512 == p.getLocation().getX() / 512) && (e.getLocation().getZ() / 512 == p.getLocation().getZ())) {
+				e.remove();
+			}
 		}
 
 		if (mRoomRepository == null) {

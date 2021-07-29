@@ -42,6 +42,7 @@ import com.playmonumenta.plugins.depths.bosses.spells.SpellHederaAnticheese;
 import com.playmonumenta.plugins.depths.bosses.spells.SpellIvyGarden;
 import com.playmonumenta.plugins.depths.bosses.spells.SpellLeafNova;
 import com.playmonumenta.plugins.depths.bosses.spells.SpellPassiveGarden;
+import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.SerializationUtils;
 
@@ -202,6 +203,11 @@ public class Hedera extends BossAbilityGroup {
 			}
 		}
 		mEndLoc.getBlock().setType(Material.REDSTONE_BLOCK);
+
+		//Kill nearby mobs
+		for (LivingEntity e : EntityUtils.getNearbyMobs(mBoss.getLocation(), 40.0)) {
+			e.damage(10000);
+		}
 
 		//Finish animation
 		DepthsUtils.animate(mBoss.getLocation());
