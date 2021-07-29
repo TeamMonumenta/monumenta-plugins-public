@@ -19,6 +19,7 @@ import org.bukkit.entity.Firework;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
+import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -31,12 +32,14 @@ import com.playmonumenta.plugins.depths.abilities.aspects.ScytheAspect;
 import com.playmonumenta.plugins.depths.abilities.aspects.SwordAspect;
 import com.playmonumenta.plugins.depths.abilities.aspects.WandAspect;
 import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 
 public class DepthsUtils {
 
@@ -116,6 +119,73 @@ public class DepthsUtils {
 				ChatColor.GOLD
 		};
 		return colors[rarity - 1];
+	}
+
+	public static ItemStack getTreeItem(DepthsTree tree) {
+		ItemStack buildItem = new ItemStack(Material.RED_STAINED_GLASS_PANE, 1);
+		ItemMeta buildMeta;
+		Material itemMat;
+		Component name;
+		String description;
+
+		if (tree == DepthsTree.EARTHBOUND) {
+			itemMat = Material.LEATHER_CHESTPLATE;
+			name = Component.text("Earthbound", getTreeColor(tree))
+					.decoration(TextDecoration.ITALIC, false)
+					.decoration(TextDecoration.BOLD, true);
+			description = "Resolute tank with capabilities of taking aggro and granting resistance to self, armed with minor crowd control.";
+		} else if (tree == DepthsTree.SUNLIGHT) {
+			itemMat = Material.SUNFLOWER;
+			name = Component.text("Dawnbringer", getTreeColor(tree))
+					.decoration(TextDecoration.ITALIC, false)
+					.decoration(TextDecoration.BOLD, true);
+			description = "Bestows passive and active buffs to allies including speed, damage, resistance, and healing.";
+		} else if (tree == DepthsTree.METALLIC) {
+			itemMat = Material.CROSSBOW;
+			name = Component.text("Steelsage", getTreeColor(tree))
+					.decoration(TextDecoration.ITALIC, false)
+					.decoration(TextDecoration.BOLD, true);
+			description = "Master of ranged abilities with dual AOE and single target damage capabilities.";
+		} else if (tree == DepthsTree.WINDWALKER) {
+			itemMat = Material.FEATHER;
+			name = Component.text("Windwalker", getTreeColor(tree))
+					.decoration(TextDecoration.ITALIC, false)
+					.decoration(TextDecoration.BOLD, true);
+			description = "An arsenal of movement abilities and crowd control, allowing precise maneuvers and quick escapes.";
+		} else if (tree == DepthsTree.FROSTBORN) {
+			itemMat = Material.ICE;
+			name = Component.text("Frostborn", getTreeColor(tree))
+					.decoration(TextDecoration.ITALIC, false)
+					.decoration(TextDecoration.BOLD, true);
+			description = "Manipulates the flow of combat by debuffing enemies with ice generating abilities and high damage potential.";
+		} else if (tree == DepthsTree.SHADOWS) {
+			itemMat = Material.IRON_SWORD;
+			name = Component.text("Shadowdancer", getTreeColor(tree))
+					.decoration(TextDecoration.ITALIC, false)
+					.decoration(TextDecoration.BOLD, true);
+			description = "Skilled in single target melee damage, especially against bosses and elites.";
+		} else if (tree == DepthsTree.FLAMECALLER) {
+			itemMat = Material.FIRE_CHARGE;
+			name = Component.text("Flamecaller", getTreeColor(tree))
+					.decoration(TextDecoration.ITALIC, false)
+					.decoration(TextDecoration.BOLD, true);
+			description = "Caster of strong burst AOE abilities and potent damage over time.";
+		} else {
+			itemMat = Material.RED_STAINED_GLASS_PANE;
+			name = Component.text("Invalid Tree", NamedTextColor.RED)
+					.decoration(TextDecoration.ITALIC, false)
+					.decoration(TextDecoration.BOLD, true);
+			description = "Please report this item's existence to a moderator.";
+		}
+		buildItem = new ItemStack(itemMat, 1);
+		buildMeta = buildItem.getItemMeta();
+		buildMeta.displayName(name);
+		buildMeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
+		splitLoreLine(buildMeta, description, 30, ChatColor.GRAY);
+		buildItem.setItemMeta(buildMeta);
+		ItemUtils.setPlainName(buildItem);
+
+		return buildItem;
 	}
 
 	public static TextColor getTreeColor(DepthsTree tree) {

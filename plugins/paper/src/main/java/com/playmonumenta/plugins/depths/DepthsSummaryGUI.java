@@ -21,8 +21,9 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 
 public class DepthsSummaryGUI extends CustomInventory {
-	public static final ArrayList<Integer> HEAD_LOCATIONS = new ArrayList<Integer>(Arrays.asList(46, 48, 50, 52));
-	private static final int START_OF_PASSIVES = 18;
+	public static final ArrayList<Integer> HEAD_LOCATIONS = new ArrayList<Integer>(Arrays.asList(45, 48, 50, 53));
+	public static final ArrayList<Integer> TREE_LOCATIONS = new ArrayList<Integer>(Arrays.asList(2, 3, 5, 6));
+	private static final int START_OF_PASSIVES = 27;
 	private static final Material FILLER = Material.GRAY_STAINED_GLASS_PANE;
 
 	class TriggerData {
@@ -46,14 +47,14 @@ public class DepthsSummaryGUI extends CustomInventory {
 	public DepthsSummaryGUI(Player requestingPlayer, Player targetPlayer) {
 		super(requestingPlayer, 54, "Current Abilities");
 
-		TRIGGER_STRINGS.add(new TriggerData(0, DepthsTrigger.WEAPON_ASPECT, "No Weapon Aspect!"));
-		TRIGGER_STRINGS.add(new TriggerData(2, DepthsTrigger.COMBO, "No Combo ability!"));
-		TRIGGER_STRINGS.add(new TriggerData(3, DepthsTrigger.RIGHT_CLICK, "No Right Click ability!"));
-		TRIGGER_STRINGS.add(new TriggerData(4, DepthsTrigger.SHIFT_LEFT_CLICK, "No Sneak Left Click ability!"));
-		TRIGGER_STRINGS.add(new TriggerData(5, DepthsTrigger.SHIFT_RIGHT_CLICK, "No Sneak Right Click ability!"));
-		TRIGGER_STRINGS.add(new TriggerData(6, DepthsTrigger.SPAWNER, "No Spawner Break ability!"));
-		TRIGGER_STRINGS.add(new TriggerData(7, DepthsTrigger.SHIFT_BOW, "No Sneak Bow ability!"));
-		TRIGGER_STRINGS.add(new TriggerData(8, DepthsTrigger.SWAP, "No Swap ability!"));
+		TRIGGER_STRINGS.add(new TriggerData(9, DepthsTrigger.WEAPON_ASPECT, "No Weapon Aspect!"));
+		TRIGGER_STRINGS.add(new TriggerData(11, DepthsTrigger.COMBO, "No Combo ability!"));
+		TRIGGER_STRINGS.add(new TriggerData(12, DepthsTrigger.RIGHT_CLICK, "No Right Click ability!"));
+		TRIGGER_STRINGS.add(new TriggerData(13, DepthsTrigger.SHIFT_LEFT_CLICK, "No Sneak Left Click ability!"));
+		TRIGGER_STRINGS.add(new TriggerData(14, DepthsTrigger.SHIFT_RIGHT_CLICK, "No Sneak Right Click ability!"));
+		TRIGGER_STRINGS.add(new TriggerData(15, DepthsTrigger.SPAWNER, "No Spawner Break ability!"));
+		TRIGGER_STRINGS.add(new TriggerData(16, DepthsTrigger.SHIFT_BOW, "No Sneak Bow ability!"));
+		TRIGGER_STRINGS.add(new TriggerData(17, DepthsTrigger.SWAP, "No Swap ability!"));
 
 		for (int i = 0; i < 54; i++) {
 			_inventory.setItem(i, new ItemStack(FILLER, 1));
@@ -70,6 +71,8 @@ public class DepthsSummaryGUI extends CustomInventory {
 					SkullMeta meta = (SkullMeta) playerHead.getItemMeta();
 					OfflinePlayer targetedPlayer = Bukkit.getPlayer(playerParty.mPlayersInParty.get(i).mPlayerId);
 					meta.setOwningPlayer(targetedPlayer);
+					meta.displayName(Component.text(targetedPlayer.getName() + "'s Abilities", NamedTextColor.YELLOW)
+										.decoration(TextDecoration.ITALIC, false));
 					playerHead.setItemMeta(meta);
 					_inventory.setItem(HEAD_LOCATIONS.get(i), playerHead);
 				}
@@ -92,8 +95,6 @@ public class DepthsSummaryGUI extends CustomInventory {
 				setAbilities((Player) chosenPlayer);
 				return;
 			}
-		} else {
-			event.getWhoClicked().closeInventory();
 		}
 	}
 
@@ -129,7 +130,7 @@ public class DepthsSummaryGUI extends CustomInventory {
 		//all for mystery box
 		DepthsPlayer playerInstance = DepthsManager.getInstance().mPlayers.get(targetPlayer.getUniqueId());
 		if (playerInstance != null && playerInstance.mHasWeaponAspect &&
-				_inventory.getItem(0) != null && _inventory.getItem(0).getType() == FILLER) {
+				_inventory.getItem(9) != null && _inventory.getItem(9).getType() == FILLER) {
 			ItemStack mysteryBox = new ItemStack(Material.BARREL, 1);
 			ItemMeta boxMeta = mysteryBox.getItemMeta();
 			boxMeta.displayName(Component.text("Mystery Box", NamedTextColor.WHITE)
@@ -140,10 +141,19 @@ public class DepthsSummaryGUI extends CustomInventory {
 					.decoration(TextDecoration.ITALIC, false));
 			boxMeta.lore(lore);
 			mysteryBox.setItemMeta(boxMeta);
-			_inventory.setItem(0, mysteryBox);
+			_inventory.setItem(9, mysteryBox);
 		}
 
-		for (int i = 0; i <= 8; i++) {
+		//Tree info
+		if (playerInstance != null) {
+			DepthsTree playerTree = null;
+			for (int i = 0; i < 4; i++) {
+				playerTree = playerInstance.mEligibleTrees.get(i);
+				_inventory.setItem(TREE_LOCATIONS.get(i), DepthsUtils.getTreeItem(playerTree));
+			}
+		}
+
+		for (int i = 9; i <= 17; i++) {
 			if (_inventory.getItem(i) != null && _inventory.getItem(i).getType() == FILLER) {
 				ItemStack noAbility = new ItemStack(Material.RED_STAINED_GLASS_PANE, 1);
 				ItemMeta noAbilityMeta = noAbility.getItemMeta();
@@ -163,10 +173,23 @@ public class DepthsSummaryGUI extends CustomInventory {
 			if (headItem != null && headItem.getType() == Material.PLAYER_HEAD) {
 				SkullMeta chosenMeta = (SkullMeta) headItem.getItemMeta();
 				OfflinePlayer chosenPlayer = chosenMeta.getOwningPlayer();
+				ItemStack indicatorItem = null;
 				if (chosenPlayer.equals(targetPlayer)) {
-					_inventory.setItem(location - 9, new ItemStack(Material.GREEN_STAINED_GLASS_PANE));
+					indicatorItem = new ItemStack(Material.GREEN_STAINED_GLASS_PANE);
 				} else {
-					_inventory.setItem(location - 9, new ItemStack(Material.ORANGE_STAINED_GLASS_PANE));
+					indicatorItem = new ItemStack(Material.ORANGE_STAINED_GLASS_PANE);
+				}
+				switch (location) {
+				case 45:
+				case 50:
+					_inventory.setItem(location + 1, indicatorItem);
+					break;
+				case 48:
+				case 53:
+					_inventory.setItem(location - 1, indicatorItem);
+					break;
+				default:
+					_inventory.setItem(location, indicatorItem);
 				}
 			}
 		}

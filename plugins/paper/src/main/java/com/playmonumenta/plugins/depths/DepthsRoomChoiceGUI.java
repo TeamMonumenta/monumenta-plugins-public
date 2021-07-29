@@ -104,6 +104,7 @@ public class DepthsRoomChoiceGUI extends CustomInventory {
 	protected void inventoryClick(InventoryClickEvent event) {
 		event.setCancelled(true);
 		if (event.getClickedInventory() != _inventory ||
+				event.getCurrentItem() != null ||
 				event.getCurrentItem().getType() == FILLER ||
 				event.isShiftClick()) {
 			return;

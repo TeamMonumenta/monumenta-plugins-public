@@ -324,7 +324,10 @@ public class DepthsParty {
 		}
 
 		for (DepthsPlayer dp : mPlayersInParty) {
-			Bukkit.getPlayer(dp.mPlayerId).sendMessage(DepthsUtils.DEPTHS_MESSAGE_PREFIX + "Spawned new " + DepthsUtils.roomString(room.mRoomType) + " room!");
+			Player p = Bukkit.getPlayer(dp.mPlayerId);
+			if (p != null) {
+				Bukkit.getPlayer(dp.mPlayerId).sendMessage(DepthsUtils.DEPTHS_MESSAGE_PREFIX + "Spawned new " + DepthsUtils.roomString(room.mRoomType) + " room!");
+			}
 		}
 
 		mBeatBoss = false;
