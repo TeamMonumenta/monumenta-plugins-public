@@ -17,7 +17,11 @@ public class PPPillar extends PartialParticle {
 	 * spread particles, prior to applying deltas
 	 * (which may put them above or below).
 	 */
-	public double mHeight;
+	protected double mHeight;
+
+	/*-------------------------------------------------------------------------------
+	 * Constructors
+	 */
 
 	public PPPillar(@NotNull Particle particle, @NotNull Location baseLocation, int count, double delta, double extra) {
 		super(particle, baseLocation, count, delta, extra);
@@ -51,6 +55,11 @@ public class PPPillar extends PartialParticle {
 		super(particle, baseLocation, count, deltaX, deltaY, deltaZ, extra, data, directionalMode, extraVariance, minimumMultiplier);
 	}
 
+	/*-------------------------------------------------------------------------------
+	 * Required init methods
+	 * One of these must be called prior to spawning this particle
+	 */
+
 	/*
 	 * Define attributes specific to this subclass of PartialParticle.
 	 */
@@ -59,6 +68,23 @@ public class PPPillar extends PartialParticle {
 
 		return this;
 	}
+
+	/*-------------------------------------------------------------------------------
+	 * Parameter getters and setters
+	 */
+
+	public PPPillar height(double height) {
+		mHeight = height;
+		return this;
+	}
+
+	public double height() {
+		return mHeight;
+	}
+
+	/*-------------------------------------------------------------------------------
+	 * Methods
+	 */
 
 	@Override
 	protected void doSpawn(@NotNull ParticleBuilder packagedValues) {

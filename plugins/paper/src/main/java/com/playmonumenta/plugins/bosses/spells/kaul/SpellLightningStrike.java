@@ -233,7 +233,7 @@ public class SpellLightningStrike extends Spell {
 					);
 					lightning.init(SHOCK_VERTICAL_RANGE, 2.5, 0.3, 0.15);
 					lightning.spawnAsBoss();
-					mInternalParticleRunnable = lightning.mRunnable;
+					mInternalParticleRunnable = lightning.runnable();
 					if (mInternalParticleRunnable != null) {
 						mActiveRunnables.add(mInternalParticleRunnable);
 					}

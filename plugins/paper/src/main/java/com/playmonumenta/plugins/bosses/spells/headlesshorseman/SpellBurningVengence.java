@@ -1,5 +1,14 @@
 package com.playmonumenta.plugins.bosses.spells.headlesshorseman;
 
+import com.playmonumenta.plugins.bosses.bosses.HeadlessHorsemanBoss;
+import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.player.PPGroundCircle;
+import com.playmonumenta.plugins.player.PartialParticle;
+import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.MovementUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
+
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -11,13 +20,6 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
-
-import com.playmonumenta.plugins.bosses.bosses.HeadlessHorsemanBoss;
-import com.playmonumenta.plugins.bosses.spells.Spell;
-import com.playmonumenta.plugins.utils.BossUtils;
-import com.playmonumenta.plugins.utils.FastUtils;
-import com.playmonumenta.plugins.utils.MovementUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
 
 
 
@@ -56,6 +58,9 @@ public class SpellBurningVengence extends Spell {
 		if (mBoss.getVehicle() != null) {
 			if (mBoss.getVehicle() instanceof LivingEntity) {
 				LivingEntity h = (LivingEntity) mBoss.getVehicle();
+
+				PPGroundCircle outerFlameCircle = new PPGroundCircle(Particle.FLAME, h.getLocation(), 48, 0.07, 0.07, 0.07, 0.01).init(0, true);
+
 				new BukkitRunnable() {
 					double mRadius = 16;
 					int mTicks = 0;
@@ -68,24 +73,12 @@ public class SpellBurningVengence extends Spell {
 						}
 						mTicks++;
 						Location loc = h.getLocation();
-						for (int i = 0; i < 3; i++) {
-							double radian1 = Math.toRadians(i * 120 + (mTicks * 3));
-							loc.add(FastUtils.cos(radian1) * 4, 0, FastUtils.sin(radian1) * 4);
-							world.spawnParticle(Particle.FLAME, loc, 2, 0.1, 0.1, 0.1, 0.065);
-							world.spawnParticle(Particle.SMOKE_NORMAL, loc, 2, 0.1, 0.1, 0.1, 0.065);
-							loc.subtract(FastUtils.cos(radian1) * 4, 0, FastUtils.sin(radian1) * 4);
-						}
+
+						outerFlameCircle.radius(mRadius).location(loc).spawnAsBoss();
 
 						for (double i = 0; i < 360; i += 7.5) {
 							double radian1 = Math.toRadians(i);
-							boolean reduce = false;
 							loc.add(FastUtils.cos(radian1) * mRadius, 0, FastUtils.sin(radian1) * mRadius);
-							if (loc.getBlock().getType().isSolid()) {
-								loc.add(0, 1, 0);
-								reduce = true;
-							}
-							world.spawnParticle(Particle.FLAME, loc, 1, 0.1, 0.1, 0.1, 0.065);
-							world.spawnParticle(Particle.SMOKE_NORMAL, loc, 1, 0.1, 0.1, 0.1, 0.065);
 
 							for (Player player : PlayerUtils.playersInRange(loc, 0.75, true)) {
 								if (mHorseman.getSpawnLocation().distance(player.getLocation()) < HeadlessHorsemanBoss.detectionRange) {
@@ -93,9 +86,6 @@ public class SpellBurningVengence extends Spell {
 									player.setFireTicks(20 * 5);
 									MovementUtils.pullTowardsByUnit(mBoss, player, (float)0.5);
 								}
-							}
-							if (reduce) {
-								loc.subtract(0, 1, 0);
 							}
 							loc.subtract(FastUtils.cos(radian1) * mRadius, 0, FastUtils.sin(radian1) * mRadius);
 						}
@@ -107,9 +97,9 @@ public class SpellBurningVengence extends Spell {
 							h.removePotionEffect(PotionEffectType.SLOW);
 							world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 3, 1.25f);
 							world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 3, 0.85f);
-							world.spawnParticle(Particle.FLAME, loc, 100, 0, 0, 0, 0.125);
-							world.spawnParticle(Particle.SMOKE_LARGE, loc, 25, 0, 0, 0, 0.1);
-							world.spawnParticle(Particle.EXPLOSION_NORMAL, loc, 15, 0, 0, 0, 0.125);
+							new PartialParticle(Particle.FLAME, loc, 100, 0, 0, 0, 0.125).spawnAsBoss();
+							new PartialParticle(Particle.SMOKE_LARGE, loc, 25, 0, 0, 0, 0.1).spawnAsBoss();
+							new PartialParticle(Particle.EXPLOSION_NORMAL, loc, 15, 0, 0, 0, 0.125).spawnAsBoss();
 							for (Player player : PlayerUtils.playersInRange(loc, 5, true)) {
 								if (mHorseman.getSpawnLocation().distance(player.getLocation()) < HeadlessHorsemanBoss.detectionRange) {
 									BossUtils.bossDamagePercent(mBoss, player, 0.5);

@@ -15,14 +15,18 @@ public class PPGroundCircle extends PartialParticle {
 	 * Radius of the circle flat on the ground within which all particles must
 	 * start, prior to applying deltas (which may put them outside).
 	 */
-	public double mRadius;
+	protected double mRadius;
 
 	/*
 	 * Set to true to evenly spread particles in a ring along the circle's
 	 * circumference.
 	 * Set to false to randomise particles within the circle's entire area.
 	 */
-	public boolean mRingMode;
+	protected boolean mRingMode;
+
+	/*-------------------------------------------------------------------------------
+	 * Constructors
+	 */
 
 	public PPGroundCircle(@NotNull Particle particle, @NotNull Location centerLocation, int count, double delta, double extra) {
 		super(particle, centerLocation, count, delta, extra);
@@ -56,22 +60,54 @@ public class PPGroundCircle extends PartialParticle {
 		super(particle, centerLocation, count, deltaX, deltaY, deltaZ, extra, data, directionalMode, extraVariance, minimumMultiplier);
 	}
 
-	/*
+	/*-------------------------------------------------------------------------------
+	 * Required init methods
+	 * One of these must be called prior to spawning this particle
+	 */
+
+	/**
 	 * Use default ringMode.
 	 */
 	public PPGroundCircle init(double radius) {
 		return init(radius, false);
 	}
 
-	/*
+	/**
 	 * Define attributes specific to this subclass of PartialParticle.
 	 */
 	public PPGroundCircle init(double radius, boolean ringMode) {
-		mRadius = radius;
-		mRingMode = ringMode;
-
+		ringMode(ringMode);
+		radius(radius);
 		return this;
 	}
+
+	/*-------------------------------------------------------------------------------
+	 * Parameter getters and setters
+	 */
+
+	/** Sets particles to spawn in a ring around the circle (true) or the circle's area (false) */
+	public PPGroundCircle ringMode(boolean ringMode) {
+		mRingMode = ringMode;
+		return this;
+	}
+
+	/** Gets whether particles spawn in a ring around the circle (true) or the circle's area (false) */
+	public boolean ringMode() {
+		return mRingMode;
+	}
+
+	public PPGroundCircle radius(double radius) {
+		mRadius = radius;
+		return this;
+	}
+
+	public double radius() {
+		return mRadius;
+	}
+
+	/*-------------------------------------------------------------------------------
+	 * Methods
+	 */
 
 	@Override
 	protected void doSpawn(@NotNull ParticleBuilder packagedValues) {

@@ -254,6 +254,11 @@ public class PartialParticle {
 		}
 	}
 
+	public PartialParticle location(Location loc) {
+		mLocation = loc;
+		return this;
+	}
+
 	/*
 	 * Use default isPassive.
 	 */

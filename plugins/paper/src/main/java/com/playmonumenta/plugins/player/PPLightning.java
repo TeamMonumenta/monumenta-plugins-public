@@ -22,22 +22,22 @@ public class PPLightning extends PartialParticle {
 	/*
 	 * Height above mLocation to start the lightning bolt.
 	 */
-	public double mHeight;
+	protected double mHeight;
 
 	/*
 	 * Width within which all particles must start in spite of hop variance,
 	 * prior to applying deltas (which may then put them outside).
 	 */
-	public double mMaxWidth;
+	protected double mMaxWidth;
 
 	/*
 	 * Random variance applied after each downward hop of the lightning's points
 	 * (initially evenly spread along the Y axis), drawing jagged lines.
 	 */
-	public double mHopXZ;
-	public double mHopY;
+	protected double mHopXZ;
+	protected double mHopY;
 
-	public @Nullable BukkitRunnable mRunnable;
+	protected @Nullable BukkitRunnable mRunnable;
 
 	private static final int HOPS_PER_BLOCK = 2;
 
@@ -46,8 +46,12 @@ public class PPLightning extends PartialParticle {
 	// use at least this many particles.
 	private static final int HOP_MINIMUM_PARTICLES = 4;
 
-	private @NotNull ArrayList<@NotNull Location> mGeneratedHops = new ArrayList<>();
-	private @NotNull HashMap<@NotNull Integer, @NotNull ArrayList<@NotNull Location>> mParticleLocations = new HashMap<>();
+	private final @NotNull ArrayList<@NotNull Location> mGeneratedHops = new ArrayList<>();
+	private final @NotNull HashMap<@NotNull Integer, @NotNull ArrayList<@NotNull Location>> mParticleLocations = new HashMap<>();
+
+	/*-------------------------------------------------------------------------------
+	 * Constructors
+	 */
 
 	public PPLightning(@NotNull Particle particle, @NotNull Location strikeLocation, int hopParticleCount, double delta, double extra) {
 		super(particle, strikeLocation, hopParticleCount, delta, extra);
@@ -81,6 +85,11 @@ public class PPLightning extends PartialParticle {
 		super(particle, strikeLocation, hopParticleCount, deltaX, deltaY, deltaZ, extra, data, directionalMode, extraVariance, minimumMultiplier);
 	}
 
+	/*-------------------------------------------------------------------------------
+	 * Required init methods
+	 * One of these must be called prior to spawning this particle
+	 */
+
 	/*
 	 * Share the same hop length for XZ and Y.
 	 */
@@ -99,6 +108,54 @@ public class PPLightning extends PartialParticle {
 
 		return this;
 	}
+
+	/*-------------------------------------------------------------------------------
+	 * Parameter getters and setters
+	 */
+
+	public PPLightning height(double height) {
+		mHeight = height;
+		return this;
+	}
+
+	public double height() {
+		return mHeight;
+	}
+
+	public PPLightning maxWidth(double maxWidth) {
+		mMaxWidth = maxWidth;
+		return this;
+	}
+
+	public double maxWidth() {
+		return mMaxWidth;
+	}
+
+	public PPLightning hopXZ(double hopXZ) {
+		mHopXZ = hopXZ;
+		return this;
+	}
+
+	public double hopXZ() {
+		return mHopXZ;
+	}
+
+	public PPLightning hopY(double hopY) {
+		mHopY = hopY;
+		return this;
+	}
+
+	public double hopY() {
+		return mHopY;
+	}
+
+	public @Nullable BukkitRunnable runnable() {
+		return mRunnable;
+	}
+
+	/*-------------------------------------------------------------------------------
+	 * Methods
+	 */
 
 	@Override
 	protected void doSpawn(@NotNull ParticleBuilder packagedValues) {
