@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.logging.Level;
 
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
@@ -22,11 +23,13 @@ import org.bukkit.event.inventory.InventoryInteractEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.util.BoundingBox;
 
+import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.abilities.delves.DelveModifier;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.DelvesUtils;
 import com.playmonumenta.plugins.utils.DelvesUtils.DelveModifierSelectionGUI;
+import com.playmonumenta.scriptedquests.utils.MessagingUtils;
 
 public class DelvesListener implements Listener {
 
@@ -84,13 +87,34 @@ public class DelvesListener implements Listener {
 			if (player != null) {
 				entity.addScoreboardTag(HAS_DELVE_MODIFIER_TAG);
 
+				// Check that all the delve modifiers are present on the player in the form of abilities before applying them
+				boolean mismatch = false;
 				for (Class<? extends DelveModifier> cls : DelvesUtils.getDelveInfo(player).getActiveModifiers()) {
-					/*
-					 * If this ever grabs an ability the player doesn't have, it'll
-					 * throw a NullPointerException, but if that's the case, there's
-					 * a bigger problem anyways and it'll be better if the plugin
-					 * stops doing things like setting loot tables and all.
-					 */
+					if (AbilityManager.getManager().getPlayerAbility(player, cls) == null) {
+						mismatch = true;
+						break;
+					}
+				}
+
+				// Try refreshing class and rerunning the check if we found a mismatch
+				if (mismatch) {
+					AbilityManager.getManager().updatePlayerAbilities(player);
+
+					for (Class<? extends DelveModifier> cls : DelvesUtils.getDelveInfo(player).getActiveModifiers()) {
+						if (AbilityManager.getManager().getPlayerAbility(player, cls) == null) {
+							// Reset delve points to prevent cases like broken modifiers but loot still being boosted
+							DelvesUtils.setDelveScore(player, ServerProperties.getShardName(), 0);
+							AbilityManager.getManager().updatePlayerAbilities(player);
+
+							Plugin.getInstance().getLogger().log(Level.SEVERE, "Plugin thinks that " + player.getName() + " has delve modifier " + cls.getName() + " but not the corresponding ability.");
+							MessagingUtils.sendRawMessage(player, "Something went wrong and your delve modifiers have been reset. Please ask a moderator for help reselecting your delve modifiers.");
+							return;
+						}
+					}
+				}
+
+				// Actually apply modifiers now that we know they're all present
+				for (Class<? extends DelveModifier> cls : DelvesUtils.getDelveInfo(player).getActiveModifiers()) {
 					AbilityManager.getManager().getPlayerAbility(player, cls).applyOnSpawnModifiers((LivingEntity) entity, event);
 				}
 			}
