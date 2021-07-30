@@ -77,13 +77,17 @@ public class SpellFrostGiantBlockBreak extends Spell {
 
 					if (material.equals(Material.COBWEB)) {
 						/* Break cobwebs immediately, don't add them to the bad block list */
-						EntityExplodeEvent event = new EntityExplodeEvent(mLauncher, mLauncher.getLocation(), Arrays.asList(block), 0f);
+						List<Block> list = new ArrayList<>(1);
+						list.add(block);
+						EntityExplodeEvent event = new EntityExplodeEvent(mLauncher, mLauncher.getLocation(), list, 0f);
 						Bukkit.getServer().getPluginManager().callEvent(event);
 						if (!event.isCancelled()) {
 							/* Only allow bosses to break blocks in areas where explosions are allowed */
-							testloc.getBlock().setType(Material.AIR);
-							loc.getWorld().playSound(loc, Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, SoundCategory.HOSTILE, 0.3f, 0.9f);
-							loc.getWorld().spawnParticle(Particle.EXPLOSION_NORMAL, loc, 6, 1, 1, 1, 0.03);
+							for (Block b : event.blockList()) {
+								b.setType(Material.AIR);
+								b.getWorld().playSound(loc, Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, SoundCategory.HOSTILE, 0.3f, 0.9f);
+								b.getWorld().spawnParticle(Particle.EXPLOSION_NORMAL, loc, 6, 1, 1, 1, 0.03);
+							}
 						}
 					} else if ((!mIgnoredMats.contains(material)) && !mNoBreak.contains(material) &&
 						(material.isSolid() || material.equals(Material.COBWEB) || block.getBlockData() instanceof TrapDoor || ItemUtils.carpet.contains(material)) &&

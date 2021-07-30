@@ -112,7 +112,9 @@ public class ChestUtils {
 		ArrayDeque<Integer> slotsWithMultipleItems = new ArrayDeque<>();
 		for (ItemStack lootItem : lootList) {
 			if (freeSlots.size() == 0) {
-				player.sendMessage("This is a bug. Please report this and a time stamp if possible!");
+				Plugin.getInstance().getLogger().severe("Tried to overfill container for player " + player.getName() + " at inventory " + inventory.getType().toString() + " at location " + player.getLocation().toString());
+				player.sendMessage("Tried to overfill this container! Please report this");
+				break;
 			}
 			int slot = freeSlots.remove(0);
 			inventory.setItem(slot, lootItem);

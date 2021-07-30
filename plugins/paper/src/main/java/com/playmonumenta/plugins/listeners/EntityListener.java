@@ -646,7 +646,10 @@ public class EntityListener implements Listener {
 			return;
 		}
 		String s = "Stasis";
-		if (mPlugin.mEffectManager.getEffects((Entity) event.getPotion().getShooter(), s) != null && (mPlugin.mEffectManager.getEffects((Entity) event.getPotion().getShooter(), s)).contains(new Stasis(120))) {
+		if (event.getPotion().getShooter() != null
+			&& event.getPotion().getShooter() instanceof Entity
+			&& mPlugin.mEffectManager.getEffects((Entity) event.getPotion().getShooter(), s) != null
+			&& mPlugin.mEffectManager.getEffects((Entity) event.getPotion().getShooter(), s).contains(new Stasis(120))) {
 			event.setCancelled(true);
 		}
 
@@ -879,7 +882,7 @@ public class EntityListener implements Listener {
 		Projectile proj = event.getEntity();
 		ProjectileSource source = proj.getShooter();
 		String s = "Stasis";
-		if (mPlugin.mEffectManager.getEffects((Entity) source, s) != null && (mPlugin.mEffectManager.getEffects((Entity) source, s)).contains(new Stasis(120))) {
+		if (source instanceof Entity && mPlugin.mEffectManager.getEffects((Entity) source, s) != null && (mPlugin.mEffectManager.getEffects((Entity) source, s)).contains(new Stasis(120))) {
 			event.setCancelled(true);
 		}
 		if (entity != null && entity instanceof Player) {

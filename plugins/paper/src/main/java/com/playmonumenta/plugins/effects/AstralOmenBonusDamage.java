@@ -32,8 +32,9 @@ public class AstralOmenBonusDamage extends Effect {
 
 	@Override
 	public boolean entityReceiveDamageEvent(EntityDamageEvent event) {
-		if (event instanceof EntityDamageByEntityEvent && mPlayer.equals(((EntityDamageByEntityEvent) event).getDamager())
-				|| ((EntityDamageByEntityEvent) event).getDamager() instanceof Projectile && mPlayer.equals(((Projectile)((EntityDamageByEntityEvent) event).getDamager()).getShooter())) {
+		if ((event instanceof EntityDamageByEntityEvent)
+			&& (mPlayer.equals(((EntityDamageByEntityEvent) event).getDamager())
+				|| ((((EntityDamageByEntityEvent) event).getDamager() instanceof Projectile) && mPlayer.equals(((Projectile)((EntityDamageByEntityEvent) event).getDamager()).getShooter())))) {
 			Entity entity = event.getEntity();
 			if (entity instanceof LivingEntity) {
 				LivingEntity mob = (LivingEntity) entity;
