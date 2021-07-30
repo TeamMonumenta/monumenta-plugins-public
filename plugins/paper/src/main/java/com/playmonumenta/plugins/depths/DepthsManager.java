@@ -86,19 +86,19 @@ import com.playmonumenta.plugins.depths.abilities.shadow.DummyDecoy;
 import com.playmonumenta.plugins.depths.abilities.shadow.ShadowDive;
 import com.playmonumenta.plugins.depths.abilities.shadow.ShadowMastery;
 import com.playmonumenta.plugins.depths.abilities.shadow.ShadowSlam;
-import com.playmonumenta.plugins.depths.abilities.steelsage.BarbedProjectiles;
 import com.playmonumenta.plugins.depths.abilities.steelsage.DepthsRapidFire;
 import com.playmonumenta.plugins.depths.abilities.steelsage.DepthsSharpshooter;
 import com.playmonumenta.plugins.depths.abilities.steelsage.DepthsSplitArrow;
 import com.playmonumenta.plugins.depths.abilities.steelsage.DepthsVolley;
 import com.playmonumenta.plugins.depths.abilities.steelsage.FireworkBlast;
+import com.playmonumenta.plugins.depths.abilities.steelsage.FocusedCombos;
 import com.playmonumenta.plugins.depths.abilities.steelsage.Metalmancy;
 import com.playmonumenta.plugins.depths.abilities.steelsage.ProjectileMastery;
 import com.playmonumenta.plugins.depths.abilities.steelsage.Scrapshot;
 import com.playmonumenta.plugins.depths.abilities.steelsage.Sidearm;
 import com.playmonumenta.plugins.depths.abilities.windwalker.Aeromancy;
-import com.playmonumenta.plugins.depths.abilities.windwalker.DepthsDisengage;
 import com.playmonumenta.plugins.depths.abilities.windwalker.DepthsDodging;
+import com.playmonumenta.plugins.depths.abilities.windwalker.GuardingBolt;
 import com.playmonumenta.plugins.depths.abilities.windwalker.HowlingWinds;
 import com.playmonumenta.plugins.depths.abilities.windwalker.OneWithTheWind;
 import com.playmonumenta.plugins.depths.abilities.windwalker.RestoringDraft;
@@ -141,8 +141,6 @@ public class DepthsManager {
 	public static final int TREASURE_PER_FLOOR = 8;
 	//How often the depths data is saved normally
 	public static final int SAVE_INTERVAL = 60 * 5 * 20; //5 min
-	//Max treasure score from a boss clear, to prevent eventual cheese for yielding infinitely scaling rewards
-	public static final int TREASURE_BOSS_CAP = 100;
 
 	//Boss soul names
 	public static final String HEDERA_LOS = "HederaVenomoftheWaves";
@@ -441,8 +439,8 @@ public class DepthsManager {
 			new WandAspect(plugin, null),
 
 			//Steelsage abilities
-			new BarbedProjectiles(plugin, null),
 			new FireworkBlast(plugin, null),
+			new FocusedCombos(plugin, null),
 			new Metalmancy(plugin, null),
 			new ProjectileMastery(plugin, null),
 			new DepthsRapidFire(plugin, null),
@@ -454,8 +452,8 @@ public class DepthsManager {
 
 			//Windwalker abilities
 			new Aeromancy(plugin, null),
-			new DepthsDisengage(plugin, null),
 			new DepthsDodging(plugin, null),
+			new GuardingBolt(plugin, null),
 			new HowlingWinds(plugin, null),
 			new OneWithTheWind(plugin, null),
 			new RestoringDraft(plugin, null),
@@ -1193,23 +1191,26 @@ public class DepthsManager {
 			p.sendMessage(DepthsUtils.DEPTHS_MESSAGE_PREFIX + "Player not in depths system!");
 			return;
 		}
-		int treasureScoreIncrease = (Math.min(TREASURE_BOSS_CAP, (TREASURE_PER_FLOOR * getPartyFromId(dp).getFloor()) + 2));
+		int treasureScoreIncrease = TREASURE_PER_FLOOR * getPartyFromId(dp).getFloor() + 2;
 		getPartyFromId(dp).mTreasureScore += treasureScoreIncrease;
 
+		int partyFloor = getPartyFromId(dp).getFloor();
 		//Check to see if they've finished the run (normal mode) and send to loot rooms
-		if (getPartyFromId(dp).getFloor() == 3 && !getPartyFromId(dp).mEndlessMode) {
+		if (partyFloor == 3 && !getPartyFromId(dp).mEndlessMode) {
 			List<DepthsPlayer> playersToLoop = new ArrayList<>(getPartyFromId(dp).mPlayersInParty);
 			for (DepthsPlayer playerInParty : playersToLoop) {
 				Player player = Bukkit.getPlayer(playerInParty.mPlayerId);
-				player.sendMessage(DepthsUtils.DEPTHS_MESSAGE_PREFIX + "Congratulations! Your final treasure score is " + dp.mFinalTreasureScore + "!");
-				getPartyFromId(dp).populateLootRoom(player, false);
-				Bukkit.getServer().dispatchCommand(Bukkit.getServer().getConsoleSender(), "broadcastcommand tellraw @a [\"\",{\"text\":\"" + player.getName() + "\",\"color\":\"gold\",\"bold\":false,\"italic\":true},{\"text\":\" defeated the Darkest Depths!\",\"color\":\"white\",\"italic\":true,\"bold\":false}]");
-				//Set score
-				ScoreboardUtils.setScoreboardValue(player, "Depths", ScoreboardUtils.getScoreboardValue(player, "Depths") + 1);
-				Bukkit.getServer().dispatchCommand(Bukkit.getServer().getConsoleSender(), "broadcastcommand leaderboard update " + player.getName() + " Depths");
+				if (player != null) {
+					player.sendMessage(DepthsUtils.DEPTHS_MESSAGE_PREFIX + "Congratulations! Your final treasure score is " + dp.mFinalTreasureScore + "!");
+					getPartyFromId(dp).populateLootRoom(player, false);
+					Bukkit.getServer().dispatchCommand(Bukkit.getServer().getConsoleSender(), "broadcastcommand tellraw @a [\"\",{\"text\":\"" + player.getName() + "\",\"color\":\"gold\",\"bold\":false,\"italic\":true},{\"text\":\" defeated the Darkest Depths!\",\"color\":\"white\",\"italic\":true,\"bold\":false}]");
+					//Set score
+					ScoreboardUtils.setScoreboardValue(player, "Depths", ScoreboardUtils.getScoreboardValue(player, "Depths") + 1);
+					Bukkit.getServer().dispatchCommand(Bukkit.getServer().getConsoleSender(), "broadcastcommand leaderboard update " + player.getName() + " Depths");
+				}
 			}
 			return;
-		} else if (getPartyFromId(dp).getFloor() == 3) {
+		} else if (partyFloor == 3) {
 			for (DepthsPlayer playerInParty : getPartyFromId(dp).mPlayersInParty) {
 				Player player = Bukkit.getPlayer(playerInParty.mPlayerId);
 				//Set score
@@ -1218,12 +1219,20 @@ public class DepthsManager {
 			}
 		}
 		//Check to see if we're in endless mode and need to assign delve points to players
-		if (getPartyFromId(dp).mEndlessMode && getPartyFromId(dp).getFloor() >= 3 && getPartyFromId(dp).getFloor() <= 11) {
+		if (getPartyFromId(dp).mEndlessMode && partyFloor >= 3 && partyFloor <= 11) {
 			int delvePoints = DepthsEndlessDifficulty.DELVE_POINTS_PER_FLOOR[getPartyFromId(dp).getFloor() - 1];
 			DepthsEndlessDifficulty.applyDelvePointsToParty(getPartyFromId(dp).mPlayersInParty, delvePoints, getPartyFromId(dp).mDelveModifiers, false);
-		} else if (getPartyFromId(dp).getFloor() == 12) {
+		} else if (partyFloor == 12) {
 			//Assign twisted at this point
 			DepthsEndlessDifficulty.applyDelvePointsToParty(getPartyFromId(dp).mPlayersInParty, 0, getPartyFromId(dp).mDelveModifiers, true);
+		} else if (partyFloor > 12 && partyFloor % 3 == 0) {
+			List<DepthsPlayer> playersToLoop = new ArrayList<>(getPartyFromId(dp).mPlayersInParty);
+			for (DepthsPlayer playerInParty : playersToLoop) {
+				Player player = Bukkit.getPlayer(playerInParty.mPlayerId);
+				if (player != null) {
+					player.sendMessage(DepthsUtils.DEPTHS_MESSAGE_PREFIX + "You will now take +" + 10 * (partyFloor - 12) / 3 + "% damage from all sources!");
+				}
+			}
 		}
 
 		//Remove all mobs in the player's region

@@ -164,7 +164,7 @@ public class Earthquake extends DepthsAbility {
 
 	@Override
 	public String getDescription(int rarity) {
-		return "Shooting a bow while sneaking causes an earthquake " + EARTHQUAKE_TIME / 20 + " seconds after impact. The earthquake deals " + DepthsUtils.getRarityColor(rarity) + DAMAGE[rarity - 1] + ChatColor.WHITE + " damage to mobs in a " + RADIUS + " block radius, silencing for " + DepthsUtils.getRarityColor(rarity) + (float)SILENCE_DURATION[rarity - 1] / 20 + ChatColor.WHITE + " seconds and knocking upward. Cooldown: " + COOLDOWN / 20 + "s.";
+		return "Shooting a bow while sneaking causes an earthquake " + EARTHQUAKE_TIME / 20 + " second after impact. The earthquake deals " + DepthsUtils.getRarityColor(rarity) + DAMAGE[rarity - 1] + ChatColor.WHITE + " damage to mobs in a " + RADIUS + " block radius, silencing for " + DepthsUtils.getRarityColor(rarity) + (float)SILENCE_DURATION[rarity - 1] / 20 + ChatColor.WHITE + " seconds and knocking upward. Cooldown: " + COOLDOWN / 20 + "s.";
 	}
 
 	@Override

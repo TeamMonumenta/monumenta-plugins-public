@@ -35,8 +35,8 @@ public class Slipstream extends DepthsAbility {
 	private static final double SPEED_AMPLIFIER = 0.2;
 	private static final String PERCENT_SPEED_EFFECT_NAME = "SlipstreamSpeedEffect";
 	private static final int JUMP_AMPLIFIER = 2;
-	private static final int RADIUS = 3;
-	private static final float KNOCKBACK_SPEED = 0.7f;
+	private static final int RADIUS = 4;
+	private static final float KNOCKBACK_SPEED = 0.9f;
 
 	public Slipstream(Plugin plugin, Player player) {
 		super(plugin, player, ABILITY_NAME);

@@ -110,16 +110,19 @@ public class Cryobox extends DepthsAbility {
 			MovementUtils.knockAway(mPlayer, mob, KNOCKBACK_SPEED);
 		}
 		for (LivingEntity mob : EntityUtils.getNearbyMobs(center, ELEVATE_RADIUS, mPlayer)) {
+			if (EntityUtils.isBoss(mob) || mob.getName().contains("Dionaea") || mob.getScoreboardTags().contains(AbilityUtils.IGNORE_TAG)) {
+				continue;
+			}
 			Location mobLoc = mob.getLocation();
-			mobLoc.setY(center.getY() + 3);
+			mobLoc.setY(center.getY() + 4);
 			mob.teleport(mobLoc);
 		}
 
 		mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF,
 		                                 new PotionEffect(PotionEffectType.ABSORPTION, DURATION, ABSORPTION[mRarity - 1], true, true));
 		World world = mPlayer.getWorld();
-		world.spawnParticle(Particle.FIREWORKS_SPARK, center.add(0, 1.15, 0), 150, 0.2, 0.35, 0.2, 0.5);
-		world.spawnParticle(Particle.SPELL_INSTANT, center.add(0, 1.15, 0), 100, 0.2, 0.35, 0.2, 1);
+		world.spawnParticle(Particle.FIREWORKS_SPARK, center.clone().add(0, 1.15, 0), 150, 0.2, 0.35, 0.2, 0.5);
+		world.spawnParticle(Particle.SPELL_INSTANT, center.clone().add(0, 1.15, 0), 100, 0.2, 0.35, 0.2, 1);
 		world.playSound(center, Sound.ITEM_TOTEM_USE, 1, 1.35f);
 		MessagingUtils.sendActionBarMessage(mPlugin, mPlayer, "Cryobox has been activated");
 
@@ -147,10 +150,7 @@ public class Cryobox extends DepthsAbility {
 			center.clone().add(0, -1, 0),
 		};
 
-		Material[] mats = new Material[locs.length];
 		for (int i = 0; i < locs.length; i++) {
-			Location loc = locs[i];
-			mats[i] = loc.getBlock().getType();
 			DepthsUtils.spawnIceTerrain(locs[i], ICE_DURATION);
 		}
 	}

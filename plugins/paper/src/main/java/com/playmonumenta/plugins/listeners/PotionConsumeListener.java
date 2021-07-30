@@ -1,9 +1,9 @@
 package com.playmonumenta.plugins.listeners;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.List;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
@@ -34,6 +34,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.cleric.NonClericProvisionsPassive;
+import com.playmonumenta.plugins.depths.abilities.dawnbringer.LightningBottle;
 import com.playmonumenta.plugins.enchantments.InstantDrink;
 import com.playmonumenta.plugins.integrations.CoreProtectIntegration;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
@@ -265,8 +266,8 @@ public class PotionConsumeListener implements Listener {
 
 		Set<String> tags = player.getScoreboardTags();
 
-		if (!tags.contains(INVENTORY_DRINK_TAG) || InventoryUtils.testForItemWithName(item, "Alchemist's Potion")) {
-			//Needs this tag to work and cannot be an Alchemist Potion
+		if (!tags.contains(INVENTORY_DRINK_TAG) || InventoryUtils.testForItemWithName(item, "Alchemist's Potion") || InventoryUtils.testForItemWithName(item, LightningBottle.POTION_NAME)) {
+			//Needs this tag to work and cannot be an Alchemist Potion or Lightning Bottle
 			return;
 		}
 

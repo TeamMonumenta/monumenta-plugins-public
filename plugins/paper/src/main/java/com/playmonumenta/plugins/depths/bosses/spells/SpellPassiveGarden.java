@@ -111,6 +111,7 @@ public class SpellPassiveGarden extends Spell {
 				}
 
 				LivingEntity newPlant = (LivingEntity) LibraryOfSoulsIntegration.summon(loc, plant);
+				newPlant.setPersistent(true);
 				mPlants.put(loc, newPlant);
 				mPlantTypes.put(loc, plant);
 

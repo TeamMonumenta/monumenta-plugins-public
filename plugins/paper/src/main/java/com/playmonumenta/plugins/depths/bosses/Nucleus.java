@@ -43,7 +43,6 @@ import com.playmonumenta.plugins.depths.bosses.spells.SpellRisingTides;
 import com.playmonumenta.plugins.depths.bosses.spells.SpellSurroundingDeath;
 import com.playmonumenta.plugins.depths.bosses.spells.SpellTectonicDevastation;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
-import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.SerializationUtils;
@@ -151,11 +150,9 @@ public class Nucleus extends BossAbilityGroup {
 		}
 
 		//Spell setup
-
 		SpellManager phase1Spells = new SpellManager(Arrays.asList(
 				new SpellSurroundingDeath(plugin, mBoss, mSpawnLoc, mCooldownTicks, this),
 				new SpellRisingTides(plugin, mBoss, mSpawnLoc, mCooldownTicks, this)
-				//new SpellTentacleCrawl(plugin, mBoss, mSpawnLoc, mCooldownTicks, this)
 			));
 		List<Spell> phase1Passives = Arrays.asList(
 				new SpellBlockBreak(mBoss, 2, 3, 2),
@@ -167,7 +164,6 @@ public class Nucleus extends BossAbilityGroup {
 				new SpellTectonicDevastation(mPlugin, mBoss, mSpawnLoc, mCooldownTicks, this),
 				new SpellSurroundingDeath(plugin, mBoss, mSpawnLoc, mCooldownTicks, this),
 				new SpellRisingTides(plugin, mBoss, mSpawnLoc, mCooldownTicks, this)
-				//new SpellTentacleCrawl(plugin, mBoss, mSpawnLoc, mCooldownTicks, this)
 			));
 		List<Spell> phase2Passives = Arrays.asList(
 			new SpellBlockBreak(mBoss, 2, 3, 2),
@@ -312,31 +308,14 @@ public class Nucleus extends BossAbilityGroup {
 
 	@Override
 	public void init() {
-		int bossTargetHp = 0;
-		int playerCount = BossUtils.getPlayersInRangeForHealthScaling(mBoss, detectionRange);
-		int hpDelta = 512;
-		int armor = (int)(Math.sqrt(playerCount * 2) - 1);
-		while (playerCount > 0) {
-			bossTargetHp = bossTargetHp + hpDelta;
-			hpDelta = hpDelta / 2;
-			playerCount--;
-		}
-		mBoss.getAttribute(Attribute.GENERIC_ARMOR).setBaseValue(armor);
-		mBoss.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(NUCLEUS_HEALTH);
-		mBoss.setHealth(NUCLEUS_HEALTH);
+		mBoss.getAttribute(Attribute.GENERIC_ARMOR).setBaseValue(0);
 		mBoss.setAI(false);
 
-		//Switch mCooldownTicks depending on floor of party
+		// Health is scaled by 1.5 times each time you fight the boss
 		DepthsParty party = DepthsUtils.getPartyFromNearbyPlayers(mSpawnLoc);
-		if (party.getFloor() == 6) {
-			//Set health higher
-			mBoss.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(NUCLEUS_HEALTH * 1.5);
-			mBoss.setHealth(NUCLEUS_HEALTH * 1.5);
-		} else if (party.getFloor() % 3 == 0) {
-			//Set health higher
-			mBoss.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(NUCLEUS_HEALTH * 2.0);
-			mBoss.setHealth(NUCLEUS_HEALTH * 2.0);
-		}
+		int modifiedHealth = (int) (NUCLEUS_HEALTH * Math.pow(1.5, (party.getFloor() - 1) / 3));
+		mBoss.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(modifiedHealth);
+		mBoss.setHealth(modifiedHealth);
 
 		Bukkit.getServer().dispatchCommand(Bukkit.getServer().getConsoleSender(), "growable grow " + (int) (mSpawnLoc.getX() - 1) + " " + (int) (mSpawnLoc.getY() + 21) + " " + (int) (mSpawnLoc.getZ() - 1) + " jellyfish 1 20 true");
 

@@ -88,7 +88,7 @@ public class CrushingEarth extends DepthsAbility {
 	public boolean runCheck() {
 		ItemStack mainhand = mPlayer.getInventory().getItemInMainHand();
 		ItemStack offhand = mPlayer.getInventory().getItemInOffHand();
-		return !mPlayer.isSneaking() && !isOnCooldown() && (DepthsUtils.isWeaponItem(mainhand) || mainhand.getType() == Material.SHIELD || offhand.getType() == Material.SHIELD);
+		return !mPlayer.isSneaking() && !isOnCooldown() && DepthsUtils.isWeaponItem(mainhand);
 	}
 
 	@Override

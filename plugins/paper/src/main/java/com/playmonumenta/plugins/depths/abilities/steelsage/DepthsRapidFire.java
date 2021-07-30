@@ -83,6 +83,7 @@ public class DepthsRapidFire extends DepthsAbility {
 					loc.getWorld().playSound(loc, Sound.ITEM_CROSSBOW_SHOOT, 1, 0.65f);
 					loc.getWorld().playSound(loc, Sound.ENTITY_ARROW_SHOOT, 1, 0.45f);
 					ProjectileLaunchEvent eventLaunch = new ProjectileLaunchEvent(arrow);
+					Bukkit.getPluginManager().callEvent(eventLaunch);
 					if (arrow.hasMetadata(Sniper.LEVEL_METAKEY)) {
 						arrow.removeMetadata(Sniper.LEVEL_METAKEY, mPlugin);
 					}
@@ -92,7 +93,6 @@ public class DepthsRapidFire extends DepthsAbility {
 					if (arrow.hasMetadata(Skyhook.META_DATA_TAG)) {
 						arrow.removeMetadata(Skyhook.META_DATA_TAG, mPlugin);
 					}
-					Bukkit.getPluginManager().callEvent(eventLaunch);
 					mCount++;
 				}
 			}

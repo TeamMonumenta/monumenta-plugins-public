@@ -101,8 +101,6 @@ public class Hedera extends BossAbilityGroup {
 			mCooldownTicks = 8 * 20;
 		}
 
-
-
 		//Set/remove blocks
 		if (spawnLoc.getBlock().getType() == Material.STONE_BUTTON) {
 			spawnLoc.getBlock().setType(Material.AIR);
@@ -167,20 +165,12 @@ public class Hedera extends BossAbilityGroup {
 	public void init() {
 
 		mBoss.getAttribute(Attribute.GENERIC_ARMOR).setBaseValue(0);
-		mBoss.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(HEDERA_HEALTH);
-		mBoss.setHealth(HEDERA_HEALTH);
 
-		//Switch mCooldownTicks depending on floor of party
+		// Health is scaled by 1.5 times each time you fight the boss
 		DepthsParty party = DepthsUtils.getPartyFromNearbyPlayers(mSpawnLoc);
-		if (party.getFloor() == 4) {
-			//Set health higher
-			mBoss.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(HEDERA_HEALTH * 1.5);
-			mBoss.setHealth(HEDERA_HEALTH * 1.5);
-		} else if (party.getFloor() % 3 == 1) {
-			//Set health higher
-			mBoss.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(HEDERA_HEALTH * 2.0);
-			mBoss.setHealth(HEDERA_HEALTH * 2.0);
-		}
+		int modifiedHealth = (int) (HEDERA_HEALTH * Math.pow(1.5, party.getFloor() / 3));
+		mBoss.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(modifiedHealth);
+		mBoss.setHealth(modifiedHealth);
 
 		//launch event related spawn commands
 		PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "playsound epic:music.cshura record @s ~ ~ ~ 2");

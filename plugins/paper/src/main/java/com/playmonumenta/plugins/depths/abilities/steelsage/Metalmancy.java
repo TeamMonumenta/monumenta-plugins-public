@@ -132,7 +132,7 @@ public class Metalmancy extends DepthsAbility {
 
 	@Override
 	public String getDescription(int rarity) {
-		return "Swap hands while holding a weapon to summon a steel construct in the direction you are looking that has " + DepthsUtils.getRarityColor(rarity) + HEALTH[rarity - 1] + ChatColor.WHITE + " health and does " + DepthsUtils.getRarityColor(rarity) + DAMAGE[rarity - 1] + ChatColor.WHITE + " melee damage. If the construct is still alive after " + DepthsUtils.getRarityColor(rarity) + DURATION[rarity - 1] / 20 + ChatColor.WHITE + " seconds, it will disappear. The construct will prioritize the first enemy you hit with a projectile after summoning, which can be reapplied once that target dies. Cooldown: " + COOLDOWN / 20 + "s.";
+		return "Swap hands while holding a weapon to summon a steel construct in the direction you are looking that has " + DepthsUtils.getRarityColor(rarity) + HEALTH[rarity - 1] + ChatColor.WHITE + " health and does " + DepthsUtils.getRarityColor(rarity) + DAMAGE[rarity - 1] + ChatColor.WHITE + " melee damage. If the construct is still alive after " + DepthsUtils.getRarityColor(rarity) + DURATION[rarity - 1] / 20 + ChatColor.WHITE + " seconds, it will disappear. The construct will prioritize the first enemy you hit with a projectile after summoning, which can be reapplied once that target dies. The construct taunts any mob it attacks. Cooldown: " + COOLDOWN / 20 + "s.";
 	}
 
 	@Override

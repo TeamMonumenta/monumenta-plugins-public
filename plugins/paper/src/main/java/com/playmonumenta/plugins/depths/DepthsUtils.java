@@ -56,7 +56,7 @@ public class DepthsUtils {
 	public static final String DEPTHS_MESSAGE_PREFIX = ChatColor.DARK_PURPLE + "[Depths Party] " + ChatColor.LIGHT_PURPLE;
 
 	//Material defined as ice
-	public static final Material ICE_MATERIAL = Material.PACKED_ICE;
+	public static final Material ICE_MATERIAL = Material.ICE;
 
 	//Forbidden blocks for replacing with ice
 	private static final EnumSet<Material> mIgnoredMats = EnumSet.of(

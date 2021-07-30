@@ -6,6 +6,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -76,12 +77,16 @@ public class SpellLinkBeyondLife extends Spell {
 					loc.getWorld().spawnParticle(Particle.BLOCK_DUST, sLoc, 16, 0.25, 0.1, 0.25, 0.25, Material.GRAVEL.createBlockData());
 					Random r = new Random();
 					int roll = r.nextInt(3);
+					Entity summonedMob = null;
 					if (roll == 0) {
-						LibraryOfSoulsIntegration.summon(sLoc, SUMMON_NAME_1);
+						summonedMob = LibraryOfSoulsIntegration.summon(sLoc, SUMMON_NAME_1);
 					} else if (roll == 1) {
-						LibraryOfSoulsIntegration.summon(sLoc, SUMMON_NAME_2);
+						summonedMob = LibraryOfSoulsIntegration.summon(sLoc, SUMMON_NAME_2);
 					} else if (roll == 2) {
-						LibraryOfSoulsIntegration.summon(sLoc, SUMMON_NAME_3);
+						summonedMob = LibraryOfSoulsIntegration.summon(sLoc, SUMMON_NAME_3);
+					}
+					if (summonedMob != null) {
+						summonedMob.setPersistent(true);
 					}
 					mSummons++;
 				}

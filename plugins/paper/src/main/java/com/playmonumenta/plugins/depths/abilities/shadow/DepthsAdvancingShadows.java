@@ -59,7 +59,7 @@ public class DepthsAdvancingShadows extends DepthsAbility {
 	public void cast(Action action) {
 
 		LivingEntity entity = mTarget;
-		if (entity != null && !entity.getScoreboardTags().contains(AbilityUtils.IGNORE_TAG) && !(mPlayer.getInventory().getItemInOffHand().getType() == Material.SHIELD)) {
+		if (entity != null && !entity.getScoreboardTags().contains(AbilityUtils.IGNORE_TAG)) {
 			int advancingShadows = getAbilityScore();
 			Vector dir = LocationUtils.getDirectionTo(entity.getLocation(), mPlayer.getLocation());
 			World world = mPlayer.getWorld();
@@ -109,7 +109,9 @@ public class DepthsAdvancingShadows extends DepthsAbility {
 			world.spawnParticle(Particle.SMOKE_LARGE, playerLoc.clone().add(0, 1.1, 0), 12, 0.35, 0.5, 0.35, 0.05);
 			world.playSound(mPlayer.getLocation(), Sound.ENTITY_ILLUSIONER_MIRROR_MOVE, 1.0f, 1.1f);
 
-			mPlayer.teleport(loc, TeleportCause.UNKNOWN);
+			if (!(mPlayer.getInventory().getItemInOffHand().getType() == Material.SHIELD)) {
+				mPlayer.teleport(loc, TeleportCause.UNKNOWN);
+			}
 			playerLoc = mPlayer.getLocation();
 
 			EffectManager.getInstance().addEffect(mPlayer, ABILITY_NAME, new FlatDamageDealt(DAMAGE_DURATION, DAMAGE[mRarity - 1]));

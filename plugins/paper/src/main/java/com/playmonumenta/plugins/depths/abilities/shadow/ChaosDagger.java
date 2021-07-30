@@ -39,9 +39,10 @@ public class ChaosDagger extends DepthsAbility {
 	public static final int COOLDOWN = 22 * 20;
 	public static final double[] DAMAGE = {2.0, 2.25, 2.5, 2.75, 3.0};
 	private static final double VELOCITY = 0.5;
-	private static final String DAGGER_TAG = "ChaosDagger";
 	public static final int STUN_DURATION = 3 * 20;
 	public static final int DAMAGE_DURATION = 5 * 20;
+
+	private Entity mHitMob;
 
 	public ChaosDagger(Plugin plugin, Player player) {
 		super(plugin, player, ABILITY_NAME);
@@ -61,6 +62,7 @@ public class ChaosDagger extends DepthsAbility {
 		if ((!isTimerActive() && DepthsUtils.isWeaponItem(mPlayer.getInventory().getItemInMainHand())) &&
 				EntityUtils.getNearestMob(mPlayer.getLocation(), 20.0) != null) {
 			putOnCooldown();
+			mHitMob = null;
 
 			Location loc = mPlayer.getEyeLocation();
 			ItemStack itemTincture = new ItemStack(Material.NETHERITE_SWORD);
@@ -118,7 +120,7 @@ public class ChaosDagger extends DepthsAbility {
 					if (mTarget.getBoundingBox().overlaps(tincture.getBoundingBox()) && !mTarget.getScoreboardTags().contains(AbilityUtils.IGNORE_TAG)) {
 						mWorld.spawnParticle(Particle.EXPLOSION_NORMAL, tLoc, 30, 2, 0, 2);
 						world.playSound(tLoc, Sound.ENTITY_GENERIC_EXPLODE, 1, 0.15f);
-						mTarget.addScoreboardTag(DAGGER_TAG);
+						mHitMob = mTarget;
 						if (EntityUtils.isBoss(mTarget)) {
 							EntityUtils.applySlow(mPlugin, STUN_DURATION, 0.99f, mTarget);
 						} else {
@@ -129,10 +131,10 @@ public class ChaosDagger extends DepthsAbility {
 						new BukkitRunnable() {
 							@Override
 							public void run() {
-								if (mTarget != null && mTarget.getScoreboardTags().contains(DAGGER_TAG) && mTarget.isGlowing()) {
-									mTarget.setGlowing(false);
-									mTarget.removeScoreboardTag(DAGGER_TAG);
+								if (!(mHitMob instanceof MagmaCube && mHitMob.getName().contains("Gyrhaeddant"))) {
+									mHitMob.setGlowing(false);
 								}
+								mHitMob = null;
 								this.cancel();
 							}
 						}.runTaskLater(mPlugin, DAMAGE_DURATION);
@@ -170,13 +172,12 @@ public class ChaosDagger extends DepthsAbility {
 	@Override
 	public boolean livingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
 		Entity entity = event.getEntity();
-		if (entity.getScoreboardTags().contains(DAGGER_TAG)) {
+		if (entity == mHitMob) {
 			event.setDamage(event.getDamage() * DAMAGE[mRarity - 1]);
-			entity.removeScoreboardTag(DAGGER_TAG);
-			if (entity instanceof MagmaCube && entity.getName().contains("Gyrhaeddant")) {
-				return true;
+			mHitMob = null;
+			if (!(entity instanceof MagmaCube && entity.getName().contains("Gyrhaeddant"))) {
+				entity.setGlowing(false);
 			}
-			entity.setGlowing(false);
 		}
 		return true;
 	}

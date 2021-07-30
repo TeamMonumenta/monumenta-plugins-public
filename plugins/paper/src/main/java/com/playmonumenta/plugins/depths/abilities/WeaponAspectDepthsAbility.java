@@ -13,6 +13,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.depths.DepthsAbilityItem;
 import com.playmonumenta.plugins.depths.DepthsManager;
 import com.playmonumenta.plugins.depths.DepthsUtils;
+import com.playmonumenta.plugins.utils.ItemUtils;
 
 public abstract class WeaponAspectDepthsAbility extends DepthsAbility {
 
@@ -52,6 +53,7 @@ public abstract class WeaponAspectDepthsAbility extends DepthsAbility {
 		meta.setLore(lore);
 		DepthsUtils.splitLoreLine(meta, getDescription(rarity), 30, ChatColor.WHITE);
 		stack.setItemMeta(meta);
+		ItemUtils.setPlainName(stack, mInfo.mDisplayName);
 		item.mItem = stack;
 		return item;
 	}

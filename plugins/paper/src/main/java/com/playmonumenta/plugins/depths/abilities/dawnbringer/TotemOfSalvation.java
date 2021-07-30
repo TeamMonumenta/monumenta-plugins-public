@@ -133,7 +133,11 @@ public class TotemOfSalvation extends DepthsAbility {
 
 	@Override
 	public String getDescription(int rarity) {
-		return "Swap hands while holding a weapon to summon a totem that lasts " + DURATION / 20 + " seconds. The totem heals all players within " + EFFECT_RADIUS + " blocks by " + DepthsUtils.roundPercent(PERCENT_HEALING) + "% of their max health every " + DepthsUtils.getRarityColor(rarity) + TICK_FREQUENCY[rarity - 1] / 20.0 + ChatColor.WHITE + " seconds. Cooldown: " + COOLDOWN / 20 + "s.";
+		String s = "s";
+		if (TICK_FREQUENCY[rarity - 1] == 20) {
+			s = "";
+		}
+		return "Swap hands while holding a weapon to summon a totem that lasts " + DURATION / 20 + " second. The totem heals all players within " + EFFECT_RADIUS + " blocks by " + (int) DepthsUtils.roundPercent(PERCENT_HEALING) + "% of their max health every " + DepthsUtils.getRarityColor(rarity) + TICK_FREQUENCY[rarity - 1] / 20.0 + ChatColor.WHITE + " second" + s + ". Cooldown: " + COOLDOWN / 20 + "s.";
 	}
 
 	@Override

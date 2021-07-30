@@ -162,9 +162,9 @@ public enum ClassAbility {
 	FIREWORKBLAST("Firework Blast"),
 
 	// WINDWALKER
+	GUARDING_BOLT("Guarding Bolt"),
 	SKYHOOK("Skyhook"),
 	SLIPSTREAM("Slipstream"),
-	DISENGAGE("Disengage"),
 	UPDRAFT("Updraft"),
 	WHIRLWIND("Whirlwind"),
 	HOWLINGWINDS("Howling Winds"),

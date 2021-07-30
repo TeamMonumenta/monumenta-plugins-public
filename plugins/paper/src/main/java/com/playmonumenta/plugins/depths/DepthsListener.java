@@ -11,11 +11,10 @@ import org.bukkit.Sound;
 import org.bukkit.block.Block;
 import org.bukkit.block.Chest;
 import org.bukkit.block.DoubleChest;
-import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Firework;
 import org.bukkit.entity.IronGolem;
-import org.bukkit.entity.Item;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
@@ -25,7 +24,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
-import org.bukkit.event.block.BlockExplodeEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
@@ -104,22 +102,6 @@ public class DepthsListener implements Listener {
 		} else if (DepthsManager.getInstance().isInSystem(player) && event.getBlock().getType() == Material.CHEST) {
 			//Player's can't break chests themselves
 			event.setCancelled(true);
-		}
-	}
-
-	//If a spawner is exploded, remove it from party total
-	@EventHandler
-	public void blockExplodeEvent(BlockExplodeEvent event) {
-		List<Block> explodedBlocks = event.blockList();
-		for (Block b : explodedBlocks) {
-			if (b.getType() == Material.SPAWNER) {
-				Player p = EntityUtils.getNearestPlayer(b.getLocation(), 30.0);
-				p.sendMessage("Spawner exploded! giving credit to your party");
-				if (p == null || !DepthsManager.getInstance().isInSystem(p)) {
-					return;
-				}
-				DepthsManager.getInstance().playerBrokeSpawner(p, b.getLocation());
-			}
 		}
 	}
 
@@ -215,6 +197,11 @@ public class DepthsListener implements Listener {
 				}
 
 			}
+
+			// Extra damage taken at higher floors
+			if (party.getFloor() > 15) {
+			    event.setDamage(event.getDamage() * (1 + (0.1 * ((party.getFloor() - 1) / 3) - 4)));
+			}
 		}
 	}
 
@@ -308,13 +295,18 @@ public class DepthsListener implements Listener {
 		DepthsManager.getInstance().save(Plugin.getInstance().getDataFolder() + File.separator + "depths");
 	}
 
-	// Known bug: only counts one spawner per explosion
 	@EventHandler(priority = EventPriority.HIGH)
 	public void entityExplodeEvent(EntityExplodeEvent event) {
+		event.blockList().removeIf(block -> block.getType().equals(Material.CHEST));
+		event.blockList().removeIf(block -> block.getType().equals(Material.STONE_BUTTON) && block.getLocation().add(1, 0, 0).getBlock().getType() == Material.OBSIDIAN);
+		if (event.getEntityType() == EntityType.PRIMED_TNT) {
+			event.blockList().removeIf(block -> block.getType().equals(Material.SPAWNER));
+		}
+
 		for (Block b : event.blockList()) {
 			Material mat = b.getType();
 			Location loc = b.getLocation();
-			BlockData bd = b.getBlockData();
+
 			Player p = EntityUtils.getNearestPlayer(loc, 100);
 			if (p != null && DepthsManager.getInstance().isInSystem(p)) {
 				if (mat == Material.SPAWNER) { // count spawners exploded by creepers
@@ -322,21 +314,6 @@ public class DepthsListener implements Listener {
 						return;
 					}
 					DepthsManager.getInstance().playerBrokeSpawner(p, loc);
-				} else if (mat == Material.CHEST || (mat == Material.STONE_BUTTON && b.getLocation().add(1, 0, 0).getBlock().getType() == Material.OBSIDIAN)) { // do not explode chests and buttons with obsidian to the east
-					new BukkitRunnable() {
-						@Override
-						public void run() {
-							b.setBlockData(bd);
-							for (Entity entity : b.getWorld().getNearbyEntities(loc, 10, 10, 10)) {
-								if (entity instanceof Item) {
-									Material itemMat = ((Item)entity).getItemStack().getType();
-									if (itemMat == Material.CHEST || itemMat == Material.STONE_BUTTON) {
-										entity.remove();
-									}
-								}
-							}
-						}
-					}.runTaskLater(mPlugin, 1);
 				}
 			}
 		}

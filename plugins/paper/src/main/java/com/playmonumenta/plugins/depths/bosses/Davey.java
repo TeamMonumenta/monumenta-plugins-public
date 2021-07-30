@@ -157,29 +157,13 @@ public class Davey extends BossAbilityGroup {
 
 	@Override
 	public void init() {
-		int bossTargetHp = 0;
-		int playerCount = BossUtils.getPlayersInRangeForHealthScaling(mBoss, detectionRange);
-		int hpDelta = 512;
-		int armor = (int)(Math.sqrt(playerCount * 2) - 1);
-		while (playerCount > 0) {
-			bossTargetHp = bossTargetHp + hpDelta;
-			hpDelta = hpDelta / 2;
-			playerCount--;
-		}
-		mBoss.getAttribute(Attribute.GENERIC_ARMOR).setBaseValue(armor);
-		mBoss.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(DAVEY_HEALTH);
-		mBoss.setHealth(DAVEY_HEALTH);
+		mBoss.getAttribute(Attribute.GENERIC_ARMOR).setBaseValue(0);
 
+		// Health is scaled by 1.5 times each time you fight the boss
 		DepthsParty party = DepthsUtils.getPartyFromNearbyPlayers(mSpawnLoc);
-		if (party.getFloor() == 5) {
-			//Set health higher
-			mBoss.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(DAVEY_HEALTH * 1.5);
-			mBoss.setHealth(DAVEY_HEALTH * 1.5);
-		} else if (party.getFloor() % 3 == 2) {
-			//Set health higher
-			mBoss.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(DAVEY_HEALTH * 2.0);
-			mBoss.setHealth(DAVEY_HEALTH * 2.0);
-		}
+		int modifiedHealth = (int) (DAVEY_HEALTH * Math.pow(1.5, party.getFloor() / 3));
+		mBoss.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(modifiedHealth);
+		mBoss.setHealth(modifiedHealth);
 
 		//launch event related spawn commands
 		PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "playsound epic:music.varcosa record @s ~ ~ ~ 2");

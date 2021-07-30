@@ -94,6 +94,7 @@ public class SpellPassiveSummons extends Spell {
 					if (ele != null && !mSummoned.contains(ele.getUniqueId())) {
 						mSummoned.add(ele.getUniqueId());
 						ele.setAI(false);
+						ele.setPersistent(true);
 
 						new BukkitRunnable() {
 							int mT = 0;

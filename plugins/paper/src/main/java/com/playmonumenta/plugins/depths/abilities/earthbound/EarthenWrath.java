@@ -34,7 +34,7 @@ public class EarthenWrath extends DepthsAbility {
 
 	public static final String ABILITY_NAME = "Earthen Wrath";
 	private static final double[] PERCENT_DAMAGE_REFLECTED = {0.8, 1.0, 1.2, 1.4, 1.6};
-	private static final double[] PERCENT_DAMAGE_RECEIVED = {0.55, 0.575, 0.6, 0.625, 0.65};
+	private static final double[] PERCENT_DAMAGE_REDUCTION = {0.35, 0.375, 0.4, 0.425, 0.45};
 	private static final int COOLDOWN = 20 * 30;
 	private static final int DURATION = 6 * 20;
 	private static final int DAMAGE_RADIUS = 6;
@@ -139,7 +139,7 @@ public class EarthenWrath extends DepthsAbility {
 		if (mAbsorbDamage && !player.equals(mPlayer)) {
 			mDamageAbsorbed += event.getDamage();
 
-			EntityUtils.damageEntity(mPlugin, mPlayer, event.getDamage() * PERCENT_DAMAGE_RECEIVED[mRarity - 1], null, MagicType.PHYSICAL, true, mInfo.mLinkedSpell);
+			EntityUtils.damageEntity(mPlugin, mPlayer, event.getDamage() * (1 - PERCENT_DAMAGE_REDUCTION[mRarity - 1]), null, MagicType.PHYSICAL, true, null);
 
 			World world = mPlayer.getWorld();
 			world.playSound(mPlayer.getLocation(), Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, 1, 2);
@@ -166,7 +166,7 @@ public class EarthenWrath extends DepthsAbility {
 
 	@Override
 	public String getDescription(int rarity) {
-		return "Swap while holding a weapon to redirect damage taken by allies to you at a " + DepthsUtils.getRarityColor(rarity) + DepthsUtils.roundPercent(PERCENT_DAMAGE_RECEIVED[rarity - 1]) + "%" + ChatColor.WHITE + " damage reduction for " + DURATION / 20 + " seconds, then do a burst damage in a " + DAMAGE_RADIUS + " block radius around you, dealing " + DepthsUtils.getRarityColor(rarity) + DepthsUtils.roundPercent(PERCENT_DAMAGE_REFLECTED[rarity - 1]) + "%" + ChatColor.WHITE + " of damage absorbed. Cooldown: " + COOLDOWN / 20 + "s.";
+		return "Swap while holding a weapon to redirect damage taken by allies to you at a " + DepthsUtils.getRarityColor(rarity) + DepthsUtils.roundPercent(PERCENT_DAMAGE_REDUCTION[rarity - 1]) + "%" + ChatColor.WHITE + " damage reduction for " + DURATION / 20 + " seconds, then do a burst damage in a " + DAMAGE_RADIUS + " block radius around you, dealing " + DepthsUtils.getRarityColor(rarity) + DepthsUtils.roundPercent(PERCENT_DAMAGE_REFLECTED[rarity - 1]) + "%" + ChatColor.WHITE + " of original damage absorbed. Cooldown: " + COOLDOWN / 20 + "s.";
 	}
 
 	@Override

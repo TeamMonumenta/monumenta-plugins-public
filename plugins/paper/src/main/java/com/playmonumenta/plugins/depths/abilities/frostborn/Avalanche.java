@@ -79,6 +79,11 @@ public class Avalanche extends DepthsAbility {
 	}
 
 	@Override
+	public boolean runCheck() {
+		return (!isOnCooldown() && DepthsUtils.isWeaponItem(mPlayer.getInventory().getItemInMainHand()));
+	}
+
+	@Override
 	public String getDescription(int rarity) {
 		return "Swap hands to shatter all ice blocks within a radius of " + RADIUS + ", dealing " + DepthsUtils.getRarityColor(rarity) + DAMAGE[rarity - 1] + ChatColor.WHITE + " damage to enemies on the shattered ice. Affected enemies are rooted for " + (SLOW_DURATION / 20.0) + " seconds. Cooldown: " + COOLDOWN_TICKS / 20 + "s.";
 	}

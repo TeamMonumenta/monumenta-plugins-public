@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.depths.abilities.frostborn;
 
 import java.util.List;
 
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.LivingEntity;
@@ -58,7 +59,8 @@ public class Frostbreaker extends DepthsAbility {
 	}
 
 	public boolean isOnIce(LivingEntity entity) {
-		if (entity.getLocation().getBlock().getRelative(BlockFace.DOWN).getType() == DepthsUtils.ICE_MATERIAL) {
+		Location loc = entity.getLocation();
+		if (loc.getBlock().getRelative(BlockFace.DOWN).getType() == DepthsUtils.ICE_MATERIAL && DepthsUtils.iceActive.containsKey(loc)) {
 			return true;
 		}
 		return false;

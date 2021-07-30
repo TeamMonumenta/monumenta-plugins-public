@@ -112,7 +112,7 @@ public class FrostSpear extends DepthsAbility {
 			// Replace blocks at bottom with ice
 			Location checkingLoc = bLoc.clone();
 			int count = 0;
-			while (!world.getBlockAt(checkingLoc).isSolid() && count < 15) {
+			while (!world.getBlockAt(checkingLoc).isSolid() && world.getBlockAt(checkingLoc).getType() != Material.WATER && count < 15) {
 				checkingLoc = checkingLoc.clone().add(0, -1, 0);
 				count++;
 			}

@@ -99,9 +99,9 @@ public class Pyroblast extends DepthsAbility {
 	private void explode(AbstractArrow arrow, Location loc) {
 		World world = arrow.getWorld();
 		world.spawnParticle(Particle.EXPLOSION_HUGE, loc, 1, 0, 0, 0);
-		world.spawnParticle(Particle.SOUL_FIRE_FLAME, loc, 25, 2, 2, 2, 0);
-		world.spawnParticle(Particle.FLAME, loc, 25, 2, 2, 2, 0);
-		world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, .75f, 1);
+		world.spawnParticle(Particle.SOUL_FIRE_FLAME, loc, 40, 2, 2, 2, 0);
+		world.spawnParticle(Particle.FLAME, loc, 40, 2, 2, 2, 0);
+		world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 1, 1);
 		List<LivingEntity> mobs = EntityUtils.getNearbyMobs(loc, RADIUS);
 		for (LivingEntity e : mobs) {
 			EntityUtils.applyFire(mPlugin, DURATION, e, mPlayer);
