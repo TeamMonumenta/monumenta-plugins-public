@@ -53,7 +53,7 @@ public class Nucleus extends BossAbilityGroup {
 	public static final String identityTag = "boss_nucleus";
 	public static final int detectionRange = 50;
 	public static final String DOOR_FILL_TAG = "Door";
-	public static final int NUCLEUS_HEALTH = 4000;
+	public static final int NUCLEUS_HEALTH = 7000;
 	public static final int SWAP_TARGET_SECONDS = 15;
 	public static final String EYE_STAND_TAG = "Plant";
 	public static final String EYE_LOS = "GyrhaeddantEye";
@@ -313,7 +313,7 @@ public class Nucleus extends BossAbilityGroup {
 
 		// Health is scaled by 1.5 times each time you fight the boss
 		DepthsParty party = DepthsUtils.getPartyFromNearbyPlayers(mSpawnLoc);
-		int modifiedHealth = (int) (NUCLEUS_HEALTH * Math.pow(1.5, (party.getFloor() - 1) / 3));
+		int modifiedHealth = (int) (NUCLEUS_HEALTH * Math.pow(1.25, (party.getFloor() - 1) / 3));
 		mBoss.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(modifiedHealth);
 		mBoss.setHealth(modifiedHealth);
 

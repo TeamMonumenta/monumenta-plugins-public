@@ -85,7 +85,6 @@ public class DepthsSummaryGUI extends CustomInventory {
 	protected void inventoryClick(InventoryClickEvent event) {
 		event.setCancelled(true);
 		if (event.getClickedInventory() != _inventory) {
-			event.getWhoClicked().closeInventory();
 			return;
 		}
 		if (event.getCurrentItem().getType() == Material.PLAYER_HEAD) {

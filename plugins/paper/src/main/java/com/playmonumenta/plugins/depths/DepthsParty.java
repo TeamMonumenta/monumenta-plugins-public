@@ -244,6 +244,7 @@ public class DepthsParty {
 				slime.setInvulnerable(true);
 				slime.setInvisible(true);
 				slime.addScoreboardTag(AbilityUtils.IGNORE_TAG);
+				slime.addScoreboardTag("boss_delveimmune");
 			}
 			itemEffects = new ItemEffects(l, e);
 		}

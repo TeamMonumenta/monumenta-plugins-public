@@ -18,7 +18,8 @@ import net.md_5.bungee.api.ChatColor;
 public class Dethroner extends DepthsAbility {
 
 	public static final String ABILITY_NAME = "Dethroner";
-	public static final double[] DAMAGE = {1.14, 1.175, 1.21, 1.245, 1.28};
+	public static final double[] ELITE_DAMAGE = {1.14, 1.175, 1.21, 1.245, 1.28};
+	public static final double[] BOSS_DAMAGE = {1.1, 1.125, 1.15, 1.175, 1.2};
 
 	public Dethroner(Plugin plugin, Player player) {
 		super(plugin, player, ABILITY_NAME);
@@ -28,8 +29,10 @@ public class Dethroner extends DepthsAbility {
 
 	@Override
 	public boolean livingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
-		if (EntityUtils.isElite(event.getEntity()) || EntityUtils.isBoss(event.getEntity())) {
-			event.setDamage(event.getDamage() * DAMAGE[mRarity - 1]);
+		if (EntityUtils.isBoss(event.getEntity())) {
+			event.setDamage(event.getDamage() * BOSS_DAMAGE[mRarity - 1]);
+		} else if (EntityUtils.isElite(event.getEntity())) {
+			event.setDamage(event.getDamage() * ELITE_DAMAGE[mRarity - 1]);
 		}
 
 		return true;
@@ -37,8 +40,10 @@ public class Dethroner extends DepthsAbility {
 
 	@Override
 	public boolean livingEntityShotByPlayerEvent(Projectile proj, LivingEntity damagee, EntityDamageByEntityEvent event) {
-		if (EntityUtils.isElite(event.getEntity()) || EntityUtils.isBoss(event.getEntity())) {
-			event.setDamage(event.getDamage() * DAMAGE[mRarity - 1]);
+		if (EntityUtils.isBoss(event.getEntity())) {
+			event.setDamage(event.getDamage() * BOSS_DAMAGE[mRarity - 1]);
+		} else if (EntityUtils.isElite(event.getEntity())) {
+			event.setDamage(event.getDamage() * ELITE_DAMAGE[mRarity - 1]);
 		}
 
 		return true;
@@ -46,7 +51,7 @@ public class Dethroner extends DepthsAbility {
 
 	@Override
 	public String getDescription(int rarity) {
-		return "All damage you deal to elites and bosses is multiplied by " + DepthsUtils.getRarityColor(rarity) + DAMAGE[rarity - 1] + ChatColor.WHITE + ".";
+		return "All damage you deal to elites is multiplied by " + DepthsUtils.getRarityColor(rarity) + ELITE_DAMAGE[rarity - 1] + ChatColor.WHITE + ". All damage you deal to bosses is multiplied by " + DepthsUtils.getRarityColor(rarity) + BOSS_DAMAGE[rarity - 1] + ChatColor.WHITE + ".";
 	}
 
 	@Override

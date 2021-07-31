@@ -42,7 +42,6 @@ import com.playmonumenta.plugins.depths.bosses.spells.SpellLinkBeyondLife;
 import com.playmonumenta.plugins.depths.bosses.spells.SpellVoidBlast;
 import com.playmonumenta.plugins.depths.bosses.spells.SpellVoidGrenades;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
-import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.SerializationUtils;
@@ -51,7 +50,7 @@ public class Davey extends BossAbilityGroup {
 	public static final String identityTag = "boss_davey";
 	public static final int detectionRange = 50;
 	public static final String DOOR_FILL_TAG = "Door";
-	public static final int DAVEY_HEALTH = 3250;
+	public static final int DAVEY_HEALTH = 5250;
 	public static final String VEX_LOS = "AbyssalSpawn";
 	public static final int SWAP_TARGET_SECONDS = 15;
 
@@ -161,7 +160,7 @@ public class Davey extends BossAbilityGroup {
 
 		// Health is scaled by 1.5 times each time you fight the boss
 		DepthsParty party = DepthsUtils.getPartyFromNearbyPlayers(mSpawnLoc);
-		int modifiedHealth = (int) (DAVEY_HEALTH * Math.pow(1.5, party.getFloor() / 3));
+		int modifiedHealth = (int) (DAVEY_HEALTH * Math.pow(1.25, party.getFloor() / 3));
 		mBoss.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(modifiedHealth);
 		mBoss.setHealth(modifiedHealth);
 

@@ -146,7 +146,7 @@ public class GuardingBolt extends DepthsAbility {
 
 	@Override
 	public String getDescription(int rarity) {
-		return "Left click the air while sneaking and looking directly at a player within " + RANGE + " blocks to dash to their location. Mobs in a " + RADIUS + " block radius of the destination are dealt " + DepthsUtils.getRarityColor(rarity) + DAMAGE[rarity - 1] + ChatColor.WHITE + " damage, knocked back, and stunned for " + DepthsUtils.getRarityColor(rarity) + STUN_DURATION[rarity - 1] / 20 + ChatColor.WHITE + " seconds. Cooldown: " + COOLDOWN + "s.";
+		return "Left click the air while sneaking and looking directly at a player within " + RANGE + " blocks to dash to their location. Mobs in a " + RADIUS + " block radius of the destination are dealt " + DepthsUtils.getRarityColor(rarity) + DAMAGE[rarity - 1] + ChatColor.WHITE + " damage, knocked back, and stunned for " + DepthsUtils.getRarityColor(rarity) + STUN_DURATION[rarity - 1] / 20.0 + ChatColor.WHITE + " seconds. Cooldown: " + COOLDOWN / 20 + "s.";
 	}
 
 	@Override

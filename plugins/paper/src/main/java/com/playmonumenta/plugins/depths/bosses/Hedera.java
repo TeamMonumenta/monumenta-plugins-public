@@ -52,7 +52,7 @@ public class Hedera extends BossAbilityGroup {
 	public static final String PLANT_STAND_TAG = "Plant";
 	public static final String DOOR_FILL_TAG = "Door";
 	public static final int PLANT_CONSUME_HP = 150;
-	public static final int HEDERA_HEALTH = 2500;
+	public static final int HEDERA_HEALTH = 4000;
 	public static final int SWAP_TARGET_SECONDS = 15;
 
 
@@ -168,7 +168,7 @@ public class Hedera extends BossAbilityGroup {
 
 		// Health is scaled by 1.5 times each time you fight the boss
 		DepthsParty party = DepthsUtils.getPartyFromNearbyPlayers(mSpawnLoc);
-		int modifiedHealth = (int) (HEDERA_HEALTH * Math.pow(1.5, party.getFloor() / 3));
+		int modifiedHealth = (int) (HEDERA_HEALTH * Math.pow(1.25, party.getFloor() / 3));
 		mBoss.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(modifiedHealth);
 		mBoss.setHealth(modifiedHealth);
 
