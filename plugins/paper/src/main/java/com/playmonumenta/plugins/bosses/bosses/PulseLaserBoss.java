@@ -28,8 +28,6 @@ public class PulseLaserBoss extends BossAbilityGroup {
 		public boolean SINGLE_TARGET = false;
 	}
 
-	public static final int detectionRange = 30;
-
 	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
 		return new PulseLaserBoss(plugin, boss);
 	}
@@ -67,6 +65,6 @@ public class PulseLaserBoss extends BossAbilityGroup {
 					})
 		));
 
-		super.constructBoss(activeSpells, null, detectionRange, null, p.DELAY);
+		super.constructBoss(activeSpells, null, p.DETECTION, null, p.DELAY);
 	}
 }
