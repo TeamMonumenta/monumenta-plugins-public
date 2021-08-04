@@ -1011,7 +1011,7 @@ public class DepthsManager {
 	 * @return the appropriate GUI to open for their current room reward
 	 */
 	public Boolean getRoomReward(Player p, Location l) {
-		if (p == null || mPlayers.get(p.getUniqueId()) == null || l == null) {
+		if (p == null || mPlayers.get(p.getUniqueId()) == null) {
 			return false;
 		}
 		DepthsPlayer dp = mPlayers.get(p.getUniqueId());

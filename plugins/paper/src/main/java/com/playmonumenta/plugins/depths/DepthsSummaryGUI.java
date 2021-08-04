@@ -9,12 +9,14 @@ import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 
 import com.goncalomb.bukkit.mylib.utils.CustomInventory;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
+import com.playmonumenta.plugins.utils.ItemUtils;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -25,6 +27,7 @@ public class DepthsSummaryGUI extends CustomInventory {
 	public static final ArrayList<Integer> TREE_LOCATIONS = new ArrayList<Integer>(Arrays.asList(2, 3, 5, 6));
 	private static final int START_OF_PASSIVES = 27;
 	private static final Material FILLER = Material.GRAY_STAINED_GLASS_PANE;
+	private static final int REWARD_LOCATION = 49;
 
 	class TriggerData {
 		int mInvLocation;
@@ -78,21 +81,44 @@ public class DepthsSummaryGUI extends CustomInventory {
 				}
 			}
 		}
+		DepthsPlayer playerWhoAsked = DepthsManager.getInstance().mPlayers.get(requestingPlayer.getUniqueId());
+
+
+		//First- check if the player has any rewards to open
+		if (playerWhoAsked.mEarnedRewards.size() > 0) {
+			ItemStack rewardItem = new ItemStack(Material.GOLD_NUGGET, playerWhoAsked.mEarnedRewards.size());
+			ItemMeta rewardMeta = rewardItem.getItemMeta();
+			rewardMeta.displayName(Component.text("Claim your Room Reward!", NamedTextColor.YELLOW)
+										.decoration(TextDecoration.ITALIC, false));
+			rewardMeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
+			rewardItem.setItemMeta(rewardMeta);
+			ItemUtils.setPlainName(rewardItem, "Claim your Room Reward!");
+			_inventory.setItem(REWARD_LOCATION, rewardItem);
+		}
 		setAbilities(targetPlayer);
 	}
 
 	@Override
 	protected void inventoryClick(InventoryClickEvent event) {
 		event.setCancelled(true);
-		if (event.getClickedInventory() != _inventory) {
+		if (event.getClickedInventory() != _inventory ||
+				event.getCurrentItem().getType() == FILLER) {
 			return;
 		}
+		Player clicker = (Player) event.getWhoClicked();
 		if (event.getCurrentItem().getType() == Material.PLAYER_HEAD) {
 			SkullMeta chosenMeta = (SkullMeta) event.getCurrentItem().getItemMeta();
 			OfflinePlayer chosenPlayer = chosenMeta.getOwningPlayer();
 			if (chosenPlayer.isOnline()) {
 				setAbilities((Player) chosenPlayer);
 				return;
+			}
+		}
+		if (event.getSlot() == REWARD_LOCATION) {
+			DepthsPlayer playerInstance = DepthsManager.getInstance().mPlayers.get(clicker.getUniqueId());
+			if (playerInstance != null) {
+				event.getWhoClicked().closeInventory();
+				DepthsManager.getInstance().getRoomReward((Player) event.getWhoClicked(), null);
 			}
 		}
 	}
