@@ -34,6 +34,7 @@ import org.bukkit.loot.LootTable;
 
 import com.playmonumenta.plugins.utils.ChestUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 
 import de.tr7zw.nbtapi.NBTCompound;
@@ -79,6 +80,9 @@ public class LootChestsInInventory implements Listener {
 		if (table == null) {
 			return;
 		}
+		if (item.isSimilar(event.getCursor())) {
+			return;
+		}
 		if (!event.getCursor().getType().equals(Material.AIR)) {
 			player.sendMessage(ChatColor.DARK_RED + "You must have an empty cursor to open loot chests!");
 			event.setCancelled(true);
@@ -102,6 +106,7 @@ public class LootChestsInInventory implements Listener {
 			emptyChestMeta.displayName(item2.getItemMeta().displayName());
 		}
 		emptyChest.setItemMeta(emptyChestMeta);
+		ItemUtils.setPlainTag(emptyChest);
 		InventoryUtils.giveItem(player, emptyChest);
 	}
 
