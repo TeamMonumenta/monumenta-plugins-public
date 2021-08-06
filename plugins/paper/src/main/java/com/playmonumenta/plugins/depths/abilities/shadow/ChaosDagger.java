@@ -1,5 +1,7 @@
 package com.playmonumenta.plugins.depths.abilities.shadow;
 
+import java.util.List;
+
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -10,6 +12,7 @@ import org.bukkit.entity.Item;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.MagmaCube;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.inventory.ItemStack;
@@ -41,6 +44,8 @@ public class ChaosDagger extends DepthsAbility {
 	private static final double VELOCITY = 0.5;
 	public static final int STUN_DURATION = 3 * 20;
 	public static final int DAMAGE_DURATION = 5 * 20;
+	private static final int TARGET_RADIUS = 20;
+	private static final int ELITE_RADIUS = 5;
 
 	private Entity mHitMob;
 
@@ -99,29 +104,28 @@ public class ChaosDagger extends DepthsAbility {
 						this.cancel();
 					}
 					Location tLoc = tincture.getLocation();
-					mTarget = EntityUtils.getNearestMob(tLoc, 20);
+
+					List<LivingEntity> veryNearbyMobs = EntityUtils.getNearbyMobs(tLoc, ELITE_RADIUS);
+					veryNearbyMobs.removeIf(mob -> mob.getScoreboardTags().contains(AbilityUtils.IGNORE_TAG));
+					veryNearbyMobs.removeIf(mob -> !(EntityUtils.isBoss(mob) || EntityUtils.isElite(mob)));
+					mTarget = EntityUtils.getNearestMob(tLoc, veryNearbyMobs);
+
+					if (mTarget == null) {
+						List<LivingEntity> nearbyMobs = EntityUtils.getNearbyMobs(tLoc, TARGET_RADIUS);
+						nearbyMobs.removeIf(mob -> mob.getScoreboardTags().contains(AbilityUtils.IGNORE_TAG));
+						mTarget = EntityUtils.getNearestMob(tLoc, nearbyMobs);
+					}
 
 					if (mTarget == null) {
 						tincture.remove();
 						this.cancel();
-					}
-					// Has to check other mobs if nearest mob is chest slime or decoy
-					if (mTarget.getScoreboardTags().contains(AbilityUtils.IGNORE_TAG)) {
-						for (LivingEntity mob : EntityUtils.getNearbyMobs(tLoc, 20)) {
-							if (mob != null && mob.getScoreboardTags() != null) {
-								if (!mob.getScoreboardTags().contains(AbilityUtils.IGNORE_TAG)) {
-									mTarget = mob;
-									break;
-								}
-							}
-						}
 					}
 
 					if (mTarget.getBoundingBox().overlaps(tincture.getBoundingBox()) && !mTarget.getScoreboardTags().contains(AbilityUtils.IGNORE_TAG)) {
 						mWorld.spawnParticle(Particle.EXPLOSION_NORMAL, tLoc, 30, 2, 0, 2);
 						world.playSound(tLoc, Sound.ENTITY_GENERIC_EXPLODE, 1, 0.15f);
 						mHitMob = mTarget;
-						if (EntityUtils.isBoss(mTarget)) {
+						if (EntityUtils.isBoss(mTarget) || mTarget.getScoreboardTags().contains("boss_ccimmune")) {
 							EntityUtils.applySlow(mPlugin, STUN_DURATION, 0.99f, mTarget);
 						} else {
 							EntityUtils.applyStun(mPlugin, STUN_DURATION, mTarget);
@@ -168,9 +172,7 @@ public class ChaosDagger extends DepthsAbility {
 		}
 	}
 
-	//Bug that I don't feel like fixing: a player with chaos dagger will deal extra damage and use up another player's chaos dagger tag
-	@Override
-	public boolean livingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
+	private void doBonusDamage(EntityDamageByEntityEvent event) {
 		Entity entity = event.getEntity();
 		if (entity == mHitMob) {
 			event.setDamage(event.getDamage() * DAMAGE[mRarity - 1]);
@@ -179,12 +181,23 @@ public class ChaosDagger extends DepthsAbility {
 				entity.setGlowing(false);
 			}
 		}
+	}
+
+	@Override
+	public boolean livingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
+		doBonusDamage(event);
+		return true;
+	}
+
+	@Override
+	public boolean livingEntityShotByPlayerEvent(Projectile proj, LivingEntity le, EntityDamageByEntityEvent event) {
+		doBonusDamage(event);
 		return true;
 	}
 
 	@Override
 	public String getDescription(int rarity) {
-		return "Swap hands to throw a cursed dagger that stuns an enemy for " + STUN_DURATION / 20 + " seconds (rooting bosses instead). Your next instance of damage to this mob within " + DAMAGE_DURATION / 20 + " seconds is multiplied by " + DepthsUtils.getRarityColor(rarity) + DAMAGE[rarity - 1] + ChatColor.WHITE + ". Cooldown: " + COOLDOWN / 20 + "s.";
+		return "Swap hands to throw a cursed dagger that stuns an enemy for " + STUN_DURATION / 20 + " seconds (rooting bosses instead). The next instance of any type of damage you deal to this mob within " + DAMAGE_DURATION / 20 + " seconds is multiplied by " + DepthsUtils.getRarityColor(rarity) + DAMAGE[rarity - 1] + ChatColor.WHITE + ". The dagger prioritizes nearby Elites and Bosses but can hit any mob in its path. Cooldown: " + COOLDOWN / 20 + "s.";
 	}
 
 	@Override

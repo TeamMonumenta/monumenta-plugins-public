@@ -8,7 +8,7 @@ import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
@@ -25,6 +25,7 @@ import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
 import com.playmonumenta.plugins.utils.AbilityUtils;
+import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 
@@ -121,8 +122,8 @@ public class EarthenWrath extends DepthsAbility {
 		}.runTaskTimer(mPlugin, 0, 1);
 	}
 
-	public void damagedEntity(Player player, EntityDamageEvent event) {
-		if (AbilityUtils.isBlocked(event)) {
+	public void damagedEntity(Player player, EntityDamageByEntityEvent event) {
+		if (AbilityUtils.isBlocked(event) || !(event.getDamager() instanceof LivingEntity)) {
 			return;
 		}
 
@@ -139,7 +140,10 @@ public class EarthenWrath extends DepthsAbility {
 		if (mAbsorbDamage && !player.equals(mPlayer)) {
 			mDamageAbsorbed += event.getDamage();
 
-			EntityUtils.damageEntity(mPlugin, mPlayer, event.getDamage() * (1 - PERCENT_DAMAGE_REDUCTION[mRarity - 1]), null, MagicType.PHYSICAL, true, null);
+			//EntityUtils.damageEntity(mPlugin, mPlayer, event.getDamage() * (1 - PERCENT_DAMAGE_REDUCTION[mRarity - 1]), null, MagicType.PHYSICAL, true, null);
+			Vector velocity = mPlayer.getVelocity();
+			BossUtils.bossDamage((LivingEntity) event.getDamager(), mPlayer, event.getDamage() * (1 - PERCENT_DAMAGE_REDUCTION[mRarity - 1]));
+			mPlayer.setVelocity(velocity);
 
 			World world = mPlayer.getWorld();
 			world.playSound(mPlayer.getLocation(), Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, 1, 2);
@@ -166,7 +170,7 @@ public class EarthenWrath extends DepthsAbility {
 
 	@Override
 	public String getDescription(int rarity) {
-		return "Swap while holding a weapon to redirect damage taken by allies to you at a " + DepthsUtils.getRarityColor(rarity) + DepthsUtils.roundPercent(PERCENT_DAMAGE_REDUCTION[rarity - 1]) + "%" + ChatColor.WHITE + " damage reduction for " + DURATION / 20 + " seconds, then do a burst damage in a " + DAMAGE_RADIUS + " block radius around you, dealing " + DepthsUtils.getRarityColor(rarity) + DepthsUtils.roundPercent(PERCENT_DAMAGE_REFLECTED[rarity - 1]) + "%" + ChatColor.WHITE + " of original damage absorbed. Cooldown: " + COOLDOWN / 20 + "s.";
+		return "Swap while holding a weapon to redirect all damage allies take from mobs (excluding percent health damage) to you at a " + DepthsUtils.getRarityColor(rarity) + DepthsUtils.roundPercent(PERCENT_DAMAGE_REDUCTION[rarity - 1]) + "%" + ChatColor.WHITE + " damage reduction for " + DURATION / 20 + " seconds, then do a burst damage in a " + DAMAGE_RADIUS + " block radius around you, dealing " + DepthsUtils.getRarityColor(rarity) + DepthsUtils.roundPercent(PERCENT_DAMAGE_REFLECTED[rarity - 1]) + "%" + ChatColor.WHITE + " of original damage absorbed. Cooldown: " + COOLDOWN / 20 + "s.";
 	}
 
 	@Override

@@ -37,7 +37,7 @@ public class FireworkBlast extends DepthsAbility {
 	private static final int COOLDOWN = 12 * 20;
 	private static final int[] DAMAGE = {16, 20, 24, 28, 32};
 	private static final int[] DAMAGE_CAP = {32, 40, 48, 56, 64};
-	private static final double DAMAGE_INCREASE_PER_BLOCK = 0.05;
+	private static final double DAMAGE_INCREASE_PER_BLOCK = 0.1;
 	private static final int RADIUS = 4;
 
 	private static final Particle.DustOptions GRAY_COLOR = new Particle.DustOptions(Color.fromRGB(130, 130, 130), 1.0f);
@@ -117,7 +117,7 @@ public class FireworkBlast extends DepthsAbility {
 
 	@Override
 	public String getDescription(int rarity) {
-		return "Right click while sneaking and holding a weapon to shoot a firework that deals " + DepthsUtils.getRarityColor(rarity) + DAMAGE[rarity - 1] + ChatColor.WHITE + " damage to enemies within " + RADIUS + " blocks of its explosion. The damage is increased by " + DAMAGE_INCREASE_PER_BLOCK + "% for every block the firework travels, up to " + DepthsUtils.getRarityColor(rarity) + DAMAGE_CAP[rarity - 1] + ChatColor.WHITE + " damage. Cooldown: " + COOLDOWN / 20 + "s.";
+		return "Right click while sneaking and holding a weapon to shoot a firework that deals " + DepthsUtils.getRarityColor(rarity) + DAMAGE[rarity - 1] + ChatColor.WHITE + " damage to enemies within " + RADIUS + " blocks of its explosion. The damage is increased by " + (int) DepthsUtils.roundPercent(DAMAGE_INCREASE_PER_BLOCK) + "% for every block the firework travels, up to " + DepthsUtils.getRarityColor(rarity) + DAMAGE_CAP[rarity - 1] + ChatColor.WHITE + " damage. Cooldown: " + COOLDOWN / 20 + "s.";
 	}
 
 	@Override

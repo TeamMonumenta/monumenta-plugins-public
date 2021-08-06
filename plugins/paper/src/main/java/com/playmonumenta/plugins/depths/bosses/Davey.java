@@ -54,6 +54,8 @@ public class Davey extends BossAbilityGroup {
 	public static final String VEX_LOS = "AbyssalSpawn";
 	public static final int SWAP_TARGET_SECONDS = 15;
 
+	private static final int MUSIC_DURATION = 196; //seconds
+
 	private final Location mSpawnLoc;
 	private final Location mEndLoc;
 
@@ -165,12 +167,12 @@ public class Davey extends BossAbilityGroup {
 		mBoss.setHealth(modifiedHealth);
 
 		//launch event related spawn commands
-		PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "playsound epic:music.varcosa record @s ~ ~ ~ 2");
 		PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "effect give @s minecraft:blindness 2 2");
 		PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "title @s title [\"\",{\"text\":\"Lieutenant Davey\",\"color\":\"dark_gray\",\"bold\":true}]");
 		PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "title @s subtitle [\"\",{\"text\":\"Void Herald\",\"color\":\"gray\",\"bold\":true}]");
 		PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "playsound minecraft:entity.wither.spawn master @s ~ ~ ~ 10 0.7");
 		PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "tellraw @s [\"\",{\"text\":\"[Davey]\", \"color\":\"gold\"},{\"text\":\" Ahoy! Ye have the stink of the Veil upon ye. She won't be likin' this... Sink!\",\"color\":\"blue\"}]");
+		mMusicRunnable.runTaskTimer(mPlugin, 0, MUSIC_DURATION * 20 + 20);
 	}
 
 	@Override
@@ -202,6 +204,7 @@ public class Davey extends BossAbilityGroup {
 			public void run() {
 				PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "effect give @s minecraft:blindness 2 2");
 				PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "stopsound @p");
+				mMusicRunnable.cancel();
 			}
 
 		}.runTaskLater(mPlugin, 60);
@@ -223,4 +226,14 @@ public class Davey extends BossAbilityGroup {
 			((Player) event.getEntity()).addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 60, 1));
 		}
 	}
+
+	BukkitRunnable mMusicRunnable = new BukkitRunnable() {
+		@Override
+		public void run() {
+			if (mBoss == null || mBoss.getHealth() <= 0) {
+				this.cancel();
+			}
+			PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "playsound epic:music.varcosa record @s ~ ~ ~ 2");
+		}
+	};
 }

@@ -45,10 +45,18 @@ public class Avalanche extends DepthsAbility {
 	public void playerSwapHandItemsEvent(PlayerSwapHandItemsEvent event) {
 		event.setCancelled(true);
 		if (!isTimerActive()) {
-			putOnCooldown();
-
 			World world = mPlayer.getWorld();
 			Location loc = mPlayer.getLocation();
+
+			HashSet<Location> iceToBreak = new HashSet<>(DepthsUtils.iceActive.keySet());
+			iceToBreak.removeIf(l -> l.distance(loc) > RADIUS);
+			iceToBreak.removeIf(l -> l.getBlock().getType() != DepthsUtils.ICE_MATERIAL);
+
+			if (iceToBreak.size() == 0) {
+				return;
+			}
+
+			putOnCooldown();
 
 			world.playSound(loc, Sound.BLOCK_GLASS_BREAK, 1, 0.95f);
 			world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 1, 0.95f);
@@ -59,11 +67,9 @@ public class Avalanche extends DepthsAbility {
 			world.playSound(loc, Sound.BLOCK_GLASS_BREAK, 0.5f, 1f);
 
 			//Shatter all nearby ice
-			for (Location l : new HashSet<>(DepthsUtils.iceActive.keySet())) {
-				if (l.distance(loc) > RADIUS) {
-					continue;
-				}
+			for (Location l : iceToBreak) {
 				Location aboveLoc = l.clone().add(0.5, 1, 0.5);
+
 				//Damage and root mobs
 				for (LivingEntity mob : EntityUtils.getNearbyMobs(aboveLoc, 1.0)) {
 					EntityUtils.applySlow(mPlugin, SLOW_DURATION, SLOW_MODIFIER, mob);
@@ -85,7 +91,7 @@ public class Avalanche extends DepthsAbility {
 
 	@Override
 	public String getDescription(int rarity) {
-		return "Swap hands to shatter all ice blocks within a radius of " + RADIUS + ", dealing " + DepthsUtils.getRarityColor(rarity) + DAMAGE[rarity - 1] + ChatColor.WHITE + " damage to enemies on the shattered ice. Affected enemies are rooted for " + (SLOW_DURATION / 20.0) + " seconds. Cooldown: " + COOLDOWN_TICKS / 20 + "s.";
+		return "Swap hands to shatter all ice blocks within a radius of " + RADIUS + ", dealing " + DepthsUtils.getRarityColor(rarity) + DAMAGE[rarity - 1] + ChatColor.WHITE + " damage to enemies on the shattered ice. Affected enemies are rooted for " + SLOW_DURATION / 20 + " seconds. Cooldown: " + COOLDOWN_TICKS / 20 + "s.";
 	}
 
 	@Override

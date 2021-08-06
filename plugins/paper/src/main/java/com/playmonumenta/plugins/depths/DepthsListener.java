@@ -32,8 +32,6 @@ import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.player.PlayerExpChangeEvent;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 import org.bukkit.projectiles.ProjectileSource;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
@@ -165,6 +163,25 @@ public class DepthsListener implements Listener {
 			}
 		}
 
+		if (event.getEntity() instanceof Player) {
+			Player player = (Player) event.getEntity();
+			DepthsPlayer dp1 = DepthsManager.getInstance().mPlayers.get(player.getUniqueId());
+			if (dp1 == null || DepthsManager.getInstance().getPartyFromId(dp1) == null) {
+				return;
+			}
+			DepthsParty party = DepthsManager.getInstance().getPartyFromId(dp1);
+			// Extra damage taken at higher floors
+			if (party.getFloor() > 15) {
+			    event.setDamage(event.getDamage() * (1 + (0.1 * ((party.getFloor() - 1) / 3) - 4)));
+			}
+		}
+	}
+
+	@EventHandler(priority = EventPriority.LOW)
+	public void entityDamageByEntityEvent(EntityDamageByEntityEvent event) {
+		Entity entity = event.getEntity();
+		Entity damager = event.getDamager();
+
 		//EarthenWrath implementation handler
 		if (event.getEntity() instanceof Player) {
 			Player player = (Player) event.getEntity();
@@ -195,37 +212,11 @@ public class DepthsListener implements Listener {
 				} catch (Exception e) {
 					Plugin.getInstance().getLogger().info("Exception for depths on entity damage- earthen wrath");
 				}
-
 			}
-
-			// Extra damage taken at higher floors
-			if (party.getFloor() > 15) {
-			    event.setDamage(event.getDamage() * (1 + (0.1 * ((party.getFloor() - 1) / 3) - 4)));
-			}
-		}
-	}
-
-	@EventHandler(priority = EventPriority.LOW)
-	public void entityDamageByEntityEvent(EntityDamageByEntityEvent event) {
-		Entity entity = event.getEntity();
-		Entity damager = event.getDamager();
-
-		//Prevent Metalmancy golem getting Decayed
-		if (entity instanceof IronGolem && entity.getScoreboardTags().contains(Metalmancy.GOLEM_TAG) && damager instanceof Player) {
-			new BukkitRunnable() {
-				@Override
-				public void run() {
-					PotionEffect wither = ((IronGolem)entity).getPotionEffect(PotionEffectType.WITHER);
-					if (wither != null && wither.getAmplifier() > 0) {
-						((IronGolem)entity).removePotionEffect(PotionEffectType.WITHER);
-					}
-				}
-			}.runTaskLater(mPlugin, 1);
-			event.setCancelled(true);
 		}
 
 		//Prevent plants from getting hit up
-		if (event.getEntity().getName().contains("Dionaea")) {
+		if (entity.getName().contains("Dionaea")) {
 			new BukkitRunnable() {
 				@Override
 				public void run() {
@@ -235,7 +226,7 @@ public class DepthsListener implements Listener {
 		}
 
 		//Metalmancy golem taunt
-		if (entity instanceof Mob && damager instanceof IronGolem && damager.getScoreboardTags().contains(Metalmancy.GOLEM_TAG)) {
+		if (entity instanceof Mob && damager instanceof IronGolem && damager.getScoreboardTags().contains(Metalmancy.GOLEM_TAG) && !EntityUtils.isBoss(entity)) {
 			((Mob) entity).setTarget((IronGolem) damager);
 		}
 	}
@@ -245,10 +236,7 @@ public class DepthsListener implements Listener {
 		Projectile proj = event.getEntity();
 		ProjectileSource shooter = proj.getShooter();
 		Entity damagee = event.getHitEntity();
-		if (damagee instanceof IronGolem && damagee.getScoreboardTags().contains(Metalmancy.GOLEM_TAG) && shooter instanceof Player) {
-			// Metalmancy Golems cannot be shot
-			event.setCancelled(true);
-		} else if (proj instanceof Firework && FireworkBlast.isDamaging((Firework) proj) && damagee instanceof Player) {
+		if (proj instanceof Firework && FireworkBlast.isDamaging((Firework) proj) && damagee instanceof Player) {
 			// Firework Blast fireworks go through players
 			event.setCancelled(true);
 		} else if (damagee instanceof Slime && damagee.getName().contains("Eye") && shooter instanceof Player) {
@@ -297,9 +285,14 @@ public class DepthsListener implements Listener {
 
 	@EventHandler(priority = EventPriority.HIGH)
 	public void entityExplodeEvent(EntityExplodeEvent event) {
+		EntityType entityType = event.getEntityType();
+		if (!(entityType == EntityType.CREEPER || entityType == EntityType.PRIMED_TNT)) {
+			return;
+		}
+
 		event.blockList().removeIf(block -> block.getType().equals(Material.CHEST));
 		event.blockList().removeIf(block -> block.getType().equals(Material.STONE_BUTTON) && block.getLocation().add(1, 0, 0).getBlock().getType() == Material.OBSIDIAN);
-		if (event.getEntityType() == EntityType.PRIMED_TNT) {
+		if (entityType == EntityType.PRIMED_TNT) {
 			event.blockList().removeIf(block -> block.getType().equals(Material.SPAWNER));
 		}
 

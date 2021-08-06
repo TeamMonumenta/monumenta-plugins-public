@@ -10,6 +10,7 @@ import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
+import org.bukkit.World;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -42,13 +43,14 @@ public class DepthsDamageRunnable extends BukkitRunnable {
 				continue;
 			}
 			Location loc = p.getLocation();
+			World world = p.getWorld();
 			if (BAD_BLOCKS.contains(loc.getBlock().getRelative(BlockFace.DOWN).getType())) {
 				//Damage player
 				Vector vel = p.getVelocity();
 				EntityUtils.damageEntity(Plugin.getInstance(), p, 0.1, null, null, true, null, false, false, false, true);
 				BossUtils.bossDamagePercent(p, p, PCT_DAMAGE);
 				p.setVelocity(vel);
-				p.getWorld().playSound(loc, Sound.ENTITY_GENERIC_EXTINGUISH_FIRE, 0.3f, 1.5f);
+				world.playSound(loc, Sound.ENTITY_GENERIC_EXTINGUISH_FIRE, 0.3f, 1.5f);
 			}
 		}
 	}

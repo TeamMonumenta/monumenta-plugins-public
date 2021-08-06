@@ -39,11 +39,14 @@ public class ShadowDive extends DepthsAbility {
 	public static final String ABILITY_NAME = "Cloak of Shadows";
 	public static final int COOLDOWN = 20 * 15;
 	public static final int WEAKEN_DURATION = 20 * 6;
-	public static final int[] DAMAGE = {8, 10, 12, 14, 16};
 	public static final int[] STEALTH_DURATION = {30, 35, 40, 45, 50};
 	public static final double[] WEAKEN_AMPLIFIER = {0.2, 0.25, 0.3, 0.35, 0.4};
+	public static final int[] DAMAGE = {12, 15, 18, 21, 24};
+	public static final int DAMAGE_DURATION = 4 * 20;
 	private static final double VELOCITY = 0.7;
 	private static final double RADIUS = 5.0;
+
+	private boolean mBonusDamage = false;
 
 	public ShadowDive(Plugin plugin, Player player) {
 		super(plugin, player, ABILITY_NAME);
@@ -52,10 +55,14 @@ public class ShadowDive extends DepthsAbility {
 		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;
 		mInfo.mCooldown = COOLDOWN;
 		mInfo.mLinkedSpell = ClassAbility.SHADOW_DIVE;
+		mInfo.mIgnoreCooldown = true;
 	}
 
 	@Override
 	public void cast(Action trigger) {
+		if (!(mPlayer.isSneaking() && !mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.mLinkedSpell) && DepthsUtils.isWeaponItem(mPlayer.getInventory().getItemInMainHand()))) {
+			return;
+		}
 
 		Location loc = mPlayer.getEyeLocation();
 		ItemStack itemTincture = new ItemStack(Material.BLACK_CONCRETE);
@@ -76,6 +83,14 @@ public class ShadowDive extends DepthsAbility {
 
 		putOnCooldown();
 		AbilityUtils.applyStealth(mPlugin, mPlayer, STEALTH_DURATION[mRarity - 1]);
+
+		mBonusDamage = true;
+		new BukkitRunnable() {
+			@Override
+			public void run() {
+				mBonusDamage = false;
+			}
+		}.runTaskLater(mPlugin, DAMAGE_DURATION);
 
 		new BukkitRunnable() {
 
@@ -107,7 +122,12 @@ public class ShadowDive extends DepthsAbility {
 
 	@Override
 	public boolean livingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
-	    if (event.getCause().equals(DamageCause.ENTITY_ATTACK)) {
+		if (event.getCause().equals(DamageCause.ENTITY_ATTACK) && mBonusDamage) {
+			event.setDamage(event.getDamage() + DAMAGE[mRarity - 1]);
+			mBonusDamage = false;
+		}
+
+		if (event.getCause().equals(DamageCause.ENTITY_ATTACK) && mPlayer.isSneaking() && !mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.mLinkedSpell) && DepthsUtils.isWeaponItem(mPlayer.getInventory().getItemInMainHand())) {
 	        cast(Action.LEFT_CLICK_AIR);
 	    }
 
@@ -115,13 +135,8 @@ public class ShadowDive extends DepthsAbility {
 	}
 
 	@Override
-	public boolean runCheck() {
-		return (mPlayer.isSneaking() && !isOnCooldown() && DepthsUtils.isWeaponItem(mPlayer.getInventory().getItemInMainHand()));
-	}
-
-	@Override
 	public String getDescription(int rarity) {
-		return "Left click while sneaking and holding a weapon to throw a shadow bomb, which explodes on landing, applying " + DepthsUtils.getRarityColor(rarity) + DepthsUtils.roundPercent(WEAKEN_AMPLIFIER[rarity - 1]) + "%" + ChatColor.WHITE + " weaken for " + WEAKEN_DURATION / 20 + " seconds. You enter stealth for " + DepthsUtils.getRarityColor(rarity) + STEALTH_DURATION[rarity - 1] / 20.0 + ChatColor.WHITE + " seconds upon casting. Cooldown: " + COOLDOWN / 20 + "s.";
+		return "Left click while sneaking and holding a weapon to throw a shadow bomb, which explodes on landing, applying " + DepthsUtils.getRarityColor(rarity) + DepthsUtils.roundPercent(WEAKEN_AMPLIFIER[rarity - 1]) + "%" + ChatColor.WHITE + " weaken for " + WEAKEN_DURATION / 20 + " seconds. You enter stealth for " + DepthsUtils.getRarityColor(rarity) + STEALTH_DURATION[rarity - 1] / 20.0 + ChatColor.WHITE + " seconds upon casting and the next instance of melee damage you deal within " + DAMAGE_DURATION / 20 + " seconds deals " + DepthsUtils.getRarityColor(rarity) + DAMAGE[rarity - 1] + ChatColor.WHITE + " additional damage. Cooldown: " + COOLDOWN / 20 + "s.";
 	}
 
 	@Override

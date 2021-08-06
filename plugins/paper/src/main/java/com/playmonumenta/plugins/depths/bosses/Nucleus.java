@@ -59,6 +59,8 @@ public class Nucleus extends BossAbilityGroup {
 	public static final String EYE_LOS = "GyrhaeddantEye";
 	public static final int EYE_KILL_COUNT = 4;
 
+	private static final int MUSIC_DURATION = 152; //seconds
+
 	public final Location mSpawnLoc;
 	public final Location mEndLoc;
 
@@ -331,11 +333,11 @@ public class Nucleus extends BossAbilityGroup {
 				//launch event related spawn commands
 				if (mTicks >= 6 * 20) {
 					this.cancel();
-					PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "playsound epic:music.azacor record @s ~ ~ ~ 2");
 					PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "effect give @s minecraft:blindness 2 2");
 					PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "title @s title [\"\",{\"text\":\"Gyrhaeddant\",\"color\":\"dark_red\",\"bold\":true}]");
 					PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "title @s subtitle [\"\",{\"text\":\"The Nucleus\",\"color\":\"dark_red\",\"bold\":true}]");
 					PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "playsound minecraft:entity.wither.spawn master @s ~ ~ ~ 10 0.7");
+					mMusicRunnable.runTaskTimer(mPlugin, 0, MUSIC_DURATION * 20 + 20);
 				}
 
 			}
@@ -369,6 +371,7 @@ public class Nucleus extends BossAbilityGroup {
 			public void run() {
 				PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "effect give @s minecraft:blindness 2 2");
 				PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "stopsound @p");
+				mMusicRunnable.cancel();
 			}
 
 		}.runTaskLater(mPlugin, 60);
@@ -390,4 +393,14 @@ public class Nucleus extends BossAbilityGroup {
 			((Player) event.getEntity()).addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 60, 1));
 		}
 	}
+
+	BukkitRunnable mMusicRunnable = new BukkitRunnable() {
+		@Override
+		public void run() {
+			if (mBoss == null || mBoss.getHealth() <= 0) {
+				this.cancel();
+			}
+			PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "playsound epic:music.nucleus record @s ~ ~ ~ 2");
+		}
+	};
 }

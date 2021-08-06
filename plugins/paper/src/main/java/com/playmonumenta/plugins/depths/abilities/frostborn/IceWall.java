@@ -30,8 +30,9 @@ public class IceWall extends DepthsAbility {
 	public static final String ABILITY_NAME = "Ice Barrier";
 	public static final int[] ICE_TICKS = {8 * 20, 10 * 20, 12 * 20, 14 * 20, 16 * 20};
 	public static final int[] COOLDOWN = {20 * 20, 18 * 20, 16 * 20, 14 * 20, 12 * 20};
-	public static final int SLOW_DURATION = 3 * 20; // time for lingering after wall goes away
-	public static final double SLOW_AMPLIFIER = 0.15;
+	public static final int CAST_RANGE = 15;
+	public static final int[] MAX_LENGTH = {20, 25, 30, 35, 40};
+	public static final int CAST_TIME = 5 * 20;
 
 	public boolean mIsPrimed;
 	public Location mPrimedLoc;
@@ -56,14 +57,14 @@ public class IceWall extends DepthsAbility {
 		}
 
 		World world = mPlayer.getWorld();
-		Block block = mPlayer.getTargetBlock(10);
+		Block block = mPlayer.getTargetBlock(CAST_RANGE);
 		boolean validLength = true;
-		if (mPrimedLoc != null && mPrimedLoc.distance(block.getLocation()) > 20) {
+		if (mPrimedLoc != null && (mPrimedLoc.distance(block.getLocation()) > MAX_LENGTH[mRarity - 1] || mPrimedLoc.distance(block.getLocation()) < 1)) {
 			validLength = false;
 		}
 
 		if (block.getType() != Material.AIR && block.getType() != Material.BEDROCK && validLength) {
-			DepthsUtils.spawnIceTerrain(block.getLocation(), ICE_TICKS[mRarity - 1]);
+			DepthsUtils.spawnIceTerrain(block.getLocation(), CAST_TIME);
 			world.spawnParticle(Particle.CRIT, block.getLocation(), 15, 0, 0, 0, 0.6f);
 			world.spawnParticle(Particle.CRIT_MAGIC, block.getLocation(), 15, 0, 0, 0, 0.6f);
 			world.playSound(mPlayer.getLocation(), Sound.BLOCK_GLASS_BREAK, 1, 1.4f);
@@ -84,11 +85,12 @@ public class IceWall extends DepthsAbility {
 						}
 					}
 
-				}.runTaskLater(mPlugin, 5 * 20);
+				}.runTaskLater(mPlugin, CAST_TIME);
 			} else {
 				//Build the wall
 				putOnCooldown();
 				mIsPrimed = false;
+
 				ArrayList<Block> blocksToIce = new ArrayList<>();
 
 				Vector v = block.getLocation().toVector().subtract(mPrimedLoc.toVector());
@@ -119,7 +121,7 @@ public class IceWall extends DepthsAbility {
 
 	@Override
 	public String getDescription(int rarity) {
-		return "Right clicking while sneaking and holding a weapon to place an ice marker. Placing a second marker within 5 seconds and within 20 blocks of the first marker forms a wall of ice connecting the two points, lasting for " + DepthsUtils.getRarityColor(rarity) + ICE_TICKS[rarity - 1] / 20 + ChatColor.WHITE + " seconds. Cooldown is refunded if no second marker is placed. Cooldown: " + DepthsUtils.getRarityColor(rarity) + COOLDOWN[rarity - 1] / 20 + "s" + ChatColor.WHITE + ".";
+		return "Right clicking while sneaking and holding a weapon to place an ice marker up to " + CAST_RANGE + " blocks away. Placing a second marker within " + CAST_TIME / 20 + " seconds and within " + DepthsUtils.getRarityColor(rarity) + MAX_LENGTH[rarity - 1] + ChatColor.WHITE + " blocks of the first marker forms a wall of ice connecting the two points, lasting for " + DepthsUtils.getRarityColor(rarity) + ICE_TICKS[rarity - 1] / 20 + ChatColor.WHITE + " seconds. Cooldown is refunded if no second marker is placed. Cooldown: " + DepthsUtils.getRarityColor(rarity) + COOLDOWN[rarity - 1] / 20 + "s" + ChatColor.WHITE + ".";
 	}
 
 	@Override

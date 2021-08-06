@@ -336,7 +336,7 @@ public class DepthsManager {
 	}
 
 	/**
-	 * Helper method to get the party object from a participating plater
+	 * Helper method to get the party object from a participating player
 	 * @param dp depths player instance to check
 	 * @return party object of associated player
 	 */
@@ -1081,7 +1081,7 @@ public class DepthsManager {
 		// Move this later
 
 		List<DepthsAbilityItem> offeredItems = mUpgradeOfferings.get(p.getUniqueId());
-		if (offeredItems != null && offeredItems.size() >= 0) {
+		if (offeredItems != null && offeredItems.size() > 0) {
 			return offeredItems;
 		}
 

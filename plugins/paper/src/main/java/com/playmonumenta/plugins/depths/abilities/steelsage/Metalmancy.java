@@ -8,6 +8,7 @@ import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.MagmaCube;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
@@ -30,7 +31,6 @@ public class Metalmancy extends DepthsAbility {
 
 	public static final String ABILITY_NAME = "Metalmancy";
 
-	public static final int[] HEALTH = {100, 125, 150, 175, 200};
 	public static final double[] DAMAGE = {10, 12.5, 15, 17.5, 20};
 	public static final int[] DURATION = {10 * 20, 11 * 20, 12 * 20, 13 * 20, 14 * 20};
 	public static final int COOLDOWN = 32 * 20;
@@ -64,8 +64,7 @@ public class Metalmancy extends DepthsAbility {
 			Location loc = mPlayer.getLocation();
 			Vector facingDirection = mPlayer.getEyeLocation().getDirection().normalize();
 			mGolem = (Mob) LibraryOfSoulsIntegration.summon(mPlayer.getLocation().add(facingDirection).add(0, 1, 0), GOLEM_NAME); // adds facing direction so golem doesn't spawn inside user
-			mGolem.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(HEALTH[mRarity - 1]);
-			mGolem.setHealth(HEALTH[mRarity - 1]);
+			mGolem.setInvulnerable(true);
 			mGolem.getAttribute(Attribute.GENERIC_ATTACK_DAMAGE).setBaseValue(DAMAGE[mRarity - 1]);
 			mGolem.setVelocity(facingDirection.multiply(VELOCITY));
 
@@ -86,7 +85,9 @@ public class Metalmancy extends DepthsAbility {
 							world.spawnParticle(Particle.SMOKE_NORMAL, golemLoc, 20);
 						}
 						if (!(mTarget == null)) {
-							mTarget.setGlowing(false);
+							if (!(mTarget instanceof MagmaCube && mTarget.getName().contains("Gyrhaeddant"))) {
+								mTarget.setGlowing(false);
+							}
 							mTarget = null;
 						}
 						mGolem.remove();
@@ -132,7 +133,7 @@ public class Metalmancy extends DepthsAbility {
 
 	@Override
 	public String getDescription(int rarity) {
-		return "Swap hands while holding a weapon to summon a steel construct in the direction you are looking that has " + DepthsUtils.getRarityColor(rarity) + HEALTH[rarity - 1] + ChatColor.WHITE + " health and does " + DepthsUtils.getRarityColor(rarity) + DAMAGE[rarity - 1] + ChatColor.WHITE + " melee damage. If the construct is still alive after " + DepthsUtils.getRarityColor(rarity) + DURATION[rarity - 1] / 20 + ChatColor.WHITE + " seconds, it will disappear. The construct will prioritize the first enemy you hit with a projectile after summoning, which can be reapplied once that target dies. The construct taunts any mob it attacks. Cooldown: " + COOLDOWN / 20 + "s.";
+		return "Swap hands while holding a weapon to summon a steel construct in the direction you are looking that does " + DepthsUtils.getRarityColor(rarity) + DAMAGE[rarity - 1] + ChatColor.WHITE + " melee damage. The Construct is invulnerable and disappears after " + DepthsUtils.getRarityColor(rarity) + DURATION[rarity - 1] / 20 + ChatColor.WHITE + " seconds. The Construct will prioritize the first enemy you hit with a projectile after summoning, which can be reapplied once that target dies. The Construct taunts any mob it attacks. Cooldown: " + COOLDOWN / 20 + "s.";
 	}
 
 	@Override

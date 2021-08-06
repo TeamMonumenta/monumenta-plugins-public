@@ -234,7 +234,7 @@ public class DelveInfusionCustomInventory extends CustomInventory {
 			ItemStack pannel = new ItemStack(Material.LIGHT_BLUE_WOOL, 1);
 			ItemMeta meta = pannel.getItemMeta();
 			meta.displayName(Component.text("Expedite level " + (i + 1), TextColor.fromCSSHexString("#4AC2E5")).decoration(TextDecoration.BOLD, true).decoration(TextDecoration.ITALIC, false));
-			splitLoreLine(meta, "Damaging an enemy with an ability increases your movement speed by " + 1 * (i * 1) + "% for 5 seconds, stacking up to 3 times.", MAX_LORE_LENGHT, ChatColor.GRAY);
+			splitLoreLine(meta, "Damaging an enemy with an ability increases your movement speed by " + 1 * (i + 1) + "% for 5 seconds, stacking up to 3 times.", MAX_LORE_LENGHT, ChatColor.GRAY);
 			pannel.setItemMeta(meta);
 			lbItems.add(pannel);
 		}
@@ -441,22 +441,22 @@ public class DelveInfusionCustomInventory extends CustomInventory {
 
 		//Delve Mats
 		//r1
-		mDelveMatsMap.put(DelveInfusionSelection.PENNATE, "Soul Essence");
-		mDelveMatsMap.put(DelveInfusionSelection.CARAPACE, "Beastly Brood");
-		mDelveMatsMap.put(DelveInfusionSelection.AURA, "Plagueroot Sap");
-		mDelveMatsMap.put(DelveInfusionSelection.EXPEDITE, "Arcane Crystal");
-		mDelveMatsMap.put(DelveInfusionSelection.CHOLER, "Season's Wrath");
-		mDelveMatsMap.put(DelveInfusionSelection.USURPER, "Nightmare Fuel");
+		mDelveMatsMap.put(DelveInfusionSelection.PENNATE, "Soul Essences");
+		mDelveMatsMap.put(DelveInfusionSelection.CARAPACE, "Beastly Broods");
+		mDelveMatsMap.put(DelveInfusionSelection.AURA, "Plagueroot Saps");
+		mDelveMatsMap.put(DelveInfusionSelection.EXPEDITE, "Arcane Crystals");
+		mDelveMatsMap.put(DelveInfusionSelection.CHOLER, "Season's Wraths");
+		mDelveMatsMap.put(DelveInfusionSelection.USURPER, "Nightmare Fuels");
 		//r2
 		mDelveMatsMap.put(DelveInfusionSelection.EMPOWERED, "Refound Knowledge");
 		mDelveMatsMap.put(DelveInfusionSelection.NUTRIMENT, "Roots of Balance");
 		mDelveMatsMap.put(DelveInfusionSelection.EXECUTION, "Forgotten Ashes");
-		mDelveMatsMap.put(DelveInfusionSelection.REFLECTION, "Aurora Shard");
+		mDelveMatsMap.put(DelveInfusionSelection.REFLECTION, "Aurora Shards");
 		mDelveMatsMap.put(DelveInfusionSelection.MITOSIS, "Feverish Flesh");
-		mDelveMatsMap.put(DelveInfusionSelection.ARDOR, "Despondent Doubloon");
-		mDelveMatsMap.put(DelveInfusionSelection.EPOCH, "Weathered Rune");
+		mDelveMatsMap.put(DelveInfusionSelection.ARDOR, "Despondent Doubloons");
+		mDelveMatsMap.put(DelveInfusionSelection.EPOCH, "Weathered Runes");
 		mDelveMatsMap.put(DelveInfusionSelection.NATANT, "Primordial Clay");
-		mDelveMatsMap.put(DelveInfusionSelection.UNDERSTANDING, "Binah Leaf");
+		mDelveMatsMap.put(DelveInfusionSelection.UNDERSTANDING, "Binah Leaves");
 
 	}
 
@@ -881,7 +881,7 @@ public class DelveInfusionCustomInventory extends CustomInventory {
 											.decoration(TextDecoration.BOLD, true));
 							List<Component> itemLore = new ArrayList<>();
 
-							itemLore.add(Component.text("You will need " + DelveInfusionUtils.MAT_DEPTHS_COST_PER_INFUSION[level] + " Voidstained Geode,", NamedTextColor.GRAY)
+							itemLore.add(Component.text("You will need " + DelveInfusionUtils.MAT_DEPTHS_COST_PER_INFUSION[level] + " Voidstained Geodes,", NamedTextColor.GRAY)
 											.decoration(TextDecoration.ITALIC, false));
 
 							itemLore.add(Component.text(DelveInfusionUtils.MAT_COST_PER_INFUSION[level] + " " + mDelveMatsMap.get(infusion) + ",", NamedTextColor.GRAY)
