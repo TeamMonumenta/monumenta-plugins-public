@@ -11,6 +11,8 @@ import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -185,6 +187,15 @@ public class AmplifyingHex extends Ability {
 		double pitch = mPlayer.getLocation().getPitch();
 		return (mPlayer.isSneaking() && pitch < 50 && pitch > -50
 				&& ItemUtils.isHoe(mPlayer.getInventory().getItemInMainHand()));
+	}
+
+	@Override
+	public boolean livingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
+	    if (event.getCause().equals(DamageCause.ENTITY_ATTACK)) {
+	        cast(Action.LEFT_CLICK_AIR);
+	    }
+
+	    return true;
 	}
 
 	@Override

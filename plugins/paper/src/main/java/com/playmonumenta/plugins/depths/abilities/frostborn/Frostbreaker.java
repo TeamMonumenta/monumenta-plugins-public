@@ -60,7 +60,7 @@ public class Frostbreaker extends DepthsAbility {
 
 	public boolean isOnIce(LivingEntity entity) {
 		Location loc = entity.getLocation();
-		if (loc.getBlock().getRelative(BlockFace.DOWN).getType() == DepthsUtils.ICE_MATERIAL && DepthsUtils.iceActive.containsKey(loc)) {
+		if (loc.getBlock().getRelative(BlockFace.DOWN).getType() == DepthsUtils.ICE_MATERIAL && DepthsUtils.iceActive.containsKey(loc.getBlock().getRelative(BlockFace.DOWN).getLocation())) {
 			return true;
 		}
 		return false;

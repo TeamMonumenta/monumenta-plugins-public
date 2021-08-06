@@ -9,6 +9,7 @@ import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.inventory.ItemStack;
 
@@ -100,6 +101,15 @@ public class CelestialBlessing extends Ability {
 		}
 
 		putOnCooldown();
+	}
+
+	@Override
+	public boolean livingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
+	    if (event.getCause().equals(DamageCause.ENTITY_ATTACK)) {
+	        cast(Action.LEFT_CLICK_AIR);
+	    }
+
+	    return true;
 	}
 
 	@Override

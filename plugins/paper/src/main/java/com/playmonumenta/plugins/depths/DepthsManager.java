@@ -1187,20 +1187,22 @@ public class DepthsManager {
 	 */
 	public void goToNextFloor(Player p) {
 		DepthsPlayer dp = mPlayers.get(p.getUniqueId());
+		DepthsParty party = getPartyFromId(dp);
+		int partyFloor = party.getFloor();
 		if (dp == null || getPartyFromId(dp) == null) {
 			p.sendMessage(DepthsUtils.DEPTHS_MESSAGE_PREFIX + "Player not in depths system!");
 			return;
 		}
-		int treasureScoreIncrease = TREASURE_PER_FLOOR * getPartyFromId(dp).getFloor() + 2;
-		getPartyFromId(dp).mTreasureScore += treasureScoreIncrease;
+		int treasureScoreIncrease = TREASURE_PER_FLOOR * partyFloor + 2;
+		party.mTreasureScore += treasureScoreIncrease;
 
-		int partyFloor = getPartyFromId(dp).getFloor();
 		//Check to see if they've finished the run (normal mode) and send to loot rooms
-		if (partyFloor == 3 && !getPartyFromId(dp).mEndlessMode) {
-			List<DepthsPlayer> playersToLoop = new ArrayList<>(getPartyFromId(dp).mPlayersInParty);
+		if (partyFloor == 3 && !party.mEndlessMode) {
+			List<DepthsPlayer> playersToLoop = new ArrayList<>(party.mPlayersInParty);
 			for (DepthsPlayer playerInParty : playersToLoop) {
 				Player player = Bukkit.getPlayer(playerInParty.mPlayerId);
 				if (player != null) {
+					dp.mFinalTreasureScore = party.mTreasureScore;
 					player.sendMessage(DepthsUtils.DEPTHS_MESSAGE_PREFIX + "Congratulations! Your final treasure score is " + dp.mFinalTreasureScore + "!");
 					getPartyFromId(dp).populateLootRoom(player, false);
 					Bukkit.getServer().dispatchCommand(Bukkit.getServer().getConsoleSender(), "broadcastcommand tellraw @a [\"\",{\"text\":\"" + player.getName() + "\",\"color\":\"gold\",\"bold\":false,\"italic\":true},{\"text\":\" defeated the Darkest Depths!\",\"color\":\"white\",\"italic\":true,\"bold\":false}]");
@@ -1211,7 +1213,7 @@ public class DepthsManager {
 			}
 			return;
 		} else if (partyFloor == 3) {
-			for (DepthsPlayer playerInParty : getPartyFromId(dp).mPlayersInParty) {
+			for (DepthsPlayer playerInParty : party.mPlayersInParty) {
 				Player player = Bukkit.getPlayer(playerInParty.mPlayerId);
 				//Set score
 				ScoreboardUtils.setScoreboardValue(player, "Depths", ScoreboardUtils.getScoreboardValue(player, "Depths") + 1);
@@ -1219,14 +1221,14 @@ public class DepthsManager {
 			}
 		}
 		//Check to see if we're in endless mode and need to assign delve points to players
-		if (getPartyFromId(dp).mEndlessMode && partyFloor >= 3 && partyFloor <= 11) {
-			int delvePoints = DepthsEndlessDifficulty.DELVE_POINTS_PER_FLOOR[getPartyFromId(dp).getFloor() - 1];
-			DepthsEndlessDifficulty.applyDelvePointsToParty(getPartyFromId(dp).mPlayersInParty, delvePoints, getPartyFromId(dp).mDelveModifiers, false);
+		if (party.mEndlessMode && partyFloor >= 3 && partyFloor <= 11) {
+			int delvePoints = DepthsEndlessDifficulty.DELVE_POINTS_PER_FLOOR[partyFloor - 1];
+			DepthsEndlessDifficulty.applyDelvePointsToParty(party.mPlayersInParty, delvePoints, party.mDelveModifiers, false);
 		} else if (partyFloor == 12) {
 			//Assign twisted at this point
-			DepthsEndlessDifficulty.applyDelvePointsToParty(getPartyFromId(dp).mPlayersInParty, 0, getPartyFromId(dp).mDelveModifiers, true);
+			DepthsEndlessDifficulty.applyDelvePointsToParty(party.mPlayersInParty, 0, party.mDelveModifiers, true);
 		} else if (partyFloor > 12 && partyFloor % 3 == 0) {
-			List<DepthsPlayer> playersToLoop = new ArrayList<>(getPartyFromId(dp).mPlayersInParty);
+			List<DepthsPlayer> playersToLoop = new ArrayList<>(party.mPlayersInParty);
 			for (DepthsPlayer playerInParty : playersToLoop) {
 				Player player = Bukkit.getPlayer(playerInParty.mPlayerId);
 				if (player != null) {

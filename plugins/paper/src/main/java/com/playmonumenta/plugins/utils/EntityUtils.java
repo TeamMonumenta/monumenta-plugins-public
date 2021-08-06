@@ -929,11 +929,12 @@ public class EntityUtils {
 		}
 	}
 
-	//TODO this likely overwrites longer fire tick amounts, such as from Fire Aspect
 	public static void applyFire(Plugin plugin, int fireTicks, LivingEntity target, Player player) {
 		target.setMetadata(Inferno.SET_FIRE_TICK_METAKEY, new FixedMetadataValue(plugin, target.getTicksLived()));
 		target.setMetadata(Inferno.FIRE_TICK_METAKEY, new FixedMetadataValue(plugin, target.getTicksLived()));
-		target.setFireTicks(fireTicks);
+		if (target.getFireTicks() < fireTicks) {
+			target.setFireTicks(fireTicks);
+		}
 
 		//TODO this 0.001 damage can get affected by abilities/enchants,
 		// becoming high enough (> 0.01) to be displayed by training dummies.

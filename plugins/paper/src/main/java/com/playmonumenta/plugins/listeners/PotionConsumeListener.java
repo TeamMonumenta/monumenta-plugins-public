@@ -8,6 +8,7 @@ import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -60,7 +61,7 @@ public class PotionConsumeListener implements Listener {
 
 	@EventHandler(priority = EventPriority.HIGHEST)
 	public void drinkablePotionEvent(InventoryClickEvent event) {
-
+		HumanEntity whoClicked = event.getWhoClicked();
 		if (
 		    // Must not be cancelled
 		    event.isCancelled() ||
@@ -70,8 +71,9 @@ public class PotionConsumeListener implements Listener {
 		    // Must be placing a single block
 		    event.getAction() == null ||
 		    // Must be a player interacting with an inventory
-		    event.getWhoClicked() == null ||
-		    !(event.getWhoClicked() instanceof Player) ||
+		    whoClicked == null ||
+		    !(whoClicked instanceof Player) ||
+		    ((Player)whoClicked).getGameMode() == GameMode.SPECTATOR ||
 		    event.getClickedInventory() == null ||
 		    // Must be a click on a drinkable potion or glass bottle in empty hand
 		    (event.getCursor() != null && !event.getCursor().getType().equals(Material.AIR)) ||
@@ -84,7 +86,7 @@ public class PotionConsumeListener implements Listener {
 			return;
 		}
 
-		Player player = (Player)event.getWhoClicked();
+		Player player = (Player) whoClicked;
 		ItemStack item = event.getCurrentItem();
 
 		Set<String> tags = player.getScoreboardTags();
@@ -128,16 +130,16 @@ public class PotionConsumeListener implements Listener {
 			return;
 		}
 
-		if (checkPotionCooldown(player)) {
+		PotionMeta meta = (PotionMeta) item.getItemMeta();
+		List<PotionEffect> effects = PotionUtils.getEffects(meta);
+
+		if (checkPotionCooldown(player) && event.getClickedInventory().getType() != InventoryType.CHEST && isCooldownApplicable(effects)) {
 			player.sendMessage(ChatColor.RED + "Quick drink is still on cooldown!");
 			player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1.0f, 1.0f);
 
 			event.setCancelled(true);
 			return;
 		}
-
-		PotionMeta meta = (PotionMeta) item.getItemMeta();
-		List<PotionEffect> effects = PotionUtils.getEffects(meta);
 
 		if (item.containsEnchantment(Enchantment.ARROW_INFINITE) && !(effects.size() == 1 && effects.get(0).getType().equals(PotionEffectType.GLOWING))) {
 			player.sendMessage(ChatColor.RED + "Infinite potions can not be quick drinked!");
@@ -161,7 +163,9 @@ public class PotionConsumeListener implements Listener {
 
 		InventoryType invType = event.getClickedInventory().getType();
 		if (invType == InventoryType.PLAYER || invType == InventoryType.ENDER_CHEST || invType == InventoryType.SHULKER_BOX || invType == InventoryType.CRAFTING) {
-			setPotionCooldown(player);
+			if (isCooldownApplicable(effects)) {
+				setPotionCooldown(player);
+			}
 		}
 
 		//If instant drink enchantment, instantly apply potion, otherwise imitate potion drinking
@@ -237,6 +241,7 @@ public class PotionConsumeListener implements Listener {
 
 	@EventHandler(priority = EventPriority.HIGHEST)
 	public void throwablePotionEvent(InventoryClickEvent event) {
+		HumanEntity whoClicked = event.getWhoClicked();
 		if (
 		    // Must not be cancelled
 		    event.isCancelled() ||
@@ -247,8 +252,9 @@ public class PotionConsumeListener implements Listener {
 		    event.getAction() == null ||
 		    !event.getAction().equals(InventoryAction.PICKUP_HALF) ||
 		    // Must be a player interacting with their main inventory
-		    event.getWhoClicked() == null ||
-		    !(event.getWhoClicked() instanceof Player) ||
+		    whoClicked == null ||
+		    !(whoClicked instanceof Player) ||
+		    ((Player)whoClicked).getGameMode() == GameMode.SPECTATOR ||
 		    event.getClickedInventory() == null ||
 		    // Must be a click on a shulker box with an empty hand
 		    (event.getCursor() != null && !event.getCursor().getType().equals(Material.AIR)) ||
@@ -261,7 +267,7 @@ public class PotionConsumeListener implements Listener {
 			return;
 		}
 
-		Player player = (Player)event.getWhoClicked();
+		Player player = (Player) whoClicked;
 		ItemStack item = event.getCurrentItem();
 
 		Set<String> tags = player.getScoreboardTags();
@@ -271,7 +277,10 @@ public class PotionConsumeListener implements Listener {
 			return;
 		}
 
-		if (checkPotionCooldown(player)) {
+		PotionMeta meta = (PotionMeta) item.getItemMeta();
+		List<PotionEffect> effects = PotionUtils.getEffects(meta);
+
+		if (checkPotionCooldown(player) && event.getClickedInventory().getType() != InventoryType.CHEST && isCooldownApplicable(effects)) {
 			player.sendMessage(ChatColor.RED + "Quick drink is still on cooldown!");
 			player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1.0f, 1.0f);
 
@@ -292,6 +301,13 @@ public class PotionConsumeListener implements Listener {
 
 		CoreProtectIntegration.logContainerTransaction(player, event.getClickedInventory().getLocation());
 
+		InventoryType invType = event.getClickedInventory().getType();
+		if (invType == InventoryType.PLAYER || invType == InventoryType.ENDER_CHEST || invType == InventoryType.SHULKER_BOX || invType == InventoryType.CRAFTING) {
+			if (isCooldownApplicable(effects)) {
+				setPotionCooldown(player);
+			}
+		}
+
 		//If Sacred Provisions check passes, do not consume
 		if (NonClericProvisionsPassive.testRandomChance(player)) {
 			event.setCancelled(true);
@@ -300,11 +316,6 @@ public class PotionConsumeListener implements Listener {
 
 		//Remove item
 		item.setAmount(item.getAmount() - 1);
-
-		InventoryType invType = event.getClickedInventory().getType();
-		if (invType == InventoryType.PLAYER || invType == InventoryType.ENDER_CHEST || invType == InventoryType.SHULKER_BOX || invType == InventoryType.CRAFTING) {
-			setPotionCooldown(player);
-		}
 
 		event.setCancelled(true);
 	}
@@ -331,5 +342,16 @@ public class PotionConsumeListener implements Listener {
 	//False if no cooldowns and the quick drink is activatable now
 	private boolean checkPotionCooldown(HumanEntity player) {
 		return mCooldowns.containsKey(player.getUniqueId()) && !mCooldowns.get(player.getUniqueId()).isCancelled();
+	}
+
+	private boolean isCooldownApplicable(List<PotionEffect> effects) {
+		for (PotionEffect effect : effects) {
+			PotionEffectType type = effect.getType();
+			int amp = effect.getAmplifier();
+			if (type.equals(PotionEffectType.HEAL) || (type.equals(PotionEffectType.REGENERATION) && amp >= 2) || (type.equals(PotionEffectType.DAMAGE_RESISTANCE) && amp >= 2) || type.equals(PotionEffectType.ABSORPTION) || type.equals(PotionEffectType.SATURATION)) {
+				return true;
+			}
+		}
+		return false;
 	}
 }

@@ -2,6 +2,14 @@ package com.playmonumenta.plugins.abilities.warrior;
 
 import java.util.EnumSet;
 
+import org.bukkit.Location;
+import org.bukkit.Particle;
+import org.bukkit.World;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
+
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.classes.ClassAbility;
@@ -12,14 +20,6 @@ import com.playmonumenta.plugins.tracking.PlayerTracking;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
-
-import org.bukkit.Location;
-import org.bukkit.Particle;
-import org.bukkit.World;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 
 
 
@@ -61,7 +61,7 @@ public class BruteForce extends Ability {
 		mInfo.mScoreboardId = "BruteForce";
 		mInfo.mShorthandName = "BF";
 		mInfo.mDescriptions.add("Attacking an enemy with a cooled down falling attack passively deals 2 more damage to it, 2 physical damage to all enemies in a 2-block cube around it, and knocks all non-boss enemies away from you.");
-		mInfo.mDescriptions.add("Damage is increased from 2, to 15% and then 3.");
+		mInfo.mDescriptions.add("Damage is increased from 2, to 10% and then 3.");
 	}
 
 	@Override

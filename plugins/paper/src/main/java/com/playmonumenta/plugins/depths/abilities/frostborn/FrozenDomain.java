@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.depths.abilities.frostborn;
 
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.attribute.Attribute;
@@ -95,7 +96,8 @@ public class FrozenDomain extends DepthsAbility {
 	}
 
 	public boolean isOnIce(LivingEntity entity) {
-		if (entity.getLocation().getBlock().getRelative(BlockFace.DOWN).getType() == DepthsUtils.ICE_MATERIAL) {
+		Location loc = entity.getLocation();
+		if (loc.getBlock().getRelative(BlockFace.DOWN).getType() == DepthsUtils.ICE_MATERIAL && DepthsUtils.iceActive.containsKey(loc.getBlock().getRelative(BlockFace.DOWN).getLocation())) {
 			return true;
 		}
 		return false;

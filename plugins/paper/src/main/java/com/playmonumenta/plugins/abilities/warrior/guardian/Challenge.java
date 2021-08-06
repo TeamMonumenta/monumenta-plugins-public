@@ -11,6 +11,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 
 import com.playmonumenta.plugins.Plugin;
@@ -79,11 +80,19 @@ public class Challenge extends Ability {
 
 		for (LivingEntity mob : mobs) {
 			if (mob instanceof Mob) {
-				EntityUtils.applyTaunt(mPlugin, (Mob) mob, mPlayer);
+				EntityUtils.applyTaunt(mPlugin, mob, mPlayer);
 			}
 		}
 
 		putOnCooldown();
 	}
 
+	@Override
+	public boolean livingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
+	    if (event.getCause().equals(DamageCause.ENTITY_ATTACK)) {
+	        cast(Action.LEFT_CLICK_AIR);
+	    }
+
+	    return true;
+	}
 }

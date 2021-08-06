@@ -4,6 +4,7 @@ import java.util.EnumSet;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
+import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
@@ -18,6 +19,7 @@ import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.metadata.FixedMetadataValue;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.bosses.bosses.CrowdControlImmunityBoss;
 import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
@@ -52,7 +54,7 @@ public class ThunderAspect implements BaseEnchantment {
 		if (rand < randChance) {
 			if (EntityUtils.isElite(target)) {
 				EntityUtils.applyStun(plugin, 10, target);
-			} else if (!EntityUtils.isBoss(target)) {
+			} else {
 				EntityUtils.applyStun(plugin, 50, target);
 			}
 
@@ -60,10 +62,14 @@ public class ThunderAspect implements BaseEnchantment {
 				event.setDamage(event.getDamage() + 1.0);
 			}
 
-			world.spawnParticle(Particle.REDSTONE, target.getLocation().add(0, 1, 0), 12, 0.5, 0.5, 0.5, YELLOW_1_COLOR);
-			world.spawnParticle(Particle.REDSTONE, target.getLocation().add(0, 1, 0), 12, 0.5, 0.5, 0.5, YELLOW_2_COLOR);
-			world.spawnParticle(Particle.FIREWORKS_SPARK, target.getLocation().add(0, 1, 0), 15, 0, 0, 0, 0.15);
-			player.getWorld().playSound(target.getLocation(), Sound.ENTITY_FIREWORK_ROCKET_TWINKLE, 0.65f, 1.5f);
+			if (!(EntityUtils.isBoss(target) || target.getScoreboardTags().contains(CrowdControlImmunityBoss.identityTag))) {
+				Location loc = target.getLocation();
+				world.playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_TWINKLE, 0.65f, 1.5f);
+				loc = loc.add(0, 1, 0);
+				world.spawnParticle(Particle.REDSTONE, loc, 12, 0.5, 0.5, 0.5, YELLOW_1_COLOR);
+				world.spawnParticle(Particle.REDSTONE, loc, 12, 0.5, 0.5, 0.5, YELLOW_2_COLOR);
+				world.spawnParticle(Particle.FIREWORKS_SPARK, loc, 15, 0, 0, 0, 0.15);
+			}
 		}
 	}
 

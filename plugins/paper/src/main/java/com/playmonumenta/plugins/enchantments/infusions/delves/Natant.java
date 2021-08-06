@@ -3,17 +3,16 @@ package com.playmonumenta.plugins.enchantments.infusions.delves;
 import java.util.EnumSet;
 import java.util.NavigableSet;
 
+import org.bukkit.ChatColor;
+import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
+
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.effects.Effect;
+import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.enchantments.BaseEnchantment;
 import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
 import com.playmonumenta.plugins.utils.DelveInfusionUtils;
-import com.playmonumenta.plugins.effects.Effect;
-import com.playmonumenta.plugins.effects.PercentSpeed;
-
-import org.bukkit.ChatColor;
-import org.bukkit.entity.Player;
-import org.bukkit.Material;
-import org.jetbrains.annotations.NotNull;
 
 public class Natant implements BaseEnchantment {
 
@@ -34,9 +33,7 @@ public class Natant implements BaseEnchantment {
 
 	@Override
 	public void tick(@NotNull Plugin plugin, @NotNull Player player, int level) {
-		Material m = player.getLocation().getBlock().getType();
-		Material mHead = player.getEyeLocation().getBlock().getType();
-	    if (m == Material.WATER || mHead == Material.WATER) {
+	    if (player.isInWater()) {
 			NavigableSet<Effect> speedEffects = plugin.mEffectManager.getEffects(player, PERCENT_SPEED_EFFECT_NAME);
 			if (speedEffects != null) {
 				for (Effect effect : speedEffects) {

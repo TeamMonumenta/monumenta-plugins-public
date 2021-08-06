@@ -9,6 +9,8 @@ import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import com.playmonumenta.plugins.Constants;
@@ -136,6 +138,15 @@ public class FrostNova extends Ability {
 		world.spawnParticle(Particle.CLOUD, loc, 25, 0, 0, 0, 0.35);
 		world.spawnParticle(Particle.SPIT, loc, 35, 0, 0, 0, 0.45);
 		world.playSound(loc, Sound.BLOCK_GLASS_BREAK, 0.5f, 1f);
+	}
+
+	@Override
+	public boolean livingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
+	    if (event.getCause().equals(DamageCause.ENTITY_ATTACK)) {
+	        cast(Action.LEFT_CLICK_AIR);
+	    }
+
+	    return true;
 	}
 
 	@Override
