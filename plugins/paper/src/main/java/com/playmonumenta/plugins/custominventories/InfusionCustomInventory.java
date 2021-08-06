@@ -102,7 +102,7 @@ public class InfusionCustomInventory extends CustomInventory {
 		ItemStack acumenPannel = new ItemStack(Material.LIME_STAINED_GLASS_PANE, 1);
 		ItemMeta acumenMeta = acumenPannel.getItemMeta();
 		acumenMeta.displayName(Component.text("Acumen", TextColor.fromCSSHexString("#32CD32")).decoration(TextDecoration.BOLD, true).decoration(TextDecoration.ITALIC, false));
-		splitLoreLine(acumenMeta, "Each level of Acumen gives you 1% bonus experience.", MAX_LORE_LENGHT, ChatColor.GRAY);
+		splitLoreLine(acumenMeta, "Each level of Acumen gives you 2% bonus experience.", MAX_LORE_LENGHT, ChatColor.GRAY);
 		acumenPannel.setItemMeta(acumenMeta);
 		mPannelList.add(acumenPannel);
 
@@ -128,7 +128,7 @@ public class InfusionCustomInventory extends CustomInventory {
 			ItemStack pannels = new ItemStack(Material.LIME_STAINED_GLASS_PANE, 1);
 			ItemMeta meta = pannels.getItemMeta();
 			meta.displayName(Component.text("Acumen level " + (i + 1), TextColor.fromCSSHexString("#32CD32")).decoration(TextDecoration.BOLD, true).decoration(TextDecoration.ITALIC, false));
-			splitLoreLine(meta, "You are currently receiving: " + (i + 1) + "% bonus experience.", MAX_LORE_LENGHT, ChatColor.GRAY);
+			splitLoreLine(meta, "You are currently receiving: " + (i + 1) * 2 + "% bonus experience.", MAX_LORE_LENGHT, ChatColor.GRAY);
 			pannels.setItemMeta(meta);
 			acumenPannels.add(pannels);
 		}
