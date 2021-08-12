@@ -25,7 +25,7 @@ import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
-import com.playmonumenta.plugins.depths.abilities.steelsage.DepthsRapidFire;
+import com.playmonumenta.plugins.depths.abilities.steelsage.RapidFire;
 
 import net.md_5.bungee.api.ChatColor;
 
@@ -124,7 +124,7 @@ public class Skyhook extends DepthsAbility {
 
 	@Override
 	public boolean playerShotArrowEvent(AbstractArrow arrow) {
-		if (mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.mLinkedSpell) || arrow.hasMetadata(DepthsRapidFire.META_DATA_TAG)) {
+		if (mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.mLinkedSpell) || arrow.hasMetadata(RapidFire.META_DATA_TAG)) {
 			return true;
 		}
 

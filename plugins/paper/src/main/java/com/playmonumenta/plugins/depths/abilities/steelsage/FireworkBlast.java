@@ -76,6 +76,7 @@ public class FireworkBlast extends DepthsAbility {
 
 		ProjectileLaunchEvent event = new ProjectileLaunchEvent(rocket);
 		Bukkit.getPluginManager().callEvent(event);
+		rocket.setVelocity(rocket.getVelocity().multiply(2));
 
 		new BukkitRunnable() {
 			@Override

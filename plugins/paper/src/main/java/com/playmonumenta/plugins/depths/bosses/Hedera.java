@@ -184,7 +184,7 @@ public class Hedera extends BossAbilityGroup {
 	@Override
 	public void death(EntityDeathEvent event) {
 		PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "playsound minecraft:entity.enderdragon.death master @s ~ ~ ~ 100 0.8");
-		PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "tellraw @s [\"\",{\"text\":\"[Hedera]\",\"color\":\"gold\"},{\"text\":\" No! No! This cannot be! The Broken Beyond must let me flee!\",\"color\":\"green\"}]");
+		PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "tellraw @s [\"\",{\"text\":\"[Hedera]\",\"color\":\"gold\"},{\"text\":\" No! No! This cannot be! The Broken Beyond must let me flee!\",\"color\":\"dark_green\"}]");
 		for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true)) {
 			player.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, 20 * 10, 2));
 			player.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 20 * 10, 2));
@@ -247,7 +247,7 @@ public class Hedera extends BossAbilityGroup {
 			mPlants.get(unluckyPlant).damage(10000);
 			mPlants.remove(unluckyPlant);
 			mPlantTypes.remove(unluckyPlant);
-			PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "tellraw @s [\"\",{\"text\":\"[Hedera]\",\"color\":\"gold\"},{\"text\":\" Consumeth me mine hydrophytes, the vines begone now give me life!\",\"color\":\"green\"}]");
+			PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "tellraw @s [\"\",{\"text\":\"[Hedera]\",\"color\":\"gold\"},{\"text\":\" Consumeth me mine hydrophytes, the vines begone now give me life!\",\"color\":\"dark_green\"}]");
 			//Heal Hedera
 			double amountToHeal = Math.max(.05, .25 - (mTimesHealed * .05));
 			mBoss.setHealth(mBoss.getHealth() + (mBoss.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue() * amountToHeal));

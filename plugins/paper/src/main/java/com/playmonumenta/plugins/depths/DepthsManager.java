@@ -56,6 +56,7 @@ import com.playmonumenta.plugins.depths.abilities.earthbound.EarthenWrath;
 import com.playmonumenta.plugins.depths.abilities.earthbound.Earthquake;
 import com.playmonumenta.plugins.depths.abilities.earthbound.StoneSkin;
 import com.playmonumenta.plugins.depths.abilities.earthbound.Taunt;
+import com.playmonumenta.plugins.depths.abilities.flamecaller.Apocalypse;
 import com.playmonumenta.plugins.depths.abilities.flamecaller.Detonation;
 import com.playmonumenta.plugins.depths.abilities.flamecaller.Fireball;
 import com.playmonumenta.plugins.depths.abilities.flamecaller.FlameSpirit;
@@ -69,24 +70,23 @@ import com.playmonumenta.plugins.depths.abilities.flamecaller.VolcanicMeteor;
 import com.playmonumenta.plugins.depths.abilities.frostborn.Avalanche;
 import com.playmonumenta.plugins.depths.abilities.frostborn.Cryobox;
 import com.playmonumenta.plugins.depths.abilities.frostborn.DepthsFrostNova;
-import com.playmonumenta.plugins.depths.abilities.frostborn.FrostSpear;
-import com.playmonumenta.plugins.depths.abilities.frostborn.Frostbreaker;
-import com.playmonumenta.plugins.depths.abilities.frostborn.FrozenCombos;
+import com.playmonumenta.plugins.depths.abilities.frostborn.FrigidCombos;
 import com.playmonumenta.plugins.depths.abilities.frostborn.FrozenDomain;
-import com.playmonumenta.plugins.depths.abilities.frostborn.IceBurst;
+import com.playmonumenta.plugins.depths.abilities.frostborn.IceBarrier;
 import com.playmonumenta.plugins.depths.abilities.frostborn.IceLance;
-import com.playmonumenta.plugins.depths.abilities.frostborn.IceWall;
+import com.playmonumenta.plugins.depths.abilities.frostborn.Icebreaker;
+import com.playmonumenta.plugins.depths.abilities.frostborn.Permafrost;
+import com.playmonumenta.plugins.depths.abilities.frostborn.PiercingCold;
 import com.playmonumenta.plugins.depths.abilities.shadow.BladeFlurry;
-import com.playmonumenta.plugins.depths.abilities.shadow.BrutalStrike;
+import com.playmonumenta.plugins.depths.abilities.shadow.Brutalize;
 import com.playmonumenta.plugins.depths.abilities.shadow.ChaosDagger;
+import com.playmonumenta.plugins.depths.abilities.shadow.CloakOfShadows;
 import com.playmonumenta.plugins.depths.abilities.shadow.DarkCombos;
+import com.playmonumenta.plugins.depths.abilities.shadow.DeadlyStrike;
 import com.playmonumenta.plugins.depths.abilities.shadow.DepthsAdvancingShadows;
 import com.playmonumenta.plugins.depths.abilities.shadow.Dethroner;
 import com.playmonumenta.plugins.depths.abilities.shadow.DummyDecoy;
-import com.playmonumenta.plugins.depths.abilities.shadow.ShadowDive;
-import com.playmonumenta.plugins.depths.abilities.shadow.ShadowMastery;
 import com.playmonumenta.plugins.depths.abilities.shadow.ShadowSlam;
-import com.playmonumenta.plugins.depths.abilities.steelsage.DepthsRapidFire;
 import com.playmonumenta.plugins.depths.abilities.steelsage.DepthsSharpshooter;
 import com.playmonumenta.plugins.depths.abilities.steelsage.DepthsSplitArrow;
 import com.playmonumenta.plugins.depths.abilities.steelsage.DepthsVolley;
@@ -94,12 +94,14 @@ import com.playmonumenta.plugins.depths.abilities.steelsage.FireworkBlast;
 import com.playmonumenta.plugins.depths.abilities.steelsage.FocusedCombos;
 import com.playmonumenta.plugins.depths.abilities.steelsage.Metalmancy;
 import com.playmonumenta.plugins.depths.abilities.steelsage.ProjectileMastery;
+import com.playmonumenta.plugins.depths.abilities.steelsage.RapidFire;
 import com.playmonumenta.plugins.depths.abilities.steelsage.Scrapshot;
 import com.playmonumenta.plugins.depths.abilities.steelsage.Sidearm;
 import com.playmonumenta.plugins.depths.abilities.windwalker.Aeromancy;
 import com.playmonumenta.plugins.depths.abilities.windwalker.DepthsDodging;
 import com.playmonumenta.plugins.depths.abilities.windwalker.GuardingBolt;
 import com.playmonumenta.plugins.depths.abilities.windwalker.HowlingWinds;
+import com.playmonumenta.plugins.depths.abilities.windwalker.LastBreath;
 import com.playmonumenta.plugins.depths.abilities.windwalker.OneWithTheWind;
 import com.playmonumenta.plugins.depths.abilities.windwalker.RestoringDraft;
 import com.playmonumenta.plugins.depths.abilities.windwalker.Skyhook;
@@ -443,7 +445,7 @@ public class DepthsManager {
 			new FocusedCombos(plugin, null),
 			new Metalmancy(plugin, null),
 			new ProjectileMastery(plugin, null),
-			new DepthsRapidFire(plugin, null),
+			new RapidFire(plugin, null),
 			new Scrapshot(plugin, null),
 			new Sidearm(plugin, null),
 			new DepthsSharpshooter(plugin, null),
@@ -455,6 +457,7 @@ public class DepthsManager {
 			new DepthsDodging(plugin, null),
 			new GuardingBolt(plugin, null),
 			new HowlingWinds(plugin, null),
+			new LastBreath(plugin, null),
 			new OneWithTheWind(plugin, null),
 			new RestoringDraft(plugin, null),
 			new Skyhook(plugin, null),
@@ -465,27 +468,28 @@ public class DepthsManager {
 			//Shadow abilities
 			new DepthsAdvancingShadows(plugin, null),
 			new BladeFlurry(plugin, null),
-			new BrutalStrike(plugin, null),
+			new Brutalize(plugin, null),
 			new ChaosDagger(plugin, null),
 			new DarkCombos(plugin, null),
+			new DeadlyStrike(plugin, null),
 			new Dethroner(plugin, null),
 			new DummyDecoy(plugin, null),
-			new ShadowDive(plugin, null),
-			new ShadowMastery(plugin, null),
+			new CloakOfShadows(plugin, null),
 			new ShadowSlam(plugin, null),
 
 			//Dawnbringer abilities
 			new BottledSunlight(plugin, null),
-			new DepthsRejuvenation(plugin, null),
 			new Enlightenment(plugin, null),
 			new LightningBottle(plugin, null),
 			new RadiantBlessing(plugin, null),
+			new DepthsRejuvenation(plugin, null),
 			new SoothingCombos(plugin, null),
 			new Sundrops(plugin, null),
 			new TotemOfSalvation(plugin, null),
 			new WardOfLight(plugin, null),
 
 			//Flamecaller abilities
+			new Apocalypse(plugin, null),
 			new Detonation(plugin, null),
 			new Fireball(plugin, null),
 			new FlameSpirit(plugin, null),
@@ -500,14 +504,14 @@ public class DepthsManager {
 			// Frostborn abilities
 			new Avalanche(plugin, null),
 			new Cryobox(plugin, null),
-			new Frostbreaker(plugin, null),
+			new FrigidCombos(plugin, null),
 			new DepthsFrostNova(plugin, null),
-			new FrostSpear(plugin, null),
-			new FrozenCombos(plugin, null),
 			new FrozenDomain(plugin, null),
-			new IceWall(plugin, null),
-			new IceBurst(plugin, null),
+			new IceBarrier(plugin, null),
+			new Icebreaker(plugin, null),
 			new IceLance(plugin, null),
+			new Permafrost(plugin, null),
+			new PiercingCold(plugin, null),
 
 			// Earthbound abilities
 			new BrambleShell(plugin, null),
@@ -845,8 +849,8 @@ public class DepthsManager {
 		}
 
 		//If the party is in endless mode and on floor 4+, reduce the chance of utility room
-		//66% chance to remove utility room from the pool if so
-		if (party.mRoomNumber >= 30 && mRandom.nextInt(3) > 0) {
+		//50% chance to remove utility room from the pool if so
+		if (party.mRoomNumber >= 30 && mRandom.nextInt(2) > 0) {
 			values.remove(DepthsRoomType.UTILITY);
 		}
 

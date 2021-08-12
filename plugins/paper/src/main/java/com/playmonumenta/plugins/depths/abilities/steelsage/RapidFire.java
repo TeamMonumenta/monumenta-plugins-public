@@ -34,7 +34,7 @@ import com.playmonumenta.plugins.utils.InventoryUtils;
 
 import net.md_5.bungee.api.ChatColor;
 
-public class DepthsRapidFire extends DepthsAbility {
+public class RapidFire extends DepthsAbility {
 
 	public static final String ABILITY_NAME = "Rapid Fire";
 	public static final int[] ARROWS = {4, 5, 6, 7, 8};
@@ -42,7 +42,7 @@ public class DepthsRapidFire extends DepthsAbility {
 	public static final int COOLDOWN = 18 * 20;
 	public static final String META_DATA_TAG = "RapidFireArrow";
 
-	public DepthsRapidFire(Plugin plugin, Player player) {
+	public RapidFire(Plugin plugin, Player player) {
 		super(plugin, player, ABILITY_NAME);
 		mDisplayItem = Material.REPEATER;
 		mInfo.mLinkedSpell = ClassAbility.RAPIDFIRE;
@@ -112,8 +112,8 @@ public class DepthsRapidFire extends DepthsAbility {
 	@Override
 	public boolean livingEntityShotByPlayerEvent(Projectile proj, LivingEntity le, EntityDamageByEntityEvent event) {
 		ProjectileSource shooter = proj.getShooter();
-		if (proj instanceof Arrow && shooter instanceof Player && le instanceof LivingEntity && proj.hasMetadata(DepthsRapidFire.META_DATA_TAG)) {
-			EntityUtils.damageEntity(mPlugin, le, DepthsRapidFire.DAMAGE, (Player) shooter, MagicType.PHYSICAL, true, mInfo.mLinkedSpell, true, true, true, false);
+		if (proj instanceof Arrow && shooter instanceof Player && le instanceof LivingEntity && proj.hasMetadata(RapidFire.META_DATA_TAG)) {
+			EntityUtils.damageEntity(mPlugin, le, DAMAGE, (Player) shooter, MagicType.PHYSICAL, true, mInfo.mLinkedSpell, true, true, true, false);
 			event.setCancelled(true);
 			proj.remove();
 		}

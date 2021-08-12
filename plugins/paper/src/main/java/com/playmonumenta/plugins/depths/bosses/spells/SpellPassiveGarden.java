@@ -69,7 +69,8 @@ public class SpellPassiveGarden extends Spell {
 
 		//Give a warning if we're 2 seconds before plants spawn
 		if ((mTicks + 40) % PLANT_SPAWN_INTERVAL == 0) {
-			PlayerUtils.executeCommandOnNearbyPlayers(mLauncher.getLocation(), Hedera.detectionRange, "tellraw @s [\"\",{\"text\":\"[Hedera]\",\"color\":\"gold\"},{\"text\":\" Twisting vines, grow and rise! Bring forth ruin, spell demise!\",\"color\":\"green\"}]");
+			mLauncher.getWorld().playSound(mLauncher.getLocation(), Sound.ENTITY_WITCH_CELEBRATE, 1, 1);
+			PlayerUtils.executeCommandOnNearbyPlayers(mLauncher.getLocation(), Hedera.detectionRange, "tellraw @s [\"\",{\"text\":\"[Hedera]\",\"color\":\"gold\"},{\"text\":\" Twisting vines, grow and rise! Bring forth ruin, spell demise!\",\"color\":\"dark_green\"}]");
 		}
 
 		//Also spawn if 2 seconds into the fight

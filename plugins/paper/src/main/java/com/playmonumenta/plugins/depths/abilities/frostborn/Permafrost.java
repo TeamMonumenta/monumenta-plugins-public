@@ -17,14 +17,14 @@ import com.playmonumenta.plugins.utils.InventoryUtils;
 
 import net.md_5.bungee.api.ChatColor;
 
-public class IceBurst extends DepthsAbility {
+public class Permafrost extends DepthsAbility {
 
 	public static final String ABILITY_NAME = "Permafrost";
 	public static final int[] ICE_TICKS = {8 * 20, 11 * 20, 14 * 20, 17 * 20, 20 * 20};
 
 	public static String tree;
 
-	public IceBurst(Plugin plugin, Player player) {
+	public Permafrost(Plugin plugin, Player player) {
 		super(plugin, player, ABILITY_NAME);
 		mDisplayItem = Material.QUARTZ;
 		mTree = DepthsTree.FROSTBORN;

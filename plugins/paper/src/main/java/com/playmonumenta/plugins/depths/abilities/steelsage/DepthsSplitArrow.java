@@ -43,7 +43,7 @@ public class DepthsSplitArrow extends DepthsAbility {
 	@Override
 	public boolean livingEntityShotByPlayerEvent(Projectile proj, LivingEntity le, EntityDamageByEntityEvent event) {
 		LivingEntity damagee = le;
-		if ((proj instanceof Arrow || proj instanceof SpectralArrow) && !proj.hasMetadata(DepthsRapidFire.META_DATA_TAG)) {
+		if ((proj instanceof Arrow || proj instanceof SpectralArrow) && !proj.hasMetadata(RapidFire.META_DATA_TAG)) {
 			LivingEntity nearestMob = EntityUtils.getNearestMob(damagee.getLocation(), SPLIT_ARROW_CHAIN_RANGE, damagee);
 
 			if (nearestMob != null && !nearestMob.getScoreboardTags().contains(AbilityUtils.IGNORE_TAG)) {

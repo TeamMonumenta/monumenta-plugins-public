@@ -13,12 +13,12 @@ import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
 
 import net.md_5.bungee.api.ChatColor;
 
-public class ShadowMastery extends DepthsAbility {
+public class DeadlyStrike extends DepthsAbility {
 
 	public static final String ABILITY_NAME = "Deadly Strike";
 	public static final double[] DAMAGE = {1.10, 1.125, 1.15, 1.175, 1.2};
 
-	public ShadowMastery(Plugin plugin, Player player) {
+	public DeadlyStrike(Plugin plugin, Player player) {
 		super(plugin, player, ABILITY_NAME);
 		mDisplayItem = Material.BLACK_CONCRETE_POWDER;
 		mTree = DepthsTree.SHADOWS;

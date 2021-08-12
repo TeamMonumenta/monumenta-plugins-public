@@ -21,13 +21,13 @@ import com.playmonumenta.plugins.utils.PotionUtils;
 
 import net.md_5.bungee.api.ChatColor;
 
-public class Frostbreaker extends DepthsAbility {
+public class Icebreaker extends DepthsAbility {
 
 	public static final String ABILITY_NAME = "Icebreaker";
 	public static final double[] ICE_DAMAGE = {1.24, 1.28, 1.32, 1.36, 1.40};
 	public static final double[] EFFECT_DAMAGE = {1.18, 1.21, 1.24, 1.27, 1.30};
 
-	public Frostbreaker(Plugin plugin, Player player) {
+	public Icebreaker(Plugin plugin, Player player) {
 		super(plugin, player, ABILITY_NAME);
 		mDisplayItem = Material.TUBE_CORAL_FAN;
 		mTree = DepthsTree.FROSTBORN;

@@ -45,13 +45,15 @@ public class DepthsRemoveAbilityGUI extends CustomInventory {
 	public DepthsRemoveAbilityGUI(Player targetPlayer) {
 		super(targetPlayer, 54, "Remove an Ability");
 
-		TRIGGER_STRINGS.add(new TriggerData(19, DepthsTrigger.COMBO, "No Combo ability!"));
-		TRIGGER_STRINGS.add(new TriggerData(20, DepthsTrigger.RIGHT_CLICK, "No Right Click ability!"));
-		TRIGGER_STRINGS.add(new TriggerData(21, DepthsTrigger.SHIFT_LEFT_CLICK, "No Sneak Left Click ability!"));
-		TRIGGER_STRINGS.add(new TriggerData(22, DepthsTrigger.SHIFT_RIGHT_CLICK, "No Sneak Right Click ability!"));
+		TRIGGER_STRINGS.add(new TriggerData(18, DepthsTrigger.COMBO, "No Combo ability!"));
+		TRIGGER_STRINGS.add(new TriggerData(19, DepthsTrigger.RIGHT_CLICK, "No Right Click ability!"));
+		TRIGGER_STRINGS.add(new TriggerData(20, DepthsTrigger.SHIFT_LEFT_CLICK, "No Sneak Left Click ability!"));
+		TRIGGER_STRINGS.add(new TriggerData(21, DepthsTrigger.SHIFT_RIGHT_CLICK, "No Sneak Right Click ability!"));
+		//empty space to be even
 		TRIGGER_STRINGS.add(new TriggerData(23, DepthsTrigger.SPAWNER, "No Spawner Break ability!"));
 		TRIGGER_STRINGS.add(new TriggerData(24, DepthsTrigger.SHIFT_BOW, "No Sneak Bow ability!"));
 		TRIGGER_STRINGS.add(new TriggerData(25, DepthsTrigger.SWAP, "No Swap ability!"));
+		TRIGGER_STRINGS.add(new TriggerData(26, DepthsTrigger.LIFELINE, "No Lifeline ability!"));
 
 		for (int i = 0; i < 54; i++) {
 			_inventory.setItem(i, new ItemStack(FILLER, 1));

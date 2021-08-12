@@ -34,7 +34,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.md_5.bungee.api.ChatColor;
 
-public class ShadowDive extends DepthsAbility {
+public class CloakOfShadows extends DepthsAbility {
 
 	public static final String ABILITY_NAME = "Cloak of Shadows";
 	public static final int COOLDOWN = 20 * 15;
@@ -48,13 +48,13 @@ public class ShadowDive extends DepthsAbility {
 
 	private boolean mBonusDamage = false;
 
-	public ShadowDive(Plugin plugin, Player player) {
+	public CloakOfShadows(Plugin plugin, Player player) {
 		super(plugin, player, ABILITY_NAME);
 		mDisplayItem = Material.BLACK_CONCRETE;
 		mTree = DepthsTree.SHADOWS;
 		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;
 		mInfo.mCooldown = COOLDOWN;
-		mInfo.mLinkedSpell = ClassAbility.SHADOW_DIVE;
+		mInfo.mLinkedSpell = ClassAbility.CLOAK_OF_SHADOWS;
 		mInfo.mIgnoreCooldown = true;
 	}
 

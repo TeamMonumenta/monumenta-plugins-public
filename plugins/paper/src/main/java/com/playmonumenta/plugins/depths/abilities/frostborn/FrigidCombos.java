@@ -19,7 +19,7 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 
 import net.md_5.bungee.api.ChatColor;
 
-public class FrozenCombos extends DepthsAbility {
+public class FrigidCombos extends DepthsAbility {
 
 	public static final String ABILITY_NAME = "Frigid Combos";
 	public static final int TIME = 2 * 20;
@@ -29,7 +29,7 @@ public class FrozenCombos extends DepthsAbility {
 
 	private int mComboCount = 0;
 
-	public FrozenCombos(Plugin plugin, Player player) {
+	public FrigidCombos(Plugin plugin, Player player) {
 		super(plugin, player, ABILITY_NAME);
 		mDisplayItem = Material.BLUE_DYE;
 		mTree = DepthsTree.FROSTBORN;

@@ -148,6 +148,7 @@ public enum ClassAbility {
 	// [DEPTHS ABILITIES]
 
 	// FLAMECALLER
+	APOCALYPSE("Apocalypse"),
 	FIREBALL("Fireball"),
 	RING_OF_FLAMES("Ring of Flames"),
 	FLAMESTRIKE("Flamestrike"),
@@ -163,6 +164,7 @@ public enum ClassAbility {
 
 	// WINDWALKER
 	GUARDING_BOLT("Guarding Bolt"),
+	LAST_BREATH("Last Breath"),
 	SKYHOOK("Skyhook"),
 	SLIPSTREAM("Slipstream"),
 	UPDRAFT("Updraft"),
@@ -171,7 +173,7 @@ public enum ClassAbility {
 
 	// SHADOW
 	BLADE_FLURRY("Blade Flurry"),
-	SHADOW_DIVE("Cloak of Shadows"),
+	CLOAK_OF_SHADOWS("Cloak of Shadows"),
 	CHAOS_DAGGER("Chaos Dagger"),
 	DUMMY_DECOY("Dummy Decoy"),
 
@@ -184,9 +186,9 @@ public enum ClassAbility {
 
 	// FROSTBORN
 	ICE_LANCE("Ice Lance"),
-	ICE_WALL("Ice Barrier"),
+	ICE_BARRIER("Ice Barrier"),
 	AVALANCHE("Avalanche"),
-	FROST_SPEAR("Piercing Cold"),
+	PIERCING_COLD("Piercing Cold"),
 	CRYOBOX("Cryobox"),
 
 	// EARTHBORN

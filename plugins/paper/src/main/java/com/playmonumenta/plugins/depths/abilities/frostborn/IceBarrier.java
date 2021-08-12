@@ -25,7 +25,7 @@ import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
 
 import net.md_5.bungee.api.ChatColor;
 
-public class IceWall extends DepthsAbility {
+public class IceBarrier extends DepthsAbility {
 
 	public static final String ABILITY_NAME = "Ice Barrier";
 	public static final int[] ICE_TICKS = {8 * 20, 10 * 20, 12 * 20, 14 * 20, 16 * 20};
@@ -37,13 +37,13 @@ public class IceWall extends DepthsAbility {
 	public boolean mIsPrimed;
 	public Location mPrimedLoc;
 
-	public IceWall(Plugin plugin, Player player) {
+	public IceBarrier(Plugin plugin, Player player) {
 		super(plugin, player, ABILITY_NAME);
 		mDisplayItem = Material.PRISMARINE_WALL;
 		mTree = DepthsTree.FROSTBORN;
 		mInfo.mCooldown = (mRarity == 0) ? 20 * 20 : COOLDOWN[mRarity - 1];
 		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
-		mInfo.mLinkedSpell = ClassAbility.ICE_WALL;
+		mInfo.mLinkedSpell = ClassAbility.ICE_BARRIER;
 		mInfo.mIgnoreCooldown = true;
 		mIsPrimed = false;
 		mPrimedLoc = null;

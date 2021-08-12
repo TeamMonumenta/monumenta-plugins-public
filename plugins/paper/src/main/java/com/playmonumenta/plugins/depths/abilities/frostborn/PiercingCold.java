@@ -32,7 +32,7 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 
 import net.md_5.bungee.api.ChatColor;
 
-public class FrostSpear extends DepthsAbility {
+public class PiercingCold extends DepthsAbility {
 
 	public static final String ABILITY_NAME = "Piercing Cold";
 	public static final int[] DAMAGE = {14, 17, 20, 23, 26};
@@ -44,12 +44,12 @@ public class FrostSpear extends DepthsAbility {
 
 	public static String tree;
 
-	public FrostSpear(Plugin plugin, Player player) {
+	public PiercingCold(Plugin plugin, Player player) {
 		super(plugin, player, ABILITY_NAME);
 		mDisplayItem = Material.PRISMARINE_SHARD;
 		mTree = DepthsTree.FROSTBORN;
 		mInfo.mCooldown = COOLDOWN;
-		mInfo.mLinkedSpell = ClassAbility.FROST_SPEAR;
+		mInfo.mLinkedSpell = ClassAbility.PIERCING_COLD;
 	}
 
 	public void execute() {

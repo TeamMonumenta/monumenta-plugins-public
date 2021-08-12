@@ -32,6 +32,7 @@ import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.player.PlayerExpChangeEvent;
+import org.bukkit.event.player.PlayerItemDamageEvent;
 import org.bukkit.projectiles.ProjectileSource;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
@@ -308,6 +309,17 @@ public class DepthsListener implements Listener {
 					}
 					DepthsManager.getInstance().playerBrokeSpawner(p, loc);
 				}
+			}
+		}
+	}
+
+	@EventHandler(priority = EventPriority.LOW)
+	public void playerItemDamageEvent(PlayerItemDamageEvent event) {
+		DepthsManager manager = DepthsManager.getInstance();
+		if (manager.isInSystem(event.getPlayer())) {
+			DepthsPlayer dp = manager.mPlayers.get(event.getPlayer().getUniqueId());
+			if (manager.getPartyFromId(dp).getRoomNumber() % 10 == 0) {
+				event.setCancelled(true);
 			}
 		}
 	}

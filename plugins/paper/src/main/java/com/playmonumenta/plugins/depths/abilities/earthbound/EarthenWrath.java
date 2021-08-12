@@ -6,10 +6,13 @@ import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
+import org.bukkit.projectiles.ProjectileSource;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
@@ -123,7 +126,21 @@ public class EarthenWrath extends DepthsAbility {
 	}
 
 	public void damagedEntity(Player player, EntityDamageByEntityEvent event) {
-		if (AbilityUtils.isBlocked(event) || !(event.getDamager() instanceof LivingEntity)) {
+		if (AbilityUtils.isBlocked(event)) {
+			return;
+		}
+
+		Entity damager = event.getDamager();
+		LivingEntity realDamager = null;
+		if (damager instanceof LivingEntity) {
+			realDamager = (LivingEntity) damager;
+		} else if (damager instanceof Projectile) {
+			ProjectileSource source = ((Projectile) damager).getShooter();
+			if (source instanceof LivingEntity) {
+				realDamager = (LivingEntity) source;
+			}
+		}
+		if (realDamager == null) {
 			return;
 		}
 
@@ -142,7 +159,7 @@ public class EarthenWrath extends DepthsAbility {
 
 			//EntityUtils.damageEntity(mPlugin, mPlayer, event.getDamage() * (1 - PERCENT_DAMAGE_REDUCTION[mRarity - 1]), null, MagicType.PHYSICAL, true, null);
 			Vector velocity = mPlayer.getVelocity();
-			BossUtils.bossDamage((LivingEntity) event.getDamager(), mPlayer, event.getDamage() * (1 - PERCENT_DAMAGE_REDUCTION[mRarity - 1]));
+			BossUtils.bossDamage(realDamager, mPlayer, event.getDamage() * (1 - PERCENT_DAMAGE_REDUCTION[mRarity - 1]));
 			mPlayer.setVelocity(velocity);
 
 			World world = mPlayer.getWorld();

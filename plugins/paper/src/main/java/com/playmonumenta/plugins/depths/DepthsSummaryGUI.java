@@ -51,13 +51,14 @@ public class DepthsSummaryGUI extends CustomInventory {
 		super(requestingPlayer, 54, "Current Abilities");
 
 		TRIGGER_STRINGS.add(new TriggerData(9, DepthsTrigger.WEAPON_ASPECT, "No Weapon Aspect!"));
-		TRIGGER_STRINGS.add(new TriggerData(11, DepthsTrigger.COMBO, "No Combo ability!"));
-		TRIGGER_STRINGS.add(new TriggerData(12, DepthsTrigger.RIGHT_CLICK, "No Right Click ability!"));
-		TRIGGER_STRINGS.add(new TriggerData(13, DepthsTrigger.SHIFT_LEFT_CLICK, "No Sneak Left Click ability!"));
-		TRIGGER_STRINGS.add(new TriggerData(14, DepthsTrigger.SHIFT_RIGHT_CLICK, "No Sneak Right Click ability!"));
-		TRIGGER_STRINGS.add(new TriggerData(15, DepthsTrigger.SPAWNER, "No Spawner Break ability!"));
-		TRIGGER_STRINGS.add(new TriggerData(16, DepthsTrigger.SHIFT_BOW, "No Sneak Bow ability!"));
-		TRIGGER_STRINGS.add(new TriggerData(17, DepthsTrigger.SWAP, "No Swap ability!"));
+		TRIGGER_STRINGS.add(new TriggerData(10, DepthsTrigger.COMBO, "No Combo ability!"));
+		TRIGGER_STRINGS.add(new TriggerData(11, DepthsTrigger.RIGHT_CLICK, "No Right Click ability!"));
+		TRIGGER_STRINGS.add(new TriggerData(12, DepthsTrigger.SHIFT_LEFT_CLICK, "No Sneak Left Click ability!"));
+		TRIGGER_STRINGS.add(new TriggerData(13, DepthsTrigger.SHIFT_RIGHT_CLICK, "No Sneak Right Click ability!"));
+		TRIGGER_STRINGS.add(new TriggerData(14, DepthsTrigger.SPAWNER, "No Spawner Break ability!"));
+		TRIGGER_STRINGS.add(new TriggerData(15, DepthsTrigger.SHIFT_BOW, "No Sneak Bow ability!"));
+		TRIGGER_STRINGS.add(new TriggerData(16, DepthsTrigger.SWAP, "No Swap ability!"));
+		TRIGGER_STRINGS.add(new TriggerData(17, DepthsTrigger.LIFELINE, "No Lifeline ability!"));
 
 		for (int i = 0; i < 54; i++) {
 			_inventory.setItem(i, new ItemStack(FILLER, 1));

@@ -50,7 +50,7 @@ public class HowlingWinds extends DepthsAbility {
 	@Override
 	public void playerSwapHandItemsEvent(PlayerSwapHandItemsEvent event) {
 		event.setCancelled(true);
-		if (!isTimerActive()) {
+		if (!isTimerActive() && DepthsUtils.isWeaponItem(mPlayer.getInventory().getItemInMainHand())) {
 			putOnCooldown();
 
 			Location loc = mPlayer.getEyeLocation();

@@ -17,6 +17,7 @@ import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
+import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.AbsorptionUtils;
@@ -124,7 +125,7 @@ public class Cryobox extends DepthsAbility {
 		world.spawnParticle(Particle.FIREWORKS_SPARK, center.clone().add(0, 1.15, 0), 150, 0.2, 0.35, 0.2, 0.5);
 		world.spawnParticle(Particle.SPELL_INSTANT, center.clone().add(0, 1.15, 0), 100, 0.2, 0.35, 0.2, 1);
 		world.playSound(center, Sound.ITEM_TOTEM_USE, 1, 1.35f);
-		MessagingUtils.sendActionBarMessage(mPlugin, mPlayer, "Cryobox has been activated");
+		MessagingUtils.sendActionBarMessage(mPlugin, mPlayer, "Cryobox has been activated!");
 
 		if (dealDamageLater) {
 			mPlayer.setHealth(1);
@@ -159,12 +160,17 @@ public class Cryobox extends DepthsAbility {
 
 	@Override
 	public String getDescription(int rarity) {
-		return "When your health drops below " + TRIGGER_HEALTH / 2 + " hearts, gain Absorption " + DepthsUtils.getRarityColor(rarity) + (ABSORPTION[rarity - 1] + 1) + ChatColor.WHITE + " for " + DURATION / 20 + " seconds, knock enemies away, and encase yourself in a cage of ice. Cooldown: " + COOLDOWN / 20 + "s.";
+		return "When your health drops below " + TRIGGER_HEALTH / 2 + " hearts, gain Absorption " + DepthsUtils.getRarityColor(rarity) + (ABSORPTION[rarity - 1] + 1) + ChatColor.WHITE + " for " + DURATION / 20 + " seconds, knock enemies away, and encase yourself in a cage of ice for " + ICE_DURATION / 20 + " seconds. Cooldown: " + COOLDOWN / 20 + "s.";
 	}
 
 	@Override
 	public DepthsTree getDepthsTree() {
 		return DepthsTree.FROSTBORN;
+	}
+
+	@Override
+	public DepthsTrigger getTrigger() {
+		return DepthsTrigger.LIFELINE;
 	}
 }
 

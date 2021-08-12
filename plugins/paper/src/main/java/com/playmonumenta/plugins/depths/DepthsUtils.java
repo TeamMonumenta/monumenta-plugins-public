@@ -52,6 +52,26 @@ public class DepthsUtils {
 	public static final int WINDWALKER = 0xc0dea9;
 	public static final int SHADOWS = 0x7948af;
 
+	public static final DepthsTree[] TREES = {
+			DepthsTree.SUNLIGHT,
+			DepthsTree.EARTHBOUND,
+			DepthsTree.FLAMECALLER,
+			DepthsTree.FROSTBORN,
+			DepthsTree.SHADOWS,
+			DepthsTree.METALLIC,
+			DepthsTree.WINDWALKER
+	};
+
+	public static final String[] TREE_NAMES = {
+			"Dawnbringer",
+			"Earthbound",
+			"Flamecaller",
+			"Frostborn",
+			"Shadowdancer",
+			"Steelsage",
+			"Windwalker"
+	};
+
 	//Text that gets displayed by players getting messages
 	public static final String DEPTHS_MESSAGE_PREFIX = ChatColor.DARK_PURPLE + "[Depths Party] " + ChatColor.LIGHT_PURPLE;
 

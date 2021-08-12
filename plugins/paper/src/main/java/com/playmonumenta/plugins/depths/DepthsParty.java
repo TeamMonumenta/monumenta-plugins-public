@@ -387,6 +387,10 @@ public class DepthsParty {
 		return ((mRoomNumber - 1) / 10) + 1;
 	}
 
+	public int getRoomNumber() {
+		return mRoomNumber;
+	}
+
 	//Sends player to, and fills, the next open loot room
 	public void populateLootRoom(Player p, boolean victory) {
 		if (mLootRoomsUsed >= 4) {

@@ -10,6 +10,8 @@ import org.bukkit.entity.IronGolem;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
@@ -31,8 +33,10 @@ public class Updraft extends DepthsAbility {
 	public static final String ABILITY_NAME = "Updraft";
 	public static final int COOLDOWN = 8 * 20;
 	private static final int RADIUS = 3;
-	private static final float[] KNOCKBACK_SPEED = {0.7f, 0.9f, 1.1f, 1.3f, 1.5f};
-	private static final String[] DESC_VALUES = {"4", "5", "6", "7", "8"};
+	private static final double[] KNOCKBACK_SPEED = {0.7, 0.9, 1.1, 1.3, 1.5};
+	private static final int SLOW_FALLING_LEVEL = 0;
+	private static final double[] VULNERABILITY = {0.15, 0.175, 0.2, 0.225, 0.25};
+	private static final int DURATION = 5 * 20;
 
 	public Updraft(Plugin plugin, Player player) {
 		super(plugin, player, ABILITY_NAME);
@@ -70,7 +74,9 @@ public class Updraft extends DepthsAbility {
 		for (LivingEntity e : EntityUtils.getNearbyMobs(loc, RADIUS, mPlayer)) {
 			if (!e.getName().contains("Dionaea")) {
 				launch(e);
+				e.addPotionEffect(new PotionEffect(PotionEffectType.SLOW_FALLING, DURATION, SLOW_FALLING_LEVEL));
 			}
+			EntityUtils.applyVulnerability(mPlugin, DURATION, VULNERABILITY[mRarity - 1], e);
 		}
 		for (Player p : PlayerUtils.playersInRange(loc, RADIUS, true)) {
 			launch(p);
@@ -93,7 +99,7 @@ public class Updraft extends DepthsAbility {
 
 	@Override
 	public String getDescription(int rarity) {
-		return "Right click while sneaking to push players and enemies within a " + RADIUS + " block radius of you upwards by " + DepthsUtils.getRarityColor(rarity) + DESC_VALUES[rarity - 1] + ChatColor.WHITE + " blocks. Cooldown: " + COOLDOWN / 20 + "s.";
+		return "Right click while sneaking to push players and enemies within a " + RADIUS + " block radius of you upwards with a velocity of " + DepthsUtils.getRarityColor(rarity) + KNOCKBACK_SPEED[rarity - 1] + ChatColor.WHITE + ". Affected mobs are applied Slow Falling " + SLOW_FALLING_LEVEL + 1 + " and " + DepthsUtils.getRarityColor(rarity) + DepthsUtils.roundPercent(VULNERABILITY[rarity - 1]) + "%" + ChatColor.WHITE + " vulnerability for " + DURATION / 20 + " seconds. Cooldown: " + COOLDOWN / 20 + "s.";
 	}
 
 	@Override
