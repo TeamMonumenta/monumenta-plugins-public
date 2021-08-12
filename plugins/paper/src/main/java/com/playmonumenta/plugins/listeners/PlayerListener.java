@@ -120,6 +120,7 @@ import com.playmonumenta.plugins.enchantments.ThunderAspect;
 import com.playmonumenta.plugins.enchantments.curses.CurseOfEphemerality;
 import com.playmonumenta.plugins.enchantments.evasions.EvasionInfo;
 import com.playmonumenta.plugins.enchantments.infusions.Focus;
+import com.playmonumenta.plugins.enchantments.infusions.delves.Choler;
 import com.playmonumenta.plugins.events.AbilityCastEvent;
 import com.playmonumenta.plugins.events.EvasionEvent;
 import com.playmonumenta.plugins.point.Point;
@@ -1156,7 +1157,7 @@ public class PlayerListener implements Listener {
 					Focus.onShootAttack(mPlugin, proj, le, event);
 					Spark.onShootAttack(mPlugin, proj, le, event);
 					Regicide.onShootAttack(mPlugin, proj, le, event);
-
+					Choler.onShootAttack(mPlugin, proj, le, event);
 
 					if (damager instanceof Trident) {
 						IceAspect.onShootAttack(mPlugin, proj, le, event);

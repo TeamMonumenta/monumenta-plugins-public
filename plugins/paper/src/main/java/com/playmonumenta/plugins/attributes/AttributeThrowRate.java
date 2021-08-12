@@ -24,6 +24,7 @@ import com.playmonumenta.plugins.enchantments.RegionScalingDamageDealt;
 import com.playmonumenta.plugins.enchantments.ThunderAspect;
 import com.playmonumenta.plugins.enchantments.curses.TwoHanded;
 import com.playmonumenta.plugins.enchantments.infusions.Focus;
+import com.playmonumenta.plugins.utils.DelveInfusionUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.NmsUtils;
@@ -107,6 +108,10 @@ public class AttributeThrowRate implements BaseAttribute {
 				int regicideLevel = plugin.mTrackingManager.mPlayers.getPlayerCustomEnchantLevel(player, Regicide.class);
 				if (regicideLevel > 0) {
 					newProj.setMetadata(Regicide.LEVEL_METAKEY, new FixedMetadataValue(plugin, regicideLevel));
+				}
+				double cholerLevel = DelveInfusionUtils.getModifiedLevel(plugin, player, plugin.mTrackingManager.mPlayers.getPlayerCustomEnchantLevel(player, Regicide.class));
+				if (regicideLevel > 0) {
+					newProj.setMetadata(Regicide.LEVEL_METAKEY, new FixedMetadataValue(plugin, cholerLevel));
 				}
 
 				// Set a bunch of stuff that isn't caught by the entity duplication
