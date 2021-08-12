@@ -23,7 +23,7 @@ import com.playmonumenta.plugins.effects.FlatDamageDealt;
 import com.playmonumenta.plugins.effects.PercentDamageDealt;
 import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.utils.ItemUtils;
 
 public class PowerInjection extends Ability {
 
@@ -56,7 +56,7 @@ public class PowerInjection extends Ability {
 		mInfo.mLinkedSpell = ClassAbility.POWER_INJECTION;
 		mInfo.mScoreboardId = "PowerInjection";
 		mInfo.mShorthandName = "PI";
-		mInfo.mDescriptions.add("Left-clicking while holding an Alchemist Potion gives you +15% speed, +1 melee damage, and +15% melee damage for 15 seconds. If you were looking at another player, also give that player the effects. Cooldown: 30s.");
+		mInfo.mDescriptions.add("Left-clicking while holding an Alchemist Utensil gives you +15% speed, +1 melee damage, and +15% melee damage for 15 seconds. If you were looking at another player, also give that player the effects. Cooldown: 30s.");
 		mInfo.mDescriptions.add("Give +3 melee damage and +30% melee damage instead.");
 		mInfo.mCooldown = COOLDOWN;
 		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;
@@ -113,7 +113,7 @@ public class PowerInjection extends Ability {
 	@Override
 	public boolean runCheck() {
 		ItemStack inMainHand = mPlayer.getInventory().getItemInMainHand();
-		if (InventoryUtils.testForItemWithName(inMainHand, "Alchemist's Potion")) {
+		if (ItemUtils.isAlchemistItem(inMainHand)) {
 			LivingEntity targetEntity = EntityUtils.getEntityAtCursor(mPlayer, CAST_RANGE, true, true, true);
 			if (targetEntity instanceof Player && ((Player) targetEntity).getGameMode() != GameMode.SPECTATOR) {
 				mTargetPlayer = (Player) targetEntity;

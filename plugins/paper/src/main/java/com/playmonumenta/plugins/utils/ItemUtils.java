@@ -483,7 +483,9 @@ public class ItemUtils {
 				ItemMeta meta = item.getItemMeta();
 				if (meta.hasDisplayName()) {
 					String name = meta.getDisplayName();
-					if (name.contains("Experiencinator")) {
+					if (name.contains("Alchemist's Bag")) {
+						return ItemRegion.KINGS_VALLEY;
+					} else if (name.contains("Experiencinator")) {
 						return ItemRegion.KINGS_VALLEY;
 					} else if (name.contains("Crystallizer")) {
 						return ItemRegion.CELSIAN_ISLES;
@@ -520,7 +522,9 @@ public class ItemUtils {
 			ItemMeta meta = item.getItemMeta();
 			if (meta.hasDisplayName()) {
 				String itemName = meta.getDisplayName();
-				if (itemName.contains("Experiencinator (u)")) {
+				if (itemName.contains("Alchemist's Bag")) {
+					return ItemTier.RARE;
+				} else if (itemName.contains("Experiencinator (u)")) {
 					return ItemTier.ENHANCED_RARE;
 				} else if (itemName.contains("Experiencinator")) {
 					return ItemTier.RARE;
@@ -1307,6 +1311,22 @@ public class ItemUtils {
 
 	}
 
+	public static boolean isAlchemistItem(@NotNull ItemStack itemStack) {
+		if (itemStack != null) {
+			if (isItemShattered(itemStack)) {
+				return false;
+			}
+
+			@NotNull List<@NotNull String> loreLines = getPlainLore(itemStack);
+			for (@NotNull String loreLine : loreLines) {
+				if (loreLine.contains("* Alchemical Utensil *")) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
 	public static boolean isPickaxe(@NotNull ItemStack itemStack) {
 		if (itemStack != null) {
 			return Materials.PICKAXES.contains(itemStack.getType());
@@ -1384,6 +1404,7 @@ public class ItemUtils {
 			                          loreStripped.contains("Monumenta :") ||
 			                          loreStripped.contains("Armor") ||
 			                          loreStripped.contains("Magic Wand") ||
+									  loreStripped.contains("Alchemical Utensil") ||
 			                          loreStripped.isEmpty())) {
 				newLore.add(ChatColor.GRAY + enchantment);
 				enchantmentFound = true;

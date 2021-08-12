@@ -21,8 +21,8 @@ import org.bukkit.attribute.Attribute;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.classes.ClassAbility;
-import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
@@ -32,6 +32,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 
 import com.playmonumenta.plugins.effects.PercentDamageDealt;
+import com.playmonumenta.plugins.effects.PercentRegeneration;
 
 public class Bezoar extends Ability {
 	private static final int FREQUENCY = 5;
@@ -89,20 +90,12 @@ public class Bezoar extends Ability {
 							}
 						}
 
-						new BukkitRunnable() {
-							int mTicks = 0;
-							@Override
-							public void run() {
-								if (mTicks % 20 == 0) {
-									double maxHealth = p.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue();
-									PlayerUtils.healPlayer(p, HEAL_PERCENT * maxHealth);
-								}
-								if (mTicks >= HEAL_DURATION) {
-									this.cancel();
-								}
-								mTicks++;
-							}
-						}.runTaskTimer(mPlugin, 0, 1);
+						double maxHealth = p.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue();
+						//if the player has the effect refresh the duration
+						if (mPlugin.mEffectManager.hasEffect(p, "BezoarHealing")) {
+							mPlugin.mEffectManager.clearEffects(p, "BezoarHealing");
+						}
+						mPlugin.mEffectManager.addEffect(p, "BezoarHealing", new PercentRegeneration(HEAL_DURATION, maxHealth * HEAL_PERCENT));
 
 						if (getAbilityScore() > 1) {
 							mPlugin.mEffectManager.addEffect(p, "BezoarAbilityDamage", new PercentDamageDealt(DAMAGE_DURATION, DAMAGE_PERCENT, AFFECTED_DAMAGE_CAUSES));
@@ -118,26 +111,20 @@ public class Bezoar extends Ability {
 						}
 					}
 
-					new BukkitRunnable() {
-						int mTicks = 0;
-						@Override
-						public void run() {
-							if (mTicks % 20 == 0) {
-								double maxHealth = mPlayer.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue();
-								PlayerUtils.healPlayer(mPlayer, HEAL_PERCENT * maxHealth);
-							}
-							if (mTicks >= HEAL_DURATION) {
-								this.cancel();
-							}
-							mTicks++;
-						}
-					}.runTaskTimer(mPlugin, 0, 1);
+					double maxHealth = mPlayer.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue();
+					if (mPlugin.mEffectManager.hasEffect(mPlayer, "BezoarHealing")) {
+						mPlugin.mEffectManager.clearEffects(mPlayer, "BezoarHealing");
+					}
+					mPlugin.mEffectManager.addEffect(mPlayer, "BezoarHealing", new PercentRegeneration(HEAL_DURATION, maxHealth * HEAL_PERCENT));
 
 					if (getAbilityScore() > 1) {
-						mPlugin.mEffectManager.addEffect(p, "BezoarAbilityDamage", new PercentDamageDealt(DAMAGE_DURATION, DAMAGE_PERCENT, AFFECTED_DAMAGE_CAUSES));
+						mPlugin.mEffectManager.addEffect(mPlayer, "BezoarAbilityDamage", new PercentDamageDealt(DAMAGE_DURATION, DAMAGE_PERCENT, AFFECTED_DAMAGE_CAUSES));
 					}
 
-					AbilityUtils.addAlchemistPotions(mPlayer, 1);
+					Ability alchemistPotion = AbilityManager.getManager().getPlayerAbility(mPlayer, AlchemistPotions.class);
+					if (alchemistPotion != null) {
+						((AlchemistPotions) alchemistPotion).incrementCharge();
+					}
 
 					item.remove();
 

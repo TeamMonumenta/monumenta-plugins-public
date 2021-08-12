@@ -9,10 +9,10 @@ import com.playmonumenta.scriptedquests.utils.MessagingUtils;
 
 public class MultipleChargeAbility extends Ability {
 
-	private int mMaxCharges;
+	protected int mMaxCharges;
 
-	private int mCharges;
-	private boolean mWasOnCooldown;
+	protected int mCharges;
+	protected boolean mWasOnCooldown;
 
 	public MultipleChargeAbility(Plugin plugin, Player player,
 			String displayName, int maxCharges1, int maxCharges2) {
@@ -88,4 +88,7 @@ public class MultipleChargeAbility extends Ability {
 		manageChargeCooldowns();
 	}
 
+	public int getCharges() {
+		return mCharges;
+	}
 }

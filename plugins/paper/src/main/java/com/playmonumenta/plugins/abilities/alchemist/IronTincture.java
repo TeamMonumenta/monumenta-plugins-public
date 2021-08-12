@@ -68,6 +68,7 @@ public class IronTincture extends Ability {
 		ItemStack mainHand = mPlayer.getInventory().getItemInMainHand();
 		return mPlayer.isSneaking()
 		       && !ItemUtils.isSomeBow(mainHand)
+			   && !ItemUtils.isAlchemistItem(mainHand)
 		       && mainHand.getType() != Material.SPLASH_POTION
 		       && mainHand.getType() != Material.LINGERING_POTION
 		       && !mainHand.getType().isBlock();

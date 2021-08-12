@@ -285,7 +285,7 @@ public class EntityUtils {
 					mob.getWorld().spawnParticle(Particle.REDSTONE, l, 2, 0, 0, 0, CONFUSION_COLOR);
 
 					if (mob.getTarget() == null) {
-						mob.setTarget(getNearestMob(mob.getLocation(), 8));
+						mob.setTarget(getNearestMob(mob.getLocation(), 8, mob));
 					}
 
 					if (confused.getValue() <= 0 || mob.isDead() || !mob.isValid()) {

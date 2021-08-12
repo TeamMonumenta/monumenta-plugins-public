@@ -18,7 +18,6 @@ import com.playmonumenta.plugins.utils.PlayerUtils;
 
 public class InvigoratingOdor extends PotionAbility {
 
-	private static final double INVIGORATING_POTION_CHANCE = 0.25;
 	private static final int INVIGORATING_1_DAMAGE = 1;
 	private static final int INVIGORATING_2_DAMAGE = 2;
 	private static final int INVIGORATING_DURATION = 20 * 5;
@@ -32,8 +31,8 @@ public class InvigoratingOdor extends PotionAbility {
 		mInfo.mLinkedSpell = ClassAbility.INVIGORATING_ODOR;
 		mInfo.mScoreboardId = "InvigoratingOdor";
 		mInfo.mShorthandName = "IO";
-		mInfo.mDescriptions.add("Alchemist Potions deal +1 damage and leave an aura for 3 seconds where they hit. The aura provides Speed I and Haste I to players within it for 5 seconds. The 50% chance for a potion on ally kills is increased to 75%.");
-		mInfo.mDescriptions.add("Alchemist Potions deal +2 damage and the aura additionally grants 10% damage reduction for 5 seconds. The chance for a potion on ally kills is increased to 100%.");
+		mInfo.mDescriptions.add("Alchemist Potions deal +1 damage and leave an aura for 3 seconds where they hit. The aura provides Speed I and Haste I to players within it for 5 seconds.");
+		mInfo.mDescriptions.add("Alchemist Potions deal +2 damage and the aura additionally grants 10% damage reduction for 5 seconds.");
 	}
 
 	@Override
@@ -49,7 +48,7 @@ public class InvigoratingOdor extends PotionAbility {
 			public void run() {
 				world.spawnParticle(Particle.REDSTONE, loc, 3, 0.3, 0.3, 0.3, APOTHECARY_DARK_COLOR);
 				world.spawnParticle(Particle.END_ROD, loc, 1, radius / 2, 0.15, radius / 2, 0.05);
-				world.spawnParticle(Particle.REDSTONE, loc, (int) Math.pow(radius, 2), radius / 2, 0.15, radius / 2, APOTHECARY_LIGHT_COLOR);
+				world.spawnParticle(Particle.REDSTONE, loc, (int) (Math.pow(radius, 2) * 0.8), radius / 2, 0.15, radius / 2, APOTHECARY_LIGHT_COLOR);
 
 				for (Player player : PlayerUtils.playersInRange(loc, radius, true)) {
 					mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_OTHER, new PotionEffect(PotionEffectType.SPEED, INVIGORATING_DURATION, 0, true, true));
@@ -66,11 +65,6 @@ public class InvigoratingOdor extends PotionAbility {
 				mTicks += 5;
 			}
 		}.runTaskTimer(mPlugin, 0, 5);
-	}
-
-	// Used by NonAlchemistPotionPassive
-	public double getPotionChanceBonus() {
-		return INVIGORATING_POTION_CHANCE * getAbilityScore();
 	}
 
 }

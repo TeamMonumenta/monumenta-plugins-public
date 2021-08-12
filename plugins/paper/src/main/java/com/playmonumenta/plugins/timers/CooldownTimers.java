@@ -85,7 +85,6 @@ public class CooldownTimers {
 					int time = cooldown.getValue() - ticks;
 					if (time <= 0) {
 						ClassAbility spell = cooldown.getKey();
-
 						MessagingUtils.sendActionBarMessage(mPlugin, player, spell.getName() + " is now off cooldown!");
 
 						abilityIter.remove();

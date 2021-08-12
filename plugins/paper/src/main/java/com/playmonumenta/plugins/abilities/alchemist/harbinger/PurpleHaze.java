@@ -10,11 +10,11 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
+import com.playmonumenta.plugins.abilities.alchemist.AlchemistPotions;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.classes.magic.MagicType;
 import com.playmonumenta.plugins.point.Raycast;
 import com.playmonumenta.plugins.point.RaycastData;
-import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
@@ -53,12 +53,15 @@ public class PurpleHaze extends Ability {
 
 	private static final int PURPLE_HAZE_1_DURATION = 20 * 8;
 	private static final int PURPLE_HAZE_2_DURATION = 20 * 10;
+
 	private static final int PURPLE_HAZE_1_COOLDOWN = 20 * 35;
 	private static final int PURPLE_HAZE_2_COOLDOWN = 20 * 20;
-	private static final double PURPLE_HAZE_SLOW = 0.3;
+
 	private static final int PURPLE_HAZE_TRANSFER_DEPTH = 2;
 	private static final int PURPLE_HAZE_TRANSFER_BREADTH = 2;
-	private static final double PURPLE_HAZE_DAMAGE = 3;
+
+	private static final double PURPLE_HAZE_PERCENT_POTION_DAMAGE = 0.2;
+
 	private static final int PURPLE_HAZE_RADIUS = 5;
 	private static final int PURPLE_HAZE_RANGE = 32;
 
@@ -76,8 +79,8 @@ public class PurpleHaze extends Ability {
 		mInfo.mLinkedSpell = ClassAbility.PURPLE_HAZE;
 		mInfo.mScoreboardId = "PurpleHaze";
 		mInfo.mShorthandName = "PH";
-		mInfo.mDescriptions.add("Left-clicking while shifted with a bow while looking at a mob within 32 blocks deals 3 damage per second and gives 30% Slowness for 8 seconds to that mob. If the target dies, the user gains an additional Alchemist's Potion and the effects transfer to up to 2 mob up to 5 blocks from the target that died. The maximum number of times effects can spread is a chain 2 mobs deep. Cooldown: 35s.");
-		mInfo.mDescriptions.add("Damage and Reduced Speed duration increases to 10 seconds. Cooldown reduced to 20s.");
+		mInfo.mDescriptions.add("Left-clicking while shifted with a bow while looking at a mob within 32 blocks deals 20% of your potion damage per second and apply potion effect for 8 seconds to that mob. If the target dies, the effects transfer to up to 2 mob up to 5 blocks from the target that died. The maximum number of times effects can spread is a chain 2 mobs deep. Cooldown: 35s.");
+		mInfo.mDescriptions.add("Duration increases to 10 seconds. Cooldown reduced to 20s.");
 		mInfo.mCooldown = getAbilityScore() == 1 ? PURPLE_HAZE_1_COOLDOWN : PURPLE_HAZE_2_COOLDOWN;
 		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;
 		mDuration = getAbilityScore() == 1 ? PURPLE_HAZE_1_DURATION : PURPLE_HAZE_2_DURATION;
@@ -96,23 +99,17 @@ public class PurpleHaze extends Ability {
 						for (Map.Entry<UUID, HazedMob> entry : mHazedMobs.entrySet()) {
 							HazedMob e = entry.getValue();
 							LivingEntity damagee = e.mMob;
-							// Since purple haze damage has to stack with any other damage, EntityUtils.damageEntity()
-							// might not see it as intentional damage stacking, so iFrames need to be set manually.
-							int ticks = damagee.getNoDamageTicks();
-							damagee.setNoDamageTicks(0);
-							Vector v = damagee.getVelocity();
-							// This won't proc Perspicacity unless we rework how that enchantment works
-							// This is because it doesn't call the CustomDamageEvent
-							EntityUtils.damageEntity(plugin, damagee, PURPLE_HAZE_DAMAGE, e.mTriggeredBy, MagicType.ALCHEMY, false /* do not register CustomDamageEvent */, mInfo.mLinkedSpell);
-							damagee.setVelocity(v);
-							damagee.setNoDamageTicks(ticks);
-							EntityUtils.applySlow(mPlugin, mDuration, PURPLE_HAZE_SLOW, damagee);
-							Location loc = damagee.getLocation().add(0, 1, 0);
-							World world = damagee.getWorld();
-							world.spawnParticle(Particle.SPELL_WITCH, loc, 10, 0, 0.2, 0, 0.0001);
-							world.spawnParticle(Particle.FALLING_DUST, loc, 10, 0.2, 0.65, 0.2, Bukkit.createBlockData("purple_concrete"));
-							world.spawnParticle(Particle.FALLING_DUST, loc, 10, 0.2, 0.65, 0.2, Bukkit.createBlockData("pink_terracotta"));
-							mCounter = 0;
+							AlchemistPotions ability = AbilityManager.getManager().getPlayerAbility(e.mTriggeredBy, AlchemistPotions.class);
+							if (ability != null) {
+								ability.applyEffects(damagee);
+								EntityUtils.damageEntity(plugin, damagee, ability.getDamage() * PURPLE_HAZE_PERCENT_POTION_DAMAGE, e.mTriggeredBy, MagicType.ALCHEMY, false /* do not register CustomDamageEvent */, mInfo.mLinkedSpell, false, false, true, true);
+								Location loc = damagee.getLocation().add(0, 1, 0);
+								World world = damagee.getWorld();
+								world.spawnParticle(Particle.SPELL_WITCH, loc, 10, 0, 0.2, 0, 0.0001);
+								world.spawnParticle(Particle.FALLING_DUST, loc, 10, 0.2, 0.65, 0.2, Bukkit.createBlockData("purple_concrete"));
+								world.spawnParticle(Particle.FALLING_DUST, loc, 10, 0.2, 0.65, 0.2, Bukkit.createBlockData("pink_terracotta"));
+								mCounter = 0;
+							}
 						}
 					}
 
@@ -168,8 +165,6 @@ public class PurpleHaze extends Ability {
 										}
 									}
 								}
-
-								AbilityUtils.addAlchemistPotions(hazer.mTriggeredBy, 1);
 							}
 							iter.remove();
 						}

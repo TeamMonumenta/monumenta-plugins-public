@@ -13,7 +13,7 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.utils.AbsorptionUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
-import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 
 public class WardingRemedy extends Ability {
@@ -40,14 +40,12 @@ public class WardingRemedy extends Ability {
 
 	@Override
 	public boolean runCheck() {
-		return mPlayer.isSneaking() && InventoryUtils.testForItemWithName(mPlayer.getInventory().getItemInMainHand(), "Alchemist's Potion");
+		return mPlayer.isSneaking() && ItemUtils.isAlchemistItem(mPlayer.getInventory().getItemInMainHand());
 	}
 
 	@Override
 	public boolean playerThrewSplashPotionEvent(ThrownPotion potion) {
 		// This is sufficient because we are already checking conditions in runCheck()
-		// potion.remove() automatically returns the potion to the player
-		potion.remove();
 		putOnCooldown();
 
 		World world = mPlayer.getWorld();

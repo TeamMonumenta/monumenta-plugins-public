@@ -27,12 +27,14 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.potion.PotionData;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.potion.PotionType;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.jetbrains.annotations.NotNull;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.effects.AbilitySilence;
@@ -150,7 +152,7 @@ public class AbilityUtils {
 		Plugin.getInstance().mEffectManager.clearEffects(player, ABILITY_SILENCE_EFFECT_NAME);
 	}
 
-	private static ItemStack getAlchemistPotion() {
+	public static ItemStack getAlchemistPotion() {
 		//TODO get from loot tables instead
 		ItemStack itemStack = new ItemStack(Material.SPLASH_POTION, 1);
 		PotionMeta potionMeta = (PotionMeta) itemStack.getItemMeta();
@@ -235,6 +237,19 @@ public class AbilityUtils {
 			return true;
 		}
 
+		return false;
+	}
+
+	public static boolean updateAlchemistItem(@NotNull ItemStack item, int count) {
+		ItemMeta meta = item.getItemMeta();
+
+		if (meta.getDisplayName() != null) {
+			if (meta.getDisplayName().contains("Alchemist's Bag")) {
+				meta.setDisplayName(ChatColor.DARK_GREEN + "" + ChatColor.BOLD + "Alchemist's Bag (" + count + ")");
+				item.setItemMeta(meta);
+				return true;
+			}
+		}
 		return false;
 	}
 
