@@ -15,8 +15,8 @@ import com.playmonumenta.plugins.utils.MessagingUtils;
 
 public class Sharpshooter extends Ability {
 	private static final int SHARPSHOOTER_DECAY_TIMER = 20 * 4;
-	private static final int MAX_STACKS_1 = 5;
-	private static final int MAX_STACKS_2 = 10;
+	private static final int MAX_STACKS_1 = 4;
+	private static final int MAX_STACKS_2 = 8;
 	private static final double PERCENT_DAMAGE_PER_STACK = 0.06;
 
 	private final int mMaxStacks;
@@ -25,8 +25,8 @@ public class Sharpshooter extends Ability {
 		super(plugin, player, "Sharpshooter");
 		mInfo.mScoreboardId = "Sharpshooter";
 		mInfo.mShorthandName = "Ss";
-		mInfo.mDescriptions.add("Each enemy hit with a critical arrow gives you a stack of Sharpshooter, up to 5. Stacks decay after 4 seconds of not gaining a stack. Each stack makes your arrows deal +6% damage.");
-		mInfo.mDescriptions.add("Max stacks increased to 10 (+60% damage).");
+		mInfo.mDescriptions.add("Each enemy hit with a critical arrow gives you a stack of Sharpshooter, up to 4. Stacks decay after 4 seconds of not gaining a stack. Each stack makes your arrows deal +6% damage.");
+		mInfo.mDescriptions.add("Max stacks increased to 8 (+48% damage).");
 		mInfo.mIgnoreTriggerCap = true;
 
 		mMaxStacks = getAbilityScore() == 1 ? MAX_STACKS_1 : MAX_STACKS_2;

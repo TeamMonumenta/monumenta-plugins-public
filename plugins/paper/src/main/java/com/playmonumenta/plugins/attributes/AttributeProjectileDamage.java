@@ -1,9 +1,5 @@
 package com.playmonumenta.plugins.attributes;
 
-import com.playmonumenta.plugins.Constants;
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.utils.EntityUtils;
-
 import org.bukkit.entity.AbstractArrow;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -14,10 +10,14 @@ import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
 
+import com.playmonumenta.plugins.Constants;
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.utils.EntityUtils;
+
 
 
 public class AttributeProjectileDamage implements BaseAttribute {
-	private static final String PROPERTY_NAME = "Projectile Damage";
+	public static final String PROPERTY_NAME = "Projectile Damage";
 	public static final String DAMAGE_METAKEY = "AttributeProjectileDamageMetakey";
 
 	@Override

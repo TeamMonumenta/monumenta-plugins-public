@@ -3,14 +3,7 @@ package com.playmonumenta.plugins.abilities.scout.ranger;
 import java.util.Iterator;
 import java.util.List;
 
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.MultipleChargeAbility;
-import com.playmonumenta.plugins.classes.ClassAbility;
-import com.playmonumenta.plugins.classes.magic.MagicType;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.ItemUtils;
-import com.playmonumenta.plugins.utils.MovementUtils;
-
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -24,12 +17,22 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.AbilityManager;
+import com.playmonumenta.plugins.abilities.MultipleChargeAbility;
+import com.playmonumenta.plugins.abilities.scout.WindBomb;
+import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.classes.magic.MagicType;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.MovementUtils;
+
 
 
 public class WhirlingBlade extends MultipleChargeAbility {
 
-	private static final int BLADE_1_DAMAGE = 10;
-	private static final int BLADE_2_DAMAGE = 15;
+	private static final int BLADE_1_DAMAGE = 12;
+	private static final int BLADE_2_DAMAGE = 18;
 	private static final float BLADE_1_KNOCKBACK = 0.4f;
 	private static final float BLADE_2_KNOCKBACK = 1.2f;
 	private static final double THROW_RADIUS = 3;
@@ -43,22 +46,34 @@ public class WhirlingBlade extends MultipleChargeAbility {
 	private final float mKnockback;
 
 	private int mLastCastTicks = 0;
+	private WindBomb mWindBomb;
 
 	public WhirlingBlade(Plugin plugin, Player player) {
 		super(plugin, player, "Whirling Blade", BLADE_1_MAX_CHARGES, BLADE_2_MAX_CHARGES);
 		mInfo.mScoreboardId = "WhirlingBlade";
 		mInfo.mShorthandName = "WB";
-		mInfo.mDescriptions.add("Use the swap key while holding a weapon to throw a whirling blade that circles around you, knocking back and dealing 10 damage to enemies it hits. Cooldown: 8s. Charges: 2.");
-		mInfo.mDescriptions.add("The damage is increased to 15 and the knockback is greatly increased.");
+		mInfo.mDescriptions.add("Use the swap key while holding a weapon and not looking up to throw a whirling blade that circles around you, knocking back and dealing " + BLADE_1_DAMAGE + " damage to enemies it hits. Cooldown: 8s. Charges: 2.");
+		mInfo.mDescriptions.add("The damage is increased to " + BLADE_2_DAMAGE + " and the knockback is greatly increased.");
 		mInfo.mLinkedSpell = ClassAbility.WHIRLING_BLADE;
 		mDamage = getAbilityScore() == 1 ? BLADE_1_DAMAGE : BLADE_2_DAMAGE;
 		mKnockback = getAbilityScore() == 1 ? BLADE_1_KNOCKBACK : BLADE_2_KNOCKBACK;
 		mInfo.mCooldown = getAbilityScore() == 1 ? BLADE_1_COOLDOWN : BLADE_2_COOLDOWN;
 		mInfo.mIgnoreCooldown = true;
+
+		Bukkit.getScheduler().runTask(plugin, () -> {
+			if (player != null) {
+				mWindBomb = AbilityManager.getManager().getPlayerAbility(mPlayer, WindBomb.class);
+			}
+		});
 	}
 
 	@Override
 	public void playerSwapHandItemsEvent(PlayerSwapHandItemsEvent event) {
+		event.setCancelled(true);
+
+		if (mWindBomb != null && mPlayer.isSneaking()) {
+			return;
+		}
 
 		ItemStack inMainHand = mPlayer.getInventory().getItemInMainHand();
 		ItemStack inOffHand = mPlayer.getInventory().getItemInOffHand();
@@ -67,7 +82,11 @@ public class WhirlingBlade extends MultipleChargeAbility {
 			return;
 		}
 
-		event.setCancelled(true);
+		// Player is looking up, do not cast (conflict with Swiftness)
+		//TODO needs sneaking check for wind bomb - but needs Stick's PR in first to do this
+		if (mPlayer.getLocation().getPitch() < -45) {
+			return;
+		}
 
 		int ticks = mPlayer.getTicksLived();
 		// Prevent double casting on accident. Also, strange bug, this seems to trigger twice when right clicking, but not the

@@ -54,7 +54,7 @@ public class CursedWound extends Ability {
 		mInfo.mScoreboardId = "CursedWound";
 		mInfo.mShorthandName = "CW";
 		mInfo.mDescriptions.add("Attacking an enemy with a cooled down falling scythe attack passively afflicts it and all enemies in a 3-block cube around it with Wither 2 for 6s. Your melee attacks passively deal 0.5 more damage per ability on cooldown, capped at 3 damage.");
-		mInfo.mDescriptions.add("Cooled down falling attacks now also extend all enemies' debuffs by 2s. Damage cap is increased from 3 to 5.");
+		mInfo.mDescriptions.add("Cooled down falling attacks now also extend all enemies' debuffs (except Stun, Silence, and Confusion) by 2s. Damage cap is increased from 3 to 5.");
 	}
 
 	@Override

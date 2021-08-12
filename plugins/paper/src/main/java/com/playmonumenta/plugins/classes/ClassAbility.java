@@ -80,9 +80,10 @@ public enum ClassAbility {
 	// [Scout]
 	EAGLE_EYE("Eagle Eye"),
 	VOLLEY("Volley"),
+	WIND_BOMB("Wind Bomb"),
 
 	// Hunter
-	ENCHANTED_ARROW("Enchanted Arrow"),
+	HUNTING_COMPANION("Hunting Companion"),
 	SPLIT_ARROW("Split Arrow"),
 
 	// Ranger

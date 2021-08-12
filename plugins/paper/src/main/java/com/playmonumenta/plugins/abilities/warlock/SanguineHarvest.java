@@ -31,6 +31,8 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 
 
 public class SanguineHarvest extends Ability {
@@ -61,7 +63,7 @@ public class SanguineHarvest extends Ability {
 		mInfo.mScoreboardId = "SanguineHarvest";
 		mInfo.mShorthandName = "SH";
 		mInfo.mDescriptions.add("Enemies you damage with an ability are afflicted with Bleed I for 10 seconds. Bleed gives mobs 10% Slowness and 10% Weaken per level if the mob is below 50% Max Health. Additionally, double right click while holding a scythe to fire a burst of darkness. This projectile travels up to 8 blocks and upon contact with a surface or an enemy, it explodes, knocking back and marking all mobs within 3 blocks of the explosion for a harvest. Any player that kills a marked mob is healed for 5% of max health. Cooldown: 20s.");
-		mInfo.mDescriptions.add("Increase passive Bleed level to II, and increase the radius to 4 blocks.");
+		mInfo.mDescriptions.add("Increase passive Bleed level to II, and increase the radius to 4 blocks. Players killing a marked mob are healed by 10%.");
 		mInfo.mLinkedSpell = ClassAbility.SANGUINE_HARVEST;
 		mInfo.mCooldown = COOLDOWN;
 		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
@@ -158,8 +160,11 @@ public class SanguineHarvest extends Ability {
 	}
 
 	@Override
-	public void playerDealtCustomDamageEvent(CustomDamageEvent event) {
-		LivingEntity damagee = event.getDamaged();
-		EntityUtils.applyBleed(mPlugin, BLEED_DURATION, mBleedLevel, damagee);
+	public boolean livingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
+		if (event.getCause() == DamageCause.CUSTOM) {
+			LivingEntity damagee = (LivingEntity) event.getEntity();
+			EntityUtils.applyBleed(mPlugin, BLEED_DURATION, mBleedLevel, damagee);
+		}
+		return true;
 	}
 }

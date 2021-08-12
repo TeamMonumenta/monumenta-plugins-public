@@ -62,7 +62,7 @@ public class SanctifiedArmor extends Ability {
 	@Override
 	public boolean playerDamagedByLivingEntityEvent(EntityDamageByEntityEvent event) {
 		LivingEntity mob = (LivingEntity) event.getDamager();
-		if (event.getCause() == DamageCause.ENTITY_ATTACK && EntityUtils.isUndead(mob) && !EntityUtils.isBoss(mob)) {
+		if (event.getCause() == DamageCause.ENTITY_ATTACK && Crusade.enemyTriggersAbilities(mob, mCrusade) && !EntityUtils.isBoss(mob)) {
 			trigger(mob, event);
 		}
 

@@ -25,8 +25,8 @@ import com.playmonumenta.plugins.utils.MovementUtils;
 
 public class SplitArrow extends Ability {
 
-	private static final double SPLIT_ARROW_1_DAMAGE_PERCENT = 0.4;
-	private static final double SPLIT_ARROW_2_DAMAGE_PERCENT = 0.7;
+	private static final double SPLIT_ARROW_1_DAMAGE_PERCENT = 0.35;
+	private static final double SPLIT_ARROW_2_DAMAGE_PERCENT = 0.60;
 	private static final double SPLIT_ARROW_CHAIN_RANGE = 5;
 	private static final PotionEffect SPECTRAL_ARROW_EFFECT = new PotionEffect(PotionEffectType.GLOWING, 200, 0);
 
@@ -37,8 +37,8 @@ public class SplitArrow extends Ability {
 		mInfo.mLinkedSpell = ClassAbility.SPLIT_ARROW;
 		mInfo.mScoreboardId = "SplitArrow";
 		mInfo.mShorthandName = "SA";
-		mInfo.mDescriptions.add("When you hit an enemy with an arrow, the next nearest enemy within 5 blocks takes 40% of the original arrow damage (ignores invulnerability frames).");
-		mInfo.mDescriptions.add("Damage to the second target is increased to 70% of the original arrow damage.");
+		mInfo.mDescriptions.add("When you hit an enemy with an arrow, the next nearest enemy within 5 blocks takes " + (int) (100 * SPLIT_ARROW_1_DAMAGE_PERCENT) + "% of the original arrow damage (ignores invulnerability frames).");
+		mInfo.mDescriptions.add("Damage to the second target is increased to " + (int) (100 * SPLIT_ARROW_2_DAMAGE_PERCENT) + "% of the original arrow damage.");
 		mInfo.mIgnoreTriggerCap = true;
 
 		mDamagePercent = getAbilityScore() == 1 ? SPLIT_ARROW_1_DAMAGE_PERCENT : SPLIT_ARROW_2_DAMAGE_PERCENT;

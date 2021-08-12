@@ -125,13 +125,13 @@ import com.playmonumenta.plugins.abilities.rogue.swordsage.WindWalk;
 import com.playmonumenta.plugins.abilities.scout.Agility;
 import com.playmonumenta.plugins.abilities.scout.BowMastery;
 import com.playmonumenta.plugins.abilities.scout.EagleEye;
-import com.playmonumenta.plugins.abilities.scout.FinishingBlow;
+import com.playmonumenta.plugins.abilities.scout.WindBomb;
 import com.playmonumenta.plugins.abilities.scout.ScoutPassive;
 import com.playmonumenta.plugins.abilities.scout.Sharpshooter;
 import com.playmonumenta.plugins.abilities.scout.SwiftCuts;
 import com.playmonumenta.plugins.abilities.scout.Swiftness;
 import com.playmonumenta.plugins.abilities.scout.Volley;
-import com.playmonumenta.plugins.abilities.scout.hunter.EnchantedShot;
+import com.playmonumenta.plugins.abilities.scout.hunter.HuntingCompanion;
 import com.playmonumenta.plugins.abilities.scout.hunter.PinningShot;
 import com.playmonumenta.plugins.abilities.scout.hunter.SplitArrow;
 import com.playmonumenta.plugins.abilities.scout.ranger.Quickdraw;
@@ -265,6 +265,7 @@ public class AbilityManager {
 			new ScoutPassive(mPlugin, null),
 			new SwiftCuts(mPlugin, null),
 			new Sharpshooter(mPlugin, null),
+			new WindBomb(mPlugin, null),
 
 			//********** WARRIOR **********//
 			new CounterStrike(mPlugin, null),
@@ -342,7 +343,7 @@ public class AbilityManager {
 			new Quickdraw(mPlugin, null),
 
 			// HUNTER
-			new EnchantedShot(mPlugin, null),
+			new HuntingCompanion(mPlugin, null),
 			new PinningShot(mPlugin, null),
 			new SplitArrow(mPlugin, null),
 
@@ -431,7 +432,6 @@ public class AbilityManager {
 		);
 
 		List<Ability> triggerLastAbilities = Arrays.asList(
-			new FinishingBlow(mPlugin, null),
 			new PrismaticShield(mPlugin, null),
 			new EscapeDeath(mPlugin, null)
 		);

@@ -175,7 +175,7 @@ public class AttributeManager {
 
 	}
 
-	private static final String[] ATTRIBUTE_INDICATORS = {
+	public static final String[] ATTRIBUTE_INDICATORS = {
 			ChatColor.RESET + "",
 			ChatColor.GRAY + "When in Main Hand:",
 			ChatColor.GRAY + "When in Off Hand:",

@@ -112,6 +112,9 @@ public class LuminousInfusion extends Ability {
 
 	@Override
 	public boolean livingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
+		if (event.getDamage() < 0.5) {
+			return true;
+		}
 		//TODO pass in casted entities for events like these
 		LivingEntity enemy = (LivingEntity)event.getEntity();
 		boolean enemyTriggersAbilities = Crusade.enemyTriggersAbilities(enemy, mCrusade);

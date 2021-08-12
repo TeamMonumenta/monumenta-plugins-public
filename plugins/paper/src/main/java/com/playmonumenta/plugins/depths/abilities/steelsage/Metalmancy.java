@@ -1,5 +1,7 @@
 package com.playmonumenta.plugins.depths.abilities.steelsage;
 
+import java.util.List;
+
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -8,7 +10,6 @@ import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.MagmaCube;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
@@ -37,11 +38,12 @@ public class Metalmancy extends DepthsAbility {
 	public static final String GOLEM_NAME = "SteelConstruct";
 	public static final String GOLEM_TAG = "boss_metalmancy";
 	public static final double VELOCITY = 2;
-	public static final int DETECTION_RANGE = 50;
+	public static final int DETECTION_RANGE = 32;
 	public static final int TICK_INTERVAL = 5;
 
 	private Mob mGolem;
 	private Mob mTarget;
+	private boolean mOriginalGlowing = false;
 
 	public Metalmancy(Plugin plugin, Player player) {
 		super(plugin, player, ABILITY_NAME);
@@ -85,7 +87,7 @@ public class Metalmancy extends DepthsAbility {
 							world.spawnParticle(Particle.SMOKE_NORMAL, golemLoc, 20);
 						}
 						if (!(mTarget == null)) {
-							if (!(mTarget instanceof MagmaCube && mTarget.getName().contains("Gyrhaeddant"))) {
+							if (!mOriginalGlowing) {
 								mTarget.setGlowing(false);
 							}
 							mTarget = null;
@@ -95,7 +97,7 @@ public class Metalmancy extends DepthsAbility {
 						this.cancel();
 					}
 
-					if (!(mTarget == null || mTarget.getHealth() <= 0)) {
+					if (!(mTarget == null || mTarget.isDead() || mTarget.getHealth() <= 0)) {
 						if (mTarget == mGolem) {
 							mTarget = null;
 						} else {
@@ -103,9 +105,12 @@ public class Metalmancy extends DepthsAbility {
 						}
 					}
 
-					if (mGolem != null && mGolem.getTarget() == null && mTicksElapsed >= TICK_INTERVAL * 2) {
-						LivingEntity nearestMob = EntityUtils.getNearestMob(mGolem.getLocation(), 10, mGolem);
-						if (nearestMob != null && !nearestMob.getScoreboardTags().contains(AbilityUtils.IGNORE_TAG)) {
+					if (mGolem != null && (mGolem.getTarget() == null || mGolem.getTarget().isDead() || mGolem.getTarget().getHealth() <= 0) && mTicksElapsed >= TICK_INTERVAL * 2) {
+						Location golemLoc = mGolem.getLocation();
+						List<LivingEntity> nearbyMobs = EntityUtils.getNearbyMobs(golemLoc, DETECTION_RANGE, mGolem);
+						nearbyMobs.removeIf(mob -> mob.getScoreboardTags().contains(AbilityUtils.IGNORE_TAG));
+						LivingEntity nearestMob = EntityUtils.getNearestMob(golemLoc, nearbyMobs);
+						if (nearestMob != null) {
 							mGolem.setTarget(nearestMob);
 						}
 					}
@@ -125,6 +130,7 @@ public class Metalmancy extends DepthsAbility {
 		World world = mPlayer.getWorld();
 		mTarget = (Mob) le;
 		world.playSound(mPlayer.getLocation(), Sound.ENTITY_ARROW_HIT_PLAYER, 1.0f, 0.5f);
+		mOriginalGlowing = le.isGlowing();
 		le.setGlowing(true);
 		world.spawnParticle(Particle.VILLAGER_ANGRY, mGolem.getEyeLocation(), 15);
 
@@ -133,7 +139,7 @@ public class Metalmancy extends DepthsAbility {
 
 	@Override
 	public String getDescription(int rarity) {
-		return "Swap hands while holding a weapon to summon a steel construct in the direction you are looking that does " + DepthsUtils.getRarityColor(rarity) + DAMAGE[rarity - 1] + ChatColor.WHITE + " melee damage. The Construct is invulnerable and disappears after " + DepthsUtils.getRarityColor(rarity) + DURATION[rarity - 1] / 20 + ChatColor.WHITE + " seconds. The Construct will prioritize the first enemy you hit with a projectile after summoning, which can be reapplied once that target dies. The Construct taunts any mob it attacks. Cooldown: " + COOLDOWN / 20 + "s.";
+		return "Swap hands while holding a weapon to summon an invulnerable steel construct. The Construct attacks the nearest mob within " + DETECTION_RANGE + " blocks. The Construct prioritizes the first enemy you hit with a projectile after summoning, which can be reapplied once that target dies. The Construct deals " + DepthsUtils.getRarityColor(rarity) + DAMAGE[rarity - 1] + ChatColor.WHITE + " damage and taunts non-boss enemies it hits. The Construct disappears after " + DepthsUtils.getRarityColor(rarity) + DURATION[rarity - 1] / 20 + ChatColor.WHITE + " seconds. Cooldown: " + COOLDOWN / 20 + "s.";
 	}
 
 	@Override

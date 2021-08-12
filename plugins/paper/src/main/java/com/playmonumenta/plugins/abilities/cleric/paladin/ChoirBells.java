@@ -88,7 +88,6 @@ public class ChoirBells extends Ability {
 					EntityUtils.applySlow(mPlugin, DURATION, mSlownessAmount, mob);
 
 					if (Crusade.enemyTriggersAbilities(mob, mCrusade)) {
-						//TODO Bug #8353, Taunt damage used to make aggro stick triggers Luminous
 						// Infusion
 						EntityUtils.applyTaunt(mPlugin, (Mob) mob, mPlayer);
 						EntityUtils.applyVulnerability(mPlugin, DURATION, mVulnerabilityEffect, mob);

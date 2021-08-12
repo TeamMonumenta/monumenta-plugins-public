@@ -35,8 +35,8 @@ public class Riposte extends Ability {
 		}
 	}
 
-	private static final int RIPOSTE_1_COOLDOWN = 12 * 20;
-	private static final int RIPOSTE_2_COOLDOWN = 10 * 20;
+	private static final int RIPOSTE_1_COOLDOWN = 15 * 20;
+	private static final int RIPOSTE_2_COOLDOWN = 12 * 20;
 	private static final int RIPOSTE_SWORD_DURATION = 2 * 20;
 	private static final int RIPOSTE_AXE_DURATION = 3 * 20;
 	private static final float RIPOSTE_KNOCKBACK_SPEED = 0.15f;
@@ -48,8 +48,8 @@ public class Riposte extends Ability {
 		mInfo.mLinkedSpell = ClassAbility.RIPOSTE;
 		mInfo.mScoreboardId = "Obliteration";
 		mInfo.mShorthandName = "Rip";
-		mInfo.mDescriptions.add("While wielding a sword or axe, you block a melee attack that would have hit you. Cooldown: 12s.");
-		mInfo.mDescriptions.add("Cooldown lowered to 10s and if you block an attack with Riposte's effect while holding a sword, your next sword attack within 2s deals double damage. If you block with Riposte's effect while holding an axe, the attacking mob is stunned for 3s.");
+		mInfo.mDescriptions.add("While wielding a sword or axe, you block a melee attack that would have hit you. Cooldown: 15s.");
+		mInfo.mDescriptions.add("Cooldown lowered to 12s and if you block an attack with Riposte's effect while holding a sword, your next sword attack within 2s deals double damage. If you block with Riposte's effect while holding an axe, the attacking mob is stunned for 3s.");
 		mInfo.mCooldown = getAbilityScore() == 1 ? RIPOSTE_1_COOLDOWN : RIPOSTE_2_COOLDOWN;
 		mInfo.mIgnoreCooldown = true;
 	}

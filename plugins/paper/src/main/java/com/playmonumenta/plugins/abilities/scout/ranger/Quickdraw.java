@@ -1,11 +1,5 @@
 package com.playmonumenta.plugins.abilities.scout.ranger;
 
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.abilities.AbilityTrigger;
-import com.playmonumenta.plugins.classes.ClassAbility;
-import com.playmonumenta.plugins.utils.ItemUtils;
-
 import org.bukkit.Bukkit;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -22,6 +16,12 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.abilities.AbilityTrigger;
+import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.utils.ItemUtils;
 
 
 
@@ -48,8 +48,8 @@ public class Quickdraw extends Ability {
 	@Override
 	public void cast(Action action) {
 		ItemStack inMainHand = mPlayer.getInventory().getItemInMainHand();
-		if (!mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.mLinkedSpell)
-				&& ItemUtils.isSomeBow(inMainHand)) {
+		Damageable damageable = (Damageable)inMainHand.getItemMeta();
+		if (!mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.mLinkedSpell) && ItemUtils.isSomeBow(inMainHand) && !(damageable.getDamage() > inMainHand.getType().getMaxDurability())) {
 			World world = mPlayer.getWorld();
 			world.playSound(mPlayer.getLocation(), Sound.ENTITY_ARROW_SHOOT, 1, 1.4f);
 			world.spawnParticle(Particle.CRIT, mPlayer.getEyeLocation().add(mPlayer.getLocation().getDirection()), 15, 0, 0, 0, 0.6f);
@@ -76,12 +76,11 @@ public class Quickdraw extends Ability {
 				putOnCooldown();
 			}
 
-			//Delete bow if durability is 0 and isn't shattered.
+			//Shatter bow if durability is 0 and isn't shattered.
 			//This is needed because QuickDraw doesn't consume durability, but there is a high-damage uncommon bow
 			//with 0 durability that should not be infinitely usable with the QuickDraw ability
-			Damageable damageable = (Damageable)inMainHand.getItemMeta();
 			if ((damageable.getDamage() >= inMainHand.getType().getMaxDurability()) && !ItemUtils.isItemShattered(inMainHand)) {
-				inMainHand.setAmount(0);
+				ItemUtils.shatterItem(inMainHand);
 			}
 		}
 	}

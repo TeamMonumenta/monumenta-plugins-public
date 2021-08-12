@@ -19,7 +19,7 @@ public class Focus implements BaseEnchantment {
 
 	public static final String PROPERTY_NAME = ChatColor.GRAY + "Focus";
 	public static final String LEVEL_METAKEY = "FocusLevelMetakey";
-	private static final double DAMAGE_PCT_PER_LEVEL = 0.01;
+	public static final double DAMAGE_PCT_PER_LEVEL = 0.01;
 
 	@Override
 	public String getProperty() {

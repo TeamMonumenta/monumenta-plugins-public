@@ -8,6 +8,7 @@ import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
+import com.playmonumenta.plugins.classes.magic.MagicType;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
@@ -62,7 +63,7 @@ public class Quake implements BaseEnchantment {
 
 			//Damage any mobs in the area
 			for (LivingEntity mob : mobs) {
-				EntityUtils.damageEntity(plugin, mob, e.getDamage() * DAMAGE_MODIFIER_PER_LEVEL * level, player);
+				EntityUtils.damageEntity(plugin, mob, e.getDamage() * DAMAGE_MODIFIER_PER_LEVEL * level, player, MagicType.ENCHANTMENT);
 				if (fire > 0) {
 					EntityUtils.applyFire(plugin, 80 * fire, mob, player);
 				}

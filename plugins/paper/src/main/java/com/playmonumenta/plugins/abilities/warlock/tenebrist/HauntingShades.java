@@ -45,7 +45,7 @@ public class HauntingShades extends MultipleChargeAbility {
 	private static final int SHADES_CHARGES_1 = 2;
 	private static final int SHADES_CHARGES_2 = 3;
 	private static final int VULN_1 = 1;
-	private static final int VULN_2 = 3;
+	private static final int VULN_2 = 2;
 	private static final double EXTRA_SPEED = 0.1;
 	private static final int EFFECT_DURATION = 20 * 2;
 	private static final int RANGE = 10;
@@ -62,7 +62,7 @@ public class HauntingShades extends MultipleChargeAbility {
 		mInfo.mScoreboardId = "HauntingShades";
 		mInfo.mShorthandName = "HS";
 		mInfo.mDescriptions.add("Press the swap key while not sneaking with a scythe to conjure a Shade at the target block or mob location. Mobs within 6 blocks of a Shade are afflicted with 10% Vulnerability, and players within 6 blocks of the shade are given 10% speed. A Shade fades back into darkness after 8 seconds. Cooldown: 15s. Charges: 2.");
-		mInfo.mDescriptions.add("Your number of charges increases to 3 and mobs within 6 blocks of a Shade are afflicted with 20% Vulnerability.");
+		mInfo.mDescriptions.add("Your number of charges increases to 3 and mobs within 6 blocks of a Shade are afflicted with 15% Vulnerability.");
 		mInfo.mCooldown = COOLDOWN;
 		mInfo.mTrigger = AbilityTrigger.ALL;
 		mInfo.mIgnoreCooldown = true;

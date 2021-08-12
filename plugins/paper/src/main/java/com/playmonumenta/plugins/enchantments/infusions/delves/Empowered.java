@@ -20,7 +20,7 @@ import org.jetbrains.annotations.NotNull;
 public class Empowered implements BaseEnchantment {
 
 	public static final String PROPERTY_NAME = ChatColor.GRAY + "Empowered";
-	private static final double PERCENT_CHANCE = 0.0025;
+	private static final double PERCENT_CHANCE = 0.002;
 	private static final double PERCENT_REPAIR = 0.01;
 	private static final String ACUMEN_TAG = ChatColor.GRAY + "Acumen";
 	private static final double ACUMEN_BONUS = 0.02;

@@ -1,8 +1,10 @@
 package com.playmonumenta.plugins.abilities.scout;
 
+import org.bukkit.Sound;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.entity.Player;
+import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
@@ -10,6 +12,8 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
 
@@ -20,13 +24,14 @@ public class Swiftness extends Ability {
 	private static final int SWIFTNESS_EFFECT_JUMP_LVL = 2;
 
 	private boolean mWasInNoMobilityZone = false;
+	private boolean mJumpBoost = true;
 
 	public Swiftness(Plugin plugin, Player player) {
 		super(plugin, player, "Swiftness");
 		mInfo.mScoreboardId = "Swiftness";
 		mInfo.mShorthandName = "Swf";
 		mInfo.mDescriptions.add("Gain +20% Speed when you are not inside a town.");
-		mInfo.mDescriptions.add("In addition, gain Jump Boost III when you are not inside a town.");
+		mInfo.mDescriptions.add("In addition, gain Jump Boost III when you are not inside a town. Swap hands looking up, not sneaking, and not holding a bow or crossbow to toggle the Jump Boost.");
 
 		if (player != null) {
 			addModifier(player);
@@ -36,8 +41,7 @@ public class Swiftness extends Ability {
 	@Override
 	public void setupClassPotionEffects() {
 		if (getAbilityScore() > 1) {
-			mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF,
-			                                 new PotionEffect(PotionEffectType.JUMP, 1000000, SWIFTNESS_EFFECT_JUMP_LVL, true, false));
+			mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.JUMP, 1000000, SWIFTNESS_EFFECT_JUMP_LVL, true, false));
 		}
 	}
 
@@ -52,6 +56,31 @@ public class Swiftness extends Ability {
 		}
 
 		mWasInNoMobilityZone = isInNoMobilityZone;
+	}
+
+	@Override
+	public void playerSwapHandItemsEvent(PlayerSwapHandItemsEvent event) {
+		if (getAbilityScore() < 2) {
+			return;
+		}
+
+		event.setCancelled(true);
+
+		if (mPlayer.isSneaking() || mPlayer.getLocation().getPitch() >= -45 || InventoryUtils.isBowItem(mPlayer.getInventory().getItemInMainHand())) {
+			return;
+		}
+
+		if (mJumpBoost) {
+			mJumpBoost = false;
+			mPlugin.mPotionManager.removePotion(mPlayer, PotionID.ABILITY_SELF, PotionEffectType.JUMP);
+			MessagingUtils.sendActionBarMessage(mPlugin, mPlayer, "Jump Boost has been turned off");
+			mPlayer.playSound(mPlayer.getLocation(), Sound.BLOCK_BEACON_DEACTIVATE, 2.0f, 1.6f);
+		} else {
+			mJumpBoost = true;
+			mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.JUMP, 1000000, SWIFTNESS_EFFECT_JUMP_LVL, true, false));
+			MessagingUtils.sendActionBarMessage(mPlugin, mPlayer, "Jump Boost has been turned on");
+			mPlayer.playSound(mPlayer.getLocation(), Sound.BLOCK_BEACON_ACTIVATE, 2.0f, 1.6f);
+		}
 	}
 
 	private static void addModifier(Player player) {

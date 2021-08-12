@@ -10,7 +10,7 @@ import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
-
+import com.playmonumenta.plugins.classes.magic.MagicType;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
@@ -70,7 +70,7 @@ public class Eruption implements BaseEnchantment {
 
 			//Damage any mobs in the area
 			for (LivingEntity mob : mobs) {
-				EntityUtils.damageEntity(plugin, mob, DAMAGE_PER_LEVEL * level, player);
+				EntityUtils.damageEntity(plugin, mob, DAMAGE_PER_LEVEL * level, player, MagicType.ENCHANTMENT);
 				if (fire > 0) {
 					EntityUtils.applyFire(plugin, 80 * fire, mob, player);
 				}

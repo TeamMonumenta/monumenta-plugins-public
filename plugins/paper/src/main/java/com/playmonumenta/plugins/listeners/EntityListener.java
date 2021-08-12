@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.NavigableSet;
 import java.util.Set;
 
+import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -28,6 +29,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.EvokerFangs;
 import org.bukkit.entity.Firework;
+import org.bukkit.entity.Fox;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.LivingEntity;
@@ -82,7 +84,10 @@ import com.destroystokyo.paper.event.entity.WitchThrowPotionEvent;
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityManager;
+import com.playmonumenta.plugins.abilities.scout.hunter.HuntingCompanion;
 import com.playmonumenta.plugins.attributes.AttributeProjectileDamage;
+import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.classes.magic.MagicType;
 import com.playmonumenta.plugins.effects.Effect;
 import com.playmonumenta.plugins.effects.Stasis;
 import com.playmonumenta.plugins.enchantments.Inferno;
@@ -317,6 +322,27 @@ public class EntityListener implements Listener {
 							event.setCancelled(true);
 						}
 					}
+				}
+			}
+		} else if (damager instanceof Fox && damager.getScoreboardTags().contains(HuntingCompanion.FOX_TAG)) {
+			Fox fox = (Fox) damager;
+			World world = fox.getWorld();
+			if (fox.hasMetadata(HuntingCompanion.OWNER_METADATA_TAG) && damagee instanceof LivingEntity) {
+				Player owner = Bukkit.getPlayer(fox.getMetadata(HuntingCompanion.OWNER_METADATA_TAG).get(0).asString());
+				if (owner != null && owner.getWorld() == world) {
+					event.setCancelled(true);
+					if (!EntityUtils.isElite(damagee)) {
+						HuntingCompanion huntingCompanion = AbilityManager.getManager().getPlayerAbility(owner, HuntingCompanion.class);
+						if (huntingCompanion != null) {
+							List<Entity> stunnedMobs = huntingCompanion.mStunnedMobs;
+							if (!stunnedMobs.contains(damagee)) {
+								EntityUtils.applyStun(mPlugin, huntingCompanion.mStunTime, (LivingEntity) damagee);
+								stunnedMobs.add(damagee);
+							}
+						}
+					}
+					EntityUtils.damageEntity(mPlugin, (LivingEntity) damagee, event.getDamage(), owner, MagicType.PHYSICAL, true, ClassAbility.HUNTING_COMPANION, false, false, true, false); //bypasses iframes, counts as damage from the player
+					world.playSound(fox.getLocation(), Sound.ENTITY_FOX_BITE, 1.5f, 1.0f);
 				}
 			}
 		}
@@ -951,19 +977,32 @@ public class EntityListener implements Listener {
 
 	@EventHandler(priority = EventPriority.LOW)
 	public void entityTargetLivingEntityEvent(EntityTargetLivingEntityEvent event) {
-		if (event.getEntity() instanceof Creature && (EntityUtils.isStunned(event.getEntity())
-		                                              || EntityUtils.isConfused(event.getEntity()))) {
+		Entity entity = event.getEntity();
+		LivingEntity target = event.getTarget();
+
+		if (entity instanceof Creature && (EntityUtils.isStunned(entity)
+		                                              || EntityUtils.isConfused(entity))) {
 			event.setCancelled(true);
 			return;
 		}
-		if (event.getTarget() instanceof Player) {
-			Player player = (Player) event.getTarget();
+		if (target instanceof Player) {
+			Player player = (Player) target;
 			if (AbilityUtils.isStealthed(player)) {
 				event.setTarget(null);
 				event.setCancelled(true);
 			} else {
 				mAbilities.entityTargetLivingEntityEvent(player, event);
 			}
+		}
+
+		//Disallows mobs targeting fox companion
+		if (target instanceof Fox && target.getScoreboardTags().contains(HuntingCompanion.FOX_TAG)) {
+			event.setCancelled(true);
+		}
+
+		//Disallows fox companion targeting players or some mobs it shouldn't
+		if (entity instanceof Fox && entity.getScoreboardTags().contains(HuntingCompanion.FOX_TAG) && (target instanceof Player || target.getScoreboardTags().contains(AbilityUtils.IGNORE_TAG))) {
+			event.setCancelled(true);
 		}
 	}
 

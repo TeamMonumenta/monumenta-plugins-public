@@ -9,12 +9,14 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.VectorUtils;
+import com.playmonumenta.plugins.utils.AbilityUtils;
 
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.Guardian;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
@@ -24,140 +26,43 @@ import org.bukkit.util.Vector;
 
 public class CounterStrike extends Ability {
 
-	private static final float COUNTER_STRIKE_DISTANCE = 7;
-	private static final float COUNTER_STRIKE_DOT_ANGLE = 0.33f;
-	private static final int COUNTER_STRIKE_COOLDOWN = 20 * 8;
-	private static final int COUNTER_STRIKE_ACTIVATION_PERIOD = 20 * 2;
-	private static final int COUNTER_STRIKE_1_DAMAGE = 6;
-	private static final int COUNTER_STRIKE_2_DAMAGE = 12;
-	private static final float COUNTER_STRIKE_RADIUS = 5.0f;
-	private static final double COUNTER_STRIKE_MELEE_THRESHOLD = 2;
+	private static final int COUNTER_STRIKE_1_DAMAGE = 3;
+	private static final int COUNTER_STRIKE_2_DAMAGE = 5;
+	private static final double COUNTER_STRIKE_1_REFLECT = 0.2;
+	private static final double COUNTER_STRIKE_2_REFLECT = 0.4;
+	private static final float COUNTER_STRIKE_RADIUS = 3.0f;
 
-	private BukkitRunnable mActivityTimer;
-	private boolean mActive = false;
+	private double mReflect;
+	private int mDamage;
 
 	public CounterStrike(Plugin plugin, Player player) {
 		super(plugin, player, "Counter Strike");
 		mInfo.mScoreboardId = "CounterStrike";
 		mInfo.mShorthandName = "CS";
-		mInfo.mDescriptions.add("Hitting a mob within 2s of successfully blocking an attack with either a shield or with Riposte deals 6 damage in an AoE cone 7 blocks in front of you. Cooldown: 8s. In addition, when you are hit you have a 15% chance to deal 6 damage to all enemies in a 5 block radius when you are hit by a melee attack (Even if you block).");
-		mInfo.mDescriptions.add("Damage is increased to 12. The passive part of the skill's damage is increased to 12.");
+		mInfo.mDescriptions.add("When you take melee damage, deal 3 + 20% of pre-mitigation damage taken to all mobs in a 3 block radius.");
+		mInfo.mDescriptions.add("The damage is increased to 5 + 40% of pre-mitigation damage.");
 		mInfo.mLinkedSpell = ClassAbility.COUNTER_STRIKE;
-		mInfo.mCooldown = COUNTER_STRIKE_COOLDOWN;
-		mInfo.mIgnoreCooldown = true;
+		mReflect = getAbilityScore() == 1 ? COUNTER_STRIKE_1_REFLECT : COUNTER_STRIKE_2_REFLECT;
+		mDamage = getAbilityScore() == 1 ? COUNTER_STRIKE_1_DAMAGE : COUNTER_STRIKE_2_DAMAGE;
 	}
 
 	@Override
 	public boolean playerDamagedByLivingEntityEvent(EntityDamageByEntityEvent event) {
-		// Prevent ranged mob abilities from triggering Counter Strike
-		if (event.getEntity().getBoundingBox().expand(COUNTER_STRIKE_MELEE_THRESHOLD).contains(mPlayer.getLocation().toVector())) {
-
-			// Passive chance to damage nearby mobs
-			if (FastUtils.RANDOM.nextDouble() < 0.15f) {
-				int counterStrike = getAbilityScore();
-				Entity damager = event.getDamager();
-				Vector dir = LocationUtils.getDirectionTo(mPlayer.getLocation().add(0, 1, 0), damager.getLocation().add(0, damager.getHeight() / 2, 0));
-				Location loc = mPlayer.getLocation().add(0, 1, 0).subtract(dir);
+		if (!AbilityUtils.isBlocked(event)) {
+			LivingEntity damager = (LivingEntity) event.getDamager();
+			if (event.getCause() == DamageCause.ENTITY_ATTACK && !(damager instanceof Guardian)) {
+				Location loc = mPlayer.getLocation().add(0, 1, 0);
 				World world = mPlayer.getWorld();
 				world.spawnParticle(Particle.SWEEP_ATTACK, loc, 8, 0.75, 0.5, 0.75, 0.001);
 				world.spawnParticle(Particle.FIREWORKS_SPARK, loc, 20, 0.75, 0.5, 0.75, 0.1);
 				mPlayer.playSound(mPlayer.getLocation(), Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, 1f, 0.7f);
-				double csDamage = counterStrike == 1 ? COUNTER_STRIKE_1_DAMAGE : COUNTER_STRIKE_2_DAMAGE;
+				double eventDamage = event.getDamage() * mReflect;
 
 				for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), COUNTER_STRIKE_RADIUS, mPlayer)) {
-					EntityUtils.damageEntity(mPlugin, mob, csDamage, mPlayer, MagicType.SHADOWS /* Find a better type */, true, mInfo.mLinkedSpell);
-				}
-			}
-
-			// Active trigger if blocking, Riposte check is done separately through AbilityCastEvent
-			if (!mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), ClassAbility.COUNTER_STRIKE)) {
-				if (mPlayer.isBlocking()) {
-					mPlayer.spawnParticle(Particle.CRIT, mPlayer.getLocation(), 10, 0, 0, 0, 1);
-					activate();
+					EntityUtils.damageEntity(mPlugin, mob, mDamage + eventDamage, mPlayer, MagicType.SHADOWS, true, mInfo.mLinkedSpell);
 				}
 			}
 		}
-
 		return true;
 	}
-
-	@Override
-	public boolean livingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
-		if (mActive && event.getCause() == DamageCause.ENTITY_ATTACK) {
-			mActive = false;
-			Location loc = mPlayer.getLocation().add(mPlayer.getLocation().getDirection().multiply(0.5));
-			World world = mPlayer.getWorld();
-			world.spawnParticle(Particle.EXPLOSION_NORMAL, mPlayer.getLocation(), 25, 0, 0, 0, 0.15);
-			new BukkitRunnable() {
-				double mD = 30;
-				@Override
-				public void run() {
-					Vector vec;
-					for (double r = 1; r < 5; r += 0.5) {
-						for (double degree = mD; degree <= mD + 60; degree += 8) {
-							double radian1 = Math.toRadians(degree);
-							vec = new Vector(FastUtils.cos(radian1) * r, 0.75, FastUtils.sin(radian1) * r);
-							vec = VectorUtils.rotateZAxis(vec, 20);
-							vec = VectorUtils.rotateXAxis(vec, loc.getPitch() - 20);
-							vec = VectorUtils.rotateYAxis(vec, loc.getYaw());
-
-							Location l = loc.clone().add(vec);
-							world.spawnParticle(Particle.CRIT, l, 1, 0.1, 0.1, 0.1, 0.025);
-							world.spawnParticle(Particle.CRIT_MAGIC, l, 1, 0.1, 0.1, 0.1, 0.025);
-						}
-					}
-					mD += 60;
-					if (mD >= 150) {
-						this.cancel();
-					}
-				}
-
-			}.runTaskTimer(mPlugin, 0, 1);
-			mPlayer.playSound(mPlayer.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1f, 0.7f);
-			mPlayer.playSound(mPlayer.getLocation(), Sound.ENTITY_PLAYER_ATTACK_KNOCKBACK, 1f, 1.25f);
-			LivingEntity damagee = (LivingEntity) event.getEntity();
-			int damage = getAbilityScore() == 1 ? COUNTER_STRIKE_1_DAMAGE : COUNTER_STRIKE_2_DAMAGE;
-
-			event.setDamage(event.getDamage() + damage);
-
-			Vector playerDir = mPlayer.getEyeLocation().getDirection().setY(0).normalize();
-			for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), COUNTER_STRIKE_DISTANCE, mPlayer)) {
-				if (mob != damagee) {
-					Vector toMobVector = mob.getLocation().toVector().subtract(mPlayer.getLocation().toVector()).setY(0).normalize();
-					if (playerDir.dot(toMobVector) > COUNTER_STRIKE_DOT_ANGLE) {
-						EntityUtils.damageEntity(mPlugin, mob, damage, mPlayer, MagicType.PHYSICAL, true, mInfo.mLinkedSpell);
-					}
-				}
-			}
-			putOnCooldown();
-		}
-
-		return true;
-	}
-
-	@Override
-	public boolean abilityCastEvent(AbilityCastEvent event) {
-		if (event.getAbility() == ClassAbility.RIPOSTE) {
-			activate();
-		}
-
-		return true;
-	}
-
-	private void activate() {
-		mActive = true;
-		// Prevent multiple activity timers from overwriting each other
-		if (mActivityTimer != null && !mActivityTimer.isCancelled()) {
-			mActivityTimer.cancel();
-		}
-		mActivityTimer = new BukkitRunnable() {
-			@Override
-			public void run() {
-				mActive = false;
-				this.cancel();
-			}
-		};
-		mActivityTimer.runTaskLater(mPlugin, COUNTER_STRIKE_ACTIVATION_PERIOD);
-	}
-
 }

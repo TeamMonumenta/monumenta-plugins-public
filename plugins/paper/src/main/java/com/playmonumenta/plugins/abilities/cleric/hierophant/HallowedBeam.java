@@ -1,18 +1,5 @@
 package com.playmonumenta.plugins.abilities.cleric.hierophant;
 
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.AbilityManager;
-import com.playmonumenta.plugins.abilities.AbilityTrigger;
-import com.playmonumenta.plugins.abilities.MultipleChargeAbility;
-import com.playmonumenta.plugins.abilities.cleric.Crusade;
-import com.playmonumenta.plugins.classes.ClassAbility;
-import com.playmonumenta.plugins.effects.PercentDamageReceived;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.ItemUtils;
-import com.playmonumenta.plugins.utils.MovementUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.scriptedquests.utils.MessagingUtils;
-
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -22,21 +9,34 @@ import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.enchantments.Enchantment;
-import org.bukkit.entity.AbstractArrow.PickupStatus;
-import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
-import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
+
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.AbilityManager;
+import com.playmonumenta.plugins.abilities.AbilityTrigger;
+import com.playmonumenta.plugins.abilities.MultipleChargeAbility;
+import com.playmonumenta.plugins.abilities.cleric.Crusade;
+import com.playmonumenta.plugins.attributes.AttributeProjectileDamage;
+import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.classes.magic.MagicType;
+import com.playmonumenta.plugins.effects.PercentDamageReceived;
+import com.playmonumenta.plugins.enchantments.infusions.Focus;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.MovementUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.scriptedquests.utils.MessagingUtils;
 
 
 
@@ -63,7 +63,7 @@ public class HallowedBeam extends MultipleChargeAbility {
 		super(plugin, player, "Hallowed Beam", HALLOWED_1_MAX_CHARGES, HALLOWED_2_MAX_CHARGES);
 		mInfo.mScoreboardId = "HallowedBeam";
 		mInfo.mShorthandName = "HB";
-		mInfo.mDescriptions.add("Left-click the air with a bow or crossbow while looking directly at a player or mob to shoot a beam of light. If aimed at a player, the beam instantly heals them for 20% of their max health, knocking back enemies within 4 blocks. If aimed at an Undead, it instantly deals the equipped projectile weapon's damage to the target, and stuns them for half a second. If aimed at a non-undead mob, it instantly stuns them for 2s. Two charges. Pressing Swap while holding a bow will change the mode of Hallowed Beam between 'Default' (default), 'Healing' (only heals players, does not work on mobs), and 'Attack' (only applies mob effects, does not heal). Cooldown: 16s each charge.");
+		mInfo.mDescriptions.add("Left-click with a bow or crossbow while looking directly at a player or mob to shoot a beam of light. If aimed at a player, the beam instantly heals them for 20% of their max health, knocking back enemies within 4 blocks. If aimed at an Undead, it instantly deals the equipped projectile weapon's damage to the target, and stuns them for half a second. If aimed at a non-undead mob, it instantly stuns them for 2s. Two charges. Pressing Swap while holding a bow will change the mode of Hallowed Beam between 'Default' (default), 'Healing' (only heals players, does not work on mobs), and 'Attack' (only applies mob effects, does not heal). Cooldown: 16s each charge.");
 		mInfo.mDescriptions.add("Hallowed Beam gains a third charge, the cooldown is reduced to 12 seconds, and players healed by it gain 10% damage resistance for 5 seconds.");
 		mInfo.mLinkedSpell = ClassAbility.HALLOWED_BEAM;
 		mInfo.mCooldown = getAbilityScore() == 1 ? HALLOWED_1_COOLDOWN : HALLOWED_2_COOLDOWN;
@@ -85,8 +85,9 @@ public class HallowedBeam extends MultipleChargeAbility {
 
 			PlayerInventory inventory = mPlayer.getInventory();
 			ItemStack inMainHand = inventory.getItemInMainHand();
+			Damageable damageable = (Damageable)inMainHand.getItemMeta();
 
-			if (ItemUtils.isSomeBow(inMainHand) && !ItemUtils.isShootableItem(inventory.getItemInOffHand()) && !ItemUtils.isItemShattered(inMainHand)) {
+			if (ItemUtils.isSomeBow(inMainHand) && !ItemUtils.isShootableItem(inventory.getItemInOffHand()) && !ItemUtils.isItemShattered(inMainHand) && !(damageable.getDamage() > inMainHand.getType().getMaxDurability())) {
 				if (!consumeCharge()) {
 					return;
 				}
@@ -174,27 +175,24 @@ public class HallowedBeam extends MultipleChargeAbility {
 									break;
 								}
 							}
-							Arrow arrow = mPlayer.launchProjectile(Arrow.class);
-							if (inMainHand.containsEnchantment(Enchantment.ARROW_FIRE)) {
-								arrow.setFireTicks(20 * 5);
-							}
-							arrow.setCritical(true);
-							arrow.setPickupStatus(PickupStatus.CREATIVE_ONLY);
-							arrow.setVelocity(mPlayer.getLocation().getDirection().multiply(100.0));
-							ProjectileLaunchEvent eventLaunch = new ProjectileLaunchEvent(arrow);
-							Bukkit.getPluginManager().callEvent(eventLaunch);
 
-							EntityUtils.applyStun(mPlugin, HALLOWED_UNDEAD_STUN, applyE);
+							//Applies damage based on Projectile Damage attribute, AP, and Crusade
+							double damage = PlayerUtils.getAttribute(mPlayer, AttributeProjectileDamage.PROPERTY_NAME);
+							int focusLevel = mPlugin.mTrackingManager.mPlayers.getPlayerCustomEnchantLevel(mPlayer, Focus.class);
+							if (focusLevel > 0) {
+								damage *= 1 + focusLevel * Focus.DAMAGE_PCT_PER_LEVEL;
+							}
+							EntityUtils.damageEntity(mPlugin, applyE, damage, mPlayer, MagicType.HOLY, true, mInfo.mLinkedSpell, false, false, true, false);
+
 							Location eLoc = applyE.getLocation().add(0, applyE.getHeight() / 2, 0);
 							world.spawnParticle(Particle.SPIT, eLoc, 40, 0, 0, 0, 0.25f);
 							world.spawnParticle(Particle.FIREWORKS_SPARK, eLoc, 75, 0, 0, 0, 0.3f);
 
-							//Delete bow if durability is 0 and isn't shattered.
+							//Shatter if durability is 0 and isn't shattered.
 							//This is needed because Hallowed doesn't consume durability, but there is a high-damage uncommon bow
 							//with 0 durability that should not be infinitely usable.
-							Damageable damageable = (Damageable)inMainHand.getItemMeta();
-							if ((damageable.getDamage() >= inMainHand.getType().getMaxDurability()) && !ItemUtils.isItemShattered(inMainHand)) {
-								inMainHand.setAmount(0);
+							if (damageable.getDamage() >= inMainHand.getType().getMaxDurability() && !ItemUtils.isItemShattered(inMainHand)) {
+								ItemUtils.shatterItem(inMainHand);
 							}
 						} else if (EntityUtils.isHostileMob(applyE)) {
 							if (mMode == 1) {
@@ -214,7 +212,13 @@ public class HallowedBeam extends MultipleChargeAbility {
 									break;
 								}
 							}
-							EntityUtils.applyStun(mPlugin, HALLOWED_LIVING_STUN, applyE);
+
+							if (Crusade.enemyTriggersAbilities(applyE, mCrusade)) {
+								EntityUtils.applyStun(mPlugin, HALLOWED_UNDEAD_STUN, applyE);
+							} else {
+								EntityUtils.applyStun(mPlugin, HALLOWED_LIVING_STUN, applyE);
+							}
+
 							if (inMainHand.containsEnchantment(Enchantment.ARROW_FIRE)) {
 								EntityUtils.applyFire(mPlugin, 20 * 15, applyE, player);
 							}

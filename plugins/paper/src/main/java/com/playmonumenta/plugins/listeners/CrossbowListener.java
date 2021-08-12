@@ -1,8 +1,5 @@
 package com.playmonumenta.plugins.listeners;
 
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.utils.EntityUtils;
-
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
@@ -15,6 +12,9 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.inventory.ItemStack;
+
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.utils.EntityUtils;
 
 
 
@@ -62,8 +62,7 @@ public class CrossbowListener implements Listener {
 			    itemInOffHand.getType().equals(Material.CROSSBOW)) {
 
 				//Infinity gives arrow to player if the arrow shot had no custom effects
-				if ((itemInMainHand.getEnchantmentLevel(Enchantment.ARROW_INFINITE) > 0
-						|| itemInOffHand.getEnchantmentLevel(Enchantment.ARROW_INFINITE) > 0)
+				if (itemInMainHand.getEnchantmentLevel(Enchantment.ARROW_INFINITE) > 0
 						&& arrow instanceof Arrow
 						&& !((Arrow)event.getEntity()).hasCustomEffects()
 						&& ((Arrow)event.getEntity()).getPickupStatus() == AbstractArrow.PickupStatus.ALLOWED) {

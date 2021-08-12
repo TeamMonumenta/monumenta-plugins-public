@@ -47,7 +47,7 @@ public class Expedite implements BaseEnchantment {
 			player.getWorld().playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 0.1f, 1.0f);
 			if (speedEffects != null) {
 				for (Effect effect : speedEffects) {
-					double mag = effect.getMagnitude() / PERCENT_SPEED_PER_LEVEL;
+					double mag = effect.getMagnitude() / (PERCENT_SPEED_PER_LEVEL * DelveInfusionUtils.getModifiedLevel(plugin, player, level));
 					if (effect.getMagnitude() == PERCENT_SPEED_PER_LEVEL * DelveInfusionUtils.getModifiedLevel(plugin, player, level) * Math.min(5, mag + 1)) {
 						effect.setDuration(DURATION);
 					} else {

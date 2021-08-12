@@ -67,40 +67,31 @@ public class JudgementChain extends Ability {
 		mInfo.mLinkedSpell = ClassAbility.JUDGEMENT_CHAIN;
 		mInfo.mScoreboardId = "JudgementChain";
 		mInfo.mShorthandName = "JC";
-		mInfo.mDescriptions.add("Double right-click while sneaking and looking at a non-boss hostile mob to conjure an unbreakable chain, linking the soul of the Reaper and the mob. The mob becomes immortal (as long as there is another mob within 8 blocks) for the next 20 seconds and will only target the Reaper it is chained to, but it is slowed by 25% and deals 50% less damage to the Reaper, and no damage to all other players. All debuffs on the chained mob are inverted to their positive counterpart and transferred to the Reaper for 10s, capped at level 1. Bosses cannot be chained. Shift + Swap while looking up, or move more than 16 blocks away from the mob, to break the chain and cancel the immortality on the mob, dealing 20 damage to it. Cooldown: 25s.");
+		mInfo.mDescriptions.add("Press the swap key while not sneaking and looking at a non-boss hostile mob to conjure an unbreakable chain, linking the soul of the Reaper and the mob. The mob becomes immortal (as long as there is another mob within 8 blocks) for the next 20 seconds and will only target the Reaper it is chained to, but it is slowed by 25% and deals 50% less damage to the Reaper, and no damage to all other players. All debuffs on the chained mob are inverted to their positive counterpart and transferred to the Reaper for 10s, capped at level 1. Bosses cannot be chained. Shift + Swap while looking up, or move more than 16 blocks away from the mob, to break the chain and cancel the immortality on the mob, dealing 20 damage to it. Cooldown: 25s.");
 		mInfo.mDescriptions.add("Players that walk through the chain linking the mob and the Reaper are granted 10s of the inverted debuffs, and mobs that walk through the chain are given 10s of the debuffs on the mob. Additionally, the level of buffs and debuffs is preserved, up to level 2, except for Resistance and Regeneration, and the damage from the active chain break is now applied to all mobs in a 3 block radius of the chained mob.");
 		mInfo.mCooldown = COOLDOWN;
 		mInfo.mIgnoreCooldown = true;
-		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
 		mAmplifierCap = getAbilityScore() == 1 ? AMPLIFIER_CAP_1 : AMPLIFIER_CAP_2;
 	}
 
 	@Override
-	public boolean runCheck() {
-		return (ItemUtils.isHoe(mPlayer.getInventory().getItemInMainHand()) && mPlayer.isSneaking());
+	public void playerSwapHandItemsEvent(PlayerSwapHandItemsEvent event) {
+		ItemStack mainHandItem = mPlayer.getInventory().getItemInMainHand();
+		if (ItemUtils.isHoe(mainHandItem)) {
+			event.setCancelled(true);
+			if (mPlayer.isSneaking() && mPlayer.getLocation().getPitch() < -50.0) {
+				breakChain(true);
+				mTarget = null;
+			} else if (!mPlayer.isSneaking() && mPlayer.isOnGround()) {
+				summonChain();
+			}
+		}
 	}
 
-	@Override
-	public void cast(Action action) {
+	public void summonChain() {
 		if (mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.mLinkedSpell)) {
 			return;
 		}
-		if (MetadataUtils.checkOnceThisTick(mPlugin, mPlayer, CHECK_ONCE_THIS_TICK_METAKEY)) {
-			mRightClicks++;
-			new BukkitRunnable() {
-				@Override
-				public void run() {
-					if (mRightClicks > 0) {
-						mRightClicks--;
-					}
-					this.cancel();
-				}
-			}.runTaskLater(mPlugin, 5);
-		}
-		if (mRightClicks < 2) {
-			return;
-		}
-		mRightClicks = 0;
 
 		Location loc = mPlayer.getEyeLocation();
 		World world = mPlayer.getWorld();
@@ -233,18 +224,6 @@ public class JudgementChain extends Ability {
 
 			// This loop only runs at most once!
 			putOnCooldown();
-		}
-	}
-
-	@Override
-	public void playerSwapHandItemsEvent(PlayerSwapHandItemsEvent event) {
-		ItemStack mainHandItem = mPlayer.getInventory().getItemInMainHand();
-		if (ItemUtils.isHoe(mainHandItem)) {
-			event.setCancelled(true);
-			if (mPlayer.isSneaking() && mPlayer.getLocation().getPitch() < -50.0) {
-				breakChain(true);
-				mTarget = null;
-			}
 		}
 	}
 

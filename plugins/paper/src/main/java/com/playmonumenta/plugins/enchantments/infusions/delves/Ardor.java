@@ -3,21 +3,21 @@ package com.playmonumenta.plugins.enchantments.infusions.delves;
 import java.util.EnumSet;
 import java.util.NavigableSet;
 
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.enchantments.BaseEnchantment;
-import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
-import com.playmonumenta.plugins.utils.ItemUtils;
-import com.playmonumenta.plugins.utils.DelveInfusionUtils;
-import com.playmonumenta.plugins.effects.Effect;
-import com.playmonumenta.plugins.effects.PercentSpeed;
-
 import org.bukkit.ChatColor;
-import org.bukkit.entity.Player;
 import org.bukkit.Material;
 import org.bukkit.Sound;
-import org.jetbrains.annotations.NotNull;
-import org.bukkit.inventory.ItemStack;
+import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.NotNull;
+
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.effects.Effect;
+import com.playmonumenta.plugins.effects.PercentSpeed;
+import com.playmonumenta.plugins.enchantments.BaseEnchantment;
+import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
+import com.playmonumenta.plugins.utils.DelveInfusionUtils;
+import com.playmonumenta.plugins.utils.ItemUtils;
 
 public class Ardor implements BaseEnchantment {
 
@@ -46,7 +46,7 @@ public class Ardor implements BaseEnchantment {
 			Material mHead = player.getEyeLocation().getBlock().getType();
 		    if (m == Material.WATER || mHead == Material.WATER) {
 		        int currAir = player.getRemainingAir();
-		        player.setRemainingAir(currAir + (AIR_INCREASE * (int) DelveInfusionUtils.getModifiedLevel(plugin, player, level)));
+		        player.setRemainingAir(Math.min(20, currAir + (AIR_INCREASE * (int) DelveInfusionUtils.getModifiedLevel(plugin, player, level))));
 		    } else {
 				NavigableSet<Effect> speedEffects = plugin.mEffectManager.getEffects(player, PERCENT_SPEED_EFFECT_NAME);
 				if (speedEffects != null) {
