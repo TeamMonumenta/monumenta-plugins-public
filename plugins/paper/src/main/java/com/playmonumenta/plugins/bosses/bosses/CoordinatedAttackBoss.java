@@ -17,6 +17,7 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
+import com.playmonumenta.plugins.abilities.delves.DelveModifier;
 import com.playmonumenta.plugins.effects.EffectManager;
 import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.utils.AbilityUtils;
@@ -84,7 +85,7 @@ public class CoordinatedAttackBoss extends BossAbilityGroup {
 							if (!AbilityUtils.isStealthed(mTarget)) {
 								Set<String> tags = mob.getScoreboardTags();
 								// Don't set target of mobs with this ability, or else infinite loop
-								if (tags == null || !tags.contains(identityTag)) {
+								if (tags == null || (!tags.contains(identityTag) && !tags.contains(DelveModifier.AVOID_MODIFIERS))) {
 									((Mob) mob).setTarget(mTarget);
 
 									EffectManager.getInstance().addEffect(mob, PERCENT_SPEED_EFFECT_NAME,

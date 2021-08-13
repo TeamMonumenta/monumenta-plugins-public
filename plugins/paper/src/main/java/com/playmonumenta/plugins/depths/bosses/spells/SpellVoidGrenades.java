@@ -18,8 +18,9 @@ import org.bukkit.util.Vector;
 
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.depths.bosses.Davey;
+import com.playmonumenta.plugins.player.PPGroundCircle;
+import com.playmonumenta.plugins.player.PartialParticle;
 import com.playmonumenta.plugins.utils.BossUtils;
-import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 
@@ -88,42 +89,53 @@ public class SpellVoidGrenades extends Spell {
 			vect.normalize().multiply((pLoc.distance(tLoc)) / 20).setY(0.7f);
 			fallingBlock.setVelocity(vect);
 
+			PartialParticle flameTrail = new PartialParticle(Particle.SOUL, fallingBlock.getLocation(), 3, 0.25, .25, .25, 0.025);
+			PartialParticle smokeTrail = new PartialParticle(Particle.SPELL_WITCH, fallingBlock.getLocation(), 2, 0.25, .25, .25, 0.025);
+
 			new BukkitRunnable() {
 				World mWorld = mBoss.getWorld();
 				@Override
 				public void run() {
-					mWorld.spawnParticle(Particle.SOUL, fallingBlock.getLocation().add(0, fallingBlock.getHeight() / 2, 0), 1, 0.25, .25, .25, 0.025);
-					mWorld.spawnParticle(Particle.SPELL_WITCH, fallingBlock.getLocation().add(0, fallingBlock.getHeight() / 2, 0), 1, 0.25, .25, .25, 0.025);
-					if (fallingBlock.isOnGround() || !fallingBlock.isValid()) {
-						fallingBlock.remove();
-						fallingBlock.getLocation().getBlock().setType(Material.AIR);
-						mWorld.spawnParticle(Particle.SOUL, fallingBlock.getLocation(), 150, 0, 0, 0, 0.165);
-						mWorld.spawnParticle(Particle.SPELL_WITCH, fallingBlock.getLocation(), 65, 0, 0, 0, 0.1);
-						mWorld.spawnParticle(Particle.EXPLOSION_LARGE, fallingBlock.getLocation(), 1, 0, 0, 0, 0);
-						mWorld.playSound(fallingBlock.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 2, 0.85f);
+					// Particles while flying through the air
+					Location particleLoc = fallingBlock.getLocation().add(0, fallingBlock.getHeight() / 2, 0);
+					flameTrail.location(particleLoc).spawnAsBoss();
+					smokeTrail.location(particleLoc).spawnAsBoss();
 
-						for (Player player : PlayerUtils.playersInRange(fallingBlock.getLocation(), 3, true)) {
+					if (fallingBlock.isOnGround() || !fallingBlock.isValid()) {
+						// Landed on ground
+						fallingBlock.remove();
+						Location loc = fallingBlock.getLocation();
+
+						loc.getBlock().setType(Material.AIR);
+						new PartialParticle(Particle.SOUL, loc, 150, 0, 0, 0, 0.165).spawnAsBoss();
+						new PartialParticle(Particle.SPELL_WITCH, loc, 65, 0, 0, 0, 0.1).spawnAsBoss();
+						new PartialParticle(Particle.EXPLOSION_LARGE, loc, 1, 0, 0, 0, 0).spawnAsBoss();
+						mWorld.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 2, 0.85f);
+
+						for (Player player : PlayerUtils.playersInRange(loc, 3, true)) {
 							BossUtils.bossDamage(mBoss, player, 40);
 							// Shields don'mTicks stop fire!
 						}
 
+						Location alternateHeight = loc.clone();
+						alternateHeight.setY(loc.getY() + 0.5);
+						PartialParticle marker1 = new PartialParticle(Particle.SOUL, alternateHeight, 10, 1, 0.15, 1, 0.025);
+						PartialParticle marker2 = new PartialParticle(Particle.REDSTONE, alternateHeight, 10, 1, 0.15, BLACK_COLOR);
+						PPGroundCircle circle = new PPGroundCircle(Particle.REDSTONE, alternateHeight, 15, 0, 0, 0, 0, DARK_PURPLE_COLOR);
+						circle.radius(3);
+						circle.ringMode(true);
+
 						new BukkitRunnable() {
 							int mTicks = 0;
-							Location mLoc = fallingBlock.getLocation();
 							@Override
 							public void run() {
 								mTicks += 2;
-								Location alternateHeight = mLoc.clone();
-								alternateHeight.setY(mLoc.getY() + 0.5);
-								mWorld.spawnParticle(Particle.SOUL, alternateHeight, 10, 1, 0.15, 1, 0.025);
-								mWorld.spawnParticle(Particle.REDSTONE, alternateHeight, 10, 1, 0.15, 1, BLACK_COLOR);
-								for (double deg = 0; deg < 360; deg += 10) {
-									mWorld.spawnParticle(Particle.REDSTONE, mLoc.clone().add(3 * FastUtils.cosDeg(deg), 0.5, 3 * FastUtils.sinDeg(deg)), 1, 0, 0, 0, DARK_PURPLE_COLOR);
-									mWorld.spawnParticle(Particle.REDSTONE, mLoc.clone().add(3 * FastUtils.cosDeg(deg), 0.25, 3 * FastUtils.sinDeg(deg)), 1, 0, 0, 0, DARK_PURPLE_COLOR);
-								}
+								marker1.spawnAsBoss();
+								marker2.spawnAsBoss();
+								circle.spawnAsBoss();
 
 								if (mTicks % 10 == 0) {
-									for (Player player : PlayerUtils.playersInRange(fallingBlock.getLocation(), 3, true)) {
+									for (Player player : PlayerUtils.playersInRange(loc, 3, true)) {
 										/* Fire aura can not be blocked */
 										BossUtils.bossDamagePercent(mBoss, player, 0.1, (Location)null);
 									}
@@ -136,8 +148,6 @@ public class SpellVoidGrenades extends Spell {
 
 						}.runTaskTimer(mPlugin, 10, 2);
 						this.cancel();
-
-
 					}
 				}
 

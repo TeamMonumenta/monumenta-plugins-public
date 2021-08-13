@@ -99,6 +99,7 @@ public class Davey extends BossAbilityGroup {
 			mCooldownTicks = 7 * 20;
 		}
 
+		//Davey and vex target swap
 		new BukkitRunnable() {
 			Mob mDavey = (Mob) mBoss;
 			@Override
@@ -112,6 +113,14 @@ public class Davey extends BossAbilityGroup {
 				if (players != null && players.size() > 0) {
 					Collections.shuffle(players);
 					mDavey.setTarget(players.get(0));
+				}
+				if (players != null && players.size() > 0 && mVexes.size() >= 1 && mVexes.get(0) != null) {
+					Collections.shuffle(players);
+					((Mob) mVexes.get(0)).setTarget(players.get(0));
+				}
+				if (players != null && players.size() > 0 && mVexes.size() >= 2 && mVexes.get(1) != null) {
+					Collections.shuffle(players);
+					((Mob) mVexes.get(1)).setTarget(players.get(0));
 				}
 			}
 		}.runTaskTimer(mPlugin, 0, SWAP_TARGET_SECONDS * 20);
