@@ -369,6 +369,10 @@ public class PlayerUtils {
 					}
 					String[] loreSegments = loreEntryStripped.split(" ", 2);
 
+					if (loreSegments.length < 2) {
+						continue;
+					}
+
 					// We are only looking for lore with attributeName after the number
 					if (!loreSegments[1].contains(attributeName)) {
 						continue;
