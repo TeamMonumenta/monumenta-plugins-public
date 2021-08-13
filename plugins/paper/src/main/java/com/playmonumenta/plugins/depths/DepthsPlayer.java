@@ -67,21 +67,27 @@ public class DepthsPlayer {
 			}
 
 			double rand = Math.random();
-			if (4/7.0 < rand && rand < chance) {
+			if (rand < 4.0/7.0) {
+				//Guarantee the tree, but same chance that they would normally get it
+				return initTreesWithGuarantee(talismanScore);
+			} else if (rand < chance) {
+				//The Talisman granted them the tree when it wouldn't normally
+				player.sendMessage(DepthsUtils.DEPTHS_MESSAGE_PREFIX + "Due to your Talisman, you have become a " + DepthsUtils.TREE_NAMES[talismanScore - 1] + " when you would not have otherwise!");
+				return initTreesWithGuarantee(talismanScore);
+			} else {
+				//They failed both the usual random chance of the tree and the Talisman chance
 				List<DepthsTree> randomTrees = new ArrayList<DepthsTree>();
 
 				DepthsTree talismanTree = DepthsUtils.TREES[talismanScore - 1];
-				randomTrees.add(talismanTree);
-				player.sendMessage(DepthsUtils.DEPTHS_MESSAGE_PREFIX + "Due to your Talisman, you have become a " + DepthsUtils.TREE_NAMES[talismanScore - 1] + " when you would not have otherwise!");
 
 				List<DepthsTree> allTrees = new ArrayList<>();
 				//Get all possible trees and shuffle them
 				Collections.addAll(allTrees, DepthsTree.values());
+				//This is the 1/4 chance in Endless with the Talisman to NOT get the requested tree
 				allTrees.remove(talismanTree);
 				Collections.shuffle(allTrees);
 
-				//Select one less tree since we already have one chosen
-				for (int i = 0; i < DepthsManager.NUM_TREES_PER_RUN - 1; i++) {
+				for (int i = 0; i < DepthsManager.NUM_TREES_PER_RUN; i++) {
 					randomTrees.add(allTrees.get(i));
 				}
 
@@ -104,6 +110,26 @@ public class DepthsPlayer {
 
 		//Select the first x values as valid tree offerings this run
 		for (int i = 0; i < DepthsManager.NUM_TREES_PER_RUN; i++) {
+			randomTrees.add(allTrees.get(i));
+		}
+
+		return randomTrees;
+	}
+
+	public List<DepthsTree> initTreesWithGuarantee(int talismanScore) {
+		List<DepthsTree> randomTrees = new ArrayList<DepthsTree>();
+
+		DepthsTree talismanTree = DepthsUtils.TREES[talismanScore - 1];
+		randomTrees.add(talismanTree);
+
+		List<DepthsTree> allTrees = new ArrayList<>();
+		//Get all possible trees and shuffle them
+		Collections.addAll(allTrees, DepthsTree.values());
+		allTrees.remove(talismanTree);
+		Collections.shuffle(allTrees);
+
+		//Select one less tree since we already have one chosen
+		for (int i = 0; i < DepthsManager.NUM_TREES_PER_RUN - 1; i++) {
 			randomTrees.add(allTrees.get(i));
 		}
 
