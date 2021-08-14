@@ -63,8 +63,8 @@ public class AlchemistPotions extends Ability {
 	private static final String POTION_SCOREBOARD = "StoredPotions";
 
 	public static final String POTION_METADATA_PLAYER_NAME = "HitByAlchemist";
-	public static final int NORMAL_MOB_HEALTH_PER_POTION = 20;
-	public static final int BOSS_MOB_HEALTH_PER_POTION = 40;
+	public static final int NORMAL_MOB_HEALTH_PER_POTION = 30;
+	public static final int BOSS_MOB_HEALTH_PER_POTION = 60;
 
 	private List<PotionAbility> mPotionAbilities = new ArrayList<PotionAbility>();
 	private double mDamage = 0;

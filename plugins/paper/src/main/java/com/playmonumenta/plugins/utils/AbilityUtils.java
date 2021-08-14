@@ -247,6 +247,7 @@ public class AbilityUtils {
 			if (meta.getDisplayName().contains("Alchemist's Bag")) {
 				meta.setDisplayName(ChatColor.DARK_GREEN + "" + ChatColor.BOLD + "Alchemist's Bag (" + count + ")");
 				item.setItemMeta(meta);
+				ItemUtils.setPlainTag(item);
 				return true;
 			}
 		}

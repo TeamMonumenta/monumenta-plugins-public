@@ -16,6 +16,7 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.abilities.KillTriggeredAbilityTracker;
 import com.playmonumenta.plugins.abilities.KillTriggeredAbilityTracker.KillTriggeredAbility;
+import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.EntityUtils;
 
 /*
@@ -58,7 +59,14 @@ public class NonAlchemistPotionPassive extends Ability implements KillTriggeredA
 	public void triggerOnKill(LivingEntity mob) {
 		if (mob.hasMetadata(AlchemistPotions.POTION_METADATA_PLAYER_NAME)) {
 			double mobHealt = mob.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue();
-			mPotionQuantity += EntityUtils.isBoss(mob) || EntityUtils.isElite(mob) ? (mobHealt / AlchemistPotions.BOSS_MOB_HEALTH_PER_POTION) : (mobHealt / AlchemistPotions.NORMAL_MOB_HEALTH_PER_POTION);
+			if (!ServerProperties.getClassSpecializationsEnabled()) {
+				//we are on R1
+				mPotionQuantity += EntityUtils.isBoss(mob) || EntityUtils.isElite(mob) ? (mobHealt / AlchemistPotions.BOSS_MOB_HEALTH_PER_POTION) : (mobHealt / AlchemistPotions.NORMAL_MOB_HEALTH_PER_POTION);
+			} else {
+				//we are on R2
+				mPotionQuantity += EntityUtils.isBoss(mob) || EntityUtils.isElite(mob) ? (mobHealt / (AlchemistPotions.BOSS_MOB_HEALTH_PER_POTION * 2)) : (mobHealt / (AlchemistPotions.NORMAL_MOB_HEALTH_PER_POTION * 2));
+				//the value are the same of R1 but just multiply by 30/60 -> 60/120
+			}
 			int quantity = (int) mPotionQuantity;
 			mPotionQuantity -= quantity;
 
@@ -77,7 +85,7 @@ public class NonAlchemistPotionPassive extends Ability implements KillTriggeredA
 						targetAlchemist != null
 					&& (ap = AbilityManager.getManager().getPlayerAbility(targetAlchemist, AlchemistPotions.class)) != null
 					&& ap.canUse(targetAlchemist)) {
-						((AlchemistPotions) ap).incrementChargeByQuantity(quantity);
+						((AlchemistPotions) ap).incrementChargeByQuantity(quantity + 1);
 					}
 				}
 			}
