@@ -6,15 +6,11 @@ import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.List;
 
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.Particle;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.ThrownPotion;
-import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.PotionSplashEvent;
-import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.metadata.FixedMetadataValue;
@@ -23,7 +19,6 @@ import org.bukkit.scheduler.BukkitRunnable;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityManager;
-import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.alchemist.apothecary.AlchemicalAmalgam;
 import com.playmonumenta.plugins.abilities.alchemist.apothecary.InvigoratingOdor;
 import com.playmonumenta.plugins.abilities.alchemist.apothecary.WardingRemedy;
@@ -77,7 +72,6 @@ public class AlchemistPotions extends Ability {
 	public AlchemistPotions(Plugin plugin, Player player) {
 		super(plugin, player, null);
 		mInfo.mLinkedSpell = ClassAbility.ALCHEMIST_POTION;
-		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
 
 		if (player == null) {
 			/* This is a reference ability, not one actually tied to a player */
@@ -147,6 +141,20 @@ public class AlchemistPotions extends Ability {
 	}
 
 	@Override
+	public boolean playerThrewSplashPotionEvent(ThrownPotion potion) {
+		if (ItemUtils.isAlchemistItem(mPlayer.getInventory().getItemInMainHand())) {
+			if (consumeCharge()) {
+				potion.setMetadata("AlchemistPotion", new FixedMetadataValue(mPlugin, 0));
+				potion.setItem(POTION);
+			} else {
+				potion.remove();
+			}
+		}
+
+		return true;
+	}
+
+	@Override
 	public boolean playerSplashPotionEvent(Collection<LivingEntity> affectedEntities, ThrownPotion potion, PotionSplashEvent event) {
 		if (potion.hasMetadata("AlchemistPotion")) {
 			createAura(potion.getLocation());
@@ -204,20 +212,6 @@ public class AlchemistPotions extends Ability {
 
 	public double getDamage() {
 		return mDamage + AlchemistPotionsDamageEnchantment.getExtraDamage(mPlayer, AlchemistPotionsDamageEnchantment.class);
-	}
-
-	@Override
-	public void cast(Action trigger) {
-		if (ItemUtils.isAlchemistItem(mPlayer.getInventory().getItemInMainHand())) {
-			if (consumeCharge()) {
-				ThrownPotion tp = mPlayer.launchProjectile(ThrownPotion.class);
-				mPlugin.mProjectileEffectTimers.addEntity(tp, Particle.SPELL);
-				tp.setMetadata("AlchemistPotion", new FixedMetadataValue(mPlugin, 0));
-				tp.setItem(POTION);
-				ProjectileLaunchEvent event = new ProjectileLaunchEvent(tp);
-				Bukkit.getPluginManager().callEvent(event);
-			}
-		}
 	}
 
 	public boolean consumeCharge() {
