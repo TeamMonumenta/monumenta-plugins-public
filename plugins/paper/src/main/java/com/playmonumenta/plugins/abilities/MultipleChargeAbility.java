@@ -23,7 +23,7 @@ public class MultipleChargeAbility extends Ability {
 			@Override
 			public void run() {
 				mMaxCharges = getAbilityScore() == 1 ? maxCharges1 : maxCharges2;
-				mCharges = mMaxCharges;
+				mCharges = 0;
 			}
 		}.runTaskLater(mPlugin, 1);
 	}

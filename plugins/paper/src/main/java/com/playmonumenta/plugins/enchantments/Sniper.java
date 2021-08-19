@@ -6,6 +6,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.World;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
@@ -14,14 +15,15 @@ import org.bukkit.entity.Projectile;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.metadata.FixedMetadataValue;
+import org.bukkit.projectiles.ProjectileSource;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
 
 public class Sniper implements BaseEnchantment {
 	private static final String PROPERTY_NAME = ChatColor.GRAY + "Sniper";
-	private static final int DISTANCE = 16;
-	private static final int DAMAGE_PER_LEVEL = 2;
+	public static final int DISTANCE = 16;
+	public static final int DAMAGE_PER_LEVEL = 2;
 	public static final String LEVEL_METAKEY = "SniperLevelMetakey";
 	private static final String LOCATION_METAKEY = "SniperLocationMetakey";
 	private static final EnumSet<EntityType> ALLOWED_PROJECTILES = EnumSet.of(EntityType.ARROW, EntityType.SPECTRAL_ARROW);
@@ -63,15 +65,18 @@ public class Sniper implements BaseEnchantment {
 
 			if (loc.distance(target.getLocation()) > DISTANCE) {
 				event.setDamage(event.getDamage() + level * DAMAGE_PER_LEVEL);
-
-				// TODO: Fix this shitty particle! Maybe add sound?
-				target.getWorld().spawnParticle(Particle.CRIT, target.getEyeLocation(), 30, 0, 0, 0, 0.65);
-				target.getWorld().spawnParticle(Particle.CRIT_MAGIC, target.getEyeLocation(), 30, 0, 0, 0, 0.65);
-				if (proj.getShooter() instanceof Player) {
-					Player player = (Player) proj.getShooter();
-					player.playSound(player.getLocation(), Sound.ENTITY_ARROW_HIT_PLAYER, 0.6f, 0.5f);
+				ProjectileSource shooter = proj.getShooter();
+				if (shooter instanceof Player) {
+					particles(target.getEyeLocation(), (Player) shooter);
 				}
 			}
 		}
+	}
+
+	public static void particles(Location loc, Player player) {
+		World world = loc.getWorld();
+		world.spawnParticle(Particle.CRIT, loc, 30, 0, 0, 0, 0.65);
+		world.spawnParticle(Particle.CRIT_MAGIC, loc, 30, 0, 0, 0, 0.65);
+		player.playSound(player.getLocation(), Sound.ENTITY_ARROW_HIT_PLAYER, 0.6f, 0.5f);
 	}
 }

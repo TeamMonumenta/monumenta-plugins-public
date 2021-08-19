@@ -31,6 +31,8 @@ import com.playmonumenta.plugins.attributes.AttributeProjectileDamage;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.classes.magic.MagicType;
 import com.playmonumenta.plugins.effects.PercentDamageReceived;
+import com.playmonumenta.plugins.enchantments.PointBlank;
+import com.playmonumenta.plugins.enchantments.Sniper;
 import com.playmonumenta.plugins.enchantments.infusions.Focus;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
@@ -181,6 +183,15 @@ public class HallowedBeam extends MultipleChargeAbility {
 							int focusLevel = mPlugin.mTrackingManager.mPlayers.getPlayerCustomEnchantLevel(mPlayer, Focus.class);
 							if (focusLevel > 0) {
 								damage *= 1 + focusLevel * Focus.DAMAGE_PCT_PER_LEVEL;
+							}
+							int pointBlankLevel = mPlugin.mTrackingManager.mPlayers.getPlayerCustomEnchantLevel(mPlayer, PointBlank.class);
+							int sniperLevel = mPlugin.mTrackingManager.mPlayers.getPlayerCustomEnchantLevel(mPlayer, Sniper.class);
+							if (pointBlankLevel > 0 && mPlayer.getLocation().distance(applyE.getLocation()) < PointBlank.DISTANCE) {
+								damage += pointBlankLevel * PointBlank.DAMAGE_PER_LEVEL;
+								PointBlank.particles(applyE.getEyeLocation(), mPlayer);
+							} else if (sniperLevel > 0 && mPlayer.getLocation().distance(applyE.getLocation()) > Sniper.DISTANCE) {
+								damage += sniperLevel * Sniper.DAMAGE_PER_LEVEL;
+								Sniper.particles(applyE.getEyeLocation(), mPlayer);
 							}
 							EntityUtils.damageEntity(mPlugin, applyE, damage, mPlayer, MagicType.HOLY, true, mInfo.mLinkedSpell, false, false, true, false);
 

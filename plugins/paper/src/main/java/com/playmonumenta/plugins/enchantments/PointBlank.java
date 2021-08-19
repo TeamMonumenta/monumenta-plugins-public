@@ -6,6 +6,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.World;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
@@ -14,14 +15,15 @@ import org.bukkit.entity.Projectile;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.metadata.FixedMetadataValue;
+import org.bukkit.projectiles.ProjectileSource;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
 
 public class PointBlank implements BaseEnchantment {
 	private static final String PROPERTY_NAME = ChatColor.GRAY + "Point Blank";
-	private static final int DISTANCE = 8;
-	private static final int DAMAGE_PER_LEVEL = 2;
+	public static final int DISTANCE = 8;
+	public static final int DAMAGE_PER_LEVEL = 2;
 	public static final String LEVEL_METAKEY = "PointBlankLevelMetakey";
 	private static final String LOCATION_METAKEY = "PointBlankLocationMetakey";
 	private static final EnumSet<EntityType> ALLOWED_PROJECTILES = EnumSet.of(EntityType.ARROW, EntityType.SPECTRAL_ARROW);
@@ -63,12 +65,18 @@ public class PointBlank implements BaseEnchantment {
 
 			if (loc.distance(target.getLocation()) < DISTANCE) {
 				event.setDamage(event.getDamage() + level * DAMAGE_PER_LEVEL);
-
-				// TODO: Fix this shitty particle! Maybe add sound?
-				target.getWorld().spawnParticle(Particle.SMOKE_NORMAL, target.getEyeLocation(), 30, 0, 0, 0, 0.25);
-				target.getWorld().spawnParticle(Particle.CRIT_MAGIC, target.getEyeLocation(), 30, 0, 0, 0, 0.65);
-				target.getWorld().playSound(target.getLocation(), Sound.ENTITY_ARMOR_STAND_BREAK, 1.5f, 0.75f);
+				ProjectileSource shooter = proj.getShooter();
+				if (shooter instanceof Player) {
+					particles(target.getEyeLocation(), (Player) shooter);
+				}
 			}
 		}
+	}
+
+	public static void particles(Location loc, Player player) {
+		World world = loc.getWorld();
+		world.spawnParticle(Particle.SMOKE_NORMAL, loc, 30, 0, 0, 0, 0.25);
+		world.spawnParticle(Particle.CRIT_MAGIC, loc, 30, 0, 0, 0, 0.65);
+		player.playSound(player.getLocation(), Sound.ENTITY_ARMOR_STAND_BREAK, 1.5f, 0.75f);
 	}
 }

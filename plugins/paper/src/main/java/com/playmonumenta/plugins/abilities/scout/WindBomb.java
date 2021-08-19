@@ -32,6 +32,7 @@ public class WindBomb extends Ability {
 	private static final int COOLDOWN_2 = 20 * 10;
 	private static final double MIDAIR_DAMAGE_BONUS = 0.2;
 	private static final int RADIUS = 3;
+	private static final double VELOCITY = 1.5;
 
 	private Snowball mProj = null;
 
@@ -55,6 +56,7 @@ public class WindBomb extends Ability {
 			World world = mPlayer.getWorld();
 			world.playSound(mPlayer.getLocation(), Sound.ENTITY_HORSE_BREATHE, 1.0f, 0.25f);
 			mProj = mPlayer.launchProjectile(Snowball.class);
+			mProj.setVelocity(mProj.getVelocity().normalize().multiply(VELOCITY));
 			mPlugin.mProjectileEffectTimers.addEntity(mProj, Particle.CLOUD);
 			putOnCooldown();
 		}
