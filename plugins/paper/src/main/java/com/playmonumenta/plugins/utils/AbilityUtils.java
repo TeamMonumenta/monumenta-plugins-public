@@ -240,24 +240,8 @@ public class AbilityUtils {
 		return false;
 	}
 
-
 	public static boolean updateAlchemistItem(@NotNull ItemStack item, int count) {
 		ItemMeta meta = item.getItemMeta();
-
-		if (item.getType() == Material.SPLASH_POTION) {
-			PotionMeta potionMeta = (PotionMeta) meta;
-
-			if (count > 9) {
-				potionMeta.setColor(Color.GREEN);
-			} else if (count > 4) {
-				potionMeta.setColor(Color.ORANGE);
-			} else if (count > 0) {
-				potionMeta.setColor(Color.RED);
-			} else {
-				potionMeta.setColor(Color.BLACK);
-			}
-			item.setItemMeta(potionMeta);
-		}
 
 		if (meta.getDisplayName() != null) {
 			if (meta.getDisplayName().contains("Alchemist's Bag")) {

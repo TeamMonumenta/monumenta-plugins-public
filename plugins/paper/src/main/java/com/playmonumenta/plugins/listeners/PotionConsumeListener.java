@@ -272,7 +272,7 @@ public class PotionConsumeListener implements Listener {
 
 		Set<String> tags = player.getScoreboardTags();
 
-		if (!tags.contains(INVENTORY_DRINK_TAG) || InventoryUtils.testForItemWithName(item, "Alchemist's Potion") || InventoryUtils.testForItemWithName(item, LightningBottle.POTION_NAME) || ItemUtils.isAlchemistItem(item)) {
+		if (!tags.contains(INVENTORY_DRINK_TAG) || InventoryUtils.testForItemWithName(item, "Alchemist's Potion") || InventoryUtils.testForItemWithName(item, LightningBottle.POTION_NAME)) {
 			//Needs this tag to work and cannot be an Alchemist Potion or Lightning Bottle
 			return;
 		}
