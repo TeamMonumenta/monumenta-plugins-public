@@ -5,6 +5,7 @@ import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
+import org.bukkit.entity.ThrownPotion;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 
@@ -18,6 +19,8 @@ import com.playmonumenta.plugins.abilities.KillTriggeredAbilityTracker;
 import com.playmonumenta.plugins.abilities.KillTriggeredAbilityTracker.KillTriggeredAbility;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.scriptedquests.utils.ScoreboardUtils;
 
 /*
  * All players can use this ability! It is used to generate potions for nearby alchemists
@@ -31,6 +34,15 @@ public class NonAlchemistPotionPassive extends Ability implements KillTriggeredA
 	public NonAlchemistPotionPassive(Plugin plugin, Player player) {
 		super(plugin, player, null);
 		mTracker = new KillTriggeredAbilityTracker(this);
+	}
+
+	@Override
+	public boolean playerThrewSplashPotionEvent(ThrownPotion potion) {
+		if (ScoreboardUtils.getScoreboardValue(mPlayer, "Class") != 5 && ItemUtils.isAlchemistItem(mPlayer.getInventory().getItemInMainHand())) {
+			potion.remove();
+		}
+
+		return true;
 	}
 
 	@Override
