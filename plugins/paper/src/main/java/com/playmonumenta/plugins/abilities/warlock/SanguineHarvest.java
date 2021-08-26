@@ -74,13 +74,11 @@ public class SanguineHarvest extends Ability {
 	}
 
 	@Override
-	public boolean runCheck() {
-		return (ItemUtils.isHoe(mPlayer.getInventory().getItemInMainHand()) && !mPlayer.isSneaking());
-	}
-
-	@Override
 	public void cast(Action action) {
 		if (mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.mLinkedSpell)) {
+			return;
+		}
+		if (!ItemUtils.isHoe(mPlayer.getInventory().getItemInMainHand()) || !mPlayer.isSneaking()) {
 			return;
 		}
 		if (MetadataUtils.checkOnceThisTick(mPlugin, mPlayer, CHECK_ONCE_THIS_TICK_METAKEY)) {
@@ -160,11 +158,8 @@ public class SanguineHarvest extends Ability {
 	}
 
 	@Override
-	public boolean livingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
-		if (event.getCause() == DamageCause.CUSTOM) {
-			LivingEntity damagee = (LivingEntity) event.getEntity();
-			EntityUtils.applyBleed(mPlugin, BLEED_DURATION, mBleedLevel, damagee);
-		}
-		return true;
+	public void playerDealtCustomDamageEvent(CustomDamageEvent event) {
+		LivingEntity damagee = (LivingEntity) event.getDamaged();
+		EntityUtils.applyBleed(mPlugin, BLEED_DURATION, mBleedLevel, damagee);
 	}
 }

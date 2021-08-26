@@ -32,6 +32,7 @@ import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.VectorUtils;
+import com.playmonumenta.plugins.server.properties.ServerProperties;
 
 
 
@@ -54,6 +55,8 @@ public class AmplifyingHex extends Ability {
 	private static final int AMPLIFIER_DAMAGE_2 = 2;
 	private static final int AMPLIFIER_CAP_1 = 2;
 	private static final int AMPLIFIER_CAP_2 = 3;
+	private static final float R1_CAP = 3.5f;
+	private static final float R2_CAP = 5f;
 	private static final int RADIUS_1 = 8;
 	private static final int RADIUS_2 = 10;
 	private static final double DOT_ANGLE = 0.33;
@@ -75,6 +78,7 @@ public class AmplifyingHex extends Ability {
 	private final int mAmplifierDamage;
 	private final int mAmplifierCap;
 	private final int mRadius;
+	private float mRegionCap;
 	private float mDamage = 0f;
 
 	public AmplifyingHex(Plugin plugin, Player player) {
@@ -118,6 +122,7 @@ public class AmplifyingHex extends Ability {
 	@Override
 	public void cast(Action action) {
 		World world = mPlayer.getWorld();
+		mRegionCap = ServerProperties.getClassSpecializationsEnabled() == true ? R2_CAP : R1_CAP;
 		new BukkitRunnable() {
 			final Location mLoc = mPlayer.getLocation();
 			double mRadiusIncrement = 0.5;
@@ -201,7 +206,7 @@ public class AmplifyingHex extends Ability {
 				}
 
 				if (debuffCount > 0) {
-					float finalDamage = AmplifyingHexDamageEnchantment.getExtraPercentDamage(mPlayer, AmplifyingHexDamageEnchantment.class, debuffCount * (FLAT_DAMAGE + mDamage) + amplifierCount * mAmplifierDamage);
+					float finalDamage = AmplifyingHexDamageEnchantment.getExtraPercentDamage(mPlayer, AmplifyingHexDamageEnchantment.class, debuffCount * (FLAT_DAMAGE + Math.min(mDamage, mRegionCap)) + amplifierCount * mAmplifierDamage);
 					EntityUtils.damageEntity(mPlugin, mob, finalDamage, mPlayer, MagicType.DARK_MAGIC, true, mInfo.mLinkedSpell);
 					MovementUtils.knockAway(mPlayer, mob, KNOCKBACK_SPEED);
 				}

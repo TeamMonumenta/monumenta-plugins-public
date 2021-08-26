@@ -184,6 +184,7 @@ public class HallowedBeam extends MultipleChargeAbility {
 							if (focusLevel > 0) {
 								damage *= 1 + focusLevel * Focus.DAMAGE_PCT_PER_LEVEL;
 							}
+
 							int pointBlankLevel = mPlugin.mTrackingManager.mPlayers.getPlayerCustomEnchantLevel(mPlayer, PointBlank.class);
 							int sniperLevel = mPlugin.mTrackingManager.mPlayers.getPlayerCustomEnchantLevel(mPlayer, Sniper.class);
 							if (pointBlankLevel > 0 && mPlayer.getLocation().distance(applyE.getLocation()) < PointBlank.DISTANCE) {
