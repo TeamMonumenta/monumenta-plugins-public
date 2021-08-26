@@ -20,9 +20,9 @@ import com.playmonumenta.plugins.utils.FastUtils;
 public class Transcendent extends DelveModifier {
 
 	private static final double[] ABILITY_CHANCE = {
-			0.2,
-			0.4,
-			0.6
+			0.15,
+			0.3,
+			0.45
 	};
 
 	private static final String[] ABILITY_POOL_MELEE = {

@@ -1,31 +1,22 @@
 package com.playmonumenta.plugins.abilities.delves;
 
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.SpawnerSpawnEvent;
-
 import java.util.ArrayList;
 import java.util.List;
 
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
+import org.bukkit.event.entity.SpawnerSpawnEvent;
+
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.bosses.bosses.ChargerBoss;
+import com.playmonumenta.plugins.bosses.bosses.ProjectileBoss;
 import com.playmonumenta.plugins.bosses.bosses.RejuvenationBoss;
 import com.playmonumenta.plugins.bosses.bosses.TpBehindBoss;
 import com.playmonumenta.plugins.utils.DelvesUtils;
 import com.playmonumenta.plugins.utils.DelvesUtils.Modifier;
-import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 
 public class Arcanic extends DelveModifier {
-
-	private static final double[] CUSTOM_DAMAGE_TAKEN_MULTIPLIER = {
-			1.1,
-			1.2,
-			1.3,
-			1.4,
-			1.5
-	};
 
 	private static final double[] ABILITY_CHANCE = {
 			0.06,
@@ -46,9 +37,12 @@ public class Arcanic extends DelveModifier {
 		rejuvenation.add(RejuvenationBoss.identityTag);
 		ABILITY_POOL.add(rejuvenation);
 
-		//TrackingProjectileBoss  //notes this will be deprecated! use ProjectileBoss
+		//ProjectileBoss - tracking
 		List<String> trackingProjectile = new ArrayList<>();
-		trackingProjectile.add(RejuvenationBoss.identityTag);
+		trackingProjectile.add(ProjectileBoss.identityTag);
+		trackingProjectile.add(ProjectileBoss.identityTag + "[damage=30,speed=0.2,delay=20,cooldown=320,turnRadius=3.141]");
+		trackingProjectile.add(ProjectileBoss.identityTag + "[SoundStart=[(BLOCK_BEACON_POWER_SELECT,1,0.5)],SoundLaunch=[(ENTITY_EVOKER_CAST_SPELL,1,0.5)],SoundProjectile=[(BLOCK_BEACON_POWER_SELECT,0.4,0.5)],SoundHit=[(BLOCK_BEACON_DEACTIVATE,1,0.5)]]");
+		trackingProjectile.add(ProjectileBoss.identityTag + "[ParticleLaunch=[(SPELL_WITCH,40,0,0,0,0.3)],ParticleProjectile=[(SPELL_WITCH,6,0,0,0,0.3),(SMOKE_LARGE,2,0.2,0.2,0.2,0)],ParticleHit=[(SPELL_WITCH,50,0,0,0,0.3)]]");
 		ABILITY_POOL.add(trackingProjectile);
 
 		//TpBehindTargetedBoss
@@ -60,12 +54,15 @@ public class Arcanic extends DelveModifier {
 		//ChargerStrongBoss
 		List<String> charger = new ArrayList<>();
 		charger.add(ChargerBoss.identityTag);
-		charger.add(ChargerBoss.identityTag + "[damage=25]");
+		charger.add(ChargerBoss.identityTag + "[damage=37.5]");
 		ABILITY_POOL.add(charger);
 
-		//MagicArrowBoss    //notes this will be deprecated! use ProjectileBoss
+		//ProjectileBoss - magic arrow
 		List<String> magicArrow = new ArrayList<>();
-		magicArrow.add(RejuvenationBoss.identityTag);
+		magicArrow.add(ProjectileBoss.identityTag);
+		magicArrow.add(ProjectileBoss.identityTag + "[damage=30,distance=32,speed=0.8,delay=20,cooldown=160,turnRadius=0]");
+		magicArrow.add(ProjectileBoss.identityTag + "[SoundStart=[(ENTITY_FIREWORK_ROCKET_LAUNCH,0.01,1)],SoundLaunch=[(ENTITY_FIREWORK_ROCKET_LAUNCH,1,1.5)],SoundProjectile=[(ENTITY_BLAZE_BURN,0)],SoundHit=[(ENTITY_FIREWORK_ROCKET_TWINKLE,0.5,1.5)]]");
+		magicArrow.add(ProjectileBoss.identityTag + "[ParticleLaunch=[(FIREWORKS_SPARK,0)],ParticleProjectile=[(FIREWORKS_SPARK,5,0.1,0.1,0.1,0.05),(CRIT_MAGIC,20,0.2,0.2,0.2,0.1)],ParticleHit=[(FIREWORKS_SPARK,30,0,0,0,0.25)]]");
 		ABILITY_POOL.add(magicArrow);
 	}
 
@@ -73,24 +70,18 @@ public class Arcanic extends DelveModifier {
 
 	public static final String[][] RANK_DESCRIPTIONS = {
 			{
-				"Enemies have a " + Math.round(ABILITY_CHANCE[0] * 100) + "% chance to be Arcanic.",
-				"Enemies deal +" + Math.round((CUSTOM_DAMAGE_TAKEN_MULTIPLIER[0] - 1) * 100) + "% Ability Damage."
+				"Enemies have a " + Math.round(ABILITY_CHANCE[0] * 100) + "% chance to be Arcanic."
 			}, {
-				"Enemies have a " + Math.round(ABILITY_CHANCE[1] * 100) + "% chance to be Arcanic.",
-				"Enemies deal +" + Math.round((CUSTOM_DAMAGE_TAKEN_MULTIPLIER[1] - 1) * 100) + "% Ability Damage."
+				"Enemies have a " + Math.round(ABILITY_CHANCE[1] * 100) + "% chance to be Arcanic."
 			}, {
-				"Enemies have a " + Math.round(ABILITY_CHANCE[2] * 100) + "% chance to be Arcanic.",
-				"Enemies deal +" + Math.round((CUSTOM_DAMAGE_TAKEN_MULTIPLIER[2] - 1) * 100) + "% Ability Damage."
+				"Enemies have a " + Math.round(ABILITY_CHANCE[2] * 100) + "% chance to be Arcanic."
 			}, {
-				"Enemies have a " + Math.round(ABILITY_CHANCE[3] * 100) + "% chance to be Arcanic.",
-				"Enemies deal +" + Math.round((CUSTOM_DAMAGE_TAKEN_MULTIPLIER[3] - 1) * 100) + "% Ability Damage."
+				"Enemies have a " + Math.round(ABILITY_CHANCE[3] * 100) + "% chance to be Arcanic."
 			}, {
-				"Enemies have a " + Math.round(ABILITY_CHANCE[4] * 100) + "% chance to be Arcanic.",
-				"Enemies deal +" + Math.round((CUSTOM_DAMAGE_TAKEN_MULTIPLIER[4] - 1) * 100) + "% Ability Damage."
+				"Enemies have a " + Math.round(ABILITY_CHANCE[4] * 100) + "% chance to be Arcanic."
 			}
 	};
 
-	private final double mCustomDamageTakenMultiplier;
 	private final double mAbilityChance;
 
 	public Arcanic(Plugin plugin, Player player) {
@@ -98,18 +89,10 @@ public class Arcanic extends DelveModifier {
 
 		if (player != null) {
 			int rank = DelvesUtils.getDelveInfo(player).getRank(Modifier.ARCANIC);
-			mCustomDamageTakenMultiplier = CUSTOM_DAMAGE_TAKEN_MULTIPLIER[rank - 1];
 			mAbilityChance = ABILITY_CHANCE[rank - 1];
 		} else {
-			mCustomDamageTakenMultiplier = 0;
 			mAbilityChance = 0;
 		}
-	}
-
-	@Override
-	public boolean playerTookCustomDamageEvent(EntityDamageByEntityEvent event) {
-		event.setDamage(EntityUtils.getDamageApproximation(event, mCustomDamageTakenMultiplier));
-		return true;
 	}
 
 	@Override

@@ -20,8 +20,10 @@ import org.bukkit.potion.PotionEffectType;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
+import com.playmonumenta.plugins.enchantments.curses.Starvation;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
 import com.playmonumenta.plugins.utils.PotionUtils.PotionInfo;
@@ -62,6 +64,12 @@ public class InstantDrink implements BaseEnchantment {
 				} else {
 					PotionInfo info = PotionUtils.getPotionInfo(meta.getBasePotionData(), 1);
 					PotionUtils.apply(player, info);
+				}
+
+				//Apply Starvation if applicable
+				int starvation = InventoryUtils.getCustomEnchantLevel(item, Starvation.PROPERTY_NAME, true);
+				if (starvation > 0) {
+					Starvation.apply(player, starvation);
 				}
 
 				player.getWorld().playSound(player.getLocation(), Sound.ENTITY_GENERIC_DRINK, 1, 1);

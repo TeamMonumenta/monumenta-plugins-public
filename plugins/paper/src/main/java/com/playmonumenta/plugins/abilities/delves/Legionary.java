@@ -12,11 +12,11 @@ import com.playmonumenta.plugins.utils.FastUtils;
 public class Legionary extends DelveModifier {
 
 	private static final double[] SPAWN_CHANCE = {
-			0.2,
-			0.4,
+			0.15,
+			0.3,
+			0.45,
 			0.6,
-			0.8,
-			1
+			0.75
 	};
 
 	private final double mSpawnChance;

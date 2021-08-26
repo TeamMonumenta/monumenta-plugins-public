@@ -1071,7 +1071,8 @@ public class FrostGiant extends BossAbilityGroup {
 	@Override
 	public void init() {
 		int bossTargetHp = 0;
-		int playerCount = PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true).size();
+		List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true);
+		int playerCount = players.size();
 		int hpDel = 5012;
 
 		/*
@@ -1099,6 +1100,12 @@ public class FrostGiant extends BossAbilityGroup {
 		mBoss.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 20 * 9999, 10));
 
 		mBoss.setPersistent(true);
+
+		for (Player player : players) {
+			if (player.hasPotionEffect(PotionEffectType.GLOWING)) {
+				player.removePotionEffect(PotionEffectType.GLOWING);
+			}
+		}
 
 	}
 

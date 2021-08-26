@@ -59,7 +59,7 @@ public class DelvesUtils {
 
 	public enum Modifier {
 
-		RELENTLESS(Relentless.class, 1, Material.DIAMOND_PICKAXE, Component.text("Relentless", NamedTextColor.AQUA, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false), Relentless.DESCRIPTION, Relentless.RANK_DESCRIPTIONS),
+		RELENTLESS(Relentless.class, 1, Material.ELYTRA, Component.text("Relentless", NamedTextColor.AQUA, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false), Relentless.DESCRIPTION, Relentless.RANK_DESCRIPTIONS),
 		ARCANIC(Arcanic.class, 2, Material.NETHER_STAR, Component.text("Arcanic", NamedTextColor.LIGHT_PURPLE, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false), Arcanic.DESCRIPTION, Arcanic.RANK_DESCRIPTIONS),
 		INFERNAL(Infernal.class, 3, Material.LAVA_BUCKET, Component.text("Infernal", NamedTextColor.GOLD, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false), Infernal.DESCRIPTION, Infernal.RANK_DESCRIPTIONS),
 		TRANSCENDENT(Transcendent.class, 4, Material.ENDER_EYE, Component.text("Transcendent", NamedTextColor.GREEN, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false), Transcendent.DESCRIPTION, Transcendent.RANK_DESCRIPTIONS),

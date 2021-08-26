@@ -141,6 +141,25 @@ public class SpellBombToss extends Spell {
 			vect.normalize().multiply((pLoc.distance(tLoc)) / 20).setY(0.7f);
 			tnt.setVelocity(vect);
 
+			int delay = mFuse % 4;
+			BukkitRunnable fuseSound = new BukkitRunnable() {
+				TNTPrimed mTnt = tnt;
+				int mCount = 0;
+				@Override
+				public void run() {
+					if (mCount >= 3) {
+						this.cancel();
+						return;
+					}
+
+					mTnt.getWorld().playSound(mTnt.getLocation(), Sound.ENTITY_TNT_PRIMED, 1.5f, 1);
+
+					mCount++;
+				}
+			};
+			fuseSound.runTaskTimer(mPlugin, delay + (mFuse - delay) / 4, (mFuse - delay) / 4);
+			mActiveRunnables.add(fuseSound);
+
 			// Create explosion manually for proper damage calculations; source it at a mob entity and use the TNT location
 			BukkitRunnable explosion = new BukkitRunnable() {
 				TNTPrimed mTnt = tnt;

@@ -425,9 +425,11 @@ public class PlayerUtils {
 		for (double flat : flats) {
 			finalValue += flat;
 		}
+		double overallMultiplier = 1;
 		for (double mult : mults) {
-			finalValue *= (1 + mult);
+			overallMultiplier += mult;
 		}
+		finalValue *= overallMultiplier;
 		return finalValue;
 	}
 }

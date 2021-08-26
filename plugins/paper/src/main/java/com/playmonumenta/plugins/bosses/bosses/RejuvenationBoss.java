@@ -21,8 +21,6 @@ public class RejuvenationBoss extends BossAbilityGroup {
 		public int COOLDOWN = 15 * 20;
 	}
 
-	public static final int detectionRange = 20;
-
 	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
 		return new RejuvenationBoss(plugin, boss);
 	}
@@ -36,6 +34,6 @@ public class RejuvenationBoss extends BossAbilityGroup {
 			new SpellMobHealAoE(plugin, boss, p.HEAL, p.RANGE, p.DURATION, p.COOLDOWN)
 		                                             ));
 
-		super.constructBoss(activeSpells, null, detectionRange, null, p.DELAY);
+		super.constructBoss(activeSpells, null, p.DETECTION, null, p.DELAY);
 	}
 }

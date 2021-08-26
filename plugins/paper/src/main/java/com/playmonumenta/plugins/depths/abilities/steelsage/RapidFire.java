@@ -65,6 +65,7 @@ public class RapidFire extends DepthsAbility {
 
 				if (mCount >= ARROWS[mRarity - 1]) {
 					this.cancel();
+					return;
 				}
 
 				ItemStack inMainHand = mPlayer.getInventory().getItemInMainHand();

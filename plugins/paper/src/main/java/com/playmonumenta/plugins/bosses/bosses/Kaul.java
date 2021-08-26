@@ -1051,6 +1051,13 @@ public class Kaul extends BossAbilityGroup {
 		mBoss.getAttribute(Attribute.GENERIC_FOLLOW_RANGE).setBaseValue(detectionRange);
 		mBoss.getAttribute(Attribute.GENERIC_KNOCKBACK_RESISTANCE).setBaseValue(1);
 		mBoss.setHealth(bossTargetHp);
+
+		for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true)) {
+			if (player.hasPotionEffect(PotionEffectType.GLOWING)) {
+				player.removePotionEffect(PotionEffectType.GLOWING);
+			}
+		}
+
 		EntityEquipment equips = mBoss.getEquipment();
 		ItemStack[] armorc = equips.getArmorContents();
 		ItemStack m = equips.getItemInMainHand();

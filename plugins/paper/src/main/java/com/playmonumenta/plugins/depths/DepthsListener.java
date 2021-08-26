@@ -172,8 +172,10 @@ public class DepthsListener implements Listener {
 			}
 			DepthsParty party = DepthsManager.getInstance().getPartyFromId(dp1);
 			// Extra damage taken at higher floors
-			if (party.getFloor() > 15) {
-			    event.setDamage(event.getDamage() * (1 + (0.1 * ((party.getFloor() - 1) / 3) - 4)));
+			int floor = party.getFloor();
+			if (floor > 15) {
+				double multiplier = 1 + (0.1 * (((floor - 1) / 3) - 4));
+			    event.setDamage(event.getDamage() * multiplier);
 			}
 		}
 	}

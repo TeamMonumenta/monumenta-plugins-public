@@ -1,43 +1,35 @@
 package com.playmonumenta.plugins.abilities.delves;
 
-import org.bukkit.Location;
-import org.bukkit.Sound;
-import org.bukkit.World;
-import org.bukkit.block.Block;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Vex;
 import org.bukkit.event.entity.SpawnerSpawnEvent;
-import org.bukkit.util.BoundingBox;
-import org.bukkit.util.Vector;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.bosses.bosses.BlockBreakBoss;
 import com.playmonumenta.plugins.utils.DelvesUtils;
 import com.playmonumenta.plugins.utils.DelvesUtils.Modifier;
 import com.playmonumenta.plugins.utils.FastUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
 
 public class Pernicious extends DelveModifier {
 
-	private static final double[] SPAWN_CHANCE = {
-			0.15,
-			0.3,
-			0.45
+	private static final double[] BLOCK_BREAK_CHANCE = {
+			0.05,
+			0.1,
+			0.15
 	};
 
-	private final double mSpawnChance;
+	private final double mBlockBreakChance;
 
-	public static final String DESCRIPTION = "Enemies have craftier spawning patterns.";
+	public static final String DESCRIPTION = "Enemies can destroy terrain.";
 
 	public static final String[][] RANK_DESCRIPTIONS = {
 			{
-				"Spawners have a " + Math.round(SPAWN_CHANCE[0] * 100) + "% chance",
-				"to spawn a copy of an enemy behind a player."
+				"Enemies have a " + Math.round(BLOCK_BREAK_CHANCE[0] * 100) + "% chance to have Block Break."
 			}, {
-				"Spawners have a " + Math.round(SPAWN_CHANCE[1] * 100) + "% chance",
-				"to spawn a copy of an enemy behind a player."
+				"Enemies have a " + Math.round(BLOCK_BREAK_CHANCE[1] * 100) + "% chance to have Block Break."
 			}, {
-				"Spawners have a " + Math.round(SPAWN_CHANCE[2] * 100) + "% chance",
-				"to spawn a copy of an enemy behind a player."
+				"Enemies have a " + Math.round(BLOCK_BREAK_CHANCE[2] * 100) + "% chance to have Block Break."
 			}
 	};
 
@@ -46,87 +38,16 @@ public class Pernicious extends DelveModifier {
 
 		if (player != null) {
 			int rank = DelvesUtils.getDelveInfo(player).getRank(Modifier.PERNICIOUS);
-			mSpawnChance = SPAWN_CHANCE[rank - 1];
+			mBlockBreakChance = BLOCK_BREAK_CHANCE[rank - 1];
 		} else {
-			mSpawnChance = 0;
+			mBlockBreakChance = 0;
 		}
 	}
 
 	@Override
 	public void applyModifiers(LivingEntity mob, SpawnerSpawnEvent event) {
-		if (FastUtils.RANDOM.nextDouble() < mSpawnChance) {
-			for (Player player : PlayerUtils.playersInRange(mob.getEyeLocation(), 16, true)) {
-				if (player.hasLineOfSight(mob)) {
-					Location loc = getSpawnLocationBehindPlayer(mob, player);
-					if (loc != null) {
-						loc.getWorld().playSound(loc, Sound.ENTITY_WITCH_AMBIENT, 1.4f, 0.5f);
-						DelvesUtils.duplicateLibraryOfSoulsMob(mob, loc);
-
-						return;
-					}
-				}
-			}
+		if (!(mob instanceof Vex) && FastUtils.RANDOM.nextDouble() < mBlockBreakChance) {
+			mob.addScoreboardTag(BlockBreakBoss.identityTag);
 		}
 	}
-
-	private Location getSpawnLocationBehindPlayer(LivingEntity mob, Player player) {
-		Vector directionBackwards = player.getLocation().getDirection().multiply(-1);
-		if (directionBackwards.getX() == 0 && directionBackwards.getZ() == 0) {
-			return null;
-		}
-
-		directionBackwards.setY(0).normalize();
-		Vector directionSideways = new Vector(directionBackwards.getZ(), 0, -directionBackwards.getX());
-
-		// Try random-ish locations a few times
-		for (int i = 0; i < 5; i++) {
-			double distanceBackwards = FastUtils.RANDOM.nextDouble() * 4 + 4;
-			double distanceSideways = FastUtils.RANDOM.nextDouble() * 2 - 4;
-
-			Location loc = player.getLocation()
-					.add(directionBackwards.clone().multiply(distanceBackwards))
-					.add(directionSideways.clone().multiply(distanceSideways));
-
-			if (PlayerUtils.playersInRange(loc, 4, true).size() > 0) {
-				continue;
-			}
-
-			BoundingBox hitbox = mob.getBoundingBox();
-			hitbox.shift(loc.clone().subtract(mob.getLocation()).toVector());
-
-			// Increase the y-level if needed
-			for (int y = 0; y < 5; y++) {
-				if (canSpawn(loc, hitbox)) {
-					return loc;
-				}
-
-				loc.add(0, 1, 0);
-			}
-		}
-
-		return null;
-	}
-
-	private boolean canSpawn(Location loc, BoundingBox hitbox) {
-		World world = loc.getWorld();
-		if (isObstructed(loc, hitbox)
-				|| isObstructed(new Location(world, hitbox.getMinX(), hitbox.getMinY(), hitbox.getMinZ()), hitbox)
-				|| isObstructed(new Location(world, hitbox.getMinX(), hitbox.getMinY(), hitbox.getMaxZ()), hitbox)
-				|| isObstructed(new Location(world, hitbox.getMinX(), hitbox.getMaxY(), hitbox.getMinZ()), hitbox)
-				|| isObstructed(new Location(world, hitbox.getMinX(), hitbox.getMaxY(), hitbox.getMaxZ()), hitbox)
-				|| isObstructed(new Location(world, hitbox.getMaxX(), hitbox.getMinY(), hitbox.getMinZ()), hitbox)
-				|| isObstructed(new Location(world, hitbox.getMaxX(), hitbox.getMinY(), hitbox.getMaxZ()), hitbox)
-				|| isObstructed(new Location(world, hitbox.getMaxX(), hitbox.getMaxY(), hitbox.getMinZ()), hitbox)
-				|| isObstructed(new Location(world, hitbox.getMaxX(), hitbox.getMaxY(), hitbox.getMaxZ()), hitbox)) {
-			return false;
-		}
-
-		return true;
-	}
-
-	private boolean isObstructed(Location loc, BoundingBox box) {
-		Block block = loc.getBlock();
-		return block.getBoundingBox().overlaps(box) && !block.isLiquid();
-	}
-
 }

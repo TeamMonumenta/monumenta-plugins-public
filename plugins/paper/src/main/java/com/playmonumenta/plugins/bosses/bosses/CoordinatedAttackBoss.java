@@ -29,7 +29,7 @@ public class CoordinatedAttackBoss extends BossAbilityGroup {
 	public static final int detectionRange = 24;
 
 	private static final String PERCENT_SPEED_EFFECT_NAME = "CoordinatedAttackPercentSpeedEffect";
-	private static final double PERCENT_SPEED_EFFECT = 0.3;
+	private static final double PERCENT_SPEED_EFFECT = 0.15;
 	private static final int PERCENT_SPEED_DURATION = 20 * 6;
 
 	private static final int TARGET_RADIUS = 20;
@@ -61,8 +61,9 @@ public class CoordinatedAttackBoss extends BossAbilityGroup {
 
 			World world = mBoss.getWorld();
 			Location loc = target.getLocation();
-			world.playSound(loc, Sound.EVENT_RAID_HORN, 0.5f, 1.5f);
-			world.spawnParticle(Particle.VILLAGER_ANGRY, loc, 30, 3, 0, 3, 0);
+			world.playSound(loc, Sound.ENTITY_RAVAGER_ROAR, 0.5f, 1.0f);
+			world.spawnParticle(Particle.VILLAGER_ANGRY, loc, 30, 2, 0, 2, 0);
+			world.spawnParticle(Particle.SPELL_WITCH, loc.clone().add(0, 0.5, 0), 30, 2, 0.5, 2, 0);
 
 			new BukkitRunnable() {
 				Player mTarget = (Player) target;
@@ -99,8 +100,7 @@ public class CoordinatedAttackBoss extends BossAbilityGroup {
 									mob.setVelocity(velocity);
 
 									world.spawnParticle(Particle.CLOUD, loc, 10, 0.1, 0.1, 0.1, 0.1);
-									world.spawnParticle(Particle.VILLAGER_ANGRY, mob.getEyeLocation(), 5, 0.3, 0.3, 0.3,
-											0);
+									world.spawnParticle(Particle.VILLAGER_ANGRY, mob.getEyeLocation(), 8, 0.3, 0.3, 0.3, 0);
 
 									i++;
 									if (i >= AFFECTED_MOB_CAP) {

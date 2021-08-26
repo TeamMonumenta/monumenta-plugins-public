@@ -1,8 +1,10 @@
 package com.playmonumenta.plugins.abilities.delves;
 
+import java.util.EnumSet;
+
 import org.bukkit.entity.Creeper;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.Flying;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
@@ -48,6 +50,14 @@ public class Chivalrous extends DelveModifier {
 
 	private final double mSpawnChance;
 
+	private static final EnumSet<EntityType> CHIVALROUS_IMMUNE = EnumSet.of(
+			EntityType.GHAST,
+			EntityType.PHANTOM,
+			EntityType.VEX,
+			EntityType.BEE,
+			EntityType.BLAZE
+	);
+
 	public Chivalrous(Plugin plugin, Player player) {
 		super(plugin, player, Modifier.CHIVALROUS);
 
@@ -67,7 +77,7 @@ public class Chivalrous extends DelveModifier {
 
 	@Override
 	public void applyModifiers(LivingEntity mob, SpawnerSpawnEvent event) {
-		if (!mob.isInsideVehicle() && !(mob instanceof Flying) && !EntityUtils.isBoss(mob) && !DelvesUtils.isDelveMob(mob)
+		if (!mob.isInsideVehicle() && !(CHIVALROUS_IMMUNE.contains(mob.getType())) && !EntityUtils.isBoss(mob) && !DelvesUtils.isDelveMob(mob)
 				&& FastUtils.RANDOM.nextDouble() < mSpawnChance) {
 			Entity mount = LibraryOfSoulsIntegration.summon(mob.getLocation(), MOUNTS[FastUtils.RANDOM.nextInt(MOUNTS.length)]);
 			mount.addPassenger(mob);

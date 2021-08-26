@@ -21,12 +21,13 @@ import com.playmonumenta.plugins.utils.PotionUtils;
  * @deprecated use boss_projectile instead, like this:
  * <blockquote><pre>
  * /bos var Tags add boss_projectile
- * /bos var Tags add boss_projectile[damage=24,speed=0.2,delay=20,cooldown=320,launchTraking=true,turnRadius=3.141]
+ * /bos var Tags add boss_projectile[damage=24,speed=0.2,delay=20,cooldown=320,launchTracking=true,turnRadius=3.141]
  * /bos var Tags add boss_projectile[SoundStart=BLOCK_BEACON_POWER_SELECT,ParticleLaunch=SPELL_WITCH,SoundLaunch=ENTITY_EVOKER_CAST_SPELL,ParticleProjectileMain=SPELL_WITCH]
  * /bos var Tags add boss_projectile[ParticleProjectileSecond=SMOKE_LARGE,SoundProjectile=BLOCK_BEACON_POWER_SELECT,SoundHit=BLOCK_BEACON_DEACTIVATE,ParticleHit=SPELL_WITCH]
  * </pre></blockquote>
  * @G3m1n1Boy
  */
+@Deprecated
 public class TrackingProjectileBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_trackingprojectile";
 	public static final int detectionRange = 24;
