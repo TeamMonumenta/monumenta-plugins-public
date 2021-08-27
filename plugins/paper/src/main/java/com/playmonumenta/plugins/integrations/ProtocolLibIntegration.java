@@ -61,14 +61,18 @@ public class ProtocolLibIntegration implements Listener {
 					if (event.getPacketType().equals(PacketType.Play.Server.TILE_ENTITY_DATA)) {
 						PacketContainer packet = event.getPacket();
 						for (NbtBase<?> base : packet.getNbtModifier().getValues()) {
-							stripNBT(NbtFactory.asCompound(base));
+							if (base != null) {
+								stripNBT(NbtFactory.asCompound(base));
+							}
 						}
 						event.setPacket(packet);
 					} else if (event.getPacketType().equals(PacketType.Play.Server.MAP_CHUNK)) {
 						PacketContainer packet = event.getPacket();
 						for (List<NbtBase<?>> listNBT : packet.getListNbtModifier().getValues()) {
 							for (NbtBase<?> base : listNBT) {
-								stripNBT(NbtFactory.asCompound(base));
+								if (base != null) {
+									stripNBT(NbtFactory.asCompound(base));
+								}
 							}
 						}
 						event.setPacket(packet);
