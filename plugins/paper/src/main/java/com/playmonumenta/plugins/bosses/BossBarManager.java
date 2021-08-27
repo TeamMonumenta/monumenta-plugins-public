@@ -83,7 +83,7 @@ public class BossBarManager {
 			mEventCursor--;
 		}
 
-		if (progress > 1.0f || progress < 0f) {
+		if (!Double.isFinite(progress) || progress > 1.0f || progress < 0f) {
 			mPlugin.getLogger().severe("Boss '" + mBoss.getCustomName() + "' has invalid health " +
 			                           Double.toString(mBoss.getHealth()) + " out of max " +
 									   Double.toString(mBoss.getAttribute(Attribute.GENERIC_MAX_HEALTH).getBaseValue()));
