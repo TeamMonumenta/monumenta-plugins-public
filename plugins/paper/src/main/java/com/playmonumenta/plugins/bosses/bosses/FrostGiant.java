@@ -341,6 +341,7 @@ public class FrostGiant extends BossAbilityGroup {
 						public void run() {
 							if (mTicks >= 10) {
 								mT = 0;
+								this.cancel();
 
 								//List is farthest players in the beginning, and nearest players at the end
 								List<Player> players = EntityUtils.getNearestPlayers(mStartLoc, detectionRange);
@@ -349,13 +350,12 @@ public class FrostGiant extends BossAbilityGroup {
 								}
 								players.removeIf(p -> p.getGameMode() == GameMode.CREATIVE || p.getGameMode() == GameMode.SPECTATOR || p.getScoreboardTags().contains("disable_class"));
 								for (Player player : players) {
-									if (!player.getUniqueId().equals(mTargeted.getUniqueId())) {
+									if (mTargeted == null || !player.getUniqueId().equals(mTargeted.getUniqueId())) {
 										c.setTarget(player);
 										mTargeted = player;
 										break;
 									}
 								}
-								this.cancel();
 							} else {
 								mBoss.getWorld().playSound(mBoss.getLocation(), Sound.ENTITY_POLAR_BEAR_WARNING, SoundCategory.HOSTILE, 5, 0);
 							}
