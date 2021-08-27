@@ -286,11 +286,8 @@ public class PlayerListener implements Listener {
 		}
 	}
 
-	@EventHandler(priority = EventPriority.LOW)
+	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	public void blockPlaceEvent(BlockPlaceEvent event) {
-		if (event.isCancelled()) {
-			return;
-		}
 		ItemStack item = event.getItemInHand();
 		Player player = event.getPlayer();
 		NavigableSet<Effect> effects = mPlugin.mEffectManager.getEffects(player, STASIS);
@@ -377,11 +374,8 @@ public class PlayerListener implements Listener {
 	}
 
 	// Player interacts with an armor stand
-	@EventHandler(priority = EventPriority.LOW)
+	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	public void playerArmorStandManipulateEvent(PlayerArmorStandManipulateEvent event) {
-		if (event.isCancelled()) {
-			return;
-		}
 		NavigableSet<Effect> effects = mPlugin.mEffectManager.getEffects(event.getPlayer(), STASIS);
 		if (effects != null && mPlugin.mEffectManager.getEffects(event.getPlayer(), STASIS) != null && (mPlugin.mEffectManager.getEffects(event.getPlayer(), STASIS)).contains(new Stasis(120))) {
 			event.setCancelled(true);
@@ -422,12 +416,8 @@ public class PlayerListener implements Listener {
 	}
 
 	// The player dropped an item.
-	@EventHandler(priority = EventPriority.HIGH)
+	@EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
 	public void playerDropItemEvent(PlayerDropItemEvent event) {
-		if (event.isCancelled()) {
-			return;
-		}
-
 		Player player = event.getPlayer();
 
 		/* Don't let the player do this when in a restricted zone */
@@ -439,12 +429,8 @@ public class PlayerListener implements Listener {
 	}
 
 	// An entity picked up an item
-	@EventHandler(priority = EventPriority.HIGH)
+	@EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
 	public void entityPickupItemEvent(EntityPickupItemEvent event) {
-		if (event.isCancelled()) {
-			return;
-		}
-
 		if (event.getEntity() instanceof Player) {
 			Player player = (Player) event.getEntity();
 			NavigableSet<Effect> effects = mPlugin.mEffectManager.getEffects(event.getEntity(), STASIS);
@@ -507,11 +493,8 @@ public class PlayerListener implements Listener {
 	}
 
 	// If an item is being dragged in an inventory
-	@EventHandler(priority = EventPriority.HIGH)
+	@EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
 	public void inventoryDragEvent(InventoryDragEvent event) {
-		if (event.isCancelled()) {
-			return;
-		}
 		if (event.getWhoClicked() instanceof Player) {
 			Player player = (Player) event.getWhoClicked();
 			InventoryUtils.scheduleDelayedEquipmentCheck(mPlugin, player, event);
@@ -530,12 +513,8 @@ public class PlayerListener implements Listener {
 	}
 
 	// The player opened an inventory
-	@EventHandler(priority = EventPriority.HIGH)
+	@EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
 	public void inventoryOpenEvent(InventoryOpenEvent event) {
-		if (event.isCancelled()) {
-			return;
-		}
-
 		if (event.getPlayer() instanceof Player) {
 			Player player = (Player) event.getPlayer();
 
@@ -577,12 +556,8 @@ public class PlayerListener implements Listener {
 	}
 
 	// Something interacts with an inventory
-	@EventHandler(priority = EventPriority.HIGH)
+	@EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
 	public void inventoryInteractEvent(InventoryInteractEvent event) {
-		if (event.isCancelled()) {
-			return;
-		}
-
 		if (event.getWhoClicked() instanceof Player) {
 			Player player = (Player) event.getWhoClicked();
 
@@ -632,11 +607,8 @@ public class PlayerListener implements Listener {
 	}
 
 	// Player swapped hand items
-	@EventHandler(priority = EventPriority.HIGH)
+	@EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
 	public void playerSwapHandItemsEvent(PlayerSwapHandItemsEvent event) {
-		if (event.isCancelled()) {
-			return;
-		}
 		mPlugin.mAbilityManager.playerSwapHandItemsEvent(event.getPlayer(), event);
 		if (event.getPlayer().getScoreboardTags().contains(ToggleSwap.SWAP_TAG)) {
 			event.setCancelled(true);
@@ -645,13 +617,9 @@ public class PlayerListener implements Listener {
 	}
 
 	// The player has died
-	@EventHandler(priority = EventPriority.HIGH)
+	@EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
 	public void playerDeathEvent(PlayerDeathEvent event) {
 		Player player = event.getEntity();
-
-		if (event.isCancelled()) {
-			return;
-		}
 
 		mPlugin.mTrackingManager.mPlayers.onDeath(mPlugin, player, event);
 		mPlugin.mAbilityManager.playerDeathEvent(player, event);
@@ -705,11 +673,8 @@ public class PlayerListener implements Listener {
 		}, 0);
 	}
 
-	@EventHandler(priority = EventPriority.LOW)
+	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	public void playerFishEvent(PlayerFishEvent event) {
-		if (event.isCancelled()) {
-			return;
-		}
 		NavigableSet<Effect> effects = mPlugin.mEffectManager.getEffects(event.getPlayer(), STASIS);
 		if (effects != null && mPlugin.mEffectManager.getEffects(event.getPlayer(), STASIS) != null && (mPlugin.mEffectManager.getEffects(event.getPlayer(), STASIS)).contains(new Stasis(120))) {
 			event.setCancelled(true);
@@ -792,11 +757,8 @@ public class PlayerListener implements Listener {
 	}
 
 	// An item has taken damage.
-	@EventHandler(priority = EventPriority.LOW)
+	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	public void playerItemDamageEvent(PlayerItemDamageEvent event) {
-		if (event.isCancelled()) {
-			return;
-		}
 		NavigableSet<Effect> effects = mPlugin.mEffectManager.getEffects(event.getPlayer(), STASIS);
 		if (effects != null && mPlugin.mEffectManager.getEffects(event.getPlayer(), STASIS) != null && (mPlugin.mEffectManager.getEffects(event.getPlayer(), STASIS)).contains(new Stasis(120))) {
 			event.setCancelled(true);
@@ -907,12 +869,8 @@ public class PlayerListener implements Listener {
 	 * If a command block is found, it's command string is used for coordinates to teleport
 	 * the player to after a short delay
 	 */
-	@EventHandler(priority = EventPriority.LOW)
+	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	public void playerBedEnterEvent(PlayerBedEnterEvent event) {
-		if (event.isCancelled()) {
-			return;
-		}
-
 		Player player = event.getPlayer();
 		Block bed = event.getBed();
 		Location loc = bed.getLocation();
@@ -1077,12 +1035,8 @@ public class PlayerListener implements Listener {
 		mPlugin.mAbilityManager.abilityCastEvent(player, event);
 	}
 
-	@EventHandler
+	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	public void blockBreakEvent(BlockBreakEvent event) {
-		if (event.isCancelled()) {
-			return;
-		}
-
 		Player player = event.getPlayer();
 		String s = "Stasis";
 		NavigableSet<Effect> effects = mPlugin.mEffectManager.getEffects(player, s);
@@ -1130,12 +1084,8 @@ public class PlayerListener implements Listener {
 	 * modifiers from custom effects (EventPriority.NORMAL) or abilities
 	 * (EventPriority.HIGH) are applied.
 	 */
-	@EventHandler(priority = EventPriority.LOW)
+	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	public void entityDamageByEntityEvent(EntityDamageByEntityEvent event) {
-		if (event.isCancelled()) {
-			return;
-		}
-
 		Entity damagee = event.getEntity();
 		Entity damager = event.getDamager();
 

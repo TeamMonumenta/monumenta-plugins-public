@@ -1063,7 +1063,7 @@ public class EntityListener implements Listener {
 		}
 	}
 
-	@EventHandler
+	@EventHandler(ignoreCancelled = true)
 	public void blockBreakEvent(BlockBreakEvent event) {
 		if (!mAbilities.blockBreakEvent(event.getPlayer(), event)) {
 			event.setCancelled(true);
