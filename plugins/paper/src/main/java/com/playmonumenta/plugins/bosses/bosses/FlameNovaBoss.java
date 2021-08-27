@@ -13,12 +13,11 @@ import com.playmonumenta.plugins.utils.BossUtils;
  * @deprecated use boss_nova instead, like this:
  * <blockquote><pre>
  * /bos var Tags add boss_nova
- * /bos var Tags add boss_nova[damage=17,duration=70,detection=20]
- * /bos var Tags add boss_nova[fireticks=80]
- * /bos var Tags add boss_nova[ParticleAir=lava,soundCharge=BLOCK_FIRE_AMBIENT,ParticleAirNumber=2,ParticleLoad=flame,ParticleExplodeMain=flame,ParticleExplodeSecond=smoke_normal,SoundCast=ENTITY_WITHER_SHOOT]
- *  you can use multiple raw if needed
+ * /bos var Tags add boss_nova[damage=17,duration=70,detection=20,effects=[(fire,80)]]
+ * /bos var Tags add boss_nova[soundCharge=BLOCK_FIRE_AMBIENT,SoundCast=[(ENTITY_WITHER_SHOOT,1.5,0.65)]]
+ * /bos var Tags add boss_nova[ParticleAir=[(lava,2,4.5,4.5,4.5,0.05)],ParticleLoad=[(flame,1,0.25,0.25,0.25,0.1)],ParticleExplode=[(flame,1,0.1,0.1,0.1,0.3),(smoke_normal,2,0.25,0.25,0.25,0.1)]]
  * </pre></blockquote>
- * @G3m1n1Boy
+ * @author G3m1n1Boy
  */
 public class FlameNovaBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_flamenova";

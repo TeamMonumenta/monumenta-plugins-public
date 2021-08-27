@@ -78,9 +78,9 @@ public class SoundsList {
 			if (split.length == 3) {
 				return new CSound(sound, Float.valueOf(split[1]), Float.valueOf(split[2]));
 			} else if (split.length == 2) {
-				return new CSound(sound, Float.valueOf(split[1]), 1.0f);
+				return new CSound(sound, Float.valueOf(split[1]));
 			} else if (split.length == 1) {
-				return new CSound(sound, 1.0f, 1.0f);
+				return new CSound(sound);
 			} else {
 				throw new IllegalFormatException("Fail loading custom sound. Object of size " + split.length);
 			}

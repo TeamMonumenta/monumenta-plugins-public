@@ -21,9 +21,9 @@ import com.playmonumenta.plugins.utils.PotionUtils;
  * @deprecated use boss_projectile instead, like this:
  * <blockquote><pre>
  * /bos var Tags add boss_projectile
- * /bos var Tags add boss_projectile[damage=24,speed=0.2,delay=20,cooldown=320,launchTracking=true,turnRadius=3.141]
- * /bos var Tags add boss_projectile[SoundStart=BLOCK_BEACON_POWER_SELECT,ParticleLaunch=SPELL_WITCH,SoundLaunch=ENTITY_EVOKER_CAST_SPELL,ParticleProjectileMain=SPELL_WITCH]
- * /bos var Tags add boss_projectile[ParticleProjectileSecond=SMOKE_LARGE,SoundProjectile=BLOCK_BEACON_POWER_SELECT,SoundHit=BLOCK_BEACON_DEACTIVATE,ParticleHit=SPELL_WITCH]
+ * /bos var Tags add boss_projectile[damage=24,speed=0.2,delay=20,cooldown=320,turnRadius=3.141]
+ * /bos var Tags add boss_projectile[SoundStart=[(BLOCK_BEACON_POWER_SELECT,1,0.5)],SoundLaunch=[(ENTITY_EVOKER_CAST_SPELL,1,0.5)],SoundProjectile=[(BLOCK_BEACON_POWER_SELECT,0.4,0.5)],SoundHit=[(BLOCK_BEACON_DEACTIVATE,1,0.5)]]
+ * /bos var Tags add boss_projectileboss_projectile[ParticleLaunch=[(SPELL_WITCH,40,0,0,0,0.3)],ParticleProjectile=[(SPELL_WITCH,6,0,0,0,0.3),(SMOKE_LARGE,2,0.2,0.2,0.2,0)],ParticleHit=[(SPELL_WITCH,50,0,0,0,0.3)]]
  * </pre></blockquote>
  * @G3m1n1Boy
  */

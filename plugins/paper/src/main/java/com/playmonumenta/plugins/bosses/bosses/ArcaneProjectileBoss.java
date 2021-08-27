@@ -20,9 +20,9 @@ import com.playmonumenta.plugins.utils.PotionUtils;
  * @deprecated use boss_projectile instead, like this:
  * <blockquote><pre>
  * /bos var Tags add boss_projectile
- * /bos var Tags add boss_projectile[damage=20,distance=32,speed=0.8,delay=20,cooldown=160,launchTraking=true,turnRadius=0.042]
- * /bos var Tags add boss_projectile[SoundStart=BLOCK_ENCHANTMENT_TABLE_USE,SoundLaunch=ENTITY_FIREWORK_ROCKET_LAUNCH,ParticleProjectileMain=SOUL_FIRE_FLAME]
- * /bos var Tags add boss_projectile[ParticleProjectileSecond=SMOKE_LARGE,SoundProjectile=ENTITY_BLAZE_BURN,SoundHit=ENTITY_GENERIC_EXPLODE,ParticleHit=SOUL_FIRE_FLAME]
+ * /bos var Tags add boss_projectile[damage=20,distance=32,speed=0.8,delay=20,cooldown=160,turnRadius=0.042]
+ * /bos var Tags add boss_projectile[SoundStart=[(BLOCK_ENCHANTMENT_TABLE_USE,2,1)],SoundLaunch=[(ENTITY_FIREWORK_ROCKET_LAUNCH,1,1.5)],SoundProjectile=[(ENTITY_BLAZE_BURN,0.5,0.2)],SoundHit=[(ENTITY_GENERIC_EXPLODE,0.5,0.5),(ENTITY_BLAZE_AMBIENT,0.5,0.5)]]
+ * /bos var Tags add boss_projectile[ParticleLaunch=[(SOUL_FIRE_FLAME,0)],ParticleProjectile=[(SOUL_FIRE_FLAME,5,0.1,0.1,0.1,0.05),(SMOKE_LARGE,2,0.25,0.25,0.25)],ParticleHit=[(SOUL_FIRE_FLAME,30,0,0,0,0.25)]]
  * </pre></blockquote>
  * @G3m1n1Boy
  */

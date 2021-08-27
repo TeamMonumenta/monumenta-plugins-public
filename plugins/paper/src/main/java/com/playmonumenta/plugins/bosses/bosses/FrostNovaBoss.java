@@ -13,10 +13,9 @@ import com.playmonumenta.plugins.utils.BossUtils;
  * @deprecated use boss_nova instead, like this:
  * <blockquote><pre>
  * /bos var Tags add boss_nova
- * /bos var Tags add boss_nova[radius=8,damage=18,duration=80,detection=20]
- * /bos var Tags add boss_nova[effect=slow,effectDuration=50,effectAmplified=3]
- * /bos var Tags add boss_nova[soundCharge=ENTITY_SNOWBALL_THROW,ParticleAirNumber=7,ParticleLoad=snowball,ParticleExplodeMain=Cloud,ParticleExplodeSecond=snowball,SoundCast=BLOCK_GLASS_BREAK]
- *  you can use multiple raw if needed
+ * /bos var Tags add boss_nova[damage=18,duration=80,detection=20,effects=[(slow,50,3)]]
+ * /bos var Tags add boss_nova[soundCharge=ENTITY_SNOWBALL_THROW,SoundCast=[(BLOCK_GLASS_BREAK,1.5,0.65)]]
+ * /bos var Tags add boss_nova[ParticleAir=[(CLOUD,2,4.5,4.5,4.5,0.05)],ParticleLoad=[(snowball,1,0.25,0.25,0.25,0.1)],ParticleExplode=[(Cloud,1,0.1,0.1,0.1,0.3),(snowball,2,0.25,0.25,0.25,0.1)]]
  * </pre></blockquote>
  * @G3m1n1Boy
  */

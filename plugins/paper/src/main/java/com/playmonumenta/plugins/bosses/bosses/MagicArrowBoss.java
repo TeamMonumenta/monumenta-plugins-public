@@ -21,9 +21,9 @@ import com.playmonumenta.plugins.utils.PotionUtils;
  * @deprecated use boss_projectile instead, like this:
  * <blockquote><pre>
  * /bos var Tags add boss_projectile
- * /bos var Tags add boss_projectile[damage=20,distance=32,speed=0.8,delay=20,cooldown=160,launchTracking=true,turnRadius=0]
- * /bos var Tags add boss_projectile[SoundStart=ENTITY_ARMOR_STAND_PLACE,SoundLaunch=ENTITY_FIREWORK_ROCKET_LAUNCH,ParticleProjectileMain=FIREWORKS_SPARK]
- * /bos var Tags add boss_projectile[ParticleProjectileSecond=CRIT_MAGIC,SoundProjectile=ENTITY_BLAZE_BURN,SoundHit=ENTITY_FIREWORK_ROCKET_TWINKLE,ParticleHit=FIREWORKS_SPARK]
+ * /bos var Tags add boss_projectile[damage=20,distance=32,speed=0.8,delay=20,cooldown=160,turnRadius=0]
+ * /bos var Tags add boss_projectile[SoundStart=[(ENTITY_FIREWORK_ROCKET_LAUNCH,0.01,1)],SoundLaunch=[(ENTITY_FIREWORK_ROCKET_LAUNCH,1,1.5)],SoundProjectile=[(ENTITY_BLAZE_BURN,0)],SoundHit=[(ENTITY_FIREWORK_ROCKET_TWINKLE,0.5,1.5)]]
+ * /bos var Tags add boss_projectile[ParticleLaunch=[(FIREWORKS_SPARK,0)],ParticleProjectile=[(FIREWORKS_SPARK,5,0.1,0.1,0.1,0.05),(CRIT_MAGIC,20,0.2,0.2,0.2,0.1)],ParticleHit=[(FIREWORKS_SPARK,30,0,0,0,0.25)]]
  * </pre></blockquote>
  * @G3m1n1Boy
  */

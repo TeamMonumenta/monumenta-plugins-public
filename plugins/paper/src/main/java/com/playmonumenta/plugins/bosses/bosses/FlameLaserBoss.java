@@ -15,6 +15,16 @@ import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.spells.SpellBaseLaser;
 import com.playmonumenta.plugins.utils.BossUtils;
 
+/**
+ * @deprecated use boss_laser instead, like this:
+ * <blockquote><pre>
+ * /bos var Tags add boss_laser
+ * /bos var Tags add boss_laser[damage=19,cooldown=160,singletarget=true,effects=[(fire,80)]]
+ * /bos var Tags add boss_laser[soundTicks=[(UI_TOAST_IN,0.5)],soundEnd=[(ENTITY_DRAGON_FIREBALL_EXPLODE,1,1.5)]]
+ * /bos var Tags add boss_laser[ParticleLaser=[(CLOUD,1,0.02,0.02,0.02,0),(FLAME,1,0.04,0.04,0.04,1)],ParticleEnd=[(FIREWORKS_SPARK,300,0.8,0.8,0.8,0)]]
+ * </pre></blockquote>
+ * @author G3m1n1Boy
+ */
 public class FlameLaserBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_flamelaser";
 
