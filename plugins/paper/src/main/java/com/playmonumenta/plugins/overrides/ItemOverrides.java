@@ -4,6 +4,12 @@ import java.util.EnumMap;
 import java.util.EnumSet;
 import java.util.Map;
 
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.server.properties.ServerProperties;
+import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.utils.ZoneUtils;
+import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
+
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -17,13 +23,6 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.event.player.PlayerRiptideEvent;
 import org.bukkit.inventory.ItemStack;
-
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.Constants.Materials;
-import com.playmonumenta.plugins.server.properties.ServerProperties;
-import com.playmonumenta.plugins.utils.InventoryUtils;
-import com.playmonumenta.plugins.utils.ZoneUtils;
-import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
 
 
 
@@ -307,6 +306,9 @@ public class ItemOverrides {
 
 		BaseOverride writtenBookOverride = new WrittenBookOverride();
 		mItems.put(Material.WRITTEN_BOOK, writtenBookOverride);
+
+		BaseOverride noAdventurePlaceOverride = new NoAdventureZonePlacementOverride();
+		mItems.put(Material.LILY_PAD, noAdventurePlaceOverride);
 	}
 
 	public boolean rightClickInteraction(Plugin plugin, Player player, Action action, ItemStack item, Block block, PlayerInteractEvent event) {
