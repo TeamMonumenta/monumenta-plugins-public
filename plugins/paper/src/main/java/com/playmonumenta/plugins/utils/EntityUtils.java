@@ -712,6 +712,11 @@ public class EntityUtils {
 			return -1;
 		}
 
+		// getFinalDamage() is 0 if the damage was blocked by a shield. Only trust the vanilla calculation in this case.
+		if (event.getFinalDamage() <= 0) {
+			return 0;
+		}
+
 		Player player = (Player) event.getEntity();
 		DamageCause cause = event.getCause();
 		double damage = event.getDamage();
