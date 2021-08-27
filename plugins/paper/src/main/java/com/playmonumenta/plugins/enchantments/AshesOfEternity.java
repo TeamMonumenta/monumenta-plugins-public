@@ -15,11 +15,14 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
+import net.kyori.adventure.text.Component;
+
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.MessagingUtils;
 
 /*
  * Ashes of Eternity - When held, acts as a normal totem but does not shatter or break when life is saved.
@@ -61,9 +64,9 @@ public class AshesOfEternity extends VoidTether {
 			// Remove Lore Text
 			ItemStack item = player.getInventory().getItemInMainHand();
 			ItemMeta meta = item.getItemMeta();
-			List<String> lore = meta.getLore();
-			lore.removeIf((String loreEntry) -> loreEntry.contains(PROPERTY_NAME));
-			meta.setLore(lore);
+			List<Component> lore = meta.lore();
+			lore.removeIf((Component loreEntry) -> MessagingUtils.PLAIN_SERIALIZER.serialize(loreEntry).contains("Ashes of Eternity"));
+			meta.lore(lore);
 			item.setItemMeta(meta);
 			ItemUtils.setPlainLore(item);
 
