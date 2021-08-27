@@ -216,7 +216,7 @@ public class DeathItemListener implements Listener {
 				ItemStack invItem = inventory.getItem(slot);
 				if (originalItem != null && (invItem == null || invItem.getType().isAir()) && originalItem.isSimilar(item)) {
 					//Put the item back in this slot, unless it was an armor slot and the item was curse of binding
-					if (slot < 36 || !item.containsEnchantment(Enchantment.BINDING_CURSE)) {
+					if (slot < 36 || (!item.containsEnchantment(Enchantment.BINDING_CURSE) && !ItemUtils.isShatteredWearable(item))) {
 						if (ItemUtils.isArmor(item) && slot >= 36 && slot <= 39) {
 							player.getWorld().playSound(player.getLocation(), ItemUtils.getArmorEquipSound(item.getType()), 0.75f, 1);
 						}

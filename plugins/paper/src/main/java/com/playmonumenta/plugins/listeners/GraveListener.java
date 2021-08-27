@@ -43,7 +43,6 @@ import com.playmonumenta.redissync.event.PlayerSaveEvent;
 import de.tr7zw.nbtapi.NBTEntity;
 import net.md_5.bungee.api.ChatColor;
 
-@SuppressWarnings("unused")
 public class GraveListener implements Listener {
 	Plugin mPlugin;
 
