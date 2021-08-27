@@ -32,6 +32,7 @@ import org.bukkit.loot.LootContext;
 import org.bukkit.loot.LootContext.Builder;
 import org.bukkit.loot.LootTable;
 
+import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.utils.ChestUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
@@ -126,6 +127,15 @@ public class LootChestsInInventory implements Listener {
 					if (item != null && !item.getType().isAir()) {
 						Item droppedItem = player.getWorld().dropItem(player.getLocation(), item);
 						droppedItem.setPickupDelay(0);
+						droppedItem.setOwner(player.getUniqueId());
+						droppedItem.setThrower(player.getUniqueId());
+
+						// Allow other players to pick this up after 10s
+						Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
+							if (droppedItem.isValid() && !droppedItem.isDead()) {
+								droppedItem.setOwner(null);
+							}
+						}, 200);
 					}
 				}
 				/* Make sure the source container is cleared, since it won't be reachable anymore anyway */
