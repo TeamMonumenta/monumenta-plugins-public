@@ -36,6 +36,7 @@ public class MonumentaRedisSyncIntegration implements Listener {
 		Player player = event.getPlayer();
 		mLogger.info("PlayerTransferEvent: Player: " + player + "   Target: " + event.getTarget());
 		Plugin.getInstance().mEffectManager.clearEffects(player);
+		event.getPlayer().clearTitle();
 
 		player.closeInventory();
 
