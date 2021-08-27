@@ -7,6 +7,11 @@ import org.bukkit.event.entity.EntityRegainHealthEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import com.playmonumenta.plugins.bosses.events.SpellCastEvent;
 
+/* NOTE:
+ *
+ * Effects should not themselves modify other effects when any of the below methods are called
+ * If you need to do this, you should use Bukkit.getScheduler().runTask(...) to update the effects after the current operation finishes processing
+ */
 public abstract class Effect implements Comparable<Effect> {
 
 	private int mDuration;

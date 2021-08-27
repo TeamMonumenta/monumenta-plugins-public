@@ -87,7 +87,10 @@ public class VoodooBondsOtherPlayer extends Effect {
 		}
 
 		mTriggerTickParticle = true;
-		mPlugin.mEffectManager.addEffect(mPlayer, SEND_EFFECT_NAME, new VoodooBondsReaper(duration, mPlayer, event.getDamage(), percentDamage, mPlugin));
+		// Add this effect immediately afterwards to avoid causing a ConcurrentModificationException
+		Bukkit.getScheduler().runTask(mPlugin, () -> {
+			mPlugin.mEffectManager.addEffect(mPlayer, SEND_EFFECT_NAME, new VoodooBondsReaper(duration, mPlayer, event.getDamage(), percentDamage, mPlugin));
+		});
 
 		Location loc = event.getEntity().getLocation();
 		World world = loc.getWorld();
