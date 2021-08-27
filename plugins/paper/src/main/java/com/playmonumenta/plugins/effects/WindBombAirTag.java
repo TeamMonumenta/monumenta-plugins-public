@@ -34,14 +34,17 @@ public class WindBombAirTag extends Effect {
 
 	@Override
 	public boolean entityReceiveDamageEvent(EntityDamageEvent event) {
-		if (event instanceof EntityDamageByEntityEvent && mPlayer.equals(((EntityDamageByEntityEvent) event).getDamager())) {
-			Entity entity = event.getEntity();
-			if (entity instanceof LivingEntity) {
-				event.setDamage(event.getDamage() * (1 + mAmount));
-			}
-		} else if (((EntityDamageByEntityEvent) event).getDamager() instanceof Projectile) {
-			if (mPlayer.equals(((Projectile) ((EntityDamageByEntityEvent) event).getDamager()).getShooter())) {
-				event.setDamage(event.getDamage() * (1 + mAmount));
+		if (event instanceof EntityDamageByEntityEvent) {
+			EntityDamageByEntityEvent edbee = (EntityDamageByEntityEvent) event;
+			if (mPlayer.equals(edbee.getDamager())) {
+				Entity entity = event.getEntity();
+				if (entity instanceof LivingEntity) {
+					event.setDamage(event.getDamage() * (1 + mAmount));
+				}
+			} else if (edbee.getDamager() instanceof Projectile) {
+				if (mPlayer.equals(((Projectile) edbee.getDamager()).getShooter())) {
+					event.setDamage(event.getDamage() * (1 + mAmount));
+				}
 			}
 		}
 		return true;
