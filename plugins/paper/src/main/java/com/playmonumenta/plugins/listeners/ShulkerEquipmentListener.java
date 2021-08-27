@@ -1,15 +1,19 @@
 package com.playmonumenta.plugins.listeners;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.NavigableSet;
 import java.util.TreeMap;
+import java.util.UUID;
 
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.block.ShulkerBox;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -23,6 +27,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.BlockStateMeta;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.effects.Effect;
@@ -30,6 +35,7 @@ import com.playmonumenta.plugins.effects.Stasis;
 import com.playmonumenta.plugins.enchantments.Locked;
 import com.playmonumenta.plugins.enchantments.curses.CurseOfEphemerality;
 import com.playmonumenta.plugins.overrides.FirmamentOverride;
+import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
@@ -56,6 +62,8 @@ public class ShulkerEquipmentListener implements Listener {
 	}
 
 	Plugin mPlugin = null;
+	private Map<UUID, BukkitRunnable> mCooldowns = new HashMap<UUID, BukkitRunnable>();
+
 
 	public ShulkerEquipmentListener(Plugin plugin) {
 		mPlugin = plugin;
@@ -116,14 +124,32 @@ public class ShulkerEquipmentListener implements Listener {
 					ShulkerBox sbox = (ShulkerBox)sMeta.getBlockState();
 
 					if (sbox.isLocked() && sbox.getLock().equals(LOCK_STRING)) {
+
+						//if on cooldown don't swap
+						if (checkSwapCooldown(player)) {
+				            player.sendMessage(ChatColor.RED + "Lockbox still on cooldown!");
+				            player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1.0f, 1.0f);
+				            event.setCancelled(true);
+				            return;
+						}
+
 						swap(player, pInv, sbox);
+
+						//check if swapped in radius of boss
+						Location loc = player.getLocation();
+						for (LivingEntity mob : EntityUtils.getNearbyMobs(loc, 24)) {
+					        if (mob.getScoreboardTags().contains("Boss")) {
+					            player.sendMessage(ChatColor.RED + "Close to boss - Lockbox on 15s cooldown!");
+					            setSwapCooldown(player);
+					        }
+					    }
 
 						sMeta.setBlockState(sbox);
 						sboxItem.setItemMeta(sMeta);
-
 						player.updateInventory();
 						event.setCancelled(true);
 						InventoryUtils.scheduleDelayedEquipmentCheck(mPlugin, player, null);
+
 					}
 				}
 			}
@@ -189,5 +215,28 @@ public class ShulkerEquipmentListener implements Listener {
 		ItemStack tmp = from.getItem(fromSlot);
 		from.setItem(fromSlot, to.getItem(toSlot));
 		to.setItem(toSlot, tmp);
+	}
+
+	//Set cooldown after swapping in RADIUS 24 blocks of boss
+	private void setSwapCooldown(Player player) {
+		BukkitRunnable runnable = mCooldowns.remove(player.getUniqueId());
+		if (runnable != null) {
+			runnable.cancel();
+		}
+		runnable = new BukkitRunnable() {
+			@Override
+			public void run() {
+				//Don't need to put anything here - method checks if BukkitRunnable is active
+				mCooldowns.remove(player.getUniqueId());
+			}
+		};
+		runnable.runTaskLater(mPlugin, 20 * 15); //15s cooldown
+		mCooldowns.put(player.getUniqueId(), runnable);
+	}
+
+	//Returns true if cooldown is up right now
+	//False if no cooldowns and the lockbox is activatable now
+	private boolean checkSwapCooldown(Player player) {
+		return mCooldowns.containsKey(player.getUniqueId()) && !mCooldowns.get(player.getUniqueId()).isCancelled();
 	}
 }
