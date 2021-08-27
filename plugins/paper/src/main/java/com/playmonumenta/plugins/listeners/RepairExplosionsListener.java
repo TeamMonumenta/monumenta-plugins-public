@@ -215,7 +215,8 @@ public class RepairExplosionsListener implements Listener {
 		List<BlockState> chunkBlocks = mBlocksToRepair.remove(event.getChunk().getChunkKey());
 		if (chunkBlocks != null) {
 			for (BlockState state : chunkBlocks) {
-				if (state.getLocation().getBlock().getType().isAir()) {
+				Material currentType = state.getLocation().getBlock().getType();
+				if (currentType.isAir() || currentType == Material.WATER) {
 					mPlugin.getLogger().fine("Repairing block " + state.getType().toString() + " at " + state.getLocation().toString());
 					needsSave = true;
 					state.update(true, false);
