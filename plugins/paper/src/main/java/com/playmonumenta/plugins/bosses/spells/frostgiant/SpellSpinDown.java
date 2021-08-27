@@ -4,6 +4,13 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+import com.destroystokyo.paper.entity.Pathfinder;
+import com.playmonumenta.plugins.bosses.bosses.FrostGiant;
+import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
+
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -13,8 +20,8 @@ import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.bukkit.block.BlockState;
 import org.bukkit.block.data.Ageable;
-import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.Creature;
 import org.bukkit.entity.FallingBlock;
 import org.bukkit.entity.LivingEntity;
@@ -22,13 +29,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
-
-import com.destroystokyo.paper.entity.Pathfinder;
-import com.playmonumenta.plugins.bosses.bosses.FrostGiant;
-import com.playmonumenta.plugins.bosses.spells.Spell;
-import com.playmonumenta.plugins.utils.BossUtils;
-import com.playmonumenta.plugins.utils.FastUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
 
 public class SpellSpinDown extends Spell {
 
@@ -74,8 +74,7 @@ public class SpellSpinDown extends Spell {
 
 		FrostGiant.delayHailstormDamage();
 
-		Map<Location, Material> oldBlocks = new HashMap<>();
-		Map<Location, BlockData> oldData = new HashMap<>();
+		Map<Location, BlockState> oldBlocks = new HashMap<>();
 
 		if (FrostGiant.mInstance != null) {
 			FrostGiant.mInstance.mPreventTargetting = true;
@@ -136,8 +135,7 @@ public class SpellSpinDown extends Spell {
 													continue;
 												}
 
-												oldBlocks.put(l, b.getType());
-												oldData.put(l, b.getBlockData());
+												oldBlocks.put(l, b.getState());
 
 												b.setType(Material.FROSTED_ICE);
 												Ageable age = (Ageable) b.getBlockData();
@@ -184,43 +182,35 @@ public class SpellSpinDown extends Spell {
 				if (mTicks >= 20 * FrostGiant.frostedIceDuration || mBoss.isDead() || !mBoss.isValid() || mDeleteIce) {
 					new BukkitRunnable() {
 						int mTicks = 0;
-						Iterator<Map.Entry<Location, Material>> mBlocks = oldBlocks.entrySet().iterator();
 
 						@Override
 						public void run() {
 							mTicks++;
 
-							if (mTicks >= 20 * 3 || !mBlocks.hasNext()) {
-								while (mBlocks.hasNext()) {
-									Map.Entry<Location, Material> e = mBlocks.next();
+							if (mTicks >= 20 * 3 || oldBlocks.isEmpty()) {
+								//Restore everything that is currently ice to original state, and clear map
+								for (Map.Entry<Location, BlockState> e : oldBlocks.entrySet()) {
 									if (e.getKey().getBlock().getType() == Material.FROSTED_ICE) {
-										e.getKey().getBlock().setType(e.getValue());
-										if (oldData.containsKey(e.getKey())) {
-											e.getKey().getBlock().setBlockData(oldData.get(e.getKey()));
-										}
+										e.getValue().update(true, false);
 									}
-									mBlocks.remove();
 								}
+								oldBlocks.clear();
 
 								this.cancel();
 							} else {
 								//Remove 50 blocks per tick
-								for (int i = 0; i < 50; i++) {
-									if (!mBlocks.hasNext()) {
-										break;
-									}
-									Map.Entry<Location, Material> e = mBlocks.next();
+								Iterator<Map.Entry<Location, BlockState>> blockIter = oldBlocks.entrySet().iterator();
+								for (int i = 0; i < 50 && blockIter.hasNext(); i++) {
+									Map.Entry<Location, BlockState> e = blockIter.next();
+									Material currentBlockType = e.getKey().getBlock().getType();
 									//If doing shatter, wait for another tick
-									if (e.getKey().getBlock().getType() == Material.CRIMSON_HYPHAE) {
+									if (currentBlockType == Material.CRIMSON_HYPHAE) {
 										break;
 									}
-									if (e.getKey().getBlock().getType() == Material.FROSTED_ICE) {
-										e.getKey().getBlock().setType(e.getValue());
-										if (oldData.containsKey(e.getKey())) {
-											e.getKey().getBlock().setBlockData(oldData.get(e.getKey()));
-										}
+									if (currentBlockType == Material.FROSTED_ICE) {
+										e.getValue().update(true, false);
 									}
-									mBlocks.remove();
+									blockIter.remove();
 								}
 							}
 						}

@@ -6,23 +6,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.bukkit.GameMode;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
-import org.bukkit.SoundCategory;
-import org.bukkit.World;
-import org.bukkit.block.BlockFace;
-import org.bukkit.block.data.BlockData;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Mob;
-import org.bukkit.entity.Player;
-import org.bukkit.plugin.Plugin;
-import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.util.BoundingBox;
-import org.bukkit.util.Vector;
-
 import com.playmonumenta.plugins.bosses.bosses.FrostGiant;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.utils.AbilityUtils;
@@ -32,6 +15,23 @@ import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.VectorUtils;
+
+import org.bukkit.GameMode;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
+import org.bukkit.World;
+import org.bukkit.block.BlockFace;
+import org.bukkit.block.BlockState;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Mob;
+import org.bukkit.entity.Player;
+import org.bukkit.plugin.Plugin;
+import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.util.BoundingBox;
+import org.bukkit.util.Vector;
 
 
 /*
@@ -48,8 +48,7 @@ public class Shatter extends Spell {
 	private LivingEntity mBoss;
 	public float mKnockback;
 
-	private Map<Location, Material> mOldBlocks = new HashMap<>();
-	private Map<Location, BlockData> mOldData = new HashMap<>();
+	private Map<Location, BlockState> mOldBlocks = new HashMap<>();
 
 	private Location mStartLoc;
 
@@ -63,8 +62,6 @@ public class Shatter extends Spell {
 	@Override
 	public void run() {
 		FrostGiant.freezeGolems(mBoss);
-		mOldBlocks.clear();
-		mOldData.clear();
 
 		mBoss.setAI(false);
 		World world = mBoss.getWorld();
@@ -138,8 +135,7 @@ public class Shatter extends Spell {
 											l.add(0, 1, 0);
 										}
 										if (l.getBlock().getType() != Material.CRIMSON_HYPHAE) {
-											mOldBlocks.put(l, l.getBlock().getType());
-											mOldData.put(l, l.getBlock().getBlockData());
+											mOldBlocks.put(l, l.getBlock().getState());
 										}
 										l.getBlock().setType(Material.CRIMSON_HYPHAE);
 										world.spawnParticle(Particle.SPELL_INSTANT, l, 3, 0.45, 6, 0.45, 0, null, true);
@@ -207,42 +203,34 @@ public class Shatter extends Spell {
 						}
 					}
 
+					FrostGiant.unfreezeGolems(mBoss);
+
 					if (!mOldBlocks.isEmpty()) {
 						BukkitRunnable runnable = new BukkitRunnable() {
 							int mTicks = 0;
-							Iterator<Map.Entry<Location, Material>> mBlocks = mOldBlocks.entrySet().iterator();
 							@Override
 							public void run() {
 								mTicks++;
 
-								if (mTicks >= 20 * 2 || !mBlocks.hasNext()) {
-									while (mBlocks.hasNext()) {
-										Map.Entry<Location, Material> e = mBlocks.next();
+								if (mTicks >= 20 * 2 || mOldBlocks.isEmpty()) {
+									//Restore everything that is currently hyphae to original state, and clear map
+									for (Map.Entry<Location, BlockState> e : mOldBlocks.entrySet()) {
 										if (e.getKey().getBlock().getType() == Material.CRIMSON_HYPHAE) {
-											e.getKey().getBlock().setType(e.getValue());
-											if (mOldData.containsKey(e.getKey())) {
-												e.getKey().getBlock().setBlockData(mOldData.get(e.getKey()));
-											}
+											e.getValue().update(true, false);
 										}
-										mBlocks.remove();
 									}
+									mOldBlocks.clear();
 
 									this.cancel();
 								} else {
 									//Remove 100 blocks per tick
-									for (int i = 0; i < 100; i++) {
-										if (!mBlocks.hasNext()) {
-											break;
-										}
-										Map.Entry<Location, Material> e = mBlocks.next();
+									Iterator<Map.Entry<Location, BlockState>> blockIter = mOldBlocks.entrySet().iterator();
+									for (int i = 0; i < 100 && blockIter.hasNext(); i++) {
+										Map.Entry<Location, BlockState> e = blockIter.next();
 										if (e.getKey().getBlock().getType() == Material.CRIMSON_HYPHAE) {
-											e.getKey().getBlock().setType(e.getValue());
-											if (mOldData.containsKey(e.getKey())) {
-												e.getKey().getBlock().setBlockData(mOldData.get(e.getKey()));
-											}
+											e.getValue().update(true, false);
 										}
-										mBlocks.remove();
-										FrostGiant.unfreezeGolems(mBoss);
+										blockIter.remove();
 									}
 								}
 							}
@@ -263,44 +251,13 @@ public class Shatter extends Spell {
 	public void cancel() {
 		super.cancel();
 
-		new BukkitRunnable() {
-			int mTicks = 0;
-			Iterator<Map.Entry<Location, Material>> mBlocks = mOldBlocks.entrySet().iterator();
-			@Override
-			public void run() {
-				mTicks++;
-
-				if (mTicks >= 20 * 2 || !mBlocks.hasNext()) {
-					while (mBlocks.hasNext()) {
-						Map.Entry<Location, Material> e = mBlocks.next();
-						if (e.getKey().getBlock().getType() == Material.CRIMSON_HYPHAE) {
-							e.getKey().getBlock().setType(e.getValue());
-							if (mOldData.containsKey(e.getKey())) {
-								e.getKey().getBlock().setBlockData(mOldData.get(e.getKey()));
-							}
-						}
-						mBlocks.remove();
-					}
-
-					this.cancel();
-				} else {
-					//Remove 100 blocks per tick
-					for (int i = 0; i < 100; i++) {
-						if (!mBlocks.hasNext()) {
-							break;
-						}
-						Map.Entry<Location, Material> e = mBlocks.next();
-						if (e.getKey().getBlock().getType() == Material.CRIMSON_HYPHAE) {
-							e.getKey().getBlock().setType(e.getValue());
-							if (mOldData.containsKey(e.getKey())) {
-								e.getKey().getBlock().setBlockData(mOldData.get(e.getKey()));
-							}
-						}
-						mBlocks.remove();
-					}
-				}
+		//Restore everything that is currently hyphae to original state, and clear map
+		for (Map.Entry<Location, BlockState> e : mOldBlocks.entrySet()) {
+			if (e.getKey().getBlock().getType() == Material.CRIMSON_HYPHAE) {
+				e.getValue().update(true, false);
 			}
-		}.runTaskTimer(mPlugin, 0, 1);
+		}
+		mOldBlocks.clear();
 	}
 
 	@Override
