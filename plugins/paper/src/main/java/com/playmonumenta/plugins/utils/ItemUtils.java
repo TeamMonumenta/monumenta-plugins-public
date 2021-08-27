@@ -1042,7 +1042,7 @@ public class ItemUtils {
 	}
 
 	public static String getPlainName(ItemStack itemStack, boolean refresh) {
-		if (itemStack == null || !itemStack.hasItemMeta() || !itemStack.getItemMeta().hasDisplayName()) {
+		if (itemStack == null || itemStack.getType().isAir() || !itemStack.hasItemMeta() || !itemStack.getItemMeta().hasDisplayName()) {
 			return "";
 		}
 		if (refresh || !hasPlainName(itemStack)) {
@@ -1052,7 +1052,7 @@ public class ItemUtils {
 	}
 
 	public static String getPlainNameIfExists(ItemStack itemStack) {
-		if (itemStack == null || !itemStack.hasItemMeta()) {
+		if (itemStack == null || itemStack.getType().isAir() || !itemStack.hasItemMeta()) {
 			return "";
 		}
 		NBTItem nbtItem = new NBTItem(itemStack);
@@ -1068,7 +1068,7 @@ public class ItemUtils {
 	}
 
 	public static boolean hasPlainName(ItemStack itemStack) {
-		if (itemStack == null || !itemStack.hasItemMeta()) {
+		if (itemStack == null || itemStack.getType().isAir() || !itemStack.hasItemMeta()) {
 			return false;
 		}
 		NBTItem nbtItem = new NBTItem(itemStack);
@@ -1095,7 +1095,7 @@ public class ItemUtils {
 	}
 
 	public static void setPlainName(ItemStack itemStack, String plainName) {
-		if (itemStack == null || itemStack.getType() == Material.AIR) {
+		if (itemStack == null || itemStack.getType().isAir()) {
 			return;
 		}
 
@@ -1144,7 +1144,7 @@ public class ItemUtils {
 	}
 
 	private static List<String> getPlainLoreIfExists(ItemStack itemStack) {
-		if (itemStack == null || !itemStack.hasItemMeta()) {
+		if (itemStack == null || itemStack.getType().isAir() || !itemStack.hasItemMeta()) {
 			return new ArrayList<>();
 		}
 		NBTItem nbtItem = new NBTItem(itemStack);
@@ -1160,7 +1160,7 @@ public class ItemUtils {
 	}
 
 	public static boolean hasPlainLore(ItemStack itemStack) {
-		if (itemStack == null || !itemStack.hasItemMeta()) {
+		if (itemStack == null || itemStack.getType().isAir() || !itemStack.hasItemMeta()) {
 			return false;
 		}
 		NBTItem nbtItem = new NBTItem(itemStack);
