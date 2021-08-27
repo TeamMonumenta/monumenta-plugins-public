@@ -1,13 +1,14 @@
 package com.playmonumenta.plugins.effects;
 
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.ZoneUtils;
+import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
+
 import org.bukkit.attribute.Attributable;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.entity.Entity;
-
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.ZoneUtils;
-import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
+import org.bukkit.entity.Player;
 
 public class PercentSpeed extends Effect {
 
@@ -29,7 +30,7 @@ public class PercentSpeed extends Effect {
 
 	@Override
 	public void entityGainEffect(Entity entity) {
-		if (entity instanceof Attributable && !ZoneUtils.hasZoneProperty(entity, ZoneProperty.NO_MOBILITY_ABILITIES)) {
+		if (entity instanceof Attributable && (!(entity instanceof Player) || !ZoneUtils.hasZoneProperty(entity, ZoneProperty.NO_MOBILITY_ABILITIES))) {
 			EntityUtils.addAttribute((Attributable) entity, Attribute.GENERIC_MOVEMENT_SPEED, new AttributeModifier(mModifierName, mAmount, AttributeModifier.Operation.MULTIPLY_SCALAR_1));
 		}
 	}
@@ -43,15 +44,17 @@ public class PercentSpeed extends Effect {
 
 	@Override
 	public void entityTickEffect(Entity entity, boolean fourHertz, boolean twoHertz, boolean oneHertz) {
-		boolean isInNoMobilityZone = ZoneUtils.hasZoneProperty(entity, ZoneProperty.NO_MOBILITY_ABILITIES);
+		if (entity instanceof Player) {
+			boolean isInNoMobilityZone = ZoneUtils.hasZoneProperty(entity, ZoneProperty.NO_MOBILITY_ABILITIES);
 
-		if (mWasInNoMobilityZone && !isInNoMobilityZone) {
-			entityGainEffect(entity);
-		} else if (!mWasInNoMobilityZone && isInNoMobilityZone) {
-			entityLoseEffect(entity);
+			if (mWasInNoMobilityZone && !isInNoMobilityZone) {
+				entityGainEffect(entity);
+			} else if (!mWasInNoMobilityZone && isInNoMobilityZone) {
+				entityLoseEffect(entity);
+			}
+
+			mWasInNoMobilityZone = isInNoMobilityZone;
 		}
-
-		mWasInNoMobilityZone = isInNoMobilityZone;
 	}
 
 	@Override
