@@ -119,6 +119,7 @@ public class ChaosDagger extends DepthsAbility {
 					if (mTarget == null) {
 						tincture.remove();
 						this.cancel();
+						return;
 					}
 
 					if (mTarget.getBoundingBox().overlaps(tincture.getBoundingBox()) && !mTarget.getScoreboardTags().contains(AbilityUtils.IGNORE_TAG)) {
@@ -135,7 +136,7 @@ public class ChaosDagger extends DepthsAbility {
 						new BukkitRunnable() {
 							@Override
 							public void run() {
-								if (!(mHitMob instanceof MagmaCube && mHitMob.getName().contains("Gyrhaeddant"))) {
+								if (mHitMob != null && !(mHitMob instanceof MagmaCube && mHitMob.getName().contains("Gyrhaeddant"))) {
 									mHitMob.setGlowing(false);
 								}
 								mHitMob = null;
