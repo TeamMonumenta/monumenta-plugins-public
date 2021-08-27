@@ -12,6 +12,20 @@ import java.util.NavigableSet;
 import java.util.Set;
 import java.util.UUID;
 
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.AbilityManager;
+import com.playmonumenta.plugins.bosses.BossManager;
+import com.playmonumenta.plugins.bosses.bosses.CrowdControlImmunityBoss;
+import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.classes.magic.MagicType;
+import com.playmonumenta.plugins.effects.Bleed;
+import com.playmonumenta.plugins.effects.Effect;
+import com.playmonumenta.plugins.effects.PercentDamageDealt;
+import com.playmonumenta.plugins.effects.PercentDamageReceived;
+import com.playmonumenta.plugins.effects.PercentSpeed;
+import com.playmonumenta.plugins.enchantments.Inferno;
+import com.playmonumenta.plugins.events.CustomDamageEvent;
+
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Location;
@@ -30,6 +44,7 @@ import org.bukkit.entity.Bee;
 import org.bukkit.entity.Blaze;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Flying;
 import org.bukkit.entity.Ghast;
 import org.bukkit.entity.Giant;
 import org.bukkit.entity.Hoglin;
@@ -68,20 +83,6 @@ import org.bukkit.util.BlockIterator;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
-
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.AbilityManager;
-import com.playmonumenta.plugins.bosses.BossManager;
-import com.playmonumenta.plugins.bosses.bosses.CrowdControlImmunityBoss;
-import com.playmonumenta.plugins.classes.ClassAbility;
-import com.playmonumenta.plugins.classes.magic.MagicType;
-import com.playmonumenta.plugins.effects.Bleed;
-import com.playmonumenta.plugins.effects.Effect;
-import com.playmonumenta.plugins.effects.PercentDamageDealt;
-import com.playmonumenta.plugins.effects.PercentDamageReceived;
-import com.playmonumenta.plugins.effects.PercentSpeed;
-import com.playmonumenta.plugins.enchantments.Inferno;
-import com.playmonumenta.plugins.events.CustomDamageEvent;
 
 
 
@@ -240,6 +241,10 @@ public class EntityUtils {
 					Map.Entry<LivingEntity, Integer> stunned = stunnedIter.next();
 					LivingEntity mob = stunned.getKey();
 					STUNNED_MOBS.put(mob, stunned.getValue() - 1);
+
+					if (mob instanceof Vex || mob instanceof Flying) {
+						mob.setVelocity(new Vector(0, 0, 0));
+					}
 
 					double angle = Math.toRadians(mRotation);
 					Location l = mob.getLocation();
@@ -986,10 +991,6 @@ public class EntityUtils {
 			((Mob) mob).setTarget(null);
 		}
 
-		if (mob instanceof Vex) {
-			mob.setVelocity(new Vector(0, 0, 0));
-		}
-
 		// Only reduce speed if mob is not already in map. We can avoid storing original speed by just +/- 10.
 		Integer t = COOLING_MOBS.get(mob);
 		if (t == null) {
@@ -1021,10 +1022,6 @@ public class EntityUtils {
 
 		if (mob instanceof Mob) {
 			((Mob) mob).setTarget(null);
-		}
-
-		if (mob instanceof Vex) {
-			mob.setVelocity(new Vector(0, 0, 0));
 		}
 
 		/* Fake "event" so bosses can handle being stunned if they need to */
@@ -1088,10 +1085,6 @@ public class EntityUtils {
 		}
 
 		Mob creature = (Mob) mob;
-
-		if (mob instanceof Vex) {
-			mob.setVelocity(new Vector(0, 0, 0));
-		}
 
 		/* Fake "event" so bosses can handle being confused if they need to */
 		BossManager.getInstance().entityConfused(mob);
