@@ -30,7 +30,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.entity.Trident;
 import org.bukkit.entity.Villager;
-import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -476,10 +475,6 @@ public class PlayerListener implements Listener {
 	// An item on the player breaks.
 	@EventHandler(priority = EventPriority.HIGH)
 	public void playerItemBreakEvent(PlayerItemBreakEvent event) {
-		NavigableSet<Effect> effects = mPlugin.mEffectManager.getEffects(event.getPlayer(), STASIS);
-		if (effects != null && mPlugin.mEffectManager.getEffects(event.getPlayer(), STASIS) != null && (mPlugin.mEffectManager.getEffects(event.getPlayer(), STASIS)).contains(new Stasis(120))) {
-			((Cancellable) event).setCancelled(true);
-		}
 		InventoryUtils.scheduleDelayedEquipmentCheck(mPlugin, event.getPlayer(), event);
 	}
 
@@ -822,11 +817,10 @@ public class PlayerListener implements Listener {
 		Player player = event.getPlayer();
 		Location loc = player.getLocation();
 		NavigableSet<Effect> effects = mPlugin.mEffectManager.getEffects(player, STASIS);
-		if (effects != null && mPlugin.mEffectManager.getEffects(event.getPlayer(), STASIS) != null && (mPlugin.mEffectManager.getEffects(event.getPlayer(), STASIS)).contains(new Stasis(120))) {
-			((Cancellable) event).setCancelled(true);
-		}
+		boolean stasis = effects != null && mPlugin.mEffectManager.getEffects(event.getPlayer(), STASIS) != null && (mPlugin.mEffectManager.getEffects(event.getPlayer(), STASIS)).contains(new Stasis(120));
+
 		//Manually forces the player in place during the riptide if they use it out of water (in rain)
-		if (!mPlugin.mItemOverrides.playerRiptide(mPlugin, player, event)) {
+		if (stasis || !mPlugin.mItemOverrides.playerRiptide(mPlugin, player, event)) {
 			player.teleport(loc);
 			player.setCooldown(Material.TRIDENT, 15*20);
 			new BukkitRunnable() {
@@ -1097,10 +1091,9 @@ public class PlayerListener implements Listener {
 	public void evasionEvent(EvasionEvent event) {
 		Player player = event.getPlayer();
 		NavigableSet<Effect> effects = mPlugin.mEffectManager.getEffects(player, STASIS);
-		if (effects != null && (mPlugin.mEffectManager.getEffects(player, STASIS)).contains(new Stasis(120))) {
-			((Cancellable) event).setCancelled(true);
+		if (effects == null || !(mPlugin.mEffectManager.getEffects(player, STASIS)).contains(new Stasis(120))) {
+			mPlugin.mTrackingManager.mPlayers.onEvade(mPlugin, player, event);
 		}
-		mPlugin.mTrackingManager.mPlayers.onEvade(mPlugin, player, event);
 	}
 
 	@EventHandler
