@@ -9,13 +9,12 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Player;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
 
 
 
 public class SecondWind implements BaseEnchantment {
 	private static String PROPERTY_NAME = ChatColor.GRAY + "Second Wind";
-	private static final String DAMAGE_RESIST_NAME = "SecondWindDamageReduction";
 	private static final double DAMAGE_RESIST = 0.1;
 	private static final double HEALTH_LIMIT = 0.5;
 
@@ -30,7 +29,7 @@ public class SecondWind implements BaseEnchantment {
 	}
 
 	@Override
-	public void onHurtByEntity(Plugin plugin, Player player, int level, EntityDamageByEntityEvent event) {
+	public void onHurt(Plugin plugin, Player player, int level, EntityDamageEvent event) {
 		double currHealth = player.getHealth();
 		double maxHealth = player.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue();
 		double hpAfterHit = currHealth - EntityUtils.getRealFinalDamage(event);
