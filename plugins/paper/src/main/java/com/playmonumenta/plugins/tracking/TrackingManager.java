@@ -96,6 +96,7 @@ public class TrackingManager {
 	public void removeEntity(Entity entity) {
 		if (entity instanceof Player) {
 			mPlayers.removeEntity(entity);
+			mFishingHook.removeEntity((Player)entity);
 		} else if (entity instanceof Creeper) {
 			mCreepers.removeEntity(entity);
 		} else if (entity instanceof Boat) {

@@ -21,12 +21,10 @@ public class FishingHookTracking implements EntityTracking {
 	public void removeEntity(Player player) {
 		UUID uuid = player.getUniqueId();
 
-		FishHook entity = mEntities.get(uuid);
+		FishHook entity = mEntities.remove(uuid);
 		if (entity != null) {
 			entity.remove();
 		}
-
-		mEntities.remove(uuid);
 	}
 
 	public boolean containsEntity(Player player) {
