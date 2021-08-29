@@ -65,7 +65,7 @@ public class PEBCustomInventory extends CustomInventory {
 				"Inventory Sort, Filtered Pickup, and more toggleable choices.", ChatColor.LIGHT_PURPLE,
 				Material.LEVER, "page 3"));
 		PEB_ITEMS.add(new PebItem(1, 38, "Server Information",
-				"Information such as how to use the PEB, current shrine buffs, and random tips.", ChatColor.LIGHT_PURPLE,
+				"Information such as how to use the PEB and random tips.", ChatColor.LIGHT_PURPLE,
 				Material.DISPENSER, "page 4"));
 		PEB_ITEMS.add(new PebItem(1, 42, "Book Skins",
 				"Change the color of the cover on your P.E.B.", ChatColor.LIGHT_PURPLE,
@@ -88,9 +88,6 @@ public class PEBCustomInventory extends CustomInventory {
 		PEB_ITEMS.add(new PebItem(2, 25, "Dungeon Instances",
 				"Click to view what dungeon instances you have open, and how old they are.", ChatColor.LIGHT_PURPLE,
 				Material.WHITE_WOOL, "clickable peb_dungeoninfo"));
-		PEB_ITEMS.add(new PebItem(2, 37, "Patreon Shrine",
-				"Click to view what buffs are active on the " + ChatColor.GOLD + "Patreon Shrine" + ChatColor.LIGHT_PURPLE + " and your settings.", ChatColor.LIGHT_PURPLE,
-				Material.LANTERN, "clickable peb_shrineinfo"));
 		PEB_ITEMS.add(new PebItem(2, 39, "Patron",
 				"Click to view patron information. Use /donate to learn about donating.", ChatColor.LIGHT_PURPLE,
 				Material.GLOWSTONE_DUST, "clickable peb_patroninfo"));
