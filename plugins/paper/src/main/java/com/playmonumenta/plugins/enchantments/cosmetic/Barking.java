@@ -44,24 +44,23 @@ public class Barking implements BaseEnchantment {
 	}
 
 	@Override
-	public void applyProperty(Plugin plugin, Player player, int level) {
-		//When equipment is updated, check if the player has debarking.
-		ItemStack inMainHand = player.getInventory().getItemInMainHand();
-		if (InventoryUtils.testForItemWithLore(inMainHand, PROPERTY_NAME)) {
-			if (InventoryUtils.testForItemWithLore(inMainHand, ChatColor.GRAY + "Debarking")) {
+	public int getPlayerItemLevel(ItemStack itemStack, Player player, ItemSlot itemSlot) {
+		int level = BaseEnchantment.super.getPlayerItemLevel(itemStack, player, itemSlot);
+		if (level > 0) {
+			if (InventoryUtils.testForItemWithLore(itemStack, ChatColor.GRAY + "Debarking")) {
 				HAS_DEBARKING.add(player.getUniqueId());
 			} else {
 				HAS_DEBARKING.remove(player.getUniqueId());
 			}
 		}
+		return level;
 	}
 
 	@Override
 	public void onBlockBreak(Plugin plugin, Player player, BlockBreakEvent event, ItemStack item, int level) {
 		if ((level == 1) && !HAS_DEBARKING.contains(player.getUniqueId())) {
 			if (listOfStrippedWood.contains(event.getBlock().getType())) {
-				int num = FastUtils.RANDOM.nextInt(5);
-				if (num == 0) {
+				if (FastUtils.RANDOM.nextInt(5) == 0) {
 					//Congratulations, you're our lucky winner!
 					player.getWorld().playSound(player.getLocation(), Sound.ENTITY_WOLF_AMBIENT, SoundCategory.HOSTILE, 1.0f, 0.8f);
 				}
