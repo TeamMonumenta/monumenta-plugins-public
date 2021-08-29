@@ -102,7 +102,7 @@ public class LocationUtils {
 
 		/*
 		 * Check up to 50 blocks underneath the location. Stop when
-		 * a non-air block is hit. If it's a liquid, this is allowed, otherwise it's not
+		 * a non-air block is hit. If it's a rail, this is allowed, otherwise it's not
 		 */
 		loc = loc.clone();
 		for (int i = loc.getBlockY(); i > (Math.max(0, loc.getBlockY() - 50)); i--) {
