@@ -9,12 +9,12 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
 public class GuiItem {
-	int mPage;
-	int mSlot;
-	ItemStack mShowedItem;
-	Map<ItemStack, Integer> mCost;
-	DoubleParameterFunction<Player, Inventory, Boolean> mAfterClickFunction;
-	DoubleParameterFunction<Player, Inventory, Boolean> mCondition;
+	private int mPage;
+	private int mSlot;
+	private ItemStack mShowedItem;
+	private Map<ItemStack, Integer> mCost;
+	private DoubleParameterFunction<Player, Inventory, Boolean> mAfterClickFunction;
+	private DoubleParameterFunction<Player, Inventory, Boolean> mCondition;
 
 	public GuiItem(int page, int slot, ItemStack showedItem, Map<ItemStack, Integer> cost, DoubleParameterFunction<Player, Inventory, Boolean> cond, DoubleParameterFunction<Player, Inventory, Boolean> afterClick) {
 		this.mPage = page;
@@ -66,14 +66,24 @@ public class GuiItem {
 	}
 
 	public boolean isVisible(Player player, Inventory inventory) {
-		return mCondition.applay(player, inventory);
+		return mCondition.apply(player, inventory);
 	}
 
 	public boolean afterClick(Player player, Inventory inventory) {
-		return mAfterClickFunction.applay(player, inventory);
+		if (mAfterClickFunction != null) {
+			return mAfterClickFunction.apply(player, inventory);
+		}
+		return true;
 	}
 
-	public boolean canPurcase(Player player) {
+	public boolean doesSomethingOnClick() {
+		if (mAfterClickFunction != null) {
+			return true;
+		}
+		return false;
+	}
+
+	public boolean canPurchase(Player player) {
 		if (player.getGameMode() == GameMode.CREATIVE) {
 			return true;
 		}
@@ -116,7 +126,7 @@ public class GuiItem {
 		return result;
 	}
 
-	public boolean purcase(Player player) {
+	public boolean purchase(Player player) {
 		if (player.getGameMode() == GameMode.CREATIVE) {
 			return true;
 		}
@@ -152,11 +162,10 @@ public class GuiItem {
 	 */
 	public GuiItem copy() {
 		return new GuiItem(mPage, mSlot, mShowedItem, mCost, mCondition, mAfterClickFunction);
-
 	}
 
 	@FunctionalInterface
 	public interface DoubleParameterFunction<P, I, B> {
-		B applay(P p, I i);
+		B apply(P p, I i);
 	}
 }

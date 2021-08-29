@@ -233,15 +233,11 @@ public class ParrotCustomInventory extends CustomInventory {
 
 		ItemStack leftShoulder = buildItem(Material.BRICK, "Left Shoulder Selected", lore);
 		GUI_ITEMS.add(new GuiItem(1, 18, leftShoulder, new HashMap<>(), (player, inv) -> {
-						return true; },
-							(player, inv) -> {
-								return true; }));
+						return true; }, null));
 
 		ItemStack rightShoulder = buildItem(Material.BRICK, "Right Shoulder Selected", lore);
 		GUI_ITEMS.add(new GuiItem(2, 19, rightShoulder, new HashMap<>(), (player, inv) -> {
-						return true; },
-							(player, inv) -> {
-								return true; }));
+						return true; }, null));
 
 		//parrots owned
 
@@ -784,19 +780,20 @@ public class ParrotCustomInventory extends CustomInventory {
 		Inventory inventory = event.getClickedInventory();
 
 
-		if (gItem.canPurcase(whoClicked)) {
-			if (gItem.purcase(whoClicked)) {
-				whoClicked.playSound(whoClicked.getLocation(), Sound.UI_CARTOGRAPHY_TABLE_TAKE_RESULT, SoundCategory.NEUTRAL, 10f, 1.3f);
-				gItem.afterClick(whoClicked, inventory);
-				updateInventory(whoClicked);
+		if (gItem.doesSomethingOnClick()) {
+			if (gItem.canPurchase(whoClicked)) {
+				if (gItem.purchase(whoClicked)) {
+					whoClicked.playSound(whoClicked.getLocation(), Sound.UI_CARTOGRAPHY_TABLE_TAKE_RESULT, SoundCategory.NEUTRAL, 10f, 1.3f);
+					gItem.afterClick(whoClicked, inventory);
+					updateInventory(whoClicked);
+				} else {
+					whoClicked.sendMessage(Component.text("[SYSTEM]", NamedTextColor.RED).decoration(TextDecoration.BOLD, true)
+					.append(Component.text(" Error! please contact a mod! fail with purchasing.", NamedTextColor.RED).decoration(TextDecoration.BOLD, false)));
+				}
 			} else {
-				whoClicked.sendMessage(Component.text("[SYSTEM]", NamedTextColor.RED).decoration(TextDecoration.BOLD, true)
-				.append(Component.text(" Error! please contact a mod! fail with purchasing.", NamedTextColor.RED).decoration(TextDecoration.BOLD, false)));
+				whoClicked.sendMessage(Component.text("You don't have enough currency to pay for this item.", NamedTextColor.RED));
 			}
-		} else {
-			whoClicked.sendMessage(Component.text("You don't have enough currency to pay for this item.", NamedTextColor.RED));
 		}
-
 	}
 
 
