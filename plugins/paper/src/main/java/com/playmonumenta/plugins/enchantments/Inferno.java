@@ -33,11 +33,13 @@ public class Inferno implements BaseEnchantment {
 		public Player mTriggeredBy;
 		public int mLevel;
 		public double mFireResistantDamage;
+		public int mFireAspectLevel;
 
-		public InfernoMob(Player triggeredBy, int level) {
-			this.mTriggeredBy = triggeredBy;
-			this.mLevel = level;
-			this.mFireResistantDamage = (level + 1) / 2.0;
+		public InfernoMob(Player triggeredBy, int level, int fireAspectLevel) {
+			mTriggeredBy = triggeredBy;
+			mLevel = level;
+			mFireResistantDamage = (level + 1) / 2.0;
+			mFireAspectLevel = fireAspectLevel;
 		}
 	}
 
@@ -79,8 +81,10 @@ public class Inferno implements BaseEnchantment {
 
 		if (event.getCause() == DamageCause.ENTITY_ATTACK
 			&& player.getInventory().getItemInMainHand().containsEnchantment(Enchantment.FIRE_ASPECT)) {
-			if (!sTaggedMobs.containsKey(target) || sTaggedMobs.get(target).mLevel <= level) {
-				infernoTagMob(plugin, target, level, player, "melee");
+			int fireAspectLevel = player.getInventory().getItemInMainHand().getEnchantmentLevel(Enchantment.FIRE_ASPECT);
+			InfernoMob mob = sTaggedMobs.get(target);
+			if (mob == null || mob.mLevel <= level) {
+				infernoTagMob(plugin, target, level, player, "melee", fireAspectLevel);
 				target.setMetadata(SET_FIRE_TICK_METAKEY, new FixedMetadataValue(plugin, target.getTicksLived()));
 				target.setMetadata(FIRE_TICK_METAKEY, new FixedMetadataValue(plugin, target.getTicksLived()));
 			}
@@ -90,10 +94,11 @@ public class Inferno implements BaseEnchantment {
 			// Happens in onShootAttack()
 		} else if (target.hasMetadata(SET_FIRE_TICK_METAKEY)) {
 			// TODO fire ticks when using abilities may be mismanaged atm
+			// Treat magic damage as fire aspect 1
 			if (!sTaggedMobs.containsKey(target) || sTaggedMobs.get(target).mLevel < level) {
-				infernoTagMob(plugin, target, level, player, "magichigh");
+				infernoTagMob(plugin, target, level, player, "magichigh", 1);
 			} else if (!sTaggedMobs.containsKey(target) || sTaggedMobs.get(target).mLevel == level) {
-				infernoTagMob(plugin, target, level, player, "magic");
+				infernoTagMob(plugin, target, level, player, "magic", 1);
 			}
 		}
 	}
@@ -109,11 +114,12 @@ public class Inferno implements BaseEnchantment {
 	 * This has to manually manage the fire ticks because the fire ticks get overwritten before this function triggers
 	 */
 	public static void onShootAttack(Plugin plugin, Projectile proj, LivingEntity target, EntityDamageByEntityEvent event) {
+		// Treat projectiles as fire aspect 1
 		if (!sTaggedMobs.containsKey(target)) {
 			// New inferno case
 			if (proj.hasMetadata(LEVEL_METAKEY)) {
 				int level = proj.getMetadata(LEVEL_METAKEY).get(0).asInt();
-				infernoTagMob(plugin, target, level, (Player) proj.getShooter(), "projectile");
+				infernoTagMob(plugin, target, level, (Player) proj.getShooter(), "projectile", 1);
 				target.setMetadata(SET_FIRE_TICK_METAKEY, new FixedMetadataValue(plugin, target.getTicksLived()));
 				target.setMetadata(FIRE_TICK_METAKEY, new FixedMetadataValue(plugin, target.getTicksLived()));
 			} else if (target.hasMetadata(OLD_FIRE_TICKS_METAKEY) && target.getMetadata(OLD_FIRE_TICKS_METAKEY).get(0).asInt() > target.getFireTicks()) {
@@ -123,13 +129,13 @@ public class Inferno implements BaseEnchantment {
 		} else if (proj.hasMetadata(LEVEL_METAKEY) && sTaggedMobs.get(target).mLevel < proj.getMetadata(LEVEL_METAKEY).get(0).asInt()) {
 			// Higher inferno case
 			int level = proj.getMetadata(LEVEL_METAKEY).get(0).asInt();
-			infernoTagMob(plugin, target, level, (Player) proj.getShooter(), "projectile");
+			infernoTagMob(plugin, target, level, (Player) proj.getShooter(), "projectile", 1);
 			target.setMetadata(SET_FIRE_TICK_METAKEY, new FixedMetadataValue(plugin, target.getTicksLived()));
 			target.setMetadata(FIRE_TICK_METAKEY, new FixedMetadataValue(plugin, target.getTicksLived()));
 		} else if (proj.hasMetadata(LEVEL_METAKEY) && sTaggedMobs.get(target).mLevel == proj.getMetadata(LEVEL_METAKEY).get(0).asInt()) {
 			// Same level inferno case
 			int level = proj.getMetadata(LEVEL_METAKEY).get(0).asInt();
-			infernoTagMob(plugin, target, level, (Player) proj.getShooter(), "projectile");
+			infernoTagMob(plugin, target, level, (Player) proj.getShooter(), "projectile", 1);
 			target.setMetadata(SET_FIRE_TICK_METAKEY, new FixedMetadataValue(plugin, target.getTicksLived()));
 			target.setMetadata(FIRE_TICK_METAKEY, new FixedMetadataValue(plugin, target.getTicksLived()));
 			if (target.hasMetadata(OLD_FIRE_TICKS_METAKEY) && target.getMetadata(OLD_FIRE_TICKS_METAKEY).get(0).asInt() > target.getFireTicks()) {
@@ -155,13 +161,13 @@ public class Inferno implements BaseEnchantment {
 		return sTaggedMobs.containsKey(mob) ? sTaggedMobs.get(mob).mLevel : 0;
 	}
 
-	private static void infernoTagMob(Plugin plugin, LivingEntity target, int level, Player player, String type) {
+	private static void infernoTagMob(Plugin plugin, LivingEntity target, int level, Player player, String type, int fireAspectLevel) {
 		/*
 		 * Record this mob as being inferno tagged
 		 * Add to a secondary map of pending additions to prevent ConcurrentModificationException's
 		 */
 
-		sPendingTagMobs.put(target, new InfernoMob(player, level));
+		sPendingTagMobs.put(target, new InfernoMob(player, level, fireAspectLevel));
 		// Analog to potion effects, only track duration of highest level inferno
 		if (target.getFireTicks() > 0) {
 			// Fire aspect applies fire ticks after onDamage and will set the fireticks to the right amount with this change.
@@ -199,7 +205,7 @@ public class Inferno implements BaseEnchantment {
 							continue;
 						} else if (EntityUtils.isFireResistant(mob)) {
 							if (mob.getLocation().getBlock().getType() == Material.WATER
-								|| ticksLived - mob.getMetadata(SET_FIRE_TICK_METAKEY).get(0).asInt() >= FIRE_RESISTANT_INFERNO_TICKS) {
+								|| ticksLived - mob.getMetadata(SET_FIRE_TICK_METAKEY).get(0).asInt() >= FIRE_RESISTANT_INFERNO_TICKS * value.mFireAspectLevel) {
 								infernoMobsIter.remove();
 								continue;
 							}
