@@ -139,7 +139,7 @@ public class ShatteredEquipmentListener implements Listener {
 	// Player swapped hand items
 	@EventHandler(priority = EventPriority.LOWEST)
 	public void playerSwapHandItemsEvent(PlayerSwapHandItemsEvent event) {
-		if (ItemUtils.isItemShattered(event.getOffHandItem())) {
+		if (ItemUtils.isItemShattered(event.getOffHandItem()) || ItemUtils.isItemShattered(event.getMainHandItem())) {
 			MessagingUtils.sendActionBarMessage(mPlugin, event.getPlayer(), "Shattered items must be reforged before use");
 			event.setCancelled(true);
 		}
