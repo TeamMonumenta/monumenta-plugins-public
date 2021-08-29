@@ -119,9 +119,14 @@ public class StatTrackItem extends GenericCommand {
 			return;
 		}
 		//Add the chosen stat tracking enchant to the item
-		CommandUtils.enchantify(sender, player, "Stat Track", "Tracked by");
-		CommandUtils.enchantify(sender, player, ChatColor.RED + option.getEnchantName() + ": 0");
-		animate(player);
+		try {
+			CommandUtils.enchantify(sender, player, "Stat Track", "Tracked by");
+			CommandUtils.enchantify(sender, player, ChatColor.RED + option.getEnchantName() + ": 0");
+			animate(player);
+		} catch (WrapperCommandSyntaxException ex) {
+			player.sendMessage("Failed to add stat track: " + ex.getMessage());
+			throw ex;
+		}
 	}
 
 	/**
