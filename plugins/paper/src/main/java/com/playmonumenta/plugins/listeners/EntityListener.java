@@ -614,6 +614,11 @@ public class EntityListener implements Listener {
 				if (itemInMainHand.getType().equals(Material.SNOWBALL)
 						&& itemInMainHand.getEnchantmentLevel(Enchantment.ARROW_INFINITE) > 0) {
 					Snowball newBall = (Snowball)origBall.getWorld().spawnEntity(origBall.getLocation(), EntityType.SNOWBALL);
+
+					// Copy the item's name/etc so it can be textured
+					newBall.getItem().setItemMeta(itemInMainHand.getItemMeta());
+					ItemUtils.setPlainTag(newBall.getItem());
+
 					newBall.setShooter(player);
 					newBall.setVelocity(origBall.getVelocity());
 					// Set projectile attributes; don't need to do speed attribute since that's only used to calculate non-critical arrow damage
@@ -632,6 +637,11 @@ public class EntityListener implements Listener {
 				if (itemInMainHand.getType().equals(Material.ENDER_PEARL)
 						&& itemInMainHand.getEnchantmentLevel(Enchantment.ARROW_INFINITE) > 0) {
 					EnderPearl newPearl = (EnderPearl)origPearl.getWorld().spawnEntity(origPearl.getLocation(), EntityType.ENDER_PEARL);
+
+					// Copy the item's name/etc so it can be textured
+					newPearl.getItem().setItemMeta(itemInMainHand.getItemMeta());
+					ItemUtils.setPlainTag(newPearl.getItem());
+
 					newPearl.setShooter(player);
 					newPearl.setVelocity(origPearl.getVelocity());
 					//Set Ranged Damage attribute
