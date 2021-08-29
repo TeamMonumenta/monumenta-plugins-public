@@ -59,7 +59,7 @@ public class Spectral extends DelveModifier {
 	public void entityDeathEvent(EntityDeathEvent event) {
 		LivingEntity mob = event.getEntity();
 
-		if (!EntityUtils.isElite(mob) && !DelvesUtils.isDelveMob(mob)) {
+		if (!EntityUtils.isElite(mob) && !DelvesUtils.isDelveMob(mob) && EntityUtils.isHostileMob(mob)) {
 			if (FastUtils.RANDOM.nextDouble() < mSpawnChance) {
 				Location loc = mob.getLocation();
 				World world = loc.getWorld();
