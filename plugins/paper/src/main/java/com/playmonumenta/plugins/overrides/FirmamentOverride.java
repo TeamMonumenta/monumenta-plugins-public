@@ -120,6 +120,8 @@ public class FirmamentOverride extends BaseOverride {
 						// Forcibly update the new block state and apply physics
 						state.update(true, true);
 						state.setType(Material.PRISMARINE);
+						//Log the placement
+						CoreProtectIntegration.logPlacement(player, event.getBlock().getLocation(), Material.PRISMARINE, blockData);
 					} else {
 						blockData = Material.BLACKSTONE.createBlockData();
 						state.setBlockData(blockData);
@@ -127,9 +129,9 @@ public class FirmamentOverride extends BaseOverride {
 						// Forcibly update the new block state and apply physics
 						state.update(true, true);
 						state.setType(Material.BLACKSTONE);
+						//Log the placement
+						CoreProtectIntegration.logPlacement(player, event.getBlock().getLocation(), Material.BLACKSTONE, blockData);
 					}
-					//Log the placement of prismarine
-					CoreProtectIntegration.logPlacement(player, event.getBlock().getLocation(), Material.PRISMARINE, blockData);
 					// No changes needed to the shulker, exit here and cancel the event
 					return false;
 				}
