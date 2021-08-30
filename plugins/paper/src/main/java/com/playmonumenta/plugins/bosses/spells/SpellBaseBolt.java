@@ -1,6 +1,12 @@
 package com.playmonumenta.plugins.bosses.spells;
 
 import java.util.List;
+import java.util.function.Predicate;
+
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.LocationUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
@@ -11,11 +17,6 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
-
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.FastUtils;
-import com.playmonumenta.plugins.utils.LocationUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
 
 /**
  * This is the base spell for a bolt spell.
@@ -80,12 +81,7 @@ public class SpellBaseBolt extends Spell {
 	private final CastAction mCastAction;
 	private final ParticleAction mParticleAction;
 	private final IntersectAction mIntersectAction;
-
-	public SpellBaseBolt(Plugin plugin, LivingEntity caster, int delay, int duration, double velocity,
-	                     double detectRange, double hitboxRadius, boolean singleTarget, boolean stopOnFirstHit,
-						 TickAction tickAction, CastAction castAction, ParticleAction particleAction, IntersectAction intersectAction) {
-		this(plugin, caster, delay, duration, velocity, detectRange, hitboxRadius, singleTarget, stopOnFirstHit, 1, 1, tickAction, castAction, particleAction, intersectAction);
-	}
+	private final Predicate<Player> mPlayerFilter;
 
 	/**
 	 *
@@ -103,10 +99,11 @@ public class SpellBaseBolt extends Spell {
 	 * @param castAction The action to perform when the bolt is casted
 	 * @param particleAction The action the bolt performs while it travels
 	 * @param intersectAction The action the bolt performs when it intersects a block or player
+	 * @param playerFilter A function to evaluate whether a player is a valid target (true) or not (false)
 	 */
 	public SpellBaseBolt(Plugin plugin, LivingEntity caster, int delay, int duration, double velocity,
 	                     double detectRange, double hitboxRadius, boolean singleTarget, boolean stopOnFirstHit, int shots, int rate,
-						 TickAction tickAction, CastAction castAction, ParticleAction particleAction, IntersectAction intersectAction) {
+						 TickAction tickAction, CastAction castAction, ParticleAction particleAction, IntersectAction intersectAction, Predicate<Player> playerFilter) {
 		mPlugin = plugin;
 		mCaster = caster;
 		mDelay = delay;
@@ -122,6 +119,7 @@ public class SpellBaseBolt extends Spell {
 		mCastAction = castAction;
 		mParticleAction = particleAction;
 		mIntersectAction = intersectAction;
+		mPlayerFilter = playerFilter;
 	}
 
 	@Override
@@ -143,6 +141,9 @@ public class SpellBaseBolt extends Spell {
 						this.cancel();
 
 						List<Player> players = PlayerUtils.playersInRange(mCaster.getLocation(), mDetectRange, false);
+						if (mPlayerFilter != null) {
+							players.removeIf(mPlayerFilter.negate());
+						}
 						if (players.size() > 0) {
 							if (mSingleTarget) {
 								if (mCaster instanceof Mob) {
@@ -180,6 +181,9 @@ public class SpellBaseBolt extends Spell {
 				Vector dir = LocationUtils.getDirectionTo(player.getLocation().add(0, 1, 0), mCaster.getEyeLocation());
 				Location detLoc = mCaster.getLocation();
 				List<Player> players = PlayerUtils.playersInRange(detLoc, 75, false);
+				if (mPlayerFilter != null) {
+					players.removeIf(mPlayerFilter.negate());
+				}
 
 				new BukkitRunnable() {
 					BoundingBox mBox = BoundingBox.of(mCaster.getEyeLocation(), mHitboxRadius, mHitboxRadius, mHitboxRadius);

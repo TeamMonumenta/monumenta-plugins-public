@@ -142,7 +142,7 @@ public class PrimordialElementalKaulBoss extends BossAbilityGroup {
 	protected static SpellBaseBolt getBoltSpell(Plugin plugin, LivingEntity boss) {
 		World world = boss.getWorld();
 
-		return new SpellBaseBolt(plugin, boss, 20 * 2, 20 * 5, 1.1, detectionRange, 0.5, false, true,
+		return new SpellBaseBolt(plugin, boss, 20 * 2, 20 * 5, 1.1, detectionRange, 0.5, false, true, 1, 1,
 			(Entity entity, int tick) -> {
 				if (entity.getLocation().getY() > 60) {
 					return;
@@ -205,6 +205,11 @@ public class PrimordialElementalKaulBoss extends BossAbilityGroup {
 				world.spawnParticle(Particle.FLAME, loc, 125, 0, 0, 0, 0.175);
 				world.spawnParticle(Particle.SMOKE_LARGE, loc, 50, 0, 0, 0, 0.25);
 				world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 1, 0.9f);
+			},
+
+			// Only allow targetting players below y=60
+			(Player player) -> {
+				return player != null && player.getLocation().getY() < 60;
 			}
 		);
 	}

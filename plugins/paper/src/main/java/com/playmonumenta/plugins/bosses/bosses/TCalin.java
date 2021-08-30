@@ -126,7 +126,8 @@ public class TCalin extends BossAbilityGroup {
 				world.spawnParticle(Particle.SMOKE_LARGE, loc, 50, 0, 0, 0, 0.25);
 				world.spawnParticle(Particle.EXPLOSION_NORMAL, loc, 50, 0, 0, 0, 0.25);
 				world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 1, 1.25f);
-			}
+			},
+			null
 		);
 
 		SpellDelayedAction aoe = new SpellDelayedAction(plugin, mBoss.getLocation(), 20 * 3,
