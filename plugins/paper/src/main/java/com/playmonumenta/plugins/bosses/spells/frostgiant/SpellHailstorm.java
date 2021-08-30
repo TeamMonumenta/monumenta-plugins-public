@@ -5,6 +5,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.playmonumenta.plugins.bosses.bosses.FrostGiant;
+import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.player.PPGroundCircle;
+import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
+
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.GameMode;
@@ -20,12 +26,6 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
-
-import com.playmonumenta.plugins.bosses.bosses.FrostGiant;
-import com.playmonumenta.plugins.bosses.spells.Spell;
-import com.playmonumenta.plugins.utils.BossUtils;
-import com.playmonumenta.plugins.utils.FastUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
 
 /*
  Hailstorm - Creates a snowstorm in a circle that is 24 blocks and beyond that passively
@@ -44,10 +44,11 @@ public class SpellHailstorm extends Spell {
 	private double mRadius;
 	private List<Player> mWarned = new ArrayList<Player>();
 	private Map<Player, BukkitRunnable> mDamage = new HashMap<>();
+	private final PPGroundCircle mInnerCircle;
+	private final PPGroundCircle mOuterCircle;
 
 	private BukkitRunnable mDelay;
 
-	private static final Particle.DustOptions BLUE_COLOR = new Particle.DustOptions(Color.fromRGB(66, 185, 245), 1.0f);
 	private static final Particle.DustOptions LIGHT_BLUE_COLOR = new Particle.DustOptions(Color.fromRGB(0, 255, 247), 1.0f);
 
 	public SpellHailstorm(Plugin plugin, LivingEntity boss, double radius, Location start) {
@@ -55,6 +56,10 @@ public class SpellHailstorm extends Spell {
 		mRadius = radius;
 		mPlugin = plugin;
 		mStartLoc = start;
+
+		Location loc = boss.getLocation();
+		mInnerCircle = new PPGroundCircle(Particle.REDSTONE, loc, 60, 0.1, 0.1, 0.1, 1, LIGHT_BLUE_COLOR).init(radius - 0.75, true);
+		mOuterCircle = new PPGroundCircle(Particle.CLOUD, loc, 30, 2, 2, 2, 0.075).init(radius + 5, true);
 
 		new BukkitRunnable() {
 			@Override
@@ -73,25 +78,14 @@ public class SpellHailstorm extends Spell {
 		World world = mBoss.getWorld();
 
 		if (mDoDamage) {
-			for (double degree = 0; degree < 360; degree += 8) {
-				double radian = Math.toRadians(degree);
-				loc.add(FastUtils.cos(radian) * (mRadius + 5), 2.5, FastUtils.sin(radian) * (mRadius + 5));
-				world.spawnParticle(Particle.CLOUD, loc, 2, 2, 1, 3, 0.075);
-				world.spawnParticle(Particle.CLOUD, loc, 2, 2, 4, 3, 0.075);
-				world.spawnParticle(Particle.REDSTONE, loc, 3, 2, 4, 3, 0.075, BLUE_COLOR);
-				world.spawnParticle(Particle.REDSTONE, loc, 3, 2, 1, 3, 0.075, BLUE_COLOR);
-				loc.subtract(FastUtils.cos(radian) * (mRadius + 5), 2.5, FastUtils.sin(radian) * (mRadius + 5));
-			}
+			Location offsetLoc = loc.clone().add(0, 2, 0);
+			mOuterCircle.location(offsetLoc);
+			mOuterCircle.spawnAsBoss();
 		}
 
-		for (double degree = 0; degree < 360; degree++) {
-			if (FastUtils.RANDOM.nextDouble() < 0.4) {
-				double radian = Math.toRadians(degree);
-				loc.add(FastUtils.cos(radian) * (mRadius), 0.5, FastUtils.sin(radian) * (mRadius));
-				world.spawnParticle(Particle.REDSTONE, loc, 1, 0, 0, 0, LIGHT_BLUE_COLOR);
-				loc.subtract(FastUtils.cos(radian) * (mRadius), 0.5, FastUtils.sin(radian) * (mRadius));
-			}
-		}
+		Location offsetLoc = loc.clone().add(0, 0.2, 0);
+		mInnerCircle.location(offsetLoc);
+		mInnerCircle.spawnAsBoss();
 
 		if (!mAttack) {
 			mAttack = true;

@@ -19,7 +19,6 @@ import com.playmonumenta.plugins.utils.VectorUtils;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.World;
@@ -111,9 +110,6 @@ public class Shatter extends Spell {
 
 								//Spawns particles
 								Location l = loc.clone().add(vec);
-								if (r % 2 == 0 && degree % 10 == 0) {
-									world.spawnParticle(Particle.FLAME, l, 1, 0.1, 0.2, 0.1, 0.1);
-								}
 
 								l.subtract(0, 1, 0);
 								//Spawns crimson hyphae as a warning at a 1/3 rate, will try to climb 1 block up or down if needed
@@ -138,7 +134,6 @@ public class Shatter extends Spell {
 											mOldBlocks.put(l, l.getBlock().getState());
 										}
 										l.getBlock().setType(Material.CRIMSON_HYPHAE);
-										world.spawnParticle(Particle.SPELL_INSTANT, l, 3, 0.45, 6, 0.45, 0, null, true);
 									}
 								}
 							}
@@ -168,7 +163,6 @@ public class Shatter extends Spell {
 					Vector vec;
 					List<BoundingBox> boxes = new ArrayList<BoundingBox>();
 
-					//Final particle show
 					for (double r = 0; r < 30; r++) {
 						for (int dir = 0; dir < 360; dir += 90) {
 							for (double degree = 60; degree < 120; degree += 5) {
@@ -180,10 +174,6 @@ public class Shatter extends Spell {
 								//1.5 -> 15
 								BoundingBox box = BoundingBox.of(l, 0.65, 15, 0.65);
 								boxes.add(box);
-
-								if (r % 2 == 0 && degree % 10 == 0) {
-									world.spawnParticle(Particle.FLAME, l, 1, 0.1, 0.2, 0.1, 0.25);
-								}
 							}
 						}
 					}
