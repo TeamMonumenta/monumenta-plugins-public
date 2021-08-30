@@ -87,7 +87,11 @@ public class FirmamentOverride extends BaseOverride {
 		Inventory shulkerInventory = shulkerBox.getInventory();
 		for (int i = 0; i < 27; i++) {
 			ItemStack currentItem = shulkerInventory.getItem(i);
-			if (currentItem == null || currentItem.getType().isAir() || ItemUtils.notAllowedTreeReplace.contains(currentItem.getType()) || (!currentItem.getType().isOccluding() && !ItemUtils.GOOD_OCCLUDERS.contains(currentItem.getType()))) {
+			if (currentItem == null
+				|| currentItem.getType().isAir()
+				|| ItemUtils.notAllowedTreeReplace.contains(currentItem.getType())
+				|| (!currentItem.getType().isOccluding() && !ItemUtils.GOOD_OCCLUDERS.contains(currentItem.getType()))
+				|| (currentItem.getItemMeta().hasLore() && !currentItem.getItemMeta().lore().isEmpty())) {
 				// Air breaks it, skip over it. Also the banned items break it, skip over those.
 				continue;
 			}
