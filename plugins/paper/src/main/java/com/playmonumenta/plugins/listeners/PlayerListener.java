@@ -455,6 +455,9 @@ public class PlayerListener implements Listener {
 
 			/* Mark the item so it won't get shattered later */
 			event.getItem().addScoreboardTag("ShatterProcessed");
+		} else {
+			/* Non-player entities don't get to pick up items */
+			event.setCancelled(true);
 		}
 	}
 
