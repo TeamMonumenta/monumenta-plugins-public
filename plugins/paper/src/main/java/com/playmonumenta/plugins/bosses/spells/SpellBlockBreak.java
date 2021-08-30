@@ -11,6 +11,7 @@ import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.block.Block;
+import org.bukkit.block.data.Rail;
 import org.bukkit.block.data.type.Fence;
 import org.bukkit.block.data.type.Gate;
 import org.bukkit.block.data.type.TrapDoor;
@@ -79,7 +80,7 @@ public class SpellBlockBreak extends Spell {
 					Block block = testloc.getBlock();
 					Material material = block.getType();
 
-					if (material.equals(Material.COBWEB) || material.equals(Material.HONEY_BLOCK) || block.getBlockData() instanceof TrapDoor || block.getBlockData() instanceof Fence || block.getBlockData() instanceof Gate || block.getBlockData() instanceof Wall) {
+					if (material.equals(Material.COBWEB) || material.equals(Material.HONEY_BLOCK) || block.getBlockData() instanceof TrapDoor || block.getBlockData() instanceof Fence || block.getBlockData() instanceof Gate || block.getBlockData() instanceof Wall || block.getBlockData() instanceof Rail) {
 						/* Break cobwebs immediately, don't add them to the bad block list */
 						List<Block> list = new ArrayList<>(1);
 						list.add(block);
