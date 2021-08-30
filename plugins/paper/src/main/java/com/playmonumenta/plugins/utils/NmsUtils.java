@@ -77,6 +77,11 @@ public class NmsUtils {
 	}
 
 	public static void unblockableEntityDamageEntity(@Nonnull LivingEntity damagee, double amount, @Nonnull LivingEntity damager) {
+		// Don't damage invulnerable entities even though this is unblockable
+		if (damagee.isInvulnerable()) {
+			return;
+		}
+
 		DamageSource reason = new UnblockableEntityDamageSource(damager == null ? null : ((CraftLivingEntity) damager).getHandle());
 
 		((CraftLivingEntity)damagee).getHandle().damageEntity(reason, (float) amount);
