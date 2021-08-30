@@ -1096,6 +1096,7 @@ public class PlayerListener implements Listener {
 		if (effects != null && (mPlugin.mEffectManager.getEffects(damager, STASIS) != null && (mPlugin.mEffectManager.getEffects(event.getDamager(), STASIS)).contains(new Stasis(120))) ||
 				(mPlugin.mEffectManager.getEffects(damagee, STASIS) != null && (mPlugin.mEffectManager.getEffects(damagee, STASIS)).contains(new Stasis(120)))) {
 			event.setCancelled(true);
+			return;
 		}
 		if (damagee instanceof Player) {
 			Player player = (Player) damagee;
