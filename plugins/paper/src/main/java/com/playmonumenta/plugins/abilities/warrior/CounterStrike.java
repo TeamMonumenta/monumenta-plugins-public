@@ -52,7 +52,7 @@ public class CounterStrike extends Ability {
 				double eventDamage = event.getDamage() * mReflect;
 
 				for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), COUNTER_STRIKE_RADIUS, mPlayer)) {
-					EntityUtils.damageEntity(mPlugin, mob, mDamage + eventDamage, mPlayer, MagicType.SHADOWS, true, mInfo.mLinkedSpell);
+					EntityUtils.damageEntity(mPlugin, mob, mDamage + eventDamage, mPlayer, MagicType.SHADOWS, true, mInfo.mLinkedSpell, false, false, true, false);
 				}
 			}
 		}
