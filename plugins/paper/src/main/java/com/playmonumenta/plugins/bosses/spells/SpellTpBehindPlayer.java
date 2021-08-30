@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.bosses.spells;
 
 import java.util.List;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -116,6 +117,10 @@ public class SpellTpBehindPlayer extends Spell {
 							mLauncher.teleport(locTest);
 							if (mLauncher instanceof Mob) {
 								((Mob) mLauncher).setTarget(target);
+								// For some reason just setting the target doesn't seem to be enough, so try again a tick later
+								Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
+									((Mob) mLauncher).setTarget(target);
+								}, 1);
 							}
 
 							locTest.add(0, mLauncher.getHeight() / 2, 0);
