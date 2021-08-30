@@ -5,6 +5,7 @@ import java.util.EnumSet;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
 import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 
 import org.bukkit.ChatColor;
@@ -48,7 +49,7 @@ public class Retrieval implements BaseEnchantment {
 					if (infLevel == 0 && FastUtils.RANDOM.nextDouble() < RETRIEVAL_CHANCE * level) {
 						player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ARROW_HIT_PLAYER, 0.3f, 1.0f);
 
-						arrow.setPickupStatus(Arrow.PickupStatus.ALLOWED);
+						arrow.setPickupStatus(Arrow.PickupStatus.DISALLOWED);
 						Inventory playerInv = player.getInventory();
 						int firstArrow = playerInv.first(Material.ARROW);
 						int firstTippedArrow = playerInv.first(Material.TIPPED_ARROW);
@@ -70,9 +71,10 @@ public class Retrieval implements BaseEnchantment {
 						} else if (firstSpectralArrow > -1) {
 							arrowSlot = firstSpectralArrow;
 						} else {
+							// No arrow left - player must have shot their last arrow. Grab the arrow from the event and give it back to the player, then abort
+							InventoryUtils.giveItem(player, arrow.getItemStack());
 							return;
 						}
-						arrow.setPickupStatus(Arrow.PickupStatus.DISALLOWED);
 						if (arrow.isShotFromCrossbow()) {
 							playerInv.getItem(arrowSlot).setAmount(playerInv.getItem(arrowSlot).getAmount() + 1);
 						} else {
