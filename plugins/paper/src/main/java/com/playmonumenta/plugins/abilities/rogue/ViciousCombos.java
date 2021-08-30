@@ -35,7 +35,7 @@ public class ViciousCombos extends Ability {
 		super(plugin, player, "Vicious Combos");
 		mInfo.mScoreboardId = "ViciousCombos";
 		mInfo.mShorthandName = "VC";
-		mInfo.mDescriptions.add("Passively, killing an enemy refreshes the cooldown of your abilities by 1 second. Killing an Elite enemy instead resets the cooldown of your abilities.");
+		mInfo.mDescriptions.add("Passively, killing an enemy with melee or ability damage refreshes the cooldown of your abilities by 1 second. Killing an Elite enemy instead resets the cooldown of your abilities.");
 		mInfo.mDescriptions.add("Killing an enemy now refreshes your ability cooldowns by 2 seconds. Killing an Elite enemy inflicts nearby enemies within 5 blocks with 15% weaken and 15% Vulnerability for 5 seconds.");
 	}
 
