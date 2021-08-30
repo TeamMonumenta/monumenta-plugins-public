@@ -64,8 +64,7 @@ public class RecklessSwing extends Ability {
 	@Override
 	public boolean livingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
 		if (event.getCause() == DamageCause.ENTITY_ATTACK) {
-			int missingHealthChunks = (int)((mPlayer.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue() - mPlayer.getHealth()) / DAMAGE_INCREMENT_THRESHOLD_HEALTH);
-			event.setDamage(event.getDamage() * (1 + Math.min(mMaxDamagePercent, mDamagePercentPer4Health * missingHealthChunks)));
+			event.setDamage(computeDamageUsingHealth(event.getDamage()));
 		}
 		return true;
 	}
@@ -75,6 +74,7 @@ public class RecklessSwing extends Ability {
 		if (mPlayer.isSneaking()) {
 			// Run at the end of this tick so it'll apply after any damage dealt to mobs
 			Bukkit.getScheduler().runTask(mPlugin, () -> {
+				double preReduceHealthDamage = computeDamageUsingHealth(mDamage);
 				if (mPlayer.getHealth() <= SELF_DAMAGE) {
 					mPlayer.damage(9001);
 				} else {
@@ -90,11 +90,16 @@ public class RecklessSwing extends Ability {
 				for (LivingEntity mob : EntityUtils.getNearbyMobs(loc, RADIUS)) {
 					EntityUtils.damageEntity(mPlugin, mob, mDamage, mPlayer, MagicType.PHYSICAL, true, mInfo.mLinkedSpell, true, true, true, false);
 					if (mRampage != null) {
-						mRampage.customRecklessSwingInteraction(mDamage);
+						mRampage.customRecklessSwingInteraction(preReduceHealthDamage);
 					}
 				}
 			});
 		}
+	}
+
+	private double computeDamageUsingHealth(double baseDamage) {
+		int missingHealthChunks = (int)((mPlayer.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue() - mPlayer.getHealth()) / DAMAGE_INCREMENT_THRESHOLD_HEALTH);
+		return baseDamage * (1 + Math.min(mMaxDamagePercent, mDamagePercentPer4Health * missingHealthChunks));
 	}
 
 	@Override
