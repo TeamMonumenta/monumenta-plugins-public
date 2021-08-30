@@ -128,7 +128,6 @@ public class Hedera extends BossAbilityGroup {
 		for (ArmorStand stand : nearbyStands) {
 			if (stand.getName().contains(PLANT_STAND_TAG)) {
 				mPlantSpawns.add(stand.getLocation());
-				stand.remove();
 			}
 
 			//Set bedrock behind boss room
@@ -194,6 +193,13 @@ public class Hedera extends BossAbilityGroup {
 			}
 		}
 		mEndLoc.getBlock().setType(Material.REDSTONE_BLOCK);
+
+		// Remove the plant armorstands
+		for (ArmorStand stand : mBoss.getWorld().getNearbyEntitiesByType(ArmorStand.class, mBoss.getLocation(), 50.0)) {
+			if (stand.getName().contains(PLANT_STAND_TAG)) {
+				stand.remove();
+			}
+		}
 
 		//Kill nearby mobs
 		for (LivingEntity e : EntityUtils.getNearbyMobs(mBoss.getLocation(), 40.0)) {
