@@ -1244,7 +1244,7 @@ public class DepthsManager {
 		//Remove all mobs in the player's region
 		List<Entity> mobs = p.getWorld().getEntities();
 		for (Entity e : mobs) {
-			if (EntityUtils.isHostileMob(e) && (e.getLocation().getX() / 512 == p.getLocation().getX() / 512) && (e.getLocation().getZ() / 512 == p.getLocation().getZ())) {
+			if (EntityUtils.isHostileMob(e) && (e.getLocation().getBlockX() / 512 == p.getLocation().getBlockX() / 512) && (e.getLocation().getBlockZ() / 512 == p.getLocation().getBlockZ())) {
 				e.remove();
 			}
 		}
