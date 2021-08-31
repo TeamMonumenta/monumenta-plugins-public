@@ -3,6 +3,18 @@ package com.playmonumenta.plugins.player;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import com.google.gson.JsonObject;
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.attributes.BaseAttribute;
+import com.playmonumenta.plugins.enchantments.BaseEnchantment;
+import com.playmonumenta.plugins.enchantments.CustomEnchantment;
+import com.playmonumenta.plugins.events.CustomDamageEvent;
+import com.playmonumenta.plugins.events.EvasionEvent;
+import com.playmonumenta.plugins.listeners.ShulkerEquipmentListener;
+import com.playmonumenta.plugins.utils.AbsorptionUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.InventoryUtils;
+
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.entity.Entity;
@@ -16,6 +28,7 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityRegainHealthEvent;
+import org.bukkit.event.entity.EntityResurrectEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -36,18 +49,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import net.kyori.adventure.text.Component;
-
-import com.google.gson.JsonObject;
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.attributes.BaseAttribute;
-import com.playmonumenta.plugins.enchantments.BaseEnchantment;
-import com.playmonumenta.plugins.enchantments.CustomEnchantment;
-import com.playmonumenta.plugins.events.CustomDamageEvent;
-import com.playmonumenta.plugins.events.EvasionEvent;
-import com.playmonumenta.plugins.listeners.ShulkerEquipmentListener;
-import com.playmonumenta.plugins.utils.AbsorptionUtils;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.InventoryUtils;
 
 public class PlayerInventory {
 	/*
@@ -203,7 +204,7 @@ public class PlayerInventory {
 				Integer level = iter.getValue();
 
 				Integer oldLevel = mPreviousProperties.get(property);
-				if (oldLevel == level) {
+				if (oldLevel == level && !(event instanceof EntityResurrectEvent)) {
 					// Don't need to do anything - player already had effects from this
 				} else if (oldLevel == null) {
 					// This didn't exist before - just apply the new property
