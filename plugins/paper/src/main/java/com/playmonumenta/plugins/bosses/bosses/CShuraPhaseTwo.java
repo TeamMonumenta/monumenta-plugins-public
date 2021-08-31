@@ -5,6 +5,19 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.playmonumenta.plugins.bosses.BossBarManager;
+import com.playmonumenta.plugins.bosses.BossBarManager.BossHealthAction;
+import com.playmonumenta.plugins.bosses.SpellManager;
+import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.bosses.spells.SpellBlockBreak;
+import com.playmonumenta.plugins.bosses.spells.SpellConditionalTeleport;
+import com.playmonumenta.plugins.bosses.spells.SpellSmokeBomb;
+import com.playmonumenta.plugins.bosses.spells.SpellTpBehindPlayer;
+import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.utils.SerializationUtils;
+
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.attribute.Attribute;
@@ -18,19 +31,6 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
-
-import com.playmonumenta.plugins.bosses.BossBarManager;
-import com.playmonumenta.plugins.bosses.BossBarManager.BossHealthAction;
-import com.playmonumenta.plugins.bosses.SpellManager;
-import com.playmonumenta.plugins.bosses.spells.Spell;
-import com.playmonumenta.plugins.bosses.spells.SpellBlockBreak;
-import com.playmonumenta.plugins.bosses.spells.SpellConditionalTeleport;
-import com.playmonumenta.plugins.bosses.spells.SpellSmokeBomb;
-import com.playmonumenta.plugins.bosses.spells.SpellTpBehindRandomPlayer;
-import com.playmonumenta.plugins.utils.BossUtils;
-import com.playmonumenta.plugins.utils.FastUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.plugins.utils.SerializationUtils;
 
 public class CShuraPhaseTwo extends BossAbilityGroup {
 	public static final String identityTag = "boss_cshura_2";
@@ -60,7 +60,7 @@ public class CShuraPhaseTwo extends BossAbilityGroup {
 		mBoss.addScoreboardTag("Boss");
 
 		SpellManager activeSpells = new SpellManager(Arrays.asList(
-			new SpellTpBehindRandomPlayer(plugin, mBoss, 160),
+			new SpellTpBehindPlayer(plugin, mBoss, 160, 80, 50, 10, true),
 			new SpellSmokeBomb(plugin, boss, 7, 40)
 		));
 		List<Spell> passiveSpells = Arrays.asList(

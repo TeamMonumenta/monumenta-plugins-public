@@ -5,6 +5,21 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.playmonumenta.plugins.bosses.BossBarManager;
+import com.playmonumenta.plugins.bosses.BossBarManager.BossHealthAction;
+import com.playmonumenta.plugins.bosses.SpellManager;
+import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.bosses.spells.SpellBaseSeekingProjectile;
+import com.playmonumenta.plugins.bosses.spells.SpellBlockBreak;
+import com.playmonumenta.plugins.bosses.spells.SpellPurgeNegatives;
+import com.playmonumenta.plugins.bosses.spells.SpellTpBehindPlayer;
+import com.playmonumenta.plugins.bosses.spells.mimicqueen.SpellMultihitHeal;
+import com.playmonumenta.plugins.bosses.spells.mimicqueen.SpellSummonMiniboss;
+import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.utils.PotionUtils;
+import com.playmonumenta.plugins.utils.SerializationUtils;
+
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -20,21 +35,6 @@ import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-
-import com.playmonumenta.plugins.bosses.BossBarManager;
-import com.playmonumenta.plugins.bosses.BossBarManager.BossHealthAction;
-import com.playmonumenta.plugins.bosses.SpellManager;
-import com.playmonumenta.plugins.bosses.spells.Spell;
-import com.playmonumenta.plugins.bosses.spells.SpellBaseSeekingProjectile;
-import com.playmonumenta.plugins.bosses.spells.SpellBlockBreak;
-import com.playmonumenta.plugins.bosses.spells.SpellPurgeNegatives;
-import com.playmonumenta.plugins.bosses.spells.SpellTpBehindRandomPlayer;
-import com.playmonumenta.plugins.bosses.spells.mimicqueen.SpellMultihitHeal;
-import com.playmonumenta.plugins.bosses.spells.mimicqueen.SpellSummonMiniboss;
-import com.playmonumenta.plugins.utils.BossUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.plugins.utils.PotionUtils;
-import com.playmonumenta.plugins.utils.SerializationUtils;
 
 public class MimicQueen extends BossAbilityGroup {
 	public static final String identityTag = "boss_mimicqueen";
@@ -76,7 +76,7 @@ public class MimicQueen extends BossAbilityGroup {
 		SpellManager activeSpells = new SpellManager(Arrays.asList(
 				new SpellMultihitHeal(plugin, boss),
 				new SpellSummonMiniboss(plugin, boss),
-				new SpellTpBehindRandomPlayer(plugin, boss, 120),
+				new SpellTpBehindPlayer(plugin, boss, 120, 80, 50, 10, true),
 				new SpellBaseSeekingProjectile(plugin, boss, detectionRange, SINGLE_TARGET, LAUNCH_TRACKING, COOLDOWN, DELAY,
 						SPEED, TURN_RADIUS, LIFETIME_TICKS, HITBOX_LENGTH, COLLIDES_WITH_BLOCKS, LINGERS,
 						// Initiate Aesthetic

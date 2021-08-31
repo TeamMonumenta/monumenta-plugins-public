@@ -5,6 +5,21 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.playmonumenta.plugins.bosses.BossBarManager;
+import com.playmonumenta.plugins.bosses.BossBarManager.BossHealthAction;
+import com.playmonumenta.plugins.bosses.SpellManager;
+import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.bosses.spells.SpellAxtalMeleeMinions;
+import com.playmonumenta.plugins.bosses.spells.SpellAxtalTntThrow;
+import com.playmonumenta.plugins.bosses.spells.SpellAxtalWitherAoe;
+import com.playmonumenta.plugins.bosses.spells.SpellBaseLaser;
+import com.playmonumenta.plugins.bosses.spells.SpellBlockBreak;
+import com.playmonumenta.plugins.bosses.spells.SpellConditionalTeleport;
+import com.playmonumenta.plugins.bosses.spells.SpellTpBehindPlayer;
+import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.utils.SerializationUtils;
+
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -17,21 +32,6 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.plugin.Plugin;
-
-import com.playmonumenta.plugins.bosses.BossBarManager;
-import com.playmonumenta.plugins.bosses.BossBarManager.BossHealthAction;
-import com.playmonumenta.plugins.bosses.SpellManager;
-import com.playmonumenta.plugins.bosses.spells.Spell;
-import com.playmonumenta.plugins.bosses.spells.SpellAxtalMeleeMinions;
-import com.playmonumenta.plugins.bosses.spells.SpellAxtalTntThrow;
-import com.playmonumenta.plugins.bosses.spells.SpellAxtalWitherAoe;
-import com.playmonumenta.plugins.bosses.spells.SpellBaseLaser;
-import com.playmonumenta.plugins.bosses.spells.SpellBlockBreak;
-import com.playmonumenta.plugins.bosses.spells.SpellConditionalTeleport;
-import com.playmonumenta.plugins.bosses.spells.SpellTpBehindRandomPlayer;
-import com.playmonumenta.plugins.utils.BossUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.plugins.utils.SerializationUtils;
 
 public class CAxtal extends BossAbilityGroup {
 	public static final String identityTag = "boss_caxtal";
@@ -62,7 +62,7 @@ public class CAxtal extends BossAbilityGroup {
 		SpellManager activeSpells = new SpellManager(Arrays.asList(
 			new SpellAxtalWitherAoe(plugin, mBoss, 13, 30, 0),
 			new SpellAxtalMeleeMinions(plugin, mBoss, 10, 3, 3, 20, 12),
-			new SpellTpBehindRandomPlayer(plugin, mBoss, 160),
+			new SpellTpBehindPlayer(plugin, mBoss, 160, 80, 50, 10, true),
 			new SpellAxtalTntThrow(plugin, mBoss, 5, 15),
 			new SpellBaseLaser(plugin, boss, 60, 140, false, true, 160,
 			                   // Tick action per player
