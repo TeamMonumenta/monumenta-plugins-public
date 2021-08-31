@@ -48,7 +48,7 @@ public class SpellHallowsEnd extends Spell {
 	private void pillar(Location loc, boolean bounce) {
 		World world = loc.getWorld();
 		world.playSound(loc, Sound.BLOCK_BUBBLE_COLUMN_WHIRLPOOL_INSIDE, 2, 0.85f);
-		new BukkitRunnable() {
+		BukkitRunnable run = new BukkitRunnable() {
 			int mTicks = 0;
 			@Override
 			public void run() {
@@ -86,8 +86,9 @@ public class SpellHallowsEnd extends Spell {
 					}
 				}
 			}
-
-		}.runTaskTimer(mPlugin, 0, 1);
+		};
+		run.runTaskTimer(mPlugin, 0, 1);
+		mActiveRunnables.add(run);
 	}
 
 	@Override
@@ -104,7 +105,7 @@ public class SpellHallowsEnd extends Spell {
 		mHit = false;
 		pillar(mBoss.getLocation(), false);
 
-		new BukkitRunnable() {
+		BukkitRunnable run = new BukkitRunnable() {
 			boolean mInit = false;
 			int mTicks = 0;
 			int mHits = 0;
@@ -149,7 +150,9 @@ public class SpellHallowsEnd extends Spell {
 					this.cancel();
 				}
 			}
-		}.runTaskTimer(mPlugin, 25, 1);
+		};
+		run.runTaskTimer(mPlugin, 25, 1);
+		mActiveRunnables.add(run);
 	}
 
 	@Override
