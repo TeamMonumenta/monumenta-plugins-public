@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
@@ -204,10 +205,18 @@ public class GraveListener implements Listener {
 			// If the item shatters, drop it on the player with instant pickup, grave item if it couldn't be picked up.
 			Player player = event.getPlayer();
 			Location location = player.getLocation();
-			Item entity = player.getWorld().dropItemNaturally(location, item);
-			entity.setPickupDelay(0);
+			Item droppedItem = player.getWorld().dropItemNaturally(location, item);
+			droppedItem.setOwner(player.getUniqueId());
+			droppedItem.setThrower(player.getUniqueId());
+			droppedItem.setPickupDelay(0);
+			// Allow other players to pick this up after 10s
+			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
+				if (droppedItem.isValid() && !droppedItem.isDead()) {
+					droppedItem.setOwner(null);
+				}
+			}, 200);
 			if (!player.getScoreboardTags().contains("DisableGraves")) {
-				GraveManager.onDropItem(player, entity);
+				GraveManager.onDropItem(player, droppedItem);
 			}
 			player.sendMessage(ChatColor.RED + "An item shattered because it ran out of durability");
 		}
