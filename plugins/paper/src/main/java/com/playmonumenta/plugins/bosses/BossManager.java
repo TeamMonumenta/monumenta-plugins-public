@@ -578,7 +578,7 @@ public class BossManager implements Listener {
 		}
 	}
 
-	@EventHandler(priority = EventPriority.HIGHEST)
+	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
 	public void projectileHitEvent(ProjectileHitEvent event) {
 		Projectile proj = event.getEntity();
 		if (proj != null) {

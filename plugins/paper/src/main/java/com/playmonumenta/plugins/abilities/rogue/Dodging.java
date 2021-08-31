@@ -68,7 +68,7 @@ public class Dodging extends Ability {
 		mInfo.mLinkedSpell = ClassAbility.DODGING;
 		mInfo.mScoreboardId = "Dodging";
 		mInfo.mShorthandName = "Dg";
-		mInfo.mDescriptions.add("Blocks an arrow or blaze fireball that would have hit you. Cooldown: 12s.");
+		mInfo.mDescriptions.add("Blocks an arrow, thrown potion, blaze fireball, or snowball that would have hit you. Cooldown: 12s.");
 		mInfo.mDescriptions.add("The cooldown is reduced to 10 s. When this ability is triggered, you gain 15 s of Speed I.");
 		// NOTE: getAbilityScore() can only be used after the scoreboardId is set!
 		mInfo.mCooldown = getAbilityScore() == 1 ? DODGING_COOLDOWN_1 : DODGING_COOLDOWN_2;

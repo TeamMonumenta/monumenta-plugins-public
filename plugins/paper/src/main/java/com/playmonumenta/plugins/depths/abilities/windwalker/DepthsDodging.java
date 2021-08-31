@@ -150,7 +150,7 @@ public class DepthsDodging extends DepthsAbility {
 
 	@Override
 	public String getDescription(int rarity) {
-		return "You dodge the next projectile attack that would have hit you, nullifying the damage. Cooldown: " + DepthsUtils.getRarityColor(rarity) + COOLDOWN[rarity - 1] / 20 + "s" + ChatColor.WHITE + ".";
+		return "You dodge the next projectile or potion attack that would have hit you, nullifying the damage. Cooldown: " + DepthsUtils.getRarityColor(rarity) + COOLDOWN[rarity - 1] / 20 + "s" + ChatColor.WHITE + ".";
 	}
 
 	@Override
