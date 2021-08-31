@@ -139,6 +139,12 @@ public class BodkinBlitz extends MultipleChargeAbility {
 				// Each incrementation of j checks for 1.5 blocks, for a max of 4 (6 blocks).
 				// This is so that we can have a small projectile animation.
 
+				// Don't allow teleporting outside the world border
+				if (!mTpLoc.getWorld().getWorldBorder().isInside(mTpLoc)) {
+					this.cancel();
+					return;
+				}
+
 				// Teleport player
 				if (mTick >= 4) {
 					mTpLoc.setDirection(mPlayer.getLocation().getDirection());

@@ -153,8 +153,8 @@ public class ThunderStep extends Ability {
 				new BukkitRunnable() {
 					@Override
 					public void run() {
-						if (mPlayer == null || mPlayer.isDead() || !mPlayer.isValid()) {
-							this.cancel();
+						if (mPlayer == null || mPlayer.isDead() || !mPlayer.isValid() || !playerEndLocation.getWorld().getWorldBorder().isInside(playerEndLocation)) {
+							return;
 						}
 
 						mPlayer.teleport(playerEndLocation);
