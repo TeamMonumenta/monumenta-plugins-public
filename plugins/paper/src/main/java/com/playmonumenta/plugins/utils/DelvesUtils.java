@@ -806,7 +806,7 @@ public class DelvesUtils {
 
 					ItemMeta meta = item.getItemMeta();
 					String name = ItemUtils.getPlainName(item);
-					meta.displayName(Component.text("Rank " + name.charAt(name.length() - 1), NamedTextColor.GOLD));
+					meta.displayName(Component.text("Rank " + name.charAt(name.length() - 1), NamedTextColor.GOLD).decoration(TextDecoration.ITALIC, false));
 					item.setItemMeta(meta);
 					ItemUtils.setPlainName(item);
 
@@ -822,7 +822,7 @@ public class DelvesUtils {
 
 					ItemMeta meta = item.getItemMeta();
 					String name = ItemUtils.getPlainName(item);
-					meta.displayName(Component.text("Rank " + name.charAt(name.length() - 1), NamedTextColor.GRAY));
+					meta.displayName(Component.text("Rank " + name.charAt(name.length() - 1), NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false));
 					item.setItemMeta(meta);
 					ItemUtils.setPlainName(item);
 				}
