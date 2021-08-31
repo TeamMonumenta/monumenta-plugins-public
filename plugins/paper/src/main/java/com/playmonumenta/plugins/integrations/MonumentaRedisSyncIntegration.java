@@ -47,6 +47,8 @@ public class MonumentaRedisSyncIntegration implements Listener {
 			} else if (dropped > 1) {
 				player.sendMessage(ChatColor.RED + "The dungeon keys you were carrying were dropped!");
 			}
+		} else {
+			InventoryUtils.removeSpecialItems(player, true);
 		}
 	}
 
