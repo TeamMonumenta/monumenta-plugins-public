@@ -21,6 +21,10 @@ import org.bukkit.inventory.meta.BlockDataMeta;
 import org.bukkit.inventory.meta.BlockStateMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
+
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.enchantments.StatTrack.StatTrackOptions;
 import com.playmonumenta.plugins.enchantments.StatTrackManager;
@@ -29,17 +33,22 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.ItemUtils.ItemTier;
 
 public class FirmamentOverride extends BaseOverride {
 	private static final String CAN_PLACE_SHULKER_PERM = "monumenta.canplaceshulker";
 
-	private static final String PRISMARINE_ENABLED = ChatColor.AQUA + "Prismarine " + ChatColor.GREEN + "Enabled";
-	private static final String PRISMARINE_DISABLED = ChatColor.AQUA + "Prismarine " + ChatColor.RED + "Disabled";
+	private static final Component PRISMARINE_ENABLED = Component.text("Prismarine ").color(NamedTextColor.AQUA).decoration(TextDecoration.ITALIC, false)
+		.append(Component.text("Enabled").color(NamedTextColor.GREEN).decoration(TextDecoration.ITALIC, false));
+	private static final Component PRISMARINE_DISABLED = Component.text("Prismarine ").color(NamedTextColor.AQUA).decoration(TextDecoration.ITALIC, false)
+		.append(Component.text("Disabled").color(NamedTextColor.RED).decoration(TextDecoration.ITALIC, false));
+	private static final Component BLACKSTONE_ENABLED = Component.text("Blackstone ").color(NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)
+		.append(Component.text("Enabled").color(NamedTextColor.GREEN).decoration(TextDecoration.ITALIC, false));
+	private static final Component BLACKSTONE_DISABLED = Component.text("Blackstone ").color(NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)
+		.append(Component.text("Disabled").color(NamedTextColor.RED).decoration(TextDecoration.ITALIC, false));
 	private static final String ITEM_NAME = "Firmament";
 	private static final String DELVE_SKIN_NAME = "Doorway from Eternity";
-	private static final String BLACKSTONE_ENABLED = ChatColor.GRAY + "Blackstone " + ChatColor.GREEN + "Enabled";
-	private static final String BLACKSTONE_DISABLED = ChatColor.GRAY + "Blackstone " + ChatColor.RED + "Disabled";
 
 	@Override
 	public boolean blockPlaceInteraction(Plugin plugin, Player player, ItemStack item, BlockPlaceEvent event) {
@@ -109,7 +118,7 @@ public class FirmamentOverride extends BaseOverride {
 				BlockState state = event.getBlockReplacedState();
 				if (FastUtils.RANDOM.nextBoolean()
 						&& item.getItemMeta().hasLore()
-						&& (item.getItemMeta().getLore().contains(PRISMARINE_ENABLED) || item.getItemMeta().getLore().contains(BLACKSTONE_ENABLED))) {
+						&& (InventoryUtils.testForItemWithLore(item, "Prismarine Enabled") || InventoryUtils.testForItemWithLore(item, "Blackstone Enabled"))) {
 
 					// Place a prismarine block instead of the block from the shulker
 					BlockData blockData = null;
@@ -182,18 +191,18 @@ public class FirmamentOverride extends BaseOverride {
 			return true;
 		}
 
-		List<String> lore = item.getItemMeta().getLore();
-		List<String> newLore = new ArrayList<>();
+		List<Component> lore = item.getItemMeta().lore();
+		List<Component> newLore = new ArrayList<>();
 		boolean foundLine = false;
 		if (InventoryUtils.testForItemWithName(item, ITEM_NAME)) {
-			for (String loreEntry : lore) {
-				if (loreEntry.equals(PRISMARINE_ENABLED) && !foundLine) {
+			for (Component loreEntry : lore) {
+				if (MessagingUtils.plainText(loreEntry).equals("Prismarine Enabled") && !foundLine) {
 					newLore.add(PRISMARINE_DISABLED);
 					player.sendMessage(PRISMARINE_DISABLED);
 					player.playSound(player.getLocation(), Sound.BLOCK_SHULKER_BOX_CLOSE, SoundCategory.BLOCKS, 1, 1);
 					foundLine = true;
 					continue;
-				} else if (loreEntry.equals(PRISMARINE_DISABLED) && !foundLine) {
+				} else if (MessagingUtils.plainText(loreEntry).equals("Prismarine Disabled") && !foundLine) {
 					newLore.add(PRISMARINE_ENABLED);
 					player.sendMessage(PRISMARINE_ENABLED);
 					player.playSound(player.getLocation(), Sound.BLOCK_SHULKER_BOX_OPEN, SoundCategory.BLOCKS, 1, 1);
@@ -208,14 +217,14 @@ public class FirmamentOverride extends BaseOverride {
 				}
 			}
 		} else if (InventoryUtils.testForItemWithName(item, DELVE_SKIN_NAME)) {
-			for (String loreEntry : lore) {
-				if (loreEntry.equals(BLACKSTONE_ENABLED) && !foundLine) {
+			for (Component loreEntry : lore) {
+				if (MessagingUtils.plainText(loreEntry).equals("Blackstone Enabled") && !foundLine) {
 					newLore.add(BLACKSTONE_DISABLED);
 					player.sendMessage(BLACKSTONE_DISABLED);
 					player.playSound(player.getLocation(), Sound.BLOCK_SHULKER_BOX_CLOSE, SoundCategory.BLOCKS, 1, 1);
 					foundLine = true;
 					continue;
-				} else if (loreEntry.equals(BLACKSTONE_DISABLED) && !foundLine) {
+				} else if (MessagingUtils.plainText(loreEntry).equals("Blackstone Disabled") && !foundLine) {
 					newLore.add(BLACKSTONE_ENABLED);
 					player.sendMessage(BLACKSTONE_ENABLED);
 					player.playSound(player.getLocation(), Sound.BLOCK_SHULKER_BOX_OPEN, SoundCategory.BLOCKS, 1, 1);
@@ -231,7 +240,7 @@ public class FirmamentOverride extends BaseOverride {
 			}
 		}
 		ItemMeta meta = item.getItemMeta();
-		meta.setLore(newLore);
+		meta.lore(newLore);
 		item.setItemMeta(meta);
 		ItemUtils.setPlainLore(item);
 		return true;
