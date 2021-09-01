@@ -6,16 +6,6 @@ import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.List;
 
-import org.bukkit.Location;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
-import org.bukkit.entity.ThrownPotion;
-import org.bukkit.event.entity.PotionSplashEvent;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.PlayerInventory;
-import org.bukkit.metadata.FixedMetadataValue;
-import org.bukkit.scheduler.BukkitRunnable;
-
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityManager;
@@ -31,12 +21,24 @@ import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
 import com.playmonumenta.plugins.enchantments.abilities.BaseAbilityEnchantment;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MetadataUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
+
+import org.bukkit.Location;
+import org.bukkit.NamespacedKey;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
+import org.bukkit.entity.ThrownPotion;
+import org.bukkit.event.entity.PotionSplashEvent;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.PlayerInventory;
+import org.bukkit.metadata.FixedMetadataValue;
+import org.bukkit.scheduler.BukkitRunnable;
 
 /*
  * Handles giving potions on kills and the direct damage aspect
@@ -67,7 +69,7 @@ public class AlchemistPotions extends Ability {
 	private int mSlot = 0;
 	private int mCharges;
 
-	private static final ItemStack POTION = AbilityUtils.getAlchemistPotion();
+	private static ItemStack POTION = null;
 
 	public AlchemistPotions(Plugin plugin, Player player) {
 		super(plugin, player, null);
@@ -142,10 +144,18 @@ public class AlchemistPotions extends Ability {
 
 	@Override
 	public boolean playerThrewSplashPotionEvent(ThrownPotion potion) {
-		if (ItemUtils.isAlchemistItem(mPlayer.getInventory().getItemInMainHand())) {
+		if (ItemUtils.isAlchemistItem(mPlayer.getInventory().getItemInMainHand()) && ItemUtils.isAlchemistItem(potion.getItem())) {
 			if (consumeCharge()) {
 				potion.setMetadata("AlchemistPotion", new FixedMetadataValue(mPlugin, 0));
-				potion.setItem(POTION);
+
+				if (POTION == null) {
+					POTION = InventoryUtils.getItemFromLootTable(mPlayer, NamespacedKey.fromString("epic:r1/items/alchemists_potion"));
+				}
+				if (POTION != null) {
+					potion.setItem(POTION);
+				} else {
+					mPlugin.getLogger().severe("Failed to get alchemist's potion from loot table!");
+				}
 			} else {
 				potion.remove();
 			}

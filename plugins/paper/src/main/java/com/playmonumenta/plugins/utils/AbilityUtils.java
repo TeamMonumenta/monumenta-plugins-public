@@ -1,12 +1,15 @@
 package com.playmonumenta.plugins.utils;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.effects.AbilitySilence;
+import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -25,20 +28,13 @@ import org.bukkit.entity.Player;
 import org.bukkit.entity.ThrownPotion;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.PotionMeta;
-import org.bukkit.potion.PotionData;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-import org.bukkit.potion.PotionType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.NotNull;
-
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.effects.AbilitySilence;
-import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 
 
 
@@ -150,56 +146,6 @@ public class AbilityUtils {
 
 	public static void unsilencePlayer(Player player) {
 		Plugin.getInstance().mEffectManager.clearEffects(player, ABILITY_SILENCE_EFFECT_NAME);
-	}
-
-	public static ItemStack getAlchemistPotion() {
-		//TODO get from loot tables instead
-		ItemStack itemStack = new ItemStack(Material.SPLASH_POTION, 1);
-		PotionMeta potionMeta = (PotionMeta) itemStack.getItemMeta();
-
-		potionMeta.setBasePotionData(new PotionData(PotionType.MUNDANE));
-		potionMeta.addItemFlags(ItemFlag.HIDE_POTION_EFFECTS); // Hide "No Effects" vanilla potion effect lore
-		potionMeta.setColor(Color.WHITE);
-		String plainName = "Alchemist's Potion";
-		potionMeta.setDisplayName(ChatColor.AQUA + plainName); // OG Alchemist's Potion item name colour of &b
-
-		List<String> loreList = Arrays.asList(
-			ChatColor.DARK_GRAY + "A unique potion for Alchemists." // Standard Monumenta lore text colour of &8
-		);
-		potionMeta.setLore(loreList);
-
-		itemStack.setItemMeta(potionMeta);
-		ItemUtils.setPlainTag(itemStack); // Support for resource pack textures like with other items & mechanisms
-		return itemStack;
-	}
-
-	public static void addAlchemistPotions(Player player, int numAddedPotions) {
-		if (numAddedPotions == 0) {
-			return;
-		}
-
-		Inventory inv = player.getInventory();
-		ItemStack firstFoundPotStack = null;
-		int potCount = 0;
-
-		for (ItemStack item : inv.getContents()) {
-			if (InventoryUtils.testForItemWithName(item, "Alchemist's Potion")) {
-				if (firstFoundPotStack == null) {
-					firstFoundPotStack = item;
-				}
-				potCount += item.getAmount();
-			}
-		}
-
-		if (potCount < 32) {
-			if (firstFoundPotStack != null) {
-				firstFoundPotStack.setAmount(firstFoundPotStack.getAmount() + numAddedPotions);
-			} else {
-				ItemStack newPotions = getAlchemistPotion();
-				newPotions.setAmount(numAddedPotions);
-				inv.addItem(newPotions);
-			}
-		}
 	}
 
 	// You can't just use a negative value with the add method if the potions to be remove are distributed across multiple stacks
