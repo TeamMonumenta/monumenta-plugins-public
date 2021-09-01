@@ -100,7 +100,7 @@ public class Bodyguard extends Ability {
 				}
 
 				// If looking at another player, or reached the end of range check and looking down
-				if (player.getBoundingBox().overlaps(box)) {
+				if (player.getBoundingBox().overlaps(box) && !ZoneUtils.hasZoneProperty(player, ZoneProperty.NO_MOBILITY_ABILITIES)) {
 					// Double LClick detection
 					mLeftClicks++;
 					new BukkitRunnable() {
