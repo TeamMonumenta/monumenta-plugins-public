@@ -5,6 +5,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Queue;
+import java.util.Set;
 
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
@@ -16,6 +17,7 @@ import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.Monster;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -28,8 +30,6 @@ import org.bukkit.event.world.StructureGrowEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.util.Vector;
-
-
 
 public class WorldListener implements Listener {
 	Plugin mPlugin;
@@ -45,6 +45,20 @@ public class WorldListener implements Listener {
 
 		for (Entity entity : entities) {
 			mPlugin.mTrackingManager.addEntity(entity);
+
+			if (entity instanceof Monster) {
+				Monster mob = (Monster)entity;
+
+				int timer = mPlugin.mCombatLoggingTimers.getTimer(entity.getUniqueId());
+				if (timer >= 0) {
+					Set<String> tags = mob.getScoreboardTags();
+					if (!tags.contains("Elite") && !tags.contains("Boss")) {
+						mob.setRemoveWhenFarAway(false);
+					}
+
+					mPlugin.mCombatLoggingTimers.removeTimer(entity.getUniqueId());
+				}
+			}
 		}
 	}
 
@@ -179,7 +193,6 @@ public class WorldListener implements Listener {
 			InventoryUtils.scheduleDelayedEquipmentCheck(mPlugin, (Player) event.getTargetEntity(), event);
 		}
 	}
-
 
 	@EventHandler(priority = EventPriority.LOWEST)
 	public void blockFormEvent(BlockFormEvent event) {
