@@ -27,19 +27,19 @@ public class ParticlesList {
 		double mVelocity;
 		D mExtra2; //used when we have a particle that is inside PARTICLE_MATERIALS or Particle.REDSTONE
 
-		public CParticle(Particle particle, int count) {
+		public CParticle(Particle particle, int count) throws Exception {
 			this(particle, count, 0, 0, 0);
 		}
 
-		public CParticle(Particle particle, int count, double dx, double dy, double dz) {
+		public CParticle(Particle particle, int count, double dx, double dy, double dz) throws Exception {
 			this(particle, count, dx, dy, dz, 0.0d);
 		}
 
-		public CParticle(Particle particle, int count, double dx, double dy, double dz, double extra1) {
+		public CParticle(Particle particle, int count, double dx, double dy, double dz, double extra1) throws Exception {
 			this(particle, count, dx, dy, dz, extra1, null);
 		}
 
-		public CParticle(Particle particle, int count, double dx, double dy, double dz, double extra1, D extra2) {
+		public CParticle(Particle particle, int count, double dx, double dy, double dz, double extra1, D extra2) throws Exception {
 			mParticle = particle;
 			mCount = count;
 			mDx = dx;
@@ -47,6 +47,10 @@ public class ParticlesList {
 			mDz = dz;
 			mVelocity = extra1;
 			mExtra2 = extra2;
+
+			if (mCount <= 0) {
+				throw new Exception("Invalid count=" + mCount + " - must be > 0");
+			}
 		}
 
 		@Override
@@ -63,7 +67,7 @@ public class ParticlesList {
 			return "(" + mParticle.name() + "," + mCount + "," + mDx + "," + mDy + "," + mDz + "," + mVelocity + "," + mExtra2 + ")";
 		}
 
-		public static CParticle fromString(String value) throws Exception {
+		public static CParticle<?, ?> fromString(String value) throws Exception {
 			if (value.startsWith("(")) {
 				value = value.substring(1);
 			}
@@ -157,11 +161,15 @@ public class ParticlesList {
 		}
 	}
 
-	private List<CParticle> mParticleList;
+	private List<CParticle<?, ?>> mParticleList;
 
 	public ParticlesList(String values) throws RuntimeException {
 		mParticleList = new ArrayList<>();
 		List<String> split = BossUtils.splitByCommasUsingBrackets(values);
+		if (split.isEmpty()) {
+			// Allow deliberately empty particle lists
+			return;
+		}
 
 		for (String stringSplitted : split) {
 			try {
@@ -185,7 +193,7 @@ public class ParticlesList {
 	}
 
 	public <F> void spawn(Location loc, double dx, double dy, double dz, F extra1) {
-		for (CParticle particle : mParticleList) {
+		for (CParticle<?, ?> particle : mParticleList) {
 			if (extra1 instanceof Double) {
 				particle.spawn(loc, dx, dy, dz, (Double) extra1);
 			} else if (extra1 instanceof Float) {
@@ -203,7 +211,7 @@ public class ParticlesList {
 	@Override
 	public String toString() {
 		String msg = "[";
-		for (CParticle particle : mParticleList) {
+		for (CParticle<?, ?> particle : mParticleList) {
 			msg = msg + particle.toString() + ",";
 		}
 		//remove last comma
@@ -220,7 +228,7 @@ public class ParticlesList {
 
 	private static class ParticleNotFoundException extends RuntimeException {
 		ParticleNotFoundException(String value) {
-			super("Particle don't found from values: " + value);
+			super("Particle not found from values: " + value);
 		}
 	}
 

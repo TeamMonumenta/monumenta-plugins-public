@@ -43,7 +43,7 @@ public abstract class BossAbilityGroup {
 		void run(LivingEntity entity);
 	}
 
-	public static final int PASSIVE_RUN_INTERVAL = Constants.QUARTER_TICKS_PER_SECOND;
+	public static final int PASSIVE_RUN_INTERVAL_DEFAULT = Constants.QUARTER_TICKS_PER_SECOND;
 
 	protected final Plugin mPlugin;
 	protected final LivingEntity mBoss;
@@ -87,6 +87,13 @@ public abstract class BossAbilityGroup {
 
 	public void constructBoss(SpellManager activeSpells,
 	                          List<Spell> passiveSpells, int detectionRange, BossBarManager bossBar, long spellDelay) {
+		constructBoss(activeSpells, passiveSpells, detectionRange, bossBar, spellDelay, PASSIVE_RUN_INTERVAL_DEFAULT);
+
+	}
+
+	/* If detectionRange <= 0, will always run regardless of whether players are nearby */
+	public void constructBoss(SpellManager activeSpells,
+	                          List<Spell> passiveSpells, int detectionRange, BossBarManager bossBar, long spellDelay, long passiveIntervalTicks) {
 		mBossBar = bossBar;
 		mActiveSpells = activeSpells;
 		mPassiveSpells = passiveSpells;
@@ -100,7 +107,7 @@ public abstract class BossAbilityGroup {
 					mBossBar.update();
 				}
 
-				mMissingTicks += PASSIVE_RUN_INTERVAL;
+				mMissingTicks += passiveIntervalTicks;
 				if (mMissingTicks > 100) {
 					mMissingTicks = 0;
 					/* Check if somehow the boss entity is missing even though this is still running */
@@ -118,7 +125,7 @@ public abstract class BossAbilityGroup {
 				}
 
 				/* Don't run abilities if players aren't present */
-				if (BossUtils.getPlayersInRangeForHealthScaling(mBoss, detectionRange) < 1) {
+				if (detectionRange > 0 && BossUtils.getPlayersInRangeForHealthScaling(mBoss, detectionRange) < 1) {
 					return;
 				}
 
@@ -129,7 +136,7 @@ public abstract class BossAbilityGroup {
 				}
 			}
 		};
-		mTaskPassive.runTaskTimer(mPlugin, 1, PASSIVE_RUN_INTERVAL);
+		mTaskPassive.runTaskTimer(mPlugin, 1, passiveIntervalTicks);
 
 		mTaskActive = new BukkitRunnable() {
 			private boolean mDisabled = true;
@@ -162,7 +169,7 @@ public abstract class BossAbilityGroup {
 				}
 
 				/* Don't progress if players aren't present */
-				if (BossUtils.getPlayersInRangeForHealthScaling(mBoss, detectionRange) < 1) {
+				if (detectionRange > 0 && BossUtils.getPlayersInRangeForHealthScaling(mBoss, detectionRange) < 1) {
 					if (!mDisabled) {
 						/* Cancel all the spells just in case they were activated */
 						mDisabled = true;

@@ -289,7 +289,7 @@ public class BossUtils {
 					field.set(parameters, ParticlesList.fromString(fieldValueOrDefault));
 				}
 			} catch (Exception ex) {
-				Plugin.getInstance().getLogger().warning("Failed to parse boss argument field " + fieldName + " for boss " + identityTag);
+				Plugin.getInstance().getLogger().warning("Failed to parse boss argument field " + fieldName + " for boss " + identityTag + ": " + ex.getMessage());
 			}
 		}
 

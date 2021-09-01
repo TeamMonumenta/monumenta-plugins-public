@@ -109,7 +109,7 @@ public class SpellLightningStrike extends Spell {
 		}
 
 		// Count of the tick next run
-		mRemainingCooldownTicks -= BossAbilityGroup.PASSIVE_RUN_INTERVAL;
+		mRemainingCooldownTicks -= BossAbilityGroup.PASSIVE_RUN_INTERVAL_DEFAULT;
 	}
 
 	@Override

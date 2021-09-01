@@ -227,6 +227,7 @@ public class BossManager implements Listener {
 		mStatelessBosses.put(AuraEffectBoss.identityTag, (Plugin p, LivingEntity e) -> new AuraEffectBoss(p, e));
 		mStatelessBosses.put(DummyDecoyBoss.identityTag, (Plugin p, LivingEntity e) -> new DummyDecoyBoss(p, e));
 		mStatelessBosses.put(LaserBoss.identityTag, (Plugin p, LivingEntity e) -> new LaserBoss(p, e));
+		mStatelessBosses.put(SpinBoss.identityTag, (Plugin p, LivingEntity e) -> new SpinBoss(p, e));
 		mStatelessBosses.put(OnHitBoss.identityTag, (Plugin p, LivingEntity e) -> new OnHitBoss(p, e));
 		mStatelessBosses.put(NovaBoss.identityTag, (Plugin p, LivingEntity e) -> new NovaBoss(p, e));
 		mStatelessBosses.put(ProjectileBoss.identityTag, (Plugin p, LivingEntity e) -> new ProjectileBoss(p, e));
@@ -417,6 +418,7 @@ public class BossManager implements Listener {
 		mBossDeserializers.put(Davey.identityTag, (Plugin p, LivingEntity e) -> Davey.deserialize(p, e));
 		mBossDeserializers.put(Nucleus.identityTag, (Plugin p, LivingEntity e) -> Nucleus.deserialize(p, e));
 		mBossDeserializers.put(LaserBoss.identityTag, (Plugin p, LivingEntity e) -> LaserBoss.deserialize(p, e));
+		mBossDeserializers.put(SpinBoss.identityTag, (Plugin p, LivingEntity e) -> SpinBoss.deserialize(p, e));
 		mBossDeserializers.put(OnHitBoss.identityTag, (Plugin p, LivingEntity e) -> OnHitBoss.deserialize(p, e));
 		mBossDeserializers.put(NovaBoss.identityTag, (Plugin p, LivingEntity e) -> NovaBoss.deserialize(p, e));
 		mBossDeserializers.put(ProjectileBoss.identityTag, (Plugin p, LivingEntity e) -> ProjectileBoss.deserialize(p, e));
