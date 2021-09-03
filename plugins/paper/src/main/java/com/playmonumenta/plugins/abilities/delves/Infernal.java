@@ -132,6 +132,9 @@ public class Infernal extends DelveModifier {
 			event.setDamage(event.getDamage() * mBurningDamageTakenMultiplier);
 		} else if (ENVIRONMENTAL_DAMAGE_CAUSES.contains(event.getCause())) {
 			event.setDamage(event.getDamage() * mEnvironmentalDamageTakenMultiplier);
+			if (event.getCause() == DamageCause.POISON) {
+				event.setDamage(Math.min(event.getDamage(), Math.max(mPlayer.getHealth() - 1, 0)));
+			}
 		}
 
 		return true;

@@ -1,5 +1,7 @@
 package com.playmonumenta.plugins.abilities.cleric.hierophant;
 
+import java.util.NavigableSet;
+
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -26,10 +28,12 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.MultipleChargeAbility;
+import com.playmonumenta.plugins.abilities.cleric.CelestialBlessing;
 import com.playmonumenta.plugins.abilities.cleric.Crusade;
 import com.playmonumenta.plugins.attributes.AttributeProjectileDamage;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.classes.magic.MagicType;
+import com.playmonumenta.plugins.effects.Effect;
 import com.playmonumenta.plugins.effects.PercentDamageReceived;
 import com.playmonumenta.plugins.enchantments.PointBlank;
 import com.playmonumenta.plugins.enchantments.Sniper;
@@ -193,6 +197,10 @@ public class HallowedBeam extends MultipleChargeAbility {
 							} else if (sniperLevel > 0 && mPlayer.getLocation().distance(applyE.getLocation()) > Sniper.DISTANCE) {
 								damage += sniperLevel * Sniper.DAMAGE_PER_LEVEL;
 								Sniper.particles(applyE.getEyeLocation(), mPlayer);
+							}
+							NavigableSet<Effect> celestialBlessingEffects = mPlugin.mEffectManager.getEffects(mPlayer, CelestialBlessing.DAMAGE_EFFECT_NAME);
+							if (celestialBlessingEffects != null) {
+								damage *= 1 + celestialBlessingEffects.last().getMagnitude();
 							}
 							EntityUtils.damageEntity(mPlugin, applyE, damage, mPlayer, MagicType.HOLY, true, mInfo.mLinkedSpell, false, false, true, false);
 

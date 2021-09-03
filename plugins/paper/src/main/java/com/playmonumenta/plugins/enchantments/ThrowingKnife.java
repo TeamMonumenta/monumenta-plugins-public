@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.enchantments;
 import java.util.EnumSet;
 
 import org.bukkit.ChatColor;
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -53,7 +54,7 @@ public class ThrowingKnife implements BaseEnchantment {
 			ItemStack item = event.getItem();
 			if (item != null && (item.getType() == Material.ARROW || item.getType() == Material.SPECTRAL_ARROW || item.getType() == Material.TIPPED_ARROW)) {
 				if (player.getCooldown(item.getType()) <= 0) {
-					if (!item.containsEnchantment(Enchantment.ARROW_INFINITE)) {
+					if (!item.containsEnchantment(Enchantment.ARROW_INFINITE) && player.getGameMode() != GameMode.CREATIVE) {
 						item.setAmount(item.getAmount() - 1);
 					}
 					player.setCooldown(item.getType(), (int)(20 * 0.75));

@@ -49,117 +49,120 @@ public class ShieldWall extends Ability {
 		mInfo.mDescriptions.add("The shield lasts 10 seconds instead. Additionally, the shield knocks back enemies that try to go through it. Cooldown: 20s.");
 		mInfo.mCooldown = getAbilityScore() == 1 ? SHIELD_WALL_1_COOLDOWN : SHIELD_WALL_2_COOLDOWN;
 		mInfo.mLinkedSpell = ClassAbility.SHIELD_WALL;
+		mInfo.mIgnoreCooldown = true;
 	}
 
 	@Override
 	public void playerSwapHandItemsEvent(PlayerSwapHandItemsEvent event) {
 		event.setCancelled(true);
-		int time = getAbilityScore() == 1 ? SHIELD_WALL_1_DURATION : SHIELD_WALL_2_DURATION;
-		boolean knockback = getAbilityScore() != 1;
-		World world = mPlayer.getWorld();
-		world.playSound(mPlayer.getLocation(), Sound.BLOCK_ANVIL_PLACE, 1, 1.5f);
-		world.playSound(mPlayer.getLocation(), Sound.ENTITY_IRON_GOLEM_HURT, 1, 0.8f);
-		world.spawnParticle(Particle.FIREWORKS_SPARK, mPlayer.getLocation(), 70, 0, 0, 0, 0.3f);
-		putOnCooldown();
-		new BukkitRunnable() {
-			int mT = 0;
-			final Location mLoc = mPlayer.getLocation();
-			final List<BoundingBox> mBoxes = new ArrayList<>();
-			List<LivingEntity> mMobsAlreadyHit = new ArrayList<>();
-			final List<LivingEntity> mMobsHitThisTick = new ArrayList<>();
-			boolean mHitboxes = false;
+		if (!isTimerActive()) {
+			int time = getAbilityScore() == 1 ? SHIELD_WALL_1_DURATION : SHIELD_WALL_2_DURATION;
+			boolean knockback = getAbilityScore() != 1;
+			World world = mPlayer.getWorld();
+			world.playSound(mPlayer.getLocation(), Sound.BLOCK_ANVIL_PLACE, 1, 1.5f);
+			world.playSound(mPlayer.getLocation(), Sound.ENTITY_IRON_GOLEM_HURT, 1, 0.8f);
+			world.spawnParticle(Particle.FIREWORKS_SPARK, mPlayer.getLocation(), 70, 0, 0, 0, 0.3f);
+			putOnCooldown();
+			new BukkitRunnable() {
+				int mT = 0;
+				final Location mLoc = mPlayer.getLocation();
+				final List<BoundingBox> mBoxes = new ArrayList<>();
+				List<LivingEntity> mMobsAlreadyHit = new ArrayList<>();
+				final List<LivingEntity> mMobsHitThisTick = new ArrayList<>();
+				boolean mHitboxes = false;
 
-			@Override
-			public void run() {
-				mT++;
-				Vector vec;
-				for (int y = 0; y < 5; y++) {
-					for (double degree = 0; degree < 180; degree += 10) {
-						double radian1 = Math.toRadians(degree);
-						vec = new Vector(FastUtils.cos(radian1) * 4, y, FastUtils.sin(radian1) * 4);
-						vec = VectorUtils.rotateYAxis(vec, mLoc.getYaw());
+				@Override
+				public void run() {
+					mT++;
+					Vector vec;
+					for (int y = 0; y < 5; y++) {
+						for (double degree = 0; degree < 180; degree += 10) {
+							double radian1 = Math.toRadians(degree);
+							vec = new Vector(FastUtils.cos(radian1) * 4, y, FastUtils.sin(radian1) * 4);
+							vec = VectorUtils.rotateYAxis(vec, mLoc.getYaw());
 
-						Location l = mLoc.clone().add(vec);
-						if (mT % 4 == 0) {
-							world.spawnParticle(Particle.SPELL_INSTANT, l, 1, 0.1, 0.2, 0.1, 0);
-						}
-						if (!mHitboxes) {
-							mBoxes.add(BoundingBox.of(l.clone().subtract(0.6, 0, 0.6),
-							                         l.clone().add(0.6, 5, 0.6)));
-						}
-					}
-					mHitboxes = true;
-				}
-
-				for (BoundingBox box : mBoxes) {
-					for (Entity e :world.getNearbyEntities(box)) {
-						Location eLoc = e.getLocation();
-						if (e instanceof Projectile) {
-							Projectile proj = (Projectile) e;
-							if (proj.getShooter() instanceof LivingEntity) {
-								LivingEntity shooter = (LivingEntity) proj.getShooter();
-								if (!(shooter instanceof Player) || AbilityManager.getManager().isPvPEnabled((Player)shooter)) {
-									proj.remove();
-									world.spawnParticle(Particle.FIREWORKS_SPARK, eLoc, 5, 0, 0, 0, 0.25f);
-									world.playSound(eLoc, Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, 0.75f, 1.5f);
-								}
+							Location l = mLoc.clone().add(vec);
+							if (mT % 4 == 0) {
+								world.spawnParticle(Particle.SPELL_INSTANT, l, 1, 0.1, 0.2, 0.1, 0);
 							}
-						} else if (EntityUtils.isHostileMob(e)) {
-							LivingEntity le = (LivingEntity) e;
-							// Stores mobs hit this tick
-							mMobsHitThisTick.add(le);
-							// This list does not update to the mobs hit this tick until after everything runs
-							if (!mMobsAlreadyHit.contains(le)) {
-								mMobsAlreadyHit.add(le);
-								Vector v = le.getVelocity();
-								EntityUtils.damageEntity(mPlugin, le, SHIELD_WALL_DAMAGE, mPlayer, MagicType.HOLY, true, mInfo.mLinkedSpell);
-								//Bosses should not be affected by slowness or knockback.
-								if (knockback && !e.getScoreboardTags().contains("Boss")) {
-									MovementUtils.knockAway(mLoc, le, 0.3f);
-									world.spawnParticle(Particle.EXPLOSION_NORMAL, eLoc, 50, 0, 0, 0, 0.35f);
-									world.playSound(eLoc, Sound.ENTITY_GENERIC_EXPLODE, 1, 1f);
-								} else {
-									le.setVelocity(v);
-								}
-							} else if (le.getNoDamageTicks() + 5 < le.getMaximumNoDamageTicks()) {
-								if (knockback && !e.getScoreboardTags().contains("Boss")) {
-									/*
-									 * This is a temporary fix while we decide how to handle KBR mobs with Shield Wall level 2.
-									 *
-									 * If a mob collides with shield wall halfway through its invulnerability period, assume it
-									 * resists knockback and give it Slowness V for 5 seconds to simulate the old effect of
-									 * halting mobs with stunlock damage, minus the insane damage part.
-									 *
-									 * This effect is reapplied each tick, so the mob is slowed drastically until 2 seconds
-									 * after they leave shield wall hitbox.
-									 */
-									PotionUtils.applyPotion(mPlayer, le, new PotionEffect(PotionEffectType.SLOW, 20 * 2, 4, true, false));
-								}
+							if (!mHitboxes) {
+								mBoxes.add(BoundingBox.of(l.clone().subtract(0.6, 0, 0.6),
+								                         l.clone().add(0.6, 5, 0.6)));
 							}
 						}
+						mHitboxes = true;
 					}
-				}
-				/*
-				 * Compare the two lists of mobs and only remove from the
-				 * actual hit tracker if the mob isn't detected as hit this
-				 * tick, meaning it is no longer in the shield wall hitbox
-				 * and is thus eligible for another hit.
-				 */
-				List<LivingEntity> mobsAlreadyHitAdjusted = new ArrayList<>();
-				for (LivingEntity mob : mMobsAlreadyHit) {
-					if (mMobsHitThisTick.contains(mob)) {
-						mobsAlreadyHitAdjusted.add(mob);
-					}
-				}
-				mMobsAlreadyHit = mobsAlreadyHitAdjusted;
-				mMobsHitThisTick.clear();
-				if (mT >= time) {
-					this.cancel();
-					mBoxes.clear();
-				}
-			}
 
-		}.runTaskTimer(mPlugin, 0, 1);
+					for (BoundingBox box : mBoxes) {
+						for (Entity e :world.getNearbyEntities(box)) {
+							Location eLoc = e.getLocation();
+							if (e instanceof Projectile) {
+								Projectile proj = (Projectile) e;
+								if (proj.getShooter() instanceof LivingEntity) {
+									LivingEntity shooter = (LivingEntity) proj.getShooter();
+									if (!(shooter instanceof Player) || AbilityManager.getManager().isPvPEnabled((Player)shooter)) {
+										proj.remove();
+										world.spawnParticle(Particle.FIREWORKS_SPARK, eLoc, 5, 0, 0, 0, 0.25f);
+										world.playSound(eLoc, Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, 0.75f, 1.5f);
+									}
+								}
+							} else if (EntityUtils.isHostileMob(e)) {
+								LivingEntity le = (LivingEntity) e;
+								// Stores mobs hit this tick
+								mMobsHitThisTick.add(le);
+								// This list does not update to the mobs hit this tick until after everything runs
+								if (!mMobsAlreadyHit.contains(le)) {
+									mMobsAlreadyHit.add(le);
+									Vector v = le.getVelocity();
+									EntityUtils.damageEntity(mPlugin, le, SHIELD_WALL_DAMAGE, mPlayer, MagicType.HOLY, true, mInfo.mLinkedSpell);
+									//Bosses should not be affected by slowness or knockback.
+									if (knockback && !e.getScoreboardTags().contains("Boss")) {
+										MovementUtils.knockAway(mLoc, le, 0.3f);
+										world.spawnParticle(Particle.EXPLOSION_NORMAL, eLoc, 50, 0, 0, 0, 0.35f);
+										world.playSound(eLoc, Sound.ENTITY_GENERIC_EXPLODE, 1, 1f);
+									} else {
+										le.setVelocity(v);
+									}
+								} else if (le.getNoDamageTicks() + 5 < le.getMaximumNoDamageTicks()) {
+									if (knockback && !e.getScoreboardTags().contains("Boss")) {
+										/*
+										 * This is a temporary fix while we decide how to handle KBR mobs with Shield Wall level 2.
+										 *
+										 * If a mob collides with shield wall halfway through its invulnerability period, assume it
+										 * resists knockback and give it Slowness V for 5 seconds to simulate the old effect of
+										 * halting mobs with stunlock damage, minus the insane damage part.
+										 *
+										 * This effect is reapplied each tick, so the mob is slowed drastically until 2 seconds
+										 * after they leave shield wall hitbox.
+										 */
+										PotionUtils.applyPotion(mPlayer, le, new PotionEffect(PotionEffectType.SLOW, 20 * 2, 4, true, false));
+									}
+								}
+							}
+						}
+					}
+					/*
+					 * Compare the two lists of mobs and only remove from the
+					 * actual hit tracker if the mob isn't detected as hit this
+					 * tick, meaning it is no longer in the shield wall hitbox
+					 * and is thus eligible for another hit.
+					 */
+					List<LivingEntity> mobsAlreadyHitAdjusted = new ArrayList<>();
+					for (LivingEntity mob : mMobsAlreadyHit) {
+						if (mMobsHitThisTick.contains(mob)) {
+							mobsAlreadyHitAdjusted.add(mob);
+						}
+					}
+					mMobsAlreadyHit = mobsAlreadyHitAdjusted;
+					mMobsHitThisTick.clear();
+					if (mT >= time) {
+						this.cancel();
+						mBoxes.clear();
+					}
+				}
+
+			}.runTaskTimer(mPlugin, 0, 1);
+		}
 	}
 
 	@Override

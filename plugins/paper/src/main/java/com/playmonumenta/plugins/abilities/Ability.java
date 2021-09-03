@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.abilities;
 
 import java.util.Collection;
 
+import org.bukkit.GameMode;
 import org.bukkit.entity.AbstractArrow;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -138,7 +139,7 @@ public abstract class Ability {
 	 * @return true or false
 	 */
 	public final boolean canCast() {
-		return runCheck() && !isOnCooldown();
+		return runCheck() && !isOnCooldown() && mPlayer.getGameMode() != GameMode.SPECTATOR;
 	}
 
 	//Events

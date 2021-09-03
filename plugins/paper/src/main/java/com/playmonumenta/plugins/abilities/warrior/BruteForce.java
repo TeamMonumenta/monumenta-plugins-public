@@ -60,7 +60,7 @@ public class BruteForce extends Ability {
 		mInfo.mLinkedSpell = ClassAbility.BRUTE_FORCE;
 		mInfo.mScoreboardId = "BruteForce";
 		mInfo.mShorthandName = "BF";
-		mInfo.mDescriptions.add("Attacking an enemy with a cooled down falling attack passively deals 2 more damage to it, 2 physical damage to all enemies in a 2-block cube around it, and knocks all non-boss enemies away from you.");
+		mInfo.mDescriptions.add("Attacking an enemy with a critical attack passively deals 2 more damage to it, 2 physical damage to all enemies in a 2-block cube around it, and knocks all non-boss enemies away from you.");
 		mInfo.mDescriptions.add("Damage is increased from 2, to 10% and then 3.");
 	}
 

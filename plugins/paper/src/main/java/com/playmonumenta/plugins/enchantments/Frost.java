@@ -2,14 +2,6 @@ package com.playmonumenta.plugins.enchantments;
 
 import java.util.EnumSet;
 
-import com.playmonumenta.plugins.Constants;
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.effects.PercentSpeed;
-import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
-import com.playmonumenta.plugins.player.PartialParticle;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.LocationUtils;
-
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -26,11 +18,18 @@ import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.jetbrains.annotations.NotNull;
 
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
+import com.playmonumenta.plugins.player.PartialParticle;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.LocationUtils;
+
 
 
 public class Frost implements BaseEnchantment {
 	private static final String METADATA_KEY = "frost_arrow";
-	private static final String SOURCE_SLOWNESS = "frost_slowness";
+	private static final int DURATION = 4 * 20;
+	private static final double SLOW_EFFECT = 0.2;
 
 	private static final Particle.DustOptions COLOUR_LIGHT_BLUE
 		= new Particle.DustOptions(Color.fromRGB(85, 170, 255), 0.75f);
@@ -81,15 +80,7 @@ public class Frost implements BaseEnchantment {
 				entityDamageByEntityEvent.setDamage(entityDamageByEntityEvent.getDamage() + 1);
 			}
 
-			plugin.mEffectManager.addEffect(
-				enemy,
-				SOURCE_SLOWNESS,
-				new PercentSpeed(
-					4 * Constants.TICKS_PER_SECOND,
-					-0.2,
-					SOURCE_SLOWNESS
-				)
-			);
+			EntityUtils.applySlow(plugin, DURATION, SLOW_EFFECT, enemy);
 
 			double widthDelta = PartialParticle.getWidthDelta(enemy);
 			double widerWidthDelta = widthDelta * 1.5;

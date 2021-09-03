@@ -66,7 +66,7 @@ public class DivineJustice extends Ability {
 		mInfo.mShorthandName = "DJ";
 		mInfo.mDescriptions.add(
 			String.format(
-				"Your cooled down falling attacks passively deal %s holy damage to undead enemies, ignoring iframes.",
+				"Your critical attacks passively deal %s holy damage to undead enemies, ignoring iframes.",
 				DAMAGE
 			)
 		);

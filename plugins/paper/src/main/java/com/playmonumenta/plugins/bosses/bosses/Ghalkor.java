@@ -252,7 +252,6 @@ public class Ghalkor extends BossAbilityGroup {
 	public void init() {
 		int bossTargetHp = 0;
 		int playerCount = PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true).size();
-		int armor = (int)(Math.sqrt(playerCount * 2) - 1);
 
 		/*
 		 * New boss mechanic: The more players there are,
@@ -266,7 +265,6 @@ public class Ghalkor extends BossAbilityGroup {
 		}
 		mBoss.setMaximumNoDamageTicks(mBoss.getMaximumNoDamageTicks() - noDamageTicksTake);
 		bossTargetHp = (int) (BASE_HEALTH * (1 + (1 - 1/Math.E) * Math.log(playerCount)));
-		mBoss.getAttribute(Attribute.GENERIC_ARMOR).setBaseValue(armor);
 		mBoss.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(bossTargetHp);
 		mBoss.getAttribute(Attribute.GENERIC_FOLLOW_RANGE).setBaseValue(detectionRange);
 		mBoss.getAttribute(Attribute.GENERIC_KNOCKBACK_RESISTANCE).setBaseValue(1);

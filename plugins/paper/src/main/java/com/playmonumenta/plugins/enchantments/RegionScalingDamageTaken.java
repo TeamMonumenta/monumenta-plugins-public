@@ -5,6 +5,7 @@ import java.util.EnumSet;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.inventory.ItemStack;
 
 import com.playmonumenta.plugins.Plugin;
@@ -44,6 +45,9 @@ public class RegionScalingDamageTaken implements BaseEnchantment {
 	@Override
 	public void onHurt(Plugin plugin, Player player, int level, EntityDamageEvent event) {
 		event.setDamage(event.getDamage() * DAMAGE_TAKEN_MULTIPLIER);
+		if (event.getCause() == DamageCause.POISON) {
+			event.setDamage(Math.min(event.getDamage(), Math.max(player.getHealth() - 1, 0)));
+		}
 	}
 
 	@Override

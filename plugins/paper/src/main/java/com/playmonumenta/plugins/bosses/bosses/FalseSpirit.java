@@ -441,7 +441,6 @@ public class FalseSpirit extends BossAbilityGroup {
 		int bossTargetHp = 0;
 		int playerCount = PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true).size();
 		int hpDel = 3012;
-		int armor = (int)(Math.sqrt(playerCount * 2) - 1);
 
 		/*
 		 * New boss mechanic: The more players there are,
@@ -455,7 +454,6 @@ public class FalseSpirit extends BossAbilityGroup {
 		}
 		mBoss.setMaximumNoDamageTicks(mBoss.getMaximumNoDamageTicks() - noDamageTicksTake);
 		bossTargetHp = (int) (hpDel * (1 + (1 - 1/Math.E) * Math.log(playerCount)));
-		mBoss.getAttribute(Attribute.GENERIC_ARMOR).setBaseValue(armor);
 		mBoss.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(bossTargetHp);
 		mBoss.getAttribute(Attribute.GENERIC_FOLLOW_RANGE).setBaseValue(detectionRange);
 		mBoss.getAttribute(Attribute.GENERIC_KNOCKBACK_RESISTANCE).setBaseValue(1);

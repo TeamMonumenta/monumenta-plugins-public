@@ -162,15 +162,12 @@ public class VarcosaLingeringWillBoss extends BossAbilityGroup {
 		int bossTargetHp = 0;
 		int bossHpDelta = 1000;
 		int playersInRange = BossUtils.getPlayersInRangeForHealthScaling(mBoss, detectionRange);
-		int armor = (int)(Math.sqrt(playersInRange * 2) - 1);
-		armor = playersInRange / 2 + 1;
 		while (playersInRange > 0) {
 			bossTargetHp += bossHpDelta;
 			bossHpDelta = (int)Math.floor(bossHpDelta / 1.8 + 100);
 			playersInRange--;
 		}
 
-		mBoss.getAttribute(Attribute.GENERIC_ARMOR).setBaseValue(armor);
 		mBoss.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(bossTargetHp);
 		mBoss.getAttribute(Attribute.GENERIC_FOLLOW_RANGE).setBaseValue(detectionRange);
 		mBoss.getAttribute(Attribute.GENERIC_KNOCKBACK_RESISTANCE).setBaseValue(1);

@@ -16,10 +16,10 @@ import org.bukkit.potion.PotionEffectType;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.classes.magic.MagicType;
+import com.playmonumenta.plugins.events.CustomDamageEvent;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
-import com.playmonumenta.plugins.events.CustomDamageEvent;
-import com.playmonumenta.plugins.classes.magic.MagicType;
 
 /*
  * Coup De Grâce: If you melee attack a normal enemy and that attack
@@ -78,7 +78,7 @@ public class CoupDeGrace extends Ability {
 	@Override
 	public void playerDealtCustomDamageEvent(CustomDamageEvent event) {
 		if (event.getDamaged() instanceof LivingEntity && event.getMagicType() == MagicType.ENCHANTMENT) {
-			LivingEntity le = (LivingEntity) event.getDamaged();
+			LivingEntity le = event.getDamaged();
 			AttributeInstance maxHealth = le.getAttribute(Attribute.GENERIC_MAX_HEALTH);
 			if (maxHealth != null) {
 				double maxHealthValue = maxHealth.getValue();
@@ -97,7 +97,7 @@ public class CoupDeGrace extends Ability {
 
 	private void execute(EntityDamageByEntityEvent event) {
 		LivingEntity le = (LivingEntity) event.getEntity();
-		event.setDamage(event.getDamage() + 9001);
+		EntityUtils.damageEntity(mPlugin, le, 9001, mPlayer, null, true, null, false, false, true, true);
 		World world = mPlayer.getWorld();
 		world.playSound(le.getLocation(), Sound.ENTITY_PLAYER_HURT, 0.75f, 0.75f);
 		world.playSound(le.getLocation(), Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, 0.5f, 1.5f);
@@ -109,7 +109,7 @@ public class CoupDeGrace extends Ability {
 	}
 
 	private void execute(CustomDamageEvent event) {
-		LivingEntity le = (LivingEntity) event.getDamaged();
+		LivingEntity le = event.getDamaged();
 		event.setDamage(event.getDamage() + 9001);
 		World world = mPlayer.getWorld();
 		world.playSound(le.getLocation(), Sound.ENTITY_PLAYER_HURT, 0.75f, 0.75f);

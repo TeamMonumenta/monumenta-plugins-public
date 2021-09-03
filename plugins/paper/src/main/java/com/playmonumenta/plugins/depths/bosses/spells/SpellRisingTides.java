@@ -157,7 +157,7 @@ public class SpellRisingTides extends Spell {
 					for (Player p : PlayerUtils.playersInRange(mStartLoc, 50, true)) {
 						if (tide && p.getLocation().getY() < mStartLoc.getY() + .5) {
 							BossUtils.bossDamagePercent(mBoss, p, DAMAGE, mStartLoc);
-							com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(p, "ectonic", new PercentSpeed(2 * 20, -.99, "Tectonic"));
+							com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(p, "Tectonic", new PercentSpeed(2 * 20, -.99, "Tectonic"));
 
 						} else if (!tide && p.getLocation().getY() > mStartLoc.getY() + .5) {
 							BossUtils.bossDamagePercent(mBoss, p, DAMAGE, mStartLoc);

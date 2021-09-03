@@ -61,7 +61,7 @@ public class CoordinatedAttackBoss extends BossAbilityGroup {
 
 			World world = mBoss.getWorld();
 			Location loc = target.getLocation();
-			world.playSound(loc, Sound.ENTITY_RAVAGER_ROAR, 0.5f, 1.0f);
+			world.playSound(loc, Sound.EVENT_RAID_HORN, 0.5f, 1.5f);
 			world.spawnParticle(Particle.VILLAGER_ANGRY, loc, 30, 2, 0, 2, 0);
 			world.spawnParticle(Particle.SPELL_WITCH, loc.clone().add(0, 0.5, 0), 30, 2, 0.5, 2, 0);
 

@@ -25,16 +25,12 @@ import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
-import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 
 public class DepthsDodging extends DepthsAbility {
 
 	public static final String ABILITY_NAME = "Dodging";
 	public static final int[] COOLDOWN = {20 * 16, 20 * 14, 20 * 12, 20 * 10, 20 * 8};
-	private static final int DODGING_SPEED_EFFECT_DURATION = 15 * 20;
-	private static final double PERCENT_SPEED = 0.2;
-	private static final String ATTR_NAME = "DodgingExtraSpeed";
 
 	private int mTriggerTick = 0;
 
@@ -136,13 +132,6 @@ public class DepthsDodging extends DepthsAbility {
 
 		Location loc = mPlayer.getLocation().add(0, 1, 0);
 		World world = mPlayer.getWorld();
-		int dodging = getAbilityScore();
-		if (dodging > 1) {
-			mPlugin.mEffectManager.addEffect(mPlayer, ATTR_NAME,
-					new PercentSpeed(DODGING_SPEED_EFFECT_DURATION, PERCENT_SPEED, ATTR_NAME));
-			world.spawnParticle(Particle.EXPLOSION_NORMAL, loc, 20, 0.25, 0.45, 0.25, 0.15);
-			world.playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_LAUNCH, 1, 1.35f);
-		}
 		world.spawnParticle(Particle.SMOKE_NORMAL, loc, 90, 0.25, 0.45, 0.25, 0.1);
 		world.playSound(loc, Sound.ENTITY_BLAZE_SHOOT, 1, 2f);
 		return true;

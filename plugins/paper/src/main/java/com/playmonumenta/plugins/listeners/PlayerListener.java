@@ -95,7 +95,6 @@ import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Constants.Colors;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.attributes.AttributeProjectileDamage;
-
 import com.playmonumenta.plugins.attributes.AttributeThrowRate;
 import com.playmonumenta.plugins.commands.ToggleSwap;
 import com.playmonumenta.plugins.effects.Effect;
@@ -1041,12 +1040,13 @@ public class PlayerListener implements Listener {
 	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	public void blockBreakEvent(BlockBreakEvent event) {
 		Player player = event.getPlayer();
+		ItemStack item = player.getInventory().getItemInMainHand();
+
 		String s = "Stasis";
 		NavigableSet<Effect> effects = mPlugin.mEffectManager.getEffects(player, s);
 		if (effects != null && mPlugin.mEffectManager.getEffects(event.getPlayer(), s) != null && (mPlugin.mEffectManager.getEffects(event.getPlayer(), s)).contains(new Stasis(120))) {
 			event.setCancelled(true);
 		}
-		ItemStack item = player.getInventory().getItemInMainHand();
 		if (!mPlugin.mItemOverrides.blockBreakInteraction(mPlugin, event.getPlayer(), event.getBlock(), event)) {
 			event.setCancelled(true);
 			return;

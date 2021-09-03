@@ -133,10 +133,6 @@ public class Varcosa extends BossAbilityGroup {
 	@Override
 	public void init() {
 		int bossTargetHp = 1500;
-
-		int armor = (0);
-
-		mBoss.getAttribute(Attribute.GENERIC_ARMOR).setBaseValue(armor);
 		mBoss.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(bossTargetHp);
 		mBoss.setHealth(bossTargetHp);
 

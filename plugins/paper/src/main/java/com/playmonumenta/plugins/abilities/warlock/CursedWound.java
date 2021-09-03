@@ -2,6 +2,19 @@ package com.playmonumenta.plugins.abilities.warlock;
 
 import java.util.EnumSet;
 
+import org.bukkit.Bukkit;
+import org.bukkit.Material;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
+import org.bukkit.World;
+import org.bukkit.block.data.BlockData;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
+
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityManager;
@@ -18,19 +31,6 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
-
-import org.bukkit.Bukkit;
-import org.bukkit.Material;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
-import org.bukkit.World;
-import org.bukkit.block.data.BlockData;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 
 
 
@@ -53,8 +53,8 @@ public class CursedWound extends Ability {
 		super(plugin, player, "Cursed Wound");
 		mInfo.mScoreboardId = "CursedWound";
 		mInfo.mShorthandName = "CW";
-		mInfo.mDescriptions.add("Attacking an enemy with a cooled down falling scythe attack passively afflicts it and all enemies in a 3-block cube around it with Wither 2 for 6s. Your melee attacks passively deal 0.5 more damage per ability on cooldown, capped at 3 damage.");
-		mInfo.mDescriptions.add("Cooled down falling attacks now also extend all enemies' debuffs (except Stun, Silence, and Confusion) by 2s. Damage cap is increased from 3 to 5.");
+		mInfo.mDescriptions.add("Attacking an enemy with a critical scythe attack passively afflicts it and all enemies in a 3-block cube around it with Wither 2 for 6s. Your melee attacks passively deal 0.5 more damage per ability on cooldown, capped at 3 damage.");
+		mInfo.mDescriptions.add("Critical attacks now also extend all enemies' debuffs (except Stun, Silence, and Confusion) by 2s. Damage cap is increased from 3 to 5.");
 	}
 
 	@Override

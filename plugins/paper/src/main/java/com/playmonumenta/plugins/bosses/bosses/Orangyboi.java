@@ -57,13 +57,11 @@ public class Orangyboi extends BossAbilityGroup {
 		int bossTargetHp = 0;
 		int playerCount = BossUtils.getPlayersInRangeForHealthScaling(mBoss, detectionRange);
 		int hpDelta = 125;
-		int armor = (int)(Math.sqrt(playerCount * 2) - 1);
 		while (playerCount > 0) {
 			bossTargetHp = bossTargetHp + hpDelta;
 			hpDelta = hpDelta / 2;
 			playerCount--;
 		}
-		mBoss.getAttribute(Attribute.GENERIC_ARMOR).setBaseValue(armor);
 		mBoss.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(bossTargetHp);
 		mBoss.setHealth(bossTargetHp);
 	}

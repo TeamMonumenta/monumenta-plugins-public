@@ -1,22 +1,22 @@
 package com.playmonumenta.plugins.abilities.cleric.paladin;
 
+import org.bukkit.Bukkit;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
+import org.bukkit.event.player.PlayerSwapHandItemsEvent;
+import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.util.Vector;
+
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.abilities.cleric.Crusade;
 import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.classes.magic.MagicType;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ParticleUtils;
-
-import org.bukkit.Bukkit;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Mob;
-import org.bukkit.entity.Player;
-import org.bukkit.event.player.PlayerSwapHandItemsEvent;
-import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.util.Vector;
 
 
 
@@ -32,6 +32,7 @@ public class ChoirBells extends Ability {
 	private static final int COOLDOWN = 20 * 20;
 	private static final int CHOIR_BELLS_RANGE = 10;
 	private static final double CHOIR_BELLS_CONICAL_THRESHOLD = 1d / 3;
+	private static final int DAMAGE = 4;
 
 	private static final float[] CHOIR_BELLS_PITCHES = {0.6f, 0.8f, 0.6f, 0.8f, 1f};
 
@@ -46,7 +47,7 @@ public class ChoirBells extends Ability {
 		mInfo.mLinkedSpell = ClassAbility.CHOIR_BELLS;
 		mInfo.mScoreboardId = "ChoirBells";
 		mInfo.mShorthandName = "CB";
-		mInfo.mDescriptions.add("While not sneaking, pressing the swap key afflicts all enemies in front of you within a 10-block cube around you with 10% slowness for 8s. Undead enemies also switch targets over to you, and are afflicted with 20% vulnerability and 20% weakness for 8s. Cooldown: 20s.");
+		mInfo.mDescriptions.add("While not sneaking, pressing the swap key afflicts all enemies in front of you within a 10-block cube around you with 10% slowness for 8s. Undead enemies also switch targets over to you, are dealt " + DAMAGE + " damage, and are afflicted with 20% vulnerability and 20% weakness for 8s. Cooldown: 20s.");
 		mInfo.mDescriptions.add("Slowness is increased from 10% to 20%. Vulnerability and weakness are increased from 20% to 35%.");
 		mInfo.mCooldown = COOLDOWN;
 		mInfo.mIgnoreCooldown = true;
@@ -89,7 +90,8 @@ public class ChoirBells extends Ability {
 
 					if (Crusade.enemyTriggersAbilities(mob, mCrusade)) {
 						// Infusion
-						EntityUtils.applyTaunt(mPlugin, (Mob) mob, mPlayer);
+						EntityUtils.applyTaunt(mPlugin, mob, mPlayer);
+						EntityUtils.damageEntity(mPlugin, mob, DAMAGE, mPlayer, MagicType.HOLY, false, null, false, false, true, true);
 						EntityUtils.applyVulnerability(mPlugin, DURATION, mVulnerabilityEffect, mob);
 						EntityUtils.applyWeaken(mPlugin, DURATION, mWeakenEffect, mob);
 					}

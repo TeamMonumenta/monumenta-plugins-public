@@ -137,7 +137,6 @@ public class VarcosaSummonerBoss extends BossAbilityGroup {
 		mBoss.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 99, 9999));
 		mBoss.setAI(false);
 
-		mBoss.getAttribute(Attribute.GENERIC_ARMOR).setBaseValue(0);
 		mBoss.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(bossTargetHp);
 		mBoss.getAttribute(Attribute.GENERIC_FOLLOW_RANGE).setBaseValue(detectionRange);
 		mBoss.getAttribute(Attribute.GENERIC_KNOCKBACK_RESISTANCE).setBaseValue(1);

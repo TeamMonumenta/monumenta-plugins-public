@@ -1,15 +1,12 @@
 package com.playmonumenta.plugins.listeners;
 
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.utils.ItemUtils;
-import com.playmonumenta.plugins.utils.MessagingUtils;
-
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockDispenseArmorEvent;
 import org.bukkit.event.block.BlockDispenseEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
@@ -24,6 +21,10 @@ import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
+
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.MessagingUtils;
 
 public class ShatteredEquipmentListener implements Listener {
 	private Plugin mPlugin;
@@ -162,6 +163,15 @@ public class ShatteredEquipmentListener implements Listener {
 			if (event.getTargetEntity() instanceof Player) {
 				MessagingUtils.sendActionBarMessage(mPlugin, (Player) event.getTargetEntity(), "Shattered items must be reforged before use");
 			}
+			event.setCancelled(true);
+		}
+	}
+
+	@EventHandler(priority = EventPriority.LOWEST)
+	public void blockBreakEvent(BlockBreakEvent event) {
+		Player player = event.getPlayer();
+		ItemStack item = player.getInventory().getItemInMainHand();
+		if (ItemUtils.isItemShattered(item)) {
 			event.setCancelled(true);
 		}
 	}

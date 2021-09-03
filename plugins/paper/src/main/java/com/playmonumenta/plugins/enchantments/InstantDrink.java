@@ -4,6 +4,7 @@ import java.util.EnumSet;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
+import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -90,7 +91,7 @@ public class InstantDrink implements BaseEnchantment {
 				//Wait, this is illegal for a potion to have.
 				if (item.containsEnchantment(Enchantment.ARROW_INFINITE)) {
 					event.setUseItemInHand(Result.DENY);
-				} else {
+				} else if (player.getGameMode() != GameMode.CREATIVE) {
 					item.setAmount(item.getAmount() - 1);
 					player.getInventory().addItem(new ItemStack(Material.GLASS_BOTTLE));
 				}

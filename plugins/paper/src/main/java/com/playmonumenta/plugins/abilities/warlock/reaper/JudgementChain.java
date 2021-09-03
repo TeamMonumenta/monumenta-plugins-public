@@ -4,21 +4,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.abilities.AbilityTrigger;
-import com.playmonumenta.plugins.classes.ClassAbility;
-import com.playmonumenta.plugins.classes.magic.MagicType;
-import com.playmonumenta.plugins.effects.JudgementChainMobEffect;
-import com.playmonumenta.plugins.enchantments.Inferno;
-import com.playmonumenta.plugins.potion.PotionManager.PotionID;
-import com.playmonumenta.plugins.tracking.PlayerTracking;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.ItemUtils;
-import com.playmonumenta.plugins.utils.MetadataUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.plugins.utils.PotionUtils;
-
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -28,7 +13,6 @@ import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
@@ -37,12 +21,22 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.classes.magic.MagicType;
+import com.playmonumenta.plugins.effects.JudgementChainMobEffect;
+import com.playmonumenta.plugins.enchantments.Inferno;
+import com.playmonumenta.plugins.potion.PotionManager.PotionID;
+import com.playmonumenta.plugins.tracking.PlayerTracking;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.utils.PotionUtils;
+
 
 
 public class JudgementChain extends Ability {
-
-	private static final String CHECK_ONCE_THIS_TICK_METAKEY = "JudgementChainTickRightClicked";
-
 	private static final int COOLDOWN = 25 * 20;
 	private static final int DURATION = 20 * 20;
 	private static final int BUFF_DURATION = 10 * 20;
@@ -60,7 +54,6 @@ public class JudgementChain extends Ability {
 	private final int mAmplifierCap;
 
 	private LivingEntity mTarget = null;
-	private int mRightClicks = 0;
 
 	public JudgementChain(Plugin plugin, Player player) {
 		super(plugin, player, "Judgement Chain");

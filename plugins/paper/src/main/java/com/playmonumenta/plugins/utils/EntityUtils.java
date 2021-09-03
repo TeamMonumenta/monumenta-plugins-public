@@ -347,7 +347,7 @@ public class EntityUtils {
 					|| entity instanceof Hoglin || entity instanceof Piglin || entity instanceof Bee) {
 				return true;
 			} else if (entity instanceof Wolf) {
-				return ((Wolf) entity).isAngry() || entity.getScoreboardTags().contains("boss_targetplayer");
+				return (((Wolf) entity).isAngry() && ((Wolf) entity).getOwner() != null) || entity.getScoreboardTags().contains("boss_targetplayer");
 			} else if (entity instanceof Rabbit) {
 				return ((Rabbit) entity).getRabbitType() == Type.THE_KILLER_BUNNY;
 			} else if (entity instanceof Player) {

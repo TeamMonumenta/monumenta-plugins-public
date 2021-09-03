@@ -67,7 +67,7 @@ public class ByMyBlade extends Ability {
 		mInfo.mLinkedSpell = ClassAbility.BY_MY_BLADE;
 		mInfo.mScoreboardId = "ByMyBlade";
 		mInfo.mShorthandName = "BmB";
-		mInfo.mDescriptions.add("While holding two swords, attacking an enemy with a cooled down falling attack deals 12 more damage, and grants you Haste 2 for 4s. Cooldown: 10s.");
+		mInfo.mDescriptions.add("While holding two swords, attacking an enemy with a critical attack deals 12 more damage, and grants you Haste 2 for 4s. Cooldown: 10s.");
 		mInfo.mDescriptions.add("Damage is increased from 12 to 24. Haste level is increased from 2 to 4.");
 		mInfo.mCooldown = BY_MY_BLADE_COOLDOWN;
 		mDamageBonus = getAbilityScore() == 1 ? BY_MY_BLADE_1_DAMAGE : BY_MY_BLADE_2_DAMAGE;

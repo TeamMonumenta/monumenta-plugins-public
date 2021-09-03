@@ -66,8 +66,13 @@ public class SpellMultihitHeal extends Spell {
 							for (Player player : PlayerUtils.playersInRange(loc, 4, true)) {
 								player.damage(15, mBoss);
 
+								double originalHealth = mBoss.getHealth();
+								if (originalHealth <= 0) {
+									break;
+								}
+
 								//Heal Mimic Queen by 15 health on hit
-								double hp = mBoss.getHealth() + HEALTH_HEALED;
+								double hp = originalHealth + HEALTH_HEALED;
 								double max = mBoss.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue();
 								if (hp >= max) {
 									mBoss.setHealth(max);

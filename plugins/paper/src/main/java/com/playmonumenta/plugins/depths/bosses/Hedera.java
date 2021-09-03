@@ -163,9 +163,6 @@ public class Hedera extends BossAbilityGroup {
 
 	@Override
 	public void init() {
-
-		mBoss.getAttribute(Attribute.GENERIC_ARMOR).setBaseValue(0);
-
 		// Health is scaled by 1.5 times each time you fight the boss
 		DepthsParty party = DepthsUtils.getPartyFromNearbyPlayers(mSpawnLoc);
 		int modifiedHealth = (int) (HEDERA_HEALTH * Math.pow(1.25, party.getFloor() / 3));
@@ -224,7 +221,7 @@ public class Hedera extends BossAbilityGroup {
 
 			@Override
 			public void run() {
-				DepthsManager.getInstance().goToNextFloor(PlayerUtils.playersInRange(mBoss.getLocation(), 20.0, true).get(0));
+				DepthsManager.getInstance().goToNextFloor(PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true).get(0));
 			}
 
 		}.runTaskLater(mPlugin, 80);

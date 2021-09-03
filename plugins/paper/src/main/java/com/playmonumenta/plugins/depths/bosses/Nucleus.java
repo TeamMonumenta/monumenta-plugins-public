@@ -310,7 +310,6 @@ public class Nucleus extends BossAbilityGroup {
 
 	@Override
 	public void init() {
-		mBoss.getAttribute(Attribute.GENERIC_ARMOR).setBaseValue(0);
 		mBoss.setAI(false);
 
 		// Health is scaled by 1.5 times each time you fight the boss

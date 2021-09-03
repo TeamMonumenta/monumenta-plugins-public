@@ -48,13 +48,14 @@ public class CelestialBlessing extends Ability {
 			DamageCause.ENTITY_SWEEP_ATTACK,
 			DamageCause.PROJECTILE
 	);
+	public static final String DAMAGE_EFFECT_NAME = "CelestialBlessingExtraDamage";
 
 	public CelestialBlessing(Plugin plugin, Player player) {
 		super(plugin, player, "Celestial Blessing");
 		mInfo.mLinkedSpell = ClassAbility.CELESTIAL_BLESSING;
 		mInfo.mScoreboardId = "Celestial";
 		mInfo.mShorthandName = "CB";
-		mInfo.mDescriptions.add("When you strike while sneaking (regardless of whether you hit anything), while on the ground, you and all other players in a 12 block radius gain +20% melee and bow damage and +20% speed for 10 s. Cooldown: 40s.");
+		mInfo.mDescriptions.add("When you strike while sneaking, you and all other players in a 12 block radius gain +20% melee and bow damage and +20% speed for 10 s. Cooldown: 40s.");
 		mInfo.mDescriptions.add("Increases the buff to +35% attack damage for 12 s.");
 		mInfo.mCooldown = CELESTIAL_COOLDOWN;
 		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;
@@ -75,7 +76,7 @@ public class CelestialBlessing extends Ability {
 
 		// Give these players the metadata tag that boosts their damage
 		for (Player p : affectedPlayers) {
-			mPlugin.mEffectManager.addEffect(p, "CelestialBlessingExtraDamage", new PercentDamageDealt(duration, extraDamage, AFFECTED_DAMAGE_CAUSES));
+			mPlugin.mEffectManager.addEffect(p, DAMAGE_EFFECT_NAME, new PercentDamageDealt(duration, extraDamage, AFFECTED_DAMAGE_CAUSES));
 			mPlugin.mEffectManager.addEffect(p, "CelestialBlessingExtraSpeed", new PercentSpeed(duration, CELESTIAL_EXTRA_SPEED, ATTR_NAME));
 			mPlugin.mEffectManager.addEffect(p, "CelestialBlessingParticles", new Aesthetics(duration,
 				(entity, fourHertz, twoHertz, oneHertz) -> {
@@ -114,11 +115,8 @@ public class CelestialBlessing extends Ability {
 
 	@Override
 	public boolean runCheck() {
-		if (mPlayer.isOnGround()) {
-			ItemStack mainHand = mPlayer.getInventory().getItemInMainHand();
-			return (mPlayer.isSneaking() && !ItemUtils.isPickaxe(mainHand));
-		}
-		return false;
+		ItemStack mainHand = mPlayer.getInventory().getItemInMainHand();
+		return (mPlayer.isSneaking() && !ItemUtils.isPickaxe(mainHand));
 	}
 
 	@Override

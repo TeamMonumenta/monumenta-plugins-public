@@ -25,7 +25,6 @@ import org.bukkit.event.player.PlayerRiptideEvent;
 import org.bukkit.inventory.ItemStack;
 
 
-
 public class ItemOverrides {
 	/*
 	 * Exceptions for materials that players in survival can place,
@@ -274,6 +273,9 @@ public class ItemOverrides {
 		mItems.put(Material.POTTED_WHITE_TULIP, flowerOverride);
 		mItems.put(Material.POTTED_PINK_TULIP, flowerOverride);
 		mItems.put(Material.POTTED_OXEYE_DAISY, flowerOverride);
+		mItems.put(Material.POTTED_CORNFLOWER, flowerOverride);
+		mItems.put(Material.POTTED_LILY_OF_THE_VALLEY, flowerOverride);
+		mItems.put(Material.POTTED_WITHER_ROSE, flowerOverride);
 		mItems.put(Material.POTTED_OAK_SAPLING, flowerOverride);
 		mItems.put(Material.POTTED_SPRUCE_SAPLING, flowerOverride);
 		mItems.put(Material.POTTED_BIRCH_SAPLING, flowerOverride);
@@ -285,6 +287,11 @@ public class ItemOverrides {
 		mItems.put(Material.POTTED_FERN, flowerOverride);
 		mItems.put(Material.POTTED_DEAD_BUSH, flowerOverride);
 		mItems.put(Material.POTTED_CACTUS, flowerOverride);
+		mItems.put(Material.POTTED_BAMBOO, flowerOverride);
+		mItems.put(Material.POTTED_CRIMSON_FUNGUS, flowerOverride);
+		mItems.put(Material.POTTED_CRIMSON_ROOTS, flowerOverride);
+		mItems.put(Material.POTTED_WARPED_FUNGUS, flowerOverride);
+		mItems.put(Material.POTTED_WARPED_ROOTS, flowerOverride);
 
 		BaseOverride firmamentOverride = new FirmamentOverride();
 		mItems.put(Material.SHULKER_BOX, firmamentOverride);

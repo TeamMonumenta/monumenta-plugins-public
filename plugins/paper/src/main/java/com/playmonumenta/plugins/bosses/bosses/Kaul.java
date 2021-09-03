@@ -1040,13 +1040,11 @@ public class Kaul extends BossAbilityGroup {
 		int bossTargetHp = 0;
 		int playerCount = BossUtils.getPlayersInRangeForHealthScaling(mBoss, detectionRange);
 		int hpDelta = 2048;
-		int armor = (int)(Math.sqrt(playerCount * 2) - 1);
 		while (playerCount > 0) {
 			bossTargetHp = bossTargetHp + hpDelta;
 			hpDelta = hpDelta / 2 + 25;
 			playerCount--;
 		}
-		mBoss.getAttribute(Attribute.GENERIC_ARMOR).setBaseValue(armor);
 		mBoss.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(bossTargetHp);
 		mBoss.getAttribute(Attribute.GENERIC_FOLLOW_RANGE).setBaseValue(detectionRange);
 		mBoss.getAttribute(Attribute.GENERIC_KNOCKBACK_RESISTANCE).setBaseValue(1);

@@ -32,6 +32,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.depths.DepthsRoomType.DepthsRewardType;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
+import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
 import com.playmonumenta.plugins.depths.abilities.WeaponAspectDepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.aspects.AxeAspect;
 import com.playmonumenta.plugins.depths.abilities.aspects.RandomAspect;
@@ -1219,6 +1220,10 @@ public class DepthsManager {
 		} else if (partyFloor == 3) {
 			for (DepthsPlayer playerInParty : party.mPlayersInParty) {
 				Player player = Bukkit.getPlayer(playerInParty.mPlayerId);
+				if (player == null || !player.isOnline()) {
+					continue;
+				}
+
 				//Set score
 				ScoreboardUtils.setScoreboardValue(player, "Depths", ScoreboardUtils.getScoreboardValue(player, "Depths") + 1);
 				Bukkit.getServer().dispatchCommand(Bukkit.getServer().getConsoleSender(), "broadcastcommand leaderboard update " + player.getName() + " Depths");
@@ -1314,6 +1319,22 @@ public class DepthsManager {
 	public void getRandomAbility(Player p, DepthsPlayer dp, int[] chances) {
 		//Give random ability
 		List<DepthsAbility> abilities = getFilteredAbilities(dp.mEligibleTrees);
+
+		//Do not give any abilities that have the same trigger as abilities that are currently offered in an ability reward
+		//This is needed because players can open up an ability reward, not choose anything, then take mystery box or chaos and end up with two abilities on a trigger
+		List<DepthsAbilityItem> abilityOffering = mAbilityOfferings.get(p.getUniqueId());
+		if (abilityOffering != null) {
+			List<DepthsTrigger> blockedTriggers = new ArrayList<>();
+			for (DepthsAbilityItem offeredAbility : abilityOffering) {
+				DepthsTrigger trigger = offeredAbility.mTrigger;
+				if (trigger != DepthsTrigger.PASSIVE) {
+					blockedTriggers.add(trigger);
+				}
+			}
+
+			abilities.removeIf(ability -> blockedTriggers.contains(ability.getTrigger()));
+		}
+
 		Collections.shuffle(abilities);
 		for (DepthsAbility da : abilities) {
 			if (da.canBeOffered(p)) {
