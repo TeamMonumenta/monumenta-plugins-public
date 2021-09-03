@@ -667,6 +667,7 @@ public class EntityListener implements Listener {
 					if (itemInMainHand.getType().equals(Material.SPLASH_POTION)
 						&& itemInMainHand.getEnchantmentLevel(Enchantment.ARROW_INFINITE) > 0) {
 							ThrownPotion potionClone = (ThrownPotion)potion.getWorld().spawnEntity(potion.getLocation(), EntityType.SPLASH_POTION);
+							potionClone.setItem(potionItem);
 							potionClone.setShooter(player);
 							potionClone.setVelocity(potion.getVelocity());
 							//this potion should not have other metadata
