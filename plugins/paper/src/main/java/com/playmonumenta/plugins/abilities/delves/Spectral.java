@@ -19,7 +19,11 @@ public class Spectral extends DelveModifier {
 	private static final double[] SPAWN_CHANCE = {
 			0.07,
 			0.14,
-			0.21
+			0.21,
+			0.28,
+			0.35,
+			0.42,
+			0.49
 	};
 
 	private static final String[] SPECTERS = {
@@ -38,6 +42,18 @@ public class Spectral extends DelveModifier {
 				"to spawn Specters."
 			}, {
 				"Dying Enemies have a " + Math.round(SPAWN_CHANCE[2] * 100) + "% chance",
+				"to spawn Specters."
+			}, {
+				"Dying Enemies have a " + Math.round(SPAWN_CHANCE[3] * 100) + "% chance",
+				"to spawn Specters."
+			}, {
+				"Dying Enemies have a " + Math.round(SPAWN_CHANCE[4] * 100) + "% chance",
+				"to spawn Specters."
+			}, {
+				"Dying Enemies have a " + Math.round(SPAWN_CHANCE[5] * 100) + "% chance",
+				"to spawn Specters."
+			}, {
+				"Dying Enemies have a " + Math.round(SPAWN_CHANCE[6] * 100) + "% chance",
 				"to spawn Specters."
 			}
 	};

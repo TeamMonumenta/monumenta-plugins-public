@@ -23,6 +23,7 @@ public class DepthsLoot {
 	public static final NamespacedKey RELIC_KEY = NamespacedKey.fromString("epic:r2/depths/loot/relicroll");
 	public static final NamespacedKey GEODE_KEY = NamespacedKey.fromString("epic:r2/depths/loot/voidstained_geode");
 	public static final NamespacedKey POME_KEY = NamespacedKey.fromString("epic:r2/delves/items/twisted_pome");
+	public static final NamespacedKey TROPHY_KEY = NamespacedKey.fromString("epic:r2/delves/trophies/depths");
 
 	public static final int RELIC_CHANCE = 250;
 
@@ -34,7 +35,7 @@ public class DepthsLoot {
 	 * @param loc loot room spawn location
 	 * @param treasureScore amount of loot to spawn
 	 */
-	public static void generateLoot(Location loc, int treasureScore, Player p) {
+	public static void generateLoot(Location loc, int treasureScore, Player p, boolean trophy) {
 
 		//Load the main reward table with ccs and depths mats and spawn it in
 
@@ -97,11 +98,22 @@ public class DepthsLoot {
 							loc.getWorld().dropItem(loc, item);
 						}
 					}
-					ItemStack fillerBlocks = new ItemStack(Material.BLACKSTONE, 2);
-					loc.getWorld().dropItem(loc, fillerBlocks);
 				}
 			}
 		}
+
+		//Delve trophy if max points
+		if (trophy) {
+			LootTable trophyTable = Bukkit.getLootTable(TROPHY_KEY);
+
+			loot = trophyTable.populateLoot(FastUtils.RANDOM, context);
+			if (!loot.isEmpty()) {
+				for (ItemStack item : loot) {
+					loc.getWorld().dropItem(loc, item);
+				}
+			}
+		}
+
 
 		//Roll for relics- treasure score / 250 chance (if above 250, guaranteed drop and subtract relic)
 

@@ -20,7 +20,11 @@ public class Colossal extends DelveModifier {
 	private static final double[] SPAWN_CHANCE = {
 			0.05,
 			0.1,
-			0.15
+			0.15,
+			0.2,
+			0.25,
+			0.3,
+			0.35
 	};
 
 	private static final String[] COLOSSI = {
@@ -39,6 +43,18 @@ public class Colossal extends DelveModifier {
 				"to spawn Colossi."
 			}, {
 				"Broken Spawners have a " + Math.round(SPAWN_CHANCE[2] * 100) + "% chance",
+				"to spawn Colossi."
+			}, {
+				"Broken Spawners have a " + Math.round(SPAWN_CHANCE[3] * 100) + "% chance",
+				"to spawn Colossi."
+			}, {
+				"Broken Spawners have a " + Math.round(SPAWN_CHANCE[4] * 100) + "% chance",
+				"to spawn Colossi."
+			}, {
+				"Broken Spawners have a " + Math.round(SPAWN_CHANCE[5] * 100) + "% chance",
+				"to spawn Colossi."
+			}, {
+				"Broken Spawners have a " + Math.round(SPAWN_CHANCE[6] * 100) + "% chance",
 				"to spawn Colossi."
 			}
 	};

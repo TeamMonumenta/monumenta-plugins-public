@@ -1225,12 +1225,9 @@ public class DepthsManager {
 			}
 		}
 		//Check to see if we're in endless mode and need to assign delve points to players
-		if (party.mEndlessMode && partyFloor >= 3 && partyFloor <= 11) {
+		if (party.mEndlessMode && partyFloor >= 3 && partyFloor <= 14) {
 			int delvePoints = DepthsEndlessDifficulty.DELVE_POINTS_PER_FLOOR[partyFloor - 1];
 			DepthsEndlessDifficulty.applyDelvePointsToParty(party.mPlayersInParty, delvePoints, party.mDelveModifiers, false);
-		} else if (partyFloor == 12) {
-			//Assign twisted at this point
-			DepthsEndlessDifficulty.applyDelvePointsToParty(party.mPlayersInParty, 0, party.mDelveModifiers, true);
 		} else if (partyFloor > 12 && partyFloor % 3 == 0) {
 			List<DepthsPlayer> playersToLoop = new ArrayList<>(party.mPlayersInParty);
 			for (DepthsPlayer playerInParty : playersToLoop) {

@@ -19,7 +19,9 @@ public class Dreadful extends DelveModifier {
 	private static final double[] SPAWN_CHANCE = {
 			0.2,
 			0.4,
-			0.6
+			0.6,
+			0.8,
+			1.0
 	};
 
 	private static final String[] DREADNAUGHTS = {
@@ -38,6 +40,12 @@ public class Dreadful extends DelveModifier {
 				"to spawn Dreadnaughts."
 			}, {
 				"Dying Elites have a " + Math.round(SPAWN_CHANCE[2] * 100) + "% chance",
+				"to spawn Dreadnaughts."
+			}, {
+				"Dying Elites have a " + Math.round(SPAWN_CHANCE[3] * 100) + "% chance",
+				"to spawn Dreadnaughts."
+			}, {
+				"Dying Elites have a " + Math.round(SPAWN_CHANCE[4] * 100) + "% chance",
 				"to spawn Dreadnaughts."
 			}
 	};

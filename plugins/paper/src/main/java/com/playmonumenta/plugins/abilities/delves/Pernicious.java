@@ -16,7 +16,10 @@ public class Pernicious extends DelveModifier {
 	private static final double[] BLOCK_BREAK_CHANCE = {
 			0.05,
 			0.1,
-			0.15
+			0.15,
+			0.2,
+			0.25,
+			0.3
 	};
 
 	private final double mBlockBreakChance;
@@ -30,6 +33,12 @@ public class Pernicious extends DelveModifier {
 				"Enemies have a " + Math.round(BLOCK_BREAK_CHANCE[1] * 100) + "% chance to have Block Break."
 			}, {
 				"Enemies have a " + Math.round(BLOCK_BREAK_CHANCE[2] * 100) + "% chance to have Block Break."
+			}, {
+				"Enemies have a " + Math.round(BLOCK_BREAK_CHANCE[3] * 100) + "% chance to have Block Break."
+			}, {
+				"Enemies have a " + Math.round(BLOCK_BREAK_CHANCE[4] * 100) + "% chance to have Block Break."
+			}, {
+				"Enemies have a " + Math.round(BLOCK_BREAK_CHANCE[5] * 100) + "% chance to have Block Break."
 			}
 	};
 

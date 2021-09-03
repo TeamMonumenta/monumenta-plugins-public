@@ -151,6 +151,24 @@ public class DelvesUtils {
 			MODIFIER_RANK_CAPS.put(Modifier.ENTROPY, 5);
 			MODIFIER_RANK_CAPS.put(Modifier.TWISTED, 1);
 
+			// Depths endless changes- use dev2 for testing
+			if (ServerProperties.getShardName().contains("depths")
+					|| ServerProperties.getShardName().equals("dev2")) {
+				// Total of 72 points in depths
+				MODIFIER_RANK_CAPS.put(Modifier.RELENTLESS, 5);
+				MODIFIER_RANK_CAPS.put(Modifier.ARCANIC, 7);
+				MODIFIER_RANK_CAPS.put(Modifier.INFERNAL, 7);
+				MODIFIER_RANK_CAPS.put(Modifier.TRANSCENDENT, 6);
+				MODIFIER_RANK_CAPS.put(Modifier.SPECTRAL, 7);
+				MODIFIER_RANK_CAPS.put(Modifier.DREADFUL, 5);
+				MODIFIER_RANK_CAPS.put(Modifier.COLOSSAL, 7);
+				MODIFIER_RANK_CAPS.put(Modifier.CHIVALROUS, 3);
+				MODIFIER_RANK_CAPS.put(Modifier.BLOODTHIRSTY, 5);
+				MODIFIER_RANK_CAPS.put(Modifier.PERNICIOUS, 6);
+				MODIFIER_RANK_CAPS.put(Modifier.LEGIONARY, 7);
+				MODIFIER_RANK_CAPS.put(Modifier.CARAPACE, 7);
+			}
+
 			int maxDepthPoints = 0;
 			for (Map.Entry<Modifier, Integer> entry : MODIFIER_RANK_CAPS.entrySet()) {
 				if (entry.getKey() == Modifier.TWISTED) {
@@ -166,6 +184,7 @@ public class DelvesUtils {
 		private final Player mPlayer;
 		private final String mDungeon;
 
+		private boolean mIsDepths = false;
 		private boolean mIsEditable = false;
 
 		private long mDelveScore;
@@ -187,6 +206,10 @@ public class DelvesUtils {
 			mPlayer = player;
 			mDungeon = dungeon;
 			mDelveScore = delveScore;
+			if (ServerProperties.getShardName().contains("depths")
+					|| ServerProperties.getShardName().startsWith("dev2")) {
+				mIsDepths = true;
+			}
 
 			if (!storeDelveInfo()) {
 				player.sendMessage("You currently have an invalid Delves score. Please contact a moderator, and do NOT start/continue a Delve.");
@@ -874,14 +897,14 @@ public class DelvesUtils {
 
 			lore.add(Component.text(""));
 
-			lore.add(Component.text("Delve Material Multipliers (Not Counting Loot Scaling):", NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, false));
 			double baseAmount = DelveLootTableGroup.getDelveMaterialTableChance(MINIMUM_DEPTH_POINTS, 9001);
 			double delveMaterialMultiplierSolo = DelveLootTableGroup.getDelveMaterialTableChance(depthPoints, 1) / baseAmount;
 			double delveMaterialMultiplierDuo = DelveLootTableGroup.getDelveMaterialTableChance(depthPoints, 2) / baseAmount;
 			double delveMaterialMultiplierTrio = DelveLootTableGroup.getDelveMaterialTableChance(depthPoints, 3) / baseAmount;
 			double delveMaterialMultiplier = DelveLootTableGroup.getDelveMaterialTableChance(depthPoints, 9001) / baseAmount;
 
-			if (delveMaterialMultiplier > 0) {
+			if (delveMaterialMultiplier > 0 && !mDelveInfo.mIsDepths) {
+				lore.add(Component.text("Delve Material Multipliers (Not Counting Loot Scaling):", NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, false));
 				if (delveMaterialMultiplierSolo == DelveLootTableGroup.getDelveMaterialTableChance(9001, 1) / baseAmount) {
 					lore.add(Component.text(String.format("- 1 Player: x%.2f (Capped)", delveMaterialMultiplierSolo), NamedTextColor.YELLOW).decoration(TextDecoration.ITALIC, false));
 				} else {
@@ -905,7 +928,8 @@ public class DelvesUtils {
 				} else {
 					lore.add(Component.text(String.format("- 4+ Players: x%.2f", delveMaterialMultiplier), NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false));
 				}
-			} else {
+			} else if (!mDelveInfo.mIsDepths) {
+				lore.add(Component.text("Delve Material Multipliers (Not Counting Loot Scaling):", NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, false));
 				lore.add(Component.text(String.format("  - 1 Player: x%.2f", delveMaterialMultiplierSolo), NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false));
 				lore.add(Component.text(String.format("  - 2 Players: x%.2f", delveMaterialMultiplierDuo), NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false));
 				lore.add(Component.text(String.format("  - 3 Players: x%.2f", delveMaterialMultiplierTrio), NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false));
@@ -1002,10 +1026,10 @@ public class DelvesUtils {
 			String[][] rankDescriptions = modifier.getRankDescriptions();
 			int row = ROWS - 1;
 
-			for (; row > rankDescriptions.length; row--) {
+
+			for (; row > DelveInfo.getRankCap(modifier); row--) {
 				modifierItems.add(new ItemStack(Material.BLACK_STAINED_GLASS_PANE, 1));
 			}
-
 			for (; row > mDelveInfo.getRank(modifier); row--) {
 				ItemStack item = new ItemStack(Material.RED_STAINED_GLASS_PANE, 1);
 				ItemMeta meta = item.getItemMeta();
@@ -1046,15 +1070,35 @@ public class DelvesUtils {
 
 			ItemStack item = new ItemStack(modifier.getIcon());
 
+			if (mDelveInfo.mIsDepths && mDelveInfo.getRank(modifier) == 0) {
+				item = new ItemStack(Material.BARRIER);
+			}
+
 			ItemMeta meta = item.getItemMeta();
 			meta.displayName(modifier.getName());
-			meta.lore(Arrays.asList(Component.text(modifier.getDescription(), NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, false)));
 
+			if (mDelveInfo.mIsDepths) {
+				List<Component> lore = new ArrayList<>();
+				item.setAmount(Math.max(1, mDelveInfo.getRank(modifier)));
+				if (mDelveInfo.getRank(modifier) > 0) {
+					lore.add(Component.text("Rank " + mDelveInfo.getRank(modifier) + "/" + DelveInfo.MODIFIER_RANK_CAPS.get(modifier), NamedTextColor.GOLD).decoration(TextDecoration.ITALIC, false));
+				}
+				lore.add(Component.text(modifier.getDescription(), NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, false));
+				if (mDelveInfo.getRank(modifier) > 0) {
+					for (int i = 0; i < rankDescriptions[mDelveInfo.getRank(modifier) - 1].length; i++) {
+						lore.add(Component.text(rankDescriptions[mDelveInfo.getRank(modifier) - 1][i], NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, false));
+					}
+				}
+				meta.lore(lore);
+
+			} else {
+				meta.lore(Arrays.asList(Component.text(modifier.getDescription(), NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, false)));
+			}
 			if (modifier == Modifier.PERNICIOUS) {
 				meta.addItemFlags(ItemFlag.HIDE_POTION_EFFECTS);
 			} else if (modifier == Modifier.RELENTLESS || modifier == Modifier.LEGIONARY || modifier == Modifier.CARAPACE) {
 				meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
-			} else if (modifier == Modifier.TWISTED) {
+			} else if (modifier == Modifier.TWISTED && !mDelveInfo.mIsDepths) {
 				((PotionMeta) meta).setColor(Color.fromRGB(6684672));
 				meta.addItemFlags(ItemFlag.HIDE_POTION_EFFECTS);
 			}

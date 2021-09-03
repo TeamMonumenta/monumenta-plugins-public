@@ -143,8 +143,8 @@ public class Davey extends BossAbilityGroup {
 
 		//Summon vexes
 		mVexes = new ArrayList<>();
-		mVexes.add((LivingEntity) LibraryOfSoulsIntegration.summon(spawnLoc.clone().add(2, 2, 2), VEX_LOS));
-		mVexes.add((LivingEntity) LibraryOfSoulsIntegration.summon(spawnLoc.clone().add(-2, 2, -2), VEX_LOS));
+		mVexes.add((LivingEntity) LibraryOfSoulsIntegration.summon(spawnLoc.clone().add(5, 3, 5), VEX_LOS));
+		mVexes.add((LivingEntity) LibraryOfSoulsIntegration.summon(spawnLoc.clone().add(-5, 3, -5), VEX_LOS));
 
 		SpellManager activeSpells = new SpellManager(Arrays.asList(
 			new SpellLinkBeyondLife(mBoss, mCooldownTicks),

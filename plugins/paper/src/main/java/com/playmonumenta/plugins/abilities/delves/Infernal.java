@@ -41,7 +41,9 @@ public class Infernal extends DelveModifier {
 			1.4,
 			1.6,
 			1.8,
-			2
+			2,
+			2.2,
+			2.4
 	};
 
 	private static final double[] BURNING_DAMAGE_TAKEN_MULTIPLIER = {
@@ -49,7 +51,9 @@ public class Infernal extends DelveModifier {
 			1.8,
 			2.2,
 			2.6,
-			3
+			3,
+			3.4,
+			3.8
 	};
 
 	private static final double[] ABILITY_CHANCE = {
@@ -57,7 +61,9 @@ public class Infernal extends DelveModifier {
 			0.12,
 			0.18,
 			0.24,
-			0.3
+			0.3,
+			0.36,
+			0.42
 	};
 
 	private static final String[] ABILITY_POOL = {
@@ -90,6 +96,14 @@ public class Infernal extends DelveModifier {
 				"Enemies have a " + Math.round(ABILITY_CHANCE[4] * 100) + "% chance to be Infernal.",
 				"Players take +" + Math.round((BURNING_DAMAGE_TAKEN_MULTIPLIER[4] - 1) * 100) + "% Burning Damage",
 				"and +" + Math.round((ENVIRONMENTAL_DAMAGE_TAKEN_MULTIPLIER[4] - 1) * 100) + "% Environmental Damage."
+			}, {
+				"Enemies have a " + Math.round(ABILITY_CHANCE[5] * 100) + "% chance to be Infernal.",
+				"Players take +" + Math.round((BURNING_DAMAGE_TAKEN_MULTIPLIER[5] - 1) * 100) + "% Burning Damage",
+				"and +" + Math.round((ENVIRONMENTAL_DAMAGE_TAKEN_MULTIPLIER[5] - 1) * 100) + "% Environmental Damage."
+			}, {
+				"Enemies have a " + Math.round(ABILITY_CHANCE[6] * 100) + "% chance to be Infernal.",
+				"Players take +" + Math.round((BURNING_DAMAGE_TAKEN_MULTIPLIER[6] - 1) * 100) + "% Burning Damage",
+				"and +" + Math.round((ENVIRONMENTAL_DAMAGE_TAKEN_MULTIPLIER[6] - 1) * 100) + "% Environmental Damage."
 			}
 	};
 

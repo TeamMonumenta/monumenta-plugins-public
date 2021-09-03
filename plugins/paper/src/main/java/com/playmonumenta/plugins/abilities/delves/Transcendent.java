@@ -22,7 +22,10 @@ public class Transcendent extends DelveModifier {
 	private static final double[] ABILITY_CHANCE = {
 			0.15,
 			0.3,
-			0.45
+			0.45,
+			0.6,
+			0.75,
+			0.9
 	};
 
 	private static final String[] ABILITY_POOL_MELEE = {
@@ -45,6 +48,12 @@ public class Transcendent extends DelveModifier {
 				"Elites have a " + Math.round(ABILITY_CHANCE[1] * 100) + "% chance to be Transcendent."
 			}, {
 				"Elites have a " + Math.round(ABILITY_CHANCE[2] * 100) + "% chance to be Transcendent."
+			}, {
+				"Elites have a " + Math.round(ABILITY_CHANCE[3] * 100) + "% chance to be Transcendent."
+			}, {
+				"Elites have a " + Math.round(ABILITY_CHANCE[4] * 100) + "% chance to be Transcendent."
+			}, {
+				"Elites have a " + Math.round(ABILITY_CHANCE[5] * 100) + "% chance to be Transcendent."
 			}
 	};
 

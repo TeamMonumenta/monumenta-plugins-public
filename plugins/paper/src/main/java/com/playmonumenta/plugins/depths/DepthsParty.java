@@ -426,7 +426,11 @@ public class DepthsParty {
 				}
 				DepthsManager.getInstance().deletePlayer(p);
 				mPlayersInParty.remove(dp);
-				DepthsLoot.generateLoot(lootRoomLoc.clone().add(DepthsLoot.LOOT_ROOM_LOOT_OFFSET), treasureScore, p);
+				if (roomReached > 120) {
+					DepthsLoot.generateLoot(lootRoomLoc.clone().add(DepthsLoot.LOOT_ROOM_LOOT_OFFSET), treasureScore, p, true);
+				} else {
+					DepthsLoot.generateLoot(lootRoomLoc.clone().add(DepthsLoot.LOOT_ROOM_LOOT_OFFSET), treasureScore, p, false);
+				}
 			}
 			//Set their highest room score and do announcements
 			int highestRoom = ScoreboardUtils.getScoreboardValue(p, "DepthsEndless");

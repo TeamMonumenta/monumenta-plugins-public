@@ -16,7 +16,9 @@ public class Legionary extends DelveModifier {
 			0.3,
 			0.45,
 			0.6,
-			0.75
+			0.75,
+			0.9,
+			1.05
 	};
 
 	private final double mSpawnChance;
@@ -39,6 +41,12 @@ public class Legionary extends DelveModifier {
 			}, {
 				"Spawners have a " + Math.round(SPAWN_CHANCE[4] * 100) + "% chance",
 				"to spawn a copy of an enemy."
+			}, {
+				"Spawners have a " + Math.round(SPAWN_CHANCE[5] * 100) + "% chance",
+				"to spawn a copy of an enemy."
+			}, {
+				"Spawners have a " + Math.round(SPAWN_CHANCE[6] * 100) + "% chance",
+				"to spawn a copy of an enemy."
 			}
 	};
 
@@ -56,6 +64,10 @@ public class Legionary extends DelveModifier {
 	@Override
 	public void applyModifiers(LivingEntity mob, SpawnerSpawnEvent event) {
 		if (FastUtils.RANDOM.nextDouble() < mSpawnChance) {
+			DelvesUtils.duplicateLibraryOfSoulsMob(mob);
+		}
+		//Chance for a third if chance > 100
+		if (FastUtils.RANDOM.nextDouble() < mSpawnChance - 1) {
 			DelvesUtils.duplicateLibraryOfSoulsMob(mob);
 		}
 	}

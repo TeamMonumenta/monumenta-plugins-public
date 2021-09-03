@@ -33,7 +33,7 @@ public class Sidearm extends DepthsAbility {
 	private static final int COOLDOWN = 4 * 20;
 	private static final int KILL_COOLDOWN_REDUCTION = 2 * 20;
 	private static final double[] DAMAGE = {12, 15, 18, 21, 24};
-	private static final int RANGE = 8;
+	private static final int RANGE = 14;
 
 	private static final Particle.DustOptions SIDEARM_COLOR = new Particle.DustOptions(Color.fromRGB(130, 130, 130), 1.0f);
 
@@ -52,7 +52,7 @@ public class Sidearm extends DepthsAbility {
 		Location loc = mPlayer.getEyeLocation();
 		BoundingBox box = BoundingBox.of(loc, 0.75, 0.75, 0.75);
 		Vector dir = loc.getDirection();
-		List<LivingEntity> mobs = EntityUtils.getNearbyMobs(mPlayer.getLocation(), 10, mPlayer);
+		List<LivingEntity> mobs = EntityUtils.getNearbyMobs(mPlayer.getLocation(), RANGE, mPlayer);
 		World world = mPlayer.getWorld();
 		world.spawnParticle(Particle.SMOKE_NORMAL, loc, 50, 0, 0, 0, 0.125);
 

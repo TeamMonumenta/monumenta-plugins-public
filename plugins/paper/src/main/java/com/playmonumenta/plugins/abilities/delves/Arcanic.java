@@ -23,7 +23,9 @@ public class Arcanic extends DelveModifier {
 			0.12,
 			0.18,
 			0.24,
-			0.3
+			0.3,
+			0.36,
+			0.42,
 	};
 
 	private static final List<List<String>> ABILITY_POOL;
@@ -79,6 +81,10 @@ public class Arcanic extends DelveModifier {
 				"Enemies have a " + Math.round(ABILITY_CHANCE[3] * 100) + "% chance to be Arcanic."
 			}, {
 				"Enemies have a " + Math.round(ABILITY_CHANCE[4] * 100) + "% chance to be Arcanic."
+			}, {
+				"Enemies have a " + Math.round(ABILITY_CHANCE[5] * 100) + "% chance to be Arcanic."
+			}, {
+				"Enemies have a " + Math.round(ABILITY_CHANCE[6] * 100) + "% chance to be Arcanic."
 			}
 	};
 

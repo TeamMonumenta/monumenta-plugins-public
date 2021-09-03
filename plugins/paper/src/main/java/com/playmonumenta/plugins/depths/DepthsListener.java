@@ -185,6 +185,15 @@ public class DepthsListener implements Listener {
 		Entity entity = event.getEntity();
 		Entity damager = event.getDamager();
 
+		//Scaling boss damage- 5% extra per 3 floors
+		if (EntityUtils.isBoss(damager) && entity instanceof Player && DepthsManager.getInstance().isInSystem((Player) entity)) {
+			DepthsPlayer dp1 = DepthsManager.getInstance().mPlayers.get(entity.getUniqueId());
+			if (DepthsManager.getInstance().getPartyFromId(dp1).getFloor() > 3) {
+				double multiplier = 1 + (0.05 * (((DepthsManager.getInstance().getPartyFromId(dp1).getFloor() - 1) / 3)));
+				event.setDamage(event.getDamage() * multiplier);
+			}
+		}
+
 		//EarthenWrath implementation handler
 		if (event.getEntity() instanceof Player) {
 			Player player = (Player) event.getEntity();

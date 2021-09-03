@@ -15,7 +15,9 @@ public class Bloodthirsty extends DelveModifier {
 	private static final double[] BLOODTHIRSTY_CHANCE = {
 			0.07,
 			0.14,
-			0.21
+			0.21,
+			0.28,
+			0.35
 	};
 
 	public static final String DESCRIPTION = "Enemies can coordinate attacks on players.";
@@ -27,6 +29,10 @@ public class Bloodthirsty extends DelveModifier {
 				"Enemies have a " + Math.round(BLOODTHIRSTY_CHANCE[1] * 100) + "% chance to be Bloodthirsty."
 			}, {
 				"Enemies have a " + Math.round(BLOODTHIRSTY_CHANCE[2] * 100) + "% chance to be Bloodthirsty."
+			}, {
+				"Enemies have a " + Math.round(BLOODTHIRSTY_CHANCE[3] * 100) + "% chance to be Bloodthirsty."
+			}, {
+				"Enemies have a " + Math.round(BLOODTHIRSTY_CHANCE[4] * 100) + "% chance to be Bloodthirsty."
 			}
 	};
 

@@ -17,8 +17,8 @@ import com.playmonumenta.plugins.utils.FastUtils;
 public class DepthsEndlessDifficulty {
 
 	//Delve points to add per floor in endless mode
-	//Each index is the floor to be assigned at the end of (ex. 3rd floor -> 4th floor is 9)
-	public static final int[] DELVE_POINTS_PER_FLOOR = {0, 0, 9, 3, 3, 9, 3, 3, 9, 3, 4};
+	//Each index is the floor to be assigned at the end of (ex. 3rd floor -> 4th floor is 10)
+	public static final int[] DELVE_POINTS_PER_FLOOR = {0, 0, 10, 4, 4, 10, 4, 4, 10, 4, 4, 10, 4, 4};
 
 	public static void applyDelvePointsToParty(List<DepthsPlayer> depthsPlayers, int pointsToAssign, Map<Modifier, Integer> delvePointsForParty, boolean twisted) {
 		//First, take an available player and assign points to them based on the party's current assignment

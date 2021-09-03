@@ -32,7 +32,7 @@ public class BladeFlurry extends DepthsAbility {
 	public static final int COOLDOWN = 20 * 6;
 	public static final int[] DAMAGE = {8, 10, 12, 14, 16};
 	public static final int RADIUS = 3;
-	public static final int SILENCE_DURATION = 1 * 20;
+	public static final int[] SILENCE_DURATION = {20, 25, 30, 35, 40};
 
 	public BladeFlurry(Plugin plugin, Player player) {
 		super(plugin, player, ABILITY_NAME);
@@ -52,7 +52,7 @@ public class BladeFlurry extends DepthsAbility {
 		Location loc = mPlayer.getEyeLocation().add(0, -0.5, 0);
 		List<LivingEntity> mobs = EntityUtils.getNearbyMobs(loc, 3);
 		for (LivingEntity mob : mobs) {
-			EntityUtils.applySilence(mPlugin, SILENCE_DURATION, mob);
+			EntityUtils.applySilence(mPlugin, SILENCE_DURATION[mRarity - 1], mob);
 			EntityUtils.damageEntity(mPlugin, mob, DAMAGE[mRarity - 1], mPlayer, MagicType.ARCANE, true, mInfo.mLinkedSpell);
 			MovementUtils.knockAway(mPlayer, mob, 0.8f);
 		}
@@ -94,7 +94,7 @@ public class BladeFlurry extends DepthsAbility {
 
 	@Override
 	public String getDescription(int rarity) {
-		return "Right click while sneaking and holding a weapon to deal " + DepthsUtils.getRarityColor(rarity) + DAMAGE[rarity - 1] + ChatColor.WHITE + " damage in a " + RADIUS + " block radius around you. Affected mobs are silenced for " + SILENCE_DURATION / 20 + " second and knocked away slightly. Cooldown: " + COOLDOWN / 20 + "s.";
+		return "Right click while sneaking and holding a weapon to deal " + DepthsUtils.getRarityColor(rarity) + DAMAGE[rarity - 1] + ChatColor.WHITE + " damage in a " + RADIUS + " block radius around you. Affected mobs are silenced for " + DepthsUtils.getRarityColor(rarity) + (SILENCE_DURATION[rarity - 1] / 20.0) + ChatColor.WHITE + " seconds and knocked away slightly. Cooldown: " + COOLDOWN / 20 + "s.";
 	}
 
 	@Override

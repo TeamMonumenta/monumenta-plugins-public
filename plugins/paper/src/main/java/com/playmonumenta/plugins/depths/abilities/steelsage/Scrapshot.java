@@ -34,7 +34,7 @@ public class Scrapshot extends DepthsAbility {
 	public static final String ABILITY_NAME = "Scrapshot";
 	private static final int COOLDOWN = 10 * 20;
 	private static final double[] DAMAGE = {25, 31, 37, 43, 50};
-	private static final double[] DISTANCE_MULTIPLIER = {1, 1, 0.9, 0.8, 0.7, 0.6, 0.5, 0.4};
+	private static final double[] DISTANCE_MULTIPLIER = {1, 1, 1, 1, 0.9, 0.8, 0.7, 0.6};
 	private static final double VELOCITY = 1;
 	private static final int RANGE = 8;
 
@@ -131,7 +131,7 @@ public class Scrapshot extends DepthsAbility {
 
 	@Override
 	public String getDescription(int rarity) {
-		return "Left click while sneaking and holding a weapon to fire a blunderbuss shot that goes up to " + RANGE + " blocks, in a cone that deals " + DepthsUtils.getRarityColor(rarity) + DAMAGE[rarity - 1] + ChatColor.WHITE + " damage and knocks you backward. Damage is decreased for every block of distance after the first 2 blocks. Cooldown: " + COOLDOWN / 20 + "s.";
+		return "Left click while sneaking and holding a weapon to fire a blunderbuss shot that goes up to " + RANGE + " blocks, in a cone that deals " + DepthsUtils.getRarityColor(rarity) + DAMAGE[rarity - 1] + ChatColor.WHITE + " damage and knocks you backward. Damage is decreased for every block of distance after the first 4 blocks. Cooldown: " + COOLDOWN / 20 + "s.";
 	}
 
 	@Override

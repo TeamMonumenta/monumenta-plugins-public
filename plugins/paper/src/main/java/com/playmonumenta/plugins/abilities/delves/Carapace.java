@@ -17,7 +17,9 @@ public class Carapace extends DelveModifier {
 			16,
 			24,
 			32,
-			40
+			40,
+			48,
+			56
 	};
 
 	private static final double ELITE_CARAPACE_HEALTH_MULTIPLIER = 0.5;
@@ -43,6 +45,14 @@ public class Carapace extends DelveModifier {
 				"A Carapace blocks that damage amount in any 10s period."
 			}, {
 				"Enemies gain Carapaces with " + CARAPACE_HEALTH_RAW_PERCENT[4] + "% of their Max Health",
+				"Elites' Carapaces have x" + ELITE_CARAPACE_HEALTH_MULTIPLIER + " Health.",
+				"A Carapace blocks that damage amount in any 10s period."
+			}, {
+				"Enemies gain Carapaces with " + CARAPACE_HEALTH_RAW_PERCENT[5] + "% of their Max Health",
+				"Elites' Carapaces have x" + ELITE_CARAPACE_HEALTH_MULTIPLIER + " Health.",
+				"A Carapace blocks that damage amount in any 10s period."
+			}, {
+				"Enemies gain Carapaces with " + CARAPACE_HEALTH_RAW_PERCENT[6] + "% of their Max Health",
 				"Elites' Carapaces have x" + ELITE_CARAPACE_HEALTH_MULTIPLIER + " Health.",
 				"A Carapace blocks that damage amount in any 10s period."
 			}
