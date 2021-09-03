@@ -70,9 +70,11 @@ public class AuditListener implements Listener {
 
 	private final Map<HumanEntity, ItemStack> mLastCreativeDestroy = new HashMap<HumanEntity, ItemStack>();
 	private final Logger mLogger;
+	private static AuditListener INSTANCE = null;
 
 	public AuditListener(Logger logger) {
 		mLogger = logger;
+		INSTANCE = this;
 	}
 
 	@EventHandler(priority = EventPriority.MONITOR)
@@ -83,7 +85,7 @@ public class AuditListener implements Listener {
 
 		Player player = event.getEntity();
 
-		log("Death: " + player.getName() + " " + event.getDeathMessage());
+		log("Death: " + player.getName() + " " + MessagingUtils.plainText(event.deathMessage()));
 
 		checkDestroy(player);
 	}
@@ -212,7 +214,8 @@ public class AuditListener implements Listener {
 						}
 					}
 					if (state instanceof Sign) {
-						for (String line : ((Sign)state).getLines()) {
+						for (Component comp : ((Sign)state).lines()) {
+							String line = MessagingUtils.plainText(comp);
 							if (line != null && !line.isEmpty()) {
 								if (elementAdded) {
 									retStr += ", ";
@@ -230,9 +233,11 @@ public class AuditListener implements Listener {
 		return retStr + ")";
 	}
 
-	private void log(@NotNull String message) {
-		mLogger.info("Audit | " + message);
-		MonumentaNetworkRelayIntegration.sendAuditLogMessage(message);
+	public static void log(@NotNull String message) {
+		if (INSTANCE != null) {
+			INSTANCE.mLogger.info("Audit | " + message);
+			MonumentaNetworkRelayIntegration.sendAuditLogMessage(message);
+		}
 	}
 
 	private void checkDestroy(HumanEntity player) {

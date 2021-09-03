@@ -30,6 +30,7 @@ import com.playmonumenta.plugins.enchantments.infusions.Perspicacity;
 import com.playmonumenta.plugins.enchantments.infusions.Tenacity;
 import com.playmonumenta.plugins.enchantments.infusions.Vigor;
 import com.playmonumenta.plugins.enchantments.infusions.Vitality;
+import com.playmonumenta.plugins.listeners.AuditListener;
 import com.playmonumenta.plugins.utils.ItemUtils.ItemRegion;
 
 import dev.jorel.commandapi.CommandAPI;
@@ -319,6 +320,8 @@ public class InfusionUtils {
 		}
 
 		int level = getInfuseLevel(item);
+
+		AuditListener.log("Infusion refund - player=" + player.getName() + " item='" + ItemUtils.getPlainName(item) + "' level=" + level);
 
 		//Remove the infusion enchants from the item
 		for (InfusionSelection sel : InfusionSelection.values()) {

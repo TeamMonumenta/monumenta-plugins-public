@@ -3,20 +3,6 @@ package com.playmonumenta.plugins.utils;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.bukkit.ChatColor;
-import org.bukkit.Color;
-import org.bukkit.FireworkEffect;
-import org.bukkit.GameMode;
-import org.bukkit.Location;
-import org.bukkit.NamespacedKey;
-import org.bukkit.entity.EntityType;
-import org.bukkit.entity.Firework;
-import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.PlayerInventory;
-import org.bukkit.inventory.meta.FireworkMeta;
-import org.bukkit.scheduler.BukkitRunnable;
-
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.enchantments.infusions.delves.Ardor;
 import com.playmonumenta.plugins.enchantments.infusions.delves.Aura;
@@ -33,6 +19,21 @@ import com.playmonumenta.plugins.enchantments.infusions.delves.Pennate;
 import com.playmonumenta.plugins.enchantments.infusions.delves.Reflection;
 import com.playmonumenta.plugins.enchantments.infusions.delves.Understanding;
 import com.playmonumenta.plugins.enchantments.infusions.delves.Usurper;
+import com.playmonumenta.plugins.listeners.AuditListener;
+
+import org.bukkit.ChatColor;
+import org.bukkit.Color;
+import org.bukkit.FireworkEffect;
+import org.bukkit.GameMode;
+import org.bukkit.Location;
+import org.bukkit.NamespacedKey;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Firework;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.PlayerInventory;
+import org.bukkit.inventory.meta.FireworkMeta;
+import org.bukkit.scheduler.BukkitRunnable;
 
 public class DelveInfusionUtils {
 
@@ -166,6 +167,10 @@ public class DelveInfusionUtils {
 
 		List<ItemStack> mats = null;
 
+		/* Audit */
+		String matStr = "";
+		int auditLevel = level + 1;
+
 		int[] preCostAdjustment = {4, 8, 16, 32};
 		while (level >= 0) {
 			mats = getCurrenciesCost(item, infusion, level, player);
@@ -173,9 +178,22 @@ public class DelveInfusionUtils {
 				mats.get(0).setAmount(preCostAdjustment[level]);
 			}
 			level--;
+
+			/* Audit */
+			for (ItemStack it : mats) {
+				if (it != null && it.getAmount() > 0) {
+					if (!matStr.isEmpty()) {
+						matStr += ",";
+					}
+					matStr += "'" + ItemUtils.getPlainName(it) + ":" + it.getAmount() + "'";
+				}
+			}
+
 			giveMaterials(player, mats);
 			mats.clear();
 		}
+
+		AuditListener.log("Delve infusion refund - player=" + player.getName() + " item='" + ItemUtils.getPlainName(item) + "' level=" + auditLevel + " mats=" + matStr);
 
 		int xp = ExperienceUtils.getTotalExperience(player);
 		for (int i = 0; i <= levelXp; i++) {
