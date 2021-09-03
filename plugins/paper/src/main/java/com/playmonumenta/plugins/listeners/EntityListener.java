@@ -103,6 +103,7 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.GraveUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.MetadataUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
@@ -110,6 +111,7 @@ import com.playmonumenta.plugins.utils.PotionUtils.PotionInfo;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
 
+import net.kyori.adventure.text.Component;
 import net.md_5.bungee.api.ChatColor;
 
 public class EntityListener implements Listener {
@@ -667,7 +669,13 @@ public class EntityListener implements Listener {
 					if (itemInMainHand.getType().equals(Material.SPLASH_POTION)
 						&& itemInMainHand.getEnchantmentLevel(Enchantment.ARROW_INFINITE) > 0) {
 							ThrownPotion potionClone = (ThrownPotion)potion.getWorld().spawnEntity(potion.getLocation(), EntityType.SPLASH_POTION);
-							potionClone.setItem(potionItem);
+							ItemStack newPotion = potionItem.clone();
+							List<Component> lore = newPotion.lore();
+							lore.removeIf((component) -> !MessagingUtils.plainText(component).contains("* Alchemical Utensil *"));
+							newPotion.lore(lore);
+							ItemUtils.setPlainTag(newPotion);
+
+							potionClone.setItem(newPotion);
 							potionClone.setShooter(player);
 							potionClone.setVelocity(potion.getVelocity());
 							//this potion should not have other metadata
