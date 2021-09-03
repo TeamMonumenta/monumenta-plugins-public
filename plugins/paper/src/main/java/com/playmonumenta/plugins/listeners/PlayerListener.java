@@ -190,8 +190,10 @@ public class PlayerListener implements Listener {
 		mPlugin.mTrackingManager.removeEntity(player);
 
 		for (LivingEntity mob : EntityUtils.getNearbyMobs(player.getLocation(), 20)) {
-			mPlugin.mCombatLoggingTimers.addTimer(mob.getUniqueId(), Constants.TEN_MINUTES);
-			mob.setRemoveWhenFarAway(false);
+			if (!mob.isPersistent()) {
+				mPlugin.mCombatLoggingTimers.addTimer(mob.getUniqueId(), Constants.TEN_MINUTES);
+				mob.setRemoveWhenFarAway(false);
+			}
 		}
 	}
 
