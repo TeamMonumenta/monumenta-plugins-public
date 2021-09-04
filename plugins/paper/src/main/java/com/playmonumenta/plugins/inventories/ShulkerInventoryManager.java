@@ -50,7 +50,7 @@ public class ShulkerInventoryManager {
 	 * @return True if the Shulker Box was successfully opened.
 	 */
 	public boolean openShulker(Player player, Inventory parentInventory, int parentSlot) {
-		if (mRateLimited.contains(player.getUniqueId())) {
+		if (playerIsShulkerRateLimited(player)) {
 			player.sendMessage(ERROR_SHULKER_RATE_LIMITED);
 			return false;
 		}
@@ -307,8 +307,8 @@ public class ShulkerInventoryManager {
 	 * @return True if the player had a valid open Shulker Box
 	 */
 	private boolean closeDepositShulker(UUID uuid) {
-		if (mDepositInventories.containsKey(uuid)) {
-			ShulkerInventory inv = mDepositInventories.remove(uuid);
+		ShulkerInventory inv = mDepositInventories.remove(uuid);
+		if (inv != null) {
 			return inv.closeShulker(false);
 		}
 		return false;
@@ -408,6 +408,19 @@ public class ShulkerInventoryManager {
 	public static boolean playerHasShulkerOpen(HumanEntity player) {
 		if (INSTANCE != null) {
 			return INSTANCE.mInventories.containsKey(player.getUniqueId());
+		}
+		return false;
+	}
+
+	/**
+	 * Check if a player is currently rate limited
+	 *
+	 * @param player The player to be tested
+	 * @return True if the player is shulker rate limited.
+	 */
+	public static boolean playerIsShulkerRateLimited(HumanEntity player) {
+		if (INSTANCE != null) {
+			return INSTANCE.mRateLimited.contains(player.getUniqueId());
 		}
 		return false;
 	}

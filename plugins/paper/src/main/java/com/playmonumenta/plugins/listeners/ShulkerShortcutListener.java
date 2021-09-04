@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.listeners;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.enchantments.curses.CurseOfEphemerality;
+import com.playmonumenta.plugins.inventories.ShulkerInventoryManager;
 import com.playmonumenta.plugins.utils.ItemUtils;
 
 import org.bukkit.Bukkit;
@@ -173,6 +174,10 @@ public class ShulkerShortcutListener implements Listener {
 								// Shulker couldn't be opened
 								player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1.0f, 1.0f);
 							}
+							event.setCancelled(true);
+						} else if (ShulkerInventoryManager.playerIsShulkerRateLimited(player)) {
+							player.sendMessage(ChatColor.RED + "Too fast! Please try again");
+							player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1.0f, 1.0f);
 							event.setCancelled(true);
 						}
 					}
