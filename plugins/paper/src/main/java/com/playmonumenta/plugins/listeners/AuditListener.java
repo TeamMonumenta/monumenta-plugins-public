@@ -85,7 +85,7 @@ public class AuditListener implements Listener {
 
 		Player player = event.getEntity();
 
-		log("Death: " + player.getName() + " " + MessagingUtils.plainText(event.deathMessage()));
+		log("Death: " + player.getName() + " " + event.getDeathMessage());
 
 		checkDestroy(player);
 	}
