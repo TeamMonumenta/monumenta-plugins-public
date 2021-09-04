@@ -59,7 +59,8 @@ public class DepthsAdvancingShadows extends DepthsAbility {
 	public void cast(Action action) {
 
 		LivingEntity entity = mTarget;
-		if (entity != null && !entity.getScoreboardTags().contains(AbilityUtils.IGNORE_TAG)) {
+		double origDistance = mPlayer.getLocation().distance(entity.getLocation());
+		if (entity != null && origDistance <= ADVANCING_SHADOWS_RANGE && !entity.getScoreboardTags().contains(AbilityUtils.IGNORE_TAG)) {
 			int advancingShadows = getAbilityScore();
 			Vector dir = LocationUtils.getDirectionTo(entity.getLocation(), mPlayer.getLocation());
 			World world = mPlayer.getWorld();
@@ -77,8 +78,16 @@ public class DepthsAdvancingShadows extends DepthsAbility {
 			loc.add(0, 1, 0);
 
 			// Just in case the player's teleportation loc is in a block.
-			while (loc.getBlock().getType().isSolid()) {
+			int count = 0;
+			while (count < 5 && loc.getBlock().getType().isSolid()) {
+				count++;
 				loc.subtract(dir.clone().multiply(1.15));
+			}
+
+			// If still solid, something is wrong. Additionally, don't allow the player to teleport further away from a mob using this
+			if (loc.getBlock().getType().isSolid() || loc.distance(entity.getLocation()) > origDistance) {
+				world.playSound(mPlayer.getLocation(), Sound.ENTITY_ILLUSIONER_MIRROR_MOVE, 1.0f, 1.8f);
+				return;
 			}
 
 			// Prevent the player from teleporting over void
@@ -101,6 +110,12 @@ public class DepthsAdvancingShadows extends DepthsAbility {
 
 				// Don't teleport players below y = 1.1 to avoid clipping into oblivion
 				loc.setY(Math.max(1.1, loc.getY()));
+			}
+
+			// Extra safeguard to prevent bizarro teleports
+			if (mPlayer.getLocation().distance(loc) > ADVANCING_SHADOWS_RANGE) {
+				world.playSound(mPlayer.getLocation(), Sound.ENTITY_ILLUSIONER_MIRROR_MOVE, 1.0f, 1.8f);
+				return;
 			}
 
 			Location playerLoc = mPlayer.getLocation();

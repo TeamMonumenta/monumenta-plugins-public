@@ -89,8 +89,8 @@ public class AdvancingShadows extends Ability {
 		mInfo.mShorthandName = "AS";
 		mInfo.mCooldown = ADVANCING_SHADOWS_COOLDOWN;
 		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
-		mInfo.mDescriptions.add("While holding two swords and not sneaking, right click to teleport to the target hostile enemy within 10 blocks and gain strength 2 for 5 seconds. Cooldown: 20s.");
-		mInfo.mDescriptions.add("Teleport range is increased to 15 blocks and all hostile non-target mobs within 4 blocks are knocked away from the target.");
+		mInfo.mDescriptions.add("While holding two swords and not sneaking, right click to teleport to the target hostile enemy within " + ADVANCING_SHADOWS_RANGE_1 + " blocks and gain strength 2 for 5 seconds. Cooldown: 20s.");
+		mInfo.mDescriptions.add("Teleport range is increased to " + ADVANCING_SHADOWS_RANGE_2 + " blocks and all hostile non-target mobs within " + ADVANCING_SHADOWS_AOE_KNOCKBACKS_RANGE + " blocks are knocked away from the target.");
 		Bukkit.getScheduler().runTask(plugin, () -> {
 			if (player != null) {
 				mBladeDance = AbilityManager.getManager().getPlayerAbility(mPlayer, BladeDance.class);
@@ -101,7 +101,9 @@ public class AdvancingShadows extends Ability {
 	@Override
 	public void cast(Action action) {
 		LivingEntity entity = mTarget;
-		if (entity != null) {
+		double maxRange = getActivationRange();
+		double origDistance = mPlayer.getLocation().distance(entity.getLocation());
+		if (entity != null && origDistance <= maxRange) {
 			int advancingShadows = getAbilityScore();
 			Vector dir = LocationUtils.getDirectionTo(entity.getLocation(), mPlayer.getLocation());
 			World world = mPlayer.getWorld();
@@ -119,8 +121,16 @@ public class AdvancingShadows extends Ability {
 			loc.add(0, 1, 0);
 
 			// Just in case the player's teleportation loc is in a block.
-			while (loc.getBlock().getType().isSolid()) {
+			int count = 0;
+			while (count < 5 && loc.getBlock().getType().isSolid()) {
+				count++;
 				loc.subtract(dir.clone().multiply(1.15));
+			}
+
+			// If still solid, something is wrong. Additionally, don't allow the player to teleport further away from a mob using this
+			if (loc.getBlock().getType().isSolid() || loc.distance(entity.getLocation()) > origDistance) {
+				world.playSound(mPlayer.getLocation(), Sound.ENTITY_ILLUSIONER_MIRROR_MOVE, 1.0f, 1.8f);
+				return;
 			}
 
 			// Prevent the player from teleporting over void
@@ -143,6 +153,12 @@ public class AdvancingShadows extends Ability {
 
 				// Don't teleport players below y = 1.1 to avoid clipping into oblivion
 				loc.setY(Math.max(1.1, loc.getY()));
+			}
+
+			// Extra safeguard to prevent bizarro teleports
+			if (mPlayer.getLocation().distance(loc) > maxRange) {
+				world.playSound(mPlayer.getLocation(), Sound.ENTITY_ILLUSIONER_MIRROR_MOVE, 1.0f, 1.8f);
+				return;
 			}
 
 			world.spawnParticle(Particle.SPELL_WITCH, mPlayer.getLocation().add(0, 1.1, 0), 50, 0.35, 0.5, 0.35, 1.0);
@@ -181,14 +197,11 @@ public class AdvancingShadows extends Ability {
 				if (mBladeDance != null && mPlayer.getLocation().getPitch() >= 50) {
 					return false;
 				}
-				int advancingShadows = getAbilityScore();
-				int range = (advancingShadows == 1) ? ADVANCING_SHADOWS_RANGE_1 : ADVANCING_SHADOWS_RANGE_2;
-				range = (int) AdvancingShadowsRadiusEnchantment.getRadius(mPlayer, range, AdvancingShadowsRadiusEnchantment.class);
 
 				// Basically makes sure if the target is in LoS and if there is
 				// a path.
 				Location eyeLoc = mPlayer.getEyeLocation();
-				Raycast ray = new Raycast(eyeLoc, eyeLoc.getDirection(), range);
+				Raycast ray = new Raycast(eyeLoc, eyeLoc.getDirection(), (int)getActivationRange());
 				ray.mThroughBlocks = false;
 				ray.mThroughNonOccluding = false;
 				if (AbilityManager.getManager().isPvPEnabled(mPlayer)) {
@@ -214,5 +227,11 @@ public class AdvancingShadows extends Ability {
 	@Override
 	public Class<? extends BaseAbilityEnchantment> getCooldownEnchantment() {
 		return AdvancingShadowsCooldownEnchantment.class;
+	}
+
+	private double getActivationRange() {
+		int advancingShadows = getAbilityScore();
+		int range = (advancingShadows == 1) ? ADVANCING_SHADOWS_RANGE_1 : ADVANCING_SHADOWS_RANGE_2;
+		return AdvancingShadowsRadiusEnchantment.getRadius(mPlayer, range, AdvancingShadowsRadiusEnchantment.class);
 	}
 }
