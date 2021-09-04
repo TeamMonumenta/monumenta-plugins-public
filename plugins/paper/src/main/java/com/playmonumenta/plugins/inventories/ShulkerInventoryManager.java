@@ -1,5 +1,9 @@
 package com.playmonumenta.plugins.inventories;
 
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.UUID;
+
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
@@ -7,16 +11,13 @@ import com.playmonumenta.plugins.utils.ZoneUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.block.Block;
 import org.bukkit.block.ShulkerBox;
+import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BlockStateMeta;
 import org.bukkit.scheduler.BukkitRunnable;
-
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.UUID;
 
 /**
  * This class allows Shulker Boxes to be opened directly from inventories,
@@ -29,6 +30,7 @@ public class ShulkerInventoryManager {
 	private static final String ERROR_SHULKER_ALREADY_OPEN = ChatColor.RED + "This shulker is already open";
 	private static final String ERROR_SHULKER_ZONE_BLOCKED = ChatColor.RED + "Shulkers can not be opened here";
 	private static final String ERROR_SHULKER_RATE_LIMITED = ChatColor.RED + "Too fast! Please try again";
+	private static ShulkerInventoryManager INSTANCE = null;
 	private final Plugin mPlugin;
 	private final HashMap<UUID, ShulkerInventory> mInventories = new HashMap<>();
 	private final HashMap<UUID, ShulkerInventory> mDepositInventories = new HashMap<>();
@@ -36,6 +38,7 @@ public class ShulkerInventoryManager {
 
 	public ShulkerInventoryManager(Plugin plugin) {
 		mPlugin = plugin;
+		INSTANCE = this;
 	}
 
 	/**
@@ -402,7 +405,10 @@ public class ShulkerInventoryManager {
 	 * @param player The player to be tested
 	 * @return True if the player has a shulker open.
 	 */
-	public boolean playerHasShulkerOpen(Player player) {
-		return mInventories.containsKey(player.getUniqueId());
+	public static boolean playerHasShulkerOpen(HumanEntity player) {
+		if (INSTANCE != null) {
+			return INSTANCE.mInventories.containsKey(player.getUniqueId());
+		}
+		return false;
 	}
 }

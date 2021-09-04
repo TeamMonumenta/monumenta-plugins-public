@@ -5,6 +5,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
+import com.playmonumenta.plugins.inventories.ShulkerInventory;
+import com.playmonumenta.plugins.inventories.ShulkerInventoryManager;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
@@ -141,6 +143,11 @@ public class ChestSortIntegration implements Listener {
 
 	@EventHandler(priority = EventPriority.HIGH)
 	public void chestSortEvent(ChestSortEvent event) {
+		if (!(event.getInventory() instanceof ShulkerInventory) && ShulkerInventoryManager.playerHasShulkerOpen(event.getPlayer())) {
+			event.setCancelled(true);
+			return;
+		}
+
 		for (Map.Entry<ItemStack, Map<String, String>> itemSortMapPair : event.getSortableMaps().entrySet()) {
 			ItemStack item = itemSortMapPair.getKey();
 			Map<String, String> sortMap = itemSortMapPair.getValue();

@@ -74,7 +74,7 @@ public class ShulkerShortcutListener implements Listener {
 			// A player clicked inside an inventory window
 			Player player = (Player)event.getWhoClicked();
 			if (topInventory.getType() == InventoryType.SHULKER_BOX &&           // Player has Shulker open
-			    mPlugin.mShulkerInventoryManager.playerHasShulkerOpen(player) && // Shulker was opened via shortcut
+			    ShulkerInventoryManager.playerHasShulkerOpen(player) &&          // Shulker was opened via shortcut
 			    !mPlugin.mShulkerInventoryManager.updateShulker(player)) {       // Try to update Shulker if it still exists.
 				// The currently open shulker no longer exists, cancel the click and close the inventory.
 				event.setCancelled(true);
@@ -192,7 +192,7 @@ public class ShulkerShortcutListener implements Listener {
 		if (event.getWhoClicked() instanceof Player) {
 			Player player = (Player)event.getWhoClicked();
 			if (event.getView().getTopInventory().getType() == InventoryType.SHULKER_BOX && // Player has Shulker open
-				mPlugin.mShulkerInventoryManager.playerHasShulkerOpen(player) && // Shulker was opened via shortcut
+				ShulkerInventoryManager.playerHasShulkerOpen(player) && // Shulker was opened via shortcut
 				!mPlugin.mShulkerInventoryManager.updateShulker(player)) { // Try to update Shulker if it still exists.
 				// The currently open shulker no longer exists, cancel the click and close the inventory.
 				event.setCancelled(true);
