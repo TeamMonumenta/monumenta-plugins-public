@@ -4,23 +4,26 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Set;
 import java.util.UUID;
-
-import org.bukkit.Location;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.Item;
-import org.bukkit.entity.Player;
-import org.bukkit.event.player.PlayerAttemptPickupItemEvent;
-import org.bukkit.event.world.ChunkLoadEvent;
-import org.bukkit.event.world.ChunkUnloadEvent;
-import org.bukkit.inventory.EquipmentSlot;
-import org.bukkit.inventory.ItemStack;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.playmonumenta.redissync.MonumentaRedisSyncAPI;
 import com.playmonumenta.redissync.event.PlayerSaveEvent;
+
+import org.bukkit.Location;
+import org.bukkit.entity.ArmorStand;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.Item;
+import org.bukkit.entity.Monster;
+import org.bukkit.entity.Player;
+import org.bukkit.event.player.PlayerAttemptPickupItemEvent;
+import org.bukkit.event.world.ChunkLoadEvent;
+import org.bukkit.event.world.ChunkUnloadEvent;
+import org.bukkit.inventory.EquipmentSlot;
+import org.bukkit.inventory.ItemStack;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -140,6 +143,16 @@ public class GraveManager {
 	}
 
 	public static void onChunkLoad(ChunkLoadEvent event) {
+		/*
+		 * Graves are not saved in the chunks they are in - if one chunk loads in, it's because the server crashed
+		 * These graves should be removed, as they're also saved on the player and will be respawned
+		 */
+		for (Entity entity : event.getChunk().getEntities()) {
+			if (entity instanceof ArmorStand && entity.getScoreboardTags().contains("Grave") && !GRAVES.containsKey(entity.getUniqueId())) {
+				entity.remove();
+			}
+		}
+
 		HashSet<Grave> graves = new HashSet<>(getUnloadedGraves(event.getChunk().getChunkKey()));
 		for (Grave grave : graves) {
 			grave.onChunkLoad();
