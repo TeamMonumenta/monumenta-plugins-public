@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.graves;
 
 import java.util.UUID;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -95,6 +96,7 @@ public class GraveItem {
 	Integer mDungeonInstance;
 	Short mAge;
 	Status mStatus;
+	int mTickLastStatusChange;
 
 	private GraveItem(GraveManager manager, Grave grave, Player player, ItemStack item) {
 		mManager = manager;
@@ -108,6 +110,7 @@ public class GraveItem {
 		mAge = null;
 		mStatus = null;
 		mRunnable = null;
+		mTickLastStatusChange = Bukkit.getCurrentTick();
 	}
 
 	// Full GraveItem from deserialized data
@@ -261,6 +264,7 @@ public class GraveItem {
 
 	private void remove(Status newStatus) {
 		mStatus = newStatus;
+		mTickLastStatusChange = Bukkit.getCurrentTick();
 		update();
 		stopTracking();
 		if (mEntity != null) {
@@ -375,6 +379,11 @@ public class GraveItem {
 
 	void onDeath() {
 		if (isInThisWorld() && mStatus == Status.LIMBO) {
+			if (Math.abs(mTickLastStatusChange - Bukkit.getCurrentTick()) < 40) {
+				Plugin.getInstance().getLogger().warning("Tried to shatter an item due to death that was just placed in limbo <2s ago, ignoring");
+				return;
+			}
+
 			ItemUtils.ItemDeathResult result = ItemUtils.getItemDeathResult(mItem);
 			if (result == ItemUtils.ItemDeathResult.SHATTER) {
 				remove(Status.SHATTERED);
@@ -388,7 +397,6 @@ public class GraveItem {
 					mGrave.mAlertedLost = true;
 					mPlayer.sendMessage(Component.text("Some of the items in your grave were lost! This only happens to common items like torches and food; be sure to restock! (/deathhelp for more info)", NamedTextColor.RED));
 				}
-				//TODO Let player know an item in limbo was lost on death
 			}
 		}
 	}
