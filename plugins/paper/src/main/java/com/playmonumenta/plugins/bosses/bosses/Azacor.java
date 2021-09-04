@@ -99,8 +99,11 @@ public class Azacor extends BossAbilityGroup {
 			                       loc.getWorld().playSound(loc, Sound.ENTITY_DRAGON_FIREBALL_EXPLODE, SoundCategory.HOSTILE, 1f, 1.5f);
 			                       loc.getWorld().spawnParticle(Particle.EXPLOSION_LARGE, loc, 30, 0, 0, 0, 0.3);
 			                       if (!blocked) {
-			                           BossUtils.bossDamagePercent(mBoss, player, 0.75);
-			                           player.addPotionEffect(new PotionEffect(PotionEffectType.WITHER, 100, 2));
+									   BossUtils.bossDamagePercent(mBoss, player, 0.75, mBoss.getLocation());
+									   if (BossUtils.bossDamageBlocked(player, 1, mBoss.getLocation())) {
+										   BossUtils.bossDamagePercent(mBoss, player, 0.25);
+									   }
+									   player.addPotionEffect(new PotionEffect(PotionEffectType.WITHER, 100, 2));
 			                       } else {
 									   EntityUtils.summonEntityAt(loc, EntityType.PRIMED_TNT, "{Fuse:0}");
 			                       }
