@@ -670,9 +670,11 @@ public class EntityListener implements Listener {
 						&& itemInMainHand.getEnchantmentLevel(Enchantment.ARROW_INFINITE) > 0) {
 							ThrownPotion potionClone = (ThrownPotion)potion.getWorld().spawnEntity(potion.getLocation(), EntityType.SPLASH_POTION);
 							ItemStack newPotion = potionItem.clone();
-							List<Component> lore = newPotion.lore();
-							lore.removeIf((component) -> !MessagingUtils.plainText(component).contains("* Alchemical Utensil *"));
-							newPotion.lore(lore);
+							if (newPotion.hasItemMeta() && newPotion.getItemMeta().hasLore()) {
+								List<Component> lore = newPotion.lore();
+								lore.removeIf((component) -> !MessagingUtils.plainText(component).contains("* Alchemical Utensil *"));
+								newPotion.lore(lore);
+							}
 							ItemUtils.setPlainTag(newPotion);
 
 							potionClone.setItem(newPotion);
