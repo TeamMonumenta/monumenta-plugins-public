@@ -864,27 +864,12 @@ public class PlayerListener implements Listener {
 		}.runTaskTimer(mPlugin, 0, 1);
 	}
 
-	/** Implements bed teleporters.
-	 *
-	 * When a player sleeps in a bed, the 10 blocks under that bed are checked for
-	 * a regular command block.
-	 *
-	 * If a command block is found, it's command string is used for coordinates to teleport
-	 * the player to after a short delay
-	 */
 	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	public void playerBedEnterEvent(PlayerBedEnterEvent event) {
 		Player player = event.getPlayer();
 		Block bed = event.getBed();
 		Location loc = bed.getLocation();
 		World world = loc.getWorld();
-
-		//Records player's previous spawnpoint
-		Location tempSpawnLoc = world.getSpawnLocation(); //Default spawn is za warudo spawn
-		if (player.getBedSpawnLocation() != null && !(player.getBedSpawnLocation().equals(loc))) {
-			tempSpawnLoc = player.getBedSpawnLocation(); //If the player has another bed in the world, that's their spawn
-		}
-		Location playerSpawn = tempSpawnLoc; //Weird scope error workaround
 
 		/* Prevent entering beds designed to glitch through blocks */
 		Material aboveMat = loc.add(0, 1, 0).getBlock().getType();
@@ -906,6 +891,14 @@ public class PlayerListener implements Listener {
 			return;
 		}
 
+		/** Implements bed teleporters.
+		 *
+		 * When a player sleeps in a bed, the 10 blocks under that bed are checked for
+		 * a regular command block.
+		 *
+		 * If a command block is found, it's command string is used for coordinates to teleport
+		 * the player to after a short delay
+		 */
 		for (double y = 10; y > 0; y--) {
 			loc = loc.subtract(0, 1, 0);
 			Block testblock = loc.getBlock();
@@ -933,21 +926,30 @@ public class PlayerListener implements Listener {
 					// Adjust for player teleports being off-center
 					Location teleLoc = new Location(world, pt.mX - 0.5, pt.mY, pt.mZ - 0.5, yaw, pitch);
 
+					//Records player's previous spawnpoint
+					Location tempSpawnLoc = world.getSpawnLocation(); //Default spawn is za warudo spawn
+					if (player.getBedSpawnLocation() != null && !(player.getBedSpawnLocation().equals(loc))) {
+						tempSpawnLoc = player.getBedSpawnLocation(); //If the player has another bed in the world, that's their spawn
+					}
+					final Location playerSpawn = tempSpawnLoc;
+
 					// Create a deferred task to eject player and teleport them after a short sleep
 					new BukkitRunnable() {
-						Integer mTicks = 0;
+						int mTicks = 0;
+
 						@Override
 						public void run() {
 							GameMode mode;
 							final int BED_TELE_TIME = 20 * 3;
 
-							if (++mTicks == BED_TELE_TIME) {
-								// Abort, player got out of bed early
-								if (player.isSleeping() == false) {
-									this.cancel();
-									return;
-								}
+							if (mTicks == 0) {
+								//Set player's spawnpoint back to whatever it was
+								String cmd = String.format("spawnpoint %s %d %d %d", player.getName(), playerSpawn.getBlockX(), playerSpawn.getBlockY(), playerSpawn.getBlockZ());
+								Bukkit.dispatchCommand(Bukkit.getServer().getConsoleSender(), cmd);
+							}
 
+
+							if (++mTicks == BED_TELE_TIME) {
 								// Get player's current gamemode
 								mode = player.getGameMode();
 
@@ -960,17 +962,16 @@ public class PlayerListener implements Listener {
 								// Set player's gamemode back to whatever it was
 								player.setGameMode(mode);
 
-								//Set player's spawnpoint back to whatever it was
-								//I couldn't find a Bukkit method to do so, ran the spawnpoint command instead from console
-								String cmd = String.format("spawnpoint %s %d %d %d", player.getName(), playerSpawn.getBlockX(), playerSpawn.getBlockY(), playerSpawn.getBlockZ());
-								Bukkit.dispatchCommand(Bukkit.getServer().getConsoleSender(), cmd);
-
 							} else if (mTicks >= BED_TELE_TIME + 1) {
 								player.teleport(teleLoc);
 
 								world.playSound(teleLoc, Sound.ENTITY_ELDER_GUARDIAN_DEATH, 1.0f, 1.3f);
 
 								this.cancel();
+							} else if (player.isSleeping() == false) {
+								// Abort, player got out of bed early
+								this.cancel();
+								return;
 							}
 						}
 					}.runTaskTimer(mPlugin, 0, 1);
