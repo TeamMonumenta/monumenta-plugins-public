@@ -2,12 +2,15 @@ package com.playmonumenta.plugins.enchantments;
 
 import java.util.EnumSet;
 
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
+
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
-import org.bukkit.entity.Arrow;
+import org.bukkit.entity.AbstractArrow;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -16,9 +19,6 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.projectiles.ProjectileSource;
-
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
 
 public class PointBlank implements BaseEnchantment {
 	private static final String PROPERTY_NAME = ChatColor.GRAY + "Point Blank";
@@ -41,7 +41,7 @@ public class PointBlank implements BaseEnchantment {
 	@Override
 	public void onLaunchProjectile(Plugin plugin, Player player, int level, Projectile proj, ProjectileLaunchEvent event) {
 		if (ALLOWED_PROJECTILES.contains(proj.getType())) {
-			if ((proj instanceof Arrow) && !((Arrow)proj).isCritical()) {
+			if ((proj instanceof AbstractArrow) && !((AbstractArrow)proj).isCritical()) {
 				// If this is an arrow, it must be critical. Since this is not, abort early
 				return;
 			}

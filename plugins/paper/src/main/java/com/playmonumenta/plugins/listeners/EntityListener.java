@@ -318,7 +318,7 @@ public class EntityListener implements Listener {
 					}
 
 					// Call events if not a throwing knife
-					if (!(proj instanceof Arrow && ThrowingKnife.isThrowingKnife((Arrow) proj))) {
+					if (!(proj instanceof AbstractArrow && ThrowingKnife.isThrowingKnife((AbstractArrow) proj))) {
 						if (!mAbilities.livingEntityShotByPlayerEvent(player, proj, (LivingEntity) damagee, event)) {
 							damager.remove();
 							event.setCancelled(true);

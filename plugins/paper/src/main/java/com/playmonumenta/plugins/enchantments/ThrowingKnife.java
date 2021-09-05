@@ -2,12 +2,16 @@ package com.playmonumenta.plugins.enchantments;
 
 import java.util.EnumSet;
 
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
+
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.AbstractArrow;
 import org.bukkit.entity.AbstractArrow.PickupStatus;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Player;
@@ -19,9 +23,6 @@ import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.util.Vector;
-
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
 
 public class ThrowingKnife implements BaseEnchantment {
 
@@ -44,7 +45,7 @@ public class ThrowingKnife implements BaseEnchantment {
 		return false;
 	}
 
-	public static boolean isThrowingKnife(Arrow arrow) {
+	public static boolean isThrowingKnife(AbstractArrow arrow) {
 		return arrow.hasMetadata(METADATA_KEY);
 	}
 

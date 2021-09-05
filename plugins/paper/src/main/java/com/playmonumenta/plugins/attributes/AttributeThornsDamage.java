@@ -1,14 +1,14 @@
 package com.playmonumenta.plugins.attributes;
 
-import org.bukkit.entity.Arrow;
+import com.playmonumenta.plugins.Plugin;
+
+import org.bukkit.entity.AbstractArrow;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.projectiles.ProjectileSource;
-
-import com.playmonumenta.plugins.Plugin;
 
 /* Thorns Damage Attribute:
  * +X Thorns Damage
@@ -30,8 +30,8 @@ public class AttributeThornsDamage implements BaseAttribute {
 			return;
 		}
 		//Set damager to shooter of arrow instead of the actual arrow if hit by projectile damage.
-		if (damager instanceof Arrow) {
-			final Arrow arrow = (Arrow) event.getDamager();
+		if (damager instanceof AbstractArrow) {
+			final AbstractArrow arrow = (AbstractArrow) event.getDamager();
 			final ProjectileSource shooter = arrow.getShooter();
 			if (shooter instanceof Entity) {
 				damager = (Entity) shooter;
