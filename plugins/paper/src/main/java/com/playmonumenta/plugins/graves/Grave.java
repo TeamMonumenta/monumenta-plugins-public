@@ -27,6 +27,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.enchantments.Phylactery;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 
 import de.tr7zw.nbtapi.NBTContainer;
@@ -192,6 +193,7 @@ public class Grave {
 		mItems.remove(item);
 		if (isEmpty()) {
 			delete();
+			Phylactery.giveStoredXP(mPlayer);
 		}
 	}
 
@@ -501,6 +503,7 @@ public class Grave {
 		if (isEmpty()) {
 			player.sendMessage(Component.text("Goodbye!", NamedTextColor.AQUA));
 			delete();
+			Phylactery.giveStoredXP(mPlayer);
 		}
 	}
 

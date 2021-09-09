@@ -46,4 +46,8 @@ public class ExperienceUtils {
 		player.setExp(0);
 		player.giveExp(xp);
 	}
+
+	public static void addTotalExperience(Player player, int amount) {
+		setTotalExperience(player, amount + getTotalExperience(player));
+	}
 }

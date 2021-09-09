@@ -127,6 +127,7 @@ public enum CustomEnchantment {
 	COLOSSAL(new Colossal()),
 	HOPE(new Hope()),
 	HOPELESS(new Hopeless()),
+	PHYLACTERY(new Phylactery()),
 
 	// Curses
 	CURSE_ANEMIA(new CurseOfAnemia()),
