@@ -4,6 +4,18 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 
+import org.bukkit.Color;
+import org.bukkit.Location;
+import org.bukkit.Particle;
+import org.bukkit.Particle.DustOptions;
+import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
+import org.bukkit.World;
+import org.bukkit.entity.Player;
+import org.bukkit.scheduler.BukkitRunnable;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.bosses.bosses.BossAbilityGroup;
@@ -18,18 +30,6 @@ import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
-
-import org.bukkit.Color;
-import org.bukkit.Location;
-import org.bukkit.Particle;
-import org.bukkit.Particle.DustOptions;
-import org.bukkit.Sound;
-import org.bukkit.SoundCategory;
-import org.bukkit.World;
-import org.bukkit.entity.Player;
-import org.bukkit.scheduler.BukkitRunnable;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 
 
@@ -379,7 +379,7 @@ public class SpellLightningStrike extends Spell {
 				// similar to bypassIFrames in entity utils, instead of overwriting
 				// last damage to a small amount with every shock
 				player.setNoDamageTicks(0);
-				BossUtils.bossDamagePercent(mKaul.getBoss(), player, SHOCK_DAMAGE_MULTIPLIER, strikeLocation);
+				BossUtils.bossDamagePercent(mKaul.getBoss(), player, SHOCK_DAMAGE_MULTIPLIER, strikeLocation, "Lightning Strike");
 
 				if (mInitialLocationUsed) {
 					shockLightning.mLocation = LocationUtils.getHalfHeightLocation(player);
@@ -532,7 +532,7 @@ public class SpellLightningStrike extends Spell {
 						// similar to bypassIFrames in entity utils, instead of overwriting
 						// last damage to a small amount with every shock
 						player.setNoDamageTicks(0);
-						BossUtils.bossDamagePercent(mKaul.getBoss(), player, FIRE_DAMAGE_MULTIPLIER, fireLocation);
+						BossUtils.bossDamagePercent(mKaul.getBoss(), player, FIRE_DAMAGE_MULTIPLIER, fireLocation, "Lightning Stike");
 					});
 				}
 

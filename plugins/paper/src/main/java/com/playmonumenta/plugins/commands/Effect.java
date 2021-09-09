@@ -4,10 +4,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.potion.PotionManager;
-import com.playmonumenta.plugins.potion.PotionManager.PotionID;
-
 import org.bukkit.GameRule;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
@@ -16,6 +12,10 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.potion.PotionManager;
+import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 
 import dev.jorel.commandapi.CommandAPI;
 import dev.jorel.commandapi.CommandAPICommand;
@@ -119,7 +119,7 @@ public class Effect {
 
 				/* Apply potion via potion manager */
 				manager.addPotion(player, PotionID.APPLIED_POTION,
-				                  new PotionEffect(type, seconds * 20, amplifier, true, true));
+				                  new PotionEffect(type, seconds * 20, amplifier, true, !hideParticles));
 			} else if (e instanceof LivingEntity) {
 				LivingEntity entity = (LivingEntity)e;
 				// Not a player - apply the effect directly

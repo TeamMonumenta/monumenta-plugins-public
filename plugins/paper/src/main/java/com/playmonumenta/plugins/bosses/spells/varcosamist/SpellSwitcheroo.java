@@ -92,7 +92,7 @@ public class SpellSwitcheroo extends Spell {
 				if (mLauncher instanceof LivingEntity) {
 
 					for (Player player : PlayerUtils.playersInRange(targetLoc, 4, false)) {
-						BossUtils.bossDamage((LivingEntity)mLauncher, player, 35);
+						BossUtils.bossDamage((LivingEntity)mLauncher, player, 35, mLauncher.getLocation(), "Shadow Sneak");
 					}
 						new BukkitRunnable() {
 
@@ -106,7 +106,7 @@ public class SpellSwitcheroo extends Spell {
 
 							if (mT % 10 == 0) {
 								for (Player player : PlayerUtils.playersInRange(mobLoc, 3, true)) {
-									BossUtils.bossDamagePercent((LivingEntity)mLauncher, player, 0.05, (Location)null);
+									BossUtils.bossDamagePercent((LivingEntity)mLauncher, player, 0.05, (Location)null, "Phantom Snare");
 								}
 							}
 

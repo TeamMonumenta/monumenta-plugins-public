@@ -93,7 +93,7 @@ public class SpellIvyGarden extends Spell {
 									player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 100, 0));
 									MovementUtils.knockAway(le, player, 1.2f);
 								}
-								BossUtils.bossDamage(le, player, DAMAGE);
+								BossUtils.bossDamage(le, player, DAMAGE, le.getLocation(), "Ivy Garden");
 
 								player.getWorld().spawnParticle(Particle.VILLAGER_ANGRY, player.getLocation().clone().add(0, 1, 0), 4, 0.25, 0.5, 0.25, 0);
 							}

@@ -6,6 +6,7 @@ import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Cow;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.Fish;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
 import org.bukkit.inventory.ItemStack;
@@ -33,6 +34,8 @@ public class BucketOverride extends BaseOverride {
 		if (clickedEntity == null) {
 			return true;
 		} else if (clickedEntity instanceof Cow) {
+			return false;
+		} else if (clickedEntity instanceof Fish && ZoneUtils.hasZoneProperty(clickedEntity, ZoneProperty.ADVENTURE_MODE)) {
 			return false;
 		}
 

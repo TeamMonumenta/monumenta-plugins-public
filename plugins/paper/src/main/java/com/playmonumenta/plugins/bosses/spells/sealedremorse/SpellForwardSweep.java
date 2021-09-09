@@ -80,7 +80,7 @@ public class SpellForwardSweep extends Spell {
 					for (Player player : PlayerUtils.playersInRange(loc, 40, true)) {
 						for (BoundingBox box : boxes) {
 							if (player.getBoundingBox().overlaps(box)) {
-								BossUtils.bossDamage(mBoss, player, 26, null);
+								BossUtils.bossDamage(mBoss, player, 26, null, "Forward Sweep");
 								player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 8, 1));
 							}
 						}

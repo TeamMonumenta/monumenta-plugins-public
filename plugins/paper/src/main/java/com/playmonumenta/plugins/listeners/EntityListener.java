@@ -460,11 +460,8 @@ public class EntityListener implements Listener {
 				}
 			}
 		} else if (damagee instanceof Item) {
-			//TODO Part of old graves, remove in a couple weeks
-			if (damagee.getScoreboardTags().contains("PlayerDeath") && !damagee.getScoreboardTags().contains("ShatterProcessed")) {
-				damagee.addScoreboardTag("ShatterProcessed");
-				damagee.addScoreboardTag("ShatteringNoPickup");
-				GraveUtils.destroyItemEntity((Item) damagee);
+			if (damagee.getTicksLived() <= 100 && (source.equals(DamageCause.ENTITY_EXPLOSION) || source.equals(DamageCause.BLOCK_EXPLOSION))) {
+				event.setCancelled(true);
 			}
 		} else {
 			// Not damaging a player
@@ -831,10 +828,9 @@ public class EntityListener implements Listener {
 		for (Player p : affectedPlayers) {
 			Collection<PotionEffect> appliedEffects = p.getActivePotionEffects();
 			for (PotionEffect pe : appliedEffects) {
-				if (pe.getType().equals(PotionEffectType.SLOW_FALLING) &&
-						p.getGameMode().equals(GameMode.ADVENTURE)) {
-					//Remove Slow Falling effects in Adventure mode areas (#947)
-					p.sendMessage(ChatColor.RED + "You cannot apply slow falling potion effects in adventure mode areas, other effects were still applied.");
+				if (pe.getType().equals(PotionEffectType.SLOW_FALLING)) {
+					//Remove Slow Falling effects
+					p.sendMessage(ChatColor.RED + "You cannot apply slow falling potion effects, other effects were still applied.");
 					p.getServer().getScheduler().scheduleSyncDelayedTask(mPlugin, new Runnable() {
 						@Override
 						public void run() {

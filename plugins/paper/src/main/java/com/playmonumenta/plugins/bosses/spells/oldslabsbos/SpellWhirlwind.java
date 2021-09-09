@@ -98,7 +98,7 @@ public class SpellWhirlwind extends Spell {
 									Player player = iter.next();
 
 									if (player.getLocation().distance(loc) < mBladeDamageRadius) {
-										BossUtils.bossDamage(mBoss, player, 6);
+										BossUtils.bossDamage(mBoss, player, 6, mBoss.getLocation(), "Whirlwind");
 										MovementUtils.knockAway(mBoss.getLocation(), player, 0.5f, 0.65f);
 										iter.remove();
 									}

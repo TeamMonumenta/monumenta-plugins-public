@@ -113,8 +113,7 @@ public class SpellVoidGrenades extends Spell {
 						mWorld.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 2, 0.85f);
 
 						for (Player player : PlayerUtils.playersInRange(loc, 3, true)) {
-							BossUtils.bossDamage(mBoss, player, 40);
-							// Shields don'mTicks stop fire!
+							BossUtils.bossDamage(mBoss, player, 40, null, "Void Grenades");
 						}
 
 						Location alternateHeight = loc.clone();
@@ -137,7 +136,7 @@ public class SpellVoidGrenades extends Spell {
 								if (mTicks % 10 == 0) {
 									for (Player player : PlayerUtils.playersInRange(loc, 3, true)) {
 										/* Fire aura can not be blocked */
-										BossUtils.bossDamagePercent(mBoss, player, 0.1, (Location)null);
+										BossUtils.bossDamagePercent(mBoss, player, 0.1, (Location)null, "Void Grenades");
 									}
 								}
 

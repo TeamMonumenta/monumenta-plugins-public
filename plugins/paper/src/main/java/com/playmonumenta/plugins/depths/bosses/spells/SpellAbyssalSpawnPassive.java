@@ -73,7 +73,7 @@ public class SpellAbyssalSpawnPassive extends Spell {
 
 			if (mTicks % 20 == 0) {
 				for (Player player : PlayerUtils.playersInRange(vex.getLocation(), 2, true)) {
-					BossUtils.bossDamagePercent((LivingEntity) mLauncher, player, 0.2, (Location) null);
+					BossUtils.bossDamagePercent((LivingEntity) mLauncher, player, 0.2, (Location) null, "Abyssal Spawn");
 				}
 			}
 

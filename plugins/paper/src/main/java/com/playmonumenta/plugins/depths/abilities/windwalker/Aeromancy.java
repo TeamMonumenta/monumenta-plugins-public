@@ -12,6 +12,7 @@ import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
+import com.playmonumenta.plugins.events.CustomDamageEvent;
 
 import net.md_5.bungee.api.ChatColor;
 
@@ -39,6 +40,11 @@ public class Aeromancy extends DepthsAbility {
 		event.setDamage(event.getDamage() * damageMultiplier(damagee));
 
 		return true;
+	}
+
+	@Override
+	public void playerDealtCustomDamageEvent(CustomDamageEvent event) {
+		event.setDamage(event.getDamage() * damageMultiplier(event.getDamaged()));
 	}
 
 	private double damageMultiplier(Entity damagee) {

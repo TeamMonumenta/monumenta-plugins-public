@@ -76,7 +76,7 @@ public class SpellEarthsWrath extends Spell {
 								world.spawnParticle(Particle.CLOUD, bLoc, 1, 0, 0, 0, 0);
 								for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), 40, true)) {
 									if (player.getBoundingBox().overlaps(mBox)) {
-										BossUtils.bossDamage(mBoss, player, 28);
+										BossUtils.bossDamage(mBoss, player, 28, mBoss.getLocation(), "Earth's Wrath");
 										MovementUtils.knockAway(centerLoc, player, -0.6f, 0.8f);
 										player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 10, 2));
 										player.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, 20 * 10, -4));

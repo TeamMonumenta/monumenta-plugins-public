@@ -1,14 +1,5 @@
 package com.playmonumenta.plugins.bosses.spells.headlesshorseman;
 
-import com.playmonumenta.plugins.bosses.bosses.HeadlessHorsemanBoss;
-import com.playmonumenta.plugins.bosses.spells.Spell;
-import com.playmonumenta.plugins.player.PPGroundCircle;
-import com.playmonumenta.plugins.player.PartialParticle;
-import com.playmonumenta.plugins.utils.BossUtils;
-import com.playmonumenta.plugins.utils.FastUtils;
-import com.playmonumenta.plugins.utils.MovementUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
-
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -20,6 +11,15 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
+
+import com.playmonumenta.plugins.bosses.bosses.HeadlessHorsemanBoss;
+import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.player.PPGroundCircle;
+import com.playmonumenta.plugins.player.PartialParticle;
+import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.MovementUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 
 
 
@@ -82,7 +82,7 @@ public class SpellBurningVengence extends Spell {
 
 							for (Player player : PlayerUtils.playersInRange(loc, 0.75, true)) {
 								if (mHorseman.getSpawnLocation().distance(player.getLocation()) < HeadlessHorsemanBoss.detectionRange) {
-									BossUtils.bossDamage(mBoss, player, 4);
+									BossUtils.bossDamage(mBoss, player, 4, mBoss.getLocation(), "Burning Vengence");
 									player.setFireTicks(20 * 5);
 									MovementUtils.pullTowardsByUnit(mBoss, player, (float)0.5);
 								}
@@ -102,7 +102,7 @@ public class SpellBurningVengence extends Spell {
 							new PartialParticle(Particle.EXPLOSION_NORMAL, loc, 15, 0, 0, 0, 0.125).spawnAsBoss();
 							for (Player player : PlayerUtils.playersInRange(loc, 5, true)) {
 								if (mHorseman.getSpawnLocation().distance(player.getLocation()) < HeadlessHorsemanBoss.detectionRange) {
-									BossUtils.bossDamagePercent(mBoss, player, 0.5);
+									BossUtils.bossDamagePercent(mBoss, player, 0.5, "Burning Vengence");
 									MovementUtils.knockAway(loc, player, 3.0f);
 								}
 							}

@@ -16,11 +16,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.Nullable;
 
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.TextComponent;
-import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.format.TextDecoration;
-
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityCollection;
@@ -33,6 +28,11 @@ import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
+
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 
 public class YellowTesseractOverride extends BaseOverride {
 	private static final TextComponent TESSERACT_NAME = Component.text("Tesseract of the Elements", NamedTextColor.YELLOW, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false);
@@ -81,6 +81,13 @@ public class YellowTesseractOverride extends BaseOverride {
 			player.sendMessage(Component.text("You need to have a class and abilities first!", NamedTextColor.RED));
 			return false;
 		}
+		// If the player is silenced/stasised, they cannot change abilities
+		// This is to fix an exploit where multiple classes' abilities could be obtained at once
+		if (AbilityManager.getManager().getPlayerAbilities(player).isSilenced()) {
+			player.sendMessage(Component.text("You cannot use this Tesseract while silenced!", NamedTextColor.RED));
+			return false;
+		}
+
 
 		if (!InventoryUtils.testForItemWithLore(item, CLASS_STR)
 				|| !InventoryUtils.testForItemWithName(item, CONFIGURED.content())) {

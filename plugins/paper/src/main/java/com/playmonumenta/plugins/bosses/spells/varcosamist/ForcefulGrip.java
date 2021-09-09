@@ -16,7 +16,7 @@ import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
 
-public class SpellVarcosaHook extends SpellBaseSeekingProjectile {
+public class ForcefulGrip extends SpellBaseSeekingProjectile {
 	public static final int detectionRange = 24;
 
 	private static final boolean SINGLE_TARGET = false;
@@ -31,7 +31,7 @@ public class SpellVarcosaHook extends SpellBaseSeekingProjectile {
 	private static final int DAMAGE = 20;
 
 
-	public SpellVarcosaHook(Plugin plugin, LivingEntity boss, int cooldown, String dio) {
+	public ForcefulGrip(Plugin plugin, LivingEntity boss, int cooldown, String dio) {
 		super(plugin, boss, detectionRange, SINGLE_TARGET, LAUNCH_TRACKING, cooldown, DELAY,
 					SPEED, TURN_RADIUS, LIFETIME_TICKS, HITBOX_LENGTH, COLLIDES_WITH_BLOCKS, LINGERS,
 					// Initiate Aesthetic
@@ -60,7 +60,7 @@ public class SpellVarcosaHook extends SpellBaseSeekingProjectile {
 						world.playSound(loc, Sound.ENTITY_ARMOR_STAND_BREAK, 1f, 0.5f);
 						world.spawnParticle(Particle.CRIT, loc, 50, 0, 0, 0, 0.25);
 						if (player != null) {
-							BossUtils.bossDamage(boss, player, DAMAGE);
+							BossUtils.bossDamage(boss, player, DAMAGE, boss.getLocation(), "Forceful Grip");
 							MovementUtils.pullTowards(boss, player, 1);
 						}
 					});

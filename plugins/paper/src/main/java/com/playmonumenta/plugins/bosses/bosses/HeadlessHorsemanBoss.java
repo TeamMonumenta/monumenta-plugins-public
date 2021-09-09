@@ -36,7 +36,7 @@ import com.playmonumenta.plugins.bosses.BossBarManager.BossHealthAction;
 import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.bosses.spells.SpellConditionalTeleport;
-import com.playmonumenta.plugins.bosses.spells.headlesshorseman.SpellBatBombs;
+import com.playmonumenta.plugins.bosses.spells.headlesshorseman.SpellBeeBombs;
 import com.playmonumenta.plugins.bosses.spells.headlesshorseman.SpellBurningVengence;
 import com.playmonumenta.plugins.bosses.spells.headlesshorseman.SpellHallowsEnd;
 import com.playmonumenta.plugins.bosses.spells.headlesshorseman.SpellHellzoneGrenade;
@@ -155,13 +155,13 @@ public class HeadlessHorsemanBoss extends BossAbilityGroup {
 
 		SpellManager phase1Spells = new SpellManager(Arrays.asList(
 				new SpellHellzoneGrenade(plugin, boss, mSpawnLoc, detectionRange, mCooldownTicks),
-				new SpellBatBombs(plugin, boss, mCooldownTicks, this),
+				new SpellBeeBombs(plugin, boss, mCooldownTicks, this),
 				new SpellBurningVengence(plugin, boss, mCooldownTicks, this)
 				));
 
 		SpellManager phase2Spells = new SpellManager(Arrays.asList(
 				new SpellHellzoneGrenade(plugin, boss, mSpawnLoc, detectionRange, mCooldownTicks),
-				new SpellBatBombs(plugin, boss, mCooldownTicks, this),
+				new SpellBeeBombs(plugin, boss, mCooldownTicks, this),
 				new SpellBurningVengence(plugin, boss, mCooldownTicks, this),
 				new SpellHallowsEnd(plugin, boss, mCooldownTicks, this),
 				new SpellReaperOfLife(plugin, boss, mSpawnLoc, detectionRange, mCooldownTicks)

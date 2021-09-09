@@ -20,7 +20,7 @@ import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 
-public class PassiveEarthCrack extends Spell {
+public class PassiveVoidRift extends Spell {
 	private int mCooldown = 0;
 	private LivingEntity mBoss;
 	private Plugin mPlugin;
@@ -28,7 +28,7 @@ public class PassiveEarthCrack extends Spell {
 
 	private int mRadius = 3;
 
-	public PassiveEarthCrack(LivingEntity boss, Plugin plugin, int timer) {
+	public PassiveVoidRift(LivingEntity boss, Plugin plugin, int timer) {
 		mBoss = boss;
 		mPlugin = plugin;
 		mTimer = timer;
@@ -74,7 +74,7 @@ public class PassiveEarthCrack extends Spell {
 							world.playSound(loc, Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, 1.5f, 1);
 
 							for (Player p : PlayerUtils.playersInRange(loc, mRadius, true)) {
-								BossUtils.bossDamage(mBoss, p, 35);
+								BossUtils.bossDamage(mBoss, p, 35, mBoss.getLocation(), "Void Rift");
 								MovementUtils.knockAway(loc, p, 0f, 1f);
 							}
 						}

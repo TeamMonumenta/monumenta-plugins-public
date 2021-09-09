@@ -6,16 +6,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import com.playmonumenta.plugins.bosses.bosses.FrostGiant;
-import com.playmonumenta.plugins.bosses.spells.Spell;
-import com.playmonumenta.plugins.utils.AbilityUtils;
-import com.playmonumenta.plugins.utils.BossUtils;
-import com.playmonumenta.plugins.utils.FastUtils;
-import com.playmonumenta.plugins.utils.LocationUtils;
-import com.playmonumenta.plugins.utils.MovementUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.plugins.utils.VectorUtils;
-
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -31,6 +21,16 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
+
+import com.playmonumenta.plugins.bosses.bosses.FrostGiant;
+import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.utils.AbilityUtils;
+import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.LocationUtils;
+import com.playmonumenta.plugins.utils.MovementUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.utils.VectorUtils;
 
 
 /*
@@ -186,7 +186,7 @@ public class Shatter extends Spell {
 
 						for (BoundingBox box : boxes) {
 							if (player.getBoundingBox().overlaps(box)) {
-								BossUtils.bossDamage(mBoss, player, 35, null);
+								BossUtils.bossDamage(mBoss, player, 35, null, "Shatter");
 								MovementUtils.knockAway(loc, player, mKnockback, 0.5f, false);
 								AbilityUtils.silencePlayer(player, 20 * 5);
 							}

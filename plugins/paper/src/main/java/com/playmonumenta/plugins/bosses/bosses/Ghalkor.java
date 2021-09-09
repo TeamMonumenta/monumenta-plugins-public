@@ -165,7 +165,7 @@ public class Ghalkor extends BossAbilityGroup {
 
 				//If player too far from arena center or below 4 blocks or too high and either moving very slowly or is on a block, damage them
 				for (Player p : PlayerUtils.playersInRange(mMiddleLoc, detectionRange, true)) {
-					if ((mMiddleLoc.distance(p.getLocation()) > 20
+					if ((mMiddleLoc.distance(p.getLocation()) > 22
 							|| mMiddleLoc.getY() - p.getLocation().getY() >= 3
 							|| (mMiddleLoc.getY() - p.getLocation().getY() <= -3 && (p.getVelocity().getY() <= 0.1 || p.isOnGround())))
 							&& p.getGameMode() != GameMode.CREATIVE) {

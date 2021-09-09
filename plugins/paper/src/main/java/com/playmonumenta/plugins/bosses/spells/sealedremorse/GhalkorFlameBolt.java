@@ -74,7 +74,7 @@ public class GhalkorFlameBolt extends Spell {
 					player.playSound(player.getLocation(), Sound.ENTITY_BLAZE_DEATH, SoundCategory.HOSTILE, 1, 2);
 					player.spawnParticle(Particle.FLAME, loc, 20, 0.5, 0.5, 0.5, 0.5);
 
-					BossUtils.bossDamage(boss, player, DAMAGE);
+					BossUtils.bossDamage(boss, player, DAMAGE, boss.getLocation(), "Flame Bolt");
 					player.setFireTicks(4 * 20);
 				});
 	}

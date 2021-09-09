@@ -41,7 +41,7 @@ public class SpellDashAttack extends SpellBaseCharge {
 		      (Player player) -> {
 		          player.getWorld().spawnParticle(Particle.BLOCK_CRACK, player.getLocation().add(0, 1, 0), 5, 0.4, 0.4, 0.4, 0.4, Material.REDSTONE_BLOCK.createBlockData());
 		          player.getWorld().spawnParticle(Particle.BLOCK_CRACK, player.getLocation().add(0, 1, 0), 12, 0.4, 0.4, 0.4, 0.4, Material.REDSTONE_WIRE.createBlockData());
-		          BossUtils.bossDamage(boss, player, damage);
+		          BossUtils.bossDamage(boss, player, damage, boss.getLocation(), "Charge");
 		      },
 		      // Attack particles
 		      (Location loc) -> {

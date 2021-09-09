@@ -11,6 +11,7 @@ import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
+import com.playmonumenta.plugins.events.CustomDamageEvent;
 import com.playmonumenta.plugins.utils.EntityUtils;
 
 import net.md_5.bungee.api.ChatColor;
@@ -47,6 +48,15 @@ public class Dethroner extends DepthsAbility {
 		}
 
 		return true;
+	}
+
+	@Override
+	public void playerDealtCustomDamageEvent(CustomDamageEvent event) {
+		if (EntityUtils.isBoss(event.getDamaged())) {
+			event.setDamage(event.getDamage() * BOSS_DAMAGE[mRarity - 1]);
+		} else if (EntityUtils.isElite(event.getDamaged())) {
+			event.setDamage(event.getDamage() * ELITE_DAMAGE[mRarity - 1]);
+		}
 	}
 
 	@Override

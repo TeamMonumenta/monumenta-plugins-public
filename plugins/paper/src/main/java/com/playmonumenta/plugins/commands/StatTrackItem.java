@@ -3,13 +3,6 @@ package com.playmonumenta.plugins.commands;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.enchantments.StatTrack.StatTrackOptions;
-import com.playmonumenta.plugins.enchantments.StatTrackManager;
-import com.playmonumenta.plugins.player.PlayerData;
-import com.playmonumenta.plugins.utils.CommandUtils;
-import com.playmonumenta.plugins.utils.InventoryUtils;
-
 import org.bukkit.Color;
 import org.bukkit.FireworkEffect;
 import org.bukkit.Location;
@@ -20,6 +13,13 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.scheduler.BukkitRunnable;
+
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.enchantments.StatTrack.StatTrackOptions;
+import com.playmonumenta.plugins.enchantments.StatTrackManager;
+import com.playmonumenta.plugins.player.PlayerData;
+import com.playmonumenta.plugins.utils.CommandUtils;
+import com.playmonumenta.plugins.utils.InventoryUtils;
 
 import dev.jorel.commandapi.CommandAPI;
 import dev.jorel.commandapi.CommandAPICommand;
@@ -174,14 +174,21 @@ public class StatTrackItem extends GenericCommand {
 		if (type == null) {
 			player.sendMessage("Could not find stat track infusion type!");
 			return;
-		} else {
-			//Remove the lore from the item
-			InventoryUtils.removeCustomEnchant(is, ChatColor.RED + type.getEnchantName() + ": ");
-			InventoryUtils.removeCustomEnchant(is, ChatColor.GRAY + "Stat Track");
-			InventoryUtils.removeCustomEnchant(is, "Tracked by");
-			player.sendMessage("Removed Stat Tracking from your item!");
-			animate(player);
 		}
+
+		for (String line : is.getLore()) {
+			if (line.contains("Tracked by " + player.getName())) {
+				//Remove the lore from the item
+				InventoryUtils.removeCustomEnchant(is, ChatColor.RED + type.getEnchantName() + ": ");
+				InventoryUtils.removeCustomEnchant(is, ChatColor.GRAY + "Stat Track");
+				InventoryUtils.removeCustomEnchant(is, "Tracked by");
+				player.sendMessage("Removed Stat Tracking from your item!");
+				animate(player);
+				return;
+			}
+		}
+
+		player.sendMessage("You cannot remove stat track from an item not tracked by you!");
 	}
 
 	//Firework effect for stat infusion

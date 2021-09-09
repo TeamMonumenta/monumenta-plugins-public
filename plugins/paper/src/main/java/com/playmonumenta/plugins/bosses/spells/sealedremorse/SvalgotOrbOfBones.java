@@ -76,7 +76,7 @@ public class SvalgotOrbOfBones extends SpellBaseSeekingProjectile {
 					world.spawnParticle(Particle.CLOUD, loc, 40, 1, 1, 1, 0.5);
 
 					for (Player p : PlayerUtils.playersInRange(loc, 5, true)) {
-						BossUtils.bossDamage(boss, p, DAMAGE, null);
+						BossUtils.bossDamage(boss, p, DAMAGE, null, "Orb of Bones");
 						p.setFireTicks(4 * 20);
 					}
 				});
@@ -131,7 +131,7 @@ public class SvalgotOrbOfBones extends SpellBaseSeekingProjectile {
 		world.spawnParticle(Particle.REDSTONE, loc, 40, 0.5, 0.5, 0.5, new Particle.DustOptions(Color.fromRGB(255, 0, 0), 1.0f));
 
 		for (Player p : PlayerUtils.playersInRange(loc, 6, true)) {
-			BossUtils.bossDamage(mBoss, p, DAMAGE, null);
+			BossUtils.bossDamage(mBoss, p, DAMAGE, null, "Orb of Bones");
 			p.setFireTicks(4 * 20);
 		}
 	}

@@ -13,8 +13,8 @@ public class BrutalAlchemy extends PotionAbility {
 	private static final int BRUTAL_ALCHEMY_1_DAMAGE = 1;
 	private static final int BRUTAL_ALCHEMY_2_DAMAGE = 2;
 	private static final int BRUTAL_ALCHEMY_DURATION = 20 * 8;
-	private static final int BRUTAL_ALCHEMY_1_VULNERABILITY_AMPLIFIER = 1;
-	private static final int BRUTAL_ALCHEMY_2_VULNERABILITY_AMPLIFIER = 2;
+	private static final int BRUTAL_ALCHEMY_1_VULNERABILITY_AMPLIFIER = 2;
+	private static final int BRUTAL_ALCHEMY_2_VULNERABILITY_AMPLIFIER = 4;
 
 	private final int mVulnerabilityAmplifier;
 
@@ -23,8 +23,8 @@ public class BrutalAlchemy extends PotionAbility {
 		mInfo.mLinkedSpell = ClassAbility.BRUTAL_ALCHEMY;
 		mInfo.mScoreboardId = "BrutalAlchemy";
 		mInfo.mShorthandName = "BA";
-		mInfo.mDescriptions.add("Your Alchemist's Potions deal +1 damage and 10% Vulnerability for 8 seconds.");
-		mInfo.mDescriptions.add("Your Alchemist's Potions now deal +2 damage and 15% Vulnerability.");
+		mInfo.mDescriptions.add("Your Alchemist's Potions deal +1 damage and 15% Vulnerability for 8 seconds.");
+		mInfo.mDescriptions.add("Your Alchemist's Potions now deal +2 damage and 25% Vulnerability.");
 
 		mVulnerabilityAmplifier = getAbilityScore() == 1 ? BRUTAL_ALCHEMY_1_VULNERABILITY_AMPLIFIER : BRUTAL_ALCHEMY_2_VULNERABILITY_AMPLIFIER;
 	}

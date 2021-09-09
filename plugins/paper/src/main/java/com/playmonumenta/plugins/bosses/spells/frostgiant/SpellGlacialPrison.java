@@ -195,7 +195,7 @@ public class SpellGlacialPrison extends Spell {
 									world.playSound(center, Sound.BLOCK_GLASS_BREAK, SoundCategory.HOSTILE, 1, 0.75f);
 									world.playSound(center, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 1, 0.75f);
 									if (player.getLocation().distance(center) <= 2) {
-										BossUtils.bossDamagePercent(mBoss, player, 0.8);
+										BossUtils.bossDamagePercent(mBoss, player, 0.8, "Glacial Prison");
 									}
 								}
 							}

@@ -191,7 +191,7 @@ public class SpellFrostRift extends Spell {
 
 				for (Player player : players) {
 					if (player.getBoundingBox().overlaps(mBox)) {
-						BossUtils.bossDamage(mBoss, player, 30);
+						BossUtils.bossDamage(mBoss, player, 30, mBoss.getLocation(), "Frost Rift");
 					}
 				}
 				if (bLoc.distance(mOgLoc) >= 50) {
@@ -219,7 +219,7 @@ public class SpellFrostRift extends Spell {
 					BoundingBox box = BoundingBox.of(loc, 0.85, 1.2, 0.85);
 					for (Player player : players) {
 						if (player.getBoundingBox().overlaps(box)) {
-							BossUtils.bossDamage(mBoss, player, 25, null);
+							BossUtils.bossDamage(mBoss, player, 25, null, "Frost Rift");
 							player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 6, 2));
 							player.addPotionEffect(new PotionEffect(PotionEffectType.HUNGER, 20 * 6, 49));
 						}

@@ -16,6 +16,7 @@ import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.enchantments.Inferno;
+import com.playmonumenta.plugins.events.CustomDamageEvent;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
 
@@ -44,6 +45,19 @@ public class Icebreaker extends DepthsAbility {
 	@Override
 	public boolean livingEntityShotByPlayerEvent(Projectile proj, LivingEntity damagee, EntityDamageByEntityEvent event) {
 		return handleEvent(damagee, event);
+	}
+
+	@Override
+	public void playerDealtCustomDamageEvent(CustomDamageEvent event) {
+		LivingEntity entity = event.getDamaged();
+		List<PotionEffectType> e = PotionUtils.getNegativeEffects(mPlugin, entity);
+		if (isOnIce(entity)) {
+			event.setDamage(ICE_DAMAGE[mRarity - 1] * event.getDamage());
+		} else if (e.size() > 0 || EntityUtils.isStunned(entity) || EntityUtils.isConfused(entity) || EntityUtils.isBleeding(mPlugin, entity)
+				|| EntityUtils.isSlowed(mPlugin, entity) || EntityUtils.isWeakened(mPlugin, entity) || EntityUtils.isSilenced(entity) || EntityUtils.vulnerabilityMult(entity) > 1
+				|| entity.getFireTicks() > 0 || Inferno.getMobInfernoLevel(mPlugin, entity) > 0) {
+			event.setDamage(EFFECT_DAMAGE[mRarity - 1] * event.getDamage());
+		}
 	}
 
 	public boolean handleEvent(LivingEntity entity, EntityDamageByEntityEvent event) {

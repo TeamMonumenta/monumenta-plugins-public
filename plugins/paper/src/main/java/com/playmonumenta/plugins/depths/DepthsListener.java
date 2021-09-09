@@ -87,13 +87,13 @@ public class DepthsListener implements Listener {
 				}
 			}
 			if (totalChance >= 100) {
-				Sundrops.summonSundrop(event.getBlock().getLocation());
+				Sundrops.summonSundrop(event.getBlock().getLocation().add(0.5, 0, 0.5));
 			} else if (totalChance > 0) {
 				//Do the random roll
 				Random r = new Random();
 				int roll = r.nextInt(100) + 1;
 				if (roll < totalChance) {
-					Sundrops.summonSundrop(event.getBlock().getLocation());
+					Sundrops.summonSundrop(event.getBlock().getLocation().add(0.5, 0, 0.5));
 				}
 			}
 

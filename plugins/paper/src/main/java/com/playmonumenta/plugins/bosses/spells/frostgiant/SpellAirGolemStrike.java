@@ -140,7 +140,7 @@ public class SpellAirGolemStrike extends Spell {
 					BoundingBox box = BoundingBox.of(loc, 1, 20, 1);
 					for (Player player : players) {
 						if (box.overlaps(player.getBoundingBox())) {
-							BossUtils.bossDamage(mBoss, player, 45);
+							BossUtils.bossDamage(mBoss, player, 45, mBoss.getLocation(), "Air Golem Strike");
 						}
 					}
 					Location particleLoc = loc.clone();
@@ -215,7 +215,7 @@ public class SpellAirGolemStrike extends Spell {
 
 						}.runTaskLater(mPlugin, 30);
 						if (target instanceof Player) {
-							BossUtils.bossDamage(golem, (Player) target, mAttackDamage);
+							BossUtils.bossDamage(golem, (Player) target, mAttackDamage, mBoss.getLocation(), "Air Golem Strike");
 						} else {
 							target.damage(mAttackDamage, golem);
 						}

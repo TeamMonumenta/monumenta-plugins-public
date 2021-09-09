@@ -149,7 +149,7 @@ public class SpellTitanicRupture extends Spell {
 					BoundingBox smallBox = BoundingBox.of(loc, 1, 20, 1);
 					for (Player player : players) {
 						if (smallBox.overlaps(player.getBoundingBox())) {
-							BossUtils.bossDamagePercent(mBoss, player, 1);
+							BossUtils.bossDamagePercent(mBoss, player, 1, "Titanic Rupture");
 							player.damage(420, mBoss);
 						}
 					}
@@ -157,7 +157,7 @@ public class SpellTitanicRupture extends Spell {
 					BoundingBox box = BoundingBox.of(loc, 4, 20, 4);
 					for (Player player : players) {
 						if (box.overlaps(player.getBoundingBox())) {
-							BossUtils.bossDamagePercent(mBoss, player, 0.8);
+							BossUtils.bossDamagePercent(mBoss, player, 0.8, "Titanic Rupture");
 						}
 					}
 					Location particleLoc = loc.clone();

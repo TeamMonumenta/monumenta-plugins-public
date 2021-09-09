@@ -6,11 +6,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.utils.FastUtils;
-import com.playmonumenta.plugins.utils.InventoryUtils;
-import com.playmonumenta.plugins.utils.ItemUtils;
-
 import org.bukkit.Sound;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Item;
@@ -23,6 +18,11 @@ import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.scheduler.BukkitRunnable;
+
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.utils.ItemUtils;
 
 import de.tr7zw.nbtapi.NBTEntity;
 
@@ -57,7 +57,7 @@ public class DeathItemListener implements Listener {
 
 			//Do not put in the death map of a player with no items
 			for (ItemStack item : beforeDeathItems) {
-				if (item != null && !item.getType().isAir()) {
+				if (item != null && !item.getType().isAir() && item.hasItemMeta()) {
 					//Found at least one non-air item
 					//Save the player's death inventory
 					//Update inventory includes the 15 minute timer that starts to run on death (synced up to hoped items despawn timer)

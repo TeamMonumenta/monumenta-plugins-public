@@ -21,7 +21,7 @@ import com.playmonumenta.plugins.bosses.spells.SpellBaseSeekingProjectile;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 
-public class PassiveSeekingProjectile extends SpellBaseSeekingProjectile {
+public class NothingnessSeeker extends SpellBaseSeekingProjectile {
 
 	private static final boolean SINGLE_TARGET = true;
 	private static final boolean LAUNCH_TRACKING = false;
@@ -41,7 +41,7 @@ public class PassiveSeekingProjectile extends SpellBaseSeekingProjectile {
 
 	private static final Particle.DustOptions GREEN_COLOR = new Particle.DustOptions(Color.fromRGB(0, 255, 0), 1.0f);
 
-	public PassiveSeekingProjectile(Plugin plugin, LivingEntity boss, int timer, double speed, boolean delve) {
+	public NothingnessSeeker(Plugin plugin, LivingEntity boss, int timer, double speed, boolean delve) {
 		super(plugin, boss, FalseSpirit.detectionRange, SINGLE_TARGET, LAUNCH_TRACKING, COOLDOWN, DELAY,
 				speed, TURN_RADIUS, LIFETIME_TICKS, HITBOX_LENGTH, COLLIDES_WITH_BLOCKS, LINGERS,
 				// Initiate Aesthetic
@@ -67,9 +67,9 @@ public class PassiveSeekingProjectile extends SpellBaseSeekingProjectile {
 					world.spawnParticle(Particle.REDSTONE, loc, 50, 0.5, 0.5, 0.5, 0.25, GREEN_COLOR);
 					if (player != null) {
 						if (delve) {
-							BossUtils.bossDamage(boss, player, 30);
+							BossUtils.bossDamage(boss, player, 30, boss.getLocation(), "Nothingness Seeker");
 						} else {
-							BossUtils.bossDamage(boss, player, 25);
+							BossUtils.bossDamage(boss, player, 25, boss.getLocation(), "Nothingness Seeker");
 						}
 					}
 				});

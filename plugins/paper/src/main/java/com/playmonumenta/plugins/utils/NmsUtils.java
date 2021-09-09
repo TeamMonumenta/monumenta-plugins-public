@@ -59,8 +59,15 @@ public class NmsUtils {
 	}
 
 	private static class UnblockableEntityDamageSource extends EntityDamageSource {
+		String mKilledUsingMsg;
+
 		public UnblockableEntityDamageSource(Entity entity) {
 			super("custom", entity);
+		}
+
+		public UnblockableEntityDamageSource(Entity damager, @Nullable String killedUsingMsg) {
+			super("custom", damager);
+			mKilledUsingMsg = killedUsingMsg;
 		}
 
 		@Override
@@ -70,19 +77,29 @@ public class NmsUtils {
 
 		@Override
 		public IChatBaseComponent getLocalizedDeathMessage(EntityLiving entityliving) {
-			String s = "death.attack.mob";
-			return new ChatMessage(s, new Object[] { entityliving.getScoreboardDisplayName(), this.w.getScoreboardDisplayName()});
+			if (mKilledUsingMsg == null) {
+				String s = "death.attack.mob";
+				return new ChatMessage(s, new Object[] { entityliving.getScoreboardDisplayName(), this.w.getScoreboardDisplayName()});
+			} else {
+				// death.attack.indirectMagic.item=%1$s was killed by %2$s using %3$s
+				String s = "death.attack.indirectMagic.item";
+				return new ChatMessage(s, new Object[] { entityliving.getScoreboardDisplayName(), this.w.getScoreboardDisplayName(), mKilledUsingMsg});
+			}
 		}
 
 	}
 
 	public static void unblockableEntityDamageEntity(@Nonnull LivingEntity damagee, double amount, @Nonnull LivingEntity damager) {
+		unblockableEntityDamageEntity(damagee, amount, damager, null);
+	}
+
+	public static void unblockableEntityDamageEntity(@Nonnull LivingEntity damagee, double amount, @Nonnull LivingEntity damager, String cause) {
 		// Don't damage invulnerable entities even though this is unblockable
 		if (damagee.isInvulnerable()) {
 			return;
 		}
 
-		DamageSource reason = new UnblockableEntityDamageSource(damager == null ? null : ((CraftLivingEntity) damager).getHandle());
+		DamageSource reason = new UnblockableEntityDamageSource(damager == null ? null : ((CraftLivingEntity) damager).getHandle(), cause);
 
 		((CraftLivingEntity)damagee).getHandle().damageEntity(reason, (float) amount);
 	}

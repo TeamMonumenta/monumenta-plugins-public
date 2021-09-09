@@ -44,7 +44,6 @@ import com.playmonumenta.plugins.abilities.alchemist.BrutalAlchemy;
 import com.playmonumenta.plugins.abilities.alchemist.EnfeeblingElixir;
 import com.playmonumenta.plugins.abilities.alchemist.GruesomeAlchemy;
 import com.playmonumenta.plugins.abilities.alchemist.IronTincture;
-import com.playmonumenta.plugins.abilities.alchemist.NonAlchemistPotionPassive;
 import com.playmonumenta.plugins.abilities.alchemist.PowerInjection;
 import com.playmonumenta.plugins.abilities.alchemist.UnstableArrows;
 import com.playmonumenta.plugins.abilities.alchemist.apothecary.AlchemicalAmalgam;
@@ -125,12 +124,12 @@ import com.playmonumenta.plugins.abilities.rogue.swordsage.WindWalk;
 import com.playmonumenta.plugins.abilities.scout.Agility;
 import com.playmonumenta.plugins.abilities.scout.BowMastery;
 import com.playmonumenta.plugins.abilities.scout.EagleEye;
-import com.playmonumenta.plugins.abilities.scout.WindBomb;
 import com.playmonumenta.plugins.abilities.scout.ScoutPassive;
 import com.playmonumenta.plugins.abilities.scout.Sharpshooter;
 import com.playmonumenta.plugins.abilities.scout.SwiftCuts;
 import com.playmonumenta.plugins.abilities.scout.Swiftness;
 import com.playmonumenta.plugins.abilities.scout.Volley;
+import com.playmonumenta.plugins.abilities.scout.WindBomb;
 import com.playmonumenta.plugins.abilities.scout.hunter.HuntingCompanion;
 import com.playmonumenta.plugins.abilities.scout.hunter.PinningShot;
 import com.playmonumenta.plugins.abilities.scout.hunter.SplitArrow;
@@ -221,8 +220,6 @@ public class AbilityManager {
 			// ALL (CLUCKING POTIONS)
 			new CluckingPotions(mPlugin, null),
 
-			// ALL PLAYERS (but technically for Alchemist)
-			new NonAlchemistPotionPassive(mPlugin, null),
 			// ALL PLAYERS (but technically for Cleric)
 			new NonClericProvisionsPassive(mPlugin, null),
 

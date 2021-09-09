@@ -38,7 +38,7 @@ import com.playmonumenta.plugins.bosses.spells.varcosamist.SpellJibberJabber;
 import com.playmonumenta.plugins.bosses.spells.varcosamist.SpellPurgeGlowing;
 import com.playmonumenta.plugins.bosses.spells.varcosamist.SpellSummonConstantly;
 import com.playmonumenta.plugins.bosses.spells.varcosamist.SpellSwitcheroo;
-import com.playmonumenta.plugins.bosses.spells.varcosamist.SpellVarcosaHook;
+import com.playmonumenta.plugins.bosses.spells.varcosamist.ForcefulGrip;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
@@ -91,7 +91,7 @@ public class VarcosaLingeringWillBoss extends BossAbilityGroup {
 						new SpellDeathlyCharge(mPlugin, mBoss, 20 * 15, "The Mist is callin' ye still. Let it in...!"),
 						new SpellGhostlyCannons(mPlugin, mBoss, 22, mCenter, true, "Call down the cannons mateys, right quick!"),
 						new SpellSwitcheroo(mPlugin, mBoss, 20 * 10, 30, "A trap be set now. Get ye into it!"),
-						new SpellVarcosaHook(mPlugin, mBoss, 20 * 10, "Yarr, get ye over here! I'll deal with ye myself.") //change later lmao
+						new ForcefulGrip(mPlugin, mBoss, 20 * 10, "Yarr, get ye over here! I'll deal with ye myself.") //change later lmao
 				));
 
 		//Passive Spells

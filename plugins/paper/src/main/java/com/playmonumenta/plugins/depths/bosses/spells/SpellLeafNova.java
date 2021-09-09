@@ -49,7 +49,7 @@ public class SpellLeafNova extends SpellBaseAoE {
 			},
 			(Location loc) -> {
 				for (Player player : PlayerUtils.playersInRange(launcher.getLocation(), radius, true)) {
-					BossUtils.bossDamagePercent(launcher, player, DAMAGE, (Location) null);
+					BossUtils.bossDamagePercent(launcher, player, DAMAGE, (Location) null, "Leaf Nova");
 					player.addPotionEffect(new PotionEffect(PotionEffectType.HUNGER, 20 * 6, 4));
 				}
 			}

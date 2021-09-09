@@ -37,7 +37,7 @@ import com.playmonumenta.plugins.bosses.spells.sealedremorse.BlackflameBurst;
 import com.playmonumenta.plugins.bosses.spells.sealedremorse.BlackflameCharge;
 import com.playmonumenta.plugins.bosses.spells.sealedremorse.BlackflameGolemNecromancy;
 import com.playmonumenta.plugins.bosses.spells.sealedremorse.BlackflameOrb;
-import com.playmonumenta.plugins.bosses.spells.sealedremorse.PassiveEarthCrack;
+import com.playmonumenta.plugins.bosses.spells.sealedremorse.PassiveVoidRift;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.SerializationUtils;
@@ -97,7 +97,7 @@ public class BeastOfTheBlackFlame extends BossAbilityGroup {
 		List<Spell> lowHealthPassives = Arrays.asList(
 				new SpellPurgeNegatives(boss, 20 * 3),
 				new SpellBlockBreak(boss, 2, 3, 2),
-				new PassiveEarthCrack(boss, plugin, 20 * 9)
+				new PassiveVoidRift(boss, plugin, 20 * 9)
 			);
 
 		Map<Integer, BossHealthAction> events = new HashMap<Integer, BossHealthAction>();
@@ -132,7 +132,7 @@ public class BeastOfTheBlackFlame extends BossAbilityGroup {
 
 				//If player too far from arena center or below 4 blocks or too high and either moving very slowly or is on a block, damage them
 				for (Player p : PlayerUtils.playersInRange(mSpawnLoc, detectionRange, true)) {
-					if ((mSpawnLoc.distance(p.getLocation()) > 20
+					if ((mSpawnLoc.distance(p.getLocation()) > 22
 							|| mSpawnLoc.getY() - p.getLocation().getY() >= 3
 							|| (mSpawnLoc.getY() - p.getLocation().getY() <= -3 && (p.getVelocity().getY() <= 0.1 || p.isOnGround())))
 							&& p.getGameMode() != GameMode.CREATIVE) {

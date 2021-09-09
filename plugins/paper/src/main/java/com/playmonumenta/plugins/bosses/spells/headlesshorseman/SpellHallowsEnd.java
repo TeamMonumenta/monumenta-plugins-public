@@ -75,7 +75,7 @@ public class SpellHallowsEnd extends Spell {
 						if (mHorseman.getSpawnLocation().distance(player.getLocation()) < HeadlessHorsemanBoss.detectionRange) {
 							int mNDT = player.getNoDamageTicks();
 							player.setNoDamageTicks(0);
-							BossUtils.bossDamage(mBoss, player, 50);
+							BossUtils.bossDamage(mBoss, player, 50, mBoss.getLocation(), "Hallow's End");
 							player.setFireTicks(20 * 8);
 							player.setNoDamageTicks(mNDT);
 							MovementUtils.knockAway(loc, player, 0.50f, 1.5f);

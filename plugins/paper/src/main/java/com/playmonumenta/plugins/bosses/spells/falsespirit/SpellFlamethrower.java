@@ -177,9 +177,9 @@ public class SpellFlamethrower extends Spell {
 										if (box.overlaps(player.getBoundingBox()) && !mHitPlayers.contains(player)) {
 											endLoc.getWorld().playSound(endLoc, Sound.BLOCK_FIRE_EXTINGUISH, SoundCategory.HOSTILE, 1, 1);
 											if (mDelve) {
-												BossUtils.bossDamagePercent(mBoss, player, 0.25);
+												BossUtils.bossDamagePercent(mBoss, player, 0.25, "Flamethrower");
 											} else {
-												BossUtils.bossDamagePercent(mBoss, player, 0.2);
+												BossUtils.bossDamagePercent(mBoss, player, 0.2, "Flamethrower");
 											}
 											mHitPlayers.add(player);
 										}

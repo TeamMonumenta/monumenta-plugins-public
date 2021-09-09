@@ -77,7 +77,7 @@ public class TriplicateSlash extends Spell {
 					for (Player player : PlayerUtils.playersInRange(loc, 40, true)) {
 						for (BoundingBox box : boxes) {
 							if (player.getBoundingBox().overlaps(box)) {
-								BossUtils.bossDamage(mBoss, player, 30, null);
+								BossUtils.bossDamage(mBoss, player, 30, null, "Triplicate Slash");
 							}
 						}
 					}

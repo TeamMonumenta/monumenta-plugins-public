@@ -63,7 +63,7 @@ public class SvalgotBoneSweep extends Spell {
 					world.spawnParticle(Particle.LAVA, loc, 100, 3, 0.1, 3, 0.25);
 					world.spawnParticle(Particle.EXPLOSION_NORMAL, loc, 75, 3, 0.1, 3, 0.25);
 					for (Player player : PlayerUtils.playersInRange(loc, 4, true)) {
-						BossUtils.bossDamagePercent(mBoss, player, .6, null);
+						BossUtils.bossDamagePercent(mBoss, player, .6, "Bone Sweep");
 						MovementUtils.knockAway(loc, player, 0.50f, 1f);
 						player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 10, 2));
 					}

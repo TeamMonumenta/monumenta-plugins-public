@@ -66,6 +66,7 @@ public class DepthsVolley extends DepthsAbility {
 		world.playSound(mPlayer.getLocation(), Sound.ENTITY_ARROW_SHOOT, 1, 1f);
 		world.playSound(mPlayer.getLocation(), Sound.ENTITY_ARROW_SHOOT, 1, 1.33f);
 
+		float arrowSpeed = (float) (arrow.getVelocity().length());
 		// Give time for other skills to set data
 		new BukkitRunnable() {
 			@Override
@@ -86,9 +87,9 @@ public class DepthsVolley extends DepthsAbility {
 						}
 					}
 
-					projectiles = EntityUtils.spawnArrowVolley(mPlugin, mPlayer, numArrows, 1.75f, 5, Arrow.class);
+					projectiles = EntityUtils.spawnArrowVolley(mPlugin, mPlayer, numArrows, arrowSpeed, 5, Arrow.class);
 				} else {
-					projectiles = EntityUtils.spawnArrowVolley(mPlugin, mPlayer, numArrows, 1.75f, 5, SpectralArrow.class);
+					projectiles = EntityUtils.spawnArrowVolley(mPlugin, mPlayer, numArrows, arrowSpeed, 5, SpectralArrow.class);
 				}
 
 				for (Projectile proj : projectiles) {

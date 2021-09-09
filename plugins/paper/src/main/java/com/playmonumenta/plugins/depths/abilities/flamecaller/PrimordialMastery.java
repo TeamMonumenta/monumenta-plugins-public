@@ -2,13 +2,12 @@ package com.playmonumenta.plugins.depths.abilities.flamecaller;
 
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
+import com.playmonumenta.plugins.events.CustomDamageEvent;
 
 import net.md_5.bungee.api.ChatColor;
 
@@ -26,13 +25,10 @@ public class PrimordialMastery extends DepthsAbility {
 	}
 
 	@Override
-	public boolean livingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
-		if (event.getCause() == DamageCause.CUSTOM) {
-			double originalDamage = event.getDamage();
-			double modifiedDamage = originalDamage * SPELL_MOD[mRarity - 1];
-			event.setDamage(modifiedDamage);
-		}
-		return true;
+	public void playerDealtCustomDamageEvent(CustomDamageEvent event) {
+		double originalDamage = event.getDamage();
+		double modifiedDamage = originalDamage * SPELL_MOD[mRarity - 1];
+		event.setDamage(modifiedDamage);
 	}
 
 	@Override

@@ -6,6 +6,17 @@ import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.List;
 
+import org.bukkit.Location;
+import org.bukkit.NamespacedKey;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
+import org.bukkit.entity.ThrownPotion;
+import org.bukkit.event.entity.PotionSplashEvent;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.PlayerInventory;
+import org.bukkit.metadata.FixedMetadataValue;
+import org.bukkit.scheduler.BukkitRunnable;
+
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityManager;
@@ -29,17 +40,6 @@ import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
 
-import org.bukkit.Location;
-import org.bukkit.NamespacedKey;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
-import org.bukkit.entity.ThrownPotion;
-import org.bukkit.event.entity.PotionSplashEvent;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.PlayerInventory;
-import org.bukkit.metadata.FixedMetadataValue;
-import org.bukkit.scheduler.BukkitRunnable;
-
 /*
  * Handles giving potions on kills and the direct damage aspect
  */
@@ -51,8 +51,8 @@ public class AlchemistPotions extends Ability {
 		}
 	}
 
-	private static final int MAX_CHARGE_POTIONS = 16;
-	private static final int POTIONS_TIMER = 16 * 20;
+	private static final int MAX_CHARGE_POTIONS = 4;
+	private static final int POTIONS_TIMER = (int) (2.5 * 20);
 	private static final int POTIONS_TIMER_TOWN = 1 * 20;
 
 	private static final double DAMAGE_PER_SKILL_POINT = 0.5;
@@ -60,8 +60,6 @@ public class AlchemistPotions extends Ability {
 	private static final String POTION_SCOREBOARD = "StoredPotions";
 
 	public static final String POTION_METADATA_PLAYER_NAME = "HitByAlchemist";
-	public static final int NORMAL_MOB_HEALTH_PER_POTION = 30;
-	public static final int BOSS_MOB_HEALTH_PER_POTION = 60;
 
 	private List<PotionAbility> mPotionAbilities = new ArrayList<PotionAbility>();
 	private double mDamage = 0;
@@ -254,31 +252,13 @@ public class AlchemistPotions extends Ability {
 		return false;
 	}
 
-	public boolean incrementChargeByQuantity(int quantity) {
-		if (mCharges < MAX_CHARGE_POTIONS) {
-			if (mCharges + quantity < MAX_CHARGE_POTIONS) {
-				mCharges += quantity;
-			} else {
-				mCharges = MAX_CHARGE_POTIONS;
-			}
-			ScoreboardUtils.setScoreboardValue(mPlayer, POTION_SCOREBOARD, mCharges);
-			//update item
-			ItemStack item = mPlayer.getInventory().getItem(mSlot);
-			if (item != null) {
-				AbilityUtils.updateAlchemistItem(item, mCharges);
-			}
-			return true;
-		}
-		return false;
-	}
-
 	private boolean mOnCooldown = false;
 
 	@Override
 	public void periodicTrigger(boolean twoHertz, boolean oneSecond, int ticks) {
-		if (oneSecond) {
+		if (twoHertz) {
 			if (mOnCooldown) {
-				mTimer += 20;
+				mTimer += 10;
 				if (mTimer >= POTIONS_TIMER || (ZoneUtils.hasZoneProperty(mPlayer, ZoneProperty.RESIST_5) && mTimer >= POTIONS_TIMER_TOWN)) {
 					mTimer = 0;
 					incrementCharge();
@@ -288,6 +268,16 @@ public class AlchemistPotions extends Ability {
 
 			if (mCharges < MAX_CHARGE_POTIONS) {
 				mOnCooldown = true;
+			}
+
+			if (mCharges > MAX_CHARGE_POTIONS) {
+				mCharges = MAX_CHARGE_POTIONS;
+				ScoreboardUtils.setScoreboardValue(mPlayer, POTION_SCOREBOARD, mCharges);
+				//update item
+				ItemStack item = mPlayer.getInventory().getItem(mSlot);
+				if (item != null) {
+					AbilityUtils.updateAlchemistItem(item, mCharges);
+				}
 			}
 		}
 	}

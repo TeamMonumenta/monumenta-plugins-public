@@ -135,7 +135,7 @@ public class SpellSurroundingDeath extends Spell {
 
 					for (Player p : PlayerUtils.playersInRange(mStartLoc, outerRadius, true)) {
 						if (!PlayerUtils.playersInRange(mStartLoc, innerRadius, true).contains(p)) {
-							BossUtils.bossDamage(mBoss, p, DAMAGE, mStartLoc);
+							BossUtils.bossDamage(mBoss, p, DAMAGE, mStartLoc, "Surrounding Death");
 							MovementUtils.knockAway(mStartLoc, p, 0, .75f);
 						}
 					}

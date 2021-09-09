@@ -72,7 +72,7 @@ public class GiantStomp extends Spell {
 
 						if (mTicks >= 20) {
 							for (Player player : PlayerUtils.playersInRange(loc, radius, true)) {
-								BossUtils.bossDamage(mBoss, player, 40, null);
+								BossUtils.bossDamage(mBoss, player, 40, null, "Giant Stomp");
 								MovementUtils.knockAway(mBoss.getLocation(), player, 0.5f, 0.1f, true);
 							}
 							this.cancel();

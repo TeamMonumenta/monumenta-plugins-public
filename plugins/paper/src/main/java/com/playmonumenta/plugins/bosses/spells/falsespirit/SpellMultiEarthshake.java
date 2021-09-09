@@ -211,16 +211,16 @@ public class SpellMultiEarthshake extends Spell {
 							if (p.getLocation().distance(loc) <= mRadius) {
 								p.setVelocity(p.getVelocity().add(new Vector(0.0, 1.5, 0.0)));
 								if (mDelve) {
-									BossUtils.bossDamage(mBoss, p, 45.0);
+									BossUtils.bossDamage(mBoss, p, 45.0, mBoss.getLocation(), "Earthshake");
 								} else {
-									BossUtils.bossDamage(mBoss, p, 40.0);
+									BossUtils.bossDamage(mBoss, p, 40.0, mBoss.getLocation(), "Earthshake");
 								}
 							} else {
 								p.setVelocity(p.getVelocity().add(new Vector(0.0, 1.0, 0.0)));
 								if (mDelve) {
-									BossUtils.bossDamage(mBoss, p, 45.0);
+									BossUtils.bossDamage(mBoss, p, 45.0, mBoss.getLocation(), "Earthshake");
 								} else {
-									BossUtils.bossDamage(mBoss, p, 40.0);
+									BossUtils.bossDamage(mBoss, p, 40.0, mBoss.getLocation(), "Earthshake");
 								}
 							}
 						}

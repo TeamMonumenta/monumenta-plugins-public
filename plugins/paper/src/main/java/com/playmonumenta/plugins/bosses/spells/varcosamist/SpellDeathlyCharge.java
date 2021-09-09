@@ -133,7 +133,7 @@ public class SpellDeathlyCharge extends Spell {
 			world.playSound(loc, Sound.ENTITY_PLAYER_HURT, 1.5f, 0.65f);
 			world.spawnParticle(Particle.BLOCK_CRACK, player.getLocation().add(0, 1, 0), 45, 0.4, 0.4, 0.4, Material.REDSTONE_WIRE.createBlockData());
 			player.setNoDamageTicks(0);
-			BossUtils.bossDamage(mBoss, player, DAMAGE);
+			BossUtils.bossDamage(mBoss, player, DAMAGE, mBoss.getLocation(), "Deathly Charge");
 			AbilityUtils.silencePlayer(player, 5 * 20);
 			player.addPotionEffect(new PotionEffect(PotionEffectType.WITHER, 20 * 5, 1));
 			if (BossUtils.bossDamageBlocked(player, DAMAGE, loc)) {

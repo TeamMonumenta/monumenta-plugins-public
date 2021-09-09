@@ -45,12 +45,12 @@ import com.playmonumenta.plugins.bosses.spells.SpellBlockBreak;
 import com.playmonumenta.plugins.bosses.spells.SpellPurgeNegatives;
 import com.playmonumenta.plugins.bosses.spells.falsespirit.DamageBlocker;
 import com.playmonumenta.plugins.bosses.spells.falsespirit.GatesOfHell;
-import com.playmonumenta.plugins.bosses.spells.falsespirit.PassiveSeekingProjectile;
+import com.playmonumenta.plugins.bosses.spells.falsespirit.NothingnessSeeker;
 import com.playmonumenta.plugins.bosses.spells.falsespirit.SpellFlamethrower;
 import com.playmonumenta.plugins.bosses.spells.falsespirit.SpellForceTwo;
 import com.playmonumenta.plugins.bosses.spells.falsespirit.SpellMultiEarthshake;
 import com.playmonumenta.plugins.bosses.spells.falsespirit.TriplicateSlash;
-import com.playmonumenta.plugins.bosses.spells.falsespirit.UltimateBulletMania;
+import com.playmonumenta.plugins.bosses.spells.falsespirit.LapseOfReality;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.DelvesUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -76,7 +76,7 @@ public class FalseSpirit extends BossAbilityGroup {
 
 	private static final Particle.DustOptions RED_COLOR = new Particle.DustOptions(Color.fromRGB(200, 0, 0), 1.0f);
 
-	private UltimateBulletMania mMania;
+	private LapseOfReality mMania;
 	private GatesOfHell mHell;
 	private GatesOfHell mCeilingHell;
 
@@ -121,7 +121,7 @@ public class FalseSpirit extends BossAbilityGroup {
 			}
 		}
 
-		mMania = new UltimateBulletMania(boss, plugin);
+		mMania = new LapseOfReality(boss, plugin);
 
 		List<LivingEntity> portals = new ArrayList<>(24);
 		LivingEntity ceilingPortal = null;
@@ -176,7 +176,7 @@ public class FalseSpirit extends BossAbilityGroup {
 				new SpellPurgeNegatives(boss, 20 * 5),
 				new DamageBlocker(plugin, boss, mHell, mCeilingHell),
 				new SpellBlockBreak(boss, 2, 3, 2),
-				new PassiveSeekingProjectile(plugin, boss, passiveCooldown, passiveSpeed, mDelve)
+				new NothingnessSeeker(plugin, boss, passiveCooldown, passiveSpeed, mDelve)
 			);
 
 		Map<Integer, BossHealthAction> events = new HashMap<Integer, BossHealthAction>();

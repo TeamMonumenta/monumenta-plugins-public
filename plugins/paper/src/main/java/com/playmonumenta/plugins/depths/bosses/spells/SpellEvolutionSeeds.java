@@ -56,7 +56,7 @@ public class SpellEvolutionSeeds extends Spell {
 				double hpDealt = currentPlant.getAttribute(Attribute.GENERIC_MAX_HEALTH).getBaseValue() - currentPlant.getHealth();
 
 				//Kill existing plant
-				currentPlant.teleport(new Location(currentPlant.getWorld(), currentPlant.getLocation().getX(), currentPlant.getLocation().getY() - 100, currentPlant.getLocation().getZ()));
+				currentPlant.teleport(new Location(currentPlant.getWorld(), currentPlant.getLocation().getX(), -100, currentPlant.getLocation().getZ()));
 
 				LivingEntity newPlant = (LivingEntity) LibraryOfSoulsIntegration.summon(loc, evolvedType);
 

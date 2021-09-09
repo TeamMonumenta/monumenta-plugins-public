@@ -141,7 +141,7 @@ public class SpellGhostlyCannons extends Spell {
 					for (Player player : PlayerUtils.playersInRange(mLoc, 3, true)) {
 						BoundingBox pBox = player.getBoundingBox();
 						if (pBox.overlaps(box)) {
-							BossUtils.bossDamage(mBoss, player, 45, mLoc);
+							BossUtils.bossDamage(mBoss, player, 45, mLoc, "Ghostly Cannons");
 							MovementUtils.knockAway(mLoc, player, 0.5f, 0.65f);
 							AbilityUtils.silencePlayer(player, 15 * 20);
 						}

@@ -744,10 +744,9 @@ public class PlayerListener implements Listener {
 					}
 				}, 0);
 			} else if (effect.getType() != null &&
-					effect.getType().equals(PotionEffectType.SLOW_FALLING) &&
-					player.getGameMode().equals(GameMode.ADVENTURE)) {
-				//Remove Slow Falling effects in Adventure mode areas (#947)
-				player.sendMessage(Component.text("You cannot apply slow falling potion effects in adventure mode areas, other effects were still applied.", NamedTextColor.RED));
+					effect.getType().equals(PotionEffectType.SLOW_FALLING)) {
+				//Remove Slow Falling effects
+				player.sendMessage(Component.text("You cannot apply slow falling potion effects, other effects were still applied.", NamedTextColor.RED));
 				player.getServer().getScheduler().scheduleSyncDelayedTask(mPlugin, new Runnable() {
 					@Override
 					public void run() {
@@ -1043,13 +1042,20 @@ public class PlayerListener implements Listener {
 	public void blockBreakEvent(BlockBreakEvent event) {
 		Player player = event.getPlayer();
 		ItemStack item = player.getInventory().getItemInMainHand();
+		Block block = event.getBlock();
 
 		String s = "Stasis";
 		NavigableSet<Effect> effects = mPlugin.mEffectManager.getEffects(player, s);
 		if (effects != null && mPlugin.mEffectManager.getEffects(event.getPlayer(), s) != null && (mPlugin.mEffectManager.getEffects(event.getPlayer(), s)).contains(new Stasis(120))) {
 			event.setCancelled(true);
 		}
-		if (!mPlugin.mItemOverrides.blockBreakInteraction(mPlugin, event.getPlayer(), event.getBlock(), event)) {
+		if (!mPlugin.mItemOverrides.blockBreakInteraction(mPlugin, event.getPlayer(), block, event)) {
+			event.setCancelled(true);
+			return;
+		}
+
+		//Prevent breaking blocks that are inside an adventure mode zone (from outside of it)
+		if (ZoneUtils.hasZoneProperty(block.getLocation(), ZoneProperty.ADVENTURE_MODE)) {
 			event.setCancelled(true);
 			return;
 		}

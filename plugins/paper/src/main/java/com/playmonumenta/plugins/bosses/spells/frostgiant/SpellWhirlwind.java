@@ -102,7 +102,7 @@ public class SpellWhirlwind extends Spell {
 							}
 							if (mTicks % 10 == 0) {
 								for (Player player : PlayerUtils.playersInRange(loc, 8, true)) {
-									BossUtils.bossDamage(mBoss, player, 28);
+									BossUtils.bossDamage(mBoss, player, 28, mBoss.getLocation(), "Whirlwind");
 								}
 							}
 							if (mTicks >= 20 * 6) {

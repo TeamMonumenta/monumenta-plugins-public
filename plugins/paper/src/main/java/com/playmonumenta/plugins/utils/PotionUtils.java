@@ -8,15 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.NavigableSet;
 
-import com.google.gson.JsonObject;
-import com.playmonumenta.plugins.Constants;
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.effects.Effect;
-import com.playmonumenta.plugins.events.PotionEffectApplyEvent;
-import com.playmonumenta.plugins.potion.PotionManager.PotionID;
-
 import org.bukkit.Bukkit;
-import org.bukkit.Material;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -27,7 +19,13 @@ import org.bukkit.potion.PotionData;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.potion.PotionType;
-import org.jetbrains.annotations.NotNull;
+
+import com.google.gson.JsonObject;
+import com.playmonumenta.plugins.Constants;
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.effects.Effect;
+import com.playmonumenta.plugins.events.PotionEffectApplyEvent;
+import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 
 
 
@@ -272,7 +270,7 @@ public class PotionUtils {
 	public static boolean hasNegativeEffects(ItemStack potionItem) {
 		for (PotionEffect effect : getEffects(potionItem)) {
 			if (hasNegativeEffects(effect.getType())) {
-				if (effect.getDuration() > 30 || effect.getAmplifier() == 0) {
+				if (effect.getDuration() > 30 || effect.getAmplifier() == 0 || effect.getType() == PotionEffectType.HARM) {
 					// The negative effect lasts longer than 1s or is only level 1
 					// Probably not an antidote / other "good" negative potion
 					return true;
@@ -396,7 +394,7 @@ public class PotionUtils {
 			}
 		}
 
-		NavigableSet<Effect> slows = plugin.mEffectManager.getEffects((Entity) le, "SlowEffect");
+		NavigableSet<Effect> slows = plugin.mEffectManager.getEffects(le, "SlowEffect");
 		if (slows != null && !types.contains(PotionEffectType.SLOW)) {
 			types.add(PotionEffectType.SLOW);
 		}

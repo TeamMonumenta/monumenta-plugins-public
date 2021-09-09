@@ -73,7 +73,7 @@ public class BlackflameOrb extends SpellBaseSeekingProjectile {
 					world.spawnParticle(Particle.SMOKE_LARGE, loc, 40, 1, 1, 1, 0.5);
 
 					for (Player p : PlayerUtils.playersInRange(loc, 5, true)) {
-						BossUtils.bossDamagePercent(boss, p, 0.7, null);
+						BossUtils.bossDamagePercent(boss, p, 0.7, "Blackflame Orb");
 						p.setFireTicks(4 * 20);
 					}
 				});
@@ -131,7 +131,7 @@ public class BlackflameOrb extends SpellBaseSeekingProjectile {
 		world.spawnParticle(Particle.SMOKE_LARGE, loc, 40, 1, 1, 1, 0.5);
 
 		for (Player p : PlayerUtils.playersInRange(loc, 6, true)) {
-			BossUtils.bossDamage(mBoss, p, 0.7, null);
+			BossUtils.bossDamagePercent(mBoss, p, 0.7, null, "Blackflame Orb");
 			p.setFireTicks(4 * 20);
 		}
 	}

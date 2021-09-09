@@ -5,12 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.playmonumenta.plugins.bosses.bosses.FrostGiant;
-import com.playmonumenta.plugins.bosses.spells.Spell;
-import com.playmonumenta.plugins.player.PPGroundCircle;
-import com.playmonumenta.plugins.utils.BossUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
-
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.GameMode;
@@ -26,6 +20,12 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
+
+import com.playmonumenta.plugins.bosses.bosses.FrostGiant;
+import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.player.PPGroundCircle;
+import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 
 /*
  Hailstorm - Creates a snowstorm in a circle that is 24 blocks and beyond that passively
@@ -128,7 +128,7 @@ public class SpellHailstorm extends Spell {
 
 							if (pLocY.distanceSquared(loc) > mRadius * mRadius && mDoDamage) {
 								Vector vel = player.getVelocity();
-								BossUtils.bossDamagePercent(mBoss, player, 0.15, loc);
+								BossUtils.bossDamagePercent(mBoss, player, 0.15, loc, "Hailstorm");
 								player.setVelocity(vel);
 								player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 2, 0));
 							} else {

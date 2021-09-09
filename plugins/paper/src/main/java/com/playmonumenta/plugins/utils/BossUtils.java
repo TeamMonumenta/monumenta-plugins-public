@@ -5,14 +5,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.NavigableSet;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.bosses.parameters.EffectsList;
-import com.playmonumenta.plugins.bosses.parameters.ParticlesList;
-import com.playmonumenta.plugins.bosses.parameters.SoundsList;
 
 import org.bukkit.Color;
 import org.bukkit.GameMode;
@@ -27,6 +23,13 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
+
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.bosses.parameters.EffectsList;
+import com.playmonumenta.plugins.bosses.parameters.ParticlesList;
+import com.playmonumenta.plugins.bosses.parameters.SoundsList;
+import com.playmonumenta.plugins.effects.Effect;
+import com.playmonumenta.plugins.effects.Stasis;
 
 public class BossUtils {
 
@@ -48,13 +51,14 @@ public class BossUtils {
 	}
 
 	public static void bossDamage(@Nonnull LivingEntity boss, @Nonnull Player target, double damage) {
-		bossDamage(boss, target, damage, boss.getLocation());
+		bossDamage(boss, target, damage, boss.getLocation(), null);
 	}
 
-	/*
-	 * Returns true if the damage was applied to the player and
-	 */
 	public static void bossDamage(@Nonnull LivingEntity boss, @Nonnull Player target, double damage, @Nullable Location source) {
+		bossDamage(boss, target, damage, source, null);
+	}
+
+	public static void bossDamage(@Nonnull LivingEntity boss, @Nonnull Player target, double damage, @Nullable Location source, String cause) {
 		int resistance = 0;
 		if (target.hasPotionEffect(PotionEffectType.DAMAGE_RESISTANCE)) {
 			resistance = target.getPotionEffect(PotionEffectType.DAMAGE_RESISTANCE).getAmplifier() + 1;
@@ -73,22 +77,34 @@ public class BossUtils {
 		} else {
 			// Don't adjust damage to account for resistance, because target.damage() already does this
 			// Apply the damage using a custom damage source that can not be blocked
-			NmsUtils.unblockableEntityDamageEntity(target, damage, boss);
+			NmsUtils.unblockableEntityDamageEntity(target, damage, boss, cause);
 		}
 	}
 
 	public static boolean bossDamagePercent(@Nonnull LivingEntity boss, @Nonnull Player target, double percentHealth) {
-		return bossDamagePercent(boss, target, percentHealth, null, false);
+		return bossDamagePercent(boss, target, percentHealth, null, false, null);
 	}
 
 	public static boolean bossDamagePercent(@Nonnull LivingEntity boss, @Nonnull Player target, double percentHealth, @Nullable Location source) {
-		return bossDamagePercent(boss, target, percentHealth, source, false);
+		return bossDamagePercent(boss, target, percentHealth, source, false, null);
+	}
+
+	public static boolean bossDamagePercent(@Nonnull LivingEntity boss, @Nonnull Player target, double percentHealth, @Nullable Location source, boolean raw) {
+		return bossDamagePercent(boss, target, percentHealth, source, raw, null);
+	}
+
+	public static boolean bossDamagePercent(@Nonnull LivingEntity boss, @Nonnull Player target, double percentHealth, String cause) {
+		return bossDamagePercent(boss, target, percentHealth, null, false, cause);
+	}
+
+	public static boolean bossDamagePercent(@Nonnull LivingEntity boss, @Nonnull Player target, double percentHealth, @Nullable Location source, String cause) {
+		return bossDamagePercent(boss, target, percentHealth, source, false, cause);
 	}
 
 	/*
 	 * Returns whether or not the player survived (true) or was killed (false)
 	 */
-	public static boolean bossDamagePercent(@Nonnull LivingEntity boss, @Nonnull Player target, double percentHealth, @Nullable Location source, boolean raw) {
+	public static boolean bossDamagePercent(@Nonnull LivingEntity boss, @Nonnull Player target, double percentHealth, @Nullable Location source, boolean raw, String cause) {
 		if (target instanceof Player) {
 			Player player = target;
 			if (player.getGameMode() == GameMode.CREATIVE || player.getGameMode() == GameMode.SPECTATOR) {
@@ -103,6 +119,14 @@ public class BossUtils {
 
 		// Resist 5 = no damage
 		if (resistance >= 5) {
+			return true;
+		}
+
+		// Do not damage players currently in stasis
+		Plugin plugin = Plugin.getInstance();
+		String s = "Stasis";
+		NavigableSet<Effect> effects = plugin.mEffectManager.getEffects(target, s);
+		if (effects != null && plugin.mEffectManager.getEffects(target, s) != null && (plugin.mEffectManager.getEffects(target, s)).contains(new Stasis(120))) {
 			return true;
 		}
 
@@ -133,7 +157,7 @@ public class BossUtils {
 
 			if (adjustedHealth <= 0) {
 				// Kill the player, but allow totems to trigger
-				NmsUtils.unblockableEntityDamageEntity(target, 1000, boss);
+				NmsUtils.unblockableEntityDamageEntity(target, 1000, boss, cause);
 				return false;
 			} else {
 				if (absorp > 0) {
@@ -154,7 +178,7 @@ public class BossUtils {
 				}
 				//TODO B#9334: test if this is doing more damage than the provided percentage - the intended amount
 				// Also test if iframes can eat this part of the damage and prevent events from triggering
-				NmsUtils.unblockableEntityDamageEntity(target, 1, boss);
+				NmsUtils.unblockableEntityDamageEntity(target, 1, boss, cause);
 			}
 		}
 

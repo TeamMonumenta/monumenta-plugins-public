@@ -57,7 +57,7 @@ public class GhalkorFlamingCharge extends SpellBaseCharge {
 							0.4, 0.4, 0.4, Material.REDSTONE_BLOCK.createBlockData());
 					player.getWorld().spawnParticle(Particle.BLOCK_CRACK, player.getLocation().add(0, 1, 0), 12, 0.4,
 							0.4, 0.4, 0.4, Material.REDSTONE_WIRE.createBlockData());
-					BossUtils.bossDamage(boss, player, DAMAGE, null);
+					BossUtils.bossDamage(boss, player, DAMAGE, null, "Flaming Charge");
 				},
 				// Attack particles
 				(Location loc) -> {

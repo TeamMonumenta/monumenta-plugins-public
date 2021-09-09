@@ -22,7 +22,7 @@ import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
 
-public class UltimateBulletMania extends Spell {
+public class LapseOfReality extends Spell {
 
 	private SpellBaseSeekingProjectile mMissile;
 
@@ -45,7 +45,7 @@ public class UltimateBulletMania extends Spell {
 	private static final boolean LINGERS = true;
 	private static final int DAMAGE = 35;
 
-	public UltimateBulletMania(LivingEntity boss, Plugin plugin) {
+	public LapseOfReality(LivingEntity boss, Plugin plugin) {
 		mBoss = boss;
 		mPlugin = plugin;
 
@@ -72,7 +72,7 @@ public class UltimateBulletMania extends Spell {
 					world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 0.5f, 0.5f);
 					world.spawnParticle(Particle.FIREWORKS_SPARK, loc, 10, 0, 0, 0, 0.25);
 					if (player != null) {
-						BossUtils.bossDamage(boss, player, DAMAGE);
+						BossUtils.bossDamage(boss, player, DAMAGE, mBoss.getLocation(), "Lapse of Reality");
 					}
 				});
 	}

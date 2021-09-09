@@ -157,9 +157,8 @@ public class EarthenWrath extends DepthsAbility {
 		if (mAbsorbDamage && !player.equals(mPlayer)) {
 			mDamageAbsorbed += event.getDamage();
 
-			//EntityUtils.damageEntity(mPlugin, mPlayer, event.getDamage() * (1 - PERCENT_DAMAGE_REDUCTION[mRarity - 1]), null, MagicType.PHYSICAL, true, null);
 			Vector velocity = mPlayer.getVelocity();
-			BossUtils.bossDamage(realDamager, mPlayer, event.getDamage() * (1 - PERCENT_DAMAGE_REDUCTION[mRarity - 1]));
+			BossUtils.bossDamage(realDamager, mPlayer, event.getDamage() * (1 - PERCENT_DAMAGE_REDUCTION[mRarity - 1]), null, "Earthen Wrath");
 			mPlayer.setVelocity(velocity);
 
 			World world = mPlayer.getWorld();

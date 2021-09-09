@@ -60,7 +60,7 @@ public class SpellAbyssalLeap extends SpellBaseSlam {
 					world.spawnParticle(Particle.EXPLOSION_NORMAL, loc, 20, 0F, 0F, 0F, 0.3F);
 					world.spawnParticle(Particle.SOUL_FIRE_FLAME, loc, 3 * (int)(DAMAGE_RADIUS * DAMAGE_RADIUS), DAMAGE_RADIUS, 0.25f, DAMAGE_RADIUS, 0);
 					if (player != null) {
-						BossUtils.bossDamagePercent(launcher, player, DAMAGE_PERCENT);
+						BossUtils.bossDamagePercent(launcher, player, DAMAGE_PERCENT, "Abyssal Leap");
 						return;
 					}
 					for (Player players : PlayerUtils.playersInRange(loc, DAMAGE_RADIUS, true)) {

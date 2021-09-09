@@ -15,7 +15,6 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
@@ -61,7 +60,6 @@ public class ViciousCombos extends Ability {
 					if (EntityUtils.isElite(killedEntity)) {
 						mPlugin.mTimers.removeAllCooldowns(mPlayer.getUniqueId());
 						MessagingUtils.sendActionBarMessage(mPlugin, mPlayer, "All your cooldowns have been reset");
-						mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.SPEED, VICIOUS_COMBOS_EFFECT_DURATION, VICIOUS_COMBOS_EFFECT_LEVEL, true, true, true));
 
 						if (viciousCombos > 1) {
 							for (LivingEntity mob : EntityUtils.getNearbyMobs(loc, VICIOUS_COMBOS_RANGE, mPlayer)) {

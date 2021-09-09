@@ -70,7 +70,7 @@ public class SvalgotBoneSlam extends SpellBaseSlam {
 
 			world.spawnParticle(Particle.SOUL_FIRE_FLAME, loc, 3 * (int)(DAMAGE_RADIUS * DAMAGE_RADIUS), DAMAGE_RADIUS, 0.25f, DAMAGE_RADIUS, 0);
 			if (player != null) {
-				BossUtils.bossDamagePercent(boss, player, DAMAGE_PERCENT);
+				BossUtils.bossDamagePercent(boss, player, DAMAGE_PERCENT, "Bone Slam");
 				return;
 			}
 			for (Player players : PlayerUtils.playersInRange(loc, DAMAGE_RADIUS, true)) {

@@ -237,7 +237,7 @@ public class SpellTectonicDevastation extends Spell {
 								if (player.getScoreboardTags().contains(TAG)) {
 									continue;
 								} else {
-									BossUtils.bossDamagePercent(mBoss, player, 0.4, (Location) null);
+									BossUtils.bossDamagePercent(mBoss, player, 0.4, (Location) null, "Tectonic Devastation");
 									player.addScoreboardTag(TAG);
 									new BukkitRunnable() {
 										@Override

@@ -2,15 +2,17 @@ package com.playmonumenta.plugins.enchantments;
 
 import java.util.EnumSet;
 
+import org.bukkit.ChatColor;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.Particle;
+import org.bukkit.entity.Item;
+import org.bukkit.scheduler.BukkitRunnable;
+
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
 import com.playmonumenta.plugins.utils.EntityUtils;
-
-import org.bukkit.ChatColor;
-import org.bukkit.Particle;
-import org.bukkit.entity.Item;
-import org.bukkit.scheduler.BukkitRunnable;
 
 import de.tr7zw.nbtapi.NBTEntity;
 
@@ -47,7 +49,16 @@ public class Hope implements BaseSpawnableItemEnchantment {
 
 			@Override
 			public void run() {
-				item.getWorld().spawnParticle(Particle.SPELL_INSTANT, item.getLocation(), 3, 0.2, 0.2, 0.2, 0);
+				Location loc = item.getLocation();
+				item.getWorld().spawnParticle(Particle.SPELL_INSTANT, loc, 3, 0.2, 0.2, 0.2, 0);
+
+				//Attempt to move the item upwards if in lava
+				Material currentBlock = loc.getBlock().getType();
+				Material upwardsBlock = loc.clone().add(0, 1, 0).getBlock().getType();
+				if (currentBlock == Material.LAVA && (upwardsBlock == Material.LAVA || upwardsBlock == Material.AIR)) {
+					item.teleport(loc.clone().add(0, 0.25, 0));
+				}
+
 				if (item.isDead() || !item.isValid()) {
 					this.cancel();
 				}

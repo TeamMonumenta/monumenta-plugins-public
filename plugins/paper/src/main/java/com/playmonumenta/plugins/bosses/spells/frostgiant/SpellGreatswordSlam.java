@@ -216,7 +216,7 @@ public class SpellGreatswordSlam extends Spell {
 
 									for (BoundingBox box : boxes) {
 										if (player.getBoundingBox().overlaps(box) && !mHitPlayers.contains(player)) {
-											BossUtils.bossDamage(mBoss, player, 18, null);
+											BossUtils.bossDamage(mBoss, player, 18, null, "Greatsword Slam");
 											AbilityUtils.silencePlayer(player, 20 * 5);
 											MovementUtils.knockAway(loc, player, 0f, 1.5f, false);
 											mHitPlayers.add(player);
@@ -300,7 +300,7 @@ public class SpellGreatswordSlam extends Spell {
 					if ((player.getLocation().getBlock().getRelative(BlockFace.DOWN).getType() != Material.AIR || player.getLocation().getBlock().getType() != Material.AIR)
 					    && (player.getLocation().getBlock().getRelative(BlockFace.DOWN).getType() == Material.FROSTED_ICE || player.getLocation().getBlock().getType() == Material.FROSTED_ICE)) {
 						Vector vel = player.getVelocity();
-						BossUtils.bossDamage(mBoss, player, 18, null);
+						BossUtils.bossDamage(mBoss, player, 18, null, "Greatsword Slam");
 						player.setVelocity(vel);
 					}
 				}

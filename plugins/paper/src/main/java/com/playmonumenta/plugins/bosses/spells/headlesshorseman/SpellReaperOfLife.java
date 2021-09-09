@@ -5,12 +5,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-import com.playmonumenta.plugins.bosses.bosses.HeadlessHorsemanBoss;
-import com.playmonumenta.plugins.bosses.spells.Spell;
-import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
-import com.playmonumenta.plugins.utils.BossUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
-
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -26,6 +20,12 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
+
+import com.playmonumenta.plugins.bosses.bosses.HeadlessHorsemanBoss;
+import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
+import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 
 
 
@@ -162,7 +162,7 @@ public class SpellReaperOfLife extends Spell {
 						if (mCenter.distance(player.getLocation()) < mRange) {
 							int mNDT = player.getNoDamageTicks();
 							player.setNoDamageTicks(0);
-							BossUtils.bossDamagePercent(mBoss, player, 0.85, (Location)null);
+							BossUtils.bossDamagePercent(mBoss, player, 0.85, (Location)null, "Reaper of Life");
 							player.setFireTicks(20 * 3);
 							player.setNoDamageTicks(mNDT);
 							player.addPotionEffect(new PotionEffect(PotionEffectType.UNLUCK, 20 * 10, 4));

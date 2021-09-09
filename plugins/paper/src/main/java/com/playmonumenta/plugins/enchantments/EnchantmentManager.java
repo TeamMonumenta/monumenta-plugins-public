@@ -91,7 +91,8 @@ public class EnchantmentManager implements Listener {
 			new Recoil(),
 			new RageOfTheKeter(),
 			new Retrieval(),
-			new ProtectionOfDepths()
+			new ProtectionOfDepths(),
+			new Radiant()
 	);
 
 	/*

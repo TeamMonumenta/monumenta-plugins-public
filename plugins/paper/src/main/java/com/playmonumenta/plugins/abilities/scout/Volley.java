@@ -101,6 +101,7 @@ public class Volley extends Ability {
 		world.playSound(mPlayer.getLocation(), Sound.ENTITY_ARROW_SHOOT, 1, 1f);
 		world.playSound(mPlayer.getLocation(), Sound.ENTITY_ARROW_SHOOT, 1, 1.33f);
 
+		float arrowSpeed = (float) (arrow.getVelocity().length());
 		// Give time for other skills to set data
 		new BukkitRunnable() {
 			@Override
@@ -112,8 +113,6 @@ public class Volley extends Ability {
 				List<Projectile> projectiles;
 				// Store PotionData from the original arrow only if it is weakness or slowness
 				PotionData tArrowData = null;
-
-				float arrowSpeed = (float) (arrow.getVelocity().length());
 
 				if (arrow instanceof Arrow) {
 					Arrow regularArrow = (Arrow) arrow;

@@ -76,7 +76,7 @@ public class BlackflameBurst extends Spell {
 					player.playSound(player.getLocation(), Sound.ENTITY_WITHER_HURT, SoundCategory.HOSTILE, 1, 0);
 					player.spawnParticle(Particle.SOUL_FIRE_FLAME, loc, 20, 0.5, 0.5, 0.5, 0.5);
 
-					BossUtils.bossDamage(boss, player, DAMAGE);
+					BossUtils.bossDamage(boss, player, DAMAGE, mBoss.getLocation(), "Blackflame Burst");
 					player.setFireTicks(4 * 20);
 				});
 	}

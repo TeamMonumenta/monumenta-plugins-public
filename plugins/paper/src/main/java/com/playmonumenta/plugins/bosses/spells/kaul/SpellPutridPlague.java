@@ -182,7 +182,7 @@ public class SpellPutridPlague extends Spell {
 								player.addPotionEffect(new PotionEffect(PotionEffectType.WITHER, 20 * 30, 1));
 								player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 30, 1));
 								player.addPotionEffect(new PotionEffect(PotionEffectType.POISON, 20 * 30, 1));
-								BossUtils.bossDamage(mBoss, player, damage, (Location)null);
+								BossUtils.bossDamage(mBoss, player, damage, (Location)null, "Putrid Plague");
 							} else {
 								world.spawnParticle(Particle.SPELL, player.getLocation().add(0, 1, 0), 25, 0.25, 0.45, 0.25, 1);
 								world.spawnParticle(Particle.SPELL_INSTANT, player.getLocation().add(0, 1, 0), 35, 0.25, 0.45, 0.25, 1);

@@ -86,7 +86,7 @@ public class SpellBash extends Spell {
 					for (Player player : PlayerUtils.playersInRange(loc, 4, true)) {
 						Vector toPlayerVector = player.getLocation().toVector().subtract(loc.toVector()).normalize();
 						if (direction.dot(toPlayerVector) > 0.33f) {
-							BossUtils.bossDamage(mBoss, player, 6);
+							BossUtils.bossDamage(mBoss, player, 6, mBoss.getLocation(), "Bash");
 							MovementUtils.knockAway(mBoss.getLocation(), player, 0.5f, 0.65f);
 						}
 					}

@@ -1,14 +1,7 @@
 package com.playmonumenta.plugins.abilities.mage;
 
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.classes.ClassAbility;
-import com.playmonumenta.plugins.classes.magic.MagicType;
-import com.playmonumenta.plugins.utils.EntityUtils;
-
 import org.bukkit.Particle;
 import org.bukkit.entity.AbstractArrow;
-import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Blaze;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -16,6 +9,12 @@ import org.bukkit.entity.Projectile;
 import org.bukkit.entity.Stray;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.metadata.FixedMetadataValue;
+
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.classes.magic.MagicType;
+import com.playmonumenta.plugins.utils.EntityUtils;
 
 
 
@@ -44,10 +43,10 @@ public class ElementalArrows extends Ability {
 
 	@Override
 	public boolean livingEntityShotByPlayerEvent(Projectile proj, LivingEntity damagee, EntityDamageByEntityEvent event) {
-		if (!(proj instanceof Arrow)) {
+		if (!EntityUtils.isSomeArrow(proj)) {
 			return true;
 		}
-		Arrow arrow = (Arrow) proj;
+		AbstractArrow arrow = (AbstractArrow) proj;
 
 		int elementalArrows = getAbilityScore();
 		double damage = elementalArrows == 1 ? DAMAGE_MULTIPLIER_1 * event.getDamage() : DAMAGE_MULTIPLIER_2 * event.getDamage();

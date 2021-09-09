@@ -1,13 +1,5 @@
 package com.playmonumenta.plugins.bosses.spells.headlesshorseman;
 
-import com.playmonumenta.plugins.bosses.bosses.HeadlessHorsemanBoss;
-import com.playmonumenta.plugins.bosses.spells.Spell;
-import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
-import com.playmonumenta.plugins.utils.BossUtils;
-import com.playmonumenta.plugins.utils.FastUtils;
-import com.playmonumenta.plugins.utils.MovementUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
-
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -17,6 +9,14 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import com.playmonumenta.plugins.bosses.bosses.HeadlessHorsemanBoss;
+import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
+import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.MovementUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
+
 
 
 /*
@@ -24,7 +24,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 the bats explode dealing 32 damage to anyone with 4 blocks of them, killing the bat in the process.
 The bats have 20hp.
  */
-public class SpellBatBombs extends Spell {
+public class SpellBeeBombs extends Spell {
 
 	private static final int DAMAGE = 40;
 
@@ -33,7 +33,7 @@ public class SpellBatBombs extends Spell {
 	private HeadlessHorsemanBoss mHorseman;
 	private int mCooldownTicks = 0;
 
-	public SpellBatBombs(Plugin plugin, LivingEntity entity, int cooldown, HeadlessHorsemanBoss horseman) {
+	public SpellBeeBombs(Plugin plugin, LivingEntity entity, int cooldown, HeadlessHorsemanBoss horseman) {
 		mPlugin = plugin;
 		mBoss = entity;
 		mHorseman = horseman;
@@ -74,7 +74,7 @@ public class SpellBatBombs extends Spell {
 
 								for (Player player : PlayerUtils.playersInRange(loc, 5.5, true)) {
 									if (mHorseman.getSpawnLocation().distance(player.getLocation()) < HeadlessHorsemanBoss.detectionRange) {
-										BossUtils.bossDamage(mHorseman.getEntity(), player, DAMAGE, loc);
+										BossUtils.bossDamage(mHorseman.getEntity(), player, DAMAGE, loc, "Bee Bombs");
 										if (!BossUtils.bossDamageBlocked(player, DAMAGE, loc)) {
 											MovementUtils.knockAway(loc, player, 0.2f, 0.4f);
 										}

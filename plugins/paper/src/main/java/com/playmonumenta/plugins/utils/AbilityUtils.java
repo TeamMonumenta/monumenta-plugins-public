@@ -7,10 +7,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.effects.AbilitySilence;
-import com.playmonumenta.plugins.potion.PotionManager.PotionID;
-
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
@@ -35,6 +31,10 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.NotNull;
+
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.effects.AbilitySilence;
+import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 
 
 
@@ -193,11 +193,13 @@ public class AbilityUtils {
 		if (item.getType() == Material.SPLASH_POTION) {
 			PotionMeta potionMeta = (PotionMeta) meta;
 
-			if (count > 9) {
+			if (count >= 4) {
 				potionMeta.setColor(Color.GREEN);
-			} else if (count > 4) {
+			} else if (count == 3) {
+				potionMeta.setColor(Color.YELLOW);
+			} else if (count == 2) {
 				potionMeta.setColor(Color.ORANGE);
-			} else if (count > 0) {
+			} else if (count == 1) {
 				potionMeta.setColor(Color.RED);
 			} else {
 				potionMeta.setColor(Color.BLACK);

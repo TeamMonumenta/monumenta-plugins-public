@@ -44,7 +44,7 @@ public class SpellVoidBlast extends SpellBaseAoE {
 			(Location loc) -> {
 				for (Player player : PlayerUtils.playersInRange(launcher.getLocation(), radius, true)) {
 					double distance = player.getLocation().distance(launcher.getLocation());
-					BossUtils.bossDamage(launcher, player, ((maxDamage - minDamage) * ((radius - distance) / radius)) + minDamage);
+					BossUtils.bossDamage(launcher, player, ((maxDamage - minDamage) * ((radius - distance) / radius)) + minDamage, launcher.getLocation(), "Void Blast");
 					com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(player, "Void Blast", new AbilitySilence(SILENCE_DURATION));
 				}
 			}
