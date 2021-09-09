@@ -86,6 +86,7 @@ public class AdvancingShadows extends Ability {
 		super(plugin, player, "Advancing Shadows");
 		mInfo.mLinkedSpell = ClassAbility.ADVANCING_SHADOWS;
 		mInfo.mScoreboardId = "AdvancingShadows";
+		mInfo.mShorthandName = "AS";
 		mInfo.mCooldown = ADVANCING_SHADOWS_COOLDOWN;
 		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
 		mInfo.mDescriptions.add("While holding two swords and not sneaking, right click to teleport to the target hostile enemy within 10 blocks and gain strength 2 for 5 seconds. Cooldown: 20s.");

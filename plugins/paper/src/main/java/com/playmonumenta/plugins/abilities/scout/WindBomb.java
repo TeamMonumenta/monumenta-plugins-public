@@ -39,6 +39,7 @@ public class WindBomb extends Ability {
 	public WindBomb(Plugin plugin, Player player) {
 		super(plugin, player, "Wind Bomb");
 		mInfo.mScoreboardId = "WindBomb";
+		mInfo.mShorthandName = "WB";
 		mInfo.mLinkedSpell = ClassAbility.WIND_BOMB;
 		mInfo.mDescriptions.add("Pressing the swap key while sneaking throws a projectile that, upon contact with the ground or an enemy, launches mobs in a 3 block radius into the air, giving them Slow Falling and 20% Weaken for 4s. Cooldown: 15s.");
 		mInfo.mDescriptions.add("The cooldown is reduced to 10s. Additionally, you deal 20% more damage to enemies made airborne by this skill, until they hit the ground.");
