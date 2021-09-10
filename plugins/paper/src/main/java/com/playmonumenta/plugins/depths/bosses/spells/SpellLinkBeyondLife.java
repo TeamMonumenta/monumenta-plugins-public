@@ -42,7 +42,7 @@ public class SpellLinkBeyondLife extends Spell {
 
 		PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), Davey.detectionRange, "tellraw @s [\"\",{\"text\":\"[Davey]\",\"color\":\"gold\"},{\"text\":\" Now ye've done it. She be watchin'. Help me, heathens of \",\"color\":\"blue\"},{\"text\":\"ngbgbggb\",\"obfuscated\":\"true\",\"color\":\"blue\"},{\"text\":\"!\",\"color\":\"blue\"}]");
 
-		new BukkitRunnable() {
+		BukkitRunnable run = new BukkitRunnable() {
 			int mTicks = 0;
 			int mSummons = 0;
 
@@ -92,7 +92,9 @@ public class SpellLinkBeyondLife extends Spell {
 				}
 
 			}
-		}.runTaskTimer(Plugin.getInstance(), 0, 1);
+		};
+		run.runTaskTimer(Plugin.getInstance(), 0, 1);
+		mActiveRunnables.add(run);
 	}
 
 	@Override
