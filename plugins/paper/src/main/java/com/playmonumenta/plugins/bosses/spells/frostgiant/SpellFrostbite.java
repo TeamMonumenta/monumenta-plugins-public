@@ -55,7 +55,7 @@ public class SpellFrostbite extends Spell {
 	public void run() {
 		mAttack = false;
 		World world = mBoss.getWorld();
-		for (Player player : PlayerUtils.playersInRange(mStartLoc, 65, true)) {
+		for (Player player : PlayerUtils.playersInRange(mStartLoc, 70, true)) {
 			Location playerLoc = player.getLocation();
 
 			if (player.getGameMode() == GameMode.CREATIVE) {
