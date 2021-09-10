@@ -392,10 +392,14 @@ public class EntityListener implements Listener {
 			if (event instanceof EntityDamageByEntityEvent) {
 				// This event is damage attributable to an entity
 				EntityDamageByEntityEvent edbee = (EntityDamageByEntityEvent)event;
-				if (!(edbee.getDamager() instanceof Player) ||
-				    (damagee.isInvulnerable() && !((Player)edbee.getDamager()).getGameMode().equals(GameMode.CREATIVE))) {
-					// This damage is from an entity, but that entity is not a player
-					// OR The damage is from a player but the item frame/painting is invulnerable and the player is not in creative
+				if (
+						// This damage is from an entity, but that entity is not a player
+						!(edbee.getDamager() instanceof Player) ||
+						// OR The damage is from a player but the item frame/painting is invulnerable and the player is not in creative
+						(damagee.isInvulnerable() && !((Player)edbee.getDamager()).getGameMode().equals(GameMode.CREATIVE)) ||
+						// OR the damage is from a player and they are in adventure mode
+						((Player)edbee.getDamager()).getGameMode().equals(GameMode.ADVENTURE)
+					) {
 					// Don't allow it
 					event.setCancelled(true);
 				}
