@@ -14,22 +14,18 @@ import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 
 public class Sharpshooter extends Ability {
+	private static final double PERCENT_BASE_DAMAGE = 0.2;
 	private static final int SHARPSHOOTER_DECAY_TIMER = 20 * 4;
-	private static final int MAX_STACKS_1 = 4;
-	private static final int MAX_STACKS_2 = 8;
-	private static final double PERCENT_DAMAGE_PER_STACK = 0.06;
-
-	private final int mMaxStacks;
+	private static final int MAX_STACKS = 8;
+	private static final double PERCENT_DAMAGE_PER_STACK = 0.03;
 
 	public Sharpshooter(Plugin plugin, Player player) {
 		super(plugin, player, "Sharpshooter");
 		mInfo.mScoreboardId = "Sharpshooter";
 		mInfo.mShorthandName = "Ss";
-		mInfo.mDescriptions.add("Each enemy hit with a critical arrow gives you a stack of Sharpshooter, up to 4. Stacks decay after 4 seconds of not gaining a stack. Each stack makes your arrows deal +6% damage.");
-		mInfo.mDescriptions.add("Max stacks increased to 8 (+48% damage).");
+		mInfo.mDescriptions.add("Your arrows deal 20% more damage.");
+		mInfo.mDescriptions.add("Each enemy hit with a critical arrow gives you a stack of Sharpshooter, up to 8. Stacks decay after 4 seconds of not gaining a stack. Each stack makes your arrows deal +3% damage.");
 		mInfo.mIgnoreTriggerCap = true;
-
-		mMaxStacks = getAbilityScore() == 1 ? MAX_STACKS_1 : MAX_STACKS_2;
 	}
 
 	private int mStacks = 0;
@@ -41,16 +37,16 @@ public class Sharpshooter extends Ability {
 			AbstractArrow arrow = (AbstractArrow) proj;
 
 			// Critical arrow and mob is actually going to take damage
-			if (arrow.isCritical() && (damagee.getNoDamageTicks() <= 10 || damagee.getLastDamage() < event.getDamage())) {
+			if (getAbilityScore() > 1 && arrow.isCritical() && (damagee.getNoDamageTicks() <= 10 || damagee.getLastDamage() < event.getDamage())) {
 				mTicksToStackDecay = SHARPSHOOTER_DECAY_TIMER;
 
-				if (mStacks < mMaxStacks) {
+				if (mStacks < MAX_STACKS) {
 					mStacks++;
 					MessagingUtils.sendActionBarMessage(mPlugin, mPlayer, "Sharpshooter Stacks: " + mStacks);
 				}
 			}
 
-			event.setDamage(event.getDamage() * (1 + mStacks * PERCENT_DAMAGE_PER_STACK));
+			event.setDamage(event.getDamage() * (1 + PERCENT_BASE_DAMAGE + mStacks * PERCENT_DAMAGE_PER_STACK));
 		}
 
 		return true;
@@ -72,14 +68,14 @@ public class Sharpshooter extends Ability {
 	public static void addStacks(Plugin plugin, Player player, int stacks) {
 		Sharpshooter ss = AbilityManager.getManager().getPlayerAbility(player, Sharpshooter.class);
 		if (ss != null) {
-			ss.mStacks = Math.min(ss.mMaxStacks, ss.mStacks + stacks);
+			ss.mStacks = Math.min(MAX_STACKS, ss.mStacks + stacks);
 			MessagingUtils.sendActionBarMessage(plugin, player, "Sharpshooter Stacks: " + ss.mStacks);
 		}
 	}
 
 	public static double getDamageMultiplier(Player player) {
 		Sharpshooter ss = AbilityManager.getManager().getPlayerAbility(player, Sharpshooter.class);
-		return ss == null ? 1 : (1 + ss.mStacks * PERCENT_DAMAGE_PER_STACK);
+		return ss == null ? 1 : (1 + PERCENT_BASE_DAMAGE + ss.mStacks * PERCENT_DAMAGE_PER_STACK);
 	}
 
 }

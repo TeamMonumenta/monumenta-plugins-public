@@ -182,26 +182,9 @@ public class HallowedBeam extends MultipleChargeAbility {
 								}
 							}
 
-							//Applies damage based on Projectile Damage attribute, AP, and Crusade
-							double damage = PlayerUtils.getAttribute(mPlayer, AttributeProjectileDamage.PROPERTY_NAME);
-							int focusLevel = mPlugin.mTrackingManager.mPlayers.getPlayerCustomEnchantLevel(mPlayer, Focus.class);
-							if (focusLevel > 0) {
-								damage *= 1 + focusLevel * Focus.DAMAGE_PCT_PER_LEVEL;
-							}
+							//Applies damage based on Projectile Damage attribute, Focus, Enchantments, Proj Damage Effects, AP, and Crusade
+							double damage = EntityUtils.getProjSkillDamage(mPlayer, mPlugin, true, applyE.getLocation());
 
-							int pointBlankLevel = mPlugin.mTrackingManager.mPlayers.getPlayerCustomEnchantLevel(mPlayer, PointBlank.class);
-							int sniperLevel = mPlugin.mTrackingManager.mPlayers.getPlayerCustomEnchantLevel(mPlayer, Sniper.class);
-							if (pointBlankLevel > 0 && mPlayer.getLocation().distance(applyE.getLocation()) < PointBlank.DISTANCE) {
-								damage += pointBlankLevel * PointBlank.DAMAGE_PER_LEVEL;
-								PointBlank.particles(applyE.getEyeLocation(), mPlayer);
-							} else if (sniperLevel > 0 && mPlayer.getLocation().distance(applyE.getLocation()) > Sniper.DISTANCE) {
-								damage += sniperLevel * Sniper.DAMAGE_PER_LEVEL;
-								Sniper.particles(applyE.getEyeLocation(), mPlayer);
-							}
-							NavigableSet<Effect> celestialBlessingEffects = mPlugin.mEffectManager.getEffects(mPlayer, CelestialBlessing.DAMAGE_EFFECT_NAME);
-							if (celestialBlessingEffects != null) {
-								damage *= 1 + celestialBlessingEffects.last().getMagnitude();
-							}
 							EntityUtils.damageEntity(mPlugin, applyE, damage, mPlayer, MagicType.HOLY, true, mInfo.mLinkedSpell, false, false, true, false);
 
 							Location eLoc = applyE.getLocation().add(0, applyE.getHeight() / 2, 0);

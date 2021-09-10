@@ -1,4 +1,4 @@
-package com.playmonumenta.plugins.abilities.scout.hunter;
+package com.playmonumenta.plugins.abilities.scout;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -115,11 +115,9 @@ public class HuntingCompanion extends Ability {
 			mFox.setInvulnerable(true);
 			mFox.addScoreboardTag(FOX_TAG);
 
-			double damage = PlayerUtils.getAttribute(mPlayer, AttributeProjectileDamage.PROPERTY_NAME) * mDamage;
-			int focusLevel = mPlugin.mTrackingManager.mPlayers.getPlayerCustomEnchantLevel(mPlayer, Focus.class);
-			if (focusLevel > 0) {
-				damage *= 1 + focusLevel * Focus.DAMAGE_PCT_PER_LEVEL;
-			}
+			// Damage calculation - include Base Proj Attr, Focus, Teammate buffs (Blessing/Thurible), and Sharpshooter
+			double damage = EntityUtils.getProjSkillDamage(mPlayer, mPlugin) * mDamage;
+
 			mFox.getAttribute(Attribute.GENERIC_ATTACK_DAMAGE).setBaseValue(damage);
 
 			mFox.setMetadata(OWNER_METADATA_TAG, new FixedMetadataValue(mPlugin, mPlayer.getName()));

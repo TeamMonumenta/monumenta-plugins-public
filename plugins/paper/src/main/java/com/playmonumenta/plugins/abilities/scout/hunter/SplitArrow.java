@@ -29,6 +29,7 @@ public class SplitArrow extends Ability {
 	private static final double SPLIT_ARROW_2_DAMAGE_PERCENT = 0.60;
 	private static final double SPLIT_ARROW_CHAIN_RANGE = 5;
 	private static final PotionEffect SPECTRAL_ARROW_EFFECT = new PotionEffect(PotionEffectType.GLOWING, 200, 0);
+	private static final int IFRAMES = 10;
 
 	private final double mDamagePercent;
 
@@ -61,14 +62,18 @@ public class SplitArrow extends Ability {
 						break;
 					}
 				}
-				world.spawnParticle(Particle.CRIT, eye, 30, 0, 0, 0, 0.6);
-				world.spawnParticle(Particle.CRIT_MAGIC, eye, 20, 0, 0, 0, 0.6);
-				world.playSound(eye, Sound.ENTITY_ARROW_HIT, 1, 1.2f);
 
-				EntityUtils.damageEntity(mPlugin, nearestMob, event.getDamage() * mDamagePercent, mPlayer, MagicType.PHYSICAL, true, mInfo.mLinkedSpell, true, true, true, false);
-				MovementUtils.knockAway(damagee, nearestMob, 0.125f, 0.35f);
-				if (proj instanceof SpectralArrow) {
-					nearestMob.addPotionEffect(SPECTRAL_ARROW_EFFECT);
+				if (!EntityUtils.hasArrowIframes(mPlugin, nearestMob)) {
+					world.spawnParticle(Particle.CRIT, eye, 30, 0, 0, 0, 0.6);
+					world.spawnParticle(Particle.CRIT_MAGIC, eye, 20, 0, 0, 0, 0.6);
+					world.playSound(eye, Sound.ENTITY_ARROW_HIT, 1, 1.2f);
+
+					EntityUtils.damageEntity(mPlugin, nearestMob, event.getDamage() * mDamagePercent, mPlayer, MagicType.PHYSICAL, true, mInfo.mLinkedSpell, true, true, true, false);
+					MovementUtils.knockAway(damagee, nearestMob, 0.125f, 0.35f);
+					EntityUtils.applyArrowIframes(mPlugin, IFRAMES, nearestMob);
+					if (proj instanceof SpectralArrow) {
+						nearestMob.addPotionEffect(SPECTRAL_ARROW_EFFECT);
+					}
 				}
 			}
 		}

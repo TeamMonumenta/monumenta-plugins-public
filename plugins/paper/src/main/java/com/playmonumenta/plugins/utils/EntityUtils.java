@@ -23,8 +23,16 @@ import com.playmonumenta.plugins.effects.Effect;
 import com.playmonumenta.plugins.effects.PercentDamageDealt;
 import com.playmonumenta.plugins.effects.PercentDamageReceived;
 import com.playmonumenta.plugins.effects.PercentSpeed;
+import com.playmonumenta.plugins.effects.SplitArrowIframesEffect;
 import com.playmonumenta.plugins.enchantments.Inferno;
+import com.playmonumenta.plugins.enchantments.PointBlank;
+import com.playmonumenta.plugins.enchantments.Sniper;
+import com.playmonumenta.plugins.enchantments.infusions.Focus;
 import com.playmonumenta.plugins.events.CustomDamageEvent;
+import com.playmonumenta.plugins.attributes.AttributeProjectileDamage;
+import com.playmonumenta.plugins.abilities.cleric.CelestialBlessing;
+import com.playmonumenta.plugins.abilities.cleric.hierophant.ThuribleProcession;
+import com.playmonumenta.plugins.abilities.scout.Sharpshooter;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
@@ -1039,6 +1047,20 @@ public class EntityUtils {
 		}
 	}
 
+	private static final String ARROW_IFRAMES_EFFECT_NAME = "SplitArrrowIframesEffect";
+
+	public static void applyArrowIframes(Plugin plugin, int ticks, LivingEntity mob) {
+		plugin.mEffectManager.addEffect(mob, ARROW_IFRAMES_EFFECT_NAME, new SplitArrowIframesEffect(ticks));
+	}
+
+	public static boolean hasArrowIframes(Plugin plugin, LivingEntity mob) {
+		NavigableSet<Effect> arrowIframes = plugin.mEffectManager.getEffects(mob, ARROW_IFRAMES_EFFECT_NAME);
+		if (arrowIframes != null) {
+			return true;
+		}
+		return false;
+	}
+
 	public static boolean isSilenced(Entity mob) {
 		return SILENCED_MOBS.containsKey(mob);
 	}
@@ -1358,5 +1380,36 @@ public class EntityUtils {
 			entityType == EntityType.ARROW
 			|| entityType == EntityType.SPECTRAL_ARROW
 		);
+	}
+
+	public static double getProjSkillDamage(Player player, Plugin plugin) {
+		return getProjSkillDamage(player, plugin, true, null);
+	}
+
+	public static double getProjSkillDamage(Player player, Plugin plugin, boolean includeSniperAndPB, Location targetLoc) {
+		double damage = PlayerUtils.getAttribute(player, AttributeProjectileDamage.PROPERTY_NAME);
+		int focusLevel = plugin.mTrackingManager.mPlayers.getPlayerCustomEnchantLevel(player, Focus.class);
+		if (focusLevel > 0) {
+			damage *= 1 + focusLevel * Focus.DAMAGE_PCT_PER_LEVEL;
+		}
+
+		if (includeSniperAndPB) {
+			int pointBlankLevel = plugin.mTrackingManager.mPlayers.getPlayerCustomEnchantLevel(player, PointBlank.class);
+			int sniperLevel = plugin.mTrackingManager.mPlayers.getPlayerCustomEnchantLevel(player, Sniper.class);
+			if (pointBlankLevel > 0 && player.getLocation().distance(targetLoc) < PointBlank.DISTANCE) {
+				damage += pointBlankLevel * PointBlank.DAMAGE_PER_LEVEL;
+			} else if (sniperLevel > 0 && player.getLocation().distance(targetLoc) > Sniper.DISTANCE) {
+				damage += sniperLevel * Sniper.DAMAGE_PER_LEVEL;
+			}
+		}
+
+		// All possible Proj Damage sources that don't also include Ability Damage at the same level, prevents things from double-stacking
+		NavigableSet<Effect> celestialBlessingEffects = plugin.mEffectManager.getEffects(player, CelestialBlessing.DAMAGE_EFFECT_NAME);
+		NavigableSet<Effect> thuribleEffects = plugin.mEffectManager.getEffects(player, ThuribleProcession.PERCENT_DAMAGE_EFFECT_NAME);
+		double blessingBonus = celestialBlessingEffects != null ? celestialBlessingEffects.last().getMagnitude() : 0;
+		double thuribleBonus = thuribleEffects != null ? thuribleEffects.last().getMagnitude() : 0;
+
+		damage *= Sharpshooter.getDamageMultiplier(player) + blessingBonus + thuribleBonus;
+		return damage;
 	}
 }

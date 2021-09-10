@@ -122,16 +122,16 @@ import com.playmonumenta.plugins.abilities.rogue.swordsage.BladeDance;
 import com.playmonumenta.plugins.abilities.rogue.swordsage.DeadlyRonde;
 import com.playmonumenta.plugins.abilities.rogue.swordsage.WindWalk;
 import com.playmonumenta.plugins.abilities.scout.Agility;
-import com.playmonumenta.plugins.abilities.scout.BowMastery;
 import com.playmonumenta.plugins.abilities.scout.EagleEye;
+import com.playmonumenta.plugins.abilities.scout.HuntingCompanion;
 import com.playmonumenta.plugins.abilities.scout.ScoutPassive;
 import com.playmonumenta.plugins.abilities.scout.Sharpshooter;
 import com.playmonumenta.plugins.abilities.scout.SwiftCuts;
 import com.playmonumenta.plugins.abilities.scout.Swiftness;
 import com.playmonumenta.plugins.abilities.scout.Volley;
 import com.playmonumenta.plugins.abilities.scout.WindBomb;
-import com.playmonumenta.plugins.abilities.scout.hunter.HuntingCompanion;
 import com.playmonumenta.plugins.abilities.scout.hunter.PinningShot;
+import com.playmonumenta.plugins.abilities.scout.hunter.PredatorStrike;
 import com.playmonumenta.plugins.abilities.scout.hunter.SplitArrow;
 import com.playmonumenta.plugins.abilities.scout.ranger.Quickdraw;
 import com.playmonumenta.plugins.abilities.scout.ranger.TacticalManeuver;
@@ -179,8 +179,6 @@ import com.playmonumenta.plugins.utils.DelvesUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MetadataUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
-
-
 
 public class AbilityManager {
 
@@ -255,7 +253,7 @@ public class AbilityManager {
 
 			//********** SCOUT **********//
 			new Agility(mPlugin, null),
-			new BowMastery(mPlugin, null),
+			new HuntingCompanion(mPlugin, null),
 			new Volley(mPlugin, null),
 			new Swiftness(mPlugin, null),
 			new EagleEye(mPlugin, null),
@@ -340,9 +338,9 @@ public class AbilityManager {
 			new Quickdraw(mPlugin, null),
 
 			// HUNTER
-			new HuntingCompanion(mPlugin, null),
 			new PinningShot(mPlugin, null),
 			new SplitArrow(mPlugin, null),
+			new PredatorStrike(mPlugin, null),
 
 			//********** WARRIOR **********//
 			// BERSERKER

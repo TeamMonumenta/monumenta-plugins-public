@@ -44,23 +44,23 @@ public class CursedWound extends Ability {
 	private static final int CURSED_WOUND_EFFECT_LEVEL = 1;
 	private static final int CURSED_WOUND_DURATION = 6 * 20;
 	private static final int CURSED_WOUND_RADIUS = 3;
-	private static final double CURSED_WOUND_DAMAGE = 0.5;
-	private static final int CURSED_WOUND_1_CAP = 3;
-	private static final int CURSED_WOUND_2_CAP = 5;
+	private static final double CURSED_WOUND_DAMAGE = 0.05;
+	private static final double CURSED_WOUND_1_CAP = 0.15;
+	private static final double CURSED_WOUND_2_CAP = 0.3;
 	private static final int CURSED_WOUND_EXTENDED_DURATION = 2 * 20;
 
 	public CursedWound(Plugin plugin, Player player) {
 		super(plugin, player, "Cursed Wound");
 		mInfo.mScoreboardId = "CursedWound";
 		mInfo.mShorthandName = "CW";
-		mInfo.mDescriptions.add("Attacking an enemy with a critical scythe attack passively afflicts it and all enemies in a 3-block cube around it with Wither 2 for 6s. Your melee attacks passively deal 0.5 more damage per ability on cooldown, capped at 3 damage.");
-		mInfo.mDescriptions.add("Critical attacks now also extend all enemies' debuffs (except Stun, Silence, and Confusion) by 2s. Damage cap is increased from 3 to 5.");
+		mInfo.mDescriptions.add("Attacking an enemy with a critical scythe attack passively afflicts it and all enemies in a 3-block cube around it with Wither 2 for 6s. Your melee attacks passively deal 3% more damage per ability on cooldown, capped at +15% damage.");
+		mInfo.mDescriptions.add("Critical attacks now also extend all enemies' debuffs (except Stun, Silence, and Confusion) by 2s. Damage cap is increased from 15% to 30%.");
 	}
 
 	@Override
 	public boolean livingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
 		if (event.getCause() == DamageCause.ENTITY_ATTACK) {
-			float cursedWoundCap = getAbilityScore() == 1 ? CURSED_WOUND_1_CAP : CURSED_WOUND_2_CAP;
+			double cursedWoundCap = getAbilityScore() == 1 ? CURSED_WOUND_1_CAP : CURSED_WOUND_2_CAP;
 			LivingEntity damagee = (LivingEntity) event.getEntity();
 			BlockData fallingDustData = Material.ANVIL.createBlockData();
 			World world = mPlayer.getWorld();
@@ -90,7 +90,8 @@ public class CursedWound extends Ability {
 						cooldowns++;
 					}
 				}
-				event.setDamage(event.getDamage() + CursedWoundDamageEnchantment.getExtraPercentDamage(mPlayer, CursedWoundDamageEnchantment.class, (float) Math.min(cooldowns * CURSED_WOUND_DAMAGE, cursedWoundCap)));
+
+				event.setDamage(event.getDamage() * (1 + CursedWoundDamageEnchantment.getExtraPercentDamage(mPlayer, CursedWoundDamageEnchantment.class, (float) Math.min(cooldowns * CURSED_WOUND_DAMAGE, cursedWoundCap))));
 				CustomDamageEvent customDamageEvent = new CustomDamageEvent(mPlayer, damagee, 0, null);
 				Bukkit.getPluginManager().callEvent(customDamageEvent);
 			}

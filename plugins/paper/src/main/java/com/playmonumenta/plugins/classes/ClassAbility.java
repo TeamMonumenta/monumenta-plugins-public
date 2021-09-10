@@ -81,9 +81,10 @@ public enum ClassAbility {
 	EAGLE_EYE("Eagle Eye"),
 	VOLLEY("Volley"),
 	WIND_BOMB("Wind Bomb"),
+	HUNTING_COMPANION("Hunting Companion"),
 
 	// Hunter
-	HUNTING_COMPANION("Hunting Companion"),
+	PREDATOR_STRIKE("Predator Strike"),
 	SPLIT_ARROW("Split Arrow"),
 
 	// Ranger

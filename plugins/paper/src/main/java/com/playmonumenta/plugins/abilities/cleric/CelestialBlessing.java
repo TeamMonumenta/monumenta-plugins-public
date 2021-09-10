@@ -55,8 +55,8 @@ public class CelestialBlessing extends Ability {
 		mInfo.mLinkedSpell = ClassAbility.CELESTIAL_BLESSING;
 		mInfo.mScoreboardId = "Celestial";
 		mInfo.mShorthandName = "CB";
-		mInfo.mDescriptions.add("When you strike while sneaking, you and all other players in a 12 block radius gain +20% melee and bow damage and +20% speed for 10 s. Cooldown: 40s.");
-		mInfo.mDescriptions.add("Increases the buff to +35% attack damage for 12 s.");
+		mInfo.mDescriptions.add("When you strike while sneaking, you and all other players in a 12 block radius gain +20% melee and projectile damage and +20% speed for 10 s. Cooldown: 40s.");
+		mInfo.mDescriptions.add("Increases the buff to +35% damage for 12 s.");
 		mInfo.mCooldown = CELESTIAL_COOLDOWN;
 		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;
 	}

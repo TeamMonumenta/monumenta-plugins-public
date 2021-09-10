@@ -8,8 +8,6 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
@@ -17,29 +15,28 @@ import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
-import com.playmonumenta.plugins.utils.PotionUtils;
 
 public class Smokescreen extends Ability {
 
 	private static final int SMOKESCREEN_RANGE = 6;
 	private static final int SMOKESCREEN_DURATION = 8 * 20;
 	private static final double SMOKESCREEN_SLOWNESS_AMPLIFIER = 0.2;
-	private static final int SMOKESCREEN_1_WEAKNESS_AMPLIFIER = 0;
-	private static final int SMOKESCREEN_2_WEAKNESS_AMPLIFIER = 1;
+	private static final double WEAKEN_EFFECT_1 = 0.2;
+	private static final double WEAKEN_EFFECT_2 = 0.4;
 	private static final int SMOKESCREEN_COOLDOWN = 20 * 20;
 
-	private final int mWeaknessAmplifier;
+	private final double mWeakenEffect;
 
 	public Smokescreen(Plugin plugin, Player player) {
 		super(plugin, player, "Smoke Screen");
 		mInfo.mLinkedSpell = ClassAbility.SMOKESCREEN;
 		mInfo.mScoreboardId = "SmokeScreen";
 		mInfo.mShorthandName = "Smk";
-		mInfo.mDescriptions.add("When holding two swords, right-click while sneaking and looking down to release a cloud of smoke, afflicting all enemies in a 6 block radius with 8 s of Weakness I and 20% Slowness. Cooldown: 20s.");
-		mInfo.mDescriptions.add("The Weakness debuff is increased to level II.");
+		mInfo.mDescriptions.add("When holding two swords, right-click while sneaking and looking down to release a cloud of smoke, afflicting all enemies in a 6 block radius with 8s of 20% Weaken and 20% Slowness. Cooldown: 20s.");
+		mInfo.mDescriptions.add("The Weaken debuff is increased to 40%.");
 		mInfo.mCooldown = SMOKESCREEN_COOLDOWN;
 		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
-		mWeaknessAmplifier = getAbilityScore() == 1 ? SMOKESCREEN_1_WEAKNESS_AMPLIFIER : SMOKESCREEN_2_WEAKNESS_AMPLIFIER;
+		mWeakenEffect = getAbilityScore() == 1 ? WEAKEN_EFFECT_1 : WEAKEN_EFFECT_2;
 	}
 
 	@Override
@@ -51,7 +48,7 @@ public class Smokescreen extends Ability {
 		world.playSound(loc, Sound.ENTITY_BLAZE_SHOOT, 1.0f, 0.35f);
 		for (LivingEntity mob : EntityUtils.getNearbyMobs(loc, SMOKESCREEN_RANGE, mPlayer)) {
 			EntityUtils.applySlow(mPlugin, SMOKESCREEN_DURATION, SMOKESCREEN_SLOWNESS_AMPLIFIER, mob);
-			PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(PotionEffectType.WEAKNESS, SMOKESCREEN_DURATION, mWeaknessAmplifier, false, true));
+			EntityUtils.applyWeaken(mPlugin, SMOKESCREEN_DURATION, mWeakenEffect, mob);
 		}
 		putOnCooldown();
 	}

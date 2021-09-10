@@ -25,7 +25,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
-
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
 
 
 public class DarkPact extends Ability {
@@ -57,8 +57,8 @@ public class DarkPact extends Ability {
 		super(plugin, player, "Dark Pact");
 		mInfo.mScoreboardId = "DarkPact";
 		mInfo.mShorthandName = "DaP";
-		mInfo.mDescriptions.add("Swapping while airborne and not sneaking and holding a scythe causes a dark aura to form around you. For the next 7 seconds, you gain 10% damage reduction, +10% attack speed, and deal +40% melee damage. Each kill during this time increases the duration of your aura by 1 second and gives 1 absorption health (capped at 6) for the duration of the aura. However, the player cannot heal for 10 seconds. Cooldown: 14s.");
-		mInfo.mDescriptions.add("You gain +20% attack speed and deal +100% melee damage, and Soul Rend bypasses the healing prevention, healing the player by +2/+4 HP, depending on the level of Soul Rend. Nearby players are still healed as normal.");
+		mInfo.mDescriptions.add("Swapping while airborne and not sneaking and holding a scythe causes a dark aura to form around you. For the next 7 seconds, you gain 10% damage reduction, +10% attack speed, and deal +40% melee damage on your scythe attacks. Each kill during this time increases the duration of your aura by 1 second and gives 1 absorption health (capped at 6) for the duration of the aura. However, the player cannot heal for 10 seconds. Cooldown: 14s.");
+		mInfo.mDescriptions.add("You gain +20% attack speed and attacks with a scythe deal +100% melee damage, and Soul Rend bypasses the healing prevention, healing the player by +2/+4 HP, depending on the level of Soul Rend. Nearby players are still healed as normal.");
 		mInfo.mCooldown = COOLDOWN;
 		mInfo.mLinkedSpell = ClassAbility.DARK_PACT;
 		mInfo.mIgnoreCooldown = true;
@@ -133,5 +133,15 @@ public class DarkPact extends Ability {
 				effect.setDuration(effect.getDuration() + DURATION_INCREASE_ON_KILL);
 			}
 		}
+	}
+
+	@Override
+	public boolean livingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
+		if (event.getCause() == DamageCause.ENTITY_ATTACK) {
+			if (!ItemUtils.isHoe(mPlayer.getInventory().getItemInMainHand())) {
+				event.setDamage(event.getDamage() / (1 + mPercentDamageDealt));
+			}
+		}
+		return true;
 	}
 }
