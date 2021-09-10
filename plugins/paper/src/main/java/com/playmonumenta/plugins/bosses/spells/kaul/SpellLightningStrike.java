@@ -532,7 +532,7 @@ public class SpellLightningStrike extends Spell {
 						// similar to bypassIFrames in entity utils, instead of overwriting
 						// last damage to a small amount with every shock
 						player.setNoDamageTicks(0);
-						BossUtils.bossDamagePercent(mKaul.getBoss(), player, FIRE_DAMAGE_MULTIPLIER, fireLocation, "Lightning Stike");
+						BossUtils.bossDamagePercent(mKaul.getBoss(), player, FIRE_DAMAGE_MULTIPLIER, fireLocation, "Lightning Strike");
 					});
 				}
 
