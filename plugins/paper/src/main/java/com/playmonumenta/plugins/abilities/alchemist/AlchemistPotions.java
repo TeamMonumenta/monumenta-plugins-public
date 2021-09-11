@@ -51,8 +51,9 @@ public class AlchemistPotions extends Ability {
 		}
 	}
 
-	private static final int MAX_CHARGE_POTIONS = 4;
-	private static final int POTIONS_TIMER = (int) (2.5 * 20);
+	private static final int MAX_CHARGE_POTIONS = 6;
+	private static final int POTIONS_TIMER_BASE = 2 * 20;
+	private static final int POTION_TIMER_HARB = (int) (1.5 * 20);
 	private static final int POTIONS_TIMER_TOWN = 1 * 20;
 
 	private static final double DAMAGE_PER_SKILL_POINT = 0.5;
@@ -66,6 +67,7 @@ public class AlchemistPotions extends Ability {
 	private int mTimer = 0;
 	private int mSlot = 0;
 	private int mCharges;
+	private int mChargeTime;
 
 	private static ItemStack POTION = null;
 
@@ -86,6 +88,7 @@ public class AlchemistPotions extends Ability {
 		*/
 		if (player != null) {
 			mCharges = ScoreboardUtils.getScoreboardValue(player, POTION_SCOREBOARD);
+			mChargeTime = POTIONS_TIMER_BASE;
 			new BukkitRunnable() {
 				@Override
 				public void run() {
@@ -126,6 +129,10 @@ public class AlchemistPotions extends Ability {
 								PotionAbility potionAbility = (PotionAbility) specializationAbility;
 								mPotionAbilities.add(potionAbility);
 								mDamage += potionAbility.getDamage();
+							}
+
+							if (specializationAbility instanceof NightmarishAlchemy) {
+								mChargeTime = POTION_TIMER_HARB;
 							}
 						}
 					}
@@ -259,7 +266,7 @@ public class AlchemistPotions extends Ability {
 		if (twoHertz) {
 			if (mOnCooldown) {
 				mTimer += 10;
-				if (mTimer >= POTIONS_TIMER || (ZoneUtils.hasZoneProperty(mPlayer, ZoneProperty.RESIST_5) && mTimer >= POTIONS_TIMER_TOWN)) {
+				if (mTimer >= mChargeTime || (ZoneUtils.hasZoneProperty(mPlayer, ZoneProperty.RESIST_5) && mTimer >= POTIONS_TIMER_TOWN)) {
 					mTimer = 0;
 					incrementCharge();
 					mOnCooldown = false;

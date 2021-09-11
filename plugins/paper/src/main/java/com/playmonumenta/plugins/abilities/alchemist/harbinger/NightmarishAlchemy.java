@@ -13,8 +13,8 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 
 public class NightmarishAlchemy extends PotionAbility {
-	private static final int NIGHTMARISH_ALCHEMY_1_DAMAGE = 3;
-	private static final int NIGHTMARISH_ALCHEMY_2_DAMAGE = 5;
+	private static final int NIGHTMARISH_ALCHEMY_1_DAMAGE = 2;
+	private static final int NIGHTMARISH_ALCHEMY_2_DAMAGE = 4;
 	private static final int NIGHTMARISH_ALCHEMY_CONFUSION_DURATION = 20 * 4;
 	private static final float NIGHTMARISH_ALCHEMY_1_CONFUSION_CHANCE = 0.1f;
 	private static final float NIGHTMARISH_ALCHEMY_2_CONFUSION_CHANCE = 0.2f;
@@ -26,8 +26,8 @@ public class NightmarishAlchemy extends PotionAbility {
 		mInfo.mLinkedSpell = ClassAbility.NIGHTMARISH_ALCHEMY;
 		mInfo.mScoreboardId = "Nightmarish";
 		mInfo.mShorthandName = "Nm";
-		mInfo.mDescriptions.add("Your Alchemist Potions deal +3 damage. Non-boss enemies hit have a 10% chance to attack other enemies for 4s.");
-		mInfo.mDescriptions.add("Your Alchemist Potions deal +5 damage instead and the chance of confusing enemies is increased to 20%.");
+		mInfo.mDescriptions.add("Your Alchemist Potions deal +2 damage and refresh every 1.5 seconds instead of every 2. Non-boss enemies hit have a 10% chance to attack other enemies for 4s.");
+		mInfo.mDescriptions.add("Your Alchemist Potions deal +4 damage instead and the chance of confusing enemies is increased to 20%.");
 
 		mConfusionChance = getAbilityScore() == 1 ? NIGHTMARISH_ALCHEMY_1_CONFUSION_CHANCE : NIGHTMARISH_ALCHEMY_2_CONFUSION_CHANCE;
 	}
