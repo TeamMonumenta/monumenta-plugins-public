@@ -113,9 +113,11 @@ public class Volley extends Ability {
 				List<Projectile> projectiles;
 				// Store PotionData from the original arrow only if it is weakness or slowness
 				PotionData tArrowData = null;
+				int fireticks = 0;
 
 				if (arrow instanceof Arrow) {
 					Arrow regularArrow = (Arrow) arrow;
+					fireticks = regularArrow.getFireTicks();
 					if (regularArrow.hasCustomEffects()) {
 						tArrowData = regularArrow.getBasePotionData();
 						if (tArrowData.getType() != PotionType.SLOWNESS && tArrowData.getType() != PotionType.WEAKNESS) {
@@ -132,6 +134,9 @@ public class Volley extends Ability {
 				for (Projectile proj : projectiles) {
 					AbstractArrow projArrow = (AbstractArrow) proj;
 					projArrow.setPickupStatus(PickupStatus.CREATIVE_ONLY);
+					if (fireticks > 0) {
+						projArrow.setFireTicks(fireticks);
+					}
 
 					projArrow.setMetadata(VOLLEY_METAKEY, new FixedMetadataValue(mPlugin, null));
 					projArrow.setCritical(arrow.isCritical());
