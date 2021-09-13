@@ -200,6 +200,7 @@ public class SpellBaseBolt extends Spell {
 									mIntersectAction.run(player, loc, false);
 									if (mStopOnFirstHit) {
 										this.cancel();
+										return;
 									}
 								}
 							}

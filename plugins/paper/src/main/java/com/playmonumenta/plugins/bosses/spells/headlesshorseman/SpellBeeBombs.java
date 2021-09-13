@@ -9,7 +9,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import com.playmonumenta.plugins.bosses.bosses.HeadlessHorsemanBoss;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import com.playmonumenta.plugins.utils.BossUtils;
@@ -17,12 +16,9 @@ import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 
-
-
 /*
- * Bat Bomb - The Horseman summons 20* bats around himself to distract his enemies. After 3 seconds
-the bats explode dealing 32 damage to anyone with 4 blocks of them, killing the bat in the process.
-The bats have 20hp.
+ * Bee Bomb - The Horseman summons bees around himself to distract his enemies. After some seconds
+the bees explode dealing damage to anyone nearby, killing the bee in the process.
  */
 public class SpellBeeBombs extends Spell {
 
@@ -30,14 +26,17 @@ public class SpellBeeBombs extends Spell {
 
 	private Plugin mPlugin;
 	private LivingEntity mBoss;
-	private HeadlessHorsemanBoss mHorseman;
+	private Location mCenter;
+	private int mRange;
+	private int mCount;
 	private int mCooldownTicks = 0;
 
-	public SpellBeeBombs(Plugin plugin, LivingEntity entity, int cooldown, HeadlessHorsemanBoss horseman) {
+	public SpellBeeBombs(Plugin plugin, LivingEntity entity, int cooldown, Location center, int count) {
 		mPlugin = plugin;
 		mBoss = entity;
-		mHorseman = horseman;
+		mCenter = center;
 		mCooldownTicks = cooldown;
+		mCount = count;
 	}
 
 	public void spawnBat(Location loc) {
@@ -73,8 +72,8 @@ public class SpellBeeBombs extends Spell {
 								world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 0.65f, 1);
 
 								for (Player player : PlayerUtils.playersInRange(loc, 5.5, true)) {
-									if (mHorseman.getSpawnLocation().distance(player.getLocation()) < HeadlessHorsemanBoss.detectionRange) {
-										BossUtils.bossDamage(mHorseman.getEntity(), player, DAMAGE, loc, "Bee Bombs");
+									if (mCenter.distance(player.getLocation()) < mRange) {
+										BossUtils.bossDamage(mBoss, player, DAMAGE, loc, "Bee Bombs");
 										if (!BossUtils.bossDamageBlocked(player, DAMAGE, loc)) {
 											MovementUtils.knockAway(loc, player, 0.2f, 0.4f);
 										}
@@ -93,12 +92,12 @@ public class SpellBeeBombs extends Spell {
 	@Override
 	public void run() {
 		World world = mBoss.getWorld();
-		for (int i = 0; i < 20; i++) {
+		for (int i = 0; i < mCount; i++) {
 			Location loc = new Location(
 			    world,
-			    mHorseman.getSpawnLocation().getX() + FastUtils.randomDoubleInRange(-15, 15),
-			    mHorseman.getSpawnLocation().getY() + FastUtils.randomDoubleInRange(1, 3),
-			    mHorseman.getSpawnLocation().getZ() + FastUtils.randomDoubleInRange(-15, 15)
+			    mCenter.getX() + FastUtils.randomDoubleInRange(-15, 15),
+			    mCenter.getY() + FastUtils.randomDoubleInRange(1, 3),
+			    mCenter.getZ() + FastUtils.randomDoubleInRange(-15, 15)
 			);
 			spawnBat(loc);
 		}

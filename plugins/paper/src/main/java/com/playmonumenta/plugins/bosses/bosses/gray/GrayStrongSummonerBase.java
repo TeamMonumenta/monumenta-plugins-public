@@ -38,7 +38,7 @@ public abstract class GrayStrongSummonerBase extends BossAbilityGroup {
 		}
 
 		SpellManager activeSpells = new SpellManager(Arrays.asList(
-			new SpellBaseSummon(plugin, SUMMON_TIME, TIME_BETWEEN_CASTS, PLAYER_RADIUS, SPAWNS_PER_PLAYER, false,
+			new SpellBaseSummon(plugin, SUMMON_TIME, TIME_BETWEEN_CASTS, PLAYER_RADIUS, SPAWNS_PER_PLAYER, false, 0,
 				() -> {
 					// Run on some number of nearby players. Scale a bit below linear to avoid insane spam
 					List<Player> targets = PlayerUtils.playersInRange(boss.getLocation(), PLAYER_RANGE, true);

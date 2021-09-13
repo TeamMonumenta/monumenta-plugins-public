@@ -62,6 +62,7 @@ public class SpellBaseSummon extends Spell {
 	private final int mDuration;
 	private final int mSpawnsPerPlayer;
 	private final boolean mStopWhenHit;
+	private final int mSummonRate;
 	private final GetTargetPlayers mGetPlayers;
 	private final SummonMobAt mSummon;
 	private final SummonerAnimation mAnimation;
@@ -69,7 +70,7 @@ public class SpellBaseSummon extends Spell {
 	private final List<Vector> mLocationOffsets;
 
 	public SpellBaseSummon(Plugin plugin, int castTime, int duration, int rangeFromPlayer,
-	                       int spawnsPerPlayer, boolean stopWhenHit, GetTargetPlayers getPlayers,
+	                       int spawnsPerPlayer, boolean stopWhenHit, int summonRate, GetTargetPlayers getPlayers,
 	                       SummonMobAt summon, SummonerAnimation animation, CanRun canRun) {
 		mPlugin = plugin;
 		mCastTime = castTime;
@@ -79,6 +80,7 @@ public class SpellBaseSummon extends Spell {
 		mGetPlayers = getPlayers;
 		mSummon = summon;
 		mAnimation = animation;
+		mSummonRate = summonRate;
 		mCanRun = canRun;
 
 		// Calculate a reference list of offsets to randomly try when spawning mobs
@@ -119,31 +121,69 @@ public class SpellBaseSummon extends Spell {
 
 		// Shuffle the list once per run - all players will use same shuffled list
 		Collections.shuffle(mLocationOffsets);
-		for (Player player : players) {
-			int numSummoned = 0;
-			for (Vector offset : mLocationOffsets) {
-				Location loc = player.getLocation().add(offset);
+		if (mSummonRate > 0) {
+			for (Player player : players) {
+				new BukkitRunnable() {
+					int mNumSummoned = 0;
 
-				// Underneath block must be solid
-				if (!loc.subtract(0, 1, 0).getBlock().getType().isSolid()) {
-					continue;
-				}
+					int mIndex = 0;
+					@Override
+					public void run() {
+						mNumSummoned++;
 
-				// Blocks above summon-on block must be not solid
-				if (loc.add(0, 1, 0).getBlock().getType().isSolid() || loc.add(0, 1, 0).getBlock().getType().isSolid()) {
-					continue;
-				}
+						Vector offset = mLocationOffsets.get(mIndex);
+						Location loc = player.getLocation().add(offset);
+						BukkitRunnable r = mSummon.run(loc, player);
 
-				// Summon the mob
-				runnable = mSummon.run(loc, player);
-				if (runnable != null) {
-					mActiveRunnables.add(runnable);
-				}
+						// Underneath block must be solid
+						if (!loc.subtract(0, 1, 0).getBlock().getType().isSolid()) {
+							return;
+						}
 
-				// Stop once the right number of mobs have been summoned for this player
-				numSummoned++;
-				if (numSummoned >= mSpawnsPerPlayer) {
-					break;
+						// Blocks above summon-on block must be not solid
+						if (loc.add(0, 1, 0).getBlock().getType().isSolid() || loc.add(0, 1, 0).getBlock().getType().isSolid()) {
+							return;
+						}
+
+						// Summon the mob
+						if (mSummon.run(loc, player) != null) {
+							mActiveRunnables.add(r);
+						}
+						mIndex++;
+						if (mNumSummoned >= mSpawnsPerPlayer) {
+							this.cancel();
+						}
+					}
+
+				}.runTaskTimer(mPlugin, 0, mSummonRate);
+			}
+		} else {
+			for (Player player : players) {
+				int numSummoned = 0;
+				for (Vector offset : mLocationOffsets) {
+					Location loc = player.getLocation().add(offset);
+
+					// Underneath block must be solid
+					if (!loc.subtract(0, 1, 0).getBlock().getType().isSolid()) {
+						continue;
+					}
+
+					// Blocks above summon-on block must be not solid
+					if (loc.add(0, 1, 0).getBlock().getType().isSolid() || loc.add(0, 1, 0).getBlock().getType().isSolid()) {
+						continue;
+					}
+
+					// Summon the mob
+					runnable = mSummon.run(loc, player);
+					if (runnable != null) {
+						mActiveRunnables.add(runnable);
+					}
+
+					// Stop once the right number of mobs have been summoned for this player
+					numSummoned++;
+					if (numSummoned >= mSpawnsPerPlayer) {
+						break;
+					}
 				}
 			}
 		}

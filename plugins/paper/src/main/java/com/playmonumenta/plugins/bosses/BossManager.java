@@ -61,6 +61,20 @@ import com.playmonumenta.plugins.bosses.bosses.gray.GrayDemonSummoner;
 import com.playmonumenta.plugins.bosses.bosses.gray.GrayGolemSummoner;
 import com.playmonumenta.plugins.bosses.bosses.gray.GrayScarabSummoner;
 import com.playmonumenta.plugins.bosses.bosses.gray.GraySummoned;
+import com.playmonumenta.plugins.bosses.bosses.lich.LichAlchBoss;
+import com.playmonumenta.plugins.bosses.bosses.lich.LichClericBoss;
+import com.playmonumenta.plugins.bosses.bosses.lich.LichConquestBoss;
+import com.playmonumenta.plugins.bosses.bosses.lich.LichCurseBoss;
+import com.playmonumenta.plugins.bosses.bosses.lich.LichDemiseBoss;
+import com.playmonumenta.plugins.bosses.bosses.lich.LichJudgementBoss;
+import com.playmonumenta.plugins.bosses.bosses.lich.LichKeyGlowBoss;
+import com.playmonumenta.plugins.bosses.bosses.lich.LichMageBoss;
+import com.playmonumenta.plugins.bosses.bosses.lich.LichRogueBoss;
+import com.playmonumenta.plugins.bosses.bosses.lich.LichScoutBoss;
+import com.playmonumenta.plugins.bosses.bosses.lich.LichShieldBoss;
+import com.playmonumenta.plugins.bosses.bosses.lich.LichStrifeBoss;
+import com.playmonumenta.plugins.bosses.bosses.lich.LichWarlockBoss;
+import com.playmonumenta.plugins.bosses.bosses.lich.LichWarriorBoss;
 import com.playmonumenta.plugins.bosses.events.SpellCastEvent;
 import com.playmonumenta.plugins.depths.bosses.Davey;
 import com.playmonumenta.plugins.depths.bosses.Hedera;
@@ -238,6 +252,20 @@ public class BossManager implements Listener {
 		mStatelessBosses.put(NoAbilityDamageBoss.identityTag, (Plugin p, LivingEntity e) -> new NoAbilityDamageBoss(p, e));
 		mStatelessBosses.put(NoGlowingBoss.identityTag, (Plugin p, LivingEntity e) -> new NoGlowingBoss(p, e));
 
+		mStatelessBosses.put(LichMageBoss.identityTag, (Plugin p, LivingEntity e) -> new LichMageBoss(p, e));
+		mStatelessBosses.put(LichRogueBoss.identityTag, (Plugin p, LivingEntity e) -> new LichRogueBoss(p, e));
+		mStatelessBosses.put(LichClericBoss.identityTag, (Plugin p, LivingEntity e) -> new LichClericBoss(p, e));
+		mStatelessBosses.put(LichWarlockBoss.identityTag, (Plugin p, LivingEntity e) -> new LichWarlockBoss(p, e));
+		mStatelessBosses.put(LichAlchBoss.identityTag, (Plugin p, LivingEntity e) -> new LichAlchBoss(p, e));
+		mStatelessBosses.put(LichScoutBoss.identityTag, (Plugin p, LivingEntity e) -> new LichScoutBoss(p, e));
+		mStatelessBosses.put(LichWarriorBoss.identityTag, (Plugin p, LivingEntity e) -> new LichWarriorBoss(p, e));
+		mStatelessBosses.put(LichConquestBoss.identityTag, (Plugin p, LivingEntity e) -> new LichConquestBoss(p, e));
+		mStatelessBosses.put(LichDemiseBoss.identityTag, (Plugin p, LivingEntity e) -> new LichDemiseBoss(p, e));
+		mStatelessBosses.put(LichJudgementBoss.identityTag, (Plugin p, LivingEntity e) -> new LichJudgementBoss(p, e));
+		mStatelessBosses.put(LichStrifeBoss.identityTag, (Plugin p, LivingEntity e) -> new LichStrifeBoss(p, e));
+		mStatelessBosses.put(LichCurseBoss.identityTag, (Plugin p, LivingEntity e) -> new LichCurseBoss(p, e));
+		mStatelessBosses.put(LichShieldBoss.identityTag, (Plugin p, LivingEntity e) -> new LichShieldBoss(p, e));
+		mStatelessBosses.put(LichKeyGlowBoss.identityTag, (Plugin p, LivingEntity e) -> new LichKeyGlowBoss(p, e));
 
 		/* Stateful bosses have a remembered spawn location and end location where a redstone block is set when they die */
 		mStatefulBosses = new HashMap<String, StatefulBossConstructor>();
@@ -264,6 +292,7 @@ public class BossManager implements Listener {
 		mStatefulBosses.put(VarcosaLingeringWillBoss.identityTag, (Plugin p, LivingEntity e, Location s, Location l) -> new VarcosaLingeringWillBoss(p, e, s, l));
 		mStatefulBosses.put(MimicQueen.identityTag, (Plugin p, LivingEntity e, Location s, Location l) -> new MimicQueen(p, e, s, l));
 		mStatefulBosses.put(FalseSpirit.identityTag, (Plugin p, LivingEntity e, Location s, Location l) -> new FalseSpirit(p, e, s, l));
+		mStatefulBosses.put(Lich.identityTag, (Plugin p, LivingEntity e, Location s, Location l) -> new Lich(p, e, s, l));
 		mStatefulBosses.put(Hedera.identityTag, (Plugin p, LivingEntity e, Location s, Location l) -> new Hedera(p, e, s, l));
 		mStatefulBosses.put(Davey.identityTag, (Plugin p, LivingEntity e, Location s, Location l) -> new Davey(p, e, s, l));
 		mStatefulBosses.put(Nucleus.identityTag, (Plugin p, LivingEntity e, Location s, Location l) -> new Nucleus(p, e, s, l));
@@ -428,6 +457,23 @@ public class BossManager implements Listener {
 		mBossDeserializers.put(PounceBoss.identityTag, (Plugin p, LivingEntity e) -> PounceBoss.deserialize(p, e));
 		mBossDeserializers.put(NoAbilityDamageBoss.identityTag, (Plugin p, LivingEntity e) -> NoAbilityDamageBoss.deserialize(p, e));
 		mBossDeserializers.put(NoGlowingBoss.identityTag, (Plugin p, LivingEntity e) -> NoGlowingBoss.deserialize(p, e));
+
+		mBossDeserializers.put(Lich.identityTag, (Plugin p, LivingEntity e) -> Lich.deserialize(p, e));
+		mBossDeserializers.put(LichAlchBoss.identityTag, (Plugin p, LivingEntity e) -> LichAlchBoss.deserialize(p, e));
+		mBossDeserializers.put(LichClericBoss.identityTag, (Plugin p, LivingEntity e) -> LichClericBoss.deserialize(p, e));
+		mBossDeserializers.put(LichMageBoss.identityTag, (Plugin p, LivingEntity e) -> LichMageBoss.deserialize(p, e));
+		mBossDeserializers.put(LichRogueBoss.identityTag, (Plugin p, LivingEntity e) -> LichRogueBoss.deserialize(p, e));
+		mBossDeserializers.put(LichScoutBoss.identityTag, (Plugin p, LivingEntity e) -> LichScoutBoss.deserialize(p, e));
+		mBossDeserializers.put(LichWarlockBoss.identityTag, (Plugin p, LivingEntity e) -> LichWarlockBoss.deserialize(p, e));
+		mBossDeserializers.put(LichWarriorBoss.identityTag, (Plugin p, LivingEntity e) -> LichWarriorBoss.deserialize(p, e));
+		mBossDeserializers.put(LichConquestBoss.identityTag, (Plugin p, LivingEntity e) -> LichConquestBoss.deserialize(p, e));
+		mBossDeserializers.put(LichDemiseBoss.identityTag, (Plugin p, LivingEntity e) -> LichDemiseBoss.deserialize(p, e));
+		mBossDeserializers.put(LichJudgementBoss.identityTag, (Plugin p, LivingEntity e) -> LichJudgementBoss.deserialize(p, e));
+		mBossDeserializers.put(LichStrifeBoss.identityTag, (Plugin p, LivingEntity e) -> LichStrifeBoss.deserialize(p, e));
+		mBossDeserializers.put(LichCurseBoss.identityTag, (Plugin p, LivingEntity e) -> LichCurseBoss.deserialize(p, e));
+		mBossDeserializers.put(LichShieldBoss.identityTag, (Plugin p, LivingEntity e) -> LichShieldBoss.deserialize(p, e));
+		mBossDeserializers.put(LichKeyGlowBoss.identityTag, (Plugin p, LivingEntity e) -> LichKeyGlowBoss.deserialize(p, e));
+
 	}
 
 	/********************************************************************************

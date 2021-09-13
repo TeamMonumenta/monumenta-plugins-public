@@ -9,21 +9,33 @@ public class PercentDamageDealt extends Effect {
 
 	private final double mAmount;
 	private final EnumSet<EntityDamageEvent.DamageCause> mAffectedDamageCauses;
+	private final int mPriority;
 
-	public PercentDamageDealt(int duration, double amount, EnumSet<EntityDamageEvent.DamageCause> affectedDamageCauses) {
+	public PercentDamageDealt(int duration, double amount, EnumSet<EntityDamageEvent.DamageCause> affectedDamageCauses, int priority) {
 		super(duration);
 		mAmount = amount;
 		mAffectedDamageCauses = affectedDamageCauses;
+		mPriority = priority;
 	}
 
 	public PercentDamageDealt(int duration, double amount) {
-		this(duration, amount, null);
+		this(duration, amount, null, 0);
+	}
+
+	public PercentDamageDealt(int duration, double amount, EnumSet<EntityDamageEvent.DamageCause> affectedDamageCauses) {
+		this(duration, amount, affectedDamageCauses, 0);
 	}
 
 	// This needs to trigger before any flat damage
 	@Override
 	public EffectPriority getPriority() {
-		return EffectPriority.EARLY;
+		if (mPriority == 1) {
+			return EffectPriority.NORMAL;
+		} else if (mPriority == 2) {
+			return EffectPriority.LATE;
+		} else {
+			return EffectPriority.EARLY;
+		}
 	}
 
 	@Override

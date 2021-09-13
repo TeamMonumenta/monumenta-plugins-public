@@ -40,6 +40,12 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
 public class LocationUtils {
+	public static Vector getVectorTo(Location to, Location from) {
+		Vector vFrom = from.toVector();
+		Vector vTo = to.toVector();
+		return vTo.subtract(vFrom);
+	}
+
 	public static Vector getDirectionTo(Location to, Location from) {
 		Vector vFrom = from.toVector();
 		Vector vTo = to.toVector();

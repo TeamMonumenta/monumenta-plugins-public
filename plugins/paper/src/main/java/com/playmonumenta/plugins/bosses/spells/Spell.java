@@ -56,6 +56,10 @@ public abstract class Spell implements Cloneable {
 		return 0;
 	}
 
+	public boolean onlyForceCasted() {
+		return false;
+	}
+
 	/*
 	 * Boss damaged another entity
 	 */

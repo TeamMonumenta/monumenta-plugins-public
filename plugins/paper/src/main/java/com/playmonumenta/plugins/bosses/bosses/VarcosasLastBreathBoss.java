@@ -29,10 +29,10 @@ import com.playmonumenta.plugins.bosses.BossBarManager;
 import com.playmonumenta.plugins.bosses.BossBarManager.BossHealthAction;
 import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.bosses.spells.SpellBossBlockBreak;
 import com.playmonumenta.plugins.bosses.spells.SpellConditionalTeleport;
 import com.playmonumenta.plugins.bosses.spells.SpellPlayerAction;
 import com.playmonumenta.plugins.bosses.spells.SpellPurgeNegatives;
-import com.playmonumenta.plugins.bosses.spells.kaul.SpellKaulBlockBreak;
 import com.playmonumenta.plugins.bosses.spells.varcosamist.SpellActions;
 import com.playmonumenta.plugins.bosses.spells.varcosamist.SpellDeathlyCharge;
 import com.playmonumenta.plugins.bosses.spells.varcosamist.SpellGhostlyCannons;
@@ -106,7 +106,7 @@ public class VarcosasLastBreathBoss extends BossAbilityGroup {
 				new SpellConditionalTeleport(mBoss, mSpawnLoc, b -> b.getLocation().getBlock().getType() == Material.WATER),
 				new SpellJibberJabber(mBoss, mSpeak, detectionRange),
 				new SpellPurgeNegatives(mBoss, 20 * 3),
-				new SpellKaulBlockBreak(mBoss, 175),
+				new SpellBossBlockBreak(mBoss, 175, 1, 3, 1, true, true),
 				action, tooHighAction
 				);
 

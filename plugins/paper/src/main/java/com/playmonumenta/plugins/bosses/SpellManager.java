@@ -72,7 +72,7 @@ public class SpellManager {
 		Iterator<Spell> iterator = spells.iterator();
 		while (iterator.hasNext()) {
 			Spell spell = iterator.next();
-			if (spell.canRun()) {
+			if (spell.canRun() && !spell.onlyForceCasted()) {
 				spell.run();
 				mLastCasted = spell;
 				mCooldownSpells.add(spell);

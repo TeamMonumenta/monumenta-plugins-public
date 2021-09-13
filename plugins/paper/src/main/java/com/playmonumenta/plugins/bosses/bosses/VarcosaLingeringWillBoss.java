@@ -28,9 +28,9 @@ import com.playmonumenta.plugins.bosses.BossBarManager;
 import com.playmonumenta.plugins.bosses.BossBarManager.BossHealthAction;
 import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.bosses.spells.SpellBossBlockBreak;
 import com.playmonumenta.plugins.bosses.spells.SpellPlayerAction;
 import com.playmonumenta.plugins.bosses.spells.SpellPurgeNegatives;
-import com.playmonumenta.plugins.bosses.spells.kaul.SpellKaulBlockBreak;
 import com.playmonumenta.plugins.bosses.spells.varcosamist.SpellActions;
 import com.playmonumenta.plugins.bosses.spells.varcosamist.SpellDeathlyCharge;
 import com.playmonumenta.plugins.bosses.spells.varcosamist.SpellGhostlyCannons;
@@ -107,7 +107,7 @@ public class VarcosaLingeringWillBoss extends BossAbilityGroup {
 				new SpellJibberJabber(mBoss, mSpeak, detectionRange),
 				new SpellPurgeNegatives(mBoss, 2),
 				new SpellPurgeGlowing(mBoss, 20 * 15),
-				new SpellKaulBlockBreak(mBoss, 175),
+				new SpellBossBlockBreak(mBoss, 175, 1, 3, 1, true, true),
 				action, tooHighAction
 				);
 

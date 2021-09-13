@@ -46,13 +46,13 @@ import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.events.SpellCastEvent;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.bosses.spells.SpellBaseParticleAura;
+import com.playmonumenta.plugins.bosses.spells.SpellBossBlockBreak;
 import com.playmonumenta.plugins.bosses.spells.SpellConditionalTeleport;
 import com.playmonumenta.plugins.bosses.spells.SpellPlayerAction;
 import com.playmonumenta.plugins.bosses.spells.SpellPurgeNegatives;
 import com.playmonumenta.plugins.bosses.spells.kaul.SpellArachnopocolypse;
 import com.playmonumenta.plugins.bosses.spells.kaul.SpellEarthsWrath;
 import com.playmonumenta.plugins.bosses.spells.kaul.SpellGroundSurge;
-import com.playmonumenta.plugins.bosses.spells.kaul.SpellKaulBlockBreak;
 import com.playmonumenta.plugins.bosses.spells.kaul.SpellKaulsJudgement;
 import com.playmonumenta.plugins.bosses.spells.kaul.SpellLightningStorm;
 import com.playmonumenta.plugins.bosses.spells.kaul.SpellLightningStrike;
@@ -262,7 +262,7 @@ public class Kaul extends BossAbilityGroup {
 		});
 
 		List<Spell> passiveSpells = Arrays.asList(
-			new SpellKaulBlockBreak(mBoss, 8),
+			new SpellBossBlockBreak(mBoss, 8, 1, 3, 1, true, true),
 			new SpellBaseParticleAura(boss, 1, (LivingEntity mBoss) -> {
 				world.spawnParticle(Particle.FALLING_DUST, mBoss.getLocation().add(0, mBoss.getHeight() / 2, 0), 8, 0.35,
 				0.45, 0.35, Material.GREEN_CONCRETE.createBlockData());
@@ -278,7 +278,7 @@ public class Kaul extends BossAbilityGroup {
 		);
 
 		List<Spell> phase2PassiveSpells = Arrays.asList(
-			new SpellKaulBlockBreak(mBoss, 8),
+			new SpellBossBlockBreak(mBoss, 8, 1, 3, 1, true, true),
 			new SpellBaseParticleAura(boss, 1, (LivingEntity mBoss) -> {
 				world.spawnParticle(Particle.FALLING_DUST, mBoss.getLocation().add(0, mBoss.getHeight() / 2, 0), 8, 0.35,
 				0.45, 0.35, Material.GREEN_CONCRETE.createBlockData());
@@ -294,7 +294,7 @@ public class Kaul extends BossAbilityGroup {
 		);
 
 		List<Spell> phase3PassiveSpells = Arrays.asList(
-			new SpellKaulBlockBreak(mBoss, 8),
+			new SpellBossBlockBreak(mBoss, 8, 1, 3, 1, true, true),
 			new SpellBaseParticleAura(boss, 1, (LivingEntity mBoss) -> {
 				world.spawnParticle(Particle.FALLING_DUST, mBoss.getLocation().add(0, mBoss.getHeight() / 2, 0), 2, 0.35,
 				0.45, 0.35, Material.GREEN_CONCRETE.createBlockData());
@@ -316,7 +316,7 @@ public class Kaul extends BossAbilityGroup {
 		);
 
 		List<Spell> phase4PassiveSpells = Arrays.asList(
-			new SpellKaulBlockBreak(mBoss, 8),
+			new SpellBossBlockBreak(mBoss, 8, 1, 3, 1, true, true),
 			new SpellBaseParticleAura(boss, 1, (LivingEntity mBoss) -> {
 				world.spawnParticle(Particle.FALLING_DUST, mBoss.getLocation().add(0, mBoss.getHeight() / 2, 0), 2, 0.35,
 				0.45, 0.35, Material.GREEN_CONCRETE.createBlockData());

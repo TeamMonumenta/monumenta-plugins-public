@@ -42,13 +42,15 @@ public class SpellHellzoneGrenade extends Spell {
 	private double mRange;
 	private Location mCenter;
 	private int mCooldownTicks;
+	private int mCount;
 
-	public SpellHellzoneGrenade(Plugin plugin, LivingEntity entity, Location center, double range, int cooldown) {
+	public SpellHellzoneGrenade(Plugin plugin, LivingEntity entity, Location center, double range, int cooldown, int count) {
 		mPlugin = plugin;
 		mBoss = entity;
 		mRange = range;
 		mCenter = center;
 		mCooldownTicks = cooldown;
+		mCount = count;
 	}
 
 	@Override
@@ -76,7 +78,7 @@ public class SpellHellzoneGrenade extends Spell {
 						break;
 					}
 				}
-				if (mTicks >= 4) {
+				if (mTicks >= mCount) {
 					this.cancel();
 				}
 			}

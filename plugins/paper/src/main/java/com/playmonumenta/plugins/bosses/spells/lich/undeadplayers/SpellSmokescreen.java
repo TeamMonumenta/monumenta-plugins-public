@@ -1,0 +1,84 @@
+package com.playmonumenta.plugins.bosses.spells.lich.undeadplayers;
+
+import org.bukkit.Location;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
+import org.bukkit.World;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
+import org.bukkit.plugin.Plugin;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
+import org.bukkit.scheduler.BukkitRunnable;
+
+import com.playmonumenta.plugins.bosses.bosses.Lich;
+import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.player.PartialParticle;
+
+/*
+ * Casts Smoke Bomb every 14 seconds giving players within 6 blocks weakness 2 and slowness 3 for 6 seconds.
+ */
+
+public class SpellSmokescreen extends Spell {
+
+	private Plugin mPlugin;
+	private LivingEntity mBoss;
+	private int DELAY = (int) (20 * 1.25);
+	private int DURATION = 20 * 10;
+
+	public SpellSmokescreen(Plugin plugin, LivingEntity boss) {
+		mPlugin = plugin;
+		mBoss = boss;
+	}
+
+	@Override
+	public void run() {
+		World world = mBoss.getWorld();
+		Location loc = mBoss.getLocation();
+		mBoss.addPotionEffect(new PotionEffect(PotionEffectType.GLOWING, 20, 0, false));
+		world.playSound(mBoss.getLocation(), Sound.ENTITY_CREEPER_PRIMED, SoundCategory.HOSTILE, 1.0f, 0.8f);
+		BukkitRunnable run = new BukkitRunnable() {
+			int mT = 0;
+			@Override
+			public void run() {
+				if (mT == 0) {
+					world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 0.75f, 1.2f);
+				}
+				mT += 10;
+				new PartialParticle(Particle.SMOKE_NORMAL, loc, 3, 0.3, 0.05, 0.3, 0.075).spawnAsEnemy();
+				new PartialParticle(Particle.SMOKE_LARGE, loc, 2, 0.3, 0.05, 0.3, 0.075).spawnAsEnemy();
+				if (mBoss.isDead()) {
+					this.cancel();
+					return;
+				}
+				if (mT >= DELAY) {
+					new PartialParticle(Particle.SMOKE_LARGE, loc.clone().add(0, 1, 0), 75, 3.5, 0.8, 4.5, 0.05).spawnAsEnemy();
+					new PartialParticle(Particle.SMOKE_NORMAL, loc.clone().add(0, 1, 0), 150, 3.5, 0.2, 4.5, 0.1).spawnAsEnemy();
+					world.playSound(mBoss.getLocation(), Sound.BLOCK_FIRE_EXTINGUISH, SoundCategory.HOSTILE, 1, 0.25f);
+					for (Player player : Lich.playersInRange(loc, 4, true)) {
+						player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 6, 2));
+						player.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, 20 * 6, 1));
+					}
+				}
+				if (mT >= DELAY + DURATION) {
+					this.cancel();
+				}
+			}
+
+		};
+		run.runTaskTimer(mPlugin, 20, 10);
+		mActiveRunnables.add(run);
+	}
+
+	@Override
+	public boolean canRun() {
+		return Lich.playersInRange(mBoss.getLocation(), 5, true).size() > 0;
+	}
+
+	@Override
+	public int cooldownTicks() {
+		return 20 * 14;
+	}
+
+}

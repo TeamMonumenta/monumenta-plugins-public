@@ -34,9 +34,13 @@ import org.jetbrains.annotations.NotNull;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.effects.AbilitySilence;
+import com.playmonumenta.plugins.effects.PercentDamageDealt;
+import com.playmonumenta.plugins.effects.PercentDamageReceived;
+import com.playmonumenta.plugins.effects.PercentHeal;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 
-
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 
 public class AbilityUtils {
 
@@ -146,6 +150,26 @@ public class AbilityUtils {
 
 	public static void unsilencePlayer(Player player) {
 		Plugin.getInstance().mEffectManager.clearEffects(player, ABILITY_SILENCE_EFFECT_NAME);
+	}
+
+	public static void increaseHealingPlayer(Player player, int duration, double healBoost, String cause) {
+		Plugin.getInstance().mEffectManager.addEffect(player, cause, new PercentHeal(duration, healBoost));
+		player.addPotionEffect(new PotionEffect(PotionEffectType.BAD_OMEN, duration, -1));
+		if (healBoost < 0) {
+			player.sendActionBar(Component.text("You have reduced healing for " + duration / 20 + "s", NamedTextColor.DARK_RED));
+		}
+	}
+
+	// the unluck potion effect does not increase nor decrease luck attribute
+	public static void increaseDamageRecievedPlayer(Player player, int duration, double damageBoost, String cause) {
+		Plugin.getInstance().mEffectManager.addEffect(player, cause, new PercentDamageReceived(duration, damageBoost));
+		player.addPotionEffect(new PotionEffect(PotionEffectType.UNLUCK, duration, -1));
+	}
+
+	// the weakness potion effect does not increase nor decrease melee damage
+	public static void increaseDamageDealtPlayer(Player player, int duration, double damageBoost, String cause) {
+		Plugin.getInstance().mEffectManager.addEffect(player, cause, new PercentDamageDealt(duration, damageBoost));
+		player.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, duration, -1));
 	}
 
 	// You can't just use a negative value with the add method if the potions to be remove are distributed across multiple stacks
