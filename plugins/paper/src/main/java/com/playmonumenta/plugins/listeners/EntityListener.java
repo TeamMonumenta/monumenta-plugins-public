@@ -662,9 +662,8 @@ public class EntityListener implements Listener {
 				if (potion.getItem() != null) {
 					ItemStack potionItem = potion.getItem();
 
-					ItemStack itemInMainHand = player.getEquipment().getItemInMainHand();
-					if (itemInMainHand.getType().equals(Material.SPLASH_POTION)
-						&& itemInMainHand.getEnchantmentLevel(Enchantment.ARROW_INFINITE) > 0) {
+					if (potionItem.getType().equals(Material.SPLASH_POTION)
+						&& potionItem.getEnchantmentLevel(Enchantment.ARROW_INFINITE) > 0) {
 							ThrownPotion potionClone = (ThrownPotion)potion.getWorld().spawnEntity(potion.getLocation(), EntityType.SPLASH_POTION);
 							ItemStack newPotion = potionItem.clone();
 							if (newPotion.hasItemMeta() && newPotion.getItemMeta().hasLore()) {
