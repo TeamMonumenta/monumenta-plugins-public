@@ -1,21 +1,16 @@
 package com.playmonumenta.plugins.utils;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.FireworkEffect;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
-import org.bukkit.command.CommandSender;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Firework;
 import org.bukkit.entity.Item;
-import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.FireworkMeta;
@@ -38,10 +33,8 @@ import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
 
 public class InfusionUtils {
 
-	private static final String PULSATING_GOLD = ChatColor.GOLD + "" + ChatColor.BOLD + "Pulsating Gold";
-	private static final String PULSATING_GOLD_BAR = ChatColor.GOLD + "" + ChatColor.BOLD + "Pulsating Gold Bar";
-	private static final String PULSATING_EMERALD = ChatColor.DARK_GREEN + "" + ChatColor.BOLD + "Pulsating Emerald";
-	private static final String PULSATING_EMERALD_BLOCK = ChatColor.DARK_GREEN + "" + ChatColor.BOLD + "Pulsating Emerald Block";
+	/**When set to true the refund function will return all the XP used for the infusion, when false only the 50% */
+	public static final boolean FULL_REFUND = false;
 
 	public enum InfusionSelection {
 		ACUMEN("acumen", Acumen.PROPERTY_NAME),
@@ -81,231 +74,6 @@ public class InfusionUtils {
 		}
 	}
 
-	public static void doInfusion(CommandSender sender, Player player, ItemStack item, List<ItemFrame> paymentFrames, InfusionSelection selection) throws WrapperCommandSyntaxException {
-		if (selection.equals(InfusionSelection.REFUND)) {
-			refundInfusion(item, player);
-			return;
-		} else if (selection.equals(InfusionSelection.SPEC_REFUND)) {
-			specialRefund(item, player);
-			return;
-		}
-
-		//If item is not being refunded, check if cost adjust lore text exists, if so remove it to prevent abuse
-		List<String> newLore = new ArrayList<>();
-		for (String line : item.getLore()) {
-			if (!line.contains("PRE COST ADJUST")) {
-				newLore.add(line);
-			}
-		}
-		item.setLore(newLore);
-		ItemUtils.setPlainLore(item);
-
-		ItemRegion region = ItemUtils.getItemRegion(item);
-		int payment = calcPaymentValue(paymentFrames, region);
-		int cost = calcInfuseCost(item);
-		if (cost < 0) {
-			CommandAPI.fail("You must have a valid item to infuse in your main hand!");
-			return;
-		}
-
-		if (item.getAmount() > 1) {
-			CommandAPI.fail("Only one item can be infused at a time!");
-			return;
-		}
-
-		if (payment == cost) {
-			if (ExperienceUtils.getTotalExperience(player) >= getExpInfuseCost(item)) {
-				//Infusion accepted
-				for (ItemFrame frame : paymentFrames) {
-					ItemStack frameItem = frame.getItem();
-					if (frameItem == null || frameItem.getItemMeta() == null ||
-							frameItem.getItemMeta().getDisplayName() == null) {
-						continue;
-					}
-					if (region.equals(ItemRegion.KINGS_VALLEY)) {
-						if (frameItem.getItemMeta().getDisplayName().equals(PULSATING_GOLD)) {
-							//Clear item frame contents
-							frame.setItem(null);
-						} else if (frameItem.getItemMeta().getDisplayName().equals(PULSATING_GOLD_BAR)) {
-							//Clear item frame contents
-							frame.setItem(null);
-						}
-					} else if (region.equals(ItemRegion.CELSIAN_ISLES) || region.equals(ItemRegion.MONUMENTA)) {
-						if (frameItem.getItemMeta().getDisplayName().equals(PULSATING_EMERALD)) {
-							//Clear item frame contents
-							frame.setItem(null);
-						} else if (frameItem.getItemMeta().getDisplayName().equals(PULSATING_EMERALD_BLOCK)) {
-							//Clear item frame contents
-							frame.setItem(null);
-						}
-					}
-				}
-
-				int newXP = ExperienceUtils.getTotalExperience(player) - getExpInfuseCost(item);
-				ExperienceUtils.setTotalExperience(player, newXP);
-
-				int prevLvl = InventoryUtils.getCustomEnchantLevel(item, selection.getEnchantName(), true);
-				if (prevLvl > 0) {
-					InventoryUtils.removeCustomEnchant(item, selection.getEnchantName());
-				}
-				String numeral = "";
-				switch (prevLvl) {
-					case 1:
-						numeral = " II";
-						break;
-					case 2:
-						numeral = " III";
-						break;
-					case 3:
-						numeral = " IV";
-						break;
-					case 0:
-						numeral = " I";
-						break;
-					default:
-						CommandAPI.fail("ERROR while assigning infusion level. Please contact a moderator if you see this message!");
-				}
-				CommandUtils.enchantify(sender, player, ChatColor.stripColor(selection.getEnchantName()) + numeral);
-
-				animate(player);
-			} else {
-				CommandAPI.fail("You don't have enough exp to infuse that item!");
-			}
-		} else {
-			if (region.equals(ItemRegion.KINGS_VALLEY)) {
-				CommandAPI.fail("You must insert exactly " + cost + " Pulsating Gold into the 8 item frames!");
-			} else if (region.equals(ItemRegion.CELSIAN_ISLES) || region.equals(ItemRegion.MONUMENTA)) {
-				CommandAPI.fail("You must insert exactly " + cost + " Pulsating Emeralds into the 8 item frames!");
-			} else {
-				CommandAPI.fail("You must have a valid item to infuse in your main hand!");
-			}
-		}
-	}
-
-	public static void freeInfusion(CommandSender sender, Player player, InfusionSelection selection, int level) throws WrapperCommandSyntaxException {
-		ItemStack item = player.getInventory().getItemInMainHand();
-		if (selection.equals(InfusionSelection.REFUND)) {
-			refundInfusion(item, player);
-			return;
-		} else if (selection.equals(InfusionSelection.SPEC_REFUND)) {
-			specialRefund(item, player);
-			return;
-		}
-
-		List<String> newLore = new ArrayList<>();
-		if (item.getLore() != null) {
-			for (String line : item.getLore()) {
-				if (!line.contains("PRE COST ADJUST")) {
-					newLore.add(line);
-				}
-			}
-			item.setLore(newLore);
-			ItemUtils.setPlainLore(item);
-		}
-
-
-		if (calcInfuseCost(item) < 0) {
-			CommandAPI.fail("You must have a valid item to infuse in your main hand!");
-			return;
-		}
-
-		if (item.getAmount() > 1) {
-			CommandAPI.fail("Only one item can be infused at a time!");
-			return;
-		}
-
-		String numeral = "";
-		switch (level) {
-			case 1:
-				numeral = " I";
-				break;
-			case 2:
-				numeral = " II";
-				break;
-			case 3:
-				numeral = " III";
-				break;
-			case 4:
-				numeral = " IV";
-				break;
-
-			default:
-				CommandAPI.fail("Not a valid level!");
-		}
-		CommandUtils.enchantify(sender, player, ChatColor.stripColor(selection.getEnchantName()) + numeral);
-	}
-
-	/*
-	 * Special Refunds for items that were infused prior to 4/2/2020 cost changes
-	 * Items must be marked with 'PRE-UPDATE' lore text to be eligible.
-	 * Running this command will grant the difference in pulsating materials to the player vs old costs
-	 */
-	private static void specialRefund(ItemStack item, Player player) throws WrapperCommandSyntaxException {
-		//Remove the lore text marker from the item
-		boolean isPreUpdate = false;
-		List<String> newLore = new ArrayList<>();
-		for (String line : item.getLore()) {
-			if (!line.contains("PRE COST ADJUST")) {
-				newLore.add(line);
-			} else {
-				isPreUpdate = true;
-			}
-		}
-		item.setLore(newLore);
-		ItemUtils.setPlainLore(item);
-
-		if (isPreUpdate) {
-			ItemRegion region = ItemUtils.getItemRegion(item);
-			int refundMaterials = 0;
-
-			//Determine old cost multiplier
-			int oldMult = 0;
-			switch (ItemUtils.getItemTier(item)) {
-				case MEME:
-				case UNCOMMON:
-				case ENHANCED_UNCOMMON:
-				case UNIQUE:
-				case UNIQUE_EVENT:
-				case RARE:
-				case PATRON_MADE:
-					oldMult = 1;
-					break;
-				case RELIC:
-				case ARTIFACT:
-				case ENHANCED_RARE:
-					oldMult = 2;
-					break;
-				case EPIC:
-					oldMult = 4;
-					break;
-				default:
-					CommandAPI.fail("Invalid item tier. Only Uncommon and higher tiered items are able to be infused!");
-			}
-
-			//Calc old value
-			int infuseLevel = getInfuseLevel(item) - 1;
-			int oldValue = 0;
-			while (infuseLevel >= 0) {
-				oldValue += (oldMult * Math.pow(2, infuseLevel));
-				infuseLevel--;
-			}
-
-			//Calc new value [first level free]
-			infuseLevel = getInfuseLevel(item) - 2;
-			int newValue = 0;
-			while (infuseLevel >= 0) {
-				newValue += (getCostMultiplier(item) * Math.pow(2, infuseLevel));
-				infuseLevel--;
-			}
-
-			//Calc and give difference
-			refundMaterials = oldValue - newValue;
-			giveMaterials(player, region, refundMaterials);
-		} else {
-			CommandAPI.fail("This item does not have the 'PRE COST ADJUST' lore text so it is not eligible for a refund.");
-		}
-	}
-
 	public static void refundInfusion(ItemStack item, Player player) throws WrapperCommandSyntaxException {
 		ItemRegion region = ItemUtils.getItemRegion(item);
 		int refundMaterials = 0;
@@ -332,6 +100,8 @@ public class InfusionUtils {
 		}
 
 		int xp = ExperienceUtils.getTotalExperience(player);
+		int refundXP = 0;
+
 		switch (ItemUtils.getItemTier(item)) {
 			case MEME:
 			case UNCOMMON:
@@ -342,16 +112,16 @@ public class InfusionUtils {
 			case PATRON_MADE:
 				switch (level) {
 					case 1:
-						ExperienceUtils.setTotalExperience(player, xp + (1395 / 2));
+						refundXP = (1395);
 						break;
 					case 2:
-						ExperienceUtils.setTotalExperience(player, xp + ((1395 + 2920) / 2));
+						refundXP = (1395 + 2920);
 						break;
 					case 3:
-						ExperienceUtils.setTotalExperience(player, xp + ((1395 + 2920 + 5345) / 2));
+						refundXP = (1395 + 2920 + 5345);
 						break;
 					case 4:
-						ExperienceUtils.setTotalExperience(player, xp + ((1395 + 2920 + 5345 + 8670) / 2));
+						refundXP = (1395 + 2920 + 5345 + 8670);
 						break;
 					default:
 					case 0:
@@ -363,16 +133,16 @@ public class InfusionUtils {
 			case ENHANCED_RARE:
 				switch (level) {
 					case 1:
-						ExperienceUtils.setTotalExperience(player, xp + (2920 / 2));
+						refundXP = (2920);
 						break;
 					case 2:
-						ExperienceUtils.setTotalExperience(player, xp + ((2920 + 5345) / 2));
+						refundXP = (2920 + 5345);
 						break;
 					case 3:
-						ExperienceUtils.setTotalExperience(player, xp + ((2920 + 5345 + 8670) / 2));
+						refundXP = (2920 + 5345 + 8670);
 						break;
 					case 4:
-						ExperienceUtils.setTotalExperience(player, xp + ((2920 + 5345 + 8670 + 12895) / 2));
+						refundXP = (2920 + 5345 + 8670 + 12895);
 						break;
 					default:
 					case 0:
@@ -382,16 +152,16 @@ public class InfusionUtils {
 			case EPIC:
 				switch (level) {
 					case 1:
-						ExperienceUtils.setTotalExperience(player, xp + (5345 / 2));
+						refundXP = (5345);
 						break;
 					case 2:
-						ExperienceUtils.setTotalExperience(player, xp + ((5345 + 8670) / 2));
+						refundXP = (5345 + 8670);
 						break;
 					case 3:
-						ExperienceUtils.setTotalExperience(player, xp + ((5345 + 8670 + 12895) / 2));
+						refundXP = (5345 + 8670 + 12895);
 						break;
 					case 4:
-						ExperienceUtils.setTotalExperience(player, xp + ((5345 + 8670 + 12895 + 18020) / 2));
+						refundXP = (5345 + 8670 + 12895 + 18020);
 						break;
 					default:
 					case 0:
@@ -401,6 +171,9 @@ public class InfusionUtils {
 			default:
 				CommandAPI.fail("Invalid item. Item must be infused!");
 		}
+
+		refundXP = (FULL_REFUND ? refundXP : refundXP / 2);
+		ExperienceUtils.setTotalExperience(player, xp + refundXP);
 	}
 
 	private static void giveMaterials(Player player, ItemRegion region, int refundMaterials) throws WrapperCommandSyntaxException {
@@ -489,31 +262,6 @@ public class InfusionUtils {
 				CommandAPI.fail("Invalid item tier. Only Uncommon and higher tiered items are able to be infused!");
 				return 99999999;
 		}
-	}
-
-	private static int calcPaymentValue(List<ItemFrame> paymentFrames, ItemRegion region) {
-		int payment = 0;
-		for (ItemFrame iframe : paymentFrames) {
-			ItemStack frameItem = iframe.getItem();
-			if (frameItem == null || frameItem.getItemMeta() == null ||
-					frameItem.getItemMeta().getDisplayName() == null) {
-				continue;
-			}
-			if (region.equals(ItemRegion.KINGS_VALLEY)) {
-				if (frameItem.getItemMeta().getDisplayName().equals(PULSATING_GOLD)) {
-					payment += 1;
-				} else if (frameItem.getItemMeta().getDisplayName().equals(PULSATING_GOLD_BAR)) {
-					payment += 8;
-				}
-			} else if (region.equals(ItemRegion.CELSIAN_ISLES) || region.equals(ItemRegion.MONUMENTA)) {
-				if (frameItem.getItemMeta().getDisplayName().equals(PULSATING_EMERALD)) {
-					payment += 1;
-				} else if (frameItem.getItemMeta().getDisplayName().equals(PULSATING_EMERALD_BLOCK)) {
-					payment += 8;
-				}
-			}
-		}
-		return payment;
 	}
 
 	private static int getExpInfuseCost(ItemStack item) throws WrapperCommandSyntaxException {
@@ -633,16 +381,6 @@ public class InfusionUtils {
 		if (!getCurrentInfusion(item).equals(selection) && getInfuseLevel(item) > 0) {
 			return false;
 		}
-
-		//If item is not being refunded, check if cost adjust lore text exists, if so remove it to prevent abuse
-		List<String> newLore = new ArrayList<>();
-		for (String line : item.getLore()) {
-			if (!line.contains("PRE COST ADJUST")) {
-				newLore.add(line);
-			}
-		}
-		item.setLore(newLore);
-		ItemUtils.setPlainLore(item);
 
 		int prevLvl = InventoryUtils.getCustomEnchantLevel(item, selection.getEnchantName(), true);
 		if (prevLvl > 0) {

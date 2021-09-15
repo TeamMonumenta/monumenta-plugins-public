@@ -43,6 +43,9 @@ public class DelveInfusionUtils {
 	public static final int[] XP_COST_PER_LEVEL = {2920, 5345, 8670, 12895};
 													//40, 50, 60, 70
 
+	/**When set to true the refund function will return all the XP used for the infusion, when false only the 50% */
+	public static final boolean FULL_REFUND = false;
+
 	public static final NamespacedKey DEPTHS_MAT_LOOT_TABLE = NamespacedKey.fromString("epic:r2/depths/loot/voidstained_geode");
 
 	public enum DelveInfusionSelection {
@@ -105,17 +108,6 @@ public class DelveInfusionUtils {
 			return;
 		}
 
-		List<String> newLore = new ArrayList<>();
-		if (item.getLore() != null) {
-			for (String line : item.getLore()) {
-				if (!line.contains("PRE COST ADJUST")) {
-					newLore.add(line);
-				}
-			}
-			item.setLore(newLore);
-			ItemUtils.setPlainLore(item);
-		}
-
 		//Assume the player has already paid for this infusion
 		int prevLvl = InventoryUtils.getCustomEnchantLevel(item, selection.getEnchantName(), true);
 		if (prevLvl > 0) {
@@ -151,32 +143,14 @@ public class DelveInfusionUtils {
 
 		InventoryUtils.removeCustomEnchant(item, infusion.getEnchantName());
 
-		boolean found = false;
-		List<String> newLore = new ArrayList<>();
-		if (item.getLore() != null) {
-			for (String line : item.getLore()) {
-				if (!line.contains("PRE COST ADJUST")) {
-					newLore.add(line);
-				} else {
-					found = true;
-				}
-			}
-			item.setLore(newLore);
-			ItemUtils.setPlainLore(item);
-		}
-
 		List<ItemStack> mats = null;
 
 		/* Audit */
 		String matStr = "";
 		int auditLevel = level + 1;
 
-		int[] preCostAdjustment = {4, 8, 16, 32};
 		while (level >= 0) {
 			mats = getCurrenciesCost(item, infusion, level, player);
-			if (found) {
-				mats.get(0).setAmount(preCostAdjustment[level]);
-			}
 			level--;
 
 			/* Audit */
@@ -197,7 +171,7 @@ public class DelveInfusionUtils {
 
 		int xp = ExperienceUtils.getTotalExperience(player);
 		for (int i = 0; i <= levelXp; i++) {
-			xp += found ? XP_COST_PER_LEVEL[i] : XP_COST_PER_LEVEL[i] / 2;
+			xp += FULL_REFUND ? XP_COST_PER_LEVEL[i] : XP_COST_PER_LEVEL[i] / 2;
 		}
 		ExperienceUtils.setTotalExperience(player, xp);
 	}
