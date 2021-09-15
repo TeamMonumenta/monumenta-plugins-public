@@ -63,8 +63,8 @@ public class Arcanic extends DelveModifier {
 		List<String> magicArrow = new ArrayList<>();
 		magicArrow.add(ProjectileBoss.identityTag);
 		magicArrow.add(ProjectileBoss.identityTag + "[damage=30,distance=32,speed=0.8,delay=20,cooldown=160,turnRadius=0]");
-		magicArrow.add(ProjectileBoss.identityTag + "[SoundStart=[(ENTITY_FIREWORK_ROCKET_LAUNCH,1,1)],SoundLaunch=[(ENTITY_FIREWORK_ROCKET_LAUNCH,1,1.5)],SoundProjectile=[(ENTITY_BLAZE_BURN,0)],SoundHit=[(ENTITY_FIREWORK_ROCKET_TWINKLE,0.5,1.5)]]");
-		magicArrow.add(ProjectileBoss.identityTag + "[ParticleLaunch=[(FIREWORKS_SPARK,0)],ParticleProjectile=[(FIREWORKS_SPARK,5,0.1,0.1,0.1,0.05),(CRIT_MAGIC,20,0.2,0.2,0.2,0.1)],ParticleHit=[(FIREWORKS_SPARK,30,0,0,0,0.25)]]");
+		magicArrow.add(ProjectileBoss.identityTag + "[SoundStart=[(ENTITY_FIREWORK_ROCKET_LAUNCH,1,1)],SoundLaunch=[(ENTITY_FIREWORK_ROCKET_LAUNCH,1,1.5)],SoundProjectile=[],SoundHit=[(ENTITY_FIREWORK_ROCKET_TWINKLE,0.5,1.5)]]");
+		magicArrow.add(ProjectileBoss.identityTag + "[ParticleLaunch=[],ParticleProjectile=[(FIREWORKS_SPARK,5,0.1,0.1,0.1,0.05),(CRIT_MAGIC,20,0.2,0.2,0.2,0.1)],ParticleHit=[(FIREWORKS_SPARK,30,0,0,0,0.25)]]");
 		ABILITY_POOL.add(magicArrow);
 	}
 

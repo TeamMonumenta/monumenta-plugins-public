@@ -8,6 +8,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
 import com.playmonumenta.plugins.bosses.SpellManager;
+import com.playmonumenta.plugins.bosses.parameters.CustomString;
 import com.playmonumenta.plugins.bosses.parameters.EffectsList;
 import com.playmonumenta.plugins.bosses.parameters.ParticlesList;
 import com.playmonumenta.plugins.bosses.parameters.SoundsList;
@@ -31,6 +32,8 @@ public class ChargerBoss extends BossAbilityGroup {
 		//other stats not used by the defaults ones
 		public double DAMAGE_PERCENTAGE = 0.0;
 		public EffectsList EFFECTS = EffectsList.EMPTY;
+		/** The spell name showed when the player die by this skill */
+		public CustomString SPELL_NAME = CustomString.EMPTY;
 
 		//Particle & Sounds!
 		/** Particle summoned at boss location when starting the ability */
@@ -81,11 +84,19 @@ public class ChargerBoss extends BossAbilityGroup {
 			(Player player) -> {
 				p.PARTICLE_HIT.spawn(player.getLocation().add(0, 1, 0), 0.4d, 0.4d, 0.4d, 0.4d);
 				if (p.DAMAGE > 0) {
-					BossUtils.bossDamage(boss, player, p.DAMAGE);
+					if (p.SPELL_NAME.isEmpty()) {
+						BossUtils.bossDamage(boss, player, p.DAMAGE);
+					} else {
+						BossUtils.bossDamage(boss, player, p.DAMAGE, mBoss.getLocation(), p.SPELL_NAME.getString());
+					}
 				}
 
 				if (p.DAMAGE_PERCENTAGE > 0.0) {
-					BossUtils.bossDamagePercent(mBoss, player, p.DAMAGE_PERCENTAGE);
+					if (p.SPELL_NAME.isEmpty()) {
+						BossUtils.bossDamagePercent(mBoss, player, p.DAMAGE_PERCENTAGE);
+					} else {
+						BossUtils.bossDamagePercent(mBoss, player, p.DAMAGE_PERCENTAGE, p.SPELL_NAME.getString());
+					}
 				}
 
 				p.EFFECTS.apply(player, mBoss);

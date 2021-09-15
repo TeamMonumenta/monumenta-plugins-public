@@ -93,6 +93,11 @@ public class SoundsList {
 		mSoundsList = new ArrayList<>();
 
 		List<String> split = BossUtils.splitByCommasUsingBrackets(values);
+		if (split.isEmpty()) {
+			// Allow deliberately empty sound lists
+			return;
+		}
+
 		for (String cSoundString : split) {
 			try {
 				mSoundsList.add(CSound.fromString(cSoundString));
@@ -150,7 +155,7 @@ public class SoundsList {
 	}
 
 	public static SoundsList fromString(String string) throws RuntimeException {
-		return new SoundsList(string.replace(" ", ""));
+		return new SoundsList(string.replace(" ", "").toLowerCase());
 	}
 
 	private static class SoundNotFoundException extends RuntimeException {

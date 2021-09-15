@@ -25,6 +25,7 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.bosses.parameters.CustomString;
 import com.playmonumenta.plugins.bosses.parameters.EffectsList;
 import com.playmonumenta.plugins.bosses.parameters.ParticlesList;
 import com.playmonumenta.plugins.bosses.parameters.SoundsList;
@@ -201,7 +202,7 @@ public class BossUtils {
 		if (!s.startsWith("[")) {
 			return;
 		}
-		s = s.replace(" ", "").substring(1);
+		s = s.substring(1);
 
 		if (s.endsWith("]")) {
 			s = s.substring(0, s.length() - 1);
@@ -210,6 +211,7 @@ public class BossUtils {
 		int lastSplitIndex = 0;
 		int squareBrackets = 0;
 		int roundBrackets = 0;
+		int quoteCount = 0;
 		char charAtI;
 
 		for (int i = 0; i < s.length(); i++) {
@@ -227,12 +229,16 @@ public class BossUtils {
 				case ')':
 					roundBrackets--;
 					break;
+				case '"':
+					quoteCount = (quoteCount + 1) % 2;
+					break;
 				default:
 			}
-			if (squareBrackets == 0 && roundBrackets == 0 && charAtI == ',') {
+
+			if (squareBrackets == 0 && roundBrackets == 0 && quoteCount == 0 && charAtI == ',') {
 				toMap = s.substring(lastSplitIndex, i).split("=");
 				if (toMap.length == 2) {
-					map.put(toMap[0], toMap[1]);
+					map.put(toMap[0].replace(" ", "").toLowerCase(), toMap[1]);
 				} else {
 					Plugin.getInstance().getLogger().warning("Fail to load: " + s.substring(lastSplitIndex, i) + ". Illegal declaration");
 				}
@@ -240,15 +246,15 @@ public class BossUtils {
 			}
 		}
 
-		if (squareBrackets == 0 && roundBrackets == 0 && lastSplitIndex != s.length()) {
+		if (squareBrackets == 0 && roundBrackets == 0 && quoteCount == 0 && lastSplitIndex != s.length()) {
 			toMap = s.substring(lastSplitIndex, s.length()).split("=");
 			if (toMap.length == 2) {
-				map.put(toMap[0], toMap[1]);
+				map.put(toMap[0].replace(" ", "").toLowerCase(), toMap[1]);
 			} else {
 				Plugin.getInstance().getLogger().warning("Fail to load: " + toMap + ". Illegal declaration");
 			}
 		} else {
-			Plugin.getInstance().getLogger().warning("Fail too many brackets inside: " + s);
+			Plugin.getInstance().getLogger().warning("Fail too many brackets/quote inside: " + s);
 		}
 	}
 
@@ -258,7 +264,7 @@ public class BossUtils {
 
 		for (String tag : boss.getScoreboardTags()) {
 			if (tag.startsWith(modTag)) {
-				String found = tag.replace(idTag, "").toLowerCase();
+				String found = tag.replace(idTag, "");
 				addModifiersFromString(map, found);
 			}
 		}
@@ -271,7 +277,7 @@ public class BossUtils {
 	}
 
 	public static <T> T getParameters(LivingEntity boss, String identityTag, T parameters) {
-		Map<String, String> modMap = BossUtils.getModifiersFromIdentityTag(boss, identityTag);
+		Map<String, String> modMap = getModifiersFromIdentityTag(boss, identityTag);
 
 		for (Field field : parameters.getClass().getFields()) {
 			Class<?> t = field.getType();
@@ -286,7 +292,7 @@ public class BossUtils {
 				}
 
 				if (t.equals(boolean.class)) {
-					field.set(parameters, Boolean.parseBoolean(fieldValueOrDefault));
+					field.set(parameters, Boolean.parseBoolean(fieldValueOrDefault.toLowerCase()));
 				} else if (t.equals(int.class)) {
 					field.set(parameters, Integer.parseInt(fieldValueOrDefault));
 				} else if (t.equals(long.class)) {
@@ -311,6 +317,8 @@ public class BossUtils {
 					field.set(parameters, SoundsList.fromString(fieldValueOrDefault));
 				} else if (t.equals(ParticlesList.class)) {
 					field.set(parameters, ParticlesList.fromString(fieldValueOrDefault));
+				} else if (t.equals(CustomString.class)) {
+					field.set(parameters, CustomString.fromString(fieldValueOrDefault));
 				}
 			} catch (Exception ex) {
 				Plugin.getInstance().getLogger().warning("Failed to parse boss argument field " + fieldName + " for boss " + identityTag + ": " + ex.getMessage());

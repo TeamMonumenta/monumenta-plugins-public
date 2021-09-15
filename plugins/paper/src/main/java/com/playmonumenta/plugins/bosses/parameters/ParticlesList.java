@@ -222,7 +222,7 @@ public class ParticlesList {
 	}
 
 	public static ParticlesList fromString(String string) throws RuntimeException {
-		return new ParticlesList(string.replace(" ", ""));
+		return new ParticlesList(string.replace(" ", "").toLowerCase());
 	}
 
 

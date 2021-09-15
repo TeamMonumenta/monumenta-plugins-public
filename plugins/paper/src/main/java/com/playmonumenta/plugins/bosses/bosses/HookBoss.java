@@ -21,12 +21,12 @@ import com.playmonumenta.plugins.utils.PotionUtils;
 /**
  * @deprecated use boss_projectile instead, like this:
  * <blockquote><pre>
- * /bos var Tags add boss_projectile
- * /bos var Tags add boss_projectile[damage=30,distance=128,speed=0.8,delay=20,cooldown=160,launchTraking=true,turnRadius=0.035,HookForce=1]
- * /bos var Tags add boss_projectile[SoundStart=ITEM_CROSSBOW_LOADING_MIDDLE,ParticleLaunch=SMOKE_NORMAL,SoundLaunch=ITEM_CROSSBOW_SHOOT,ParticleProjectileMain=CRIT]
- * /bos var Tags add boss_projectile[ParticleProjectileSecond=SMOKE_LARGE,SoundProjectile=ENTITY_ARROW_SHOOT,SoundHit=ENTITY_ARMOR_STAND_BREAK,ParticleHit=CRIT]
+	/bos var Tags add boss_projectile
+	/bos var Tags add boss_projectile[damage=30,distance=128,speed=0.8,delay=20,cooldown=140,turnRadius=0.035,effects=[(pull,3)]]
+	/bos var Tags add boss_projectile[SoundStart=[(ITEM_CROSSBOW_LOADING_MIDDLE,2,0.5)],SoundHit=[(ENTITY_ARMOR_STAND_BREAK,1,0.5)],SoundProjectile=[(ENTITY_ARROW_SHOOT,2,0.2)],SoundLaunch=[(ITEM_CROSSBOW_SHOOT,2,0.5)]]
+	/bos var Tags add boss_projectile[ParticleLaunch=[(SMOKE_NORMAL,1)],ParticleProjectile=[(crit,3,0,0,0,0.1),(SPELL_INSTANT,4,0.25,0.25,0.25)],ParticleHit=[(CRIT,50,0,0,0,0.25)]]
  * </pre></blockquote>
- * @G3m1n1Boy
+ * @Author G3m1n1Boy
  */
 public class HookBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_hook";

@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.bosses.bosses;
 import java.util.Arrays;
 
 import com.playmonumenta.plugins.bosses.SpellManager;
+import com.playmonumenta.plugins.bosses.parameters.CustomString;
 import com.playmonumenta.plugins.bosses.parameters.EffectsList;
 import com.playmonumenta.plugins.bosses.parameters.ParticlesList;
 import com.playmonumenta.plugins.bosses.parameters.SoundsList;
@@ -38,6 +39,8 @@ public class ProjectileBoss extends BossAbilityGroup {
 
 		/*Effects applied to the player when he got hit */
 		public EffectsList EFFECTS = EffectsList.EMPTY;
+		/** The spell name showed when the player die by this skill */
+		public CustomString SPELL_NAME = CustomString.EMPTY;
 
 		//particle & sound used!
 		/** Sound played at the start */
@@ -95,11 +98,19 @@ public class ProjectileBoss extends BossAbilityGroup {
 						p.PARTICLE_HIT.spawn(loc, 0d, 0d, 0d, 0.25d);
 						if (player != null) {
 							if (p.DAMAGE > 0) {
-								BossUtils.bossDamage(boss, player, p.DAMAGE);
+								if (p.SPELL_NAME.isEmpty()) {
+									BossUtils.bossDamage(boss, player, p.DAMAGE);
+								} else {
+									BossUtils.bossDamage(boss, player, p.DAMAGE, mBoss.getLocation(), p.SPELL_NAME.getString());
+								}
 							}
 
 							if (p.DAMAGE_PERCENTAGE > 0.0) {
-								BossUtils.bossDamagePercent(mBoss, player, p.DAMAGE_PERCENTAGE);
+								if (p.SPELL_NAME.isEmpty()) {
+									BossUtils.bossDamagePercent(mBoss, player, p.DAMAGE_PERCENTAGE);
+								} else {
+									BossUtils.bossDamagePercent(mBoss, player, p.DAMAGE_PERCENTAGE, p.SPELL_NAME.getString());
+								}
 							}
 							p.EFFECTS.apply(player, boss);
 

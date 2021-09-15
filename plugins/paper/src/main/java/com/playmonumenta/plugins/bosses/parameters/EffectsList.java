@@ -146,7 +146,7 @@ public class EffectsList {
 	}
 
 	public static EffectsList fromString(String string) {
-		return new EffectsList(string.replace(" ", ""));
+		return new EffectsList(string.replace(" ", "").toLowerCase());
 	}
 
 	private static class EffectNotFoundException extends RuntimeException {
