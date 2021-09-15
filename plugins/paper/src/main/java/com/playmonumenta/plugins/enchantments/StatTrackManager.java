@@ -65,28 +65,29 @@ public class StatTrackManager {
 		if (!item.hasItemMeta() || !item.getItemMeta().hasDisplayName()) {
 			return;
 		}
+		String itemName = getItemName(item);
 		//Check if the player that is updating the stat is the same one
-		if (mStatUpdates.contains(item.getItemMeta().displayName().toString(), player.getUniqueId())) {
+		if (mStatUpdates.contains(itemName, player.getUniqueId())) {
 			//The item is in the system, so we add our increment to the amount waiting to be updated
 			mStatUpdates.put(
-				item.getItemMeta().displayName().toString(),
+				itemName,
 				player.getUniqueId(),
-				mStatUpdates.get(item.getItemMeta().displayName().toString(), player.getUniqueId()).intValue() + amount
+				mStatUpdates.get(itemName, player.getUniqueId()).intValue() + amount
 			);
 			//Reset the timeout timer on the runnable
-			StatDelayedUpdateCheck runnable = mStatRunnables.get(item.getItemMeta().displayName().toString(), player.getUniqueId());
+			StatDelayedUpdateCheck runnable = mStatRunnables.get(itemName, player.getUniqueId());
 			if (runnable != null) {
 				runnable.mRetries = 0;
 			}
 		} else {
 			//The item is not in the system, schedule a delayed update check for it
 			StatDelayedUpdateCheck delayedUpdate = new StatDelayedUpdateCheck(item, player, enchant);
-			mStatRunnables.put(item.getItemMeta().displayName().toString(), player.getUniqueId(), delayedUpdate);
+			mStatRunnables.put(itemName, player.getUniqueId(), delayedUpdate);
 			//Run check every second
 			delayedUpdate.runTaskTimer(Plugin.getInstance(), 0, 20);
 			//Add number to update to the map
 			mStatUpdates.put(
-				item.getItemMeta().displayName().toString(),
+				itemName,
 				player.getUniqueId(),
 				amount
 			);
@@ -109,7 +110,7 @@ public class StatTrackManager {
 		//Get the old stat on the item
 		int stat = parseValue(item, enchant);
 		//Add the stats waiting to update
-		Integer num = mStatUpdates.get(item.getItemMeta().displayName().toString(), player.getUniqueId());
+		Integer num = mStatUpdates.get(itemName, player.getUniqueId());
 		if (num == null) {
 			return;
 		}
@@ -129,7 +130,7 @@ public class StatTrackManager {
 		ItemUtils.setPlainLore(item);
 
 		//Remove the item from the system
-		mStatUpdates.remove(item.getItemMeta().displayName().toString(), player.getUniqueId());
+		mStatUpdates.remove(itemName, player.getUniqueId());
 	}
 
 	/**
@@ -225,11 +226,21 @@ public class StatTrackManager {
 			if (item == null || !item.hasItemMeta() || !item.getItemMeta().hasDisplayName()) {
 				continue;
 			}
-			if (item.getItemMeta().displayName().toString().equals(name) && getTrackingType(item) == stat) {
+			if (getItemName(item).startsWith(name) && getTrackingType(item) == stat) {
 				return item;
 			}
 		}
 		return null;
+	}
+
+	/**
+	 *  NOTES: hard coded for "Alchemis's Bag (X)" since the name change base on the numbers of charge.
+	 * a better solution should be found if other items of this kind are created
+	 */
+	private static String getItemName(ItemStack item) {
+		String itemName = ItemUtils.getPlainName(item);
+		itemName = itemName.startsWith("Alchemist's Bag") ? "Alchemist's Bag" : itemName;
+		return itemName;
 	}
 
 	/**
@@ -247,7 +258,7 @@ public class StatTrackManager {
 
 		public StatDelayedUpdateCheck(ItemStack item, Player player, StatTrackOptions enchant) {
 			mPlayer = player;
-			mItemName = item.getItemMeta().displayName().toString();
+			mItemName = getItemName(item);
 			mEnchant = enchant;
 		}
 
@@ -269,7 +280,7 @@ public class StatTrackManager {
 					return;
 				}
 
-				if (currentItem.getItemMeta().displayName().toString().equals(mItemName)) {
+				if (getItemName(currentItem).startsWith(mItemName)) {
 					//The player is still using the item, so we'll try again later
 					mRetries++;
 					if (mRetries > StatTrackManager.NUM_RETRIES) {
