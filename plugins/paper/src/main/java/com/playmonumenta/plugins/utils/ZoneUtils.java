@@ -74,7 +74,7 @@ public class ZoneUtils {
 	// Must be in survival mode, attempting to interact in an adventure mode area that is not a survival mode plots area to be false
 	// Does not include "interactions" like trapdoors/chests/etc
 	public static boolean playerCanInteractWithBlock(Player player, Location loc) {
-		return player.getGameMode() != GameMode.SURVIVAL || !ZoneUtils.hasZoneProperty(loc, ZoneProperty.ADVENTURE_MODE) && !isSurvivalModeInPlots(loc);
+		return player.getGameMode() != GameMode.SURVIVAL || !ZoneUtils.hasZoneProperty(loc, ZoneProperty.ADVENTURE_MODE) || isSurvivalModeInPlots(loc);
 	}
 
 	public static boolean hasZoneProperty(Entity entity, ZoneProperty property) {
