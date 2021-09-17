@@ -149,8 +149,10 @@ public class Metalmancy extends DepthsAbility {
 
 	@Override
 	public void playerQuitEvent(PlayerQuitEvent event) {
-		mGolem.remove();
-		mGolem = null;
+		if (mGolem != null) {
+			mGolem.remove();
+			mGolem = null;
+		}
 	}
 
 	public boolean isThisGolem(IronGolem golem) {

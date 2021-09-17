@@ -206,8 +206,10 @@ public class HuntingCompanion extends Ability {
 
 	@Override
 	public void playerQuitEvent(PlayerQuitEvent event) {
-		mFox.remove();
-		mFox = null;
+		if (mFox != null) {
+			mFox.remove();
+			mFox = null;
+		}
 	}
 
 	public boolean isThisFox(Fox fox) {

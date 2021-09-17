@@ -406,7 +406,7 @@ public class ShulkerInventoryManager {
 	 * @return True if the player has a shulker open.
 	 */
 	public static boolean playerHasShulkerOpen(HumanEntity player) {
-		if (INSTANCE != null) {
+		if (INSTANCE != null && player != null) {
 			return INSTANCE.mInventories.containsKey(player.getUniqueId());
 		}
 		return false;
