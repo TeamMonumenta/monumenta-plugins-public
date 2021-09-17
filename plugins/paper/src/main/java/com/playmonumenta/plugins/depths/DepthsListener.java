@@ -8,6 +8,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
+import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.Chest;
 import org.bukkit.block.DoubleChest;
@@ -40,6 +41,8 @@ import org.bukkit.util.Vector;
 import com.destroystokyo.paper.event.player.PlayerPostRespawnEvent;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityManager;
+import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.classes.magic.MagicType;
 import com.playmonumenta.plugins.depths.abilities.dawnbringer.Enlightenment;
 import com.playmonumenta.plugins.depths.abilities.dawnbringer.Sundrops;
 import com.playmonumenta.plugins.depths.abilities.earthbound.EarthenWrath;
@@ -237,9 +240,32 @@ public class DepthsListener implements Listener {
 			}.runTaskLater(mPlugin, 1);
 		}
 
-		//Metalmancy golem taunt
-		if (entity instanceof Mob && damager instanceof IronGolem && damager.getScoreboardTags().contains(Metalmancy.GOLEM_TAG) && !EntityUtils.isBoss(entity)) {
-			((Mob) entity).setTarget((IronGolem) damager);
+		//Metalmancy damage/taunt implementation
+		if (damager instanceof IronGolem && damager.getScoreboardTags().contains(Metalmancy.GOLEM_TAG)) {
+			IronGolem golem = (IronGolem) damager;
+			if (golem.getTicksLived() <= Metalmancy.DURATION[4]) {
+				World world = golem.getWorld();
+				if (golem.hasMetadata(Metalmancy.OWNER_METADATA_TAG) && entity instanceof Mob) {
+					Player owner = Bukkit.getPlayer(golem.getMetadata(Metalmancy.OWNER_METADATA_TAG).get(0).asString());
+					if (owner != null && owner.getWorld() == world) {
+						event.setCancelled(true);
+						event.setDamage(0);
+						Metalmancy metalmancy = AbilityManager.getManager().getPlayerAbility(owner, Metalmancy.class);
+						if (metalmancy == null || !metalmancy.isThisGolem(golem)) {
+							golem.remove();
+						} else {
+							if (!EntityUtils.isBoss(entity)) {
+								((Mob) entity).setTarget(golem);
+							}
+							EntityUtils.damageEntity(mPlugin, (LivingEntity) entity, metalmancy.getDamage(), owner, MagicType.PHYSICAL, true, ClassAbility.METALMANCY, false, false, true, false); //bypasses iframes, counts as damage from the player
+						}
+					} else {
+						golem.remove();
+					}
+				}
+			} else {
+				golem.remove();
+			}
 		}
 	}
 

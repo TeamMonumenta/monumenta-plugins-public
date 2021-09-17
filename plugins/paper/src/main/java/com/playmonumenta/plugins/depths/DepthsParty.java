@@ -80,6 +80,8 @@ public class DepthsParty {
 	public boolean mBeatBoss = false;
 	//Used to track pickup of treasure rewards from rooms
 	public boolean mCanGetTreasureReward = false;
+	//The world the party is in
+	public final World mWorld;
 
 	/**
 	 * Creates a new depths party with the given players
@@ -87,6 +89,7 @@ public class DepthsParty {
 	 */
 	public DepthsParty(List<DepthsPlayer> players, Location loc) {
 		mPlayersInParty = players;
+		mWorld = loc.getWorld();
 
 		for (DepthsPlayer dp : players) {
 

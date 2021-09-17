@@ -16,30 +16,30 @@ import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.metadata.FixedMetadataValue;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityManager;
-import com.playmonumenta.plugins.abilities.scout.WindBomb;
-import com.playmonumenta.plugins.attributes.AttributeProjectileDamage;
 import com.playmonumenta.plugins.classes.ClassAbility;
-import com.playmonumenta.plugins.enchantments.infusions.Focus;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.utils.PotionUtils;
 
 public class HuntingCompanion extends Ability {
 	private static final int COOLDOWN = 24 * 20;
-	private static final int DURATION = 12 * 20;
+	public static final int DURATION = 12 * 20;
 	private static final int TICK_INTERVAL = 5;
 	public static final String FOX_NAME = "FoxCompanion";
 	public static final String FOX_TAG = "FoxCompanion";
@@ -55,7 +55,6 @@ public class HuntingCompanion extends Ability {
 
 	private Fox mFox;
 	private LivingEntity mTarget;
-	private boolean mOriginalGlowing = false;
 	private double mDamage;
 	public int mStunTime;
 	private WindBomb mWindBomb;
@@ -99,6 +98,11 @@ public class HuntingCompanion extends Ability {
 			putOnCooldown();
 			mStunnedMobs = new ArrayList<Entity>();
 
+			if (mFox != null) {
+				mFox.remove();
+				mFox = null;
+			}
+
 			World world = mPlayer.getWorld();
 			Location loc = mPlayer.getLocation();
 			Vector facingDirection = mPlayer.getEyeLocation().getDirection().normalize();
@@ -126,7 +130,7 @@ public class HuntingCompanion extends Ability {
 			mFox.teleport(mFox.getLocation().setDirection(facingDirection));
 
 			//Shatter if durability is 0 and isn't shattered.
-			//This is needed because Hallowed doesn't consume durability, but there is a high-damage uncommon bow
+			//This is needed because Hunting Companion doesn't consume durability, but there is a high-damage uncommon bow
 			//with 0 durability that should not be infinitely usable.
 			if (damageable.getDamage() >= inMainHand.getType().getMaxDurability() && !ItemUtils.isItemShattered(inMainHand)) {
 				ItemUtils.shatterItem(inMainHand);
@@ -155,9 +159,7 @@ public class HuntingCompanion extends Ability {
 							world.spawnParticle(Particle.SMOKE_NORMAL, foxLoc, 20);
 						}
 						if (!(mTarget == null)) {
-							if (!mOriginalGlowing) {
-								mTarget.setGlowing(false);
-							}
+							mTarget.removePotionEffect(PotionEffectType.GLOWING);
 							mTarget = null;
 						}
 						mFox.remove();
@@ -196,10 +198,19 @@ public class HuntingCompanion extends Ability {
 		mTarget = le;
 		world.playSound(mPlayer.getLocation(), Sound.ENTITY_ARROW_HIT_PLAYER, 1.0f, 0.5f);
 		world.playSound(mFox.getLocation(), Sound.ENTITY_FOX_AGGRO, 1.5f, 1.0f);
-		mOriginalGlowing = le.isGlowing();
-		le.setGlowing(true);
+		PotionUtils.applyPotion(mPlayer, mTarget, new PotionEffect(PotionEffectType.GLOWING, DURATION, 0, true, false));
 		world.spawnParticle(Particle.VILLAGER_ANGRY, mFox.getEyeLocation(), 25);
 
 		return true;
+	}
+
+	@Override
+	public void playerQuitEvent(PlayerQuitEvent event) {
+		mFox.remove();
+		mFox = null;
+	}
+
+	public boolean isThisFox(Fox fox) {
+		return fox == mFox;
 	}
 }

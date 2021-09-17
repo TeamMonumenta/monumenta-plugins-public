@@ -328,24 +328,34 @@ public class EntityListener implements Listener {
 			}
 		} else if (damager instanceof Fox && damager.getScoreboardTags().contains(HuntingCompanion.FOX_TAG)) {
 			Fox fox = (Fox) damager;
-			World world = fox.getWorld();
-			if (fox.hasMetadata(HuntingCompanion.OWNER_METADATA_TAG) && damagee instanceof LivingEntity) {
-				Player owner = Bukkit.getPlayer(fox.getMetadata(HuntingCompanion.OWNER_METADATA_TAG).get(0).asString());
-				if (owner != null && owner.getWorld() == world) {
-					event.setCancelled(true);
-					if (!EntityUtils.isElite(damagee)) {
+			if (fox.getTicksLived() <= HuntingCompanion.DURATION) {
+				World world = fox.getWorld();
+				if (fox.hasMetadata(HuntingCompanion.OWNER_METADATA_TAG) && damagee instanceof LivingEntity) {
+					Player owner = Bukkit.getPlayer(fox.getMetadata(HuntingCompanion.OWNER_METADATA_TAG).get(0).asString());
+					if (owner != null && owner.getWorld() == world) {
+						event.setCancelled(true);
+						double damage = event.getDamage();
+						event.setDamage(0);
 						HuntingCompanion huntingCompanion = AbilityManager.getManager().getPlayerAbility(owner, HuntingCompanion.class);
-						if (huntingCompanion != null) {
-							List<Entity> stunnedMobs = huntingCompanion.mStunnedMobs;
-							if (!stunnedMobs.contains(damagee)) {
-								EntityUtils.applyStun(mPlugin, huntingCompanion.mStunTime, (LivingEntity) damagee);
-								stunnedMobs.add(damagee);
+						if (huntingCompanion == null || !huntingCompanion.isThisFox(fox)) {
+							fox.remove();
+						} else {
+							if (!EntityUtils.isElite(damagee)) {
+								List<Entity> stunnedMobs = huntingCompanion.mStunnedMobs;
+								if (!stunnedMobs.contains(damagee)) {
+									EntityUtils.applyStun(mPlugin, huntingCompanion.mStunTime, (LivingEntity) damagee);
+									stunnedMobs.add(damagee);
+								}
 							}
+							EntityUtils.damageEntity(mPlugin, (LivingEntity) damagee, damage, owner, MagicType.PHYSICAL, true, ClassAbility.HUNTING_COMPANION, false, false, true, false); //bypasses iframes, counts as damage from the player
+							world.playSound(fox.getLocation(), Sound.ENTITY_FOX_BITE, 1.5f, 1.0f);
 						}
+					} else {
+						fox.remove();
 					}
-					EntityUtils.damageEntity(mPlugin, (LivingEntity) damagee, event.getDamage(), owner, MagicType.PHYSICAL, true, ClassAbility.HUNTING_COMPANION, false, false, true, false); //bypasses iframes, counts as damage from the player
-					world.playSound(fox.getLocation(), Sound.ENTITY_FOX_BITE, 1.5f, 1.0f);
 				}
+			} else {
+				fox.remove();
 			}
 		}
 
@@ -1032,7 +1042,7 @@ public class EntityListener implements Listener {
 		}
 
 		//Disallows fox companion targeting players or some mobs it shouldn't
-		if (entity instanceof Fox && entity.getScoreboardTags().contains(HuntingCompanion.FOX_TAG) && (target instanceof Player || target.getScoreboardTags().contains(AbilityUtils.IGNORE_TAG))) {
+		if (entity instanceof Fox && entity.getScoreboardTags().contains(HuntingCompanion.FOX_TAG) && (target instanceof Player || target.getScoreboardTags().contains(AbilityUtils.IGNORE_TAG) || !EntityUtils.isHostileMob(entity))) {
 			event.setCancelled(true);
 		}
 	}

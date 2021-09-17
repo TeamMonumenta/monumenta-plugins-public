@@ -9,12 +9,17 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
+import org.bukkit.entity.IronGolem;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
+import org.bukkit.metadata.FixedMetadataValue;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
@@ -27,6 +32,7 @@ import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.PotionUtils;
 
 public class Metalmancy extends DepthsAbility {
 
@@ -40,10 +46,10 @@ public class Metalmancy extends DepthsAbility {
 	public static final double VELOCITY = 2;
 	public static final int DETECTION_RANGE = 32;
 	public static final int TICK_INTERVAL = 5;
+	public static final String OWNER_METADATA_TAG = "MetalmancyOwnerMetadataTag";
 
 	private Mob mGolem;
 	private Mob mTarget;
-	private boolean mOriginalGlowing = false;
 
 	public Metalmancy(Plugin plugin, Player player) {
 		super(plugin, player, ABILITY_NAME);
@@ -51,7 +57,7 @@ public class Metalmancy extends DepthsAbility {
 		mTree = DepthsTree.METALLIC;
 		mInfo.mLinkedSpell = ClassAbility.METALMANCY;
 		mInfo.mCooldown = COOLDOWN;
-		mInfo.mIgnoreCooldown = true; // so that the shooting portion functions; activation manually checks for cooldwon
+		mInfo.mIgnoreCooldown = true; // so that the shooting portion functions; activation manually checks for cooldown
 	}
 
 	@Override
@@ -62,6 +68,11 @@ public class Metalmancy extends DepthsAbility {
 		if (!isTimerActive() && DepthsUtils.isWeaponItem(mPlayer.getInventory().getItemInMainHand())) {
 			putOnCooldown();
 
+			if (mGolem != null) {
+				mGolem.remove();
+				mGolem = null;
+			}
+
 			World world = mPlayer.getWorld();
 			Location loc = mPlayer.getLocation();
 			Vector facingDirection = mPlayer.getEyeLocation().getDirection().normalize();
@@ -69,6 +80,8 @@ public class Metalmancy extends DepthsAbility {
 			mGolem.setInvulnerable(true);
 			mGolem.getAttribute(Attribute.GENERIC_ATTACK_DAMAGE).setBaseValue(DAMAGE[mRarity - 1]);
 			mGolem.setVelocity(facingDirection.multiply(VELOCITY));
+
+			mGolem.setMetadata(OWNER_METADATA_TAG, new FixedMetadataValue(mPlugin, mPlayer.getName()));
 
 			world.playSound(loc, Sound.ENTITY_IRON_GOLEM_REPAIR, 1.0f, 1.0f);
 			world.playSound(loc, Sound.BLOCK_CHAIN_BREAK, 1.0f, 1.0f);
@@ -87,9 +100,7 @@ public class Metalmancy extends DepthsAbility {
 							world.spawnParticle(Particle.SMOKE_NORMAL, golemLoc, 20);
 						}
 						if (!(mTarget == null)) {
-							if (!mOriginalGlowing) {
-								mTarget.setGlowing(false);
-							}
+							mTarget.removePotionEffect(PotionEffectType.GLOWING);
 							mTarget = null;
 						}
 						mGolem.remove();
@@ -130,11 +141,24 @@ public class Metalmancy extends DepthsAbility {
 		World world = mPlayer.getWorld();
 		mTarget = (Mob) le;
 		world.playSound(mPlayer.getLocation(), Sound.ENTITY_ARROW_HIT_PLAYER, 1.0f, 0.5f);
-		mOriginalGlowing = le.isGlowing();
-		le.setGlowing(true);
+		PotionUtils.applyPotion(mPlayer, mTarget, new PotionEffect(PotionEffectType.GLOWING, DURATION[mRarity - 1], 0, true, false));
 		world.spawnParticle(Particle.VILLAGER_ANGRY, mGolem.getEyeLocation(), 15);
 
 		return true;
+	}
+
+	@Override
+	public void playerQuitEvent(PlayerQuitEvent event) {
+		mGolem.remove();
+		mGolem = null;
+	}
+
+	public boolean isThisGolem(IronGolem golem) {
+		return golem == mGolem;
+	}
+
+	public double getDamage() {
+		return DAMAGE[mRarity - 1];
 	}
 
 	@Override

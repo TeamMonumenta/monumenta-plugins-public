@@ -21,10 +21,6 @@ import org.bukkit.inventory.meta.BlockDataMeta;
 import org.bukkit.inventory.meta.BlockStateMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.format.TextDecoration;
-
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.enchantments.StatTrack.StatTrackOptions;
 import com.playmonumenta.plugins.enchantments.StatTrackManager;
@@ -33,8 +29,13 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
-import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.ItemUtils.ItemTier;
+import com.playmonumenta.plugins.utils.MessagingUtils;
+import com.playmonumenta.plugins.utils.ZoneUtils;
+
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 
 public class FirmamentOverride extends BaseOverride {
 	private static final String CAN_PLACE_SHULKER_PERM = "monumenta.canplaceshulker";
@@ -88,6 +89,9 @@ public class FirmamentOverride extends BaseOverride {
 		}
 		if (!player.hasPermission("monumenta.firmament")) {
 			player.sendMessage(ChatColor.RED + "You don't have permission to use this item. Please ask a moderator to fix this.");
+			return false;
+		}
+		if (!ZoneUtils.playerCanInteractWithBlock(player, event.getBlock())) {
 			return false;
 		}
 

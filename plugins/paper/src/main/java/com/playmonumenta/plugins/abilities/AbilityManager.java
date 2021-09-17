@@ -32,6 +32,7 @@ import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.player.PlayerAnimationEvent;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.event.player.PlayerItemDamageEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.inventory.ItemStack;
 
@@ -787,6 +788,10 @@ public class AbilityManager {
 
 	public void playerSwapHandItemsEvent(Player player, PlayerSwapHandItemsEvent event) {
 		conditionalCast(player, (ability) -> ability.playerSwapHandItemsEvent(event));
+	}
+
+	public void playerQuitEvent(Player player, PlayerQuitEvent event) {
+		conditionalCast(player, (ability) -> ability.playerQuitEvent(event));
 	}
 
 	public void playerInteractEvent(Player player, Action action, ItemStack itemInHand, Material blockClicked) {

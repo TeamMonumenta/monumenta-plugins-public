@@ -21,6 +21,7 @@ import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.player.PlayerAnimationEvent;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.event.player.PlayerItemDamageEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
@@ -266,6 +267,10 @@ public abstract class Ability {
 	}
 
 	public void playerSwapHandItemsEvent(PlayerSwapHandItemsEvent event) {
+
+	}
+
+	public void playerQuitEvent(PlayerQuitEvent event) {
 
 	}
 

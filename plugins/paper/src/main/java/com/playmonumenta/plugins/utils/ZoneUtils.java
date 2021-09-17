@@ -1,14 +1,16 @@
 package com.playmonumenta.plugins.utils;
 
-import com.playmonumenta.plugins.server.properties.ServerProperties;
-
 import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
+
+import com.playmonumenta.plugins.server.properties.ServerProperties;
 
 public class ZoneUtils {
 	public enum ZoneProperty {
@@ -56,8 +58,23 @@ public class ZoneUtils {
 			return false;
 		}
 
+		return isSurvivalModeInPlots(loc);
+	}
+
+	public static boolean isSurvivalModeInPlots(Location loc) {
 		Material mat = loc.getWorld().getBlockAt(loc.getBlockX(), 10, loc.getBlockZ()).getType();
 		return mat == Material.SPONGE;
+	}
+
+	public static boolean playerCanInteractWithBlock(Player player, Block block) {
+		return playerCanInteractWithBlock(player, block.getLocation());
+	}
+
+	// True when the player is allowed to break/place blocks in the location
+	// Must be in survival mode, attempting to interact in an adventure mode area that is not a survival mode plots area to be false
+	// Does not include "interactions" like trapdoors/chests/etc
+	public static boolean playerCanInteractWithBlock(Player player, Location loc) {
+		return player.getGameMode() != GameMode.SURVIVAL || !ZoneUtils.hasZoneProperty(loc, ZoneProperty.ADVENTURE_MODE) && !isSurvivalModeInPlots(loc);
 	}
 
 	public static boolean hasZoneProperty(Entity entity, ZoneProperty property) {

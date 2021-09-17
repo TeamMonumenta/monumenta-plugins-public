@@ -433,8 +433,7 @@ public class DepthsRoomRepository {
 	 */
 	public void goToNextFloor(DepthsParty party, int treasure) {
 
-		//Load the room in the world
-		World world = Bukkit.getPlayer(party.mPlayersInParty.get(0).mPlayerId).getWorld();
+		World world = party.mWorld;
 		Location loc = new Location(world, party.mFloorLobbyLoadPoint.getX(), party.mFloorLobbyLoadPoint.getY(), party.mFloorLobbyLoadPoint.getZ());
 
 		//Separate rooms by floor here

@@ -1,5 +1,7 @@
 package com.playmonumenta.plugins.depths.abilities.earthbound;
 
+import java.util.List;
+
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -9,8 +11,6 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.util.Vector;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
@@ -19,6 +19,8 @@ import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
+import com.playmonumenta.plugins.point.Raycast;
+import com.playmonumenta.plugins.point.RaycastData;
 import com.playmonumenta.plugins.utils.EntityUtils;
 
 import net.md_5.bungee.api.ChatColor;
@@ -43,51 +45,38 @@ public class CrushingEarth extends DepthsAbility {
 	@Override
 	public void cast(Action action) {
 
-		LivingEntity e = EntityUtils.getEntityAtCursor(mPlayer, CAST_RANGE, true, true, true);
+		Location eyeLoc = mPlayer.getEyeLocation();
+		Raycast ray = new Raycast(eyeLoc, eyeLoc.getDirection(), CAST_RANGE);
+		ray.mThroughBlocks = false;
+		ray.mThroughNonOccluding = false;
 
-		if (e == null) {
-			return;
-		}
+		RaycastData data = ray.shootRaycast();
 
-		new BukkitRunnable() {
-			@Override
-			public void run() {
-				Location loc = mPlayer.getEyeLocation();
-				Vector dir = loc.getDirection();
-				World world = mPlayer.getWorld();
+		List<LivingEntity> mobs = data.getEntities();
+		if (mobs != null && !mobs.isEmpty()) {
+			World world = mPlayer.getWorld();
+			for (LivingEntity mob : mobs) {
+				if (mob.isValid() && !mob.isDead() && EntityUtils.isHostileMob(mob)) {
+					Location mobLoc = mob.getEyeLocation();
+					world.spawnParticle(Particle.CRIT, mobLoc, 50, 0, 0.25, 0, 0.25);
+					world.spawnParticle(Particle.CRIT_MAGIC, mobLoc, 50, 0, 0.25, 0, 0.25);
+					world.spawnParticle(Particle.SPIT, mobLoc, 5, 0.15, 0.5, 0.15, 0);
+					world.playSound(eyeLoc, Sound.ENTITY_PLAYER_ATTACK_CRIT, 1.5f, 0.5f);
+					world.playSound(eyeLoc, Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, 0.5f, 1.0f);
 
-				LivingEntity applyE = e;
+					EntityUtils.applyStun(mPlugin, STUN_DURATION[mRarity - 1], mob);
+					EntityUtils.damageEntity(mPlugin, mob, DAMAGE[mRarity - 1], mPlayer);
 
-				if (EntityUtils.isHostileMob(applyE)) {
-
-					world.playSound(loc, Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, 1, 0.9f);
-					for (int i = 0; i < CAST_RANGE; i++) {
-						loc.add(dir);
-						world.spawnParticle(Particle.CRIT, loc, 5, 0.25, 0.25, 0.25, 0);
-						world.spawnParticle(Particle.EXPLOSION_NORMAL, loc, 2, 0.05f, 0.05f, 0.05f, 0.025f);
-						if (loc.distance(e.getEyeLocation()) < 1.25) {
-							world.playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_BLAST, 1, 1.35f);
-							world.playSound(loc, Sound.ITEM_SHIELD_BREAK, 1, 1.2f);
-							break;
-						}
-					}
-					EntityUtils.applyStun(mPlugin, STUN_DURATION[mRarity - 1], applyE);
-					EntityUtils.damageEntity(mPlugin, e, DAMAGE[mRarity - 1], mPlayer);
-
-					Location eLoc = applyE.getLocation().add(0, applyE.getHeight() / 2, 0);
-					world.spawnParticle(Particle.SPIT, eLoc, 40, 0, 0, 0, 0.25f);
-					world.spawnParticle(Particle.CRIT_MAGIC, loc, 30, 1, 1, 1, 0.25);
+					putOnCooldown();
+					break;
 				}
-				this.cancel();
 			}
-		}.runTaskTimer(mPlugin, 0, 1);
-		putOnCooldown();
+		}
 	}
 
 	@Override
 	public boolean runCheck() {
 		ItemStack mainhand = mPlayer.getInventory().getItemInMainHand();
-		ItemStack offhand = mPlayer.getInventory().getItemInOffHand();
 		return !mPlayer.isSneaking() && !isOnCooldown() && DepthsUtils.isWeaponItem(mainhand);
 	}
 

@@ -1174,6 +1174,22 @@ public class DepthsManager {
 
 		for (int i = 0; i < 2; i++) {
 			List<DepthsAbility> abilities = getFilteredAbilities(dp.mEligibleTrees);
+
+			//Do not give any abilities that have the same trigger as abilities that are currently offered in an ability reward
+			//This is needed because players can open up an ability reward, not choose anything, then take mystery box or chaos and end up with two abilities on a trigger
+			List<DepthsAbilityItem> abilityOffering = mAbilityOfferings.get(p.getUniqueId());
+			if (abilityOffering != null) {
+				List<DepthsTrigger> blockedTriggers = new ArrayList<>();
+				for (DepthsAbilityItem offeredAbility : abilityOffering) {
+					DepthsTrigger trigger = offeredAbility.mTrigger;
+					if (trigger != DepthsTrigger.PASSIVE) {
+						blockedTriggers.add(trigger);
+					}
+				}
+
+				abilities.removeIf(ability -> blockedTriggers.contains(ability.getTrigger()));
+			}
+
 			Collections.shuffle(abilities);
 			for (DepthsAbility da : abilities) {
 				if (da.canBeOffered(p) && !da.getDisplayName().equals(removedAbility)) {

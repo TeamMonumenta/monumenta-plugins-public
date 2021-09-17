@@ -187,6 +187,8 @@ public class PlayerListener implements Listener {
 		/* Remove ephemeral items on logout */
 		InventoryUtils.removeSpecialItems(player, true);
 
+		mPlugin.mAbilityManager.playerQuitEvent(player, event);
+
 		mPlugin.mTrackingManager.removeEntity(player);
 
 		for (LivingEntity mob : EntityUtils.getNearbyMobs(player.getLocation(), 20)) {
@@ -292,7 +294,6 @@ public class PlayerListener implements Listener {
 		ItemStack item = event.getItemInHand();
 		Player player = event.getPlayer();
 		Block block = event.getBlock();
-		Location loc = block.getLocation();
 
 		NavigableSet<Effect> effects = mPlugin.mEffectManager.getEffects(player, STASIS);
 		if (effects != null && mPlugin.mEffectManager.getEffects(player, STASIS) != null && (mPlugin.mEffectManager.getEffects(player, STASIS)).contains(new Stasis(120))) {
@@ -304,9 +305,7 @@ public class PlayerListener implements Listener {
 		}
 
 		//Prevent players in survival mode breaking blocks in adventure mode zones not including plots
-		Location checkForSponge = loc.clone();
-		checkForSponge.setY(10);
-		if (player.getGameMode() == GameMode.SURVIVAL && ZoneUtils.hasZoneProperty(loc, ZoneProperty.ADVENTURE_MODE) && checkForSponge.getBlock().getType() != Material.SPONGE) {
+		if (!ZoneUtils.playerCanInteractWithBlock(player, block)) {
 			event.setCancelled(true);
 			return;
 		}
@@ -1056,7 +1055,6 @@ public class PlayerListener implements Listener {
 		Player player = event.getPlayer();
 		ItemStack item = player.getInventory().getItemInMainHand();
 		Block block = event.getBlock();
-		Location loc = block.getLocation();
 
 		String s = "Stasis";
 		NavigableSet<Effect> effects = mPlugin.mEffectManager.getEffects(player, s);
@@ -1069,9 +1067,7 @@ public class PlayerListener implements Listener {
 		}
 
 		//Prevent players in survival mode breaking blocks in adventure mode zones not including plots
-		Location checkForSponge = loc.clone();
-		checkForSponge.setY(10);
-		if (player.getGameMode() == GameMode.SURVIVAL && ZoneUtils.hasZoneProperty(loc, ZoneProperty.ADVENTURE_MODE) && checkForSponge.getBlock().getType() != Material.SPONGE) {
+		if (!ZoneUtils.playerCanInteractWithBlock(player, block)) {
 			event.setCancelled(true);
 			return;
 		}
