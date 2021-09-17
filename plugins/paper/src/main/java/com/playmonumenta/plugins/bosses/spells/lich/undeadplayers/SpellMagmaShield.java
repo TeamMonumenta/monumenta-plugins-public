@@ -13,12 +13,12 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
-import com.playmonumenta.plugins.bosses.bosses.Lich;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.player.PartialParticle;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.VectorUtils;
 
 /*
@@ -54,11 +54,11 @@ public class SpellMagmaShield extends Spell {
 					this.cancel();
 					Location loc = mBoss.getLocation();
 					Vector playerDir = mBoss.getEyeLocation().getDirection().setY(0).normalize();
-					for (Player p : Lich.playersInRange(mBoss.getLocation(), 6, true)) {
+					for (Player p : PlayerUtils.playersInRange(mBoss.getLocation(), 6, true)) {
 						Vector toMobVector = p.getLocation().toVector().subtract(mBoss.getLocation().toVector()).setY(0).normalize();
 						if (playerDir.dot(toMobVector) > 0.33) {
 							MovementUtils.knockAway(mBoss, p, 0.5f);
-							BossUtils.bossDamage(mBoss, p, 30);
+							BossUtils.bossDamage(mBoss, p, 30, mBoss.getLocation(), "Magma Shield");
 							p.setFireTicks(20 * 5);
 						}
 					}
@@ -101,7 +101,7 @@ public class SpellMagmaShield extends Spell {
 
 	@Override
 	public boolean canRun() {
-		return Lich.playersInRange(mBoss.getLocation(), 6, true).size() > 0;
+		return PlayerUtils.playersInRange(mBoss.getLocation(), 9, true).size() > 0;
 	}
 
 	@Override

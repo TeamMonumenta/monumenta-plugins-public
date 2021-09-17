@@ -153,7 +153,7 @@ public class SpellFinalHeatMech extends Spell {
 			List<Player> players = Lich.playersInRange(mCenter, mRange, true);
 			for (Player p : players) {
 				if (p.getBoundingBox().overlaps(box)) {
-					BossUtils.bossDamage(mBoss, p, 75);
+					BossUtils.bossDamage(mBoss, p, 75, null, "Malakut's Dynamo");
 					MovementUtils.knockAway(mBoss, p, 0.5f);
 					p.setFireTicks(100);
 				}

@@ -205,7 +205,7 @@ public class SpellDarkOmen extends Spell {
 					mDamaged.add(p);
 					world.playSound(p.getLocation(), Sound.ENTITY_FIREWORK_ROCKET_LAUNCH, 1.0f, 1.5f);
 					world.playSound(p.getLocation(), Sound.ENTITY_GENERIC_EXTINGUISH_FIRE, 1.0f, 2.0f);
-					BossUtils.bossDamagePercent(mBoss, p, 0.75);
+					BossUtils.bossDamagePercent(mBoss, p, 0.75, null, "Dark Omen");
 					Lich.cursePlayer(mPlugin, p);
 				}
 			}

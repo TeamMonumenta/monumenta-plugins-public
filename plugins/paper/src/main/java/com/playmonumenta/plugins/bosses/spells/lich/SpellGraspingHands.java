@@ -124,7 +124,7 @@ public class SpellGraspingHands extends Spell {
 
 			PPGroundCircle indicator = new PPGroundCircle(Particle.REDSTONE, player.getLocation(), 24, 0.25, 0.1, 0.25, 0, GRASPING_HANDS_COLOR).init(0, true);
 			PPGroundCircle indicator2 = new PPGroundCircle(Particle.SMOKE_NORMAL, player.getLocation(), 24, 0.2, 0, 0.2, 0).init(0, true);
-			PPGroundCircle indicator3 = new PPGroundCircle(Particle.DRAGON_BREATH, player.getLocation(), 15, 0.25, 0.1, 0.25, mRand.nextDouble(0.025, 0.1)).init(0, true);
+			PPGroundCircle indicator3 = new PPGroundCircle(Particle.DRAGON_BREATH, player.getLocation(), 15, 0.25, 0.1, 0.25, mRand.nextDouble(0.01, 0.05)).init(0, true);
 
 			BukkitRunnable runC = new BukkitRunnable() {
 				int mT = 0;
@@ -154,7 +154,7 @@ public class SpellGraspingHands extends Spell {
 									//damage the player
 									for (Player p : Lich.playersInRange(mLoc, 5.0, true)) {
 										Vector v = p.getVelocity();
-										BossUtils.bossDamagePercent(mBoss, player, 0.1, player.getLocation());
+										BossUtils.bossDamagePercent(mBoss, player, 0.1, player.getLocation(), "Grasping Hands");
 										p.setVelocity(v);
 										p.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 4, 2));
 										p.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, 20 * 4, -4));

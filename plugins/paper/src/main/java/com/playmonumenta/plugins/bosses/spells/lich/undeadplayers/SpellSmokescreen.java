@@ -12,9 +12,9 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import com.playmonumenta.plugins.bosses.bosses.Lich;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.player.PartialParticle;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 
 /*
  * Casts Smoke Bomb every 14 seconds giving players within 6 blocks weakness 2 and slowness 3 for 6 seconds.
@@ -53,10 +53,10 @@ public class SpellSmokescreen extends Spell {
 					return;
 				}
 				if (mT >= DELAY) {
-					new PartialParticle(Particle.SMOKE_LARGE, loc.clone().add(0, 1, 0), 75, 3.5, 0.8, 4.5, 0.05).spawnAsEnemy();
-					new PartialParticle(Particle.SMOKE_NORMAL, loc.clone().add(0, 1, 0), 150, 3.5, 0.2, 4.5, 0.1).spawnAsEnemy();
-					world.playSound(mBoss.getLocation(), Sound.BLOCK_FIRE_EXTINGUISH, SoundCategory.HOSTILE, 1, 0.25f);
-					for (Player player : Lich.playersInRange(loc, 4, true)) {
+					new PartialParticle(Particle.SMOKE_LARGE, loc.clone().add(0, 1, 0), 60, 3.5, 0.8, 4.5, 0.025).spawnAsEnemy();
+					new PartialParticle(Particle.SMOKE_NORMAL, loc.clone().add(0, 1, 0), 100, 3.5, 0.2, 4.5, 0.05).spawnAsEnemy();
+					world.playSound(mBoss.getLocation(), Sound.BLOCK_FIRE_EXTINGUISH, SoundCategory.HOSTILE, 1, 0.7f);
+					for (Player player : PlayerUtils.playersInRange(loc, 4, true)) {
 						player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 6, 2));
 						player.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, 20 * 6, 1));
 					}
@@ -73,7 +73,7 @@ public class SpellSmokescreen extends Spell {
 
 	@Override
 	public boolean canRun() {
-		return Lich.playersInRange(mBoss.getLocation(), 5, true).size() > 0;
+		return PlayerUtils.playersInRange(mBoss.getLocation(), 7, true).size() > 0;
 	}
 
 	@Override

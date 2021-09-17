@@ -240,22 +240,22 @@ public class SpellAutoAttack extends Spell {
 
 	private void damage(Player player) {
 		if (mPhase == 1) {
-			BossUtils.bossDamage(mBoss, player, 22, mBoss.getLocation());
+			BossUtils.bossDamage(mBoss, player, 22, mBoss.getLocation(), "Death Bolt");
 		}
 
 		if (mPhase == 2) {
-			BossUtils.bossDamage(mBoss, player, 27, mBoss.getLocation());
+			BossUtils.bossDamage(mBoss, player, 27, mBoss.getLocation(), "Death Bolt");
 			AbilityUtils.increaseDamageRecievedPlayer(player, 20 * 5, 0.2, "Lich");
 		}
 
 		if (mPhase == 3) {
-			BossUtils.bossDamage(mBoss, player, 32, mBoss.getLocation());
+			BossUtils.bossDamage(mBoss, player, 32, mBoss.getLocation(), "Death Bolt");
 			AbilityUtils.increaseDamageRecievedPlayer(player, 20 * 5, 0.2, "Lich");
 			AbilityUtils.increaseDamageDealtPlayer(player, 20 * 5, -0.2, "Lich");
 		}
 
 		if (mPhase >= 4) {
-			BossUtils.bossDamage(mBoss, player, 37, mBoss.getLocation());
+			BossUtils.bossDamage(mBoss, player, 37, mBoss.getLocation(), "Death Bolt");
 			AbilityUtils.increaseDamageRecievedPlayer(player, 20 * 5, 0.2, "Lich");
 			AbilityUtils.increaseDamageDealtPlayer(player, 20 * 5, -0.2, "Lich");
 		}

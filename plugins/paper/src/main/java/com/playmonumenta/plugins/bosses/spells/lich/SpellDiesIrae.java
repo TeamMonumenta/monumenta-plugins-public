@@ -105,7 +105,7 @@ public class SpellDiesIrae extends Spell {
 					Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "team modify crystal color white");
 					for (EnderCrystal e : mCrystal) {
 						e.setGlowing(true);
-						e.setBeamTarget(mBoss.getLocation().add(0, 1.5, 0));
+						e.setBeamTarget(mBoss.getLocation().add(0, 0, 0));
 						UUID uuid = e.getUniqueId();
 						Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "team join crystal " + uuid);
 					}
@@ -184,7 +184,7 @@ public class SpellDiesIrae extends Spell {
 		for (EnderCrystal e : mCrystal) {
 			e.remove();
 			new PartialParticle(Particle.EXPLOSION_HUGE, e.getLocation(), 1, 0, 0, 0, 0.1).spawnAsBoss();
-			world.playSound(e.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 2f, 1f);
+			world.playSound(e.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 3f, 1f);
 		}
 
 		//heal boss + damage with delay (only once)
@@ -233,7 +233,7 @@ public class SpellDiesIrae extends Spell {
 					List<Player> players = Lich.playersInRange(mCenter, mRange, true);
 					players.removeIf(pl -> SpellDimensionDoor.getShadowed().contains(pl) || pl.getLocation().getY() >= mCenter.getY() + mCeiling);
 					for (Player p : players) {
-						BossUtils.bossDamagePercent(mBoss, p, damage);
+						BossUtils.bossDamagePercent(mBoss, p, damage, null, "Dies Irae");
 						world.playSound(p.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 1.0f, 0.5f);
 					}
 				}

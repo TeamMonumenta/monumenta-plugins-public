@@ -214,14 +214,14 @@ public class SpellFinalCrystal extends Spell {
 								@Override
 								public void run() {
 									mTicks += 5;
-									new PartialParticle(Particle.SOUL, mLoc, 4, 3, 0.15, 3, 0).spawnAsBoss();
+									new PartialParticle(Particle.SOUL, mLoc, 20, 3, 0.15, 3, 0).spawnAsBoss();
 									indicator.location(mLoc).spawnAsBoss();
 
 									if (mTicks % 10 == 0) {
 										for (Player player : Lich.playersInRange(block.getLocation(), 4, true)) {
 											if (mCenter.distance(player.getLocation()) < mRange) {
 												/* Fire aura can not be blocked */
-												BossUtils.bossDamagePercent(mBoss, player, 0.15, (Location)null);
+												BossUtils.bossDamagePercent(mBoss, player, 0.15, (Location)null, "Souldrain Pool");
 												AbilityUtils.increaseDamageDealtPlayer(player, 20 * 8, -0.3, "Lich");
 											}
 										}

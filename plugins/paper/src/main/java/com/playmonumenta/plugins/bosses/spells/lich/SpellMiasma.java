@@ -46,7 +46,7 @@ public class SpellMiasma extends Spell {
 					Location l = player.getEyeLocation();
 					world.spawnParticle(Particle.SQUID_INK, l, 10, 0.1, 0.1, 0.1, 0.25);
 
-					BossUtils.bossDamage(mBoss, player, 20, (Location)null);
+					BossUtils.bossDamage(mBoss, player, 20, (Location)null, "Miasma");
 					player.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 2 * 20, 0));
 					player.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, 6 * 20, 1));
 					if (!mWarnedPlayers.contains(player)) {

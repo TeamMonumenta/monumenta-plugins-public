@@ -137,7 +137,7 @@ public class SpellGravityWell extends Spell {
 
 									if (pull) {
 										if (player.getLocation().distance(mLoc) > 4) {
-											BossUtils.bossDamage(mBoss, player, 20);
+											BossUtils.bossDamage(mBoss, player, 20, null, "Gravity Well");
 										}
 										player.setVelocity(dir.multiply(-0.85));
 									}
@@ -145,7 +145,7 @@ public class SpellGravityWell extends Spell {
 
 								if (mT % 10 == 0) {
 									if (player.getLocation().distance(mLoc) <= 4) {
-										BossUtils.bossDamage(mBoss, player, 35);
+										BossUtils.bossDamage(mBoss, player, 35, null, "Gravity Well");
 									}
 								}
 							}

@@ -171,7 +171,7 @@ public class SpellLichSinisterReach extends Spell {
 				if (mInc < 20 && mInc % 2 == 0) {
 					p.setNoDamageTicks(0);
 					world.spawnParticle(Particle.CRIT_MAGIC, p.getLocation(), 30, 0.1, 0.1, 0.1, 0.75);
-					BossUtils.bossDamagePercent(mBoss, p, 1.0, mBoss.getLocation(), true);
+					BossUtils.bossDamagePercent(mBoss, p, 1.0, mBoss.getLocation(), true, "Sinister Reach");
 					// Doesn't matter if the player is blocking, there are 12 hits and only one can be blocked
 					p.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20, 10));
 				}

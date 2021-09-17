@@ -127,7 +127,7 @@ public class SpellSalientOfDecay extends Spell {
 											int ndt = p.getNoDamageTicks();
 											p.setNoDamageTicks(0);
 											Vector velocity = p.getVelocity();
-											BossUtils.bossDamage(mBoss, p, 16, null); //16 dmg every sec, 6 seconds
+											BossUtils.bossDamage(mBoss, p, 16, null, "Salient of Decay"); //16 dmg every sec, 6 seconds
 											p.setVelocity(velocity);
 											p.setNoDamageTicks(ndt);
 											if (mT >= 6 || p.isDead()) {

@@ -270,6 +270,11 @@ public class Lich extends BossAbilityGroup {
 						mKey.remove();
 					}
 				}
+
+				//destroy vehicle to prevent cheese
+				if (mBoss.getVehicle() != null) {
+					mBoss.getVehicle().remove();
+				}
 			}
 
 		}.runTaskTimer(mPlugin, 20 * 23, 5);
@@ -480,6 +485,8 @@ public class Lich extends BossAbilityGroup {
 
 		events.put(50, mBoss -> {
 			forceCastSpell(SpellDiesIrae.class);
+			//prevent overkilling before ability is casted
+			mPhase = 3;
 		});
 
 		events.put(33, mBoss -> {
@@ -614,7 +621,7 @@ public class Lich extends BossAbilityGroup {
 						mBoss.setInvulnerable(false);
 						mBoss.setAI(true);
 						mBoss.setGravity(true);
-						mPhase = 3;
+						mPhase = 4;
 						SpellDiesIrae.setActive(false);
 						changePhase(phase3Spells, phase3PassiveSpells, null);
 						mCutscene = false;
@@ -848,7 +855,9 @@ public class Lich extends BossAbilityGroup {
 		double damage = event.getFinalDamage();
 		if (mPhase == 1 && mBoss.getHealth() - damage <= mBoss.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue() * 0.51) {
 			event.setDamage(mBoss.getHealth() - mBoss.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue() * 0.51);
-		} else if (mPhase == 2 && mBoss.getHealth() - damage <= mBoss.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue() * 0.31) {
+		} else if (mPhase == 2 && mBoss.getHealth() - damage <= mBoss.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue() * 0.34) {
+			event.setDamage(mBoss.getHealth() - mBoss.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue() * 0.34);
+		} else if (mPhase == 3 && mBoss.getHealth() - damage <= mBoss.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue() * 0.31) {
 			event.setDamage(mBoss.getHealth() - mBoss.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue() * 0.31);
 		}
 
@@ -1236,7 +1245,7 @@ public class Lich extends BossAbilityGroup {
 		}
 		String[] dio1 = new String[] {
 				"I... WILL... NOT... BE... DESTROYED...",
-				"NO! I MUST... BE THE FIRST TO TAKE... THE..."
+				"NO! I MUST... SPEAK... THE PARTING VIEL..."
 				};
 		new BukkitRunnable() {
 			int mT = 0;
@@ -1393,9 +1402,8 @@ public class Lich extends BossAbilityGroup {
 	private void surprise() {
 		mDefeated = false;
 		String[] dio = new String[] {
-				"...AND STILL I HOLD ON TO LIFE.",
-				"I WILL TAKE THE FIRST NAPKIN.",
-				"THE VEIL SUSTAINS ME. I HAVE NO TIME FOR DEATH."
+				"...THE PARTING VEIL GRANTS ME STRENGTH.",
+				"IT SUSTAINS ME. I HAVE NO TIME FOR DEATH."
 				};
 		World world = mStart.getWorld();
 
@@ -1441,7 +1449,7 @@ public class Lich extends BossAbilityGroup {
 					mBoss.teleport(mStart.getLocation().add(0, 10, 0));
 					world.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_SHOOT, 3.0f, 0.5f);
 					new PartialParticle(Particle.CLOUD, mBoss.getLocation(), 25, 0.1, 0.1, 0.1, 0.1).spawnAsBoss();
-					particles();
+					particles(world);
 				}
 				if (mT > dio.length) {
 					this.cancel();
@@ -1453,8 +1461,7 @@ public class Lich extends BossAbilityGroup {
 		}.runTaskTimer(mPlugin, 20 * 3, 20 * 4);
 	}
 
-	private void particles() {
-		World world = mStart.getWorld();
+	private void particles(World world) {
 		List<Player> players = playersInRange(mBoss.getLocation(), detectionRange, true);
 		for (Player p : players) {
 			new BukkitRunnable() {
@@ -1493,10 +1500,9 @@ public class Lich extends BossAbilityGroup {
 		block.setGravity(false);
 		block.setTicksLived(1);
 		for (Player p : playersInRange(mStart.getLocation(), detectionRange, true)) {
-			p.sendMessage(ChatColor.LIGHT_PURPLE + "I HAVE NO TIME FOR YOU AND YOUR MEDDLING!");
+			p.sendMessage(ChatColor.LIGHT_PURPLE + "AND I HAVE NO TIME FOR YOU AND YOUR MEDDLING!");
 		}
 
-		mPhase = 4;
 		List<Spell> death0Passives = Arrays.asList(
 				new SpellEdgeKill(mBoss, mStart.getLocation()),
 				new SpellFinalParticle(mPlugin, mBoss, mStart.getLocation(), detectionRange, block),
@@ -1978,7 +1984,7 @@ public class Lich extends BossAbilityGroup {
 	public void init() {
 		int bossTargetHp = 0;
 		int playercount = playersInRange(mBoss.getLocation(), detectionRange, true).size();
-		double hpdel = 3750;
+		double hpdel = 4000;
 		bossTargetHp = (int) (hpdel * (1 + (1 - 1/Math.E) * Math.max(Math.log(playercount), 0)));
 		mBoss.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(bossTargetHp);
 		mBoss.getAttribute(Attribute.GENERIC_FOLLOW_RANGE).setBaseValue(detectionRange);

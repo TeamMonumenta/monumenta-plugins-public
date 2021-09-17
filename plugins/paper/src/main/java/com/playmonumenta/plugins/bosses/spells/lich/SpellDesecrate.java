@@ -88,7 +88,7 @@ public class SpellDesecrate extends Spell {
 						player.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, 20 * 3, -10));
 						player.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, 20 * 3, 10));
 						AbilityUtils.silencePlayer(player, 3 * 20);
-						BossUtils.bossDamage(mBoss, player, 20);
+						BossUtils.bossDamage(mBoss, player, 20, null, "Desecrate");
 						MovementUtils.knockAway(mBoss.getLocation(), player, 0.4f);
 					}
 
@@ -136,7 +136,7 @@ public class SpellDesecrate extends Spell {
 								}
 								//fail to escape
 								if (pHoriLoc.distance(mBossLoc) < mRadius) {
-									BossUtils.bossDamage(mBoss, p, 75);
+									BossUtils.bossDamage(mBoss, p, 75, null, "Desecrate");
 									MovementUtils.knockAway(mBoss.getLocation(), p, 0.5f);
 									world.playSound(p.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 1.0f, 0.75f);
 									world.playSound(mBossLoc, Sound.BLOCK_ENCHANTMENT_TABLE_USE, 2.0f, 0.5f);

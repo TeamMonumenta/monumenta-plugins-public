@@ -92,13 +92,14 @@ public class SpellFinalParticle extends Spell {
 				}
 				int ndt = p.getNoDamageTicks();
 				p.setNoDamageTicks(0);
-				BossUtils.bossDamagePercent(mBoss, p, 0.05);
+				BossUtils.bossDamagePercent(mBoss, p, 0.05, null, "Miasma");
 				p.setNoDamageTicks(ndt);
 				//death bloom nod >:3
 				p.addPotionEffect(new PotionEffect(PotionEffectType.WITHER, 20 * 15, 2));
 				p.addPotionEffect(new PotionEffect(PotionEffectType.POISON, 20 * 15, 2));
 				p.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, 20 * 15, 1));
 				p.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 15, 0));
+				p.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 20 * 2, 0));
 			}
 		}
 		//kill all projectiles close to boss

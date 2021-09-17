@@ -16,10 +16,11 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
-import com.playmonumenta.plugins.bosses.bosses.Lich;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.player.PartialParticle;
 import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.MovementUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.VectorUtils;
 
 /*
@@ -94,7 +95,7 @@ public class SpellAmpHex extends Spell {
 				world.playSound(mBoss.getLocation(), Sound.ENTITY_BLAZE_SHOOT, SoundCategory.HOSTILE, 1.0f, 0.65f);
 
 				Vector playerDir = mBoss.getEyeLocation().getDirection().setY(0).normalize();
-				for (Player p : Lich.playersInRange(mBoss.getLocation(), 8, true)) {
+				for (Player p : PlayerUtils.playersInRange(mBoss.getLocation(), 8, true)) {
 					Vector toMobVector = p.getLocation().toVector().subtract(mBoss.getLocation().toVector()).setY(0).normalize();
 					if (playerDir.dot(toMobVector) > 0.33) {
 						int debuffCount = 0;
@@ -104,7 +105,8 @@ public class SpellAmpHex extends Spell {
 								debuffCount++;
 							}
 						}
-						BossUtils.bossDamage(mBoss, p, 21 + 7 * debuffCount);
+						BossUtils.bossDamage(mBoss, p, 21 + 7 * debuffCount, mBoss.getLocation(), "Amplifying Hex");
+						MovementUtils.knockAway(mBoss, p, 0.3f);
 					}
 				}
 			}
