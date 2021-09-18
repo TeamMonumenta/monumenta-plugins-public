@@ -18,6 +18,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
 public class Stasis extends Effect {
 
 	private static int mDuration;
+	public static String STASIS_NAME = "Stasis";
 
 	public Stasis(int duration) {
 		super(duration);

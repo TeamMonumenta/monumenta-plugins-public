@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.bosses.spells.lich;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.NavigableSet;
 import java.util.concurrent.ThreadLocalRandom;
 
 import org.bukkit.Bukkit;
@@ -32,6 +33,8 @@ import org.bukkit.util.Vector;
 import com.playmonumenta.plugins.bosses.ChargeUpManager;
 import com.playmonumenta.plugins.bosses.bosses.Lich;
 import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.effects.Effect;
+import com.playmonumenta.plugins.effects.Stasis;
 import com.playmonumenta.plugins.player.PPGroundCircle;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.BossUtils;
@@ -268,6 +271,11 @@ public class SpellDimensionDoor extends Spell {
 
 					mTeleport.removeIf(p -> mByPortal.contains(p));
 					for (Player p : mTeleport) {
+						NavigableSet<Effect> effects = com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.getEffects(p, Stasis.STASIS_NAME);
+						if ((effects != null && effects.contains(new Stasis(120))) || (effects != null && effects.contains(new Stasis(120)))) {
+							continue;
+						}
+
 						Location tLoc = p.getLocation();
 						for (Location loc : mPortalLoc) {
 							if (tLoc.getBlock().getType() == Material.END_PORTAL && p.getLocation().distance(loc) <= 4) {
