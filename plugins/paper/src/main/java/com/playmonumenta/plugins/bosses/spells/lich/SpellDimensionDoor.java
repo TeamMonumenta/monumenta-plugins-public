@@ -272,7 +272,7 @@ public class SpellDimensionDoor extends Spell {
 					mTeleport.removeIf(p -> mByPortal.contains(p));
 					for (Player p : mTeleport) {
 						NavigableSet<Effect> effects = com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.getEffects(p, Stasis.STASIS_NAME);
-						if ((effects != null && effects.contains(new Stasis(120))) || (effects != null && effects.contains(new Stasis(120)))) {
+						if (effects != null && effects.contains(new Stasis(120))) {
 							continue;
 						}
 
