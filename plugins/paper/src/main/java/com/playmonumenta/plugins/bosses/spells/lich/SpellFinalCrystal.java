@@ -18,6 +18,7 @@ import org.bukkit.boss.BarFlag;
 import org.bukkit.boss.BarStyle;
 import org.bukkit.boss.BossBar;
 import org.bukkit.entity.EnderCrystal;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.FallingBlock;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -180,6 +181,7 @@ public class SpellFinalCrystal extends Spell {
 		//kill ghast shield
 		for (Location loc : mCrystalLoc) {
 			List<LivingEntity> enList = EntityUtils.getNearbyMobs(loc, 3);
+			enList.removeIf(e -> e.getType() == EntityType.ENDER_CRYSTAL);
 			for (LivingEntity en : enList) {
 				en.setHealth(0);
 			}

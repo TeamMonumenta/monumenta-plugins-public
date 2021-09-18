@@ -52,7 +52,7 @@ public class SpellDimensionDoor extends Spell {
 	private double mRange;
 	private int mCoolDown = 20 * 45;
 	private int mT = 20 * 10;
-	private int mCap = 10;
+	private int mCap = 15;
 	private boolean mCanRun = true;
 	private final EnumSet<Material> mIgnoredMats = EnumSet.of(
 			Material.COMMAND_BLOCK,
@@ -158,11 +158,11 @@ public class SpellDimensionDoor extends Spell {
 
 		for (Player p : targets) {
 			Location pLoc = p.getLocation();
-			world.playSound(pLoc, Sound.BLOCK_PORTAL_TRIGGER, SoundCategory.HOSTILE, 1.5f, 2.0f);
-			world.playSound(pLoc, Sound.BLOCK_END_PORTAL_FRAME_FILL, SoundCategory.HOSTILE, 1.5f, 1.0f);
+			world.playSound(pLoc, Sound.BLOCK_PORTAL_TRIGGER, SoundCategory.HOSTILE, 1f, 2.0f);
+			world.playSound(pLoc, Sound.BLOCK_END_PORTAL_FRAME_FILL, SoundCategory.HOSTILE, 1f, 1.0f);
 
-			PPGroundCircle indicator = new PPGroundCircle(Particle.SPELL_WITCH, pLoc, 24, 0.2, 0, 0.2, 0).init(3, true);
-			PPGroundCircle indicator2 = new PPGroundCircle(Particle.SMOKE_NORMAL, pLoc, 12, 0.2, 0, 0.2, 0).init(3, true);
+			PPGroundCircle indicator = new PPGroundCircle(Particle.SPELL_WITCH, pLoc, 20, 0.2, 0, 0.2, 0).init(3, true);
+			PPGroundCircle indicator2 = new PPGroundCircle(Particle.SMOKE_NORMAL, pLoc, 10, 0.2, 0, 0.2, 0).init(3, true);
 
 			List<BlockState> toRestore = new ArrayList<>();
 			BukkitRunnable runB = new BukkitRunnable() {
@@ -192,7 +192,7 @@ public class SpellDimensionDoor extends Spell {
 					if (mT == 25) {
 						mPortalLoc.add(portalCenterLoc);
 						mTeleport = Lich.playersInRange(mSpawnLoc, mRange, true);
-						world.playSound(mLoc, Sound.BLOCK_END_PORTAL_SPAWN, SoundCategory.HOSTILE, 2.0f, 1.0f);
+						world.playSound(mLoc, Sound.BLOCK_END_PORTAL_SPAWN, SoundCategory.HOSTILE, 1.0f, 1.0f);
 						//get blocks 5x5
 						for (int x = -2; x <= 2; x++) {
 							testloc.setX(portalCenterLoc.getX() + x);

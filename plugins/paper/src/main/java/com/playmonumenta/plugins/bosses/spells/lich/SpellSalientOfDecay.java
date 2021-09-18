@@ -40,7 +40,7 @@ public class SpellSalientOfDecay extends Spell {
 	private Plugin mPlugin;
 	private LivingEntity mBoss;
 	private static final Particle.DustOptions SALIENT_OF_DECAY_COLOR = new Particle.DustOptions(Color.fromRGB(3, 163, 116), 1f);
-	private int mCap = 8;
+	private int mCap = 12;
 	private ChargeUpManager mChargeUp;
 	private int mTell = 40;
 

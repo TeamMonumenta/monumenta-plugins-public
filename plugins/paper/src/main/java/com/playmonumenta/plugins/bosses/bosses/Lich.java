@@ -379,6 +379,7 @@ public class Lich extends BossAbilityGroup {
 					if (mT % 60 == 0 && mDio < dio.length) {
 						for (Player p : playersInRange(mStart.getLocation(), detectionRange, true)) {
 							p.sendMessage(ChatColor.LIGHT_PURPLE + dio[mDio]);
+							p.removePotionEffect(PotionEffectType.LEVITATION);
 						}
 						mDio++;
 					}
@@ -474,6 +475,10 @@ public class Lich extends BossAbilityGroup {
 						new PartialParticle(Particle.CLOUD, mBoss.getLocation(), 30, 0.1, 0.1, 0.1, 0.05).spawnAsBoss();
 						world.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_SHOOT, 2.0f, 1.0f);
 
+						for (Player p : playersInRange(mStart.getLocation(), detectionRange, true)) {
+							p.removePotionEffect(PotionEffectType.LEVITATION);
+						}
+
 						mBoss.setInvulnerable(false);
 						mBoss.setAI(true);
 						mBoss.setGravity(true);
@@ -515,6 +520,7 @@ public class Lich extends BossAbilityGroup {
 					if (mT % 60 == 0 && mDio < dio.length) {
 						for (Player p : playersInRange(mStart.getLocation(), detectionRange, true)) {
 							p.sendMessage(ChatColor.LIGHT_PURPLE + dio[mDio]);
+							p.removePotionEffect(PotionEffectType.LEVITATION);
 						}
 						mDio++;
 					}
@@ -617,6 +623,10 @@ public class Lich extends BossAbilityGroup {
 						mBoss.teleport(mCenter.clone());
 						new PartialParticle(Particle.CLOUD, mBoss.getLocation(), 30, 0.1, 0.1, 0.1, 0.05).spawnAsBoss();
 						world.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_SHOOT, 2.0f, 1.0f);
+
+						for (Player p : playersInRange(mStart.getLocation(), detectionRange, true)) {
+							p.removePotionEffect(PotionEffectType.LEVITATION);
+						}
 
 						mBoss.setInvulnerable(false);
 						mBoss.setAI(true);
@@ -862,76 +872,78 @@ public class Lich extends BossAbilityGroup {
 		}
 
 		// death check
-		if (!mActivated && mBoss.getHealth() - event.getFinalDamage() <= 0) {
+		if (mBoss.getHealth() - event.getFinalDamage() <= 0) {
 			event.setCancelled(true);
-			if (mKey.isValid()) {
-				mBoss.setHealth(mBoss.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue() * 0.15);
+			mBoss.setHealth(100);
+			if (!mActivated) {
+				if (mKey.isValid()) {
+					mBoss.setHealth(mBoss.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue() * 0.15);
 
 
-				mBoss.getWorld().playSound(mBoss.getLocation(), Sound.ENTITY_ENDER_DRAGON_GROWL, SoundCategory.HOSTILE, 5.0f, 0.75f);
-				SpellManager phase3Spells = new SpellManager(
-						Arrays.asList(
-								new SpellGraspingHands(mPlugin, mBoss),
-								new SpellDesecrate(mPlugin, mBoss),
-								new SpellGravityWell(mPlugin, mBoss, mStart.getLocation(), detectionRange),
-								new SpellDiesIrae(mPlugin, mBoss, mKey, mStart.getLocation(), detectionRange, mCeiling, mCrystalLoc, mShieldCrystal),
-								new SpellDarkOmen(mPlugin, mBoss, mStart.getLocation(), detectionRange) // ult + dialogue?
-						));
+					mBoss.getWorld().playSound(mBoss.getLocation(), Sound.ENTITY_ENDER_DRAGON_GROWL, SoundCategory.HOSTILE, 5.0f, 0.75f);
+					SpellManager phase3Spells = new SpellManager(
+							Arrays.asList(
+									new SpellGraspingHands(mPlugin, mBoss),
+									new SpellDesecrate(mPlugin, mBoss),
+									new SpellGravityWell(mPlugin, mBoss, mStart.getLocation(), detectionRange),
+									new SpellDiesIrae(mPlugin, mBoss, mKey, mStart.getLocation(), detectionRange, mCeiling, mCrystalLoc, mShieldCrystal),
+									new SpellDarkOmen(mPlugin, mBoss, mStart.getLocation(), detectionRange) // ult + dialogue?
+							));
 
-				SpellManager keyAlive = new SpellManager(
-						Arrays.asList(
-								new SpellDiesIrae(mPlugin, mBoss, mKey, mStart.getLocation(), detectionRange, mCeiling, mCrystalLoc, mShieldCrystal),
-								new SpellSoulShackle(mPlugin, mBoss, mStart.getLocation(), detectionRange, mCeiling),
-								new SpellRaiseDead(mPlugin, mBoss, mStart.getLocation(), detectionRange, mCeiling),
-								new SpellDarkOmen(mPlugin, mBoss, mStart.getLocation(), detectionRange) // ult + dialogue?
-						));
+					SpellManager keyAlive = new SpellManager(
+							Arrays.asList(
+									new SpellDiesIrae(mPlugin, mBoss, mKey, mStart.getLocation(), detectionRange, mCeiling, mCrystalLoc, mShieldCrystal),
+									new SpellSoulShackle(mPlugin, mBoss, mStart.getLocation(), detectionRange, mCeiling),
+									new SpellRaiseDead(mPlugin, mBoss, mStart.getLocation(), detectionRange, mCeiling),
+									new SpellDarkOmen(mPlugin, mBoss, mStart.getLocation(), detectionRange) // ult + dialogue?
+							));
 
-				List<Spell> phase3PassiveSpells = Arrays.asList(
-						new SpellHorseResist(mBoss, mStart.getLocation(), detectionRange),
-						new SpellBossBlockBreak(mBoss, mStart.getLocation().getY(), 1, 3, 1, false, false),
-						new SpellMiasma(mBoss, mStart.getLocation(), mStart.getLocation().getY(), detectionRange),
-						new SpellDimensionDoor(mPlugin, mBoss, mStart.getLocation(), detectionRange),
-						new SpellPurgeNegatives(mBoss, 2 * 20),
-						new SpellShadowRealm(mStart.getLocation(), detectionRange),
-						new SpellEdgeKill(mBoss, mStart.getLocation()),
-						new SpellAutoAttack(mPlugin, mBoss, mStart.getLocation(), 20 * 4, detectionRange, mCeiling, 3),
-						new SpellCrystalRespawn(mPlugin, mStart.getLocation(), detectionRange, mCrystalLoc, mShieldCrystal));
+					List<Spell> phase3PassiveSpells = Arrays.asList(
+							new SpellHorseResist(mBoss, mStart.getLocation(), detectionRange),
+							new SpellBossBlockBreak(mBoss, mStart.getLocation().getY(), 1, 3, 1, false, false),
+							new SpellMiasma(mBoss, mStart.getLocation(), mStart.getLocation().getY(), detectionRange),
+							new SpellDimensionDoor(mPlugin, mBoss, mStart.getLocation(), detectionRange),
+							new SpellPurgeNegatives(mBoss, 2 * 20),
+							new SpellShadowRealm(mStart.getLocation(), detectionRange),
+							new SpellEdgeKill(mBoss, mStart.getLocation()),
+							new SpellAutoAttack(mPlugin, mBoss, mStart.getLocation(), 20 * 4, detectionRange, mCeiling, 3),
+							new SpellCrystalRespawn(mPlugin, mStart.getLocation(), detectionRange, mCrystalLoc, mShieldCrystal));
 
-				changePhase(keyAlive, null, null);
-				forceCastSpell(SpellDarkOmen.class);
-				forceCastSpell(SpellSoulShackle.class);
-				forceCastSpell(SpellRaiseDead.class);
-				spawnCrystal(mCrystalLoc, 5, mShieldCrystal);
-				for (Player p : playersInRange(mStart.getLocation(), detectionRange, true)) {
-					p.sendMessage(ChatColor.LIGHT_PURPLE + "YOUR HASTE WILL BE YOUR DOWNFALL.");
-				}
-
-				new BukkitRunnable() {
-
-					@Override
-					public void run() {
-						for (Player p : playersInRange(mStart.getLocation(), detectionRange, true)) {
-							p.sendMessage(ChatColor.LIGHT_PURPLE + "YOU WILL NEVER DESTROY MY SOUL, YOU SEE. DIES IRAE! DIES ILLA!");
-						}
-						forceCastSpell(SpellDiesIrae.class);
-						new BukkitRunnable() {
-
-							@Override
-							public void run() {
-								changePhase(phase3Spells, phase3PassiveSpells, null);
-							}
-
-						}.runTaskLater(mPlugin, 20 * 15);
+					changePhase(keyAlive, null, null);
+					forceCastSpell(SpellDarkOmen.class);
+					forceCastSpell(SpellSoulShackle.class);
+					forceCastSpell(SpellRaiseDead.class);
+					spawnCrystal(mCrystalLoc, 5, mShieldCrystal);
+					for (Player p : playersInRange(mStart.getLocation(), detectionRange, true)) {
+						p.sendMessage(ChatColor.LIGHT_PURPLE + "YOUR HASTE WILL BE YOUR DOWNFALL.");
 					}
 
-				}.runTaskLater(mPlugin, 50);
+					new BukkitRunnable() {
 
-			} else {
-				mActivated = true;
-				mBoss.setHealth(100);
-				mBoss.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 100, 10));
-				die();
-				return;
+						@Override
+						public void run() {
+							for (Player p : playersInRange(mStart.getLocation(), detectionRange, true)) {
+								p.sendMessage(ChatColor.LIGHT_PURPLE + "YOU WILL NEVER DESTROY MY SOUL, YOU SEE. DIES IRAE! DIES ILLA!");
+							}
+							forceCastSpell(SpellDiesIrae.class);
+							new BukkitRunnable() {
+
+								@Override
+								public void run() {
+									changePhase(phase3Spells, phase3PassiveSpells, null);
+								}
+
+							}.runTaskLater(mPlugin, 20 * 15);
+						}
+
+					}.runTaskLater(mPlugin, 50);
+
+				} else {
+					mActivated = true;
+					mBoss.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 100, 10));
+					die();
+					return;
+				}
 			}
 		}
 
@@ -1245,7 +1257,7 @@ public class Lich extends BossAbilityGroup {
 		}
 		String[] dio1 = new String[] {
 				"I... WILL... NOT... BE... DESTROYED...",
-				"NO! I MUST... SPEAK... THE PARTING VIEL..."
+				"NO! I MUST... SPEAK... THE PARTING VEIL..."
 				};
 		new BukkitRunnable() {
 			int mT = 0;
@@ -1558,6 +1570,12 @@ public class Lich extends BossAbilityGroup {
 		timer.setVisible(true); //p4 substitute
 		double timelimit = 200.0d * 20.0d;
 
+		//initialize
+		mTowerGroup.add(mTower0);
+		mTowerGroup.add(mTower1);
+		mTowerGroup.add(mTower2);
+		mTowerGroup.add(mTower3);
+
 		new BukkitRunnable() {
 			int mT = 0;
 			int mChat = 0;
@@ -1569,10 +1587,6 @@ public class Lich extends BossAbilityGroup {
 						mTrigger = true;
 						changePhase(null, death0Passives, null);
 						SpellFinalCrystal.setTriggered(false);
-						mTowerGroup.add(mTower0);
-						mTowerGroup.add(mTower1);
-						mTowerGroup.add(mTower2);
-						mTowerGroup.add(mTower3);
 						Collections.shuffle(mTowerGroup);
 						lastStand(mTowerGroup.get(0));
 						mBoss.setHealth(mBoss.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue());
@@ -1584,7 +1598,6 @@ public class Lich extends BossAbilityGroup {
 						}
 					} else if (mCounter == 1) {
 						mTrigger = true;
-						mTowerGroup.remove(0);
 						changePhase(null, death1Passives, null);
 						SpellFinalCrystal.setTriggered(false);
 						Collections.shuffle(mTowerGroup);
@@ -1599,7 +1612,6 @@ public class Lich extends BossAbilityGroup {
 						}
 					} else if (mCounter == 2) {
 						mTrigger = true;
-						mTowerGroup.remove(0);
 						changePhase(null, death2Passives, null);
 						SpellFinalCrystal.setTriggered(false);
 						Collections.shuffle(mTowerGroup);
@@ -1615,7 +1627,6 @@ public class Lich extends BossAbilityGroup {
 						}
 					} else if (mCounter == 3) {
 						mTrigger = true;
-						mTowerGroup.remove(0);
 						changePhase(null, death3Passives, null);
 						SpellFinalCrystal.setTriggered(false);
 						Collections.shuffle(mTowerGroup);
@@ -1760,6 +1771,7 @@ public class Lich extends BossAbilityGroup {
 							tower.get(top).getBlock().setType(Material.END_GATEWAY);
 							world.playSound(tower.get(top), Sound.ENTITY_ZOMBIE_VILLAGER_CONVERTED,
 									SoundCategory.HOSTILE, 5, 1);
+							mTowerGroup.remove(tower);
 							mTrigger = false;
 						}
 
