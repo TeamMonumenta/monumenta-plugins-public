@@ -30,7 +30,7 @@ public class SilverfishTracking implements EntityTracking {
 		Iterator<Silverfish> silverfishIter = mEntities.iterator();
 		while (silverfishIter.hasNext()) {
 			Silverfish silverfish = silverfishIter.next();
-			if (silverfish != null && silverfish.isValid()) {
+			if (silverfish != null && silverfish.isValid() && silverfish.getLocation().isChunkLoaded()) {
 				if (ZoneUtils.hasZoneProperty(silverfish, ZoneProperty.ADVENTURE_MODE)) {
 					silverfish.remove();
 					silverfishIter.remove();

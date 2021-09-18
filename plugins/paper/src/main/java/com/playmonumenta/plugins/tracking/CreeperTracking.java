@@ -29,7 +29,7 @@ public class CreeperTracking implements EntityTracking {
 		Iterator<Creeper> creeperIter = mEntities.iterator();
 		while (creeperIter.hasNext()) {
 			Creeper creeper = creeperIter.next();
-			if (creeper != null && creeper.isValid()) {
+			if (creeper != null && creeper.isValid() && creeper.getLocation().isChunkLoaded()) {
 				Set<String> tags = creeper.getScoreboardTags();
 				if (tags != null && tags.contains("Snuggles")) {
 					creeper.getWorld().spawnParticle(Particle.HEART, creeper.getLocation().add(0, 1, 0), 1, 0.4, 1, 0.4, 0);

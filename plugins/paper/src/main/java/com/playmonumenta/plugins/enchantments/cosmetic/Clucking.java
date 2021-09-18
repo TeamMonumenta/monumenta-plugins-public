@@ -68,8 +68,9 @@ public class Clucking implements BaseSpawnableItemEnchantment {
 
 			@Override
 			public void run() {
-				if (item == null || item.isDead() || !item.isValid()) {
+				if (!item.getLocation().isChunkLoaded() || item.isDead() || !item.isValid()) {
 					this.cancel();
+					return;
 				}
 
 				item.getWorld().playSound(item.getLocation(), Sound.ENTITY_CHICKEN_AMBIENT, SoundCategory.HOSTILE, 1.0f, 0.8f);

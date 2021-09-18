@@ -33,7 +33,7 @@ public class BoatTracking implements EntityTracking {
 		Iterator<Boat> boatIter = mEntities.iterator();
 		while (boatIter.hasNext()) {
 			Boat boat = boatIter.next();
-			if (boat != null && boat.isValid()) {
+			if (boat != null && boat.isValid() && boat.getLocation().isChunkLoaded()) {
 				if (!LocationUtils.isValidBoatLocation(boat.getLocation())) {
 					TreeSpecies woodType = boat.getWoodType();
 					World world = boat.getWorld();

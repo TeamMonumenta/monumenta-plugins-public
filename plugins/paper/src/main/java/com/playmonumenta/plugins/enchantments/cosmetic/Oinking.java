@@ -2,17 +2,17 @@ package com.playmonumenta.plugins.enchantments.cosmetic;
 
 import java.util.EnumSet;
 
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.enchantments.BaseSpawnableItemEnchantment;
+import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
+import com.playmonumenta.plugins.utils.EntityUtils;
+
 import org.bukkit.ChatColor;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
-
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.enchantments.BaseSpawnableItemEnchantment;
-import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
-import com.playmonumenta.plugins.utils.EntityUtils;
 
 /*
  * Plays pig oinking sounds when in inventory or dropped
@@ -68,8 +68,9 @@ public class Oinking implements BaseSpawnableItemEnchantment {
 
 			@Override
 			public void run() {
-				if (item == null || item.isDead() || !item.isValid()) {
+				if (!item.getLocation().isChunkLoaded() || item.isDead() || !item.isValid()) {
 					this.cancel();
+					return;
 				}
 
 				item.getWorld().playSound(item.getLocation(), Sound.ENTITY_PIG_AMBIENT, SoundCategory.HOSTILE, 1.0f, 0.8f);

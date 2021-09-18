@@ -376,6 +376,9 @@ public class EntityUtils {
 
 	public static boolean isStillLoaded(Entity entity) {
 		Location loc = entity.getLocation();
+		if (!loc.isChunkLoaded()) {
+			return false;
+		}
 
 		for (Entity ne : loc.getWorld().getNearbyEntities(loc, 0.75, 0.75, 0.75)) {
 			if (ne.getUniqueId().equals(entity.getUniqueId())) {

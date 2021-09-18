@@ -77,11 +77,12 @@ public class Festive implements BaseSpawnableItemEnchantment {
 			World mWorld = item.getWorld();
 			@Override
 			public void run() {
-				if (item == null || item.isDead() || !item.isValid()) {
+				final Location loc = item.getLocation().add(0, 0.15, 0);
+				if (!loc.isChunkLoaded() || item.isDead() || !item.isValid()) {
 					this.cancel();
+					return;
 				}
 
-				final Location loc = item.getLocation().add(0, 0.15, 0);
 				mWorld.spawnParticle(Particle.REDSTONE, loc, 3, 0.2, 0.2, 0.2, FESTIVE_RED_COLOR);
 				mWorld.spawnParticle(Particle.REDSTONE, loc, 3, 0.2, 0.2, 0.2, FESTIVE_GREEN_COLOR);
 				mWorld.spawnParticle(Particle.SNOWBALL, loc, 3, 0.2, 0.2, 0.2, 0);

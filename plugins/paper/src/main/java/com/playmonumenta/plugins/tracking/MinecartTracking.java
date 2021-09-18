@@ -35,7 +35,7 @@ public class MinecartTracking implements EntityTracking {
 		Iterator<Minecart> minecartIter = mEntities.iterator();
 		while (minecartIter.hasNext()) {
 			Minecart minecart = minecartIter.next();
-			if (minecart != null && minecart.isValid()) {
+			if (minecart != null && minecart.isValid() && minecart.getLocation().isChunkLoaded()) {
 				if (!LocationUtils.isValidMinecartLocation(minecart.getLocation())) {
 					if (minecart instanceof ExplosiveMinecart) {
 						minecart.getWorld().dropItem(minecart.getLocation(), new ItemStack(Material.TNT_MINECART));

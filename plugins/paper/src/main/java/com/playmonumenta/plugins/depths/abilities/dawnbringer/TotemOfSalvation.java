@@ -94,8 +94,9 @@ public class TotemOfSalvation extends DepthsAbility {
 
 				@Override
 				public void run() {
-					if (item == null || item.isDead() || !item.isValid()) {
+					if (!item.getLocation().isChunkLoaded() || item.isDead() || !item.isValid()) {
 						this.cancel();
+						return;
 					}
 
 					//Particles once per second

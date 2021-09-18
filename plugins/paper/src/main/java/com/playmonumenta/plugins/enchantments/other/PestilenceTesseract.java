@@ -50,8 +50,9 @@ public class PestilenceTesseract implements BaseSpawnableItemEnchantment {
 
 			@Override
 			public void run() {
-				if (item == null || item.isDead() || !item.isValid()) {
+				if (!item.getLocation().isChunkLoaded() || item.isDead() || !item.isValid()) {
 					this.cancel();
+					return;
 				}
 
 				ParticleUtils.explodingRingEffect(plugin, item.getLocation().add(0, 0.5, 0), EFFECT_RADIUS, PARTICLE_RING_HEIGHT, TICK_PERIOD, PARTICLES);

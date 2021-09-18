@@ -50,6 +50,12 @@ public class Hope implements BaseSpawnableItemEnchantment {
 			@Override
 			public void run() {
 				Location loc = item.getLocation();
+
+				if (!loc.isChunkLoaded() || item.isDead() || !item.isValid()) {
+					this.cancel();
+					return;
+				}
+
 				item.getWorld().spawnParticle(Particle.SPELL_INSTANT, loc, 3, 0.2, 0.2, 0.2, 0);
 
 				//Attempt to move the item upwards if in lava
@@ -57,10 +63,6 @@ public class Hope implements BaseSpawnableItemEnchantment {
 				Material upwardsBlock = loc.clone().add(0, 1, 0).getBlock().getType();
 				if (currentBlock == Material.LAVA && (upwardsBlock == Material.LAVA || upwardsBlock == Material.AIR)) {
 					item.teleport(loc.clone().add(0, 0.25, 0));
-				}
-
-				if (item.isDead() || !item.isValid()) {
-					this.cancel();
 				}
 
 				// Very infrequently check if the item is still actually there
