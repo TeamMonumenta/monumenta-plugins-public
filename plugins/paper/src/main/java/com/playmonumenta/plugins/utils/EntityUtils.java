@@ -12,28 +12,6 @@ import java.util.NavigableSet;
 import java.util.Set;
 import java.util.UUID;
 
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.AbilityManager;
-import com.playmonumenta.plugins.bosses.BossManager;
-import com.playmonumenta.plugins.bosses.bosses.CrowdControlImmunityBoss;
-import com.playmonumenta.plugins.classes.ClassAbility;
-import com.playmonumenta.plugins.classes.magic.MagicType;
-import com.playmonumenta.plugins.effects.Bleed;
-import com.playmonumenta.plugins.effects.Effect;
-import com.playmonumenta.plugins.effects.PercentDamageDealt;
-import com.playmonumenta.plugins.effects.PercentDamageReceived;
-import com.playmonumenta.plugins.effects.PercentSpeed;
-import com.playmonumenta.plugins.effects.SplitArrowIframesEffect;
-import com.playmonumenta.plugins.enchantments.Inferno;
-import com.playmonumenta.plugins.enchantments.PointBlank;
-import com.playmonumenta.plugins.enchantments.Sniper;
-import com.playmonumenta.plugins.enchantments.infusions.Focus;
-import com.playmonumenta.plugins.events.CustomDamageEvent;
-import com.playmonumenta.plugins.attributes.AttributeProjectileDamage;
-import com.playmonumenta.plugins.abilities.cleric.CelestialBlessing;
-import com.playmonumenta.plugins.abilities.cleric.hierophant.ThuribleProcession;
-import com.playmonumenta.plugins.abilities.scout.Sharpshooter;
-
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Location;
@@ -91,6 +69,28 @@ import org.bukkit.util.BlockIterator;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
+
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.AbilityManager;
+import com.playmonumenta.plugins.abilities.cleric.CelestialBlessing;
+import com.playmonumenta.plugins.abilities.cleric.hierophant.ThuribleProcession;
+import com.playmonumenta.plugins.abilities.scout.Sharpshooter;
+import com.playmonumenta.plugins.attributes.AttributeProjectileDamage;
+import com.playmonumenta.plugins.bosses.BossManager;
+import com.playmonumenta.plugins.bosses.bosses.CrowdControlImmunityBoss;
+import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.classes.magic.MagicType;
+import com.playmonumenta.plugins.effects.Bleed;
+import com.playmonumenta.plugins.effects.Effect;
+import com.playmonumenta.plugins.effects.PercentDamageDealt;
+import com.playmonumenta.plugins.effects.PercentDamageReceived;
+import com.playmonumenta.plugins.effects.PercentSpeed;
+import com.playmonumenta.plugins.effects.SplitArrowIframesEffect;
+import com.playmonumenta.plugins.enchantments.Inferno;
+import com.playmonumenta.plugins.enchantments.PointBlank;
+import com.playmonumenta.plugins.enchantments.Sniper;
+import com.playmonumenta.plugins.enchantments.infusions.Focus;
+import com.playmonumenta.plugins.events.CustomDamageEvent;
 
 
 

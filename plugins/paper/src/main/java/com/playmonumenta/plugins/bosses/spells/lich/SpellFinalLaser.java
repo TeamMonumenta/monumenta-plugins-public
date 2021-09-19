@@ -42,8 +42,8 @@ public class SpellFinalLaser extends Spell {
 	private boolean mTrigger = false;
 	private List<Player> mPlayers = new ArrayList<Player>();
 
-	private static final double BOX_SIZE = 0.5;
-	private static final double CHECK_INCREMENT = 0.5;
+	private static final double BOX_SIZE = 0.4;
+	private static final double CHECK_INCREMENT = 0.75;
 
 	private final EnumSet<Material> mIgnoredMats = EnumSet.of(
 			Material.AIR,

@@ -197,7 +197,7 @@ public class SpellFinalCrystal extends Spell {
 				FallingBlock block = world.spawnFallingBlock(spawnLoc, Bukkit.createBlockData(Material.CRYING_OBSIDIAN));
 				block.setVelocity(new Vector(FastUtils.randomDoubleInRange(-0.55, 0.55), FastUtils.randomDoubleInRange(0.25, 1), FastUtils.randomDoubleInRange(-0.55, 0.55)));
 
-				PPGroundCircle indicator = new PPGroundCircle(Particle.SOUL_FIRE_FLAME, block.getLocation(), 24, 0.2, 0, 0.2, 0).init(4, true);
+				PPGroundCircle indicator = new PPGroundCircle(Particle.SOUL_FIRE_FLAME, block.getLocation(), 12, 0.2, 0, 0.2, 0).init(4, true);
 
 				BukkitRunnable runB = new BukkitRunnable() {
 
@@ -211,7 +211,7 @@ public class SpellFinalCrystal extends Spell {
 							world.playSound(block.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 2, 0.85f);
 							Location loc = block.getLocation();
 
-							new BukkitRunnable() {
+							BukkitRunnable runC = new BukkitRunnable() {
 								int mTicks = 0;
 								Location mLoc = loc.clone().add(0, 0.2, 0);
 								@Override
@@ -236,7 +236,9 @@ public class SpellFinalCrystal extends Spell {
 									}
 								}
 
-							}.runTaskTimer(mPlugin, 10, 5);
+							};
+							runC.runTaskTimer(mPlugin, 10, 5);
+							mActiveRunnables.add(runC);
 							this.cancel();
 						}
 					}

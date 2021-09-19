@@ -61,7 +61,7 @@ public class SpellVolley extends Spell {
 							// spawn particle
 							new PartialParticle(Particle.FIREWORKS_SPARK, projArrow.getLocation(), 1, 0.1, 0.1, 0.1, 0).spawnAsEnemy();
 
-							if (projArrow.isInBlock()) {
+							if (projArrow.isInBlock() || !projArrow.isValid()) {
 								this.cancel();
 							}
 						}

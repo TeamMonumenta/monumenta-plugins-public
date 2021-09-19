@@ -24,6 +24,7 @@ public class LichShieldBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_lichshield";
 	public static final int detectionRange = 55;
 	private final Location mCenter = Lich.getLichSpawn();
+	private final Location mSpawnLoc;
 	private int mHpScaling = 8;
 	private double mHp = 0;
 	static LivingEntity mBoss;
@@ -36,8 +37,9 @@ public class LichShieldBoss extends BossAbilityGroup {
 		super(plugin, identityTag, boss);
 		mBoss = boss;
 
+		mSpawnLoc = mBoss.getLocation();
 		List<Spell> passiveSpells = Arrays.asList(
-			new SpellCrystalParticle(mBoss)
+			new SpellCrystalParticle(mBoss, mSpawnLoc)
 		);
 
 		super.constructBoss(null, passiveSpells, detectionRange, null);

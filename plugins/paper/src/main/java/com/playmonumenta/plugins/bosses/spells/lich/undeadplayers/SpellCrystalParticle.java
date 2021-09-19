@@ -11,13 +11,16 @@ import com.playmonumenta.plugins.utils.FastUtils;
 public class SpellCrystalParticle extends Spell {
 
 	private LivingEntity mBoss;
+	private Location mSpawnLoc;
 
-	public SpellCrystalParticle(LivingEntity boss) {
+	public SpellCrystalParticle(LivingEntity boss, Location spawn) {
 		mBoss = boss;
+		mSpawnLoc = spawn;
 	}
 
 	@Override
 	public void run() {
+		mBoss.teleport(mSpawnLoc);
 		double hp = mBoss.getHealth();
 		Location pCenter = mBoss.getLocation().add(0, 2, 0);
 		for (double deg = 0; deg < 360; deg += 36) {

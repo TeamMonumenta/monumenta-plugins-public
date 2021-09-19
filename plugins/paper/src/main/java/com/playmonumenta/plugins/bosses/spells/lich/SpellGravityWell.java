@@ -68,15 +68,15 @@ public class SpellGravityWell extends Spell {
 		World world = mBoss.getWorld();
 		new PartialParticle(Particle.PORTAL, mBoss.getLocation(), 100, 0.1, 0.1, 0.1, 0.1).spawnAsBoss();
 
-		PPGroundCircle indicator = new PPGroundCircle(Particle.REDSTONE, mBoss.getLocation(), 50, 0.01, 0.01, 0.01, 0, YELLOW).init(mRadius, true);
-		PPGroundCircle indicator2 = new PPGroundCircle(Particle.REDSTONE, mBoss.getLocation(), 50, 0.01, 0.01, 0.01, 0, RED).init(mRadius, true);
+		PPGroundCircle indicator = new PPGroundCircle(Particle.REDSTONE, mBoss.getLocation(), 36, 0.01, 0.01, 0.01, 0, YELLOW).init(mRadius, true);
+		PPGroundCircle indicator2 = new PPGroundCircle(Particle.REDSTONE, mBoss.getLocation(), 36, 0.01, 0.01, 0.01, 0, RED).init(mRadius, true);
 
 		List<Player> players = Lich.playersInRange(mCenter, mRange, true);
 		players.removeIf(p -> SpellDimensionDoor.getShadowed().contains(p));
 		Collections.shuffle(players);
 		Player p = players.get(0);
-		world.playSound(p.getLocation(), Sound.ENTITY_WITHER_AMBIENT, 3.0f, 0.5f);
-		world.playSound(p.getLocation(), Sound.BLOCK_PORTAL_TRAVEL, 3.0f, 1.0f);
+		world.playSound(p.getLocation(), Sound.ENTITY_WITHER_AMBIENT, 2.0f, 0.5f);
+		world.playSound(p.getLocation(), Sound.BLOCK_PORTAL_TRAVEL, 2.0f, 1.0f);
 
 		BukkitRunnable runA = new BukkitRunnable() {
 			Location mLoc = p.getLocation().add(0, 0.2, 0);
@@ -89,7 +89,7 @@ public class SpellGravityWell extends Spell {
 				for (int i = 0; i < 6; i++) {
 					double radian = Math.toRadians(mRotation + (60*i));
 					mLoc.add(FastUtils.cos(radian) * mRad, 0, FastUtils.sin(radian) * mRad);
-					new PartialParticle(Particle.SPELL_WITCH, mLoc, 2, 0.15, 0.15, 0.15, 0).spawnAsBoss();
+					new PartialParticle(Particle.SPELL_WITCH, mLoc, 1, 0.15, 0.15, 0.15, 0).spawnAsBoss();
 					new PartialParticle(Particle.PORTAL, mLoc, 2, 0.15, 0.15, 0.15, 0.1).spawnAsBoss();
 					new PartialParticle(Particle.SMOKE_NORMAL, mLoc, 1, 0.15, 0.15, 0.15, 0).spawnAsBoss();
 					mLoc.subtract(FastUtils.cos(radian) * mRad, 0, FastUtils.sin(radian) * mRad);
@@ -102,7 +102,7 @@ public class SpellGravityWell extends Spell {
 					this.cancel();
 					mChargeUp.setTitle(ChatColor.YELLOW + "Casting Gravity Well...");
 					mChargeUp.setColor(BarColor.RED);
-					world.playSound(mLoc, Sound.BLOCK_END_PORTAL_SPAWN, 3.0f, 2.0f);
+					world.playSound(mLoc, Sound.BLOCK_END_PORTAL_SPAWN, 2.0f, 2.0f);
 					new PartialParticle(Particle.SMOKE_LARGE, mBoss.getLocation(), 50, 0, 0, 0, 0.25).spawnAsBoss();
 					new PartialParticle(Particle.DRAGON_BREATH, mBoss.getLocation(), 160, 0, 0, 0, 0.25).spawnAsBoss();
 					BukkitRunnable runB = new BukkitRunnable() {
@@ -113,7 +113,7 @@ public class SpellGravityWell extends Spell {
 							mChargeUp.setProgress(1.0d - (mT / (20 * 9.0d)));
 							List<Player> players = Lich.playersInRange(mLoc, mRadius, true);
 							if (mT % 15 == 0) {
-								world.playSound(mLoc, Sound.BLOCK_PORTAL_AMBIENT, 3.0f, 0.5f);
+								world.playSound(mLoc, Sound.BLOCK_PORTAL_AMBIENT, 2.0f, 0.5f);
 							}
 							indicator2.radius(mRadius).location(mLoc).spawnAsBoss();
 

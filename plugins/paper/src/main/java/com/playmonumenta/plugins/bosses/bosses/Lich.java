@@ -127,7 +127,7 @@ public class Lich extends BossAbilityGroup {
 	private List<Location> mTower3 = new ArrayList<Location>();
 	private List<List<Location>> mTowerGroup = new ArrayList<List<Location>>();
 	private List<Location> mTp = new ArrayList<Location>();
-	private List<Player> mWarned = new ArrayList<Player>();
+	private static List<Player> mCursed = new ArrayList<Player>();
 	private static boolean mActivated = false;
 	private static boolean mGotHit = false;
 	private boolean mTrigger = false;
@@ -193,6 +193,9 @@ public class Lich extends BossAbilityGroup {
 
 		//summon key mob in shadow realm
 		mKey = (LivingEntity) LibraryOfSoulsIntegration.summon(mStart.getLocation().subtract(0, 41, 0), "ShadowPhylactery");
+		Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "team empty lichphylactery");
+		Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "team empty crystal");
+		Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "team empty Hekawt");
 		Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "team modify lichphylactery color white");
 		UUID keyUUID = mKey.getUniqueId();
 		Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "team join lichphylactery " + keyUUID);
@@ -217,6 +220,7 @@ public class Lich extends BossAbilityGroup {
 				//sleep-dow realm
 				if (!mDefeated) {
 					for (Player p : playersInRange(mSpawnLoc, detectionRange, true)) {
+						p.removePotionEffect(PotionEffectType.LEVITATION);
 						if (p.isSleeping()) {
 							SpellDimensionDoor.getWealmed(mPlugin, p, mBoss, p.getLocation(), false);
 						}
@@ -380,7 +384,6 @@ public class Lich extends BossAbilityGroup {
 					if (mT % 60 == 0 && mDio < dio.length) {
 						for (Player p : playersInRange(mStart.getLocation(), detectionRange, true)) {
 							p.sendMessage(ChatColor.LIGHT_PURPLE + dio[mDio]);
-							p.removePotionEffect(PotionEffectType.LEVITATION);
 						}
 						mDio++;
 					}
@@ -476,10 +479,6 @@ public class Lich extends BossAbilityGroup {
 						new PartialParticle(Particle.CLOUD, mBoss.getLocation(), 20, 0.1, 0.1, 0.1, 0.05).spawnAsBoss();
 						world.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_SHOOT, 2.0f, 1.0f);
 
-						for (Player p : playersInRange(mStart.getLocation(), detectionRange, true)) {
-							p.removePotionEffect(PotionEffectType.LEVITATION);
-						}
-
 						mBoss.setInvulnerable(false);
 						mBoss.setAI(true);
 						mBoss.setGravity(true);
@@ -521,7 +520,6 @@ public class Lich extends BossAbilityGroup {
 					if (mT % 60 == 0 && mDio < dio.length) {
 						for (Player p : playersInRange(mStart.getLocation(), detectionRange, true)) {
 							p.sendMessage(ChatColor.LIGHT_PURPLE + dio[mDio]);
-							p.removePotionEffect(PotionEffectType.LEVITATION);
 						}
 						mDio++;
 					}
@@ -625,10 +623,6 @@ public class Lich extends BossAbilityGroup {
 						new PartialParticle(Particle.CLOUD, mBoss.getLocation(), 20, 0.1, 0.1, 0.1, 0.05).spawnAsBoss();
 						world.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_SHOOT, 2.0f, 1.0f);
 
-						for (Player p : playersInRange(mStart.getLocation(), detectionRange, true)) {
-							p.removePotionEffect(PotionEffectType.LEVITATION);
-						}
-
 						mBoss.setInvulnerable(false);
 						mBoss.setAI(true);
 						mBoss.setGravity(true);
@@ -726,6 +720,7 @@ public class Lich extends BossAbilityGroup {
 							Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), cmd);
 							mT++;
 						} else {
+							this.cancel();
 							String cmd = "execute positioned " + mStart.getLocation().getX() + " "
 									+ mStart.getLocation().getY() + " " + mStart.getLocation().getZ() + " run "
 									+ end[0];
@@ -799,7 +794,6 @@ public class Lich extends BossAbilityGroup {
 								}
 
 							}.runTaskTimer(mPlugin, 20 * 2, 20 * 4);
-							this.cancel();
 						}
 					}
 
@@ -994,10 +988,7 @@ public class Lich extends BossAbilityGroup {
 			event.setCancelled(true);
 			player.playSound(mBoss.getLocation(), Sound.BLOCK_ANVIL_PLACE, 1, 5);
 			mBoss.getWorld().spawnParticle(Particle.FIREWORKS_SPARK, mBoss.getLocation(), 10, 0, 0, 0, 0.1);
-			if (!mWarned.contains(player)) {
-				mWarned.add(player);
-				player.sendMessage(ChatColor.AQUA + "Hekawt has formed a miasma shield around himself! Get closer to pierce through the shield!");
-			}
+			player.sendMessage(ChatColor.AQUA + "Hekawt has formed a miasma shield around himself! Get closer to pierce through the shield!");
 			//stop teleport
 			return;
 		}
@@ -1210,6 +1201,7 @@ public class Lich extends BossAbilityGroup {
 	}
 
 	public static void cursePlayer(Plugin plugin, Player p, int time) {
+		mCursed.add(p);
 		p.playSound(p.getLocation(), Sound.ENTITY_ELDER_GUARDIAN_CURSE, 1.0f, 0.5f);
 		AbilityUtils.increaseHealingPlayer(p, 20 * time, -0.5, "CurseEffect");
 		AbilityUtils.increaseDamageRecievedPlayer(p, 20 * time, 1.0, "CurseEffect");
@@ -1222,7 +1214,10 @@ public class Lich extends BossAbilityGroup {
 			public void run() {
 				mT += 10;
 				new PartialParticle(Particle.SOUL, p.getLocation().add(0, 0.75, 0), 6, 0.3, 0.3, 0.3, 0.01).spawnAsBoss();
-				if (mT > 20 * time || p.isDead()) {
+				if ((mT > 20 * time || p.isDead()) && mCursed.contains(p)) {
+					this.cancel();
+					mCursed.remove(p);
+				} else if ((mT > 20 * time || p.isDead()) && !mCursed.contains(p)) {
 					this.cancel();
 				} else if (mT % 200 == 0) {
 					p.sendActionBar(Component.text("Cursed for " + (time - mT / 20) + " seconds.", NamedTextColor.DARK_RED));
@@ -1230,6 +1225,10 @@ public class Lich extends BossAbilityGroup {
 			}
 
 		}.runTaskTimer(plugin, 0, 10);
+	}
+
+	public static List<Player> getCursed() {
+		return mCursed;
 	}
 
 	public static void bossGotHit(boolean gothit) {
@@ -1505,6 +1504,7 @@ public class Lich extends BossAbilityGroup {
 
 	// Phase 4
 	private void p4(World world) {
+		SpellDiesIrae.setActive(false);
 		mDead = false;
 		mCounter = 0;
 		world.playSound(mBoss.getLocation(), Sound.ENTITY_ENDER_DRAGON_GROWL, 3.0f, 1.0f);
@@ -1520,21 +1520,16 @@ public class Lich extends BossAbilityGroup {
 				new SpellEdgeKill(mBoss, mStart.getLocation()),
 				new SpellFinalParticle(mPlugin, mBoss, mStart.getLocation(), detectionRange, block),
 				new SpellFinalSwarm(mPlugin, mStart.getLocation(), detectionRange),
-				new SpellFinalCrystal(mPlugin, mBoss, mStart.getLocation(), detectionRange, mCrystalLoc));
+				new SpellFinalCrystal(mPlugin, mBoss, mStart.getLocation(), detectionRange, mCrystalLoc),
+				new SpellAutoAttack(mPlugin, mBoss, mStart.getLocation(), 20 * 5, detectionRange, mCeiling, 4));
 		List<Spell> death1Passives = Arrays.asList(
 				new SpellEdgeKill(mBoss, mStart.getLocation()),
 				new SpellFinalParticle(mPlugin, mBoss, mStart.getLocation(), detectionRange, block),
 				new SpellFinalSwarm(mPlugin, mStart.getLocation(), detectionRange),
 				new SpellFinalCrystal(mPlugin, mBoss, mStart.getLocation(), detectionRange, mCrystalLoc),
-				new SpellFinalLaser(mPlugin, mBoss, mStart.getLocation(), detectionRange));
+				new SpellFinalLaser(mPlugin, mBoss, mStart.getLocation(), detectionRange),
+				new SpellAutoAttack(mPlugin, mBoss, mStart.getLocation(), 20 * 4, detectionRange, mCeiling, 4));
 		List<Spell> death2Passives = Arrays.asList(
-				new SpellEdgeKill(mBoss, mStart.getLocation()),
-				new SpellFinalParticle(mPlugin, mBoss, mStart.getLocation(), detectionRange, block),
-				new SpellFinalSwarm(mPlugin, mStart.getLocation(), detectionRange),
-				new SpellFinalCrystal(mPlugin, mBoss, mStart.getLocation(), detectionRange, mCrystalLoc),
-				new SpellFinalHeatMech(mPlugin, mBoss, mStart.getLocation(), detectionRange),
-				new SpellFinalLaser(mPlugin, mBoss, mStart.getLocation(), detectionRange));
-		List<Spell> death3Passives = Arrays.asList(
 				new SpellEdgeKill(mBoss, mStart.getLocation()),
 				new SpellFinalParticle(mPlugin, mBoss, mStart.getLocation(), detectionRange, block),
 				new SpellFinalSwarm(mPlugin, mStart.getLocation(), detectionRange),
@@ -1542,6 +1537,14 @@ public class Lich extends BossAbilityGroup {
 				new SpellFinalHeatMech(mPlugin, mBoss, mStart.getLocation(), detectionRange),
 				new SpellFinalLaser(mPlugin, mBoss, mStart.getLocation(), detectionRange),
 				new SpellAutoAttack(mPlugin, mBoss, mStart.getLocation(), 20 * 3, detectionRange, mCeiling, 4));
+		List<Spell> death3Passives = Arrays.asList(
+				new SpellEdgeKill(mBoss, mStart.getLocation()),
+				new SpellFinalParticle(mPlugin, mBoss, mStart.getLocation(), detectionRange, block),
+				new SpellFinalSwarm(mPlugin, mStart.getLocation(), detectionRange),
+				new SpellFinalCrystal(mPlugin, mBoss, mStart.getLocation(), detectionRange, mCrystalLoc),
+				new SpellFinalHeatMech(mPlugin, mBoss, mStart.getLocation(), detectionRange),
+				new SpellFinalLaser(mPlugin, mBoss, mStart.getLocation(), detectionRange),
+				new SpellAutoAttack(mPlugin, mBoss, mStart.getLocation(), 20 * 2, detectionRange, mCeiling, 4));
 
 		// partial respawn arena
 		String cmd = "execute positioned " + mStart.getLocation().getX() + " " + mStart.getLocation().getY() + " "

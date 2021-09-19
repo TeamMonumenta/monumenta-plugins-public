@@ -72,7 +72,7 @@ public class SpellMagmaShield extends Spell {
 
 							Vector vec;
 							mRadius += 1.25;
-							for (double degree = -60; degree <= 60; degree += 15) {
+							for (double degree = -60; degree <= 60; degree += 30) {
 								double radian1 = Math.toRadians(degree);
 								vec = new Vector(FastUtils.cos(radian1) * mRadius, 0.125, FastUtils.sin(radian1) * mRadius);
 								vec = VectorUtils.rotateXAxis(vec, -loc.getPitch());

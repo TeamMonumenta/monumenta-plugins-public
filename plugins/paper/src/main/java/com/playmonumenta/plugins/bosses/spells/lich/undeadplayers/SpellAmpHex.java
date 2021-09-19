@@ -19,6 +19,7 @@ import org.bukkit.util.Vector;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.player.PartialParticle;
 import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.VectorUtils;
@@ -71,9 +72,9 @@ public class SpellAmpHex extends Spell {
 
 						Vector vec;
 						mRadius += 1.25;
-						for (double degree = 30; degree <= 120; degree += 10) {
+						for (double degree = 30; degree <= 120; degree += 20) {
 							double radian1 = Math.toRadians(degree);
-							vec = new Vector(Math.cos(radian1) * mRadius, 0.15, Math.sin(radian1) * mRadius);
+							vec = new Vector(FastUtils.cos(radian1) * mRadius, 0.15, FastUtils.sin(radian1) * mRadius);
 							vec = VectorUtils.rotateXAxis(vec, -mLoc.getPitch());
 							vec = VectorUtils.rotateYAxis(vec, mLoc.getYaw());
 

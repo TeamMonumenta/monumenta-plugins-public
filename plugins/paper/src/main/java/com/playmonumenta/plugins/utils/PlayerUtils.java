@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.utils;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.NavigableSet;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -27,6 +28,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.attributes.AttributeManager;
 import com.playmonumenta.plugins.attributes.AttributeProjectileSpeed;
 import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.effects.Effect;
 import com.playmonumenta.plugins.events.AbilityCastEvent;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 
@@ -76,6 +78,28 @@ public class PlayerUtils {
 		List<Player> players = playersInRange(player.getLocation(), radius, includeNonTargetable);
 		players.removeIf(p -> (p == player));
 		return players;
+	}
+
+	public static boolean isCursed(Plugin plugin, Player p) {
+		NavigableSet<Effect> cursed = plugin.mEffectManager.getEffects(p, "CurseEffect");
+		if (cursed != null) {
+			return true;
+		}
+		return false;
+	}
+
+	public static void removeCursed(Plugin plugin, Player p) {
+		setCursedTicks(plugin, p, 0);
+		p.removePotionEffect(PotionEffectType.BAD_OMEN);
+		p.removePotionEffect(PotionEffectType.UNLUCK);
+	}
+
+	public static void setCursedTicks(Plugin plugin, Player p, int ticks) {
+		NavigableSet<Effect> cursed = plugin.mEffectManager.getEffects(p, "CurseEffect");
+		if (cursed != null) {
+			Effect curse = cursed.last();
+			curse.setDuration(ticks);
+		}
 	}
 
 	public static void healPlayer(Player player, double healAmount) {

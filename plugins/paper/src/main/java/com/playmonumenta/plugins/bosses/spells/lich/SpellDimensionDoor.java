@@ -40,6 +40,7 @@ import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 
 public class SpellDimensionDoor extends Spell {
 
@@ -102,6 +103,9 @@ public class SpellDimensionDoor extends Spell {
 		List<Player> toRemove = new ArrayList<Player>();
 		for (Player p : players) {
 			p.sendMessage(ChatColor.LIGHT_PURPLE + "THE SHADOWS HOLD MANY SECRETS.");
+			if (Lich.getCursed().contains(p) || PlayerUtils.isCursed(com.playmonumenta.plugins.Plugin.getInstance(), p)) {
+				p.sendMessage(ChatColor.AQUA + "I can cleanse the curse on me if I enter the shadows.");
+			}
 			if (p.getLocation().getY() < mSpawnLoc.getY() - 8) {
 				toRemove.add(p);
 			}
@@ -164,8 +168,8 @@ public class SpellDimensionDoor extends Spell {
 			world.playSound(pLoc, Sound.BLOCK_PORTAL_TRIGGER, SoundCategory.HOSTILE, 1f, 2.0f);
 			world.playSound(pLoc, Sound.BLOCK_END_PORTAL_FRAME_FILL, SoundCategory.HOSTILE, 1f, 1.0f);
 
-			PPGroundCircle indicator = new PPGroundCircle(Particle.SPELL_WITCH, pLoc, 8, 0.2, 0, 0.2, 0).init(3, true);
-			PPGroundCircle indicator2 = new PPGroundCircle(Particle.SMOKE_NORMAL, pLoc, 4, 0.2, 0, 0.2, 0).init(3, true);
+			PPGroundCircle indicator = new PPGroundCircle(Particle.SPELL_WITCH, pLoc, 3, 0.2, 0, 0.2, 0).init(3, true);
+			PPGroundCircle indicator2 = new PPGroundCircle(Particle.SMOKE_NORMAL, pLoc, 2, 0.2, 0, 0.2, 0).init(3, true);
 
 			List<BlockState> toRestore = new ArrayList<>();
 			BukkitRunnable runB = new BukkitRunnable() {
@@ -185,8 +189,8 @@ public class SpellDimensionDoor extends Spell {
 						locdown = mLoc.clone().subtract(0, 1, 0);
 					}
 
-					indicator.location(mLoc.clone().add(0, 1.2, 0)).spawnAsBoss();
-					indicator2.location(mLoc.clone().add(0, 1.2, 0)).spawnAsBoss();
+					indicator.location(mLoc.clone().add(0, 1.1, 0)).spawnAsBoss();
+					indicator2.location(mLoc.clone().add(0, 1.1, 0)).spawnAsBoss();
 
 					//get blocks and replace
 					Location portalCenterLoc = mLoc.clone();
@@ -311,6 +315,14 @@ public class SpellDimensionDoor extends Spell {
 		}
 		p.teleport(tele);
 		p.addPotionEffect(new PotionEffect(PotionEffectType.CONFUSION, 20 * 5, 0));
+		//remove curse
+		if (PlayerUtils.isCursed(com.playmonumenta.plugins.Plugin.getInstance(), p)) {
+			PlayerUtils.removeCursed(com.playmonumenta.plugins.Plugin.getInstance(), p);
+		}
+		if (Lich.getCursed().contains(p)) {
+			Lich.getCursed().remove(p);
+			p.sendMessage(ChatColor.AQUA + "You felt a curse being lifted.");
+		}
 		mShadowed.add(p);
 
 		String[] dio = new String[] {
@@ -361,7 +373,7 @@ public class SpellDimensionDoor extends Spell {
 
 			@Override
 			public void run() {
-				mT--;
+				mT -= 2;
 				double progress = mT * 1.0d / (20 * 20);
 				if (progress >= 0) {
 					bar.setProgress(progress);
@@ -377,7 +389,7 @@ public class SpellDimensionDoor extends Spell {
 				//kill player if time runs out. show that they are dying extremely quickly
 				if (mT <= 0) {
 					p.setNoDamageTicks(0);
-					BossUtils.bossDamagePercent(mBoss, p, 0.05);
+					BossUtils.bossDamagePercent(mBoss, p, 0.1);
 				}
 
 				if (spectre.isDead() || !spectre.isValid() || Lich.phase3over() || mBoss.isDead() || !mBoss.isValid()) {
@@ -406,7 +418,7 @@ public class SpellDimensionDoor extends Spell {
 					this.cancel();
 				}
 			}
-		}.runTaskTimer(plugin, 0, 1);
+		}.runTaskTimer(plugin, 0, 2);
 	}
 
 	@Override

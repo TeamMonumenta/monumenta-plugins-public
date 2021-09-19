@@ -116,10 +116,10 @@ public class SpellSoulShackle extends Spell {
 
 			BossUtils.bossDamage(mBoss, p, 35, null, "Soul Shackle");
 			AbilityUtils.silencePlayer(p, 5 * 20);
-			new PartialParticle(Particle.END_ROD, pLoc, 50, 1, 1, 1, 0).spawnAsBoss();
+			new PartialParticle(Particle.END_ROD, pLoc, 40, 1, 1, 1, 0).spawnAsBoss();
 			world.playSound(pLoc, Sound.ENTITY_ZOMBIE_VILLAGER_CURE, 0.7f, 0.5f);
 
-			PPGroundCircle indicator = new PPGroundCircle(Particle.END_ROD, pLoc, 36, 0.1, 0.1, 0.1, 0).init(3, true);
+			PPGroundCircle indicator = new PPGroundCircle(Particle.END_ROD, pLoc, 36, 0, 0, 0, 0).init(3, true);
 
 			BukkitRunnable run = new BukkitRunnable() {
 				BossBar mBar = Bukkit.getServer().createBossBar(ChatColor.RED + "Soul Shackle Duration", BarColor.RED, BarStyle.SOLID, BarFlag.PLAY_BOSS_MUSIC);
@@ -152,15 +152,15 @@ public class SpellSoulShackle extends Spell {
 							p.sendMessage(ChatColor.AQUA + "I shouldn't leave this ring.");
 							world.playSound(p.getLocation(), Sound.BLOCK_END_PORTAL_FRAME_FILL, 2.0f, 1.0f);
 							BossUtils.bossDamagePercent(mBoss, p, 0.15, null, "Soul Shackle");
-							MovementUtils.knockAway(pCheckLoc, p, -0.5f);
+							MovementUtils.knockAway(pCheckLoc, p, -0.7f);
 						}
 
 						Location endLoc = pLoc.clone();
 						Vector baseVect = LocationUtils.getDirectionTo(p.getLocation(), pLoc);
 
-						for (int inc = 0; inc < 200; inc++) {
+						for (int inc = 0; inc < 100; inc++) {
 							world.spawnParticle(Particle.END_ROD, endLoc, 1, 0.1, 0.1, 0.1, 0);
-							endLoc.add(baseVect.clone().multiply(0.4));
+							endLoc.add(baseVect.clone().multiply(0.5));
 							if (endLoc.distance(pLoc) > p.getLocation().distance(pLoc)) {
 								break;
 							}

@@ -145,7 +145,7 @@ public class SpellAutoAttack extends Spell {
 			public void run() {
 				mT++;
 				Vector v;
-				for (double r = 0; r <= 5; r += 0.5) {
+				for (double r = 0; r <= 5; r += 0.75) {
 					for (double degree = -40; degree < 40; degree += 10) {
 						double radian1 = Math.toRadians(degree);
 						v = new Vector(Math.cos(radian1) * r, 0, Math.sin(radian1) * r);
@@ -158,7 +158,7 @@ public class SpellAutoAttack extends Spell {
 				}
 				if (mT >= 10) {
 					Vector vec;
-					for (double r1 = 0; r1 <= 5; r1 += 0.5) {
+					for (double r1 = 0; r1 <= 5; r1 += 0.75) {
 						for (double degree1 = -40; degree1 < 40; degree1 += 10) {
 							double radian2 = Math.toRadians(degree1);
 							vec = new Vector(Math.cos(radian2) * r1, 0, Math.sin(radian2) * r1);
@@ -168,7 +168,7 @@ public class SpellAutoAttack extends Spell {
 							Location l = mBoss.getLocation().clone().add(vec);
 							new PartialParticle(Particle.SPELL_WITCH, l, 1, 0.1, 0.1, 0.1, 0.1).spawnAsBoss();
 							new PartialParticle(Particle.CRIT_MAGIC, l, 2, 0.1, 0.1, 0.1, 0.1).spawnAsBoss();
-							BoundingBox box = BoundingBox.of(l, 0.3, 10, 0.3);
+							BoundingBox box = BoundingBox.of(l, 0.4, 10, 0.4);
 
 							for (Player player : Lich.playersInRange(mBoss.getLocation(), 10, true)) {
 								if (player.getBoundingBox().overlaps(box)) {

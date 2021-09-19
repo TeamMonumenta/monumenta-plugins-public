@@ -136,7 +136,7 @@ public class SpellDesecrate extends Spell {
 								}
 								//fail to escape
 								if (pHoriLoc.distance(mBossLoc) < mRadius) {
-									BossUtils.bossDamage(mBoss, p, 75, null, "Desecrate");
+									BossUtils.bossDamage(mBoss, p, 85, null, "Desecrate");
 									MovementUtils.knockAway(mBoss.getLocation(), p, 0.5f);
 									world.playSound(p.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 1.0f, 0.75f);
 									world.playSound(mBossLoc, Sound.BLOCK_ENCHANTMENT_TABLE_USE, 2.0f, 0.5f);

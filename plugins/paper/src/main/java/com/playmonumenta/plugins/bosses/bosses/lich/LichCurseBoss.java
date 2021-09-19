@@ -7,6 +7,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.plugin.Plugin;
+
 import com.playmonumenta.plugins.bosses.bosses.BossAbilityGroup;
 import com.playmonumenta.plugins.bosses.bosses.Lich;
 import com.playmonumenta.plugins.bosses.spells.Spell;
@@ -37,7 +38,7 @@ public class LichCurseBoss extends BossAbilityGroup {
 		if (event.getEntity() instanceof Player) {
 			event.getDamager().remove();
 			Player p = (Player) event.getEntity();
-			Lich.cursePlayer(mPlugin, p);
+			Lich.cursePlayer(mPlugin, p, 120);
 		}
 	}
 }

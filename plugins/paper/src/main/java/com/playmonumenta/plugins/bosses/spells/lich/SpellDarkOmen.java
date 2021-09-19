@@ -48,7 +48,6 @@ public class SpellDarkOmen extends Spell {
 	private double mArenaRange = 42;
 	private double mVelocity = 20;
 	private static final Particle.DustOptions BLADE_COLOR1 = new Particle.DustOptions(Color.fromRGB(199, 0, 255), 1.0f);
-	private static final Particle.DustOptions BLADE_COLOR2 = new Particle.DustOptions(Color.fromRGB(140, 0, 210), 1.0f);
 	private static final Particle.DustOptions RED = new Particle.DustOptions(Color.fromRGB(185, 0, 0), 1.0f);
 	private ChargeUpManager mChargeUp;
 	private List<Player> mDamaged = new ArrayList<Player>();
@@ -187,7 +186,6 @@ public class SpellDarkOmen extends Spell {
 				new PartialParticle(Particle.REDSTONE, l, 1, 0.1, 0.1, 0.1, 0, RED).spawnAsBoss();
 			} else {
 				new PartialParticle(Particle.REDSTONE, l, 1, 0.1, 0.1, 0.1, 0, BLADE_COLOR1).spawnAsBoss();
-				new PartialParticle(Particle.REDSTONE, l, 1, 0.1, 0.1, 0.1, 0, BLADE_COLOR2).spawnAsBoss();
 				new PartialParticle(Particle.SOUL_FIRE_FLAME, l, 1, 0.1, 0.1, 0.1, 0).spawnAsBoss();
 				BoundingBox box = BoundingBox.of(l, 0.3, 0.3, 0.3);
 				for (Player p : players) {
@@ -205,7 +203,7 @@ public class SpellDarkOmen extends Spell {
 					world.playSound(p.getLocation(), Sound.ENTITY_FIREWORK_ROCKET_LAUNCH, 1.0f, 1.5f);
 					world.playSound(p.getLocation(), Sound.ENTITY_GENERIC_EXTINGUISH_FIRE, 1.0f, 2.0f);
 					BossUtils.bossDamagePercent(mBoss, p, 0.75, null, "Dark Omen");
-					Lich.cursePlayer(mPlugin, p);
+					Lich.cursePlayer(mPlugin, p, 120);
 				}
 			}
 		}
@@ -213,7 +211,7 @@ public class SpellDarkOmen extends Spell {
 
 	public void vex(Location anchor) {
 		List<Player> players = Lich.playersInRange(mCenter, mRange, true);
-		double count = players.size() / 4.0 + 1.0;
+		double count = Math.min(8, players.size() / 8.0 + 0.5);
 		for (int i = 0; i < count; i++) {
 			LibraryOfSoulsIntegration.summon(anchor, "LivingCurse");
 		}
