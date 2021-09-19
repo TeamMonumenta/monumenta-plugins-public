@@ -79,7 +79,7 @@ public class SpellAmpHex extends Spell {
 
 							Location l = mLoc.clone().clone().add(0, 0.15, 0).add(vec);
 							new PartialParticle(Particle.DRAGON_BREATH, l, 2, 0.05, 0.05, 0.05, 0.1).spawnAsEnemy();
-							new PartialParticle(Particle.SMOKE_NORMAL, l, 3, 0.05, 0.05, 0.05, 0.1).spawnAsEnemy();
+							new PartialParticle(Particle.SMOKE_NORMAL, l, 1, 0.05, 0.05, 0.05, 0.1).spawnAsEnemy();
 						}
 
 						if (mRadius >= 9) {

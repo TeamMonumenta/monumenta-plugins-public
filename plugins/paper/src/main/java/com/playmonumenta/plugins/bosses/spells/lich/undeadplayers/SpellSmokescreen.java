@@ -53,8 +53,8 @@ public class SpellSmokescreen extends Spell {
 					return;
 				}
 				if (mT >= DELAY) {
-					new PartialParticle(Particle.SMOKE_LARGE, loc.clone().add(0, 1, 0), 60, 3.5, 0.8, 4.5, 0.025).spawnAsEnemy();
-					new PartialParticle(Particle.SMOKE_NORMAL, loc.clone().add(0, 1, 0), 100, 3.5, 0.2, 4.5, 0.05).spawnAsEnemy();
+					new PartialParticle(Particle.SMOKE_LARGE, loc.clone().add(0, 1, 0), 30, 3.5, 0.8, 4.5, 0.025).spawnAsEnemy();
+					new PartialParticle(Particle.SMOKE_NORMAL, loc.clone().add(0, 1, 0), 75, 3.5, 0.2, 4.5, 0.05).spawnAsEnemy();
 					world.playSound(mBoss.getLocation(), Sound.BLOCK_FIRE_EXTINGUISH, SoundCategory.HOSTILE, 1, 0.7f);
 					for (Player player : PlayerUtils.playersInRange(loc, 4, true)) {
 						player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 6, 2));

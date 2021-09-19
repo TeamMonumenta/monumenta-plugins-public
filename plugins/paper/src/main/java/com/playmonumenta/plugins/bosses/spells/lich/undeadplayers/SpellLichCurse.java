@@ -18,8 +18,8 @@ public class SpellLichCurse extends Spell {
 	@Override
 	public void run() {
 		mT += 5;
-		new PartialParticle(Particle.SOUL, mBoss.getLocation().add(0, 0.25, 0), 4, 0.2, 0.2, 0.2, 0.01).spawnAsEnemy();
-		new PartialParticle(Particle.SOUL_FIRE_FLAME, mBoss.getLocation().add(0, 0.25, 0), 4, 0.2, 0.2, 0.2, 0.01).spawnAsEnemy();
+		new PartialParticle(Particle.SOUL, mBoss.getLocation().add(0, 0.25, 0), 2, 0.2, 0.2, 0.2, 0.01).spawnAsEnemy();
+		new PartialParticle(Particle.SOUL_FIRE_FLAME, mBoss.getLocation().add(0, 0.25, 0), 2, 0.2, 0.2, 0.2, 0.01).spawnAsEnemy();
 		if (mT >= 20 * 20) {
 			mBoss.remove();
 		}

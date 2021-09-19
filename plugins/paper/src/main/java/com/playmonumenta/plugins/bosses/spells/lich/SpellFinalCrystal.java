@@ -197,7 +197,7 @@ public class SpellFinalCrystal extends Spell {
 				FallingBlock block = world.spawnFallingBlock(spawnLoc, Bukkit.createBlockData(Material.CRYING_OBSIDIAN));
 				block.setVelocity(new Vector(FastUtils.randomDoubleInRange(-0.55, 0.55), FastUtils.randomDoubleInRange(0.25, 1), FastUtils.randomDoubleInRange(-0.55, 0.55)));
 
-				PPGroundCircle indicator = new PPGroundCircle(Particle.SOUL_FIRE_FLAME, block.getLocation(), 36, 0.2, 0, 0.2, 0).init(4, true);
+				PPGroundCircle indicator = new PPGroundCircle(Particle.SOUL_FIRE_FLAME, block.getLocation(), 24, 0.2, 0, 0.2, 0).init(4, true);
 
 				BukkitRunnable runB = new BukkitRunnable() {
 
@@ -209,14 +209,15 @@ public class SpellFinalCrystal extends Spell {
 							block.getLocation().getBlock().setType(Material.AIR);
 							//limit particle count for ability stacking
 							world.playSound(block.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 2, 0.85f);
+							Location loc = block.getLocation();
 
 							new BukkitRunnable() {
 								int mTicks = 0;
-								Location mLoc = block.getLocation();
+								Location mLoc = loc.clone().add(0, 0.2, 0);
 								@Override
 								public void run() {
 									mTicks += 5;
-									new PartialParticle(Particle.SOUL, mLoc, 20, 3, 0.15, 3, 0).spawnAsBoss();
+									new PartialParticle(Particle.SOUL, mLoc, 8, 3, 0.15, 3, 0).spawnAsBoss();
 									indicator.location(mLoc).spawnAsBoss();
 
 									if (mTicks % 10 == 0) {

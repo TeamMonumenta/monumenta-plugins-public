@@ -55,7 +55,7 @@ public class SpellFinalParticle extends Spell {
 		mBlock.setTicksLived(1);
 		World world = mBoss.getWorld();
 		//smoke ring particle
-		PPGroundCircle indicator = new PPGroundCircle(Particle.REDSTONE, mCenter, 30, 0.1, 0.1, 0.1, 0, BLACK).init(mCylRadius, true);
+		PPGroundCircle indicator = new PPGroundCircle(Particle.REDSTONE, mCenter, 20, 0.1, 0.1, 0.1, 0, BLACK).init(mCylRadius, true);
 		if (mPTick) {
 			mPTick = false;
 			for (int j = 0; j < 20; j += 1.5) {
@@ -65,9 +65,6 @@ public class SpellFinalParticle extends Spell {
 			mPTick = true;
 		}
 
-		//ball particle above lich
-		Location ballLoc = mBoss.getLocation().add(0, 4.5, 0);
-		new PartialParticle(Particle.REDSTONE, ballLoc, 20, 0.5, 0.5, 0.5, 0, BLACK).spawnAsBoss();
 		//hurt players within the circle
 		//update player count every 5 seconds
 		if (!mTrigger) {
@@ -104,6 +101,7 @@ public class SpellFinalParticle extends Spell {
 		}
 		//kill all projectiles close to boss
 		//prevent easy shooting of corner crystals
+		Location ballLoc = mBoss.getLocation().add(0, 4.5, 0);
 		BukkitRunnable run = new BukkitRunnable() {
 			int mT = 0;
 			@Override
@@ -123,7 +121,7 @@ public class SpellFinalParticle extends Spell {
 						if (pLoc.distance(loc) > dist) {
 							break;
 						}
-						new PartialParticle(Particle.REDSTONE, pLoc, 2, 0.1, 0.1, 0.1, 0, BLACK).spawnAsBoss();
+						new PartialParticle(Particle.REDSTONE, pLoc, 1, 0.1, 0.1, 0.1, 0, BLACK).spawnAsBoss();
 					}
 					world.playSound(loc, Sound.ENTITY_LIGHTNING_BOLT_THUNDER, SoundCategory.HOSTILE, 1, 1);
 					proj.remove();

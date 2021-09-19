@@ -130,8 +130,8 @@ public class SpellRaiseDead extends Spell {
 			int mINC = 0;
 			@Override
 			public void run() {
-				mINC++;
-				new PartialParticle(Particle.BLOCK_DUST, loc, 2, 0.4, 0.1, 0.4, 0.25, Material.DIRT.createBlockData()).spawnAsBoss();
+				mINC += 2;
+				new PartialParticle(Particle.BLOCK_DUST, loc, 1, 0.4, 0.1, 0.4, 0.25, Material.DIRT.createBlockData()).spawnAsBoss();
 				if (mINC >= 20) {
 					loc.getWorld().playSound(loc, Sound.BLOCK_GRAVEL_BREAK, 1, 1f);
 					new PartialParticle(Particle.BLOCK_DUST, loc, 16, 0.25, 0.1, 0.25, 0.25, Material.DIRT.createBlockData()).spawnAsBoss();
@@ -140,7 +140,7 @@ public class SpellRaiseDead extends Spell {
 				}
 			}
 
-		}.runTaskTimer(plugin, 0, 1);
+		}.runTaskTimer(plugin, 0, 2);
 	}
 
 	public static Location getRandomCenteration(Location origin, double range) {

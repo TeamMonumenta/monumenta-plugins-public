@@ -33,7 +33,7 @@ public class SpellResistance extends Spell {
 	public void run() {
 		Location loc = mBoss.getLocation().add(0, 1, 0);
 		World world = mBoss.getWorld();
-		new PartialParticle(Particle.SPELL_INSTANT, loc, 25, 0.4, 0.4, 0.4, 0.25).spawnAsEnemy();
+		new PartialParticle(Particle.SPELL_INSTANT, loc, 10, 0.4, 0.4, 0.4, 0.25).spawnAsEnemy();
 		world.playSound(mBoss.getLocation(), Sound.BLOCK_ANVIL_USE, SoundCategory.HOSTILE, 2.0f, 0.75f);
 		world.playSound(mBoss.getLocation(), Sound.ITEM_SHIELD_BLOCK, SoundCategory.HOSTILE, 2.0f, 0.5f);
 		mBoss.addPotionEffect(new PotionEffect(PotionEffectType.GLOWING, 20, 0, false));
@@ -41,7 +41,7 @@ public class SpellResistance extends Spell {
 
 			@Override
 			public void run() {
-				new PartialParticle(Particle.SPELL_INSTANT, loc, 50, 0.4, 0.4, 0.4, 1).spawnAsEnemy();
+				new PartialParticle(Particle.SPELL_INSTANT, loc, 25, 0.4, 0.4, 0.4, 1).spawnAsEnemy();
 				world.playSound(mBoss.getLocation(), Sound.BLOCK_ANVIL_PLACE, SoundCategory.HOSTILE, 2.0f, 1.35f);
 				world.playSound(mBoss.getLocation(), Sound.ENTITY_ILLUSIONER_CAST_SPELL, SoundCategory.HOSTILE, 1.25f, 1.1f);
 				for (LivingEntity e : EntityUtils.getNearbyMobs(loc, 12)) {

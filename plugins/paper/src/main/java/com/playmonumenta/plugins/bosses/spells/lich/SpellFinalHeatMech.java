@@ -121,8 +121,8 @@ public class SpellFinalHeatMech extends Spell {
 					@Override
 					public void run() {
 						Location l = fallingBlock.getLocation();
-						new PartialParticle(Particle.FLAME, l, 3, 0.25, .25, .25, 0.025).spawnAsBoss();
-						new PartialParticle(Particle.DAMAGE_INDICATOR, mCenter.clone().add(0, 5.5, 0), 8, 10, 1, 10, 0).spawnAsBoss();
+						new PartialParticle(Particle.FLAME, l, 2, 0.25, .25, .25, 0.025).spawnAsBoss();
+						new PartialParticle(Particle.DAMAGE_INDICATOR, mCenter.clone().add(0, 5.5, 0), 4, 10, 1, 10, 0).spawnAsBoss();
 						if (fallingBlock.isOnGround() || !fallingBlock.isValid()) {
 							this.cancel();
 							fallingBlock.remove();
@@ -158,7 +158,7 @@ public class SpellFinalHeatMech extends Spell {
 					p.setFireTicks(100);
 				}
 			}
-			new PartialParticle(Particle.EXPLOSION_LARGE, loc, 400, 10, 1, 10, 0).spawnAsBoss();
+			new PartialParticle(Particle.EXPLOSION_LARGE, loc, 200, 10, 1, 10, 0).spawnAsBoss();
 		}
 	}
 

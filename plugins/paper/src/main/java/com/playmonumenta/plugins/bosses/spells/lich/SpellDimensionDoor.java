@@ -164,8 +164,8 @@ public class SpellDimensionDoor extends Spell {
 			world.playSound(pLoc, Sound.BLOCK_PORTAL_TRIGGER, SoundCategory.HOSTILE, 1f, 2.0f);
 			world.playSound(pLoc, Sound.BLOCK_END_PORTAL_FRAME_FILL, SoundCategory.HOSTILE, 1f, 1.0f);
 
-			PPGroundCircle indicator = new PPGroundCircle(Particle.SPELL_WITCH, pLoc, 20, 0.2, 0, 0.2, 0).init(3, true);
-			PPGroundCircle indicator2 = new PPGroundCircle(Particle.SMOKE_NORMAL, pLoc, 10, 0.2, 0, 0.2, 0).init(3, true);
+			PPGroundCircle indicator = new PPGroundCircle(Particle.SPELL_WITCH, pLoc, 8, 0.2, 0, 0.2, 0).init(3, true);
+			PPGroundCircle indicator2 = new PPGroundCircle(Particle.SMOKE_NORMAL, pLoc, 4, 0.2, 0, 0.2, 0).init(3, true);
 
 			List<BlockState> toRestore = new ArrayList<>();
 			BukkitRunnable runB = new BukkitRunnable() {
@@ -185,8 +185,8 @@ public class SpellDimensionDoor extends Spell {
 						locdown = mLoc.clone().subtract(0, 1, 0);
 					}
 
-					indicator.location(mLoc.clone().add(0, 0.75, 0)).spawnAsBoss();
-					indicator2.location(mLoc.clone().add(0, 0.75, 0)).spawnAsBoss();
+					indicator.location(mLoc.clone().add(0, 1.2, 0)).spawnAsBoss();
+					indicator2.location(mLoc.clone().add(0, 1.2, 0)).spawnAsBoss();
 
 					//get blocks and replace
 					Location portalCenterLoc = mLoc.clone();

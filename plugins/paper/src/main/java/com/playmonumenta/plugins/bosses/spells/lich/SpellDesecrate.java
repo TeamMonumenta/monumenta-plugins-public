@@ -55,11 +55,11 @@ public class SpellDesecrate extends Spell {
 	public void run() {
 		World world = mBoss.getWorld();
 
-		PPGroundCircle indicator = new PPGroundCircle(Particle.SMOKE_NORMAL, mBoss.getLocation(), 36, 0.2, 0, 0.2, 0).init(0, true);
-		PPGroundCircle indicator2 = new PPGroundCircle(Particle.SPELL_WITCH, mBoss.getLocation(), 36, 0.2, 0, 0.2, 0).init(0, true);
+		PPGroundCircle indicator = new PPGroundCircle(Particle.SMOKE_NORMAL, mBoss.getLocation(), 12, 0.2, 0, 0.2, 0).init(0, true);
+		PPGroundCircle indicator2 = new PPGroundCircle(Particle.SPELL_WITCH, mBoss.getLocation(), 12, 0.2, 0, 0.2, 0).init(0, true);
 
-		PPGroundCircle indicator3 = new PPGroundCircle(Particle.SMOKE_LARGE, mBoss.getLocation(), 60, 0.2, 0, 0.2, 0).init(0, true);
-		PPGroundCircle indicator4 = new PPGroundCircle(Particle.DRAGON_BREATH, mBoss.getLocation(), 60, 0.2, 0.2, 0.2, 0).init(0, true);
+		PPGroundCircle indicator3 = new PPGroundCircle(Particle.SMOKE_LARGE, mBoss.getLocation(), 15, 0.2, 0, 0.2, 0).init(0, true);
+		PPGroundCircle indicator4 = new PPGroundCircle(Particle.DRAGON_BREATH, mBoss.getLocation(), 15, 0.2, 0.2, 0.2, 0).init(0, true);
 
 		BukkitRunnable runA = new BukkitRunnable() {
 			double mRadius = 12;
@@ -67,8 +67,8 @@ public class SpellDesecrate extends Spell {
 			public void run() {
 				float fTick = mChargeUp.getTime();
 				float ft = fTick / 25;
-				new PartialParticle(Particle.SMOKE_LARGE, mBoss.getLocation(), 4, 0.35, 0, 0.35, 0.005).spawnAsBoss();
-				new PartialParticle(Particle.SPELL_WITCH, mBoss.getLocation().add(0, 1, 0), 5, 0.4, 0.4, 0.4, 0).spawnAsBoss();
+				new PartialParticle(Particle.SMOKE_LARGE, mBoss.getLocation(), 2, 0.35, 0, 0.35, 0.005).spawnAsBoss();
+				new PartialParticle(Particle.SPELL_WITCH, mBoss.getLocation().add(0, 1, 0), 3, 0.4, 0.4, 0.4, 0).spawnAsBoss();
 				world.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_SPAWN, 5, 0.5f + ft);
 				Location loc = mBoss.getLocation();
 
@@ -82,8 +82,8 @@ public class SpellDesecrate extends Spell {
 					mChargeUp.setTitle(ChatColor.YELLOW + "Casting Desecrate...");
 					mChargeUp.setColor(BarColor.RED);
 					for (Player player : players) {
-						new PartialParticle(Particle.SMOKE_LARGE, player.getLocation(), 4, 0.35, 0, 0.35, 0.005).spawnAsBoss();
-						new PartialParticle(Particle.SPELL_WITCH, player.getLocation().add(0, 1, 0), 5, 0.4, 0.4, 0.4, 0).spawnAsBoss();
+						new PartialParticle(Particle.SMOKE_LARGE, player.getLocation(), 2, 0.35, 0, 0.35, 0.005).spawnAsBoss();
+						new PartialParticle(Particle.SPELL_WITCH, player.getLocation().add(0, 1, 0), 3, 0.4, 0.4, 0.4, 0).spawnAsBoss();
 						player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 3, 6));
 						player.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, 20 * 3, -10));
 						player.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, 20 * 3, 10));
@@ -107,7 +107,7 @@ public class SpellDesecrate extends Spell {
 								Location pHoriLoc = new Location(world, pLoc.getX(), mBossLoc.getY(), pLoc.getZ());
 
 								Vector baseVect = LocationUtils.getVectorTo(pLoc, endLoc);
-								baseVect = baseVect.normalize().multiply(0.2);
+								baseVect = baseVect.normalize().multiply(0.5);
 								//line
 								if (mBool) {
 									mBool = false;

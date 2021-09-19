@@ -95,20 +95,20 @@ public class SpellSalientOfDecay extends Spell {
 				public void run() {
 					mT += 2;
 					Location loc = mBoss.getLocation().add(0, 1.25, 0);
-					for (int i = 0; i < 100; i++) {
+					for (int i = 0; i < 60; i++) {
 						loc.add(mDir.clone().multiply(0.5));
-						new PartialParticle(Particle.REDSTONE, loc, 2, 0.25, 0.25, 0.25, 0, SALIENT_OF_DECAY_COLOR).spawnAsBoss();
+						new PartialParticle(Particle.REDSTONE, loc, 1, 0.25, 0.25, 0.25, 0, SALIENT_OF_DECAY_COLOR).spawnAsBoss();
 					}
 
 					if (Lich.phase3over()) {
 						this.cancel();
 					} else if (mT >= mTell) {
 						BoundingBox box = BoundingBox.of(mBoss.getLocation(), 0.65, 0.65, 0.65);
-						for (int i = 0; i < 100; i++) {
+						for (int i = 0; i < 60; i++) {
 							box.shift(mDir.clone().multiply(0.5));
 							Location bLoc = box.getCenter().toLocation(world);
-							new PartialParticle(Particle.SPELL_WITCH, bLoc, 3, 0.25, 0.25, 0.25, 1).spawnAsBoss();
-							new PartialParticle(Particle.SMOKE_NORMAL, bLoc, 4, 0.25, 0.25, 0.25, 0.25).spawnAsBoss();
+							new PartialParticle(Particle.SPELL_WITCH, bLoc, 2, 0.25, 0.25, 0.25, 1).spawnAsBoss();
+							new PartialParticle(Particle.SMOKE_NORMAL, bLoc, 2, 0.25, 0.25, 0.25, 0.25).spawnAsBoss();
 							Iterator<Player> it = players.iterator();
 							while (it.hasNext()) {
 								Player p = it.next();

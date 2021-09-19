@@ -153,7 +153,7 @@ public class SpellAutoAttack extends Spell {
 						v = VectorUtils.rotateYAxis(v, tloc.getYaw() + 90);
 
 						Location loc = mBoss.getLocation().clone().add(v);
-						new PartialParticle(Particle.REDSTONE, loc, 5, 0.1, 0.1, 0.1, 0.1, RED).spawnAsBoss();
+						new PartialParticle(Particle.REDSTONE, loc, 2, 0.1, 0.1, 0.1, 0.1, RED).spawnAsBoss();
 					}
 				}
 				if (mT >= 10) {
@@ -166,14 +166,14 @@ public class SpellAutoAttack extends Spell {
 							vec = VectorUtils.rotateYAxis(vec, tloc.getYaw() + 90);
 
 							Location l = mBoss.getLocation().clone().add(vec);
-							new PartialParticle(Particle.SPELL_WITCH, l, 5, 0.1, 0.1, 0.1, 0.1).spawnAsBoss();
-							new PartialParticle(Particle.CRIT_MAGIC, l, 10, 0.1, 0.1, 0.1, 0.1).spawnAsBoss();
+							new PartialParticle(Particle.SPELL_WITCH, l, 1, 0.1, 0.1, 0.1, 0.1).spawnAsBoss();
+							new PartialParticle(Particle.CRIT_MAGIC, l, 2, 0.1, 0.1, 0.1, 0.1).spawnAsBoss();
 							BoundingBox box = BoundingBox.of(l, 0.3, 10, 0.3);
 
 							for (Player player : Lich.playersInRange(mBoss.getLocation(), 10, true)) {
 								if (player.getBoundingBox().overlaps(box)) {
 									MovementUtils.knockAway(mBoss.getLocation(), player, 1.5f, 0.5f);
-									new PartialParticle(Particle.CRIT_MAGIC, player.getLocation(), 50, 0.25, 0.25, 0.25, 0.25).spawnAsBoss();
+									new PartialParticle(Particle.CRIT_MAGIC, player.getLocation(), 20, 0.25, 0.25, 0.25, 0.25).spawnAsBoss();
 
 									damage(player);
 								}
@@ -209,16 +209,16 @@ public class SpellAutoAttack extends Spell {
 					for (Player player : players) {
 						if (player.getBoundingBox().overlaps(mBox)) {
 							damage(player);
-							w.spawnParticle(Particle.SMOKE_LARGE, loc, 25, 0, 0, 0, 0.25);
-							w.spawnParticle(Particle.REDSTONE, loc, 25, 0.2, 0.2, 0.2, 0.25, YELLOW);
+							w.spawnParticle(Particle.SMOKE_LARGE, loc, 15, 0, 0, 0, 0.25);
+							w.spawnParticle(Particle.REDSTONE, loc, 15, 0.2, 0.2, 0.2, 0.25, YELLOW);
 							w.playSound(loc, Sound.ENTITY_WITHER_HURT, 1, 0.75f);
 							this.cancel();
 						}
 					}
 
 					if (loc.getBlock().getType().isSolid() && (mPhase != 4 || loc.getY() <= mCenter.getY())) {
-						w.spawnParticle(Particle.SMOKE_LARGE, loc, 25, 0, 0, 0, 0.25);
-						w.spawnParticle(Particle.REDSTONE, loc, 25, 0.2, 0.2, 0.2, 0.25, YELLOW);
+						w.spawnParticle(Particle.SMOKE_LARGE, loc, 15, 0, 0, 0, 0.25);
+						w.spawnParticle(Particle.REDSTONE, loc, 15, 0.2, 0.2, 0.2, 0.25, YELLOW);
 						w.playSound(loc, Sound.ENTITY_WITHER_HURT, 1, 0.75f);
 						this.cancel();
 					}
@@ -240,22 +240,22 @@ public class SpellAutoAttack extends Spell {
 
 	private void damage(Player player) {
 		if (mPhase == 1) {
-			BossUtils.bossDamage(mBoss, player, 22, mBoss.getLocation(), "Death Bolt");
+			BossUtils.bossDamage(mBoss, player, 25, mBoss.getLocation(), "Death Bolt");
 		}
 
 		if (mPhase == 2) {
-			BossUtils.bossDamage(mBoss, player, 27, mBoss.getLocation(), "Death Bolt");
+			BossUtils.bossDamage(mBoss, player, 30, mBoss.getLocation(), "Death Bolt");
 			AbilityUtils.increaseDamageRecievedPlayer(player, 20 * 5, 0.2, "Lich");
 		}
 
 		if (mPhase == 3) {
-			BossUtils.bossDamage(mBoss, player, 32, mBoss.getLocation(), "Death Bolt");
+			BossUtils.bossDamage(mBoss, player, 35, mBoss.getLocation(), "Death Bolt");
 			AbilityUtils.increaseDamageRecievedPlayer(player, 20 * 5, 0.2, "Lich");
 			AbilityUtils.increaseDamageDealtPlayer(player, 20 * 5, -0.2, "Lich");
 		}
 
 		if (mPhase >= 4) {
-			BossUtils.bossDamage(mBoss, player, 37, mBoss.getLocation(), "Death Bolt");
+			BossUtils.bossDamage(mBoss, player, 40, mBoss.getLocation(), "Death Bolt");
 			AbilityUtils.increaseDamageRecievedPlayer(player, 20 * 5, 0.2, "Lich");
 			AbilityUtils.increaseDamageDealtPlayer(player, 20 * 5, -0.2, "Lich");
 		}

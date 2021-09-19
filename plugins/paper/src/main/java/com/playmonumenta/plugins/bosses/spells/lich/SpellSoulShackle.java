@@ -61,7 +61,7 @@ public class SpellSoulShackle extends Spell {
 	public void run() {
 		World world = mBoss.getWorld();
 		world.playSound(mBoss.getLocation(), Sound.ENTITY_EVOKER_PREPARE_SUMMON, 6.0f, 1.0f);
-		new PartialParticle(Particle.PORTAL, mBoss.getLocation().add(0, 5, 0), 400, 0.1, 0.1, 0.1, 1.5).spawnAsBoss();
+		new PartialParticle(Particle.PORTAL, mBoss.getLocation().add(0, 5, 0), 100, 0.1, 0.1, 0.1, 1.5).spawnAsBoss();
 
 		List<Player> players = Lich.playersInRange(mCenter, mRange, true);
 		players.removeIf(p -> SpellDimensionDoor.getShadowed().contains(p) || p.getLocation().getY() >= mCenter.getY() + mCeiling);
@@ -138,7 +138,7 @@ public class SpellSoulShackle extends Spell {
 
 					if (mINC % 10 == 0) {
 						p.removePotionEffect(PotionEffectType.LEVITATION);
-						for (double n = -1; n < 2; n += 0.5) {
+						for (double n = -1; n < 2; n += 1) {
 							Location mColumn = pLoc.clone().add(0, n, 0);
 							new PartialParticle(Particle.FIREWORKS_SPARK, mColumn, 1, 0, 0, 0, 0).spawnAsBoss();
 						}
@@ -160,7 +160,7 @@ public class SpellSoulShackle extends Spell {
 
 						for (int inc = 0; inc < 200; inc++) {
 							world.spawnParticle(Particle.END_ROD, endLoc, 1, 0.1, 0.1, 0.1, 0);
-							endLoc.add(baseVect.clone().multiply(0.25));
+							endLoc.add(baseVect.clone().multiply(0.4));
 							if (endLoc.distance(pLoc) > p.getLocation().distance(pLoc)) {
 								break;
 							}

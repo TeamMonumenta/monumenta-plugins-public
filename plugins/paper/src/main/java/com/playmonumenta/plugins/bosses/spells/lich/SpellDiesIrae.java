@@ -200,12 +200,12 @@ public class SpellDiesIrae extends Spell {
 						Vector vec = LocationUtils.getVectorTo(mEnd, mStart);
 
 						Location particleLoc = mStart.add(vec.multiply(mInc / 40d));
-						new PartialParticle(Particle.SOUL_FIRE_FLAME, particleLoc, 4, 0, 0, 0, 0.03).spawnAsBoss();
+						new PartialParticle(Particle.SOUL_FIRE_FLAME, particleLoc, 2, 0, 0, 0, 0.03).spawnAsBoss();
 						new PartialParticle(Particle.DRAGON_BREATH, particleLoc, 2, 0.1, 0.1, 0.1, 0).spawnAsBoss();
 					}
 				}
 				if (mInc == 20 * 2) {
-					new PartialParticle(Particle.HEART, mBoss.getLocation(), 30, 0.5, 0.5, 0.5, 0.1).spawnAsBoss();
+					new PartialParticle(Particle.HEART, mBoss.getLocation(), 20, 0.5, 0.5, 0.5, 0.1).spawnAsBoss();
 					world.playSound(mBoss.getLocation(), Sound.BLOCK_ENCHANTMENT_TABLE_USE, 3.0f, 1.5f);
 					mBoss.setHealth(healthFinal);
 					if (mKey.isValid()) {
@@ -216,7 +216,6 @@ public class SpellDiesIrae extends Spell {
 					Location pitch = mBoss.getLocation();
 					pitch.setPitch(90);
 					mBoss.teleport(pitch);
-					new PartialParticle(Particle.DRAGON_BREATH, mBoss.getLocation(), 50, 0.4, 0.4, 0.4, 0.01).spawnAsBoss();
 				}
 				if (mInc == 20 * 4) {
 					world.playSound(mBoss.getLocation().clone(), Sound.ENTITY_WITHER_SPAWN, 10.0f, 0.5f);
@@ -225,7 +224,7 @@ public class SpellDiesIrae extends Spell {
 					Vector vec = LocationUtils.getVectorTo(mCenter, mBoss.getLocation()).multiply((mInc - 4 * 20) / 20d);
 					Location pLoc = mBoss.getLocation();
 					new PartialParticle(Particle.EXPLOSION_LARGE, pLoc.add(vec), 1, 0, 0, 0, 0).spawnAsBoss();
-					new PartialParticle(Particle.DRAGON_BREATH, pLoc.add(vec), 50, 0.4, 0.4, 0.4, 0.01).spawnAsBoss();
+					new PartialParticle(Particle.DRAGON_BREATH, pLoc.add(vec), 15, 0.4, 0.4, 0.4, 0.01).spawnAsBoss();
 				}
 				if (mInc == 20 * (4 + 1)) {
 					new PartialParticle(Particle.EXPLOSION_LARGE, mCenter.clone().add(0, 0.5, 0), mCrystal.size() * 125 + 1000, 42, 0.75, 42, 0).spawnAsBoss();

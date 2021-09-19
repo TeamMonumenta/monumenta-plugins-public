@@ -79,6 +79,7 @@ import com.playmonumenta.plugins.bosses.spells.lich.SpellSalientOfDecay;
 import com.playmonumenta.plugins.bosses.spells.lich.SpellShadowRealm;
 import com.playmonumenta.plugins.bosses.spells.lich.SpellSoulShackle;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
+import com.playmonumenta.plugins.player.PPGroundCircle;
 import com.playmonumenta.plugins.player.PartialParticle;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.BossUtils;
@@ -385,10 +386,10 @@ public class Lich extends BossAbilityGroup {
 					}
 					mT++;
 					if (mT == 20 * 1) {
-						new PartialParticle(Particle.CLOUD, mBoss.getLocation(), 30, 0.1, 0.1, 0.1, 0.05).spawnAsBoss();
+						new PartialParticle(Particle.CLOUD, mBoss.getLocation(), 20, 0.1, 0.1, 0.1, 0.05).spawnAsBoss();
 						world.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_SHOOT, 2.0f, 1.0f);
 						mBoss.teleport(mCenter.clone().add(0, 14, 0));
-						new PartialParticle(Particle.CLOUD, mBoss.getLocation(), 30, 0.1, 0.1, 0.1, 0.05).spawnAsBoss();
+						new PartialParticle(Particle.CLOUD, mBoss.getLocation(), 20, 0.1, 0.1, 0.1, 0.05).spawnAsBoss();
 						world.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_SHOOT, 2.0f, 1.0f);
 						switchArmor("LichTwo");
 					}
@@ -469,10 +470,10 @@ public class Lich extends BossAbilityGroup {
 						this.cancel();
 						mCutscene = false;
 						mPhase = 2;
-						new PartialParticle(Particle.CLOUD, mBoss.getLocation(), 30, 0.1, 0.1, 0.1, 0.05).spawnAsBoss();
+						new PartialParticle(Particle.CLOUD, mBoss.getLocation(), 20, 0.1, 0.1, 0.1, 0.05).spawnAsBoss();
 						world.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_SHOOT, 2.0f, 1.0f);
 						mBoss.teleport(mCenter.clone());
-						new PartialParticle(Particle.CLOUD, mBoss.getLocation(), 30, 0.1, 0.1, 0.1, 0.05).spawnAsBoss();
+						new PartialParticle(Particle.CLOUD, mBoss.getLocation(), 20, 0.1, 0.1, 0.1, 0.05).spawnAsBoss();
 						world.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_SHOOT, 2.0f, 1.0f);
 
 						for (Player p : playersInRange(mStart.getLocation(), detectionRange, true)) {
@@ -531,10 +532,10 @@ public class Lich extends BossAbilityGroup {
 						Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), cmd);
 					}
 					if (mT == 30) {
-						new PartialParticle(Particle.CLOUD, mBoss.getLocation(), 30, 0.1, 0.1, 0.1, 0.05).spawnAsBoss();
+						new PartialParticle(Particle.CLOUD, mBoss.getLocation(), 20, 0.1, 0.1, 0.1, 0.05).spawnAsBoss();
 						world.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_SHOOT, 2.0f, 1.0f);
 						mBoss.teleport(mCenter.clone().add(0, 14, 0));
-						new PartialParticle(Particle.CLOUD, mBoss.getLocation(), 30, 0.1, 0.1, 0.1, 0.05).spawnAsBoss();
+						new PartialParticle(Particle.CLOUD, mBoss.getLocation(), 20, 0.1, 0.1, 0.1, 0.05).spawnAsBoss();
 						world.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_SHOOT, 2.0f, 1.0f);
 						switchArmor("LichThree");
 					}
@@ -549,7 +550,7 @@ public class Lich extends BossAbilityGroup {
 							Vector vec = LocationUtils.getVectorTo(endLoc, startLoc);
 
 							Location pLoc = startLoc.add(vec.multiply((mT - 20 * 2.5) / 128));
-							new PartialParticle(Particle.SOUL_FIRE_FLAME, pLoc, 4, 0, 0, 0, 0.03).spawnAsBoss();
+							new PartialParticle(Particle.SOUL_FIRE_FLAME, pLoc, 3, 0, 0, 0, 0.03).spawnAsBoss();
 						}
 					}
 					// put out torches after swirl/flame particle reach boss
@@ -558,7 +559,7 @@ public class Lich extends BossAbilityGroup {
 						// blast noise
 						world.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_SHOOT, 5.0f, 0.5f);
 						world.playSound(mBoss.getLocation(), Sound.ENTITY_ENDER_DRAGON_GROWL, 5.0f, 0.5f);
-						new PartialParticle(Particle.CAMPFIRE_COSY_SMOKE, mBoss.getLocation(), 250, 0, 0, 0, 0.75).spawnAsBoss();
+						new PartialParticle(Particle.CAMPFIRE_COSY_SMOKE, mBoss.getLocation(), 150, 0, 0, 0, 0.75).spawnAsBoss();
 						// put out torches by growables
 						com.playmonumenta.scriptedquests.Plugin scriptedQuestsPlugin;
 						scriptedQuestsPlugin = (com.playmonumenta.scriptedquests.Plugin) Bukkit.getPluginManager()
@@ -618,10 +619,10 @@ public class Lich extends BossAbilityGroup {
 							}
 						}
 
-						new PartialParticle(Particle.CLOUD, mBoss.getLocation(), 30, 0.1, 0.1, 0.1, 0.05).spawnAsBoss();
+						new PartialParticle(Particle.CLOUD, mBoss.getLocation(), 20, 0.1, 0.1, 0.1, 0.05).spawnAsBoss();
 						world.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_SHOOT, 2.0f, 1.0f);
 						mBoss.teleport(mCenter.clone());
-						new PartialParticle(Particle.CLOUD, mBoss.getLocation(), 30, 0.1, 0.1, 0.1, 0.05).spawnAsBoss();
+						new PartialParticle(Particle.CLOUD, mBoss.getLocation(), 20, 0.1, 0.1, 0.1, 0.05).spawnAsBoss();
 						world.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_SHOOT, 2.0f, 1.0f);
 
 						for (Player p : playersInRange(mStart.getLocation(), detectionRange, true)) {
@@ -730,7 +731,7 @@ public class Lich extends BossAbilityGroup {
 									+ end[0];
 							Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), cmd);
 							// make boss visible
-							new PartialParticle(Particle.END_ROD, mStart.getLocation().add(0, 17, 0), 1000, 6, 6, 6, 0).spawnAsBoss();
+							new PartialParticle(Particle.END_ROD, mStart.getLocation().add(0, 17, 0), 750, 6, 6, 6, 0).spawnAsBoss();
 							world.spawnParticle(Particle.EXPLOSION_HUGE, mStart.getLocation().add(0, 18, 0), 10, 4, 4,
 									4, 0);
 							mBoss.removePotionEffect(PotionEffectType.INVISIBILITY);
@@ -837,9 +838,9 @@ public class Lich extends BossAbilityGroup {
 	public void nearbyPlayerDeath(PlayerDeathEvent event) {
 		Player player = event.getEntity();
 		World world = player.getWorld();
-		world.spawnParticle(Particle.FALLING_DUST, player.getLocation().add(0, 1, 0), 20, 0.4, 0.45, 0.4,
+		world.spawnParticle(Particle.FALLING_DUST, player.getLocation().add(0, 1, 0), 10, 0.4, 0.45, 0.4,
 				Material.MELON.createBlockData());
-		new PartialParticle(Particle.SMOKE_NORMAL, player.getLocation().add(0, 1, 0), 50, 0.45, 0.45, 0.45, 0.15).spawnAsBoss();
+		new PartialParticle(Particle.SMOKE_NORMAL, player.getLocation().add(0, 1, 0), 30, 0.45, 0.45, 0.45, 0.15).spawnAsBoss();
 		Location spawnLoc = player.getLocation();
 		if (player.getLocation().getY() <= mStart.getLocation().getY()) {
 			spawnLoc.setY(mStart.getLocation().getY());
@@ -1220,7 +1221,7 @@ public class Lich extends BossAbilityGroup {
 			@Override
 			public void run() {
 				mT += 10;
-				new PartialParticle(Particle.SOUL, p.getLocation().add(0, 0.75, 0), 8, 0.3, 0.3, 0.3, 0.01).spawnAsBoss();
+				new PartialParticle(Particle.SOUL, p.getLocation().add(0, 0.75, 0), 6, 0.3, 0.3, 0.3, 0.01).spawnAsBoss();
 				if (mT > 20 * time || p.isDead()) {
 					this.cancel();
 				} else if (mT % 200 == 0) {
@@ -1490,7 +1491,7 @@ public class Lich extends BossAbilityGroup {
 						p.removePotionEffect(PotionEffectType.REGENERATION);
 					}
 					Location pLoc = mStart.clone().add(mVec.clone().multiply(mT));
-					new PartialParticle(Particle.FIREWORKS_SPARK, pLoc, 4, 0.1, 0.1, 0.1, 0.02).spawnAsBoss();
+					new PartialParticle(Particle.FIREWORKS_SPARK, pLoc, 2, 0.1, 0.1, 0.1, 0.02).spawnAsBoss();
 					if (mT >= 20 * 4) {
 						this.cancel();
 					}
@@ -1507,7 +1508,7 @@ public class Lich extends BossAbilityGroup {
 		mDead = false;
 		mCounter = 0;
 		world.playSound(mBoss.getLocation(), Sound.ENTITY_ENDER_DRAGON_GROWL, 3.0f, 1.0f);
-		new PartialParticle(Particle.CAMPFIRE_COSY_SMOKE, mBoss.getLocation(), 250, 0, 0, 0, 0.75).spawnAsBoss();
+		new PartialParticle(Particle.CAMPFIRE_COSY_SMOKE, mBoss.getLocation(), 150, 0, 0, 0, 0.75).spawnAsBoss();
 		FallingBlock block = world.spawnFallingBlock(mBoss.getLocation().add(0, 3.5, 0), Bukkit.createBlockData(Material.OBSIDIAN));
 		block.setGravity(false);
 		block.setTicksLived(1);
@@ -1548,17 +1549,14 @@ public class Lich extends BossAbilityGroup {
 		Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), cmd);
 
 		//warning smoke ring
+		PPGroundCircle indicator = new PPGroundCircle(Particle.SMOKE_LARGE, mStart.getLocation(), 20, 0.1, 0.1, 0.1, 0).init(8, true);
 		new BukkitRunnable() {
 			int mT = 0;
 			@Override
 			public void run() {
-				for (int i = 0; i < 360; i += 12) {
-					double radians = Math.toRadians(i);
-					Location pLoc = mStart.getLocation().add(FastUtils.cos(radians) * 8, 0, FastUtils.sin(radians) * 8);
-					new PartialParticle(Particle.SMOKE_LARGE, pLoc.clone(), 1, 0.1, 0.1, 0.1, 0).spawnAsBoss();
-				}
+				indicator.spawnAsBoss();
 				mT++;
-				if (mT > 4 * 20) {
+				if (mT > 3 * 20) {
 					this.cancel();
 				}
 			}

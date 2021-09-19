@@ -48,7 +48,7 @@ public class SpellMagmaShield extends Spell {
 				if (mT % 2 == 0) {
 					world.playSound(mBoss.getLocation(), Sound.BLOCK_FIRE_AMBIENT, SoundCategory.HOSTILE, 1, 1.25f);
 				}
-				new PartialParticle(Particle.FLAME, mBoss.getLocation(), 3, 0.3, 0.05, 0.3, 0.075).spawnAsEnemy();
+				new PartialParticle(Particle.FLAME, mBoss.getLocation(), 2, 0.3, 0.05, 0.3, 0.075).spawnAsEnemy();
 				new PartialParticle(Particle.LAVA, mBoss.getLocation(), 1, 0.3, 0.05, 0.3, 0.075).spawnAsEnemy();
 				if (mT >= 20 * 2) {
 					this.cancel();
@@ -72,7 +72,7 @@ public class SpellMagmaShield extends Spell {
 
 							Vector vec;
 							mRadius += 1.25;
-							for (double degree = -60; degree <= 60; degree += 10) {
+							for (double degree = -60; degree <= 60; degree += 15) {
 								double radian1 = Math.toRadians(degree);
 								vec = new Vector(FastUtils.cos(radian1) * mRadius, 0.125, FastUtils.sin(radian1) * mRadius);
 								vec = VectorUtils.rotateXAxis(vec, -loc.getPitch());
@@ -80,7 +80,7 @@ public class SpellMagmaShield extends Spell {
 
 								Location l = loc.clone().add(0, 0.1, 0).add(vec);
 								new PartialParticle(Particle.FLAME, l, 2, 0.15, 0.15, 0.15, 0.15).spawnAsEnemy();
-								new PartialParticle(Particle.SMOKE_NORMAL, l, 3, 0.15, 0.15, 0.15, 0.1).spawnAsEnemy();
+								new PartialParticle(Particle.SMOKE_NORMAL, l, 2, 0.15, 0.15, 0.15, 0.1).spawnAsEnemy();
 							}
 
 							if (mRadius >= 7) {

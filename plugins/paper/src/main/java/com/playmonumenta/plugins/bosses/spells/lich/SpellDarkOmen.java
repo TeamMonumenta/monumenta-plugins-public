@@ -91,8 +91,8 @@ public class SpellDarkOmen extends Spell {
 						Vector quad = VectorUtils.rotateYAxis(dir.clone(), 90 * i);
 						Vector qlength = quad.multiply(1 - mT / mTell);
 						Vector qdir = VectorUtils.rotateYAxis(qlength.clone(), 90 / (mT / mTell));
-						Location l = mBoss.getLocation().add(qdir);
-						new PartialParticle(Particle.SOUL_FIRE_FLAME, l, 2, 0.1, 0.1, 0.1, 0).spawnAsBoss();
+						Location l = mBoss.getLocation().add(qdir).add(0, 0.5, 0);
+						new PartialParticle(Particle.SOUL_FIRE_FLAME, l, 1, 0.1, 0.1, 0.1, 0).spawnAsBoss();
 					}
 				}
 
@@ -144,8 +144,8 @@ public class SpellDarkOmen extends Spell {
 						anchor = startLoc.clone().add(dir.clone().multiply(mVelocity / 20 * (mT + 0.5 * x)));
 						if (!warning && (anchor.distance(mCenter) > mArenaRange || anchor.distance(startLoc) > mMaxRange)) {
 							vex(anchor);
-							new PartialParticle(Particle.FIREWORKS_SPARK, anchor, 200, 0.1, 0.1, 0.1, 0.3).spawnAsBoss();
-							new PartialParticle(Particle.SMOKE_NORMAL, anchor, 200, 0.1, 0.1, 0.1, 0.2).spawnAsBoss();
+							new PartialParticle(Particle.FIREWORKS_SPARK, anchor, 100, 0.1, 0.1, 0.1, 0.3).spawnAsBoss();
+							new PartialParticle(Particle.SMOKE_NORMAL, anchor, 100, 0.1, 0.1, 0.1, 0.2).spawnAsBoss();
 							world.playSound(anchor, Sound.ENTITY_FIREWORK_ROCKET_TWINKLE, 3.0f, 1.5f);
 							world.playSound(anchor, Sound.ENTITY_VEX_AMBIENT, 5.0f, 0.75f);
 							this.cancel();
@@ -188,7 +188,6 @@ public class SpellDarkOmen extends Spell {
 			} else {
 				new PartialParticle(Particle.REDSTONE, l, 1, 0.1, 0.1, 0.1, 0, BLADE_COLOR1).spawnAsBoss();
 				new PartialParticle(Particle.REDSTONE, l, 1, 0.1, 0.1, 0.1, 0, BLADE_COLOR2).spawnAsBoss();
-				new PartialParticle(Particle.SMOKE_NORMAL, l, 2, 0.1, 0.1, 0.1, 0).spawnAsBoss();
 				new PartialParticle(Particle.SOUL_FIRE_FLAME, l, 1, 0.1, 0.1, 0.1, 0).spawnAsBoss();
 				BoundingBox box = BoundingBox.of(l, 0.3, 0.3, 0.3);
 				for (Player p : players) {

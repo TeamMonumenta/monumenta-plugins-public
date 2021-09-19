@@ -20,7 +20,7 @@ public class SpellCrystalParticle extends Spell {
 	public void run() {
 		double hp = mBoss.getHealth();
 		Location pCenter = mBoss.getLocation().add(0, 2, 0);
-		for (double deg = 0; deg < 360; deg += 15) {
+		for (double deg = 0; deg < 360; deg += 36) {
 			double c = FastUtils.cosDeg(deg);
 			double s = FastUtils.sinDeg(deg);
 			if (hp > 25) {

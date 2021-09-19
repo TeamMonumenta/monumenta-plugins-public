@@ -40,7 +40,7 @@ public class SpellPotionCloud extends Spell {
 		World world = mBoss.getWorld();
 		world.playSound(loc, Sound.ENTITY_WITCH_CELEBRATE, SoundCategory.HOSTILE, 1.5f, 0.9f);
 		mBoss.addPotionEffect(new PotionEffect(PotionEffectType.GLOWING, 20, 0, false));
-		new PartialParticle(Particle.SPELL_WITCH, mBoss.getEyeLocation(), 10, 0.3, 0.3, 0.3, 0.1).spawnAsEnemy();
+		new PartialParticle(Particle.SPELL_WITCH, mBoss.getEyeLocation(), 5, 0.3, 0.3, 0.3, 0.1).spawnAsEnemy();
 
 		loc.setY(loc.getY() + 0.1);
 		BukkitRunnable run = new BukkitRunnable() {
@@ -53,7 +53,7 @@ public class SpellPotionCloud extends Spell {
 				}
 				mT++;
 				if (mT <= 20 * 14) {
-					new PartialParticle(Particle.DRAGON_BREATH, loc, 15, 1.5, 0.1, 1.5, 0.01).spawnAsEnemy();
+					new PartialParticle(Particle.DRAGON_BREATH, loc, 8, 1.5, 0.1, 1.5, 0.01).spawnAsEnemy();
 				}
 
 				if (mT % 10 == 0 && mT >= 20 && mT < 20 * 15) {

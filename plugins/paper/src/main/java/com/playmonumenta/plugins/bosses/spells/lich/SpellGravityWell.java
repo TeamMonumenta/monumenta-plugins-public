@@ -68,8 +68,8 @@ public class SpellGravityWell extends Spell {
 		World world = mBoss.getWorld();
 		new PartialParticle(Particle.PORTAL, mBoss.getLocation(), 100, 0.1, 0.1, 0.1, 0.1).spawnAsBoss();
 
-		PPGroundCircle indicator = new PPGroundCircle(Particle.REDSTONE, mBoss.getLocation(), 75, 0.01, 0.01, 0.01, 0, YELLOW).init(mRadius, true);
-		PPGroundCircle indicator2 = new PPGroundCircle(Particle.REDSTONE, mBoss.getLocation(), 75, 0.01, 0.01, 0.01, 0, RED).init(mRadius, true);
+		PPGroundCircle indicator = new PPGroundCircle(Particle.REDSTONE, mBoss.getLocation(), 50, 0.01, 0.01, 0.01, 0, YELLOW).init(mRadius, true);
+		PPGroundCircle indicator2 = new PPGroundCircle(Particle.REDSTONE, mBoss.getLocation(), 50, 0.01, 0.01, 0.01, 0, RED).init(mRadius, true);
 
 		List<Player> players = Lich.playersInRange(mCenter, mRange, true);
 		players.removeIf(p -> SpellDimensionDoor.getShadowed().contains(p));
