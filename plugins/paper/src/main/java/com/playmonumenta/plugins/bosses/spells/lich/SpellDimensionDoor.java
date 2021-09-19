@@ -48,8 +48,8 @@ public class SpellDimensionDoor extends Spell {
 	private Location mSpawnLoc;
 	private ThreadLocalRandom mRand = ThreadLocalRandom.current();
 	private static List<Player> mShadowed = new ArrayList<Player>();
-	private static List<Player> mByPortal = new ArrayList<Player>();
 	private static List<Player> mWarned = new ArrayList<Player>();
+	private List<Player> mByPortal = new ArrayList<Player>();
 	private List<Location> mPortalLoc = new ArrayList<Location>();
 	private List<Location> mReplaceLoc = new ArrayList<Location>();
 	private double mRange;
@@ -279,6 +279,7 @@ public class SpellDimensionDoor extends Spell {
 						Location tLoc = p.getLocation();
 						for (Location loc : mPortalLoc) {
 							if (tLoc.getBlock().getType() == Material.END_PORTAL && p.getLocation().distance(loc) <= 4) {
+								mByPortal.add(p);
 								getWealmed(mPlugin, p, mBoss, tLoc, true);
 							}
 						}
@@ -392,7 +393,6 @@ public class SpellDimensionDoor extends Spell {
 						p.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, 20 * 5, 0));
 						p.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, 20 * 5, 1));
 						p.sendMessage(ChatColor.AQUA + "Something feels different. The shadows aren't clinging to me anymore.");
-						mByPortal.add(p);
 					} else {
 						p.teleport(leaveLoc);
 						BossUtils.bossDamage(mBoss, p, 1);

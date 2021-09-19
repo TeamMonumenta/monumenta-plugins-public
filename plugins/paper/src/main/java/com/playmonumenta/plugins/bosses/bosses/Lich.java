@@ -989,7 +989,7 @@ public class Lich extends BossAbilityGroup {
 				player = (Player) proj.getShooter();
 			}
 		}
-		if (player.getLocation().distance(mBoss.getLocation()) > 15) {
+		if (player != null && player.getLocation().distance(mBoss.getLocation()) > 15) {
 			event.setCancelled(true);
 			player.playSound(mBoss.getLocation(), Sound.BLOCK_ANVIL_PLACE, 1, 5);
 			mBoss.getWorld().spawnParticle(Particle.FIREWORKS_SPARK, mBoss.getLocation(), 10, 0, 0, 0, 0.1);
