@@ -69,7 +69,7 @@ public class SpellDesecrate extends Spell {
 				float ft = fTick / 25;
 				new PartialParticle(Particle.SMOKE_LARGE, mBoss.getLocation(), 2, 0.35, 0, 0.35, 0.005).spawnAsBoss();
 				new PartialParticle(Particle.SPELL_WITCH, mBoss.getLocation().add(0, 1, 0), 3, 0.4, 0.4, 0.4, 0).spawnAsBoss();
-				world.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_SPAWN, 5, 0.5f + ft);
+				world.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_SPAWN, 7, 0.5f + ft);
 				Location loc = mBoss.getLocation();
 
 				indicator.radius(mRadius).location(loc).spawnAsBoss();

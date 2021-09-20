@@ -411,7 +411,7 @@ public class SpellDimensionDoor extends Spell {
 						p.playSound(p.getLocation(), Sound.ENTITY_ELDER_GUARDIAN_HURT, SoundCategory.HOSTILE, 1, 1);
 					}
 				}
-				if (p.getLocation().getY() > Lich.getLichSpawn().getY() - 10) {
+				if (p.getLocation().getY() > Lich.getLichSpawn().getY() - 10 || !Lich.playersInRange(shadowLoc, 60, true).contains(p)) {
 					mShadowed.remove(p);
 					bar.setVisible(false);
 					bar.removeAll();

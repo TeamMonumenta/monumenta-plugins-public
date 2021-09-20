@@ -97,8 +97,9 @@ public class PlayerUtils {
 	public static void setCursedTicks(Plugin plugin, Player p, int ticks) {
 		NavigableSet<Effect> cursed = plugin.mEffectManager.getEffects(p, "CurseEffect");
 		if (cursed != null) {
-			Effect curse = cursed.last();
-			curse.setDuration(ticks);
+			for (Effect curse : cursed) {
+				curse.setDuration(ticks);
+			}
 		}
 	}
 

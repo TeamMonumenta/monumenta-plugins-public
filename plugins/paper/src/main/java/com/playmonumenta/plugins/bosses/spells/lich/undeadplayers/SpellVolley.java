@@ -48,7 +48,7 @@ public class SpellVolley extends Spell {
 				w.playSound(mBoss.getLocation(), Sound.ENTITY_FIREWORK_ROCKET_LAUNCH, SoundCategory.HOSTILE, 3, 1);
 				w.playSound(mBoss.getLocation(), Sound.ENTITY_FIREWORK_ROCKET_SHOOT, SoundCategory.HOSTILE, 3, 1);
 				List<Projectile> projectiles;
-				projectiles = EntityUtils.spawnArrowVolley(com.playmonumenta.plugins.Plugin.getInstance(), mBoss, 10, 1.5f, 5.0, Arrow.class);
+				projectiles = EntityUtils.spawnArrowVolley(com.playmonumenta.plugins.Plugin.getInstance(), mBoss, 10, 2, 5.0, Arrow.class);
 				for (Projectile proj : projectiles) {
 					AbstractArrow projArrow = (AbstractArrow) proj;
 					projArrow.setPickupStatus(PickupStatus.CREATIVE_ONLY);

@@ -154,7 +154,7 @@ public class SpellGraspingHands extends Spell {
 									//damage the player
 									for (Player p : Lich.playersInRange(mLoc, 5.0, true)) {
 										Vector v = p.getVelocity();
-										BossUtils.bossDamagePercent(mBoss, player, 0.15, player.getLocation(), "Grasping Hands");
+										BossUtils.bossDamagePercent(mBoss, p, 0.15, p.getLocation(), "Grasping Hands");
 										p.setVelocity(v);
 										p.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 4, 2));
 										p.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, 20 * 4, -4));

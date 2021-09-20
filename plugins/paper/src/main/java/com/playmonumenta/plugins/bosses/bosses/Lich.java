@@ -1217,7 +1217,7 @@ public class Lich extends BossAbilityGroup {
 				if ((mT > 20 * time || p.isDead()) && mCursed.contains(p)) {
 					this.cancel();
 					mCursed.remove(p);
-				} else if ((mT > 20 * time || p.isDead()) && !mCursed.contains(p)) {
+				} else if (!mCursed.contains(p)) {
 					this.cancel();
 				} else if (mT % 200 == 0) {
 					p.sendActionBar(Component.text("Cursed for " + (time - mT / 20) + " seconds.", NamedTextColor.DARK_RED));
@@ -1229,6 +1229,10 @@ public class Lich extends BossAbilityGroup {
 
 	public static List<Player> getCursed() {
 		return mCursed;
+	}
+
+	public static void removemCursed(Player p) {
+		mCursed.remove(p);
 	}
 
 	public static void bossGotHit(boolean gothit) {

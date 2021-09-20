@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.entity.LivingEntity;
@@ -44,7 +45,10 @@ public class SpellEdgeKill extends Spell {
 				//check distance
 				Location pLoc = p.getLocation();
 				pLoc.setY(mCenter.getY());
-				if (pLoc.distance(mCenter) > mMaxDistance) {
+				Location standLoc = p.getLocation();
+				standLoc.subtract(0, 1, 0);
+				if (pLoc.distance(mCenter) > mMaxDistance && p.getLocation().getBlock().getType() == Material.AIR
+						&& standLoc.getBlock().getType() == Material.AIR) {
 					//players are on the outer ring of the arena, do damage + massive knock back into arena
 					BossUtils.bossDamagePercent(mBoss, p, 0.4);
 					MovementUtils.knockAway(mCenter, p, -5);
