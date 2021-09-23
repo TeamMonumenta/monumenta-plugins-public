@@ -4,12 +4,6 @@ import java.util.EnumMap;
 import java.util.EnumSet;
 import java.util.Map;
 
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.server.properties.ServerProperties;
-import com.playmonumenta.plugins.utils.InventoryUtils;
-import com.playmonumenta.plugins.utils.ZoneUtils;
-import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
-
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -23,6 +17,12 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.event.player.PlayerRiptideEvent;
 import org.bukkit.inventory.ItemStack;
+
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.server.properties.ServerProperties;
+import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.utils.ZoneUtils;
+import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
 
 
 public class ItemOverrides {
@@ -169,6 +169,9 @@ public class ItemOverrides {
 		mItems.put(Material.GREEN_BED, bedOverride);
 		mItems.put(Material.RED_BED, bedOverride);
 		mItems.put(Material.BLACK_BED, bedOverride);
+
+		RespawnAnchorOverride respawnAnchorOverride = new RespawnAnchorOverride();
+		mItems.put(Material.RESPAWN_ANCHOR, respawnAnchorOverride);
 
 		BaseOverride boatOverride = new BoatOverride();
 		mItems.put(Material.OAK_BOAT, boatOverride);

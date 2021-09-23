@@ -13,6 +13,6 @@ public class PhylacteryifyHeldItem extends GenericCommand {
 	}
 
 	private static void run(CommandSender sender, Player player) throws WrapperCommandSyntaxException {
-		CommandUtils.enchantify(sender, player, "Phylactery", "Enbalmed by");
+		CommandUtils.enchantify(sender, player, "Phylactery", "Embalmed by");
 	}
 }
