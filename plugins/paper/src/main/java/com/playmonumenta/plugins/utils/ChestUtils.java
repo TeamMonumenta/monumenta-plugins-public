@@ -66,7 +66,9 @@ public class ChestUtils {
 
 				setPlayerLuckLevel(player, plugin);
 				LootContext.Builder builder = new LootContext.Builder(player.getLocation());
-				builder.lootedEntity(player);
+				if (player.hasPotionEffect(PotionEffectType.LUCK)) {
+					builder.luck(player.getPotionEffect(PotionEffectType.LUCK).getAmplifier() + 1);
+				}
 				LootContext context = builder.build();
 				Collection<ItemStack> popLoot = lootTable.populateLoot(FastUtils.RANDOM, context);
 

@@ -5,13 +5,20 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
+
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.AbilityManager;
+import com.playmonumenta.plugins.enchantments.curses.CurseOfEphemerality;
+import com.playmonumenta.plugins.enchantments.curses.TwoHanded;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.block.ShulkerBox;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
@@ -27,11 +34,6 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.io.BukkitObjectInputStream;
 import org.bukkit.util.io.BukkitObjectOutputStream;
 import org.yaml.snakeyaml.external.biz.base64Coder.Base64Coder;
-
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.AbilityManager;
-import com.playmonumenta.plugins.enchantments.curses.CurseOfEphemerality;
-import com.playmonumenta.plugins.enchantments.curses.TwoHanded;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -530,17 +532,25 @@ public class InventoryUtils {
 		return false;
 	}
 
-	public static ItemStack getItemFromLootTable(final Player player, NamespacedKey key) {
-		ItemStack result = null;
-		LootContext context = new LootContext.Builder(player.getLocation()).build();
-		ItemStack[] dummy = new ItemStack[0];
+	/* Note this should only be used with loot tables that contain a single item */
+	public static ItemStack getItemFromLootTable(Entity entity, NamespacedKey key) {
+		return getItemFromLootTable(entity.getLocation(), key);
+	}
+
+	/* Note this should only be used with loot tables that contain a single item */
+	public static ItemStack getItemFromLootTable(Location loc, NamespacedKey key) {
+		for (ItemStack item : getItemsFromLootTable(loc, key)) {
+			return item;
+		}
+		return null;
+	}
+
+	public static Collection<ItemStack> getItemsFromLootTable(Location loc, NamespacedKey key) {
+		LootContext context = new LootContext.Builder(loc).build();
 		LootTable table = Bukkit.getLootTable(key);
 		if (table != null) {
-			Collection<ItemStack> loot = table.populateLoot(FastUtils.RANDOM, context);
-			if (!loot.isEmpty()) {
-				result = loot.toArray(dummy)[0];
-			}
+			return table.populateLoot(FastUtils.RANDOM, context);
 		}
-		return result;
+		return Collections.emptyList();
 	}
 }

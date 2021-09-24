@@ -8,7 +8,14 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-import org.bukkit.Bukkit;
+import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
+import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.DelvesUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
+
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -33,21 +40,11 @@ import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.loot.LootContext;
-import org.bukkit.loot.LootTable;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
-
-import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
-import com.playmonumenta.plugins.utils.BossUtils;
-import com.playmonumenta.plugins.utils.DelvesUtils;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.FastUtils;
-import com.playmonumenta.plugins.utils.InventoryUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
 
 public class FalseSpiritPortal extends BossAbilityGroup {
 	public static final String identityTag = "boss_falsespiritportal";
@@ -135,15 +132,11 @@ public class FalseSpiritPortal extends BossAbilityGroup {
 						break;
 				}
 
-				LootContext context = new LootContext.Builder(mBoss.getLocation()).build();
-				ItemStack[] dummy = new ItemStack[0];
 				if (mTrident == null) {
-					LootTable table = Bukkit.getLootTable(key);
-					if (table != null) {
-						Collection<ItemStack> loot = table.populateLoot(FastUtils.RANDOM, context);
-						if (!loot.isEmpty()) {
-							mTrident = loot.toArray(dummy)[0];
-						}
+					mTrident = InventoryUtils.getItemFromLootTable(mBoss, key);
+					if (mTrident == null) {
+						com.playmonumenta.plugins.Plugin.getInstance().getLogger().severe("Failed to get trident from loot table! False Spirit will be impossible to defeat");
+						return;
 					}
 				}
 

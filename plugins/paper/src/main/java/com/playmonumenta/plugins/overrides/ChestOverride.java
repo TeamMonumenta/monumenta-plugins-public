@@ -167,9 +167,10 @@ public class ChestOverride extends BaseOverride {
 		List<Player> players = PlayerUtils.playersInRange(block.getLocation(), 30, true);
 
 		//Runs replacement with closest player
-		if (players.size() > 0 && players.get(0) != null) {
-			ChestUtils.chestScalingLuck(plugin, players.get(0), block);
-			DelvesUtils.setDelveLootTable(players.get(0), block);
+		if (!players.isEmpty()) {
+			Player player = players.get(0);
+			DelvesUtils.setDelveLootTable(player, block);
+			ChestUtils.generateContainerLootWithScaling(player, block, plugin);
 		}
 
 		return true;
