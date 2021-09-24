@@ -4,6 +4,7 @@ import com.playmonumenta.plugins.utils.BossUtils;
 
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
 public class UnstableBoss extends BossAbilityGroup {
@@ -31,6 +32,10 @@ public class UnstableBoss extends BossAbilityGroup {
 
 	@Override
 	public void death(EntityDeathEvent event) {
-		mBoss.getLocation().getWorld().createExplosion(mBoss, mPFinal.EXPLOSION_POWER, mPFinal.SET_FIRE, mPFinal.BREAK_BLOCK);
+		// The cause of death is NOT equal to a player attack
+		if (!(event.getEntity().getKiller() instanceof Player)) {
+			mBoss.getLocation().getWorld().createExplosion(mBoss, mPFinal.EXPLOSION_POWER, mPFinal.SET_FIRE,
+					mPFinal.BREAK_BLOCK);
+		}
 	}
 }
