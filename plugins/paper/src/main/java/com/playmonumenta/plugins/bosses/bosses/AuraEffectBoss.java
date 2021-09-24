@@ -21,6 +21,8 @@ public class AuraEffectBoss extends BossAbilityGroup {
 		public int RADIUS = 35;
 		public int HEIGHT = 20;
 		public int DETECTION = 45;
+		public int DELAY = 20;
+
 
 		/** Particles summoned in the air */
 		public ParticlesList PARTICLE = ParticlesList.fromString("[(redstone,20,0,0,0,#ffffff,2.0)]");
@@ -29,6 +31,9 @@ public class AuraEffectBoss extends BossAbilityGroup {
 
 		/** Effects applied to the player when inside the range*/
 		public EffectsList EFFECTS = EffectsList.EMPTY;
+
+		/** How often the passive spells will trigger */
+		public int PASSIVE_RATE = PASSIVE_RUN_INTERVAL_DEFAULT;
 	}
 
 
@@ -53,6 +58,6 @@ public class AuraEffectBoss extends BossAbilityGroup {
 				)
 			)
 		);
-		super.constructBoss(null, passiveSpells, p.DETECTION, null);
+		super.constructBoss(null, passiveSpells, p.DETECTION, null, p.DELAY, p.PASSIVE_RATE);
 	}
 }
