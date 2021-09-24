@@ -127,8 +127,8 @@ public class AdvancingShadows extends Ability {
 				loc.subtract(dir.clone().multiply(1.15));
 			}
 
-			// If still solid, something is wrong. Additionally, don't allow the player to teleport further away from a mob using this
-			if (loc.getBlock().getType().isSolid() || loc.distance(entity.getLocation()) > origDistance) {
+			// If still solid, something is wrong.
+			if (loc.getBlock().getType().isSolid()) {
 				world.playSound(mPlayer.getLocation(), Sound.ENTITY_ILLUSIONER_MIRROR_MOVE, 1.0f, 1.8f);
 				return;
 			}
@@ -165,7 +165,9 @@ public class AdvancingShadows extends Ability {
 			world.spawnParticle(Particle.SMOKE_LARGE, mPlayer.getLocation().add(0, 1.1, 0), 12, 0.35, 0.5, 0.35, 0.05);
 			world.playSound(mPlayer.getLocation(), Sound.ENTITY_ILLUSIONER_MIRROR_MOVE, 1.0f, 1.1f);
 
-			mPlayer.teleport(loc, TeleportCause.UNKNOWN);
+			if (loc.distance(entity.getLocation()) <= origDistance) {
+				mPlayer.teleport(loc, TeleportCause.UNKNOWN);
+			}
 
 			mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.INCREASE_DAMAGE, DURATION, EFFECT_LEVEL, true, false));
 			float range = AdvancingShadowsKnockbackRadiusEnchantment.getKnockbackRadius(mPlayer, ADVANCING_SHADOWS_AOE_KNOCKBACKS_RANGE);

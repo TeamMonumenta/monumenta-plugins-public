@@ -123,7 +123,7 @@ public class HolyJavelin extends Ability {
 		// Get a list of all the mobs this could possibly hit (that are within range of the player)
 		List<LivingEntity> potentialTargets = EntityUtils.getNearbyMobs(location, RANGE + HITBOX_LENGTH, mPlayer);
 		BoundingBox box = BoundingBox.of(playerLoc, HITBOX_LENGTH, HITBOX_LENGTH, HITBOX_LENGTH);
-		for (int i = 0; i < RANGE; i++) {
+		for (double i = 0; i < RANGE; i += HITBOX_LENGTH) {
 			box.shift(increment);
 			Location loc = box.getCenter().toLocation(world);
 			world.spawnParticle(Particle.REDSTONE, loc, 22, 0.25, 0.25, 0.25, COLOR);

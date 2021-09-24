@@ -32,7 +32,7 @@ public class Recoil implements BaseEnchantment {
 	public void onLaunchProjectile(Plugin plugin, Player player, int level, Projectile proj, ProjectileLaunchEvent event) {
 		if (event.getEntity() instanceof AbstractArrow && !ItemUtils.isShootableItem(player.getInventory().getItemInOffHand())) {
 			if (player.isSneaking()) {
-				player.setCooldown(player.getInventory().getItemInMainHand().getType(), (int)(20 * Math.sqrt(level)));
+				player.setCooldown(player.getInventory().getItemInMainHand().getType(), 10);
 			} else if (!ZoneUtils.hasZoneProperty(player, ZoneProperty.NO_MOBILITY_ABILITIES)) {
 				Vector velocity = player.getLocation().getDirection().multiply(-0.5 * Math.sqrt(level));
 				player.setVelocity(velocity.setY(Math.max(0.1, velocity.getY())));

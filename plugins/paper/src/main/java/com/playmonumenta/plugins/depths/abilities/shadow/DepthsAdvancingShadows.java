@@ -84,8 +84,8 @@ public class DepthsAdvancingShadows extends DepthsAbility {
 				loc.subtract(dir.clone().multiply(1.15));
 			}
 
-			// If still solid, something is wrong. Additionally, don't allow the player to teleport further away from a mob using this
-			if (loc.getBlock().getType().isSolid() || loc.distance(entity.getLocation()) > origDistance) {
+			// If still solid, something is wrong.
+			if (loc.getBlock().getType().isSolid()) {
 				world.playSound(mPlayer.getLocation(), Sound.ENTITY_ILLUSIONER_MIRROR_MOVE, 1.0f, 1.8f);
 				return;
 			}
@@ -124,7 +124,7 @@ public class DepthsAdvancingShadows extends DepthsAbility {
 			world.spawnParticle(Particle.SMOKE_LARGE, playerLoc.clone().add(0, 1.1, 0), 12, 0.35, 0.5, 0.35, 0.05);
 			world.playSound(mPlayer.getLocation(), Sound.ENTITY_ILLUSIONER_MIRROR_MOVE, 1.0f, 1.1f);
 
-			if (!(mPlayer.getInventory().getItemInOffHand().getType() == Material.SHIELD)) {
+			if (!(mPlayer.getInventory().getItemInOffHand().getType() == Material.SHIELD) && (loc.distance(entity.getLocation()) <= origDistance)) {
 				mPlayer.teleport(loc, TeleportCause.UNKNOWN);
 			}
 			playerLoc = mPlayer.getLocation();
