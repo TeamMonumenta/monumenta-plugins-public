@@ -44,15 +44,24 @@ public class SpellDesecrate extends Spell {
 	private Plugin mPlugin;
 	private LivingEntity mBoss;
 	private ChargeUpManager mChargeUp;
+	private PartialParticle mSmoke;
+	private PartialParticle mWitch;
+	private PartialParticle mEnch;
+	private PartialParticle mHeart;
 
 	public SpellDesecrate(Plugin plugin, LivingEntity boss) {
 		mPlugin = plugin;
 		mBoss = boss;
 		mChargeUp = new ChargeUpManager(mBoss, 50, ChatColor.YELLOW + "Channeling Desecrate...", BarColor.YELLOW, BarStyle.SOLID, 50);
+		mSmoke = new PartialParticle(Particle.SMOKE_LARGE, mBoss.getLocation(), 2, 0.35, 0, 0.35, 0.005);
+		mWitch = new PartialParticle(Particle.SPELL_WITCH, mBoss.getLocation(), 3, 0.4, 0.4, 0.4, 0);
+		mEnch = new PartialParticle(Particle.ENCHANTMENT_TABLE, mBoss.getLocation(), 1, 0.1, 0.1, 0.1, 0.1);
+		mHeart = new PartialParticle(Particle.HEART, mBoss.getEyeLocation(), 3, 0.1, 0.1, 0.1, 0.1);
 	}
 
 	@Override
 	public void run() {
+		mChargeUp.setTime(0);
 		World world = mBoss.getWorld();
 
 		PPGroundCircle indicator = new PPGroundCircle(Particle.SMOKE_NORMAL, mBoss.getLocation(), 12, 0.2, 0, 0.2, 0).init(0, true);
@@ -67,8 +76,8 @@ public class SpellDesecrate extends Spell {
 			public void run() {
 				float fTick = mChargeUp.getTime();
 				float ft = fTick / 25;
-				new PartialParticle(Particle.SMOKE_LARGE, mBoss.getLocation(), 2, 0.35, 0, 0.35, 0.005).spawnAsBoss();
-				new PartialParticle(Particle.SPELL_WITCH, mBoss.getLocation().add(0, 1, 0), 3, 0.4, 0.4, 0.4, 0).spawnAsBoss();
+				mSmoke.location(mBoss.getLocation()).spawnAsBoss();
+				mWitch.location(mBoss.getLocation().add(0, 1, 0)).spawnAsBoss();
 				world.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_SPAWN, 7, 0.5f + ft);
 				Location loc = mBoss.getLocation();
 
@@ -76,14 +85,15 @@ public class SpellDesecrate extends Spell {
 				indicator2.radius(mRadius).location(loc).spawnAsBoss();
 
 				mRadius -= 0.24;
-				if (mChargeUp.nextTick() || Lich.phase3over()) {
+				mChargeUp.nextTick();
+				if (mRadius <= 0 || Lich.phase3over()) {
 					List<Player> players = Lich.playersInRange(loc, 12, true);
 					players.removeAll(SpellDimensionDoor.getShadowed());
 					mChargeUp.setTitle(ChatColor.YELLOW + "Casting Desecrate...");
 					mChargeUp.setColor(BarColor.RED);
 					for (Player player : players) {
-						new PartialParticle(Particle.SMOKE_LARGE, player.getLocation(), 2, 0.35, 0, 0.35, 0.005).spawnAsBoss();
-						new PartialParticle(Particle.SPELL_WITCH, player.getLocation().add(0, 1, 0), 3, 0.4, 0.4, 0.4, 0).spawnAsBoss();
+						mSmoke.location(player.getLocation()).spawnAsBoss();
+						mWitch.location(player.getLocation().add(0, 1, 0)).spawnAsBoss();
 						player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 3, 6));
 						player.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, 20 * 3, -10));
 						player.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, 20 * 3, 10));
@@ -112,7 +122,7 @@ public class SpellDesecrate extends Spell {
 								if (mBool) {
 									mBool = false;
 									for (int i = 0; i < 80; i++) {
-										new PartialParticle(Particle.ENCHANTMENT_TABLE, endLoc, 1, 0.1, 0.1, 0.1, 0.1).spawnAsBoss();
+										mEnch.location(endLoc).spawnAsBoss();
 										endLoc.add(baseVect);
 
 										//stop line
@@ -125,7 +135,7 @@ public class SpellDesecrate extends Spell {
 								}
 
 								//escape option
-								if (pHoriLoc.distance(mBossLoc) > 15) {
+								if (pHoriLoc.distance(mBossLoc) > 15 || SpellDimensionDoor.getShadowed().contains(p)) {
 									toRemove.add(p);
 									p.removePotionEffect(PotionEffectType.SLOW);
 									p.removePotionEffect(PotionEffectType.WEAKNESS);
@@ -140,7 +150,7 @@ public class SpellDesecrate extends Spell {
 									MovementUtils.knockAway(mBoss.getLocation(), p, 0.5f);
 									world.playSound(p.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 1.0f, 0.75f);
 									world.playSound(mBossLoc, Sound.BLOCK_ENCHANTMENT_TABLE_USE, 2.0f, 0.5f);
-									new PartialParticle(Particle.HEART, mBoss.getEyeLocation(), 3, 0.1, 0.1, 0.1, 0.1).spawnAsBoss();
+									mHeart.location(mBoss.getEyeLocation()).spawnAsBoss();
 									double newHealth = mBoss.getHealth() * 1.03;
 									if (newHealth >= mBoss.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue()) {
 										mBoss.setHealth(mBoss.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue());

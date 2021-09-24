@@ -7,22 +7,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import com.playmonumenta.plugins.bosses.BossBarManager;
-import com.playmonumenta.plugins.bosses.BossBarManager.BossHealthAction;
-import com.playmonumenta.plugins.bosses.SpellManager;
-import com.playmonumenta.plugins.bosses.spells.Spell;
-import com.playmonumenta.plugins.bosses.spells.SpellConditionalTeleport;
-import com.playmonumenta.plugins.bosses.spells.headlesshorseman.SpellBeeBombs;
-import com.playmonumenta.plugins.bosses.spells.headlesshorseman.SpellBurningVengence;
-import com.playmonumenta.plugins.bosses.spells.headlesshorseman.SpellHallowsEnd;
-import com.playmonumenta.plugins.bosses.spells.headlesshorseman.SpellHellzoneGrenade;
-import com.playmonumenta.plugins.bosses.spells.headlesshorseman.SpellPhantomOfTheOpera;
-import com.playmonumenta.plugins.bosses.spells.headlesshorseman.SpellReaperOfLife;
-import com.playmonumenta.plugins.utils.BossUtils;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.plugins.utils.SerializationUtils;
-
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -46,6 +30,22 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
+
+import com.playmonumenta.plugins.bosses.BossBarManager;
+import com.playmonumenta.plugins.bosses.BossBarManager.BossHealthAction;
+import com.playmonumenta.plugins.bosses.SpellManager;
+import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.bosses.spells.SpellConditionalTeleport;
+import com.playmonumenta.plugins.bosses.spells.headlesshorseman.SpellBeeBombs;
+import com.playmonumenta.plugins.bosses.spells.headlesshorseman.SpellBurningVengence;
+import com.playmonumenta.plugins.bosses.spells.headlesshorseman.SpellHallowsEnd;
+import com.playmonumenta.plugins.bosses.spells.headlesshorseman.SpellHellzoneGrenade;
+import com.playmonumenta.plugins.bosses.spells.headlesshorseman.SpellPhantomOfTheOpera;
+import com.playmonumenta.plugins.bosses.spells.headlesshorseman.SpellReaperOfLife;
+import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.utils.SerializationUtils;
 
 /*
  * Barrier of Flames - (Hard mode only) When the boss enters phase 2 he gains a shield of
@@ -155,13 +155,13 @@ public class HeadlessHorsemanBoss extends BossAbilityGroup {
 
 		SpellManager phase1Spells = new SpellManager(Arrays.asList(
 				new SpellHellzoneGrenade(plugin, boss, mSpawnLoc, detectionRange, mCooldownTicks, 4),
-				new SpellBeeBombs(plugin, boss, mCooldownTicks, mSpawnLoc, 20),
+				new SpellBeeBombs(plugin, boss, mCooldownTicks, mSpawnLoc, 20, detectionRange),
 				new SpellBurningVengence(plugin, boss, mCooldownTicks, mSpawnLoc, detectionRange, 0.5)
 				));
 
 		SpellManager phase2Spells = new SpellManager(Arrays.asList(
 				new SpellHellzoneGrenade(plugin, boss, mSpawnLoc, detectionRange, mCooldownTicks, 4),
-				new SpellBeeBombs(plugin, boss, mCooldownTicks, mSpawnLoc, 20),
+				new SpellBeeBombs(plugin, boss, mCooldownTicks, mSpawnLoc, 20, detectionRange),
 				new SpellBurningVengence(plugin, boss, mCooldownTicks, mSpawnLoc, detectionRange, 0.5),
 				new SpellHallowsEnd(plugin, boss, mCooldownTicks, this),
 				new SpellReaperOfLife(plugin, boss, mSpawnLoc, detectionRange, mCooldownTicks)

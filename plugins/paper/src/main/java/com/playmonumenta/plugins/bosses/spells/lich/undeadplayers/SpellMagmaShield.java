@@ -29,10 +29,18 @@ public class SpellMagmaShield extends Spell {
 
 	private Plugin mPlugin;
 	private LivingEntity mBoss;
+	private PartialParticle mFlame1;
+	private PartialParticle mFlame2;
+	private PartialParticle mLava;
+	private PartialParticle mSmoke;
 
 	public SpellMagmaShield(Plugin plugin, LivingEntity boss) {
 		mPlugin = plugin;
 		mBoss = boss;
+		mFlame1 = new PartialParticle(Particle.FLAME, mBoss.getLocation(), 2, 0.3, 0.05, 0.3, 0.075);
+		mFlame2 = new PartialParticle(Particle.FLAME, mBoss.getLocation(), 2, 0.15, 0.15, 0.15, 0.15);
+		mLava = new PartialParticle(Particle.LAVA, mBoss.getLocation(), 1, 0.3, 0.05, 0.3, 0.075);
+		mSmoke = new PartialParticle(Particle.SMOKE_NORMAL, mBoss.getLocation(), 2, 0.15, 0.15, 0.15, 0.1);
 	}
 
 	@Override
@@ -48,8 +56,8 @@ public class SpellMagmaShield extends Spell {
 				if (mT % 2 == 0) {
 					world.playSound(mBoss.getLocation(), Sound.BLOCK_FIRE_AMBIENT, SoundCategory.HOSTILE, 1, 1.25f);
 				}
-				new PartialParticle(Particle.FLAME, mBoss.getLocation(), 2, 0.3, 0.05, 0.3, 0.075).spawnAsEnemy();
-				new PartialParticle(Particle.LAVA, mBoss.getLocation(), 1, 0.3, 0.05, 0.3, 0.075).spawnAsEnemy();
+				mFlame1.location(mBoss.getLocation()).spawnAsEnemy();
+				mLava.location(mBoss.getLocation()).spawnAsEnemy();
 				if (mT >= 20 * 2) {
 					this.cancel();
 					Location loc = mBoss.getLocation();
@@ -79,8 +87,8 @@ public class SpellMagmaShield extends Spell {
 								vec = VectorUtils.rotateYAxis(vec, loc.getYaw() + 90);
 
 								Location l = loc.clone().add(0, 0.1, 0).add(vec);
-								new PartialParticle(Particle.FLAME, l, 2, 0.15, 0.15, 0.15, 0.15).spawnAsEnemy();
-								new PartialParticle(Particle.SMOKE_NORMAL, l, 2, 0.15, 0.15, 0.15, 0.1).spawnAsEnemy();
+								mFlame2.location(l).spawnAsEnemy();
+								mSmoke.location(l).spawnAsEnemy();
 							}
 
 							if (mRadius >= 7) {

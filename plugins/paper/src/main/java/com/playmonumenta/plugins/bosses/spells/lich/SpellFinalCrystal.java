@@ -52,6 +52,8 @@ public class SpellFinalCrystal extends Spell {
 	private boolean mTrigger = false;
 	private boolean mBombActive = false;
 	private List<Player> mPlayers = new ArrayList<Player>();
+	private PartialParticle mSoul;
+	private PartialParticle mExpH;
 
 	public SpellFinalCrystal(Plugin plugin, LivingEntity boss, Location loc, double range, List<Location> crystalLoc) {
 		mPlugin = plugin;
@@ -59,6 +61,8 @@ public class SpellFinalCrystal extends Spell {
 		mCenter = loc;
 		mRange = range;
 		mCrystalLoc = crystalLoc;
+		mSoul = new PartialParticle(Particle.SOUL, mBoss.getLocation(), 8, 3, 0.15, 3, 0);
+		mExpH = new PartialParticle(Particle.EXPLOSION_HUGE, mBoss.getLocation(), 1, 0, 0, 0, 0.1);
 	}
 
 	@Override
@@ -190,7 +194,7 @@ public class SpellFinalCrystal extends Spell {
 		for (EnderCrystal e : mCrystal) {
 			Location spawnLoc = e.getLocation();
 			e.remove();
-			new PartialParticle(Particle.EXPLOSION_HUGE, e.getLocation(), 1, 0, 0, 0, 0.1).spawnAsBoss();
+			mExpH.location(e.getLocation()).spawnAsBoss();
 			world.playSound(e.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 2f, 1f);
 			for (int i = 0; i < 5; i++) {
 				//Velocity randomized of the frosted ice as a falling block
@@ -217,7 +221,7 @@ public class SpellFinalCrystal extends Spell {
 								@Override
 								public void run() {
 									mTicks += 5;
-									new PartialParticle(Particle.SOUL, mLoc, 8, 3, 0.15, 3, 0).spawnAsBoss();
+									mSoul.location(mLoc).spawnAsBoss();
 									indicator.location(mLoc).spawnAsBoss();
 
 									if (mTicks % 10 == 0) {

@@ -28,10 +28,18 @@ public class SpellPotionCloud extends Spell {
 
 	private Plugin mPlugin;
 	private LivingEntity mBoss;
+	private PartialParticle mWitch;
+	private PartialParticle mBreath;
+	private PartialParticle mLava;
+	private PartialParticle mExpH;
 
 	public SpellPotionCloud(Plugin plugin, LivingEntity boss) {
 		mPlugin = plugin;
 		mBoss = boss;
+		mWitch = new PartialParticle(Particle.SPELL_WITCH, mBoss.getLocation(), 5, 0.3, 0.3, 0.3, 0.1);
+		mBreath = new PartialParticle(Particle.DRAGON_BREATH, mBoss.getLocation(), 8, 1.5, 0.1, 1.5, 0.01);
+		mLava = new PartialParticle(Particle.LAVA, mBoss.getLocation(), 20, 3, 0, 3, 0);
+		mExpH = new PartialParticle(Particle.EXPLOSION_HUGE, mBoss.getLocation(), 1, 0, 0, 0, 0);
 	}
 
 	@Override
@@ -40,7 +48,7 @@ public class SpellPotionCloud extends Spell {
 		World world = mBoss.getWorld();
 		world.playSound(loc, Sound.ENTITY_WITCH_CELEBRATE, SoundCategory.HOSTILE, 1.5f, 0.9f);
 		mBoss.addPotionEffect(new PotionEffect(PotionEffectType.GLOWING, 20, 0, false));
-		new PartialParticle(Particle.SPELL_WITCH, mBoss.getEyeLocation(), 5, 0.3, 0.3, 0.3, 0.1).spawnAsEnemy();
+		mWitch.location(mBoss.getEyeLocation()).spawnAsEnemy();
 
 		loc.setY(loc.getY() + 0.1);
 		BukkitRunnable run = new BukkitRunnable() {
@@ -53,7 +61,7 @@ public class SpellPotionCloud extends Spell {
 				}
 				mT++;
 				if (mT <= 20 * 14) {
-					new PartialParticle(Particle.DRAGON_BREATH, loc, 8, 1.5, 0.1, 1.5, 0.01).spawnAsEnemy();
+					mBreath.location(loc).spawnAsEnemy();
 				}
 
 				if (mT % 10 == 0 && mT >= 20 && mT < 20 * 15) {
@@ -67,12 +75,12 @@ public class SpellPotionCloud extends Spell {
 
 				if (mT % 18 == 0 && mT > 20 * 12 && mT < 20 * 15) {
 					world.playSound(loc, Sound.BLOCK_LAVA_EXTINGUISH, SoundCategory.HOSTILE, 1f, 1f);
-					new PartialParticle(Particle.LAVA, loc, 20, 3, 0, 3, 0).spawnAsEnemy();
+					mLava.location(loc).spawnAsEnemy();
 				}
 
 				if (mT >= 20 * 15) {
 					this.cancel();
-					new PartialParticle(Particle.EXPLOSION_HUGE, loc, 1, 0, 0, 0, 0).spawnAsEnemy();
+					mExpH.location(loc).spawnAsEnemy();
 					world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 2f, 1f);
 					for (Player p : PlayerUtils.playersInRange(loc, 3, true)) {
 						BossUtils.bossDamage(mBoss, p, 40, loc, "Unstable Concoction");

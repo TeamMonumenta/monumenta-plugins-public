@@ -41,6 +41,9 @@ public class SpellFinalLaser extends Spell {
 	private LivingEntity mBoss;
 	private boolean mTrigger = false;
 	private List<Player> mPlayers = new ArrayList<Player>();
+	private PartialParticle mMob;
+	private PartialParticle mSmoke;
+	private PartialParticle mExpL;
 
 	private static final double BOX_SIZE = 0.4;
 	private static final double CHECK_INCREMENT = 0.75;
@@ -63,6 +66,9 @@ public class SpellFinalLaser extends Spell {
 		mBoss = boss;
 		mCenter = loc;
 		mRange = range;
+		mMob = new PartialParticle(Particle.SPELL_MOB, mBoss.getLocation(), 1, 0.02, 0.02, 0.02, 1);
+		mSmoke = new PartialParticle(Particle.SMOKE_LARGE, mBoss.getLocation(), 2, 0.02, 0.02, 0.02, 0);
+		mExpL = new PartialParticle(Particle.EXPLOSION_LARGE, mBoss.getLocation(), 30, 0, 0, 0, 0.3);
 	}
 
 	@Override
@@ -131,8 +137,8 @@ public class SpellFinalLaser extends Spell {
 						vector,
 						CHECK_INCREMENT,
 						(Location loc) -> {
-							new PartialParticle(Particle.SMOKE_NORMAL, loc, 1, 0.02, 0.02, 0.02, 0).spawnAsBoss();
-							new PartialParticle(Particle.SPELL_MOB, loc, 1, 0.02, 0.02, 0.02, 1).spawnAsBoss();
+							mSmoke.location(loc).spawnAsBoss();
+							mMob.location(loc).spawnAsBoss();
 						},
 						1,
 						6
@@ -150,7 +156,7 @@ public class SpellFinalLaser extends Spell {
 
 				if (mTicks >= 100) {
 					world.playSound(movingLaserBox.getCenter().toLocation(world), Sound.ENTITY_DRAGON_FIREBALL_EXPLODE, SoundCategory.HOSTILE, 1f, 1.5f);
-					new PartialParticle(Particle.EXPLOSION_LARGE, movingLaserBox.getCenter().toLocation(world), 30, 0, 0, 0, 0.3).spawnAsBoss();
+					mExpL.location(movingLaserBox.getCenter().toLocation(world)).spawnAsBoss();
 					breakBlocks(movingLaserBox.getCenter().toLocation(world));
 					if (movingLaserBox.overlaps(target.getBoundingBox())) {
 						BossUtils.bossDamage(mBoss, target, 60, null, "Death Laser");

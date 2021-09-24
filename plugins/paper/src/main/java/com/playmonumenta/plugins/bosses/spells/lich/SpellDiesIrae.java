@@ -47,6 +47,15 @@ public class SpellDiesIrae extends Spell {
 	private Collection<EnderCrystal> mCrystal = new ArrayList<EnderCrystal>();
 	private String mCrystalNBT;
 	private static boolean mActive = false;
+	private PartialParticle mCloud;
+	private PartialParticle mExpH;
+	private PartialParticle mSoul;
+	private PartialParticle mBreath1;
+	private PartialParticle mBreath2;
+	private PartialParticle mBreath3;
+	private PartialParticle mExpL1;
+	private PartialParticle mExpL2;
+	private PartialParticle mHeart;
 
 	public SpellDiesIrae(Plugin plugin, LivingEntity boss, LivingEntity key, Location loc, double range, int ceil, List<Location> crystalLoc, String crystalnbt) {
 		mPlugin = plugin;
@@ -57,6 +66,13 @@ public class SpellDiesIrae extends Spell {
 		mCeiling = ceil;
 		mCrystalLoc = crystalLoc;
 		mCrystalNBT = crystalnbt;
+		mCloud = new PartialParticle(Particle.CLOUD, mBoss.getLocation(), 50, 0.1, 0.1, 0.1, 0.1);
+		mExpH = new PartialParticle(Particle.EXPLOSION_HUGE, mBoss.getLocation(), 1, 0, 0, 0, 0.1);
+		mSoul = new PartialParticle(Particle.SOUL_FIRE_FLAME, mBoss.getLocation(), 2, 0, 0, 0, 0.03);
+		mBreath1 = new PartialParticle(Particle.DRAGON_BREATH, mBoss.getLocation(), 2, 0.1, 0.1, 0.1, 0);
+		mExpL1 = new PartialParticle(Particle.EXPLOSION_LARGE, mBoss.getLocation(), 1, 0, 0, 0, 0);
+		mBreath2 = new PartialParticle(Particle.DRAGON_BREATH, mBoss.getLocation(), 15, 0.4, 0.4, 0.4, 0.01);
+		mHeart = new PartialParticle(Particle.HEART, mBoss.getLocation(), 20, 0.5, 0.5, 0.5, 0.1);
 	}
 
 	public static boolean getActive() {
@@ -68,16 +84,20 @@ public class SpellDiesIrae extends Spell {
 	}
 
 	@Override
+	public boolean canRun() {
+		if (Lich.getCD()) {
+			return false;
+		}
+		return true;
+	}
+
+	@Override
 	public void run() {
 		mActive = true;
 		World world = mBoss.getWorld();
 		BossBar bar = Bukkit.getServer().createBossBar(null, BarColor.GREEN, BarStyle.SOLID, BarFlag.PLAY_BOSS_MUSIC);
 		bar.setVisible(true);
-		//calc the amount of crystal need to spawn
-		List<Player> players = Lich.playersInRange(mCenter, mRange, true);
-		double tospawn = Math.min(7, Math.sqrt(players.size())) + 1;
-
-		Lich.spawnCrystal(mCrystalLoc, tospawn, mCrystalNBT);
+		Lich.spawnCrystal(mCrystalLoc, 4, mCrystalNBT);
 
 		//tele lich to center + 10 blocks + invuln + no ai
 		mBoss.teleport(mCenter.clone().add(0, 10, 0));
@@ -85,7 +105,7 @@ public class SpellDiesIrae extends Spell {
 		mBoss.setGravity(false);
 		mBoss.setInvulnerable(true);
 		world.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_SHOOT, 3.0f, 0.5f);
-		new PartialParticle(Particle.CLOUD, mBoss.getLocation(), 50, 0.1, 0.1, 0.1, 0.1).spawnAsBoss();
+		mCloud.location(mBoss.getLocation()).spawnAsBoss();
 
 		//get all active crystals
 		for (Location l : mCrystalLoc) {
@@ -121,6 +141,7 @@ public class SpellDiesIrae extends Spell {
 					bar.setVisible(false);
 					mActive = false;
 					this.cancel();
+					return;
 				}
 				//warning 1
 				if (mT == 20 * 2) {
@@ -149,7 +170,7 @@ public class SpellDiesIrae extends Spell {
 				} else if (progress <= 0.67) {
 					bar.setColor(BarColor.YELLOW);
 				}
-				for (Player player : players) {
+				for (Player player : Lich.playersInRange(mCenter, mRange, true)) {
 					if (player.getLocation().distance(mBoss.getLocation()) < mRange) {
 						bar.addPlayer(player);
 					} else {
@@ -165,12 +186,15 @@ public class SpellDiesIrae extends Spell {
 	private void attack() {
 		World world = mBoss.getWorld();
 
+		mBreath3 = new PartialParticle(Particle.DRAGON_BREATH, mBoss.getLocation(), mCrystal.size() * 1000 + 7000, 42, 0, 42, 0.01);
+		mExpL2 = new PartialParticle(Particle.EXPLOSION_LARGE, mBoss.getLocation(), mCrystal.size() * 125 + 1000, 42, 0.75, 42, 0);
+
 		//healing and final damage calc
 		double heal = mBoss.getHealth() + mBoss.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue() * mCrystal.size() * 0.025;
 		double healthFinal = Math.min(heal, mBoss.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue());
-		double keyheal = mKey.getHealth() + mKey.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue() * mCrystal.size() * 0.025;
+		double keyheal = mKey.getHealth() + mKey.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue() * mCrystal.size() * 0.05;
 		double keyHealthFinal = Math.min(keyheal, mKey.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue());
-		double damage = Math.min(1, mCrystal.size() * 0.15 + 0.15);
+		double damage = Math.min(1.6, mCrystal.size() * 0.15 + 0.4);
 
 		world.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_SPAWN, 10.0f, 0.5f);
 		//kill ghast shield
@@ -183,7 +207,7 @@ public class SpellDiesIrae extends Spell {
 		//kill end crystals
 		for (EnderCrystal e : mCrystal) {
 			e.remove();
-			new PartialParticle(Particle.EXPLOSION_HUGE, e.getLocation(), 1, 0, 0, 0, 0.1).spawnAsBoss();
+			mExpH.location(e.getLocation()).spawnAsBoss();
 			world.playSound(e.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 3f, 1f);
 		}
 
@@ -200,12 +224,12 @@ public class SpellDiesIrae extends Spell {
 						Vector vec = LocationUtils.getVectorTo(mEnd, mStart);
 
 						Location particleLoc = mStart.add(vec.multiply(mInc / 40d));
-						new PartialParticle(Particle.SOUL_FIRE_FLAME, particleLoc, 2, 0, 0, 0, 0.03).spawnAsBoss();
-						new PartialParticle(Particle.DRAGON_BREATH, particleLoc, 2, 0.1, 0.1, 0.1, 0).spawnAsBoss();
+						mSoul.location(particleLoc).spawnAsBoss();
+						mBreath1.location(particleLoc).spawnAsBoss();
 					}
 				}
 				if (mInc == 20 * 2) {
-					new PartialParticle(Particle.HEART, mBoss.getLocation(), 20, 0.5, 0.5, 0.5, 0.1).spawnAsBoss();
+					mHeart.location(mBoss.getEyeLocation()).spawnAsBoss();
 					world.playSound(mBoss.getLocation(), Sound.BLOCK_ENCHANTMENT_TABLE_USE, 3.0f, 1.5f);
 					mBoss.setHealth(healthFinal);
 					if (mKey.isValid()) {
@@ -223,12 +247,12 @@ public class SpellDiesIrae extends Spell {
 				if (mInc >= 20 * 4 && mInc < 20 * (4 + 1)) {
 					Vector vec = LocationUtils.getVectorTo(mCenter, mBoss.getLocation()).multiply((mInc - 4 * 20) / 20d);
 					Location pLoc = mBoss.getLocation();
-					new PartialParticle(Particle.EXPLOSION_LARGE, pLoc.add(vec), 1, 0, 0, 0, 0).spawnAsBoss();
-					new PartialParticle(Particle.DRAGON_BREATH, pLoc.add(vec), 15, 0.4, 0.4, 0.4, 0.01).spawnAsBoss();
+					mExpL1.location(pLoc.add(vec)).spawnAsBoss();
+					mBreath2.location(pLoc.add(vec)).spawnAsBoss();
 				}
 				if (mInc == 20 * (4 + 1)) {
-					new PartialParticle(Particle.EXPLOSION_LARGE, mCenter.clone().add(0, 0.5, 0), mCrystal.size() * 125 + 1000, 42, 0.75, 42, 0).spawnAsBoss();
-					new PartialParticle(Particle.DRAGON_BREATH, mCenter.clone(), mCrystal.size() * 1000 + 7000, 42, 0, 42, 0.01).spawnAsBoss();
+					mExpL2.location(mCenter.clone().add(0, 0.5, 0)).spawnAsBoss();
+					mBreath3.location(mCenter.clone()).spawnAsBoss();
 					List<Player> players = Lich.playersInRange(mCenter, mRange, true);
 					players.removeIf(pl -> SpellDimensionDoor.getShadowed().contains(pl) || pl.getLocation().getY() >= mCenter.getY() + mCeiling);
 					for (Player p : players) {

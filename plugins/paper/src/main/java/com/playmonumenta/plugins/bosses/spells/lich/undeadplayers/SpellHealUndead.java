@@ -22,10 +22,20 @@ public class SpellHealUndead extends Spell {
 
 	private Plugin mPlugin;
 	private LivingEntity mBoss;
+	private PartialParticle mSpell1;
+	private PartialParticle mSpell2;
+	private PartialParticle mSpell3;
+	private PartialParticle mSpell4;
+	private PartialParticle mSpark;
 
 	public SpellHealUndead(Plugin plugin, LivingEntity boss) {
 		mPlugin = plugin;
 		mBoss = boss;
+		mSpell1 = new PartialParticle(Particle.SPELL_INSTANT, mBoss.getLocation(), 6, 0.4, 0.4, 0.4, 0);
+		mSpell2 = new PartialParticle(Particle.SPELL_INSTANT, mBoss.getLocation(), 2, 0.1, 0.1, 0.1, 0.075);
+		mSpell3 = new PartialParticle(Particle.SPELL_INSTANT, mBoss.getLocation(), 100, 5, 3, 5, 0.075);
+		mSpell4 = new PartialParticle(Particle.SPELL_INSTANT, mBoss.getLocation(), 20, 0.35, 0.4, 0.35, 0.075);
+		mSpark = new PartialParticle(Particle.FIREWORKS_SPARK, mBoss.getLocation(), 25, 0, 0, 0, 0.25);
 	}
 
 	@Override
@@ -45,19 +55,19 @@ public class SpellHealUndead extends Spell {
 				if (mT % 2 == 0) {
 					world.playSound(mBoss.getLocation(), Sound.ITEM_TRIDENT_RETURN, SoundCategory.HOSTILE, 2, (float) (0.8 + mT * 0.1));
 				}
-				new PartialParticle(Particle.SPELL_INSTANT, mBoss.getLocation().add(0, 1, 0), 6, 0.4, 0.4, 0.4, 0).spawnAsEnemy();
+				mSpell1.location(mBoss.getLocation().add(0, 1, 0)).spawnAsEnemy();
 				for (int i = 0; i < 3; i++) {
 					double radian = Math.toRadians(mRotation + (120*i));
 					loc.add(Math.cos(radian) * mRadius, 0, Math.sin(radian) * mRadius);
-					new PartialParticle(Particle.SPELL_INSTANT, loc, 2, 0.1, 0.1, 0.1, 0.075).spawnAsEnemy();
+					mSpell2.location(loc).spawnAsEnemy();
 					loc.subtract(Math.cos(radian) * mRadius, 0, Math.sin(radian) * mRadius);
 				}
 				if (mRadius <= 0) {
 					this.cancel();
 					world.playSound(mBoss.getLocation(), Sound.ENTITY_EVOKER_CAST_SPELL, SoundCategory.HOSTILE, 1, 1.25f);
 					world.playSound(loc, Sound.ENTITY_ZOMBIE_VILLAGER_CONVERTED, 3, 2f);
-					new PartialParticle(Particle.FIREWORKS_SPARK, loc, 25, 0, 0, 0, 0.25).spawnAsEnemy();
-					new PartialParticle(Particle.SPELL_INSTANT, loc, 100, 5, 3, 5, 0.075).spawnAsEnemy();
+					mSpark.location(loc).spawnAsEnemy();
+					mSpell3.location(loc).spawnAsEnemy();
 					for (LivingEntity le : loc.getNearbyLivingEntities(10, 10)) {
 						if (EntityUtils.isUndead(le) && !le.isDead() && le != mBoss) {
 							double health = le.getHealth() + 80;
@@ -66,7 +76,7 @@ public class SpellHealUndead extends Spell {
 							} else {
 								le.setHealth(health);
 							}
-							new PartialParticle(Particle.SPELL_INSTANT, le.getLocation().add(0, 1, 0), 20, 0.35, 0.4, 0.35, 0.075).spawnAsEnemy();
+							mSpell4.location(le.getLocation().add(0, 1, 0)).spawnAsEnemy();
 						}
 					}
 				}

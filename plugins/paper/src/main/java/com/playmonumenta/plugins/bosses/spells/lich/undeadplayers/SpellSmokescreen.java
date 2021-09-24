@@ -26,10 +26,18 @@ public class SpellSmokescreen extends Spell {
 	private LivingEntity mBoss;
 	private int DELAY = (int) (20 * 1.25);
 	private int DURATION = 20 * 10;
+	private PartialParticle mSmokeN1;
+	private PartialParticle mSmokeN2;
+	private PartialParticle mSmokeL1;
+	private PartialParticle mSmokeL2;
 
 	public SpellSmokescreen(Plugin plugin, LivingEntity boss) {
 		mPlugin = plugin;
 		mBoss = boss;
+		mSmokeN1 = new PartialParticle(Particle.SMOKE_NORMAL, mBoss.getLocation(), 3, 0.3, 0.05, 0.3, 0.075);
+		mSmokeN2 = new PartialParticle(Particle.SMOKE_NORMAL, mBoss.getLocation(), 75, 3.5, 0.2, 4.5, 0.05);
+		mSmokeL1 = new PartialParticle(Particle.SMOKE_LARGE, mBoss.getLocation(), 2, 0.3, 0.05, 0.3, 0.075);
+		mSmokeL2 = new PartialParticle(Particle.SMOKE_LARGE, mBoss.getLocation(), 30, 3.5, 0.8, 4.5, 0.025);
 	}
 
 	@Override
@@ -46,15 +54,15 @@ public class SpellSmokescreen extends Spell {
 					world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 0.75f, 1.2f);
 				}
 				mT += 10;
-				new PartialParticle(Particle.SMOKE_NORMAL, loc, 3, 0.3, 0.05, 0.3, 0.075).spawnAsEnemy();
-				new PartialParticle(Particle.SMOKE_LARGE, loc, 2, 0.3, 0.05, 0.3, 0.075).spawnAsEnemy();
+				mSmokeN1.location(loc).spawnAsEnemy();
+				mSmokeL1.location(loc).spawnAsEnemy();
 				if (mBoss.isDead()) {
 					this.cancel();
 					return;
 				}
 				if (mT >= DELAY) {
-					new PartialParticle(Particle.SMOKE_LARGE, loc.clone().add(0, 1, 0), 30, 3.5, 0.8, 4.5, 0.025).spawnAsEnemy();
-					new PartialParticle(Particle.SMOKE_NORMAL, loc.clone().add(0, 1, 0), 75, 3.5, 0.2, 4.5, 0.05).spawnAsEnemy();
+					mSmokeN2.location(loc.clone().add(0, 1, 0)).spawnAsEnemy();
+					mSmokeL2.location(loc.clone().add(0, 1, 0)).spawnAsEnemy();
 					world.playSound(mBoss.getLocation(), Sound.BLOCK_FIRE_EXTINGUISH, SoundCategory.HOSTILE, 1, 0.7f);
 					for (Player player : PlayerUtils.playersInRange(loc, 4, true)) {
 						player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 6, 2));

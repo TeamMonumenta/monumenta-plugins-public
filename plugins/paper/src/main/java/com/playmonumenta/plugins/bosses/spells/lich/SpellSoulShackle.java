@@ -47,6 +47,9 @@ public class SpellSoulShackle extends Spell {
 	private int mCeiling;
 	private ChargeUpManager mChargeUp;
 	private List<Player> mGotHit = new ArrayList<Player>();
+	private PartialParticle mPortal;
+	private PartialParticle mRod;
+	private PartialParticle mSpark;
 
 	public SpellSoulShackle(Plugin plugin, LivingEntity boss, Location loc, double r, int ceil) {
 		mPlugin = plugin;
@@ -55,13 +58,16 @@ public class SpellSoulShackle extends Spell {
 		mRange = r;
 		mCeiling = ceil;
 		mChargeUp = new ChargeUpManager(mBoss, 20, ChatColor.YELLOW + "Charging Soul Shackle...", BarColor.YELLOW, BarStyle.SOLID, 50);
+		mPortal = new PartialParticle(Particle.PORTAL, mBoss.getLocation(), 100, 0.1, 0.1, 0.1, 1.5);
+		mRod = new PartialParticle(Particle.END_ROD, mBoss.getLocation(), 40, 1, 1, 1, 0);
+		mSpark = new PartialParticle(Particle.FIREWORKS_SPARK, mBoss.getLocation(), 1, 0, 0, 0, 0);
 	}
 
 	@Override
 	public void run() {
 		World world = mBoss.getWorld();
 		world.playSound(mBoss.getLocation(), Sound.ENTITY_EVOKER_PREPARE_SUMMON, 6.0f, 1.0f);
-		new PartialParticle(Particle.PORTAL, mBoss.getLocation().add(0, 5, 0), 100, 0.1, 0.1, 0.1, 1.5).spawnAsBoss();
+		mPortal.location(mBoss.getLocation().add(0, 5, 0)).spawnAsBoss();
 
 		List<Player> players = Lich.playersInRange(mCenter, mRange, true);
 		players.removeIf(p -> SpellDimensionDoor.getShadowed().contains(p) || p.getLocation().getY() >= mCenter.getY() + mCeiling);
@@ -116,7 +122,7 @@ public class SpellSoulShackle extends Spell {
 
 			BossUtils.bossDamage(mBoss, p, 35, null, "Soul Shackle");
 			AbilityUtils.silencePlayer(p, 5 * 20);
-			new PartialParticle(Particle.END_ROD, pLoc, 40, 1, 1, 1, 0).spawnAsBoss();
+			mRod.location(pLoc).spawnAsBoss();
 			world.playSound(pLoc, Sound.ENTITY_ZOMBIE_VILLAGER_CURE, 0.7f, 0.5f);
 
 			PPGroundCircle indicator = new PPGroundCircle(Particle.END_ROD, pLoc, 36, 0, 0, 0, 0).init(3, true);
@@ -140,7 +146,7 @@ public class SpellSoulShackle extends Spell {
 						p.removePotionEffect(PotionEffectType.LEVITATION);
 						for (double n = -1; n < 2; n += 1) {
 							Location mColumn = pLoc.clone().add(0, n, 0);
-							new PartialParticle(Particle.FIREWORKS_SPARK, mColumn, 1, 0, 0, 0, 0).spawnAsBoss();
+							mSpark.location(mColumn).spawnAsBoss();
 						}
 
 						// check HORIZONTAL distance to allow jump boost effects
@@ -152,7 +158,7 @@ public class SpellSoulShackle extends Spell {
 							p.sendMessage(ChatColor.AQUA + "I shouldn't leave this ring.");
 							world.playSound(p.getLocation(), Sound.BLOCK_END_PORTAL_FRAME_FILL, 2.0f, 1.0f);
 							BossUtils.bossDamagePercent(mBoss, p, 0.15, null, "Soul Shackle");
-							MovementUtils.knockAway(pCheckLoc, p, -0.7f);
+							MovementUtils.knockAway(pCheckLoc, p, -0.75f);
 						}
 
 						Location endLoc = pLoc.clone();

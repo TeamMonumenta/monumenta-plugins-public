@@ -23,17 +23,25 @@ public class SpellResistance extends Spell {
 
 	private Plugin mPlugin;
 	private LivingEntity mBoss;
+	private PartialParticle mSpell1;
+	private PartialParticle mSpell2;
+	private PartialParticle mSpell3;
+	private PartialParticle mCrit;
 
 	public SpellResistance(Plugin plugin, LivingEntity boss) {
 		mPlugin = plugin;
 		mBoss = boss;
+		mSpell1 = new PartialParticle(Particle.SPELL_INSTANT, mBoss.getLocation(), 10, 0.4, 0.4, 0.4, 0.25);
+		mSpell2 = new PartialParticle(Particle.SPELL_INSTANT, mBoss.getLocation(), 25, 0.4, 0.4, 0.4, 1);
+		mSpell3 = new PartialParticle(Particle.SPELL_INSTANT, mBoss.getLocation(), 1, 0, 0, 0, 0);
+		mCrit = new PartialParticle(Particle.CRIT_MAGIC, mBoss.getLocation(), 3, 0.1, 0.1, 0.1, 0.125);
 	}
 
 	@Override
 	public void run() {
 		Location loc = mBoss.getLocation().add(0, 1, 0);
 		World world = mBoss.getWorld();
-		new PartialParticle(Particle.SPELL_INSTANT, loc, 10, 0.4, 0.4, 0.4, 0.25).spawnAsEnemy();
+		mSpell1.location(loc).spawnAsEnemy();
 		world.playSound(mBoss.getLocation(), Sound.BLOCK_ANVIL_USE, SoundCategory.HOSTILE, 2.0f, 0.75f);
 		world.playSound(mBoss.getLocation(), Sound.ITEM_SHIELD_BLOCK, SoundCategory.HOSTILE, 2.0f, 0.5f);
 		mBoss.addPotionEffect(new PotionEffect(PotionEffectType.GLOWING, 20, 0, false));
@@ -41,7 +49,7 @@ public class SpellResistance extends Spell {
 
 			@Override
 			public void run() {
-				new PartialParticle(Particle.SPELL_INSTANT, loc, 25, 0.4, 0.4, 0.4, 1).spawnAsEnemy();
+				mSpell2.location(loc).spawnAsEnemy();
 				world.playSound(mBoss.getLocation(), Sound.BLOCK_ANVIL_PLACE, SoundCategory.HOSTILE, 2.0f, 1.35f);
 				world.playSound(mBoss.getLocation(), Sound.ENTITY_ILLUSIONER_CAST_SPELL, SoundCategory.HOSTILE, 1.25f, 1.1f);
 				for (LivingEntity e : EntityUtils.getNearbyMobs(loc, 12)) {
@@ -49,8 +57,8 @@ public class SpellResistance extends Spell {
 						continue;
 					}
 					e.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 20 * 15, 1));
-					new PartialParticle(Particle.CRIT_MAGIC, e.getLocation(), 3, 0.1, 0.1, 0.1, 0.125).spawnAsEnemy();
-					new PartialParticle(Particle.SPELL_INSTANT, e.getLocation(), 1, 0, 0, 0, 0).spawnAsEnemy();
+					mCrit.location(e.getLocation()).spawnAsEnemy();
+					mSpell3.location(e.getLocation()).spawnAsEnemy();
 				}
 			}
 

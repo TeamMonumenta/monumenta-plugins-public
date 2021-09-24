@@ -44,16 +44,22 @@ public class SpellAmpHex extends Spell {
 			PotionEffectType.WEAKNESS,
 			PotionEffectType.WITHER
 			);
+	private PartialParticle mPortal;
+	private PartialParticle mBreath;
+	private PartialParticle mSmoke;
 
 	public SpellAmpHex(Plugin plugin, LivingEntity boss) {
 		mPlugin = plugin;
 		mBoss = boss;
+		mPortal = new PartialParticle(Particle.PORTAL, mBoss.getLocation(), 25, 0.1, 0.1, 0.1, 0.1);
+		mBreath = new PartialParticle(Particle.DRAGON_BREATH, mBoss.getLocation(), 2, 0.05, 0.05, 0.05, 0.1);
+		mSmoke = new PartialParticle(Particle.SMOKE_NORMAL, mBoss.getLocation(), 1, 0.05, 0.05, 0.05, 0.1);
 	}
 
 	@Override
 	public void run() {
 		World world = mBoss.getWorld();
-		new PartialParticle(Particle.PORTAL, mBoss.getLocation(), 25, 0.1, 0.1, 0.1, 0.1).spawnAsEnemy();
+		mPortal.location(mBoss.getLocation()).spawnAsEnemy();
 		world.playSound(mBoss.getLocation(), Sound.BLOCK_PORTAL_TRAVEL, SoundCategory.HOSTILE, 0.8f, 1.5f);
 
 		BukkitRunnable runA = new BukkitRunnable() {
@@ -79,8 +85,8 @@ public class SpellAmpHex extends Spell {
 							vec = VectorUtils.rotateYAxis(vec, mLoc.getYaw());
 
 							Location l = mLoc.clone().clone().add(0, 0.15, 0).add(vec);
-							new PartialParticle(Particle.DRAGON_BREATH, l, 2, 0.05, 0.05, 0.05, 0.1).spawnAsEnemy();
-							new PartialParticle(Particle.SMOKE_NORMAL, l, 1, 0.05, 0.05, 0.05, 0.1).spawnAsEnemy();
+							mBreath.location(l).spawnAsEnemy();
+							mSmoke.location(l).spawnAsEnemy();
 						}
 
 						if (mRadius >= 9) {

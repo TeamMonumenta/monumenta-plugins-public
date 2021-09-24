@@ -16,7 +16,7 @@ public class SpellCrystalRespawn extends Spell {
 	private Plugin mPlugin;
 	private int mT;
 	private double mInc;
-	private int mMinCooldown = (int) (20 * 7.5);
+	private int mMinCooldown = 20 * 10;
 	private int mMaxCooldown = 20 * 30;
 	private int mCooldown;
 	private Location mCenter;
@@ -51,12 +51,12 @@ public class SpellCrystalRespawn extends Spell {
 		}
 
 		//cooldown
-		double factor = Math.sqrt(mPlayers.size());
+		double factor = Math.log(mPlayers.size());
 		mCooldown = (int) Math.max(mMinCooldown, Math.round(mMaxCooldown / factor));
 		mT -= 5;
 		if (mT <= 0 && !SpellDiesIrae.getActive()) {
 			mT = mCooldown;
-			mInc = mPlayers.size() / 5.0;
+			mInc = Math.min(5, mPlayers.size() / 5);
 			Lich.spawnCrystal(mLoc, mInc, mCrystalNBT);
 		}
 	}

@@ -41,6 +41,8 @@ public class SpellFinalParticle extends Spell {
 	private boolean mTrigger = false;
 	private List<Player> mPlayers = new ArrayList<Player>();
 	private static final Particle.DustOptions BLACK = new Particle.DustOptions(Color.fromRGB(0, 0, 0), 1.5f);
+	private PartialParticle mBlack;
+	private PPGroundCircle mIndicator;
 
 	public SpellFinalParticle(Plugin plugin, LivingEntity boss, Location loc, double range, FallingBlock block) {
 		mPlugin = plugin;
@@ -48,6 +50,8 @@ public class SpellFinalParticle extends Spell {
 		mCenter = loc;
 		mRange = range;
 		mBlock = block;
+		mBlack = new PartialParticle(Particle.REDSTONE, mBoss.getLocation(), 1, 0.1, 0.1, 0.1, 0, BLACK);
+		mIndicator = new PPGroundCircle(Particle.REDSTONE, mCenter, 20, 0.1, 0.1, 0.1, 0, BLACK).init(mCylRadius, true);
 	}
 
 	@Override
@@ -55,11 +59,10 @@ public class SpellFinalParticle extends Spell {
 		mBlock.setTicksLived(1);
 		World world = mBoss.getWorld();
 		//smoke ring particle
-		PPGroundCircle indicator = new PPGroundCircle(Particle.REDSTONE, mCenter, 20, 0.1, 0.1, 0.1, 0, BLACK).init(mCylRadius, true);
 		if (mPTick) {
 			mPTick = false;
 			for (int j = 0; j < 20; j += 1.5) {
-				indicator.location(mCenter.clone().add(0, j, 0)).spawnAsBoss();
+				mIndicator.location(mCenter.clone().add(0, j, 0)).spawnAsBoss();
 			}
 		} else {
 			mPTick = true;
@@ -121,7 +124,7 @@ public class SpellFinalParticle extends Spell {
 						if (pLoc.distance(loc) > dist) {
 							break;
 						}
-						new PartialParticle(Particle.REDSTONE, pLoc, 1, 0.1, 0.1, 0.1, 0, BLACK).spawnAsBoss();
+						mBlack.location(pLoc).spawnAsBoss();
 					}
 					world.playSound(loc, Sound.ENTITY_LIGHTNING_BOLT_THUNDER, SoundCategory.HOSTILE, 1, 1);
 					proj.remove();

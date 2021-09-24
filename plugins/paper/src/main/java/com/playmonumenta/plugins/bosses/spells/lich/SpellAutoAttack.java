@@ -42,6 +42,16 @@ public class SpellAutoAttack extends Spell {
 	private int mCeiling;
 	private static final Particle.DustOptions RED = new Particle.DustOptions(Color.fromRGB(255, 0, 0), 1.0f);
 	private static final Particle.DustOptions YELLOW = new Particle.DustOptions(Color.fromRGB(255, 255, 0), 1.0f);
+	private PartialParticle mPSmoke1;
+	private PartialParticle mPRed;
+	private PartialParticle mPWitch;
+	private PartialParticle mPCrit1;
+	private PartialParticle mPCrit2;
+	private PartialParticle mPSmoke2;
+	private PartialParticle mPYellow;
+	private PartialParticle mPSoul;
+	private PartialParticle mPWitch2;
+	private PartialParticle mPYellow2;
 
 	public SpellAutoAttack(Plugin plugin, LivingEntity boss, Location loc, int ticks, double range, int ceil, int phase) {
 		mPlugin = plugin;
@@ -51,6 +61,18 @@ public class SpellAutoAttack extends Spell {
 		mRange = range;
 		mCeiling = ceil;
 		mPhase = phase;
+		mPSmoke1 = new PartialParticle(Particle.SMOKE_LARGE, mBoss.getLocation(), 1, 0.35, 0, 0.35, 0.05);
+
+		mPRed = new PartialParticle(Particle.REDSTONE, mBoss.getLocation(), 2, 0.1, 0.1, 0.1, 0.1, RED);
+		mPWitch = new PartialParticle(Particle.SPELL_WITCH, mBoss.getLocation(), 1, 0.1, 0.1, 0.1, 0.1);
+		mPCrit1 = new PartialParticle(Particle.CRIT_MAGIC, mBoss.getLocation(), 2, 0.1, 0.1, 0.1, 0.1);
+		mPCrit2 = new PartialParticle(Particle.CRIT_MAGIC, mBoss.getLocation(), 20, 0.25, 0.25, 0.25, 0.25);
+
+		mPSmoke2 = new PartialParticle(Particle.SMOKE_LARGE, mBoss.getLocation(), 15, 0, 0, 0, 0.25);
+		mPYellow = new PartialParticle(Particle.REDSTONE, mBoss.getLocation(), 15, 0.2, 0.2, 0.2, 0.25, YELLOW);
+		mPSoul = new PartialParticle(Particle.SOUL_FIRE_FLAME, mBoss.getLocation(), 2, 0.35, 0.35, 0.35, 0.025);
+		mPWitch2 = new PartialParticle(Particle.SPELL_WITCH, mBoss.getLocation(), 4, 0.2, 0.2, 0.2, 0.125);
+		mPYellow2 = new PartialParticle(Particle.REDSTONE, mBoss.getLocation(), 2, 0.2, 0.2, 0.2, 0.25, YELLOW);
 	}
 
 	@Override
@@ -88,7 +110,7 @@ public class SpellAutoAttack extends Spell {
 							world.playSound(mBoss.getLocation(), Sound.BLOCK_END_PORTAL_FRAME_FILL, SoundCategory.HOSTILE, 1.5f, 0.75f);
 							world.playSound(mBoss.getLocation(), Sound.BLOCK_ENCHANTMENT_TABLE_USE, 1.5f, 0);
 						}
-						new PartialParticle(Particle.SMOKE_LARGE, mBoss.getLocation(), 1, 0.35, 0, 0.35, 0.05).spawnAsBoss();
+						mPSmoke1.location(mBoss.getLocation()).spawnAsBoss();
 						mBoss.removePotionEffect(PotionEffectType.SLOW);
 						mBoss.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20, 1));
 
@@ -153,7 +175,7 @@ public class SpellAutoAttack extends Spell {
 						v = VectorUtils.rotateYAxis(v, tloc.getYaw() + 90);
 
 						Location loc = mBoss.getLocation().clone().add(v);
-						new PartialParticle(Particle.REDSTONE, loc, 2, 0.1, 0.1, 0.1, 0.1, RED).spawnAsBoss();
+						mPRed.location(loc).spawnAsBoss();
 					}
 				}
 				if (mT >= 10) {
@@ -166,15 +188,14 @@ public class SpellAutoAttack extends Spell {
 							vec = VectorUtils.rotateYAxis(vec, tloc.getYaw() + 90);
 
 							Location l = mBoss.getLocation().clone().add(vec);
-							new PartialParticle(Particle.SPELL_WITCH, l, 1, 0.1, 0.1, 0.1, 0.1).spawnAsBoss();
-							new PartialParticle(Particle.CRIT_MAGIC, l, 2, 0.1, 0.1, 0.1, 0.1).spawnAsBoss();
+							mPWitch.location(l).spawnAsBoss();
+							mPCrit1.location(l).spawnAsBoss();
 							BoundingBox box = BoundingBox.of(l, 0.4, 10, 0.4);
 
 							for (Player player : Lich.playersInRange(mBoss.getLocation(), 10, true)) {
 								if (player.getBoundingBox().overlaps(box)) {
 									MovementUtils.knockAway(mBoss.getLocation(), player, 1.5f, 0.5f);
-									new PartialParticle(Particle.CRIT_MAGIC, player.getLocation(), 20, 0.25, 0.25, 0.25, 0.25).spawnAsBoss();
-
+									mPCrit2.location(player.getLocation()).spawnAsBoss();
 									damage(player);
 								}
 							}
@@ -209,24 +230,24 @@ public class SpellAutoAttack extends Spell {
 					for (Player player : players) {
 						if (player.getBoundingBox().overlaps(mBox)) {
 							damage(player);
-							w.spawnParticle(Particle.SMOKE_LARGE, loc, 15, 0, 0, 0, 0.25);
-							w.spawnParticle(Particle.REDSTONE, loc, 15, 0.2, 0.2, 0.2, 0.25, YELLOW);
+							mPSmoke2.location(loc).spawnAsBoss();
+							mPYellow.location(loc).spawnAsBoss();
 							w.playSound(loc, Sound.ENTITY_WITHER_HURT, 1, 0.75f);
 							this.cancel();
 						}
 					}
 
 					if (loc.getBlock().getType().isSolid() && (mPhase != 4 || loc.getY() <= mCenter.getY())) {
-						w.spawnParticle(Particle.SMOKE_LARGE, loc, 15, 0, 0, 0, 0.25);
-						w.spawnParticle(Particle.REDSTONE, loc, 15, 0.2, 0.2, 0.2, 0.25, YELLOW);
+						mPSmoke2.location(loc).spawnAsBoss();
+						mPYellow.location(loc).spawnAsBoss();
 						w.playSound(loc, Sound.ENTITY_WITHER_HURT, 1, 0.75f);
 						this.cancel();
 					}
 				}
 				Location loc = mBox.getCenter().toLocation(mBoss.getWorld());
-				w.spawnParticle(Particle.SOUL_FIRE_FLAME, loc, 2, 0.35, 0.35, 0.35, 0.025);
-				w.spawnParticle(Particle.SPELL_WITCH, loc, 4, 0.2, 0.2, 0.2, 0.125);
-				w.spawnParticle(Particle.REDSTONE, loc, 2, 0.2, 0.2, 0.2, 0.25, YELLOW);
+				mPSoul.location(loc).spawnAsBoss();
+				mPWitch2.location(loc).spawnAsBoss();
+				mPYellow2.location(loc).spawnAsBoss();
 
 				mInnerTicks++;
 				if (mInnerTicks >= 20 * 5 || mBoss == null || !mBoss.isValid()) {

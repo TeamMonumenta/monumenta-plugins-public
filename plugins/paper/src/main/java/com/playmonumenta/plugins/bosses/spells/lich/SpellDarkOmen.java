@@ -51,6 +51,11 @@ public class SpellDarkOmen extends Spell {
 	private static final Particle.DustOptions RED = new Particle.DustOptions(Color.fromRGB(185, 0, 0), 1.0f);
 	private ChargeUpManager mChargeUp;
 	private List<Player> mDamaged = new ArrayList<Player>();
+	private PartialParticle mPSoul;
+	private PartialParticle mPSpark;
+	private PartialParticle mPSmoke;
+	private PartialParticle mPRed;
+	private PartialParticle mPBlade;
 
 	public SpellDarkOmen(Plugin plugin, LivingEntity boss, Location loc, int r) {
 		mPlugin = plugin;
@@ -58,6 +63,11 @@ public class SpellDarkOmen extends Spell {
 		mCenter = loc;
 		mRange = r;
 		mChargeUp = new ChargeUpManager(mBoss, mTell, ChatColor.YELLOW + "Charging Dark Omen...", BarColor.YELLOW, BarStyle.SOLID, 50);
+		mPSoul = new PartialParticle(Particle.SOUL_FIRE_FLAME, mBoss.getLocation(), 1, 0.1, 0.1, 0.1, 0);
+		mPSpark = new PartialParticle(Particle.FIREWORKS_SPARK, mBoss.getLocation(), 100, 0.1, 0.1, 0.1, 0.3);
+		mPSmoke = new PartialParticle(Particle.SMOKE_NORMAL, mBoss.getLocation(), 100, 0.1, 0.1, 0.1, 0.2);
+		mPRed = new PartialParticle(Particle.REDSTONE, mBoss.getLocation(), 1, 0.1, 0.1, 0.1, 0, RED);
+		mPBlade = new PartialParticle(Particle.REDSTONE, mBoss.getLocation(), 1, 0.1, 0.1, 0.1, 0, BLADE_COLOR1);
 	}
 
 	@Override
@@ -91,7 +101,7 @@ public class SpellDarkOmen extends Spell {
 						Vector qlength = quad.multiply(1 - mT / mTell);
 						Vector qdir = VectorUtils.rotateYAxis(qlength.clone(), 90 / (mT / mTell));
 						Location l = mBoss.getLocation().add(qdir).add(0, 0.5, 0);
-						new PartialParticle(Particle.SOUL_FIRE_FLAME, l, 1, 0.1, 0.1, 0.1, 0).spawnAsBoss();
+						mPSoul.location(l).spawnAsBoss();
 					}
 				}
 
@@ -143,8 +153,8 @@ public class SpellDarkOmen extends Spell {
 						anchor = startLoc.clone().add(dir.clone().multiply(mVelocity / 20 * (mT + 0.5 * x)));
 						if (!warning && (anchor.distance(mCenter) > mArenaRange || anchor.distance(startLoc) > mMaxRange)) {
 							vex(anchor);
-							new PartialParticle(Particle.FIREWORKS_SPARK, anchor, 100, 0.1, 0.1, 0.1, 0.3).spawnAsBoss();
-							new PartialParticle(Particle.SMOKE_NORMAL, anchor, 100, 0.1, 0.1, 0.1, 0.2).spawnAsBoss();
+							mPSpark.location(anchor).spawnAsBoss();
+							mPSmoke.location(anchor).spawnAsBoss();
 							world.playSound(anchor, Sound.ENTITY_FIREWORK_ROCKET_TWINKLE, 3.0f, 1.5f);
 							world.playSound(anchor, Sound.ENTITY_VEX_AMBIENT, 5.0f, 0.75f);
 							this.cancel();
@@ -183,10 +193,10 @@ public class SpellDarkOmen extends Spell {
 		List<Player> damage = new ArrayList<Player>();
 		for (Location l : locAll) {
 			if (warning) {
-				new PartialParticle(Particle.REDSTONE, l, 1, 0.1, 0.1, 0.1, 0, RED).spawnAsBoss();
+				mPRed.location(l).spawnAsBoss();
 			} else {
-				new PartialParticle(Particle.REDSTONE, l, 1, 0.1, 0.1, 0.1, 0, BLADE_COLOR1).spawnAsBoss();
-				new PartialParticle(Particle.SOUL_FIRE_FLAME, l, 1, 0.1, 0.1, 0.1, 0).spawnAsBoss();
+				mPBlade.location(l).spawnAsBoss();
+				mPSoul.location(l).spawnAsBoss();
 				BoundingBox box = BoundingBox.of(l, 0.3, 0.3, 0.3);
 				for (Player p : players) {
 					if (p.getBoundingBox().overlaps(box) && !damage.contains(p)) {

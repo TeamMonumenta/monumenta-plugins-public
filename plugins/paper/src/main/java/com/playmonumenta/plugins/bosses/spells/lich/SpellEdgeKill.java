@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.bosses.spells.lich;
 
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.List;
 
 import org.bukkit.ChatColor;
@@ -18,12 +19,17 @@ import com.playmonumenta.plugins.utils.MovementUtils;
 
 public class SpellEdgeKill extends Spell {
 
-	private final int mInArena = 67;
-	private final int mMaxDistance = 46;
+	private final int mInArena = 69;
+	private final double mMaxDistance = 40.5;
 	private LivingEntity mBoss;
 	private Location mCenter;
 	private boolean mTrigger = false;
 	private List<Player> mWarned = new ArrayList<Player>();
+
+	private final EnumSet<Material> mIgnoredMats = EnumSet.of(
+			Material.AIR,
+			Material.LAVA
+		);
 
 	public SpellEdgeKill(LivingEntity boss, Location loc) {
 		mBoss = boss;
@@ -47,8 +53,8 @@ public class SpellEdgeKill extends Spell {
 				pLoc.setY(mCenter.getY());
 				Location standLoc = p.getLocation();
 				standLoc.subtract(0, 1, 0);
-				if (pLoc.distance(mCenter) > mMaxDistance && p.getLocation().getBlock().getType() == Material.AIR
-						&& standLoc.getBlock().getType() == Material.AIR) {
+				if (pLoc.distance(mCenter) > mMaxDistance &&
+						(!mIgnoredMats.contains(p.getLocation().getBlock().getType()) || !mIgnoredMats.contains(standLoc.getBlock().getType()))) {
 					//players are on the outer ring of the arena, do damage + massive knock back into arena
 					BossUtils.bossDamagePercent(mBoss, p, 0.4);
 					MovementUtils.knockAway(mCenter, p, -5);

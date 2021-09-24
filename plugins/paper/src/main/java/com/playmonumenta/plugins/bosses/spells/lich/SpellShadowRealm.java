@@ -51,6 +51,7 @@ public class SpellShadowRealm extends Spell {
 			List<Player> shadowedplayers = Lich.playersInRange(shadowloc, mRange, true);
 			shadowedplayers.removeIf(pl -> pl.getLocation().getY() > Lich.getLichSpawn().getY() - 10);
 			if (shadowedplayers.size() == 0) {
+				SpellDimensionDoor.clearShadowed();
 				List<LivingEntity> mobs = EntityUtils.getNearbyMobs(shadowloc, 55);
 				mobs.removeIf(e -> e.getType() == EntityType.MAGMA_CUBE || e.getType() == EntityType.ARMOR_STAND ||
 						e.getScoreboardTags().contains("Boss") || e.getLocation().getY() >= mCenter.getY() - 8);

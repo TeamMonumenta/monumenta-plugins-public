@@ -31,12 +31,13 @@ public class SpellBeeBombs extends Spell {
 	private int mCount;
 	private int mCooldownTicks = 0;
 
-	public SpellBeeBombs(Plugin plugin, LivingEntity entity, int cooldown, Location center, int count) {
+	public SpellBeeBombs(Plugin plugin, LivingEntity entity, int cooldown, Location center, int count, int range) {
 		mPlugin = plugin;
 		mBoss = entity;
 		mCenter = center;
 		mCooldownTicks = cooldown;
 		mCount = count;
+		mRange = range;
 	}
 
 	public void spawnBat(Location loc) {

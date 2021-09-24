@@ -45,6 +45,12 @@ public class SpellGravityWell extends Spell {
 	private static final Particle.DustOptions RED = new Particle.DustOptions(Color.fromRGB(185, 0, 0), 1.0f);
 	private static final Particle.DustOptions YELLOW = new Particle.DustOptions(Color.fromRGB(185, 185, 0), 1.0f);
 	private ChargeUpManager mChargeUp;
+	private PartialParticle mPortal1;
+	private PartialParticle mPortal2;
+	private PartialParticle mSmokeN;
+	private PartialParticle mWitch;
+	private PartialParticle mSmokeL;
+	private PartialParticle mBreath;
 
 	public SpellGravityWell(Plugin plugin, LivingEntity boss, Location center, double range) {
 		mPlugin = plugin;
@@ -52,6 +58,12 @@ public class SpellGravityWell extends Spell {
 		mCenter = center;
 		mRange = range;
 		mChargeUp = new ChargeUpManager(mBoss, 40, ChatColor.YELLOW + "Channeling Gravity Well...", BarColor.YELLOW, BarStyle.SOLID, 70);
+		mPortal1 = new PartialParticle(Particle.PORTAL, mBoss.getLocation(), 100, 0.1, 0.1, 0.1, 0.1);
+		mPortal2 = new PartialParticle(Particle.PORTAL, mBoss.getLocation(), 2, 0.15, 0.15, 0.15, 0.1);
+		mSmokeN = new PartialParticle(Particle.SMOKE_NORMAL, mBoss.getLocation(), 1, 0.15, 0.15, 0.15, 0);
+		mWitch = new PartialParticle(Particle.SPELL_WITCH, mBoss.getLocation(), 1, 0.15, 0.15, 0.15, 0);
+		mSmokeL = new PartialParticle(Particle.SMOKE_LARGE, mBoss.getLocation(), 50, 0, 0, 0, 0.25);
+		mBreath = new PartialParticle(Particle.DRAGON_BREATH, mBoss.getLocation(), 160, 0, 0, 0, 0.25);
 	}
 
 	@Override
@@ -66,7 +78,7 @@ public class SpellGravityWell extends Spell {
 
 		}.runTaskLater(mPlugin, 20 * 30);
 		World world = mBoss.getWorld();
-		new PartialParticle(Particle.PORTAL, mBoss.getLocation(), 100, 0.1, 0.1, 0.1, 0.1).spawnAsBoss();
+		mPortal1.location(mBoss.getLocation()).spawnAsBoss();
 
 		PPGroundCircle indicator = new PPGroundCircle(Particle.REDSTONE, mBoss.getLocation(), 36, 0.01, 0.01, 0.01, 0, YELLOW).init(mRadius, true);
 		PPGroundCircle indicator2 = new PPGroundCircle(Particle.REDSTONE, mBoss.getLocation(), 36, 0.01, 0.01, 0.01, 0, RED).init(mRadius, true);
@@ -89,9 +101,9 @@ public class SpellGravityWell extends Spell {
 				for (int i = 0; i < 6; i++) {
 					double radian = Math.toRadians(mRotation + (60*i));
 					mLoc.add(FastUtils.cos(radian) * mRad, 0, FastUtils.sin(radian) * mRad);
-					new PartialParticle(Particle.SPELL_WITCH, mLoc, 1, 0.15, 0.15, 0.15, 0).spawnAsBoss();
-					new PartialParticle(Particle.PORTAL, mLoc, 2, 0.15, 0.15, 0.15, 0.1).spawnAsBoss();
-					new PartialParticle(Particle.SMOKE_NORMAL, mLoc, 1, 0.15, 0.15, 0.15, 0).spawnAsBoss();
+					mWitch.location(mLoc).spawnAsBoss();
+					mPortal2.location(mLoc).spawnAsBoss();
+					mSmokeN.location(mLoc).spawnAsBoss();
 					mLoc.subtract(FastUtils.cos(radian) * mRad, 0, FastUtils.sin(radian) * mRad);
 				}
 				if (mRad <= 0) {
@@ -103,8 +115,8 @@ public class SpellGravityWell extends Spell {
 					mChargeUp.setTitle(ChatColor.YELLOW + "Casting Gravity Well...");
 					mChargeUp.setColor(BarColor.RED);
 					world.playSound(mLoc, Sound.BLOCK_END_PORTAL_SPAWN, 2.0f, 2.0f);
-					new PartialParticle(Particle.SMOKE_LARGE, mBoss.getLocation(), 50, 0, 0, 0, 0.25).spawnAsBoss();
-					new PartialParticle(Particle.DRAGON_BREATH, mBoss.getLocation(), 160, 0, 0, 0, 0.25).spawnAsBoss();
+					mSmokeL.location(mBoss.getLocation()).spawnAsBoss();
+					mBreath.location(mBoss.getLocation()).spawnAsBoss();
 					BukkitRunnable runB = new BukkitRunnable() {
 						int mT = 0;
 						@Override
@@ -121,26 +133,11 @@ public class SpellGravityWell extends Spell {
 								if (mT % 15 == 0) {
 									Location clone = mLoc.clone();
 									Vector dir = LocationUtils.getDirectionTo(player.getLocation(), clone);
-									boolean pull = false;
-									for (int i = 0; i < 200; i++) {
-										clone.add(dir.clone().multiply(0.25));
 
-										if (clone.getBlock().getType().isSolid()) {
-											break;
-										}
-
-										if (clone.distance(player.getLocation()) < 0.75) {
-											pull = true;
-											break;
-										}
+									if (player.getLocation().distance(mLoc) > 4) {
+										BossUtils.bossDamage(mBoss, player, 20, null, "Gravity Well");
 									}
-
-									if (pull) {
-										if (player.getLocation().distance(mLoc) > 4) {
-											BossUtils.bossDamage(mBoss, player, 20, null, "Gravity Well");
-										}
-										player.setVelocity(dir.multiply(-0.85));
-									}
+									player.setVelocity(dir.multiply(-0.65));
 								}
 
 								if (mT % 10 == 0) {
@@ -155,9 +152,9 @@ public class SpellGravityWell extends Spell {
 							for (int i = 0; i < 6; i++) {
 								double radian = Math.toRadians(mRotation + (60*i));
 								mLoc.add(FastUtils.cos(radian) * mRad, 0, FastUtils.sin(radian) * mRad);
-								new PartialParticle(Particle.SPELL_WITCH, mLoc, 2, 0.15, 0.15, 0.15, 0).spawnAsBoss();
-								new PartialParticle(Particle.PORTAL, mLoc, 2, 0.15, 0.15, 0.15, 0.1).spawnAsBoss();
-								new PartialParticle(Particle.SMOKE_NORMAL, mLoc, 1, 0.15, 0.15, 0.15, 0).spawnAsBoss();
+								mWitch.location(mLoc).spawnAsBoss();
+								mPortal2.location(mLoc).spawnAsBoss();
+								mSmokeN.location(mLoc).spawnAsBoss();
 								mLoc.subtract(FastUtils.cos(radian) * mRad, 0, FastUtils.sin(radian) * mRad);
 							}
 							if (mRadius <= 0) {

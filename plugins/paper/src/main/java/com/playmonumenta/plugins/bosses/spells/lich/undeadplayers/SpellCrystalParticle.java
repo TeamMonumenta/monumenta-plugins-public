@@ -12,10 +12,14 @@ public class SpellCrystalParticle extends Spell {
 
 	private LivingEntity mBoss;
 	private Location mSpawnLoc;
+	private PartialParticle mSoul;
+	private PartialParticle mFlame;
 
 	public SpellCrystalParticle(LivingEntity boss, Location spawn) {
 		mBoss = boss;
 		mSpawnLoc = spawn;
+		mSoul = new PartialParticle(Particle.SOUL_FIRE_FLAME, mBoss.getLocation(), 1, 0, 0, 0, 0);
+		mFlame = new PartialParticle(Particle.FLAME, mBoss.getLocation(), 1, 0, 0, 0, 0);
 	}
 
 	@Override
@@ -27,13 +31,13 @@ public class SpellCrystalParticle extends Spell {
 			double c = FastUtils.cosDeg(deg);
 			double s = FastUtils.sinDeg(deg);
 			if (hp > 25) {
-				new PartialParticle(Particle.SOUL_FIRE_FLAME, pCenter.clone().add(2 * c, 0, 2 * s), 1, 0, 0, 0, 0).spawnAsEnemy();
-				new PartialParticle(Particle.SOUL_FIRE_FLAME, pCenter.clone().add(2 * c, 2 * s, 0), 1, 0, 0, 0, 0).spawnAsEnemy();
-				new PartialParticle(Particle.SOUL_FIRE_FLAME, pCenter.clone().add(0, 2 * s, 2 * c), 1, 0, 0, 0, 0).spawnAsEnemy();
+				mSoul.location(pCenter.clone().add(2 * c, 0, 2 * s)).spawnAsEnemy();
+				mSoul.location(pCenter.clone().add(2 * c, 2 * s, 0)).spawnAsEnemy();
+				mSoul.location(pCenter.clone().add(0, 2 * s, 2 * c)).spawnAsEnemy();
 			} else {
-				new PartialParticle(Particle.FLAME, pCenter.clone().add(2 * c, 0, 2 * s), 1, 0, 0, 0, 0).spawnAsEnemy();
-				new PartialParticle(Particle.FLAME, pCenter.clone().add(2 * c, 2 * s, 0), 1, 0, 0, 0, 0).spawnAsEnemy();
-				new PartialParticle(Particle.FLAME, pCenter.clone().add(0, 2 * s, 2 * c), 1, 0, 0, 0, 0).spawnAsEnemy();
+				mFlame.location(pCenter.clone().add(2 * c, 0, 2 * s)).spawnAsEnemy();
+				mFlame.location(pCenter.clone().add(2 * c, 2 * s, 0)).spawnAsEnemy();
+				mFlame.location(pCenter.clone().add(0, 2 * s, 2 * c)).spawnAsEnemy();
 			}
 		}
 	}

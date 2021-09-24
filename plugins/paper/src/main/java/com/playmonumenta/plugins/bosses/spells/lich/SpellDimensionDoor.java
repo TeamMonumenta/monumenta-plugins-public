@@ -80,6 +80,10 @@ public class SpellDimensionDoor extends Spell {
 		return mShadowed;
 	}
 
+	public static void clearShadowed() {
+		mShadowed.removeAll(mShadowed);
+	}
+
 	@Override
 	public void run() {
 		mT -= 5;
@@ -189,8 +193,10 @@ public class SpellDimensionDoor extends Spell {
 						locdown = mLoc.clone().subtract(0, 1, 0);
 					}
 
-					indicator.location(mLoc.clone().add(0, 1.1, 0)).spawnAsBoss();
-					indicator2.location(mLoc.clone().add(0, 1.1, 0)).spawnAsBoss();
+					if (mT <= 25) {
+						indicator.location(mLoc.clone().add(0, 1.1, 0)).spawnAsBoss();
+						indicator2.location(mLoc.clone().add(0, 1.1, 0)).spawnAsBoss();
+					}
 
 					//get blocks and replace
 					Location portalCenterLoc = mLoc.clone();
@@ -374,6 +380,7 @@ public class SpellDimensionDoor extends Spell {
 			@Override
 			public void run() {
 				mT -= 2;
+				p.spawnParticle(Particle.SPELL_WITCH, spectre.getEyeLocation(), 1, 0.1, 0.1, 0.1, 0);
 				double progress = mT * 1.0d / (20 * 20);
 				if (progress >= 0) {
 					bar.setProgress(progress);
@@ -401,7 +408,7 @@ public class SpellDimensionDoor extends Spell {
 					if (byPortal) {
 						p.teleport(leaveLoc);
 						p.addPotionEffect(new PotionEffect(PotionEffectType.CONFUSION, 20 * 5, 0));
-						p.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 20 * 5, 1));
+						p.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 20 * 5, 10));
 						p.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, 20 * 5, 0));
 						p.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, 20 * 5, 1));
 						p.sendMessage(ChatColor.AQUA + "Something feels different. The shadows aren't clinging to me anymore.");

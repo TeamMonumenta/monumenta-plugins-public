@@ -38,7 +38,7 @@ public class SpellRaiseDead extends Spell {
 		mCenter = loc;
 		mRange = detectRange;
 		mCeiling = ceil;
-		mChargeUp = new ChargeUpManager(mBoss, 100, ChatColor.YELLOW + "Channeling Raise Dead...", BarColor.RED, BarStyle.SOLID, 50);
+		mChargeUp = new ChargeUpManager(mBoss, 100, ChatColor.YELLOW + "Channeling Raise Dead...", BarColor.RED, BarStyle.SOLID, 200);
 	}
 
 	@Override
@@ -78,14 +78,14 @@ public class SpellRaiseDead extends Spell {
 				world.playSound(mBoss.getLocation(), Sound.ENTITY_EVOKER_PREPARE_WOLOLO, 10, 0.75f);
 				world.playSound(mBoss.getLocation(), Sound.ENTITY_ILLUSIONER_PREPARE_MIRROR, 10, 1f);
 				new PartialParticle(Particle.EXPLOSION_NORMAL, mBoss.getLocation(), 50, 0.5, 0.25, 0.5, 0).spawnAsBoss();
-				mChargeUp.setChargeTime((int) a);
 				BukkitRunnable runB = new BukkitRunnable() {
 					int mT = 0;
 
 					@Override
 					public void run() {
 						mT++;
-						mChargeUp.nextTick();
+						double progress = Math.min(1.0, mT / a);
+						mChargeUp.setProgress(progress);
 						riseUndead(getRandomCenteration(mCenter, 39), mPlugin);
 						if (mT >= a || Lich.phase3over()) {
 							this.cancel();
@@ -126,15 +126,17 @@ public class SpellRaiseDead extends Spell {
 		}
 
 		String s = summon;
+		PartialParticle dust1 = new PartialParticle(Particle.BLOCK_DUST, loc, 1, 0.4, 0.1, 0.4, 0.25, Material.DIRT.createBlockData());
+		PartialParticle dust2 = new PartialParticle(Particle.BLOCK_DUST, loc, 16, 0.25, 0.1, 0.25, 0.25, Material.DIRT.createBlockData());
 		new BukkitRunnable() {
 			int mINC = 0;
 			@Override
 			public void run() {
 				mINC += 2;
-				new PartialParticle(Particle.BLOCK_DUST, loc, 1, 0.4, 0.1, 0.4, 0.25, Material.DIRT.createBlockData()).spawnAsBoss();
+				dust1.spawnAsBoss();
 				if (mINC >= 20) {
 					loc.getWorld().playSound(loc, Sound.BLOCK_GRAVEL_BREAK, 1, 1f);
-					new PartialParticle(Particle.BLOCK_DUST, loc, 16, 0.25, 0.1, 0.25, 0.25, Material.DIRT.createBlockData()).spawnAsBoss();
+					dust2.spawnAsBoss();
 					LibraryOfSoulsIntegration.summon(loc, s);
 					this.cancel();
 				}

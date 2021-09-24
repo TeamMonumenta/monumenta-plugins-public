@@ -167,7 +167,7 @@ public class SpellLichSinisterReach extends Spell {
 				}
 				mInc++;
 
-				if (mInc < 20 && mInc % 2 == 0) {
+				if (mInc < 24 && mInc % 2 == 0) {
 					p.setNoDamageTicks(0);
 					world.spawnParticle(Particle.CRIT_MAGIC, p.getLocation(), 15, 0.1, 0.1, 0.1, 0.75);
 					BossUtils.bossDamagePercent(mBoss, p, 1.0, mBoss.getLocation(), true, "Sinister Reach");

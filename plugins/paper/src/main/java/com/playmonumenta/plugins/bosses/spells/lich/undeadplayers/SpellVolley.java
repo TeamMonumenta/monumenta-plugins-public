@@ -28,10 +28,12 @@ public class SpellVolley extends Spell {
 
 	private Plugin mPlugin;
 	private LivingEntity mBoss;
+	private PartialParticle mSpark;
 
 	public SpellVolley(Plugin plugin, LivingEntity boss) {
 		mPlugin = plugin;
 		mBoss = boss;
+		mSpark = new PartialParticle(Particle.FIREWORKS_SPARK, mBoss.getLocation(), 1, 0.1, 0.1, 0.1, 0);
 	}
 
 	@Override
@@ -59,7 +61,7 @@ public class SpellVolley extends Spell {
 						@Override
 						public void run() {
 							// spawn particle
-							new PartialParticle(Particle.FIREWORKS_SPARK, projArrow.getLocation(), 1, 0.1, 0.1, 0.1, 0).spawnAsEnemy();
+							mSpark.location(projArrow.getLocation()).spawnAsEnemy();
 
 							if (projArrow.isInBlock() || !projArrow.isValid()) {
 								this.cancel();

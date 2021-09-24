@@ -37,12 +37,18 @@ public class SpellFinalHeatMech extends Spell {
 	private boolean mTrigger = false;
 	private boolean mDamage;
 	private List<Player> mPlayers = new ArrayList<Player>();
+	private PartialParticle mFlame;
+	private PartialParticle mDmg;
+	private PartialParticle mExpL;
 
 	public SpellFinalHeatMech(Plugin plugin, LivingEntity boss, Location loc, double range) {
 		mPlugin = plugin;
 		mBoss = boss;
 		mCenter = loc;
 		mRange = range;
+		mFlame = new PartialParticle(Particle.FLAME, mBoss.getLocation(), 2, 0.25, .25, .25, 0.025);
+		mDmg = new PartialParticle(Particle.DAMAGE_INDICATOR, mBoss.getLocation(), 4, 10, 1, 10, 0);
+		mExpL = new PartialParticle(Particle.EXPLOSION_LARGE, mBoss.getLocation(), 200, 10, 1, 10, 0);
 	}
 
 	@Override
@@ -121,8 +127,8 @@ public class SpellFinalHeatMech extends Spell {
 					@Override
 					public void run() {
 						Location l = fallingBlock.getLocation();
-						new PartialParticle(Particle.FLAME, l, 2, 0.25, .25, .25, 0.025).spawnAsBoss();
-						new PartialParticle(Particle.DAMAGE_INDICATOR, mCenter.clone().add(0, 5.5, 0), 4, 10, 1, 10, 0).spawnAsBoss();
+						mFlame.location(l).spawnAsBoss();
+						mDmg.location(mCenter.clone().add(0, 5.5, 0)).spawnAsBoss();
 						if (fallingBlock.isOnGround() || !fallingBlock.isValid()) {
 							this.cancel();
 							fallingBlock.remove();
@@ -153,12 +159,12 @@ public class SpellFinalHeatMech extends Spell {
 			List<Player> players = Lich.playersInRange(mCenter, mRange, true);
 			for (Player p : players) {
 				if (p.getBoundingBox().overlaps(box)) {
-					BossUtils.bossDamage(mBoss, p, 75, null, "Malakut's Dynamo");
+					BossUtils.bossDamagePercent(mBoss, p, 1, null, "Malakut's Dynamo");
 					MovementUtils.knockAway(mBoss, p, 0.5f);
 					p.setFireTicks(100);
 				}
 			}
-			new PartialParticle(Particle.EXPLOSION_LARGE, loc, 200, 10, 1, 10, 0).spawnAsBoss();
+			mExpL.location(loc).spawnAsBoss();
 		}
 	}
 

@@ -34,6 +34,7 @@ import org.bukkit.entity.EnderCrystal;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.FallingBlock;
+import org.bukkit.entity.Ghast;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
@@ -101,6 +102,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
 public class Lich extends BossAbilityGroup {
 	public static final String identityTag = "boss_lich";
 	public static final int detectionRange = 55;
+	public static final int mShieldMin = 5;
 	private static int mCeiling = 35;
 	private int mCounter = 0;
 
@@ -117,7 +119,6 @@ public class Lich extends BossAbilityGroup {
 	private double mY = 14.5;
 	private double mS = 8.5;
 	private int mPhase;
-	private static int mShieldMin = 8;
 	private Collection<EnderCrystal> mCrystal = new ArrayList<EnderCrystal>();
 	private List<Location> mCrystalLoc = new ArrayList<Location>();
 	private List<Location> mPassive2Loc = new ArrayList<Location>();
@@ -134,6 +135,7 @@ public class Lich extends BossAbilityGroup {
 	private boolean mDefeated = false;
 	private boolean mCutscene = false;
 	private static boolean mDead = false;
+	private static boolean mPhaseCD = false;
 
 	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
 		return SerializationUtils.statefulBossDeserializer(boss, identityTag, (spawnLoc, endLoc) -> {
@@ -269,6 +271,7 @@ public class Lich extends BossAbilityGroup {
 						p.sendMessage(ChatColor.LIGHT_PURPLE + "WHAT IS THIS... PAIN? I HAVE NOT FELT PAIN IN ETERNITY...");
 					}
 				}
+
 				if (mActivated || mBoss.isDead() || !mBoss.isValid()) {
 					this.cancel();
 					if (mKey.isValid()) {
@@ -283,6 +286,37 @@ public class Lich extends BossAbilityGroup {
 			}
 
 		}.runTaskTimer(mPlugin, 20 * 23, 5);
+
+		new BukkitRunnable() {
+
+			@Override
+			public void run() {
+				// invuln crystals if ghast is present
+				for (Location loc : mCrystalLoc) {
+					Collection<EnderCrystal> c = loc.getNearbyEntitiesByType(EnderCrystal.class, 3);
+					if (c.size() > 0) {
+						Collection<Ghast> g = loc.getNearbyEntitiesByType(Ghast.class, 3);
+						if (g.size() > 0) {
+							for (EnderCrystal e : c) {
+								e.setInvulnerable(true);
+							}
+						} else {
+							for (EnderCrystal e : c) {
+								e.setInvulnerable(false);
+							}
+						}
+					}
+				}
+
+				if (mActivated || mBoss.isDead() || !mBoss.isValid()) {
+					this.cancel();
+					if (mKey != null && mKey.isValid()) {
+						mKey.remove();
+					}
+				}
+			}
+
+		}.runTaskTimer(mPlugin, 0, 2);
 
 		/*
 		 * Active starts here
@@ -360,6 +394,7 @@ public class Lich extends BossAbilityGroup {
 		});
 
 		events.put(66, mBoss -> {
+			mPhaseCD = true;
 			changePhase(null, null, null);
 			mCutscene = true;
 			World world = mBoss.getWorld();
@@ -457,10 +492,9 @@ public class Lich extends BossAbilityGroup {
 												2, 2, 2, 0);
 										world.playSound(endLoc, Sound.ENTITY_GENERIC_EXPLODE, 2.5f, 1.0f);
 										// spawn the crystal for holy chest
-										LibraryOfSoulsIntegration.summon(endLoc, mShieldCrystal);
-										if (playersInRange(mStart.getLocation(), detectionRange, true).size() >= mShieldMin) {
-											LibraryOfSoulsIntegration.summon(endLoc.clone().subtract(0, 1, 0), mCrystalShield);
-										}
+										List<Location> loc = new ArrayList<Location>();
+										loc.add(endLoc);
+										spawnCrystal(loc, 1, mShieldCrystal);
 										this.cancel();
 									}
 									mInc++;
@@ -483,6 +517,16 @@ public class Lich extends BossAbilityGroup {
 						mBoss.setAI(true);
 						mBoss.setGravity(true);
 						changePhase(phase2Spells, phase2PassiveSpells, null);
+
+						//disallow dies irae instant cast
+						new BukkitRunnable() {
+
+							@Override
+							public void run() {
+								mPhaseCD = false;
+							}
+
+						}.runTaskLater(mPlugin, 5 * 20);
 					}
 				}
 			}.runTaskTimer(mPlugin, 0, 1);
@@ -495,6 +539,7 @@ public class Lich extends BossAbilityGroup {
 		});
 
 		events.put(33, mBoss -> {
+			mPhaseCD = true;
 			changePhase(null, null, null);
 			mCutscene = true;
 			World world = mBoss.getWorld();
@@ -631,6 +676,16 @@ public class Lich extends BossAbilityGroup {
 						changePhase(phase3Spells, phase3PassiveSpells, null);
 						mCutscene = false;
 						this.cancel();
+
+						//disallow dies irae instant cast
+						new BukkitRunnable() {
+
+							@Override
+							public void run() {
+								mPhaseCD = false;
+							}
+
+						}.runTaskLater(mPlugin, 5 * 20);
 					}
 					mT++;
 				}
@@ -908,7 +963,7 @@ public class Lich extends BossAbilityGroup {
 					forceCastSpell(SpellDarkOmen.class);
 					forceCastSpell(SpellSoulShackle.class);
 					forceCastSpell(SpellRaiseDead.class);
-					spawnCrystal(mCrystalLoc, 5, mShieldCrystal);
+					spawnCrystal(mCrystalLoc, 4, mShieldCrystal);
 					for (Player p : playersInRange(mStart.getLocation(), detectionRange, true)) {
 						p.sendMessage(ChatColor.LIGHT_PURPLE + "YOUR HASTE WILL BE YOUR DOWNFALL.");
 					}
@@ -1201,7 +1256,10 @@ public class Lich extends BossAbilityGroup {
 	}
 
 	public static void cursePlayer(Plugin plugin, Player p, int time) {
-		mCursed.add(p);
+		//don't add repeat instances of cursed players
+		if (!mCursed.contains(p)) {
+			mCursed.add(p);
+		}
 		p.playSound(p.getLocation(), Sound.ENTITY_ELDER_GUARDIAN_CURSE, 1.0f, 0.5f);
 		AbilityUtils.increaseHealingPlayer(p, 20 * time, -0.5, "CurseEffect");
 		AbilityUtils.increaseDamageRecievedPlayer(p, 20 * time, 1.0, "CurseEffect");
@@ -1237,6 +1295,10 @@ public class Lich extends BossAbilityGroup {
 
 	public static void bossGotHit(boolean gothit) {
 		mGotHit = gothit;
+	}
+
+	public static boolean getCD() {
+		return mPhaseCD;
 	}
 
 	private void die() {
@@ -1283,7 +1345,7 @@ public class Lich extends BossAbilityGroup {
 		mBoss.removePotionEffect(PotionEffectType.GLOWING);
 		mBoss.setHealth(0.1);
 		mBoss.setInvulnerable(true);
-		mBoss.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 20 * 10, 10));
+		mBoss.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 20 * 60, 10));
 		mBoss.setAI(false);
 		changePhase(null, null, null);
 		World world = mBoss.getWorld();
@@ -1324,7 +1386,7 @@ public class Lich extends BossAbilityGroup {
 				mBoss.setAI(false);
 				mBoss.setSilent(true);
 				mBoss.setInvulnerable(true);
-				mBoss.teleport(mStart.getLocation().subtract(0, 50, 0));
+				mBoss.teleport(mStart.getLocation().subtract(0, detectionRange + 5, 0));
 				List<LivingEntity> en = EntityUtils.getNearbyMobs(mStart.getLocation(), detectionRange);
 				en.removeIf(e -> e.getType() == EntityType.ARMOR_STAND);
 				en.removeIf(e -> e.getScoreboardTags().contains(identityTag));
@@ -1580,6 +1642,7 @@ public class Lich extends BossAbilityGroup {
 		mTowerGroup.add(mTower1);
 		mTowerGroup.add(mTower2);
 		mTowerGroup.add(mTower3);
+		List<Player> remaining = playersInRange(mStart.getLocation(), detectionRange, true);
 
 		new BukkitRunnable() {
 			int mT = 0;
@@ -1668,8 +1731,8 @@ public class Lich extends BossAbilityGroup {
 					int chat = (int) timelimit;
 					timer.setTitle(ChatColor.YELLOW + "Soul dissipating in " + (chat - mT) / 20 + " seconds!");
 				}
-				for (Player player : playersInRange(mStart.getLocation(), detectionRange, true)) {
-					if (player.getLocation().getY() > Lich.getLichSpawn().getY() + 20) {
+				for (Player player : remaining) {
+					if (!playersInRange(mStart.getLocation(), detectionRange, true).contains(player)) {
 						timer.removePlayer(player);
 					} else {
 						timer.addPlayer(player);
@@ -1680,6 +1743,7 @@ public class Lich extends BossAbilityGroup {
 						BossUtils.bossDamagePercent(mBoss, player, 0.1);
 					}
 				}
+				remaining.removeIf(p -> !playersInRange(mStart.getLocation(), detectionRange, true).contains(p));
 
 				//Psychological bell ringing
 				int bellCD = 4 * 20;
@@ -1792,6 +1856,13 @@ public class Lich extends BossAbilityGroup {
 	}
 
 	private void finalAnimation(FallingBlock block) {
+		// invuln players
+		List<Player> players = playersInRange(mStart.getLocation(), detectionRange, true);
+		for (Player player : players) {
+			player.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 20 * 40, 10));
+			player.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, 20 * 40, 2));
+		}
+
 		new BukkitRunnable() {
 
 			@Override
@@ -1816,6 +1887,7 @@ public class Lich extends BossAbilityGroup {
 					crystals.addAll(l.getNearbyEntitiesByType(EnderCrystal.class, 10));
 				}
 				for (EnderCrystal ec : crystals) {
+					ec.setInvulnerable(true);
 					ec.setBeamTarget(mBoss.getLocation().add(0, 2, 0));
 					world.playSound(ec.getLocation(), Sound.BLOCK_BEACON_ACTIVATE, SoundCategory.HOSTILE, 5, 0.85f);
 				}
@@ -1847,13 +1919,7 @@ public class Lich extends BossAbilityGroup {
 							world.playSound(mBoss.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE,
 									15, 0.8f);
 							world.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_SKELETON_DEATH, 15, 0.75f);
-							// invuln players
-							List<Player> players = playersInRange(mStart.getLocation(), detectionRange, true);
-							for (Player player : players) {
-								player.removePotionEffect(PotionEffectType.DAMAGE_RESISTANCE);
-								player.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 20 * 40, 10));
-								player.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, 20 * 40, 1));
-							}
+
 							// Lich BEGONE
 							mBoss.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, 20 * 1000, 0));
 							mBoss.setAI(false);
@@ -1957,7 +2023,7 @@ public class Lich extends BossAbilityGroup {
 										}
 										mEndLoc.getBlock().setType(Material.REDSTONE_BLOCK);
 
-										for (Player player : players) {
+										for (Player player : playersInRange(mStart.getLocation(), detectionRange, true)) {
 											player.removePotionEffect(PotionEffectType.DAMAGE_RESISTANCE);
 											player.removePotionEffect(PotionEffectType.REGENERATION);
 											if (player.getGameMode() != GameMode.CREATIVE) {

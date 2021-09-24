@@ -43,11 +43,17 @@ public class SpellSalientOfDecay extends Spell {
 	private int mCap = 12;
 	private ChargeUpManager mChargeUp;
 	private int mTell = 40;
+	private PartialParticle mDust;
+	private PartialParticle mSmoke;
+	private PartialParticle mWitch;
 
 	public SpellSalientOfDecay(Plugin plugin, LivingEntity boss) {
 		mPlugin = plugin;
 		mBoss = boss;
 		mChargeUp = new ChargeUpManager(mBoss, mTell, ChatColor.YELLOW + "Channeling Salient of Decay...", BarColor.RED, BarStyle.SOLID, 50);
+		mDust = new PartialParticle(Particle.REDSTONE, mBoss.getLocation(), 1, 0.25, 0.25, 0.25, 0, SALIENT_OF_DECAY_COLOR);
+		mSmoke = new PartialParticle(Particle.SMOKE_NORMAL, mBoss.getLocation(), 1, 0.25, 0.25, 0.25, 0.25);
+		mWitch = new PartialParticle(Particle.SPELL_WITCH, mBoss.getLocation(), 2, 0.25, 0.25, 0.25, 1);
 	}
 
 	@Override
@@ -97,18 +103,18 @@ public class SpellSalientOfDecay extends Spell {
 					Location loc = mBoss.getLocation().add(0, 1.25, 0);
 					for (int i = 0; i < 40; i++) {
 						loc.add(mDir.clone().multiply(0.75));
-						new PartialParticle(Particle.REDSTONE, loc, 1, 0.25, 0.25, 0.25, 0, SALIENT_OF_DECAY_COLOR).spawnAsBoss();
+						mDust.location(loc).spawnAsBoss();
 					}
 
 					if (Lich.phase3over()) {
 						this.cancel();
 					} else if (mT >= mTell) {
-						BoundingBox box = BoundingBox.of(mBoss.getLocation(), 0.75, 0.75, 0.75);
+						BoundingBox box = BoundingBox.of(mBoss.getLocation().add(0, 1.25, 0), 0.75, 0.75, 0.75);
 						for (int i = 0; i < 40; i++) {
 							box.shift(mDir.clone().multiply(0.75));
 							Location bLoc = box.getCenter().toLocation(world);
-							new PartialParticle(Particle.SPELL_WITCH, bLoc, 2, 0.25, 0.25, 0.25, 1).spawnAsBoss();
-							new PartialParticle(Particle.SMOKE_NORMAL, bLoc, 1, 0.25, 0.25, 0.25, 0.25).spawnAsBoss();
+							mWitch.location(bLoc).spawnAsBoss();
+							mSmoke.location(bLoc).spawnAsBoss();
 							Iterator<Player> it = players.iterator();
 							while (it.hasNext()) {
 								Player p = it.next();
