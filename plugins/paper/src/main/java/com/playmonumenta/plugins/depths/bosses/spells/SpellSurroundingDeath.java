@@ -87,12 +87,12 @@ public class SpellSurroundingDeath extends Spell {
 
 				//Spawn particles
 				if (mT == 5 || mT == 15) {
-					for (double deg = 0; deg < 360; deg += 2) {
+					for (double deg = 0; deg < 360; deg += 3) {
 						double cos = FastUtils.cosDeg(deg);
 						double sin = FastUtils.sinDeg(deg);
 
 						for (int x = innerRadius; x < outerRadius; x++) {
-							world.spawnParticle(Particle.SPELL_WITCH, mStartLoc.clone().add(cos * x, 0, sin * x), 1, 0.15, 0.15, 0.15, 0);
+							world.spawnParticle(Particle.SPELL_WITCH, mStartLoc.clone().add(cos * x, 0, sin * x), 1, 0.1, 0.1, 0.1, 0);
 						}
 					}
 				}
@@ -107,9 +107,9 @@ public class SpellSurroundingDeath extends Spell {
 					world.playSound(mStartLoc, Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, 10.5f, 1);
 
 					//Increments the x counter based on how large the circle is
-					int inc = 2;
+					int inc = 3;
 					if (innerRadius == 0) {
-						inc += 8;
+						inc += 9;
 					}
 
 					for (double deg = 0; deg < 360; deg += inc * 2) {

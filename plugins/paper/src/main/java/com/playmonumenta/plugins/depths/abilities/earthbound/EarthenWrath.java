@@ -125,9 +125,10 @@ public class EarthenWrath extends DepthsAbility {
 		}.runTaskTimer(mPlugin, 0, 1);
 	}
 
-	public void damagedEntity(Player player, EntityDamageByEntityEvent event) {
+	//Returns true if the damage was absorbed
+	public boolean damagedEntity(Player player, EntityDamageByEntityEvent event) {
 		if (AbilityUtils.isBlocked(event)) {
-			return;
+			return false;
 		}
 
 		Entity damager = event.getDamager();
@@ -141,7 +142,7 @@ public class EarthenWrath extends DepthsAbility {
 			}
 		}
 		if (realDamager == null) {
-			return;
+			return false;
 		}
 
 		DepthsPlayer dp = DepthsManager.getInstance().mPlayers.get(player.getUniqueId());
@@ -150,10 +151,11 @@ public class EarthenWrath extends DepthsAbility {
 			EarthenWrath otherWrath = AbilityManager.getManager().getPlayerAbility(player, EarthenWrath.class);
 			if (otherWrath != null) {
 				if (otherWrath.mAbsorbDamage) {
-					return;
+					return false;
 				}
 			}
 		}
+
 		if (mAbsorbDamage && !player.equals(mPlayer)) {
 			mDamageAbsorbed += event.getDamage();
 
@@ -176,7 +178,9 @@ public class EarthenWrath extends DepthsAbility {
 			}
 
 			event.setDamage(0);
+			return true;
 		}
+		return false;
 	}
 
 	@Override

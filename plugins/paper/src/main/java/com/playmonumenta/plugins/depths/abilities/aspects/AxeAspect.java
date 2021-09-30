@@ -13,7 +13,7 @@ import com.playmonumenta.plugins.utils.InventoryUtils;
 public class AxeAspect extends WeaponAspectDepthsAbility {
 
 	public static final String ABILITY_NAME = "Aspect of the Axe";
-	public static final double DAMAGE = 1.0;
+	public static final int DAMAGE = 1;
 	public static final double ATTACK_SPEED = 0.15;
 
 	public AxeAspect(Plugin plugin, Player player) {
@@ -41,7 +41,7 @@ public class AxeAspect extends WeaponAspectDepthsAbility {
 
 	@Override
 	public String getDescription(int rarity) {
-		return "You deal 1 extra damage with axe attacks and gain 15% attack speed.";
+		return "You deal " + DAMAGE + " extra damage with axe attacks and gain 15% attack speed.";
 	}
 }
 

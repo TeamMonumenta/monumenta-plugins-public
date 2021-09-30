@@ -244,12 +244,10 @@ public class AbilityUtils {
 
 	public static void refundArrow(Player player, AbstractArrow arrow) {
 		ItemStack mainHand = player.getInventory().getItemInMainHand();
-		ItemStack offHand = player.getInventory().getItemInOffHand();
 		//Only refund arrow once
 		if (MetadataUtils.checkOnceThisTick(Plugin.getInstance(), player, ARROW_REFUNDED_METAKEY)) {
-			if (ItemUtils.isSomeBow(mainHand) || ItemUtils.isSomeBow(offHand)) {
-				int infLevel = Math.max(mainHand.getEnchantmentLevel(Enchantment.ARROW_INFINITE), offHand.getEnchantmentLevel(Enchantment.ARROW_INFINITE));
-				if (infLevel == 0) {
+			if (ItemUtils.isSomeBow(mainHand)) {
+				if (!mainHand.containsEnchantment(Enchantment.ARROW_INFINITE)) {
 					arrow.setPickupStatus(Arrow.PickupStatus.ALLOWED);
 					Inventory playerInv = player.getInventory();
 					int firstArrow = playerInv.first(Material.ARROW);
@@ -287,17 +285,16 @@ public class AbilityUtils {
 		}
 	}
 
-	public static void refundPotion(Player player, ThrownPotion potion) {
+	public static boolean refundPotion(Player player, ThrownPotion potion) {
 		ItemStack mainHand = player.getInventory().getItemInMainHand();
-		ItemStack offHand = player.getInventory().getItemInOffHand();
 		if (MetadataUtils.checkOnceThisTick(Plugin.getInstance(), player, POTION_REFUNDED_METAKEY)) {
 			ItemStack item = potion.getItem();
-			if (mainHand != null && mainHand.isSimilar(item)) {
+			if (mainHand != null && mainHand.isSimilar(item) && !mainHand.containsEnchantment(Enchantment.ARROW_INFINITE)) {
 				mainHand.setAmount(mainHand.getAmount() + 1);
-			} else if (offHand != null && offHand.isSimilar(item)) {
-				offHand.setAmount(offHand.getAmount() + 1);
+				return true;
 			}
 		}
+		return false;
 	}
 
 	public static String getClass(Player player) {

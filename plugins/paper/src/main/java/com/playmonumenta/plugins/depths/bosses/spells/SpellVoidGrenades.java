@@ -118,7 +118,7 @@ public class SpellVoidGrenades extends Spell {
 
 						Location alternateHeight = loc.clone();
 						alternateHeight.setY(loc.getY() + 0.5);
-						PartialParticle marker1 = new PartialParticle(Particle.SOUL, alternateHeight, 10, 1, 0.15, 1, 0.025);
+						PartialParticle marker1 = new PartialParticle(Particle.SOUL, alternateHeight, 4, 1, 0.15, 1, 0.025);
 						PartialParticle marker2 = new PartialParticle(Particle.REDSTONE, alternateHeight, 10, 1, 0.15, BLACK_COLOR);
 						PPGroundCircle circle = new PPGroundCircle(Particle.REDSTONE, alternateHeight, 15, 0, 0, 0, 0, DARK_PURPLE_COLOR);
 						circle.radius(3);

@@ -62,13 +62,13 @@ public class SpellAbyssalSpawnPassive extends Spell {
 				((Mob) vex).setTarget(EntityUtils.getNearestPlayer(vex.getLocation(), 30));
 			}
 
-			Location mLoc = vex.getLocation();
-			World mWorld = vex.getWorld();
+			Location loc = vex.getLocation();
+			World world = vex.getWorld();
 
 			for (double deg = 0; deg < 360; deg += 6) {
-				mWorld.spawnParticle(Particle.DOLPHIN, mLoc.clone().add(2 * FastUtils.cos(deg), 0, 2 * FastUtils.sin(deg)), 1, 0, 0, 0, 0);
-				mWorld.spawnParticle(Particle.DOLPHIN, mLoc.clone().add(2 * FastUtils.cos(deg), 2 * FastUtils.sin(deg), 0), 1, 0, 0, 0, 0);
-				mWorld.spawnParticle(Particle.DOLPHIN, mLoc.clone().add(0, 2 * FastUtils.sin(deg), 2 * FastUtils.cos(deg)), 1, 0, 0, 0, 0);
+				world.spawnParticle(Particle.DOLPHIN, loc.clone().add(2 * FastUtils.cosDeg(deg), 0, 2 * FastUtils.sinDeg(deg)), 1, 0, 0, 0, 0);
+				world.spawnParticle(Particle.DOLPHIN, loc.clone().add(2 * FastUtils.cosDeg(deg), 2 * FastUtils.sinDeg(deg), 0), 1, 0, 0, 0, 0);
+				world.spawnParticle(Particle.DOLPHIN, loc.clone().add(0, 2 * FastUtils.sinDeg(deg), 2 * FastUtils.cosDeg(deg)), 1, 0, 0, 0, 0);
 			}
 
 			if (mTicks % 20 == 0) {

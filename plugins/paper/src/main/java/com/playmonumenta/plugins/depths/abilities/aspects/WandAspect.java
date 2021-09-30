@@ -14,7 +14,7 @@ import com.playmonumenta.plugins.utils.InventoryUtils;
 public class WandAspect extends WeaponAspectDepthsAbility {
 
 	public static final String ABILITY_NAME = "Aspect of the Wand";
-	public static final double DAMAGE = 1.0;
+	public static final int DAMAGE = 1;
 	public static final double SPELL_MOD = 0.25;
 
 	public WandAspect(Plugin plugin, Player player) {
@@ -48,7 +48,7 @@ public class WandAspect extends WeaponAspectDepthsAbility {
 
 	@Override
 	public String getDescription(int rarity) {
-		return "You deal " + DAMAGE + " extra damage with wand attacks, and all abilities casted with a wand benefit from " + SPELL_MOD * 100 + "% of the wands spell power.";
+		return "You deal " + DAMAGE + " extra damage with wand attacks, and all abilities casted with a wand benefit from " + (int) (SPELL_MOD * 100) + "% of the wands spell power.";
 	}
 }
 

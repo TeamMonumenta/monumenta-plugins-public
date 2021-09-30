@@ -97,20 +97,20 @@ public class SpellRisingTides extends Spell {
 					} else {
 						world.playSound(mStartLoc, Sound.ITEM_FIRECHARGE_USE, 10, 2.0f - dPitch);
 					}
-					for (double deg = 0; deg < 360; deg += 4) {
+					for (double deg = 0; deg < 360; deg += 6) {
 						double cos = FastUtils.cosDeg(deg);
 						double sin = FastUtils.sinDeg(deg);
 
-						for (int x = 1; x <= 30; x += 1) {
+						for (double x = 1; x <= 30; x += 1.25) {
 							Location loc = mStartLoc.clone().add(cos * x, 0, sin * x);
 							for (Player player : players) {
 								double dist = player.getLocation().distance(loc);
 
 								if (dist < 10 || x % 4 == 0) {
 									if (tide) {
-										player.spawnParticle(Particle.REDSTONE, loc.add(0, -.5 + (dPitch / 2), 0), 1, 0.15, 0.15, 0.15, UP_COLOR);
+										player.spawnParticle(Particle.REDSTONE, loc.add(0, -.5 + (dPitch / 2), 0), 1, 0.1, 0.05, 0.1, UP_COLOR);
 									} else {
-										player.spawnParticle(Particle.REDSTONE, loc.add(0, 2.5 - (dPitch / 2), 0), 1, 0.15, 0.15, 0.15, DOWN_COLOR);
+										player.spawnParticle(Particle.REDSTONE, loc.add(0, 2.5 - (dPitch / 2), 0), 1, 0.1, 0.05, 0.1, DOWN_COLOR);
 									}
 								}
 							}
@@ -126,12 +126,12 @@ public class SpellRisingTides extends Spell {
 						double cos = FastUtils.cosDeg(deg);
 						double sin = FastUtils.sinDeg(deg);
 
-						for (int x = 1; x <= 30; x += 1) {
+						for (int x = 4; x <= 30; x += 8) {
 							Location loc = mStartLoc.clone().add(cos * x, 0, sin * x);
 							for (Player player : players) {
 								double dist = player.getLocation().distance(loc);
 
-								if (dist < 10 || x % 8 == 0) {
+								if (dist < 10) {
 									if (tide) {
 										player.spawnParticle(Particle.SMOKE_NORMAL, loc.add(0, -.5, 0), 1, 0.15, 0.15, 0.15, 0);
 

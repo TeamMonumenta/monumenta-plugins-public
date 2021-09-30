@@ -202,6 +202,7 @@ public class PotionConsumeListener implements Listener {
 						if (mPotionsConsumed.get(player.getUniqueId()) != null &&
 							!mPotionsConsumed.get(player.getUniqueId()).containsEnchantment(Enchantment.ARROW_INFINITE) &&
 							NonClericProvisionsPassive.testRandomChance(player)) {
+							NonClericProvisionsPassive.sacredProvisionsSound(player);
 
 							Inventory inv = event.getClickedInventory();
 							int slot = event.getSlot();
@@ -305,9 +306,10 @@ public class PotionConsumeListener implements Listener {
 		//Create item as type splash or lingering and set entity item to the inv potion
 		ThrownPotion potion = (ThrownPotion) player.getWorld().spawnEntity(player.getLocation(), EntityType.SPLASH_POTION);
 		potion.setItem(item);
-		potion.setShooter(player);
 		ProjectileLaunchEvent newEvent = new ProjectileLaunchEvent(potion);
 		Bukkit.getPluginManager().callEvent(newEvent);
+		//Set shooter AFTER the event is called so that Sacred Provisions does not trigger twice - this leads to a dupe exploit
+		potion.setShooter(player);
 		if (newEvent.isCancelled()) {
 			potion.remove();
 			return;
@@ -325,6 +327,7 @@ public class PotionConsumeListener implements Listener {
 		//If Sacred Provisions check passes, do not consume
 		if (NonClericProvisionsPassive.testRandomChance(player)) {
 			event.setCancelled(true);
+			NonClericProvisionsPassive.sacredProvisionsSound(player);
 			return;
 		}
 

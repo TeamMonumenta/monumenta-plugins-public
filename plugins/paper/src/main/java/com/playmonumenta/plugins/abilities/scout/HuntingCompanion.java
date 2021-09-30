@@ -120,7 +120,7 @@ public class HuntingCompanion extends Ability {
 			mFox.addScoreboardTag(FOX_TAG);
 
 			// Damage calculation - include Base Proj Attr, Focus, Teammate buffs (Blessing/Thurible), and Sharpshooter
-			double damage = EntityUtils.getProjSkillDamage(mPlayer, mPlugin) * mDamage;
+			double damage = EntityUtils.getProjSkillDamage(mPlayer, mPlugin, false, null) * mDamage;
 
 			mFox.getAttribute(Attribute.GENERIC_ATTACK_DAMAGE).setBaseValue(damage);
 
@@ -153,9 +153,9 @@ public class HuntingCompanion extends Ability {
 							Location foxLoc = mFox.getLocation();
 
 							world.playSound(foxLoc, Sound.ENTITY_FOX_SNIFF, 1.5f, 1.0f);
-							world.playSound(loc, Sound.ENTITY_FOX_AMBIENT, 1.5f, 0.8f);
-							world.playSound(loc, Sound.ENTITY_FOX_AMBIENT, 1.5f, 1.0f);
-							world.playSound(loc, Sound.ENTITY_FOX_AMBIENT, 1.5f, 1.2f);
+							world.playSound(foxLoc, Sound.ENTITY_FOX_AMBIENT, 1.5f, 0.8f);
+							world.playSound(foxLoc, Sound.ENTITY_FOX_AMBIENT, 1.5f, 1.0f);
+							world.playSound(foxLoc, Sound.ENTITY_FOX_AMBIENT, 1.5f, 1.2f);
 							world.spawnParticle(Particle.SMOKE_NORMAL, foxLoc, 20);
 						}
 						if (!(mTarget == null)) {

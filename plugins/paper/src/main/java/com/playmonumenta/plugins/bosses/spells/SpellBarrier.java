@@ -81,7 +81,8 @@ public class SpellBarrier extends Spell {
 			return;
 		}
 
-		mTimer--;
+		//Activates once every 5 ticks
+		mTimer -= 5;
 		if (!mActive && mTimer <= 0) {
 			mTimer = mRechargeTime;
 			mActive = true;

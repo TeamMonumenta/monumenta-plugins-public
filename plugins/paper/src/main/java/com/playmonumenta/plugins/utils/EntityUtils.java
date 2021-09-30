@@ -1396,7 +1396,7 @@ public class EntityUtils {
 			damage *= 1 + focusLevel * Focus.DAMAGE_PCT_PER_LEVEL;
 		}
 
-		if (includeSniperAndPB) {
+		if (includeSniperAndPB && targetLoc != null) {
 			int pointBlankLevel = plugin.mTrackingManager.mPlayers.getPlayerCustomEnchantLevel(player, PointBlank.class);
 			int sniperLevel = plugin.mTrackingManager.mPlayers.getPlayerCustomEnchantLevel(player, Sniper.class);
 			if (pointBlankLevel > 0 && player.getLocation().distance(targetLoc) < PointBlank.DISTANCE) {

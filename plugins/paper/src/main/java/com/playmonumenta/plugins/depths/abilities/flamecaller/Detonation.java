@@ -45,7 +45,7 @@ public class Detonation extends DepthsAbility {
 		Location location = entity.getLocation();
 		World world = mPlayer.getWorld();
 		for (LivingEntity mob : EntityUtils.getNearbyMobs(location, DAMAGE_RADIUS)) {
-			world.spawnParticle(Particle.CAMPFIRE_SIGNAL_SMOKE, mob.getLocation().add(0, 1, 0), 3);
+			world.spawnParticle(Particle.CAMPFIRE_SIGNAL_SMOKE, mob.getLocation().add(0, 1, 0), 2);
 			EntityUtils.damageEntity(mPlugin, mob, DAMAGE[mRarity - 1], mPlayer, MagicType.FIRE, true, mInfo.mLinkedSpell, true, true, true, true);
 		}
 		world.spawnParticle(Particle.EXPLOSION_LARGE, location.add(0, 0.5, 0), 1);

@@ -85,7 +85,7 @@ public class Slipstream extends DepthsAbility {
 
 	@Override
 	public String getDescription(int rarity) {
-		return "Right click to knock all enemies within " + RADIUS + " blocks away from you and gain Jump Boost " + (JUMP_AMPLIFIER + 1) + " and " + DepthsUtils.roundPercent(SPEED_AMPLIFIER) + "% speed for " + DURATION / 20 + " seconds. Cooldown: " + DepthsUtils.getRarityColor(rarity) + COOLDOWN[rarity - 1] + "s" + ChatColor.WHITE + ".";
+		return "Right click to knock all enemies within " + RADIUS + " blocks away from you and gain Jump Boost " + (JUMP_AMPLIFIER + 1) + " and " + (int) DepthsUtils.roundPercent(SPEED_AMPLIFIER) + "% speed for " + DURATION / 20 + " seconds. Cooldown: " + DepthsUtils.getRarityColor(rarity) + COOLDOWN[rarity - 1] + "s" + ChatColor.WHITE + ".";
 	}
 
 	@Override

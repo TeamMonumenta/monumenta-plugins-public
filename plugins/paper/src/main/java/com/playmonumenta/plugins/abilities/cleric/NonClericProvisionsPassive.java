@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.abilities.cleric;
 
+import org.bukkit.Sound;
 import org.bukkit.entity.AbstractArrow;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.ThrownPotion;
@@ -51,6 +52,7 @@ public class NonClericProvisionsPassive extends Ability {
 	public void playerItemConsumeEvent(PlayerItemConsumeEvent event) {
 		if (testRandomChance(mPlayer)) {
 			event.setReplacement(event.getItem());
+			sacredProvisionsSound(mPlayer);
 		}
 	}
 
@@ -72,7 +74,9 @@ public class NonClericProvisionsPassive extends Ability {
 	@Override
 	public boolean playerThrewSplashPotionEvent(ThrownPotion potion) {
 		if (testRandomChance(mPlayer)) {
-			AbilityUtils.refundPotion(mPlayer, potion);
+			if (AbilityUtils.refundPotion(mPlayer, potion)) {
+				sacredProvisionsSound(mPlayer);
+			}
 		}
 		return true;
 	}
@@ -80,9 +84,15 @@ public class NonClericProvisionsPassive extends Ability {
 	@Override
 	public boolean playerThrewLingeringPotionEvent(ThrownPotion potion) {
 		if (testRandomChance(mPlayer)) {
-			AbilityUtils.refundPotion(mPlayer, potion);
+			if (AbilityUtils.refundPotion(mPlayer, potion)) {
+				sacredProvisionsSound(mPlayer);
+			}
 		}
 		return true;
+	}
+
+	public static void sacredProvisionsSound(Player player) {
+		player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_COW_BELL, 0.65f, 2f);
 	}
 
 }

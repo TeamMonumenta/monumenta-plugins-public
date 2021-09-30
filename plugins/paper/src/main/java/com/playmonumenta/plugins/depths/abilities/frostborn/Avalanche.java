@@ -79,7 +79,7 @@ public class Avalanche extends DepthsAbility {
 				DepthsUtils.iceActive.remove(l);
 
 				world.spawnParticle(Particle.REDSTONE, aboveLoc, 15, 0.5, 0.5, 0.5, ICE_PARTICLE_COLOR);
-				world.spawnParticle(Particle.CAMPFIRE_SIGNAL_SMOKE, aboveLoc, 3, 0.5, 0.25, 0.5);
+				world.spawnParticle(Particle.CAMPFIRE_SIGNAL_SMOKE, aboveLoc, 2, 0.5, 0.25, 0.5);
 			}
 		}
 	}

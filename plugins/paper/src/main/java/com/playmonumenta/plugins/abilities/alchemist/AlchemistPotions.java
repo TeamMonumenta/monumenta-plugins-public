@@ -264,6 +264,8 @@ public class AlchemistPotions extends Ability {
 	@Override
 	public void periodicTrigger(boolean twoHertz, boolean oneSecond, int ticks) {
 		if (twoHertz) {
+			ItemStack item = mPlayer.getInventory().getItem(mSlot);
+
 			if (mOnCooldown) {
 				mTimer += 10;
 				if (mTimer >= mChargeTime || (ZoneUtils.hasZoneProperty(mPlayer, ZoneProperty.RESIST_5) && mTimer >= POTIONS_TIMER_TOWN)) {
@@ -281,10 +283,14 @@ public class AlchemistPotions extends Ability {
 				mCharges = MAX_CHARGE_POTIONS;
 				ScoreboardUtils.setScoreboardValue(mPlayer, POTION_SCOREBOARD, mCharges);
 				//update item
-				ItemStack item = mPlayer.getInventory().getItem(mSlot);
+
 				if (item != null) {
 					AbilityUtils.updateAlchemistItem(item, mCharges);
 				}
+			}
+
+			if (item != null && item.getAmount() > 1) {
+				item.setAmount(1);
 			}
 		}
 	}

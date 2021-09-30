@@ -1,6 +1,8 @@
 package com.playmonumenta.plugins.depths;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
@@ -188,32 +190,24 @@ public class DepthsListener implements Listener {
 		Entity entity = event.getEntity();
 		Entity damager = event.getDamager();
 
-		//Scaling boss damage- 5% extra per 3 floors
-		if (EntityUtils.isBoss(damager) && entity instanceof Player && DepthsManager.getInstance().isInSystem((Player) entity)) {
-			DepthsPlayer dp1 = DepthsManager.getInstance().mPlayers.get(entity.getUniqueId());
-			if (DepthsManager.getInstance().getPartyFromId(dp1).getFloor() > 3) {
-				double multiplier = 1 + (0.05 * (((DepthsManager.getInstance().getPartyFromId(dp1).getFloor() - 1) / 3)));
-				event.setDamage(event.getDamage() * multiplier);
-			}
-		}
-
 		//EarthenWrath implementation handler
-		if (event.getEntity() instanceof Player) {
-			Player player = (Player) event.getEntity();
+		if (entity instanceof Player) {
+			Player player = (Player) entity;
 			DepthsPlayer dp1 = DepthsManager.getInstance().mPlayers.get(player.getUniqueId());
 			if (dp1 == null || DepthsManager.getInstance().getPartyFromId(dp1) == null) {
 				return;
 			}
-			try {
-				if (dp1.mAbilities != null && dp1.mAbilities.get(EarthenWrath.ABILITY_NAME) != null && dp1.mAbilities.get(EarthenWrath.ABILITY_NAME).intValue() > 0) {
-					AbilityManager.getManager().getPlayerAbility(player, EarthenWrath.class).damagedEntity(player, event);
-				}
-			} catch (Exception e) {
-				Plugin.getInstance().getLogger().info("Exception for depths on entity damage- earthen wrath");
-			}
 
 			DepthsParty party = DepthsManager.getInstance().getPartyFromId(dp1);
+
+			//Creates a new party list with random order without modifying the normal order of the party
+			List<DepthsPlayer> playersInParty = new ArrayList<DepthsPlayer>();
 			for (DepthsPlayer dp : party.mPlayersInParty) {
+				playersInParty.add(dp);
+			}
+			Collections.shuffle(playersInParty);
+
+			for (DepthsPlayer dp : playersInParty) {
 				if (dp == null || dp.mAbilities == null || dp.mAbilities.size() == 0) {
 					continue;
 				}
@@ -221,12 +215,23 @@ public class DepthsListener implements Listener {
 				Player p = Bukkit.getPlayer(dp.mPlayerId);
 				try {
 					if (dp != null && dp.mAbilities != null && dp.mAbilities.get(EarthenWrath.ABILITY_NAME) != null && dp.mAbilities.get(EarthenWrath.ABILITY_NAME).intValue() > 0 && p != null && p.isOnline() && !p.equals(player)) {
-						AbilityManager.getManager().getPlayerAbility(p, EarthenWrath.class).damagedEntity(player, event);
-						break;
+						//Breaks only if the damage is absorbed to allow for multiple party members with earthen wrath
+						if (AbilityManager.getManager().getPlayerAbility(p, EarthenWrath.class).damagedEntity(player, event)) {
+							break;
+						}
 					}
 				} catch (Exception e) {
 					Plugin.getInstance().getLogger().info("Exception for depths on entity damage- earthen wrath");
 				}
+			}
+		}
+
+		//Scaling boss damage- 5% extra per 3 floors
+		if (EntityUtils.isBoss(damager) && entity instanceof Player && DepthsManager.getInstance().isInSystem((Player) entity)) {
+			DepthsPlayer dp1 = DepthsManager.getInstance().mPlayers.get(entity.getUniqueId());
+			if (DepthsManager.getInstance().getPartyFromId(dp1).getFloor() > 3) {
+				double multiplier = 1 + (0.05 * (((DepthsManager.getInstance().getPartyFromId(dp1).getFloor() - 1) / 3)));
+				event.setDamage(event.getDamage() * multiplier);
 			}
 		}
 
