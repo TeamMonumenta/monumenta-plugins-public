@@ -74,7 +74,7 @@ public class SvalgotBoneSlam extends SpellBaseSlam {
 				return;
 			}
 			for (Player players : PlayerUtils.playersInRange(loc, DAMAGE_RADIUS, true)) {
-				BossUtils.bossDamagePercent(boss, players, DAMAGE_PERCENT);
+				BossUtils.bossDamagePercent(boss, players, DAMAGE_PERCENT, "Bone Slam");
 			}
 			});
 

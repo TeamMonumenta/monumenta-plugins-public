@@ -271,7 +271,7 @@ public class DelveInfusionCustomInventory extends CustomInventory {
 			ItemStack pannel = new ItemStack(Material.LIME_WOOL, 1);
 			ItemMeta meta = pannel.getItemMeta();
 			meta.displayName(Component.text("Empowered level " + (i + 1), TextColor.fromCSSHexString("#55FF55")).decoration(TextDecoration.BOLD, true).decoration(TextDecoration.ITALIC, false));
-			splitLoreLine(meta, "When you gain XP, you have a " + 0.2 * (i + 1) + "% chance per XP point to repair all currently equipped items by 1% of their max durability.", MAX_LORE_LENGHT, ChatColor.GRAY);
+			splitLoreLine(meta, "When you gain XP, you have a " + String.format("%,.1f", (0.2 * (i + 1))) + "% chance per XP point to repair all currently equipped items by 1% of their max durability.", MAX_LORE_LENGHT, ChatColor.GRAY);
 			pannel.setItemMeta(meta);
 			limeItems.add(pannel);
 		}

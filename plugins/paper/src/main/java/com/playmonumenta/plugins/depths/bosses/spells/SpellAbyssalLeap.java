@@ -64,7 +64,7 @@ public class SpellAbyssalLeap extends SpellBaseSlam {
 						return;
 					}
 					for (Player players : PlayerUtils.playersInRange(loc, DAMAGE_RADIUS, true)) {
-						BossUtils.bossDamagePercent(launcher, players, DAMAGE_PERCENT);
+						BossUtils.bossDamagePercent(launcher, players, DAMAGE_PERCENT, "Abyssal Leap");
 					}
 					});
 		mPlugin = plugin;
