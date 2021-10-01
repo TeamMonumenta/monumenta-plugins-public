@@ -81,7 +81,7 @@ public class DepthsParty {
 	//Used to track pickup of treasure rewards from rooms
 	public boolean mCanGetTreasureReward = false;
 	//The world the party is in
-	public final World mWorld;
+	public final UUID mWorldUUID;
 
 	/**
 	 * Creates a new depths party with the given players
@@ -89,7 +89,7 @@ public class DepthsParty {
 	 */
 	public DepthsParty(List<DepthsPlayer> players, Location loc) {
 		mPlayersInParty = players;
-		mWorld = loc.getWorld();
+		mWorldUUID = loc.getWorld().getUID();
 
 		for (DepthsPlayer dp : players) {
 

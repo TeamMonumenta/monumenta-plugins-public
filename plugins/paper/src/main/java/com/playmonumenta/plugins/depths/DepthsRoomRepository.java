@@ -439,7 +439,11 @@ public class DepthsRoomRepository {
 	 */
 	public void goToNextFloor(DepthsParty party, int treasure) {
 
-		World world = party.mWorld;
+		World world = Bukkit.getWorld(party.mWorldUUID);
+		if (world == null) {
+			Plugin.getInstance().getLogger().info("Got null world from party's id - DepthsRoomRepository");
+			return;
+		}
 		Location loc = new Location(world, party.mFloorLobbyLoadPoint.getX(), party.mFloorLobbyLoadPoint.getY(), party.mFloorLobbyLoadPoint.getZ());
 
 		//Separate rooms by floor here
