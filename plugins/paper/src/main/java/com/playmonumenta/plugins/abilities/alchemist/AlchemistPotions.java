@@ -289,7 +289,7 @@ public class AlchemistPotions extends Ability {
 				}
 			}
 
-			if (item != null && item.getAmount() > 1) {
+			if (item != null && item.getAmount() > 1 && ItemUtils.isAlchemistItem(item)) {
 				item.setAmount(1);
 			}
 		}
