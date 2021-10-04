@@ -15,6 +15,7 @@ import com.playmonumenta.plugins.utils.VectorUtils;
 
 import org.bukkit.Color;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
@@ -54,6 +55,7 @@ public class UmbralWail extends Ability {
 		mInfo.mDescriptions.add("The damage done by the shadow is increased to 20 and the Silence duration is increased to 8s.");
 		mInfo.mCooldown = COOLDOWN;
 		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
+		mDisplayItem = new ItemStack(Material.WARPED_FUNGUS, 1);
 		mDamage = getAbilityScore() == 1 ? DAMAGE_1 : DAMAGE_2;
 		mDuration = getAbilityScore() == 1 ? DURATION_1 : DURATION_2;
 	}

@@ -1,6 +1,8 @@
 package com.playmonumenta.plugins.classes;
 
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.rogue.AdvancingShadows;
@@ -20,6 +22,9 @@ import com.playmonumenta.plugins.abilities.rogue.swordsage.BladeDance;
 import com.playmonumenta.plugins.abilities.rogue.swordsage.DeadlyRonde;
 import com.playmonumenta.plugins.abilities.rogue.swordsage.WindWalk;
 
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.md_5.bungee.api.ChatColor;
+
 
 
 public class Rogue extends PlayerClass {
@@ -35,13 +40,17 @@ public class Rogue extends PlayerClass {
 		mAbilities.add(new ViciousCombos(plugin, player));
 		mClass = 4;
 		mClassName = "Rogue";
+		mDisplayItem = new ItemStack(Material.STONE_SWORD, 1);
 
 		mSpecOne.mAbilities.add(new BladeDance(plugin, player));
 		mSpecOne.mAbilities.add(new DeadlyRonde(plugin, player));
 		mSpecOne.mAbilities.add(new WindWalk(plugin, player));
 		mSpecOne.mSpecQuestScoreboard = "Quest103c";
 		mSpecOne.mSpecialization = 7;
+		mClassColor = NamedTextColor.WHITE;
+		mChatColor = ChatColor.WHITE;
 		mSpecOne.mSpecName = "Swordsage";
+		mSpecOne.mDisplayItem = new ItemStack(Material.IRON_HELMET, 1);
 
 		mSpecTwo.mAbilities.add(new BodkinBlitz(plugin, player));
 		mSpecTwo.mAbilities.add(new CloakAndDagger(plugin, player));
@@ -49,6 +58,7 @@ public class Rogue extends PlayerClass {
 		mSpecTwo.mSpecQuestScoreboard = "Quest103j";
 		mSpecTwo.mSpecialization = 8;
 		mSpecTwo.mSpecName = "Assassin";
+		mSpecTwo.mDisplayItem = new ItemStack(Material.WITHER_ROSE, 1);
 
 	}
 }

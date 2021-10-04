@@ -14,6 +14,7 @@ import com.playmonumenta.plugins.utils.VectorUtils;
 
 import org.bukkit.Color;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
@@ -51,6 +52,7 @@ public class ArcaneStrike extends Ability {
 		mInfo.mDescriptions.add("When you attack an enemy with a wand, you unleash an arcane explosion dealing 4 damage to all mobs in a 4 block radius around the target. Enemies that are on fire or slowed take 2 extra damage. Arcane strike can not trigger Spellshock's static. Cooldown: 5s.");
 		mInfo.mDescriptions.add("The damage is increased to 7. Mobs that are on fire or slowed take 3 additional damage.");
 		mInfo.mCooldown = COOLDOWN;
+		mDisplayItem = new ItemStack(Material.GOLDEN_SWORD, 1);
 		mDamageBonus = getAbilityScore() == 1 ? DAMAGE_1 : DAMAGE_2;
 		mDamageBonusAffected = getAbilityScore() == 1 ? BONUS_DAMAGE_1 : BONUS_DAMAGE_2;
 	}

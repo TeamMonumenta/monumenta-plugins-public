@@ -10,12 +10,14 @@ import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
@@ -62,6 +64,7 @@ public class Starfall extends Ability {
 		);
 		mInfo.mCooldown = COOLDOWN_TICKS;
 		mInfo.mIgnoreCooldown = true;
+		mDisplayItem = new ItemStack(Material.MAGMA_BLOCK, 1);
 
 		mLevelDamage = getAbilityScore() == 2 ? DAMAGE_2 : DAMAGE_1;
 	}

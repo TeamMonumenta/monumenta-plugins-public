@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.abilities.mage;
 import java.util.EnumSet;
 
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
@@ -11,6 +12,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import com.playmonumenta.plugins.Constants;
@@ -80,6 +82,7 @@ public class FrostNova extends Ability {
 		);
 		mInfo.mCooldown = COOLDOWN_TICKS;
 		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;
+		mDisplayItem = new ItemStack(Material.ICE, 1);
 
 		boolean isUpgraded = getAbilityScore() == 2;
 		mLevelDamage = isUpgraded ? DAMAGE_2 : DAMAGE_1;

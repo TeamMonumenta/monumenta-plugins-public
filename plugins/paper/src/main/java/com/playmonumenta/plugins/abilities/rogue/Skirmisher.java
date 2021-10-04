@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.abilities.rogue;
 
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
@@ -35,6 +36,7 @@ public class Skirmisher extends Ability {
 		mInfo.mShorthandName = "Sk";
 		mInfo.mDescriptions.add("When holding two swords, deal 1 + 10% final damage to mobs when other mobs are within 2.5 blocks.");
 		mInfo.mDescriptions.add("The damage bonus now also applies to mobs not targeting you, and the damage bonus is increased to 2 + 15% final damage done");
+		mDisplayItem = new ItemStack(Material.BONE, 1);
 		mIsolatedPercentDamage = getAbilityScore() == 1 ? GROUPED_PERCENT_DAMAGE_1 : GROUPED_PERCENT_DAMAGE_2;
 		mIsolatedFlatDamage = getAbilityScore() == 1 ? GROUPED_FLAT_DAMAGE : GROUPED_FLAT_DAMAGE_2;
 	}

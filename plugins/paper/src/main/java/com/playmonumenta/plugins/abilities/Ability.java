@@ -46,6 +46,7 @@ public abstract class Ability {
 	public final AbilityInfo mInfo;
 	protected final Player mPlayer;
 	private Integer mScore = null;
+	public ItemStack mDisplayItem;
 
 	public Ability(Plugin plugin, @Nullable Player player, String displayName) {
 		mPlugin = plugin;

@@ -17,6 +17,7 @@ import com.playmonumenta.plugins.utils.PlayerUtils;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
@@ -26,6 +27,7 @@ import org.bukkit.entity.Projectile;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 
 
@@ -62,6 +64,7 @@ public class LuminousInfusion extends Ability {
 		mInfo.mIgnoreCooldown = true;
 		mInfo.mIgnoreTriggerCap = true;
 		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
+		mDisplayItem = new ItemStack(Material.BLAZE_POWDER, 1);
 
 		mDoMultiplierAndFire = getAbilityScore() == 2;
 

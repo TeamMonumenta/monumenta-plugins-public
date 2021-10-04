@@ -64,6 +64,7 @@ public class JudgementChain extends Ability {
 		mInfo.mDescriptions.add("Players that walk through the chain linking the mob and the Reaper are granted 10s of the inverted debuffs, and mobs that walk through the chain are given 10s of the debuffs on the mob. Additionally, the level of buffs and debuffs is preserved, up to level 2, except for Resistance and Regeneration, and the damage from the active chain break is now applied to all mobs in a 3 block radius of the chained mob.");
 		mInfo.mCooldown = COOLDOWN;
 		mInfo.mIgnoreCooldown = true;
+		mDisplayItem = new ItemStack(Material.CHAIN, 1);
 		mAmplifierCap = getAbilityScore() == 1 ? AMPLIFIER_CAP_1 : AMPLIFIER_CAP_2;
 	}
 

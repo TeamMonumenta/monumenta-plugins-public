@@ -16,11 +16,13 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.StringUtils;
 
+import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 
 
 
@@ -71,6 +73,7 @@ public class AstralOmen extends Ability {
 				StringUtils.multiplierToPercentage(BONUS_MULTIPLIER_2)
 			)
 		);
+		mDisplayItem = new ItemStack(Material.NETHER_STAR, 1);
 
 		boolean isUpgraded = getAbilityScore() == 2;
 		mLevelBonusMultiplier = isUpgraded ? BONUS_MULTIPLIER_2 : BONUS_MULTIPLIER_1;

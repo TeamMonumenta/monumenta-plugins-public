@@ -2,9 +2,11 @@ package com.playmonumenta.plugins.abilities.alchemist.apothecary;
 
 import org.bukkit.Color;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -33,6 +35,7 @@ public class InvigoratingOdor extends PotionAbility {
 		mInfo.mShorthandName = "IO";
 		mInfo.mDescriptions.add("Alchemist Potions deal +1 damage and leave an aura for 3 seconds where they hit. The aura provides Speed I and Haste I to players within it for 5 seconds.");
 		mInfo.mDescriptions.add("Alchemist Potions deal +2 damage and the aura additionally grants 10% damage reduction for 5 seconds.");
+		mDisplayItem = new ItemStack(Material.LINGERING_POTION, 1);
 	}
 
 	@Override

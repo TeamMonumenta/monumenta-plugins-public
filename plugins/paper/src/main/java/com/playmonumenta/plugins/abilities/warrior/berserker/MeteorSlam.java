@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.abilities.warrior.berserker;
 
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
@@ -10,6 +11,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -98,6 +100,7 @@ public class MeteorSlam extends Ability {
 			)
 		);
 		mInfo.mIgnoreCooldown = true;
+		mDisplayItem = new ItemStack(Material.FIRE_CHARGE, 1);
 
 		boolean isUpgraded = getAbilityScore() == 2;
 		mInfo.mCooldown = isUpgraded ? COOLDOWN_TICKS_2 : COOLDOWN_TICKS_1;

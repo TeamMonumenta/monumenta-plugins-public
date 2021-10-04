@@ -44,6 +44,7 @@ public class CoupDeGrace extends Ability {
 		mInfo.mShorthandName = "CdG";
 		mInfo.mDescriptions.add("If you melee attack a normal enemy and they get under 10% health they die instantly. The threshold for elites is 20% health");
 		mInfo.mDescriptions.add("The health threshold is increased to 15% for normal enemies and 30% for elites.");
+		mDisplayItem = new ItemStack(Material.WITHER_SKELETON_SKULL, 1);
 		mNormalThreshold = getAbilityScore() == 1 ? COUP_1_NORMAL_THRESHOLD : COUP_2_NORMAL_THRESHOLD;
 		mEliteThreshold = getAbilityScore() == 1 ? COUP_1_ELITE_THRESHOLD : COUP_2_ELITE_THRESHOLD;
 	}

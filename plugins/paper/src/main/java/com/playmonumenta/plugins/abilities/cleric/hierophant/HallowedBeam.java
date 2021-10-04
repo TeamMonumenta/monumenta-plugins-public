@@ -5,6 +5,7 @@ import java.util.NavigableSet;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
@@ -75,6 +76,7 @@ public class HallowedBeam extends MultipleChargeAbility {
 		mInfo.mCooldown = getAbilityScore() == 1 ? HALLOWED_1_COOLDOWN : HALLOWED_2_COOLDOWN;
 		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;
 		mInfo.mIgnoreCooldown = true;
+		mDisplayItem = new ItemStack(Material.BOW, 1);
 
 		Bukkit.getScheduler().runTask(plugin, () -> {
 			if (player != null) {

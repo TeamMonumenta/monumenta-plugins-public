@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.abilities.warrior;
 import java.util.EnumSet;
 
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
@@ -52,6 +53,7 @@ public class Riposte extends Ability {
 		mInfo.mDescriptions.add("Cooldown lowered to 12s and if you block an attack with Riposte's effect while holding a sword, your next sword attack within 2s deals double damage. If you block with Riposte's effect while holding an axe, the attacking mob is stunned for 3s.");
 		mInfo.mCooldown = getAbilityScore() == 1 ? RIPOSTE_1_COOLDOWN : RIPOSTE_2_COOLDOWN;
 		mInfo.mIgnoreCooldown = true;
+		mDisplayItem = new ItemStack(Material.SKELETON_SKULL, 1);
 	}
 
 	@Override

@@ -55,6 +55,7 @@ public class Bezoar extends Ability {
 		mInfo.mShorthandName = "BZ";
 		mInfo.mDescriptions.add("Every 5th mob killed within 16 blocks of the Alchemist spawns a Bezoar that lingers for 10s. Picking up a Bezoar will grant the Alchemist an additional Alchemist Potion, and will grant both the player who picks it up and the Alchemist a custom healing effect that regenerates 5% of max health every second for 2 seconds and reduces the duration of all current potion debuffs by 10s.");
 		mInfo.mDescriptions.add("The Bezoar now additionally grants +15% ability damage for 8s.");
+		mDisplayItem = new ItemStack(Material.LIME_CONCRETE, 1);
 	}
 
 	public void dropBezoar(EntityDeathEvent event, boolean shouldGenDrops) {

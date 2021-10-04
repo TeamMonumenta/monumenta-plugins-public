@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.bukkit.Color;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
@@ -62,6 +63,7 @@ public class DaggerThrow extends Ability {
 		mInfo.mDescriptions.add("The damage is increased to 12 and the Vulnerability increased to 40%.");
 		mInfo.mCooldown = DAGGER_THROW_COOLDOWN;
 		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;
+		mDisplayItem = new ItemStack(Material.WOODEN_SWORD, 1);
 		mDamage = getAbilityScore() == 1 ? DAGGER_THROW_1_DAMAGE : DAGGER_THROW_2_DAMAGE;
 		mVulnAmplifier = getAbilityScore() == 1 ? DAGGER_THROW_1_VULN : DAGGER_THROW_2_VULN;
 	}

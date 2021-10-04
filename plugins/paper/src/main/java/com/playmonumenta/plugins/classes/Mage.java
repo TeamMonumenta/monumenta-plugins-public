@@ -1,6 +1,8 @@
 package com.playmonumenta.plugins.classes;
 
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.mage.ArcaneStrike;
@@ -20,6 +22,9 @@ import com.playmonumenta.plugins.abilities.mage.elementalist.Blizzard;
 import com.playmonumenta.plugins.abilities.mage.elementalist.ElementalSpiritFire;
 import com.playmonumenta.plugins.abilities.mage.elementalist.Starfall;
 
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.md_5.bungee.api.ChatColor;
+
 
 
 
@@ -36,6 +41,9 @@ public class Mage extends PlayerClass {
 		mAbilities.add(new PrismaticShield(plugin, player));
 		mClass = 1;
 		mClassName = "Mage";
+		mClassColor = NamedTextColor.LIGHT_PURPLE;
+		mChatColor = ChatColor.LIGHT_PURPLE;
+		mDisplayItem = new ItemStack(Material.BLAZE_ROD, 1);
 
 		mSpecOne.mAbilities.add(new AstralOmen(plugin, player));
 		mSpecOne.mAbilities.add(new SpatialShatter(plugin, player));
@@ -43,6 +51,7 @@ public class Mage extends PlayerClass {
 		mSpecOne.mSpecQuestScoreboard = "Quest103i";
 		mSpecOne.mSpecialization = 1;
 		mSpecOne.mSpecName = "Arcanist";
+		mSpecOne.mDisplayItem = new ItemStack(Material.DRAGON_BREATH, 1);
 
 		mSpecTwo.mAbilities.add(new Blizzard(plugin, player));
 		mSpecTwo.mAbilities.add(new ElementalSpiritFire(plugin, player));
@@ -50,5 +59,6 @@ public class Mage extends PlayerClass {
 		mSpecTwo.mSpecQuestScoreboard = "Quest103b";
 		mSpecTwo.mSpecialization = 2;
 		mSpecTwo.mSpecName = "Elementalist";
+		mSpecTwo.mDisplayItem = new ItemStack(Material.BLAZE_POWDER, 1);
 	}
 }

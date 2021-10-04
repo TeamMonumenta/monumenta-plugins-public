@@ -55,6 +55,7 @@ public class Rampage extends Ability {
 		mInfo.mShorthandName = "Rmp";
 		mInfo.mDescriptions.add("Gain a stack of rage for each 40 melee damage dealt. Stacks decay by 1 every 5 seconds of not dealing melee damage and cap at 15. Passively gain 1% damage resistance for each stack. When at 10 or more stacks, right click while looking down to consume all stacks and damage mobs in a 4 block radius by stacks consumed. For the next (stacks consumed / 2) seconds, heal 5% of max health per second and keep your passive damage reduction.");
 		mInfo.mDescriptions.add("Gain a stack of rage for each 25 melee damage dealt, with stacks capping at 20.");
+		mDisplayItem = new ItemStack(Material.BLAZE_POWDER, 1);
 		mDamagePerStack = getAbilityScore() == 1 ? RAMPAGE_1_DAMAGE_PER_STACK : RAMPAGE_2_DAMAGE_PER_STACK;
 		mStackLimit = getAbilityScore() == 1 ? RAMPAGE_1_STACK_LIMIT : RAMPAGE_2_STACK_LIMIT;
 	}

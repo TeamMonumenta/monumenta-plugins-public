@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.abilities.mage;
 
+import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.entity.AbstractArrow;
 import org.bukkit.entity.Blaze;
@@ -8,6 +9,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.entity.Stray;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
 
 import com.playmonumenta.plugins.Plugin;
@@ -39,6 +41,7 @@ public class ElementalArrows extends Ability {
 		mInfo.mShorthandName = "EA";
 		mInfo.mDescriptions.add("Your fully drawn arrows are set on fire. If sneaking, shoot an ice arrow instead, afflicting the target with 20% Slowness for 6 seconds. Fire and Ice arrows deal 10% extra damage. Ice arrows deal 8 extra damage to Blazes. Fire arrows deal 8 extra damage to strays. This skill can not apply Spellshock.");
 		mInfo.mDescriptions.add("Your fire arrows also set nearby enemies within a radius of 3 blocks on fire when they hit a target. Your ice arrows also slow nearby enemies within a radius of 3 blocks when they hit a target. Both area of effect effects do 20% bow damage to all targets affected.");
+		mDisplayItem = new ItemStack(Material.SPECTRAL_ARROW, 1);
 	}
 
 	@Override

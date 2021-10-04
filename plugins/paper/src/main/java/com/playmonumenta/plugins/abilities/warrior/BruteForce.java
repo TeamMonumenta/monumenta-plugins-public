@@ -3,12 +3,14 @@ package com.playmonumenta.plugins.abilities.warrior;
 import java.util.EnumSet;
 
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
+import org.bukkit.inventory.ItemStack;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
@@ -62,6 +64,7 @@ public class BruteForce extends Ability {
 		mInfo.mShorthandName = "BF";
 		mInfo.mDescriptions.add("Attacking an enemy with a critical attack passively deals 2 more damage to it, 2 physical damage to all enemies in a 2-block cube around it, and knocks all non-boss enemies away from you.");
 		mInfo.mDescriptions.add("Damage is increased from 2, to 10% and then 3.");
+		mDisplayItem = new ItemStack(Material.STONE_AXE, 1);
 	}
 
 	@Override

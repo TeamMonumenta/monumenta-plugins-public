@@ -1,6 +1,8 @@
 package com.playmonumenta.plugins.classes;
 
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.scout.Agility;
@@ -18,6 +20,9 @@ import com.playmonumenta.plugins.abilities.scout.ranger.Quickdraw;
 import com.playmonumenta.plugins.abilities.scout.ranger.TacticalManeuver;
 import com.playmonumenta.plugins.abilities.scout.ranger.WhirlingBlade;
 
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.md_5.bungee.api.ChatColor;
+
 
 public class Scout extends PlayerClass {
 
@@ -32,6 +37,9 @@ public class Scout extends PlayerClass {
 		mAbilities.add(new Volley(plugin, player));
 		mClass = 6;
 		mClassName = "Scout";
+		mClassColor = NamedTextColor.AQUA;
+		mChatColor = ChatColor.AQUA;
+		mDisplayItem = new ItemStack(Material.BOW, 1);
 
 		mSpecOne.mAbilities.add(new Quickdraw(plugin, player));
 		mSpecOne.mAbilities.add(new WhirlingBlade(plugin, player));
@@ -39,6 +47,7 @@ public class Scout extends PlayerClass {
 		mSpecOne.mSpecQuestScoreboard = "Quest103e";
 		mSpecOne.mSpecialization = 11;
 		mSpecOne.mSpecName = "Ranger";
+		mSpecOne.mDisplayItem = new ItemStack(Material.LARGE_FERN, 1);
 
 		mSpecTwo.mAbilities.add(new PinningShot(plugin, player));
 		mSpecTwo.mAbilities.add(new SplitArrow(plugin, player));
@@ -46,6 +55,7 @@ public class Scout extends PlayerClass {
 		mSpecTwo.mSpecQuestScoreboard = "Quest103l";
 		mSpecTwo.mSpecialization = 12;
 		mSpecTwo.mSpecName = "Hunter";
+		mSpecTwo.mDisplayItem = new ItemStack(Material.LEATHER, 1);
 
 	}
 }

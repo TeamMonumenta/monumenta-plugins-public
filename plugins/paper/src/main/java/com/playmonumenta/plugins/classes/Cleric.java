@@ -1,6 +1,8 @@
 package com.playmonumenta.plugins.classes;
 
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.cleric.CelestialBlessing;
@@ -20,6 +22,9 @@ import com.playmonumenta.plugins.abilities.cleric.paladin.ChoirBells;
 import com.playmonumenta.plugins.abilities.cleric.paladin.HolyJavelin;
 import com.playmonumenta.plugins.abilities.cleric.paladin.LuminousInfusion;
 
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.md_5.bungee.api.ChatColor;
+
 
 
 
@@ -36,20 +41,25 @@ public class Cleric extends PlayerClass {
 		mAbilities.add(new SanctifiedArmor(plugin, player));
 		mClass = 3;
 		mClassName = "Cleric";
+		mClassColor = NamedTextColor.YELLOW;
+		mChatColor = ChatColor.YELLOW;
+		mDisplayItem = new ItemStack(Material.POPPY, 1);
 
-		mSpecOne.mAbilities.add(new ChoirBells(plugin, player));
 		mSpecOne.mAbilities.add(new HolyJavelin(plugin, player));
+		mSpecOne.mAbilities.add(new ChoirBells(plugin, player));
 		mSpecOne.mAbilities.add(new LuminousInfusion(plugin, player));
 		mSpecOne.mSpecQuestScoreboard = "Quest103d";
 		mSpecOne.mSpecialization = 5;
 		mSpecOne.mSpecName = "Paladin";
+		mSpecOne.mDisplayItem = new ItemStack(Material.GHAST_TEAR, 1);
 
 		mSpecTwo.mAbilities.add(new EnchantedPrayer(plugin, player));
-		mSpecTwo.mAbilities.add(new HallowedBeam(plugin, player));
 		mSpecTwo.mAbilities.add(new ThuribleProcession(plugin, player));
+		mSpecTwo.mAbilities.add(new HallowedBeam(plugin, player));
 		mSpecTwo.mSpecQuestScoreboard = "Quest103k";
 		mSpecTwo.mSpecialization = 6;
 		mSpecTwo.mSpecName = "Hierophant";
+		mSpecTwo.mDisplayItem = new ItemStack(Material.DRAGON_BREATH, 1);
 
 	}
 }

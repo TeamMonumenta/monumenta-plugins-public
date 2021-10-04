@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
@@ -70,6 +71,7 @@ public class HuntingCompanion extends Ability {
 		mInfo.mCooldown = COOLDOWN;
 		mInfo.mIgnoreCooldown = true;
 		mInfo.mLinkedSpell = ClassAbility.HUNTING_COMPANION;
+		mDisplayItem = new ItemStack(Material.SWEET_BERRIES, 1);
 
 		boolean isLevelOne = getAbilityScore() == 1;
 		mDamage = isLevelOne ? DAMAGE_1 : DAMAGE_2;

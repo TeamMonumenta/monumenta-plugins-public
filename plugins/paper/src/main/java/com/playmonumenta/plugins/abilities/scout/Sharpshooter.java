@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.abilities.scout;
 
+import org.bukkit.Material;
 import org.bukkit.entity.AbstractArrow;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.LivingEntity;
@@ -7,6 +8,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.entity.SpectralArrow;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.inventory.ItemStack;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
@@ -26,6 +28,7 @@ public class Sharpshooter extends Ability {
 		mInfo.mDescriptions.add("Your arrows deal 20% more damage.");
 		mInfo.mDescriptions.add("Each enemy hit with a critical arrow gives you a stack of Sharpshooter, up to 8. Stacks decay after 4 seconds of not gaining a stack. Each stack makes your arrows deal +3% damage.");
 		mInfo.mIgnoreTriggerCap = true;
+		mDisplayItem = new ItemStack(Material.TARGET, 1);
 	}
 
 	private int mStacks = 0;

@@ -22,11 +22,13 @@ import com.playmonumenta.plugins.utils.StringUtils;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.BoundingBox;
@@ -90,6 +92,7 @@ public class ElementalSpiritFire extends Ability {
 			)
 		);
 		mInfo.mCooldown = COOLDOWN_TICKS;
+		mDisplayItem = new ItemStack(Material.SUNFLOWER, 1);
 
 		boolean isUpgraded = getAbilityScore() == 2;
 		mLevelDamage = isUpgraded ? DAMAGE_2 : DAMAGE_1;

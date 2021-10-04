@@ -10,6 +10,7 @@ import java.util.NavigableSet;
 import java.util.Set;
 
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
@@ -17,6 +18,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
+import org.bukkit.inventory.ItemStack;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
@@ -70,6 +72,7 @@ public class Spellshock extends Ability {
 		mInfo.mShorthandName = "SS";
 		mInfo.mDescriptions.add("Hitting an enemy with a wand or spell inflicts static for 6 seconds. If an enemy with static is hit by another spell, a spellshock centered on the enemy deals 2.5 damage to all mobs in a 3 block radius. Spellshock can cause a chain reaction on enemies with static. An enemy can only be hit by a spellshock once per tick.");
 		mInfo.mDescriptions.add("Damage is increased to 4. Additionally, gain +15% speed for 6 seconds whenever a spellshock is triggered.");
+		mDisplayItem = new ItemStack(Material.GLOWSTONE_DUST, 1);
 
 		mLevelDamage = getAbilityScore() == 2 ? DAMAGE_2 : DAMAGE_1;
 	}

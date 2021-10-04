@@ -51,6 +51,7 @@ public class EagleEye extends Ability {
 		mInfo.mDescriptions.add("The effect is increased to 35% Vulnerability.");
 		mInfo.mCooldown = EAGLE_EYE_COOLDOWN;
 		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;
+		mDisplayItem = new ItemStack(Material.ENDER_EYE, 1);
 	}
 
 

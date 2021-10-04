@@ -28,6 +28,7 @@ import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
@@ -84,6 +85,7 @@ public class SpatialShatter extends Ability {
 		);
 		mInfo.mCooldown = COOLDOWN_TICKS;
 		mInfo.mIgnoreCooldown = true;
+		mDisplayItem = new ItemStack(Material.PRISMARINE_CRYSTALS, 1);
 
 		boolean isUpgraded = getAbilityScore() == 2;
 		mLevelDamage = isUpgraded ? DAMAGE_2 : DAMAGE_1;

@@ -4,6 +4,7 @@ import java.util.EnumSet;
 import java.util.List;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.attribute.Attribute;
@@ -11,6 +12,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.NotNull;
@@ -81,6 +83,7 @@ public class DivineJustice extends Ability {
 				StringUtils.multiplierToPercentage(DAMAGE_MULTIPLIER)
 			)
 		);
+		mDisplayItem = new ItemStack(Material.IRON_SWORD, 1);
 
 		mDoHealingAndMultiplier = getAbilityScore() == 2;
 

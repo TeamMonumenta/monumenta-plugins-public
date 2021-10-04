@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.abilities.rogue.assassin;
 
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
@@ -10,6 +11,7 @@ import org.bukkit.entity.Projectile;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.event.entity.EntityDeathEvent;
 
 import com.playmonumenta.plugins.Plugin;
@@ -51,6 +53,7 @@ public class CloakAndDagger extends Ability implements KillTriggeredAbility {
 		mInfo.mLinkedSpell = ClassAbility.CLOAK_AND_DAGGER;
 		mInfo.mCooldown = 0;
 		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;
+		mDisplayItem = new ItemStack(Material.IRON_SWORD, 1);
 		mDamageMultiplier = getAbilityScore() == 1 ? CLOAK_1_DAMAGE_MULTIPLIER : CLOAK_2_DAMAGE_MULTIPLIER;
 		mMaxStacks = getAbilityScore() == 1 ? CLOAK_1_MAX_STACKS : CLOAK_2_MAX_STACKS;
 		mTracker = new KillTriggeredAbilityTracker(this);

@@ -56,6 +56,7 @@ public class DefensiveLine extends Ability {
 		mInfo.mDescriptions.add("The effect is increased to 30% Resistance.");
 		mInfo.mCooldown = COOLDOWN;
 		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
+		mDisplayItem = new ItemStack(Material.CHAIN, 1);
 		mPercentDamageReceived = getAbilityScore() == 1 ? PERCENT_DAMAGE_RECEIVED_EFFECT_1 : PERCENT_DAMAGE_RECEIVED_EFFECT_2;
 	}
 

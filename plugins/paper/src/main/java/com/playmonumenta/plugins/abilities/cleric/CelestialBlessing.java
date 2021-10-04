@@ -4,6 +4,7 @@ import java.util.EnumSet;
 import java.util.List;
 
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
@@ -59,6 +60,7 @@ public class CelestialBlessing extends Ability {
 		mInfo.mDescriptions.add("Increases the buff to +35% damage for 12 s.");
 		mInfo.mCooldown = CELESTIAL_COOLDOWN;
 		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;
+		mDisplayItem = new ItemStack(Material.SUGAR, 1);
 	}
 
 	@Override

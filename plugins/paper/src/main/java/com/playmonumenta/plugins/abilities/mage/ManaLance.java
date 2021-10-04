@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.bukkit.Color;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
@@ -58,6 +59,7 @@ public class ManaLance extends Ability {
 		mInfo.mDescriptions.add("The beam instead deals 7 damage. Cooldown: 3s.");
 		mInfo.mCooldown = getAbilityScore() == 1 ? COOLDOWN_1 : COOLDOWN_2;
 		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
+		mDisplayItem = new ItemStack(Material.TRIDENT, 1);
 	}
 
 	@Override

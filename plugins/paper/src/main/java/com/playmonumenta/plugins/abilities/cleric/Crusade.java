@@ -7,9 +7,11 @@ import com.playmonumenta.plugins.player.PartialParticle;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.StringUtils;
 
+import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -39,6 +41,7 @@ public class Crusade extends Ability {
 		mInfo.mDescriptions.add(
 			"Your abilities that work against undead enemies now also work against human-like enemies - illagers, vexes, witches, piglins, piglin brutes, golems and giants."
 		); // List of human-likes hardcoded
+		mDisplayItem = new ItemStack(Material.ZOMBIE_HEAD, 1);
 
 		mCountsHumanlikes = getAbilityScore() == 2;
 	}

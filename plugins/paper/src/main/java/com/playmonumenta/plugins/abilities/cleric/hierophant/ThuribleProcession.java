@@ -4,12 +4,14 @@ import java.util.EnumSet;
 import java.util.List;
 
 import org.bukkit.Color;
+import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
+import org.bukkit.inventory.ItemStack;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
@@ -51,6 +53,7 @@ public class ThuribleProcession extends Ability {
 		mInfo.mDescriptions.add("Progression - +15% Attack Speed (after 4s of no melee), +15% Speed (after 8s of no melee), +15% Attack and Projectile Damage (after 12s of no melee), Cleric's passive heal is tripled, to 15% of max health every 5s (after 16s of no melee)");
 		mInfo.mCooldown = 20 * THURIBLE_COOLDOWN;
 		mInfo.mLinkedSpell = ClassAbility.THURIBLE_PROCESSION;
+		mDisplayItem = new ItemStack(Material.GLOWSTONE_DUST, 1);
 	}
 
 	@Override

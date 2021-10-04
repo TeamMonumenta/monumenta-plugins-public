@@ -1,7 +1,9 @@
 package com.playmonumenta.plugins.abilities.alchemist;
 
+import org.bukkit.Material;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
@@ -28,6 +30,7 @@ public class GruesomeAlchemy extends PotionAbility {
 
 		mSlownessAmount = getAbilityScore() == 1 ? GRUESOME_ALCHEMY_1_SLOWNESS_AMPLIFIER : GRUESOME_ALCHEMY_2_SLOWNESS_AMPLIFIER;
 		mWitherAmplifier = getAbilityScore() == 1 ? GRUESOME_ALCHEMY_1_WITHER_AMPLIFIER : GRUESOME_ALCHEMY_2_WITHER_AMPLIFIER;
+		mDisplayItem = new ItemStack(Material.SKELETON_SKULL, 1);
 	}
 
 	@Override

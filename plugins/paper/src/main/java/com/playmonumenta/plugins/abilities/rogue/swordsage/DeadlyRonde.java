@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.abilities.rogue.swordsage;
 
 import org.bukkit.Color;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
@@ -57,6 +58,7 @@ public class DeadlyRonde extends Ability {
 		mInfo.mShorthandName = "DR";
 		mInfo.mDescriptions.add("After casting a skill, gain a stack of Deadly Ronde for 5 seconds, stacking up to 2 times. While Deadly Ronde is active, you gain Speed I, and your next melee attack consumes a stack to fire a flurry of blades, that fire in a cone with a radius of 4 blocks and deal 5 damage to all enemies they hit.");
 		mInfo.mDescriptions.add("Damage increased to 8, and you can now store up to 3 charges.");
+		mDisplayItem = new ItemStack(Material.BLAZE_ROD, 1);
 	}
 
 	@Override

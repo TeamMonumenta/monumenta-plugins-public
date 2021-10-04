@@ -21,6 +21,7 @@ import com.playmonumenta.plugins.utils.LocationUtils;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
@@ -84,6 +85,7 @@ public class PurpleHaze extends Ability {
 		mInfo.mCooldown = getAbilityScore() == 1 ? PURPLE_HAZE_1_COOLDOWN : PURPLE_HAZE_2_COOLDOWN;
 		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;
 		mDuration = getAbilityScore() == 1 ? PURPLE_HAZE_1_DURATION : PURPLE_HAZE_2_DURATION;
+		mDisplayItem = new ItemStack(Material.POPPED_CHORUS_FRUIT, 1);
 
 		/*
 		 * Only one runnable ever exists for purple haze - it is a global list, not tied to any individual players

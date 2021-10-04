@@ -14,6 +14,7 @@ import com.playmonumenta.plugins.utils.MovementUtils;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
@@ -22,6 +23,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.projectiles.ProjectileSource;
 
 
@@ -51,6 +53,7 @@ public class SanctifiedArmor extends Ability {
 		mInfo.mDescriptions.add("Whenever a non-boss undead enemy hits you with a melee or projectile attack, it takes 1.5 times the final damage you took and is knocked away from you.");
 		mInfo.mDescriptions.add("Deal 2.5 times the final damage instead, and the undead enemy is also afflicted with 20% Slowness for 3 seconds (even if you are blocking).");
 		mPercentDamageReturned = getAbilityScore() == 1 ? PERCENT_DAMAGE_RETURNED_1 : PERCENT_DAMAGE_RETURNED_2;
+		mDisplayItem = new ItemStack(Material.IRON_CHESTPLATE, 1);
 
 		Bukkit.getScheduler().runTask(plugin, () -> {
 			if (player != null) {

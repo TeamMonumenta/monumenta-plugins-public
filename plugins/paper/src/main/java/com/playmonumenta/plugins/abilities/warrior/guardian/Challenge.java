@@ -4,6 +4,7 @@ import java.util.EnumSet;
 import java.util.List;
 
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
@@ -13,6 +14,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
+import org.bukkit.inventory.ItemStack;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
@@ -54,6 +56,7 @@ public class Challenge extends Ability {
 		mInfo.mIgnoreCooldown = true;
 		mInfo.mLinkedSpell = ClassAbility.CHALLENGE;
 		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;
+		mDisplayItem = new ItemStack(Material.IRON_AXE, 1);
 		mPercentDamageDealtEffect = getAbilityScore() == 1 ? PERCENT_DAMAGE_DEALT_EFFECT_1 : PERCENT_DAMAGE_DEALT_EFFECT_2;
 		mAbsorptionPerMob = getAbilityScore() == 1 ? ABSORPTION_PER_MOB_1 : ABSORPTION_PER_MOB_2;
 		mMaxAbsorption = getAbilityScore() == 1 ? MAX_ABSORPTION_1 : MAX_ABSORPTION_2;

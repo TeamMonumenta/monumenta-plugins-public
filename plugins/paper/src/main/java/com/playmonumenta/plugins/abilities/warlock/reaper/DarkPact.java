@@ -17,6 +17,7 @@ import com.playmonumenta.plugins.utils.AbsorptionUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
@@ -25,6 +26,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 
 
@@ -62,6 +64,7 @@ public class DarkPact extends Ability {
 		mInfo.mCooldown = COOLDOWN;
 		mInfo.mLinkedSpell = ClassAbility.DARK_PACT;
 		mInfo.mIgnoreCooldown = true;
+		mDisplayItem = new ItemStack(Material.SOUL_SAND, 1);
 		mPercentDamageDealt = getAbilityScore() == 1 ? PERCENT_DAMAGE_DEALT_1 : PERCENT_DAMAGE_DEALT_2;
 		mPercentAtks = getAbilityScore() == 1 ? PERCENT_ATKS_1 : PERCENT_ATKS_2;
 		Bukkit.getScheduler().runTask(plugin, () -> {
