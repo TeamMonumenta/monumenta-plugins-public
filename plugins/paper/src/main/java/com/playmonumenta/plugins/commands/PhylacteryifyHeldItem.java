@@ -9,7 +9,7 @@ import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
 
 public class PhylacteryifyHeldItem extends GenericCommand {
 	public static void register() {
-		registerPlayerCommand("Phylacteryifyhelditem", "monumenta.command.phylacteryifyhelditem", PhylacteryifyHeldItem::run);
+		registerPlayerCommand("phylacteryifyhelditem", "monumenta.command.phylacteryifyhelditem", PhylacteryifyHeldItem::run);
 	}
 
 	private static void run(CommandSender sender, Player player) throws WrapperCommandSyntaxException {
