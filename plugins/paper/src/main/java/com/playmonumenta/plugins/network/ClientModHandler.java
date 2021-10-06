@@ -24,7 +24,7 @@ public class ClientModHandler implements Listener {
 
 	public static final String CHANNEL_ID = "monumenta:client_channel_v1";
 
-	private static ClientModHandler INSTANCE;
+	private static ClientModHandler INSTANCE = null;
 
 	private final Plugin mPlugin;
 
