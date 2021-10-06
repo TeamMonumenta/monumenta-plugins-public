@@ -67,7 +67,7 @@ public class CooldownTimers {
 		}
 	}
 
-	public void updateCooldowns(Integer ticks) {
+	public void updateCooldowns(int ticks) {
 		//  Our set of player cooldowns is broken down into a Hashmap of Hashmaps.
 		//  Because of this, we first loop through each player (UUID), than we loop
 		//  through their different ability ID's.
@@ -88,8 +88,11 @@ public class CooldownTimers {
 						MessagingUtils.sendActionBarMessage(mPlugin, player, spell.getName() + " is now off cooldown!");
 
 						abilityIter.remove();
+
+						mPlugin.mClientModIntegration.updateAbility(player, spell);
 					} else {
 						cooldown.setValue(time);
+						// don't send update to client mod, as this is the normal case of time passing
 					}
 				}
 			}
@@ -106,7 +109,7 @@ public class CooldownTimers {
 	 * @param player The player whose cooldown ticks will be updated
 	 * @param ticks The cooldown reduction in ticks
 	 */
-	public void updateCooldowns(Player player, Integer ticks) {
+	public void updateCooldowns(Player player, int ticks) {
 		HashMap<ClassAbility, Integer> cds = mTimers.get(player.getUniqueId());
 
 		if (cds != null) {
@@ -121,15 +124,16 @@ public class CooldownTimers {
 				} else {
 					cds.put(spell, cd);
 				}
+				mPlugin.mClientModIntegration.updateAbility(player, spell);
 			}
 
-			if (mTimers.keySet().size() <= 0) {
+			if (cds.isEmpty()) {
 				mTimers.remove(player.getUniqueId());
 			}
 		}
 	}
 
-	public void updateCooldown(Player player, ClassAbility spell, Integer ticks) {
+	public void updateCooldown(Player player, ClassAbility spell, int ticks) {
 		HashMap<ClassAbility, Integer> cds = mTimers.get(player.getUniqueId());
 
 		if (cds != null && cds.containsKey(spell)) {
@@ -141,15 +145,19 @@ public class CooldownTimers {
 			} else {
 				cds.put(spell, cd);
 			}
+			mPlugin.mClientModIntegration.updateAbility(player, spell);
 
-			if (mTimers.keySet().size() <= 0) {
+			if (cds.isEmpty()) {
 				mTimers.remove(player.getUniqueId());
 			}
 		}
 	}
 
-	public void removeAllCooldowns(UUID playerID) {
-		mTimers.remove(playerID);
+	public void removeAllCooldowns(Player player) {
+		HashMap<ClassAbility, Integer> cds = mTimers.remove(player.getUniqueId());
+		for (ClassAbility classAbility : cds.keySet()) {
+			mPlugin.mClientModIntegration.updateAbility(player, classAbility);
+		}
 	}
 
 	public Set<ClassAbility> getCooldowns(UUID playerID) {
@@ -160,4 +168,17 @@ public class CooldownTimers {
 			return null;
 		}
 	}
+
+	/**
+	 * returns the remaining cooldown of the given ability, in ticks. Returns 0 if not on cooldown.
+	 */
+	public int getCooldown(UUID playerID, ClassAbility ability) {
+		HashMap<ClassAbility, Integer> player = mTimers.get(playerID);
+		if (player != null) {
+			return player.getOrDefault(ability, 0);
+		} else {
+			return 0;
+		}
+	}
+
 }

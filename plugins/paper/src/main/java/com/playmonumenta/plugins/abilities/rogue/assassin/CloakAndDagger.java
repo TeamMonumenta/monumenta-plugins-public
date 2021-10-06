@@ -15,6 +15,7 @@ import org.bukkit.event.entity.EntityDeathEvent;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
+import com.playmonumenta.plugins.abilities.AbilityWithChargesOrStacks;
 import com.playmonumenta.plugins.abilities.KillTriggeredAbilityTracker;
 import com.playmonumenta.plugins.abilities.KillTriggeredAbilityTracker.KillTriggeredAbility;
 import com.playmonumenta.plugins.classes.ClassAbility;
@@ -23,7 +24,7 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 
-public class CloakAndDagger extends Ability implements KillTriggeredAbility {
+public class CloakAndDagger extends Ability implements KillTriggeredAbility, AbilityWithChargesOrStacks {
 
 	private static final double CLOAK_1_DAMAGE_MULTIPLIER = 1.5;
 	private static final double CLOAK_2_DAMAGE_MULTIPLIER = 2.5;
@@ -136,5 +137,17 @@ public class CloakAndDagger extends Ability implements KillTriggeredAbility {
 		}
 
 		MessagingUtils.sendActionBarMessage(mPlugin, mPlayer, "Cloak stacks: " + mCloak);
+		mPlugin.mClientModIntegration.updateAbility(mPlayer, this);
 	}
+
+	@Override
+	public int getCharges() {
+		return mCloak;
+	}
+
+	@Override
+	public int getMaxCharges() {
+		return mMaxStacks;
+	}
+
 }

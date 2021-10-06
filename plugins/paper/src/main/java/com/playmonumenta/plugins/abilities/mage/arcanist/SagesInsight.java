@@ -5,20 +5,21 @@ import java.util.HashMap;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
-import org.bukkit.entity.Player;
 import org.bukkit.Sound;
 import org.bukkit.World;
+import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.utils.MessagingUtils;
+import com.playmonumenta.plugins.abilities.AbilityWithChargesOrStacks;
 import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.events.AbilityCastEvent;
 import com.playmonumenta.plugins.events.CustomDamageEvent;
-import com.playmonumenta.plugins.effects.PercentSpeed;
+import com.playmonumenta.plugins.utils.MessagingUtils;
 
-public class SagesInsight extends Ability {
+public class SagesInsight extends Ability implements AbilityWithChargesOrStacks {
 	private static final int DECAY_TIMER = 20 * 4;
 	private static final int MAX_STACKS = 8;
 	private static final double SPEED_1 = 0.2;
@@ -63,6 +64,7 @@ public class SagesInsight extends Ability {
 				mTicksToStackDecay = DECAY_TIMER;
 				mStacks--;
 				MessagingUtils.sendActionBarMessage(mPlugin, mPlayer, "Sage's Insight Stacks: " + mStacks);
+				mPlugin.mClientModIntegration.updateAbility(mPlayer, this);
 			}
 		}
 	}
@@ -106,6 +108,7 @@ public class SagesInsight extends Ability {
 					world.spawnParticle(Particle.EXPLOSION_NORMAL, locD, 15, 0, 0, 0, 0.2);
 					MessagingUtils.sendActionBarMessage(mPlugin, mPlayer, "Sage's Insight Stacks: " + mStacks);
 				}
+				mPlugin.mClientModIntegration.updateAbility(mPlayer, this);
 			}
 		}
 	}
@@ -135,6 +138,16 @@ public class SagesInsight extends Ability {
 			return true;
 		}
 		return true;
+	}
+
+	@Override
+	public int getCharges() {
+		return mStacks;
+	}
+
+	@Override
+	public int getMaxCharges() {
+		return MAX_STACKS;
 	}
 
 }

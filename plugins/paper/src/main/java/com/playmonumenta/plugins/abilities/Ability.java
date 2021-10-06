@@ -73,7 +73,7 @@ public abstract class Ability {
 
 	/**
 	 * Gets the AbilityInfo object, which contains the small data side of the ability itself, and is required to have for any ability.
-	 * @return the AbilityInfo object, if one exists. If not, it returns null.
+	 * @return the AbilityInfo object. Never null.
 	 */
 	public AbilityInfo getInfo() {
 		return mInfo;

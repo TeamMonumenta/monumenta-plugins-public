@@ -83,6 +83,7 @@ import com.playmonumenta.plugins.integrations.MonumentaRedisSyncIntegration;
 import com.playmonumenta.plugins.integrations.PlaceholderAPIIntegration;
 import com.playmonumenta.plugins.integrations.PremiumVanishIntegration;
 import com.playmonumenta.plugins.integrations.ProtocolLibIntegration;
+import com.playmonumenta.plugins.network.ClientModHandler;
 import com.playmonumenta.plugins.integrations.luckperms.LuckPermsIntegration;
 import com.playmonumenta.plugins.inventories.AnvilFixInInventory;
 import com.playmonumenta.plugins.inventories.LootChestsInInventory;
@@ -153,6 +154,8 @@ public class Plugin extends JavaPlugin {
 	public IndexInventoryManager mIndexInventoryManager;
 	public EffectManager mEffectManager;
 	public ParrotManager mParrotManager;
+
+	public ClientModHandler mClientModIntegration;
 
 	public DeathItemListener mDeathItemListener;
 
@@ -279,6 +282,7 @@ public class Plugin extends JavaPlugin {
 		mEffectManager = new EffectManager(this);
 		mDeathItemListener = new DeathItemListener(this);
 		mParrotManager = new ParrotManager(this);
+		mClientModIntegration = new ClientModHandler(this);
 
 		DailyReset.startTimer(this);
 
@@ -332,6 +336,7 @@ public class Plugin extends JavaPlugin {
 		manager.registerEvents(new GraveListener(this), this);
 		manager.registerEvents(new BrewingListener(), this);
 		manager.registerEvents(new ItemUpdateManager(this), this);
+		manager.registerEvents(mClientModIntegration, this);
 
 		if (ServerProperties.getShardName().contains("depths")
 				|| ServerProperties.getShardName().equals("mobs")

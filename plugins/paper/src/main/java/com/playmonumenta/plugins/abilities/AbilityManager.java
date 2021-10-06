@@ -574,6 +574,9 @@ public class AbilityManager {
 		for (Ability abil : getPlayerAbilities(player).getAbilities()) {
 			abil.setupClassPotionEffects();
 		}
+
+		mPlugin.mClientModIntegration.updateAbilities(player);
+
 		return collection;
 	}
 

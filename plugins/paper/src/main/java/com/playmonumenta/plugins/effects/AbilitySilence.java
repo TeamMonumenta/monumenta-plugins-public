@@ -5,11 +5,11 @@ import org.bukkit.Particle;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
+import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.bosses.events.SpellCastEvent;
-
-import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 
 public class AbilitySilence extends Effect {
 
@@ -36,6 +36,7 @@ public class AbilitySilence extends Effect {
 		if (entity instanceof Player) {
 			entity.sendActionBar(Component.text("You are silenced! You cannot use abilities for " + getDuration() / 20 + "s", NamedTextColor.DARK_RED));
 			AbilityManager.getManager().getPlayerAbilities((Player) entity).silence();
+			Plugin.getInstance().mClientModIntegration.silenced((Player) entity, getDuration());
 		}
 	}
 
@@ -43,6 +44,7 @@ public class AbilitySilence extends Effect {
 	public void entityLoseEffect(Entity entity) {
 		if (entity instanceof Player) {
 			AbilityManager.getManager().getPlayerAbilities((Player) entity).unsilence();
+			Plugin.getInstance().mClientModIntegration.silenced((Player) entity, 0);
 		}
 	}
 

@@ -111,6 +111,7 @@ public class EscapeDeath extends Ability {
 			world.playSound(loc, Sound.ENTITY_ARROW_SHOOT, 1f, 0f);
 
 			MessagingUtils.sendActionBarMessage(mPlugin, mPlayer, "Escape Death has been activated");
+			mPlugin.mClientModIntegration.updateAbility(mPlayer, this);
 
 			if (dealDamageLater) {
 				mPlayer.setHealth(1);
