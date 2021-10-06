@@ -280,7 +280,7 @@ public class Plugin extends JavaPlugin {
 		mEffectManager = new EffectManager(this);
 		mDeathItemListener = new DeathItemListener(this);
 		mParrotManager = new ParrotManager(this);
-		ClientModHandler clientModIntegration = ClientModHandler.setup(this);
+		ClientModHandler clientModIntegration = new ClientModHandler(this);
 
 		DailyReset.startTimer(this);
 

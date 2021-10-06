@@ -30,15 +30,11 @@ public class ClientModHandler implements Listener {
 
 	private final Gson mGson;
 
-	private ClientModHandler(Plugin plugin) {
+	public ClientModHandler(Plugin plugin) {
 		this.mPlugin = plugin;
 		mGson = new GsonBuilder().create();
-	}
-
-	public static ClientModHandler setup(Plugin plugin) {
-		INSTANCE = new ClientModHandler(plugin);
 		Bukkit.getMessenger().registerOutgoingPluginChannel(plugin, CHANNEL_ID);
-		return INSTANCE;
+		INSTANCE = this;
 	}
 
 	@EventHandler(priority = EventPriority.MONITOR)
@@ -47,6 +43,9 @@ public class ClientModHandler implements Listener {
 	}
 
 	public static void updateAbility(Player player, ClassAbility classAbility) {
+		if (INSTANCE == null) {
+			return;
+		}
 		Ability ability = INSTANCE.mPlugin.mAbilityManager.getPlayerAbilities(player).getAbility(classAbility);
 		if (ability == null) {
 			return;
@@ -60,7 +59,7 @@ public class ClientModHandler implements Listener {
 	 * Does nothing if the player does not have a compatible client mod installed, or if the ability makes no sense to send to clients (see {@link #shouldHandleAbility(Ability)}).
 	 */
 	public static void updateAbility(Player player, Ability ability) {
-		if (!playerHasClientMod(player) || !shouldHandleAbility(ability)) {
+		if (INSTANCE == null || !playerHasClientMod(player) || !shouldHandleAbility(ability)) {
 			return;
 		}
 		INSTANCE.sendPacket(player, INSTANCE.prepareAbilityUpdatePacket(player, ability));
@@ -87,7 +86,7 @@ public class ClientModHandler implements Listener {
 	 * Does nothing if the player does not have a compatible client mod installed.
 	 */
 	public static void updateAbilities(Player player) {
-		if (!playerHasClientMod(player)) {
+		if (INSTANCE == null || !playerHasClientMod(player)) {
 			return;
 		}
 
@@ -103,6 +102,9 @@ public class ClientModHandler implements Listener {
 	}
 
 	public static void silenced(Player player, int duration) {
+		if (INSTANCE == null) {
+			return;
+		}
 		PlayerStatusPacket packet = new PlayerStatusPacket();
 		packet.silenceDuration = duration;
 		INSTANCE.sendPacket(player, packet);
