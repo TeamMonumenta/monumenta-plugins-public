@@ -15,6 +15,7 @@ import com.playmonumenta.plugins.abilities.AbilityWithChargesOrStacks;
 import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
+import com.playmonumenta.plugins.network.ClientModHandler;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import net.md_5.bungee.api.ChatColor;
 
@@ -46,7 +47,7 @@ public class DepthsSharpshooter extends DepthsAbility implements AbilityWithChar
 				if (mStacks < MAX_STACKS) {
 					mStacks++;
 					MessagingUtils.sendActionBarMessage(mPlugin, mPlayer, "Sharpshooter Stacks: " + mStacks);
-					mPlugin.mClientModIntegration.updateAbility(mPlayer, this);
+					ClientModHandler.updateAbility(mPlayer, this);
 				}
 			}
 
@@ -65,7 +66,7 @@ public class DepthsSharpshooter extends DepthsAbility implements AbilityWithChar
 				mTicksToStackDecay = SHARPSHOOTER_DECAY_TIMER;
 				mStacks--;
 				MessagingUtils.sendActionBarMessage(mPlugin, mPlayer, "Sharpshooter Stacks: " + mStacks);
-				mPlugin.mClientModIntegration.updateAbility(mPlayer, this);
+				ClientModHandler.updateAbility(mPlayer, this);
 			}
 		}
 	}
@@ -75,7 +76,7 @@ public class DepthsSharpshooter extends DepthsAbility implements AbilityWithChar
 		if (ss != null) {
 			ss.mStacks = Math.min(MAX_STACKS, ss.mStacks + stacks);
 			MessagingUtils.sendActionBarMessage(plugin, player, "Sharpshooter Stacks: " + ss.mStacks);
-			ss.mPlugin.mClientModIntegration.updateAbility(ss.mPlayer, ss);
+			ClientModHandler.updateAbility(ss.mPlayer, ss);
 		}
 	}
 

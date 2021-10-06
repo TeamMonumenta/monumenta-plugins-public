@@ -21,6 +21,7 @@ import com.playmonumenta.plugins.abilities.AbilityWithChargesOrStacks;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.classes.magic.MagicType;
 import com.playmonumenta.plugins.events.AbilityCastEvent;
+import com.playmonumenta.plugins.network.ClientModHandler;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
@@ -97,7 +98,7 @@ public class DeadlyRonde extends Ability implements AbilityWithChargesOrStacks {
 
 		mRondeStacks = Math.min(mRondeStacks + 1, maxStacks);
 		MessagingUtils.sendActionBarMessage(mPlugin, mPlayer, "Deadly Ronde stacks: " + mRondeStacks);
-		mPlugin.mClientModIntegration.updateAbility(mPlayer, this);
+		ClientModHandler.updateAbility(mPlayer, this);
 
 		return true;
 	}
@@ -142,7 +143,7 @@ public class DeadlyRonde extends Ability implements AbilityWithChargesOrStacks {
 
 			mRondeStacks--;
 			MessagingUtils.sendActionBarMessage(mPlugin, mPlayer, "Deadly Ronde stacks: " + mRondeStacks);
-			mPlugin.mClientModIntegration.updateAbility(mPlayer, this);
+			ClientModHandler.updateAbility(mPlayer, this);
 			if (mRondeStacks > 0) {
 				mActiveRunnable = new BukkitRunnable() {
 
@@ -151,7 +152,7 @@ public class DeadlyRonde extends Ability implements AbilityWithChargesOrStacks {
 						mActiveRunnable = null;
 						mRondeStacks = 0;
 						MessagingUtils.sendActionBarMessage(mPlugin, mPlayer, "Deadly Ronde stacks: " + mRondeStacks);
-						mPlugin.mClientModIntegration.updateAbility(mPlayer, DeadlyRonde.this);
+						ClientModHandler.updateAbility(mPlayer, DeadlyRonde.this);
 					}
 
 				};

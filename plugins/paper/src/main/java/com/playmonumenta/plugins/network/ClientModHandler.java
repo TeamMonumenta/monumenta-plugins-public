@@ -11,7 +11,6 @@ import org.bukkit.event.Listener;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.annotations.SerializedName;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityWithChargesOrStacks;
@@ -25,14 +24,21 @@ public class ClientModHandler implements Listener {
 
 	public static final String CHANNEL_ID = "monumenta:client_channel_v1";
 
+	private static ClientModHandler INSTANCE;
+
 	private final Plugin mPlugin;
 
 	private final Gson mGson;
 
-	public ClientModHandler(Plugin plugin) {
+	private ClientModHandler(Plugin plugin) {
 		this.mPlugin = plugin;
-		Bukkit.getMessenger().registerOutgoingPluginChannel(plugin, CHANNEL_ID);
 		mGson = new GsonBuilder().create();
+	}
+
+	public static ClientModHandler setup(Plugin plugin) {
+		INSTANCE = new ClientModHandler(plugin);
+		Bukkit.getMessenger().registerOutgoingPluginChannel(plugin, CHANNEL_ID);
+		return INSTANCE;
 	}
 
 	@EventHandler(priority = EventPriority.MONITOR)
@@ -40,8 +46,8 @@ public class ClientModHandler implements Listener {
 		updateAbility(event.getCaster(), event.getAbility());
 	}
 
-	public void updateAbility(Player player, ClassAbility classAbility) {
-		Ability ability = mPlugin.mAbilityManager.getPlayerAbilities(player).getAbility(classAbility);
+	public static void updateAbility(Player player, ClassAbility classAbility) {
+		Ability ability = INSTANCE.mPlugin.mAbilityManager.getPlayerAbilities(player).getAbility(classAbility);
 		if (ability == null) {
 			return;
 		}
@@ -53,11 +59,11 @@ public class ClientModHandler implements Listener {
 	 * <p>
 	 * Does nothing if the player does not have a compatible client mod installed, or if the ability makes no sense to send to clients (see {@link #shouldHandleAbility(Ability)}).
 	 */
-	public void updateAbility(Player player, Ability ability) {
+	public static void updateAbility(Player player, Ability ability) {
 		if (!playerHasClientMod(player) || !shouldHandleAbility(ability)) {
 			return;
 		}
-		sendPacket(player, prepareAbilityUpdatePacket(player, ability));
+		INSTANCE.sendPacket(player, INSTANCE.prepareAbilityUpdatePacket(player, ability));
 	}
 
 	private AbilityUpdatePacket prepareAbilityUpdatePacket(Player player, Ability ability) {
@@ -67,11 +73,11 @@ public class ClientModHandler implements Listener {
 		int maxCharges = ability instanceof AbilityWithChargesOrStacks ? ((AbilityWithChargesOrStacks) ability).getMaxCharges() : 0;
 
 		AbilityUpdatePacket packet = new AbilityUpdatePacket();
-		packet.mName = getAbilityName(ability);
-		packet.mRemainingCooldown = remainingCooldown;
-		packet.mInitialCooldown = ability.getInfo().mCooldown;
-		packet.mRemainingCharges = charges;
-		packet.mMaxCharges = maxCharges;
+		packet.name = getAbilityName(ability);
+		packet.remainingCooldown = remainingCooldown;
+		packet.initialCooldown = ability.getInfo().mCooldown;
+		packet.remainingCharges = charges;
+		packet.maxCharges = maxCharges;
 		return packet;
 	}
 
@@ -80,26 +86,26 @@ public class ClientModHandler implements Listener {
 	 * <p>
 	 * Does nothing if the player does not have a compatible client mod installed.
 	 */
-	public void updateAbilities(Player player) {
+	public static void updateAbilities(Player player) {
 		if (!playerHasClientMod(player)) {
 			return;
 		}
 
-		AbilityUpdatePacket[] abilities = mPlugin.mAbilityManager.getPlayerAbilities(player).getAbilities().stream()
+		AbilityUpdatePacket[] abilities = INSTANCE.mPlugin.mAbilityManager.getPlayerAbilities(player).getAbilities().stream()
 			.filter(ClientModHandler::shouldHandleAbility)
-			.map(ability -> prepareAbilityUpdatePacket(player, ability))
-			.sorted(Comparator.comparing(p -> p.mName))
+			.map(ability -> INSTANCE.prepareAbilityUpdatePacket(player, ability))
+			.sorted(Comparator.comparing(p -> p.name))
 			.toArray(AbilityUpdatePacket[]::new);
 
 		ClassUpdatePacket packet = new ClassUpdatePacket();
-		packet.mAbilities = abilities;
-		sendPacket(player, packet);
+		packet.abilities = abilities;
+		INSTANCE.sendPacket(player, packet);
 	}
 
-	public void silenced(Player player, int duration) {
+	public static void silenced(Player player, int duration) {
 		PlayerStatusPacket packet = new PlayerStatusPacket();
-		packet.mSilenceDuration = duration;
-		sendPacket(player, packet);
+		packet.silenceDuration = duration;
+		INSTANCE.sendPacket(player, packet);
 	}
 
 	private void sendPacket(Player player, Packet packet) {
@@ -135,11 +141,9 @@ public class ClientModHandler implements Listener {
 	 */
 	private static class ClassUpdatePacket implements Packet {
 
-		@SerializedName("_type")
-		final String mType = "ClassUpdatePacket";
+		final String _type = "ClassUpdatePacket";
 
-		@SerializedName("abilities")
-		AbilityUpdatePacket[] mAbilities;
+		AbilityUpdatePacket[] abilities;
 
 	}
 
@@ -148,23 +152,15 @@ public class ClientModHandler implements Listener {
 	 */
 	private static class AbilityUpdatePacket implements Packet {
 
-		@SerializedName("_type")
-		final String mType = "AbilityUpdatePacket";
+		final String _type = "AbilityUpdatePacket";
 
-		@SerializedName("name")
-		String mName;
+		String name;
 
-		@SerializedName("remainingCooldown")
-		int mRemainingCooldown;
+		int remainingCooldown;
+		int initialCooldown;
 
-		@SerializedName("initialCooldown")
-		int mInitialCooldown;
-
-		@SerializedName("remainingCharges")
-		int mRemainingCharges;
-
-		@SerializedName("maxCharges")
-		int mMaxCharges;
+		int remainingCharges;
+		int maxCharges;
 
 	}
 
@@ -173,11 +169,9 @@ public class ClientModHandler implements Listener {
 	 */
 	private static class PlayerStatusPacket implements Packet {
 
-		@SerializedName("_type")
-		final String mType = "PlayerStatusPacket";
+		final String _type = "PlayerStatusPacket";
 
-		@SerializedName("silenceDuration")
-		int mSilenceDuration;
+		int silenceDuration;
 
 	}
 

@@ -12,6 +12,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.abilities.AbilityWithChargesOrStacks;
+import com.playmonumenta.plugins.network.ClientModHandler;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 
 public class Sharpshooter extends Ability implements AbilityWithChargesOrStacks {
@@ -44,7 +45,7 @@ public class Sharpshooter extends Ability implements AbilityWithChargesOrStacks 
 				if (mStacks < MAX_STACKS) {
 					mStacks++;
 					MessagingUtils.sendActionBarMessage(mPlugin, mPlayer, "Sharpshooter Stacks: " + mStacks);
-					mPlugin.mClientModIntegration.updateAbility(mPlayer, this);
+					ClientModHandler.updateAbility(mPlayer, this);
 				}
 			}
 
@@ -63,7 +64,7 @@ public class Sharpshooter extends Ability implements AbilityWithChargesOrStacks 
 				mTicksToStackDecay = SHARPSHOOTER_DECAY_TIMER;
 				mStacks--;
 				MessagingUtils.sendActionBarMessage(mPlugin, mPlayer, "Sharpshooter Stacks: " + mStacks);
-				mPlugin.mClientModIntegration.updateAbility(mPlayer, this);
+				ClientModHandler.updateAbility(mPlayer, this);
 			}
 		}
 	}
@@ -73,7 +74,7 @@ public class Sharpshooter extends Ability implements AbilityWithChargesOrStacks 
 		if (ss != null) {
 			ss.mStacks = Math.min(MAX_STACKS, ss.mStacks + stacks);
 			MessagingUtils.sendActionBarMessage(plugin, player, "Sharpshooter Stacks: " + ss.mStacks);
-			ss.mPlugin.mClientModIntegration.updateAbility(ss.mPlayer, ss);
+			ClientModHandler.updateAbility(ss.mPlayer, ss);
 		}
 	}
 

@@ -10,6 +10,7 @@ import org.bukkit.entity.Player;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.network.ClientModHandler;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 
 public class CooldownTimers {
@@ -89,7 +90,7 @@ public class CooldownTimers {
 
 						abilityIter.remove();
 
-						mPlugin.mClientModIntegration.updateAbility(player, spell);
+						ClientModHandler.updateAbility(player, spell);
 					} else {
 						cooldown.setValue(time);
 						// don't send update to client mod, as this is the normal case of time passing
@@ -124,7 +125,7 @@ public class CooldownTimers {
 				} else {
 					cds.put(spell, cd);
 				}
-				mPlugin.mClientModIntegration.updateAbility(player, spell);
+				ClientModHandler.updateAbility(player, spell);
 			}
 
 			if (cds.isEmpty()) {
@@ -145,7 +146,7 @@ public class CooldownTimers {
 			} else {
 				cds.put(spell, cd);
 			}
-			mPlugin.mClientModIntegration.updateAbility(player, spell);
+			ClientModHandler.updateAbility(player, spell);
 
 			if (cds.isEmpty()) {
 				mTimers.remove(player.getUniqueId());
@@ -156,7 +157,7 @@ public class CooldownTimers {
 	public void removeAllCooldowns(Player player) {
 		HashMap<ClassAbility, Integer> cds = mTimers.remove(player.getUniqueId());
 		for (ClassAbility classAbility : cds.keySet()) {
-			mPlugin.mClientModIntegration.updateAbility(player, classAbility);
+			ClientModHandler.updateAbility(player, classAbility);
 		}
 	}
 

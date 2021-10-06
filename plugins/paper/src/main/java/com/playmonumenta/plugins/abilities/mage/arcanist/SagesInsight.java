@@ -17,6 +17,7 @@ import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.events.AbilityCastEvent;
 import com.playmonumenta.plugins.events.CustomDamageEvent;
+import com.playmonumenta.plugins.network.ClientModHandler;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 
 public class SagesInsight extends Ability implements AbilityWithChargesOrStacks {
@@ -64,7 +65,7 @@ public class SagesInsight extends Ability implements AbilityWithChargesOrStacks 
 				mTicksToStackDecay = DECAY_TIMER;
 				mStacks--;
 				MessagingUtils.sendActionBarMessage(mPlugin, mPlayer, "Sage's Insight Stacks: " + mStacks);
-				mPlugin.mClientModIntegration.updateAbility(mPlayer, this);
+				ClientModHandler.updateAbility(mPlayer, this);
 			}
 		}
 	}
@@ -108,7 +109,7 @@ public class SagesInsight extends Ability implements AbilityWithChargesOrStacks 
 					world.spawnParticle(Particle.EXPLOSION_NORMAL, locD, 15, 0, 0, 0, 0.2);
 					MessagingUtils.sendActionBarMessage(mPlugin, mPlayer, "Sage's Insight Stacks: " + mStacks);
 				}
-				mPlugin.mClientModIntegration.updateAbility(mPlayer, this);
+				ClientModHandler.updateAbility(mPlayer, this);
 			}
 		}
 	}

@@ -19,6 +19,7 @@ import com.playmonumenta.plugins.abilities.AbilityWithChargesOrStacks;
 import com.playmonumenta.plugins.abilities.KillTriggeredAbilityTracker;
 import com.playmonumenta.plugins.abilities.KillTriggeredAbilityTracker.KillTriggeredAbility;
 import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.network.ClientModHandler;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
@@ -71,7 +72,7 @@ public class CloakAndDagger extends Ability implements KillTriggeredAbility, Abi
 			world.spawnParticle(Particle.SPELL_WITCH, mPlayer.getLocation().add(0, 1, 0), 70, 0.25, 0.45, 0.25, 0.15);
 			world.spawnParticle(Particle.EXPLOSION_NORMAL, mPlayer.getLocation(), 25, 0.2, 0, 0.2, 0.1);
 
-			mPlugin.mClientModIntegration.updateAbility(mPlayer, this);
+			ClientModHandler.updateAbility(mPlayer, this);
 		}
 	}
 
@@ -139,7 +140,7 @@ public class CloakAndDagger extends Ability implements KillTriggeredAbility, Abi
 		}
 
 		MessagingUtils.sendActionBarMessage(mPlugin, mPlayer, "Cloak stacks: " + mCloak);
-		mPlugin.mClientModIntegration.updateAbility(mPlayer, this);
+		ClientModHandler.updateAbility(mPlayer, this);
 	}
 
 	@Override

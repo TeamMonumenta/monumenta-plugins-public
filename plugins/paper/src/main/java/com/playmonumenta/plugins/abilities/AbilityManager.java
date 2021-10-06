@@ -172,6 +172,7 @@ import com.playmonumenta.plugins.enchantments.infusions.Vitality;
 import com.playmonumenta.plugins.events.AbilityCastEvent;
 import com.playmonumenta.plugins.events.CustomDamageEvent;
 import com.playmonumenta.plugins.events.PotionEffectApplyEvent;
+import com.playmonumenta.plugins.network.ClientModHandler;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.AbilityUtils;
@@ -575,7 +576,7 @@ public class AbilityManager {
 			abil.setupClassPotionEffects();
 		}
 
-		mPlugin.mClientModIntegration.updateAbilities(player);
+		ClientModHandler.updateAbilities(player);
 
 		return collection;
 	}

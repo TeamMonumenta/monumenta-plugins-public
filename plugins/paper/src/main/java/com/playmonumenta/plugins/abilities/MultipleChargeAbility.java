@@ -4,6 +4,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.network.ClientModHandler;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.scriptedquests.utils.MessagingUtils;
 
@@ -45,7 +46,7 @@ public abstract class MultipleChargeAbility extends Ability implements AbilityWi
 		if (mCharges < mMaxCharges) {
 			mCharges++;
 			MessagingUtils.sendActionBarMessage(mPlayer, mInfo.mLinkedSpell.getName() + " Charges: " + mCharges);
-			mPlugin.mClientModIntegration.updateAbility(mPlayer, mInfo.mLinkedSpell);
+			ClientModHandler.updateAbility(mPlayer, mInfo.mLinkedSpell);
 
 			return true;
 		}
@@ -78,7 +79,7 @@ public abstract class MultipleChargeAbility extends Ability implements AbilityWi
 		}
 
 		if (hasUpdate) {
-			mPlugin.mClientModIntegration.updateAbility(mPlayer, this);
+			ClientModHandler.updateAbility(mPlayer, this);
 		}
 
 		mWasOnCooldown = onCooldown;
