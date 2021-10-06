@@ -70,6 +70,8 @@ public class CloakAndDagger extends Ability implements KillTriggeredAbility, Abi
 			world.playSound(mPlayer.getLocation(), Sound.ENTITY_ILLUSIONER_MIRROR_MOVE, 1, 1);
 			world.spawnParticle(Particle.SPELL_WITCH, mPlayer.getLocation().add(0, 1, 0), 70, 0.25, 0.45, 0.25, 0.15);
 			world.spawnParticle(Particle.EXPLOSION_NORMAL, mPlayer.getLocation(), 25, 0.2, 0, 0.2, 0.1);
+
+			mPlugin.mClientModIntegration.updateAbility(mPlayer, this);
 		}
 	}
 

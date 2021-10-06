@@ -11,14 +11,14 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityManager;
+import com.playmonumenta.plugins.abilities.AbilityWithChargesOrStacks;
 import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.utils.MessagingUtils;
-
 import net.md_5.bungee.api.ChatColor;
 
-public class DepthsSharpshooter extends DepthsAbility {
+public class DepthsSharpshooter extends DepthsAbility implements AbilityWithChargesOrStacks {
 
 	public static final String ABILITY_NAME = "Sharpshooter";
 	public static final double[] DAMAGE_PER_STACK = {0.025, 0.032, 0.038, 0.044, 0.050};
@@ -46,6 +46,7 @@ public class DepthsSharpshooter extends DepthsAbility {
 				if (mStacks < MAX_STACKS) {
 					mStacks++;
 					MessagingUtils.sendActionBarMessage(mPlugin, mPlayer, "Sharpshooter Stacks: " + mStacks);
+					mPlugin.mClientModIntegration.updateAbility(mPlayer, this);
 				}
 			}
 
@@ -64,6 +65,7 @@ public class DepthsSharpshooter extends DepthsAbility {
 				mTicksToStackDecay = SHARPSHOOTER_DECAY_TIMER;
 				mStacks--;
 				MessagingUtils.sendActionBarMessage(mPlugin, mPlayer, "Sharpshooter Stacks: " + mStacks);
+				mPlugin.mClientModIntegration.updateAbility(mPlayer, this);
 			}
 		}
 	}
@@ -73,6 +75,7 @@ public class DepthsSharpshooter extends DepthsAbility {
 		if (ss != null) {
 			ss.mStacks = Math.min(MAX_STACKS, ss.mStacks + stacks);
 			MessagingUtils.sendActionBarMessage(plugin, player, "Sharpshooter Stacks: " + ss.mStacks);
+			ss.mPlugin.mClientModIntegration.updateAbility(ss.mPlayer, ss);
 		}
 	}
 
@@ -90,5 +93,16 @@ public class DepthsSharpshooter extends DepthsAbility {
 	public DepthsTree getDepthsTree() {
 		return DepthsTree.METALLIC;
 	}
+
+	@Override
+	public int getCharges() {
+		return mStacks;
+	}
+
+	@Override
+	public int getMaxCharges() {
+		return MAX_STACKS;
+	}
+
 }
 

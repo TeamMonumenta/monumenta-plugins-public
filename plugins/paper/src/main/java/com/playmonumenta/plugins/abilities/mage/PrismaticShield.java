@@ -125,7 +125,6 @@ public class PrismaticShield extends Ability {
 		world.spawnParticle(Particle.SPELL_INSTANT, mPlayer.getLocation().add(0, 1.15, 0), 100, 0.2, 0.35, 0.2, 1);
 		world.playSound(mPlayer.getLocation(), Sound.ITEM_TOTEM_USE, 1, 1.35f);
 		MessagingUtils.sendActionBarMessage(mPlugin, mPlayer, "Prismatic Shield has been activated");
-		mPlugin.mClientModIntegration.updateAbility(mPlayer, this);
 
 		if (dealDamageLater) {
 			mPlayer.setHealth(1);
