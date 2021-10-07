@@ -78,7 +78,7 @@ public class Sidearm extends DepthsAbility {
 				if (box.overlaps(mob.getBoundingBox())) {
 					EntityUtils.damageEntity(mPlugin, mob, DAMAGE[mRarity - 1], mPlayer, MagicType.PHYSICAL, true, mInfo.mLinkedSpell);
 					if ((mob == null || mob.isDead() || mob.getHealth() <= 0) && !hasReducedCooldown) {
-						mPlugin.mTimers.addCooldown(mPlayer.getUniqueId(), mInfo.mLinkedSpell, COOLDOWN - KILL_COOLDOWN_REDUCTION);
+						mPlugin.mTimers.addCooldown(mPlayer, mInfo.mLinkedSpell, COOLDOWN - KILL_COOLDOWN_REDUCTION);
 						hasReducedCooldown = true;
 					}
 

@@ -156,7 +156,6 @@ public class Dodging extends Ability {
 		 * tick will also be dodged
 		 */
 		mTriggerTick = mPlayer.getTicksLived();
-		int cd = getAbilityScore() == 1 ? DODGING_COOLDOWN_1 : DODGING_COOLDOWN_2;
 		putOnCooldown();
 
 		Location loc = mPlayer.getLocation().add(0, 1, 0);

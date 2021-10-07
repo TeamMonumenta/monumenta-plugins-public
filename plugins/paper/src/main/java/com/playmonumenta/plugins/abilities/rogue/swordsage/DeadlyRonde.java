@@ -85,6 +85,7 @@ public class DeadlyRonde extends Ability implements AbilityWithChargesOrStacks {
 			public void run() {
 				mActiveRunnable = null;
 				mRondeStacks = 0;
+				ClientModHandler.updateAbility(mPlayer, DeadlyRonde.this);
 			}
 
 		};

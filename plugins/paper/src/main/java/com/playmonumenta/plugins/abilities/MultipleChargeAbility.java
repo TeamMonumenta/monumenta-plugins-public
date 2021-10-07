@@ -35,6 +35,7 @@ public abstract class MultipleChargeAbility extends Ability implements AbilityWi
 			mCharges--;
 			PlayerUtils.callAbilityCastEvent(mPlayer, mInfo.mLinkedSpell);
 			MessagingUtils.sendActionBarMessage(mPlayer, mInfo.mLinkedSpell.getName() + " Charges: " + mCharges);
+			ClientModHandler.updateAbility(mPlayer, this);
 
 			return true;
 		}
@@ -46,7 +47,7 @@ public abstract class MultipleChargeAbility extends Ability implements AbilityWi
 		if (mCharges < mMaxCharges) {
 			mCharges++;
 			MessagingUtils.sendActionBarMessage(mPlayer, mInfo.mLinkedSpell.getName() + " Charges: " + mCharges);
-			ClientModHandler.updateAbility(mPlayer, mInfo.mLinkedSpell);
+			ClientModHandler.updateAbility(mPlayer, this);
 
 			return true;
 		}
@@ -89,7 +90,7 @@ public abstract class MultipleChargeAbility extends Ability implements AbilityWi
 	@Override
 	public void putOnCooldown() {
 		if (!mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.mLinkedSpell)) {
-			mPlugin.mTimers.addCooldown(mPlayer.getUniqueId(), mInfo.mLinkedSpell, mInfo.mCooldown);
+			mPlugin.mTimers.addCooldown(mPlayer, mInfo.mLinkedSpell, mInfo.mCooldown);
 		}
 	}
 

@@ -129,7 +129,7 @@ public abstract class Ability {
 
 				int cooldown = (int) (info.mCooldown * (1 + epochPercent) * (1 + abilityEnchantmentPercent));
 
-				mPlugin.mTimers.addCooldown(mPlayer.getUniqueId(), info.mLinkedSpell, cooldown);
+				mPlugin.mTimers.addCooldown(mPlayer, info.mLinkedSpell, cooldown);
 				PlayerUtils.callAbilityCastEvent(mPlayer, info.mLinkedSpell);
 			}
 		}

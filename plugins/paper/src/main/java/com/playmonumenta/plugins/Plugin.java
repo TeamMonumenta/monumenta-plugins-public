@@ -281,6 +281,8 @@ public class Plugin extends JavaPlugin {
 		mDeathItemListener = new DeathItemListener(this);
 		mParrotManager = new ParrotManager(this);
 
+		new ClientModHandler(this);
+
 		DailyReset.startTimer(this);
 
 		//  Load info.
@@ -333,7 +335,6 @@ public class Plugin extends JavaPlugin {
 		manager.registerEvents(new GraveListener(this), this);
 		manager.registerEvents(new BrewingListener(), this);
 		manager.registerEvents(new ItemUpdateManager(this), this);
-		manager.registerEvents(new ClientModHandler(this), this);
 
 		if (ServerProperties.getShardName().contains("depths")
 				|| ServerProperties.getShardName().equals("mobs")

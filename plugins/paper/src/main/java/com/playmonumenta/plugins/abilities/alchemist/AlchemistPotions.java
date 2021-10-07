@@ -20,6 +20,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityManager;
+import com.playmonumenta.plugins.abilities.AbilityWithChargesOrStacks;
 import com.playmonumenta.plugins.abilities.alchemist.apothecary.AlchemicalAmalgam;
 import com.playmonumenta.plugins.abilities.alchemist.apothecary.InvigoratingOdor;
 import com.playmonumenta.plugins.abilities.alchemist.apothecary.WardingRemedy;
@@ -30,6 +31,7 @@ import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.classes.magic.MagicType;
 import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
 import com.playmonumenta.plugins.enchantments.abilities.BaseAbilityEnchantment;
+import com.playmonumenta.plugins.network.ClientModHandler;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
@@ -43,7 +45,7 @@ import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
 /*
  * Handles giving potions on kills and the direct damage aspect
  */
-public class AlchemistPotions extends Ability {
+public class AlchemistPotions extends Ability implements AbilityWithChargesOrStacks {
 
 	public static class AlchemistPotionsDamageEnchantment extends BaseAbilityEnchantment {
 		public AlchemistPotionsDamageEnchantment() {
@@ -240,6 +242,8 @@ public class AlchemistPotions extends Ability {
 			AbilityUtils.updateAlchemistItem(inventory.getItemInMainHand(), mCharges);
 			mSlot = inventory.getHeldItemSlot();
 
+			ClientModHandler.updateAbility(mPlayer, this);
+
 			return true;
 		}
 		return false;
@@ -254,6 +258,7 @@ public class AlchemistPotions extends Ability {
 			if (item != null) {
 				AbilityUtils.updateAlchemistItem(item, mCharges);
 			}
+			ClientModHandler.updateAbility(mPlayer, this);
 			return true;
 		}
 		return false;
@@ -294,4 +299,15 @@ public class AlchemistPotions extends Ability {
 			}
 		}
 	}
+
+	@Override
+	public int getCharges() {
+		return mCharges;
+	}
+
+	@Override
+	public int getMaxCharges() {
+		return MAX_CHARGE_POTIONS;
+	}
+
 }

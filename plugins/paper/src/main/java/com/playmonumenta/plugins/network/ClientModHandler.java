@@ -5,9 +5,6 @@ import java.util.Comparator;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
-import org.bukkit.event.Listener;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -15,12 +12,11 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityWithChargesOrStacks;
 import com.playmonumenta.plugins.classes.ClassAbility;
-import com.playmonumenta.plugins.events.AbilityCastEvent;
 
 /**
  * Handles communication with an (optional) client mod.
  */
-public class ClientModHandler implements Listener {
+public class ClientModHandler {
 
 	public static final String CHANNEL_ID = "monumenta:client_channel_v1";
 
@@ -35,11 +31,6 @@ public class ClientModHandler implements Listener {
 		mGson = new GsonBuilder().create();
 		Bukkit.getMessenger().registerOutgoingPluginChannel(plugin, CHANNEL_ID);
 		INSTANCE = this;
-	}
-
-	@EventHandler(priority = EventPriority.MONITOR)
-	public void abilityCastEvent(AbilityCastEvent event) {
-		updateAbility(event.getCaster(), event.getAbility());
 	}
 
 	public static void updateAbility(Player player, ClassAbility classAbility) {
