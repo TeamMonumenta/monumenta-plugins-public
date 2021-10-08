@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.abilities.mage;
 
+import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
@@ -7,6 +8,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
@@ -46,6 +48,7 @@ public class PrismaticShield extends Ability {
 		mInfo.mCooldown = getAbilityScore() == 1 ? COOLDOWN_1 : COOLDOWN_2;
 		mAmplifier = getAbilityScore() == 1 ? AMPLIFIER_1 : AMPLIFIER_2;
 		mDuration = getAbilityScore() == 1 ? DURATION_1 : DURATION_2;
+		mDisplayItem = new ItemStack(Material.SHIELD, 1);
 	}
 
 	/*

@@ -59,6 +59,7 @@ public class ShieldBash extends Ability {
 		mInfo.mDescriptions.add("Additionally, apply damage, stun, and taunt to all enemies in a 2 block radius from the enemy you are looking at.");
 		mInfo.mCooldown = SHIELD_BASH_COOLDOWN;
 		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
+		mDisplayItem = new ItemStack(Material.IRON_DOOR, 1);
 	}
 
 	@Override

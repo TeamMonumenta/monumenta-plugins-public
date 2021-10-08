@@ -22,6 +22,7 @@ import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.Color;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
@@ -66,6 +67,7 @@ public class HauntingShades extends MultipleChargeAbility {
 		mInfo.mCooldown = COOLDOWN;
 		mInfo.mTrigger = AbilityTrigger.ALL;
 		mInfo.mIgnoreCooldown = true;
+		mDisplayItem = new ItemStack(Material.SKELETON_SKULL, 1);
 		mVuln = getAbilityScore() == 1 ? VULN_1 : VULN_2;
 	}
 

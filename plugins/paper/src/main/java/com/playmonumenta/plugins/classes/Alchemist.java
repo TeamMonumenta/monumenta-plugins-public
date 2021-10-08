@@ -1,6 +1,8 @@
 package com.playmonumenta.plugins.classes;
 
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.alchemist.Bezoar;
@@ -20,6 +22,9 @@ import com.playmonumenta.plugins.abilities.alchemist.harbinger.NightmarishAlchem
 import com.playmonumenta.plugins.abilities.alchemist.harbinger.PurpleHaze;
 import com.playmonumenta.plugins.abilities.alchemist.harbinger.ScorchedEarth;
 
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.md_5.bungee.api.ChatColor;
+
 
 public class Alchemist extends PlayerClass {
 
@@ -34,6 +39,9 @@ public class Alchemist extends PlayerClass {
 		mAbilities.add(new Bezoar(plugin, player));
 		mClass = 5;
 		mClassName = "Alchemist";
+		mClassColor = NamedTextColor.GREEN;
+		mChatColor = ChatColor.GREEN;
+		mDisplayItem = new ItemStack(Material.POTION, 1);
 
 		mSpecOne.mAbilities.add(new PurpleHaze(plugin, player));
 		mSpecOne.mAbilities.add(new ScorchedEarth(plugin, player));
@@ -41,6 +49,7 @@ public class Alchemist extends PlayerClass {
 		mSpecOne.mSpecQuestScoreboard = "Quest103m";
 		mSpecOne.mSpecialization = 9;
 		mSpecOne.mSpecName = "Harbringer";
+		mSpecOne.mDisplayItem = new ItemStack(Material.DEAD_BUSH, 1);
 
 		mSpecTwo.mAbilities.add(new AlchemicalAmalgam(plugin, player));
 		mSpecTwo.mAbilities.add(new InvigoratingOdor(plugin, player));
@@ -48,6 +57,7 @@ public class Alchemist extends PlayerClass {
 		mSpecTwo.mSpecQuestScoreboard = "Quest103f";
 		mSpecTwo.mSpecialization = 10;
 		mSpecTwo.mSpecName = "Apothecary";
+		mSpecTwo.mDisplayItem = new ItemStack(Material.BLUE_ORCHID, 1);
 
 	}
 }

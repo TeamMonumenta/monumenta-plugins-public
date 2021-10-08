@@ -61,6 +61,7 @@ public class IronTincture extends Ability {
 		mInfo.mDescriptions.add("Effect and effect cap increased to 12 absorption health.");
 		mInfo.mCooldown = IRON_TINCTURE_USE_COOLDOWN; // Full duration cooldown
 		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
+		mDisplayItem = new ItemStack(Material.SPLASH_POTION, 1);
 	}
 
 	@Override
@@ -134,7 +135,7 @@ public class IronTincture extends Ability {
 					this.cancel();
 
 					// Take the skill off cooldown (by setting to 0)
-					mPlugin.mTimers.addCooldown(mPlayer.getUniqueId(), mInfo.mLinkedSpell, 0);
+					mPlugin.mTimers.addCooldown(mPlayer, mInfo.mLinkedSpell, 0);
 				}
 			}
 

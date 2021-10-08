@@ -65,5 +65,14 @@ public class CustomInventoryCommands {
 				new ParrotCustomInventory(player).openInventory(player, plugin);
 			})
 			.register();
+
+		new CommandAPICommand("openclassgui")
+			.withPermission("monumenta.command.openclassgui")
+			.withArguments(new EntitySelectorArgument("player", EntitySelector.ONE_PLAYER))
+			.executes((sender, args) -> {
+				Player player = (Player)args[0];
+				new ClassSelectionCustomInventory(player).openInventory(player, plugin);
+			})
+			.register();
 	}
 }

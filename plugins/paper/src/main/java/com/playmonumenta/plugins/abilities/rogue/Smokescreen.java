@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.abilities.rogue;
 
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
@@ -36,6 +37,7 @@ public class Smokescreen extends Ability {
 		mInfo.mDescriptions.add("The Weaken debuff is increased to 40%.");
 		mInfo.mCooldown = SMOKESCREEN_COOLDOWN;
 		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
+		mDisplayItem = new ItemStack(Material.DEAD_TUBE_CORAL, 1);
 		mWeakenEffect = getAbilityScore() == 1 ? WEAKEN_EFFECT_1 : WEAKEN_EFFECT_2;
 	}
 

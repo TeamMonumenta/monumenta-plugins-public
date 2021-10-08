@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.abilities.alchemist;
 import java.util.EnumSet;
 
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
@@ -13,6 +14,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.entity.SpectralArrow;
 import org.bukkit.event.entity.ProjectileHitEvent;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
@@ -65,6 +67,7 @@ public class UnstableArrows extends Ability {
 		} else {
 			mInfo.mCooldown = getAbilityScore() == 1 ? UNSTABLE_ARROWS_1_COOLDOWN : UNSTABLE_ARROWS_2_COOLDOWN;
 		}
+		mDisplayItem = new ItemStack(Material.TIPPED_ARROW, 1);
 	}
 
 	@Override
@@ -104,7 +107,7 @@ public class UnstableArrows extends Ability {
 
 							double baseDamage = (getAbilityScore() == 1) ? UNSTABLE_ARROWS_1_DAMAGE : UNSTABLE_ARROWS_2_DAMAGE;
 							AlchemistPotions ap = AbilityManager.getManager().getPlayerAbility(mPlayer, AlchemistPotions.class);
-							double potDamage = ap.getDamage();
+							double potDamage = ap == null ? 0 : ap.getDamage();
 
 							for (LivingEntity mob : EntityUtils.getNearbyMobs(mLoc, UNSTABLE_ARROWS_RADIUS, mPlayer)) {
 								EntityUtils.damageEntity(mPlugin, mob, baseDamage + potDamage, mPlayer, MagicType.ALCHEMY, true, mInfo.mLinkedSpell);

@@ -99,7 +99,7 @@ public class SpellDesecrate extends Spell {
 						player.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, 20 * 3, 10));
 						AbilityUtils.silencePlayer(player, 3 * 20);
 						BossUtils.bossDamage(mBoss, player, 20, null, "Desecrate");
-						MovementUtils.knockAway(mBoss.getLocation(), player, 0.4f);
+						MovementUtils.knockAway(mBoss.getLocation(), player, 0.2f);
 					}
 
 					BukkitRunnable runB = new BukkitRunnable() {

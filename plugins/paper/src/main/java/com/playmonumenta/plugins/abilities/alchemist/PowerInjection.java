@@ -5,6 +5,7 @@ import java.util.EnumSet;
 import org.bukkit.Color;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
@@ -62,6 +63,7 @@ public class PowerInjection extends Ability {
 		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;
 		mFlatDamageDealtEffect = getAbilityScore() == 1 ? FLAT_DAMAGE_DEALT_EFFECT_1 : FLAT_DAMAGE_DEALT_EFFECT_2;
 		mPercentDamageDealtEffect = getAbilityScore() == 1 ? PERCENT_DAMAGE_DEALT_EFFECT_1 : PERCENT_DAMAGE_DEALT_EFFECT_2;
+		mDisplayItem = new ItemStack(Material.GUNPOWDER, 1);
 	}
 
 	@Override

@@ -12,6 +12,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
@@ -55,6 +56,7 @@ public class CursedWound extends Ability {
 		mInfo.mShorthandName = "CW";
 		mInfo.mDescriptions.add("Attacking an enemy with a critical scythe attack passively afflicts it and all enemies in a 3-block cube around it with Wither 2 for 6s. Your melee attacks passively deal 3% more damage per ability on cooldown, capped at +15% damage.");
 		mInfo.mDescriptions.add("Critical attacks now also extend all enemies' debuffs (except Stun, Silence, and Confusion) by 2s. Damage cap is increased from 15% to 30%.");
+		mDisplayItem = new ItemStack(Material.GOLDEN_SWORD, 1);
 	}
 
 	@Override

@@ -1,11 +1,13 @@
 package com.playmonumenta.plugins.abilities.alchemist.apothecary;
 
 import org.bukkit.Color;
+import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.ThrownPotion;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import com.playmonumenta.plugins.Plugin;
@@ -36,6 +38,7 @@ public class WardingRemedy extends Ability {
 		mInfo.mShorthandName = "WR";
 		mInfo.mDescriptions.add("You and allies in a 12 block radius passively gain an additional 10% damage on melee and ranged attacks when having absorption health. Shift and right click with an Alchemist Potion to give players (including yourself) within a 6 block radius 1 absorption health per 0.5 seconds for 6 seconds, lasting 30 seconds, up to 6 absorption health. Cooldown: 30s.");
 		mInfo.mDescriptions.add("The damage bonus is increased to 15%, and cooldown decreased to 25s.");
+		mDisplayItem = new ItemStack(Material.GOLDEN_CARROT, 1);
 	}
 
 	@Override

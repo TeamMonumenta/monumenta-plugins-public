@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.EnumSet;
 
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
@@ -16,6 +17,7 @@ import org.bukkit.event.entity.EntityCombustByEntityEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.PotionSplashEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionData;
 import org.bukkit.potion.PotionType;
 
@@ -74,6 +76,7 @@ public class Dodging extends Ability {
 		mInfo.mCooldown = getAbilityScore() == 1 ? DODGING_COOLDOWN_1 : DODGING_COOLDOWN_2;
 		// NOTE: This skill will get events even when it is on cooldown!
 		mInfo.mIgnoreCooldown = true;
+		mDisplayItem = new ItemStack(Material.SHIELD, 1);
 	}
 
 	@Override
@@ -156,7 +159,6 @@ public class Dodging extends Ability {
 		 * tick will also be dodged
 		 */
 		mTriggerTick = mPlayer.getTicksLived();
-		int cd = getAbilityScore() == 1 ? DODGING_COOLDOWN_1 : DODGING_COOLDOWN_2;
 		putOnCooldown();
 
 		Location loc = mPlayer.getLocation().add(0, 1, 0);

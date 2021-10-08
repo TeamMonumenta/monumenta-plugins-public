@@ -4,12 +4,14 @@ import java.util.NavigableSet;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
+import org.bukkit.inventory.ItemStack;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
@@ -43,6 +45,7 @@ public class SoulRend extends Ability {
 		mInfo.mDescriptions.add("Players within 7 blocks of you are now also healed. Flat healing is increased from 2 to 4 health.");
 		mInfo.mLinkedSpell = ClassAbility.SOUL_REND;
 		mInfo.mCooldown = COOLDOWN;
+		mDisplayItem = new ItemStack(Material.POTION, 1);
 		mHeal = getAbilityScore() == 1 ? HEAL_1 : HEAL_2;
 		Bukkit.getScheduler().runTask(plugin, () -> {
 			if (player != null) {

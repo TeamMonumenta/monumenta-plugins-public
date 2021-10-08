@@ -3,20 +3,32 @@ package com.playmonumenta.plugins.classes;
 import java.util.ArrayList;
 
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.scriptedquests.utils.ScoreboardUtils;
 
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.md_5.bungee.api.ChatColor;
+
+
 public class PlayerClass {
 
 	public ArrayList<Ability> mAbilities = new ArrayList<Ability>();
 	public int mClass;
 	public String mClassName;
+	public NamedTextColor mClassColor;
+	public ChatColor mChatColor;
+	public ItemStack mDisplayItem;
+	public String mQuestReq = null;
+	public int mQuestReqMin;
+	public String mClassDescription;
+	public String mClassPassiveDescription;
 
-	PlayerSpec mSpecOne = new PlayerSpec();
-	PlayerSpec mSpecTwo = new PlayerSpec();
+	public PlayerSpec mSpecOne = new PlayerSpec();
+	public PlayerSpec mSpecTwo = new PlayerSpec();
 
 	public Boolean getClassAccessPerms(Player player) {
 		return true;

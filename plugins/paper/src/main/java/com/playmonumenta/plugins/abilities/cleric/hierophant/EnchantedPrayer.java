@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.abilities.cleric.hierophant;
 import java.util.EnumSet;
 
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
@@ -47,6 +48,7 @@ public class EnchantedPrayer extends Ability {
 		mInfo.mLinkedSpell = ClassAbility.ENCHANTED_PRAYER;
 		mInfo.mCooldown = ENCHANTED_PRAYER_COOLDOWN;
 		mInfo.mIgnoreCooldown = true;
+		mDisplayItem = new ItemStack(Material.CHORUS_FRUIT, 1);
 		mDamage = getAbilityScore() == 1 ? ENCHANTED_PRAYER_1_DAMAGE : ENCHANTED_PRAYER_2_DAMAGE;
 		mHeal = getAbilityScore() == 1 ? ENCHANTED_PRAYER_1_HEAL : ENCHANTED_PRAYER_2_HEAL;
 	}

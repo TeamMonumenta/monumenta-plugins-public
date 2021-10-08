@@ -4,10 +4,11 @@ import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.network.ClientModHandler;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.scriptedquests.utils.MessagingUtils;
 
-public class MultipleChargeAbility extends Ability {
+public abstract class MultipleChargeAbility extends Ability implements AbilityWithChargesOrStacks {
 
 	protected int mMaxCharges;
 
@@ -34,6 +35,7 @@ public class MultipleChargeAbility extends Ability {
 			mCharges--;
 			PlayerUtils.callAbilityCastEvent(mPlayer, mInfo.mLinkedSpell);
 			MessagingUtils.sendActionBarMessage(mPlayer, mInfo.mLinkedSpell.getName() + " Charges: " + mCharges);
+			ClientModHandler.updateAbility(mPlayer, this);
 
 			return true;
 		}
@@ -45,6 +47,7 @@ public class MultipleChargeAbility extends Ability {
 		if (mCharges < mMaxCharges) {
 			mCharges++;
 			MessagingUtils.sendActionBarMessage(mPlayer, mInfo.mLinkedSpell.getName() + " Charges: " + mCharges);
+			ClientModHandler.updateAbility(mPlayer, this);
 
 			return true;
 		}
@@ -61,15 +64,23 @@ public class MultipleChargeAbility extends Ability {
 			mPlugin.mTimers.removeCooldown(mPlayer.getUniqueId(), mInfo.mLinkedSpell);
 		}
 
+		boolean hasUpdate = false;
+
 		// Increment charges if last check was on cooldown, and now is off cooldown.
 		if (mCharges < mMaxCharges && mWasOnCooldown && !onCooldown) {
 			mCharges++;
 			MessagingUtils.sendActionBarMessage(mPlayer, mInfo.mLinkedSpell.getName() + " Charges: " + mCharges);
+			hasUpdate = true;
 		}
 
 		// Put on cooldown if charges can still be gained
 		if (mCharges < mMaxCharges && !onCooldown) {
 			putOnCooldown();
+			hasUpdate = true;
+		}
+
+		if (hasUpdate) {
+			ClientModHandler.updateAbility(mPlayer, this);
 		}
 
 		mWasOnCooldown = onCooldown;
@@ -79,7 +90,7 @@ public class MultipleChargeAbility extends Ability {
 	@Override
 	public void putOnCooldown() {
 		if (!mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.mLinkedSpell)) {
-			mPlugin.mTimers.addCooldown(mPlayer.getUniqueId(), mInfo.mLinkedSpell, mInfo.mCooldown);
+			mPlugin.mTimers.addCooldown(mPlayer, mInfo.mLinkedSpell, mInfo.mCooldown);
 		}
 	}
 
@@ -88,7 +99,14 @@ public class MultipleChargeAbility extends Ability {
 		manageChargeCooldowns();
 	}
 
+	@Override
 	public int getCharges() {
 		return mCharges;
 	}
+
+	@Override
+	public int getMaxCharges() {
+		return mMaxCharges;
+	}
+
 }

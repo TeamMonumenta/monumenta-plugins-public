@@ -59,6 +59,7 @@ public class WhirlingBlade extends MultipleChargeAbility {
 		mKnockback = getAbilityScore() == 1 ? BLADE_1_KNOCKBACK : BLADE_2_KNOCKBACK;
 		mInfo.mCooldown = getAbilityScore() == 1 ? BLADE_1_COOLDOWN : BLADE_2_COOLDOWN;
 		mInfo.mIgnoreCooldown = true;
+		mDisplayItem = new ItemStack(Material.IRON_SWORD, 1);
 
 		Bukkit.getScheduler().runTask(plugin, () -> {
 			if (player != null) {

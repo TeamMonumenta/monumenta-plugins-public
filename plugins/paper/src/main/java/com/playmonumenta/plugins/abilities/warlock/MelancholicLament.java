@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.abilities.warlock;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
@@ -54,6 +55,7 @@ public class MelancholicLament extends Ability {
 		mInfo.mDescriptions.add("Increase the Weaken to 30% and decrease the duration of all negative potion effects on players in the radius by 10s.");
 		mInfo.mCooldown = COOLDOWN;
 		mInfo.mIgnoreCooldown = true;
+		mDisplayItem = new ItemStack(Material.GHAST_TEAR, 1);
 		mWeakenEffect = getAbilityScore() == 1 ? WEAKEN_EFFECT_1 : WEAKEN_EFFECT_2;
 		Bukkit.getScheduler().runTask(plugin, () -> {
 			if (player != null) {

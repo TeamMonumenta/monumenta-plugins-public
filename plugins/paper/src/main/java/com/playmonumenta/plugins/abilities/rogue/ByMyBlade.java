@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.abilities.rogue;
 import java.util.EnumSet;
 
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
@@ -70,6 +71,7 @@ public class ByMyBlade extends Ability {
 		mInfo.mDescriptions.add("While holding two swords, attacking an enemy with a critical attack deals 12 more damage, and grants you Haste 2 for 4s. Cooldown: 10s.");
 		mInfo.mDescriptions.add("Damage is increased from 12 to 24. Haste level is increased from 2 to 4.");
 		mInfo.mCooldown = BY_MY_BLADE_COOLDOWN;
+		mDisplayItem = new ItemStack(Material.SKELETON_SKULL, 1);
 		mDamageBonus = getAbilityScore() == 1 ? BY_MY_BLADE_1_DAMAGE : BY_MY_BLADE_2_DAMAGE;
 	}
 

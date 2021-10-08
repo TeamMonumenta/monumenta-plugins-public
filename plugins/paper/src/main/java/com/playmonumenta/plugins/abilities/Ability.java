@@ -46,6 +46,7 @@ public abstract class Ability {
 	public final AbilityInfo mInfo;
 	protected final Player mPlayer;
 	private Integer mScore = null;
+	public ItemStack mDisplayItem;
 
 	public Ability(Plugin plugin, @Nullable Player player, String displayName) {
 		mPlugin = plugin;
@@ -73,7 +74,7 @@ public abstract class Ability {
 
 	/**
 	 * Gets the AbilityInfo object, which contains the small data side of the ability itself, and is required to have for any ability.
-	 * @return the AbilityInfo object, if one exists. If not, it returns null.
+	 * @return the AbilityInfo object. Never null.
 	 */
 	public AbilityInfo getInfo() {
 		return mInfo;
@@ -129,7 +130,7 @@ public abstract class Ability {
 
 				int cooldown = (int) (info.mCooldown * (1 + epochPercent) * (1 + abilityEnchantmentPercent));
 
-				mPlugin.mTimers.addCooldown(mPlayer.getUniqueId(), info.mLinkedSpell, cooldown);
+				mPlugin.mTimers.addCooldown(mPlayer, info.mLinkedSpell, cooldown);
 				PlayerUtils.callAbilityCastEvent(mPlayer, info.mLinkedSpell);
 			}
 		}

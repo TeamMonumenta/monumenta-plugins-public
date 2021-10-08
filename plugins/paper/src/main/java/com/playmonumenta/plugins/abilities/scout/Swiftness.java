@@ -1,10 +1,12 @@
 package com.playmonumenta.plugins.abilities.scout;
 
+import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
@@ -32,7 +34,7 @@ public class Swiftness extends Ability {
 		mInfo.mShorthandName = "Swf";
 		mInfo.mDescriptions.add("Gain +20% Speed when you are not inside a town.");
 		mInfo.mDescriptions.add("In addition, gain Jump Boost III when you are not inside a town. Swap hands looking up, not sneaking, and not holding a bow or crossbow to toggle the Jump Boost.");
-
+		mDisplayItem = new ItemStack(Material.RABBIT_FOOT, 1);
 		if (player != null) {
 			addModifier(player);
 		}

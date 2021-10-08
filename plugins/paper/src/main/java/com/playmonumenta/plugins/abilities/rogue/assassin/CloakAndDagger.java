@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.abilities.rogue.assassin;
 
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
@@ -10,20 +11,23 @@ import org.bukkit.entity.Projectile;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.event.entity.EntityDeathEvent;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
+import com.playmonumenta.plugins.abilities.AbilityWithChargesOrStacks;
 import com.playmonumenta.plugins.abilities.KillTriggeredAbilityTracker;
 import com.playmonumenta.plugins.abilities.KillTriggeredAbilityTracker.KillTriggeredAbility;
 import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.network.ClientModHandler;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 
-public class CloakAndDagger extends Ability implements KillTriggeredAbility {
+public class CloakAndDagger extends Ability implements KillTriggeredAbility, AbilityWithChargesOrStacks {
 
 	private static final double CLOAK_1_DAMAGE_MULTIPLIER = 1.5;
 	private static final double CLOAK_2_DAMAGE_MULTIPLIER = 2.5;
@@ -51,6 +55,7 @@ public class CloakAndDagger extends Ability implements KillTriggeredAbility {
 		mInfo.mLinkedSpell = ClassAbility.CLOAK_AND_DAGGER;
 		mInfo.mCooldown = 0;
 		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;
+		mDisplayItem = new ItemStack(Material.IRON_SWORD, 1);
 		mDamageMultiplier = getAbilityScore() == 1 ? CLOAK_1_DAMAGE_MULTIPLIER : CLOAK_2_DAMAGE_MULTIPLIER;
 		mMaxStacks = getAbilityScore() == 1 ? CLOAK_1_MAX_STACKS : CLOAK_2_MAX_STACKS;
 		mTracker = new KillTriggeredAbilityTracker(this);
@@ -69,6 +74,8 @@ public class CloakAndDagger extends Ability implements KillTriggeredAbility {
 			world.playSound(mPlayer.getLocation(), Sound.ENTITY_ILLUSIONER_MIRROR_MOVE, 1, 1);
 			world.spawnParticle(Particle.SPELL_WITCH, mPlayer.getLocation().add(0, 1, 0), 70, 0.25, 0.45, 0.25, 0.15);
 			world.spawnParticle(Particle.EXPLOSION_NORMAL, mPlayer.getLocation(), 25, 0.2, 0, 0.2, 0.1);
+
+			ClientModHandler.updateAbility(mPlayer, this);
 		}
 	}
 
@@ -136,5 +143,17 @@ public class CloakAndDagger extends Ability implements KillTriggeredAbility {
 		}
 
 		MessagingUtils.sendActionBarMessage(mPlugin, mPlayer, "Cloak stacks: " + mCloak);
+		ClientModHandler.updateAbility(mPlayer, this);
 	}
+
+	@Override
+	public int getCharges() {
+		return mCloak;
+	}
+
+	@Override
+	public int getMaxCharges() {
+		return mMaxStacks;
+	}
+
 }

@@ -14,6 +14,7 @@ import com.playmonumenta.plugins.utils.VectorUtils;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
@@ -48,6 +49,7 @@ public class WitheringGaze extends Ability {
 		mInfo.mLinkedSpell = ClassAbility.WITHERING_GAZE;
 		mInfo.mCooldown = getAbilityScore() == 1 ? WITHERING_GAZE_1_COOLDOWN : WITHERING_GAZE_2_COOLDOWN;
 		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;
+		mDisplayItem = new ItemStack(Material.WITHER_ROSE, 1);
 		mWitherDuration = getAbilityScore() == 1 ? WITHERING_GAZE_WITHER_DURATION_1 : WITHERING_GAZE_WITHER_DURATION_2;
 	}
 

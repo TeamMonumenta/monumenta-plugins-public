@@ -49,6 +49,7 @@ public class TacticalManeuver extends MultipleChargeAbility {
 		mInfo.mCooldown = getAbilityScore() == 1 ? TACTICAL_MANEUVER_1_COOLDOWN : TACTICAL_MANEUVER_2_COOLDOWN;
 		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
 		mInfo.mIgnoreCooldown = true;
+		mDisplayItem = new ItemStack(Material.STRING, 1);
 	}
 
 	@Override

@@ -48,6 +48,7 @@ public class HandOfLight extends Ability {
 		mInfo.mDescriptions.add("The healing is improved to 4 hearts + 20% of their max health. Cooldown: 10s.");
 		mInfo.mCooldown = getAbilityScore() == 1 ? HEALING_1_COOLDOWN : HEALING_2_COOLDOWN;
 		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
+		mDisplayItem = new ItemStack(Material.PINK_DYE, 1);
 	}
 
 	@Override

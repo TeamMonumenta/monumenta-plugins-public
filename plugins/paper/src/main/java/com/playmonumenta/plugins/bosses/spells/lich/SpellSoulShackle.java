@@ -124,11 +124,14 @@ public class SpellSoulShackle extends Spell {
 			AbilityUtils.silencePlayer(p, 5 * 20);
 			mRod.location(pLoc).spawnAsBoss();
 			world.playSound(pLoc, Sound.ENTITY_ZOMBIE_VILLAGER_CURE, 0.7f, 0.5f);
+			BossBar bar = Bukkit.getServer().createBossBar(ChatColor.RED + "Soul Shackle Duration", BarColor.RED, BarStyle.SOLID, BarFlag.PLAY_BOSS_MUSIC);
+			bar.setVisible(true);
+			bar.addPlayer(p);
 
 			PPGroundCircle indicator = new PPGroundCircle(Particle.END_ROD, pLoc, 36, 0, 0, 0, 0).init(3, true);
 
 			BukkitRunnable run = new BukkitRunnable() {
-				BossBar mBar = Bukkit.getServer().createBossBar(ChatColor.RED + "Soul Shackle Duration", BarColor.RED, BarStyle.SOLID, BarFlag.PLAY_BOSS_MUSIC);
+
 				int mINC = 0;
 
 				@Override
@@ -137,8 +140,8 @@ public class SpellSoulShackle extends Spell {
 					mINC++;
 					if (SpellDimensionDoor.getShadowed().contains(p)) {
 						this.cancel();
-						mBar.setVisible(false);
-						mBar.removePlayer(p);
+						bar.setVisible(false);
+						bar.removePlayer(p);
 						return;
 					}
 
@@ -176,24 +179,36 @@ public class SpellSoulShackle extends Spell {
 					}
 
 					//boss bar
-					mBar.setVisible(true);
-					mBar.addPlayer(p);
 					double progress = 1.0d - mINC / (20.0d * 5.0d);
 					if (progress > 0) {
-						mBar.setProgress(progress);
+						bar.setProgress(progress);
 					}
 
 					// cancel
 					if (mINC >= 20 * 5 || p.isDead() || Lich.phase3over() || mBoss.isDead() || !mBoss.isValid()) {
-						this.cancel();
-						mBar.setVisible(false);
-						mBar.removePlayer(p);
+						bar.setVisible(false);
+						bar.removePlayer(p);
 						mGotHit.remove(p);
+						this.cancel();
 					}
 				}
 			};
 			run.runTaskTimer(mPlugin, 0, 1);
 			mActiveRunnables.add(run);
+
+			//do not put this in activerunnables or else the boss bar will linger when phase change
+			new BukkitRunnable() {
+
+				@Override
+				public void run() {
+					if (run.isCancelled()) {
+						bar.setVisible(false);
+						bar.removeAll();
+						this.cancel();
+					}
+				}
+
+			}.runTaskTimer(mPlugin, 0, 5);
 		}
 	}
 

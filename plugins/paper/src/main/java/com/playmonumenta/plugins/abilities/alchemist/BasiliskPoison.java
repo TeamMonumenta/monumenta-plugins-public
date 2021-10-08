@@ -6,6 +6,7 @@ import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.classes.magic.MagicType;
 import com.playmonumenta.plugins.effects.CustomDamageOverTime;
 
+import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
@@ -16,6 +17,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.entity.SpectralArrow;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.inventory.ItemStack;
 
 
 
@@ -37,6 +39,7 @@ public class BasiliskPoison extends Ability {
 		mInfo.mDescriptions.add("Damage over time is improved to 8%");
 		mInfo.mLinkedSpell = ClassAbility.BASILISK_POISON;
 		mPercent = getAbilityScore() == 1 ? BASILISK_POISON_1_PERCENT_DAMAGE : BASILISK_POISON_2_PERCENT_DAMAGE;
+		mDisplayItem = new ItemStack(Material.POISONOUS_POTATO, 1);
 	}
 
 	@Override

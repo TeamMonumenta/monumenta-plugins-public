@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.bukkit.Color;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
@@ -60,6 +61,7 @@ public class AlchemicalAmalgam extends Ability {
 		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;
 		mDamage = getAbilityScore() == 1 ? AMALGAM_1_DAMAGE : AMALGAM_2_DAMAGE;
 		mShield = getAbilityScore() == 1 ? AMALGAM_1_SHIELD : AMALGAM_2_SHIELD;
+		mDisplayItem = new ItemStack(Material.PURPLE_CONCRETE, 1);
 	}
 
 	@Override

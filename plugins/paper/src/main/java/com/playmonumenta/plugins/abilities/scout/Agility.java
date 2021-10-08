@@ -1,8 +1,10 @@
 package com.playmonumenta.plugins.abilities.scout;
 
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
@@ -23,6 +25,7 @@ public class Agility extends Ability {
 		mInfo.mShorthandName = "Agl";
 		mInfo.mDescriptions.add("You gain permanent Haste I. Your melee attacks deal +1 extra damage.");
 		mInfo.mDescriptions.add("You gain permanent Haste II. Increase melee damage by +1 plus 10% of final damage done.");
+		mDisplayItem = new ItemStack(Material.GOLDEN_PICKAXE, 1);
 	}
 
 	@Override

@@ -1,6 +1,8 @@
 package com.playmonumenta.plugins.abilities.warlock;
 
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 
 import java.util.EnumSet;
 
@@ -42,6 +44,7 @@ public class PhlegmaticResolve extends Ability {
 		mInfo.mShorthandName = "PR";
 		mInfo.mDescriptions.add("For each spell on cooldown, gain +2% Damage Reduction and +1 Knockback Resistance.");
 		mInfo.mDescriptions.add("Increase to +3% Damage Reduction per spell on cooldown, and players within 7 blocks are given 33% of your bonuses. (Does not stack with mulitple Warlocks.)");
+		mDisplayItem = new ItemStack(Material.SHIELD, 1);
 		mPercentDamageResist = getAbilityScore() == 1 ? PERCENT_DAMAGE_RESIST_1 : PERCENT_DAMAGE_RESIST_2;
 	}
 

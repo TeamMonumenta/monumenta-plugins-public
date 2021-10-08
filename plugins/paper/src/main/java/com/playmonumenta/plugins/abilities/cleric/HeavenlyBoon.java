@@ -4,6 +4,7 @@ import java.util.Collection;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
@@ -49,6 +50,7 @@ public class HeavenlyBoon extends Ability implements KillTriggeredAbility {
 		mInfo.mDescriptions.add("The chance to be splashed upon killing an Undead increases to 16%, the effect potions can now also be Strength and Resistance, and the durations of each are greater.");
 		mTracker = new KillTriggeredAbilityTracker(this);
 		mChance = getAbilityScore() == 1 ? HEAVENLY_BOON_1_CHANCE : HEAVENLY_BOON_2_CHANCE;
+		mDisplayItem = new ItemStack(Material.SPLASH_POTION, 1);
 
 		Bukkit.getScheduler().runTask(plugin, () -> {
 			if (player != null) {

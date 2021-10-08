@@ -8,6 +8,7 @@ import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
@@ -16,6 +17,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
+import org.bukkit.inventory.ItemStack;
 
 public class CounterStrike extends Ability {
 
@@ -35,6 +37,7 @@ public class CounterStrike extends Ability {
 		mInfo.mDescriptions.add("When you take melee damage, deal 3 + 20% of pre-mitigation damage taken to all mobs in a 3 block radius.");
 		mInfo.mDescriptions.add("The damage is increased to 5 + 40% of pre-mitigation damage.");
 		mInfo.mLinkedSpell = ClassAbility.COUNTER_STRIKE;
+		mDisplayItem = new ItemStack(Material.CACTUS, 1);
 		mReflect = getAbilityScore() == 1 ? COUNTER_STRIKE_1_REFLECT : COUNTER_STRIKE_2_REFLECT;
 		mDamage = getAbilityScore() == 1 ? COUNTER_STRIKE_1_DAMAGE : COUNTER_STRIKE_2_DAMAGE;
 	}

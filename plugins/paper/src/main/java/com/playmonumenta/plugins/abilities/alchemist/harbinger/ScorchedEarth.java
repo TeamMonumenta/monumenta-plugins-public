@@ -16,6 +16,7 @@ import com.playmonumenta.plugins.utils.ItemUtils;
 
 import org.bukkit.Color;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
@@ -23,6 +24,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.ThrownPotion;
 import org.bukkit.event.entity.PotionSplashEvent;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
@@ -70,6 +72,7 @@ public class ScorchedEarth extends MultipleChargeAbility {
 		mInfo.mDescriptions.add("Cooldown reduced to 25s, and two charges of this ability can be stored at once.");
 		mInfo.mCooldown = getAbilityScore() == 1 ? SCORCHED_EARTH_1_COOLDOWN : SCORCHED_EARTH_2_COOLDOWN;
 		mInfo.mIgnoreCooldown = true;
+		mDisplayItem = new ItemStack(Material.BROWN_DYE, 1);
 
 		// Only one runnable ever exists for Scorched Earth - it is a global list, not tied to any individual players
 		if (mMobHealthsTracker == null) {

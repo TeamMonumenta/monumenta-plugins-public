@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.abilities.warrior.guardian;
 import java.util.List;
 
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
@@ -53,6 +54,7 @@ public class Bodyguard extends Ability {
 		mInfo.mCooldown = COOLDOWN;
 		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;
 		mInfo.mIgnoreCooldown = true;
+		mDisplayItem = new ItemStack(Material.IRON_CHESTPLATE, 1);
 		mAbsorptionAmplifier = getAbilityScore() == 1 ? ABSORPTION_AMPLIFIER_1 : ABSORPTION_AMPLIFIER_2;
 	}
 

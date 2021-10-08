@@ -5,6 +5,7 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
@@ -33,6 +34,7 @@ public class WeaponryMastery extends Ability {
 		mInfo.mShorthandName = "WM";
 		mInfo.mDescriptions.add("You gain 10% damage resistance while holding a sword. Additionally, your axe damage is increased by +2 plus 5% of final damage done.");
 		mInfo.mDescriptions.add("Increase axe damage by +4 plus 10% of final damage done and increase sword damage by +1 plus 10% of final damage done.");
+		mDisplayItem = new ItemStack(Material.STONE_SWORD, 1);
 		mDamageBonusAxeFlat = getAbilityScore() == 1 ? AXE_1_DAMAGE_FLAT : AXE_2_DAMAGE_FLAT;
 		mDamageBonusSwordFlat = getAbilityScore() == 1 ? 0 : SWORD_2_DAMAGE_FLAT;
 		mDamageBonusAxe = getAbilityScore() == 1 ? AXE_1_DAMAGE : AXE_2_DAMAGE;

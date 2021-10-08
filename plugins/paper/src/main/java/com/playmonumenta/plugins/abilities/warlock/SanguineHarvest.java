@@ -68,6 +68,7 @@ public class SanguineHarvest extends Ability {
 		mInfo.mCooldown = COOLDOWN;
 		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
 		mInfo.mIgnoreCooldown = true;
+		mDisplayItem = new ItemStack(Material.NETHER_STAR, 1);
 		mRadius = getAbilityScore() == 1 ? RADIUS_1 : RADIUS_2;
 		mHealPercent = getAbilityScore() == 1 ? HEAL_PERCENT_1 : HEAL_PERCENT_2;
 		mBleedLevel = getAbilityScore() == 1 ? BLEED_LEVEL_1 : BLEED_LEVEL_2;

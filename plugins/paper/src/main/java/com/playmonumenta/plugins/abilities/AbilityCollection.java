@@ -8,6 +8,7 @@ import java.util.Map;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.playmonumenta.plugins.abilities.delves.DelveModifier;
+import com.playmonumenta.plugins.classes.ClassAbility;
 
 public class AbilityCollection {
 
@@ -51,6 +52,17 @@ public class AbilityCollection {
 		} else {
 			return (T) mAbilities.get(cls);
 		}
+	}
+
+	public Ability getAbility(ClassAbility classAbility) {
+		if (!mIsSilenced) {
+			for (Ability ability : mAbilities.values()) {
+				if (ability.getInfo().mLinkedSpell == classAbility) {
+					return ability;
+				}
+			}
+		}
+		return null;
 	}
 
 	public JsonElement getAsJson() {

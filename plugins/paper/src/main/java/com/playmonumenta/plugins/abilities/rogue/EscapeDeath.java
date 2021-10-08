@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.abilities.rogue;
 
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
@@ -9,6 +10,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
@@ -42,6 +44,7 @@ public class EscapeDeath extends Ability {
 		mInfo.mDescriptions.add("When taking damage from a mob leaves you below 5 hearts, throw a paralyzing grenade that stuns all enemies within 5 blocks for 3 seconds. Cooldown: 90s.");
 		mInfo.mDescriptions.add("When this skill is triggered, also gain 8 seconds of Absorption II, 30% Speed, and Jump Boost III. If damage taken would kill you but could have been prevented by this skill it will instead do so");
 		mInfo.mCooldown = COOLDOWN;
+		mDisplayItem = new ItemStack(Material.DRAGON_BREATH, 1);
 	}
 
 	@Override

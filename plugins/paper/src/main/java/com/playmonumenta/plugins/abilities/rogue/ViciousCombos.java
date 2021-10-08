@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.abilities.rogue;
 
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
@@ -8,6 +9,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -36,6 +38,7 @@ public class ViciousCombos extends Ability {
 		mInfo.mShorthandName = "VC";
 		mInfo.mDescriptions.add("Passively, killing an enemy with melee or ability damage refreshes the cooldown of your abilities by 1 second. Killing an Elite enemy instead resets the cooldown of your abilities.");
 		mInfo.mDescriptions.add("Killing an enemy now refreshes your ability cooldowns by 2 seconds. Killing an Elite enemy inflicts nearby enemies within 5 blocks with 15% weaken and 15% Vulnerability for 5 seconds.");
+		mDisplayItem = new ItemStack(Material.ZOMBIE_HEAD, 1);
 	}
 
 	@Override
@@ -58,7 +61,7 @@ public class ViciousCombos extends Ability {
 
 					World world = mPlayer.getWorld();
 					if (EntityUtils.isElite(killedEntity)) {
-						mPlugin.mTimers.removeAllCooldowns(mPlayer.getUniqueId());
+						mPlugin.mTimers.removeAllCooldowns(mPlayer);
 						MessagingUtils.sendActionBarMessage(mPlugin, mPlayer, "All your cooldowns have been reset");
 
 						if (viciousCombos > 1) {

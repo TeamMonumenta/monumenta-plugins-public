@@ -2,23 +2,27 @@ package com.playmonumenta.plugins.abilities.mage.arcanist;
 
 import java.util.HashMap;
 
-import org.bukkit.Color;
-import org.bukkit.Location;
-import org.bukkit.Particle;
-import org.bukkit.entity.Player;
-import org.bukkit.Sound;
-import org.bukkit.World;
-import org.bukkit.scheduler.BukkitRunnable;
-
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.utils.MessagingUtils;
+import com.playmonumenta.plugins.abilities.AbilityWithChargesOrStacks;
 import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.events.AbilityCastEvent;
 import com.playmonumenta.plugins.events.CustomDamageEvent;
-import com.playmonumenta.plugins.effects.PercentSpeed;
+import com.playmonumenta.plugins.network.ClientModHandler;
+import com.playmonumenta.plugins.utils.MessagingUtils;
 
-public class SagesInsight extends Ability {
+import org.bukkit.Color;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
+import org.bukkit.World;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.scheduler.BukkitRunnable;
+
+public class SagesInsight extends Ability implements AbilityWithChargesOrStacks {
 	private static final int DECAY_TIMER = 20 * 4;
 	private static final int MAX_STACKS = 8;
 	private static final double SPEED_1 = 0.2;
@@ -44,6 +48,7 @@ public class SagesInsight extends Ability {
 		mInfo.mDescriptions.add("If an active spell hits an enemy, you gain an Arcane Insight. Insights stack up to 8, but decay every 4s of not gaining one. Once 8 Insights are revealed, the Arcanist gains 20% Speed for 8s and the cooldowns of the previous two spells cast are refreshed. This sets your Insights back to 0.");
 		mInfo.mDescriptions.add("Sage's Insight now grants 30% Speed and refreshes the cooldowns of your previous three spells upon activating.");
 		mInfo.mIgnoreTriggerCap = true;
+		mDisplayItem = new ItemStack(Material.ENDER_EYE, 1);
 		mResetSize = getAbilityScore() == 1 ? ABILITIES_COUNT_1 : ABILITIES_COUNT_2;
 		mResets = new ClassAbility[mResetSize];
 		mSpeed = getAbilityScore() == 1 ? SPEED_1 : SPEED_2;
@@ -63,6 +68,7 @@ public class SagesInsight extends Ability {
 				mTicksToStackDecay = DECAY_TIMER;
 				mStacks--;
 				MessagingUtils.sendActionBarMessage(mPlugin, mPlayer, "Sage's Insight Stacks: " + mStacks);
+				ClientModHandler.updateAbility(mPlayer, this);
 			}
 		}
 	}
@@ -106,6 +112,7 @@ public class SagesInsight extends Ability {
 					world.spawnParticle(Particle.EXPLOSION_NORMAL, locD, 15, 0, 0, 0, 0.2);
 					MessagingUtils.sendActionBarMessage(mPlugin, mPlayer, "Sage's Insight Stacks: " + mStacks);
 				}
+				ClientModHandler.updateAbility(mPlayer, this);
 			}
 		}
 	}
@@ -135,6 +142,16 @@ public class SagesInsight extends Ability {
 			return true;
 		}
 		return true;
+	}
+
+	@Override
+	public int getCharges() {
+		return mStacks;
+	}
+
+	@Override
+	public int getMaxCharges() {
+		return MAX_STACKS;
 	}
 
 }

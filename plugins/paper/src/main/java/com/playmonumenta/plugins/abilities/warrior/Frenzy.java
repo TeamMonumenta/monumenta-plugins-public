@@ -5,8 +5,10 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.effects.PercentAttackSpeed;
 import com.playmonumenta.plugins.effects.PercentSpeed;
 
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.inventory.ItemStack;
 
 
 
@@ -27,6 +29,7 @@ public class Frenzy extends Ability {
 		mInfo.mShorthandName = "Fnz";
 		mInfo.mDescriptions.add("Gain +30% Attack Speed for 5 seconds after killing a mob.");
 		mInfo.mDescriptions.add("Gain +40% Attack Speed and +20% Speed for 5 seconds after killing a mob.");
+		mDisplayItem = new ItemStack(Material.FEATHER, 1);
 
 		mPercentAttackSpeedEffect = getAbilityScore() == 1 ? PERCENT_ATTACK_SPEED_EFFECT_1 : PERCENT_ATTACK_SPEED_EFFECT_2;
 	}

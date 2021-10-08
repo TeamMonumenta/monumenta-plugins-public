@@ -201,6 +201,7 @@ public class Lich extends BossAbilityGroup {
 		Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "team modify lichphylactery color white");
 		UUID keyUUID = mKey.getUniqueId();
 		Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "team join lichphylactery " + keyUUID);
+		SpellDiesIrae.initDmg(0);
 		int playercount = playersInRange(mBoss.getLocation(), detectionRange, true).size();
 		double hpdel = 1250;
 		//some how ducc made it so ln(playercount) < 0, additional check
@@ -224,6 +225,7 @@ public class Lich extends BossAbilityGroup {
 					for (Player p : playersInRange(mSpawnLoc, detectionRange, true)) {
 						p.removePotionEffect(PotionEffectType.LEVITATION);
 						if (p.isSleeping()) {
+							BossUtils.bossDamagePercent(mBoss, p, Math.max(0.5, SpellDiesIrae.getDmg()));
 							SpellDimensionDoor.getWealmed(mPlugin, p, mBoss, p.getLocation(), false);
 						}
 					}
@@ -308,7 +310,7 @@ public class Lich extends BossAbilityGroup {
 					}
 				}
 
-				if (mActivated || mBoss.isDead() || !mBoss.isValid()) {
+				if (mBoss.isDead() || !mBoss.isValid()) {
 					this.cancel();
 					if (mKey != null && mKey.isValid()) {
 						mKey.remove();
@@ -838,7 +840,7 @@ public class Lich extends BossAbilityGroup {
 											p.sendTitle(ChatColor.DARK_GRAY + "" + ChatColor.BOLD + "Hekawt, The Eternal",
 													ChatColor.GRAY + "" + ChatColor.BOLD + "Inheritor of Eternity", 10, 70, 20);
 											p.playSound(p.getLocation(), Sound.ENTITY_WITHER_SPAWN, SoundCategory.HOSTILE, 10f, 0.75f);
-											p.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 2, 2));
+											p.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 2 * 20, 2));
 										}
 
 										BossBarManager bossBar = new BossBarManager(plugin, boss, detectionRange,

@@ -1,16 +1,5 @@
 package com.playmonumenta.plugins.abilities.warrior.berserker;
 
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.abilities.AbilityTrigger;
-import com.playmonumenta.plugins.classes.ClassAbility;
-import com.playmonumenta.plugins.classes.magic.MagicType;
-import com.playmonumenta.plugins.effects.PercentDamageReceived;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.ItemUtils;
-import com.playmonumenta.plugins.utils.MessagingUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
-
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -24,9 +13,22 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.inventory.ItemStack;
 
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.abilities.AbilityTrigger;
+import com.playmonumenta.plugins.abilities.AbilityWithChargesOrStacks;
+import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.classes.magic.MagicType;
+import com.playmonumenta.plugins.effects.PercentDamageReceived;
+import com.playmonumenta.plugins.network.ClientModHandler;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.MessagingUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 
 
-public class Rampage extends Ability {
+
+public class Rampage extends Ability implements AbilityWithChargesOrStacks {
 
 	private static final int RAMPAGE_STACK_DECAY_TIME = 20 * 5;
 	private static final int RAMPAGE_1_DAMAGE_PER_STACK = 40;
@@ -55,6 +57,7 @@ public class Rampage extends Ability {
 		mInfo.mShorthandName = "Rmp";
 		mInfo.mDescriptions.add("Gain a stack of rage for each 40 melee damage dealt. Stacks decay by 1 every 5 seconds of not dealing melee damage and cap at 15. Passively gain 1% damage resistance for each stack. When at 10 or more stacks, right click while looking down to consume all stacks and damage mobs in a 4 block radius by stacks consumed. For the next (stacks consumed / 2) seconds, heal 5% of max health per second and keep your passive damage reduction.");
 		mInfo.mDescriptions.add("Gain a stack of rage for each 25 melee damage dealt, with stacks capping at 20.");
+		mDisplayItem = new ItemStack(Material.BLAZE_POWDER, 1);
 		mDamagePerStack = getAbilityScore() == 1 ? RAMPAGE_1_DAMAGE_PER_STACK : RAMPAGE_2_DAMAGE_PER_STACK;
 		mStackLimit = getAbilityScore() == 1 ? RAMPAGE_1_STACK_LIMIT : RAMPAGE_2_STACK_LIMIT;
 	}
@@ -86,6 +89,7 @@ public class Rampage extends Ability {
 
 			mStacks = 0;
 			MessagingUtils.sendActionBarMessage(mPlugin, mPlayer, "Rage: " + mStacks);
+			ClientModHandler.updateAbility(mPlayer, this);
 		}
 	}
 
@@ -98,6 +102,7 @@ public class Rampage extends Ability {
 				mTimeToStackDecay = 0;
 				mStacks--;
 				MessagingUtils.sendActionBarMessage(mPlugin, mPlayer, "Rage: " + mStacks);
+				ClientModHandler.updateAbility(mPlayer, this);
 			}
 		}
 
@@ -123,6 +128,7 @@ public class Rampage extends Ability {
 			if (newStacks > 0) {
 				mStacks = Math.min(mStackLimit, mStacks + newStacks);
 				MessagingUtils.sendActionBarMessage(mPlugin, mPlayer, "Rage: " + mStacks);
+				ClientModHandler.updateAbility(mPlayer, this);
 			}
 		}
 
@@ -139,6 +145,7 @@ public class Rampage extends Ability {
 		if (newStacks > 0) {
 			mStacks = Math.min(mStackLimit, mStacks + newStacks);
 			MessagingUtils.sendActionBarMessage(mPlugin, mPlayer, "Rage: " + mStacks);
+			ClientModHandler.updateAbility(mPlayer, this);
 		}
 	}
 
@@ -153,4 +160,15 @@ public class Rampage extends Ability {
 		event.setDamage(EntityUtils.getDamageApproximation(event, 1 - mStacks * RAMPAGE_DAMAGE_RESISTANCE_STACK_RATIO / 100.0));
 		return true;
 	}
+
+	@Override
+	public int getCharges() {
+		return mStacks;
+	}
+
+	@Override
+	public int getMaxCharges() {
+		return mStackLimit;
+	}
+
 }

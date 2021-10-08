@@ -3,12 +3,14 @@ package com.playmonumenta.plugins.abilities.warlock;
 import java.util.EnumSet;
 
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -51,6 +53,7 @@ public class CholericFlames extends Ability {
 		mInfo.mLinkedSpell = ClassAbility.CHOLERIC_FLAMES;
 		mInfo.mCooldown = COOLDOWN;
 		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
+		mDisplayItem = new ItemStack(Material.FIRE_CHARGE, 1);
 		mDamage = getAbilityScore() == 1 ? DAMAGE_1 : DAMAGE_2;
 	}
 

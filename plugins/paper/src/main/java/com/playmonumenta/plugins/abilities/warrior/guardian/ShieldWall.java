@@ -50,6 +50,7 @@ public class ShieldWall extends Ability {
 		mInfo.mCooldown = getAbilityScore() == 1 ? SHIELD_WALL_1_COOLDOWN : SHIELD_WALL_2_COOLDOWN;
 		mInfo.mLinkedSpell = ClassAbility.SHIELD_WALL;
 		mInfo.mIgnoreCooldown = true;
+		mDisplayItem = new ItemStack(Material.STONE_BRICK_WALL, 1);
 	}
 
 	@Override

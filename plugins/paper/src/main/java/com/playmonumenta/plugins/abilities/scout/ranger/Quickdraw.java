@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.abilities.scout.ranger;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
@@ -43,6 +44,7 @@ public class Quickdraw extends Ability {
 		mInfo.mCooldown = getAbilityScore() == 1 ? QUICKDRAW_1_COOLDOWN : QUICKDRAW_2_COOLDOWN;
 		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;
 		mInfo.mIgnoreCooldown = true;
+		mDisplayItem = new ItemStack(Material.BLAZE_POWDER, 1);
 	}
 
 	@Override

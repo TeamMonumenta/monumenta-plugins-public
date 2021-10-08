@@ -68,6 +68,7 @@ public class EnfeeblingElixir extends Ability {
 		mWeakenEffect = getAbilityScore() == 1 ? WEAKEN_AMPLIFIER_1 : WEAKEN_AMPLIFIER_2;
 		mSpeedAmp = getAbilityScore() == 1 ? SPEED_AMPLIFIER_1 : SPEED_AMPLIFIER_2;
 		mKnockbackSpeed = getAbilityScore() == 1 ? KNOCKBACK_SPEED_1 : KNOCKBACK_SPEED_2;
+		mDisplayItem = new ItemStack(Material.RABBIT_FOOT, 1);
 	}
 
 	@Override

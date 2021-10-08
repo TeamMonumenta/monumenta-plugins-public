@@ -1,6 +1,8 @@
 package com.playmonumenta.plugins.classes;
 
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.warlock.AmplifyingHex;
@@ -21,6 +23,9 @@ import com.playmonumenta.plugins.abilities.warlock.tenebrist.UmbralWail;
 import com.playmonumenta.plugins.abilities.warlock.tenebrist.WitheringGaze;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.md_5.bungee.api.ChatColor;
+
 
 public class Warlock extends PlayerClass {
 
@@ -35,6 +40,11 @@ public class Warlock extends PlayerClass {
 		mAbilities.add(new SoulRend(plugin, player));
 		mClass = 7;
 		mClassName = "Warlock";
+		mClassColor = NamedTextColor.DARK_PURPLE;
+		mChatColor = ChatColor.DARK_PURPLE;
+		mDisplayItem = new ItemStack(Material.STONE_HOE, 1);
+		mQuestReq = "Quest13";
+		mQuestReqMin = 1;
 
 		mSpecOne.mAbilities.add(new HauntingShades(plugin, player));
 		mSpecOne.mAbilities.add(new UmbralWail(plugin, player));
@@ -42,6 +52,7 @@ public class Warlock extends PlayerClass {
 		mSpecOne.mSpecQuestScoreboard = "Quest103n";
 		mSpecOne.mSpecialization = 13;
 		mSpecOne.mSpecName = "Tenebrist";
+		mSpecOne.mDisplayItem = new ItemStack(Material.CRIMSON_NYLIUM, 1);
 
 		mSpecTwo.mAbilities.add(new DarkPact(plugin, player));
 		mSpecTwo.mAbilities.add(new JudgementChain(plugin, player));
@@ -49,6 +60,7 @@ public class Warlock extends PlayerClass {
 		mSpecTwo.mSpecQuestScoreboard = "Quest103g";
 		mSpecTwo.mSpecialization = 14;
 		mSpecTwo.mSpecName = "Reaper";
+		mSpecTwo.mDisplayItem = new ItemStack(Material.WITHER_SKELETON_SKULL, 1);
 
 	}
 

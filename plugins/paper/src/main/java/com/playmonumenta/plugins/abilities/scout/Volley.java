@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
@@ -17,6 +18,7 @@ import org.bukkit.entity.Projectile;
 import org.bukkit.entity.SpectralArrow;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.potion.PotionData;
 import org.bukkit.potion.PotionType;
@@ -83,7 +85,7 @@ public class Volley extends Ability {
 		mInfo.mDescriptions.add("Increases the number of Arrows to 11 and enhances the bonus damage to 50%.");
 		mInfo.mCooldown = VOLLEY_COOLDOWN;
 		mInfo.mIgnoreCooldown = true;
-
+		mDisplayItem = new ItemStack(Material.ARROW, 1);
 	}
 
 	@Override

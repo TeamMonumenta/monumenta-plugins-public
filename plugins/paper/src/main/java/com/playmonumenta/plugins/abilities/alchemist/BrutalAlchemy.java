@@ -1,7 +1,9 @@
 package com.playmonumenta.plugins.abilities.alchemist;
 
+import org.bukkit.Material;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
@@ -25,6 +27,7 @@ public class BrutalAlchemy extends PotionAbility {
 		mInfo.mShorthandName = "BA";
 		mInfo.mDescriptions.add("Your Alchemist's Potions deal +1 damage and 15% Vulnerability for 8 seconds.");
 		mInfo.mDescriptions.add("Your Alchemist's Potions now deal +2 damage and 25% Vulnerability.");
+		mDisplayItem = new ItemStack(Material.REDSTONE, 1);
 
 		mVulnerabilityAmplifier = getAbilityScore() == 1 ? BRUTAL_ALCHEMY_1_VULNERABILITY_AMPLIFIER : BRUTAL_ALCHEMY_2_VULNERABILITY_AMPLIFIER;
 	}

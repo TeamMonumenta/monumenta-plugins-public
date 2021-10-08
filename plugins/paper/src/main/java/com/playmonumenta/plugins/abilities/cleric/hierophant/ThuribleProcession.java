@@ -4,25 +4,29 @@ import java.util.EnumSet;
 import java.util.List;
 
 import org.bukkit.Color;
+import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
+import org.bukkit.inventory.ItemStack;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.abilities.AbilityWithChargesOrStacks;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.effects.Effect;
 import com.playmonumenta.plugins.effects.PercentAttackSpeed;
 import com.playmonumenta.plugins.effects.PercentDamageDealt;
 import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.effects.ThuribleBonusHealing;
+import com.playmonumenta.plugins.network.ClientModHandler;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 
-public class ThuribleProcession extends Ability {
+public class ThuribleProcession extends Ability implements AbilityWithChargesOrStacks {
 
 	private static final int EFFECTS_DURATION = 20 * 8;
 	private static final int PASSIVE_DURATION = 50; //50 ticks; 20 * 2.5
@@ -30,6 +34,7 @@ public class ThuribleProcession extends Ability {
 	private static final int THURIBLE_COOLDOWN = 8;
 	private static final double EFFECT_PERCENT_1 = 0.10;
 	private static final double EFFECT_PERCENT_2 = 0.15;
+	private static final int MAX_BUFFS = 4;
 	private static final EnumSet<DamageCause> ALLOWED_DAMAGE_CAUSES = EnumSet.of(DamageCause.ENTITY_ATTACK, DamageCause.PROJECTILE);
 	private static final String PERCENT_ATTACK_SPEED_EFFECT_NAME = "ThuribleProcessionPercentAttackSpeedEffect";
 	private static final String PERCENT_SPEED_EFFECT_NAME = "ThuribleProcessionPercentSpeedEffect";
@@ -51,6 +56,7 @@ public class ThuribleProcession extends Ability {
 		mInfo.mDescriptions.add("Progression - +15% Attack Speed (after 4s of no melee), +15% Speed (after 8s of no melee), +15% Attack and Projectile Damage (after 12s of no melee), Cleric's passive heal is tripled, to 15% of max health every 5s (after 16s of no melee)");
 		mInfo.mCooldown = 20 * THURIBLE_COOLDOWN;
 		mInfo.mLinkedSpell = ClassAbility.THURIBLE_PROCESSION;
+		mDisplayItem = new ItemStack(Material.GLOWSTONE_DUST, 1);
 	}
 
 	@Override
@@ -106,9 +112,11 @@ public class ThuribleProcession extends Ability {
 		mBuffs = mSeconds / 4;
 
 		//Cap to 4 effects
-		if (mBuffs > 4) {
-			mBuffs = 4;
+		if (mBuffs > MAX_BUFFS) {
+			mBuffs = MAX_BUFFS;
 		}
+
+		ClientModHandler.updateAbility(mPlayer, this);
 	}
 
 	//Applies built up buffs to all around them and themselves, take the duration as parameter (passive/built-up)
@@ -127,9 +135,19 @@ public class ThuribleProcession extends Ability {
 	}
 
 	private Effect[] getEffectArray() {
-		Effect[] effects = getAbilityScore() == 1 ? new Effect[] {new PercentAttackSpeed(EFFECTS_DURATION, EFFECT_PERCENT_1, PERCENT_ATTACK_SPEED_EFFECT_NAME), new PercentSpeed(EFFECTS_DURATION, EFFECT_PERCENT_1, PERCENT_SPEED_EFFECT_NAME), new PercentDamageDealt(EFFECTS_DURATION, EFFECT_PERCENT_1, ALLOWED_DAMAGE_CAUSES), new ThuribleBonusHealing(EFFECTS_DURATION, EFFECT_PERCENT_1)}
-		: new Effect[] {new PercentAttackSpeed(EFFECTS_DURATION, EFFECT_PERCENT_2, PERCENT_ATTACK_SPEED_EFFECT_NAME), new PercentSpeed(EFFECTS_DURATION, EFFECT_PERCENT_2, PERCENT_SPEED_EFFECT_NAME), new PercentDamageDealt(EFFECTS_DURATION, EFFECT_PERCENT_2, ALLOWED_DAMAGE_CAUSES), new ThuribleBonusHealing(EFFECTS_DURATION, EFFECT_PERCENT_2)};
+		Effect[] effects = getAbilityScore() == 1 ? new Effect[]{new PercentAttackSpeed(EFFECTS_DURATION, EFFECT_PERCENT_1, PERCENT_ATTACK_SPEED_EFFECT_NAME), new PercentSpeed(EFFECTS_DURATION, EFFECT_PERCENT_1, PERCENT_SPEED_EFFECT_NAME), new PercentDamageDealt(EFFECTS_DURATION, EFFECT_PERCENT_1, ALLOWED_DAMAGE_CAUSES), new ThuribleBonusHealing(EFFECTS_DURATION, EFFECT_PERCENT_1)}
+			: new Effect[]{new PercentAttackSpeed(EFFECTS_DURATION, EFFECT_PERCENT_2, PERCENT_ATTACK_SPEED_EFFECT_NAME), new PercentSpeed(EFFECTS_DURATION, EFFECT_PERCENT_2, PERCENT_SPEED_EFFECT_NAME), new PercentDamageDealt(EFFECTS_DURATION, EFFECT_PERCENT_2, ALLOWED_DAMAGE_CAUSES), new ThuribleBonusHealing(EFFECTS_DURATION, EFFECT_PERCENT_2)};
 		return effects;
+	}
+
+	@Override
+	public int getCharges() {
+		return mBuffs;
+	}
+
+	@Override
+	public int getMaxCharges() {
+		return MAX_BUFFS;
 	}
 
 }

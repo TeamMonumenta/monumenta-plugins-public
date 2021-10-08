@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.abilities.scout;
 
+import org.bukkit.Material;
 import org.bukkit.entity.AbstractArrow;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.LivingEntity;
@@ -7,13 +8,16 @@ import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.entity.SpectralArrow;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.inventory.ItemStack;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityManager;
+import com.playmonumenta.plugins.abilities.AbilityWithChargesOrStacks;
+import com.playmonumenta.plugins.network.ClientModHandler;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 
-public class Sharpshooter extends Ability {
+public class Sharpshooter extends Ability implements AbilityWithChargesOrStacks {
 	private static final double PERCENT_BASE_DAMAGE = 0.2;
 	private static final int SHARPSHOOTER_DECAY_TIMER = 20 * 4;
 	private static final int MAX_STACKS = 8;
@@ -26,6 +30,7 @@ public class Sharpshooter extends Ability {
 		mInfo.mDescriptions.add("Your arrows deal 20% more damage.");
 		mInfo.mDescriptions.add("Each enemy hit with a critical arrow gives you a stack of Sharpshooter, up to 8. Stacks decay after 4 seconds of not gaining a stack. Each stack makes your arrows deal +3% damage.");
 		mInfo.mIgnoreTriggerCap = true;
+		mDisplayItem = new ItemStack(Material.TARGET, 1);
 	}
 
 	private int mStacks = 0;
@@ -43,6 +48,7 @@ public class Sharpshooter extends Ability {
 				if (mStacks < MAX_STACKS) {
 					mStacks++;
 					MessagingUtils.sendActionBarMessage(mPlugin, mPlayer, "Sharpshooter Stacks: " + mStacks);
+					ClientModHandler.updateAbility(mPlayer, this);
 				}
 			}
 
@@ -61,6 +67,7 @@ public class Sharpshooter extends Ability {
 				mTicksToStackDecay = SHARPSHOOTER_DECAY_TIMER;
 				mStacks--;
 				MessagingUtils.sendActionBarMessage(mPlugin, mPlayer, "Sharpshooter Stacks: " + mStacks);
+				ClientModHandler.updateAbility(mPlayer, this);
 			}
 		}
 	}
@@ -70,12 +77,23 @@ public class Sharpshooter extends Ability {
 		if (ss != null) {
 			ss.mStacks = Math.min(MAX_STACKS, ss.mStacks + stacks);
 			MessagingUtils.sendActionBarMessage(plugin, player, "Sharpshooter Stacks: " + ss.mStacks);
+			ClientModHandler.updateAbility(ss.mPlayer, ss);
 		}
 	}
 
 	public static double getDamageMultiplier(Player player) {
 		Sharpshooter ss = AbilityManager.getManager().getPlayerAbility(player, Sharpshooter.class);
 		return ss == null ? 1 : (1 + PERCENT_BASE_DAMAGE + ss.mStacks * PERCENT_DAMAGE_PER_STACK);
+	}
+
+	@Override
+	public int getCharges() {
+		return mStacks;
+	}
+
+	@Override
+	public int getMaxCharges() {
+		return MAX_STACKS;
 	}
 
 }

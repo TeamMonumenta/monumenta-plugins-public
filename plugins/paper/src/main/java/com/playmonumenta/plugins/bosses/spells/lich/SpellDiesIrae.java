@@ -47,6 +47,7 @@ public class SpellDiesIrae extends Spell {
 	private Collection<EnderCrystal> mCrystal = new ArrayList<EnderCrystal>();
 	private String mCrystalNBT;
 	private static boolean mActive = false;
+	private static double mCrystalDmg;
 	private PartialParticle mCloud;
 	private PartialParticle mExpH;
 	private PartialParticle mSoul;
@@ -81,6 +82,14 @@ public class SpellDiesIrae extends Spell {
 
 	public static void setActive(boolean active) {
 		mActive = active;
+	}
+
+	public static double getDmg() {
+		return mCrystalDmg;
+	}
+
+	public static void initDmg(double n) {
+		mCrystalDmg = n;
 	}
 
 	@Override
@@ -185,6 +194,7 @@ public class SpellDiesIrae extends Spell {
 
 	private void attack() {
 		World world = mBoss.getWorld();
+		mCrystalDmg = Math.min(1.6, mCrystal.size() * 0.15 + 0.4);
 
 		mBreath3 = new PartialParticle(Particle.DRAGON_BREATH, mBoss.getLocation(), mCrystal.size() * 1000 + 7000, 42, 0, 42, 0.01);
 		mExpL2 = new PartialParticle(Particle.EXPLOSION_LARGE, mBoss.getLocation(), mCrystal.size() * 125 + 1000, 42, 0.75, 42, 0);
@@ -194,7 +204,6 @@ public class SpellDiesIrae extends Spell {
 		double healthFinal = Math.min(heal, mBoss.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue());
 		double keyheal = mKey.getHealth() + mKey.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue() * mCrystal.size() * 0.05;
 		double keyHealthFinal = Math.min(keyheal, mKey.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue());
-		double damage = Math.min(1.6, mCrystal.size() * 0.15 + 0.4);
 
 		world.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_SPAWN, 10.0f, 0.5f);
 		//kill ghast shield
@@ -256,7 +265,7 @@ public class SpellDiesIrae extends Spell {
 					List<Player> players = Lich.playersInRange(mCenter, mRange, true);
 					players.removeIf(pl -> SpellDimensionDoor.getShadowed().contains(pl) || pl.getLocation().getY() >= mCenter.getY() + mCeiling);
 					for (Player p : players) {
-						BossUtils.bossDamagePercent(mBoss, p, damage, null, "Dies Irae");
+						BossUtils.bossDamagePercent(mBoss, p, mCrystalDmg, null, "Dies Irae");
 						world.playSound(p.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 1.0f, 0.5f);
 					}
 				}
@@ -269,6 +278,7 @@ public class SpellDiesIrae extends Spell {
 					mBoss.setGravity(true);
 					mBoss.setInvulnerable(false);
 					mActive = false;
+					mCrystalDmg = 0;
 					world.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_SHOOT, 3.0f, 0.5f);
 					this.cancel();
 				}
