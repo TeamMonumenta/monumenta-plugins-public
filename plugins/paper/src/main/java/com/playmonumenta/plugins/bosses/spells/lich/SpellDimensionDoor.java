@@ -321,14 +321,6 @@ public class SpellDimensionDoor extends Spell {
 		}
 		p.teleport(tele);
 		p.addPotionEffect(new PotionEffect(PotionEffectType.CONFUSION, 20 * 5, 0));
-		//remove curse
-		if (PlayerUtils.isCursed(com.playmonumenta.plugins.Plugin.getInstance(), p)) {
-			PlayerUtils.removeCursed(com.playmonumenta.plugins.Plugin.getInstance(), p);
-		}
-		if (Lich.getCursed().contains(p)) {
-			Lich.getCursed().remove(p);
-			p.sendMessage(ChatColor.AQUA + "You felt a curse being lifted.");
-		}
 		mShadowed.add(p);
 
 		String[] dio = new String[] {
@@ -338,6 +330,7 @@ public class SpellDimensionDoor extends Spell {
 				};
 
 		//do different stuff for different entry method
+		int t = 20 * 20;
 		if (byPortal) {
 			if (mWarned.contains(p)) {
 				p.sendMessage(ChatColor.AQUA + "" + dio[FastUtils.RANDOM.nextInt(3)]);
@@ -345,12 +338,22 @@ public class SpellDimensionDoor extends Spell {
 				p.sendMessage(ChatColor.AQUA + "" + dio[0]);
 				mWarned.add(p);
 			}
+			//remove curse only through portal
+			if (PlayerUtils.isCursed(com.playmonumenta.plugins.Plugin.getInstance(), p)) {
+				PlayerUtils.removeCursed(com.playmonumenta.plugins.Plugin.getInstance(), p);
+				p.sendMessage(ChatColor.AQUA + "You felt a curse being lifted.");
+			}
+			if (Lich.getCursed().contains(p)) {
+				Lich.getCursed().remove(p);
+			}
 		} else {
+			t = 20 * 10;
 			BossUtils.bossDamage(mBoss, p, 1);
 			p.playSound(p.getLocation(), Sound.ENTITY_ELDER_GUARDIAN_HURT, SoundCategory.HOSTILE, 1, 1);
-			AbilityUtils.increaseDamageDealtPlayer(p, 20 * 5, -0.2, "Lich");
+			AbilityUtils.increaseDamageDealtPlayer(p, 20 * 30, -0.2, "Lich");
 			Lich.cursePlayer(plugin, p);
 		}
+		int tick = t;
 
 		//mirror location summon spectre
 		Vector vec = LocationUtils.getVectorTo(tele, shadowLoc);
@@ -370,18 +373,18 @@ public class SpellDimensionDoor extends Spell {
 		((Creature) spectre).setTarget(p);
 
 		BossBar bar = Bukkit.getServer().createBossBar(null, BarColor.PURPLE, BarStyle.SOLID, BarFlag.PLAY_BOSS_MUSIC);
-		bar.setTitle(ChatColor.YELLOW + "Soul dissipating in 20 seconds!");
+		bar.setTitle(ChatColor.YELLOW + "Soul dissipating in " + tick / 20 + " seconds!");
 		bar.setVisible(true);
 		bar.addPlayer(p);
 
 		new BukkitRunnable() {
-			int mT = 20 * 20;
+			int mT = tick;
 
 			@Override
 			public void run() {
 				mT -= 2;
 				p.spawnParticle(Particle.SPELL_WITCH, spectre.getEyeLocation(), 1, 0.1, 0.1, 0.1, 0);
-				double progress = mT * 1.0d / (20 * 20);
+				double progress = mT * 1.0d / (tick);
 				if (progress >= 0) {
 					bar.setProgress(progress);
 				}

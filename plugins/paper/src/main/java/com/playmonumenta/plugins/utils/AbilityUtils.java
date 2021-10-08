@@ -154,8 +154,8 @@ public class AbilityUtils {
 
 	public static void increaseHealingPlayer(Player player, int duration, double healBoost, String cause) {
 		Plugin.getInstance().mEffectManager.addEffect(player, cause, new PercentHeal(duration, healBoost));
-		player.addPotionEffect(new PotionEffect(PotionEffectType.BAD_OMEN, duration, -1));
 		if (healBoost < 0) {
+			player.addPotionEffect(new PotionEffect(PotionEffectType.BAD_OMEN, duration, -1));
 			player.sendActionBar(Component.text("You have reduced healing for " + duration / 20 + "s", NamedTextColor.DARK_RED));
 		}
 	}
@@ -163,13 +163,22 @@ public class AbilityUtils {
 	// the unluck potion effect does not increase nor decrease luck attribute
 	public static void increaseDamageRecievedPlayer(Player player, int duration, double damageBoost, String cause) {
 		Plugin.getInstance().mEffectManager.addEffect(player, cause, new PercentDamageReceived(duration, damageBoost));
-		player.addPotionEffect(new PotionEffect(PotionEffectType.UNLUCK, duration, -1));
+		if (damageBoost > 0) {
+			player.addPotionEffect(new PotionEffect(PotionEffectType.UNLUCK, duration, -1));
+		} else {
+			player.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, duration, -1));
+		}
 	}
 
 	// the weakness potion effect does not increase nor decrease melee damage
 	public static void increaseDamageDealtPlayer(Player player, int duration, double damageBoost, String cause) {
 		Plugin.getInstance().mEffectManager.addEffect(player, cause, new PercentDamageDealt(duration, damageBoost));
-		player.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, duration, -1));
+		if (damageBoost < 0) {
+			player.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, duration, -1));
+		} else {
+			player.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE, duration, -1));
+		}
+
 	}
 
 	// You can't just use a negative value with the add method if the potions to be remove are distributed across multiple stacks
