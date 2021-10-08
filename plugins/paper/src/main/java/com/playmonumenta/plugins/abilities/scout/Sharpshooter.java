@@ -13,9 +13,11 @@ import org.bukkit.inventory.ItemStack;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityManager;
+import com.playmonumenta.plugins.abilities.AbilityWithChargesOrStacks;
+import com.playmonumenta.plugins.network.ClientModHandler;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 
-public class Sharpshooter extends Ability {
+public class Sharpshooter extends Ability implements AbilityWithChargesOrStacks {
 	private static final double PERCENT_BASE_DAMAGE = 0.2;
 	private static final int SHARPSHOOTER_DECAY_TIMER = 20 * 4;
 	private static final int MAX_STACKS = 8;
@@ -46,6 +48,7 @@ public class Sharpshooter extends Ability {
 				if (mStacks < MAX_STACKS) {
 					mStacks++;
 					MessagingUtils.sendActionBarMessage(mPlugin, mPlayer, "Sharpshooter Stacks: " + mStacks);
+					ClientModHandler.updateAbility(mPlayer, this);
 				}
 			}
 
@@ -64,6 +67,7 @@ public class Sharpshooter extends Ability {
 				mTicksToStackDecay = SHARPSHOOTER_DECAY_TIMER;
 				mStacks--;
 				MessagingUtils.sendActionBarMessage(mPlugin, mPlayer, "Sharpshooter Stacks: " + mStacks);
+				ClientModHandler.updateAbility(mPlayer, this);
 			}
 		}
 	}
@@ -73,12 +77,23 @@ public class Sharpshooter extends Ability {
 		if (ss != null) {
 			ss.mStacks = Math.min(MAX_STACKS, ss.mStacks + stacks);
 			MessagingUtils.sendActionBarMessage(plugin, player, "Sharpshooter Stacks: " + ss.mStacks);
+			ClientModHandler.updateAbility(ss.mPlayer, ss);
 		}
 	}
 
 	public static double getDamageMultiplier(Player player) {
 		Sharpshooter ss = AbilityManager.getManager().getPlayerAbility(player, Sharpshooter.class);
 		return ss == null ? 1 : (1 + PERCENT_BASE_DAMAGE + ss.mStacks * PERCENT_DAMAGE_PER_STACK);
+	}
+
+	@Override
+	public int getCharges() {
+		return mStacks;
+	}
+
+	@Override
+	public int getMaxCharges() {
+		return MAX_STACKS;
 	}
 
 }

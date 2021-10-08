@@ -107,7 +107,7 @@ public class UnstableArrows extends Ability {
 
 							double baseDamage = (getAbilityScore() == 1) ? UNSTABLE_ARROWS_1_DAMAGE : UNSTABLE_ARROWS_2_DAMAGE;
 							AlchemistPotions ap = AbilityManager.getManager().getPlayerAbility(mPlayer, AlchemistPotions.class);
-							double potDamage = ap.getDamage();
+							double potDamage = ap == null ? 0 : ap.getDamage();
 
 							for (LivingEntity mob : EntityUtils.getNearbyMobs(mLoc, UNSTABLE_ARROWS_RADIUS, mPlayer)) {
 								EntityUtils.damageEntity(mPlugin, mob, baseDamage + potDamage, mPlayer, MagicType.ALCHEMY, true, mInfo.mLinkedSpell);

@@ -18,9 +18,11 @@ import org.bukkit.util.Vector;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.abilities.AbilityWithChargesOrStacks;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.classes.magic.MagicType;
 import com.playmonumenta.plugins.events.AbilityCastEvent;
+import com.playmonumenta.plugins.network.ClientModHandler;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
@@ -36,7 +38,7 @@ import com.playmonumenta.plugins.utils.MovementUtils;
  * it with Slowness II for 4 s.
  */
 
-public class DeadlyRonde extends Ability {
+public class DeadlyRonde extends Ability implements AbilityWithChargesOrStacks {
 
 	private static final int RONDE_1_DAMAGE = 5;
 	private static final int RONDE_2_DAMAGE = 8;
@@ -85,12 +87,13 @@ public class DeadlyRonde extends Ability {
 			public void run() {
 				mActiveRunnable = null;
 				mRondeStacks = 0;
+				ClientModHandler.updateAbility(mPlayer, DeadlyRonde.this);
 			}
 
 		};
 		mActiveRunnable.runTaskLater(mPlugin, 20 * 5);
 
-		int maxStacks = getAbilityScore() == 1 ? RONDE_1_MAX_STACKS : RONDE_2_MAX_STACKS;
+		int maxStacks = getMaxCharges();
 		if (mRondeStacks < maxStacks) {
 			mPlayer.playSound(mPlayer.getLocation(), Sound.ENTITY_PUFFER_FISH_BLOW_OUT, 1, 1f);
 			mPlayer.playSound(mPlayer.getLocation(), Sound.ENTITY_SNOW_GOLEM_DEATH, 0.7f, 1.5f);
@@ -98,6 +101,7 @@ public class DeadlyRonde extends Ability {
 
 		mRondeStacks = Math.min(mRondeStacks + 1, maxStacks);
 		MessagingUtils.sendActionBarMessage(mPlugin, mPlayer, "Deadly Ronde stacks: " + mRondeStacks);
+		ClientModHandler.updateAbility(mPlayer, this);
 
 		return true;
 	}
@@ -142,6 +146,7 @@ public class DeadlyRonde extends Ability {
 
 			mRondeStacks--;
 			MessagingUtils.sendActionBarMessage(mPlugin, mPlayer, "Deadly Ronde stacks: " + mRondeStacks);
+			ClientModHandler.updateAbility(mPlayer, this);
 			if (mRondeStacks > 0) {
 				mActiveRunnable = new BukkitRunnable() {
 
@@ -150,6 +155,7 @@ public class DeadlyRonde extends Ability {
 						mActiveRunnable = null;
 						mRondeStacks = 0;
 						MessagingUtils.sendActionBarMessage(mPlugin, mPlayer, "Deadly Ronde stacks: " + mRondeStacks);
+						ClientModHandler.updateAbility(mPlayer, DeadlyRonde.this);
 					}
 
 				};
@@ -157,6 +163,16 @@ public class DeadlyRonde extends Ability {
 			}
 		}
 		return true;
+	}
+
+	@Override
+	public int getCharges() {
+		return mRondeStacks;
+	}
+
+	@Override
+	public int getMaxCharges() {
+		return getAbilityScore() == 1 ? RONDE_1_MAX_STACKS : RONDE_2_MAX_STACKS;
 	}
 
 }

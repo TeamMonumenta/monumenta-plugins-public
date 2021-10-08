@@ -117,6 +117,7 @@ import com.playmonumenta.plugins.listeners.TridentListener;
 import com.playmonumenta.plugins.listeners.VehicleListener;
 import com.playmonumenta.plugins.listeners.WorldListener;
 import com.playmonumenta.plugins.listeners.ZonePropertyListener;
+import com.playmonumenta.plugins.network.ClientModHandler;
 import com.playmonumenta.plugins.network.HttpManager;
 import com.playmonumenta.plugins.overrides.ItemOverrides;
 import com.playmonumenta.plugins.parrots.ParrotManager;
@@ -279,6 +280,8 @@ public class Plugin extends JavaPlugin {
 		mEffectManager = new EffectManager(this);
 		mDeathItemListener = new DeathItemListener(this);
 		mParrotManager = new ParrotManager(this);
+
+		new ClientModHandler(this);
 
 		DailyReset.startTimer(this);
 

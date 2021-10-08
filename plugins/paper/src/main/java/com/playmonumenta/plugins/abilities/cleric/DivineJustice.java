@@ -88,7 +88,7 @@ public class DivineJustice extends Ability {
 		mDoHealingAndMultiplier = getAbilityScore() == 2;
 
 		if (player != null) {
-		Bukkit.getScheduler().runTask(plugin, () -> {
+			Bukkit.getScheduler().runTask(plugin, () -> {
 				mCrusade = AbilityManager.getManager().getPlayerAbility(mPlayer, Crusade.class);
 			});
 		}

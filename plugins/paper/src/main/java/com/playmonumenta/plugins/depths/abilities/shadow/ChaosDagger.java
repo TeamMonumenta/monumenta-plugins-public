@@ -100,7 +100,7 @@ public class ChaosDagger extends DepthsAbility {
 					if (mExpire >= 10 * 20) {
 						tincture.remove();
 						// Take the skill off cooldown (by setting to 0)
-						mPlugin.mTimers.addCooldown(mPlayer.getUniqueId(), mInfo.mLinkedSpell, 0);
+						mPlugin.mTimers.addCooldown(mPlayer, mInfo.mLinkedSpell, 0);
 						this.cancel();
 					}
 					Location tLoc = tincture.getLocation();

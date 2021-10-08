@@ -61,7 +61,7 @@ public class ViciousCombos extends Ability {
 
 					World world = mPlayer.getWorld();
 					if (EntityUtils.isElite(killedEntity)) {
-						mPlugin.mTimers.removeAllCooldowns(mPlayer.getUniqueId());
+						mPlugin.mTimers.removeAllCooldowns(mPlayer);
 						MessagingUtils.sendActionBarMessage(mPlugin, mPlayer, "All your cooldowns have been reset");
 
 						if (viciousCombos > 1) {
