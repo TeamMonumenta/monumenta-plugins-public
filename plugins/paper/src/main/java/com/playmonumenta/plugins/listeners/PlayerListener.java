@@ -121,6 +121,7 @@ import com.playmonumenta.plugins.enchantments.infusions.Focus;
 import com.playmonumenta.plugins.enchantments.infusions.delves.Choler;
 import com.playmonumenta.plugins.events.AbilityCastEvent;
 import com.playmonumenta.plugins.events.EvasionEvent;
+import com.playmonumenta.plugins.network.ClientModHandler;
 import com.playmonumenta.plugins.point.Point;
 import com.playmonumenta.plugins.portals.PortalManager;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
@@ -170,6 +171,14 @@ public class PlayerListener implements Listener {
 		//This checks to make sure that when you login you aren't stuck in blocks, just in case the lag that causes you to fall also kicks you. You don't want to be stuck in dirt forever, right?
 		Location loc = player.getLocation();
 		runTeleportRunnable(player, loc);
+
+		// Send class update to client mod. Needs to be delayed so that both abilities and the plugin channel are properly initialised.
+		new BukkitRunnable() {
+			@Override
+			public void run() {
+				ClientModHandler.updateAbilities(player);
+			}
+		}.runTaskLater(mPlugin, 10);
 	}
 
 	@EventHandler(priority = EventPriority.LOW)
