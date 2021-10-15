@@ -55,7 +55,7 @@ public class Hedera extends BossAbilityGroup {
 	public static final int HEDERA_HEALTH = 4000;
 	public static final int SWAP_TARGET_SECONDS = 15;
 
-	private static final int MUSIC_DURATION = 229; //seconds
+	private static final int MUSIC_DURATION = 202; //seconds
 
 	private final Location mSpawnLoc;
 	private final Location mEndLoc;
@@ -284,7 +284,7 @@ public class Hedera extends BossAbilityGroup {
 			if (mBoss == null || mBoss.getHealth() <= 0) {
 				this.cancel();
 			}
-			PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "playsound epic:music.cshura record @s ~ ~ ~ 2");
+			PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "playsound epic:music.hedera record @s ~ ~ ~ 2");
 		}
 	};
 }
