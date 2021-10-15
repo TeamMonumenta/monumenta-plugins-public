@@ -108,6 +108,8 @@ public class ThuribleProcession extends Ability implements AbilityWithChargesOrS
 	//Recounts number of buffs and applies the passive ones
 	private void updateBuffs() {
 
+		int previousBuffs = mBuffs;
+
 		//Convert time into number of buffs and cap to maximum effect index for that level
 		mBuffs = mSeconds / 4;
 
@@ -116,7 +118,9 @@ public class ThuribleProcession extends Ability implements AbilityWithChargesOrS
 			mBuffs = MAX_BUFFS;
 		}
 
-		ClientModHandler.updateAbility(mPlayer, this);
+		if (previousBuffs != mBuffs) {
+			ClientModHandler.updateAbility(mPlayer, this);
+		}
 	}
 
 	//Applies built up buffs to all around them and themselves, take the duration as parameter (passive/built-up)

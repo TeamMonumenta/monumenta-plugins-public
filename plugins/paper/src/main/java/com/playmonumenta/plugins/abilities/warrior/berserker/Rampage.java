@@ -119,33 +119,29 @@ public class Rampage extends Ability implements AbilityWithChargesOrStacks {
 	@Override
 	public boolean livingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
 		if (event.getCause() == DamageCause.ENTITY_ATTACK) {
-			mTimeToStackDecay = 0;
-
-			mRemainderDamage += event.getFinalDamage();
-			int newStacks = mRemainderDamage / mDamagePerStack;
-			mRemainderDamage %= mDamagePerStack;
-
-			if (newStacks > 0) {
-				mStacks = Math.min(mStackLimit, mStacks + newStacks);
-				MessagingUtils.sendActionBarMessage(mPlugin, mPlayer, "Rage: " + mStacks);
-				ClientModHandler.updateAbility(mPlayer, this);
-			}
+			damageDealt(event.getFinalDamage());
 		}
-
 		return true;
 	}
 
 	public void customRecklessSwingInteraction(double swingDamage) {
+		damageDealt(swingDamage);
+	}
+
+	private void damageDealt(double damage) {
 		mTimeToStackDecay = 0;
 
-		mRemainderDamage += swingDamage;
+		mRemainderDamage += damage;
 		int newStacks = mRemainderDamage / mDamagePerStack;
 		mRemainderDamage %= mDamagePerStack;
 
 		if (newStacks > 0) {
+			int previousStacks = mStacks;
 			mStacks = Math.min(mStackLimit, mStacks + newStacks);
 			MessagingUtils.sendActionBarMessage(mPlugin, mPlayer, "Rage: " + mStacks);
-			ClientModHandler.updateAbility(mPlayer, this);
+			if (mStacks != previousStacks) {
+				ClientModHandler.updateAbility(mPlayer, this);
+			}
 		}
 	}
 

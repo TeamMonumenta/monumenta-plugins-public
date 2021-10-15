@@ -97,11 +97,11 @@ public class DeadlyRonde extends Ability implements AbilityWithChargesOrStacks {
 		if (mRondeStacks < maxStacks) {
 			mPlayer.playSound(mPlayer.getLocation(), Sound.ENTITY_PUFFER_FISH_BLOW_OUT, 1, 1f);
 			mPlayer.playSound(mPlayer.getLocation(), Sound.ENTITY_SNOW_GOLEM_DEATH, 0.7f, 1.5f);
+			mRondeStacks++;
+			ClientModHandler.updateAbility(mPlayer, this);
 		}
 
-		mRondeStacks = Math.min(mRondeStacks + 1, maxStacks);
 		MessagingUtils.sendActionBarMessage(mPlugin, mPlayer, "Deadly Ronde stacks: " + mRondeStacks);
-		ClientModHandler.updateAbility(mPlayer, this);
 
 		return true;
 	}

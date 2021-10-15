@@ -11,8 +11,8 @@ import org.bukkit.entity.Projectile;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.inventory.ItemStack;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
@@ -140,10 +140,10 @@ public class CloakAndDagger extends Ability implements KillTriggeredAbility, Abi
 			} else {
 				mCloak++;
 			}
+			ClientModHandler.updateAbility(mPlayer, this);
 		}
 
 		MessagingUtils.sendActionBarMessage(mPlugin, mPlayer, "Cloak stacks: " + mCloak);
-		ClientModHandler.updateAbility(mPlayer, this);
 	}
 
 	@Override
