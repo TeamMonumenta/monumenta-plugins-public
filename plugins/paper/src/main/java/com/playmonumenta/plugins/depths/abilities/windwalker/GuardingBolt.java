@@ -19,6 +19,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.classes.magic.MagicType;
+import com.playmonumenta.plugins.depths.DepthsManager;
 import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
@@ -63,6 +64,12 @@ public class GuardingBolt extends DepthsAbility {
 		Vector dir = oLoc.getDirection();
 		List<Player> players = PlayerUtils.playersInRange(mPlayer.getEyeLocation(), RANGE, true);
 		players.remove(mPlayer);
+
+		//Do not teleport to players who aren't in the depths system
+		//This allows players to teleport into another players loot room (stuck spot as well as abusable)
+		DepthsManager manager = DepthsManager.getInstance();
+		players.removeIf(p -> !manager.mPlayers.containsKey(p.getUniqueId()));
+
 		for (int i = 0; i < RANGE; i++) {
 			box.shift(dir);
 			Location bLoc = box.getCenter().toLocation(world);
