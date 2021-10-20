@@ -96,7 +96,7 @@ public class HuntingCompanion extends Ability {
 
 		ItemStack inMainHand = mPlayer.getInventory().getItemInMainHand();
 		Damageable damageable = (Damageable)inMainHand.getItemMeta();
-		if (!isTimerActive() && !mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.mLinkedSpell) && InventoryUtils.isBowItem(inMainHand) && !(damageable.getDamage() > inMainHand.getType().getMaxDurability())) {
+		if (!isTimerActive() && !mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.mLinkedSpell) && InventoryUtils.isBowItem(inMainHand) && !(damageable.getDamage() > inMainHand.getType().getMaxDurability() && !ItemUtils.isItemShattered(inMainHand))) {
 			putOnCooldown();
 			mStunnedMobs = new ArrayList<Entity>();
 

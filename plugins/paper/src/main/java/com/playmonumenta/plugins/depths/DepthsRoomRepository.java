@@ -131,6 +131,7 @@ public class DepthsRoomRepository {
 		DepthsRoom f1r36 = new DepthsRoom("\"depths/f1r36\"", DepthsRoomType.ABILITY, new Vector(72, 53, 65), new Location(world, 1.0, -8.0, -49.0), 14, RoomDirection.EVEN);
 		DepthsRoom f1r37 = new DepthsRoom("\"depths/f1r37\"", DepthsRoomType.ABILITY, new Vector(52, 61, 71), new Location(world, 1.0, 0.0, -7.0), 43, RoomDirection.EVEN);
 		DepthsRoom f1r38 = new DepthsRoom("\"depths/f1r38\"", DepthsRoomType.ABILITY, new Vector(60, 29, 36), new Location(world, 1.0, -8.0, -17.0), 17, RoomDirection.UP);
+		DepthsRoom f1r40 = new DepthsRoom("\"depths/f1r40\"", DepthsRoomType.ABILITY, new Vector(30, 22, 71), new Location(world, 1.0, -2.0, -7.0), 23, RoomDirection.EVEN);
 
 		mF1EliteRooms.add(f1r12);
 		mF1EliteRooms.add(f1r13);
@@ -147,6 +148,7 @@ public class DepthsRoomRepository {
 		mF1EliteRooms.add(f1r36);
 		mF1EliteRooms.add(f1r37);
 		mF1EliteRooms.add(f1r38);
+		mF1EliteRooms.add(f1r40);
 
 		//Special f1 room
 		DepthsRoom f1r16 = new DepthsRoom("\"depths/f1r16\"", DepthsRoomType.ABILITY, new Vector(43, 32, 46), new Location(world, 1.0, -3.0, -23.0), 0, RoomDirection.EVEN);

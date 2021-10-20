@@ -292,6 +292,7 @@ public class AlchemistPotions extends Ability implements AbilityWithChargesOrSta
 				if (item != null) {
 					AbilityUtils.updateAlchemistItem(item, mCharges);
 				}
+				ClientModHandler.updateAbility(mPlayer, this);
 			}
 
 			if (item != null && item.getAmount() > 1 && ItemUtils.isAlchemistItem(item)) {
