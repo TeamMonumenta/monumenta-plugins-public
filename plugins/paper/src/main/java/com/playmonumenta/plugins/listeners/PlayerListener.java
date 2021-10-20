@@ -71,6 +71,7 @@ import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.player.PlayerRegisterChannelEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.event.player.PlayerRiptideEvent;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
@@ -172,13 +173,20 @@ public class PlayerListener implements Listener {
 		Location loc = player.getLocation();
 		runTeleportRunnable(player, loc);
 
-		// Send class update to client mod. Needs to be delayed so that both abilities and the plugin channel are properly initialised.
-		new BukkitRunnable() {
-			@Override
-			public void run() {
-				ClientModHandler.updateAbilities(player);
-			}
-		}.runTaskLater(mPlugin, 10);
+	}
+
+	@EventHandler(priority = EventPriority.MONITOR)
+	public void playerChannelEvent(PlayerRegisterChannelEvent event) {
+		if (ClientModHandler.CHANNEL_ID.equals(event.getChannel())) {
+			Player player = event.getPlayer();
+			// Send class update to client mod. Needs to be delayed so that abilities are properly initialised (e.g. abilities with stacks are delayed by 1 tick).
+			new BukkitRunnable() {
+				@Override
+				public void run() {
+					ClientModHandler.updateAbilities(player);
+				}
+			}.runTaskLater(mPlugin, 2);
+		}
 	}
 
 	@EventHandler(priority = EventPriority.LOW)
