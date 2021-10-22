@@ -11,10 +11,12 @@ import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.ZoneUtils;
 
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Monster;
@@ -25,6 +27,8 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockDispenseArmorEvent;
 import org.bukkit.event.block.BlockDispenseEvent;
 import org.bukkit.event.block.BlockFormEvent;
+import org.bukkit.event.block.BlockPistonExtendEvent;
+import org.bukkit.event.block.BlockPistonRetractEvent;
 import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.event.world.StructureGrowEvent;
 import org.bukkit.inventory.ItemStack;
@@ -205,5 +209,59 @@ public class WorldListener implements Listener {
 			event.setCancelled(true);
 			return;
 		}
+	}
+
+	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+	public void blockPistonExtendEvent(BlockPistonExtendEvent event) {
+		Block piston = event.getBlock();
+		BlockFace direction = event.getDirection();
+		for (Block block : event.getBlocks()) {
+			if (shouldCancelPiston(piston, direction, block)) {
+				event.setCancelled(true);
+				return;
+			}
+		}
+	}
+
+	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+	public void blockPistonRetractEvent(BlockPistonRetractEvent event) {
+		Block piston = event.getBlock();
+		BlockFace direction = event.getDirection();
+		for (Block block : event.getBlocks()) {
+			if (shouldCancelPiston(piston, direction, block)) {
+				event.setCancelled(true);
+				return;
+			}
+		}
+	}
+
+	public boolean shouldCancelPiston(Block piston, BlockFace direction, Block affectedBlock) {
+		int pistonTestValue = pistonZonePropertyTest(piston.getLocation());
+
+		Location oldLoc = affectedBlock.getLocation();
+		if (pistonTestValue != pistonZonePropertyTest(oldLoc)) {
+			return true;
+		}
+
+		Location newLoc = new Location(oldLoc.getWorld(),
+		                               oldLoc.getX() + direction.getModX(),
+		                               oldLoc.getY() + direction.getModY(),
+		                               oldLoc.getZ() + direction.getModZ());
+		if (pistonTestValue != pistonZonePropertyTest(newLoc)) {
+			return true;
+		}
+
+		return false;
+	}
+
+	private int pistonZonePropertyTest(Location loc) {
+		int testValue = 0;
+		if (ZoneUtils.hasZoneProperty(loc, ZoneUtils.ZoneProperty.ADVENTURE_MODE)) {
+			testValue |= 1;
+		}
+		if (ZoneUtils.isInPlot(loc)) {
+			testValue |= 2;
+		}
+		return testValue;
 	}
 }

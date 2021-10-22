@@ -45,7 +45,11 @@ public class ZoneUtils {
 	}
 
 	public static boolean isInPlot(@NotNull Player player) {
-		return inPlot(player.getLocation(), ServerProperties.getIsTownWorld());
+		return isInPlot(player.getLocation());
+	}
+
+	public static boolean isInPlot(@NotNull Location loc) {
+		return inPlot(loc, ServerProperties.getIsTownWorld());
 	}
 
 	public static boolean inPlot(Entity entity, boolean isTownWorld) {
