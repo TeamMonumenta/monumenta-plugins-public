@@ -131,7 +131,6 @@ import com.playmonumenta.plugins.server.reset.DailyReset;
 import com.playmonumenta.plugins.utils.ChestUtils;
 import com.playmonumenta.plugins.utils.CommandUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.GraveUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
@@ -275,40 +274,6 @@ public class PlayerListener implements Listener {
 				    && ZoneUtils.inPlot(location, ServerProperties.getIsTownWorld())) {
 					event.setUseInteractedBlock(Event.Result.DENY);
 					return;
-				}
-				if (GraveUtils.isGrave(block)
-				    && player.getGameMode() != GameMode.CREATIVE
-				    && player.getGameMode() != GameMode.SPECTATOR) {
-					Chest grave = (Chest) block.getState();
-					if (GraveUtils.canPlayerOpenGrave(block, player)) {
-						// Player has permission to access this grave. Move as much of the grave's contents as possible into the player's inventory.
-						Inventory graveInventory = grave.getInventory();
-						PlayerInventory playerInventory = player.getInventory();
-						int itemsMoved = 0;
-						int itemsLeftBehind = 0;
-						for (int i = 0; i < graveInventory.getSize(); i++) {
-							if (graveInventory.getItem(i) != null) {
-								if (playerInventory.firstEmpty() != -1) {
-									// Player has a space in their inventory. Move the item
-									playerInventory.setItem(playerInventory.firstEmpty(), graveInventory.getItem(i));
-									graveInventory.setItem(i, null);
-									itemsMoved++;
-								} else {
-									// Player doesn't have a space in their inventory. Don't move anything
-									itemsLeftBehind++;
-								}
-							}
-						}
-						player.sendActionBar(Component.text(String.format("Retrieved %d items from the grave. %d items remain.", itemsMoved, itemsLeftBehind)));
-						if (itemsLeftBehind == 0) {
-							block.setType(Material.AIR);
-						}
-						event.setUseInteractedBlock(Event.Result.DENY);
-					} else {
-						// Player does not have permission to access this grave.
-						player.sendActionBar(Component.text("You cannot open ").append(grave.customName()));
-						event.setUseInteractedBlock(Event.Result.DENY);
-					}
 				}
 			}
 		}
@@ -584,9 +549,7 @@ public class PlayerListener implements Listener {
 		} else if (holder instanceof Chest) {
 			Chest chest = (Chest) holder;
 			// Break empty graves or halloween creeper chests in safe zones automatically when closed
-			if (ChestUtils.isEmpty(chest)
-			    && (GraveUtils.isGrave(chest)
-			        || (chest.getCustomName() != null && chest.getCustomName().contains("Creeperween Chest")))) {
+			if (ChestUtils.isEmpty(chest) && (chest.getCustomName() != null && chest.getCustomName().contains("Creeperween Chest"))) {
 				chest.getBlock().breakNaturally();
 			}
 		}

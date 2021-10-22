@@ -23,7 +23,6 @@ import org.bukkit.util.Vector;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.utils.ChestUtils;
 import com.playmonumenta.plugins.utils.DelvesUtils;
-import com.playmonumenta.plugins.utils.GraveUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.TOVUtils;
@@ -126,18 +125,6 @@ public class ChestOverride extends BaseOverride {
 		} else if (!breakable(block)) {
 			MessagingUtils.sendActionBarMessage(plugin, player, "This block can not be broken!");
 			return false;
-		} else if (GraveUtils.isGrave(block)) {
-			if (ChestUtils.isEmpty(block)) {
-				// Remove the custom name from the grave before breaking it.
-				// Players should not be able to obtain graves.
-				Chest chest = (Chest)block.getState();
-				chest.setCustomName(null);
-				chest.update();
-				return true;
-			} else {
-				MessagingUtils.sendActionBarMessage(plugin, player, "You cannot break graves with items inside");
-				return false;
-			}
 		}
 
 		DelvesUtils.setDelveLootTable(player, block);
@@ -151,17 +138,6 @@ public class ChestOverride extends BaseOverride {
 			return false;
 		} else if (!breakable(block)) {
 			return false;
-		} else if (GraveUtils.isGrave(block)) {
-			if (ChestUtils.isEmpty(block)) {
-				// Remove the custom name from the grave before breaking it.
-				// Players should not be able to obtain graves.
-				Chest chest = (Chest)block.getState();
-				chest.setCustomName(null);
-				chest.update();
-				return true;
-			} else {
-				return false;
-			}
 		}
 
 		List<Player> players = PlayerUtils.playersInRange(block.getLocation(), 30, true);

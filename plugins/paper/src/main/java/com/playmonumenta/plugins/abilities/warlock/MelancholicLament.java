@@ -51,7 +51,7 @@ public class MelancholicLament extends Ability {
 		mInfo.mLinkedSpell = ClassAbility.MELANCHOLIC_LAMENT;
 		mInfo.mScoreboardId = "Melancholic";
 		mInfo.mShorthandName = "MLa";
-		mInfo.mDescriptions.add("Press the swap key while sneaking to recite a haunting song, causing all mobs within 7 blocks to target the user and afflicting them with 20% Weaken for 8 seconds. Cooldown: 16s");
+		mInfo.mDescriptions.add("Press the swap key while sneaking and holding a scythe to recite a haunting song, causing all mobs within 7 blocks to target the user and afflicting them with 20% Weaken for 8 seconds. Cooldown: 16s");
 		mInfo.mDescriptions.add("Increase the Weaken to 30% and decrease the duration of all negative potion effects on players in the radius by 10s.");
 		mInfo.mCooldown = COOLDOWN;
 		mInfo.mIgnoreCooldown = true;

@@ -91,7 +91,7 @@ public class CloakAndDagger extends Ability implements KillTriggeredAbility, Abi
 			} else if (EntityUtils.isBoss(damagee)) {
 				eliteScaling = PASSIVE_DAMAGE_BOSS_MODIFIER;
 			}
-			event.setDamage((event.getDamage() + mCloakOnActivation * mDamageMultiplier) * eliteScaling);
+			event.setDamage(event.getDamage() + (mCloakOnActivation * mDamageMultiplier) * eliteScaling);
 
 			Location loc = event.getEntity().getLocation();
 

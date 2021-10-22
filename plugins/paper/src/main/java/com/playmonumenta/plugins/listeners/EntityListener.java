@@ -60,7 +60,6 @@ import org.bukkit.event.entity.EntityResurrectEvent;
 import org.bukkit.event.entity.EntitySpawnEvent;
 import org.bukkit.event.entity.EntityTargetLivingEntityEvent;
 import org.bukkit.event.entity.ExplosionPrimeEvent;
-import org.bukkit.event.entity.ItemDespawnEvent;
 import org.bukkit.event.entity.PotionSplashEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
@@ -79,7 +78,6 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 import org.spigotmc.event.entity.EntityDismountEvent;
 
-import com.destroystokyo.paper.event.entity.EntityRemoveFromWorldEvent;
 import com.destroystokyo.paper.event.entity.WitchThrowPotionEvent;
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
@@ -100,7 +98,6 @@ import com.playmonumenta.plugins.tracking.PlayerTracking;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.GraveUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
@@ -544,11 +541,11 @@ public class EntityListener implements Listener {
 			if (player.getGameMode() == GameMode.ADVENTURE) {
 				event.setCancelled(true);
 			}
-		} else if (damager instanceof Arrow) {
-			// If hurt by an arrow from a player in adventure mode.
-			Arrow arrow = (Arrow)damager;
+		} else if (damager instanceof Projectile) {
+			// If hurt by a projectile from a player in adventure mode.
+			Projectile projectile = (Projectile)damager;
 
-			ProjectileSource source = arrow.getShooter();
+			ProjectileSource source = projectile.getShooter();
 			if (source instanceof Player) {
 				Player player = (Player)source;
 				if (player.getGameMode() == GameMode.ADVENTURE) {
@@ -1110,22 +1107,4 @@ public class EntityListener implements Listener {
 		}
 	}
 
-	// Fires whenever an item entity despawns due to time. Does not catch items that got killed in other ways.
-	@EventHandler(priority = EventPriority.HIGH)
-	public void itemDespawnEvent(ItemDespawnEvent event) {
-		Item entity = event.getEntity();
-		GraveUtils.destroyItemEntity(entity);
-	}
-
-	// Fires any time any entity is deleted.
-	@EventHandler(priority = EventPriority.HIGH)
-	public void entityRemoveFromWorldEvent(EntityRemoveFromWorldEvent event) {
-		if (event.getEntity() instanceof Item) {
-			// Check if an item entity was destroyed by the void.
-			Item entity = (Item) event.getEntity();
-			if (entity.getLocation().getY() <= -64) {
-				GraveUtils.destroyItemEntity(entity);
-			}
-		}
-	}
 }
