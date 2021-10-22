@@ -1,6 +1,8 @@
 package com.playmonumenta.plugins.parrots;
 
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import com.playmonumenta.plugins.Plugin;
@@ -9,7 +11,6 @@ import com.playmonumenta.plugins.utils.ScoreboardUtils;
 
 import org.bukkit.GameMode;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Parrot;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -24,6 +25,10 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.event.player.PlayerToggleFlightEvent;
 import org.bukkit.scheduler.BukkitRunnable;
+
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 
 public class ParrotManager implements Listener {
 
@@ -44,7 +49,11 @@ public class ParrotManager implements Listener {
 		ELDRASK("Permafrost Kea", 11, Parrot.Variant.CYAN),
 		RAINBOW("Rainbow Parrot", 12, Parrot.Variant.CYAN),
 		SNOWY("Snowy Cockatoo", 13, Parrot.Variant.GRAY),
-		DEPTHS("Otherworldly Myiopsitta", 14, Parrot.Variant.RED);
+		DEPTHS("Otherworldly Myiopsitta", 14, Parrot.Variant.RED),
+		DEPTHS_UPGRADE("Otherworldly Myiopsitta (u)", 15, Parrot.Variant.BLUE),
+		BEE("Bee Conure", 16, Parrot.Variant.CYAN),
+		RADIANT("Radiant Conure", 17, Parrot.Variant.CYAN),
+		HEKAWT("Veil Electus", 18, Parrot.Variant.BLUE);
 
 
 		private String mName;
@@ -82,8 +91,29 @@ public class ParrotManager implements Listener {
 		}
 	}
 
+	private static final Map<Parrot.Variant, Set<String>> PARROT_PETS = new HashMap<>();
 
-	public static Plugin mPlugin;
+	static {
+		PARROT_PETS.put(Parrot.Variant.BLUE, new HashSet<>());
+		PARROT_PETS.put(Parrot.Variant.GRAY, new HashSet<>());
+		PARROT_PETS.put(Parrot.Variant.GREEN, new HashSet<>());
+		PARROT_PETS.put(Parrot.Variant.CYAN, new HashSet<>());
+		PARROT_PETS.put(Parrot.Variant.RED, new HashSet<>());
+
+		for (ParrotVariant variant : ParrotVariant.values()) {
+			PARROT_PETS.get(variant.mVariant).add(variant.mName);
+		}
+	}
+
+
+	public enum PlayerShoulder {
+		LEFT,
+		RIGHT,
+		NONE;
+	}
+
+
+	private static Plugin mPlugin;
 
 	private static final String SCOREBOARD_PARROT_VISIBLE = "ParrotVisible";
 	// 0 if invisible, 1 if visible.
@@ -124,8 +154,25 @@ public class ParrotManager implements Listener {
 		return null;
 	}
 
-	public static void updateParrot(Player p, ParrotVariant variant, String shoulder) {
-		int numVariant = variant.getNumber();
+	public static void updateParrot(Player p, ParrotVariant variant, PlayerShoulder shoulder) {
+		updateParrot(p, variant.mNumber, shoulder);
+	}
+
+	public static void updateParrot(Player p, int variantNum, PlayerShoulder shoulder) {
+		if (shoulder == PlayerShoulder.NONE) {
+			p.sendMessage(Component.text("[Parrot Manager] shoulder == none. how do we get here? please contact a Mod.", NamedTextColor.RED).decoration(TextDecoration.BOLD, true));
+			return;
+		}
+
+		ParrotVariant variant;
+
+		try {
+			variant = ParrotVariant.values()[variantNum - 1];
+		} catch (Exception ex) {
+			mPlugin.getLogger().warning("[Parrot Manager] Catch an IndexOutOfBoundException. Probably coming from a different version of the plugin?");
+			p.sendMessage(Component.text("[Parrot Manager] Error converting parrot. Please contact a Mod", NamedTextColor.RED).decoration(TextDecoration.BOLD, true).hoverEvent(Component.text(ex.getMessage())));
+			return;
+		}
 
 		int leftShoulderParrot = ScoreboardUtils.getScoreboardValue(p, SCOREBOARD_PARROT_LEFT);
 		int rightShoulderParrot = ScoreboardUtils.getScoreboardValue(p, SCOREBOARD_PARROT_RIGHT);
@@ -135,31 +182,31 @@ public class ParrotManager implements Listener {
 		ScoreboardUtils.setScoreboardValue(p, SCOREBOARD_PARROT_VISIBLE, 1);
 
 		if (bothShoulder == 0) { // only one parrot!
-			if (shoulder == "RIGHT" && leftShoulderParrot != 0) {
+			if (shoulder == PlayerShoulder.RIGHT && leftShoulderParrot != 0) {
 				p.setShoulderEntityLeft(null);
 				ScoreboardUtils.setScoreboardValue(p, SCOREBOARD_PARROT_LEFT, 0);
 				mPrideLeft.remove(p);
 			}
 
-			if (shoulder == "LEFT" && rightShoulderParrot != 0) {
+			if (shoulder == PlayerShoulder.LEFT && rightShoulderParrot != 0) {
 				p.setShoulderEntityRight(null);
 				ScoreboardUtils.setScoreboardValue(p, SCOREBOARD_PARROT_RIGHT, 0);
 				mPrideRight.remove(p);
 			}
 		}
 
-		ParrotPet pp = new ParrotPet(variant, p, shoulder);
+		ParrotPet pp = new ParrotPet(variant, p);
 
-		if (shoulder.equalsIgnoreCase("LEFT")) {
+		if (shoulder == PlayerShoulder.LEFT) {
 			mPrideLeft.remove(p);
 		} else {
 			mPrideRight.remove(p);
 		}
 
-		if (numVariant == 12) {
+		if (variantNum == 12) {
 			//pride parrot.
 
-			if (shoulder.equalsIgnoreCase("LEFT")) {
+			if (shoulder == PlayerShoulder.LEFT) {
 				mPrideLeft.add(p);
 			} else {
 				mPrideRight.add(p);
@@ -203,14 +250,14 @@ public class ParrotManager implements Listener {
 			}
 		}
 
-		if (shoulder.equalsIgnoreCase("LEFT")) {
+		if (shoulder == PlayerShoulder.LEFT) {
 			p.setShoulderEntityLeft(null);
-			ScoreboardUtils.setScoreboardValue(p, SCOREBOARD_PARROT_LEFT, numVariant);
+			ScoreboardUtils.setScoreboardValue(p, SCOREBOARD_PARROT_LEFT, variantNum);
 			p.setShoulderEntityLeft(pp.getParrot());
 		}
-		if (shoulder.equalsIgnoreCase("RIGHT")) {
+		if (shoulder == PlayerShoulder.RIGHT) {
 			p.setShoulderEntityRight(null);
-			ScoreboardUtils.setScoreboardValue(p, SCOREBOARD_PARROT_RIGHT, numVariant);
+			ScoreboardUtils.setScoreboardValue(p, SCOREBOARD_PARROT_RIGHT, variantNum);
 			p.setShoulderEntityRight(pp.getParrot());
 		}
 	}
@@ -221,10 +268,10 @@ public class ParrotManager implements Listener {
 			int parrotLeft = ScoreboardUtils.getScoreboardValue(player, SCOREBOARD_PARROT_LEFT);
 			int parrotRight = ScoreboardUtils.getScoreboardValue(player, SCOREBOARD_PARROT_RIGHT);
 			if (parrotLeft != 0) {
-				updateParrot(player, ParrotVariant.values()[parrotLeft - 1], "LEFT");
+				updateParrot(player, parrotLeft, PlayerShoulder.LEFT);
 			}
 			if (parrotRight != 0) {
-				updateParrot(player, ParrotVariant.values()[parrotRight - 1], "RIGHT");
+				updateParrot(player, parrotRight, PlayerShoulder.RIGHT);
 			}
 		} else {
 			mPrideLeft.remove(player);
@@ -252,11 +299,11 @@ public class ParrotManager implements Listener {
 		int parrotLeft = ScoreboardUtils.getScoreboardValue(player, SCOREBOARD_PARROT_LEFT);
 
 		if (parrotLeft != 0) {
-			ParrotManager.updateParrot(player, ParrotVariant.values()[parrotLeft - 1], "LEFT");
+			ParrotManager.updateParrot(player, parrotLeft, PlayerShoulder.LEFT);
 		}
 
 		if (parrotRight != 0) {
-			ParrotManager.updateParrot(player, ParrotVariant.values()[parrotRight - 1], "RIGHT");
+			ParrotManager.updateParrot(player, parrotRight, PlayerShoulder.RIGHT);
 		}
 	}
 
@@ -278,12 +325,10 @@ public class ParrotManager implements Listener {
 	public void parrotSpawnEvent(EntitySpawnEvent e) {
 		Entity entity = e.getEntity();
 
-		if (entity.getType() == EntityType.PARROT) {
-			for (ParrotVariant pv : ParrotVariant.values()) {
-				if (pv.getName().equals(entity.getName())) {
-					e.setCancelled(true);
-					break;
-				}
+		if (entity instanceof Parrot) {
+			Parrot parrot = (Parrot) entity;
+			if (PARROT_PETS.get(parrot.getVariant()) != null && PARROT_PETS.get(parrot.getVariant()).contains(parrot.getName())) {
+				e.setCancelled(true);
 			}
 		}
 	}
