@@ -235,6 +235,14 @@ public class PlayerListener implements Listener {
 		ItemStack item = event.getItem();
 		Block block = event.getClickedBlock();
 		Material mat = (block != null) ? block.getType() : Material.AIR;
+
+		// Plot Security: If block is in a plot but the player is in adventure, cancel.
+		if (block != null && player != null && player.getGameMode() == GameMode.ADVENTURE
+			&& ZoneUtils.inPlot(block.getLocation(), ServerProperties.getIsTownWorld())) {
+			event.setCancelled(true);
+			return;
+		}
+
 		mPlugin.mAbilityManager.playerInteractEvent(player, action, item, mat);
 		mPlugin.mTrackingManager.mPlayers.onPlayerInteract(mPlugin, player, event);
 
