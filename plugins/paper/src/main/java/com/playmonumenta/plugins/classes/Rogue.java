@@ -41,6 +41,8 @@ public class Rogue extends PlayerClass {
 		mClass = 4;
 		mClassName = "Rogue";
 		mDisplayItem = new ItemStack(Material.STONE_SWORD, 1);
+		mClassDescription = "Rogues excel in one-on-one battles, using precise strikes to bring down dangerous elite enemies.";
+		mClassPassiveDescription = "While holding two swords, abilities deal 2x damage to elite enemies, and 25% more to bosses.";
 
 		mSpecOne.mAbilities.add(new BladeDance(plugin, player));
 		mSpecOne.mAbilities.add(new DeadlyRonde(plugin, player));
@@ -51,6 +53,7 @@ public class Rogue extends PlayerClass {
 		mChatColor = ChatColor.WHITE;
 		mSpecOne.mSpecName = "Swordsage";
 		mSpecOne.mDisplayItem = new ItemStack(Material.IRON_HELMET, 1);
+		mSpecOne.mDescription = "Swordsages specialize in tackling multiple enemies through dexterous movement.";
 
 		mSpecTwo.mAbilities.add(new BodkinBlitz(plugin, player));
 		mSpecTwo.mAbilities.add(new CloakAndDagger(plugin, player));
@@ -59,6 +62,7 @@ public class Rogue extends PlayerClass {
 		mSpecTwo.mSpecialization = 8;
 		mSpecTwo.mSpecName = "Assassin";
 		mSpecTwo.mDisplayItem = new ItemStack(Material.WITHER_ROSE, 1);
+		mSpecTwo.mDescription = "Assassins excel in precise strikes and deception to devastate their enemies.";
 
 	}
 }

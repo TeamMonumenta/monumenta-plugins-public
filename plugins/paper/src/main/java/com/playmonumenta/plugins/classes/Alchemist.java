@@ -42,6 +42,9 @@ public class Alchemist extends PlayerClass {
 		mClassColor = NamedTextColor.GREEN;
 		mChatColor = ChatColor.GREEN;
 		mDisplayItem = new ItemStack(Material.POTION, 1);
+		mClassDescription = "Alchemists employ magic potions to weaken and destroy their enemies.";
+		mClassPassiveDescription = "You gain 1 potion every 2.5 seconds. Each skill point" +
+				" increases your potion damage by 0.5. Each spec point increases potion damage by 1.";
 
 		mSpecOne.mAbilities.add(new PurpleHaze(plugin, player));
 		mSpecOne.mAbilities.add(new ScorchedEarth(plugin, player));
@@ -50,6 +53,7 @@ public class Alchemist extends PlayerClass {
 		mSpecOne.mSpecialization = 9;
 		mSpecOne.mSpecName = "Harbringer";
 		mSpecOne.mDisplayItem = new ItemStack(Material.DEAD_BUSH, 1);
+		mSpecOne.mDescription = "Harbingers use special potions to weaken and destroy their enemies. Harbingers prefer slinging deadly potions and using strategy.";
 
 		mSpecTwo.mAbilities.add(new AlchemicalAmalgam(plugin, player));
 		mSpecTwo.mAbilities.add(new InvigoratingOdor(plugin, player));
@@ -58,6 +62,7 @@ public class Alchemist extends PlayerClass {
 		mSpecTwo.mSpecialization = 10;
 		mSpecTwo.mSpecName = "Apothecary";
 		mSpecTwo.mDisplayItem = new ItemStack(Material.BLUE_ORCHID, 1);
+		mSpecTwo.mDescription = "Apothecaries employ magic potions to weaken enemies and support friends.";
 
 	}
 }

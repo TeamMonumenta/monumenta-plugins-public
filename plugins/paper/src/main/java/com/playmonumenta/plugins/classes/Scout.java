@@ -40,6 +40,8 @@ public class Scout extends PlayerClass {
 		mClassColor = NamedTextColor.AQUA;
 		mChatColor = ChatColor.AQUA;
 		mDisplayItem = new ItemStack(Material.BOW, 1);
+		mClassDescription = "Scouts are agile masters of archery and exploration.";
+		mClassPassiveDescription = "Whenever you fire a bow, you have a 20% chance to not consume the arrow.";
 
 		mSpecOne.mAbilities.add(new Quickdraw(plugin, player));
 		mSpecOne.mAbilities.add(new WhirlingBlade(plugin, player));
@@ -48,6 +50,7 @@ public class Scout extends PlayerClass {
 		mSpecOne.mSpecialization = 11;
 		mSpecOne.mSpecName = "Ranger";
 		mSpecOne.mDisplayItem = new ItemStack(Material.LARGE_FERN, 1);
+		mSpecOne.mDescription = "Rangers are agile masters of archery and that have unparalleled mastery of movement.";
 
 		mSpecTwo.mAbilities.add(new PinningShot(plugin, player));
 		mSpecTwo.mAbilities.add(new SplitArrow(plugin, player));
@@ -56,6 +59,7 @@ public class Scout extends PlayerClass {
 		mSpecTwo.mSpecialization = 12;
 		mSpecTwo.mSpecName = "Hunter";
 		mSpecTwo.mDisplayItem = new ItemStack(Material.LEATHER, 1);
+		mSpecTwo.mDescription = "Hunters are agile masters of exploration that have dedicated their lives to archery.";
 
 	}
 }

@@ -44,6 +44,8 @@ public class Mage extends PlayerClass {
 		mClassColor = NamedTextColor.LIGHT_PURPLE;
 		mChatColor = ChatColor.LIGHT_PURPLE;
 		mDisplayItem = new ItemStack(Material.BLAZE_ROD, 1);
+		mClassDescription = "Mages are masters of area control, freezing, wounding, and igniting enemies with their strikes.";
+		mClassPassiveDescription = "After casting a spell, your next melee attack with a wand deals 20% more damage.";
 
 		mSpecOne.mAbilities.add(new AstralOmen(plugin, player));
 		mSpecOne.mAbilities.add(new SpatialShatter(plugin, player));
@@ -52,6 +54,7 @@ public class Mage extends PlayerClass {
 		mSpecOne.mSpecialization = 1;
 		mSpecOne.mSpecName = "Arcanist";
 		mSpecOne.mDisplayItem = new ItemStack(Material.DRAGON_BREATH, 1);
+		mSpecOne.mDescription = "Arcanists are mages that specialize at controlling their skill cooldowns and getting up close.";
 
 		mSpecTwo.mAbilities.add(new Blizzard(plugin, player));
 		mSpecTwo.mAbilities.add(new ElementalSpiritFire(plugin, player));
@@ -60,5 +63,6 @@ public class Mage extends PlayerClass {
 		mSpecTwo.mSpecialization = 2;
 		mSpecTwo.mSpecName = "Elementalist";
 		mSpecTwo.mDisplayItem = new ItemStack(Material.BLAZE_POWDER, 1);
+		mSpecTwo.mDescription = "Elementalists are the undisputed masters of the elements. They excel at zoning and crowd control.";
 	}
 }
