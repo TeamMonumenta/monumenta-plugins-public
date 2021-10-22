@@ -158,8 +158,10 @@ public class CooldownTimers {
 
 	public void removeAllCooldowns(Player player) {
 		HashMap<ClassAbility, Integer> cds = mTimers.remove(player.getUniqueId());
-		for (ClassAbility classAbility : cds.keySet()) {
-			ClientModHandler.updateAbility(player, classAbility);
+		if (cds != null) {
+			for (ClassAbility classAbility : cds.keySet()) {
+				ClientModHandler.updateAbility(player, classAbility);
+			}
 		}
 	}
 

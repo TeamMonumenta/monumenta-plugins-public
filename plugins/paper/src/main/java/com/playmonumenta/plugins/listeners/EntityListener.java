@@ -1026,24 +1026,27 @@ public class EntityListener implements Listener {
 			event.setCancelled(true);
 			return;
 		}
-		if (target instanceof Player) {
-			Player player = (Player) target;
-			if (AbilityUtils.isStealthed(player)) {
-				event.setTarget(null);
-				event.setCancelled(true);
-			} else {
-				mAbilities.entityTargetLivingEntityEvent(player, event);
+
+		if (target != null) {
+			if (target instanceof Player) {
+				Player player = (Player) target;
+				if (AbilityUtils.isStealthed(player)) {
+					event.setTarget(null);
+					event.setCancelled(true);
+				} else {
+					mAbilities.entityTargetLivingEntityEvent(player, event);
+				}
 			}
-		}
 
-		//Disallows mobs targeting fox companion
-		if (target instanceof Fox && target.getScoreboardTags().contains(HuntingCompanion.FOX_TAG)) {
-			event.setCancelled(true);
-		}
+			//Disallows mobs targeting fox companion
+			if (target instanceof Fox && target.getScoreboardTags().contains(HuntingCompanion.FOX_TAG)) {
+				event.setCancelled(true);
+			}
 
-		//Disallows fox companion targeting players or some mobs it shouldn't
-		if (entity instanceof Fox && entity.getScoreboardTags().contains(HuntingCompanion.FOX_TAG) && (target instanceof Player || target.getScoreboardTags().contains(AbilityUtils.IGNORE_TAG) || !EntityUtils.isHostileMob(entity))) {
-			event.setCancelled(true);
+			//Disallows fox companion targeting players or some mobs it shouldn't
+			if (entity instanceof Fox && entity.getScoreboardTags().contains(HuntingCompanion.FOX_TAG) && (target instanceof Player || target.getScoreboardTags().contains(AbilityUtils.IGNORE_TAG) || !EntityUtils.isHostileMob(entity))) {
+				event.setCancelled(true);
+			}
 		}
 	}
 

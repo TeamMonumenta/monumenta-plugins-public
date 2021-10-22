@@ -151,7 +151,7 @@ public class HuntingCompanion extends Ability {
 				public void run() {
 					boolean isOutOfTime = mTicksElapsed >= DURATION;
 					if (isOutOfTime || mFox == null) {
-						if (isOutOfTime) {
+						if (isOutOfTime && mFox != null) {
 							Location foxLoc = mFox.getLocation();
 
 							world.playSound(foxLoc, Sound.ENTITY_FOX_SNIFF, 1.5f, 1.0f);
@@ -160,16 +160,19 @@ public class HuntingCompanion extends Ability {
 							world.playSound(foxLoc, Sound.ENTITY_FOX_AMBIENT, 1.5f, 1.2f);
 							world.spawnParticle(Particle.SMOKE_NORMAL, foxLoc, 20);
 						}
-						if (!(mTarget == null)) {
+						if (mTarget != null) {
 							mTarget.removePotionEffect(PotionEffectType.GLOWING);
 							mTarget = null;
 						}
-						mFox.remove();
-						mFox = null;
+						if (mFox != null) {
+							mFox.remove();
+							mFox = null;
+						}
 						this.cancel();
+						return;
 					}
 
-					if (!(mTarget == null || mTarget.isDead() || mTarget.getHealth() <= 0)) {
+					if (mFox != null && mTarget != null && !mTarget.isDead() && mTarget.getHealth() > 0) {
 						mFox.setTarget(mTarget);
 					}
 
