@@ -45,7 +45,7 @@ public class Cleric extends PlayerClass {
 		mChatColor = ChatColor.YELLOW;
 		mDisplayItem = new ItemStack(Material.POPPY, 1);
 		mClassDescription = "Clerics are mighty healers and specialize in fighting the undead.";
-		mClassPassiveDescription = "You and all sllies in a 12 block radius heal 5% of max health every 5s while under 50% health.";
+		mClassPassiveDescription = "You and all allies in a 12 block radius heal 5% of max health every 5s while under 50% health.";
 
 		mSpecOne.mAbilities.add(new HolyJavelin(plugin, player));
 		mSpecOne.mAbilities.add(new ChoirBells(plugin, player));
