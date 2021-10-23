@@ -24,6 +24,7 @@ public class ParrotPet {
 		mPlayer = player;
 		mVariant = variant.getVariant();
 
+		mParrot.addScoreboardTag(ParrotManager.PARROT_TAG);
 		mParrot.remove();
 		mParrot.setSilent(true);
 		mParrot.setCustomName(mName);

@@ -1,8 +1,6 @@
 package com.playmonumenta.plugins.parrots;
 
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 import com.playmonumenta.plugins.Plugin;
@@ -31,6 +29,8 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 
 public class ParrotManager implements Listener {
+
+	protected static final String PARROT_TAG = "ParrotPet";
 
 	public enum ParrotVariant {
 		//minecraft default
@@ -90,21 +90,6 @@ public class ParrotManager implements Listener {
 			this.mVariant = variant;
 		}
 	}
-
-	private static final Map<Parrot.Variant, Set<String>> PARROT_PETS = new HashMap<>();
-
-	static {
-		PARROT_PETS.put(Parrot.Variant.BLUE, new HashSet<>());
-		PARROT_PETS.put(Parrot.Variant.GRAY, new HashSet<>());
-		PARROT_PETS.put(Parrot.Variant.GREEN, new HashSet<>());
-		PARROT_PETS.put(Parrot.Variant.CYAN, new HashSet<>());
-		PARROT_PETS.put(Parrot.Variant.RED, new HashSet<>());
-
-		for (ParrotVariant variant : ParrotVariant.values()) {
-			PARROT_PETS.get(variant.mVariant).add(variant.mName);
-		}
-	}
-
 
 	public enum PlayerShoulder {
 		LEFT,
@@ -326,9 +311,18 @@ public class ParrotManager implements Listener {
 		Entity entity = e.getEntity();
 
 		if (entity instanceof Parrot) {
-			Parrot parrot = (Parrot) entity;
-			if (PARROT_PETS.get(parrot.getVariant()) != null && PARROT_PETS.get(parrot.getVariant()).contains(parrot.getName())) {
+			if (entity.getScoreboardTags().contains(PARROT_TAG)) {
 				e.setCancelled(true);
+				return;
+			}
+
+			//parrot spawned with an old version will not have the tag, so we need to check the name
+			Parrot parrot = (Parrot) entity;
+			for (ParrotVariant variant : ParrotVariant.values()) {
+				if (parrot.getCustomName() != null && parrot.getCustomName().contains(variant.mName)) {
+					e.setCancelled(true);
+					return;
+				}
 			}
 		}
 	}

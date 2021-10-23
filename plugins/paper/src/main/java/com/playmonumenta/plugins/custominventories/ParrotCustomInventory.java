@@ -723,7 +723,7 @@ public class ParrotCustomInventory extends CustomInventory {
 		GUI_ITEMS.add(new GuiItem(ParrotGUIPage.R2.mNum, 21, boughtDepthsU, (player, inv) -> {
 			return ScoreboardUtils.getScoreboardValue(player, "ParrotBought15") > 0 && mShoulderSelected != PlayerShoulder.NONE;
 		}, (player, inv) -> {
-			ParrotManager.updateParrot(player, ParrotVariant.DEPTHS, mShoulderSelected);
+			ParrotManager.updateParrot(player, ParrotVariant.DEPTHS_UPGRADE, mShoulderSelected);
 			return true;
 		}));
 
