@@ -47,7 +47,7 @@
         </repository>
         <repository>
             <id>jeff-media-repo</id>
-            <url>https://repo.jeff-media.de/maven2</url>
+            <url>https://hub.jeff-media.com/nexus/repository/jeff-media-public/</url>
         </repository>
         <repository>
             <id>BKCommonLib</id>
@@ -121,7 +121,7 @@
         <dependency>
             <groupId>de.jeff_media</groupId>
             <artifactId>ChestSortAPI</artifactId>
-            <version>2.0.0</version>
+            <version>12.0.0</version>
             <scope>provided</scope>
         </dependency>
         <dependency>

@@ -28,13 +28,12 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.plugin.Plugin;
 
-import de.jeff_media.ChestSortAPI.ChestSort;
-import de.jeff_media.ChestSortAPI.ChestSortAPI;
-import de.jeff_media.ChestSortAPI.ChestSortEvent;
+import de.jeff_media.chestsort.api.ChestSortAPI;
+import de.jeff_media.chestsort.api.ChestSortEvent;
 
 public class ChestSortIntegration implements Listener {
 	private static boolean checkedForPlugin = false;
-	private static ChestSortAPI chestSortAPI = null;
+	private static boolean mIsEnabled = false;
 	private final com.playmonumenta.plugins.Plugin mPlugin;
 	private final Set<UUID> mClicked = new HashSet<>();
 
@@ -44,10 +43,7 @@ public class ChestSortIntegration implements Listener {
 	}
 
 	private static void checkForPlugin() {
-		Plugin plugin = Bukkit.getServer().getPluginManager().getPlugin("ChestSort");
-		if (plugin instanceof ChestSort) {
-			chestSortAPI = ((ChestSort)plugin).getAPI();
-		}
+		mIsEnabled = Bukkit.getServer().getPluginManager().isPluginEnabled("ChestSort");
 		checkedForPlugin = true;
 	}
 
@@ -56,7 +52,7 @@ public class ChestSortIntegration implements Listener {
 			checkForPlugin();
 		}
 
-		return chestSortAPI != null;
+		return mIsEnabled;
 	}
 
 	public static void sortInventory(Inventory inventory) {
@@ -65,9 +61,9 @@ public class ChestSortIntegration implements Listener {
 		}
 
 		if (inventory instanceof PlayerInventory) {
-			chestSortAPI.sortInventory(inventory, 9, 35);
+			ChestSortAPI.sortInventory(inventory, 9, 35);
 		} else {
-			chestSortAPI.sortInventory(inventory);
+			ChestSortAPI.sortInventory(inventory);
 		}
 	}
 
