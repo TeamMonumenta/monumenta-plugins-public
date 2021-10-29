@@ -8,11 +8,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.AbilityManager;
-import com.playmonumenta.plugins.enchantments.curses.CurseOfEphemerality;
-import com.playmonumenta.plugins.enchantments.curses.TwoHanded;
-
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -34,6 +29,11 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.io.BukkitObjectInputStream;
 import org.bukkit.util.io.BukkitObjectOutputStream;
 import org.yaml.snakeyaml.external.biz.base64Coder.Base64Coder;
+
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.AbilityManager;
+import com.playmonumenta.plugins.enchantments.curses.CurseOfEphemerality;
+import com.playmonumenta.plugins.enchantments.curses.TwoHanded;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -514,12 +514,12 @@ public class InventoryUtils {
 
 	public static void giveItem(final Player player, final ItemStack item) {
 		final PlayerInventory inv = player.getInventory();
-		if (inv.firstEmpty() == -1) {
+		if (canFitInInventory(item, inv)) {
+			inv.addItem(item);
+		} else {
 			final Location ploc = player.getLocation();
 			ploc.getWorld().dropItem(ploc, item);
 			player.sendMessage(Component.text("Your inventory is full! Some items were dropped on the ground!", NamedTextColor.RED));
-		} else {
-			inv.addItem(item);
 		}
 	}
 
@@ -552,5 +552,20 @@ public class InventoryUtils {
 			return table.populateLoot(FastUtils.RANDOM, context);
 		}
 		return Collections.emptyList();
+	}
+
+	public static boolean canFitInInventory(ItemStack item, Inventory inventory) {
+		int remainingCount = item.getAmount();
+		for (ItemStack itemInInventory : inventory.getContents()) {
+			if (itemInInventory == null) {
+				 return true;
+			} else if (item.isSimilar(itemInInventory)) {
+				remainingCount -= item.getMaxStackSize() - itemInInventory.getAmount();
+				if (remainingCount <= 0) {
+					return true;
+				}
+			}
+		}
+		return false;
 	}
 }
