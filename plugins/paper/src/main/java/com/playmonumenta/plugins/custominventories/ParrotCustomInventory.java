@@ -9,7 +9,9 @@ import java.util.Map;
 
 import com.goncalomb.bukkit.mylib.utils.CustomInventory;
 import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
+import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.parrots.ParrotManager;
 import com.playmonumenta.plugins.parrots.ParrotManager.ParrotVariant;
 import com.playmonumenta.plugins.parrots.ParrotManager.PlayerShoulder;
@@ -23,6 +25,7 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -58,14 +61,85 @@ public class ParrotCustomInventory extends CustomInventory {
 	private static final ItemStack JUNK_BORDER_ITEM = new ItemStack(Material.BLACK_STAINED_GLASS_PANE, 1);
 	private static final ItemStack JUNK_INTERIOR_ITEM = new ItemStack(Material.GRAY_STAINED_GLASS_PANE, 1);
 
+	//this item is the same as the JUNK_BORDER_ITEM but with different PlainName()
+	private static final Map<ParrotGUIPage, ItemStack> BORDER_TOPLEFT_MAP = new HashMap<>();
+
+	private static final Map<ParrotGUIPage, ItemStack> SIGN_MAP = new HashMap<>();
+
 	static {
 		ItemMeta metaB = JUNK_BORDER_ITEM.getItemMeta();
 		metaB.displayName(Component.empty());
 		JUNK_BORDER_ITEM.setItemMeta(metaB);
 
+		ItemUtils.setPlainName(JUNK_BORDER_ITEM, "gui_blank");
+
 		ItemMeta metaI = JUNK_INTERIOR_ITEM.getItemMeta();
 		metaI.displayName(Component.empty());
 		JUNK_INTERIOR_ITEM.setItemMeta(metaI);
+
+		ItemUtils.setPlainName(JUNK_INTERIOR_ITEM, "gui_blank");
+
+		List<Component> lore = new ArrayList<>();
+
+		ItemStack signValley = new ItemStack(Material.OAK_SIGN);
+		ItemMeta metaValley = signValley.getItemMeta();
+		metaValley.displayName(Component.text("King's Valley Parrots", NamedTextColor.GRAY).decoration(TextDecoration.BOLD, true).decoration(TextDecoration.ITALIC, false));
+		lore.add(Component.text("Purchase and select your", NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false));
+		lore.add(Component.text("parrots from King's Valley!", NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false));
+		metaValley.lore(lore);
+		signValley.setItemMeta(metaValley);
+		ItemUtils.setPlainName(signValley, "King's Valley Parrots");
+
+		SIGN_MAP.put(ParrotGUIPage.R1, signValley);
+
+		lore.clear();
+		ItemStack signIsles = new ItemStack(Material.OAK_SIGN);
+		ItemMeta metaIsles = signIsles.getItemMeta();
+		metaIsles.displayName(Component.text("Celsian Isles Parrots", NamedTextColor.GRAY).decoration(TextDecoration.BOLD, true).decoration(TextDecoration.ITALIC, false));
+		lore.add(Component.text("Purchase and select your", NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false));
+		lore.add(Component.text("parrots from Celsian Isles!", NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false));
+		metaIsles.lore(lore);
+		signIsles.setItemMeta(metaIsles);
+		ItemUtils.setPlainName(signIsles, "Celsian Isles Parrots");
+
+		SIGN_MAP.put(ParrotGUIPage.R2, signIsles);
+
+		lore.clear();
+		ItemStack signSpecial = new ItemStack(Material.OAK_SIGN);
+		ItemMeta metaSpecial = signSpecial.getItemMeta();
+		metaSpecial.displayName(Component.text("Special Parrots", NamedTextColor.GRAY).decoration(TextDecoration.BOLD, true).decoration(TextDecoration.ITALIC, false));
+		lore.add(Component.text("Purchase and select", NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false));
+		lore.add(Component.text("your Special Parrots", NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false));
+		metaSpecial.lore(lore);
+		signSpecial.setItemMeta(metaSpecial);
+		ItemUtils.setPlainName(signSpecial, "Special Parrots");
+
+		SIGN_MAP.put(ParrotGUIPage.SPECIAL, signSpecial);
+
+
+		ItemStack junkValley = new ItemStack(Material.BLACK_STAINED_GLASS_PANE, 1);
+		ItemMeta metaJunkValley = junkValley.getItemMeta();
+		metaJunkValley.displayName(Component.empty());
+		junkValley.setItemMeta(metaJunkValley);
+
+		ItemUtils.setPlainName(junkValley, "ParrotGUIOverlay1");
+		BORDER_TOPLEFT_MAP.put(ParrotGUIPage.R1, junkValley);
+
+		ItemStack junkIsles = new ItemStack(Material.BLACK_STAINED_GLASS_PANE, 1);
+		ItemMeta metaJunkIsles = junkIsles.getItemMeta();
+		metaJunkIsles.displayName(Component.empty());
+		junkIsles.setItemMeta(metaJunkIsles);
+
+		ItemUtils.setPlainName(junkIsles, "ParrotGUIOverlay2");
+		BORDER_TOPLEFT_MAP.put(ParrotGUIPage.R2, junkIsles);
+
+		ItemStack junkSpecial = new ItemStack(Material.BLACK_STAINED_GLASS_PANE, 1);
+		ItemMeta metaJunkSpecial = junkSpecial.getItemMeta();
+		metaJunkSpecial.displayName(Component.empty());
+		junkSpecial.setItemMeta(metaJunkSpecial);
+
+		ItemUtils.setPlainName(junkIsles, "ParrotGUIOverlay99");
+		BORDER_TOPLEFT_MAP.put(ParrotGUIPage.SPECIAL, junkSpecial);
 	}
 
 
@@ -180,7 +254,7 @@ public class ParrotCustomInventory extends CustomInventory {
 
 
 		lore.clear();
-		ItemStack turnRight = buildItem(Material.ARROW, "turn page ->", lore);
+		ItemStack turnRight = buildItem(Material.ARROW, "Turn Page ->", lore);
 		GUI_ITEMS.add(new GuiItem(ParrotGUIPage.OTHERS.mNum, ROWS * COLUMNS - 1, turnRight, (player, inv) -> {
 						return mCurrentPage != ParrotGUIPage.SPECIAL; },
 							(player, inv) -> {
@@ -191,7 +265,7 @@ public class ParrotCustomInventory extends CustomInventory {
 								}
 								return true; }));
 
-		ItemStack turnLeft = buildItem(Material.ARROW, "<- turn page", lore);
+		ItemStack turnLeft = buildItem(Material.ARROW, "<- Turn Page", lore);
 		GUI_ITEMS.add(new GuiItem(ParrotGUIPage.OTHERS.mNum, ROWS * COLUMNS - 9, turnLeft, (player, inv) -> {
 						return mCurrentPage != ParrotGUIPage.R1; },
 							(player, inv) -> {
@@ -864,6 +938,8 @@ public class ParrotCustomInventory extends CustomInventory {
 		}
 
 		newItem.setItemMeta(meta);
+
+		ItemUtils.setPlainName(newItem, name);
 		return newItem;
 	   }
 
@@ -895,12 +971,20 @@ public class ParrotCustomInventory extends CustomInventory {
 		loadItem(owner);
 		owner.playSound(owner.getLocation(), Sound.BLOCK_NOTE_BLOCK_CHIME, 3f, 1.2f);
 
-		updateInventory(owner);
+		new BukkitRunnable() {
+			public void run() {
+				updateInventory(owner);
+			}
+		}.runTaskLater(Plugin.getInstance(), 2);
 	}
 
 	public void updateInventory(Player player) {
 		_inventory.clear();
 		mInvMapping.clear();
+
+		if (SIGN_MAP.get(mCurrentPage) != null) {
+			_inventory.setItem(4, SIGN_MAP.get(mCurrentPage));
+		}
 
 		for (GuiItem gItem : GUI_ITEMS) {
 			ParrotGUIPage itemPage = ParrotGUIPage.valueOfPage(gItem.getPage());
@@ -911,9 +995,14 @@ public class ParrotCustomInventory extends CustomInventory {
 		}
 
 		fillWithJunk(_inventory);
+
 	}
 
 	public void fillWithJunk(Inventory inventory) {
+		if (BORDER_TOPLEFT_MAP.get(mCurrentPage) != null) {
+			inventory.setItem(0, BORDER_TOPLEFT_MAP.get(mCurrentPage));
+		}
+
 		for (int i = 0; i < (ROWS*COLUMNS); i++) {
 			if (inventory.getItem(i) == null) {
 				if (i < COLUMNS || i > ((ROWS - 1)*COLUMNS) || (i % COLUMNS == 0) || (i % COLUMNS == COLUMNS - 1)) {
@@ -941,6 +1030,10 @@ public class ParrotCustomInventory extends CustomInventory {
 
 		if (event.getCurrentItem().getType().equals(JUNK_BORDER_ITEM.getType()) || event.getCurrentItem().getType().equals(JUNK_INTERIOR_ITEM.getType())) {
 			//if the player press the junk item nothing happen    // Magikarp use SPLASH!
+			return;
+		}
+
+		if (event.getCurrentItem().getType().equals(Material.OAK_SIGN)) {
 			return;
 		}
 
