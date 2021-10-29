@@ -257,7 +257,8 @@ public class AbilityUtils {
 		if (MetadataUtils.checkOnceThisTick(Plugin.getInstance(), player, ARROW_REFUNDED_METAKEY)) {
 			if (ItemUtils.isSomeBow(mainHand)) {
 				if (!mainHand.containsEnchantment(Enchantment.ARROW_INFINITE)) {
-					arrow.setPickupStatus(Arrow.PickupStatus.ALLOWED);
+
+					arrow.setPickupStatus(Arrow.PickupStatus.DISALLOWED);
 					Inventory playerInv = player.getInventory();
 					int firstArrow = playerInv.first(Material.ARROW);
 					int firstTippedArrow = playerInv.first(Material.TIPPED_ARROW);
@@ -278,16 +279,26 @@ public class AbilityUtils {
 					} else if (firstTippedArrow > -1 && firstSpectralArrow > -1 && firstArrow > -1) {
 						arrowSlot = Math.min(firstTippedArrow, Math.min(firstSpectralArrow, firstArrow));
 					} else {
+						// No arrow left - player must have shot their last arrow. Grab the arrow from the event and give it back to the player, then abort
+						InventoryUtils.giveItem(player, arrow.getItemStack());
 						return;
 					}
 
-					// Make sure the duplicate arrow can't be picked up
-					arrow.setPickupStatus(Arrow.PickupStatus.DISALLOWED);
-					// I'm not sure why this works, but it does.
+					//arrowStack has the count from before the arrow is shot
+					//so if from bow we just keep the same amount
+					//and if from crossbow we add one arrow
+					ItemStack arrowStack = playerInv.getItem(arrowSlot);
 					if (arrow.isShotFromCrossbow()) {
-						playerInv.getItem(arrowSlot).setAmount(playerInv.getItem(arrowSlot).getAmount() + 1);
+						int stackSize = arrowStack.getAmount();
+						if (stackSize < arrowStack.getMaxStackSize()) {
+							arrowStack.setAmount(stackSize + 1);
+						} else {
+							ItemStack clone = arrowStack.clone();
+							clone.setAmount(1);
+							InventoryUtils.giveItem(player, clone);
+						}
 					} else {
-						playerInv.setItem(arrowSlot, playerInv.getItem(arrowSlot));
+						playerInv.setItem(arrowSlot, arrowStack);
 					}
 				}
 			}
