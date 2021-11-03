@@ -118,6 +118,7 @@ import com.playmonumenta.plugins.listeners.TridentListener;
 import com.playmonumenta.plugins.listeners.VehicleListener;
 import com.playmonumenta.plugins.listeners.WorldListener;
 import com.playmonumenta.plugins.listeners.ZonePropertyListener;
+import com.playmonumenta.plugins.minigames.chess.ChessManager;
 import com.playmonumenta.plugins.network.ClientModHandler;
 import com.playmonumenta.plugins.network.HttpManager;
 import com.playmonumenta.plugins.overrides.ItemOverrides;
@@ -156,6 +157,7 @@ public class Plugin extends JavaPlugin {
 	public IndexInventoryManager mIndexInventoryManager;
 	public EffectManager mEffectManager;
 	public ParrotManager mParrotManager;
+	public ChessManager mChessManager;
 
 	public DeathItemListener mDeathItemListener;
 
@@ -283,6 +285,7 @@ public class Plugin extends JavaPlugin {
 		mEffectManager = new EffectManager(this);
 		mDeathItemListener = new DeathItemListener(this);
 		mParrotManager = new ParrotManager(this);
+		mChessManager = new ChessManager(this);
 
 		new ClientModHandler(this);
 
@@ -301,6 +304,11 @@ public class Plugin extends JavaPlugin {
 			|| ServerProperties.getShardName().equals("dev1")
 			|| ServerProperties.getShardName().equals("dev2")) {
 			manager.registerEvents(new ShopManager(), this);
+		}
+
+		if (ServerProperties.getShardName().contains("valley")
+			|| ServerProperties.getShardName().contains("dev")) {
+			manager.registerEvents(mChessManager, this);
 		}
 
 		if (ServerProperties.getAuditMessagesEnabled()) {
@@ -477,6 +485,7 @@ public class Plugin extends JavaPlugin {
 		INSTANCE = null;
 		getServer().getScheduler().cancelTasks(this);
 
+		mChessManager.unloadAll();
 		mTrackingManager.unloadTrackedEntities();
 		mHttpManager.stop();
 		mBossManager.unloadAll(true);
