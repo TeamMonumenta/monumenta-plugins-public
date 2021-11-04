@@ -421,6 +421,7 @@ public class ChessInterface {
 				possibleFrame.setItem(MAP_BOARD.get(white ? 0 : 1), false);
 			}
 		}
+		updateInteractable();
 	}
 
 	public void updateSlot(int slot) {
