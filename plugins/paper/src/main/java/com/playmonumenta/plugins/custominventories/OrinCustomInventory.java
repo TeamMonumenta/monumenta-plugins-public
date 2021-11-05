@@ -7,6 +7,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
@@ -78,6 +79,32 @@ public class OrinCustomInventory extends CustomInventory {
 		}
 	}
 
+	private static ArrayList<TeleportEntry> LOCATIONS_COMMON = new ArrayList<>();
+
+	static {
+		LOCATIONS_COMMON.add(new TeleportEntry(45, "Build Server", null, "Click to teleport!", Material.STONE_PICKAXE, "transferserver build -2456.0 56.5 1104.0 90 0"));
+
+		LOCATIONS_COMMON.add(new TeleportEntry(20, "Labs", "D0Access", "Click to teleport!", Material.GLASS_BOTTLE, "execute as @S run function monumenta:lobbies/send_one/d0"));
+		LOCATIONS_COMMON.add(new TeleportEntry(21, "White", "D1Access", "Click to teleport!", Material.WHITE_WOOL, "execute as @S run function monumenta:lobbies/send_one/d1"));
+		LOCATIONS_COMMON.add(new TeleportEntry(22, "Orange", "D2Access", "Click to teleport!", Material.ORANGE_WOOL, "execute as @S run function monumenta:lobbies/send_one/d2"));
+		LOCATIONS_COMMON.add(new TeleportEntry(29, "Magenta", "D3Access", "Click to teleport!", Material.MAGENTA_WOOL, "execute as @S run function monumenta:lobbies/send_one/d3"));
+		LOCATIONS_COMMON.add(new TeleportEntry(30, "Light Blue", "D4Access", "Click to teleport!", Material.LIGHT_BLUE_WOOL, "execute as @S run function monumenta:lobbies/send_one/d4"));
+		LOCATIONS_COMMON.add(new TeleportEntry(31, "Yellow", "D5Access", "Click to teleport!", Material.YELLOW_WOOL, "execute as @S run function monumenta:lobbies/send_one/d5"));
+		LOCATIONS_COMMON.add(new TeleportEntry(38, "Willows", "DB1Access", "Click to teleport!", Material.JUNGLE_LEAVES, "execute as @S run function monumenta:lobbies/send_one/db1"));
+		LOCATIONS_COMMON.add(new TeleportEntry(39, "Reverie", "DCAccess", "Click to teleport!", Material.FIRE_CORAL, "execute as @S run function monumenta:lobbies/send_one/dc"));
+		LOCATIONS_COMMON.add(new TeleportEntry(40, "Sanctum", "DS1Access", "Click to teleport!", Material.GRASS_BLOCK, "execute as @S run function monumenta:lobbies/send_one/ds1"));
+
+		LOCATIONS_COMMON.add(new TeleportEntry(24, "Lime", "D6Access", "Click to teleport!", Material.LIME_WOOL, "execute as @S run function monumenta:lobbies/send_one/d6"));
+		LOCATIONS_COMMON.add(new TeleportEntry(25, "Pink", "D7Access", "Click to teleport!", Material.PINK_WOOL, "execute as @S run function monumenta:lobbies/send_one/d7"));
+		LOCATIONS_COMMON.add(new TeleportEntry(26, "Gray", "D8Access", "Click to teleport!", Material.GRAY_WOOL, "execute as @S run function monumenta:lobbies/send_one/d8"));
+		LOCATIONS_COMMON.add(new TeleportEntry(33, "Light Gray", "D9Access", "Click to teleport!", Material.LIGHT_GRAY_WOOL, "execute as @S run function monumenta:lobbies/send_one/d9"));
+		LOCATIONS_COMMON.add(new TeleportEntry(34, "Cyan", "D10Access", "Click to teleport!", Material.CYAN_WOOL, "execute as @S run function monumenta:lobbies/send_one/d10"));
+		LOCATIONS_COMMON.add(new TeleportEntry(35, "Purple", "D11Access", "Click to teleport!", Material.PURPLE_WOOL, "execute as @S run function monumenta:lobbies/send_one/d11"));
+		LOCATIONS_COMMON.add(new TeleportEntry(42, "Teal", "DTLAccess", "Click to teleport!", Material.CYAN_CONCRETE_POWDER, "execute as @S run function monumenta:lobbies/send_one/dtl"));
+		LOCATIONS_COMMON.add(new TeleportEntry(43, "Shifting City", "DRL2Access", "Click to teleport!", Material.PRISMARINE_BRICKS, "execute as @S run function monumenta:lobbies/send_one/drl2"));
+		LOCATIONS_COMMON.add(new TeleportEntry(44, "The Fallen Forum", "DFFAccess", "Click to teleport!", Material.BOOKSHELF, "execute as @S run function monumenta:lobbies/send_one/dff"));
+	}
+
 	private static ArrayList<TeleportEntry> LOCATIONS_PLOTS = new ArrayList<>();
 
 	static {
@@ -85,87 +112,27 @@ public class OrinCustomInventory extends CustomInventory {
 		LOCATIONS_PLOTS.add(new TeleportEntry(18, "Market", null, "Click to teleport!", Material.BARREL, "execute as @S run function monumenta:mechanisms/teleporters/enter_new_market"));
 		LOCATIONS_PLOTS.add(new TeleportEntry(27, "Personal Plot", null, "Click to teleport!", Material.GRASS_BLOCK, "execute as @S run function plot:plot/home"));
 		LOCATIONS_PLOTS.add(new TeleportEntry(36, "Guild Plot", null, "Click to teleport!", Material.YELLOW_BANNER, "teleportguild @S"));
-		LOCATIONS_PLOTS.add(new TeleportEntry(45, "Build Server", null, "Click to teleport!", Material.STONE_PICKAXE, "transferserver build -2456.0 56.5 1104.0 90 0"));
 
 		LOCATIONS_PLOTS.add(new TeleportEntry(3, "Sierhaven", null, "Click to teleport!", Material.GREEN_CONCRETE, "execute as @S run function monumenta:mechanisms/teleporters/tp/plots_to_valley"));
-		LOCATIONS_PLOTS.add(new TeleportEntry(20, "Labs", "D0Access", "Click to teleport!", Material.GLASS_BOTTLE, "execute as @S run function monumenta:lobbies/send_one/d0"));
-		LOCATIONS_PLOTS.add(new TeleportEntry(21, "White", "D1Access", "Click to teleport!", Material.WHITE_WOOL, "execute as @S run function monumenta:lobbies/send_one/d1"));
-		LOCATIONS_PLOTS.add(new TeleportEntry(22, "Orange", "D2Access", "Click to teleport!", Material.ORANGE_WOOL, "execute as @S run function monumenta:lobbies/send_one/d2"));
-		LOCATIONS_PLOTS.add(new TeleportEntry(29, "Magenta", "D3Access", "Click to teleport!", Material.MAGENTA_WOOL, "execute as @S run function monumenta:lobbies/send_one/d3"));
-		LOCATIONS_PLOTS.add(new TeleportEntry(30, "Light Blue", "D4Access", "Click to teleport!", Material.LIGHT_BLUE_WOOL, "execute as @S run function monumenta:lobbies/send_one/d4"));
-		LOCATIONS_PLOTS.add(new TeleportEntry(31, "Yellow", "D5Access", "Click to teleport!", Material.YELLOW_WOOL, "execute as @S run function monumenta:lobbies/send_one/d5"));
-		LOCATIONS_PLOTS.add(new TeleportEntry(38, "Willows", "DB1Access", "Click to teleport!", Material.JUNGLE_LEAVES, "execute as @S run function monumenta:lobbies/send_one/db1"));
-		LOCATIONS_PLOTS.add(new TeleportEntry(39, "Reverie", "DCAccess", "Click to teleport!", Material.FIRE_CORAL, "execute as @S run function monumenta:lobbies/send_one/dc"));
-		LOCATIONS_PLOTS.add(new TeleportEntry(40, "Sanctum", "DS1Access", "Click to teleport!", Material.GRASS_BLOCK, "execute as @S run function monumenta:lobbies/send_one/ds1"));
 
 		LOCATIONS_PLOTS.add(new TeleportEntry(7, "Mistport", "Quest101", "Click to teleport!", Material.SAND, "execute as @S run function monumenta:mechanisms/teleporters/tp/plots_to_isles", 13));
-		LOCATIONS_PLOTS.add(new TeleportEntry(24, "Lime", "D6Access", "Click to teleport!", Material.LIME_WOOL, "execute as @S run function monumenta:lobbies/send_one/d6"));
-		LOCATIONS_PLOTS.add(new TeleportEntry(25, "Pink", "D7Access", "Click to teleport!", Material.PINK_WOOL, "execute as @S run function monumenta:lobbies/send_one/d7"));
-		LOCATIONS_PLOTS.add(new TeleportEntry(26, "Gray", "D8Access", "Click to teleport!", Material.GRAY_WOOL, "execute as @S run function monumenta:lobbies/send_one/d8"));
-		LOCATIONS_PLOTS.add(new TeleportEntry(33, "Light Gray", "D9Access", "Click to teleport!", Material.LIGHT_GRAY_WOOL, "execute as @S run function monumenta:lobbies/send_one/d9"));
-		LOCATIONS_PLOTS.add(new TeleportEntry(34, "Cyan", "D10Access", "Click to teleport!", Material.CYAN_WOOL, "execute as @S run function monumenta:lobbies/send_one/d10"));
-		LOCATIONS_PLOTS.add(new TeleportEntry(35, "Purple", "D11Access", "Click to teleport!", Material.PURPLE_WOOL, "execute as @S run function monumenta:lobbies/send_one/d11"));
-		LOCATIONS_PLOTS.add(new TeleportEntry(42, "Teal", "DTLAccess", "Click to teleport!", Material.CYAN_CONCRETE_POWDER, "execute as @S run function monumenta:lobbies/send_one/dtl"));
-		LOCATIONS_PLOTS.add(new TeleportEntry(43, "Shifting City", "DRL2Access", "Click to teleport!", Material.PRISMARINE_BRICKS, "execute as @S run function monumenta:lobbies/send_one/drl2"));
-		LOCATIONS_PLOTS.add(new TeleportEntry(44, "The Fallen Forum", "DFFAccess", "Click to teleport!", Material.BOOKSHELF, "execute as @S run function monumenta:lobbies/send_one/dff"));
+
 	}
 
 	private static ArrayList<TeleportEntry> LOCATIONS_REGION1 = new ArrayList<>();
 
 	static {
-		LOCATIONS_REGION1.add(new TeleportEntry(9, "Docks", null, "Click to teleport!", Material.LIGHT_BLUE_CONCRETE, "execute as @S run function monumenta:mechanisms/teleporters/tp/sierhaven_to_plots"));
-		LOCATIONS_REGION1.add(new TeleportEntry(36, "Build Server", null, "Click to teleport!", Material.STONE_PICKAXE, "transferserver build -765.5 106.0625 70.5 180 0"));
-
+		LOCATIONS_REGION1.add(new TeleportEntry(9, "Plots", null, "Click to teleport!", Material.LIGHT_BLUE_CONCRETE, "execute as @S run function monumenta:mechanisms/teleporters/tp/sierhaven_to_plots"));
 		LOCATIONS_REGION1.add(new TeleportEntry(3, "Sierhaven", null, "Click to teleport!", Material.GREEN_CONCRETE, "tp @S -765.5 106.0625 70.5 180 0"));
-		LOCATIONS_REGION1.add(new TeleportEntry(20, "Labs", "D0Access", "Click to teleport!", Material.GLASS_BOTTLE, "execute as @S run function monumenta:lobbies/send_one/d0"));
-		LOCATIONS_REGION1.add(new TeleportEntry(21, "White", "D1Access", "Click to teleport!", Material.WHITE_WOOL, "execute as @S run function monumenta:lobbies/send_one/d1"));
-		LOCATIONS_REGION1.add(new TeleportEntry(22, "Orange", "D2Access", "Click to teleport!", Material.ORANGE_WOOL, "execute as @S run function monumenta:lobbies/send_one/d2"));
-		LOCATIONS_REGION1.add(new TeleportEntry(29, "Magenta", "D3Access", "Click to teleport!", Material.MAGENTA_WOOL, "execute as @S run function monumenta:lobbies/send_one/d3"));
-		LOCATIONS_REGION1.add(new TeleportEntry(30, "Light Blue", "D4Access", "Click to teleport!", Material.LIGHT_BLUE_WOOL, "execute as @S run function monumenta:lobbies/send_one/d4"));
-		LOCATIONS_REGION1.add(new TeleportEntry(31, "Yellow", "D5Access", "Click to teleport!", Material.YELLOW_WOOL, "execute as @S run function monumenta:lobbies/send_one/d5"));
-		LOCATIONS_REGION1.add(new TeleportEntry(38, "Willows", "DB1Access", "Click to teleport!", Material.JUNGLE_LEAVES, "execute as @S run function monumenta:lobbies/send_one/db1"));
-		LOCATIONS_REGION1.add(new TeleportEntry(39, "Reverie", "DCAccess", "Click to teleport!", Material.FIRE_CORAL, "execute as @S run function monumenta:lobbies/send_one/dc"));
-		LOCATIONS_REGION1.add(new TeleportEntry(40, "Sanctum", "DS1Access", "Click to teleport!", Material.GRASS_BLOCK, "execute as @S run function monumenta:lobbies/send_one/ds1"));
-
 		LOCATIONS_REGION1.add(new TeleportEntry(7, "Mistport", "Quest101", "Click to teleport!", Material.SAND, "execute as @S run function monumenta:mechanisms/teleporters/tp/sierhaven_to_isles", 13));
-		LOCATIONS_REGION1.add(new TeleportEntry(24, "Lime", "D6Access", "Click to teleport!", Material.LIME_WOOL, "execute as @S run function monumenta:lobbies/send_one/d6"));
-		LOCATIONS_REGION1.add(new TeleportEntry(25, "Pink", "D7Access", "Click to teleport!", Material.PINK_WOOL, "execute as @S run function monumenta:lobbies/send_one/d7"));
-		LOCATIONS_REGION1.add(new TeleportEntry(26, "Gray", "D8Access", "Click to teleport!", Material.GRAY_WOOL, "execute as @S run function monumenta:lobbies/send_one/d8"));
-		LOCATIONS_REGION1.add(new TeleportEntry(33, "Light Gray", "D9Access", "Click to teleport!", Material.LIGHT_GRAY_WOOL, "execute as @S run function monumenta:lobbies/send_one/d9"));
-		LOCATIONS_REGION1.add(new TeleportEntry(34, "Cyan", "D10Access", "Click to teleport!", Material.CYAN_WOOL, "execute as @S run function monumenta:lobbies/send_one/d10"));
-		LOCATIONS_REGION1.add(new TeleportEntry(35, "Purple", "D11Access", "Click to teleport!", Material.PURPLE_WOOL, "execute as @S run function monumenta:lobbies/send_one/d11"));
-		LOCATIONS_REGION1.add(new TeleportEntry(42, "Teal", "DTLAccess", "Click to teleport!", Material.CYAN_CONCRETE_POWDER, "execute as @S run function monumenta:lobbies/send_one/dtl"));
-		LOCATIONS_REGION1.add(new TeleportEntry(43, "Shifting City", "DRL2Access", "Click to teleport!", Material.PRISMARINE_BRICKS, "execute as @S run function monumenta:lobbies/send_one/drl2"));
-		LOCATIONS_REGION1.add(new TeleportEntry(44, "The Fallen Forum", "DFFAccess", "Click to teleport!", Material.BOOKSHELF, "execute as @S run function monumenta:lobbies/send_one/dff"));
 	}
 
 	private static ArrayList<TeleportEntry> LOCATIONS_REGION2 = new ArrayList<>();
 
 	static {
-		LOCATIONS_REGION2.add(new TeleportEntry(9, "Docks", null, "Click to teleport!", Material.LIGHT_BLUE_CONCRETE, "execute as @S run function monumenta:mechanisms/teleporters/tp/mistport_to_plots"));
-		LOCATIONS_REGION2.add(new TeleportEntry(36, "Build Server", null, "Click to teleport!", Material.STONE_PICKAXE, "transferserver build -762.5 70.1 1344.5 180 0"));
-
+		LOCATIONS_REGION2.add(new TeleportEntry(9, "Plots", null, "Click to teleport!", Material.LIGHT_BLUE_CONCRETE, "execute as @S run function monumenta:mechanisms/teleporters/tp/mistport_to_plots"));
 		LOCATIONS_REGION2.add(new TeleportEntry(3, "Sierhaven", null, "Click to teleport!", Material.GREEN_CONCRETE, "execute as @S run function monumenta:mechanisms/teleporters/tp/mistport_to_valley"));
-		LOCATIONS_REGION2.add(new TeleportEntry(20, "Labs", "D0Access", "Click to teleport!", Material.GLASS_BOTTLE, "execute as @S run function monumenta:lobbies/send_one/d0"));
-		LOCATIONS_REGION2.add(new TeleportEntry(21, "White", "D1Access", "Click to teleport!", Material.WHITE_WOOL, "execute as @S run function monumenta:lobbies/send_one/d1"));
-		LOCATIONS_REGION2.add(new TeleportEntry(22, "Orange", "D2Access", "Click to teleport!", Material.ORANGE_WOOL, "execute as @S run function monumenta:lobbies/send_one/d2"));
-		LOCATIONS_REGION2.add(new TeleportEntry(29, "Magenta", "D3Access", "Click to teleport!", Material.MAGENTA_WOOL, "execute as @S run function monumenta:lobbies/send_one/d3"));
-		LOCATIONS_REGION2.add(new TeleportEntry(30, "Light Blue", "D4Access", "Click to teleport!", Material.LIGHT_BLUE_WOOL, "execute as @S run function monumenta:lobbies/send_one/d4"));
-		LOCATIONS_REGION2.add(new TeleportEntry(31, "Yellow", "D5Access", "Click to teleport!", Material.YELLOW_WOOL, "execute as @S run function monumenta:lobbies/send_one/d5"));
-		LOCATIONS_REGION2.add(new TeleportEntry(38, "Willows", "DB1Access", "Click to teleport!", Material.JUNGLE_LEAVES, "execute as @S run function monumenta:lobbies/send_one/db1"));
-		LOCATIONS_REGION2.add(new TeleportEntry(39, "Reverie", "DCAccess", "Click to teleport!", Material.FIRE_CORAL, "execute as @S run function monumenta:lobbies/send_one/dc"));
-		LOCATIONS_REGION2.add(new TeleportEntry(40, "Sanctum", "DS1Access", "Click to teleport!", Material.GRASS_BLOCK, "execute as @S run function monumenta:lobbies/send_one/ds1"));
-
 		LOCATIONS_REGION2.add(new TeleportEntry(7, "Mistport", "Quest101", "Click to teleport!", Material.SAND, "tp @S -762.5 70.1 1344.5 180 0", 13));
-		LOCATIONS_REGION2.add(new TeleportEntry(24, "Lime", "D6Access", "Click to teleport!", Material.LIME_WOOL, "execute as @S run function monumenta:lobbies/send_one/d6"));
-		LOCATIONS_REGION2.add(new TeleportEntry(25, "Pink", "D7Access", "Click to teleport!", Material.PINK_WOOL, "execute as @S run function monumenta:lobbies/send_one/d7"));
-		LOCATIONS_REGION2.add(new TeleportEntry(26, "Gray", "D8Access", "Click to teleport!", Material.GRAY_WOOL, "execute as @S run function monumenta:lobbies/send_one/d8"));
-		LOCATIONS_REGION2.add(new TeleportEntry(33, "Light Gray", "D9Access", "Click to teleport!", Material.LIGHT_GRAY_WOOL, "execute as @S run function monumenta:lobbies/send_one/d9"));
-		LOCATIONS_REGION2.add(new TeleportEntry(34, "Cyan", "D10Access", "Click to teleport!", Material.CYAN_WOOL, "execute as @S run function monumenta:lobbies/send_one/d10"));
-		LOCATIONS_REGION2.add(new TeleportEntry(35, "Purple", "D11Access", "Click to teleport!", Material.PURPLE_WOOL, "execute as @S run function monumenta:lobbies/send_one/d11"));
-		LOCATIONS_REGION2.add(new TeleportEntry(42, "Teal", "DTLAccess", "Click to teleport!", Material.CYAN_CONCRETE_POWDER, "execute as @S run function monumenta:lobbies/send_one/dtl"));
-		LOCATIONS_REGION2.add(new TeleportEntry(43, "Shifting City", "DRL2Access", "Click to teleport!", Material.PRISMARINE_BRICKS, "execute as @S run function monumenta:lobbies/send_one/drl2"));
-		LOCATIONS_REGION2.add(new TeleportEntry(44, "The Fallen Forum", "DFFAccess", "Click to teleport!", Material.BOOKSHELF, "execute as @S run function monumenta:lobbies/send_one/dff"));
 	}
 
 	public OrinCustomInventory(Player player) {
@@ -265,8 +232,8 @@ public class OrinCustomInventory extends CustomInventory {
 			lore.add(location.mLore);
 		}
 		meta.setLore(lore);
+		meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
 		newItem.setItemMeta(meta);
-		ItemUtils.setPlainTag(newItem);
 		return newItem;
 	}
 
@@ -292,6 +259,12 @@ public class OrinCustomInventory extends CustomInventory {
 			listOfItems = LOCATIONS_PLOTS;
 			ScoreboardUtils.setScoreboardValue(player, PAGE_SCOREBOARD, 0);
 			break;
+		}
+		for (TeleportEntry commonLoc : LOCATIONS_COMMON) {
+			if (commonLoc.mScoreboard == null || ScoreboardUtils.getScoreboardValue(player, commonLoc.mScoreboard) >= commonLoc.mScoreRequired) {
+				ItemStack newItem = createCustomItem(commonLoc);
+				_inventory.setItem(commonLoc.mSlot, newItem);
+			}
 		}
 
 		for (TeleportEntry location : listOfItems) {
