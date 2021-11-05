@@ -183,12 +183,18 @@ public class OrinCustomInventory extends CustomInventory {
 
 		if (clickedItem != null && clickedItem.getType() != FILLER && !event.isShiftClick()) {
 			int chosenSlot = event.getSlot();
+			for (TeleportEntry location : LOCATIONS_COMMON) {
+				if (location.mSlot == chosenSlot) {
+					completeCommand(player, location.mCommand);
+					player.closeInventory();
+					return;
+				}
+			}
 			for (TeleportEntry location : listOfItems) {
 				if (location.mSlot == chosenSlot) {
 					completeCommand(player, location.mCommand);
 					player.closeInventory();
 					return;
-
 				}
 			}
 		}
