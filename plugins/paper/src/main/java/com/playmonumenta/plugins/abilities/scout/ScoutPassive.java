@@ -30,7 +30,7 @@ public class ScoutPassive extends Ability {
 	@Override
 	public boolean playerShotArrowEvent(AbstractArrow arrow) {
 		if (FastUtils.RANDOM.nextDouble() < PASSIVE_ARROW_SAVE) {
-			mPlayer.getWorld().playSound(mPlayer.getLocation(), Sound.ENTITY_ARROW_HIT_PLAYER, 0.3f, 1.0f);
+			mPlayer.playSound(mPlayer.getLocation(), Sound.ENTITY_ARROW_HIT_PLAYER, 0.3f, 1.0f);
 			AbilityUtils.refundArrow(mPlayer, arrow);
 		}
 		return true;

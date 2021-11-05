@@ -554,9 +554,11 @@ public class InventoryUtils {
 		return Collections.emptyList();
 	}
 
-	public static boolean canFitInInventory(ItemStack item, Inventory inventory) {
+	public static boolean canFitInInventory(ItemStack item, PlayerInventory inventory) {
 		int remainingCount = item.getAmount();
-		for (ItemStack itemInInventory : inventory.getContents()) {
+
+		// getStorageContents excludes armor, offhand slots
+		for (ItemStack itemInInventory : inventory.getStorageContents()) {
 			if (itemInInventory == null) {
 				 return true;
 			} else if (item.isSimilar(itemInInventory)) {

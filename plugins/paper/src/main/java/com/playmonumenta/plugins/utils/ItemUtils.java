@@ -9,13 +9,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 
-import com.playmonumenta.plugins.Constants.Materials;
-import com.playmonumenta.plugins.enchantments.Colossal;
-import com.playmonumenta.plugins.itemindex.Attribute;
-import com.playmonumenta.plugins.listeners.ShulkerShortcutListener;
-import com.playmonumenta.plugins.server.properties.ServerProperties;
-import com.playmonumenta.plugins.utils.PotionUtils.PotionInfo;
-
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.Color;
 import org.bukkit.Material;
@@ -35,6 +28,13 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.potion.PotionType;
 import org.jetbrains.annotations.NotNull;
+
+import com.playmonumenta.plugins.Constants.Materials;
+import com.playmonumenta.plugins.enchantments.Colossal;
+import com.playmonumenta.plugins.itemindex.Attribute;
+import com.playmonumenta.plugins.listeners.ShulkerShortcutListener;
+import com.playmonumenta.plugins.server.properties.ServerProperties;
+import com.playmonumenta.plugins.utils.PotionUtils.PotionInfo;
 
 import de.tr7zw.nbtapi.NBTCompound;
 import de.tr7zw.nbtapi.NBTItem;
@@ -1432,5 +1432,11 @@ public class ItemUtils {
 
 	}
 
+	public static boolean hasLore(ItemStack item) {
+		return item.hasItemMeta() && item.getItemMeta().hasLore();
+	}
 
+	public static boolean isInteresting(ItemStack item) {
+		return ServerProperties.getAlwaysPickupMats().contains(item.getType()) || hasLore(item) || (item.hasItemMeta() && item.getItemMeta().hasDisplayName() && ServerProperties.getNamedPickupMats().contains(item.getType()));
+	}
 }

@@ -16,10 +16,11 @@ import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.PlayerInventory;
 
-import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.CommandUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.utils.ItemUtils;
 
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.CommandPermission;
@@ -30,20 +31,24 @@ import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
 
 public class ItemDropListener implements Listener {
 	public static final String COMMAND = "disabledrop";
+	public static final String ALIAS = "dd";
 
 	private static final String LORE_TAG = "DisableDropLore";
 	private static final String INTERESTING_TAG = "DisableDropInteresting";
 	private static final String ALL_TAG = "DisableDropAll";
+	private static final String HOLDING_TAG = "DisableDropHolding";
 
 	private final Set<UUID> mLorePlayers = new HashSet<>();
 	private final Set<UUID> mInterestingPlayers = new HashSet<>();
 	private final Set<UUID> mAllPlayers = new HashSet<>();
+	private final Set<UUID> mHoldingPlayers = new HashSet<>();
 
 	public ItemDropListener() {
 		final CommandPermission perms = CommandPermission.fromString("monumenta.command.disabledrop");
 
 		new CommandAPICommand(COMMAND)
 			.withPermission(perms)
+			.withAliases(ALIAS)
 			.executes((sender, args) -> {
 				playerToggle(sender);
 			})
@@ -51,6 +56,7 @@ public class ItemDropListener implements Listener {
 
 		new CommandAPICommand(COMMAND)
 		.withPermission(perms)
+		.withAliases(ALIAS)
 		.withArguments(new LiteralArgument("none"))
 		.executes((sender, args) -> {
 			enable(sender);
@@ -59,6 +65,7 @@ public class ItemDropListener implements Listener {
 
 		new CommandAPICommand(COMMAND)
 		.withPermission(perms)
+		.withAliases(ALIAS)
 		.withArguments(new LiteralArgument("lore"))
 		.executes((sender, args) -> {
 			disableLore(sender);
@@ -67,6 +74,7 @@ public class ItemDropListener implements Listener {
 
 		new CommandAPICommand(COMMAND)
 		.withPermission(perms)
+		.withAliases(ALIAS)
 		.withArguments(new LiteralArgument("interesting"))
 		.executes((sender, args) -> {
 			disableInteresting(sender);
@@ -75,12 +83,21 @@ public class ItemDropListener implements Listener {
 
 		new CommandAPICommand(COMMAND)
 		.withPermission(perms)
+		.withAliases(ALIAS)
 		.withArguments(new LiteralArgument("all"))
 		.executes((sender, args) -> {
 			disableAll(sender);
 		})
 		.register();
 
+		new CommandAPICommand(COMMAND)
+		.withPermission(perms)
+		.withAliases(ALIAS)
+		.withArguments(new LiteralArgument("holding"))
+		.executes((sender, args) -> {
+			disableHolding(sender);
+		})
+		.register();
 	}
 
 	private void playerToggle(CommandSender sender) throws WrapperCommandSyntaxException {
@@ -89,7 +106,7 @@ public class ItemDropListener implements Listener {
 		if (hasTag(player)) {
 			enable(player);
 		} else {
-			disableAll(player);
+			disableLore(player);
 		}
 	}
 
@@ -105,6 +122,8 @@ public class ItemDropListener implements Listener {
 				mInterestingPlayers.add(uuid);
 			} else if (tags.contains(ALL_TAG)) {
 				mAllPlayers.add(uuid);
+			} else if (tags.contains(HOLDING_TAG)) {
+				mHoldingPlayers.add(uuid);
 			}
 		}
 	}
@@ -122,8 +141,10 @@ public class ItemDropListener implements Listener {
 			return;
 		}
 
+		// If the item wouldn't fit back into the inventory we need to throw it in order to not delete it
 		ItemStack item = itemEntity.getItemStack();
-		if (!InventoryUtils.canFitInInventory(item, player.getInventory())) {
+		PlayerInventory playerInventory = player.getInventory();
+		if (!InventoryUtils.canFitInInventory(item, playerInventory)) {
 			return;
 		}
 
@@ -131,11 +152,20 @@ public class ItemDropListener implements Listener {
 		if (mAllPlayers.contains(uuid)) {
 			event.setCancelled(true);
 		} else if (mInterestingPlayers.contains(uuid)) {
-			if (isInteresting(item)) {
+			if (ItemUtils.isInteresting(item)) {
 				event.setCancelled(true);
 			}
 		} else if (mLorePlayers.contains(uuid)) {
-			if (isLored(item)) {
+			if (ItemUtils.hasLore(item)) {
+				event.setCancelled(true);
+			}
+		} else if (mHoldingPlayers.contains(uuid)) {
+			//Some bugs here that I have no idea how to fix
+			//Prevents dropping any item from inventory if holding nothing in mainhand
+			//Prevents dropping items from inventory if they are the same as the item you're holding
+
+			ItemStack mainhand = playerInventory.getItemInMainHand();
+			if (mainhand == null || mainhand.getType().isAir() || mainhand.isSimilar(item)) {
 				event.setCancelled(true);
 			}
 		}
@@ -171,15 +201,24 @@ public class ItemDropListener implements Listener {
 		player.sendMessage(ChatColor.GOLD + "" + ChatColor.BOLD + "You can no longer drop items.");
 	}
 
+	private void disableHolding(CommandSender sender) throws WrapperCommandSyntaxException {
+		Player player = CommandUtils.getPlayerFromSender(sender);
+		remove(player);
+		player.addScoreboardTag(HOLDING_TAG);
+		mHoldingPlayers.add(player.getUniqueId());
+		player.sendMessage(ChatColor.GOLD + "" + ChatColor.BOLD + "You can no longer drop the item you are holding.");
+	}
+
 	private boolean hasTag(Player player) {
 		Set<String> tags = player.getScoreboardTags();
-		return tags.contains(LORE_TAG) || tags.contains(INTERESTING_TAG) || tags.contains(ALL_TAG);
+		return tags.contains(LORE_TAG) || tags.contains(INTERESTING_TAG) || tags.contains(ALL_TAG) || tags.contains(HOLDING_TAG);
 	}
 
 	private void remove(Player player) {
 		player.removeScoreboardTag(LORE_TAG);
 		player.removeScoreboardTag(INTERESTING_TAG);
 		player.removeScoreboardTag(ALL_TAG);
+		player.removeScoreboardTag(HOLDING_TAG);
 		removeFromSets(player);
 	}
 
@@ -188,13 +227,6 @@ public class ItemDropListener implements Listener {
 		mLorePlayers.remove(uuid);
 		mInterestingPlayers.remove(uuid);
 		mAllPlayers.remove(uuid);
-	}
-
-	private boolean isLored(ItemStack item) {
-		return (item.hasItemMeta() && (item.getItemMeta().hasLore() || (item.getItemMeta().hasDisplayName() && ServerProperties.getNamedPickupMats().contains(item.getType()))));
-	}
-
-	private boolean isInteresting(ItemStack item) {
-		return ServerProperties.getAlwaysPickupMats().contains(item.getType()) || isLored(item);
+		mHoldingPlayers.remove(uuid);
 	}
 }
