@@ -1,17 +1,22 @@
 package com.playmonumenta.plugins.custominventories;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import com.goncalomb.bukkit.mylib.utils.CustomInventory;
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.utils.SignUtils;
 import com.playmonumenta.scriptedquests.utils.ScoreboardUtils;
 
 import net.kyori.adventure.text.Component;
@@ -30,8 +35,9 @@ public class PEBCustomInventory extends CustomInventory {
 		Material mType;
 		String mCommand;
 		ChatColor mChatColor = null;
+		Boolean mCloseAfter;
 
-		public PebItem(int pg, int sl, String n, String l, ChatColor cc, Material t, String cmd) {
+		public PebItem(int pg, int sl, String n, String l, ChatColor cc, Material t, String cmd, Boolean closeAfter) {
 			mSlot = sl;
 			mName = n;
 			mLore = l;
@@ -39,6 +45,7 @@ public class PEBCustomInventory extends CustomInventory {
 			mCommand = cmd;
 			mPage = pg;
 			mChatColor = cc;
+			mCloseAfter = closeAfter;
 		}
 
 	}
@@ -46,183 +53,225 @@ public class PEBCustomInventory extends CustomInventory {
 	private static ArrayList<PebItem> PEB_ITEMS = new ArrayList<>();
 
 	static {
+		//If the command is internal to the GUI, closeAfter is ignored. Otherwise, the GUI abides by that boolean.
+
 		//Common items for all but main menu are "page 0"
 		//Page 1 is the top level menu, 2-9 saved for the next level of menus.
 		//Pages 10 and beyond are used for implementation of specialized menus.
 
-		PEB_ITEMS.add(new PebItem(0, 0, "Back to Main Menu", "Returns you to page 1.", ChatColor.GOLD, Material.OBSERVER, "page 1"));
-		PEB_ITEMS.add(new PebItem(0, 8, "Exit PEB", "Exits this menu.", ChatColor.GOLD, Material.RED_CONCRETE, "exit"));
+		PEB_ITEMS.add(new PebItem(0, 0, "Back to Main Menu", "Returns you to page 1.", ChatColor.GOLD, Material.OBSERVER, "page 1", false));
+		PEB_ITEMS.add(new PebItem(0, 8, "Exit PEB", "Exits this menu.", ChatColor.GOLD, Material.RED_CONCRETE, "exit", false));
 		PEB_ITEMS.add(new PebItem(0, 45, "Delete P.E.B.s ✗",
 				"Click to remove P.E.B.s from your inventory.", ChatColor.LIGHT_PURPLE,
-				Material.FLINT_AND_STEEL, "clickable peb_delete"));
+				Material.FLINT_AND_STEEL, "clickable peb_delete", false));
 
 		//page 1: main menu
-		PEB_ITEMS.add(new PebItem(1, 0, "", "", ChatColor.LIGHT_PURPLE, FILLER, ""));
+		PEB_ITEMS.add(new PebItem(1, 0, "", "", ChatColor.LIGHT_PURPLE, FILLER, "", false));
 		PEB_ITEMS.add(new PebItem(1, 11, "Player Information",
 				"Details about Housing, Prestige, and other player-focused options.", ChatColor.LIGHT_PURPLE,
-				Material.PLAYER_HEAD, "page 2"));
+				Material.PLAYER_HEAD, "page 2", false));
 		PEB_ITEMS.add(new PebItem(1, 15, "Toggle-able Options",
 				"Inventory Sort, Filtered Pickup, and more toggleable choices.", ChatColor.LIGHT_PURPLE,
-				Material.LEVER, "page 3"));
+				Material.LEVER, "page 3", false));
 		PEB_ITEMS.add(new PebItem(1, 38, "Server Information",
 				"Information such as how to use the PEB and random tips.", ChatColor.LIGHT_PURPLE,
-				Material.DISPENSER, "page 4"));
+				Material.DISPENSER, "page 4", false));
 		PEB_ITEMS.add(new PebItem(1, 42, "Book Skins",
 				"Change the color of the cover on your P.E.B.", ChatColor.LIGHT_PURPLE,
-				Material.ENCHANTED_BOOK, "page 5"));
+				Material.ENCHANTED_BOOK, "page 5", false));
 
 
 		//page 2: Player Info
 		PEB_ITEMS.add(new PebItem(2, 4, "Player Information",
 				"", ChatColor.LIGHT_PURPLE,
-				Material.PLAYER_HEAD, ""));
+				Material.PLAYER_HEAD, "", false));
 		PEB_ITEMS.add(new PebItem(2, 19, "Housing",
 				"Click to view housing information.", ChatColor.LIGHT_PURPLE,
-				Material.OAK_DOOR, "clickable peb_housing"));
+				Material.OAK_DOOR, "clickable peb_housing", true));
 		PEB_ITEMS.add(new PebItem(2, 21, "Prestige",
 				"Click to view prestige and related unlocks.", ChatColor.LIGHT_PURPLE,
-				Material.BRICK, "clickable peb_prestige"));
+				Material.BRICK, "clickable peb_prestige", true));
 		PEB_ITEMS.add(new PebItem(2, 23, "Class",
 				"Click to view your class and skills.", ChatColor.LIGHT_PURPLE,
-				Material.STONE_SWORD, "clickable peb_class"));
+				Material.STONE_SWORD, "clickable peb_class", true));
 		PEB_ITEMS.add(new PebItem(2, 25, "Dungeon Instances",
 				"Click to view what dungeon instances you have open, and how old they are.", ChatColor.LIGHT_PURPLE,
-				Material.WHITE_WOOL, "clickable peb_dungeoninfo"));
+				Material.WHITE_WOOL, "clickable peb_dungeoninfo", true));
 		PEB_ITEMS.add(new PebItem(2, 39, "Patron",
 				"Click to view patron information. Use /donate to learn about donating.", ChatColor.LIGHT_PURPLE,
-				Material.GLOWSTONE_DUST, "clickable peb_patroninfo"));
+				Material.GLOWSTONE_DUST, "clickable peb_patroninfo", true));
 		PEB_ITEMS.add(new PebItem(2, 41, "Dailies",
 				"Click to see what daily content you have and haven't done today.", ChatColor.LIGHT_PURPLE,
-				Material.ACACIA_BOAT, "clickable peb_dailies"));
+				Material.ACACIA_BOAT, "clickable peb_dailies", true));
 
 		//page 3: Toggle-able Options
 		PEB_ITEMS.add(new PebItem(3, 4, "Toggleable Options",
 				"", ChatColor.LIGHT_PURPLE,
-				Material.LEVER, ""));
-		PEB_ITEMS.add(new PebItem(3, 20, "Self Particles",
+				Material.LEVER, "", false));
+		PEB_ITEMS.add(new PebItem(3, 19, "Self Particles",
 				"Click to toggle self particles.", ChatColor.LIGHT_PURPLE,
-				Material.FIREWORK_STAR, "clickable peb_selfparticles"));
-		PEB_ITEMS.add(new PebItem(3, 21, "UA Rocket Jumping",
+				Material.FIREWORK_STAR, "clickable peb_selfparticles", false));
+		PEB_ITEMS.add(new PebItem(3, 20, "UA Rocket Jumping",
 				"Click to toggle rocket jumping with Unstable Arrows.", ChatColor.LIGHT_PURPLE,
-				Material.FIREWORK_ROCKET, "clickable peb_uarj"));
-		PEB_ITEMS.add(new PebItem(3, 22, "Show name on patron buff announcement.",
+				Material.FIREWORK_ROCKET, "clickable peb_uarj", false));
+		PEB_ITEMS.add(new PebItem(3, 21, "Show name on patron buff announcement.",
 				"Toggles whether the player has their IGN in the buff announcement when they"
 				+ " activate " + ChatColor.GOLD + "Patreon " + ChatColor.LIGHT_PURPLE + "buffs.", ChatColor.LIGHT_PURPLE,
-				Material.GLOWSTONE, "clickable toggle_patron_buff_thank"));
+				Material.GLOWSTONE, "clickable toggle_patron_buff_thank", false));
 		PEB_ITEMS.add(new PebItem(3, 23, "Inventory Drink",
 				"Click to toggle drinking potions with a right click in any inventory.", ChatColor.LIGHT_PURPLE,
-				Material.GLASS_BOTTLE, "clickable peb_tid"));
-		PEB_ITEMS.add(new PebItem(3, 24, "Filtered Pickup",
-				"Click to toggle the pickup of uninteresting items.", ChatColor.LIGHT_PURPLE,
-				Material.DIRT, "pickup"));
-		PEB_ITEMS.add(new PebItem(3, 25, "Filtered Pickup information",
-				"Click to explain filtered pickup.", ChatColor.LIGHT_PURPLE,
-				Material.BOOK, "clickable peb_filteredinfo"));
-		PEB_ITEMS.add(new PebItem(3, 38, "Compass Particles",
+				Material.GLASS_BOTTLE, "clickable peb_tid", false));
+		PEB_ITEMS.add(new PebItem(3, 24, "Filtered Pickup and Disabled Drop",
+				"Click to choose your pickup and disabled drop preferences.", ChatColor.LIGHT_PURPLE,
+				Material.DIRT, "page 20", false));
+		PEB_ITEMS.add(new PebItem(3, 25, "Compass Particles",
 				"Click to toggle a trail of guiding particles when following the quest compass.", ChatColor.LIGHT_PURPLE,
-				Material.COMPASS, "clickable peb_comp_particles"));
-		PEB_ITEMS.add(new PebItem(3, 39, "Death Sort",
+				Material.COMPASS, "clickable peb_comp_particles", false));
+		PEB_ITEMS.add(new PebItem(3, 37, "Death Sort",
 				"Click to toggle death sorting, which attempts to return items dropped on death to the slot they were in prior to death.", ChatColor.LIGHT_PURPLE,
-				Material.CHEST, "clickable peb_toggle_dso"));
-		PEB_ITEMS.add(new PebItem(3, 40, "Toggle Darksight",
+				Material.CHEST, "clickable peb_toggle_dso", false));
+		PEB_ITEMS.add(new PebItem(3, 38, "Toggle Darksight",
 				"Click to toggle whether Darksight provides Night Vision", ChatColor.LIGHT_PURPLE,
-				Material.LANTERN, "execute as @S run function monumenta:mechanisms/darksight_toggle"));
-		PEB_ITEMS.add(new PebItem(3, 41, "Toggle Radiant",
+				Material.LANTERN, "execute as @S run function monumenta:mechanisms/darksight_toggle", false));
+		PEB_ITEMS.add(new PebItem(3, 39, "Toggle Radiant",
 				"Click to toggle whether Radiant provides Night Vision.", ChatColor.LIGHT_PURPLE,
-				Material.SOUL_LANTERN, "execute as @S run function monumenta:mechanisms/radiant_toggle"));
-		PEB_ITEMS.add(new PebItem(3, 42, "Offhand Swapping",
+				Material.SOUL_LANTERN, "execute as @S run function monumenta:mechanisms/radiant_toggle", false));
+		PEB_ITEMS.add(new PebItem(3, 41, "Offhand Swapping",
 				"Click to toggle whether pressing your swap key will be fully cancelled or only cancelled when a spellcast does so", ChatColor.LIGHT_PURPLE,
-				Material.SHIELD, "toggleswap"));
-		PEB_ITEMS.add(new PebItem(3, 43, "Spawner Equipment",
+				Material.SHIELD, "toggleswap", false));
+		PEB_ITEMS.add(new PebItem(3, 42, "Spawner Equipment",
 				"Click to toggle whether mob equipment is displayed in spawners (significantly decreases FPS in many areas)", ChatColor.LIGHT_PURPLE,
-				Material.IRON_CHESTPLATE, "clickable peb_spawnerequipment"));
+				Material.IRON_CHESTPLATE, "clickable peb_spawnerequipment", false));
 
 		//page 4: Server Info
 		PEB_ITEMS.add(new PebItem(4, 4, "Server Information",
 				"", ChatColor.LIGHT_PURPLE,
-				Material.DISPENSER, ""));
+				Material.DISPENSER, "", false));
 		PEB_ITEMS.add(new PebItem(4, 20, "P.E.B. Introduction",
 				"Click to hear the P.E.B. Introduction.", ChatColor.LIGHT_PURPLE,
-				Material.ENCHANTED_BOOK, "clickable peb_intro"));
+				Material.ENCHANTED_BOOK, "clickable peb_intro", true));
 		PEB_ITEMS.add(new PebItem(4, 24, "Get a random tip!",
 				"Click to get a random tip!", ChatColor.LIGHT_PURPLE,
-				Material.REDSTONE_TORCH, "clickable peb_tip"));
+				Material.REDSTONE_TORCH, "clickable peb_tip", true));
 
 		//page 5: Book Skins
 		PEB_ITEMS.add(new PebItem(5, 4, "Book Skins",
 				"", ChatColor.LIGHT_PURPLE,
-				Material.ENCHANTED_BOOK, ""));
+				Material.ENCHANTED_BOOK, "", false));
 		PEB_ITEMS.add(new PebItem(5, 40, "Wool Colors",
 				"Click to jump to a page of wool colors.", ChatColor.LIGHT_PURPLE,
-				Material.WHITE_WOOL, "page 10"));
+				Material.WHITE_WOOL, "page 10", false));
 		PEB_ITEMS.add(new PebItem(5, 19, "Enchanted Book",
 				"Click to change skin to Enchanted Book. (Default)", ChatColor.LIGHT_PURPLE,
-				Material.ENCHANTED_BOOK, "clickable peb_skin_enchantedbook"));
+				Material.ENCHANTED_BOOK, "clickable peb_skin_enchantedbook", true));
 		PEB_ITEMS.add(new PebItem(5, 21, "Regal",
 				"Click to change skin to Regal.", ChatColor.LIGHT_PURPLE,
-				Material.YELLOW_CONCRETE, "clickable peb_skin_regal"));
+				Material.YELLOW_CONCRETE, "clickable peb_skin_regal", true));
 		PEB_ITEMS.add(new PebItem(5, 23, "Crimson King",
 				"Upon the ancient powers creep...", ChatColor.DARK_RED,
-				Material.RED_TERRACOTTA, "clickable peb_skin_ck"));
+				Material.RED_TERRACOTTA, "clickable peb_skin_ck", true));
 		PEB_ITEMS.add(new PebItem(5, 25, "Rose",
 				"Red like roses!", ChatColor.RED,
-				Material.RED_CONCRETE, "clickable peb_skin_rose"));
+				Material.RED_CONCRETE, "clickable peb_skin_rose", true));
 
-		//page 10
+		//page 10: Wool book skins
 		PEB_ITEMS.add(new PebItem(10, 9, "Back to Book Skins",
 				"", ChatColor.LIGHT_PURPLE,
-				Material.ENCHANTED_BOOK, "page 5"));
+				Material.ENCHANTED_BOOK, "page 5", false));
 		PEB_ITEMS.add(new PebItem(10, 4, "Wool Skins",
 				"", ChatColor.LIGHT_PURPLE,
-				Material.ENCHANTED_BOOK, ""));
+				Material.ENCHANTED_BOOK, "", false));
 		PEB_ITEMS.add(new PebItem(10, 11, "White",
 				"Click to change skin to White.", ChatColor.LIGHT_PURPLE,
-				Material.WHITE_WOOL, "clickable peb_skin_white"));
+				Material.WHITE_WOOL, "clickable peb_skin_white", true));
 		PEB_ITEMS.add(new PebItem(10, 12, "Orange",
 				"Click to change skin to Orange.", ChatColor.LIGHT_PURPLE,
-				Material.ORANGE_WOOL, "clickable peb_skin_orange"));
+				Material.ORANGE_WOOL, "clickable peb_skin_orange", true));
 		PEB_ITEMS.add(new PebItem(10, 20, "Magenta",
 				"Click to change skin to Magenta.", ChatColor.LIGHT_PURPLE,
-				Material.MAGENTA_WOOL, "clickable peb_skin_magenta"));
+				Material.MAGENTA_WOOL, "clickable peb_skin_magenta", true));
 		PEB_ITEMS.add(new PebItem(10, 21, "Light Blue",
 				"Click to change skin to Light Blue.", ChatColor.LIGHT_PURPLE,
-				Material.LIGHT_BLUE_WOOL, "clickable peb_skin_lightblue"));
+				Material.LIGHT_BLUE_WOOL, "clickable peb_skin_lightblue", true));
 		PEB_ITEMS.add(new PebItem(10, 29, "Yellow",
 				"Click to change skin to Yellow.", ChatColor.LIGHT_PURPLE,
-				Material.YELLOW_WOOL, "clickable peb_skin_yellow"));
+				Material.YELLOW_WOOL, "clickable peb_skin_yellow", true));
 		PEB_ITEMS.add(new PebItem(10, 30, "Lime",
 				"Click to change skin to Lime.", ChatColor.LIGHT_PURPLE,
-				Material.LIME_WOOL, "clickable peb_skin_lime"));
+				Material.LIME_WOOL, "clickable peb_skin_lime", true));
 		PEB_ITEMS.add(new PebItem(10, 38, "Pink",
 				"Click to change skin to Pink.", ChatColor.LIGHT_PURPLE,
-				Material.PINK_WOOL, "clickable peb_skin_pink"));
+				Material.PINK_WOOL, "clickable peb_skin_pink", true));
 		PEB_ITEMS.add(new PebItem(10, 39, "Gray",
 				"Click to change skin to Gray.", ChatColor.LIGHT_PURPLE,
-				Material.GRAY_WOOL, "clickable peb_skin_gray"));
+				Material.GRAY_WOOL, "clickable peb_skin_gray", true));
 		PEB_ITEMS.add(new PebItem(10, 14, "Light Gray",
 				"Click to change skin to Light Gray.", ChatColor.LIGHT_PURPLE,
-				Material.LIGHT_GRAY_WOOL, "clickable peb_skin_lightgray"));
+				Material.LIGHT_GRAY_WOOL, "clickable peb_skin_lightgray", true));
 		PEB_ITEMS.add(new PebItem(10, 15, "Cyan",
 				"Click to change skin to Cyan.", ChatColor.LIGHT_PURPLE,
-				Material.CYAN_WOOL, "clickable peb_skin_cyan"));
+				Material.CYAN_WOOL, "clickable peb_skin_cyan", true));
 		PEB_ITEMS.add(new PebItem(10, 23, "Purple",
 				"Click to change skin to Purple.", ChatColor.LIGHT_PURPLE,
-				Material.PURPLE_WOOL, "clickable peb_skin_purple"));
+				Material.PURPLE_WOOL, "clickable peb_skin_purple", true));
 		PEB_ITEMS.add(new PebItem(10, 24, "Blue",
 				"Click to change skin to Blue.", ChatColor.LIGHT_PURPLE,
-				Material.BLUE_WOOL, "clickable peb_skin_blue"));
+				Material.BLUE_WOOL, "clickable peb_skin_blue", true));
 		PEB_ITEMS.add(new PebItem(10, 32, "Brown",
 				"Click to change skin to Brown.", ChatColor.LIGHT_PURPLE,
-				Material.BROWN_WOOL, "clickable peb_skin_brown"));
+				Material.BROWN_WOOL, "clickable peb_skin_brown", true));
 		PEB_ITEMS.add(new PebItem(10, 33, "Green",
 				"Click to change skin to Green.", ChatColor.LIGHT_PURPLE,
-				Material.GREEN_WOOL, "clickable peb_skin_green"));
+				Material.GREEN_WOOL, "clickable peb_skin_green", true));
 		PEB_ITEMS.add(new PebItem(10, 41, "Red",
 				"Click to change skin to Red.", ChatColor.LIGHT_PURPLE,
-				Material.RED_WOOL, "clickable peb_skin_red"));
+				Material.RED_WOOL, "clickable peb_skin_red", true));
 		PEB_ITEMS.add(new PebItem(10, 42, "Black",
 				"Click to change skin to Black.", ChatColor.LIGHT_PURPLE,
-				Material.BLACK_WOOL, "clickable peb_skin_black"));
+				Material.BLACK_WOOL, "clickable peb_skin_black", true));
+
+		//page 20: Pickup and Disable Drop
+		PEB_ITEMS.add(new PebItem(20, 0, "Back to Toggleable Options",
+				"", ChatColor.LIGHT_PURPLE,
+				Material.OBSERVER, "page 3", false));
+		PEB_ITEMS.add(new PebItem(20, 4, "Pickup and Disable Drop Settings",
+				"Choose the appropriate level of pickup filter and drop filter below.", ChatColor.LIGHT_PURPLE,
+				Material.PRISMARINE_CRYSTALS, "", false));
+		PEB_ITEMS.add(new PebItem(20, 19, "Disable Drop:",
+				"", ChatColor.LIGHT_PURPLE,
+				Material.BLACK_CONCRETE, "", false));
+		PEB_ITEMS.add(new PebItem(20, 21, "None",
+				"Disable no drops, the vanilla drop behavior.", ChatColor.LIGHT_PURPLE,
+				Material.BARRIER, "disabledrop none", false));
+		PEB_ITEMS.add(new PebItem(20, 22, "Holding",
+				"Disable dropping of only held items.", ChatColor.LIGHT_PURPLE,
+				Material.WOODEN_PICKAXE, "disabledrop holding", false));
+		PEB_ITEMS.add(new PebItem(20, 23, "Lore",
+				"Disable the drop of items with custom lore.", ChatColor.LIGHT_PURPLE,
+				Material.LECTERN, "disabledrop lore", false));
+		PEB_ITEMS.add(new PebItem(20, 24, "Interesting",
+				"Disable the dropping of anything that matches the default pickup filter of interesting items.", ChatColor.LIGHT_PURPLE,
+				Material.GOLD_NUGGET, "disabledrop interesting", false));
+		PEB_ITEMS.add(new PebItem(20, 25, "All",
+				"Disable all drops.", ChatColor.LIGHT_PURPLE,
+				Material.DIRT, "disabledrop all", false));
+
+		PEB_ITEMS.add(new PebItem(20, 37, "Pickup Filter:",
+				"", ChatColor.LIGHT_PURPLE,
+				Material.WHITE_CONCRETE, "", false));
+		PEB_ITEMS.add(new PebItem(20, 40, "Lore",
+				"Only pick up items that have custom lore.", ChatColor.LIGHT_PURPLE,
+				Material.LECTERN, "pickup lore", false));
+		PEB_ITEMS.add(new PebItem(20, 41, "Interesting",
+				"Only pick up items are of interest for the adventuring player, like arrows, torches, and anything with custom lore.", ChatColor.LIGHT_PURPLE,
+				Material.GOLD_NUGGET, "pickup interesting", false));
+		PEB_ITEMS.add(new PebItem(20, 42, "All",
+				"Pick up anything and everything, matching vanilla functionality.", ChatColor.LIGHT_PURPLE,
+				Material.DIRT, "pickup all", false));
+		PEB_ITEMS.add(new PebItem(20, 43, "Threshold",
+				"Set the minimum size of a stack of uninteresting items to pick up.", ChatColor.LIGHT_PURPLE,
+				Material.OAK_SIGN, "threshold", false));
+
 	}
 
 	public PEBCustomInventory(Player player) {
@@ -245,57 +294,111 @@ public class PEBCustomInventory extends CustomInventory {
 		if (event.getClickedInventory() != _inventory) {
 			return;
 		}
-		int newPageValue;
 		int currentPage = ScoreboardUtils.getScoreboardValue(player, "PEBPage");
 		if (clickedItem != null && clickedItem.getType() != FILLER && !event.isShiftClick()) {
-
 			int chosenSlot = event.getSlot();
 			for (PebItem item : PEB_ITEMS) {
 				if (item.mSlot == chosenSlot && item.mPage == currentPage) {
-					if (item.mCommand == "") {
-						return;
-					}
-					if (item.mCommand.startsWith("page")) {
-						newPageValue = Integer.parseInt(item.mCommand.split(" ")[1]);
-						setLayout(newPageValue, player);
-						return;
-					} else if (item.mCommand.startsWith("exit")) {
-						player.closeInventory();
-						return;
-					} else {
-						completeCommand(player, item.mCommand);
-						player.closeInventory();
-						return;
-					}
+					completeCommand(player, item);
 				}
 				if (item.mSlot == chosenSlot && item.mPage == 0) {
-					if (item.mCommand == "") {
-						return;
-					}
-					if (item.mCommand.startsWith("page")) {
-						newPageValue = Integer.parseInt(item.mCommand.split(" ")[1]);
-						setLayout(newPageValue, player);
-						return;
-					} else {
-						completeCommand(player, item.mCommand);
-						player.closeInventory();
-						return;
-					}
+					completeCommand(player, item);
 				}
 			}
 		}
 	}
 
-	public void completeCommand(Player player, String command) {
+	public Boolean isInternalCommand(String command) {
+		if (command.equals("exit") || command.startsWith("page") || command.equals("threshold")) {
+			return true;
+		}
+		return false;
+	}
+
+	public Boolean isPlayerCommand(String command) {
 		if (command.startsWith("clickable") ||
-				command.equals("pickup") ||
-				command.equals("toggleswap")) {
-			player.performCommand(command);
+				command.startsWith("pickup") ||
+				command.equals("toggleswap") ||
+				command.startsWith("disabledrop")) {
+			return true;
+		}
+		return false;
+	}
+
+	public void runInternalCommand(Player player, PebItem item) {
+		if (item.mCommand.startsWith("page")) {
+			int newPageValue = Integer.parseInt(item.mCommand.split(" ")[1]);
+			setLayout(newPageValue, player);
+			return;
+		} else if (item.mCommand.startsWith("exit")) {
+			player.closeInventory();
+			return;
+		} else if (item.mCommand.equals("threshold")) {
+			player.closeInventory();
+			callSignUI(player);
+		}
+	}
+
+	public void completeCommand(Player player, PebItem item) {
+		if (item.mCommand == "") {
+			return;
+		}
+		if (isInternalCommand(item.mCommand)) {
+			runInternalCommand(player, item);
+			return;
+		} else if (isPlayerCommand(item.mCommand)) {
+			player.performCommand(item.mCommand);
+			if (item.mCloseAfter) {
+				player.closeInventory();
+			}
 			return;
 		} else {
-			String finalCommand = command.replace("@S", player.getName());
+			String finalCommand = item.mCommand.replace("@S", player.getName());
 			Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), finalCommand);
+			if (item.mCloseAfter) {
+				player.closeInventory();
+			}
+			return;
 		}
+	}
+
+	public void callSignUI(Player target) {
+		SignUtils.Menu menu = SignUtils.newMenu(
+				new ArrayList<String>(Arrays.asList("", "~~~~~~~~~~~", "Input a number", "from 1-65 above.")))
+	            .reopenIfFail(false)
+	            .response((player, strings) -> {
+					int inputVal = -1;
+					try {
+						inputVal = Integer.parseInt(strings[0]);
+					} catch (Exception e) {
+						new BukkitRunnable() {
+							@Override
+							public void run() {
+								player.sendMessage("Input is not an integer.");
+							}
+						}.runTaskLater(Plugin.getInstance(), 2);
+						return false;
+					}
+					if (inputVal >= 1 && inputVal <= 65) {
+						new BukkitRunnable() {
+							@Override
+							public void run() {
+								player.performCommand("pickup threshold " + strings[0]);
+							}
+						}.runTaskLater(Plugin.getInstance(), 2);
+					    return false;
+					} else {
+						new BukkitRunnable() {
+							@Override
+							public void run() {
+								player.sendMessage("Input is not with the bounds of 1 - 65.");
+							}
+						}.runTaskLater(Plugin.getInstance(), 2);
+					}
+					return true;
+	            });
+
+	    menu.open(target);
 	}
 
 	public ItemStack createCustomItem(PebItem item, Player player) {
@@ -314,6 +417,7 @@ public class PEBCustomInventory extends CustomInventory {
 		if (item.mLore != "") {
 			splitLoreLine(meta, item.mLore, 30, defaultColor);
 		}
+		meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
 		newItem.setItemMeta(meta);
 		return newItem;
 	}

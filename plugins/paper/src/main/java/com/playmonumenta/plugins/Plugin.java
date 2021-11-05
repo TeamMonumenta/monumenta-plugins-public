@@ -135,6 +135,7 @@ import com.playmonumenta.plugins.timers.ProjectileEffectTimers;
 import com.playmonumenta.plugins.tracking.TrackingManager;
 import com.playmonumenta.plugins.utils.FileUtils;
 import com.playmonumenta.plugins.utils.MetadataUtils;
+import com.playmonumenta.plugins.utils.SignUtils;
 
 public class Plugin extends JavaPlugin {
 	public CooldownTimers mTimers = null;
@@ -158,6 +159,8 @@ public class Plugin extends JavaPlugin {
 	public EffectManager mEffectManager;
 	public ParrotManager mParrotManager;
 	public ChessManager mChessManager;
+
+	public SignUtils mSignUtils;
 
 	public DeathItemListener mDeathItemListener;
 
@@ -286,6 +289,7 @@ public class Plugin extends JavaPlugin {
 		mDeathItemListener = new DeathItemListener(this);
 		mParrotManager = new ParrotManager(this);
 		mChessManager = new ChessManager(this);
+		mSignUtils = new SignUtils(this);
 
 		new ClientModHandler(this);
 
