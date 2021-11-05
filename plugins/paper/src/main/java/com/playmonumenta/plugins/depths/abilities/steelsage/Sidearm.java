@@ -32,7 +32,7 @@ public class Sidearm extends DepthsAbility {
 	public static final String ABILITY_NAME = "Sidearm";
 	private static final int COOLDOWN = 4 * 20;
 	private static final int KILL_COOLDOWN_REDUCTION = 2 * 20;
-	private static final double[] DAMAGE = {12, 15, 18, 21, 24};
+	private static final double[] DAMAGE = {12, 15, 18, 21, 24, 30};
 	private static final int RANGE = 14;
 
 	private static final Particle.DustOptions SIDEARM_COLOR = new Particle.DustOptions(Color.fromRGB(130, 130, 130), 1.0f);

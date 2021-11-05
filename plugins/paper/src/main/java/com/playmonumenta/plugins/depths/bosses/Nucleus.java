@@ -36,12 +36,12 @@ import com.playmonumenta.plugins.bosses.spells.SpellBlockBreak;
 import com.playmonumenta.plugins.depths.DepthsManager;
 import com.playmonumenta.plugins.depths.DepthsParty;
 import com.playmonumenta.plugins.depths.DepthsUtils;
-import com.playmonumenta.plugins.depths.bosses.spells.VolanicDeepmise;
 import com.playmonumenta.plugins.depths.bosses.spells.SpellPassiveEyes;
 import com.playmonumenta.plugins.depths.bosses.spells.SpellPassiveSummons;
 import com.playmonumenta.plugins.depths.bosses.spells.SpellRisingTides;
 import com.playmonumenta.plugins.depths.bosses.spells.SpellSurroundingDeath;
 import com.playmonumenta.plugins.depths.bosses.spells.SpellTectonicDevastation;
+import com.playmonumenta.plugins.depths.bosses.spells.VolcanicDeepmise;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
@@ -159,7 +159,7 @@ public class Nucleus extends BossAbilityGroup {
 		List<Spell> phase1Passives = Arrays.asList(
 				new SpellBlockBreak(mBoss, 2, 3, 2),
 				new SpellPassiveEyes(mBoss, this, spawnLoc),
-				new SpellPassiveSummons(plugin, mBoss, 30.0, 15, mSpawnLoc.getY(), mSpawnLoc)
+				new SpellPassiveSummons(plugin, mBoss, 30.0, 15, mSpawnLoc.getY(), mSpawnLoc, ((party.getFloor() - 1) / 3) + 1)
 			);
 
 		SpellManager phase2Spells = new SpellManager(Arrays.asList(
@@ -170,7 +170,7 @@ public class Nucleus extends BossAbilityGroup {
 		List<Spell> phase2Passives = Arrays.asList(
 			new SpellBlockBreak(mBoss, 2, 3, 2),
 			new SpellPassiveEyes(mBoss, this, spawnLoc),
-			new SpellPassiveSummons(plugin, mBoss, 30.0, 15, mSpawnLoc.getY(), mSpawnLoc)
+			new SpellPassiveSummons(plugin, mBoss, 30.0, 15, mSpawnLoc.getY(), mSpawnLoc, ((party.getFloor() - 1) / 3) + 1)
 		);
 
 		SpellManager phase3Spells = new SpellManager(Arrays.asList(
@@ -181,9 +181,9 @@ public class Nucleus extends BossAbilityGroup {
 		));
 		List<Spell> phase3Passives = Arrays.asList(
 			new SpellBlockBreak(mBoss, 2, 3, 2),
-			new VolanicDeepmise(mBoss, mSpawnLoc),
+			new VolcanicDeepmise(mBoss, mSpawnLoc),
 			new SpellPassiveEyes(mBoss, this, spawnLoc),
-			new SpellPassiveSummons(plugin, mBoss, 30.0, 15, mSpawnLoc.getY(), mSpawnLoc)
+			new SpellPassiveSummons(plugin, mBoss, 30.0, 15, mSpawnLoc.getY(), mSpawnLoc, ((party.getFloor() - 1) / 3) + 1)
 		);
 
 		Map<Integer, BossHealthAction> events = new HashMap<Integer, BossHealthAction>();
@@ -314,7 +314,7 @@ public class Nucleus extends BossAbilityGroup {
 
 		// Health is scaled by 1.5 times each time you fight the boss
 		DepthsParty party = DepthsUtils.getPartyFromNearbyPlayers(mSpawnLoc);
-		int modifiedHealth = (int) (NUCLEUS_HEALTH * Math.pow(1.25, (party.getFloor() - 1) / 3));
+		int modifiedHealth = (int) (NUCLEUS_HEALTH * Math.pow(1.15, (party.getFloor() - 1) / 3));
 		mBoss.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(modifiedHealth);
 		mBoss.setHealth(modifiedHealth);
 

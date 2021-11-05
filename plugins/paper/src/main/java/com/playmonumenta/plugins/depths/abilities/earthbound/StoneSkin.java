@@ -17,6 +17,7 @@ import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
 import com.playmonumenta.plugins.effects.PercentDamageReceived;
+import com.playmonumenta.plugins.effects.PercentKnockbackResist;
 
 import net.md_5.bungee.api.ChatColor;
 
@@ -24,7 +25,9 @@ public class StoneSkin extends DepthsAbility {
 
 	public static final String ABILITY_NAME = "Stone Skin";
 	private static final String PERCENT_DAMAGE_RECEIVED_EFFECT_NAME = "StoneSkinPercentDamageReceivedEffect";
-	private static final double[] PERCENT_DAMAGE_RECEIVED = {-.20, -.25, -.30, -.35, -.40};
+	private static final double[] PERCENT_DAMAGE_RECEIVED = {-.15, -.18, -.22, -.26, -.30, -.38};
+	private static final String KNOCKBACK_RESISTANCE_EFFECT_NAME = "StoneSkinPercentDamageReceivedEffect";
+	private static final double[] KNOCKBACK_RESISTANCE = {0.4, 0.5, 0.6, 0.7, 0.8, 1.0};
 	private static final int DURATION = 20 * 5;
 	private static final int COOLDOWN = 20 * 12;
 
@@ -53,7 +56,7 @@ public class StoneSkin extends DepthsAbility {
 				world.playSound(loc, Sound.ENTITY_ILLUSIONER_CAST_SPELL, 1.25f, 1.1f);
 				world.spawnParticle(Particle.SPELL_INSTANT, loc, 35, 0.4, 0.4, 0.4, 0.25);
 				mPlugin.mEffectManager.addEffect(mPlayer, PERCENT_DAMAGE_RECEIVED_EFFECT_NAME, new PercentDamageReceived(DURATION, PERCENT_DAMAGE_RECEIVED[mRarity - 1]));
-
+				mPlugin.mEffectManager.addEffect(mPlayer, KNOCKBACK_RESISTANCE_EFFECT_NAME, new PercentKnockbackResist(DURATION, KNOCKBACK_RESISTANCE[mRarity - 1], KNOCKBACK_RESISTANCE_EFFECT_NAME));
 			}
 		}.runTaskLater(mPlugin, 1);
 
@@ -66,7 +69,7 @@ public class StoneSkin extends DepthsAbility {
 
 	@Override
 	public String getDescription(int rarity) {
-		return "Right click while sneaking to gain " + DepthsUtils.getRarityColor(rarity) + DepthsUtils.roundPercent(-PERCENT_DAMAGE_RECEIVED[rarity - 1]) + "%" + ChatColor.WHITE + " resistance for " + DURATION / 20 + " seconds. Cooldown: " + COOLDOWN / 20 + "s.";
+		return "Right click while sneaking to gain " + DepthsUtils.getRarityColor(rarity) + DepthsUtils.roundPercent(-PERCENT_DAMAGE_RECEIVED[rarity - 1]) + "%" + ChatColor.WHITE + " resistance and " + DepthsUtils.getRarityColor(rarity) + DepthsUtils.roundPercent(KNOCKBACK_RESISTANCE[rarity - 1]) + "%" + ChatColor.WHITE + " knockback resistance for " + DURATION / 20 + " seconds. Cooldown: " + COOLDOWN / 20 + "s.";
 	}
 
 	@Override

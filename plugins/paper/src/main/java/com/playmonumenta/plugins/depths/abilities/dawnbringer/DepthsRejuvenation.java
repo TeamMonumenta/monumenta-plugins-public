@@ -22,7 +22,7 @@ import net.md_5.bungee.api.ChatColor;
 public class DepthsRejuvenation extends DepthsAbility {
 
 	public static final String ABILITY_NAME = "Rejuvenation";
-	public static final int[] HEAL_INTERVAL = {100, 90, 80, 70, 60};
+	public static final int[] HEAL_INTERVAL = {100, 90, 80, 70, 60, 50};
 	public static final int RADIUS = 12;
 	public static final double PERCENT_HEAL = .05;
 

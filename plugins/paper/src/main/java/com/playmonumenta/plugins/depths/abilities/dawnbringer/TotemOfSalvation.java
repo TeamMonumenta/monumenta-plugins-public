@@ -27,6 +27,7 @@ import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
+import com.playmonumenta.plugins.utils.AbsorptionUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.ParticleUtils;
@@ -42,12 +43,14 @@ public class TotemOfSalvation extends DepthsAbility {
 
 	public static final String ABILITY_NAME = "Totem of Salvation";
 	public static final int COOLDOWN = 20 * 40;
-	public static final int[] TICK_FREQUENCY = {40, 35, 30, 25, 20};
+	public static final int[] TICK_FREQUENCY = {40, 35, 30, 25, 20, 10};
 	private static final double VELOCITY = 0.5;
 	public static final int DURATION = 15 * 20;
 	private static final double EFFECT_RADIUS = 5;
 	private static final double PARTICLE_RING_HEIGHT = 1.0;
 	private static final double PERCENT_HEALING = 0.08;
+	private static final int MAX_ABSORPTION = 4;
+	private static final int ABSORPTION_DURATION = 5 * 20;
 	private static final Particle.DustOptions PARTICLE_COLOR = new Particle.DustOptions(Color.fromRGB(254, 212, 38), 1.0f);
 
 	private static final Collection<Map.Entry<Double, SpawnParticleAction>> PARTICLES =
@@ -109,7 +112,16 @@ public class TotemOfSalvation extends DepthsAbility {
 						for (Player p : PlayerUtils.playersInRange(item.getLocation(), EFFECT_RADIUS, true)) {
 							AttributeInstance maxHealth = p.getAttribute(Attribute.GENERIC_MAX_HEALTH);
 							if (maxHealth != null) {
-								PlayerUtils.healPlayer(p, maxHealth.getValue() * PERCENT_HEALING);
+								double maxHealthValue = maxHealth.getValue();
+								double healthFromFull = maxHealthValue - p.getHealth();
+								double healthToHeal = maxHealthValue * PERCENT_HEALING;
+
+								PlayerUtils.healPlayer(p, healthToHeal);
+
+								double remainingHealing = healthToHeal - healthFromFull;
+								if (remainingHealing > 0) {
+									AbsorptionUtils.addAbsorption(p, remainingHealing, MAX_ABSORPTION, ABSORPTION_DURATION);
+								}
 							}
 						}
 					}
@@ -138,7 +150,7 @@ public class TotemOfSalvation extends DepthsAbility {
 		if (TICK_FREQUENCY[rarity - 1] == 20) {
 			s = "";
 		}
-		return "Swap hands while holding a weapon to summon a totem that lasts " + DURATION / 20 + " second. The totem heals all players within " + EFFECT_RADIUS + " blocks by " + (int) DepthsUtils.roundPercent(PERCENT_HEALING) + "% of their max health every " + DepthsUtils.getRarityColor(rarity) + TICK_FREQUENCY[rarity - 1] / 20.0 + ChatColor.WHITE + " second" + s + ". Cooldown: " + COOLDOWN / 20 + "s.";
+		return "Swap hands while holding a weapon to summon a totem that lasts " + DURATION / 20 + " second. The totem heals all players within " + EFFECT_RADIUS + " blocks by " + (int) DepthsUtils.roundPercent(PERCENT_HEALING) + "% of their max health every " + DepthsUtils.getRarityColor(rarity) + TICK_FREQUENCY[rarity - 1] / 20.0 + ChatColor.WHITE + " second" + s + ". If a player has full health, the healing will be converted into absorption that lasts " + ABSORPTION_DURATION / 20 + " seconds and caps at " + MAX_ABSORPTION / 2 + " hearts. Cooldown: " + COOLDOWN / 20 + "s.";
 	}
 
 	@Override

@@ -18,7 +18,7 @@ import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 
-public class VolanicDeepmise extends Spell {
+public class VolcanicDeepmise extends Spell {
 
 	public static final double ARENA_SIZE = 30.0;
 	public static final int DAMAGE = 35;
@@ -28,7 +28,7 @@ public class VolanicDeepmise extends Spell {
 	private final LivingEntity mBoss;
 
 
-	public VolanicDeepmise(LivingEntity boss, Location spawnLoc) {
+	public VolcanicDeepmise(LivingEntity boss, Location spawnLoc) {
 		mBoss = boss;
 		mCenter = spawnLoc;
 	}
@@ -110,7 +110,7 @@ public class VolanicDeepmise extends Spell {
 					for (Player player : PlayerUtils.playersInRange(mLoc, 4, true)) {
 						BoundingBox pBox = player.getBoundingBox();
 						if (pBox.overlaps(box)) {
-							BossUtils.bossDamage(mBoss, player, DAMAGE, mLoc, "Volanic Deepmise");
+							BossUtils.bossDamage(mBoss, player, DAMAGE, mLoc, "Volcanic Deepmise");
 							if (!BossUtils.bossDamageBlocked(player, DAMAGE, mLoc)) {
 								MovementUtils.knockAway(mLoc, player, 0.5f, 0.65f);
 							}

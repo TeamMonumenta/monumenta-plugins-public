@@ -82,6 +82,8 @@ public class DepthsParty {
 	public boolean mCanGetTreasureReward = false;
 	//The world the party is in
 	public final UUID mWorldUUID;
+	//Whether the party got a twisted room already this floor
+	public boolean mTwistedThisFloor = false;
 
 	/**
 	 * Creates a new depths party with the given players
@@ -308,6 +310,11 @@ public class DepthsParty {
 				//Reset ability removal eligibility
 				p.mUsedAbilityDeletion = false;
 			}
+			mTwistedThisFloor = false;
+		}
+
+		if (mCurrentRoomType == DepthsRoomType.TWISTED) {
+			mTwistedThisFloor = true;
 		}
 
 		//Add to room history so party can't get it again

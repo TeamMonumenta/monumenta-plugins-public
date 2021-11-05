@@ -25,13 +25,14 @@ import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
+import com.playmonumenta.plugins.depths.abilities.aspects.BowAspect;
 import com.playmonumenta.plugins.depths.abilities.steelsage.RapidFire;
 
 import net.md_5.bungee.api.ChatColor;
 
 public class Skyhook extends DepthsAbility {
 	public static final String ABILITY_NAME = "Skyhook";
-	public static final int[] COOLDOWN = {16 * 20, 14 * 20, 12 * 20, 10 * 20, 8 * 20};
+	public static final int[] COOLDOWN = {16 * 20, 14 * 20, 12 * 20, 10 * 20, 8 * 20, 4 * 20};
 	public static final int MAX_TICKS = 20 * 20;
 	public static final String META_DATA_TAG = "SkyhookArrow";
 
@@ -40,11 +41,12 @@ public class Skyhook extends DepthsAbility {
 		mDisplayItem = Material.FISHING_ROD;
 		mTree = DepthsTree.WINDWALKER;
 		mInfo.mLinkedSpell = ClassAbility.SKYHOOK;
-		mInfo.mCooldown = (mRarity == 0) ? 20 * 20 : COOLDOWN[mRarity - 1];
+		mInfo.mCooldown = getAbilityScore() == 0 ? COOLDOWN[0] : COOLDOWN[mRarity - 1];
 		mInfo.mIgnoreCooldown = true;
 	}
 
 	public void execute() {
+		mInfo.mCooldown = (int) (COOLDOWN[mRarity - 1] * BowAspect.getCooldownReduction(mPlayer));
 		putOnCooldown();
 		World world = mPlayer.getWorld();
 		Location loc = mPlayer.getLocation();

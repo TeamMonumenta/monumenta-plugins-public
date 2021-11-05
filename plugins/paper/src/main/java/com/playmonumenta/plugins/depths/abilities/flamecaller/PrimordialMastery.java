@@ -14,7 +14,7 @@ import net.md_5.bungee.api.ChatColor;
 public class PrimordialMastery extends DepthsAbility {
 
 	public static final String ABILITY_NAME = "Primordial Mastery";
-	public static final double[] SPELL_MOD = {1.1, 1.125, 1.15, 1.175, 1.2};
+	public static final double[] SPELL_MOD = {1.08, 1.10, 1.12, 1.14, 1.16, 1.2};
 
 	public static String tree;
 

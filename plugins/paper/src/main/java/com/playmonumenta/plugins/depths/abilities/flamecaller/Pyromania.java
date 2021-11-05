@@ -13,8 +13,8 @@ import net.md_5.bungee.api.ChatColor;
 public class Pyromania extends DepthsAbility {
 
 	public static final String ABILITY_NAME = "Pyromania";
-	public static final double[] FIRE_BONUS_DAMAGE = {1, 1.25, 1.5, 1.75, 2};
-	public static final int RADIUS = 8;
+	public static final double[] FIRE_BONUS_DAMAGE = {2, 2.5, 3, 3.5, 4, 6};
+	public static final int RADIUS = 20;
 
 	public static String tree;
 

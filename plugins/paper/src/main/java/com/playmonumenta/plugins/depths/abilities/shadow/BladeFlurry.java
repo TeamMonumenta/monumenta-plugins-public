@@ -30,9 +30,9 @@ public class BladeFlurry extends DepthsAbility {
 
 	public static final String ABILITY_NAME = "Blade Flurry";
 	public static final int COOLDOWN = 20 * 6;
-	public static final int[] DAMAGE = {8, 10, 12, 14, 16};
+	public static final int[] DAMAGE = {8, 10, 12, 14, 16, 20};
 	public static final int RADIUS = 3;
-	public static final int[] SILENCE_DURATION = {20, 25, 30, 35, 40};
+	public static final int[] SILENCE_DURATION = {20, 25, 30, 35, 40, 50};
 
 	public BladeFlurry(Plugin plugin, Player player) {
 		super(plugin, player, ABILITY_NAME);

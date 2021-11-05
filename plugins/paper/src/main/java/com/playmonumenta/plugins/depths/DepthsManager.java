@@ -35,6 +35,7 @@ import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
 import com.playmonumenta.plugins.depths.abilities.WeaponAspectDepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.aspects.AxeAspect;
+import com.playmonumenta.plugins.depths.abilities.aspects.BowAspect;
 import com.playmonumenta.plugins.depths.abilities.aspects.RandomAspect;
 import com.playmonumenta.plugins.depths.abilities.aspects.ScytheAspect;
 import com.playmonumenta.plugins.depths.abilities.aspects.SwordAspect;
@@ -115,6 +116,8 @@ import com.playmonumenta.plugins.utils.DelvesUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FileUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
+
+import net.md_5.bungee.api.ChatColor;
 
 /**
  * @author ShadowVisions
@@ -411,8 +414,10 @@ public class DepthsManager {
 			try {
 				for (DepthsPlayer otherPlayer : getPartyFromId(dp).mPlayersInParty) {
 					Player newPlayer = Bukkit.getPlayer(otherPlayer.mPlayerId);
-					if (newPlayer != null && !newPlayer.equals(p) && level > 0) {
+					if (newPlayer != null && !newPlayer.equals(p) && level > 0 && level < 6) {
 						newPlayer.sendMessage(DepthsUtils.DEPTHS_MESSAGE_PREFIX + p.getDisplayName() + " now has ability: " + name + " at " + DepthsUtils.getRarityText(level) + " level!");
+					} else if (newPlayer != null && !newPlayer.equals(p) && level == 6) {
+						newPlayer.sendMessage(DepthsUtils.DEPTHS_MESSAGE_PREFIX + p.getDisplayName() + " now has ability: " + name + " at " + ChatColor.MAGIC + DepthsUtils.getRarityText(level) + ChatColor.RESET + ChatColor.LIGHT_PURPLE + " level!");
 					} else if (newPlayer != null && !newPlayer.equals(p) && level == 0) {
 						newPlayer.sendMessage(DepthsUtils.DEPTHS_MESSAGE_PREFIX + p.getDisplayName() + " has lost ability: " + name + "!");
 					}
@@ -440,6 +445,7 @@ public class DepthsManager {
 			new ScytheAspect(plugin, null),
 			new SwordAspect(plugin, null),
 			new WandAspect(plugin, null),
+			new BowAspect(plugin, null),
 
 			//Steelsage abilities
 			new FireworkBlast(plugin, null),
@@ -547,7 +553,8 @@ public class DepthsManager {
 			new RandomAspect(mPlugin, null),
 			new ScytheAspect(mPlugin, null),
 			new SwordAspect(mPlugin, null),
-			new WandAspect(mPlugin, null));
+			new WandAspect(mPlugin, null),
+			new BowAspect(mPlugin, null));
 	}
 
 	/**
@@ -555,13 +562,19 @@ public class DepthsManager {
 	 * In the future, this might be more applicable to work on a per player basis,
 	 * with active skills they have influencing rarities or available abilities.
 	 */
-	private void initItems(List<DepthsTree> filter, boolean isElite) {
+	private void initItems(List<DepthsTree> filter, boolean isElite, Player p) {
 		// Replace this with a dedicated place later
 		mItems.clear();
 		for (DepthsAbility da : getFilteredAbilities(filter)) {
 			// Get a number 1 to 100
 			int roll = mRandom.nextInt(100) + 1;
 			DepthsAbilityItem item = null;
+
+			//Add enlightenment level to roll if applicable
+			int enlightenmentLevel = getPlayerLevelInAbility(Enlightenment.ABILITY_NAME, p);
+			if (enlightenmentLevel > 0) {
+				roll += Enlightenment.RARITY_INCREASE[enlightenmentLevel - 1];
+			}
 
 			if (isElite) {
 				if (roll < 46) {
@@ -617,9 +630,9 @@ public class DepthsManager {
 		if (offeredItems == null || offeredItems.size() == 0) {
 			//Filter the item offerings by the player's eligible trees for that run
 			if (dp.mEarnedRewards.peek() == DepthsRewardType.ABILITY_ELITE) {
-				initItems(dp.mEligibleTrees, true);
+				initItems(dp.mEligibleTrees, true, p);
 			} else {
-				initItems(dp.mEligibleTrees, false);
+				initItems(dp.mEligibleTrees, false, p);
 			}
 		} else {
 			return offeredItems;
@@ -855,6 +868,12 @@ public class DepthsManager {
 			values.remove(DepthsRoomType.UTILITY);
 		}
 
+		//Roll chance for twisted room - 1.5% per room selection
+		boolean twisted = false;
+		if (mRandom.nextInt(200) < 3 && !party.mTwistedThisFloor) {
+			twisted = true;
+		}
+
 		//Pull 4 room types at random. They may or may not be the same, so it is skewed towards fewer options atm.
 		DepthsRoomType e1 = values.get(mRandom.nextInt(values.size()));
 		DepthsRoomType e2 = values.get(mRandom.nextInt(values.size()));
@@ -862,15 +881,31 @@ public class DepthsManager {
 		DepthsRoomType e4 = values.get(mRandom.nextInt(values.size()));
 
 		if (choices == 4) {
+			if (twisted) {
+				party.mNextRoomChoices = EnumSet.of(e1, e2, e3, DepthsRoomType.TWISTED);
+				return EnumSet.of(e1, e2, e3, DepthsRoomType.TWISTED);
+			}
 			party.mNextRoomChoices = EnumSet.of(e1, e2, e3, e4);
 			return EnumSet.of(e1, e2, e3, e4);
 		} else if (choices == 3) {
+			if (twisted) {
+				party.mNextRoomChoices = EnumSet.of(e1, e2, DepthsRoomType.TWISTED);
+				return EnumSet.of(e1, e2, DepthsRoomType.TWISTED);
+			}
 			party.mNextRoomChoices = EnumSet.of(e1, e2, e3);
 			return EnumSet.of(e1, e2, e3);
 		} else if (choices == 2) {
+			if (twisted) {
+				party.mNextRoomChoices = EnumSet.of(e1, DepthsRoomType.TWISTED);
+				return EnumSet.of(e1, DepthsRoomType.TWISTED);
+			}
 			party.mNextRoomChoices = EnumSet.of(e1, e2);
 			return EnumSet.of(e1, e2);
 		} else {
+			if (twisted) {
+				party.mNextRoomChoices = EnumSet.of(e1, DepthsRoomType.TWISTED);
+				return EnumSet.of(e1, DepthsRoomType.TWISTED);
+			}
 			party.mNextRoomChoices = EnumSet.of(e1);
 			return EnumSet.of(e1);
 		}
@@ -1029,7 +1064,7 @@ public class DepthsManager {
 				Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "opendepthsgui ability " + p.getName());
 
 				return true;
-			} else if (dp.mEarnedRewards.peek() == DepthsRewardType.UPGRADE || dp.mEarnedRewards.peek() == DepthsRewardType.UPGRADE_ELITE) {
+			} else if (dp.mEarnedRewards.peek() == DepthsRewardType.UPGRADE || dp.mEarnedRewards.peek() == DepthsRewardType.UPGRADE_ELITE || dp.mEarnedRewards.peek() == DepthsRewardType.TWISTED) {
 				Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "opendepthsgui upgrade " + p.getName());
 
 				return true;
@@ -1105,16 +1140,17 @@ public class DepthsManager {
 				break;
 			}
 			int level = getPlayerLevelInAbility(da.getDisplayName(), p);
-			if (level == 0 || level >= 5 || da instanceof WeaponAspectDepthsAbility) {
+			if (level == 0 || (level >= 5 && !(dp.mEarnedRewards.peek() == DepthsRewardType.TWISTED)) || level >= 6 || da instanceof WeaponAspectDepthsAbility) {
 				continue;
 			} else {
 				DepthsAbilityItem item;
 				//If they're in an elite room, their reward is +2 levels instead
 				if (dp.mEarnedRewards.peek() == DepthsRewardType.UPGRADE_ELITE) {
 					item = da.getAbilityItem(Math.min(5, level + 2));
+				} else if (dp.mEarnedRewards.peek() == DepthsRewardType.TWISTED) {
+					item = da.getAbilityItem(6);
 				} else {
 					item = da.getAbilityItem(Math.min(5, level + 1));
-
 				}
 
 				offeredItems.add(item);

@@ -147,7 +147,7 @@ public class Davey extends BossAbilityGroup {
 		mVexes.add((LivingEntity) LibraryOfSoulsIntegration.summon(spawnLoc.clone().add(-5, 3, -5), VEX_LOS));
 
 		SpellManager activeSpells = new SpellManager(Arrays.asList(
-			new SpellLinkBeyondLife(mBoss, mCooldownTicks),
+			new SpellLinkBeyondLife(mBoss, mCooldownTicks, ((party.getFloor() - 1) / 3) + 1),
 			new SpellVoidBlast(plugin, mVexes.get(0), mCooldownTicks / 2),
 			new SpellVoidBlast(plugin, mVexes.get(1), mCooldownTicks / 2),
 			new SpellAbyssalLeap(plugin, mBoss, mCooldownTicks),
@@ -167,9 +167,9 @@ public class Davey extends BossAbilityGroup {
 
 	@Override
 	public void init() {
-		// Health is scaled by 1.5 times each time you fight the boss
+		// Health is scaled by 1.15 times each time you fight the boss
 		DepthsParty party = DepthsUtils.getPartyFromNearbyPlayers(mSpawnLoc);
-		int modifiedHealth = (int) (DAVEY_HEALTH * Math.pow(1.25, party.getFloor() / 3));
+		int modifiedHealth = (int) (DAVEY_HEALTH * Math.pow(1.15, party.getFloor() / 3));
 		mBoss.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(modifiedHealth);
 		mBoss.setHealth(modifiedHealth);
 

@@ -37,7 +37,7 @@ import net.md_5.bungee.api.ChatColor;
 public class RapidFire extends DepthsAbility {
 
 	public static final String ABILITY_NAME = "Rapid Fire";
-	public static final int[] ARROWS = {4, 5, 6, 7, 8};
+	public static final int[] ARROWS = {4, 5, 6, 7, 8, 10};
 	public static final int DAMAGE = 12;
 	public static final int COOLDOWN = 18 * 20;
 	public static final String META_DATA_TAG = "RapidFireArrow";

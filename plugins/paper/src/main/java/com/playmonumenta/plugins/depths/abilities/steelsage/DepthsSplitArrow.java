@@ -31,7 +31,7 @@ public class DepthsSplitArrow extends DepthsAbility {
 
 	private static final int SPLIT_ARROW_CHAIN_RANGE = 5;
 	public static final String ABILITY_NAME = "Split Arrow";
-	public static final double[] DAMAGE_MOD = {.40, .50, .60, .70, .80};
+	public static final double[] DAMAGE_MOD = {.40, .50, .60, .70, .80, 1.00};
 	private static final PotionEffect SPECTRAL_ARROW_EFFECT = new PotionEffect(PotionEffectType.GLOWING, 200, 0);
 
 	public DepthsSplitArrow(Plugin plugin, Player player) {

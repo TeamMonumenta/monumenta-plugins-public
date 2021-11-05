@@ -26,6 +26,7 @@ import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
+import com.playmonumenta.plugins.depths.abilities.aspects.BowAspect;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 
@@ -34,8 +35,8 @@ import net.md_5.bungee.api.ChatColor;
 public class Earthquake extends DepthsAbility {
 	public static final String ABILITY_NAME = "Earthquake";
 	public static final int COOLDOWN = 16 * 20;
-	public static final int[] DAMAGE = {20, 25, 30, 35, 40};
-	public static final int[] SILENCE_DURATION = {80, 90, 100, 110, 120};
+	public static final int[] DAMAGE = {20, 25, 30, 35, 40, 50};
+	public static final int[] SILENCE_DURATION = {80, 90, 100, 110, 120, 140};
 	public static final int EARTHQUAKE_TIME = 20;
 	public static final int RADIUS = 4;
 	public static final double KNOCKBACK = 0.8;
@@ -155,6 +156,7 @@ public class Earthquake extends DepthsAbility {
 
 		if (mPlayer.isSneaking()) {
 			arrow.remove();
+			mInfo.mCooldown = (int) (COOLDOWN * BowAspect.getCooldownReduction(mPlayer));
 			putOnCooldown();
 			execute();
 		}

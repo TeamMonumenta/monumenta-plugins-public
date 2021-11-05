@@ -17,8 +17,8 @@ import net.md_5.bungee.api.ChatColor;
 public class OneWithTheWind extends DepthsAbility {
 
 	public static final String ABILITY_NAME = "One with the Wind";
-	public static final double[] SPEED = {0.16, 0.2, 0.24, 0.28, 0.32};
-	public static final double[] PERCENT_DAMAGE_RECEIVED = {-.10, -.125, -.15, -.175, -.20};
+	public static final double[] SPEED = {0.16, 0.2, 0.24, 0.28, 0.32, 0.4};
+	public static final double[] PERCENT_DAMAGE_RECEIVED = {-.08, -.10, -.12, -.14, -.16, -.20};
 	public static final int RANGE = 10;
 
 	public OneWithTheWind(Plugin plugin, Player player) {

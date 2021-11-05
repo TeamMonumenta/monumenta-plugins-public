@@ -10,6 +10,7 @@ import org.bukkit.entity.Projectile;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.bosses.bosses.AntiRangeChivalrousBoss;
 import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
@@ -21,7 +22,7 @@ import net.md_5.bungee.api.ChatColor;
 public class FocusedCombos extends DepthsAbility {
 
 	public static final String ABILITY_NAME = "Focused Combos";
-	public static final double[] DAMAGE = {1.20, 1.25, 1.30, 1.35, 1.40};
+	public static final double[] DAMAGE = {1.20, 1.25, 1.30, 1.35, 1.40, 1.50};
 	public static final int BLEED_LEVEL = 2;
 	public static final int BLEED_DURATION = 20 * 3;
 
@@ -53,8 +54,14 @@ public class FocusedCombos extends DepthsAbility {
 	}
 
 	@Override
+	public boolean playerShotArrowEvent(AbstractArrow arrow) {
+		arrow.addScoreboardTag(AntiRangeChivalrousBoss.ignoreTag);
+		return true;
+	}
+
+	@Override
 	public String getDescription(int rarity) {
-		return "Every third critical arrow shot deals " + DepthsUtils.getRarityColor(rarity) + DAMAGE[rarity - 1] + ChatColor.WHITE + " times damage and applies Bleed " + BLEED_LEVEL + " for " + BLEED_DURATION / 20 + " seconds.";
+		return "Every third critical arrow shot deals " + DepthsUtils.getRarityColor(rarity) + DAMAGE[rarity - 1] + ChatColor.WHITE + " times damage and applies Bleed " + BLEED_LEVEL + " for " + BLEED_DURATION / 20 + " seconds. Additionally, arrows you shoot bypass arrow immunity.";
 	}
 
 	@Override

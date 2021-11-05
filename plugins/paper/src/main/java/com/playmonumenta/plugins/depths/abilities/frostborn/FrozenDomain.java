@@ -21,8 +21,8 @@ import net.md_5.bungee.api.ChatColor;
 public class FrozenDomain extends DepthsAbility {
 
 	public static final String ABILITY_NAME = "Frozen Domain";
-	public static final double[] EXTRA_SPEED_PCT = {.1, .125, .15, .175, .20};
-	public static final double[] REGEN_TIME = {2, 1.75, 1.5, 1.25, 1}; //seconds
+	public static final double[] EXTRA_SPEED_PCT = {.1, .125, .15, .175, .20, .25};
+	public static final double[] REGEN_TIME = {2, 1.75, 1.5, 1.25, 1, .75}; //seconds
 	private static final int DURATION_TICKS = 100;
 	private static final double PERCENT_HEAL = .05;
 	private static final String ATTR_NAME = "FrozenDomainExtraSpeedAttr";

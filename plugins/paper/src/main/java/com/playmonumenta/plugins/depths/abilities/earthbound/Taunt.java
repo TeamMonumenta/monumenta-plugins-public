@@ -31,7 +31,7 @@ public class Taunt extends DepthsAbility {
 
 	public static final String ABILITY_NAME = "Taunt";
 	private static final int COOLDOWN = 20 * 18;
-	private static final double[] ABSORPTION = {1, 1.25, 1.5, 1.75, 2};
+	private static final double[] ABSORPTION = {1, 1.25, 1.5, 1.75, 2, 2.5};
 	private static final int CAST_RANGE = 12;
 	private static final int MAX_ABSORB = 6;
 	private static final int ABSORPTION_DURATION = 20 * 8;

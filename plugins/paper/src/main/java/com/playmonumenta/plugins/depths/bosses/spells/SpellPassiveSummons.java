@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.depths.bosses.spells;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Random;
 import java.util.UUID;
 
 import org.bukkit.Location;
@@ -29,6 +30,7 @@ public class SpellPassiveSummons extends Spell {
 	private int mSummonTime;
 	private double mY;
 	private List<UUID> mSummoned = new ArrayList<UUID>();
+	private int mFightNumber;
 
 	private Location mSpawnLoc;
 
@@ -36,9 +38,10 @@ public class SpellPassiveSummons extends Spell {
 
 	private static final List<String> CONSTRUCTS = Arrays.asList("EldritchSpawn", "EldritchHunter", "EngorgedFloater");
 	private static final List<String> CONSTRUCTS_ELITE = Arrays.asList("Alarinkiri", "UnavoidableDespair", "RequiemoftheFlames");
+	private static final int ELITE_CHANCE_PER_FLOOR = 5;
 
 
-	public SpellPassiveSummons(Plugin plugin, LivingEntity boss, double summonRange, int summonTime, double y, Location spawnLoc) {
+	public SpellPassiveSummons(Plugin plugin, LivingEntity boss, double summonRange, int summonTime, double y, Location spawnLoc, int fightNumber) {
 		mPlugin = plugin;
 		mBoss = boss;
 		mSummonRange = summonRange;
@@ -46,6 +49,7 @@ public class SpellPassiveSummons extends Spell {
 		mSummonTime = summonTime;
 		mY = y;
 		mSpawnLoc = spawnLoc;
+		mFightNumber = fightNumber;
 	}
 
 	@Override
@@ -89,7 +93,7 @@ public class SpellPassiveSummons extends Spell {
 						sLoc = loc.clone().add(x, 0.25, z);
 					}
 					Location spawn = sLoc.clone().subtract(0, 1.75, 0);
-					LivingEntity ele = isElite ? (LivingEntity)LibraryOfSoulsIntegration.summon(spawn, CONSTRUCTS_ELITE.get(FastUtils.RANDOM.nextInt(CONSTRUCTS.size()))) : (LivingEntity)LibraryOfSoulsIntegration.summon(spawn, CONSTRUCTS.get(FastUtils.RANDOM.nextInt(CONSTRUCTS.size())));
+					LivingEntity ele = (isElite || isEliteSummon()) ? (LivingEntity)LibraryOfSoulsIntegration.summon(spawn, CONSTRUCTS_ELITE.get(FastUtils.RANDOM.nextInt(CONSTRUCTS.size()))) : (LivingEntity)LibraryOfSoulsIntegration.summon(spawn, CONSTRUCTS.get(FastUtils.RANDOM.nextInt(CONSTRUCTS.size())));
 					Location scLoc = sLoc.clone();
 					if (ele != null && !mSummoned.contains(ele.getUniqueId())) {
 						mSummoned.add(ele.getUniqueId());
@@ -170,6 +174,15 @@ public class SpellPassiveSummons extends Spell {
 			}
 
 		}.runTaskLater(mPlugin, 20);
+	}
+
+	public boolean isEliteSummon() {
+		Random r = new Random();
+		int roll = r.nextInt(100);
+		if (roll < (mFightNumber - 1) * ELITE_CHANCE_PER_FLOOR) {
+			return true;
+		}
+		return false;
 	}
 
 

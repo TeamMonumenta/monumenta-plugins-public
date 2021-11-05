@@ -31,7 +31,7 @@ import net.md_5.bungee.api.ChatColor;
 public class IceLance extends DepthsAbility {
 
 	public static final String ABILITY_NAME = "Ice Lance";
-	public static final double[] DAMAGE = {12.5, 15.0, 17.5, 20.0, 22.5};
+	public static final double[] DAMAGE = {12.5, 15.0, 17.5, 20.0, 22.5, 27.5};
 	private static final Particle.DustOptions MANA_LANCE_COLOR = new Particle.DustOptions(Color.fromRGB(194, 224, 249), 1.0f);
 	private static final int COOLDOWN = 6 * 20;
 	private static final int DURATION = 2 * 20;

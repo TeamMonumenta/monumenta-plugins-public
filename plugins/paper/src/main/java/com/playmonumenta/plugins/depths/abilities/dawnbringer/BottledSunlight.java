@@ -38,7 +38,7 @@ public class BottledSunlight extends DepthsAbility {
 
 	public static final String ABILITY_NAME = "Bottled Sunlight";
 	private static final int COOLDOWN = 12 * 20;
-	private static final int[] ABSORPTION = {8, 10, 12, 14, 16};
+	private static final int[] ABSORPTION = {8, 10, 12, 14, 16, 20};
 	private static final int BOTTLE_THROW_COOLDOWN = 10 * 20;
 	private static final int BOTTLE_USE_COOLDOWN = 30 * 20;
 	private static final int BOTTLE_ABSORPTION_DURATION = 20 * 30;

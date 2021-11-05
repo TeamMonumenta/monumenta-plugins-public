@@ -3,7 +3,6 @@ package com.playmonumenta.plugins.depths.abilities.aspects;
 import java.util.Collection;
 
 import org.bukkit.Material;
-import org.bukkit.Particle;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.attribute.AttributeModifier.Operation;
@@ -37,7 +36,6 @@ public class ScytheAspect extends WeaponAspectDepthsAbility {
 		if (event.getCause().equals(DamageCause.ENTITY_ATTACK) && InventoryUtils.isScytheItem(mPlayer.getInventory().getItemInMainHand())) {
 			if (PlayerUtils.isFallingAttack(mPlayer)) {
 				PlayerUtils.healPlayer(mPlayer, 1.0);
-				mPlayer.getWorld().spawnParticle(Particle.HEART, event.getEntity().getLocation().add(0, 1, 0), 3, 0.1, 0.1, 0.1, 0.001);
 			} else {
 				double attackSpeed = 4;
 				double multiplier = 1;
@@ -58,9 +56,7 @@ public class ScytheAspect extends WeaponAspectDepthsAbility {
 						}
 					}
 				}
-
 				PlayerUtils.healPlayer(mPlayer, 0.5 / Math.sqrt(attackSpeed * multiplier) * mPlayer.getCooledAttackStrength(0));
-				mPlayer.getWorld().spawnParticle(Particle.HEART, event.getEntity().getLocation().add(0, 1, 0), 1, 0.1, 0.1, 0.1, 0.001);
 			}
 		}
 

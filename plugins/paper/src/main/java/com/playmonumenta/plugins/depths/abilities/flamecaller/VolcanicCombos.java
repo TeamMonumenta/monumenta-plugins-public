@@ -22,7 +22,7 @@ import net.md_5.bungee.api.ChatColor;
 
 public class VolcanicCombos extends DepthsAbility {
 	public static final String ABILITY_NAME = "Volcanic Combos";
-	public static final double[] DAMAGE = {5, 6, 7, 8, 9};
+	public static final double[] DAMAGE = {6, 7, 8, 9, 10, 12};
 	public static final double RADIUS = 4;
 	public static final int FIRE_TICKS = 3 * 20;
 

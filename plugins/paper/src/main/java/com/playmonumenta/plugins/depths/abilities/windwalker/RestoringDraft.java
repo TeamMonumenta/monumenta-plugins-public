@@ -24,7 +24,7 @@ import net.md_5.bungee.api.ChatColor;
 public class RestoringDraft extends DepthsAbility {
 
 	public static final String ABILITY_NAME = "Restoring Draft";
-	public static final double[] HEALING = {0.3, 0.35, 0.4, 0.45, 0.5};
+	public static final double[] HEALING = {0.2, 0.3, 0.4, 0.5, 0.6, 0.8};
 	public static final int HEIGHT_CAP = 12;
 	private static final String SLAM_ONCE_THIS_TICK_METAKEY = "RestoringDraftTickSlammed";
 	public static final int AUTOMATIC_THRESHOLD = 4;

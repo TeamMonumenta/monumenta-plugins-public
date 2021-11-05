@@ -26,6 +26,7 @@ import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
+import com.playmonumenta.plugins.depths.abilities.aspects.BowAspect;
 import com.playmonumenta.plugins.depths.abilities.steelsage.DepthsSharpshooter;
 import com.playmonumenta.plugins.depths.abilities.steelsage.ProjectileMastery;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -35,9 +36,9 @@ import net.md_5.bungee.api.ChatColor;
 public class PiercingCold extends DepthsAbility {
 
 	public static final String ABILITY_NAME = "Piercing Cold";
-	public static final int[] DAMAGE = {14, 17, 20, 23, 26};
-	public static final int ICE_TICKS = 10 * 20;
-	public static final int COOLDOWN = 8 * 20;
+	public static final int[] DAMAGE = {14, 17, 20, 23, 26, 32};
+	public static final int ICE_TICKS = 8 * 20;
+	public static final int COOLDOWN = 11 * 20;
 	private static final Particle.DustOptions ENCHANTED_ARROW_COLOR = new Particle.DustOptions(Color.fromRGB(80, 32, 140), 2.0f);
 	private static final Particle.DustOptions ENCHANTED_ARROW_FRINGE_COLOR = new Particle.DustOptions(Color.fromRGB(168, 255, 252), 2.0f);
 	private static final int MAX_DIST = 50;
@@ -126,7 +127,7 @@ public class PiercingCold extends DepthsAbility {
 				blocksToIce.add(centerBlock.getRelative(BlockFace.WEST));
 
 				for (Block b : blocksToIce) {
-					DepthsUtils.iceExposedBlock(b, ICE_TICKS);
+					DepthsUtils.iceExposedBlock(b, ICE_TICKS, mPlayer);
 				}
 			}
 
@@ -152,6 +153,7 @@ public class PiercingCold extends DepthsAbility {
 		if (mPlayer.isSneaking()) {
 			arrow.remove();
 			mPlugin.mProjectileEffectTimers.removeEntity(arrow);
+			mInfo.mCooldown = (int) (COOLDOWN * BowAspect.getCooldownReduction(mPlayer));
 			putOnCooldown();
 			execute();
 		}

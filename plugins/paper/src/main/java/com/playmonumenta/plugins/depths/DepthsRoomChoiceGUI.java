@@ -11,8 +11,14 @@ import org.bukkit.inventory.meta.ItemMeta;
 
 import com.goncalomb.bukkit.mylib.utils.CustomInventory;
 
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.TextColor;
+import net.kyori.adventure.text.format.TextDecoration;
+
 public class DepthsRoomChoiceGUI extends CustomInventory {
 	private static final Material FILLER = Material.BLACK_STAINED_GLASS_PANE;
+
+	public static final int LEVELSIX = 0x703663;
 
 	public DepthsRoomChoiceGUI(Player player) {
 		super(player, 27, "Select the Next Room Type");
@@ -98,6 +104,15 @@ public class DepthsRoomChoiceGUI extends CustomInventory {
 		} else {
 			_inventory.setItem(4, new ItemStack(Material.BLACK_STAINED_GLASS_PANE));
 		}
+
+		if (roomChoices.contains(DepthsRoomType.TWISTED)) {
+			ItemStack stack = new ItemStack(Material.BLACK_CONCRETE, 1);
+			ItemMeta meta = stack.getItemMeta();
+			meta.displayName(Component.text(ChatColor.MAGIC + "XXXXXX", TextColor.color(LEVELSIX))
+				.decoration(TextDecoration.ITALIC, false));
+			stack.setItemMeta(meta);
+			_inventory.setItem(13, stack);
+		}
 	}
 
 	@Override
@@ -128,6 +143,8 @@ public class DepthsRoomChoiceGUI extends CustomInventory {
 			DepthsManager.getInstance().playerSelectedRoom(DepthsRoomType.TREASURE_ELITE, p);
 		} else if (event.getSlot() == 4) {
 			DepthsManager.getInstance().playerSelectedRoom(DepthsRoomType.UTILITY, p);
+		} else if (event.getSlot() == 13) {
+			DepthsManager.getInstance().playerSelectedRoom(DepthsRoomType.TWISTED, p);
 		}
 
 		event.getWhoClicked().closeInventory();

@@ -87,13 +87,28 @@ public class DepthsSummaryGUI extends CustomInventory {
 
 		//First- check if the player has any rewards to open
 		if (playerWhoAsked.mEarnedRewards.size() > 0) {
-			ItemStack rewardItem = new ItemStack(Material.GOLD_NUGGET, playerWhoAsked.mEarnedRewards.size());
+			ItemStack rewardItem = new ItemStack(Material.GOLD_INGOT, playerWhoAsked.mEarnedRewards.size());
 			ItemMeta rewardMeta = rewardItem.getItemMeta();
 			rewardMeta.displayName(Component.text("Claim your Room Reward!", NamedTextColor.YELLOW)
 										.decoration(TextDecoration.ITALIC, false));
 			rewardMeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
-			rewardItem.setItemMeta(rewardMeta);
 			ItemUtils.setPlainName(rewardItem, "Claim your Room Reward!");
+			if (playerWhoAsked.mEarnedRewards.size() > 1) {
+				rewardMeta.displayName(Component.text("Claim your Room Rewards!", NamedTextColor.YELLOW)
+						.decoration(TextDecoration.ITALIC, false));
+				rewardMeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
+				ItemUtils.setPlainName(rewardItem, "Claim your Room Rewards!");
+			}
+			rewardItem.setItemMeta(rewardMeta);
+			_inventory.setItem(REWARD_LOCATION, rewardItem);
+		} else {
+			ItemStack rewardItem = new ItemStack(Material.GOLD_NUGGET, 1);
+			ItemMeta rewardMeta = rewardItem.getItemMeta();
+			rewardMeta.displayName(Component.text("All Room Rewards Claimed!", NamedTextColor.YELLOW)
+										.decoration(TextDecoration.ITALIC, false));
+			rewardMeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
+			ItemUtils.setPlainName(rewardItem, "All Room Rewards Claimed!");
+			rewardItem.setItemMeta(rewardMeta);
 			_inventory.setItem(REWARD_LOCATION, rewardItem);
 		}
 		setAbilities(targetPlayer);
@@ -117,7 +132,7 @@ public class DepthsSummaryGUI extends CustomInventory {
 		}
 		if (event.getSlot() == REWARD_LOCATION) {
 			DepthsPlayer playerInstance = DepthsManager.getInstance().mPlayers.get(clicker.getUniqueId());
-			if (playerInstance != null) {
+			if (playerInstance != null && playerInstance.mEarnedRewards.size() > 0) {
 				event.getWhoClicked().closeInventory();
 				DepthsManager.getInstance().getRoomReward((Player) event.getWhoClicked(), null);
 			}

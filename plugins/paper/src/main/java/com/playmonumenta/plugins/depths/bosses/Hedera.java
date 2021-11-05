@@ -37,6 +37,7 @@ import com.playmonumenta.plugins.bosses.spells.SpellBlockBreak;
 import com.playmonumenta.plugins.depths.DepthsManager;
 import com.playmonumenta.plugins.depths.DepthsParty;
 import com.playmonumenta.plugins.depths.DepthsUtils;
+import com.playmonumenta.plugins.depths.bosses.spells.SpellEndlessHederaSummons;
 import com.playmonumenta.plugins.depths.bosses.spells.SpellEvolutionSeeds;
 import com.playmonumenta.plugins.depths.bosses.spells.SpellHederaAnticheese;
 import com.playmonumenta.plugins.depths.bosses.spells.SpellIvyGarden;
@@ -97,7 +98,7 @@ public class Hedera extends BossAbilityGroup {
 		} else if (party.getFloor() == 4) {
 			mCooldownTicks = 6 * 20;
 		} else if (party.getFloor() % 3 == 1) {
-			mCooldownTicks = 4 * 20;
+			mCooldownTicks = 5 * 20;
 		} else {
 			mCooldownTicks = 8 * 20;
 		}
@@ -150,6 +151,17 @@ public class Hedera extends BossAbilityGroup {
 			new SpellIvyGarden(plugin, mCooldownTicks, mPlants),
 			new SpellEvolutionSeeds(plugin, mCooldownTicks, mPlants, mPlantTypes)
 		));
+		//Extra summon ability if fighting on f4 or higher
+		if (party.getFloor() != 1) {
+			activeSpells = new SpellManager(Arrays.asList(
+					//new SpellEarthshake(plugin, mBoss, 5, 80),
+					new SpellLeafNova(plugin, mBoss, mCooldownTicks),
+					new SpellIvyGarden(plugin, mCooldownTicks, mPlants),
+					new SpellEvolutionSeeds(plugin, mCooldownTicks, mPlants, mPlantTypes),
+					new SpellEndlessHederaSummons(mBoss, mCooldownTicks, ((party.getFloor() - 1) / 3) + 1)
+				));
+		}
+
 		List<Spell> passiveSpells = Arrays.asList(
 			new SpellBlockBreak(mBoss, 2, 3, 2, true, Material.AIR),
 			new SpellHederaAnticheese(mBoss, mSpawnLoc),
@@ -163,9 +175,9 @@ public class Hedera extends BossAbilityGroup {
 
 	@Override
 	public void init() {
-		// Health is scaled by 1.5 times each time you fight the boss
+		// Health is scaled by 1.15 times each time you fight the boss
 		DepthsParty party = DepthsUtils.getPartyFromNearbyPlayers(mSpawnLoc);
-		int modifiedHealth = (int) (HEDERA_HEALTH * Math.pow(1.25, party.getFloor() / 3));
+		int modifiedHealth = (int) (HEDERA_HEALTH * Math.pow(1.15, party.getFloor() / 3));
 		mBoss.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(modifiedHealth);
 		mBoss.setHealth(modifiedHealth);
 

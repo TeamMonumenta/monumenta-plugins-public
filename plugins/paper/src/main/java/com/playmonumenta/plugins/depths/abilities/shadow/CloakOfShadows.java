@@ -39,9 +39,9 @@ public class CloakOfShadows extends DepthsAbility {
 	public static final String ABILITY_NAME = "Cloak of Shadows";
 	public static final int COOLDOWN = 20 * 15;
 	public static final int WEAKEN_DURATION = 20 * 6;
-	public static final int[] STEALTH_DURATION = {30, 35, 40, 45, 50};
-	public static final double[] WEAKEN_AMPLIFIER = {0.2, 0.25, 0.3, 0.35, 0.4};
-	public static final int[] DAMAGE = {12, 15, 18, 21, 24};
+	public static final int[] STEALTH_DURATION = {30, 35, 40, 45, 50, 60};
+	public static final double[] WEAKEN_AMPLIFIER = {0.2, 0.25, 0.3, 0.35, 0.4, 0.5};
+	public static final int[] DAMAGE = {12, 15, 18, 21, 24, 30};
 	public static final int DAMAGE_DURATION = 4 * 20;
 	private static final double VELOCITY = 0.7;
 	private static final double RADIUS = 5.0;

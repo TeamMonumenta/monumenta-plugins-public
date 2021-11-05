@@ -60,20 +60,23 @@ public class DepthsWeaponAspectGUI extends CustomInventory {
 		int slot = 0;
 		if (player.getScoreboardTags().contains(PAID_SCOREBOARD_TAG)) {
 			switch (event.getSlot()) {
-			case 9:
+			case 10:
 				slot = 0;
 				break;
 			case 11:
 				slot = 1;
 				break;
-			case 13:
+			case 12:
 				slot = 2;
 				break;
-			case 15:
+			case 14:
 				slot = 3;
 				break;
-			case 17:
+			case 15:
 				slot = 4;
+				break;
+			case 16:
+				slot = 5;
 				break;
 			default:
 				player.closeInventory();
@@ -102,7 +105,7 @@ public class DepthsWeaponAspectGUI extends CustomInventory {
 	}
 
 	void setLayout(Player player, Inventory inventory, Boolean paid) {
-		int[] paidLocations = {9, 11, 13, 15, 17};
+		int[] paidLocations = {10, 11, 12, 14, 15, 16};
 		int[] unpaidLocations = {10, 13, 16};
 		int[] chosenArray = null;
 

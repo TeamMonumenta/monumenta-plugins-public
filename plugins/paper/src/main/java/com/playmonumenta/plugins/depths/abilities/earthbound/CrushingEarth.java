@@ -29,9 +29,9 @@ public class CrushingEarth extends DepthsAbility {
 
 	public static final String ABILITY_NAME = "Crushing Earth";
 	private static final int COOLDOWN = 20 * 8;
-	private static final double[] DAMAGE = {6, 7.5, 9, 10.5, 12};
+	private static final double[] DAMAGE = {8, 10, 12, 14, 16, 24};
 	private static final int CAST_RANGE = 4;
-	private static final int[] STUN_DURATION = {20, 25, 30, 35, 40};
+	private static final int[] STUN_DURATION = {20, 25, 30, 35, 40, 50};
 
 	public CrushingEarth(Plugin plugin, Player player) {
 		super(plugin, player, ABILITY_NAME);

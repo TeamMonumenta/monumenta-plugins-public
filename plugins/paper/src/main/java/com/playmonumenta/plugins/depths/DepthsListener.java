@@ -328,6 +328,8 @@ public class DepthsListener implements Listener {
 
 	@EventHandler(priority = EventPriority.HIGH)
 	public void entityExplodeEvent(EntityExplodeEvent event) {
+		//Call util to check for ice barrier slow
+		DepthsUtils.explodeEvent(event);
 		EntityType entityType = event.getEntityType();
 		if (!(entityType == EntityType.CREEPER || entityType == EntityType.PRIMED_TNT)) {
 			return;

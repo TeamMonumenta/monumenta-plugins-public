@@ -26,7 +26,7 @@ public class Fireball extends DepthsAbility {
 	public static final String ABILITY_NAME = "Fireball";
 	private static final int COOLDOWN = 6 * 20;
 	private static final int DISTANCE = 8;
-	private static final double[] DAMAGE = {10, 12.5, 15, 17.5, 20};
+	private static final double[] DAMAGE = {10, 12.5, 15, 17.5, 20, 25};
 	private static final int RADIUS = 3;
 	private static final int FIRE_TICKS = 3 * 20;
 

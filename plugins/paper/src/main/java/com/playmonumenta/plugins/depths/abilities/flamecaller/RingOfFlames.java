@@ -36,8 +36,8 @@ public class RingOfFlames extends DepthsAbility {
 
 	public static final String ABILITY_NAME = "Ring of Flames";
 	private static final int COOLDOWN = 18 * 20;
-	private static final double[] DAMAGE = {4, 5, 6, 7, 8};
-	private static final int DURATION = 10 * 20;
+	private static final double[] DAMAGE = {4, 5, 6, 7, 8, 10};
+	private static final int[] DURATION = {8 * 20, 9 * 20, 10 * 20, 11 * 20, 12 * 20, 14 * 20};
 	private static final int EFFECT_DURATION = 4 * 20;
 
 	public RingOfFlames(Plugin plugin, Player player) {
@@ -80,7 +80,7 @@ public class RingOfFlames extends DepthsAbility {
 			private List<LivingEntity> mMobs;
 			@Override
 			public void run() {
-				if (mTicks >= DURATION) {
+				if (mTicks >= DURATION[mRarity - 1]) {
 					this.cancel();
 					world.playSound(loc, Sound.ENTITY_GENERIC_EXTINGUISH_FIRE, SoundCategory.PLAYERS, 1, 0.75f);
 					return;
@@ -141,7 +141,7 @@ public class RingOfFlames extends DepthsAbility {
 
 	@Override
 	public String getDescription(int rarity) {
-		return "Left click while sneaking and holding a weapon to summon a ring of flames around you that lasts for " + DURATION / 20 + " seconds. Enemies on the flame perimeter are dealt " + DepthsUtils.getRarityColor(rarity) + DAMAGE[rarity - 1] + ChatColor.WHITE + " damage every second, and they are inflicted with Bleed 1 and set on fire for " + EFFECT_DURATION / 20 + " seconds. Cooldown: " + COOLDOWN / 20 + "s.";
+		return "Left click while sneaking and holding a weapon to summon a ring of flames around you that lasts for " + DepthsUtils.getRarityColor(rarity) + DURATION[rarity - 1] / 20 + ChatColor.WHITE + " seconds. Enemies on the flame perimeter are dealt " + DepthsUtils.getRarityColor(rarity) + DAMAGE[rarity - 1] + ChatColor.WHITE + " damage every second, and they are inflicted with Bleed 1 and set on fire for " + EFFECT_DURATION / 20 + " seconds. Cooldown: " + COOLDOWN / 20 + "s.";
 	}
 
 	@Override

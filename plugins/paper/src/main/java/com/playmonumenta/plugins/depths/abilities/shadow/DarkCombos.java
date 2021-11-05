@@ -23,7 +23,7 @@ import net.md_5.bungee.api.ChatColor;
 public class DarkCombos extends DepthsAbility {
 
 	public static final String ABILITY_NAME = "Dark Combos";
-	public static final double[] VULN_AMPLIFIER = {0.15, 0.1875, 0.225, 0.2625, 0.3};
+	public static final double[] VULN_AMPLIFIER = {0.15, 0.1875, 0.225, 0.2625, 0.3, 0.375};
 	public static final int DURATION = 20 * 3;
 
 	private int mComboCount = 0;

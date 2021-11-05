@@ -38,8 +38,8 @@ public class Metalmancy extends DepthsAbility {
 
 	public static final String ABILITY_NAME = "Metalmancy";
 
-	public static final double[] DAMAGE = {10, 12.5, 15, 17.5, 20};
-	public static final int[] DURATION = {10 * 20, 11 * 20, 12 * 20, 13 * 20, 14 * 20};
+	public static final double[] DAMAGE = {10, 12.5, 15, 17.5, 20, 25};
+	public static final int[] DURATION = {10 * 20, 11 * 20, 12 * 20, 13 * 20, 14 * 20, 18 * 20};
 	public static final int COOLDOWN = 32 * 20;
 	public static final String GOLEM_NAME = "SteelConstruct";
 	public static final String GOLEM_TAG = "boss_metalmancy";

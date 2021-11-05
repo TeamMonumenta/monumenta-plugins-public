@@ -28,10 +28,10 @@ import net.md_5.bungee.api.ChatColor;
 public class IceBarrier extends DepthsAbility {
 
 	public static final String ABILITY_NAME = "Ice Barrier";
-	public static final int[] ICE_TICKS = {8 * 20, 10 * 20, 12 * 20, 14 * 20, 16 * 20};
-	public static final int[] COOLDOWN = {20 * 20, 18 * 20, 16 * 20, 14 * 20, 12 * 20};
+	public static final int[] ICE_TICKS = {8 * 20, 10 * 20, 12 * 20, 14 * 20, 16 * 20, 20 * 20};
+	public static final int[] COOLDOWN = {20 * 20, 18 * 20, 16 * 20, 14 * 20, 12 * 20, 8 * 20};
 	public static final int CAST_RANGE = 15;
-	public static final int[] MAX_LENGTH = {20, 25, 30, 35, 40};
+	public static final int[] MAX_LENGTH = {20, 25, 30, 35, 40, 50};
 	public static final int CAST_TIME = 5 * 20;
 
 	public boolean mIsPrimed;
@@ -64,7 +64,7 @@ public class IceBarrier extends DepthsAbility {
 		}
 
 		if (block.getType() != Material.AIR && block.getType() != Material.BEDROCK && validLength) {
-			DepthsUtils.spawnIceTerrain(block.getLocation(), CAST_TIME);
+			DepthsUtils.spawnIceTerrain(block.getLocation(), CAST_TIME, mPlayer);
 			world.spawnParticle(Particle.CRIT, block.getLocation(), 15, 0, 0, 0, 0.6f);
 			world.spawnParticle(Particle.CRIT_MAGIC, block.getLocation(), 15, 0, 0, 0, 0.6f);
 			world.playSound(mPlayer.getLocation(), Sound.BLOCK_GLASS_BREAK, 1, 1.4f);
@@ -104,7 +104,7 @@ public class IceBarrier extends DepthsAbility {
 				}
 
 				for (Block b : blocksToIce) {
-					DepthsUtils.spawnIceTerrain(b.getRelative(BlockFace.UP).getLocation(), ICE_TICKS[mRarity - 1]);
+					DepthsUtils.spawnIceTerrain(b.getRelative(BlockFace.UP).getLocation(), ICE_TICKS[mRarity - 1], mPlayer, Boolean.TRUE);
 					world.spawnParticle(Particle.CRIT, b.getLocation(), 15, 0, 0, 0, 0.6f);
 					world.spawnParticle(Particle.CRIT_MAGIC, b.getLocation(), 15, 0, 0, 0, 0.6f);
 				}
@@ -121,7 +121,7 @@ public class IceBarrier extends DepthsAbility {
 
 	@Override
 	public String getDescription(int rarity) {
-		return "Right clicking while sneaking and holding a weapon to place an ice marker up to " + CAST_RANGE + " blocks away. Placing a second marker within " + CAST_TIME / 20 + " seconds and within " + DepthsUtils.getRarityColor(rarity) + MAX_LENGTH[rarity - 1] + ChatColor.WHITE + " blocks of the first marker forms a wall of ice connecting the two points, lasting for " + DepthsUtils.getRarityColor(rarity) + ICE_TICKS[rarity - 1] / 20 + ChatColor.WHITE + " seconds. Cooldown is refunded if no second marker is placed. Cooldown: " + DepthsUtils.getRarityColor(rarity) + COOLDOWN[rarity - 1] / 20 + "s" + ChatColor.WHITE + ".";
+		return "Right clicking while sneaking and holding a weapon to place an ice marker up to " + CAST_RANGE + " blocks away. Placing a second marker within " + CAST_TIME / 20 + " seconds and within " + DepthsUtils.getRarityColor(rarity) + MAX_LENGTH[rarity - 1] + ChatColor.WHITE + " blocks of the first marker forms a wall of ice connecting the two points, lasting for " + DepthsUtils.getRarityColor(rarity) + ICE_TICKS[rarity - 1] / 20 + ChatColor.WHITE + " seconds. Mobs that break the barrier are slowed by 50% for 2s. Cooldown is refunded if no second marker is placed. Cooldown: " + DepthsUtils.getRarityColor(rarity) + COOLDOWN[rarity - 1] / 20 + "s" + ChatColor.WHITE + ".";
 	}
 
 	@Override

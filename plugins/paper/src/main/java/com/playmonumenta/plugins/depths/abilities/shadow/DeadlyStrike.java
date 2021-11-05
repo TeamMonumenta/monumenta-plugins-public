@@ -16,7 +16,7 @@ import net.md_5.bungee.api.ChatColor;
 public class DeadlyStrike extends DepthsAbility {
 
 	public static final String ABILITY_NAME = "Deadly Strike";
-	public static final double[] DAMAGE = {1.10, 1.125, 1.15, 1.175, 1.2};
+	public static final double[] DAMAGE = {1.10, 1.125, 1.15, 1.175, 1.2, 1.25};
 
 	public DeadlyStrike(Plugin plugin, Player player) {
 		super(plugin, player, ABILITY_NAME);

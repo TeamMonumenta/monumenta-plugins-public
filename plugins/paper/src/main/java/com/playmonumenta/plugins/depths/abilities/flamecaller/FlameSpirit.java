@@ -26,7 +26,7 @@ public class FlameSpirit extends DepthsAbility {
 
 	public static final String ABILITY_NAME = "Flame Spirit";
 
-	public static final int[] DAMAGE = {5, 6, 7, 8, 9};
+	public static final int[] DAMAGE = {5, 6, 7, 8, 9, 13};
 	public static final int DAMAGE_COUNT = 3;
 	public static final int FIRE_TICKS = 2 * 20;
 	public static final int RADIUS = 4;

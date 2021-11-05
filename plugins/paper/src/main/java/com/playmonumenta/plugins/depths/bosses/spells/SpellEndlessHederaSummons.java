@@ -12,27 +12,26 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.bosses.spells.Spell;
-import com.playmonumenta.plugins.depths.bosses.Davey;
+import com.playmonumenta.plugins.depths.bosses.Hedera;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 
-public class SpellLinkBeyondLife extends Spell {
-	private static final String SUMMON_NAME_1 = "AbyssalTrilobite";
-	private static final String SUMMON_NAME_2 = "DistortedScoundrel";
-	private static final String SUMMON_NAME_3 = "DistortedCrewman";
-	private static final String SUMMON_NAME_4 = "DecayedCorpse";
-	private static final int SPAWN_COUNT = 4; // Summon count 4-8 depending on players alive
+public class SpellEndlessHederaSummons extends Spell {
+	private static final String SUMMON_NAME_1 = "LushArachnid";
+	private static final String SUMMON_NAME_2 = "MossyRemains";
+	private static final String SUMMON_NAME_3 = "FerociousBoar";
+	private static final int SPAWN_COUNT = 2; // Summon count 4-8 depending on players alive
 	private static final int RANGE = 10;
-	private static final int MAX_MOBS = 15;
+	private static final int MAX_MOBS = 10;
 	private static final int ELITE_CHANCE_PER_FLOOR = 10;
 
 	private final LivingEntity mBoss;
 	private int mCooldownTicks;
 	private int mFightNumber;
 
-	public SpellLinkBeyondLife(LivingEntity boss, int cooldown, int fightNumber) {
+	public SpellEndlessHederaSummons(LivingEntity boss, int cooldown, int fightNumber) {
 		mBoss = boss;
 		mCooldownTicks = cooldown;
 		mFightNumber = fightNumber;
@@ -42,9 +41,9 @@ public class SpellLinkBeyondLife extends Spell {
 	public void run() {
 		Location loc = mBoss.getLocation();
 		loc.getWorld().playSound(loc, Sound.ENTITY_EVOKER_PREPARE_SUMMON, 20, 1);
-		int summonCount = SPAWN_COUNT + PlayerUtils.playersInRange(mBoss.getLocation(), Davey.detectionRange, true).size();
+		int summonCount = SPAWN_COUNT + PlayerUtils.playersInRange(mBoss.getLocation(), Hedera.detectionRange, true).size();
 
-		PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), Davey.detectionRange, "tellraw @s [\"\",{\"text\":\"[Davey]\",\"color\":\"gold\"},{\"text\":\" Now ye've done it. She be watchin'. Help me, heathens of \",\"color\":\"blue\"},{\"text\":\"ngbgbggb\",\"obfuscated\":\"true\",\"color\":\"blue\"},{\"text\":\"!\",\"color\":\"blue\"}]");
+		//PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), Davey.detectionRange, "tellraw @s [\"\",{\"text\":\"[Davey]\",\"color\":\"gold\"},{\"text\":\" Now ye've done it. She be watchin'. Help me, heathens of \",\"color\":\"blue\"},{\"text\":\"ngbgbggb\",\"obfuscated\":\"true\",\"color\":\"blue\"},{\"text\":\"!\",\"color\":\"blue\"}]");
 
 		BukkitRunnable run = new BukkitRunnable() {
 			int mTicks = 0;
@@ -80,23 +79,22 @@ public class SpellLinkBeyondLife extends Spell {
 					loc.getWorld().playSound(sLoc, Sound.BLOCK_GRAVEL_BREAK, 1, 0.75f);
 					loc.getWorld().spawnParticle(Particle.BLOCK_DUST, sLoc, 16, 0.25, 0.1, 0.25, 0.25, Material.GRAVEL.createBlockData());
 					Random r = new Random();
-					int roll = r.nextInt(3);
+					int roll = r.nextInt(2);
 					Entity summonedMob = null;
 					if (isEliteSummon()) {
-						summonedMob = LibraryOfSoulsIntegration.summon(sLoc, SUMMON_NAME_4);
+						summonedMob = LibraryOfSoulsIntegration.summon(sLoc, SUMMON_NAME_3);
 					} else {
 						if (roll == 0) {
 							summonedMob = LibraryOfSoulsIntegration.summon(sLoc, SUMMON_NAME_1);
 						} else if (roll == 1) {
 							summonedMob = LibraryOfSoulsIntegration.summon(sLoc, SUMMON_NAME_2);
-						} else if (roll == 2) {
-							summonedMob = LibraryOfSoulsIntegration.summon(sLoc, SUMMON_NAME_3);
 						}
 					}
 
 					if (summonedMob != null) {
 						summonedMob.setPersistent(true);
 					}
+
 					mSummons++;
 				}
 
@@ -122,6 +120,6 @@ public class SpellLinkBeyondLife extends Spell {
 
 	@Override
 	public boolean canRun() {
-		return EntityUtils.getNearbyMobs(mBoss.getLocation(), Davey.detectionRange).size() < MAX_MOBS;
+		return EntityUtils.getNearbyMobs(mBoss.getLocation(), Hedera.detectionRange).size() < MAX_MOBS;
 	}
 }

@@ -35,7 +35,7 @@ import net.md_5.bungee.api.ChatColor;
 public class DepthsAdvancingShadows extends DepthsAbility {
 
 	public static final String ABILITY_NAME = "Advancing Shadows";
-	public static final int[] DAMAGE = {5, 7, 9, 11, 13};
+	public static final int[] DAMAGE = {5, 7, 9, 11, 13, 17};
 
 	private static final int ADVANCING_SHADOWS_RANGE = 12;
 	private static final float ADVANCING_SHADOWS_AOE_KNOCKBACKS_SPEED = 0.5f;

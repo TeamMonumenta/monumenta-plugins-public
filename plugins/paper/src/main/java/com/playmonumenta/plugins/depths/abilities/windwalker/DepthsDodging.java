@@ -30,7 +30,7 @@ import com.playmonumenta.plugins.utils.AbilityUtils;
 public class DepthsDodging extends DepthsAbility {
 
 	public static final String ABILITY_NAME = "Dodging";
-	public static final int[] COOLDOWN = {20 * 16, 20 * 14, 20 * 12, 20 * 10, 20 * 8};
+	public static final int[] COOLDOWN = {20 * 16, 20 * 14, 20 * 12, 20 * 10, 20 * 8, 20 * 5};
 
 	private int mTriggerTick = 0;
 

@@ -16,7 +16,8 @@ public class Enlightenment extends DepthsAbility {
 	//Technical implementation of this ability is handled in the depths listener, so that any member of the party can benefit from it
 
 	public static final String ABILITY_NAME = "Enlightenment";
-	public static final double[] XP_MULTIPLIER = {1.25, 1.32, 1.38, 1.44, 1.5};
+	public static final double[] XP_MULTIPLIER = {1.3, 1.35, 1.4, 1.45, 1.5, 1.7};
+	public static final int[] RARITY_INCREASE = {3, 4, 5, 6, 7, 10};
 
 
 	public Enlightenment(Plugin plugin, Player player) {
@@ -27,7 +28,7 @@ public class Enlightenment extends DepthsAbility {
 
 	@Override
 	public String getDescription(int rarity) {
-		return "All players in your party gain " + DepthsUtils.getRarityColor(rarity) + XP_MULTIPLIER[rarity - 1] + "x" + ChatColor.WHITE + " experience. Does not stack if multiple players in the party have the skill.";
+		return "All players in your party gain " + DepthsUtils.getRarityColor(rarity) + XP_MULTIPLIER[rarity - 1] + "x" + ChatColor.WHITE + " experience. Does not stack if multiple players in the party have the skill. Additionally, your chances of finding higher rarity abilities are increased by " + DepthsUtils.getRarityColor(rarity) + RARITY_INCREASE[rarity - 1] + ChatColor.WHITE + "%.";
 	}
 
 	@Override

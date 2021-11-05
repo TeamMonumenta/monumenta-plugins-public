@@ -35,8 +35,8 @@ public class FireworkBlast extends DepthsAbility {
 	public static final String ABILITY_NAME = "Firework Blast";
 	private static final String ABILITY_METAKEY = "FireworkBlastMetakey";
 	private static final int COOLDOWN = 12 * 20;
-	private static final int[] DAMAGE = {16, 20, 24, 28, 32};
-	private static final int[] DAMAGE_CAP = {32, 40, 48, 56, 64};
+	private static final int[] DAMAGE = {16, 20, 24, 28, 32, 40};
+	private static final int[] DAMAGE_CAP = {32, 40, 48, 56, 64, 80};
 	private static final double DAMAGE_INCREASE_PER_BLOCK = 0.1;
 	private static final int RADIUS = 4;
 

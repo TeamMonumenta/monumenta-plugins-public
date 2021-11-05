@@ -17,7 +17,7 @@ public class DepthsToughness extends DepthsAbility {
 
 	public static final String ABILITY_NAME = "Toughness";
 	public static final String TOUGHNESS_MODIFIER_NAME = "ToughnessPercentHealthModifier";
-	public static final double[] PERCENT_MAX_HEALTH = {.10, .125, .15, .175, .20};
+	public static final double[] PERCENT_MAX_HEALTH = {.10, .125, .15, .175, .20, .25};
 
 	public DepthsToughness(Plugin plugin, Player player) {
 		super(plugin, player, ABILITY_NAME);

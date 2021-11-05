@@ -27,13 +27,13 @@ import net.md_5.bungee.api.ChatColor;
 public class HowlingWinds extends DepthsAbility {
 
 	public static final String ABILITY_NAME = "Howling Winds";
-	public static final double[] DAMAGE = {1.0, 1.25, 1.5, 1.75, 2.0};
+	public static final double[] DAMAGE = {1.0, 1.25, 1.5, 1.75, 2.0, 2.5};
 	public static final int COOLDOWN = 25 * 20;
 	public static final int DAMAGE_RADIUS = 4;
 	public static final int PULL_RADIUS = 16;
 	public static final int DISTANCE = 6;
 	public static final int DAMAGE_INTERVAL = 20;
-	public static final int[] PULL_INTERVAL = {20, 18, 16, 14, 12};
+	public static final int[] PULL_INTERVAL = {20, 18, 16, 14, 12, 8};
 	public static final int DURATION_TICKS = 6 * 20;
 	public static final double PULL_VELOCITY = 0.6;
 	public static final double BASE_RATIO = 0.15;

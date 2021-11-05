@@ -28,6 +28,7 @@ import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
+import com.playmonumenta.plugins.depths.abilities.aspects.BowAspect;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.scriptedquests.utils.MetadataUtils;
 
@@ -38,9 +39,9 @@ public class DepthsVolley extends DepthsAbility {
 	public static final String ABILITY_NAME = "Volley";
 	private static final String VOLLEY_METAKEY = "VolleyArrowMetakey";
 	private static final String VOLLEY_HIT_METAKEY = "VolleyMobHitTickMetakey";
-	private static final int COOLDOWN = 15 * 20;
-	public static final int[] ARROWS = {7, 10, 12, 15, 18};
-	private static final double[] DAMAGE_MULTIPLIER = {1.6, 1.7, 1.8, 1.9, 2.0};
+	private static final int COOLDOWN = 12 * 20;
+	public static final int[] ARROWS = {7, 10, 12, 15, 18, 24};
+	private static final double[] DAMAGE_MULTIPLIER = {1.6, 1.7, 1.8, 1.9, 2.0, 2.2};
 
 	public DepthsVolley(Plugin plugin, Player player) {
 		super(plugin, player, ABILITY_NAME);
@@ -60,6 +61,7 @@ public class DepthsVolley extends DepthsAbility {
 		}
 
 		// Start the cooldown first so we don't cause an infinite loop of Volleys
+		mInfo.mCooldown = (int) (COOLDOWN * BowAspect.getCooldownReduction(mPlayer));
 		putOnCooldown();
 		World world = mPlayer.getWorld();
 		world.playSound(mPlayer.getLocation(), Sound.ENTITY_ARROW_SHOOT, 1, 0.75f);

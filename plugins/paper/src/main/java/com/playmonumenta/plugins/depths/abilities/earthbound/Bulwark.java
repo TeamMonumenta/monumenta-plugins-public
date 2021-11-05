@@ -21,7 +21,7 @@ import net.md_5.bungee.api.ChatColor;
 public class Bulwark extends DepthsAbility {
 
 	public static final String ABILITY_NAME = "Bulwark";
-	public static final int[] COOLDOWN = {16, 14, 12, 10, 8}; //seconds
+	public static final int[] COOLDOWN = {18, 16, 14, 12, 10, 7}; //seconds
 
 	public Bulwark(Plugin plugin, Player player) {
 		super(plugin, player, ABILITY_NAME);

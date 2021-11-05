@@ -22,7 +22,7 @@ import net.md_5.bungee.api.ChatColor;
 public class Brutalize extends DepthsAbility {
 
 	public static final String ABILITY_NAME = "Brutalize";
-	public static final double[] DAMAGE = {0.09, 0.12, 0.15, 0.18, 0.21};
+	public static final double[] DAMAGE = {0.09, 0.12, 0.15, 0.18, 0.21, 0.27};
 	public static final float RADIUS = 2.0f;
 
 	public Brutalize(Plugin plugin, Player player) {

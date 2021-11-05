@@ -27,6 +27,7 @@ import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
+import com.playmonumenta.plugins.depths.abilities.aspects.BowAspect;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import com.playmonumenta.plugins.utils.EntityUtils;
 
@@ -39,8 +40,8 @@ public class DummyDecoy extends DepthsAbility {
 	public static final double DAMAGE_MULTIPLIER = 0.15;
 	public static final int COOLDOWN = 25 * 20;
 	public static final String DUMMY_NAME = "AlluringShadow";
-	public static final int[] HEALTH = {30, 35, 40, 45, 50};
-	public static final double[] STUN_SECONDS = {1.0, 1.25, 1.5, 1.75, 2.0};
+	public static final int[] HEALTH = {30, 35, 40, 45, 50, 60};
+	public static final double[] STUN_SECONDS = {1.0, 1.25, 1.5, 1.75, 2.0, 2.5};
 	public static final int MAX_TICKS = 4 * 20;
 	public static final int AGGRO_RADIUS = 8;
 	public static final int STUN_RADIUS = 4;
@@ -137,6 +138,7 @@ public class DummyDecoy extends DepthsAbility {
 		if (mPlayer.isSneaking()) {
 			arrow.remove();
 			mPlugin.mProjectileEffectTimers.removeEntity(arrow);
+			mInfo.mCooldown = (int) (COOLDOWN * BowAspect.getCooldownReduction(mPlayer));
 			putOnCooldown();
 			execute();
 		}

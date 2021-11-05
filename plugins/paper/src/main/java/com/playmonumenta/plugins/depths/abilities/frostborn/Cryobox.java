@@ -5,12 +5,12 @@ import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
+import org.bukkit.attribute.Attribute;
+import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.classes.ClassAbility;
@@ -18,7 +18,6 @@ import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
-import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.AbsorptionUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -30,14 +29,14 @@ import net.md_5.bungee.api.ChatColor;
 public class Cryobox extends DepthsAbility {
 
 	public static final String ABILITY_NAME = "Cryobox";
-	public static final int[] ABSORPTION = {1, 2, 3, 4, 5};
+	public static final int[] ABSORPTION_HEALTH = {8, 10, 12, 14, 16, 20};
 	public static final int COOLDOWN = 90 * 20;
-	private static final int TRIGGER_HEALTH = 6;
+	private static final double TRIGGER_HEALTH = 0.25;
 	private static final int KNOCKBACK_RADIUS = 4;
 	private static final int ELEVATE_RADIUS = 2;
 	private static final float KNOCKBACK_SPEED = 0.7f;
 	private static final int DURATION = 12 * 20;
-	private static final int ICE_DURATION = 20 * 20;
+	private static final int ICE_DURATION = 15 * 20;
 
 	public Cryobox(Plugin plugin, Player player) {
 		super(plugin, player, ABILITY_NAME);
@@ -91,10 +90,10 @@ public class Cryobox extends DepthsAbility {
 		double healthRemaining = mPlayer.getHealth() + AbsorptionUtils.getAbsorption(mPlayer) - EntityUtils.getRealFinalDamage(event);
 
 		// Health is less than 0 but does not penetrate the absorption shield
-		boolean dealDamageLater = healthRemaining < 0 && healthRemaining > -4 * (ABSORPTION[mRarity - 1] + 1);
+		boolean dealDamageLater = healthRemaining < 0 && healthRemaining > -(ABSORPTION_HEALTH[mRarity - 1]);
 
-
-		if (healthRemaining > TRIGGER_HEALTH) {
+		AttributeInstance maxHealth = mPlayer.getAttribute(Attribute.GENERIC_MAX_HEALTH);
+		if (healthRemaining > maxHealth.getValue() * TRIGGER_HEALTH) {
 			return;
 		} else if (dealDamageLater) {
 			// The player has taken fatal damage BUT will be saved by the absorption, so set damage to 0 and compensate later
@@ -119,8 +118,7 @@ public class Cryobox extends DepthsAbility {
 			mob.teleport(mobLoc);
 		}
 
-		mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF,
-		                                 new PotionEffect(PotionEffectType.ABSORPTION, DURATION, ABSORPTION[mRarity - 1], true, true));
+		AbsorptionUtils.addAbsorption(mPlayer, ABSORPTION_HEALTH[mRarity - 1], ABSORPTION_HEALTH[mRarity - 1], DURATION);
 		World world = mPlayer.getWorld();
 		world.spawnParticle(Particle.FIREWORKS_SPARK, center.clone().add(0, 1.15, 0), 150, 0.2, 0.35, 0.2, 0.5);
 		world.spawnParticle(Particle.SPELL_INSTANT, center.clone().add(0, 1.15, 0), 100, 0.2, 0.35, 0.2, 1);
@@ -152,7 +150,7 @@ public class Cryobox extends DepthsAbility {
 		};
 
 		for (int i = 0; i < locs.length; i++) {
-			DepthsUtils.spawnIceTerrain(locs[i], ICE_DURATION);
+			DepthsUtils.spawnIceTerrain(locs[i], ICE_DURATION, mPlayer);
 		}
 	}
 
@@ -160,7 +158,7 @@ public class Cryobox extends DepthsAbility {
 
 	@Override
 	public String getDescription(int rarity) {
-		return "When your health drops below " + TRIGGER_HEALTH / 2 + " hearts, gain Absorption " + DepthsUtils.getRarityColor(rarity) + (ABSORPTION[rarity - 1] + 1) + ChatColor.WHITE + " for " + DURATION / 20 + " seconds, knock enemies away, and encase yourself in a cage of ice for " + ICE_DURATION / 20 + " seconds. Cooldown: " + COOLDOWN / 20 + "s.";
+		return "When your health drops below " + (int) DepthsUtils.roundPercent(TRIGGER_HEALTH) + "%, gain " + DepthsUtils.getRarityColor(rarity) + (ABSORPTION_HEALTH[rarity - 1] / 2) + ChatColor.WHITE + " absorption hearts for " + DURATION / 20 + " seconds, knock enemies away, and encase yourself in a cage of ice for " + ICE_DURATION / 20 + " seconds. Cooldown: " + COOLDOWN / 20 + "s.";
 	}
 
 	@Override

@@ -17,7 +17,7 @@ import net.md_5.bungee.api.ChatColor;
 public class ProjectileMastery extends DepthsAbility {
 
 	public static final String ABILITY_NAME = "Projectile Mastery";
-	public static final double[] SPELL_MOD = {1.1, 1.125, 1.15, 1.175, 1.2};
+	public static final double[] SPELL_MOD = {1.1, 1.125, 1.15, 1.175, 1.2, 1.25};
 
 	public ProjectileMastery(Plugin plugin, Player player) {
 		super(plugin, player, ABILITY_NAME);

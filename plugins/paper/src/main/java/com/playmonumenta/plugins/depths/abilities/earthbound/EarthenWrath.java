@@ -37,8 +37,8 @@ import net.md_5.bungee.api.ChatColor;
 public class EarthenWrath extends DepthsAbility {
 
 	public static final String ABILITY_NAME = "Earthen Wrath";
-	private static final double[] PERCENT_DAMAGE_REFLECTED = {0.8, 1.0, 1.2, 1.4, 1.6};
-	private static final double[] PERCENT_DAMAGE_REDUCTION = {0.35, 0.375, 0.4, 0.425, 0.45};
+	private static final double[] PERCENT_DAMAGE_REFLECTED = {0.8, 1.0, 1.2, 1.4, 1.6, 2.0};
+	private static final double[] PERCENT_DAMAGE_REDUCTION = {0.35, 0.375, 0.4, 0.425, 0.45, 0.5};
 	private static final int COOLDOWN = 20 * 30;
 	private static final int DURATION = 6 * 20;
 	private static final int DAMAGE_RADIUS = 6;

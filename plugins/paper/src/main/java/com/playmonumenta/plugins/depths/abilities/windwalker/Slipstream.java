@@ -30,7 +30,7 @@ import net.md_5.bungee.api.ChatColor;
 public class Slipstream extends DepthsAbility {
 
 	public static final String ABILITY_NAME = "Slipstream";
-	public static final int[] COOLDOWN = {16, 14, 12, 10, 8};
+	public static final int[] COOLDOWN = {16, 14, 12, 10, 8, 4};
 	private static final int DURATION = 8 * 20;
 	private static final double SPEED_AMPLIFIER = 0.2;
 	private static final String PERCENT_SPEED_EFFECT_NAME = "SlipstreamSpeedEffect";

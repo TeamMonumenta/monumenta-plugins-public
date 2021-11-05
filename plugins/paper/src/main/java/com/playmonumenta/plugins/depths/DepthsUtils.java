@@ -16,9 +16,11 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Firework;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
+import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.FireworkMeta;
@@ -28,9 +30,12 @@ import org.bukkit.scheduler.BukkitRunnable;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.depths.DepthsRoomType.DepthsRewardType;
 import com.playmonumenta.plugins.depths.abilities.aspects.AxeAspect;
+import com.playmonumenta.plugins.depths.abilities.aspects.BowAspect;
 import com.playmonumenta.plugins.depths.abilities.aspects.ScytheAspect;
 import com.playmonumenta.plugins.depths.abilities.aspects.SwordAspect;
 import com.playmonumenta.plugins.depths.abilities.aspects.WandAspect;
+import com.playmonumenta.plugins.depths.abilities.frostborn.Permafrost;
+import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
@@ -51,6 +56,8 @@ public class DepthsUtils {
 	public static final int FLAMECALLER = 0xf04e21;
 	public static final int WINDWALKER = 0xc0dea9;
 	public static final int SHADOWS = 0x7948af;
+
+	public static final int LEVELSIX = 0x703663;
 
 	public static final DepthsTree[] TREES = {
 			DepthsTree.SUNLIGHT,
@@ -94,6 +101,8 @@ public class DepthsUtils {
 
 	//List of locations where ice is currently active
 	public static Map<Location, BlockData> iceActive = new HashMap<>();
+	//List of locations where ice is spawned by a barrier
+	public static Map<Location, Boolean> iceBarrier = new HashMap<>();
 
 	public static Component getLoreForItem(DepthsTree tree, int rarity) {
 		TextComponent loreLine = Component.text("");
@@ -114,7 +123,11 @@ public class DepthsUtils {
 		}
 
 		loreLine = loreLine.append(Component.text(" : ", NamedTextColor.DARK_GRAY));
-		loreLine = loreLine.append(Component.text(getRarityColor(rarity) + getRarityText(rarity)));
+		TextComponent rarityText = Component.text(getRarityColor(rarity) + getRarityText(rarity));
+		if (rarity == 6) {
+			rarityText = Component.text(ChatColor.MAGIC + getRarityText(rarity), TextColor.color(LEVELSIX));
+		}
+		loreLine = loreLine.append(rarityText);
 
 		return loreLine;
 	}
@@ -125,7 +138,8 @@ public class DepthsUtils {
 				"Uncommon",
 				"Rare",
 				"Epic",
-				"Legendary"
+				"Legendary",
+				"XXXXXX"
 		};
 		return rarities[rarity - 1];
 	}
@@ -136,7 +150,8 @@ public class DepthsUtils {
 				ChatColor.GREEN,
 				ChatColor.BLUE,
 				ChatColor.LIGHT_PURPLE,
-				ChatColor.GOLD
+				ChatColor.GOLD,
+				ChatColor.DARK_PURPLE
 		};
 		return colors[rarity - 1];
 	}
@@ -228,15 +243,26 @@ public class DepthsUtils {
 		return NamedTextColor.WHITE;
 	}
 
-	public static void spawnIceTerrain(Location l, int ticks) {
+	public static void spawnIceTerrain(Location l, int ticks, Player p) {
+		spawnIceTerrain(l, ticks, p, Boolean.FALSE);
+	}
+
+	public static void spawnIceTerrain(Location l, int ticks, Player p, Boolean isBarrier) {
 		//Check if the block is valid, or if the location is already active in the system
 		if (mIgnoredMats.contains(l.getWorld().getBlockAt(l).getType()) || iceActive.get(l) != null) {
 			return;
 		}
 
+		//Check for permafrost to increase ice duration
+		int playerPermLevel = DepthsManager.getInstance().getPlayerLevelInAbility(Permafrost.ABILITY_NAME, p);
+		if (playerPermLevel > 0) {
+			ticks += (Permafrost.ICE_BONUS_DURATION_SECONDS[playerPermLevel - 1] * 20);
+		}
+
 		BlockData bd = l.getWorld().getBlockAt(l).getBlockData();
 		l.getWorld().getBlockAt(l).setType(ICE_MATERIAL);
 		iceActive.put(l, bd);
+		iceBarrier.put(l, isBarrier);
 
 		new BukkitRunnable() {
 			@Override
@@ -247,6 +273,7 @@ public class DepthsUtils {
 						b.setBlockData(bd);
 					}
 					iceActive.remove(l);
+					iceBarrier.remove(l);
 				}
 			}
 		}.runTaskLater(Plugin.getInstance(), ticks);
@@ -297,7 +324,7 @@ public class DepthsUtils {
 	}
 
 	public static boolean isWeaponAspectAbility(String s) {
-		return s.equals(AxeAspect.ABILITY_NAME) || s.equals(WandAspect.ABILITY_NAME) || s.equals(ScytheAspect.ABILITY_NAME) || s.equals(SwordAspect.ABILITY_NAME);
+		return s.equals(AxeAspect.ABILITY_NAME) || s.equals(WandAspect.ABILITY_NAME) || s.equals(ScytheAspect.ABILITY_NAME) || s.equals(SwordAspect.ABILITY_NAME) || s.equals(BowAspect.ABILITY_NAME);
 	}
 
 	/**
@@ -355,6 +382,8 @@ public class DepthsUtils {
 			return DepthsRewardType.UPGRADE;
 		} else if (roomType == DepthsRoomType.UPGRADE_ELITE) {
 			return DepthsRewardType.UPGRADE_ELITE;
+		} else if (roomType == DepthsRoomType.TWISTED) {
+			return DepthsRewardType.TWISTED;
 		}
 		return null;
 	}
@@ -366,6 +395,8 @@ public class DepthsUtils {
 			return "Upgrade";
 		} else if (roomType == DepthsRoomType.TREASURE || roomType == DepthsRoomType.TREASURE_ELITE) {
 			return "Treasure";
+		} else if (roomType == DepthsRoomType.TWISTED) {
+			return ChatColor.MAGIC + "XXXXXX" + ChatColor.LIGHT_PURPLE;
 		}
 		return "";
 	}
@@ -380,18 +411,36 @@ public class DepthsUtils {
 			return "Utility";
 		} else if (roomType == DepthsRoomType.BOSS) {
 			return "Boss";
+		} else if (roomType == DepthsRoomType.TWISTED) {
+			return ChatColor.MAGIC + "XXXXXX" + ChatColor.LIGHT_PURPLE;
 		}
 		return "";
 	}
 
-	public static void iceExposedBlock(Block b, int iceTicks) {
+	public static void iceExposedBlock(Block b, int iceTicks, Player p) {
 		//Check above block first and see if it is exposed to air
 		if (b.getRelative(BlockFace.UP).isSolid() && !(b.getRelative(BlockFace.UP).getRelative(BlockFace.UP).isSolid() || b.getRelative(BlockFace.UP).getRelative(BlockFace.UP).getType() == Material.WATER)) {
-			DepthsUtils.spawnIceTerrain(b.getRelative(BlockFace.UP).getLocation(), iceTicks);
+			DepthsUtils.spawnIceTerrain(b.getRelative(BlockFace.UP).getLocation(), iceTicks, p);
 		} else if (b.isSolid() || b.getType() == Material.WATER) {
-			DepthsUtils.spawnIceTerrain(b.getLocation(), iceTicks);
+			DepthsUtils.spawnIceTerrain(b.getLocation(), iceTicks, p);
 		} else if (b.getRelative(BlockFace.DOWN).isSolid() || b.getRelative(BlockFace.DOWN).getType() == Material.WATER) {
-			DepthsUtils.spawnIceTerrain(b.getRelative(BlockFace.DOWN).getLocation(), iceTicks);
+			DepthsUtils.spawnIceTerrain(b.getRelative(BlockFace.DOWN).getLocation(), iceTicks, p);
 		}
+	}
+
+	public static void explodeEvent(EntityExplodeEvent event) {
+		// Check location of blocks to see if they were ice barrier placed
+		if (event.getEntity() == null || event.getEntity().isDead() || !(event.getEntity() instanceof LivingEntity)) {
+			return;
+		}
+		List<Block> blocks = event.blockList();
+		for (Block b : blocks) {
+			if (iceBarrier.get(b.getLocation()) == Boolean.TRUE) {
+				// Apply ice barrier slow passive effect to the mob
+				EntityUtils.applySlow(Plugin.getInstance(), 2 * 20, .5, (LivingEntity) event.getEntity());
+				return;
+			}
+		}
+
 	}
 }

@@ -40,7 +40,7 @@ public class ChaosDagger extends DepthsAbility {
 
 	public static final String ABILITY_NAME = "Chaos Dagger";
 	public static final int COOLDOWN = 22 * 20;
-	public static final double[] DAMAGE = {2.0, 2.25, 2.5, 2.75, 3.0};
+	public static final double[] DAMAGE = {2.0, 2.25, 2.5, 2.75, 3.0, 3.5};
 	private static final double VELOCITY = 0.5;
 	public static final int STUN_DURATION = 3 * 20;
 	public static final int DAMAGE_DURATION = 5 * 20;

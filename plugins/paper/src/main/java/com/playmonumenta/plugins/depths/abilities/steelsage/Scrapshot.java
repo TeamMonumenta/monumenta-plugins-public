@@ -33,7 +33,7 @@ import net.md_5.bungee.api.ChatColor;
 public class Scrapshot extends DepthsAbility {
 	public static final String ABILITY_NAME = "Scrapshot";
 	private static final int COOLDOWN = 10 * 20;
-	private static final double[] DAMAGE = {25, 31, 37, 43, 50};
+	private static final double[] DAMAGE = {30, 37, 45, 52, 60, 75};
 	private static final double[] DISTANCE_MULTIPLIER = {1, 1, 1, 1, 0.9, 0.8, 0.7, 0.6};
 	private static final double VELOCITY = 1;
 	private static final int RANGE = 8;

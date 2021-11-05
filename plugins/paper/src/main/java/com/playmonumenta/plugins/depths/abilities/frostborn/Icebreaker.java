@@ -25,8 +25,8 @@ import net.md_5.bungee.api.ChatColor;
 public class Icebreaker extends DepthsAbility {
 
 	public static final String ABILITY_NAME = "Icebreaker";
-	public static final double[] ICE_DAMAGE = {1.24, 1.28, 1.32, 1.36, 1.40};
-	public static final double[] EFFECT_DAMAGE = {1.18, 1.21, 1.24, 1.27, 1.30};
+	public static final double[] ICE_DAMAGE = {1.24, 1.28, 1.32, 1.36, 1.40, 1.48};
+	public static final double[] EFFECT_DAMAGE = {1.12, 1.14, 1.16, 1.18, 1.20, 1.24};
 
 	public Icebreaker(Plugin plugin, Player player) {
 		super(plugin, player, ABILITY_NAME);

@@ -26,6 +26,7 @@ import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
+import com.playmonumenta.plugins.depths.abilities.aspects.BowAspect;
 import com.playmonumenta.plugins.utils.EntityUtils;
 
 import net.md_5.bungee.api.ChatColor;
@@ -35,7 +36,7 @@ public class Pyroblast extends DepthsAbility {
 	public static final String ABILITY_NAME = "Pyroblast";
 
 	public static final int COOLDOWN = 12 * 20;
-	public static final int[] DAMAGE = {20, 25, 30, 35, 40};
+	public static final int[] DAMAGE = {20, 25, 30, 35, 40, 50};
 	private static final double RADIUS = 4.0;
 	private static final int DURATION = 4 * 20;
 	public static final String META_DATA_TAG = "PyroblastArrow";
@@ -118,6 +119,7 @@ public class Pyroblast extends DepthsAbility {
 
 		if (mPlayer.isSneaking()) {
 			arrow.remove();
+			mInfo.mCooldown = (int) (COOLDOWN * BowAspect.getCooldownReduction(mPlayer));
 			putOnCooldown();
 			execute();
 		}

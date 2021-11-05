@@ -24,7 +24,7 @@ import net.md_5.bungee.api.ChatColor;
 public class Detonation extends DepthsAbility {
 
 	public static final String ABILITY_NAME = "Detonation";
-	public static final int[] DAMAGE = {5, 6, 7, 8, 9};
+	public static final int[] DAMAGE = {4, 5, 6, 7, 8, 10};
 	public static final int DEATH_RADIUS = 8;
 	public static final int DAMAGE_RADIUS = 2;
 

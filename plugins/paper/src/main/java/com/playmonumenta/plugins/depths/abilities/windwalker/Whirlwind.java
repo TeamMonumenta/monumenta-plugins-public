@@ -26,8 +26,8 @@ public class Whirlwind extends DepthsAbility {
 
 	public static final String ABILITY_NAME = "Whirlwind";
 	private static final int RADIUS = 3;
-	private static final double[] KNOCKBACK_SPEED = {0.8, 1.0, 1.2, 1.4, 1.6};
-	private static final double[] SPEED = {0.1, 0.125, 0.15, 0.175, 0.2};
+	private static final double[] KNOCKBACK_SPEED = {0.8, 1.0, 1.2, 1.4, 1.6, 2.0};
+	private static final double[] SPEED = {0.1, 0.125, 0.15, 0.175, 0.2, 0.3};
 	private static final int SPEED_DURATION = 6 * 20;
 	private static final String SPEED_EFFECT_NAME = "WhirlwindSpeedEffect";
 

@@ -33,12 +33,12 @@ import net.md_5.bungee.api.ChatColor;
 public class DepthsFrostNova extends DepthsAbility {
 
 	public static final String ABILITY_NAME = "Frost Nova";
-	public static final int[] DAMAGE = {6, 8, 10, 12, 14};
+	public static final int[] DAMAGE = {6, 8, 10, 12, 14, 18};
 	public static final int SIZE = 6;
-	public static final double[] SLOW_MULTIPLIER = {0.25, 0.3, 0.35, 0.4, 0.45};
+	public static final double[] SLOW_MULTIPLIER = {0.25, 0.3, 0.35, 0.4, 0.45, 0.55};
 	public static final int DURATION_TICKS = 4 * 20;
 	public static final int COOLDOWN_TICKS = 18 * 20;
-	public static final int ICE_TICKS = 8 * 20;
+	public static final int ICE_TICKS = 6 * 20;
 
 	public DepthsFrostNova(Plugin plugin, Player player) {
 		super(plugin, player, ABILITY_NAME);
@@ -97,7 +97,7 @@ public class DepthsFrostNova extends DepthsAbility {
 		blocksToIce.add(block.getRelative(BlockFace.SOUTH).getRelative(BlockFace.EAST).getRelative(BlockFace.EAST));
 
 		for (Block b : blocksToIce) {
-			DepthsUtils.iceExposedBlock(b, ICE_TICKS);
+			DepthsUtils.iceExposedBlock(b, ICE_TICKS, mPlayer);
 		}
 
 		World world = mPlayer.getWorld();

@@ -25,7 +25,7 @@ import net.md_5.bungee.api.ChatColor;
 public class Avalanche extends DepthsAbility {
 
 	public static final String ABILITY_NAME = "Avalanche";
-	public static final int[] DAMAGE = {32, 39, 46, 53, 60};
+	public static final int[] DAMAGE = {30, 35, 40, 45, 50, 60};
 	public static final int COOLDOWN_TICKS = 20 * 20;
 	public static final int SLOW_DURATION = 3 * 20;
 	public static final double SLOW_MODIFIER = 0.99;

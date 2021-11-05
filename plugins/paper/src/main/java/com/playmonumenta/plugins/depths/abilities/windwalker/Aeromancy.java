@@ -19,8 +19,8 @@ import net.md_5.bungee.api.ChatColor;
 public class Aeromancy extends DepthsAbility {
 
 	public static final String ABILITY_NAME = "Aeromancy";
-	public static final double[] PLAYER_DAMAGE = {1.12, 1.15, 1.18, 1.21, 1.24};
-	public static final double[] MOB_DAMAGE = {1.056, 1.07, 1.084, 1.098, 1.112};
+	public static final double[] PLAYER_DAMAGE = {1.12, 1.15, 1.18, 1.21, 1.24, 1.3};
+	public static final double[] MOB_DAMAGE = {1.056, 1.07, 1.084, 1.098, 1.112, 1.156};
 
 	public Aeromancy(Plugin plugin, Player player) {
 		super(plugin, player, ABILITY_NAME);

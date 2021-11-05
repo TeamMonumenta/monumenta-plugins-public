@@ -20,7 +20,8 @@ import net.md_5.bungee.api.ChatColor;
 public class Permafrost extends DepthsAbility {
 
 	public static final String ABILITY_NAME = "Permafrost";
-	public static final int[] ICE_TICKS = {8 * 20, 11 * 20, 14 * 20, 17 * 20, 20 * 20};
+	public static final int[] ICE_TICKS = {8 * 20, 11 * 20, 14 * 20, 17 * 20, 20 * 20, 26 * 20};
+	public static final int[] ICE_BONUS_DURATION_SECONDS = {2, 3, 4, 5, 6, 8};
 
 	public static String tree;
 
@@ -37,7 +38,7 @@ public class Permafrost extends DepthsAbility {
 			ArrayList<Block> blocksToIce = new ArrayList<>();
 			Block block = event.getBlock().getRelative(BlockFace.DOWN);
 			if (block.isSolid() || block.getType() == Material.WATER) {
-				DepthsUtils.spawnIceTerrain(block.getLocation(), ICE_TICKS[mRarity - 1]);
+				DepthsUtils.spawnIceTerrain(block.getLocation(), ICE_TICKS[mRarity - 1], mPlayer);
 			}
 			blocksToIce.add(block.getRelative(BlockFace.NORTH));
 			blocksToIce.add(block.getRelative(BlockFace.EAST));
@@ -53,7 +54,7 @@ public class Permafrost extends DepthsAbility {
 			blocksToIce.add(block.getRelative(BlockFace.SOUTH).getRelative(BlockFace.EAST));
 
 			for (Block b : blocksToIce) {
-				DepthsUtils.iceExposedBlock(b, ICE_TICKS[mRarity - 1]);
+				DepthsUtils.iceExposedBlock(b, ICE_TICKS[mRarity - 1], mPlayer);
 			}
 		}
 		return true;
@@ -61,7 +62,7 @@ public class Permafrost extends DepthsAbility {
 
 	@Override
 	public String getDescription(int rarity) {
-		return "Breaking a spawner spawns ice around it that lasts for " + DepthsUtils.getRarityColor(rarity) + ICE_TICKS[rarity - 1] / 20 + ChatColor.WHITE + " seconds.";
+		return "Breaking a spawner spawns ice around it that lasts for " + DepthsUtils.getRarityColor(rarity) + ICE_TICKS[rarity - 1] / 20 + ChatColor.WHITE + " seconds. All ice you place with abilities lasts " + DepthsUtils.getRarityColor(rarity) + ICE_BONUS_DURATION_SECONDS[rarity - 1] + ChatColor.WHITE + " seconds longer.";
 	}
 
 	@Override

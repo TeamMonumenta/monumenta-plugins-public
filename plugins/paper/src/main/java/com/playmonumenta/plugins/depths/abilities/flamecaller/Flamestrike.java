@@ -29,7 +29,7 @@ import net.md_5.bungee.api.ChatColor;
 public class Flamestrike extends DepthsAbility {
 	public static final String ABILITY_NAME = "Flamestrike";
 	public static final int COOLDOWN = 10 * 20;
-	public static final double[] DAMAGE = {14, 17.5, 21, 24.5, 28};
+	public static final double[] DAMAGE = {14, 17.5, 21, 24.5, 28, 35};
 	public static final int SIZE = 6;
 	public static final double DOT_ANGLE = 1d / 3;
 	public static final int FIRE_TICKS = 4 * 20;

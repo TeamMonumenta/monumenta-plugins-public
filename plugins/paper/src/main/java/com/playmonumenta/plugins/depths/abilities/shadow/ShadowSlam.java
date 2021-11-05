@@ -27,7 +27,7 @@ import net.md_5.bungee.api.ChatColor;
 public class ShadowSlam extends DepthsAbility {
 
 	public static final String ABILITY_NAME = "Shadow Slam";
-	public static final double[] DAMAGE = {2.0, 2.5, 3.0, 3.5, 4.0};
+	public static final double[] DAMAGE = {2.5, 3.0, 3.5, 4.0, 4.5, 5.5};
 	public static final int SIZE = 3;
 	private static final String SLAM_ONCE_THIS_TICK_METAKEY = "MeteorSlamTickSlammed";
 	public static final int REDUCED_THRESHOLD = 128; //No reduced damage for depths

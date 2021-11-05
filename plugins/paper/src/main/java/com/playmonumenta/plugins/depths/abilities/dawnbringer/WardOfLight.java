@@ -20,7 +20,6 @@ import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
-import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.utils.ParticleUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 
@@ -29,12 +28,10 @@ import net.md_5.bungee.api.ChatColor;
 public class WardOfLight extends DepthsAbility {
 
 	public static final String ABILITY_NAME = "Ward of Light";
-	public static final double[] HEAL = {0.32, 0.4, 0.48, 0.56, 0.64};
+	public static final double[] HEAL = {0.32, 0.4, 0.48, 0.56, 0.64, 0.8};
 	private static final int HEALING_RADIUS = 12;
 	private static final double HEALING_DOT_ANGLE = 0.33;
 	private static final int COOLDOWN = 12 * 20;
-	private static final double PERCENT_SPEED = 0.15;
-	private static final int DURATION = 4 * 20;
 
 	public WardOfLight(Plugin plugin, Player player) {
 		super(plugin, player, ABILITY_NAME);
@@ -70,7 +67,6 @@ public class WardOfLight extends DepthsAbility {
 				}
 
 				Location loc = p.getLocation();
-				mPlugin.mEffectManager.addEffect(p, ABILITY_NAME, new PercentSpeed(DURATION, PERCENT_SPEED, ABILITY_NAME));
 				world.spawnParticle(Particle.HEART, loc.add(0, 1, 0), 10, 0.7, 0.7, 0.7, 0.001);
 				world.spawnParticle(Particle.END_ROD, loc.add(0, 1, 0), 10, 0.7, 0.7, 0.7, 0.001);
 				mPlayer.getWorld().playSound(loc, Sound.BLOCK_ENCHANTMENT_TABLE_USE, 2.0f, 1.6f);
@@ -97,7 +93,7 @@ public class WardOfLight extends DepthsAbility {
 
 	@Override
 	public String getDescription(int rarity) {
-		return "Right click while holding a weapon and not sneaking to heal nearby players within " + HEALING_RADIUS + " blocks in front of you for " + DepthsUtils.getRarityColor(rarity) + DepthsUtils.roundPercent(HEAL[rarity - 1]) + "%" + ChatColor.WHITE + " of their max health and grant them " + DepthsUtils.roundPercent(PERCENT_SPEED) + "% speed for " + DURATION / 20 + " seconds. Cooldown: " + COOLDOWN / 20 + "s.";
+		return "Right click while holding a weapon and not sneaking to heal nearby players within " + HEALING_RADIUS + " blocks in front of you for " + DepthsUtils.getRarityColor(rarity) + DepthsUtils.roundPercent(HEAL[rarity - 1]) + "%" + ChatColor.WHITE + " of their max health. Cooldown: " + COOLDOWN / 20 + "s.";
 	}
 
 	@Override

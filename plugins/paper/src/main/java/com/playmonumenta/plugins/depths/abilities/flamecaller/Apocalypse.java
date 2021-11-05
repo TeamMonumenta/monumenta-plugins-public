@@ -31,12 +31,11 @@ import net.md_5.bungee.api.ChatColor;
 
 public class Apocalypse extends DepthsAbility {
 	public static final String ABILITY_NAME = "Apocalypse";
-	public static final int COOLDOWN = 90 * 20;
-	private static final int TRIGGER_HEALTH = 6;
-	public static final int[] DAMAGE = {40, 50, 60, 70, 80};
+	public static final int COOLDOWN = 75 * 20;
+	private static final double TRIGGER_HEALTH = 0.25;
+	public static final int[] DAMAGE = {40, 50, 60, 70, 80, 100};
 	public static final int RADIUS = 5;
 	public static final double HEALING = 0.1; //percent health per kill
-	public static final int MAX_KILLS = 5;
 
 	public Apocalypse(Plugin plugin, Player player) {
 		super(plugin, player, ABILITY_NAME);
@@ -88,7 +87,8 @@ public class Apocalypse extends DepthsAbility {
 		// Calculate whether this effect should not be run based on player health.
 		double healthRemaining = mPlayer.getHealth() + AbsorptionUtils.getAbsorption(mPlayer) - EntityUtils.getRealFinalDamage(event);
 
-		if (healthRemaining > TRIGGER_HEALTH) {
+		AttributeInstance maxHealth = mPlayer.getAttribute(Attribute.GENERIC_MAX_HEALTH);
+		if (healthRemaining > maxHealth.getValue() * TRIGGER_HEALTH) {
 			return;
 		}
 
@@ -103,9 +103,7 @@ public class Apocalypse extends DepthsAbility {
 				count++;
 			}
 		}
-		count = Math.min(count, MAX_KILLS);
 
-		AttributeInstance maxHealth = mPlayer.getAttribute(Attribute.GENERIC_MAX_HEALTH);
 		if (maxHealth != null) {
 			PlayerUtils.healPlayer(mPlayer, maxHealth.getValue() * count * HEALING);
 		}
@@ -123,7 +121,7 @@ public class Apocalypse extends DepthsAbility {
 
 	@Override
 	public String getDescription(int rarity) {
-		return "When your health drops below " + TRIGGER_HEALTH / 2 + " hearts, deal " + DepthsUtils.getRarityColor(rarity) + DAMAGE[rarity - 1] + ChatColor.WHITE + " damage in a " + RADIUS + " block radius. For each mob that is killed, up to " + MAX_KILLS + ", heal " + (int) DepthsUtils.roundPercent(HEALING) + "% of your max health. Cooldown: " + COOLDOWN / 20 + "s.";
+		return "When your health drops below " + (int) DepthsUtils.roundPercent(TRIGGER_HEALTH) + "%, deal " + DepthsUtils.getRarityColor(rarity) + DAMAGE[rarity - 1] + ChatColor.WHITE + " damage in a " + RADIUS + " block radius. For each mob that is killed, heal " + (int) DepthsUtils.roundPercent(HEALING) + "% of your max health. Cooldown: " + COOLDOWN / 20 + "s.";
 	}
 
 	@Override
