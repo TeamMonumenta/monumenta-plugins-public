@@ -856,6 +856,7 @@ public class DepthsManager {
 		ArrayList<DepthsRoomType> values = new ArrayList<>();
 		values.addAll(Arrays.asList(DepthsRoomType.values()));
 		values.remove(DepthsRoomType.BOSS);
+		values.remove(DepthsRoomType.TWISTED);
 		//if the party has not selected any abilities yet, do not let them get an upgrade reward!
 		if (!party.mHasAtLeastOneAbility) {
 			values.remove(DepthsRoomType.UPGRADE);
