@@ -259,7 +259,7 @@ public class ChessBoard {
 		}
 		for (int move: KING_MOVES_RIGHT) {
 			canMove = canMoveToWithRightBorder(piece, piece.mBoardLoc + move);
-			if (canMove == 0 && !squareUnderAttack(piece.mTeam, piece.mBoardLoc + move)) {
+			if (canMove >= 0 && !squareUnderAttack(piece.mTeam, piece.mBoardLoc + move)) {
 				list.add(piece.mBoardLoc + move);
 			}
 		}
@@ -277,7 +277,7 @@ public class ChessBoard {
 					}
 
 					if (canCast) {
-						list.add(57);
+						list.add(58);
 					}
 				}
 
@@ -296,14 +296,14 @@ public class ChessBoard {
 				if (mBlackCastlingShort) {
 					boolean canCast = true;
 					//checking positions 1 - 2 - 3
-					for (int i = 1; i < 4; i++) {
+					for (int i = 2; i < 3; i++) {
 						if (squareUnderAttack(piece.mTeam, i) || canMoveTo(piece, i) != 0) {
 							canCast = false;
 							break;
 						}
 					}
 					if (canCast) {
-						list.add(1);
+						list.add(2);
 					}
 
 				}
@@ -563,17 +563,17 @@ public class ChessBoard {
 			if (startPiece.mType == ChessPieceType.KING) {
 				if (startPiece.mTeam == ChessTeam.WHITE) {
 
-					if (endLocation == 57 && mWhiteCastlingLong) {
+					if (endLocation == 58 && mWhiteCastlingLong) {
 						//at position 56 should be a tower
 						ChessPiece rook = mBoard[56];
-						rook.mBoardLoc = 58;
+						rook.mBoardLoc = 59;
 						mBoard[56] = null;
-						mBoard[58] = rook;
+						mBoard[59] = rook;
 
 						new BukkitRunnable() {
 							@Override
 							public void run() {
-								ChessEvent chessEvent = new MovePieceChessEvent(INSTANCE, mWhitePlayer, mBlackPlayer, 56, 58);
+								ChessEvent chessEvent = new MovePieceChessEvent(INSTANCE, mWhitePlayer, mBlackPlayer, 56, 59);
 								Bukkit.getPluginManager().callEvent(chessEvent);
 							}
 						}.runTaskLater(Plugin.getInstance(), 1);
@@ -598,17 +598,17 @@ public class ChessBoard {
 					mWhiteCastlingLong = false;
 					mWhiteCastlingShort = false;
 				} else {
-					if (endLocation == 1 && mBlackCastlingLong) {
+					if (endLocation == 2 && mBlackCastlingLong) {
 						//at position 0 should be a tower
 						ChessPiece rook = mBoard[0];
-						rook.mBoardLoc = 2;
+						rook.mBoardLoc = 3;
 						mBoard[0] = null;
-						mBoard[2] = rook;
+						mBoard[3] = rook;
 
 						new BukkitRunnable() {
 							@Override
 							public void run() {
-								ChessEvent chessEvent = new MovePieceChessEvent(INSTANCE, mWhitePlayer, mBlackPlayer, 0, 2);
+								ChessEvent chessEvent = new MovePieceChessEvent(INSTANCE, mWhitePlayer, mBlackPlayer, 0, 3);
 								Bukkit.getPluginManager().callEvent(chessEvent);
 							}
 						}.runTaskLater(Plugin.getInstance(), 1);
@@ -819,6 +819,7 @@ public class ChessBoard {
 			} else {
 				if (count != 0) {
 					fen += count;
+					count = 0;
 				}
 				ChessPiece piece = mBoard[pos];
 				char charPiece = ' ';

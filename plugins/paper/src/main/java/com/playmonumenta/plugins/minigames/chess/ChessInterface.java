@@ -407,6 +407,12 @@ public class ChessInterface {
 		}
 	}
 
+	public void removeRunnable() {
+		if (mParticleRunnable != null) {
+			mParticleRunnable.cancel();
+		}
+	}
+
 	public void refresh() {
 		for (int i = 0; i < 64; i++) {
 			ChessPiece piece = mBoard.getChessPiece(i);

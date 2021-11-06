@@ -333,6 +333,7 @@ public class ChessManager implements Listener {
 		board.restart();
 		List<ChessInterface> chessInterfaces = mBoardsInterfaces.get(board);
 		for (ChessInterface ci: chessInterfaces) {
+			ci.removeRunnable();
 			ci.refresh();
 		}
 	}
