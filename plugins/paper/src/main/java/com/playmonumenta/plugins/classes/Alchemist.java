@@ -51,7 +51,7 @@ public class Alchemist extends PlayerClass {
 		mSpecOne.mAbilities.add(new NightmarishAlchemy(plugin, player));
 		mSpecOne.mSpecQuestScoreboard = "Quest103m";
 		mSpecOne.mSpecialization = 9;
-		mSpecOne.mSpecName = "Harbringer";
+		mSpecOne.mSpecName = "Harbinger";
 		mSpecOne.mDisplayItem = new ItemStack(Material.DEAD_BUSH, 1);
 		mSpecOne.mDescription = "Harbingers use special potions to weaken and destroy their enemies. Harbingers prefer slinging deadly potions and using strategy.";
 
