@@ -82,8 +82,6 @@ public class OrinCustomInventory extends CustomInventory {
 	private static ArrayList<TeleportEntry> LOCATIONS_COMMON = new ArrayList<>();
 
 	static {
-		LOCATIONS_COMMON.add(new TeleportEntry(45, "Build Server", null, "Click to teleport!", Material.STONE_PICKAXE, "transferserver build -2456.0 56.5 1104.0 90 0"));
-
 		LOCATIONS_COMMON.add(new TeleportEntry(20, "Labs", "D0Access", "Click to teleport!", Material.GLASS_BOTTLE, "execute as @S run function monumenta:lobbies/send_one/d0"));
 		LOCATIONS_COMMON.add(new TeleportEntry(21, "White", "D1Access", "Click to teleport!", Material.WHITE_WOOL, "execute as @S run function monumenta:lobbies/send_one/d1"));
 		LOCATIONS_COMMON.add(new TeleportEntry(22, "Orange", "D2Access", "Click to teleport!", Material.ORANGE_WOOL, "execute as @S run function monumenta:lobbies/send_one/d2"));
@@ -112,6 +110,7 @@ public class OrinCustomInventory extends CustomInventory {
 		LOCATIONS_PLOTS.add(new TeleportEntry(18, "Market", null, "Click to teleport!", Material.BARREL, "execute as @S run function monumenta:mechanisms/teleporters/enter_new_market"));
 		LOCATIONS_PLOTS.add(new TeleportEntry(27, "Personal Plot", null, "Click to teleport!", Material.GRASS_BLOCK, "execute as @S run function plot:plot/home"));
 		LOCATIONS_PLOTS.add(new TeleportEntry(36, "Guild Plot", null, "Click to teleport!", Material.YELLOW_BANNER, "teleportguild @S"));
+		LOCATIONS_PLOTS.add(new TeleportEntry(45, "Build Server", null, "Click to teleport!", Material.STONE_PICKAXE, "transferserver build -2456.0 56.5 1104.0 90 0"));
 
 		LOCATIONS_PLOTS.add(new TeleportEntry(3, "Sierhaven", null, "Click to teleport!", Material.GREEN_CONCRETE, "execute as @S run function monumenta:mechanisms/teleporters/tp/plots_to_valley"));
 
@@ -125,6 +124,7 @@ public class OrinCustomInventory extends CustomInventory {
 		LOCATIONS_REGION1.add(new TeleportEntry(9, "Plots", null, "Click to teleport!", Material.LIGHT_BLUE_CONCRETE, "execute as @S run function monumenta:mechanisms/teleporters/tp/sierhaven_to_plots"));
 		LOCATIONS_REGION1.add(new TeleportEntry(3, "Sierhaven", null, "Click to teleport!", Material.GREEN_CONCRETE, "tp @S -765.5 106.0625 70.5 180 0"));
 		LOCATIONS_REGION1.add(new TeleportEntry(7, "Mistport", "Quest101", "Click to teleport!", Material.SAND, "execute as @S run function monumenta:mechanisms/teleporters/tp/sierhaven_to_isles", 13));
+		LOCATIONS_REGION1.add(new TeleportEntry(36, "Build Server", null, "Click to teleport!", Material.STONE_PICKAXE, "transferserver build -765.5 106.0625 70.5 180 0"));
 	}
 
 	private static ArrayList<TeleportEntry> LOCATIONS_REGION2 = new ArrayList<>();
@@ -133,6 +133,8 @@ public class OrinCustomInventory extends CustomInventory {
 		LOCATIONS_REGION2.add(new TeleportEntry(9, "Plots", null, "Click to teleport!", Material.LIGHT_BLUE_CONCRETE, "execute as @S run function monumenta:mechanisms/teleporters/tp/mistport_to_plots"));
 		LOCATIONS_REGION2.add(new TeleportEntry(3, "Sierhaven", null, "Click to teleport!", Material.GREEN_CONCRETE, "execute as @S run function monumenta:mechanisms/teleporters/tp/mistport_to_valley"));
 		LOCATIONS_REGION2.add(new TeleportEntry(7, "Mistport", "Quest101", "Click to teleport!", Material.SAND, "tp @S -762.5 70.1 1344.5 180 0", 13));
+		LOCATIONS_REGION2.add(new TeleportEntry(36, "Build Server", null, "Click to teleport!", Material.STONE_PICKAXE, "transferserver build -762.5 70.1 1344.5 180 0"));
+
 	}
 
 	public OrinCustomInventory(Player player) {
