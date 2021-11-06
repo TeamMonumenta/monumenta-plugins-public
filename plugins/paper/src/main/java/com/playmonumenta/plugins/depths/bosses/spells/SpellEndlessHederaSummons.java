@@ -14,6 +14,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.depths.bosses.Hedera;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
+import com.playmonumenta.plugins.utils.DelvesUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
@@ -25,7 +26,7 @@ public class SpellEndlessHederaSummons extends Spell {
 	private static final int SPAWN_COUNT = 2; // Summon count 4-8 depending on players alive
 	private static final int RANGE = 10;
 	private static final int MAX_MOBS = 10;
-	private static final int ELITE_CHANCE_PER_FLOOR = 10;
+	private static final int ELITE_CHANCE_PER_FLOOR = 15;
 
 	private final LivingEntity mBoss;
 	private int mCooldownTicks;
@@ -83,6 +84,9 @@ public class SpellEndlessHederaSummons extends Spell {
 					Entity summonedMob = null;
 					if (isEliteSummon()) {
 						summonedMob = LibraryOfSoulsIntegration.summon(sLoc, SUMMON_NAME_3);
+						if (summonedMob != null) {
+							summonedMob.addScoreboardTag(DelvesUtils.DELVE_MOB_TAG);
+						}
 					} else {
 						if (roll == 0) {
 							summonedMob = LibraryOfSoulsIntegration.summon(sLoc, SUMMON_NAME_1);
@@ -107,7 +111,7 @@ public class SpellEndlessHederaSummons extends Spell {
 	public boolean isEliteSummon() {
 		Random r = new Random();
 		int roll = r.nextInt(100);
-		if (roll < (mFightNumber - 1) * ELITE_CHANCE_PER_FLOOR) {
+		if (roll < (Math.sqrt(mFightNumber) - 1) * ELITE_CHANCE_PER_FLOOR) {
 			return true;
 		}
 		return false;

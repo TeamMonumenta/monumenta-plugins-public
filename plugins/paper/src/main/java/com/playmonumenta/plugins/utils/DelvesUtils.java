@@ -1178,7 +1178,7 @@ public class DelvesUtils {
 
 
 
-	private static final String DELVE_MOB_TAG = "delve_mob";
+	public static final String DELVE_MOB_TAG = "delve_mob";
 
 	public static boolean isDelveMob(Entity entity) {
 		Set<String> tags = entity.getScoreboardTags();

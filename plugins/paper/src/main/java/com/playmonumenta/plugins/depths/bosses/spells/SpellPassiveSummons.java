@@ -179,7 +179,7 @@ public class SpellPassiveSummons extends Spell {
 	public boolean isEliteSummon() {
 		Random r = new Random();
 		int roll = r.nextInt(100);
-		if (roll < (mFightNumber - 1) * ELITE_CHANCE_PER_FLOOR) {
+		if (roll < (Math.sqrt(mFightNumber) - 1) * ELITE_CHANCE_PER_FLOOR) {
 			return true;
 		}
 		return false;
