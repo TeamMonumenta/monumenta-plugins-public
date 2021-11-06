@@ -5,8 +5,6 @@ import java.util.TreeMap;
 
 import org.bukkit.attribute.Attribute;
 
-
-
 public class StringUtils {
 
 	public static String toRoman(int number) {
@@ -72,6 +70,14 @@ public class StringUtils {
 		} else {
 			return minutes + ":" + seconds;
 		}
+	}
+
+	public static String longToHoursMinuteAndSeconds(long i) {
+		long seconds = i % 60;
+		long minutes = i / 60;
+		long hours = minutes / 60;
+		minutes %= 60;
+		return String.format("%ld:%02ld:%02ld", hours, minutes, seconds);
 	}
 
 	public static String ticksToTime(int ticks) {

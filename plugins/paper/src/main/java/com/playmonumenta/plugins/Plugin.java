@@ -67,6 +67,7 @@ import com.playmonumenta.plugins.commands.ToggleSwap;
 import com.playmonumenta.plugins.commands.UnlockHeldItem;
 import com.playmonumenta.plugins.commands.UnsignBook;
 import com.playmonumenta.plugins.commands.UpdateHeldItem;
+import com.playmonumenta.plugins.commands.UpTimeCommand;
 import com.playmonumenta.plugins.custominventories.CustomInventoryCommands;
 import com.playmonumenta.plugins.depths.DepthsCommand;
 import com.playmonumenta.plugins.depths.DepthsGUICommands;
@@ -214,6 +215,7 @@ public class Plugin extends JavaPlugin {
 		TeleportAsync.register();
 		TeleportByScore.register();
 		UpdateHeldItem.register();
+		UpTimeCommand.register();
 		Portal1.register();
 		Portal2.register();
 		ClearPortals.register();
