@@ -45,7 +45,7 @@ public class WeakHookBoss extends BossAbilityGroup {
 	private static final boolean LINGERS = true;
 	private static final int DAMAGE = 30;
 
-	public static class Parameters {
+	public static class Parameters extends BossParameters {
 		public float MULTIPLIER = 3;
 	}
 
@@ -55,7 +55,7 @@ public class WeakHookBoss extends BossAbilityGroup {
 
 	public WeakHookBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
-		Parameters p = BossUtils.getParameters(boss, identityTag, new Parameters());
+		Parameters p = BossParameters.getParameters(boss, identityTag, new Parameters());
 
 		SpellManager activeSpells = new SpellManager(Arrays.asList(
 			new SpellBaseSeekingProjectile(plugin, boss, detectionRange, SINGLE_TARGET, LAUNCH_TRACKING, COOLDOWN, DELAY,

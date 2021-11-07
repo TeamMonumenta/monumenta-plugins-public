@@ -15,6 +15,7 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.util.Vector;
 
 import com.playmonumenta.plugins.bosses.SpellManager;
+import com.playmonumenta.plugins.bosses.parameters.BossParam;
 import com.playmonumenta.plugins.bosses.spells.SpellBaseSlam;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.ParticleUtils;
@@ -25,15 +26,24 @@ public class MeteorSlamBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_meteor_slam";
 
 
-	public static class Parameters {
+	public static class Parameters extends BossParameters {
+		@BossParam(help = "not written")
 		public int DETECTION = 32;
+		@BossParam(help = "not written")
 		public int DELAY = 20 * 5;
+		@BossParam(help = "not written")
 		public int COOLDOWN = 20 * 8;
+		@BossParam(help = "not written")
 		public int MIN_RANGE = 0;
+		@BossParam(help = "not written")
 		public int RUN_DISTANCE = 0;
+		@BossParam(help = "not written")
 		public double VELOCITY_MULTIPLIER = 0.5;
+		@BossParam(help = "not written")
 		public double DAMAGE_RADIUS = 3;
+		@BossParam(help = "not written")
 		public double DAMAGE_PERCENT = 0.5;
+		@BossParam(help = "not written")
 		public int JUMP_HEIGHT = 1;
 		//notes: this ability will probably become deprecated in the future!
 	}
@@ -45,7 +55,7 @@ public class MeteorSlamBoss extends BossAbilityGroup {
 	public MeteorSlamBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
 
-		Parameters p = BossUtils.getParameters(boss, identityTag, new Parameters());
+		Parameters p = BossParameters.getParameters(boss, identityTag, new Parameters());
 		SpellManager manager = new SpellManager(Arrays.asList(new SpellBaseSlam(plugin, boss, p.JUMP_HEIGHT, p.DETECTION, p.MIN_RANGE, p.RUN_DISTANCE, p.COOLDOWN, p.VELOCITY_MULTIPLIER,
 				(World world, Location loc) -> {
 					world.playSound(loc, Sound.ENTITY_ENDER_DRAGON_GROWL, SoundCategory.PLAYERS, 1, 1);

@@ -12,7 +12,7 @@ import com.playmonumenta.plugins.utils.BossUtils;
 public class TpBehindBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_tpbehind";
 
-	public static class Parameters {
+	public static class Parameters extends BossParameters {
 		public int STUN = 10;
 		public int RANGE = 80;
 		public int DELAY = 50;
@@ -34,7 +34,7 @@ public class TpBehindBoss extends BossAbilityGroup {
 	public TpBehindBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
 
-		Parameters p = BossUtils.getParameters(boss, identityTag, new Parameters());
+		Parameters p = BossParameters.getParameters(boss, identityTag, new Parameters());
 
 		SpellManager activeSpells = new SpellManager(Arrays.asList(
 			new SpellTpBehindPlayer(plugin, boss, p.COOLDOWN, p.RANGE, p.DELAY, p.STUN, p.RANDOM)

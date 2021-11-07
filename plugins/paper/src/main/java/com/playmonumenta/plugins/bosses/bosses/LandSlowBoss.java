@@ -14,7 +14,7 @@ public class LandSlowBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_land_slow";
 	public static final int detectionRange = 40;
 
-	public static class Parameters {
+	public static class Parameters extends BossParameters {
 		public double SLOWNESSPERCENT = 1;
 	}
 
@@ -24,7 +24,7 @@ public class LandSlowBoss extends BossAbilityGroup {
 
 	public LandSlowBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
-		Parameters p = BossUtils.getParameters(boss, identityTag, new Parameters());
+		Parameters p = BossParameters.getParameters(boss, identityTag, new Parameters());
 		List<Spell> passiveSpells = Arrays.asList(new SpellLandSlow(plugin, boss, p.SLOWNESSPERCENT));
 
 		super.constructBoss(null, passiveSpells, detectionRange, null);

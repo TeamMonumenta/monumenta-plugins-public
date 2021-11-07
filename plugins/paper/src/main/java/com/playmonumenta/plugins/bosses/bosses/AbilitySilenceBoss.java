@@ -27,7 +27,7 @@ public class AbilitySilenceBoss extends BossAbilityGroup {
 
 	public static final String identityTag = "boss_abilitysilence";
 
-	public static class Parameters {
+	public static class Parameters extends BossParameters {
 		public int DETECTION = 32;
 		public int DURATION = 20 * 3;
 		public Particle.DustOptions COLOR = new Particle.DustOptions(Color.fromRGB(127, 0, 0), 1.0f);
@@ -42,7 +42,7 @@ public class AbilitySilenceBoss extends BossAbilityGroup {
 	public AbilitySilenceBoss(Plugin plugin, LivingEntity boss) throws Exception {
 		super(plugin, identityTag, boss);
 
-		mParams = BossUtils.getParameters(boss, identityTag, new Parameters());
+		mParams = BossParameters.getParameters(boss, identityTag, new Parameters());
 
 		super.constructBoss(null, null, mParams.DETECTION, null);
 	}

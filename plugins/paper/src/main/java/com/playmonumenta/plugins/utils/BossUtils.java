@@ -1,6 +1,5 @@
 package com.playmonumenta.plugins.utils;
 
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -10,11 +9,14 @@ import java.util.NavigableSet;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.effects.Effect;
+import com.playmonumenta.plugins.effects.Stasis;
+
 import org.bukkit.Color;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.attribute.Attribute;
@@ -23,14 +25,6 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
-
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.bosses.parameters.CustomString;
-import com.playmonumenta.plugins.bosses.parameters.EffectsList;
-import com.playmonumenta.plugins.bosses.parameters.ParticlesList;
-import com.playmonumenta.plugins.bosses.parameters.SoundsList;
-import com.playmonumenta.plugins.effects.Effect;
-import com.playmonumenta.plugins.effects.Stasis;
 
 public class BossUtils {
 
@@ -258,152 +252,7 @@ public class BossUtils {
 		}
 	}
 
-	public static Map<String, String> getModifiersFromIdentityTag(LivingEntity boss, String idTag) {
-		String modTag = idTag + "[";
-		Map<String, String> map = new HashMap<>();
-
-		for (String tag : boss.getScoreboardTags()) {
-			if (tag.startsWith(modTag)) {
-				String found = tag.replace(idTag, "");
-				addModifiersFromString(map, found);
-			}
-		}
-
-		return map;
-	}
-
-	private static String translateFieldNameToTag(String fieldName) {
+	public static String translateFieldNameToTag(String fieldName) {
 		return fieldName.toLowerCase().replaceAll("[^a-z0-9]", "");
-	}
-
-	public static <T> T getParameters(LivingEntity boss, String identityTag, T parameters) {
-		Map<String, String> modMap = getModifiersFromIdentityTag(boss, identityTag);
-
-		for (Field field : parameters.getClass().getFields()) {
-			Class<?> t = field.getType();
-			String fieldName = field.getName();
-
-			try {
-				String fieldValueOrDefault;
-				if (!t.equals(Color.class)) {
-					fieldValueOrDefault = modMap.getOrDefault(translateFieldNameToTag(fieldName), field.get(parameters).toString());
-				} else {
-					fieldValueOrDefault = modMap.getOrDefault(translateFieldNameToTag(fieldName), "#" + Integer.toHexString(((Color) field.get(parameters)).asRGB()));
-				}
-
-				if (t.equals(boolean.class)) {
-					field.set(parameters, Boolean.parseBoolean(fieldValueOrDefault.toLowerCase()));
-				} else if (t.equals(int.class)) {
-					field.set(parameters, Integer.parseInt(fieldValueOrDefault));
-				} else if (t.equals(long.class)) {
-					field.set(parameters, Long.parseLong(fieldValueOrDefault));
-				} else if (t.equals(float.class)) {
-					field.set(parameters, Float.parseFloat(fieldValueOrDefault));
-				} else if (t.equals(double.class)) {
-					field.set(parameters, Double.parseDouble(fieldValueOrDefault));
-				} else if (t.equals(PotionEffectType.class)) {
-					field.set(parameters, PotionEffectType.getByName(fieldValueOrDefault.toUpperCase()));
-				} else if (t.equals(Particle.class)) {
-					field.set(parameters, Particle.valueOf(fieldValueOrDefault.toUpperCase()));
-				} else if (t.equals(Sound.class)) {
-					field.set(parameters, Sound.valueOf(fieldValueOrDefault.toUpperCase()));
-				} else if (t.equals(Color.class)) {
-					field.set(parameters, colorFromString(fieldValueOrDefault));
-				} else if (t.equals(String.class)) {
-					field.set(parameters, fieldValueOrDefault);
-				} else if (t.equals(EffectsList.class)) {
-					field.set(parameters, EffectsList.fromString(fieldValueOrDefault));
-				} else if (t.equals(SoundsList.class)) {
-					field.set(parameters, SoundsList.fromString(fieldValueOrDefault));
-				} else if (t.equals(ParticlesList.class)) {
-					field.set(parameters, ParticlesList.fromString(fieldValueOrDefault));
-				} else if (t.equals(CustomString.class)) {
-					field.set(parameters, CustomString.fromString(fieldValueOrDefault));
-				}
-			} catch (Exception ex) {
-				Plugin.getInstance().getLogger().warning("Failed to parse boss argument field " + fieldName + " for boss " + identityTag + ": " + ex.getMessage());
-			}
-		}
-
-		return parameters;
-	}
-
-	public static final Map<String, Color> COLOR_MAP = new HashMap<>();
-
-	static {
-		//this is just because Color don't have the fuctions values() and getName()...
-		COLOR_MAP.put("AQUA", Color.AQUA);
-		COLOR_MAP.put("BLACK", Color.BLACK);
-		COLOR_MAP.put("BLUE", Color.BLUE);
-		COLOR_MAP.put("FUCHSIA", Color.FUCHSIA);
-		COLOR_MAP.put("GRAY", Color.GRAY);
-		COLOR_MAP.put("GREEN", Color.GREEN);
-		COLOR_MAP.put("LIME", Color.LIME);
-		COLOR_MAP.put("MAROON", Color.MAROON);
-		COLOR_MAP.put("NAVY", Color.NAVY);
-		COLOR_MAP.put("OLIVE", Color.OLIVE);
-		COLOR_MAP.put("ORANGE", Color.ORANGE);
-		COLOR_MAP.put("PURPLE", Color.PURPLE);
-		COLOR_MAP.put("RED", Color.RED);
-		COLOR_MAP.put("SILVER", Color.SILVER);
-		COLOR_MAP.put("TEAL", Color.TEAL);
-		COLOR_MAP.put("WHITE", Color.WHITE);
-		COLOR_MAP.put("YELLOW", Color.YELLOW);
-	}
-
-	public static Color colorFromString(String hexStringOrName) throws Exception {
-		Color color = COLOR_MAP.get(hexStringOrName);
-		if (color == null) {
-			if (hexStringOrName.startsWith("#")) {
-				hexStringOrName = hexStringOrName.substring(1);
-			}
-			color = Color.fromRGB(Integer.parseInt(hexStringOrName, 16));
-		}
-
-		if (color == null) {
-			throw new Exception("Unable to parse color: " + hexStringOrName);
-		}
-		return color;
-	}
-
-
-	public static List<String> splitByCommasUsingBrackets(String string) {
-		if (string.startsWith("[")) {
-			string = string.substring(1);
-		}
-		if (string.endsWith("]")) {
-			string = string.substring(0, string.length() - 1);
-		}
-
-		List<String> splitted = new ArrayList<String>();
-		int lastSplitIndex = 0;
-		int brackets = 0;
-
-		char charAtI;
-
-		for (int i = 0; i < string.length(); i++) {
-			charAtI = string.charAt(i);
-			switch (charAtI) {
-				case '(':
-					brackets++;
-					break;
-				case ')':
-					brackets--;
-					break;
-				default:
-			}
-			if (brackets == 0 && charAtI == ',') {
-				splitted.add(string.substring(lastSplitIndex, i));
-				lastSplitIndex = i + 1;
-			}
-		}
-
-		if (brackets == 0 && lastSplitIndex != string.length()) {
-			splitted.add(string.substring(lastSplitIndex, string.length()));
-		} else if (!string.isEmpty()) {
-			Plugin.getInstance().getLogger().warning("Failed to parse string: '" + string + "' too many brackets");
-		}
-
-		return splitted;
 	}
 }

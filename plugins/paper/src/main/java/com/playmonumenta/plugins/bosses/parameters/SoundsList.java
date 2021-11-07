@@ -4,12 +4,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.utils.BossUtils;
 
 import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
+
+import dev.jorel.commandapi.Tooltip;
 
 public class SoundsList {
 	public static class CSound {
@@ -62,53 +63,23 @@ public class SoundsList {
 		public String toString() {
 			return "(" + mSound + ", " + mVolume + ", " + mPitch + ")";
 		}
-
-		public static CSound fromString(String value) throws RuntimeException {
-			if (value.startsWith("(")) {
-				value = value.substring(1);
-			}
-			if (value.endsWith(")")) {
-				value = value.substring(0, value.length() - 1);
-			}
-			String[] split = value.split(",");
-			Sound sound = Sound.valueOf(split[0].toUpperCase());
-			if (sound == null) {
-				throw new SoundNotFoundException(split[0]);
-			}
-			if (split.length == 3) {
-				return new CSound(sound, Float.valueOf(split[1]), Float.valueOf(split[2]));
-			} else if (split.length == 2) {
-				return new CSound(sound, Float.valueOf(split[1]));
-			} else if (split.length == 1) {
-				return new CSound(sound);
-			} else {
-				throw new IllegalFormatException("Fail loading custom sound. Object of size " + split.length);
-			}
-		}
 	}
 
-	private List<CSound> mSoundsList;
+	private final List<CSound> mSoundsList;
 
-	public SoundsList(String values) throws RuntimeException {
-		mSoundsList = new ArrayList<>();
+	private SoundsList(List<CSound> sounds) {
+		mSoundsList = sounds;
+	}
 
-		List<String> split = BossUtils.splitByCommasUsingBrackets(values);
-		if (split.isEmpty()) {
-			// Allow deliberately empty sound lists
-			return;
+	public static SoundsList fromString(String string) {
+		ParseResult<SoundsList> result = fromReader(new StringReader(string), "");
+		if (result.getResult() == null) {
+			Plugin.getInstance().getLogger().warning("Failed to parse '" + string + "' as SoundsList");
+			Thread.dumpStack();
+			return new SoundsList(new ArrayList<>(0));
 		}
 
-		for (String cSoundString : split) {
-			try {
-				mSoundsList.add(CSound.fromString(cSoundString));
-			} catch (Exception ex) {
-				Plugin.getInstance().getLogger().warning("Failed to parse '" + cSoundString + "': " + ex.getMessage());
-			}
-		}
-
-		if (mSoundsList.isEmpty()) {
-			throw new ListEmptyException("Fail parsing string to list. List empty");
-		}
+		return result.getResult();
 	}
 
 	public void play(Location loc) {
@@ -144,35 +115,113 @@ public class SoundsList {
 	@Override
 	public String toString() {
 		String msg = "[";
+		boolean first = true;
 		for (CSound cSound : mSoundsList) {
-			msg = msg + cSound.toString() + ",";
-		}
-		//remove last comma
-		if (msg.endsWith(",")) {
-			msg = msg.substring(0, msg.length() - 1);
+			msg = msg + (first ? "" : ",") + cSound.toString();
+			first = false;
 		}
 		return msg + "]";
 	}
 
-	public static SoundsList fromString(String string) throws RuntimeException {
-		return new SoundsList(string.replace(" ", "").toLowerCase());
-	}
-
-	private static class SoundNotFoundException extends RuntimeException {
-		public SoundNotFoundException(String value) {
-			super("Sound don't found for argument: " + value);
+	/*
+	 * Parses a SoundsList at the next position in the StringReader.
+	 * If this item parses successfully:
+	 *   The returned ParseResult will contain a non-null getResult() and a null getTooltip()
+	 *   The reader will be advanced to the next character past this SoundsList value.
+	 * Else:
+	 *   The returned ParseResult will contain a null getResult() and a non-null getTooltip()
+	 *   The reader will not be advanced
+	 */
+	public static ParseResult<SoundsList> fromReader(StringReader reader, String hoverDescription) {
+		if (!reader.advance("[")) {
+			return ParseResult.of(Tooltip.arrayOf(Tooltip.of(reader.readSoFar() + "[", hoverDescription)));
 		}
-	}
 
-	private class ListEmptyException extends RuntimeException {
-		public ListEmptyException(String value) {
-			super(value);
-		}
-	}
+		List<CSound> soundsList = new ArrayList<>(2);
 
-	private static class IllegalFormatException extends RuntimeException {
-		public IllegalFormatException(String value) {
-			super(value);
+		boolean atLeastOneSoundIter = false;
+		while (true) {
+			// Start trying to parse the next individual sound entry in the list
+
+			if (reader.advance("]")) {
+				// Got closing bracket and parsed rest successfully - complete sound list, break this loop
+				break;
+			}
+
+			if (atLeastOneSoundIter) {
+				if (!reader.advance(",")) {
+					return ParseResult.of(Tooltip.arrayOf(
+						Tooltip.of(reader.readSoFar() + ",", hoverDescription),
+						Tooltip.of(reader.readSoFar() + "]", hoverDescription)
+					));
+				}
+				if (!reader.advance("(")) {
+					return ParseResult.of(Tooltip.arrayOf(Tooltip.of(reader.readSoFar() + "(", hoverDescription)));
+				}
+			} else {
+				if (!reader.advance("(")) {
+					return ParseResult.of(Tooltip.arrayOf(
+						Tooltip.of(reader.readSoFar() + "(", hoverDescription),
+						Tooltip.of(reader.readSoFar() + "]", hoverDescription)
+					));
+				}
+			}
+
+			atLeastOneSoundIter = true;
+
+			Sound sound = reader.readSound();
+			if (sound == null) {
+				// Entry not valid, offer all entries as completions
+				List<Tooltip<String>> suggArgs = new ArrayList<>(Sound.values().length);
+				String soFar = reader.readSoFar();
+				for (Sound valid : Sound.values()) {
+					suggArgs.add(Tooltip.of(soFar + valid.name(), hoverDescription));
+				}
+				return ParseResult.of(suggArgs.toArray(Tooltip.arrayOf()));
+			}
+
+			if (!reader.advance(",")) {
+				if (!reader.advance(")")) {
+					return ParseResult.of(Tooltip.arrayOf(
+						Tooltip.of(reader.readSoFar() + ",", "Specify volume and optionally pitch"),
+						Tooltip.of(reader.readSoFar() + ")", "Use 1.0 as default volume and pitch")
+					));
+				}
+				// End of this sound, loop to next
+				soundsList.add(new CSound(sound));
+				continue;
+			}
+
+			Double volume = reader.readDouble();
+			if (volume == null || volume <= 0) {
+				return ParseResult.of(Tooltip.arrayOf(Tooltip.of(reader.readSoFar() + "1.0", "Sound volume > 0")));
+			}
+
+			if (!reader.advance(",")) {
+				if (!reader.advance(")")) {
+					return ParseResult.of(Tooltip.arrayOf(
+						Tooltip.of(reader.readSoFar() + ",", "Specify pitch"),
+						Tooltip.of(reader.readSoFar() + ")", "Use 1.0 as default pitch")
+					));
+				}
+				// End of this sound, loop to next
+				soundsList.add(new CSound(sound, volume.floatValue()));
+				continue;
+			}
+
+			Double pitch = reader.readDouble();
+			if (pitch == null || pitch < 0) {
+				return ParseResult.of(Tooltip.arrayOf(Tooltip.of(reader.readSoFar() + "1.0", "Sound pitch >= 0")));
+			}
+
+			if (!reader.advance(")")) {
+				return ParseResult.of(Tooltip.arrayOf(Tooltip.of(reader.readSoFar() + ")", hoverDescription)));
+			}
+
+			// End of this sound, loop to next
+			soundsList.add(new CSound(sound, volume.floatValue(), pitch.floatValue()));
 		}
+
+		return ParseResult.of(new SoundsList(soundsList));
 	}
 }

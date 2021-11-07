@@ -12,6 +12,7 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
+import com.playmonumenta.plugins.bosses.parameters.BossParam;
 import com.playmonumenta.plugins.bosses.parameters.ParticlesList;
 import com.playmonumenta.plugins.bosses.parameters.SoundsList;
 import com.playmonumenta.plugins.utils.BossUtils;
@@ -21,26 +22,41 @@ public class AvengerBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_avenger";
 	public static final String SPEED_MODIFIER = "AvengerBossSpeedModifier";
 
-	public static class Parameters {
+	public static class Parameters extends BossParameters {
+		@BossParam(help = "not written")
 		public int DETECTION = 15;
 
+		@BossParam(help = "not written")
 		public int MAX_STACKS = 10;
+
+		@BossParam(help = "not written")
 		public int RADIUS = 8;
+
+		@BossParam(help = "not written")
 		public double HEAL_PERCENT = .1;
+
+		@BossParam(help = "not written")
 		public double SPEED_PERCENT_INCREMENT = 0.06; // Capped at x1.6 Speed by default
+
+		@BossParam(help = "not written")
 		public double DAMAGE_PERCENT_INCREMENT = 0.2; // Capped at x3 Damage by deafult
 
-		/** Sounds summoned when a nearby mob dies */
+		@BossParam(help = "Sounds summoned when a nearby mob dies")
 		public SoundsList SOUND_DEATH = SoundsList.fromString("[(ENTITY_ENDER_DRAGON_GROWL,0.1,0.8)]");
-		/** Particle summon when a nearby mob dies */
+
+		@BossParam(help = "Particle summon when a nearby mob dies")
 		public ParticlesList PARTICLE_DEATH = ParticlesList.fromString("[(SPELL_WITCH,20)]");
-		/** Particle that moves from death location to boss in a line */
+
+		@BossParam(help = "Particle that moves from death location to boss in a line")
 		public ParticlesList PARTICLE_VECTOR = ParticlesList.fromString("[(VILLAGER_HAPPY,3)]");
-		/** Particle summon at bos when PARTICLE_VECTOR is over */
+
+		@BossParam(help = "Particle summon at bos when PARTICLE_VECTOR is over")
 		public ParticlesList PARTICLE_BOSS = ParticlesList.fromString("[(CRIT_MAGIC,20)]");
-		/** Particle summon with PARTICLE_BOSS if boss heals */
+
+		@BossParam(help = "Particle summon with PARTICLE_BOSS if boss heals")
 		public ParticlesList PARTICLE_HEAL = ParticlesList.fromString("[(HEART,3)]");
-		/** Ticks between death and PARTICLE_BOSS */
+
+		@BossParam(help = "Ticks between death and PARTICLE_BOSS")
 		public int VECTOR_TICKS = 12;
 	}
 
@@ -53,7 +69,7 @@ public class AvengerBoss extends BossAbilityGroup {
 
 	public AvengerBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
-		mParam = BossUtils.getParameters(boss, identityTag, new Parameters());
+		mParam = BossParameters.getParameters(boss, identityTag, new Parameters());
 		super.constructBoss(null, null, mParam.DETECTION, null);
 	}
 

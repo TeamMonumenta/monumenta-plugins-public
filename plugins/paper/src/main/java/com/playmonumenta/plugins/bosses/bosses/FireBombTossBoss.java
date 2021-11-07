@@ -12,6 +12,7 @@ import org.bukkit.entity.TNTPrimed;
 import org.bukkit.plugin.Plugin;
 
 import com.playmonumenta.plugins.bosses.SpellManager;
+import com.playmonumenta.plugins.bosses.parameters.BossParam;
 import com.playmonumenta.plugins.bosses.spells.SpellBombToss;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
@@ -19,14 +20,29 @@ import com.playmonumenta.plugins.utils.PlayerUtils;
 public class FireBombTossBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_firebombtoss";
 
-	public static class Parameters {
+	public static class Parameters extends BossParameters {
+		@BossParam(help = "not written")
 		public int LOBS = 1;
+
+		@BossParam(help = "not written")
 		public int DAMAGE = 64;
+
+		@BossParam(help = "not written")
 		public int DELAY = 100;
+
+		@BossParam(help = "not written")
 		public double RADIUS = 8;
+
+		@BossParam(help = "not written")
 		public int DETECTION = 20;
+
+		@BossParam(help = "not written")
 		public int FUSE_TIME = 50;
+
+		@BossParam(help = "not written")
 		public int COOLDOWN = 160;
+
+		@BossParam(help = "not written")
 		public int FIRE_DURATION = 20 * 8;
 	}
 
@@ -37,7 +53,7 @@ public class FireBombTossBoss extends BossAbilityGroup {
 	public FireBombTossBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
 
-		Parameters p = BossUtils.getParameters(boss, identityTag, new Parameters());
+		Parameters p = BossParameters.getParameters(boss, identityTag, new Parameters());
 
 		SpellManager activeSpells = new SpellManager(Arrays.asList(
 			new SpellBombToss(plugin, boss, p.DETECTION, p.LOBS, p.FUSE_TIME, p.COOLDOWN,

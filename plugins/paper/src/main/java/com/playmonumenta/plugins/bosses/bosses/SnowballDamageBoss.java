@@ -13,7 +13,7 @@ import com.playmonumenta.plugins.utils.BossUtils;
 public class SnowballDamageBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_snowballdamage";
 
-	public static class Parameters {
+	public static class Parameters extends BossParameters {
 		public int DETECTION = 50;
 		public int DAMAGE = 8;
 	}
@@ -31,7 +31,7 @@ public class SnowballDamageBoss extends BossAbilityGroup {
 			throw new Exception("boss_snowballdamage only works on snowmen!");
 		}
 
-		mParams = BossUtils.getParameters(boss, identityTag, new Parameters());
+		mParams = BossParameters.getParameters(boss, identityTag, new Parameters());
 
 		super.constructBoss(null, null, mParams.DETECTION, null);
 	}

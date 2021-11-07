@@ -8,8 +8,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
 import com.playmonumenta.plugins.bosses.SpellManager;
-import com.playmonumenta.plugins.bosses.parameters.CustomString;
 import com.playmonumenta.plugins.bosses.parameters.EffectsList;
+import com.playmonumenta.plugins.bosses.parameters.BossParam;
 import com.playmonumenta.plugins.bosses.parameters.ParticlesList;
 import com.playmonumenta.plugins.bosses.parameters.SoundsList;
 import com.playmonumenta.plugins.bosses.spells.SpellBaseCharge;
@@ -18,37 +18,59 @@ import com.playmonumenta.plugins.utils.BossUtils;
 public class ChargerBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_charger";
 
-	public static class Parameters {
+	public static class Parameters extends BossParameters {
 		//i would very like to set the damage to 0 but for this we need to rework all the mobs
 		//with boss_charger in the game...so BIG NOPE
-		public float DAMAGE = 15;
+		@BossParam(help = "not written")
+		public int DAMAGE = 15;
+
+		@BossParam(help = "not written")
 		public int DURATION = 25;
+
+		@BossParam(help = "not written")
 		public int DELAY = 5 * 20;
+
+		@BossParam(help = "not written")
 		public int DETECTION = 20;
+
+		@BossParam(help = "not written")
 		public int COOLDOWN = 8 * 20;
+
+		@BossParam(help = "not written")
 		public boolean STOP_ON_HIT = false;
+
+		@BossParam(help = "not written")
 		public boolean TARGET_FURTHEST = false;
 
-		//other stats not used by the defaults ones
+		@BossParam(help = "not written")
 		public double DAMAGE_PERCENTAGE = 0.0;
+
+		@BossParam(help = "Effects applied to players hit by the charge")
 		public EffectsList EFFECTS = EffectsList.EMPTY;
-		/** The spell name showed when the player die by this skill */
-		public CustomString SPELL_NAME = CustomString.EMPTY;
+
+		@BossParam(help = "The spell name showed when the player die by this skill")
+		public String SPELL_NAME = "";
 
 		//Particle & Sounds!
-		/** Particle summoned at boss location when starting the ability */
+		@BossParam(help = "Particle summoned at boss location when starting the ability")
 		public ParticlesList PARTICLE_WARNING = ParticlesList.fromString("[(VILLAGER_ANGRY,50)]");
-		/** Sound summoned at boss location when starting the ability */
+
+		@BossParam(help = "Sound summoned at boss location when starting the ability")
 		public SoundsList SOUND_WARNING = SoundsList.fromString("[(ENTITY_ELDER_GUARDIAN_CURSE,1,1.5)]");
-		/** Particle to show the player where the boss want to charge */
+
+		@BossParam(help = "Particle to show the player where the boss want to charge")
 		public ParticlesList PARTICLE_TELL = ParticlesList.fromString("[(CRIT,2)]");
-		/** Particle summon when the ability hit a player */
+
+		@BossParam(help = "Particle summon when the ability hit a player")
 		public ParticlesList PARTICLE_HIT = ParticlesList.fromString("[(BLOCK_CRACK,5,0.4,0.4,0.4,0.4,REDSTONE_BLOCK),(BLOCK_CRACK,12,0.4,0.4,0.4,0.4,REDSTONE_WIRE)]");
-		/** Particle summoned at the start and end of the charge */
+
+		@BossParam(help = "Particle summoned at the start and end of the charge")
 		public ParticlesList PARTICLE_ROAR = ParticlesList.fromString("[(SMOKE_LARGE,125)]");
-		/** Sound summoned at the start and end of the charge */
+
+		@BossParam(help = "Sound summoned at the start and end of the charge")
 		public SoundsList SOUND_ROAR = SoundsList.fromString("[(ENTITY_ENDER_DRAGON_GROWL,1,1.5)]");
-		/** Particle summoned when the charge hit a player*/
+
+		@BossParam(help = "Particle summoned when the charge hit a player")
 		public ParticlesList PARTICLE_ATTACK = ParticlesList.fromString("[(FLAME,4,0.5,0.5,0.5,0.075),(CRIT,8,0.5,0.5,0.5,0.75)]");
 
 	}
@@ -60,7 +82,7 @@ public class ChargerBoss extends BossAbilityGroup {
 	public ChargerBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
 
-		Parameters p = BossUtils.getParameters(boss, identityTag, new Parameters());
+		Parameters p = BossParameters.getParameters(boss, identityTag, new Parameters());
 
 		SpellManager activeSpells = new SpellManager(Arrays.asList(
 			new SpellBaseCharge(plugin, boss, p.DETECTION, p.COOLDOWN, p.DURATION, p.STOP_ON_HIT,
@@ -87,7 +109,7 @@ public class ChargerBoss extends BossAbilityGroup {
 					if (p.SPELL_NAME.isEmpty()) {
 						BossUtils.bossDamage(boss, player, p.DAMAGE);
 					} else {
-						BossUtils.bossDamage(boss, player, p.DAMAGE, mBoss.getLocation(), p.SPELL_NAME.getString());
+						BossUtils.bossDamage(boss, player, p.DAMAGE, mBoss.getLocation(), p.SPELL_NAME);
 					}
 				}
 
@@ -95,7 +117,7 @@ public class ChargerBoss extends BossAbilityGroup {
 					if (p.SPELL_NAME.isEmpty()) {
 						BossUtils.bossDamagePercent(mBoss, player, p.DAMAGE_PERCENTAGE);
 					} else {
-						BossUtils.bossDamagePercent(mBoss, player, p.DAMAGE_PERCENTAGE, p.SPELL_NAME.getString());
+						BossUtils.bossDamagePercent(mBoss, player, p.DAMAGE_PERCENTAGE, p.SPELL_NAME);
 					}
 				}
 

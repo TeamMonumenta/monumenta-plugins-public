@@ -14,7 +14,7 @@ public class CrowdControlResistanceBoss extends BossAbilityGroup {
 
 	public static final String identityTag = "boss_cleanse";
 
-	public static class Parameters {
+	public static class Parameters extends BossParameters {
 		public int CLEAR_TIME = 20 * 4;
 		public int DETECTION = 100;
 	}
@@ -28,7 +28,7 @@ public class CrowdControlResistanceBoss extends BossAbilityGroup {
 	public CrowdControlResistanceBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
 
-		Parameters p = BossUtils.getParameters(boss, identityTag, new Parameters());
+		Parameters p = BossParameters.getParameters(boss, identityTag, new Parameters());
 
 		List<Spell> passive = Arrays.asList(new SpellCrowdControlClear(boss, p.CLEAR_TIME));
 

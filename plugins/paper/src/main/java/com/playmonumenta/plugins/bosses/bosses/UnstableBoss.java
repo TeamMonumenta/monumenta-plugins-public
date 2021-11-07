@@ -10,7 +10,7 @@ import org.bukkit.plugin.Plugin;
 public class UnstableBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_unstable";
 
-	public static class Parameters {
+	public static class Parameters extends BossParameters {
 		public int DETECTION = 20;
 		public int EXPLOSION_POWER = 4;
 		public boolean BREAK_BLOCK = true;
@@ -25,7 +25,7 @@ public class UnstableBoss extends BossAbilityGroup {
 
 	public UnstableBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
-		mPFinal = BossUtils.getParameters(boss, identityTag, new Parameters());
+		mPFinal = BossParameters.getParameters(boss, identityTag, new Parameters());
 		// Boss effectively does nothing lol
 		super.constructBoss(null, null, mPFinal.DETECTION, null);
 	}

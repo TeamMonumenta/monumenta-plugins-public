@@ -120,6 +120,7 @@ public class BossManager implements Listener {
 	static final Map<String, StatelessBossConstructor> mStatelessBosses;
 	static final Map<String, StatefulBossConstructor> mStatefulBosses;
 	static final Map<String, BossDeserializer> mBossDeserializers;
+	public static final Map<String, BossParameters> mBossParameters;
 
 	static {
 		/* Stateless bosses are those that have no end location set where a redstone block would be spawned when they die */
@@ -474,6 +475,35 @@ public class BossManager implements Listener {
 		mBossDeserializers.put(LichShieldBoss.identityTag, (Plugin p, LivingEntity e) -> LichShieldBoss.deserialize(p, e));
 		mBossDeserializers.put(LichKeyGlowBoss.identityTag, (Plugin p, LivingEntity e) -> LichKeyGlowBoss.deserialize(p, e));
 
+
+		/***************************************************
+		 * Boss Parameters
+		 ****************************************************/
+		mBossParameters = new HashMap<>();
+		mBossParameters.put(NovaBoss.identityTag, new NovaBoss.Parameters());
+		mBossParameters.put(LaserBoss.identityTag, new LaserBoss.Parameters());
+		mBossParameters.put(ProjectileBoss.identityTag, new ProjectileBoss.Parameters());
+		mBossParameters.put(AuraEffectBoss.identityTag, new AuraEffectBoss.Parameters());
+		mBossParameters.put(AvengerBoss.identityTag, new AvengerBoss.Parameters());
+		mBossParameters.put(BarrierBoss.identityTag, new BarrierBoss.Parameters());
+		mBossParameters.put(ChargerBoss.identityTag, new ChargerBoss.Parameters());
+		mBossParameters.put(CommanderBoss.identityTag, new CommanderBoss.Parameters());
+		mBossParameters.put(CrowdControlResistanceBoss.identityTag, new CrowdControlResistanceBoss.Parameters());
+		mBossParameters.put(EarthshakeBoss.identityTag, new EarthshakeBoss.Parameters());
+		mBossParameters.put(FireBombTossBoss.identityTag, new FireBombTossBoss.Parameters());
+		mBossParameters.put(FlameTrailBoss.identityTag, new FlameTrailBoss.Parameters());
+		mBossParameters.put(ForceBoss.identityTag, new ForceBoss.Parameters());
+		mBossParameters.put(JumpBoss.identityTag, new JumpBoss.Parameters());
+		mBossParameters.put(MeteorSlamBoss.identityTag, new MeteorSlamBoss.Parameters());
+		mBossParameters.put(OnHitBoss.identityTag, new OnHitBoss.Parameters());
+		mBossParameters.put(PounceBoss.identityTag, new PounceBoss.Parameters());
+		mBossParameters.put(RejuvenationBoss.identityTag, new RejuvenationBoss.Parameters());
+		mBossParameters.put(SpawnMobsBoss.identityTag, new SpawnMobsBoss.Parameters());
+		mBossParameters.put(SwingBoss.identityTag, new SwingBoss.Parameters());
+		mBossParameters.put(TpBehindBoss.identityTag, new TpBehindBoss.Parameters());
+		mBossParameters.put(TpSwapBoss.identityTag, new TpSwapBoss.Parameters());
+		mBossParameters.put(UnstableBoss.identityTag, new UnstableBoss.Parameters());
+		mBossParameters.put(SeekingProjectileBoss.identityTag, new SeekingProjectileBoss.Parameters());
 	}
 
 	/********************************************************************************
@@ -988,6 +1018,12 @@ public class BossManager implements Listener {
 	public String[] listBosses() {
 		Set<String> allBossTags = new HashSet<String>(mStatelessBosses.keySet());
 		allBossTags.addAll(mStatefulBosses.keySet());
+		return allBossTags.toArray(new String[mStatelessBosses.size()]);
+	}
+
+	/* Machine readable list */
+	public String[] listStatelessBosses() {
+		Set<String> allBossTags = new HashSet<String>(mStatelessBosses.keySet());
 		return allBossTags.toArray(new String[mStatelessBosses.size()]);
 	}
 

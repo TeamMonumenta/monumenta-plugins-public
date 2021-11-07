@@ -21,7 +21,7 @@ public class CommanderBoss extends BossAbilityGroup {
 
 	public static final String identityTag = "boss_commander";
 
-	public static class Parameters {
+	public static class Parameters extends BossParameters {
 		public int DETECTION = 24;
 		private int RANGE = 8;
 	}
@@ -36,7 +36,7 @@ public class CommanderBoss extends BossAbilityGroup {
 	public CommanderBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
 
-		mParams = BossUtils.getParameters(boss, identityTag, new Parameters());
+		mParams = BossParameters.getParameters(boss, identityTag, new Parameters());
 		List<Spell> passiveSpells = Arrays.asList(
 			new SpellInspire(com.playmonumenta.plugins.Plugin.getInstance(), boss, mParams.RANGE)
 		);

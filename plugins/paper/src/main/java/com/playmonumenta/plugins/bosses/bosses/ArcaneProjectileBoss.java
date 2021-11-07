@@ -29,7 +29,7 @@ import com.playmonumenta.plugins.utils.PotionUtils;
 public class ArcaneProjectileBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_arcaneprojectile";
 
-	public static class Parameters {
+	public static class Parameters extends BossParameters {
 		public int DAMAGE = 20;
 		public int DISTANCE = 32;
 		public double SPEED = 0.8;
@@ -51,7 +51,7 @@ public class ArcaneProjectileBoss extends BossAbilityGroup {
 	public ArcaneProjectileBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
 
-		final Parameters p = BossUtils.getParameters(boss, identityTag, new Parameters());
+		final Parameters p = BossParameters.getParameters(boss, identityTag, new Parameters());
 
 		int lifetimeTicks = (int) (p.DISTANCE / p.SPEED);
 

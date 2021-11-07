@@ -12,7 +12,7 @@ import com.playmonumenta.plugins.utils.BossUtils;
 public class TpSwapBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_tpswap";
 
-	public static class Parameters {
+	public static class Parameters extends BossParameters {
 		public int RANGE = 6;
 		public int DELAY = 100;
 		public int DURATION = 50;
@@ -27,7 +27,7 @@ public class TpSwapBoss extends BossAbilityGroup {
 	public TpSwapBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
 
-		Parameters p = BossUtils.getParameters(boss, identityTag, new Parameters());
+		Parameters p = BossParameters.getParameters(boss, identityTag, new Parameters());
 
 		SpellManager activeSpells = new SpellManager(Arrays.asList(
 			new SpellTpSwapPlaces(plugin, boss, p.COOLDOWN, p.RANGE, p.DURATION)));

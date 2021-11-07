@@ -19,6 +19,7 @@ import com.playmonumenta.plugins.commands.AdminNotify;
 import com.playmonumenta.plugins.commands.BarkifyHeldItem;
 import com.playmonumenta.plugins.commands.BossDebug;
 import com.playmonumenta.plugins.commands.BossFight;
+import com.playmonumenta.plugins.commands.BossTagCommand;
 import com.playmonumenta.plugins.commands.CalculateReforge;
 import com.playmonumenta.plugins.commands.ClaimRaffle;
 import com.playmonumenta.plugins.commands.ClearPortals;
@@ -234,6 +235,7 @@ public class Plugin extends JavaPlugin {
 		DelveInfuseHeldItem.register();
 		CustomInventoryCommands.register(this);
 		AdminNotify.register();
+		BossTagCommand.register();
 
 
 		try {

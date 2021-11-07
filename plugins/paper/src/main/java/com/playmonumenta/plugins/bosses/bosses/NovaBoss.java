@@ -2,14 +2,8 @@ package com.playmonumenta.plugins.bosses.bosses;
 
 import java.util.Arrays;
 
-import org.bukkit.Location;
-import org.bukkit.Sound;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
-import org.bukkit.plugin.Plugin;
-
 import com.playmonumenta.plugins.bosses.SpellManager;
-import com.playmonumenta.plugins.bosses.parameters.CustomString;
+import com.playmonumenta.plugins.bosses.parameters.BossParam;
 import com.playmonumenta.plugins.bosses.parameters.EffectsList;
 import com.playmonumenta.plugins.bosses.parameters.ParticlesList;
 import com.playmonumenta.plugins.bosses.parameters.SoundsList;
@@ -17,33 +11,52 @@ import com.playmonumenta.plugins.bosses.spells.SpellBaseNova;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 
+import org.bukkit.Location;
+import org.bukkit.Sound;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
+import org.bukkit.plugin.Plugin;
+
 public class NovaBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_nova";
 
-	public static class Parameters {
+	public static class Parameters extends BossParameters {
+		@BossParam(help = "not written")
 		public int RADIUS = 9;
+		@BossParam(help = "not written")
 		public int DAMAGE = 0;
+		@BossParam(help = "not written")
 		public int DELAY = 100;
+		@BossParam(help = "not written")
 		public int DURATION = 70;
+		@BossParam(help = "not written")
 		public int DETECTION = 40;
+		@BossParam(help = "not written")
 		public int COOLDOWN = 8 * 20;
+		@BossParam(help = "not written")
 		public boolean CAN_MOVE = false;
+		@BossParam(help = "not written")
 		public double DAMAGE_PERCENTAGE = 0.0;
 
+		@BossParam(help = "Effect applied to players hit by the nova")
 		public EffectsList EFFECTS = EffectsList.EMPTY;
-		/** The spell name showed when the player die by this skill */
-		public CustomString SPELL_NAME = CustomString.EMPTY;
+		@BossParam(help = "The spell name showed when the player die by this skill")
+		public String SPELL_NAME = "";
 
 		//particle & sound used!
-		/** Particle summon on the air */
+		@BossParam(help = "Particle summon on the air")
 		public ParticlesList PARTICLE_AIR = ParticlesList.fromString("[(cloud,5)]");
-		/** Sound used when charging the ability */
+
+		@BossParam(help = "Sound used when charging the ability")
 		public Sound SOUND_CHARGE = Sound.ENTITY_WITCH_CELEBRATE;
-		/** Particle summon arround the boss when loading the spell */
+
+		@BossParam(help = "Particle summon arround the boss when loading the spell")
 		public ParticlesList PARTICLE_LOAD = ParticlesList.fromString("[(crit,1)]");
-		/** Sound used when the spell is casted (when explode) */
+
+		@BossParam(help = "Sound used when the spell is casted (when explode)")
 		public SoundsList SOUND_CAST = SoundsList.fromString("[(ENTITY_WITCH_DRINK,1.5,0.65),(ENTITY_WITCH_DRINK,1.5,0.55)]");
-		/*Particle summoned when the spell explode */
+
+		@BossParam(help = "Particle summoned when the spell explode")
 		public ParticlesList PARTICLE_EXPLODE = ParticlesList.fromString("[(CRIT,1,0.1,0.1,0.1,0.3),(CRIT_MAGIC,1,0.25,0.25,0.25,0.1)]");
 
 	}
@@ -55,7 +68,7 @@ public class NovaBoss extends BossAbilityGroup {
 	public NovaBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
 
-		Parameters p = BossUtils.getParameters(boss, identityTag, new Parameters());
+		Parameters p = BossParameters.getParameters(boss, identityTag, new Parameters());
 
 		SpellManager activeSpells = new SpellManager(Arrays.asList(
 			new SpellBaseNova(plugin, boss, p.RADIUS, p.DURATION, p.COOLDOWN, p.CAN_MOVE, p.SOUND_CHARGE,
@@ -78,7 +91,7 @@ public class NovaBoss extends BossAbilityGroup {
 						if (p.SPELL_NAME.isEmpty()) {
 							BossUtils.bossDamage(boss, player, p.DAMAGE);
 						} else {
-							BossUtils.bossDamage(boss, player, p.DAMAGE, mBoss.getLocation(), p.SPELL_NAME.getString());
+							BossUtils.bossDamage(boss, player, p.DAMAGE, mBoss.getLocation(), p.SPELL_NAME);
 						}
 					}
 
@@ -86,7 +99,7 @@ public class NovaBoss extends BossAbilityGroup {
 						if (p.SPELL_NAME.isEmpty()) {
 							BossUtils.bossDamagePercent(mBoss, player, p.DAMAGE_PERCENTAGE);
 						} else {
-							BossUtils.bossDamagePercent(mBoss, player, p.DAMAGE_PERCENTAGE, p.SPELL_NAME.getString());
+							BossUtils.bossDamagePercent(mBoss, player, p.DAMAGE_PERCENTAGE, p.SPELL_NAME);
 						}
 					}
 					p.EFFECTS.apply(player, mBoss);

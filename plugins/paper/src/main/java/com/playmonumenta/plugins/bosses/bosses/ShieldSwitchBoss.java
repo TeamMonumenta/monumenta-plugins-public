@@ -13,7 +13,7 @@ import com.playmonumenta.plugins.utils.BossUtils;
 public class ShieldSwitchBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_shieldswitch";
 
-	public static class Parameters {
+	public static class Parameters extends BossParameters {
 		public int DETECTION = 35;
 		public int DELAY = 5 * 20;
 	}
@@ -32,7 +32,7 @@ public class ShieldSwitchBoss extends BossAbilityGroup {
 
 		mBoss = (Mob)boss;
 
-		Parameters p = BossUtils.getParameters(boss, identityTag, new Parameters());
+		Parameters p = BossParameters.getParameters(boss, identityTag, new Parameters());
 
 		SpellManager activeSpells = new SpellManager(Arrays.asList(
 			new SpellShieldSwitch(mBoss, plugin)

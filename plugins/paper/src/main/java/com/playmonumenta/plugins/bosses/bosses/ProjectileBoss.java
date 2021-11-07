@@ -3,7 +3,7 @@ package com.playmonumenta.plugins.bosses.bosses;
 import java.util.Arrays;
 
 import com.playmonumenta.plugins.bosses.SpellManager;
-import com.playmonumenta.plugins.bosses.parameters.CustomString;
+import com.playmonumenta.plugins.bosses.parameters.BossParam;
 import com.playmonumenta.plugins.bosses.parameters.EffectsList;
 import com.playmonumenta.plugins.bosses.parameters.ParticlesList;
 import com.playmonumenta.plugins.bosses.parameters.SoundsList;
@@ -22,40 +22,72 @@ import org.bukkit.potion.PotionEffectType;
 public class ProjectileBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_projectile";
 
-	public static class Parameters {
+	public static class Parameters extends BossParameters {
+		@BossParam(help = "not written")
 		public int DAMAGE = 0;
+
+		@BossParam(help = "not written")
 		public int DISTANCE = 64;
+
+		@BossParam(help = "not written")
 		public double SPEED = 0.4;
+
+		@BossParam(help = "not written")
 		public int DETECTION = 24;
+
+		@BossParam(help = "not written")
 		public int DELAY = 20 * 5;
+
+		@BossParam(help = "not written")
 		public int COOLDOWN = 20 * 10;
+
+		@BossParam(help = "not written")
 		public boolean LINGERS = true;
+
+		@BossParam(help = "not written")
 		public double HITBOX_LENGTH = 0.5;
+
+		@BossParam(help = "not written")
 		public boolean SINGLE_TARGET = true;
+
+		@BossParam(help = "not written")
 		public double DAMAGE_PERCENTAGE = 0.0;
+
+		@BossParam(help = "not written")
 		public boolean LAUNCH_TRACKING = true;
+
+		@BossParam(help = "not written")
 		public double TURN_RADIUS = Math.PI / 30;
+
+		@BossParam(help = "not written")
 		public boolean COLLIDES_WITH_BLOCKS = true;
 
-		/*Effects applied to the player when he got hit */
+
+		@BossParam(help = "Effects applied to the player when he got hit")
 		public EffectsList EFFECTS = EffectsList.EMPTY;
-		/** The spell name showed when the player die by this skill */
-		public CustomString SPELL_NAME = CustomString.EMPTY;
+		@BossParam(help = "The spell name showed when the player die by this skill")
+		public String SPELL_NAME = "";
 
 		//particle & sound used!
-		/** Sound played at the start */
+		@BossParam(help = "Sound played at the start")
 		public SoundsList SOUND_START = SoundsList.fromString("[(ENTITY_BLAZE_AMBIENT,1.5,1)]");
-		/** Particle used when launching the projectile */
+
+		@BossParam(help = "Particle used when launching the projectile")
 		public ParticlesList PARTICLE_LAUNCH = ParticlesList.fromString("[(EXPLOSION_LARGE,1)]");
-		/** Sound used when launching the projectile */
+
+		@BossParam(help = "Sound used when launching the projectile")
 		public SoundsList SOUND_LAUNCH = SoundsList.fromString("[(ENTITY_BLAZE_SHOOT,0.5,0.5)]");
-		/** Particle used for the projectile*/
+
+		@BossParam(help = "Particle used for the projectile")
 		public ParticlesList PARTICLE_PROJECTILE = ParticlesList.fromString("[(FLAME, 4, 0.05, 0.05, 0.05, 0.1),(SMOKE_LARGE, 3, 0.25, 0.25, 0.25)]");
-		/** Sound summoned every 2 sec on the projectile location */
+
+		@BossParam(help = "Sound summoned every 2 sec on the projectile location")
 		public SoundsList SOUND_PROJECTILE = SoundsList.fromString("[(ENTITY_BLAZE_BURN,0.5,0.2)]");
-		/** Particle used when the projectile hit something */
+
+		@BossParam(help = "Particle used when the projectile hit something")
 		public ParticlesList PARTICLE_HIT = ParticlesList.fromString("[(CLOUD,50,0,0,0,0.25)]");
-		/** Sound used when the projectile hit something */
+
+		@BossParam(help = "Sound used when the projectile hit something")
 		public SoundsList SOUND_HIT = SoundsList.fromString("[(ENTITY_GENERIC_DEATH,0.5,0.5)]");
 
 	}
@@ -68,7 +100,7 @@ public class ProjectileBoss extends BossAbilityGroup {
 	public ProjectileBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
 
-		Parameters p = BossUtils.getParameters(boss, identityTag, new Parameters());
+		Parameters p = BossParameters.getParameters(boss, identityTag, new Parameters());
 
 		int lifetimeTicks = (int) (p.DISTANCE/p.SPEED);
 
@@ -101,7 +133,7 @@ public class ProjectileBoss extends BossAbilityGroup {
 								if (p.SPELL_NAME.isEmpty()) {
 									BossUtils.bossDamage(boss, player, p.DAMAGE);
 								} else {
-									BossUtils.bossDamage(boss, player, p.DAMAGE, mBoss.getLocation(), p.SPELL_NAME.getString());
+									BossUtils.bossDamage(boss, player, p.DAMAGE, mBoss.getLocation(), p.SPELL_NAME);
 								}
 							}
 
@@ -109,7 +141,7 @@ public class ProjectileBoss extends BossAbilityGroup {
 								if (p.SPELL_NAME.isEmpty()) {
 									BossUtils.bossDamagePercent(mBoss, player, p.DAMAGE_PERCENTAGE);
 								} else {
-									BossUtils.bossDamagePercent(mBoss, player, p.DAMAGE_PERCENTAGE, p.SPELL_NAME.getString());
+									BossUtils.bossDamagePercent(mBoss, player, p.DAMAGE_PERCENTAGE, p.SPELL_NAME);
 								}
 							}
 							p.EFFECTS.apply(player, boss);

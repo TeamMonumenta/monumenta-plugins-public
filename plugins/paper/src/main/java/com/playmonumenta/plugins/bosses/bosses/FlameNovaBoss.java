@@ -22,7 +22,7 @@ import com.playmonumenta.plugins.utils.BossUtils;
 public class FlameNovaBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_flamenova";
 
-	public static class Parameters {
+	public static class Parameters extends BossParameters {
 		public int RANGE = 9;
 		public int DELAY = 100;
 		public int DAMAGE = 17;
@@ -39,7 +39,7 @@ public class FlameNovaBoss extends BossAbilityGroup {
 	public FlameNovaBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
 
-		Parameters p = BossUtils.getParameters(boss, identityTag, new Parameters());
+		Parameters p = BossParameters.getParameters(boss, identityTag, new Parameters());
 
 		SpellManager activeSpells = new SpellManager(Arrays.asList(
 			new SpellFlameNova(plugin, boss, p.RANGE, p.FUSE_TIME, p.COOLDOWN, p.DAMAGE, p.FIRE_DURATION)

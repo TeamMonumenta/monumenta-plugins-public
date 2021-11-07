@@ -31,7 +31,7 @@ import com.playmonumenta.plugins.utils.PotionUtils;
 public class MagicArrowBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_magicarrow";
 
-	public static class Parameters {
+	public static class Parameters extends BossParameters {
 		public int DAMAGE = 20;
 		public int DISTANCE = 32;
 		public int DETECTION = 24;
@@ -53,7 +53,7 @@ public class MagicArrowBoss extends BossAbilityGroup {
 	public MagicArrowBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
 
-		Parameters p = BossUtils.getParameters(boss, identityTag, new Parameters());
+		Parameters p = BossParameters.getParameters(boss, identityTag, new Parameters());
 
 		int lifeTimeTicks = (int) (p.DISTANCE/p.SPEED);
 

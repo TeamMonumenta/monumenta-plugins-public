@@ -25,7 +25,7 @@ import com.playmonumenta.plugins.utils.PotionUtils;
 public class IceAspectBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_iceaspect";
 
-	public static class Parameters {
+	public static class Parameters extends BossParameters {
 		public int DETECTION = 50;
 		public int SLOW_AMPLIFIER = 1;
 		public int SLOW_DURATION = 80;
@@ -40,7 +40,7 @@ public class IceAspectBoss extends BossAbilityGroup {
 	public IceAspectBoss(Plugin plugin, LivingEntity boss) throws Exception {
 		super(plugin, identityTag, boss);
 
-		mParams = BossUtils.getParameters(boss, identityTag, new Parameters());
+		mParams = BossParameters.getParameters(boss, identityTag, new Parameters());
 		super.constructBoss(null, null, mParams.DETECTION, null);
 	}
 

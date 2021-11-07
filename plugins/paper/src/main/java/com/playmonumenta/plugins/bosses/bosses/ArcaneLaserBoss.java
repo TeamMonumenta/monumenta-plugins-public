@@ -18,7 +18,7 @@ import com.playmonumenta.plugins.utils.BossUtils;
 public class ArcaneLaserBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_arcanelaser";
 
-	public static class Parameters {
+	public static class Parameters extends BossParameters {
 		public int DETECTION = 30;
 		public int SLOW_LEVEL = 1;
 		public int DURATION = 5 * 20;
@@ -34,7 +34,7 @@ public class ArcaneLaserBoss extends BossAbilityGroup {
 	public ArcaneLaserBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
 
-		final Parameters p = BossUtils.getParameters(boss, identityTag, new Parameters());
+		final Parameters p = BossParameters.getParameters(boss, identityTag, new Parameters());
 
 		SpellManager activeSpells = new SpellManager(Arrays.asList(
 			new SpellBaseLaser(plugin, boss, p.DETECTION, p.DURATION, false, p.SINGLE_TARGET, p.COOLDOWN,

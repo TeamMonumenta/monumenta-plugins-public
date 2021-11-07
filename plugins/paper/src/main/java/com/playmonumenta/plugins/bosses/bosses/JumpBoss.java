@@ -15,6 +15,7 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.util.Vector;
 
 import com.playmonumenta.plugins.bosses.SpellManager;
+import com.playmonumenta.plugins.bosses.parameters.BossParam;
 import com.playmonumenta.plugins.bosses.spells.SpellBaseSlam;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.ParticleUtils;
@@ -23,13 +24,20 @@ import com.playmonumenta.plugins.utils.ParticleUtils.SpawnParticleAction;
 public class JumpBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_jump";
 
-	public static class Parameters {
+	public static class Parameters extends BossParameters {
+		@BossParam(help = "not written")
 		public int DELAY = 100;
+		@BossParam(help = "not written")
 		public int MIN_RANGE = 0;
+		@BossParam(help = "not written")
 		public int DETECTION = 32;
+		@BossParam(help = "not written")
 		public int JUMP_HEIGHT = 1;
+		@BossParam(help = "not written")
 		public int RUN_DISTANCE = 0;
+		@BossParam(help = "not written")
 		public int COOLDOWN = 20 * 8;
+		@BossParam(help = "not written")
 		public double VELOCITY_MULTIPLIER = 0.45;
 	}
 
@@ -40,7 +48,7 @@ public class JumpBoss extends BossAbilityGroup {
 	public JumpBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
 
-		Parameters p = BossUtils.getParameters(boss, identityTag, new Parameters());
+		Parameters p = BossParameters.getParameters(boss, identityTag, new Parameters());
 
 		SpellManager manager = new SpellManager(Arrays.asList(new SpellBaseSlam(plugin, boss, p.JUMP_HEIGHT, p.DETECTION, p.MIN_RANGE, p.RUN_DISTANCE, p.COOLDOWN, p.VELOCITY_MULTIPLIER,
 				(World world, Location loc) -> {

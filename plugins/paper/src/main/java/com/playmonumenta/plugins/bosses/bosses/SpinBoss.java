@@ -14,7 +14,7 @@ import org.bukkit.entity.LivingEntity;
 public class SpinBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_spin";
 
-	public static class Parameters {
+	public static class Parameters extends BossParameters {
 		/** Rate of spin in degrees per tick */
 		public int SPIN_RATE = 10;
 	}
@@ -26,7 +26,7 @@ public class SpinBoss extends BossAbilityGroup {
 	public SpinBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
 
-		final Parameters p = BossUtils.getParameters(boss, identityTag, new Parameters());
+		final Parameters p = BossParameters.getParameters(boss, identityTag, new Parameters());
 
 		List<Spell> passiveSpells = Arrays.asList(new SpellRunAction(() -> {
 			Location loc = boss.getLocation();

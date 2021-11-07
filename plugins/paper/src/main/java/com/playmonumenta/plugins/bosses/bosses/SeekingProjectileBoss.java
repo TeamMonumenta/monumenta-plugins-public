@@ -22,7 +22,7 @@ import com.playmonumenta.plugins.utils.PotionUtils;
 public class SeekingProjectileBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_seekingprojectile";
 
-	public static class Parameters {
+	public static class Parameters extends BossParameters {
 		public int DAMAGE = 20;
 		public int DISTANCE = 64;
 		public double SPEED = 0.4;
@@ -52,7 +52,7 @@ public class SeekingProjectileBoss extends BossAbilityGroup {
 	public SeekingProjectileBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
 
-		Parameters p = BossUtils.getParameters(boss, identityTag, new Parameters());
+		Parameters p = BossParameters.getParameters(boss, identityTag, new Parameters());
 		com.playmonumenta.plugins.Plugin customEffectInstance = com.playmonumenta.plugins.Plugin.getInstance();
 		int lifetimeTicks = (int) (p.DISTANCE/p.SPEED);
 

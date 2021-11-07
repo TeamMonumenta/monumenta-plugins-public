@@ -11,6 +11,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
+import com.playmonumenta.plugins.bosses.parameters.BossParam;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.bosses.spells.SpellBaseTrail;
 import com.playmonumenta.plugins.utils.BossUtils;
@@ -19,16 +20,35 @@ import com.playmonumenta.plugins.utils.NmsUtils;
 public class FlameTrailBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_flametrail";
 
-	public static class Parameters {
+	public static class Parameters extends BossParameters {
+		@BossParam(help = "not written")
 		public int DELAY = 100;
+
+		@BossParam(help = "not written")
 		public int DAMAGE = 10;
+
+		@BossParam(help = "not written")
 		public int TICK_RATE = 5;
+
+		@BossParam(help = "not written")
 		public int DETECTION = 24;
+
+		@BossParam(help = "not written")
 		public int TRAIL_RATE = 5;
+
+		@BossParam(help = "not written")
 		public int HITBOX_LENGTH = 1;
+
+		@BossParam(help = "not written")
 		public int FIRE_DURATION = 20 * 8;
+
+		@BossParam(help = "not written")
 		public int TRAIL_DURATION = 20 * 5;
+
+		@BossParam(help = "not written")
 		public boolean TRAIL_CONSUMED = true;
+
+		@BossParam(help = "not written")
 		public boolean TRAIL_GROUND_ONLY = true;
 	}
 
@@ -39,7 +59,7 @@ public class FlameTrailBoss extends BossAbilityGroup {
 	public FlameTrailBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
 
-		Parameters p = BossUtils.getParameters(boss, identityTag, new Parameters());
+		Parameters p = BossParameters.getParameters(boss, identityTag, new Parameters());
 
 
 		List<Spell> passiveSpells = Arrays.asList(

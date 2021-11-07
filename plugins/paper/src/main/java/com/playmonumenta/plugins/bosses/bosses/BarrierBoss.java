@@ -8,6 +8,7 @@ import org.bukkit.Location;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.plugin.Plugin;
 
+import com.playmonumenta.plugins.bosses.parameters.BossParam;
 import com.playmonumenta.plugins.bosses.parameters.ParticlesList;
 import com.playmonumenta.plugins.bosses.parameters.SoundsList;
 import com.playmonumenta.plugins.bosses.spells.Spell;
@@ -17,16 +18,21 @@ import com.playmonumenta.plugins.utils.BossUtils;
 public class BarrierBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_barrier";
 
-	public static class Paramaters {
+	public static class Parameters extends BossParameters {
+		@BossParam(help = "not written")
 		public int DETECTION = 100;
+		@BossParam(help = "not written")
 		public int COOLDOWN = 5 * 20;
+		@BossParam(help = "not written")
 		public int HITS_TO_BREAK = 1;
 
-		/** Particle*/
+		@BossParam(help = "Particle summon at boss loc")
 		public ParticlesList PARTICLE = ParticlesList.fromString("[(REDSTONE,4,0,1,0,#ffffff,2)]");
-		/** Sound played when the barrier refresh */
+
+		@BossParam(help = "Sound played when the barrier refresh")
 		public SoundsList SOUND_REFRESH = SoundsList.fromString("[(BLOCK_BEACON_ACTIVATE,1,1)]");
-		/** Sound played when the barrier break */
+
+		@BossParam(help = "Sound played when the barrier break")
 		public SoundsList SOUND_BREAK = SoundsList.fromString("[(ITEM_SHIELD_BREAK,1,1)]");
 	}
 
@@ -37,7 +43,7 @@ public class BarrierBoss extends BossAbilityGroup {
 	public BarrierBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
 
-		Paramaters p = BossUtils.getParameters(boss, identityTag, new Paramaters());
+		Parameters p = BossParameters.getParameters(boss, identityTag, new Parameters());
 
 		List<Spell> passives = new ArrayList<>(Arrays.asList(new SpellBarrier(plugin, boss, p.DETECTION, p.COOLDOWN, p.HITS_TO_BREAK,
 				(Location loc) -> {

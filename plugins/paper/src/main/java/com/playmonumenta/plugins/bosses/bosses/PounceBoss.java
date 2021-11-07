@@ -12,6 +12,7 @@ import org.bukkit.util.Vector;
 
 import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.parameters.EffectsList;
+import com.playmonumenta.plugins.bosses.parameters.BossParam;
 import com.playmonumenta.plugins.bosses.parameters.ParticlesList;
 import com.playmonumenta.plugins.bosses.parameters.SoundsList;
 import com.playmonumenta.plugins.bosses.spells.SpellBaseSlam;
@@ -24,38 +25,55 @@ import com.playmonumenta.plugins.utils.PlayerUtils;
 public class PounceBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_pounce";
 
-	public static class Parameters {
-
+	public static class Parameters extends BossParameters {
+		@BossParam(help = "not written")
 		public int MIN_RANGE = 0;
+		@BossParam(help = "not written")
 		public int DETECTION = 32;
+		@BossParam(help = "not written")
 		public int DELAY = 20 * 5;
+		@BossParam(help = "not written")
 		public int JUMP_HEIGHT = 1;
+		@BossParam(help = "not written")
 		public int RUN_DISTANCE = 0;
+		@BossParam(help = "not written")
 		public int COOLDOWN = 20 * 8;
+		@BossParam(help = "not written")
 		public double VELOCITY_MULTIPLIER = 0.5;
 
+		@BossParam(help = "not written")
 		public double DAMAGE_RADIUS = 3;
+		@BossParam(help = "not written")
 		public double DAMAGE = 0;
+		@BossParam(help = "not written")
 		public double DAMAGE_PERCENT = 0;
 
+		@BossParam(help = "Effects applied to player hit by the pounce")
 		public EffectsList EFFECTS = EffectsList.EMPTY;
 
 		//Particles & Sounds
-		/** Sound played when the ability start */
+		@BossParam(help = "Sound played when the ability start")
 		public SoundsList SOUND_START = SoundsList.fromString("[(ENTITY_ENDER_DRAGON_GROWL,1,1)]");
-		/** Particle spawned when the ability start */
+
+		@BossParam(help = "Particle spawned whe the ability start")
 		public ParticlesList PARTICLE_START = ParticlesList.fromString("[(LAVA,15)]");
-		/** Particle used at the start of the leap */
+
+		@BossParam(help = "Particle used at the start of the leap")
 		public ParticlesList PARTICLE_LEAP = ParticlesList.fromString("[(LAVA,15)]");
-		/** Sound used at the start of the leap */
+
+		@BossParam(help = "Sound used at the start of the leap")
 		public SoundsList SOUND_LEAP = SoundsList.fromString("[(ENTITY_HORSE_JUMP,1,1)]");
-		/** Particle used for the leaping */
+
+		@BossParam(help = "Particle used for the leaping")
 		public ParticlesList PARTICLE_LEAPING = ParticlesList.fromString("[(REDSTONE,4,0.5,0.5,0.5,#ffffff,1)]");
-		/** Particle summoned when the boss hit the ground as a ring */
+
+		@BossParam(help = "Particle summoned when the boss hit the ground as a ring")
 		public ParticlesList PARTICLE_RING = ParticlesList.fromString("[(FLAME,1,0.1,0.1,0.1,0.1),(CLOUD,1,0.1,0.1,0.1,0.1)]");
-		/** Sound played when a player got hit by the ability or the boss hit the ground*/
+
+		@BossParam(help = "Sound played when a player got hit by the ability or the boss hit the ground")
 		public SoundsList SOUND_HIT = SoundsList.fromString("[(ENTITY_GENERIC_EXPLODE,1.3,0),(ENTITY_GENERIC_EXPLODE,2,1.25)]");
-		/** Particle summoned when a player got hit by the ability or the boss hit the ground*/
+
+		@BossParam(help = "Particle summoned when a player got hit by the ability or the boss hit the ground")
 		public ParticlesList PARTICLE_HIT = ParticlesList.fromString("[(FLAME,60,0,0,0,0.2),(EXPLOSION_NORMAL,20,0,0,0,0.3),(LAVA,27,3,0.25,3,0)]");
 	}
 
@@ -66,7 +84,7 @@ public class PounceBoss extends BossAbilityGroup {
 	public PounceBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
 
-		Parameters p = BossUtils.getParameters(boss, identityTag, new Parameters());
+		Parameters p = BossParameters.getParameters(boss, identityTag, new Parameters());
 		SpellManager manager = new SpellManager(Arrays.asList(new SpellBaseSlam(plugin, boss, p.JUMP_HEIGHT, p.DETECTION, p.MIN_RANGE, p.RUN_DISTANCE, p.COOLDOWN, p.VELOCITY_MULTIPLIER,
 				(World world, Location loc) -> {
 					p.SOUND_START.play(loc, 1f, 1f);

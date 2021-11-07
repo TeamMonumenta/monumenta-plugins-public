@@ -4,7 +4,7 @@ import java.util.Arrays;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.bosses.SpellManager;
-import com.playmonumenta.plugins.bosses.parameters.CustomString;
+import com.playmonumenta.plugins.bosses.parameters.BossParam;
 import com.playmonumenta.plugins.bosses.parameters.EffectsList;
 import com.playmonumenta.plugins.bosses.parameters.ParticlesList;
 import com.playmonumenta.plugins.bosses.parameters.SoundsList;
@@ -21,33 +21,55 @@ import org.bukkit.potion.PotionEffectType;
 public class LaserBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_laser";
 
-	public static class Parameters {
+	public static class Parameters extends BossParameters {
+		@BossParam(help = "not written")
 		public int DAMAGE = 0;
+
+		@BossParam(help = "not written")
 		public int DETECTION = 30;
+
+		@BossParam(help = "not written")
 		public int DELAY = 5 * 20;
+
+		@BossParam(help = "not written")
 		public int DURATION = 5 * 20;
+
+		@BossParam(help = "not written")
 		public int COOLDOWN = 12 * 20;
+
+		@BossParam(help = "not written")
 		public boolean CAN_BLOCK = true;
+
+		@BossParam(help = "not written")
 		public boolean CAN_MOVE = false;
+
+		@BossParam(help = "not written")
 		public boolean SINGLE_TARGET = false;
+
+		@BossParam(help = "not written")
 		public double DAMAGE_PERCENTAGE = 0.0;
 
-		/*Effects apply to player after the laser end */
+		@BossParam(help = "Effects apply to player after the laser end")
 		public EffectsList EFFECTS = EffectsList.EMPTY;
-		/** The spell name showed when the player die by this skill */
-		public CustomString SPELL_NAME = CustomString.EMPTY;
+		@BossParam(help = "The spell name showed when the player die by this skill")
+		public String SPELL_NAME = "";
 
 		//particle & sound used!
-		/** Sound used atch tick on each player */
+		@BossParam(help = "Sound used each tick on each player")
 		public SoundsList SOUND_TICKS = SoundsList.fromString("[(ENTITY_SHULKER_BULLET_HIT)]");
-		/** Particle used for the laser */
+
+		@BossParam(help = "Particle used for the laser")
 		public ParticlesList PARTICLE_LASER = ParticlesList.fromString("[(crit,1),(crit_magic,1)]");
-		/** Particle used when the cast is over */
+
+		@BossParam(help = "Particle used when the cast is over")
 		public ParticlesList PARTICLE_END = ParticlesList.fromString("[(EXPLOSION_NORMAL,35)]");
-		/** Sound used when the cast is over */
+
+		@BossParam(help = "Sound used when the cast is over")
 		public SoundsList SOUND_END = SoundsList.fromString("[(ENTITY_DRAGON_FIREBALL_EXPLODE,0.6,1.5)]");
 
+		@BossParam(help = "not written")
 		public int PARTICLE_FREQUENCY = 1;
+		@BossParam(help = "not written")
 		public int PARTICLE_CHANCE = 6;
 	}
 
@@ -58,7 +80,7 @@ public class LaserBoss extends BossAbilityGroup {
 	public LaserBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
 
-		final Parameters p = BossUtils.getParameters(boss, identityTag, new Parameters());
+		final Parameters p = BossParameters.getParameters(boss, identityTag, new Parameters());
 
 		SpellManager activeSpells = new SpellManager(Arrays.asList(
 			new SpellBaseLaser(plugin, boss, p.DETECTION, p.DURATION, false, p.SINGLE_TARGET, p.COOLDOWN,
@@ -93,7 +115,7 @@ public class LaserBoss extends BossAbilityGroup {
 							if (p.SPELL_NAME.isEmpty()) {
 								BossUtils.bossDamage(boss, player, p.DAMAGE);
 							} else {
-								BossUtils.bossDamage(boss, player, p.DAMAGE, mBoss.getLocation(), p.SPELL_NAME.getString());
+								BossUtils.bossDamage(boss, player, p.DAMAGE, mBoss.getLocation(), p.SPELL_NAME);
 							}
 						}
 
@@ -101,7 +123,7 @@ public class LaserBoss extends BossAbilityGroup {
 							if (p.SPELL_NAME.isEmpty()) {
 								BossUtils.bossDamagePercent(mBoss, player, p.DAMAGE_PERCENTAGE);
 							} else {
-								BossUtils.bossDamagePercent(mBoss, player, p.DAMAGE_PERCENTAGE, p.SPELL_NAME.getString());
+								BossUtils.bossDamagePercent(mBoss, player, p.DAMAGE_PERCENTAGE, p.SPELL_NAME);
 							}
 						}
 
