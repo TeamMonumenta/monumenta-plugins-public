@@ -312,7 +312,7 @@ public abstract class Ability {
 	 * For different conditions, an ability must override this method
 	 */
 	public boolean canUse(Player player) {
-		return mInfo.mScoreboardId != null && ScoreboardUtils.getScoreboardValue(player, mInfo.mScoreboardId) > 0;
+		return mInfo.mScoreboardId != null && ScoreboardUtils.getScoreboardValue(player, mInfo.mScoreboardId).orElse(0) > 0;
 	}
 
 	/*
@@ -322,7 +322,7 @@ public abstract class Ability {
 		AbilityInfo info = getInfo();
 		if (mPlayer != null && info.mScoreboardId != null) {
 			if (mScore == null) {
-				mScore = ScoreboardUtils.getScoreboardValue(mPlayer, info.mScoreboardId);
+				mScore = ScoreboardUtils.getScoreboardValue(mPlayer, info.mScoreboardId).orElse(0);
 			}
 			return mScore;
 		}

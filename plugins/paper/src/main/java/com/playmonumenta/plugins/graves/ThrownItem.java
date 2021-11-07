@@ -74,7 +74,7 @@ public class ThrownItem {
 		mValid = true;
 		mDungeonInstance = null;
 		if (ScoreboardUtils.getScoreboardValue("$Shard", "const").orElse(0) > 0) {
-			mDungeonInstance = ScoreboardUtils.getScoreboardValue(mPlayer, "DAccess");
+			mDungeonInstance = ScoreboardUtils.getScoreboardValue(mPlayer, "DAccess").orElse(0);
 		}
 		// Item dropping for first time, make immune to explosions for 5 seconds.
 		// This prevents shattering due to double-creepers and TNT traps.
@@ -225,7 +225,7 @@ public class ThrownItem {
 
 	private void updateInstance() {
 		if (isInThisWorld() && mDungeonInstance != null) {
-			int instance = ScoreboardUtils.getScoreboardValue(mPlayer, "DAccess");
+			int instance = ScoreboardUtils.getScoreboardValue(mPlayer, "DAccess").orElse(0);
 			if (instance != 0 && instance != mDungeonInstance) {
 				int x = 512 * ((instance / Constants.DUNGEON_INSTANCE_MODULUS) - (mDungeonInstance / Constants.DUNGEON_INSTANCE_MODULUS));
 				int z = 512 * ((instance % Constants.DUNGEON_INSTANCE_MODULUS) - (mDungeonInstance % Constants.DUNGEON_INSTANCE_MODULUS));

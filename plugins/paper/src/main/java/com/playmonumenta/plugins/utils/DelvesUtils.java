@@ -420,8 +420,8 @@ public class DelvesUtils {
 			return 0;
 		}
 
-		long msb = ScoreboardUtils.getScoreboardValue(player, prefix + 1);
-		long lsb = ScoreboardUtils.getScoreboardValue(player, prefix + 2);
+		long msb = ScoreboardUtils.getScoreboardValue(player, prefix + 1).orElse(0);
+		long lsb = ScoreboardUtils.getScoreboardValue(player, prefix + 2).orElse(0);
 		return (msb << 31) + lsb; // Shift MSB by only 31 bits because treating ints as 31 bit unsigned ints
 	}
 

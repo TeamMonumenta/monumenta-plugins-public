@@ -46,7 +46,7 @@ public class DailyReset {
 	public static void handle(Plugin plugin, Player player) {
 		if (ServerProperties.getDailyResetEnabled() && player != null) {
 			//  Test to see if the player's Daily version is different than the servers.
-			int dailyVersion = ScoreboardUtils.getScoreboardValue(player, "DailyVersion");
+			int dailyVersion = ScoreboardUtils.getScoreboardValue(player, "DailyVersion").orElse(0);
 			if (dailyVersion != getDailyVersion()) {
 				//  If so reset some scoreboards and message the player.
 				ScoreboardUtils.setScoreboardValue(player, "DailyVersion", getDailyVersion());

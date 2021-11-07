@@ -104,7 +104,7 @@ public class DepthsParty {
 			}
 
 			if (mPartyNum <= 0) {
-				mPartyNum = ScoreboardUtils.getScoreboardValue(p, "DDAccess");
+				mPartyNum = ScoreboardUtils.getScoreboardValue(p, "DDAccess").orElse(0);
 				if (mPartyNum <= 0) {
 					mPartyNum = UUID.randomUUID().getMostSignificantBits() & Long.MAX_VALUE;
 				}
@@ -274,7 +274,7 @@ public class DepthsParty {
 			Player p = Bukkit.getPlayer(dp.mPlayerId);
 			if (p != null && p.isOnline()) {
 				ret += "" + p.getName() + " ";
-				if (ScoreboardUtils.getScoreboardValue(p, "Depths") > 0) {
+				if (ScoreboardUtils.getScoreboardValue(p, "Depths").orElse(0) > 0) {
 					endlessModeUnlocked = true;
 				}
 			}
@@ -443,7 +443,7 @@ public class DepthsParty {
 				}
 			}
 			//Set their highest room score and do announcements
-			int highestRoom = ScoreboardUtils.getScoreboardValue(p, "DepthsEndless");
+			int highestRoom = ScoreboardUtils.getScoreboardValue(p, "DepthsEndless").orElse(0);
 			if (roomReached > highestRoom) {
 				ScoreboardUtils.setScoreboardValue(p, "DepthsEndless", roomReached);
 				Bukkit.getServer().dispatchCommand(Bukkit.getServer().getConsoleSender(), "broadcastcommand leaderboard update " + p.getDisplayName() + " DepthsEndless");

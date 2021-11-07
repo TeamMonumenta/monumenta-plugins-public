@@ -81,7 +81,7 @@ public class TeleportByScore extends GenericCommand {
 			return null;
 		}
 
-		return ScoreboardUtils.getScoreboardValue(entity.getName(), obj).orElse(null);
+		return ScoreboardUtils.getScoreboardValue(entity, obj).orElse(null);
 	}
 
 	private static void teleport(@Nonnull CommandSender sender, @Nonnull Entity entity, @Nonnull String objX, @Nonnull String objY, @Nonnull String objZ, @Nullable String objYaw, @Nullable String objPitch, float scale, @Nullable FunctionWrapper[] asyncFunctions) {

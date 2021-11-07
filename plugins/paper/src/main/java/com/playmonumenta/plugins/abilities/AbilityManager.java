@@ -883,8 +883,8 @@ public class AbilityManager {
 			}
 		}
 		// Reset Skill and SkillSpec
-		int skill = ScoreboardUtils.getScoreboardValue(player, "TotalLevel");
-		int spec = ScoreboardUtils.getScoreboardValue(player, "TotalSpec");
+		int skill = ScoreboardUtils.getScoreboardValue(player, "TotalLevel").orElse(0);
+		int spec = ScoreboardUtils.getScoreboardValue(player, "TotalSpec").orElse(0);
 		ScoreboardUtils.setScoreboardValue(player, "Skill", skill);
 		ScoreboardUtils.setScoreboardValue(player, "SkillSpec", spec);
 

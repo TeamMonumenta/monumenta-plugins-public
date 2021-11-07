@@ -62,7 +62,7 @@ public class UnstableArrows extends Ability {
 		mInfo.mShorthandName = "UA";
 		mInfo.mDescriptions.add("When you crouch and fire an arrow it will begin to hiss upon landing. 3s later it explodes, dealing 12 damage to mobs within a four block radius and spawning an Alchemist Potion at the location. Cooldown: 20 seconds. You can toggle whether the explosion will apply knockback to you or not in the P.E.B.");
 		mInfo.mDescriptions.add("The damage is increased to 20 and the cooldown is reduced to 16s.");
-		if (player == null || ScoreboardUtils.getScoreboardValue(player, "RocketJumper") == 9001) {
+		if (player == null || ScoreboardUtils.getScoreboardValue(player, "RocketJumper").orElse(0) == 9001) {
 			mInfo.mCooldown = 0;
 		} else {
 			mInfo.mCooldown = getAbilityScore() == 1 ? UNSTABLE_ARROWS_1_COOLDOWN : UNSTABLE_ARROWS_2_COOLDOWN;
@@ -76,7 +76,7 @@ public class UnstableArrows extends Ability {
 			AbstractArrow arrow = (AbstractArrow) proj;
 			if (mUnstableArrow != null && arrow == mUnstableArrow) {
 				arrow.setPickupStatus(Arrow.PickupStatus.DISALLOWED);
-				if (mPlayer == null || ScoreboardUtils.getScoreboardValue(mPlayer, "RocketJumper") == 9001) {
+				if (mPlayer == null || ScoreboardUtils.getScoreboardValue(mPlayer, "RocketJumper").orElse(0) == 9001) {
 					mInfo.mCooldown = 0;
 				}
 				putOnCooldown();
@@ -119,7 +119,7 @@ public class UnstableArrows extends Ability {
 							}
 
 							// Custom knockback function because this is unreliable as is with weird arrow location calculations
-							if (ScoreboardUtils.getScoreboardValue(mPlayer, "RocketJumper") == 1
+							if (ScoreboardUtils.getScoreboardValue(mPlayer, "RocketJumper").orElse(0) == 1
 								&& mPlayer.getLocation().distance(mLoc) < UNSTABLE_ARROWS_RADIUS / 2.0) {
 								if (!ZoneUtils.hasZoneProperty(mPlayer, ZoneProperty.NO_MOBILITY_ABILITIES)) {
 									Vector dir = mPlayer.getLocation().subtract(mLoc.toVector()).toVector();
@@ -127,7 +127,7 @@ public class UnstableArrows extends Ability {
 									dir.setY(dir.getY() + 0.5);
 									mPlayer.setVelocity(dir);
 								}
-							} else if (ScoreboardUtils.getScoreboardValue(mPlayer, "RocketJumper") == 9001
+							} else if (ScoreboardUtils.getScoreboardValue(mPlayer, "RocketJumper").orElse(0) == 9001
 								&& mPlayer.getLocation().distance(mLoc) < UNSTABLE_ARROWS_RADIUS) {
 								MovementUtils.knockAwayRealistic(mLoc, mPlayer, UNSTABLE_ARROWS_KNOCKBACK_SPEED * 4, 6);
 							}

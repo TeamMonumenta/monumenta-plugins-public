@@ -89,7 +89,7 @@ public class AlchemistPotions extends Ability implements AbilityWithChargesOrSta
 		* future-proofing.
 		*/
 		if (player != null) {
-			mCharges = ScoreboardUtils.getScoreboardValue(player, POTION_SCOREBOARD);
+			mCharges = ScoreboardUtils.getScoreboardValue(player, POTION_SCOREBOARD).orElse(0);
 			mChargeTime = POTIONS_TIMER_BASE;
 			new BukkitRunnable() {
 				@Override
@@ -146,7 +146,7 @@ public class AlchemistPotions extends Ability implements AbilityWithChargesOrSta
 
 	@Override
 	public boolean canUse(Player player) {
-		return ScoreboardUtils.getScoreboardValue(player, "Class") == 5;
+		return ScoreboardUtils.getScoreboardValue(player, "Class").orElse(0) == 5;
 	}
 
 	@Override

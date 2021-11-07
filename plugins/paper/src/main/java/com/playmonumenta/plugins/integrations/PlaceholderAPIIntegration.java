@@ -46,7 +46,7 @@ public class PlaceholderAPIIntegration extends PlaceholderExpansion {
 		if (identifier.equalsIgnoreCase("class")) {
 			// TODO: This really should use the standard thing in Plugin.java... but it's
 			// currently a pile of crap and this is actually less awful
-			switch (ScoreboardUtils.getScoreboardValue(player, "Class")) {
+			switch (ScoreboardUtils.getScoreboardValue(player, "Class").orElse(0)) {
 			case 0:
 				return "No class";
 			case 1:
@@ -71,7 +71,7 @@ public class PlaceholderAPIIntegration extends PlaceholderExpansion {
 
 		// %monumenta_level%
 		if (identifier.equalsIgnoreCase("level")) {
-			return Integer.toString(ScoreboardUtils.getScoreboardValue(player, "TotalLevel"));
+			return Integer.toString(ScoreboardUtils.getScoreboardValue(player, "TotalLevel").orElse(0));
 		}
 
 		if (identifier.equalsIgnoreCase("shard")) {

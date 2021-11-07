@@ -22,7 +22,7 @@ public class RoguePassive extends Ability {
 
 	@Override
 	public boolean canUse(Player player) {
-		return ScoreboardUtils.getScoreboardValue(player, "Class") == 4;
+		return ScoreboardUtils.getScoreboardValue(player, "Class").orElse(0) == 4;
 	}
 
 	@Override

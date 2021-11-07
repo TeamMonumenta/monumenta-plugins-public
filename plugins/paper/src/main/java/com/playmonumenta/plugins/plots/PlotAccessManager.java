@@ -394,9 +394,9 @@ public class PlotAccessManager {
 
 	/* Gets the player's plot coords based on scores. If no plot, return null */
 	private @Nullable String getPlotCoordsKey(Player player) {
-		int x = ScoreboardUtils.getScoreboardValue(player, "plotx");
-		int y = ScoreboardUtils.getScoreboardValue(player, "ploty");
-		int z = ScoreboardUtils.getScoreboardValue(player, "plotz");
+		int x = ScoreboardUtils.getScoreboardValue(player, "plotx").orElse(0);
+		int y = ScoreboardUtils.getScoreboardValue(player, "ploty").orElse(0);
+		int z = ScoreboardUtils.getScoreboardValue(player, "plotz").orElse(0);
 
 		if (y <= 0) {
 			return null;

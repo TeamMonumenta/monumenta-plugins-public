@@ -118,7 +118,7 @@ public class Grave {
 		mWorldName = mPlayer.getWorld().getName();
 		mDungeonInstance = null;
 		if (ScoreboardUtils.getScoreboardValue("$Shard", "const").orElse(0) > 0) {
-			mDungeonInstance = ScoreboardUtils.getScoreboardValue(mPlayer, "DAccess");
+			mDungeonInstance = ScoreboardUtils.getScoreboardValue(mPlayer, "DAccess").orElse(0);
 		}
 		mLocation = mPlayer.getLocation().clone();
 		if (mLocation.getY() < 0) {
@@ -546,7 +546,7 @@ public class Grave {
 
 	private void updateInstance() {
 		if (isInThisWorld() && mDungeonInstance != null) {
-			int instance = ScoreboardUtils.getScoreboardValue(mPlayer, "DAccess");
+			int instance = ScoreboardUtils.getScoreboardValue(mPlayer, "DAccess").orElse(0);
 			if (instance != 0 && instance != mDungeonInstance) {
 				int x = 512 * ((instance / Constants.DUNGEON_INSTANCE_MODULUS) - (mDungeonInstance / Constants.DUNGEON_INSTANCE_MODULUS));
 				int z = 512 * ((instance % Constants.DUNGEON_INSTANCE_MODULUS) - (mDungeonInstance % Constants.DUNGEON_INSTANCE_MODULUS));

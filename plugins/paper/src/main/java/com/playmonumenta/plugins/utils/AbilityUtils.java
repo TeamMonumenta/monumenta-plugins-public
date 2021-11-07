@@ -318,7 +318,7 @@ public class AbilityUtils {
 	}
 
 	public static String getClass(Player player) {
-		int classVal = ScoreboardUtils.getScoreboardValue(player, "Class");
+		int classVal = ScoreboardUtils.getScoreboardValue(player, "Class").orElse(0);
 		switch (classVal) {
 		case 1:
 			return "Mage";
@@ -335,7 +335,7 @@ public class AbilityUtils {
 		case 7:
 			return "Warlock";
 		default:
-			return "???";
+			return "No Class";
 		}
 	}
 
@@ -361,7 +361,7 @@ public class AbilityUtils {
 	}
 
 	public static String getSpec(Player player) {
-		int classVal = ScoreboardUtils.getScoreboardValue(player, "Specialization");
+		int classVal = ScoreboardUtils.getScoreboardValue(player, "Specialization").orElse(0);
 		switch (classVal) {
 		case 1:
 			return "Arcanist";

@@ -289,7 +289,7 @@ public class GraveItem {
 
 	private void updateInstance() {
 		if (isInThisWorld() && mDungeonInstance != null) {
-			int instance = ScoreboardUtils.getScoreboardValue(mPlayer, "DAccess");
+			int instance = ScoreboardUtils.getScoreboardValue(mPlayer, "DAccess").orElse(0);
 			if (instance != 0 && instance != mDungeonInstance) {
 				int x = 512 * ((instance / Constants.DUNGEON_INSTANCE_MODULUS) - (mDungeonInstance / Constants.DUNGEON_INSTANCE_MODULUS));
 				int z = 512 * ((instance % Constants.DUNGEON_INSTANCE_MODULUS) - (mDungeonInstance % Constants.DUNGEON_INSTANCE_MODULUS));

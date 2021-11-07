@@ -25,7 +25,7 @@ public class MagePassive extends Ability {
 
 	@Override
 	public boolean canUse(Player player) {
-		return ScoreboardUtils.getScoreboardValue(player, "Class") == 1;
+		return ScoreboardUtils.getScoreboardValue(player, "Class").orElse(0) == 1;
 	}
 
 	@Override

@@ -159,10 +159,10 @@ public class ParrotManager implements Listener {
 			return;
 		}
 
-		int leftShoulderParrot = ScoreboardUtils.getScoreboardValue(p, SCOREBOARD_PARROT_LEFT);
-		int rightShoulderParrot = ScoreboardUtils.getScoreboardValue(p, SCOREBOARD_PARROT_RIGHT);
+		int leftShoulderParrot = ScoreboardUtils.getScoreboardValue(p, SCOREBOARD_PARROT_LEFT).orElse(0);
+		int rightShoulderParrot = ScoreboardUtils.getScoreboardValue(p, SCOREBOARD_PARROT_RIGHT).orElse(0);
 
-		int bothShoulder = ScoreboardUtils.getScoreboardValue(p, SCOREBOARD_PARROT_BOTH);
+		int bothShoulder = ScoreboardUtils.getScoreboardValue(p, SCOREBOARD_PARROT_BOTH).orElse(0);
 
 		ScoreboardUtils.setScoreboardValue(p, SCOREBOARD_PARROT_VISIBLE, 1);
 
@@ -250,8 +250,8 @@ public class ParrotManager implements Listener {
 	public static void setParrotVisible(Player player, boolean visible) {
 		if (visible) {
 			ScoreboardUtils.setScoreboardValue(player, SCOREBOARD_PARROT_VISIBLE, 1);
-			int parrotLeft = ScoreboardUtils.getScoreboardValue(player, SCOREBOARD_PARROT_LEFT);
-			int parrotRight = ScoreboardUtils.getScoreboardValue(player, SCOREBOARD_PARROT_RIGHT);
+			int parrotLeft = ScoreboardUtils.getScoreboardValue(player, SCOREBOARD_PARROT_LEFT).orElse(0);
+			int parrotRight = ScoreboardUtils.getScoreboardValue(player, SCOREBOARD_PARROT_RIGHT).orElse(0);
 			if (parrotLeft != 0) {
 				updateParrot(player, parrotLeft, PlayerShoulder.LEFT);
 			}
@@ -274,14 +274,14 @@ public class ParrotManager implements Listener {
 	}
 
 	public static boolean hasParrotOnShoulders(Player player) {
-		return ScoreboardUtils.getScoreboardValue(player, SCOREBOARD_PARROT_LEFT) != 0 || ScoreboardUtils.getScoreboardValue(player, SCOREBOARD_PARROT_RIGHT) != 0;
+		return ScoreboardUtils.getScoreboardValue(player, SCOREBOARD_PARROT_LEFT).orElse(0) != 0 || ScoreboardUtils.getScoreboardValue(player, SCOREBOARD_PARROT_RIGHT).orElse(0) != 0;
 	}
 
 
 
 	public static void updateAllParrot(Player player) {
-		int parrotRight = ScoreboardUtils.getScoreboardValue(player, SCOREBOARD_PARROT_RIGHT);
-		int parrotLeft = ScoreboardUtils.getScoreboardValue(player, SCOREBOARD_PARROT_LEFT);
+		int parrotRight = ScoreboardUtils.getScoreboardValue(player, SCOREBOARD_PARROT_RIGHT).orElse(0);
+		int parrotLeft = ScoreboardUtils.getScoreboardValue(player, SCOREBOARD_PARROT_LEFT).orElse(0);
 
 		if (parrotLeft != 0) {
 			ParrotManager.updateParrot(player, parrotLeft, PlayerShoulder.LEFT);
@@ -299,11 +299,11 @@ public class ParrotManager implements Listener {
 	}
 
 	public static boolean isParrotsVisible(Player p) {
-		return ScoreboardUtils.getScoreboardValue(p, SCOREBOARD_PARROT_VISIBLE) != 0;
+		return ScoreboardUtils.getScoreboardValue(p, SCOREBOARD_PARROT_VISIBLE).orElse(0) != 0;
 	}
 
 	public static boolean hasDoubleShoulders(Player p) {
-		return ScoreboardUtils.getScoreboardValue(p, SCOREBOARD_PARROT_BOTH) > 0;
+		return ScoreboardUtils.getScoreboardValue(p, SCOREBOARD_PARROT_BOTH).orElse(0) > 0;
 	}
 
 	@EventHandler
@@ -330,7 +330,7 @@ public class ParrotManager implements Listener {
 	@EventHandler
 	public void onCFlight(PlayerToggleFlightEvent e) {
 		final Player player = e.getPlayer();
-		int visible = ScoreboardUtils.getScoreboardValue(player, SCOREBOARD_PARROT_VISIBLE);
+		int visible = ScoreboardUtils.getScoreboardValue(player, SCOREBOARD_PARROT_VISIBLE).orElse(0);
 		if (visible != 0 && player.isFlying()) {
 			new BukkitRunnable() {
 				@Override
@@ -345,7 +345,7 @@ public class ParrotManager implements Listener {
 	public void onJoinBed(PlayerBedEnterEvent e) {
 		//we need to remove the parrots when someone go to the bed
 		final Player player = e.getPlayer();
-		int visible = ScoreboardUtils.getScoreboardValue(player, SCOREBOARD_PARROT_VISIBLE);
+		int visible = ScoreboardUtils.getScoreboardValue(player, SCOREBOARD_PARROT_VISIBLE).orElse(0);
 		if (visible != 0) {
 			mPrideLeft.remove(player);
 			mPrideRight.remove(player);
@@ -356,7 +356,7 @@ public class ParrotManager implements Listener {
 	@EventHandler
 	public void onLeaveBed(PlayerBedLeaveEvent e) {
 		final Player player = e.getPlayer();
-		int visible = ScoreboardUtils.getScoreboardValue(player, SCOREBOARD_PARROT_VISIBLE);
+		int visible = ScoreboardUtils.getScoreboardValue(player, SCOREBOARD_PARROT_VISIBLE).orElse(0);
 		if (visible != 0) {
 			new BukkitRunnable() {
 				@Override

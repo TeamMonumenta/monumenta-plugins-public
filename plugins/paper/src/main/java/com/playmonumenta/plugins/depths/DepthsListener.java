@@ -319,7 +319,7 @@ public class DepthsListener implements Listener {
 	public void playerSave(PlayerSaveEvent event) {
 
 		//If they are in the system with an access score of zero, remove them from the system
-		if (ScoreboardUtils.getScoreboardValue(event.getPlayer(), "DDAccess") == 0) {
+		if (ScoreboardUtils.getScoreboardValue(event.getPlayer(), "DDAccess").orElse(0) == 0) {
 			DepthsManager.getInstance().deletePlayer(event.getPlayer());
 		}
 

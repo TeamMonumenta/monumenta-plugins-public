@@ -45,7 +45,7 @@ public class PromoteGuild {
 			CommandAPI.fail(err);
 		}
 
-		if (ScoreboardUtils.getScoreboardValue(player, "Founder") == 1) {
+		if (ScoreboardUtils.getScoreboardValue(player, "Founder").orElse(0) == 1) {
 			String err = ChatColor.RED + "You are already a founder of guild '" + currentGuildName + "'";
 			player.sendMessage(err);
 			CommandAPI.fail(err);
@@ -57,7 +57,7 @@ public class PromoteGuild {
 			String nearbyPlayerGroupName = LuckPermsIntegration.getGuildName(nearbyPlayerGroup);
 			if (nearbyPlayerGroup != null && nearbyPlayerGroupName != null &&
 			    nearbyPlayerGroupName.equalsIgnoreCase(currentGuildName) &&
-				ScoreboardUtils.getScoreboardValue(p, "Founder") == 1) {
+				ScoreboardUtils.getScoreboardValue(p, "Founder").orElse(0) == 1) {
 
 				// Set scores and permissions
 				ScoreboardUtils.setScoreboardValue(player, "Founder", 1);

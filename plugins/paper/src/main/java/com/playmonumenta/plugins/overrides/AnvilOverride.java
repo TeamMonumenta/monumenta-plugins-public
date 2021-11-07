@@ -68,7 +68,7 @@ public class AnvilOverride extends BaseOverride {
 			}.runTaskTimer(plugin, 0, 7);
 			block.setType(Material.AIR);
 			block.removeMetadata(Constants.ANVIL_CONFIRMATION_METAKEY, plugin);
-			int repCount = ScoreboardUtils.getScoreboardValue(player, REPAIR_OBJECTIVE) + 1;
+			int repCount = ScoreboardUtils.getScoreboardValue(player, REPAIR_OBJECTIVE).orElse(0) + 1;
 			ScoreboardUtils.setScoreboardValue(player, REPAIR_OBJECTIVE, repCount);
 
 			Bukkit.dispatchCommand(Bukkit.getConsoleSender(),

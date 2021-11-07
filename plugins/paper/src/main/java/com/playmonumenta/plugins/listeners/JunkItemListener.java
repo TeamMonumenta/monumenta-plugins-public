@@ -183,7 +183,7 @@ public class JunkItemListener implements Listener {
 				return;
 			}
 
-			int minStack = ScoreboardUtils.getScoreboardValue(player, PICKUP_MIN_OBJ_NAME);
+			int minStack = ScoreboardUtils.getScoreboardValue(player, PICKUP_MIN_OBJ_NAME).orElse(0);
 			if (minStack <= 0) { // Initializes PickupMin at JUNK_ITEM_SIZE_THRESHOLD; removes useless PickupMin values
 				minStack = JUNK_ITEM_SIZE_THRESHOLD;
 				ScoreboardUtils.setScoreboardValue(player, PICKUP_MIN_OBJ_NAME, minStack);

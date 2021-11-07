@@ -70,6 +70,6 @@ public class Warlock extends PlayerClass {
 
 	@Override
 	public Boolean getClassAccessPerms(Player player) {
-		return ScoreboardUtils.getScoreboardValue(player, "Quest13") >= 1;
+		return ScoreboardUtils.getScoreboardValue(player, "Quest13").orElse(0) >= 1;
 	}
 }

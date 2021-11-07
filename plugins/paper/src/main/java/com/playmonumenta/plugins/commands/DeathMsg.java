@@ -98,7 +98,7 @@ public class DeathMsg {
 			ScoreboardUtils.setScoreboardValue(player, Constants.SCOREBOARD_DEATH_MESSAGE, newState.getScore());
 		} else {
 			// Otherwise, get the existing value
-			newState = DeathMessageState.getDeathMessageState(ScoreboardUtils.getScoreboardValue(player, Constants.SCOREBOARD_DEATH_MESSAGE));
+			newState = DeathMessageState.getDeathMessageState(ScoreboardUtils.getScoreboardValue(player, Constants.SCOREBOARD_DEATH_MESSAGE).orElse(0));
 		}
 
 		player.sendMessage(ChatColor.GOLD + "" + ChatColor.BOLD + "Death Message Settings");

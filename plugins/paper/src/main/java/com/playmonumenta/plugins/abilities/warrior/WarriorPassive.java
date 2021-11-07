@@ -18,7 +18,7 @@ public class WarriorPassive extends Ability {
 
 	@Override
 	public boolean canUse(Player player) {
-		return ScoreboardUtils.getScoreboardValue(player, "Class") == 2;
+		return ScoreboardUtils.getScoreboardValue(player, "Class").orElse(0) == 2;
 	}
 
 	@Override

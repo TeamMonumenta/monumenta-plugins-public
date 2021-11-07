@@ -72,7 +72,7 @@ public class YellowTesseractOverride extends BaseOverride {
 			return true;
 		}
 		// If player doesn't have the quest done, tell them they can't use it
-		if (ScoreboardUtils.getScoreboardValue(player, "Quest114") < 15) {
+		if (ScoreboardUtils.getScoreboardValue(player, "Quest114").orElse(0) < 15) {
 			player.sendMessage(Component.text("You have not completed Primeval Creations III!", NamedTextColor.RED));
 			return false;
 		}
@@ -103,7 +103,7 @@ public class YellowTesseractOverride extends BaseOverride {
 			/* Active and soulbound to player */
 			if ((action.equals(Action.RIGHT_CLICK_AIR) || action.equals(Action.RIGHT_CLICK_BLOCK))) {
 				boolean safeZone = ZoneUtils.hasZoneProperty(player, ZoneProperty.RESIST_5);
-				int cd = ScoreboardUtils.getScoreboardValue(player, "YellowCooldown");
+				int cd = ScoreboardUtils.getScoreboardValue(player, "YellowCooldown").orElse(0);
 				// If the player is in a safezone and the Tesseract is on CD, remove CD and continue.
 				if (safeZone && cd > 0) {
 					ScoreboardUtils.setScoreboardValue(player, "YellowCooldown", 0);
@@ -151,8 +151,8 @@ public class YellowTesseractOverride extends BaseOverride {
 		ItemMeta meta = item.getItemMeta();
 		List<Component> lore = meta.lore();
 		Map<String, Integer> targetSkills = new HashMap<String, Integer>();
-		Integer totalLevel = ScoreboardUtils.getScoreboardValue(player, TOTAL_LEVEL);
-		Integer totalSpec = ScoreboardUtils.getScoreboardValue(player, TOTAL_SPEC);
+		Integer totalLevel = ScoreboardUtils.getScoreboardValue(player, TOTAL_LEVEL).orElse(0);
+		Integer totalSpec = ScoreboardUtils.getScoreboardValue(player, TOTAL_SPEC).orElse(0);
 
 		/* Get all the target skills */
 		for (Component comp : lore) {
@@ -251,10 +251,10 @@ public class YellowTesseractOverride extends BaseOverride {
 	private void storeSkills(Player player, ItemStack item) {
 		ItemMeta meta = item.getItemMeta();
 		List<Component> lore = meta.lore();
-		Integer classLevel = ScoreboardUtils.getScoreboardValue(player, LEVEL);
-		Integer totalLevel = ScoreboardUtils.getScoreboardValue(player, TOTAL_LEVEL);
-		Integer specLevel = ScoreboardUtils.getScoreboardValue(player, SPEC_LEVEL);
-		Integer totalSpec = ScoreboardUtils.getScoreboardValue(player, TOTAL_SPEC);
+		Integer classLevel = ScoreboardUtils.getScoreboardValue(player, LEVEL).orElse(0);
+		Integer totalLevel = ScoreboardUtils.getScoreboardValue(player, TOTAL_LEVEL).orElse(0);
+		Integer specLevel = ScoreboardUtils.getScoreboardValue(player, SPEC_LEVEL).orElse(0);
+		Integer totalSpec = ScoreboardUtils.getScoreboardValue(player, TOTAL_SPEC).orElse(0);
 
 		if (InventoryUtils.testForItemWithLore(item, CLASS_STR)) {
 			clearTesseractLore(lore);

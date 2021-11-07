@@ -66,7 +66,7 @@ public abstract class PatronParticles extends Ability {
 	@Override
 	public boolean canUse(Player player) {
 		// Changing to different coloured particles also refreshes class, meaning canUse() will function fine just checking once
-		int particleScore = ScoreboardUtils.getScoreboardValue(player, mParticleObjectiveName);
+		int particleScore = ScoreboardUtils.getScoreboardValue(player, mParticleObjectiveName).orElse(0);
 		return (
 			particleScore > 0
 			&& PlayerData.getPatreonDollars(player) >= mMinimumPatreonScore

@@ -41,7 +41,7 @@ public class PlayerUtils {
 	}
 
 	public static void awardStrike(Plugin plugin, Player player, String reason) {
-		int strikes = ScoreboardUtils.getScoreboardValue(player, "Strikes");
+		int strikes = ScoreboardUtils.getScoreboardValue(player, "Strikes").orElse(0);
 		strikes++;
 		ScoreboardUtils.setScoreboardValue(player, "Strikes", strikes);
 

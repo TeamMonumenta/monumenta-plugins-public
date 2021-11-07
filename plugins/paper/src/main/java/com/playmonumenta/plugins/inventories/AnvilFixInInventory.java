@@ -72,7 +72,7 @@ public class AnvilFixInInventory implements Listener {
 
 			}.runTaskTimer(mPlugin, 0, 7);
 
-			int repCount = ScoreboardUtils.getScoreboardValue(player, REPAIR_OBJECTIVE) + 1;
+			int repCount = ScoreboardUtils.getScoreboardValue(player, REPAIR_OBJECTIVE).orElse(0) + 1;
 			ScoreboardUtils.setScoreboardValue(player, REPAIR_OBJECTIVE, repCount);
 
 			Bukkit.dispatchCommand(Bukkit.getConsoleSender(),

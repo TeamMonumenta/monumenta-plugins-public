@@ -71,11 +71,11 @@ public class CreateGuild {
 				inGuildAlready = true;
 			}
 
-			int prestige = ScoreboardUtils.getScoreboardValue(founder, "Prestige");
+			int prestige = ScoreboardUtils.getScoreboardValue(founder, "Prestige").orElse(0);
 			if (prestige < 8) {
 				sender.sendMessage(ChatColor.DARK_RED + "" + ChatColor.ITALIC + "The minimal prestige count for "
 				                   + founder.getName() + " is not reached ("
-				                   + ScoreboardUtils.getScoreboardValue(founder, "Prestige") + "/8)");
+				                   + ScoreboardUtils.getScoreboardValue(founder, "Prestige").orElse(0) + "/8)");
 				hasEnoughPrestige = false;
 			}
 			totalPrestige += prestige;

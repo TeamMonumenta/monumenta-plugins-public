@@ -59,14 +59,14 @@ public class TOVUtils {
 	}
 
 	private static boolean canOpen(Plugin plugin, Player player) {
-		if (ScoreboardUtils.getScoreboardValue(player, CACHES_OPENED_SCORE) < 100) {
+		if (ScoreboardUtils.getScoreboardValue(player, CACHES_OPENED_SCORE).orElse(0) < 100) {
 			return true;
 		}
 
 		Optional<Integer> counter = ScoreboardUtils.getScoreboardValue(COUNTER_NAME, CACHE_COUNTER_SCORE);
 		if (counter.isPresent()) {
 			int value = counter.get();
-			if (value == ScoreboardUtils.getScoreboardValue(player, CACHE_COUNTER_SCORE)) {
+			if (value == ScoreboardUtils.getScoreboardValue(player, CACHE_COUNTER_SCORE).orElse(0)) {
 				MessagingUtils.sendActionBarMessage(plugin, player, "You cannot open more than 1 cache per spawn.");
 				new BukkitRunnable() {
 					@Override

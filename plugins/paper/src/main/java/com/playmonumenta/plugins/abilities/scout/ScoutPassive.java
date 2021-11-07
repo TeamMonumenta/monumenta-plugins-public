@@ -24,7 +24,7 @@ public class ScoutPassive extends Ability {
 
 	@Override
 	public boolean canUse(Player player) {
-		return ScoreboardUtils.getScoreboardValue(player, "Class") == 6;
+		return ScoreboardUtils.getScoreboardValue(player, "Class").orElse(0) == 6;
 	}
 
 	@Override

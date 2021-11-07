@@ -31,7 +31,7 @@ public class PlayerData {
 		@Nullable String objectiveName = source.mObjectiveName;
 		if (objectiveName != null) {
 			// Defaults to 100% when value is missing
-			int interpretedValue = ScoreboardUtils.getValue(player, objectiveName, 100);
+			int interpretedValue = ScoreboardUtils.getScoreboardValue(player, objectiveName).orElse(100);
 			int clampedValue = Math.min(interpretedValue, 500);
 			clampedValue = Math.max(clampedValue, 0);
 			return clampedValue / 100d;
@@ -41,6 +41,6 @@ public class PlayerData {
 	}
 
 	public static int getPatreonDollars(Player player) {
-		return ScoreboardUtils.getScoreboardValue(player, Objectives.PATREON_DOLLARS);
+		return ScoreboardUtils.getScoreboardValue(player, Objectives.PATREON_DOLLARS).orElse(0);
 	}
 }

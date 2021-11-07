@@ -38,7 +38,7 @@ public class PortableEnderListener implements Listener {
 				if (ZoneUtils.hasZoneProperty(player, ZoneUtils.ZoneProperty.NO_PORTABLE_STORAGE)) {
 					player.sendMessage(ChatColor.RED + "The void here is too thick to part");
 					player.playSound(player.getLocation(), Sound.BLOCK_ENDER_CHEST_CLOSE, SoundCategory.PLAYERS, 1.0f, 0.6f);
-				} else if (ScoreboardUtils.getScoreboardValue(player, "RushDown") < 40) {
+				} else if (ScoreboardUtils.getScoreboardValue(player, "RushDown").orElse(0) < 40) {
 					player.sendMessage(ChatColor.RED + "You must conquer Wave 40 of Rush of Dissonance before you can part the void.");
 					player.playSound(player.getLocation(), Sound.BLOCK_ENDER_CHEST_CLOSE, SoundCategory.PLAYERS, 1.0f, 0.6f);
 				} else {
