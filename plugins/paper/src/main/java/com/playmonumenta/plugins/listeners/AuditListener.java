@@ -233,6 +233,13 @@ public class AuditListener implements Listener {
 		return retStr + ")";
 	}
 
+	public static void logSevere(@NotNull String message) {
+		if (INSTANCE != null) {
+			INSTANCE.mLogger.info("Audit | " + message);
+			MonumentaNetworkRelayIntegration.sendAuditLogSevereMessage(message);
+		}
+	}
+
 	public static void log(@NotNull String message) {
 		if (INSTANCE != null) {
 			INSTANCE.mLogger.info("Audit | " + message);

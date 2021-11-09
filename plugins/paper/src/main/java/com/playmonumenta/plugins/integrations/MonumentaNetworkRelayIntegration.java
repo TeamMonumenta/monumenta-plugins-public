@@ -15,6 +15,7 @@ import com.playmonumenta.plugins.commands.RedeemVoteRewards;
 
 public class MonumentaNetworkRelayIntegration implements Listener {
 	public static final String AUDIT_LOG_CHANNEL = "Monumenta.Automation.AuditLog";
+	public static final String AUDIT_LOG_SEVERE_CHANNEL = "Monumenta.Automation.AuditLogSevere";
 	public static final String GET_VOTES_UNCLAIMED_CHANNEL = "Monumenta.Bungee.GetVotesUnclaimed";
 	public static final String CHECK_RAFFLE_ELIGIBILITY_CHANNEL = "Monumenta.Bungee.CheckRaffleEligibility";
 	public static final String ADMIN_ALERT_CHANNEL = "Monumenta.Automation.AdminNotification";
@@ -85,6 +86,19 @@ public class MonumentaNetworkRelayIntegration implements Listener {
 		}
 		default:
 			break;
+		}
+	}
+
+	public static void sendAuditLogSevereMessage(String message) {
+		if (INSTANCE != null) {
+			JsonObject data = new JsonObject();
+			data.addProperty("message", message);
+			try {
+				NetworkRelayAPI.sendMessage("automation-bot", AUDIT_LOG_SEVERE_CHANNEL, data);
+			} catch (Exception ex) {
+				INSTANCE.mLogger.severe("Failed to send audit log message: " + ex.getMessage());
+				ex.printStackTrace();
+			}
 		}
 	}
 
