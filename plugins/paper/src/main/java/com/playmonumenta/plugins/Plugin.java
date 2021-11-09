@@ -16,6 +16,7 @@ import com.playmonumenta.plugins.bosses.BossManager;
 import com.playmonumenta.plugins.bosses.spells.SpellDetectionCircle;
 import com.playmonumenta.plugins.classes.MonumentaClasses;
 import com.playmonumenta.plugins.commands.AdminNotify;
+import com.playmonumenta.plugins.commands.AuditLogCommand;
 import com.playmonumenta.plugins.commands.BarkifyHeldItem;
 import com.playmonumenta.plugins.commands.BossDebug;
 import com.playmonumenta.plugins.commands.BossFight;
@@ -234,6 +235,7 @@ public class Plugin extends JavaPlugin {
 		DelveInfuseHeldItem.register();
 		CustomInventoryCommands.register(this);
 		AdminNotify.register();
+		AuditLogCommand.register();
 
 
 		try {
