@@ -26,11 +26,11 @@ public class ScoreboardUtils {
 	}
 
 	public static @NotNull Optional<Integer> getScoreboardValue(@NotNull Entity entity, @NotNull String objectiveName) {
-		return getScoreboardValue(entity.getUniqueId().toString(), objectiveName);
-	}
-
-	public static @NotNull Optional<Integer> getScoreboardValue(@NotNull Player player, @NotNull String objectiveName) {
-		return getScoreboardValue(player.getName(), objectiveName);
+		if (entity instanceof Player) {
+			return getScoreboardValue(((Player)entity).getName(), objectiveName);
+		} else {
+			return getScoreboardValue(entity.getUniqueId().toString(), objectiveName);
+		}
 	}
 
 	public static void setScoreboardValue(@NotNull String entryName, @NotNull String objectiveName, int value) {
