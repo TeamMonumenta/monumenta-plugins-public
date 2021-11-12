@@ -28,6 +28,7 @@ public class DepthsSummaryGUI extends CustomInventory {
 	private static final int START_OF_PASSIVES = 27;
 	private static final Material FILLER = Material.GRAY_STAINED_GLASS_PANE;
 	private static final int REWARD_LOCATION = 49;
+	private Boolean mDebugVersion = false;
 
 	class TriggerData {
 		int mInvLocation;
@@ -49,6 +50,9 @@ public class DepthsSummaryGUI extends CustomInventory {
 
 	public DepthsSummaryGUI(Player requestingPlayer, Player targetPlayer) {
 		super(requestingPlayer, 54, "Current Abilities");
+		if (requestingPlayer.getUniqueId() != targetPlayer.getUniqueId()) {
+			mDebugVersion = true;
+		}
 
 		TRIGGER_STRINGS.add(new TriggerData(9, DepthsTrigger.WEAPON_ASPECT, "No Weapon Aspect!"));
 		TRIGGER_STRINGS.add(new TriggerData(10, DepthsTrigger.COMBO, "No Combo ability!"));
@@ -82,7 +86,7 @@ public class DepthsSummaryGUI extends CustomInventory {
 				}
 			}
 		}
-		DepthsPlayer playerWhoAsked = DepthsManager.getInstance().mPlayers.get(requestingPlayer.getUniqueId());
+		DepthsPlayer playerWhoAsked = DepthsManager.getInstance().mPlayers.get(targetPlayer.getUniqueId());
 
 
 		//First- check if the player has any rewards to open
@@ -130,7 +134,7 @@ public class DepthsSummaryGUI extends CustomInventory {
 				return;
 			}
 		}
-		if (event.getSlot() == REWARD_LOCATION) {
+		if (event.getSlot() == REWARD_LOCATION && !mDebugVersion) {
 			DepthsPlayer playerInstance = DepthsManager.getInstance().mPlayers.get(clicker.getUniqueId());
 			if (playerInstance != null && playerInstance.mEarnedRewards.size() > 0) {
 				event.getWhoClicked().closeInventory();
