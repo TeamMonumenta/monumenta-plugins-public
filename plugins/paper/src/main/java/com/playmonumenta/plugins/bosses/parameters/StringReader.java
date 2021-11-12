@@ -10,6 +10,8 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.playmonumenta.plugins.Plugin;
+
 import org.apache.commons.lang.StringEscapeUtils;
 import org.bukkit.Color;
 import org.bukkit.Material;
@@ -179,9 +181,12 @@ public class StringReader {
 
 	public PotionEffectType readPotionEffectType() {
 		skipWhitespace();
-		String remain = remaining();
+		String remain = remaining().toUpperCase(); // TODO: Remove toUpperCase()
 		for (PotionEffectType type : POTION_EFFECT_TYPES_SORTED) {
 			if (remain.startsWith(type.getName())) {
+				if (!remaining().startsWith(type.getName())) { // TODO: Remove this entire statement once all these bugs are fixed
+					Plugin.getInstance().getLogger().severe("Incorrectly capitalized potion in boss tag: " + remaining());
+				}
 				advance(type.getName().length());
 				return type;
 			}
@@ -191,9 +196,12 @@ public class StringReader {
 
 	public Sound readSound() {
 		skipWhitespace();
-		String remain = remaining();
+		String remain = remaining().toUpperCase(); // TODO: Remove toUpperCase()
 		for (Sound type : SOUNDS_SORTED) {
 			if (remain.startsWith(type.name())) {
+				if (!remaining().startsWith(type.name())) { // TODO: Remove this entire statement once all these bugs are fixed
+					Plugin.getInstance().getLogger().severe("Incorrectly capitalized sound in boss tag: " + remaining());
+				}
 				advance(type.name().length());
 				return type;
 			}
@@ -205,9 +213,12 @@ public class StringReader {
 	//aka CRIT_MAGIC can be read with CRIT
 	public Particle readParticle() {
 		skipWhitespace();
-		String remain = remaining();
+		String remain = remaining().toUpperCase(); // TODO: Remove toUpperCase()
 		for (Particle type : PARTICLES_SORTED) {
 			if (remain.startsWith(type.name())) {
+				if (!remaining().startsWith(type.name())) { // TODO: Remove this entire statement once all these bugs are fixed
+					Plugin.getInstance().getLogger().severe("Incorrectly capitalized particle in boss tag: " + remaining());
+				}
 				advance(type.name().length());
 				return type;
 			}
@@ -218,10 +229,13 @@ public class StringReader {
 	public Material readMaterial() {
 		skipWhitespace();
 
-		String remain = remaining();
+		String remain = remaining().toUpperCase(); // TODO: Remove toUpperCase()
 
 		for (Material material : MATERIALS_SORTED) {
 			if (remain.startsWith(material.name())) {
+				if (!remaining().startsWith(material.name())) { // TODO: Remove this entire statement once all these bugs are fixed
+					Plugin.getInstance().getLogger().severe("Incorrectly capitalized material in boss tag: " + remaining());
+				}
 				advance(material.name().length());
 				return material;
 			}
