@@ -62,7 +62,7 @@ public class DepthsPlayer {
 		int talismanScore = ScoreboardUtils.getScoreboardValue(player, "DDTalisman");
 		if (0 < talismanScore && talismanScore <= DepthsUtils.TREES.length) {
 			double chance = 1;
-			if (player.getScoreboardTags().contains(DepthsManager.ENDLESS_MODE_STRING)) {
+			if (player.getScoreboardTags().contains(DepthsManager.ENDLESS_MODE_STRING) && !player.getScoreboardTags().contains(DepthsManager.RIGGED_STRING)) {
 				chance = 0.75;
 			}
 

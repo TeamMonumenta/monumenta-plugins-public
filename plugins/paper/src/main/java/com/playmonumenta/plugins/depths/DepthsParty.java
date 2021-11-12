@@ -74,6 +74,8 @@ public class DepthsParty {
 	public boolean mSpawnedReward;
 	//Whether or not the party is playing in endless mode
 	public boolean mEndlessMode = false;
+	//Whether or not the party is playing with rigged talismans in endless
+	public boolean mIsRigged = false;
 	//Keep track of the delve modifiers for the party
 	public Map<Modifier, Integer> mDelveModifiers;
 	//Used to keep track of if you have beaten the boss (should spawn a room of next floor)
@@ -101,6 +103,11 @@ public class DepthsParty {
 			if (p.getScoreboardTags().contains(DepthsManager.ENDLESS_MODE_STRING)) {
 				mEndlessMode = true;
 				p.removeScoreboardTag(DepthsManager.ENDLESS_MODE_STRING);
+			}
+
+			if (p.getScoreboardTags().contains(DepthsManager.RIGGED_STRING)) {
+				mIsRigged = true;
+				p.removeScoreboardTag(DepthsManager.RIGGED_STRING);
 			}
 
 			if (mPartyNum <= 0) {

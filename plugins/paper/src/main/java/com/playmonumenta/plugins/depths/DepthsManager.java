@@ -56,6 +56,7 @@ import com.playmonumenta.plugins.depths.abilities.earthbound.DepthsToughness;
 import com.playmonumenta.plugins.depths.abilities.earthbound.EarthenCombos;
 import com.playmonumenta.plugins.depths.abilities.earthbound.EarthenWrath;
 import com.playmonumenta.plugins.depths.abilities.earthbound.Earthquake;
+import com.playmonumenta.plugins.depths.abilities.earthbound.Entrench;
 import com.playmonumenta.plugins.depths.abilities.earthbound.StoneSkin;
 import com.playmonumenta.plugins.depths.abilities.earthbound.Taunt;
 import com.playmonumenta.plugins.depths.abilities.flamecaller.Apocalypse;
@@ -99,6 +100,7 @@ import com.playmonumenta.plugins.depths.abilities.steelsage.ProjectileMastery;
 import com.playmonumenta.plugins.depths.abilities.steelsage.RapidFire;
 import com.playmonumenta.plugins.depths.abilities.steelsage.Scrapshot;
 import com.playmonumenta.plugins.depths.abilities.steelsage.Sidearm;
+import com.playmonumenta.plugins.depths.abilities.steelsage.SteelStallion;
 import com.playmonumenta.plugins.depths.abilities.windwalker.Aeromancy;
 import com.playmonumenta.plugins.depths.abilities.windwalker.DepthsDodging;
 import com.playmonumenta.plugins.depths.abilities.windwalker.GuardingBolt;
@@ -139,6 +141,9 @@ public class DepthsManager {
 
 	//Tag to check for endless mode
 	public static final String ENDLESS_MODE_STRING = "DepthsEndlessMode";
+
+	//Tag to check for rigged talisman (in endless mode)
+	public static final String RIGGED_STRING = "DepthsRigged";
 
 	//Treasure score amount for defeating rooms
 	public static final int TREASURE_PER_NORMAL = 3;
@@ -455,6 +460,7 @@ public class DepthsManager {
 			new RapidFire(plugin, null),
 			new Scrapshot(plugin, null),
 			new Sidearm(plugin, null),
+			new SteelStallion(plugin, null),
 			new DepthsSharpshooter(plugin, null),
 			new DepthsSplitArrow(plugin, null),
 			new DepthsVolley(plugin, null),
@@ -528,6 +534,7 @@ public class DepthsManager {
 			new EarthenCombos(plugin, null),
 			new EarthenWrath(plugin, null),
 			new Earthquake(plugin, null),
+			new Entrench(plugin, null),
 			new StoneSkin(plugin, null),
 			new Taunt(plugin, null));
 	}
