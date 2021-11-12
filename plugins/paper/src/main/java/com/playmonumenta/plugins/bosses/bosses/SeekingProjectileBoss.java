@@ -1,6 +1,5 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
-
 import java.util.Arrays;
 
 import org.bukkit.Location;
@@ -19,6 +18,9 @@ import com.playmonumenta.plugins.effects.PercentHeal;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
 
+/**
+ * @deprecated
+ */
 public class SeekingProjectileBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_seekingprojectile";
 

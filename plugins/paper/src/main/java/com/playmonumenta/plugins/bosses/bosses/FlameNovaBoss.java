@@ -7,7 +7,6 @@ import org.bukkit.plugin.Plugin;
 
 import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.spells.SpellFlameNova;
-import com.playmonumenta.plugins.utils.BossUtils;
 
 /**
  * @deprecated use boss_nova instead, like this:

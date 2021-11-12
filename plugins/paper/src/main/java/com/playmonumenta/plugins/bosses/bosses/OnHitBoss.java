@@ -4,7 +4,6 @@ import com.playmonumenta.plugins.bosses.parameters.EffectsList;
 import com.playmonumenta.plugins.bosses.parameters.BossParam;
 import com.playmonumenta.plugins.bosses.parameters.ParticlesList;
 import com.playmonumenta.plugins.bosses.parameters.SoundsList;
-import com.playmonumenta.plugins.utils.BossUtils;
 
 import org.bukkit.Location;
 import org.bukkit.entity.LivingEntity;
@@ -27,7 +26,7 @@ public class OnHitBoss extends BossAbilityGroup {
 
 		//Particle & Sounds!
 		@BossParam(help = "Particle summoned when the player got hit by the boss")
-		public ParticlesList PARTICLE = ParticlesList.fromString("[(REDSTONE,20,0,0,0,#ffffff,2)]");
+		public ParticlesList PARTICLE = ParticlesList.fromString("[(REDSTONE,20,0,0,0,1,#ffffff,2)]");
 
 		@BossParam(help = "Sound played when the player got hit by the boss")
 		public SoundsList SOUND = SoundsList.fromString("[(BLOCK_PORTAL_TRIGGER,0.25,2)]");

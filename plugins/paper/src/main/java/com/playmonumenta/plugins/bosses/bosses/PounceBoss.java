@@ -65,7 +65,7 @@ public class PounceBoss extends BossAbilityGroup {
 		public SoundsList SOUND_LEAP = SoundsList.fromString("[(ENTITY_HORSE_JUMP,1,1)]");
 
 		@BossParam(help = "Particle used for the leaping")
-		public ParticlesList PARTICLE_LEAPING = ParticlesList.fromString("[(REDSTONE,4,0.5,0.5,0.5,#ffffff,1)]");
+		public ParticlesList PARTICLE_LEAPING = ParticlesList.fromString("[(REDSTONE,4,0.5,0.5,0.5,0,#ffffff,1)]");
 
 		@BossParam(help = "Particle summoned when the boss hit the ground as a ring")
 		public ParticlesList PARTICLE_RING = ParticlesList.fromString("[(FLAME,1,0.1,0.1,0.1,0.1),(CLOUD,1,0.1,0.1,0.1,0.1)]");

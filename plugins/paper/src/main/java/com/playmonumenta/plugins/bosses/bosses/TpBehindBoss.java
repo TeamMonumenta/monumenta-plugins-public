@@ -7,7 +7,6 @@ import org.bukkit.plugin.Plugin;
 
 import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.spells.SpellTpBehindPlayer;
-import com.playmonumenta.plugins.utils.BossUtils;
 
 public class TpBehindBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_tpbehind";

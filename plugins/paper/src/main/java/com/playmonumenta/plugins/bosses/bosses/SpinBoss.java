@@ -6,7 +6,6 @@ import java.util.List;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.bosses.spells.SpellRunAction;
-import com.playmonumenta.plugins.utils.BossUtils;
 
 import org.bukkit.Location;
 import org.bukkit.entity.LivingEntity;

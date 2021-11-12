@@ -7,7 +7,6 @@ import org.bukkit.plugin.Plugin;
 
 import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.spells.SpellTpSwapPlaces;
-import com.playmonumenta.plugins.utils.BossUtils;
 
 public class TpSwapBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_tpswap";

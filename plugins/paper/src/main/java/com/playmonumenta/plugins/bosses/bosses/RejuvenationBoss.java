@@ -8,7 +8,6 @@ import org.bukkit.plugin.Plugin;
 import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.parameters.BossParam;
 import com.playmonumenta.plugins.bosses.spells.SpellMobHealAoE;
-import com.playmonumenta.plugins.utils.BossUtils;
 
 public class RejuvenationBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_rejuvenation";

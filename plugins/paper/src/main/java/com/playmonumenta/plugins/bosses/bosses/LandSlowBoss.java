@@ -8,7 +8,6 @@ import org.bukkit.entity.LivingEntity;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.bosses.spells.SpellLandSlow;
-import com.playmonumenta.plugins.utils.BossUtils;
 
 public class LandSlowBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_land_slow";

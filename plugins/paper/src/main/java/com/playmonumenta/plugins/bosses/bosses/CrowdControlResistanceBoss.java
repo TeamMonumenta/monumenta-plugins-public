@@ -8,7 +8,6 @@ import org.bukkit.plugin.Plugin;
 
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.bosses.spells.SpellCrowdControlClear;
-import com.playmonumenta.plugins.utils.BossUtils;
 
 public class CrowdControlResistanceBoss extends BossAbilityGroup {
 

@@ -56,7 +56,7 @@ public class SwingBoss extends BossAbilityGroup {
 		public SoundsList SOUND_EXPLODE = SoundsList.fromString("[(ENTITY_PLAYER_ATTACK_STRONG,1.5,0.65)]");
 
 		@BossParam(help = "Particle summon when the ability explode")
-		public ParticlesList PARTICLE_CIRCLE_EXPLODE = ParticlesList.fromString("[(SWEEP_ATTACK,1,0.1,0.1,0.1,0.3),(REDSTONE,2,0.25,0.25,0.25,#ffffff,2)]");
+		public ParticlesList PARTICLE_CIRCLE_EXPLODE = ParticlesList.fromString("[(SWEEP_ATTACK,1,0.1,0.1,0.1,0.3),(REDSTONE,2,0.25,0.25,0.25,0,#ffffff,2)]");
 
 	}
 

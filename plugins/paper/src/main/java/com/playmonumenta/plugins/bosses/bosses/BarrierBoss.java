@@ -13,7 +13,6 @@ import com.playmonumenta.plugins.bosses.parameters.ParticlesList;
 import com.playmonumenta.plugins.bosses.parameters.SoundsList;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.bosses.spells.SpellBarrier;
-import com.playmonumenta.plugins.utils.BossUtils;
 
 public class BarrierBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_barrier";
@@ -27,7 +26,7 @@ public class BarrierBoss extends BossAbilityGroup {
 		public int HITS_TO_BREAK = 1;
 
 		@BossParam(help = "Particle summon at boss loc")
-		public ParticlesList PARTICLE = ParticlesList.fromString("[(REDSTONE,4,0,1,0,#ffffff,2)]");
+		public ParticlesList PARTICLE = ParticlesList.fromString("[(REDSTONE,4,0,1,0,0,#ffffff,2)]");
 
 		@BossParam(help = "Sound played when the barrier refresh")
 		public SoundsList SOUND_REFRESH = SoundsList.fromString("[(BLOCK_BEACON_ACTIVATE,1,1)]");

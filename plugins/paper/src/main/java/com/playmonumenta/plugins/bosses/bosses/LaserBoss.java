@@ -59,7 +59,7 @@ public class LaserBoss extends BossAbilityGroup {
 		public SoundsList SOUND_TICKS = SoundsList.fromString("[(ENTITY_SHULKER_BULLET_HIT)]");
 
 		@BossParam(help = "Particle used for the laser")
-		public ParticlesList PARTICLE_LASER = ParticlesList.fromString("[(crit,1),(crit_magic,1)]");
+		public ParticlesList PARTICLE_LASER = ParticlesList.fromString("[(CRIT,1),(CRIT_MAGIC,1)]");
 
 		@BossParam(help = "Particle used when the cast is over")
 		public ParticlesList PARTICLE_END = ParticlesList.fromString("[(EXPLOSION_NORMAL,35)]");

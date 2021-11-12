@@ -5,7 +5,6 @@ import java.util.Arrays;
 import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.parameters.BossParam;
 import com.playmonumenta.plugins.bosses.spells.SpellEarthshake;
-import com.playmonumenta.plugins.utils.BossUtils;
 
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.plugin.Plugin;

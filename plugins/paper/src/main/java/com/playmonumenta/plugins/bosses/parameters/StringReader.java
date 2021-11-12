@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.bosses.parameters;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -179,9 +180,9 @@ public class StringReader {
 	public PotionEffectType readPotionEffectType() {
 		skipWhitespace();
 		String remain = remaining();
-		for (PotionEffectType type : PotionEffectType.values()) {
+		for (PotionEffectType type : POTION_EFFECT_TYPES_SORTED) {
 			if (remain.startsWith(type.getName())) {
-				advance(type.getName());
+				advance(type.getName().length());
 				return type;
 			}
 		}
@@ -191,21 +192,23 @@ public class StringReader {
 	public Sound readSound() {
 		skipWhitespace();
 		String remain = remaining();
-		for (Sound type : Sound.values()) {
+		for (Sound type : SOUNDS_SORTED) {
 			if (remain.startsWith(type.name())) {
-				advance(type.name());
+				advance(type.name().length());
 				return type;
 			}
 		}
 		return null;
 	}
 
+	//we need to check before match with longer particle or we can end up with a misunderstanding
+	//aka CRIT_MAGIC can be read with CRIT
 	public Particle readParticle() {
 		skipWhitespace();
 		String remain = remaining();
-		for (Particle type : Particle.values()) {
+		for (Particle type : PARTICLES_SORTED) {
 			if (remain.startsWith(type.name())) {
-				advance(type.name());
+				advance(type.name().length());
 				return type;
 			}
 		}
@@ -215,22 +218,23 @@ public class StringReader {
 	public Material readMaterial() {
 		skipWhitespace();
 
-		Material[] mats = Material.values();
 		String remain = remaining();
 
-		// Iterate through Material in reverse order, because hopefully the list is in sorted order already
-		// Important so that things that are a subset of each other try longest match first
-		for (int i = mats.length - 1; i >= 0; i--) {
-			String mat = mats[i].name();
-			if (remain.startsWith(mat)) {
-				advance(mat.length());
-				return mats[i];
+		for (Material material : MATERIALS_SORTED) {
+			if (remain.startsWith(material.name())) {
+				advance(material.name().length());
+				return material;
 			}
 		}
+
 		return null;
 	}
 
 	public static final Map<String, Color> COLOR_MAP = new LinkedHashMap<>();
+	public static final List<Particle> PARTICLES_SORTED = Arrays.asList(Particle.values());
+	public static final List<Material> MATERIALS_SORTED = Arrays.asList(Material.values());
+	public static final List<Sound> SOUNDS_SORTED = Arrays.asList(Sound.values());
+	public static final List<PotionEffectType> POTION_EFFECT_TYPES_SORTED = Arrays.asList(PotionEffectType.values());
 
 	static {
 		//this is just because Color don't have the fuctions values() and getName()...
@@ -251,6 +255,26 @@ public class StringReader {
 		COLOR_MAP.put("TEAL", Color.TEAL);
 		COLOR_MAP.put("WHITE", Color.WHITE);
 		COLOR_MAP.put("YELLOW", Color.YELLOW);
+
+		//Sorting Particle
+		Collections.sort(PARTICLES_SORTED, (a, b) -> {
+			return b.name().length() - a.name().length();
+		});
+
+		//Sorting Material
+		Collections.sort(MATERIALS_SORTED, (a, b) -> {
+			return b.name().length() - a.name().length();
+		});
+
+		//sorting Sound
+		Collections.sort(SOUNDS_SORTED, (a, b) -> {
+			return b.name().length() - a.name().length();
+		});
+
+		//sorting Potion Effect Type
+		Collections.sort(POTION_EFFECT_TYPES_SORTED, (a, b) -> {
+			return b.getName().length() - a.getName().length();
+		});
 	}
 
 	public Color readColor() {
@@ -260,7 +284,7 @@ public class StringReader {
 		if (remain.startsWith("#")) {
 			if (remain.length() >= 7) {
 				try {
-					Color ret = Color.fromRGB(Integer.parseInt(remain.substring(0, 8), 16));
+					Color ret = Color.fromRGB(Integer.parseInt(remain.substring(1, 7), 16));
 					advance(7);
 					return ret;
 				} catch (NumberFormatException nfe) {

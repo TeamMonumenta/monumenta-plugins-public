@@ -8,7 +8,6 @@ import org.bukkit.plugin.Plugin;
 
 import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.spells.SpellShieldSwitch;
-import com.playmonumenta.plugins.utils.BossUtils;
 
 public class ShieldSwitchBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_shieldswitch";

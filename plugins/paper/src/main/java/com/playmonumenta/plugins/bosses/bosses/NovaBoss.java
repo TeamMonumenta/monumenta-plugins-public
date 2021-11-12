@@ -45,13 +45,13 @@ public class NovaBoss extends BossAbilityGroup {
 
 		//particle & sound used!
 		@BossParam(help = "Particle summon on the air")
-		public ParticlesList PARTICLE_AIR = ParticlesList.fromString("[(cloud,5)]");
+		public ParticlesList PARTICLE_AIR = ParticlesList.fromString("[(CLOUD,5)]");
 
 		@BossParam(help = "Sound used when charging the ability")
 		public Sound SOUND_CHARGE = Sound.ENTITY_WITCH_CELEBRATE;
 
 		@BossParam(help = "Particle summon arround the boss when loading the spell")
-		public ParticlesList PARTICLE_LOAD = ParticlesList.fromString("[(crit,1)]");
+		public ParticlesList PARTICLE_LOAD = ParticlesList.fromString("[(CRIT,1)]");
 
 		@BossParam(help = "Sound used when the spell is casted (when explode)")
 		public SoundsList SOUND_CAST = SoundsList.fromString("[(ENTITY_WITCH_DRINK,1.5,0.65),(ENTITY_WITCH_DRINK,1.5,0.55)]");

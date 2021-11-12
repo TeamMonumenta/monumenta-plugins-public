@@ -39,7 +39,7 @@ public class ParticlesList {
 		}
 
 		public CParticle(Particle particle, int count, double dx, double dy, double dz) {
-			this(particle, count, dx, dy, dz, 1.0d);
+			this(particle, count, dx, dy, dz, 0.0d);
 		}
 
 		public CParticle(Particle particle, int count, double dx, double dy, double dz, double extra1) {
@@ -203,7 +203,6 @@ public class ParticlesList {
 			}
 
 			atLeastOneParticleIter = true;
-
 			Particle particle = reader.readParticle();
 			if (particle == null) {
 				// Entry not valid, offer all entries as completions
@@ -367,7 +366,7 @@ public class ParticlesList {
 						// ITEM_CRACK particle requires an itemstack, not the underlying material
 						particlesList.add(new CParticle(particle, count.intValue(), dx, dy, dz, velocity, new ItemStack(mat)));
 					} else {
-						particlesList.add(new CParticle(particle, count.intValue(), dx, dy, dz, velocity, mat));
+						particlesList.add(new CParticle(particle, count.intValue(), dx, dy, dz, velocity, mat.createBlockData()));
 					}
 					continue;
 				}
