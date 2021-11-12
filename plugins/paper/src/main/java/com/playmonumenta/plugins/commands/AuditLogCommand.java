@@ -24,7 +24,7 @@ public class AuditLogCommand {
 			.withArguments(new EntitySelectorArgument("player", EntitySelector.ONE_PLAYER))
 			.withArguments(new TextArgument("message"))
 			.executes((sender, args) -> {
-				AuditListener.log(((String)args[0]).replaceAll("@S", ((Player)args[1]).getName()));
+				AuditListener.log(((String)args[1]).replaceAll("@S", ((Player)args[0]).getName()));
 			})
 			.register();
 		new CommandAPICommand("auditlogsevere")
@@ -39,7 +39,7 @@ public class AuditLogCommand {
 			.withArguments(new EntitySelectorArgument("player", EntitySelector.ONE_PLAYER))
 			.withArguments(new TextArgument("message"))
 			.executes((sender, args) -> {
-				AuditListener.logSevere(((String)args[0]).replaceAll("@S", ((Player)args[1]).getName()));
+				AuditListener.logSevere(((String)args[1]).replaceAll("@S", ((Player)args[0]).getName()));
 			})
 			.register();
 	}
