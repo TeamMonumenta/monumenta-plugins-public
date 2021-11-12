@@ -240,12 +240,15 @@ public class PEBCustomInventory extends CustomInventory {
 		PEB_ITEMS.add(new PebItem(20, 19, "Disable Drop:",
 				"", ChatColor.LIGHT_PURPLE,
 				Material.BLACK_CONCRETE, "", false));
-		PEB_ITEMS.add(new PebItem(20, 21, "None",
+		PEB_ITEMS.add(new PebItem(20, 20, "None",
 				"Disable no drops, the vanilla drop behavior.", ChatColor.LIGHT_PURPLE,
 				Material.BARRIER, "disabledrop none", false));
-		PEB_ITEMS.add(new PebItem(20, 22, "Holding",
+		PEB_ITEMS.add(new PebItem(20, 21, "Holding",
 				"Disable dropping of only held items.", ChatColor.LIGHT_PURPLE,
 				Material.WOODEN_PICKAXE, "disabledrop holding", false));
+		PEB_ITEMS.add(new PebItem(20, 22, "Tiered",
+				"Disable dropping of tiered items.", ChatColor.LIGHT_PURPLE,
+				Material.OAK_STAIRS, "disabledrop tiered", false));
 		PEB_ITEMS.add(new PebItem(20, 23, "Lore",
 				"Disable the drop of items with custom lore.", ChatColor.LIGHT_PURPLE,
 				Material.LECTERN, "disabledrop lore", false));

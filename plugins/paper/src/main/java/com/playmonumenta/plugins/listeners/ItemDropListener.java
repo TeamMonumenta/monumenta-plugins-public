@@ -21,6 +21,7 @@ import org.bukkit.inventory.PlayerInventory;
 import com.playmonumenta.plugins.utils.CommandUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.ItemUtils.ItemTier;
 
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.CommandPermission;
@@ -33,11 +34,13 @@ public class ItemDropListener implements Listener {
 	public static final String COMMAND = "disabledrop";
 	public static final String ALIAS = "dd";
 
+	private static final String TIERED_TAG = "DisableDropTiered";
 	private static final String LORE_TAG = "DisableDropLore";
 	private static final String INTERESTING_TAG = "DisableDropInteresting";
 	private static final String ALL_TAG = "DisableDropAll";
 	private static final String HOLDING_TAG = "DisableDropHolding";
 
+	private final Set<UUID> mTieredPlayers = new HashSet<>();
 	private final Set<UUID> mLorePlayers = new HashSet<>();
 	private final Set<UUID> mInterestingPlayers = new HashSet<>();
 	private final Set<UUID> mAllPlayers = new HashSet<>();
@@ -98,6 +101,15 @@ public class ItemDropListener implements Listener {
 			disableHolding(sender);
 		})
 		.register();
+
+		new CommandAPICommand(COMMAND)
+		.withPermission(perms)
+		.withAliases(ALIAS)
+		.withArguments(new LiteralArgument("tiered"))
+		.executes((sender, args) -> {
+			disableTiered(sender);
+		})
+		.register();
 	}
 
 	private void playerToggle(CommandSender sender) throws WrapperCommandSyntaxException {
@@ -106,7 +118,7 @@ public class ItemDropListener implements Listener {
 		if (hasTag(player)) {
 			enable(player);
 		} else {
-			disableLore(player);
+			disableTiered(player);
 		}
 	}
 
@@ -116,7 +128,9 @@ public class ItemDropListener implements Listener {
 		Set<String> tags = player.getScoreboardTags();
 		if (tags != null) {
 			UUID uuid = player.getUniqueId();
-			if (tags.contains(LORE_TAG)) {
+			if (tags.contains(TIERED_TAG)) {
+				mTieredPlayers.add(uuid);
+			} else if (tags.contains(LORE_TAG)) {
 				mLorePlayers.add(uuid);
 			} else if (tags.contains(INTERESTING_TAG)) {
 				mInterestingPlayers.add(uuid);
@@ -151,12 +165,8 @@ public class ItemDropListener implements Listener {
 		UUID uuid = event.getPlayer().getUniqueId();
 		if (mAllPlayers.contains(uuid)) {
 			event.setCancelled(true);
-		} else if (mInterestingPlayers.contains(uuid)) {
-			if (ItemUtils.isInteresting(item)) {
-				event.setCancelled(true);
-			}
-		} else if (mLorePlayers.contains(uuid)) {
-			if (ItemUtils.hasLore(item)) {
+		} else if (mTieredPlayers.contains(uuid)) {
+			if (ItemUtils.getItemTier(item) != ItemTier.UNKNOWN) {
 				event.setCancelled(true);
 			}
 		} else if (mHoldingPlayers.contains(uuid)) {
@@ -166,6 +176,14 @@ public class ItemDropListener implements Listener {
 
 			ItemStack mainhand = playerInventory.getItemInMainHand();
 			if (mainhand == null || mainhand.getType().isAir() || mainhand.isSimilar(item)) {
+				event.setCancelled(true);
+			}
+		} else if (mLorePlayers.contains(uuid)) {
+			if (ItemUtils.hasLore(item) || ItemUtils.isShulkerBox(item.getType())) {
+				event.setCancelled(true);
+			}
+		} else if (mInterestingPlayers.contains(uuid)) {
+			if (ItemUtils.isInteresting(item)) {
 				event.setCancelled(true);
 			}
 		}
@@ -209,9 +227,17 @@ public class ItemDropListener implements Listener {
 		player.sendMessage(ChatColor.GOLD + "" + ChatColor.BOLD + "You can no longer drop the item you are holding.");
 	}
 
+	private void disableTiered(CommandSender sender) throws WrapperCommandSyntaxException {
+		Player player = CommandUtils.getPlayerFromSender(sender);
+		remove(player);
+		player.addScoreboardTag(TIERED_TAG);
+		mTieredPlayers.add(player.getUniqueId());
+		player.sendMessage(ChatColor.GOLD + "" + ChatColor.BOLD + "You can no longer drop tiered items.");
+	}
+
 	private boolean hasTag(Player player) {
 		Set<String> tags = player.getScoreboardTags();
-		return tags.contains(LORE_TAG) || tags.contains(INTERESTING_TAG) || tags.contains(ALL_TAG) || tags.contains(HOLDING_TAG);
+		return tags.contains(TIERED_TAG) || tags.contains(LORE_TAG) || tags.contains(HOLDING_TAG) || tags.contains(INTERESTING_TAG) || tags.contains(ALL_TAG);
 	}
 
 	private void remove(Player player) {
@@ -219,6 +245,7 @@ public class ItemDropListener implements Listener {
 		player.removeScoreboardTag(INTERESTING_TAG);
 		player.removeScoreboardTag(ALL_TAG);
 		player.removeScoreboardTag(HOLDING_TAG);
+		player.removeScoreboardTag(TIERED_TAG);
 		removeFromSets(player);
 	}
 
@@ -228,5 +255,6 @@ public class ItemDropListener implements Listener {
 		mInterestingPlayers.remove(uuid);
 		mAllPlayers.remove(uuid);
 		mHoldingPlayers.remove(uuid);
+		mTieredPlayers.remove(uuid);
 	}
 }
