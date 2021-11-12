@@ -24,7 +24,7 @@ public class FrigidCombos extends DepthsAbility {
 	public static final String ABILITY_NAME = "Frigid Combos";
 	public static final int TIME = 2 * 20;
 	public static final double[] SLOW_AMPLIFIER = {0.2, 0.25, 0.3, 0.35, 0.4, 0.5};
-	public static final double[] DAMAGE = {2, 3, 4, 5, 6, 8};
+	public static final int[] DAMAGE = {2, 3, 4, 5, 6, 8};
 	public static final int RADIUS = 4;
 
 	private int mComboCount = 0;

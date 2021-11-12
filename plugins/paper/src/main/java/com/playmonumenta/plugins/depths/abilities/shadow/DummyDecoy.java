@@ -37,7 +37,6 @@ public class DummyDecoy extends DepthsAbility {
 
 	public static final String ABILITY_NAME = "Dummy Decoy";
 
-	public static final double DAMAGE_MULTIPLIER = 0.15;
 	public static final int COOLDOWN = 25 * 20;
 	public static final String DUMMY_NAME = "AlluringShadow";
 	public static final int[] HEALTH = {30, 35, 40, 45, 50, 60};

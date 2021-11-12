@@ -318,7 +318,7 @@ public class ItemOverrides {
 		BaseOverride writtenBookOverride = new WrittenBookOverride();
 		mItems.put(Material.WRITTEN_BOOK, writtenBookOverride);
 
-		BaseOverride noAdventurePlaceOverride = new NoAdventureZonePlacementOverride();
+		BaseOverride noAdventurePlaceOverride = new NoAdventureModePlacementOverride();
 		mItems.put(Material.LILY_PAD, noAdventurePlaceOverride);
 	}
 

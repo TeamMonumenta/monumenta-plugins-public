@@ -95,7 +95,7 @@ public class Sundrops extends DepthsAbility {
 
 	@Override
 	public String getDescription(int rarity) {
-		return "Whenever a player in your party breaks a spawner, there is a " + DepthsUtils.getRarityColor(rarity) + DROP_CHANCE[rarity - 1] + "%" + ChatColor.WHITE + " chance of spawning a sundrop. Picking up a sundrop gives " + DepthsUtils.roundPercent(PERCENT_SPEED) + "% speed and " + DepthsUtils.roundPercent(-PERCENT_DAMAGE_RECEIVED) + "% resistance for " + DURATION / 20 + " seconds. Spawn chance stacks with other players in your party who have the skill, up to 100%.";
+		return "Whenever a player in your party breaks a spawner, there is a " + DepthsUtils.getRarityColor(rarity) + DROP_CHANCE[rarity - 1] + "%" + ChatColor.WHITE + " chance of spawning a sundrop. Picking up a sundrop gives " + (int) DepthsUtils.roundPercent(PERCENT_SPEED) + "% speed and " + (int) DepthsUtils.roundPercent(-PERCENT_DAMAGE_RECEIVED) + "% resistance for " + DURATION / 20 + " seconds. Spawn chance stacks with other players in your party who have the skill, up to 100%.";
 	}
 
 	@Override

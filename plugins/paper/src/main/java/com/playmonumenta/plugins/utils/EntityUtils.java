@@ -88,9 +88,11 @@ import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.effects.SplitArrowIframesEffect;
 import com.playmonumenta.plugins.enchantments.Inferno;
 import com.playmonumenta.plugins.enchantments.PointBlank;
+import com.playmonumenta.plugins.enchantments.RegionScalingDamageDealt;
 import com.playmonumenta.plugins.enchantments.Sniper;
 import com.playmonumenta.plugins.enchantments.infusions.Focus;
 import com.playmonumenta.plugins.events.CustomDamageEvent;
+import com.playmonumenta.plugins.server.properties.ServerProperties;
 
 
 
@@ -1413,6 +1415,12 @@ public class EntityUtils {
 		double thuribleBonus = thuribleEffects != null ? thuribleEffects.last().getMagnitude() : 0;
 
 		damage *= Sharpshooter.getDamageMultiplier(player) + blessingBonus + thuribleBonus;
+
+		//If they're using an r2 bow/crossbow in r1, decrease damage appropriately
+		if (!ServerProperties.getClassSpecializationsEnabled() && plugin.mTrackingManager.mPlayers.getPlayerCustomEnchantLevel(player, RegionScalingDamageDealt.class) > 0) {
+			damage *= RegionScalingDamageDealt.DAMAGE_DEALT_MULTIPLIER;
+		}
+
 		return damage;
 	}
 }

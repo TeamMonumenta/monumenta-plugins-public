@@ -28,7 +28,7 @@ public class Enlightenment extends DepthsAbility {
 
 	@Override
 	public String getDescription(int rarity) {
-		return "All players in your party gain " + DepthsUtils.getRarityColor(rarity) + XP_MULTIPLIER[rarity - 1] + "x" + ChatColor.WHITE + " experience. Does not stack if multiple players in the party have the skill. Additionally, your chances of finding higher rarity abilities are increased by " + DepthsUtils.getRarityColor(rarity) + RARITY_INCREASE[rarity - 1] + ChatColor.WHITE + "%.";
+		return "All players in your party gain " + DepthsUtils.getRarityColor(rarity) + XP_MULTIPLIER[rarity - 1] + "x" + ChatColor.WHITE + " experience. Does not stack if multiple players in the party have the skill. Additionally, your chances of finding higher rarity abilities are increased by " + DepthsUtils.getRarityColor(rarity) + RARITY_INCREASE[rarity - 1] + "%" + ChatColor.WHITE + ".";
 	}
 
 	@Override

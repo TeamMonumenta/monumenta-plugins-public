@@ -41,7 +41,7 @@ import com.playmonumenta.plugins.depths.abilities.aspects.ScytheAspect;
 import com.playmonumenta.plugins.depths.abilities.aspects.SwordAspect;
 import com.playmonumenta.plugins.depths.abilities.aspects.WandAspect;
 import com.playmonumenta.plugins.depths.abilities.dawnbringer.BottledSunlight;
-import com.playmonumenta.plugins.depths.abilities.dawnbringer.DepthsRejuvenation;
+import com.playmonumenta.plugins.depths.abilities.dawnbringer.Rejuvenation;
 import com.playmonumenta.plugins.depths.abilities.dawnbringer.Enlightenment;
 import com.playmonumenta.plugins.depths.abilities.dawnbringer.LightningBottle;
 import com.playmonumenta.plugins.depths.abilities.dawnbringer.RadiantBlessing;
@@ -495,7 +495,7 @@ public class DepthsManager {
 			new Enlightenment(plugin, null),
 			new LightningBottle(plugin, null),
 			new RadiantBlessing(plugin, null),
-			new DepthsRejuvenation(plugin, null),
+			new Rejuvenation(plugin, null),
 			new SoothingCombos(plugin, null),
 			new Sundrops(plugin, null),
 			new TotemOfSalvation(plugin, null),

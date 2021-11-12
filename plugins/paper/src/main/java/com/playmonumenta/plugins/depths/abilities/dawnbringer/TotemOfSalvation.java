@@ -46,7 +46,7 @@ public class TotemOfSalvation extends DepthsAbility {
 	public static final int[] TICK_FREQUENCY = {40, 35, 30, 25, 20, 10};
 	private static final double VELOCITY = 0.5;
 	public static final int DURATION = 15 * 20;
-	private static final double EFFECT_RADIUS = 5;
+	private static final int EFFECT_RADIUS = 5;
 	private static final double PARTICLE_RING_HEIGHT = 1.0;
 	private static final double PERCENT_HEALING = 0.08;
 	private static final int MAX_ABSORPTION = 4;

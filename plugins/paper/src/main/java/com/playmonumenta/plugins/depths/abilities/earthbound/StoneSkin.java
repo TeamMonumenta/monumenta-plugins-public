@@ -69,7 +69,7 @@ public class StoneSkin extends DepthsAbility {
 
 	@Override
 	public String getDescription(int rarity) {
-		return "Right click while sneaking to gain " + DepthsUtils.getRarityColor(rarity) + DepthsUtils.roundPercent(-PERCENT_DAMAGE_RECEIVED[rarity - 1]) + "%" + ChatColor.WHITE + " resistance and " + DepthsUtils.getRarityColor(rarity) + DepthsUtils.roundPercent(KNOCKBACK_RESISTANCE[rarity - 1]) + "%" + ChatColor.WHITE + " knockback resistance for " + DURATION / 20 + " seconds. Cooldown: " + COOLDOWN / 20 + "s.";
+		return "Right click while sneaking to gain " + DepthsUtils.getRarityColor(rarity) + (int) DepthsUtils.roundPercent(-PERCENT_DAMAGE_RECEIVED[rarity - 1]) + "%" + ChatColor.WHITE + " resistance and " + DepthsUtils.getRarityColor(rarity) + (int) DepthsUtils.roundPercent(KNOCKBACK_RESISTANCE[rarity - 1]) + "%" + ChatColor.WHITE + " knockback resistance for " + DURATION / 20 + " seconds. Cooldown: " + COOLDOWN / 20 + "s.";
 	}
 
 	@Override

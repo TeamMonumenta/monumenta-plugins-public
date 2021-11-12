@@ -62,7 +62,7 @@ public class EarthenCombos extends DepthsAbility {
 
 	@Override
 	public String getDescription(int rarity) {
-		return "Every third melee attack gives you " + DepthsUtils.getRarityColor(rarity) + DepthsUtils.roundPercent(-PERCENT_DAMAGE_RECEIVED[rarity - 1]) + "%" + ChatColor.WHITE + " resistance for " + DURATION / 20 + " seconds and roots the enemy for " + ROOT_DURATION / 20.0 + " seconds.";
+		return "Every third melee attack gives you " + DepthsUtils.getRarityColor(rarity) + (int) DepthsUtils.roundPercent(-PERCENT_DAMAGE_RECEIVED[rarity - 1]) + "%" + ChatColor.WHITE + " resistance for " + DURATION / 20 + " seconds and roots the enemy for " + ROOT_DURATION / 20.0 + " seconds.";
 	}
 
 	@Override

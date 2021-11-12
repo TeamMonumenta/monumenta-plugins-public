@@ -25,7 +25,7 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 public class BrambleShell extends DepthsAbility {
 
 	public static final String ABILITY_NAME = "Bramble Shell";
-	public static final double[] BRAMBLE_DAMAGE = {8, 10, 12, 14, 16, 24};
+	public static final int[] BRAMBLE_DAMAGE = {8, 10, 12, 14, 16, 24};
 
 	public BrambleShell(Plugin plugin, Player player) {
 		super(plugin, player, ABILITY_NAME);

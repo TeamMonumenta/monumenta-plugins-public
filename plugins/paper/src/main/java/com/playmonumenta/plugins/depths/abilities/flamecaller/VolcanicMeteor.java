@@ -24,7 +24,7 @@ import net.md_5.bungee.api.ChatColor;
 
 public class VolcanicMeteor extends DepthsAbility {
 	public static final String ABILITY_NAME = "Volcanic Meteor";
-	public static final double[] DAMAGE = {40, 50, 60, 70, 80, 100};
+	public static final int[] DAMAGE = {40, 50, 60, 70, 80, 100};
 	public static final int COOLDOWN_TICKS = 25 * 20;
 	public static final int DISTANCE = 25;
 	public static final int SIZE = 6;

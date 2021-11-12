@@ -29,7 +29,7 @@ public class CrushingEarth extends DepthsAbility {
 
 	public static final String ABILITY_NAME = "Crushing Earth";
 	private static final int COOLDOWN = 20 * 8;
-	private static final double[] DAMAGE = {8, 10, 12, 14, 16, 24};
+	private static final int[] DAMAGE = {8, 10, 12, 14, 16, 24};
 	private static final int CAST_RANGE = 4;
 	private static final int[] STUN_DURATION = {20, 25, 30, 35, 40, 50};
 

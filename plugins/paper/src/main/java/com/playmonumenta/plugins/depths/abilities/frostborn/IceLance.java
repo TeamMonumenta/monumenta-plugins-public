@@ -92,7 +92,7 @@ public class IceLance extends DepthsAbility {
 
 	@Override
 	public String getDescription(int rarity) {
-		return "Right click to shoot an ice lance that travels " + RANGE + " blocks and pierces through mobs, dealing " + DepthsUtils.getRarityColor(rarity) + DAMAGE[rarity - 1] + ChatColor.WHITE + " damage and applying " + DepthsUtils.roundPercent(AMPLIFIER) + "% slowness and weaken for " + DURATION / 20 + " seconds. Cooldown: " + COOLDOWN / 20 + "s.";
+		return "Right click to shoot an ice lance that travels " + RANGE + " blocks and pierces through mobs, dealing " + DepthsUtils.getRarityColor(rarity) + DAMAGE[rarity - 1] + ChatColor.WHITE + " damage and applying " + (int) DepthsUtils.roundPercent(AMPLIFIER) + "% slowness and weaken for " + DURATION / 20 + " seconds. Cooldown: " + COOLDOWN / 20 + "s.";
 	}
 
 	@Override

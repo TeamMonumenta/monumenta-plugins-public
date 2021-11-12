@@ -146,7 +146,7 @@ public class DepthsFrostNova extends DepthsAbility {
 
 	@Override
 	public String getDescription(int rarity) {
-		return "Left click while sneaking and holding a weapon to unleash a frost nova, dealing " + DepthsUtils.getRarityColor(rarity) + DAMAGE[rarity - 1] + ChatColor.WHITE + " damage to all enemies in a " + SIZE + " block cube around you and afflicting them with " + DepthsUtils.getRarityColor(rarity) + DepthsUtils.roundPercent(SLOW_MULTIPLIER[rarity - 1]) + "%" + ChatColor.WHITE + " slowness for " + DURATION_TICKS / 20 + " seconds. All mobs and players within range are extinguished if they are on fire. Nearby blocks are replaced with ice for " + ICE_TICKS / 20 + " seconds. Cooldown: " + COOLDOWN_TICKS / 20 + "s.";
+		return "Left click while sneaking and holding a weapon to unleash a frost nova, dealing " + DepthsUtils.getRarityColor(rarity) + DAMAGE[rarity - 1] + ChatColor.WHITE + " damage to all enemies in a " + SIZE + " block cube around you and afflicting them with " + DepthsUtils.getRarityColor(rarity) + (int) DepthsUtils.roundPercent(SLOW_MULTIPLIER[rarity - 1]) + "%" + ChatColor.WHITE + " slowness for " + DURATION_TICKS / 20 + " seconds. All mobs and players within range are extinguished if they are on fire. Nearby blocks are replaced with ice for " + ICE_TICKS / 20 + " seconds. Cooldown: " + COOLDOWN_TICKS / 20 + "s.";
 	}
 
 	@Override

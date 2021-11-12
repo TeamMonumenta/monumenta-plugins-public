@@ -142,7 +142,7 @@ public class LightningBottle extends DepthsAbility {
 
 	@Override
 	public String getDescription(int rarity) {
-		return "For every " + KILLS_PER + " mobs that die within " + DEATH_RADIUS + " blocks of you, you gain a lightning bottle, which stack up to " + MAX_STACK + ". Throwing a lightning bottle deals " + DepthsUtils.getRarityColor(rarity) + (float)DAMAGE[rarity - 1] + ChatColor.WHITE + " damage and applies " + DepthsUtils.roundPercent(SLOWNESS) + "% slowness and " + DepthsUtils.getRarityColor(rarity) + DepthsUtils.roundPercent(VULNERABILITY[rarity - 1]) + "%" + ChatColor.WHITE + " vulnerability for " + DURATION / 20 + " seconds.";
+		return "For every " + KILLS_PER + " mobs that die within " + DEATH_RADIUS + " blocks of you, you gain a lightning bottle, which stack up to " + MAX_STACK + ". Throwing a lightning bottle deals " + DepthsUtils.getRarityColor(rarity) + (float)DAMAGE[rarity - 1] + ChatColor.WHITE + " damage and applies " + (int) DepthsUtils.roundPercent(SLOWNESS) + "% slowness and " + DepthsUtils.getRarityColor(rarity) + DepthsUtils.roundPercent(VULNERABILITY[rarity - 1]) + "%" + ChatColor.WHITE + " vulnerability for " + DURATION / 20 + " seconds.";
 	}
 
 	@Override

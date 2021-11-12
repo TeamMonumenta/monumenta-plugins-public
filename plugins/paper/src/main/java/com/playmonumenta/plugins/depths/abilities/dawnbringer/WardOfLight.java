@@ -93,7 +93,7 @@ public class WardOfLight extends DepthsAbility {
 
 	@Override
 	public String getDescription(int rarity) {
-		return "Right click while holding a weapon and not sneaking to heal nearby players within " + HEALING_RADIUS + " blocks in front of you for " + DepthsUtils.getRarityColor(rarity) + DepthsUtils.roundPercent(HEAL[rarity - 1]) + "%" + ChatColor.WHITE + " of their max health. Cooldown: " + COOLDOWN / 20 + "s.";
+		return "Right click while holding a weapon and not sneaking to heal nearby players within " + HEALING_RADIUS + " blocks in front of you for " + DepthsUtils.getRarityColor(rarity) + (int) DepthsUtils.roundPercent(HEAL[rarity - 1]) + "%" + ChatColor.WHITE + " of their max health. Cooldown: " + COOLDOWN / 20 + "s.";
 	}
 
 	@Override

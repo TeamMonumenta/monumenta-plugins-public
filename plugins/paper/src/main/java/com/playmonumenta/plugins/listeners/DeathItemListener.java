@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Item;
@@ -57,8 +58,8 @@ public class DeathItemListener implements Listener {
 
 			//Do not put in the death map of a player with no items
 			for (ItemStack item : beforeDeathItems) {
-				if (item != null && !item.getType().isAir() && item.hasItemMeta()) {
-					//Found at least one non-air item
+				if (item != null && !item.getType().isAir() && item.hasItemMeta() && !item.getType().equals(Material.COMPASS)) {
+					//Found at least one non-air non-compass item with meta
 					//Save the player's death inventory
 					//Update inventory includes the 15 minute timer that starts to run on death (synced up to hoped items despawn timer)
 					mBeforeDeathItems.put(event.getEntity().getUniqueId(), beforeDeathItems);

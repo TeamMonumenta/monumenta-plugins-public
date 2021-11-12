@@ -44,7 +44,7 @@ public class CloakOfShadows extends DepthsAbility {
 	public static final int[] DAMAGE = {12, 15, 18, 21, 24, 30};
 	public static final int DAMAGE_DURATION = 4 * 20;
 	private static final double VELOCITY = 0.7;
-	private static final double RADIUS = 5.0;
+	private static final int RADIUS = 5;
 
 	private boolean mBonusDamage = false;
 
@@ -136,7 +136,7 @@ public class CloakOfShadows extends DepthsAbility {
 
 	@Override
 	public String getDescription(int rarity) {
-		return "Left click while sneaking and holding a weapon to throw a shadow bomb, which explodes on landing, applying " + DepthsUtils.getRarityColor(rarity) + DepthsUtils.roundPercent(WEAKEN_AMPLIFIER[rarity - 1]) + "%" + ChatColor.WHITE + " weaken for " + WEAKEN_DURATION / 20 + " seconds. You enter stealth for " + DepthsUtils.getRarityColor(rarity) + STEALTH_DURATION[rarity - 1] / 20.0 + ChatColor.WHITE + " seconds upon casting and the next instance of melee damage you deal within " + DAMAGE_DURATION / 20 + " seconds deals " + DepthsUtils.getRarityColor(rarity) + DAMAGE[rarity - 1] + ChatColor.WHITE + " additional damage. Cooldown: " + COOLDOWN / 20 + "s.";
+		return "Left click while sneaking and holding a weapon to throw a shadow bomb, which explodes on landing, applying " + DepthsUtils.getRarityColor(rarity) + (int) DepthsUtils.roundPercent(WEAKEN_AMPLIFIER[rarity - 1]) + "%" + ChatColor.WHITE + " weaken for " + WEAKEN_DURATION / 20 + " seconds in a " + RADIUS + " block radius. You enter stealth for " + DepthsUtils.getRarityColor(rarity) + STEALTH_DURATION[rarity - 1] / 20.0 + ChatColor.WHITE + " seconds upon casting and the next instance of melee damage you deal within " + DAMAGE_DURATION / 20 + " seconds deals " + DepthsUtils.getRarityColor(rarity) + DAMAGE[rarity - 1] + ChatColor.WHITE + " additional damage. Cooldown: " + COOLDOWN / 20 + "s.";
 	}
 
 	@Override

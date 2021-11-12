@@ -19,7 +19,7 @@ import com.playmonumenta.plugins.utils.PlayerUtils;
 
 import net.md_5.bungee.api.ChatColor;
 
-public class DepthsRejuvenation extends DepthsAbility {
+public class Rejuvenation extends DepthsAbility {
 
 	public static final String ABILITY_NAME = "Rejuvenation";
 	public static final int[] HEAL_INTERVAL = {100, 90, 80, 70, 60, 50};
@@ -32,7 +32,7 @@ public class DepthsRejuvenation extends DepthsAbility {
 
 	private int mTimer = 0;
 
-	public DepthsRejuvenation(Plugin plugin, Player player) {
+	public Rejuvenation(Plugin plugin, Player player) {
 		super(plugin, player, ABILITY_NAME);
 		mDisplayItem = Material.NETHER_STAR;
 		mTree = DepthsTree.SUNLIGHT;
@@ -73,7 +73,7 @@ public class DepthsRejuvenation extends DepthsAbility {
 
 	@Override
 	public String getDescription(int rarity) {
-		return "All players within " + RADIUS + " blocks of you (including yourself) heal " + DepthsUtils.roundPercent(PERCENT_HEAL) + "% of their max health every " + DepthsUtils.getRarityColor(rarity) + HEAL_INTERVAL[rarity - 1] / 20.0 + ChatColor.WHITE + " seconds. A given player will only be healed by the highest Rejuvenation that affects them.";
+		return "All players within " + RADIUS + " blocks of you (including yourself) heal " + (int) DepthsUtils.roundPercent(PERCENT_HEAL) + "% of their max health every " + DepthsUtils.getRarityColor(rarity) + HEAL_INTERVAL[rarity - 1] / 20.0 + ChatColor.WHITE + " seconds. A given player will only be healed by the highest Rejuvenation that affects them.";
 	}
 
 	@Override

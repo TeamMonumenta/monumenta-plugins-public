@@ -37,7 +37,7 @@ public class OneWithTheWind extends DepthsAbility {
 
 	@Override
 	public String getDescription(int rarity) {
-		return "If there are no other players in an " + RANGE + " block radius, you gain " + DepthsUtils.getRarityColor(rarity) + DepthsUtils.roundPercent(-PERCENT_DAMAGE_RECEIVED[rarity - 1]) + "%" + ChatColor.WHITE + " resistance and " + DepthsUtils.getRarityColor(rarity) + DepthsUtils.roundPercent(SPEED[rarity - 1]) + "%" + ChatColor.WHITE + " speed.";
+		return "If there are no other players in an " + RANGE + " block radius, you gain " + DepthsUtils.getRarityColor(rarity) + (int) DepthsUtils.roundPercent(-PERCENT_DAMAGE_RECEIVED[rarity - 1]) + "%" + ChatColor.WHITE + " resistance and " + DepthsUtils.getRarityColor(rarity) + (int) DepthsUtils.roundPercent(SPEED[rarity - 1]) + "%" + ChatColor.WHITE + " speed.";
 	}
 
 	@Override

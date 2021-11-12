@@ -68,7 +68,7 @@ public class SoothingCombos extends DepthsAbility {
 
 	@Override
 	public String getDescription(int rarity) {
-		return "Every third melee attack applies " + DepthsUtils.getRarityColor(rarity) + DepthsUtils.roundPercent(SPEED_PERCENT[rarity - 1]) + "%" + ChatColor.WHITE + " speed and Haste I for " + DepthsUtils.getRarityColor(rarity) + DURATION[rarity - 1] + ChatColor.WHITE + " seconds to players within " + RANGE + " blocks, including the user.";
+		return "Every third melee attack applies " + DepthsUtils.getRarityColor(rarity) + DepthsUtils.roundPercent(SPEED_PERCENT[rarity - 1]) + "%" + ChatColor.WHITE + " speed and Haste I for " + DepthsUtils.getRarityColor(rarity) + (int) DURATION[rarity - 1] + ChatColor.WHITE + " seconds to players within " + RANGE + " blocks, including the user.";
 	}
 
 	@Override

@@ -51,7 +51,7 @@ public class Quickdraw extends Ability {
 	public void cast(Action action) {
 		ItemStack inMainHand = mPlayer.getInventory().getItemInMainHand();
 		Damageable damageable = (Damageable)inMainHand.getItemMeta();
-		if (!mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.mLinkedSpell) && ItemUtils.isSomeBow(inMainHand) && !(damageable.getDamage() > inMainHand.getType().getMaxDurability() && !ItemUtils.isItemShattered(inMainHand))) {
+		if (!mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.mLinkedSpell) && ItemUtils.isSomeBow(inMainHand) && !(damageable.getDamage() > inMainHand.getType().getMaxDurability()) && !ItemUtils.isItemShattered(inMainHand)) {
 			World world = mPlayer.getWorld();
 			world.playSound(mPlayer.getLocation(), Sound.ENTITY_ARROW_SHOOT, 1, 1.4f);
 			world.spawnParticle(Particle.CRIT, mPlayer.getEyeLocation().add(mPlayer.getLocation().getDirection()), 15, 0, 0, 0, 0.6f);

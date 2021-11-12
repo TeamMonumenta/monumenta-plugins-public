@@ -29,7 +29,7 @@ public class RegionScalingDamageDealt implements BaseEnchantment {
 	private static final String PROPERTY_NAME = ChatColor.DARK_GRAY + "Celsian Isles : ";
 
 	public static final String APPLY_MULTIPLIER_METAKEY = "ApplyRegionScalingMultiplier";
-	private static final double DAMAGE_DEALT_MULTIPLIER = 0.5;
+	public static final double DAMAGE_DEALT_MULTIPLIER = 0.5;
 
 	private static final String ATTRIBUTE_CANCELLATION_NAME = "RegionScalingAttributeCancellation";
 

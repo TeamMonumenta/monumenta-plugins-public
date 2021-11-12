@@ -23,7 +23,7 @@ public class Brutalize extends DepthsAbility {
 
 	public static final String ABILITY_NAME = "Brutalize";
 	public static final double[] DAMAGE = {0.09, 0.12, 0.15, 0.18, 0.21, 0.27};
-	public static final float RADIUS = 2.0f;
+	public static final int RADIUS = 2;
 
 	public Brutalize(Plugin plugin, Player player) {
 		super(plugin, player, ABILITY_NAME);
@@ -56,7 +56,7 @@ public class Brutalize extends DepthsAbility {
 
 	@Override
 	public String getDescription(int rarity) {
-		return "When you critically strike you deal " + DepthsUtils.getRarityColor(rarity) + DepthsUtils.roundPercent(DAMAGE[rarity - 1]) + "%" + ChatColor.WHITE + " of the damage to nearby enemies and knock them away from the target.";
+		return "When you critically strike you deal " + DepthsUtils.getRarityColor(rarity) + (int) DepthsUtils.roundPercent(DAMAGE[rarity - 1]) + "%" + ChatColor.WHITE + " of the damage to enemies in a " + RADIUS + " block radius and knock them away from the target.";
 	}
 
 	@Override

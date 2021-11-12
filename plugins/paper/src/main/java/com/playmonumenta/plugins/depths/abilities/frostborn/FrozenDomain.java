@@ -109,7 +109,7 @@ public class FrozenDomain extends DepthsAbility {
 		if (REGEN_TIME[rarity - 1] == 20) {
 			s = "";
 		}
-		return "When standing on ice, gain " + DepthsUtils.getRarityColor(rarity) + DepthsUtils.roundPercent(EXTRA_SPEED_PCT[rarity - 1]) + "%" + ChatColor.WHITE + " speed and regain " + DepthsUtils.roundPercent(PERCENT_HEAL) + "% of your max health every "
+		return "When standing on ice, gain " + DepthsUtils.getRarityColor(rarity) + DepthsUtils.roundPercent(EXTRA_SPEED_PCT[rarity - 1]) + "%" + ChatColor.WHITE + " speed and regain " + (int) DepthsUtils.roundPercent(PERCENT_HEAL) + "% of your max health every "
 				+ DepthsUtils.getRarityColor(rarity) + REGEN_TIME[rarity - 1] + ChatColor.WHITE + " second" + s + ". Effects last for " + DURATION_TICKS / 20 + " seconds after leaving ice.";
 	}
 

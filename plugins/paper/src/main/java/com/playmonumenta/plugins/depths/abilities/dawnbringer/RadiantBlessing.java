@@ -79,7 +79,7 @@ public class RadiantBlessing extends DepthsAbility {
 
 	@Override
 	public String getDescription(int rarity) {
-		return "Left click while sneaking and holding a weapon to enchant players within " + HEALING_RADIUS + " blocks, including yourself, with " + DepthsUtils.roundPercent(-PERCENT_DAMAGE_RECEIVED) + "% resistance and " + DepthsUtils.getRarityColor(rarity) + DepthsUtils.roundPercent(PERCENT_DAMAGE[rarity - 1]) + "%" + ChatColor.WHITE + " melee damage for " + DURATION / 20 + " seconds. Cooldown: " + COOLDOWN / 20 + "s.";
+		return "Left click while sneaking and holding a weapon to enchant players within " + HEALING_RADIUS + " blocks, including yourself, with " + (int) DepthsUtils.roundPercent(-PERCENT_DAMAGE_RECEIVED) + "% resistance and " + DepthsUtils.getRarityColor(rarity) + (int) DepthsUtils.roundPercent(PERCENT_DAMAGE[rarity - 1]) + "%" + ChatColor.WHITE + " melee damage for " + DURATION / 20 + " seconds. Cooldown: " + COOLDOWN / 20 + "s.";
 	}
 
 	@Override
