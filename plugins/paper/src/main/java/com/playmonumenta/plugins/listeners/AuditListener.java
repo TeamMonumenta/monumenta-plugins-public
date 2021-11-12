@@ -4,11 +4,14 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
 import com.playmonumenta.plugins.integrations.MonumentaNetworkRelayIntegration;
+import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
+import com.playmonumenta.redissync.MonumentaRedisSyncAPI;
 
 import org.bukkit.GameMode;
 import org.bukkit.Material;
@@ -22,6 +25,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -163,6 +167,25 @@ public class AuditListener implements Listener {
 		}
 
 		/* Don't checkDestroy() here - this event fires every time InventoryCreativeEvent fires */
+	}
+
+	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+	public void pickup(EntityPickupItemEvent event) {
+		if (event.getEntity() instanceof Player) {
+			ItemStack item = event.getItem().getItemStack();
+			if (!ItemUtils.isShulkerBox(item.getType()) && !ItemUtils.hasLore(item)) {
+				return;
+			}
+
+			UUID throwerId = event.getItem().getThrower();
+			String throwerSuffix = "";
+			if (throwerId != null) {
+				throwerSuffix = " thrown by " + MonumentaRedisSyncAPI.cachedUuidToName(throwerId);
+			}
+
+			Player player = (Player) event.getEntity();
+			log("+PickupItem: " + player.getName() + " at " + player.getLocation().toString() + " " + getItemLogString(item) + throwerSuffix);
+		}
 	}
 
 	@EventHandler(priority = EventPriority.MONITOR)
