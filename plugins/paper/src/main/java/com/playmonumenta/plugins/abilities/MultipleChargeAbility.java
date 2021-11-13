@@ -61,25 +61,25 @@ public abstract class MultipleChargeAbility extends Ability implements AbilityWi
 
 		// If the skill is somehow on cooldown when charges are full, take it off cooldown
 		if (mCharges == mMaxCharges && onCooldown) {
-			mPlugin.mTimers.removeCooldown(mPlayer.getUniqueId(), mInfo.mLinkedSpell);
+			mPlugin.mTimers.removeCooldown(mPlayer, mInfo.mLinkedSpell);
 		}
 
-		boolean hasUpdate = false;
+		boolean needsClientModUpdate = false;
 
 		// Increment charges if last check was on cooldown, and now is off cooldown.
 		if (mCharges < mMaxCharges && mWasOnCooldown && !onCooldown) {
 			mCharges++;
 			MessagingUtils.sendActionBarMessage(mPlayer, mInfo.mLinkedSpell.getName() + " Charges: " + mCharges);
-			hasUpdate = true;
+			needsClientModUpdate = true;
 		}
 
 		// Put on cooldown if charges can still be gained
 		if (mCharges < mMaxCharges && !onCooldown) {
 			putOnCooldown();
-			hasUpdate = true;
+			needsClientModUpdate = false; // putOnCooldown() already sends an update
 		}
 
-		if (hasUpdate) {
+		if (needsClientModUpdate) {
 			ClientModHandler.updateAbility(mPlayer, this);
 		}
 

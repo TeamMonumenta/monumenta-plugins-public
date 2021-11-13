@@ -103,7 +103,7 @@ public class BottledSunlight extends DepthsAbility {
 						execute(p);
 					}
 
-					mPlugin.mTimers.removeCooldown(mPlayer.getUniqueId(), mInfo.mLinkedSpell);
+					mPlugin.mTimers.removeCooldown(mPlayer, mInfo.mLinkedSpell);
 					putOnCooldown();
 
 					this.cancel();

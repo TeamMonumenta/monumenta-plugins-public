@@ -122,7 +122,7 @@ public class IronTincture extends Ability {
 						execute(p);
 					}
 
-					mPlugin.mTimers.removeCooldown(mPlayer.getUniqueId(), mInfo.mLinkedSpell);
+					mPlugin.mTimers.removeCooldown(mPlayer, mInfo.mLinkedSpell);
 					putOnCooldown();
 
 					this.cancel();
