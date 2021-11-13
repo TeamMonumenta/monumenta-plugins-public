@@ -349,10 +349,10 @@ public class ClassSelectionCustomInventory extends CustomInventory {
 		} else if (ScoreboardUtils.getScoreboardValue(player, "Specialization") == 0) {
 			//unlocked and no spec selected
 			ItemStack specItem = createBasicItem(spec.mDisplayItem.getType(), spec.mSpecName, NamedTextColor.RED, false,
-					"Click to choose this specialization!", ChatColor.WHITE);
+					"Click to choose this specialization!", ChatColor.GRAY);
 			if (spec.mDescription != null) {
 				ItemMeta newMeta = specItem.getItemMeta();
-				splitLoreLine(newMeta, spec.mDescription, 30, ChatColor.WHITE, false);
+				splitLoreLine(newMeta, "Description: " + spec.mDescription, 30, ChatColor.YELLOW, false);
 				specItem.setItemMeta(newMeta);
 			}
 			_inventory.setItem(P2_SPEC_LOCS.get(specNumber - 1), specItem);
@@ -391,15 +391,15 @@ public class ClassSelectionCustomInventory extends CustomInventory {
 			return newItem;
 		}
 		ItemStack newItem = createBasicItem(classToItemize.mDisplayItem.getType(), classToItemize.mClassName,
-				classToItemize.mClassColor, true, "Click to choose this class!", ChatColor.WHITE);
+				classToItemize.mClassColor, true, "Click to choose this class!", ChatColor.GRAY);
 		if (classToItemize.mClassDescription != null) {
 			ItemMeta newMeta = newItem.getItemMeta();
-			splitLoreLine(newMeta, classToItemize.mClassDescription, 30, ChatColor.WHITE, false);
+			splitLoreLine(newMeta, "Description: " + classToItemize.mClassDescription, 30, ChatColor.YELLOW, false);
 			newItem.setItemMeta(newMeta);
 		}
 		if (classToItemize.mClassPassiveDescription != null) {
 			ItemMeta newMeta = newItem.getItemMeta();
-			splitLoreLine(newMeta, classToItemize.mClassPassiveDescription, 30, ChatColor.WHITE, false);
+			splitLoreLine(newMeta, "Passive: " + classToItemize.mClassPassiveDescription, 30, ChatColor.GREEN, false);
 			newItem.setItemMeta(newMeta);
 		}
 

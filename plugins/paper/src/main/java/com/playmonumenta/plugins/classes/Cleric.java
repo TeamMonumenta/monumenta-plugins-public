@@ -44,6 +44,8 @@ public class Cleric extends PlayerClass {
 		mClassColor = NamedTextColor.YELLOW;
 		mChatColor = ChatColor.YELLOW;
 		mDisplayItem = new ItemStack(Material.POPPY, 1);
+		mClassDescription = "Clerics are mighty healers and specialize in fighting the undead.";
+		mClassPassiveDescription = "You and all allies in a 12 block radius heal 5% of max health every 5s while under 50% health.";
 
 		mSpecOne.mAbilities.add(new HolyJavelin(plugin, player));
 		mSpecOne.mAbilities.add(new ChoirBells(plugin, player));
@@ -52,6 +54,7 @@ public class Cleric extends PlayerClass {
 		mSpecOne.mSpecialization = 5;
 		mSpecOne.mSpecName = "Paladin";
 		mSpecOne.mDisplayItem = new ItemStack(Material.GHAST_TEAR, 1);
+		mSpecOne.mDescription = "Paladins are mighty healers that have mastered combating undead foes. They will make sure the dead stay dead.";
 
 		mSpecTwo.mAbilities.add(new EnchantedPrayer(plugin, player));
 		mSpecTwo.mAbilities.add(new ThuribleProcession(plugin, player));
@@ -60,6 +63,7 @@ public class Cleric extends PlayerClass {
 		mSpecTwo.mSpecialization = 6;
 		mSpecTwo.mSpecName = "Hierophant";
 		mSpecTwo.mDisplayItem = new ItemStack(Material.DRAGON_BREATH, 1);
+		mSpecTwo.mDescription = "Hierophants specialize in support and have mastered healing. They will make sure the living stay living.";
 
 	}
 }

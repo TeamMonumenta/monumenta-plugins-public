@@ -101,6 +101,11 @@ import com.playmonumenta.plugins.abilities.mage.elementalist.Blizzard;
 import com.playmonumenta.plugins.abilities.mage.elementalist.ElementalSpiritFire;
 import com.playmonumenta.plugins.abilities.mage.elementalist.ElementalSpiritIce;
 import com.playmonumenta.plugins.abilities.mage.elementalist.Starfall;
+import com.playmonumenta.plugins.abilities.other.AttribaAttackDamage;
+import com.playmonumenta.plugins.abilities.other.AttribaAttackSpeed;
+import com.playmonumenta.plugins.abilities.other.AttribaKnockbackResistance;
+import com.playmonumenta.plugins.abilities.other.AttribaMaxHealth;
+import com.playmonumenta.plugins.abilities.other.AttribaMovementSpeed;
 import com.playmonumenta.plugins.abilities.other.CluckingPotions;
 import com.playmonumenta.plugins.abilities.other.PatronGreen;
 import com.playmonumenta.plugins.abilities.other.PatronPurple;
@@ -222,6 +227,13 @@ public class AbilityManager {
 
 			// ALL PLAYERS (but technically for Cleric)
 			new NonClericProvisionsPassive(mPlugin, null),
+
+			// ALL Attriba
+			new AttribaAttackDamage(mPlugin, null),
+			new AttribaAttackSpeed(mPlugin, null),
+			new AttribaKnockbackResistance(mPlugin, null),
+			new AttribaMaxHealth(mPlugin, null),
+			new AttribaMovementSpeed(mPlugin, null),
 
 			// All other non-class abilities
 			new PvP(mPlugin, null),

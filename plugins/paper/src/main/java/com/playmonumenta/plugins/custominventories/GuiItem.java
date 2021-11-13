@@ -1,6 +1,5 @@
-package com.playmonumenta.plugins.guis;
+package com.playmonumenta.plugins.custominventories;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import org.bukkit.GameMode;
@@ -26,19 +25,15 @@ public class GuiItem {
 	}
 
 	public GuiItem(int page, int slot, ItemStack showedItem, Map<ItemStack, Integer> cost, DoubleParameterFunction<Player, Inventory, Boolean> cond) {
-		this(page, slot, showedItem, cost, cond, (i, s) -> {
-			return true;
-		});
+		this(page, slot, showedItem, cost, cond, null);
 	}
 
 	public GuiItem(int page, int slot, ItemStack showedItem, DoubleParameterFunction<Player, Inventory, Boolean> cond, DoubleParameterFunction<Player, Inventory, Boolean> afterClick) {
-		this(page, slot, showedItem, new HashMap<>(), cond, afterClick);
+		this(page, slot, showedItem, null, cond, afterClick);
 	}
 
 	public GuiItem(int page, int slot, ItemStack showedItem, Map<ItemStack, Integer> cost) {
-		this (page, slot, showedItem, cost, (i, s) -> {
-			return true;
-		});
+		this (page, slot, showedItem, cost, null);
 	}
 
 	public GuiItem(int slot, ItemStack showedItem, Map<ItemStack, Integer> cost) {
@@ -46,11 +41,11 @@ public class GuiItem {
 	}
 
 	public GuiItem(int slot, ItemStack showedItemStack) {
-		this (0, slot, showedItemStack, new HashMap<>());
+		this (0, slot, showedItemStack, (Map<ItemStack, Integer>) null);
 	}
 
-	public GuiItem(int slot, ItemStack showedItemStack, DoubleParameterFunction<Player, Inventory, Boolean> cond) {
-		this (0, slot, showedItemStack, new HashMap<>(), cond);
+	public GuiItem(int page, int slot, ItemStack showedItemStack, DoubleParameterFunction<Player, Inventory, Boolean> cond) {
+		this (page, slot, showedItemStack, (Map<ItemStack, Integer>) null, cond);
 	}
 
 	public int getPage() {
@@ -154,7 +149,7 @@ public class GuiItem {
 
 	//we consider that an item with no cost is free
 	public boolean isFree() {
-		return mCost.isEmpty();
+		return mCost == null || mCost.isEmpty();
 	}
 
 	/**

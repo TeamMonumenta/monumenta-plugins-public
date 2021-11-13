@@ -43,6 +43,8 @@ public class Warrior extends PlayerClass {
 		mClassColor = NamedTextColor.RED;
 		mChatColor = ChatColor.RED;
 		mDisplayItem = new ItemStack(Material.STONE_AXE, 1);
+		mClassDescription = "Warriors specialize in melee combat, being able to both deal and survive heavy damage.";
+		mClassPassiveDescription = "Gain a base of 20% Knockback Resistance. This stacks with other skills and items.";
 
 		mSpecOne.mAbilities.add(new MeteorSlam(plugin, player));
 		mSpecOne.mAbilities.add(new Rampage(plugin, player));
@@ -51,6 +53,7 @@ public class Warrior extends PlayerClass {
 		mSpecOne.mSpecialization = 3;
 		mSpecOne.mSpecName = "Berserker";
 		mSpecOne.mDisplayItem = new ItemStack(Material.WITHER_SKELETON_SKULL, 1);
+		mSpecOne.mDescription = "Berserkers specialize in melee combat. They thrive in the heart of battle taking heavy risks for great rewards.";
 
 		mSpecTwo.mAbilities.add(new Bodyguard(plugin, player));
 		mSpecTwo.mAbilities.add(new Challenge(plugin, player));
@@ -59,5 +62,6 @@ public class Warrior extends PlayerClass {
 		mSpecTwo.mSpecialization = 4;
 		mSpecTwo.mSpecName = "Guardian";
 		mSpecTwo.mDisplayItem = new ItemStack(Material.SHIELD, 1);
+		mSpecTwo.mDescription = "Guardians specialize in melee combat. Their skills are focused on taking heavy damage and drawing enemy attacks to themselves.";
 	}
 }

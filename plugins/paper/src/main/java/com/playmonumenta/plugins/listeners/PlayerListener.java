@@ -71,6 +71,7 @@ import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.player.PlayerRegisterChannelEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.event.player.PlayerRiptideEvent;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
@@ -130,7 +131,6 @@ import com.playmonumenta.plugins.server.reset.DailyReset;
 import com.playmonumenta.plugins.utils.ChestUtils;
 import com.playmonumenta.plugins.utils.CommandUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.GraveUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
@@ -172,13 +172,20 @@ public class PlayerListener implements Listener {
 		Location loc = player.getLocation();
 		runTeleportRunnable(player, loc);
 
-		// Send class update to client mod. Needs to be delayed so that both abilities and the plugin channel are properly initialised.
-		new BukkitRunnable() {
-			@Override
-			public void run() {
-				ClientModHandler.updateAbilities(player);
-			}
-		}.runTaskLater(mPlugin, 10);
+	}
+
+	@EventHandler(priority = EventPriority.MONITOR)
+	public void playerChannelEvent(PlayerRegisterChannelEvent event) {
+		if (ClientModHandler.CHANNEL_ID.equals(event.getChannel())) {
+			Player player = event.getPlayer();
+			// Send class update to client mod. Needs to be delayed so that abilities are properly initialised (e.g. abilities with stacks are delayed by 1 tick).
+			new BukkitRunnable() {
+				@Override
+				public void run() {
+					ClientModHandler.updateAbilities(player);
+				}
+			}.runTaskLater(mPlugin, 2);
+		}
 	}
 
 	@EventHandler(priority = EventPriority.LOW)
@@ -227,6 +234,14 @@ public class PlayerListener implements Listener {
 		ItemStack item = event.getItem();
 		Block block = event.getClickedBlock();
 		Material mat = (block != null) ? block.getType() : Material.AIR;
+
+		// Plot Security: If block is in a plot but the player is in adventure, cancel.
+		if (block != null && player != null && player.getGameMode() == GameMode.ADVENTURE
+			&& ZoneUtils.inPlot(block.getLocation(), ServerProperties.getIsTownWorld())) {
+			event.setCancelled(true);
+			return;
+		}
+
 		mPlugin.mAbilityManager.playerInteractEvent(player, action, item, mat);
 		mPlugin.mTrackingManager.mPlayers.onPlayerInteract(mPlugin, player, event);
 
@@ -259,40 +274,6 @@ public class PlayerListener implements Listener {
 				    && ZoneUtils.inPlot(location, ServerProperties.getIsTownWorld())) {
 					event.setUseInteractedBlock(Event.Result.DENY);
 					return;
-				}
-				if (GraveUtils.isGrave(block)
-				    && player.getGameMode() != GameMode.CREATIVE
-				    && player.getGameMode() != GameMode.SPECTATOR) {
-					Chest grave = (Chest) block.getState();
-					if (GraveUtils.canPlayerOpenGrave(block, player)) {
-						// Player has permission to access this grave. Move as much of the grave's contents as possible into the player's inventory.
-						Inventory graveInventory = grave.getInventory();
-						PlayerInventory playerInventory = player.getInventory();
-						int itemsMoved = 0;
-						int itemsLeftBehind = 0;
-						for (int i = 0; i < graveInventory.getSize(); i++) {
-							if (graveInventory.getItem(i) != null) {
-								if (playerInventory.firstEmpty() != -1) {
-									// Player has a space in their inventory. Move the item
-									playerInventory.setItem(playerInventory.firstEmpty(), graveInventory.getItem(i));
-									graveInventory.setItem(i, null);
-									itemsMoved++;
-								} else {
-									// Player doesn't have a space in their inventory. Don't move anything
-									itemsLeftBehind++;
-								}
-							}
-						}
-						player.sendActionBar(Component.text(String.format("Retrieved %d items from the grave. %d items remain.", itemsMoved, itemsLeftBehind)));
-						if (itemsLeftBehind == 0) {
-							block.setType(Material.AIR);
-						}
-						event.setUseInteractedBlock(Event.Result.DENY);
-					} else {
-						// Player does not have permission to access this grave.
-						player.sendActionBar(Component.text("You cannot open ").append(grave.customName()));
-						event.setUseInteractedBlock(Event.Result.DENY);
-					}
 				}
 			}
 		}
@@ -568,9 +549,7 @@ public class PlayerListener implements Listener {
 		} else if (holder instanceof Chest) {
 			Chest chest = (Chest) holder;
 			// Break empty graves or halloween creeper chests in safe zones automatically when closed
-			if (ChestUtils.isEmpty(chest)
-			    && (GraveUtils.isGrave(chest)
-			        || (chest.getCustomName() != null && chest.getCustomName().contains("Creeperween Chest")))) {
+			if (ChestUtils.isEmpty(chest) && (chest.getCustomName() != null && chest.getCustomName().contains("Creeperween Chest"))) {
 				chest.getBlock().breakNaturally();
 			}
 		}

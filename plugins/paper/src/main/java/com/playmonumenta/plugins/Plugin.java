@@ -103,6 +103,7 @@ import com.playmonumenta.plugins.listeners.DelvesListener;
 import com.playmonumenta.plugins.listeners.EntityListener;
 import com.playmonumenta.plugins.listeners.ExceptionListener;
 import com.playmonumenta.plugins.listeners.GraveListener;
+import com.playmonumenta.plugins.listeners.ItemDropListener;
 import com.playmonumenta.plugins.listeners.JunkItemListener;
 import com.playmonumenta.plugins.listeners.MobListener;
 import com.playmonumenta.plugins.listeners.PlayerListener;
@@ -143,6 +144,7 @@ public class Plugin extends JavaPlugin {
 	public EnchantmentManager mEnchantmentManager;
 	public AttributeManager mAttributeManager;
 	public JunkItemListener mJunkItemsListener;
+	public ItemDropListener mItemDropListener;
 	private HttpManager mHttpManager = null;
 	public TrackingManager mTrackingManager;
 	public PotionManager mPotionManager;
@@ -251,6 +253,7 @@ public class Plugin extends JavaPlugin {
 		mAttributeManager = new AttributeManager();
 
 		mJunkItemsListener = new JunkItemListener();
+		mItemDropListener = new ItemDropListener();
 	}
 
 	//  Logic that is performed upon enabling the plugin.
@@ -320,6 +323,7 @@ public class Plugin extends JavaPlugin {
 		manager.registerEvents(new CrossbowListener(this), this);
 		manager.registerEvents(mEnchantmentManager, this);
 		manager.registerEvents(mJunkItemsListener, this);
+		manager.registerEvents(mItemDropListener, this);
 		manager.registerEvents(mBossManager, this);
 		manager.registerEvents(mEffectManager, this);
 		manager.registerEvents(mParrotManager, this);

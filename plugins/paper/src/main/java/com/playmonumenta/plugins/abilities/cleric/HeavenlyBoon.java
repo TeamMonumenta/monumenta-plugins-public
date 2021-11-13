@@ -36,9 +36,12 @@ public class HeavenlyBoon extends Ability implements KillTriggeredAbility {
 	private static final double HEAVENLY_BOON_2_CHANCE = 0.16;
 	private static final double HEAVENLY_BOON_RADIUS = 12;
 	private static final double HEAVENLY_BOON_TRIGGER_INTENSITY = 0.05;
+	private static final int HEAVENLY_BOON_1_DURATION = 20 * 20;
+	private static final int HEAVENLY_BOON_2_DURATION = 50 * 20;
 
 	private final KillTriggeredAbilityTracker mTracker;
 	private final double mChance;
+	private final int mDuration;
 
 	private Crusade mCrusade;
 
@@ -46,10 +49,11 @@ public class HeavenlyBoon extends Ability implements KillTriggeredAbility {
 		super(plugin, player, "Heavenly Boon");
 		mInfo.mScoreboardId = "HeavenlyBoon";
 		mInfo.mShorthandName = "HB";
-		mInfo.mDescriptions.add("Whenever you are hit with a positive splash potion, the effects are also given to other players in a 12 block radius. In addition, whenever you kill an undead mob, you have a 8% chance to be splashed with an Instant Health I potion, as well as either a Speed I, Regen I, or Absorption I potion.");
-		mInfo.mDescriptions.add("The chance to be splashed upon killing an Undead increases to 16%, the effect potions can now also be Strength and Resistance, and the durations of each are greater.");
+		mInfo.mDescriptions.add("Whenever you are hit with a positive splash potion, the effects are also given to other players in a 12 block radius. In addition, whenever you kill an undead mob, you have a 8% chance to be splashed with an Instant Health I potion, as well as either a Speed I, Regen I, or Absorption I potion with 20 second duration.");
+		mInfo.mDescriptions.add("The chance to be splashed upon killing an Undead increases to 16%, the effect potions can now also be Strength and Resistance, and the durations of each are increased to 50 seconds.");
 		mTracker = new KillTriggeredAbilityTracker(this);
 		mChance = getAbilityScore() == 1 ? HEAVENLY_BOON_1_CHANCE : HEAVENLY_BOON_2_CHANCE;
+		mDuration = getAbilityScore() == 1 ? HEAVENLY_BOON_1_DURATION : HEAVENLY_BOON_2_DURATION;
 		mDisplayItem = new ItemStack(Material.SPLASH_POTION, 1);
 
 		Bukkit.getScheduler().runTask(plugin, () -> {
@@ -131,31 +135,31 @@ public class HeavenlyBoon extends Ability implements KillTriggeredAbility {
 			if (getAbilityScore() == 1) {
 				int rand = FastUtils.RANDOM.nextInt(4);
 				if (rand == 0 || rand == 1) {
-					potions = ItemUtils.createStackedPotions(PotionEffectType.REGENERATION, 1, 20 * 20, 0,
+					potions = ItemUtils.createStackedPotions(PotionEffectType.REGENERATION, 1, mDuration, 0,
 					                                         "Splash Potion of Regeneration");
 				} else if (rand == 2) {
-					potions = ItemUtils.createStackedPotions(PotionEffectType.ABSORPTION, 1, 20 * 20, 0,
+					potions = ItemUtils.createStackedPotions(PotionEffectType.ABSORPTION, 1, mDuration, 0,
 					                                         "Splash Potion of Absorption");
 				} else {
-					potions = ItemUtils.createStackedPotions(PotionEffectType.SPEED, 1, 20 * 20, 0,
+					potions = ItemUtils.createStackedPotions(PotionEffectType.SPEED, 1, mDuration, 0,
 					                                         "Splash Potion of Speed");
 				}
 			} else {
 				int rand = FastUtils.RANDOM.nextInt(5);
 				if (rand == 0) {
-					potions = ItemUtils.createStackedPotions(PotionEffectType.REGENERATION, 1, 50 * 20, 0,
+					potions = ItemUtils.createStackedPotions(PotionEffectType.REGENERATION, 1, mDuration, 0,
 					                                         "Splash Potion of Regeneration");
 				} else if (rand == 1) {
-					potions = ItemUtils.createStackedPotions(PotionEffectType.ABSORPTION, 1, 50 * 20, 0,
+					potions = ItemUtils.createStackedPotions(PotionEffectType.ABSORPTION, 1, mDuration, 0,
 					                                         "Splash Potion of Absorption");
 				} else if (rand == 2) {
-					potions = ItemUtils.createStackedPotions(PotionEffectType.SPEED, 1, 50 * 20, 0,
+					potions = ItemUtils.createStackedPotions(PotionEffectType.SPEED, 1, mDuration, 0,
 					                                         "Splash Potion of Speed");
 				} else if (rand == 3) {
-					potions = ItemUtils.createStackedPotions(PotionEffectType.INCREASE_DAMAGE, 1, 50 * 20, 0,
+					potions = ItemUtils.createStackedPotions(PotionEffectType.INCREASE_DAMAGE, 1, mDuration, 0,
 					                                         "Splash Potion of Strength");
 				} else {
-					potions = ItemUtils.createStackedPotions(PotionEffectType.DAMAGE_RESISTANCE, 1, 50 * 20, 0,
+					potions = ItemUtils.createStackedPotions(PotionEffectType.DAMAGE_RESISTANCE, 1, mDuration, 0,
 					                                         "Splash Potion of Resistance");
 				}
 			}

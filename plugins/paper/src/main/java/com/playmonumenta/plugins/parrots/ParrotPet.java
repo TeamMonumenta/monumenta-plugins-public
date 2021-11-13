@@ -12,20 +12,19 @@ public class ParrotPet {
 	private String mName;
 	private Parrot mParrot;
 	private Player mPlayer;
-	private String mShoulder;
 	private Parrot.Variant mVariant;
 
-	public ParrotPet(ParrotVariant variant, Player p, String shoulder) {
-		this(variant, (Parrot)p.getWorld().spawnEntity(p.getLocation(), EntityType.PARROT), p, shoulder);
+	public ParrotPet(ParrotVariant variant, Player p) {
+		this(variant, (Parrot)p.getWorld().spawnEntity(p.getLocation(), EntityType.PARROT), p);
 	}
 
-	public ParrotPet(ParrotVariant variant, Parrot spawnEntity, Player player, String shoulder) {
+	public ParrotPet(ParrotVariant variant, Parrot spawnEntity, Player player) {
 		mName = variant.getName();
 		mParrot = spawnEntity;
 		mPlayer = player;
-		mShoulder = shoulder;
 		mVariant = variant.getVariant();
 
+		mParrot.addScoreboardTag(ParrotManager.PARROT_TAG);
 		mParrot.remove();
 		mParrot.setSilent(true);
 		mParrot.setCustomName(mName);
@@ -48,10 +47,6 @@ public class ParrotPet {
 
 	public Player getPlayer() {
 		return mPlayer;
-	}
-
-	public String getShoulder() {
-		return mShoulder;
 	}
 
 	public Parrot.Variant getVariant() {
