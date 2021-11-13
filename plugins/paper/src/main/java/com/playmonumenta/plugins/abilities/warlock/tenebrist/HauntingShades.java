@@ -5,6 +5,24 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+import org.bukkit.Color;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
+import org.bukkit.World;
+import org.bukkit.entity.ArmorStand;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
+import org.bukkit.event.player.PlayerSwapHandItemsEvent;
+import org.bukkit.inventory.EquipmentSlot;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
+import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.util.BoundingBox;
+import org.bukkit.util.Vector;
+
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.MultipleChargeAbility;
@@ -18,24 +36,6 @@ import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
-
-import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.Color;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
-import org.bukkit.World;
-import org.bukkit.entity.ArmorStand;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
-import org.bukkit.inventory.EquipmentSlot;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
-import org.bukkit.event.player.PlayerSwapHandItemsEvent;
-import org.bukkit.util.BoundingBox;
-import org.bukkit.util.Vector;
 
 public class HauntingShades extends MultipleChargeAbility {
 
@@ -58,7 +58,7 @@ public class HauntingShades extends MultipleChargeAbility {
 	private final int mVuln;
 
 	public HauntingShades(Plugin plugin, Player player) {
-		super(plugin, player, "Haunting Shades", SHADES_CHARGES_1, SHADES_CHARGES_2);
+		super(plugin, player, "Haunting Shades");
 		mInfo.mLinkedSpell = ClassAbility.HAUNTING_SHADES;
 		mInfo.mScoreboardId = "HauntingShades";
 		mInfo.mShorthandName = "HS";
@@ -69,6 +69,7 @@ public class HauntingShades extends MultipleChargeAbility {
 		mInfo.mIgnoreCooldown = true;
 		mDisplayItem = new ItemStack(Material.SKELETON_SKULL, 1);
 		mVuln = getAbilityScore() == 1 ? VULN_1 : VULN_2;
+		mMaxCharges = getAbilityScore() == 1 ? SHADES_CHARGES_1 : SHADES_CHARGES_2;
 	}
 
 	@Override

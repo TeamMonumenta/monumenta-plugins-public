@@ -45,7 +45,7 @@ public class WindWalk extends MultipleChargeAbility {
 	private int mLeftClicks = 0;
 
 	public WindWalk(Plugin plugin, Player player) {
-		super(plugin, player, "Wind Walk", WIND_WALK_MAX_CHARGES, WIND_WALK_MAX_CHARGES);
+		super(plugin, player, "Wind Walk");
 		mInfo.mLinkedSpell = ClassAbility.WIND_WALK;
 		mInfo.mScoreboardId = "WindWalk";
 		mInfo.mShorthandName = "WW";
@@ -56,6 +56,7 @@ public class WindWalk extends MultipleChargeAbility {
 		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;
 		mDisplayItem = new ItemStack(Material.QUARTZ, 1);
 		mDuration = getAbilityScore() == 1 ? WIND_WALK_1_DURATION : WIND_WALK_2_DURATION;
+		mMaxCharges = WIND_WALK_MAX_CHARGES;
 	}
 
 	@Override
