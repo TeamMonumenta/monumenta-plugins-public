@@ -35,10 +35,10 @@ public class AuraEffectBoss extends BossAbilityGroup {
 		public int PASSIVE_RATE = PASSIVE_RUN_INTERVAL_DEFAULT;
 
 		@BossParam(help = "Particles summoned in the effect area")
-		public ParticlesList PARTICLE = ParticlesList.fromString("[(REDSTONE,20,0,0,0,#ffffff,2.0)]");
+		public ParticlesList PARTICLE = ParticlesList.fromString("[(REDSTONE,20,0,0,0,0,#ffffff,2.0)]");
 
 		@BossParam(help = "Particles summoned near the entity")
-		public ParticlesList PARTICLE_ENTITY = ParticlesList.fromString("[(REDSTONE,2,1,1,1,#ffffff,2.0)]");
+		public ParticlesList PARTICLE_ENTITY = ParticlesList.fromString("[(REDSTONE,2,1,1,1,0,#ffffff,2.0)]");
 
 		@BossParam(help = "Effects applied to the player when inside the range")
 		public EffectsList EFFECTS = EffectsList.EMPTY;

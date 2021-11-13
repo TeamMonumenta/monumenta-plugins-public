@@ -317,7 +317,7 @@ public class StringReader {
 	}
 
 	private static final Pattern QUOTED_STRING_PATTERN = Pattern.compile("^\"(?:[^\"\\\\]|\\\\.)*\"");
-	private static final Pattern NON_QUOTED_STRING_PATTERN = Pattern.compile("^[^\",)][^,)]*");
+	private static final Pattern NON_QUOTED_STRING_PATTERN = Pattern.compile("^[^\",)][^,)\\]]*");
 
 	public String readString() {
 		skipWhitespace();
