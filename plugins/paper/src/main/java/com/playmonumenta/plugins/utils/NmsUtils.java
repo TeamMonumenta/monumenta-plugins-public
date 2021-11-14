@@ -1,5 +1,7 @@
 package com.playmonumenta.plugins.utils;
 
+import java.lang.reflect.Field;
+
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
@@ -108,13 +110,47 @@ public class NmsUtils {
 	public static <T extends org.bukkit.entity.Entity> T duplicateEntity(T entity) {
 		T newEntity = (T)entity.getWorld().spawnEntity(entity.getLocation(), entity.getType());
 
-		NBTTagCompound nbttagcompound = ((CraftEntity)entity).getHandle().save(new NBTTagCompound());
+		NBTTagCompound nbttagcompound = ((CraftEntity) entity).getHandle().save(new NBTTagCompound());
 		nbttagcompound.remove("UUID");
 		nbttagcompound.remove("UUIDMost");
 		nbttagcompound.remove("UUIDLeast");
 
-		((CraftEntity)newEntity).getHandle().load(nbttagcompound);
+		((CraftEntity) newEntity).getHandle().load(nbttagcompound);
 
 		return newEntity;
 	}
+
+	private static final Field attackCooldownField = getAttackCooldownField();
+
+	private static Field getAttackCooldownField() {
+		try {
+			Field f = EntityLiving.class.getDeclaredField("at");
+			f.setAccessible(true);
+			return f;
+		} catch (NoSuchFieldException e) {
+			// Should only happen if Minecraft is updated. If it happens, update the field name in the above code.
+			// To find the new field name, see which field is reset by EntityHuman.resetAttackCooldown
+			// If the field's type changed from int to another type, update the type used by the getAttackCooldown/setAttackCooldown methods in this class accordingly.
+			throw new RuntimeException(e);
+		}
+	}
+
+	public static int getAttackCooldown(LivingEntity entity) {
+		try {
+			return (int) attackCooldownField.get(((CraftLivingEntity) entity).getHandle());
+		} catch (IllegalAccessException e) {
+			// Should not happen as the field is set to be accessible
+			throw new RuntimeException(e);
+		}
+	}
+
+	public static void setAttackCooldown(LivingEntity entity, int newCooldown) {
+		try {
+			attackCooldownField.set(((CraftLivingEntity) entity).getHandle(), newCooldown);
+		} catch (IllegalAccessException e) {
+			// Should not happen as the field is set to be accessible
+			throw new RuntimeException(e);
+		}
+	}
+
 }

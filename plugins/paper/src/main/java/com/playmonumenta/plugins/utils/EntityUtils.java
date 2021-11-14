@@ -1340,6 +1340,11 @@ public class EntityUtils {
 				return;
 			}
 
+			int originalAttackCooldown = 0;
+			if (attacker instanceof LivingEntity) {
+				originalAttackCooldown = NmsUtils.getAttackCooldown((LivingEntity) attacker);
+			}
+
 			int originalIFrames = target.getNoDamageTicks();
 			double originalLastDamage = target.getLastDamage();
 			Vector originalVelocity = target.getVelocity();
@@ -1370,6 +1375,11 @@ public class EntityUtils {
 			if (restoreVelocity) {
 				target.setVelocity(originalVelocity);
 			}
+
+			if (attacker instanceof LivingEntity) {
+				NmsUtils.setAttackCooldown((LivingEntity) attacker, originalAttackCooldown);
+			}
+
 		}
 	}
 
