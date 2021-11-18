@@ -42,11 +42,11 @@ public class ScoreboardUtils {
 	}
 
 	public static void setScoreboardValue(@NotNull Entity entity, @NotNull String objectiveName, int value) {
-		setScoreboardValue(entity.getUniqueId().toString(), objectiveName, value);
-	}
-
-	public static void setScoreboardValue(@NotNull Player player, @NotNull String objectiveName, int value) {
-		setScoreboardValue(player.getName(), objectiveName, value);
+		if (entity instanceof Player) {
+			setScoreboardValue(((Player)entity).getName(), objectiveName, value);
+		} else {
+			setScoreboardValue(entity.getUniqueId().toString(), objectiveName, value);
+		}
 	}
 
 	public static boolean checkTag(
