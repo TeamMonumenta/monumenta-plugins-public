@@ -46,6 +46,7 @@ import com.playmonumenta.plugins.commands.MonumentaDebug;
 import com.playmonumenta.plugins.commands.MonumentaReload;
 import com.playmonumenta.plugins.commands.OpenDelveModifierSelectionGUI;
 import com.playmonumenta.plugins.commands.PhylacteryifyHeldItem;
+import com.playmonumenta.plugins.commands.PickLevelAfterAnvils;
 import com.playmonumenta.plugins.commands.Portal1;
 import com.playmonumenta.plugins.commands.Portal2;
 import com.playmonumenta.plugins.commands.RedeemVoteRewards;
@@ -238,6 +239,7 @@ public class Plugin extends JavaPlugin {
 		AdminNotify.register();
 		AuditLogCommand.register();
 		BossTagCommand.register();
+		PickLevelAfterAnvils.register();
 
 
 		try {
