@@ -64,7 +64,7 @@ public class BrambleShell extends DepthsAbility {
 		world.playSound(loc, Sound.BLOCK_SWEET_BERRY_BUSH_BREAK, 1, 0.8f);
 
 		if (!mPlayer.isBlocking() || event.getFinalDamage() > 0) {
-			EntityUtils.damageEntity(mPlugin, mob, BRAMBLE_DAMAGE[mRarity - 1], mPlayer, MagicType.HOLY, true, mInfo.mLinkedSpell);
+			EntityUtils.damageEntity(mPlugin, mob, BRAMBLE_DAMAGE[mRarity - 1], mPlayer, MagicType.HOLY, true, mInfo.mLinkedSpell, false, false, true);
 		}
 	}
 

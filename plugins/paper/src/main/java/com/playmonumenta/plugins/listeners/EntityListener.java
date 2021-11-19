@@ -86,6 +86,7 @@ import com.playmonumenta.plugins.abilities.scout.HuntingCompanion;
 import com.playmonumenta.plugins.attributes.AttributeProjectileDamage;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.classes.magic.MagicType;
+import com.playmonumenta.plugins.depths.abilities.steelsage.SteelStallion;
 import com.playmonumenta.plugins.effects.Effect;
 import com.playmonumenta.plugins.effects.Stasis;
 import com.playmonumenta.plugins.enchantments.Inferno;
@@ -457,6 +458,13 @@ public class EntityListener implements Listener {
 								// Remove their vehicle if they had one.
 								Entity vehicle = player.getVehicle();
 								if (vehicle != null) {
+
+									//Fix for a Depths skill that caused too many false positives
+									//Do not award strike or remove vehicle if the player is on the Steel Stallion horse
+									if (vehicle.getName().equals(SteelStallion.ABILITY_NAME)) {
+										return;
+									}
+
 									vehicle.eject();
 									vehicle.remove();
 								}

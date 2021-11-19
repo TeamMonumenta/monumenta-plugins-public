@@ -14,6 +14,7 @@ import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.BlockData;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Firework;
 import org.bukkit.entity.LivingEntity;
@@ -442,5 +443,26 @@ public class DepthsUtils {
 			}
 		}
 
+	}
+
+	public static boolean isPlant(Entity entity) {
+		if (entity != null) {
+			String name = entity.getName();
+			if (name != null && name.contains("Dionaea")) {
+				List<String> plantNames = new ArrayList<>();
+				plantNames.add("Spore Dionaea");
+				plantNames.add("Vampiric Dionaea");
+				plantNames.add("Poisonous Dionaea");
+				plantNames.add("Fertilizer Dionaea");
+				plantNames.add("Elder Spore Dionaea");
+				plantNames.add("Elder Vampiric Dionaea");
+				plantNames.add("Elder Poisonous Dionaea");
+				plantNames.add("Elder Fertilizer Dionaea");
+				if (plantNames.contains(name)) {
+					return true;
+				}
+			}
+		}
+		return false;
 	}
 }

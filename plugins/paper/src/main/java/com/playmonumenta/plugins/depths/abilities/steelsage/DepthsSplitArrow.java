@@ -76,7 +76,7 @@ public class DepthsSplitArrow extends DepthsAbility {
 
 	@Override
 	public String getDescription(int rarity) {
-		return "When you shoot an enemy with an arrow, the nearest enemy within " + SPLIT_ARROW_CHAIN_RANGE + " blocks takes " + DepthsUtils.getRarityColor(rarity) + DepthsUtils.roundPercent(DAMAGE_MOD[rarity - 1]) + "%" + ChatColor.WHITE + " of the arrow's damage. Bypasses iframes.";
+		return "When you shoot an enemy with an arrow, the nearest enemy within " + SPLIT_ARROW_CHAIN_RANGE + " blocks takes " + DepthsUtils.getRarityColor(rarity) + (int) DepthsUtils.roundPercent(DAMAGE_MOD[rarity - 1]) + "%" + ChatColor.WHITE + " of the arrow's damage. Bypasses iframes.";
 	}
 
 	@Override

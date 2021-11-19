@@ -92,7 +92,7 @@ public class Updraft extends DepthsAbility {
 			}.runTaskTimer(mPlugin, 0, 1);
 
 			for (LivingEntity e : EntityUtils.getNearbyMobs(loc, RADIUS)) {
-				if (!e.getName().contains("Dionaea")) {
+				if (!DepthsUtils.isPlant(e)) {
 					launch(e);
 					e.addPotionEffect(new PotionEffect(PotionEffectType.SLOW_FALLING, DURATION, SLOW_FALLING_LEVEL));
 				}

@@ -79,7 +79,9 @@ public class Slipstream extends DepthsAbility {
 		}.runTaskTimer(mPlugin, 0, 1);
 
 		for (LivingEntity mob : EntityUtils.getNearbyMobs(loc, RADIUS, mPlayer)) {
-			MovementUtils.knockAway(mPlayer.getLocation(), mob, KNOCKBACK_SPEED, KNOCKBACK_SPEED / 2);
+			if (!DepthsUtils.isPlant(mob)) {
+				MovementUtils.knockAway(mPlayer.getLocation(), mob, KNOCKBACK_SPEED, KNOCKBACK_SPEED / 2);
+			}
 		}
 	}
 

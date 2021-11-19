@@ -108,7 +108,7 @@ public class Earthquake extends DepthsAbility {
 			public void run() {
 				if (mTicks >= EARTHQUAKE_TIME) {
 					for (LivingEntity mob : EntityUtils.getNearbyMobs(loc, RADIUS)) {
-						if (!mob.getName().contains("Dionaea")) {
+						if (!DepthsUtils.isPlant(mob)) {
 							knockup(mob);
 						}
 						EntityUtils.damageEntity(mPlugin, mob, DAMAGE[mRarity - 1], mPlayer, null, true, mInfo.mLinkedSpell, true, true, false, true);
