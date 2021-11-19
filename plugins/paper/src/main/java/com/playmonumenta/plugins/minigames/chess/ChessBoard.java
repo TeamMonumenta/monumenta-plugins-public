@@ -188,7 +188,7 @@ public class ChessBoard {
 				}
 			}
 
-			ChessPiece enemyPiece = mBoard[pawn.mBoardLoc + 9];
+			ChessPiece enemyPiece = pawn.mBoardLoc + 9 < 64 ? mBoard[pawn.mBoardLoc + 9] : null;
 			if (enemyPiece != null) {
 				if (canMoveToWithRightBorder(pawn, pawn.mBoardLoc + 9) == 1) {
 					list.add(pawn.mBoardLoc + 9);
@@ -209,7 +209,7 @@ public class ChessBoard {
 					list.add(pawn.mBoardLoc - 16);
 				}
 			}
-			ChessPiece enemyPiece = mBoard[pawn.mBoardLoc - 9];
+			ChessPiece enemyPiece = pawn.mBoardLoc - 9 >= 0 ? mBoard[pawn.mBoardLoc - 9] : null;
 			if (enemyPiece != null) {
 				if (canMoveToWithLeftBorder(pawn, pawn.mBoardLoc - 9) == 1) {
 					list.add(pawn.mBoardLoc - 9);
@@ -662,6 +662,24 @@ public class ChessBoard {
 		if (startPiece.mType == ChessPieceType.PAWNS) {
 			if (startingLocation == endLocation + 16 || startingLocation == endLocation - 16) {
 				startPiece.mPieceTags.add(PAWNS_EN_PASSANT_TAG);
+			} else if (startingLocation == endLocation + 7 || startingLocation == endLocation - 9) {
+				ChessPiece possibleEnemy = getChessPiece(startingLocation + 1);
+				if (possibleEnemy != null && possibleEnemy.mPieceTags.contains(PAWNS_EN_PASSANT_TAG)) {
+					mBoard[startingLocation + 1] = null;
+					ChessManager.updateGuiSlot(this, startingLocation + 1);
+					mBlackPieces.remove(possibleEnemy);
+					mWhitePieces.remove(possibleEnemy);
+				}
+
+			} else if (startingLocation == endLocation - 7 || startingLocation == endLocation + 9) {
+				ChessPiece possibleEnemy = getChessPiece(startingLocation - 1);
+				if (possibleEnemy != null && possibleEnemy.mPieceTags.contains(PAWNS_EN_PASSANT_TAG)) {
+					mBoard[startingLocation - 1] = null;
+					ChessManager.updateGuiSlot(this, startingLocation - 1);
+					mBlackPieces.remove(possibleEnemy);
+					mWhitePieces.remove(possibleEnemy);
+				}
+
 			}
 		}
 
