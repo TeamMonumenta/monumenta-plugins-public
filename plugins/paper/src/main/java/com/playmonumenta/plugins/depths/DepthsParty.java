@@ -22,6 +22,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
 import com.playmonumenta.plugins.depths.DepthsRoomType.DepthsRewardType;
+import com.playmonumenta.plugins.integrations.MonumentaNetworkRelayIntegration;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.DelvesUtils;
@@ -453,10 +454,10 @@ public class DepthsParty {
 			int highestRoom = ScoreboardUtils.getScoreboardValue(p, "DepthsEndless").orElse(0);
 			if (roomReached > highestRoom) {
 				ScoreboardUtils.setScoreboardValue(p, "DepthsEndless", roomReached);
-				Bukkit.getServer().dispatchCommand(Bukkit.getServer().getConsoleSender(), "broadcastcommand leaderboard update " + p.getDisplayName() + " DepthsEndless");
+				Bukkit.getServer().dispatchCommand(Bukkit.getServer().getConsoleSender(), "leaderboard update " + p.getDisplayName() + " DepthsEndless");
 			}
 			if (victory) {
-				Bukkit.getServer().dispatchCommand(Bukkit.getServer().getConsoleSender(), "broadcastcommand tellraw @a [\"\",{\"text\":\"" + p.getDisplayName() + "\",\"color\":\"gold\",\"bold\":false,\"italic\":true},{\"text\":\" defeated the Darkest Depths! (Endless Room Reached: " + roomReached + ")\",\"color\":\"white\",\"italic\":true,\"bold\":false}]");
+				MonumentaNetworkRelayIntegration.broadcastCommand("tellraw @a [\"\",{\"text\":\"" + p.getDisplayName() + "\",\"color\":\"gold\",\"bold\":false,\"italic\":true},{\"text\":\" defeated the Darkest Depths! (Endless Room Reached: " + roomReached + ")\",\"color\":\"white\",\"italic\":true,\"bold\":false}]");
 			}
 
 		} else {

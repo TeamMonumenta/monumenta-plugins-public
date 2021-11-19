@@ -113,6 +113,7 @@ import com.playmonumenta.plugins.depths.abilities.windwalker.Slipstream;
 import com.playmonumenta.plugins.depths.abilities.windwalker.Updraft;
 import com.playmonumenta.plugins.depths.abilities.windwalker.Whirlwind;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
+import com.playmonumenta.plugins.integrations.MonumentaNetworkRelayIntegration;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.DelvesUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -1270,10 +1271,10 @@ public class DepthsManager {
 					dp.mFinalTreasureScore = party.mTreasureScore;
 					player.sendMessage(DepthsUtils.DEPTHS_MESSAGE_PREFIX + "Congratulations! Your final treasure score is " + dp.mFinalTreasureScore + "!");
 					getPartyFromId(dp).populateLootRoom(player, false);
-					Bukkit.getServer().dispatchCommand(Bukkit.getServer().getConsoleSender(), "broadcastcommand tellraw @a [\"\",{\"text\":\"" + player.getName() + "\",\"color\":\"gold\",\"bold\":false,\"italic\":true},{\"text\":\" defeated the Darkest Depths!\",\"color\":\"white\",\"italic\":true,\"bold\":false}]");
+					MonumentaNetworkRelayIntegration.broadcastCommand("tellraw @a [\"\",{\"text\":\"" + player.getName() + "\",\"color\":\"gold\",\"bold\":false,\"italic\":true},{\"text\":\" defeated the Darkest Depths!\",\"color\":\"white\",\"italic\":true,\"bold\":false}]");
 					//Set score
 					ScoreboardUtils.setScoreboardValue(player, "Depths", ScoreboardUtils.getScoreboardValue(player, "Depths").orElse(0) + 1);
-					Bukkit.getServer().dispatchCommand(Bukkit.getServer().getConsoleSender(), "broadcastcommand leaderboard update " + player.getName() + " Depths");
+					Bukkit.getServer().dispatchCommand(Bukkit.getServer().getConsoleSender(), "leaderboard update " + player.getName() + " Depths");
 				}
 			}
 			return;
@@ -1286,7 +1287,7 @@ public class DepthsManager {
 
 				//Set score
 				ScoreboardUtils.setScoreboardValue(player, "Depths", ScoreboardUtils.getScoreboardValue(player, "Depths").orElse(0) + 1);
-				Bukkit.getServer().dispatchCommand(Bukkit.getServer().getConsoleSender(), "broadcastcommand leaderboard update " + player.getName() + " Depths");
+				Bukkit.getServer().dispatchCommand(Bukkit.getServer().getConsoleSender(), "leaderboard update " + player.getName() + " Depths");
 			}
 		}
 		//Check to see if we're in endless mode and need to assign delve points to players
