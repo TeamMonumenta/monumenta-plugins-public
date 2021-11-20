@@ -482,6 +482,10 @@ public class Grave {
 				.append(mPlayer.displayName().hoverEvent(mPlayer))
 				.append(Component.text("."))
 			);
+			mPlayer.sendMessage(Component.text("Your grave at ", NamedTextColor.AQUA)
+				.append(Component.text((int) mLocation.getX() + ", " + (int) mLocation.getY() + ", " + (int) mLocation.getZ(), NamedTextColor.AQUA))
+				.append(Component.text(" has been located by another player!", NamedTextColor.AQUA))
+			);
 			if (dropped > 0) {
 				player.sendMessage(Component.text("There ", NamedTextColor.AQUA)
 					.append(Component.text(dropped == 1 ? "is 1 item" : "are " + dropped + " items"))
