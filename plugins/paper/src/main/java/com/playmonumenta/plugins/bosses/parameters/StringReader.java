@@ -244,6 +244,19 @@ public class StringReader {
 		return null;
 	}
 
+	public <E extends Enum<?>> E readEnum(E[] values) {
+		String remain = remaining();
+
+		for (E value : values) {
+			if (remain.startsWith(value.name())) {
+				advance(value.name().length());
+				return value;
+			}
+		}
+
+		return null;
+	}
+
 	public static final Map<String, Color> COLOR_MAP = new LinkedHashMap<>();
 	public static final List<Particle> PARTICLES_SORTED = Arrays.asList(Particle.values());
 	public static final List<Material> MATERIALS_SORTED = Arrays.asList(Material.values());
