@@ -60,7 +60,7 @@ public class Aeromancy extends DepthsAbility {
 
 	@Override
 	public String getDescription(int rarity) {
-		return "All damage you deal while airborne is multiplied by " + DepthsUtils.getRarityColor(rarity) + PLAYER_DAMAGE[rarity - 1] + ChatColor.WHITE + ". Addionally, all damage you deal against airborne enemies is multiplied by " + DepthsUtils.getRarityColor(rarity) + MOB_DAMAGE[rarity - 1] + ChatColor.WHITE + ".";
+		return "All damage you deal while airborne is multiplied by " + DepthsUtils.getRarityColor(rarity) + PLAYER_DAMAGE[rarity - 1] + ChatColor.WHITE + ". Additionally, all damage you deal against airborne enemies is multiplied by " + DepthsUtils.getRarityColor(rarity) + MOB_DAMAGE[rarity - 1] + ChatColor.WHITE + ".";
 	}
 
 	@Override

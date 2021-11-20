@@ -2,16 +2,6 @@ package com.playmonumenta.plugins.abilities.mage.arcanist;
 
 import java.util.HashMap;
 
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.abilities.AbilityWithChargesOrStacks;
-import com.playmonumenta.plugins.classes.ClassAbility;
-import com.playmonumenta.plugins.effects.PercentSpeed;
-import com.playmonumenta.plugins.events.AbilityCastEvent;
-import com.playmonumenta.plugins.events.CustomDamageEvent;
-import com.playmonumenta.plugins.network.ClientModHandler;
-import com.playmonumenta.plugins.utils.MessagingUtils;
-
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -21,6 +11,16 @@ import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
+
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.abilities.AbilityWithChargesOrStacks;
+import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.effects.PercentSpeed;
+import com.playmonumenta.plugins.events.AbilityCastEvent;
+import com.playmonumenta.plugins.events.CustomDamageEvent;
+import com.playmonumenta.plugins.network.ClientModHandler;
+import com.playmonumenta.plugins.utils.MessagingUtils;
 
 public class SagesInsight extends Ability implements AbilityWithChargesOrStacks {
 	private static final int DECAY_TIMER = 20 * 4;
@@ -105,7 +105,7 @@ public class SagesInsight extends Ability implements AbilityWithChargesOrStacks 
 					mStacks = 0;
 					mArraySize = 0;
 					for (ClassAbility s : mResets) {
-						mPlugin.mTimers.removeCooldown(mPlayer.getUniqueId(), s);
+						mPlugin.mTimers.removeCooldown(mPlayer, s);
 					}
 				} else {
 					world.spawnParticle(Particle.REDSTONE, locD, 15, 0.4, 0.4, 0.4, COLOR);

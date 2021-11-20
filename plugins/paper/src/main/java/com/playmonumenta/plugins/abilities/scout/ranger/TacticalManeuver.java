@@ -40,7 +40,7 @@ public class TacticalManeuver extends MultipleChargeAbility {
 	private int mLastCastTicks = 0;
 
 	public TacticalManeuver(Plugin plugin, Player player) {
-		super(plugin, player, "Tactical Maneuver", TACTICAL_MANEUVER_1_MAX_CHARGES, TACTICAL_MANEUVER_2_MAX_CHARGES);
+		super(plugin, player, "Tactical Maneuver");
 		mInfo.mLinkedSpell = ClassAbility.TACTICAL_MANEUVER;
 		mInfo.mScoreboardId = "TacticalManeuver";
 		mInfo.mShorthandName = "TM";
@@ -50,6 +50,7 @@ public class TacticalManeuver extends MultipleChargeAbility {
 		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
 		mInfo.mIgnoreCooldown = true;
 		mDisplayItem = new ItemStack(Material.STRING, 1);
+		mMaxCharges = getAbilityScore() == 1 ? TACTICAL_MANEUVER_1_MAX_CHARGES : TACTICAL_MANEUVER_2_MAX_CHARGES;
 	}
 
 	@Override

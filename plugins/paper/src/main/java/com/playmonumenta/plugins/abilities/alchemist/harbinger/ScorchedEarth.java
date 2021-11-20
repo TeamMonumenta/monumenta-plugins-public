@@ -6,14 +6,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.MultipleChargeAbility;
-import com.playmonumenta.plugins.classes.ClassAbility;
-import com.playmonumenta.plugins.classes.magic.MagicType;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.FastUtils;
-import com.playmonumenta.plugins.utils.ItemUtils;
-
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -28,6 +20,14 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
+
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.MultipleChargeAbility;
+import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.classes.magic.MagicType;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.ItemUtils;
 
 
 
@@ -64,7 +64,7 @@ public class ScorchedEarth extends MultipleChargeAbility {
 	private static BukkitRunnable mMobHealthsTracker;
 
 	public ScorchedEarth(Plugin plugin, Player player) {
-		super(plugin, player, "Scorched Earth", SCORCHED_EARTH_1_CHARGES, SCORCHED_EARTH_2_CHARGES);
+		super(plugin, player, "Scorched Earth");
 		mInfo.mLinkedSpell = ClassAbility.SCORCHED_EARTH;
 		mInfo.mScoreboardId = "ScorchedEarth";
 		mInfo.mShorthandName = "SE";
@@ -73,6 +73,7 @@ public class ScorchedEarth extends MultipleChargeAbility {
 		mInfo.mCooldown = getAbilityScore() == 1 ? SCORCHED_EARTH_1_COOLDOWN : SCORCHED_EARTH_2_COOLDOWN;
 		mInfo.mIgnoreCooldown = true;
 		mDisplayItem = new ItemStack(Material.BROWN_DYE, 1);
+		mMaxCharges = getAbilityScore() == 1 ? SCORCHED_EARTH_1_CHARGES : SCORCHED_EARTH_2_CHARGES;
 
 		// Only one runnable ever exists for Scorched Earth - it is a global list, not tied to any individual players
 		if (mMobHealthsTracker == null) {

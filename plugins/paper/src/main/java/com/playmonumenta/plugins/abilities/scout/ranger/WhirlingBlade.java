@@ -49,7 +49,7 @@ public class WhirlingBlade extends MultipleChargeAbility {
 	private WindBomb mWindBomb;
 
 	public WhirlingBlade(Plugin plugin, Player player) {
-		super(plugin, player, "Whirling Blade", BLADE_1_MAX_CHARGES, BLADE_2_MAX_CHARGES);
+		super(plugin, player, "Whirling Blade");
 		mInfo.mScoreboardId = "WhirlingBlade";
 		mInfo.mShorthandName = "WB";
 		mInfo.mDescriptions.add("Use the swap key while holding a weapon and not looking up to throw a whirling blade that circles around you, knocking back and dealing " + BLADE_1_DAMAGE + " damage to enemies it hits. Cooldown: 8s. Charges: 2.");
@@ -60,6 +60,7 @@ public class WhirlingBlade extends MultipleChargeAbility {
 		mInfo.mCooldown = getAbilityScore() == 1 ? BLADE_1_COOLDOWN : BLADE_2_COOLDOWN;
 		mInfo.mIgnoreCooldown = true;
 		mDisplayItem = new ItemStack(Material.IRON_SWORD, 1);
+		mMaxCharges = getAbilityScore() == 1 ? BLADE_1_MAX_CHARGES : BLADE_2_MAX_CHARGES;
 
 		Bukkit.getScheduler().runTask(plugin, () -> {
 			if (player != null) {

@@ -50,7 +50,7 @@ public class BodkinBlitz extends MultipleChargeAbility {
 	private int mTicks;
 
 	public BodkinBlitz(Plugin plugin, Player player) {
-		super(plugin, player, "Bodkin Blitz", BODKINBLITZ_MAX_CHARGES, BODKINBLITZ_MAX_CHARGES);
+		super(plugin, player, "Bodkin Blitz");
 		mInfo.mLinkedSpell = ClassAbility.BODKIN_BLITZ;
 		mInfo.mScoreboardId = "BodkinBlitz";
 		mInfo.mShorthandName = "BB";
@@ -60,6 +60,7 @@ public class BodkinBlitz extends MultipleChargeAbility {
 		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
 		mInfo.mIgnoreCooldown = true;
 		mDisplayItem = new ItemStack(Material.BLAZE_POWDER, 1);
+		mMaxCharges = BODKINBLITZ_MAX_CHARGES;
 
 		mStealthDuration = getAbilityScore() == 1 ? BODKINBLITZ_1_STEALTH_DURATION : BODKINBLITZ_2_STEALTH_DURATION;
 		mBonusDmg = getAbilityScore() == 1 ? BODKINBLITZ_1_BONUS_DMG : BODKINBLITZ_2_BONUS_DMG;

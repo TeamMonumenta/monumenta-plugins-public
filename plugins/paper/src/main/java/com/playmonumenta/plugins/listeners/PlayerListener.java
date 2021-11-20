@@ -177,14 +177,7 @@ public class PlayerListener implements Listener {
 	@EventHandler(priority = EventPriority.MONITOR)
 	public void playerChannelEvent(PlayerRegisterChannelEvent event) {
 		if (ClientModHandler.CHANNEL_ID.equals(event.getChannel())) {
-			Player player = event.getPlayer();
-			// Send class update to client mod. Needs to be delayed so that abilities are properly initialised (e.g. abilities with stacks are delayed by 1 tick).
-			new BukkitRunnable() {
-				@Override
-				public void run() {
-					ClientModHandler.updateAbilities(player);
-				}
-			}.runTaskLater(mPlugin, 2);
+			ClientModHandler.updateAbilities(event.getPlayer());
 		}
 	}
 

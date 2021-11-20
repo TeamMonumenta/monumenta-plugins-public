@@ -66,14 +66,11 @@ public class ClientModHandler {
 		ClassAbility classAbility = ability.getInfo().mLinkedSpell;
 		int remainingCooldown = classAbility == null ? 0 : INSTANCE.mPlugin.mTimers.getCooldown(player.getUniqueId(), classAbility);
 		int charges = ability instanceof AbilityWithChargesOrStacks ? ((AbilityWithChargesOrStacks) ability).getCharges() : 0;
-		int maxCharges = ability instanceof AbilityWithChargesOrStacks ? ((AbilityWithChargesOrStacks) ability).getMaxCharges() : 0;
 
 		AbilityUpdatePacket packet = new AbilityUpdatePacket();
 		packet.name = getAbilityName(ability);
 		packet.remainingCooldown = remainingCooldown;
-		packet.initialCooldown = ability.getInfo().mCooldown;
 		packet.remainingCharges = charges;
-		packet.maxCharges = maxCharges;
 		INSTANCE.sendPacket(player, packet);
 	}
 
@@ -209,10 +206,8 @@ public class ClientModHandler {
 		// className is not required, as a player should never have multiple abilities with the same name
 
 		int remainingCooldown;
-		int initialCooldown;
 
 		int remainingCharges;
-		int maxCharges;
 
 	}
 
