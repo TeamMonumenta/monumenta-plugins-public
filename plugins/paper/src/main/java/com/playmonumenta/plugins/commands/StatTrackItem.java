@@ -109,7 +109,7 @@ public class StatTrackItem extends GenericCommand {
 		if (
 			PlayerData.getPatreonDollars(player) < StatTrackManager.PATRON_TIER
 		) {
-			player.sendMessage("You must be an active $5 patron or higher to infuse items with stat tracking!");
+			player.sendMessage("You must be an active $" + StatTrackManager.PATRON_TIER + " patron or higher to infuse items with stat tracking!");
 			return;
 		}
 		//Check to see if the item in hand is already infused
@@ -124,17 +124,14 @@ public class StatTrackItem extends GenericCommand {
 			CommandUtils.enchantify(sender, player, ChatColor.RED + option.getEnchantName() + ": 0");
 			animate(player);
 		} catch (WrapperCommandSyntaxException ex) {
-			player.sendMessage("Failed to add stat track: " + ex.getMessage());
+			player.sendMessage("Failed to add stat track: " + (ex.getException() != null ? ex.getException().getRawMessage() : "unexpected error"));
 			throw ex;
 		}
 	}
 
 	/**
 	 * Command to be run by moderators to manually set the stat on an item
-	 * @param sender command sender (player/mod)
 	 * @param player the mod who ran the command (get their item in hand)
-	 * @param option the stat track enchant option to infuse with
-	 * @param name the player's name which should be on the item
 	 * @param stat the numerical value the stat should have
 	 * @throws WrapperCommandSyntaxException
 	 */
@@ -160,7 +157,6 @@ public class StatTrackItem extends GenericCommand {
 
 	/**
 	 * Removes the stat track infusion from the item in hand
-	 * @param sender command sender
 	 * @param player player to get item from
 	 */
 	private static void runRemove(Player player) {
