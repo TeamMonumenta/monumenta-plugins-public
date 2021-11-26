@@ -251,7 +251,18 @@ public class AbilityUtils {
 		return false;
 	}
 
-	public static void refundArrow(Player player, AbstractArrow arrow) {
+	/**
+	 * Refunds the shot arrow if possible
+	 *
+	 * @param player
+	 * @param arrow
+	 * @return Whether the arrow was refunded or not
+	 */
+	public static boolean refundArrow(Player player, AbstractArrow arrow) {
+		// Do not refund extra arrows shot my multishot crossbows (or bows with infinity, though that is checked later on again)
+		if (arrow.getPickupStatus() != AbstractArrow.PickupStatus.ALLOWED) {
+			return false;
+		}
 		ItemStack mainHand = player.getInventory().getItemInMainHand();
 		//Only refund arrow once
 		if (MetadataUtils.checkOnceThisTick(Plugin.getInstance(), player, ARROW_REFUNDED_METAKEY)) {
@@ -281,7 +292,7 @@ public class AbilityUtils {
 					} else {
 						// No arrow left - player must have shot their last arrow. Grab the arrow from the event and give it back to the player, then abort
 						InventoryUtils.giveItem(player, arrow.getItemStack());
-						return;
+						return true;
 					}
 
 					//arrowStack has the count from before the arrow is shot
@@ -300,9 +311,11 @@ public class AbilityUtils {
 					} else {
 						playerInv.setItem(arrowSlot, arrowStack);
 					}
+					return true;
 				}
 			}
 		}
+		return false;
 	}
 
 	public static boolean refundPotion(Player player, ThrownPotion potion) {

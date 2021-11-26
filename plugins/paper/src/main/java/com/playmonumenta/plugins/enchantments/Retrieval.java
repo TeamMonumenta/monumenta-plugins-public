@@ -34,8 +34,10 @@ public class Retrieval implements BaseEnchantment {
 	@Override
 	public void onLaunchProjectile(Plugin plugin, Player player, int level, Projectile proj, ProjectileLaunchEvent event) {
 		if ((proj.getType() == EntityType.ARROW || proj.getType() == EntityType.SPECTRAL_ARROW) && FastUtils.RANDOM.nextDouble() < RETRIEVAL_CHANCE * level) {
-			AbilityUtils.refundArrow(player, (AbstractArrow) proj);
-			player.playSound(player.getLocation(), Sound.ENTITY_ARROW_HIT_PLAYER, 0.3f, 1.0f);
+			boolean refunded = AbilityUtils.refundArrow(player, (AbstractArrow) proj);
+			if (refunded) {
+				player.playSound(player.getLocation(), Sound.ENTITY_ARROW_HIT_PLAYER, 0.3f, 1.0f);
+			}
 		}
 	}
 }
