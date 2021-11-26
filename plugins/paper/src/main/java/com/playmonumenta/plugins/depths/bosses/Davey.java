@@ -19,6 +19,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
@@ -211,7 +212,9 @@ public class Davey extends BossAbilityGroup {
 			public void run() {
 				PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "effect give @s minecraft:blindness 2 2");
 				PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "stopsound @p");
-				mMusicRunnable.cancel();
+				if (!mMusicRunnable.isCancelled()) {
+					mMusicRunnable.cancel();
+				}
 			}
 
 		}.runTaskLater(mPlugin, 60);
@@ -230,7 +233,13 @@ public class Davey extends BossAbilityGroup {
 	public void bossDamagedEntity(EntityDamageByEntityEvent event) {
 		//Slow on hit
 		if (event.getEntity() instanceof Player) {
-			((Player) event.getEntity()).addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 60, 1));
+			Player player = (Player) event.getEntity();
+			player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 60, 1));
+			if (event.getCause().equals(DamageCause.ENTITY_ATTACK)) {
+				if (player.isBlocking()) {
+					player.setCooldown(Material.SHIELD, 20 * 30);
+				}
+			}
 		}
 	}
 

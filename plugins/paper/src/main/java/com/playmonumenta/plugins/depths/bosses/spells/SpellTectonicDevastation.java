@@ -93,8 +93,8 @@ public class SpellTectonicDevastation extends Spell {
 	}
 
 	public void cast(int offset) {
-		mOldBlocks.clear();
-		mOldData.clear();
+		mOldBlocks = new HashMap<>();
+		mOldData = new HashMap<>();
 
 		//mBoss.setAI(false);
 		World world = mBoss.getWorld();

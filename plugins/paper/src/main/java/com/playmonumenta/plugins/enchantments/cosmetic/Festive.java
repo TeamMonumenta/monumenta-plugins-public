@@ -18,6 +18,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.enchantments.BaseSpawnableItemEnchantment;
 import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
+import com.playmonumenta.plugins.integrations.PremiumVanishIntegration;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 
@@ -55,6 +56,10 @@ public class Festive implements BaseSpawnableItemEnchantment {
 
 	@Override
 	public void tick(Plugin plugin, Player player, int level) {
+		if (PremiumVanishIntegration.isInvisible(player)) {
+			return;
+		}
+
 		final Location loc = player.getLocation().add(0, 1, 0);
 		if (NO_SELF_PARTICLES.contains(player.getUniqueId())) {
 			for (Player other : PlayerUtils.otherPlayersInRange(player, 30, true)) {

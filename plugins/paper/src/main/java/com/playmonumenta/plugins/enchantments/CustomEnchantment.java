@@ -119,8 +119,8 @@ public enum CustomEnchantment {
 	ASHES_OF_ETERNITY(new AshesOfEternity()),
 	EVASION(new Evasion()),
 	MELEE_EVASION(new MeleeEvasion()),
-	RESURRECTION(new Resurrection()),
 	VOID_TETHER(new VoidTether()),
+	RESURRECTION(new Resurrection()),
 	PROTECTION_OF_THE_DEPTHS(new ProtectionOfDepths()),
 
 	// Durability

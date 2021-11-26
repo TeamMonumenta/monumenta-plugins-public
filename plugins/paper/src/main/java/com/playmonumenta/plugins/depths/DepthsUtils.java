@@ -454,12 +454,10 @@ public class DepthsUtils {
 				plantNames.add("Vampiric Dionaea");
 				plantNames.add("Poisonous Dionaea");
 				plantNames.add("Fertilizer Dionaea");
-				plantNames.add("Elder Spore Dionaea");
-				plantNames.add("Elder Vampiric Dionaea");
-				plantNames.add("Elder Poisonous Dionaea");
-				plantNames.add("Elder Fertilizer Dionaea");
-				if (plantNames.contains(name)) {
-					return true;
+				for (String plant : plantNames) {
+					if (name.contains(plant)) {
+						return true;
+					}
 				}
 			}
 		}

@@ -224,7 +224,9 @@ public class Hedera extends BossAbilityGroup {
 			public void run() {
 				PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "effect give @s minecraft:blindness 2 2");
 				PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "stopsound @p");
-				mMusicRunnable.cancel();
+				if (!mMusicRunnable.isCancelled()) {
+					mMusicRunnable.cancel();
+				}
 			}
 
 		}.runTaskLater(mPlugin, 60);

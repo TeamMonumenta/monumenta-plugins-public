@@ -20,6 +20,7 @@ import org.bukkit.inventory.ItemStack;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.enchantments.BaseEnchantment;
 import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
+import com.playmonumenta.plugins.integrations.PremiumVanishIntegration;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
@@ -158,6 +159,10 @@ public class DivineAura implements BaseEnchantment {
 
 	@Override
 	public void tick(Plugin plugin, Player player, int level) {
+		if (PremiumVanishIntegration.isInvisible(player)) {
+			return;
+		}
+
 		if (isActive(level)) {
 			STATIC_TICKS += 5;
 			if (STATIC_TICKS >= 20 * 300) {

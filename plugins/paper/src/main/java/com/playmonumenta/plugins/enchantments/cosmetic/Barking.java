@@ -18,6 +18,7 @@ import org.bukkit.inventory.ItemStack;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.enchantments.BaseEnchantment;
 import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
+import com.playmonumenta.plugins.integrations.PremiumVanishIntegration;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 
@@ -71,6 +72,9 @@ public class Barking implements BaseEnchantment {
 	@Override
 	public void tick(Plugin plugin, Player player, int level) {
 		if ((level > 1) && !HAS_DEBARKING.contains(player.getUniqueId())) {
+			if (PremiumVanishIntegration.isInvisible(player)) {
+				return;
+			}
 
 			staticTicks++;
 

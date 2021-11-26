@@ -2,22 +2,23 @@ package com.playmonumenta.plugins.enchantments.infusions.delves;
 
 import java.util.EnumSet;
 import java.util.NavigableSet;
+import java.util.TreeSet;
 
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.enchantments.BaseEnchantment;
-import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
-import com.playmonumenta.plugins.utils.DelveInfusionUtils;
-import com.playmonumenta.plugins.events.CustomDamageEvent;
-import com.playmonumenta.plugins.effects.Effect;
-import com.playmonumenta.plugins.effects.PercentSpeed;
-import com.playmonumenta.plugins.utils.MetadataUtils;
-import com.playmonumenta.plugins.classes.magic.MagicType;
-
-import org.bukkit.Sound;
 import org.bukkit.ChatColor;
+import org.bukkit.Sound;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
+
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.classes.magic.MagicType;
+import com.playmonumenta.plugins.effects.Effect;
+import com.playmonumenta.plugins.effects.PercentSpeed;
+import com.playmonumenta.plugins.enchantments.BaseEnchantment;
+import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
+import com.playmonumenta.plugins.events.CustomDamageEvent;
+import com.playmonumenta.plugins.utils.DelveInfusionUtils;
+import com.playmonumenta.plugins.utils.MetadataUtils;
 
 public class Expedite implements BaseEnchantment {
 
@@ -46,7 +47,7 @@ public class Expedite implements BaseEnchantment {
 			NavigableSet<Effect> speedEffects = plugin.mEffectManager.getEffects(player, PERCENT_SPEED_EFFECT_NAME);
 			player.getWorld().playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 0.1f, 1.0f);
 			if (speedEffects != null) {
-				for (Effect effect : speedEffects) {
+				for (Effect effect : new TreeSet<>(speedEffects)) {
 					double mag = effect.getMagnitude() / (PERCENT_SPEED_PER_LEVEL * DelveInfusionUtils.getModifiedLevel(plugin, player, level));
 					if (effect.getMagnitude() == PERCENT_SPEED_PER_LEVEL * DelveInfusionUtils.getModifiedLevel(plugin, player, level) * Math.min(5, mag + 1)) {
 						effect.setDuration(DURATION);

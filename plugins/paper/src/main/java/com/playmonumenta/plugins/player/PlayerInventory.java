@@ -3,18 +3,6 @@ package com.playmonumenta.plugins.player;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import com.google.gson.JsonObject;
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.attributes.BaseAttribute;
-import com.playmonumenta.plugins.enchantments.BaseEnchantment;
-import com.playmonumenta.plugins.enchantments.CustomEnchantment;
-import com.playmonumenta.plugins.events.CustomDamageEvent;
-import com.playmonumenta.plugins.events.EvasionEvent;
-import com.playmonumenta.plugins.listeners.ShulkerEquipmentListener;
-import com.playmonumenta.plugins.utils.AbsorptionUtils;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.InventoryUtils;
-
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.entity.Entity;
@@ -31,6 +19,7 @@ import org.bukkit.event.entity.EntityRegainHealthEvent;
 import org.bukkit.event.entity.EntityResurrectEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
+import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
@@ -47,6 +36,18 @@ import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import com.google.gson.JsonObject;
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.attributes.BaseAttribute;
+import com.playmonumenta.plugins.enchantments.BaseEnchantment;
+import com.playmonumenta.plugins.enchantments.CustomEnchantment;
+import com.playmonumenta.plugins.events.CustomDamageEvent;
+import com.playmonumenta.plugins.events.EvasionEvent;
+import com.playmonumenta.plugins.listeners.ShulkerEquipmentListener;
+import com.playmonumenta.plugins.utils.AbsorptionUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.InventoryUtils;
 
 import net.kyori.adventure.text.Component;
 
@@ -141,6 +142,10 @@ public class PlayerInventory {
 				// Updates clicked slot and hotbar slot if numbers were used to swap
 				plugin.mEnchantmentManager.updateItemProperties(invClickEvent.getSlot(), mCurrentProperties, mInventoryProperties, player, plugin);
 				plugin.mEnchantmentManager.updateItemProperties(invClickEvent.getHotbarButton(), mCurrentProperties, mInventoryProperties, player, plugin);
+			} else if (invClickEvent.getClick().equals(ClickType.SWAP_OFFHAND)) {
+				// Updates clicked slot and offhand slot when swap hands key is used
+				plugin.mEnchantmentManager.updateItemProperties(invClickEvent.getSlot(), mCurrentProperties, mInventoryProperties, player, plugin);
+				plugin.mEnchantmentManager.updateItemProperties(40, mCurrentProperties, mInventoryProperties, player, plugin);
 			} else {
 				plugin.mEnchantmentManager.updateItemProperties(invClickEvent.getSlot(), mCurrentProperties, mInventoryProperties, player, plugin);
 			}

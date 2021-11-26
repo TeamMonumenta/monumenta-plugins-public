@@ -2,17 +2,18 @@ package com.playmonumenta.plugins.enchantments.cosmetic;
 
 import java.util.EnumSet;
 
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.enchantments.BaseSpawnableItemEnchantment;
-import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
-import com.playmonumenta.plugins.utils.EntityUtils;
-
 import org.bukkit.ChatColor;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
+
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.enchantments.BaseSpawnableItemEnchantment;
+import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
+import com.playmonumenta.plugins.integrations.PremiumVanishIntegration;
+import com.playmonumenta.plugins.utils.EntityUtils;
 
 /*
  * Plays sheep baaing sounds when in inventory or dropped
@@ -41,6 +42,10 @@ public class Baaing implements BaseSpawnableItemEnchantment {
 
 	@Override
 	public void tick(Plugin plugin, Player player, int level) {
+		if (PremiumVanishIntegration.isInvisible(player)) {
+			return;
+		}
+
 		staticTicks++;
 
 		/*

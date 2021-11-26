@@ -43,6 +43,7 @@ public class WindWalk extends MultipleChargeAbility {
 	private final int mDuration;
 
 	private int mLeftClicks = 0;
+	private int mLastCastTicks = 0;
 
 	public WindWalk(Plugin plugin, Player player) {
 		super(plugin, player, "Wind Walk");
@@ -86,9 +87,12 @@ public class WindWalk extends MultipleChargeAbility {
 		}
 		mLeftClicks = 0;
 
-		if (!consumeCharge()) {
+		int ticks = mPlayer.getTicksLived();
+		// Prevent double casting on accident
+		if (ticks - mLastCastTicks <= 5 || !consumeCharge()) {
 			return;
 		}
+		mLastCastTicks = ticks;
 
 		World world = mPlayer.getWorld();
 		world.playSound(loc, Sound.ENTITY_BLAZE_SHOOT, 1, 1.75f);

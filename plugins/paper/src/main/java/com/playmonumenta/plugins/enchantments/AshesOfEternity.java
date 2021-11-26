@@ -15,14 +15,14 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
-import net.kyori.adventure.text.Component;
-
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
+
+import net.kyori.adventure.text.Component;
 
 /*
  * Ashes of Eternity - When held, acts as a normal totem but does not shatter or break when life is saved.
@@ -44,12 +44,12 @@ public class AshesOfEternity extends VoidTether {
 
 	@Override
 	public EnumSet<ItemSlot> getValidSlots() {
-		return EnumSet.of(ItemSlot.MAINHAND);
+		return EnumSet.of(ItemSlot.MAINHAND, ItemSlot.OFFHAND);
 	}
 
 	@Override
 	protected boolean runCheck(Plugin plugin, Player player) {
-		return InventoryUtils.testForItemWithLore(player.getInventory().getItemInMainHand(), PROPERTY_NAME);
+		return InventoryUtils.testForItemWithLore(player.getInventory().getItemInMainHand(), PROPERTY_NAME) || InventoryUtils.testForItemWithLore(player.getInventory().getItemInOffHand(), PROPERTY_NAME);
 	}
 
 	@Override
@@ -61,8 +61,24 @@ public class AshesOfEternity extends VoidTether {
 			// Void tether didn't cancel the event - so this player would die
 			// They definitely aren't in the void at this point
 
+			// Find which hand is holding the item, prioritize mainhand
+			ItemStack mainhand = player.getInventory().getItemInMainHand();
+			ItemStack offhand = player.getInventory().getItemInOffHand();
+			ItemStack item = null;
+			if (InventoryUtils.getCustomEnchantLevel(mainhand, PROPERTY_NAME, false) > 0) {
+				item = mainhand;
+			} else {
+				if (InventoryUtils.getCustomEnchantLevel(offhand, PROPERTY_NAME, false) > 0) {
+					item = offhand;
+				}
+			}
+
+			// This should never trigger
+			if (item == null) {
+				return;
+			}
+
 			// Remove Lore Text
-			ItemStack item = player.getInventory().getItemInMainHand();
 			ItemMeta meta = item.getItemMeta();
 			List<Component> lore = meta.lore();
 			lore.removeIf((Component loreEntry) -> MessagingUtils.PLAIN_SERIALIZER.serialize(loreEntry).contains("Ashes of Eternity"));

@@ -110,6 +110,9 @@ public class ShatteredEquipmentListener implements Listener {
 					if (event.getSlotType() == InventoryType.SlotType.ARMOR || event.getSlot() == 40) {
 						equipping = true;
 					}
+				} else if (click.equals(ClickType.SWAP_OFFHAND)) {
+					item = event.getCurrentItem();
+					equipping = true;
 				}
 				if (equipping && ItemUtils.isItemShattered(item)) {
 					event.setCancelled(true);

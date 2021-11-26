@@ -1,17 +1,18 @@
 package com.playmonumenta.plugins.abilities.other;
 
-import com.playmonumenta.plugins.Constants;
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.player.PartialParticle;
-import com.playmonumenta.plugins.player.PlayerData;
-import com.playmonumenta.plugins.utils.LocationUtils;
-import com.playmonumenta.plugins.utils.ScoreboardUtils;
-
 import org.bukkit.Particle;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import com.playmonumenta.plugins.Constants;
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.integrations.PremiumVanishIntegration;
+import com.playmonumenta.plugins.player.PartialParticle;
+import com.playmonumenta.plugins.player.PlayerData;
+import com.playmonumenta.plugins.utils.LocationUtils;
+import com.playmonumenta.plugins.utils.ScoreboardUtils;
 
 
 
@@ -70,6 +71,7 @@ public abstract class PatronParticles extends Ability {
 		return (
 			particleScore > 0
 			&& PlayerData.getPatreonDollars(player) >= mMinimumPatreonScore
+			&& !PremiumVanishIntegration.isInvisible(player)
 		);
 	}
 }

@@ -57,6 +57,7 @@ public class HallowedBeam extends MultipleChargeAbility {
 	private Crusade mCrusade;
 
 	private int mMode = 0;
+	private int mLastCastTicks = 0;
 
 	public HallowedBeam(Plugin plugin, Player player) {
 		super(plugin, player, "Hallowed Beam");
@@ -89,9 +90,12 @@ public class HallowedBeam extends MultipleChargeAbility {
 			Damageable damageable = (Damageable)inMainHand.getItemMeta();
 
 			if (ItemUtils.isSomeBow(inMainHand) && !ItemUtils.isShootableItem(inventory.getItemInOffHand()) && !ItemUtils.isItemShattered(inMainHand) && !(damageable.getDamage() > inMainHand.getType().getMaxDurability())) {
-				if (!consumeCharge()) {
+				int ticks = mPlayer.getTicksLived();
+				// Prevent double casting on accident
+				if (ticks - mLastCastTicks <= 5 || !consumeCharge()) {
 					return;
 				}
+				mLastCastTicks = ticks;
 
 				//Unsure why the runnable needs to exist, but it breaks if I don't have it
 				new BukkitRunnable() {
@@ -119,7 +123,7 @@ public class HallowedBeam extends MultipleChargeAbility {
 							if (en instanceof Player && ((Player) en).getGameMode() != GameMode.SPECTATOR && en.getUniqueId() != mPlayer.getUniqueId()) {
 								Player newP = EntityUtils.getNearestPlayer(en.getLocation(), 1.5);
 								// Don't count if the caster is the closest, can't do a self-heal
-								if (newP.getUniqueId() != mPlayer.getUniqueId()) {
+								if (newP != null && newP.getUniqueId() != mPlayer.getUniqueId()) {
 									applyE = newP;
 								}
 							}

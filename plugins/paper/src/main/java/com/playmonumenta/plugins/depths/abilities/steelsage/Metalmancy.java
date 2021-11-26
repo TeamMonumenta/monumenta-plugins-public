@@ -92,8 +92,8 @@ public class Metalmancy extends DepthsAbility {
 				@Override
 				public void run() {
 					boolean isOutOfTime = mTicksElapsed >= DURATION[mRarity - 1];
-					if (isOutOfTime || mGolem == null || mGolem.getHealth() <= 0) {
-						if (isOutOfTime) {
+					if (isOutOfTime || mGolem == null) {
+						if (isOutOfTime && mGolem != null) {
 							Location golemLoc = mGolem.getLocation();
 							world.playSound(golemLoc, Sound.ENTITY_IRON_GOLEM_DEATH, 0.8f, 1.0f);
 							world.spawnParticle(Particle.CAMPFIRE_COSY_SMOKE, golemLoc, 15);
@@ -103,8 +103,10 @@ public class Metalmancy extends DepthsAbility {
 							mTarget.removePotionEffect(PotionEffectType.GLOWING);
 							mTarget = null;
 						}
-						mGolem.remove();
-						mGolem = null;
+						if (mGolem != null) {
+							mGolem.remove();
+							mGolem = null;
+						}
 						this.cancel();
 					}
 

@@ -210,8 +210,11 @@ public class YellowTesseractOverride extends BaseOverride {
 		for (Ability reference : AbilityManager.getManager().getReferenceAbilities()) {
 			@Nullable Integer level = targetSkills.get(reference.getDisplayName());
 			if (level != null) {
-				ScoreboardUtils.setScoreboardValue(player, reference.getScoreboard(), level);
-				totalSkillsAdded += level;
+				String scoreboard = reference.getScoreboard();
+				if (scoreboard != null) {
+					ScoreboardUtils.setScoreboardValue(player, reference.getScoreboard(), level);
+					totalSkillsAdded += level;
+				}
 			}
 		}
 
@@ -219,8 +222,11 @@ public class YellowTesseractOverride extends BaseOverride {
 		for (Ability reference : AbilityManager.getManager().getDisabledAbilities()) {
 			@Nullable Integer level = targetSkills.get(reference.getDisplayName());
 			if (level != null) {
-				ScoreboardUtils.setScoreboardValue(player, reference.getScoreboard(), level);
-				totalSkillsAdded += level;
+				String scoreboard = reference.getScoreboard();
+				if (scoreboard != null) {
+					ScoreboardUtils.setScoreboardValue(player, reference.getScoreboard(), level);
+					totalSkillsAdded += level;
+				}
 			}
 		}
 

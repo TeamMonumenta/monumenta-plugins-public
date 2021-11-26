@@ -2,18 +2,19 @@ package com.playmonumenta.plugins.enchantments.cosmetic;
 
 import java.util.EnumSet;
 
-import com.playmonumenta.plugins.Constants;
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.enchantments.BaseSpawnableItemEnchantment;
-import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
-import com.playmonumenta.plugins.player.PartialParticle;
-import com.playmonumenta.plugins.utils.LocationUtils;
-
 import org.bukkit.Color;
 import org.bukkit.Particle;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
+
+import com.playmonumenta.plugins.Constants;
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.enchantments.BaseSpawnableItemEnchantment;
+import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
+import com.playmonumenta.plugins.integrations.PremiumVanishIntegration;
+import com.playmonumenta.plugins.player.PartialParticle;
+import com.playmonumenta.plugins.utils.LocationUtils;
 
 
 
@@ -40,6 +41,10 @@ public class Gilded implements BaseSpawnableItemEnchantment {
 
 	@Override
 	public void tick(Plugin plugin, Player player, int level) {
+		if (PremiumVanishIntegration.isInvisible(player)) {
+			return;
+		}
+
 		double doubleWidthDelta = PartialParticle.getWidthDelta(player) * 2;
 		new PartialParticle(
 			PARTICLE,

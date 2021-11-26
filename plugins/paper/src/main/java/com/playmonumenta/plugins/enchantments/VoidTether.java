@@ -57,7 +57,7 @@ public class VoidTether implements BaseEnchantment {
 
 	protected boolean runCheck(Plugin plugin, Player player) {
 		/* Check to make sure the player still has a non-shattered totem or resurrection item */
-		if (plugin.mTrackingManager.mPlayers.getPlayerCustomEnchantLevel(player, Resurrection.class) == 0) {
+		if (plugin.mTrackingManager.mPlayers.getPlayerCustomEnchantLevel(player, Resurrection.class) == 0 && plugin.mTrackingManager.mPlayers.getPlayerCustomEnchantLevel(player, AshesOfEternity.class) == 0) {
 			ItemStack item = player.getInventory().getItemInMainHand();
 			if (item == null || !item.getType().equals(Material.TOTEM_OF_UNDYING) || ItemUtils.isItemShattered(item)) {
 				item = player.getInventory().getItemInOffHand();

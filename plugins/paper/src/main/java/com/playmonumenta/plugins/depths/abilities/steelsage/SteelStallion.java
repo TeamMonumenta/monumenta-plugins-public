@@ -127,7 +127,7 @@ public class SteelStallion extends DepthsAbility {
 			mHorse = (Mob) horse;
 			mHorse.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(HEALTH[mRarity - 1]);
 			//Horse absorbs the damage from the hit that triggers it
-			mHorse.setHealth(HEALTH[mRarity - 1] - event.getDamage());
+			mHorse.setHealth(Math.max(HEALTH[mRarity - 1] - event.getDamage(), 0));
 			mHorse.setInvulnerable(true);
 			event.setDamage(0);
 			event.setCancelled(true);
