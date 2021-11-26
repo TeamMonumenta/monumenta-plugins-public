@@ -195,9 +195,9 @@ public class ChessBoard {
 				}
 			}
 
-			enemyPiece = mBoard[pawn.mBoardLoc + 7];
-			if (enemyPiece != null) {
-				if (canMoveToWithLeftBorder(pawn, pawn.mBoardLoc + 7) == 1) {
+			if (canMoveToWithLeftBorder(pawn, pawn.mBoardLoc + 7) == 1) {
+				enemyPiece = mBoard[pawn.mBoardLoc + 7];
+				if (enemyPiece != null) {
 					list.add(pawn.mBoardLoc + 7);
 				}
 			}
@@ -215,9 +215,9 @@ public class ChessBoard {
 					list.add(pawn.mBoardLoc - 9);
 				}
 			}
-			enemyPiece = mBoard[pawn.mBoardLoc - 7];
-			if (enemyPiece != null) {
-				if (canMoveToWithRightBorder(pawn, pawn.mBoardLoc - 7) == 1) {
+			if (canMoveToWithRightBorder(pawn, pawn.mBoardLoc - 7) == 1) {
+				enemyPiece = mBoard[pawn.mBoardLoc - 7];
+				if (enemyPiece != null) {
 					list.add(pawn.mBoardLoc - 7);
 				}
 			}
@@ -282,8 +282,8 @@ public class ChessBoard {
 				}
 
 				if (mWhiteCastlingShort) {
-					boolean canCast = !(squareUnderAttack(piece.mTeam, 61) || squareUnderAttack(piece.mTeam, 62)) &&
-										canMoveTo(piece, 61) == 0 && canMoveTo(piece, 62) == 0;
+					boolean canCast = !(squareUnderAttack(piece.mTeam, 60) || squareUnderAttack(piece.mTeam, 61) || squareUnderAttack(piece.mTeam, 62)) &&
+										canMoveTo(piece, 60) == 0 && canMoveTo(piece, 61) == 0 && canMoveTo(piece, 62) == 0;
 
 					if (canCast) {
 						list.add(62);
@@ -309,8 +309,8 @@ public class ChessBoard {
 				}
 
 				if (mBlackCastlingLong) {
-					boolean canCast = !(squareUnderAttack(piece.mTeam, 5) || squareUnderAttack(piece.mTeam, 6)) &&
-										canMoveTo(piece, 5) == 0 && canMoveTo(piece, 6) == 0;
+					boolean canCast = !(squareUnderAttack(piece.mTeam, 5) || squareUnderAttack(piece.mTeam, 6) || squareUnderAttack(piece.mTeam, 4)) &&
+										canMoveTo(piece, 5) == 0 && canMoveTo(piece, 6) == 0 && canMoveTo(piece, 4) == 0;
 
 					if (canCast) {
 						list.add(6);
