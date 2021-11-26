@@ -71,6 +71,10 @@ public class HexEater implements BaseEnchantment {
 			effects++;
 		}
 
+		if (EntityUtils.hasDamageOverTime(plugin, target)) {
+			effects++;
+		}
+
 		if (target.getFireTicks() > 0 || Inferno.getMobInfernoLevel(plugin, target) > 0) {
 			effects++;
 		}

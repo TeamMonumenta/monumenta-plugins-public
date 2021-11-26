@@ -2,10 +2,6 @@ package com.playmonumenta.plugins.enchantments;
 
 import java.util.EnumSet;
 
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
-import com.playmonumenta.plugins.utils.PotionUtils;
-
 import org.bukkit.ChatColor;
 import org.bukkit.Particle;
 import org.bukkit.entity.LivingEntity;
@@ -15,15 +11,18 @@ import org.bukkit.entity.Trident;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.metadata.FixedMetadataValue;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
+
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.effects.CustomDamageOverTime;
+import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
 
 
 
 public class Decay implements BaseEnchantment {
 	public static final String PROPERTY_NAME = ChatColor.GRAY + "Decay";
-	private static final int DURATION = 20 * 4;
+	public static final int DURATION = 20 * 4;
 	private static final String LEVEL_METAKEY = "DecayLevelMetakey";
+	public static final String DOT_EFFECT_NAME = "DecayDamageOverTimeEffect";
 
 	@Override
 	public String getProperty() {
@@ -37,7 +36,7 @@ public class Decay implements BaseEnchantment {
 
 	@Override
 	public void onAttack(Plugin plugin, Player player, int level, LivingEntity target, EntityDamageByEntityEvent event) {
-		PotionUtils.applyPotion(player, target, new PotionEffect(PotionEffectType.WITHER, (int)(DURATION * player.getCooledAttackStrength(0)), level - 1, false, true));
+		plugin.mEffectManager.addEffect(target, DOT_EFFECT_NAME, new CustomDamageOverTime((int)(DURATION * player.getCooledAttackStrength(0)), 1, 40 / level, player, null, null, Particle.SQUID_INK, plugin));
 		player.getWorld().spawnParticle(Particle.SQUID_INK, target.getLocation().add(0, 1, 0), 4, 0.4, 0.5, 0.4);
 	}
 
@@ -61,7 +60,7 @@ public class Decay implements BaseEnchantment {
 		if (proj.hasMetadata(LEVEL_METAKEY) && proj instanceof Trident && proj.getShooter() instanceof Player) {
 			int level = proj.getMetadata(LEVEL_METAKEY).get(0).asInt();
 			Player player = (Player)proj.getShooter();
-			PotionUtils.applyPotion(player, target, new PotionEffect(PotionEffectType.WITHER, DURATION, level - 1, false, true));
+			plugin.mEffectManager.addEffect(target, DOT_EFFECT_NAME, new CustomDamageOverTime(DURATION, 1, 40 / level, player, null, null, Particle.SQUID_INK, plugin));
 			player.getWorld().spawnParticle(Particle.SQUID_INK, target.getLocation().add(0, 1, 0), 4, 0.4, 0.5, 0.4);
 		}
 	}

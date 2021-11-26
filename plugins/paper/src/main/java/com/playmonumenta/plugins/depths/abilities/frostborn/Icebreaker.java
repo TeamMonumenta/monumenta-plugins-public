@@ -55,7 +55,7 @@ public class Icebreaker extends DepthsAbility {
 			event.setDamage(ICE_DAMAGE[mRarity - 1] * event.getDamage());
 		} else if (e.size() > 0 || EntityUtils.isStunned(entity) || EntityUtils.isConfused(entity) || EntityUtils.isBleeding(mPlugin, entity)
 				|| EntityUtils.isSlowed(mPlugin, entity) || EntityUtils.isWeakened(mPlugin, entity) || EntityUtils.isSilenced(entity) || EntityUtils.vulnerabilityMult(entity) > 1
-				|| entity.getFireTicks() > 0 || Inferno.getMobInfernoLevel(mPlugin, entity) > 0) {
+				|| entity.getFireTicks() > 0 || Inferno.getMobInfernoLevel(mPlugin, entity) > 0 || EntityUtils.hasDamageOverTime(mPlugin, entity)) {
 			event.setDamage(EFFECT_DAMAGE[mRarity - 1] * event.getDamage());
 		}
 	}
@@ -66,7 +66,7 @@ public class Icebreaker extends DepthsAbility {
 			event.setDamage(ICE_DAMAGE[mRarity - 1] * event.getDamage());
 		} else if (e.size() > 0 || EntityUtils.isStunned(entity) || EntityUtils.isConfused(entity) || EntityUtils.isBleeding(mPlugin, entity)
 				|| EntityUtils.isSlowed(mPlugin, entity) || EntityUtils.isWeakened(mPlugin, entity) || EntityUtils.isSilenced(entity) || EntityUtils.vulnerabilityMult(entity) > 1
-				|| entity.getFireTicks() > 0 || Inferno.getMobInfernoLevel(mPlugin, entity) > 0) {
+				|| entity.getFireTicks() > 0 || Inferno.getMobInfernoLevel(mPlugin, entity) > 0 || EntityUtils.hasDamageOverTime(mPlugin, entity)) {
 			event.setDamage(EFFECT_DAMAGE[mRarity - 1] * event.getDamage());
 		}
 		return true;

@@ -1,11 +1,5 @@
 package com.playmonumenta.plugins.abilities.alchemist;
 
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.classes.ClassAbility;
-import com.playmonumenta.plugins.classes.magic.MagicType;
-import com.playmonumenta.plugins.effects.CustomDamageOverTime;
-
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -19,6 +13,12 @@ import org.bukkit.entity.SpectralArrow;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.inventory.ItemStack;
 
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.classes.magic.MagicType;
+import com.playmonumenta.plugins.effects.CustomDamageOverTime;
+
 
 
 public class BasiliskPoison extends Ability {
@@ -26,6 +26,7 @@ public class BasiliskPoison extends Ability {
 	private static final double BASILISK_POISON_1_PERCENT_DAMAGE = 0.05;
 	private static final double BASILISK_POISON_2_PERCENT_DAMAGE = 0.08;
 	private static final int DURATION = 6 * 20;
+	private static final int PERIOD = 1 * 20;
 
 	private static final String DAMAGE_EFFECT_NAME = "BasiliskPoisonDamageEffect";
 
@@ -46,7 +47,7 @@ public class BasiliskPoison extends Ability {
 	public boolean livingEntityShotByPlayerEvent(Projectile proj, LivingEntity damagee, EntityDamageByEntityEvent event) {
 		if (proj instanceof Arrow || proj instanceof SpectralArrow) {
 			World world = mPlayer.getWorld();
-			mPlugin.mEffectManager.addEffect(damagee, DAMAGE_EFFECT_NAME, new CustomDamageOverTime(DURATION, event.getDamage() * mPercent, mPlayer, MagicType.ALCHEMY, ClassAbility.BASILISK_POISON, Particle.TOTEM, mPlugin));
+			mPlugin.mEffectManager.addEffect(damagee, DAMAGE_EFFECT_NAME, new CustomDamageOverTime(DURATION, event.getDamage() * mPercent, PERIOD, mPlayer, MagicType.ALCHEMY, ClassAbility.BASILISK_POISON, Particle.TOTEM, mPlugin));
 			world.spawnParticle(Particle.TOTEM, damagee.getLocation().add(0, 1.6, 0), 12, 0.4, 0.4, 0.4, 0.1);
 			world.playSound(damagee.getLocation(), Sound.ENTITY_CREEPER_HURT, 1, 1.6f);
 		}

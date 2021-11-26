@@ -1,17 +1,5 @@
 package com.playmonumenta.plugins.abilities.warlock.tenebrist;
 
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.abilities.AbilityManager;
-import com.playmonumenta.plugins.abilities.AbilityTrigger;
-import com.playmonumenta.plugins.classes.ClassAbility;
-import com.playmonumenta.plugins.events.CustomDamageEvent;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.FastUtils;
-import com.playmonumenta.plugins.utils.ItemUtils;
-import com.playmonumenta.plugins.utils.PotionUtils;
-import com.playmonumenta.plugins.utils.VectorUtils;
-
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -23,34 +11,48 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
+
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.abilities.AbilityManager;
+import com.playmonumenta.plugins.abilities.AbilityTrigger;
+import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.classes.magic.MagicType;
+import com.playmonumenta.plugins.effects.CustomDamageOverTime;
+import com.playmonumenta.plugins.events.CustomDamageEvent;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.VectorUtils;
 
 
 
 public class WitheringGaze extends Ability {
 
 	private static final int WITHERING_GAZE_STUN_DURATION = 3 * 20;
-	private static final int WITHERING_GAZE_WITHER_DURATION_1 = 6 * 20;
-	private static final int WITHERING_GAZE_WITHER_DURATION_2 = 8 * 20;
+	private static final int WITHERING_GAZE_DOT_DURATION_1 = 6 * 20;
+	private static final int WITHERING_GAZE_DOT_DURATION_2 = 8 * 20;
+	private static final int WITHERING_GAZE_DOT_PERIOD = 10;
+	private static final int WITHERING_GAZE_DOT_DAMAGE = 1;
 	private static final int WITHERING_GAZE_1_COOLDOWN = 20 * 30;
 	private static final int WITHERING_GAZE_2_COOLDOWN = 20 * 20;
+	private static final String DOT_EFFECT_NAME = "WitheringGazeDamageOverTimeEffect";
 
-	private final int mWitherDuration;
+	private final int mDOTDuration;
 
 	public WitheringGaze(Plugin plugin, Player player) {
 		super(plugin, player, "Withering Gaze");
 		mInfo.mScoreboardId = "WitheringGaze";
 		mInfo.mShorthandName = "WG";
-		mInfo.mDescriptions.add("Sprint left-clicking unleashes a 9 block long cone in the direction the player is facing. Enemies in its path are stunned for 3 seconds (elites and bosses are given 30% Slowness instead) and given Wither 3 for 6 seconds. Cooldown: 30s.");
-		mInfo.mDescriptions.add("Your Wither lasts for 8 seconds. Cooldown: 20s.");
+		mInfo.mDescriptions.add("Sprint left-clicking unleashes a 9 block long cone in the direction the player is facing. Enemies in its path are stunned for 3 seconds (elites and bosses are given 30% Slowness instead) and dealt 1 damage every half second for 6 seconds. Cooldown: 30s.");
+		mInfo.mDescriptions.add("Your damage over time lasts for 8 seconds. Cooldown: 20s.");
 		mInfo.mLinkedSpell = ClassAbility.WITHERING_GAZE;
 		mInfo.mCooldown = getAbilityScore() == 1 ? WITHERING_GAZE_1_COOLDOWN : WITHERING_GAZE_2_COOLDOWN;
 		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;
 		mDisplayItem = new ItemStack(Material.WITHER_ROSE, 1);
-		mWitherDuration = getAbilityScore() == 1 ? WITHERING_GAZE_WITHER_DURATION_1 : WITHERING_GAZE_WITHER_DURATION_2;
+		mDOTDuration = getAbilityScore() == 1 ? WITHERING_GAZE_DOT_DURATION_1 : WITHERING_GAZE_DOT_DURATION_2;
 	}
 
 	@Override
@@ -92,7 +94,7 @@ public class WitheringGaze extends Ability {
 							} else {
 								EntityUtils.applyStun(mPlugin, WITHERING_GAZE_STUN_DURATION, le);
 							}
-							PotionUtils.applyPotion(player, le, new PotionEffect(PotionEffectType.WITHER, mWitherDuration, 2));
+							mPlugin.mEffectManager.addEffect(le, DOT_EFFECT_NAME, new CustomDamageOverTime(mDOTDuration, WITHERING_GAZE_DOT_DAMAGE, WITHERING_GAZE_DOT_PERIOD, mPlayer, MagicType.DARK_MAGIC, null, Particle.SQUID_INK, mPlugin));
 							CustomDamageEvent event = new CustomDamageEvent(player, le, 0, null);
 							Bukkit.getPluginManager().callEvent(event);
 						}

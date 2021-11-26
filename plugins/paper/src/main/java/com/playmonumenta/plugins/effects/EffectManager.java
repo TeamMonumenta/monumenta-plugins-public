@@ -90,16 +90,44 @@ public class EffectManager implements Listener {
 			return null;
 		}
 
-		 public boolean hasEffect(String source) {
-	            for (Map<String, NavigableSet<Effect>> priorityEffects : mPriorityMap.values()) {
-	                NavigableSet<Effect> effectGroup = priorityEffects.get(source);
-	                if (effectGroup != null && !effectGroup.isEmpty()) {
-	                    return true;
-	                }
-	            }
+		public NavigableSet<? extends Effect> getEffects(Class<? extends Effect> cls) {
+			NavigableSet<Effect> effectSet = new TreeSet<Effect>();
+			for (Map<String, NavigableSet<Effect>> priorityEffects : mPriorityMap.values()) {
+				for (NavigableSet<Effect> effects : priorityEffects.values()) {
+					for (Effect effect : effects) {
+						if (cls.isInstance(effect)) {
+							effectSet.add(effect);
+						}
+					}
+				}
+			}
+			return effectSet;
+		}
 
-	            return false;
-	        }
+		public boolean hasEffect(String source) {
+			for (Map<String, NavigableSet<Effect>> priorityEffects : mPriorityMap.values()) {
+				NavigableSet<Effect> effectGroup = priorityEffects.get(source);
+				if (effectGroup != null && !effectGroup.isEmpty()) {
+					return true;
+				}
+			}
+
+			return false;
+		}
+
+		public boolean hasEffect(Class<? extends Effect> cls) {
+			for (Map<String, NavigableSet<Effect>> priorityEffects : mPriorityMap.values()) {
+				for (NavigableSet<Effect> effects : priorityEffects.values()) {
+					for (Effect effect : effects) {
+						if (cls.isInstance(effect)) {
+							return true;
+						}
+					}
+				}
+			}
+
+			return false;
+		}
 
 		public NavigableSet<Effect> clearEffects(String source) {
 			for (Map<String, NavigableSet<Effect>> priorityEffects : mPriorityMap.values()) {
@@ -296,7 +324,23 @@ public class EffectManager implements Listener {
 		return null;
 	}
 
-	  /**
+	/**
+	 * Returns effects of a given type from an entity.
+	 *
+	 * @param  entity the entity being checked
+	 * @param  type the class of effect
+	 * @return the set of effects if they exist, null otherwise
+	 */
+	public NavigableSet<? extends Effect> getEffects(Entity entity, Class<? extends Effect> type) {
+		Effects effects = mEntities.get(entity);
+		if (effects != null) {
+			return effects.getEffects(type);
+		}
+
+		return null;
+	}
+
+	/**
      * Returns if an entity has an effect source or not.
      *
      * @param  entity the entity being checked
@@ -307,6 +351,21 @@ public class EffectManager implements Listener {
 		Effects effects = mEntities.get(entity);
 		if (effects != null) {
 			return effects.hasEffect(source);
+		}
+		return false;
+	}
+
+	/**
+     * Returns if an entity has an effect source or not.
+     *
+     * @param  entity the entity being checked
+     * @param  type the class of effect
+     * @return whether the entity has the effect or not
+     */
+	public boolean hasEffect(Entity entity, Class<? extends Effect> type) {
+		Effects effects = mEntities.get(entity);
+		if (effects != null) {
+			return effects.hasEffect(type);
 		}
 		return false;
 	}

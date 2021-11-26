@@ -3,13 +3,6 @@ package com.playmonumenta.plugins.enchantments;
 import java.util.EnumSet;
 import java.util.List;
 
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.InventoryUtils;
-import com.playmonumenta.plugins.utils.PotionUtils;
-import com.playmonumenta.plugins.classes.magic.MagicType;
-
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.Particle;
@@ -24,6 +17,14 @@ import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.classes.magic.MagicType;
+import com.playmonumenta.plugins.effects.CustomDamageOverTime;
+import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.utils.PotionUtils;
 
 
 
@@ -74,7 +75,7 @@ public class Quake implements BaseEnchantment {
 					EntityUtils.applyStun(plugin, 10 * thunder, mob);
 				}
 				if (decay > 0) {
-					PotionUtils.applyPotion(player, mob, new PotionEffect(PotionEffectType.WITHER, 80, decay - 1, false, true));
+					plugin.mEffectManager.addEffect(mob, Decay.DOT_EFFECT_NAME, new CustomDamageOverTime(Decay.DURATION, 1, 40 / decay, player, null, null, Particle.SQUID_INK, plugin));
 				}
 				if (bleed > 0) {
 					EntityUtils.applyBleed(plugin, 100, level, mob);

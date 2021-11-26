@@ -208,6 +208,12 @@ public class AmplifyingHex extends Ability {
 					amplifierCount += Math.min(mAmplifierCap, Math.max((int) Math.floor(weakAmp * 10) - 1, 0));
 				}
 
+				//Custom DoT interaction
+				if (EntityUtils.hasDamageOverTime(mPlugin, mob)) {
+					debuffCount++;
+					amplifierCount += Math.min(mAmplifierCap, (int) EntityUtils.getDamageOverTimeMagnitude(mPlugin, mob) - 1);
+				}
+
 				if (debuffCount > 0) {
 					float finalDamage = AmplifyingHexDamageEnchantment.getExtraPercentDamage(mPlayer, AmplifyingHexDamageEnchantment.class, debuffCount * (FLAT_DAMAGE + Math.min(mDamage, mRegionCap)) + amplifierCount * mAmplifierDamage);
 					EntityUtils.damageEntity(mPlugin, mob, finalDamage, mPlayer, MagicType.DARK_MAGIC, true, mInfo.mLinkedSpell);

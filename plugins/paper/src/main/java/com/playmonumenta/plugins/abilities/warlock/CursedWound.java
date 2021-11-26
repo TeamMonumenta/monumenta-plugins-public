@@ -25,6 +25,8 @@ import com.playmonumenta.plugins.abilities.warlock.reaper.VoodooBonds;
 import com.playmonumenta.plugins.abilities.warlock.tenebrist.HauntingShades;
 import com.playmonumenta.plugins.abilities.warlock.tenebrist.UmbralWail;
 import com.playmonumenta.plugins.abilities.warlock.tenebrist.WitheringGaze;
+import com.playmonumenta.plugins.classes.magic.MagicType;
+import com.playmonumenta.plugins.effects.CustomDamageOverTime;
 import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
 import com.playmonumenta.plugins.enchantments.abilities.BaseAbilityEnchantment;
 import com.playmonumenta.plugins.events.CustomDamageEvent;
@@ -42,19 +44,21 @@ public class CursedWound extends Ability {
 		}
 	}
 
-	private static final int CURSED_WOUND_EFFECT_LEVEL = 1;
+	private static final int CURSED_WOUND_DOT_DAMAGE = 1;
+	private static final int CURSED_WOUND_DOT_PERIOD = 20;
 	private static final int CURSED_WOUND_DURATION = 6 * 20;
 	private static final int CURSED_WOUND_RADIUS = 3;
 	private static final double CURSED_WOUND_DAMAGE = 0.05;
 	private static final double CURSED_WOUND_1_CAP = 0.15;
 	private static final double CURSED_WOUND_2_CAP = 0.3;
 	private static final int CURSED_WOUND_EXTENDED_DURATION = 2 * 20;
+	private static final String DOT_EFFECT_NAME = "CursedWoundDamageOverTimeEffect";
 
 	public CursedWound(Plugin plugin, Player player) {
 		super(plugin, player, "Cursed Wound");
 		mInfo.mScoreboardId = "CursedWound";
 		mInfo.mShorthandName = "CW";
-		mInfo.mDescriptions.add("Attacking an enemy with a critical scythe attack passively afflicts it and all enemies in a 3-block cube around it with Wither 2 for 6s. Your melee attacks passively deal 3% more damage per ability on cooldown, capped at +15% damage.");
+		mInfo.mDescriptions.add("Attacking an enemy with a critical scythe attack passively afflicts it and all enemies in a 3-block cube around it with 1 damage every second for 6s. Your melee attacks passively deal 3% more damage per ability on cooldown, capped at +15% damage.");
 		mInfo.mDescriptions.add("Critical attacks now also extend all enemies' debuffs (except Stun, Silence, and Confusion) by 2s. Damage cap is increased from 15% to 30%.");
 		mDisplayItem = new ItemStack(Material.GOLDEN_SWORD, 1);
 	}
@@ -105,7 +109,7 @@ public class CursedWound extends Ability {
 					                     (mob.getWidth() / 2) + 0.1, mob.getHeight() / 3, (mob.getWidth() / 2) + 0.1, fallingDustData);
 					world.spawnParticle(Particle.SPELL_MOB, mob.getLocation().add(0, mob.getHeight() / 2, 0), 6,
 					                     (mob.getWidth() / 2) + 0.1, mob.getHeight() / 3, (mob.getWidth() / 2) + 0.1, 0);
-					PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(PotionEffectType.WITHER, CURSED_WOUND_DURATION, CURSED_WOUND_EFFECT_LEVEL, true, false));
+					mPlugin.mEffectManager.addEffect(mob, DOT_EFFECT_NAME, new CustomDamageOverTime(CURSED_WOUND_DURATION, CURSED_WOUND_DOT_DAMAGE, CURSED_WOUND_DOT_PERIOD, mPlayer, MagicType.DARK_MAGIC, null, Particle.SQUID_INK, mPlugin));
 					if (getAbilityScore() > 1) {
 						//Bleed interaction
 						if (EntityUtils.isBleeding(mPlugin, mob)) {

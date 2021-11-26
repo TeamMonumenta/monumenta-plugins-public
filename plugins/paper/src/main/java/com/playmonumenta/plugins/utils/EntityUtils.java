@@ -81,6 +81,7 @@ import com.playmonumenta.plugins.bosses.bosses.CrowdControlImmunityBoss;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.classes.magic.MagicType;
 import com.playmonumenta.plugins.effects.Bleed;
+import com.playmonumenta.plugins.effects.CustomDamageOverTime;
 import com.playmonumenta.plugins.effects.Effect;
 import com.playmonumenta.plugins.effects.PercentDamageDealt;
 import com.playmonumenta.plugins.effects.PercentDamageReceived;
@@ -950,6 +951,22 @@ public class EntityUtils {
 			Effect weak = weaks.last();
 			weak.setDuration(ticks);
 		}
+	}
+
+	public static boolean hasDamageOverTime(Plugin plugin, LivingEntity mob) {
+		return plugin.mEffectManager.hasEffect(mob, CustomDamageOverTime.class);
+	}
+
+	public static int getDamageOverTimeCount(Plugin plugin, LivingEntity mob) {
+		return plugin.mEffectManager.getEffects(mob, CustomDamageOverTime.class).size();
+	}
+
+	public static double getDamageOverTimeMagnitude(Plugin plugin, LivingEntity mob) {
+		double sum = 0;
+		for (Effect effect : plugin.mEffectManager.getEffects(mob, CustomDamageOverTime.class)) {
+			sum += effect.getMagnitude();
+		}
+		return sum;
 	}
 
 	public static void applyFire(Plugin plugin, int fireTicks, LivingEntity target, Player player) {
