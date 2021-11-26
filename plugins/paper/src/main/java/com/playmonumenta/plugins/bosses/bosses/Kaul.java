@@ -206,26 +206,26 @@ public class Kaul extends BossAbilityGroup {
 		Spell judgement = SpellKaulsJudgement.getInstance(mSpawnLoc);
 
 		SpellManager phase2Spells = new SpellManager(
-		    Arrays.asList(new SpellPutridPlague(mPlugin, mBoss, detectionRange / 2, false, mShrineMarker.getLocation()),
-		                  new SpellEarthsWrath(mPlugin, mBoss, mShrineMarker.getLocation().getY()),
-		                  new SpellRaiseJungle(mPlugin, mBoss, 10, detectionRange, 20 * 8, 20 * 10, mShrineMarker.getLocation().getY()),
-		                  new SpellGroundSurge(mPlugin, mBoss, detectionRange),
-		                  judgement));
+			Arrays.asList(new SpellPutridPlague(mPlugin, mBoss, detectionRange, false, mShrineMarker.getLocation()),
+			              new SpellEarthsWrath(mPlugin, mBoss, mShrineMarker.getLocation().getY()),
+			              new SpellRaiseJungle(mPlugin, mBoss, 10, detectionRange, 20 * 8, 20 * 10, mShrineMarker.getLocation().getY()),
+			              new SpellGroundSurge(mPlugin, mBoss, detectionRange),
+			              judgement));
 
 		List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true);
 
 		SpellManager phase3Spells = new SpellManager(
-		    Arrays.asList(new SpellPutridPlague(mPlugin, mBoss, detectionRange / 2, true, mShrineMarker.getLocation()),
-		                  new SpellEarthsWrath(mPlugin, mBoss, mShrineMarker.getLocation().getY()),
-		                  new SpellVolcanicDemise(plugin, mBoss, 40D, mShrineMarker.getLocation()),
-		                  new SpellGroundSurge(mPlugin, mBoss, detectionRange),
-		                  judgement));
+			Arrays.asList(new SpellPutridPlague(mPlugin, mBoss, detectionRange, true, mShrineMarker.getLocation()),
+			              new SpellEarthsWrath(mPlugin, mBoss, mShrineMarker.getLocation().getY()),
+			              new SpellVolcanicDemise(plugin, mBoss, 40D, mShrineMarker.getLocation()),
+			              new SpellGroundSurge(mPlugin, mBoss, detectionRange),
+			              judgement));
 
 		SpellManager phase4Spells = new SpellManager(
-			    Arrays.asList(new SpellPutridPlague(mPlugin, mBoss, detectionRange / 2, true, mShrineMarker.getLocation()),
-			                  new SpellEarthsWrath(mPlugin, mBoss, mShrineMarker.getLocation().getY()),
-			                  new SpellVolcanicDemise(plugin, mBoss, 40D, mShrineMarker.getLocation()),
-			                  new SpellGroundSurge(mPlugin, mBoss, detectionRange)));
+			Arrays.asList(new SpellPutridPlague(mPlugin, mBoss, detectionRange, true, mShrineMarker.getLocation()),
+			              new SpellEarthsWrath(mPlugin, mBoss, mShrineMarker.getLocation().getY()),
+			              new SpellVolcanicDemise(plugin, mBoss, 40D, mShrineMarker.getLocation()),
+			              new SpellGroundSurge(mPlugin, mBoss, detectionRange)));
 
 		List<UUID> hit = new ArrayList<UUID>();
 
