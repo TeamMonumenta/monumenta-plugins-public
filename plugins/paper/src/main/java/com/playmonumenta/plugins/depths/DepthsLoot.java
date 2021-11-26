@@ -41,8 +41,13 @@ public class DepthsLoot {
 
 		//Load the main reward table with ccs and depths mats and spawn it in
 		LootContext context = new LootContext.Builder(loc).build();
-
-		int money = treasureScore * 2;
+		//Money beyond 54 treasure score is reduced to 1 ccs/treasure, first 54 is worth 2ccs each
+		int money = 0;
+		if (treasureScore <= 54) {
+			money = treasureScore * 2;
+		} else {
+			money = 54 + treasureScore;
+		}
 		int hcs = money / 64;
 		int ccs = money % 64;
 
