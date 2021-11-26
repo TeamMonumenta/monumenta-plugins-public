@@ -103,7 +103,7 @@ public class HeadlessHorsemanBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_horseman";
 	public static final int detectionRange = 22;
 	public static final int arenaSize = 45;
-	public int mCooldownTicks = 10 * 20;
+	public int mCooldownTicks = 11 * 20;
 
 	private final Location mSpawnLoc;
 	private final Location mEndLoc;
@@ -159,25 +159,7 @@ public class HeadlessHorsemanBoss extends BossAbilityGroup {
 				new SpellBurningVengence(plugin, boss, mCooldownTicks, mSpawnLoc, detectionRange, 0.5)
 				));
 
-		SpellManager phase2Spells = new SpellManager(Arrays.asList(
-				new SpellHellzoneGrenade(plugin, boss, mSpawnLoc, detectionRange, mCooldownTicks, 4),
-				new SpellBeeBombs(plugin, boss, mCooldownTicks, mSpawnLoc, 20, detectionRange),
-				new SpellBurningVengence(plugin, boss, mCooldownTicks, mSpawnLoc, detectionRange, 0.5),
-				new SpellHallowsEnd(plugin, boss, mCooldownTicks, this),
-				new SpellReaperOfLife(plugin, boss, mSpawnLoc, detectionRange, mCooldownTicks)
-				));
-
-		List<Spell> phase1Passives = Arrays.asList(
-				// Teleport the boss to spawnLoc if he gets too far away from where he spawned
-				new SpellConditionalTeleport(mBoss, spawnLoc, b -> spawnLoc.distance(b.getLocation()) > 80),
-				// Teleport the boss to spawnLoc if he is stuck in bedrock
-				new SpellConditionalTeleport(mBoss, spawnLoc, b -> b.getLocation().getBlock().getType() == Material.BEDROCK ||
-				                                                   b.getLocation().add(0, 1, 0).getBlock().getType() == Material.BEDROCK ||
-				                                                   b.getLocation().getBlock().getType() == Material.LAVA),
-				new SpellPhantomOfTheOpera(plugin, boss, mSpawnLoc, detectionRange, 20 * 60)
-			);
-
-		List<Spell> phase2Passives = Arrays.asList(
+		List<Spell> passives = Arrays.asList(
 				// Teleport the boss to spawnLoc if he gets too far away from where he spawned
 				new SpellConditionalTeleport(mBoss, spawnLoc, b -> spawnLoc.distance(b.getLocation()) > 80),
 				// Teleport the boss to spawnLoc if he is stuck in bedrock
@@ -193,16 +175,28 @@ public class HeadlessHorsemanBoss extends BossAbilityGroup {
 		});
 
 		events.put(50, mBoss -> {
-			mCooldownTicks = 8 * 20;
-			changePhase(phase2Spells, phase2Passives, null);
+			SpellManager p2C9Spells = new SpellManager(Arrays.asList(
+					new SpellHellzoneGrenade(plugin, boss, mSpawnLoc, detectionRange, 9 * 20, 4),
+					new SpellBeeBombs(plugin, boss, 9 * 20, mSpawnLoc, 20, detectionRange),
+					new SpellBurningVengence(plugin, boss, 9 * 20, mSpawnLoc, detectionRange, 0.5),
+					new SpellHallowsEnd(plugin, boss, 9 * 20, this),
+					new SpellReaperOfLife(plugin, boss, mSpawnLoc, detectionRange, 9 * 20)
+					));
+			changePhase(p2C9Spells, passives, null);
 			PlayerUtils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"[The Horseman] \",\"color\":\"dark_red\"},{\"text\":\"Ha ha ha! I haven't felt this alive for what feels like eternity! \",\"color\":\"gold\"},{\"text\":\"We'll \",\"color\":\"dark_red\"},{\"text\":\"have to speed this up!.\",\"color\":\"gold\"}]");
 			forceCastSpell(SpellReaperOfLife.class);
 		});
 
 		events.put(30, mBoss -> {
-			mCooldownTicks = 5 * 20;
+			SpellManager p2C6Spells = new SpellManager(Arrays.asList(
+					new SpellHellzoneGrenade(plugin, boss, mSpawnLoc, detectionRange, 6 * 20, 4),
+					new SpellBeeBombs(plugin, boss, 6 * 20, mSpawnLoc, 20, detectionRange),
+					new SpellBurningVengence(plugin, boss, 6 * 20, mSpawnLoc, detectionRange, 0.5),
+					new SpellHallowsEnd(plugin, boss, 6 * 20, this),
+					new SpellReaperOfLife(plugin, boss, mSpawnLoc, detectionRange, 6 * 20)
+					));
 			//to enforce the new cooldown
-			changePhase(phase2Spells, phase2Passives, null);
+			changePhase(p2C6Spells, passives, null);
 			PlayerUtils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"[The Horseman] \",\"color\":\"dark_red\"},{\"text\":\"Let's speed this up just a bit more!\",\"color\":\"gold\"}]");
 		});
 
@@ -217,7 +211,7 @@ public class HeadlessHorsemanBoss extends BossAbilityGroup {
 
 		BossBarManager bossBar = new BossBarManager(plugin, boss, detectionRange*2, BarColor.RED, BarStyle.SEGMENTED_10, events);
 
-		super.constructBoss(phase1Spells, phase1Passives, detectionRange, bossBar);
+		super.constructBoss(phase1Spells, passives, detectionRange, bossBar);
 	}
 
 	public Location getSpawnLocation() {
