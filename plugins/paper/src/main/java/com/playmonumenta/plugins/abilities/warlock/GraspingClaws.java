@@ -5,6 +5,7 @@ import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
+import org.bukkit.entity.AbstractArrow;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -59,9 +60,10 @@ public class GraspingClaws extends Ability {
 	public void cast(Action action) {
 		ItemStack inMainHand = mPlayer.getInventory().getItemInMainHand();
 		if (!mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), ClassAbility.GRASPING_CLAWS) && mPlayer.isSneaking() && ItemUtils.isSomeBow(inMainHand) && !ItemUtils.isItemShattered(inMainHand)) {
-			mArrow = mPlayer.launchProjectile(Arrow.class);
+			mArrow = mPlayer.getWorld().spawnArrow(mPlayer.getEyeLocation(), mPlayer.getLocation().getDirection(), 1.5f, 0, Arrow.class);
+			mArrow.setShooter(mPlayer);
 			mArrow.setDamage(0);
-			mArrow.setVelocity(mPlayer.getLocation().getDirection().multiply(1.5));
+			mArrow.setPickupStatus(AbstractArrow.PickupStatus.CREATIVE_ONLY);
 			mPlugin.mProjectileEffectTimers.addEntity(mArrow, Particle.SPELL_WITCH);
 			putOnCooldown();
 		}

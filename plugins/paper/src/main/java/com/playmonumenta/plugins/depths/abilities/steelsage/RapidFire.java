@@ -70,11 +70,8 @@ public class RapidFire extends DepthsAbility {
 
 				ItemStack inMainHand = mPlayer.getInventory().getItemInMainHand();
 				if (InventoryUtils.isBowItem(inMainHand)) {
-					Arrow arrow = mPlayer.launchProjectile(Arrow.class);
-
+					Arrow arrow = mPlayer.getWorld().spawnArrow(mPlayer.getEyeLocation(), mPlayer.getLocation().getDirection(), 3.0f, 0, Arrow.class);
 					arrow.setCritical(true);
-					arrow.setPickupStatus(PickupStatus.CREATIVE_ONLY);
-					arrow.setVelocity(mPlayer.getLocation().getDirection().multiply(3.0));
 					arrow.setMetadata(META_DATA_TAG, new FixedMetadataValue(mPlugin, 0));
 					arrow.setShooter(mPlayer);
 					arrow.setPickupStatus(PickupStatus.CREATIVE_ONLY);
