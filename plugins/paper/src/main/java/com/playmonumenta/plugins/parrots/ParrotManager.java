@@ -3,10 +3,7 @@ package com.playmonumenta.plugins.parrots;
 import java.util.HashSet;
 import java.util.Set;
 
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.utils.FastUtils;
-import com.playmonumenta.plugins.utils.ScoreboardUtils;
-
+import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Parrot;
@@ -17,12 +14,13 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntitySpawnEvent;
 import org.bukkit.event.player.PlayerBedEnterEvent;
 import org.bukkit.event.player.PlayerBedLeaveEvent;
-import org.bukkit.event.player.PlayerGameModeChangeEvent;
-import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.event.player.PlayerToggleFlightEvent;
 import org.bukkit.scheduler.BukkitRunnable;
+
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.ScoreboardUtils;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -104,7 +102,7 @@ public class ParrotManager implements Listener {
 	// 0 if invisible, 1 if visible.
 
 	private static final String SCOREBOARD_PARROT_BOTH = "ParrotBoth";
-	// 0 if player can only hold only one parrot
+	// 0 if player can hold only one parrot
 
 	private static final String SCOREBOARD_PARROT_LEFT = "ParrotLeft";
 	// store the info about which parrot is on the left shoulder
@@ -115,14 +113,27 @@ public class ParrotManager implements Listener {
 	private static final Set<Player> mPrideRight = new HashSet<>();
 	private static final Set<Player> mPrideLeft = new HashSet<>();
 
-	private static final int FREQUENCY = 3;
+	private static final int PRIDE_FREQUENCY = 3;
 
-	private static BukkitRunnable mRunnable;
-
+	private static BukkitRunnable mPrideRunnable;
 
 	public ParrotManager(Plugin plugin) {
 		mPlugin = plugin;
-		mRunnable = null;
+		mPrideRunnable = null;
+
+		// Periodically updates all players' parrots.
+		// Workaround for an Optifine bug that only shows custom parrot textures if the parrot has been a standalone entity before it was put onto a shoulder
+		new BukkitRunnable() {
+			@Override
+			public void run() {
+				for (Player player : Bukkit.getOnlinePlayers()) {
+					// Flying players lose parrots almost instantly, causing flickering, so don't update parrots for them. They'll get their parrots back once they land.
+					if (!player.isFlying() && player.getGameMode() != GameMode.SPECTATOR) {
+						updateAllIfVisible(player);
+					}
+				}
+			}
+		}.runTaskTimer(plugin, 10 * 20L, 20L); // low priority task, so can start after a long delay
 	}
 
 	public static void removeParrot(Player p) {
@@ -188,7 +199,7 @@ public class ParrotManager implements Listener {
 			mPrideRight.remove(p);
 		}
 
-		if (variantNum == 12) {
+		if (variantNum == ParrotVariant.RAINBOW.getNumber()) {
 			//pride parrot.
 
 			if (shoulder == PlayerShoulder.LEFT) {
@@ -197,12 +208,13 @@ public class ParrotManager implements Listener {
 				mPrideRight.add(p);
 			}
 
-			if (mRunnable == null) {
+			if (mPrideRunnable == null) {
 				//no task is running so create a new one
-				mRunnable = new BukkitRunnable() {
-					Parrot.Variant[] mVariants = Parrot.Variant.values();
+				mPrideRunnable = new BukkitRunnable() {
+					final Parrot.Variant[] mVariants = Parrot.Variant.values();
 					int mRandom = FastUtils.RANDOM.nextInt(5);
 
+					@Override
 					public void run() {
 						if (mPrideLeft.isEmpty() && mPrideRight.isEmpty()) {
 							this.cancel();
@@ -211,7 +223,7 @@ public class ParrotManager implements Listener {
 						if (this.isCancelled()) {
 							mPrideLeft.clear();
 							mPrideRight.clear();
-							mRunnable = null;
+							mPrideRunnable = null;
 							return;
 						}
 
@@ -219,31 +231,34 @@ public class ParrotManager implements Listener {
 						Parrot.Variant variant = mVariants[mRandom];
 						for (Player player : mPrideRight) {
 							Parrot parrot = (Parrot) player.getShoulderEntityRight();
-							parrot.setVariant(variant);
-							player.setShoulderEntityRight(parrot);
+							if (parrot != null) {
+								parrot.setVariant(variant);
+								player.setShoulderEntityRight(parrot);
+							}
 						}
 
 						for (Player player : mPrideLeft) {
 							Parrot parrot = (Parrot) player.getShoulderEntityLeft();
-							parrot.setVariant(variant);
-							player.setShoulderEntityLeft(parrot);
+							if (parrot != null) {
+								parrot.setVariant(variant);
+								player.setShoulderEntityLeft(parrot);
+							}
 						}
 
 					}
 				};
-				mRunnable.runTaskTimer(mPlugin, 0, FREQUENCY);
+				mPrideRunnable.runTaskTimer(mPlugin, 0, PRIDE_FREQUENCY);
 			}
 		}
 
 		if (shoulder == PlayerShoulder.LEFT) {
-			p.setShoulderEntityLeft(null);
 			ScoreboardUtils.setScoreboardValue(p, SCOREBOARD_PARROT_LEFT, variantNum);
-			p.setShoulderEntityLeft(pp.getParrot());
-		}
-		if (shoulder == PlayerShoulder.RIGHT) {
-			p.setShoulderEntityRight(null);
+			p.setShoulderEntityLeft(null);
+			p.setShoulderEntityLeft(pp.spawnParrot());
+		} else {
 			ScoreboardUtils.setScoreboardValue(p, SCOREBOARD_PARROT_RIGHT, variantNum);
-			p.setShoulderEntityRight(pp.getParrot());
+			p.setShoulderEntityRight(null);
+			p.setShoulderEntityRight(pp.spawnParrot());
 		}
 	}
 
@@ -276,8 +291,6 @@ public class ParrotManager implements Listener {
 	public static boolean hasParrotOnShoulders(Player player) {
 		return ScoreboardUtils.getScoreboardValue(player, SCOREBOARD_PARROT_LEFT).orElse(0) != 0 || ScoreboardUtils.getScoreboardValue(player, SCOREBOARD_PARROT_RIGHT).orElse(0) != 0;
 	}
-
-
 
 	public static void updateAllParrot(Player player) {
 		int parrotRight = ScoreboardUtils.getScoreboardValue(player, SCOREBOARD_PARROT_RIGHT).orElse(0);
@@ -330,8 +343,7 @@ public class ParrotManager implements Listener {
 	@EventHandler
 	public void onCFlight(PlayerToggleFlightEvent e) {
 		final Player player = e.getPlayer();
-		int visible = ScoreboardUtils.getScoreboardValue(player, SCOREBOARD_PARROT_VISIBLE).orElse(0);
-		if (visible != 0 && player.isFlying()) {
+		if (isParrotsVisible(player) && player.isFlying()) {
 			new BukkitRunnable() {
 				@Override
 				public void run() {
@@ -345,8 +357,7 @@ public class ParrotManager implements Listener {
 	public void onJoinBed(PlayerBedEnterEvent e) {
 		//we need to remove the parrots when someone go to the bed
 		final Player player = e.getPlayer();
-		int visible = ScoreboardUtils.getScoreboardValue(player, SCOREBOARD_PARROT_VISIBLE).orElse(0);
-		if (visible != 0) {
+		if (isParrotsVisible(player)) {
 			mPrideLeft.remove(player);
 			mPrideRight.remove(player);
 		}
@@ -356,8 +367,7 @@ public class ParrotManager implements Listener {
 	@EventHandler
 	public void onLeaveBed(PlayerBedLeaveEvent e) {
 		final Player player = e.getPlayer();
-		int visible = ScoreboardUtils.getScoreboardValue(player, SCOREBOARD_PARROT_VISIBLE).orElse(0);
-		if (visible != 0) {
+		if (isParrotsVisible(player)) {
 			new BukkitRunnable() {
 				@Override
 				public void run() {
@@ -374,42 +384,6 @@ public class ParrotManager implements Listener {
 		if (isParrotsVisible(player)) {
 			mPrideLeft.remove(player);
 			mPrideRight.remove(player);
-		}
-	}
-
-	//this two methods are for fixing a bug with optifine that doesn't show the skins
-	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-	public void onPlayerJoin(PlayerJoinEvent e) {
-		//this function is called each time a player change shard or connect to the server
-		final Player player = e.getPlayer();
-		new BukkitRunnable() {
-			public void run() {
-				updateAllIfVisible(player);
-			}
-		}.runTaskLater(mPlugin, 40L);
-	}
-
-	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-	public void onPlayerRespawn(PlayerRespawnEvent e) {
-		final Player player = e.getPlayer();
-		new BukkitRunnable() {
-			public void run() {
-				updateAllIfVisible(player);
-			}
-		}.runTaskLater(mPlugin, 20L);
-	}
-
-	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-	public void onGamemodeChange(PlayerGameModeChangeEvent e) {
-		final GameMode gameMode = e.getNewGameMode();
-		final Player player = e.getPlayer();
-		final GameMode oldGameMode = player.getGameMode();
-		if ((gameMode != GameMode.SPECTATOR && gameMode != GameMode.CREATIVE) && (oldGameMode.equals(GameMode.CREATIVE) || oldGameMode.equals(GameMode.SPECTATOR))) {
-			new BukkitRunnable() {
-				public void run() {
-					updateAllIfVisible(player);
-				}
-			}.runTaskLater(mPlugin, 20L);
 		}
 	}
 

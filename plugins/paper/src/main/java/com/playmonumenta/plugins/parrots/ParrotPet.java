@@ -1,48 +1,42 @@
 package com.playmonumenta.plugins.parrots;
 
-import com.playmonumenta.plugins.parrots.ParrotManager.ParrotVariant;
-
 import org.bukkit.entity.AnimalTamer;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Parrot;
 import org.bukkit.entity.Player;
 
+import com.playmonumenta.plugins.parrots.ParrotManager.ParrotVariant;
+
 public class ParrotPet {
 
 	private String mName;
-	private Parrot mParrot;
 	private Player mPlayer;
 	private Parrot.Variant mVariant;
 
-	public ParrotPet(ParrotVariant variant, Player p) {
-		this(variant, (Parrot)p.getWorld().spawnEntity(p.getLocation(), EntityType.PARROT), p);
-	}
-
-	public ParrotPet(ParrotVariant variant, Parrot spawnEntity, Player player) {
+	public ParrotPet(ParrotVariant variant, Player player) {
 		mName = variant.getName();
-		mParrot = spawnEntity;
 		mPlayer = player;
 		mVariant = variant.getVariant();
+	}
 
-		mParrot.addScoreboardTag(ParrotManager.PARROT_TAG);
-		mParrot.remove();
-		mParrot.setSilent(true);
-		mParrot.setCustomName(mName);
-		mParrot.setCustomNameVisible(false);
-		mParrot.setVariant(mVariant);
-		mParrot.setSitting(true);
-		mParrot.setOwner((AnimalTamer) mPlayer);
-		mParrot.setTamed(true);
-		mParrot.setAI(true);
-
+	public Parrot spawnParrot() {
+		Parrot parrot = (Parrot) mPlayer.getWorld().spawnEntity(mPlayer.getLocation().add(0, -256, 0), EntityType.PARROT);
+		parrot.addScoreboardTag(ParrotManager.PARROT_TAG);
+		parrot.setCustomName(mName);
+		parrot.setVariant(mVariant);
+		parrot.remove();
+		parrot.setSilent(true);
+		parrot.setCustomNameVisible(false);
+		parrot.setSitting(true);
+		parrot.setOwner((AnimalTamer) mPlayer);
+		parrot.setTamed(true);
+		parrot.setAI(true);
+		parrot.setInvisible(true);
+		return parrot;
 	}
 
 	public String getName() {
 		return mName;
-	}
-
-	public Parrot getParrot() {
-		return mParrot;
 	}
 
 	public Player getPlayer() {
@@ -51,9 +45,5 @@ public class ParrotPet {
 
 	public Parrot.Variant getVariant() {
 		return mVariant;
-	}
-
-	public void destroy() {
-		mParrot.remove();
 	}
 }
