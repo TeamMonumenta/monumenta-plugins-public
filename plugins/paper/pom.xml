@@ -155,7 +155,7 @@
         <dependency>
             <groupId>com.playmonumenta</groupId>
             <artifactId>monumenta-network-relay</artifactId>
-            <version>1.0</version>
+            <version>0.3</version>
             <scope>provided</scope>
         </dependency>
         <dependency>

@@ -14,20 +14,20 @@ public class CustomInventoryCommands {
 		//Once in the constructor for the GUI, it's much more difficult to properly
 		//reject the player.
 		new CommandAPICommand("openexamplecustominvgui")
-			.withPermission("monumenta.command.openexamplecustominvgui")
-			.withArguments(new EntitySelectorArgument("player", EntitySelector.ONE_PLAYER))
-			.executes((sender, args) -> {
-				Player player = (Player)args[0];
-				new ExampleCustomInventory(player).openInventory(player, plugin);
-			})
-			.register();
+		.withPermission("monumenta.command.openexamplecustominvgui")
+		.withArguments(new EntitySelectorArgument("player", EntitySelector.ONE_PLAYER))
+		.executes((sender, args) -> {
+			Player player = (Player)args[0];
+			new ExampleCustomInventory(player).openInventory(player, plugin);
+		})
+		.register();
 
 		new CommandAPICommand("openteleportergui")
 			.withPermission("monumenta.command.openteleportergui")
 			.withArguments(new EntitySelectorArgument("player", EntitySelector.ONE_PLAYER))
 			.executes((sender, args) -> {
 				Player player = (Player)args[0];
-				new OrinCustomInventory(player, -1).openInventory(player, plugin);
+				new OrinCustomInventory(player).openInventory(player, plugin);
 			})
 			.register();
 		new CommandAPICommand("openPEB")
