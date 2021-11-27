@@ -47,7 +47,7 @@ public class EffectManager implements Listener {
 		 * are tracked and ticked down by the over-arching runnable, meaning that after a stronger Effect wears off,
 		 * longer lasting weaker Effects are still active and will be applied.
 		 */
-		public final Map<EffectPriority, Map<String, NavigableSet<Effect>>> mPriorityMap = new EnumMap<EffectPriority, Map<String, NavigableSet<Effect>>>(EffectPriority.class);
+		public final Map<EffectPriority, HashMap<String, NavigableSet<Effect>>> mPriorityMap = new EnumMap<>(EffectPriority.class);
 		public final Entity mEntity;
 
 		public Effects(Entity entity) {
@@ -156,7 +156,7 @@ public class EffectManager implements Listener {
 		 */
 		public JsonObject getAsJsonObject() {
 			JsonObject ret = new JsonObject();
-			for (Map.Entry<EffectPriority, Map<String, NavigableSet<Effect>>> priorityEntries : mPriorityMap.entrySet()) {
+			for (Map.Entry<EffectPriority, HashMap<String, NavigableSet<Effect>>> priorityEntries : mPriorityMap.entrySet()) {
 				JsonObject mid = new JsonObject();
 				for (Map.Entry<String, NavigableSet<Effect>> effects : priorityEntries.getValue().entrySet()) {
 					JsonArray inner = new JsonArray();
@@ -177,6 +177,7 @@ public class EffectManager implements Listener {
 	private final BukkitRunnable mTimer;
 	private static EffectManager INSTANCE = null;
 
+	@SuppressWarnings("unchecked")
 	public EffectManager(Plugin plugin) {
 		INSTANCE = this;
 		/*
@@ -194,88 +195,94 @@ public class EffectManager implements Listener {
 				boolean oneHertz = mTicks % 20 == 0;
 
 				// Periodic trigger for Effects in case they need stuff like particles
-				for (Map.Entry<Entity, Effects> entry : mEntities.entrySet()) {
-					for (Map<String, NavigableSet<Effect>> priorityEffects : entry.getValue().mPriorityMap.values()) {
-						for (NavigableSet<Effect> effectGroup : priorityEffects.values()) {
-							try {
-								effectGroup.last().entityTickEffect(entry.getKey(), fourHertz, twoHertz, oneHertz);
-							} catch (Exception ex) {
-								Plugin.getInstance().getLogger().severe("Error in effect manager entityTickEffect: " + ex.getMessage());
-								ex.printStackTrace();
+				try {
+					for (Map.Entry<Entity, Effects> entry : mEntities.entrySet()) {
+						for (HashMap<String, NavigableSet<Effect>> priorityEffects : entry.getValue().mPriorityMap.values()) {
+							// Have to make a copy of the map to prevent concurrent modification exceptions in case ticking changes the effects :(
+							for (NavigableSet<Effect> effectGroup : ((HashMap<String, NavigableSet<Effect>>)priorityEffects.clone()).values()) {
+								try {
+									effectGroup.last().entityTickEffect(entry.getKey(), fourHertz, twoHertz, oneHertz);
+								} catch (Exception ex) {
+									Plugin.getInstance().getLogger().severe("Error in effect manager entityTickEffect: " + ex.getMessage());
+									ex.printStackTrace();
+								}
 							}
 						}
 					}
-				}
 
-				// Count down the durations of all Effects, and remove expired Effects and empty sets
-				Iterator<Effects> entityIter = mEntities.values().iterator();
-				while (entityIter.hasNext()) {
-					Effects effects = entityIter.next();
-					Entity entity = effects.mEntity;
-					if (entity.isDead() || !entity.isValid()) {
-						if (!(entity instanceof Player) || ((Player) entity).isOnline()) {
-							entityIter.remove();
-							continue;
-						}
-					}
-
-					Iterator<Map<String, NavigableSet<Effect>>> effectsIter = effects.mPriorityMap.values().iterator();
-					while (effectsIter.hasNext()) {
-						Iterator<NavigableSet<Effect>> priorityEffectsIter = effectsIter.next().values().iterator();
-						while (priorityEffectsIter.hasNext()) {
-							NavigableSet<Effect> effectGroup = priorityEffectsIter.next();
-							if (effectGroup.isEmpty()) {
-								priorityEffectsIter.remove();
+					// Count down the durations of all Effects, and remove expired Effects and empty sets
+					Iterator<Effects> entityIter = mEntities.values().iterator();
+					while (entityIter.hasNext()) {
+						Effects effects = entityIter.next();
+						Entity entity = effects.mEntity;
+						if (entity.isDead() || !entity.isValid()) {
+							if (!(entity instanceof Player) || ((Player) entity).isOnline()) {
+								entityIter.remove();
 								continue;
 							}
+						}
 
-							boolean currentEffectRemoved = false;
-							Effect currentEffect = effectGroup.last();
-							Iterator<Effect> effectGroupIter = effectGroup.descendingIterator();
-							while (effectGroupIter.hasNext()) {
-								Effect effect = effectGroupIter.next();
-
-								if (currentEffectRemoved) {
-									try {
-										effect.entityGainEffect(entity);
-									} catch (Exception ex) {
-										Plugin.getInstance().getLogger().severe("Error in effect manager entityGainEffect: " + ex.getMessage());
-										ex.printStackTrace();
-									}
-									currentEffectRemoved = false;
+						Iterator<HashMap<String, NavigableSet<Effect>>> effectsIter = effects.mPriorityMap.values().iterator();
+						while (effectsIter.hasNext()) {
+							Iterator<NavigableSet<Effect>> priorityEffectsIter = effectsIter.next().values().iterator();
+							while (priorityEffectsIter.hasNext()) {
+								NavigableSet<Effect> effectGroup = priorityEffectsIter.next();
+								if (effectGroup.isEmpty()) {
+									priorityEffectsIter.remove();
+									continue;
 								}
 
-								boolean tickResult;
-								try {
-									tickResult = effect.tick(PERIOD);
-								} catch (Exception ex) {
-									Plugin.getInstance().getLogger().severe("Error in effect manager tick: " + ex.getMessage());
-									ex.printStackTrace();
-									/* If ticking throws an exception (i.e. NPE) remove it */
-									tickResult = false;
-								}
-								if (tickResult) {
-									if (effect == currentEffect) {
+								boolean currentEffectRemoved = false;
+								Effect currentEffect = effectGroup.last();
+								Iterator<Effect> effectGroupIter = effectGroup.descendingIterator();
+								while (effectGroupIter.hasNext()) {
+									Effect effect = effectGroupIter.next();
+
+									if (currentEffectRemoved) {
 										try {
-											effect.entityLoseEffect(entity);
+											effect.entityGainEffect(entity);
 										} catch (Exception ex) {
-											Plugin.getInstance().getLogger().severe("Error in effect manager entityLoseEffect: " + ex.getMessage());
+											Plugin.getInstance().getLogger().severe("Error in effect manager entityGainEffect: " + ex.getMessage());
 											ex.printStackTrace();
 										}
-										currentEffectRemoved = true;
+										currentEffectRemoved = false;
 									}
 
-									effectGroupIter.remove();
+									boolean tickResult;
+									try {
+										tickResult = effect.tick(PERIOD);
+									} catch (Exception ex) {
+										Plugin.getInstance().getLogger().severe("Error in effect manager tick: " + ex.getMessage());
+										ex.printStackTrace();
+										/* If ticking throws an exception (i.e. NPE) remove it */
+										tickResult = false;
+									}
+									if (tickResult) {
+										if (effect == currentEffect) {
+											try {
+												effect.entityLoseEffect(entity);
+											} catch (Exception ex) {
+												Plugin.getInstance().getLogger().severe("Error in effect manager entityLoseEffect: " + ex.getMessage());
+												ex.printStackTrace();
+											}
+											currentEffectRemoved = true;
+										}
 
-									if (!effectGroup.isEmpty()) {
-										currentEffect = effectGroup.last();
-									} else {
-										priorityEffectsIter.remove();
+										effectGroupIter.remove();
+
+										if (!effectGroup.isEmpty()) {
+											currentEffect = effectGroup.last();
+										} else {
+											priorityEffectsIter.remove();
+										}
 									}
 								}
 							}
 						}
 					}
+				} catch (Exception ex) {
+					Plugin.getInstance().getLogger().severe("SEVERE error in effect manager ticking task that caused many pieces to be skipped: " + ex.getMessage());
+					ex.printStackTrace();
 				}
 			}
 		};
