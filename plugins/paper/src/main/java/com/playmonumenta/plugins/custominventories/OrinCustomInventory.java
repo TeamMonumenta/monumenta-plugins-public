@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.custominventories;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
@@ -268,6 +269,7 @@ public class OrinCustomInventory extends CustomInventory {
 			} else {
 				String finalCommand = cmd.replace("@S", player.getName());
 				Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), finalCommand);
+				player.closeInventory();
 			}
 		}
 	}
@@ -347,7 +349,9 @@ public class OrinCustomInventory extends CustomInventory {
 		results.removeIf(item -> !item.startsWith(searchTerm));
 		int page = (searchTerm.equals("valley")) ? 11 : 12;
 		Material itemType = (searchTerm.equals("valley")) ? Material.GRASS : Material.PUFFERFISH;
-		for (String shard : results) {
+		ArrayList<String> resultList = new ArrayList<>(results);
+		Collections.sort(resultList);
+		for (String shard : resultList) {
 			String shardName = shard.substring(0, 1).toUpperCase() + shard.substring(1, shard.length());
 			if (index <= INSTANCE_LOCATIONS.length) {
 				INSTANCE_ITEMS.add(new TeleportEntry(page, INSTANCE_LOCATIONS[index++], shardName, "Click to teleport!", itemType, null, 0, "transferserver " + shard));

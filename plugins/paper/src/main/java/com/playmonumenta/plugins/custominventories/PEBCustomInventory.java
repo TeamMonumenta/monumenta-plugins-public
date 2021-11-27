@@ -63,7 +63,7 @@ public class PEBCustomInventory extends CustomInventory {
 		PEB_ITEMS.add(new PebItem(0, 8, "Exit PEB", "Exits this menu.", ChatColor.GOLD, Material.RED_CONCRETE, "exit", false));
 		PEB_ITEMS.add(new PebItem(0, 45, "Delete P.E.B.s ✗",
 				"Click to remove P.E.B.s from your inventory.", ChatColor.LIGHT_PURPLE,
-				Material.FLINT_AND_STEEL, "clickable peb_delete", false));
+				Material.FLINT_AND_STEEL, "clickable peb_delete", true));
 
 		//page 1: main menu
 		PEB_ITEMS.add(new PebItem(1, 0, "", "", ChatColor.LIGHT_PURPLE, FILLER, "", false));
