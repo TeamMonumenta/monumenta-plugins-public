@@ -90,8 +90,8 @@ public class AdvancingShadows extends Ability {
 		mInfo.mShorthandName = "AS";
 		mInfo.mCooldown = ADVANCING_SHADOWS_COOLDOWN;
 		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
-		mInfo.mDescriptions.add("While holding two swords and not sneaking, right click to teleport to the target hostile enemy within " + ADVANCING_SHADOWS_RANGE_1 + " blocks and gain strength 2 for 5 seconds. Cooldown: 20s.");
-		mInfo.mDescriptions.add("Teleport range is increased to " + ADVANCING_SHADOWS_RANGE_2 + " blocks and all hostile non-target mobs within " + ADVANCING_SHADOWS_AOE_KNOCKBACKS_RANGE + " blocks are knocked away from the target.");
+		mInfo.mDescriptions.add("While holding two swords and not sneaking, right click to teleport to the target hostile enemy within " + (ADVANCING_SHADOWS_RANGE_1 - 1) + " blocks and gain strength 2 for 5 seconds. Cooldown: 20s.");
+		mInfo.mDescriptions.add("Teleport range is increased to " + (ADVANCING_SHADOWS_RANGE_2 - 1) + " blocks and all hostile non-target mobs within " + ADVANCING_SHADOWS_AOE_KNOCKBACKS_RANGE + " blocks are knocked away from the target.");
 		mDisplayItem = new ItemStack(Material.ENDER_EYE, 1);
 		Bukkit.getScheduler().runTask(plugin, () -> {
 			if (player != null) {
