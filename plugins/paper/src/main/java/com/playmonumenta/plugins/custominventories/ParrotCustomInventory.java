@@ -138,7 +138,7 @@ public class ParrotCustomInventory extends CustomInventory {
 		metaJunkSpecial.displayName(Component.empty());
 		junkSpecial.setItemMeta(metaJunkSpecial);
 
-		ItemUtils.setPlainName(junkIsles, "ParrotGUIOverlay99");
+		ItemUtils.setPlainName(junkSpecial, "ParrotGUIOverlay99");
 		BORDER_TOPLEFT_MAP.put(ParrotGUIPage.SPECIAL, junkSpecial);
 	}
 
