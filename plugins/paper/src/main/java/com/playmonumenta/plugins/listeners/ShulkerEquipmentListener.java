@@ -2,7 +2,6 @@ package com.playmonumenta.plugins.listeners;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.NavigableSet;
 import java.util.TreeMap;
 import java.util.UUID;
 
@@ -30,8 +29,6 @@ import org.bukkit.inventory.meta.BlockStateMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.effects.Effect;
-import com.playmonumenta.plugins.effects.Stasis;
 import com.playmonumenta.plugins.enchantments.Locked;
 import com.playmonumenta.plugins.enchantments.curses.CurseOfEphemerality;
 import com.playmonumenta.plugins.overrides.FirmamentOverride;
@@ -71,11 +68,6 @@ public class ShulkerEquipmentListener implements Listener {
 
 	@EventHandler(priority = EventPriority.HIGHEST)
 	public void inventoryClickEvent(InventoryClickEvent event) {
-		String s = "Stasis";
-		NavigableSet<Effect> activeEffects = mPlugin.mEffectManager.getEffects(event.getWhoClicked(), s);
-		if (activeEffects != null && activeEffects.contains(new Stasis(120))) {
-			event.setCancelled(true);
-		}
 		if (
 		    // Must not be cancelled
 		    event.isCancelled() ||
