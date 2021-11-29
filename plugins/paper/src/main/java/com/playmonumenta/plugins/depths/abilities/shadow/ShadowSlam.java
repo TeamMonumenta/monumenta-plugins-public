@@ -116,8 +116,9 @@ public class ShadowSlam extends DepthsAbility {
 		}
 
 		World world = mPlayer.getWorld();
-		world.playSound(location, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.PLAYERS, 1.3F, 0);
-		world.playSound(location, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.PLAYERS, 2, 1.25F);
+		float volumeScale = (float) Math.min(0.1 + fallDistance / 16 * 0.9, 1);
+		world.playSound(location, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.PLAYERS, volumeScale * 1.3F, 0);
+		world.playSound(location, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.PLAYERS, volumeScale * 2, 1.25F);
 		world.spawnParticle(Particle.SPELL_WITCH, location, 60, 0F, 0F, 0F, 0.2F);
 		world.spawnParticle(Particle.EXPLOSION_NORMAL, location, 20, 0F, 0F, 0F, 0.3F);
 		world.spawnParticle(Particle.CAMPFIRE_COSY_SMOKE, location, 3 * SIZE * SIZE, SIZE, 0.25f, SIZE, 0);
