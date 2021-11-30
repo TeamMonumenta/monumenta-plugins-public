@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.depths.abilities.shadow;
 
+import java.util.EnumSet;
 import java.util.List;
 
 import org.bukkit.Location;
@@ -10,6 +11,7 @@ import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import org.bukkit.util.Vector;
 
@@ -129,7 +131,7 @@ public class DepthsAdvancingShadows extends DepthsAbility {
 			}
 			playerLoc = mPlayer.getLocation();
 
-			EffectManager.getInstance().addEffect(mPlayer, ABILITY_NAME, new FlatDamageDealt(DAMAGE_DURATION, DAMAGE[mRarity - 1]));
+			EffectManager.getInstance().addEffect(mPlayer, ABILITY_NAME, new FlatDamageDealt(DAMAGE_DURATION, DAMAGE[mRarity - 1], EnumSet.of(DamageCause.ENTITY_ATTACK)));
 			float range = ADVANCING_SHADOWS_AOE_KNOCKBACKS_RANGE;
 			float speed = ADVANCING_SHADOWS_AOE_KNOCKBACKS_SPEED;
 			if (advancingShadows > 1) {
