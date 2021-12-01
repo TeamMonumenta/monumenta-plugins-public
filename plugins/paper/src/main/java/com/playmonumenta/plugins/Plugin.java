@@ -69,8 +69,8 @@ import com.playmonumenta.plugins.commands.TeleportByScore;
 import com.playmonumenta.plugins.commands.ToggleSwap;
 import com.playmonumenta.plugins.commands.UnlockHeldItem;
 import com.playmonumenta.plugins.commands.UnsignBook;
-import com.playmonumenta.plugins.commands.UpdateHeldItem;
 import com.playmonumenta.plugins.commands.UpTimeCommand;
+import com.playmonumenta.plugins.commands.UpdateHeldItem;
 import com.playmonumenta.plugins.custominventories.CustomInventoryCommands;
 import com.playmonumenta.plugins.depths.DepthsCommand;
 import com.playmonumenta.plugins.depths.DepthsGUICommands;
@@ -118,6 +118,7 @@ import com.playmonumenta.plugins.listeners.ShatteredEquipmentListener;
 import com.playmonumenta.plugins.listeners.ShulkerEquipmentListener;
 import com.playmonumenta.plugins.listeners.ShulkerShortcutListener;
 import com.playmonumenta.plugins.listeners.SpawnerListener;
+import com.playmonumenta.plugins.listeners.TradeListener;
 import com.playmonumenta.plugins.listeners.TridentListener;
 import com.playmonumenta.plugins.listeners.VehicleListener;
 import com.playmonumenta.plugins.listeners.WorldListener;
@@ -359,6 +360,7 @@ public class Plugin extends JavaPlugin {
 		manager.registerEvents(new GraveListener(this), this);
 		manager.registerEvents(new BrewingListener(), this);
 		manager.registerEvents(new ItemUpdateManager(this), this);
+		manager.registerEvents(new TradeListener(), this);
 
 		if (ServerProperties.getShardName().contains("depths")
 				|| ServerProperties.getShardName().equals("mobs")

@@ -81,7 +81,7 @@ public class InfusionUtils {
 		//Calculate refund amount
 		// First level is free and we calculate based on the level below current.
 		int infuseLevel = getInfuseLevel(item) - 2;
-		int costMult = getCostMultiplier(item);
+		int costMult = getCostMultiplierWithCheck(item);
 		while (infuseLevel >= 0) {
 			refundMaterials += (costMult * Math.pow(2, infuseLevel));
 			infuseLevel--;
@@ -223,7 +223,7 @@ public class InfusionUtils {
 	public static int calcInfuseCost(ItemStack item) throws WrapperCommandSyntaxException {
 		// First level is free
 		int infuseLvl = getInfuseLevel(item) - 1;
-		int cost = getCostMultiplier(item);
+		int cost = getCostMultiplierWithCheck(item);
 		// Special case for first level
 		if (infuseLvl == -1) {
 			cost = 0;
@@ -238,11 +238,23 @@ public class InfusionUtils {
 
 	public static int getInfuseLevel(ItemStack item) {
 		return InventoryUtils.getCustomEnchantLevel(item, Acumen.PROPERTY_NAME, true) + InventoryUtils.getCustomEnchantLevel(item, Focus.PROPERTY_NAME, true)
-		+ InventoryUtils.getCustomEnchantLevel(item, Perspicacity.PROPERTY_NAME, true) + InventoryUtils.getCustomEnchantLevel(item, Tenacity.PROPERTY_NAME, true)
-		+ InventoryUtils.getCustomEnchantLevel(item, Vigor.PROPERTY_NAME, true) + InventoryUtils.getCustomEnchantLevel(item, Vitality.PROPERTY_NAME, true);
+			+ InventoryUtils.getCustomEnchantLevel(item, Perspicacity.PROPERTY_NAME, true) + InventoryUtils.getCustomEnchantLevel(item, Tenacity.PROPERTY_NAME, true)
+			+ InventoryUtils.getCustomEnchantLevel(item, Vigor.PROPERTY_NAME, true) + InventoryUtils.getCustomEnchantLevel(item, Vitality.PROPERTY_NAME, true);
 	}
 
-	private static int getCostMultiplier(ItemStack item) throws WrapperCommandSyntaxException {
+	private static int getCostMultiplierWithCheck(ItemStack item) throws WrapperCommandSyntaxException {
+		int mult = getCostMultiplier(item);
+		if (mult < 0) {
+			CommandAPI.fail("Invalid item tier. Only Uncommon and higher tiered items are able to be infused!");
+			return 99999999;
+		}
+		return mult;
+	}
+
+	/**
+	 * Gets the infusion cost multiplier for the given item, or -1 if the item is not of a tier that can be infused.
+	 */
+	public static int getCostMultiplier(ItemStack item) {
 		switch (ItemUtils.getItemTier(item)) {
 			case MEME:
 			case UNCOMMON:
@@ -259,13 +271,12 @@ public class InfusionUtils {
 			case EPIC:
 				return 6;
 			default:
-				CommandAPI.fail("Invalid item tier. Only Uncommon and higher tiered items are able to be infused!");
-				return 99999999;
+				return -1;
 		}
 	}
 
 	private static int getExpInfuseCost(ItemStack item) throws WrapperCommandSyntaxException {
-		int costMult = getCostMultiplier(item);
+		int costMult = getCostMultiplierWithCheck(item);
 		int level = getInfuseLevel(item);
 		switch (costMult) {
 			case 2:

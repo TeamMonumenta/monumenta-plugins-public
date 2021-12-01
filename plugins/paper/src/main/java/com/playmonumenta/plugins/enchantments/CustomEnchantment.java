@@ -1,7 +1,6 @@
 package com.playmonumenta.plugins.enchantments;
 
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import com.playmonumenta.plugins.enchantments.cosmetic.Baaing;
 import com.playmonumenta.plugins.enchantments.cosmetic.Barking;
@@ -164,7 +163,7 @@ public enum CustomEnchantment {
 		mEnchantment = enchantment;
 	}
 
-	public @Nullable BaseEnchantment getEnchantment() {
+	public @NotNull BaseEnchantment getEnchantment() {
 		return mEnchantment;
 	}
 }

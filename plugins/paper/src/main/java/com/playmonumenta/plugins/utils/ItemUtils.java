@@ -1439,4 +1439,15 @@ public class ItemUtils {
 	public static boolean isInteresting(ItemStack item) {
 		return ServerProperties.getAlwaysPickupMats().contains(item.getType()) || hasLore(item) || (item.hasItemMeta() && item.getItemMeta().hasDisplayName() && ServerProperties.getNamedPickupMats().contains(item.getType()));
 	}
+
+	/**
+	 * Properly clones an item stack. The default clone method does not clone NBT, which can lead to issues.
+	 *
+	 * @param itemStack The item stack to be cloned
+	 * @return A completely new item stack that is a clone of the original item stack
+	 */
+	public static ItemStack clone(ItemStack itemStack) {
+		return NBTItem.convertNBTtoItem(NBTItem.convertItemtoNBT(itemStack));
+	}
+
 }
