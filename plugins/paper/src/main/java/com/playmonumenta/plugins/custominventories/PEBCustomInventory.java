@@ -234,38 +234,41 @@ public class PEBCustomInventory extends CustomInventory {
 		PEB_ITEMS.add(new PebItem(20, 4, "Pickup and Disable Drop Settings",
 				"Choose the appropriate level of pickup filter and drop filter below.", ChatColor.LIGHT_PURPLE,
 				Material.PRISMARINE_CRYSTALS, "", false));
-		PEB_ITEMS.add(new PebItem(20, 19, "Disable Drop:",
+		PEB_ITEMS.add(new PebItem(20, 11, "Disable Drop:",
 				"", ChatColor.LIGHT_PURPLE,
 				Material.BLACK_CONCRETE, "", false));
-		PEB_ITEMS.add(new PebItem(20, 20, "None",
+		PEB_ITEMS.add(new PebItem(20, 19, "None",
 				"Disable no drops, the vanilla drop behavior.", ChatColor.LIGHT_PURPLE,
 				Material.BARRIER, "disabledrop none", false));
-		PEB_ITEMS.add(new PebItem(20, 21, "Holding",
+		PEB_ITEMS.add(new PebItem(20, 20, "Holding",
 				"Disable dropping of only held items.", ChatColor.LIGHT_PURPLE,
 				Material.WOODEN_PICKAXE, "disabledrop holding", false));
-		PEB_ITEMS.add(new PebItem(20, 22, "Tiered",
+		PEB_ITEMS.add(new PebItem(20, 21, "Equipped",
+				"Disable dropping of only equipped items.", ChatColor.LIGHT_PURPLE,
+				Material.LEATHER_HELMET, "disabledrop equipped", false));
+		PEB_ITEMS.add(new PebItem(20, 28, "Tiered",
 				"Disable dropping of tiered items.", ChatColor.LIGHT_PURPLE,
 				Material.OAK_STAIRS, "disabledrop tiered", false));
-		PEB_ITEMS.add(new PebItem(20, 23, "Lore",
+		PEB_ITEMS.add(new PebItem(20, 29, "Lore",
 				"Disable the drop of items with custom lore.", ChatColor.LIGHT_PURPLE,
 				Material.LECTERN, "disabledrop lore", false));
-		PEB_ITEMS.add(new PebItem(20, 24, "Interesting",
+		PEB_ITEMS.add(new PebItem(20, 30, "Interesting",
 				"Disable the dropping of anything that matches the default pickup filter of interesting items.", ChatColor.LIGHT_PURPLE,
 				Material.GOLD_NUGGET, "disabledrop interesting", false));
-		PEB_ITEMS.add(new PebItem(20, 25, "All",
+		PEB_ITEMS.add(new PebItem(20, 38, "All",
 				"Disable all drops.", ChatColor.LIGHT_PURPLE,
 				Material.DIRT, "disabledrop all", false));
 
-		PEB_ITEMS.add(new PebItem(20, 37, "Pickup Filter:",
+		PEB_ITEMS.add(new PebItem(20, 15, "Pickup Filter:",
 				"", ChatColor.LIGHT_PURPLE,
 				Material.WHITE_CONCRETE, "", false));
-		PEB_ITEMS.add(new PebItem(20, 40, "Lore",
+		PEB_ITEMS.add(new PebItem(20, 23, "Lore",
 				"Only pick up items that have custom lore.", ChatColor.LIGHT_PURPLE,
 				Material.LECTERN, "pickup lore", false));
-		PEB_ITEMS.add(new PebItem(20, 41, "Interesting",
+		PEB_ITEMS.add(new PebItem(20, 25, "Interesting",
 				"Only pick up items are of interest for the adventuring player, like arrows, torches, and anything with custom lore.", ChatColor.LIGHT_PURPLE,
 				Material.GOLD_NUGGET, "pickup interesting", false));
-		PEB_ITEMS.add(new PebItem(20, 42, "All",
+		PEB_ITEMS.add(new PebItem(20, 41, "All",
 				"Pick up anything and everything, matching vanilla functionality.", ChatColor.LIGHT_PURPLE,
 				Material.DIRT, "pickup all", false));
 		PEB_ITEMS.add(new PebItem(20, 43, "Threshold",

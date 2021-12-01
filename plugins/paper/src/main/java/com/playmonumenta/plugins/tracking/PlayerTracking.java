@@ -21,6 +21,7 @@ import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityRegainHealthEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
+import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerExpChangeEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
@@ -33,7 +34,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.enchantments.BaseEnchantment;
 import com.playmonumenta.plugins.events.CustomDamageEvent;
 import com.playmonumenta.plugins.events.EvasionEvent;
-import com.playmonumenta.plugins.player.PlayerInventory;
+import com.playmonumenta.plugins.player.PlayerInventoryManager;
 import com.playmonumenta.plugins.point.Point;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
@@ -46,7 +47,7 @@ public class PlayerTracking implements EntityTracking {
 	private static PlayerTracking INSTANCE = null;
 
 	Plugin mPlugin = null;
-	private HashMap<Player, PlayerInventory> mPlayers = new HashMap<Player, PlayerInventory>();
+	private HashMap<Player, PlayerInventoryManager> mPlayers = new HashMap<Player, PlayerInventoryManager>();
 
 	PlayerTracking(Plugin plugin) {
 		mPlugin = plugin;
@@ -74,7 +75,7 @@ public class PlayerTracking implements EntityTracking {
 		}
 
 		// Load the players inventory / custom enchantments and apply them
-		mPlayers.put(player, new PlayerInventory(mPlugin, player));
+		mPlayers.put(player, new PlayerInventoryManager(mPlugin, player));
 	}
 
 	@Override
@@ -89,7 +90,7 @@ public class PlayerTracking implements EntityTracking {
 	}
 
 	public JsonObject getAsJsonObject(Player player) {
-		PlayerInventory manager = mPlayers.get(player);
+		PlayerInventoryManager manager = mPlayers.get(player);
 		if (manager != null) {
 			return manager.getAsJsonObject();
 		}
@@ -97,7 +98,7 @@ public class PlayerTracking implements EntityTracking {
 	}
 
 	public int getPlayerCustomEnchantLevel(Player player, Class<? extends BaseEnchantment> cls) {
-		PlayerInventory manager = mPlayers.get(player);
+		PlayerInventoryManager manager = mPlayers.get(player);
 		if (manager != null) {
 			return manager.getEnchantmentLevel(mPlugin, cls);
 		}
@@ -105,112 +106,112 @@ public class PlayerTracking implements EntityTracking {
 	}
 
 	public void updateEquipmentProperties(Player player, Event event) {
-		PlayerInventory manager = mPlayers.get(player);
+		PlayerInventoryManager manager = mPlayers.get(player);
 		if (manager != null) {
 			manager.updateEquipmentProperties(mPlugin, player, event);
 		}
 	}
 
 	public void updateItemSlotProperties(Player player, int slot) {
-		PlayerInventory manager = mPlayers.get(player);
+		PlayerInventoryManager manager = mPlayers.get(player);
 		if (manager != null) {
 			manager.updateItemSlotProperties(mPlugin, player, slot);
 		}
 	}
 
 	public void onKill(Plugin plugin, Player player, Entity target, EntityDeathEvent event) {
-		PlayerInventory manager = mPlayers.get(player);
+		PlayerInventoryManager manager = mPlayers.get(player);
 		if (manager != null) {
 			manager.onKill(plugin, player, target, event);
 		}
 	}
 
 	public void onAttack(Plugin plugin, Player player, LivingEntity target, EntityDamageByEntityEvent event) {
-		PlayerInventory manager = mPlayers.get(player);
+		PlayerInventoryManager manager = mPlayers.get(player);
 		if (manager != null) {
 			manager.onAttack(plugin, player, target, event);
 		}
 	}
 
 	public void onDamage(Plugin plugin, Player player, LivingEntity target, EntityDamageByEntityEvent event) {
-		PlayerInventory manager = mPlayers.get(player);
+		PlayerInventoryManager manager = mPlayers.get(player);
 		if (manager != null) {
 			manager.onDamage(plugin, player, target, event);
 		}
 	}
 
 	public void onAbility(Plugin plugin, Player player, LivingEntity target, CustomDamageEvent event) {
-		PlayerInventory manager = mPlayers.get(player);
+		PlayerInventoryManager manager = mPlayers.get(player);
 		if (manager != null) {
 			manager.onAbility(plugin, player, target, event);
 		}
 	}
 
 	public void onLaunchProjectile(Plugin plugin, Player player, Projectile proj, ProjectileLaunchEvent event) {
-		PlayerInventory manager = mPlayers.get(player);
+		PlayerInventoryManager manager = mPlayers.get(player);
 		if (manager != null) {
 			manager.onLaunchProjectile(plugin, player, proj, event);
 		}
 	}
 
 	public void onBlockBreak(Plugin plugin, Player player, BlockBreakEvent event, ItemStack item) {
-		PlayerInventory manager = mPlayers.get(player);
+		PlayerInventoryManager manager = mPlayers.get(player);
 		if (manager != null) {
 			manager.onBlockBreak(plugin, player, event, item);
 		}
 	}
 
 	public void onPlayerInteract(Plugin plugin, Player player, PlayerInteractEvent event) {
-		PlayerInventory manager = mPlayers.get(player);
+		PlayerInventoryManager manager = mPlayers.get(player);
 		if (manager != null) {
 			manager.onPlayerInteract(plugin, player, event);
 		}
 	}
 
 	public void onDeath(Plugin plugin, Player player, PlayerDeathEvent event) {
-		PlayerInventory manager = mPlayers.get(player);
+		PlayerInventoryManager manager = mPlayers.get(player);
 		if (manager != null) {
 			manager.onDeath(plugin, player, event);
 		}
 	}
 
 	public void onExpChange(Plugin plugin, Player player, PlayerExpChangeEvent event) {
-		PlayerInventory manager = mPlayers.get(player);
+		PlayerInventoryManager manager = mPlayers.get(player);
 		if (manager != null) {
 			manager.onExpChange(plugin, player, event);
 		}
 	}
 
 	public void onHurt(Plugin plugin, Player player, EntityDamageEvent event) {
-		PlayerInventory manager = mPlayers.get(player);
+		PlayerInventoryManager manager = mPlayers.get(player);
 		if (manager != null) {
 			manager.onHurt(plugin, player, event);
 		}
 	}
 
 	public void onHurtByEntity(Plugin plugin, Player player, EntityDamageByEntityEvent event) {
-		PlayerInventory manager = mPlayers.get(player);
+		PlayerInventoryManager manager = mPlayers.get(player);
 		if (manager != null) {
 			manager.onHurtByEntity(plugin, player, event);
 		}
 	}
 
 	public void onFatalHurt(Plugin plugin, Player player, EntityDamageEvent event) {
-		PlayerInventory manager = mPlayers.get(player);
+		PlayerInventoryManager manager = mPlayers.get(player);
 		if (manager != null) {
 			manager.onFatalHurt(plugin, player, event);
 		}
 	}
 
 	public void onEvade(Plugin plugin, Player player, EvasionEvent event) {
-		PlayerInventory manager = mPlayers.get(player);
+		PlayerInventoryManager manager = mPlayers.get(player);
 		if (manager != null) {
 			manager.onEvade(plugin, player, event);
 		}
 	}
 
 	public void onConsume(Plugin plugin, Player player, PlayerItemConsumeEvent event) {
-		PlayerInventory manager = mPlayers.get(player);
+		PlayerInventoryManager manager = mPlayers.get(player);
 		if (manager != null) {
 
 			manager.onConsume(plugin, player, event);
@@ -218,7 +219,7 @@ public class PlayerTracking implements EntityTracking {
 	}
 
 	public void onItemDamage(Plugin plugin, Player player, PlayerItemDamageEvent event) {
-		PlayerInventory manager = mPlayers.get(player);
+		PlayerInventoryManager manager = mPlayers.get(player);
 		if (manager != null) {
 
 			manager.onItemDamage(plugin, player, event);
@@ -226,7 +227,7 @@ public class PlayerTracking implements EntityTracking {
 	}
 
 	public void onRegain(Plugin plugin, Player player, EntityRegainHealthEvent event) {
-		PlayerInventory manager = mPlayers.get(player);
+		PlayerInventoryManager manager = mPlayers.get(player);
 		if (manager != null) {
 			manager.onRegain(plugin, player, event);
 		}
@@ -234,11 +235,11 @@ public class PlayerTracking implements EntityTracking {
 
 	@Override
 	public void update(int ticks) {
-		Iterator<Entry<Player, PlayerInventory>> playerIter = mPlayers.entrySet().iterator();
+		Iterator<Entry<Player, PlayerInventoryManager>> playerIter = mPlayers.entrySet().iterator();
 		while (playerIter.hasNext()) {
-			Entry<Player, PlayerInventory> entry = playerIter.next();
+			Entry<Player, PlayerInventoryManager> entry = playerIter.next();
 			Player player = entry.getKey();
-			PlayerInventory inventory = entry.getValue();
+			PlayerInventoryManager inventory = entry.getValue();
 
 			GameMode mode = player.getGameMode();
 
@@ -302,11 +303,29 @@ public class PlayerTracking implements EntityTracking {
 		}
 	}
 
+	public boolean hasSlotChanged(Player player, int slot) {
+		PlayerInventoryManager manager = mPlayers.get(player);
+		if (manager == null) {
+			return false;
+		}
+		return manager.hasSlotChanged(player, slot);
+	}
+
+	// Returns the first similar slot's number where there is a difference in item count, or -1 if not found
+	public int getDroppedSlotId(PlayerDropItemEvent event) {
+		Player player = event.getPlayer();
+		PlayerInventoryManager manager = mPlayers.get(player);
+		if (manager == null) {
+			return -1;
+		}
+		return manager.getDroppedSlotId(event);
+	}
+
 	@Override
 	public void unloadTrackedEntities() {
-		Iterator<Entry<Player, PlayerInventory>> iter = mPlayers.entrySet().iterator();
+		Iterator<Entry<Player, PlayerInventoryManager>> iter = mPlayers.entrySet().iterator();
 		while (iter.hasNext()) {
-			Entry<Player, PlayerInventory> entry = iter.next();
+			Entry<Player, PlayerInventoryManager> entry = iter.next();
 			Player player = entry.getKey();
 			entry.getValue().removeProperties(mPlugin, player);
 		}

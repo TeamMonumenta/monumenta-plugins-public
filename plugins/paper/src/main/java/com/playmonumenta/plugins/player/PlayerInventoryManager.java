@@ -44,6 +44,7 @@ import com.playmonumenta.plugins.enchantments.BaseEnchantment;
 import com.playmonumenta.plugins.enchantments.CustomEnchantment;
 import com.playmonumenta.plugins.events.CustomDamageEvent;
 import com.playmonumenta.plugins.events.EvasionEvent;
+import com.playmonumenta.plugins.integrations.PremiumVanishIntegration;
 import com.playmonumenta.plugins.listeners.ShulkerEquipmentListener;
 import com.playmonumenta.plugins.utils.AbsorptionUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -51,7 +52,7 @@ import com.playmonumenta.plugins.utils.InventoryUtils;
 
 import net.kyori.adventure.text.Component;
 
-public class PlayerInventory {
+public class PlayerInventoryManager {
 	/*
 	 * This list contains all of a player's currently valid item properties,
 	 * including ones that are on duplicate specialized lists below
@@ -63,6 +64,7 @@ public class PlayerInventory {
 	 * Needs to be ordered so that trigger orders are correct
 	 */
 
+	@NotNull private ItemStack[] mInventoryLastCheck = new ItemStack[41];
 	private Map<Integer, Map<BaseEnchantment, Integer>> mInventoryProperties = new LinkedHashMap<>();
 	private Map<BaseEnchantment, Integer> mCurrentProperties = new LinkedHashMap<>();
 	private Map<BaseEnchantment, Integer> mPreviousProperties = new LinkedHashMap<>();
@@ -70,14 +72,13 @@ public class PlayerInventory {
 	//Set true when player shift clicks items in inventory so it only runs after inventory is closed
 	private boolean mNeedsUpdate = false;
 
-	public PlayerInventory(Plugin plugin, Player player) {
+	public PlayerInventoryManager(Plugin plugin, Player player) {
 		InventoryUtils.scheduleDelayedEquipmentCheck(plugin, player, new PlayerJoinEvent(player, Component.text(""))); // Just a dummy event
 	}
 
 	public void tick(Plugin plugin, Player player) {
-		// Players in spectator do not have ticking effects
-		// TODO Add vanish hook here also
-		if (player.getGameMode().equals(GameMode.SPECTATOR)) {
+		// Players in spectator or who are vanished do not have ticking effects
+		if (PremiumVanishIntegration.isInvisible(player) || player.getGameMode().equals(GameMode.SPECTATOR)) {
 			return;
 		}
 
@@ -104,8 +105,21 @@ public class PlayerInventory {
 	}
 
 	//Updates only for the slot given
-	public void updateItemSlotProperties(Plugin plugin, Player player, int slot) {
+	public void updateItemSlotProperties(@NotNull Plugin plugin, @NotNull Player player, int slot) {
+		@NotNull ItemStack[] inv = player.getInventory().getContents();
+		if (slot < 0 || slot >= inv.length) {
+			return;
+		}
 		plugin.mEnchantmentManager.updateItemProperties(slot, mCurrentProperties, mInventoryProperties, player, plugin);
+		updateItemLastCheck(slot, inv[slot]);
+	}
+
+	public void updateItemLastCheck(int slot, @Nullable ItemStack item) {
+		if (item == null) {
+			mInventoryLastCheck[slot] = null;
+		} else {
+			mInventoryLastCheck[slot] = item.clone();
+		}
 	}
 
 	public void updateEquipmentProperties(Plugin plugin, Player player, Event event) {
@@ -132,48 +146,53 @@ public class PlayerInventory {
 			} else if (invClickEvent.isRightClick() && ShulkerEquipmentListener.isEquipmentBox(invClickEvent.getCurrentItem())) {
 				for (int i = 0; i <= 8; i++) {
 					// Update hotbar
-					plugin.mEnchantmentManager.updateItemProperties(i, mCurrentProperties, mInventoryProperties, player, plugin);
+					updateItemSlotProperties(plugin, player, i);
 				}
 				for (int i = 36; i <= 40; i++) {
 					// Update armor and offhand
-					plugin.mEnchantmentManager.updateItemProperties(i, mCurrentProperties, mInventoryProperties, player, plugin);
+					updateItemSlotProperties(plugin, player, i);
 				}
 			} else if (invClickEvent.getHotbarButton() != -1) {
 				// Updates clicked slot and hotbar slot if numbers were used to swap
-				plugin.mEnchantmentManager.updateItemProperties(invClickEvent.getSlot(), mCurrentProperties, mInventoryProperties, player, plugin);
-				plugin.mEnchantmentManager.updateItemProperties(invClickEvent.getHotbarButton(), mCurrentProperties, mInventoryProperties, player, plugin);
+				updateItemSlotProperties(plugin, player, invClickEvent.getSlot());
+				updateItemSlotProperties(plugin, player, invClickEvent.getHotbarButton());
 			} else if (invClickEvent.getClick().equals(ClickType.SWAP_OFFHAND)) {
 				// Updates clicked slot and offhand slot when swap hands key is used
-				plugin.mEnchantmentManager.updateItemProperties(invClickEvent.getSlot(), mCurrentProperties, mInventoryProperties, player, plugin);
-				plugin.mEnchantmentManager.updateItemProperties(40, mCurrentProperties, mInventoryProperties, player, plugin);
+				updateItemSlotProperties(plugin, player, invClickEvent.getSlot());
+				updateItemSlotProperties(plugin, player, 40);
 			} else {
-				plugin.mEnchantmentManager.updateItemProperties(invClickEvent.getSlot(), mCurrentProperties, mInventoryProperties, player, plugin);
+				updateItemSlotProperties(plugin, player, invClickEvent.getSlot());
 			}
 		} else if (event instanceof InventoryDragEvent) {
 			for (int i : ((InventoryDragEvent) event).getInventorySlots()) {
-				plugin.mEnchantmentManager.updateItemProperties(i, mCurrentProperties, mInventoryProperties, player, plugin);
+				updateItemSlotProperties(plugin, player, i);
 			}
 		} else if (event instanceof PlayerInteractEvent || event instanceof BlockDispenseArmorEvent) {
-			plugin.mEnchantmentManager.updateItemProperties(36, mCurrentProperties, mInventoryProperties, player, plugin);
-			plugin.mEnchantmentManager.updateItemProperties(37, mCurrentProperties, mInventoryProperties, player, plugin);
-			plugin.mEnchantmentManager.updateItemProperties(38, mCurrentProperties, mInventoryProperties, player, plugin);
-			plugin.mEnchantmentManager.updateItemProperties(39, mCurrentProperties, mInventoryProperties, player, plugin);
+			for (int i = 36; i <= 39; i++) {
+				// Update armor
+				updateItemSlotProperties(plugin, player, i);
+			}
 		} else if (event instanceof PlayerItemBreakEvent) {
 			//Updates item properties for armor, mainhand and offhand
-			plugin.mEnchantmentManager.updateItemProperties(player.getInventory().getHeldItemSlot(), mCurrentProperties, mInventoryProperties, player, plugin);
-			plugin.mEnchantmentManager.updateItemProperties(36, mCurrentProperties, mInventoryProperties, player, plugin);
-			plugin.mEnchantmentManager.updateItemProperties(37, mCurrentProperties, mInventoryProperties, player, plugin);
-			plugin.mEnchantmentManager.updateItemProperties(38, mCurrentProperties, mInventoryProperties, player, plugin);
-			plugin.mEnchantmentManager.updateItemProperties(39, mCurrentProperties, mInventoryProperties, player, plugin);
-			plugin.mEnchantmentManager.updateItemProperties(40, mCurrentProperties, mInventoryProperties, player, plugin);
+			updateItemSlotProperties(plugin, player, player.getInventory().getHeldItemSlot());
+			for (int i = 36; i <= 40; i++) {
+				// Update armor and offhand
+				updateItemSlotProperties(plugin, player, i);
+			}
 		} else if (event instanceof PlayerItemHeldEvent) {
-			plugin.mEnchantmentManager.updateItemProperties(((PlayerItemHeldEvent) event).getPreviousSlot(), mCurrentProperties, mInventoryProperties, player, plugin);
-			plugin.mEnchantmentManager.updateItemProperties(((PlayerItemHeldEvent) event).getNewSlot(), mCurrentProperties, mInventoryProperties, player, plugin);
+			updateItemSlotProperties(plugin, player, ((PlayerItemHeldEvent) event).getPreviousSlot());
+			updateItemSlotProperties(plugin, player, ((PlayerItemHeldEvent) event).getNewSlot());
 		} else if (event instanceof PlayerSwapHandItemsEvent) {
-			plugin.mEnchantmentManager.updateItemProperties(player.getInventory().getHeldItemSlot(), mCurrentProperties, mInventoryProperties, player, plugin);
-			plugin.mEnchantmentManager.updateItemProperties(40, mCurrentProperties, mInventoryProperties, player, plugin);
+			updateItemSlotProperties(plugin, player, player.getInventory().getHeldItemSlot());
+			updateItemSlotProperties(plugin, player, 40);
 		} else if (event instanceof PlayerDropItemEvent) {
-			plugin.mEnchantmentManager.updateItemProperties(player.getInventory().getHeldItemSlot(), mCurrentProperties, mInventoryProperties, player, plugin);
+			int heldItemSlot = player.getInventory().getHeldItemSlot();
+			if (hasSlotChanged(player, heldItemSlot)) {
+				updateItemSlotProperties(plugin, player, heldItemSlot);
+			} else {
+				int droppedSlot = getDroppedSlotId((PlayerDropItemEvent) event);
+				updateItemSlotProperties(plugin, player, droppedSlot);
+			}
 		} else if (!mNeedsUpdate && event instanceof InventoryCloseEvent) {
 			return; //Only ever updates on InventoryCloseEvent if shift clicks have been made
 		} else {
@@ -183,7 +202,9 @@ public class PlayerInventory {
 				mNeedsUpdate = false;
 			}
 
+			ItemStack[] inv = player.getInventory().getContents();
 			for (int i = 0; i <= 40; i++) {
+				updateItemLastCheck(i, inv[i]);
 				mInventoryProperties.put(i, new LinkedHashMap<>());
 			}
 
@@ -417,6 +438,45 @@ public class PlayerInventory {
 		}
 
 		return 0;
+	}
+
+	public boolean hasSlotChanged(@NotNull Player player, int slot) {
+		if (slot < 0 || slot > 40) {
+			return false;
+		}
+		@Nullable ItemStack oldItem = mInventoryLastCheck[slot];
+		@Nullable ItemStack currentItem = player.getInventory().getContents()[slot];
+		if (oldItem == null) {
+			return currentItem == null;
+		} else {
+			return !oldItem.equals(currentItem);
+		}
+	}
+
+	// Returns the first similar slot's number where there is a difference in item count, or -1 if not found
+	public int getDroppedSlotId(@NotNull PlayerDropItemEvent event) {
+		@NotNull Player player = event.getPlayer();
+		@NotNull ItemStack[] inv = player.getInventory().getContents();
+		@NotNull ItemStack droppedItem = event.getItemDrop().getItemStack();
+
+		for (int slot = 0; slot <= 40; slot++) {
+			@Nullable ItemStack oldItem = mInventoryLastCheck[slot];
+			if (!droppedItem.isSimilar(oldItem)) {
+				continue;
+			}
+			int oldAmount = oldItem.getAmount();
+
+			@Nullable ItemStack currentItem = inv[slot];
+			if (droppedItem.isSimilar(currentItem)) {
+				int newAmount = currentItem.getAmount();
+				if (oldAmount - newAmount > 0) {
+					return slot;
+				}
+			} else {
+				return slot;
+			}
+		}
+		return -1;
 	}
 
 	public JsonObject getAsJsonObject() {
