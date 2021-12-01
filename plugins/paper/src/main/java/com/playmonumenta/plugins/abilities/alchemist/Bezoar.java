@@ -7,22 +7,24 @@ import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
+import org.bukkit.attribute.Attribute;
+import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.block.data.BlockData;
-import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.EntityDeathEvent;
-import org.bukkit.potion.PotionEffectType;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.potion.PotionEffect;
-import org.bukkit.attribute.Attribute;
+import org.bukkit.potion.PotionEffectType;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.effects.PercentDamageDealt;
+import com.playmonumenta.plugins.effects.PercentRegeneration;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
@@ -30,9 +32,6 @@ import com.playmonumenta.plugins.utils.PotionUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
-
-import com.playmonumenta.plugins.effects.PercentDamageDealt;
-import com.playmonumenta.plugins.effects.PercentRegeneration;
 
 public class Bezoar extends Ability {
 	private static final int FREQUENCY = 5;
@@ -122,9 +121,9 @@ public class Bezoar extends Ability {
 						mPlugin.mEffectManager.addEffect(mPlayer, "BezoarAbilityDamage", new PercentDamageDealt(DAMAGE_DURATION, DAMAGE_PERCENT, AFFECTED_DAMAGE_CAUSES));
 					}
 
-					Ability alchemistPotion = AbilityManager.getManager().getPlayerAbility(mPlayer, AlchemistPotions.class);
+					AlchemistPotions alchemistPotion = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(mPlayer, AlchemistPotions.class);
 					if (alchemistPotion != null) {
-						((AlchemistPotions) alchemistPotion).incrementCharge();
+						alchemistPotion.incrementCharge();
 					}
 
 					item.remove();

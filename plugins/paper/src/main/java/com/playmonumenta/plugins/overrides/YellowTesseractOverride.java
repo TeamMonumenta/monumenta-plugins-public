@@ -77,7 +77,7 @@ public class YellowTesseractOverride extends BaseOverride {
 			return false;
 		}
 		// If a player doesn't have any abilities, tell them that's required
-		if (AbilityManager.getManager().getPlayerAbilities(player).getAbilities().isEmpty()) {
+		if (AbilityManager.getManager().getPlayerAbilities(player).getAbilitiesIgnoringSilence().isEmpty()) {
 			player.sendMessage(Component.text("You need to have a class and abilities first!", NamedTextColor.RED));
 			return false;
 		}
@@ -186,7 +186,7 @@ public class YellowTesseractOverride extends BaseOverride {
 		/* Remove all the player's current skills */
 		AbilityCollection coll = AbilityManager.getManager().getPlayerAbilities(player);
 		if (coll != null) {
-			for (Ability ability : coll.getAbilities()) {
+			for (Ability ability : coll.getAbilitiesIgnoringSilence()) {
 				String scoreboard = ability.getScoreboard();
 				if (scoreboard != null) {
 					ScoreboardUtils.setScoreboardValue(player, scoreboard, 0);
@@ -273,10 +273,10 @@ public class YellowTesseractOverride extends BaseOverride {
 
 		AbilityCollection coll = AbilityManager.getManager().getPlayerAbilities(player);
 		if (coll != null) {
-			for (Ability ability : coll.getAbilities()) {
+			for (Ability ability : coll.getAbilitiesIgnoringSilence()) {
 				if (ability.getDisplayName() != null) {
 					lore.add(Component.text(PREFIX + ability.getDisplayName() + " : " + ability.getAbilityScore(),
-					    NamedTextColor.YELLOW).decoration(TextDecoration.ITALIC, false));
+					                        NamedTextColor.YELLOW).decoration(TextDecoration.ITALIC, false));
 				}
 			}
 		}

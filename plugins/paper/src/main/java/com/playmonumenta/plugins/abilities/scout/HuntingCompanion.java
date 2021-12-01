@@ -79,11 +79,11 @@ public class HuntingCompanion extends Ability {
 
 		mStunnedMobs = new ArrayList<Entity>();
 
-		Bukkit.getScheduler().runTask(plugin, () -> {
-			if (player != null) {
-				mWindBomb = AbilityManager.getManager().getPlayerAbility(mPlayer, WindBomb.class);
-			}
-		});
+		if (player != null) {
+			Bukkit.getScheduler().runTask(plugin, () -> {
+				mWindBomb = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(mPlayer, WindBomb.class);
+			});
+		}
 	}
 
 	@Override

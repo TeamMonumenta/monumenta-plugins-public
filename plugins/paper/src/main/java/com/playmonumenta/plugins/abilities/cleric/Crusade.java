@@ -1,12 +1,5 @@
 package com.playmonumenta.plugins.abilities.cleric;
 
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.events.CustomDamageEvent;
-import com.playmonumenta.plugins.player.PartialParticle;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.StringUtils;
-
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.entity.LivingEntity;
@@ -14,6 +7,13 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.events.CustomDamageEvent;
+import com.playmonumenta.plugins.player.PartialParticle;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.StringUtils;
 
 
 
@@ -26,7 +26,7 @@ public class Crusade extends Ability {
 
 	public Crusade(
 		@NotNull Plugin plugin,
-		@NotNull Player player
+		@Nullable Player player
 	) {
 		super(plugin, player, NAME);
 

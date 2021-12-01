@@ -2,19 +2,6 @@ package com.playmonumenta.plugins.abilities.cleric.paladin;
 
 import java.util.List;
 
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.abilities.AbilityManager;
-import com.playmonumenta.plugins.abilities.AbilityTrigger;
-import com.playmonumenta.plugins.abilities.cleric.Crusade;
-import com.playmonumenta.plugins.classes.ClassAbility;
-import com.playmonumenta.plugins.classes.magic.MagicType;
-import com.playmonumenta.plugins.events.CustomDamageEvent;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.MessagingUtils;
-import com.playmonumenta.plugins.utils.MovementUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
-
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -30,6 +17,18 @@ import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.abilities.AbilityManager;
+import com.playmonumenta.plugins.abilities.AbilityTrigger;
+import com.playmonumenta.plugins.abilities.cleric.Crusade;
+import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.classes.magic.MagicType;
+import com.playmonumenta.plugins.events.CustomDamageEvent;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.MessagingUtils;
+import com.playmonumenta.plugins.utils.MovementUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 
 
 public class LuminousInfusion extends Ability {
@@ -70,11 +69,12 @@ public class LuminousInfusion extends Ability {
 
 		if (player != null) {
 			Bukkit.getScheduler().runTask(plugin, () -> {
-				mCrusade = AbilityManager.getManager().getPlayerAbility(mPlayer, Crusade.class);
+				mCrusade = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(mPlayer, Crusade.class);
 			});
 		}
 	}
 
+	@Override
 	public void playerSwapHandItemsEvent(PlayerSwapHandItemsEvent event) {
 		event.setCancelled(true);
 

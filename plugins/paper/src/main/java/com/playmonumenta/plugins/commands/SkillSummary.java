@@ -52,7 +52,7 @@ public class SkillSummary extends GenericCommand {
 
 		Component abilityHover;
 		if (useShorthand) {
-			for (Ability ability : plugin.mAbilityManager.getPlayerAbilities(player).getAbilities()) {
+			for (Ability ability : plugin.mAbilityManager.getPlayerAbilities(player).getAbilitiesIgnoringSilence()) {
 				if (ability == null) {
 					continue;
 				}
@@ -65,7 +65,7 @@ public class SkillSummary extends GenericCommand {
 			player.sendMessage(component);
 		} else {
 			player.sendMessage(component);
-			for (Ability ability : plugin.mAbilityManager.getPlayerAbilities(player).getAbilities()) {
+			for (Ability ability : plugin.mAbilityManager.getPlayerAbilities(player).getAbilitiesIgnoringSilence()) {
 				if (ability == null) {
 					continue;
 				}

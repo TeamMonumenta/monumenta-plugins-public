@@ -3,7 +3,9 @@ package com.playmonumenta.plugins.abilities.warlock;
 import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.stream.Stream;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -98,27 +100,14 @@ public class AmplifyingHex extends Ability {
 		mRadius = getAbilityScore() == 1 ? RADIUS_1 : RADIUS_2;
 
 		if (player != null) {
-			new BukkitRunnable() {
-				@Override
-				public void run() {
-					Ability[] abilities = new Ability[8];
-
-					abilities[0] = AbilityManager.getManager().getPlayerAbility(mPlayer, AmplifyingHex.class);
-					abilities[1] = AbilityManager.getManager().getPlayerAbility(mPlayer, CholericFlames.class);
-					abilities[2] = AbilityManager.getManager().getPlayerAbility(mPlayer, GraspingClaws.class);
-					abilities[3] = AbilityManager.getManager().getPlayerAbility(mPlayer, SoulRend.class);
-					abilities[4] = AbilityManager.getManager().getPlayerAbility(mPlayer, SanguineHarvest.class);
-					abilities[5] = AbilityManager.getManager().getPlayerAbility(mPlayer, MelancholicLament.class);
-					abilities[6] = AbilityManager.getManager().getPlayerAbility(mPlayer, CursedWound.class);
-					abilities[7] = AbilityManager.getManager().getPlayerAbility(mPlayer, PhlegmaticResolve.class);
-
-					for (Ability classAbility : abilities) {
-						if (classAbility != null) {
-							mDamage += DAMAGE_PER_SKILL_POINT * classAbility.getAbilityScore();
-						}
-					}
-				}
-			}.runTaskLater(mPlugin, 5);
+			Bukkit.getScheduler().runTask(plugin, () -> {
+				int skillPoints = Stream.of(AmplifyingHex.class, CholericFlames.class, GraspingClaws.class, SoulRend.class,
+				                            SanguineHarvest.class, MelancholicLament.class, CursedWound.class, PhlegmaticResolve.class)
+					.map(c -> AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, c))
+					.mapToInt(a -> a == null ? 0 : a.getAbilityScore())
+					.sum();
+				mDamage = DAMAGE_PER_SKILL_POINT * skillPoints;
+			});
 		}
 	}
 

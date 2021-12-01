@@ -58,7 +58,7 @@ public class HeavenlyBoon extends Ability implements KillTriggeredAbility {
 
 		Bukkit.getScheduler().runTask(plugin, () -> {
 			if (player != null) {
-				mCrusade = AbilityManager.getManager().getPlayerAbility(mPlayer, Crusade.class);
+				mCrusade = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(mPlayer, Crusade.class);
 			}
 		});
 	}

@@ -102,7 +102,7 @@ public class ElementalSpiritFire extends Ability {
 		// Task runs on the next server tick. Need to wait for entire AbilityCollection to be initialised to properly getPlayerAbility()
 		if (player != null) {
 			Bukkit.getScheduler().runTask(plugin, () -> {
-				mElementalArrows = AbilityManager.getManager().getPlayerAbility(mPlayer, ElementalArrows.class);
+				mElementalArrows = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(mPlayer, ElementalArrows.class);
 			});
 		}
 	}

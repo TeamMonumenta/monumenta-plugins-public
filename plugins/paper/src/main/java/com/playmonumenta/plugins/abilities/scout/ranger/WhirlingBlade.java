@@ -62,11 +62,11 @@ public class WhirlingBlade extends MultipleChargeAbility {
 		mDisplayItem = new ItemStack(Material.IRON_SWORD, 1);
 		mMaxCharges = getAbilityScore() == 1 ? BLADE_1_MAX_CHARGES : BLADE_2_MAX_CHARGES;
 
-		Bukkit.getScheduler().runTask(plugin, () -> {
-			if (player != null) {
-				mWindBomb = AbilityManager.getManager().getPlayerAbility(mPlayer, WindBomb.class);
-			}
-		});
+		if (player != null) {
+			Bukkit.getScheduler().runTask(plugin, () -> {
+				mWindBomb = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(mPlayer, WindBomb.class);
+			});
+		}
 	}
 
 	@Override

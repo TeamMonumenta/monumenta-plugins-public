@@ -1,7 +1,9 @@
 package com.playmonumenta.plugins.abilities.warlock;
 
 import java.util.EnumSet;
+import java.util.stream.Stream;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -37,6 +39,7 @@ public class PhlegmaticResolve extends Ability {
 
 	private final double mPercentDamageResist;
 
+	private Ability[] mAbilities = {};
 
 	public PhlegmaticResolve(Plugin plugin, Player player) {
 		super(plugin, player, "Phlegmatic Resolve");
@@ -46,28 +49,23 @@ public class PhlegmaticResolve extends Ability {
 		mInfo.mDescriptions.add("Increase to +3% Damage Reduction per spell on cooldown, and players within 7 blocks are given 33% of your bonuses. (Does not stack with multiple Warlocks.)");
 		mDisplayItem = new ItemStack(Material.SHIELD, 1);
 		mPercentDamageResist = getAbilityScore() == 1 ? PERCENT_DAMAGE_RESIST_1 : PERCENT_DAMAGE_RESIST_2;
+
+		if (player != null) {
+			Bukkit.getScheduler().runTask(plugin, () -> {
+				mAbilities = Stream.of(AmplifyingHex.class, CholericFlames.class, GraspingClaws.class, SoulRend.class,
+				                       SanguineHarvest.class, MelancholicLament.class, DarkPact.class, VoodooBonds.class,
+				                       JudgementChain.class, HauntingShades.class, WitheringGaze.class, UmbralWail.class)
+					.map(c -> AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, c)).toArray(Ability[]::new);
+			});
+		}
 	}
 
 	@Override
 	public void periodicTrigger(boolean twoHertz, boolean oneSecond, int ticks) {
 		//Triggers four times a second
-		// *TO DO* - move into constructor
-		Ability[] abilities = new Ability[12];
-		abilities[0] = AbilityManager.getManager().getPlayerAbility(mPlayer, AmplifyingHex.class);
-		abilities[1] = AbilityManager.getManager().getPlayerAbility(mPlayer, CholericFlames.class);
-		abilities[2] = AbilityManager.getManager().getPlayerAbility(mPlayer, GraspingClaws.class);
-		abilities[3] = AbilityManager.getManager().getPlayerAbility(mPlayer, SoulRend.class);
-		abilities[4] = AbilityManager.getManager().getPlayerAbility(mPlayer, SanguineHarvest.class);
-		abilities[5] = AbilityManager.getManager().getPlayerAbility(mPlayer, MelancholicLament.class);
-		abilities[6] = AbilityManager.getManager().getPlayerAbility(mPlayer, DarkPact.class);
-		abilities[7] = AbilityManager.getManager().getPlayerAbility(mPlayer, VoodooBonds.class);
-		abilities[8] = AbilityManager.getManager().getPlayerAbility(mPlayer, JudgementChain.class);
-		abilities[9] = AbilityManager.getManager().getPlayerAbility(mPlayer, HauntingShades.class);
-		abilities[10] = AbilityManager.getManager().getPlayerAbility(mPlayer, WitheringGaze.class);
-		abilities[11] = AbilityManager.getManager().getPlayerAbility(mPlayer, UmbralWail.class);
 
 		int cooldowns = 0;
-		for (Ability ability : abilities) {
+		for (Ability ability : mAbilities) {
 			if (ability != null && mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), ability.getInfo().mLinkedSpell)) {
 				cooldowns++;
 			}

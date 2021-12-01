@@ -12,8 +12,8 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -59,7 +59,7 @@ public class DivineJustice extends Ability {
 
 	public DivineJustice(
 		@NotNull Plugin plugin,
-		@NotNull Player player
+		@Nullable Player player
 	) {
 		super(plugin, player, NAME);
 		mInfo.mLinkedSpell = ABILITY;
@@ -89,7 +89,7 @@ public class DivineJustice extends Ability {
 
 		if (player != null) {
 			Bukkit.getScheduler().runTask(plugin, () -> {
-				mCrusade = AbilityManager.getManager().getPlayerAbility(mPlayer, Crusade.class);
+				mCrusade = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(mPlayer, Crusade.class);
 			});
 		}
 	}

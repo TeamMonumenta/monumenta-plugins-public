@@ -72,11 +72,11 @@ public class HallowedBeam extends MultipleChargeAbility {
 		mDisplayItem = new ItemStack(Material.BOW, 1);
 		mMaxCharges = getAbilityScore() == 1 ? HALLOWED_1_MAX_CHARGES : HALLOWED_2_MAX_CHARGES;
 
-		Bukkit.getScheduler().runTask(plugin, () -> {
-			if (player != null) {
-				mCrusade = AbilityManager.getManager().getPlayerAbility(mPlayer, Crusade.class);
-			}
-		});
+		if (player != null) {
+			Bukkit.getScheduler().runTask(plugin, () -> {
+				mCrusade = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(mPlayer, Crusade.class);
+			});
+		}
 	}
 
 	@Override

@@ -47,11 +47,12 @@ public class SoulRend extends Ability {
 		mInfo.mCooldown = COOLDOWN;
 		mDisplayItem = new ItemStack(Material.POTION, 1);
 		mHeal = getAbilityScore() == 1 ? HEAL_1 : HEAL_2;
-		Bukkit.getScheduler().runTask(plugin, () -> {
-			if (player != null) {
-				mDarkPact = AbilityManager.getManager().getPlayerAbility(mPlayer, DarkPact.class);
-			}
-		});
+
+		if (player != null) {
+			Bukkit.getScheduler().runTask(plugin, () -> {
+				mDarkPact = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(mPlayer, DarkPact.class);
+			});
+		}
 	}
 
 	@Override

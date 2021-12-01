@@ -71,7 +71,7 @@ public class ElementalSpiritIce extends Ability {
 
 		if (player != null) {
 			Bukkit.getScheduler().runTask(plugin, () -> {
-				mElementalArrows = AbilityManager.getManager().getPlayerAbility(mPlayer, ElementalArrows.class);
+				mElementalArrows = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(mPlayer, ElementalArrows.class);
 			});
 		}
 	}

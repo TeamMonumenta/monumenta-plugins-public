@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.abilities.warlock;
 
 import java.util.EnumSet;
+import java.util.stream.Stream;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -54,6 +55,8 @@ public class CursedWound extends Ability {
 	private static final int CURSED_WOUND_EXTENDED_DURATION = 2 * 20;
 	private static final String DOT_EFFECT_NAME = "CursedWoundDamageOverTimeEffect";
 
+	private Ability[] mAbilities = {};
+
 	public CursedWound(Plugin plugin, Player player) {
 		super(plugin, player, "Cursed Wound");
 		mInfo.mScoreboardId = "CursedWound";
@@ -61,6 +64,15 @@ public class CursedWound extends Ability {
 		mInfo.mDescriptions.add("Attacking an enemy with a critical scythe attack passively afflicts it and all enemies in a 3-block cube around it with 1 damage every second for 6s. Your melee attacks passively deal 3% more damage per ability on cooldown, capped at +15% damage.");
 		mInfo.mDescriptions.add("Critical attacks now also extend all enemies' debuffs (except Stun, Silence, and Confusion) by 2s. Damage cap is increased from 15% to 30%.");
 		mDisplayItem = new ItemStack(Material.GOLDEN_SWORD, 1);
+
+		if (player != null) {
+			Bukkit.getScheduler().runTask(plugin, () -> {
+				mAbilities = Stream.of(AmplifyingHex.class, CholericFlames.class, GraspingClaws.class, SoulRend.class,
+				                       SanguineHarvest.class, MelancholicLament.class, DarkPact.class, VoodooBonds.class,
+				                       JudgementChain.class, HauntingShades.class, WitheringGaze.class, UmbralWail.class)
+					.map(c -> AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, c)).toArray(Ability[]::new);
+			});
+		}
 	}
 
 	@Override
@@ -75,23 +87,9 @@ public class CursedWound extends Ability {
 				                     (damagee.getWidth() / 2) + 0.1, damagee.getHeight() / 3, (damagee.getWidth() / 2) + 0.1, fallingDustData);
 				world.spawnParticle(Particle.SPELL_MOB, damagee.getLocation().add(0, damagee.getHeight() / 2, 0), 6,
 				                     (damagee.getWidth() / 2) + 0.1, damagee.getHeight() / 3, (damagee.getWidth() / 2) + 0.1, 0);
-				// *TO DO* - Move to constructor
-				Ability[] abilities = new Ability[12];
-				abilities[0] = AbilityManager.getManager().getPlayerAbility(mPlayer, AmplifyingHex.class);
-				abilities[1] = AbilityManager.getManager().getPlayerAbility(mPlayer, CholericFlames.class);
-				abilities[2] = AbilityManager.getManager().getPlayerAbility(mPlayer, GraspingClaws.class);
-				abilities[3] = AbilityManager.getManager().getPlayerAbility(mPlayer, SoulRend.class);
-				abilities[4] = AbilityManager.getManager().getPlayerAbility(mPlayer, SanguineHarvest.class);
-				abilities[5] = AbilityManager.getManager().getPlayerAbility(mPlayer, MelancholicLament.class);
-				abilities[6] = AbilityManager.getManager().getPlayerAbility(mPlayer, DarkPact.class);
-				abilities[7] = AbilityManager.getManager().getPlayerAbility(mPlayer, VoodooBonds.class);
-				abilities[8] = AbilityManager.getManager().getPlayerAbility(mPlayer, JudgementChain.class);
-				abilities[9] = AbilityManager.getManager().getPlayerAbility(mPlayer, HauntingShades.class);
-				abilities[10] = AbilityManager.getManager().getPlayerAbility(mPlayer, WitheringGaze.class);
-				abilities[11] = AbilityManager.getManager().getPlayerAbility(mPlayer, UmbralWail.class);
 
 				int cooldowns = 0;
-				for (Ability ability : abilities) {
+				for (Ability ability : mAbilities) {
 					if (ability != null && mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), ability.getInfo().mLinkedSpell)) {
 						cooldowns++;
 					}

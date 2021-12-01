@@ -2,16 +2,6 @@ package com.playmonumenta.plugins.abilities.cleric;
 
 import java.util.EnumSet;
 
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.abilities.AbilityManager;
-import com.playmonumenta.plugins.classes.ClassAbility;
-import com.playmonumenta.plugins.classes.magic.MagicType;
-import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
-import com.playmonumenta.plugins.enchantments.abilities.BaseAbilityEnchantment;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.MovementUtils;
-
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -26,6 +16,15 @@ import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.projectiles.ProjectileSource;
 
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.abilities.AbilityManager;
+import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.classes.magic.MagicType;
+import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
+import com.playmonumenta.plugins.enchantments.abilities.BaseAbilityEnchantment;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.MovementUtils;
 
 
 public class SanctifiedArmor extends Ability {
@@ -55,11 +54,11 @@ public class SanctifiedArmor extends Ability {
 		mPercentDamageReturned = getAbilityScore() == 1 ? PERCENT_DAMAGE_RETURNED_1 : PERCENT_DAMAGE_RETURNED_2;
 		mDisplayItem = new ItemStack(Material.IRON_CHESTPLATE, 1);
 
-		Bukkit.getScheduler().runTask(plugin, () -> {
-			if (player != null) {
-				mCrusade = AbilityManager.getManager().getPlayerAbility(mPlayer, Crusade.class);
-			}
-		});
+		if (player != null) {
+			Bukkit.getScheduler().runTask(plugin, () -> {
+				mCrusade = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(mPlayer, Crusade.class);
+			});
+		}
 	}
 
 	@Override

@@ -57,13 +57,13 @@ public class MelancholicLament extends Ability {
 		mInfo.mIgnoreCooldown = true;
 		mDisplayItem = new ItemStack(Material.GHAST_TEAR, 1);
 		mWeakenEffect = getAbilityScore() == 1 ? WEAKEN_EFFECT_1 : WEAKEN_EFFECT_2;
-		Bukkit.getScheduler().runTask(plugin, () -> {
-			if (player != null) {
-				mJudgementChain = AbilityManager.getManager().getPlayerAbility(mPlayer, JudgementChain.class);
-				mDarkPact = AbilityManager.getManager().getPlayerAbility(mPlayer, DarkPact.class);
-				mUmbral = AbilityManager.getManager().getPlayerAbility(mPlayer, UmbralWail.class);
-			}
-		});
+		if (player != null) {
+			Bukkit.getScheduler().runTask(plugin, () -> {
+				mJudgementChain = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(mPlayer, JudgementChain.class);
+				mDarkPact = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(mPlayer, DarkPact.class);
+				mUmbral = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(mPlayer, UmbralWail.class);
+			});
+		}
 	}
 
 	@Override

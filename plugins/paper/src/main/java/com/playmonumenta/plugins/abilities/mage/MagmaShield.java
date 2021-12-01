@@ -86,12 +86,12 @@ public class MagmaShield extends Ability {
 
 		mLevelDamage = getAbilityScore() == 2 ? DAMAGE_2 : DAMAGE_1;
 
-		Bukkit.getScheduler().runTask(plugin, () -> {
-			if (player != null) {
-				Blizzard blizzard = AbilityManager.getManager().getPlayerAbility(mPlayer, Blizzard.class);
+		if (player != null) {
+			Bukkit.getScheduler().runTask(plugin, () -> {
+				Blizzard blizzard = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(mPlayer, Blizzard.class);
 				mLookUpRestriction = blizzard != null; // If Blizzard is not null, player has Blizzard, require restriction
-			}
-		});
+			});
+		}
 	}
 
 	@Override

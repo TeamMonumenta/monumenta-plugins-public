@@ -546,7 +546,7 @@ public class AbilityManager {
 
 		/* Get the old ability list and run invalidate() on all of them to clean up lingering runnables */
 		if (mAbilities.containsKey(player.getUniqueId())) {
-			for (Ability abil : getPlayerAbilities(player).getAbilities()) {
+			for (Ability abil : getPlayerAbilities(player).getAbilitiesIgnoringSilence()) {
 				abil.invalidate();
 			}
 		}
@@ -584,7 +584,7 @@ public class AbilityManager {
 		mAbilities.put(player.getUniqueId(), collection);
 
 		// Set up new class potion abilities
-		for (Ability abil : getPlayerAbilities(player).getAbilities()) {
+		for (Ability abil : getPlayerAbilities(player).getAbilitiesIgnoringSilence()) {
 			abil.setupClassPotionEffects();
 		}
 
@@ -595,6 +595,10 @@ public class AbilityManager {
 
 	public <T extends Ability> T getPlayerAbility(Player player, Class<T> cls) {
 		return getPlayerAbilities(player).getAbility(cls);
+	}
+
+	public <T extends Ability> T getPlayerAbilityIgnoringSilence(Player player, Class<T> cls) {
+		return getPlayerAbilities(player).getAbilityIgnoringSilence(cls);
 	}
 
 	/* Do not modify the returned data! */
@@ -610,7 +614,7 @@ public class AbilityManager {
 
 	/* Convenience method */
 	public boolean isPvPEnabled(Player player) {
-		return getPlayerAbilities(player).getAbility(PvP.class) != null;
+		return getPlayerAbilities(player).getAbilityIgnoringSilence(PvP.class) != null;
 	}
 
 	public JsonElement getAsJson(Player player) {

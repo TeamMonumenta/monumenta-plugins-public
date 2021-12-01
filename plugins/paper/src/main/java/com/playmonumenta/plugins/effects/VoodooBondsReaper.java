@@ -1,23 +1,23 @@
 package com.playmonumenta.plugins.effects;
 
 import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
-import org.bukkit.attribute.Attribute;
-import org.bukkit.entity.Entity;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.Particle;
 import org.bukkit.Color;
+import org.bukkit.Location;
+import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
-import org.bukkit.Location;
+import org.bukkit.attribute.Attribute;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.Player;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
 
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.MessagingUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.plugins.utils.AbsorptionUtils;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.abilities.warlock.reaper.VoodooBonds;
+import com.playmonumenta.plugins.utils.AbsorptionUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.MessagingUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 
 public class VoodooBondsReaper extends Effect {
 
@@ -42,12 +42,12 @@ public class VoodooBondsReaper extends Effect {
 		mDamagePercent = damagePercent;
 		mPlugin = plugin;
 
-		Bukkit.getScheduler().runTask(mPlugin, () -> {
-			if (mPlayer != null) {
+		if (mPlayer != null) {
+			Bukkit.getScheduler().runTask(mPlugin, () -> {
 				mVoodooBonds = AbilityManager.getManager().getPlayerAbility(mPlayer, VoodooBonds.class);
 				mScore = mVoodooBonds != null ? mVoodooBonds.getAbilityScore() : 0;
-			}
-		});
+			});
+		}
 	}
 
 	@Override

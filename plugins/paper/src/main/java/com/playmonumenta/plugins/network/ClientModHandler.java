@@ -47,7 +47,7 @@ public class ClientModHandler {
 		if (INSTANCE == null) {
 			return;
 		}
-		Ability ability = INSTANCE.mPlugin.mAbilityManager.getPlayerAbilities(player).getAbility(classAbility);
+		Ability ability = INSTANCE.mPlugin.mAbilityManager.getPlayerAbilities(player).getAbilityIgnoringSilence(classAbility);
 		if (ability == null) {
 			return;
 		}
@@ -84,7 +84,7 @@ public class ClientModHandler {
 			return;
 		}
 
-		ClassUpdatePacket.AbilityInfo[] abilities = INSTANCE.mPlugin.mAbilityManager.getPlayerAbilities(player).getAbilities().stream()
+		ClassUpdatePacket.AbilityInfo[] abilities = INSTANCE.mPlugin.mAbilityManager.getPlayerAbilities(player).getAbilitiesIgnoringSilence().stream()
 			.filter(ClientModHandler::shouldHandleAbility)
 			.map(ability -> {
 				ClassAbility classAbility = ability.getInfo().mLinkedSpell;

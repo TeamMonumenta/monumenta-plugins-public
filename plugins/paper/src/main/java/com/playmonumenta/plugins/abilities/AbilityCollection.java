@@ -44,6 +44,10 @@ public class AbilityCollection {
 		}
 	}
 
+	public Collection<Ability> getAbilitiesIgnoringSilence() {
+		return mAbilities.values();
+	}
+
 	@SuppressWarnings("unchecked")
 	public <T extends Ability> T getAbility(Class<T> cls) {
 		if (mIsSilenced) {
@@ -55,11 +59,18 @@ public class AbilityCollection {
 	}
 
 	public Ability getAbility(ClassAbility classAbility) {
-		if (!mIsSilenced) {
-			for (Ability ability : mAbilities.values()) {
-				if (ability.getInfo().mLinkedSpell == classAbility) {
-					return ability;
-				}
+		return mIsSilenced ? null : getAbilityIgnoringSilence(classAbility);
+	}
+
+	@SuppressWarnings("unchecked")
+	public <T extends Ability> T getAbilityIgnoringSilence(Class<T> cls) {
+		return (T) mAbilities.get(cls);
+	}
+
+	public Ability getAbilityIgnoringSilence(ClassAbility classAbility) {
+		for (Ability ability : mAbilities.values()) {
+			if (ability.getInfo().mLinkedSpell == classAbility) {
+				return ability;
 			}
 		}
 		return null;

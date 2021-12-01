@@ -60,7 +60,7 @@ public class ChoirBells extends Ability {
 
 		if (player != null) {
 			Bukkit.getScheduler().runTask(plugin, () -> {
-				mCrusade = AbilityManager.getManager().getPlayerAbility(mPlayer, Crusade.class);
+				mCrusade = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(mPlayer, Crusade.class);
 			});
 		}
 	}

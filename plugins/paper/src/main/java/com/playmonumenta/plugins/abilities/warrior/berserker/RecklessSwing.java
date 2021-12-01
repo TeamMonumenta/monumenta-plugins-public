@@ -56,11 +56,12 @@ public class RecklessSwing extends Ability {
 		mDamagePercentPer4Health = getAbilityScore() == 1 ? DAMAGE_PERCENT_PER_4_HEALTH_1 : DAMAGE_PERCENT_PER_4_HEALTH_2;
 		mMaxDamagePercent = getAbilityScore() == 1 ? MAX_DAMAGE_PERCENT_1 : MAX_DAMAGE_PERCENT_2;
 		mDamage = getAbilityScore() == 1 ? DAMAGE_1 : DAMAGE_2;
-		Bukkit.getScheduler().runTask(plugin, () -> {
-			if (player != null) {
-				mRampage = AbilityManager.getManager().getPlayerAbility(mPlayer, Rampage.class);
-			}
-		});
+
+		if (player != null) {
+			Bukkit.getScheduler().runTask(plugin, () -> {
+				mRampage = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(mPlayer, Rampage.class);
+			});
+		}
 	}
 
 	@Override

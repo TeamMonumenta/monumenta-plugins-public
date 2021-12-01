@@ -96,20 +96,20 @@ public class AlchemistPotions extends Ability implements AbilityWithChargesOrSta
 				public void run() {
 					Ability[] classAbilities = new Ability[8];
 					Ability[] specializationAbilities = new Ability[6];
-					classAbilities[0] = AbilityManager.getManager().getPlayerAbility(mPlayer, GruesomeAlchemy.class);
-					classAbilities[1] = AbilityManager.getManager().getPlayerAbility(mPlayer, BrutalAlchemy.class);
-					classAbilities[2] = AbilityManager.getManager().getPlayerAbility(mPlayer, IronTincture.class);
-					classAbilities[3] = AbilityManager.getManager().getPlayerAbility(mPlayer, BasiliskPoison.class);
-					classAbilities[4] = AbilityManager.getManager().getPlayerAbility(mPlayer, PowerInjection.class);
-					classAbilities[5] = AbilityManager.getManager().getPlayerAbility(mPlayer, UnstableArrows.class);
-					classAbilities[6] = AbilityManager.getManager().getPlayerAbility(mPlayer, EnfeeblingElixir.class);
-					classAbilities[7] = AbilityManager.getManager().getPlayerAbility(mPlayer, Bezoar.class);
-					specializationAbilities[0] = AbilityManager.getManager().getPlayerAbility(mPlayer, PurpleHaze.class);
-					specializationAbilities[1] = AbilityManager.getManager().getPlayerAbility(mPlayer, NightmarishAlchemy.class);
-					specializationAbilities[2] = AbilityManager.getManager().getPlayerAbility(mPlayer, ScorchedEarth.class);
-					specializationAbilities[3] = AbilityManager.getManager().getPlayerAbility(mPlayer, WardingRemedy.class);
-					specializationAbilities[4] = AbilityManager.getManager().getPlayerAbility(mPlayer, InvigoratingOdor.class);
-					specializationAbilities[5] = AbilityManager.getManager().getPlayerAbility(mPlayer, AlchemicalAmalgam.class);
+					classAbilities[0] = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(mPlayer, GruesomeAlchemy.class);
+					classAbilities[1] = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(mPlayer, BrutalAlchemy.class);
+					classAbilities[2] = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(mPlayer, IronTincture.class);
+					classAbilities[3] = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(mPlayer, BasiliskPoison.class);
+					classAbilities[4] = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(mPlayer, PowerInjection.class);
+					classAbilities[5] = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(mPlayer, UnstableArrows.class);
+					classAbilities[6] = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(mPlayer, EnfeeblingElixir.class);
+					classAbilities[7] = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(mPlayer, Bezoar.class);
+					specializationAbilities[0] = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(mPlayer, PurpleHaze.class);
+					specializationAbilities[1] = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(mPlayer, NightmarishAlchemy.class);
+					specializationAbilities[2] = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(mPlayer, ScorchedEarth.class);
+					specializationAbilities[3] = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(mPlayer, WardingRemedy.class);
+					specializationAbilities[4] = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(mPlayer, InvigoratingOdor.class);
+					specializationAbilities[5] = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(mPlayer, AlchemicalAmalgam.class);
 
 					for (Ability classAbility : classAbilities) {
 						if (classAbility != null) {
