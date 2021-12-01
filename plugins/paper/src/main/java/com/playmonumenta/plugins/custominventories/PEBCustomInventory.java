@@ -68,7 +68,7 @@ public class PEBCustomInventory extends CustomInventory {
 		//page 1: main menu
 		PEB_ITEMS.add(new PebItem(1, 0, "", "", ChatColor.LIGHT_PURPLE, FILLER, "", false));
 		PEB_ITEMS.add(new PebItem(1, 11, "Player Information",
-				"Details about Housing, Prestige, and other player-focused options.", ChatColor.LIGHT_PURPLE,
+				"Details about Housing, Dailies, and other player-focused options.", ChatColor.LIGHT_PURPLE,
 				Material.PLAYER_HEAD, "page 2", false));
 		PEB_ITEMS.add(new PebItem(1, 15, "Toggle-able Options",
 				"Inventory Sort, Filtered Pickup, and more toggleable choices.", ChatColor.LIGHT_PURPLE,
@@ -85,16 +85,13 @@ public class PEBCustomInventory extends CustomInventory {
 		PEB_ITEMS.add(new PebItem(2, 4, "Player Information",
 				"", ChatColor.LIGHT_PURPLE,
 				Material.PLAYER_HEAD, "", false));
-		PEB_ITEMS.add(new PebItem(2, 19, "Housing",
+		PEB_ITEMS.add(new PebItem(2, 20, "Housing",
 				"Click to view housing information.", ChatColor.LIGHT_PURPLE,
 				Material.OAK_DOOR, "clickable peb_housing", true));
-		PEB_ITEMS.add(new PebItem(2, 21, "Prestige",
-				"Click to view prestige and related unlocks.", ChatColor.LIGHT_PURPLE,
-				Material.BRICK, "clickable peb_prestige", true));
-		PEB_ITEMS.add(new PebItem(2, 23, "Class",
+		PEB_ITEMS.add(new PebItem(2, 22, "Class",
 				"Click to view your class and skills.", ChatColor.LIGHT_PURPLE,
 				Material.STONE_SWORD, "clickable peb_class", true));
-		PEB_ITEMS.add(new PebItem(2, 25, "Dungeon Instances",
+		PEB_ITEMS.add(new PebItem(2, 24, "Dungeon Instances",
 				"Click to view what dungeon instances you have open, and how old they are.", ChatColor.LIGHT_PURPLE,
 				Material.WHITE_WOOL, "clickable peb_dungeoninfo", true));
 		PEB_ITEMS.add(new PebItem(2, 39, "Patron",
