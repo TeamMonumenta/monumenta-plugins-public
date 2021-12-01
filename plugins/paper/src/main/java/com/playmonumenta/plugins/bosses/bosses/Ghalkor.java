@@ -53,9 +53,10 @@ public class Ghalkor extends BossAbilityGroup {
 	private final Location mMiddleLoc;
 
 	private LivingEntity mSvalgot;
+	private Svalgot mSvalgotBoss;
 
-	//True when the final boss should be called from death
-	private boolean mSummonFinal = false;
+	//True when the final boss has been called from death
+	boolean mSummonedFinalBoss = false;
 
 	//Lower number = faster cast speed
 	//0.5 is double casting speed
@@ -120,7 +121,14 @@ public class Ghalkor extends BossAbilityGroup {
 			}
 		}
 
-		if (mSvalgot == null) {
+		if (mSvalgot != null) {
+			new BukkitRunnable() {
+				@Override
+				public void run() {
+					mSvalgotBoss = mSvalgot != null ? BossManager.getInstance().getBoss(mSvalgot, Svalgot.class) : null;
+				}
+			}.runTaskLater(mPlugin, 1);
+		} else {
 			mPlugin.getLogger().warning("Svalgot was not found by Ghalkor!");
 		}
 
@@ -133,8 +141,6 @@ public class Ghalkor extends BossAbilityGroup {
 					//changePhase to increased pace
 					mBoss.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).setBaseValue(mBoss.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).getBaseValue() * 1.05);
 					mBoss.getAttribute(Attribute.GENERIC_ATTACK_DAMAGE).setBaseValue(mBoss.getAttribute(Attribute.GENERIC_ATTACK_DAMAGE).getBaseValue() * 1.25);
-
-					mSummonFinal = true;
 
 					PlayerUtils.executeCommandOnNearbyPlayers(mSpawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"[Ghalkor]\",\"color\":\"gold\"},{\"text\":\" Broer, for you and for the Blackflame, I will devour them!\",\"color\":\"dark_gray\"}]");
 					mBoss.getWorld().playSound(mBoss.getLocation(), Sound.ENTITY_VINDICATOR_DEATH, 3, 0);
@@ -231,11 +237,9 @@ public class Ghalkor extends BossAbilityGroup {
 
 	@Override
 	public void death(EntityDeathEvent event) {
-		if (mSvalgot == null || mSvalgot.isDead() || !mSvalgot.isValid()) {
-			mSummonFinal = true;
-		}
+		if ((mSvalgot == null || mSvalgot.isDead() || !mSvalgot.isValid()) && (mSvalgotBoss == null || !mSvalgotBoss.mSummonedFinalBoss)) {
+			mSummonedFinalBoss = true;
 
-		if (mSummonFinal) {
 			PlayerUtils.executeCommandOnNearbyPlayers(mSpawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"[Ghalkor]\",\"color\":\"gold\"},{\"text\":\" With mine Laastasem...  My lifeblood fuels the ritual... Come forth o Beast!\",\"color\":\"dark_gray\"}]");
 
 			LivingEntity beast = (LivingEntity) LibraryOfSoulsIntegration.summon(mSpawnLoc.add(-2, -3, 0), BeastOfTheBlackFlame.losName);
