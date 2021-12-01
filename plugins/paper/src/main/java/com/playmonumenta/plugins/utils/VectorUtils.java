@@ -7,8 +7,10 @@ import org.bukkit.util.Vector;
  * of any particle design (lines, arcs, helixes, etc.) on the<br>
  * specified axis.<br>
  * Order of rotation (IMPORTANT): Z-axis, X-Axis, Y-Axis
- * @author NickNackGus
  *
+ * (Now also does other things.)
+ *
+ * @author NickNackGus
  */
 
 public class VectorUtils {
@@ -51,5 +53,13 @@ public class VectorUtils {
 		ret.setY((u.getZ() * v.getX()) - (u.getX() * v.getZ()));
 		ret.setZ((u.getX() * v.getY()) - (u.getY() * v.getX()));
 		return ret;
+	}
+
+	public static boolean isAngleWithin(
+		Vector v1,
+		Vector v2,
+		double degrees
+	) {
+		return v1.angle(v2) < Math.toRadians(degrees);
 	}
 }

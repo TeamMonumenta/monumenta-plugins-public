@@ -49,8 +49,10 @@ public class MagmaShield extends Ability {
 	public static final int FIRE_SECONDS = 4;
 	public static final int FIRE_TICKS = FIRE_SECONDS * 20;
 	public static final float KNOCKBACK = 0.5f;
-	public static final double DOT_ANGLE = 1d / 3; // 0.66 dot allowance on each side, so 120° total
-	public static final double ANGLE = Blizzard.ANGLE;
+	// 70° on each side of look direction for XZ-plane (flattened Y),
+	// so 140° angle of effect
+	public static final int ANGLE = 70;
+	public static final int BLIZZARD_ANGLE = Blizzard.ANGLE;
 	public static final int COOLDOWN_SECONDS = 12;
 	public static final int COOLDOWN_TICKS = COOLDOWN_SECONDS * 20;
 
@@ -99,13 +101,19 @@ public class MagmaShield extends Ability {
 		putOnCooldown();
 
 		float damage = SpellPower.getSpellDamage(mPlayer, mLevelDamage);
-		Vector playerDir = mPlayer.getEyeLocation().getDirection().setY(0).normalize();
-		for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), SIZE, mPlayer)) {
-			Vector toMobVector = mob.getLocation().toVector().subtract(mPlayer.getLocation().toVector()).setY(0).normalize();
-			if (playerDir.dot(toMobVector) > DOT_ANGLE) {
-				EntityUtils.applyFire(mPlugin, FIRE_TICKS, mob, mPlayer);
-				EntityUtils.damageEntity(mPlugin, mob, damage, mPlayer, MagicType.FIRE, true, mInfo.mLinkedSpell, true, true, true);
-				MovementUtils.knockAway(mPlayer, mob, KNOCKBACK);
+		Vector flattenedLookDirection = mPlayer.getEyeLocation().getDirection().setY(0);
+		for (LivingEntity potentialTarget : EntityUtils.getNearbyMobs(mPlayer.getLocation(), SIZE, mPlayer)) {
+			Vector flattenedTargetVector = potentialTarget.getLocation().toVector().subtract(mPlayer.getLocation().toVector()).setY(0);
+			if (
+				VectorUtils.isAngleWithin(
+					flattenedLookDirection,
+					flattenedTargetVector,
+					ANGLE
+				)
+			) {
+				EntityUtils.applyFire(mPlugin, FIRE_TICKS, potentialTarget, mPlayer);
+				EntityUtils.damageEntity(mPlugin, potentialTarget, damage, mPlayer, MagicType.FIRE, true, mInfo.mLinkedSpell, true, true, true);
+				MovementUtils.knockAway(mPlayer, potentialTarget, KNOCKBACK);
 			}
 		}
 
@@ -153,7 +161,7 @@ public class MagmaShield extends Ability {
 			boolean lookingTooHigh = false;
 			if (mLookUpRestriction) {
 				// Only check if looking too high, if have restriction. Otherwise never looking too high (false)
-				lookingTooHigh = mPlayer.getLocation().getPitch() < ANGLE;
+				lookingTooHigh = mPlayer.getLocation().getPitch() < BLIZZARD_ANGLE;
 			}
 			return mPlayer.isSneaking() && !lookingTooHigh;
 		}
