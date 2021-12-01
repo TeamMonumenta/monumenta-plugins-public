@@ -10,7 +10,6 @@ import org.bukkit.attribute.Attribute;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
 import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
@@ -53,8 +52,8 @@ public class Virius extends BossAbilityGroup {
 			new SpellChangeFloor(plugin, mBoss, mSpawnLoc, detectionRange, 3, Material.MAGMA_BLOCK, 800),
 			new SpellBaseLaser(plugin, boss, detectionRange, 100, false, false, 160,
 						// Tick action per player
-						(Player player, int ticks, boolean blocked) -> {
-							player.playSound(player.getLocation(), Sound.UI_TOAST_IN, 2, 0.5f + (ticks / 80f) * 1.5f);
+						(LivingEntity player, int ticks, boolean blocked) -> {
+							player.getWorld().playSound(player.getLocation(), Sound.UI_TOAST_IN, 2, 0.5f + (ticks / 80f) * 1.5f);
 							boss.getLocation().getWorld().playSound(boss.getLocation(), Sound.UI_TOAST_IN, 2, 0.5f + (ticks / 80f) * 1.5f);
 							if (ticks == 0) {
 								boss.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 110, 4));
@@ -66,7 +65,7 @@ public class Virius extends BossAbilityGroup {
 							loc.getWorld().spawnParticle(Particle.WATER_SPLASH, loc, 1, 0.04, 0.04, 0.04, 1);
 						},
 						// Damage generated at the end of the attack
-						(Player player, Location loc, boolean blocked) -> {
+						(LivingEntity player, Location loc, boolean blocked) -> {
 							loc.getWorld().playSound(loc, Sound.ENTITY_DRAGON_FIREBALL_EXPLODE, 1f, 1.5f);
 							loc.getWorld().spawnParticle(Particle.WATER_WAKE, loc, 300, 0.8, 0.8, 0.8, 0);
 							if (!blocked) {

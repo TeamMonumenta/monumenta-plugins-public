@@ -23,7 +23,11 @@ public class EffectsList {
 		static {
 			EFFECT_RUNNER = new HashMap<>();
 			EFFECT_RUNNER.put("fire", (p, boss, duration) -> p.setFireTicks((int) duration));
-			EFFECT_RUNNER.put("silence", (p, boss, duration) -> AbilityUtils.silencePlayer(p, (int) duration));
+			EFFECT_RUNNER.put("silence", (p, boss, duration) -> {
+				if (p instanceof Player) {
+					AbilityUtils.silencePlayer((Player)p, (int) duration);
+				}
+			});
 			EFFECT_RUNNER.put("pullforce", (p, boss, duration) -> MovementUtils.pullTowards(boss, p, duration));
 			EFFECT_RUNNER.put("pull", (p, boss, duration) -> MovementUtils.pullTowardsByUnit(boss, p, duration));
 			EFFECT_RUNNER.put("pushforce", (p, boss, duration) -> MovementUtils.knockAway(boss, p, duration));
@@ -66,7 +70,7 @@ public class EffectsList {
 			this(effect, duration, 0);
 		}
 
-		public void apply(Player p, LivingEntity boss) {
+		public void apply(LivingEntity p, LivingEntity boss) {
 			if (mEffect != null) {
 				p.addPotionEffect(new PotionEffect(mEffect, mDurationTicks, mAmplifier, true, false));
 			} else {
@@ -85,7 +89,7 @@ public class EffectsList {
 
 		@FunctionalInterface
 		private interface EffectRunner {
-			void apply(Player p, LivingEntity boss, float duration);
+			void apply(LivingEntity p, LivingEntity boss, float duration);
 		}
 	}
 
@@ -97,7 +101,7 @@ public class EffectsList {
 
 	}
 
-	public void apply(Player player, LivingEntity boss) {
+	public void apply(LivingEntity player, LivingEntity boss) {
 		//if the list is empty the for will be skipped
 		for (Effect effect : mEffectList) {
 			effect.apply(player, boss);

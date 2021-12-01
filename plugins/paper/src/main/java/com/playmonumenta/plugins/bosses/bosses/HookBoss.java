@@ -7,7 +7,6 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -80,12 +79,12 @@ public class HookBoss extends BossAbilityGroup {
 						}
 					},
 					// Hit Action
-					(World world, Player player, Location loc) -> {
+					(World world, LivingEntity target, Location loc) -> {
 						world.playSound(loc, Sound.ENTITY_ARMOR_STAND_BREAK, 1f, 0.5f);
 						world.spawnParticle(Particle.CRIT, loc, 50, 0, 0, 0, 0.25);
-						if (player != null) {
-							BossUtils.bossDamage(boss, player, p.DAMAGE);
-							MovementUtils.pullTowards(boss, player, 1);
+						if (target != null) {
+							BossUtils.bossDamage(boss, target, p.DAMAGE);
+							MovementUtils.pullTowards(boss, target, 1);
 						}
 					}
 			)));

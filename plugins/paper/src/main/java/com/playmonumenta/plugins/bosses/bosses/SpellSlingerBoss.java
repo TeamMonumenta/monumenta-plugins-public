@@ -7,7 +7,6 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
 import com.playmonumenta.plugins.bosses.SpellManager;
@@ -57,7 +56,7 @@ public class SpellSlingerBoss extends BossAbilityGroup {
 							world.spawnParticle(Particle.END_ROD, loc, 2, 0.25, 0.25, 0.25, 0);
 						},
 						// Hit Action
-						(World world, Player player, Location loc) -> {
+						(World world, LivingEntity player, Location loc) -> {
 							world.playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_TWINKLE, 0.5f, 1.5f);
 							world.spawnParticle(Particle.FIREWORKS_SPARK, loc, 30, 0, 0, 0, 0.25);
 							if (player != null) {

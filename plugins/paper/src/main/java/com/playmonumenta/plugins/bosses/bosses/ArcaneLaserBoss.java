@@ -6,7 +6,6 @@ import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -39,8 +38,8 @@ public class ArcaneLaserBoss extends BossAbilityGroup {
 		SpellManager activeSpells = new SpellManager(Arrays.asList(
 			new SpellBaseLaser(plugin, boss, p.DETECTION, p.DURATION, false, p.SINGLE_TARGET, p.COOLDOWN,
 					// Tick action per player
-					(Player player, int ticks, boolean blocked) -> {
-						player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_BULLET_HIT, 0.8f, 0.5f + (ticks / 80f) * 1.5f);
+					(LivingEntity target, int ticks, boolean blocked) -> {
+						target.getWorld().playSound(target.getLocation(), Sound.ENTITY_SHULKER_BULLET_HIT, 0.8f, 0.5f + (ticks / 80f) * 1.5f);
 						boss.getLocation().getWorld().playSound(boss.getLocation(), Sound.ENTITY_SHULKER_BULLET_HIT, 0.8f, 0.5f + (ticks / 80f) * 1.5f);
 						if (ticks == 0) {
 							boss.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 110, 4, false, true));
@@ -52,12 +51,12 @@ public class ArcaneLaserBoss extends BossAbilityGroup {
 						loc.getWorld().spawnParticle(Particle.CRIT_MAGIC, loc, 1, 0.04, 0.04, 0.04, 1);
 					},
 					// Damage generated at the end of the attack
-					(Player player, Location loc, boolean blocked) -> {
+					(LivingEntity target, Location loc, boolean blocked) -> {
 						loc.getWorld().playSound(loc, Sound.ENTITY_DRAGON_FIREBALL_EXPLODE, 0.6f, 1.5f);
 						loc.getWorld().spawnParticle(Particle.EXPLOSION_NORMAL, loc, 35, 0, 0, 0, 0.25);
 						if (!blocked) {
-							BossUtils.bossDamage(boss, player, 18);
-							player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, p.SLOW_DURATION, p.SLOW_LEVEL));
+							BossUtils.bossDamage(boss, target, 18);
+							target.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, p.SLOW_DURATION, p.SLOW_LEVEL));
 						}
 					})
 		));

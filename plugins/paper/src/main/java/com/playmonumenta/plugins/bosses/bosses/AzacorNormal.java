@@ -72,13 +72,13 @@ public class AzacorNormal extends BossAbilityGroup {
 			                  }),
 			new SpellBaseLaser(plugin, boss, detectionRange, 100, false, false, 160,
 			                   // Tick action per player
-			                   (Player player, int ticks, boolean blocked) -> {
+			                   (LivingEntity target, int ticks, boolean blocked) -> {
 								   if (ticks % 8 == 0) {
-									   player.playSound(player.getLocation(), Sound.UI_TOAST_IN, SoundCategory.HOSTILE, 0.75f, 0.5f + (ticks / 80f) * 1.5f);
+										target.getWorld().playSound(target.getLocation(), Sound.UI_TOAST_IN, SoundCategory.HOSTILE, 0.75f, 0.5f + (ticks / 80f) * 1.5f);
 								   } else if (ticks % 8 == 2) {
 									   boss.getLocation().getWorld().playSound(boss.getLocation(), Sound.UI_TOAST_IN, SoundCategory.HOSTILE, 1.0f, 0.5f + (ticks / 80f) * 1.5f);
 								   } else if (ticks % 8 == 4) {
-									   player.playSound(player.getLocation(), Sound.ENTITY_WITHER_SPAWN, SoundCategory.HOSTILE, 0.75f, 0.5f + (ticks / 100f) * 1.5f);
+										target.getWorld().playSound(target.getLocation(), Sound.ENTITY_WITHER_SPAWN, SoundCategory.HOSTILE, 0.75f, 0.5f + (ticks / 100f) * 1.5f);
 								   } else if (ticks % 8 == 6) {
 									   boss.getLocation().getWorld().playSound(boss.getLocation(), Sound.UI_TOAST_IN, SoundCategory.HOSTILE, 1.0f, 0.5f + (ticks / 100f) * 1.5f);
 								   }
@@ -92,12 +92,12 @@ public class AzacorNormal extends BossAbilityGroup {
 			                       loc.getWorld().spawnParticle(Particle.FLAME, loc, 1, 0.02, 0.02, 0.02, 0);
 			                   },
 			                   // Damage generated at the end of the attack
-			                   (Player player, Location loc, boolean blocked) -> {
+			                   (LivingEntity target, Location loc, boolean blocked) -> {
 			                       loc.getWorld().playSound(loc, Sound.ENTITY_DRAGON_FIREBALL_EXPLODE, SoundCategory.HOSTILE, 1f, 1.5f);
 			                       loc.getWorld().spawnParticle(Particle.EXPLOSION_LARGE, loc, 30, 0, 0, 0, 0.3);
 
 			                       if (!blocked) {
-			                           BossUtils.bossDamagePercent(mBoss, player, 0.74);
+			                           BossUtils.bossDamagePercent(mBoss, target, 0.74);
 			                       } else {
 									   EntityUtils.summonEntityAt(loc, EntityType.PRIMED_TNT, "{Fuse:0}");
 			                       }

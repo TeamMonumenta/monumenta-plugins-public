@@ -60,7 +60,7 @@ public class TCalin extends BossAbilityGroup {
 		World world = mSpawnLoc.getWorld();
 		mBoss.addScoreboardTag("Boss");
 		SpellBaseCharge charge = new SpellBaseCharge(plugin, mBoss, 20, 25, 160, true,
-			(Player player) -> {
+			(LivingEntity player) -> {
 				boss.getWorld().spawnParticle(Particle.VILLAGER_ANGRY, boss.getLocation(), 50, 2, 2, 2, 0);
 				boss.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 40, 4));
 				boss.getWorld().playSound(boss.getLocation(), Sound.ENTITY_WITHER_SPAWN, 1f, 1.5f);
@@ -70,12 +70,12 @@ public class TCalin extends BossAbilityGroup {
 				loc.getWorld().spawnParticle(Particle.SMOKE_NORMAL, loc, 1, 1, 1, 1, 0);
 			},
 			// Charge attack sound/particles at boss location
-			(Player player) -> {
+			(LivingEntity player) -> {
 				boss.getWorld().spawnParticle(Particle.SMOKE_LARGE, boss.getLocation(), 100, 2, 2, 2, 0);
 				boss.getWorld().playSound(boss.getLocation(), Sound.ENTITY_WITHER_SHOOT, 1f, 0.5f);
 			},
 			// Attack hit a player
-			(Player player) -> {
+			(LivingEntity player) -> {
 				player.getWorld().spawnParticle(Particle.SMOKE_NORMAL, player.getLocation(), 80, 1, 1, 1, 0);
 				player.getWorld().spawnParticle(Particle.EXPLOSION_NORMAL, player.getLocation(), 20, 1, 1, 1, 0.15);
 				boss.getWorld().playSound(player.getLocation(), Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, 1f, 0.85f);

@@ -30,7 +30,6 @@ import org.bukkit.attribute.Attribute;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
 import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
@@ -98,11 +97,11 @@ public class MimicQueen extends BossAbilityGroup {
 							}
 						},
 						// Hit Action
-						(World world, Player player, Location loc) -> {
+						(World world, LivingEntity target, Location loc) -> {
 							world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 0.5f, 0.5f);
 							world.spawnParticle(Particle.FLAME, loc, 50, 0, 0, 0, 0.25);
-							if (player != null) {
-								BossUtils.bossDamage(boss, player, DAMAGE);
+							if (target != null) {
+								BossUtils.bossDamage(boss, target, DAMAGE);
 							}
 						})
 		));

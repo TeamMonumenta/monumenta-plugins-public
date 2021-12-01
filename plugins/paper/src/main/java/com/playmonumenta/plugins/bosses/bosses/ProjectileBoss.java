@@ -5,8 +5,12 @@ import java.util.Arrays;
 import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.parameters.BossParam;
 import com.playmonumenta.plugins.bosses.parameters.EffectsList;
+import com.playmonumenta.plugins.bosses.parameters.EntityTargets;
 import com.playmonumenta.plugins.bosses.parameters.ParticlesList;
 import com.playmonumenta.plugins.bosses.parameters.SoundsList;
+import com.playmonumenta.plugins.bosses.parameters.EntityTargets.Limit;
+import com.playmonumenta.plugins.bosses.parameters.EntityTargets.TARGETS;
+import com.playmonumenta.plugins.bosses.parameters.EntityTargets.Limit.LIMITSENUM;
 import com.playmonumenta.plugins.bosses.spells.SpellBaseSeekingProjectile;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
@@ -14,7 +18,6 @@ import com.playmonumenta.plugins.utils.PotionUtils;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -62,6 +65,8 @@ public class ProjectileBoss extends BossAbilityGroup {
 		@BossParam(help = "not written")
 		public boolean COLLIDES_WITH_BLOCKS = true;
 
+		@BossParam(help = "Let you choose the targets of this spell")
+		public EntityTargets TARGETS = EntityTargets.GENERIC_PLAYER_TARGET;
 
 		@BossParam(help = "Effects applied to the player when he got hit")
 		public EffectsList EFFECTS = EffectsList.EMPTY;
@@ -104,9 +109,20 @@ public class ProjectileBoss extends BossAbilityGroup {
 
 		int lifetimeTicks = (int) (p.DISTANCE/p.SPEED);
 
+		if (p.TARGETS == EntityTargets.GENERIC_PLAYER_TARGET) {
+			//same object
+			//probably an older mob version?
+			//build a new target from others config
+			p.TARGETS = new EntityTargets(TARGETS.PLAYER, p.DETECTION, false, p.SINGLE_TARGET ? new Limit(1) : new Limit(LIMITSENUM.ALL));
+			//by default LaserBoss don't take player in stealt.
+		}
 		SpellManager activeSpells = new SpellManager(Arrays.asList(
-			new SpellBaseSeekingProjectile(plugin, boss, p.DETECTION, p.SINGLE_TARGET, p.LAUNCH_TRACKING, p.COOLDOWN, p.DELAY,
-					p.SPEED, p.TURN_RADIUS, lifetimeTicks, p.HITBOX_LENGTH, p.COLLIDES_WITH_BLOCKS, p.LINGERS,
+			new SpellBaseSeekingProjectile(plugin, boss, p.LAUNCH_TRACKING, p.COOLDOWN, p.DELAY,
+					p.SPEED, p.TURN_RADIUS, lifetimeTicks, p.HITBOX_LENGTH, p.COLLIDES_WITH_BLOCKS, p.LINGERS, 0, false,
+					//spell targets
+					() -> {
+						return p.TARGETS.getTargetsList(mBoss);
+					},
 					// Initiate Aesthetic
 					(World world, Location loc, int ticks) -> {
 						PotionUtils.applyPotion(null, boss, new PotionEffect(PotionEffectType.GLOWING, p.DELAY, 0));
@@ -125,28 +141,26 @@ public class ProjectileBoss extends BossAbilityGroup {
 						}
 					},
 					// Hit Action
-					(World world, Player player, Location loc) -> {
+					(World world, LivingEntity target, Location loc) -> {
 						p.SOUND_HIT.play(loc, 0.5f, 0.5f);
 						p.PARTICLE_HIT.spawn(loc, 0d, 0d, 0d, 0.25d);
-						if (player != null) {
-							if (p.DAMAGE > 0) {
-								if (p.SPELL_NAME.isEmpty()) {
-									BossUtils.bossDamage(boss, player, p.DAMAGE);
-								} else {
-									BossUtils.bossDamage(boss, player, p.DAMAGE, mBoss.getLocation(), p.SPELL_NAME);
-								}
+						if (p.DAMAGE > 0) {
+							if (p.SPELL_NAME.isEmpty()) {
+								BossUtils.bossDamage(boss, target, p.DAMAGE);
+							} else {
+								BossUtils.bossDamage(boss, target, p.DAMAGE, mBoss.getLocation(), p.SPELL_NAME);
 							}
-
-							if (p.DAMAGE_PERCENTAGE > 0.0) {
-								if (p.SPELL_NAME.isEmpty()) {
-									BossUtils.bossDamagePercent(mBoss, player, p.DAMAGE_PERCENTAGE);
-								} else {
-									BossUtils.bossDamagePercent(mBoss, player, p.DAMAGE_PERCENTAGE, p.SPELL_NAME);
-								}
-							}
-							p.EFFECTS.apply(player, boss);
-
 						}
+
+						if (p.DAMAGE_PERCENTAGE > 0.0) {
+							if (p.SPELL_NAME.isEmpty()) {
+								BossUtils.bossDamagePercent(mBoss, target, p.DAMAGE_PERCENTAGE);
+							} else {
+								BossUtils.bossDamagePercent(mBoss, target, p.DAMAGE_PERCENTAGE, p.SPELL_NAME);
+							}
+						}
+						p.EFFECTS.apply(target, boss);
+
 					})
 		));
 

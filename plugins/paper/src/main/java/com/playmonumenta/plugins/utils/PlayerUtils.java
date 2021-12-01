@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.NavigableSet;
+import java.util.Optional;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -456,5 +457,41 @@ public class PlayerUtils {
 		}
 		finalValue *= overallMultiplier;
 		return finalValue;
+	}
+
+
+	public static boolean isMage(Player player) {
+		Optional<Integer> opt = ScoreboardUtils.getScoreboardValue(player, "Class");
+		return opt.orElse(0) == 1;
+	}
+
+	public static boolean isWarrior(Player player) {
+		Optional<Integer> opt = ScoreboardUtils.getScoreboardValue(player, "Class");
+		return opt.orElse(0) == 2;
+	}
+
+	public static boolean isCleric(Player player) {
+		Optional<Integer> opt = ScoreboardUtils.getScoreboardValue(player, "Class");
+		return opt.orElse(0) == 3;
+	}
+
+	public static boolean isRogue(Player player) {
+		Optional<Integer> opt = ScoreboardUtils.getScoreboardValue(player, "Class");
+		return opt.orElse(0) == 4;
+	}
+
+	public static boolean isAlchemist(Player player) {
+		Optional<Integer> opt = ScoreboardUtils.getScoreboardValue(player, "Class");
+		return opt.orElse(0) == 5;
+	}
+
+	public static boolean isScout(Player player) {
+		Optional<Integer> opt = ScoreboardUtils.getScoreboardValue(player, "Class");
+		return opt.orElse(0) == 6;
+	}
+
+	public static boolean isWarlock(Player player) {
+		Optional<Integer> opt = ScoreboardUtils.getScoreboardValue(player, "Class");
+		return opt.orElse(0) == 7;
 	}
 }

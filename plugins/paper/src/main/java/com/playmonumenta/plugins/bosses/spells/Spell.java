@@ -2,8 +2,10 @@ package com.playmonumenta.plugins.bosses.spells;
 
 import java.util.Iterator;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Set;
 
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.entity.AreaEffectCloudApplyEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.PotionSplashEvent;
@@ -111,6 +113,11 @@ public abstract class Spell implements Cloneable {
 
 	public void bossCastAbility(SpellCastEvent event) {
 
+	}
+
+	@FunctionalInterface
+	public interface GetSpellTargets<V extends LivingEntity> {
+		List<V> getTargets();
 	}
 
 }

@@ -1,8 +1,5 @@
 package com.playmonumenta.plugins.utils;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.NavigableSet;
 
@@ -13,7 +10,6 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.effects.Effect;
 import com.playmonumenta.plugins.effects.Stasis;
 
-import org.bukkit.Color;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -45,15 +41,15 @@ public class BossUtils {
 		return false;
 	}
 
-	public static void bossDamage(@Nonnull LivingEntity boss, @Nonnull Player target, double damage) {
+	public static void bossDamage(@Nonnull LivingEntity boss, @Nonnull LivingEntity target, double damage) {
 		bossDamage(boss, target, damage, boss.getLocation(), null);
 	}
 
-	public static void bossDamage(@Nonnull LivingEntity boss, @Nonnull Player target, double damage, @Nullable Location source) {
+	public static void bossDamage(@Nonnull LivingEntity boss, @Nonnull LivingEntity target, double damage, @Nullable Location source) {
 		bossDamage(boss, target, damage, source, null);
 	}
 
-	public static void bossDamage(@Nonnull LivingEntity boss, @Nonnull Player target, double damage, @Nullable Location source, String cause) {
+	public static void bossDamage(@Nonnull LivingEntity boss, @Nonnull LivingEntity target, double damage, @Nullable Location source, String cause) {
 		int resistance = 0;
 		if (target.hasPotionEffect(PotionEffectType.DAMAGE_RESISTANCE)) {
 			resistance = target.getPotionEffect(PotionEffectType.DAMAGE_RESISTANCE).getAmplifier() + 1;
@@ -64,11 +60,11 @@ public class BossUtils {
 			return;
 		}
 
-		if (bossDamageBlocked(target, damage, source)) {
+		if ((target instanceof Player) && bossDamageBlocked((Player)target, damage, source)) {
 			/* One second of cooldown for every 2 points of damage */
-			target.setCooldown(Material.SHIELD, (int)(20 * damage / 2.5));
+			((Player) target).setCooldown(Material.SHIELD, (int)(20 * damage / 2.5));
 			target.getWorld().playSound(target.getLocation(), Sound.ITEM_SHIELD_BREAK, SoundCategory.PLAYERS, 1.0f, 1.0f);
-			ItemUtils.damageShield(target, (int)(damage / 5));
+			ItemUtils.damageShield((Player) target, (int)(damage / 5));
 		} else {
 			// Don't adjust damage to account for resistance, because target.damage() already does this
 			// Apply the damage using a custom damage source that can not be blocked
@@ -76,32 +72,32 @@ public class BossUtils {
 		}
 	}
 
-	public static boolean bossDamagePercent(@Nonnull LivingEntity boss, @Nonnull Player target, double percentHealth) {
+	public static boolean bossDamagePercent(@Nonnull LivingEntity boss, @Nonnull LivingEntity target, double percentHealth) {
 		return bossDamagePercent(boss, target, percentHealth, null, false, null);
 	}
 
-	public static boolean bossDamagePercent(@Nonnull LivingEntity boss, @Nonnull Player target, double percentHealth, @Nullable Location source) {
+	public static boolean bossDamagePercent(@Nonnull LivingEntity boss, @Nonnull LivingEntity target, double percentHealth, @Nullable Location source) {
 		return bossDamagePercent(boss, target, percentHealth, source, false, null);
 	}
 
-	public static boolean bossDamagePercent(@Nonnull LivingEntity boss, @Nonnull Player target, double percentHealth, @Nullable Location source, boolean raw) {
+	public static boolean bossDamagePercent(@Nonnull LivingEntity boss, @Nonnull LivingEntity target, double percentHealth, @Nullable Location source, boolean raw) {
 		return bossDamagePercent(boss, target, percentHealth, source, raw, null);
 	}
 
-	public static boolean bossDamagePercent(@Nonnull LivingEntity boss, @Nonnull Player target, double percentHealth, String cause) {
+	public static boolean bossDamagePercent(@Nonnull LivingEntity boss, @Nonnull LivingEntity target, double percentHealth, String cause) {
 		return bossDamagePercent(boss, target, percentHealth, null, false, cause);
 	}
 
-	public static boolean bossDamagePercent(@Nonnull LivingEntity boss, @Nonnull Player target, double percentHealth, @Nullable Location source, String cause) {
+	public static boolean bossDamagePercent(@Nonnull LivingEntity boss, @Nonnull LivingEntity target, double percentHealth, @Nullable Location source, String cause) {
 		return bossDamagePercent(boss, target, percentHealth, source, false, cause);
 	}
 
 	/*
 	 * Returns whether or not the player survived (true) or was killed (false)
 	 */
-	public static boolean bossDamagePercent(@Nonnull LivingEntity boss, @Nonnull Player target, double percentHealth, @Nullable Location source, boolean raw, String cause) {
+	public static boolean bossDamagePercent(@Nonnull LivingEntity boss, @Nonnull LivingEntity target, double percentHealth, @Nullable Location source, boolean raw, String cause) {
 		if (target instanceof Player) {
-			Player player = target;
+			Player player = (Player) target;
 			if (player.getGameMode() == GameMode.CREATIVE || player.getGameMode() == GameMode.SPECTATOR) {
 				return true;
 			}
@@ -130,21 +126,21 @@ public class BossUtils {
 			toTake = percentHealth;
 		}
 
-		if (bossDamageBlocked(target, 0, source)) {
+		if ((target instanceof Player) && bossDamageBlocked((Player) target, 0, source)) {
 			/*
 			 * One second of cooldown for every 2 points of damage
 			 * Since this is % based, compute cooldown based on "Normal" health
 			 */
 			if (raw) {
 				if (toTake > 1) {
-					target.setCooldown(Material.SHIELD, (int) Math.ceil(toTake * 0.5));
+					((Player) target).setCooldown(Material.SHIELD, (int) Math.ceil(toTake * 0.5));
 				}
 				target.getWorld().playSound(target.getLocation(), Sound.ITEM_SHIELD_BREAK, SoundCategory.PLAYERS, 1.0f, 1.0f);
-				ItemUtils.damageShield(target, (int) Math.ceil(toTake / 2.5));
+				ItemUtils.damageShield((Player) target, (int) Math.ceil(toTake / 2.5));
 			} else {
-				target.setCooldown(Material.SHIELD, (int)(20 * percentHealth * 20));
+				((Player) target).setCooldown(Material.SHIELD, (int)(20 * percentHealth * 20));
 				target.getWorld().playSound(target.getLocation(), Sound.ITEM_SHIELD_BREAK, SoundCategory.PLAYERS, 1.0f, 1.0f);
-				ItemUtils.damageShield(target, (int)(percentHealth * 20 / 2.5));
+				ItemUtils.damageShield((Player) target, (int)(percentHealth * 20 / 2.5));
 			}
 		} else {
 			double absorp = AbsorptionUtils.getAbsorption(target);

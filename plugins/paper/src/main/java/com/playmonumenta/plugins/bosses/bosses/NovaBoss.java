@@ -5,16 +5,17 @@ import java.util.Arrays;
 import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.parameters.BossParam;
 import com.playmonumenta.plugins.bosses.parameters.EffectsList;
+import com.playmonumenta.plugins.bosses.parameters.EntityTargets;
 import com.playmonumenta.plugins.bosses.parameters.ParticlesList;
 import com.playmonumenta.plugins.bosses.parameters.SoundsList;
+import com.playmonumenta.plugins.bosses.parameters.EntityTargets.TARGETS;
 import com.playmonumenta.plugins.bosses.spells.SpellBaseNova;
 import com.playmonumenta.plugins.utils.BossUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
 
 import org.bukkit.Location;
 import org.bukkit.Sound;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
 public class NovaBoss extends BossAbilityGroup {
@@ -43,6 +44,9 @@ public class NovaBoss extends BossAbilityGroup {
 		@BossParam(help = "The spell name showed when the player die by this skill")
 		public String SPELL_NAME = "";
 
+		@BossParam(help = "Let you choose the targets of this spell")
+		public EntityTargets TARGETS = EntityTargets.GENERIC_PLAYER_TARGET;
+
 		//particle & sound used!
 		@BossParam(help = "Particle summon on the air")
 		public ParticlesList PARTICLE_AIR = ParticlesList.fromString("[(CLOUD,5)]");
@@ -70,6 +74,13 @@ public class NovaBoss extends BossAbilityGroup {
 
 		Parameters p = BossParameters.getParameters(boss, identityTag, new Parameters());
 
+		if (p.TARGETS == EntityTargets.GENERIC_PLAYER_TARGET) {
+			//same object
+			//probably an older mob version?
+			//build a new target from others config
+			p.TARGETS = new EntityTargets(TARGETS.PLAYER, p.RADIUS, true);
+			//by default LaserBoss take player in stealt.
+		}
 		SpellManager activeSpells = new SpellManager(Arrays.asList(
 			new SpellBaseNova(plugin, boss, p.RADIUS, p.DURATION, p.COOLDOWN, p.CAN_MOVE, p.SOUND_CHARGE,
 			(Location loc) -> {
@@ -85,24 +96,26 @@ public class NovaBoss extends BossAbilityGroup {
 				p.PARTICLE_EXPLODE.spawn(loc, 0.2, 0.2, 0.2, 0.2);
 			},
 			(Location loc) -> {
-				for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), p.RADIUS, true)) {
-
-					if (p.DAMAGE > 0) {
-						if (p.SPELL_NAME.isEmpty()) {
-							BossUtils.bossDamage(boss, player, p.DAMAGE);
-						} else {
-							BossUtils.bossDamage(boss, player, p.DAMAGE, mBoss.getLocation(), p.SPELL_NAME);
+				for (Entity entity : p.TARGETS.getTargetsList(mBoss)) {
+					if (entity instanceof LivingEntity) {
+						LivingEntity target = (LivingEntity) entity;
+						if (p.DAMAGE > 0) {
+							if (p.SPELL_NAME.isEmpty()) {
+								BossUtils.bossDamage(boss, target, p.DAMAGE);
+							} else {
+								BossUtils.bossDamage(boss, target, p.DAMAGE, mBoss.getLocation(), p.SPELL_NAME);
+							}
 						}
-					}
 
-					if (p.DAMAGE_PERCENTAGE > 0.0) {
-						if (p.SPELL_NAME.isEmpty()) {
-							BossUtils.bossDamagePercent(mBoss, player, p.DAMAGE_PERCENTAGE);
-						} else {
-							BossUtils.bossDamagePercent(mBoss, player, p.DAMAGE_PERCENTAGE, p.SPELL_NAME);
+						if (p.DAMAGE_PERCENTAGE > 0.0) {
+							if (p.SPELL_NAME.isEmpty()) {
+								BossUtils.bossDamagePercent(mBoss, target, p.DAMAGE_PERCENTAGE);
+							} else {
+								BossUtils.bossDamagePercent(mBoss, target, p.DAMAGE_PERCENTAGE, p.SPELL_NAME);
+							}
 						}
+						p.EFFECTS.apply(target, mBoss);
 					}
-					p.EFFECTS.apply(player, mBoss);
 				}
 			})));
 

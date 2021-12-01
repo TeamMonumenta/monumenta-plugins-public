@@ -72,12 +72,13 @@ public class BlackflameBurst extends Spell {
 					world.spawnParticle(Particle.SMOKE_NORMAL, loc, 4, 0.25, 0.25, 0.25, 0.05);
 				},
 				// Hit Action
-				(World world, Player player, Location loc) -> {
-					player.playSound(player.getLocation(), Sound.ENTITY_WITHER_HURT, SoundCategory.HOSTILE, 1, 0);
-					player.spawnParticle(Particle.SOUL_FIRE_FLAME, loc, 20, 0.5, 0.5, 0.5, 0.5);
-
-					BossUtils.bossDamage(boss, player, DAMAGE, mBoss.getLocation(), "Blackflame Burst");
-					player.setFireTicks(4 * 20);
+				(World world, LivingEntity player, Location loc) -> {
+					loc.getWorld().playSound(loc, Sound.ENTITY_WITHER_HURT, SoundCategory.HOSTILE, 1, 0);
+					loc.getWorld().spawnParticle(Particle.SOUL_FIRE_FLAME, loc, 20, 0.5, 0.5, 0.5, 0.5);
+					if (player != null) {
+						BossUtils.bossDamage(boss, player, DAMAGE, mBoss.getLocation(), "Blackflame Burst");
+						((LivingEntity) player).setFireTicks(4 * 20);
+					}
 				});
 	}
 

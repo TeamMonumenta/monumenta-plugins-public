@@ -7,7 +7,6 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -73,7 +72,7 @@ public class TrackingProjectileBoss extends BossAbilityGroup {
 						}
 					},
 					// Hit Action
-					(World world, Player player, Location loc) -> {
+					(World world, LivingEntity player, Location loc) -> {
 						world.playSound(loc, Sound.BLOCK_BEACON_DEACTIVATE, 2f, 0.5f);
 						world.spawnParticle(Particle.SPELL_WITCH, loc, 50, 0, 0, 0, 0.25);
 						if (player != null) {

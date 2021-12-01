@@ -7,7 +7,6 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -80,23 +79,23 @@ public class SeekingProjectileBoss extends BossAbilityGroup {
 						}
 					},
 					// Hit Action
-					(World world, Player player, Location loc) -> {
+					(World world, LivingEntity target, Location loc) -> {
 						world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 0.5f, 0.5f);
 						world.spawnParticle(Particle.FLAME, loc, 50, 0, 0, 0, 0.25);
-						if (player != null) {
-							BossUtils.bossDamage(boss, player, p.DAMAGE);
+						if (target != null) {
+							BossUtils.bossDamage(boss, target, p.DAMAGE);
 							if (p.FIRE_DURATION != 0) {
-								player.setFireTicks(p.FIRE_DURATION);
+								target.setFireTicks(p.FIRE_DURATION);
 							}
 							if (p.EFFECT_DURATION != 0) {
-								player.addPotionEffect(new PotionEffect(p.EFFECT, p.EFFECT_DURATION, p.EFFECT_AMPLIFIER, true, true));
+								target.addPotionEffect(new PotionEffect(p.EFFECT, p.EFFECT_DURATION, p.EFFECT_AMPLIFIER, true, true));
 							}
 							if (p.EFFECT_DURATION_TWO != 0) {
-								player.addPotionEffect(new PotionEffect(p.EFFECT_TWO, p.EFFECT_DURATION_TWO, p.EFFECT_AMPLIFIER_TWO, true, true));
+								target.addPotionEffect(new PotionEffect(p.EFFECT_TWO, p.EFFECT_DURATION_TWO, p.EFFECT_AMPLIFIER_TWO, true, true));
 							}
 							if (p.ANTIHEAL_DURATION != 0) {
-								customEffectInstance.mEffectManager.addEffect(player, "BossPercentHealEffect", new PercentHeal(p.ANTIHEAL_DURATION, 0.5));
-								player.addPotionEffect(new PotionEffect(PotionEffectType.BAD_OMEN, p.ANTIHEAL_DURATION, 1, true, true));
+								customEffectInstance.mEffectManager.addEffect(target, "BossPercentHealEffect", new PercentHeal(p.ANTIHEAL_DURATION, 0.5));
+								target.addPotionEffect(new PotionEffect(PotionEffectType.BAD_OMEN, p.ANTIHEAL_DURATION, 1, true, true));
 							}
 						}
 					})

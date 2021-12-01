@@ -62,7 +62,7 @@ public class NothingnessSeeker extends SpellBaseSeekingProjectile {
 					}
 				},
 				// Hit Action
-				(World world, Player player, Location loc) -> {
+				(World world, LivingEntity player, Location loc) -> {
 					world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 0.5f, 0.5f);
 					world.spawnParticle(Particle.REDSTONE, loc, 50, 0.5, 0.5, 0.5, 0.25, GREEN_COLOR);
 					if (player != null) {

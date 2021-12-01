@@ -26,9 +26,9 @@ public class SpellBaseCharge extends Spell {
 		 *
 		 * Probably slow the boss down, particles, and a sound
 		 *
-		 * @param player Targeted player
+		 * @param target Targeted LivingEntity
 		 */
-		void run(Player player);
+		void run(LivingEntity target);
 	}
 
 	@FunctionalInterface
@@ -49,9 +49,9 @@ public class SpellBaseCharge extends Spell {
 		 *
 		 * Probably Particles / sound
 		 *
-		 * @param player Targeted player
+		 * @param target Targeted LivingEntity
 		 */
-		void run(Player player);
+		void run(LivingEntity target);
 	}
 
 	@FunctionalInterface
@@ -61,9 +61,9 @@ public class SpellBaseCharge extends Spell {
 		 *
 		 * Probably particles, sound, and damage player
 		 *
-		 * @param player Hit player
+		 * @param target Hit LivingEntity
 		 */
-		void run(Player player);
+		void run(LivingEntity target);
 	}
 
 	@FunctionalInterface
@@ -104,6 +104,7 @@ public class SpellBaseCharge extends Spell {
 	private int mRate;
 	private double mYStartAdd;
 	private boolean mTargetFurthest;
+	private GetSpellTargets<LivingEntity> mTargets;
 
 	public SpellBaseCharge(Plugin plugin, LivingEntity boss, int range, int chargeTicks,
 	                       WarningAction warning, ParticleAction warnParticles, StartAction start,
@@ -155,10 +156,48 @@ public class SpellBaseCharge extends Spell {
 		mYStartAdd = yStartAdd;
 		mTargetFurthest = targetFurthest;
 		mCooldown = cooldown;
+		mTargets = null;
+	}
+
+	public SpellBaseCharge(Plugin plugin, LivingEntity boss, int cooldown, int chargeTicks, boolean stopOnFirstHit,
+			int charges, int rate, double yStartAdd, GetSpellTargets<LivingEntity> targets, WarningAction warning,
+			ParticleAction warnParticles, StartAction start, HitPlayerAction hitPlayer, ParticleAction particle, EndAction end) {
+		mPlugin = plugin;
+		mBoss = boss;
+		mChargeTicks = chargeTicks;
+		mWarningAction = warning;
+		mWarnParticleAction = warnParticles;
+		mStartAction = start;
+		mHitPlayerAction = hitPlayer;
+		mParticleAction = particle;
+		mEndAction = end;
+		mStopOnFirstHit = stopOnFirstHit;
+		mCharges = charges;
+		mRate = rate;
+		mYStartAdd = yStartAdd;
+		mCooldown = cooldown;
+
+		mTargets = targets;
+
+		mTargetFurthest = false;
+		mRange = 0;
 	}
 
 	@Override
 	public void run() {
+		if (mTargets != null) {
+			List<LivingEntity> targets = mTargets.getTargets();
+			for (LivingEntity target : targets) {
+				if (mCharges <= 0 || mRate <= 0) {
+					launch(target, targets);
+				} else {
+					launch(target, targets, mCharges, mRate);
+				}
+				break;
+			}
+			return;
+		}
+
 		// Get list of all nearby players who could be hit by the attack
 		List<Player> bystanders = PlayerUtils.playersInRange(mBoss.getLocation(), mRange * 2, true);
 
@@ -311,6 +350,114 @@ public class SpellBaseCharge extends Spell {
 		return chargeHitsPlayer;
 	}
 
+	/**
+	 * Does a charge attack - which may not do anything, depending on parameters passed
+	 * Returns whether the charge hit a player or not
+	 *
+	 * @param target The intended target of the attack
+	 * @param charger The living entity charging the player
+	 * @param validTargets Other targets (including the target!) who might be indicentally hit by the charge
+	 * @param start Action to run on boss at start location (may be null)
+	 * @param particle Action to spawn particle at locations along path (may be null)
+	 * @param hitPlayer Action to run if a player is hit (may be null)
+	 * @param end Action to run on boss at end location (may be null)
+	 * @param teleboss Boolean indicating whether the boss should actually be teleported to the end
+	 * @param stopOnFirstHit Boolean indicating whether the boss should damage only one player at a time
+	 */
+	public static boolean doCharge(LivingEntity target, Entity charger, Location targetLoc, List<LivingEntity> validTargets, StartAction start,
+	                               ParticleAction particle, HitPlayerAction hitPlayer, EndAction end, boolean teleBoss, boolean stopOnFirstHit, double yStartAdd) {
+		final Location launLoc;
+		if (charger instanceof LivingEntity) {
+			launLoc = ((LivingEntity)charger).getEyeLocation().add(0, yStartAdd, 0);
+		} else {
+			launLoc = charger.getLocation().add(0, yStartAdd, 0);
+		}
+
+		/* Test locations that are iterated in the loop */
+		Location endLoc = launLoc.clone();
+		Location endLoc1 = launLoc.clone().add(0, 1, 0); // Same as endLoc but one block higher
+
+		Vector baseVect = new Vector(targetLoc.getX() - launLoc.getX(), targetLoc.getY() - launLoc.getY(), targetLoc.getZ() - launLoc.getZ());
+		baseVect = baseVect.normalize().multiply(0.3);
+
+		if (start != null) {
+			start.run(target);
+		}
+
+		Entity switchAggro = target;
+		boolean chargeHitsPlayer = false;
+		boolean cancel = false;
+		BoundingBox box = charger.getBoundingBox();
+		for (int i = 0; i < 200; i++) {
+			box.shift(baseVect);
+			endLoc.add(baseVect);
+			endLoc1.add(baseVect);
+
+			if (particle != null) {
+				particle.run(endLoc);
+			}
+
+			// Check if the bounding box overlaps with any of the surrounding blocks
+			for (int x = -1; x <= 1 && !cancel; x++) {
+				for (int y = -1; y <= 1 && !cancel; y++) {
+					for (int z = -1; z <= 1 && !cancel; z++) {
+						Block block = endLoc.clone().add(x, y, z).getBlock();
+						// If it overlaps with any, move it back to the last safe location
+						// and terminate the charge before the block.
+						if (block.getBoundingBox().overlaps(box) && !block.isLiquid()) {
+							endLoc.subtract(baseVect);
+							cancel = true;
+						}
+					}
+				}
+			}
+
+			if (!cancel && (endLoc.getBlock().getType().isSolid() || endLoc1.getBlock().getType().isSolid())) {
+				// No longer air - need to go back a bit so we don't tele the boss into a block
+				endLoc.subtract(baseVect.multiply(1));
+				// Charge terminated at a block
+				break;
+			} else if (launLoc.distance(endLoc) > (launLoc.distance(targetLoc) + 6.0f)) {
+				// Reached end of charge without hitting anything
+				break;
+			}
+
+			for (LivingEntity player : validTargets) {
+				if (player.getLocation().distance(endLoc) < 1.8F) {
+					// Hit player - mark this and continue
+					chargeHitsPlayer = true;
+					switchAggro = player;
+
+					if (hitPlayer != null) {
+						hitPlayer.run(player);
+					}
+					if (stopOnFirstHit) {
+						cancel = true;
+						break;
+					}
+				}
+			}
+
+			if (cancel) {
+				break;
+			}
+		}
+
+		if (teleBoss) {
+			charger.teleport(endLoc);
+		}
+
+		if (switchAggro != null && charger instanceof Mob && switchAggro instanceof LivingEntity) {
+			((Mob)charger).setTarget((LivingEntity) switchAggro);
+		}
+
+		if (end != null) {
+			end.run();
+		}
+
+		return chargeHitsPlayer;
+	}
+
 	private void launch(Player target, List<Player> players, int charges, int rate) {
 		BukkitRunnable runnable = new BukkitRunnable() {
 			private int mTicks = 0;
@@ -394,6 +541,93 @@ public class SpellBaseCharge extends Spell {
 					         mEndAction, true, mStopOnFirstHit, mYStartAdd);
 					this.cancel();
 					mActiveRunnables.remove(this);
+				}
+
+				mTicks += 2;
+			}
+		};
+		runnable.runTaskTimer(mPlugin, 0, 2);
+		mActiveRunnables.add(runnable);
+	}
+
+	private void launch(LivingEntity target, List<LivingEntity> targets) {
+		BukkitRunnable runnable = new BukkitRunnable() {
+			private int mTicks = 0;
+			Location mTargetLoc = target.getEyeLocation();
+
+			@Override
+			public void run() {
+				if (mBoss == null || !mBoss.isValid() || mBoss.isDead() || EntityUtils.isStunned(mBoss)) {
+					this.cancel();
+					return;
+				}
+				if (mTicks == 0) {
+					if (mWarningAction != null) {
+						mWarningAction.run(target);
+					}
+				} else if (mTicks > 0 && mTicks < mChargeTicks) {
+					// This runs once every other tick while charging
+					doCharge(target, mBoss, mTargetLoc, targets, null, mWarnParticleAction, null, null, false, mStopOnFirstHit, mYStartAdd);
+				} else if (mTicks >= mChargeTicks) {
+					// Do the "real" charge attack
+					doCharge(target, mBoss, mTargetLoc, targets, mStartAction, mParticleAction, mHitPlayerAction,
+					         mEndAction, true, mStopOnFirstHit, mYStartAdd);
+					this.cancel();
+					mActiveRunnables.remove(this);
+				}
+
+				mTicks += 2;
+			}
+		};
+		runnable.runTaskTimer(mPlugin, 0, 2);
+		mActiveRunnables.add(runnable);
+	}
+
+	private void launch(LivingEntity target, List<LivingEntity> targets, int charges, int rate) {
+		BukkitRunnable runnable = new BukkitRunnable() {
+			private int mTicks = 0;
+			private int mChargesDone = 0;
+			Location mTargetLoc;
+			List<LivingEntity> mBystanders = targets;
+			LivingEntity mTarget = target;
+
+			@Override
+			public void run() {
+				if (mBoss == null || !mBoss.isValid() || mBoss.isDead() || EntityUtils.isStunned(mBoss) || EntityUtils.isSilenced(mBoss) || EntityUtils.isConfused(mBoss)) {
+					if (mBoss != null) {
+						mBoss.setAI(true);
+					}
+					this.cancel();
+					return;
+				}
+				if (mTicks == 0) {
+					mTargetLoc = mTarget.getEyeLocation();
+					if (mWarningAction != null) {
+						mWarningAction.run(target);
+					}
+				} else if (mTicks > 0 && mTicks < mChargeTicks) {
+					// This runs once every other tick while charging
+					doCharge(mTarget, mBoss, mTargetLoc, mBystanders, null, mWarnParticleAction, null, null, false, mStopOnFirstHit, mYStartAdd);
+				} else if (mTicks >= mChargeTicks) {
+					// Do the "real" charge attack
+					doCharge(mTarget, mBoss, mTargetLoc, mBystanders, mStartAction, mParticleAction, mHitPlayerAction,
+					         mEndAction, true, mStopOnFirstHit, mYStartAdd);
+					mChargesDone++;
+					if (mChargesDone >= charges) {
+						this.cancel();
+						mActiveRunnables.remove(this);
+					} else {
+						// Get list of all nearby players who could be hit by the attack
+						mBystanders = mTargets.getTargets();
+
+						// Choose random player within range that has line of sight to boss
+						for (LivingEntity entity : mBystanders) {
+							mTarget = entity;
+							mTargetLoc = mTarget.getEyeLocation();
+							break;
+						}
+						mTicks -= rate;
+					}
 				}
 
 				mTicks += 2;

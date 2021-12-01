@@ -22,10 +22,12 @@ import org.bukkit.entity.EvokerFangs;
 import org.bukkit.entity.Fireball;
 import org.bukkit.entity.Firework;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.entity.Slime;
 import org.bukkit.entity.Vex;
+import org.bukkit.entity.Zombie;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -149,6 +151,19 @@ public class MobListener implements Listener {
 
 	@EventHandler(priority = EventPriority.LOWEST)
 	public void entityDamageByEntityEvent(EntityDamageByEntityEvent event) {
+
+		//TODO look for this "bug" (?) https://discord.com/channels/186225508562763776/186266724440604673/913044974768103484
+		//When a zombie damage another zombie with BossUtils.bossDamage(..) or bossDamagePercent(..)
+		//it also hit himselft, causing to setTarget(himselft) and make so it strikes itself to death
+		if (event.getDamager() == event.getEntity() && event.getDamager() instanceof Zombie) {
+			event.setCancelled(true);
+			if (((Mob) event.getDamager()).getTarget() == event.getDamager()) {
+				((Mob) event.getDamager()).setTarget(null);
+			}
+			return;
+		}
+		//end-todo
+
 		// Set base custom damage of crossbows and tridents before other modifications
 		// No firework damage!
 		if (event.getDamager() instanceof Firework) {

@@ -67,7 +67,7 @@ public class LapseOfReality extends Spell {
 					world.spawnParticle(Particle.SPELL_WITCH, loc, 2, 0, 0, 0, 0.3);
 				},
 				// Hit Action
-				(World world, Player player, Location loc) -> {
+				(World world, LivingEntity player, Location loc) -> {
 					world.playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_TWINKLE, 0.5f, 1.5f);
 					world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 0.5f, 0.5f);
 					world.spawnParticle(Particle.FIREWORKS_SPARK, loc, 10, 0, 0, 0, 0.25);

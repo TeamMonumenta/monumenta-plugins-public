@@ -7,7 +7,6 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -74,11 +73,11 @@ public class MagicArrowBoss extends BossAbilityGroup {
 						world.spawnParticle(Particle.CRIT_MAGIC, loc, 20, 0.2, 0.2, 0.2, 0.1);
 					},
 					// Hit Action
-					(World world, Player player, Location loc) -> {
+					(World world, LivingEntity target, Location loc) -> {
 						world.playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_TWINKLE, 0.5f, 1.5f);
 						world.spawnParticle(Particle.FIREWORKS_SPARK, loc, 30, 0, 0, 0, 0.25);
-						if (player != null) {
-							BossUtils.bossDamage(boss, player, p.DAMAGE);
+						if (target != null) {
+							BossUtils.bossDamage(boss, target, p.DAMAGE);
 						}
 					})
 		));

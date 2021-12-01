@@ -33,6 +33,7 @@ public class SpellBaseLaser extends Spell {
 	private final int mParticleFrequency;
 	private final int mParticleChance;
 	private final FinishAction mFinishAction;
+	private final GetSpellTargets<LivingEntity> mGetTargets;
 
 	/**
 	 * @param plugin          Plugin
@@ -99,14 +100,53 @@ public class SpellBaseLaser extends Spell {
 		mSingleTarget = singleTarget;
 		mCooldown = cooldown;
 		mTickAction = tickAction;
+		mGetTargets = null;
 		mParticleAction = particleAction;
 		mParticleFrequency = particleFrequency;
 		mParticleChance = particleChance;
 		mFinishAction = finishAction;
 	}
 
+	public SpellBaseLaser(
+		Plugin plugin,
+		LivingEntity boss,
+		int duration,
+		boolean stopWhenBlocked,
+		int cooldown,
+		GetSpellTargets<LivingEntity> getTargets,
+		TickAction tickAction,
+		ParticleAction particleAction,
+		int particleFrequency,
+		int particleChance,
+		FinishAction finishAction
+	) {
+		mPlugin = plugin;
+		mBoss = boss;
+		mRange = 0;
+		mDuration = duration;
+		mStopWhenBlocked = stopWhenBlocked;
+		mSingleTarget = false;
+		mCooldown = cooldown;
+		mGetTargets = getTargets;
+		mTickAction = tickAction;
+		mParticleAction = particleAction;
+		mParticleFrequency = particleFrequency;
+		mParticleChance = particleChance;
+		mFinishAction = finishAction;
+	}
+
+
 	@Override
 	public void run() {
+		if (mGetTargets != null) {
+			List<LivingEntity> targets = mGetTargets.getTargets();
+			for (LivingEntity target : targets) {
+				if (target instanceof LivingEntity) {
+					launch((LivingEntity)target);
+				}
+			}
+			return;
+		}
 		List<Player> potentialTargets = PlayerUtils.playersInRange(mBoss.getLocation(), mRange, false);
 
 		// Single-target laser chooses 1 player
@@ -134,6 +174,10 @@ public class SpellBaseLaser extends Spell {
 
 	@Override
 	public boolean canRun() {
+		if (mGetTargets != null) {
+			return !mGetTargets.getTargets().isEmpty();
+		}
+
 		List<Player> potentialTargets = PlayerUtils.playersInRange(mBoss.getLocation(), mRange, false);
 
 		for (Player target : potentialTargets) {
@@ -156,7 +200,7 @@ public class SpellBaseLaser extends Spell {
 		return mDuration;
 	}
 
-	private void launch(Player target) {
+	private void launch(LivingEntity target) {
 		BukkitRunnable runnable = new BukkitRunnable() {
 			private int mTicks = 0;
 
@@ -222,12 +266,12 @@ public class SpellBaseLaser extends Spell {
 		 * Useful for things like player sound cues
 		 * or initial effects when tick == 0
 		 *
-		 * @param player  Player being targeted
+		 * @param target  Player being targeted
 		 * @param tick    Number of ticks since start of laser.
 		 *                NOTE: Only even numbers are returned here!
 		 * @param blocked Whether the laser is obstructed (true) or hits the player (false)
 		 */
-		void run(Player player, int tick, boolean blocked);
+		void run(LivingEntity target, int tick, boolean blocked);
 	}
 
 	@FunctionalInterface
@@ -247,10 +291,10 @@ public class SpellBaseLaser extends Spell {
 		/**
 		 * Called at the end once when the laser detonates
 		 *
-		 * @param player      Player being targeted
+		 * @param target      LivingEntity being targeted
 		 * @param endLocation Location where the laser ends (either at player or obstructing block)
 		 * @param blocked     Whether the laser is obstructed (true) or hits the player (false)
 		 */
-		void run(Player player, Location endLocation, boolean blocked);
+		void run(LivingEntity target, Location endLocation, boolean blocked);
 	}
 }

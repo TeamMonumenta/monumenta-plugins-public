@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.bosses.spells;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -8,6 +9,7 @@ import java.util.Map;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Block;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
@@ -34,10 +36,10 @@ public class SpellBaseSeekingProjectile extends Spell {
 	public interface HitAction {
 		/**
 		 * Called when the projectile intersects a player (or possibly a block)
-		 * @param player Player being targeted (null if hit a block)
+		 * @param target Player being targeted (null if hit a block)
 		 * @param loc    Location where the projectile hit (either at player or block)
 		 */
-		void run(World world, Player player, Location loc);
+		void run(World world, LivingEntity target, Location loc);
 	}
 
 	private final Plugin mPlugin;
@@ -60,6 +62,7 @@ public class SpellBaseSeekingProjectile extends Spell {
 	private final HitAction mHitAction;
 	private final int mCollisionCheckDelay;
 	private final boolean mCollidesWithOthers;
+	private final GetSpellTargets<LivingEntity> mGetSpellTargets;
 
 	public SpellBaseSeekingProjectile(Plugin plugin, LivingEntity boss, int range, boolean singleTarget, boolean launchTracking, int cooldown, int delay,
 			double speed, double turnRadius, int lifetimeTicks, double hitboxLength, boolean collidesWithBlocks, boolean lingers,
@@ -111,13 +114,82 @@ public class SpellBaseSeekingProjectile extends Spell {
 		mHitAction = hitAction;
 		mCollisionCheckDelay = collisionCheckDelay;
 		mCollidesWithOthers = collidesWithOthers;
+
+		//not used
+		mGetSpellTargets = null;
 	}
+
+	public SpellBaseSeekingProjectile(Plugin plugin, LivingEntity boss, boolean launchTracking, int cooldown, int delay,
+			double speed, double turnRadius, int lifetimeTicks, double hitboxLength, boolean collidesWithBlocks, boolean lingers, int collisionCheckDelay, boolean collidesWithOthers,
+			GetSpellTargets<LivingEntity> targets, AestheticAction initiateAesthetic, AestheticAction launchAesthetic, AestheticAction projectileAesthetic, HitAction hitAction) {
+		mPlugin = plugin;
+		mBoss = boss;
+		mWorld = boss.getWorld();
+		mLaunchTracking = launchTracking;
+		mCooldown = cooldown;
+		mSpeed = speed;
+		mDelay = delay;
+		mTurnRadius = Math.max(0, Math.min(Math.PI, turnRadius));
+		mLifetimeTicks = lifetimeTicks;
+		mHitboxLength = hitboxLength;
+		mCollidesWithBlocks = collidesWithBlocks;
+		mLingers = lingers;
+		mInitiateAesthetic = initiateAesthetic;
+		mLaunchAesthetic = launchAesthetic;
+		mProjectileAesthetic = projectileAesthetic;
+		mHitAction = hitAction;
+		mCollisionCheckDelay = collisionCheckDelay;
+		mCollidesWithOthers = collidesWithOthers;
+		mGetSpellTargets = targets;
+
+		mSingleTarget = false;
+		//it should be not used since mGetSpellTargets will handle also the singletarget
+
+		mRange = 50;
+		//used to calc if the projectile should stop before since the player is to far.
+	}
+
 
 	@Override
 	public void run() {
 		mInitiateAesthetic.run(mWorld, mBoss.getEyeLocation(), 0);
 
-		List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), mRange, false);
+		if (mGetSpellTargets != null) {
+			List<LivingEntity> entities = mGetSpellTargets.getTargets();
+			Map<LivingEntity, Location> locations = new HashMap<LivingEntity, Location>();
+			if (!mLaunchTracking) {
+				for (LivingEntity target : entities) {
+					locations.put(target, target.getEyeLocation());
+				}
+			}
+			BukkitRunnable initiateSpell = new BukkitRunnable() {
+				List<LivingEntity> mTargets = entities;
+				Map<LivingEntity, Location> mLocations = locations;
+
+				@Override
+				public void run() {
+					if (!mLaunchTracking) {
+						for (Map.Entry<LivingEntity, Location> entry : mLocations.entrySet()) {
+							LivingEntity target = entry.getKey();
+							launch(target, entry.getValue());
+						}
+					} else {
+						for (LivingEntity target : mTargets) {
+							launch(target, target.getEyeLocation());
+						}
+					}
+
+				}
+
+			};
+
+			initiateSpell.runTaskLater(mPlugin, mDelay);
+			mActiveRunnables.add(initiateSpell);
+			return;
+
+		}
+
+		final List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), mRange, false);
 
 		Map<Player, Location> locations = new HashMap<Player, Location>();
 		if (!mLaunchTracking) {
@@ -176,7 +248,11 @@ public class SpellBaseSeekingProjectile extends Spell {
 		if (EntityUtils.isStunned(mBoss) || EntityUtils.isSilenced(mBoss) || EntityUtils.isConfused(mBoss)) {
 			return false;
 		}
+		if (mGetSpellTargets != null) {
+			return !mGetSpellTargets.getTargets().isEmpty();
+		}
 		List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), mRange, false);
+
 		if (!players.isEmpty()) {
 			for (Player player : players) {
 				if (LocationUtils.hasLineOfSight(mBoss, player)) {
@@ -192,13 +268,13 @@ public class SpellBaseSeekingProjectile extends Spell {
 		return mCooldown;
 	}
 
-	public void launch(Player target, Location targetLoc) {
+	public <V extends LivingEntity> void launch(V target, Location targetLoc) {
 		mLaunchAesthetic.run(mWorld, mBoss.getEyeLocation(), 0);
 
 		BukkitRunnable runnable = new BukkitRunnable() {
 			Location mLocation = mBoss.getEyeLocation();
 			BoundingBox mHitbox = BoundingBox.of(mLocation, mHitboxLength / 2, mHitboxLength / 2, mHitboxLength / 2);
-			Player mTarget = target;
+			V mTarget = target;
 			Vector mDirection = targetLoc.subtract(mLocation).toVector().normalize();
 			int mTicks = 0;
 			int mCollisionDelayTicks = mCollisionCheckDelay;
@@ -208,7 +284,7 @@ public class SpellBaseSeekingProjectile extends Spell {
 				mTicks++;
 				mCollisionDelayTicks--;
 
-				if (mTarget != null && (!mTarget.isOnline() || mTarget.isDead())) {
+				if (mTarget != null && (!mTarget.isValid() || mTarget.isDead())) {
 					this.cancel();
 					if (!mLingers) {
 						mActiveRunnables.remove(this);
@@ -218,7 +294,7 @@ public class SpellBaseSeekingProjectile extends Spell {
 				}
 
 				if (mTarget != null) {
-					Vector newDirection = mTarget.getEyeLocation().subtract(mLocation).toVector();
+					Vector newDirection = mTarget.getLocation().add(0, 1.0, 0).subtract(mLocation).toVector();
 					if (newDirection.length() > 2 * mRange) {
 						this.cancel();
 						if (!mLingers) {
@@ -228,7 +304,6 @@ public class SpellBaseSeekingProjectile extends Spell {
 						return;
 					}
 					newDirection.normalize();
-
 					// Because of double rounding errors, the dot product could be something stupid like 1.0000000000000002 (true story), so pre-process it before taking acos()
 					double newAngle = Math.acos(Math.max(-1, Math.min(1, mDirection.dot(newDirection))));
 
@@ -245,7 +320,6 @@ public class SpellBaseSeekingProjectile extends Spell {
 						}
 					}
 				}
-
 
 				Vector shift = mDirection.clone().multiply(mSpeed);
 
@@ -270,13 +344,27 @@ public class SpellBaseSeekingProjectile extends Spell {
 						}
 					}
 				}
-
 				mLocation.add(shift);
 				mHitbox.shift(shift);
 				mProjectileAesthetic.run(mWorld, mLocation, mTicks);
 
 				if (mCollisionDelayTicks <= 0) {
 					// Grab all players that could have overlapping bounding boxes
+					if (mGetSpellTargets != null) {
+						Collection<Entity> entities = mLocation.getWorld().getNearbyEntities(mLocation, mHitboxLength + 2, mHitboxLength + 2, mHitboxLength + 2);
+						for (Entity entity : entities) {
+							if (entity instanceof LivingEntity && mHitbox.overlaps(entity.getBoundingBox()) && (mTarget.equals(entity) || !mCollidesWithOthers)) {
+								mHitAction.run(mWorld, mTarget, mLocation);
+								this.cancel();
+								if (!mLingers) {
+									mActiveRunnables.remove(this);
+								}
+								return;
+							}
+						}
+					}
+
+
 					for (Player player : PlayerUtils.playersInRange(mLocation, mHitboxLength + 2, true)) {
 						if (mHitbox.overlaps(player.getBoundingBox()) && (player.equals(mTarget) || !mCollidesWithOthers)) {
 							mHitAction.run(mWorld, player, mLocation);

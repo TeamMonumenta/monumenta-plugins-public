@@ -7,7 +7,6 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -76,12 +75,12 @@ public class ArcaneProjectileBoss extends BossAbilityGroup {
 						}
 					},
 					// Hit Action
-					(World world, Player player, Location loc) -> {
+					(World world, LivingEntity target, Location loc) -> {
 						world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 0.5f, 0.5f);
 						world.playSound(loc, Sound.ENTITY_BLAZE_AMBIENT, 0.5f, 0.5f);
 						world.spawnParticle(Particle.SOUL_FIRE_FLAME, loc, 30, 0, 0, 0, 0.25);
-						if (player != null) {
-							BossUtils.bossDamage(boss, player, p.DAMAGE);
+						if (target != null) {
+							BossUtils.bossDamage(boss, target, p.DAMAGE);
 						}
 					})
 		));

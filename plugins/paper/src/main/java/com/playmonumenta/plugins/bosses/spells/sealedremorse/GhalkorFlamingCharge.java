@@ -32,7 +32,7 @@ public class GhalkorFlamingCharge extends SpellBaseCharge {
 	public GhalkorFlamingCharge(Plugin plugin, LivingEntity boss, Ghalkor bossClass) {
 		super(plugin, boss, 20, 20 * 6, 20, false,
 				// Warning sound/particles at boss location and slow boss
-				(Player player) -> {
+				(LivingEntity player) -> {
 					boss.getWorld().spawnParticle(Particle.VILLAGER_ANGRY, boss.getLocation(), 50, 2, 2, 2, 0);
 					boss.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 40, 4));
 					boss.getWorld().playSound(boss.getLocation(), Sound.ENTITY_BLAZE_SHOOT, 1f, 1.75f);
@@ -44,7 +44,7 @@ public class GhalkorFlamingCharge extends SpellBaseCharge {
 					loc.getWorld().spawnParticle(Particle.CRIT, loc, 2, 0.65, 0.65, 0.65, 0);
 				},
 				// Charge attack sound/particles at boss location
-				(Player player) -> {
+				(LivingEntity player) -> {
 					boss.getWorld().spawnParticle(Particle.SMOKE_NORMAL, boss.getLocation(), 125, 0.4, 0.4, 0.4, 0.25);
 					boss.getWorld().spawnParticle(Particle.CLOUD, boss.getLocation(), 45, 0.15, 0.4, 0.15, 0.15);
 					boss.getWorld().playSound(boss.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1f, 0.75f);
@@ -52,7 +52,7 @@ public class GhalkorFlamingCharge extends SpellBaseCharge {
 					boss.getWorld().playSound(boss.getLocation(), Sound.ENTITY_BLAZE_SHOOT, 1f, 1.4f);
 				},
 				// Attack hit a player
-				(Player player) -> {
+				(LivingEntity player) -> {
 					player.getWorld().spawnParticle(Particle.BLOCK_CRACK, player.getLocation().add(0, 1, 0), 5, 0.4,
 							0.4, 0.4, 0.4, Material.REDSTONE_BLOCK.createBlockData());
 					player.getWorld().spawnParticle(Particle.BLOCK_CRACK, player.getLocation().add(0, 1, 0), 12, 0.4,

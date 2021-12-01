@@ -4,14 +4,15 @@ import java.util.Arrays;
 
 import org.bukkit.Location;
 import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
 import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.parameters.EffectsList;
+import com.playmonumenta.plugins.bosses.parameters.EntityTargets;
 import com.playmonumenta.plugins.bosses.parameters.BossParam;
 import com.playmonumenta.plugins.bosses.parameters.ParticlesList;
 import com.playmonumenta.plugins.bosses.parameters.SoundsList;
+import com.playmonumenta.plugins.bosses.parameters.EntityTargets.TARGETS;
 import com.playmonumenta.plugins.bosses.spells.SpellBaseCharge;
 import com.playmonumenta.plugins.utils.BossUtils;
 
@@ -51,6 +52,9 @@ public class ChargerBoss extends BossAbilityGroup {
 		@BossParam(help = "The spell name showed when the player die by this skill")
 		public String SPELL_NAME = "";
 
+		@BossParam(help = "Let you choose the targets of this spell")
+		public EntityTargets TARGETS = EntityTargets.GENERIC_PLAYER_TARGET;
+
 		//Particle & Sounds!
 		@BossParam(help = "Particle summoned at boss location when starting the ability")
 		public ParticlesList PARTICLE_WARNING = ParticlesList.fromString("[(VILLAGER_ANGRY,50)]");
@@ -84,11 +88,23 @@ public class ChargerBoss extends BossAbilityGroup {
 
 		Parameters p = BossParameters.getParameters(boss, identityTag, new Parameters());
 
+		if (p.TARGETS == EntityTargets.GENERIC_PLAYER_TARGET) {
+			//same object
+			//probably an older mob version?
+			//build a new target from others config
+			p.TARGETS = new EntityTargets(TARGETS.PLAYER, p.DETECTION, false);
+			//by default Charger don't take player in stealt.
+		}
+
+
 		SpellManager activeSpells = new SpellManager(Arrays.asList(
-			new SpellBaseCharge(plugin, boss, p.DETECTION, p.COOLDOWN, p.DURATION, p.STOP_ON_HIT,
-			0, 0, 0, p.TARGET_FURTHEST,
+			new SpellBaseCharge(plugin, boss, p.COOLDOWN, p.DURATION, p.STOP_ON_HIT,
+			0, 0, 0,
+			() -> {
+				return p.TARGETS.getTargetsList(mBoss);
+			},
 			// Warning sound/particles at boss location and slow boss
-			(Player player) -> {
+			(LivingEntity player) -> {
 				p.PARTICLE_WARNING.spawn(boss.getLocation(), 2d, 2d, 2d);
 				p.SOUND_WARNING.play(boss.getLocation(), 1f, 1.5f);
 				boss.setAI(false);
@@ -98,30 +114,30 @@ public class ChargerBoss extends BossAbilityGroup {
 				p.PARTICLE_TELL.spawn(loc, 0.65d, 0.65d, 0.65d);
 			},
 			// Charge attack sound/particles at boss location
-			(Player player) -> {
+			(LivingEntity player) -> {
 				p.PARTICLE_ROAR.spawn(boss.getLocation(), 0.3d, 0.3d, 0.3d, 0.15d);
 				p.SOUND_ROAR.play(boss.getLocation(), 1f, 1.5f);
 			},
 			// Attack hit a player
-			(Player player) -> {
-				p.PARTICLE_HIT.spawn(player.getLocation().add(0, 1, 0), 0.4d, 0.4d, 0.4d, 0.4d);
+			(LivingEntity target) -> {
+				p.PARTICLE_HIT.spawn(target.getEyeLocation(), 0.4d, 0.4d, 0.4d, 0.4d);
 				if (p.DAMAGE > 0) {
 					if (p.SPELL_NAME.isEmpty()) {
-						BossUtils.bossDamage(boss, player, p.DAMAGE);
+						BossUtils.bossDamage(boss, target, p.DAMAGE);
 					} else {
-						BossUtils.bossDamage(boss, player, p.DAMAGE, mBoss.getLocation(), p.SPELL_NAME);
+						BossUtils.bossDamage(boss, target, p.DAMAGE, mBoss.getLocation(), p.SPELL_NAME);
 					}
 				}
 
 				if (p.DAMAGE_PERCENTAGE > 0.0) {
 					if (p.SPELL_NAME.isEmpty()) {
-						BossUtils.bossDamagePercent(mBoss, player, p.DAMAGE_PERCENTAGE);
+						BossUtils.bossDamagePercent(mBoss, target, p.DAMAGE_PERCENTAGE);
 					} else {
-						BossUtils.bossDamagePercent(mBoss, player, p.DAMAGE_PERCENTAGE, p.SPELL_NAME);
+						BossUtils.bossDamagePercent(mBoss, target, p.DAMAGE_PERCENTAGE, p.SPELL_NAME);
 					}
 				}
 
-				p.EFFECTS.apply(player, mBoss);
+				p.EFFECTS.apply(target, mBoss);
 			},
 			// Attack particles
 			(Location loc) -> {

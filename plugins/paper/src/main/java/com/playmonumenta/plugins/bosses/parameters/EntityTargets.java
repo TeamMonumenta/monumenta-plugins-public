@@ -73,17 +73,18 @@ public class EntityTargets {
 	 */
 
 	public interface EntityFinder {
-		List<? extends Entity> getTargets(Entity launcher, Location loc, double range, boolean optional);
+		<V extends LivingEntity> List<V> getTargets(LivingEntity launcher, Location loc, double range, boolean optional);
 	}
 
+	//enum don't works with generics
 	public enum TARGETS implements EntityFinder {
 		PLAYER {
-			public List<? extends Entity> getTargets(Entity launcher, Location loc, double range, boolean includeNonTargetable) {
+			public List<Player> getTargets(LivingEntity launcher, Location loc, double range, boolean includeNonTargetable) {
 				return PlayerUtils.playersInRange(loc, range, includeNonTargetable);
 			}
 		},
 		MOB {
-			public List<? extends Entity> getTargets(Entity launcher, Location loc, double range, boolean notIncludeLauncher) {
+			public List<LivingEntity> getTargets(LivingEntity launcher, Location loc, double range, boolean notIncludeLauncher) {
 				List<LivingEntity> mobs = EntityUtils.getNearbyMobs(loc, range, (LivingEntity) launcher);
 				if (!notIncludeLauncher) {
 					mobs.add((LivingEntity) launcher);
@@ -92,18 +93,21 @@ public class EntityTargets {
 			}
 		},
 		ENTITY {
-			public List<? extends Entity> getTargets(Entity launcher, Location loc, double range, boolean notIncludeLauncher) {
+			public List<LivingEntity> getTargets(LivingEntity launcher, Location loc, double range, boolean notIncludeLauncher) {
 				Collection<Entity> entities = loc.getWorld().getNearbyEntities(loc, range, range, range);
 				if (notIncludeLauncher) {
 					entities.remove(launcher);
 				}
-				List<Entity> entitiesList = new ArrayList<>(entities.size());
-				entitiesList.addAll(entities);
+				entities.removeIf(entity -> !(entity instanceof LivingEntity));
+				List<LivingEntity> entitiesList = new ArrayList<>(entities.size());
+				for (Entity entity : entities) {
+					entitiesList.add((LivingEntity)entity);
+				}
 				return entitiesList;
 			}
 		},
 		SELF {
-			public List<? extends Entity> getTargets(Entity launcher, Location notUsed, double notUsed2, boolean notUsed3) {
+			public List<LivingEntity> getTargets(LivingEntity launcher, Location notUsed, double notUsed2, boolean notUsed3) {
 				return Arrays.asList(launcher);
 			}
 		};
@@ -114,7 +118,7 @@ public class EntityTargets {
 
 	}
 
-	//TODO-implements different filters.
+	//-----------------------------------------------------MOB FILTERS------------------------------------------------------------------------------------
 	public enum MOBFILTER implements EntityFilter {
 		IS_BOSS {
 			@Override
@@ -131,12 +135,54 @@ public class EntityTargets {
 
 	}
 
-	//TODO-implements different filters.
+	//-----------------------------------------------------PLAYER FILTERS------------------------------------------------------------------------------------
 	public enum PLAYERFILTER implements EntityFilter {
 		IS_CLASSLESS {
 			@Override
 			public <V extends Entity> boolean filter(LivingEntity launcher, V entity) {
 				return ScoreboardUtils.getScoreboardValue((Player) entity, "Class").get() == 0;
+			}
+		},
+		IS_MAGE {
+			@Override
+			public <V extends Entity> boolean filter(LivingEntity launcher, V entity) {
+				return PlayerUtils.isMage((Player) entity);
+			}
+		},
+		IS_WARRIOR {
+			@Override
+			public <V extends Entity> boolean filter(LivingEntity launcher, V entity) {
+				return PlayerUtils.isWarrior((Player) entity);
+			}
+		},
+		IS_CLERIC {
+			@Override
+			public <V extends Entity> boolean filter(LivingEntity launcher, V entity) {
+				return PlayerUtils.isCleric((Player) entity);
+			}
+		},
+		IS_ROGUE {
+			@Override
+			public <V extends Entity> boolean filter(LivingEntity launcher, V entity) {
+				return PlayerUtils.isRogue((Player) entity);
+			}
+		},
+		IS_ALCHEMIST {
+			@Override
+			public <V extends Entity> boolean filter(LivingEntity launcher, V entity) {
+				return PlayerUtils.isAlchemist((Player) entity);
+			}
+		},
+		IS_SCOUT {
+			@Override
+			public <V extends Entity> boolean filter(LivingEntity launcher, V entity) {
+				return PlayerUtils.isScout((Player) entity);
+			}
+		},
+		IS_WARLOCK {
+			@Override
+			public <V extends Entity> boolean filter(LivingEntity launcher, V entity) {
+				return PlayerUtils.isWarlock((Player) entity);
 			}
 		},
 		HAS_LINEOFSIGHT {
@@ -147,6 +193,7 @@ public class EntityTargets {
 
 	}
 
+	//-----------------------------------------------------ENTITY FILTERS------------------------------------------------------------------------------------
 	//TODO-implements different filters.
 	public enum ENTITYFILTERENUM implements EntityFilter {
 		IS_ARMORSTAND {
@@ -159,6 +206,12 @@ public class EntityTargets {
 			@Override
 			public <V extends Entity> boolean filter(LivingEntity launcher, V entity) {
 				return EntityUtils.isHostileMob(entity);
+			}
+		},
+		IS_PLAYER {
+			@Override
+			public <V extends Entity> boolean filter(LivingEntity launcher, V entity) {
+				return entity instanceof Player;
 			}
 		},
 		HAS_LINEOFSIGHT {
@@ -246,10 +299,10 @@ public class EntityTargets {
 		}
 
 		private interface SortingInterface {
-			void sort(Location loc, List<? extends Entity> list);
+			<V extends Entity> void sort(Location loc, List<V> list);
 		}
 
-		private enum LIMITSENUM implements LimitToNum {
+		public enum LIMITSENUM implements LimitToNum {
 			ALL {
 				@Override
 				public int getNum(List<?> list) {
@@ -259,47 +312,59 @@ public class EntityTargets {
 			}, HALF {
 				@Override
 				public int getNum(List<?> list) {
-					return list.size() / 2;
+					int num = list.size() / 2;
+					if (list.size() > 0) {
+						return num > 0 ? num : 1;
+					}
+					return 0;
 				}
 
 			}, ONE_QUARTER {
 				@Override
 				public int getNum(List<?> list) {
-					return list.size() / 4;
+					int num = list.size() / 4;
+					if (list.size() > 0) {
+						return num > 0 ? num : 1;
+					}
+					return 0;
 				}
 
 			}, ONE_EIGHTH {
 				@Override
 				public int getNum(List<?> list) {
-					return list.size() / 8;
+					int num = list.size() / 8;
+					if (list.size() > 0) {
+						return num > 0 ? num : 1;
+					}
+					return 0;
 				}
 			};
 		}
 
-		private enum SORTING implements SortingInterface {
+		public enum SORTING implements SortingInterface {
 			RANDOM {
 				@Override
-				public void sort(Location loc, List<? extends Entity> list) {
+				public <V extends Entity> void sort(Location loc, List<V> list) {
 					Collections.shuffle(list);
 				}
 			},
 			CLOSER {
 				@Override
-				public void sort(Location loc, List<? extends Entity> list) {
+				public <V extends Entity> void sort(Location loc, List<V> list) {
 					Collections.sort(list, (e1, e2) -> {
 						return (int) (loc.distance(((Entity)e1).getLocation()) - loc.distance(((Entity)e2).getLocation()));
 					});
 				}
 			},
 			FARTHER {
-				public void sort(Location loc, List<? extends Entity> list) {
+				public <V extends Entity> void sort(Location loc, List<V> list) {
 					Collections.sort(list, (e1, e2) -> {
 						return (int) (loc.distance(((Entity)e1).getLocation()) - loc.distance(((Entity)e2).getLocation())) * -1;
 					});
 				}
 			},
 			LOWER_HP {
-				public void sort(Location loc, List<? extends Entity> list) {
+				public <V extends Entity> void sort(Location loc, List<V> list) {
 					Collections.sort(list, (e1, e2) -> {
 						if (e1 instanceof LivingEntity && e2 instanceof LivingEntity) {
 							return (int) (((LivingEntity)e1).getHealth() - ((LivingEntity)e2).getHealth());
@@ -309,7 +374,7 @@ public class EntityTargets {
 				}
 			},
 			HIGHER_HP {
-				public void sort(Location loc, List<? extends Entity> list) {
+				public <V extends Entity> void sort(Location loc, List<V> list) {
 					Collections.sort(list, (e1, e2) -> {
 						if (e1 instanceof LivingEntity && e2 instanceof LivingEntity) {
 							return (int) (((LivingEntity)e1).getHealth() - ((LivingEntity)e2).getHealth()) * -1;
@@ -324,10 +389,18 @@ public class EntityTargets {
 		private SORTING mSorting;
 		private int mNumb;
 
+		public Limit(LIMITSENUM limit) {
+			this(limit, SORTING.RANDOM);
+		}
+
 		public Limit(LIMITSENUM limit, SORTING sorting) {
 			mLimitEnum = limit;
 			mSorting = sorting;
 			mNumb = 0;
+		}
+
+		public Limit(int num) {
+			this(num, SORTING.RANDOM);
 		}
 
 		public Limit(int num, SORTING sorting) {
@@ -337,10 +410,18 @@ public class EntityTargets {
 		}
 
 
-		public List<? extends Entity> sort(Location loc, List<? extends Entity> list) {
+		public <V extends Entity> List<V> sort(Location loc, List<V> list) {
+			if (list == null) {
+				return new ArrayList<>(0);
+			}
+
 			int num = mNumb;
 			if (mLimitEnum != null) {
 				num = mLimitEnum.getNum(list);
+			}
+
+			if (num > list.size()) {
+				num = list.size();
 			}
 			mSorting.sort(loc, list);
 			return list.subList(0, num);
@@ -466,28 +547,29 @@ public class EntityTargets {
 		return string;
 	}
 
-	public List<? extends Entity> getTargetsList(LivingEntity boss) {
-		List<? extends Entity> list = mTargets.getTargets(boss, boss.getLocation(), mRange, mOptional);
+	public <V extends LivingEntity> List<V> getTargetsList(LivingEntity boss) {
+		List<V> list = mTargets.getTargets(boss, boss.getLocation(), mRange, mOptional);
 
-		boolean dontRemove = true;
-		for (Entity entity : list) {
-			dontRemove = true;
-
-			if (mTagsFilter.filter(boss, entity)) {
-				dontRemove = true;
-				continue;
-			}
-
-			for (EntityFilter filter : mFilters) {
+		boolean dontRemove = false;
+		if (!mTagsFilter.mTags.isEmpty() || !mFilters.isEmpty()) {
+			for (Entity entity : new ArrayList<>(list)) {
 				dontRemove = false;
-				if (filter.filter(boss, entity)) {
+
+				if (mTagsFilter.filter(boss, entity)) {
 					dontRemove = true;
-					break;
+					continue;
 				}
 
-			}
-			if (!dontRemove) {
-				list.remove(entity);
+				for (EntityFilter filter : mFilters) {
+					if (filter.filter(boss, entity)) {
+						dontRemove = true;
+						break;
+					}
+
+				}
+				if (!dontRemove) {
+					list.remove(entity);
+				}
 			}
 		}
 
@@ -495,9 +577,9 @@ public class EntityTargets {
 	}
 
 	public List<Location> getTargetsLocationList(LivingEntity boss) {
-		List<? extends Entity> entityList = getTargetsList(boss);
+		List<LivingEntity> entityList = (List<LivingEntity>) getTargetsList(boss);
 		List<Location> locations = new ArrayList<>(entityList.size());
-		for (Entity entity : entityList) {
+		for (LivingEntity entity : entityList) {
 			locations.add(entity.getLocation());
 		}
 		return locations;

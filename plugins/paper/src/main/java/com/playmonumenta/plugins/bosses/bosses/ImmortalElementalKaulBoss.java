@@ -61,7 +61,7 @@ public class ImmortalElementalKaulBoss extends BossAbilityGroup {
 
 		SpellManager activeSpells = new SpellManager(Arrays.asList(
 			new SpellBaseCharge(plugin, mBoss, 20, 20, 160, true,
-				(Player player) -> {
+				(LivingEntity target) -> {
 					boss.getWorld().spawnParticle(Particle.VILLAGER_ANGRY, boss.getLocation(), 50, 2, 2, 2, 0);
 					boss.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 40, 4));
 					boss.getWorld().playSound(boss.getLocation(), Sound.ENTITY_WITHER_SPAWN, 1f, 1.5f);
@@ -71,17 +71,17 @@ public class ImmortalElementalKaulBoss extends BossAbilityGroup {
 					loc.getWorld().spawnParticle(Particle.SMOKE_NORMAL, loc, 1, 1, 1, 1, 0);
 				},
 				// Charge attack sound/particles at boss location
-				(Player player) -> {
+				(LivingEntity player) -> {
 					boss.getWorld().spawnParticle(Particle.SMOKE_LARGE, boss.getLocation(), 100, 2, 2, 2, 0);
 					boss.getWorld().playSound(boss.getLocation(), Sound.ENTITY_WITHER_SHOOT, 1f, 0.5f);
 				},
 				// Attack hit a player
-				(Player player) -> {
-					player.getWorld().spawnParticle(Particle.SMOKE_NORMAL, player.getLocation(), 80, 1, 1, 1, 0);
-					player.getWorld().spawnParticle(Particle.BLOCK_DUST, player.getLocation(), 20, 1, 1, 1, Material.COARSE_DIRT.createBlockData());
-					boss.getWorld().playSound(player.getLocation(), Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, 1f, 0.85f);
-					BossUtils.bossDamage(mBoss, player, 25);
-					MovementUtils.knockAway(mBoss.getLocation(), player, 0.4f, 0.4f);
+				(LivingEntity target) -> {
+					target.getWorld().spawnParticle(Particle.SMOKE_NORMAL, target.getLocation(), 80, 1, 1, 1, 0);
+					target.getWorld().spawnParticle(Particle.BLOCK_DUST, target.getLocation(), 20, 1, 1, 1, Material.COARSE_DIRT.createBlockData());
+					boss.getWorld().playSound(target.getLocation(), Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, 1f, 0.85f);
+					BossUtils.bossDamage(mBoss, target, 25);
+					MovementUtils.knockAway(mBoss.getLocation(), target, 0.4f, 0.4f);
 				},
 				// Attack particles
 				(Location loc) -> {

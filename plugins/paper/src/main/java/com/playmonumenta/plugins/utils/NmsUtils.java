@@ -102,7 +102,6 @@ public class NmsUtils {
 		}
 
 		DamageSource reason = new UnblockableEntityDamageSource(damager == null ? null : ((CraftLivingEntity) damager).getHandle(), cause);
-
 		((CraftLivingEntity)damagee).getHandle().damageEntity(reason, (float) amount);
 	}
 

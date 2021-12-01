@@ -62,7 +62,7 @@ public class KineticProjectileBoss extends BossAbilityGroup {
 						world.spawnParticle(Particle.EXPLOSION_NORMAL, loc, 15, 0.2, 0.2, 0.2, 0.1);
 					},
 					// Hit Action
-					(World world, Player player, Location loc) -> {
+					(World world, LivingEntity target, Location loc) -> {
 						world.playSound(loc, Sound.ENTITY_IRON_GOLEM_HURT, 1f, 0.5f);
 						world.spawnParticle(Particle.EXPLOSION_LARGE, loc, 1, 0, 0, 0, 0);
 
@@ -74,7 +74,7 @@ public class KineticProjectileBoss extends BossAbilityGroup {
 							if (hitbox.overlaps(p.getBoundingBox())) {
 								BossUtils.bossDamage(boss, p, DAMAGE);
 
-								if (!p.equals(player)) {
+								if (!p.equals(target)) {
 									MovementUtils.knockAway(loc, p, KNOCKBACK_SPEED);
 								}
 							}

@@ -66,7 +66,7 @@ public class BlackflameOrb extends SpellBaseSeekingProjectile {
 					world.spawnParticle(Particle.SMOKE_LARGE, loc, 6, 0.5, 0.5, 0.5, 0);
 				},
 				// Hit Action
-				(World world, Player player, Location loc) -> {
+				(World world, LivingEntity player, Location loc) -> {
 					world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 3, 1);
 					world.spawnParticle(Particle.FLAME, loc, 80, 2, 2, 2, 0.5);
 					world.spawnParticle(Particle.SOUL_FIRE_FLAME, loc, 80, 2, 2, 2, 0.5);
@@ -88,7 +88,7 @@ public class BlackflameOrb extends SpellBaseSeekingProjectile {
 	}
 
 	@Override
-	public void launch(Player target, Location targetLoc) {
+	public <V extends LivingEntity> void launch(V target, Location targetLoc) {
 		mOnCooldown = true;
 		new BukkitRunnable() {
 

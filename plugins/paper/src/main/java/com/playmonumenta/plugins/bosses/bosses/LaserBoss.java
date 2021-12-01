@@ -6,14 +6,18 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.parameters.BossParam;
 import com.playmonumenta.plugins.bosses.parameters.EffectsList;
+import com.playmonumenta.plugins.bosses.parameters.EntityTargets;
 import com.playmonumenta.plugins.bosses.parameters.ParticlesList;
 import com.playmonumenta.plugins.bosses.parameters.SoundsList;
+import com.playmonumenta.plugins.bosses.parameters.EntityTargets.Limit;
+import com.playmonumenta.plugins.bosses.parameters.EntityTargets.PLAYERFILTER;
+import com.playmonumenta.plugins.bosses.parameters.EntityTargets.TARGETS;
+import com.playmonumenta.plugins.bosses.parameters.EntityTargets.Limit.LIMITSENUM;
 import com.playmonumenta.plugins.bosses.spells.SpellBaseLaser;
 import com.playmonumenta.plugins.utils.BossUtils;
 
 import org.bukkit.Location;
 import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
@@ -49,6 +53,9 @@ public class LaserBoss extends BossAbilityGroup {
 		@BossParam(help = "not written")
 		public double DAMAGE_PERCENTAGE = 0.0;
 
+		@BossParam(help = "Let you choose the targets of this spell")
+		public EntityTargets TARGETS = EntityTargets.GENERIC_PLAYER_TARGET;
+
 		@BossParam(help = "Effects apply to player after the laser end")
 		public EffectsList EFFECTS = EffectsList.EMPTY;
 		@BossParam(help = "The spell name showed when the player die by this skill")
@@ -82,12 +89,22 @@ public class LaserBoss extends BossAbilityGroup {
 
 		final Parameters p = BossParameters.getParameters(boss, identityTag, new Parameters());
 
+		if (p.TARGETS == EntityTargets.GENERIC_PLAYER_TARGET) {
+			//same object
+			//probably an older mob version?
+			//build a new target from others config
+			p.TARGETS = new EntityTargets(TARGETS.PLAYER, p.DETECTION, false, p.SINGLE_TARGET ? new Limit(1) : new Limit(LIMITSENUM.ALL), Arrays.asList(PLAYERFILTER.HAS_LINEOFSIGHT));
+			//by default LaserBoss don't take player in stealt and need LINEOFSIGHT to cast.
+		}
 		SpellManager activeSpells = new SpellManager(Arrays.asList(
-			new SpellBaseLaser(plugin, boss, p.DETECTION, p.DURATION, false, p.SINGLE_TARGET, p.COOLDOWN,
+			new SpellBaseLaser(plugin, boss, p.DURATION, false, p.COOLDOWN,
+					() -> {
+						return p.TARGETS.getTargetsList(mBoss);
+					},
 					// Tick action per player
-					(Player player, int ticks, boolean blocked) -> {
+					(LivingEntity target, int ticks, boolean blocked) -> {
 
-						p.SOUND_TICKS.play(player, 0.8f, 0.5f + (ticks / 80f) * 1.5f);
+						p.SOUND_TICKS.play(target.getLocation(), 0.8f, 0.5f + (ticks / 80f) * 1.5f);
 						p.SOUND_TICKS.play(boss.getLocation(), 0.8f, 0.5f + (ticks / 80f) * 1.5f);
 
 						if (ticks == 0 && !p.CAN_MOVE) {
@@ -101,7 +118,7 @@ public class LaserBoss extends BossAbilityGroup {
 					p.PARTICLE_FREQUENCY,
 					p.PARTICLE_CHANCE,
 					// Damage generated at the end of the attack
-					(Player player, Location loc, boolean blocked) -> {
+					(LivingEntity target, Location loc, boolean blocked) -> {
 						p.SOUND_END.play(loc, 0.6f, 1.5f);
 						p.PARTICLE_END.spawn(loc, 0, 0, 0, 0.25);
 
@@ -113,21 +130,21 @@ public class LaserBoss extends BossAbilityGroup {
 
 						if (p.DAMAGE > 0) {
 							if (p.SPELL_NAME.isEmpty()) {
-								BossUtils.bossDamage(boss, player, p.DAMAGE);
+								BossUtils.bossDamage(boss, target, p.DAMAGE);
 							} else {
-								BossUtils.bossDamage(boss, player, p.DAMAGE, mBoss.getLocation(), p.SPELL_NAME);
+								BossUtils.bossDamage(boss, target, p.DAMAGE, mBoss.getLocation(), p.SPELL_NAME);
 							}
 						}
 
 						if (p.DAMAGE_PERCENTAGE > 0.0) {
 							if (p.SPELL_NAME.isEmpty()) {
-								BossUtils.bossDamagePercent(mBoss, player, p.DAMAGE_PERCENTAGE);
+								BossUtils.bossDamagePercent(mBoss, target, p.DAMAGE_PERCENTAGE);
 							} else {
-								BossUtils.bossDamagePercent(mBoss, player, p.DAMAGE_PERCENTAGE, p.SPELL_NAME);
+								BossUtils.bossDamagePercent(mBoss, target, p.DAMAGE_PERCENTAGE, p.SPELL_NAME);
 							}
 						}
 
-						p.EFFECTS.apply(player, mBoss);
+						p.EFFECTS.apply(target, mBoss);
 
 
 					})

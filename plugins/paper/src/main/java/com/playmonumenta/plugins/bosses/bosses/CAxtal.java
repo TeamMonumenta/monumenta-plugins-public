@@ -29,7 +29,6 @@ import org.bukkit.attribute.Attribute;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
 import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.plugin.Plugin;
 
@@ -66,14 +65,14 @@ public class CAxtal extends BossAbilityGroup {
 			new SpellAxtalTntThrow(plugin, mBoss, 5, 15),
 			new SpellBaseLaser(plugin, boss, 60, 140, false, true, 160,
 			                   // Tick action per player
-			                   (Player player, int ticks, boolean blocked) -> {
+			                   (LivingEntity target, int ticks, boolean blocked) -> {
 								   World world = boss.getWorld();
 								   if (ticks % 8 == 0) {
-									   world.playSound(player.getLocation(), Sound.UI_TOAST_IN, 2, 0.5f + (ticks / 100f) * 1.5f);
+									   world.playSound(target.getLocation(), Sound.UI_TOAST_IN, 2, 0.5f + (ticks / 100f) * 1.5f);
 								   } else if (ticks % 8 == 2) {
 									   world.playSound(boss.getLocation(), Sound.UI_TOAST_IN, 2, 0.5f + (ticks / 100f) * 1.5f);
 								   } else if (ticks % 8 == 4) {
-									   world.playSound(player.getLocation(), Sound.ENTITY_WITHER_SPAWN, 2, 0.5f + (ticks / 100f) * 1.5f);
+									   world.playSound(target.getLocation(), Sound.ENTITY_WITHER_SPAWN, 2, 0.5f + (ticks / 100f) * 1.5f);
 								   } else if (ticks % 8 == 6) {
 									   world.playSound(boss.getLocation(), Sound.UI_TOAST_IN, 2, 0.5f + (ticks / 100f) * 1.5f);
 								   }
@@ -85,7 +84,7 @@ public class CAxtal extends BossAbilityGroup {
 			                       loc.getWorld().spawnParticle(Particle.SPELL_MOB, loc, 1, 0.02, 0.02, 0.02, 1);
 			                   },
 			                   // TNT generated at the end of the attack
-			                   (Player player, Location loc, boolean blocked) -> {
+			                   (LivingEntity player, Location loc, boolean blocked) -> {
 			                       loc.getWorld().createExplosion(loc, 7);
 			                   })
 		));
