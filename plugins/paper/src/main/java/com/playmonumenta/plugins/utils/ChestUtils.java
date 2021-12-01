@@ -8,9 +8,11 @@ import java.util.List;
 
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockState;
 import org.bukkit.block.Chest;
 import org.bukkit.block.Container;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.DoubleChestInventory;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.loot.LootContext;
@@ -57,9 +59,21 @@ public class ChestUtils {
 	}
 
 	public static void generateContainerLootWithScaling(Player player, Block block, Plugin plugin) {
-		if (block.getState() != null && block.getState() instanceof Lootable && block.getState() instanceof Container) {
-			Container container = (Container)block.getState();
-			Lootable lootable = (Lootable)block.getState();
+		BlockState blockState = block.getState();
+		if (blockState instanceof Container) {
+			Inventory inventory = ((Container) blockState).getInventory();
+			if (inventory instanceof DoubleChestInventory) {
+				generateContainerLootWithScaling(player, ((DoubleChestInventory) inventory).getLeftSide(), plugin);
+				generateContainerLootWithScaling(player, ((DoubleChestInventory) inventory).getRightSide(), plugin);
+			} else {
+				generateContainerLootWithScaling(player, inventory, plugin);
+			}
+		}
+	}
+
+	private static void generateContainerLootWithScaling(Player player, Inventory inventory, Plugin plugin) {
+		if (inventory.getHolder() instanceof Lootable) {
+			Lootable lootable = (Lootable) inventory.getHolder();
 
 			if (lootable.hasLootTable()) {
 				LootTable lootTable = lootable.getLootTable();
@@ -72,7 +86,6 @@ public class ChestUtils {
 				LootContext context = builder.build();
 				Collection<ItemStack> popLoot = lootTable.populateLoot(FastUtils.RANDOM, context);
 
-				Inventory inventory = container.getInventory();
 				inventory.clear();
 				ChestUtils.generateLootInventory(popLoot, inventory, player);
 
