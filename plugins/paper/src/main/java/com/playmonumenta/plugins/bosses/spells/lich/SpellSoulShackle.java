@@ -18,7 +18,6 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.entity.Projectile;
 import org.bukkit.entity.ShulkerBullet;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.plugin.Plugin;
@@ -95,7 +94,7 @@ public class SpellSoulShackle extends Spell {
 						Player p = players.get(i);
 						ShulkerBullet b = (ShulkerBullet) bullets.get(i);
 						b.setTarget(p);
-						((Projectile) b).setShooter(mBoss);
+						b.setShooter(mBoss);
 					}
 					mChargeUp.reset();
 				}
@@ -109,13 +108,17 @@ public class SpellSoulShackle extends Spell {
 	// soul shackle player lock
 	@Override
 	public void bossProjectileHit(ProjectileHitEvent event) {
-		if (event.getEntity() instanceof ShulkerBullet && event.getHitEntity() instanceof Player && !mGotHit.contains(event.getHitEntity())) {
-			mGotHit.add((Player) event.getHitEntity());
+		if (event.getEntity() instanceof ShulkerBullet && event.getHitEntity() instanceof Player) {
 			event.setCancelled(true);
 			event.getEntity().remove();
 
-			World world = mBoss.getWorld();
 			Player p = (Player) event.getHitEntity();
+			if (mGotHit.contains(p)) {
+				return;
+			}
+			mGotHit.add(p);
+
+			World world = mBoss.getWorld();
 			Location pLoc = p.getLocation().add(0, 1.5, 0);
 			p.sendMessage(ChatColor.AQUA
 	                   + "You got chained by Hekawt! Don't move outside of the ring!");
