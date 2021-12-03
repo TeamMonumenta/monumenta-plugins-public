@@ -122,7 +122,7 @@ import com.playmonumenta.plugins.listeners.TradeListener;
 import com.playmonumenta.plugins.listeners.TridentListener;
 import com.playmonumenta.plugins.listeners.VehicleListener;
 import com.playmonumenta.plugins.listeners.WorldListener;
-import com.playmonumenta.plugins.listeners.ZonePropertyListener;
+import com.playmonumenta.plugins.listeners.ZoneListener;
 import com.playmonumenta.plugins.minigames.chess.ChessManager;
 import com.playmonumenta.plugins.network.ClientModHandler;
 import com.playmonumenta.plugins.network.HttpManager;
@@ -339,7 +339,7 @@ public class Plugin extends JavaPlugin {
 		manager.registerEvents(new ShatteredEquipmentListener(this), this);
 		manager.registerEvents(new PotionConsumeListener(this), this);
 		manager.registerEvents(mDeathItemListener, this);
-		manager.registerEvents(new ZonePropertyListener(), this);
+		manager.registerEvents(new ZoneListener(), this);
 		manager.registerEvents(new TridentListener(), this);
 		manager.registerEvents(new CrossbowListener(this), this);
 		manager.registerEvents(mEnchantmentManager, this);

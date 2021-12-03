@@ -1,14 +1,18 @@
 package com.playmonumenta.plugins.listeners;
 
 import org.bukkit.GameMode;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.BlockFromToEvent;
 
+import com.playmonumenta.plugins.utils.ZoneUtils;
 import com.playmonumenta.scriptedquests.zones.ZonePropertyChangeEvent;
 
-public class ZonePropertyListener implements Listener {
+public class ZoneListener implements Listener {
+
 	@EventHandler(priority = EventPriority.LOWEST)
 	public void zonePropertyChangeEvent(ZonePropertyChangeEvent event) {
 		Player player = event.getPlayer();
@@ -34,4 +38,13 @@ public class ZonePropertyListener implements Listener {
 			}
 		}
 	}
+
+	@EventHandler(priority = EventPriority.LOWEST)
+	public void blockFromToEvent(BlockFromToEvent event) {
+		if (event.getBlock().getType() == Material.DRAGON_EGG
+			&& ZoneUtils.hasZoneProperty(event.getToBlock().getLocation(), ZoneUtils.ZoneProperty.ADVENTURE_MODE)) {
+			event.setCancelled(true);
+		}
+	}
+
 }
