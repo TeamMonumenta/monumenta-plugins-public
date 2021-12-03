@@ -29,6 +29,7 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Multimap;
 import com.playmonumenta.plugins.attributes.AttributeManager;
 import com.playmonumenta.plugins.enchantments.CustomEnchantment;
+import com.playmonumenta.plugins.enchantments.Locked;
 import com.playmonumenta.plugins.enchantments.StatTrack;
 import com.playmonumenta.plugins.utils.InfusionUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
@@ -292,6 +293,7 @@ public class TradeListener implements Listener {
 
 	private static boolean isCustomEnchantmentLoreLine(String lore) {
 		String plainLore = ChatColor.stripColor(lore);
+
 		for (CustomEnchantment ench : CustomEnchantment.values()) {
 			// "Fake" enchantments for Celsian Isles items. These match "Celsian Isles : " so would consider the region tag an enchantment
 			if (ench == CustomEnchantment.REGION_SCALING_DAMAGE_DEALT || ench == CustomEnchantment.REGION_SCALING_DAMAGE_TAKEN) {
@@ -303,11 +305,18 @@ public class TradeListener implements Listener {
 				return true;
 			}
 		}
+
+		// Locked is not in the CustomEnchantment enum, so an extra check is needed
+		if (plainLore.startsWith(ChatColor.stripColor(Locked.PROPERTY_NAME))) {
+			return true;
+		}
+
 		for (StatTrack.StatTrackOptions ench : StatTrack.StatTrackOptions.values()) {
 			if (plainLore.startsWith(ench.getEnchantName())) {
 				return true;
 			}
 		}
+
 		return false;
 	}
 
