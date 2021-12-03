@@ -28,7 +28,6 @@ import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.DelvesUtils;
 import com.playmonumenta.plugins.utils.DelvesUtils.Modifier;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
-import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.scriptedquests.Plugin;
 
 import net.md_5.bungee.api.ChatColor;
@@ -416,12 +415,14 @@ public class DepthsParty {
 
 	//Sends player to, and fills, the next open loot room
 	public void populateLootRoom(Player p, boolean victory) {
+		if (mLootRoomsUsed >= 4) {
+			p.sendMessage(DepthsUtils.DEPTHS_MESSAGE_PREFIX + "Max loot rooms reached! This should never happen- please contact a moderator.");
+		}
 		if (mLootRoomLocations.size() > mLootRoomsUsed) {
 			int roomReached = mRoomNumber;
 			Location lootRoomLoc = new Location(p.getWorld(), mLootRoomLocations.get(mLootRoomsUsed).getX(), mLootRoomLocations.get(mLootRoomsUsed).getY(), mLootRoomLocations.get(mLootRoomsUsed).getZ());
 			p.teleport(lootRoomLoc);
 			p.setBedSpawnLocation(lootRoomLoc, true);
-			p.addScoreboardTag(Constants.Tags.NO_TRANSPOSING);
 			mLootRoomsUsed++;
 			p.sendMessage(DepthsUtils.DEPTHS_MESSAGE_PREFIX + "Sending you to loot room " + mLootRoomsUsed);
 			//Calculate their treasure score, remove them from the depths system/party, spawn loot into the room
