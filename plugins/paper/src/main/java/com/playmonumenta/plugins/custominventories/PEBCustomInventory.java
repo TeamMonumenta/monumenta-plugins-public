@@ -67,16 +67,32 @@ public class PEBCustomInventory extends CustomInventory {
 
 		//page 1: main menu
 		PEB_ITEMS.add(new PebItem(1, 0, "", "", ChatColor.LIGHT_PURPLE, FILLER, "", false));
-		PEB_ITEMS.add(new PebItem(1, 11, "Player Information",
+		PEB_ITEMS.add(new PebItem(1, 4, "Main Menu",
+				"A list of commonly used options, along with menu buttons to reach the full lists.", ChatColor.LIGHT_PURPLE,
+				Material.PLAYER_HEAD, "", false));
+		PEB_ITEMS.add(new PebItem(1, 20, "Filtered Pickup and Disabled Drop",
+				"Click to choose your pickup and disabled drop preferences.", ChatColor.LIGHT_PURPLE,
+				Material.DIRT, "page 20", false));
+		PEB_ITEMS.add(new PebItem(1, 21, "Toggle Darksight",
+				"Click to toggle whether Darksight provides Night Vision", ChatColor.LIGHT_PURPLE,
+				Material.LANTERN, "execute as @S run function monumenta:mechanisms/darksight_toggle", false));
+		PEB_ITEMS.add(new PebItem(1, 23, "Dailies",
+				"Click to see what daily content you have and haven't done today.", ChatColor.LIGHT_PURPLE,
+				Material.ACACIA_BOAT, "clickable peb_dailies", true));
+		PEB_ITEMS.add(new PebItem(1, 24, "Dungeon Instances",
+				"Click to view what dungeon instances you have open, and how old they are.", ChatColor.LIGHT_PURPLE,
+				Material.WHITE_WOOL, "clickable peb_dungeoninfo", true));
+
+		PEB_ITEMS.add(new PebItem(1, 37, "Player Information",
 				"Details about Housing, Dailies, and other player-focused options.", ChatColor.LIGHT_PURPLE,
 				Material.PLAYER_HEAD, "page 2", false));
-		PEB_ITEMS.add(new PebItem(1, 15, "Toggle-able Options",
+		PEB_ITEMS.add(new PebItem(1, 39, "Toggle-able Options",
 				"Inventory Sort, Filtered Pickup, and more toggleable choices.", ChatColor.LIGHT_PURPLE,
 				Material.LEVER, "page 3", false));
-		PEB_ITEMS.add(new PebItem(1, 38, "Server Information",
+		PEB_ITEMS.add(new PebItem(1, 41, "Server Information",
 				"Information such as how to use the PEB and random tips.", ChatColor.LIGHT_PURPLE,
 				Material.DISPENSER, "page 4", false));
-		PEB_ITEMS.add(new PebItem(1, 42, "Book Skins",
+		PEB_ITEMS.add(new PebItem(1, 43, "Book Skins",
 				"Change the color of the cover on your P.E.B.", ChatColor.LIGHT_PURPLE,
 				Material.ENCHANTED_BOOK, "page 5", false));
 
