@@ -1,11 +1,13 @@
 package com.playmonumenta.plugins.depths;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.FireworkEffect;
@@ -28,6 +30,8 @@ import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.depths.DepthsRoomType.DepthsRewardType;
 import com.playmonumenta.plugins.depths.abilities.aspects.AxeAspect;
@@ -37,6 +41,7 @@ import com.playmonumenta.plugins.depths.abilities.aspects.SwordAspect;
 import com.playmonumenta.plugins.depths.abilities.aspects.WandAspect;
 import com.playmonumenta.plugins.depths.abilities.frostborn.Permafrost;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.FileUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
@@ -462,5 +467,37 @@ public class DepthsUtils {
 			}
 		}
 		return false;
+	}
+
+	//Store the player ability data to a file, including the name of the player and the room they died in.
+	public static void storetoFile(DepthsPlayer dp, String path) {
+		// Name of the file and it's path
+		String fileName = path + File.separator + dp.mPlayerId + " - " + java.time.Instant.now().getEpochSecond() + ".json";
+		// Player data inside the json
+		JsonObject json = new JsonObject();
+		JsonObject abilityObjectInJson = new JsonObject();
+		for (String ability : dp.mAbilities.keySet()) {
+			abilityObjectInJson.addProperty(ability, dp.mAbilities.get(ability));
+		}
+		JsonArray initialPlayersJsonArray = new JsonArray();
+		for (String player : DepthsManager.getInstance().getPartyFromId(dp).mInitialPlayers) {
+			initialPlayersJsonArray.add(player);
+		}
+		json.addProperty("PlayerName", Bukkit.getPlayer(dp.mPlayerId).getName());
+		json.addProperty("Room Number", DepthsManager.getInstance().getPartyFromId(dp).getRoomNumber());
+		json.addProperty("Treasure Score", DepthsManager.getInstance().getPartyFromId(dp).mTreasureScore);
+		json.add("Abilities", abilityObjectInJson);
+		json.add("Initial Players", initialPlayersJsonArray);
+		Bukkit.getScheduler().runTaskAsynchronously(Plugin.getInstance(), new Runnable() { //run async
+			@Override
+			public void run() {
+				try {
+					FileUtils.writeFile(fileName, json.toString());
+				} catch (Exception e) {
+					Plugin.getInstance().getLogger().severe("Caught exception saving file '" + fileName + "': " + e);
+					e.printStackTrace();
+				}
+			}
+		});
 	}
 }

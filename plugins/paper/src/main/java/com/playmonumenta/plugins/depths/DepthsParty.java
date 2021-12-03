@@ -87,6 +87,9 @@ public class DepthsParty {
 	public final UUID mWorldUUID;
 	//Whether the party got a twisted room already this floor
 	public boolean mTwistedThisFloor = false;
+	//Write the 4 players that started the party
+	public transient ArrayList<String> mInitialPlayers = new ArrayList<>();
+	//Whether or not the reward chest has been spawned for this room already
 
 	/**
 	 * Creates a new depths party with the given players
@@ -118,6 +121,7 @@ public class DepthsParty {
 				}
 			}
 			dp.mPartyNum = this.mPartyNum;
+			mInitialPlayers.add(p.getName());
 		}
 
 		//Run this later so it finishes constructing the party first

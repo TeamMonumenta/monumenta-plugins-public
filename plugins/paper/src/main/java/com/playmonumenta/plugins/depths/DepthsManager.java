@@ -1268,6 +1268,7 @@ public class DepthsManager {
 			for (DepthsPlayer playerInParty : playersToLoop) {
 				Player player = Bukkit.getPlayer(playerInParty.mPlayerId);
 				if (player != null) {
+					DepthsUtils.storetoFile(dp, Plugin.getInstance().getDataFolder() + File.separator + "DepthsStats"); //Save the player's stats
 					dp.mFinalTreasureScore = party.mTreasureScore;
 					player.sendMessage(DepthsUtils.DEPTHS_MESSAGE_PREFIX + "Congratulations! Your final treasure score is " + dp.mFinalTreasureScore + "!");
 					getPartyFromId(dp).populateLootRoom(player, false);

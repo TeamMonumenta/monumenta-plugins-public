@@ -304,7 +304,7 @@ public class DepthsListener implements Listener {
 	public void playerPostRespawnEvent(PlayerPostRespawnEvent event) {
 		//Tp player to loot room when they respawn
 		DepthsPlayer dp = DepthsManager.getInstance().mPlayers.get(event.getPlayer().getUniqueId());
-
+		DepthsUtils.storetoFile(dp, Plugin.getInstance().getDataFolder() + File.separator + "DepthsStats"); //Save the player's stats
 		if (dp != null && DepthsManager.getInstance().getPartyFromId(dp) != null) {
 			if (DepthsManager.getInstance().getPartyFromId(dp).mEndlessMode && DepthsManager.getInstance().getPartyFromId(dp).mRoomNumber > 30) {
 				DepthsManager.getInstance().getPartyFromId(dp).populateLootRoom(event.getPlayer(), true);
