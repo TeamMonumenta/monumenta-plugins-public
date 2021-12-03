@@ -17,6 +17,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.util.Vector;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
@@ -57,34 +58,49 @@ public class Quickdraw extends Ability {
 			world.spawnParticle(Particle.CRIT, mPlayer.getEyeLocation().add(mPlayer.getLocation().getDirection()), 15, 0, 0, 0, 0.6f);
 			world.spawnParticle(Particle.CRIT_MAGIC, mPlayer.getEyeLocation().add(mPlayer.getLocation().getDirection()), 15, 0, 0, 0, 0.6f);
 
-			Arrow arrow = mPlayer.launchProjectile(Arrow.class);
-			if (inMainHand.containsEnchantment(Enchantment.ARROW_FIRE)) {
-				arrow.setFireTicks(20 * 15);
-			}
-			if (inMainHand.containsEnchantment(Enchantment.PIERCING)) {
-				arrow.setPierceLevel(inMainHand.getEnchantmentLevel(Enchantment.PIERCING) + QUICKDRAW_PIERCING_BONUS);
-			} else {
-				arrow.setPierceLevel(QUICKDRAW_PIERCING_BONUS);
-			}
-			arrow.setCritical(true);
-			arrow.setPickupStatus(PickupStatus.CREATIVE_ONLY);
-			arrow.setVelocity(mPlayer.getLocation().getDirection().multiply(3.0));
-			arrow.addCustomEffect(new PotionEffect(PotionEffectType.SLOW, QUICKDRAW_SLOWNESS_DURATION, QUICKDRAW_SLOWNESS_LEVEL), false);
-
-			mPlugin.mProjectileEffectTimers.addEntity(arrow, Particle.FIREWORKS_SPARK);
-			ProjectileLaunchEvent eventLaunch = new ProjectileLaunchEvent(arrow);
-			Bukkit.getPluginManager().callEvent(eventLaunch);
-			if (!eventLaunch.isCancelled()) {
+			boolean launched = shootArrow(inMainHand, 0);
+			if (launched) {
 				putOnCooldown();
-			}
 
-			//Shatter bow if durability is 0 and isn't shattered.
-			//This is needed because QuickDraw doesn't consume durability, but there is a high-damage uncommon bow
-			//with 0 durability that should not be infinitely usable with the QuickDraw ability
-			if ((damageable.getDamage() >= inMainHand.getType().getMaxDurability()) && !ItemUtils.isItemShattered(inMainHand)) {
-				ItemUtils.shatterItem(inMainHand);
+				if (inMainHand.containsEnchantment(Enchantment.MULTISHOT)) {
+					for (int i = 0; i < 2; i++) {
+						shootArrow(inMainHand, 2 * i - 1);
+					}
+				}
+
+				//Shatter bow if durability is 0 and isn't shattered.
+				//This is needed because QuickDraw doesn't consume durability, but there is a high-damage uncommon bow
+				//with 0 durability that should not be infinitely usable with the QuickDraw ability
+				if ((damageable.getDamage() >= inMainHand.getType().getMaxDurability()) && !ItemUtils.isItemShattered(inMainHand)) {
+					ItemUtils.shatterItem(inMainHand);
+				}
 			}
 		}
+	}
+
+	private boolean shootArrow(ItemStack inMainHand, int deviation) {
+		Vector direction = mPlayer.getLocation().getDirection();
+		if (deviation != 0) {
+			direction.rotateAroundY(deviation * 10.0 * Math.PI / 180);
+		}
+		Arrow arrow = mPlayer.getWorld().spawnArrow(mPlayer.getEyeLocation(), direction, 3.0f, 0, Arrow.class);
+		arrow.setShooter(mPlayer);
+		if (inMainHand.containsEnchantment(Enchantment.ARROW_FIRE)) {
+			arrow.setFireTicks(20 * 15);
+		}
+		arrow.setPierceLevel(inMainHand.getEnchantmentLevel(Enchantment.PIERCING) + QUICKDRAW_PIERCING_BONUS);
+		arrow.setCritical(true);
+		arrow.setPickupStatus(PickupStatus.CREATIVE_ONLY);
+		arrow.addCustomEffect(new PotionEffect(PotionEffectType.SLOW, QUICKDRAW_SLOWNESS_DURATION, QUICKDRAW_SLOWNESS_LEVEL), false);
+
+		ProjectileLaunchEvent eventLaunch = new ProjectileLaunchEvent(arrow);
+		Bukkit.getPluginManager().callEvent(eventLaunch);
+
+		if (!eventLaunch.isCancelled()) {
+			mPlugin.mProjectileEffectTimers.addEntity(arrow, Particle.FIREWORKS_SPARK);
+		}
+
+		return !eventLaunch.isCancelled();
 	}
 
 	@Override
