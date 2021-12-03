@@ -212,6 +212,8 @@ public class EntityUtils {
 	private static final Particle.DustOptions CONFUSION_COLOR = new Particle.DustOptions(Color.fromRGB(62, 0, 102), 1.0f);
 	private static final Particle.DustOptions TAUNT_COLOR = new Particle.DustOptions(Color.fromRGB(200, 0, 0), 1.0f);
 
+	private static final double LOG_2 = Math.log(2);
+
 	private static void startTracker(Plugin plugin) {
 		mobsTracker = new BukkitRunnable() {
 			int mRotation = 0;
@@ -781,7 +783,7 @@ public class EntityUtils {
 		int vulnerability = (player.getPotionEffect(PotionEffectType.UNLUCK) == null
 				? 0 : (player.getPotionEffect(PotionEffectType.UNLUCK).getAmplifier() + 1));
 
-		return calculateDamageAfterArmor(damage, armor, toughness) * (1 - Math.min(20.0, protection) / 25) * (1 - Math.min(5, resistance) / 5) * (1 + 0.05 * vulnerability);
+		return calculateDamageAfterArmor(damage, armor, toughness, false) * (1 - Math.min(20.0, protection) / 25) * (1 - Math.min(5.0, resistance) / 5) * (1 + 0.05 * vulnerability);
 	}
 
 	public static double vulnerabilityMult(LivingEntity target) {
@@ -1213,9 +1215,13 @@ public class EntityUtils {
 	 * @param toughness  the armor toughness of the damagee
 	 * @param damage     the initial raw damage
 	 * @param multiplier the desired multiplier for the final damage
-	 * @return           the raw damage needed to achieve the desired multiplier for final damage
+	 * @return the raw damage needed to achieve the desired multiplier for final damage
 	 */
 	public static double getDamageApproximation(double armor, double toughness, double damage, double multiplier) {
+		return getDamageApproximation(armor, toughness, damage, multiplier, false);
+	}
+
+	private static double getDamageApproximation(double armor, double toughness, double damage, double multiplier, boolean useVanillaArmorCalculation) {
 		double rawDamageLowerBound;
 		double rawDamageUpperBound;
 
@@ -1229,14 +1235,14 @@ public class EntityUtils {
 			return damage;
 		}
 
-		double finalDamageBaseline = calculateDamageAfterArmor(damage, armor, toughness);
+		double finalDamageBaseline = calculateDamageAfterArmor(damage, armor, toughness, useVanillaArmorCalculation);
 
 		// Infinite loop safe this in case of bugs
 		for (int i = 0; i < MAXIMUM_ITERATIONS; i++) {
 			// No need to worry about double overflow
 			double rawDamageMiddle = (rawDamageLowerBound + rawDamageUpperBound) / 2;
 			// Protection is constant, evasion is already factored in
-			double damageRatio = calculateDamageAfterArmor(rawDamageMiddle, armor, toughness) / finalDamageBaseline;
+			double damageRatio = calculateDamageAfterArmor(rawDamageMiddle, armor, toughness, useVanillaArmorCalculation) / finalDamageBaseline;
 
 			if (damageRatio <= multiplier) {
 				if (damageRatio > multiplier * (1 - MARGIN_OF_ERROR)) {
@@ -1253,6 +1259,10 @@ public class EntityUtils {
 	}
 
 	public static double getDamageApproximation(EntityDamageByEntityEvent event, double multiplier) {
+		return getDamageApproximation(event, multiplier, false);
+	}
+
+	public static double getDamageApproximation(EntityDamageByEntityEvent event, double multiplier, boolean useVanillaArmorCalculation) {
 		// Not affected by armor
 		if (!PHYSICAL_DAMAGE.contains(event.getCause())) {
 			return event.getDamage() * multiplier;
@@ -1265,14 +1275,14 @@ public class EntityUtils {
 
 		LivingEntity le = (LivingEntity) event.getEntity();
 
-		return getDamageApproximation(le.getAttribute(Attribute.GENERIC_ARMOR).getValue(), le.getAttribute(Attribute.GENERIC_ARMOR_TOUGHNESS).getValue(), event.getDamage(), multiplier);
+		return getDamageApproximation(le.getAttribute(Attribute.GENERIC_ARMOR).getValue(), le.getAttribute(Attribute.GENERIC_ARMOR_TOUGHNESS).getValue(), event.getDamage(), multiplier, useVanillaArmorCalculation);
 	}
 
 	// getFinalDamage() does not work for dummy event calls, and this is fewer calculations than getRealFinalDamage()
-	private static double calculateDamageAfterArmor(double damage, double armor, double toughness) {
+	private static double calculateDamageAfterArmor(double damage, double armor, double toughness, boolean useVanillaArmorCalculation) {
 		armor = Math.min(30, armor);
 		toughness = Math.min(20, toughness);
-		return damage * (1 - Math.min(20, Math.max(armor / 5, armor - damage / (2 + toughness / 4))) / 25);
+		return damage * (1 - Math.min(20, Math.max(armor / 5, armor - (damage <= 16 || useVanillaArmorCalculation ? damage : 4 * Math.log(damage) / LOG_2) / (2 + toughness / 4))) / 25);
 	}
 
 	// Only use this to set max health of newly spawned mobs

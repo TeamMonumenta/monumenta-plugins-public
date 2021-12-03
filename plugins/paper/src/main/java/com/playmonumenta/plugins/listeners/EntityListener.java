@@ -372,7 +372,7 @@ public class EntityListener implements Listener {
 					event.setDamage(4 * Math.log(damage) / Math.log(2));
 
 					// Multiply the "final" event damage by the amount reduced - this multiplier adjusts for armor piercing
-					event.setDamage(EntityUtils.getDamageApproximation(event, damage / event.getDamage()));
+					event.setDamage(EntityUtils.getDamageApproximation(event, damage / event.getDamage(), true));
 				}
 			}
 		}
