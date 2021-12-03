@@ -63,20 +63,22 @@ public class SpellLightningStrike extends Spell {
 	private @NotNull Kaul mKaul;
 	private int mCooldownTicks;
 	private int mRemainingCooldownTicks;
+	private Location mCenter;
 
 	public SpellLightningStrike(
 		@NotNull Kaul kaul,
 		int cooldownSeconds,
-		boolean startCooledDown
+		boolean startCooledDown,
+		Location center
 	) {
 		mKaul = kaul;
 		mCooldownTicks = cooldownSeconds * Constants.TICKS_PER_SECOND;
-
 		if (startCooledDown) {
 			mRemainingCooldownTicks = 0;
 		} else {
 			mRemainingCooldownTicks = mCooldownTicks;
 		}
+		mCenter = center;
 	}
 
 	@Override
@@ -122,6 +124,7 @@ public class SpellLightningStrike extends Spell {
 	public void startStrike(@NotNull Player targetPlayer) {
 		@NotNull World world = targetPlayer.getWorld();
 		@NotNull Location strikeLocation = targetPlayer.getLocation();
+		strikeLocation.setY(mCenter.getY());
 
 		// P: Danger, tall markers
 		@NotNull PPPillar abovegroundMarker = new PPPillar(

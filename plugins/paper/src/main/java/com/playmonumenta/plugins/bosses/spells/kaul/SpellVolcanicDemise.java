@@ -17,7 +17,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
-import org.bukkit.util.Vector;
 
 import com.playmonumenta.plugins.bosses.ChargeUpManager;
 import com.playmonumenta.plugins.bosses.spells.Spell;
@@ -107,9 +106,10 @@ public class SpellVolcanicDemise extends Spell {
 								players.removeIf(p -> p.getLocation().getY() >= 61);
 								Collections.shuffle(players);
 								for (Player player : players) {
-									Vector loc = player.getLocation().toVector();
-									if (player.getLocation().getBlock().isLiquid() || !loc.isInSphere(mCenter.toVector(), 42)) {
-										rainMeteor(player.getLocation(), players, 10);
+									Location loc = player.getLocation();
+									if (loc.getBlock().isLiquid() || !loc.toVector().isInSphere(mCenter.toVector(), 42)) {
+										loc.setY(mCenter.getY());
+										rainMeteor(loc, players, 10);
 									}
 								}
 								for (int j = 0; j < 4; j++) {
@@ -120,6 +120,7 @@ public class SpellVolcanicDemise extends Spell {
 								if (players.size() >= 1) {
 									Player rPlayer = players.get(FastUtils.RANDOM.nextInt(players.size()));
 									Location loc = rPlayer.getLocation();
+									loc.setY(mCenter.getY());
 									rainMeteor(loc.add(FastUtils.randomDoubleInRange(-8, 8), 0, FastUtils.randomDoubleInRange(-8, 8)), players, 40);
 								}
 
@@ -180,8 +181,8 @@ public class SpellVolcanicDemise extends Spell {
 					mWorld.spawnParticle(Particle.FLAME, mLoc, 50, 0, 0, 0, 0.175, null, true);
 					mWorld.spawnParticle(Particle.SMOKE_LARGE, mLoc, 10, 0, 0, 0, 0.25, null, true);
 					mWorld.playSound(mLoc, Sound.ENTITY_GENERIC_EXPLODE, 1.5f, 0.9f);
-					BoundingBox death = BoundingBox.of(mLoc, 1.5, 1.5, 1.5);
-					BoundingBox box = BoundingBox.of(mLoc, 4, 4, 4);
+					BoundingBox death = BoundingBox.of(mLoc, 1.5, 5, 1.5);
+					BoundingBox box = BoundingBox.of(mLoc, 4, 10, 4);
 					for (Player player : PlayerUtils.playersInRange(mLoc, 4, true)) {
 						BoundingBox pBox = player.getBoundingBox();
 						if (pBox.overlaps(death)) {

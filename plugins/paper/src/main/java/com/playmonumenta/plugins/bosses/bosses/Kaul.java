@@ -212,8 +212,6 @@ public class Kaul extends BossAbilityGroup {
 			              new SpellGroundSurge(mPlugin, mBoss, detectionRange),
 			              judgement));
 
-		List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true);
-
 		SpellManager phase3Spells = new SpellManager(
 			Arrays.asList(new SpellPutridPlague(mPlugin, mBoss, detectionRange, true, mShrineMarker.getLocation()),
 			              new SpellEarthsWrath(mPlugin, mBoss, mShrineMarker.getLocation().getY()),
@@ -265,80 +263,82 @@ public class Kaul extends BossAbilityGroup {
 			new SpellBossBlockBreak(mBoss, 8, 1, 3, 1, true, true),
 			new SpellBaseParticleAura(boss, 1, (LivingEntity mBoss) -> {
 				world.spawnParticle(Particle.FALLING_DUST, mBoss.getLocation().add(0, mBoss.getHeight() / 2, 0), 8, 0.35,
-				0.45, 0.35, Material.GREEN_CONCRETE.createBlockData());
+				                    0.45, 0.35, Material.GREEN_CONCRETE.createBlockData());
 			}),
-			new SpellLightningStrike(this, LIGHTNING_STRIKE_COOLDOWN_SECONDS_1, false),
+			new SpellLightningStrike(this, LIGHTNING_STRIKE_COOLDOWN_SECONDS_1, false, mShrineMarker.getLocation()),
 			new SpellLightningStorm(boss, detectionRange),
 			new SpellPurgeNegatives(mBoss, 20 * 6),
 			new SpellConditionalTeleport(mBoss, spawnLoc,
-										 b -> b.getLocation().getBlock().getType() == Material.BEDROCK
-										 || b.getLocation().add(0, 1, 0).getBlock().getType() == Material.BEDROCK
-										 || b.getLocation().getBlock().getType() == Material.LAVA
-										 || b.getLocation().getBlock().getType() == Material.WATER), action
+			                             b -> b.getLocation().getBlock().getType() == Material.BEDROCK
+				                             || b.getLocation().add(0, 1, 0).getBlock().getType() == Material.BEDROCK
+				                             || b.getLocation().getBlock().getType() == Material.LAVA
+				                             || b.getLocation().getBlock().getType() == Material.WATER), action
 		);
 
 		List<Spell> phase2PassiveSpells = Arrays.asList(
 			new SpellBossBlockBreak(mBoss, 8, 1, 3, 1, true, true),
 			new SpellBaseParticleAura(boss, 1, (LivingEntity mBoss) -> {
 				world.spawnParticle(Particle.FALLING_DUST, mBoss.getLocation().add(0, mBoss.getHeight() / 2, 0), 8, 0.35,
-				0.45, 0.35, Material.GREEN_CONCRETE.createBlockData());
+				                    0.45, 0.35, Material.GREEN_CONCRETE.createBlockData());
 			}),
-			new SpellLightningStrike(this, LIGHTNING_STRIKE_COOLDOWN_SECONDS_2, true),
+			new SpellLightningStrike(this, LIGHTNING_STRIKE_COOLDOWN_SECONDS_2, true, mShrineMarker.getLocation()),
 			new SpellLightningStorm(boss, detectionRange),
 			new SpellPurgeNegatives(mBoss, 20 * 3),
 			new SpellConditionalTeleport(mBoss, spawnLoc,
-										 b -> b.getLocation().getBlock().getType() == Material.BEDROCK
-										 || b.getLocation().add(0, 1, 0).getBlock().getType() == Material.BEDROCK
-										 || b.getLocation().getBlock().getType() == Material.LAVA
-										 || b.getLocation().getBlock().getType() == Material.WATER), action
+			                             b -> b.getLocation().getBlock().getType() == Material.BEDROCK
+				                             || b.getLocation().add(0, 1, 0).getBlock().getType() == Material.BEDROCK
+				                             || b.getLocation().getBlock().getType() == Material.LAVA
+				                             || b.getLocation().getBlock().getType() == Material.WATER), action
 		);
 
 		List<Spell> phase3PassiveSpells = Arrays.asList(
 			new SpellBossBlockBreak(mBoss, 8, 1, 3, 1, true, true),
 			new SpellBaseParticleAura(boss, 1, (LivingEntity mBoss) -> {
 				world.spawnParticle(Particle.FALLING_DUST, mBoss.getLocation().add(0, mBoss.getHeight() / 2, 0), 2, 0.35,
-				0.45, 0.35, Material.GREEN_CONCRETE.createBlockData());
+				                    0.45, 0.35, Material.GREEN_CONCRETE.createBlockData());
 				world.spawnParticle(Particle.FLAME, mBoss.getLocation().add(0, mBoss.getHeight() / 2, 0), 2, 0.35, 0.45,
-				0.35, 0.1);
+				                    0.35, 0.1);
 				world.spawnParticle(Particle.REDSTONE, mBoss.getLocation().add(0, mBoss.getHeight() / 2, 0), 2, 0.35, 0.45,
-				0.35, RED_COLOR);
+				                    0.35, RED_COLOR);
 				world.spawnParticle(Particle.FALLING_DUST, mBoss.getLocation().add(0, mBoss.getHeight() / 2, 0), 2, 0.35,
-				0.45, 0.35, Material.BLUE_WOOL.createBlockData());
+				                    0.45, 0.35, Material.BLUE_WOOL.createBlockData());
 			}),
-			new SpellLightningStrike(this, LIGHTNING_STRIKE_COOLDOWN_SECONDS_3, true),
+			new SpellLightningStrike(this, LIGHTNING_STRIKE_COOLDOWN_SECONDS_3, true, mShrineMarker.getLocation()),
 			new SpellLightningStorm(boss, detectionRange),
 			new SpellPurgeNegatives(mBoss, 2),
 			new SpellConditionalTeleport(mBoss, spawnLoc,
-										 b -> b.getLocation().getBlock().getType() == Material.BEDROCK
-										 || b.getLocation().add(0, 1, 0).getBlock().getType() == Material.BEDROCK
-										 || b.getLocation().getBlock().getType() == Material.LAVA
-										 || b.getLocation().getBlock().getType() == Material.WATER), action
+			                             b -> b.getLocation().getBlock().getType() == Material.BEDROCK
+				                             || b.getLocation().add(0, 1, 0).getBlock().getType() == Material.BEDROCK
+				                             || b.getLocation().getBlock().getType() == Material.LAVA
+				                             || b.getLocation().getBlock().getType() == Material.WATER), action
 		);
 
 		List<Spell> phase4PassiveSpells = Arrays.asList(
 			new SpellBossBlockBreak(mBoss, 8, 1, 3, 1, true, true),
 			new SpellBaseParticleAura(boss, 1, (LivingEntity mBoss) -> {
 				world.spawnParticle(Particle.FALLING_DUST, mBoss.getLocation().add(0, mBoss.getHeight() / 2, 0), 2, 0.35,
-				0.45, 0.35, Material.GREEN_CONCRETE.createBlockData());
+				                    0.45, 0.35, Material.GREEN_CONCRETE.createBlockData());
 				world.spawnParticle(Particle.FLAME, mBoss.getLocation().add(0, mBoss.getHeight() / 2, 0), 2, 0.35, 0.45,
-				0.35, 0.1);
+				                    0.35, 0.1);
 				world.spawnParticle(Particle.REDSTONE, mBoss.getLocation().add(0, mBoss.getHeight() / 2, 0), 2, 0.35, 0.45,
-				0.35, RED_COLOR);
+				                    0.35, RED_COLOR);
 				world.spawnParticle(Particle.FALLING_DUST, mBoss.getLocation().add(0, mBoss.getHeight() / 2, 0), 2, 0.35,
-				0.45, 0.35, Material.BLUE_WOOL.createBlockData());
+				                    0.45, 0.35, Material.BLUE_WOOL.createBlockData());
 			}),
-			new SpellLightningStrike(this, LIGHTNING_STRIKE_COOLDOWN_SECONDS_4, true),
+			new SpellLightningStrike(this, LIGHTNING_STRIKE_COOLDOWN_SECONDS_4, true, mShrineMarker.getLocation()),
 			new SpellLightningStorm(boss, detectionRange),
 			new SpellPurgeNegatives(mBoss, 2),
 			new SpellConditionalTeleport(mBoss, spawnLoc,
-										 b -> b.getLocation().getBlock().getType() == Material.BEDROCK
-										 || b.getLocation().add(0, 1, 0).getBlock().getType() == Material.BEDROCK
-										 || b.getLocation().getBlock().getType() == Material.LAVA
-										 || b.getLocation().getBlock().getType() == Material.WATER), action
+			                             b -> b.getLocation().getBlock().getType() == Material.BEDROCK
+				                             || b.getLocation().add(0, 1, 0).getBlock().getType() == Material.BEDROCK
+				                             || b.getLocation().getBlock().getType() == Material.LAVA
+				                             || b.getLocation().getBlock().getType() == Material.WATER), action
 		);
+
 
 		Map<Integer, BossHealthAction> events = new HashMap<Integer, BossHealthAction>();
 		events.put(100, mBoss -> {
+			List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true);
 			if (players.size() == 1) {
 				PlayerUtils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"THE JUNGLE WILL NOT ALLOW A LONE MORTAL LIKE YOU TO LIVE. PERISH, FOOLISH USURPER!\",\"color\":\"dark_green\"}]");
 			} else {
@@ -505,9 +505,7 @@ public class Kaul extends BossAbilityGroup {
 							public void run() {
 								if (miniboss == null) {
 									this.cancel();
-								}
-
-								if (miniboss.isDead() || !miniboss.isValid()) {
+								} else if (miniboss.isDead() || !miniboss.isValid()) {
 									this.cancel();
 									mBoss.setInvulnerable(false);
 									mBoss.setAI(true);
