@@ -294,7 +294,7 @@ public class SpellBaseSeekingProjectile extends Spell {
 				}
 
 				if (mTarget != null) {
-					Vector newDirection = mTarget.getLocation().add(0, 1.0, 0).subtract(mLocation).toVector();
+					Vector newDirection = mTarget.getEyeLocation().subtract(mLocation).toVector();
 					if (newDirection.length() > 2 * mRange) {
 						this.cancel();
 						if (!mLingers) {
@@ -353,7 +353,7 @@ public class SpellBaseSeekingProjectile extends Spell {
 					if (mGetSpellTargets != null) {
 						Collection<Entity> entities = mLocation.getWorld().getNearbyEntities(mLocation, mHitboxLength + 2, mHitboxLength + 2, mHitboxLength + 2);
 						for (Entity entity : entities) {
-							if (entity instanceof LivingEntity && mHitbox.overlaps(entity.getBoundingBox()) && (mTarget.equals(entity) || !mCollidesWithOthers)) {
+							if (entity instanceof LivingEntity && mHitbox.overlaps(entity.getBoundingBox()) && !mBoss.equals(entity) && (mTarget.equals(entity) || !mCollidesWithOthers)) {
 								mHitAction.run(mWorld, mTarget, mLocation);
 								this.cancel();
 								if (!mLingers) {
