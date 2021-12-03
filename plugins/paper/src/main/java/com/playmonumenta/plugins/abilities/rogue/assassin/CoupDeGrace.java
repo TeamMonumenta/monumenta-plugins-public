@@ -42,7 +42,7 @@ public class CoupDeGrace extends Ability {
 		super(plugin, player, "Coup de Grace");
 		mInfo.mScoreboardId = "CoupDeGrace";
 		mInfo.mShorthandName = "CdG";
-		mInfo.mDescriptions.add("If you melee attack a normal enemy and they get under 10% health they die instantly. The threshold for elites is 20% health");
+		mInfo.mDescriptions.add("If you melee attack a normal enemy and they get under 10% health they die instantly. The threshold for elites is 20% health.");
 		mInfo.mDescriptions.add("The health threshold is increased to 15% for normal enemies and 30% for elites.");
 		mDisplayItem = new ItemStack(Material.WITHER_SKELETON_SKULL, 1);
 		mNormalThreshold = getAbilityScore() == 1 ? COUP_1_NORMAL_THRESHOLD : COUP_2_NORMAL_THRESHOLD;

@@ -37,7 +37,7 @@ public class BasiliskPoison extends Ability {
 		mInfo.mScoreboardId = "BasiliskPoison";
 		mInfo.mShorthandName = "BP";
 		mInfo.mDescriptions.add("Equips your arrows with a damage over time that deals 5% of your bow shot every 1s for 6s.");
-		mInfo.mDescriptions.add("Damage over time is improved to 8%");
+		mInfo.mDescriptions.add("Damage over time is improved to 8%.");
 		mInfo.mLinkedSpell = ClassAbility.BASILISK_POISON;
 		mPercent = getAbilityScore() == 1 ? BASILISK_POISON_1_PERCENT_DAMAGE : BASILISK_POISON_2_PERCENT_DAMAGE;
 		mDisplayItem = new ItemStack(Material.POISONOUS_POTATO, 1);

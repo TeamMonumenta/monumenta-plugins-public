@@ -5,7 +5,6 @@ import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
@@ -35,7 +34,7 @@ public class Skirmisher extends Ability {
 		mInfo.mScoreboardId = "Skirmisher";
 		mInfo.mShorthandName = "Sk";
 		mInfo.mDescriptions.add("When holding two swords, deal 1 + 10% final damage to mobs when other mobs are within 2.5 blocks.");
-		mInfo.mDescriptions.add("The damage bonus now also applies to mobs not targeting you, and the damage bonus is increased to 2 + 15% final damage done");
+		mInfo.mDescriptions.add("The damage bonus now also applies to mobs not targeting you, and the damage bonus is increased to 2 + 15% final damage done.");
 		mDisplayItem = new ItemStack(Material.BONE, 1);
 		mIsolatedPercentDamage = getAbilityScore() == 1 ? GROUPED_PERCENT_DAMAGE_1 : GROUPED_PERCENT_DAMAGE_2;
 		mIsolatedFlatDamage = getAbilityScore() == 1 ? GROUPED_FLAT_DAMAGE : GROUPED_FLAT_DAMAGE_2;
