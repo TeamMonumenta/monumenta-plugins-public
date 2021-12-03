@@ -16,6 +16,7 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.depths.bosses.Nucleus;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
@@ -31,6 +32,7 @@ public class SpellPassiveSummons extends Spell {
 	private double mY;
 	private List<UUID> mSummoned = new ArrayList<UUID>();
 	private int mFightNumber;
+	private Nucleus mBossInstance;
 
 	private Location mSpawnLoc;
 
@@ -41,7 +43,7 @@ public class SpellPassiveSummons extends Spell {
 	private static final int ELITE_CHANCE_PER_FLOOR = 5;
 
 
-	public SpellPassiveSummons(Plugin plugin, LivingEntity boss, double summonRange, int summonTime, double y, Location spawnLoc, int fightNumber) {
+	public SpellPassiveSummons(Plugin plugin, LivingEntity boss, double summonRange, int summonTime, double y, Location spawnLoc, int fightNumber, Nucleus bossInstance) {
 		mPlugin = plugin;
 		mBoss = boss;
 		mSummonRange = summonRange;
@@ -50,14 +52,15 @@ public class SpellPassiveSummons extends Spell {
 		mY = y;
 		mSpawnLoc = spawnLoc;
 		mFightNumber = fightNumber;
+		mBossInstance = bossInstance;
 	}
 
 	@Override
 	public void run() {
 		mTicks += 5;
 
-		//Don't run in start animation
-		if (mTicks < 6 * 20) {
+		//Don't run in start animation, or if spawning is disabled
+		if (mTicks < 6 * 20 || (mBossInstance != null && !mBossInstance.mCanSpawnMobs)) {
 			return;
 		}
 

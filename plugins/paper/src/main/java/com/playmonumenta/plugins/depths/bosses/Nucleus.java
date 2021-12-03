@@ -69,6 +69,7 @@ public class Nucleus extends BossAbilityGroup {
 	public Map<Location, LivingEntity> mEyes;
 	public int mEyesKilled = 0;
 	public boolean mIsHidden;
+	public boolean mCanSpawnMobs = true;
 
 	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
 		return SerializationUtils.statefulBossDeserializer(boss, identityTag, (spawnLoc, endLoc) -> {
@@ -103,6 +104,8 @@ public class Nucleus extends BossAbilityGroup {
 		DepthsParty party = DepthsUtils.getPartyFromNearbyPlayers(mSpawnLoc);
 		if (party == null || party.getFloor() == 3) {
 			mCooldownTicks = 8 * 20;
+			//Disable passive mob spawning until 90% hp if fighting for the first time
+			mCanSpawnMobs = false;
 		} else if (party.getFloor() == 6) {
 			mCooldownTicks = 7 * 20;
 		} else if (party.getFloor() % 3 == 0) {
@@ -159,7 +162,7 @@ public class Nucleus extends BossAbilityGroup {
 		List<Spell> phase1Passives = Arrays.asList(
 				new SpellBlockBreak(mBoss, 2, 3, 2),
 				new SpellPassiveEyes(mBoss, this, spawnLoc),
-				new SpellPassiveSummons(plugin, mBoss, 30.0, 15, mSpawnLoc.getY(), mSpawnLoc, ((party.getFloor() - 1) / 3) + 1)
+				new SpellPassiveSummons(plugin, mBoss, 30.0, 15, mSpawnLoc.getY(), mSpawnLoc, ((party.getFloor() - 1) / 3) + 1, this)
 			);
 
 		SpellManager phase2Spells = new SpellManager(Arrays.asList(
@@ -170,7 +173,7 @@ public class Nucleus extends BossAbilityGroup {
 		List<Spell> phase2Passives = Arrays.asList(
 			new SpellBlockBreak(mBoss, 2, 3, 2),
 			new SpellPassiveEyes(mBoss, this, spawnLoc),
-			new SpellPassiveSummons(plugin, mBoss, 30.0, 15, mSpawnLoc.getY(), mSpawnLoc, ((party.getFloor() - 1) / 3) + 1)
+			new SpellPassiveSummons(plugin, mBoss, 30.0, 15, mSpawnLoc.getY(), mSpawnLoc, ((party.getFloor() - 1) / 3) + 1, this)
 		);
 
 		SpellManager phase3Spells = new SpellManager(Arrays.asList(
@@ -183,11 +186,13 @@ public class Nucleus extends BossAbilityGroup {
 			new SpellBlockBreak(mBoss, 2, 3, 2),
 			new VolcanicDeepmise(mBoss, mSpawnLoc),
 			new SpellPassiveEyes(mBoss, this, spawnLoc),
-			new SpellPassiveSummons(plugin, mBoss, 30.0, 15, mSpawnLoc.getY(), mSpawnLoc, ((party.getFloor() - 1) / 3) + 1)
+			new SpellPassiveSummons(plugin, mBoss, 30.0, 15, mSpawnLoc.getY(), mSpawnLoc, ((party.getFloor() - 1) / 3) + 1, this)
 		);
 
 		Map<Integer, BossHealthAction> events = new HashMap<Integer, BossHealthAction>();
-
+		events.put(90, (mBoss) -> {
+			mCanSpawnMobs = true;
+		});
 		events.put(60, (mBoss) -> {
 			mCooldownTicks -= 30;
 			changePhase(phase2Spells, phase2Passives, null);
