@@ -239,7 +239,6 @@ public class Plugin extends JavaPlugin {
 		CustomInventoryCommands.register(this);
 		AdminNotify.register();
 		AuditLogCommand.register();
-		BossTagCommand.register();
 		PickLevelAfterAnvils.register();
 
 
@@ -440,6 +439,7 @@ public class Plugin extends JavaPlugin {
 
 		// Hook into Library of Souls for mob management if available
 		if (Bukkit.getPluginManager().isPluginEnabled("LibraryOfSouls")) {
+			BossTagCommand.register();
 			new LibraryOfSoulsIntegration(this.getLogger());
 		}
 
