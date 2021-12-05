@@ -5,26 +5,18 @@ import java.util.Set;
 import java.util.UUID;
 
 import org.bukkit.ChatColor;
-import org.bukkit.GameMode;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.HumanEntity;
-import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.inventory.ClickType;
-import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.PlayerInventory;
 
-import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.utils.CommandUtils;
-import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.ItemUtils.ItemTier;
 
@@ -167,6 +159,7 @@ public class ItemDropListener implements Listener {
 	@EventHandler(priority = EventPriority.LOW)
 	public void inventoryClickEvent(InventoryClickEvent event) {
 
+		/*
 		if (event.getClick() == ClickType.DROP
 			|| event.getClick() == ClickType.CONTROL_DROP
 			|| event.getAction() == InventoryAction.DROP_ALL_CURSOR
@@ -204,12 +197,15 @@ public class ItemDropListener implements Listener {
 				}
 			}
 		}
+		*/
 	}
 
 	// Handles every drop event, but badly - items don't get put back in the proper slots when this event is cancelled.
 	// Events already handled & cancelled by other handlers won't reach this code, so those will be handled nicely.
 	@EventHandler(priority = EventPriority.LOW)
 	public void playerDropItemEvent(PlayerDropItemEvent event) {
+
+		/*
 		Player player = event.getPlayer();
 		Item itemEntity = event.getItemDrop();
 		if (player == null || itemEntity == null || player.getGameMode() == GameMode.CREATIVE) {
@@ -240,6 +236,7 @@ public class ItemDropListener implements Listener {
 				event.setCancelled(true);
 			}
 		}
+		*/
 	}
 
 	/**
