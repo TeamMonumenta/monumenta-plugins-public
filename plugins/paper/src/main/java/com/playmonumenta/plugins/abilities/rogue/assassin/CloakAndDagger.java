@@ -83,21 +83,23 @@ public class CloakAndDagger extends Ability implements KillTriggeredAbility, Abi
 	public boolean onStealthAttack(EntityDamageByEntityEvent event) {
 		if (event.getCause() == DamageCause.ENTITY_ATTACK && mActive) {
 			AbilityUtils.removeStealth(mPlugin, mPlayer, false);
-			LivingEntity damagee = (LivingEntity) event.getEntity();
-			double eliteScaling = 1.0;
-			if (EntityUtils.isElite(damagee)) {
-				eliteScaling = PASSIVE_DAMAGE_ELITE_MODIFIER;
-			} else if (EntityUtils.isBoss(damagee)) {
-				eliteScaling = PASSIVE_DAMAGE_BOSS_MODIFIER;
+			if (InventoryUtils.rogueTriggerCheck(mPlayer.getInventory().getItemInMainHand(), mPlayer.getInventory().getItemInOffHand())) {
+				LivingEntity damagee = (LivingEntity) event.getEntity();
+				double eliteScaling = 1.0;
+				if (EntityUtils.isElite(damagee)) {
+					eliteScaling = PASSIVE_DAMAGE_ELITE_MODIFIER;
+				} else if (EntityUtils.isBoss(damagee)) {
+					eliteScaling = PASSIVE_DAMAGE_BOSS_MODIFIER;
+				}
+				event.setDamage(event.getDamage() + (mCloakOnActivation * mDamageMultiplier) * eliteScaling);
+
+				Location loc = event.getEntity().getLocation();
+
+				World world = mPlayer.getWorld();
+				world.playSound(loc, Sound.ENTITY_IRON_GOLEM_DEATH, 1f, 2f);
+				world.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_STRONG, 1f, 0.5f);
+				world.spawnParticle(Particle.SMOKE_NORMAL, loc.clone().add(0, 1, 0), 25, 0.25, 0.5, 0.25, 0.2f);
 			}
-			event.setDamage(event.getDamage() + (mCloakOnActivation * mDamageMultiplier) * eliteScaling);
-
-			Location loc = event.getEntity().getLocation();
-
-			World world = mPlayer.getWorld();
-			world.playSound(loc, Sound.ENTITY_IRON_GOLEM_DEATH, 1f, 2f);
-			world.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_STRONG, 1f, 0.5f);
-			world.spawnParticle(Particle.SMOKE_NORMAL, loc.clone().add(0, 1, 0), 25, 0.25, 0.5, 0.25, 0.2f);
 
 			mActive = false;
 		}
