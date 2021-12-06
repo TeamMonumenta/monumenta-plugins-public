@@ -81,8 +81,7 @@ public class CloakAndDagger extends Ability implements KillTriggeredAbility, Abi
 
 	@Override
 	public boolean onStealthAttack(EntityDamageByEntityEvent event) {
-		if (event.getCause() == DamageCause.ENTITY_ATTACK && mActive
-				&& InventoryUtils.rogueTriggerCheck(mPlayer.getInventory().getItemInMainHand(), mPlayer.getInventory().getItemInOffHand())) {
+		if (event.getCause() == DamageCause.ENTITY_ATTACK && mActive) {
 			AbilityUtils.removeStealth(mPlugin, mPlayer, false);
 			LivingEntity damagee = (LivingEntity) event.getEntity();
 			double eliteScaling = 1.0;
