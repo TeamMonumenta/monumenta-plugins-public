@@ -144,22 +144,24 @@ public class ProjectileBoss extends BossAbilityGroup {
 					(World world, LivingEntity target, Location loc) -> {
 						p.SOUND_HIT.play(loc, 0.5f, 0.5f);
 						p.PARTICLE_HIT.spawn(loc, 0d, 0d, 0d, 0.25d);
-						if (p.DAMAGE > 0) {
-							if (p.SPELL_NAME.isEmpty()) {
-								BossUtils.bossDamage(boss, target, p.DAMAGE);
-							} else {
-								BossUtils.bossDamage(boss, target, p.DAMAGE, mBoss.getLocation(), p.SPELL_NAME);
+						if (target != null) {
+							if (p.DAMAGE > 0) {
+								if (p.SPELL_NAME.isEmpty()) {
+									BossUtils.bossDamage(boss, target, p.DAMAGE);
+								} else {
+									BossUtils.bossDamage(boss, target, p.DAMAGE, mBoss.getLocation(), p.SPELL_NAME);
+								}
 							}
-						}
 
-						if (p.DAMAGE_PERCENTAGE > 0.0) {
-							if (p.SPELL_NAME.isEmpty()) {
-								BossUtils.bossDamagePercent(mBoss, target, p.DAMAGE_PERCENTAGE);
-							} else {
-								BossUtils.bossDamagePercent(mBoss, target, p.DAMAGE_PERCENTAGE, p.SPELL_NAME);
+							if (p.DAMAGE_PERCENTAGE > 0.0) {
+								if (p.SPELL_NAME.isEmpty()) {
+									BossUtils.bossDamagePercent(mBoss, target, p.DAMAGE_PERCENTAGE);
+								} else {
+									BossUtils.bossDamagePercent(mBoss, target, p.DAMAGE_PERCENTAGE, p.SPELL_NAME);
+								}
 							}
+							p.EFFECTS.apply(target, boss);
 						}
-						p.EFFECTS.apply(target, boss);
 
 					})
 		));

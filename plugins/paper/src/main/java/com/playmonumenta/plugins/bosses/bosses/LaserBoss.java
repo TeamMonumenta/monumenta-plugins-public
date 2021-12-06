@@ -127,24 +127,25 @@ public class LaserBoss extends BossAbilityGroup {
 								return;
 							}
 						}
-
-						if (p.DAMAGE > 0) {
-							if (p.SPELL_NAME.isEmpty()) {
-								BossUtils.bossDamage(boss, target, p.DAMAGE);
-							} else {
-								BossUtils.bossDamage(boss, target, p.DAMAGE, mBoss.getLocation(), p.SPELL_NAME);
+						if (target != null) {
+							if (p.DAMAGE > 0) {
+								if (p.SPELL_NAME.isEmpty()) {
+									BossUtils.bossDamage(boss, target, p.DAMAGE);
+								} else {
+									BossUtils.bossDamage(boss, target, p.DAMAGE, mBoss.getLocation(), p.SPELL_NAME);
+								}
 							}
-						}
 
-						if (p.DAMAGE_PERCENTAGE > 0.0) {
-							if (p.SPELL_NAME.isEmpty()) {
-								BossUtils.bossDamagePercent(mBoss, target, p.DAMAGE_PERCENTAGE);
-							} else {
-								BossUtils.bossDamagePercent(mBoss, target, p.DAMAGE_PERCENTAGE, p.SPELL_NAME);
+							if (p.DAMAGE_PERCENTAGE > 0.0) {
+								if (p.SPELL_NAME.isEmpty()) {
+									BossUtils.bossDamagePercent(mBoss, target, p.DAMAGE_PERCENTAGE);
+								} else {
+									BossUtils.bossDamagePercent(mBoss, target, p.DAMAGE_PERCENTAGE, p.SPELL_NAME);
+								}
 							}
-						}
 
-						p.EFFECTS.apply(target, mBoss);
+							p.EFFECTS.apply(target, mBoss);
+						}
 
 
 					})
