@@ -327,7 +327,8 @@ public class ShulkerShortcutListener implements Listener {
 		       ItemUtils.isShulkerBox(item.getType()) &&
 			   item.hasItemMeta() &&
 			   item.getItemMeta().hasDisplayName() &&
-			   ItemUtils.getPlainName(item).contains("Carrier of Emotion");
+			   (ItemUtils.getPlainName(item).contains("Carrier of Emotion")
+			    || ItemUtils.getPlainName(item).contains("Carrier of Festivity"));
 	}
 
 	public static boolean isEnderExpansion(ItemStack item) {
