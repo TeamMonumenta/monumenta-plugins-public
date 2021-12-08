@@ -26,12 +26,11 @@ public class CrossbowListener implements Listener {
 		mPlugin = plugin;
 	}
 
-	@EventHandler(priority = EventPriority.HIGH)
+	@EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
 	public void projectileLaunchEvent(ProjectileLaunchEvent event) {
 		//Has to be an arrow
 		if (
-			event.isCancelled()
-			|| !EntityUtils.isSomeArrow(event.getEntity())
+			!EntityUtils.isSomeArrow(event.getEntity())
 			|| !(event.getEntity().getShooter() instanceof LivingEntity)
 		) {
 			return;

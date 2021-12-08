@@ -34,7 +34,7 @@ public class ArrowListener implements Listener {
 		}.runTaskTimer(mPlugin, 20 * 60 * 5, 20 * 60 * 5);
 	}
 
-	@EventHandler(priority = EventPriority.HIGH)
+	@EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
 	public void projectileHitEvent(ProjectileHitEvent event) {
 		//Has to be an arrow
 		if (event.getHitEntity() == null

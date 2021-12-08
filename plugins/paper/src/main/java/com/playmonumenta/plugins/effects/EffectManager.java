@@ -420,7 +420,7 @@ public class EffectManager implements Listener {
 		return new JsonObject();
 	}
 
-	@EventHandler(priority = EventPriority.NORMAL)
+	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
 	public boolean entityRegainHealthEvent(EntityRegainHealthEvent event) {
 		Effects effects = mEntities.get(event.getEntity());
 		if (effects != null) {
@@ -436,7 +436,7 @@ public class EffectManager implements Listener {
 		return true;
 	}
 
-	@EventHandler(priority = EventPriority.NORMAL)
+	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
 	public boolean entityDeathEvent(EntityDeathEvent event) {
 		Effects effects = mEntities.get(event.getEntity());
 		if (effects != null) {
@@ -452,7 +452,7 @@ public class EffectManager implements Listener {
 		return true;
 	}
 
-	@EventHandler(priority = EventPriority.NORMAL)
+	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
 	public boolean entityDamageByEntityEvent(EntityDamageByEntityEvent event) {
 		Entity damager = event.getDamager();
 		if (damager instanceof Projectile) {
@@ -476,7 +476,7 @@ public class EffectManager implements Listener {
 		return true;
 	}
 
-	@EventHandler(priority = EventPriority.NORMAL)
+	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
 	public boolean entityDamageEvent(EntityDamageEvent event) {
 		Effects effects = mEntities.get(event.getEntity());
 		if (effects != null) {

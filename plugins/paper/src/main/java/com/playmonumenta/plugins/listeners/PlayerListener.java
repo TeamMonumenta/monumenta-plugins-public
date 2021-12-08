@@ -155,7 +155,7 @@ public class PlayerListener implements Listener {
 		mPlugin = plugin;
 	}
 
-	@EventHandler(priority = EventPriority.LOW)
+	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	public void playerJoinEvent(PlayerJoinEvent event) {
 		Player player = event.getPlayer();
 
@@ -174,14 +174,14 @@ public class PlayerListener implements Listener {
 
 	}
 
-	@EventHandler(priority = EventPriority.MONITOR)
+	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void playerChannelEvent(PlayerRegisterChannelEvent event) {
 		if (ClientModHandler.CHANNEL_ID.equals(event.getChannel())) {
 			ClientModHandler.updateAbilities(event.getPlayer());
 		}
 	}
 
-	@EventHandler(priority = EventPriority.LOW)
+	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	public void playerQuitEvent(PlayerQuitEvent event) {
 		if (!ServerProperties.getJoinMessagesEnabled()) {
 			event.setQuitMessage("");
@@ -208,7 +208,7 @@ public class PlayerListener implements Listener {
 		}
 	}
 
-	@EventHandler (priority = EventPriority.LOW)
+	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	public void onPlayerMove(PlayerMoveEvent event) {
 		Player player = event.getPlayer();
 		NavigableSet<Effect> effects = mPlugin.mEffectManager.getEffects(player, STASIS);
@@ -220,7 +220,7 @@ public class PlayerListener implements Listener {
 		}
 	}
 
-	@EventHandler(priority = EventPriority.NORMAL)
+	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
 	public void playerInteractEvent(PlayerInteractEvent event) {
 		Action action = event.getAction();
 		Player player = event.getPlayer();
@@ -295,7 +295,7 @@ public class PlayerListener implements Listener {
 	}
 
 	// Player interacts with an entity (not triggered on armor stands for some reason
-	@EventHandler(priority = EventPriority.NORMAL)
+	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
 	public void playerInteractEntityEvent(PlayerInteractEntityEvent event) {
 		Player player = event.getPlayer();
 		NavigableSet<Effect> effects = mPlugin.mEffectManager.getEffects(player, STASIS);
@@ -392,7 +392,7 @@ public class PlayerListener implements Listener {
 		}
 	}
 
-	@EventHandler(priority = EventPriority.HIGH)
+	@EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
 	public void entityShootBowEvent(EntityShootBowEvent event) {
 		NavigableSet<Effect> effects = mPlugin.mEffectManager.getEffects(event.getEntity(), STASIS);
 		if (effects != null && mPlugin.mEffectManager.getEffects(event.getEntity(), STASIS) != null && (mPlugin.mEffectManager.getEffects(event.getEntity(), STASIS)).contains(new Stasis(120))) {
@@ -405,7 +405,7 @@ public class PlayerListener implements Listener {
 	}
 
 	// The Player swapped their current selected item.
-	@EventHandler(priority = EventPriority.HIGH)
+	@EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
 	public void playerItemHeldEvent(PlayerItemHeldEvent event) {
 		InventoryUtils.scheduleDelayedEquipmentCheck(mPlugin, event.getPlayer(), event);
 	}
@@ -457,15 +457,15 @@ public class PlayerListener implements Listener {
 	}
 
 	// An item on the player breaks.
-	@EventHandler(priority = EventPriority.HIGH)
+	@EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
 	public void playerItemBreakEvent(PlayerItemBreakEvent event) {
 		InventoryUtils.scheduleDelayedEquipmentCheck(mPlugin, event.getPlayer(), event);
 	}
 
 	// If an inventory interaction happened.
-	@EventHandler(priority = EventPriority.NORMAL)
+	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
 	public void inventoryClickEvent(InventoryClickEvent event) {
-		if (event.isCancelled() || !(event.getWhoClicked() instanceof Player)) {
+		if (!(event.getWhoClicked() instanceof Player)) {
 			return;
 		}
 		// If item contains curse of ephemerality, prevent from putting in other inventories
@@ -528,7 +528,7 @@ public class PlayerListener implements Listener {
 
 	// ...Because there's a known bug with the stupid Item Property stuff and the InventoryClickEvent stuff...
 	// The player inventory is closed
-	@EventHandler(priority = EventPriority.HIGH)
+	@EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
 	public void inventoryCloseEvent(InventoryCloseEvent event) {
 		Inventory inventory = event.getInventory();
 		InventoryHolder holder = inventory.getHolder();
@@ -569,7 +569,7 @@ public class PlayerListener implements Listener {
 	}
 
 	// Player ran a command
-	@EventHandler(priority = EventPriority.LOW)
+	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	public void playerCommandPreprocessEvent(PlayerCommandPreprocessEvent event) {
 		final String NBT_EDITOR_OPTIONAL_PREFIX = "nbteditor:";
 
@@ -597,7 +597,7 @@ public class PlayerListener implements Listener {
 	}
 
 	// Player changed hand items
-	@EventHandler(priority = EventPriority.HIGH)
+	@EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
 	public void playerChangedMainHandEvent(PlayerChangedMainHandEvent event) {
 		InventoryUtils.scheduleDelayedEquipmentCheck(mPlugin, event.getPlayer(), event);
 	}
@@ -647,7 +647,7 @@ public class PlayerListener implements Listener {
 	}
 
 	// The player has respawned.
-	@EventHandler(priority = EventPriority.HIGH)
+	@EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
 	public void playerRespawnEvent(PlayerRespawnEvent event) {
 		Player player = event.getPlayer();
 		final String name = player.getName();
@@ -780,7 +780,7 @@ public class PlayerListener implements Listener {
 		mPlugin.mTrackingManager.mPlayers.onItemDamage(mPlugin, event.getPlayer(), event);
 	}
 
-	@EventHandler(priority = EventPriority.LOW)
+	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	public void playerRiptideEvent(PlayerRiptideEvent event) {
 		Player player = event.getPlayer();
 		Location loc = player.getLocation();
@@ -804,14 +804,14 @@ public class PlayerListener implements Listener {
 		}
 	}
 
-	@EventHandler(priority = EventPriority.LOW)
+	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	public void playerExpChangeEvent(PlayerExpChangeEvent event) {
 		Player player = event.getPlayer();
 
 		mPlugin.mTrackingManager.mPlayers.onExpChange(mPlugin, player, event);
 	}
 
-	@EventHandler(priority = EventPriority.HIGHEST)
+	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
 	public void playerTeleportEvent(PlayerTeleportEvent event) {
 		// Cancel teleports caused by forbidden sources
 		TeleportCause cause = event.getCause();
@@ -981,7 +981,7 @@ public class PlayerListener implements Listener {
 	/*
 	 * Prevent players from passing through 1-thick barriers using beds
 	 */
-	@EventHandler(priority = EventPriority.HIGHEST)
+	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
 	public void playerBedLeaveEvent(PlayerBedLeaveEvent event) {
 		Player player = event.getPlayer();
 		if (MetadataUtils.checkOnceThisTick(mPlugin, player, PLAYER_LEFT_BED_TICK_METAKEY)) {
@@ -991,7 +991,7 @@ public class PlayerListener implements Listener {
 		}
 	}
 
-	@EventHandler(priority = EventPriority.LOW)
+	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	public void playerToggleSneakEvent(PlayerToggleSneakEvent event) {
 		Player player = event.getPlayer();
 
@@ -1025,7 +1025,7 @@ public class PlayerListener implements Listener {
 		}
 	}
 
-	@EventHandler
+	@EventHandler(ignoreCancelled = true)
 	public void abilityCastEvent(AbilityCastEvent event) {
 		Player player = event.getCaster();
 		mPlugin.mAbilityManager.abilityCastEvent(player, event);
@@ -1056,7 +1056,7 @@ public class PlayerListener implements Listener {
 		mPlugin.mTrackingManager.mPlayers.onBlockBreak(mPlugin, player, event, item);
 	}
 
-	@EventHandler
+	@EventHandler(ignoreCancelled = true)
 	public void evasionEvent(EvasionEvent event) {
 		Player player = event.getPlayer();
 		NavigableSet<Effect> effects = mPlugin.mEffectManager.getEffects(player, STASIS);
@@ -1065,7 +1065,7 @@ public class PlayerListener implements Listener {
 		}
 	}
 
-	@EventHandler
+	@EventHandler(ignoreCancelled = true)
 	public void playerAnimationEvent(PlayerAnimationEvent event) {
 		Player player = event.getPlayer();
 		if (event.getAnimationType().equals(PlayerAnimationType.ARM_SWING)) {
@@ -1074,7 +1074,7 @@ public class PlayerListener implements Listener {
 	}
 
 	//Player is healed.
-	@EventHandler(priority = EventPriority.LOW)
+	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	public void onRegain(EntityRegainHealthEvent event) {
 		if (event.getEntity() instanceof Player) {
 			Player player = (Player) event.getEntity();

@@ -54,28 +54,28 @@ public class GraveListener implements Listener {
 		mPlugin = plugin;
 	}
 
-	@EventHandler(priority = EventPriority.LOWEST)
+	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
 	public void playerAttemptPickupItem(PlayerAttemptPickupItemEvent event) {
 		GraveManager.onAttemptPickupItem(event);
 	}
 
-	@EventHandler
+	@EventHandler(ignoreCancelled = true)
 	public void playerJoin(PlayerJoinEvent event) {
 		Grave.removeSummonListTag(event.getPlayer());
 		GraveManager.onLogin(event.getPlayer());
 	}
 
-	@EventHandler
+	@EventHandler(ignoreCancelled = true)
 	public void playerQuit(PlayerQuitEvent event) {
 		GraveManager.onLogout(event.getPlayer());
 	}
 
-	@EventHandler
+	@EventHandler(ignoreCancelled = true)
 	public void playerSave(PlayerSaveEvent event) {
 		GraveManager.onSave(event);
 	}
 
-	@EventHandler(priority = EventPriority.HIGH)
+	@EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
 	public void playerInteractEntity(PlayerInteractEntityEvent event) {
 		if (GraveManager.isGrave(event.getRightClicked())) {
 			GraveManager.onInteract(event.getPlayer(), event.getRightClicked());
@@ -83,7 +83,7 @@ public class GraveListener implements Listener {
 		}
 	}
 
-	@EventHandler(priority = EventPriority.HIGH)
+	@EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
 	public void playerArmorStandManipulate(PlayerArmorStandManipulateEvent event) {
 		if (GraveManager.isGrave(event.getRightClicked())) {
 			GraveManager.onInteract(event.getPlayer(), event.getRightClicked());
@@ -91,7 +91,7 @@ public class GraveListener implements Listener {
 		}
 	}
 
-	@EventHandler(priority = EventPriority.HIGH)
+	@EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
 	public void playerInteractAtEntity(PlayerInteractAtEntityEvent event) {
 		if (GraveManager.isGrave(event.getRightClicked())) {
 			GraveManager.onInteract(event.getPlayer(), event.getRightClicked());
@@ -99,7 +99,7 @@ public class GraveListener implements Listener {
 		}
 	}
 
-	@EventHandler(priority = EventPriority.HIGH)
+	@EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
 	public void entityDamageByEntity(EntityDamageByEntityEvent event) {
 		if (event.getDamager() instanceof Player && event.getEntityType() == EntityType.ARMOR_STAND) {
 			if (GraveManager.isGrave(event.getEntity())) {
@@ -109,7 +109,7 @@ public class GraveListener implements Listener {
 		}
 	}
 
-	@EventHandler
+	@EventHandler(ignoreCancelled = true)
 	public void itemMerge(ItemMergeEvent event) {
 		Item entity = event.getEntity();
 		if (GraveManager.isGraveItem(entity) || GraveManager.isThrownItem(entity)) {
@@ -117,26 +117,24 @@ public class GraveListener implements Listener {
 		}
 	}
 
-	@EventHandler
+	@EventHandler(ignoreCancelled = true)
 	public void chunkLoad(ChunkLoadEvent event) {
 		GraveManager.onChunkLoad(event);
 	}
 
-	@EventHandler
+	@EventHandler(ignoreCancelled = true)
 	public void chunkUnload(ChunkUnloadEvent event) {
 		GraveManager.onChunkUnload(event);
 	}
 
 	// Fires whenever an item entity despawns due to time. Does not catch items that got killed in other ways.
-	@EventHandler(priority = EventPriority.MONITOR)
+	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void itemDespawnEvent(ItemDespawnEvent event) {
-		if (!event.isCancelled()) {
-			GraveManager.onDestroyItem(event.getEntity());
-		}
+		GraveManager.onDestroyItem(event.getEntity());
 	}
 
 	// Fires any time any entity is deleted.
-	@EventHandler(priority = EventPriority.MONITOR)
+	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void entityRemoveFromWorld(EntityRemoveFromWorldEvent event) {
 		if (event.getEntity() instanceof Item) {
 			// Check if an item entity was destroyed by the void.
@@ -147,28 +145,26 @@ public class GraveListener implements Listener {
 		}
 	}
 
-	@EventHandler(priority = EventPriority.HIGHEST)
+	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
 	public void entityDamage(EntityDamageEvent event) {
-		if (!event.isCancelled()) {
-			if (event.getEntityType() == EntityType.DROPPED_ITEM) {
-				Item entity = (Item) event.getEntity();
-				EntityDamageEvent.DamageCause cause = event.getCause();
-				if (entity.isInvulnerable()
-				    || (entity.getScoreboardTags().contains("ExplosionImmune")
-				        && (cause == EntityDamageEvent.DamageCause.ENTITY_EXPLOSION || cause == EntityDamageEvent.DamageCause.BLOCK_EXPLOSION))) {
-					event.setCancelled(true);
-					return;
-				}
-				GraveManager.onDestroyItem(entity);
-			} else if (event.getEntityType() == EntityType.ARMOR_STAND) {
-				if (GraveManager.isGrave(event.getEntity())) {
-					event.setCancelled(true);
-				}
+		if (event.getEntityType() == EntityType.DROPPED_ITEM) {
+			Item entity = (Item) event.getEntity();
+			EntityDamageEvent.DamageCause cause = event.getCause();
+			if (entity.isInvulnerable()
+				|| (entity.getScoreboardTags().contains("ExplosionImmune")
+				&& (cause == EntityDamageEvent.DamageCause.ENTITY_EXPLOSION || cause == EntityDamageEvent.DamageCause.BLOCK_EXPLOSION))) {
+				event.setCancelled(true);
+				return;
+			}
+			GraveManager.onDestroyItem(entity);
+		} else if (event.getEntityType() == EntityType.ARMOR_STAND) {
+			if (GraveManager.isGrave(event.getEntity())) {
+				event.setCancelled(true);
 			}
 		}
 	}
 
-	@EventHandler
+	@EventHandler(ignoreCancelled = true)
 	public void playerDropItem(PlayerDropItemEvent event) {
 		Player player = event.getPlayer();
 		Item entity = event.getItemDrop();
@@ -197,7 +193,7 @@ public class GraveListener implements Listener {
 	}
 
 	// An item on the player breaks.
-	@EventHandler(priority = EventPriority.HIGH)
+	@EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
 	public void playerItemBreakEvent(PlayerItemBreakEvent event) {
 		// If an item breaks, attempt to shatter it
 		ItemStack item = event.getBrokenItem();
@@ -223,12 +219,12 @@ public class GraveListener implements Listener {
 	}
 
 	// The player has died
-	@EventHandler(priority = EventPriority.HIGHEST)
+	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
 	public void playerDeath(PlayerDeathEvent event) {
 		Player player = event.getEntity();
 		PlayerInventory inv = player.getInventory();
 
-		if (event.isCancelled() || player.getHealth() > 0) {
+		if (player.getHealth() > 0) {
 			return;
 		}
 

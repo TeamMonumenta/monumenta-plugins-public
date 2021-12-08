@@ -1,6 +1,5 @@
 package com.playmonumenta.plugins.listeners;
 
-import com.playmonumenta.plugins.utils.ItemUtils;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.AbstractHorse;
@@ -17,6 +16,7 @@ import org.bukkit.event.vehicle.VehicleEnterEvent;
 import org.bukkit.event.vehicle.VehicleEntityCollisionEvent;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
 
@@ -27,7 +27,7 @@ public class VehicleListener implements Listener {
 		mPlugin = plugin;
 	}
 
-	@EventHandler(priority = EventPriority.LOWEST)
+	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
 	public void vehicleCreateEvent(VehicleCreateEvent event) {
 
 		// prevent boats from being placed near barrier blocks
@@ -40,12 +40,12 @@ public class VehicleListener implements Listener {
 		mPlugin.mTrackingManager.addEntity(event.getVehicle());
 	}
 
-	@EventHandler(priority = EventPriority.LOWEST)
+	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
 	public void vehicleDestroyEvent(VehicleDestroyEvent event) {
 		mPlugin.mTrackingManager.removeEntity(event.getVehicle());
 	}
 
-	@EventHandler(priority = EventPriority.LOWEST)
+	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
 	public void vehicleEntityCollisionEvent(VehicleEntityCollisionEvent event) {
 		Entity entity = event.getEntity();
 		Vehicle vehicle = event.getVehicle();
@@ -63,7 +63,7 @@ public class VehicleListener implements Listener {
 		}
 	}
 
-	@EventHandler(priority = EventPriority.LOWEST)
+	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
 	public void vehicleEnterEvent(VehicleEnterEvent event) {
 		Entity entity = event.getEntered();
 		Vehicle vehicle = event.getVehicle();

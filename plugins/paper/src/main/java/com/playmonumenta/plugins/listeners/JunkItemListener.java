@@ -111,7 +111,7 @@ public class JunkItemListener implements Listener {
 		player.sendMessage(ChatColor.GOLD + "" + ChatColor.BOLD + "Threshold to pick up uninteresting items set to " + newMin + ".");
 	}
 
-	@EventHandler(priority = EventPriority.MONITOR)
+	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void join(PlayerJoinEvent event) {
 		Player player = event.getPlayer();
 		Set<String> tags = player.getScoreboardTags();
@@ -147,20 +147,20 @@ public class JunkItemListener implements Listener {
 		player.sendMessage(ChatColor.GOLD + "" + ChatColor.BOLD + "You will no longer pick up uninteresting items.");
 	}
 
-	@EventHandler(priority = EventPriority.MONITOR)
+	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void quit(PlayerQuitEvent event) {
 		removeFromSets(event.getPlayer());
 	}
 
-	@EventHandler(priority = EventPriority.LOWEST)
+	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
 	public void pickupItem(EntityPickupItemEvent event) {
-		if (!event.isCancelled() && (event.getEntity() instanceof Player)) {
+		if (event.getEntity() instanceof Player) {
 			Item entity = event.getItem();
 			ItemStack item = entity.getItemStack();
 			if (item == null || item.getType().isAir()) {
 				return;
 			}
-			Player player = (Player)event.getEntity();
+			Player player = (Player) event.getEntity();
 			UUID uuid = player.getUniqueId();
 			PlayerInventory inv = player.getInventory();
 

@@ -52,7 +52,7 @@ public class TradeListener implements Listener {
 	// These lore lines are not considered for lore equality, and will also not be copied over to the final item
 	private static final ImmutableSet<String> IGNORED_LORE = ImmutableSet.of("Prismarine Enabled", "Prismarine Disabled", "Blackstone Enabled", "Blackstone Disabled");
 
-	@EventHandler(priority = EventPriority.NORMAL)
+	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
 	public void tradeWindowOpenEvent(TradeWindowOpenEvent event) {
 
 		// For "re-skin" trades, add trades matching a player's existing items that preserve added infusions etc.

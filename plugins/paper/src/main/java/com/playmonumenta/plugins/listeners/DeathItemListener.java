@@ -43,11 +43,11 @@ public class DeathItemListener implements Listener {
 	}
 
 	//Records player's items into a map that gives slot of a hashmap
-	@EventHandler(priority = EventPriority.HIGH)
+	@EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
 	public void recordPlayerDeathEvent(PlayerDeathEvent event) {
-		if (!event.isCancelled()
-				//Player contains PEB tag
-				&& event.getEntity().getScoreboardTags().contains(DEATH_SORT_TAG)
+		if (
+			//Player contains PEB tag
+			event.getEntity().getScoreboardTags().contains(DEATH_SORT_TAG)
 				//In case a problem happens and the peb option can be turned off
 				&& event.getEntity().hasPermission("monumenta.deathitemsort")
 				//Player is in an area where they drop their items
@@ -72,10 +72,10 @@ public class DeathItemListener implements Listener {
 		}
 	}
 
-	@EventHandler(priority = EventPriority.HIGHEST)
+	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
 	public void checkItemEvent(EntityPickupItemEvent event) {
-		if (event.isCancelled() || !(event.getEntity() instanceof Player) || !event.getEntity().getScoreboardTags().contains(DEATH_SORT_TAG)) {
-			return; //Cancelled, not a player, or they don't have death sort enabled
+		if (!(event.getEntity() instanceof Player) || !event.getEntity().getScoreboardTags().contains(DEATH_SORT_TAG)) {
+			return; // not a player, or they don't have death sort enabled
 		}
 
 		//Get the item picked up

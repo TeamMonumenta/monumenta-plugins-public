@@ -1,8 +1,5 @@
 package com.playmonumenta.plugins.listeners;
 
-import com.playmonumenta.plugins.utils.ItemUtils;
-import com.playmonumenta.plugins.utils.ScoreboardUtils;
-import com.playmonumenta.plugins.utils.ZoneUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
@@ -19,20 +16,23 @@ import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BlockStateMeta;
 
+import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.ScoreboardUtils;
+import com.playmonumenta.plugins.utils.ZoneUtils;
+
 public class PortableEnderListener implements Listener {
 	private static final String LOCK_STRING = "PortableEnder";
 
-	@EventHandler(priority = EventPriority.HIGHEST)
+	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
 	public void inventoryClickEvent(InventoryClickEvent event) {
-		if (!event.isCancelled() &&
-		    event.getClick() == ClickType.RIGHT &&
-		    event.getAction() == InventoryAction.PICKUP_HALF &&
-		    event.getWhoClicked() instanceof Player) {
+		if (event.getClick() == ClickType.RIGHT &&
+			event.getAction() == InventoryAction.PICKUP_HALF &&
+			event.getWhoClicked() instanceof Player) {
 			// An item was right-clicked
 			Player player = (Player) event.getWhoClicked();
 			ItemStack item = event.getCurrentItem();
 			if (isPortableEnder(item) &&
-			    !ItemUtils.isItemShattered(item)) {
+				!ItemUtils.isItemShattered(item)) {
 				// The clicked item is a portable ender chest, and is not shattered
 				event.setCancelled(true);
 				if (ZoneUtils.hasZoneProperty(player, ZoneUtils.ZoneProperty.NO_PORTABLE_STORAGE)) {
@@ -50,9 +50,9 @@ public class PortableEnderListener implements Listener {
 		}
 	}
 
-	@EventHandler(priority = EventPriority.HIGHEST)
+	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
 	public void blockDispenseEvent(BlockDispenseEvent event) {
-		if (!event.isCancelled() && isPortableEnder(event.getItem())) {
+		if (isPortableEnder(event.getItem())) {
 			event.getBlock().getWorld().playSound(event.getBlock().getLocation(), Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1.0f, 1.0f);
 			event.setCancelled(true);
 		}

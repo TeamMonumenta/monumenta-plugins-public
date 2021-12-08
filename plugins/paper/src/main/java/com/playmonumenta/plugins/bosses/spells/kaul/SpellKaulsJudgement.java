@@ -276,7 +276,7 @@ public class SpellKaulsJudgement extends Spell implements Listener {
 		return 20 * 4;
 	}
 
-	@EventHandler(priority = EventPriority.HIGHEST)
+	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
 	public void entityDamageEvent(EntityDamageEvent event) {
 		Entity damagee = event.getEntity();
 
@@ -294,7 +294,7 @@ public class SpellKaulsJudgement extends Spell implements Listener {
 		}
 	}
 
-	@EventHandler(priority = EventPriority.HIGHEST)
+	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
 	public void playerQuitEvent(PlayerQuitEvent event) {
 		Player player = event.getPlayer();
 

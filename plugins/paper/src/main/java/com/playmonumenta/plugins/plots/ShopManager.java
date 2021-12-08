@@ -7,13 +7,6 @@ import java.util.function.Consumer;
 
 import javax.annotation.Nullable;
 
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.integrations.luckperms.LuckPermsIntegration;
-import com.playmonumenta.plugins.utils.ZoneUtils;
-import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
-import com.playmonumenta.scriptedquests.quests.QuestNpc;
-import com.playmonumenta.scriptedquests.utils.ScoreboardUtils;
-
 import org.bukkit.ChatColor;
 import org.bukkit.DyeColor;
 import org.bukkit.GameMode;
@@ -52,6 +45,13 @@ import org.bukkit.loot.LootTables;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.BoundingBox;
 
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.integrations.luckperms.LuckPermsIntegration;
+import com.playmonumenta.plugins.utils.ZoneUtils;
+import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
+import com.playmonumenta.scriptedquests.quests.QuestNpc;
+import com.playmonumenta.scriptedquests.utils.ScoreboardUtils;
+
 import dev.jorel.commandapi.CommandAPI;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.CommandPermission;
@@ -70,7 +70,7 @@ public class ShopManager implements Listener {
 	private static final String NPC_NAME = "SHOP NPC";
 	private static final String GUILD_NPC_NAME = "GUILD SHOP NPC";
 
-	@EventHandler(priority = EventPriority.LOWEST)
+	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
 	public void entityDamageByEntityEvent(EntityDamageByEntityEvent event) {
 		Entity damagee = event.getEntity();
 		Entity damager = event.getDamager();
@@ -109,30 +109,26 @@ public class ShopManager implements Listener {
 		}
 	}
 
-	@EventHandler(priority = EventPriority.LOWEST)
+	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
 	public void entityCombustByBlockEvent(EntityCombustByBlockEvent event) {
-		if (!event.isCancelled()) {
-			cancelIfNpc(event.getEntity(), event);
-		}
+		cancelIfNpc(event.getEntity(), event);
 	}
 
-	@EventHandler(priority = EventPriority.LOWEST)
+	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
 	public void entityCombustByEntityEvent(EntityCombustByEntityEvent event) {
-		if (!event.isCancelled()) {
-			cancelIfNpc(event.getEntity(), event);
-		}
+		cancelIfNpc(event.getEntity(), event);
 	}
 
-	@EventHandler(priority = EventPriority.LOWEST)
+	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
 	public void entityDamageEvent(EntityDamageEvent event) {
-		if (!event.isCancelled() && event.getCause() != DamageCause.CUSTOM && event.getCause() != DamageCause.VOID) {
+		if (event.getCause() != DamageCause.CUSTOM && event.getCause() != DamageCause.VOID) {
 			cancelIfNpc(event.getEntity(), event);
 		}
 	}
 
-	@EventHandler(priority = EventPriority.LOWEST)
+	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
 	public void entityPotionEffectEvent(EntityPotionEffectEvent event) {
-		if (!event.isCancelled() && event.getAction().equals(EntityPotionEffectEvent.Action.ADDED) && !event.getNewEffect().getType().equals(PotionEffectType.HEAL)) {
+		if (event.getAction().equals(EntityPotionEffectEvent.Action.ADDED) && !event.getNewEffect().getType().equals(PotionEffectType.HEAL)) {
 			cancelIfNpc(event.getEntity(), event);
 		}
 	}
@@ -145,10 +141,10 @@ public class ShopManager implements Listener {
 		}
 	}
 
-	@EventHandler(priority = EventPriority.LOW)
+	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	public void blockPlaceEvent(BlockPlaceEvent event) {
 		/* Prevent players from placing bricks */
-		if (!event.isCancelled() && event.getBlockPlaced() != null
+		if (event.getBlockPlaced() != null
 			&& event.getBlockPlaced().getType().equals(Material.BRICKS)
 			&& !event.getPlayer().getGameMode().equals(GameMode.CREATIVE)
 			&& ZoneUtils.hasZoneProperty(event.getBlockPlaced().getLocation(), ZoneProperty.SHOPS_POSSIBLE)) {
@@ -156,21 +152,21 @@ public class ShopManager implements Listener {
 			return;
 		}
 
-		if (!event.isCancelled() && !isAllowed(event.getPlayer(), event.getBlockPlaced())) {
+		if (!isAllowed(event.getPlayer(), event.getBlockPlaced())) {
 			event.setCancelled(true);
 		}
 	}
 
-	@EventHandler(priority = EventPriority.LOW)
+	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	public void blockBreakEvent(BlockBreakEvent event) {
-		if (!event.isCancelled() && !isAllowed(event.getPlayer(), event.getBlock())) {
+		if (!isAllowed(event.getPlayer(), event.getBlock())) {
 			event.setCancelled(true);
 		}
 	}
 
-	@EventHandler(priority = EventPriority.LOW)
+	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	public void blockDispenseEvent(BlockDispenseEvent event) {
-		if (!event.isCancelled() && !isAllowed(event.getBlock().getLocation(), event.getBlock())) {
+		if (!isAllowed(event.getBlock().getLocation(), event.getBlock())) {
 			event.setCancelled(true);
 		}
 	}

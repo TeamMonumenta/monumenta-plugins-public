@@ -73,7 +73,7 @@ public class SinglePageGUIManager implements Listener {
 		}
 	}
 
-	@EventHandler
+	@EventHandler(ignoreCancelled = true)
 	public void inventoryClickEvent(InventoryClickEvent event) {
 		SinglePageGUI gui = getGUI(event);
 		if (gui != null) {
@@ -82,14 +82,14 @@ public class SinglePageGUIManager implements Listener {
 		}
 	}
 
-	@EventHandler
+	@EventHandler(ignoreCancelled = true)
 	public void inventoryInteractEvent(InventoryInteractEvent event) {
 		if (getGUI(event) != null) {
 			event.setCancelled(true);
 		}
 	}
 
-	@EventHandler
+	@EventHandler(ignoreCancelled = true)
 	public void inventoryCloseEvent(InventoryCloseEvent event) {
 		UUID uuid = event.getPlayer().getUniqueId();
 		SinglePageGUI gui = GUI_MAPPINGS.get(uuid);
@@ -99,7 +99,7 @@ public class SinglePageGUIManager implements Listener {
 		}
 	}
 
-	@EventHandler
+	@EventHandler(ignoreCancelled = true)
 	public void playerQuitEvent(PlayerQuitEvent event) {
 		GUI_MAPPINGS.remove(event.getPlayer().getUniqueId());
 	}

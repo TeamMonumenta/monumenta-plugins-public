@@ -30,7 +30,7 @@ public class AnvilFixInInventory implements Listener {
 	}
 
 	@SuppressWarnings("deprecation")
-	@EventHandler(priority = EventPriority.NORMAL)
+	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
 	public void inventoryClickEvent(InventoryClickEvent event) {
 		if (!event.getClick().equals(ClickType.RIGHT)) {
 			return;

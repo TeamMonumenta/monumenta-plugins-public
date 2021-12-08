@@ -80,7 +80,7 @@ public class SpawnerListener implements Listener {
 		mCleaner.runTaskTimer(plugin, 0, CLEANER_INTERVAL);
 	}
 
-	@EventHandler(priority = EventPriority.LOW)
+	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	public void spawnerSpawnEvent(SpawnerSpawnEvent event) {
 		BlockVector spawnerLoc = new BlockVector(event.getSpawner().getLocation().toVector());
 		Entity mob = event.getEntity();
@@ -133,7 +133,7 @@ public class SpawnerListener implements Listener {
 		mMobInfos.put(mob.getUniqueId(), mobInfo);
 	}
 
-	@EventHandler(priority = EventPriority.LOW)
+	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	public void entityTargetEvent(EntityTargetEvent event) {
 		// Update the mob's last target whenever it targets or untargets a mob
 		MobInfo mobInfo = mMobInfos.get(event.getEntity().getUniqueId());
@@ -143,7 +143,7 @@ public class SpawnerListener implements Listener {
 		}
 	}
 
-	@EventHandler(priority = EventPriority.LOW)
+	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	public void chunkUnloadEvent(ChunkUnloadEvent event) {
 		// Mark the mob as unloaded by setting the entity object to null
 		for (Entity entity : event.getChunk().getEntities()) {
@@ -154,7 +154,7 @@ public class SpawnerListener implements Listener {
 		}
 	}
 
-	@EventHandler(priority = EventPriority.LOW)
+	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	public void chunkLoadEvent(ChunkLoadEvent event) {
 		// Mark the mob as loaded by setting the entity object to the newly generated one
 		for (Entity entity : event.getChunk().getEntities()) {

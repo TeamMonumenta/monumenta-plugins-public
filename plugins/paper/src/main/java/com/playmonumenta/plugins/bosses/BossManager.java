@@ -520,20 +520,18 @@ public class BossManager implements Listener {
 	 * Event Handlers
 	 *******************************************************************************/
 
-	@EventHandler(priority = EventPriority.MONITOR)
+	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void creatureSpawnEvent(CreatureSpawnEvent event) {
-		if (!event.isCancelled()) {
-			Entity entity = event.getEntity();
+		Entity entity = event.getEntity();
 
-			if (!(entity instanceof LivingEntity)) {
-				return;
-			}
-
-			processEntity((LivingEntity)entity);
+		if (!(entity instanceof LivingEntity)) {
+			return;
 		}
+
+		processEntity((LivingEntity) entity);
 	}
 
-	@EventHandler(priority = EventPriority.LOWEST)
+	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
 	public void chunkLoadEvent(ChunkLoadEvent event) {
 		for (Entity entity : event.getChunk().getEntities()) {
 			if (!(entity instanceof LivingEntity)) {
@@ -544,7 +542,7 @@ public class BossManager implements Listener {
 		}
 	}
 
-	@EventHandler(priority = EventPriority.MONITOR)
+	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void chunkUnloadEvent(ChunkUnloadEvent event) {
 		Entity[] entities = event.getChunk().getEntities();
 
@@ -557,64 +555,60 @@ public class BossManager implements Listener {
 		}
 	}
 
-	@EventHandler(priority = EventPriority.MONITOR)
+	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void entityDeathEvent(EntityDeathEvent event) {
-		if (!event.isCancelled()) {
-			Entity entity = event.getEntity();
-			if (!(entity instanceof LivingEntity)) {
-				return;
-			}
+		Entity entity = event.getEntity();
+		if (!(entity instanceof LivingEntity)) {
+			return;
+		}
 
-			if (mNearbyEntityDeathEnabled) {
-				/* For performance reasons this check is only enabled when there is a loaded
-				 * boss that is using this feature
+		if (mNearbyEntityDeathEnabled) {
+			/* For performance reasons this check is only enabled when there is a loaded
+			 * boss that is using this feature
+			 */
+			for (LivingEntity m : EntityUtils.getNearbyMobs(entity.getLocation(), 12.0)) {
+				Boss boss = mBosses.get(m.getUniqueId());
+				if (boss != null) {
+					boss.nearbyEntityDeath(event);
+				}
+			}
+		}
+
+		Boss boss = mBosses.get(entity.getUniqueId());
+		if (boss != null) {
+			boss.death(event);
+			if (((LivingEntity) entity).getHealth() <= 0) {
+				unload(boss, false);
+				mBosses.remove(entity.getUniqueId());
+
+				/*
+				 * Remove special serialization data from drops. Should not be
+				 * necessary since loaded bosses already have this data stripped
 				 */
-				for (LivingEntity m : EntityUtils.getNearbyMobs(entity.getLocation(), 12.0)) {
-					Boss boss = mBosses.get(m.getUniqueId());
-					if (boss != null) {
-						boss.nearbyEntityDeath(event);
-					}
-				}
-			}
-
-			Boss boss = mBosses.get(entity.getUniqueId());
-			if (boss != null) {
-				boss.death(event);
-				if (((LivingEntity) entity).getHealth() <= 0) {
-					unload(boss, false);
-					mBosses.remove(entity.getUniqueId());
-
-					/*
-					 * Remove special serialization data from drops. Should not be
-					 * necessary since loaded bosses already have this data stripped
-					 */
-					SerializationUtils.stripSerializationDataFromDrops(event);
-				}
+				SerializationUtils.stripSerializationDataFromDrops(event);
 			}
 		}
 	}
 
-	@EventHandler(priority = EventPriority.MONITOR)
+	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void blockBreakEvent(BlockBreakEvent event) {
-		if (!event.isCancelled()) {
-			if (mNearbyBlockBreakEnabled) {
-				/* For performance reasons this check is only enabled when there is a loaded
-				 * boss that is using this feature
-				 */
-				for (LivingEntity m : EntityUtils.getNearbyMobs(event.getBlock().getLocation(), 62.0)) {
-					Boss boss = mBosses.get(m.getUniqueId());
-					if (boss != null) {
-						boss.nearbyBlockBreak(event);
-					}
+		if (mNearbyBlockBreakEnabled) {
+			/* For performance reasons this check is only enabled when there is a loaded
+			 * boss that is using this feature
+			 */
+			for (LivingEntity m : EntityUtils.getNearbyMobs(event.getBlock().getLocation(), 62.0)) {
+				Boss boss = mBosses.get(m.getUniqueId());
+				if (boss != null) {
+					boss.nearbyBlockBreak(event);
 				}
 			}
 		}
 	}
 
-	@EventHandler(priority = EventPriority.MONITOR)
+	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void entityExplodeEvent(EntityExplodeEvent event) {
 		Entity entity = event.getEntity();
-		if (!event.isCancelled() && entity != null && entity instanceof Creeper) {
+		if (entity != null && entity instanceof Creeper) {
 			Boss boss = mBosses.remove(entity.getUniqueId());
 			if (boss != null) {
 				boss.death(null);
@@ -623,13 +617,13 @@ public class BossManager implements Listener {
 		}
 	}
 
-	@EventHandler(priority = EventPriority.HIGHEST)
+	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
 	public void projectileLaunchEvent(ProjectileLaunchEvent event) {
 		Projectile proj = event.getEntity();
-		if (proj != null && !event.isCancelled()) {
+		if (proj != null) {
 			ProjectileSource shooter = proj.getShooter();
 			if (shooter != null && shooter instanceof LivingEntity) {
-				Boss boss = mBosses.get(((LivingEntity)shooter).getUniqueId());
+				Boss boss = mBosses.get(((LivingEntity) shooter).getUniqueId());
 				if (boss != null) {
 					// May cancel the event
 					boss.bossLaunchedProjectile(event);
@@ -659,7 +653,7 @@ public class BossManager implements Listener {
 		}
 	}
 
-	@EventHandler(priority = EventPriority.HIGHEST)
+	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
 	public void areaEffectCloudApplyEvent(AreaEffectCloudApplyEvent event) {
 		// Make a copy so it can be iterated while bosses modify the actual list
 		for (LivingEntity entity : new ArrayList<LivingEntity>(event.getAffectedEntities())) {
@@ -670,7 +664,7 @@ public class BossManager implements Listener {
 		}
 	}
 
-	@EventHandler(priority = EventPriority.HIGHEST)
+	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
 	public void potionSplashEvent(PotionSplashEvent event) {
 		// Make a copy so it can be iterated while bosses modify the actual list
 		for (LivingEntity entity : new ArrayList<LivingEntity>(event.getAffectedEntities())) {
@@ -681,7 +675,7 @@ public class BossManager implements Listener {
 		}
 	}
 
-	@EventHandler(priority = EventPriority.HIGHEST)
+	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
 	public void entityPotionEffectEvent(EntityPotionEffectEvent event) {
 		Boss boss = mBosses.get(event.getEntity().getUniqueId());
 		if (boss != null) {
@@ -689,11 +683,11 @@ public class BossManager implements Listener {
 		}
 	}
 
-	@EventHandler(priority = EventPriority.HIGHEST)
+	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
 	public void entityDamageEvent(EntityDamageEvent event) {
 		if (event.getCause() == DamageCause.FIRE_TICK) {
 			Entity damagee = event.getEntity();
-			if (damagee != null && !event.isCancelled()) {
+			if (damagee != null) {
 				Boss boss = mBosses.get(damagee.getUniqueId());
 				if (boss != null && boss.getLastHitBy() != null) {
 					// May cancel the event
@@ -718,7 +712,7 @@ public class BossManager implements Listener {
 		return null;
 	}
 
-	@EventHandler(priority = EventPriority.HIGHEST)
+	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
 	public void entityDamageByEntityEvent(EntityDamageByEntityEvent event) {
 		Entity damagee = event.getEntity();
 		Entity damager = event.getDamager();
@@ -727,29 +721,27 @@ public class BossManager implements Listener {
 			return;
 		}
 
-		if (!event.isCancelled()) {
-			Boss boss = mBosses.get(damagee.getUniqueId());
-			if (boss != null) {
-				// May cancel the event
-				boss.bossDamagedByEntity(event);
-				if (damager instanceof Projectile && ((Projectile) damager).getShooter() instanceof Entity) {
-					Entity e = (Entity) ((Projectile) damager).getShooter();
-					boss.setLastHitBy(e);
-				} else {
-					boss.setLastHitBy(damager);
-				}
+		Boss boss = mBosses.get(damagee.getUniqueId());
+		if (boss != null) {
+			// May cancel the event
+			boss.bossDamagedByEntity(event);
+			if (damager instanceof Projectile && ((Projectile) damager).getShooter() instanceof Entity) {
+				Entity e = (Entity) ((Projectile) damager).getShooter();
+				boss.setLastHitBy(e);
+			} else {
+				boss.setLastHitBy(damager);
 			}
 		}
 
-		if (damager != null && !event.isCancelled()) {
-			Boss boss = mBosses.get(damager.getUniqueId());
+		if (damager != null) {
+			boss = mBosses.get(damager.getUniqueId());
 			if (boss != null) {
 				// May cancel the event
 				boss.bossDamagedEntity(event);
 			}
 
 			if (damager instanceof EvokerFangs) {
-				LivingEntity owner = ((EvokerFangs)damager).getOwner();
+				LivingEntity owner = ((EvokerFangs) damager).getOwner();
 				if (owner != null) {
 					boss = mBosses.get(owner.getUniqueId());
 					if (boss != null) {
@@ -768,7 +760,7 @@ public class BossManager implements Listener {
 		}
 	}
 
-	@EventHandler(priority = EventPriority.HIGHEST)
+	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
 	public void spellCastEvent(SpellCastEvent event) {
 		LivingEntity boss = event.getBoss();
 		Boss b = mBosses.get(boss.getUniqueId());
@@ -777,7 +769,7 @@ public class BossManager implements Listener {
 		}
 	}
 
-	@EventHandler
+	@EventHandler(ignoreCancelled = true)
 	public void entityPathfindEvent(EntityPathfindEvent event) {
 		if (event.getEntity() instanceof Mob) {
 			Mob entity = (Mob) event.getEntity();
@@ -789,7 +781,7 @@ public class BossManager implements Listener {
 		}
 	}
 
-	@EventHandler(priority = EventPriority.NORMAL)
+	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
 	public void entityTargetEvent(EntityTargetEvent event) {
 		if (event.getEntity() instanceof Mob) {
 			Mob entity = (Mob) event.getEntity();
@@ -801,7 +793,7 @@ public class BossManager implements Listener {
 		}
 	}
 
-	@EventHandler(priority = EventPriority.NORMAL)
+	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
 	public void slimeSplitEvent(SlimeSplitEvent event) {
 		if (event.getEntity().getScoreboardTags().contains("boss_nosplit")) {
 			/*
@@ -840,35 +832,33 @@ public class BossManager implements Listener {
 	}
 
 	/* Kind of a weird one - not hooked to bosses but used for snowman killer */
-	@EventHandler(priority = EventPriority.HIGHEST)
+	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
 	public void playerDeathEvent(PlayerDeathEvent event) {
 		Player player = event.getEntity();
 		if (player.hasMetadata(WinterSnowmanEventBoss.deathMetakey)) {
 			Component deathMessage = Component.text("")
-			    .append(Component.selector(player.getName()))
-			    .append(Component.text(" was snowballed by "))
-			    .append(Component.selector(player.getMetadata(WinterSnowmanEventBoss.deathMetakey).get(0).asString()));
+				.append(Component.selector(player.getName()))
+				.append(Component.text(" was snowballed by "))
+				.append(Component.selector(player.getMetadata(WinterSnowmanEventBoss.deathMetakey).get(0).asString()));
 			event.deathMessage(deathMessage);
 			player.removeMetadata(WinterSnowmanEventBoss.deathMetakey, mPlugin);
 		}
 
-		if (!event.isCancelled()) {
-			if (mNearbyPlayerDeathEnabled) {
-				/* For performance reasons this check is only enabled when there is a loaded
-				 * boss that is using this feature
-				 */
-				for (LivingEntity m : EntityUtils.getNearbyMobs(player.getLocation(), 75.0)) {
-					Boss boss = mBosses.get(m.getUniqueId());
-					if (boss != null) {
-						boss.nearbyPlayerDeath(event);
-					}
+		if (mNearbyPlayerDeathEnabled) {
+			/* For performance reasons this check is only enabled when there is a loaded
+			 * boss that is using this feature
+			 */
+			for (LivingEntity m : EntityUtils.getNearbyMobs(player.getLocation(), 75.0)) {
+				Boss boss = mBosses.get(m.getUniqueId());
+				if (boss != null) {
+					boss.nearbyPlayerDeath(event);
 				}
 			}
 		}
 	}
 
 	/* Another weird one - used for exorcism potion */
-	@EventHandler(priority = EventPriority.HIGHEST)
+	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
 	public void lingeringPotionSplashEvent(LingeringPotionSplashEvent event) {
 		if (event.getEntityType() == EntityType.SPLASH_POTION) {
 			ThrownPotion potEntity = event.getEntity();
@@ -888,14 +878,14 @@ public class BossManager implements Listener {
 		}
 	}
 
-	@EventHandler(priority = EventPriority.NORMAL)
+	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
 	public void playerLeashEntityEvent(PlayerLeashEntityEvent event) {
-		if (!event.isCancelled() && mBosses.get(event.getEntity().getUniqueId()) != null) {
+		if (mBosses.get(event.getEntity().getUniqueId()) != null) {
 			event.setCancelled(true);
 		}
 	}
 
-	@EventHandler
+	@EventHandler(ignoreCancelled = true)
 	public void customEffectAppliedToBoss(CustomEffectApplyEvent event) {
 		Boss boss = mBosses.get(event.getEntity().getUniqueId());
 

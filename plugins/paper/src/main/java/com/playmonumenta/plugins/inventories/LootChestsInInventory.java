@@ -35,8 +35,8 @@ import org.bukkit.loot.LootTable;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.utils.ChestUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
-import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.utils.ItemUtils;
 
 import de.tr7zw.nbtapi.NBTCompound;
 import de.tr7zw.nbtapi.NBTItem;
@@ -45,7 +45,7 @@ import net.md_5.bungee.api.ChatColor;
 public class LootChestsInInventory implements Listener {
 	private final Map<UUID, Integer> mLootMenu = new HashMap<>();
 
-	@EventHandler(priority = EventPriority.LOW)
+	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	public void inventoryClickEvent(InventoryClickEvent event) {
 		if (!event.getClick().equals(ClickType.RIGHT)) {
 			return;
@@ -112,7 +112,7 @@ public class LootChestsInInventory implements Listener {
 	}
 
 	//Drop the items upon closing the inventory
-	@EventHandler(priority = EventPriority.LOW)
+	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	public void inventoryCloseEvent(InventoryCloseEvent event) {
 		if (event.getInventory().getHolder() == null && event.getView().getTopInventory().getType().equals(InventoryType.CHEST) && event.getView().getTopInventory().getSize() == 27) {
 			/* Right type of inventory - check if the player is in the map */
@@ -145,12 +145,12 @@ public class LootChestsInInventory implements Listener {
 	}
 
 	//Failsafes
-	@EventHandler(priority = EventPriority.LOW)
+	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	public void playerJoinEvent(PlayerJoinEvent event) {
 		mLootMenu.remove(event.getPlayer().getUniqueId());
 	}
 
-	@EventHandler(priority = EventPriority.LOW)
+	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	public void playerQuitEvent(PlayerQuitEvent event) {
 		mLootMenu.remove(event.getPlayer().getUniqueId());
 	}

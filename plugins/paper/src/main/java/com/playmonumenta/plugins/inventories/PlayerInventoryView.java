@@ -3,12 +3,6 @@ package com.playmonumenta.plugins.inventories;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.playmonumenta.plugins.point.Raycast;
-import com.playmonumenta.plugins.point.RaycastData;
-import com.playmonumenta.scriptedquests.utils.InventoryUtils;
-
-import net.kyori.adventure.text.Component;
-
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -29,12 +23,18 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 
+import com.playmonumenta.plugins.point.Raycast;
+import com.playmonumenta.plugins.point.RaycastData;
+import com.playmonumenta.scriptedquests.utils.InventoryUtils;
+
+import net.kyori.adventure.text.Component;
+
 public class PlayerInventoryView implements Listener {
 	private static final String PERMISSION = "monumenta.peb.inventoryview";
 	private static List<Player> mPlayers = new ArrayList<>(10);
 	private static List<Inventory> mInventories = new ArrayList<>(10);
 
-	@EventHandler(priority = EventPriority.LOW)
+	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	public void playerInteractEvent(PlayerInteractEvent event) {
 		if (!event.getAction().equals(Action.LEFT_CLICK_AIR) && !event.getAction().equals(Action.LEFT_CLICK_BLOCK)) {
 			return;
@@ -75,7 +75,7 @@ public class PlayerInventoryView implements Listener {
 	}
 
 	//This handles clicking, shift clicking, double clicking, etc.
-	@EventHandler(priority = EventPriority.LOW)
+	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	public void inventoryClickEvent(InventoryClickEvent event) {
 		if (mPlayers.contains(event.getWhoClicked())
 		    || mInventories.contains(event.getClickedInventory())
@@ -85,25 +85,25 @@ public class PlayerInventoryView implements Listener {
 	}
 
 	//Just as a precaution
-	@EventHandler(priority = EventPriority.LOW)
+	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	public void inventoryDragEvent(InventoryDragEvent event) {
 		if (mPlayers.contains(event.getWhoClicked()) || mInventories.contains(event.getInventory())) {
 			event.setCancelled(true);
 		}
 	}
 
-	@EventHandler(priority = EventPriority.LOW)
+	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	public void inventoryCloseEvent(InventoryCloseEvent event) {
 		mPlayers.remove(event.getPlayer());
 		mInventories.remove(event.getInventory());
 	}
 
-	@EventHandler(priority = EventPriority.LOW)
+	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	public void playerLoginEvent(PlayerLoginEvent event) {
 		mPlayers.remove(event.getPlayer());
 	}
 
-	@EventHandler(priority = EventPriority.LOW)
+	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	public void playerQuitEvent(PlayerQuitEvent event) {
 		mPlayers.remove(event.getPlayer());
 	}

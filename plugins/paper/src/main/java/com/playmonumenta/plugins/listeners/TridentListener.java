@@ -16,20 +16,19 @@ import com.playmonumenta.plugins.utils.ItemUtils;
 
 public class TridentListener implements Listener {
 
-	@EventHandler(priority = EventPriority.HIGH)
+	@EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
 	public void tridentThrowEvent(ProjectileLaunchEvent event) {
-		//If a player throws a trident and event is not cancelled
-		if (event.isCancelled()
-				|| event.getEntity().getType() != EntityType.TRIDENT
-				|| event.getEntity().getShooter() == null
-				|| !(event.getEntity().getShooter() instanceof Player)) {
+		//If a player throws a trident
+		if (event.getEntity().getType() != EntityType.TRIDENT
+			|| event.getEntity().getShooter() == null
+			|| !(event.getEntity().getShooter() instanceof Player)) {
 			return;
 		}
 
-		Player player = (Player)event.getEntity().getShooter();
+		Player player = (Player) event.getEntity().getShooter();
 		ItemStack mainhand = player.getInventory().getItemInMainHand();
 		ItemStack offhand = player.getInventory().getItemInOffHand();
-		Trident trident = (Trident)event.getEntity();
+		Trident trident = (Trident) event.getEntity();
 		ItemStack item = trident.getItemStack();
 
 		//If neither hand has the same trident as the projectile,

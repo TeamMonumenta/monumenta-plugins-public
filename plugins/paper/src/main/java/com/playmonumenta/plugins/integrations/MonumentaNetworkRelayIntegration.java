@@ -29,7 +29,7 @@ public class MonumentaNetworkRelayIntegration implements Listener {
 		INSTANCE = this;
 	}
 
-	@EventHandler(priority = EventPriority.LOW)
+	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	public void networkRelayMessageEvent(NetworkRelayMessageEvent event) {
 		switch (event.getChannel()) {
 		case GET_VOTES_UNCLAIMED_CHANNEL: {

@@ -7,12 +7,6 @@ import java.util.ListIterator;
 import java.util.Queue;
 import java.util.Set;
 
-import com.playmonumenta.plugins.Constants;
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.utils.InventoryUtils;
-import com.playmonumenta.plugins.utils.ItemUtils;
-import com.playmonumenta.plugins.utils.ZoneUtils;
-
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -35,6 +29,12 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.util.Vector;
 
+import com.playmonumenta.plugins.Constants;
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.ZoneUtils;
+
 public class WorldListener implements Listener {
 	Plugin mPlugin;
 
@@ -43,7 +43,7 @@ public class WorldListener implements Listener {
 	}
 
 	//  A Chunk Loaded.
-	@EventHandler(priority = EventPriority.LOWEST)
+	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
 	public void chunkLoadEvent(ChunkLoadEvent event) {
 		Entity[] entities = event.getChunk().getEntities();
 
@@ -96,7 +96,7 @@ public class WorldListener implements Listener {
 	                                                         new Vector(-1, -1, -1)
 	                                                     );
 
-	@EventHandler(priority = EventPriority.LOWEST)
+	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
 	public void structureGrowEvent(StructureGrowEvent event) {
 		List<BlockState> blockStates = event.getBlocks();
 
@@ -176,29 +176,24 @@ public class WorldListener implements Listener {
 
 	// Block Dispense Event
 	// Cancel dispensers/droppers dropping specific items
-	@EventHandler(priority = EventPriority.LOWEST)
+	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
 	public void blockDispenseEvent(BlockDispenseEvent event) {
 		Block block = event.getBlock();
 		ItemStack dispensed = event.getItem();
-		if (event.isCancelled()) {
-			return;
-		}
-
 		if (!mPlugin.mItemOverrides.blockDispenseInteraction(mPlugin, block, dispensed)) {
 			event.setCancelled(true);
-			return;
 		}
 	}
 
 	// Block Dispense Armor Event
-	@EventHandler(priority = EventPriority.HIGH)
+	@EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
 	public void blockDispenseArmorEvent(BlockDispenseArmorEvent event) {
 		if (event.getTargetEntity() instanceof Player) {
 			InventoryUtils.scheduleDelayedEquipmentCheck(mPlugin, (Player) event.getTargetEntity(), event);
 		}
 	}
 
-	@EventHandler(priority = EventPriority.LOWEST)
+	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
 	public void blockFormEvent(BlockFormEvent event) {
 		Material blockType = event.getNewState().getType();
 		if (blockType == null) {

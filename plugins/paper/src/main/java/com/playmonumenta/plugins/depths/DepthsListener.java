@@ -63,11 +63,8 @@ public class DepthsListener implements Listener {
 		mPlugin = plugin;
 	}
 
-	@EventHandler
+	@EventHandler(ignoreCancelled = true)
 	public void blockBreakEvent(BlockBreakEvent event) {
-		if (event.isCancelled()) {
-			return;
-		}
 		Player player = event.getPlayer();
 
 		if (player == null) {
@@ -110,7 +107,7 @@ public class DepthsListener implements Listener {
 	}
 
 	//Enlightenment ability logic
-	@EventHandler(priority = EventPriority.LOW)
+	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	public void playerExpChangeEvent(PlayerExpChangeEvent event) {
 		Player player = event.getPlayer();
 		if (DepthsManager.getInstance().isInSystem(player)) {
@@ -134,7 +131,7 @@ public class DepthsListener implements Listener {
 	}
 
 	//Logic to replace chest opening with a ability selection gui, if applicable
-	@EventHandler
+	@EventHandler(ignoreCancelled = true)
 	public void onInventoryOpenEvent(InventoryOpenEvent e) {
 	   Player p = (Player) e.getPlayer();
 	   if (e.getInventory().getHolder() instanceof Chest || e.getInventory().getHolder() instanceof DoubleChest) {
@@ -146,7 +143,7 @@ public class DepthsListener implements Listener {
 	   }
 	}
 
-	@EventHandler(priority = EventPriority.LOW)
+	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	public void entityDamageEvent(EntityDamageEvent event) {
 		//Pyromania implementation handler
 		if (!(event.getEntity() instanceof Player) && event.getCause() == DamageCause.FIRE_TICK && event.getEntity() instanceof LivingEntity) {
@@ -185,7 +182,7 @@ public class DepthsListener implements Listener {
 		}
 	}
 
-	@EventHandler(priority = EventPriority.LOW)
+	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	public void entityDamageByEntityEvent(EntityDamageByEntityEvent event) {
 		Entity entity = event.getEntity();
 		Entity damager = event.getDamager();
@@ -274,7 +271,7 @@ public class DepthsListener implements Listener {
 		}
 	}
 
-	@EventHandler(priority = EventPriority.LOW)
+	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	public void projectileHitEvent(ProjectileHitEvent event) {
 		Projectile proj = event.getEntity();
 		ProjectileSource shooter = proj.getShooter();
@@ -288,7 +285,7 @@ public class DepthsListener implements Listener {
 		}
 	}
 
-	@EventHandler(priority = EventPriority.LOW)
+	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	public void playerDeathEvent(PlayerDeathEvent event) {
 		//Set treasure score at death time, so they can't just wait around in death screen for party to get more rewards
 		DepthsPlayer dp = DepthsManager.getInstance().mPlayers.get(event.getEntity().getUniqueId());
@@ -300,7 +297,7 @@ public class DepthsListener implements Listener {
 		}
 	}
 
-	@EventHandler(priority = EventPriority.LOW)
+	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	public void playerPostRespawnEvent(PlayerPostRespawnEvent event) {
 		//Tp player to loot room when they respawn
 		DepthsPlayer dp = DepthsManager.getInstance().mPlayers.get(event.getPlayer().getUniqueId());
@@ -315,7 +312,7 @@ public class DepthsListener implements Listener {
 	}
 
 	//Save player data on logout or shard crash, to be loaded on startup later
-	@EventHandler
+	@EventHandler(ignoreCancelled = true)
 	public void playerSave(PlayerSaveEvent event) {
 
 		//If they are in the system with an access score of zero, remove them from the system
@@ -326,7 +323,7 @@ public class DepthsListener implements Listener {
 		DepthsManager.getInstance().save(Plugin.getInstance().getDataFolder() + File.separator + "depths");
 	}
 
-	@EventHandler(priority = EventPriority.HIGH)
+	@EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
 	public void entityExplodeEvent(EntityExplodeEvent event) {
 		//Call util to check for ice barrier slow
 		DepthsUtils.explodeEvent(event);
@@ -357,7 +354,7 @@ public class DepthsListener implements Listener {
 		}
 	}
 
-	@EventHandler(priority = EventPriority.LOW)
+	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	public void playerItemDamageEvent(PlayerItemDamageEvent event) {
 		DepthsManager manager = DepthsManager.getInstance();
 		if (manager.isInSystem(event.getPlayer())) {

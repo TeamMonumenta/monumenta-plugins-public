@@ -1,10 +1,5 @@
 package com.playmonumenta.plugins.listeners;
 
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.enchantments.curses.CurseOfEphemerality;
-import com.playmonumenta.plugins.inventories.ShulkerInventoryManager;
-import com.playmonumenta.plugins.utils.ItemUtils;
-
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -35,6 +30,11 @@ import org.bukkit.inventory.meta.BlockStateMeta;
 import org.bukkit.permissions.Permission;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.enchantments.curses.CurseOfEphemerality;
+import com.playmonumenta.plugins.inventories.ShulkerInventoryManager;
+import com.playmonumenta.plugins.utils.ItemUtils;
+
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 
 /**
@@ -59,11 +59,8 @@ public class ShulkerShortcutListener implements Listener {
 	 *
 	 * @see InventoryClickEvent
 	 */
-	@EventHandler(priority = EventPriority.HIGH)
+	@EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
 	public void inventoryClickEvent(InventoryClickEvent event) {
-		if (event.isCancelled()) {
-			return;
-		}
 		ClickType click = event.getClick();
 		InventoryAction action = event.getAction();
 		ItemStack itemHeld = event.getCursor();
@@ -192,7 +189,7 @@ public class ShulkerShortcutListener implements Listener {
 	 *
 	 * @see InventoryDragEvent
 	 */
-	@EventHandler(priority = EventPriority.MONITOR)
+	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void inventoryDragEvent(InventoryDragEvent event) {
 		if (event.getWhoClicked() instanceof Player) {
 			Player player = (Player)event.getWhoClicked();
@@ -218,7 +215,7 @@ public class ShulkerShortcutListener implements Listener {
 	 *
 	 * @see InventoryCloseEvent
 	 */
-	@EventHandler(priority = EventPriority.MONITOR)
+	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void inventoryCloseEvent(InventoryCloseEvent event) {
 		if (event.getPlayer() instanceof Player) {
 			Player player = (Player)event.getPlayer();
@@ -232,13 +229,12 @@ public class ShulkerShortcutListener implements Listener {
 	 *
 	 * @see BlockDispenseEvent
 	 */
-	@EventHandler(priority = EventPriority.LOW)
+	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	public void blockDispenseEvent(BlockDispenseEvent event) {
-		if (!event.isCancelled() &&
-			ItemUtils.isShulkerBox(event.getItem().getType()) &&
+		if (ItemUtils.isShulkerBox(event.getItem().getType()) &&
 			(mPlugin.mShulkerInventoryManager.isShulkerInUse(event.getItem()) ||
-			 isPurpleTesseractContainer(event.getItem()) ||
-			 isEnderExpansion(event.getItem()))) {
+				isPurpleTesseractContainer(event.getItem()) ||
+				isEnderExpansion(event.getItem()))) {
 			event.getBlock().getWorld().playSound(event.getBlock().getLocation(), Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1.0f, 1.0f);
 			event.setCancelled(true);
 		}
@@ -250,12 +246,11 @@ public class ShulkerShortcutListener implements Listener {
 	 *
 	 * @see BlockPlaceEvent
 	 */
-	@EventHandler(priority = EventPriority.LOW)
+	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	public void blockPlaceEvent(BlockPlaceEvent event) {
 		Player player = event.getPlayer();
 		Block block = event.getBlockPlaced();
-		if (!event.isCancelled() &&
-		    ItemUtils.isShulkerBox(block.getType())) {
+		if (ItemUtils.isShulkerBox(block.getType())) {
 			if (mPlugin.mShulkerInventoryManager.isShulkerInUse(block)) {
 				player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1.0f, 1.0f);
 				player.sendMessage(ChatColor.RED + "That shulker is open");
@@ -263,7 +258,7 @@ public class ShulkerShortcutListener implements Listener {
 				event.setBuild(false);
 			} else if (isPurpleTesseractContainer(event.getItemInHand())) {
 				ItemStack item = event.getItemInHand();
-				ShulkerBox sbox = (ShulkerBox)((BlockStateMeta)item.getItemMeta()).getBlockState();
+				ShulkerBox sbox = (ShulkerBox) ((BlockStateMeta) item.getItemMeta()).getBlockState();
 				ItemStack[] contents = sbox.getInventory().getContents();
 				final String lockStr;
 				if (sbox.isLocked()) {
@@ -297,22 +292,22 @@ public class ShulkerShortcutListener implements Listener {
 		}
 	}
 
-	@EventHandler(priority = EventPriority.LOW)
+	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	public void playerQuitEvent(PlayerQuitEvent event) {
 		mPlugin.mShulkerInventoryManager.closeShulker(event.getPlayer(), true);
 	}
 
-	@EventHandler(priority = EventPriority.LOW)
+	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	public void playerKickEvent(PlayerKickEvent event) {
 		mPlugin.mShulkerInventoryManager.closeShulker(event.getPlayer(), true);
 	}
 
-	@EventHandler(priority = EventPriority.LOW)
+	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	public void playerDeathEvent(PlayerDeathEvent event) {
 		mPlugin.mShulkerInventoryManager.closeShulker(event.getEntity(), true);
 	}
 
-	@EventHandler(priority = EventPriority.LOW)
+	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	public void playerDropItemEvent(PlayerDropItemEvent event) {
 		if (isEnderExpansion(event.getItemDrop().getItemStack())) {
 			event.getPlayer().playSound(event.getPlayer().getLocation(), Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1.0f, 1.0f);

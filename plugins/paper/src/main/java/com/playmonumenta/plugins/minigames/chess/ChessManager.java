@@ -7,17 +7,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.minigames.chess.ChessBoard.BoardState;
-import com.playmonumenta.plugins.minigames.chess.ChessBoard.ChessPiece;
-import com.playmonumenta.plugins.minigames.chess.ChessBoard.ChessPieceType;
-import com.playmonumenta.plugins.minigames.chess.ChessBoard.ChessTeam;
-import com.playmonumenta.plugins.minigames.chess.ChessInterface.InterfaceType;
-import com.playmonumenta.plugins.minigames.chess.events.ChessEvent;
-import com.playmonumenta.plugins.minigames.chess.events.EndGameChessEvent;
-import com.playmonumenta.plugins.minigames.chess.events.MovePieceChessEvent;
-import com.playmonumenta.plugins.minigames.chess.events.PromotingChessEvent;
-
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.FireworkEffect;
@@ -39,6 +28,17 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.world.ChunkUnloadEvent;
 import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.scheduler.BukkitRunnable;
+
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.minigames.chess.ChessBoard.BoardState;
+import com.playmonumenta.plugins.minigames.chess.ChessBoard.ChessPiece;
+import com.playmonumenta.plugins.minigames.chess.ChessBoard.ChessPieceType;
+import com.playmonumenta.plugins.minigames.chess.ChessBoard.ChessTeam;
+import com.playmonumenta.plugins.minigames.chess.ChessInterface.InterfaceType;
+import com.playmonumenta.plugins.minigames.chess.events.ChessEvent;
+import com.playmonumenta.plugins.minigames.chess.events.EndGameChessEvent;
+import com.playmonumenta.plugins.minigames.chess.events.MovePieceChessEvent;
+import com.playmonumenta.plugins.minigames.chess.events.PromotingChessEvent;
 
 import dev.jorel.commandapi.CommandAPI;
 import dev.jorel.commandapi.CommandAPICommand;
@@ -435,7 +435,7 @@ public class ChessManager implements Listener {
 
 	}
 
-	@EventHandler(priority = EventPriority.MONITOR)
+	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void onPlayerClicks(PlayerInteractEvent event) {
 		Player player = event.getPlayer();
 		if (player != null) {
@@ -465,7 +465,7 @@ public class ChessManager implements Listener {
 		}
 	}
 
-	@EventHandler
+	@EventHandler(ignoreCancelled = true)
 	public static void onChessEvent(ChessEvent event) {
 		final ChessBoard board = event.getBoard();
 		if (board != null) {
@@ -535,7 +535,7 @@ public class ChessManager implements Listener {
 		}
 	}
 
-	@EventHandler(priority = EventPriority.MONITOR)
+	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public static void onChunkUnload(ChunkUnloadEvent event) {
 		boolean shouldCheckInterfaces = false;
 		for (Entity entity : event.getChunk().getEntities()) {
@@ -557,7 +557,7 @@ public class ChessManager implements Listener {
 		}
 	}
 
-	@EventHandler(priority = EventPriority.MONITOR)
+	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public static void onPlayerQuit(PlayerQuitEvent event) {
 		//this is only to be sure that we are not gonna have infinite chessplayer
 		Player player = event.getPlayer();

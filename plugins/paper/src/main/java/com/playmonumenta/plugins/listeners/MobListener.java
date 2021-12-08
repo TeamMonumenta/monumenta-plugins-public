@@ -124,7 +124,7 @@ public class MobListener implements Listener {
 		}
 	}
 
-	@EventHandler(priority = EventPriority.LOWEST)
+	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
 	void spawnerSpawnEvent(SpawnerSpawnEvent event) {
 		CreatureSpawner spawner = event.getSpawner();
 
@@ -149,7 +149,7 @@ public class MobListener implements Listener {
 		mob.setMetadata(Constants.SPAWNER_COUNT_METAKEY, new FixedMetadataValue(mPlugin, spawnCount));
 	}
 
-	@EventHandler(priority = EventPriority.LOWEST)
+	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
 	public void entityDamageByEntityEvent(EntityDamageByEntityEvent event) {
 
 		//TODO look for this "bug" (?) https://discord.com/channels/186225508562763776/186266724440604673/913044974768103484
@@ -248,13 +248,8 @@ public class MobListener implements Listener {
 	}
 
 	/* Prevent fire from catching in towns */
-	@EventHandler(priority = EventPriority.LOWEST)
+	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
 	void blockIgniteEvent(BlockIgniteEvent event) {
-		if (event.isCancelled()) {
-			// Don't waste time if cancelled somewhere else
-			return;
-		}
-
 		Block block = event.getBlock();
 
 		// If the block is within a safezone, cancel the ignition unless it was from a player in creative mode
@@ -272,7 +267,7 @@ public class MobListener implements Listener {
 		}
 	}
 
-	@EventHandler(priority = EventPriority.HIGH)
+	@EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
 	public void entityDeathEvent(EntityDeathEvent event) {
 		LivingEntity livingEntity = event.getEntity();
 		boolean shouldGenDrops = true;
@@ -352,7 +347,7 @@ public class MobListener implements Listener {
 		}
 	}
 
-	@EventHandler(priority = EventPriority.LOW)
+	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	public void entityZapEvent(EntityZapEvent event) {
 		if (event.getEntityType().equals(EntityType.VILLAGER)) {
 			event.setCancelled(true);

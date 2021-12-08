@@ -3,8 +3,6 @@ package com.playmonumenta.plugins.itemupdater;
 import java.time.Instant;
 import java.util.List;
 
-import net.kyori.adventure.text.Component;
-
 import org.bukkit.block.BlockState;
 import org.bukkit.block.Jukebox;
 import org.bukkit.entity.AbstractArrow;
@@ -32,12 +30,13 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.LlamaInventory;
 import org.bukkit.inventory.Merchant;
 import org.bukkit.inventory.MerchantRecipe;
-import org.bukkit.inventory.meta.BlockStateMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.utils.ItemUtils;
+
+import net.kyori.adventure.text.Component;
 
 public class ItemUpdateManager implements Listener {
 	// Updates items if needed as they load.
@@ -50,7 +49,7 @@ public class ItemUpdateManager implements Listener {
 		mUpdateTimestamp = Instant.now().toEpochMilli();
 	}
 
-	@EventHandler(priority = EventPriority.LOWEST)
+	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
 	public void join(PlayerJoinEvent event) {
 		Player player = event.getPlayer();
 		long lastSaved = player.getLastLogin();
@@ -75,24 +74,16 @@ public class ItemUpdateManager implements Listener {
 		updateNested((Entity) player);
 	}
 
-	@EventHandler(priority = EventPriority.LOWEST)
+	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
 	public void playerAttemptPickupItem(PlayerAttemptPickupItemEvent event) {
-		if (event.isCancelled()) {
-			return;
-		}
-
 		Item entity = event.getItem();
 		ItemStack item = entity.getItemStack();
 		updateNested(item);
 	}
 
-	@EventHandler(priority = EventPriority.LOWEST)
+	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
 	public void playerDropItem(PlayerDropItemEvent event) {
 		Player player = event.getPlayer();
-		if (event.isCancelled()) {
-			return;
-		}
-
 		Item entity = event.getItemDrop();
 		ItemStack preGrabbedItem = entity.getItemStack().clone();
 		if (entity.isValid()) {
@@ -113,34 +104,22 @@ public class ItemUpdateManager implements Listener {
 		}.runTask(mPlugin);
 	}
 
-	@EventHandler(priority = EventPriority.LOWEST)
+	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
 	public void entityPickupItemEvent(EntityPickupItemEvent event) {
-		if (event.isCancelled()) {
-			return;
-		}
-
 		Item entity = event.getItem();
 		ItemStack item = entity.getItemStack();
 		updateNested(item);
 	}
 
-	@EventHandler(priority = EventPriority.LOWEST)
+	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
 	public void itemSpawnEvent(ItemSpawnEvent event) {
-		if (event.isCancelled()) {
-			return;
-		}
-
 		Item itemEntity = event.getEntity();
 		ItemStack item = itemEntity.getItemStack();
 		updateNested(item);
 	}
 
-	@EventHandler(priority = EventPriority.LOWEST)
+	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
 	public void inventoryOpenEvent(InventoryOpenEvent event) {
-		if (event.isCancelled()) {
-			return;
-		}
-
 		Inventory inv = event.getInventory();
 		ItemStack[] items = inv.getContents();
 		for (int i = 0; i < items.length; i++) {

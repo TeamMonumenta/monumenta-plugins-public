@@ -5,11 +5,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
-import com.playmonumenta.plugins.utils.InventoryUtils;
-import com.playmonumenta.plugins.utils.ItemUtils;
-import com.playmonumenta.plugins.utils.ZoneUtils;
-import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
-
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
@@ -26,7 +21,11 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
-import org.bukkit.plugin.Plugin;
+
+import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.ZoneUtils;
+import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
 
 import de.jeff_media.chestsort.api.ChestSortAPI;
 import de.jeff_media.chestsort.api.ChestSortEvent;
@@ -67,9 +66,9 @@ public class ChestSortIntegration implements Listener {
 		}
 	}
 
-	@EventHandler(priority = EventPriority.HIGH)
+	@EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
 	public void inventoryClickEvent(InventoryClickEvent event) {
-		if (event.isCancelled() || !isPresent()) {
+		if (!isPresent()) {
 			return;
 		}
 		if (event.getWhoClicked() instanceof Player) {
@@ -112,9 +111,9 @@ public class ChestSortIntegration implements Listener {
 		}
 	}
 
-	@EventHandler(priority = EventPriority.HIGH)
+	@EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
 	public void inventoryOpenEvent(InventoryOpenEvent event) {
-		if (event.isCancelled() || !isPresent()) {
+		if (!isPresent()) {
 			return;
 		}
 
@@ -123,7 +122,7 @@ public class ChestSortIntegration implements Listener {
 		}
 	}
 
-	@EventHandler(priority = EventPriority.HIGH)
+	@EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
 	public void inventoryCloseEvent(InventoryCloseEvent event) {
 		if (!isPresent()) {
 			return;
@@ -135,7 +134,7 @@ public class ChestSortIntegration implements Listener {
 		}
 	}
 
-	@EventHandler(priority = EventPriority.HIGH)
+	@EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
 	public void chestSortEvent(ChestSortEvent event) {
 		for (Map.Entry<ItemStack, Map<String, String>> itemSortMapPair : event.getSortableMaps().entrySet()) {
 			ItemStack item = itemSortMapPair.getKey();

@@ -319,7 +319,7 @@ public class ParrotManager implements Listener {
 		return ScoreboardUtils.getScoreboardValue(p, SCOREBOARD_PARROT_BOTH).orElse(0) > 0;
 	}
 
-	@EventHandler
+	@EventHandler(ignoreCancelled = true)
 	public void parrotSpawnEvent(EntitySpawnEvent e) {
 		Entity entity = e.getEntity();
 
@@ -340,7 +340,7 @@ public class ParrotManager implements Listener {
 		}
 	}
 
-	@EventHandler
+	@EventHandler(ignoreCancelled = true)
 	public void onCFlight(PlayerToggleFlightEvent e) {
 		final Player player = e.getPlayer();
 		if (isParrotsVisible(player) && player.isFlying()) {
@@ -353,7 +353,7 @@ public class ParrotManager implements Listener {
 		}
 	}
 
-	@EventHandler
+	@EventHandler(ignoreCancelled = true)
 	public void onJoinBed(PlayerBedEnterEvent e) {
 		//we need to remove the parrots when someone go to the bed
 		final Player player = e.getPlayer();
@@ -364,7 +364,7 @@ public class ParrotManager implements Listener {
 	}
 
 
-	@EventHandler
+	@EventHandler(ignoreCancelled = true)
 	public void onLeaveBed(PlayerBedLeaveEvent e) {
 		final Player player = e.getPlayer();
 		if (isParrotsVisible(player)) {

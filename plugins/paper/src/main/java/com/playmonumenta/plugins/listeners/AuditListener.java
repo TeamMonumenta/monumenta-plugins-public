@@ -7,9 +7,6 @@ import java.util.Map;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
-import com.playmonumenta.plugins.integrations.MonumentaNetworkRelayIntegration;
-import com.playmonumenta.plugins.utils.MessagingUtils;
-
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.block.BlockState;
@@ -35,6 +32,9 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.loot.Lootable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import com.playmonumenta.plugins.integrations.MonumentaNetworkRelayIntegration;
+import com.playmonumenta.plugins.utils.MessagingUtils;
 
 import net.kyori.adventure.text.Component;
 
@@ -77,12 +77,8 @@ public class AuditListener implements Listener {
 		INSTANCE = this;
 	}
 
-	@EventHandler(priority = EventPriority.MONITOR)
+	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void death(PlayerDeathEvent event) {
-		if (event.isCancelled()) {
-			return;
-		}
-
 		Player player = event.getEntity();
 
 		log("Death: " + player.getName() + " " + event.getDeathMessage());
@@ -90,12 +86,8 @@ public class AuditListener implements Listener {
 		checkDestroy(player);
 	}
 
-	@EventHandler(priority = EventPriority.MONITOR)
+	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void block(BlockPlaceEvent event) {
-		if (event.isCancelled()) {
-			return;
-		}
-
 		Player player = event.getPlayer();
 		if (!player.getGameMode().equals(GameMode.CREATIVE)) {
 			return;
@@ -106,12 +98,8 @@ public class AuditListener implements Listener {
 		checkDestroy(player);
 	}
 
-	@EventHandler(priority = EventPriority.MONITOR)
+	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void creative(InventoryCreativeEvent event) {
-		if (event.isCancelled()) {
-			return;
-		}
-
 		HumanEntity player = event.getWhoClicked();
 
 		if (event.getCursor() != null && !event.getCursor().getType().equals(Material.AIR)) {
@@ -151,9 +139,9 @@ public class AuditListener implements Listener {
 		}
 	}
 
-	@EventHandler(priority = EventPriority.MONITOR)
+	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void cloneClick(InventoryClickEvent event) {
-		if (event.isCancelled() || !event.getWhoClicked().getGameMode().equals(GameMode.CREATIVE)) {
+		if (!event.getWhoClicked().getGameMode().equals(GameMode.CREATIVE)) {
 			return;
 		}
 
@@ -165,7 +153,7 @@ public class AuditListener implements Listener {
 		/* Don't checkDestroy() here - this event fires every time InventoryCreativeEvent fires */
 	}
 
-	@EventHandler(priority = EventPriority.MONITOR)
+	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void inventoryClose(InventoryCloseEvent event) {
 		checkDestroy(event.getPlayer());
 	}

@@ -6,9 +6,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-import com.bergerkiller.bukkit.common.wrappers.LongHashMap;
-import com.playmonumenta.plugins.server.properties.ServerProperties;
-
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
@@ -27,6 +24,9 @@ import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.world.ChunkUnloadEvent;
 import org.bukkit.plugin.Plugin;
+
+import com.bergerkiller.bukkit.common.wrappers.LongHashMap;
+import com.playmonumenta.plugins.server.properties.ServerProperties;
 
 
 
@@ -183,25 +183,25 @@ public class RepairExplosionsListener implements Listener {
 		}
 	}
 
-	@EventHandler(priority = EventPriority.MONITOR)
+	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void entityExplodeEvent(EntityExplodeEvent event) {
-		if (event.isCancelled() || !ServerProperties.getRepairExplosions()) {
+		if (!ServerProperties.getRepairExplosions()) {
 			return;
 		}
 
 		commonExplosionHandler(event.blockList());
 	}
 
-	@EventHandler(priority = EventPriority.MONITOR)
+	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void blockExplodeEvent(BlockExplodeEvent event) {
-		if (event.isCancelled() || !ServerProperties.getRepairExplosions()) {
+		if (!ServerProperties.getRepairExplosions()) {
 			return;
 		}
 
 		commonExplosionHandler(event.blockList());
 	}
 
-	@EventHandler(priority = EventPriority.LOWEST)
+	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
 	public void chunkUnloadEvent(ChunkUnloadEvent event) {
 		if (!ServerProperties.getRepairExplosions()) {
 			return;
@@ -268,9 +268,9 @@ public class RepairExplosionsListener implements Listener {
 		}
 	}
 
-	@EventHandler(priority = EventPriority.MONITOR)
+	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void playerDeathEvent(PlayerDeathEvent event) {
-		if (event.isCancelled() || !ServerProperties.getRepairExplosions()) {
+		if (!ServerProperties.getRepairExplosions()) {
 			return;
 		}
 

@@ -13,7 +13,7 @@ import com.playmonumenta.scriptedquests.zones.ZonePropertyChangeEvent;
 
 public class ZoneListener implements Listener {
 
-	@EventHandler(priority = EventPriority.LOWEST)
+	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
 	public void zonePropertyChangeEvent(ZonePropertyChangeEvent event) {
 		Player player = event.getPlayer();
 		String layer = event.getLayer();
@@ -39,7 +39,7 @@ public class ZoneListener implements Listener {
 		}
 	}
 
-	@EventHandler(priority = EventPriority.LOWEST)
+	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
 	public void blockFromToEvent(BlockFromToEvent event) {
 		if (event.getBlock().getType() == Material.DRAGON_EGG
 			&& ZoneUtils.hasZoneProperty(event.getToBlock().getLocation(), ZoneUtils.ZoneProperty.ADVENTURE_MODE)) {

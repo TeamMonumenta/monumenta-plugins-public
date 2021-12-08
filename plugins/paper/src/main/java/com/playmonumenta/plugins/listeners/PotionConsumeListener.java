@@ -60,12 +60,10 @@ public class PotionConsumeListener implements Listener {
 		mPlugin = plugin;
 	}
 
-	@EventHandler(priority = EventPriority.HIGHEST)
+	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
 	public void drinkablePotionEvent(InventoryClickEvent event) {
 		HumanEntity whoClicked = event.getWhoClicked();
 		if (
-		    // Must not be cancelled
-		    event.isCancelled() ||
 		    // Must be a left or right click
 		    event.getClick() == null ||
 		    !(event.getClick().equals(ClickType.LEFT) || event.getClick().equals(ClickType.RIGHT)) ||
@@ -254,12 +252,10 @@ public class PotionConsumeListener implements Listener {
 		event.setCancelled(true);
 	}
 
-	@EventHandler(priority = EventPriority.HIGHEST)
+	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
 	public void throwablePotionEvent(InventoryClickEvent event) {
 		HumanEntity whoClicked = event.getWhoClicked();
 		if (
-		    // Must not be cancelled
-		    event.isCancelled() ||
 		    // Must be a right click
 		    event.getClick() == null ||
 		    !event.getClick().equals(ClickType.RIGHT) ||

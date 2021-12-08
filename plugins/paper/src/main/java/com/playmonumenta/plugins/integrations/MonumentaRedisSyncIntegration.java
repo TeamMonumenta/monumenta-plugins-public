@@ -31,7 +31,7 @@ public class MonumentaRedisSyncIntegration implements Listener {
 		mLogger.info("Enabling MonumentaRedisSync integration");
 	}
 
-	@EventHandler(priority = EventPriority.HIGH)
+	@EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
 	public void playerServerTransferEvent(PlayerServerTransferEvent event) {
 		Player player = event.getPlayer();
 		mLogger.info("PlayerTransferEvent: Player: " + player + "   Target: " + event.getTarget());
@@ -52,7 +52,7 @@ public class MonumentaRedisSyncIntegration implements Listener {
 		}
 	}
 
-	@EventHandler(priority = EventPriority.MONITOR)
+	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void playerJoinEvent(PlayerJoinEvent event) {
 		Player player = event.getPlayer();
 
@@ -69,14 +69,14 @@ public class MonumentaRedisSyncIntegration implements Listener {
 		}
 	}
 
-	@EventHandler(priority = EventPriority.MONITOR)
+	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void playerSaveEvent(PlayerSaveEvent event) {
 		JsonObject pluginData = new JsonObject();
 		pluginData.add("potions", mPlugin.mPotionManager.getAsJsonObject(event.getPlayer(), false));
 		event.setPluginData(IDENTIFIER, pluginData);
 	}
 
-	@EventHandler(priority = EventPriority.MONITOR)
+	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void playerQuitEvent(PlayerQuitEvent event) {
 		Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
 			if (!event.getPlayer().isOnline()) {

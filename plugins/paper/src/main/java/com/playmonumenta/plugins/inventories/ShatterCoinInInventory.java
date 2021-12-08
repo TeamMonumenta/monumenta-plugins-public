@@ -26,7 +26,7 @@ public class ShatterCoinInInventory implements Listener {
 		mPlugin = plugin;
 	}
 
-	@EventHandler(priority = EventPriority.HIGHEST)
+	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
 	public void inventoryClickEvent(InventoryClickEvent event) {
 		Player player = (Player)event.getWhoClicked();
 

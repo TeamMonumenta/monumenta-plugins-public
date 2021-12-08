@@ -394,7 +394,7 @@ public class EnchantmentManager implements Listener {
 	/*
 	 * Watch for spawned items
 	 */
-	@EventHandler(priority = EventPriority.MONITOR)
+	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void itemSpawnEvent(ItemSpawnEvent event) {
 		checkSpawnedItem(event.getEntity());
 	}
@@ -402,7 +402,7 @@ public class EnchantmentManager implements Listener {
 	/*
 	 * Chunk loading an item entity also counts as spawning
 	 */
-	@EventHandler(priority = EventPriority.MONITOR)
+	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void chunkLoadEvent(ChunkLoadEvent event) {
 		for (Entity entity : event.getChunk().getEntities()) {
 			if (entity instanceof Item) {

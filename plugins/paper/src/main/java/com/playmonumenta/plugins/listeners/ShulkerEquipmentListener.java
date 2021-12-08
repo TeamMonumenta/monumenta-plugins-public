@@ -66,11 +66,9 @@ public class ShulkerEquipmentListener implements Listener {
 		mPlugin = plugin;
 	}
 
-	@EventHandler(priority = EventPriority.HIGHEST)
+	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
 	public void inventoryClickEvent(InventoryClickEvent event) {
 		if (
-		    // Must not be cancelled
-		    event.isCancelled() ||
 		    // Must be a right click
 		    event.getClick() == null ||
 		    !event.getClick().equals(ClickType.RIGHT) ||
@@ -148,12 +146,8 @@ public class ShulkerEquipmentListener implements Listener {
 		}
 	}
 
-	@EventHandler(priority = EventPriority.HIGHEST)
+	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
 	public void blockDispenseEvent(BlockDispenseEvent event) {
-		if (event.isCancelled()) {
-			return;
-		}
-
 		if (isEquipmentBox(event.getItem())) {
 			event.setCancelled(true);
 		}

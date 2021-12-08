@@ -4,22 +4,20 @@ import java.util.EnumSet;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
+import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
-import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
-import org.bukkit.Location;
+import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
 
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
+import com.playmonumenta.plugins.effects.Aesthetics;
 import com.playmonumenta.plugins.effects.PercentDamageDealt;
 import com.playmonumenta.plugins.effects.PercentSpeed;
-import com.playmonumenta.plugins.effects.Aesthetics;
+import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 
 public class RageOfTheKeter implements BaseEnchantment {
@@ -56,7 +54,6 @@ public class RageOfTheKeter implements BaseEnchantment {
 		return EnumSet.of(ItemSlot.MAINHAND, ItemSlot.OFFHAND);
 	}
 
-	@EventHandler(priority = EventPriority.HIGHEST)
 	@Override
 	public void onConsume(Plugin plugin, Player player, PlayerItemConsumeEvent event, int level) {
 		if (InventoryUtils.testForItemWithLore(event.getItem(), "Rage of the Keter")) {

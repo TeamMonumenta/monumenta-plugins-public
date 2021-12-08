@@ -18,7 +18,7 @@ public class ExceptionListener implements Listener {
 		mPlugin = plugin;
 	}
 
-	@EventHandler(priority = EventPriority.MONITOR)
+	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void serverExceptionEvent(ServerExceptionEvent event) {
 		ServerException exception = event.getException();
 

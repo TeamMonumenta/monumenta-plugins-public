@@ -2,12 +2,6 @@ package com.playmonumenta.plugins.listeners;
 
 import java.util.List;
 
-import com.playmonumenta.plugins.player.PartialParticle;
-import com.playmonumenta.plugins.utils.ItemUtils;
-import com.playmonumenta.plugins.utils.LocationUtils;
-import com.playmonumenta.plugins.utils.MovementUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
-
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -28,10 +22,16 @@ import org.bukkit.potion.PotionType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import com.playmonumenta.plugins.player.PartialParticle;
+import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.LocationUtils;
+import com.playmonumenta.plugins.utils.MovementUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
+
 
 
 public class BrewingListener implements Listener {
-	@EventHandler
+	@EventHandler(ignoreCancelled = true)
 	public void brewEvent(@NotNull BrewEvent brewEvent) {
 		@NotNull BrewerInventory brewerInventory = brewEvent.getContents();
 		@Nullable ItemStack ingredient = brewerInventory.getIngredient();

@@ -149,11 +149,8 @@ public class EntityListener implements Listener {
 		mAbilities = abilities;
 	}
 
-	@EventHandler(priority = EventPriority.LOW)
+	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	public void entityCombustByEntityEvent(EntityCombustByEntityEvent event) {
-		if (event.isCancelled()) {
-			return;
-		}
 		String s = "Stasis";
 		if (mPlugin.mEffectManager.getEffects(event.getEntity(), s) != null && (mPlugin.mEffectManager.getEffects(event.getEntity(), s)).contains(new Stasis(120))) {
 			event.setCancelled(true);
@@ -189,7 +186,7 @@ public class EntityListener implements Listener {
 		}
 	}
 
-	@EventHandler
+	@EventHandler(ignoreCancelled = true)
 	public void customDamageEvent(CustomDamageEvent event) {
 		String s = "Stasis";
 		NavigableSet<Effect> damagerEffects = mPlugin.mEffectManager.getEffects(event.getDamager(), s);
@@ -212,11 +209,8 @@ public class EntityListener implements Listener {
 	}
 
 	//  An Entity hit another Entity.
-	@EventHandler(priority = EventPriority.HIGH)
+	@EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
 	public void entityDamageByEntityEvent(EntityDamageByEntityEvent event) {
-		if (event.isCancelled()) {
-			return;
-		}
 		Entity damagee = event.getEntity();
 		Entity damager = event.getDamager();
 		String s = "Stasis";
@@ -379,15 +373,13 @@ public class EntityListener implements Listener {
 	}
 
 	// Entity Hurt Event.
-	@EventHandler(priority = EventPriority.LOW)
+	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	public void entityDamageEvent(EntityDamageEvent event) {
 		Entity damagee = event.getEntity();
 		DamageCause source = event.getCause();
 		String s = "Stasis";
 		if (mPlugin.mEffectManager.getEffects(event.getEntity(), s) != null && (mPlugin.mEffectManager.getEffects(event.getEntity(), s)).contains(new Stasis(120))) {
 			event.setCancelled(true);
-		}
-		if (event.isCancelled()) {
 			return;
 		}
 		if ((source == DamageCause.BLOCK_EXPLOSION || source == DamageCause.ENTITY_EXPLOSION) &&
@@ -493,7 +485,7 @@ public class EntityListener implements Listener {
 	}
 
 	//changes the potion in the witches mainhand to throw
-	@EventHandler(priority = EventPriority.LOW)
+	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	public void witchThrowPotionEvent(WitchThrowPotionEvent event) {
 		Witch witch = event.getEntity();
 		ItemStack potion = event.getPotion();
@@ -515,7 +507,7 @@ public class EntityListener implements Listener {
 	}
 
 	// Entity interacts with something
-	@EventHandler(priority = EventPriority.LOWEST)
+	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
 	public void entityInteractEvent(EntityInteractEvent event) {
 		Material material = event.getBlock().getType();
 
@@ -534,12 +526,8 @@ public class EntityListener implements Listener {
 	}
 
 	// Hanging Entity hurt by another entity.
-	@EventHandler(priority = EventPriority.LOW)
+	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	public void hangingBreakByEntityEvent(HangingBreakByEntityEvent event) {
-		if (event.isCancelled()) {
-			return;
-		}
-
 		Entity damager = event.getRemover();
 
 		if (damager instanceof Player) {
@@ -563,7 +551,7 @@ public class EntityListener implements Listener {
 		}
 	}
 
-	@EventHandler(priority = EventPriority.MONITOR)
+	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void entityResurrectEvent(EntityResurrectEvent event) {
 		Entity entity = event.getEntity();
 		if (entity instanceof Player) {
@@ -588,7 +576,7 @@ public class EntityListener implements Listener {
 	}
 
 	// Entity Spawn Event.
-	@EventHandler(priority = EventPriority.LOWEST)
+	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
 	public void entitySpawnEvent(EntitySpawnEvent event) {
 		Entity entity = event.getEntity();
 		mPlugin.mTrackingManager.addEntity(entity);
@@ -596,12 +584,8 @@ public class EntityListener implements Listener {
 
 	// Player shoots an arrow.
 	//TODO PlayerLaunchProjectileEvent to access ItemStack
-	@EventHandler(priority = EventPriority.HIGH)
+	@EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
 	public void projectileLaunchEvent(ProjectileLaunchEvent event) {
-		if (event.isCancelled()) {
-			return;
-		}
-
 		Projectile proj = event.getEntity();
 		ProjectileSource shooter = proj.getShooter();
 		String s = "Stasis";
@@ -713,11 +697,8 @@ public class EntityListener implements Listener {
 		}
 	}
 
-	@EventHandler(priority = EventPriority.HIGH)
+	@EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
 	public void potionSplashEvent(PotionSplashEvent event) {
-		if (event.isCancelled()) {
-			return;
-		}
 		String s = "Stasis";
 		if (event.getPotion().getShooter() != null
 			&& event.getPotion().getShooter() instanceof Entity
@@ -803,11 +784,8 @@ public class EntityListener implements Listener {
 	}
 
 	// Entity ran into the effect cloud.
-	@EventHandler(priority = EventPriority.HIGH)
+	@EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
 	public void areaEffectCloudApplyEvent(AreaEffectCloudApplyEvent event) {
-		if (event.isCancelled()) {
-			return;
-		}
 		event.getAffectedEntities().removeIf((l) -> mPlugin.mEffectManager.hasEffect(l, "Stasis"));
 		AreaEffectCloud cloud = event.getEntity();
 		Collection<LivingEntity> affectedEntities = event.getAffectedEntities();
@@ -861,7 +839,7 @@ public class EntityListener implements Listener {
 	}
 
 	// Cancel explosions in adventure zones
-	@EventHandler(priority = EventPriority.LOWEST)
+	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
 	public void entityExplodeEvent(EntityExplodeEvent event) {
 		// Cancel the event immediately if within a adventure zone
 		if (ZoneUtils.hasZoneProperty(event.getLocation(), ZoneProperty.ADVENTURE_MODE)) {
@@ -895,7 +873,7 @@ public class EntityListener implements Listener {
 	}
 
 	// Cancel explosions in adventure zones
-	@EventHandler(priority = EventPriority.LOWEST)
+	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
 	public void blockExplodeEvent(BlockExplodeEvent event) {
 		// Cancel the event immediately if within a zone with no explosions
 		if (ZoneUtils.hasZoneProperty(event.getBlock().getLocation(), ZoneProperty.ADVENTURE_MODE)) {
@@ -922,7 +900,7 @@ public class EntityListener implements Listener {
 	}
 
 	// Reset creeper explosions on stun
-	@EventHandler(priority = EventPriority.LOW)
+	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	public void explosionPrimeEvent(ExplosionPrimeEvent event) {
 		if (EntityUtils.isStunned(event.getEntity())) {
 			event.setCancelled(true);
@@ -930,25 +908,25 @@ public class EntityListener implements Listener {
 	}
 
 	// Never generate new trades
-	@EventHandler(priority = EventPriority.LOWEST)
+	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
 	public void villagerAcquireTradeEvent(VillagerAcquireTradeEvent event) {
 		event.setCancelled(true);
 	}
 
 	// Never generate new trades
-	@EventHandler(priority = EventPriority.LOWEST)
+	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
 	public void villagerCareerChangeEvent(VillagerCareerChangeEvent event) {
 		event.setCancelled(true);
 	}
 
 	// Never generate new trades
-	@EventHandler(priority = EventPriority.LOWEST)
+	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
 	public void villagerReplenishTradeEvent(VillagerReplenishTradeEvent event) {
 		event.setCancelled(true);
 	}
 
 	//  An Arrow hit something.
-	@EventHandler(priority = EventPriority.HIGH)
+	@EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
 	public void projectileHitEvent(ProjectileHitEvent event) {
 		Entity entity = event.getHitEntity();
 		Projectile proj = event.getEntity();
@@ -1021,7 +999,7 @@ public class EntityListener implements Listener {
 		}
 	}
 
-	@EventHandler(priority = EventPriority.LOW)
+	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	public void entityTargetLivingEntityEvent(EntityTargetLivingEntityEvent event) {
 		Entity entity = event.getEntity();
 		LivingEntity target = event.getTarget();
@@ -1055,7 +1033,7 @@ public class EntityListener implements Listener {
 		}
 	}
 
-	@EventHandler
+	@EventHandler(ignoreCancelled = true)
 	public void potionEffectApplyEvent(PotionEffectApplyEvent event) {
 		LivingEntity applied = event.getApplied();
 
@@ -1088,7 +1066,7 @@ public class EntityListener implements Listener {
 		}
 	}
 
-	@EventHandler
+	@EventHandler(ignoreCancelled = true)
 	public void entityChangeBlockEvent(EntityChangeBlockEvent event) {
 		event.setCancelled(!mPlugin.mItemOverrides.blockChangeInteraction(mPlugin, event.getBlock()));
 		if (event.getEntity() instanceof Wither) {
@@ -1108,7 +1086,7 @@ public class EntityListener implements Listener {
 		}
 	}
 
-	@EventHandler
+	@EventHandler(ignoreCancelled = true)
 	public void entityDismountEvent(EntityDismountEvent event) {
 		if (event.getDismounted() instanceof ArmorStand) {
 			event.getDismounted().remove();
