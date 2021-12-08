@@ -14,6 +14,7 @@ import org.bukkit.entity.MagmaCube;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -186,7 +187,9 @@ public class ChaosDagger extends DepthsAbility {
 
 	@Override
 	public boolean livingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
-		doBonusDamage(event);
+		if (event.getCause() == DamageCause.ENTITY_ATTACK) {
+			doBonusDamage(event);
+		}
 		return true;
 	}
 
@@ -198,7 +201,7 @@ public class ChaosDagger extends DepthsAbility {
 
 	@Override
 	public String getDescription(int rarity) {
-		return "Swap hands to throw a cursed dagger that stuns an enemy for " + STUN_DURATION / 20 + " seconds (rooting bosses instead). The next instance of any type of damage you deal to this mob within " + DAMAGE_DURATION / 20 + " seconds is multiplied by " + DepthsUtils.getRarityColor(rarity) + DAMAGE[rarity - 1] + ChatColor.WHITE + ". The dagger prioritizes nearby Elites and Bosses but can hit any mob in its path. Cooldown: " + COOLDOWN / 20 + "s.";
+		return "Swap hands to throw a cursed dagger that stuns an enemy for " + STUN_DURATION / 20 + " seconds (rooting bosses instead). The next instance of melee or projectile damage you deal to this mob within " + DAMAGE_DURATION / 20 + " seconds is multiplied by " + DepthsUtils.getRarityColor(rarity) + DAMAGE[rarity - 1] + ChatColor.WHITE + ". The dagger prioritizes nearby Elites and Bosses but can hit any mob in its path. Cooldown: " + COOLDOWN / 20 + "s.";
 	}
 
 	@Override
