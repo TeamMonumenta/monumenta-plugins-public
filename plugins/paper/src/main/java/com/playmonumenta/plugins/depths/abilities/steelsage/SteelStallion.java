@@ -8,6 +8,7 @@ import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.Horse;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
@@ -162,6 +163,10 @@ public class SteelStallion extends DepthsAbility {
 		world.playSound(loc, Sound.ENTITY_IRON_GOLEM_HURT, 1, 0.5f);
 
 		MessagingUtils.sendActionBarMessage(mPlugin, mPlayer, "Steel Stallion has been activated!");
+	}
+
+	public static boolean isSteelStallion(Entity entity) {
+		return entity instanceof Horse && entity.getName() == ABILITY_NAME;
 	}
 
 	@Override

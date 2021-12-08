@@ -250,19 +250,19 @@ public class ItemOverrides {
 		mItems.put(Material.CRIMSON_SIGN, signOverride);
 		mItems.put(Material.CRIMSON_WALL_SIGN, signOverride);
 
-		mItems.put(Material.ACACIA_TRAPDOOR, new TrapdoorOverride());
-		mItems.put(Material.BIRCH_TRAPDOOR, new TrapdoorOverride());
-		mItems.put(Material.CRIMSON_TRAPDOOR, new TrapdoorOverride());
-		mItems.put(Material.DARK_OAK_TRAPDOOR, new TrapdoorOverride());
-		mItems.put(Material.JUNGLE_TRAPDOOR, new TrapdoorOverride());
-		mItems.put(Material.OAK_TRAPDOOR, new TrapdoorOverride());
-		mItems.put(Material.SPRUCE_TRAPDOOR, new TrapdoorOverride());
-		mItems.put(Material.WARPED_TRAPDOOR, new TrapdoorOverride());
+		BaseOverride trapdoorOverride = new TrapdoorOverride();
+		mItems.put(Material.ACACIA_TRAPDOOR, trapdoorOverride);
+		mItems.put(Material.BIRCH_TRAPDOOR, trapdoorOverride);
+		mItems.put(Material.CRIMSON_TRAPDOOR, trapdoorOverride);
+		mItems.put(Material.DARK_OAK_TRAPDOOR, trapdoorOverride);
+		mItems.put(Material.JUNGLE_TRAPDOOR, trapdoorOverride);
+		mItems.put(Material.OAK_TRAPDOOR, trapdoorOverride);
+		mItems.put(Material.SPRUCE_TRAPDOOR, trapdoorOverride);
+		mItems.put(Material.WARPED_TRAPDOOR, trapdoorOverride);
 
 
 		BaseOverride unbreakableOverride = new UnbreakableOnBedrockOverride();
 		mItems.put(Material.SPAWNER, unbreakableOverride);
-		mItems.put(Material.SLIME_BLOCK, unbreakableOverride);
 
 		BaseOverride flowerOverride = new FlowerPotOverride();
 		mItems.put(Material.FLOWER_POT, flowerOverride);
@@ -317,6 +317,15 @@ public class ItemOverrides {
 
 		BaseOverride noAdventurePlaceOverride = new NoAdventureModePlacementOverride();
 		mItems.put(Material.LILY_PAD, noAdventurePlaceOverride);
+
+		BaseOverride horseFoodOverride = new HorseFoodOverride();
+		mItems.put(Material.SUGAR, horseFoodOverride);
+		mItems.put(Material.WHEAT, horseFoodOverride);
+		mItems.put(Material.APPLE, horseFoodOverride);
+		mItems.put(Material.GOLDEN_CARROT, horseFoodOverride);
+		mItems.put(Material.HAY_BLOCK, horseFoodOverride);
+		mItems.put(Material.ENCHANTED_GOLDEN_APPLE, horseFoodOverride);
+		// GOLDEN_APPLE is in GOldenAppleOverride, which manually calls this override
 	}
 
 	public boolean rightClickInteraction(Plugin plugin, Player player, Action action, ItemStack item, Block block, PlayerInteractEvent event) {

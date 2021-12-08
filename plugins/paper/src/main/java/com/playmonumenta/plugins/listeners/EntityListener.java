@@ -453,7 +453,7 @@ public class EntityListener implements Listener {
 
 									//Fix for a Depths skill that caused too many false positives
 									//Do not award strike or remove vehicle if the player is on the Steel Stallion horse
-									if (vehicle.getName().equals(SteelStallion.ABILITY_NAME)) {
+									if (SteelStallion.isSteelStallion(vehicle)) {
 										return;
 									}
 
