@@ -164,7 +164,7 @@ public class GraveListener implements Listener {
 		}
 	}
 
-	@EventHandler(ignoreCancelled = true)
+	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void playerDropItem(PlayerDropItemEvent event) {
 		Player player = event.getPlayer();
 		Item entity = event.getItemDrop();

@@ -161,6 +161,18 @@ public class TradeListener implements Listener {
 					List<String> extraLore = new ArrayList<>(playerItemLore);
 					extraLore.removeAll(sourceLore);
 					extraLore = removeIgnoredLoreLines(extraLore);
+					// Kaul reskins add Hope (and unskinning removes it), so need to handle these specially to prevent double hope or removing hope
+					if (CustomEnchantment.HOPE.getEnchantment().getItemLevel(source) == 0
+						&& CustomEnchantment.HOPE.getEnchantment().getItemLevel(result) > 0
+						&& CustomEnchantment.HOPE.getEnchantment().getItemLevel(playerItem) > 0) {
+						// reskin adds Hope and player item already has hope: remove the extra Hope line
+						extraLore.remove(CustomEnchantment.HOPE.getEnchantment().getProperty());
+					} else if (CustomEnchantment.HOPE.getEnchantment().getItemLevel(source) > 0
+						&& CustomEnchantment.HOPE.getEnchantment().getItemLevel(result) == 0
+						&& extraLore.stream().anyMatch(s -> ChatColor.stripColor(s).startsWith("Infused by "))) {
+						// reskin removes Hope and player item is manually hoped: add the missing Hope line
+						extraLore.add(0, CustomEnchantment.HOPE.getEnchantment().getProperty());
+					}
 					List<String> newLore = new ArrayList<>(resultLore);
 					for (String extra : extraLore) {
 						int pos = isCustomEnchantmentLoreLine(extra) ? enchantsPos : othersPos;
