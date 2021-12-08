@@ -117,6 +117,8 @@ public class Constants {
 	public static class Tags {
 		// PlayerData
 		public static final String NO_SELF_PARTICLES = "noSelfParticles";
+		public static final String NO_TRANSPOSING = "NoTransposing";
+		public static final String STASIS = "Stasis";
 	}
 
 	// Note blocks

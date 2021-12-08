@@ -10,6 +10,7 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
+import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.abilities.AbilityManager;
 
 import net.kyori.adventure.text.Component;
@@ -37,6 +38,7 @@ public class Stasis extends Effect {
 	public void entityGainEffect(Entity entity) {
 		if (entity instanceof Player) {
 			entity.sendActionBar(Component.text("You are in stasis! You cannot use abilities for " + getDuration() / 20 + "s", NamedTextColor.DARK_RED));
+			entity.addScoreboardTag(Constants.Tags.STASIS);
 			((Player)entity).addPotionEffect(new PotionEffect(PotionEffectType.SLOW, mDuration, 100), false);
 			((Player)entity).addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, mDuration, 100), false);
 			((Player)entity).addPotionEffect(new PotionEffect(PotionEffectType.GLOWING, mDuration, 100), false);
@@ -62,6 +64,7 @@ public class Stasis extends Effect {
 	@Override
 	public void entityLoseEffect(Entity entity) {
 		if (entity instanceof Player) {
+			entity.removeScoreboardTag(Constants.Tags.STASIS);
 			AbilityManager.getManager().updatePlayerAbilities((Player) entity);
 			AbilityManager.getManager().getPlayerAbilities((Player) entity).unsilence();
 		}
