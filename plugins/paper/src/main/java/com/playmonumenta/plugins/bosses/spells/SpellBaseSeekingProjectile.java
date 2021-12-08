@@ -9,7 +9,6 @@ import java.util.Map;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Block;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
@@ -351,10 +350,10 @@ public class SpellBaseSeekingProjectile extends Spell {
 				if (mCollisionDelayTicks <= 0) {
 					// Grab all players that could have overlapping bounding boxes
 					if (mGetSpellTargets != null) {
-						Collection<Entity> entities = mLocation.getWorld().getNearbyEntities(mLocation, mHitboxLength + 2, mHitboxLength + 2, mHitboxLength + 2);
-						for (Entity entity : entities) {
-							if (entity instanceof LivingEntity && mHitbox.overlaps(entity.getBoundingBox()) && !mBoss.equals(entity) && (mTarget.equals(entity) || !mCollidesWithOthers)) {
-								mHitAction.run(mWorld, mTarget, mLocation);
+						Collection<LivingEntity> entities = mLocation.getWorld().getNearbyEntitiesByType(LivingEntity.class, mLocation, mHitboxLength + 2);
+						for (LivingEntity entity : entities) {
+							if (mHitbox.overlaps(entity.getBoundingBox()) && !mBoss.equals(entity) && (mTarget.equals(entity) || mCollidesWithOthers)) {
+								mHitAction.run(mWorld, entity, mLocation);
 								this.cancel();
 								if (!mLingers) {
 									mActiveRunnables.remove(this);

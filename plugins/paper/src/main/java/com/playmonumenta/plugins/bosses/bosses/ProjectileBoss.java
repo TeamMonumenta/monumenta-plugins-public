@@ -63,6 +63,9 @@ public class ProjectileBoss extends BossAbilityGroup {
 		public double TURN_RADIUS = Math.PI / 30;
 
 		@BossParam(help = "not written")
+		public boolean COLLIDES_WITH_OTHERS = false;
+
+		@BossParam(help = "not written")
 		public boolean COLLIDES_WITH_BLOCKS = true;
 
 		@BossParam(help = "Let you choose the targets of this spell")
@@ -118,7 +121,7 @@ public class ProjectileBoss extends BossAbilityGroup {
 		}
 		SpellManager activeSpells = new SpellManager(Arrays.asList(
 			new SpellBaseSeekingProjectile(plugin, boss, p.LAUNCH_TRACKING, p.COOLDOWN, p.DELAY,
-					p.SPEED, p.TURN_RADIUS, lifetimeTicks, p.HITBOX_LENGTH, p.COLLIDES_WITH_BLOCKS, p.LINGERS, 0, false,
+					p.SPEED, p.TURN_RADIUS, lifetimeTicks, p.HITBOX_LENGTH, p.COLLIDES_WITH_BLOCKS, p.LINGERS, 0, p.COLLIDES_WITH_OTHERS,
 					//spell targets
 					() -> {
 						return p.TARGETS.getTargetsList(mBoss);
