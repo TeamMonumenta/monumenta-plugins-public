@@ -6,10 +6,6 @@ import java.util.NavigableSet;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.effects.Effect;
-import com.playmonumenta.plugins.effects.Stasis;
-
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -21,6 +17,10 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
+
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.effects.Effect;
+import com.playmonumenta.plugins.effects.Stasis;
 
 public class BossUtils {
 

@@ -48,7 +48,7 @@ public class CustomDamageOverTime extends Effect {
 			if (mTicks >= mPeriod) {
 				mTicks %= mPeriod;
 				EntityUtils.damageEntity(mPlugin, le, mDamage, mPlayer, mMagic, true, mSpell, false, false, true, true);
-				mPlayer.getWorld().spawnParticle(mParticle, le.getEyeLocation(), 8, 0.4, 0.4, 0.4, 0.1);
+				entity.getWorld().spawnParticle(mParticle, le.getEyeLocation(), 8, 0.4, 0.4, 0.4, 0.1);
 			}
 		}
 	}
