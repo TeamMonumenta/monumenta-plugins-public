@@ -15,6 +15,7 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
@@ -50,7 +51,7 @@ public class PowerInjection extends Ability {
 	private final int mFlatDamageDealtEffect;
 	private final double mPercentDamageDealtEffect;
 
-	private Player mTargetPlayer;
+	private @Nullable Player mTargetPlayer;
 
 	public PowerInjection(Plugin plugin, Player player) {
 		super(plugin, player, "Power Injection");

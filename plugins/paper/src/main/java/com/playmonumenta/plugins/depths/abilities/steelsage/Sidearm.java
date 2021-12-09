@@ -1,6 +1,5 @@
 package com.playmonumenta.plugins.depths.abilities.steelsage;
 
-import java.util.Iterator;
 import java.util.List;
 
 import org.bukkit.Color;
@@ -48,6 +47,9 @@ public class Sidearm extends DepthsAbility {
 
 	@Override
 	public void cast(Action trigger) {
+		if (mPlayer == null) {
+			return;
+		}
 		putOnCooldown();
 		Location loc = mPlayer.getEyeLocation();
 		BoundingBox box = BoundingBox.of(loc, 0.75, 0.75, 0.75);
@@ -71,20 +73,14 @@ public class Sidearm extends DepthsAbility {
 				world.playSound(bLoc, Sound.ENTITY_FIREWORK_ROCKET_BLAST, 1, 0);
 				break;
 			}
-			Iterator<LivingEntity> iter = mobs.iterator();
-			boolean hasReducedCooldown = false;
-			while (iter.hasNext()) {
-				LivingEntity mob = iter.next();
+			for (LivingEntity mob : mobs) {
 				if (box.overlaps(mob.getBoundingBox())) {
 					EntityUtils.damageEntity(mPlugin, mob, DAMAGE[mRarity - 1], mPlayer, MagicType.PHYSICAL, true, mInfo.mLinkedSpell);
-					if ((mob == null || mob.isDead() || mob.getHealth() <= 0) && !hasReducedCooldown) {
+					if ((mob.isDead() || mob.getHealth() <= 0)) {
 						mPlugin.mTimers.addCooldown(mPlayer, mInfo.mLinkedSpell, COOLDOWN - KILL_COOLDOWN_REDUCTION);
-						hasReducedCooldown = true;
 					}
 
 					mob.setVelocity(new Vector(0, 0, 0));
-					iter.remove();
-					mobs.remove(mob);
 
 					world.spawnParticle(Particle.SQUID_INK, bLoc, 30, 0, 0, 0, 0.125);
 					world.playSound(bLoc, Sound.ENTITY_FIREWORK_ROCKET_BLAST, 1, 0);
@@ -103,7 +99,7 @@ public class Sidearm extends DepthsAbility {
 
 	@Override
 	public boolean runCheck() {
-		return (!mPlayer.isSneaking() && DepthsUtils.isWeaponItem(mPlayer.getInventory().getItemInMainHand()));
+		return mPlayer != null && !mPlayer.isSneaking() && DepthsUtils.isWeaponItem(mPlayer.getInventory().getItemInMainHand());
 	}
 
 	@Override

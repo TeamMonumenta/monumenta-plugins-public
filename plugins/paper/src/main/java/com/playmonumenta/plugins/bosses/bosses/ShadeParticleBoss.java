@@ -9,7 +9,7 @@ import org.bukkit.plugin.Plugin;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.bosses.spells.SpellShadeParticle;
 
-public class ShadeParticleBoss extends BossAbilityGroup {
+public final class ShadeParticleBoss extends BossAbilityGroup {
 
 	public static final String identityTag = "boss_shadeparticle";
 	public static final int detectionRange = 16;

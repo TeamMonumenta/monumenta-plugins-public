@@ -522,10 +522,11 @@ public class InfusionCustomInventory extends CustomInventory {
 		}
 
 
-		if (!mMapFunction.keySet().contains(slot)) {
+		ItemClicked itemClicked = mMapFunction.get(slot);
+		if (itemClicked == null) {
 			return;
 		}
-		mMapFunction.get(slot).run(player, clickedInventory, slot);
+		itemClicked.run(player, clickedInventory, slot);
 		loadInv(player);
 	}
 

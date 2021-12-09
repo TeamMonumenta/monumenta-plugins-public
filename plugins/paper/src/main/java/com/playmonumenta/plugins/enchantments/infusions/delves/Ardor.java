@@ -9,7 +9,7 @@ import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.inventory.ItemStack;
-import org.jetbrains.annotations.NotNull;
+
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.effects.Effect;
@@ -28,7 +28,7 @@ public class Ardor implements BaseEnchantment {
 	private static final String PERCENT_SPEED_EFFECT_NAME = "ArdorPercentSpeedEffect";
 
 	@Override
-	public @NotNull String getProperty() {
+	public String getProperty() {
 		return PROPERTY_NAME;
 	}
 

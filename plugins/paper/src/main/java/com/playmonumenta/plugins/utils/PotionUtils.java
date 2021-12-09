@@ -9,7 +9,6 @@ import java.util.Map;
 import java.util.NavigableSet;
 
 import org.bukkit.Bukkit;
-import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -19,6 +18,7 @@ import org.bukkit.potion.PotionData;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.potion.PotionType;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.Constants;
@@ -117,7 +117,7 @@ public class PotionUtils {
 
 		public static final PotionInfo LUCK = new PotionInfo(PotionEffectType.LUCK, MINUTES_5, 0, false, true);
 
-		public PotionEffectType mType;
+		public @Nullable PotionEffectType mType;
 		public int mDuration;
 		public int mAmplifier;
 		public boolean mAmbient;
@@ -147,7 +147,7 @@ public class PotionUtils {
 		public JsonObject getAsJsonObject() {
 			JsonObject potionInfoObject = new JsonObject();
 
-			potionInfoObject.addProperty("type", mType.getName());
+			potionInfoObject.addProperty("type", mType == null ? null : mType.getName());
 			potionInfoObject.addProperty("duration", mDuration);
 			potionInfoObject.addProperty("amplifier", mAmplifier);
 			potionInfoObject.addProperty("ambient", mAmbient);
@@ -169,8 +169,8 @@ public class PotionUtils {
 	 * Dividend should be 1 for drink/splash, 4 for lingering potions, 8 for tipped arrows
 	 * NOTE: This may return NULL for some broken potions!
 	 */
-	public static PotionInfo getPotionInfo(PotionData data, int dividend) {
-		PotionInfo newInfo = null;
+	public static @Nullable PotionInfo getPotionInfo(PotionData data, int dividend) {
+		PotionInfo newInfo;
 		PotionType type = data.getType();
 		boolean isExtended = data.isExtended();
 		boolean isUpgraded = data.isUpgraded();
@@ -315,7 +315,7 @@ public class PotionUtils {
 			double health = player.getHealth();
 			double healthToAdd = 4 * (effect.getAmplifier() + 1);
 
-			health = Math.min(health + healthToAdd, player.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue());
+			health = Math.min(health + healthToAdd, EntityUtils.getMaxHealth(player));
 
 			player.setHealth(health);
 		} else {
@@ -323,15 +323,16 @@ public class PotionUtils {
 		}
 	}
 
-	public static void applyPotion(Entity applier, LivingEntity applied, PotionEffect effect) {
+	public static void applyPotion(@Nullable Entity applier, LivingEntity applied, PotionEffect effect) {
 		if (applied.hasPotionEffect(effect.getType())) {
 			PotionEffect targetPotionEffect = applied.getPotionEffect(effect.getType());
 			if (
-				targetPotionEffect.getAmplifier() < effect.getAmplifier()
-				|| (
-					targetPotionEffect.getAmplifier() == effect.getAmplifier()
-					&& targetPotionEffect.getDuration() < effect.getDuration()
-				)
+				targetPotionEffect != null && (
+					targetPotionEffect.getAmplifier() < effect.getAmplifier()
+						|| (
+						targetPotionEffect.getAmplifier() == effect.getAmplifier()
+							&& targetPotionEffect.getDuration() < effect.getDuration()
+					))
 			) {
 				PotionEffectApplyEvent event = new PotionEffectApplyEvent(applier, applied, effect);
 				Bukkit.getPluginManager().callEvent(event);
@@ -348,7 +349,7 @@ public class PotionUtils {
 		}
 	}
 
-	public static void applyPotion(Plugin plugin, Player player, PotionMeta meta) {
+	public static void applyPotion(Plugin plugin, Player player, @Nullable PotionMeta meta) {
 		//Do not run if null to avoid NullPointerException
 		if (meta == null) {
 			return;
@@ -402,7 +403,7 @@ public class PotionUtils {
 		return types;
 	}
 
-	public static PotionEffectType getOppositeEffect(PotionEffectType type) {
+	public static @Nullable PotionEffectType getOppositeEffect(PotionEffectType type) {
 		return OPPOSITE_EFFECTS.get(type);
 	}
 

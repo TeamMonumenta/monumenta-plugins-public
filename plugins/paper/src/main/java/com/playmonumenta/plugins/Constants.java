@@ -5,7 +5,6 @@ import java.util.EnumSet;
 import org.bukkit.Material;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-import org.jetbrains.annotations.NotNull;
 
 import net.kyori.adventure.text.format.TextColor;
 
@@ -155,8 +154,8 @@ public class Constants {
 	}
 
 	public static class Colors {
-		public static final @NotNull TextColor GREENISH_BLUE = TextColor.color(85, 255, 170);
-		public static final @NotNull TextColor GREENISH_BLUE_DARK = TextColor.color(76, 230, 153);
+		public static final TextColor GREENISH_BLUE = TextColor.color(85, 255, 170);
+		public static final TextColor GREENISH_BLUE_DARK = TextColor.color(76, 230, 153);
 	}
 
 	public static class Materials {

@@ -1,13 +1,13 @@
 package com.playmonumenta.plugins.abilities.alchemist;
 
 import java.util.EnumSet;
+import java.util.Objects;
 
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
-import org.bukkit.attribute.Attribute;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
@@ -25,6 +25,7 @@ import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.effects.PercentDamageDealt;
 import com.playmonumenta.plugins.effects.PercentRegeneration;
+import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
@@ -73,14 +74,17 @@ public class Bezoar extends Ability {
 
 		new BukkitRunnable() {
 			int mT = 0;
-			BlockData mFallingDustData = Material.LIME_CONCRETE.createBlockData();
+			final BlockData mFallingDustData = Material.LIME_CONCRETE.createBlockData();
 			@Override
 			public void run() {
+				if (mPlayer == null) {
+					return;
+				}
 				mT++;
 				world.spawnParticle(Particle.FALLING_DUST, item.getLocation(), 1, 0.2, 0.2, 0.2, mFallingDustData);
 				//Other player
 				for (Player p : PlayerUtils.playersInRange(item.getLocation(), 1, true)) {
-					if (!p.getName().equals(mPlayer.getName())) {
+					if (!Objects.equals(p.getName(), mPlayer.getName())) {
 						for (PotionEffectType effectType : PotionUtils.getNegativeEffects(mPlugin, p)) {
 							PotionEffect effect = p.getPotionEffect(effectType);
 							if (effect != null) {
@@ -90,7 +94,7 @@ public class Bezoar extends Ability {
 							}
 						}
 
-						double maxHealth = p.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue();
+						double maxHealth = EntityUtils.getMaxHealth(p);
 						//if the player has the effect refresh the duration
 						if (mPlugin.mEffectManager.hasEffect(p, "BezoarHealing")) {
 							mPlugin.mEffectManager.clearEffects(p, "BezoarHealing");
@@ -111,7 +115,7 @@ public class Bezoar extends Ability {
 						}
 					}
 
-					double maxHealth = mPlayer.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue();
+					double maxHealth = EntityUtils.getMaxHealth(mPlayer);
 					if (mPlugin.mEffectManager.hasEffect(mPlayer, "BezoarHealing")) {
 						mPlugin.mEffectManager.clearEffects(mPlayer, "BezoarHealing");
 					}

@@ -3,10 +3,11 @@ package com.playmonumenta.plugins.integrations;
 import java.util.Set;
 import java.util.logging.Logger;
 
-import com.playmonumenta.libraryofsouls.LibraryOfSoulsAPI;
-
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
+import org.checkerframework.checker.nullness.qual.Nullable;
+
+import com.playmonumenta.libraryofsouls.LibraryOfSoulsAPI;
 
 public class LibraryOfSoulsIntegration {
 	private static boolean ENABLED = false;
@@ -16,21 +17,21 @@ public class LibraryOfSoulsIntegration {
 		ENABLED = true;
 	}
 
-	public static Entity summon(Location loc, String soulName) {
+	public static @Nullable Entity summon(Location loc, String soulName) {
 		if (ENABLED) {
 			return LibraryOfSoulsAPI.summon(loc, soulName);
 		}
 		return null;
 	}
 
-	public static Set<String> getSoulNames() {
+	public static @Nullable Set<String> getSoulNames() {
 		if (ENABLED) {
 			return LibraryOfSoulsAPI.getSoulNames();
 		}
 		return null;
 	}
 
-	public static Set<String> getSoulLocations() {
+	public static @Nullable Set<String> getSoulLocations() {
 		if (ENABLED) {
 			return LibraryOfSoulsAPI.getSoulLocations();
 		}

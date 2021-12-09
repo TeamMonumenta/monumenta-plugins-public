@@ -10,6 +10,7 @@ import org.bukkit.event.player.PlayerAttemptPickupItemEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.Constants;
@@ -32,17 +33,18 @@ public class ThrownItem {
 	private static final String KEY_X = "x";
 	private static final String KEY_Y = "y";
 	private static final String KEY_Z = "z";
-	BukkitRunnable mRunnable = null;
+
+	private @Nullable BukkitRunnable mRunnable = null;
 	GraveManager mManager;
 	Player mPlayer;
 	ItemStack mItem;
-	Item mEntity;
+	private @Nullable Item mEntity;
 	String mWorldName;
 	Location mLocation;
-	Vector mVelocity;
+	private Vector mVelocity;
 	Integer mDungeonInstance;
-	Short mAge;
-	boolean mValid;
+	private Short mAge;
+	private boolean mValid;
 
 	// Full ThrownItem from deserialization
 	public ThrownItem(GraveManager manager, Player player, ItemStack item, String world, Location location, Vector velocity, Integer instance, Short age) {
@@ -272,7 +274,7 @@ public class ThrownItem {
 		return new ThrownItem(manager, player, item, world, location, velocity, instance, age);
 	}
 
-	JsonObject serialize() {
+	@Nullable JsonObject serialize() {
 		update();
 		if (!mValid) {
 			return null;

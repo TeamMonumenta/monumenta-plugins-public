@@ -5,8 +5,6 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.function.Consumer;
 
-import javax.annotation.Nullable;
-
 import org.bukkit.ChatColor;
 import org.bukkit.DyeColor;
 import org.bukkit.GameMode;
@@ -44,6 +42,14 @@ import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.loot.LootTables;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.BoundingBox;
+import org.checkerframework.checker.nullness.qual.Nullable;
+
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.integrations.luckperms.LuckPermsIntegration;
+import com.playmonumenta.plugins.utils.ZoneUtils;
+import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
+import com.playmonumenta.scriptedquests.quests.QuestNpc;
+import com.playmonumenta.scriptedquests.utils.ScoreboardUtils;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.integrations.luckperms.LuckPermsIntegration;
@@ -262,9 +268,11 @@ public class ShopManager implements Listener {
 
 			if (x1 == null || y1 == null || z1 == null || x2 == null || y2 == null || z2 == null || ownerName == null || ownerUUID == null || originalEntityMat == null) {
 				CommandAPI.fail("Shop entity is missing a required tag");
+				throw new RuntimeException();
 			}
 
-			return new Shop(new Location(shopEntity.getWorld(), x1, y1, z1), new Location(shopEntity.getWorld(), x2, y2, z2), (Shulker) shopEntity, ownerName, ownerGuildName, ownerUUID, originalEntityMat);
+			return new Shop(new Location(shopEntity.getWorld(), x1, y1, z1), new Location(shopEntity.getWorld(), x2, y2, z2),
+			                (Shulker) shopEntity, ownerName, ownerGuildName, ownerUUID, originalEntityMat);
 		}
 
 		/* Calls func(Location) for each shop platform block, plus a 1-block border */

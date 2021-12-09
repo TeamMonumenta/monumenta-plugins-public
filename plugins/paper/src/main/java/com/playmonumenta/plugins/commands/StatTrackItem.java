@@ -172,15 +172,18 @@ public class StatTrackItem extends GenericCommand {
 			return;
 		}
 
-		for (String line : is.getLore()) {
-			if (line.contains("Tracked by " + player.getName())) {
-				//Remove the lore from the item
-				InventoryUtils.removeCustomEnchant(is, ChatColor.RED + type.getEnchantName() + ": ");
-				InventoryUtils.removeCustomEnchant(is, ChatColor.GRAY + "Stat Track");
-				InventoryUtils.removeCustomEnchant(is, "Tracked by");
-				player.sendMessage("Removed Stat Tracking from your item!");
-				animate(player);
-				return;
+		List<String> lore = is.getLore();
+		if (lore != null) {
+			for (String line : lore) {
+				if (line.contains("Tracked by " + player.getName())) {
+					//Remove the lore from the item
+					InventoryUtils.removeCustomEnchant(is, ChatColor.RED + type.getEnchantName() + ": ");
+					InventoryUtils.removeCustomEnchant(is, ChatColor.GRAY + "Stat Track");
+					InventoryUtils.removeCustomEnchant(is, "Tracked by");
+					player.sendMessage("Removed Stat Tracking from your item!");
+					animate(player);
+					return;
+				}
 			}
 		}
 

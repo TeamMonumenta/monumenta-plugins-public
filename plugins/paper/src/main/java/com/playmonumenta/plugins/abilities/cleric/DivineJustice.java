@@ -7,7 +7,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
-import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
@@ -15,8 +14,7 @@ import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
@@ -58,7 +56,7 @@ public class DivineJustice extends Ability {
 	private @Nullable Crusade mCrusade;
 
 	public DivineJustice(
-		@NotNull Plugin plugin,
+		Plugin plugin,
 		@Nullable Player player
 	) {
 		super(plugin, player, NAME);
@@ -126,7 +124,7 @@ public class DivineJustice extends Ability {
 			);
 
 			double widerWidthDelta = PartialParticle.getWidthDelta(enemy) * 1.5;
-			@NotNull PartialParticle partialParticle = new PartialParticle(
+			PartialParticle partialParticle = new PartialParticle(
 				Particle.END_ROD,
 				LocationUtils.getHalfHeightLocation(enemy),
 				10,
@@ -153,18 +151,19 @@ public class DivineJustice extends Ability {
 	@Override
 	public void entityDeathEvent(EntityDeathEvent entityDeathEvent, boolean dropsLoot) {
 		if (
-			mDoHealingAndMultiplier
-			&& Crusade.enemyTriggersAbilities(entityDeathEvent.getEntity(), mCrusade)
+			mPlayer != null
+				&& mDoHealingAndMultiplier
+				&& Crusade.enemyTriggersAbilities(entityDeathEvent.getEntity(), mCrusade)
 		) {
 			PlayerUtils.healPlayer(
 				mPlayer,
-				mPlayer.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue() * HEALING_MULTIPLIER_OWN
+				EntityUtils.getMaxHealth(mPlayer) * HEALING_MULTIPLIER_OWN
 			);
-			@NotNull List<@NotNull Player> players = PlayerUtils.otherPlayersInRange(mPlayer, RADIUS, true);
-			for (@NotNull Player otherPlayer : players) {
+			List<Player> players = PlayerUtils.otherPlayersInRange(mPlayer, RADIUS, true);
+			for (Player otherPlayer : players) {
 				PlayerUtils.healPlayer(
 					otherPlayer,
-					otherPlayer.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue() * DivineJusticeAllyHealingEnchantment.getExtraPercentHealing(mPlayer, DivineJusticeAllyHealingEnchantment.class, (float) HEALING_MULTIPLIER_OTHER)
+					EntityUtils.getMaxHealth(otherPlayer) * DivineJusticeAllyHealingEnchantment.getExtraPercentHealing(mPlayer, DivineJusticeAllyHealingEnchantment.class, (float) HEALING_MULTIPLIER_OTHER)
 				);
 			}
 
@@ -182,7 +181,7 @@ public class DivineJustice extends Ability {
 	}
 
 	public static void doHealingSounds(List<Player> players, float pitch) {
-		for (@NotNull Player healedPlayer : players) {
+		for (Player healedPlayer : players) {
 			healedPlayer.playSound(
 				healedPlayer.getLocation(),
 				Sound.BLOCK_NOTE_BLOCK_CHIME,

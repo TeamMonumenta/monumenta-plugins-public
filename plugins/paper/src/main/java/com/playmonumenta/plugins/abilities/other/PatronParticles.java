@@ -2,8 +2,7 @@ package com.playmonumenta.plugins.abilities.other;
 
 import org.bukkit.Particle;
 import org.bukkit.entity.Player;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
@@ -15,24 +14,23 @@ import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 
 
-
 public abstract class PatronParticles extends Ability {
-	private final @NotNull Particle mParticle;
-	private final @NotNull Object mParticleData;
-	private final @NotNull String mParticleObjectiveName;
+	private final Particle mParticle;
+	private final Object mParticleData;
+	private final String mParticleObjectiveName;
 	private final int mMinimumPatreonScore;
 
 	// Skip particle data
-	public PatronParticles(@NotNull Plugin plugin, @Nullable Player player, @NotNull Particle particle, @NotNull String particleObjectiveName, int minimumPatreonScore) {
+	public PatronParticles(Plugin plugin, @Nullable Player player, Particle particle, String particleObjectiveName, int minimumPatreonScore) {
 		this(plugin, player, particle, null, particleObjectiveName, minimumPatreonScore);
 	}
 
 	public PatronParticles(
-		@NotNull Plugin plugin,
+		Plugin plugin,
 		@Nullable Player player,
-		@NotNull Particle particle,
+		Particle particle,
 		@Nullable Object particleData,
-		@NotNull String particleObjectiveName,
+		String particleObjectiveName,
 		int minimumPatreonScore
 	) {
 		super(plugin, player, null);

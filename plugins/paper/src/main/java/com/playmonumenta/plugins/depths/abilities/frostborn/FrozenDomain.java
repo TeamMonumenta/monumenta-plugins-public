@@ -3,7 +3,6 @@ package com.playmonumenta.plugins.depths.abilities.frostborn;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
-import org.bukkit.attribute.Attribute;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -14,6 +13,7 @@ import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.effects.PercentSpeed;
+import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 
 import net.md_5.bungee.api.ChatColor;
@@ -38,6 +38,9 @@ public class FrozenDomain extends DepthsAbility {
 
 	@Override
 	public void periodicTrigger(boolean twoHertz, boolean oneSecond, int ticks) {
+		if (mPlayer == null) {
+			return;
+		}
 		if (twoHertz && isOnIce(mPlayer)) {
 			mPlayer.getLocation().getWorld().spawnParticle(Particle.SNOW_SHOVEL, mPlayer.getLocation(), 8, 0, 0, 0, 0.65);
 		}
@@ -59,9 +62,13 @@ public class FrozenDomain extends DepthsAbility {
 	}
 
 	public void handleParticles() {
+		if (mPlayer == null) {
+			return;
+		}
 		mPlayer.getLocation().getWorld().spawnParticle(Particle.HEART, mPlayer.getLocation().add(0, 1, 0), 5, 0, 0, 0, 0.65);
 		new BukkitRunnable() {
 			int mCount = 0;
+
 			@Override
 			public void run() {
 				mPlayer.getLocation().getWorld().spawnParticle(Particle.SNOW_SHOVEL, mPlayer.getLocation().add(0, 1, 0), 8, 0, 0, 0, 0.65);
@@ -86,7 +93,10 @@ public class FrozenDomain extends DepthsAbility {
 	}
 
 	public void applyHealing() {
-		double maxHealth = mPlayer.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue();
+		if (mPlayer == null) {
+			return;
+		}
+		double maxHealth = EntityUtils.getMaxHealth(mPlayer);
 		PlayerUtils.healPlayer(mPlayer, PERCENT_HEAL * maxHealth);
 		handleParticles();
 	}

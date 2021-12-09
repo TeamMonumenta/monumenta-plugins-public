@@ -6,7 +6,6 @@ import java.util.NavigableSet;
 import java.util.UUID;
 
 import org.bukkit.Particle;
-import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Player;
 
 import com.playmonumenta.plugins.Plugin;
@@ -14,6 +13,7 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.effects.Effect;
 import com.playmonumenta.plugins.effects.ThuribleBonusHealing;
+import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 
@@ -43,7 +43,7 @@ public class ClericPassive extends Ability {
 
 	@Override
 	public void periodicTrigger(boolean twoHertz, boolean oneSecond, int ticks) {
-		if (oneSecond && !mPlayer.isDead()) {
+		if (oneSecond && mPlayer != null && !mPlayer.isDead()) {
 			mTimer += 20;
 			if (mTimer % HEAL_INTERVAL == 0) {
 				for (Player player : PlayerUtils.playersInRange(mPlayer.getLocation(), RADIUS, true)) {
@@ -59,10 +59,10 @@ public class ClericPassive extends Ability {
 						healPercent = effect.getMagnitude();
 					}
 					Integer lastHealTick = LAST_HEAL_TICK.get(player.getUniqueId());
-					if (lastHealTick == null || player.getTicksLived() - LAST_HEAL_TICK.get(player.getUniqueId()) >= HEAL_INTERVAL) {
+					if (lastHealTick == null || player.getTicksLived() - lastHealTick >= HEAL_INTERVAL) {
 						LAST_HEAL_TICK.put(player.getUniqueId(), player.getTicksLived());
-						double maxHealth = player.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue();
-						double hp = player.getHealth() / player.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue();
+						double maxHealth = EntityUtils.getMaxHealth(player);
+						double hp = player.getHealth() / maxHealth;
 						if (hp <= HEALTH_LIMIT) {
 							PlayerUtils.healPlayer(player, healPercent * maxHealth);
 							int numHearts = (int) (healPercent * 20);

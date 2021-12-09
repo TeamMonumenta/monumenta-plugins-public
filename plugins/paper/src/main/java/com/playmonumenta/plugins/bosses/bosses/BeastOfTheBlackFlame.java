@@ -42,7 +42,7 @@ import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.SerializationUtils;
 
-public class BeastOfTheBlackFlame extends BossAbilityGroup {
+public final class BeastOfTheBlackFlame extends BossAbilityGroup {
 
 	public static final String identityTag = "boss_beast_blackflame";
 	public static final int detectionRange = 75;

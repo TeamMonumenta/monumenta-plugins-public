@@ -6,6 +6,7 @@ import java.util.List;
 import org.bukkit.entity.EntityType;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class SpawnEffect {
 	public enum SpawnEffectType {
@@ -55,7 +56,7 @@ public class SpawnEffect {
 		return mValue;
 	}
 
-	public List<PotionEffect> getPotionEffects() {
+	public @Nullable List<PotionEffect> getPotionEffects() {
 		if (mType != SpawnEffectType.Potion) {
 			return null;
 		}

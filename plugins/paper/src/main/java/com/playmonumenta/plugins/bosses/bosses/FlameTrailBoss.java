@@ -16,7 +16,7 @@ import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.bosses.spells.SpellBaseTrail;
 import com.playmonumenta.plugins.utils.NmsUtils;
 
-public class FlameTrailBoss extends BossAbilityGroup {
+public final class FlameTrailBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_flametrail";
 
 	public static class Parameters extends BossParameters {

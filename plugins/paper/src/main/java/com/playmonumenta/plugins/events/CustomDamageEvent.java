@@ -5,6 +5,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.classes.magic.MagicType;
@@ -17,7 +18,7 @@ public class CustomDamageEvent extends Event implements Cancellable {
 	private final Entity mDamager;
 	private final LivingEntity mDamaged;
 	private double mDamage;
-	private final MagicType mMagicType;
+	private final @Nullable MagicType mMagicType;
 
 	/*
 	 * We want this event to trigger on all custom damage,
@@ -26,15 +27,16 @@ public class CustomDamageEvent extends Event implements Cancellable {
 	 */
 	private final boolean mRegistered;
 
-	private final ClassAbility mSpell;
+	private final @Nullable ClassAbility mSpell;
 	private final boolean mApplySpellshock;
 	private final boolean mTriggerSpellshock;
 
-	public CustomDamageEvent(Entity damager, LivingEntity damaged, double damage, MagicType magicType) {
+	public CustomDamageEvent(Entity damager, LivingEntity damaged, double damage, @Nullable MagicType magicType) {
 		this(damager, damaged, damage, magicType, true, null, true, true);
 	}
 
-	public CustomDamageEvent(Entity damager, LivingEntity damaged, double damage, MagicType magicType, boolean registered, ClassAbility spell, boolean applySpellshock, boolean triggerSpellshock) {
+	public CustomDamageEvent(Entity damager, LivingEntity damaged, double damage, @Nullable MagicType magicType, boolean registered,
+	                         @Nullable ClassAbility spell, boolean applySpellshock, boolean triggerSpellshock) {
 		mIsCancelled = false;
 		mDamager = damager;
 		mDamaged = damaged;
@@ -60,11 +62,11 @@ public class CustomDamageEvent extends Event implements Cancellable {
 		mIsCancelled = arg0;
 	}
 
-	public ClassAbility getSpell() {
+	public @Nullable ClassAbility getSpell() {
 		return mSpell;
 	}
 
-	public MagicType getMagicType() {
+	public @Nullable MagicType getMagicType() {
 		return mMagicType;
 	}
 

@@ -34,8 +34,7 @@ import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.inventory.ItemStack;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.Plugin;
@@ -64,10 +63,9 @@ public class PlayerInventoryManager {
 	 * Needs to be ordered so that trigger orders are correct
 	 */
 
-	@NotNull private ItemStack[] mInventoryLastCheck = new ItemStack[41];
-	private Map<Integer, Map<BaseEnchantment, Integer>> mInventoryProperties = new LinkedHashMap<>();
+	private final @Nullable ItemStack[] mInventoryLastCheck = new ItemStack[41];
+	private final Map<Integer, Map<BaseEnchantment, Integer>> mInventoryProperties = new LinkedHashMap<>();
 	private Map<BaseEnchantment, Integer> mCurrentProperties = new LinkedHashMap<>();
-	private Map<BaseEnchantment, Integer> mPreviousProperties = new LinkedHashMap<>();
 
 	//Set true when player shift clicks items in inventory so it only runs after inventory is closed
 	private boolean mNeedsUpdate = false;
@@ -82,17 +80,14 @@ public class PlayerInventoryManager {
 			return;
 		}
 
-		for (
-			@NotNull Map.Entry<@Nullable BaseEnchantment, @Nullable Integer> currentProperty
-				: mCurrentProperties.entrySet()
-		) {
+		for (Map.Entry<BaseEnchantment, Integer> currentProperty : mCurrentProperties.entrySet()) {
 			//TODO room for refactoring?
 			// Below, args passed are Integer but param already is of type int (assumptions).
 			// BaseEnchantment could have its methods static,
 			// using .class to set ordering (similar to plans for null player Abilities),
 			// while creating BaseEnchant objects with int (not Integer) properties to store data?
-			@Nullable BaseEnchantment baseEnchantment = currentProperty.getKey();
-			@Nullable Integer level = currentProperty.getValue();
+			BaseEnchantment baseEnchantment = currentProperty.getKey();
+			Integer level = currentProperty.getValue();
 
 			if (baseEnchantment != null) {
 				baseEnchantment.tick(
@@ -105,8 +100,8 @@ public class PlayerInventoryManager {
 	}
 
 	//Updates only for the slot given
-	public void updateItemSlotProperties(@NotNull Plugin plugin, @NotNull Player player, int slot) {
-		@NotNull ItemStack[] inv = player.getInventory().getContents();
+	public void updateItemSlotProperties(Plugin plugin, Player player, int slot) {
+		ItemStack[] inv = player.getInventory().getContents();
 		if (slot < 0 || slot >= inv.length) {
 			return;
 		}
@@ -122,7 +117,7 @@ public class PlayerInventoryManager {
 		}
 	}
 
-	public void updateEquipmentProperties(Plugin plugin, Player player, Event event) {
+	public void updateEquipmentProperties(Plugin plugin, Player player, @Nullable Event event) {
 		// If the player transferred shards (join event), clear most types of custom enchants and re-apply the relevant ones
 		if (event instanceof PlayerJoinEvent) {
 			for (CustomEnchantment e : CustomEnchantment.values()) {
@@ -209,7 +204,7 @@ public class PlayerInventoryManager {
 			}
 
 			// Current properties becomes previous, update current properties
-			mPreviousProperties = mCurrentProperties;
+			Map<BaseEnchantment, Integer> previousProperties = mCurrentProperties;
 			mCurrentProperties = new LinkedHashMap<>();
 			try {
 				plugin.mEnchantmentManager.getItemProperties(mCurrentProperties, mInventoryProperties, player);
@@ -218,7 +213,7 @@ public class PlayerInventoryManager {
 			}
 
 			// Remove properties from the player that were removed
-			for (BaseEnchantment property : mPreviousProperties.keySet()) {
+			for (BaseEnchantment property : previousProperties.keySet()) {
 				if (!mCurrentProperties.containsKey(property)) {
 					property.removeProperty(plugin, player);
 				}
@@ -227,10 +222,10 @@ public class PlayerInventoryManager {
 			// Apply properties to the player that changed or have a new level
 			for (Map.Entry<BaseEnchantment, Integer> iter : mCurrentProperties.entrySet()) {
 				BaseEnchantment property = iter.getKey();
-				Integer level = iter.getValue();
+				int level = iter.getValue();
 
-				Integer oldLevel = mPreviousProperties.get(property);
-				if (oldLevel == level && !(event instanceof EntityResurrectEvent)) {
+				Integer oldLevel = previousProperties.get(property);
+				if (oldLevel != null && (int) oldLevel == level && !(event instanceof EntityResurrectEvent)) {
 					// Don't need to do anything - player already had effects from this
 				} else if (oldLevel == null) {
 					// This didn't exist before - just apply the new property
@@ -440,7 +435,7 @@ public class PlayerInventoryManager {
 		return 0;
 	}
 
-	public boolean hasSlotChanged(@NotNull Player player, int slot) {
+	public boolean hasSlotChanged(Player player, int slot) {
 		if (slot < 0 || slot > 40) {
 			return false;
 		}
@@ -454,10 +449,10 @@ public class PlayerInventoryManager {
 	}
 
 	// Returns the first similar slot's number where there is a difference in item count, or -1 if not found
-	public int getDroppedSlotId(@NotNull PlayerDropItemEvent event) {
-		@NotNull Player player = event.getPlayer();
-		@NotNull ItemStack[] inv = player.getInventory().getContents();
-		@NotNull ItemStack droppedItem = event.getItemDrop().getItemStack();
+	public int getDroppedSlotId(PlayerDropItemEvent event) {
+		Player player = event.getPlayer();
+		ItemStack[] inv = player.getInventory().getContents();
+		ItemStack droppedItem = event.getItemDrop().getItemStack();
 
 		for (int slot = 0; slot <= 40; slot++) {
 			@Nullable ItemStack oldItem = mInventoryLastCheck[slot];

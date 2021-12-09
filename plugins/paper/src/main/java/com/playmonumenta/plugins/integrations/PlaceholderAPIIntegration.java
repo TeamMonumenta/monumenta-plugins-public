@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.integrations;
 
 import org.bukkit.entity.Player;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
@@ -22,7 +23,7 @@ public class PlaceholderAPIIntegration extends PlaceholderExpansion {
 	}
 
 	@Override
-	public String getPlugin() {
+	public @Nullable String getPlugin() {
 		return null;
 	}
 
@@ -37,7 +38,7 @@ public class PlaceholderAPIIntegration extends PlaceholderExpansion {
 	}
 
 	@Override
-	public String onPlaceholderRequest(Player player, String identifier) {
+	public @Nullable String onPlaceholderRequest(Player player, String identifier) {
 		if (player == null) {
 			return "";
 		}

@@ -2,14 +2,14 @@ package com.playmonumenta.plugins.enchantments.curses;
 
 import java.util.EnumSet;
 
+import org.bukkit.ChatColor;
+import org.bukkit.entity.Item;
+import org.bukkit.inventory.ItemStack;
+
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.enchantments.BaseSpawnableItemEnchantment;
 import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
 import com.playmonumenta.plugins.utils.InventoryUtils;
-
-import org.bukkit.ChatColor;
-import org.bukkit.entity.Item;
-import org.bukkit.inventory.ItemStack;
 
 public class CurseOfEphemerality implements BaseSpawnableItemEnchantment {
 

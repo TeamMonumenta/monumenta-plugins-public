@@ -5,8 +5,7 @@ import org.bukkit.Particle;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
@@ -25,7 +24,7 @@ public class Crusade extends Ability {
 	private final boolean mCountsHumanlikes;
 
 	public Crusade(
-		@NotNull Plugin plugin,
+		Plugin plugin,
 		@Nullable Player player
 	) {
 		super(plugin, player, NAME);
@@ -71,13 +70,13 @@ public class Crusade extends Ability {
 	}
 
 	private boolean enemyTriggersAbilities(
-		@NotNull LivingEntity enemy
+		LivingEntity enemy
 	) {
 		return enemyTriggersAbilities(enemy, this);
 	}
 
 	public static boolean enemyTriggersAbilities(
-		@NotNull LivingEntity enemy,
+		LivingEntity enemy,
 		@Nullable Crusade crusade
 	) {
 		return (

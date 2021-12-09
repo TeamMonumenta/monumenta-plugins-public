@@ -1,17 +1,15 @@
 package com.playmonumenta.plugins.itemindex;
 
-import com.goncalomb.bukkit.mylib.reflect.NBTUtils;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.Constants.Materials;
-import com.playmonumenta.plugins.enchantments.CustomEnchantment;
-import com.playmonumenta.plugins.utils.ItemUtils;
-import com.playmonumenta.plugins.utils.StringUtils;
-import de.tr7zw.nbtapi.NBTItem;
+import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
+import java.util.UUID;
+
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.DyeColor;
@@ -29,49 +27,53 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.potion.PotionEffect;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
-import javax.annotation.Nullable;
-import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
-import java.util.UUID;
+import com.goncalomb.bukkit.mylib.reflect.NBTUtils;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.playmonumenta.plugins.Constants.Materials;
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.enchantments.CustomEnchantment;
+import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.StringUtils;
+
+import de.tr7zw.nbtapi.NBTItem;
 
 // describes a monumenta item
 public class MonumentaItem {
 	private static final Gson GSON = new GsonBuilder().disableHtmlEscaping().create();
 	private static final Gson GSON_PRETTY = new GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create();
 
-	private MonumentaItem mEdits;
-	private String mName;
-	private Material mMaterial;
-	private Region mRegion;
-	private ItemTier mTier;
-	private ItemLocation mLoc;
-	private TreeMap<Integer, String> mLoreMap;
-	private TreeMap<CustomEnchantment, Integer> mEnchantMap;
-	private int[] mColor;
-	private String mLastEditedBy;
-	private Long mLastEditedTimestamp;
-	private TreeMap<EquipmentSlot, TreeMap<Attribute, TreeMap<AttributeModifier.Operation, Double>>> mAttributeDataMap;
-	private ArmorMaterial mArmorMaterial;
-	private ArmorMaterial mArmorMaterialOverride;
-	private Boolean mIsMagicWand;
-	private Boolean mUnbreakable;
-	private Integer mBaseDurability;
-	private String mOldName;
-	private Material mOldMaterial;
-	private TreeMap<PassiveEffect, TreeMap<Integer, Integer>> mOnConsumeMap;
-	private ArrayList<Pattern> mBannerPatterns;
-	private DyeColor mBannerBaseColor;
-	private CraftingMaterialKind mCraftingMaterialKind;
-	private TreeMap<Integer, String> mBookTextContentMap;
-	private String mBookAuthor;
-	private String mQuestID;
+	private @Nullable MonumentaItem mEdits;
+	private @Nullable String mName;
+	private @Nullable Material mMaterial;
+	private @Nullable Region mRegion;
+	private @Nullable ItemTier mTier;
+	private @Nullable ItemLocation mLoc;
+	private @Nullable TreeMap<Integer, String> mLoreMap;
+	private @Nullable TreeMap<CustomEnchantment, Integer> mEnchantMap;
+	private int @Nullable [] mColor;
+	private @Nullable String mLastEditedBy;
+	private @Nullable Long mLastEditedTimestamp;
+	private @Nullable TreeMap<EquipmentSlot, TreeMap<Attribute, TreeMap<AttributeModifier.Operation, Double>>> mAttributeDataMap;
+	private @Nullable ArmorMaterial mArmorMaterial;
+	private @Nullable ArmorMaterial mArmorMaterialOverride;
+	private @Nullable Boolean mIsMagicWand;
+	private @Nullable Boolean mUnbreakable;
+	private @Nullable Integer mBaseDurability;
+	private @Nullable String mOldName;
+	private @Nullable Material mOldMaterial;
+	private @Nullable TreeMap<PassiveEffect, TreeMap<Integer, Integer>> mOnConsumeMap;
+	private @Nullable ArrayList<Pattern> mBannerPatterns;
+	private @Nullable DyeColor mBannerBaseColor;
+	private @Nullable CraftingMaterialKind mCraftingMaterialKind;
+	private @Nullable TreeMap<Integer, String> mBookTextContentMap;
+	private @Nullable String mBookAuthor;
+	private @Nullable String mQuestID;
 
 	public MonumentaItem() {
 	}
@@ -520,28 +522,29 @@ public class MonumentaItem {
 		}
 		if (this.getLore() != null) {
 			out.append(String.format("%s%sLore:%s %s\n",
-				editable, this.getLore().size() == 0 ? unused : "",
-				reset, this.getLore().size() > 0 ? this.getLore().toString().replace(",", "\n              ").replace('{', '}').replace("}", "") : "None"));
+			                         editable, this.getLore().size() == 0 ? unused : "",
+			                         reset, this.getLore().size() > 0 ? this.getLore().toString().replace(",", "\n              ").replace('{', '}').replace("}", "") : "None"));
 		}
 		if (this.getEnchantMap() != null) {
 			out.append(String.format("%s%sEnchants:%s %s\n",
-				editable,
-				this.getEnchantMap().size() == 0 ? unused : "",
-				reset,
-				this.getEnchantMap().size() > 0 ? this.getEnchantMap().toString().replace(",", "\n              ").replace('{', '}').replace("}", "") : "None"));
+			                         editable,
+			                         this.getEnchantMap().size() == 0 ? unused : "",
+			                         reset,
+			                         this.getEnchantMap().size() > 0 ? this.getEnchantMap().toString().replace(",", "\n              ").replace('{', '}').replace("}", "") : "None"));
 		}
-		if (this.getColor() != null) {
+		int[] color = this.getColor();
+		if (color != null) {
 			out.append(String.format("%s%sColor:%s R:%d G:%d B:%d -> %s\n",
-				editable,
-				this.isColorable() ? "" : unused,
-				reset,
-				this.getColor()[0],
-				this.getColor()[1],
-				this.getColor()[2],
-				String.format("#%02X%02X%02X",
-					this.getColor()[0],
-					this.getColor()[1],
-					this.getColor()[2])));
+			                         editable,
+			                         this.isColorable() ? "" : unused,
+			                         reset,
+			                         color[0],
+			                         color[1],
+			                         color[2],
+			                         String.format("#%02X%02X%02X",
+			                                       color[0],
+			                                       color[1],
+			                                       color[2])));
 		}
 		if (this.getAttributesMap() != null) {
 			out.append(String.format("%s%sAttributes:%s\n", editable, this.getAttributesMap().size() == 0 ? unused : "", reset));
@@ -591,7 +594,7 @@ public class MonumentaItem {
 			out.append(String.format("%sUnbreakable:%s %s\n", editable, reset, this.getUnbreakable()));
 		}
 		if (this.getDurability() != null) {
-			out.append(String.format("%s%sDurability:%s %s\n", editable, this.getUnbreakable() != null && this.getUnbreakable() ? unused : "", reset, this.getUnbreakable()));
+			out.append(String.format("%s%sDurability:%s %s\n", editable, Boolean.TRUE.equals(this.getUnbreakable()) ? unused : "", reset, this.getDurability()));
 		}
 		if (this.getOldName() != null) {
 			out.append(String.format("%sOld Name:%s %s\n", readOnly, reset, this.getOldName()));
@@ -662,41 +665,34 @@ public class MonumentaItem {
 	}
 
 	public String getNameColorless() {
-		return ChatColor.stripColor(this.getName());
+		return "" + ChatColor.stripColor(this.getName());
 	}
 
-	@Nullable
-	public String getNameRaw() {
+	public @Nullable String getNameRaw() {
 		return this.mName;
 	}
 
-	@Nullable
-	public Material getMaterial() {
+	public @Nullable Material getMaterial() {
 		return this.mMaterial;
 	}
 
-	@Nullable
-	public Region getRegion() {
+	public @Nullable Region getRegion() {
 		return this.mRegion;
 	}
 
-	@Nullable
-	public ItemTier getTier() {
+	public @Nullable ItemTier getTier() {
 		return this.mTier;
 	}
 
-	@Nullable
-	public ItemLocation getLocation() {
+	public @Nullable ItemLocation getLocation() {
 		return this.mLoc;
 	}
 
-	@Nullable
-	public TreeMap<Integer, String> getLore() {
+	public @Nullable TreeMap<Integer, String> getLore() {
 		return this.mLoreMap;
 	}
 
-	@Nullable
-	public Map<CustomEnchantment, Integer> getEnchantMap() {
+	public @Nullable Map<CustomEnchantment, Integer> getEnchantMap() {
 		return this.mEnchantMap;
 	}
 
@@ -708,24 +704,22 @@ public class MonumentaItem {
 	}
 
 	public boolean isColorable() {
-		boolean result = false;
-		if (this.getMaterial() != null) {
-			switch (this.getMaterial()) {
-				case LEATHER_BOOTS:
-				case LEATHER_LEGGINGS:
-				case LEATHER_CHESTPLATE:
-				case LEATHER_HELMET:
-					result = true;
-					break;
-				default:
-					break;
+		Material material = this.getMaterial();
+		if (material != null) {
+			switch (material) {
+			case LEATHER_BOOTS:
+			case LEATHER_LEGGINGS:
+			case LEATHER_CHESTPLATE:
+			case LEATHER_HELMET:
+				return true;
+			default:
+				return false;
 			}
 		}
-		return result;
+		return false;
 	}
 
-	@Nullable
-	public int[] getColor() {
+	public int @Nullable [] getColor() {
 		return this.mColor;
 	}
 
@@ -761,13 +755,11 @@ public class MonumentaItem {
 		}
 	}
 
-	@Nullable
-	public String getLastEditor() {
+	public @Nullable String getLastEditor() {
 		return this.mLastEditedBy;
 	}
 
-	@Nullable
-	public TreeMap<EquipmentSlot, TreeMap<Attribute, TreeMap<AttributeModifier.Operation, Double>>> getAttributesMap() {
+	public @Nullable TreeMap<EquipmentSlot, TreeMap<Attribute, TreeMap<AttributeModifier.Operation, Double>>> getAttributesMap() {
 		return this.mAttributeDataMap;
 	}
 
@@ -778,68 +770,55 @@ public class MonumentaItem {
 		return this.getAttributesMap().getOrDefault(slot, new TreeMap<>()).getOrDefault(attribute, new TreeMap<>()).getOrDefault(operation, 0.0);
 	}
 
-	@Nullable
-	public ArmorMaterial getArmorMaterial() {
+	public @Nullable ArmorMaterial getArmorMaterial() {
 		return this.mArmorMaterial;
 	}
 
-	@Nullable
-	public ArmorMaterial getArmorMaterialOverride() {
+	public @Nullable ArmorMaterial getArmorMaterialOverride() {
 		return this.mArmorMaterialOverride;
 	}
 
-	@Nullable
-	public Boolean getIsMagicWand() {
+	public @Nullable Boolean getIsMagicWand() {
 		return this.mIsMagicWand;
 	}
 
-	@Nullable
-	public Boolean isMagicWand() {
+	public @Nullable Boolean isMagicWand() {
 		return mIsMagicWand;
 	}
 
-	@Nullable
-	public Boolean getUnbreakable() {
+	public @Nullable Boolean getUnbreakable() {
 		return this.mUnbreakable;
 	}
 
-	@Nullable
-	public Integer getDurability() {
+	public @Nullable Integer getDurability() {
 		return this.mBaseDurability;
 	}
 
-	@Nullable
-	public String getOldName() {
+	public @Nullable String getOldName() {
 		return this.mOldName;
 	}
 
-	@Nullable
-	public Material getOldMaterial() {
+	public @Nullable Material getOldMaterial() {
 		return this.mOldMaterial;
 	}
 
-	@Nullable
-	public TreeMap<PassiveEffect, TreeMap<Integer, Integer>> getOnConsumeMap() {
+	public @Nullable TreeMap<PassiveEffect, TreeMap<Integer, Integer>> getOnConsumeMap() {
 		return this.mOnConsumeMap;
 	}
 
-	@Nullable
-	public ArrayList<Pattern> getBannerPatterns() {
+	public @Nullable ArrayList<Pattern> getBannerPatterns() {
 		return this.mBannerPatterns;
 	}
 
-	@Nullable
-	public CraftingMaterialKind getCraftingMaterialKind() {
+	public @Nullable CraftingMaterialKind getCraftingMaterialKind() {
 		return this.mCraftingMaterialKind;
 	}
 
-	@Nullable
-	public TreeMap<Integer, String> getBookTextContentMap() {
+	public @Nullable TreeMap<Integer, String> getBookTextContentMap() {
 		return this.mBookTextContentMap;
 	}
 
-	@Nullable
-	public String getBookPage(Integer i) {
+	public @Nullable String getBookPage(Integer i) {
 		String out = null;
 		if (this.mBookTextContentMap != null) {
 			out = this.mBookTextContentMap.get(i);
@@ -847,65 +826,64 @@ public class MonumentaItem {
 		return out;
 	}
 
-	@Nullable
-	public String getBookAuthor() {
+	public @Nullable String getBookAuthor() {
 		return mBookAuthor;
 	}
 
-	public String getQuestID() {
+	public @Nullable String getQuestID() {
 		return this.mQuestID;
 	}
 
 	// setters
 
-	public void setEdits(MonumentaItem edits) {
+	public void setEdits(@Nullable MonumentaItem edits) {
 		this.mEdits = edits;
 	}
 
-	public void setName(String name) {
-		this.mName = name.replace('§', '&');
+	public void setName(@Nullable String name) {
+		this.mName = name == null ? null : name.replace('§', '&');
 	}
 
-	public void setMaterial(Material mMaterial) {
+	public void setMaterial(@Nullable Material mMaterial) {
 		this.mMaterial = mMaterial;
 		this.computeArmorMaterial();
 	}
 
-	public void setRegion(Region region) {
+	public void setRegion(@Nullable Region region) {
 		this.mRegion = region;
 	}
 
-	public void setTier(ItemTier tier) {
+	public void setTier(@Nullable ItemTier tier) {
 		this.mTier = tier;
 	}
 
-	public void setLocation(ItemLocation loc) {
+	public void setLocation(@Nullable ItemLocation loc) {
 		this.mLoc = loc;
 	}
 
-	public void setLore(TreeMap<Integer, String> lore) {
+	public void setLore(@Nullable TreeMap<Integer, String> lore) {
 		this.mLoreMap = lore;
 	}
 
 	public void setLoreLine(int index, String str) {
-		if (this.getLore() == null) {
+		if (this.mLoreMap == null) {
 			this.mLoreMap = new TreeMap<>();
 		}
 		this.mLoreMap.put(index, str);
 	}
 
 	public void setEnchantLevel(CustomEnchantment enchant, int level) {
-		if (this.getEnchantMap() == null) {
+		if (this.mEnchantMap == null) {
 			this.mEnchantMap = new TreeMap<>();
 		}
 		this.mEnchantMap.put(enchant, level);
 	}
 
-	public void setEnchantMap(TreeMap<CustomEnchantment, Integer> enchantMap) {
+	public void setEnchantMap(@Nullable TreeMap<CustomEnchantment, Integer> enchantMap) {
 		this.mEnchantMap = enchantMap;
 	}
 
-	public void setColor(int[] color) {
+	public void setColor(int @Nullable [] color) {
 		this.mColor = color;
 	}
 
@@ -913,7 +891,7 @@ public class MonumentaItem {
 		this.mLastEditedTimestamp = LocalDateTime.now().toInstant(ZoneOffset.UTC).getEpochSecond();
 	}
 
-	public void setLastEditor(String name) {
+	public void setLastEditor(@Nullable String name) {
 		this.mLastEditedBy = name;
 	}
 
@@ -962,15 +940,15 @@ public class MonumentaItem {
 		this.mArmorMaterial = ArmorMaterial.NONE;
 	}
 
-	public void setArmorMaterialOverride(ArmorMaterial armorMaterialOverride) {
+	public void setArmorMaterialOverride(@Nullable ArmorMaterial armorMaterialOverride) {
 		this.mArmorMaterialOverride = armorMaterialOverride;
 	}
 
-	public void setIsMagicWand(Boolean isMagicWand) {
+	public void setIsMagicWand(@Nullable Boolean isMagicWand) {
 		this.mIsMagicWand = isMagicWand;
 	}
 
-	public void setUnbreakable(Boolean unbreakable) {
+	public void setUnbreakable(@Nullable Boolean unbreakable) {
 		this.mUnbreakable = unbreakable;
 	}
 
@@ -978,11 +956,11 @@ public class MonumentaItem {
 		this.mBaseDurability = i;
 	}
 
-	public void setOldName(String oldName) {
+	public void setOldName(@Nullable String oldName) {
 		this.mOldName = oldName;
 	}
 
-	public void setOldMaterial(Material oldMaterial) {
+	public void setOldMaterial(@Nullable Material oldMaterial) {
 		this.mOldMaterial = oldMaterial;
 	}
 
@@ -995,25 +973,24 @@ public class MonumentaItem {
 		this.mOnConsumeMap.put(effect, valueMap);
 	}
 
-	public void setBannerPatterns(List<Pattern> patternList) {
-		ArrayList<Pattern> in = new ArrayList<>(patternList);
-		this.mBannerPatterns = in;
+	public void setBannerPatterns(@Nullable List<Pattern> patternList) {
+		this.mBannerPatterns = new ArrayList<>(patternList);
 	}
 
-	public void setBannerBaseColor(DyeColor bannerBaseColor) {
+	public void setBannerBaseColor(@Nullable DyeColor bannerBaseColor) {
 		this.mBannerBaseColor = bannerBaseColor;
 	}
 
 	public void setBanner(ItemStack banner) {
 		if (banner.getItemMeta() instanceof BannerMeta) {
-			BannerMeta bMeta = (BannerMeta)banner.getItemMeta();
+			BannerMeta bMeta = (BannerMeta) banner.getItemMeta();
 			this.setBannerPatterns(bMeta.getPatterns());
 			DyeColor c = DyeColor.valueOf(banner.getType().toString().replace("_BANNER", ""));
 			this.setBannerBaseColor(c);
 		}
 	}
 
-	public void setCraftingMaterialKind(CraftingMaterialKind kind) {
+	public void setCraftingMaterialKind(@Nullable CraftingMaterialKind kind) {
 		this.mCraftingMaterialKind = kind;
 	}
 
@@ -1024,17 +1001,17 @@ public class MonumentaItem {
 		this.mBookTextContentMap.put(page, content);
 	}
 
-	public void setBookAuthor(String mBookAuthor) {
+	public void setBookAuthor(@Nullable String mBookAuthor) {
 		this.mBookAuthor = mBookAuthor;
 	}
 
-	public void setQuestID(String mQuestID) {
+	public void setQuestID(@Nullable String mQuestID) {
 		this.mQuestID = mQuestID;
 	}
 
 	// utils
 
-	public static MonumentaItem fromItemStack(ItemStack itemStack) {
+	public static @Nullable MonumentaItem fromItemStack(ItemStack itemStack) {
 		return Plugin.getInstance().mItemManager.getMMItemWithEdits(itemStack);
 	}
 

@@ -15,7 +15,7 @@ import org.bukkit.entity.Projectile;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.metadata.FixedMetadataValue;
-import org.jetbrains.annotations.NotNull;
+
 
 public class Choler implements BaseEnchantment {
 
@@ -24,7 +24,7 @@ public class Choler implements BaseEnchantment {
 	public static final String LEVEL_METAKEY = "CholerLevelMetakey";
 
 	@Override
-	public @NotNull String getProperty() {
+	public String getProperty() {
 		return PROPERTY_NAME;
 	}
 
@@ -34,7 +34,7 @@ public class Choler implements BaseEnchantment {
 	}
 
 	@Override
-	public void onDamage(@NotNull Plugin plugin, @NotNull Player player, int level, @NotNull LivingEntity enemy, @NotNull EntityDamageByEntityEvent entityDamageByEntityEvent) {
+	public void onDamage(Plugin plugin, Player player, int level, LivingEntity enemy, EntityDamageByEntityEvent entityDamageByEntityEvent) {
 		if (EntityUtils.isStunned(enemy) || EntityUtils.isSlowed(plugin, enemy) || enemy.getFireTicks() > 0) {
 			entityDamageByEntityEvent.setDamage(entityDamageByEntityEvent.getDamage() * (1 + (DAMAGE_MLT_PER_LVL * DelveInfusionUtils.getModifiedLevel(plugin, player, level))));
 		}

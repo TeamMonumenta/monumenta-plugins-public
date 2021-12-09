@@ -17,6 +17,7 @@ import com.playmonumenta.scriptedquests.utils.QuestUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class ServerProperties {
 	/* Only the most recent instance of this is used */
@@ -143,12 +144,12 @@ public class ServerProperties {
 		return INSTANCE.mNamedPickupMats;
 	}
 
-	public static void load(Plugin plugin, CommandSender sender) {
+	public static void load(Plugin plugin, @Nullable CommandSender sender) {
 		ensureInstance();
 		INSTANCE.loadInternal(plugin, sender);
 	}
 
-	private void loadInternal(Plugin plugin, CommandSender sender) {
+	private void loadInternal(Plugin plugin, @Nullable CommandSender sender) {
 		QuestUtils.loadScriptedQuests(plugin, ".", sender, (object) -> {
 			mDailyResetEnabled = getPropertyValueBool(plugin, object, "dailyResetEnabled", mDailyResetEnabled);
 			mJoinMessagesEnabled = getPropertyValueBool(plugin, object, "joinMessagesEnabled", mJoinMessagesEnabled);

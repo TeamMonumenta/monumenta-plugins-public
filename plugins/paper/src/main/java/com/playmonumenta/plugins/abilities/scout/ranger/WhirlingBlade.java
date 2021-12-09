@@ -16,6 +16,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityManager;
@@ -46,7 +47,7 @@ public class WhirlingBlade extends MultipleChargeAbility {
 	private final float mKnockback;
 
 	private int mLastCastTicks = 0;
-	private WindBomb mWindBomb;
+	private @Nullable WindBomb mWindBomb;
 
 	public WhirlingBlade(Plugin plugin, Player player) {
 		super(plugin, player, "Whirling Blade");
@@ -64,7 +65,7 @@ public class WhirlingBlade extends MultipleChargeAbility {
 
 		if (player != null) {
 			Bukkit.getScheduler().runTask(plugin, () -> {
-				mWindBomb = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(mPlayer, WindBomb.class);
+				mWindBomb = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, WindBomb.class);
 			});
 		}
 	}

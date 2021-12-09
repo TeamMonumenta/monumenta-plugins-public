@@ -196,6 +196,9 @@ public class FirmamentOverride extends BaseOverride {
 		}
 
 		List<Component> lore = item.getItemMeta().lore();
+		if (lore == null) {
+			return true;
+		}
 		List<Component> newLore = new ArrayList<>();
 		boolean foundLine = false;
 		if (InventoryUtils.testForItemWithName(item, ITEM_NAME)) {

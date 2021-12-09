@@ -5,8 +5,8 @@ import com.playmonumenta.plugins.utils.FastUtils;
 
 import org.bukkit.Location;
 import org.bukkit.Particle;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 
 
@@ -28,35 +28,35 @@ public class PPGroundCircle extends PartialParticle {
 	 * Constructors
 	 */
 
-	public PPGroundCircle(@NotNull Particle particle, @NotNull Location centerLocation, int count, double delta, double extra) {
+	public PPGroundCircle(Particle particle, Location centerLocation, int count, double delta, double extra) {
 		super(particle, centerLocation, count, delta, extra);
 	}
 
-	public PPGroundCircle(@NotNull Particle particle, @NotNull Location centerLocation, int count, double delta, double extra, @Nullable Object data) {
+	public PPGroundCircle(Particle particle, Location centerLocation, int count, double delta, double extra, @Nullable Object data) {
 		super(particle, centerLocation, count, delta, extra, data);
 	}
 
-	public PPGroundCircle(@NotNull Particle particle, @NotNull Location centerLocation, int count, double delta, double extra, @Nullable Object data, boolean directionalMode, double extraVariance) {
+	public PPGroundCircle(Particle particle, Location centerLocation, int count, double delta, double extra, @Nullable Object data, boolean directionalMode, double extraVariance) {
 		super(particle, centerLocation, count, delta, extra, data, directionalMode, extraVariance);
 	}
 
-	public PPGroundCircle(@NotNull Particle particle, @NotNull Location centerLocation, int count, double delta, double extra, @Nullable Object data, boolean directionalMode, double extraVariance, boolean minimumMultiplier) {
+	public PPGroundCircle(Particle particle, Location centerLocation, int count, double delta, double extra, @Nullable Object data, boolean directionalMode, double extraVariance, boolean minimumMultiplier) {
 		super(particle, centerLocation, count, delta, extra, data, directionalMode, extraVariance, minimumMultiplier);
 	}
 
-	public PPGroundCircle(@NotNull Particle particle, @NotNull Location centerLocation, int count, double deltaX, double deltaY, double deltaZ, double extra) {
+	public PPGroundCircle(Particle particle, Location centerLocation, int count, double deltaX, double deltaY, double deltaZ, double extra) {
 		super(particle, centerLocation, count, deltaX, deltaY, deltaZ, extra);
 	}
 
-	public PPGroundCircle(@NotNull Particle particle, @NotNull Location centerLocation, int count, double deltaX, double deltaY, double deltaZ, double extra, @Nullable Object data) {
+	public PPGroundCircle(Particle particle, Location centerLocation, int count, double deltaX, double deltaY, double deltaZ, double extra, @Nullable Object data) {
 		super(particle, centerLocation, count, deltaX, deltaY, deltaZ, extra, data);
 	}
 
-	public PPGroundCircle(@NotNull Particle particle, @NotNull Location centerLocation, int count, double deltaX, double deltaY, double deltaZ, double extra, @Nullable Object data, boolean directionalMode, double extraVariance) {
+	public PPGroundCircle(Particle particle, Location centerLocation, int count, double deltaX, double deltaY, double deltaZ, double extra, @Nullable Object data, boolean directionalMode, double extraVariance) {
 		super(particle, centerLocation, count, deltaX, deltaY, deltaZ, extra, data, directionalMode, extraVariance);
 	}
 
-	public PPGroundCircle(@NotNull Particle particle, @NotNull Location centerLocation, int count, double deltaX, double deltaY, double deltaZ, double extra, @Nullable Object data, boolean directionalMode, double extraVariance, boolean minimumMultiplier) {
+	public PPGroundCircle(Particle particle, Location centerLocation, int count, double deltaX, double deltaY, double deltaZ, double extra, @Nullable Object data, boolean directionalMode, double extraVariance, boolean minimumMultiplier) {
 		super(particle, centerLocation, count, deltaX, deltaY, deltaZ, extra, data, directionalMode, extraVariance, minimumMultiplier);
 	}
 
@@ -110,9 +110,9 @@ public class PPGroundCircle extends PartialParticle {
 	 */
 
 	@Override
-	protected void doSpawn(@NotNull ParticleBuilder packagedValues) {
+	protected void doSpawn(ParticleBuilder packagedValues) {
 		int partialCount = packagedValues.count();
-		@NotNull Location centerLocation = packagedValues.location();
+		Location centerLocation = packagedValues.location();
 		// Spawning one by one, looping manually by partialCount times.
 		// spawnWithSettings() will handle whether count should be 0 for
 		// directional mode
@@ -143,7 +143,7 @@ public class PPGroundCircle extends PartialParticle {
 				offsetZ *= inwardFactor;
 			}
 
-			@NotNull Location currentLocation = centerLocation.clone();
+			Location currentLocation = centerLocation.clone();
 			currentLocation.add(offsetX, 0, offsetZ);
 			packagedValues.location(currentLocation);
 

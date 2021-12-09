@@ -6,8 +6,6 @@ import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
-import org.bukkit.attribute.Attribute;
-import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -50,7 +48,7 @@ public class EnchantedPrayerAoE extends Effect {
 
 	@Override
 	public boolean entityDealDamageEvent(EntityDamageByEntityEvent event) {
-		if (mAffectedDamageCauses == null || mAffectedDamageCauses.contains(event.getCause())) {
+		if (mPlayer != null && (mAffectedDamageCauses == null || mAffectedDamageCauses.contains(event.getCause()))) {
 			Entity damagee = event.getEntity();
 			World world = mPlayer.getWorld();
 			world.playSound(damagee.getLocation(), Sound.ENTITY_FIREWORK_ROCKET_BLAST, 1, 0.9f);
@@ -60,8 +58,7 @@ public class EnchantedPrayerAoE extends Effect {
 			for (LivingEntity le : EntityUtils.getNearbyMobs(damagee.getLocation(), 3.5)) {
 				EntityUtils.damageEntity(mPlugin, le, mDamageAmount, mPlayer, MagicType.HOLY, true, ClassAbility.ENCHANTED_PRAYER, false, false, true, false);
 			}
-			AttributeInstance maxHealth = mPlayer.getAttribute(Attribute.GENERIC_MAX_HEALTH);
-			PlayerUtils.healPlayer(mPlayer, maxHealth.getValue() * mHealAmount);
+			PlayerUtils.healPlayer(mPlayer, EntityUtils.getMaxHealth(mPlayer) * mHealAmount);
 			setDuration(0);
 		}
 

@@ -3,9 +3,6 @@ package com.playmonumenta.plugins.listeners;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.NavigableSet;
-
-import javax.annotation.Nullable;
 
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
@@ -90,7 +87,6 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.projectiles.ProjectileSource;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.jetbrains.annotations.NotNull;
 
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Constants.Colors;
@@ -98,7 +94,6 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.attributes.AttributeProjectileDamage;
 import com.playmonumenta.plugins.attributes.AttributeThrowRate;
 import com.playmonumenta.plugins.commands.ToggleSwap;
-import com.playmonumenta.plugins.effects.Effect;
 import com.playmonumenta.plugins.effects.Stasis;
 import com.playmonumenta.plugins.enchantments.Bleeding;
 import com.playmonumenta.plugins.enchantments.Decay;
@@ -146,8 +141,6 @@ import net.kyori.adventure.text.format.TextDecoration;
 
 
 public class PlayerListener implements Listener {
-
-	public static final String STASIS = "Stasis";
 
 	Plugin mPlugin = null;
 
@@ -210,9 +203,11 @@ public class PlayerListener implements Listener {
 
 	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	public void onPlayerMove(PlayerMoveEvent event) {
+		if (event.isCancelled()) {
+			return;
+		}
 		Player player = event.getPlayer();
-		NavigableSet<Effect> effects = mPlugin.mEffectManager.getEffects(player, STASIS);
-		if (effects != null && mPlugin.mEffectManager.getEffects(player, STASIS) != null && (mPlugin.mEffectManager.getEffects(player, STASIS)).contains(new Stasis(120))) {
+		if (mPlugin.mEffectManager.hasEffect(player, Stasis.class)) {
 			Location to = event.getFrom();
 			to.setPitch(event.getTo().getPitch());
 			to.setYaw(event.getTo().getYaw());
@@ -278,13 +273,14 @@ public class PlayerListener implements Listener {
 		Player player = event.getPlayer();
 		Block block = event.getBlock();
 
-		NavigableSet<Effect> effects = mPlugin.mEffectManager.getEffects(player, STASIS);
-		if (effects != null && mPlugin.mEffectManager.getEffects(player, STASIS) != null && (mPlugin.mEffectManager.getEffects(player, STASIS)).contains(new Stasis(120))) {
+		if (mPlugin.mEffectManager.hasEffect(player, Stasis.class)) {
 			event.setCancelled(true);
+			return;
 		}
 
 		if (!mPlugin.mItemOverrides.blockPlaceInteraction(mPlugin, player, item, event)) {
 			event.setCancelled(true);
+			return;
 		}
 
 		//Prevent players in survival mode breaking blocks in adventure mode zones not including plots
@@ -294,13 +290,16 @@ public class PlayerListener implements Listener {
 		}
 	}
 
-	// Player interacts with an entity (not triggered on armor stands for some reason
+	// Player interacts with an entity (not triggered on armor stands for some reason)
 	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
 	public void playerInteractEntityEvent(PlayerInteractEntityEvent event) {
+		if (event.isCancelled()) {
+			return;
+		}
 		Player player = event.getPlayer();
-		NavigableSet<Effect> effects = mPlugin.mEffectManager.getEffects(player, STASIS);
-		if (effects != null && mPlugin.mEffectManager.getEffects(player, STASIS) != null && (mPlugin.mEffectManager.getEffects(player, STASIS)).contains(new Stasis(120))) {
+		if (mPlugin.mEffectManager.hasEffect(player, Stasis.class)) {
 			event.setCancelled(true);
+			return;
 		}
 		/* Don't let the player do this when in a restricted zone */
 		if (ZoneUtils.hasZoneProperty(player, ZoneProperty.RESTRICTED) && player.getGameMode() != GameMode.CREATIVE) {
@@ -371,11 +370,11 @@ public class PlayerListener implements Listener {
 	// Player interacts with an armor stand
 	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	public void playerArmorStandManipulateEvent(PlayerArmorStandManipulateEvent event) {
-		NavigableSet<Effect> effects = mPlugin.mEffectManager.getEffects(event.getPlayer(), STASIS);
-		if (effects != null && mPlugin.mEffectManager.getEffects(event.getPlayer(), STASIS) != null && (mPlugin.mEffectManager.getEffects(event.getPlayer(), STASIS)).contains(new Stasis(120))) {
-			event.setCancelled(true);
-		}
 		Player player = event.getPlayer();
+		if (mPlugin.mEffectManager.hasEffect(player, Stasis.class)) {
+			event.setCancelled(true);
+			return;
+		}
 		ArmorStand armorStand = event.getRightClicked();
 
 		/* Don't let the player do this in a restricted zone */
@@ -394,9 +393,12 @@ public class PlayerListener implements Listener {
 
 	@EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
 	public void entityShootBowEvent(EntityShootBowEvent event) {
-		NavigableSet<Effect> effects = mPlugin.mEffectManager.getEffects(event.getEntity(), STASIS);
-		if (effects != null && mPlugin.mEffectManager.getEffects(event.getEntity(), STASIS) != null && (mPlugin.mEffectManager.getEffects(event.getEntity(), STASIS)).contains(new Stasis(120))) {
+		if (event.isCancelled()) {
+			return;
+		}
+		if (mPlugin.mEffectManager.hasEffect(event.getEntity(), Stasis.class)) {
 			event.setCancelled(true);
+			return;
 		}
 		if (event.getEntity() instanceof Player && event.getArrowItem() != null && event.getArrowItem().hasItemMeta() && event.getArrowItem().getItemMeta().hasLore()) {
 			mPlugin.mAttributeManager.mAttributeTrie.resetArrow((Player) event.getEntity());
@@ -407,6 +409,9 @@ public class PlayerListener implements Listener {
 	// The Player swapped their current selected item.
 	@EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
 	public void playerItemHeldEvent(PlayerItemHeldEvent event) {
+		if (event.isCancelled()) {
+			return;
+		}
 		InventoryUtils.scheduleDelayedEquipmentCheck(mPlugin, event.getPlayer(), event);
 	}
 
@@ -428,9 +433,9 @@ public class PlayerListener implements Listener {
 	public void entityPickupItemEvent(EntityPickupItemEvent event) {
 		if (event.getEntity() instanceof Player) {
 			Player player = (Player) event.getEntity();
-			NavigableSet<Effect> effects = mPlugin.mEffectManager.getEffects(event.getEntity(), STASIS);
-			if (effects != null && (mPlugin.mEffectManager.getEffects(player, STASIS)).contains(new Stasis(120))) {
+			if (mPlugin.mEffectManager.hasEffect(player, Stasis.class)) {
 				event.setCancelled(true);
+				return;
 			}
 			/* Don't let the player do this when in a restricted zone */
 			if (ZoneUtils.hasZoneProperty(player, ZoneProperty.RESTRICTED) && player.getGameMode() != GameMode.CREATIVE) {
@@ -571,6 +576,9 @@ public class PlayerListener implements Listener {
 	// Player ran a command
 	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	public void playerCommandPreprocessEvent(PlayerCommandPreprocessEvent event) {
+		if (event.isCancelled()) {
+			return;
+		}
 		final String NBT_EDITOR_OPTIONAL_PREFIX = "nbteditor:";
 
 		Player player = event.getPlayer();
@@ -671,14 +679,15 @@ public class PlayerListener implements Listener {
 
 	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	public void playerFishEvent(PlayerFishEvent event) {
-		NavigableSet<Effect> effects = mPlugin.mEffectManager.getEffects(event.getPlayer(), STASIS);
-		if (effects != null && mPlugin.mEffectManager.getEffects(event.getPlayer(), STASIS) != null && (mPlugin.mEffectManager.getEffects(event.getPlayer(), STASIS)).contains(new Stasis(120))) {
+		Player player = event.getPlayer();
+		if (mPlugin.mEffectManager.hasEffect(player, Stasis.class)) {
 			event.setCancelled(true);
+			return;
 		}
 		if (event.getState() == State.FISHING) {
-			mPlugin.mTrackingManager.mFishingHook.addEntity(event.getPlayer(), event.getHook());
+			mPlugin.mTrackingManager.mFishingHook.addEntity(player, event.getHook());
 		} else if (event.getState() == State.CAUGHT_ENTITY || event.getState() == State.CAUGHT_FISH) {
-			mPlugin.mTrackingManager.mFishingHook.removeEntity(event.getPlayer());
+			mPlugin.mTrackingManager.mFishingHook.removeEntity(player);
 
 			if (event.getState() == State.CAUGHT_ENTITY && !EntityUtils.isHostileMob(event.getCaught())) {
 				event.setCancelled(true);
@@ -689,8 +698,7 @@ public class PlayerListener implements Listener {
 	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	public void playerItemConsumeEvent(PlayerItemConsumeEvent event) {
 		Player player = event.getPlayer();
-		NavigableSet<Effect> effects = mPlugin.mEffectManager.getEffects(player, STASIS);
-		if (effects != null && mPlugin.mEffectManager.getEffects(event.getPlayer(), STASIS) != null && (mPlugin.mEffectManager.getEffects(event.getPlayer(), STASIS)).contains(new Stasis(120))) {
+		if (mPlugin.mEffectManager.hasEffect(player, Stasis.class)) {
 			event.setCancelled(true);
 			return;
 		}
@@ -754,18 +762,19 @@ public class PlayerListener implements Listener {
 	// An item has taken damage.
 	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	public void playerItemDamageEvent(PlayerItemDamageEvent event) {
-		NavigableSet<Effect> effects = mPlugin.mEffectManager.getEffects(event.getPlayer(), STASIS);
-		if (effects != null && mPlugin.mEffectManager.getEffects(event.getPlayer(), STASIS) != null && (mPlugin.mEffectManager.getEffects(event.getPlayer(), STASIS)).contains(new Stasis(120))) {
+		Player player = event.getPlayer();
+		if (mPlugin.mEffectManager.hasEffect(player, Stasis.class)) {
 			event.setCancelled(true);
+			return;
 		}
 		ItemStack item = event.getItem();
-		mPlugin.mAbilityManager.playerItemDamageEvent(event.getPlayer(), event);
+		mPlugin.mAbilityManager.playerItemDamageEvent(player, event);
 
 		int damage = event.getDamage();
 
 		if (ItemUtils.isArmor(item)) {
 			// Players that get resistance from safezones don't take armor damage
-			if (damage < 0 || ZoneUtils.hasZoneProperty(event.getPlayer(), ZoneProperty.NO_EQUIPMENT_DAMAGE)) {
+			if (damage < 0 || ZoneUtils.hasZoneProperty(player, ZoneProperty.NO_EQUIPMENT_DAMAGE)) {
 				damage = 0;
 			}
 
@@ -773,19 +782,18 @@ public class PlayerListener implements Listener {
 		}
 
 		//Tridents do not take damage in safezones
-		if (event.getItem().getType() == Material.TRIDENT && ZoneUtils.hasZoneProperty(event.getPlayer(), ZoneProperty.NO_EQUIPMENT_DAMAGE)) {
+		if (event.getItem().getType() == Material.TRIDENT && ZoneUtils.hasZoneProperty(player, ZoneProperty.NO_EQUIPMENT_DAMAGE)) {
 			event.setDamage(0);
 		}
 
-		mPlugin.mTrackingManager.mPlayers.onItemDamage(mPlugin, event.getPlayer(), event);
+		mPlugin.mTrackingManager.mPlayers.onItemDamage(mPlugin, player, event);
 	}
 
 	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	public void playerRiptideEvent(PlayerRiptideEvent event) {
 		Player player = event.getPlayer();
 		Location loc = player.getLocation();
-		NavigableSet<Effect> effects = mPlugin.mEffectManager.getEffects(player, STASIS);
-		boolean stasis = effects != null && mPlugin.mEffectManager.getEffects(event.getPlayer(), STASIS) != null && (mPlugin.mEffectManager.getEffects(event.getPlayer(), STASIS)).contains(new Stasis(120));
+		boolean stasis = mPlugin.mEffectManager.hasEffect(player, Stasis.class);
 
 		//Manually forces the player in place during the riptide if they use it out of water (in rain)
 		if (stasis || !mPlugin.mItemOverrides.playerRiptide(mPlugin, player, event)) {
@@ -813,15 +821,18 @@ public class PlayerListener implements Listener {
 
 	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
 	public void playerTeleportEvent(PlayerTeleportEvent event) {
+		if (event.isCancelled()) {
+			return;
+		}
 		// Cancel teleports caused by forbidden sources
 		TeleportCause cause = event.getCause();
 		if (cause.equals(TeleportCause.CHORUS_FRUIT)
-		    || cause.equals(TeleportCause.END_GATEWAY)
-		    || cause.equals(TeleportCause.END_PORTAL)
-		    || (cause.equals(TeleportCause.ENDER_PEARL)
-		        && (ZoneUtils.hasZoneProperty(event.getFrom(), ZoneProperty.ADVENTURE_MODE)
-		            || ZoneUtils.hasZoneProperty(event.getTo(), ZoneProperty.ADVENTURE_MODE)))
-		    || cause.equals(TeleportCause.NETHER_PORTAL)) {
+			|| cause.equals(TeleportCause.END_GATEWAY)
+			|| cause.equals(TeleportCause.END_PORTAL)
+			|| (cause.equals(TeleportCause.ENDER_PEARL)
+			&& (ZoneUtils.hasZoneProperty(event.getFrom(), ZoneProperty.ADVENTURE_MODE)
+			|| ZoneUtils.hasZoneProperty(event.getTo(), ZoneProperty.ADVENTURE_MODE)))
+			|| cause.equals(TeleportCause.NETHER_PORTAL)) {
 			event.setCancelled(true);
 			return;
 		}
@@ -883,12 +894,12 @@ public class PlayerListener implements Listener {
 			return;
 		}
 
-		/** Implements bed teleporters.
+		/* Implements bed teleporters.
 		 *
 		 * When a player sleeps in a bed, the 10 blocks under that bed are checked for
 		 * a regular command block.
 		 *
-		 * If a command block is found, it's command string is used for coordinates to teleport
+		 * If a command block is found, its command string is used for coordinates to teleport
 		 * the player to after a short delay
 		 */
 		for (double y = 10; y > 0; y--) {
@@ -960,7 +971,7 @@ public class PlayerListener implements Listener {
 								world.playSound(teleLoc, Sound.ENTITY_ELDER_GUARDIAN_DEATH, 1.0f, 1.3f);
 
 								this.cancel();
-							} else if (player.isSleeping() == false) {
+							} else if (!player.isSleeping()) {
 								// Abort, player got out of bed early
 								this.cancel();
 								return;
@@ -983,6 +994,9 @@ public class PlayerListener implements Listener {
 	 */
 	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
 	public void playerBedLeaveEvent(PlayerBedLeaveEvent event) {
+		if (event.isCancelled()) {
+			return;
+		}
 		Player player = event.getPlayer();
 		if (MetadataUtils.checkOnceThisTick(mPlugin, player, PLAYER_LEFT_BED_TICK_METAKEY)) {
 			Block bed = event.getBed();
@@ -993,6 +1007,9 @@ public class PlayerListener implements Listener {
 
 	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	public void playerToggleSneakEvent(PlayerToggleSneakEvent event) {
+		if (event.isCancelled()) {
+			return;
+		}
 		Player player = event.getPlayer();
 
 		if (event.isSneaking()) {
@@ -1027,6 +1044,9 @@ public class PlayerListener implements Listener {
 
 	@EventHandler(ignoreCancelled = true)
 	public void abilityCastEvent(AbilityCastEvent event) {
+		if (event.isCancelled()) {
+			return;
+		}
 		Player player = event.getCaster();
 		mPlugin.mAbilityManager.abilityCastEvent(player, event);
 	}
@@ -1037,10 +1057,9 @@ public class PlayerListener implements Listener {
 		ItemStack item = player.getInventory().getItemInMainHand();
 		Block block = event.getBlock();
 
-		String s = "Stasis";
-		NavigableSet<Effect> effects = mPlugin.mEffectManager.getEffects(player, s);
-		if (effects != null && mPlugin.mEffectManager.getEffects(event.getPlayer(), s) != null && (mPlugin.mEffectManager.getEffects(event.getPlayer(), s)).contains(new Stasis(120))) {
+		if (mPlugin.mEffectManager.hasEffect(player, Stasis.class)) {
 			event.setCancelled(true);
+			return;
 		}
 		if (!mPlugin.mItemOverrides.blockBreakInteraction(mPlugin, event.getPlayer(), block, event)) {
 			event.setCancelled(true);
@@ -1059,14 +1078,16 @@ public class PlayerListener implements Listener {
 	@EventHandler(ignoreCancelled = true)
 	public void evasionEvent(EvasionEvent event) {
 		Player player = event.getPlayer();
-		NavigableSet<Effect> effects = mPlugin.mEffectManager.getEffects(player, STASIS);
-		if (effects == null || !(mPlugin.mEffectManager.getEffects(player, STASIS)).contains(new Stasis(120))) {
+		if (!mPlugin.mEffectManager.hasEffect(player, Stasis.class)) {
 			mPlugin.mTrackingManager.mPlayers.onEvade(mPlugin, player, event);
 		}
 	}
 
 	@EventHandler(ignoreCancelled = true)
 	public void playerAnimationEvent(PlayerAnimationEvent event) {
+		if (event.isCancelled()) {
+			return;
+		}
 		Player player = event.getPlayer();
 		if (event.getAnimationType().equals(PlayerAnimationType.ARM_SWING)) {
 			mPlugin.mAbilityManager.playerAnimationEvent(player, event);
@@ -1076,6 +1097,9 @@ public class PlayerListener implements Listener {
 	//Player is healed.
 	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	public void onRegain(EntityRegainHealthEvent event) {
+		if (event.isCancelled()) {
+			return;
+		}
 		if (event.getEntity() instanceof Player) {
 			Player player = (Player) event.getEntity();
 			mPlugin.mTrackingManager.mPlayers.onRegain(mPlugin, player, event);
@@ -1093,9 +1117,7 @@ public class PlayerListener implements Listener {
 		Entity damagee = event.getEntity();
 		Entity damager = event.getDamager();
 
-		NavigableSet<Effect> effects = mPlugin.mEffectManager.getEffects(damagee, STASIS);
-		if (effects != null && (mPlugin.mEffectManager.getEffects(damager, STASIS) != null && (mPlugin.mEffectManager.getEffects(event.getDamager(), STASIS)).contains(new Stasis(120))) ||
-				(mPlugin.mEffectManager.getEffects(damagee, STASIS) != null && (mPlugin.mEffectManager.getEffects(damagee, STASIS)).contains(new Stasis(120)))) {
+		if (mPlugin.mEffectManager.hasEffect(damagee, Stasis.class) || mPlugin.mEffectManager.hasEffect(damager, Stasis.class)) {
 			event.setCancelled(true);
 			return;
 		}
@@ -1167,12 +1189,12 @@ public class PlayerListener implements Listener {
 	 * switching into either gamemode.
 	 */
 	@EventHandler(ignoreCancelled = true)
-	public void gamemodeCorrection(@NotNull PlayerGameModeChangeEvent event) {
-		@NotNull GameMode newGameMode = event.getNewGameMode();
-		@NotNull Player player = event.getPlayer();
+	public void gamemodeCorrection(PlayerGameModeChangeEvent event) {
+		GameMode newGameMode = event.getNewGameMode();
+		Player player = event.getPlayer();
 		boolean shouldBeAdventure = (
 			ZoneUtils.hasZoneProperty(player, ZoneProperty.ADVENTURE_MODE)
-			&& !ZoneUtils.isInPlot(player)
+				&& !ZoneUtils.isInPlot(player)
 		);
 
 		//NOTE Once we update Paper version more,
@@ -1256,16 +1278,16 @@ public class PlayerListener implements Listener {
 	 * when switching to/from spectator.
 	 */
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-	public void spectatorAbilityRefresh(@NotNull PlayerGameModeChangeEvent event) {
-		@NotNull Player player = event.getPlayer();
-		@NotNull GameMode oldGameMode = player.getGameMode();
-		@NotNull GameMode newGameMode = event.getNewGameMode();
+	public void spectatorAbilityRefresh(PlayerGameModeChangeEvent event) {
+		Player player = event.getPlayer();
+		GameMode oldGameMode = player.getGameMode();
+		GameMode newGameMode = event.getNewGameMode();
 
 		if (
 			GameMode.SPECTATOR.equals(oldGameMode)
-			|| GameMode.SPECTATOR.equals(newGameMode)
+				|| GameMode.SPECTATOR.equals(newGameMode)
 		) {
-			@Nullable Plugin plugin = Plugin.getInstance();
+			Plugin plugin = Plugin.getInstance();
 			if (plugin != null) {
 				new BukkitRunnable() {
 					@Override
@@ -1281,8 +1303,11 @@ public class PlayerListener implements Listener {
 	 * Prevent crafting with custom items
 	 */
 	@EventHandler(ignoreCancelled = true)
-	public void craftItemEvent(@NotNull CraftItemEvent event) {
+	public void craftItemEvent(CraftItemEvent event) {
 		ItemStack result = event.getCurrentItem();
+		if (result == null) {
+			return;
+		}
 		Material resultMat = result.getType();
 		String resultMatStr = resultMat.getKey().toString();
 
@@ -1291,9 +1316,9 @@ public class PlayerListener implements Listener {
 		boolean gotDye = false;
 		boolean resultIsDyed = false;
 		if (resultMat.equals(Material.FIREWORK_STAR)
-		    || resultMatStr.startsWith("minecraft:leather_")
-		    || resultMatStr.endsWith("_banner")
-		    || resultMatStr.endsWith("_shulker_box")) {
+			|| resultMatStr.startsWith("minecraft:leather_")
+			|| resultMatStr.endsWith("_banner")
+			|| resultMatStr.endsWith("_shulker_box")) {
 			resultIsDyed = true;
 		}
 

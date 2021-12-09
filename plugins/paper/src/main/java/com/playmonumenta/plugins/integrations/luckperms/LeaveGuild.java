@@ -2,14 +2,13 @@ package com.playmonumenta.plugins.integrations.luckperms;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map.Entry;
-
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.utils.ScoreboardUtils;
 
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
+
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.utils.ScoreboardUtils;
 
 import dev.jorel.commandapi.CommandAPI;
 import dev.jorel.commandapi.CommandAPICommand;
@@ -50,6 +49,7 @@ public class LeaveGuild {
 			String err = ChatColor.RED + "You are not in a guild";
 			player.sendMessage(err);
 			CommandAPI.fail(err);
+			throw new RuntimeException();
 		}
 
 		String guildName = LuckPermsIntegration.getGuildName(group);
@@ -58,6 +58,9 @@ public class LeaveGuild {
 			@Override
 			public void run() {
 				User user = LuckPermsIntegration.UM.getUser(player.getUniqueId());
+				if (user == null) {
+					return;
+				}
 				for (InheritanceNode node : user.getNodes(NodeType.INHERITANCE)) {
 					if (node.getGroupName().equals(group.getName())) {
 						user.data().remove(node);

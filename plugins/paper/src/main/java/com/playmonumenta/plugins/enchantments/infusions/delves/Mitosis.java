@@ -17,7 +17,7 @@ import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
-import org.jetbrains.annotations.NotNull;
+
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.event.block.BlockBreakEvent;
 
@@ -30,7 +30,7 @@ public class Mitosis implements BaseEnchantment {
 	private static final Particle.DustOptions COLOR = new Particle.DustOptions(Color.fromRGB(214, 148, 181), 1.0f);
 
 	@Override
-	public @NotNull String getProperty() {
+	public String getProperty() {
 		return PROPERTY_NAME;
 	}
 

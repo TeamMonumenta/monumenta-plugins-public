@@ -16,7 +16,7 @@ import org.bukkit.entity.Projectile;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.metadata.FixedMetadataValue;
-import org.jetbrains.annotations.NotNull;
+
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
@@ -35,12 +35,12 @@ public class Frost implements BaseEnchantment {
 		= new Particle.DustOptions(Color.fromRGB(85, 170, 255), 0.75f);
 
 	@Override
-	public @NotNull String getProperty() {
+	public String getProperty() {
 		return "Frost";
 	}
 
 	@Override
-	public @NotNull EnumSet<ItemSlot> getValidSlots() {
+	public EnumSet<ItemSlot> getValidSlots() {
 		return EnumSet.of(ItemSlot.MAINHAND);
 	}
 
@@ -51,11 +51,11 @@ public class Frost implements BaseEnchantment {
 
 	@Override
 	public void onLaunchProjectile(
-		@NotNull Plugin plugin,
-		@NotNull Player player,
+		Plugin plugin,
+		Player player,
 		int level,
-		@NotNull Projectile projectile,
-		@NotNull ProjectileLaunchEvent projectileLaunchEvent
+		Projectile projectile,
+		ProjectileLaunchEvent projectileLaunchEvent
 	) {
 		if (EntityUtils.isSomeArrow(projectile)) {
 			projectile.setMetadata(METADATA_KEY, new FixedMetadataValue(plugin, 1));
@@ -70,10 +70,10 @@ public class Frost implements BaseEnchantment {
 	 * This works this way because you might have the enchantment when you fire the arrow, but switch to a different item before it hits
 	 */
 	public static void onShootAttack(
-		@NotNull Plugin plugin,
-		@NotNull Projectile projectile,
-		@NotNull LivingEntity enemy,
-		@NotNull EntityDamageByEntityEvent entityDamageByEntityEvent
+		Plugin plugin,
+		Projectile projectile,
+		LivingEntity enemy,
+		EntityDamageByEntityEvent entityDamageByEntityEvent
 	) {
 		if (projectile.hasMetadata(METADATA_KEY)) {
 			if (enemy instanceof Blaze) {
@@ -123,8 +123,8 @@ public class Frost implements BaseEnchantment {
 			partialParticle.mCount = 10;
 			partialParticle.spawnAsEnemy();
 
-			@NotNull World world = enemy.getWorld();
-			@NotNull Location enemyLocation = enemy.getLocation();
+			World world = enemy.getWorld();
+			Location enemyLocation = enemy.getLocation();
 			// /playsound block.soul_sand.place master @p ~ ~ ~ 1 0.5
 			world.playSound(
 				enemyLocation,

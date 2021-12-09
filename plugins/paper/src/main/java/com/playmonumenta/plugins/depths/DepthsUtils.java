@@ -29,6 +29,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -286,16 +287,16 @@ public class DepthsUtils {
 	}
 
 	public static void splitLoreLine(ItemMeta meta, String lore, int maxLength, ChatColor defaultColor) {
-		String[] splitLine = lore.split(" ");
-		String currentString = defaultColor + "";
-		List<String> finalLines = new ArrayList<String>();
-		if (meta.getLore() != null && meta.getLore().size() > 0) {
-			for (String line : meta.getLore()) {
-				finalLines.add(line);
-			}
+		List<String> finalLines = new ArrayList<>();
+
+		List<String> existingLore = meta.getLore();
+		if (existingLore != null) {
+			finalLines.addAll(existingLore);
 		}
 
 		int currentLength = 0;
+		String[] splitLine = lore.split(" ");
+		String currentString = defaultColor + "";
 		for (String word : splitLine) {
 			if (currentLength + word.length() > maxLength) {
 				finalLines.add(currentString);
@@ -305,7 +306,7 @@ public class DepthsUtils {
 			currentString += word + " ";
 			currentLength += word.length() + 1;
 		}
-		if (currentString != defaultColor + "") {
+		if (!currentString.equals(defaultColor + "")) {
 			finalLines.add(currentString);
 		}
 		meta.setLore(finalLines);
@@ -335,9 +336,10 @@ public class DepthsUtils {
 
 	/**
 	 * Returns the party of nearby players, if applicable
+	 *
 	 * @return nearby party, otherwise null if none exists
 	 */
-	public static DepthsParty getPartyFromNearbyPlayers(Location l) {
+	public static @Nullable DepthsParty getPartyFromNearbyPlayers(Location l) {
 
 		List<Player> players = PlayerUtils.playersInRange(l, 30.0, true);
 
@@ -379,7 +381,7 @@ public class DepthsUtils {
 		}.runTaskLater(Plugin.getInstance(), 5);
 	}
 
-	public static DepthsRewardType rewardFromRoom(DepthsRoomType roomType) {
+	public static @Nullable DepthsRewardType rewardFromRoom(DepthsRoomType roomType) {
 		if (roomType == DepthsRoomType.ABILITY) {
 			return DepthsRewardType.ABILITY;
 		} else if (roomType == DepthsRoomType.ABILITY_ELITE) {

@@ -20,6 +20,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
@@ -48,7 +49,7 @@ public class ChaosDagger extends DepthsAbility {
 	private static final int TARGET_RADIUS = 20;
 	private static final int ELITE_RADIUS = 5;
 
-	private Entity mHitMob;
+	private @Nullable Entity mHitMob;
 
 	public ChaosDagger(Plugin plugin, Player player) {
 		super(plugin, player, ABILITY_NAME);

@@ -22,6 +22,7 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.classes.ClassAbility;
@@ -48,8 +49,8 @@ public class Metalmancy extends DepthsAbility {
 	public static final int TICK_INTERVAL = 5;
 	public static final String OWNER_METADATA_TAG = "MetalmancyOwnerMetadataTag";
 
-	private Mob mGolem;
-	private Mob mTarget;
+	private @Nullable Mob mGolem;
+	private @Nullable Mob mTarget;
 
 	public Metalmancy(Plugin plugin, Player player) {
 		super(plugin, player, ABILITY_NAME);

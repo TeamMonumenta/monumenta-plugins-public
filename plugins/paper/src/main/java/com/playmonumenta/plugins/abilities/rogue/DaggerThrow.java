@@ -118,7 +118,7 @@ public class DaggerThrow extends Ability {
 
 	@Override
 	public boolean runCheck() {
-		if (mPlayer.isSneaking() && mPlayer.getLocation().getPitch() > -50) {
+		if (mPlayer != null && mPlayer.isSneaking() && mPlayer.getLocation().getPitch() > -50) {
 			ItemStack mainHand = mPlayer.getInventory().getItemInMainHand();
 			ItemStack offHand = mPlayer.getInventory().getItemInOffHand();
 			return InventoryUtils.rogueTriggerCheck(mainHand, offHand);

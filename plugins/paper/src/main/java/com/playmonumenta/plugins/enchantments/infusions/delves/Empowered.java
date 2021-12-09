@@ -15,7 +15,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerExpChangeEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
-import org.jetbrains.annotations.NotNull;
+
 
 public class Empowered implements BaseEnchantment {
 
@@ -28,7 +28,7 @@ public class Empowered implements BaseEnchantment {
 	private static final double INTUITION_BONUS = 0.5;
 
 	@Override
-	public @NotNull String getProperty() {
+	public String getProperty() {
 		return PROPERTY_NAME;
 	}
 

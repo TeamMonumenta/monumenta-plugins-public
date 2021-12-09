@@ -1,14 +1,14 @@
 package com.playmonumenta.plugins.abilities.warrior;
 
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.effects.PercentAttackSpeed;
-import com.playmonumenta.plugins.effects.PercentSpeed;
-
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.inventory.ItemStack;
+
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.effects.PercentAttackSpeed;
+import com.playmonumenta.plugins.effects.PercentSpeed;
 
 
 
@@ -36,6 +36,9 @@ public class Frenzy extends Ability {
 
 	@Override
 	public void entityDeathEvent(EntityDeathEvent event, boolean shouldGenDrops) {
+		if (mPlayer == null) {
+			return;
+		}
 		mPlugin.mEffectManager.addEffect(mPlayer, PERCENT_ATTACK_SPEED_EFFECT_NAME,
 				new PercentAttackSpeed(DURATION, mPercentAttackSpeedEffect, PERCENT_ATTACK_SPEED_EFFECT_NAME));
 

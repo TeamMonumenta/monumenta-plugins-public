@@ -58,15 +58,19 @@ public class WitheringGaze extends Ability {
 	@Override
 	public void cast(Action action) {
 		Player player = mPlayer;
+		if (player == null) {
+			return;
+		}
 		Location loc = player.getLocation().add(0, 0.65, 0); // the Y height is higher so that the skill doesn't get stomped by half slabs
 		Vector direction = loc.getDirection().setY(0).normalize();
-		World world = mPlayer.getWorld();
+		World world = player.getWorld();
 		world.playSound(loc, Sound.ENTITY_WITHER_SHOOT, 1f, 0.4f);
 		world.playSound(loc, Sound.ENTITY_WITHER_AMBIENT, 1f, 1f);
 		new BukkitRunnable() {
 			double mT = 0;
 			double mDamageRange = 1.15;
 			double mR = 1;
+
 			@Override
 			public void run() {
 
@@ -94,7 +98,7 @@ public class WitheringGaze extends Ability {
 							} else {
 								EntityUtils.applyStun(mPlugin, WITHERING_GAZE_STUN_DURATION, le);
 							}
-							mPlugin.mEffectManager.addEffect(le, DOT_EFFECT_NAME, new CustomDamageOverTime(mDOTDuration, WITHERING_GAZE_DOT_DAMAGE, WITHERING_GAZE_DOT_PERIOD, mPlayer, MagicType.DARK_MAGIC, null, Particle.SQUID_INK, mPlugin));
+							mPlugin.mEffectManager.addEffect(le, DOT_EFFECT_NAME, new CustomDamageOverTime(mDOTDuration, WITHERING_GAZE_DOT_DAMAGE, WITHERING_GAZE_DOT_PERIOD, player, MagicType.DARK_MAGIC, null, Particle.SQUID_INK, mPlugin));
 							CustomDamageEvent event = new CustomDamageEvent(player, le, 0, null);
 							Bukkit.getPluginManager().callEvent(event);
 						}
@@ -119,6 +123,9 @@ public class WitheringGaze extends Ability {
 
 	@Override
 	public boolean runCheck() {
+		if (mPlayer == null) {
+			return false;
+		}
 		ItemStack mHand = mPlayer.getInventory().getItemInMainHand();
 		return mPlayer.isSprinting() && ItemUtils.isHoe(mHand);
 	}

@@ -20,6 +20,7 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.bosses.bosses.FrostGiant;
 import com.playmonumenta.plugins.bosses.spells.Spell;
@@ -37,17 +38,17 @@ public class SpellHailstorm extends Spell {
 	//Used when the boss teleports, prevent from doing damage
 	private boolean mDoDamage = true;
 
-	private Plugin mPlugin;
-	private LivingEntity mBoss;
-	private Location mStartLoc;
+	private final Plugin mPlugin;
+	private final LivingEntity mBoss;
+	private final Location mStartLoc;
 	private boolean mAttack = false;
-	private double mRadius;
-	private List<Player> mWarned = new ArrayList<Player>();
-	private Map<Player, BukkitRunnable> mDamage = new HashMap<>();
+	private final double mRadius;
+	private final List<Player> mWarned = new ArrayList<Player>();
+	private final Map<Player, BukkitRunnable> mDamage = new HashMap<>();
 	private final PPGroundCircle mInnerCircle;
 	private final PPGroundCircle mOuterCircle;
 
-	private BukkitRunnable mDelay;
+	private @Nullable BukkitRunnable mDelay;
 
 	private static final Particle.DustOptions LIGHT_BLUE_COLOR = new Particle.DustOptions(Color.fromRGB(0, 255, 247), 1.0f);
 

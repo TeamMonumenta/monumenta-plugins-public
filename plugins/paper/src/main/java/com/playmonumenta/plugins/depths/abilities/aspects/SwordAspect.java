@@ -22,7 +22,7 @@ public class SwordAspect extends WeaponAspectDepthsAbility {
 	@Override
 	public boolean livingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
 
-		if (event.getCause().equals(DamageCause.ENTITY_ATTACK) && InventoryUtils.isSwordItem(mPlayer.getInventory().getItemInMainHand())) {
+		if (mPlayer != null && event.getCause().equals(DamageCause.ENTITY_ATTACK) && InventoryUtils.isSwordItem(mPlayer.getInventory().getItemInMainHand())) {
 			event.setDamage(event.getDamage() + DAMAGE);
 		}
 

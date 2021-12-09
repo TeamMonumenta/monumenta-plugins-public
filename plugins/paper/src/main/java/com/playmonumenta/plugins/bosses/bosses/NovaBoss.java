@@ -2,23 +2,22 @@ package com.playmonumenta.plugins.bosses.bosses;
 
 import java.util.Arrays;
 
+import org.bukkit.Location;
+import org.bukkit.Sound;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.plugin.Plugin;
+
 import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.parameters.BossParam;
 import com.playmonumenta.plugins.bosses.parameters.EffectsList;
 import com.playmonumenta.plugins.bosses.parameters.EntityTargets;
+import com.playmonumenta.plugins.bosses.parameters.EntityTargets.TARGETS;
 import com.playmonumenta.plugins.bosses.parameters.ParticlesList;
 import com.playmonumenta.plugins.bosses.parameters.SoundsList;
-import com.playmonumenta.plugins.bosses.parameters.EntityTargets.TARGETS;
 import com.playmonumenta.plugins.bosses.spells.SpellBaseNova;
 import com.playmonumenta.plugins.utils.BossUtils;
 
-import org.bukkit.Location;
-import org.bukkit.Sound;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.plugin.Plugin;
-
-public class NovaBoss extends BossAbilityGroup {
+public final class NovaBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_nova";
 
 	public static class Parameters extends BossParameters {
@@ -96,26 +95,23 @@ public class NovaBoss extends BossAbilityGroup {
 				p.PARTICLE_EXPLODE.spawn(loc, 0.2, 0.2, 0.2, 0.2);
 			},
 			(Location loc) -> {
-				for (Entity entity : p.TARGETS.getTargetsList(mBoss)) {
-					if (entity instanceof LivingEntity) {
-						LivingEntity target = (LivingEntity) entity;
-						if (p.DAMAGE > 0) {
-							if (p.SPELL_NAME.isEmpty()) {
-								BossUtils.bossDamage(boss, target, p.DAMAGE);
-							} else {
-								BossUtils.bossDamage(boss, target, p.DAMAGE, mBoss.getLocation(), p.SPELL_NAME);
-							}
+				for (LivingEntity target : p.TARGETS.getTargetsList(mBoss)) {
+					if (p.DAMAGE > 0) {
+						if (p.SPELL_NAME.isEmpty()) {
+							BossUtils.bossDamage(boss, target, p.DAMAGE);
+						} else {
+							BossUtils.bossDamage(boss, target, p.DAMAGE, mBoss.getLocation(), p.SPELL_NAME);
 						}
-
-						if (p.DAMAGE_PERCENTAGE > 0.0) {
-							if (p.SPELL_NAME.isEmpty()) {
-								BossUtils.bossDamagePercent(mBoss, target, p.DAMAGE_PERCENTAGE);
-							} else {
-								BossUtils.bossDamagePercent(mBoss, target, p.DAMAGE_PERCENTAGE, p.SPELL_NAME);
-							}
-						}
-						p.EFFECTS.apply(target, mBoss);
 					}
+
+					if (p.DAMAGE_PERCENTAGE > 0.0) {
+						if (p.SPELL_NAME.isEmpty()) {
+							BossUtils.bossDamagePercent(mBoss, target, p.DAMAGE_PERCENTAGE);
+						} else {
+							BossUtils.bossDamagePercent(mBoss, target, p.DAMAGE_PERCENTAGE, p.SPELL_NAME);
+						}
+					}
+					p.EFFECTS.apply(target, mBoss);
 				}
 			})));
 

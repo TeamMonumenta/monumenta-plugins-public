@@ -10,12 +10,14 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+
 import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.spells.SpellBaseSeekingProjectile;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
 
 /**
+ * @author G3m1n1Boy
  * @deprecated use boss_projectile instead, like this:
  * <blockquote><pre>
  * /bos var Tags add boss_projectile
@@ -23,9 +25,8 @@ import com.playmonumenta.plugins.utils.PotionUtils;
  * /bos var Tags add boss_projectile[SoundStart=[(BLOCK_ENCHANTMENT_TABLE_USE,2,1)],SoundLaunch=[(ENTITY_FIREWORK_ROCKET_LAUNCH,1,1.5)],SoundProjectile=[(ENTITY_BLAZE_BURN,0.5,0.2)],SoundHit=[(ENTITY_GENERIC_EXPLODE,0.5,0.5),(ENTITY_BLAZE_AMBIENT,0.5,0.5)]]
  * /bos var Tags add boss_projectile[ParticleLaunch=[(SOUL_FIRE_FLAME,0)],ParticleProjectile=[(SOUL_FIRE_FLAME,5,0.1,0.1,0.1,0.05),(SMOKE_LARGE,2,0.25,0.25,0.25)],ParticleHit=[(SOUL_FIRE_FLAME,30,0,0,0,0.25)]]
  * </pre></blockquote>
- * @G3m1n1Boy
  */
-public class ArcaneProjectileBoss extends BossAbilityGroup {
+public final class ArcaneProjectileBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_arcaneprojectile";
 
 	public static class Parameters extends BossParameters {

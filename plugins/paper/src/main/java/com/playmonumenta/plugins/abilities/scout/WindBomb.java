@@ -68,7 +68,7 @@ public class WindBomb extends Ability {
 
 	@Override
 	public void projectileHitEvent(ProjectileHitEvent event, Projectile proj) {
-		if (this.mProj != null && this.mProj == proj) {
+		if (mPlayer != null && this.mProj != null && this.mProj == proj) {
 			this.mProj = null;
 			Location loc = proj.getLocation();
 			World world = proj.getWorld();
@@ -76,6 +76,7 @@ public class WindBomb extends Ability {
 			world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 1.2f, 1.25f);
 			new BukkitRunnable() {
 				double mRadius = RADIUS;
+
 				@Override
 				public void run() {
 					for (double j = 0; j < 360; j += 6) {

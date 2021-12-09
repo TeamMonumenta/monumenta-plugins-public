@@ -164,7 +164,7 @@ public class Effect {
 			}
 		}
 
-		if (world != null && world.getGameRuleValue(GameRule.SEND_COMMAND_FEEDBACK)) {
+		if (world != null && Boolean.TRUE.equals(world.getGameRuleValue(GameRule.SEND_COMMAND_FEEDBACK))) {
 			if (type == null) {
 				sender.sendMessage("Cleared all effects from entities");
 			} else {

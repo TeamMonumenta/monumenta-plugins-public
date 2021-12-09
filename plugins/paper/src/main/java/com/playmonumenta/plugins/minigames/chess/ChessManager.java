@@ -28,6 +28,18 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.world.ChunkUnloadEvent;
 import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.checkerframework.checker.nullness.qual.Nullable;
+
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.minigames.chess.ChessBoard.BoardState;
+import com.playmonumenta.plugins.minigames.chess.ChessBoard.ChessPiece;
+import com.playmonumenta.plugins.minigames.chess.ChessBoard.ChessPieceType;
+import com.playmonumenta.plugins.minigames.chess.ChessBoard.ChessTeam;
+import com.playmonumenta.plugins.minigames.chess.ChessInterface.InterfaceType;
+import com.playmonumenta.plugins.minigames.chess.events.ChessEvent;
+import com.playmonumenta.plugins.minigames.chess.events.EndGameChessEvent;
+import com.playmonumenta.plugins.minigames.chess.events.MovePieceChessEvent;
+import com.playmonumenta.plugins.minigames.chess.events.PromotingChessEvent;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.minigames.chess.ChessBoard.BoardState;
@@ -68,7 +80,7 @@ public class ChessManager implements Listener {
 		PVAI;
 	}
 
-	private static Plugin mPlugin;
+	private static @Nullable Plugin mPlugin;
 	private static final Map<String, ChessBoard> mBoards = new HashMap<>();
 	private static final Map<ChessBoard, List<ChessInterface>> mBoardsInterfaces = new HashMap<>();
 

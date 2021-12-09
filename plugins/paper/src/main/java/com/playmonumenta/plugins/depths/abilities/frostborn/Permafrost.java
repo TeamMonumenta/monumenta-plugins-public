@@ -23,8 +23,6 @@ public class Permafrost extends DepthsAbility {
 	public static final int[] ICE_TICKS = {8 * 20, 11 * 20, 14 * 20, 17 * 20, 20 * 20, 26 * 20};
 	public static final int[] ICE_BONUS_DURATION_SECONDS = {2, 3, 4, 5, 6, 8};
 
-	public static String tree;
-
 	public Permafrost(Plugin plugin, Player player) {
 		super(plugin, player, ABILITY_NAME);
 		mDisplayItem = Material.QUARTZ;

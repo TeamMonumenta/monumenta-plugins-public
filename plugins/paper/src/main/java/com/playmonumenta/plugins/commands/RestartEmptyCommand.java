@@ -1,17 +1,18 @@
 package com.playmonumenta.plugins.commands;
 
-import com.playmonumenta.plugins.Plugin;
-
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.checkerframework.checker.nullness.qual.Nullable;
+
+import com.playmonumenta.plugins.Plugin;
 
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.CommandPermission;
 import dev.jorel.commandapi.arguments.LiteralArgument;
 
 public class RestartEmptyCommand {
-	public static BukkitRunnable TASK = null;
+	public static @Nullable BukkitRunnable TASK = null;
 
 	public static void register(Plugin plugin) {
 		new CommandAPICommand("restart-empty")

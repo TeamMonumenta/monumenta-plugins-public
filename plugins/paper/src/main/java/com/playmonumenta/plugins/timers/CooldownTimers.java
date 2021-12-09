@@ -7,6 +7,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import org.bukkit.entity.Player;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.classes.ClassAbility;
@@ -28,7 +29,10 @@ public class CooldownTimers {
 		mTimers.put(player.getUniqueId(), cd);
 	}
 
-	public boolean isAbilityOnCooldown(UUID playerID, ClassAbility spell) {
+	public boolean isAbilityOnCooldown(UUID playerID, @Nullable ClassAbility spell) {
+		if (spell == null) {
+			return false;
+		}
 		//  First check if the player has any cooldowns in the HashMap.
 		HashMap<ClassAbility, Integer> player = mTimers.get(playerID);
 		if (player != null) {
@@ -118,10 +122,11 @@ public class CooldownTimers {
 		HashMap<ClassAbility, Integer> cds = mTimers.get(player.getUniqueId());
 
 		if (cds != null) {
-			Iterator<ClassAbility> it = cds.keySet().iterator();
+			Iterator<Entry<ClassAbility, Integer>> it = cds.entrySet().iterator();
 			while (it.hasNext()) {
-				ClassAbility spell = it.next();
-				int cd = cds.get(spell);
+				Entry<ClassAbility, Integer> entry = it.next();
+				ClassAbility spell = entry.getKey();
+				int cd = entry.getValue();
 				cd -= ticks;
 				if (cd <= 0) {
 					MessagingUtils.sendActionBarMessage(mPlugin, player, spell.getName() + " is now off cooldown!");
@@ -167,7 +172,7 @@ public class CooldownTimers {
 		}
 	}
 
-	public Set<ClassAbility> getCooldowns(UUID playerID) {
+	public @Nullable Set<ClassAbility> getCooldowns(UUID playerID) {
 		HashMap<ClassAbility, Integer> player = mTimers.get(playerID);
 		if (player != null) {
 			return player.keySet();

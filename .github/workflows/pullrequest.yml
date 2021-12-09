@@ -61,4 +61,14 @@ jobs:
         cd ..
         cat bungee/target/pmd.txt paper/target/pmd.txt | reviewdog -efm="%f:%l:	%m" -name="pmd" -reporter=github-pr-check
         ./compile-all.sh --batch-mode --no-snapshot-updates | tee compile.log
-        cat compile.log | grep '^\[WARNING\].*\.java' | reviewdog -efm="[WARNING] %f:[%l,%c] %m" -name="compiler-warnings" -reporter=github-pr-check
+        cat compile.log | grep '^\[WARNING\].*\.java' | reviewdog -efm="%+C %.%#" -efm="%W[WARNING] %f:[%l,%c] %m" -name="compiler-warnings" -reporter=github-pr-check
+
+    - name: Checker framework warnings
+      working-directory: ./plugins
+      env:
+        REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        set -o pipefail
+
+        ./compile-all.sh --batch-mode --no-snapshot-updates -P checkerframework | tee compile.log
+        cat compile.log | grep '^\[WARNING\].*\.java' | reviewdog -efm="%+C %.%#" -efm="%W[WARNING] %f:[%l,%c] %m" -name="checker framework warnings" -reporter=github-pr-check

@@ -22,6 +22,7 @@ import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityManager;
@@ -54,7 +55,7 @@ public class HallowedBeam extends MultipleChargeAbility {
 	private static final int HALLOWED_LIVING_STUN = 20 * 2;
 	private static final int CAST_RANGE = 30;
 
-	private Crusade mCrusade;
+	private @Nullable Crusade mCrusade;
 
 	private int mMode = 0;
 	private int mLastCastTicks = 0;
@@ -74,7 +75,7 @@ public class HallowedBeam extends MultipleChargeAbility {
 
 		if (player != null) {
 			Bukkit.getScheduler().runTask(plugin, () -> {
-				mCrusade = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(mPlayer, Crusade.class);
+				mCrusade = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, Crusade.class);
 			});
 		}
 	}

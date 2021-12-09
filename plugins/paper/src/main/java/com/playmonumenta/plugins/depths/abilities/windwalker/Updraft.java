@@ -17,6 +17,7 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
@@ -42,7 +43,7 @@ public class Updraft extends DepthsAbility {
 	private static final int DURATION = 5 * 20;
 	private static final double VELOCITY = 1.5;
 
-	private Snowball mProj;
+	private @Nullable Snowball mProj;
 
 	public Updraft(Plugin plugin, Player player) {
 		super(plugin, player, ABILITY_NAME);

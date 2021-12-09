@@ -17,6 +17,7 @@ import org.bukkit.event.player.PlayerBedLeaveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerToggleFlightEvent;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.utils.FastUtils;
@@ -96,7 +97,7 @@ public class ParrotManager implements Listener {
 	}
 
 
-	private static Plugin mPlugin;
+	private static @Nullable Plugin mPlugin;
 
 	private static final String SCOREBOARD_PARROT_VISIBLE = "ParrotVisible";
 	// 0 if invisible, 1 if visible.
@@ -115,7 +116,7 @@ public class ParrotManager implements Listener {
 
 	private static final int PRIDE_FREQUENCY = 3;
 
-	private static BukkitRunnable mPrideRunnable;
+	private static @Nullable BukkitRunnable mPrideRunnable;
 
 	public ParrotManager(Plugin plugin) {
 		mPlugin = plugin;
@@ -141,7 +142,7 @@ public class ParrotManager implements Listener {
 		p.setShoulderEntityRight(null);
 	}
 
-	public static ParrotVariant getParrotVariantByName(String name) {
+	public static @Nullable ParrotVariant getParrotVariantByName(String name) {
 		for (ParrotVariant pv : ParrotVariant.values()) {
 			if (pv.getName().equals(name)) {
 				return pv;

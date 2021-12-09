@@ -30,6 +30,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.loot.LootTable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.abilities.delves.Arcanic;
 import com.playmonumenta.plugins.abilities.delves.Bloodthirsty;
@@ -127,7 +128,7 @@ public class DelvesUtils {
 		}
 	}
 
-	public static class DelveInfo {
+	public static final class DelveInfo {
 
 		private static final int MAX_DEPTH_POINTS;
 
@@ -268,15 +269,15 @@ public class DelvesUtils {
 
 			for (Modifier modifier : Modifier.values()) {
 				if (modifier == Modifier.TWISTED) {
-					mDepthPointsTwisted = mModifierRanks.get(modifier) * TWISTED_DEPTH_POINTS;
+					mDepthPointsTwisted = mModifierRanks.getOrDefault(modifier, 0) * TWISTED_DEPTH_POINTS;
 				} else {
-					mDepthPointsRegular += mModifierRanks.get(modifier);
+					mDepthPointsRegular += mModifierRanks.getOrDefault(modifier, 0);
 
 					if (modifier == Modifier.ENTROPY) {
 						if (entropyAssigned) {
 							mDepthPointsEntropyUnassigned = 0;
 						} else {
-							mDepthPointsEntropyUnassigned = Entropy.getDepthPointsAssigned(mModifierRanks.get(modifier));
+							mDepthPointsEntropyUnassigned = Entropy.getDepthPointsAssigned(mModifierRanks.getOrDefault(modifier, 0));
 						}
 					}
 				}
@@ -288,7 +289,7 @@ public class DelvesUtils {
 		}
 
 		public static int getRankCap(Modifier modifier) {
-			return MODIFIER_RANK_CAPS.get(modifier);
+			return MODIFIER_RANK_CAPS.getOrDefault(modifier, 0);
 		}
 
 		public boolean isEditable() {
@@ -340,7 +341,7 @@ public class DelvesUtils {
 		}
 
 		public void setRank(Modifier modifier, int rank) {
-			int oldRank = mModifierRanks.get(modifier);
+			int oldRank = mModifierRanks.getOrDefault(modifier, 0);
 			int difference = rank - oldRank;
 
 			mModifierRanks.put(modifier, rank);
@@ -356,13 +357,13 @@ public class DelvesUtils {
 			}
 		}
 
-		public int getRank(Modifier modifier) {
-			return mModifierRanks.get(modifier);
+		public int getRank(@Nullable Modifier modifier) {
+			return mModifierRanks.getOrDefault(modifier, 0);
 		}
 
 		public int getDepthPoints() {
 			return Math.min(MAX_DEPTH_POINTS - TWISTED_DEPTH_POINTS - getRankCap(Modifier.ENTROPY) + getRank(Modifier.ENTROPY),
-					mDepthPointsRegular + mDepthPointsEntropyUnassigned) + mDepthPointsTwisted;
+			                mDepthPointsRegular + mDepthPointsEntropyUnassigned) + mDepthPointsTwisted;
 		}
 
 		public Collection<Class<? extends DelveModifier>> getActiveModifiers() {
@@ -454,7 +455,7 @@ public class DelvesUtils {
 		return new DelveInfo(player, dungeon);
 	}
 
-	public static DelveInfo removeDelveInfo(Player player) {
+	public static @Nullable DelveInfo removeDelveInfo(Player player) {
 		return DELVE_INFO_MAPPINGS.remove(player.getUniqueId());
 	}
 
@@ -516,7 +517,7 @@ public class DelvesUtils {
 			mRegularTables = regularTables;
 		}
 
-		public String getDelveLootTable(int depthPoints, int playerCount) {
+		public @Nullable String getDelveLootTable(int depthPoints, int playerCount) {
 			if (depthPoints == 0) {
 				return null;
 			}
@@ -633,8 +634,7 @@ public class DelvesUtils {
 	}
 
 
-
-	public static class DelveModifierSelectionGUI {
+	public static final class DelveModifierSelectionGUI {
 
 		private static final Map<String, String> DUNGEON_FUNCTION_MAPPINGS = new HashMap<>();
 
@@ -737,16 +737,16 @@ public class DelvesUtils {
 				return;
 			}
 
-			if (mInventory1.getItem(NEXT_PAGE_INDEX).equals(clickedItem)) {
+			if (clickedItem.equals(mInventory1.getItem(NEXT_PAGE_INDEX))) {
 				nextPage();
-			} else if (mInventory2.getItem(PREVIOUS_PAGE_INDEX).equals(clickedItem)) {
+			} else if (clickedItem.equals(mInventory2.getItem(PREVIOUS_PAGE_INDEX))) {
 				previousPage();
 			} else if (mDelveInfo.isEditable() && mPlayer == mRequestingPlayer) {
-				if (mInventory1.getItem(BEGIN_DELVE_INDEX).equals(clickedItem) || mInventory2.getItem(BEGIN_DELVE_INDEX).equals(clickedItem)) {
+				if (clickedItem.equals(mInventory1.getItem(BEGIN_DELVE_INDEX)) || clickedItem.equals(mInventory2.getItem(BEGIN_DELVE_INDEX))) {
 					beginDelve();
-				} else if (mInventory1.getItem(RESET_MODIFIERS_INDEX).equals(clickedItem)) {
+				} else if (clickedItem.equals(mInventory1.getItem(RESET_MODIFIERS_INDEX))) {
 					resetModifiers();
-				} else if (mInventory2.getItem(SELECT_ALL_MODIFIERS_INDEX).equals(clickedItem)) {
+				} else if (clickedItem.equals(mInventory2.getItem(SELECT_ALL_MODIFIERS_INDEX))) {
 					selectAllModifiers();
 				} else {
 					updateModifier(event.getInventory(), event.getSlot());
@@ -824,6 +824,9 @@ public class DelvesUtils {
 				int current = index;
 				for (int i = 0; i < newRank - oldRank; i++) {
 					ItemStack item = inventory.getItem(current);
+					if (item == null) {
+						continue;
+					}
 					item.setType(Material.ORANGE_STAINED_GLASS_PANE);
 
 					ItemMeta meta = item.getItemMeta();
@@ -840,6 +843,9 @@ public class DelvesUtils {
 					current -= COLUMNS;
 
 					ItemStack item = inventory.getItem(current);
+					if (item == null) {
+						continue;
+					}
 					item.setType(Material.RED_STAINED_GLASS_PANE);
 
 					ItemMeta meta = item.getItemMeta();

@@ -47,6 +47,9 @@ public class StoneSkin extends DepthsAbility {
 		new BukkitRunnable() {
 			@Override
 			public void run() {
+				if (mPlayer == null) {
+					return;
+				}
 				World world = mPlayer.getWorld();
 				Location loc = mPlayer.getLocation();
 				world.spawnParticle(Particle.FIREWORKS_SPARK, loc, 20, 0.2, 0, 0.2, 0.25);
@@ -64,7 +67,7 @@ public class StoneSkin extends DepthsAbility {
 
 	@Override
 	public boolean runCheck() {
-		return (mPlayer.isSneaking() && !isOnCooldown() && DepthsUtils.isWeaponItem(mPlayer.getInventory().getItemInMainHand()));
+		return mPlayer != null && mPlayer.isSneaking() && !isOnCooldown() && DepthsUtils.isWeaponItem(mPlayer.getInventory().getItemInMainHand());
 	}
 
 	@Override

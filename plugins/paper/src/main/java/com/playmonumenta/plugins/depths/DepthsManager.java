@@ -25,6 +25,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -41,10 +42,10 @@ import com.playmonumenta.plugins.depths.abilities.aspects.ScytheAspect;
 import com.playmonumenta.plugins.depths.abilities.aspects.SwordAspect;
 import com.playmonumenta.plugins.depths.abilities.aspects.WandAspect;
 import com.playmonumenta.plugins.depths.abilities.dawnbringer.BottledSunlight;
-import com.playmonumenta.plugins.depths.abilities.dawnbringer.Rejuvenation;
 import com.playmonumenta.plugins.depths.abilities.dawnbringer.Enlightenment;
 import com.playmonumenta.plugins.depths.abilities.dawnbringer.LightningBottle;
 import com.playmonumenta.plugins.depths.abilities.dawnbringer.RadiantBlessing;
+import com.playmonumenta.plugins.depths.abilities.dawnbringer.Rejuvenation;
 import com.playmonumenta.plugins.depths.abilities.dawnbringer.SoothingCombos;
 import com.playmonumenta.plugins.depths.abilities.dawnbringer.Sundrops;
 import com.playmonumenta.plugins.depths.abilities.dawnbringer.TotemOfSalvation;
@@ -168,14 +169,14 @@ public class DepthsManager {
 	public static final String PAID_SCOREBOARD_TAG = "DepthsWeaponAspectUpgradeBought";
 
 	public static final EnumSet<DepthsRoomType> mRoomOptionsWithoutBoss = EnumSet.of(DepthsRoomType.ABILITY,
-			DepthsRoomType.ABILITY_ELITE, DepthsRoomType.TREASURE, DepthsRoomType.TREASURE_ELITE,
-			DepthsRoomType.UPGRADE, DepthsRoomType.UPGRADE_ELITE, DepthsRoomType.UTILITY);
+	                                                                                 DepthsRoomType.ABILITY_ELITE, DepthsRoomType.TREASURE, DepthsRoomType.TREASURE_ELITE,
+	                                                                                 DepthsRoomType.UPGRADE, DepthsRoomType.UPGRADE_ELITE, DepthsRoomType.UTILITY);
 
 	// Singleton implementation
-	private static DepthsManager mInstance;
+	private static @Nullable DepthsManager mInstance;
 	// Map of players to their depths information- to persist through logouts
-	public Map<UUID, DepthsPlayer> mPlayers;
-	private static Plugin mPlugin;
+	public Map<UUID, DepthsPlayer> mPlayers = new HashMap<>();
+	private static @Nullable Plugin mPlugin;
 	// List of all items with random rarities
 	public ArrayList<DepthsAbilityItem> mItems = new ArrayList<>();
 	// List of ability offers for each player
@@ -184,21 +185,19 @@ public class DepthsManager {
 	public Map<UUID, List<DepthsAbilityItem>> mUpgradeOfferings = new HashMap<>();
 	public Random mRandom = new Random();
 	// Parties currently active in the system
-	public ArrayList<DepthsParty> mParties;
+	public ArrayList<DepthsParty> mParties = new ArrayList<>();
 	// Repository for storing and spawning depths rooms
-	public DepthsRoomRepository mRoomRepository;
+	public @Nullable DepthsRoomRepository mRoomRepository;
 	// Runnable to manage for dealing damage to players under certain conditions
-	public DepthsDamageRunnable mDamageRunnable;
+	public @Nullable DepthsDamageRunnable mDamageRunnable;
 	// Config path for saving and loading depths data from the file system
-	private String mConfigPath;
+	private @Nullable String mConfigPath;
 
 	private DepthsManager() {
-		mParties = new ArrayList<>();
 		//Start the runnable for damaging players on bad glass
 		mDamageRunnable = new DepthsDamageRunnable();
 		mDamageRunnable.runTaskTimer(Plugin.getInstance(), 0, GLASS_DAMAGE_TICK_INTERVAL);
 		mPlugin = Plugin.getInstance();
-		mPlayers = new HashMap<>();
 	}
 
 	public DepthsManager(Plugin p, Logger logger, String configPath) {
@@ -207,12 +206,10 @@ public class DepthsManager {
 		mPlugin = p;
 		if (!load(logger, configPath)) {
 			//Otherwise create a new instance
-			mParties = new ArrayList<>();
 			//Start the runnable for damaging players on bad glass
 			mDamageRunnable = new DepthsDamageRunnable();
 			mDamageRunnable.runTaskTimer(p, 0, GLASS_DAMAGE_TICK_INTERVAL);
 			mConfigPath = configPath;
-			mPlayers = new HashMap<>();
 			new BukkitRunnable() {
 
 				@Override
@@ -349,10 +346,11 @@ public class DepthsManager {
 
 	/**
 	 * Helper method to get the party object from a participating player
+	 *
 	 * @param dp depths player instance to check
 	 * @return party object of associated player
 	 */
-	public DepthsParty getPartyFromId(DepthsPlayer dp) {
+	public @Nullable DepthsParty getPartyFromId(DepthsPlayer dp) {
 		for (DepthsParty party : mParties) {
 			if (party.mPartyNum == dp.mPartyNum) {
 				return party;
@@ -623,10 +621,11 @@ public class DepthsManager {
 
 	/**
 	 * This method generates the available ability offerings for the given player.
+	 *
 	 * @param p player to generate items for
 	 * @return the ability items the player can select from
 	 */
-	public List<DepthsAbilityItem> getAbilityUnlocks(Player p) {
+	public @Nullable List<DepthsAbilityItem> getAbilityUnlocks(Player p) {
 
 		DepthsPlayer dp = mPlayers.get(p.getUniqueId());
 
@@ -760,10 +759,11 @@ public class DepthsManager {
 
 	/**
 	 * Returns the ability item previews of all abilities the player currently has
+	 *
 	 * @param p the player to look up
 	 * @return ability items for all their active abilities (rarity > 0)
 	 */
-	public List<DepthsAbilityItem> getPlayerAbilitySummary(Player p) {
+	public @Nullable List<DepthsAbilityItem> getPlayerAbilitySummary(Player p) {
 
 		DepthsPlayer dp = mPlayers.get(p.getUniqueId());
 
@@ -788,10 +788,11 @@ public class DepthsManager {
 
 	/**
 	 * Returns the abilities the player currently has
+	 *
 	 * @param p the player to look up
 	 * @return all their active abilities (rarity > 0)
 	 */
-	public List<DepthsAbility> getPlayerAbilities(Player p) {
+	public @Nullable List<DepthsAbility> getPlayerAbilities(Player p) {
 
 		DepthsPlayer dp = mPlayers.get(p.getUniqueId());
 
@@ -833,10 +834,11 @@ public class DepthsManager {
 
 	/**
 	 * Generates the next available room options for the party
+	 *
 	 * @param party the depths party to generate for
 	 * @return available room options for the party's designated player to select from the gui
 	 */
-	public EnumSet<DepthsRoomType> generateRoomOptions(DepthsParty party) {
+	public @Nullable EnumSet<DepthsRoomType> generateRoomOptions(DepthsParty party) {
 
 		// Check if they're currently in a bossfight and cancel the call
 		if (!party.mBeatBoss && party.mRoomNumber % 10 == 0 && party.mRoomNumber > 0) {
@@ -923,10 +925,11 @@ public class DepthsManager {
 	/**
 	 * This method is input when the player needs to generate a new room
 	 * It looks up the next available room from the party
+	 *
 	 * @param p player to generate for
 	 * @return available room choices for the party
 	 */
-	public EnumSet<DepthsRoomType> generateRoomOptions(Player p) {
+	public @Nullable EnumSet<DepthsRoomType> generateRoomOptions(Player p) {
 
 		DepthsPlayer dp = mPlayers.get(p.getUniqueId());
 		if (dp != null && getPartyFromId(dp) != null) {
@@ -1123,10 +1126,11 @@ public class DepthsManager {
 
 	/**
 	 * Logic to get available upgrades for the player when they have an upgrade reward
+	 *
 	 * @param p player to generate for
 	 * @return the items for the available upgrades
 	 */
-	public List<DepthsAbilityItem> getAbilityUpgradeOptions(Player p) {
+	public @Nullable List<DepthsAbilityItem> getAbilityUpgradeOptions(Player p) {
 		// Move this later
 
 		List<DepthsAbilityItem> offeredItems = mUpgradeOfferings.get(p.getUniqueId());

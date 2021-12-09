@@ -65,11 +65,15 @@ public class CelestialBlessing extends Ability {
 
 	@Override
 	public void cast(Action action) {
-		int celestial = getAbilityScore();
+		if (mPlayer == null) {
+			return;
+		}
 
-		World world = mPlayer.getWorld();
+		int celestial = getAbilityScore();
 		int duration = celestial == 1 ? CELESTIAL_1_DURATION : CELESTIAL_2_DURATION;
 		double extraDamage = celestial == 1 ? CELESTIAL_1_EXTRA_DAMAGE : CELESTIAL_2_EXTRA_DAMAGE;
+
+		World world = mPlayer.getWorld();
 
 		List<Player> affectedPlayers = PlayerUtils.playersInRange(mPlayer.getLocation(), CELESTIAL_RADIUS, true);
 
@@ -117,6 +121,9 @@ public class CelestialBlessing extends Ability {
 
 	@Override
 	public boolean runCheck() {
+		if (mPlayer == null) {
+			return false;
+		}
 		ItemStack mainHand = mPlayer.getInventory().getItemInMainHand();
 		return (mPlayer.isSneaking() && !ItemUtils.isPickaxe(mainHand));
 	}

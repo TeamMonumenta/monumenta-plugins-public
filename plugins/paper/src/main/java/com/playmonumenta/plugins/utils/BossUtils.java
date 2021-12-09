@@ -1,10 +1,9 @@
 package com.playmonumenta.plugins.utils;
 
 import java.util.Map;
-import java.util.NavigableSet;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.effects.Stasis;
 
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -17,14 +16,11 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
-
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.effects.Effect;
-import com.playmonumenta.plugins.effects.Stasis;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class BossUtils {
 
-	public static boolean bossDamageBlocked(@Nonnull Player target, double damage, @Nullable Location source) {
+	public static boolean bossDamageBlocked(Player target, double damage, @Nullable Location source) {
 		/*
 		 * Attacks can only be blocked if:
 		 * - They have a source location
@@ -41,15 +37,15 @@ public class BossUtils {
 		return false;
 	}
 
-	public static void bossDamage(@Nonnull LivingEntity boss, @Nonnull LivingEntity target, double damage) {
+	public static void bossDamage(LivingEntity boss, LivingEntity target, double damage) {
 		bossDamage(boss, target, damage, boss.getLocation(), null);
 	}
 
-	public static void bossDamage(@Nonnull LivingEntity boss, @Nonnull LivingEntity target, double damage, @Nullable Location source) {
+	public static void bossDamage(LivingEntity boss, LivingEntity target, double damage, @Nullable Location source) {
 		bossDamage(boss, target, damage, source, null);
 	}
 
-	public static void bossDamage(@Nonnull LivingEntity boss, @Nonnull LivingEntity target, double damage, @Nullable Location source, String cause) {
+	public static void bossDamage(LivingEntity boss, LivingEntity target, double damage, @Nullable Location source, String cause) {
 		int resistance = 0;
 		if (target.hasPotionEffect(PotionEffectType.DAMAGE_RESISTANCE)) {
 			resistance = target.getPotionEffect(PotionEffectType.DAMAGE_RESISTANCE).getAmplifier() + 1;
@@ -72,30 +68,30 @@ public class BossUtils {
 		}
 	}
 
-	public static boolean bossDamagePercent(@Nonnull LivingEntity boss, @Nonnull LivingEntity target, double percentHealth) {
+	public static boolean bossDamagePercent(LivingEntity boss, LivingEntity target, double percentHealth) {
 		return bossDamagePercent(boss, target, percentHealth, null, false, null);
 	}
 
-	public static boolean bossDamagePercent(@Nonnull LivingEntity boss, @Nonnull LivingEntity target, double percentHealth, @Nullable Location source) {
+	public static boolean bossDamagePercent(LivingEntity boss, LivingEntity target, double percentHealth, @Nullable Location source) {
 		return bossDamagePercent(boss, target, percentHealth, source, false, null);
 	}
 
-	public static boolean bossDamagePercent(@Nonnull LivingEntity boss, @Nonnull LivingEntity target, double percentHealth, @Nullable Location source, boolean raw) {
+	public static boolean bossDamagePercent(LivingEntity boss, LivingEntity target, double percentHealth, @Nullable Location source, boolean raw) {
 		return bossDamagePercent(boss, target, percentHealth, source, raw, null);
 	}
 
-	public static boolean bossDamagePercent(@Nonnull LivingEntity boss, @Nonnull LivingEntity target, double percentHealth, String cause) {
+	public static boolean bossDamagePercent(LivingEntity boss, LivingEntity target, double percentHealth, String cause) {
 		return bossDamagePercent(boss, target, percentHealth, null, false, cause);
 	}
 
-	public static boolean bossDamagePercent(@Nonnull LivingEntity boss, @Nonnull LivingEntity target, double percentHealth, @Nullable Location source, String cause) {
+	public static boolean bossDamagePercent(LivingEntity boss, LivingEntity target, double percentHealth, @Nullable Location source, String cause) {
 		return bossDamagePercent(boss, target, percentHealth, source, false, cause);
 	}
 
 	/*
 	 * Returns whether or not the player survived (true) or was killed (false)
 	 */
-	public static boolean bossDamagePercent(@Nonnull LivingEntity boss, @Nonnull LivingEntity target, double percentHealth, @Nullable Location source, boolean raw, String cause) {
+	public static boolean bossDamagePercent(LivingEntity boss, LivingEntity target, double percentHealth, @Nullable Location source, boolean raw, String cause) {
 		if (target instanceof Player) {
 			Player player = (Player) target;
 			if (player.getGameMode() == GameMode.CREATIVE || player.getGameMode() == GameMode.SPECTATOR) {
@@ -115,13 +111,11 @@ public class BossUtils {
 
 		// Do not damage players currently in stasis
 		Plugin plugin = Plugin.getInstance();
-		String s = "Stasis";
-		NavigableSet<Effect> effects = plugin.mEffectManager.getEffects(target, s);
-		if (effects != null && plugin.mEffectManager.getEffects(target, s) != null && (plugin.mEffectManager.getEffects(target, s)).contains(new Stasis(120))) {
+		if (plugin.mEffectManager.hasEffect(target, Stasis.class)) {
 			return true;
 		}
 
-		double toTake = (target.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue() * percentHealth);
+		double toTake = EntityUtils.getMaxHealth(target) * percentHealth;
 		if (raw) {
 			toTake = percentHealth;
 		}

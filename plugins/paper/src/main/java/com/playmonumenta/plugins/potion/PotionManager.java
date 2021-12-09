@@ -5,15 +5,14 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.UUID;
 
-import javax.annotation.Nonnull;
+import org.bukkit.entity.Player;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.utils.PotionUtils.PotionInfo;
-
-import org.bukkit.entity.Player;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 
 public class PotionManager {
 	//  Player ID / Player Potion Info
@@ -41,7 +40,7 @@ public class PotionManager {
 			return mName;
 		}
 
-		public static PotionID getFromString(String name) {
+		public static @Nullable PotionID getFromString(String name) {
 			if (name.equals(PotionID.APPLIED_POTION.getName())) {
 				return PotionID.APPLIED_POTION;
 			} else if (name.equals(PotionID.ABILITY_SELF.getName())) {
@@ -134,7 +133,7 @@ public class PotionManager {
 		}
 	}
 
-	public @Nonnull JsonObject getAsJsonObject(@Nonnull Player player, boolean includeAll) {
+	public JsonObject getAsJsonObject(Player player, boolean includeAll) {
 		final PlayerPotionInfo info;
 
 		info = mPlayerPotions.get(player.getUniqueId());
@@ -146,7 +145,7 @@ public class PotionManager {
 		return new JsonObject();
 	}
 
-	public void loadFromJsonObject(@Nonnull Player player, @Nonnull JsonObject object) throws Exception {
+	public void loadFromJsonObject(Player player, JsonObject object) throws Exception {
 		clearAllPotions(player);
 
 		PlayerPotionInfo info = new PlayerPotionInfo();

@@ -1,6 +1,5 @@
 package com.playmonumenta.plugins.classes;
 
-import org.jetbrains.annotations.NotNull;
 
 import com.playmonumenta.plugins.abilities.cleric.DivineJustice;
 import com.playmonumenta.plugins.abilities.mage.ElementalArrows;
@@ -202,13 +201,13 @@ public enum ClassAbility {
 	STONE_SKIN("Stone Skin"),
 	TAUNT("Taunt");
 
-	private final @NotNull String mName;
+	private final String mName;
 
-	ClassAbility(@NotNull String name) {
+	ClassAbility(String name) {
 		this.mName = name;
 	}
 
-	public @NotNull String getName() {
+	public String getName() {
 		return mName;
 	}
 }

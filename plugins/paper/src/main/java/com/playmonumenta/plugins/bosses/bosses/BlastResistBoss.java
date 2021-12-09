@@ -5,7 +5,7 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.plugin.Plugin;
 
-public class BlastResistBoss extends BossAbilityGroup {
+public final class BlastResistBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_blastresist";
 	public static final int detectionRange = 100;
 

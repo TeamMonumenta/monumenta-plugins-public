@@ -9,7 +9,7 @@ import org.bukkit.plugin.Plugin;
 import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.spells.SpellShieldSwitch;
 
-public class ShieldSwitchBoss extends BossAbilityGroup {
+public final class ShieldSwitchBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_shieldswitch";
 
 	public static class Parameters extends BossParameters {

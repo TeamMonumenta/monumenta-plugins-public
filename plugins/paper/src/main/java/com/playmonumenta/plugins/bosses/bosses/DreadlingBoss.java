@@ -13,7 +13,7 @@ import com.playmonumenta.plugins.bosses.spells.SpellDreadlingParticle;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 
-public class DreadlingBoss extends BossAbilityGroup {
+public final class DreadlingBoss extends BossAbilityGroup {
 
 	public static final String identityTag = "boss_dreadling";
 	public static final int detectionRange = 24;

@@ -77,7 +77,7 @@ public class Fireball extends DepthsAbility {
 
 	@Override
 	public boolean runCheck() {
-		return (!mPlayer.isSneaking() && DepthsUtils.isWeaponItem(mPlayer.getInventory().getItemInMainHand()));
+		return mPlayer != null && !mPlayer.isSneaking() && DepthsUtils.isWeaponItem(mPlayer.getInventory().getItemInMainHand());
 	}
 
 	@Override

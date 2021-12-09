@@ -41,7 +41,7 @@ import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.SerializationUtils;
 
 
-public class SwordsageRichter extends BossAbilityGroup {
+public final class SwordsageRichter extends BossAbilityGroup {
 	public static final String identityTag = "boss_swordsagerichter";
 	public static final int detectionRange = 60;
 	private static final Particle.DustOptions BOLT_COLOR = new Particle.DustOptions(Color.fromRGB(255, 255, 255), 1.0f);

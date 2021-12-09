@@ -8,16 +8,16 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.plugins.utils.ScoreboardUtils;
-
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.utils.ScoreboardUtils;
 
 import dev.jorel.commandapi.Tooltip;
 
@@ -73,7 +73,7 @@ public class EntityTargets {
 	 */
 
 	public interface EntityFinder {
-		<V extends LivingEntity> List<V> getTargets(LivingEntity launcher, Location loc, double range, boolean optional);
+		List<? extends LivingEntity> getTargets(LivingEntity launcher, Location loc, double range, boolean optional);
 	}
 
 	//enum don't works with generics
@@ -538,7 +538,7 @@ public class EntityTargets {
 		boolean first = true;
 		for (EntityFilter filter : mFilters) {
 			if (filter instanceof Enum) {
-				string += (first ? "" : ",") + ((Enum<?>)filter).name();
+				string += (first ? "" : ",") + ((Enum<?>) filter).name();
 				first = false;
 			}
 		}
@@ -547,25 +547,22 @@ public class EntityTargets {
 		return string;
 	}
 
-	public <V extends LivingEntity> List<V> getTargetsList(LivingEntity boss) {
-		List<V> list = mTargets.getTargets(boss, boss.getLocation(), mRange, mOptional);
+	public List<? extends LivingEntity> getTargetsList(LivingEntity boss) {
+		List<? extends LivingEntity> list = mTargets.getTargets(boss, boss.getLocation(), mRange, mOptional);
 
-		boolean dontRemove = false;
 		if (!mTagsFilter.mTags.isEmpty() || !mFilters.isEmpty()) {
-			for (Entity entity : new ArrayList<>(list)) {
-				dontRemove = false;
+			for (LivingEntity entity : new ArrayList<>(list)) {
 
 				if (mTagsFilter.filter(boss, entity)) {
-					dontRemove = true;
 					continue;
 				}
 
+				boolean dontRemove = false;
 				for (EntityFilter filter : mFilters) {
 					if (filter.filter(boss, entity)) {
 						dontRemove = true;
 						break;
 					}
-
 				}
 				if (!dontRemove) {
 					list.remove(entity);
@@ -577,7 +574,7 @@ public class EntityTargets {
 	}
 
 	public List<Location> getTargetsLocationList(LivingEntity boss) {
-		List<LivingEntity> entityList = (List<LivingEntity>) getTargetsList(boss);
+		List<? extends LivingEntity> entityList = getTargetsList(boss);
 		List<Location> locations = new ArrayList<>(entityList.size());
 		for (LivingEntity entity : entityList) {
 			locations.add(entity.getLocation());

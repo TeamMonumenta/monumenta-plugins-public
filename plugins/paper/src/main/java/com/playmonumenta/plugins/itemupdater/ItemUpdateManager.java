@@ -32,6 +32,7 @@ import org.bukkit.inventory.Merchant;
 import org.bukkit.inventory.MerchantRecipe;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.utils.ItemUtils;
@@ -40,7 +41,7 @@ import net.kyori.adventure.text.Component;
 
 public class ItemUpdateManager implements Listener {
 	// Updates items if needed as they load.
-	private static Plugin mPlugin;
+	private static @Nullable Plugin mPlugin;
 	private static long mUpdateTimestamp;
 
 	public ItemUpdateManager(Plugin plugin) {

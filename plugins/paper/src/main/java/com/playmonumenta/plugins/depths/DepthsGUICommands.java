@@ -1,6 +1,5 @@
 package com.playmonumenta.plugins.depths;
 
-import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
 
@@ -83,17 +82,8 @@ public class DepthsGUICommands {
 						}
 
 						List<WeaponAspectDepthsAbility> weapons = DepthsManager.getInstance().mPlayers.get(player.getUniqueId()).mWeaponOfferings;
-						List<DepthsAbilityItem> items = new ArrayList<>();
 
 						if (weapons == null || weapons.size() == 0) {
-							return;
-						}
-
-						for (WeaponAspectDepthsAbility weapon : weapons) {
-							items.add(weapon.getAbilityItem(1));
-						}
-
-						if (items == null || items.size() == 0) {
 							return;
 						}
 

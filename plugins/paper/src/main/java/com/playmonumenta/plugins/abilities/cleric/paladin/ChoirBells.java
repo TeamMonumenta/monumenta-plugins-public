@@ -10,6 +10,7 @@ import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
@@ -42,7 +43,7 @@ public class ChoirBells extends Ability {
 	private final double mWeakenEffect;
 	private final double mVulnerabilityEffect;
 
-	private Crusade mCrusade;
+	private @Nullable Crusade mCrusade;
 
 	public ChoirBells(Plugin plugin, Player player) {
 		super(plugin, player, "Choir Bells");
@@ -60,7 +61,7 @@ public class ChoirBells extends Ability {
 
 		if (player != null) {
 			Bukkit.getScheduler().runTask(plugin, () -> {
-				mCrusade = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(mPlayer, Crusade.class);
+				mCrusade = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, Crusade.class);
 			});
 		}
 	}

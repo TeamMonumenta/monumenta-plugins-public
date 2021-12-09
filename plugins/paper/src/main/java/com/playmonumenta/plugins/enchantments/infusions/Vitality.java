@@ -3,16 +3,16 @@ package com.playmonumenta.plugins.enchantments.infusions;
 import java.util.Collection;
 import java.util.EnumSet;
 
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.enchantments.BaseEnchantment;
-import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
-import com.playmonumenta.plugins.server.properties.ServerProperties;
-
 import org.bukkit.ChatColor;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.entity.Player;
+
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.enchantments.BaseEnchantment;
+import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
+import com.playmonumenta.plugins.server.properties.ServerProperties;
 
 public class Vitality implements BaseEnchantment {
 
@@ -40,9 +40,11 @@ public class Vitality implements BaseEnchantment {
 			removeProperty(plugin, player);
 			double healthBoostPct = HP_PCT_PER_LEVEL * level;
 			AttributeInstance maxHealth = player.getAttribute(Attribute.GENERIC_MAX_HEALTH);
-			AttributeModifier mod = new AttributeModifier(MODIFIER, healthBoostPct,
-					AttributeModifier.Operation.MULTIPLY_SCALAR_1);
-			maxHealth.addModifier(mod);
+			if (maxHealth != null) {
+				AttributeModifier mod = new AttributeModifier(MODIFIER, healthBoostPct,
+				                                              AttributeModifier.Operation.MULTIPLY_SCALAR_1);
+				maxHealth.addModifier(mod);
+			}
 		}
 	}
 

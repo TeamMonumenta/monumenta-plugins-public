@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.effects;
 
+import java.util.Collections;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -19,6 +20,7 @@ import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityRegainHealthEvent;
 import org.bukkit.projectiles.ProjectileSource;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -79,7 +81,7 @@ public class EffectManager implements Listener {
 			}
 		}
 
-		public NavigableSet<Effect> getEffects(String source) {
+		public @Nullable NavigableSet<Effect> getEffects(String source) {
 			for (Map<String, NavigableSet<Effect>> priorityEffects : mPriorityMap.values()) {
 				NavigableSet<Effect> effectGroup = priorityEffects.get(source);
 				if (effectGroup != null) {
@@ -129,7 +131,7 @@ public class EffectManager implements Listener {
 			return false;
 		}
 
-		public NavigableSet<Effect> clearEffects(String source) {
+		public @Nullable NavigableSet<Effect> clearEffects(String source) {
 			for (Map<String, NavigableSet<Effect>> priorityEffects : mPriorityMap.values()) {
 				NavigableSet<Effect> removedEffectGroup = priorityEffects.remove(source);
 				if (removedEffectGroup != null) {
@@ -318,11 +320,11 @@ public class EffectManager implements Listener {
 	/**
 	 * Returns effects from a given source from an entity.
 	 *
-	 * @param  entity the entity being checked
-	 * @param  source the source of effects to be retrieved
+	 * @param entity the entity being checked
+	 * @param source the source of effects to be retrieved
 	 * @return the set of effects if they exist, null otherwise
 	 */
-	public NavigableSet<Effect> getEffects(Entity entity, String source) {
+	public @Nullable NavigableSet<Effect> getEffects(Entity entity, String source) {
 		Effects effects = mEntities.get(entity);
 		if (effects != null) {
 			return effects.getEffects(source);
@@ -334,17 +336,16 @@ public class EffectManager implements Listener {
 	/**
 	 * Returns effects of a given type from an entity.
 	 *
-	 * @param  entity the entity being checked
-	 * @param  type the class of effect
-	 * @return the set of effects if they exist, null otherwise
+	 * @param entity the entity being checked
+	 * @param type   the class of effect
+	 * @return the set of effects if they exist, an empty set otherwise
 	 */
 	public NavigableSet<? extends Effect> getEffects(Entity entity, Class<? extends Effect> type) {
 		Effects effects = mEntities.get(entity);
 		if (effects != null) {
 			return effects.getEffects(type);
 		}
-
-		return null;
+		return Collections.emptyNavigableSet();
 	}
 
 	/**
@@ -381,11 +382,11 @@ public class EffectManager implements Listener {
 	/**
 	 * Clears and returns effects from a given source from an entity.
 	 *
-	 * @param  entity the entity to clear effects from
-	 * @param  source the source of effects to be cleared
+	 * @param entity the entity to clear effects from
+	 * @param source the source of effects to be cleared
 	 * @return the set of effects if effects were removed, null otherwise
 	 */
-	public NavigableSet<Effect> clearEffects(Entity entity, String source) {
+	public @Nullable NavigableSet<Effect> clearEffects(Entity entity, String source) {
 		Effects effects = mEntities.get(entity);
 		if (effects != null) {
 			return effects.clearEffects(source);

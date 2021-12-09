@@ -1,6 +1,5 @@
 package com.playmonumenta.plugins.bosses;
 
-import com.playmonumenta.scriptedquests.Plugin;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.boss.BarColor;
@@ -9,13 +8,16 @@ import org.bukkit.boss.BossBar;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.checkerframework.checker.nullness.qual.Nullable;
+
+import com.playmonumenta.scriptedquests.Plugin;
 
 public class ChargeUpManager {
 
 	private int mTime;
 	private int mChargeTime;
 	private String mTitle;
-	private LivingEntity mBoss;
+	private @Nullable LivingEntity mBoss;
 	private Location mLoc;
 	private final int mRange;
 	private final BossBar mBar;
@@ -26,7 +28,7 @@ public class ChargeUpManager {
 		this(boss.getLocation(), boss, chargeTime, title, color, style, range);
 	}
 
-	public ChargeUpManager(Location loc, LivingEntity boss, int chargeTime, String title, BarColor color, BarStyle style, int range) {
+	public ChargeUpManager(Location loc, @Nullable LivingEntity boss, int chargeTime, String title, BarColor color, BarStyle style, int range) {
 		mLoc = loc;
 		mChargeTime = chargeTime;
 		mBoss = boss;
@@ -66,10 +68,7 @@ public class ChargeUpManager {
 	public boolean nextTick(int time) {
 		mTime += time;
 		update();
-		if (mTime >= mChargeTime) {
-			return true;
-		}
-		return false;
+		return mTime >= mChargeTime;
 	}
 
 	public void setTitle(String title) {

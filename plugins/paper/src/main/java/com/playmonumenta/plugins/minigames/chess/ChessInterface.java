@@ -7,24 +7,25 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.playmonumenta.plugins.minigames.chess.ChessBoard.ChessPiece;
-import com.playmonumenta.plugins.minigames.chess.ChessBoard.ChessPieceType;
-import com.playmonumenta.plugins.minigames.chess.ChessBoard.ChessTeam;
-import com.playmonumenta.plugins.server.properties.ServerProperties;
-import com.playmonumenta.scriptedquests.Plugin;
-
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
-import org.bukkit.World;
 import org.bukkit.Particle.DustOptions;
+import org.bukkit.World;
 import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.MapMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
+import org.checkerframework.checker.nullness.qual.Nullable;
+
+import com.playmonumenta.plugins.minigames.chess.ChessBoard.ChessPiece;
+import com.playmonumenta.plugins.minigames.chess.ChessBoard.ChessPieceType;
+import com.playmonumenta.plugins.minigames.chess.ChessBoard.ChessTeam;
+import com.playmonumenta.plugins.server.properties.ServerProperties;
+import com.playmonumenta.scriptedquests.Plugin;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextColor;
@@ -56,8 +57,8 @@ public class ChessInterface {
 			return mLabel;
 		}
 
-		public static FacingPosition valueOfLabel(String label) {
-			for (FacingPosition fp :FacingPosition.values()) {
+		public static @Nullable FacingPosition valueOfLabel(String label) {
+			for (FacingPosition fp : FacingPosition.values()) {
 				if (fp.mLabel.equalsIgnoreCase(label)) {
 					return fp;
 				}
@@ -186,8 +187,8 @@ public class ChessInterface {
 
 	private Set<Integer> mPossibleMoves = null;
 	private int mPieceSelected;
-	private Boolean mPlayerTurn;
-	private BukkitRunnable mParticleRunnable;
+	private @Nullable Boolean mPlayerTurn;
+	private @Nullable BukkitRunnable mParticleRunnable;
 
 	public ChessInterface(ChessBoard board, InterfaceType type) {
 		mBoard = board;
@@ -301,7 +302,7 @@ public class ChessInterface {
 			return false;
 		}
 
-		if (mPlayerTurn) {
+		if (Boolean.TRUE.equals(mPlayerTurn)) {
 			int pos = mFramePosMap.get(frame);
 
 			if (mPossibleMoves == null) {

@@ -6,17 +6,16 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
+import org.bukkit.scheduler.BukkitRunnable;
+
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.minigames.chess.ChessManager.ChessBoardType;
 import com.playmonumenta.plugins.minigames.chess.events.ChessEvent;
 import com.playmonumenta.plugins.minigames.chess.events.EndGameChessEvent;
 import com.playmonumenta.plugins.minigames.chess.events.MovePieceChessEvent;
 import com.playmonumenta.plugins.minigames.chess.events.PromotingChessEvent;
-
-import org.apache.commons.lang.ArrayUtils;
-import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
-import org.bukkit.scheduler.BukkitRunnable;
 
 public class ChessBoard {
 
@@ -48,26 +47,30 @@ public class ChessBoard {
 	//private static final String KING_UNDER_ATTACK_TAG = "KingUnderAttack";
 	//private static final String BLOCK_KING_UNDER_ATTACK_TAG = "AttackingEnemyKing";
 
-	private static final int[][] ROOKS_MOVES = {{ -8, -16, -24, -32, -40, -48, -56},
-												{8, 16, 24, 32, 40, 48, 56}};
-	private static final int[][] ROOKS_MOVES_RIGHT = {{ 1, 2, 3, 4, 5, 6, 7}};
+	private static final int[][] ROOKS_MOVES = {{-8, -16, -24, -32, -40, -48, -56},
+	                                            {8, 16, 24, 32, 40, 48, 56}};
+	private static final int[][] ROOKS_MOVES_RIGHT = {{1, 2, 3, 4, 5, 6, 7}};
 	private static final int[][] ROOKS_MOVES_LEFT = {{-1, -2, -3, -4, -5, -6, -7}};
 
-	private static final int[][] BISHOPS_MOVES_RIGHT = {{ 9, 18, 27, 36, 45, 54, 63},
-														{-7, -14, -21, -28, -35, -42, -49}};
-	private static final int[][] BISHOPS_MOVES_LEFT = {{ -9, -18, -27, -36, -45, -54, -63},
-														{7, 14, 21, 28, 35, 42, 49}};
+	private static final int[][] BISHOPS_MOVES_RIGHT = {{9, 18, 27, 36, 45, 54, 63},
+	                                                    {-7, -14, -21, -28, -35, -42, -49}};
+	private static final int[][] BISHOPS_MOVES_LEFT = {{-9, -18, -27, -36, -45, -54, -63},
+	                                                   {7, 14, 21, 28, 35, 42, 49}};
 
 	private static final int[] KNIGHTS_MOVES_RIGHT = {-6, -15, 10, 17};
 	private static final int[] KNIGHTS_MOVES_LEFT = {6, 15, -10, -17};
 
 	private static final int[] KING_MOVES = {-8, 8};
-	private static final int[] KING_MOVES_RIGHT = { 1, 9, -7};
-	private static final int[] KING_MOVES_LEFT = { -1, -9, 7};
+	private static final int[] KING_MOVES_RIGHT = {1, 9, -7};
+	private static final int[] KING_MOVES_LEFT = {-1, -9, 7};
 
 	private static final int[][] QUEEN_MOVES = ROOKS_MOVES;
-	private static final int[][] QUEEN_MOVES_RIGHT = (int[][]) ArrayUtils.addAll(BISHOPS_MOVES_RIGHT, ROOKS_MOVES_RIGHT);
-	private static final int[][] QUEEN_MOVES_LEFT = (int[][]) ArrayUtils.addAll(BISHOPS_MOVES_LEFT, ROOKS_MOVES_LEFT);
+	private static final int[][] QUEEN_MOVES_RIGHT = {{9, 18, 27, 36, 45, 54, 63},
+	                                                  {-7, -14, -21, -28, -35, -42, -49},
+	                                                  {1, 2, 3, 4, 5, 6, 7}};
+	private static final int[][] QUEEN_MOVES_LEFT = {{-9, -18, -27, -36, -45, -54, -63},
+	                                                 {7, 14, 21, 28, 35, 42, 49},
+	                                                 {-1, -2, -3, -4, -5, -6, -7}};
 
 	public static class ChessPiece {
 		private ChessTeam mTeam;

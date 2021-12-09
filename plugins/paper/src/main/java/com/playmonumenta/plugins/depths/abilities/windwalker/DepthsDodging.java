@@ -74,6 +74,9 @@ public class DepthsDodging extends DepthsAbility {
 
 	@Override
 	public boolean playerHitByProjectileEvent(ProjectileHitEvent event) {
+		if (mPlayer == null) {
+			return false;
+		}
 		Projectile proj = event.getEntity();
 		// See if we should dodge. If false, allow the event to proceed normally
 		// This probably doesn't properly check for blocking whereas the other method does
@@ -102,6 +105,9 @@ public class DepthsDodging extends DepthsAbility {
 	}
 
 	private boolean dodge() {
+		if (mPlayer == null) {
+			return false;
+		}
 		//Update cooldown here
 		mInfo.mCooldown = COOLDOWN[mRarity - 1];
 

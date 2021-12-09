@@ -80,6 +80,7 @@ public class Festive implements BaseSpawnableItemEnchantment {
 		new BukkitRunnable() {
 			int mTicks = 0;
 			World mWorld = item.getWorld();
+
 			@Override
 			public void run() {
 				final Location loc = item.getLocation().add(0, 0.15, 0);

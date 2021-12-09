@@ -4,16 +4,17 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.utils.InventoryUtils;
-import com.playmonumenta.plugins.utils.ItemUtils;
-import com.playmonumenta.plugins.utils.ItemUtils.ItemRegion;
-
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
+
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.ItemUtils.ItemRegion;
 
 import dev.jorel.commandapi.CommandAPI;
 import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
@@ -31,10 +32,10 @@ import net.md_5.bungee.api.chat.TextComponent;
  */
 public class CalculateReforge extends GenericCommand {
 
-	public static ItemStack mCXP = null;
-	public static ItemStack mHXP = null;
-	public static ItemStack mCCS = null;
-	public static ItemStack mHCS = null;
+	public static @MonotonicNonNull ItemStack mCXP = null;
+	public static @MonotonicNonNull ItemStack mHXP = null;
+	public static @MonotonicNonNull ItemStack mCCS = null;
+	public static @MonotonicNonNull ItemStack mHCS = null;
 
 	public static void register() {
 		registerPlayerCommand("calculatereforge", "monumenta.command.calculatereforge", (sender, player) -> {

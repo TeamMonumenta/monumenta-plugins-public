@@ -14,6 +14,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.classes.ClassAbility;
@@ -39,7 +40,7 @@ public class SteelStallion extends DepthsAbility {
 	public static final int[] DURATION = {10 * 20, 11 * 20, 12 * 20, 13 * 20, 14 * 20, 18 * 20};
 	public static final int TICK_INTERVAL = 5;
 
-	private Mob mHorse;
+	private @Nullable Mob mHorse;
 
 	public SteelStallion(Plugin plugin, Player player) {
 		super(plugin, player, ABILITY_NAME);

@@ -18,6 +18,7 @@ import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.destroystokyo.paper.event.entity.EntityPathfindEvent;
 import com.playmonumenta.plugins.bosses.bosses.BossAbilityGroup;
@@ -29,7 +30,7 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 public class Boss {
 	private final Plugin mPlugin;
 	private final List<BossAbilityGroup> mAbilities;
-	private Entity mLastHitBy;
+	private @Nullable Entity mLastHitBy;
 
 	public Boss(Plugin plugin, BossAbilityGroup ability) {
 		mPlugin = plugin;

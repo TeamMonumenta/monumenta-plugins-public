@@ -39,7 +39,7 @@ import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.SerializationUtils;
 
-public class Azacor extends BossAbilityGroup {
+public final class Azacor extends BossAbilityGroup {
 	public static final String identityTag = "boss_azacor";
 	public static final int detectionRange = 50;
 
@@ -161,19 +161,19 @@ public class Azacor extends BossAbilityGroup {
 		int rand = FastUtils.RANDOM.nextInt(4);
 		if (rand == 0) {
 			LivingEntity elite = (LivingEntity) LibraryOfSoulsIntegration.summon(loc, "SarintultheUnseen");
-			elite.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(eliteHealth);
+			EntityUtils.setAttributeBase(elite, Attribute.GENERIC_MAX_HEALTH, eliteHealth);
 			elite.setHealth(eliteHealth);
 		} else if (rand == 1) {
 			LivingEntity elite = (LivingEntity) LibraryOfSoulsIntegration.summon(loc, "ZirinkelthePrecise");
-			elite.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(eliteHealth);
+			EntityUtils.setAttributeBase(elite, Attribute.GENERIC_MAX_HEALTH, eliteHealth);
 			elite.setHealth(eliteHealth);
 		} else if (rand == 2) {
 			LivingEntity elite = (LivingEntity) LibraryOfSoulsIntegration.summon(loc, "KazarthuntheMighty");
-			elite.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(1.5 * eliteHealth);
+			EntityUtils.setAttributeBase(elite, Attribute.GENERIC_MAX_HEALTH, 1.5 * eliteHealth);
 			elite.setHealth(1.5 * eliteHealth);
-		} else if (rand == 3) {
+		} else {
 			LivingEntity elite = (LivingEntity) LibraryOfSoulsIntegration.summon(loc, "VerkantaltheCunning");
-			elite.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(0.75 * eliteHealth);
+			EntityUtils.setAttributeBase(elite, Attribute.GENERIC_MAX_HEALTH, 0.75 * eliteHealth);
 			elite.setHealth(0.75 * eliteHealth);
 		}
 		if (tellraw != null && !tellraw.isEmpty()) {

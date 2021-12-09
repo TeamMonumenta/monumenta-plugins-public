@@ -37,8 +37,7 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.bosses.BossBarManager;
 import com.playmonumenta.plugins.bosses.BossBarManager.BossHealthAction;
@@ -61,6 +60,7 @@ import com.playmonumenta.plugins.bosses.spells.kaul.SpellRaiseJungle;
 import com.playmonumenta.plugins.bosses.spells.kaul.SpellVolcanicDemise;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
@@ -754,23 +754,25 @@ public class Kaul extends BossAbilityGroup {
 					world.playSound(mLoc, Sound.ENTITY_ENDERMAN_TELEPORT, 1, 0.75f);
 					world.spawnParticle(Particle.CRIT_MAGIC, mLoc, 150, 0.1, 0.1, 0.1, 1);
 					LivingEntity miniboss = spawnImmortal(mLoc);
-					miniboss.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).setBaseValue(miniboss.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).getBaseValue() + 0.01);
-					miniboss.setInvulnerable(true);
-					miniboss.setCustomNameVisible(true);
-					new BukkitRunnable() {
+					if (miniboss != null) {
+						EntityUtils.setAttributeBase(miniboss, Attribute.GENERIC_MOVEMENT_SPEED, EntityUtils.getAttributeBaseOrDefault(miniboss, Attribute.GENERIC_MOVEMENT_SPEED, 0) + 0.01);
+						miniboss.setInvulnerable(true);
+						miniboss.setCustomNameVisible(true);
+						new BukkitRunnable() {
 
-						@Override
-						public void run() {
+							@Override
+							public void run() {
 
-							if (mBoss.isDead() || !mBoss.isValid() || mDefeated) {
-								this.cancel();
-								if (!miniboss.isDead()) {
-									miniboss.setHealth(0);
+								if (mBoss.isDead() || !mBoss.isValid() || mDefeated) {
+									this.cancel();
+									if (!miniboss.isDead()) {
+										miniboss.setHealth(0);
+									}
 								}
 							}
-						}
 
-					}.runTaskTimer(mPlugin, 0, 20);
+						}.runTaskTimer(mPlugin, 0, 20);
+					}
 				}
 				if (mBoss.isDead()) {
 					this.cancel();
@@ -870,12 +872,12 @@ public class Kaul extends BossAbilityGroup {
 		}
 	}
 
-	private LivingEntity spawnPrimordial(Location loc) {
+	private @Nullable LivingEntity spawnPrimordial(Location loc) {
 		LivingEntity entity = (LivingEntity) LibraryOfSoulsIntegration.summon(loc, primordial);
 		return entity;
 	}
 
-	private LivingEntity spawnImmortal(Location loc) {
+	private @Nullable LivingEntity spawnImmortal(Location loc) {
 		LivingEntity entity = (LivingEntity) LibraryOfSoulsIntegration.summon(loc, immortal);
 		return entity;
 	}
@@ -1128,18 +1130,18 @@ public class Kaul extends BossAbilityGroup {
 		}.runTaskLater(mPlugin, 1);
 	}
 
-	public @NotNull Collection<@NotNull Player> getArenaParticipants() {
+	public Collection<Player> getArenaParticipants() {
 		if (mShrineMarker == null) {
 			return Collections.emptyList();
 		}
 
-		@NotNull Location arenaCenter = mShrineMarker.getLocation();
+		Location arenaCenter = mShrineMarker.getLocation();
 		arenaCenter.setY(ARENA_MAX_Y / 2d);
 
 		return PlayerUtils.playersInBox(arenaCenter, ARENA_WIDTH, ARENA_MAX_Y);
 	}
 
-	public @NotNull LivingEntity getBoss() {
+	public LivingEntity getBoss() {
 		return mBoss;
 	}
 }

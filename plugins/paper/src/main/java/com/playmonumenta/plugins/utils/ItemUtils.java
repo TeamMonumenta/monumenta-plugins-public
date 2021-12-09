@@ -27,7 +27,7 @@ import org.bukkit.potion.PotionData;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.potion.PotionType;
-import org.jetbrains.annotations.NotNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.Constants.Materials;
 import com.playmonumenta.plugins.enchantments.Colossal;
@@ -53,7 +53,7 @@ public class ItemUtils {
 	private static final String NAME_KEY = "Name";
 	private static final Pattern NON_PLAIN_REGEX = Pattern.compile("[^ -~]");
 
-	// List of materials that trees can replace when they grow
+	// List of materials that trees can't replace when they grow
 	public static final Set<Material> notAllowedTreeReplace = EnumSet.of(
 		// Basically #minecraft:wither_immune + chests, barrels, shulker boxes, spawners
 		Material.BARRIER,
@@ -449,7 +449,7 @@ public class ItemUtils {
 	}
 
 	// Return the quest ID string, which is assumed to start with "#Q", or null
-	public static String getItemQuestId(ItemStack item) {
+	public static @Nullable String getItemQuestId(ItemStack item) {
 		if (item == null) {
 			return null;
 		}
@@ -772,7 +772,7 @@ public class ItemUtils {
 		}
 	}
 
-	public static String getBookTitle(ItemStack book) {
+	public static @Nullable String getBookTitle(ItemStack book) {
 		if (book == null) {
 			return null;
 		}
@@ -783,7 +783,7 @@ public class ItemUtils {
 		return ((BookMeta) itemMeta).getTitle();
 	}
 
-	public static String getBookAuthor(ItemStack book) {
+	public static @Nullable String getBookAuthor(ItemStack book) {
 		if (book == null) {
 			return null;
 		}
@@ -941,33 +941,33 @@ public class ItemUtils {
 		}
 	}
 
-	public static boolean isAllowedTreeReplace(Material item) {
-		return !notAllowedTreeReplace.contains(item);
+	public static boolean isAllowedTreeReplace(@Nullable Material mat) {
+		return mat == null || !notAllowedTreeReplace.contains(mat);
 	}
 
-	public static boolean isShulkerBox(Material mat) {
-		return shulkerBoxes.contains(mat);
+	public static boolean isShulkerBox(@Nullable Material mat) {
+		return mat != null && shulkerBoxes.contains(mat);
 	}
 
 	//Returns true if the item material is something a player can launch an AbstractArrow/Projectile from
-	public static boolean isRanged(Material mat) {
-		return ranged.contains(mat);
+	public static boolean isRanged(@Nullable Material mat) {
+		return mat != null && ranged.contains(mat);
 	}
 
 	//Returns true if the item material is a dye
-	public static boolean isDye(Material mat) {
-		return dyes.contains(mat);
+	public static boolean isDye(@Nullable Material mat) {
+		return mat != null && dyes.contains(mat);
 	}
 
-	public static boolean isStrippable(Material mat) {
-		return strippables.contains(mat);
+	public static boolean isStrippable(@Nullable Material mat) {
+		return mat != null && strippables.contains(mat);
 	}
 
 	public static void damageItem(ItemStack item, int damage, boolean canBreak) {
 		ItemMeta meta = item.hasItemMeta() ? item.getItemMeta() : null;
 		if (meta != null && (meta instanceof Damageable)) {
 			// This item can be damaged - remove some durability from it
-			Damageable dMeta = (Damageable)meta;
+			Damageable dMeta = (Damageable) meta;
 			short maxDurability = item.getType().getMaxDurability();
 			int currentDamage = dMeta.getDamage();
 			int newDamage = currentDamage + damage;
@@ -1232,7 +1232,7 @@ public class ItemUtils {
 		return NON_PLAIN_REGEX.matcher(plainText).replaceAll("").trim();
 	}
 
-	public static boolean isArmor(@NotNull ItemStack itemStack) {
+	public static boolean isArmor(ItemStack itemStack) {
 		if (itemStack != null) {
 			return Materials.ARMOR.contains(itemStack.getType());
 		} else {
@@ -1240,7 +1240,7 @@ public class ItemUtils {
 		}
 	}
 
-	public static boolean isWearable(@NotNull ItemStack itemStack) {
+	public static boolean isWearable(ItemStack itemStack) {
 		if (itemStack != null) {
 			return Materials.WEARABLE.contains(itemStack.getType());
 		} else {
@@ -1249,7 +1249,7 @@ public class ItemUtils {
 
 	}
 
-	public static boolean isShatteredWearable(@NotNull ItemStack itemStack) {
+	public static boolean isShatteredWearable(ItemStack itemStack) {
 		if (itemStack != null) {
 			return isWearable(itemStack) && isItemShattered(itemStack);
 		} else {
@@ -1257,7 +1257,7 @@ public class ItemUtils {
 		}
 	}
 
-	public static boolean isSword(@NotNull ItemStack itemStack) {
+	public static boolean isSword(ItemStack itemStack) {
 		if (itemStack != null) {
 			return Materials.SWORDS.contains(itemStack.getType());
 		} else {
@@ -1265,7 +1265,7 @@ public class ItemUtils {
 		}
 	}
 
-	public static boolean isSomeBow(@NotNull ItemStack itemStack) {
+	public static boolean isSomeBow(ItemStack itemStack) {
 		if (itemStack != null) {
 			return Materials.BOWS.contains(itemStack.getType());
 		} else {
@@ -1276,7 +1276,7 @@ public class ItemUtils {
 	/*
 	 * Does not count shattered hoes.
 	 */
-	public static boolean isHoe(@NotNull ItemStack itemStack) {
+	public static boolean isHoe(ItemStack itemStack) {
 		if (itemStack != null) {
 			if (isItemShattered(itemStack)) {
 				return false;
@@ -1291,14 +1291,14 @@ public class ItemUtils {
 	/*
 	 * Does not count shattered wands.
 	 */
-	public static boolean isWand(@NotNull ItemStack itemStack) {
+	public static boolean isWand(ItemStack itemStack) {
 		if (itemStack != null) {
 			if (isItemShattered(itemStack)) {
 				return false;
 			}
 
-			@NotNull List<@NotNull String> loreLines = getPlainLore(itemStack);
-			for (@NotNull String loreLine : loreLines) {
+			List<String> loreLines = getPlainLore(itemStack);
+			for (String loreLine : loreLines) {
 				if (loreLine.contains("* Magic Wand *")) {
 					return true;
 				}
@@ -1311,14 +1311,14 @@ public class ItemUtils {
 
 	}
 
-	public static boolean isAlchemistItem(@NotNull ItemStack itemStack) {
+	public static boolean isAlchemistItem(ItemStack itemStack) {
 		if (itemStack != null) {
 			if (isItemShattered(itemStack)) {
 				return false;
 			}
 
-			@NotNull List<@NotNull String> loreLines = getPlainLore(itemStack);
-			for (@NotNull String loreLine : loreLines) {
+			List<String> loreLines = getPlainLore(itemStack);
+			for (String loreLine : loreLines) {
 				if (loreLine.contains("* Alchemical Utensil *")) {
 					return true;
 				}
@@ -1327,7 +1327,7 @@ public class ItemUtils {
 		return false;
 	}
 
-	public static boolean isPickaxe(@NotNull ItemStack itemStack) {
+	public static boolean isPickaxe(ItemStack itemStack) {
 		if (itemStack != null) {
 			return Materials.PICKAXES.contains(itemStack.getType());
 		} else {
@@ -1335,7 +1335,7 @@ public class ItemUtils {
 		}
 	}
 
-	public static boolean isAxe(@NotNull ItemStack itemStack) {
+	public static boolean isAxe(ItemStack itemStack) {
 		if (itemStack != null) {
 			return Materials.AXES.contains(itemStack.getType());
 		} else {
@@ -1343,7 +1343,7 @@ public class ItemUtils {
 		}
 	}
 
-	public static boolean isShovel(@NotNull ItemStack itemStack) {
+	public static boolean isShovel(ItemStack itemStack) {
 		if (itemStack != null) {
 			return Materials.SHOVELS.contains(itemStack.getType());
 		} else {
@@ -1351,7 +1351,7 @@ public class ItemUtils {
 		}
 	}
 
-	public static boolean isSomePotion(@NotNull ItemStack itemStack) {
+	public static boolean isSomePotion(ItemStack itemStack) {
 		if (itemStack != null) {
 			return Materials.POTIONS.contains(itemStack.getType());
 		} else {
@@ -1359,7 +1359,7 @@ public class ItemUtils {
 		}
 	}
 
-	public static void enchantifyItem(@NotNull ItemStack itemStack, String enchantment) throws Exception {
+	public static void enchantifyItem(ItemStack itemStack, String enchantment) throws Exception {
 		enchantifyItem(itemStack, enchantment, null, null);
 	}
 
@@ -1370,7 +1370,7 @@ public class ItemUtils {
 	 * This most likely means @NickNackGus or @Combustible
 	 * If this does not happen, your changes will NOT persist across weekly updates!
 	 */
-	public static void enchantifyItem(@NotNull ItemStack itemStack, String enchantment, String ownerPrefix, Player player) throws Exception {
+	public static void enchantifyItem(ItemStack itemStack, String enchantment, String ownerPrefix, Player player) throws Exception {
 
 		if (itemStack == null) {
 			throw new Exception("Player must have a valid item in their main hand!");

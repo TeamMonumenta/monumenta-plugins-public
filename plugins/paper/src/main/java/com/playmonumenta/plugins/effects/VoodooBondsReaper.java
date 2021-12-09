@@ -10,6 +10,7 @@ import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityManager;
@@ -27,11 +28,11 @@ public class VoodooBondsReaper extends Effect {
 	private static final String MESSAGE = "You feel a pull on your soul...";
 
 	private final Player mPlayer;
-	private double mDamageTaken;
-	private double mDamagePercent;
+	private final double mDamageTaken;
+	private final double mDamagePercent;
 	private final Plugin mPlugin;
 
-	private VoodooBonds mVoodooBonds;
+	private @Nullable VoodooBonds mVoodooBonds;
 	private int mScore;
 	private boolean mDone = false;
 

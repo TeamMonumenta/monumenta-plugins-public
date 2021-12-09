@@ -8,7 +8,7 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
-import org.jetbrains.annotations.NotNull;
+
 
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 
@@ -44,11 +44,11 @@ public class ZoneUtils {
 		}
 	}
 
-	public static boolean isInPlot(@NotNull Player player) {
+	public static boolean isInPlot(Player player) {
 		return isInPlot(player.getLocation());
 	}
 
-	public static boolean isInPlot(@NotNull Location loc) {
+	public static boolean isInPlot(Location loc) {
 		return inPlot(loc, ServerProperties.getIsTownWorld());
 	}
 

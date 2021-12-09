@@ -28,8 +28,6 @@ public class Detonation extends DepthsAbility {
 	public static final int DEATH_RADIUS = 8;
 	public static final int DAMAGE_RADIUS = 2;
 
-	public static String tree;
-
 	public Detonation(Plugin plugin, Player player) {
 		super(plugin, player, ABILITY_NAME);
 		mDisplayItem = Material.TNT;

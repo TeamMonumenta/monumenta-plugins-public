@@ -30,7 +30,6 @@ import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.jetbrains.annotations.NotNull;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.effects.AbilitySilence;
@@ -122,7 +121,7 @@ public class AbilityUtils {
 			plugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.INVISIBILITY, duration, 0));
 			INVISIBLE_PLAYERS.put(player, duration);
 		} else {
-			int currentDuration = INVISIBLE_PLAYERS.get(player);
+			int currentDuration = INVISIBLE_PLAYERS.getOrDefault(player, 0);
 			plugin.mPotionManager.removePotion(player, PotionID.ABILITY_SELF, PotionEffectType.INVISIBILITY);
 			plugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.INVISIBILITY, duration + currentDuration, 0));
 			INVISIBLE_PLAYERS.put(player, duration + currentDuration);
@@ -220,7 +219,7 @@ public class AbilityUtils {
 	}
 
 
-	public static boolean updateAlchemistItem(@NotNull ItemStack item, int count) {
+	public static boolean updateAlchemistItem(ItemStack item, int count) {
 		ItemMeta meta = item.getItemMeta();
 
 		if (item.getType() == Material.SPLASH_POTION) {

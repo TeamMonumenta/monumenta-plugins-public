@@ -5,6 +5,7 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class Portal {
 
@@ -16,13 +17,10 @@ public class Portal {
 
 	public BlockFace mFacing;
 
-	public Entity mItemFrame1;
-	public Entity mItemFrame2;
-
 	//The portal it links to
-	public Portal mPair;
+	public @Nullable Portal mPair;
 	//The owner of the portal
-	public Player mOwner;
+	public @Nullable Player mOwner;
 
 	public Portal(Location loc1, Location loc2, BlockFace face, Location b1, Location b2) {
 		mLocation1 = loc1;
@@ -32,7 +30,7 @@ public class Portal {
 		mBlock2 = b2;
 	}
 
-	public Vector getShift() {
+	public @Nullable Vector getShift() {
 		if (mFacing == BlockFace.UP) {
 			return new Vector(0, 1, 0);
 		} else if (mFacing == BlockFace.DOWN) {

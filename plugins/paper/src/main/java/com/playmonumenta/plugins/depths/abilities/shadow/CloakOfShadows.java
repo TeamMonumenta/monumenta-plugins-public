@@ -60,7 +60,8 @@ public class CloakOfShadows extends DepthsAbility {
 
 	@Override
 	public void cast(Action trigger) {
-		if (!(mPlayer.isSneaking() && !mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.mLinkedSpell) && DepthsUtils.isWeaponItem(mPlayer.getInventory().getItemInMainHand()))) {
+		if (mPlayer == null
+			|| !(mPlayer.isSneaking() && !mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.mLinkedSpell) && DepthsUtils.isWeaponItem(mPlayer.getInventory().getItemInMainHand()))) {
 			return;
 		}
 
@@ -122,16 +123,19 @@ public class CloakOfShadows extends DepthsAbility {
 
 	@Override
 	public boolean livingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
+		if (mPlayer == null) {
+			return false;
+		}
 		if (event.getCause().equals(DamageCause.ENTITY_ATTACK) && mBonusDamage) {
 			event.setDamage(event.getDamage() + DAMAGE[mRarity - 1]);
 			mBonusDamage = false;
 		}
 
 		if (event.getCause().equals(DamageCause.ENTITY_ATTACK) && mPlayer.isSneaking() && !mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.mLinkedSpell) && DepthsUtils.isWeaponItem(mPlayer.getInventory().getItemInMainHand())) {
-	        cast(Action.LEFT_CLICK_AIR);
-	    }
+			cast(Action.LEFT_CLICK_AIR);
+		}
 
-	    return true;
+		return true;
 	}
 
 	@Override

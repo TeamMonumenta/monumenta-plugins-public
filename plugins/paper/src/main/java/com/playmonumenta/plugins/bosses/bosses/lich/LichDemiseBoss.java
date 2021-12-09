@@ -17,6 +17,7 @@ import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.bosses.spells.SpellBossBlockBreak;
 import com.playmonumenta.plugins.bosses.spells.SpellConditionalTeleport;
 import com.playmonumenta.plugins.bosses.spells.headlesshorseman.SpellBurningVengence;
+import com.playmonumenta.plugins.utils.EntityUtils;
 
 public class LichDemiseBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_demise";
@@ -36,7 +37,7 @@ public class LichDemiseBoss extends BossAbilityGroup {
 		int playercount = Lich.playersInRange(loc, detectionRange, true).size();
 		double hpdel = 325;
 		double hp = (int) (hpdel * (1 + (1 - 1/Math.E) * Math.log(playercount)));
-		mBoss.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(hp);
+		EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_MAX_HEALTH, hp);
 		mBoss.setHealth(hp);
 
 		SpellManager activeSpells = new SpellManager(Arrays.asList(

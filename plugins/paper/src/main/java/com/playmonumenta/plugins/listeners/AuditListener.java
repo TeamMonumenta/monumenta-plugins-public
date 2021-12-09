@@ -30,8 +30,8 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BlockStateMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.loot.Lootable;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.integrations.MonumentaNetworkRelayIntegration;
 import com.playmonumenta.plugins.utils.MessagingUtils;
@@ -41,7 +41,7 @@ import net.kyori.adventure.text.Component;
 
 
 public class AuditListener implements Listener {
-	private static final List<@NotNull Pattern> IGNORED_COMMAND_REGEX = Arrays.asList(
+	private static final List<Pattern> IGNORED_COMMAND_REGEX = Arrays.asList(
 		// ScriptedQuests
 		exactOptionalArguments("(scriptedquests:)?questtrigger"),
 		exactOptionalArguments("clickable"),
@@ -221,14 +221,14 @@ public class AuditListener implements Listener {
 		return retStr + ")";
 	}
 
-	public static void logSevere(@NotNull String message) {
+	public static void logSevere(String message) {
 		if (INSTANCE != null) {
 			INSTANCE.mLogger.info("Audit | " + message);
 			MonumentaNetworkRelayIntegration.sendAuditLogSevereMessage(message);
 		}
 	}
 
-	public static void log(@NotNull String message) {
+	public static void log(String message) {
 		if (INSTANCE != null) {
 			INSTANCE.mLogger.info("Audit | " + message);
 			MonumentaNetworkRelayIntegration.sendAuditLogMessage(message);
@@ -245,21 +245,21 @@ public class AuditListener implements Listener {
 
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void playerGameModeChangeEvent(PlayerGameModeChangeEvent event) {
-		@NotNull Player player = event.getPlayer();
+		Player player = event.getPlayer();
 		if (!player.isOp()) {
 			return;
 		}
 
 		// Don't log normal game mode changes, eg changing zones
-		@NotNull GameMode oldGameMode = player.getGameMode();
-		@NotNull GameMode newGameMode = event.getNewGameMode();
+		GameMode oldGameMode = player.getGameMode();
+		GameMode newGameMode = event.getNewGameMode();
 		if (
 			(
 				GameMode.SURVIVAL.equals(oldGameMode)
-				|| GameMode.ADVENTURE.equals(oldGameMode)
+					|| GameMode.ADVENTURE.equals(oldGameMode)
 			) && (
 				GameMode.SURVIVAL.equals(newGameMode)
-				|| GameMode.ADVENTURE.equals(newGameMode)
+					|| GameMode.ADVENTURE.equals(newGameMode)
 			)
 		) {
 			return;
@@ -276,14 +276,14 @@ public class AuditListener implements Listener {
 	}
 
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-	public void playerCommandPreprocessEvent(@NotNull PlayerCommandPreprocessEvent event) {
-		@NotNull Player player = event.getPlayer();
+	public void playerCommandPreprocessEvent(PlayerCommandPreprocessEvent event) {
+		Player player = event.getPlayer();
 		if (!player.isOp()) {
 			return;
 		}
 
-		@NotNull String command = event.getMessage();
-		for (@NotNull Pattern pattern : IGNORED_COMMAND_REGEX) {
+		String command = event.getMessage();
+		for (Pattern pattern : IGNORED_COMMAND_REGEX) {
 			if (pattern.matcher(command).find()) {
 				return;
 			}
@@ -301,7 +301,7 @@ public class AuditListener implements Listener {
 	 * (eg "r" won't match "restart" as well),
 	 * either with or without arguments after it.
 	 */
-	private static @NotNull Pattern exactOptionalArguments(@NotNull String command) {
+	private static Pattern exactOptionalArguments(String command) {
 		return Pattern.compile("^\\/" + command + "($| )");
 	}
 }

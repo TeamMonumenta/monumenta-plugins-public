@@ -148,7 +148,7 @@ public class IronTincture extends Ability {
 
 		AbsorptionUtils.addAbsorption(player, absorption, absorption, IRON_TINCTURE_ABSORPTION_DURATION);
 
-		World world = mPlayer.getWorld();
+		World world = player.getWorld();
 		world.playSound(player.getLocation(), Sound.ENTITY_ILLUSIONER_PREPARE_MIRROR, 1.2f, 1.0f);
 		world.spawnParticle(Particle.FLAME, player.getLocation(), 30, 0.25, 0.1, 0.25, 0.125);
 		new BukkitRunnable() {

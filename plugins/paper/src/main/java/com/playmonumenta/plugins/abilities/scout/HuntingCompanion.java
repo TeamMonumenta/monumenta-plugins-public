@@ -26,6 +26,7 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
@@ -54,11 +55,11 @@ public class HuntingCompanion extends Ability {
 	private static final double VELOCITY = 0.9;
 	private static final double JUMP_HEIGHT = 0.8;
 
-	private Fox mFox;
-	private LivingEntity mTarget;
-	private double mDamage;
+	private @Nullable Fox mFox;
+	private @Nullable LivingEntity mTarget;
+	private final double mDamage;
 	public int mStunTime;
-	private WindBomb mWindBomb;
+	private @Nullable WindBomb mWindBomb;
 
 	public List<Entity> mStunnedMobs;
 
@@ -172,11 +173,12 @@ public class HuntingCompanion extends Ability {
 						return;
 					}
 
-					if (mFox != null && mTarget != null && !mTarget.isDead() && mTarget.getHealth() > 0) {
+					if (mTarget != null && !mTarget.isDead() && mTarget.getHealth() > 0) {
 						mFox.setTarget(mTarget);
 					}
 
-					if (mFox != null && (mFox.getTarget() == null || mFox.getTarget().isDead() || mFox.getTarget().getHealth() <= 0) && mTicksElapsed >= TICK_INTERVAL * 2) {
+					LivingEntity target = mFox.getTarget();
+					if ((target == null || target.isDead() || target.getHealth() <= 0) && mTicksElapsed >= TICK_INTERVAL * 2) {
 						Location foxLoc = mFox.getLocation();
 						List<LivingEntity> nearbyMobs = EntityUtils.getNearbyMobs(foxLoc, DETECTION_RANGE, mFox);
 						nearbyMobs.removeIf(mob -> mob.getScoreboardTags().contains(AbilityUtils.IGNORE_TAG));
@@ -195,7 +197,8 @@ public class HuntingCompanion extends Ability {
 
 	@Override
 	public boolean livingEntityShotByPlayerEvent(Projectile proj, LivingEntity le, EntityDamageByEntityEvent event) {
-		if (mFox == null || mFox.getHealth() <= 0 || !(mTarget == null || mTarget.getHealth() <= 0) || le.getLocation().distance(mFox.getLocation()) > DETECTION_RANGE || !(le instanceof Mob)) {
+		if (mPlayer == null || mFox == null || mFox.getHealth() <= 0 || !(mTarget == null || mTarget.getHealth() <= 0)
+			|| le.getLocation().distance(mFox.getLocation()) > DETECTION_RANGE || !(le instanceof Mob)) {
 			return true;
 		}
 

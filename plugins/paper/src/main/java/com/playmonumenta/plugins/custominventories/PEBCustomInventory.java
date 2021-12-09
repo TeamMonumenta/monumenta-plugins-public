@@ -8,11 +8,13 @@ import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.goncalomb.bukkit.mylib.utils.CustomInventory;
 import com.playmonumenta.plugins.Plugin;
@@ -34,7 +36,7 @@ public class PEBCustomInventory extends CustomInventory {
 		String mLore;
 		Material mType;
 		String mCommand;
-		ChatColor mChatColor = null;
+		@Nullable ChatColor mChatColor = null;
 		Boolean mCloseAfter;
 
 		public PebItem(int pg, int sl, String n, String l, ChatColor cc, Material t, String cmd, Boolean closeAfter) {
@@ -298,7 +300,7 @@ public class PEBCustomInventory extends CustomInventory {
 
 		ScoreboardUtils.setScoreboardValue(player, "PEBPage", 1);
 
-		setLayout(1, player);
+		setLayout(_inventory, 1, player);
 	}
 	@Override
 	protected void inventoryClick(InventoryClickEvent event) {
@@ -347,11 +349,9 @@ public class PEBCustomInventory extends CustomInventory {
 	public void runInternalCommand(Player player, PebItem item) {
 		if (item.mCommand.startsWith("page")) {
 			int newPageValue = Integer.parseInt(item.mCommand.split(" ")[1]);
-			setLayout(newPageValue, player);
-			return;
+			setLayout(_inventory, newPageValue, player);
 		} else if (item.mCommand.startsWith("exit")) {
 			player.closeInventory();
-			return;
 		} else if (item.mCommand.equals("threshold")) {
 			player.closeInventory();
 			callSignUI(player);
@@ -359,25 +359,22 @@ public class PEBCustomInventory extends CustomInventory {
 	}
 
 	public void completeCommand(Player player, PebItem item) {
-		if (item.mCommand == "") {
+		if (item.mCommand.isEmpty()) {
 			return;
 		}
 		if (isInternalCommand(item.mCommand)) {
 			runInternalCommand(player, item);
-			return;
 		} else if (isPlayerCommand(item.mCommand)) {
 			player.performCommand(item.mCommand);
 			if (item.mCloseAfter) {
 				player.closeInventory();
 			}
-			return;
 		} else {
 			String finalCommand = item.mCommand.replace("@S", player.getName());
 			Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), finalCommand);
 			if (item.mCloseAfter) {
 				player.closeInventory();
 			}
-			return;
 		}
 	}
 
@@ -420,7 +417,7 @@ public class PEBCustomInventory extends CustomInventory {
 	    menu.open(target);
 	}
 
-	public ItemStack createCustomItem(PebItem item, Player player) {
+	public static ItemStack createCustomItem(PebItem item, Player player) {
 		ItemStack newItem = new ItemStack(item.mType, 1);
 		if (item.mType == Material.PLAYER_HEAD) {
 			SkullMeta meta = (SkullMeta) newItem.getItemMeta();
@@ -430,7 +427,7 @@ public class PEBCustomInventory extends CustomInventory {
 		ItemMeta meta = newItem.getItemMeta();
 		if (item.mName != "") {
 			meta.displayName(Component.text(item.mName, NamedTextColor.WHITE)
-					.decoration(TextDecoration.ITALIC, false));
+				                 .decoration(TextDecoration.ITALIC, false));
 		}
 		ChatColor defaultColor = (item.mChatColor != null) ? item.mChatColor : ChatColor.LIGHT_PURPLE;
 		if (item.mLore != "") {
@@ -441,7 +438,7 @@ public class PEBCustomInventory extends CustomInventory {
 		return newItem;
 	}
 
-	public void splitLoreLine(ItemMeta meta, String lore, int maxLength, ChatColor defaultColor) {
+	public static void splitLoreLine(ItemMeta meta, String lore, int maxLength, ChatColor defaultColor) {
 		String[] splitLine = lore.split(" ");
 		String currentString = defaultColor + "";
 		List<String> finalLines = new ArrayList<String>();
@@ -461,21 +458,21 @@ public class PEBCustomInventory extends CustomInventory {
 		meta.setLore(finalLines);
 	}
 
-	public void setLayout(int page, Player player) {
+	public static void setLayout(Inventory inventory, int page, Player player) {
 
-		_inventory.clear();
+		inventory.clear();
 		for (PebItem item : PEB_ITEMS) {
 			if (item.mPage == 0) {
-				_inventory.setItem(item.mSlot, createCustomItem(item, player));
+				inventory.setItem(item.mSlot, createCustomItem(item, player));
 			} //intentionally not else, so overrides can happen
 			if (item.mPage == page) {
-				_inventory.setItem(item.mSlot, createCustomItem(item, player));
+				inventory.setItem(item.mSlot, createCustomItem(item, player));
 			}
 		}
 
 		for (int i = 0; i < 54; i++) {
-			if (_inventory.getItem(i) == null) {
-				_inventory.setItem(i, new ItemStack(FILLER, 1));
+			if (inventory.getItem(i) == null) {
+				inventory.setItem(i, new ItemStack(FILLER, 1));
 			}
 		}
 		ScoreboardUtils.setScoreboardValue(player, "PEBPage", page);

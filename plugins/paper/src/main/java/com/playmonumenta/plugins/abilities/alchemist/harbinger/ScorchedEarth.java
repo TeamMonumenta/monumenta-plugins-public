@@ -20,6 +20,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.MultipleChargeAbility;
@@ -61,7 +62,7 @@ public class ScorchedEarth extends MultipleChargeAbility {
 	 */
 	private static final Map<Location, Map.Entry<Player, Integer>> mZoneCenters = new HashMap<>();
 	private static Map<LivingEntity, Double> mMobHealths = new HashMap<>();
-	private static BukkitRunnable mMobHealthsTracker;
+	private static @Nullable BukkitRunnable mMobHealthsTracker;
 
 	public ScorchedEarth(Plugin plugin, Player player) {
 		super(plugin, player, "Scorched Earth");
@@ -155,7 +156,7 @@ public class ScorchedEarth extends MultipleChargeAbility {
 
 	@Override
 	public boolean playerThrewSplashPotionEvent(ThrownPotion potion) {
-		if (mPlayer.isSneaking() && ItemUtils.isAlchemistItem(mPlayer.getInventory().getItemInMainHand())) {
+		if (mPlayer != null && mPlayer.isSneaking() && ItemUtils.isAlchemistItem(mPlayer.getInventory().getItemInMainHand())) {
 			if (consumeCharge()) {
 				potion.setMetadata(SCORCHED_EARTH_POTION_METAKEY, new FixedMetadataValue(mPlugin, null));
 			}
@@ -166,7 +167,7 @@ public class ScorchedEarth extends MultipleChargeAbility {
 
 	@Override
 	public boolean playerSplashPotionEvent(Collection<LivingEntity> affectedEntities, ThrownPotion potion, PotionSplashEvent event) {
-		if (potion.hasMetadata(SCORCHED_EARTH_POTION_METAKEY)) {
+		if (mPlayer != null && potion.hasMetadata(SCORCHED_EARTH_POTION_METAKEY)) {
 			Location loc = potion.getLocation();
 			World world = mPlayer.getWorld();
 			world.spawnParticle(Particle.SMOKE_NORMAL, loc, 50, 2.1, 0.5, 2.1, 0.1);

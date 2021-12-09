@@ -154,7 +154,7 @@ public class SpellBaseSeekingProjectile extends Spell {
 		mInitiateAesthetic.run(mWorld, mBoss.getEyeLocation(), 0);
 
 		if (mGetSpellTargets != null) {
-			List<LivingEntity> entities = mGetSpellTargets.getTargets();
+			List<? extends LivingEntity> entities = mGetSpellTargets.getTargets();
 			Map<LivingEntity, Location> locations = new HashMap<LivingEntity, Location>();
 			if (!mLaunchTracking) {
 				for (LivingEntity target : entities) {
@@ -162,8 +162,8 @@ public class SpellBaseSeekingProjectile extends Spell {
 				}
 			}
 			BukkitRunnable initiateSpell = new BukkitRunnable() {
-				List<LivingEntity> mTargets = entities;
-				Map<LivingEntity, Location> mLocations = locations;
+				final List<? extends LivingEntity> mTargets = entities;
+				final Map<LivingEntity, Location> mLocations = locations;
 
 				@Override
 				public void run() {

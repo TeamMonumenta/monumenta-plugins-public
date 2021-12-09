@@ -188,6 +188,6 @@ public class Spellshock extends Ability {
 
 	@Override
 	public boolean runCheck() {
-		return ItemUtils.isWand(mPlayer.getInventory().getItemInMainHand());
+		return mPlayer != null && ItemUtils.isWand(mPlayer.getInventory().getItemInMainHand());
 	}
 }

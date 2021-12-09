@@ -8,7 +8,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.Sound;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.jetbrains.annotations.NotNull;
+
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.classes.magic.MagicType;
@@ -29,7 +29,7 @@ public class Expedite implements BaseEnchantment {
 	private static final String CHECK_ONCE_THIS_TICK_METAKEY = "ExpediteTick";
 
 	@Override
-	public @NotNull String getProperty() {
+	public String getProperty() {
 		return PROPERTY_NAME;
 	}
 
@@ -39,7 +39,7 @@ public class Expedite implements BaseEnchantment {
 	}
 
 	@Override
-	public void onAbility(@NotNull Plugin plugin, @NotNull Player player, int level, @NotNull LivingEntity enemy, @NotNull CustomDamageEvent customDamageEvent) {
+	public void onAbility(Plugin plugin, Player player, int level, LivingEntity enemy, CustomDamageEvent customDamageEvent) {
 		if (customDamageEvent.getMagicType() == MagicType.ENCHANTMENT) {
 			return;
 		}

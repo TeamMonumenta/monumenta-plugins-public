@@ -5,7 +5,7 @@ import java.util.NavigableSet;
 
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
-import org.jetbrains.annotations.NotNull;
+
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.effects.Effect;
@@ -22,7 +22,7 @@ public class Natant implements BaseEnchantment {
 	private static final String PERCENT_SPEED_EFFECT_NAME = "NatantPercentSpeedEffect";
 
 	@Override
-	public @NotNull String getProperty() {
+	public String getProperty() {
 		return PROPERTY_NAME;
 	}
 
@@ -32,8 +32,8 @@ public class Natant implements BaseEnchantment {
 	}
 
 	@Override
-	public void tick(@NotNull Plugin plugin, @NotNull Player player, int level) {
-	    if (player.isInWater()) {
+	public void tick(Plugin plugin, Player player, int level) {
+		if (player.isInWater()) {
 			NavigableSet<Effect> speedEffects = plugin.mEffectManager.getEffects(player, PERCENT_SPEED_EFFECT_NAME);
 			if (speedEffects != null) {
 				for (Effect effect : speedEffects) {

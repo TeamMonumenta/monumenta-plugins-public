@@ -6,12 +6,13 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.guis.SinglePageGUI;
 
 public class ExampleSinglePageGUI extends SinglePageGUI {
 
-	public ExampleSinglePageGUI(Player player, String[] args) {
+	public ExampleSinglePageGUI(@Nullable Player player, @Nullable String[] args) {
 		super(player, args);
 	}
 

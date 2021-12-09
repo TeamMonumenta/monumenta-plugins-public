@@ -14,6 +14,7 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import org.bukkit.util.Vector;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityManager;
@@ -46,7 +47,7 @@ public class DepthsAdvancingShadows extends DepthsAbility {
 	private static final int COOLDOWN = 18 * 20;
 	private static final int DAMAGE_DURATION = 5 * 20;
 
-	private LivingEntity mTarget = null;
+	private @Nullable LivingEntity mTarget = null;
 
 	public DepthsAdvancingShadows(Plugin plugin, Player player) {
 		super(plugin, player, ABILITY_NAME);
@@ -61,8 +62,12 @@ public class DepthsAdvancingShadows extends DepthsAbility {
 	public void cast(Action action) {
 
 		LivingEntity entity = mTarget;
+		if (entity == null || mPlayer == null) {
+			return;
+		}
+
 		double origDistance = mPlayer.getLocation().distance(entity.getLocation());
-		if (entity != null && origDistance <= ADVANCING_SHADOWS_RANGE && !entity.getScoreboardTags().contains(AbilityUtils.IGNORE_TAG)) {
+		if (origDistance <= ADVANCING_SHADOWS_RANGE && !entity.getScoreboardTags().contains(AbilityUtils.IGNORE_TAG)) {
 			int advancingShadows = getAbilityScore();
 			Vector dir = LocationUtils.getDirectionTo(entity.getLocation(), mPlayer.getLocation());
 			World world = mPlayer.getWorld();
@@ -155,13 +160,12 @@ public class DepthsAdvancingShadows extends DepthsAbility {
 	@Override
 	public boolean runCheck() {
 
-		if (!mPlayer.isSneaking() && DepthsUtils.isWeaponItem(mPlayer.getInventory().getItemInMainHand())) {
-			int range = ADVANCING_SHADOWS_RANGE;
+		if (mPlayer != null && !mPlayer.isSneaking() && DepthsUtils.isWeaponItem(mPlayer.getInventory().getItemInMainHand())) {
 
 			// Basically makes sure if the target is in LoS and if there is
 			// a path.
 			Location eyeLoc = mPlayer.getEyeLocation();
-			Raycast ray = new Raycast(eyeLoc, eyeLoc.getDirection(), range);
+			Raycast ray = new Raycast(eyeLoc, eyeLoc.getDirection(), ADVANCING_SHADOWS_RANGE);
 			ray.mThroughBlocks = false;
 			ray.mThroughNonOccluding = false;
 			if (AbilityManager.getManager().isPvPEnabled(mPlayer)) {

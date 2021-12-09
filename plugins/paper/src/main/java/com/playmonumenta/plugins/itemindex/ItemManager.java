@@ -1,5 +1,17 @@
 package com.playmonumenta.plugins.itemindex;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.util.ArrayList;
+import java.util.Map;
+import java.util.TreeMap;
+
+import org.bukkit.ChatColor;
+import org.bukkit.Material;
+import org.bukkit.inventory.ItemStack;
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 import com.google.common.base.Charsets;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -7,18 +19,8 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.playmonumenta.plugins.Plugin;
-import de.tr7zw.nbtapi.NBTItem;
-import org.bukkit.ChatColor;
-import org.bukkit.Material;
-import org.bukkit.inventory.ItemStack;
 
-import javax.annotation.Nullable;
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.util.ArrayList;
-import java.util.Map;
-import java.util.TreeMap;
+import de.tr7zw.nbtapi.NBTItem;
 
 public class ItemManager {
 	private static final Gson GSON = new GsonBuilder().disableHtmlEscaping().create();
@@ -44,7 +46,7 @@ public class ItemManager {
 		}
 	}
 
-	private Map<String, MonumentaItem> loadMaterialDirectory(File directory) {
+	private @Nullable Map<String, MonumentaItem> loadMaterialDirectory(File directory) {
 		Map<String, MonumentaItem> out = new TreeMap<>();
 		File[] files = directory.listFiles();
 		if (files == null || files.length == 0) {
@@ -66,8 +68,7 @@ public class ItemManager {
 		return out;
 	}
 
-	@Nullable
-	public static MonumentaItem jsonToItem(String json) {
+	public static @Nullable MonumentaItem jsonToItem(String json) {
 		if (json == null || json.length() == 0) {
 			return null;
 		}
@@ -115,14 +116,11 @@ public class ItemManager {
 		this.updateFile(item);
 	}
 
-	@Nullable
-	public MonumentaItem getIndexMMItem(ItemStack itemStack) {
-		MonumentaItem i = getIndexMMItem(itemStack.getType(), ChatColor.stripColor(itemStack.getItemMeta().getDisplayName()));
-		return i;
+	public @Nullable MonumentaItem getIndexMMItem(ItemStack itemStack) {
+		return getIndexMMItem(itemStack.getType(), ChatColor.stripColor(itemStack.getItemMeta().getDisplayName()));
 	}
 
-	@Nullable
-	public MonumentaItem getIndexMMItem(Material material, String name) {
+	public @Nullable MonumentaItem getIndexMMItem(Material material, String name) {
 		if (material == null || this.mItems == null || this.mItems.size() == 0) {
 			return null;
 		}
@@ -133,8 +131,7 @@ public class ItemManager {
 		return nameMap.getOrDefault(name, null);
 	}
 
-	@Nullable
-	public MonumentaItem getMMItemWithEdits(ItemStack itemStack) {
+	public @Nullable MonumentaItem getMMItemWithEdits(ItemStack itemStack) {
 		String json = new NBTItem(itemStack).getString("MonumentaItemEdits");
 		MonumentaItem edits = null;
 		if (json != null) {
@@ -177,7 +174,7 @@ public class ItemManager {
 				}
 			}
 		}
-		return out.toArray(new MonumentaItem[0]);
+		return out.toArray(MonumentaItem[]::new);
 	}
 
 	public void remove(MonumentaItem item) {

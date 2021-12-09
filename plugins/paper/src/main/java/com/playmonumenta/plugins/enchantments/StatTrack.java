@@ -12,6 +12,7 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.inventory.ItemStack;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
@@ -110,7 +111,7 @@ public class StatTrack implements BaseEnchantment {
 			return mLabel;
 		}
 
-		public static StatTrackOptions getInfusionSelection(String label) {
+		public static @Nullable StatTrackOptions getInfusionSelection(String label) {
 			if (label == null) {
 				return null;
 			}

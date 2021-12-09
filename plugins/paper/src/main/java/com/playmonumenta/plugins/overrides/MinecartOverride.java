@@ -17,11 +17,11 @@ public class MinecartOverride extends BaseOverride {
 		}
 
 		// Ignore the passed-in block and compute which block the player is looking at
-		block = player.getTargetBlockExact(6, FluidCollisionMode.SOURCE_ONLY);
-		if (block == null) {
+		Block targetBlock = player.getTargetBlockExact(6, FluidCollisionMode.SOURCE_ONLY);
+		if (targetBlock == null) {
 			return false;
 		}
 
-		return LocationUtils.isValidMinecartLocation(block.getLocation());
+		return LocationUtils.isValidMinecartLocation(targetBlock.getLocation());
 	}
 }

@@ -3,14 +3,6 @@ package com.playmonumenta.plugins.overrides;
 import java.util.HashMap;
 import java.util.UUID;
 
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.bosses.BossManager;
-import com.playmonumenta.plugins.bosses.bosses.FestiveTesseractSnowmanBoss;
-import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
-import com.playmonumenta.plugins.utils.FastUtils;
-import com.playmonumenta.plugins.utils.InventoryUtils;
-import com.playmonumenta.plugins.utils.MessagingUtils;
-
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
@@ -24,13 +16,22 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.loot.Lootable;
+import org.checkerframework.checker.nullness.qual.Nullable;
+
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.bosses.BossManager;
+import com.playmonumenta.plugins.bosses.bosses.FestiveTesseractSnowmanBoss;
+import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
+import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.utils.MessagingUtils;
 
 public class FestiveTesseractOverride extends BaseOverride {
 	private static final String TESSERACT_NAME = "Tesseract of Festivity";
 	private static final Particle.DustOptions FESTIVE_RED_COLOR = new Particle.DustOptions(Color.fromRGB(255, 98, 71), 1.0f);
 	private static final Particle.DustOptions FESTIVE_GREEN_COLOR = new Particle.DustOptions(Color.fromRGB(75, 200, 0), 1.0f);
 	private static final int COOLDOWN = 60 * 20 * 5;
-	private static HashMap<UUID, Integer> PLAYERS_ON_COOLDOWN = null;
+	private static final HashMap<UUID, Integer> PLAYERS_ON_COOLDOWN = new HashMap<>();
 
 	@Override
 	public boolean leftClickItemInteraction(Plugin plugin, Player player, Action action, ItemStack item, Block block) {
@@ -52,10 +53,6 @@ public class FestiveTesseractOverride extends BaseOverride {
 	public boolean rightClickItemInteraction(Plugin plugin, Player player, Action action, ItemStack item, Block block) {
 		if (!InventoryUtils.testForItemWithName(item, TESSERACT_NAME)) {
 			return true;
-		}
-
-		if (PLAYERS_ON_COOLDOWN == null) {
-			PLAYERS_ON_COOLDOWN = new HashMap<>();
 		}
 
 		Integer cooldownEnds = PLAYERS_ON_COOLDOWN.get(player.getUniqueId());
@@ -89,7 +86,7 @@ public class FestiveTesseractOverride extends BaseOverride {
 		loc.getWorld().spawnParticle(Particle.SNOWBALL, loc, 20, 0.2, 0.2, 0.2, 0);
 		loc.getWorld().playSound(loc, Sound.ENTITY_SNOW_GOLEM_SHOOT, SoundCategory.PLAYERS, 0.8f, 0.1f);
 
-		final LivingEntity[] summons = new LivingEntity[6];
+		final @Nullable LivingEntity[] summons = new LivingEntity[6];
 		float rnd = FastUtils.RANDOM.nextFloat();
 		if (rnd < 1.0/5) {
 			summons[0] = (LivingEntity) LibraryOfSoulsIntegration.summon(loc, "TurretSnowman");
@@ -128,13 +125,12 @@ public class FestiveTesseractOverride extends BaseOverride {
 			summons[5] = (LivingEntity) LibraryOfSoulsIntegration.summon(loc, "HoppingSnowman");
 		}
 
-		for (int i = 0; i < summons.length; i++) {
-			LivingEntity summon = summons[i];
+		for (LivingEntity summon : summons) {
 			if (summon != null) {
 				summon.getScoreboardTags().remove("boss_targetplayer");
 				summon.getScoreboardTags().remove("boss_winter_snowman");
 				if (summon instanceof Lootable) {
-					((Lootable)summon).clearLootTable();
+					((Lootable) summon).clearLootTable();
 				}
 				BossManager.getInstance().unload(summon, false);
 				try {

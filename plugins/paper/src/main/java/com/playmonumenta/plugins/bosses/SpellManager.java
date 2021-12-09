@@ -9,6 +9,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 import com.playmonumenta.plugins.bosses.spells.Spell;
 
 /*
@@ -29,7 +31,7 @@ public class SpellManager {
 	private Map<Class<? extends Spell>, Spell> mReadySpells;
 	private final Queue<Spell> mCooldownSpells;
 	private final int mCooldown;
-	private Spell mLastCasted;
+	private @Nullable Spell mLastCasted;
 
 	public List<Spell> getSpells() {
 		List<Spell> spells = new ArrayList<Spell>();
@@ -102,7 +104,7 @@ public class SpellManager {
 		return 20;
 	}
 
-	public Spell getLastCastedSpell() {
+	public @Nullable Spell getLastCastedSpell() {
 		return mLastCasted;
 	}
 

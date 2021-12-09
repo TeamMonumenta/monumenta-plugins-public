@@ -6,6 +6,7 @@ import java.util.List;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import dev.jorel.commandapi.CommandAPI;
 import dev.jorel.commandapi.CommandAPICommand;
@@ -50,7 +51,7 @@ public class TeleportGuild {
 			.register();
 	}
 
-	private static void run(Player player, String guildName) throws WrapperCommandSyntaxException {
+	private static void run(Player player, @Nullable String guildName) throws WrapperCommandSyntaxException {
 
 		Group group = null;
 
@@ -61,12 +62,10 @@ public class TeleportGuild {
 				String err = ChatColor.RED + "You are not in a guild!";
 				player.sendMessage(err);
 				CommandAPI.fail(err);
+				throw new RuntimeException();
 			}
-		}
-
-		if (group == null) {
-			// Still null, need to look up from name
-			// The only way to get here is if guildName != null
+		} else {
+			// need to look up from name
 
 			// Guild name sanitization for command usage
 			//TODO: Better lookup of guild name?
@@ -75,6 +74,7 @@ public class TeleportGuild {
 			group = LuckPermsIntegration.GM.getGroup(cleanGuildName);
 			if (group == null) {
 				CommandAPI.fail("The luckperms group '" + cleanGuildName + "' does not exist");
+				throw new RuntimeException();
 			}
 		}
 

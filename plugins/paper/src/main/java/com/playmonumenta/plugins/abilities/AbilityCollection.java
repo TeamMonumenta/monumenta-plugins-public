@@ -5,6 +5,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.playmonumenta.plugins.abilities.delves.DelveModifier;
@@ -49,7 +51,7 @@ public class AbilityCollection {
 	}
 
 	@SuppressWarnings("unchecked")
-	public <T extends Ability> T getAbility(Class<T> cls) {
+	public <T extends @Nullable Ability> T getAbility(Class<T> cls) {
 		if (mIsSilenced) {
 			// A silenced player has no abilities
 			return (T) mDelveModifiers.get(cls);
@@ -58,16 +60,16 @@ public class AbilityCollection {
 		}
 	}
 
-	public Ability getAbility(ClassAbility classAbility) {
+	public @Nullable Ability getAbility(ClassAbility classAbility) {
 		return mIsSilenced ? null : getAbilityIgnoringSilence(classAbility);
 	}
 
 	@SuppressWarnings("unchecked")
-	public <T extends Ability> T getAbilityIgnoringSilence(Class<T> cls) {
+	public <T extends @Nullable Ability> T getAbilityIgnoringSilence(Class<T> cls) {
 		return (T) mAbilities.get(cls);
 	}
 
-	public Ability getAbilityIgnoringSilence(ClassAbility classAbility) {
+	public @Nullable Ability getAbilityIgnoringSilence(ClassAbility classAbility) {
 		for (Ability ability : mAbilities.values()) {
 			if (ability.getInfo().mLinkedSpell == classAbility) {
 				return ability;

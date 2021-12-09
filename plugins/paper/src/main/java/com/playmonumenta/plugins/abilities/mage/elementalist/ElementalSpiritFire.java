@@ -18,8 +18,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
@@ -38,10 +37,9 @@ import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.StringUtils;
 
 
-
 public class ElementalSpiritFire extends Ability {
-	@NotNull public static final String NAME = "Elemental Spirits";
-	@NotNull public static final ClassAbility ABILITY = ClassAbility.ELEMENTAL_SPIRIT_FIRE;
+	public static final String NAME = "Elemental Spirits";
+	public static final ClassAbility ABILITY = ClassAbility.ELEMENTAL_SPIRIT_FIRE;
 
 	public static final int DAMAGE_1 = 10;
 	public static final int DAMAGE_2 = 15;
@@ -52,7 +50,7 @@ public class ElementalSpiritFire extends Ability {
 
 	private final int mLevelDamage;
 	private final double mLevelBowMultiplier;
-	private final @NotNull Set<LivingEntity> mEnemiesAffected = new HashSet<>();
+	private final Set<LivingEntity> mEnemiesAffected = new HashSet<>();
 
 	private @Nullable ElementalArrows mElementalArrows;
 	private @Nullable BukkitTask mPlayerParticlesGenerator;
@@ -121,7 +119,7 @@ public class ElementalSpiritFire extends Ability {
 					public void run() {
 						mEnemiesAffectedProcessor = null;
 
-						@NotNull Location playerLocation = mPlayer.getLocation();
+						Location playerLocation = mPlayer.getLocation();
 						@Nullable LivingEntity farthestEnemy = null;
 						double farthestDistanceSquared = 0;
 
@@ -139,19 +137,19 @@ public class ElementalSpiritFire extends Ability {
 						if (farthestEnemy != null) {
 							putOnCooldown();
 
-							@NotNull Location startLocation = LocationUtils.getHalfHeightLocation(mPlayer);
-							@NotNull Location endLocation = LocationUtils.getHalfHeightLocation(farthestEnemy);
+							Location startLocation = LocationUtils.getHalfHeightLocation(mPlayer);
+							Location endLocation = LocationUtils.getHalfHeightLocation(farthestEnemy);
 
-							@NotNull World world = mPlayer.getWorld();
-							@NotNull BoundingBox movingSpiritBox = BoundingBox.of(mPlayer.getEyeLocation(), HITBOX, HITBOX, HITBOX);
+							World world = mPlayer.getWorld();
+							BoundingBox movingSpiritBox = BoundingBox.of(mPlayer.getEyeLocation(), HITBOX, HITBOX, HITBOX);
 							double maxDistanceSquared = startLocation.distanceSquared(endLocation);
 							double maxDistance = Math.sqrt(maxDistanceSquared);
-							@NotNull Vector vector = endLocation.clone().subtract(startLocation).toVector();
+							Vector vector = endLocation.clone().subtract(startLocation).toVector();
 							double increment = 0.2;
 
-							@NotNull List<LivingEntity> potentialTargets = EntityUtils.getNearbyMobs(playerLocation, maxDistance + HITBOX);
+							List<LivingEntity> potentialTargets = EntityUtils.getNearbyMobs(playerLocation, maxDistance + HITBOX);
 							float spellDamage = SpellPower.getSpellDamage(mPlayer, mLevelDamage);
-							@NotNull Vector vectorIncrement = vector.normalize().multiply(increment);
+							Vector vectorIncrement = vector.normalize().multiply(increment);
 
 							// Fire spirit sound
 							world.playSound(playerLocation, Sound.ENTITY_BLAZE_AMBIENT, 1, 0.5f);
@@ -159,9 +157,9 @@ public class ElementalSpiritFire extends Ability {
 							// Damage action & particles
 							double maxIterations = maxDistance / increment * 1.1;
 							for (int i = 0; i < maxIterations; i++) {
-								@NotNull Iterator<LivingEntity> iterator = potentialTargets.iterator();
+								Iterator<LivingEntity> iterator = potentialTargets.iterator();
 								while (iterator.hasNext()) {
-									@NotNull LivingEntity potentialTarget = iterator.next();
+									LivingEntity potentialTarget = iterator.next();
 									if (potentialTarget.getBoundingBox().overlaps(movingSpiritBox)) {
 										float finalDamage = spellDamage;
 										if (
@@ -186,7 +184,7 @@ public class ElementalSpiritFire extends Ability {
 								} else {
 									// Else spawn particles at the new location and continue doing damage at this place the next tick
 									// These particles skip the first damage attempt
-									@NotNull PartialParticle partialParticle = new PartialParticle(
+									PartialParticle partialParticle = new PartialParticle(
 										Particle.FLAME,
 										newPotentialLocation,
 										4,

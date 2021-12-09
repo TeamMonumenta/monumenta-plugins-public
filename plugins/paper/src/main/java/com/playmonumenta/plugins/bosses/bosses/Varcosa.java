@@ -32,10 +32,11 @@ import com.playmonumenta.plugins.bosses.spells.SpellConditionalTeleport;
 import com.playmonumenta.plugins.bosses.spells.SpellGenericCharge;
 import com.playmonumenta.plugins.bosses.spells.SpellTpSwapPlaces;
 import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.SerializationUtils;
 
-public class Varcosa extends BossAbilityGroup {
+public final class Varcosa extends BossAbilityGroup {
 	public static final String identityTag = "boss_varcosa";
 	public static final int detectionRange = 110;
 
@@ -133,7 +134,7 @@ public class Varcosa extends BossAbilityGroup {
 	@Override
 	public void init() {
 		int bossTargetHp = 1500;
-		mBoss.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(bossTargetHp);
+		EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_MAX_HEALTH, bossTargetHp);
 		mBoss.setHealth(bossTargetHp);
 
 		//launch event related spawn commands

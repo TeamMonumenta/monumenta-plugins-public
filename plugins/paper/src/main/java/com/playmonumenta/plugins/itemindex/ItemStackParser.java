@@ -1,7 +1,8 @@
 package com.playmonumenta.plugins.itemindex;
 
-import com.google.common.collect.Multimap;
-import com.playmonumenta.plugins.utils.ItemUtils;
+import java.util.List;
+import java.util.Map;
+
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.attribute.Attribute;
@@ -17,8 +18,8 @@ import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.potion.PotionEffect;
 
-import java.util.List;
-import java.util.Map;
+import com.google.common.collect.Multimap;
+import com.playmonumenta.plugins.utils.ItemUtils;
 
 public class ItemStackParser {
 
@@ -78,7 +79,9 @@ public class ItemStackParser {
 			for (int i = 0; i < bMeta.getPageCount(); i++) {
 				this.mMonumentaItem.setBookPageContent(i, bMeta.getPage(i));
 			}
-			this.mMonumentaItem.setBookAuthor(bMeta.getAuthor());
+			if (bMeta.hasAuthor()) {
+				this.mMonumentaItem.setBookAuthor(bMeta.getAuthor());
+			}
 		}
 	}
 
@@ -207,29 +210,37 @@ public class ItemStackParser {
 	}
 
 	private void parseLore() {
-		int i = 0;
-		main: for (String s : this.mItemStack.getItemMeta().getLore()) {
-			if (s.startsWith(ChatColor.DARK_GRAY + "")) {
-				for (Region r : Region.values()) {
-					if (r != Region.NONE && s.startsWith(r.getReadableString())) {
-						continue main;
-					} else if (s.startsWith(ChatColor.DARK_GRAY + "* Magic Wand *")) {
-						this.mMonumentaItem.setIsMagicWand(true);
-						continue main;
+		ItemMeta meta = this.mItemStack.getItemMeta();
+		if (meta != null && meta.hasLore()) {
+			int i = 0;
+			main:
+			for (String s : meta.getLore()) {
+				if (s.startsWith(ChatColor.DARK_GRAY + "")) {
+					for (Region r : Region.values()) {
+						if (r != Region.NONE && s.startsWith(r.getReadableString())) {
+							continue main;
+						} else if (s.startsWith(ChatColor.DARK_GRAY + "* Magic Wand *")) {
+							this.mMonumentaItem.setIsMagicWand(true);
+							continue main;
+						}
 					}
+					this.mMonumentaItem.setLoreLine(i, ChatColor.stripColor(s));
+					i++;
 				}
-				this.mMonumentaItem.setLoreLine(i, ChatColor.stripColor(s));
-				i++;
 			}
 		}
+
 	}
 
 	private void parseLocation() {
-		for (String s : this.mItemStack.getItemMeta().getLore()) {
-			for (ItemLocation l : ItemLocation.values()) {
-				if (l != ItemLocation.NONE && s.startsWith(l.getReadableString())) {
-					this.mMonumentaItem.setLocation(l);
-					return;
+		ItemMeta meta = this.mItemStack.getItemMeta();
+		if (meta != null && meta.hasLore()) {
+			for (String s : meta.getLore()) {
+				for (ItemLocation l : ItemLocation.values()) {
+					if (l != ItemLocation.NONE && s.startsWith(l.getReadableString())) {
+						this.mMonumentaItem.setLocation(l);
+						return;
+					}
 				}
 			}
 		}

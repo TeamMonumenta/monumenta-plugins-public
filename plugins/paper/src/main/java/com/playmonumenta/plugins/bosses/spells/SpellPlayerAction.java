@@ -9,10 +9,9 @@ public class SpellPlayerAction extends Spell {
 	@FunctionalInterface
 	public interface Action {
 		/**
-		 * User function called once every two ticks while bolt is charging
-		 * @param entity  The entity charging the bolt
-		 * @param tick    Number of ticks since start of attack
-		 *      NOTE - Only even numbers are returned here!
+		 * User function called once every two ticks while the spell is active
+		 *
+		 * @param player The targeted player
 		 */
 		void run(Player player);
 	}
@@ -20,49 +19,42 @@ public class SpellPlayerAction extends Spell {
 	@FunctionalInterface
 	public interface TickAction {
 		/**
-		 * User function called once every two ticks while bolt is charging
-		 * @param entity  The entity charging the bolt
-		 * @param tick    Number of ticks since start of attack
-		 *      NOTE - Only even numbers are returned here!
+		 * User function called once every two ticks while the spell is active
+		 *
+		 * @param player The targeted player
+		 * @param tick   Number of ticks since start of attack
+		 *               NOTE - Only even numbers are returned here!
 		 */
 		void run(Player player, int tick);
 	}
 
-	private LivingEntity mBoss;
-	private double mRange;
-	private Action mAction;
-	private TickAction mTickAction;
-	private int mTicks;
+	private final LivingEntity mBoss;
+	private final double mRange;
+	private final TickAction mTickAction;
+	private int mTicks = 0;
 
 	public SpellPlayerAction(LivingEntity boss, double range, Action action) {
 		mBoss = boss;
 		mRange = range;
-		mAction = action;
-		mTickAction = null;
+		mTickAction = (player, tick) -> action.run(player);
 	}
 
 	public SpellPlayerAction(LivingEntity boss, double range, TickAction action) {
 		mBoss = boss;
 		mRange = range;
 		mTickAction = action;
-		mTicks = 0;
 	}
 
 	@Override
 	public void run() {
 		for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), mRange, true)) {
-			if (mTickAction != null) {
-				mTicks += 2;
-				mTickAction.run(player, mTicks);
-			} else {
-				mAction.run(player);
-			}
+			mTicks += 2;
+			mTickAction.run(player, mTicks);
 		}
 	}
 
 	@Override
 	public int cooldownTicks() {
-		// TODO Auto-generated method stub
 		return 0;
 	}
 

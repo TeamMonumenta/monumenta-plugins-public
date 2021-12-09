@@ -33,9 +33,10 @@ public class ExampleCustomInventory extends CustomInventory {
 		event.setCancelled(true);
 		//Check to make sure they clicked the GUI, didn't shift click, and
 		//did not click the filler item
-		if (event.getClickedInventory() != _inventory ||
-				event.getCurrentItem().getType() == FILLER ||
-				event.isShiftClick()) {
+		if (event.getClickedInventory() != _inventory
+			|| event.getCurrentItem() == null
+			|| event.getCurrentItem().getType() == FILLER
+			|| event.isShiftClick()) {
 			return;
 		}
 

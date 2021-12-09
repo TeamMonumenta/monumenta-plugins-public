@@ -2,12 +2,6 @@ package com.playmonumenta.plugins.itemindex;
 
 import java.util.ArrayList;
 
-import javax.annotation.Nullable;
-
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.utils.CommandUtils;
-import com.playmonumenta.plugins.utils.ItemUtils;
-
 import org.bukkit.Material;
 import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.block.Block;
@@ -17,6 +11,11 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BannerMeta;
+import org.checkerframework.checker.nullness.qual.Nullable;
+
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.utils.CommandUtils;
+import com.playmonumenta.plugins.utils.ItemUtils;
 
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.CommandPermission;
@@ -821,13 +820,11 @@ public class ItemIndexCommand {
 			.register();
 	}
 
-	@Nullable
-	private static Player commandSecurities(CommandSender sender) throws WrapperCommandSyntaxException {
+	private static @Nullable Player commandSecurities(CommandSender sender) throws WrapperCommandSyntaxException {
 		return commandSecurities(sender, true);
 	}
 
-	@Nullable
-	private static Player commandSecurities(CommandSender sender, boolean requiresItem) throws WrapperCommandSyntaxException {
+	private static @Nullable Player commandSecurities(CommandSender sender, boolean requiresItem) throws WrapperCommandSyntaxException {
 		Player p = CommandUtils.getPlayerFromSender(sender);
 		ItemStack item = p.getInventory().getItemInMainHand();
 		if (requiresItem && (item.getType() == Material.AIR || item.getAmount() == 0)) {
@@ -837,9 +834,8 @@ public class ItemIndexCommand {
 		return p;
 	}
 
-	private static MonumentaItem itemSecurities(Player p) {
-		MonumentaItem out = Plugin.getInstance().mItemManager.getMMItemWithEdits(p.getInventory().getItemInMainHand());
-		return out;
+	private static @Nullable MonumentaItem itemSecurities(Player p) {
+		return Plugin.getInstance().mItemManager.getMMItemWithEdits(p.getInventory().getItemInMainHand());
 	}
 
 	private static void updateItemInHand(MonumentaItem item, Player p) {

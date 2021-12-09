@@ -20,6 +20,12 @@ import org.bukkit.event.player.PlayerGameModeChangeEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
+import org.checkerframework.checker.nullness.qual.Nullable;
+
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.LocationUtils;
+import com.playmonumenta.plugins.utils.NmsUtils;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.utils.FastUtils;
@@ -68,17 +74,17 @@ public class SpectateBot extends GenericCommand implements Listener {
 		new CommandAPICommand("spectatebot")
 			.withPermission(CommandPermission.fromString("monumenta.command.spectatebot"))
 			.executes((sender, args) -> {
-				if (sender instanceof Player && ((Player)sender).getGameMode().equals(GameMode.SPECTATOR)) {
-				    run(plugin, (Player)sender);
+				if (sender instanceof Player && ((Player) sender).getGameMode().equals(GameMode.SPECTATOR)) {
+					run(plugin, (Player) sender);
 				} else {
-				    CommandAPI.fail(ChatColor.RED + "This command must be run by a player in spectator mode!");
+					CommandAPI.fail(ChatColor.RED + "This command must be run by a player in spectator mode!");
 				}
 			})
 			.register();
 	}
 
-	private static Player getPlayerToSpectate(Player spectator) {
-		List<Player> players = new ArrayList<Player>(Bukkit.getOnlinePlayers());
+	private static @Nullable Player getPlayerToSpectate(Player spectator) {
+		List<Player> players = new ArrayList<>(Bukkit.getOnlinePlayers());
 		players.removeIf((p) -> p.equals(spectator) || p.getGameMode().equals(GameMode.SPECTATOR));
 		if (players.size() <= 0) {
 			return null;

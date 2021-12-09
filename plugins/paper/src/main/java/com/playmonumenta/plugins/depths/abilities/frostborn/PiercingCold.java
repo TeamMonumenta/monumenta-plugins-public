@@ -43,8 +43,6 @@ public class PiercingCold extends DepthsAbility {
 	private static final Particle.DustOptions ENCHANTED_ARROW_FRINGE_COLOR = new Particle.DustOptions(Color.fromRGB(168, 255, 252), 2.0f);
 	private static final int MAX_DIST = 50;
 
-	public static String tree;
-
 	public PiercingCold(Plugin plugin, Player player) {
 		super(plugin, player, ABILITY_NAME);
 		mDisplayItem = Material.PRISMARINE_SHARD;

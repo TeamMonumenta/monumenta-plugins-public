@@ -11,7 +11,7 @@ import org.bukkit.potion.PotionEffectType;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.bosses.spells.SpellMobEffect;
 
-public class HungerCloudBoss extends BossAbilityGroup {
+public final class HungerCloudBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_hungercloud";
 	public static final int detectionRange = 100;
 

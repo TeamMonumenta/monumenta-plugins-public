@@ -22,6 +22,16 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryInteractEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.util.BoundingBox;
+import org.checkerframework.checker.nullness.qual.Nullable;
+
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.AbilityManager;
+import com.playmonumenta.plugins.abilities.delves.DelveModifier;
+import com.playmonumenta.plugins.server.properties.ServerProperties;
+import com.playmonumenta.plugins.utils.DelvesUtils;
+import com.playmonumenta.plugins.utils.DelvesUtils.DelveModifierSelectionGUI;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.scriptedquests.utils.MessagingUtils;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityManager;
@@ -126,10 +136,10 @@ public class DelvesListener implements Listener {
 	 * Gets a player in the same dungeon as the specified location.
 	 * Code may change if we change how dungeons are instanced.
 	 */
-	private Player getPlayerInDungeon(Location loc) {
+	private @Nullable Player getPlayerInDungeon(Location loc) {
 		// Get a bounding box for the dungeon
-		int xRegionMin = (((int)loc.getX()) >> 9) << 9;
-		int zRegionMin = (((int)loc.getZ()) >> 9) << 9;
+		int xRegionMin = (((int) loc.getX()) >> 9) << 9;
+		int zRegionMin = (((int) loc.getZ()) >> 9) << 9;
 		BoundingBox box = new BoundingBox(xRegionMin, 0, zRegionMin, xRegionMin + 512, 256, zRegionMin + 512);
 
 		for (Player player : Bukkit.getOnlinePlayers()) {
@@ -165,7 +175,7 @@ public class DelvesListener implements Listener {
 		player.closeInventory();
 	}
 
-	private DelveModifierSelectionGUI getGUI(InventoryInteractEvent event) {
+	private @Nullable DelveModifierSelectionGUI getGUI(InventoryInteractEvent event) {
 		HumanEntity entity = event.getWhoClicked();
 		if (entity instanceof Player) {
 			Player player = (Player) entity;

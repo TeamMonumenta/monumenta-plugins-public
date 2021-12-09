@@ -13,9 +13,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.annotation.Nullable;
-import javax.annotation.Nonnull;
-
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.yaml.snakeyaml.Yaml;
 
 import net.md_5.bungee.api.connection.ProxiedPlayer;
@@ -115,9 +113,8 @@ public class NameListener implements Listener {
 		}
 	}
 
-	@Nullable
 	/* Case insensitive! */
-	public static UUID name2uuid(@Nonnull String name) {
+	public static @Nullable UUID name2uuid(String name) {
 		if (globalNameListener == null) {
 			return null;
 		}
@@ -132,8 +129,7 @@ public class NameListener implements Listener {
 		return UUID.fromString(uuidStr);
 	}
 
-	@Nullable
-	public static String uuid2name(@Nonnull UUID uuid) {
+	public static @Nullable String uuid2name(UUID uuid) {
 		if (globalNameListener == null) {
 			return null;
 		}

@@ -43,8 +43,10 @@ public class Agility extends Ability {
 
 	@Override
 	public void setupClassPotionEffects() {
-		int effectLevel = getAbilityScore() == 1 ? AGILITY_1_EFFECT_LVL : AGILITY_2_EFFECT_LVL;
-		mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF,
-		                                 new PotionEffect(PotionEffectType.FAST_DIGGING, 1000000, effectLevel, true, false));
+		if (mPlayer != null) {
+			int effectLevel = getAbilityScore() == 1 ? AGILITY_1_EFFECT_LVL : AGILITY_2_EFFECT_LVL;
+			mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF,
+			                                 new PotionEffect(PotionEffectType.FAST_DIGGING, 1000000, effectLevel, true, false));
+		}
 	}
 }

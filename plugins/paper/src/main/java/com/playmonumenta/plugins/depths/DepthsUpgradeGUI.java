@@ -18,29 +18,31 @@ public class DepthsUpgradeGUI extends CustomInventory {
 		List<DepthsAbilityItem> items = DepthsManager.getInstance().getAbilityUpgradeOptions(player);
 
 		for (int i = 0; i < 27; i++) {
-			_inventory.setItem(i, new ItemStack(Material.GRAY_STAINED_GLASS_PANE, 1));
+			_inventory.setItem(i, new ItemStack(FILLER, 1));
 		}
-
-		if (items == null || items.size() >= 1) {
-			_inventory.setItem(10, items.get(0).mItem);
-		}
-		if (items == null || items.size() >= 2) {
-			_inventory.setItem(13, items.get(1).mItem);
-		}
-		if (items == null || items.size() >= 3) {
-			_inventory.setItem(16, items.get(2).mItem);
+		if (items != null) {
+			if (items.size() >= 1) {
+				_inventory.setItem(10, items.get(0).mItem);
+			}
+			if (items.size() >= 2) {
+				_inventory.setItem(13, items.get(1).mItem);
+			}
+			if (items.size() >= 3) {
+				_inventory.setItem(16, items.get(2).mItem);
+			}
 		}
 	}
 
 	@Override
 	protected void inventoryClick(InventoryClickEvent event) {
 		event.setCancelled(true);
-		if (event.getClickedInventory() != _inventory ||
-				event.getCurrentItem().getType() == FILLER ||
-				event.isShiftClick()) {
+		if (event.getClickedInventory() != _inventory
+			|| event.getCurrentItem() == null
+			|| event.getCurrentItem().getType() == FILLER
+			|| event.isShiftClick()) {
 			return;
 		}
-		int slot = 0;
+		int slot;
 		if (event.getSlot() == 10) {
 			slot = 0;
 		} else if (event.getSlot() == 13) {
@@ -48,7 +50,7 @@ public class DepthsUpgradeGUI extends CustomInventory {
 		} else if (event.getSlot() == 16) {
 			slot = 2;
 		} else {
-			event.setCancelled(true);
+			return;
 		}
 
 		DepthsManager.getInstance().playerUpgradedItem((Player) event.getWhoClicked(), slot);

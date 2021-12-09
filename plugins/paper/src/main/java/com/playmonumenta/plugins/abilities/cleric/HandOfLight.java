@@ -112,6 +112,9 @@ public class HandOfLight extends Ability {
 
 	@Override
 	public boolean runCheck() {
+		if (mPlayer == null) {
+			return false;
+		}
 		// If holding a shield, must be sneaking to activate
 		ItemStack offHand = mPlayer.getInventory().getItemInOffHand();
 		ItemStack mainHand = mPlayer.getInventory().getItemInMainHand();

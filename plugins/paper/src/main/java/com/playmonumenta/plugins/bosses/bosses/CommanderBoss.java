@@ -6,7 +6,6 @@ import java.util.List;
 import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.World;
-import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.plugin.Plugin;
@@ -16,7 +15,7 @@ import com.playmonumenta.plugins.bosses.spells.SpellInspire;
 import com.playmonumenta.plugins.utils.DelvesUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 
-public class CommanderBoss extends BossAbilityGroup {
+public final class CommanderBoss extends BossAbilityGroup {
 
 	public static final String identityTag = "boss_commander";
 
@@ -45,7 +44,7 @@ public class CommanderBoss extends BossAbilityGroup {
 
 	@Override
 	public void bossDamagedByEntity(EntityDamageByEntityEvent event) {
-		if (!mSummonedReinforcements && mBoss.getHealth() < mBoss.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue() / 2) {
+		if (!mSummonedReinforcements && mBoss.getHealth() < EntityUtils.getMaxHealth(mBoss) / 2) {
 			mSummonedReinforcements = true;
 
 			World world = mBoss.getWorld();

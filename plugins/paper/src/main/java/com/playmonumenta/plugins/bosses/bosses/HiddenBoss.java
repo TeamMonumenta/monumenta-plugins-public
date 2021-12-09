@@ -15,7 +15,7 @@ import com.playmonumenta.plugins.utils.BossUtils;
 /*
  * Mob that is invisible until players are nearby
  */
-public class HiddenBoss extends BossAbilityGroup {
+public final class HiddenBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_hidden";
 	public static final int detectionRange = 50;
 	public static final int visibleRange = 5;

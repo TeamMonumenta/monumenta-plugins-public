@@ -52,6 +52,7 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.bosses.BossBarManager;
 import com.playmonumenta.plugins.bosses.BossBarManager.BossHealthAction;
@@ -99,36 +100,36 @@ import net.kyori.adventure.text.format.NamedTextColor;
  * I'm too lazy so here's the formal write up for reference :) -Fwap
  * https://docs.google.com/document/d/149Wa83eyxaJ_EuOn1oCZl4ivoDzj-tw5m04i_xVA87M/edit?usp=sharing
  */
-public class Lich extends BossAbilityGroup {
+public final class Lich extends BossAbilityGroup {
 	public static final String identityTag = "boss_lich";
 	public static final int detectionRange = 55;
 	public static final int mShieldMin = 5;
-	private static int mCeiling = 35;
+	private static final int mCeiling = 35;
 	private int mCounter = 0;
 
 	private final Location mSpawnLoc;
 	private final Location mEndLoc;
-	private static Set<UUID> mSummoned = new HashSet<UUID>();
+	private static final Set<UUID> mSummoned = new HashSet<UUID>();
 	private static final String START_TAG = "lich_center";
-	private static String mShieldCrystal = "DeathCrystal";
-	private static String mCrystalShield = "CrystalShield";
-	private String mFinalCrystal = "WarpedCrystal";
+	private static final String mShieldCrystal = "DeathCrystal";
+	private static final String mCrystalShield = "CrystalShield";
+	private final String mFinalCrystal = "WarpedCrystal";
 	private static LivingEntity mStart;
-	private LivingEntity mKey;
-	private double mL = 26.5;
-	private double mY = 14.5;
-	private double mS = 8.5;
+	private @Nullable LivingEntity mKey;
+	private final double mL = 26.5;
+	private final double mY = 14.5;
+	private final double mS = 8.5;
 	private int mPhase;
-	private Collection<EnderCrystal> mCrystal = new ArrayList<EnderCrystal>();
-	private List<Location> mCrystalLoc = new ArrayList<Location>();
-	private List<Location> mPassive2Loc = new ArrayList<Location>();
-	private List<Location> mTower0 = new ArrayList<Location>();
-	private List<Location> mTower1 = new ArrayList<Location>();
-	private List<Location> mTower2 = new ArrayList<Location>();
-	private List<Location> mTower3 = new ArrayList<Location>();
-	private List<List<Location>> mTowerGroup = new ArrayList<List<Location>>();
-	private List<Location> mTp = new ArrayList<Location>();
-	private static List<Player> mCursed = new ArrayList<Player>();
+	private final Collection<EnderCrystal> mCrystal = new ArrayList<EnderCrystal>();
+	private final List<Location> mCrystalLoc = new ArrayList<Location>();
+	private final List<Location> mPassive2Loc = new ArrayList<Location>();
+	private final List<Location> mTower0 = new ArrayList<Location>();
+	private final List<Location> mTower1 = new ArrayList<Location>();
+	private final List<Location> mTower2 = new ArrayList<Location>();
+	private final List<Location> mTower3 = new ArrayList<Location>();
+	private final List<List<Location>> mTowerGroup = new ArrayList<List<Location>>();
+	private final List<Location> mTp = new ArrayList<Location>();
+	private static final List<Player> mCursed = new ArrayList<Player>();
 	private static boolean mActivated = false;
 	private static boolean mGotHit = false;
 	private boolean mTrigger = false;
@@ -159,6 +160,9 @@ public class Lich extends BossAbilityGroup {
 				mStart = (LivingEntity) e;
 				break;
 			}
+		}
+		if (mStart == null) {
+			return;
 		}
 
 		// load all the crystal spawn locations
@@ -193,21 +197,24 @@ public class Lich extends BossAbilityGroup {
 		mTp.add(mStart.getLocation().clone().add(9, 6, -9));
 		mTp.add(mStart.getLocation().clone().add(-9, 6, -9));
 
+		SpellDiesIrae.initDmg(0);
+
 		//summon key mob in shadow realm
 		mKey = (LivingEntity) LibraryOfSoulsIntegration.summon(mStart.getLocation().subtract(0, 41, 0), "ShadowPhylactery");
-		Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "team empty lichphylactery");
-		Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "team empty crystal");
-		Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "team empty Hekawt");
-		Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "team modify lichphylactery color white");
-		UUID keyUUID = mKey.getUniqueId();
-		Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "team join lichphylactery " + keyUUID);
-		SpellDiesIrae.initDmg(0);
-		int playercount = playersInRange(mBoss.getLocation(), detectionRange, true).size();
-		double hpdel = 1250;
-		//some how ducc made it so ln(playercount) < 0, additional check
-		double hp = (int) (hpdel * (1 + (1 - 1/Math.E) * Math.max(Math.log(playercount) * 1.2, 0)));
-		mKey.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(hp);
-		mKey.setHealth(hp);
+		if (mKey != null) {
+			Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "team empty lichphylactery");
+			Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "team empty crystal");
+			Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "team empty Hekawt");
+			Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "team modify lichphylactery color white");
+			UUID keyUUID = mKey.getUniqueId();
+			Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "team join lichphylactery " + keyUUID);
+			int playercount = playersInRange(mBoss.getLocation(), detectionRange, true).size();
+			double hpdel = 1250;
+			//some how ducc made it so ln(playercount) < 0, additional check
+			double hp = (int) (hpdel * (1 + (1 - 1 / Math.E) * Math.max(Math.log(playercount) * 1.2, 0)));
+			EntityUtils.setAttributeBase(mKey, Attribute.GENERIC_MAX_HEALTH, hp);
+			mKey.setHealth(hp);
+		}
 
 		mDefeated = false;
 		mActivated = false;
@@ -249,17 +256,20 @@ public class Lich extends BossAbilityGroup {
 				}
 
 				// key glow color + prevent log spam
-				double health = mKey.getHealth();
-				if (health / hp <= 0.34 && mColor == 1) {
-					mColor++;
-					Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "team modify lichphylactery color red");
-				} else if (health / hp <= 0.67 && mColor == 0) {
-					mColor++;
-					Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "team modify lichphylactery color yellow");
+				if (mKey != null) {
+					double health = mKey.getHealth();
+					double maxHealth = EntityUtils.getMaxHealth(mKey);
+					if (health / maxHealth <= 0.34 && mColor == 1) {
+						mColor++;
+						Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "team modify lichphylactery color red");
+					} else if (health / maxHealth <= 0.67 && mColor == 0) {
+						mColor++;
+						Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "team modify lichphylactery color yellow");
+					}
 				}
 
 				// key death
-				if ((mKey.isDead() || !mKey.isValid()) && mKeyDead == false) {
+				if (mKey == null || (mKey.isDead() || !mKey.isValid()) && mKeyDead == false) {
 					mKeyDead = true;
 					List<Player> players = playersInRange(mBoss.getLocation(), detectionRange, true);
 					List<Player> shadowed = SpellDimensionDoor.getShadowed();
@@ -444,7 +454,7 @@ public class Lich extends BossAbilityGroup {
 							Vector vec = LocationUtils.getDirectionTo(endLoc.clone().add(0, 1, 0), startLoc);
 							new BukkitRunnable() {
 								int mInc = 0;
-								Entity mSkull;
+								@Nullable Entity mSkull;
 
 								@Override
 								public void run() {
@@ -915,12 +925,13 @@ public class Lich extends BossAbilityGroup {
 
 		// ridiculous burst prevention, 1% above the next health action
 		double damage = event.getFinalDamage();
-		if (mPhase == 1 && mBoss.getHealth() - damage <= mBoss.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue() * 0.51) {
-			event.setDamage(mBoss.getHealth() - mBoss.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue() * 0.51);
-		} else if (mPhase == 2 && mBoss.getHealth() - damage <= mBoss.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue() * 0.34) {
-			event.setDamage(mBoss.getHealth() - mBoss.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue() * 0.34);
-		} else if (mPhase == 3 && mBoss.getHealth() - damage <= mBoss.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue() * 0.31) {
-			event.setDamage(mBoss.getHealth() - mBoss.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue() * 0.31);
+		double maxHealth = EntityUtils.getMaxHealth(mBoss);
+		if (mPhase == 1 && mBoss.getHealth() - damage <= maxHealth * 0.51) {
+			event.setDamage(mBoss.getHealth() - maxHealth * 0.51);
+		} else if (mPhase == 2 && mBoss.getHealth() - damage <= maxHealth * 0.34) {
+			event.setDamage(mBoss.getHealth() - maxHealth * 0.34);
+		} else if (mPhase == 3 && mBoss.getHealth() - damage <= maxHealth * 0.31) {
+			event.setDamage(mBoss.getHealth() - maxHealth * 0.31);
 		}
 
 		// death check
@@ -1823,8 +1834,10 @@ public class Lich extends BossAbilityGroup {
 							.getPlugin("ScriptedQuests");
 
 					try {
-						scriptedQuestsPlugin.mGrowableManager.grow("LichFlame", tower.get(top).clone().add(0, 3, 0), 1,
-								4, false);
+						if (scriptedQuestsPlugin != null) {
+							scriptedQuestsPlugin.mGrowableManager.grow("LichFlame", tower.get(top).clone().add(0, 3, 0), 1,
+							                                           4, false);
+						}
 					} catch (Exception e) {
 						e.printStackTrace();
 					}
@@ -2070,10 +2083,10 @@ public class Lich extends BossAbilityGroup {
 		int bossTargetHp = 0;
 		int playercount = playersInRange(mBoss.getLocation(), detectionRange, true).size();
 		double hpdel = 4000;
-		bossTargetHp = (int) (hpdel * (1 + (1 - 1/Math.E) * Math.max(Math.log(playercount), 0)));
-		mBoss.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(bossTargetHp);
-		mBoss.getAttribute(Attribute.GENERIC_FOLLOW_RANGE).setBaseValue(detectionRange);
-		mBoss.getAttribute(Attribute.GENERIC_KNOCKBACK_RESISTANCE).setBaseValue(1);
+		bossTargetHp = (int) (hpdel * (1 + (1 - 1 / Math.E) * Math.max(Math.log(playercount), 0)));
+		EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_MAX_HEALTH, bossTargetHp);
+		EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_FOLLOW_RANGE, detectionRange);
+		EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_KNOCKBACK_RESISTANCE, 1);
 		mBoss.setHealth(bossTargetHp);
 		mBoss.setPersistent(true);
 	}

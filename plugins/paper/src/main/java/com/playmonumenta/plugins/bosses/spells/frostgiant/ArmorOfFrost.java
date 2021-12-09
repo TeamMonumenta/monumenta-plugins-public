@@ -19,15 +19,16 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
-
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.bosses.bosses.FrostGiant;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
+
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 
 /*
 Armor of Frost - Once every 60 seconds or phase change
@@ -38,17 +39,17 @@ by positioning the boss underneath an icicle above and knocking it down to hit h
  */
 public class ArmorOfFrost extends Spell {
 
-	private Plugin mPlugin;
-	private LivingEntity mBoss;
-	private List<Player> mWarned = new ArrayList<Player>();
+	private final Plugin mPlugin;
+	private final LivingEntity mBoss;
+	private final List<Player> mWarned = new ArrayList<Player>();
 	//Gets frostArmorActive, which determines whether or not the permafrost armor is up
-	private FrostGiant mBossClass;
-	private BukkitRunnable mCooldown;
-	private int mMaxLevel;
+	private final FrostGiant mBossClass;
+	private @Nullable BukkitRunnable mCooldown;
+	private final int mMaxLevel;
 	private int mLevel;
 	//Whether or not the immune armor regenerates after 45 seconds
 	//ONLY FALSE IF FINAL 10% PHASE
-	private boolean mRegen;
+	private final boolean mRegen;
 
 	public ArmorOfFrost(Plugin plugin, LivingEntity boss, FrostGiant giantClass, int max, boolean regen) {
 		mPlugin = plugin;

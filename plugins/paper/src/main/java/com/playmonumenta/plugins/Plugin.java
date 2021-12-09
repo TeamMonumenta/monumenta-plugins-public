@@ -9,6 +9,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.attributes.AttributeManager;
@@ -143,16 +144,15 @@ import com.playmonumenta.plugins.utils.MetadataUtils;
 import com.playmonumenta.plugins.utils.SignUtils;
 
 public class Plugin extends JavaPlugin {
-	public CooldownTimers mTimers = null;
-	public ProjectileEffectTimers mProjectileEffectTimers = null;
-	public CombatLoggingTimers mCombatLoggingTimers = null;
-	int mPeriodicTimer = -1;
+	public CooldownTimers mTimers;
+	public ProjectileEffectTimers mProjectileEffectTimers;
+	public CombatLoggingTimers mCombatLoggingTimers;
 
 	public EnchantmentManager mEnchantmentManager;
 	public AttributeManager mAttributeManager;
 	public JunkItemListener mJunkItemsListener;
 	public ItemDropListener mItemDropListener;
-	private HttpManager mHttpManager = null;
+	private @Nullable HttpManager mHttpManager = null;
 	public TrackingManager mTrackingManager;
 	public PotionManager mPotionManager;
 	public SpawnZoneManager mZoneManager;
@@ -171,10 +171,17 @@ public class Plugin extends JavaPlugin {
 
 	public ItemOverrides mItemOverrides;
 
-	private static Plugin INSTANCE = null;
+	// INSTANCE is set if the plugin is properly enabled
+	@SuppressWarnings("initialization.static.field.uninitialized")
+	private static Plugin INSTANCE;
 
 	public static Plugin getInstance() {
 		return INSTANCE;
+	}
+
+	// fields are set as long as the plugin is properly enabled
+	@SuppressWarnings("initialization.fields.uninitialized")
+	public Plugin() {
 	}
 
 	@Override
@@ -275,7 +282,9 @@ public class Plugin extends JavaPlugin {
 		INSTANCE = this;
 		PluginManager manager = getServer().getPluginManager();
 
-		mHttpManager.start();
+		if (mHttpManager != null) {
+			mHttpManager.start();
+		}
 
 		mItemOverrides = new ItemOverrides();
 
@@ -362,8 +371,8 @@ public class Plugin extends JavaPlugin {
 		manager.registerEvents(new TradeListener(), this);
 
 		if (ServerProperties.getShardName().contains("depths")
-				|| ServerProperties.getShardName().equals("mobs")
-				|| ServerProperties.getShardName().startsWith("dev")) {
+			|| ServerProperties.getShardName().equals("mobs")
+			|| ServerProperties.getShardName().startsWith("dev")) {
 			manager.registerEvents(new DepthsListener(this), this);
 		}
 
@@ -501,12 +510,14 @@ public class Plugin extends JavaPlugin {
 
 		mChessManager.unloadAll();
 		mTrackingManager.unloadTrackedEntities();
-		mHttpManager.stop();
+		if (mHttpManager != null) {
+			mHttpManager.stop();
+		}
 		mBossManager.unloadAll(true);
 		MetadataUtils.removeAllMetadata(this);
 	}
 
-	public Player getPlayer(UUID playerID) {
+	public @Nullable Player getPlayer(UUID playerID) {
 		return getServer().getPlayer(playerID);
 	}
 

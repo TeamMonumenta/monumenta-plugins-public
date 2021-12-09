@@ -1,6 +1,5 @@
 package com.playmonumenta.plugins.enchantments;
 
-import org.jetbrains.annotations.NotNull;
 
 import com.playmonumenta.plugins.enchantments.cosmetic.Baaing;
 import com.playmonumenta.plugins.enchantments.cosmetic.Barking;
@@ -157,13 +156,13 @@ public enum CustomEnchantment {
 	// Apply these last
 	STAT_TRACK(new StatTrack());
 
-	private final @NotNull BaseEnchantment mEnchantment;
+	private final BaseEnchantment mEnchantment;
 
-	CustomEnchantment(@NotNull BaseEnchantment enchantment) {
+	CustomEnchantment(BaseEnchantment enchantment) {
 		mEnchantment = enchantment;
 	}
 
-	public @NotNull BaseEnchantment getEnchantment() {
+	public BaseEnchantment getEnchantment() {
 		return mEnchantment;
 	}
 }

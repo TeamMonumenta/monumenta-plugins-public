@@ -1,7 +1,5 @@
 package com.playmonumenta.plugins.attributes;
 
-import com.playmonumenta.plugins.Plugin;
-
 import org.bukkit.entity.AbstractArrow;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -10,6 +8,9 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.projectiles.ProjectileSource;
 
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.effects.Stasis;
+
 /* Thorns Damage Attribute:
  * +X Thorns Damage
  * Deals X damage to attacking mob when hit by melee or ranged attack.
@@ -17,7 +18,6 @@ import org.bukkit.projectiles.ProjectileSource;
 */
 public class AttributeThornsDamage implements BaseAttribute {
 	private static final String PROPERTY_NAME = "Thorns Damage";
-	private static final String STASIS = "Stasis";
 	@Override
 	public String getProperty() {
 		return PROPERTY_NAME;
@@ -26,7 +26,7 @@ public class AttributeThornsDamage implements BaseAttribute {
 	@Override
 	public void onHurtByEntity(Plugin plugin, Player player, double value, EntityDamageByEntityEvent event) {
 		Entity damager = event.getDamager();
-		if (plugin.mEffectManager.hasEffect(player, STASIS)) {
+		if (plugin.mEffectManager.hasEffect(player, Stasis.class)) {
 			return;
 		}
 		//Set damager to shooter of arrow instead of the actual arrow if hit by projectile damage.

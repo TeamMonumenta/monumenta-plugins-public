@@ -18,6 +18,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.util.Vector;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -42,7 +43,7 @@ public class SpellEarthshake extends SpellBaseAoE {
 		Material.END_PORTAL,
 		Material.END_PORTAL_FRAME
 	);
-	private static Location targetLocation;
+	private static @Nullable Location targetLocation;
 	private static boolean targeted = false;
 	private static int particleCounter1 = 0;
 	private static int particleCounter2 = 0;

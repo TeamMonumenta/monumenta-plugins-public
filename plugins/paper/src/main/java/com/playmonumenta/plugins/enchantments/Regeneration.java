@@ -7,7 +7,7 @@ import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 
 import org.bukkit.entity.Player;
-import org.jetbrains.annotations.NotNull;
+
 
 
 
@@ -22,19 +22,19 @@ public class Regeneration implements BaseEnchantment {
 	private static final double TICK_HEALING_1 = 1d / 3 / 4;
 
 	@Override
-	public @NotNull String getProperty() {
+	public String getProperty() {
 		return "Regeneration";
 	}
 
 	@Override
-	public @NotNull EnumSet<ItemSlot> getValidSlots() {
+	public EnumSet<ItemSlot> getValidSlots() {
 		return EnumSet.of(ItemSlot.OFFHAND, ItemSlot.ARMOR);
 	}
 
 	@Override
 	public void tick(
-		@NotNull Plugin plugin,
-		@NotNull Player player,
+		Plugin plugin,
+		Player player,
 		int level
 	) {
 		doHeal(
@@ -46,7 +46,7 @@ public class Regeneration implements BaseEnchantment {
 		);
 	}
 
-	public static void doHeal(@NotNull Player player, int level) {
+	public static void doHeal(Player player, int level) {
 		PlayerUtils.healPlayer(
 			player,
 			TICK_HEALING_1 * Math.sqrt(level)

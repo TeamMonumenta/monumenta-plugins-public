@@ -6,12 +6,13 @@ import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
-import com.playmonumenta.plugins.Plugin;
-
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.checkerframework.checker.nullness.qual.Nullable;
+
+import com.playmonumenta.plugins.Plugin;
 
 public class AbsorptionUtils {
 
@@ -44,7 +45,7 @@ public class AbsorptionUtils {
 	}
 
 	private static final Map<LivingEntity, AbsorptionInstances> ABSORPTION_INFO_MAPPINGS = new HashMap<LivingEntity, AbsorptionInstances>();
-	private static BukkitRunnable ABSORPTION_INFO_TRACKER; // Effectively final
+	private static @Nullable BukkitRunnable ABSORPTION_INFO_TRACKER; // Effectively final
 
 	private static final int TRACKER_PERIOD = 20;
 

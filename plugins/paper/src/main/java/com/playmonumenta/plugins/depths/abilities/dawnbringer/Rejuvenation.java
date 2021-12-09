@@ -57,7 +57,7 @@ public class Rejuvenation extends DepthsAbility {
 						}
 					}
 					Integer lastHealTick = LAST_HEAL_TICK.get(player.getUniqueId());
-					if (lastHealTick == null || player.getTicksLived() - LAST_HEAL_TICK.get(player.getUniqueId()) >= mHealInterval && highestLevel) {
+					if (lastHealTick == null || player.getTicksLived() - lastHealTick >= mHealInterval && highestLevel) {
 						LAST_HEAL_TICK.put(player.getUniqueId(), player.getTicksLived());
 
 						double maxHealth = player.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue();

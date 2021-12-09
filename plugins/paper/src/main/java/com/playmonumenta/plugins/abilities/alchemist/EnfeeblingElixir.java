@@ -105,7 +105,7 @@ public class EnfeeblingElixir extends Ability {
 
 	@Override
 	public boolean runCheck() {
-		return mPlayer.isSneaking();
+		return mPlayer != null && mPlayer.isSneaking();
 	}
 
 	@Override

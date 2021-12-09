@@ -113,7 +113,7 @@ public class SpellSoulShackle extends Spell {
 			event.getEntity().remove();
 
 			Player p = (Player) event.getHitEntity();
-			if (mGotHit.contains(p)) {
+			if (p == null || mGotHit.contains(p)) {
 				return;
 			}
 			mGotHit.add(p);

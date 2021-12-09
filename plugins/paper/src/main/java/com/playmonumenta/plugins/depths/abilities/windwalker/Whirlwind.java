@@ -31,8 +31,6 @@ public class Whirlwind extends DepthsAbility {
 	private static final int SPEED_DURATION = 6 * 20;
 	private static final String SPEED_EFFECT_NAME = "WhirlwindSpeedEffect";
 
-	public static String tree;
-
 	public Whirlwind(Plugin plugin, Player player) {
 		super(plugin, player, ABILITY_NAME);
 		mDisplayItem = Material.IRON_PICKAXE;

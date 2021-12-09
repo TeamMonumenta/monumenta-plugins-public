@@ -15,6 +15,7 @@ import org.bukkit.event.entity.PotionSplashEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
@@ -29,8 +30,7 @@ import com.playmonumenta.plugins.utils.PotionUtils;
 import com.playmonumenta.plugins.utils.PotionUtils.PotionInfo;
 
 
-
-public class HeavenlyBoon extends Ability implements KillTriggeredAbility {
+public final class HeavenlyBoon extends Ability implements KillTriggeredAbility {
 
 	private static final double HEAVENLY_BOON_1_CHANCE = 0.08;
 	private static final double HEAVENLY_BOON_2_CHANCE = 0.16;
@@ -43,7 +43,7 @@ public class HeavenlyBoon extends Ability implements KillTriggeredAbility {
 	private final double mChance;
 	private final int mDuration;
 
-	private Crusade mCrusade;
+	private @Nullable Crusade mCrusade;
 
 	public HeavenlyBoon(Plugin plugin, Player player) {
 		super(plugin, player, "Heavenly Boon");
@@ -56,11 +56,11 @@ public class HeavenlyBoon extends Ability implements KillTriggeredAbility {
 		mDuration = getAbilityScore() == 1 ? HEAVENLY_BOON_1_DURATION : HEAVENLY_BOON_2_DURATION;
 		mDisplayItem = new ItemStack(Material.SPLASH_POTION, 1);
 
-		Bukkit.getScheduler().runTask(plugin, () -> {
-			if (player != null) {
-				mCrusade = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(mPlayer, Crusade.class);
-			}
-		});
+		if (player != null) {
+			Bukkit.getScheduler().runTask(plugin, () -> {
+				mCrusade = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, Crusade.class);
+			});
+		}
 	}
 
 	/*
@@ -71,8 +71,11 @@ public class HeavenlyBoon extends Ability implements KillTriggeredAbility {
 	@Override
 	public boolean playerSplashedByPotionEvent(Collection<LivingEntity> affectedEntities, ThrownPotion potion,
 	                                           PotionSplashEvent event) {
-		boolean hasPositiveEffects = PotionUtils.hasPositiveEffects(PotionUtils.getEffects(potion.getItem()));
+		if (mPlayer == null) {
+			return false;
+		}
 
+		boolean hasPositiveEffects = PotionUtils.hasPositiveEffects(PotionUtils.getEffects(potion.getItem()));
 		if (PotionUtils.hasNegativeEffects(potion.getItem()) && !hasPositiveEffects) {
 			return true;
 		}
@@ -127,8 +130,9 @@ public class HeavenlyBoon extends Ability implements KillTriggeredAbility {
 	@Override
 	public void triggerOnKill(LivingEntity mob) {
 		if (
-			Crusade.enemyTriggersAbilities(mob, mCrusade)
-			&& FastUtils.RANDOM.nextDouble() < mChance
+			mPlayer != null
+				&& Crusade.enemyTriggersAbilities(mob, mCrusade)
+				&& FastUtils.RANDOM.nextDouble() < mChance
 		) {
 			ItemStack potions;
 

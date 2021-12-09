@@ -36,7 +36,7 @@ import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.SerializationUtils;
 
-public class TCalin extends BossAbilityGroup {
+public final class TCalin extends BossAbilityGroup {
 	public static final String identityTag = "boss_tcalin";
 	public static final int detectionRange = 60;
 

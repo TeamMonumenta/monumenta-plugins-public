@@ -3,6 +3,21 @@ package com.playmonumenta.plugins.utils;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.bukkit.ChatColor;
+import org.bukkit.Color;
+import org.bukkit.FireworkEffect;
+import org.bukkit.GameMode;
+import org.bukkit.Location;
+import org.bukkit.NamespacedKey;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Firework;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.PlayerInventory;
+import org.bukkit.inventory.meta.FireworkMeta;
+import org.bukkit.scheduler.BukkitRunnable;
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.enchantments.infusions.delves.Ardor;
 import com.playmonumenta.plugins.enchantments.infusions.delves.Aura;
@@ -20,20 +35,6 @@ import com.playmonumenta.plugins.enchantments.infusions.delves.Reflection;
 import com.playmonumenta.plugins.enchantments.infusions.delves.Understanding;
 import com.playmonumenta.plugins.enchantments.infusions.delves.Usurper;
 import com.playmonumenta.plugins.listeners.AuditListener;
-
-import org.bukkit.ChatColor;
-import org.bukkit.Color;
-import org.bukkit.FireworkEffect;
-import org.bukkit.GameMode;
-import org.bukkit.Location;
-import org.bukkit.NamespacedKey;
-import org.bukkit.entity.EntityType;
-import org.bukkit.entity.Firework;
-import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.PlayerInventory;
-import org.bukkit.inventory.meta.FireworkMeta;
-import org.bukkit.scheduler.BukkitRunnable;
 
 public class DelveInfusionUtils {
 
@@ -77,7 +78,7 @@ public class DelveInfusionUtils {
 			mLootTable = lootTable;
 		}
 
-		public static DelveInfusionSelection getInfusionSelection(String label) {
+		public static @Nullable DelveInfusionSelection getInfusionSelection(@Nullable String label) {
 			if (label == null) {
 				return null;
 			}
@@ -282,7 +283,7 @@ public class DelveInfusionUtils {
 	}
 
 
-	public static DelveInfusionSelection getCurrentInfusion(ItemStack item) {
+	public static @Nullable DelveInfusionSelection getCurrentInfusion(ItemStack item) {
 		for (DelveInfusionSelection infusionSelection : DelveInfusionSelection.values()) {
 			if (InventoryUtils.getCustomEnchantLevel(item, infusionSelection.mEnchantName, true) > 0) {
 				return infusionSelection;

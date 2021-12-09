@@ -17,6 +17,7 @@ import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
@@ -53,7 +54,7 @@ public class UnstableArrows extends Ability {
 	private static final double UNSTABLE_ARROWS_2_DAMAGE = 20.0;
 	private static final int UNSTABLE_ARROWS_RADIUS = 4;
 
-	private AbstractArrow mUnstableArrow = null;
+	private @Nullable AbstractArrow mUnstableArrow = null;
 
 	public UnstableArrows(Plugin plugin, Player player) {
 		super(plugin, player, "Unstable Arrows");
@@ -143,7 +144,7 @@ public class UnstableArrows extends Ability {
 	@Override
 	public boolean playerShotArrowEvent(AbstractArrow arrow) {
 		// Can't use runCheck for this because player doesn't need to be sneaking when arrow lands
-		if (mPlayer.isSneaking()) {
+		if (mPlayer != null && mPlayer.isSneaking()) {
 			mPlayer.getWorld().playSound(mPlayer.getLocation(), Sound.BLOCK_LAVA_EXTINGUISH, 5.0f, 0.25f);
 			mUnstableArrow = arrow;
 			mPlugin.mProjectileEffectTimers.addEntity(arrow, Particle.FLAME);

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -18,14 +19,14 @@ public class PlayerClass {
 
 	public ArrayList<Ability> mAbilities = new ArrayList<Ability>();
 	public int mClass;
-	public String mClassName;
-	public NamedTextColor mClassColor;
-	public ChatColor mChatColor;
-	public ItemStack mDisplayItem;
-	public String mQuestReq = null;
+	public @Nullable String mClassName;
+	public @Nullable NamedTextColor mClassColor;
+	public @Nullable ChatColor mChatColor;
+	public @Nullable ItemStack mDisplayItem;
+	public @Nullable String mQuestReq = null;
 	public int mQuestReqMin;
-	public String mClassDescription;
-	public String mClassPassiveDescription;
+	public @Nullable String mClassDescription;
+	public @Nullable String mClassPassiveDescription;
 
 	public PlayerSpec mSpecOne = new PlayerSpec();
 	public PlayerSpec mSpecTwo = new PlayerSpec();

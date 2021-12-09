@@ -17,6 +17,7 @@ import org.bukkit.event.entity.ItemSpawnEvent;
 import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.alchemist.AlchemistPotions.AlchemistPotionsDamageEnchantment;
@@ -205,7 +206,7 @@ public class EnchantmentManager implements Listener {
 		}
 	}
 
-	private static int[] getItems(PlayerInventory inv, ItemSlot slot) {
+	private static int @Nullable [] getItems(PlayerInventory inv, ItemSlot slot) {
 		switch (slot) {
 		case MAINHAND:
 			return new int[] {inv.getHeldItemSlot()};
@@ -225,7 +226,7 @@ public class EnchantmentManager implements Listener {
 		}
 	}
 
-	public BaseEnchantment getEnchantmentHandle(Class<? extends BaseEnchantment> cls) {
+	public @Nullable BaseEnchantment getEnchantmentHandle(Class<? extends BaseEnchantment> cls) {
 		return mEnchantLocator.get(cls);
 	}
 
@@ -256,7 +257,7 @@ public class EnchantmentManager implements Listener {
 			if (invMapSlot != null && !invMapSlot.isEmpty()) {
 				//Removes the previously stored custom enchants from that item slot and applies the new enchant
 				for (Map.Entry<BaseEnchantment, Integer> enchant : invMapSlot.entrySet()) {
-					int newLevel = propertyMap.get(enchant.getKey()) - enchant.getValue();
+					int newLevel = propertyMap.getOrDefault(enchant.getKey(), 0) - enchant.getValue();
 					propertyMap.remove(enchant.getKey());
 					enchant.getKey().removeProperty(plugin, player);
 					if (newLevel > 0 || (enchant.getKey().canNegativeLevel() && newLevel < 0)) {

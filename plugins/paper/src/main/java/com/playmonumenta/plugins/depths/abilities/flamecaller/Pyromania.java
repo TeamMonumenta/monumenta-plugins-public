@@ -16,8 +16,6 @@ public class Pyromania extends DepthsAbility {
 	public static final double[] FIRE_BONUS_DAMAGE = {2, 2.5, 3, 3.5, 4, 6};
 	public static final int RADIUS = 20;
 
-	public static String tree;
-
 	public Pyromania(Plugin plugin, Player player) {
 		super(plugin, player, ABILITY_NAME);
 		mDisplayItem = Material.CAMPFIRE;

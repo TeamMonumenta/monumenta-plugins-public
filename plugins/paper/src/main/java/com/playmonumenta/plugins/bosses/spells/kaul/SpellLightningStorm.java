@@ -13,6 +13,7 @@ import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.utils.BossUtils;
@@ -25,7 +26,7 @@ public class SpellLightningStorm extends Spell {
 	private LivingEntity mBoss;
 	private double mRange;
 	private static final String LIGHTNING_STORM_TAG = "KaulLightningStormTag";
-	private Location mCenter;
+	private @Nullable Location mCenter;
 	private List<Player> mWarnedPlayers = new ArrayList<Player>();
 	private static final Particle.DustOptions YELLOW_1_COLOR = new Particle.DustOptions(Color.fromRGB(255, 255, 20), 1.0f);
 	private static final Particle.DustOptions YELLOW_2_COLOR = new Particle.DustOptions(Color.fromRGB(255, 255, 120), 1.0f);

@@ -68,7 +68,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BlockIterator;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
-import org.jetbrains.annotations.NotNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityManager;
@@ -398,14 +398,15 @@ public class EntityUtils {
 	 * Gets the entity in the crosshair of the player
 	 * <p>
 	 * Utilizes raycasting for the detection.
+	 *
 	 * @param player
 	 * @param range
 	 * @param targetPlayers
 	 * @param targetNonPlayers
 	 * @return The Entity in the crosshair of the player
 	 */
-	public static LivingEntity getCrosshairTarget(Player player, int range, boolean targetPlayers,
-	                                              boolean targetNonPlayers, boolean checkLos, boolean throughNonOccluding) {
+	public static @Nullable LivingEntity getCrosshairTarget(Player player, int range, boolean targetPlayers,
+	                                                        boolean targetNonPlayers, boolean checkLos, boolean throughNonOccluding) {
 		Location loc = player.getEyeLocation();
 		Vector dir = loc.getDirection();
 
@@ -429,7 +430,7 @@ public class EntityUtils {
 				if (e instanceof LivingEntity) {
 					//  Make sure we should be targeting this entity.
 					if ((targetPlayers && (e instanceof Player)) || (targetNonPlayers && (!(e instanceof Player)))) {
-						return (LivingEntity)e;
+						return (LivingEntity) e;
 					}
 				}
 			}
@@ -438,7 +439,7 @@ public class EntityUtils {
 		return null;
 	}
 
-	public static LivingEntity getEntityAtCursor(Player player, int range, boolean targetPlayers, boolean targetNonPlayers, boolean checkLos) {
+	public static @Nullable LivingEntity getEntityAtCursor(Player player, int range, boolean targetPlayers, boolean targetNonPlayers, boolean checkLos) {
 		List<Entity> en = player.getNearbyEntities(range, range, range);
 		ArrayList<LivingEntity> entities = new ArrayList<LivingEntity>();
 		for (Entity e : en) {
@@ -446,7 +447,7 @@ public class EntityUtils {
 			if (e instanceof LivingEntity) {
 				//  Make sure we should be targeting this entity.
 				if ((targetPlayers && (e instanceof Player)) || (targetNonPlayers && (!(e instanceof Player)))) {
-					entities.add((LivingEntity)e);
+					entities.add((LivingEntity) e);
 				}
 			}
 		}
@@ -670,15 +671,15 @@ public class EntityUtils {
 		return playersInLine;
 	}
 
-	public static LivingEntity getNearestMob(Location loc, double radius, LivingEntity getter) {
+	public static @Nullable LivingEntity getNearestMob(Location loc, double radius, LivingEntity getter) {
 		return getNearestMob(loc, getNearbyMobs(loc, radius, getter));
 	}
 
-	public static LivingEntity getNearestMob(Location loc, double radius) {
+	public static @Nullable LivingEntity getNearestMob(Location loc, double radius) {
 		return getNearestMob(loc, getNearbyMobs(loc, radius));
 	}
 
-	public static LivingEntity getNearestMob(Location loc, List<LivingEntity> nearbyMobs) {
+	public static @Nullable LivingEntity getNearestMob(Location loc, List<LivingEntity> nearbyMobs) {
 		LivingEntity nearest = null;
 		double nearestDistanceSquared = Double.POSITIVE_INFINITY;
 
@@ -693,7 +694,7 @@ public class EntityUtils {
 		return nearest;
 	}
 
-	public static Player getNearestPlayer(Location loc, double radius) {
+	public static @Nullable Player getNearestPlayer(Location loc, double radius) {
 		List<Player> nearbyPlayers = PlayerUtils.playersInRange(loc, radius, true);
 		if (nearbyPlayers.size() == 0) {
 			return null;
@@ -713,7 +714,7 @@ public class EntityUtils {
 		return nearbyPlayers;
 	}
 
-	public static Entity getEntity(World world, UUID entityUUID) {
+	public static @Nullable Entity getEntity(World world, UUID entityUUID) {
 		List<Entity> entities = world.getEntities();
 		for (Entity entity : entities) {
 			if (entity.getUniqueId() == entityUUID) {
@@ -801,12 +802,12 @@ public class EntityUtils {
 		return 1;
 	}
 
-	public static LivingEntity getNearestHostile(Player player, double range) {
+	public static @Nullable LivingEntity getNearestHostile(Player player, double range) {
 		LivingEntity target = null;
 		double maxDist = range;
 
 		for (Entity e : player.getNearbyEntities(range, range, range)) {
-			if (isHostileMob(e) && !e.isDead()) {
+			if (e instanceof LivingEntity && isHostileMob(e) && !e.isDead()) {
 				LivingEntity le = (LivingEntity) e;
 
 				if (le.getLocation().distance(player.getLocation()) < maxDist) {
@@ -1315,33 +1316,56 @@ public class EntityUtils {
 		}
 	}
 
+	public static double getMaxHealth(LivingEntity entity) {
+		AttributeInstance maxHealth = entity.getAttribute(Attribute.GENERIC_MAX_HEALTH);
+		return maxHealth == null ? 0 : maxHealth.getValue();
+	}
+
+	/**
+	 * Returns {@code entity.getAttribute(attribute).getBaseValue(value)} if the attribute exists, or {@code def} if not.
+	 */
+	public static double getAttributeBaseOrDefault(LivingEntity entity, Attribute attribute, double def) {
+		AttributeInstance attr = entity.getAttribute(attribute);
+		return attr == null ? def : attr.getBaseValue();
+	}
+
+	/**
+	 * Null-safe version of {@code entity.getAttribute(attribute).setBaseValue(value)}
+	 */
+	public static void setAttributeBase(LivingEntity entity, Attribute attribute, double value) {
+		AttributeInstance attr = entity.getAttribute(attribute);
+		if (attr != null) {
+			attr.setBaseValue(value);
+		}
+	}
+
 	// Skip magic type, register event, spell, spellshock, iframes, velocity
-	public static void damageEntity(Plugin plugin, LivingEntity target, double damage, Entity attacker) {
+	public static void damageEntity(Plugin plugin, LivingEntity target, double damage, @Nullable Entity attacker) {
 		damageEntity(plugin, target, damage, attacker, null);
 	}
 
 	// Skip register event, spell, spellshock, iframes, velocity
-	public static void damageEntity(Plugin plugin, LivingEntity target, double damage, Entity attacker, MagicType magicType) {
+	public static void damageEntity(Plugin plugin, LivingEntity target, double damage, @Nullable Entity attacker, @Nullable MagicType magicType) {
 		damageEntity(plugin, target, damage, attacker, magicType, true);
 	}
 
 	// Skip spell, spellshock, iframes, velocity
-	public static void damageEntity(Plugin plugin, LivingEntity target, double damage, Entity attacker, MagicType magicType, boolean registerEvent) {
+	public static void damageEntity(Plugin plugin, LivingEntity target, double damage, @Nullable Entity attacker, @Nullable MagicType magicType, boolean registerEvent) {
 		damageEntity(plugin, target, damage, attacker, magicType, registerEvent, null);
 	}
 
 	// Skip spellshock, iframes, velocity
-	public static void damageEntity(Plugin plugin, LivingEntity target, double damage, Entity attacker, MagicType magicType, boolean registerEvent, ClassAbility spell) {
+	public static void damageEntity(Plugin plugin, LivingEntity target, double damage, @Nullable Entity attacker, @Nullable MagicType magicType, boolean registerEvent, @Nullable ClassAbility spell) {
 		damageEntity(plugin, target, damage, attacker, magicType, registerEvent, spell, true, true);
 	}
 
 	// Skip iframes, velocity
-	public static void damageEntity(Plugin plugin, LivingEntity target, double damage, Entity attacker, MagicType magicType, boolean registerEvent, ClassAbility spell, boolean applySpellshock, boolean triggerSpellshock) {
+	public static void damageEntity(Plugin plugin, LivingEntity target, double damage, @Nullable Entity attacker, @Nullable MagicType magicType, boolean registerEvent, @Nullable ClassAbility spell, boolean applySpellshock, boolean triggerSpellshock) {
 		damageEntity(plugin, target, damage, attacker, magicType, registerEvent, spell, applySpellshock, triggerSpellshock, false);
 	}
 
 	// Skip velocity
-	public static void damageEntity(Plugin plugin, LivingEntity target, double damage, Entity attacker, MagicType magicType, boolean registerEvent, ClassAbility spell, boolean applySpellshock, boolean triggerSpellshock, boolean bypassIFrames) {
+	public static void damageEntity(Plugin plugin, LivingEntity target, double damage, @Nullable Entity attacker, @Nullable MagicType magicType, boolean registerEvent, @Nullable ClassAbility spell, boolean applySpellshock, boolean triggerSpellshock, boolean bypassIFrames) {
 		damageEntity(plugin, target, damage, attacker, magicType, registerEvent, spell, applySpellshock, triggerSpellshock, bypassIFrames, false);
 	}
 
@@ -1349,10 +1373,10 @@ public class EntityUtils {
 		Plugin plugin,
 		LivingEntity target,
 		double damage,
-		Entity attacker,
-		MagicType magicType,
+		@Nullable Entity attacker,
+		@Nullable MagicType magicType,
 		boolean registerEvent,
-		ClassAbility spell,
+		@Nullable ClassAbility spell,
 		boolean applySpellshock,
 		boolean triggerSpellshock,
 		// Usual damage iframe behaviour would be like setting to false.
@@ -1412,15 +1436,15 @@ public class EntityUtils {
 		}
 	}
 
-	public static boolean isSomeArrow(@NotNull Projectile projectile) {
+	public static boolean isSomeArrow(Projectile projectile) {
 		return isSomeArrow(projectile.getType());
 	}
 
-	public static boolean isSomeArrow(@NotNull EntityType entityType) {
+	public static boolean isSomeArrow(EntityType entityType) {
 		// TippedArrow is deprecated
 		return (
 			entityType == EntityType.ARROW
-			|| entityType == EntityType.SPECTRAL_ARROW
+				|| entityType == EntityType.SPECTRAL_ARROW
 		);
 	}
 
@@ -1460,4 +1484,5 @@ public class EntityUtils {
 
 		return damage;
 	}
+
 }

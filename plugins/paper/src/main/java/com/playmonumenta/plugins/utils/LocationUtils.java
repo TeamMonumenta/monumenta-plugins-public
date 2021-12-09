@@ -34,7 +34,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.util.BlockIterator;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
-import org.jetbrains.annotations.NotNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
@@ -191,7 +191,7 @@ public class LocationUtils {
 	}
 
 	// Search a cuboid around a Location and return the first Location found with a block matching one of the given Materials
-	public static Location getNearestBlock(Location center, int radius, Material... materials) {
+	public static @Nullable Location getNearestBlock(Location center, int radius, Material... materials) {
 		int cx = center.getBlockX();
 		int cy = center.getBlockY();
 		int cz = center.getBlockZ();
@@ -1150,24 +1150,24 @@ public class LocationUtils {
 	}
 
 	// Adds part or all of y height above feet location, based on multiplier. Player height 1.8, player sneaking height 1.5
-	public static @NotNull Location getHeightLocation(@NotNull Entity entity, double heightMultiplier) {
+	public static Location getHeightLocation(Entity entity, double heightMultiplier) {
 		return entity.getLocation().add(0, entity.getHeight() * heightMultiplier, 0);
 	}
 
-	public static @NotNull Location getHalfHeightLocation(@NotNull Entity entity) {
+	public static Location getHalfHeightLocation(Entity entity) {
 		return getHeightLocation(entity, 0.5);
 	}
 
 	// Player eye height 1.62 when not sneaking
-	public static @NotNull Location getHalfEyeLocation(@NotNull LivingEntity entity) {
+	public static Location getHalfEyeLocation(LivingEntity entity) {
 		return entity.getLocation().add(0, entity.getEyeHeight() / 2, 0);
 	}
 
-	public static @NotNull Location getLocationCentre(@NotNull Block block) {
+	public static Location getLocationCentre(Block block) {
 		return getLocationCentre(block.getLocation());
 	}
 
-	public static @NotNull Location getLocationCentre(@NotNull Location location) {
+	public static Location getLocationCentre(Location location) {
 		return location.add(0.5, 0.5, 0.5);
 	}
 

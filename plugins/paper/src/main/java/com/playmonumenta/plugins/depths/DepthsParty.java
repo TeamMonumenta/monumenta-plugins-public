@@ -20,6 +20,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.entity.Slime;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.depths.DepthsRoomType.DepthsRewardType;
 import com.playmonumenta.plugins.integrations.MonumentaNetworkRelayIntegration;
@@ -50,21 +51,21 @@ public class DepthsParty {
 	// The number of spawners remaining in the current room to break for the party to proceed
 	public int mSpawnersToBreak;
 	// The current type of room players are in
-	public DepthsRoomType mCurrentRoomType;
+	public @Nullable DepthsRoomType mCurrentRoomType;
 	// The saved choices for the party's next room options
-	public EnumSet<DepthsRoomType> mNextRoomChoices;
+	public @Nullable EnumSet<DepthsRoomType> mNextRoomChoices;
 	// The actual room object for the current room
-	public DepthsRoom mCurrentRoom;
+	public @Nullable DepthsRoom mCurrentRoom;
 	// Where in the room to spawn the next room
-	public Vector mRoomSpawnerLocation;
+	public @Nullable Vector mRoomSpawnerLocation;
 	// Party unique identifier- gets set on creation
 	public long mPartyNum = -1;
 	// Treasure score accumulated by the party
 	public int mTreasureScore;
 	//The location at which the lobby for each floor should be loaded. This is marked by an armor stand
-	public Vector mFloorLobbyLoadPoint;
+	public @Nullable Vector mFloorLobbyLoadPoint;
 	//Where to tp the players at the start of the next floor
-	public Vector mFloorLobbyLoadPlayerTpPoint;
+	public @Nullable Vector mFloorLobbyLoadPlayerTpPoint;
 	//Used to determine if the party can receive an upgrade reward
 	public boolean mHasAtLeastOneAbility;
 	//Locations of the loot rooms to tp players to (should be 4)
@@ -175,10 +176,12 @@ public class DepthsParty {
 
 		//Endless mode detection
 		Player p = Bukkit.getPlayer(player.mPlayerId);
-		p.removeScoreboardTag(DepthsManager.PAID_SCOREBOARD_TAG);
-		if (p.getScoreboardTags().contains(DepthsManager.ENDLESS_MODE_STRING)) {
-			mEndlessMode = true;
-			p.removeScoreboardTag(DepthsManager.ENDLESS_MODE_STRING);
+		if (p != null) {
+			p.removeScoreboardTag(DepthsManager.PAID_SCOREBOARD_TAG);
+			if (p.getScoreboardTags().contains(DepthsManager.ENDLESS_MODE_STRING)) {
+				mEndlessMode = true;
+				p.removeScoreboardTag(DepthsManager.ENDLESS_MODE_STRING);
+			}
 		}
 	}
 

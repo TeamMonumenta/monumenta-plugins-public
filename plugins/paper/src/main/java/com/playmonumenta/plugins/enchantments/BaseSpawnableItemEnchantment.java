@@ -1,9 +1,8 @@
 package com.playmonumenta.plugins.enchantments;
 
-import com.playmonumenta.plugins.Plugin;
-
 import org.bukkit.entity.Item;
-import org.jetbrains.annotations.NotNull;
+
+import com.playmonumenta.plugins.Plugin;
 
 
 
@@ -22,8 +21,8 @@ public interface BaseSpawnableItemEnchantment extends BaseEnchantment {
 	 * spawned item, since it isn't tied to a Player and ItemSlot.
 	 */
 	default void onSpawn(
-		@NotNull Plugin plugin,
-		@NotNull Item item,
-		@NotNull int level
+		Plugin plugin,
+		Item item,
+		int level
 	) {}
 }

@@ -15,6 +15,7 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.projectiles.ProjectileSource;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
@@ -42,7 +43,7 @@ public class SanctifiedArmor extends Ability {
 
 	private final double mPercentDamageReturned;
 
-	private Crusade mCrusade;
+	private @Nullable Crusade mCrusade;
 
 	public SanctifiedArmor(Plugin plugin, Player player) {
 		super(plugin, player, "Sanctified Armor");

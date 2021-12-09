@@ -6,8 +6,8 @@ import com.playmonumenta.plugins.player.PartialParticle.Source;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 
 import org.bukkit.entity.Player;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 
 
@@ -16,8 +16,8 @@ import org.jetbrains.annotations.Nullable;
  */
 public class PlayerData {
 	public static double getParticleMultiplier(
-		@NotNull Player player,
-		@NotNull Source source
+		Player player,
+		Source source
 	) {
 		// For now, this is the only setting players can change via existing PEB toggle
 		//TODO Scrap this part in the future once players can slide these in PEB GUI, scoreboard from 0-100 per source

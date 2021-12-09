@@ -4,15 +4,13 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map.Entry;
 
-import javax.annotation.Nonnull;
+import org.bukkit.entity.Player;
+import org.bukkit.potion.PotionEffectType;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.utils.PotionUtils.PotionInfo;
-
-import org.bukkit.entity.Player;
-import org.bukkit.potion.PotionEffectType;
 
 public class PlayerPotionInfo {
 	//  Effect Type / Potion List
@@ -56,7 +54,7 @@ public class PlayerPotionInfo {
 		}
 	}
 
-	protected @Nonnull JsonObject getAsJsonObject(boolean includeAll) {
+	protected JsonObject getAsJsonObject(boolean includeAll) {
 		JsonObject playerPotionInfoObject = new JsonObject();
 
 		for (Entry<PotionEffectType, PotionMap> potionEntry : mPotionInfo.entrySet()) {
@@ -69,7 +67,7 @@ public class PlayerPotionInfo {
 		return playerPotionInfoObject;
 	}
 
-	protected void loadFromJsonObject(@Nonnull JsonObject object) throws Exception {
+	protected void loadFromJsonObject(JsonObject object) throws Exception {
 		for (Entry<String, JsonElement> info : object.entrySet()) {
 			PotionEffectType type = PotionEffectType.getByName(info.getKey());
 			PotionMap map = new PotionMap(type);

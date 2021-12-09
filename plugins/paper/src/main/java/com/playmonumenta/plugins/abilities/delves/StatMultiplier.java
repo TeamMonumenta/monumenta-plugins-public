@@ -94,7 +94,7 @@ public class StatMultiplier extends DelveModifier {
 	}
 
 	public static double getStatCompensation(String dungeon) {
-		return STAT_COMPENSATION_MAPPINGS.get(dungeon);
+		return STAT_COMPENSATION_MAPPINGS.getOrDefault(dungeon, 1.0);
 	}
 
 	public static double getDamageMultiplier(int depthPoints) {

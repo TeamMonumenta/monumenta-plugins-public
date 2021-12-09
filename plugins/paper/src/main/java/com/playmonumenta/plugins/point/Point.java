@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.point;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.utils.CommandUtils;
 
@@ -27,16 +28,16 @@ public class Point {
 		return fromString(null, str);
 	}
 
-	public static Point fromString(CommandSender sender, String str) throws Exception {
+	public static Point fromString(@Nullable CommandSender sender, String str) throws Exception {
 		// Remove parenthesis, then split on either , or space or both together
 		String[] strArray = str.replaceAll("[()]", "").split("[, ]+");
 		if (strArray.length != 3) {
 			if (sender != null) {
 				sender.sendMessage(ChatColor.RED + "Failed to parse string '" + str +
-				                   "' as point - found " + strArray.length + " elements");
+					                   "' as point - found " + strArray.length + " elements");
 			}
 			throw new Exception("Failed to parse string '" + str +
-			                    "' as point - found " + strArray.length + " elements");
+				                    "' as point - found " + strArray.length + " elements");
 		}
 		return fromString(sender, strArray[0], strArray[1], strArray[2], false, null);
 	}
@@ -45,27 +46,27 @@ public class Point {
 		return fromString(null, xStr, yStr, zStr, false, null);
 	}
 
-	public static Point fromString(CommandSender sender,
+	public static Point fromString(@Nullable CommandSender sender,
 	                               String xStr, String yStr, String zStr) throws Exception {
 		return fromString(sender, xStr, yStr, zStr, false, null);
 	}
 
-	public static Point fromString(CommandSender sender,
+	public static Point fromString(@Nullable CommandSender sender,
 	                               String xStr, String yStr, String zStr,
 	                               Location senderLoc) throws Exception {
 		return fromString(sender, xStr, yStr, zStr, false, senderLoc);
 	}
 
-	public static Point fromString(CommandSender sender,
+	public static Point fromString(@Nullable CommandSender sender,
 	                               String xStr, String yStr, String zStr,
 	                               boolean doSubtractEntityOffset) throws Exception {
 		return fromString(sender, xStr, yStr, zStr, doSubtractEntityOffset, null);
 	}
 
-	public static Point fromString(CommandSender sender,
+	public static Point fromString(@Nullable CommandSender sender,
 	                               String xStr, String yStr, String zStr,
 	                               boolean doSubtractEntityOffset,
-	                               Location senderLoc) throws Exception {
+	                               @Nullable Location senderLoc) throws Exception {
 		double x = 0;
 		double y = 0;
 		double z = 0;

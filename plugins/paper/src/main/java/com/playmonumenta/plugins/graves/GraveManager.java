@@ -6,12 +6,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.UUID;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.playmonumenta.redissync.MonumentaRedisSyncAPI;
-import com.playmonumenta.redissync.event.PlayerSaveEvent;
-
 import org.bukkit.Location;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
@@ -22,6 +16,13 @@ import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.event.world.ChunkUnloadEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
+import org.checkerframework.checker.nullness.qual.Nullable;
+
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.playmonumenta.redissync.MonumentaRedisSyncAPI;
+import com.playmonumenta.redissync.event.PlayerSaveEvent;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -67,7 +68,7 @@ public class GraveManager {
 		}
 	}
 
-	public static GraveManager getInstance(Player player) {
+	public static @Nullable GraveManager getInstance(Player player) {
 		return INSTANCES.get(player.getUniqueId());
 	}
 
@@ -364,7 +365,7 @@ public class GraveManager {
 		return list;
 	}
 
-	public Component getGraveInfo(int index) {
+	public @Nullable Component getGraveInfo(int index) {
 		if (mGraves.size() > index) {
 			Grave grave = mGraves.get(index);
 			return Component.text("World: (", NamedTextColor.GRAY)

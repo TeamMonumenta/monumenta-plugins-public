@@ -14,6 +14,7 @@ import org.bukkit.event.entity.SpawnerSpawnEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.projectiles.ProjectileSource;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
@@ -39,15 +40,15 @@ public class DelveModifier extends Ability {
 
 	public static final String AVOID_MODIFIERS = "boss_delveimmune";
 
-	private final Modifier mModifier;
+	private final @Nullable Modifier mModifier;
 
-	public DelveModifier(Plugin plugin, Player player, Modifier modifier) {
+	public DelveModifier(Plugin plugin, Player player, @Nullable Modifier modifier) {
 		super(plugin, player, null);
 
 		mModifier = modifier;
 	}
 
-	public static boolean canUse(Player player, Modifier modifier) {
+	public static boolean canUse(Player player, @Nullable Modifier modifier) {
 		return player != null && DelvesUtils.getDelveInfo(player).getRank(modifier) > 0;
 	}
 
@@ -58,7 +59,7 @@ public class DelveModifier extends Ability {
 
 	private boolean shouldApplyModifiers(Entity mob) {
 		Set<String> tags = mob.getScoreboardTags();
-		return tags == null || !tags.contains(AVOID_MODIFIERS);
+		return !tags.contains(AVOID_MODIFIERS);
 	}
 
 	@Override
@@ -104,7 +105,7 @@ public class DelveModifier extends Ability {
 	public void applyOnSpawnModifiers(LivingEntity mob, EntitySpawnEvent event) {
 		if (EntityUtils.isHostileMob(mob)) {
 			Set<String> tags = mob.getScoreboardTags();
-			if (tags == null || !tags.contains(AVOID_MODIFIERS)) {
+			if (!tags.contains(AVOID_MODIFIERS)) {
 				PotionEffect resistance = mob.getPotionEffect(PotionEffectType.DAMAGE_RESISTANCE);
 				if (resistance == null || resistance.getAmplifier() < 4 || resistance.getDuration() < 20 * 8) {
 					applyModifiers(mob, event);

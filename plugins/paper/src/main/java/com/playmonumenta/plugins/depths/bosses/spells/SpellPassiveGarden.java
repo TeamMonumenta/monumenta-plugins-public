@@ -13,6 +13,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.depths.bosses.Hedera;
@@ -127,7 +128,7 @@ public class SpellPassiveGarden extends Spell {
 	}
 
 
-	private String getValidPlant() {
+	private @Nullable String getValidPlant() {
 		Collection<String> activeTypes = mPlantTypes.values();
 		List<String> currentTypes = new ArrayList<>();
 		for (String s : activeTypes) {

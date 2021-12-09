@@ -16,6 +16,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
@@ -71,7 +72,7 @@ public class AlchemistPotions extends Ability implements AbilityWithChargesOrSta
 	private int mCharges;
 	private int mChargeTime;
 
-	private static ItemStack POTION = null;
+	private static @Nullable ItemStack POTION = null;
 
 	public AlchemistPotions(Plugin plugin, Player player) {
 		super(plugin, player, null);
@@ -83,65 +84,63 @@ public class AlchemistPotions extends Ability implements AbilityWithChargesOrSta
 		}
 
 		/*
-		* Run this stuff 5 ticks later. As of now, the AbilityManager takes a tick
-		* to initialize everything, and the PotionAbility classes take a tick to
-		* initialize their damage values, but just give a few extra ticks for slight
-		* future-proofing.
-		*/
-		if (player != null) {
-			mCharges = ScoreboardUtils.getScoreboardValue(player, POTION_SCOREBOARD).orElse(0);
-			mChargeTime = POTIONS_TIMER_BASE;
-			new BukkitRunnable() {
-				@Override
-				public void run() {
-					Ability[] classAbilities = new Ability[8];
-					Ability[] specializationAbilities = new Ability[6];
-					classAbilities[0] = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(mPlayer, GruesomeAlchemy.class);
-					classAbilities[1] = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(mPlayer, BrutalAlchemy.class);
-					classAbilities[2] = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(mPlayer, IronTincture.class);
-					classAbilities[3] = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(mPlayer, BasiliskPoison.class);
-					classAbilities[4] = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(mPlayer, PowerInjection.class);
-					classAbilities[5] = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(mPlayer, UnstableArrows.class);
-					classAbilities[6] = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(mPlayer, EnfeeblingElixir.class);
-					classAbilities[7] = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(mPlayer, Bezoar.class);
-					specializationAbilities[0] = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(mPlayer, PurpleHaze.class);
-					specializationAbilities[1] = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(mPlayer, NightmarishAlchemy.class);
-					specializationAbilities[2] = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(mPlayer, ScorchedEarth.class);
-					specializationAbilities[3] = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(mPlayer, WardingRemedy.class);
-					specializationAbilities[4] = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(mPlayer, InvigoratingOdor.class);
-					specializationAbilities[5] = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(mPlayer, AlchemicalAmalgam.class);
+		 * Run this stuff 5 ticks later. As of now, the AbilityManager takes a tick
+		 * to initialize everything, and the PotionAbility classes take a tick to
+		 * initialize their damage values, but just give a few extra ticks for slight
+		 * future-proofing.
+		 */
+		mCharges = ScoreboardUtils.getScoreboardValue(player, POTION_SCOREBOARD).orElse(0);
+		mChargeTime = POTIONS_TIMER_BASE;
+		new BukkitRunnable() {
+			@Override
+			public void run() {
+				Ability[] classAbilities = new Ability[8];
+				Ability[] specializationAbilities = new Ability[6];
+				classAbilities[0] = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, GruesomeAlchemy.class);
+				classAbilities[1] = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, BrutalAlchemy.class);
+				classAbilities[2] = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, IronTincture.class);
+				classAbilities[3] = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, BasiliskPoison.class);
+				classAbilities[4] = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, PowerInjection.class);
+				classAbilities[5] = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, UnstableArrows.class);
+				classAbilities[6] = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, EnfeeblingElixir.class);
+				classAbilities[7] = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, Bezoar.class);
+				specializationAbilities[0] = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, PurpleHaze.class);
+				specializationAbilities[1] = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, NightmarishAlchemy.class);
+				specializationAbilities[2] = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, ScorchedEarth.class);
+				specializationAbilities[3] = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, WardingRemedy.class);
+				specializationAbilities[4] = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, InvigoratingOdor.class);
+				specializationAbilities[5] = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, AlchemicalAmalgam.class);
 
-					for (Ability classAbility : classAbilities) {
-						if (classAbility != null) {
-							mDamage += DAMAGE_PER_SKILL_POINT * classAbility.getAbilityScore();
+				for (Ability classAbility : classAbilities) {
+					if (classAbility != null) {
+						mDamage += DAMAGE_PER_SKILL_POINT * classAbility.getAbilityScore();
 
-							if (classAbility instanceof PotionAbility) {
-								PotionAbility potionAbility = (PotionAbility) classAbility;
-								mPotionAbilities.add(potionAbility);
-								mDamage += potionAbility.getDamage();
-							}
+						if (classAbility instanceof PotionAbility) {
+							PotionAbility potionAbility = (PotionAbility) classAbility;
+							mPotionAbilities.add(potionAbility);
+							mDamage += potionAbility.getDamage();
 						}
 					}
-
-					for (Ability specializationAbility : specializationAbilities) {
-						if (specializationAbility != null) {
-							mDamage += DAMAGE_PER_SPEC_POINT * specializationAbility.getAbilityScore();
-
-							if (specializationAbility instanceof PotionAbility) {
-								PotionAbility potionAbility = (PotionAbility) specializationAbility;
-								mPotionAbilities.add(potionAbility);
-								mDamage += potionAbility.getDamage();
-							}
-
-							if (specializationAbility instanceof NightmarishAlchemy) {
-								mChargeTime = POTION_TIMER_HARB;
-							}
-						}
-					}
-
 				}
-			}.runTaskLater(mPlugin, 5);
-		}
+
+				for (Ability specializationAbility : specializationAbilities) {
+					if (specializationAbility != null) {
+						mDamage += DAMAGE_PER_SPEC_POINT * specializationAbility.getAbilityScore();
+
+						if (specializationAbility instanceof PotionAbility) {
+							PotionAbility potionAbility = (PotionAbility) specializationAbility;
+							mPotionAbilities.add(potionAbility);
+							mDamage += potionAbility.getDamage();
+						}
+
+						if (specializationAbility instanceof NightmarishAlchemy) {
+							mChargeTime = POTION_TIMER_HARB;
+						}
+					}
+				}
+
+			}
+		}.runTaskLater(mPlugin, 5);
 	}
 
 	@Override
@@ -151,7 +150,7 @@ public class AlchemistPotions extends Ability implements AbilityWithChargesOrSta
 
 	@Override
 	public boolean playerThrewSplashPotionEvent(ThrownPotion potion) {
-		if (ItemUtils.isAlchemistItem(mPlayer.getInventory().getItemInMainHand()) && ItemUtils.isAlchemistItem(potion.getItem())) {
+		if (mPlayer != null && ItemUtils.isAlchemistItem(mPlayer.getInventory().getItemInMainHand()) && ItemUtils.isAlchemistItem(potion.getItem())) {
 			if (consumeCharge()) {
 				potion.setMetadata("AlchemistPotion", new FixedMetadataValue(mPlugin, 0));
 
@@ -201,7 +200,7 @@ public class AlchemistPotions extends Ability implements AbilityWithChargesOrSta
 	}
 
 	public void apply(LivingEntity mob) {
-		if (MetadataUtils.checkOnceThisTick(mPlugin, mob, "AlchemistPotionApplying")) {
+		if (mPlayer != null && MetadataUtils.checkOnceThisTick(mPlugin, mob, "AlchemistPotionApplying")) {
 			if (!mob.hasMetadata(POTION_METADATA_PLAYER_NAME)) {
 				mob.setMetadata(POTION_METADATA_PLAYER_NAME, new FixedMetadataValue(mPlugin, new HashSet<String>()));
 			}

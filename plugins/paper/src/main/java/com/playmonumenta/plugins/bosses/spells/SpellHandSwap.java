@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.bosses.spells;
 
 import org.bukkit.entity.Mob;
+import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.ItemStack;
 
 public class SpellHandSwap extends Spell {
@@ -12,10 +13,14 @@ public class SpellHandSwap extends Spell {
 
 	@Override
 	public void run() {
-		ItemStack curItem = mLauncher.getEquipment().getItemInMainHand();
-		ItemStack offItem = mLauncher.getEquipment().getItemInOffHand();
-		mLauncher.getEquipment().setItemInMainHand(offItem);
-		mLauncher.getEquipment().setItemInOffHand(curItem);
+		EntityEquipment equipment = mLauncher.getEquipment();
+		if (equipment == null) {
+			return;
+		}
+		ItemStack curItem = equipment.getItemInMainHand();
+		ItemStack offItem = equipment.getItemInOffHand();
+		equipment.setItemInMainHand(offItem);
+		equipment.setItemInOffHand(curItem);
 	}
 
 	@Override

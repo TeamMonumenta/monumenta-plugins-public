@@ -5,7 +5,10 @@ import java.util.Iterator;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 
-import javax.annotation.Nullable;
+import org.bukkit.entity.Player;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -13,10 +16,6 @@ import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.utils.PotionUtils;
 import com.playmonumenta.plugins.utils.PotionUtils.PotionInfo;
-
-import org.bukkit.entity.Player;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 
 public class PotionMap {
 	// PotionID is the type (safezone, item, etc.)
@@ -126,22 +125,17 @@ public class PotionMap {
 		}
 	}
 
-	private PotionInfo getBestEffect() {
+	private @Nullable PotionInfo getBestEffect() {
 		PotionInfo bestEffect = null;
 
-		Iterator<Entry<PotionID, TreeMap<Integer, PotionInfo>>> potionSourceIter = mPotionMap.entrySet().iterator();
-		while (potionSourceIter.hasNext()) {
-			Entry<PotionID, TreeMap<Integer, PotionInfo>> potionInfo = potionSourceIter.next();
-
-			for (Entry<Integer, PotionInfo> infoIter : potionInfo.getValue().entrySet()) {
-				PotionInfo info = infoIter.getValue();
-
+		for (TreeMap<Integer, PotionInfo> potionInfos : mPotionMap.values()) {
+			for (PotionInfo info : potionInfos.values()) {
 				if (bestEffect == null) {
 					bestEffect = info;
 				} else if (info.mAmplifier > bestEffect.mAmplifier) {
 					bestEffect = info;
 				} else if (info.mAmplifier == bestEffect.mAmplifier &&
-				           info.mDuration > bestEffect.mDuration) {
+					info.mDuration > bestEffect.mDuration) {
 					bestEffect = info;
 				}
 			}

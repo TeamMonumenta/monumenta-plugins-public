@@ -50,8 +50,11 @@ public class Quickdraw extends Ability {
 
 	@Override
 	public void cast(Action action) {
+		if (mPlayer == null) {
+			return;
+		}
 		ItemStack inMainHand = mPlayer.getInventory().getItemInMainHand();
-		Damageable damageable = (Damageable)inMainHand.getItemMeta();
+		Damageable damageable = (Damageable) inMainHand.getItemMeta();
 		if (!mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.mLinkedSpell) && ItemUtils.isSomeBow(inMainHand) && !(damageable.getDamage() > inMainHand.getType().getMaxDurability()) && !ItemUtils.isItemShattered(inMainHand)) {
 			World world = mPlayer.getWorld();
 			world.playSound(mPlayer.getLocation(), Sound.ENTITY_ARROW_SHOOT, 1, 1.4f);
@@ -79,6 +82,9 @@ public class Quickdraw extends Ability {
 	}
 
 	private boolean shootArrow(ItemStack inMainHand, int deviation) {
+		if (mPlayer == null) {
+			return true;
+		}
 		Vector direction = mPlayer.getLocation().getDirection();
 		if (deviation != 0) {
 			direction.rotateAroundY(deviation * 10.0 * Math.PI / 180);

@@ -13,8 +13,7 @@ import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
@@ -60,13 +59,13 @@ public class SpellLightningStrike extends Spell {
 	private static final int FIRE_DELAY_TICKS = (int)(0.25 * Constants.TICKS_PER_SECOND);
 	private static final int FIRE_ALIGHT_TICKS = 3 * Constants.TICKS_PER_SECOND;
 
-	private @NotNull Kaul mKaul;
+	private Kaul mKaul;
 	private int mCooldownTicks;
 	private int mRemainingCooldownTicks;
 	private Location mCenter;
 
 	public SpellLightningStrike(
-		@NotNull Kaul kaul,
+		Kaul kaul,
 		int cooldownSeconds,
 		boolean startCooledDown,
 		Location center
@@ -93,8 +92,8 @@ public class SpellLightningStrike extends Spell {
 		// cast and reset as this is now first mCooldownTicks tick
 		if (mRemainingCooldownTicks <= 0) {
 			mRemainingCooldownTicks = mCooldownTicks;
-			@NotNull Collection<@NotNull Player> arenaParticipants = mKaul.getArenaParticipants();
-			@NotNull Collection<@NotNull Player> targetPlayers = Collections.emptyList();
+			Collection<Player> arenaParticipants = mKaul.getArenaParticipants();
+			Collection<Player> targetPlayers = Collections.emptyList();
 
 			int targetCount = arenaParticipants.size() / TARGETS_DIVISOR;
 			if (targetCount < 1) {
@@ -102,12 +101,12 @@ public class SpellLightningStrike extends Spell {
 				// < TARGETS_DIVISOR players means everyone targeted
 				targetPlayers = arenaParticipants;
 			} else {
-				@NotNull ArrayList<@NotNull Player> shuffledArenaParticipants = new ArrayList<>(arenaParticipants);
+				ArrayList<Player> shuffledArenaParticipants = new ArrayList<>(arenaParticipants);
 				Collections.shuffle(shuffledArenaParticipants);
 				targetPlayers = shuffledArenaParticipants.subList(0, targetCount);
 			}
 
-			targetPlayers.forEach((@NotNull Player targetPlayer) -> startStrike(targetPlayer));
+			targetPlayers.forEach((Player targetPlayer) -> startStrike(targetPlayer));
 		}
 
 		// Count of the tick next run
@@ -121,13 +120,13 @@ public class SpellLightningStrike extends Spell {
 		return 0;
 	}
 
-	public void startStrike(@NotNull Player targetPlayer) {
-		@NotNull World world = targetPlayer.getWorld();
-		@NotNull Location strikeLocation = targetPlayer.getLocation();
+	public void startStrike(Player targetPlayer) {
+		World world = targetPlayer.getWorld();
+		Location strikeLocation = targetPlayer.getLocation();
 		strikeLocation.setY(mCenter.getY());
 
 		// P: Danger, tall markers
-		@NotNull PPPillar abovegroundMarker = new PPPillar(
+		PPPillar abovegroundMarker = new PPPillar(
 			Particle.REDSTONE,
 			strikeLocation,
 			2 * SHOCK_VERTICAL_RANGE,
@@ -137,7 +136,7 @@ public class SpellLightningStrike extends Spell {
 		);
 		abovegroundMarker.init(SHOCK_VERTICAL_RANGE);
 		abovegroundMarker.spawnAsBoss();
-		@NotNull PPPillar undergroundMarker = new PPPillar(
+		PPPillar undergroundMarker = new PPPillar(
 			Particle.FIREWORKS_SPARK,
 			strikeLocation.clone().subtract(0, SHOCK_VERTICAL_RANGE, 0),
 			2 * SHOCK_VERTICAL_RANGE,
@@ -183,7 +182,7 @@ public class SpellLightningStrike extends Spell {
 		);
 
 		// /particle dust 0.2 0.2 0.2 5 ~ ~10 ~ 1.5 0.25 1.5 0 5
-		@NotNull PartialParticle stormClouds = new PartialParticle(
+		PartialParticle stormClouds = new PartialParticle(
 			Particle.REDSTONE,
 			strikeLocation.clone().add(0, SHOCK_VERTICAL_RANGE, 0),
 			5,
@@ -196,7 +195,7 @@ public class SpellLightningStrike extends Spell {
 
 		// /particle dust 1 1 0.25 1 ~ ~ ~ 0.75 0.25 0.75 0 5
 		int electricRingMarkerCount = 8;
-		@NotNull PPGroundCircle electricRingMarker = new PPGroundCircle(
+		PPGroundCircle electricRingMarker = new PPGroundCircle(
 			Particle.REDSTONE,
 			strikeLocation,
 			5 * electricRingMarkerCount,
@@ -208,7 +207,7 @@ public class SpellLightningStrike extends Spell {
 		);
 		electricRingMarker.init(SHOCK_RADIUS, true);
 
-		@NotNull BukkitRunnable lightningRunnable = new BukkitRunnable() {
+		BukkitRunnable lightningRunnable = new BukkitRunnable() {
 			int mCountdownTicks = SHOCK_DELAY_TICKS;
 
 			@Nullable BukkitRunnable mInternalParticleRunnable;
@@ -227,7 +226,7 @@ public class SpellLightningStrike extends Spell {
 				// Count of the tick this run, last being 1
 				if (mCountdownTicks == PPLightning.ANIMATION_TICKS) {
 					// P: Lightning starts
-					@NotNull PPLightning lightning = new PPLightning(
+					PPLightning lightning = new PPLightning(
 						Particle.END_ROD,
 						strikeLocation,
 						8,
@@ -269,18 +268,18 @@ public class SpellLightningStrike extends Spell {
 					}
 					mActiveRunnables.remove(this);
 
-					@NotNull Collection<@NotNull Player> shockPlayers = PlayerUtils.playersInCylinder(
+					Collection<Player> shockPlayers = PlayerUtils.playersInCylinder(
 						strikeLocation,
 						SHOCK_RADIUS,
 						2 * SHOCK_VERTICAL_RANGE
 					);
-					shockPlayers.forEach((@NotNull Player player) -> strikeShock(strikeLocation, player));
+					shockPlayers.forEach((Player player) -> strikeShock(strikeLocation, player));
 
 					startFire(strikeLocation);
 
 					// P: Lightning hits & sparks
 					// /particle firework ~ ~ ~ 0.9 1.8 0.9 0.3 0
-					@NotNull PartialParticle sparks = new PartialParticle(
+					PartialParticle sparks = new PartialParticle(
 						Particle.FIREWORKS_SPARK,
 						strikeLocation,
 						20,
@@ -355,12 +354,12 @@ public class SpellLightningStrike extends Spell {
 	}
 
 	public void strikeShock(
-		@NotNull Location strikeLocation,
-		@NotNull Player player
+		Location strikeLocation,
+		Player player
 	) {
 		// /particle dust 1 1 0.5 0.75 ~ ~ ~ 0.225 0.45 0.225 0 5
 		double widerWidthDelta = PartialParticle.getWidthDelta(player) * 1.5;
-		@NotNull PartialParticle shockLightning = new PartialParticle(
+		PartialParticle shockLightning = new PartialParticle(
 			Particle.REDSTONE,
 			LocationUtils.getHalfHeightLocation(player),
 			5,
@@ -372,7 +371,7 @@ public class SpellLightningStrike extends Spell {
 		);
 		// Initial location already calculated as part of making object
 
-		@NotNull BukkitRunnable shockRunnable = new BukkitRunnable() {
+		BukkitRunnable shockRunnable = new BukkitRunnable() {
 			boolean mInitialLocationUsed = false;
 			int mShockTracker = 0;
 
@@ -404,11 +403,11 @@ public class SpellLightningStrike extends Spell {
 	}
 
 	// Starts in the next tick
-	public void startFire(@NotNull Location fireLocation) {
-		@NotNull World world = fireLocation.getWorld();
+	public void startFire(Location fireLocation) {
+		World world = fireLocation.getWorld();
 
 		// /particle dust 1 1 0.25 1 ~ ~ ~ 0.75 0.25 0.75 0 5
-		@NotNull PPGroundCircle fireRingMarker = new PPGroundCircle(
+		PPGroundCircle fireRingMarker = new PPGroundCircle(
 			Particle.FLAME,
 			fireLocation,
 			5,
@@ -421,7 +420,7 @@ public class SpellLightningStrike extends Spell {
 
 		// /particle flame ~ ~ ~ 0.1 1 0.1 0.1 0
 		int risingFlamesCount = 5;
-		@NotNull PPGroundCircle risingFlames = new PPGroundCircle(
+		PPGroundCircle risingFlames = new PPGroundCircle(
 			Particle.FLAME,
 			fireLocation,
 			3 * risingFlamesCount,
@@ -442,7 +441,7 @@ public class SpellLightningStrike extends Spell {
 		// /particle large_smoke ~ ~ ~ 0.75 0 0.75 0.01 2
 		int smallSmokeCount = 4;
 		int largeSmokeCount = 2;
-		@NotNull PPGroundCircle smoke = new PPGroundCircle(
+		PPGroundCircle smoke = new PPGroundCircle(
 			Particle.SMOKE_NORMAL,
 			fireLocation,
 			5,
@@ -455,12 +454,12 @@ public class SpellLightningStrike extends Spell {
 		smoke.init(FIRE_RADIUS);
 
 		int fireSoundLastThreshold = 3 * Constants.TICKS_PER_SECOND;
-		@NotNull BukkitRunnable fireRunnable = new BukkitRunnable() {
+		BukkitRunnable fireRunnable = new BukkitRunnable() {
 			int mRemainingTicks = FIRE_DURATION_TICKS;
 
 			@Override
 			public void run() {
-				double diminishingCountFactor = mRemainingTicks / (double)FIRE_DURATION_TICKS;
+				double diminishingCountFactor = mRemainingTicks / (double) FIRE_DURATION_TICKS;
 
 				// P: Danger, fire ring marker
 				fireRingMarker.spawnAsBoss();
@@ -524,11 +523,11 @@ public class SpellLightningStrike extends Spell {
 					mRemainingTicks <= FIRE_DURATION_TICKS - FIRE_DELAY_TICKS
 					&& mRemainingTicks % FIRE_INTERVAL_TICKS == 0
 				) {
-					@NotNull Collection<@NotNull Player> burnPlayers = PlayerUtils.playersInSphere(
+					Collection<Player> burnPlayers = PlayerUtils.playersInSphere(
 						fireLocation,
 						FIRE_RADIUS
 					);
-					burnPlayers.forEach((@NotNull Player player) -> {
+					burnPlayers.forEach((Player player) -> {
 						player.setFireTicks(FIRE_ALIGHT_TICKS);
 
 						//TODO B#9334: true iframe bypass via edited bossDamagePercent(),

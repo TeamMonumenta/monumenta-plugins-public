@@ -11,7 +11,7 @@ import org.bukkit.potion.PotionEffectType;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 
-public class DebuffHitBoss extends BossAbilityGroup {
+public final class DebuffHitBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_debuffhit";
 	public static final int detectionRange = 50;
 

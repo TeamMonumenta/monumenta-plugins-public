@@ -24,7 +24,7 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.event.player.PlayerItemDamageEvent;
 import org.bukkit.inventory.ItemStack;
-import org.jetbrains.annotations.NotNull;
+
 
 
 
@@ -40,7 +40,7 @@ public interface BaseEnchantment {
 	 * It processes plain text and does not use Adventure Components,
 	 * so just provide a plain name, eg "Mainhand Regeneration".
 	 */
-	@NotNull String getProperty();
+	String getProperty();
 
 	/*
 	 * By default, this enchant will not be tested for in any slot!
@@ -50,7 +50,7 @@ public interface BaseEnchantment {
 	 * See ItemSlot's definition for what they represent & which cannot be
 	 * duplicated!
 	 */
-	default @NotNull EnumSet<ItemSlot> getValidSlots() {
+	default EnumSet<ItemSlot> getValidSlots() {
 		// Empty by default - no slots supported
 		return EnumSet.noneOf(ItemSlot.class);
 	}
@@ -93,9 +93,9 @@ public interface BaseEnchantment {
 	 * Returns 0 when the enchant is not considered present on the item.
 	 */
 	default int getPlayerItemLevel(
-		@NotNull ItemStack itemStack,
-		@NotNull Player player,
-		@NotNull ItemSlot itemSlot
+		ItemStack itemStack,
+		Player player,
+		ItemSlot itemSlot
 	) {
 		if (getValidSlots().contains(itemSlot)) {
 			return getItemLevel(itemStack);
@@ -114,7 +114,7 @@ public interface BaseEnchantment {
 	 * such as Radiant only being considered present when the wielding player
 	 * is the item's soulbound owner.
 	 */
-	default int getItemLevel(@NotNull ItemStack itemStack) {
+	default int getItemLevel(ItemStack itemStack) {
 		return InventoryUtils.getCustomEnchantLevel(
 			itemStack,
 			getProperty(),
@@ -138,8 +138,8 @@ public interface BaseEnchantment {
 	 * player logs on to/switches back to each shard.
 	 */
 	default void applyProperty(
-		@NotNull Plugin plugin,
-		@NotNull Player player,
+		Plugin plugin,
+		Player player,
 		int newLevel
 	) {}
 
@@ -157,8 +157,8 @@ public interface BaseEnchantment {
 	 * or when the player stops being tracked by PlayerTracking.
 	 */
 	default void removeProperty(
-		@NotNull Plugin plugin,
-		@NotNull Player player
+		Plugin plugin,
+		Player player
 	) {}
 
 	/*
@@ -167,8 +167,8 @@ public interface BaseEnchantment {
 	 * regardless of this enchant's involvement.
 	 */
 	default void onEquipmentUpdate(
-		@NotNull Plugin plugin,
-		@NotNull Player player
+		Plugin plugin,
+		Player player
 	) {}
 
 	/*
@@ -177,8 +177,8 @@ public interface BaseEnchantment {
 	 * Same rate as class Abilities.
 	 */
 	default void tick(
-		@NotNull Plugin plugin,
-		@NotNull Player player,
+		Plugin plugin,
+		Player player,
 		int level
 	) {}
 
@@ -190,10 +190,10 @@ public interface BaseEnchantment {
 	 * This is listened for by PlayerListener.
 	 */
 	default void onEvade(
-		@NotNull Plugin plugin,
-		@NotNull Player player,
+		Plugin plugin,
+		Player player,
 		int level,
-		@NotNull EvasionEvent evasionEvent
+		EvasionEvent evasionEvent
 	) {}
 
 	/*
@@ -202,11 +202,11 @@ public interface BaseEnchantment {
 	 * (class ability) via EntityUtils.damageEntity().
 	 */
 	default void onAbility(
-		@NotNull Plugin plugin,
-		@NotNull Player player,
+		Plugin plugin,
+		Player player,
 		int level,
-		@NotNull LivingEntity enemy,
-		@NotNull CustomDamageEvent customDamageEvent
+		LivingEntity enemy,
+		CustomDamageEvent customDamageEvent
 	) {}
 
 
@@ -220,11 +220,11 @@ public interface BaseEnchantment {
 	 * onAttack() may be called after this if applicable!
 	 */
 	default void onDamage(
-		@NotNull Plugin plugin,
-		@NotNull Player player,
+		Plugin plugin,
+		Player player,
 		int level,
-		@NotNull LivingEntity enemy,
-		@NotNull EntityDamageByEntityEvent entityDamageByEntityEvent
+		LivingEntity enemy,
+		EntityDamageByEntityEvent entityDamageByEntityEvent
 	) {}
 
 	/*
@@ -233,11 +233,11 @@ public interface BaseEnchantment {
 	 * attack (DamageCause.ENTITY_ATTACK).
 	 */
 	default void onAttack(
-		@NotNull Plugin plugin,
-		@NotNull Player player,
+		Plugin plugin,
+		Player player,
 		int level,
-		@NotNull LivingEntity enemy,
-		@NotNull EntityDamageByEntityEvent entityDamageByEntityEvent
+		LivingEntity enemy,
+		EntityDamageByEntityEvent entityDamageByEntityEvent
 	) {}
 
 	/* TODO
@@ -253,11 +253,11 @@ public interface BaseEnchantment {
 	 * called when the player launches a Projectile.
 	 */
 	default void onLaunchProjectile(
-		@NotNull Plugin plugin,
-		@NotNull Player player,
+		Plugin plugin,
+		Player player,
 		int level,
-		@NotNull Projectile projectile,
-		@NotNull ProjectileLaunchEvent projectileLaunchEvent
+		Projectile projectile,
+		ProjectileLaunchEvent projectileLaunchEvent
 	) {}
 
 	/*
@@ -266,11 +266,11 @@ public interface BaseEnchantment {
 	 * enemy (EntityUtils.isHostileMob()).
 	 */
 	default void onKill(
-		@NotNull Plugin plugin,
-		@NotNull Player player,
+		Plugin plugin,
+		Player player,
 		int level,
-		@NotNull Entity enemy,
-		@NotNull EntityDeathEvent entityDeathEvent
+		Entity enemy,
+		EntityDeathEvent entityDeathEvent
 	) {}
 
 	/*
@@ -278,10 +278,10 @@ public interface BaseEnchantment {
 	 * called when the player breaks a block.
 	 */
 	default void onBlockBreak(
-		@NotNull Plugin plugin,
-		@NotNull Player player,
-		@NotNull BlockBreakEvent blockBreakEvent,
-		@NotNull ItemStack itemStack,
+		Plugin plugin,
+		Player player,
+		BlockBreakEvent blockBreakEvent,
+		ItemStack itemStack,
 		int level
 	) {}
 
@@ -294,9 +294,9 @@ public interface BaseEnchantment {
 	 * if vanilla behaviour is to do nothing, eg interacting with air.
 	*/
 	default void onPlayerInteract(
-		@NotNull Plugin plugin,
-		@NotNull Player player,
-		@NotNull PlayerInteractEvent playerInteractEvent,
+		Plugin plugin,
+		Player player,
+		PlayerInteractEvent playerInteractEvent,
 		int level
 	) {}
 
@@ -305,9 +305,9 @@ public interface BaseEnchantment {
 	 * called when the player consumes an item.
 	 */
 	default void onConsume(
-		@NotNull Plugin plugin,
-		@NotNull Player player,
-		@NotNull PlayerItemConsumeEvent playerItemConsumeEvent,
+		Plugin plugin,
+		Player player,
+		PlayerItemConsumeEvent playerItemConsumeEvent,
 		int level
 	) {}
 
@@ -316,10 +316,10 @@ public interface BaseEnchantment {
 	 * called when the player regains health.
 	 */
 	default void onRegain(
-		@NotNull Plugin plugin,
-		@NotNull Player player,
+		Plugin plugin,
+		Player player,
 		int level,
-		@NotNull EntityRegainHealthEvent entityRegainHealthEvent
+		EntityRegainHealthEvent entityRegainHealthEvent
 	) {}
 
 	/*
@@ -335,10 +335,10 @@ public interface BaseEnchantment {
 	 * This is listened for by EntityListener.
 	 */
 	default void onHurt(
-		@NotNull Plugin plugin,
-		@NotNull Player player,
+		Plugin plugin,
+		Player player,
 		int level,
-		@NotNull EntityDamageEvent entityDamageEvent
+		EntityDamageEvent entityDamageEvent
 	) {}
 
 	/* TODO
@@ -360,10 +360,10 @@ public interface BaseEnchantment {
 	 * This is listened for by EntityListener.
 	 */
 	default void onFatalHurt(
-		@NotNull Plugin plugin,
-		@NotNull Player player,
+		Plugin plugin,
+		Player player,
 		int level,
-		@NotNull EntityDamageEvent entityDamageEvent
+		EntityDamageEvent entityDamageEvent
 	) {}
 
 	/*
@@ -375,10 +375,10 @@ public interface BaseEnchantment {
 	 * This is listened for by PlayerListener.
 	 */
 	default void onHurtByEntity(
-		@NotNull Plugin plugin,
-		@NotNull Player player,
+		Plugin plugin,
+		Player player,
 		int level,
-		@NotNull EntityDamageByEntityEvent entityDamageByEntityEvent
+		EntityDamageByEntityEvent entityDamageByEntityEvent
 	) {}
 
 	/*
@@ -386,9 +386,9 @@ public interface BaseEnchantment {
 	 * called when the player has died.
 	 */
 	default void onDeath(
-		@NotNull Plugin plugin,
-		@NotNull Player player,
-		@NotNull PlayerDeathEvent playerDeathEvent,
+		Plugin plugin,
+		Player player,
+		PlayerDeathEvent playerDeathEvent,
 		int level
 	) {}
 
@@ -397,9 +397,9 @@ public interface BaseEnchantment {
 	 * called when one of the player's items takes damage.
 	 */
 	default void onItemDamage(
-		@NotNull Plugin plugin,
-		@NotNull Player player,
-		@NotNull PlayerItemDamageEvent playerItemDamageEvent,
+		Plugin plugin,
+		Player player,
+		PlayerItemDamageEvent playerItemDamageEvent,
 		int level
 	) {}
 
@@ -408,9 +408,9 @@ public interface BaseEnchantment {
 	 * called when the player's experience changes.
 	 */
 	default void onExpChange(
-		@NotNull Plugin plugin,
-		@NotNull Player player,
-		@NotNull PlayerExpChangeEvent playerExpChangeEvent,
+		Plugin plugin,
+		Player player,
+		PlayerExpChangeEvent playerExpChangeEvent,
 		int level
 	) {}
 }

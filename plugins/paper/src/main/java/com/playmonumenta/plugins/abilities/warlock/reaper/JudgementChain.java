@@ -20,6 +20,7 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
@@ -53,7 +54,7 @@ public class JudgementChain extends Ability {
 
 	private final int mAmplifierCap;
 
-	private LivingEntity mTarget = null;
+	private @Nullable LivingEntity mTarget = null;
 
 	public JudgementChain(Plugin plugin, Player player) {
 		super(plugin, player, "Judgement Chain");
@@ -70,6 +71,9 @@ public class JudgementChain extends Ability {
 
 	@Override
 	public void playerSwapHandItemsEvent(PlayerSwapHandItemsEvent event) {
+		if (mPlayer == null) {
+			return;
+		}
 		ItemStack mainHandItem = mPlayer.getInventory().getItemInMainHand();
 		if (ItemUtils.isHoe(mainHandItem)) {
 			event.setCancelled(true);
@@ -83,7 +87,7 @@ public class JudgementChain extends Ability {
 	}
 
 	public void summonChain() {
-		if (mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.mLinkedSpell)) {
+		if (mPlayer == null || mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.mLinkedSpell)) {
 			return;
 		}
 
@@ -105,6 +109,9 @@ public class JudgementChain extends Ability {
 
 				@Override
 				public void run() {
+					if (mPlayer == null) {
+						return;
+					}
 					Location l = mPlayer.getEyeLocation();
 					mT++;
 					if (mTarget != null) {
@@ -207,9 +214,7 @@ public class JudgementChain extends Ability {
 						mTarget = null;
 					} else if (l.distance(mTarget.getLocation()) > RANGE) {
 						this.cancel();
-						if (mTarget != null) {
-							breakChain(true);
-						}
+						breakChain(true);
 						mTarget = null;
 					}
 				}
@@ -222,7 +227,7 @@ public class JudgementChain extends Ability {
 	}
 
 	public void breakChain(boolean doDamage) {
-		if (mTarget != null) {
+		if (mTarget != null && mPlayer != null) {
 			mPlugin.mEffectManager.clearEffects(mTarget, EFFECT_NAME);
 
 			Location loc = mPlayer.getEyeLocation();

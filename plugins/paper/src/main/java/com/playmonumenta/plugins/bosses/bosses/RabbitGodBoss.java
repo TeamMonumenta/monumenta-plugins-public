@@ -38,11 +38,12 @@ import com.playmonumenta.plugins.bosses.spells.cluckingop.SpellEruption;
 import com.playmonumenta.plugins.bosses.spells.cluckingop.SpellFluffPools;
 import com.playmonumenta.plugins.bosses.spells.cluckingop.SpellFluffingDeath;
 import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.SerializationUtils;
 
-public class RabbitGodBoss extends BossAbilityGroup {
+public final class RabbitGodBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_rabbitgod";
 	public static final int detectionRange = 30;
 
@@ -332,11 +333,9 @@ public class RabbitGodBoss extends BossAbilityGroup {
 															for (Player player : PlayerUtils.playersInRange(mSpawnLoc, detectionRange, true)) {
 																world.spawnParticle(Particle.FIREWORKS_SPARK, player.getLocation().add(0, 1, 0), 100, 0, 0, 0, 0.4f);
 																player.removePotionEffect(PotionEffectType.SLOW);
-																if (player.hasPotionEffect(PotionEffectType.JUMP)) {
-																	PotionEffect effect = player.getPotionEffect(PotionEffectType.JUMP);
-																	if (effect.getAmplifier() < 0) {
-																		player.removePotionEffect(PotionEffectType.JUMP);
-																	}
+																PotionEffect jumpEffect = player.getPotionEffect(PotionEffectType.JUMP);
+																if (jumpEffect != null && jumpEffect.getAmplifier() < 0) {
+																	player.removePotionEffect(PotionEffectType.JUMP);
 																}
 																player.addPotionEffect(new PotionEffect(PotionEffectType.ABSORPTION, 20 * 999, 9));
 																player.addPotionEffect(new PotionEffect(PotionEffectType.HEALTH_BOOST, 20 * 999, 9));
@@ -458,11 +457,9 @@ public class RabbitGodBoss extends BossAbilityGroup {
 					for (Player player : PlayerUtils.playersInRange(mSpawnLoc, detectionRange, true)) {
 						player.removePotionEffect(PotionEffectType.HEALTH_BOOST);
 						player.removePotionEffect(PotionEffectType.ABSORPTION);
-						if (player.hasPotionEffect(PotionEffectType.SPEED)) {
-							PotionEffect effect = player.getPotionEffect(PotionEffectType.SPEED);
-							if (effect.getAmplifier() > 1) {
-								player.removePotionEffect(PotionEffectType.SPEED);
-							}
+						PotionEffect speedEffect = player.getPotionEffect(PotionEffectType.SPEED);
+						if (speedEffect != null && speedEffect.getAmplifier() > 1) {
+							player.removePotionEffect(PotionEffectType.SPEED);
 						}
 					}
 					new BukkitRunnable() {
@@ -493,8 +490,8 @@ public class RabbitGodBoss extends BossAbilityGroup {
 			hpDelta = (hpDelta / 2) + 25;
 			playerCount--;
 		}
-		mBoss.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(bossTargetHp);
-		mBoss.getAttribute(Attribute.GENERIC_KNOCKBACK_RESISTANCE).setBaseValue(1);
+		EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_MAX_HEALTH, bossTargetHp);
+		EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_KNOCKBACK_RESISTANCE, 1);
 		mBoss.setHealth(bossTargetHp);
 		mBoss.setCustomName(ChatColor.DARK_RED + "" + ChatColor.BOLD + "The Pig God");
 		PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "tellraw @s [\"\",{\"text\":\"OINK OINK!!! OINK OINK, OINK OINK OINK!?!?\",\"color\":\"dark_red\"}]");

@@ -13,6 +13,7 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
@@ -82,64 +83,64 @@ public class SpellBaseCharge extends Spell {
 		/**
 		 * Action to run on the boss when the attack is completed
 		 * Boss location will be the end point
-		 *
+		 * <p>
 		 * Probably just particles
 		 */
 		void run();
 	}
 
-	private Plugin mPlugin;
-	private LivingEntity mBoss;
-	private int mRange;
-	private int mCooldown;
-	private int mChargeTicks;
-	private WarningAction mWarningAction;
-	private ParticleAction mWarnParticleAction;
-	private StartAction mStartAction;
-	private HitPlayerAction mHitPlayerAction;
-	private ParticleAction mParticleAction;
-	private EndAction mEndAction;
-	private boolean mStopOnFirstHit;
-	private int mCharges;
-	private int mRate;
-	private double mYStartAdd;
-	private boolean mTargetFurthest;
-	private GetSpellTargets<LivingEntity> mTargets;
+	private final Plugin mPlugin;
+	private final LivingEntity mBoss;
+	private final int mRange;
+	private final int mCooldown;
+	private final int mChargeTicks;
+	private final @Nullable WarningAction mWarningAction;
+	private final @Nullable ParticleAction mWarnParticleAction;
+	private final @Nullable StartAction mStartAction;
+	private final @Nullable HitPlayerAction mHitPlayerAction;
+	private final @Nullable ParticleAction mParticleAction;
+	private final @Nullable EndAction mEndAction;
+	private final boolean mStopOnFirstHit;
+	private final int mCharges;
+	private final int mRate;
+	private final double mYStartAdd;
+	private final boolean mTargetFurthest;
+	private final @Nullable GetSpellTargets<? extends LivingEntity> mTargets;
 
 	public SpellBaseCharge(Plugin plugin, LivingEntity boss, int range, int chargeTicks,
-	                       WarningAction warning, ParticleAction warnParticles, StartAction start,
-	                       HitPlayerAction hitPlayer, ParticleAction particle, EndAction end) {
+	                       @Nullable WarningAction warning, @Nullable ParticleAction warnParticles, @Nullable StartAction start,
+	                       @Nullable HitPlayerAction hitPlayer, @Nullable ParticleAction particle, EndAction end) {
 		this(plugin, boss, range, 160, chargeTicks, false, 0, 0, 0, warning, warnParticles, start, hitPlayer, particle, end);
 	}
 
 	public SpellBaseCharge(Plugin plugin, LivingEntity boss, int range, int cooldown, int chargeTicks,
-	                       WarningAction warning, ParticleAction warnParticles, StartAction start,
-	                       HitPlayerAction hitPlayer, ParticleAction particle, EndAction end) {
+	                       @Nullable WarningAction warning, @Nullable ParticleAction warnParticles, @Nullable StartAction start,
+	                       @Nullable HitPlayerAction hitPlayer, @Nullable ParticleAction particle, @Nullable EndAction end) {
 		this(plugin, boss, range, cooldown, chargeTicks, false, 0, 0, 0, warning, warnParticles, start, hitPlayer, particle, end);
 	}
 
 	public SpellBaseCharge(Plugin plugin, LivingEntity boss, int range, int cooldown, int chargeTicks, boolean stopOnFirstHit,
-	                       WarningAction warning, ParticleAction warnParticles, StartAction start,
-	                       HitPlayerAction hitPlayer, ParticleAction particle, EndAction end) {
+	                       @Nullable WarningAction warning, @Nullable ParticleAction warnParticles, StartAction start,
+	                       @Nullable HitPlayerAction hitPlayer, @Nullable ParticleAction particle, @Nullable EndAction end) {
 		this(plugin, boss, range, cooldown, chargeTicks, stopOnFirstHit, 0, 0, 0, warning, warnParticles, start, hitPlayer, particle, end);
 	}
 
 	public SpellBaseCharge(Plugin plugin, LivingEntity boss, int range, int cooldown, int chargeTicks, boolean stopOnFirstHit,
-			int charges, int rate, WarningAction warning, ParticleAction warnParticles, StartAction start,
-			HitPlayerAction hitPlayer, ParticleAction particle, EndAction end) {
+	                       int charges, int rate, @Nullable WarningAction warning, @Nullable ParticleAction warnParticles, @Nullable StartAction start,
+	                       @Nullable HitPlayerAction hitPlayer, @Nullable ParticleAction particle, EndAction end) {
 		this(plugin, boss, range, cooldown, chargeTicks, stopOnFirstHit, charges, rate, 0, warning, warnParticles, start, hitPlayer, particle, end);
 	}
 
 	public SpellBaseCharge(Plugin plugin, LivingEntity boss, int range, int cooldown, int chargeTicks, boolean stopOnFirstHit, int charges, int rate, double yStartAdd,
-	                       WarningAction warning, ParticleAction warnParticles, StartAction start,
-	                       HitPlayerAction hitPlayer, ParticleAction particle, EndAction end) {
+	                       @Nullable WarningAction warning, @Nullable ParticleAction warnParticles, @Nullable StartAction start,
+	                       @Nullable HitPlayerAction hitPlayer, @Nullable ParticleAction particle, @Nullable EndAction end) {
 		this(plugin, boss, range, cooldown, chargeTicks, stopOnFirstHit, charges, rate, yStartAdd, false, warning, warnParticles, start, hitPlayer, particle, end);
 	}
 
 	public SpellBaseCharge(Plugin plugin, LivingEntity boss, int range, int cooldown, int chargeTicks, boolean stopOnFirstHit,
-			int charges, int rate, double yStartAdd, boolean targetFurthest, WarningAction warning,
-			ParticleAction warnParticles, StartAction start, HitPlayerAction hitPlayer, ParticleAction particle,
-			EndAction end) {
+	                       int charges, int rate, double yStartAdd, boolean targetFurthest, @Nullable WarningAction warning,
+	                       @Nullable ParticleAction warnParticles, @Nullable StartAction start, @Nullable HitPlayerAction hitPlayer, @Nullable ParticleAction particle,
+	                       @Nullable EndAction end) {
 		mPlugin = plugin;
 		mBoss = boss;
 		mRange = range;
@@ -160,8 +161,8 @@ public class SpellBaseCharge extends Spell {
 	}
 
 	public SpellBaseCharge(Plugin plugin, LivingEntity boss, int cooldown, int chargeTicks, boolean stopOnFirstHit,
-			int charges, int rate, double yStartAdd, GetSpellTargets<LivingEntity> targets, WarningAction warning,
-			ParticleAction warnParticles, StartAction start, HitPlayerAction hitPlayer, ParticleAction particle, EndAction end) {
+	                       int charges, int rate, double yStartAdd, @Nullable GetSpellTargets<LivingEntity> targets, @Nullable WarningAction warning,
+	                       @Nullable ParticleAction warnParticles, @Nullable StartAction start, @Nullable HitPlayerAction hitPlayer, @Nullable ParticleAction particle, @Nullable EndAction end) {
 		mPlugin = plugin;
 		mBoss = boss;
 		mChargeTicks = chargeTicks;
@@ -186,7 +187,7 @@ public class SpellBaseCharge extends Spell {
 	@Override
 	public void run() {
 		if (mTargets != null) {
-			List<LivingEntity> targets = mTargets.getTargets();
+			List<? extends LivingEntity> targets = mTargets.getTargets();
 			for (LivingEntity target : targets) {
 				if (mCharges <= 0 || mRate <= 0) {
 					launch(target, targets);
@@ -246,21 +247,21 @@ public class SpellBaseCharge extends Spell {
 	 * Does a charge attack - which may not do anything, depending on parameters passed
 	 * Returns whether the charge hit a player or not
 	 *
-	 * @param target The intended target of the attack
-	 * @param charger The living entity charging the player
-	 * @param validTargets Other players (including the target!) who might be indicentally hit by the charge
-	 * @param start Action to run on boss at start location (may be null)
-	 * @param particle Action to spawn particle at locations along path (may be null)
-	 * @param hitPlayer Action to run if a player is hit (may be null)
-	 * @param end Action to run on boss at end location (may be null)
-	 * @param teleboss Boolean indicating whether the boss should actually be teleported to the end
+	 * @param target         The intended target of the attack
+	 * @param charger        The living entity charging the player
+	 * @param validTargets   Other players (including the target!) who might be indicentally hit by the charge
+	 * @param start          Action to run on boss at start location (may be null)
+	 * @param particle       Action to spawn particle at locations along path (may be null)
+	 * @param hitPlayer      Action to run if a player is hit (may be null)
+	 * @param end            Action to run on boss at end location (may be null)
+	 * @param teleBoss       Boolean indicating whether the boss should actually be teleported to the end
 	 * @param stopOnFirstHit Boolean indicating whether the boss should damage only one player at a time
 	 */
-	public static boolean doCharge(Player target, Entity charger, Location targetLoc, List<Player> validTargets, StartAction start,
-	                               ParticleAction particle, HitPlayerAction hitPlayer, EndAction end, boolean teleBoss, boolean stopOnFirstHit, double yStartAdd) {
+	public static boolean doCharge(Player target, Entity charger, Location targetLoc, List<Player> validTargets, @Nullable StartAction start,
+	                               @Nullable ParticleAction particle, @Nullable HitPlayerAction hitPlayer, @Nullable EndAction end, boolean teleBoss, boolean stopOnFirstHit, double yStartAdd) {
 		final Location launLoc;
 		if (charger instanceof LivingEntity) {
-			launLoc = ((LivingEntity)charger).getEyeLocation().add(0, yStartAdd, 0);
+			launLoc = ((LivingEntity) charger).getEyeLocation().add(0, yStartAdd, 0);
 		} else {
 			launLoc = charger.getLocation().add(0, yStartAdd, 0);
 		}
@@ -340,7 +341,7 @@ public class SpellBaseCharge extends Spell {
 		}
 
 		if (switchAggro != null && charger instanceof Mob) {
-			((Mob)charger).setTarget(switchAggro);
+			((Mob) charger).setTarget(switchAggro);
 		}
 
 		if (end != null) {
@@ -354,21 +355,21 @@ public class SpellBaseCharge extends Spell {
 	 * Does a charge attack - which may not do anything, depending on parameters passed
 	 * Returns whether the charge hit a player or not
 	 *
-	 * @param target The intended target of the attack
-	 * @param charger The living entity charging the player
-	 * @param validTargets Other targets (including the target!) who might be indicentally hit by the charge
-	 * @param start Action to run on boss at start location (may be null)
-	 * @param particle Action to spawn particle at locations along path (may be null)
-	 * @param hitPlayer Action to run if a player is hit (may be null)
-	 * @param end Action to run on boss at end location (may be null)
-	 * @param teleboss Boolean indicating whether the boss should actually be teleported to the end
+	 * @param target         The intended target of the attack
+	 * @param charger        The living entity charging the player
+	 * @param validTargets   Other targets (including the target!) who might be indicentally hit by the charge
+	 * @param start          Action to run on boss at start location (may be null)
+	 * @param particle       Action to spawn particle at locations along path (may be null)
+	 * @param hitPlayer      Action to run if a player is hit (may be null)
+	 * @param end            Action to run on boss at end location (may be null)
+	 * @param teleBoss       Boolean indicating whether the boss should actually be teleported to the end
 	 * @param stopOnFirstHit Boolean indicating whether the boss should damage only one player at a time
 	 */
-	public static boolean doCharge(LivingEntity target, Entity charger, Location targetLoc, List<LivingEntity> validTargets, StartAction start,
-	                               ParticleAction particle, HitPlayerAction hitPlayer, EndAction end, boolean teleBoss, boolean stopOnFirstHit, double yStartAdd) {
+	public static boolean doCharge(LivingEntity target, Entity charger, Location targetLoc, List<? extends LivingEntity> validTargets, @Nullable StartAction start,
+	                               @Nullable ParticleAction particle, @Nullable HitPlayerAction hitPlayer, @Nullable EndAction end, boolean teleBoss, boolean stopOnFirstHit, double yStartAdd) {
 		final Location launLoc;
 		if (charger instanceof LivingEntity) {
-			launLoc = ((LivingEntity)charger).getEyeLocation().add(0, yStartAdd, 0);
+			launLoc = ((LivingEntity) charger).getEyeLocation().add(0, yStartAdd, 0);
 		} else {
 			launLoc = charger.getLocation().add(0, yStartAdd, 0);
 		}
@@ -462,7 +463,7 @@ public class SpellBaseCharge extends Spell {
 		BukkitRunnable runnable = new BukkitRunnable() {
 			private int mTicks = 0;
 			private int mChargesDone = 0;
-			Location mTargetLoc;
+			@Nullable Location mTargetLoc;
 			List<Player> mBystanders = players;
 			Player mTarget = target;
 
@@ -475,7 +476,7 @@ public class SpellBaseCharge extends Spell {
 					this.cancel();
 					return;
 				}
-				if (mTicks == 0) {
+				if (mTicks == 0 || mTargetLoc == null) {
 					mTargetLoc = mTarget.getEyeLocation();
 					if (mWarningAction != null) {
 						mWarningAction.run(target);
@@ -519,7 +520,7 @@ public class SpellBaseCharge extends Spell {
 	private void launch(Player target, List<Player> players) {
 		BukkitRunnable runnable = new BukkitRunnable() {
 			private int mTicks = 0;
-			Location mTargetLoc;
+			@Nullable Location mTargetLoc;
 
 			@Override
 			public void run() {
@@ -527,7 +528,7 @@ public class SpellBaseCharge extends Spell {
 					this.cancel();
 					return;
 				}
-				if (mTicks == 0) {
+				if (mTicks == 0 || mTargetLoc == null) {
 					mTargetLoc = target.getLocation().add(0, 1.0f, 0);
 					if (mWarningAction != null) {
 						mWarningAction.run(target);
@@ -550,10 +551,10 @@ public class SpellBaseCharge extends Spell {
 		mActiveRunnables.add(runnable);
 	}
 
-	private void launch(LivingEntity target, List<LivingEntity> targets) {
+	private void launch(LivingEntity target, List<? extends LivingEntity> targets) {
 		BukkitRunnable runnable = new BukkitRunnable() {
 			private int mTicks = 0;
-			Location mTargetLoc = target.getEyeLocation();
+			final Location mTargetLoc = target.getEyeLocation();
 
 			@Override
 			public void run() {
@@ -583,12 +584,12 @@ public class SpellBaseCharge extends Spell {
 		mActiveRunnables.add(runnable);
 	}
 
-	private void launch(LivingEntity target, List<LivingEntity> targets, int charges, int rate) {
+	private void launch(LivingEntity target, List<? extends LivingEntity> targets, int charges, int rate) {
 		BukkitRunnable runnable = new BukkitRunnable() {
 			private int mTicks = 0;
 			private int mChargesDone = 0;
-			Location mTargetLoc;
-			List<LivingEntity> mBystanders = targets;
+			@Nullable Location mTargetLoc;
+			List<? extends LivingEntity> mBystanders = targets;
 			LivingEntity mTarget = target;
 
 			@Override

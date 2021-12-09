@@ -14,10 +14,8 @@ import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.block.ShulkerBox;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
-import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
@@ -28,6 +26,7 @@ import org.bukkit.loot.LootTable;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.io.BukkitObjectInputStream;
 import org.bukkit.util.io.BukkitObjectOutputStream;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.yaml.snakeyaml.external.biz.base64Coder.Base64Coder;
 
 import com.playmonumenta.plugins.Plugin;
@@ -48,7 +47,7 @@ public class InventoryUtils {
 	private static int BOOTS_SLOT = 36;
 
 	//TODO Fix exploit where changing hotbar slots and then firing a projectile uses the old slot's attributes
-	public static void scheduleDelayedEquipmentCheck(final Plugin plugin, final Player player, final Event event) {
+	public static void scheduleDelayedEquipmentCheck(final Plugin plugin, final Player player, final @Nullable Event event) {
 		new BukkitRunnable() {
 			@Override
 			public void run() {
@@ -306,46 +305,6 @@ public class InventoryUtils {
 		return testForItemWithLore(item, "* Soulbound to " + player.getName() + " *");
 	}
 
-	public static void removeRandomEquipment(final LivingEntity mob, final Integer piecesToRemove) {
-		final int[] equipment = { 0, 1, 2, 3 };
-		shuffleArray(equipment);
-
-		final EntityEquipment gear = mob.getEquipment();
-
-		int removedCount = 0;
-		for (int i = 0; i < equipment.length; i++) {
-			if (removedCount == 2) {
-				return;
-			}
-
-			if (equipment[i] == 0) {
-				// Head Slot
-				if (gear.getHelmet().getType() != Material.AIR) {
-					gear.setHelmet(new ItemStack(Material.AIR));
-					removedCount++;
-				}
-			} else if (equipment[i] == 1) {
-				// Chestplate
-				if (gear.getChestplate().getType() != Material.AIR) {
-					gear.setChestplate(new ItemStack(Material.AIR));
-					removedCount++;
-				}
-			} else if (equipment[i] == 2) {
-				// Legs
-				if (gear.getLeggings().getType() != Material.AIR) {
-					gear.setLeggings(new ItemStack(Material.AIR));
-					removedCount++;
-				}
-			} else if (equipment[i] == 3) {
-				// Boots
-				if (gear.getBoots().getType() != Material.AIR) {
-					gear.setBoots(new ItemStack(Material.AIR));
-					removedCount++;
-				}
-			}
-		}
-	}
-
 	public static int removeSpecialItems(final Player player, final boolean ephemeralOnly) {
 		int dropped = 0;
 
@@ -370,7 +329,7 @@ public class InventoryUtils {
 		return dropped;
 	}
 
-	private static int removeSpecialItemsFromInventory(final ItemStack[] items, final Location loc, final boolean ephemeralOnly) {
+	private static int removeSpecialItemsFromInventory(final ItemStack @Nullable [] items, final Location loc, final boolean ephemeralOnly) {
 		int dropped = 0;
 
 		for (int i = 0; i < items.length; i++) {
@@ -408,7 +367,7 @@ public class InventoryUtils {
 	}
 
 	private static int removeSpecialItemsFromInventory(final Inventory inventory, final Location loc, final boolean ephemeralOnly) {
-		final ItemStack[] items = inventory.getContents();
+		final ItemStack @Nullable [] items = inventory.getContents();
 		final int dropped = removeSpecialItemsFromInventory(items, loc, ephemeralOnly);
 		inventory.setContents(items);
 		return dropped;
@@ -422,7 +381,7 @@ public class InventoryUtils {
 
 	private static int removeNamedItemsFromInventory(final Inventory inventory, final String name) {
 		int dropped = 0;
-		ItemStack[] items = inventory.getContents();
+		ItemStack @Nullable [] items = inventory.getContents();
 
 		for (int i = 0; i < items.length; i++) {
 			if (items[i] != null) {
@@ -432,8 +391,8 @@ public class InventoryUtils {
 					if (items[i].hasItemMeta() && items[i].getItemMeta() instanceof BlockStateMeta) {
 						final BlockStateMeta meta = (BlockStateMeta)items[i].getItemMeta();
 						if (meta.getBlockState() instanceof ShulkerBox) {
-							final ShulkerBox shulker = (ShulkerBox)meta.getBlockState();
-							ItemStack[] shulkerItems = shulker.getInventory().getContents();
+							final ShulkerBox shulker = (ShulkerBox) meta.getBlockState();
+							ItemStack @Nullable [] shulkerItems = shulker.getInventory().getContents();
 							for (int j = 0; j < shulkerItems.length; j++) {
 								if (shulkerItems[j] != null && shulkerItems[j].hasItemMeta() && shulkerItems[j].getItemMeta().getDisplayName().equals(name)) {
 									shulkerItems[j] = null;
@@ -526,19 +485,16 @@ public class InventoryUtils {
 	public static boolean rogueTriggerCheck(final ItemStack mainhand, final ItemStack offhand) {
 		boolean isMainhand = ItemUtils.isSword(mainhand);
 		boolean isOffhand = ItemUtils.isSword(offhand);
-		if ((isMainhand && isOffhand) || (isMainhand && testForItemWithLore(mainhand, TwoHanded.PROPERTY_NAME) && offhand.getType() == Material.AIR)) {
-			return true;
-		}
-		return false;
+		return (isMainhand && isOffhand) || (isMainhand && testForItemWithLore(mainhand, TwoHanded.PROPERTY_NAME) && offhand.getType() == Material.AIR);
 	}
 
 	/* Note this should only be used with loot tables that contain a single item */
-	public static ItemStack getItemFromLootTable(Entity entity, NamespacedKey key) {
+	public static @Nullable ItemStack getItemFromLootTable(Entity entity, NamespacedKey key) {
 		return getItemFromLootTable(entity.getLocation(), key);
 	}
 
 	/* Note this should only be used with loot tables that contain a single item */
-	public static ItemStack getItemFromLootTable(Location loc, NamespacedKey key) {
+	public static @Nullable ItemStack getItemFromLootTable(Location loc, NamespacedKey key) {
 		for (ItemStack item : getItemsFromLootTable(loc, key)) {
 			return item;
 		}

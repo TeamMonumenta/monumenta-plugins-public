@@ -21,7 +21,7 @@ import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
-import org.jetbrains.annotations.NotNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.destroystokyo.paper.MaterialSetTag;
 import com.playmonumenta.plugins.Constants;
@@ -138,7 +138,7 @@ public class PlayerUtils {
 	// vs what its max launch speed would be.
 	// Launch velocity used to calculate is specifically for PLAYERS shooting BOWS!
 	// Returns between 0 to 1, with 1 being full draw
-	public static double calculateBowDraw(@NotNull AbstractArrow arrowlike) {
+	public static double calculateBowDraw(AbstractArrow arrowlike) {
 		double currentSpeed = arrowlike.getVelocity().length();
 		double maxLaunchSpeed = Constants.PLAYER_BOW_INITIAL_SPEED * AttributeProjectileSpeed.getProjectileSpeedModifier(arrowlike);
 
@@ -154,7 +154,7 @@ public class PlayerUtils {
 	 *
 	 * Ie, no critting while sprinting.
 	 */
-	public static boolean isCriticalAttack(@NotNull Player player) {
+	public static boolean isCriticalAttack(Player player) {
 		// NMS EntityHuman:
 		// float f = (float)this.b((AttributeBase)GenericAttributes.ATTACK_DAMAGE);
 		//     f1 = EnchantmentManager.a(this.getItemInMainHand(), ((EntityLiving)entity).getMonsterType());
@@ -181,13 +181,13 @@ public class PlayerUtils {
 	 * that allowed things like crit-triggered abilities to trigger off non-crit
 	 * melee damage while sprinting.
 	 */
-	public static boolean isFallingAttack(@NotNull Player player) {
+	public static boolean isFallingAttack(Player player) {
 		return (
 			player.getCooledAttackStrength(0.5f) > 0.9
-			&& player.getFallDistance() > 0
-			&& isFreeFalling(player)
-			&& !player.hasPotionEffect(PotionEffectType.BLINDNESS)
-			&& !player.isInsideVehicle()
+				&& player.getFallDistance() > 0
+				&& isFreeFalling(player)
+				&& !player.hasPotionEffect(PotionEffectType.BLINDNESS)
+				&& !player.isInsideVehicle()
 			//TODO pass in the Entity in question to check if LivingEntity
 		);
 	}
@@ -218,8 +218,8 @@ public class PlayerUtils {
 	 * of crit requirements.
 	 */
 	public static boolean isNonFallingAttack(
-		@NotNull Player player,
-		@NotNull Entity enemy
+		Player player,
+		Entity enemy
 	) {
 		return (
 			player.getCooledAttackStrength(0.5f) > 0.9
@@ -237,8 +237,8 @@ public class PlayerUtils {
 	 * and proximity requirements.
 	 */
 	public static boolean isSweepingAttack(
-		@NotNull Player player,
-		@NotNull Entity enemy
+		Player player,
+		Entity enemy
 	) {
 		// NMS Entity:
 		// this.z = this.A;
@@ -262,7 +262,7 @@ public class PlayerUtils {
 		);
 	}
 
-	public static boolean checkPlayer(@NotNull Player player) {
+	public static boolean checkPlayer(Player player) {
 		return player.isValid() && !GameMode.SPECTATOR.equals(player.getGameMode());
 	}
 
@@ -271,8 +271,8 @@ public class PlayerUtils {
 	 *
 	 * Does not include dead players or spectators
 	 */
-	public static @NotNull Collection<@NotNull Player> playersInBox(
-		@NotNull Location boxCenter,
+	public static Collection<Player> playersInBox(
+		Location boxCenter,
 		double totalWidth,
 		double totalHeight
 	) {
@@ -288,8 +288,8 @@ public class PlayerUtils {
 	 *
 	 * Does not include dead players or spectators
 	 */
-	public static @NotNull Collection<@NotNull Player> playersInCube(
-		@NotNull Location cubeCenter,
+	public static Collection<Player> playersInCube(
+		Location cubeCenter,
 		double sideLength
 	) {
 		return playersInBox(cubeCenter, sideLength, sideLength);
@@ -301,13 +301,13 @@ public class PlayerUtils {
 	 * Measures based on feet location.
 	 * Does not include dead players or spectators
 	 */
-	public static @NotNull Collection<@NotNull Player> playersInSphere(
-		@NotNull Location sphereCenter,
+	public static Collection<Player> playersInSphere(
+		Location sphereCenter,
 		double radius
 	) {
-		@NotNull Collection<@NotNull Player> spherePlayers = playersInCube(sphereCenter, radius * 2);
+		Collection<Player> spherePlayers = playersInCube(sphereCenter, radius * 2);
 		double radiusSquared = radius * radius;
-		spherePlayers.removeIf((@NotNull Player player) -> {
+		spherePlayers.removeIf((Player player) -> {
 			if (sphereCenter.distanceSquared(player.getLocation()) > radiusSquared) {
 				return true;
 			} else {
@@ -323,15 +323,15 @@ public class PlayerUtils {
 	 *
 	 * Does not include dead players or spectators
 	 */
-	public static @NotNull Collection<@NotNull Player> playersInCylinder(
-		@NotNull Location cylinderCenter,
+	public static Collection<Player> playersInCylinder(
+		Location cylinderCenter,
 		double radius,
 		double totalHeight
 	) {
-		@NotNull Collection<@NotNull Player> cylinderPlayers = playersInBox(cylinderCenter, radius * 2, totalHeight);
+		Collection<Player> cylinderPlayers = playersInBox(cylinderCenter, radius * 2, totalHeight);
 		double centerY = cylinderCenter.getY();
-		cylinderPlayers.removeIf((@NotNull Player player) -> {
-			@NotNull Location flattenedLocation = player.getLocation();
+		cylinderPlayers.removeIf((Player player) -> {
+			Location flattenedLocation = player.getLocation();
 			flattenedLocation.setY(centerY);
 			if (cylinderCenter.distanceSquared(flattenedLocation) > radius * radius) {
 				return true;
@@ -349,7 +349,7 @@ public class PlayerUtils {
 	 */
 	public static double getAttribute(Player player, String attributeName) {
 		PlayerInventory inventory = player.getInventory();
-		List<List<String>> lores = new ArrayList<List<String>>();
+		List<@Nullable List<String>> lores = new ArrayList<>();
 		ItemStack item;
 		item = inventory.getItemInMainHand();
 		lores.add(item == null ? null : item.getLore());

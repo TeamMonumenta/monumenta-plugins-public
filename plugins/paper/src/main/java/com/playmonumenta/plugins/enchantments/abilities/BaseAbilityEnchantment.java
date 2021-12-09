@@ -11,7 +11,7 @@ import com.playmonumenta.plugins.utils.ItemUtils;
 
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.jetbrains.annotations.NotNull;
+
 
 
 
@@ -41,12 +41,12 @@ public abstract class BaseAbilityEnchantment implements BaseEnchantment {
 
 	@Override
 	public int getPlayerItemLevel(
-		@NotNull ItemStack itemStack,
-		@NotNull Player player,
-		@NotNull ItemSlot itemSlot
+		ItemStack itemStack,
+		Player player,
+		ItemSlot itemSlot
 	) {
-		@NotNull List<@NotNull String> plainLoreLines = ItemUtils.getPlainLore(itemStack);
-		for (@NotNull String plainLore : plainLoreLines) {
+		List<String> plainLoreLines = ItemUtils.getPlainLore(itemStack);
+		for (String plainLore : plainLoreLines) {
 			if (plainLore.contains(getProperty())) {
 				return parseValue(plainLore);
 			}

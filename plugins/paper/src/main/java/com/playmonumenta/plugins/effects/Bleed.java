@@ -4,12 +4,12 @@ import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.World;
-import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.utils.EntityUtils;
 
 public class Bleed extends Effect {
 
@@ -37,7 +37,7 @@ public class Bleed extends Effect {
 	public void entityTickEffect(Entity entity, boolean fourHertz, boolean twoHertz, boolean oneHertz) {
 		if (entity instanceof LivingEntity) {
 			LivingEntity le = (LivingEntity) entity;
-			if (le.getHealth() <= le.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue() / 2) {
+			if (le.getHealth() <= EntityUtils.getMaxHealth(le) / 2) {
 				Location loc = le.getLocation();
 				World world = loc.getWorld();
 				world.spawnParticle(Particle.REDSTONE, loc, 4, 0.3, 0.6, 0.3, COLOR);
@@ -47,7 +47,7 @@ public class Bleed extends Effect {
 						@Override
 						public void run() {
 							mPlugin.mEffectManager.addEffect(le, PERCENT_SPEED_EFFECT_NAME,
-									new PercentSpeed(20, mLevel * EFFECT_AMOUNT_PER_LEVEL, PERCENT_SPEED_EFFECT_NAME));
+							                                 new PercentSpeed(20, mLevel * EFFECT_AMOUNT_PER_LEVEL, PERCENT_SPEED_EFFECT_NAME));
 							mPlugin.mEffectManager.addEffect(le, PERCENT_DAMAGE_DEALT_EFFECT_NAME,
 									new PercentDamageDealt(20, mLevel * EFFECT_AMOUNT_PER_LEVEL));
 						}

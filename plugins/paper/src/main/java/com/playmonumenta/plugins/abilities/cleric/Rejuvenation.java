@@ -5,12 +5,12 @@ import java.util.Map;
 import java.util.UUID;
 
 import org.bukkit.Particle;
-import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Player;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityManager;
+import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 
 public class Rejuvenation extends Ability {
@@ -37,7 +37,7 @@ public class Rejuvenation extends Ability {
 
 	@Override
 	public void periodicTrigger(boolean twoHertz, boolean oneSecond, int ticks) {
-		if (oneSecond && !mPlayer.isDead()) {
+		if (oneSecond && mPlayer != null && !mPlayer.isDead()) {
 			mTimer += 20;
 			if (mTimer % mHealInterval == 0) {
 				for (Player player : PlayerUtils.playersInRange(mPlayer.getLocation(), RADIUS, true)) {
@@ -47,10 +47,10 @@ public class Rejuvenation extends Ability {
 					}
 
 					Integer lastHealTick = LAST_HEAL_TICK.get(player.getUniqueId());
-					if (lastHealTick == null || player.getTicksLived() - LAST_HEAL_TICK.get(player.getUniqueId()) >= mHealInterval) {
+					if (lastHealTick == null || player.getTicksLived() - lastHealTick >= mHealInterval) {
 						LAST_HEAL_TICK.put(player.getUniqueId(), player.getTicksLived());
 
-						double maxHealth = player.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue();
+						double maxHealth = EntityUtils.getMaxHealth(player);
 						if (player.getHealth() != maxHealth) {
 							PlayerUtils.healPlayer(player, PERCENT_HEAL * maxHealth);
 							player.getWorld().spawnParticle(Particle.HEART, (player.getLocation()).add(0, 2, 0), 1, 0.07, 0.07, 0.07, 0.001);

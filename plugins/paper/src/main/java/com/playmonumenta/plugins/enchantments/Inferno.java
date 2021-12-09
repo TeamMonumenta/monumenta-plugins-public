@@ -21,6 +21,7 @@ import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.classes.magic.MagicType;
@@ -51,7 +52,7 @@ public class Inferno implements BaseEnchantment {
 	public static final String LEVEL_METAKEY = "InfernoLevelMetakey";
 
 	public static final Map<LivingEntity, InfernoMob> sTaggedMobs = new HashMap<LivingEntity, InfernoMob>();
-	private static BukkitRunnable sRunnable = null;
+	private static @Nullable BukkitRunnable sRunnable = null;
 	private static final Map<LivingEntity, InfernoMob> sPendingTagMobs = new HashMap<LivingEntity, InfernoMob>();
 	private static final EnumSet<EntityType> ALLOWED_PROJECTILES = EnumSet.of(EntityType.ARROW, EntityType.SPECTRAL_ARROW);
 

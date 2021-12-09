@@ -21,6 +21,7 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.bosses.bosses.FalseSpirit;
 import com.playmonumenta.plugins.bosses.spells.Spell;
@@ -32,24 +33,25 @@ import com.playmonumenta.plugins.utils.PlayerUtils;
 
 public class SpellMultiEarthshake extends Spell {
 
-	private Plugin mPlugin;
-	private LivingEntity mBoss;
-	private int mRadius;
-	private int mDuration;
+	private final Plugin mPlugin;
+	private final LivingEntity mBoss;
+	private final int mRadius;
+	private final int mDuration;
 
-	private Location mSpawnLoc;
+	private final Location mSpawnLoc;
 
-	private static Location targetLocation;
+	private static @Nullable Location targetLocation;
 
 	private static int particleCounter1 = 0;
 	private static int particleCounter2 = 0;
 
-	private List<Player> mNoTarget = new ArrayList<>();
+	private final List<Player> mNoTarget = new ArrayList<>();
 
-	private boolean mDelve;
+	private final boolean mDelve;
 
 	private static final EnumSet<Material> mIgnoredMats = EnumSet.of(
 		Material.AIR,
+		Material.CAVE_AIR,
 		Material.COMMAND_BLOCK,
 		Material.CHAIN_COMMAND_BLOCK,
 		Material.REPEATING_COMMAND_BLOCK,
@@ -90,14 +92,12 @@ public class SpellMultiEarthshake extends Spell {
 		new BukkitRunnable() {
 			float mTicks = 0;
 			double mCurrentRadius = mRadius;
-			World mWorld = mBoss.getWorld();
+			final World mWorld = mBoss.getWorld();
 			@Override
 			public void run() {
 
 				if (mBoss.isDead() || !mBoss.isValid() || EntityUtils.isStunned(mBoss)) {
-					if (mBoss instanceof LivingEntity) {
-						mBoss.setAI(true);
-					}
+					mBoss.setAI(true);
 					this.cancel();
 					return;
 				}
@@ -109,7 +109,7 @@ public class SpellMultiEarthshake extends Spell {
 						mWorld.spawnParticle(Particle.CAMPFIRE_COSY_SMOKE, targetLocation, 1, ((double) mRadius * 2) / 2, ((double) mRadius * 2) / 2, ((double) mRadius * 2) / 2, 0.05);
 					}
 
-					mWorld.spawnParticle(Particle.BLOCK_CRACK, targetLocation, 2, mRadius / 2, 0.1, mRadius / 2, Bukkit.createBlockData(Material.STONE));
+					mWorld.spawnParticle(Particle.BLOCK_CRACK, targetLocation, 2, mRadius / 2.0, 0.1, mRadius / 2.0, Bukkit.createBlockData(Material.STONE));
 
 					if (particleCounter1 % 20 == 0 && particleCounter1 > 0) {
 						mWorld.playSound(targetLocation, Sound.ENTITY_ZOMBIE_ATTACK_WOODEN_DOOR, 1f, 0.5f);
@@ -117,8 +117,8 @@ public class SpellMultiEarthshake extends Spell {
 						for (int i = 0; i < 360; i += 18) {
 							mWorld.spawnParticle(Particle.SMOKE_NORMAL, targetLocation.clone().add(FastUtils.cos(Math.toRadians(i)) * mRadius, 0.2, FastUtils.sin(Math.toRadians(i)) * mRadius), 1, 0.1, 0.1, 0.1, 0);
 						}
-						mWorld.spawnParticle(Particle.BLOCK_CRACK, targetLocation, 80, mRadius / 2, 0.1, mRadius / 2, Bukkit.createBlockData(Material.DIRT));
-						mWorld.spawnParticle(Particle.CAMPFIRE_COSY_SMOKE, targetLocation, 8, mRadius / 2, 0.1, mRadius / 2, 0);
+						mWorld.spawnParticle(Particle.BLOCK_CRACK, targetLocation, 80, mRadius / 2.0, 0.1, mRadius / 2.0, Bukkit.createBlockData(Material.DIRT));
+						mWorld.spawnParticle(Particle.CAMPFIRE_COSY_SMOKE, targetLocation, 8, mRadius / 2.0, 0.1, mRadius / 2.0, 0);
 					}
 					particleCounter1++;
 
@@ -236,9 +236,9 @@ public class SpellMultiEarthshake extends Spell {
 						mWorld.playSound(loc, Sound.ENTITY_ZOMBIE_ATTACK_WOODEN_DOOR, 1.5f, 0.5f);
 
 						mWorld.spawnParticle(Particle.CLOUD, loc, 150, 0, 0, 0, 0.5);
-						mWorld.spawnParticle(Particle.LAVA, loc, 35, mRadius / 2, 0.1, mRadius / 2, 0);
-						mWorld.spawnParticle(Particle.BLOCK_CRACK, loc, 200, mRadius / 2, 0.1, mRadius / 2, Bukkit.createBlockData(Material.DIRT));
-						mWorld.spawnParticle(Particle.CAMPFIRE_COSY_SMOKE, loc, 35, mRadius / 2, 0.1, mRadius / 2, 0.1);
+						mWorld.spawnParticle(Particle.LAVA, loc, 35, mRadius / 2.0, 0.1, mRadius / 2.0, 0);
+						mWorld.spawnParticle(Particle.BLOCK_CRACK, loc, 200, mRadius / 2.0, 0.1, mRadius / 2.0, Bukkit.createBlockData(Material.DIRT));
+						mWorld.spawnParticle(Particle.CAMPFIRE_COSY_SMOKE, loc, 35, mRadius / 2.0, 0.1, mRadius / 2.0, 0.1);
 
 						for (int i = 0; i < 100; i++) {
 							mWorld.spawnParticle(Particle.SMOKE_LARGE, loc.clone().add(-3 + FastUtils.RANDOM.nextDouble() * 6, 0.1, -3 + FastUtils.RANDOM.nextDouble() * 6), 0, 0, 1, 0, 0.2 + FastUtils.RANDOM.nextDouble() * 0.4);

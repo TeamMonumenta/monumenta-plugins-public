@@ -24,19 +24,20 @@ import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 
 public class SpellSummonConstantly extends Spell {
-	private List<String> mMobNames;
-	private int mDuration;
+	private final List<String> mMobNames;
+	private final int mDuration;
 	private int mTimer;
-	private int mRadius;
+	private final int mRadius;
 	private final int mBaseSpawns;
-	private Location mCenter;
-	private List<Vector> mLocationOffsets;
+	private final Location mCenter;
+	private final List<Vector> mLocationOffsets;
 	private final BossAbilityGroup mSummoner;
 
 	/*
 	 * summoner = the instance of the boss ability that cast this spell
 	 */
-	public SpellSummonConstantly(List<String> mobNames, int duration, int radius, int rangeFromPlayer, int spawnsPerPlayer, Location center, LivingEntity boss, BossAbilityGroup summoner) {
+	public SpellSummonConstantly(List<String> mobNames, int duration, int radius, int rangeFromPlayer, int spawnsPerPlayer,
+	                             Location center, BossAbilityGroup summoner) {
 		mMobNames = mobNames;
 		mDuration = duration;
 		mTimer = mDuration / 3;

@@ -9,6 +9,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
@@ -45,12 +46,14 @@ public abstract class DepthsAbility extends Ability {
 	}
 
 	//Constructing the inventory item appearance for the ability
+
 	/**
 	 * Returns the ability item to display in GUIs given the input rarity
+	 *
 	 * @param rarity the rarity to put on the item
 	 * @return the item to display
 	 */
-	public DepthsAbilityItem getAbilityItem(int rarity) {
+	public @Nullable DepthsAbilityItem getAbilityItem(int rarity) {
 		DepthsAbilityItem item = null;
 
 		//Don't crash our abilities because of a null item
@@ -123,7 +126,7 @@ public abstract class DepthsAbility extends Ability {
 
 	//Description of what the ability does, abilities override this
 	public String getDescription(int rarity) {
-		return mInfo.mDisplayName;
+		return "" + mInfo.mDisplayName;
 	}
 
 	//Trigger the player uses to activate it, override this if it uses a trigger

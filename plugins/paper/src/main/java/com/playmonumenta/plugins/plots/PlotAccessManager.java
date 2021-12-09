@@ -10,8 +10,12 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.logging.Logger;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.Location;
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -21,12 +25,6 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.utils.FileUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
-
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.Location;
-import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
 
 import dev.jorel.commandapi.CommandAPI;
 import dev.jorel.commandapi.CommandAPICommand;
@@ -48,7 +46,7 @@ public class PlotAccessManager {
 			mExpiration = expiration;
 		}
 
-		private @Nonnull JsonObject toJson() {
+		private JsonObject toJson() {
 			JsonObject obj = new JsonObject();
 			obj.addProperty("name", mName);
 			obj.addProperty("expiration", mExpiration);
@@ -63,7 +61,7 @@ public class PlotAccessManager {
 			}
 		}
 
-		private static @Nonnull PlotAccessEntry fromJson(JsonObject obj) {
+		private static PlotAccessEntry fromJson(JsonObject obj) {
 			return new PlotAccessEntry(obj.get("name").getAsString(), obj.get("expiration").getAsLong());
 		}
 	}
@@ -133,7 +131,7 @@ public class PlotAccessManager {
 			return obj;
 		}
 
-		private static @Nonnull PlotEntry fromJson(String coordsKey, JsonObject obj) {
+		private static PlotEntry fromJson(String coordsKey, JsonObject obj) {
 			Map<UUID, PlotAccessEntry> access = new HashMap<>();
 			for (Map.Entry<String, JsonElement> entry : obj.get("access").getAsJsonObject().entrySet()) {
 				access.put(UUID.fromString(entry.getKey()), PlotAccessEntry.fromJson(entry.getValue().getAsJsonObject()));

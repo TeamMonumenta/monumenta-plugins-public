@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.itemindex;
 
-import com.playmonumenta.plugins.Plugin;
+import java.util.ArrayList;
+
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -8,14 +9,15 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
-import java.util.ArrayList;
+import com.playmonumenta.plugins.Plugin;
 
 public class IndexInventory {
 	private final Player mPlayer;
 	private final Inventory mInventory;
-	private ItemStack[] mContents;
-	private MonumentaItem[] mItems;
+	private final @Nullable ItemStack[] mContents = new ItemStack[54];
+	private MonumentaItem[] mItems = {};
 	private ArrayList<ItemIndexFilter> mFilters;
 	private int mCurrentPage;
 
@@ -80,7 +82,6 @@ public class IndexInventory {
 	}
 
 	private void buildMainViewContents() {
-		this.mContents = new ItemStack[54];
 		if (this.mCurrentPage > (this.mItems.length - 1) / 45 + 1) {
 			this.mCurrentPage = 0;
 		} else if (this.mCurrentPage == -1) {
@@ -122,7 +123,7 @@ public class IndexInventory {
 				}
 			}
 		}
-		this.mItems = out.toArray(new MonumentaItem[0]);
+		this.mItems = out.toArray(MonumentaItem[]::new);
 	}
 
 	public Inventory getInventory() {

@@ -25,7 +25,7 @@ public class BowAspect extends WeaponAspectDepthsAbility {
 
 	@Override
 	public boolean playerShotArrowEvent(AbstractArrow arrow) {
-		if (FastUtils.RANDOM.nextDouble() < PASSIVE_ARROW_SAVE) {
+		if (mPlayer != null && FastUtils.RANDOM.nextDouble() < PASSIVE_ARROW_SAVE) {
 			boolean refunded = AbilityUtils.refundArrow(mPlayer, arrow);
 			if (refunded) {
 				mPlayer.playSound(mPlayer.getLocation(), Sound.ENTITY_ARROW_HIT_PLAYER, 0.2f, 1.0f);

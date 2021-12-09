@@ -169,7 +169,7 @@ public class ThunderStep extends Ability {
 	}
 
 	private void doDamage(Location location, float spellDamage, boolean bypassIFrames) {
-		World world = mPlayer.getWorld();
+		World world = location.getWorld();
 		world.playSound(location, Sound.ENTITY_LIGHTNING_BOLT_THUNDER, SoundCategory.PLAYERS, 1f, 1.5f);
 		world.spawnParticle(Particle.REDSTONE, location, 100, 2.5, 2.5, 2.5, 3, COLOR_YELLOW);
 		world.spawnParticle(Particle.REDSTONE, location, 100, 2.5, 2.5, 2.5, 3, COLOR_AQUA);

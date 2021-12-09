@@ -6,17 +6,18 @@ import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 import org.bukkit.potion.PotionEffect;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class PotionEffectApplyEvent extends Event implements Cancellable {
 
 	private static final HandlerList handlers = new HandlerList();
 
-	private final Entity mApplier;
+	private final @Nullable Entity mApplier;
 	private final LivingEntity mApplied;
 	private PotionEffect mEffect;
 	private boolean mIsCancelled;
 
-	public PotionEffectApplyEvent(Entity applier, LivingEntity applied, PotionEffect effect) {
+	public PotionEffectApplyEvent(@Nullable Entity applier, LivingEntity applied, PotionEffect effect) {
 		mApplier = applier;
 		mApplied = applied;
 		mEffect = effect;
@@ -30,7 +31,7 @@ public class PotionEffectApplyEvent extends Event implements Cancellable {
 		return mApplied;
 	}
 
-	public Entity getApplier() {
+	public @Nullable Entity getApplier() {
 		return mApplier;
 	}
 

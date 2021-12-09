@@ -17,6 +17,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
@@ -80,8 +81,8 @@ public class AdvancingShadows extends Ability {
 	private static final int EFFECT_LEVEL = 1;
 	private static final int ADVANCING_SHADOWS_COOLDOWN = 20 * 20;
 
-	private LivingEntity mTarget = null;
-	private BladeDance mBladeDance;
+	private @Nullable LivingEntity mTarget = null;
+	private @Nullable BladeDance mBladeDance;
 
 	public AdvancingShadows(Plugin plugin, Player player) {
 		super(plugin, player, "Advancing Shadows");
@@ -96,17 +97,20 @@ public class AdvancingShadows extends Ability {
 
 		if (player != null) {
 			Bukkit.getScheduler().runTask(plugin, () -> {
-				mBladeDance = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(mPlayer, BladeDance.class);
+				mBladeDance = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, BladeDance.class);
 			});
 		}
 	}
 
 	@Override
 	public void cast(Action action) {
+		if (mPlayer == null || mTarget == null) {
+			return;
+		}
 		LivingEntity entity = mTarget;
 		double maxRange = getActivationRange();
 		double origDistance = mPlayer.getLocation().distance(entity.getLocation());
-		if (entity != null && origDistance <= maxRange) {
+		if (origDistance <= maxRange) {
 			int advancingShadows = getAbilityScore();
 			Vector dir = LocationUtils.getDirectionTo(entity.getLocation(), mPlayer.getLocation());
 			World world = mPlayer.getWorld();
@@ -194,6 +198,9 @@ public class AdvancingShadows extends Ability {
 
 	@Override
 	public boolean runCheck() {
+		if (mPlayer == null) {
+			return false;
+		}
 		ItemStack mainHand = mPlayer.getInventory().getItemInMainHand();
 		ItemStack offHand = mPlayer.getInventory().getItemInOffHand();
 		if (InventoryUtils.rogueTriggerCheck(mainHand, offHand)) {
@@ -235,6 +242,9 @@ public class AdvancingShadows extends Ability {
 	}
 
 	private double getActivationRange() {
+		if (mPlayer == null) {
+			return 0;
+		}
 		int advancingShadows = getAbilityScore();
 		int range = (advancingShadows == 1) ? ADVANCING_SHADOWS_RANGE_1 : ADVANCING_SHADOWS_RANGE_2;
 		return AdvancingShadowsRadiusEnchantment.getRadius(mPlayer, range, AdvancingShadowsRadiusEnchantment.class);

@@ -3,18 +3,6 @@ package com.playmonumenta.plugins.bosses.bosses;
 import java.util.List;
 import java.util.logging.Level;
 
-import com.destroystokyo.paper.event.entity.EntityPathfindEvent;
-import com.playmonumenta.plugins.Constants;
-import com.playmonumenta.plugins.bosses.BossBarManager;
-import com.playmonumenta.plugins.bosses.BossManager;
-import com.playmonumenta.plugins.bosses.SpellManager;
-import com.playmonumenta.plugins.bosses.events.SpellCastEvent;
-import com.playmonumenta.plugins.bosses.spells.Spell;
-import com.playmonumenta.plugins.events.CustomEffectApplyEvent;
-import com.playmonumenta.plugins.utils.BossUtils;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.SerializationUtils;
-
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
@@ -31,7 +19,20 @@ import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.checkerframework.checker.initialization.qual.UnknownInitialization;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
+import com.destroystokyo.paper.event.entity.EntityPathfindEvent;
+import com.playmonumenta.plugins.Constants;
+import com.playmonumenta.plugins.bosses.BossBarManager;
+import com.playmonumenta.plugins.bosses.BossManager;
+import com.playmonumenta.plugins.bosses.SpellManager;
+import com.playmonumenta.plugins.bosses.events.SpellCastEvent;
+import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.events.CustomEffectApplyEvent;
+import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.SerializationUtils;
 
 
 public abstract class BossAbilityGroup {
@@ -49,11 +50,11 @@ public abstract class BossAbilityGroup {
 	protected final LivingEntity mBoss;
 	private final String mIdentityTag;
 
-	private BossBarManager mBossBar;
-	private SpellManager mActiveSpells;
-	private List<Spell> mPassiveSpells;
-	private BukkitRunnable mTaskPassive = null;
-	private BukkitRunnable mTaskActive = null;
+	private @Nullable BossBarManager mBossBar;
+	private @Nullable SpellManager mActiveSpells;
+	private @Nullable List<Spell> mPassiveSpells;
+	private @Nullable BukkitRunnable mTaskPassive = null;
+	private @Nullable BukkitRunnable mTaskActive = null;
 	private boolean mUnloaded = false;
 	private Integer mNextActiveTimer = 0;
 	public boolean mDead = false;
@@ -65,8 +66,8 @@ public abstract class BossAbilityGroup {
 		mBoss.addScoreboardTag(mIdentityTag);
 	}
 
-	public void changePhase(SpellManager activeSpells,
-	                        List<Spell> passiveSpells, PhaseAction action) {
+	public void changePhase(@Nullable SpellManager activeSpells,
+	                        @Nullable List<Spell> passiveSpells, @Nullable PhaseAction action) {
 
 		if (action != null) {
 			action.run(mBoss);
@@ -80,20 +81,20 @@ public abstract class BossAbilityGroup {
 		mPassiveSpells = passiveSpells;
 	}
 
-	public void constructBoss(SpellManager activeSpells,
-	                          List<Spell> passiveSpells, int detectionRange, BossBarManager bossBar) {
+
+	public void constructBoss(@UnknownInitialization(BossAbilityGroup.class)BossAbilityGroup this,
+	                          @Nullable SpellManager activeSpells, @Nullable List<Spell> passiveSpells, int detectionRange, @Nullable BossBarManager bossBar) {
 		constructBoss(activeSpells, passiveSpells, detectionRange, bossBar, 100);
 	}
 
-	public void constructBoss(SpellManager activeSpells,
-	                          List<Spell> passiveSpells, int detectionRange, BossBarManager bossBar, long spellDelay) {
+	public void constructBoss(@UnknownInitialization(BossAbilityGroup.class)BossAbilityGroup this,
+	                          @Nullable SpellManager activeSpells, @Nullable List<Spell> passiveSpells, int detectionRange, @Nullable BossBarManager bossBar, long spellDelay) {
 		constructBoss(activeSpells, passiveSpells, detectionRange, bossBar, spellDelay, PASSIVE_RUN_INTERVAL_DEFAULT);
-
 	}
 
 	/* If detectionRange <= 0, will always run regardless of whether players are nearby */
-	public void constructBoss(SpellManager activeSpells,
-	                          List<Spell> passiveSpells, int detectionRange, BossBarManager bossBar, long spellDelay, long passiveIntervalTicks) {
+	public void constructBoss(@UnknownInitialization(BossAbilityGroup.class)BossAbilityGroup this,
+	                          @Nullable SpellManager activeSpells, @Nullable List<Spell> passiveSpells, int detectionRange, @Nullable BossBarManager bossBar, long spellDelay, long passiveIntervalTicks) {
 		mBossBar = bossBar;
 		mActiveSpells = activeSpells;
 		mPassiveSpells = passiveSpells;
@@ -223,11 +224,11 @@ public abstract class BossAbilityGroup {
 	 * Event Handlers
 	 *******************************************************************************/
 
-	public List<Spell> getPassives() {
+	public @Nullable List<Spell> getPassives() {
 		return mPassiveSpells;
 	}
 
-	public List<Spell> getActiveSpells() {
+	public @Nullable List<Spell> getActiveSpells() {
 		if (mActiveSpells != null) {
 			return mActiveSpells.getSpells();
 		} else {
@@ -395,7 +396,7 @@ public abstract class BossAbilityGroup {
 	 * Needed whenever the boss needs more parameters to instantiate than just
 	 * the boss mob itself (tele to spawn location, end location to set block, etc.)
 	 */
-	public String serialize() {
+	public @Nullable String serialize() {
 		return null;
 	}
 

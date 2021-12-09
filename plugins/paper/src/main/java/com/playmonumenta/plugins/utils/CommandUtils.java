@@ -3,11 +3,6 @@ package com.playmonumenta.plugins.utils;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.annotation.Nullable;
-
-import com.playmonumenta.plugins.point.AreaBounds;
-import com.playmonumenta.plugins.point.Point;
-
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -18,7 +13,9 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.jetbrains.annotations.NotNull;
+
+import com.playmonumenta.plugins.point.AreaBounds;
+import com.playmonumenta.plugins.point.Point;
 
 import dev.jorel.commandapi.CommandAPI;
 import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
@@ -173,11 +170,13 @@ public class CommandUtils {
 		ItemMeta meta = item.getItemMeta();
 		if (meta == null) {
 			CommandAPI.fail("Player must have a " + enchantment + " item in their main hand!");
+			throw new RuntimeException();
 		}
 
 		List<String> lore = meta.getLore();
 		if (lore == null || lore.isEmpty()) {
 			CommandAPI.fail("Player must have a " + enchantment + " item in their main hand!");
+			throw new RuntimeException();
 		}
 
 		List<String> newLore = new ArrayList<>();
@@ -207,17 +206,16 @@ public class CommandUtils {
 
 	// returns the sender as Player, if that sender is a player instance, or a proxied player
 	// returns null otherwise
-	@Nullable
-	public static @NotNull Player getPlayerFromSender(CommandSender sender) throws WrapperCommandSyntaxException {
+	public static Player getPlayerFromSender(CommandSender sender) throws WrapperCommandSyntaxException {
 		if (sender instanceof Player) {
-			return ((Player)sender);
+			return ((Player) sender);
 		} else if (sender instanceof ProxiedCommandSender) {
 			CommandSender callee = ((ProxiedCommandSender) sender).getCallee();
 			if (callee instanceof Player) {
-				return ((Player)callee);
+				return ((Player) callee);
 			}
 		}
 		CommandAPI.fail("This command must be run by/as a player");
-		return null; // This can never happen but is required by the compiler
+		throw new RuntimeException(); // This can never happen but is required by the compiler
 	}
 }

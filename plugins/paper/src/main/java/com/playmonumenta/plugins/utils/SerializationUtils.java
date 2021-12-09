@@ -17,6 +17,8 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.bosses.bosses.BossAbilityGroup;
 
+import net.kyori.adventure.text.Component;
+
 public class SerializationUtils {
 	private static final String SERIALCONST = "SERIALDATA=";
 	private static final int SERIALLEN = 50;
@@ -122,8 +124,11 @@ public class SerializationUtils {
 					iter.remove();
 				}
 
-				if (meta.hasLore()) {
-					meta.getLore().removeIf(lore -> lore.startsWith(SERIALCONST));
+				List<Component> lore = meta.lore();
+				if (lore != null) {
+					lore.removeIf(l -> MessagingUtils.plainText(l).startsWith(SERIALCONST));
+					meta.lore(lore);
+					item.setItemMeta(meta);
 				}
 			}
 		}

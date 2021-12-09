@@ -3,11 +3,6 @@ package com.playmonumenta.plugins.bosses.spells;
 import java.util.Collections;
 import java.util.List;
 
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.LocationUtils;
-import com.playmonumenta.plugins.utils.LocationUtils.TravelAction;
-import com.playmonumenta.plugins.utils.PlayerUtils;
-
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
@@ -16,6 +11,12 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
+import org.checkerframework.checker.nullness.qual.Nullable;
+
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.LocationUtils;
+import com.playmonumenta.plugins.utils.LocationUtils.TravelAction;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 
 public class SpellBaseLaser extends Spell {
 	private static final double BOX_SIZE = 0.5;
@@ -33,7 +34,7 @@ public class SpellBaseLaser extends Spell {
 	private final int mParticleFrequency;
 	private final int mParticleChance;
 	private final FinishAction mFinishAction;
-	private final GetSpellTargets<LivingEntity> mGetTargets;
+	private final @Nullable GetSpellTargets<LivingEntity> mGetTargets;
 
 	/**
 	 * @param plugin          Plugin
@@ -113,7 +114,7 @@ public class SpellBaseLaser extends Spell {
 		int duration,
 		boolean stopWhenBlocked,
 		int cooldown,
-		GetSpellTargets<LivingEntity> getTargets,
+		@Nullable GetSpellTargets<LivingEntity> getTargets,
 		TickAction tickAction,
 		ParticleAction particleAction,
 		int particleFrequency,
@@ -139,11 +140,9 @@ public class SpellBaseLaser extends Spell {
 	@Override
 	public void run() {
 		if (mGetTargets != null) {
-			List<LivingEntity> targets = mGetTargets.getTargets();
+			List<? extends LivingEntity> targets = mGetTargets.getTargets();
 			for (LivingEntity target : targets) {
-				if (target instanceof LivingEntity) {
-					launch((LivingEntity)target);
-				}
+				launch(target);
 			}
 			return;
 		}

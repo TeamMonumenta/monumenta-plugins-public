@@ -179,8 +179,6 @@ public class MobListener implements Listener {
 					EntityEquipment equipment = ((LivingEntity) source).getEquipment();
 					if (equipment != null) {
 						ItemStack mainhand = equipment.getItemInMainHand();
-
-						// getItemInMainHand() is @NotNull
 						Material material = mainhand.getType();
 						if (material == Material.TRIDENT || material == Material.CROSSBOW) {
 							ItemMeta meta = mainhand.getItemMeta();

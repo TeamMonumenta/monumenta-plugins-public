@@ -10,14 +10,15 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.playmonumenta.plugins.Plugin;
-
 import org.apache.commons.lang.StringEscapeUtils;
 import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.potion.PotionEffectType;
+import org.checkerframework.checker.nullness.qual.Nullable;
+
+import com.playmonumenta.plugins.Plugin;
 
 public class StringReader {
 	private final String mStr;
@@ -65,7 +66,7 @@ public class StringReader {
 	/* Reads all characters up to the specified one, not including it
 	 * Returns that substring or null if specified character doesn't exist
 	 */
-	public String readUntil(String c) {
+	public @Nullable String readUntil(String c) {
 		int index = mStr.indexOf(c, mIdx);
 		if (index == -1) {
 			return null;
@@ -104,7 +105,7 @@ public class StringReader {
 		}
 	}
 
-	public String readOneOf(Collection<String> validItems) {
+	public @Nullable String readOneOf(Collection<String> validItems) {
 		skipWhitespace();
 		String remain = remaining();
 		// Make a copy of the input collection and sort it by length,
@@ -121,17 +122,17 @@ public class StringReader {
 		return null;
 	}
 
-	public Boolean readBoolean() {
+	public @Nullable Boolean readBoolean() {
 		skipWhitespace();
 		if (advance("false")) {
-			return false;
+			return Boolean.FALSE;
 		} else if (advance("true")) {
-			return true;
+			return Boolean.TRUE;
 		}
 		return null;
 	}
 
-	public Long readLong() {
+	public @Nullable Long readLong() {
 		skipWhitespace();
 		int origIdx = mIdx;
 		int tmpIdx = mIdx;
@@ -155,7 +156,7 @@ public class StringReader {
 		return lastParse;
 	}
 
-	public Double readDouble() {
+	public @Nullable Double readDouble() {
 		skipWhitespace();
 		int origIdx = mIdx;
 		int tmpIdx = mIdx;
@@ -179,7 +180,7 @@ public class StringReader {
 		return lastParse;
 	}
 
-	public PotionEffectType readPotionEffectType() {
+	public @Nullable PotionEffectType readPotionEffectType() {
 		skipWhitespace();
 		String remain = remaining().toUpperCase(); // TODO: Remove toUpperCase()
 		for (PotionEffectType type : POTION_EFFECT_TYPES_SORTED) {
@@ -194,7 +195,7 @@ public class StringReader {
 		return null;
 	}
 
-	public Sound readSound() {
+	public @Nullable Sound readSound() {
 		skipWhitespace();
 		String remain = remaining().toUpperCase(); // TODO: Remove toUpperCase()
 		for (Sound type : SOUNDS_SORTED) {
@@ -211,7 +212,7 @@ public class StringReader {
 
 	//we need to check before match with longer particle or we can end up with a misunderstanding
 	//aka CRIT_MAGIC can be read with CRIT
-	public Particle readParticle() {
+	public @Nullable Particle readParticle() {
 		skipWhitespace();
 		String remain = remaining().toUpperCase(); // TODO: Remove toUpperCase()
 		for (Particle type : PARTICLES_SORTED) {
@@ -226,7 +227,7 @@ public class StringReader {
 		return null;
 	}
 
-	public Material readMaterial() {
+	public @Nullable Material readMaterial() {
 		skipWhitespace();
 
 		String remain = remaining().toUpperCase(); // TODO: Remove toUpperCase()
@@ -244,7 +245,7 @@ public class StringReader {
 		return null;
 	}
 
-	public <E extends Enum<?>> E readEnum(E[] values) {
+	public <E extends Enum<?>> @Nullable E readEnum(E[] values) {
 		String remain = remaining();
 
 		for (E value : values) {
@@ -264,7 +265,7 @@ public class StringReader {
 	public static final List<PotionEffectType> POTION_EFFECT_TYPES_SORTED = Arrays.asList(PotionEffectType.values());
 
 	static {
-		//this is just because Color don't have the fuctions values() and getName()...
+		//this is just because Color don't have the functions values() and getName()...
 		COLOR_MAP.put("AQUA", Color.AQUA);
 		COLOR_MAP.put("BLACK", Color.BLACK);
 		COLOR_MAP.put("BLUE", Color.BLUE);
@@ -284,27 +285,19 @@ public class StringReader {
 		COLOR_MAP.put("YELLOW", Color.YELLOW);
 
 		//Sorting Particle
-		Collections.sort(PARTICLES_SORTED, (a, b) -> {
-			return b.name().length() - a.name().length();
-		});
+		PARTICLES_SORTED.sort((a, b) -> b.name().length() - a.name().length());
 
 		//Sorting Material
-		Collections.sort(MATERIALS_SORTED, (a, b) -> {
-			return b.name().length() - a.name().length();
-		});
+		MATERIALS_SORTED.sort((a, b) -> b.name().length() - a.name().length());
 
 		//sorting Sound
-		Collections.sort(SOUNDS_SORTED, (a, b) -> {
-			return b.name().length() - a.name().length();
-		});
+		SOUNDS_SORTED.sort((a, b) -> b.name().length() - a.name().length());
 
 		//sorting Potion Effect Type
-		Collections.sort(POTION_EFFECT_TYPES_SORTED, (a, b) -> {
-			return b.getName().length() - a.getName().length();
-		});
+		POTION_EFFECT_TYPES_SORTED.sort((a, b) -> b.getName().length() - a.getName().length());
 	}
 
-	public Color readColor() {
+	public @Nullable Color readColor() {
 		skipWhitespace();
 
 		String remain = remaining();
@@ -332,7 +325,7 @@ public class StringReader {
 	private static final Pattern QUOTED_STRING_PATTERN = Pattern.compile("^\"(?:[^\"\\\\]|\\\\.)*\"");
 	private static final Pattern NON_QUOTED_STRING_PATTERN = Pattern.compile("^[^\",)][^,)\\]]*");
 
-	public String readString() {
+	public @Nullable String readString() {
 		skipWhitespace();
 		String remain = remaining();
 		Matcher quotedStringMatcher = QUOTED_STRING_PATTERN.matcher(remain);

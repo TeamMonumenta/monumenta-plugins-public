@@ -67,7 +67,7 @@ public abstract class WeaponAspectDepthsAbility extends DepthsAbility {
 	//Description of what the ability does, abilities override this
 	@Override
 	public String getDescription(int rarity) {
-		return mInfo.mDisplayName;
+		return "" + mInfo.mDisplayName;
 	}
 
 

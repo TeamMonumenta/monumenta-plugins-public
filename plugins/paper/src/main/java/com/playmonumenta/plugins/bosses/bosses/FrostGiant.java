@@ -44,6 +44,7 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.bosses.BossBarManager;
 import com.playmonumenta.plugins.bosses.BossBarManager.BossHealthAction;
@@ -191,20 +192,15 @@ public class FrostGiant extends BossAbilityGroup {
 	private static final Particle.DustOptions BLUE_COLOR = new Particle.DustOptions(Color.fromRGB(66, 185, 245), 1.0f);
 	private static final Particle.DustOptions LIGHT_BLUE_COLOR = new Particle.DustOptions(Color.fromRGB(0, 255, 247), 1.0f);
 
-	private List<Character> mDirections = new ArrayList<>();
-	private LivingEntity mNorthStand;
-	private LivingEntity mEastStand;
-	private LivingEntity mSouthStand;
-	private LivingEntity mWestStand;
+	private @Nullable LivingEntity mNorthStand;
+	private @Nullable LivingEntity mEastStand;
+	private @Nullable LivingEntity mSouthStand;
+	private @Nullable LivingEntity mWestStand;
 
-	private LivingEntity mTargeted;
-	private Location mStuckLoc;
+	private @Nullable LivingEntity mTargeted;
+	private @Nullable Location mStuckLoc;
 
-	private UltimateSeismicRuin mRuin;
-
-	//Melee does damage
-	private BukkitRunnable mDelay;
-
+	private final UltimateSeismicRuin mRuin;
 
 	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
 		return SerializationUtils.statefulBossDeserializer(boss, identityTag, (spawnLoc, endLoc) -> {
@@ -212,9 +208,9 @@ public class FrostGiant extends BossAbilityGroup {
 		});
 	}
 
-	public ItemStack[] mArmor = null;
-	private ItemStack mMainhand = null;
-	private ItemStack mOffhand = null;
+	public ItemStack @Nullable [] mArmor = null;
+	private @Nullable ItemStack mMainhand = null;
+	private @Nullable ItemStack mOffhand = null;
 
 	@Override
 	public String serialize() {
@@ -264,12 +260,13 @@ public class FrostGiant extends BossAbilityGroup {
 		mStartLoc = mStart.getLocation();
 
 		//Adds directions of the arena that seismic ruin destroys
-		mDirections.add('n');
-		mDirections.add('e');
-		mDirections.add('s');
-		mDirections.add('w');
+		List<Character> directions = new ArrayList<>();
+		directions.add('n');
+		directions.add('e');
+		directions.add('s');
+		directions.add('w');
 
-		mRuin = new UltimateSeismicRuin(mPlugin, mBoss, mDirections, mNorthStand, mEastStand, mSouthStand, mWestStand);
+		mRuin = new UltimateSeismicRuin(mPlugin, mBoss, directions, mNorthStand, mEastStand, mSouthStand, mWestStand);
 
 		//Prevents the boss from getting set on fire (does not prevent it from getting damaged by inferno)
 		new BukkitRunnable() {
@@ -737,9 +734,12 @@ public class FrostGiant extends BossAbilityGroup {
 		}
 		PlayerUtils.executeCommandOnNearbyPlayers(mStartLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"THIS EARTH... WAS OURS ONCE... WE SHAPED IT...\",\"color\":\"dark_aqua\"}]");
 
-		for (Spell sp : getPassives()) {
-			if (sp instanceof ArmorOfFrost) {
-				((ArmorOfFrost) sp).stopSkill();
+		List<Spell> passives = getPassives();
+		if (passives != null) {
+			for (Spell sp : passives) {
+				if (sp instanceof ArmorOfFrost) {
+					((ArmorOfFrost) sp).stopSkill();
+				}
 			}
 		}
 
@@ -903,10 +903,13 @@ public class FrostGiant extends BossAbilityGroup {
 	public static boolean testHitByIcicle(BoundingBox icicleBoundingBox) {
 		if (mInstance != null && mInstance.mBoss.isValid() && !mInstance.mBoss.isDead()) {
 			if (icicleBoundingBox.overlaps(mInstance.mBoss.getBoundingBox())) {
-				for (Spell sp : mInstance.getPassives()) {
-					if (sp instanceof ArmorOfFrost) {
-						((ArmorOfFrost)sp).hitByIcicle();
-						return true;
+				List<Spell> passives = mInstance.getPassives();
+				if (passives != null) {
+					for (Spell sp : passives) {
+						if (sp instanceof ArmorOfFrost) {
+							((ArmorOfFrost) sp).hitByIcicle();
+							return true;
+						}
 					}
 				}
 			}
@@ -1056,8 +1059,9 @@ public class FrostGiant extends BossAbilityGroup {
 	public static boolean delayHailstormDamage() {
 		//Delays damage for hailstorm
 		if (mInstance != null) {
-			if (mInstance.getPassives() != null) {
-				for (Spell sp : mInstance.getPassives()) {
+			List<Spell> passives = mInstance.getPassives();
+			if (passives != null) {
+				for (Spell sp : passives) {
 					if (sp instanceof SpellHailstorm) {
 						((SpellHailstorm) sp).delayDamage();
 						return true;

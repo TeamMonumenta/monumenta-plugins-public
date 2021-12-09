@@ -286,8 +286,7 @@ public class PortalManager {
 		//Activate teleport logic
 		if (mPortal1 != null && mPortal2 != null) {
 			if (mPortalTeleportChecks.get(player) == null) {
-				PortalTeleportCheck ptc = new PortalTeleportCheck();
-				ptc.mPlayer = player;
+				PortalTeleportCheck ptc = new PortalTeleportCheck(player);
 				ptc.runTaskTimer(Plugin.getInstance(), 0, 1);
 				mPortalTeleportChecks.put(player, ptc);
 			}

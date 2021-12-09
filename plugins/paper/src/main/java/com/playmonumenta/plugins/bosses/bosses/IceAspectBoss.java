@@ -13,16 +13,15 @@ import com.playmonumenta.plugins.utils.PotionUtils;
 
 
 /**
+ * @G3m1n1Boy
  * @deprecated use boss_onhit instead, like this:
- *<blockquote><pre>
+ * <blockquote><pre>
  * /boss var Tags add boss_onhit
  * /boss var Tags add boss_onhit[EFFECTS=[(SLOW,80,1)]]
  * CARE this ability has some particle & sound, fix those too if you don't want the default values
  * </pre></blockquote>
- * @G3m1n1Boy
- *
-*/
-public class IceAspectBoss extends BossAbilityGroup {
+ */
+public final class IceAspectBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_iceaspect";
 
 	public static class Parameters extends BossParameters {

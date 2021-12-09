@@ -128,6 +128,9 @@ public class Infernal extends DelveModifier {
 
 	@Override
 	public boolean playerDamagedEvent(EntityDamageEvent event) {
+		if (mPlayer == null) {
+			return true;
+		}
 		if (event.getCause() == DamageCause.FIRE_TICK) {
 			event.setDamage(event.getDamage() * mBurningDamageTakenMultiplier);
 		} else if (ENVIRONMENTAL_DAMAGE_CAUSES.contains(event.getCause())) {
@@ -142,7 +145,7 @@ public class Infernal extends DelveModifier {
 
 	@Override
 	public void applyModifiers(LivingEntity mob, SpawnerSpawnEvent event) {
-		if (event instanceof SpawnerSpawnEvent && FastUtils.RANDOM.nextDouble() < mAbilityChance) {
+		if (FastUtils.RANDOM.nextDouble() < mAbilityChance) {
 			// This runs prior to BossManager parsing, so we can just add tags directly
 			mob.addScoreboardTag(ABILITY_POOL[FastUtils.RANDOM.nextInt(ABILITY_POOL.length)]);
 		}

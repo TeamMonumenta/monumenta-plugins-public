@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.bukkit.command.CommandSender;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -22,17 +23,17 @@ import net.kyori.adventure.text.format.TextDecoration;
  */
 public class AbilityInfo {
 	// Ability name as shown in-game
-	public String mDisplayName;
+	public @Nullable String mDisplayName;
 	// Ability name shorthand (for statistic purposes; no use in-game. Should be the fewest characters that identifies this)
-	public String mShorthandName;
+	public @Nullable String mShorthandName;
 	// List of descriptions to aid ability selection
 	public List<String> mDescriptions = new ArrayList<>();
 
 	// If the ability does not require a scoreboardID and just a classId, leave this as null.
-	public String mScoreboardId = null;
+	public @Nullable String mScoreboardId = null;
 
-	public ClassAbility mLinkedSpell = null;
-	public AbilityTrigger mTrigger = null;
+	public @Nullable ClassAbility mLinkedSpell = null;
+	public @Nullable AbilityTrigger mTrigger = null;
 
 	//This is in ticks
 	public int mCooldown = 0;
@@ -82,7 +83,7 @@ public class AbilityInfo {
 	/*
 	 * Returns null if a hover message could not be created
 	 */
-	public Component getLevelHover(int skillLevel, boolean useShorthand) {
+	public @Nullable Component getLevelHover(int skillLevel, boolean useShorthand) {
 		String hoverableString;
 		if (useShorthand) {
 			if (mShorthandName == null) {

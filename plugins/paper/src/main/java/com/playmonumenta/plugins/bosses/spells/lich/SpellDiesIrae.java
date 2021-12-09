@@ -12,7 +12,6 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.World;
-import org.bukkit.attribute.Attribute;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarFlag;
 import org.bukkit.boss.BarStyle;
@@ -23,6 +22,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.bosses.bosses.Lich;
 import com.playmonumenta.plugins.bosses.spells.Spell;
@@ -48,15 +48,15 @@ public class SpellDiesIrae extends Spell {
 	private String mCrystalNBT;
 	private static boolean mActive = false;
 	private static double mCrystalDmg;
-	private PartialParticle mCloud;
-	private PartialParticle mExpH;
-	private PartialParticle mSoul;
-	private PartialParticle mBreath1;
-	private PartialParticle mBreath2;
-	private PartialParticle mBreath3;
-	private PartialParticle mExpL1;
-	private PartialParticle mExpL2;
-	private PartialParticle mHeart;
+	private final PartialParticle mCloud;
+	private final PartialParticle mExpH;
+	private final PartialParticle mSoul;
+	private final PartialParticle mBreath1;
+	private final PartialParticle mBreath2;
+	private @Nullable PartialParticle mBreath3;
+	private final PartialParticle mExpL1;
+	private @Nullable PartialParticle mExpL2;
+	private final PartialParticle mHeart;
 
 	public SpellDiesIrae(Plugin plugin, LivingEntity boss, LivingEntity key, Location loc, double range, int ceil, List<Location> crystalLoc, String crystalnbt) {
 		mPlugin = plugin;
@@ -200,10 +200,10 @@ public class SpellDiesIrae extends Spell {
 		mExpL2 = new PartialParticle(Particle.EXPLOSION_LARGE, mBoss.getLocation(), mCrystal.size() * 125 + 1000, 42, 0.75, 42, 0);
 
 		//healing and final damage calc
-		double heal = mBoss.getHealth() + mBoss.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue() * mCrystal.size() * 0.025;
-		double healthFinal = Math.min(heal, mBoss.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue());
-		double keyheal = mKey.getHealth() + mKey.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue() * mCrystal.size() * 0.05;
-		double keyHealthFinal = Math.min(keyheal, mKey.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue());
+		double heal = mBoss.getHealth() + EntityUtils.getMaxHealth(mBoss) * mCrystal.size() * 0.025;
+		double healthFinal = Math.min(heal, EntityUtils.getMaxHealth(mBoss));
+		double keyheal = mKey.getHealth() + EntityUtils.getMaxHealth(mKey) * mCrystal.size() * 0.05;
+		double keyHealthFinal = Math.min(keyheal, EntityUtils.getMaxHealth(mKey));
 
 		world.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_SPAWN, 10.0f, 0.5f);
 		//kill ghast shield

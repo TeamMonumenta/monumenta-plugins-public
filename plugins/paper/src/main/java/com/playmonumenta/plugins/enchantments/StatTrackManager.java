@@ -11,6 +11,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
@@ -29,7 +30,7 @@ public class StatTrackManager {
 
 	public static final int PATRON_TIER = Constants.PATREON_TIER_2;
 
-	private static StatTrackManager mInstance;
+	private static @Nullable StatTrackManager mInstance;
 
 	//A table that stores the amount to update each item's stat
 	//The first key is the item name and the second key is the player uuid
@@ -120,11 +121,13 @@ public class StatTrackManager {
 		//Replace the old line of lore with the new one
 		List<String> lore = item.getLore();
 		List<String> newLore = new ArrayList<>();
-		for (String line : lore) {
-			if (line.contains(enchant.getEnchantName())) {
-				line = ChatColor.RED + enchant.getEnchantName() + ": " + stat;
+		if (lore != null) {
+			for (String line : lore) {
+				if (line.contains(enchant.getEnchantName())) {
+					line = ChatColor.RED + enchant.getEnchantName() + ": " + stat;
+				}
+				newLore.add(line);
 			}
-			newLore.add(line);
 		}
 		item.setLore(newLore);
 		ItemUtils.setPlainLore(item);
@@ -142,11 +145,14 @@ public class StatTrackManager {
 	public static int parseValue(ItemStack item, StatTrackOptions enchant) {
 		List<String> lore = item.getLore();
 		int stat = 0;
-		for (String line : lore) {
-			if (line.contains(enchant.getEnchantName())) {
-				Matcher matcher = Pattern.compile("\\d+").matcher(line);
-				matcher.find();
-				stat = Integer.valueOf(matcher.group());
+		if (lore != null) {
+			for (String line : lore) {
+				if (line.contains(enchant.getEnchantName())) {
+					Matcher matcher = Pattern.compile("\\d+").matcher(line);
+					if (matcher.find()) {
+						stat = Integer.parseInt(matcher.group());
+					}
+				}
 			}
 		}
 		return stat;
@@ -176,16 +182,18 @@ public class StatTrackManager {
 
 	/**
 	 * Gets the active stat tracked enchant on the given item
+	 *
 	 * @param item item to check for
 	 * @return the stat track enchant on the given item, or null if none found
 	 */
-	public static StatTrackOptions getTrackingType(ItemStack item) {
+	public static @Nullable StatTrackOptions getTrackingType(ItemStack item) {
 		List<String> lore = item.getLore();
-
-		for (String line : lore) {
-			for (StatTrackOptions stat : StatTrackOptions.values()) {
-				if (line.contains(stat.getEnchantName())) {
-					return stat;
+		if (lore != null) {
+			for (String line : lore) {
+				for (StatTrackOptions stat : StatTrackOptions.values()) {
+					if (line.contains(stat.getEnchantName())) {
+						return stat;
+					}
 				}
 			}
 		}
@@ -203,24 +211,25 @@ public class StatTrackManager {
 			return false;
 		}
 		List<String> lore = item.getLore();
-
-		for (String line : lore) {
-			if (line.contains("Tracked by") && line.contains(player.getName())) {
-				return true;
+		if (lore != null) {
+			for (String line : lore) {
+				if (line.contains("Tracked by") && line.contains(player.getName())) {
+					return true;
+				}
 			}
-
 		}
 		return false;
 	}
 
 	/**
 	 * This method parses the player inventory to get the most current version of the item to update
+	 *
 	 * @param player player to update
-	 * @param name name of the item to get back
-	 * @param stat stat to make sure is on the item
+	 * @param name   name of the item to get back
+	 * @param stat   stat to make sure is on the item
 	 * @return the item to update
 	 */
-	public static ItemStack getStatTrackItemFromInventory(Player player, String name, StatTrackOptions stat) {
+	public static @Nullable ItemStack getStatTrackItemFromInventory(Player player, String name, StatTrackOptions stat) {
 		Inventory i = player.getInventory();
 		for (ItemStack item : i.getContents()) {
 			if (item == null || !item.hasItemMeta() || !item.getItemMeta().hasDisplayName()) {

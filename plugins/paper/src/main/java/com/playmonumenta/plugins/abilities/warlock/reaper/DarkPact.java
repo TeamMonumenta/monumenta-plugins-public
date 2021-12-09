@@ -15,6 +15,7 @@ import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.inventory.ItemStack;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
@@ -53,7 +54,7 @@ public class DarkPact extends Ability {
 	private final double mPercentDamageDealt;
 	private final double mPercentAtks;
 	private int mTicks = 0;
-	private JudgementChain mJudgementChain;
+	private @Nullable JudgementChain mJudgementChain;
 
 	public DarkPact(Plugin plugin, Player player) {
 		super(plugin, player, "Dark Pact");

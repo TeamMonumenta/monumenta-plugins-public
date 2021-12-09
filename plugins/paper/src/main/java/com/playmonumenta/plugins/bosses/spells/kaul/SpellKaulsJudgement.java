@@ -26,6 +26,7 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.bosses.ChargeUpManager;
@@ -65,7 +66,7 @@ public class SpellKaulsJudgement extends Spell implements Listener {
 	private final List<Player> mJudgedPlayers = new ArrayList<Player>();
 	private final HashMap<Player, Location> mOrigPlayerLocs = new HashMap<Player, Location>();
 
-	private ChargeUpManager mChargeUp;
+	private final ChargeUpManager mChargeUp;
 
 	private SpellKaulsJudgement(Location bossLoc) {
 		mBossLoc = bossLoc;
@@ -86,7 +87,7 @@ public class SpellKaulsJudgement extends Spell implements Listener {
 	 * If a boss is specified, overwrites the current boss entity
 	 * If no boss is specified (null), does not create an instance
 	 */
-	public static SpellKaulsJudgement getInstance(Location bossLoc) {
+	public static @Nullable SpellKaulsJudgement getInstance(Location bossLoc) {
 		if (INSTANCE == null) {
 			if (bossLoc == null) {
 				return null;

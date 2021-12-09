@@ -11,6 +11,7 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.portals.Portal;
 import com.playmonumenta.plugins.portals.PortalManager;
@@ -18,10 +19,10 @@ import com.playmonumenta.plugins.portals.PortalManager;
 public class PortalBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_portal";
 
-	PortalEntityCheck mRunnable;
-	Location mPastPosition1;
-	Location mPastPosition2;
-	int mCooldown = 0;
+	private @Nullable PortalEntityCheck mRunnable;
+	private @Nullable Location mPastPosition1;
+	private @Nullable Location mPastPosition2;
+	private int mCooldown = 0;
 
 	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
 		return new PortalBoss(plugin, boss);

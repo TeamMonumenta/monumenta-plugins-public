@@ -52,16 +52,17 @@ public class IceBarrier extends DepthsAbility {
 	@Override
 	public void cast(Action action) {
 
-		if (mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.mLinkedSpell)) {
+		if (mPlayer == null || mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.mLinkedSpell)) {
 			return;
 		}
 
 		World world = mPlayer.getWorld();
 		Block block = mPlayer.getTargetBlock(CAST_RANGE);
-		boolean validLength = true;
-		if (mPrimedLoc != null && (mPrimedLoc.distance(block.getLocation()) > MAX_LENGTH[mRarity - 1] || mPrimedLoc.distance(block.getLocation()) < 1)) {
-			validLength = false;
+		if (block == null) {
+			return;
 		}
+
+		boolean validLength = mPrimedLoc == null || (!(mPrimedLoc.distance(block.getLocation()) > MAX_LENGTH[mRarity - 1]) && !(mPrimedLoc.distance(block.getLocation()) < 1));
 
 		if (block.getType() != Material.AIR && block.getType() != Material.BEDROCK && validLength) {
 			DepthsUtils.spawnIceTerrain(block.getLocation(), CAST_TIME, mPlayer);
@@ -76,7 +77,7 @@ public class IceBarrier extends DepthsAbility {
 
 					@Override
 					public void run() {
-						if (mIsPrimed && mPrimedLoc != null) {
+						if (mPlayer != null && mIsPrimed && mPrimedLoc != null) {
 							mIsPrimed = false;
 							mPrimedLoc = null;
 							world.playSound(mPlayer.getLocation(), Sound.BLOCK_BELL_USE, 2.0f, 0.5f);
@@ -116,7 +117,7 @@ public class IceBarrier extends DepthsAbility {
 
 	@Override
 	public boolean runCheck() {
-		return mPlayer.isSneaking() && DepthsUtils.isWeaponItem(mPlayer.getInventory().getItemInMainHand());
+		return mPlayer != null && mPlayer.isSneaking() && DepthsUtils.isWeaponItem(mPlayer.getInventory().getItemInMainHand());
 	}
 
 	@Override

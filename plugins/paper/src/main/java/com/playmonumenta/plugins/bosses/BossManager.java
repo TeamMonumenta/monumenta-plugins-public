@@ -9,8 +9,6 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.logging.Level;
 
-import javax.annotation.Nonnull;
-
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -52,6 +50,7 @@ import org.bukkit.event.world.ChunkUnloadEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.projectiles.ProjectileSource;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.destroystokyo.paper.event.entity.EntityPathfindEvent;
 import com.playmonumenta.plugins.Plugin;
@@ -699,12 +698,12 @@ public class BossManager implements Listener {
 	}
 
 	@SuppressWarnings("unchecked")
-	public <T extends BossAbilityGroup> T getBoss(Entity entity, Class<T> cls) {
+	public <T extends @Nullable BossAbilityGroup> @Nullable T getBoss(Entity entity, Class<T> cls) {
 		Boss boss = mBosses.get(entity.getUniqueId());
 		if (boss != null) {
 			for (BossAbilityGroup ability : boss.getAbilities()) {
 				if (cls.isInstance(ability)) {
-					return (T)ability;
+					return (T) ability;
 				}
 			}
 		}
@@ -921,7 +920,7 @@ public class BossManager implements Listener {
 	 * Every way to unload a boss needs to bounce through this function to ensure
 	 * state is updated correctly!
 	 */
-	private void unload(@Nonnull Boss boss, boolean shuttingDown) {
+	private void unload(Boss boss, boolean shuttingDown) {
 		if (!shuttingDown) {
 			checkDisablePerformanceEvents(boss);
 		}
@@ -942,7 +941,7 @@ public class BossManager implements Listener {
 		mBosses.clear();
 	}
 
-	public void createBoss(CommandSender sender, LivingEntity targetEntity, String requestedTag) throws Exception {
+	public void createBoss(@Nullable CommandSender sender, LivingEntity targetEntity, String requestedTag) throws Exception {
 		StatelessBossConstructor stateless = mStatelessBosses.get(requestedTag);
 		if (stateless != null) {
 			createBossInternal(targetEntity, stateless.construct(mPlugin, targetEntity));
@@ -992,13 +991,12 @@ public class BossManager implements Listener {
 	public String[] listBosses() {
 		Set<String> allBossTags = new HashSet<String>(mStatelessBosses.keySet());
 		allBossTags.addAll(mStatefulBosses.keySet());
-		return allBossTags.toArray(new String[mStatelessBosses.size()]);
+		return allBossTags.toArray(String[]::new);
 	}
 
 	/* Machine readable list */
 	public String[] listStatelessBosses() {
-		Set<String> allBossTags = new HashSet<String>(mStatelessBosses.keySet());
-		return allBossTags.toArray(new String[mStatelessBosses.size()]);
+		return mStatelessBosses.keySet().toArray(String[]::new);
 	}
 
 	/********************************************************************************

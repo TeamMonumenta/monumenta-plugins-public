@@ -14,11 +14,12 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.projectiles.ProjectileSource;
 
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.bosses.spells.SpellRunAction;
 
-public class KamikazeBoss extends BossAbilityGroup {
+public final class KamikazeBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_kamikaze";
 	public static final int detectionRange = 30;
 
@@ -29,8 +30,8 @@ public class KamikazeBoss extends BossAbilityGroup {
 	public KamikazeBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
 		List<Spell> passiveSpells = Arrays.asList(
-				new SpellRunAction(() -> boss.getLocation().getWorld().spawnParticle(Particle.SMOKE_NORMAL, boss.getLocation().clone().add(new Location(boss.getWorld(), 0, 1, 0)), 2, 0.5, 1, 0.5, 0))
-			);
+			new SpellRunAction(() -> boss.getLocation().getWorld().spawnParticle(Particle.SMOKE_NORMAL, boss.getLocation().clone().add(new Location(boss.getWorld(), 0, 1, 0)), 2, 0.5, 1, 0.5, 0))
+		);
 		super.constructBoss(null, passiveSpells, detectionRange, null);
 	}
 
@@ -51,8 +52,9 @@ public class KamikazeBoss extends BossAbilityGroup {
 	@Override
 	public void bossProjectileHit(ProjectileHitEvent event) {
 		if (event.getHitEntity() instanceof Player) {
-			if (event.getEntity().getShooter() instanceof Damageable) {
-				Damageable entity = (Damageable) event.getEntity().getShooter();
+			ProjectileSource shooter = event.getEntity().getShooter();
+			if (shooter instanceof Damageable) {
+				Damageable entity = (Damageable) shooter;
 				entity.setHealth(0);
 				World world = event.getEntity().getWorld();
 				world.playSound(entity.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 0.5f, 0.7f);

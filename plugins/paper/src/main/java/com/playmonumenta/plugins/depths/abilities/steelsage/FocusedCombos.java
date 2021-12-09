@@ -36,7 +36,7 @@ public class FocusedCombos extends DepthsAbility {
 
 	@Override
 	public boolean livingEntityShotByPlayerEvent(Projectile proj, LivingEntity le, EntityDamageByEntityEvent event) {
-		if (proj instanceof AbstractArrow && ((AbstractArrow) proj).isCritical() && !proj.hasMetadata(RapidFire.META_DATA_TAG)) {
+		if (mPlayer != null && proj instanceof AbstractArrow && ((AbstractArrow) proj).isCritical() && !proj.hasMetadata(RapidFire.META_DATA_TAG)) {
 			mComboCount++;
 
 			if (mComboCount >= 3) {

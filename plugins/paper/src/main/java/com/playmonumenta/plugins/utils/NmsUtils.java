@@ -2,15 +2,13 @@ package com.playmonumenta.plugins.utils;
 
 import java.lang.reflect.Field;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-
 import org.bukkit.craftbukkit.v1_16_R3.entity.CraftEntity;
 import org.bukkit.craftbukkit.v1_16_R3.entity.CraftHumanEntity;
 import org.bukkit.craftbukkit.v1_16_R3.entity.CraftLivingEntity;
 import org.bukkit.craftbukkit.v1_16_R3.entity.CraftPlayer;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import net.minecraft.server.v1_16_R3.ChatMessage;
 import net.minecraft.server.v1_16_R3.DamageSource;
@@ -50,21 +48,22 @@ public class NmsUtils {
 		}
 	}
 
-	public static void customDamageEntity(@Nonnull LivingEntity entity, double amount, @Nonnull Player damager) {
+	public static void customDamageEntity(LivingEntity entity, double amount, Player damager) {
 		customDamageEntity(entity, amount, damager, null);
 	}
 
-	public static void customDamageEntity(@Nonnull LivingEntity entity, double amount, @Nonnull Player damager, @Nullable String killedUsingMsg) {
+	public static void customDamageEntity(LivingEntity entity, double amount, Player damager, @Nullable String killedUsingMsg) {
 		DamageSource reason = new CustomDamageSource(((CraftHumanEntity) damager).getHandle(), killedUsingMsg);
 
-		((CraftLivingEntity)entity).getHandle().damageEntity(reason, (float) amount);
+		((CraftLivingEntity) entity).getHandle().damageEntity(reason, (float) amount);
 	}
 
 	private static class UnblockableEntityDamageSource extends EntityDamageSource {
-		String mKilledUsingMsg;
+		private final @Nullable String mKilledUsingMsg;
 
 		public UnblockableEntityDamageSource(Entity entity) {
 			super("custom", entity);
+			mKilledUsingMsg = null;
 		}
 
 		public UnblockableEntityDamageSource(Entity damager, @Nullable String killedUsingMsg) {
@@ -73,36 +72,37 @@ public class NmsUtils {
 		}
 
 		@Override
-		public Vec3D w() {
+		public @Nullable Vec3D w() {
 			return null;
 		}
 
 		@Override
 		public IChatBaseComponent getLocalizedDeathMessage(EntityLiving entityliving) {
+			assert this.w != null : "@AssumeAssertion(nullness): always set in constructors of this subclass";
 			if (mKilledUsingMsg == null) {
 				String s = "death.attack.mob";
-				return new ChatMessage(s, new Object[] { entityliving.getScoreboardDisplayName(), this.w.getScoreboardDisplayName()});
+				return new ChatMessage(s, entityliving.getScoreboardDisplayName(), this.w.getScoreboardDisplayName());
 			} else {
 				// death.attack.indirectMagic.item=%1$s was killed by %2$s using %3$s
 				String s = "death.attack.indirectMagic.item";
-				return new ChatMessage(s, new Object[] { entityliving.getScoreboardDisplayName(), this.w.getScoreboardDisplayName(), mKilledUsingMsg});
+				return new ChatMessage(s, entityliving.getScoreboardDisplayName(), this.w.getScoreboardDisplayName(), mKilledUsingMsg);
 			}
 		}
 
 	}
 
-	public static void unblockableEntityDamageEntity(@Nonnull LivingEntity damagee, double amount, @Nonnull LivingEntity damager) {
+	public static void unblockableEntityDamageEntity(LivingEntity damagee, double amount, LivingEntity damager) {
 		unblockableEntityDamageEntity(damagee, amount, damager, null);
 	}
 
-	public static void unblockableEntityDamageEntity(@Nonnull LivingEntity damagee, double amount, @Nonnull LivingEntity damager, String cause) {
+	public static void unblockableEntityDamageEntity(LivingEntity damagee, double amount, LivingEntity damager, String cause) {
 		// Don't damage invulnerable entities even though this is unblockable
 		if (damagee.isInvulnerable()) {
 			return;
 		}
 
 		DamageSource reason = new UnblockableEntityDamageSource(damager == null ? null : ((CraftLivingEntity) damager).getHandle(), cause);
-		((CraftLivingEntity)damagee).getHandle().damageEntity(reason, (float) amount);
+		((CraftLivingEntity) damagee).getHandle().damageEntity(reason, (float) amount);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -134,6 +134,7 @@ public class NmsUtils {
 		}
 	}
 
+	@SuppressWarnings("unboxing.of.nullable")
 	public static int getAttackCooldown(LivingEntity entity) {
 		try {
 			return (int) attackCooldownField.get(((CraftLivingEntity) entity).getHandle());

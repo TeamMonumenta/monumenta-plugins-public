@@ -12,6 +12,7 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryInteractEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.guis.singlepageguis.ExampleSinglePageGUI;
 import com.playmonumenta.scriptedquests.utils.MessagingUtils;
@@ -51,7 +52,7 @@ public class SinglePageGUIManager implements Listener {
 		}
 	}
 
-	private SinglePageGUI getGUI(InventoryInteractEvent event) {
+	private @Nullable SinglePageGUI getGUI(InventoryInteractEvent event) {
 		HumanEntity entity = event.getWhoClicked();
 		if (entity instanceof Player) {
 			Player player = (Player) entity;

@@ -9,6 +9,7 @@ import java.util.UUID;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.Plugin;
 
@@ -33,7 +34,7 @@ public class AttributeManager {
 		}
 
 		private class Node {
-			public Map<UUID, AttributeInfo> mAttributeInfoMappings;
+			public @Nullable Map<UUID, AttributeInfo> mAttributeInfoMappings;
 			public Node[] mChildren = new Node[ALPHABET_SIZE];
 		}
 
@@ -157,7 +158,7 @@ public class AttributeManager {
 		}
 
 		// Returns the end node, null if key not in the trie
-		private Node get(String key) {
+		private @Nullable Node get(String key) {
 			Node current = mRoot;
 
 			for (int i = 0; i < key.length(); i++) {

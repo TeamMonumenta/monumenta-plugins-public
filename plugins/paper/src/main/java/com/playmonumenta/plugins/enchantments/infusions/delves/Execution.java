@@ -19,7 +19,7 @@ import org.bukkit.Particle;
 import org.bukkit.World;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.event.entity.EntityDeathEvent;
-import org.jetbrains.annotations.NotNull;
+
 
 public class Execution implements BaseEnchantment {
 
@@ -35,7 +35,7 @@ public class Execution implements BaseEnchantment {
 	);
 
 	@Override
-	public @NotNull String getProperty() {
+	public String getProperty() {
 		return PROPERTY_NAME;
 	}
 
@@ -45,11 +45,11 @@ public class Execution implements BaseEnchantment {
 	}
 
 	@Override
-	public void onKill(@NotNull Plugin plugin, @NotNull Player player, int level, @NotNull Entity enemy, EntityDeathEvent entityDeathEvent) {
+	public void onKill(Plugin plugin, Player player, int level, Entity enemy, EntityDeathEvent entityDeathEvent) {
 		BlockData fallingDustData = Material.ANVIL.createBlockData();
 		World world = player.getWorld();
 		world.spawnParticle(Particle.FALLING_DUST, enemy.getLocation().add(0, enemy.getHeight() / 2, 0), 3,
-				(enemy.getWidth() / 2) + 0.1, enemy.getHeight() / 3, (enemy.getWidth() / 2) + 0.1, fallingDustData);
+		                    (enemy.getWidth() / 2) + 0.1, enemy.getHeight() / 3, (enemy.getWidth() / 2) + 0.1, fallingDustData);
 		NavigableSet<Effect> damageEffects = plugin.mEffectManager.getEffects(player, PERCENT_DAMAGE_EFFECT_NAME);
 		if (damageEffects != null) {
 			for (Effect effect : damageEffects) {

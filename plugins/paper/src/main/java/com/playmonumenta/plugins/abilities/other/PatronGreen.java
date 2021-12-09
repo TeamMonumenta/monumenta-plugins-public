@@ -5,13 +5,13 @@ import com.playmonumenta.plugins.Plugin;
 
 import org.bukkit.Particle;
 import org.bukkit.entity.Player;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 
 
 public class PatronGreen extends PatronParticles {
-	public PatronGreen(@NotNull Plugin plugin, @Nullable Player player) {
+	public PatronGreen(Plugin plugin, @Nullable Player player) {
 		super(
 			plugin,
 			player,

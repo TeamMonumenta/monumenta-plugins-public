@@ -16,6 +16,7 @@ import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
@@ -50,7 +51,7 @@ public class LuminousInfusion extends Ability {
 
 	private boolean mActive = false;
 
-	private Crusade mCrusade;
+	private @Nullable Crusade mCrusade;
 
 	public LuminousInfusion(Plugin plugin, Player player) {
 		super(plugin, player, "Luminous Infusion");
@@ -69,7 +70,7 @@ public class LuminousInfusion extends Ability {
 
 		if (player != null) {
 			Bukkit.getScheduler().runTask(plugin, () -> {
-				mCrusade = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(mPlayer, Crusade.class);
+				mCrusade = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, Crusade.class);
 			});
 		}
 	}

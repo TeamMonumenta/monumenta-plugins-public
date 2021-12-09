@@ -12,6 +12,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
+
 import com.goncalomb.bukkit.mylib.reflect.NBTTagList;
 import com.goncalomb.bukkit.nbteditor.bos.BookOfSouls;
 import com.goncalomb.bukkit.nbteditor.nbt.variables.ListVariable;
@@ -24,9 +27,6 @@ import com.playmonumenta.plugins.bosses.parameters.BossParam;
 import com.playmonumenta.plugins.bosses.parameters.ParseResult;
 import com.playmonumenta.plugins.bosses.parameters.StringReader;
 import com.playmonumenta.plugins.utils.BossUtils;
-
-import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 
 import dev.jorel.commandapi.CommandAPI;
 import dev.jorel.commandapi.CommandAPICommand;
@@ -81,7 +81,7 @@ public class BossTagCommand {
 					infoBossTag(player, (String) args[1]);
 				} catch (Exception e) {
 					CommandAPI.fail(e.getMessage());
-					}
+				}
 			})
 			.register();
 
@@ -89,20 +89,20 @@ public class BossTagCommand {
 		arguments.add(new MultiLiteralArgument("show"));
 
 		new CommandAPICommand(COMMAND)
-		.withPermission("monumenta.bosstag.show")
-		.withArguments(arguments)
-		.executesPlayer((player, args) -> {
-			showBossTag(player);
+			.withPermission("monumenta.bosstag.show")
+			.withArguments(arguments)
+			.executesPlayer((player, args) -> {
+				showBossTag(player);
 			})
 			.register();
 
 		arguments.add(new GreedyStringArgument("boss_tag").replaceWithSafeSuggestionsT(BossTagCommand::suggestionBossTagBasedonBoS));
 
 		new CommandAPICommand(COMMAND)
-		.withPermission("monumenta.bosstag.show")
-		.withArguments(arguments)
-		.executesPlayer((player, args) -> {
-			showBossTag(player, (String) args[1]);
+			.withPermission("monumenta.bosstag.show")
+			.withArguments(arguments)
+			.executesPlayer((player, args) -> {
+				showBossTag(player, (String) args[1]);
 			})
 			.register();
 
@@ -111,10 +111,10 @@ public class BossTagCommand {
 		arguments.add(new GreedyStringArgument("boss_tag").replaceWithSafeSuggestionsT(BossTagCommand::suggestionsBossTag));
 
 		new CommandAPICommand(COMMAND)
-		.withPermission("monumenta.bosstag.search")
-		.withArguments(arguments)
-		.executesPlayer((player, args) -> {
-			searchTag(player, (String) args[1]);
+			.withPermission("monumenta.bosstag.search")
+			.withArguments(arguments)
+			.executesPlayer((player, args) -> {
+				searchTag(player, (String) args[1]);
 			})
 			.register();
 
@@ -123,10 +123,10 @@ public class BossTagCommand {
 		arguments.add(new GreedyStringArgument("boss_tag").replaceWithSafeSuggestions(t -> SEARCH_OUTCOME_MAP.keySet().toArray(new String[0])));
 
 		new CommandAPICommand(COMMAND)
-		.withPermission("monumenta.bosstag.search")
-		.withArguments(arguments)
-		.executesPlayer((player, args) -> {
-			getBosSearched(player, (String) args[1]);
+			.withPermission("monumenta.bosstag.search")
+			.withArguments(arguments)
+			.executesPlayer((player, args) -> {
+				getBosSearched(player, (String) args[1]);
 			})
 			.register();
 
@@ -134,20 +134,20 @@ public class BossTagCommand {
 		arguments.add(new MultiLiteralArgument("remove"));
 		arguments.add(new GreedyStringArgument("boss_tag").replaceWithSafeSuggestionsT(BossTagCommand::suggestionBossTagBasedonBoSAndParams));
 		new CommandAPICommand(COMMAND)
-		.withPermission("monumenta.bosstag.remove")
-		.withArguments(arguments)
-		.executesPlayer((player, args) -> {
-			removeBossTag(player, (String) args[1]);
+			.withPermission("monumenta.bosstag.remove")
+			.withArguments(arguments)
+			.executesPlayer((player, args) -> {
+				removeBossTag(player, (String) args[1]);
 			})
 			.register();
 
 		arguments.clear();
 		arguments.add(new MultiLiteralArgument("squash"));
 		new CommandAPICommand(COMMAND)
-		.withPermission("monumenta.bosstag.squash")
-		.withArguments(arguments)
-		.executesPlayer((player, args) -> {
-			squashBossTags(player);
+			.withPermission("monumenta.bosstag.squash")
+			.withArguments(arguments)
+			.executesPlayer((player, args) -> {
+				squashBossTags(player);
 			})
 			.register();
 
@@ -155,10 +155,10 @@ public class BossTagCommand {
 		arguments.clear();
 		arguments.add(new MultiLiteralArgument("help"));
 		new CommandAPICommand(COMMAND)
-		.withPermission("monumenta.bosstag.help")
-		.withArguments(arguments)
-		.executesPlayer((player, args) -> {
-			helpBossTags(player);
+			.withPermission("monumenta.bosstag.help")
+			.withArguments(arguments)
+			.executesPlayer((player, args) -> {
+				helpBossTags(player);
 			})
 			.register();
 	}
@@ -200,7 +200,7 @@ public class BossTagCommand {
 				entries.add(Tooltip.of(bossTag, description));
 			}
 			return entries.toArray(Tooltip.arrayOf());
-		} else if (bossTags.length == 0) {
+		} else {
 			StringReader reader = new StringReader(info.currentArg());
 			String currentBossTag = reader.readUntil("[");
 			if (currentBossTag == null) {
@@ -220,7 +220,7 @@ public class BossTagCommand {
 				return result.getTooltip();
 			}
 		}
-		return null;
+		return Tooltip.arrayOf();
 	}
 
 	public static class TypeAndDesc {
@@ -289,16 +289,16 @@ public class BossTagCommand {
 			//checking if the bosstag is implemented or not
 			if (!found) {
 				player.sendMessage(Component.empty()
-								.append(Component.text("[bosstag] ", NamedTextColor.GOLD).decoration(TextDecoration.BOLD, true))
-								.append(Component.text(bossTag, NamedTextColor.WHITE).decoration(TextDecoration.BOLD, false))
-								.append(Component.text(" is missing! \n", NamedTextColor.GRAY))
-								.append(Component.text("Going to implement. Wait...", NamedTextColor.GRAY)));
+					                   .append(Component.text("[bosstag] ", NamedTextColor.GOLD).decoration(TextDecoration.BOLD, true))
+					                   .append(Component.text(bossTag, NamedTextColor.WHITE).decoration(TextDecoration.BOLD, false))
+					                   .append(Component.text(" is missing! \n", NamedTextColor.GRAY))
+					                   .append(Component.text("Going to implement. Wait...", NamedTextColor.GRAY)));
 				tags.add(bossTag, player);
 				bos.saveBook();
 				player.sendMessage(Component.empty()
-								.append(Component.text("[bosstag] ", NamedTextColor.GOLD).decoration(TextDecoration.BOLD, true))
-								.append(Component.text(bossTag, NamedTextColor.WHITE).decoration(TextDecoration.BOLD, false))
-								.append(Component.text(" correctly implemented! ", NamedTextColor.GRAY)));
+					                   .append(Component.text("[bosstag] ", NamedTextColor.GOLD).decoration(TextDecoration.BOLD, true))
+					                   .append(Component.text(bossTag, NamedTextColor.WHITE).decoration(TextDecoration.BOLD, false))
+					                   .append(Component.text(" correctly implemented! ", NamedTextColor.GRAY)));
 			}
 
 			//checking if a new param overwrites an old one
@@ -316,8 +316,8 @@ public class BossTagCommand {
 		tags.add(newTag, player);
 		bos.saveBook();
 		player.sendMessage(Component.empty()
-								.append(Component.text("[bosstag] ", NamedTextColor.GOLD).decoration(TextDecoration.BOLD, true))
-								.append(Component.text("Tag added! ", NamedTextColor.GRAY).decoration(TextDecoration.BOLD, false)));
+			                   .append(Component.text("[bosstag] ", NamedTextColor.GOLD).decoration(TextDecoration.BOLD, true))
+			                   .append(Component.text("Tag added! ", NamedTextColor.GRAY).decoration(TextDecoration.BOLD, false)));
 	}
 
 	private static BookOfSouls getBos(Player player) throws WrapperCommandSyntaxException {
@@ -330,32 +330,32 @@ public class BossTagCommand {
 			CommandAPI.fail("That Book of Souls is corrupted!");
 		}
 		CommandAPI.fail("You must be holding a Book of Souls!");
-		return null;
+		throw new RuntimeException();
 	}
 
 	private static void infoBossTag(Player player, String bossTag) throws IllegalArgumentException, IllegalAccessException {
 
 		player.sendMessage(Component.empty()
-								.append(Component.text("[bosstag] ", NamedTextColor.GOLD).decoration(TextDecoration.BOLD, true))
-								.append(Component.text("Help ", NamedTextColor.GRAY).decoration(TextDecoration.BOLD, false))
-								.append(Component.text(bossTag, NamedTextColor.WHITE)));
+			                   .append(Component.text("[bosstag] ", NamedTextColor.GOLD).decoration(TextDecoration.BOLD, true))
+			                   .append(Component.text("Help ", NamedTextColor.GRAY).decoration(TextDecoration.BOLD, false))
+			                   .append(Component.text(bossTag, NamedTextColor.WHITE)));
 
 
 		BossParameters parameters = BossManager.mBossParameters.get(bossTag);
 		BossParam description = (parameters != null ? parameters.getClass().getAnnotation(BossParam.class) : null);
 
 		player.sendMessage(Component.empty()
-				.append(Component.text("Description: ", NamedTextColor.GOLD))
-				.append(Component.text((description != null ? description.help() : "not written"), NamedTextColor.GRAY))
-				);
+			                   .append(Component.text("Description: ", NamedTextColor.GOLD))
+			                   .append(Component.text((description != null ? description.help() : "not written"), NamedTextColor.GRAY))
+		);
 
 		player.sendMessage(Component.empty()
-						.append(Component.text("Parameters", NamedTextColor.GOLD).decoration(TextDecoration.BOLD, true))
-						.append(parameters == null ? Component.text(" NOT implemented.", NamedTextColor.GRAY).decoration(TextDecoration.BOLD, false) : Component.empty()));
+			                   .append(Component.text("Parameters", NamedTextColor.GOLD).decoration(TextDecoration.BOLD, true))
+			                   .append(parameters == null ? Component.text(" NOT implemented.", NamedTextColor.GRAY).decoration(TextDecoration.BOLD, false) : Component.empty()));
 
 		if (parameters != null) {
 			player.sendMessage(Component.empty()
-						.append(Component.text("Name" + (" ".repeat(26)) + "default value", NamedTextColor.GOLD).decoration(TextDecoration.BOLD, true)));
+				                   .append(Component.text("Name" + (" ".repeat(26)) + "default value", NamedTextColor.GOLD).decoration(TextDecoration.BOLD, true)));
 
 			for (Field field : parameters.getClass().getFields()) {
 				String fieldName = BossUtils.translateFieldNameToTag(field.getName());
@@ -363,13 +363,13 @@ public class BossTagCommand {
 				int spaces = 30 - fieldName.length();
 
 				player.sendMessage(Component.empty()
-						.append(Component.text("- " + fieldName + (" ".repeat(spaces)), NamedTextColor.GOLD).decoration(TextDecoration.BOLD, true)
-							.hoverEvent(Component.empty()
-								.append(Component.text("Parameter: ", TextColor.fromHexString("#ffd700")).decoration(TextDecoration.BOLD, true)
-									.append(Component.text(fieldName + "\n", TextColor.fromHexString("#808080")).decoration(TextDecoration.BOLD, false)))
-								.append(Component.text("Desciption: ", TextColor.fromHexString("#ffd700")).decoration(TextDecoration.BOLD, true)
-									.append(Component.text(annotations != null ? annotations.help() + "\n" : "\n", TextColor.fromHexString("#808080")).decoration(TextDecoration.BOLD, false)))))
-						.append(Component.text(field.get(parameters).toString())));
+					                   .append(Component.text("- " + fieldName + (" ".repeat(spaces)), NamedTextColor.GOLD).decoration(TextDecoration.BOLD, true)
+						                           .hoverEvent(Component.empty()
+							                                       .append(Component.text("Parameter: ", TextColor.fromHexString("#ffd700")).decoration(TextDecoration.BOLD, true)
+								                                               .append(Component.text(fieldName + "\n", TextColor.fromHexString("#808080")).decoration(TextDecoration.BOLD, false)))
+							                                       .append(Component.text("Desciption: ", TextColor.fromHexString("#ffd700")).decoration(TextDecoration.BOLD, true)
+								                                               .append(Component.text(annotations != null ? annotations.help() + "\n" : "\n", TextColor.fromHexString("#808080")).decoration(TextDecoration.BOLD, false)))))
+					                   .append(Component.text(field.get(parameters).toString())));
 			}
 		}
 	}
@@ -383,7 +383,7 @@ public class BossTagCommand {
 		if (nbtTagsList != null && nbtTagsList.size() > 0) {
 			for (Object tag : nbtTagsList.getAsArray()) {
 				if (statelessBoss.contains(tag)) {
-					bossTags.add((String)tag);
+					bossTags.add((String) tag);
 				}
 			}
 		}
@@ -401,31 +401,31 @@ public class BossTagCommand {
 				}
 
 				player.sendMessage(Component.empty()
-					.append(Component.text("[bosstag] ", NamedTextColor.GOLD).decoration(TextDecoration.BOLD, true))
-					.append(Component.text(bossTag, NamedTextColor.WHITE).decoration(TextDecoration.BOLD, false))
-					.append(Component.text(" is implemented!", NamedTextColor.GRAY)));
+					                   .append(Component.text("[bosstag] ", NamedTextColor.GOLD).decoration(TextDecoration.BOLD, true))
+					                   .append(Component.text(bossTag, NamedTextColor.WHITE).decoration(TextDecoration.BOLD, false))
+					                   .append(Component.text(" is implemented!", NamedTextColor.GRAY)));
 
 				player.sendMessage(Component.empty()
-					.append(Component.text("Paramaters implemented:", NamedTextColor.GOLD))
-					.append(parameters.isEmpty() ? Component.text(" NOT implemented.", NamedTextColor.GRAY) : Component.empty()));
+					                   .append(Component.text("Paramaters implemented:", NamedTextColor.GOLD))
+					                   .append(parameters.isEmpty() ? Component.text(" NOT implemented.", NamedTextColor.GRAY) : Component.empty()));
 
 				if (!parameters.isEmpty()) {
 					player.sendMessage(Component.empty()
-						.append(Component.text("Name" + (" ".repeat(26)) + "value", NamedTextColor.GOLD).decoration(TextDecoration.BOLD, true)));
+						                   .append(Component.text("Name" + (" ".repeat(26)) + "value", NamedTextColor.GOLD).decoration(TextDecoration.BOLD, true)));
 
 					for (String paramName : parameters.keySet()) {
 						int spaces = 30 - paramName.length();
 						player.sendMessage(Component.empty()
-							.append(Component.text("- " + paramName + (" ".repeat(spaces)), NamedTextColor.GOLD))
-							.append(Component.text(parameters.get(paramName))));
+							                   .append(Component.text("- " + paramName + (" ".repeat(spaces)), NamedTextColor.GOLD))
+							                   .append(Component.text(parameters.get(paramName))));
 					}
 				}
 			}
 
 		} else {
 			player.sendMessage(Component.empty()
-				.append(Component.text("[bosstag] ", NamedTextColor.GOLD).decoration(TextDecoration.BOLD, true))
-				.append(Component.text("Didn't find any bosstag for this entity", NamedTextColor.RED).decoration(TextDecoration.BOLD, false)));
+				                   .append(Component.text("[bosstag] ", NamedTextColor.GOLD).decoration(TextDecoration.BOLD, true))
+				                   .append(Component.text("Didn't find any bosstag for this entity", NamedTextColor.RED).decoration(TextDecoration.BOLD, false)));
 		}
 	}
 
@@ -448,30 +448,30 @@ public class BossTagCommand {
 
 		if (found) {
 			player.sendMessage(Component.empty()
-						.append(Component.text("[bosstag] ", NamedTextColor.GOLD).decoration(TextDecoration.BOLD, true))
-						.append(Component.text(bossTag, NamedTextColor.WHITE).decoration(TextDecoration.BOLD, false))
-						.append(Component.text(" is implemented!", NamedTextColor.GRAY)));
+				                   .append(Component.text("[bosstag] ", NamedTextColor.GOLD).decoration(TextDecoration.BOLD, true))
+				                   .append(Component.text(bossTag, NamedTextColor.WHITE).decoration(TextDecoration.BOLD, false))
+				                   .append(Component.text(" is implemented!", NamedTextColor.GRAY)));
 
 			player.sendMessage(Component.empty()
-				.append(Component.text("Paramaters implemented: ", NamedTextColor.GOLD))
-				.append(parameters.isEmpty() ? Component.text(" NOT implemented.", NamedTextColor.GOLD) : Component.empty()));
+				                   .append(Component.text("Paramaters implemented: ", NamedTextColor.GOLD))
+				                   .append(parameters.isEmpty() ? Component.text(" NOT implemented.", NamedTextColor.GOLD) : Component.empty()));
 
 			if (!parameters.isEmpty()) {
 				player.sendMessage(Component.empty()
-					.append(Component.text("Name" + (" ".repeat(26)) + "value", NamedTextColor.GOLD).decoration(TextDecoration.BOLD, true)));
+					                   .append(Component.text("Name" + (" ".repeat(26)) + "value", NamedTextColor.GOLD).decoration(TextDecoration.BOLD, true)));
 
 				for (String paramName : parameters.keySet()) {
 					int spaces = 30 - paramName.length();
 					player.sendMessage(Component.empty()
-						.append(Component.text("- " + paramName + (" ".repeat(spaces)), NamedTextColor.GOLD))
-						.append(Component.text(parameters.get(paramName))));
+						                   .append(Component.text("- " + paramName + (" ".repeat(spaces)), NamedTextColor.GOLD))
+						                   .append(Component.text(parameters.get(paramName))));
 				}
 			}
 		} else {
 			player.sendMessage(Component.empty()
-			.append(Component.text("[bosstag] ", NamedTextColor.GOLD).decoration(TextDecoration.BOLD, true))
-			.append(Component.text(bossTag, NamedTextColor.WHITE).decoration(TextDecoration.BOLD, false))
-			.append(Component.text(" is not implemented", NamedTextColor.RED)));
+				                   .append(Component.text("[bosstag] ", NamedTextColor.GOLD).decoration(TextDecoration.BOLD, true))
+				                   .append(Component.text(bossTag, NamedTextColor.WHITE).decoration(TextDecoration.BOLD, false))
+				                   .append(Component.text(" is not implemented", NamedTextColor.RED)));
 		}
 	}
 
@@ -492,14 +492,14 @@ public class BossTagCommand {
 
 		if (indexBracket == -1) {
 			player.sendMessage(Component.empty()
-					.append(Component.text("[BossTag] ", NamedTextColor.GOLD).decoration(TextDecoration.BOLD, true))
-					.append(Component.text("Searching tag that contains " + bossTag, NamedTextColor.GRAY).decoration(TextDecoration.BOLD, false))
-					.append(Component.text(" inside " + soulsName.size() + " record", NamedTextColor.GRAY).decoration(TextDecoration.BOLD, false)));
+				                   .append(Component.text("[BossTag] ", NamedTextColor.GOLD).decoration(TextDecoration.BOLD, true))
+				                   .append(Component.text("Searching tag that contains " + bossTag, NamedTextColor.GRAY).decoration(TextDecoration.BOLD, false))
+				                   .append(Component.text(" inside " + soulsName.size() + " record", NamedTextColor.GRAY).decoration(TextDecoration.BOLD, false)));
 		} else {
 			player.sendMessage(Component.empty()
-					.append(Component.text("[BossTag] ", NamedTextColor.GOLD).decoration(TextDecoration.BOLD, true))
-					.append(Component.text("Searching tag that contains " + realBossTag + " and params", NamedTextColor.GRAY).decoration(TextDecoration.BOLD, false))
-					.append(Component.text(" inside " + soulsName.size() + " record", NamedTextColor.GRAY).decoration(TextDecoration.BOLD, false)));
+				                   .append(Component.text("[BossTag] ", NamedTextColor.GOLD).decoration(TextDecoration.BOLD, true))
+				                   .append(Component.text("Searching tag that contains " + realBossTag + " and params", NamedTextColor.GRAY).decoration(TextDecoration.BOLD, false))
+				                   .append(Component.text(" inside " + soulsName.size() + " record", NamedTextColor.GRAY).decoration(TextDecoration.BOLD, false)));
 		}
 
 		for (String soulName : soulsName) {
@@ -545,17 +545,17 @@ public class BossTagCommand {
 		}
 
 		player.sendMessage(Component.empty()
-				.append(Component.text("[BossTag] ", NamedTextColor.GOLD).decoration(TextDecoration.BOLD, true))
-				.append(Component.text("Total matching souls: " + soulsList.size(), NamedTextColor.GRAY).decoration(TextDecoration.BOLD, false)));
+			                   .append(Component.text("[BossTag] ", NamedTextColor.GOLD).decoration(TextDecoration.BOLD, true))
+			                   .append(Component.text("Total matching souls: " + soulsList.size(), NamedTextColor.GRAY).decoration(TextDecoration.BOLD, false)));
 
 		SEARCH_OUTCOME_MAP.put(bossTag, soulsList);
 
 		if (soulsList.size() > 0) {
 			player.sendMessage(Component.empty()
-					.append(Component.text("[BossTag] ", NamedTextColor.GOLD).decoration(TextDecoration.BOLD, true))
-					.append(Component.text("Run ", NamedTextColor.GRAY).decoration(TextDecoration.BOLD, false))
-					.append(Component.text("/bosstag get " + bossTag, NamedTextColor.WHITE).clickEvent(ClickEvent.suggestCommand("/bosstag get " + bossTag)))
-					.append(Component.text(" to get the first BoS", NamedTextColor.GRAY)));
+				                   .append(Component.text("[BossTag] ", NamedTextColor.GOLD).decoration(TextDecoration.BOLD, true))
+				                   .append(Component.text("Run ", NamedTextColor.GRAY).decoration(TextDecoration.BOLD, false))
+				                   .append(Component.text("/bosstag get " + bossTag, NamedTextColor.WHITE).clickEvent(ClickEvent.suggestCommand("/bosstag get " + bossTag)))
+				                   .append(Component.text(" to get the first BoS", NamedTextColor.GRAY)));
 		}
 
 	}
@@ -578,12 +578,12 @@ public class BossTagCommand {
 		player.getInventory().addItem(bos.getBoS());
 
 		player.sendMessage(Component.empty()
-				.append(Component.text("[BossTag] ", NamedTextColor.GOLD).decoration(TextDecoration.BOLD, true))
-				.append(Component.text("Book Of Soul of " + bos.getLabel(), NamedTextColor.GRAY).decoration(TextDecoration.BOLD, false)));
+			                   .append(Component.text("[BossTag] ", NamedTextColor.GOLD).decoration(TextDecoration.BOLD, true))
+			                   .append(Component.text("Book Of Soul of " + bos.getLabel(), NamedTextColor.GRAY).decoration(TextDecoration.BOLD, false)));
 
 		player.sendMessage(Component.empty()
-				.append(Component.text("[BossTag] ", NamedTextColor.GOLD).decoration(TextDecoration.BOLD, true))
-				.append(Component.text("Remaining BoS: " + souls.size(), NamedTextColor.GRAY).decoration(TextDecoration.BOLD, false)));
+			                   .append(Component.text("[BossTag] ", NamedTextColor.GOLD).decoration(TextDecoration.BOLD, true))
+			                   .append(Component.text("Remaining BoS: " + souls.size(), NamedTextColor.GRAY).decoration(TextDecoration.BOLD, false)));
 
 		if (souls.size() == 0) {
 			SEARCH_OUTCOME_MAP.remove(bossTag);
@@ -601,21 +601,21 @@ public class BossTagCommand {
 		if (index != -1) {
 			realBossTag = bossTag.substring(0, index);
 			player.sendMessage(Component.empty()
-				.append(Component.text("[BossTag] ", NamedTextColor.GOLD).decoration(TextDecoration.BOLD, true))
-				.append(Component.text("Removing parameters of ", NamedTextColor.GRAY).decoration(TextDecoration.BOLD, false))
-				.append(Component.text(realBossTag, NamedTextColor.WHITE))
+				                   .append(Component.text("[BossTag] ", NamedTextColor.GOLD).decoration(TextDecoration.BOLD, true))
+				                   .append(Component.text("Removing parameters of ", NamedTextColor.GRAY).decoration(TextDecoration.BOLD, false))
+				                   .append(Component.text(realBossTag, NamedTextColor.WHITE))
 			);
 
 			player.sendMessage(Component.empty()
-				.append(Component.text("[BossTag] ", NamedTextColor.GOLD).decoration(TextDecoration.BOLD, true))
-				.append(Component.text("Parameters removed:", NamedTextColor.GRAY).decoration(TextDecoration.BOLD, false))
+				                   .append(Component.text("[BossTag] ", NamedTextColor.GOLD).decoration(TextDecoration.BOLD, true))
+				                   .append(Component.text("Parameters removed:", NamedTextColor.GRAY).decoration(TextDecoration.BOLD, false))
 			);
 		} else {
 			player.sendMessage(Component.empty()
-				.append(Component.text("[BossTag] ", NamedTextColor.GOLD).decoration(TextDecoration.BOLD, true))
-				.append(Component.text("Removing ", NamedTextColor.GRAY).decoration(TextDecoration.BOLD, false))
-				.append(Component.text(realBossTag, NamedTextColor.WHITE))
-				.append(Component.text(" and all the dependency", NamedTextColor.GRAY))
+				                   .append(Component.text("[BossTag] ", NamedTextColor.GOLD).decoration(TextDecoration.BOLD, true))
+				                   .append(Component.text("Removing ", NamedTextColor.GRAY).decoration(TextDecoration.BOLD, false))
+				                   .append(Component.text(realBossTag, NamedTextColor.WHITE))
+				                   .append(Component.text(" and all the dependency", NamedTextColor.GRAY))
 			);
 		}
 
@@ -629,8 +629,8 @@ public class BossTagCommand {
 			paramsList.add(paramKey + "=" + params.get(paramKey));
 			//why tf \t don't exists inside the Component.text()...
 			player.sendMessage(Component.empty()
-				.append(Component.text("- " + paramKey + "       ", NamedTextColor.GRAY))
-				.append(Component.text(params.get(paramKey), NamedTextColor.GRAY))
+				                   .append(Component.text("- " + paramKey + "       ", NamedTextColor.GRAY))
+				                   .append(Component.text(params.get(paramKey), NamedTextColor.GRAY))
 			);
 		}
 
@@ -675,8 +675,8 @@ public class BossTagCommand {
 		bos.saveBook();
 
 		player.sendMessage(Component.empty()
-			.append(Component.text("[BossTag] ", NamedTextColor.GOLD).decoration(TextDecoration.BOLD, true))
-			.append(Component.text("Tags removed!", NamedTextColor.GRAY).decoration(TextDecoration.BOLD, false))
+			                   .append(Component.text("[BossTag] ", NamedTextColor.GOLD).decoration(TextDecoration.BOLD, true))
+			                   .append(Component.text("Tags removed!", NamedTextColor.GRAY).decoration(TextDecoration.BOLD, false))
 		);
 	}
 
@@ -747,8 +747,8 @@ public class BossTagCommand {
 
 	private static void squashBossTags(Player player) throws WrapperCommandSyntaxException {
 		player.sendMessage(Component.empty()
-			.append(Component.text("[BossTag] ", NamedTextColor.GOLD).decoration(TextDecoration.BOLD, true))
-			.append(Component.text("Start squashing!", NamedTextColor.GRAY).decoration(TextDecoration.BOLD, false))
+			                   .append(Component.text("[BossTag] ", NamedTextColor.GOLD).decoration(TextDecoration.BOLD, true))
+			                   .append(Component.text("Start squashing!", NamedTextColor.GRAY).decoration(TextDecoration.BOLD, false))
 		);
 
 		BookOfSouls bos = getBos(player);
@@ -758,8 +758,8 @@ public class BossTagCommand {
 
 
 		player.sendMessage(Component.empty()
-			.append(Component.text("[BossTag] ", NamedTextColor.GOLD).decoration(TextDecoration.BOLD, true))
-			.append(Component.text("bosstags:", NamedTextColor.GRAY).decoration(TextDecoration.BOLD, false))
+			                   .append(Component.text("[BossTag] ", NamedTextColor.GOLD).decoration(TextDecoration.BOLD, true))
+			                   .append(Component.text("bosstags:", NamedTextColor.GRAY).decoration(TextDecoration.BOLD, false))
 		);
 		//read for bosstags
 		for (Object tag : nbtTagsList.getAsArray()) {
@@ -768,8 +768,8 @@ public class BossTagCommand {
 			if (BossManager.mBossParameters.get(tagString) != null) {
 				bossTagParamertersMap.put(tagString, new LinkedHashMap<>());
 				player.sendMessage(Component.empty()
-					.append(Component.text("- ", NamedTextColor.GOLD))
-					.append(Component.text(tagString, NamedTextColor.GRAY))
+					                   .append(Component.text("- ", NamedTextColor.GOLD))
+					                   .append(Component.text(tagString, NamedTextColor.GRAY))
 				);
 			}
 		}
@@ -822,74 +822,74 @@ public class BossTagCommand {
 		bos.saveBook();
 
 		player.sendMessage(Component.empty()
-			.append(Component.text("[BossTag] ", NamedTextColor.GOLD).decoration(TextDecoration.BOLD, true))
-			.append(Component.text("Squash complited!", NamedTextColor.GRAY).decoration(TextDecoration.BOLD, false))
+			                   .append(Component.text("[BossTag] ", NamedTextColor.GOLD).decoration(TextDecoration.BOLD, true))
+			                   .append(Component.text("Squash complited!", NamedTextColor.GRAY).decoration(TextDecoration.BOLD, false))
 		);
 	}
 
 	private static void helpBossTags(Player player) {
 		player.sendMessage(Component.empty()
-			.append(Component.text("[BossTags] ", NamedTextColor.GOLD).decoration(TextDecoration.BOLD, true))
-			.append(Component.text("help", NamedTextColor.GRAY).decoration(TextDecoration.BOLD, false))
+			                   .append(Component.text("[BossTags] ", NamedTextColor.GOLD).decoration(TextDecoration.BOLD, true))
+			                   .append(Component.text("help", NamedTextColor.GRAY).decoration(TextDecoration.BOLD, false))
 		);
 
 		player.sendMessage(Component.empty()
-			.append(Component.text("===========================================", NamedTextColor.DARK_PURPLE).decoration(TextDecoration.BOLD, true))
+			                   .append(Component.text("===========================================", NamedTextColor.DARK_PURPLE).decoration(TextDecoration.BOLD, true))
 		);
 
 		player.sendMessage(Component.empty()
-			.append(Component.text("/bosstag add <boss_tag>", NamedTextColor.GOLD).clickEvent(ClickEvent.suggestCommand("/bosstag add ")))
-			.append(Component.text(" Add the bosstag to the holding BoS", NamedTextColor.GRAY))
+			                   .append(Component.text("/bosstag add <boss_tag>", NamedTextColor.GOLD).clickEvent(ClickEvent.suggestCommand("/bosstag add ")))
+			                   .append(Component.text(" Add the bosstag to the holding BoS", NamedTextColor.GRAY))
 		);
 
 		player.sendMessage(Component.empty()
-			.append(Component.text("/bosstag add <boss_tag[...]>", NamedTextColor.GOLD).clickEvent(ClickEvent.suggestCommand("/bosstag add ")))
-			.append(Component.text(" Add the bosstag to the holding BoS and checks if the BoS has the current boss_tag implemented", NamedTextColor.GRAY))
+			                   .append(Component.text("/bosstag add <boss_tag[...]>", NamedTextColor.GOLD).clickEvent(ClickEvent.suggestCommand("/bosstag add ")))
+			                   .append(Component.text(" Add the bosstag to the holding BoS and checks if the BoS has the current boss_tag implemented", NamedTextColor.GRAY))
 		);
 
 		player.sendMessage(Component.empty()
-			.append(Component.text("/bosstag remove <boss_tag>", NamedTextColor.GOLD).clickEvent(ClickEvent.suggestCommand("/bosstag remove ")))
-			.append(Component.text(" Remove the boss_tag and all the dependecies to the holding BoS", NamedTextColor.GRAY))
+			                   .append(Component.text("/bosstag remove <boss_tag>", NamedTextColor.GOLD).clickEvent(ClickEvent.suggestCommand("/bosstag remove ")))
+			                   .append(Component.text(" Remove the boss_tag and all the dependecies to the holding BoS", NamedTextColor.GRAY))
 		);
 
 		player.sendMessage(Component.empty()
-			.append(Component.text("/bosstag remove <boss_tag[...]>", NamedTextColor.GOLD).clickEvent(ClickEvent.suggestCommand("/bosstag remove ")))
-			.append(Component.text(" Remove the parameters selected inside [...] for the boss_tag selected", NamedTextColor.GRAY))
+			                   .append(Component.text("/bosstag remove <boss_tag[...]>", NamedTextColor.GOLD).clickEvent(ClickEvent.suggestCommand("/bosstag remove ")))
+			                   .append(Component.text(" Remove the parameters selected inside [...] for the boss_tag selected", NamedTextColor.GRAY))
 		);
 
 		player.sendMessage(Component.empty()
-			.append(Component.text("/bosstag show", NamedTextColor.GOLD).clickEvent(ClickEvent.suggestCommand("/bosstag show")))
-			.append(Component.text(" Show all the bosstag implemented and parameters in the holding BoS", NamedTextColor.GRAY))
+			                   .append(Component.text("/bosstag show", NamedTextColor.GOLD).clickEvent(ClickEvent.suggestCommand("/bosstag show")))
+			                   .append(Component.text(" Show all the bosstag implemented and parameters in the holding BoS", NamedTextColor.GRAY))
 		);
 
 		player.sendMessage(Component.empty()
-			.append(Component.text("/bosstag show <boss_tag>", NamedTextColor.GOLD).clickEvent(ClickEvent.suggestCommand("/bosstag show ")))
-			.append(Component.text(" Show the parameters implemented for the selected boss_tag in the holding BoS", NamedTextColor.GRAY))
+			                   .append(Component.text("/bosstag show <boss_tag>", NamedTextColor.GOLD).clickEvent(ClickEvent.suggestCommand("/bosstag show ")))
+			                   .append(Component.text(" Show the parameters implemented for the selected boss_tag in the holding BoS", NamedTextColor.GRAY))
 		);
 
 		player.sendMessage(Component.empty()
-			.append(Component.text("/bosstag search <boss_tag>", NamedTextColor.GOLD).clickEvent(ClickEvent.suggestCommand("/bosstag search ")))
-			.append(Component.text(" Search inside the BoS database for matching tags", NamedTextColor.GRAY))
+			                   .append(Component.text("/bosstag search <boss_tag>", NamedTextColor.GOLD).clickEvent(ClickEvent.suggestCommand("/bosstag search ")))
+			                   .append(Component.text(" Search inside the BoS database for matching tags", NamedTextColor.GRAY))
 		);
 
 		player.sendMessage(Component.empty()
-			.append(Component.text("/bosstag search <boss_tag[...]>", NamedTextColor.GOLD).clickEvent(ClickEvent.suggestCommand("/bosstag search ")))
-			.append(Component.text(" Search inside the BoS database for matching tags with the selected parameters", NamedTextColor.GRAY))
+			                   .append(Component.text("/bosstag search <boss_tag[...]>", NamedTextColor.GOLD).clickEvent(ClickEvent.suggestCommand("/bosstag search ")))
+			                   .append(Component.text(" Search inside the BoS database for matching tags with the selected parameters", NamedTextColor.GRAY))
 		);
 
 
 		player.sendMessage(Component.empty()
-			.append(Component.text("/bosstag get <search_id>", NamedTextColor.GOLD).clickEvent(ClickEvent.suggestCommand("/bosstag get ")))
-			.append(Component.text(" Get the first BoS of the outcome of /bosstag search <search_id> ", NamedTextColor.GRAY))
+			                   .append(Component.text("/bosstag get <search_id>", NamedTextColor.GOLD).clickEvent(ClickEvent.suggestCommand("/bosstag get ")))
+			                   .append(Component.text(" Get the first BoS of the outcome of /bosstag search <search_id> ", NamedTextColor.GRAY))
 		);
 
 		player.sendMessage(Component.empty()
-			.append(Component.text("/bosstag info <boss_tag>", NamedTextColor.GOLD).clickEvent(ClickEvent.suggestCommand("/bosstag info ")))
-			.append(Component.text(" Show the info about the boss_tag selected and the default value of the parameters ", NamedTextColor.GRAY))
+			                   .append(Component.text("/bosstag info <boss_tag>", NamedTextColor.GOLD).clickEvent(ClickEvent.suggestCommand("/bosstag info ")))
+			                   .append(Component.text(" Show the info about the boss_tag selected and the default value of the parameters ", NamedTextColor.GRAY))
 		);
 
 		player.sendMessage(Component.empty()
-			.append(Component.text("===========================================", NamedTextColor.DARK_PURPLE).decoration(TextDecoration.BOLD, true))
+			                   .append(Component.text("===========================================", NamedTextColor.DARK_PURPLE).decoration(TextDecoration.BOLD, true))
 		);
 	}
 }

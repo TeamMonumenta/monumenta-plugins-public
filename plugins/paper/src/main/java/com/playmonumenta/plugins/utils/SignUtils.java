@@ -1,5 +1,20 @@
 package com.playmonumenta.plugins.utils;
 
+import java.lang.reflect.InvocationTargetException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.function.BiPredicate;
+
+import org.bukkit.ChatColor;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.entity.Player;
+import org.bukkit.plugin.Plugin;
+import org.bukkit.scheduler.BukkitRunnable;
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.events.PacketAdapter;
@@ -7,19 +22,6 @@ import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.events.PacketEvent;
 import com.comphenix.protocol.wrappers.BlockPosition;
 import com.comphenix.protocol.wrappers.nbt.NbtCompound;
-import org.bukkit.ChatColor;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.entity.Player;
-import org.bukkit.plugin.Plugin;
-import org.bukkit.scheduler.BukkitRunnable;
-
-import java.lang.reflect.InvocationTargetException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.function.BiPredicate;
 
 public final class SignUtils {
 
@@ -41,7 +43,7 @@ public final class SignUtils {
 		this.listen();
 	}
 
-	public static Menu newMenu(List<String> text) {
+	public static @Nullable Menu newMenu(List<String> text) {
 		if (INSTANCE == null) {
 			return null;
 		}
@@ -92,10 +94,10 @@ public final class SignUtils {
 
 		private final List<String> mText;
 
-		private BiPredicate<Player, String[]> mResponse;
+		private @Nullable BiPredicate<Player, String[]> mResponse;
 		private boolean mReopenIfFail;
 
-		private BlockPosition mPosition;
+		private @Nullable BlockPosition mPosition;
 
 		private boolean mForceClose;
 

@@ -21,6 +21,7 @@ import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.EulerAngle;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -35,7 +36,7 @@ import de.tr7zw.nbtapi.NBTItem;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 
-public class Grave {
+public final class Grave {
 	private static final String KEY_TIME = "time";
 	private static final String KEY_LOCATION = "location";
 	private static final String KEY_WORLD = "world";
@@ -64,18 +65,18 @@ public class Grave {
 	private static final List<String> KEYS_POSE_PARTS = Arrays.asList(KEY_POSE_HEAD, KEY_POSE_BODY, KEY_POSE_LEFT_ARM, KEY_POSE_RIGHT_ARM, KEY_POSE_LEFT_LEG, KEY_POSE_RIGHT_LEG);
 	private static final List<String> KEYS_EQUIPMENT_PARTS = Arrays.asList(KEY_EQUIPMENT_HEAD, KEY_EQUIPMENT_BODY, KEY_EQUIPMENT_LEGS, KEY_EQUIPMENT_FEET, KEY_EQUIPMENT_HAND, KEY_EQUIPMENT_OFF_HAND);
 
-	BukkitRunnable mRunnable = null;
+	private BukkitRunnable mRunnable = null;
 	GraveManager mManager;
 	Player mPlayer;
-	Instant mDeathTime;
-	boolean mSmall;
+	private final Instant mDeathTime;
+	private final boolean mSmall;
 	String mWorldName;
 	Integer mDungeonInstance;
 	Location mLocation;
-	HashMap<String, EulerAngle> mPose;
-	HashMap<String, ItemStack> mEquipment;
+	private @Nullable HashMap<String, EulerAngle> mPose;
+	private final HashMap<String, ItemStack> mEquipment;
 	HashSet<GraveItem> mItems;
-	ArmorStand mEntity;
+	private @Nullable ArmorStand mEntity;
 
 	boolean mAlertedSpawned = false;
 	boolean mAlertedLimbo = false;
@@ -84,8 +85,8 @@ public class Grave {
 
 	// For deserializing a grave from data
 	private Grave(GraveManager manager, Player player, String world, Integer instance,
-				 Instant time, boolean small, Location location, HashMap<String, EulerAngle> pose,
-				 HashMap<String, ItemStack> equipment, JsonArray items) {
+	              Instant time, boolean small, Location location, @Nullable HashMap<String, EulerAngle> pose,
+	              HashMap<String, ItemStack> equipment, JsonArray items) {
 		mManager = manager;
 		mPlayer = player;
 		mDeathTime = time;
@@ -174,7 +175,7 @@ public class Grave {
 		spawn();
 	}
 
-	UUID getUniqueId() {
+	@Nullable UUID getUniqueId() {
 		if (mEntity == null || !mEntity.isValid()) {
 			//TODO Handle error
 			return null;
@@ -629,7 +630,7 @@ public class Grave {
 		return new Grave(manager, player, world, instance, time, small, location, pose, equipment, items);
 	}
 
-	public JsonObject serialize() {
+	public @Nullable JsonObject serialize() {
 		JsonObject data = new JsonObject();
 
 		data.addProperty(KEY_WORLD, mWorldName);

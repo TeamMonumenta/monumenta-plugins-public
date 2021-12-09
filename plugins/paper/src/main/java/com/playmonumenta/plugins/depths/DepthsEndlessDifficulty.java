@@ -62,7 +62,7 @@ public class DepthsEndlessDifficulty {
 
 		//Store player's modifiers in the party index
 		for (Modifier m : Modifier.values()) {
-			delvePointsForParty.put(m, new Integer(info.getRank(m)));
+			delvePointsForParty.put(m, info.getRank(m));
 		}
 
 		//Assign the scores to all other active players

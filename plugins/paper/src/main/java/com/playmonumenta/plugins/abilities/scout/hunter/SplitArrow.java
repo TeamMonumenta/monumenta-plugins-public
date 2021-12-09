@@ -50,7 +50,7 @@ public class SplitArrow extends Ability {
 
 	@Override
 	public boolean livingEntityShotByPlayerEvent(Projectile proj, LivingEntity damagee, EntityDamageByEntityEvent event) {
-		if (proj instanceof Arrow || proj instanceof SpectralArrow) {
+		if (mPlayer != null && (proj instanceof Arrow || proj instanceof SpectralArrow)) {
 			LivingEntity nearestMob = EntityUtils.getNearestMob(damagee.getLocation(), SPLIT_ARROW_CHAIN_RANGE, damagee);
 
 			if (nearestMob != null && !nearestMob.getScoreboardTags().contains(AbilityUtils.IGNORE_TAG)) {

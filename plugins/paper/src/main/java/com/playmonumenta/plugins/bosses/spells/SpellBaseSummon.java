@@ -11,6 +11,7 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class SpellBaseSummon extends Spell {
 	@FunctionalInterface
@@ -25,15 +26,15 @@ public class SpellBaseSummon extends Spell {
 	public interface SummonMobAt {
 		/**
 		 * Given a valid location and a player to target, summon the mob
-		 *
+		 * <p>
 		 * Must return the bukkit runnable spawned for cancellation purposes, if any
-		 *
+		 * <p>
 		 * Might want to also override the cancel method here to do something to the mob
 		 * if gets cancelled
-		 *
+		 * <p>
 		 * Note this needs to always explicitly call cancel() when done to be cleaned up correctly.
 		 */
-		BukkitRunnable run(Location loc, Player player);
+		@Nullable BukkitRunnable run(Location loc, Player player);
 	}
 
 	@FunctionalInterface

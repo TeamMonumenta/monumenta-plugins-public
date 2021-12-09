@@ -24,8 +24,8 @@ import org.bukkit.event.player.PlayerItemDamageEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.inventory.ItemStack;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.checkerframework.checker.initialization.qual.UnknownInitialization;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.classes.ClassAbility;
@@ -40,26 +40,25 @@ import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import net.kyori.adventure.text.Component;
 
 
-
 public abstract class Ability {
 	protected final Plugin mPlugin;
 	public final AbilityInfo mInfo;
-	protected final Player mPlayer;
-	private Integer mScore = null;
-	public ItemStack mDisplayItem;
+	protected final @Nullable Player mPlayer;
+	private @Nullable Integer mScore = null;
+	public @Nullable ItemStack mDisplayItem;
 
-	public Ability(Plugin plugin, @Nullable Player player, String displayName) {
+	public Ability(Plugin plugin, @Nullable Player player, @Nullable String displayName) {
 		mPlugin = plugin;
 		mPlayer = player;
 		mInfo = new AbilityInfo();
 		mInfo.mDisplayName = displayName;
 	}
 
-	public String getDisplayName() {
+	public @Nullable String getDisplayName() {
 		return mInfo.mDisplayName;
 	}
 
-	public String getScoreboard() {
+	public @Nullable String getScoreboard() {
 		return mInfo.mScoreboardId;
 	}
 
@@ -110,11 +109,14 @@ public abstract class Ability {
 		return false;
 	}
 
-	public boolean isTimerActive(@NotNull ClassAbility spell) {
+	public boolean isTimerActive(ClassAbility spell) {
 		return mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), spell);
 	}
 
 	public void putOnCooldown() {
+		if (mPlayer == null) {
+			return;
+		}
 		AbilityInfo info = getInfo();
 		if (info.mLinkedSpell != null) {
 			if (!mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), info.mLinkedSpell)) {
@@ -141,7 +143,7 @@ public abstract class Ability {
 	 * @return true or false
 	 */
 	public final boolean canCast() {
-		return runCheck() && !isOnCooldown() && mPlayer.getGameMode() != GameMode.SPECTATOR;
+		return mPlayer != null && runCheck() && !isOnCooldown() && mPlayer.getGameMode() != GameMode.SPECTATOR;
 	}
 
 	//Events
@@ -318,7 +320,7 @@ public abstract class Ability {
 	/*
 	 * For performance, this caches the first scoreboard lookup for future use
 	 */
-	public int getAbilityScore() {
+	public int getAbilityScore(@UnknownInitialization(Ability.class)Ability this) {
 		AbilityInfo info = getInfo();
 		if (mPlayer != null && info.mScoreboardId != null) {
 			if (mScore == null) {
@@ -329,11 +331,11 @@ public abstract class Ability {
 		return 0;
 	}
 
-	public Component getLevelHover(boolean useShorthand) {
+	public @Nullable Component getLevelHover(boolean useShorthand) {
 		return mInfo.getLevelHover(getAbilityScore(), useShorthand);
 	}
 
-	public Class<? extends BaseAbilityEnchantment> getCooldownEnchantment() {
+	public @Nullable Class<? extends BaseAbilityEnchantment> getCooldownEnchantment() {
 		return null;
 	}
 

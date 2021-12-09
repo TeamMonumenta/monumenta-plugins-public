@@ -11,8 +11,8 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.util.Vector;
 
 import com.playmonumenta.plugins.bosses.SpellManager;
-import com.playmonumenta.plugins.bosses.parameters.EffectsList;
 import com.playmonumenta.plugins.bosses.parameters.BossParam;
+import com.playmonumenta.plugins.bosses.parameters.EffectsList;
 import com.playmonumenta.plugins.bosses.parameters.ParticlesList;
 import com.playmonumenta.plugins.bosses.parameters.SoundsList;
 import com.playmonumenta.plugins.bosses.spells.SpellBaseSlam;
@@ -22,7 +22,7 @@ import com.playmonumenta.plugins.utils.ParticleUtils.SpawnParticleAction;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 
 //general version of bossMeteorSlam
-public class PounceBoss extends BossAbilityGroup {
+public final class PounceBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_pounce";
 
 	public static class Parameters extends BossParameters {

@@ -11,8 +11,8 @@ import com.playmonumenta.plugins.utils.FastUtils;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 
 
@@ -46,42 +46,42 @@ public class PPLightning extends PartialParticle {
 	// use at least this many particles.
 	private static final int HOP_MINIMUM_PARTICLES = 4;
 
-	private final @NotNull ArrayList<@NotNull Location> mGeneratedHops = new ArrayList<>();
-	private final @NotNull HashMap<@NotNull Integer, @NotNull ArrayList<@NotNull Location>> mParticleLocations = new HashMap<>();
+	private final ArrayList<Location> mGeneratedHops = new ArrayList<>();
+	private final HashMap<Integer, ArrayList<Location>> mParticleLocations = new HashMap<>();
 
 	/*-------------------------------------------------------------------------------
 	 * Constructors
 	 */
 
-	public PPLightning(@NotNull Particle particle, @NotNull Location strikeLocation, int hopParticleCount, double delta, double extra) {
+	public PPLightning(Particle particle, Location strikeLocation, int hopParticleCount, double delta, double extra) {
 		super(particle, strikeLocation, hopParticleCount, delta, extra);
 	}
 
-	public PPLightning(@NotNull Particle particle, @NotNull Location strikeLocation, int hopParticleCount, double delta, double extra, @Nullable Object data) {
+	public PPLightning(Particle particle, Location strikeLocation, int hopParticleCount, double delta, double extra, @Nullable Object data) {
 		super(particle, strikeLocation, hopParticleCount, delta, extra, data);
 	}
 
-	public PPLightning(@NotNull Particle particle, @NotNull Location strikeLocation, int hopParticleCount, double delta, double extra, @Nullable Object data, boolean directionalMode, double extraVariance) {
+	public PPLightning(Particle particle, Location strikeLocation, int hopParticleCount, double delta, double extra, @Nullable Object data, boolean directionalMode, double extraVariance) {
 		super(particle, strikeLocation, hopParticleCount, delta, extra, data, directionalMode, extraVariance);
 	}
 
-	public PPLightning(@NotNull Particle particle, @NotNull Location strikeLocation, int hopParticleCount, double delta, double extra, @Nullable Object data, boolean directionalMode, double extraVariance, boolean minimumMultiplier) {
+	public PPLightning(Particle particle, Location strikeLocation, int hopParticleCount, double delta, double extra, @Nullable Object data, boolean directionalMode, double extraVariance, boolean minimumMultiplier) {
 		super(particle, strikeLocation, hopParticleCount, delta, extra, data, directionalMode, extraVariance, minimumMultiplier);
 	}
 
-	public PPLightning(@NotNull Particle particle, @NotNull Location strikeLocation, int hopParticleCount, double deltaX, double deltaY, double deltaZ, double extra) {
+	public PPLightning(Particle particle, Location strikeLocation, int hopParticleCount, double deltaX, double deltaY, double deltaZ, double extra) {
 		super(particle, strikeLocation, hopParticleCount, deltaX, deltaY, deltaZ, extra);
 	}
 
-	public PPLightning(@NotNull Particle particle, @NotNull Location strikeLocation, int hopParticleCount, double deltaX, double deltaY, double deltaZ, double extra, @Nullable Object data) {
+	public PPLightning(Particle particle, Location strikeLocation, int hopParticleCount, double deltaX, double deltaY, double deltaZ, double extra, @Nullable Object data) {
 		super(particle, strikeLocation, hopParticleCount, deltaX, deltaY, deltaZ, extra, data);
 	}
 
-	public PPLightning(@NotNull Particle particle, @NotNull Location strikeLocation, int hopParticleCount, double deltaX, double deltaY, double deltaZ, double extra, @Nullable Object data, boolean directionalMode, double extraVariance) {
+	public PPLightning(Particle particle, Location strikeLocation, int hopParticleCount, double deltaX, double deltaY, double deltaZ, double extra, @Nullable Object data, boolean directionalMode, double extraVariance) {
 		super(particle, strikeLocation, hopParticleCount, deltaX, deltaY, deltaZ, extra, data, directionalMode, extraVariance);
 	}
 
-	public PPLightning(@NotNull Particle particle, @NotNull Location strikeLocation, int hopParticleCount, double deltaX, double deltaY, double deltaZ, double extra, @Nullable Object data, boolean directionalMode, double extraVariance, boolean minimumMultiplier) {
+	public PPLightning(Particle particle, Location strikeLocation, int hopParticleCount, double deltaX, double deltaY, double deltaZ, double extra, @Nullable Object data, boolean directionalMode, double extraVariance, boolean minimumMultiplier) {
 		super(particle, strikeLocation, hopParticleCount, deltaX, deltaY, deltaZ, extra, data, directionalMode, extraVariance, minimumMultiplier);
 	}
 
@@ -158,12 +158,12 @@ public class PPLightning extends PartialParticle {
 	 */
 
 	@Override
-	protected void doSpawn(@NotNull ParticleBuilder packagedValues) {
+	protected void doSpawn(ParticleBuilder packagedValues) {
 		generateHopsOnce(packagedValues.location());
 
 		int hopParticleCount = Math.max(HOP_MINIMUM_PARTICLES, packagedValues.count());
-		@NotNull ArrayList<@NotNull Location> hopParticleLocations = generateParticleLocationsOnce(hopParticleCount);
-		double particlesPerTick = hopParticleLocations.size() / (double)ANIMATION_TICKS;
+		ArrayList<Location> hopParticleLocations = generateParticleLocationsOnce(hopParticleCount);
+		double particlesPerTick = hopParticleLocations.size() / (double) ANIMATION_TICKS;
 
 		packagedValues.count(1);
 
@@ -199,12 +199,12 @@ public class PPLightning extends PartialParticle {
 	// Each lightning bolt will have the same hops for all players,
 	// and so look "the same" in the way the same bolt jags from any screen,
 	// just drawing differently based on their particle multiplier settings
-	private void generateHopsOnce(@NotNull Location strikeLocation) {
+	private void generateHopsOnce(Location strikeLocation) {
 		if (!mGeneratedHops.isEmpty()) {
 			return;
 		}
 
-		int hopCount = (int)Math.ceil(mHeight * HOPS_PER_BLOCK);
+		int hopCount = (int) Math.ceil(mHeight * HOPS_PER_BLOCK);
 		double endHeight = strikeLocation.getY();
 		double startHeight = endHeight + mHeight;
 
@@ -219,7 +219,7 @@ public class PPLightning extends PartialParticle {
 
 		for (int hopIndex = 0; hopIndex < hopCount; hopIndex++) {
 			double currentHeight = startHeight - (mHeight / hopCount * hopIndex);
-			@NotNull Location currentHopLocation = strikeLocation.clone();
+			Location currentHopLocation = strikeLocation.clone();
 			currentHopLocation.setY(currentHeight);
 
 			// First and last points don't get varied
@@ -257,28 +257,28 @@ public class PPLightning extends PartialParticle {
 	// Store locations for the same hopParticleCount for performance,
 	// generating the same results only once,
 	// then referring to them again as the timer loops
-	private @NotNull ArrayList<@NotNull Location> generateParticleLocationsOnce(
+	private ArrayList<Location> generateParticleLocationsOnce(
 		int hopParticleCount
 	) {
-		@Nullable ArrayList<@NotNull Location> hopParticleLocations = mParticleLocations.get(hopParticleCount);
+		@Nullable ArrayList<Location> hopParticleLocations = mParticleLocations.get(hopParticleCount);
 		if (hopParticleLocations != null) {
 			return hopParticleLocations;
 		} else {
 			hopParticleLocations = new ArrayList<>();
 
 			for (int hopIndex = 0; hopIndex < mGeneratedHops.size(); hopIndex++) {
-				@NotNull Location currentHop = mGeneratedHops.get(hopIndex);
+				Location currentHop = mGeneratedHops.get(hopIndex);
 				if (hopIndex == 0) {
 					hopParticleLocations.add(currentHop);
 
 					continue;
 				}
 
-				@NotNull Location previousHop = mGeneratedHops.get(hopIndex - 1);
+				Location previousHop = mGeneratedHops.get(hopIndex - 1);
 
 				// Move from previous to current hop
-				@NotNull Location movingParticleLocation = previousHop.clone();
-				@NotNull Location hopInterval = currentHop.clone().subtract(previousHop).multiply(1d / hopParticleCount);
+				Location movingParticleLocation = previousHop.clone();
+				Location hopInterval = currentHop.clone().subtract(previousHop).multiply(1d / hopParticleCount);
 				for (int i = 0; i < hopParticleCount; i++) {
 					movingParticleLocation.add(hopInterval);
 					hopParticleLocations.add(movingParticleLocation.clone());

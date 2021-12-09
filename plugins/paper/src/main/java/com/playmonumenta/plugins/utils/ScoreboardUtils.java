@@ -7,16 +7,14 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Score;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 public class ScoreboardUtils {
-	public static @NotNull Optional<Integer> getScoreboardValue(@NotNull String scoreHolder, @NotNull String objectiveName) {
-		@NotNull Optional<Integer> scoreValue = Optional.empty();
-		@Nullable Objective objective = Bukkit.getScoreboardManager().getMainScoreboard().getObjective(objectiveName);
+	public static Optional<Integer> getScoreboardValue(String scoreHolder, String objectiveName) {
+		Optional<Integer> scoreValue = Optional.empty();
+		Objective objective = Bukkit.getScoreboardManager().getMainScoreboard().getObjective(objectiveName);
 
 		if (objective != null) {
-			@NotNull Score score = objective.getScore(scoreHolder);
+			Score score = objective.getScore(scoreHolder);
 			if (score.isScoreSet()) {
 				scoreValue = Optional.of(score.getScore());
 			}
@@ -25,33 +23,33 @@ public class ScoreboardUtils {
 		return scoreValue;
 	}
 
-	public static @NotNull Optional<Integer> getScoreboardValue(@NotNull Entity entity, @NotNull String objectiveName) {
+	public static Optional<Integer> getScoreboardValue(Entity entity, String objectiveName) {
 		if (entity instanceof Player) {
-			return getScoreboardValue(((Player)entity).getName(), objectiveName);
+			return getScoreboardValue(((Player) entity).getName(), objectiveName);
 		} else {
 			return getScoreboardValue(entity.getUniqueId().toString(), objectiveName);
 		}
 	}
 
-	public static void setScoreboardValue(@NotNull String entryName, @NotNull String objectiveName, int value) {
-		@Nullable Objective objective = Bukkit.getScoreboardManager().getMainScoreboard().getObjective(objectiveName);
+	public static void setScoreboardValue(String entryName, String objectiveName, int value) {
+		Objective objective = Bukkit.getScoreboardManager().getMainScoreboard().getObjective(objectiveName);
 		if (objective != null) {
-			@NotNull Score score = objective.getScore(entryName);
+			Score score = objective.getScore(entryName);
 			score.setScore(value);
 		}
 	}
 
-	public static void setScoreboardValue(@NotNull Entity entity, @NotNull String objectiveName, int value) {
+	public static void setScoreboardValue(Entity entity, String objectiveName, int value) {
 		if (entity instanceof Player) {
-			setScoreboardValue(((Player)entity).getName(), objectiveName, value);
+			setScoreboardValue(((Player) entity).getName(), objectiveName, value);
 		} else {
 			setScoreboardValue(entity.getUniqueId().toString(), objectiveName, value);
 		}
 	}
 
 	public static boolean checkTag(
-		@NotNull Player player,
-		@NotNull String tag
+		Player player,
+		String tag
 	) {
 		return player.getScoreboardTags().contains(tag);
 	}

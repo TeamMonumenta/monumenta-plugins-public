@@ -7,15 +7,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.goncalomb.bukkit.mylib.utils.CustomInventory;
-import com.playmonumenta.plugins.utils.InventoryUtils;
-import com.playmonumenta.plugins.utils.ItemUtils;
-import com.playmonumenta.plugins.utils.ScoreboardUtils;
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.parrots.ParrotManager;
-import com.playmonumenta.plugins.parrots.ParrotManager.ParrotVariant;
-import com.playmonumenta.plugins.parrots.ParrotManager.PlayerShoulder;
-
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.Sound;
@@ -26,6 +17,16 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.checkerframework.checker.nullness.qual.Nullable;
+
+import com.goncalomb.bukkit.mylib.utils.CustomInventory;
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.parrots.ParrotManager;
+import com.playmonumenta.plugins.parrots.ParrotManager.ParrotVariant;
+import com.playmonumenta.plugins.parrots.ParrotManager.PlayerShoulder;
+import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.ScoreboardUtils;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -45,7 +46,7 @@ public class ParrotCustomInventory extends CustomInventory {
 			mNum = num;
 		}
 
-		public static ParrotGUIPage valueOfPage(int pagenum) {
+		public static @Nullable ParrotGUIPage valueOfPage(int pagenum) {
 			for (ParrotGUIPage page : ParrotGUIPage.values()) {
 				if (page.mNum == pagenum) {
 					return page;

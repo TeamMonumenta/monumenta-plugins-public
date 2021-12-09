@@ -12,6 +12,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.depths.DepthsRoom.RoomDirection;
 import com.playmonumenta.scriptedquests.Plugin;
@@ -28,22 +29,22 @@ public class DepthsRoomRepository {
 	public static final int CUSTOM_FLOOR_LOBBIES = 10;
 
 	//List of rooms for each floor
-	ArrayList<DepthsRoom> mF1NormalRooms;
-	ArrayList<DepthsRoom> mF1EliteRooms;
-	ArrayList<DepthsRoom> mF1UtilityRooms;
-	ArrayList<DepthsRoom> mF1TwistedRooms;
-	ArrayList<DepthsRoom> mF2NormalRooms;
-	ArrayList<DepthsRoom> mF2EliteRooms;
-	ArrayList<DepthsRoom> mF2UtilityRooms;
-	ArrayList<DepthsRoom> mF2TwistedRooms;
-	ArrayList<DepthsRoom> mF3NormalRooms;
-	ArrayList<DepthsRoom> mF3EliteRooms;
-	ArrayList<DepthsRoom> mF3UtilityRooms;
-	ArrayList<DepthsRoom> mF3TwistedRooms;
-	DepthsRoom mF1BossRoom;
-	DepthsRoom mF2BossRoom;
-	DepthsRoom mF3BossRoom;
-	DepthsRoom mWeaponAspectRoom;
+	final ArrayList<DepthsRoom> mF1NormalRooms = new ArrayList<>();
+	final ArrayList<DepthsRoom> mF1EliteRooms = new ArrayList<>();
+	final ArrayList<DepthsRoom> mF1UtilityRooms = new ArrayList<>();
+	final ArrayList<DepthsRoom> mF1TwistedRooms = new ArrayList<>();
+	final ArrayList<DepthsRoom> mF2NormalRooms = new ArrayList<>();
+	final ArrayList<DepthsRoom> mF2EliteRooms = new ArrayList<>();
+	final ArrayList<DepthsRoom> mF2UtilityRooms = new ArrayList<>();
+	final ArrayList<DepthsRoom> mF2TwistedRooms = new ArrayList<>();
+	final ArrayList<DepthsRoom> mF3NormalRooms = new ArrayList<>();
+	final ArrayList<DepthsRoom> mF3EliteRooms = new ArrayList<>();
+	final ArrayList<DepthsRoom> mF3UtilityRooms = new ArrayList<>();
+	final ArrayList<DepthsRoom> mF3TwistedRooms = new ArrayList<>();
+	@Nullable DepthsRoom mF1BossRoom;
+	@Nullable DepthsRoom mF2BossRoom;
+	@Nullable DepthsRoom mF3BossRoom;
+	@Nullable DepthsRoom mWeaponAspectRoom;
 
 	public DepthsRoomRepository(World world) {
 		initRooms(world);
@@ -56,20 +57,6 @@ public class DepthsRoomRepository {
 	 * @param world
 	 */
 	private void initRooms(World world) {
-		//Init room arrays
-		mF1NormalRooms = new ArrayList<>();
-		mF1EliteRooms = new ArrayList<>();
-		mF1UtilityRooms = new ArrayList<>();
-		mF1TwistedRooms = new ArrayList<>();
-		mF2NormalRooms = new ArrayList<>();
-		mF2EliteRooms = new ArrayList<>();
-		mF2UtilityRooms = new ArrayList<>();
-		mF2TwistedRooms = new ArrayList<>();
-		mF3NormalRooms = new ArrayList<>();
-		mF3EliteRooms = new ArrayList<>();
-		mF3UtilityRooms = new ArrayList<>();
-		mF3TwistedRooms = new ArrayList<>();
-
 		//Load room details
 		//F1 utility rooms
 		DepthsRoom f1r9 = new DepthsRoom("\"depths/f1r9\"", DepthsRoomType.UTILITY, new Vector(38, 26, 38), new Location(world, 1.0, -11.0, -17.0), 0, RoomDirection.EVEN);
@@ -376,12 +363,13 @@ public class DepthsRoomRepository {
 
 	/**
 	 * This method figures out which room to give the players depending on their type selection and some random chance.
+	 *
 	 * @param roomType type of room to summon
-	 * @param party depths party to check info for
-	 * @param yLevel what level the spawn point is currently at, to avoid going into the void or sky
+	 * @param party    depths party to check info for
+	 * @param yLevel   what level the spawn point is currently at, to avoid going into the void or sky
 	 * @return a valid room object to summon
 	 */
-	public DepthsRoom getValidRoom(DepthsRoomType roomType, DepthsParty party, double yLevel) {
+	public @Nullable DepthsRoom getValidRoom(DepthsRoomType roomType, DepthsParty party, double yLevel) {
 		//Give them the first room if they just started
 		if (party.mRoomNumber == 0) {
 			return mWeaponAspectRoom;

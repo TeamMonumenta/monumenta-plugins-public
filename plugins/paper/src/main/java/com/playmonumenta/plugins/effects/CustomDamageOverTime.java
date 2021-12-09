@@ -4,6 +4,7 @@ import org.bukkit.Particle;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.classes.ClassAbility;
@@ -16,13 +17,13 @@ public class CustomDamageOverTime extends Effect {
 	private final double mPeriod;
 	private final Plugin mPlugin;
 	private final Player mPlayer;
-	private final ClassAbility mSpell;
-	private final MagicType mMagic;
+	private final @Nullable ClassAbility mSpell;
+	private final @Nullable MagicType mMagic;
 	private final Particle mParticle;
 
 	private int mTicks;
 
-	public CustomDamageOverTime(int duration, double damage, int period, Player player, MagicType magic, ClassAbility spell, Particle particle, Plugin plugin) {
+	public CustomDamageOverTime(int duration, double damage, int period, Player player, @Nullable MagicType magic, @Nullable ClassAbility spell, Particle particle, Plugin plugin) {
 		super(duration);
 		mDamage = damage;
 		mPeriod = period;

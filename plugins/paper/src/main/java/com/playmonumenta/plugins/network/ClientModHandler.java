@@ -6,6 +6,7 @@ import java.util.function.Predicate;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -101,7 +102,7 @@ public class ClientModHandler {
 				info.maxCharges = maxCharges;
 				return info;
 			})
-			.sorted(Comparator.comparing(p -> p.name))
+			.sorted(Comparator.comparing(i -> i.name == null ? "" : i.name))
 			.toArray(ClassUpdatePacket.AbilityInfo[]::new);
 
 		ClassUpdatePacket packet = new ClassUpdatePacket();
@@ -129,7 +130,7 @@ public class ClientModHandler {
 		return ability != null && (ability.getInfo().mCooldown > 0 || ability instanceof AbilityWithChargesOrStacks);
 	}
 
-	private static String getAbilityName(Ability ability) {
+	private static @Nullable String getAbilityName(Ability ability) {
 		// The ClassAbility name is preferable if it exists (e.g. for the two Elemental Spirits)
 		if (ability.getInfo().mLinkedSpell != null) {
 			return ability.getInfo().mLinkedSpell.getName();
@@ -137,7 +138,7 @@ public class ClientModHandler {
 		return ability.getDisplayName();
 	}
 
-	private static String getAbilityClassName(Ability ability) {
+	private static @Nullable String getAbilityClassName(Ability ability) {
 		if (ability instanceof DepthsAbility) {
 			DepthsTree depthsTree = ((DepthsAbility) ability).mTree;
 			if (depthsTree != null) {
@@ -177,12 +178,12 @@ public class ClientModHandler {
 
 		final String _type = "ClassUpdatePacket";
 
-		AbilityInfo[] abilities;
+		AbilityInfo @Nullable [] abilities;
 
 		public static class AbilityInfo {
 
-			String name;
-			String className;
+			@Nullable String name;
+			@Nullable String className;
 
 			int remainingCooldown;
 			int initialCooldown;
@@ -201,7 +202,7 @@ public class ClientModHandler {
 
 		final String _type = "AbilityUpdatePacket";
 
-		String name;
+		@Nullable String name;
 
 		// className is not required, as a player should never have multiple abilities with the same name
 

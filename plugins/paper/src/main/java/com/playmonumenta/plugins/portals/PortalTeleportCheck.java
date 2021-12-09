@@ -7,18 +7,22 @@ import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class PortalTeleportCheck extends BukkitRunnable {
 
-	Player mPlayer;
-	int mCooldown = 0;
-	Vector mVelocity;
-	Location mPastPosition1;
-	Location mPastPosition2;
-	double mMaxY = 0;
-	int mMaxYcooldown = 0;
+	private final Player mPlayer;
+	private int mCooldown = 0;
+	private @Nullable Location mPastPosition1;
+	private @Nullable Location mPastPosition2;
+	private double mMaxY = 0;
+	private int mMaxYcooldown = 0;
 	//Whether the player most recently went through portal 1 or portal 2
-	int mLastPortal;
+	private int mLastPortal;
+
+	public PortalTeleportCheck(Player player) {
+		this.mPlayer = player;
+	}
 
 	@Override
 	public void run() {
@@ -31,9 +35,6 @@ public class PortalTeleportCheck extends BukkitRunnable {
 		Portal mP2 = PortalManager.mPlayerPortal2.get(mPlayer);
 
 		World mWorld = mPlayer.getWorld();
-
-		//Velocity loading - avoid getting stuck on tp by using velocity 2 ticks before for calculations
-		mVelocity = mPlayer.getVelocity().clone();
 
 		if (mPastPosition1 != null) {
 			mPastPosition2 = mPastPosition1;

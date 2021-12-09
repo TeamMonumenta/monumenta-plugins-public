@@ -17,6 +17,7 @@ import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.loot.LootContext;
 import org.bukkit.loot.LootTable;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.enchantments.infusions.Acumen;
@@ -48,12 +49,13 @@ public class InfusionUtils {
 
 		private final String mLabel;
 		private final String mEnchantName;
+
 		InfusionSelection(String label, String enchantName) {
 			mLabel = label;
 			mEnchantName = enchantName;
 		}
 
-		public static InfusionSelection getInfusionSelection(String label) {
+		public static @Nullable InfusionSelection getInfusionSelection(@Nullable String label) {
 			if (label == null) {
 				return null;
 			}

@@ -1,5 +1,7 @@
 package com.playmonumenta.plugins.minigames.chess.events;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 import com.playmonumenta.plugins.minigames.chess.ChessBoard;
 import com.playmonumenta.plugins.minigames.chess.ChessPlayer;
 
@@ -20,7 +22,7 @@ public class EndGameChessEvent extends ChessEvent {
 		return mEndGameScore;
 	}
 
-	public ChessPlayer getWinner() {
+	public @Nullable ChessPlayer getWinner() {
 		if (mEndGameScore == 0) {
 			return mWhitePlayer;
 		}
@@ -32,7 +34,7 @@ public class EndGameChessEvent extends ChessEvent {
 		return null;
 	}
 
-	public ChessPlayer getLoser() {
+	public @Nullable ChessPlayer getLoser() {
 		if (mEndGameScore == 1) {
 			return mWhitePlayer;
 		}

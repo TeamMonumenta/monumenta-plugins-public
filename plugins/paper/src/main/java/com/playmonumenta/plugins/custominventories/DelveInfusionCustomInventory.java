@@ -32,7 +32,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 
-public class DelveInfusionCustomInventory extends CustomInventory {
+public final class DelveInfusionCustomInventory extends CustomInventory {
 
 	@FunctionalInterface
 	private interface ItemClicked {
@@ -50,7 +50,7 @@ public class DelveInfusionCustomInventory extends CustomInventory {
 	private static final ItemStack mRefundItem = new ItemStack(Material.GRINDSTONE);
 	private static final ItemStack mMaxLevelReachedItem = new ItemStack(Material.CAKE);
 
-	private Map<Integer, ItemClicked> mMapFunction;
+	private final Map<Integer, ItemClicked> mMapFunction;
 
 	private int mRowSelected = 99;
 
@@ -567,7 +567,7 @@ public class DelveInfusionCustomInventory extends CustomInventory {
 				}
 				mRowSelected = 99;
 			} catch (Exception e) {
-				p.sendMessage(e.getMessage());
+				p.sendMessage("Error while infusing, please contact a mod: " + e);
 			}
 
 		});
@@ -585,7 +585,7 @@ public class DelveInfusionCustomInventory extends CustomInventory {
 				}
 				mRowSelected = 99;
 			} catch (Exception e) {
-				p.sendMessage(e.getMessage());
+				p.sendMessage("Error while infusing, please contact a mod: " + e);
 			}
 
 		});
@@ -603,7 +603,7 @@ public class DelveInfusionCustomInventory extends CustomInventory {
 				}
 				mRowSelected = 99;
 			} catch (Exception e) {
-				p.sendMessage(e.getMessage());
+				p.sendMessage("Error while infusing, please contact a mod: " + e);
 			}
 
 		});
@@ -621,7 +621,7 @@ public class DelveInfusionCustomInventory extends CustomInventory {
 				}
 				mRowSelected = 99;
 			} catch (Exception e) {
-				p.sendMessage(e.getMessage());
+				p.sendMessage("Error while infusing, please contact a mod: " + e);
 			}
 
 		});
@@ -639,7 +639,7 @@ public class DelveInfusionCustomInventory extends CustomInventory {
 				}
 				mRowSelected = 99;
 			} catch (Exception e) {
-				p.sendMessage(e.getMessage());
+				p.sendMessage("Error while infusing, please contact a mod: " + e);
 			}
 
 		});
@@ -657,7 +657,7 @@ public class DelveInfusionCustomInventory extends CustomInventory {
 				}
 				mRowSelected = 99;
 			} catch (Exception e) {
-				p.sendMessage(e.getMessage());
+				p.sendMessage("Error while infusing, please contact a mod: " + e);
 			}
 
 		});
@@ -676,7 +676,7 @@ public class DelveInfusionCustomInventory extends CustomInventory {
 				}
 				mRowSelected = 99;
 			} catch (Exception e) {
-				p.sendMessage(e.getMessage());
+				p.sendMessage("Error while infusing, please contact a mod: " + e);
 			}
 
 		});
@@ -694,7 +694,7 @@ public class DelveInfusionCustomInventory extends CustomInventory {
 				}
 				mRowSelected = 99;
 			} catch (Exception e) {
-				p.sendMessage(e.getMessage());
+				p.sendMessage("Error while infusing, please contact a mod: " + e);
 			}
 
 		});
@@ -712,7 +712,7 @@ public class DelveInfusionCustomInventory extends CustomInventory {
 				}
 				mRowSelected = 99;
 			} catch (Exception e) {
-				p.sendMessage(e.getMessage());
+				p.sendMessage("Error while infusing, please contact a mod: " + e);
 			}
 
 		});
@@ -730,7 +730,7 @@ public class DelveInfusionCustomInventory extends CustomInventory {
 				}
 				mRowSelected = 99;
 			} catch (Exception e) {
-				p.sendMessage(e.getMessage());
+				p.sendMessage("Error while infusing, please contact a mod: " + e);
 			}
 
 		});
@@ -748,7 +748,7 @@ public class DelveInfusionCustomInventory extends CustomInventory {
 				}
 				mRowSelected = 99;
 			} catch (Exception e) {
-				p.sendMessage(e.getMessage());
+				p.sendMessage("Error while infusing, please contact a mod: " + e);
 			}
 
 		});
@@ -766,7 +766,7 @@ public class DelveInfusionCustomInventory extends CustomInventory {
 				}
 				mRowSelected = 99;
 			} catch (Exception e) {
-				p.sendMessage(e.getMessage());
+				p.sendMessage("Error while infusing, please contact a mod: " + e);
 			}
 
 		});
@@ -784,7 +784,7 @@ public class DelveInfusionCustomInventory extends CustomInventory {
 				}
 				mRowSelected = 99;
 			} catch (Exception e) {
-				p.sendMessage(e.getMessage());
+				p.sendMessage("Error while infusing, please contact a mod: " + e);
 			}
 
 		});
@@ -802,7 +802,7 @@ public class DelveInfusionCustomInventory extends CustomInventory {
 				}
 				mRowSelected = 99;
 			} catch (Exception e) {
-				p.sendMessage(e.getMessage());
+				p.sendMessage("Error while infusing, please contact a mod: " + e);
 			}
 
 		});
@@ -820,7 +820,7 @@ public class DelveInfusionCustomInventory extends CustomInventory {
 				}
 				mRowSelected = 99;
 			} catch (Exception e) {
-				p.sendMessage(e.getMessage());
+				p.sendMessage("Error while infusing, please contact a mod: " + e);
 			}
 
 		});
@@ -906,7 +906,7 @@ public class DelveInfusionCustomInventory extends CustomInventory {
 										p.sendMessage("You don't have enough experience and/or currency for this infusion.");
 									}
 								} catch (Exception e) {
-									p.sendMessage(e.getMessage());
+									p.sendMessage("Error while infusing, please contact a mod: " + e);
 								}
 
 							});
@@ -982,11 +982,11 @@ public class DelveInfusionCustomInventory extends CustomInventory {
 			return;
 		}
 
-		if (!mMapFunction.keySet().contains(slot)) {
+		ItemClicked itemClicked = mMapFunction.get(slot);
+		if (itemClicked == null) {
 			return;
 		}
-
-		mMapFunction.get(slot).run(player, clickedInventory, slot);
+		itemClicked.run(player, clickedInventory, slot);
 
 		loadInv(player);
 

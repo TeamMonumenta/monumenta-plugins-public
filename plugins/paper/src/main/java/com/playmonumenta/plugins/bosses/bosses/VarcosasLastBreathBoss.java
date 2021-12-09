@@ -33,31 +33,28 @@ import com.playmonumenta.plugins.bosses.spells.SpellBossBlockBreak;
 import com.playmonumenta.plugins.bosses.spells.SpellConditionalTeleport;
 import com.playmonumenta.plugins.bosses.spells.SpellPlayerAction;
 import com.playmonumenta.plugins.bosses.spells.SpellPurgeNegatives;
+import com.playmonumenta.plugins.bosses.spells.varcosamist.ForcefulGrip;
 import com.playmonumenta.plugins.bosses.spells.varcosamist.SpellActions;
 import com.playmonumenta.plugins.bosses.spells.varcosamist.SpellDeathlyCharge;
 import com.playmonumenta.plugins.bosses.spells.varcosamist.SpellGhostlyCannons;
 import com.playmonumenta.plugins.bosses.spells.varcosamist.SpellJibberJabber;
 import com.playmonumenta.plugins.bosses.spells.varcosamist.SpellSummonConstantly;
 import com.playmonumenta.plugins.bosses.spells.varcosamist.SpellSwitcheroo;
-import com.playmonumenta.plugins.bosses.spells.varcosamist.ForcefulGrip;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.SerializationUtils;
 
-public class VarcosasLastBreathBoss extends BossAbilityGroup {
+public final class VarcosasLastBreathBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_varcosa_breath";
 	public static final int detectionRange = 50;
-	private static String[] mSpeak = {"Arr, I be killin' ye myself then. I shan't be stopped twice...", "The air be growin' stale. I shan't let me end be this!"};
+	private static final String[] mSpeak = {"Arr, I be killin' ye myself then. I shan't be stopped twice...", "The air be growin' stale. I shan't let me end be this!"};
 	private final Location mSpawnLoc;
 	private final Location mEndLoc;
-	private Location mCenter = null;
-	private List<String> mSummonableMobs = new ArrayList<>();
+	private Location mCenter;
 
 	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
-		return SerializationUtils.statefulBossDeserializer(boss, identityTag, (spawnLoc, endLoc) -> {
-			return new VarcosasLastBreathBoss(plugin, boss, spawnLoc, endLoc);
-		});
+		return SerializationUtils.statefulBossDeserializer(boss, identityTag, (spawnLoc, endLoc) -> new VarcosasLastBreathBoss(plugin, boss, spawnLoc, endLoc));
 	}
 
 	@Override
@@ -70,13 +67,15 @@ public class VarcosasLastBreathBoss extends BossAbilityGroup {
 		mSpawnLoc = spawnLoc;
 		mEndLoc = endLoc;
 		mBoss.setRemoveWhenFarAway(false);
+
 		//Possible summons
+		List<String> mSummonableMobs = new ArrayList<>();
 		mSummonableMobs.add("SeaWolf");
 		mSummonableMobs.add("PirateGunner");
 		mSummonableMobs.add("DrownedCrewman");
 
 		for (LivingEntity e : mBoss.getLocation().getNearbyEntitiesByType(ArmorStand.class, detectionRange, detectionRange, detectionRange)) {
-			if (e.getScoreboardTags() != null && !e.getScoreboardTags().isEmpty() && e.getScoreboardTags().contains("varcosa_center")) {
+			if (e.getScoreboardTags().contains("varcosa_center")) {
 				mCenter = e.getLocation();
 				break;
 			}
@@ -102,13 +101,13 @@ public class VarcosasLastBreathBoss extends BossAbilityGroup {
 		//Passives
 
 		List<Spell> passiveSpells = Arrays.asList(
-				new SpellSummonConstantly(mSummonableMobs, 20 * 16, 50, 4, 2, mCenter, mBoss, this),
-				new SpellConditionalTeleport(mBoss, mSpawnLoc, b -> b.getLocation().getBlock().getType() == Material.WATER),
-				new SpellJibberJabber(mBoss, mSpeak, detectionRange),
-				new SpellPurgeNegatives(mBoss, 20 * 3),
-				new SpellBossBlockBreak(mBoss, 175, 1, 3, 1, true, true),
-				action, tooHighAction
-				);
+			new SpellSummonConstantly(mSummonableMobs, 20 * 16, 50, 4, 2, mCenter, this),
+			new SpellConditionalTeleport(mBoss, mSpawnLoc, b -> b.getLocation().getBlock().getType() == Material.WATER),
+			new SpellJibberJabber(mBoss, mSpeak, detectionRange),
+			new SpellPurgeNegatives(mBoss, 20 * 3),
+			new SpellBossBlockBreak(mBoss, 175, 1, 3, 1, true, true),
+			action, tooHighAction
+		);
 
 		BukkitRunnable runnable = SpellActions.getTeleportEntityRunnable(mBoss, mCenter);
 		runnable.runTaskTimer(plugin, 20, 20 * 2);
@@ -152,13 +151,13 @@ public class VarcosasLastBreathBoss extends BossAbilityGroup {
 		int playersInRange = BossUtils.getPlayersInRangeForHealthScaling(mBoss, detectionRange);
 		while (playersInRange > 0) {
 			bossTargetHp += bossHpDelta;
-			bossHpDelta = (int)Math.floor(bossHpDelta / 1.8 + 100);
+			bossHpDelta = (int) Math.floor(bossHpDelta / 1.8 + 100);
 			playersInRange--;
 		}
 
-		mBoss.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(bossTargetHp);
-		mBoss.getAttribute(Attribute.GENERIC_FOLLOW_RANGE).setBaseValue(detectionRange);
-		mBoss.getAttribute(Attribute.GENERIC_KNOCKBACK_RESISTANCE).setBaseValue(1);
+		EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_MAX_HEALTH, bossTargetHp);
+		EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_FOLLOW_RANGE, detectionRange);
+		EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_KNOCKBACK_RESISTANCE, 1);
 		mBoss.setHealth(bossTargetHp);
 
 		summonArmorStandIfNoneAreThere(mCenter.clone().add(0, 0, 11.5));

@@ -14,7 +14,7 @@ import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDeathEvent;
-import org.jetbrains.annotations.NotNull;
+
 
 public class Usurper implements BaseEnchantment {
 
@@ -32,7 +32,7 @@ public class Usurper implements BaseEnchantment {
 	}
 
 	@Override
-	public void onKill(@NotNull Plugin plugin, @NotNull Player player, int level, @NotNull Entity enemy, EntityDeathEvent entityDeathEvent) {
+	public void onKill(Plugin plugin, Player player, int level, Entity enemy, EntityDeathEvent entityDeathEvent) {
 		if (EntityUtils.isBoss(enemy) || EntityUtils.isElite(enemy)) {
 			double healAmount = player.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue() * HEAL_PCT_PER_LVL * DelveInfusionUtils.getModifiedLevel(plugin, player, level);
 			PlayerUtils.healPlayer(player, healAmount);

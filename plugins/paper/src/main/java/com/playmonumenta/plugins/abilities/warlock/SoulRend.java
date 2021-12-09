@@ -12,6 +12,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.inventory.ItemStack;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
@@ -35,7 +36,7 @@ public class SoulRend extends Ability {
 
 	private final int mHeal;
 
-	private DarkPact mDarkPact;
+	private @Nullable DarkPact mDarkPact;
 
 	public SoulRend(Plugin plugin, Player player) {
 		super(plugin, player, "Soul Rend");
@@ -50,7 +51,7 @@ public class SoulRend extends Ability {
 
 		if (player != null) {
 			Bukkit.getScheduler().runTask(plugin, () -> {
-				mDarkPact = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(mPlayer, DarkPact.class);
+				mDarkPact = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, DarkPact.class);
 			});
 		}
 	}

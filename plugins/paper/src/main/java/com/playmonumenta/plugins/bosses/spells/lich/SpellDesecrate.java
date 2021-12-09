@@ -9,7 +9,6 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.World;
-import org.bukkit.attribute.Attribute;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
 import org.bukkit.entity.LivingEntity;
@@ -27,6 +26,7 @@ import com.playmonumenta.plugins.player.PPGroundCircle;
 import com.playmonumenta.plugins.player.PartialParticle;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 
@@ -152,11 +152,7 @@ public class SpellDesecrate extends Spell {
 									world.playSound(mBossLoc, Sound.BLOCK_ENCHANTMENT_TABLE_USE, 2.0f, 0.5f);
 									mHeart.location(mBoss.getEyeLocation()).spawnAsBoss();
 									double newHealth = mBoss.getHealth() * 1.03;
-									if (newHealth >= mBoss.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue()) {
-										mBoss.setHealth(mBoss.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue());
-									} else {
-										mBoss.setHealth(newHealth);
-									}
+									mBoss.setHealth(Math.min(newHealth, EntityUtils.getMaxHealth(mBoss)));
 									toRemove.add(p);
 								}
 							}

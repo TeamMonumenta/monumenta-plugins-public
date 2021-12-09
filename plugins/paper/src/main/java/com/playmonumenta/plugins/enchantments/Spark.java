@@ -27,7 +27,7 @@ import org.bukkit.entity.Projectile;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.metadata.FixedMetadataValue;
-import org.jetbrains.annotations.NotNull;
+
 
 
 
@@ -41,12 +41,12 @@ public class Spark implements BaseEnchantment {
 		= new Particle.DustOptions(Color.fromRGB(255, 241, 110), 1f);
 
 	@Override
-	public @NotNull String getProperty() {
+	public String getProperty() {
 		return "Spark";
 	}
 
 	@Override
-	public @NotNull EnumSet<ItemSlot> getValidSlots() {
+	public EnumSet<ItemSlot> getValidSlots() {
 		return EnumSet.of(ItemSlot.MAINHAND);
 	}
 
@@ -57,11 +57,11 @@ public class Spark implements BaseEnchantment {
 
 	@Override
 	public void onLaunchProjectile(
-		@NotNull Plugin plugin,
-		@NotNull Player player,
+		Plugin plugin,
+		Player player,
 		int level,
-		@NotNull Projectile projectile,
-		@NotNull ProjectileLaunchEvent projectileLaunchEvent
+		Projectile projectile,
+		ProjectileLaunchEvent projectileLaunchEvent
 	) {
 		if (EntityUtils.isSomeArrow(projectile)) {
 			// Eligible arrow is always a Spark arrow for extra damage
@@ -92,10 +92,10 @@ public class Spark implements BaseEnchantment {
 	 * This works this way because you might have the enchantment when you fire the arrow, but switch to a different item before it hits
 	 */
 	public static void onShootAttack(
-		@NotNull Plugin plugin,
-		@NotNull Projectile projectile,
-		@NotNull LivingEntity enemy,
-		@NotNull EntityDamageByEntityEvent entityDamageByEntityEvent
+		Plugin plugin,
+		Projectile projectile,
+		LivingEntity enemy,
+		EntityDamageByEntityEvent entityDamageByEntityEvent
 	) {
 		if (projectile.hasMetadata(METADATA_KEY)) {
 			boolean doEffects = false;
@@ -112,7 +112,7 @@ public class Spark implements BaseEnchantment {
 			}
 
 			if (doEffects) {
-				@NotNull Location halfHeightLocation = LocationUtils.getHalfHeightLocation(enemy);
+				Location halfHeightLocation = LocationUtils.getHalfHeightLocation(enemy);
 				double widerWidthDelta = PartialParticle.getWidthDelta(enemy) * 1.5;
 				//TODO pass in the shooter of the projectile,
 				// then can safely spawn as that player's own active
@@ -143,8 +143,8 @@ public class Spark implements BaseEnchantment {
 				partialParticle.mVaryPositiveY = true;
 				partialParticle.spawnAsEnemy();
 
-				@NotNull World world = enemy.getWorld();
-				@NotNull Location enemyLocation = enemy.getLocation();
+				World world = enemy.getWorld();
+				Location enemyLocation = enemy.getLocation();
 				// /playsound entity.firework_rocket.twinkle master @p ~ ~ ~ 0.5 1.5
 				world.playSound(
 					enemyLocation,

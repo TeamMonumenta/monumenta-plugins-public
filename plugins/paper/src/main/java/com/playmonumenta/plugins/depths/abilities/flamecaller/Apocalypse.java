@@ -7,8 +7,6 @@ import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
-import org.bukkit.attribute.Attribute;
-import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
@@ -80,15 +78,15 @@ public class Apocalypse extends DepthsAbility {
 	}
 
 	private void execute(EntityDamageEvent event) {
-		if (AbilityUtils.isBlocked(event)) {
+		if (mPlayer == null || AbilityUtils.isBlocked(event)) {
 			return;
 		}
 
 		// Calculate whether this effect should not be run based on player health.
 		double healthRemaining = mPlayer.getHealth() + AbsorptionUtils.getAbsorption(mPlayer) - EntityUtils.getRealFinalDamage(event);
 
-		AttributeInstance maxHealth = mPlayer.getAttribute(Attribute.GENERIC_MAX_HEALTH);
-		if (healthRemaining > maxHealth.getValue() * TRIGGER_HEALTH) {
+		double maxHealth = EntityUtils.getMaxHealth(mPlayer);
+		if (healthRemaining > maxHealth * TRIGGER_HEALTH) {
 			return;
 		}
 
@@ -104,9 +102,7 @@ public class Apocalypse extends DepthsAbility {
 			}
 		}
 
-		if (maxHealth != null) {
-			PlayerUtils.healPlayer(mPlayer, maxHealth.getValue() * count * HEALING);
-		}
+		PlayerUtils.healPlayer(mPlayer, maxHealth * count * HEALING);
 
 		World world = mPlayer.getWorld();
 		world.spawnParticle(Particle.EXPLOSION_HUGE, loc, 10, 2, 2, 2);

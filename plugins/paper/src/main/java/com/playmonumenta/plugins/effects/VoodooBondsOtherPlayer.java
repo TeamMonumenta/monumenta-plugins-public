@@ -7,13 +7,13 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.World;
-import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityManager;
@@ -31,7 +31,7 @@ public class VoodooBondsOtherPlayer extends Effect {
 	private final Player mPlayer;
 	private final Plugin mPlugin;
 
-	private VoodooBonds mVoodooBonds;
+	private @Nullable VoodooBonds mVoodooBonds;
 	private int mScore;
 	int mRotation = 0;
 	private boolean mTriggerTickParticle = false;
@@ -43,9 +43,9 @@ public class VoodooBondsOtherPlayer extends Effect {
 		mPlayer = player;
 		mPlugin = plugin;
 
-		if (mPlayer != null) {
+		if (player != null) {
 			Bukkit.getScheduler().runTask(mPlugin, () -> {
-				mVoodooBonds = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(mPlayer, VoodooBonds.class);
+				mVoodooBonds = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, VoodooBonds.class);
 				mScore = mVoodooBonds.getAbilityScore();
 			});
 		}
@@ -56,7 +56,7 @@ public class VoodooBondsOtherPlayer extends Effect {
 		int duration = mScore == 1 ? DURATION_1 : DURATION_2;
 		Player p = (Player) event.getEntity();
 		double damage = event.getFinalDamage();
-		double maxHealth = p.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue();
+		double maxHealth = EntityUtils.getMaxHealth(p);
 		double percentDamage = damage / maxHealth;
 
 		if (event instanceof EntityDamageByEntityEvent) {

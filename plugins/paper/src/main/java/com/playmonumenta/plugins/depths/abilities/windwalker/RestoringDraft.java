@@ -21,7 +21,7 @@ import com.playmonumenta.plugins.utils.PlayerUtils;
 
 import net.md_5.bungee.api.ChatColor;
 
-public class RestoringDraft extends DepthsAbility {
+public final class RestoringDraft extends DepthsAbility {
 
 	public static final String ABILITY_NAME = "Restoring Draft";
 	public static final double[] HEALING = {0.2, 0.3, 0.4, 0.5, 0.6, 0.8};
@@ -42,42 +42,7 @@ public class RestoringDraft extends DepthsAbility {
 		mSlamAttackRunner = new BukkitRunnable() {
 			@Override
 			public void run() {
-				if (player == null) {
-					this.cancel();
-					return;
-				}
-				if (
-					DepthsManager.getInstance().getPlayerLevelInAbility(ABILITY_NAME, player) == 0
-					|| !player.isValid() // Ensure player is not dead, is still online?
-				) {
-					// If reached this point but not silenced, then proceed with cancelling
-					// If silenced, only return to not run anything, but don't cancel runnable
-					if (!AbilityManager.getManager().getPlayerAbilities(player).isSilenced()) {
-						this.cancel();
-					}
-					return;
-				}
-
-				if (!player.isOnGround()) {
-					updateFallFrom(); // Vanilla fall distance would be 0 if on ground
-				} else {
-					// Currently on ground
-
-					// If first tick landing, should still have old mFallFromY to calculate using
-					// Therefore can damage if eligible
-					if (
-						calculateFallDistance() > AUTOMATIC_THRESHOLD
-					) {
-						// Only for checking in LivingEntityDamagedByPlayerEvent below,
-						// so doesn't slam twice, since this doesn't yet set fall distance to 0
-						MetadataUtils.checkOnceThisTick(mPlugin, player, SLAM_ONCE_THIS_TICK_METAKEY);
-
-						heal();
-					}
-
-					// Whether or not did attack, now that on ground, forget mFallFromY
-					mFallFromY = -7050;
-				}
+				checkSlamAttack();
 			}
 		};
 		mSlamAttackRunner.runTaskTimer(mPlugin, 0, 1);
@@ -90,19 +55,72 @@ public class RestoringDraft extends DepthsAbility {
 		}
 	}
 
+	private void checkSlamAttack() {
+		Player player = mPlayer;
+		if (player == null) {
+			if (mSlamAttackRunner != null) {
+				mSlamAttackRunner.cancel();
+			}
+			return;
+		}
+		if (
+			DepthsManager.getInstance().getPlayerLevelInAbility(ABILITY_NAME, player) == 0
+				|| !player.isValid() // Ensure player is not dead, is still online?
+		) {
+			// If reached this point but not silenced, then proceed with cancelling
+			// If silenced, only return to not run anything, but don't cancel runnable
+			if (!AbilityManager.getManager().getPlayerAbilities(player).isSilenced()) {
+				if (mSlamAttackRunner != null) {
+					mSlamAttackRunner.cancel();
+				}
+			}
+			return;
+		}
+
+		if (!player.isOnGround()) {
+			updateFallFrom(); // Vanilla fall distance would be 0 if on ground
+		} else {
+			// Currently on ground
+
+			// If first tick landing, should still have old mFallFromY to calculate using
+			// Therefore can damage if eligible
+			if (
+				calculateFallDistance() > AUTOMATIC_THRESHOLD
+			) {
+				// Only for checking in LivingEntityDamagedByPlayerEvent below,
+				// so doesn't slam twice, since this doesn't yet set fall distance to 0
+				MetadataUtils.checkOnceThisTick(mPlugin, player, SLAM_ONCE_THIS_TICK_METAKEY);
+
+				heal();
+			}
+
+			// Whether or not did attack, now that on ground, forget mFallFromY
+			mFallFromY = -7050;
+		}
+	}
+
 	private void updateFallFrom() {
+		if (mPlayer == null) {
+			return;
+		}
 		double currentY = mPlayer.getLocation().getY();
 		double fallDistance = mPlayer.getFallDistance();
 		mFallFromY = currentY + fallDistance;
 	}
 
 	private double calculateFallDistance() {
+		if (mPlayer == null) {
+			return 0;
+		}
 		double currentY = mPlayer.getLocation().getY();
 		double fallDistance = mFallFromY - currentY;
 		return Math.max(fallDistance, 0);
 	}
 
 	private void heal() {
+		if (mPlayer == null) {
+			return;
+		}
 		double fallDistance = calculateFallDistance();
 		double healing = Math.min(HEIGHT_CAP, fallDistance) * HEALING[mRarity - 1];
 		PlayerUtils.healPlayer(mPlayer, healing);

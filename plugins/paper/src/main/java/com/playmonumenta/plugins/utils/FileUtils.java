@@ -63,14 +63,8 @@ public class FileUtils {
 			file.createNewFile();
 		}
 
-		OutputStreamWriter writer = null;
-		try {
-			writer = new OutputStreamWriter(new FileOutputStream(fileName), StandardCharsets.UTF_8);
+		try (OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(fileName), StandardCharsets.UTF_8)) {
 			writer.write(contents);
-		} finally {
-			if (writer != null) {
-				writer.close();
-			}
 		}
 	}
 

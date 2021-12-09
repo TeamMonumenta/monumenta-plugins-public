@@ -77,7 +77,6 @@ public class RingOfFlames extends DepthsAbility {
 		new BukkitRunnable() {
 			private int mTicks = 0;
 			private int mDeg = 0;
-			private List<LivingEntity> mMobs;
 			@Override
 			public void run() {
 				if (mTicks >= DURATION[mRarity - 1]) {
@@ -100,12 +99,12 @@ public class RingOfFlames extends DepthsAbility {
 
 
 				if (mTicks % 20 == 0) {
-					mMobs = EntityUtils.getNearbyMobs(loc, 6);
-					mMobs.removeIf(mob -> mob.getScoreboardTags().contains(AbilityUtils.IGNORE_TAG) && mob.getName() != DummyDecoy.DUMMY_NAME);
+					List<LivingEntity> mobs = EntityUtils.getNearbyMobs(loc, 6);
+					mobs.removeIf(mob -> mob.getScoreboardTags().contains(AbilityUtils.IGNORE_TAG) && !mob.getName().equals(DummyDecoy.DUMMY_NAME));
 
 					int mobsHitThisTick = 0;
 					for (BoundingBox box : boxes) {
-						for (LivingEntity e : mMobs) {
+						for (LivingEntity e : mobs) {
 							if (box.overlaps(e.getBoundingBox())) {
 								if (mobsHitThisTick <= 10) {
 									world.playSound(e.getLocation(), Sound.ENTITY_GENERIC_EXTINGUISH_FIRE, SoundCategory.PLAYERS, 0.8f, 1f);

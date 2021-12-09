@@ -1,12 +1,5 @@
 package com.playmonumenta.plugins.abilities.warrior;
 
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.classes.ClassAbility;
-import com.playmonumenta.plugins.classes.magic.MagicType;
-import com.playmonumenta.plugins.utils.AbilityUtils;
-import com.playmonumenta.plugins.utils.EntityUtils;
-
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -19,6 +12,13 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.inventory.ItemStack;
 
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.classes.magic.MagicType;
+import com.playmonumenta.plugins.utils.AbilityUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
+
 public class CounterStrike extends Ability {
 
 	private static final int COUNTER_STRIKE_1_DAMAGE = 3;
@@ -27,8 +27,8 @@ public class CounterStrike extends Ability {
 	private static final double COUNTER_STRIKE_2_REFLECT = 0.4;
 	private static final float COUNTER_STRIKE_RADIUS = 3.0f;
 
-	private double mReflect;
-	private int mDamage;
+	private final double mReflect;
+	private final int mDamage;
 
 	public CounterStrike(Plugin plugin, Player player) {
 		super(plugin, player, "Counter Strike");
@@ -44,6 +44,9 @@ public class CounterStrike extends Ability {
 
 	@Override
 	public boolean playerDamagedByLivingEntityEvent(EntityDamageByEntityEvent event) {
+		if (mPlayer == null) {
+			return true;
+		}
 		if (!AbilityUtils.isBlocked(event)) {
 			LivingEntity damager = (LivingEntity) event.getDamager();
 			if (event.getCause() == DamageCause.ENTITY_ATTACK && !(damager instanceof Guardian)) {

@@ -9,7 +9,6 @@ import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
-import org.bukkit.attribute.Attributable;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.attribute.AttributeModifier.Operation;
@@ -220,15 +219,13 @@ public class Twisted extends DelveModifier {
 
 					// These mobs don't have visible equipment and are obnoxious when invisible
 					if (!(mob instanceof Creeper || mob instanceof Spider || mob instanceof Witch
-							|| mob instanceof Enderman || mob instanceof IronGolem)) {
+						|| mob instanceof Enderman || mob instanceof IronGolem)) {
 						PotionUtils.applyPotion(null, mob,
-								new PotionEffect(PotionEffectType.INVISIBILITY, 20 * 3600 * 100, 0, false, false));
+						                        new PotionEffect(PotionEffectType.INVISIBILITY, 20 * 3600 * 100, 0, false, false));
 					}
 
-					if (mob instanceof Attributable) {
-						EntityUtils.addAttribute(mob, Attribute.GENERIC_MOVEMENT_SPEED,
-								new AttributeModifier(PERCENT_SPEED_MODIFIER_NAME, PERCENT_SPEED_MODIFIER, Operation.MULTIPLY_SCALAR_1));
-					}
+					EntityUtils.addAttribute(mob, Attribute.GENERIC_MOVEMENT_SPEED,
+					                         new AttributeModifier(PERCENT_SPEED_MODIFIER_NAME, PERCENT_SPEED_MODIFIER, Operation.MULTIPLY_SCALAR_1));
 				}
 			}.runTaskLater(plugin, 60);
 		}

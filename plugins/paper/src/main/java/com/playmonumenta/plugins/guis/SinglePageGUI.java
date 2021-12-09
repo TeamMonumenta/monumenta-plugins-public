@@ -9,6 +9,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.CommandPermission;
@@ -27,11 +28,11 @@ public abstract class SinglePageGUI {
 	 * DO NOT OVERRIDE ANY OTHER METHODS!
 	 */
 
-	protected final Player mPlayer;
-	protected final Inventory mInventory;
+	protected final @Nullable Player mPlayer;
+	protected final @Nullable Inventory mInventory;
 
 	// The child constructor should just call the parent constructor
-	public SinglePageGUI(Player player, String[] args) {
+	public SinglePageGUI(@Nullable Player player, @Nullable String[] args) {
 		mPlayer = player;
 
 		// If the player is null, this was called from the manager to register a command.

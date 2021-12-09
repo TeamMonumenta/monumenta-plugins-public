@@ -19,8 +19,8 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.potion.PotionData;
 import org.bukkit.potion.PotionType;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.player.PartialParticle;
 import com.playmonumenta.plugins.utils.ItemUtils;
@@ -32,8 +32,8 @@ import com.playmonumenta.plugins.utils.PlayerUtils;
 
 public class BrewingListener implements Listener {
 	@EventHandler(ignoreCancelled = true)
-	public void brewEvent(@NotNull BrewEvent brewEvent) {
-		@NotNull BrewerInventory brewerInventory = brewEvent.getContents();
+	public void brewEvent(BrewEvent brewEvent) {
+		BrewerInventory brewerInventory = brewEvent.getContents();
 		@Nullable ItemStack ingredient = brewerInventory.getIngredient();
 		if (ingredient != null) {
 			boolean malfunction = false;
@@ -41,7 +41,7 @@ public class BrewingListener implements Listener {
 			// https://papermc.io/javadocs/paper/1.16/org/bukkit/inventory/Inventory.html#getStorageContents--
 			for (@Nullable ItemStack potentialPotion : brewerInventory.getStorageContents()) {
 				if (potentialPotion != null && ItemUtils.isSomePotion(potentialPotion)) {
-					@NotNull Material ingredientMaterial = ingredient.getType();
+					Material ingredientMaterial = ingredient.getType();
 					if (
 						// Slow falling + Recoil enchant essentially allows flight,
 						// huge nope for Monumenta
@@ -56,8 +56,8 @@ public class BrewingListener implements Listener {
 					} else if (ingredientMaterial == Material.FERMENTED_SPIDER_EYE) {
 						ItemMeta itemMeta = potentialPotion.getItemMeta();
 						if (itemMeta instanceof PotionMeta) {
-							@NotNull PotionData potionData
-								= ((PotionMeta)itemMeta).getBasePotionData();
+							PotionData potionData
+								= ((PotionMeta) itemMeta).getBasePotionData();
 							if (potionData.getType() == PotionType.NIGHT_VISION) {
 								malfunction = true;
 								break;
@@ -74,8 +74,8 @@ public class BrewingListener implements Listener {
 				//TODO scrap knockback, change effects (bubbling), add player grey + grey-italic messages
 
 				// Knock players back
-				@NotNull Block block = brewEvent.getBlock();
-				@NotNull Location blockCentre = LocationUtils.getLocationCentre(block);
+				Block block = brewEvent.getBlock();
+				Location blockCentre = LocationUtils.getLocationCentre(block);
 				List<Player> nearbyPlayers = PlayerUtils.playersInRange(blockCentre, 3, true);
 				for (Player player : nearbyPlayers) {
 					MovementUtils.knockAway(blockCentre, player, 1);
@@ -83,11 +83,11 @@ public class BrewingListener implements Listener {
 
 				// Eject ingredient & refund
 				brewerInventory.setIngredient(null);
-				@NotNull World world = blockCentre.getWorld();
+				World world = blockCentre.getWorld();
 				world.dropItemNaturally(blockCentre, ingredient);
 
 				// Effects
-				@NotNull PartialParticle partialParticle = new PartialParticle(
+				PartialParticle partialParticle = new PartialParticle(
 					Particle.EXPLOSION_LARGE,
 					blockCentre,
 					2,

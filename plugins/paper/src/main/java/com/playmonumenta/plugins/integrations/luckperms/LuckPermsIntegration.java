@@ -1,12 +1,12 @@
 package com.playmonumenta.plugins.integrations.luckperms;
 
 import java.util.Optional;
-import java.util.Map.Entry;
 
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.utils.LocationUtils;
@@ -42,7 +42,7 @@ public class LuckPermsIntegration {
 		SetGuildTeleport.register(plugin);
 	}
 
-	public static Group getGuild(Player player) {
+	public static @Nullable Group getGuild(Player player) {
 		User user = UM.getUser(player.getUniqueId());
 		for (Group group : user.getInheritedGroups(QueryOptions.nonContextual())) {
 			for (MetaNode node : group.getNodes(NodeType.META)) {
@@ -55,7 +55,7 @@ public class LuckPermsIntegration {
 		return null;
 	}
 
-	public static String getGuildName(Group group) {
+	public static @Nullable String getGuildName(Group group) {
 		if (group == null) {
 			return null;
 		}
@@ -88,7 +88,7 @@ public class LuckPermsIntegration {
 		}.runTaskAsynchronously(plugin);
 	}
 
-	public static Location getGuildTp(World world, Group group) {
+	public static @Nullable Location getGuildTp(World world, Group group) {
 		try {
 			for (MetaNode node : group.getNodes(NodeType.META)) {
 				if (node.getMetaKey().equals("guildtp")) {

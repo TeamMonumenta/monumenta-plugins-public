@@ -12,7 +12,7 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.jetbrains.annotations.NotNull;
+
 
 import com.goncalomb.bukkit.mylib.utils.CustomInventory;
 import com.playmonumenta.plugins.depths.abilities.WeaponAspectDepthsAbility;
@@ -172,7 +172,7 @@ public class DepthsWeaponAspectGUI extends CustomInventory {
 
 		if (player.getInventory().containsAtLeast(currencyItem, totalToRemove)) {
 
-			@NotNull HashMap<Integer, ? extends ItemStack> findItems = player.getInventory().all(currencyItem.getType());
+			HashMap<Integer, ? extends ItemStack> findItems = player.getInventory().all(currencyItem.getType());
 			if (!findItems.isEmpty()) {
 				for (Entry<Integer, ? extends ItemStack> set : findItems.entrySet()) {
 					ItemStack testStack = set.getValue().clone();

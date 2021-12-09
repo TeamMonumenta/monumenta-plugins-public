@@ -14,13 +14,12 @@ import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityManager;
-import com.playmonumenta.plugins.abilities.warlock.reaper.DarkPact;
 import com.playmonumenta.plugins.abilities.warlock.reaper.JudgementChain;
-import com.playmonumenta.plugins.abilities.warlock.tenebrist.UmbralWail;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
@@ -41,9 +40,7 @@ public class MelancholicLament extends Ability {
 	private static final Particle.DustOptions COLOR = new Particle.DustOptions(Color.fromRGB(235, 235, 224), 1.0f);
 
 	private final double mWeakenEffect;
-	private JudgementChain mJudgementChain;
-	private DarkPact mDarkPact;
-	private UmbralWail mUmbral;
+	private @Nullable JudgementChain mJudgementChain;
 
 
 	public MelancholicLament(Plugin plugin, Player player) {
@@ -59,15 +56,16 @@ public class MelancholicLament extends Ability {
 		mWeakenEffect = getAbilityScore() == 1 ? WEAKEN_EFFECT_1 : WEAKEN_EFFECT_2;
 		if (player != null) {
 			Bukkit.getScheduler().runTask(plugin, () -> {
-				mJudgementChain = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(mPlayer, JudgementChain.class);
-				mDarkPact = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(mPlayer, DarkPact.class);
-				mUmbral = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(mPlayer, UmbralWail.class);
+				mJudgementChain = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, JudgementChain.class);
 			});
 		}
 	}
 
 	@Override
 	public void playerSwapHandItemsEvent(PlayerSwapHandItemsEvent event) {
+		if (mPlayer == null) {
+			return;
+		}
 		ItemStack mainHandItem = mPlayer.getInventory().getItemInMainHand();
 		if (ItemUtils.isHoe(mainHandItem)) {
 			event.setCancelled(true);

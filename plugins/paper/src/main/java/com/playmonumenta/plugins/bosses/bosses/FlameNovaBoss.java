@@ -9,6 +9,7 @@ import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.spells.SpellFlameNova;
 
 /**
+ * @author G3m1n1Boy
  * @deprecated use boss_nova instead, like this:
  * <blockquote><pre>
  * /bos var Tags add boss_nova
@@ -16,9 +17,8 @@ import com.playmonumenta.plugins.bosses.spells.SpellFlameNova;
  * /bos var Tags add boss_nova[soundCharge=BLOCK_FIRE_AMBIENT,SoundCast=[(ENTITY_WITHER_SHOOT,1.5,0.65)]]
  * /bos var Tags add boss_nova[ParticleAir=[(lava,2,4.5,4.5,4.5,0.05)],ParticleLoad=[(flame,1,0.25,0.25,0.25,0.1)],ParticleExplode=[(flame,1,0.1,0.1,0.1,0.3),(smoke_normal,2,0.25,0.25,0.25,0.1)]]
  * </pre></blockquote>
- * @author G3m1n1Boy
  */
-public class FlameNovaBoss extends BossAbilityGroup {
+public final class FlameNovaBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_flamenova";
 
 	public static class Parameters extends BossParameters {

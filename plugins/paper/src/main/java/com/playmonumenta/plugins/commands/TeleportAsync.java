@@ -7,9 +7,6 @@ import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentSkipListSet;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-
 import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
@@ -17,6 +14,7 @@ import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import org.bukkit.util.Vector;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.utils.CommandUtils;
 
@@ -135,7 +133,7 @@ public class TeleportAsync extends GenericCommand {
 	}
 
 	// Teleport (possibly proxied) sender to an entity, copying its rotation
-	private static int teleport(@Nonnull CommandSender sender, @Nonnull FunctionWrapper[] functions, @Nonnull Entity dst) throws WrapperCommandSyntaxException {
+	private static int teleport(CommandSender sender, FunctionWrapper[] functions, Entity dst) throws WrapperCommandSyntaxException {
 		CommandSender srcSender = CommandUtils.getCallee(sender);
 
 		if (!(srcSender instanceof Entity)) {
@@ -143,12 +141,12 @@ public class TeleportAsync extends GenericCommand {
 			return 0;
 		}
 
-		Entity src = (Entity)srcSender;
+		Entity src = (Entity) srcSender;
 		return teleport(sender, functions, src, dst.getLocation(), getEntityRotation(dst));
 	}
 
 	// Teleport (possibly proxied) sender to a location
-	private static int teleport(@Nonnull CommandSender sender, @Nonnull FunctionWrapper[] functions, @Nonnull Location dst) throws WrapperCommandSyntaxException {
+	private static int teleport(CommandSender sender, FunctionWrapper[] functions, Location dst) throws WrapperCommandSyntaxException {
 		CommandSender srcSender = CommandUtils.getCallee(sender);
 
 		if (!(srcSender instanceof Entity)) {
@@ -156,11 +154,11 @@ public class TeleportAsync extends GenericCommand {
 			return 0;
 		}
 
-		Entity src = (Entity)srcSender;
+		Entity src = (Entity) srcSender;
 		return teleport(sender, functions, src, dst, null);
 	}
 
-	private static int teleport(@Nonnull CommandSender sender, @Nonnull FunctionWrapper[] functions, @Nonnull Collection<Entity> srcs, @Nonnull Location dst, @Nullable Rotation rot) {
+	private static int teleport(CommandSender sender, FunctionWrapper[] functions, Collection<Entity> srcs, Location dst, @Nullable Rotation rot) {
 		int teleported = 0;
 		for (Entity src : srcs) {
 			teleported += teleport(sender, functions, src, dst, rot);
@@ -168,17 +166,17 @@ public class TeleportAsync extends GenericCommand {
 		return teleported;
 	}
 
-	public static int teleport(@Nonnull CommandSender sender, @Nonnull FunctionWrapper[] functions, @Nonnull Entity src, @Nonnull Location dst, @Nullable Rotation rot) {
+	public static int teleport(CommandSender sender, FunctionWrapper[] functions, Entity src, Location dst, @Nullable Rotation rot) {
 		if (entitiesTeleportingAsync.contains(src.getUniqueId())) {
 			sender.sendMessage(src.getName() + " is already scheduled to teleport, honoring previous request instead.");
 			return 0;
 		}
 
 		if (src instanceof Player) {
-			((Player)src).setSwimming(false);
+			((Player) src).setSwimming(false);
 		}
 		if (src instanceof Mob) {
-			((Mob)src).setVelocity(new Vector(0, 0.1, 0));
+			((Mob) src).setVelocity(new Vector(0, 0.1, 0));
 		}
 
 		Location srcLocation = src.getLocation();
@@ -219,7 +217,7 @@ public class TeleportAsync extends GenericCommand {
 		return 1;
 	}
 
-	private static int teleportFacing(@Nonnull CommandSender sender, @Nonnull FunctionWrapper[] functions, @Nonnull Collection<Entity> srcs, @Nonnull Location dst, @Nonnull Entity facingEntity) {
+	private static int teleportFacing(CommandSender sender, FunctionWrapper[] functions, Collection<Entity> srcs, Location dst, Entity facingEntity) {
 		Rotation rot;
 		if (srcs.contains(facingEntity)) {
 			rot = new Rotation(0.0f, -90.0f);
@@ -234,7 +232,7 @@ public class TeleportAsync extends GenericCommand {
 		return teleported;
 	}
 
-	private static int teleportFacing(@Nonnull CommandSender sender, @Nonnull FunctionWrapper[] functions, @Nonnull Collection<Entity> srcs, @Nonnull Location dst, @Nonnull Location facing) {
+	private static int teleportFacing(CommandSender sender, FunctionWrapper[] functions, Collection<Entity> srcs, Location dst, Location facing) {
 		Rotation rot = getFacingRotation(dst, facing);
 
 		int teleported = 0;
@@ -244,16 +242,16 @@ public class TeleportAsync extends GenericCommand {
 		return teleported;
 	}
 
-	private static Rotation getEntityRotation(@Nonnull Entity entity) {
+	private static Rotation getEntityRotation(Entity entity) {
 		Location loc = entity.getLocation();
 		return getLocationRotation(loc);
 	}
 
-	public static Rotation getLocationRotation(@Nonnull Location loc) {
+	public static Rotation getLocationRotation(Location loc) {
 		return new Rotation(loc.getPitch(), loc.getYaw());
 	}
 
-	private static Rotation getFacingRotation(@Nonnull Location dst, @Nonnull Location facing) {
+	private static Rotation getFacingRotation(Location dst, Location facing) {
 		Vector dstVec = dst.toVector();
 		Vector facingVec = facing.toVector();
 		facingVec.subtract(dstVec);

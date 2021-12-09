@@ -27,6 +27,7 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.event.player.PlayerItemDamageEvent;
 import org.bukkit.inventory.ItemStack;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.Constants;
@@ -46,8 +47,8 @@ import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
 public class PlayerTracking implements EntityTracking {
 	private static PlayerTracking INSTANCE = null;
 
-	Plugin mPlugin = null;
-	private HashMap<Player, PlayerInventoryManager> mPlayers = new HashMap<Player, PlayerInventoryManager>();
+	private final Plugin mPlugin;
+	private final HashMap<Player, PlayerInventoryManager> mPlayers = new HashMap<>();
 
 	PlayerTracking(Plugin plugin) {
 		mPlugin = plugin;
@@ -105,7 +106,7 @@ public class PlayerTracking implements EntityTracking {
 		return 0;
 	}
 
-	public void updateEquipmentProperties(Player player, Event event) {
+	public void updateEquipmentProperties(Player player, @Nullable Event event) {
 		PlayerInventoryManager manager = mPlayers.get(player);
 		if (manager != null) {
 			manager.updateEquipmentProperties(mPlugin, player, event);

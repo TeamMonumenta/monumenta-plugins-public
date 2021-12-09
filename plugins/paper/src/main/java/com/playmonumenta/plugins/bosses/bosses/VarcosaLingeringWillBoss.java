@@ -31,6 +31,7 @@ import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.bosses.spells.SpellBossBlockBreak;
 import com.playmonumenta.plugins.bosses.spells.SpellPlayerAction;
 import com.playmonumenta.plugins.bosses.spells.SpellPurgeNegatives;
+import com.playmonumenta.plugins.bosses.spells.varcosamist.ForcefulGrip;
 import com.playmonumenta.plugins.bosses.spells.varcosamist.SpellActions;
 import com.playmonumenta.plugins.bosses.spells.varcosamist.SpellDeathlyCharge;
 import com.playmonumenta.plugins.bosses.spells.varcosamist.SpellGhostlyCannons;
@@ -38,19 +39,17 @@ import com.playmonumenta.plugins.bosses.spells.varcosamist.SpellJibberJabber;
 import com.playmonumenta.plugins.bosses.spells.varcosamist.SpellPurgeGlowing;
 import com.playmonumenta.plugins.bosses.spells.varcosamist.SpellSummonConstantly;
 import com.playmonumenta.plugins.bosses.spells.varcosamist.SpellSwitcheroo;
-import com.playmonumenta.plugins.bosses.spells.varcosamist.ForcefulGrip;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.SerializationUtils;
 
-public class VarcosaLingeringWillBoss extends BossAbilityGroup {
+public final class VarcosaLingeringWillBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_varcosa_will";
 	public static final int detectionRange = 50;
 	private final Location mSpawnLoc;
 	private final Location mEndLoc;
-	private Location mCenter = null;
-	private List<String> mSummonableMobs = new ArrayList<>();
+	private Location mCenter;
 	private String[] mSpeak = {"The cold beyond be takin' me. It'll be takin' ye too...", "The veil be partin'... I won't go... not without me treasure..."};
 
 	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
@@ -70,16 +69,17 @@ public class VarcosaLingeringWillBoss extends BossAbilityGroup {
 		mEndLoc = endLoc;
 		mBoss.setRemoveWhenFarAway(false);
 
+		List<String> mSummonableMobs = new ArrayList<>();
 		mSummonableMobs.add("SeaWolf");
 		mSummonableMobs.add("PirateGunner");
 		mSummonableMobs.add("DrownedCrewman");
 
 		for (LivingEntity e : mBoss.getLocation().getNearbyEntitiesByType(ArmorStand.class, detectionRange, detectionRange, detectionRange)) {
-					if (e.getScoreboardTags() != null && !e.getScoreboardTags().isEmpty() && e.getScoreboardTags().contains("varcosa_center")) {
-						mCenter = e.getLocation();
-						break;
-					}
-				}
+			if (e.getScoreboardTags().contains("varcosa_center")) {
+				mCenter = e.getLocation();
+				break;
+			}
+		}
 
 		if (mCenter == null) {
 			//This should be the same spot as the armor stand - but it is really bad to do things like this, and should only be the fallback
@@ -103,15 +103,15 @@ public class VarcosaLingeringWillBoss extends BossAbilityGroup {
 
 		runnable.runTaskTimer(plugin, 20, 20 * 2);
 		List<Spell> passiveSpells = Arrays.asList(
-				new SpellSummonConstantly(mSummonableMobs, 20 * 16, 50, 4, 2, mCenter, mBoss, this),
-				new SpellJibberJabber(mBoss, mSpeak, detectionRange),
-				new SpellPurgeNegatives(mBoss, 2),
-				new SpellPurgeGlowing(mBoss, 20 * 15),
-				new SpellBossBlockBreak(mBoss, 175, 1, 3, 1, true, true),
-				action, tooHighAction
-				);
+			new SpellSummonConstantly(mSummonableMobs, 20 * 16, 50, 4, 2, mCenter, this),
+			new SpellJibberJabber(mBoss, mSpeak, detectionRange),
+			new SpellPurgeNegatives(mBoss, 2),
+			new SpellPurgeGlowing(mBoss, 20 * 15),
+			new SpellBossBlockBreak(mBoss, 175, 1, 3, 1, true, true),
+			action, tooHighAction
+		);
 
-		Map<Integer, BossHealthAction> events = new HashMap<Integer, BossHealthAction>();
+		Map<Integer, BossHealthAction> events = new HashMap<>();
 		events.put(10, mBoss -> forceCastSpell(SpellGhostlyCannons.class));
 		BossBarManager bossBar = new BossBarManager(mPlugin, mBoss, detectionRange + 20, BarColor.RED, BarStyle.SEGMENTED_10, events);
 
@@ -164,13 +164,13 @@ public class VarcosaLingeringWillBoss extends BossAbilityGroup {
 		int playersInRange = BossUtils.getPlayersInRangeForHealthScaling(mBoss, detectionRange);
 		while (playersInRange > 0) {
 			bossTargetHp += bossHpDelta;
-			bossHpDelta = (int)Math.floor(bossHpDelta / 1.8 + 100);
+			bossHpDelta = (int) Math.floor(bossHpDelta / 1.8 + 100);
 			playersInRange--;
 		}
 
-		mBoss.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(bossTargetHp);
-		mBoss.getAttribute(Attribute.GENERIC_FOLLOW_RANGE).setBaseValue(detectionRange);
-		mBoss.getAttribute(Attribute.GENERIC_KNOCKBACK_RESISTANCE).setBaseValue(1);
+		EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_MAX_HEALTH, bossTargetHp);
+		EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_FOLLOW_RANGE, detectionRange);
+		EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_KNOCKBACK_RESISTANCE, 1);
 		mBoss.setHealth(bossTargetHp);
 
 		PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "effect give @s minecraft:blindness 2 2");

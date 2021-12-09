@@ -66,13 +66,17 @@ public class DepthsRemoveAbilityGUI extends CustomInventory {
 	protected void inventoryClick(InventoryClickEvent event) {
 		event.setCancelled(true);
 		if (event.getClickedInventory() != _inventory ||
-				event.getCurrentItem().getType() == FILLER) {
+			event.getCurrentItem() == null
+			|| event.getCurrentItem().getType() == FILLER) {
 			return;
 		}
 		Player player = (Player) event.getWhoClicked();
 		DepthsManager instance = DepthsManager.getInstance();
 
 		List<DepthsAbility> abilities = instance.getPlayerAbilities(player);
+		if (abilities == null) {
+			return;
+		}
 
 		if (event.getCurrentItem().getType() == CONFIRM_MAT) {
 			for (DepthsAbility ability : abilities) {

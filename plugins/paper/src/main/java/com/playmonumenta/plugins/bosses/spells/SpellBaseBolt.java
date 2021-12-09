@@ -3,11 +3,6 @@ package com.playmonumenta.plugins.bosses.spells;
 import java.util.List;
 import java.util.function.Predicate;
 
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.FastUtils;
-import com.playmonumenta.plugins.utils.LocationUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
-
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -17,6 +12,12 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
+import org.checkerframework.checker.nullness.qual.Nullable;
+
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.LocationUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 
 /**
  * This is the base spell for a bolt spell.
@@ -59,20 +60,21 @@ public class SpellBaseBolt extends Spell {
 	public interface IntersectAction {
 		/**
 		 * User function called when the bolt hits/intersects with a player
+		 *
 		 * @param player  Player being targeted
 		 * @param loc     Location where the laser ends (either at player or occluding block)
 		 * @param blocked Whether the laser is obstructed (true) or hits the player (false)
 		 */
-		void run(Player player, Location loc, boolean blocked);
+		void run(@Nullable Player player, Location loc, boolean blocked);
 	}
 
-	private Plugin mPlugin;
-	private LivingEntity mCaster;
-	private int mDelay;
-	private int mDuration;
-	private double mVelocity;
-	private double mDetectRange;
-	private double mHitboxRadius;
+	private final Plugin mPlugin;
+	private final LivingEntity mCaster;
+	private final int mDelay;
+	private final int mDuration;
+	private final double mVelocity;
+	private final double mDetectRange;
+	private final double mHitboxRadius;
 	private final boolean mSingleTarget;
 	private final boolean mStopOnFirstHit;
 	private final int mShots;
@@ -81,7 +83,7 @@ public class SpellBaseBolt extends Spell {
 	private final CastAction mCastAction;
 	private final ParticleAction mParticleAction;
 	private final IntersectAction mIntersectAction;
-	private final Predicate<Player> mPlayerFilter;
+	private final @Nullable Predicate<Player> mPlayerFilter;
 
 	/**
 	 *
@@ -103,7 +105,7 @@ public class SpellBaseBolt extends Spell {
 	 */
 	public SpellBaseBolt(Plugin plugin, LivingEntity caster, int delay, int duration, double velocity,
 	                     double detectRange, double hitboxRadius, boolean singleTarget, boolean stopOnFirstHit, int shots, int rate,
-						 TickAction tickAction, CastAction castAction, ParticleAction particleAction, IntersectAction intersectAction, Predicate<Player> playerFilter) {
+	                     TickAction tickAction, CastAction castAction, ParticleAction particleAction, IntersectAction intersectAction, @Nullable Predicate<Player> playerFilter) {
 		mPlugin = plugin;
 		mCaster = caster;
 		mDelay = delay;
@@ -148,8 +150,9 @@ public class SpellBaseBolt extends Spell {
 							if (mSingleTarget) {
 								if (mCaster instanceof Mob) {
 									Mob mob = (Mob) mCaster;
-									if (mob.getTarget() != null && mob.getTarget() instanceof Player) {
-										launchBolt((Player)mob.getTarget());
+									LivingEntity target = mob.getTarget();
+									if (target instanceof Player) {
+										launchBolt((Player) target);
 									} else {
 										Player player = players.get(FastUtils.RANDOM.nextInt(players.size()));
 										launchBolt(player);

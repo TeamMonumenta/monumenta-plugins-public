@@ -13,8 +13,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.Vector;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
@@ -34,7 +33,7 @@ import com.playmonumenta.plugins.utils.LocationUtils;
 
 
 public class ElementalSpiritIce extends Ability {
-	@NotNull public static final ClassAbility ABILITY = ClassAbility.ELEMENTAL_SPIRIT_ICE;
+	public static final ClassAbility ABILITY = ClassAbility.ELEMENTAL_SPIRIT_ICE;
 
 	public static final int DAMAGE_1 = 4;
 	public static final int DAMAGE_2 = 6;
@@ -47,7 +46,7 @@ public class ElementalSpiritIce extends Ability {
 
 	private final int mLevelDamage;
 	private final double mLevelBowMultiplier;
-	private final @NotNull Set<LivingEntity> mEnemiesAffected = new HashSet<>();
+	private final Set<LivingEntity> mEnemiesAffected = new HashSet<>();
 
 	private @Nullable ElementalArrows mElementalArrows;
 	private @Nullable BukkitTask mPlayerParticlesGenerator;
@@ -89,7 +88,7 @@ public class ElementalSpiritIce extends Ability {
 					public void run() {
 						mEnemiesAffectedProcessor = null;
 
-						@NotNull Location playerLocation = mPlayer.getLocation();
+						Location playerLocation = mPlayer.getLocation();
 						@Nullable LivingEntity closestEnemy = null;
 						double closestDistanceSquared = 7050;
 
@@ -107,9 +106,9 @@ public class ElementalSpiritIce extends Ability {
 						if (closestEnemy != null) {
 							putOnCooldown();
 
-							@NotNull Location centre = LocationUtils.getHalfHeightLocation(closestEnemy);
+							Location centre = LocationUtils.getHalfHeightLocation(closestEnemy);
 							float spellDamage = SpellPower.getSpellDamage(mPlayer, mLevelDamage);
-							@NotNull World world = mPlayer.getWorld();
+							World world = mPlayer.getWorld();
 							mSpiritPulser = new BukkitRunnable() {
 								int mPulses = 1; // The current pulse for this run
 
@@ -130,7 +129,7 @@ public class ElementalSpiritIce extends Ability {
 									}
 
 									// Ice spirit effects
-									@NotNull PartialParticle partialParticle = new PartialParticle(
+									PartialParticle partialParticle = new PartialParticle(
 										Particle.SNOWBALL,
 										centre,
 										150,

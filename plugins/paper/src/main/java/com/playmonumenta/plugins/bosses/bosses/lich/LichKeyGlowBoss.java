@@ -5,11 +5,12 @@ import java.util.List;
 
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.plugin.Plugin;
+
 import com.playmonumenta.plugins.bosses.bosses.BossAbilityGroup;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.bosses.spells.lich.undeadplayers.SpellLichKeyGlow;
 
-public class LichKeyGlowBoss extends BossAbilityGroup {
+public final class LichKeyGlowBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_lich_keyglow";
 	public static final int detectionRange = 55;
 	LivingEntity mBoss;

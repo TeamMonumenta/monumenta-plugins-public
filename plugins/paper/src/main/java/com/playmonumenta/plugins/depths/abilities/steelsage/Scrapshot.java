@@ -51,6 +51,9 @@ public class Scrapshot extends DepthsAbility {
 
 	@Override
 	public void cast(Action trigger) {
+		if (mPlayer == null) {
+			return;
+		}
 		putOnCooldown();
 
 		Location loc = mPlayer.getEyeLocation();
@@ -126,7 +129,7 @@ public class Scrapshot extends DepthsAbility {
 
 	@Override
 	public boolean runCheck() {
-		return mPlayer.isSneaking() && DepthsUtils.isWeaponItem(mPlayer.getInventory().getItemInMainHand());
+		return mPlayer != null && mPlayer.isSneaking() && DepthsUtils.isWeaponItem(mPlayer.getInventory().getItemInMainHand());
 	}
 
 	@Override

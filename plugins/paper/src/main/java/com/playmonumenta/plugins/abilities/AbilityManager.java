@@ -35,6 +35,7 @@ import org.bukkit.event.player.PlayerItemDamageEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.inventory.ItemStack;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.google.gson.JsonElement;
 import com.playmonumenta.plugins.Plugin;
@@ -511,27 +512,29 @@ public class AbilityManager {
 		 *
 		 * TODO: This should be replaced with calls to remove() in each respective ability.
 		 */
-		AttributeInstance[] instances = {
-				knockbackResistance,
-				armor,
-				toughness,
-				attackDamage,
-				attackSpeed,
-				movementSpeed,
-				maxHealth
+		@Nullable AttributeInstance[] instances = {
+			knockbackResistance,
+			armor,
+			toughness,
+			attackDamage,
+			attackSpeed,
+			movementSpeed,
+			maxHealth
 		};
 
 		for (AttributeInstance instance : instances) {
-			for (AttributeModifier mod : instance.getModifiers()) {
-				String name = mod.getName();
-				// The name of modifiers from vanilla attributes or potions or the vitality infusion
-				if (!name.equals("Modifier")
+			if (instance != null) {
+				for (AttributeModifier mod : instance.getModifiers()) {
+					String name = mod.getName();
+					// The name of modifiers from vanilla attributes or potions or the vitality infusion
+					if (!name.equals("Modifier")
 						&& !name.startsWith("minecraft:generic.")
 						&& !name.startsWith("effect.minecraft.")
 						&& !name.startsWith("Armor ")
 						&& !name.startsWith("Weapon ")
 						&& !name.equals(Vitality.MODIFIER)) {
-					instance.removeModifier(mod);
+						instance.removeModifier(mod);
+					}
 				}
 			}
 		}
@@ -593,11 +596,11 @@ public class AbilityManager {
 		return collection;
 	}
 
-	public <T extends Ability> T getPlayerAbility(Player player, Class<T> cls) {
+	public <T extends @Nullable Ability> T getPlayerAbility(Player player, Class<T> cls) {
 		return getPlayerAbilities(player).getAbility(cls);
 	}
 
-	public <T extends Ability> T getPlayerAbilityIgnoringSilence(Player player, Class<T> cls) {
+	public <T extends @Nullable Ability> T getPlayerAbilityIgnoringSilence(Player player, Class<T> cls) {
 		return getPlayerAbilities(player).getAbilityIgnoringSilence(cls);
 	}
 

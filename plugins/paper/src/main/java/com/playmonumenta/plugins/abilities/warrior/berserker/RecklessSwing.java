@@ -13,6 +13,7 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.inventory.ItemStack;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
@@ -41,7 +42,7 @@ public class RecklessSwing extends Ability {
 	private final double mMaxDamagePercent;
 	private final int mDamage;
 
-	private Rampage mRampage;
+	private @Nullable Rampage mRampage;
 
 	public RecklessSwing(Plugin plugin, Player player) {
 		super(plugin, player, "Reckless Swing");
@@ -59,7 +60,7 @@ public class RecklessSwing extends Ability {
 
 		if (player != null) {
 			Bukkit.getScheduler().runTask(plugin, () -> {
-				mRampage = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(mPlayer, Rampage.class);
+				mRampage = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, Rampage.class);
 			});
 		}
 	}

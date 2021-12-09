@@ -36,7 +36,7 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.SerializationUtils;
 
-public class AzacorNormal extends BossAbilityGroup {
+public final class AzacorNormal extends BossAbilityGroup {
 	public static final String identityTag = "boss_azacornorm";
 	public static final int detectionRange = 50;
 
@@ -149,7 +149,7 @@ public class AzacorNormal extends BossAbilityGroup {
 			hpDelta = hpDelta / 2;
 			playerCount--;
 		}
-		mBoss.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(bossTargetHp);
+		EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_MAX_HEALTH, bossTargetHp);
 		mBoss.setHealth(bossTargetHp);
 
 		//launch event related spawn commands

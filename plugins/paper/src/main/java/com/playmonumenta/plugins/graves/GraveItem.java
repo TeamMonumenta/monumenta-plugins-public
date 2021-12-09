@@ -16,6 +16,7 @@ import org.bukkit.event.player.PlayerAttemptPickupItemEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.Constants;
@@ -86,17 +87,17 @@ public class GraveItem {
 	private static final String KEY_Y = "y";
 	private static final String KEY_Z = "z";
 	private BukkitRunnable mRunnable;
-	GraveManager mManager;
-	Grave mGrave;
-	Player mPlayer;
+	private GraveManager mManager;
+	private Grave mGrave;
+	private Player mPlayer;
 	ItemStack mItem;
-	Item mEntity;
-	Location mLocation;
-	Vector mVelocity;
-	Integer mDungeonInstance;
-	Short mAge;
-	Status mStatus;
-	int mTickLastStatusChange;
+	private @Nullable Item mEntity;
+	private @Nullable Location mLocation;
+	private @Nullable Vector mVelocity;
+	private @Nullable Integer mDungeonInstance;
+	private @Nullable Short mAge;
+	@Nullable Status mStatus;
+	private int mTickLastStatusChange;
 
 	private GraveItem(GraveManager manager, Grave grave, Player player, ItemStack item) {
 		mManager = manager;
@@ -167,7 +168,7 @@ public class GraveItem {
 		mLocation = grave.getLocation();
 	}
 
-	public UUID getUniqueId() {
+	public @Nullable UUID getUniqueId() {
 		if (mEntity == null) {
 			// Handle error
 			return null;
@@ -427,7 +428,7 @@ public class GraveItem {
 		}
 	}
 
-	static GraveItem deserialize(GraveManager manager, Grave grave, Player player, JsonObject data) {
+	static @Nullable GraveItem deserialize(GraveManager manager, Grave grave, Player player, JsonObject data) {
 		ItemStack item = null;
 		Status status = null;
 		Integer instance = null;
@@ -468,14 +469,14 @@ public class GraveItem {
 		return new GraveItem(manager, grave, player, item, status, instance, location, velocity, age);
 	}
 
-	JsonObject serialize() {
+	@Nullable JsonObject serialize() {
 		update();
 		if (mStatus == Status.COLLECTED) {
 			return null;
 		}
 		JsonObject data = new JsonObject();
 		data.addProperty(KEY_NBT, NBTItem.convertItemtoNBT(mItem).toString());
-		data.addProperty(KEY_STATUS, mStatus.toString());
+		data.addProperty(KEY_STATUS, mStatus == null ? null : mStatus.toString());
 		data.addProperty(KEY_INSTANCE, mDungeonInstance);
 		data.addProperty(KEY_AGE, mAge);
 
