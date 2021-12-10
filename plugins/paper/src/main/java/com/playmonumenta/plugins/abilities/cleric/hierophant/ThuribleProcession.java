@@ -12,6 +12,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.inventory.ItemStack;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
@@ -48,7 +49,7 @@ public class ThuribleProcession extends Ability implements AbilityWithChargesOrS
 	private int mSeconds = 0;
 	private int mBuffs = 0;
 
-	public ThuribleProcession(Plugin plugin, Player player) {
+	public ThuribleProcession(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Thurible Procession");
 		mInfo.mScoreboardId = "Thurible";
 		mInfo.mShorthandName = "TP";
@@ -63,7 +64,7 @@ public class ThuribleProcession extends Ability implements AbilityWithChargesOrS
 	public boolean livingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
 
 		//If on cooldown, do not cast
-		if (!canCast()) {
+		if (mPlayer == null || !canCast()) {
 			return true;
 		}
 
@@ -89,6 +90,9 @@ public class ThuribleProcession extends Ability implements AbilityWithChargesOrS
 
 	@Override
 	public void periodicTrigger(boolean twoHertz, boolean oneSecond, int ticks) {
+		if (mPlayer == null) {
+			return;
+		}
 		List<Player> players = PlayerUtils.playersInRange(mPlayer.getLocation(), THURIBLE_RADIUS, true);
 		if (!canCast()) {
 			return;
@@ -107,7 +111,9 @@ public class ThuribleProcession extends Ability implements AbilityWithChargesOrS
 
 	//Recounts number of buffs and applies the passive ones
 	private void updateBuffs() {
-
+		if (mPlayer == null) {
+			return;
+		}
 		int previousBuffs = mBuffs;
 
 		//Convert time into number of buffs and cap to maximum effect index for that level
@@ -125,12 +131,14 @@ public class ThuribleProcession extends Ability implements AbilityWithChargesOrS
 
 	//Applies built up buffs to all around them and themselves, take the duration as parameter (passive/built-up)
 	private void applyBuffs(int duration) {
-
+		if (mPlayer == null) {
+			return;
+		}
 		//Give everyone buffs from the array
 		List<Player> players = PlayerUtils.playersInRange(mPlayer.getLocation(), THURIBLE_RADIUS, true);
 		if (players.size() > 1) {
 			for (Player pl : players) {
-				Effect[] effects = getEffectArray();
+				Effect[] effects = getEffectArray(duration);
 				for (int i = 0; i < mBuffs; i++) {
 					mPlugin.mEffectManager.addEffect(pl, EFFECTS_NAMES[i], effects[i]);
 				}
@@ -138,10 +146,10 @@ public class ThuribleProcession extends Ability implements AbilityWithChargesOrS
 		}
 	}
 
-	private Effect[] getEffectArray() {
-		Effect[] effects = getAbilityScore() == 1 ? new Effect[]{new PercentAttackSpeed(EFFECTS_DURATION, EFFECT_PERCENT_1, PERCENT_ATTACK_SPEED_EFFECT_NAME), new PercentSpeed(EFFECTS_DURATION, EFFECT_PERCENT_1, PERCENT_SPEED_EFFECT_NAME), new PercentDamageDealt(EFFECTS_DURATION, EFFECT_PERCENT_1, ALLOWED_DAMAGE_CAUSES), new ThuribleBonusHealing(EFFECTS_DURATION, EFFECT_PERCENT_1)}
-			: new Effect[]{new PercentAttackSpeed(EFFECTS_DURATION, EFFECT_PERCENT_2, PERCENT_ATTACK_SPEED_EFFECT_NAME), new PercentSpeed(EFFECTS_DURATION, EFFECT_PERCENT_2, PERCENT_SPEED_EFFECT_NAME), new PercentDamageDealt(EFFECTS_DURATION, EFFECT_PERCENT_2, ALLOWED_DAMAGE_CAUSES), new ThuribleBonusHealing(EFFECTS_DURATION, EFFECT_PERCENT_2)};
-		return effects;
+	private Effect[] getEffectArray(int duration) {
+		return getAbilityScore() == 1
+				? new Effect[] {new PercentAttackSpeed(duration, EFFECT_PERCENT_1, PERCENT_ATTACK_SPEED_EFFECT_NAME), new PercentSpeed(duration, EFFECT_PERCENT_1, PERCENT_SPEED_EFFECT_NAME), new PercentDamageDealt(duration, EFFECT_PERCENT_1, ALLOWED_DAMAGE_CAUSES), new ThuribleBonusHealing(duration, EFFECT_PERCENT_1)}
+				: new Effect[] {new PercentAttackSpeed(duration, EFFECT_PERCENT_2, PERCENT_ATTACK_SPEED_EFFECT_NAME), new PercentSpeed(duration, EFFECT_PERCENT_2, PERCENT_SPEED_EFFECT_NAME), new PercentDamageDealt(duration, EFFECT_PERCENT_2, ALLOWED_DAMAGE_CAUSES), new ThuribleBonusHealing(duration, EFFECT_PERCENT_2)};
 	}
 
 	@Override
