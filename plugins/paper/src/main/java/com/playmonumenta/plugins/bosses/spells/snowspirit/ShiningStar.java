@@ -44,7 +44,7 @@ public class ShiningStar extends Spell {
 	private static final double HITBOX_LENGTH = 0.5;
 	private static final boolean COLLIDES_WITH_BLOCKS = false;
 	private static final boolean LINGERS = true;
-	private static final int DAMAGE = 11;
+	private static final int DAMAGE = 13;
 
 	public ShiningStar(LivingEntity boss, Plugin plugin) {
 		mBoss = boss;

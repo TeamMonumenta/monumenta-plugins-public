@@ -32,7 +32,7 @@ public class JollyBall extends SpellBaseSeekingProjectile {
 	private static final double HITBOX_LENGTH = 0.3;
 	private static final boolean COLLIDES_WITH_BLOCKS = true;
 	private static final boolean LINGERS = true;
-	private static final double DAMAGE = 18;
+	private static final double DAMAGE = 21;
 
 	private LivingEntity mBoss;
 	private Plugin mPlugin;

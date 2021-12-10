@@ -25,7 +25,7 @@ import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.VectorUtils;
 
 public class DeckTheHalls extends Spell {
-	private static final double DAMAGE = 16;
+	private static final double DAMAGE = 20;
 
 	private Plugin mPlugin;
 	private LivingEntity mBoss;

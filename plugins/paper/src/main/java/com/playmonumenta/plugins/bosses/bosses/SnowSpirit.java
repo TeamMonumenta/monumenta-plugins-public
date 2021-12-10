@@ -18,6 +18,7 @@ import org.bukkit.boss.BarStyle;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.plugin.Plugin;
@@ -40,6 +41,8 @@ import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.SerializationUtils;
+
+import net.md_5.bungee.api.ChatColor;
 
 public class SnowSpirit extends BossAbilityGroup {
 	public static final String identityTag = "boss_snowspirit";
@@ -184,7 +187,6 @@ public class SnowSpirit extends BossAbilityGroup {
 		}.runTaskTimer(mPlugin, 0, 10);
 
 		new BukkitRunnable() {
-			int mTicks = 0;
 			@Override
 			public void run() {
 				if (mBoss.isDead() || !mBoss.isValid()) {
@@ -286,8 +288,13 @@ public class SnowSpirit extends BossAbilityGroup {
 
 	@Override
 	public void bossDamagedByEntity(EntityDamageByEntityEvent event) {
-		if (event.getDamager() instanceof Player) {
-			Player player = (Player) event.getDamager();
+		Player player = null;
+		if (event.getDamager() instanceof Projectile && ((Projectile) event.getDamager()).getShooter() instanceof Player) {
+			player = (Player) ((Projectile) event.getDamager()).getShooter();
+		} else if (event.getDamager() instanceof Player) {
+			player = (Player) event.getDamager();
+		}
+		if (player != null) {
 			Location loc = mBoss.getLocation();
 			if (mMinibossesPresent) {
 				event.setCancelled(true);
@@ -295,9 +302,9 @@ public class SnowSpirit extends BossAbilityGroup {
 				List<Entity> living = new ArrayList<>(mActiveMinibosses);
 				living.removeIf(miniboss -> miniboss.isDead() || !miniboss.isValid());
 				if (living.size() <= 1) {
-					player.sendMessage("Your weapon glides cleanly through the spirit, seemingly doing nothing. There is a ghost alive.");
+					player.sendMessage(ChatColor.AQUA + "Your weapon glides cleanly through the spirit, seemingly doing nothing. There is a ghost alive.");
 				} else {
-					player.sendMessage("Your weapon glides cleanly through the spirit, seemingly doing nothing. There are " + living.size() + " ghosts alive.");
+					player.sendMessage(ChatColor.AQUA + "Your weapon glides cleanly through the spirit, seemingly doing nothing. There are " + living.size() + " ghosts alive.");
 				}
 				return;
 			} else if (player.getInventory().getHelmet().getItemMeta().getDisplayName().contains("The Grinch")) {
