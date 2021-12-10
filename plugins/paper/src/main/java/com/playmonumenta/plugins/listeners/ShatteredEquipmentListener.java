@@ -35,7 +35,7 @@ public class ShatteredEquipmentListener implements Listener {
 
 	// Player interacts with a block in the world
 	// via left-click, right-click, or stepping on a pressure plate
-	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = false)
 	public void playerInteractEvent(PlayerInteractEvent event) {
 		if (event.useItemInHand() != Event.Result.DENY) {
 			Player player = event.getPlayer();

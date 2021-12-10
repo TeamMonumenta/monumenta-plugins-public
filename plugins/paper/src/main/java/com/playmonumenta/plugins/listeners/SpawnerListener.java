@@ -133,7 +133,8 @@ public class SpawnerListener implements Listener {
 		mMobInfos.put(mob.getUniqueId(), mobInfo);
 	}
 
-	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
+	// handles cancelled events because this is used to test for mob activity only
+	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = false)
 	public void entityTargetEvent(EntityTargetEvent event) {
 		// Update the mob's last target whenever it targets or untargets a mob
 		MobInfo mobInfo = mMobInfos.get(event.getEntity().getUniqueId());

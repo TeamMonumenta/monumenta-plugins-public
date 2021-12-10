@@ -19,6 +19,7 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Firework;
 import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.Player;
+import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -29,17 +30,6 @@ import org.bukkit.event.world.ChunkUnloadEvent;
 import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.checkerframework.checker.nullness.qual.Nullable;
-
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.minigames.chess.ChessBoard.BoardState;
-import com.playmonumenta.plugins.minigames.chess.ChessBoard.ChessPiece;
-import com.playmonumenta.plugins.minigames.chess.ChessBoard.ChessPieceType;
-import com.playmonumenta.plugins.minigames.chess.ChessBoard.ChessTeam;
-import com.playmonumenta.plugins.minigames.chess.ChessInterface.InterfaceType;
-import com.playmonumenta.plugins.minigames.chess.events.ChessEvent;
-import com.playmonumenta.plugins.minigames.chess.events.EndGameChessEvent;
-import com.playmonumenta.plugins.minigames.chess.events.MovePieceChessEvent;
-import com.playmonumenta.plugins.minigames.chess.events.PromotingChessEvent;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.minigames.chess.ChessBoard.BoardState;
@@ -447,8 +437,11 @@ public class ChessManager implements Listener {
 
 	}
 
-	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = false)
 	public void onPlayerClicks(PlayerInteractEvent event) {
+		if (event.useInteractedBlock() == Event.Result.DENY && event.useItemInHand() == Event.Result.DENY) {
+			return;
+		}
 		Player player = event.getPlayer();
 		if (player != null) {
 			if (ChessPlayer.isChessPlayer(player) && (event.getAction() == Action.LEFT_CLICK_AIR || event.getAction() == Action.LEFT_CLICK_BLOCK)) {

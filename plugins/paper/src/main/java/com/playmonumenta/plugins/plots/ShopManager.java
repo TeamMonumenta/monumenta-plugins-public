@@ -51,13 +51,6 @@ import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
 import com.playmonumenta.scriptedquests.quests.QuestNpc;
 import com.playmonumenta.scriptedquests.utils.ScoreboardUtils;
 
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.integrations.luckperms.LuckPermsIntegration;
-import com.playmonumenta.plugins.utils.ZoneUtils;
-import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
-import com.playmonumenta.scriptedquests.quests.QuestNpc;
-import com.playmonumenta.scriptedquests.utils.ScoreboardUtils;
-
 import dev.jorel.commandapi.CommandAPI;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.CommandPermission;
@@ -76,14 +69,15 @@ public class ShopManager implements Listener {
 	private static final String NPC_NAME = "SHOP NPC";
 	private static final String GUILD_NPC_NAME = "GUILD SHOP NPC";
 
-	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+	// handles cancelled damage events because we're only interested in the left click interaction (and the event is always cancelled on shop shulkers anyway)
+	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = false)
 	public void entityDamageByEntityEvent(EntityDamageByEntityEvent event) {
 		Entity damagee = event.getEntity();
 		Entity damager = event.getDamager();
 
 		if (damager instanceof Player && damagee instanceof Shulker
-			&& damagee.getCustomName() != null && damagee.getCustomName().endsWith("Shop")
-			&& ZoneUtils.hasZoneProperty((Player)damager, ZoneProperty.SHOPS_POSSIBLE)) {
+				&& damagee.getCustomName() != null && damagee.getCustomName().endsWith("Shop")
+				&& ZoneUtils.hasZoneProperty((Player) damager, ZoneProperty.SHOPS_POSSIBLE)) {
 
 			final Shop shop;
 			try {

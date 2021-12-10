@@ -99,7 +99,8 @@ public class GraveListener implements Listener {
 		}
 	}
 
-	@EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+	// handle cancelled events as we're only interested in the act of clicking/attacking the grave, and not whether the attack was successful
+	@EventHandler(priority = EventPriority.HIGH, ignoreCancelled = false)
 	public void entityDamageByEntity(EntityDamageByEntityEvent event) {
 		if (event.getDamager() instanceof Player && event.getEntityType() == EntityType.ARMOR_STAND) {
 			if (GraveManager.isGrave(event.getEntity())) {
