@@ -147,7 +147,7 @@ public class EntityListener implements Listener {
 		mAbilities = abilities;
 	}
 
-	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
+	@EventHandler(priority = EventPriority.LOW)
 	public void entityCombustByEntityEvent(EntityCombustByEntityEvent event) {
 		if (mPlugin.mEffectManager.hasEffect(event.getEntity(), Stasis.class)) {
 			event.setCancelled(true);
@@ -184,7 +184,7 @@ public class EntityListener implements Listener {
 		}
 	}
 
-	@EventHandler(ignoreCancelled = true)
+	@EventHandler
 	public void customDamageEvent(CustomDamageEvent event) {
 		if (event.isCancelled()) {
 			return;
@@ -208,7 +208,7 @@ public class EntityListener implements Listener {
 	}
 
 	//  An Entity hit another Entity.
-	@EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+	@EventHandler(priority = EventPriority.HIGH)
 	public void entityDamageByEntityEvent(EntityDamageByEntityEvent event) {
 		Entity damagee = event.getEntity();
 		Entity damager = event.getDamager();
@@ -372,7 +372,7 @@ public class EntityListener implements Listener {
 	}
 
 	// Entity Hurt Event.
-	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
+	@EventHandler(priority = EventPriority.LOW)
 	public void entityDamageEvent(EntityDamageEvent event) {
 		if (event.isCancelled()) {
 			return;
@@ -486,7 +486,7 @@ public class EntityListener implements Listener {
 	}
 
 	//changes the potion in the witches mainhand to throw
-	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
+	@EventHandler(priority = EventPriority.LOW)
 	public void witchThrowPotionEvent(WitchThrowPotionEvent event) {
 		if (event.isCancelled()) {
 			return;
@@ -511,7 +511,7 @@ public class EntityListener implements Listener {
 	}
 
 	// Entity interacts with something
-	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+	@EventHandler(priority = EventPriority.LOWEST)
 	public void entityInteractEvent(EntityInteractEvent event) {
 		if (event.isCancelled()) {
 			return;
@@ -533,7 +533,7 @@ public class EntityListener implements Listener {
 	}
 
 	// Hanging Entity hurt by another entity.
-	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
+	@EventHandler(priority = EventPriority.LOW)
 	public void hangingBreakByEntityEvent(HangingBreakByEntityEvent event) {
 		Entity damager = event.getRemover();
 
@@ -558,7 +558,7 @@ public class EntityListener implements Listener {
 		}
 	}
 
-	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+	@EventHandler(priority = EventPriority.MONITOR)
 	public void entityResurrectEvent(EntityResurrectEvent event) {
 		if (event.isCancelled()) {
 			return;
@@ -586,7 +586,7 @@ public class EntityListener implements Listener {
 	}
 
 	// Entity Spawn Event.
-	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+	@EventHandler(priority = EventPriority.LOWEST)
 	public void entitySpawnEvent(EntitySpawnEvent event) {
 		if (event.isCancelled()) {
 			return;
@@ -597,7 +597,7 @@ public class EntityListener implements Listener {
 
 	// Player shoots an arrow.
 	//TODO PlayerLaunchProjectileEvent to access ItemStack
-	@EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+	@EventHandler(priority = EventPriority.HIGH)
 	public void projectileLaunchEvent(ProjectileLaunchEvent event) {
 		Projectile proj = event.getEntity();
 		ProjectileSource shooter = proj.getShooter();
@@ -710,11 +710,11 @@ public class EntityListener implements Listener {
 		}
 	}
 
-	@EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+	@EventHandler(priority = EventPriority.HIGH)
 	public void potionSplashEvent(PotionSplashEvent event) {
 		if (event.getPotion().getShooter() != null
 			&& event.getPotion().getShooter() instanceof Entity
-			&& !mPlugin.mEffectManager.hasEffect((Entity) event.getPotion().getShooter(), Stasis.class)) {
+			&& mPlugin.mEffectManager.hasEffect((Entity) event.getPotion().getShooter(), Stasis.class)) {
 			event.setCancelled(true);
 			return;
 		}
@@ -796,7 +796,7 @@ public class EntityListener implements Listener {
 	}
 
 	// Entity ran into the effect cloud.
-	@EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+	@EventHandler(priority = EventPriority.HIGH)
 	public void areaEffectCloudApplyEvent(AreaEffectCloudApplyEvent event) {
 		event.getAffectedEntities().removeIf((l) -> mPlugin.mEffectManager.hasEffect(l, Stasis.class));
 		AreaEffectCloud cloud = event.getEntity();
@@ -851,7 +851,7 @@ public class EntityListener implements Listener {
 	}
 
 	// Cancel explosions in adventure zones
-	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+	@EventHandler(priority = EventPriority.LOWEST)
 	public void entityExplodeEvent(EntityExplodeEvent event) {
 		if (event.isCancelled()) {
 			return;
@@ -888,7 +888,7 @@ public class EntityListener implements Listener {
 	}
 
 	// Cancel explosions in adventure zones
-	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+	@EventHandler(priority = EventPriority.LOWEST)
 	public void blockExplodeEvent(BlockExplodeEvent event) {
 		if (event.isCancelled()) {
 			return;
@@ -918,7 +918,7 @@ public class EntityListener implements Listener {
 	}
 
 	// Reset creeper explosions on stun
-	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
+	@EventHandler(priority = EventPriority.LOW)
 	public void explosionPrimeEvent(ExplosionPrimeEvent event) {
 		if (event.isCancelled()) {
 			return;
@@ -929,19 +929,19 @@ public class EntityListener implements Listener {
 	}
 
 	// Never generate new trades
-	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+	@EventHandler(priority = EventPriority.LOWEST)
 	public void villagerAcquireTradeEvent(VillagerAcquireTradeEvent event) {
 		event.setCancelled(true);
 	}
 
 	// Never generate new trades
-	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+	@EventHandler(priority = EventPriority.LOWEST)
 	public void villagerCareerChangeEvent(VillagerCareerChangeEvent event) {
 		event.setCancelled(true);
 	}
 
 	// Never generate new trades
-	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+	@EventHandler(priority = EventPriority.LOWEST)
 	public void villagerReplenishTradeEvent(VillagerReplenishTradeEvent event) {
 		event.setCancelled(true);
 	}
@@ -1023,7 +1023,7 @@ public class EntityListener implements Listener {
 		}
 	}
 
-	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
+	@EventHandler(priority = EventPriority.LOW)
 	public void entityTargetLivingEntityEvent(EntityTargetLivingEntityEvent event) {
 		if (event.isCancelled()) {
 			return;
@@ -1060,7 +1060,7 @@ public class EntityListener implements Listener {
 		}
 	}
 
-	@EventHandler(ignoreCancelled = true)
+	@EventHandler()
 	public void potionEffectApplyEvent(PotionEffectApplyEvent event) {
 		if (event.isCancelled()) {
 			return;
@@ -1097,7 +1097,7 @@ public class EntityListener implements Listener {
 		}
 	}
 
-	@EventHandler(ignoreCancelled = true)
+	@EventHandler()
 	public void entityChangeBlockEvent(EntityChangeBlockEvent event) {
 		if (event.isCancelled()) {
 			return;
@@ -1113,14 +1113,14 @@ public class EntityListener implements Listener {
 		}
 	}
 
-	@EventHandler(ignoreCancelled = true)
+	@EventHandler()
 	public void blockBreakEvent(BlockBreakEvent event) {
 		if (!mAbilities.blockBreakEvent(event.getPlayer(), event)) {
 			event.setCancelled(true);
 		}
 	}
 
-	@EventHandler(ignoreCancelled = true)
+	@EventHandler()
 	public void entityDismountEvent(EntityDismountEvent event) {
 		if (event.isCancelled()) {
 			return;
