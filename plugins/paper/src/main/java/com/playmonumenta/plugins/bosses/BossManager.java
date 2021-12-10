@@ -258,6 +258,7 @@ public class BossManager implements Listener {
 		mStatelessBosses.put(LichCurseBoss.identityTag, (Plugin p, LivingEntity e) -> new LichCurseBoss(p, e));
 		mStatelessBosses.put(LichShieldBoss.identityTag, (Plugin p, LivingEntity e) -> new LichShieldBoss(p, e));
 		mStatelessBosses.put(LichKeyGlowBoss.identityTag, (Plugin p, LivingEntity e) -> new LichKeyGlowBoss(p, e));
+		mStatelessBosses.put(FestiveTessUpgradeSnowmenBoss.identityTag, (Plugin p, LivingEntity e) -> new FestiveTessUpgradeSnowmenBoss(p, e));
 
 		/* Stateful bosses have a remembered spawn location and end location where a redstone block is set when they die */
 		mStatefulBosses = new HashMap<String, StatefulBossConstructor>();
@@ -457,6 +458,7 @@ public class BossManager implements Listener {
 		mBossDeserializers.put(LichCurseBoss.identityTag, (Plugin p, LivingEntity e) -> LichCurseBoss.deserialize(p, e));
 		mBossDeserializers.put(LichShieldBoss.identityTag, (Plugin p, LivingEntity e) -> LichShieldBoss.deserialize(p, e));
 		mBossDeserializers.put(LichKeyGlowBoss.identityTag, (Plugin p, LivingEntity e) -> LichKeyGlowBoss.deserialize(p, e));
+		mBossDeserializers.put(FestiveTessUpgradeSnowmenBoss.identityTag, (Plugin p, LivingEntity e) -> FestiveTessUpgradeSnowmenBoss.deserialize(p, e));
 
 
 		/***************************************************
@@ -487,6 +489,7 @@ public class BossManager implements Listener {
 		mBossParameters.put(TpSwapBoss.identityTag, new TpSwapBoss.Parameters());
 		mBossParameters.put(UnstableBoss.identityTag, new UnstableBoss.Parameters());
 		mBossParameters.put(SeekingProjectileBoss.identityTag, new SeekingProjectileBoss.Parameters());
+		mBossParameters.put(FestiveTessUpgradeSnowmenBoss.identityTag, new FestiveTessUpgradeSnowmenBoss.Parameters());
 	}
 
 	/********************************************************************************
