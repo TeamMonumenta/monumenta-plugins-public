@@ -40,6 +40,7 @@ import com.playmonumenta.plugins.commands.GiveSoulbound;
 import com.playmonumenta.plugins.commands.Grave;
 import com.playmonumenta.plugins.commands.HopeifyHeldItem;
 import com.playmonumenta.plugins.commands.InfuseHeldItem;
+import com.playmonumenta.plugins.commands.JingleBells;
 import com.playmonumenta.plugins.commands.Launch;
 import com.playmonumenta.plugins.commands.LockedHeldItem;
 import com.playmonumenta.plugins.commands.Magnetize;
@@ -247,6 +248,7 @@ public class Plugin extends JavaPlugin {
 		AdminNotify.register();
 		AuditLogCommand.register();
 		PickLevelAfterAnvils.register();
+		JingleBells.register();
 
 
 		try {
