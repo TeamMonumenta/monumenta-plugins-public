@@ -22,10 +22,11 @@ public class SignOverride extends BaseOverride {
 
 		for (Component component : sign.lines()) {
 			String line = MessagingUtils.PLAIN_SERIALIZER.serialize(component).trim();
-			if (line.matches("^[-=+]*$")) {
+			if (line.matches("^[-=+~]*$")) {
 				//When dumping signs to chat, skip decoration lines
 				continue;
 			}
+			line = line.replaceAll("[${}]", "");
 			display += line + " ";
 		}
 
