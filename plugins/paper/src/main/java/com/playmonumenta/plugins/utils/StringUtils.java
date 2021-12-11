@@ -80,7 +80,7 @@ public class StringUtils {
 		long minutes = i / 60;
 		long hours = minutes / 60;
 		minutes %= 60;
-		return String.format("%ld:%02ld:%02ld", hours, minutes, seconds);
+		return String.format("%d:%02d:%02d", hours, minutes, seconds);
 	}
 
 	public static String ticksToTime(int ticks) {
