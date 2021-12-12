@@ -142,8 +142,8 @@ public class UpgradeLegacyPlots {
 					return;
 				}
 
-				// Past one still loading
-				if (NUM_INFLIGHT >= 1) {
+				// Allow 8 tasks to run in parallel
+				if (NUM_INFLIGHT >= 8) {
 					return;
 				}
 
