@@ -57,12 +57,12 @@ public class ZoneUtils {
 	}
 
 	public static boolean inPlot(Location loc, boolean isTownWorld) {
+		if (hasZoneProperty(loc, ZoneProperty.PLOT)) {
+			return true;
+		}
 		if (!isTownWorld &&
 		    !hasZoneProperty(loc, ZoneProperty.PLOTS_POSSIBLE)) {
 			return false;
-		}
-		if (hasZoneProperty(loc, ZoneProperty.PLOT)) {
-			return true;
 		}
 
 		return isSurvivalModeInPlots(loc);

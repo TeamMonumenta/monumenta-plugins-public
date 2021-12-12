@@ -174,6 +174,7 @@ public class PlotManager {
 						int currentplot = ScoreboardUtils.getScoreboardValue(player, "CurrentPlot").orElse(0);
 						if (plot != currentplot) {
 							sender.sendMessage(ChatColor.RED + "Only the owner of this plot can change its border");
+							player.sendMessage(ChatColor.RED + "Only the owner of this plot can change its border");
 						} else {
 							new PlotBorderCustomInventory(player, false).openInventory(player, Plugin.getInstance());
 						}
