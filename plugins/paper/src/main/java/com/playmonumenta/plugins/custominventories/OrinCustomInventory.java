@@ -253,26 +253,37 @@ public class OrinCustomInventory extends CustomInventory {
 			return;
 		} else {
 			if (cmd.startsWith("transferserver")) {
-				double[] currentShardVals;
-				if (mCurrentShard.contains("valley")) {
-					currentShardVals = VALLEY_FALLBACK;
-				} else if (mCurrentShard.contains("isles")) {
-					currentShardVals = ISLES_FALLBACK;
-				} else {
-					currentShardVals = PLOT_FALLBACK;
-				}
-				//input format should be "transferserver <shard_name> x, y, z, yaw, pitch"
+				//input format should be "transferserver <shard_name>"
 				String[] splitCommand = cmd.split(" ");
+				String targetShard = splitCommand[1];
+				Location returnLoc = null;
+				Float returnYaw = null;
+				Float returnPitch = null;
 
-				double x = currentShardVals[0];
-				double y = currentShardVals[1];
-				double z = currentShardVals[2];
-				float yaw = (float) currentShardVals[3];
-				float pitch = (float) currentShardVals[4];
+				if (mCurrentShard.equals("playerplots")) {
+					// Don't modify return location
+				} else {
+					double[] currentShardVals;
+					if (mCurrentShard.contains("valley")) {
+						currentShardVals = VALLEY_FALLBACK;
+					} else if (mCurrentShard.contains("isles")) {
+						currentShardVals = ISLES_FALLBACK;
+					} else {
+						currentShardVals = PLOT_FALLBACK;
+					}
+
+					double x = currentShardVals[0];
+					double y = currentShardVals[1];
+					double z = currentShardVals[2];
+					returnYaw = (float) currentShardVals[3];
+					returnPitch = (float) currentShardVals[4];
+
+					returnLoc = new Location(player.getWorld(), x, y, z);
+				}
+
 				try {
-					MonumentaRedisSyncAPI.sendPlayer(Plugin.getInstance(), player, splitCommand[1],
-							new Location(player.getWorld(), x, y, z),
-							yaw, pitch);
+					/* Note that this API accepts null returnLoc, returnYaw, returnPitch as default current player location */
+					MonumentaRedisSyncAPI.sendPlayer(player, targetShard, returnLoc, returnYaw, returnPitch);
 				} catch (Exception e) {
 					player.sendMessage("Exception Message: " + e.getMessage());
 					player.sendMessage("Stack Trace:\n" + e.getStackTrace());
