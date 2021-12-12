@@ -165,8 +165,18 @@ public class PlotManager {
 				.withPermission(CommandPermission.fromString("monumenta.plot.bordergui"))
 				.withArguments(new EntitySelectorArgument("players", EntitySelector.MANY_PLAYERS))
 				.executes((sender, args) -> {
+					if (!ServerProperties.getShardName().equals("playerplots")) {
+						CommandAPI.fail("This command is only available on the playerplots world");
+						return;
+					}
 					for (Player player : (List<Player>)args[0]) {
-						new PlotBorderCustomInventory(player, true).openInventory(player, Plugin.getInstance());
+						int plot = ScoreboardUtils.getScoreboardValue(player, "Plot").orElse(0);
+						int currentplot = ScoreboardUtils.getScoreboardValue(player, "CurrentPlot").orElse(0);
+						if (plot != currentplot) {
+							sender.sendMessage(ChatColor.RED + "Only the owner of this plot can change its border");
+						} else {
+							new PlotBorderCustomInventory(player, false).openInventory(player, Plugin.getInstance());
+						}
 					}
 				})))
 			/********************* NEW *********************/
