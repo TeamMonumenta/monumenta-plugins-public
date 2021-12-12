@@ -29,6 +29,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.util.Vector;
 
+import com.destroystokyo.paper.event.block.TNTPrimeEvent;
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.utils.InventoryUtils;
@@ -203,6 +204,14 @@ public class WorldListener implements Listener {
 		if (blockType.equals(Material.SNOW) || blockType.equals(Material.ICE)) {
 			event.setCancelled(true);
 			return;
+		}
+	}
+
+	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+	public void tntPrimeEvent(TNTPrimeEvent event) {
+		Location loc = event.getBlock().getLocation();
+		if (ZoneUtils.hasZoneProperty(loc, ZoneUtils.ZoneProperty.ADVENTURE_MODE)) {
+			event.setCancelled(true);
 		}
 	}
 
