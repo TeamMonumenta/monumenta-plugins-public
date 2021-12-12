@@ -1,5 +1,7 @@
 package com.playmonumenta.plugins.utils;
 
+import com.playmonumenta.plugins.server.properties.ServerProperties;
+
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -9,12 +11,10 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
-
-import com.playmonumenta.plugins.server.properties.ServerProperties;
-
 public class ZoneUtils {
 	public enum ZoneProperty {
 		PLOTS_POSSIBLE("Plots Possible"),
+		PLOT("Plot"),
 		SHOPS_POSSIBLE("Shops Possible"),
 		NO_MOBILITY_ABILITIES("No Mobility Abilities"),
 		NO_PORTABLE_STORAGE("No Portable Storage"),
@@ -44,8 +44,8 @@ public class ZoneUtils {
 		}
 	}
 
-	public static boolean isInPlot(Player player) {
-		return isInPlot(player.getLocation());
+	public static boolean isInPlot(Entity entity) {
+		return isInPlot(entity.getLocation());
 	}
 
 	public static boolean isInPlot(Location loc) {
@@ -61,11 +61,14 @@ public class ZoneUtils {
 		    !hasZoneProperty(loc, ZoneProperty.PLOTS_POSSIBLE)) {
 			return false;
 		}
+		if (hasZoneProperty(loc, ZoneProperty.PLOT)) {
+			return true;
+		}
 
 		return isSurvivalModeInPlots(loc);
 	}
 
-	public static boolean isSurvivalModeInPlots(Location loc) {
+	private static boolean isSurvivalModeInPlots(Location loc) {
 		Material mat = loc.getWorld().getBlockAt(loc.getBlockX(), 10, loc.getBlockZ()).getType();
 		return mat == Material.SPONGE;
 	}

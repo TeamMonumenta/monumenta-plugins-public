@@ -3,7 +3,7 @@ main: com.playmonumenta.plugins.Plugin
 version: 0.0.1
 api-version: 1.13
 depend: [CommandAPI,ScriptedQuests,NBTAPI]
-softdepend: [MonumentaRedisSync,PlaceholderAPI,ChestSort,LuckPerms,CoreProtect,NBTEditor,LibraryOfSouls,BKCommonLib,MonumentaNetworkRelay,PremiumVanish,ProtocolLib]
+softdepend: [MonumentaRedisSync,PlaceholderAPI,ChestSort,LuckPerms,CoreProtect,NBTEditor,LibraryOfSouls,BKCommonLib,MonumentaNetworkRelay,PremiumVanish,ProtocolLib,MonumentaStructureManagement,MonumentaWorldManagement]
 commands:
   testnoscore:
     permission: monumenta.command.testnoscore

@@ -2,18 +2,17 @@ package com.playmonumenta.plugins.enchantments.curses;
 
 import java.util.EnumSet;
 
-import org.bukkit.ChatColor;
-import org.bukkit.GameMode;
-import org.bukkit.entity.Player;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
-
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.enchantments.BaseEnchantment;
 import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.utils.ZoneUtils;
-import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
+
+import org.bukkit.ChatColor;
+import org.bukkit.GameMode;
+import org.bukkit.entity.Player;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 
 public class CurseOfCorruption implements BaseEnchantment {
 	private static String PROPERTY_NAME = ChatColor.RED + "Curse of Corruption";
@@ -36,7 +35,7 @@ public class CurseOfCorruption implements BaseEnchantment {
 	@Override
 	public void applyProperty(Plugin plugin, Player player, int level) {
 		if (level > 1) {
-			if (!ZoneUtils.hasZoneProperty(player, ZoneProperty.PLOTS_POSSIBLE)) {
+			if (!ZoneUtils.isInPlot(player)) {
 				if (player.getGameMode() != GameMode.CREATIVE && player.getGameMode() != GameMode.SPECTATOR) {
 					plugin.mPotionManager.addPotion(player, PotionID.ITEM, new PotionEffect(PotionEffectType.BLINDNESS, 1000000, 0, true, false));
 				}

@@ -225,8 +225,7 @@ public class PlayerListener implements Listener {
 		Material mat = (block != null) ? block.getType() : Material.AIR;
 
 		// Plot Security: If block is in a plot but the player is in adventure, cancel.
-		if (block != null && player != null && player.getGameMode() == GameMode.ADVENTURE
-				&& ZoneUtils.inPlot(block.getLocation(), ServerProperties.getIsTownWorld())) {
+		if (block != null && player != null && player.getGameMode() == GameMode.ADVENTURE && ZoneUtils.isInPlot(block.getLocation())) {
 			event.setCancelled(true);
 			return;
 		}
@@ -260,7 +259,7 @@ public class PlayerListener implements Listener {
 			if (block != null) {
 				Location location = block.getLocation();
 				if (player.getGameMode() == GameMode.ADVENTURE
-				    && ZoneUtils.inPlot(location, ServerProperties.getIsTownWorld())) {
+				    && ZoneUtils.isInPlot(location)) {
 					event.setUseInteractedBlock(Event.Result.DENY);
 					return;
 				}
@@ -319,8 +318,7 @@ public class PlayerListener implements Listener {
 			ItemFrame frame = (ItemFrame) clickedEntity;
 
 			// Plot Security: If item frame is in a plot but the player is in adventure, cancel.
-			if (player.getGameMode() == GameMode.ADVENTURE
-			    && ZoneUtils.inPlot(frame, ServerProperties.getIsTownWorld())) {
+			if (player.getGameMode() == GameMode.ADVENTURE && ZoneUtils.isInPlot(frame)) {
 				event.setCancelled(true);
 				return;
 			}
@@ -382,8 +380,7 @@ public class PlayerListener implements Listener {
 		}
 
 		// Plot Security: If armor stand is in a plot but the player is in adventure, cancel.
-		if (player.getGameMode() == GameMode.ADVENTURE
-		    && ZoneUtils.inPlot(armorStand, ServerProperties.getIsTownWorld())) {
+		if (player.getGameMode() == GameMode.ADVENTURE && ZoneUtils.isInPlot(armorStand)) {
 			event.setCancelled(true);
 			return;
 		}

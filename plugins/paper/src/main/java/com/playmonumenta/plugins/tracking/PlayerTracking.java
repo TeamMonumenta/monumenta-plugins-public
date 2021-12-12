@@ -64,14 +64,13 @@ public class PlayerTracking implements EntityTracking {
 		Player player = (Player)entity;
 
 		/* Make sure the player is in the correct mode for where they logged in */
-		boolean isTownWorld = ServerProperties.getIsTownWorld();
 		if (player.getGameMode().equals(GameMode.SURVIVAL)
 			&& ZoneUtils.hasZoneProperty(player, ZoneProperty.ADVENTURE_MODE)
-			&& !ZoneUtils.inPlot(player, isTownWorld)) {
+			&& !ZoneUtils.isInPlot(player)) {
 			player.setGameMode(GameMode.ADVENTURE);
 		} else if (player.getGameMode().equals(GameMode.ADVENTURE)
 			&& (!ZoneUtils.hasZoneProperty(player, ZoneProperty.ADVENTURE_MODE)
-				|| ZoneUtils.inPlot(player, isTownWorld))) {
+				|| ZoneUtils.isInPlot(player))) {
 			player.setGameMode(GameMode.SURVIVAL);
 		}
 

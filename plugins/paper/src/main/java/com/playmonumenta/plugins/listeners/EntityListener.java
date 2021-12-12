@@ -264,8 +264,7 @@ public class EntityListener implements Listener {
 			}
 
 			// Plot Security: If damagee is inside a plot but the player is in adventure, cancel.
-			if (player.getGameMode() == GameMode.ADVENTURE
-				&& ZoneUtils.inPlot(damagee, ServerProperties.getIsTownWorld())) {
+			if (player.getGameMode() == GameMode.ADVENTURE && ZoneUtils.isInPlot(damagee)) {
 				event.setCancelled(true);
 				return;
 			}
@@ -287,8 +286,7 @@ public class EntityListener implements Listener {
 				Player player = (Player) shooter;
 
 				// Plot Security: If damagee is inside a plot but the player is in adventure, cancel.
-				if (player.getGameMode() == GameMode.ADVENTURE
-					&& ZoneUtils.inPlot(damagee, ServerProperties.getIsTownWorld())) {
+				if (player.getGameMode() == GameMode.ADVENTURE && ZoneUtils.isInPlot(damagee)) {
 					damager.remove();
 					event.setCancelled(true);
 					return;
@@ -1069,7 +1067,7 @@ public class EntityListener implements Listener {
 		}
 
 		// When sheep eat grass outside of plots, do not change to dirt
-		if (event.getEntity() instanceof Sheep && !ZoneUtils.inPlot(event.getBlock().getLocation(), ServerProperties.getIsTownWorld())) {
+		if (event.getEntity() instanceof Sheep && !ZoneUtils.isInPlot(event.getBlock().getLocation())) {
 			event.setCancelled(true);
 		}
 	}

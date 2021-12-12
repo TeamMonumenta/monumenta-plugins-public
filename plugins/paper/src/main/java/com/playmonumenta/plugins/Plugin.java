@@ -130,7 +130,7 @@ import com.playmonumenta.plugins.network.ClientModHandler;
 import com.playmonumenta.plugins.network.HttpManager;
 import com.playmonumenta.plugins.overrides.ItemOverrides;
 import com.playmonumenta.plugins.parrots.ParrotManager;
-import com.playmonumenta.plugins.plots.PlotAccessManager;
+import com.playmonumenta.plugins.plots.PlotManager;
 import com.playmonumenta.plugins.plots.ShopManager;
 import com.playmonumenta.plugins.potion.PotionManager;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
@@ -265,9 +265,11 @@ public class Plugin extends JavaPlugin {
 			|| ServerProperties.getShardName().equals("mobs")
 			|| ServerProperties.getShardName().equals("dev1")
 			|| ServerProperties.getShardName().equals("dev2")) {
-			new PlotAccessManager(getLogger(), getDataFolder() + File.separator + "plot_access.json");
 			ShopManager.registerCommands();
 		}
+
+		/* Plot commands are valid on all shards */
+		new PlotManager();
 
 		mEnchantmentManager = new EnchantmentManager(this);
 		mEnchantmentManager.load();
