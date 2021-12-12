@@ -23,6 +23,8 @@ import com.playmonumenta.plugins.bosses.parameters.BossParam;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.bosses.spells.SpellRunAction;
 import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.ZoneUtils;
+import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
 
 public class FestiveTessUpgradeSnowmenBoss extends BossAbilityGroup {
 	public static final String deathMetakey = "PLAYER_SNOWMAN_DEATH_METAKEY";
@@ -77,6 +79,14 @@ public class FestiveTessUpgradeSnowmenBoss extends BossAbilityGroup {
 
 	@Override
 	public void bossProjectileHit(ProjectileHitEvent event) {
+		if (event.isCancelled()) {
+			return;
+		}
+
+		if (event.getHitEntity() != null && (event.getHitEntity().isInvulnerable() || ZoneUtils.hasZoneProperty(event.getHitEntity(), ZoneProperty.ADVENTURE_MODE))) {
+			return;
+		}
+
 		if (event.getHitEntity() != null && !(event.getHitEntity() instanceof Player) &&
 				event.getHitEntity() instanceof LivingEntity && !(event.getHitEntity() instanceof Snowman)) {
 			BossUtils.bossDamage(mBoss, (LivingEntity) event.getHitEntity(), mParams.DAMAGE);
