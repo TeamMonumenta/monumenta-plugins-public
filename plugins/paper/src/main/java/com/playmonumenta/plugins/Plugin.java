@@ -66,6 +66,7 @@ import com.playmonumenta.plugins.commands.Spectate;
 import com.playmonumenta.plugins.commands.SpectateBot;
 import com.playmonumenta.plugins.commands.StasisCommand;
 import com.playmonumenta.plugins.commands.StatTrackItem;
+import com.playmonumenta.plugins.commands.Stuck;
 import com.playmonumenta.plugins.commands.TeleportAsync;
 import com.playmonumenta.plugins.commands.TeleportByScore;
 import com.playmonumenta.plugins.commands.ToggleSwap;
@@ -249,6 +250,7 @@ public class Plugin extends JavaPlugin {
 		AuditLogCommand.register();
 		PickLevelAfterAnvils.register();
 		JingleBells.register();
+		Stuck.register(this);
 
 
 		try {
