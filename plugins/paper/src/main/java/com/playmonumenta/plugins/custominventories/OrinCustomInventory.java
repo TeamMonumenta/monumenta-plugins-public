@@ -154,7 +154,7 @@ public class OrinCustomInventory extends CustomInventory {
 				mCurrentPage = 1;
 			} else if (mCurrentShard.contains("isles")) {
 				mCurrentPage = 2;
-			} else if (mCurrentShard.contains("plots")) {
+			} else if (mCurrentShard.equals("plots")) {
 				mCurrentPage = 3;
 			} else {
 				mCurrentPage = 4;
