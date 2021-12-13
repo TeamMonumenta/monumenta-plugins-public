@@ -93,7 +93,7 @@ public class SpawnerListener implements Listener {
 
 		// Generate list of player locations a single time
 		List<Location> playerLocations = new ArrayList<Location>();
-		for (Player player : Bukkit.getOnlinePlayers()) {
+		for (Player player : mob.getWorld().getPlayers()) {
 			playerLocations.add(player.getLocation());
 		}
 

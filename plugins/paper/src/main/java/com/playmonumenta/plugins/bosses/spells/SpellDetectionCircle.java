@@ -75,7 +75,7 @@ public class SpellDetectionCircle extends Spell {
 					particleLoc.getWorld().spawnParticle(Particle.SMOKE_LARGE, particleLoc, 1, 0.02, 0.02, 0.02, 0);
 				}
 
-				for (Player player : Bukkit.getServer().getOnlinePlayers()) {
+				for (Player player : mCenter.getWorld().getPlayers()) {
 					if (player.getLocation().distance(mCenter) < mRadius &&
 						(player.getGameMode() == GameMode.SURVIVAL || player.getGameMode() == GameMode.ADVENTURE)) {
 						mTarget.getBlock().setType(Material.REDSTONE_BLOCK);

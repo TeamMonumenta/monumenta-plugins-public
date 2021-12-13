@@ -203,7 +203,7 @@ public class SpellBaseLeapAttack extends Spell {
 					}
 
 					BoundingBox hitbox = mBoss.getBoundingBox();
-					for (Player player : Bukkit.getServer().getOnlinePlayers()) {
+					for (Player player : mBoss.getWorld().getPlayers()) {
 						if (player.getBoundingBox().overlaps(hitbox) && mHasBeenOneTick) {
 							((Mob) mBoss).setTarget(player);
 							mHitAction.run(mWorld, player, player.getLocation(), mDirection);

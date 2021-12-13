@@ -50,7 +50,7 @@ public class BossBarManager {
 		}
 		mBar.setVisible(true);
 
-		for (Player player : Bukkit.getServer().getOnlinePlayers()) {
+		for (Player player : boss.getWorld().getPlayers()) {
 			if (player.getLocation().distance(boss.getLocation()) < range) {
 				mBar.addPlayer(player);
 			}
@@ -63,7 +63,7 @@ public class BossBarManager {
 		}
 
 		for (Player player : Bukkit.getServer().getOnlinePlayers()) {
-			if (player.getLocation().distance(mBoss.getLocation()) < mRange) {
+			if (player.getWorld().equals(mBoss.getWorld()) && player.getLocation().distance(mBoss.getLocation()) < mRange) {
 				mBar.addPlayer(player);
 			} else {
 				mBar.removePlayer(player);

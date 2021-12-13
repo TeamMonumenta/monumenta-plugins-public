@@ -142,7 +142,7 @@ public class DelvesListener implements Listener {
 		int zRegionMin = (((int) loc.getZ()) >> 9) << 9;
 		BoundingBox box = new BoundingBox(xRegionMin, 0, zRegionMin, xRegionMin + 512, 256, zRegionMin + 512);
 
-		for (Player player : Bukkit.getOnlinePlayers()) {
+		for (Player player : loc.getWorld().getPlayers()) {
 			if (!player.getGameMode().equals(GameMode.SPECTATOR)) {
 				if (box.contains(player.getLocation().toVector())) {
 					return player;

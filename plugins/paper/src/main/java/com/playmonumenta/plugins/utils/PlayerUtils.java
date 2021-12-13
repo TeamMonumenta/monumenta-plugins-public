@@ -64,7 +64,7 @@ public class PlayerUtils {
 	public static List<Player> playersInRange(Location loc, double range, boolean includeNonTargetable) {
 		List<Player> players = new ArrayList<Player>();
 
-		for (Player player : Bukkit.getServer().getOnlinePlayers()) {
+		for (Player player : loc.getWorld().getPlayers()) {
 			if (player.getLocation().distanceSquared(loc) < range * range && player.getGameMode() != GameMode.SPECTATOR && player.getHealth() > 0) {
 				if (includeNonTargetable || !AbilityUtils.isStealthed(player)) {
 					players.add(player);
