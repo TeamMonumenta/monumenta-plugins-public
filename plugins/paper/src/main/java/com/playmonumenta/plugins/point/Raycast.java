@@ -80,19 +80,21 @@ public class Raycast {
 			}
 
 			mStart.add(mDir.clone().multiply(mDirMultiplier));
-			if (!data.getBlocks().contains(mStart.getBlock())) {
-				data.getBlocks().add(mStart.getBlock());
+			if (!mStart.getWorld().isChunkLoaded(mStart.getBlockX(), mStart.getBlockZ())) {
+				break;
+			}
+			Block block = mStart.getBlock();
+			if (!data.getBlocks().contains(block)) {
+				data.getBlocks().add(block);
 			}
 
 			if (!mThroughBlocks) {
-				Block block = mStart.getBlock();
-
 				// breakRay: determines if the ray should collide and end on this block.
 				boolean breakRay = LocationUtils.collidesWithSolid(mStart, block);
 				if (breakRay) {
 					if (!mThroughNonOccluding) {
 						break;
-					} else if (mStart.getBlock().getType().isOccluding()) {
+					} else if (block.getType().isOccluding()) {
 						break;
 					}
 				}
