@@ -195,11 +195,11 @@ public final class ItemDropListener implements Listener {
 			if (isDropDisabled(uuid, item)) {
 				event.setCancelled(true);
 			} else if (mHoldingPlayers.contains(uuid)) {
-				if (event.getSlot() == player.getInventory().getHeldItemSlot()) {
+				if (player.getInventory().equals(event.getClickedInventory()) && event.getSlot() == player.getInventory().getHeldItemSlot()) {
 					event.setCancelled(true);
 				}
 			} else if (mEquippedPlayers.contains(uuid)) {
-				if (isEquipmentSlot(event.getSlot())) {
+				if (player.getInventory().equals(event.getClickedInventory()) && isEquipmentSlot(event.getSlot())) {
 					event.setCancelled(true);
 				}
 			}
