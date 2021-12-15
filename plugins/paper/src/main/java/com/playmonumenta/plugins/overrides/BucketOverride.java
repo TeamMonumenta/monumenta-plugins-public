@@ -34,7 +34,7 @@ public class BucketOverride extends BaseOverride {
 			return true;
 		} else if (clickedEntity instanceof Cow) {
 			return false;
-		} else if (clickedEntity instanceof Fish && ZoneUtils.hasZoneProperty(clickedEntity, ZoneProperty.ADVENTURE_MODE)) {
+		} else if (clickedEntity instanceof Fish && !ZoneUtils.isInPlot(clickedEntity)) {
 			return false;
 		}
 

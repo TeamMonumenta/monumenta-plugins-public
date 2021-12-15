@@ -3,9 +3,14 @@ package com.playmonumenta.plugins.listeners;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
@@ -48,6 +53,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockExplodeEvent;
 import org.bukkit.event.entity.AreaEffectCloudApplyEvent;
+import org.bukkit.event.entity.EntityBreedEvent;
 import org.bukkit.event.entity.EntityChangeBlockEvent;
 import org.bukkit.event.entity.EntityCombustByEntityEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
@@ -66,6 +72,7 @@ import org.bukkit.event.entity.VillagerAcquireTradeEvent;
 import org.bukkit.event.entity.VillagerCareerChangeEvent;
 import org.bukkit.event.entity.VillagerReplenishTradeEvent;
 import org.bukkit.event.hanging.HangingBreakByEntityEvent;
+import org.bukkit.event.world.WorldUnloadEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.potion.PotionData;
@@ -74,6 +81,7 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.potion.PotionType;
 import org.bukkit.projectiles.ProjectileSource;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 import org.spigotmc.event.entity.EntityDismountEvent;
 
@@ -106,8 +114,10 @@ import com.playmonumenta.plugins.utils.PotionUtils;
 import com.playmonumenta.plugins.utils.PotionUtils.PotionInfo;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
+import com.playmonumenta.scriptedquests.zones.Zone;
 
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import net.md_5.bungee.api.ChatColor;
 
 public class EntityListener implements Listener {
@@ -139,8 +149,34 @@ public class EntityListener implements Listener {
 	            DamageCause.WITHER
 	        );
 
+	public static final EnumSet<EntityType> PLOT_ANIMALS = EnumSet.of(
+			EntityType.CAT,
+			EntityType.CHICKEN,
+			EntityType.COW,
+			EntityType.DONKEY,
+			EntityType.FOX,
+			EntityType.HORSE,
+			EntityType.LLAMA,
+			EntityType.MULE,
+			EntityType.MUSHROOM_COW,
+			EntityType.OCELOT,
+			EntityType.PANDA,
+			EntityType.PARROT,
+			EntityType.PIG,
+			EntityType.POLAR_BEAR,
+			EntityType.RABBIT,
+			EntityType.RAVAGER,
+			EntityType.SHEEP,
+			EntityType.SHULKER,
+			EntityType.SLIME,
+			EntityType.WOLF
+	);
+
+	public static final int MAX_ANIMALS_IN_PLAYER_PLOT = 64;
+
 	Plugin mPlugin;
 	AbilityManager mAbilities;
+	private static final Map<UUID, Integer> mLastPlotAnimalWarning = new HashMap<>();
 
 	public EntityListener(Plugin plugin, AbilityManager abilities) {
 		mPlugin = plugin;
@@ -1083,4 +1119,71 @@ public class EntityListener implements Listener {
 		}
 	}
 
+	// Cancel breeding if on a plot full of animals
+	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+	public void entityBreedEvent(EntityBreedEvent event) {
+		if (!maySummonPlotAnimal(event.getEntity().getLocation())) {
+			event.setCancelled(true);
+		}
+	}
+
+	// Stop tracking last warning of unloaded world
+	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+	public void worldUnloadEvent(WorldUnloadEvent event) {
+		mLastPlotAnimalWarning.remove(event.getWorld().getUID());
+	}
+
+	// Also used in MonsterEggOverride
+	public static boolean maySummonPlotAnimal(Location loc) {
+		if (!ZoneUtils.isInPlot(loc)) {
+			return true;
+		}
+
+		Optional<Zone> optionalZone = ZoneUtils.getZone(loc);
+		if (!optionalZone.isPresent()) {
+			// Fall back on killinator functions for plots world
+			return true;
+		}
+		Zone zone = optionalZone.get();
+		if (!zone.hasProperty(ZoneProperty.PLOT.getPropertyName())) {
+			// Fall back on killinator functions for plots world
+			return true;
+		}
+
+		int animalsRemaining = MAX_ANIMALS_IN_PLAYER_PLOT - 1;
+		World world = loc.getWorld();
+		BoundingBox bb = BoundingBox.of(zone.minCorner(), zone.maxCornerExclusive());
+		Set<Player> players = new HashSet<>();
+		for (Entity entity : world.getNearbyEntities(bb)) {
+			if (entity instanceof Player) {
+				players.add((Player) entity);
+			}
+			if (PLOT_ANIMALS.contains(entity.getType())) {
+				animalsRemaining -= 1;
+			}
+		}
+
+		Integer lastWarningCount = mLastPlotAnimalWarning.get(world.getUID());
+		if (lastWarningCount == null) {
+			lastWarningCount = MAX_ANIMALS_IN_PLAYER_PLOT;
+		}
+		mLastPlotAnimalWarning.put(world.getUID(), animalsRemaining);
+		if (animalsRemaining != lastWarningCount && animalsRemaining <= 5) {
+			String msg;
+			if (animalsRemaining >= 2) {
+				msg = "You may have " + Integer.toString(animalsRemaining) + " more animals on your plot.";
+			} else if (animalsRemaining == 1) {
+				msg = "You may have 1 more animal on your plot.";
+			} else if (animalsRemaining == 0) {
+				msg = "You may have no more animals on your plot.";
+			} else {
+				msg = "Spawn attempt cancelled, you have too many mobs.";
+			}
+			for (Player player : players) {
+				player.sendMessage(Component.text(msg, NamedTextColor.RED));
+			}
+		}
+
+		return animalsRemaining >= 0;
+	}
 }

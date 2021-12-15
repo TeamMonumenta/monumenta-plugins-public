@@ -1,6 +1,9 @@
 package com.playmonumenta.plugins.utils;
 
+import java.util.Optional;
+
 import com.playmonumenta.plugins.server.properties.ServerProperties;
+import com.playmonumenta.scriptedquests.zones.Zone;
 
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
@@ -10,6 +13,7 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class ZoneUtils {
 	public enum ZoneProperty {
@@ -39,7 +43,7 @@ public class ZoneUtils {
 			mPropertyName = propertyName;
 		}
 
-		private String getPropertyName() {
+		public String getPropertyName() {
 			return mPropertyName;
 		}
 	}
@@ -97,5 +101,25 @@ public class ZoneUtils {
 		scriptedQuestsPlugin = (com.playmonumenta.scriptedquests.Plugin)Bukkit.getPluginManager().getPlugin("ScriptedQuests");
 
 		return scriptedQuestsPlugin.mZoneManager.hasProperty(loc, "default", property.getPropertyName());
+	}
+
+	public static Optional<Zone> getZone(Location loc) {
+		return getZone(loc, "default");
+	}
+
+	public static Optional<Zone> getZone(Location loc, String layerName) {
+		com.playmonumenta.scriptedquests.Plugin scriptedQuestsPlugin;
+		scriptedQuestsPlugin = (com.playmonumenta.scriptedquests.Plugin)Bukkit.getPluginManager().getPlugin("ScriptedQuests");
+
+		if (scriptedQuestsPlugin == null || scriptedQuestsPlugin.mZoneManager == null) {
+			return Optional.empty();
+		}
+
+		@Nullable Zone zone = scriptedQuestsPlugin.mZoneManager.getZone(loc, layerName);
+		if (zone == null) {
+			return Optional.empty();
+		} else {
+			return Optional.of(zone);
+		}
 	}
 }
