@@ -62,6 +62,13 @@ public abstract class Spell implements Cloneable {
 		return false;
 	}
 
+	/**
+	 * @return Whether this ability ignores being silenced. Currently only works for passive spells.
+	 */
+	public boolean bypassSilence() {
+		return false;
+	}
+
 	/*
 	 * Boss damaged another entity
 	 */

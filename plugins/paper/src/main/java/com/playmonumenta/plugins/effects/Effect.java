@@ -3,9 +3,8 @@ package com.playmonumenta.plugins.effects;
 import org.bukkit.entity.Entity;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.event.entity.EntityRegainHealthEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
-import com.playmonumenta.plugins.bosses.events.SpellCastEvent;
+import org.bukkit.event.entity.EntityRegainHealthEvent;
 
 /* NOTE:
  *
@@ -68,10 +67,6 @@ public abstract class Effect implements Comparable<Effect> {
 	}
 
 	public boolean entityKilledEvent(EntityDeathEvent event) {
-		return true;
-	}
-
-	public boolean entityCastSpellEvent(SpellCastEvent event) {
 		return true;
 	}
 

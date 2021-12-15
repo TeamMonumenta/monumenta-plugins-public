@@ -130,9 +130,12 @@ public abstract class BossAbilityGroup {
 					return;
 				}
 
-				if (mPassiveSpells != null && !EntityUtils.isSilenced(mBoss)) {
+				boolean silenced = EntityUtils.isSilenced(mBoss);
+				if (mPassiveSpells != null) {
 					for (Spell spell : mPassiveSpells) {
-						spell.run();
+						if (!silenced || spell.bypassSilence()) {
+							spell.run();
+						}
 					}
 				}
 			}
@@ -161,7 +164,7 @@ public abstract class BossAbilityGroup {
 						this.cancel();
 						BossManager mgr = BossManager.getInstance();
 						if (mgr != null) {
-							BossManager.getInstance().unload(mBoss, false);
+							mgr.unload(mBoss, false);
 						}
 						// Just in case for some reason the boss is no longer registered with the manager...
 						unload();

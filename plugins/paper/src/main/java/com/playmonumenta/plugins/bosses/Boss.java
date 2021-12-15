@@ -174,7 +174,6 @@ public class Boss {
 
 	public void bossCastAbility(SpellCastEvent event) {
 		if (EntityUtils.isSilenced(event.getBoss())) {
-			event.setCancelled(true);
 			return;
 		}
 		for (BossAbilityGroup ability : mAbilities) {

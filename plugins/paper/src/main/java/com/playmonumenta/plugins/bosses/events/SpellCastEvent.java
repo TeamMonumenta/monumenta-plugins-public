@@ -1,13 +1,12 @@
 package com.playmonumenta.plugins.bosses.events;
 
 import org.bukkit.entity.LivingEntity;
-import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
 import com.playmonumenta.plugins.bosses.spells.Spell;
 
-public class SpellCastEvent extends Event implements Cancellable {
+public class SpellCastEvent extends Event {
 
 	private static final HandlerList handlers = new HandlerList();
 	private boolean mIsCancelled;
@@ -25,16 +24,6 @@ public class SpellCastEvent extends Event implements Cancellable {
 
 	public Spell getSpell() {
 		return mSpell;
-	}
-
-	@Override
-	public boolean isCancelled() {
-		return mIsCancelled;
-	}
-
-	@Override
-	public void setCancelled(boolean arg0) {
-		this.mIsCancelled = arg0;
 	}
 
 	// Mandatory Event Methods (If you remove these, I'm 99% sure the event will break)

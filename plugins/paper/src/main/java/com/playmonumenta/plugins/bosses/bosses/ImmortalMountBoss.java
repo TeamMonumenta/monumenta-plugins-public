@@ -3,12 +3,12 @@ package com.playmonumenta.plugins.bosses.bosses;
 import java.util.Arrays;
 import java.util.List;
 
-import com.playmonumenta.plugins.bosses.spells.Spell;
-import com.playmonumenta.plugins.bosses.spells.SpellRunAction;
-
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.plugin.Plugin;
+
+import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.bosses.spells.SpellRunAction;
 
 public class ImmortalMountBoss extends BossAbilityGroup {
 
@@ -27,7 +27,7 @@ public class ImmortalMountBoss extends BossAbilityGroup {
 				if (boss.getPassengers().size() == 0) {
 					boss.setHealth(0);
 				}
-			})
+			}, 1, true)
 		);
 
 		super.constructBoss(null, passiveSpells, detectionRange, null);

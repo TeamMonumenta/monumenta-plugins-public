@@ -6,8 +6,8 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
 import com.playmonumenta.plugins.abilities.AbilityManager;
-import com.playmonumenta.plugins.bosses.events.SpellCastEvent;
 import com.playmonumenta.plugins.network.ClientModHandler;
+
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 
@@ -23,12 +23,6 @@ public class AbilitySilence extends Effect {
 	public double getMagnitude() {
 		// This is useful so that the "active" effect is always the correct duration
 		return getDuration();
-	}
-
-	@Override
-	public boolean entityCastSpellEvent(SpellCastEvent event) {
-		event.setCancelled(true);
-		return true;
 	}
 
 	@Override
