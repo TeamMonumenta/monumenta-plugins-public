@@ -538,8 +538,12 @@ public class PlayerListener implements Listener {
 				chest.getBlock().breakNaturally();
 			}
 		}
-		if (event.getPlayer() != null && event.getPlayer() instanceof Player) {
-			InventoryUtils.scheduleDelayedEquipmentCheck(mPlugin, (Player) event.getPlayer(), event);
+		if (event.getPlayer() instanceof Player player) {
+			InventoryUtils.scheduleDelayedEquipmentCheck(mPlugin, player, event);
+
+			// Workaround for 1.17 clients not having proper inventory state after cancelling click events
+			// (when opening a new inventory after a click event is canceled, a "ghost" item is on the cursor)
+			player.updateInventory();
 		}
 	}
 
