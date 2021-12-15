@@ -1382,7 +1382,7 @@ public class ItemUtils {
 			throw new Exception("Player must have a valid item in their main hand!");
 		}
 
-		List<String> lore = meta.getLore();
+		List<Component> lore = meta.lore();
 		if (lore == null || lore.isEmpty()) {
 			throw new Exception("Player must have a valid item in their main hand!");
 		}
@@ -1391,28 +1391,29 @@ public class ItemUtils {
 			throw new Exception("Only one item can be enchanted!");
 		}
 
-		List<String> newLore = new ArrayList<>();
+		List<Component> newLore = new ArrayList<>();
 		boolean enchantmentFound = false;
 		boolean nameAdded = (ownerPrefix == null);
-		for (String loreEntry : lore) {
-			if (loreEntry.contains(ChatColor.GRAY + enchantment)) {
+		for (Component loreEntry : lore) {
+			String legacyLoreEntry = MessagingUtils.LEGACY_SERIALIZER.serialize(loreEntry);
+			if (legacyLoreEntry.contains(ChatColor.GRAY + enchantment)) {
 				enchantmentFound = true;
 			}
 
-			String loreStripped = ChatColor.stripColor(loreEntry).trim();
+			String loreStripped = ChatColor.stripColor(legacyLoreEntry).trim();
 			if (!enchantmentFound && (loreStripped.contains("King's Valley :") ||
-			                          loreStripped.contains("Celsian Isles :") ||
-			                          loreStripped.contains("Monumenta :") ||
-			                          loreStripped.contains("Armor") ||
-			                          loreStripped.contains("Magic Wand") ||
-									  loreStripped.contains("Alchemical Utensil") ||
-			                          loreStripped.isEmpty())) {
-				newLore.add(ChatColor.GRAY + enchantment);
+					loreStripped.contains("Celsian Isles :") ||
+					loreStripped.contains("Monumenta :") ||
+					loreStripped.contains("Armor") ||
+					loreStripped.contains("Magic Wand") ||
+					loreStripped.contains("Alchemical Utensil") ||
+					loreStripped.isEmpty())) {
+				newLore.add(MessagingUtils.LEGACY_SERIALIZER.deserialize(ChatColor.GRAY + enchantment).decoration(TextDecoration.ITALIC, false));
 				enchantmentFound = true;
 			}
 
-			if (!nameAdded && ChatColor.stripColor(loreEntry).trim().isEmpty()) {
-				newLore.add(ownerPrefix + " " + player.getName());
+			if (!nameAdded && loreStripped.isEmpty()) {
+				newLore.add(Component.text(ownerPrefix + " " + player.getName()));
 				nameAdded = true;
 			}
 
@@ -1424,10 +1425,10 @@ public class ItemUtils {
 		}
 
 		if (!nameAdded) {
-			newLore.add(ownerPrefix + " " + player.getName());
+			newLore.add(Component.text(ownerPrefix + " " + player.getName()));
 		}
 
-		meta.setLore(newLore);
+		meta.lore(newLore);
 		itemStack.setItemMeta(meta);
 		setPlainLore(itemStack);
 

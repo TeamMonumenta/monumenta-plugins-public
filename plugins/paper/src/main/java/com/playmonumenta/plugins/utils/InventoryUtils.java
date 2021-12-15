@@ -198,15 +198,15 @@ public class InventoryUtils {
 		if (!nameText.isEmpty() && item != null) {
 			final ItemMeta meta = item.getItemMeta();
 			if (meta != null) {
-				final List<String> lore = meta.getLore();
+				final List<Component> lore = meta.lore();
 				if (lore != null && !lore.isEmpty()) {
-					final List<String> newLore = new ArrayList<>();
-					for (final String line : lore) {
-						if (!line.startsWith(nameText)) {
+					final List<Component> newLore = new ArrayList<>();
+					for (final Component line : lore) {
+						if (!MessagingUtils.LEGACY_SERIALIZER.serialize(line).startsWith(nameText)) {
 							newLore.add(line);
 						}
 					}
-					meta.setLore(newLore);
+					meta.lore(newLore);
 					item.setItemMeta(meta);
 					ItemUtils.setPlainLore(item);
 				}
