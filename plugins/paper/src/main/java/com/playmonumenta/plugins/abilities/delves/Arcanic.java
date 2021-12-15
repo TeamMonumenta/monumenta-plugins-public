@@ -6,6 +6,7 @@ import java.util.List;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.SpawnerSpawnEvent;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.bosses.bosses.ChargerBoss;
@@ -90,7 +91,7 @@ public class Arcanic extends DelveModifier {
 
 	private final double mAbilityChance;
 
-	public Arcanic(Plugin plugin, Player player) {
+	public Arcanic(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, Modifier.ARCANIC);
 
 		if (player != null) {

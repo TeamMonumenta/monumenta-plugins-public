@@ -56,7 +56,9 @@ public class EarthenWrath extends DepthsAbility {
 
 	@Override
 	public void playerSwapHandItemsEvent(PlayerSwapHandItemsEvent event) {
-
+		if (mPlayer == null) {
+			return;
+		}
 		event.setCancelled(true);
 		putOnCooldown();
 		mDamageAbsorbed = 0;
@@ -65,10 +67,14 @@ public class EarthenWrath extends DepthsAbility {
 		world.playSound(mPlayer.getLocation(), Sound.BLOCK_BEACON_ACTIVATE, 10, 1);
 
 		DepthsParty party = DepthsManager.getInstance().getPartyFromId(DepthsManager.getInstance().mPlayers.get(mPlayer.getUniqueId()));
+		if (party == null) {
+			return;
+		}
 
 		new BukkitRunnable() {
 			private int mTicks = 0;
 			private float mPitch = 0.5f;
+
 			@Override
 			public void run() {
 				mAbsorbDamage = true;
@@ -127,7 +133,7 @@ public class EarthenWrath extends DepthsAbility {
 
 	//Returns true if the damage was absorbed
 	public boolean damagedEntity(Player player, EntityDamageByEntityEvent event) {
-		if (AbilityUtils.isBlocked(event)) {
+		if (mPlayer == null || AbilityUtils.isBlocked(event)) {
 			return false;
 		}
 
@@ -185,7 +191,7 @@ public class EarthenWrath extends DepthsAbility {
 
 	@Override
 	public boolean runCheck() {
-		return (!isOnCooldown() && DepthsUtils.isWeaponItem(mPlayer.getInventory().getItemInMainHand()));
+		return mPlayer != null && !isOnCooldown() && DepthsUtils.isWeaponItem(mPlayer.getInventory().getItemInMainHand());
 	}
 
 	@Override

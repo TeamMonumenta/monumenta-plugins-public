@@ -22,6 +22,7 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
@@ -57,7 +58,7 @@ public class HauntingShades extends MultipleChargeAbility {
 
 	private final int mVuln;
 
-	public HauntingShades(Plugin plugin, Player player) {
+	public HauntingShades(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Haunting Shades");
 		mInfo.mLinkedSpell = ClassAbility.HAUNTING_SHADES;
 		mInfo.mScoreboardId = "HauntingShades";
@@ -74,6 +75,9 @@ public class HauntingShades extends MultipleChargeAbility {
 
 	@Override
 	public boolean runCheck() {
+		if (mPlayer == null) {
+			return false;
+		}
 		if (ZoneUtils.hasZoneProperty(mPlayer, ZoneProperty.NO_MOBILITY_ABILITIES)) {
 			return false;
 		}
@@ -82,6 +86,9 @@ public class HauntingShades extends MultipleChargeAbility {
 
 	@Override
 	public void playerSwapHandItemsEvent(PlayerSwapHandItemsEvent event) {
+		if (mPlayer == null) {
+			return;
+		}
 		ItemStack mainHandItem = mPlayer.getInventory().getItemInMainHand();
 		if (ItemUtils.isHoe(mainHandItem)) {
 			event.setCancelled(true);
@@ -135,6 +142,9 @@ public class HauntingShades extends MultipleChargeAbility {
 	}
 
 	private void placeShade(Location bLoc) {
+		if (mPlayer == null) {
+			return;
+		}
 		World world = mPlayer.getWorld();
 		bLoc.setDirection(mPlayer.getLocation().toVector().subtract(bLoc.toVector()).normalize());
 		ArmorStand mStand = (ArmorStand) LibraryOfSoulsIntegration.summon(bLoc, "HauntingShade");

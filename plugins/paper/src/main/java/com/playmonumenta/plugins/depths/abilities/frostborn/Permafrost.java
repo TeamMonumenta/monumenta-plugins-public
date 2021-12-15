@@ -13,7 +13,7 @@ import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
-import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.utils.ItemUtils;
 
 import net.md_5.bungee.api.ChatColor;
 
@@ -31,8 +31,11 @@ public class Permafrost extends DepthsAbility {
 
 	@Override
 	public boolean blockBreakEvent(BlockBreakEvent event) {
+		if (mPlayer == null) {
+			return true;
+		}
 		//If we break a spawner with a pickaxe
-		if (InventoryUtils.isPickaxeItem(event.getPlayer().getInventory().getItemInMainHand()) && event.getBlock().getType() == Material.SPAWNER) {
+		if (ItemUtils.isPickaxe(event.getPlayer().getInventory().getItemInMainHand()) && event.getBlock().getType() == Material.SPAWNER) {
 			ArrayList<Block> blocksToIce = new ArrayList<>();
 			Block block = event.getBlock().getRelative(BlockFace.DOWN);
 			if (block.isSolid() || block.getType() == Material.WATER) {

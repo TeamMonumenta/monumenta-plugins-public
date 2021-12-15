@@ -10,6 +10,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
@@ -46,7 +47,7 @@ public class CleansingRain extends Ability {
 	private static final int ANGLE = -45; // Looking straight up is -90. This is 45 degrees of pitch allowance
 	private static final String PERCENT_DAMAGE_RESIST_EFFECT_NAME = "CleansingPercentDamageResistEffect";
 
-	public CleansingRain(Plugin plugin, Player player) {
+	public CleansingRain(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Cleansing Rain");
 		mInfo.mLinkedSpell = ClassAbility.CLEANSING_RAIN;
 		mInfo.mScoreboardId = "Cleansing";
@@ -60,6 +61,9 @@ public class CleansingRain extends Ability {
 
 	@Override
 	public void cast(Action action) {
+		if (mPlayer == null) {
+			return;
+		}
 		World world = mPlayer.getWorld();
 		world.playSound(mPlayer.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1.45f, 0.8f);
 		putOnCooldown();
@@ -69,6 +73,7 @@ public class CleansingRain extends Ability {
 		// Run cleansing rain here until it finishes
 		new BukkitRunnable() {
 			int mTicks = 0;
+
 			@Override
 			public void run() {
 				world.spawnParticle(Particle.CLOUD, mPlayer.getLocation().add(0, 4, 0), 5, 2.5, 0.35, 2.5, 0);

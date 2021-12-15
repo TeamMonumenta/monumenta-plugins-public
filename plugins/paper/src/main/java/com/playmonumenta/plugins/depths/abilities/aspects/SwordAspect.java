@@ -7,7 +7,7 @@ import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.depths.abilities.WeaponAspectDepthsAbility;
-import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.utils.ItemUtils;
 
 public class SwordAspect extends WeaponAspectDepthsAbility {
 
@@ -22,7 +22,7 @@ public class SwordAspect extends WeaponAspectDepthsAbility {
 	@Override
 	public boolean livingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
 
-		if (mPlayer != null && event.getCause().equals(DamageCause.ENTITY_ATTACK) && InventoryUtils.isSwordItem(mPlayer.getInventory().getItemInMainHand())) {
+		if (mPlayer != null && event.getCause().equals(DamageCause.ENTITY_ATTACK) && ItemUtils.isSword(mPlayer.getInventory().getItemInMainHand())) {
 			event.setDamage(event.getDamage() + DAMAGE);
 		}
 

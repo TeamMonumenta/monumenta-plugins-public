@@ -328,11 +328,11 @@ public class Boss {
 		}
 	}
 
-	public Entity getLastHitBy() {
+	public @Nullable Entity getLastHitBy() {
 		return mLastHitBy;
 	}
 
-	public void setLastHitBy(Entity getLastHitBy) {
+	public void setLastHitBy(@Nullable Entity getLastHitBy) {
 		this.mLastHitBy = getLastHitBy;
 	}
 

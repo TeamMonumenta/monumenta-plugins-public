@@ -44,6 +44,7 @@ import com.playmonumenta.plugins.utils.DelvesUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.utils.NamespacedKeyUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 
 public class FalseSpiritPortal extends BossAbilityGroup {
@@ -111,22 +112,22 @@ public class FalseSpiritPortal extends BossAbilityGroup {
 					}
 				}
 
-				NamespacedKey key = NamespacedKey.fromString("epic:r2/dungeons/forum/ex_nihilo");
+				NamespacedKey key = NamespacedKeyUtils.fromString("epic:r2/dungeons/forum/ex_nihilo");
 				switch (mPortalNumTag) {
 					case "PortalNum1":
-						key = NamespacedKey.fromString("epic:r2/dungeons/forum/ex_nihilo_hallud");
+						key = NamespacedKeyUtils.fromString("epic:r2/dungeons/forum/ex_nihilo_hallud");
 						break;
 					case "PortalNum2":
-						key = NamespacedKey.fromString("epic:r2/dungeons/forum/ex_nihilo_chasom");
+						key = NamespacedKeyUtils.fromString("epic:r2/dungeons/forum/ex_nihilo_chasom");
 						break;
 					case "PortalNum3":
-						key = NamespacedKey.fromString("epic:r2/dungeons/forum/ex_nihilo_midat");
+						key = NamespacedKeyUtils.fromString("epic:r2/dungeons/forum/ex_nihilo_midat");
 						break;
 					case "PortalNum4":
-						key = NamespacedKey.fromString("epic:r2/dungeons/forum/ex_nihilo_daath");
+						key = NamespacedKeyUtils.fromString("epic:r2/dungeons/forum/ex_nihilo_daath");
 						break;
 					case "PortalNum5":
-						key = NamespacedKey.fromString("epic:r2/dungeons/forum/ex_nihilo_keter");
+						key = NamespacedKeyUtils.fromString("epic:r2/dungeons/forum/ex_nihilo_keter");
 						break;
 					default:
 						break;
@@ -155,29 +156,27 @@ public class FalseSpiritPortal extends BossAbilityGroup {
 			Set<String> tags = as.getScoreboardTags();
 			for (String tag : tags) {
 				switch (tag) {
-					case SUMMON_TAG:
-						mGates.add(as);
-						break;
-					case SUMMON_CEILING_TAG:
-						mCeilingGate = as;
-						break;
-					default:
-						break;
+				case SUMMON_TAG:
+					mGates.add(as);
+					break;
+				case SUMMON_CEILING_TAG:
+					mCeilingGate = as;
+					break;
+				default:
+					break;
 				}
 			}
 		}
 
-		for (Entity e : EntityUtils.getNearbyMobs(mBoss.getLocation(), 75, EnumSet.of(EntityType.ARMOR_STAND))) {
-			if (e instanceof LivingEntity) {
-				Set<String> tags = e.getScoreboardTags();
-				for (String tag : tags) {
-					switch (tag) {
-						case TRIDENT_TAG:
-							mTridentStands.add((LivingEntity) e);
-							break;
-						default:
-							break;
-					}
+		for (LivingEntity e : EntityUtils.getNearbyMobs(mBoss.getLocation(), 75, EnumSet.of(EntityType.ARMOR_STAND))) {
+			Set<String> tags = e.getScoreboardTags();
+			for (String tag : tags) {
+				switch (tag) {
+				case TRIDENT_TAG:
+					mTridentStands.add(e);
+					break;
+				default:
+					break;
 				}
 			}
 		}
@@ -358,8 +357,7 @@ public class FalseSpiritPortal extends BossAbilityGroup {
 
 	@Override
 	public void bossHitByProjectile(ProjectileHitEvent event) {
-		if (event.getEntity() instanceof Trident) {
-			Trident trident = (Trident) event.getEntity();
+		if (event.getEntity() instanceof Trident trident) {
 
 			if (trident.getItemStack() != null && equalsTrident(trident.getItemStack())) {
 				closePortal();
@@ -371,8 +369,7 @@ public class FalseSpiritPortal extends BossAbilityGroup {
 
 	@Override
 	public void bossDamagedByEntity(EntityDamageByEntityEvent event) {
-		if (event.getDamager() instanceof Player) {
-			Player player = (Player) event.getDamager();
+		if (event.getDamager() instanceof Player player) {
 			ItemStack mainhand = player.getInventory().getItemInMainHand();
 			if (mainhand != null && equalsTrident(mainhand)) {
 				event.setCancelled(true);
@@ -387,15 +384,13 @@ public class FalseSpiritPortal extends BossAbilityGroup {
 	//Deletes all of the tridents used to close the portals/gates so you can not hoard them
 	private void deleteTridents() {
 		for (Entity e : mBoss.getLocation().getNearbyEntities(100, 100, 100)) {
-			if (e instanceof Item) {
-				Item item = (Item) e;
+			if (e instanceof Item item) {
 				if (equalsTrident(item.getItemStack())) {
 					item.remove();
 				}
-			} else if (e instanceof Player) {
-				InventoryUtils.removeNamedItems((Player) e, mTridentName);
-			} else if (e instanceof Trident) {
-				Trident trident = (Trident) e;
+			} else if (e instanceof Player player) {
+				InventoryUtils.removeNamedItems(player, mTridentName);
+			} else if (e instanceof Trident trident) {
 				if (equalsTrident(trident.getItemStack())) {
 					trident.remove();
 				}

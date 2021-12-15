@@ -45,7 +45,7 @@ import com.playmonumenta.plugins.utils.ZoneUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
 
 public class PlayerTracking implements EntityTracking {
-	private static PlayerTracking INSTANCE = null;
+	private static @Nullable PlayerTracking INSTANCE = null;
 
 	private final Plugin mPlugin;
 	private final HashMap<Player, PlayerInventoryManager> mPlayers = new HashMap<>();

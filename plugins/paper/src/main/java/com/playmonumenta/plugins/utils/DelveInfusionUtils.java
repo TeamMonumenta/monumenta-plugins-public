@@ -47,32 +47,33 @@ public class DelveInfusionUtils {
 	/**When set to true the refund function will return all the XP used for the infusion, when false only the 50% */
 	public static final boolean FULL_REFUND = false;
 
-	public static final NamespacedKey DEPTHS_MAT_LOOT_TABLE = NamespacedKey.fromString("epic:r2/depths/loot/voidstained_geode");
+	public static final NamespacedKey DEPTHS_MAT_LOOT_TABLE = NamespacedKeyUtils.fromString("epic:r2/depths/loot/voidstained_geode");
 
 	public enum DelveInfusionSelection {
-		PENNATE("pennate", Pennate.PROPERTY_NAME, NamespacedKey.fromString("epic:r1/delves/white/auxiliary/delve_material")),
-		CARAPACE("carapace", Carapace.PROPERTY_NAME, NamespacedKey.fromString("epic:r1/delves/orange/auxiliary/delve_material")),
-		AURA("aura", Aura.PROPERTY_NAME, NamespacedKey.fromString("epic:r1/delves/magenta/auxiliary/delve_material")),
-		EXPEDITE("expedite", Expedite.PROPERTY_NAME, NamespacedKey.fromString("epic:r1/delves/lightblue/auxiliary/delve_material")),
-		CHOLER("choler", Choler.PROPERTY_NAME, NamespacedKey.fromString("epic:r1/delves/yellow/auxiliary/delve_material")),
-		USURPER("usurper", Usurper.PROPERTY_NAME, NamespacedKey.fromString("epic:r1/delves/reverie/auxiliary/delve_material")),
+		PENNATE("pennate", Pennate.PROPERTY_NAME, NamespacedKeyUtils.fromString("epic:r1/delves/white/auxiliary/delve_material")),
+		CARAPACE("carapace", Carapace.PROPERTY_NAME, NamespacedKeyUtils.fromString("epic:r1/delves/orange/auxiliary/delve_material")),
+		AURA("aura", Aura.PROPERTY_NAME, NamespacedKeyUtils.fromString("epic:r1/delves/magenta/auxiliary/delve_material")),
+		EXPEDITE("expedite", Expedite.PROPERTY_NAME, NamespacedKeyUtils.fromString("epic:r1/delves/lightblue/auxiliary/delve_material")),
+		CHOLER("choler", Choler.PROPERTY_NAME, NamespacedKeyUtils.fromString("epic:r1/delves/yellow/auxiliary/delve_material")),
+		USURPER("usurper", Usurper.PROPERTY_NAME, NamespacedKeyUtils.fromString("epic:r1/delves/reverie/auxiliary/delve_material")),
 
-		EMPOWERED("empowered", Empowered.PROPERTY_NAME, NamespacedKey.fromString("epic:r2/delves/lime/auxiliary/delve_material")),
-		NUTRIMENT("nutriment", Nutriment.PROPERTY_NAME, NamespacedKey.fromString("epic:r2/delves/pink/auxiliary/delve_material")),
-		EXECUTION("execution", Execution.PROPERTY_NAME, NamespacedKey.fromString("epic:r2/delves/gray/auxiliary/delve_material")),
-		REFLECTION("reflection", Reflection.PROPERTY_NAME, NamespacedKey.fromString("epic:r2/delves/lightgray/auxiliary/delve_material")),
-		MITOSIS("mitosis", Mitosis.PROPERTY_NAME, NamespacedKey.fromString("epic:r2/delves/cyan/auxiliary/delve_material")),
-		ARDOR("ardor", Ardor.PROPERTY_NAME, NamespacedKey.fromString("epic:r2/delves/purple/auxiliary/delve_material")),
-		EPOCH("epoch", Epoch.PROPERTY_NAME, NamespacedKey.fromString("epic:r2/delves/teal/auxiliary/delve_material")),
-		NATANT("natant", Natant.PROPERTY_NAME, NamespacedKey.fromString("epic:r2/delves/shiftingcity/auxiliary/delve_material")),
-		UNDERSTANDING("understanding", Understanding.PROPERTY_NAME, NamespacedKey.fromString("epic:r2/delves/forum/auxiliary/delve_material")),
+		EMPOWERED("empowered", Empowered.PROPERTY_NAME, NamespacedKeyUtils.fromString("epic:r2/delves/lime/auxiliary/delve_material")),
+		NUTRIMENT("nutriment", Nutriment.PROPERTY_NAME, NamespacedKeyUtils.fromString("epic:r2/delves/pink/auxiliary/delve_material")),
+		EXECUTION("execution", Execution.PROPERTY_NAME, NamespacedKeyUtils.fromString("epic:r2/delves/gray/auxiliary/delve_material")),
+		REFLECTION("reflection", Reflection.PROPERTY_NAME, NamespacedKeyUtils.fromString("epic:r2/delves/lightgray/auxiliary/delve_material")),
+		MITOSIS("mitosis", Mitosis.PROPERTY_NAME, NamespacedKeyUtils.fromString("epic:r2/delves/cyan/auxiliary/delve_material")),
+		ARDOR("ardor", Ardor.PROPERTY_NAME, NamespacedKeyUtils.fromString("epic:r2/delves/purple/auxiliary/delve_material")),
+		EPOCH("epoch", Epoch.PROPERTY_NAME, NamespacedKeyUtils.fromString("epic:r2/delves/teal/auxiliary/delve_material")),
+		NATANT("natant", Natant.PROPERTY_NAME, NamespacedKeyUtils.fromString("epic:r2/delves/shiftingcity/auxiliary/delve_material")),
+		UNDERSTANDING("understanding", Understanding.PROPERTY_NAME, NamespacedKeyUtils.fromString("epic:r2/delves/forum/auxiliary/delve_material")),
 
 		REFUND("refund", "refund", null);
 
 		private final String mLabel;
 		private final String mEnchantName;
-		private final NamespacedKey mLootTable;
-		DelveInfusionSelection(String label, String enchantName, NamespacedKey lootTable) {
+		private final @Nullable NamespacedKey mLootTable;
+
+		DelveInfusionSelection(String label, String enchantName, @Nullable NamespacedKey lootTable) {
 			mLabel = label;
 			mEnchantName = enchantName;
 			mLootTable = lootTable;
@@ -98,7 +99,7 @@ public class DelveInfusionUtils {
 			return mEnchantName;
 		}
 
-		public NamespacedKey getLootTable() {
+		public @Nullable NamespacedKey getLootTable() {
 			return mLootTable;
 		}
 	}

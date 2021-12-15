@@ -26,10 +26,8 @@ public final class DebuffHitBoss extends BossAbilityGroup {
 
 	@Override
 	public void bossDamagedEntity(EntityDamageByEntityEvent event) {
-		if (event.getEntity() instanceof LivingEntity) {
-			LivingEntity target = (LivingEntity) event.getEntity();
-			if (target instanceof Player) {
-				Player player = (Player)target;
+		if (event.getEntity() instanceof LivingEntity target) {
+			if (target instanceof Player player) {
 				if (BossUtils.bossDamageBlocked(player, event.getDamage(), event.getDamager().getLocation()) && event.getCause() != DamageCause.MAGIC) {
 					return;
 				}
@@ -41,7 +39,7 @@ public final class DebuffHitBoss extends BossAbilityGroup {
 				target.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, 60, 0, false, true));
 			} else if (rand == 2) {
 				target.addPotionEffect(new PotionEffect(PotionEffectType.POISON, 60, 0, false, true));
-			} else if (rand == 3) {
+			} else {
 				target.addPotionEffect(new PotionEffect(PotionEffectType.HUNGER, 60, 0, false, true));
 			}
 		}

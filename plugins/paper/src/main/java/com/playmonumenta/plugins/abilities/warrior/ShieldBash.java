@@ -16,6 +16,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
@@ -50,7 +51,7 @@ public class ShieldBash extends Ability {
 	private static final int SHIELD_BASH_2_RADIUS = 2;
 	private static final int SHIELD_BASH_RANGE = 4;
 
-	public ShieldBash(Plugin plugin, Player player) {
+	public ShieldBash(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Shield Bash");
 		mInfo.mLinkedSpell = ClassAbility.SHIELD_BASH;
 		mInfo.mScoreboardId = "ShieldBash";
@@ -68,7 +69,7 @@ public class ShieldBash extends Ability {
 		new BukkitRunnable() {
 			@Override
 			public void run() {
-				if (mPlayer.isHandRaised()) {
+				if (mPlayer != null && mPlayer.isHandRaised()) {
 					int damage = (int) ShieldBashDamageEnchantment.getExtraDamage(mPlayer, ShieldBashDamageEnchantment.class) + SHIELD_BASH_DAMAGE;
 					Location eyeLoc = mPlayer.getEyeLocation();
 					Raycast ray = new Raycast(eyeLoc, eyeLoc.getDirection(), SHIELD_BASH_RANGE);

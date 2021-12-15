@@ -47,8 +47,11 @@ public class Crusade extends Ability {
 
 	@Override
 	public void playerDealtCustomDamageEvent(CustomDamageEvent customDamageEvent) {
+		if (mPlayer == null) {
+			return;
+		}
 		//TODO pass in casted entities for events like these
-		LivingEntity enemy = (LivingEntity)customDamageEvent.getDamaged();
+		LivingEntity enemy = customDamageEvent.getDamaged();
 
 		if (enemyTriggersAbilities(enemy)) {
 			double originalDamage = customDamageEvent.getDamage();

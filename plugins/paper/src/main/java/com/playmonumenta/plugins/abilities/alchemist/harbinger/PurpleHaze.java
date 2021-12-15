@@ -6,19 +6,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.abilities.AbilityManager;
-import com.playmonumenta.plugins.abilities.AbilityTrigger;
-import com.playmonumenta.plugins.abilities.alchemist.AlchemistPotions;
-import com.playmonumenta.plugins.classes.ClassAbility;
-import com.playmonumenta.plugins.classes.magic.MagicType;
-import com.playmonumenta.plugins.point.Raycast;
-import com.playmonumenta.plugins.point.RaycastData;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.ItemUtils;
-import com.playmonumenta.plugins.utils.LocationUtils;
-
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -31,7 +18,20 @@ import org.bukkit.event.block.Action;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.abilities.AbilityManager;
+import com.playmonumenta.plugins.abilities.AbilityTrigger;
+import com.playmonumenta.plugins.abilities.alchemist.AlchemistPotions;
+import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.classes.magic.MagicType;
+import com.playmonumenta.plugins.point.Raycast;
+import com.playmonumenta.plugins.point.RaycastData;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.LocationUtils;
 
 
 public class PurpleHaze extends Ability {
@@ -69,13 +69,13 @@ public class PurpleHaze extends Ability {
 	private static final Map<UUID, HazedMob> mHazedMobs = new HashMap<>();
 	private static final Map<UUID, HazedMob> newHazedMobs = new HashMap<>();
 
-	private static BukkitRunnable mRunnable = null;
+	private static @Nullable BukkitRunnable mRunnable = null;
 
 	private final int mDuration;
 
-	private LivingEntity mTarget = null;
+	private @Nullable LivingEntity mTarget = null;
 
-	public PurpleHaze(Plugin plugin, Player player) {
+	public PurpleHaze(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Purple Haze");
 		mInfo.mLinkedSpell = ClassAbility.PURPLE_HAZE;
 		mInfo.mScoreboardId = "PurpleHaze";
@@ -184,7 +184,7 @@ public class PurpleHaze extends Ability {
 
 	@Override
 	public boolean runCheck() {
-		if (mPlayer.isSneaking()) {
+		if (mPlayer != null && mPlayer.isSneaking()) {
 			ItemStack mainHand = mPlayer.getInventory().getItemInMainHand();
 			if (ItemUtils.isSomeBow(mainHand)) {
 
@@ -215,6 +215,9 @@ public class PurpleHaze extends Ability {
 
 	@Override
 	public void cast(Action action) {
+		if (mPlayer == null) {
+			return;
+		}
 		LivingEntity entity = mTarget;
 		if (entity != null && !mHazedMobs.containsKey(entity.getUniqueId())) {
 			HazedMob hazed = new HazedMob(entity, mPlayer, mDuration, PURPLE_HAZE_TRANSFER_DEPTH);

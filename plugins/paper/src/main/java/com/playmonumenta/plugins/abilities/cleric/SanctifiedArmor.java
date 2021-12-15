@@ -45,7 +45,7 @@ public class SanctifiedArmor extends Ability {
 
 	private @Nullable Crusade mCrusade;
 
-	public SanctifiedArmor(Plugin plugin, Player player) {
+	public SanctifiedArmor(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Sanctified Armor");
 		mInfo.mLinkedSpell = ClassAbility.SANCTIFIED_ARMOR;
 		mInfo.mScoreboardId = "Sanctified";
@@ -57,7 +57,7 @@ public class SanctifiedArmor extends Ability {
 
 		if (player != null) {
 			Bukkit.getScheduler().runTask(plugin, () -> {
-				mCrusade = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(mPlayer, Crusade.class);
+				mCrusade = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, Crusade.class);
 			});
 		}
 	}
@@ -75,20 +75,19 @@ public class SanctifiedArmor extends Ability {
 	@Override
 	public boolean playerDamagedByProjectileEvent(EntityDamageByEntityEvent event) {
 		ProjectileSource source = ((Projectile) event.getDamager()).getShooter();
-		if (source instanceof LivingEntity) {
-			LivingEntity mob = (LivingEntity) source;
-			if (
+		if (source instanceof LivingEntity mob &&
 				Crusade.enemyTriggersAbilities(mob, mCrusade)
-				&& !EntityUtils.isBoss(mob)
-			) {
-				trigger(mob, event);
-			}
+				&& !EntityUtils.isBoss(mob)) {
+			trigger(mob, event);
 		}
 
 		return true;
 	}
 
 	private void trigger(LivingEntity mob, EntityDamageByEntityEvent event) {
+		if (mPlayer == null) {
+			return;
+		}
 		Location loc = mob.getLocation();
 		World world = mPlayer.getWorld();
 		world.spawnParticle(Particle.FIREWORKS_SPARK, loc.add(0, mob.getHeight() / 2, 0), 7, 0.35, 0.35, 0.35, 0.125);

@@ -38,7 +38,7 @@ public class SoulRend extends Ability {
 
 	private @Nullable DarkPact mDarkPact;
 
-	public SoulRend(Plugin plugin, Player player) {
+	public SoulRend(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Soul Rend");
 		mInfo.mScoreboardId = "SoulRend";
 		mInfo.mShorthandName = "SR";
@@ -58,7 +58,7 @@ public class SoulRend extends Ability {
 
 	@Override
 	public boolean livingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
-		if (event.getCause() == DamageCause.ENTITY_ATTACK) {
+		if (mPlayer != null && event.getCause() == DamageCause.ENTITY_ATTACK) {
 			double heal = mHeal + event.getDamage() * PERCENT_HEAL;
 
 			Location loc = event.getEntity().getLocation();
@@ -71,7 +71,7 @@ public class SoulRend extends Ability {
 				world.spawnParticle(Particle.SMOKE_LARGE, loc.clone().add(0, 1, 0), 45, 3.5, 1.5, 3.5, 0.0);
 				NavigableSet<Effect> darkPactEffects = mPlugin.mEffectManager.getEffects(mPlayer, DarkPact.PERCENT_HEAL_EFFECT_NAME);
 				if (mPlugin.mEffectManager.getEffects(mPlayer, DarkPact.PERCENT_HEAL_EFFECT_NAME) != null) {
-					if (mDarkPact.getAbilityScore() == 2) {
+					if (mDarkPact != null && mDarkPact.getAbilityScore() == 2) {
 						int currPactDuration = darkPactEffects.last().getDuration();
 						mPlugin.mEffectManager.clearEffects(mPlayer, DarkPact.PERCENT_HEAL_EFFECT_NAME);
 						world.spawnParticle(Particle.DAMAGE_INDICATOR, mPlayer.getLocation().add(0, 1, 0), 12, 0.5, 0.5, 0.5, 0.0);
@@ -93,8 +93,8 @@ public class SoulRend extends Ability {
 
 				world.spawnParticle(Particle.DAMAGE_INDICATOR, mPlayer.getLocation().add(0, 1, 0), 12, 0.5, 0.5, 0.5, 0.0);
 				NavigableSet<Effect> darkPactEffects = mPlugin.mEffectManager.getEffects(mPlayer, DarkPact.PERCENT_HEAL_EFFECT_NAME);
-				if (mPlugin.mEffectManager.getEffects(mPlayer, DarkPact.PERCENT_HEAL_EFFECT_NAME) != null) {
-					if (mDarkPact.getAbilityScore() == 2) {
+				if (darkPactEffects != null) {
+					if (mDarkPact != null && mDarkPact.getAbilityScore() == 2) {
 						int currPactDuration = darkPactEffects.last().getDuration();
 						mPlugin.mEffectManager.clearEffects(mPlayer, DarkPact.PERCENT_HEAL_EFFECT_NAME);
 						world.spawnParticle(Particle.DAMAGE_INDICATOR, mPlayer.getLocation().add(0, 1, 0), 12, 0.5, 0.5, 0.5, 0.0);
@@ -115,6 +115,6 @@ public class SoulRend extends Ability {
 
 	@Override
 	public boolean runCheck() {
-		return PlayerUtils.isFallingAttack(mPlayer) && ItemUtils.isHoe(mPlayer.getInventory().getItemInMainHand());
+		return mPlayer != null && PlayerUtils.isFallingAttack(mPlayer) && ItemUtils.isHoe(mPlayer.getInventory().getItemInMainHand());
 	}
 }

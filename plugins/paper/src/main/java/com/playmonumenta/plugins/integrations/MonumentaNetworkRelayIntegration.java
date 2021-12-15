@@ -6,6 +6,7 @@ import java.util.logging.Logger;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.google.gson.JsonObject;
 import com.playmonumenta.networkrelay.NetworkRelayAPI;
@@ -21,7 +22,7 @@ public class MonumentaNetworkRelayIntegration implements Listener {
 	public static final String ADMIN_ALERT_CHANNEL = "Monumenta.Automation.AdminNotification";
 
 	private final Logger mLogger;
-	private static MonumentaNetworkRelayIntegration INSTANCE = null;
+	private static @Nullable MonumentaNetworkRelayIntegration INSTANCE = null;
 
 	public MonumentaNetworkRelayIntegration(Logger logger) {
 		logger.info("Enabling MonumentaNetworkRelay integration");

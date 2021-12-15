@@ -2,6 +2,9 @@ package com.playmonumenta.plugins.itemindex;
 
 import java.util.ArrayList;
 
+import org.checkerframework.checker.nullness.qual.EnsuresNonNullIf;
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 import com.playmonumenta.plugins.attributes.AttributeAbilityPower;
 import com.playmonumenta.plugins.attributes.AttributeProjectileDamage;
 import com.playmonumenta.plugins.attributes.AttributeProjectileSpeed;
@@ -29,9 +32,9 @@ public enum Attribute {
 	HORSE_JUMP_STRENGTH(org.bukkit.attribute.Attribute.HORSE_JUMP_STRENGTH, " Horse Jump Strength"),
 	ZOMBIE_SPAWN_REINFORCEMENTS(org.bukkit.attribute.Attribute.ZOMBIE_SPAWN_REINFORCEMENTS, " Zombie Spawn Reinforcements");
 
-	private org.bukkit.attribute.Attribute mBukkitAttribute;
-	BaseAttribute mCustomAttributeClass;
-	String mReadableStringFormat;
+	private final org.bukkit.attribute.@Nullable Attribute mBukkitAttribute;
+	private final @Nullable BaseAttribute mCustomAttributeClass;
+	private final String mReadableStringFormat;
 
 	Attribute(org.bukkit.attribute.Attribute bukkitAttribute, String s) {
 		this.mBukkitAttribute = bukkitAttribute;
@@ -45,6 +48,7 @@ public enum Attribute {
 		this.mReadableStringFormat = customAttribute.getProperty();
 	}
 
+	@EnsuresNonNullIf(expression = "getBukkitAttribute()", result = true)
 	public boolean isCustom() {
 		return this.mCustomAttributeClass != null;
 	}
@@ -53,7 +57,7 @@ public enum Attribute {
 		return this.mReadableStringFormat;
 	}
 
-	public org.bukkit.attribute.Attribute getBukkitAttribute() {
+	public org.bukkit.attribute.@Nullable Attribute getBukkitAttribute() {
 		return this.mBukkitAttribute;
 	}
 

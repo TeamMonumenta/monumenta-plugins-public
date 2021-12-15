@@ -7,6 +7,7 @@ import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -31,7 +32,7 @@ public class SpellTargetVisiblePlayer extends Spell {
 
 	private int mCooldownRemaining;
 	private int mTicksSinceLastSeen;
-	private Player mLastTarget;
+	private @Nullable Player mLastTarget;
 
 	public SpellTargetVisiblePlayer(Mob launcher, int detectionRange, int targetSwitchCooldown, int forgetTicks) {
 		mBoss = launcher;

@@ -13,6 +13,7 @@ import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
@@ -36,7 +37,7 @@ public class EscapeDeath extends Ability {
 	private static final int JUMP_BOOST_AMPLIFIER = 2;
 	private static final int COOLDOWN = 90 * 20;
 
-	public EscapeDeath(Plugin plugin, Player player) {
+	public EscapeDeath(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Escape Death");
 		mInfo.mLinkedSpell = ClassAbility.ESCAPE_DEATH;
 		mInfo.mScoreboardId = "EscapeDeath";

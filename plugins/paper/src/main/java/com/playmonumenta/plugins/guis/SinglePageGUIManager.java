@@ -26,7 +26,7 @@ public class SinglePageGUIManager implements Listener {
 
 	public SinglePageGUIManager() {
 		// Whenever you make a SinglePageGUI, it must be registered here
-		new ExampleSinglePageGUI(null, null).registerCommand();
+		new ExampleSinglePageGUI(null, new String[0]).registerCommand();
 	}
 
 	public static void openGUI(Player player, SinglePageGUI gui) {

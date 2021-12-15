@@ -24,7 +24,7 @@ import com.playmonumenta.plugins.utils.MetadataUtils;
 
 import net.md_5.bungee.api.ChatColor;
 
-public class ShadowSlam extends DepthsAbility {
+public final class ShadowSlam extends DepthsAbility {
 
 	public static final String ABILITY_NAME = "Shadow Slam";
 	public static final double[] DAMAGE = {2.5, 3.0, 3.5, 4.0, 4.5, 5.5};
@@ -96,18 +96,27 @@ public class ShadowSlam extends DepthsAbility {
 	}
 
 	private void updateFallFrom() {
+		if (mPlayer == null) {
+			return;
+		}
 		double currentY = mPlayer.getLocation().getY();
 		double fallDistance = mPlayer.getFallDistance();
 		mFallFromY = currentY + fallDistance;
 	}
 
 	private double calculateFallDistance() {
+		if (mPlayer == null) {
+			return 0;
+		}
 		double currentY = mPlayer.getLocation().getY();
 		double fallDistance = mFallFromY - currentY;
 		return Math.max(fallDistance, 0);
 	}
 
 	private void doSlamAttack(Location location) {
+		if (mPlayer == null) {
+			return;
+		}
 		double fallDistance = calculateFallDistance();
 		double slamDamage = Math.min(REDUCED_THRESHOLD, fallDistance) * DAMAGE[mRarity - 1] + Math.max(0, (fallDistance - REDUCED_THRESHOLD)) * 0.0;
 
@@ -126,11 +135,10 @@ public class ShadowSlam extends DepthsAbility {
 
 	@Override
 	public boolean livingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
-		if (
-			event.getCause() == DamageCause.ENTITY_ATTACK
-			&& calculateFallDistance() > MANUAL_THRESHOLD
-			&& MetadataUtils.checkOnceThisTick(mPlugin, mPlayer, SLAM_ONCE_THIS_TICK_METAKEY)
-		) {
+		if (mPlayer != null
+				&& event.getCause() == DamageCause.ENTITY_ATTACK
+				&& calculateFallDistance() > MANUAL_THRESHOLD
+				&& MetadataUtils.checkOnceThisTick(mPlugin, mPlayer, SLAM_ONCE_THIS_TICK_METAKEY)) {
 			doSlamAttack(event.getEntity().getLocation().add(0, 0.15, 0));
 			mFallFromY = -7050;
 			// Also reset fall damage, mFallFromY can continue updating from there

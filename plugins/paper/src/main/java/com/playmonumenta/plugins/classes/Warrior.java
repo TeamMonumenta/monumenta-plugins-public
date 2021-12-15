@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.classes;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.warrior.BruteForce;
@@ -13,11 +14,9 @@ import com.playmonumenta.plugins.abilities.warrior.Riposte;
 import com.playmonumenta.plugins.abilities.warrior.ShieldBash;
 import com.playmonumenta.plugins.abilities.warrior.Toughness;
 import com.playmonumenta.plugins.abilities.warrior.WeaponryMastery;
-
 import com.playmonumenta.plugins.abilities.warrior.berserker.MeteorSlam;
 import com.playmonumenta.plugins.abilities.warrior.berserker.Rampage;
 import com.playmonumenta.plugins.abilities.warrior.berserker.RecklessSwing;
-
 import com.playmonumenta.plugins.abilities.warrior.guardian.Bodyguard;
 import com.playmonumenta.plugins.abilities.warrior.guardian.Challenge;
 import com.playmonumenta.plugins.abilities.warrior.guardian.ShieldWall;
@@ -29,7 +28,7 @@ import net.md_5.bungee.api.ChatColor;
 
 public class Warrior extends PlayerClass {
 
-	Warrior(Plugin plugin, Player player) {
+	Warrior(Plugin plugin, @Nullable Player player) {
 		mAbilities.add(new BruteForce(plugin, player));
 		mAbilities.add(new CounterStrike(plugin, player));
 		mAbilities.add(new DefensiveLine(plugin, player));

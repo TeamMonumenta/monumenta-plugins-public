@@ -267,8 +267,7 @@ public class HeadlessHorsemanBoss extends BossAbilityGroup {
 			}
 		}
 
-		if (event.getEntity() instanceof Player) {
-			Player player = (Player) event.getEntity();
+		if (event.getEntity() instanceof Player player) {
 			if (player.isBlocking()) {
 				player.setCooldown(Material.SHIELD, 20 * 30);
 			}

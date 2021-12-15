@@ -53,7 +53,7 @@ public class ElementalSpiritIce extends Ability {
 	private @Nullable BukkitTask mEnemiesAffectedProcessor;
 	private @Nullable BukkitTask mSpiritPulser;
 
-	public ElementalSpiritIce(Plugin plugin, Player player) {
+	public ElementalSpiritIce(Plugin plugin, @Nullable Player player) {
 		/* NOTE
 		 * Display name is null so this variant will be ignored by the tesseract.
 		 * This variant also does not have a description

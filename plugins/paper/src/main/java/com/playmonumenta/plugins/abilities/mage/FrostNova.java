@@ -14,6 +14,7 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
@@ -54,7 +55,7 @@ public class FrostNova extends Ability {
 	private final int mLevelDamage;
 	private final double mLevelSlowMultiplier;
 
-	public FrostNova(Plugin plugin, Player player) {
+	public FrostNova(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, NAME);
 		mInfo.mLinkedSpell = ABILITY;
 
@@ -91,6 +92,9 @@ public class FrostNova extends Ability {
 
 	@Override
 	public void cast(Action action) {
+		if (mPlayer == null) {
+			return;
+		}
 		putOnCooldown();
 		float damage = SpellPower.getSpellDamage(mPlayer, mLevelDamage);
 		for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), SIZE, mPlayer)) {
@@ -154,12 +158,9 @@ public class FrostNova extends Ability {
 
 	@Override
 	public boolean runCheck() {
-		return (
-			ItemUtils.isWand(
-				mPlayer.getInventory().getItemInMainHand()
-			)
-			&& mPlayer.isSneaking()
-		);
+		return mPlayer != null
+			&& ItemUtils.isWand(mPlayer.getInventory().getItemInMainHand())
+			&& mPlayer.isSneaking();
 	}
 
 	@Override

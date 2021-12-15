@@ -187,7 +187,7 @@ public class GraveManager {
 	}
 
 	// Called only on a death that would result in a grave
-	public static void onDeath(Player player, ArrayList<ItemStack> droppedItems, HashMap<EquipmentSlot, ItemStack> equipment) {
+	public static void onDeath(Player player, ArrayList<ItemStack> droppedItems, HashMap<EquipmentSlot, @Nullable ItemStack> equipment) {
 		GraveManager manager = INSTANCES.get(player.getUniqueId());
 		manager.mGraves.add(new Grave(manager, player, droppedItems, equipment));
 	}

@@ -17,6 +17,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
@@ -27,7 +28,7 @@ import com.playmonumenta.plugins.utils.PotionUtils;
  */
 public class PvP extends Ability {
 
-	public PvP(Plugin plugin, Player player) {
+	public PvP(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, null);
 
 		if (player != null) {

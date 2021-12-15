@@ -27,6 +27,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.BlockStateMeta;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.enchantments.Locked;
@@ -58,9 +59,8 @@ public class ShulkerEquipmentListener implements Listener {
 		SWAP_SLOTS.put(40, 13);
 	}
 
-	Plugin mPlugin = null;
-	private Map<UUID, BukkitRunnable> mCooldowns = new HashMap<UUID, BukkitRunnable>();
-
+	private final Plugin mPlugin;
+	private final Map<UUID, BukkitRunnable> mCooldowns = new HashMap<>();
 
 	public ShulkerEquipmentListener(Plugin plugin) {
 		mPlugin = plugin;
@@ -69,8 +69,8 @@ public class ShulkerEquipmentListener implements Listener {
 	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
 	public void inventoryClickEvent(InventoryClickEvent event) {
 		if (
-		    // Must be a right click
-		    event.getClick() == null ||
+			// Must be a right click
+				event.getClick() == null ||
 		    !event.getClick().equals(ClickType.RIGHT) ||
 		    // Must be placing a single block
 		    event.getAction() == null ||
@@ -153,12 +153,12 @@ public class ShulkerEquipmentListener implements Listener {
 		}
 	}
 
-	public static boolean isEquipmentBox(ItemStack sboxItem) {
+	public static boolean isEquipmentBox(@Nullable ItemStack sboxItem) {
 		if (sboxItem != null && ItemUtils.isShulkerBox(sboxItem.getType()) && sboxItem.hasItemMeta()) {
 			if (sboxItem.getItemMeta() instanceof BlockStateMeta) {
-				BlockStateMeta sMeta = (BlockStateMeta)sboxItem.getItemMeta();
+				BlockStateMeta sMeta = (BlockStateMeta) sboxItem.getItemMeta();
 				if (sMeta.getBlockState() instanceof ShulkerBox) {
-					ShulkerBox sbox = (ShulkerBox)sMeta.getBlockState();
+					ShulkerBox sbox = (ShulkerBox) sMeta.getBlockState();
 
 					if (sbox.isLocked() && sbox.getLock().equals(LOCK_STRING)) {
 						return true;
@@ -185,11 +185,12 @@ public class ShulkerEquipmentListener implements Listener {
 		Inventory sInv = sbox.getInventory();
 
 		for (Map.Entry<Integer, Integer> slot : SWAP_SLOTS.entrySet()) {
-			if (slot.getKey() >= 36 && slot.getKey() <= 39 && pInv.getItem(slot.getKey()) != null && pInv.getItem(slot.getKey()).getEnchantmentLevel(Enchantment.BINDING_CURSE) != 0) {
+			ItemStack item = pInv.getItem(slot.getKey());
+			if (slot.getKey() >= 36 && slot.getKey() <= 39 && item != null && item.getEnchantmentLevel(Enchantment.BINDING_CURSE) != 0) {
 				//Does not swap if armor equipped has curse of binding on it
-			} else if (pInv.getItem(slot.getKey()) != null && InventoryUtils.getCustomEnchantLevel(pInv.getItem(slot.getKey()), CurseOfEphemerality.PROPERTY_NAME, false) != 0) {
+			} else if (item != null && InventoryUtils.getCustomEnchantLevel(item, CurseOfEphemerality.PROPERTY_NAME, false) != 0) {
 				//Doesn't swap with curse of ephemerality either
-			} else if (pInv.getItem(slot.getKey()) != null && InventoryUtils.getCustomEnchantLevel(pInv.getItem(slot.getKey()), Locked.PROPERTY_NAME, false) != 0) {
+			} else if (item != null && InventoryUtils.getCustomEnchantLevel(item, Locked.PROPERTY_NAME, false) != 0) {
 				//Doesn't swap with Locked either
 			} else {
 				swapItem(pInv, sInv, slot.getKey(), slot.getValue());

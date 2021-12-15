@@ -47,8 +47,7 @@ public class AttributeThrowRate implements BaseAttribute {
 		 * get rid of the item type checks. Not going to mess with it
 		 * currently since we need to hotfix the trident dupe bug.
 		 */
-		if (proj instanceof Trident) {
-			Trident trident = (Trident) proj;
+		if (proj instanceof Trident trident) {
 			ItemStack item = trident.getItemStack();
 			ItemStack mainhand = player.getInventory().getItemInMainHand();
 			ItemStack offhand = player.getInventory().getItemInOffHand();

@@ -18,6 +18,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
@@ -44,7 +45,7 @@ public class PredatorStrike extends Ability {
 	private boolean mActive = false;
 	private double mDistanceScale;
 
-	public PredatorStrike(Plugin plugin, Player player) {
+	public PredatorStrike(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Predator Strike");
 		mInfo.mLinkedSpell = ClassAbility.PREDATOR_STRIKE;
 		mInfo.mScoreboardId = "PredatorStrike";
@@ -60,7 +61,7 @@ public class PredatorStrike extends Ability {
 
 	@Override
 	public void cast(Action action) {
-		if (!mPlayer.isSneaking() && !mActive && !mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.mLinkedSpell)) {
+		if (mPlayer != null && !mPlayer.isSneaking() && !mActive && !mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.mLinkedSpell)) {
 			ItemStack mainHand = mPlayer.getInventory().getItemInMainHand();
 			if (ItemUtils.isSomeBow(mainHand)) {
 				Player player = mPlayer;
@@ -69,6 +70,7 @@ public class PredatorStrike extends Ability {
 				world.playSound(player.getLocation(), Sound.ITEM_CROSSBOW_LOADING_MIDDLE, 1, 1.0f);
 				new BukkitRunnable() {
 					int mTicks = 0;
+
 					@Override
 					public void run() {
 						mTicks++;
@@ -85,7 +87,7 @@ public class PredatorStrike extends Ability {
 
 	@Override
 	public boolean playerShotArrowEvent(AbstractArrow arrow) {
-		if (mActive && arrow.isCritical()) {
+		if (mPlayer != null && mActive && arrow.isCritical()) {
 			putOnCooldown();
 			arrow.remove();
 			mPlugin.mProjectileEffectTimers.removeEntity(arrow);
@@ -131,6 +133,9 @@ public class PredatorStrike extends Ability {
 	}
 
 	private void explode(Location loc) {
+		if (mPlayer == null) {
+			return;
+		}
 		World world = mPlayer.getWorld();
 
 		// Damage calculation - include Proj Attribute, Focus, Enchants, Teammate buffs (Blessing/Thurible), and Sharpshooter

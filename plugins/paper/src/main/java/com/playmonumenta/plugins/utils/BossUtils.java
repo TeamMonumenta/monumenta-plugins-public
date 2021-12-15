@@ -2,21 +2,20 @@ package com.playmonumenta.plugins.utils;
 
 import java.util.Map;
 
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.effects.Stasis;
-
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
-import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 import org.checkerframework.checker.nullness.qual.Nullable;
+
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.effects.Stasis;
 
 public class BossUtils {
 
@@ -45,7 +44,7 @@ public class BossUtils {
 		bossDamage(boss, target, damage, source, null);
 	}
 
-	public static void bossDamage(LivingEntity boss, LivingEntity target, double damage, @Nullable Location source, String cause) {
+	public static void bossDamage(LivingEntity boss, LivingEntity target, double damage, @Nullable Location source, @Nullable String cause) {
 		int resistance = 0;
 		if (target.hasPotionEffect(PotionEffectType.DAMAGE_RESISTANCE)) {
 			resistance = target.getPotionEffect(PotionEffectType.DAMAGE_RESISTANCE).getAmplifier() + 1;
@@ -84,14 +83,14 @@ public class BossUtils {
 		return bossDamagePercent(boss, target, percentHealth, null, false, cause);
 	}
 
-	public static boolean bossDamagePercent(LivingEntity boss, LivingEntity target, double percentHealth, @Nullable Location source, String cause) {
+	public static boolean bossDamagePercent(LivingEntity boss, LivingEntity target, double percentHealth, @Nullable Location source, @Nullable String cause) {
 		return bossDamagePercent(boss, target, percentHealth, source, false, cause);
 	}
 
 	/*
 	 * Returns whether or not the player survived (true) or was killed (false)
 	 */
-	public static boolean bossDamagePercent(LivingEntity boss, LivingEntity target, double percentHealth, @Nullable Location source, boolean raw, String cause) {
+	public static boolean bossDamagePercent(LivingEntity boss, LivingEntity target, double percentHealth, @Nullable Location source, boolean raw, @Nullable String cause) {
 		if (target instanceof Player) {
 			Player player = (Player) target;
 			if (player.getGameMode() == GameMode.CREATIVE || player.getGameMode() == GameMode.SPECTATOR) {
@@ -155,8 +154,8 @@ public class BossUtils {
 					}
 				}
 				if (toTake > 0) {
-					if (target.getHealth() - toTake > target.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue()) {
-						target.setHealth(target.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue());
+					if (target.getHealth() - toTake > EntityUtils.getMaxHealth(target)) {
+						target.setHealth(EntityUtils.getMaxHealth(target));
 					} else {
 						target.setHealth(Math.max(target.getHealth() - toTake, 1));
 					}

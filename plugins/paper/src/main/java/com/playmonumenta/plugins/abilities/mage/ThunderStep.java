@@ -17,6 +17,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
@@ -70,7 +71,7 @@ public class ThunderStep extends Ability {
 	private final int mLevelDistance;
 	private final boolean mDoStun;
 
-	public ThunderStep(Plugin plugin, Player player) {
+	public ThunderStep(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, NAME);
 		mInfo.mLinkedSpell = ABILITY;
 
@@ -118,16 +119,15 @@ public class ThunderStep extends Ability {
 	@Override
 	public void playerSwapHandItemsEvent(PlayerSwapHandItemsEvent event) {
 		if (
-			ItemUtils.isWand(
-				mPlayer.getInventory().getItemInMainHand()
-			)
+			mPlayer != null
+				&& ItemUtils.isWand(mPlayer.getInventory().getItemInMainHand())
 		) {
 			event.setCancelled(true);
 
 			if (
 				!isTimerActive()
-				&& mPlayer.isSneaking()
-				&& !ZoneUtils.hasZoneProperty(mPlayer, ZoneProperty.NO_MOBILITY_ABILITIES)
+					&& mPlayer.isSneaking()
+					&& !ZoneUtils.hasZoneProperty(mPlayer, ZoneProperty.NO_MOBILITY_ABILITIES)
 			) {
 				putOnCooldown();
 

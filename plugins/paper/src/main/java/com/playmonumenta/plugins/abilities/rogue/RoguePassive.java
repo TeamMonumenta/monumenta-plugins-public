@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.abilities.rogue;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
@@ -16,7 +17,7 @@ public class RoguePassive extends Ability {
 	public static final double PASSIVE_DAMAGE_ELITE_MODIFIER = 2.0;
 	public static final double PASSIVE_DAMAGE_BOSS_MODIFIER = 1.25;
 
-	public RoguePassive(Plugin plugin, Player player) {
+	public RoguePassive(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, null);
 	}
 

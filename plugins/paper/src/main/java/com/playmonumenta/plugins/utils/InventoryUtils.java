@@ -40,11 +40,11 @@ import net.kyori.adventure.text.format.NamedTextColor;
 
 
 public class InventoryUtils {
-	private static int OFFHAND_SLOT = 40;
-	private static int HELMET_SLOT = 39;
-	private static int CHESTPLATE_SLOT = 38;
-	private static int LEGGINGS_SLOT = 37;
-	private static int BOOTS_SLOT = 36;
+	private static final int OFFHAND_SLOT = 40;
+	private static final int HELMET_SLOT = 39;
+	private static final int CHESTPLATE_SLOT = 38;
+	private static final int LEGGINGS_SLOT = 37;
+	private static final int BOOTS_SLOT = 36;
 
 	//TODO Fix exploit where changing hotbar slots and then firing a projectile uses the old slot's attributes
 	public static void scheduleDelayedEquipmentCheck(final Plugin plugin, final Player player, final @Nullable Event event) {
@@ -74,7 +74,7 @@ public class InventoryUtils {
 		}.runTaskLater(plugin, 0);
 	}
 
-	public static boolean testForItemWithLore(final ItemStack item, final String legacyLoreText) {
+	public static boolean testForItemWithLore(final @Nullable ItemStack item, final @Nullable String legacyLoreText) {
 		// TODO START Remove this block when all legacy text is updated to use Adventure or plain text.
 		if (legacyLoreText == null || legacyLoreText.isEmpty()) {
 			return true;
@@ -105,7 +105,7 @@ public class InventoryUtils {
 	}
 
 	// TODO: This will *not* match items that don't have an NBT name (stick, stone sword, etc.)
-	public static boolean testForItemWithName(final ItemStack item, final String legacyNameText) {
+	public static boolean testForItemWithName(final @Nullable ItemStack item, final @Nullable String legacyNameText) {
 		// TODO START Remove this block when all legacy text is updated to use Adventure or plain text.
 		if (legacyNameText == null || legacyNameText.isEmpty()) {
 			return true;
@@ -129,7 +129,7 @@ public class InventoryUtils {
 		return false;
 	}
 
-	public static int getCustomEnchantLevel(final ItemStack item, final String legacyNameText, final boolean useLevel) {
+	public static int getCustomEnchantLevel(final @Nullable ItemStack item, final @Nullable String legacyNameText, final boolean useLevel) {
 		// TODO START Remove this block when all legacy text is updated to use Adventure or plain text.
 		if (legacyNameText == null || legacyNameText.isEmpty()) {
 			return 0;
@@ -214,92 +214,6 @@ public class InventoryUtils {
 		}
 	}
 
-	public static boolean isAxeItem(final ItemStack item) {
-		if (item != null) {
-			final Material mat = item.getType();
-			return mat == Material.WOODEN_AXE || mat == Material.STONE_AXE || mat == Material.GOLDEN_AXE
-				   || mat == Material.IRON_AXE || mat == Material.DIAMOND_AXE || mat == Material.NETHERITE_AXE;
-		}
-
-		return false;
-	}
-
-	public static boolean isBowItem(final ItemStack item) {
-		if (item != null) {
-			final Material mat = item.getType();
-			return mat == Material.BOW || mat == Material.CROSSBOW;
-		}
-
-		return false;
-	}
-
-	public static boolean isSwordItem(final ItemStack item) {
-		if (item != null) {
-			final Material mat = item.getType();
-			return mat == Material.WOODEN_SWORD || mat == Material.STONE_SWORD || mat == Material.GOLDEN_SWORD
-				   || mat == Material.IRON_SWORD || mat == Material.DIAMOND_SWORD || mat == Material.NETHERITE_SWORD;
-		}
-
-		return false;
-	}
-
-	public static boolean isPickaxeItem(final ItemStack item) {
-		if (item != null) {
-			final Material mat = item.getType();
-			return mat == Material.WOODEN_PICKAXE || mat == Material.STONE_PICKAXE || mat == Material.GOLDEN_PICKAXE
-				   || mat == Material.IRON_PICKAXE || mat == Material.DIAMOND_PICKAXE || mat == Material.NETHERITE_PICKAXE;
-		}
-
-		return false;
-	}
-
-	public static boolean isScytheItem(final ItemStack item) {
-		if (item != null) {
-			if (ItemUtils.isItemShattered(item)) {
-				return false;
-			}
-
-			final Material mat = item.getType();
-			return mat == Material.WOODEN_HOE || mat == Material.STONE_HOE || mat == Material.GOLDEN_HOE
-				   || mat == Material.IRON_HOE || mat == Material.DIAMOND_HOE || mat == Material.NETHERITE_HOE;
-		}
-
-		return false;
-	}
-
-	public static boolean isShovelItem(final ItemStack item) {
-		if (item != null) {
-			final Material mat = item.getType();
-			return mat == Material.WOODEN_SHOVEL || mat == Material.STONE_SHOVEL || mat == Material.GOLDEN_SHOVEL
-				   || mat == Material.IRON_SHOVEL || mat == Material.DIAMOND_SHOVEL;
-		}
-
-		return false;
-	}
-
-	public static boolean isWandItem(final ItemStack item) {
-		if (item == null) {
-			return false;
-		}
-
-		final List<String> lore = ItemUtils.getPlainLore(item);
-		if (lore == null || lore.isEmpty()) {
-			return false;
-		}
-
-		if (ItemUtils.isItemShattered(item)) {
-			return false;
-		}
-
-		for (final String loreEntry : lore) {
-			if (loreEntry.contains("Magic Wand")) {
-				return true;
-			}
-		}
-
-		return false;
-	}
-
 	public static boolean isSoulboundToPlayer(final ItemStack item, final Player player) {
 		// TODO: Needs to handle renames
 		return testForItemWithLore(item, "* Soulbound to " + player.getName() + " *");
@@ -317,7 +231,7 @@ public class InventoryUtils {
 		dropped += removeSpecialItemsFromInventory(player.getEnderChest(), loc, ephemeralOnly);
 
 		// Armor slots
-		ItemStack[] items = player.getInventory().getArmorContents();
+		@Nullable ItemStack[] items = player.getInventory().getArmorContents();
 		dropped += removeSpecialItemsFromInventory(items, loc, ephemeralOnly);
 		player.getInventory().setArmorContents(items);
 
@@ -329,27 +243,28 @@ public class InventoryUtils {
 		return dropped;
 	}
 
-	private static int removeSpecialItemsFromInventory(final ItemStack @Nullable [] items, final Location loc, final boolean ephemeralOnly) {
+	private static int removeSpecialItemsFromInventory(final @Nullable ItemStack[] items, final Location loc, final boolean ephemeralOnly) {
 		int dropped = 0;
 
 		for (int i = 0; i < items.length; i++) {
-			if (items[i] != null) {
-				if (!ephemeralOnly && containsSpecialLore(items[i])) {
-					loc.getWorld().dropItem(loc, items[i]);
+			ItemStack item = items[i];
+			if (item != null) {
+				if (!ephemeralOnly && containsSpecialLore(item)) {
+					loc.getWorld().dropItem(loc, item);
 					items[i] = null;
 					dropped += 1;
-				} else if (CurseOfEphemerality.isEphemeral(items[i])) {
+				} else if (CurseOfEphemerality.isEphemeral(item)) {
 					items[i] = null;
 				} else {
 					try {
-						if (items[i].hasItemMeta() && items[i].getItemMeta() instanceof BlockStateMeta) {
-							final BlockStateMeta meta = (BlockStateMeta)items[i].getItemMeta();
+						if (item.hasItemMeta() && item.getItemMeta() instanceof BlockStateMeta) {
+							final BlockStateMeta meta = (BlockStateMeta) item.getItemMeta();
 							if (meta.getBlockState() instanceof ShulkerBox) {
-								final ShulkerBox shulker = (ShulkerBox)meta.getBlockState();
+								final ShulkerBox shulker = (ShulkerBox) meta.getBlockState();
 								dropped += removeSpecialItemsFromInventory(shulker.getInventory(), loc, ephemeralOnly);
 
 								meta.setBlockState(shulker);
-								items[i].setItemMeta(meta);
+								item.setItemMeta(meta);
 							}
 						}
 					} catch (Exception ex) {
@@ -367,7 +282,7 @@ public class InventoryUtils {
 	}
 
 	private static int removeSpecialItemsFromInventory(final Inventory inventory, final Location loc, final boolean ephemeralOnly) {
-		final ItemStack @Nullable [] items = inventory.getContents();
+		final @Nullable ItemStack[] items = inventory.getContents();
 		final int dropped = removeSpecialItemsFromInventory(items, loc, ephemeralOnly);
 		inventory.setContents(items);
 		return dropped;
@@ -381,18 +296,19 @@ public class InventoryUtils {
 
 	private static int removeNamedItemsFromInventory(final Inventory inventory, final String name) {
 		int dropped = 0;
-		ItemStack @Nullable [] items = inventory.getContents();
+		@Nullable ItemStack[] items = inventory.getContents();
 
 		for (int i = 0; i < items.length; i++) {
-			if (items[i] != null) {
-				if (items[i].hasItemMeta() && items[i].getItemMeta().getDisplayName().equals(name)) {
+			ItemStack item = items[i];
+			if (item != null) {
+				if (item.hasItemMeta() && item.getItemMeta().getDisplayName().equals(name)) {
 					items[i] = null;
 				} else {
-					if (items[i].hasItemMeta() && items[i].getItemMeta() instanceof BlockStateMeta) {
-						final BlockStateMeta meta = (BlockStateMeta)items[i].getItemMeta();
+					if (item.hasItemMeta() && item.getItemMeta() instanceof BlockStateMeta) {
+						final BlockStateMeta meta = (BlockStateMeta) item.getItemMeta();
 						if (meta.getBlockState() instanceof ShulkerBox) {
 							final ShulkerBox shulker = (ShulkerBox) meta.getBlockState();
-							ItemStack @Nullable [] shulkerItems = shulker.getInventory().getContents();
+							@Nullable ItemStack[] shulkerItems = shulker.getInventory().getContents();
 							for (int j = 0; j < shulkerItems.length; j++) {
 								if (shulkerItems[j] != null && shulkerItems[j].hasItemMeta() && shulkerItems[j].getItemMeta().getDisplayName().equals(name)) {
 									shulkerItems[j] = null;
@@ -401,7 +317,7 @@ public class InventoryUtils {
 
 							shulker.getInventory().setContents(shulkerItems);
 							meta.setBlockState(shulker);
-							items[i].setItemMeta(meta);
+							item.setItemMeta(meta);
 						}
 					}
 				}

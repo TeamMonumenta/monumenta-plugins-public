@@ -181,26 +181,26 @@ public class InfusionUtils {
 	private static void giveMaterials(Player player, ItemRegion region, int refundMaterials) throws WrapperCommandSyntaxException {
 		NamespacedKey key;
 		if (region.equals(ItemRegion.KINGS_VALLEY)) {
-			key = NamespacedKey.fromString("epic:r1/items/currency/pulsating_gold");
+			key = NamespacedKeyUtils.fromString("epic:r1/items/currency/pulsating_gold");
 		} else if (region.equals(ItemRegion.CELSIAN_ISLES) || region.equals(ItemRegion.MONUMENTA)) {
-			key = NamespacedKey.fromString("epic:r2/items/currency/pulsating_emerald");
+			key = NamespacedKeyUtils.fromString("epic:r2/items/currency/pulsating_emerald");
 		} else {
 			CommandAPI.fail("Item must have a Region tag!");
 			return;
 		}
 		LootTable lt = Bukkit.getLootTable(key);
-		LootContext.Builder builder = new LootContext.Builder(player.getLocation());
-		LootContext context = builder.build();
-		Collection<ItemStack> items = lt.populateLoot(FastUtils.RANDOM, context);
-		ItemStack materials;
-		if (items.size() > 0) {
-			materials = items.iterator().next();
-		} else {
-			CommandAPI.fail("ERROR while refunding infusion (failed to get loot table). Please contact a moderator if you see this message!");
-			return;
+		if (lt != null) {
+			LootContext.Builder builder = new LootContext.Builder(player.getLocation());
+			LootContext context = builder.build();
+			Collection<ItemStack> items = lt.populateLoot(FastUtils.RANDOM, context);
+			if (items.size() > 0) {
+				ItemStack materials = items.iterator().next();
+				Item eItem = player.getWorld().dropItemNaturally(player.getLocation(), materials.add(refundMaterials - 1));
+				eItem.setPickupDelay(0);
+				return;
+			}
 		}
-		Item eItem = player.getWorld().dropItemNaturally(player.getLocation(), materials.add(refundMaterials - 1));
-		eItem.setPickupDelay(0);
+		CommandAPI.fail("ERROR while refunding infusion (failed to get loot table). Please contact a moderator if you see this message!");
 	}
 
 	public static void animate(Player player) {
@@ -522,11 +522,11 @@ public class InfusionUtils {
 		ItemStack currency = null;
 
 		if (ItemUtils.getItemRegion(item) == ItemRegion.CELSIAN_ISLES) {
-			currency = InventoryUtils.getItemFromLootTable(player, NamespacedKey.fromString("epic:r2/items/currency/pulsating_emerald"));
+			currency = InventoryUtils.getItemFromLootTable(player, NamespacedKeyUtils.fromString("epic:r2/items/currency/pulsating_emerald"));
 		}
 
 		if (ItemUtils.getItemRegion(item) == ItemRegion.KINGS_VALLEY) {
-			currency = InventoryUtils.getItemFromLootTable(player, NamespacedKey.fromString("epic:r1/items/currency/pulsating_gold"));
+			currency = InventoryUtils.getItemFromLootTable(player, NamespacedKeyUtils.fromString("epic:r1/items/currency/pulsating_gold"));
 		}
 
 		if (currency == null) {
@@ -564,11 +564,11 @@ public class InfusionUtils {
 		//currency
 		ItemStack currency = null;
 		if (ItemUtils.getItemRegion(item) == ItemRegion.CELSIAN_ISLES) {
-			currency = InventoryUtils.getItemFromLootTable(player, NamespacedKey.fromString("epic:r2/items/currency/pulsating_emerald"));
+			currency = InventoryUtils.getItemFromLootTable(player, NamespacedKeyUtils.fromString("epic:r2/items/currency/pulsating_emerald"));
 		}
 
 		if (ItemUtils.getItemRegion(item) == ItemRegion.KINGS_VALLEY) {
-			currency = InventoryUtils.getItemFromLootTable(player, NamespacedKey.fromString("epic:r1/items/currency/pulsating_gold"));
+			currency = InventoryUtils.getItemFromLootTable(player, NamespacedKeyUtils.fromString("epic:r1/items/currency/pulsating_gold"));
 		}
 
 		if (currency == null) {

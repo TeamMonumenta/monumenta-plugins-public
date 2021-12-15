@@ -14,6 +14,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
@@ -52,7 +53,7 @@ public class IronTincture extends Ability {
 	private static final int IRON_TINCTURE_TICK_PERIOD = 2;
 	private static final double IRON_TINCTURE_VELOCITY = 0.7;
 
-	public IronTincture(Plugin plugin, Player player) {
+	public IronTincture(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Iron Tincture");
 		mInfo.mLinkedSpell = ClassAbility.IRON_TINCTURE;
 		mInfo.mScoreboardId = "IronTincture";

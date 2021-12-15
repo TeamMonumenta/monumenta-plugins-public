@@ -7,6 +7,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
@@ -41,7 +42,7 @@ public class PhlegmaticResolve extends Ability {
 
 	private Ability[] mAbilities = {};
 
-	public PhlegmaticResolve(Plugin plugin, Player player) {
+	public PhlegmaticResolve(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Phlegmatic Resolve");
 		mInfo.mScoreboardId = "Phlegmatic";
 		mInfo.mShorthandName = "PR";
@@ -63,6 +64,10 @@ public class PhlegmaticResolve extends Ability {
 	@Override
 	public void periodicTrigger(boolean twoHertz, boolean oneSecond, int ticks) {
 		//Triggers four times a second
+
+		if (mPlayer == null) {
+			return;
+		}
 
 		int cooldowns = 0;
 		for (Ability ability : mAbilities) {

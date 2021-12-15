@@ -64,7 +64,7 @@ public class ScorchedEarth extends MultipleChargeAbility {
 	private static Map<LivingEntity, Double> mMobHealths = new HashMap<>();
 	private static @Nullable BukkitRunnable mMobHealthsTracker;
 
-	public ScorchedEarth(Plugin plugin, Player player) {
+	public ScorchedEarth(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Scorched Earth");
 		mInfo.mLinkedSpell = ClassAbility.SCORCHED_EARTH;
 		mInfo.mScoreboardId = "ScorchedEarth";

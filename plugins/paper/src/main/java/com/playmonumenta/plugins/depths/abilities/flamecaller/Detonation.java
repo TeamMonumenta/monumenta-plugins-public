@@ -36,8 +36,11 @@ public class Detonation extends DepthsAbility {
 
 	@Override
 	public void entityDeathRadiusEvent(EntityDeathEvent event, boolean shouldGenDrops) {
+		if (mPlayer == null) {
+			return;
+		}
 		Entity entity = event.getEntity();
-		if (entity.getScoreboardTags().contains(AbilityUtils.IGNORE_TAG) && entity.getName() != DummyDecoy.DUMMY_NAME) {
+		if (entity.getScoreboardTags().contains(AbilityUtils.IGNORE_TAG) && !DummyDecoy.DUMMY_NAME.equals(entity.getName())) {
 			return;
 		}
 		Location location = entity.getLocation();

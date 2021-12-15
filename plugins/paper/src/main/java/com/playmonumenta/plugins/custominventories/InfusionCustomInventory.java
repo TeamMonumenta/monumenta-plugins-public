@@ -335,17 +335,17 @@ public class InfusionCustomInventory extends CustomInventory {
 
 	private void loadRowNormalInfusionItem(ItemStack item, int row) {
 
-		InfusionSelection infunsion = InfusionUtils.getCurrentInfusion(item);
-		int infunsionLvl = InfusionUtils.getInfuseLevel(item);
+		InfusionSelection infusion = InfusionUtils.getCurrentInfusion(item);
+		int infusionLvl = InfusionUtils.getInfuseLevel(item);
 
-		List<ItemStack> pannelsInfusions = mInfusionPannelsMap.get(infunsion);
+		List<ItemStack> pannelsInfusions = mInfusionPannelsMap.get(infusion);
 		//notes: if pannelsInfusions == null mean that this item has no infusion.
 
-		//check if the item has an infusion infusion or not
-		if (infunsionLvl > 0) {
-			//set the refound item
-			_inventory.setItem((row*9), mRefundItem);
-			mMapFunction.put((row*9), (p, inventory, slot) -> {
+		//check if the item has an infusion or not
+		if (infusionLvl > 0) {
+			//set the refund item
+			_inventory.setItem((row * 9), mRefundItem);
+			mMapFunction.put((row * 9), (p, inventory, slot) -> {
 				try {
 					InfusionUtils.refundInfusion(item, p);
 				} catch (WrapperCommandSyntaxException e) {
@@ -354,22 +354,24 @@ public class InfusionCustomInventory extends CustomInventory {
 			});
 
 			//set the pannels to show the current infusion and level
-			for (int index = 0; index < infunsionLvl; index++) {
-				_inventory.setItem((row*9) + 2 + index, pannelsInfusions.get(index));
+			if (pannelsInfusions != null) {
+				for (int index = 0; index < infusionLvl; index++) {
+					_inventory.setItem((row * 9) + 2 + index, pannelsInfusions.get(index));
+				}
 			}
 
-			if (infunsionLvl < 4) {
-				int slot = (row * 9) + 2 + infunsionLvl;
+			if (infusionLvl < 4) {
+				int slot = (row * 9) + 2 + infusionLvl;
 				//creating item and setting the meta
 				ItemStack infuseItem = new ItemStack(Material.ENCHANTED_BOOK, 1);
 				ItemMeta infuseMeta = infuseItem.getItemMeta();
-				infuseMeta.displayName(Component.text("Click to infuse to level " + (infunsionLvl + 1), NamedTextColor.DARK_AQUA)
-								.decoration(TextDecoration.ITALIC, false)
-								.decoration(TextDecoration.BOLD, true));
+				infuseMeta.displayName(Component.text("Click to infuse to level " + (infusionLvl + 1), NamedTextColor.DARK_AQUA)
+						                       .decoration(TextDecoration.ITALIC, false)
+						                       .decoration(TextDecoration.BOLD, true));
 				List<Component> itemLore = new ArrayList<>();
 				itemLore.add(Component.text("You need " + InfusionUtils.getExpLvlInfuseCost(item) + " experience levels", NamedTextColor.GRAY)
-						.decoration(TextDecoration.ITALIC, false));
-				int currency = -1;
+						             .decoration(TextDecoration.ITALIC, false));
+				int currency;
 				try {
 					currency = InfusionUtils.calcInfuseCost(item);
 				} catch (WrapperCommandSyntaxException e) {
@@ -396,7 +398,7 @@ public class InfusionCustomInventory extends CustomInventory {
 					if (InfusionUtils.canPayInfusion(p, item)) {
 						if (InfusionUtils.payInfusion(p, item)) {
 							InfusionUtils.animate(p);
-							InfusionUtils.infuseItem(item, infunsion);
+							InfusionUtils.infuseItem(item, infusion);
 						} else {
 							p.sendMessage("If you see this message please contact a mod! (Error payInfusion)");
 						}
@@ -405,7 +407,7 @@ public class InfusionCustomInventory extends CustomInventory {
 					}
 				});
 			} else {
-				int slot = (row * 9) + 2 + infunsionLvl;
+				int slot = (row * 9) + 2 + infusionLvl;
 				_inventory.setItem(slot, mMaxLevelReachedItem);
 			}
 		} else {

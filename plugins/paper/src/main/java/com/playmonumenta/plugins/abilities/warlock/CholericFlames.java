@@ -14,6 +14,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
@@ -44,7 +45,7 @@ public class CholericFlames extends Ability {
 
 	private final int mDamage;
 
-	public CholericFlames(Plugin plugin, Player player) {
+	public CholericFlames(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Choleric Flames");
 		mInfo.mScoreboardId = "CholericFlames";
 		mInfo.mShorthandName = "CF";
@@ -59,12 +60,16 @@ public class CholericFlames extends Ability {
 
 	@Override
 	public void cast(Action action) {
+		if (mPlayer == null) {
+			return;
+		}
 		Location loc = mPlayer.getLocation();
 
 		World world = mPlayer.getWorld();
 		new BukkitRunnable() {
 			double mRadius = 0;
 			final Location mLoc = mPlayer.getLocation();
+
 			@Override
 			public void run() {
 				mRadius += 1.25;

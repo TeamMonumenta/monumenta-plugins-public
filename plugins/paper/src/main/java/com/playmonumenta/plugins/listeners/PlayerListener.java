@@ -142,7 +142,7 @@ import net.kyori.adventure.text.format.TextDecoration;
 
 public class PlayerListener implements Listener {
 
-	Plugin mPlugin = null;
+	private final Plugin mPlugin;
 
 	public PlayerListener(Plugin plugin) {
 		mPlugin = plugin;
@@ -230,7 +230,7 @@ public class PlayerListener implements Listener {
 			return;
 		}
 
-		mPlugin.mAbilityManager.playerInteractEvent(player, action, item, mat);
+		mPlugin.mAbilityManager.playerInteractEvent(player, action, mat);
 		mPlugin.mTrackingManager.mPlayers.onPlayerInteract(mPlugin, player, event);
 
 		// Overrides
@@ -335,7 +335,6 @@ public class PlayerListener implements Listener {
 					if (player.getGameMode().equals(GameMode.ADVENTURE)) {
 						ItemStack giveMap = frameItem.clone();
 						ItemMeta mapMeta;
-						List<Component> mapLore;
 
 						if (giveMap.hasItemMeta()) {
 							mapMeta = giveMap.getItemMeta();
@@ -343,10 +342,9 @@ public class PlayerListener implements Listener {
 							mapMeta = Bukkit.getServer().getItemFactory().getItemMeta(Material.FILLED_MAP);
 						}
 
-						if (mapMeta.hasLore()) {
-							mapLore = mapMeta.lore();
-						} else {
-							mapLore = new ArrayList<Component>(1);
+						List<Component> mapLore = mapMeta.lore();
+						if (mapLore == null) {
+							mapLore = new ArrayList<>(1);
 						}
 						mapLore.add(Component.text("* Official Map *", NamedTextColor.GOLD));
 						mapMeta.lore(mapLore);
@@ -629,10 +627,10 @@ public class PlayerListener implements Listener {
 		// Give the player a NewDeath score of 1 so the city guides will give items again
 		ScoreboardUtils.setScoreboardValue(player, "NewDeath", 1);
 
-		if (event.getDeathMessage() != null && ScoreboardUtils.getScoreboardValue(player, Constants.SCOREBOARD_DEATH_MESSAGE).orElse(0) != 0) {
+		if (event.deathMessage() != null && ScoreboardUtils.getScoreboardValue(player, Constants.SCOREBOARD_DEATH_MESSAGE).orElse(0) != 0) {
 			player.sendMessage(event.deathMessage());
 			player.sendMessage(Component.text("Only you saw this message. Change this with /deathmsg", NamedTextColor.AQUA));
-			event.setDeathMessage(null);
+			event.deathMessage(null);
 		}
 
 		// Clear effects
@@ -650,15 +648,16 @@ public class PlayerListener implements Listener {
 			@Override
 			public void run() {
 				Player player = Bukkit.getPlayer(name);
+				if (player != null) {
+					mPlugin.mPotionManager.clearAllPotions(player);
+					mPlugin.mAbilityManager.updatePlayerAbilities(player);
 
-				mPlugin.mPotionManager.clearAllPotions(player);
-				mPlugin.mAbilityManager.updatePlayerAbilities(player);
+					ItemStack mainHand = player.getInventory().getItemInMainHand();
+					ItemStack offHand = player.getInventory().getItemInOffHand();
 
-				ItemStack mainHand = player.getInventory().getItemInMainHand();
-				ItemStack offHand = player.getInventory().getItemInOffHand();
-
-				mPlugin.mAbilityManager.playerItemHeldEvent(player, mainHand, offHand);
-				InventoryUtils.scheduleDelayedEquipmentCheck(mPlugin, player, event);
+					mPlugin.mAbilityManager.playerItemHeldEvent(player, mainHand, offHand);
+					InventoryUtils.scheduleDelayedEquipmentCheck(mPlugin, player, event);
+				}
 			}
 		}, 0);
 	}
@@ -912,10 +911,10 @@ public class PlayerListener implements Listener {
 					// Adjust for player teleports being off-center
 					Location teleLoc = new Location(world, pt.mX - 0.5, pt.mY, pt.mZ - 0.5, yaw, pitch);
 
-					//Records player's previous spawnpoint
-					Location tempSpawnLoc = world.getSpawnLocation(); //Default spawn is za warudo spawn
-					if (player.getBedSpawnLocation() != null && !(player.getBedSpawnLocation().equals(loc))) {
-						tempSpawnLoc = player.getBedSpawnLocation(); //If the player has another bed in the world, that's their spawn
+					//Records player's previous spawnpoint - either their bed spawn point if it exists (and is not this bed), or the world spawn otherwise
+					Location tempSpawnLoc = player.getBedSpawnLocation();
+					if (tempSpawnLoc == null || tempSpawnLoc.equals(loc)) {
+						tempSpawnLoc = world.getSpawnLocation();
 					}
 					final Location playerSpawn = tempSpawnLoc;
 

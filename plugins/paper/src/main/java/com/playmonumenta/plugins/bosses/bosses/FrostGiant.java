@@ -22,7 +22,6 @@ import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
 import org.bukkit.entity.Creature;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
@@ -230,29 +229,27 @@ public class FrostGiant extends BossAbilityGroup {
 		//Gets starting position from an armor stand with START_TAG
 		//And all icicle armor stands
 		//And all directional armor stands
-		for (Entity e : EntityUtils.getNearbyMobs(mSpawnLoc.clone().subtract(0, 44, 0), 75, EnumSet.of(EntityType.ARMOR_STAND))) {
-			if (e instanceof LivingEntity) {
-				Set<String> tags = e.getScoreboardTags();
-				for (String tag : tags) {
-					switch (tag) {
-					default:
-						break;
-					case START_TAG:
-						mStart = (LivingEntity) e;
-						break;
-					case NORTH:
-						mNorthStand = (LivingEntity) e;
-						break;
-					case EAST:
-						mEastStand = (LivingEntity) e;
-						break;
-					case SOUTH:
-						mSouthStand = (LivingEntity) e;
-						break;
-					case WEST:
-						mWestStand = (LivingEntity) e;
-						break;
-					}
+		for (LivingEntity e : EntityUtils.getNearbyMobs(mSpawnLoc.clone().subtract(0, 44, 0), 75, EnumSet.of(EntityType.ARMOR_STAND))) {
+			Set<String> tags = e.getScoreboardTags();
+			for (String tag : tags) {
+				switch (tag) {
+				default:
+					break;
+				case START_TAG:
+					mStart = e;
+					break;
+				case NORTH:
+					mNorthStand = e;
+					break;
+				case EAST:
+					mEastStand = e;
+					break;
+				case SOUTH:
+					mSouthStand = e;
+					break;
+				case WEST:
+					mWestStand = e;
+					break;
 				}
 			}
 		}

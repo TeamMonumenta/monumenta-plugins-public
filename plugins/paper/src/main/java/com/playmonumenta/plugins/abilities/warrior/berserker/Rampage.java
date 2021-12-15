@@ -12,6 +12,7 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.inventory.ItemStack;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
@@ -48,7 +49,7 @@ public class Rampage extends Ability implements AbilityWithChargesOrStacks {
 	private int mTimeToStackDecay = 0;
 	private int mTimer = 0;
 
-	public Rampage(Plugin plugin, Player player) {
+	public Rampage(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Rampage");
 		mInfo.mLinkedSpell = ClassAbility.RAMPAGE;
 		mInfo.mCooldown = 0;

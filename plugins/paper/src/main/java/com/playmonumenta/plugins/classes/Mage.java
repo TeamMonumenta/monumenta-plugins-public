@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.classes;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.mage.ArcaneStrike;
@@ -13,11 +14,9 @@ import com.playmonumenta.plugins.abilities.mage.ManaLance;
 import com.playmonumenta.plugins.abilities.mage.PrismaticShield;
 import com.playmonumenta.plugins.abilities.mage.Spellshock;
 import com.playmonumenta.plugins.abilities.mage.ThunderStep;
-
 import com.playmonumenta.plugins.abilities.mage.arcanist.AstralOmen;
-import com.playmonumenta.plugins.abilities.mage.arcanist.SpatialShatter;
 import com.playmonumenta.plugins.abilities.mage.arcanist.SagesInsight;
-
+import com.playmonumenta.plugins.abilities.mage.arcanist.SpatialShatter;
 import com.playmonumenta.plugins.abilities.mage.elementalist.Blizzard;
 import com.playmonumenta.plugins.abilities.mage.elementalist.ElementalSpiritFire;
 import com.playmonumenta.plugins.abilities.mage.elementalist.Starfall;
@@ -30,7 +29,7 @@ import net.md_5.bungee.api.ChatColor;
 
 public class Mage extends PlayerClass {
 
-	Mage(Plugin plugin, Player player) {
+	Mage(Plugin plugin, @Nullable Player player) {
 		mAbilities.add(new ArcaneStrike(plugin, player));
 		mAbilities.add(new ElementalArrows(plugin, player));
 		mAbilities.add(new FrostNova(plugin, player));

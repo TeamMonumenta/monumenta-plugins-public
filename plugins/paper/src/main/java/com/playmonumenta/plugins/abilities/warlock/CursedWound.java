@@ -16,6 +16,7 @@ import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
@@ -57,7 +58,7 @@ public class CursedWound extends Ability {
 
 	private Ability[] mAbilities = {};
 
-	public CursedWound(Plugin plugin, Player player) {
+	public CursedWound(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Cursed Wound");
 		mInfo.mScoreboardId = "CursedWound";
 		mInfo.mShorthandName = "CW";
@@ -77,16 +78,16 @@ public class CursedWound extends Ability {
 
 	@Override
 	public boolean livingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
-		if (event.getCause() == DamageCause.ENTITY_ATTACK) {
+		if (mPlayer != null && event.getCause() == DamageCause.ENTITY_ATTACK) {
 			double cursedWoundCap = getAbilityScore() == 1 ? CURSED_WOUND_1_CAP : CURSED_WOUND_2_CAP;
 			LivingEntity damagee = (LivingEntity) event.getEntity();
 			BlockData fallingDustData = Material.ANVIL.createBlockData();
 			World world = mPlayer.getWorld();
 			if (EntityUtils.isHostileMob(damagee)) {
 				world.spawnParticle(Particle.FALLING_DUST, damagee.getLocation().add(0, damagee.getHeight() / 2, 0), 3,
-				                     (damagee.getWidth() / 2) + 0.1, damagee.getHeight() / 3, (damagee.getWidth() / 2) + 0.1, fallingDustData);
+				                    (damagee.getWidth() / 2) + 0.1, damagee.getHeight() / 3, (damagee.getWidth() / 2) + 0.1, fallingDustData);
 				world.spawnParticle(Particle.SPELL_MOB, damagee.getLocation().add(0, damagee.getHeight() / 2, 0), 6,
-				                     (damagee.getWidth() / 2) + 0.1, damagee.getHeight() / 3, (damagee.getWidth() / 2) + 0.1, 0);
+				                    (damagee.getWidth() / 2) + 0.1, damagee.getHeight() / 3, (damagee.getWidth() / 2) + 0.1, 0);
 
 				int cooldowns = 0;
 				for (Ability ability : mAbilities) {
@@ -139,6 +140,6 @@ public class CursedWound extends Ability {
 
 	@Override
 	public boolean runCheck() {
-		return ItemUtils.isHoe(mPlayer.getInventory().getItemInMainHand());
+		return mPlayer != null && ItemUtils.isHoe(mPlayer.getInventory().getItemInMainHand());
 	}
 }

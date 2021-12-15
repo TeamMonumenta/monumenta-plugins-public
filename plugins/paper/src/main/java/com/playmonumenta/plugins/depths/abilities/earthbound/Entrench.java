@@ -16,7 +16,7 @@ import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
 import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.utils.ItemUtils;
 
 import net.md_5.bungee.api.ChatColor;
 
@@ -38,7 +38,7 @@ public class Entrench extends DepthsAbility {
 	public boolean blockBreakEvent(BlockBreakEvent event) {
 		Block block = event.getBlock();
 		World world = block.getWorld();
-		if (InventoryUtils.isPickaxeItem(event.getPlayer().getInventory().getItemInMainHand()) && block.getType() == Material.SPAWNER) {
+		if (ItemUtils.isPickaxe(event.getPlayer().getInventory().getItemInMainHand()) && block.getType() == Material.SPAWNER) {
 			Location centerLoc = block.getLocation().add(0.5, 0, 0.5);
 			for (LivingEntity mob : EntityUtils.getNearbyMobs(centerLoc, RADIUS)) {
 				EntityUtils.applySlow(mPlugin, DURATION[mRarity - 1], SLOW_MODIFIER, mob);

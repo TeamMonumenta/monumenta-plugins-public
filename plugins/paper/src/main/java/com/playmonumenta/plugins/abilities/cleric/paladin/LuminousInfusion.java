@@ -53,7 +53,7 @@ public class LuminousInfusion extends Ability {
 
 	private @Nullable Crusade mCrusade;
 
-	public LuminousInfusion(Plugin plugin, Player player) {
+	public LuminousInfusion(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Luminous Infusion");
 		mInfo.mLinkedSpell = ClassAbility.LUMINOUS_INFUSION;
 		mInfo.mScoreboardId = "LuminousInfusion";

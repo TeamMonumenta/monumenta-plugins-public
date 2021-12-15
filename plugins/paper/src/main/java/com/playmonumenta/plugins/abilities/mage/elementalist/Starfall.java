@@ -20,7 +20,7 @@ import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
-
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 
 public class Starfall extends Ability {
@@ -39,7 +39,7 @@ public class Starfall extends Ability {
 
 	private final int mLevelDamage;
 
-	public Starfall(Plugin plugin, Player player) {
+	public Starfall(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, NAME);
 		mInfo.mLinkedSpell = ABILITY;
 

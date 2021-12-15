@@ -44,6 +44,9 @@ public class WardOfLight extends DepthsAbility {
 
 	@Override
 	public void cast(Action action) {
+		if (mPlayer == null) {
+			return;
+		}
 
 		Vector playerDir = mPlayer.getEyeLocation().getDirection().setY(0).normalize();
 		World world = mPlayer.getWorld();
@@ -87,6 +90,9 @@ public class WardOfLight extends DepthsAbility {
 
 	@Override
 	public boolean runCheck() {
+		if (mPlayer == null) {
+			return false;
+		}
 		ItemStack mainHand = mPlayer.getInventory().getItemInMainHand();
 		return DepthsUtils.isWeaponItem(mainHand) && !mPlayer.isSneaking();
 	}

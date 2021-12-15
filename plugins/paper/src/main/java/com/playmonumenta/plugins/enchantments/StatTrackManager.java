@@ -171,8 +171,8 @@ public class StatTrackManager {
 		//Check that the player is a patron and the item has their name on it and that it has the right enchant type
 		if (
 			PlayerData.getPatreonDollars(player) < PATRON_TIER
-			|| !isPlayersItem(item, player)
-			|| !(getTrackingType(item).equals(enchant))
+					|| !isPlayersItem(item, player)
+					|| getTrackingType(item) != enchant
 		) {
 			return;
 		}

@@ -193,7 +193,7 @@ public class AbilityManager {
 	private static final String CLICK_TICK_METAKEY = "ClickedThisTickMetakey";
 	private static final float DEFAULT_WALK_SPEED = 0.2f;
 
-	private static AbilityManager mManager = null;
+	private static @Nullable AbilityManager mManager = null;
 
 	private final Plugin mPlugin;
 	private final List<Ability> mReferenceAbilities;
@@ -817,7 +817,7 @@ public class AbilityManager {
 		conditionalCast(player, (ability) -> ability.playerQuitEvent(event));
 	}
 
-	public void playerInteractEvent(Player player, Action action, ItemStack itemInHand, Material blockClicked) {
+	public void playerInteractEvent(Player player, Action action, Material blockClicked) {
 		// Right clicking sometimes counts as two clicks, so make sure this can only be triggered once per tick
 		if (MetadataUtils.checkOnceThisTick(mPlugin, player, CLICK_TICK_METAKEY)) {
 			for (Ability ability : getPlayerAbilities(player).getAbilities()) {
@@ -826,7 +826,7 @@ public class AbilityManager {
 					if (abilityInfo.mTrigger == AbilityTrigger.LEFT_CLICK) {
 						if (
 							action == Action.LEFT_CLICK_AIR
-							|| action == Action.LEFT_CLICK_BLOCK
+								|| action == Action.LEFT_CLICK_BLOCK
 						) {
 							if (ability.canCast()) {
 								ability.cast(action);

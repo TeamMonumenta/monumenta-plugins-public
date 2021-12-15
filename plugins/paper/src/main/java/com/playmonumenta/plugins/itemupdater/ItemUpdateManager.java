@@ -61,7 +61,7 @@ public class ItemUpdateManager implements Listener {
 		mPlugin.getLogger().fine("Updating items on player " + player.getName() + "; last update was " + Long.toString(lastSaved));
 
 		// This is separate from the player inventory.
-		ItemStack[] enderItems = player.getEnderChest().getContents();
+		@Nullable ItemStack[] enderItems = player.getEnderChest().getContents();
 		for (int i = 0; i < enderItems.length; i++) {
 			updateNested(enderItems[i]);
 		}
@@ -122,13 +122,13 @@ public class ItemUpdateManager implements Listener {
 	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
 	public void inventoryOpenEvent(InventoryOpenEvent event) {
 		Inventory inv = event.getInventory();
-		ItemStack[] items = inv.getContents();
+		@Nullable ItemStack[] items = inv.getContents();
 		for (int i = 0; i < items.length; i++) {
 			updateNested(items[i]);
 		}
 	}
 
-	public static void updateNested(ItemStack item) {
+	public static void updateNested(@Nullable ItemStack item) {
 		if (item == null || !item.hasItemMeta()) {
 			return;
 		}
@@ -251,7 +251,7 @@ public class ItemUpdateManager implements Listener {
 			return;
 		}
 
-		ItemStack[] items = inventoryHolder.getInventory().getContents();
+		@Nullable ItemStack[] items = inventoryHolder.getInventory().getContents();
 		for (int i = 0; i < items.length; i++) {
 			updateNested(items[i]);
 		}

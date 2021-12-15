@@ -15,6 +15,7 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BlockStateMeta;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
@@ -26,13 +27,12 @@ public class PortableEnderListener implements Listener {
 	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
 	public void inventoryClickEvent(InventoryClickEvent event) {
 		if (event.getClick() == ClickType.RIGHT &&
-			event.getAction() == InventoryAction.PICKUP_HALF &&
-			event.getWhoClicked() instanceof Player) {
+				event.getAction() == InventoryAction.PICKUP_HALF &&
+				event.getWhoClicked() instanceof Player player) {
 			// An item was right-clicked
-			Player player = (Player) event.getWhoClicked();
 			ItemStack item = event.getCurrentItem();
 			if (isPortableEnder(item) &&
-				!ItemUtils.isItemShattered(item)) {
+					!ItemUtils.isItemShattered(item)) {
 				// The clicked item is a portable ender chest, and is not shattered
 				event.setCancelled(true);
 				if (ZoneUtils.hasZoneProperty(player, ZoneUtils.ZoneProperty.NO_PORTABLE_STORAGE)) {
@@ -58,7 +58,7 @@ public class PortableEnderListener implements Listener {
 		}
 	}
 
-	public static boolean isPortableEnder(ItemStack item) {
+	public static boolean isPortableEnder(@Nullable ItemStack item) {
 		if (item != null && ItemUtils.isShulkerBox(item.getType()) && item.hasItemMeta()) {
 			if (item.getItemMeta() instanceof BlockStateMeta) {
 				BlockStateMeta blockStateMeta = (BlockStateMeta) item.getItemMeta();

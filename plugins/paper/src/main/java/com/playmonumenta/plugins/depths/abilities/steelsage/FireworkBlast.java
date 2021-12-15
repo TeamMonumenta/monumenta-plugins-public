@@ -55,6 +55,9 @@ public class FireworkBlast extends DepthsAbility {
 
 	@Override
 	public void cast(Action trigger) {
+		if (mPlayer == null) {
+			return;
+		}
 		putOnCooldown();
 
 		Firework rocket = (Firework)mPlayer.getWorld().spawnEntity(mPlayer.getLocation().add(0, 1.3, 0), EntityType.FIREWORK);
@@ -113,7 +116,7 @@ public class FireworkBlast extends DepthsAbility {
 
 	@Override
 	public boolean runCheck() {
-		return mPlayer.isSneaking() && DepthsUtils.isWeaponItem(mPlayer.getInventory().getItemInMainHand());
+		return mPlayer != null && mPlayer.isSneaking() && DepthsUtils.isWeaponItem(mPlayer.getInventory().getItemInMainHand());
 	}
 
 	@Override

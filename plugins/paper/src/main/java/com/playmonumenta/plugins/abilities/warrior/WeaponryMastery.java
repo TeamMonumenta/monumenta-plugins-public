@@ -1,16 +1,16 @@
 package com.playmonumenta.plugins.abilities.warrior;
 
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.ItemUtils;
-
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.inventory.ItemStack;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.ItemUtils;
 
 
 public class WeaponryMastery extends Ability {
@@ -28,7 +28,7 @@ public class WeaponryMastery extends Ability {
 	private final double mDamageBonusAxe;
 	private final double mDamageBonusSword;
 
-	public WeaponryMastery(Plugin plugin, Player player) {
+	public WeaponryMastery(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Weapon Mastery");
 		mInfo.mScoreboardId = "WeaponMastery";
 		mInfo.mShorthandName = "WM";
@@ -43,7 +43,7 @@ public class WeaponryMastery extends Ability {
 
 	@Override
 	public boolean livingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
-		if (event.getCause() == DamageCause.ENTITY_ATTACK) {
+		if (mPlayer != null && event.getCause() == DamageCause.ENTITY_ATTACK) {
 			ItemStack mainHand = mPlayer.getInventory().getItemInMainHand();
 			if (ItemUtils.isAxe(mainHand)) {
 				event.setDamage((event.getDamage() + mDamageBonusAxeFlat) * (1 + mDamageBonusAxe));
@@ -57,7 +57,7 @@ public class WeaponryMastery extends Ability {
 
 	@Override
 	public boolean playerDamagedByLivingEntityEvent(EntityDamageByEntityEvent event) {
-		if (ItemUtils.isSword(mPlayer.getInventory().getItemInMainHand())) {
+		if (mPlayer != null && ItemUtils.isSword(mPlayer.getInventory().getItemInMainHand())) {
 			event.setDamage(EntityUtils.getDamageApproximation(event, 1 - WEAPON_MASTERY_SWORD_DAMAGE_RESISTANCE));
 		}
 

@@ -34,19 +34,21 @@ public class SpawnZoneManager {
 						String name = creature.getCustomName();
 						String goalName = effect.getName();
 
-						if ((name == null && goalName == "DEFAULT") || name.contains(goalName)) {
+						if (name == null ? "DEFAULT".equals(goalName) : name.contains(goalName)) {
 							SpawnEffectType type = effect.getEffectType();
 							if (type == SpawnEffectType.Health) {
 								double addHealth = effect.getValue();
 
 								AttributeInstance att = creature.getAttribute(Attribute.GENERIC_MAX_HEALTH);
-								double maxHealth = att.getBaseValue();
+								if (att != null) {
+									double maxHealth = att.getBaseValue();
 
-								att.setBaseValue(maxHealth + addHealth);
-								creature.setHealth(maxHealth + addHealth);
+									att.setBaseValue(maxHealth + addHealth);
+									creature.setHealth(maxHealth + addHealth);
+								}
 							} else if (type == SpawnEffectType.Potion) {
 								List<PotionEffect> potionList = effect.getPotionEffects();
-								if (potionList.size() > 0) {
+								if (potionList != null && potionList.size() > 0) {
 									for (PotionEffect currentPot : potionList) {
 										creature.addPotionEffect(currentPot);
 									}

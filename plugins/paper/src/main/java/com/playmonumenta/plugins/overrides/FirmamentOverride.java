@@ -20,6 +20,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BlockDataMeta;
 import org.bukkit.inventory.meta.BlockStateMeta;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.enchantments.StatTrack.StatTrackOptions;
@@ -57,12 +58,12 @@ public class FirmamentOverride extends BaseOverride {
 	}
 
 	@Override
-	public boolean leftClickItemInteraction(Plugin plugin, Player player, Action action, ItemStack item, Block block) {
+	public boolean leftClickItemInteraction(Plugin plugin, Player player, Action action, ItemStack item, @Nullable Block block) {
 		return changeMode(item, player);
 	}
 
 	@Override
-	public boolean leftClickBlockInteraction(Plugin plugin, Player player, Action action, ItemStack item, Block block) {
+	public boolean leftClickBlockInteraction(Plugin plugin, Player player, Action action, @Nullable ItemStack item, Block block) {
 		return changeMode(item, player);
 	}
 
@@ -101,10 +102,10 @@ public class FirmamentOverride extends BaseOverride {
 		for (int i = 0; i < 27; i++) {
 			ItemStack currentItem = shulkerInventory.getItem(i);
 			if (currentItem == null
-				|| currentItem.getType().isAir()
-				|| ItemUtils.notAllowedTreeReplace.contains(currentItem.getType())
-				|| (!currentItem.getType().isOccluding() && !ItemUtils.GOOD_OCCLUDERS.contains(currentItem.getType()))
-				|| (currentItem.getItemMeta().hasLore() && !currentItem.getItemMeta().lore().isEmpty())) {
+					|| currentItem.getType().isAir()
+					|| ItemUtils.notAllowedTreeReplace.contains(currentItem.getType())
+					|| (!currentItem.getType().isOccluding() && !ItemUtils.GOOD_OCCLUDERS.contains(currentItem.getType()))
+					|| currentItem.getItemMeta().hasLore()) {
 				// Air breaks it, skip over it. Also the banned items break it, skip over those.
 				continue;
 			}

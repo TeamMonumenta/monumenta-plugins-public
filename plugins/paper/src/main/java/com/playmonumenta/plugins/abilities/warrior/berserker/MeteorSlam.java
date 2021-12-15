@@ -15,6 +15,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
@@ -29,8 +30,7 @@ import com.playmonumenta.plugins.utils.ZoneUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
 
 
-
-public class MeteorSlam extends Ability {
+public final class MeteorSlam extends Ability {
 	public static final String NAME = "Meteor Slam";
 	public static final ClassAbility ABILITY = ClassAbility.METEOR_SLAM;
 	private static final String SLAM_ONCE_THIS_TICK_METAKEY = "MeteorSlamTickSlammed";
@@ -63,25 +63,25 @@ public class MeteorSlam extends Ability {
 
 	private double mFallFromY = -7050;
 
-	public MeteorSlam(Plugin plugin, Player player) {
+	public MeteorSlam(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, NAME);
 		mInfo.mLinkedSpell = ABILITY;
 
 		mInfo.mScoreboardId = "MeteorSlam";
 		mInfo.mShorthandName = "MS";
 		mInfo.mDescriptions.add(
-			String.format(
-				"Pressing the swap key grants you Jump Boost %s for %ss instead of doing its vanilla function. Cooldown: %ss. | Falling more than %s blocks passively generates a slam when you land, dealing %s physical damage to all enemies in a %s-block cube around you per block fallen for the first %s blocks, and %s damage per block thereafter. Falling more than %s blocks and attacking an enemy also passively generates a slam at that enemy, and resets your blocks fallen and fall damage.",
-				JUMP_LEVEL_1,
-				DURATION_SECONDS,
-				COOLDOWN_SECONDS_1,
-				AUTOMATIC_THRESHOLD,
-				DAMAGE_1,
-				SIZE_1,
-				REDUCED_THRESHOLD,
-				REDUCED_DAMAGE_1,
-				MANUAL_THRESHOLD
-			)
+				String.format(
+						"Pressing the swap key grants you Jump Boost %s for %ss instead of doing its vanilla function. Cooldown: %ss. | Falling more than %s blocks passively generates a slam when you land, dealing %s physical damage to all enemies in a %s-block cube around you per block fallen for the first %s blocks, and %s damage per block thereafter. Falling more than %s blocks and attacking an enemy also passively generates a slam at that enemy, and resets your blocks fallen and fall damage.",
+						JUMP_LEVEL_1,
+						DURATION_SECONDS,
+						COOLDOWN_SECONDS_1,
+						AUTOMATIC_THRESHOLD,
+						DAMAGE_1,
+						SIZE_1,
+						REDUCED_THRESHOLD,
+						REDUCED_DAMAGE_1,
+						MANUAL_THRESHOLD
+				)
 		);
 		mInfo.mDescriptions.add(
 			String.format(
@@ -156,11 +156,10 @@ public class MeteorSlam extends Ability {
 
 	@Override
 	public boolean livingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
-		if (
-			event.getCause() == DamageCause.ENTITY_ATTACK
-			&& calculateFallDistance() > MANUAL_THRESHOLD
-			&& MetadataUtils.checkOnceThisTick(mPlugin, mPlayer, SLAM_ONCE_THIS_TICK_METAKEY)
-		) {
+		if (mPlayer != null
+				&& event.getCause() == DamageCause.ENTITY_ATTACK
+				&& calculateFallDistance() > MANUAL_THRESHOLD
+				&& MetadataUtils.checkOnceThisTick(mPlugin, mPlayer, SLAM_ONCE_THIS_TICK_METAKEY)) {
 			doSlamAttack(event.getEntity().getLocation().add(0, 0.15, 0));
 			mFallFromY = -7050;
 			// Also reset fall damage, mFallFromY can continue updating from there
@@ -173,10 +172,9 @@ public class MeteorSlam extends Ability {
 	public void playerSwapHandItemsEvent(PlayerSwapHandItemsEvent event) {
 		event.setCancelled(true);
 
-		if (
-			!isTimerActive()
-			&& !ZoneUtils.hasZoneProperty(mPlayer, ZoneProperty.NO_MOBILITY_ABILITIES)
-		) {
+		if (mPlayer != null
+				&& !isTimerActive()
+				&& !ZoneUtils.hasZoneProperty(mPlayer, ZoneProperty.NO_MOBILITY_ABILITIES)) {
 			putOnCooldown();
 
 			mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.JUMP, DURATION_TICKS, mLevelJumpAmplifier, true, false));
@@ -207,18 +205,27 @@ public class MeteorSlam extends Ability {
 	}
 
 	private void updateFallFrom() {
+		if (mPlayer == null) {
+			return;
+		}
 		double currentY = mPlayer.getLocation().getY();
 		double fallDistance = mPlayer.getFallDistance();
 		mFallFromY = currentY + fallDistance;
 	}
 
 	private double calculateFallDistance() {
+		if (mPlayer == null) {
+			return 0;
+		}
 		double currentY = mPlayer.getLocation().getY();
 		double fallDistance = mFallFromY - currentY;
 		return Math.max(fallDistance, 0);
 	}
 
 	private void doSlamAttack(Location location) {
+		if (mPlayer == null) {
+			return;
+		}
 		double fallDistance = calculateFallDistance();
 		double slamDamage = Math.min(REDUCED_THRESHOLD, fallDistance) * mLevelDamage + Math.max(0, (fallDistance - REDUCED_THRESHOLD)) * mLevelReducedDamage;
 

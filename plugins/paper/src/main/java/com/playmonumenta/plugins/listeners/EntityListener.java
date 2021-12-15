@@ -927,13 +927,11 @@ public class EntityListener implements Listener {
 			event.setCancelled(true);
 			return;
 		}
-		if (entity != null && entity instanceof Player) {
-			Player player = (Player) entity;
+		if (entity instanceof Player player) {
 			mAbilities.playerHitByProjectileEvent(player, event);
 
 			// Tipped Arrow shenanigans
-			if (proj instanceof Arrow) {
-				Arrow arrow = (Arrow) proj;
+			if (proj instanceof Arrow arrow) {
 
 				if (player.isBlocking()) {
 					Vector to = player.getLocation().toVector();
@@ -958,8 +956,7 @@ public class EntityListener implements Listener {
 			}
 		}
 
-		if (entity != null && entity instanceof LivingEntity && !(proj instanceof ThrownPotion)) {
-			LivingEntity hitEntity = (LivingEntity) entity;
+		if (entity instanceof LivingEntity hitEntity && !(proj instanceof ThrownPotion)) {
 			if (hitEntity.getFireTicks() > 0) {
 				// Save old fireticks, the fire ticks will be managed in Inferno.onShootAttack(), which triggers for every projectile attack.
 				hitEntity.setMetadata(Inferno.OLD_FIRE_TICKS_METAKEY, new FixedMetadataValue(mPlugin, hitEntity.getFireTicks()));

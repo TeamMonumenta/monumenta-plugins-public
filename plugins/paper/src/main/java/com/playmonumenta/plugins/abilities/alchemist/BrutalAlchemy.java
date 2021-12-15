@@ -6,6 +6,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.classes.ClassAbility;
@@ -20,7 +21,7 @@ public class BrutalAlchemy extends PotionAbility {
 
 	private final int mVulnerabilityAmplifier;
 
-	public BrutalAlchemy(Plugin plugin, Player player) {
+	public BrutalAlchemy(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Brutal Alchemy", BRUTAL_ALCHEMY_1_DAMAGE, BRUTAL_ALCHEMY_2_DAMAGE);
 		mInfo.mLinkedSpell = ClassAbility.BRUTAL_ALCHEMY;
 		mInfo.mScoreboardId = "BrutalAlchemy";

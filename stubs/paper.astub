@@ -1,0 +1,94 @@
+/*
+
+Stub file for the Checker Framework. This is used to add annotations to existing libraries without modifying them.
+
+*/
+
+import org.checkerframework.checker.nullness.qual.Nullable;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.EnsuresNonNullIf;
+import org.checkerframework.checker.nullness.qual.PolyNull;
+
+package org.bukkit.inventory;
+
+public interface Inventory {
+
+	// ItemStack arrays here are all nonnull, but may contain null. Paper fixes getContents, but not other methods.
+
+	@Nullable ItemStack @NonNull [] getStorageContents();
+
+    void setContents(@Nullable ItemStack @NonNull [] items);
+
+    void setStorageContents(@Nullable ItemStack @NonNull [] items);
+
+}
+
+public interface PlayerInventory extends Inventory {
+
+    @Nullable ItemStack @NonNull [] getArmorContents();
+
+    @Nullable ItemStack @NonNull [] getExtraContents();
+
+    void setArmorContents(@Nullable ItemStack @NonNull [] items);
+
+    void setExtraContents(@Nullable ItemStack @NonNull [] items);
+
+}
+
+public class ItemStack {
+
+     boolean equals(@Nullable Object obj);
+
+}
+
+
+package org.bukkit.inventory.meta;
+
+public interface ItemMeta {
+
+	// if hasLore() returns true, then getLore() and lore() will not return null
+	@EnsuresNonNullIf(expression="getLore()", result=true)
+	@EnsuresNonNullIf(expression="lore()", result=true)
+	boolean hasLore();
+
+	@EnsuresNonNullIf(expression="getColor()", result=true)
+	boolean hasColor();
+
+	@EnsuresNonNullIf(expression="getDisplayName()", result=true)
+	@EnsuresNonNullIf(expression="displayName()", result=true)
+    boolean hasDisplayName();
+
+}
+
+
+
+package org.bukkit;
+
+public enum ChatColor {
+
+	// returns null only if the argument is null
+	static @PolyNull String stripColor(@PolyNull String input)
+
+}
+
+
+
+package org.bukkit.loot;
+
+public interface Lootable {
+
+	@EnsuresNonNullIf(expression="getLootTable()", result=true)
+    boolean hasLootTable();
+
+}
+
+
+
+package org.bukkit.entity;
+
+public interface LivingEntity {
+
+	@EnsuresNonNullIf(expression="getPotionEffect(#1)", result=true)
+    boolean hasPotionEffect(@NotNull PotionEffectType type);
+
+}

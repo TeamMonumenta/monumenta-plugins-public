@@ -30,7 +30,7 @@ import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
 
 
 
-public class JunkItemListener implements Listener {
+public final class JunkItemListener implements Listener {
 	public static final String COMMAND = "pickup";
 	public static final String ALIAS = "pu";
 
@@ -56,40 +56,40 @@ public class JunkItemListener implements Listener {
 			.register();
 
 		new CommandAPICommand(COMMAND)
-		.withPermission(perms)
-		.withAliases(ALIAS)
-		.withArguments(new LiteralArgument("lore"))
-		.executes((sender, args) -> {
-			pickupLore(sender);
-		})
-		.register();
+			.withPermission(perms)
+			.withAliases(ALIAS)
+			.withArguments(new LiteralArgument("lore"))
+			.executes((sender, args) -> {
+				pickupLore(sender);
+			})
+			.register();
 
 		new CommandAPICommand(COMMAND)
-		.withPermission(perms)
-		.withAliases(ALIAS)
-		.withArguments(new LiteralArgument("interesting"))
-		.executes((sender, args) -> {
-			pickupInteresting(sender);
-		})
-		.register();
+			.withPermission(perms)
+			.withAliases(ALIAS)
+			.withArguments(new LiteralArgument("interesting"))
+			.executes((sender, args) -> {
+				pickupInteresting(sender);
+			})
+			.register();
 
 		new CommandAPICommand(COMMAND)
-		.withPermission(perms)
-		.withAliases(ALIAS)
-		.withArguments(new LiteralArgument("all"))
-		.executes((sender, args) -> {
-			pickupAll(sender);
-		})
-		.register();
+			.withPermission(perms)
+			.withAliases(ALIAS)
+			.withArguments(new LiteralArgument("all"))
+			.executes((sender, args) -> {
+				pickupAll(sender);
+			})
+			.register();
 
 		new CommandAPICommand(COMMAND) // Sets PickupMin, but does not change pickup status
-		.withPermission(perms)
-		.withAliases(ALIAS)
-		.withArguments(new LiteralArgument("threshold"), new IntegerArgument("count"))
-		.executes((sender, args) -> {
-			playerSetMin(sender, (int)args[0]);
-		})
-		.register();
+			.withPermission(perms)
+			.withAliases(ALIAS)
+			.withArguments(new LiteralArgument("threshold"), new IntegerArgument("count"))
+			.executes((sender, args) -> {
+				playerSetMin(sender, (int) args[0]);
+			})
+			.register();
 
 	}
 

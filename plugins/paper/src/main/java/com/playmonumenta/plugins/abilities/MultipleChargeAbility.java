@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.abilities;
 
 import org.bukkit.entity.Player;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.network.ClientModHandler;
@@ -15,13 +16,13 @@ public abstract class MultipleChargeAbility extends Ability implements AbilityWi
 
 	protected boolean mWasOnCooldown;
 
-	public MultipleChargeAbility(Plugin plugin, Player player, String displayName) {
+	public MultipleChargeAbility(Plugin plugin, @Nullable Player player, String displayName) {
 		super(plugin, player, displayName);
 	}
 
 	// Call this when the ability is cast; returns whether a charge was consumed or not
 	protected boolean consumeCharge() {
-		if (mCharges > 0) {
+		if (mPlayer != null && mCharges > 0) {
 			mCharges--;
 			PlayerUtils.callAbilityCastEvent(mPlayer, mInfo.mLinkedSpell);
 			MessagingUtils.sendActionBarMessage(mPlayer, mInfo.mLinkedSpell.getName() + " Charges: " + mCharges);
@@ -34,7 +35,7 @@ public abstract class MultipleChargeAbility extends Ability implements AbilityWi
 	}
 
 	protected boolean incrementCharge() {
-		if (mCharges < mMaxCharges) {
+		if (mPlayer != null && mCharges < mMaxCharges) {
 			mCharges++;
 			MessagingUtils.sendActionBarMessage(mPlayer, mInfo.mLinkedSpell.getName() + " Charges: " + mCharges);
 			ClientModHandler.updateAbility(mPlayer, this);
@@ -47,6 +48,9 @@ public abstract class MultipleChargeAbility extends Ability implements AbilityWi
 
 	// This must be manually called if PeriodicTrigger is overridden by the superclass
 	protected void manageChargeCooldowns() {
+		if (mPlayer == null) {
+			return;
+		}
 		boolean onCooldown = mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.mLinkedSpell);
 
 		// If the skill is somehow on cooldown when charges are full, take it off cooldown
@@ -79,7 +83,7 @@ public abstract class MultipleChargeAbility extends Ability implements AbilityWi
 	// Remove the call to AbilityCastEvent, which is done instead on charge consumption
 	@Override
 	public void putOnCooldown() {
-		if (!mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.mLinkedSpell)) {
+		if (mPlayer != null && !mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.mLinkedSpell)) {
 			mPlugin.mTimers.addCooldown(mPlayer, mInfo.mLinkedSpell, mInfo.mCooldown);
 		}
 	}

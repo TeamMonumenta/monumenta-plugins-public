@@ -15,6 +15,7 @@ import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
@@ -42,9 +43,9 @@ public class Riposte extends Ability {
 	private static final int RIPOSTE_AXE_DURATION = 3 * 20;
 	private static final float RIPOSTE_KNOCKBACK_SPEED = 0.15f;
 
-	private BukkitRunnable mSwordTimer = null;
+	private @Nullable BukkitRunnable mSwordTimer = null;
 
-	public Riposte(Plugin plugin, Player player) {
+	public Riposte(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Riposte");
 		mInfo.mLinkedSpell = ClassAbility.RIPOSTE;
 		mInfo.mScoreboardId = "Obliteration";
@@ -58,11 +59,11 @@ public class Riposte extends Ability {
 
 	@Override
 	public boolean playerDamagedByLivingEntityEvent(EntityDamageByEntityEvent event) {
-		if (!isTimerActive()) {
+		if (mPlayer != null && !isTimerActive()) {
 			if (!AbilityUtils.isBlocked(event)) {
 				LivingEntity damager = (LivingEntity) event.getDamager();
 				if (event.getCause() == DamageCause.ENTITY_ATTACK
-						 && !(damager instanceof Guardian)) {
+					&& !(damager instanceof Guardian)) {
 					ItemStack mainHand = mPlayer.getInventory().getItemInMainHand();
 					MovementUtils.knockAway(mPlayer, damager, RIPOSTE_KNOCKBACK_SPEED);
 
@@ -72,6 +73,7 @@ public class Riposte extends Ability {
 								if (mSwordTimer == null) {
 									mSwordTimer = new BukkitRunnable() {
 										int mTimer = 0;
+
 										@Override
 										public void run() {
 											if (mTimer >= RIPOSTE_SWORD_DURATION) {
@@ -100,7 +102,6 @@ public class Riposte extends Ability {
 						world.spawnParticle(Particle.SWEEP_ATTACK, loc, 8, 0.75, 0.5, 0.75, 0.001);
 						world.spawnParticle(Particle.FIREWORKS_SPARK, loc, 20, 0.75, 0.5, 0.75, 0.1);
 						world.spawnParticle(Particle.CRIT, loc, 75, 0.1, 0.1, 0.1, 0.6);
-						int cooldown = getAbilityScore() == 1 ? RIPOSTE_1_COOLDOWN : RIPOSTE_2_COOLDOWN;
 						putOnCooldown();
 						return false;
 					}

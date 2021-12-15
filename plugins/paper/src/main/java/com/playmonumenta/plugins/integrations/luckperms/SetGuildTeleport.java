@@ -3,12 +3,12 @@ package com.playmonumenta.plugins.integrations.luckperms;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.playmonumenta.plugins.Plugin;
-
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+
+import com.playmonumenta.plugins.Plugin;
 
 import dev.jorel.commandapi.CommandAPI;
 import dev.jorel.commandapi.CommandAPICommand;
@@ -51,6 +51,7 @@ public class SetGuildTeleport {
 		Group group = LuckPermsIntegration.GM.getGroup(cleanGuildName);
 		if (group == null) {
 			CommandAPI.fail("The luckperms group '" + cleanGuildName + "' does not exist");
+			throw new RuntimeException();
 		}
 
 		Location loc = player.getLocation();

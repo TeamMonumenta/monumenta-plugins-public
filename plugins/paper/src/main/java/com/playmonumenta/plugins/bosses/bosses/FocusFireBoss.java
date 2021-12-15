@@ -26,8 +26,7 @@ public class FocusFireBoss extends BossAbilityGroup {
 	@Override
 	public void bossDamagedEntity(EntityDamageByEntityEvent event) {
 		//If we hit a player
-		if (event.getEntity() instanceof Player) {
-			Player player = (Player) event.getEntity();
+		if (event.getEntity() instanceof Player player) {
 			//Set all nearby mobs to target them
 			for (LivingEntity mob : EntityUtils.getNearbyMobs(mBoss.getLocation(), detectionRange)) {
 				if (mob instanceof Mob) {

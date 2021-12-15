@@ -44,6 +44,9 @@ public class CrushingEarth extends DepthsAbility {
 
 	@Override
 	public void cast(Action action) {
+		if (mPlayer == null) {
+			return;
+		}
 
 		Location eyeLoc = mPlayer.getEyeLocation();
 		Raycast ray = new Raycast(eyeLoc, eyeLoc.getDirection(), CAST_RANGE);
@@ -76,6 +79,9 @@ public class CrushingEarth extends DepthsAbility {
 
 	@Override
 	public boolean runCheck() {
+		if (mPlayer == null) {
+			return false;
+		}
 		ItemStack mainhand = mPlayer.getInventory().getItemInMainHand();
 		return !mPlayer.isSneaking() && !isOnCooldown() && DepthsUtils.isWeaponItem(mainhand);
 	}

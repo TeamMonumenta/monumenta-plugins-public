@@ -66,9 +66,8 @@ public class SerializationUtils {
 		}
 
 		List<String> addLore = serializeStringToLore(data);
-		if (meta.hasLore()) {
-			List<String> currentLore = meta.getLore();
-
+		List<String> currentLore = meta.getLore();
+		if (currentLore != null) {
 			/* Remove existing serialization data, if any */
 			currentLore.removeIf(lore -> lore.startsWith(SERIALCONST));
 
@@ -100,6 +99,10 @@ public class SerializationUtils {
 		}
 
 		List<String> currentLore = meta.getLore();
+		if (currentLore == null) {
+			return "";
+		}
+
 		String data = deserializeStringFromLore(currentLore);
 
 		/* Don't leave any serialization data on the entity */

@@ -5,14 +5,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.utils.AbilityUtils;
-import com.playmonumenta.plugins.utils.MovementUtils;
-
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.checkerframework.checker.nullness.qual.Nullable;
+
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.utils.AbilityUtils;
+import com.playmonumenta.plugins.utils.MovementUtils;
 
 import dev.jorel.commandapi.Tooltip;
 
@@ -38,7 +39,7 @@ public class EffectsList {
 		private final String mName;
 
 		// Only for potion effects
-		private final PotionEffectType mEffect;
+		private final @Nullable PotionEffectType mEffect;
 		private final int mAmplifier;
 		private final int mDurationTicks;
 

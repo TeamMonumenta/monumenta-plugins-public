@@ -42,7 +42,7 @@ public class DelveModifier extends Ability {
 
 	private final @Nullable Modifier mModifier;
 
-	public DelveModifier(Plugin plugin, Player player, @Nullable Modifier modifier) {
+	public DelveModifier(Plugin plugin, @Nullable Player player, @Nullable Modifier modifier) {
 		super(plugin, player, null);
 
 		mModifier = modifier;
@@ -79,13 +79,7 @@ public class DelveModifier extends Ability {
 	public boolean playerDamagedByProjectileEvent(EntityDamageByEntityEvent event) {
 		ProjectileSource source = ((Projectile) event.getDamager()).getShooter();
 
-		if (!(source instanceof Entity)) {
-			return true;
-		}
-
-		Entity entity = (Entity) source;
-
-		if (shouldApplyModifiers(entity)) {
+		if (source instanceof Entity entity && shouldApplyModifiers(entity)) {
 			return playerTookProjectileDamageEvent(entity, event);
 		}
 
@@ -100,7 +94,8 @@ public class DelveModifier extends Ability {
 	}
 
 	/* This version is only called when the event should apply modifiers! */
-	protected void entityDeathEvent(EntityDeathEvent event) { }
+	protected void entityDeathEvent(EntityDeathEvent event) {
+	}
 
 	public void applyOnSpawnModifiers(LivingEntity mob, EntitySpawnEvent event) {
 		if (EntityUtils.isHostileMob(mob)) {

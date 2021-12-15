@@ -51,6 +51,9 @@ public class Pyroblast extends DepthsAbility {
 	}
 
 	public void execute() {
+		if (mPlayer == null) {
+			return;
+		}
 		World world = mPlayer.getWorld();
 		world.playSound(mPlayer.getLocation(), Sound.ENTITY_FIREWORK_ROCKET_BLAST, 1, 1.4f);
 
@@ -113,7 +116,7 @@ public class Pyroblast extends DepthsAbility {
 
 	@Override
 	public boolean playerShotArrowEvent(AbstractArrow arrow) {
-		if (mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.mLinkedSpell)) {
+		if (mPlayer == null || mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.mLinkedSpell)) {
 			return true;
 		}
 

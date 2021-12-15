@@ -61,7 +61,7 @@ public class Davey extends BossAbilityGroup {
 	private final Location mEndLoc;
 
 	//Two vexes Davey controls
-	private List<LivingEntity> mVexes;
+	private final List<LivingEntity> mVexes = new ArrayList<>();
 
 	public int mCooldownTicks;
 
@@ -102,7 +102,7 @@ public class Davey extends BossAbilityGroup {
 
 		//Davey and vex target swap
 		new BukkitRunnable() {
-			Mob mDavey = (Mob) mBoss;
+			final Mob mDavey = (Mob) mBoss;
 			@Override
 			public void run() {
 				if (!mBoss.isValid() || mBoss.isDead()) {
@@ -143,17 +143,16 @@ public class Davey extends BossAbilityGroup {
 		}
 
 		//Summon vexes
-		mVexes = new ArrayList<>();
 		mVexes.add((LivingEntity) LibraryOfSoulsIntegration.summon(spawnLoc.clone().add(5, 3, 5), VEX_LOS));
 		mVexes.add((LivingEntity) LibraryOfSoulsIntegration.summon(spawnLoc.clone().add(-5, 3, -5), VEX_LOS));
 
 		SpellManager activeSpells = new SpellManager(Arrays.asList(
-			new SpellLinkBeyondLife(mBoss, mCooldownTicks, ((party.getFloor() - 1) / 3) + 1),
-			new SpellVoidBlast(plugin, mVexes.get(0), mCooldownTicks / 2),
-			new SpellVoidBlast(plugin, mVexes.get(1), mCooldownTicks / 2),
-			new SpellAbyssalLeap(plugin, mBoss, mCooldownTicks),
-			new SpellAbyssalCharge(mBoss, mCooldownTicks),
-			new SpellVoidGrenades(mPlugin, mBoss, detectionRange, mCooldownTicks)
+				new SpellLinkBeyondLife(mBoss, mCooldownTicks, ((party == null ? 0 : party.getFloor() - 1) / 3) + 1),
+				new SpellVoidBlast(plugin, mVexes.get(0), mCooldownTicks / 2),
+				new SpellVoidBlast(plugin, mVexes.get(1), mCooldownTicks / 2),
+				new SpellAbyssalLeap(plugin, mBoss, mCooldownTicks),
+				new SpellAbyssalCharge(mBoss, mCooldownTicks),
+				new SpellVoidGrenades(mPlugin, mBoss, detectionRange, mCooldownTicks)
 		));
 		List<Spell> passiveSpells = Arrays.asList(
 			new SpellBlockBreak(mBoss, 2, 3, 2),
@@ -170,8 +169,8 @@ public class Davey extends BossAbilityGroup {
 	public void init() {
 		// Health is scaled by 1.15 times each time you fight the boss
 		DepthsParty party = DepthsUtils.getPartyFromNearbyPlayers(mSpawnLoc);
-		int modifiedHealth = (int) (DAVEY_HEALTH * Math.pow(1.15, party.getFloor() / 3));
-		mBoss.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(modifiedHealth);
+		int modifiedHealth = (int) (DAVEY_HEALTH * Math.pow(1.15, party == null ? 0 : party.getFloor() / 3));
+		EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_MAX_HEALTH, modifiedHealth);
 		mBoss.setHealth(modifiedHealth);
 
 		//launch event related spawn commands
@@ -232,8 +231,7 @@ public class Davey extends BossAbilityGroup {
 	@Override
 	public void bossDamagedEntity(EntityDamageByEntityEvent event) {
 		//Slow on hit
-		if (event.getEntity() instanceof Player) {
-			Player player = (Player) event.getEntity();
+		if (event.getEntity() instanceof Player player) {
 			player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 60, 1));
 			if (event.getCause().equals(DamageCause.ENTITY_ATTACK)) {
 				if (player.isBlocking()) {

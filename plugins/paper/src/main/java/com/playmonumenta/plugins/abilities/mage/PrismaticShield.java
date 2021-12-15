@@ -11,6 +11,7 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
@@ -38,7 +39,7 @@ public class PrismaticShield extends Ability {
 	private final int mAmplifier;
 	private final int mDuration;
 
-	public PrismaticShield(Plugin plugin, Player player) {
+	public PrismaticShield(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Prismatic Shield");
 		mInfo.mLinkedSpell = ClassAbility.PRISMATIC_SHIELD;
 		mInfo.mScoreboardId = "Prismatic";

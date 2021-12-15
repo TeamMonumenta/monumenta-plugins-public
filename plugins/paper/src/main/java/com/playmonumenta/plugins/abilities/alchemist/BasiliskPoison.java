@@ -12,6 +12,7 @@ import org.bukkit.entity.Projectile;
 import org.bukkit.entity.SpectralArrow;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.inventory.ItemStack;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
@@ -32,7 +33,7 @@ public class BasiliskPoison extends Ability {
 
 	private final double mPercent;
 
-	public BasiliskPoison(Plugin plugin, Player player) {
+	public BasiliskPoison(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Basilisk Poison");
 		mInfo.mScoreboardId = "BasiliskPoison";
 		mInfo.mShorthandName = "BP";
@@ -45,6 +46,9 @@ public class BasiliskPoison extends Ability {
 
 	@Override
 	public boolean livingEntityShotByPlayerEvent(Projectile proj, LivingEntity damagee, EntityDamageByEntityEvent event) {
+		if (mPlayer == null) {
+			return true;
+		}
 		if (proj instanceof Arrow || proj instanceof SpectralArrow) {
 			World world = mPlayer.getWorld();
 			mPlugin.mEffectManager.addEffect(damagee, DAMAGE_EFFECT_NAME, new CustomDamageOverTime(DURATION, event.getDamage() * mPercent, PERIOD, mPlayer, MagicType.ALCHEMY, ClassAbility.BASILISK_POISON, Particle.TOTEM, mPlugin));

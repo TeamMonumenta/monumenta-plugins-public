@@ -9,6 +9,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.entity.ThrownPotion;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
@@ -30,7 +31,7 @@ public class WardingRemedy extends Ability {
 	private static final Color APOTHECARY_LIGHT_COLOR = Color.fromRGB(255, 255, 100);
 	private static final Particle.DustOptions APOTHECARY_DARK_COLOR = new Particle.DustOptions(Color.fromRGB(83, 0, 135), 1.5f);
 
-	public WardingRemedy(Plugin plugin, Player player) {
+	public WardingRemedy(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Warding Remedy");
 		mInfo.mScoreboardId = "WardingRemedy";
 		mInfo.mLinkedSpell = ClassAbility.WARDING_REMEDY;
@@ -43,11 +44,14 @@ public class WardingRemedy extends Ability {
 
 	@Override
 	public boolean runCheck() {
-		return mPlayer.isSneaking() && ItemUtils.isAlchemistItem(mPlayer.getInventory().getItemInMainHand());
+		return mPlayer != null && mPlayer.isSneaking() && ItemUtils.isAlchemistItem(mPlayer.getInventory().getItemInMainHand());
 	}
 
 	@Override
 	public boolean playerThrewSplashPotionEvent(ThrownPotion potion) {
+		if (mPlayer == null) {
+			return false;
+		}
 		// This is sufficient because we are already checking conditions in runCheck()
 		putOnCooldown();
 

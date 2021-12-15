@@ -44,7 +44,7 @@ public class RecklessSwing extends Ability {
 
 	private @Nullable Rampage mRampage;
 
-	public RecklessSwing(Plugin plugin, Player player) {
+	public RecklessSwing(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Reckless Swing");
 		mInfo.mLinkedSpell = ClassAbility.RECKLESS_SWING;
 		mInfo.mScoreboardId = "RecklessSwing";

@@ -7,7 +7,6 @@ import java.util.HashSet;
 import java.util.List;
 
 import org.bukkit.Location;
-import org.bukkit.NamespacedKey;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.ThrownPotion;
@@ -38,6 +37,7 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MetadataUtils;
+import com.playmonumenta.plugins.utils.NamespacedKeyUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
@@ -74,7 +74,7 @@ public class AlchemistPotions extends Ability implements AbilityWithChargesOrSta
 
 	private static @Nullable ItemStack POTION = null;
 
-	public AlchemistPotions(Plugin plugin, Player player) {
+	public AlchemistPotions(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, null);
 		mInfo.mLinkedSpell = ClassAbility.ALCHEMIST_POTION;
 
@@ -115,8 +115,7 @@ public class AlchemistPotions extends Ability implements AbilityWithChargesOrSta
 					if (classAbility != null) {
 						mDamage += DAMAGE_PER_SKILL_POINT * classAbility.getAbilityScore();
 
-						if (classAbility instanceof PotionAbility) {
-							PotionAbility potionAbility = (PotionAbility) classAbility;
+						if (classAbility instanceof PotionAbility potionAbility) {
 							mPotionAbilities.add(potionAbility);
 							mDamage += potionAbility.getDamage();
 						}
@@ -127,8 +126,7 @@ public class AlchemistPotions extends Ability implements AbilityWithChargesOrSta
 					if (specializationAbility != null) {
 						mDamage += DAMAGE_PER_SPEC_POINT * specializationAbility.getAbilityScore();
 
-						if (specializationAbility instanceof PotionAbility) {
-							PotionAbility potionAbility = (PotionAbility) specializationAbility;
+						if (specializationAbility instanceof PotionAbility potionAbility) {
 							mPotionAbilities.add(potionAbility);
 							mDamage += potionAbility.getDamage();
 						}
@@ -155,7 +153,7 @@ public class AlchemistPotions extends Ability implements AbilityWithChargesOrSta
 				potion.setMetadata("AlchemistPotion", new FixedMetadataValue(mPlugin, 0));
 
 				if (POTION == null) {
-					POTION = InventoryUtils.getItemFromLootTable(mPlayer, NamespacedKey.fromString("epic:r1/items/alchemists_potion"));
+					POTION = InventoryUtils.getItemFromLootTable(mPlayer, NamespacedKeyUtils.fromString("epic:r1/items/alchemists_potion"));
 				}
 				if (POTION != null) {
 					potion.setItem(POTION);
@@ -227,11 +225,14 @@ public class AlchemistPotions extends Ability implements AbilityWithChargesOrSta
 	}
 
 	public double getDamage() {
+		if (mPlayer == null) {
+			return 0;
+		}
 		return mDamage + AlchemistPotionsDamageEnchantment.getExtraDamage(mPlayer, AlchemistPotionsDamageEnchantment.class);
 	}
 
 	public boolean consumeCharge() {
-		if (mCharges > 0) {
+		if (mPlayer != null && mCharges > 0) {
 			mCharges--;
 			ScoreboardUtils.setScoreboardValue(mPlayer, POTION_SCOREBOARD, mCharges);
 			PlayerInventory inventory = mPlayer.getInventory();
@@ -249,7 +250,7 @@ public class AlchemistPotions extends Ability implements AbilityWithChargesOrSta
 	}
 
 	public boolean incrementCharge() {
-		if (mCharges < MAX_CHARGE_POTIONS) {
+		if (mPlayer != null && mCharges < MAX_CHARGE_POTIONS) {
 			mCharges++;
 			ScoreboardUtils.setScoreboardValue(mPlayer, POTION_SCOREBOARD, mCharges);
 			//update item
@@ -267,7 +268,7 @@ public class AlchemistPotions extends Ability implements AbilityWithChargesOrSta
 
 	@Override
 	public void periodicTrigger(boolean twoHertz, boolean oneSecond, int ticks) {
-		if (twoHertz) {
+		if (twoHertz && mPlayer != null) {
 			ItemStack item = mPlayer.getInventory().getItem(mSlot);
 
 			if (mOnCooldown) {

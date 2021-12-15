@@ -128,46 +128,22 @@ public class SpellEarthshake extends SpellBaseAoE {
 						ArrayList<Block> blocks = new ArrayList<Block>();
 
 						//Populate the blocks array with nearby blocks- logic here to get the topmost block with air above it
-						for (int x = radius * -1; x <= radius; x++) {
-							for (int y = radius * -1; y <= radius; y++) {
-								Block selected = null;
-								Block test = world.getBlockAt(loc.clone().add(x, -2, y));
-								if (test.getType() != Material.AIR) {
-									selected = world.getBlockAt(loc.clone().add(x, -2, y));
-								}
-								test = world.getBlockAt(loc.clone().add(x, -1, y));
-								if (test.getType() != Material.AIR) {
-									selected = world.getBlockAt(loc.clone().add(x, -1, y));
-								} else {
-									blocks.add(selected);
-									continue;
-								}
-								test = world.getBlockAt(loc.clone().add(x, 0, y));
-								if (test.getType() != Material.AIR) {
-									selected = world.getBlockAt(loc.clone().add(x, 0, y));
-								} else {
-									blocks.add(selected);
-									continue;
-								}
-								test = world.getBlockAt(loc.clone().add(x, 1, y));
-								if (test.getType() != Material.AIR) {
-									selected = world.getBlockAt(loc.clone().add(x, 1, y));
-								} else {
-									blocks.add(selected);
-									continue;
-								}
-								test = world.getBlockAt(loc.clone().add(x, 2, y));
-								if (test.getBlockData().getMaterial() != Material.AIR) {
-									selected = world.getBlockAt(loc.clone().add(x, 2, y));
-								} else {
-									blocks.add(selected);
-									continue;
+						for (int x = -radius; x <= radius; x++) {
+							for (int z = -radius; z <= radius; z++) {
+								Block lowerBlock = world.getBlockAt(loc.clone().add(x, -2, z));
+								for (int y = -1; y <= 2; y++) {
+									Block currentBlock = world.getBlockAt(loc.clone().add(x, y, z));
+									if (!lowerBlock.getType().isAir() && currentBlock.getType().isAir()) {
+										blocks.add(lowerBlock);
+										break;
+									}
+									lowerBlock = currentBlock;
 								}
 							}
 						}
 
 						//Make the blocks go flying
-						for (Block b: blocks) {
+						for (Block b : blocks) {
 							if (b == null) {
 								continue;
 							}

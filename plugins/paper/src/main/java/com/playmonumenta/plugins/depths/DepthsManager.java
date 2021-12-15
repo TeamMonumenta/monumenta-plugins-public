@@ -323,11 +323,12 @@ public class DepthsManager {
 
 	/**
 	 * Returns the rarity level the player has in the specified ability.
+	 *
 	 * @param name the exact name of the ability's ABILITY_NAME param
-	 * @param p player to check for
+	 * @param p    player to check for
 	 * @return the level in the ability
 	 */
-	public int getPlayerLevelInAbility(String name, Player p) {
+	public int getPlayerLevelInAbility(@Nullable String name, @Nullable Player p) {
 
 		if (p == null || name == null) {
 			return 0;

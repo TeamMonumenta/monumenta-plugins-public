@@ -15,6 +15,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
@@ -42,7 +43,7 @@ public class EagleEye extends Ability {
 	private static final int EAGLE_EYE_2_VULN_LEVEL = 6; // 35%
 	private static final int EAGLE_EYE_RADIUS = 20;
 
-	public EagleEye(Plugin plugin, Player player) {
+	public EagleEye(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Eagle Eye");
 		mInfo.mLinkedSpell = ClassAbility.EAGLE_EYE;
 		mInfo.mScoreboardId = "Tinkering"; // lmao
@@ -58,6 +59,9 @@ public class EagleEye extends Ability {
 	@Override
 	public void cast(Action action) {
 		Player player = mPlayer;
+		if (player == null) {
+			return;
+		}
 		int eagleEye = getAbilityScore();
 		World world = player.getWorld();
 		world.playSound(mPlayer.getLocation(), Sound.BLOCK_BEACON_POWER_SELECT, 1.5f, 1.25f);
@@ -110,6 +114,9 @@ public class EagleEye extends Ability {
 
 	@Override
 	public boolean runCheck() {
+		if (mPlayer == null) {
+			return false;
+		}
 		ItemStack inMainHand = mPlayer.getInventory().getItemInMainHand();
 		return mPlayer.isSneaking() && !ItemUtils.isPickaxe(inMainHand) && inMainHand.getType() != Material.HEART_OF_THE_SEA;
 	}

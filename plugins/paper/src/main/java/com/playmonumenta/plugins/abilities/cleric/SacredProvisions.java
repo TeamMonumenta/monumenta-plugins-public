@@ -3,13 +3,14 @@ package com.playmonumenta.plugins.abilities.cleric;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 
 public class SacredProvisions extends Ability {
 
-	public SacredProvisions(Plugin plugin, Player player) {
+	public SacredProvisions(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Sacred Provisions");
 		mInfo.mScoreboardId = "SacredProvisions";
 		mInfo.mShorthandName = "SP";

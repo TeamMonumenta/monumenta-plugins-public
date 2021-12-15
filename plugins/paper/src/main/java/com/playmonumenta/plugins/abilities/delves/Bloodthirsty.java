@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.abilities.delves;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.SpawnerSpawnEvent;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.bosses.bosses.CoordinatedAttackBoss;
@@ -38,7 +39,7 @@ public class Bloodthirsty extends DelveModifier {
 
 	private final double mBloodthirstyChance;
 
-	public Bloodthirsty(Plugin plugin, Player player) {
+	public Bloodthirsty(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, Modifier.BLOODTHIRSTY);
 
 		if (player != null) {

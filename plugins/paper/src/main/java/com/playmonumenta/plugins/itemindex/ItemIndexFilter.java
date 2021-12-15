@@ -6,8 +6,8 @@ public class ItemIndexFilter {
 		MATERIAL_EXCLUDE,
 	}
 
-	private Type mType;
-	private Object mValue;
+	private final Type mType;
+	private final Object mValue;
 
 	ItemIndexFilter(Type type, Object value) {
 		this.mType = type;
@@ -16,10 +16,12 @@ public class ItemIndexFilter {
 
 	public boolean match(MonumentaItem item) {
 		switch (this.mType) {
-			case MATERIAL:
-				return item.getMaterial().equals(this.mValue);
-			default:
-				return true;
+		case MATERIAL:
+			return item.getMaterial() == this.mValue;
+		case MATERIAL_EXCLUDE:
+			return item.getMaterial() != this.mValue;
+		default:
+			return true;
 		}
 	}
 }

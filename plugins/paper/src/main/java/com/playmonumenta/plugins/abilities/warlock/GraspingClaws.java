@@ -13,6 +13,7 @@ import org.bukkit.entity.Projectile;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.inventory.ItemStack;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
@@ -39,9 +40,9 @@ public class GraspingClaws extends Ability {
 
 	private final double mAmplifier;
 	private final int mDamage;
-	private Arrow mArrow = null;
+	private @Nullable Arrow mArrow = null;
 
-	public GraspingClaws(Plugin plugin, Player player) {
+	public GraspingClaws(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Grasping Claws");
 		mInfo.mScoreboardId = "GraspingClaws";
 		mInfo.mShorthandName = "GC";
@@ -58,6 +59,9 @@ public class GraspingClaws extends Ability {
 
 	@Override
 	public void cast(Action action) {
+		if (mPlayer == null) {
+			return;
+		}
 		ItemStack inMainHand = mPlayer.getInventory().getItemInMainHand();
 		if (!mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), ClassAbility.GRASPING_CLAWS) && mPlayer.isSneaking() && ItemUtils.isSomeBow(inMainHand) && !ItemUtils.isItemShattered(inMainHand)) {
 			mArrow = mPlayer.getWorld().spawnArrow(mPlayer.getEyeLocation(), mPlayer.getLocation().getDirection(), 1.5f, 0, Arrow.class);
@@ -71,7 +75,7 @@ public class GraspingClaws extends Ability {
 
 	@Override
 	public void projectileHitEvent(ProjectileHitEvent event, Projectile proj) {
-		if (this.mArrow != null && this.mArrow == proj) {
+		if (mPlayer != null && this.mArrow != null && this.mArrow == proj) {
 			this.mArrow = null;
 			Location loc = proj.getLocation();
 			World world = proj.getWorld();

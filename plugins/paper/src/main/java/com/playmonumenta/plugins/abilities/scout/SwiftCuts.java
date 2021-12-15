@@ -10,6 +10,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.inventory.ItemStack;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
@@ -21,9 +22,9 @@ public class SwiftCuts extends Ability {
 
 	private final double mConsecutivePercentDamage;
 
-	private LivingEntity mLastTarget = null;
+	private @Nullable LivingEntity mLastTarget = null;
 
-	public SwiftCuts(Plugin plugin, Player player) {
+	public SwiftCuts(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Swift Cuts");
 		mInfo.mScoreboardId = "SwiftCuts";
 		mInfo.mShorthandName = "SC";
@@ -35,6 +36,9 @@ public class SwiftCuts extends Ability {
 
 	@Override
 	public boolean livingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
+		if (mPlayer == null) {
+			return true;
+		}
 		if (event.getCause() == DamageCause.ENTITY_ATTACK) {
 			LivingEntity mob = (LivingEntity) event.getEntity();
 

@@ -3,11 +3,11 @@ package com.playmonumenta.plugins.commands;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.playmonumenta.plugins.utils.CommandUtils;
-
 import org.bukkit.Sound;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+
+import com.playmonumenta.plugins.utils.CommandUtils;
 
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.CommandPermission;
@@ -44,15 +44,15 @@ public class BarkifyHeldItem extends GenericCommand {
 	}
 
 	private static void run(CommandSender sender, Player player, String selection) throws WrapperCommandSyntaxException {
-		if (selection == "Barking2") {
+		if (selection.equals("Barking2")) {
 			selection = "Barking II";
 		}
 
 		CommandUtils.enchantify(sender, player, selection);
 
-		if (selection == "Barking") {
+		if (selection.equals("Barking")) {
 			player.playSound(player.getLocation(), Sound.ENTITY_WOLF_AMBIENT, 1, 1f);
-		} else if (selection == "Barking II") {
+		} else if (selection.equals("Barking II")) {
 			player.playSound(player.getLocation(), Sound.ENTITY_WOLF_WHINE, 1, 1f);
 		} else {
 			player.playSound(player.getLocation(), Sound.ENTITY_WOLF_GROWL, 1, 1f);

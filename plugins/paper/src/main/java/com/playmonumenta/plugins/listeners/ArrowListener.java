@@ -17,13 +17,10 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 public class ArrowListener implements Listener {
 
-	private Plugin mPlugin;
-
 	//If the projectile hits an entity, put it in here to see if it has hit the entity before
-	private Map<AbstractArrow, Entity> mHitBefore = new HashMap<>();
+	private final Map<AbstractArrow, Entity> mHitBefore = new HashMap<>();
 
 	public ArrowListener(Plugin plugin) {
-		mPlugin = plugin;
 
 		//Clear the mHitBefore map every 5 minutes
 		new BukkitRunnable() {
@@ -31,13 +28,14 @@ public class ArrowListener implements Listener {
 			public void run() {
 				mHitBefore.clear();
 			}
-		}.runTaskTimer(mPlugin, 20 * 60 * 5, 20 * 60 * 5);
+		}.runTaskTimer(plugin, 20 * 60 * 5, 20 * 60 * 5);
 	}
 
 	@EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
 	public void projectileHitEvent(ProjectileHitEvent event) {
 		//Has to be an arrow
-		if (event.getHitEntity() == null
+		Entity hitEntity = event.getHitEntity();
+		if (hitEntity == null
 				|| !(event.getEntity() instanceof AbstractArrow)
 				|| event.getEntity() instanceof Trident
 				|| !(event.getEntity().getShooter() instanceof LivingEntity)
@@ -49,9 +47,8 @@ public class ArrowListener implements Listener {
 		Entity hitBeforeEntity = mHitBefore.get(arrow);
 
 		if (hitBeforeEntity == null) {
-			mHitBefore.put(arrow, event.getHitEntity());
-			return;
-		} else if (event.getHitEntity().equals(hitBeforeEntity)) {
+			mHitBefore.put(arrow, hitEntity);
+		} else if (hitEntity.equals(hitBeforeEntity)) {
 			mHitBefore.remove(arrow);
 			arrow.remove();
 		}

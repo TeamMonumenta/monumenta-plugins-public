@@ -53,14 +53,13 @@ public class AbilitySilenceBoss extends BossAbilityGroup {
 			return;
 		}
 
-		LivingEntity target = (LivingEntity) event.getEntity();
-		if (target instanceof Player) {
-			World world = target.getWorld();
-			Location loc = target.getLocation().add(0, 1, 0);
+		if (event.getEntity() instanceof Player player) {
+			World world = player.getWorld();
+			Location loc = player.getLocation().add(0, 1, 0);
 			world.playSound(loc, Sound.BLOCK_PORTAL_TRIGGER, 0.25f, 2f);
 			world.spawnParticle(Particle.REDSTONE, loc, 100, 0, 0, 0, 0.5, mParams.COLOR);
 
-			AbilityUtils.silencePlayer((Player) target, mParams.DURATION);
+			AbilityUtils.silencePlayer(player, mParams.DURATION);
 		}
 	}
 }

@@ -33,7 +33,7 @@ import dev.jorel.commandapi.CommandPermission;
 import dev.jorel.commandapi.arguments.LiteralArgument;
 import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
 
-public class ItemDropListener implements Listener {
+public final class ItemDropListener implements Listener {
 	public static final String COMMAND = "disabledrop";
 	public static final String ALIAS = "dd";
 

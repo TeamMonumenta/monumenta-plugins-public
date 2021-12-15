@@ -7,6 +7,7 @@ import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.utils.PlayerUtils;
 
@@ -33,10 +34,10 @@ public class SpellBaseAura extends Spell {
 	private final double mParticleDY;
 	private final double mParticleDZ;
 	private final int mNumParticles;
-	private final Particle mParticle;
-	private final Object mParticleArg;
-	private final ApplyAuraEffect mAuraEffect;
-	private final SummonParticles mParticlesSummoner;
+	private final @Nullable Particle mParticle;
+	private final @Nullable Object mParticleArg;
+	private final @Nullable ApplyAuraEffect mAuraEffect;
+	private final @Nullable SummonParticles mParticlesSummoner;
 
 	private final int mRadius; // Computed maximum of mDX, mDY, mDZ
 	private int mEffectIter; // Number of effect iterations - rolls around between 0 and 2
@@ -64,7 +65,7 @@ public class SpellBaseAura extends Spell {
 		mEffectIter = 0;
 	}
 
-	public SpellBaseAura(Entity boss, double dx, double dy, double dz, SummonParticles particlesSummoner, ApplyAuraEffect auraEffect) {
+	public SpellBaseAura(Entity boss, double dx, double dy, double dz, SummonParticles particlesSummoner, @Nullable ApplyAuraEffect auraEffect) {
 		mBoss = boss;
 		// The "radius" thing is just... a mystery. Dividing by 2 is slightly better?
 		mDX = dx;
@@ -113,17 +114,19 @@ public class SpellBaseAura extends Spell {
 		}
 
 		// Apply effects every other pulse (2 Hz)
-		mEffectIter++;
-		if (mEffectIter >= 2 && mAuraEffect != null) {
-			mEffectIter = 0;
+		if (mAuraEffect != null) {
+			mEffectIter++;
+			if (mEffectIter >= 2) {
+				mEffectIter = 0;
 
-			for (Player player : PlayerUtils.playersInRange(bossLoc, mRadius, true)) {
-				Location playerLoc = player.getLocation();
-				if (Math.abs(playerLoc.getX() - bossLoc.getX()) < mDX &&
-				        Math.abs(playerLoc.getX() - bossLoc.getX()) < mDX &&
-				        Math.abs(playerLoc.getX() - bossLoc.getX()) < mDX) {
-					// Player is within range
-					mAuraEffect.run(player);
+				for (Player player : PlayerUtils.playersInRange(bossLoc, mRadius, true)) {
+					Location playerLoc = player.getLocation();
+					if (Math.abs(playerLoc.getX() - bossLoc.getX()) < mDX &&
+							Math.abs(playerLoc.getX() - bossLoc.getX()) < mDX &&
+							Math.abs(playerLoc.getX() - bossLoc.getX()) < mDX) {
+						// Player is within range
+						mAuraEffect.run(player);
+					}
 				}
 			}
 		}

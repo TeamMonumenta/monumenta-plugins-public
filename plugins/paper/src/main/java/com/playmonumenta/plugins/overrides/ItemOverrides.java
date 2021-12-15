@@ -23,9 +23,10 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.event.player.PlayerRiptideEvent;
 import org.bukkit.inventory.ItemStack;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 
-public class ItemOverrides {
+public final class ItemOverrides {
 	/*
 	 * Exceptions for materials that players in survival can place,
 	 * or use to perform right-click interactions like
@@ -328,7 +329,7 @@ public class ItemOverrides {
 		// GOLDEN_APPLE is in GOldenAppleOverride, which manually calls this override
 	}
 
-	public boolean rightClickInteraction(Plugin plugin, Player player, Action action, ItemStack item, Block block, PlayerInteractEvent event) {
+	public boolean rightClickInteraction(Plugin plugin, Player player, Action action, @Nullable ItemStack item, @Nullable Block block, PlayerInteractEvent event) {
 		Material itemType = (item != null) ? item.getType() : Material.AIR;
 		Material blockType = (block != null) ? block.getType() : Material.AIR;
 		BaseOverride itemOverride = mItems.get(itemType);
@@ -346,8 +347,8 @@ public class ItemOverrides {
 		return notCancelled;
 	}
 
-	public boolean leftClickInteraction(Plugin plugin, Player player, Action action, ItemStack item,
-	                                    Block block) {
+	public boolean leftClickInteraction(Plugin plugin, Player player, Action action, @Nullable ItemStack item,
+	                                    @Nullable Block block) {
 		Material itemType = (item != null) ? item.getType() : Material.AIR;
 		Material blockType = (block != null) ? block.getType() : Material.AIR;
 		BaseOverride itemOverride = mItems.get(itemType);

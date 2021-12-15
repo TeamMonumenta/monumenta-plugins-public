@@ -526,13 +526,7 @@ public class BossManager implements Listener {
 
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void creatureSpawnEvent(CreatureSpawnEvent event) {
-		Entity entity = event.getEntity();
-
-		if (!(entity instanceof LivingEntity)) {
-			return;
-		}
-
-		processEntity((LivingEntity) entity);
+		processEntity(event.getEntity());
 	}
 
 	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
@@ -561,10 +555,7 @@ public class BossManager implements Listener {
 
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void entityDeathEvent(EntityDeathEvent event) {
-		Entity entity = event.getEntity();
-		if (!(entity instanceof LivingEntity)) {
-			return;
-		}
+		LivingEntity entity = event.getEntity();
 
 		if (mNearbyEntityDeathEnabled) {
 			/* For performance reasons this check is only enabled when there is a loaded
@@ -581,7 +572,7 @@ public class BossManager implements Listener {
 		Boss boss = mBosses.get(entity.getUniqueId());
 		if (boss != null) {
 			boss.death(event);
-			if (((LivingEntity) entity).getHealth() <= 0) {
+			if (entity.getHealth() <= 0) {
 				unload(boss, false);
 				mBosses.remove(entity.getUniqueId());
 
@@ -754,8 +745,8 @@ public class BossManager implements Listener {
 					}
 				}
 			}
-			if (damager instanceof Projectile && ((Projectile) damager).getShooter() instanceof LivingEntity) {
-				boss = mBosses.get(((LivingEntity) ((Projectile) damager).getShooter()).getUniqueId());
+			if (damager instanceof Projectile && ((Projectile) damager).getShooter() instanceof LivingEntity shooter) {
+				boss = mBosses.get(shooter.getUniqueId());
 				if (boss != null) {
 					// May cancel the event
 					boss.bossDamagedEntity(event);
@@ -775,8 +766,7 @@ public class BossManager implements Listener {
 
 	@EventHandler(ignoreCancelled = true)
 	public void entityPathfindEvent(EntityPathfindEvent event) {
-		if (event.getEntity() instanceof Mob) {
-			Mob entity = (Mob) event.getEntity();
+		if (event.getEntity() instanceof Mob entity) {
 
 			Boss boss = mBosses.get(entity.getUniqueId());
 			if (boss != null) {
@@ -787,8 +777,7 @@ public class BossManager implements Listener {
 
 	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
 	public void entityTargetEvent(EntityTargetEvent event) {
-		if (event.getEntity() instanceof Mob) {
-			Mob entity = (Mob) event.getEntity();
+		if (event.getEntity() instanceof Mob entity) {
 
 			Boss boss = mBosses.get(entity.getUniqueId());
 			if (boss != null) {

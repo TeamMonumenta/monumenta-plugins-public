@@ -134,7 +134,7 @@ public class PotionUtils {
 			mShowParticles = effect.hasParticles();
 		}
 
-		public PotionInfo(PotionEffectType type, int duration, int amplifier, boolean ambient,
+		public PotionInfo(@Nullable PotionEffectType type, int duration, int amplifier, boolean ambient,
 		                  boolean showParticles) {
 			mType = type;
 			mDuration = duration;
@@ -299,11 +299,11 @@ public class PotionUtils {
 		}
 		for (PotionEffectType type : NEGATIVE_EFFECTS) {
 			if (player.hasPotionEffect(type)) {
-				if (type.getName() == "SLOW" && dolphin) {
+				if ("SLOW".equals(type.getName()) && dolphin) {
 					continue;
 				}
 				PotionEffect effect = player.getPotionEffect(type);
-				if (effect.getDuration() < Constants.THIRTY_MINUTES) {
+				if (effect != null && effect.getDuration() < Constants.THIRTY_MINUTES) {
 					plugin.mPotionManager.clearPotionEffectType(player, type);
 				}
 			}
@@ -376,9 +376,9 @@ public class PotionUtils {
 
 			//If instant healing, manually add health, otherwise if instant damage, manually remove health, else add effect
 			//Check then add health
-			if (info != null && info.mType.equals(PotionEffectType.HEAL)) {
+			if (info != null && info.mType != null && info.mType.equals(PotionEffectType.HEAL)) {
 				PlayerUtils.healPlayer(player, 2 * Math.pow(2, info.mAmplifier + 1));
-			} else if (info != null && info.mType.equals(PotionEffectType.HARM)) {
+			} else if (info != null && info.mType != null && info.mType.equals(PotionEffectType.HARM)) {
 				EntityUtils.damageEntity(plugin, player, 3 * Math.pow(2, info.mAmplifier + 1), null);
 			} else {
 				plugin.mPotionManager.addPotion(player, PotionID.APPLIED_POTION, info);

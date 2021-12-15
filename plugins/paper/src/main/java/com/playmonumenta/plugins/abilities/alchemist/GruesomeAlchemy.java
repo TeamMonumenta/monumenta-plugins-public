@@ -5,6 +5,7 @@ import org.bukkit.Particle;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.classes.magic.MagicType;
@@ -23,7 +24,7 @@ public class GruesomeAlchemy extends PotionAbility {
 	private final double mSlownessAmount;
 	private final int mDOTPeriod;
 
-	public GruesomeAlchemy(Plugin plugin, Player player) {
+	public GruesomeAlchemy(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Gruesome Alchemy", 0, 0);
 		mInfo.mScoreboardId = "GruesomeAlchemy";
 		mInfo.mShorthandName = "GA";

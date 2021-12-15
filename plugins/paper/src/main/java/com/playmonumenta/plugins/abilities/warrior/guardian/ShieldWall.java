@@ -19,6 +19,7 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
@@ -41,7 +42,7 @@ public class ShieldWall extends Ability {
 	private static final int SHIELD_WALL_1_COOLDOWN = 20 * 30;
 	private static final int SHIELD_WALL_2_COOLDOWN = 20 * 20;
 
-	public ShieldWall(Plugin plugin, Player player) {
+	public ShieldWall(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Shield Wall");
 		mInfo.mScoreboardId = "ShieldWall";
 		mInfo.mShorthandName = "SW";
@@ -55,6 +56,9 @@ public class ShieldWall extends Ability {
 
 	@Override
 	public void playerSwapHandItemsEvent(PlayerSwapHandItemsEvent event) {
+		if (mPlayer == null) {
+			return;
+		}
 		event.setCancelled(true);
 		if (!isTimerActive()) {
 			int time = getAbilityScore() == 1 ? SHIELD_WALL_1_DURATION : SHIELD_WALL_2_DURATION;
@@ -97,15 +101,12 @@ public class ShieldWall extends Ability {
 					for (BoundingBox box : mBoxes) {
 						for (Entity e :world.getNearbyEntities(box)) {
 							Location eLoc = e.getLocation();
-							if (e instanceof Projectile) {
-								Projectile proj = (Projectile) e;
-								if (proj.getShooter() instanceof LivingEntity) {
-									LivingEntity shooter = (LivingEntity) proj.getShooter();
-									if (!(shooter instanceof Player) || AbilityManager.getManager().isPvPEnabled((Player)shooter)) {
-										proj.remove();
-										world.spawnParticle(Particle.FIREWORKS_SPARK, eLoc, 5, 0, 0, 0, 0.25f);
-										world.playSound(eLoc, Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, 0.75f, 1.5f);
-									}
+							if (e instanceof Projectile proj) {
+								if (proj.getShooter() instanceof LivingEntity shooter
+										&& (!(shooter instanceof Player) || AbilityManager.getManager().isPvPEnabled((Player) shooter))) {
+									proj.remove();
+									world.spawnParticle(Particle.FIREWORKS_SPARK, eLoc, 5, 0, 0, 0, 0.25f);
+									world.playSound(eLoc, Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, 0.75f, 1.5f);
 								}
 							} else if (EntityUtils.isHostileMob(e)) {
 								LivingEntity le = (LivingEntity) e;
@@ -168,6 +169,9 @@ public class ShieldWall extends Ability {
 
 	@Override
 	public boolean runCheck() {
+		if (mPlayer == null) {
+			return false;
+		}
 		ItemStack mHand = mPlayer.getInventory().getItemInMainHand();
 		ItemStack oHand = mPlayer.getInventory().getItemInOffHand();
 		return mHand.getType() == Material.SHIELD || oHand.getType() == Material.SHIELD;

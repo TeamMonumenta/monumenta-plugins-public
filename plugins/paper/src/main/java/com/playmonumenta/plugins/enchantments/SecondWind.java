@@ -2,14 +2,13 @@ package com.playmonumenta.plugins.enchantments;
 
 import java.util.EnumSet;
 
+import org.bukkit.ChatColor;
+import org.bukkit.entity.Player;
+import org.bukkit.event.entity.EntityDamageEvent;
+
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
 import com.playmonumenta.plugins.utils.EntityUtils;
-
-import org.bukkit.ChatColor;
-import org.bukkit.attribute.Attribute;
-import org.bukkit.entity.Player;
-import org.bukkit.event.entity.EntityDamageEvent;
 
 
 
@@ -31,7 +30,7 @@ public class SecondWind implements BaseEnchantment {
 	@Override
 	public void onHurt(Plugin plugin, Player player, int level, EntityDamageEvent event) {
 		double currHealth = player.getHealth();
-		double maxHealth = player.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue();
+		double maxHealth = EntityUtils.getMaxHealth(player);
 		double hpAfterHit = currHealth - EntityUtils.getRealFinalDamage(event);
 		if (currHealth / maxHealth <= HEALTH_LIMIT) {
 			event.setDamage(event.getDamage() * Math.pow(1 - DAMAGE_RESIST, level));

@@ -45,6 +45,9 @@ public class RadiantBlessing extends DepthsAbility {
 
 	@Override
 	public void cast(Action action) {
+		if (mPlayer == null) {
+			return;
+		}
 		Location userLoc = mPlayer.getLocation();
 		World world = mPlayer.getWorld();
 		for (Player p : PlayerUtils.playersInRange(userLoc, HEALING_RADIUS, true)) {
@@ -73,6 +76,9 @@ public class RadiantBlessing extends DepthsAbility {
 
 	@Override
 	public boolean runCheck() {
+		if (mPlayer == null) {
+			return false;
+		}
 		ItemStack mainHand = mPlayer.getInventory().getItemInMainHand();
 		return DepthsUtils.isWeaponItem(mainHand) && mPlayer.isSneaking();
 	}

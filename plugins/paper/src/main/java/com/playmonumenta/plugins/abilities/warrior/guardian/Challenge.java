@@ -15,6 +15,7 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.inventory.ItemStack;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
@@ -46,7 +47,7 @@ public class Challenge extends Ability {
 	private final int mAbsorptionPerMob;
 	private final int mMaxAbsorption;
 
-	public Challenge(Plugin plugin, Player player) {
+	public Challenge(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Challenge");
 		mInfo.mScoreboardId = "Challenge";
 		mInfo.mShorthandName = "Ch";
@@ -64,7 +65,7 @@ public class Challenge extends Ability {
 
 	@Override
 	public void cast(Action action) {
-		if (mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.mLinkedSpell) || !mPlayer.isSneaking()) {
+		if (mPlayer == null || mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.mLinkedSpell) || !mPlayer.isSneaking()) {
 			return;
 		}
 

@@ -9,6 +9,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
@@ -23,7 +24,7 @@ public class WardingRemedyNonApothecary extends Ability {
 	private static final double WARDING_REMEDY_2_DAMAGE_MULTIPLIER = 1.15;
 	private static final Particle.DustOptions APOTHECARY_DARK_COLOR = new Particle.DustOptions(Color.fromRGB(83, 0, 135), 1.0f);
 
-	public WardingRemedyNonApothecary(Plugin plugin, Player player) {
+	public WardingRemedyNonApothecary(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, null);
 	}
 

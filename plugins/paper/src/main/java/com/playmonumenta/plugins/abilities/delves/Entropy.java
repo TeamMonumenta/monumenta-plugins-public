@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.abilities.delves;
 
 import org.bukkit.entity.Player;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.utils.DelvesUtils.Modifier;
@@ -31,7 +32,7 @@ public class Entropy extends DelveModifier {
 			}
 	};
 
-	public Entropy(Plugin plugin, Player player) {
+	public Entropy(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, Modifier.ENTROPY);
 	}
 

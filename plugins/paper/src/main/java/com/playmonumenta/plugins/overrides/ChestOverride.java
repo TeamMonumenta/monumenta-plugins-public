@@ -19,6 +19,7 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.loot.LootTable;
 import org.bukkit.util.Vector;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.utils.ChestUtils;
@@ -65,7 +66,7 @@ public class ChestOverride extends BaseOverride {
 	);
 
 	@Override
-	public boolean rightClickBlockInteraction(Plugin plugin, Player player, Action action, ItemStack item, Block block, PlayerInteractEvent event) {
+	public boolean rightClickBlockInteraction(Plugin plugin, Player player, Action action, @Nullable ItemStack item, Block block, PlayerInteractEvent event) {
 		if (player != null && !player.getGameMode().equals(GameMode.SPECTATOR)) {
 			// Iterate over adjacent blocks to trigger physics
 			for (Vector vec : ADJACENT_OFFSETS) {

@@ -4,7 +4,6 @@ import org.bukkit.Location;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.attribute.AttributeModifier;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
@@ -89,13 +88,13 @@ public class AvengerBoss extends BossAbilityGroup {
 	public void nearbyEntityDeath(EntityDeathEvent event) {
 		if (!event.isCancelled() && mBoss != null) {
 
-			Entity entity = event.getEntity();
+			LivingEntity entity = event.getEntity();
 
 			Location deadLoc = entity.getLocation();
 			Location bossLoc = mBoss.getLocation();
 
 			// Only trigger when the player kills a mob within range
-			if (entity instanceof LivingEntity && ((LivingEntity) entity).getKiller() != null
+			if (entity.getKiller() != null
 					&& entity.getLocation().distance(bossLoc) < mParam.RADIUS) {
 				mParam.SOUND_DEATH.play(bossLoc, 0.1f, 0.8f);
 				mParam.PARTICLE_DEATH.spawn(bossLoc.clone().add(0, mBoss.getHeight() / 2, 0), 0.25, 0.45, 0.25, 1);
@@ -103,6 +102,7 @@ public class AvengerBoss extends BossAbilityGroup {
 				new BukkitRunnable() {
 					int mCount = 0;
 					final int mMaxCount = mParam.VECTOR_TICKS;
+
 					public void run() {
 						if (mCount >= mMaxCount) {
 							mParam.PARTICLE_BOSS.spawn(bossLoc, 20, 1.5, 1.5, 1.5);

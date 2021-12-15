@@ -84,7 +84,7 @@ public class AdvancingShadows extends Ability {
 	private @Nullable LivingEntity mTarget = null;
 	private @Nullable BladeDance mBladeDance;
 
-	public AdvancingShadows(Plugin plugin, Player player) {
+	public AdvancingShadows(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Advancing Shadows");
 		mInfo.mLinkedSpell = ClassAbility.ADVANCING_SHADOWS;
 		mInfo.mScoreboardId = "AdvancingShadows";

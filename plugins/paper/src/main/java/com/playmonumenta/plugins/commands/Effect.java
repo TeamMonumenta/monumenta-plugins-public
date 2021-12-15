@@ -12,6 +12,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.potion.PotionManager;
@@ -131,7 +132,7 @@ public class Effect {
 	}
 
 	private static void clearEffect(Plugin plugin, CommandSender sender, Collection<Entity> entities,
-	                                PotionEffectType type) {
+	                                @Nullable PotionEffectType type) {
 		PotionManager manager = plugin.mPotionManager;
 
 		World world = null;
@@ -139,7 +140,7 @@ public class Effect {
 			world = e.getWorld();
 			if (e instanceof Player && manager != null) {
 				// This is a player - use the potion manager
-				Player player = (Player)e;
+				Player player = (Player) e;
 
 				if (type == null) {
 					// Clear all effects

@@ -56,7 +56,7 @@ public class UnstableArrows extends Ability {
 
 	private @Nullable AbstractArrow mUnstableArrow = null;
 
-	public UnstableArrows(Plugin plugin, Player player) {
+	public UnstableArrows(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Unstable Arrows");
 		mInfo.mLinkedSpell = ClassAbility.UNSTABLE_ARROWS;
 		mInfo.mScoreboardId = "BombArrow";
@@ -84,15 +84,19 @@ public class UnstableArrows extends Ability {
 				mUnstableArrow = null;
 
 				new BukkitRunnable() {
-					Location mLoc = EntityUtils.getProjectileHitLocation(event);
+					final Location mLoc = EntityUtils.getProjectileHitLocation(event);
 					int mTicks = 0;
 					@Override
 					public void run() {
+						if (mPlayer == null) {
+							this.cancel();
+							return;
+						}
 						World world = mPlayer.getWorld();
 						world.spawnParticle(Particle.FLAME, mLoc, 3, 0.3, 0.3, 0.3, 0.05);
 						world.spawnParticle(Particle.SMOKE_NORMAL, mLoc, 7, 0.5, 0.5, 0.5, 0.075);
 						world.playSound(mLoc, Sound.BLOCK_LAVA_EXTINGUISH, 0.3f,
-						                 ((UNSTABLE_ARROWS_DURATION / 3.0f) + mTicks) / (1.5f * UNSTABLE_ARROWS_DURATION));
+						                ((UNSTABLE_ARROWS_DURATION / 3.0f) + mTicks) / (1.5f * UNSTABLE_ARROWS_DURATION));
 						if (mTicks % 18 == 0) {
 							world.playSound(mLoc, Sound.BLOCK_LAVA_EXTINGUISH, 1.6f, 1f + mTicks / 36f);
 							world.spawnParticle(Particle.LAVA, mLoc, 80, UNSTABLE_ARROWS_RADIUS, 0, UNSTABLE_ARROWS_RADIUS, 0);

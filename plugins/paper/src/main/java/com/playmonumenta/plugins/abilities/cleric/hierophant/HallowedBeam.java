@@ -60,7 +60,7 @@ public class HallowedBeam extends MultipleChargeAbility {
 	private int mMode = 0;
 	private int mLastCastTicks = 0;
 
-	public HallowedBeam(Plugin plugin, Player player) {
+	public HallowedBeam(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Hallowed Beam");
 		mInfo.mScoreboardId = "HallowedBeam";
 		mInfo.mShorthandName = "HB";
@@ -82,13 +82,16 @@ public class HallowedBeam extends MultipleChargeAbility {
 
 	@Override
 	public void cast(Action action) {
+		if (mPlayer == null) {
+			return;
+		}
 		LivingEntity e = EntityUtils.getEntityAtCursor(mPlayer, CAST_RANGE, true, true, true);
-		if (e instanceof Player && ((Player) e).getGameMode() != GameMode.SPECTATOR || e != null && EntityUtils.isHostileMob(e)) {
+		if (e instanceof Player && ((Player) e).getGameMode() != GameMode.SPECTATOR || EntityUtils.isHostileMob(e)) {
 			Player player = mPlayer;
 
 			PlayerInventory inventory = mPlayer.getInventory();
 			ItemStack inMainHand = inventory.getItemInMainHand();
-			Damageable damageable = (Damageable)inMainHand.getItemMeta();
+			Damageable damageable = (Damageable) inMainHand.getItemMeta();
 
 			if (ItemUtils.isSomeBow(inMainHand) && !ItemUtils.isShootableItem(inventory.getItemInOffHand()) && !ItemUtils.isItemShattered(inMainHand) && !(damageable.getDamage() > inMainHand.getType().getMaxDurability())) {
 				int ticks = mPlayer.getTicksLived();
@@ -129,7 +132,7 @@ public class HallowedBeam extends MultipleChargeAbility {
 								}
 							}
 						}
-						if ((applyE instanceof Player && ((Player) applyE).getGameMode() != GameMode.SPECTATOR)) {
+						if ((applyE instanceof Player pe && pe.getGameMode() != GameMode.SPECTATOR)) {
 							if (mMode == 2) {
 								incrementCharge();
 								this.cancel();
@@ -147,7 +150,6 @@ public class HallowedBeam extends MultipleChargeAbility {
 									break;
 								}
 							}
-							Player pe = (Player) applyE;
 							Location eLoc = pe.getLocation().add(0, pe.getHeight() / 2, 0);
 							world.spawnParticle(Particle.SPELL_INSTANT, pe.getLocation(), 500, 2.5, 0.15f, 2.5, 1);
 							world.spawnParticle(Particle.VILLAGER_HAPPY, pe.getLocation(), 150, 2.55, 0.15f, 2.5, 1);
@@ -247,6 +249,9 @@ public class HallowedBeam extends MultipleChargeAbility {
 
 	@Override
 	public void playerSwapHandItemsEvent(PlayerSwapHandItemsEvent event) {
+		if (mPlayer == null) {
+			return;
+		}
 		PlayerInventory inventory = mPlayer.getInventory();
 		ItemStack inMainHand = inventory.getItemInMainHand();
 

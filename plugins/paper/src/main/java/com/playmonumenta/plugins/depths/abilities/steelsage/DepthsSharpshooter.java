@@ -60,6 +60,9 @@ public class DepthsSharpshooter extends DepthsAbility implements AbilityWithChar
 
 	@Override
 	public void periodicTrigger(boolean twoHertz, boolean oneSecond, int ticks) {
+		if (mPlayer == null) {
+			return;
+		}
 		if (mStacks > 0) {
 			mTicksToStackDecay -= 5;
 

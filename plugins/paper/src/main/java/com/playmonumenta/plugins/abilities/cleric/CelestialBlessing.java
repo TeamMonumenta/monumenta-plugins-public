@@ -13,6 +13,7 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.inventory.ItemStack;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
@@ -51,7 +52,7 @@ public class CelestialBlessing extends Ability {
 	);
 	public static final String DAMAGE_EFFECT_NAME = "CelestialBlessingExtraDamage";
 
-	public CelestialBlessing(Plugin plugin, Player player) {
+	public CelestialBlessing(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Celestial Blessing");
 		mInfo.mLinkedSpell = ClassAbility.CELESTIAL_BLESSING;
 		mInfo.mScoreboardId = "Celestial";

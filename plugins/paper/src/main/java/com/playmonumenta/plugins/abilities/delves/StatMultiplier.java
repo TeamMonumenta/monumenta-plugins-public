@@ -13,6 +13,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.EntitySpawnEvent;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.bosses.bosses.CrowdControlImmunityBoss;
@@ -65,14 +66,14 @@ public class StatMultiplier extends DelveModifier {
 	private final double mHealthMultiplier;
 	private final double mSpeedMultiplier;
 
-	public StatMultiplier(Plugin plugin, Player player) {
+	public StatMultiplier(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, null);
 
 		Double statCompensation = STAT_COMPENSATION_MAPPINGS.get(ServerProperties.getShardName());
 		mStatCompensation = statCompensation == null ? 1 : statCompensation;
 
 		mDelveMobStatMultiplier = ServerProperties.getClassSpecializationsEnabled()
-				? DELVE_MOB_STAT_MULTIPLIER_R2 : DELVE_MOB_STAT_MULTIPLIER_R1;
+			? DELVE_MOB_STAT_MULTIPLIER_R2 : DELVE_MOB_STAT_MULTIPLIER_R1;
 
 		if (player != null) {
 			int points = DelvesUtils.getDelveInfo(player).getDepthPoints();

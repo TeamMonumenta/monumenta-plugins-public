@@ -44,7 +44,7 @@ public class Avalanche extends DepthsAbility {
 	@Override
 	public void playerSwapHandItemsEvent(PlayerSwapHandItemsEvent event) {
 		event.setCancelled(true);
-		if (!isTimerActive()) {
+		if (mPlayer != null && !isTimerActive()) {
 			World world = mPlayer.getWorld();
 			Location loc = mPlayer.getLocation();
 
@@ -86,7 +86,7 @@ public class Avalanche extends DepthsAbility {
 
 	@Override
 	public boolean runCheck() {
-		return (!isOnCooldown() && DepthsUtils.isWeaponItem(mPlayer.getInventory().getItemInMainHand()));
+		return mPlayer != null && !isOnCooldown() && DepthsUtils.isWeaponItem(mPlayer.getInventory().getItemInMainHand());
 	}
 
 	@Override

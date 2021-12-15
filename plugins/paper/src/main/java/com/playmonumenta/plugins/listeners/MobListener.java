@@ -59,7 +59,7 @@ import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
 public class MobListener implements Listener {
 	static final int SPAWNER_DROP_THRESHOLD = 20;
 	static final int ALCH_PASSIVE_RADIUS = 12;
-	Plugin mPlugin = null;
+	private final Plugin mPlugin;
 
 	public MobListener(Plugin plugin) {
 		mPlugin = plugin;
@@ -313,7 +313,7 @@ public class MobListener implements Listener {
 		if (livingEntity instanceof Evoker) {
 			List<LivingEntity> vexes = EntityUtils.getNearbyMobs(livingEntity.getLocation(), 30, EnumSet.of(EntityType.VEX));
 			for (LivingEntity vex : vexes) {
-				if (vex instanceof Vex && ((Vex) vex).getSummoner() != null && ((Vex)vex).getSummoner().equals(livingEntity)) {
+				if (vex instanceof Vex && livingEntity.equals(((Vex) vex).getSummoner())) {
 					vex.addPotionEffect(new PotionEffect(PotionEffectType.WITHER, 9999, 3));
 				}
 			}

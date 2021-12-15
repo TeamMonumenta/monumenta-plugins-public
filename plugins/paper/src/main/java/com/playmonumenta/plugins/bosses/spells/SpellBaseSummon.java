@@ -134,7 +134,6 @@ public class SpellBaseSummon extends Spell {
 
 						Vector offset = mLocationOffsets.get(mIndex);
 						Location loc = player.getLocation().add(offset);
-						BukkitRunnable r = mSummon.run(loc, player);
 
 						// Underneath block must be solid
 						if (!loc.subtract(0, 1, 0).getBlock().getType().isSolid()) {
@@ -147,7 +146,8 @@ public class SpellBaseSummon extends Spell {
 						}
 
 						// Summon the mob
-						if (mSummon.run(loc, player) != null) {
+						BukkitRunnable r = mSummon.run(loc, player);
+						if (r != null) {
 							mActiveRunnables.add(r);
 						}
 						mIndex++;

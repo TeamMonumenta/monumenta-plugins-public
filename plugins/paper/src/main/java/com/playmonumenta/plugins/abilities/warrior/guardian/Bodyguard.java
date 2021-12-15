@@ -16,6 +16,7 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
@@ -44,7 +45,7 @@ public class Bodyguard extends Ability {
 
 	private int mLeftClicks = 0;
 
-	public Bodyguard(Plugin plugin, Player player) {
+	public Bodyguard(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Bodyguard");
 		mInfo.mScoreboardId = "Bodyguard";
 		mInfo.mShorthandName = "Bg";

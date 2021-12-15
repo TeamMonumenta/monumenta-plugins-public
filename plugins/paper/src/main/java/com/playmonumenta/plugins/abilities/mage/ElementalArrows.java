@@ -11,6 +11,7 @@ import org.bukkit.entity.Stray;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
@@ -33,7 +34,7 @@ public class ElementalArrows extends Ability {
 
 	private double mLastDamage = 0;
 
-	public ElementalArrows(Plugin plugin, Player player) {
+	public ElementalArrows(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, NAME);
 		mInfo.mLinkedSpell = ABILITY;
 
@@ -46,7 +47,7 @@ public class ElementalArrows extends Ability {
 
 	@Override
 	public boolean livingEntityShotByPlayerEvent(Projectile proj, LivingEntity damagee, EntityDamageByEntityEvent event) {
-		if (!EntityUtils.isSomeArrow(proj)) {
+		if (mPlayer == null || !EntityUtils.isSomeArrow(proj)) {
 			return true;
 		}
 		AbstractArrow arrow = (AbstractArrow) proj;
@@ -92,6 +93,9 @@ public class ElementalArrows extends Ability {
 
 	@Override
 	public boolean playerShotArrowEvent(AbstractArrow arrow) {
+		if (mPlayer == null) {
+			return true;
+		}
 		if (arrow.isCritical()) {
 			if (mPlayer.isSneaking()) {
 				arrow.setMetadata("ElementalArrowsIceArrow", new FixedMetadataValue(mPlugin, 0));

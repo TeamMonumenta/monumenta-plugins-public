@@ -8,12 +8,13 @@ import org.bukkit.Material;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import net.coreprotect.CoreProtect;
 import net.coreprotect.CoreProtectAPI;
 
 public class CoreProtectIntegration {
-	private static CoreProtectAPI API = null;
+	private static @Nullable CoreProtectAPI API = null;
 
 	public CoreProtectIntegration(Logger logger) {
 		logger.info("Enabling CoreProtect integration");

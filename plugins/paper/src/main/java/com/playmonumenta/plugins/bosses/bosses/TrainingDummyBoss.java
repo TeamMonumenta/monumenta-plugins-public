@@ -4,7 +4,6 @@ import java.text.DecimalFormat;
 import java.util.Arrays;
 
 import org.bukkit.ChatColor;
-import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -14,6 +13,7 @@ import org.bukkit.plugin.Plugin;
 
 import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.spells.SpellRunAction;
+import com.playmonumenta.plugins.utils.EntityUtils;
 
 public class TrainingDummyBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_training_dummy";
@@ -28,7 +28,7 @@ public class TrainingDummyBoss extends BossAbilityGroup {
 		super(plugin, identityTag, boss);
 		SpellManager activeSpells = new SpellManager(Arrays.asList(
 			new SpellRunAction(() -> {
-				boss.setHealth(boss.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue());
+				boss.setHealth(EntityUtils.getMaxHealth(boss));
 			}, 60 * 20)
 		));
 
@@ -51,16 +51,10 @@ public class TrainingDummyBoss extends BossAbilityGroup {
 			damageString += ".0"; // DecimalFormat would take 1.0 to "1", but the ".0" is desired
 		}
 
-		if (damager instanceof Player) {
-			Player player = (Player) damager;
+		if (damager instanceof Player player) {
 			player.sendMessage(ChatColor.GOLD + "Damage: " + ChatColor.RED + damageString);
-		}
-
-		if (damager instanceof Projectile) {
-			Projectile projectile = (Projectile) damager;
-
-			if (projectile.getShooter() instanceof Player) {
-				Player player = (Player) projectile.getShooter();
+		} else if (damager instanceof Projectile projectile) {
+			if (projectile.getShooter() instanceof Player player) {
 				player.sendMessage(ChatColor.GOLD + "Damage: " + ChatColor.RED + damageString);
 			}
 		}

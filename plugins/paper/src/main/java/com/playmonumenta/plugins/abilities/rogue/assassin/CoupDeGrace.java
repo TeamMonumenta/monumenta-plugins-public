@@ -13,6 +13,7 @@ import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
@@ -38,7 +39,7 @@ public class CoupDeGrace extends Ability {
 	private final double mNormalThreshold;
 	private final double mEliteThreshold;
 
-	public CoupDeGrace(Plugin plugin, Player player) {
+	public CoupDeGrace(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Coup de Grace");
 		mInfo.mScoreboardId = "CoupDeGrace";
 		mInfo.mShorthandName = "CdG";
@@ -51,8 +52,7 @@ public class CoupDeGrace extends Ability {
 
 	@Override
 	public boolean livingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
-		if ((event.getCause() == DamageCause.ENTITY_ATTACK || event.getCause() == DamageCause.ENTITY_SWEEP_ATTACK) && event.getEntity() instanceof LivingEntity) {
-			LivingEntity le = (LivingEntity) event.getEntity();
+		if ((event.getCause() == DamageCause.ENTITY_ATTACK || event.getCause() == DamageCause.ENTITY_SWEEP_ATTACK) && event.getEntity() instanceof LivingEntity le) {
 			for (PotionEffect effect : le.getActivePotionEffects()) {
 				if (effect.getType() == PotionEffectType.DAMAGE_RESISTANCE && effect.getAmplifier() >= 4) {
 					return true;
@@ -78,7 +78,7 @@ public class CoupDeGrace extends Ability {
 
 	@Override
 	public void playerDealtCustomDamageEvent(CustomDamageEvent event) {
-		if (event.getDamaged() instanceof LivingEntity && event.getMagicType() == MagicType.ENCHANTMENT) {
+		if (event.getMagicType() == MagicType.ENCHANTMENT) {
 			LivingEntity le = event.getDamaged();
 			AttributeInstance maxHealth = le.getAttribute(Attribute.GENERIC_MAX_HEALTH);
 			if (maxHealth != null) {

@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.itemindex;
 
 import java.util.ArrayList;
+import java.util.TreeMap;
 
 import org.bukkit.Material;
 import org.bukkit.attribute.AttributeModifier;
@@ -198,7 +199,7 @@ public class ItemIndexCommand {
 	}
 
 	private static void registerRemove() {
-		//mi enableEdit
+		//mi remove
 		new CommandAPICommand(COMMAND)
 			.withPermission(CommandPermission.fromString("monumenta.mi"))
 			.withArguments(new MultiLiteralArgument("remove"))
@@ -220,7 +221,7 @@ public class ItemIndexCommand {
 	}
 
 	private static void registerReload() {
-		//mi enableEdit
+		//mi reload
 		new CommandAPICommand(COMMAND)
 			.withPermission(CommandPermission.fromString("monumenta.mi"))
 			.withArguments(new MultiLiteralArgument("reload"))
@@ -407,7 +408,7 @@ public class ItemIndexCommand {
 	}
 
 	private static void registerEditLore() {
-		//mi edit name <value>
+		//mi edit lore <index> <value>
 		new CommandAPICommand(COMMAND)
 			.withPermission(CommandPermission.fromString("monumenta.mi"))
 			.withArguments(new MultiLiteralArgument("edit"))
@@ -697,7 +698,7 @@ public class ItemIndexCommand {
 				if (item == null) {
 					return;
 				}
-				Integer index = (Integer)args[3] - 1;
+				Integer index = (Integer) args[3] - 1;
 				ItemStack offHandItem = p.getInventory().getItemInOffHand();
 				MonumentaItem ohMMItem = Plugin.getInstance().mItemManager.getMMItemWithEdits(offHandItem);
 				if (ohMMItem == null) {
@@ -705,13 +706,14 @@ public class ItemIndexCommand {
 					return;
 				}
 				ohMMItem.preCalc();
-				if (ohMMItem.getLore() == null || ohMMItem.getLore().size() == 0) {
+				TreeMap<Integer, String> lore = ohMMItem.getLore();
+				if (lore == null || lore.size() == 0) {
 					p.sendMessage("To use that command, you must have a MonumentaItem containing lore data in your offhand");
 					return;
 				}
 				ArrayList<String> loreLines = new ArrayList<>();
-				for (int i = 0; i <= ohMMItem.getLore().lastKey(); i++) {
-					loreLines.add(ohMMItem.getLore().getOrDefault(i, ""));
+				for (int i = 0; i <= lore.lastKey(); i++) {
+					loreLines.add(lore.getOrDefault(i, ""));
 				}
 				item.edit().setBookPageContent(index, String.join("\n", loreLines.toArray(new String[0])));
 				updateItemInHand(item, p);

@@ -17,13 +17,13 @@ import org.bukkit.scoreboard.Team;
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 
-public class TrackingManager {
+public final class TrackingManager {
 	private static final String UNPUSHABLE_TEAM = "UNPUSHABLE_TEAM";
 	private static final String UNPUSHABLE_TAG = "UNPUSHABLE";
 	private static final String PUSHABLE_TAG = "PUSHABLE";
 
-	private Plugin mPlugin;
-	private Team mUnpushableTeam;
+	private final Plugin mPlugin;
+	private final Team mUnpushableTeam;
 
 	public PlayerTracking mPlayers;
 	public CreeperTracking mCreepers;
@@ -38,12 +38,13 @@ public class TrackingManager {
 		// Create a new team (or clear it if it exists) on the scoreboard to use to
 		// make entities unpushable
 		Scoreboard scoreboard = Bukkit.getScoreboardManager().getMainScoreboard();
-		mUnpushableTeam = scoreboard.getTeam(UNPUSHABLE_TEAM);
-		if (mUnpushableTeam != null) {
-			mUnpushableTeam.unregister();
+		Team unpushableTeam = scoreboard.getTeam(UNPUSHABLE_TEAM);
+		if (unpushableTeam != null) {
+			unpushableTeam.unregister();
 		}
-		mUnpushableTeam = scoreboard.registerNewTeam(UNPUSHABLE_TEAM);
-		mUnpushableTeam.setOption(Team.Option.COLLISION_RULE, Team.OptionStatus.NEVER);
+		unpushableTeam = scoreboard.registerNewTeam(UNPUSHABLE_TEAM);
+		unpushableTeam.setOption(Team.Option.COLLISION_RULE, Team.OptionStatus.NEVER);
+		mUnpushableTeam = unpushableTeam;
 
 		mPlayers = new PlayerTracking(mPlugin);
 		mCreepers = new CreeperTracking();

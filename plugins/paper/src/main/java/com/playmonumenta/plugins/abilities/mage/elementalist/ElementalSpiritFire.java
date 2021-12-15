@@ -56,7 +56,7 @@ public class ElementalSpiritFire extends Ability {
 	private @Nullable BukkitTask mPlayerParticlesGenerator;
 	private @Nullable BukkitTask mEnemiesAffectedProcessor;
 
-	public ElementalSpiritFire(Plugin plugin, Player player) {
+	public ElementalSpiritFire(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, NAME);
 		mInfo.mLinkedSpell = ABILITY;
 

@@ -45,8 +45,7 @@ public final class IceAspectBoss extends BossAbilityGroup {
 
 	@Override
 	public void bossDamagedEntity(EntityDamageByEntityEvent event) {
-		if (event.getEntity() instanceof Player) {
-			Player player = (Player)event.getEntity();
+		if (event.getEntity() instanceof Player player) {
 			if (BossUtils.bossDamageBlocked(player, event.getDamage(), event.getDamager().getLocation()) && event.getCause() != DamageCause.MAGIC) {
 				return;
 			}

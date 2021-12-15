@@ -1,5 +1,11 @@
 package com.playmonumenta.plugins.abilities.warlock;
 
+import org.bukkit.entity.Player;
+import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
@@ -7,18 +13,12 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 
-import org.bukkit.entity.Player;
-import org.bukkit.event.entity.EntityDeathEvent;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
-
-
 
 public class WarlockPassive extends Ability {
 
 	private static final int PASSIVE_DURATION = 6 * 20;
 
-	public WarlockPassive(Plugin plugin, Player player) {
+	public WarlockPassive(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, null);
 	}
 

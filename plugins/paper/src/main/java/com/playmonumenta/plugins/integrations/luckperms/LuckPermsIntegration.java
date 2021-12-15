@@ -55,7 +55,7 @@ public class LuckPermsIntegration {
 		return null;
 	}
 
-	public static @Nullable String getGuildName(Group group) {
+	public static @Nullable String getGuildName(@Nullable Group group) {
 		if (group == null) {
 			return null;
 		}

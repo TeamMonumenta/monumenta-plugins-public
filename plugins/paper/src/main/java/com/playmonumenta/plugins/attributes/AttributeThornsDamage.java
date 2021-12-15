@@ -30,8 +30,7 @@ public class AttributeThornsDamage implements BaseAttribute {
 			return;
 		}
 		//Set damager to shooter of arrow instead of the actual arrow if hit by projectile damage.
-		if (damager instanceof AbstractArrow) {
-			final AbstractArrow arrow = (AbstractArrow) event.getDamager();
+		if (damager instanceof AbstractArrow arrow) {
 			final ProjectileSource shooter = arrow.getShooter();
 			if (shooter instanceof Entity) {
 				damager = (Entity) shooter;

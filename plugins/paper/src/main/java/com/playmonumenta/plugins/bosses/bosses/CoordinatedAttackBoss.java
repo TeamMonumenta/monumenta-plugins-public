@@ -66,7 +66,7 @@ public class CoordinatedAttackBoss extends BossAbilityGroup {
 			world.spawnParticle(Particle.SPELL_WITCH, loc.clone().add(0, 0.5, 0), 30, 2, 0.5, 2, 0);
 
 			new BukkitRunnable() {
-				Player mTarget = (Player) target;
+				final Player mTarget = (Player) target;
 
 				@Override
 				public void run() {

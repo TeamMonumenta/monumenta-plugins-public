@@ -7,6 +7,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.alchemist.PotionAbility;
@@ -23,7 +24,7 @@ public class NightmarishAlchemy extends PotionAbility {
 
 	private final float mConfusionChance;
 
-	public NightmarishAlchemy(Plugin plugin, Player player) {
+	public NightmarishAlchemy(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Nightmarish Alchemy", NIGHTMARISH_ALCHEMY_1_DAMAGE, NIGHTMARISH_ALCHEMY_2_DAMAGE);
 		mInfo.mLinkedSpell = ClassAbility.NIGHTMARISH_ALCHEMY;
 		mInfo.mScoreboardId = "Nightmarish";

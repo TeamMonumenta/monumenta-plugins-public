@@ -13,6 +13,7 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
@@ -32,10 +33,11 @@ public class SpellBaseLeapAttack extends Spell {
 	public interface HitAction {
 		/**
 		 * Called when the boss intersects a player or lands
+		 *
 		 * @param player Player being targeted (null if landed)
 		 * @param loc    Location where the projectile hit (either at player or location landed)
 		 */
-		void run(World world, Player player, Location loc, Vector dir);
+		void run(World world, @Nullable Player player, Location loc, Vector dir);
 	}
 
 	@FunctionalInterface

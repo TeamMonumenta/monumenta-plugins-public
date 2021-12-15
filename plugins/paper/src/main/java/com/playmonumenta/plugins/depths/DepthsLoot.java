@@ -16,16 +16,17 @@ import org.bukkit.loot.LootTable;
 import org.bukkit.util.Vector;
 
 import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.NamespacedKeyUtils;
 
 public class DepthsLoot {
 
-	public static final NamespacedKey CCS_KEY = NamespacedKey.fromString("epic:r2/items/currency/compressed_crystalline_shard");
-	public static final NamespacedKey HCS_KEY = NamespacedKey.fromString("epic:r2/items/currency/hyper_crystalline_shard");
-	public static final NamespacedKey POTION_KEY = NamespacedKey.fromString("epic:r2/depths/loot/potion_roll");
-	public static final NamespacedKey RELIC_KEY = NamespacedKey.fromString("epic:r2/depths/loot/relicroll");
-	public static final NamespacedKey GEODE_KEY = NamespacedKey.fromString("epic:r2/depths/loot/voidstained_geode");
-	public static final NamespacedKey POME_KEY = NamespacedKey.fromString("epic:r2/delves/items/twisted_pome");
-	public static final NamespacedKey TROPHY_KEY = NamespacedKey.fromString("epic:r2/delves/trophies/depths");
+	public static final NamespacedKey CCS_KEY = NamespacedKeyUtils.fromString("epic:r2/items/currency/compressed_crystalline_shard");
+	public static final NamespacedKey HCS_KEY = NamespacedKeyUtils.fromString("epic:r2/items/currency/hyper_crystalline_shard");
+	public static final NamespacedKey POTION_KEY = NamespacedKeyUtils.fromString("epic:r2/depths/loot/potion_roll");
+	public static final NamespacedKey RELIC_KEY = NamespacedKeyUtils.fromString("epic:r2/depths/loot/relicroll");
+	public static final NamespacedKey GEODE_KEY = NamespacedKeyUtils.fromString("epic:r2/depths/loot/voidstained_geode");
+	public static final NamespacedKey POME_KEY = NamespacedKeyUtils.fromString("epic:r2/delves/items/twisted_pome");
+	public static final NamespacedKey TROPHY_KEY = NamespacedKeyUtils.fromString("epic:r2/delves/trophies/depths");
 
 	public static final int RELIC_CHANCE = 250;
 

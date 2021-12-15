@@ -4,23 +4,24 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 
+import org.bukkit.entity.Player;
+import org.bukkit.scheduler.BukkitRunnable;
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 
-import org.bukkit.entity.Player;
-import org.bukkit.scheduler.BukkitRunnable;
-
 public class DailyReset {
 	private static final String DAILY_PLAYER_CHANGES_COMMAND = "execute as @S at @s run function monumenta:mechanisms/daily_player_changes";
 	// Offset server time to UTC-9 to change when the new day arrives.
-	// Daily resets should match quest stuff & play's daily daily reboots at 9am UTC
-	private static final ZoneId TIMEZONE = ZoneOffset.of("-9");
-	private static BukkitRunnable mRunnable = null;
+	// Daily resets should match quest stuff & play's daily reboots at 9am UTC
+	private static final ZoneId TIMEZONE = ZoneOffset.ofHours(-9);
+	private static @Nullable BukkitRunnable mRunnable = null;
 
 	public static void startTimer(Plugin plugin) {
 		if (mRunnable == null || mRunnable.isCancelled()) {
-			new BukkitRunnable() {
+			mRunnable = new BukkitRunnable() {
 				int mCurVers = getDailyVersion();
 
 				@Override
@@ -34,7 +35,8 @@ public class DailyReset {
 						mCurVers = newVers;
 					}
 				}
-			}.runTaskTimer(plugin, 0, 1200);
+			};
+			mRunnable.runTaskTimer(plugin, 0, 1200);
 		}
 	}
 

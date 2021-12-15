@@ -3,19 +3,20 @@ package com.playmonumenta.plugins.classes;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.scout.Agility;
-import com.playmonumenta.plugins.abilities.scout.HuntingCompanion;
 import com.playmonumenta.plugins.abilities.scout.EagleEye;
-import com.playmonumenta.plugins.abilities.scout.WindBomb;
+import com.playmonumenta.plugins.abilities.scout.HuntingCompanion;
 import com.playmonumenta.plugins.abilities.scout.Sharpshooter;
 import com.playmonumenta.plugins.abilities.scout.SwiftCuts;
 import com.playmonumenta.plugins.abilities.scout.Swiftness;
 import com.playmonumenta.plugins.abilities.scout.Volley;
+import com.playmonumenta.plugins.abilities.scout.WindBomb;
 import com.playmonumenta.plugins.abilities.scout.hunter.PinningShot;
-import com.playmonumenta.plugins.abilities.scout.hunter.SplitArrow;
 import com.playmonumenta.plugins.abilities.scout.hunter.PredatorStrike;
+import com.playmonumenta.plugins.abilities.scout.hunter.SplitArrow;
 import com.playmonumenta.plugins.abilities.scout.ranger.Quickdraw;
 import com.playmonumenta.plugins.abilities.scout.ranger.TacticalManeuver;
 import com.playmonumenta.plugins.abilities.scout.ranger.WhirlingBlade;
@@ -26,7 +27,7 @@ import net.md_5.bungee.api.ChatColor;
 
 public class Scout extends PlayerClass {
 
-	Scout(Plugin plugin, Player player) {
+	Scout(Plugin plugin, @Nullable Player player) {
 		mAbilities.add(new Agility(plugin, player));
 		mAbilities.add(new HuntingCompanion(plugin, player));
 		mAbilities.add(new EagleEye(plugin, player));

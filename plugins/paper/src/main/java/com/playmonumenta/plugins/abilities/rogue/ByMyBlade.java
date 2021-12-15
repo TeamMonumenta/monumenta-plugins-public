@@ -14,6 +14,7 @@ import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
@@ -63,7 +64,7 @@ public class ByMyBlade extends Ability {
 
 	private final int mDamageBonus;
 
-	public ByMyBlade(Plugin plugin, Player player) {
+	public ByMyBlade(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "By My Blade");
 		mInfo.mLinkedSpell = ClassAbility.BY_MY_BLADE;
 		mInfo.mScoreboardId = "ByMyBlade";
@@ -77,7 +78,7 @@ public class ByMyBlade extends Ability {
 
 	@Override
 	public boolean livingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
-		if (event.getCause() == DamageCause.ENTITY_ATTACK) {
+		if (mPlayer != null && event.getCause() == DamageCause.ENTITY_ATTACK) {
 			int duration = BY_MY_BLADE_HASTE_DURATION + (int) ByMyBladeDurationEnchantment.getExtraDuration(mPlayer, ByMyBladeDurationEnchantment.class);
 			int hasteAmplifier = getAbilityScore() == 1 ? BY_MY_BLADE_1_HASTE_AMPLIFIER : BY_MY_BLADE_2_HASTE_AMPLIFIER;
 			hasteAmplifier += ByMyBladeHasteEnchantment.getLevel(mPlayer, ByMyBladeHasteEnchantment.class);
@@ -119,7 +120,7 @@ public class ByMyBlade extends Ability {
 
 	@Override
 	public boolean runCheck() {
-		if (PlayerUtils.isFallingAttack(mPlayer)) {
+		if (mPlayer != null && PlayerUtils.isFallingAttack(mPlayer)) {
 			ItemStack mainHand = mPlayer.getInventory().getItemInMainHand();
 			ItemStack offHand = mPlayer.getInventory().getItemInOffHand();
 			return InventoryUtils.rogueTriggerCheck(mainHand, offHand);

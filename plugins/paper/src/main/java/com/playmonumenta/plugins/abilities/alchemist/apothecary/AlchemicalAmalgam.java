@@ -16,6 +16,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
@@ -50,7 +51,7 @@ public class AlchemicalAmalgam extends Ability {
 	private final int mDamage;
 	private final int mShield;
 
-	public AlchemicalAmalgam(Plugin plugin, Player player) {
+	public AlchemicalAmalgam(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Alchemical Amalgam");
 		mInfo.mScoreboardId = "Alchemical";
 		mInfo.mShorthandName = "AAm";
@@ -66,6 +67,9 @@ public class AlchemicalAmalgam extends Ability {
 
 	@Override
 	public void cast(Action action) {
+		if (mPlayer == null) {
+			return;
+		}
 		World world = mPlayer.getWorld();
 		world.playSound(mPlayer.getLocation(), Sound.ENTITY_BLAZE_AMBIENT, 1, 1.75f);
 		world.playSound(mPlayer.getLocation(), Sound.ENTITY_WITHER_AMBIENT, 1, 0.75f);
@@ -182,6 +186,9 @@ public class AlchemicalAmalgam extends Ability {
 
 	@Override
 	public boolean runCheck() {
+		if (mPlayer == null) {
+			return false;
+		}
 		ItemStack inMainHand = mPlayer.getInventory().getItemInMainHand();
 		return mPlayer.isSneaking() && ItemUtils.isSomeBow(inMainHand);
 	}

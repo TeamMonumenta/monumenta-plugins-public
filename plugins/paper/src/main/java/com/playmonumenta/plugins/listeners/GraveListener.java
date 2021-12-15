@@ -33,6 +33,7 @@ import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.destroystokyo.paper.event.entity.EntityRemoveFromWorldEvent;
 import com.playmonumenta.plugins.Plugin;
@@ -258,14 +259,13 @@ public class GraveListener implements Listener {
 			event.getDrops().clear();
 
 			ArrayList<ItemStack> droppedItems = new ArrayList<>();
-			HashMap<EquipmentSlot, ItemStack> equipment = new HashMap<EquipmentSlot, ItemStack>() {{
-				put(EquipmentSlot.HEAD, player.getInventory().getHelmet());
-				put(EquipmentSlot.CHEST, player.getInventory().getChestplate());
-				put(EquipmentSlot.LEGS, player.getInventory().getLeggings());
-				put(EquipmentSlot.FEET, player.getInventory().getBoots());
-				put(EquipmentSlot.HAND, player.getInventory().getItemInMainHand());
-				put(EquipmentSlot.OFF_HAND, player.getInventory().getItemInOffHand());
-			}};
+			HashMap<EquipmentSlot, @Nullable ItemStack> equipment = new HashMap<>();
+			equipment.put(EquipmentSlot.HEAD, player.getInventory().getHelmet());
+			equipment.put(EquipmentSlot.CHEST, player.getInventory().getChestplate());
+			equipment.put(EquipmentSlot.LEGS, player.getInventory().getLeggings());
+			equipment.put(EquipmentSlot.FEET, player.getInventory().getBoots());
+			equipment.put(EquipmentSlot.HAND, player.getInventory().getItemInMainHand());
+			equipment.put(EquipmentSlot.OFF_HAND, player.getInventory().getItemInOffHand());
 
 			for (int slot = 0; slot <= 40; slot++) {
 				ItemStack item = inv.getItem(slot);

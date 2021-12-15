@@ -5,6 +5,7 @@ import java.util.EnumSet;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Item;
 import org.bukkit.inventory.ItemStack;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.enchantments.BaseSpawnableItemEnchantment;
@@ -35,7 +36,7 @@ public class CurseOfEphemerality implements BaseSpawnableItemEnchantment {
 		item.remove();
 	}
 
-	public static boolean isEphemeral(ItemStack item) {
+	public static boolean isEphemeral(@Nullable ItemStack item) {
 		return InventoryUtils.getCustomEnchantLevel(item, PROPERTY_NAME, false) != 0;
 	}
 }

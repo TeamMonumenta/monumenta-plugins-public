@@ -12,6 +12,7 @@ import org.bukkit.event.block.Action;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
@@ -39,7 +40,7 @@ public class BladeDance extends Ability {
 
 	private final double mWeakenAmp;
 
-	public BladeDance(Plugin plugin, Player player) {
+	public BladeDance(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Blade Dance");
 		mInfo.mScoreboardId = "BladeDance";
 		mInfo.mShorthandName = "BD";
@@ -61,7 +62,8 @@ public class BladeDance extends Ability {
 
 	@Override
 	public void cast(Action action) {
-		if (mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), ClassAbility.BLADE_DANCE)
+		if (mPlayer == null
+				|| mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), ClassAbility.BLADE_DANCE)
 				|| mPlayer.getLocation().getPitch() < 50 || mPlayer.isSneaking()
 				|| !InventoryUtils.rogueTriggerCheck(mPlayer.getInventory().getItemInMainHand(), mPlayer.getInventory().getItemInOffHand())) {
 			return;

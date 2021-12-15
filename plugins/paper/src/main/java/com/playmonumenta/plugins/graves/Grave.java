@@ -74,7 +74,7 @@ public final class Grave {
 	Integer mDungeonInstance;
 	Location mLocation;
 	private @Nullable HashMap<String, EulerAngle> mPose;
-	private final HashMap<String, ItemStack> mEquipment;
+	private final HashMap<String, @Nullable ItemStack> mEquipment;
 	HashSet<GraveItem> mItems;
 	private @Nullable ArmorStand mEntity;
 
@@ -86,7 +86,7 @@ public final class Grave {
 	// For deserializing a grave from data
 	private Grave(GraveManager manager, Player player, String world, Integer instance,
 	              Instant time, boolean small, Location location, @Nullable HashMap<String, EulerAngle> pose,
-	              HashMap<String, ItemStack> equipment, JsonArray items) {
+	              HashMap<String, @Nullable ItemStack> equipment, JsonArray items) {
 		mManager = manager;
 		mPlayer = player;
 		mDeathTime = time;
@@ -111,7 +111,7 @@ public final class Grave {
 	}
 
 	// For spawning a new grave on death
-	public Grave(GraveManager manager, Player player, ArrayList<ItemStack> droppedItems, HashMap<EquipmentSlot, ItemStack> equipment) {
+	public Grave(GraveManager manager, Player player, ArrayList<ItemStack> droppedItems, HashMap<EquipmentSlot, @Nullable ItemStack> equipment) {
 		mManager = manager;
 		mPlayer = player;
 		mDeathTime = Instant.now();
@@ -125,14 +125,13 @@ public final class Grave {
 		if (mLocation.getY() < 0) {
 			mLocation.setY(0);
 		}
-		mEquipment = new HashMap<String, ItemStack>() {{
-			put(KEY_EQUIPMENT_HEAD, equipment.get(EquipmentSlot.HEAD));
-			put(KEY_EQUIPMENT_BODY, equipment.get(EquipmentSlot.CHEST));
-			put(KEY_EQUIPMENT_LEGS, equipment.get(EquipmentSlot.LEGS));
-			put(KEY_EQUIPMENT_FEET, equipment.get(EquipmentSlot.FEET));
-			put(KEY_EQUIPMENT_HAND, equipment.get(EquipmentSlot.HAND));
-			put(KEY_EQUIPMENT_OFF_HAND, equipment.get(EquipmentSlot.OFF_HAND));
-		}};
+		mEquipment = new HashMap<>();
+		mEquipment.put(KEY_EQUIPMENT_HEAD, equipment.get(EquipmentSlot.HEAD));
+		mEquipment.put(KEY_EQUIPMENT_BODY, equipment.get(EquipmentSlot.CHEST));
+		mEquipment.put(KEY_EQUIPMENT_LEGS, equipment.get(EquipmentSlot.LEGS));
+		mEquipment.put(KEY_EQUIPMENT_FEET, equipment.get(EquipmentSlot.FEET));
+		mEquipment.put(KEY_EQUIPMENT_HAND, equipment.get(EquipmentSlot.HAND));
+		mEquipment.put(KEY_EQUIPMENT_OFF_HAND, equipment.get(EquipmentSlot.OFF_HAND));
 		generateNewPose();
 		mItems = new HashSet<>();
 		for (ItemStack item : droppedItems) {

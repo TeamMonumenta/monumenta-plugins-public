@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.abilities.scout;
 import org.bukkit.Sound;
 import org.bukkit.entity.AbstractArrow;
 import org.bukkit.entity.Player;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
@@ -18,7 +19,7 @@ public class ScoutPassive extends Ability {
 
 	private static final float PASSIVE_ARROW_SAVE = 0.20f;
 
-	public ScoutPassive(Plugin plugin, Player player) {
+	public ScoutPassive(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, null);
 	}
 

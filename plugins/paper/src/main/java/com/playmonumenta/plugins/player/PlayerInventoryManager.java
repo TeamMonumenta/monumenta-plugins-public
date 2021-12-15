@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.player;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Objects;
 
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
@@ -101,7 +102,7 @@ public class PlayerInventoryManager {
 
 	//Updates only for the slot given
 	public void updateItemSlotProperties(Plugin plugin, Player player, int slot) {
-		ItemStack[] inv = player.getInventory().getContents();
+		@Nullable ItemStack[] inv = player.getInventory().getContents();
 		if (slot < 0 || slot >= inv.length) {
 			return;
 		}
@@ -197,7 +198,7 @@ public class PlayerInventoryManager {
 				mNeedsUpdate = false;
 			}
 
-			ItemStack[] inv = player.getInventory().getContents();
+			@Nullable ItemStack[] inv = player.getInventory().getContents();
 			for (int i = 0; i <= 40; i++) {
 				updateItemLastCheck(i, inv[i]);
 				mInventoryProperties.put(i, new LinkedHashMap<>());
@@ -441,28 +442,24 @@ public class PlayerInventoryManager {
 		}
 		@Nullable ItemStack oldItem = mInventoryLastCheck[slot];
 		@Nullable ItemStack currentItem = player.getInventory().getContents()[slot];
-		if (oldItem == null) {
-			return currentItem == null;
-		} else {
-			return !oldItem.equals(currentItem);
-		}
+		return !Objects.equals(oldItem, currentItem);
 	}
 
 	// Returns the first similar slot's number where there is a difference in item count, or -1 if not found
 	public int getDroppedSlotId(PlayerDropItemEvent event) {
 		Player player = event.getPlayer();
-		ItemStack[] inv = player.getInventory().getContents();
+		@Nullable ItemStack[] inv = player.getInventory().getContents();
 		ItemStack droppedItem = event.getItemDrop().getItemStack();
 
 		for (int slot = 0; slot <= 40; slot++) {
 			@Nullable ItemStack oldItem = mInventoryLastCheck[slot];
-			if (!droppedItem.isSimilar(oldItem)) {
+			if (oldItem == null || !droppedItem.isSimilar(oldItem)) {
 				continue;
 			}
 			int oldAmount = oldItem.getAmount();
 
 			@Nullable ItemStack currentItem = inv[slot];
-			if (droppedItem.isSimilar(currentItem)) {
+			if (currentItem != null && droppedItem.isSimilar(currentItem)) {
 				int newAmount = currentItem.getAmount();
 				if (oldAmount - newAmount > 0) {
 					return slot;

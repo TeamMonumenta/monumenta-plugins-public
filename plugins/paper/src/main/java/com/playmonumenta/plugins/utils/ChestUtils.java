@@ -72,11 +72,10 @@ public class ChestUtils {
 	}
 
 	private static void generateContainerLootWithScaling(Player player, Inventory inventory, Plugin plugin) {
-		if (inventory.getHolder() instanceof Lootable) {
-			Lootable lootable = (Lootable) inventory.getHolder();
+		if (inventory.getHolder() instanceof Lootable lootable) {
 
-			if (lootable.hasLootTable()) {
-				LootTable lootTable = lootable.getLootTable();
+			LootTable lootTable = lootable.getLootTable();
+			if (lootTable != null) {
 
 				setPlayerLuckLevel(player, plugin);
 				LootContext.Builder builder = new LootContext.Builder(player.getLocation());

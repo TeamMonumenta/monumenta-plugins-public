@@ -9,6 +9,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.SpawnerSpawnEvent;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.bosses.bosses.AntiRangeChivalrousBoss;
@@ -58,7 +59,7 @@ public class Chivalrous extends DelveModifier {
 			EntityType.BLAZE
 	);
 
-	public Chivalrous(Plugin plugin, Player player) {
+	public Chivalrous(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, Modifier.CHIVALROUS);
 
 		if (player != null) {
@@ -83,8 +84,7 @@ public class Chivalrous extends DelveModifier {
 			mount.addPassenger(mob);
 			mob.addScoreboardTag(AntiRangeChivalrousBoss.identityTag);
 
-			if (mob instanceof Creeper) {
-				Creeper creeper = (Creeper) mob;
+			if (mob instanceof Creeper creeper) {
 				creeper.setExplosionRadius((creeper.getExplosionRadius() + 1) / 2);
 			}
 		}

@@ -5,11 +5,11 @@ import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
-import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDeathEvent;
 
+import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 
 public class SanguineMark extends Effect {
@@ -36,8 +36,8 @@ public class SanguineMark extends Effect {
 	@Override
 	public boolean entityKilledEvent(EntityDeathEvent event) {
 		if (event.getEntity().getKiller() != null) {
-			 Player player = event.getEntity().getKiller();
-			 double maxHealth = player.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue();
+			Player player = event.getEntity().getKiller();
+			double maxHealth = EntityUtils.getMaxHealth(player);
 			 PlayerUtils.healPlayer(player, mHealPercent * maxHealth);
 			 player.getWorld().playSound(player.getLocation(), Sound.ENTITY_SLIME_SQUISH_SMALL, 1.0f, 0.8f);
 		}

@@ -35,7 +35,6 @@ import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
 
@@ -63,7 +62,7 @@ public class HuntingCompanion extends Ability {
 
 	public List<Entity> mStunnedMobs;
 
-	public HuntingCompanion(Plugin plugin, Player player) {
+	public HuntingCompanion(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Hunting Companion");
 		mInfo.mScoreboardId = "HuntingCompanion";
 		mInfo.mShorthandName = "HC";
@@ -82,7 +81,7 @@ public class HuntingCompanion extends Ability {
 
 		if (player != null) {
 			Bukkit.getScheduler().runTask(plugin, () -> {
-				mWindBomb = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(mPlayer, WindBomb.class);
+				mWindBomb = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, WindBomb.class);
 			});
 		}
 	}
@@ -91,13 +90,13 @@ public class HuntingCompanion extends Ability {
 	public void playerSwapHandItemsEvent(PlayerSwapHandItemsEvent event) {
 		event.setCancelled(true);
 
-		if (mWindBomb != null && mPlayer.isSneaking()) {
+		if (mPlayer == null || mWindBomb != null && mPlayer.isSneaking()) {
 			return;
 		}
 
 		ItemStack inMainHand = mPlayer.getInventory().getItemInMainHand();
 		Damageable damageable = (Damageable)inMainHand.getItemMeta();
-		if (!isTimerActive() && !mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.mLinkedSpell) && InventoryUtils.isBowItem(inMainHand) && !(damageable.getDamage() > inMainHand.getType().getMaxDurability() && !ItemUtils.isItemShattered(inMainHand))) {
+		if (!isTimerActive() && !mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.mLinkedSpell) && ItemUtils.isSomeBow(inMainHand) && !(damageable.getDamage() > inMainHand.getType().getMaxDurability() && !ItemUtils.isItemShattered(inMainHand))) {
 			putOnCooldown();
 			mStunnedMobs = new ArrayList<Entity>();
 
@@ -119,13 +118,16 @@ public class HuntingCompanion extends Ability {
 			}
 
 			mFox = (Fox) LibraryOfSoulsIntegration.summon(loc.clone().add(sideOffset).add(facingDirection.clone().setY(0).normalize().multiply(-0.25)), FOX_NAME); // adds facing direction so golem doesn't spawn inside user
+			if (mFox == null) {
+				return;
+			}
 			mFox.setInvulnerable(true);
 			mFox.addScoreboardTag(FOX_TAG);
 
 			// Damage calculation - include Base Proj Attr, Focus, Teammate buffs (Blessing/Thurible), and Sharpshooter
 			double damage = EntityUtils.getProjSkillDamage(mPlayer, mPlugin, false, null) * mDamage;
 
-			mFox.getAttribute(Attribute.GENERIC_ATTACK_DAMAGE).setBaseValue(damage);
+			EntityUtils.setAttributeBase(mFox, Attribute.GENERIC_ATTACK_DAMAGE, damage);
 
 			mFox.setMetadata(OWNER_METADATA_TAG, new FixedMetadataValue(mPlugin, mPlayer.getName()));
 

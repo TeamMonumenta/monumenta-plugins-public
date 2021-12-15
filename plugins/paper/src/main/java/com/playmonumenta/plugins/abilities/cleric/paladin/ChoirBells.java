@@ -45,7 +45,7 @@ public class ChoirBells extends Ability {
 
 	private @Nullable Crusade mCrusade;
 
-	public ChoirBells(Plugin plugin, Player player) {
+	public ChoirBells(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Choir Bells");
 		mInfo.mLinkedSpell = ClassAbility.CHOIR_BELLS;
 		mInfo.mScoreboardId = "ChoirBells";

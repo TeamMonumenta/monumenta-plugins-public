@@ -18,6 +18,7 @@ import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
@@ -35,7 +36,7 @@ public class Quickdraw extends Ability {
 	private static final int QUICKDRAW_SLOWNESS_LEVEL = 1;
 	private static final int QUICKDRAW_PIERCING_BONUS = 1;
 
-	public Quickdraw(Plugin plugin, Player player) {
+	public Quickdraw(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Quickdraw");
 		mInfo.mLinkedSpell = ClassAbility.QUICKDRAW;
 		mInfo.mScoreboardId = "Quickdraw";

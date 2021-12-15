@@ -17,6 +17,7 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.SerializationUtils;
@@ -92,7 +93,7 @@ public class SheepGodBoss extends BossAbilityGroup {
 						player.removePotionEffect(PotionEffectType.ABSORPTION);
 						if (player.hasPotionEffect(PotionEffectType.SPEED)) {
 							PotionEffect effect = player.getPotionEffect(PotionEffectType.SPEED);
-							if (effect.getAmplifier() > 1) {
+							if (effect != null && effect.getAmplifier() > 1) {
 								player.removePotionEffect(PotionEffectType.SPEED);
 							}
 						}
@@ -125,8 +126,8 @@ public class SheepGodBoss extends BossAbilityGroup {
 			hpDelta = (hpDelta / 2) + 25;
 			playerCount--;
 		}
-		mBoss.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(bossTargetHp);
-		mBoss.getAttribute(Attribute.GENERIC_KNOCKBACK_RESISTANCE).setBaseValue(1);
+		EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_MAX_HEALTH, bossTargetHp);
+		EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_KNOCKBACK_RESISTANCE, 1);
 		mBoss.setHealth(bossTargetHp);
 		mBoss.setCustomName(ChatColor.DARK_RED + "" + ChatColor.BOLD + "The Sheep God");
 		PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "tellraw @s [\"\",{\"text\":\"BAA BAA!!! BAA BAAAA, BAA BAAAAA!?!?\",\"color\":\"dark_red\"}]");

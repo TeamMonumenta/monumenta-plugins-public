@@ -23,6 +23,7 @@ import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.potion.PotionData;
 import org.bukkit.potion.PotionType;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
@@ -76,7 +77,7 @@ public class Volley extends Ability {
 	private static final double VOLLEY_1_DAMAGE_MULTIPLIER = 1.3;
 	private static final double VOLLEY_2_DAMAGE_MULTIPLIER = 1.5;
 
-	public Volley(Plugin plugin, Player player) {
+	public Volley(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Volley");
 		mInfo.mLinkedSpell = ClassAbility.VOLLEY;
 		mInfo.mScoreboardId = "Volley";
@@ -90,8 +91,9 @@ public class Volley extends Ability {
 
 	@Override
 	public boolean playerShotArrowEvent(AbstractArrow arrow) {
-		if (!mPlayer.isSneaking()
-		    || mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.mLinkedSpell)) {
+		if (mPlayer == null
+				|| !mPlayer.isSneaking()
+				|| mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.mLinkedSpell)) {
 			/* This ability is actually on cooldown - event proceeds as normal */
 			return true;
 		}
@@ -117,8 +119,7 @@ public class Volley extends Ability {
 				PotionData tArrowData = null;
 				int fireticks = 0;
 
-				if (arrow instanceof Arrow) {
-					Arrow regularArrow = (Arrow) arrow;
+				if (arrow instanceof Arrow regularArrow) {
 					fireticks = regularArrow.getFireTicks();
 					if (regularArrow.hasCustomEffects()) {
 						tArrowData = regularArrow.getBasePotionData();
@@ -167,7 +168,7 @@ public class Volley extends Ability {
 
 	@Override
 	public boolean livingEntityShotByPlayerEvent(Projectile proj, LivingEntity le, EntityDamageByEntityEvent event) {
-		if (proj instanceof AbstractArrow && ((AbstractArrow) proj).hasMetadata(VOLLEY_METAKEY)) {
+		if (mPlayer != null && proj instanceof AbstractArrow && proj.hasMetadata(VOLLEY_METAKEY)) {
 			if (MetadataUtils.checkOnceThisTick(mPlugin, le, VOLLEY_HIT_METAKEY)) {
 				double damageMultiplier = getAbilityScore() == 1 ? VOLLEY_1_DAMAGE_MULTIPLIER : VOLLEY_2_DAMAGE_MULTIPLIER;
 				damageMultiplier = VolleyMultiplierEnchantment.getMultiplier(mPlayer, (float) damageMultiplier);

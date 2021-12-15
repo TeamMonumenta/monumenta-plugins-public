@@ -73,14 +73,14 @@ public class DepthsDebugGUI extends CustomInventory {
 		Player player = (Player) event.getWhoClicked();
 		for (DebugGUIItem item : GUI_ITEMS) {
 			if (event.getSlot() == item.mSlot) {
-				if (item.mCommand == "partyinfo") {
+				if (item.mCommand.equals("partyinfo")) {
 					event.getWhoClicked().sendMessage(Component.text("Output from " + mPlayerToDebug.getName() + "'s Point of View:", NamedTextColor.LIGHT_PURPLE)
-							.decoration(TextDecoration.ITALIC, false));
+							                                  .decoration(TextDecoration.ITALIC, false));
 					event.getWhoClicked().sendMessage(DepthsManager.getInstance().getPartySummary(mPlayerToDebug));
 					event.getWhoClicked().closeInventory();
-				} else if (item.mCommand == "abilityinfo") {
+				} else if (item.mCommand.equals("abilityinfo")) {
 					new DepthsSummaryGUI(player, mPlayerToDebug).openInventory(player, mPlugin);
-				} else if (item.mCommand == "delveinfo") {
+				} else if (item.mCommand.equals("delveinfo")) {
 					Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "openmoderatordmsgui " + player.getName() + " " + mPlayerToDebug.getName() + " depths");
 				}
 			}

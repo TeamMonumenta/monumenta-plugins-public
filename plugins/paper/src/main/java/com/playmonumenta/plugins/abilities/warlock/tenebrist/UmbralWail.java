@@ -3,16 +3,6 @@ package com.playmonumenta.plugins.abilities.warlock.tenebrist;
 import java.util.Iterator;
 import java.util.List;
 
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.abilities.AbilityTrigger;
-import com.playmonumenta.plugins.classes.ClassAbility;
-import com.playmonumenta.plugins.classes.magic.MagicType;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.FastUtils;
-import com.playmonumenta.plugins.utils.ItemUtils;
-import com.playmonumenta.plugins.utils.VectorUtils;
-
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -26,7 +16,17 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.abilities.AbilityTrigger;
+import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.classes.magic.MagicType;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.VectorUtils;
 
 
 public class UmbralWail extends Ability {
@@ -46,7 +46,7 @@ public class UmbralWail extends Ability {
 	private final int mDamage;
 	private final int mDuration;
 
-	public UmbralWail(Plugin plugin, Player player) {
+	public UmbralWail(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Umbral Wail");
 		mInfo.mLinkedSpell = ClassAbility.UMBRAL_WAIL;
 		mInfo.mScoreboardId = "UmbralWail";
@@ -62,13 +62,16 @@ public class UmbralWail extends Ability {
 
 	@Override
 	public void cast(Action action) {
+		if (mPlayer == null) {
+			return;
+		}
 		World world = mPlayer.getWorld();
 
 		new BukkitRunnable() {
 			final Location mLoc = mPlayer.getEyeLocation();
 			final BoundingBox mBox = BoundingBox.of(mLoc, SPHERE_RADIUS, SPHERE_RADIUS, SPHERE_RADIUS);
-			Vector mIncrement = mLoc.getDirection().multiply(MOVE_SPEED);
-			List<LivingEntity> mMobs = EntityUtils.getNearbyMobs(mLoc, 12, mPlayer);
+			final Vector mIncrement = mLoc.getDirection().multiply(MOVE_SPEED);
+			final List<LivingEntity> mMobs = EntityUtils.getNearbyMobs(mLoc, 12, mPlayer);
 
 			int mTicks = 0;
 			double mDegree = 0;
@@ -125,6 +128,9 @@ public class UmbralWail extends Ability {
 
 	@Override
 	public boolean runCheck() {
+		if (mPlayer == null) {
+			return false;
+		}
 		ItemStack mHand = mPlayer.getInventory().getItemInMainHand();
 		return mPlayer.isSprinting() && ItemUtils.isHoe(mHand);
 	}

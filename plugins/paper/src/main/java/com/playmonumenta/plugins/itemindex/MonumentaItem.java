@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.TreeMap;
 import java.util.UUID;
 
@@ -343,34 +344,34 @@ public class MonumentaItem {
 		// }
 
 		// magic wand
-		if (this.mIsMagicWand != null && this.mIsMagicWand) {
+		if (Boolean.TRUE.equals(this.mIsMagicWand)) {
 			loreLines.add(ChatColor.DARK_GRAY + "* Magic Wand *");
 		}
 
 		// crafting material
-		if (this.mCraftingMaterialKind != null && this.mCraftingMaterialKind != null) {
+		if (this.mCraftingMaterialKind != null) {
 			loreLines.add(this.mCraftingMaterialKind.getReadableString());
 		}
 
 		// armor material
-		if (this.getArmorMaterialOverride() != null) {
-			if (this.getArmorMaterialOverride() != ArmorMaterial.NONE) {
-				loreLines.add(this.getArmorMaterialOverride().getReadableString());
+		if (this.mArmorMaterialOverride != null) {
+			if (this.mArmorMaterialOverride != ArmorMaterial.NONE) {
+				loreLines.add(this.mArmorMaterialOverride.getReadableString());
 			}
-		} else if (this.getArmorMaterial() != null && this.getArmorMaterial() != ArmorMaterial.NONE) {
-			loreLines.add(this.getArmorMaterial().getReadableString());
+		} else if (this.mArmorMaterial != null && this.mArmorMaterial != ArmorMaterial.NONE) {
+			loreLines.add(this.mArmorMaterial.getReadableString());
 		}
 
 		// region + tier
-		if (this.getRegion() != null && this.getTier() != null) {
-			if (this.getRegion().getInt() >= 0 && this.getTier() != ItemTier.NONE) {
-				loreLines.add(this.getRegion().getReadableString() + " : " + this.getTier().getReadableString());
+		if (this.mRegion != null && this.mTier != null) {
+			if (this.mRegion.getInt() >= 0 && this.mTier != ItemTier.NONE) {
+				loreLines.add(this.mRegion.getReadableString() + " : " + this.mTier.getReadableString());
 			}
 		}
 
 		// location
-		if (this.getLocation() != null && this.getLocation() != ItemLocation.NONE) {
-			loreLines.add(this.getLocation().getReadableString());
+		if (this.mLoc != null && this.mLoc != ItemLocation.NONE) {
+			loreLines.add(this.mLoc.getReadableString());
 		}
 
 		// lore
@@ -405,14 +406,14 @@ public class MonumentaItem {
 		}
 
 		// attributes
-		if (this.getAttributesMap() != null) {
+		if (this.mAttributeDataMap != null) {
 			for (Map.Entry<EquipmentSlot, TreeMap<Attribute, TreeMap<AttributeModifier.Operation, Double>>> entry1 : this.mAttributeDataMap.entrySet()) {
 				EquipmentSlot slot = entry1.getKey();
 				loreLines.add("");
 				loreLines.add(slot.getReadableString());
 				for (Map.Entry<Attribute, TreeMap<AttributeModifier.Operation, Double>> entry2 : entry1.getValue().entrySet()) {
 					Attribute attribute = entry2.getKey();
-					for (Map.Entry<AttributeModifier.Operation, Double> entry3: entry2.getValue().entrySet()) {
+					for (Map.Entry<AttributeModifier.Operation, Double> entry3 : entry2.getValue().entrySet()) {
 						AttributeModifier.Operation operation = entry3.getKey();
 						Double amount = entry3.getValue();
 						loreLines.add(ItemUtils.buildAttributeLoreLine(slot, attribute, operation, amount));
@@ -477,62 +478,62 @@ public class MonumentaItem {
 		ChatColor unused = ChatColor.STRIKETHROUGH;
 		ChatColor hidden = ChatColor.ITALIC;
 		//out.append(String.format("\n", ));
-		if (this.getNameRaw() != null) {
+		if (this.mName != null) {
 			out.append(String.format("%sName:%s %s (%s%s)\n",
-				editable,
-				reset,
-				this.getNameRaw(),
-				this.getName(),
-				reset));
+			                         editable,
+			                         reset,
+			                         this.mName,
+			                         this.getName(),
+			                         reset));
 		}
-		if (this.getMaterial() != null) {
+		if (this.mMaterial != null) {
 			out.append(String.format("%sMaterial:%s %s (%s)\n",
-				editable,
-				reset,
-				this.getMaterial(),
-				this.getMaterial().getKey()));
+			                         editable,
+			                         reset,
+			                         this.mMaterial,
+			                         this.mMaterial.getKey()));
 		}
-		if (this.getRegion() != null) {
+		if (this.mRegion != null) {
 			out.append(String.format("%s%sRegion:%s %s (%d : %s%s)\n",
-				editable,
-				this.getRegion() == Region.NONE || this.getTier() == ItemTier.NONE ? unused : "",
-				reset,
-				this.getRegion(),
-				this.getRegion().getInt(),
-				this.getRegion().getReadableString(),
-				reset));
+			                         editable,
+			                         this.mRegion == Region.NONE || this.mTier == ItemTier.NONE ? unused : "",
+			                         reset,
+			                         this.mRegion,
+			                         this.mRegion.getInt(),
+			                         this.mRegion.getReadableString(),
+			                         reset));
 		}
-		if (this.getTier() != null) {
+		if (this.mTier != null) {
 			out.append(String.format("%s%sTier:%s %s (%s%s)\n",
-				editable,
-				this.getRegion() == Region.NONE || this.getTier() == ItemTier.NONE ? unused : "",
-				reset,
-				this.getTier(),
-				this.getTier().getReadableString(),
-				reset));
+			                         editable,
+			                         this.getRegion() == Region.NONE || this.mTier == ItemTier.NONE ? unused : "",
+			                         reset,
+			                         this.mTier,
+			                         this.mTier.getReadableString(),
+			                         reset));
 		}
-		if (this.getLocation() != null) {
+		if (this.mLoc != null) {
 			out.append(String.format("%s%sLocation:%s %s (%s%s)\n",
-				editable,
-				this.getLocation() == ItemLocation.NONE ? unused : "",
-				reset,
-				this.getLocation(),
-				this.getLocation().getReadableString(),
-				reset));
+			                         editable,
+			                         this.mLoc == ItemLocation.NONE ? unused : "",
+			                         reset,
+			                         this.mLoc,
+			                         this.mLoc.getReadableString(),
+			                         reset));
 		}
-		if (this.getLore() != null) {
+		if (this.mLoreMap != null) {
 			out.append(String.format("%s%sLore:%s %s\n",
-			                         editable, this.getLore().size() == 0 ? unused : "",
-			                         reset, this.getLore().size() > 0 ? this.getLore().toString().replace(",", "\n              ").replace('{', '}').replace("}", "") : "None"));
+			                         editable, this.mLoreMap.size() == 0 ? unused : "",
+			                         reset, this.mLoreMap.size() > 0 ? this.getLore().toString().replace(",", "\n              ").replace('{', '}').replace("}", "") : "None"));
 		}
-		if (this.getEnchantMap() != null) {
+		if (this.mEnchantMap != null) {
 			out.append(String.format("%s%sEnchants:%s %s\n",
 			                         editable,
-			                         this.getEnchantMap().size() == 0 ? unused : "",
+			                         this.mEnchantMap.size() == 0 ? unused : "",
 			                         reset,
-			                         this.getEnchantMap().size() > 0 ? this.getEnchantMap().toString().replace(",", "\n              ").replace('{', '}').replace("}", "") : "None"));
+			                         this.mEnchantMap.size() > 0 ? this.mEnchantMap.toString().replace(",", "\n              ").replace('{', '}').replace("}", "") : "None"));
 		}
-		int[] color = this.getColor();
+		int[] color = this.mColor;
 		if (color != null) {
 			out.append(String.format("%s%sColor:%s R:%d G:%d B:%d -> %s\n",
 			                         editable,
@@ -546,13 +547,13 @@ public class MonumentaItem {
 			                                       color[1],
 			                                       color[2])));
 		}
-		if (this.getAttributesMap() != null) {
-			out.append(String.format("%s%sAttributes:%s\n", editable, this.getAttributesMap().size() == 0 ? unused : "", reset));
+		if (this.mAttributeDataMap != null) {
+			out.append(String.format("%s%sAttributes:%s\n", editable, this.mAttributeDataMap.size() == 0 ? unused : "", reset));
 			for (Map.Entry<EquipmentSlot, TreeMap<Attribute, TreeMap<AttributeModifier.Operation, Double>>> entry1 : this.mAttributeDataMap.entrySet()) {
 				EquipmentSlot slot = entry1.getKey();
 				for (Map.Entry<Attribute, TreeMap<AttributeModifier.Operation, Double>> entry2 : entry1.getValue().entrySet()) {
 					Attribute attribute = entry2.getKey();
-					for (Map.Entry<AttributeModifier.Operation, Double> entry3: entry2.getValue().entrySet()) {
+					for (Map.Entry<AttributeModifier.Operation, Double> entry3 : entry2.getValue().entrySet()) {
 						AttributeModifier.Operation operation = entry3.getKey();
 						Double amount = entry3.getValue();
 						out.append(String.format("%-8s %18s %17s %.3f\n", slot, attribute, operation, amount));
@@ -560,47 +561,47 @@ public class MonumentaItem {
 				}
 			}
 		}
-		if (this.getLastEditor() != null) {
+		if (this.mLastEditedBy != null) {
 			out.append(String.format("%s%sLastEditor:%s %s\n",
-				readOnly,
-				hidden,
-				reset,
-				this.getLastEditor()));
+			                         readOnly,
+			                         hidden,
+			                         reset,
+			                         this.mLastEditedBy));
 		}
 		if (this.mLastEditedTimestamp != null) {
 			out.append(String.format("%s%sLastEditionTime:%s %s (%s)\n",
-				readOnly,
-				hidden,
-				reset,
-				this.getLastEditTimeAsString(),
-				this.getTimeSinceLastEditAsString()));
+			                         readOnly,
+			                         hidden,
+			                         reset,
+			                         this.getLastEditTimeAsString(),
+			                         this.getTimeSinceLastEditAsString()));
 		}
-		if (this.getArmorMaterial() != null) {
+		if (this.mArmorMaterial != null) {
 			out.append(String.format("%s%sArmorMaterial:%s %s (%s%s)\n",
-				readOnly,
-				this.getArmorMaterial() == ArmorMaterial.NONE || this.getArmorMaterialOverride() != null ? unused : "",
-				reset,
-				this.getArmorMaterial(),
-				this.getArmorMaterial().getReadableString(),
-				reset));
+			                         readOnly,
+			                         this.mArmorMaterial == ArmorMaterial.NONE || this.mArmorMaterialOverride != null ? unused : "",
+			                         reset,
+			                         this.mArmorMaterial,
+			                         this.mArmorMaterial.getReadableString(),
+			                         reset));
 		}
-		if (this.getArmorMaterialOverride() != null) {
-			out.append(String.format("%sArmorMaterialOverride:%s %s (%s%s)\n", editable, reset, this.getArmorMaterialOverride(), this.getArmorMaterialOverride().getReadableString(), reset));
+		if (this.mArmorMaterialOverride != null) {
+			out.append(String.format("%sArmorMaterialOverride:%s %s (%s%s)\n", editable, reset, this.mArmorMaterialOverride, this.mArmorMaterialOverride.getReadableString(), reset));
 		}
-		if (this.getIsMagicWand() != null) {
-			out.append(String.format("%sIsMagicWand:%s %s\n", editable, reset, this.isMagicWand()));
+		if (this.mIsMagicWand != null) {
+			out.append(String.format("%sIsMagicWand:%s %s\n", editable, reset, this.mIsMagicWand));
 		}
-		if (this.getUnbreakable() != null) {
-			out.append(String.format("%sUnbreakable:%s %s\n", editable, reset, this.getUnbreakable()));
+		if (this.mUnbreakable != null) {
+			out.append(String.format("%sUnbreakable:%s %s\n", editable, reset, this.mUnbreakable));
 		}
-		if (this.getDurability() != null) {
-			out.append(String.format("%s%sDurability:%s %s\n", editable, Boolean.TRUE.equals(this.getUnbreakable()) ? unused : "", reset, this.getDurability()));
+		if (this.mBaseDurability != null) {
+			out.append(String.format("%s%sDurability:%s %s\n", editable, Boolean.TRUE.equals(this.mUnbreakable) ? unused : "", reset, this.mBaseDurability));
 		}
-		if (this.getOldName() != null) {
-			out.append(String.format("%sOld Name:%s %s\n", readOnly, reset, this.getOldName()));
+		if (this.mOldName != null) {
+			out.append(String.format("%sOld Name:%s %s\n", readOnly, reset, this.mOldName));
 		}
-		if (this.getOldMaterial() != null) {
-			out.append(String.format("%sOld Material:%s %s\n", readOnly, reset, this.getOldMaterial()));
+		if (this.mOldMaterial != null) {
+			out.append(String.format("%sOld Material:%s %s\n", readOnly, reset, this.mOldMaterial));
 		}
 		if (this.mOnConsumeMap != null) {
 			out.append(String.format("%s%sOnConsume Effects:%s\n", editable, this.mOnConsumeMap.size() == 0 ? unused : "", reset));
@@ -697,10 +698,10 @@ public class MonumentaItem {
 	}
 
 	public int getEnchantLevel(CustomEnchantment enchant) {
-		if (this.getEnchantMap() == null) {
+		if (this.mEnchantMap == null) {
 			return 0;
 		}
-		return this.getEnchantMap().getOrDefault(enchant, 0);
+		return this.mEnchantMap.getOrDefault(enchant, 0);
 	}
 
 	public boolean isColorable() {
@@ -764,10 +765,13 @@ public class MonumentaItem {
 	}
 
 	public double getAttribute(EquipmentSlot slot, Attribute attribute, AttributeModifier.Operation operation) {
-		if (this.getAttributesMap() == null) {
+		if (this.mAttributeDataMap == null) {
 			return 0.0;
 		}
-		return this.getAttributesMap().getOrDefault(slot, new TreeMap<>()).getOrDefault(attribute, new TreeMap<>()).getOrDefault(operation, 0.0);
+		return Optional.ofNullable(this.mAttributeDataMap.get(slot))
+				.map(attrs -> attrs.get(attribute))
+				.map(ops -> ops.get(operation))
+				.orElse(0.0);
 	}
 
 	public @Nullable ArmorMaterial getArmorMaterial() {
@@ -865,11 +869,15 @@ public class MonumentaItem {
 		this.mLoreMap = lore;
 	}
 
-	public void setLoreLine(int index, String str) {
+	public void setLoreLine(int index, @Nullable String str) {
 		if (this.mLoreMap == null) {
 			this.mLoreMap = new TreeMap<>();
 		}
-		this.mLoreMap.put(index, str);
+		if (str != null) {
+			this.mLoreMap.put(index, str);
+		} else {
+			this.mLoreMap.remove(index);
+		}
 	}
 
 	public void setEnchantLevel(CustomEnchantment enchant, int level) {
@@ -896,7 +904,7 @@ public class MonumentaItem {
 	}
 
 	public void setAttribute(EquipmentSlot slot, Attribute attribute, AttributeModifier.Operation op, Double amount) {
-		if (this.getAttributesMap() == null) {
+		if (this.mAttributeDataMap == null) {
 			this.mAttributeDataMap = new TreeMap<>();
 		}
 		if (amount != 0) {
@@ -968,13 +976,11 @@ public class MonumentaItem {
 		if (this.mOnConsumeMap == null) {
 			this.mOnConsumeMap = new TreeMap<>();
 		}
-		TreeMap<Integer, Integer> valueMap = this.mOnConsumeMap.getOrDefault(effect, new TreeMap<>());
-		valueMap.put(potency, duration);
-		this.mOnConsumeMap.put(effect, valueMap);
+		this.mOnConsumeMap.computeIfAbsent(effect, (k) -> new TreeMap<>()).put(potency, duration);
 	}
 
 	public void setBannerPatterns(@Nullable List<Pattern> patternList) {
-		this.mBannerPatterns = new ArrayList<>(patternList);
+		this.mBannerPatterns = patternList == null ? null : new ArrayList<>(patternList);
 	}
 
 	public void setBannerBaseColor(@Nullable DyeColor bannerBaseColor) {
@@ -1011,7 +1017,7 @@ public class MonumentaItem {
 
 	// utils
 
-	public static @Nullable MonumentaItem fromItemStack(ItemStack itemStack) {
+	public static MonumentaItem fromItemStack(ItemStack itemStack) {
 		return Plugin.getInstance().mItemManager.getMMItemWithEdits(itemStack);
 	}
 
@@ -1098,15 +1104,7 @@ public class MonumentaItem {
 		}
 		// Lore
 		if (this.mLoreMap != null && this.mLoreMap.size() > 0) {
-			ArrayList<Integer> toRemove = new ArrayList<>();
-			for (Map.Entry<Integer, String> entry : this.mLoreMap.entrySet()) {
-				if (entry.getValue().equals(".")) {
-					toRemove.add(entry.getKey());
-				}
-			}
-			for (Integer i : toRemove) {
-				this.mLoreMap.remove(i);
-			}
+			mLoreMap.values().removeIf(s -> s.equals("."));
 			if (this.mLoreMap.size() == 0) {
 				this.mLoreMap = null;
 			}

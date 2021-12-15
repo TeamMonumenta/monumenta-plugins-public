@@ -19,6 +19,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.inventory.ItemStack;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
@@ -64,7 +65,7 @@ public class Spellshock extends Ability {
 
 	private final float mLevelDamage;
 
-	public Spellshock(Plugin plugin, Player player) {
+	public Spellshock(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, NAME);
 		mInfo.mLinkedSpell = ABILITY;
 
@@ -79,7 +80,7 @@ public class Spellshock extends Ability {
 
 	@Override
 	public void playerDealtCustomDamageEvent(CustomDamageEvent event) {
-		if (event.getSpell() == null) {
+		if (mPlayer == null || event.getSpell() == null) {
 			return;
 		}
 		LivingEntity mob = event.getDamaged();

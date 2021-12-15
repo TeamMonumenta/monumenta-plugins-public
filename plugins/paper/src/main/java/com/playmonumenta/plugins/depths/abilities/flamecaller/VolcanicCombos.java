@@ -36,7 +36,7 @@ public class VolcanicCombos extends DepthsAbility {
 
 	@Override
 	public boolean livingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
-		if (DepthsUtils.isValidComboAttack(event, mPlayer)) {
+		if (mPlayer != null && DepthsUtils.isValidComboAttack(event, mPlayer)) {
 			mComboCount++;
 
 			if (mComboCount >= 3 && mRarity > 0) {

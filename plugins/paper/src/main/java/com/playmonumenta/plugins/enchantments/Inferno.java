@@ -173,7 +173,7 @@ public class Inferno implements BaseEnchantment {
 		if (target.getFireTicks() > 0) {
 			// Fire aspect applies fire ticks after onDamage and will set the fireticks to the right amount with this change.
 			// Due to ordering this differs for projectiles, which have to be managed manually in onShootAttack()
-			if (type == "melee" && type == "magichigh") {
+			if (type.equals("melee") || type.equals("magichigh")) {
 				target.setFireTicks(1);
 			}
 		}

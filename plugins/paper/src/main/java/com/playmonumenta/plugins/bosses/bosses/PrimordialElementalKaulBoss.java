@@ -184,7 +184,7 @@ public final class PrimordialElementalKaulBoss extends BossAbilityGroup {
 			},
 
 			(Player player, Location loc, boolean blocked) -> {
-				if ((player != null && player.getLocation().getY() > 60) || (loc != null && loc.getY() > 60)) {
+				if (player == null || player.getLocation().getY() > 60 || (loc != null && loc.getY() > 60)) {
 					return;
 				}
 				if (!blocked) {

@@ -18,7 +18,7 @@ import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
 import com.playmonumenta.plugins.player.PartialParticle;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
-import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.utils.ItemUtils;
 
 import net.md_5.bungee.api.ChatColor;
 
@@ -40,10 +40,11 @@ public class FlameSpirit extends DepthsAbility {
 	@Override
 	public boolean blockBreakEvent(BlockBreakEvent event) {
 		Block block = event.getBlock();
-		if (InventoryUtils.isPickaxeItem(event.getPlayer().getInventory().getItemInMainHand()) && block.getType() == Material.SPAWNER) {
+		if (ItemUtils.isPickaxe(event.getPlayer().getInventory().getItemInMainHand()) && block.getType() == Material.SPAWNER) {
 			Location centerLoc = block.getLocation().add(0.5, 0, 0.5);
 			new BukkitRunnable() {
 				int mTickCount = 0;
+
 				@Override
 				public void run() {
 					if (mTickCount >= DAMAGE_COUNT) {

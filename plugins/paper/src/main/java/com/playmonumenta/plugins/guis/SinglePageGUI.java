@@ -32,7 +32,7 @@ public abstract class SinglePageGUI {
 	protected final @Nullable Inventory mInventory;
 
 	// The child constructor should just call the parent constructor
-	public SinglePageGUI(@Nullable Player player, @Nullable String[] args) {
+	public SinglePageGUI(@Nullable Player player, String[] args) {
 		mPlayer = player;
 
 		// If the player is null, this was called from the manager to register a command.
@@ -83,15 +83,17 @@ public abstract class SinglePageGUI {
 	public abstract Inventory getInventory(Player player, String[] args);
 
 	public void openGUI(Map<UUID, SinglePageGUI> tracker) {
-		mPlayer.openInventory(mInventory);
+		if (mPlayer != null && mInventory != null) {
+			mPlayer.openInventory(mInventory);
+		}
 	}
 
 	public boolean contains(Inventory inventory) {
-		return (mInventory.equals(inventory));
+		return mInventory != null && mInventory.equals(inventory);
 	}
 
 	public void registerClick(InventoryClickEvent event) {
-		if (mInventory.equals(event.getInventory())) {
+		if (mInventory != null && mInventory.equals(event.getInventory())) {
 			processClick(event);
 		}
 	}

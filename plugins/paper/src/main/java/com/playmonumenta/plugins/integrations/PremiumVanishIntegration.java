@@ -6,11 +6,12 @@ import java.util.UUID;
 import java.util.logging.Logger;
 
 import org.bukkit.entity.Player;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import de.myzelyam.api.vanish.VanishAPI;
 
 public class PremiumVanishIntegration {
-	private static PremiumVanishIntegration INSTANCE = null;
+	private static @Nullable PremiumVanishIntegration INSTANCE = null;
 
 	public PremiumVanishIntegration(Logger logger) {
 		logger.info("Enabling PremiumVanish integration");

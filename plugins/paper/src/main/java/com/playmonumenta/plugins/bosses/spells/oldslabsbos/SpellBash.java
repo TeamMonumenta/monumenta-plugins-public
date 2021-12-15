@@ -4,8 +4,8 @@ import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
-import org.bukkit.entity.Creature;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
@@ -35,30 +35,33 @@ public class SpellBash extends Spell {
 
 	@Override
 	public void run() {
-		mBoss.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 25, 1));
+		if (mBoss instanceof Mob mob) {
+			LivingEntity target = mob.getTarget();
+			if (target == null) {
+				return;
+			}
+			mBoss.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 25, 1));
+			mWorld.playSound(mBoss.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1.5f, 0.7f);
+			mWorld.playSound(mBoss.getLocation(), Sound.BLOCK_ANVIL_PLACE, 1.5f, 1.75f);
+			new BukkitRunnable() {
+				int mTicks = 0;
 
-		Creature c = (Creature) mBoss;
-		LivingEntity target = c.getTarget();
-		mWorld.playSound(mBoss.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1.5f, 0.7f);
-		mWorld.playSound(mBoss.getLocation(), Sound.BLOCK_ANVIL_PLACE, 1.5f, 1.75f);
-		new BukkitRunnable() {
-			int mTicks = 0;
-			@Override
-			public void run() {
-				mTicks++;
-				mWorld.spawnParticle(Particle.CLOUD, mBoss.getLocation(), 1, 0.1, 0.1, 0.1, 0.175);
-				mWorld.spawnParticle(Particle.CRIT, mBoss.getLocation().add(0, 1, 0), 3, 0.4, 0.5, 0.4, 0.025);
-				if (mTicks >= 25) {
-					this.cancel();
-					Location loc = mBoss.getEyeLocation().subtract(0, 0.15, 0);
-					Vector direction = LocationUtils.getDirectionTo(target.getLocation().add(0, 1.25, 0), loc);
-					loc.setDirection(direction);
-					mWorld.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1.5f, 0.7f);
-					mWorld.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_KNOCKBACK, 1.5f, 1.25f);
-					mWorld.spawnParticle(Particle.CLOUD, mBoss.getLocation(), 25, 0.1, 0.1, 0.1, 0.25);
-					mWorld.spawnParticle(Particle.EXPLOSION_NORMAL, mBoss.getLocation(), 15, 0.1, 0.1, 0.1, 0.2);
-					new BukkitRunnable() {
-						double mDegrees = 30;
+				@Override
+				public void run() {
+					mTicks++;
+					mWorld.spawnParticle(Particle.CLOUD, mBoss.getLocation(), 1, 0.1, 0.1, 0.1, 0.175);
+					mWorld.spawnParticle(Particle.CRIT, mBoss.getLocation().add(0, 1, 0), 3, 0.4, 0.5, 0.4, 0.025);
+					if (mTicks >= 25) {
+						this.cancel();
+						Location loc = mBoss.getEyeLocation().subtract(0, 0.15, 0);
+						Vector direction = LocationUtils.getDirectionTo(target.getLocation().add(0, 1.25, 0), loc);
+						loc.setDirection(direction);
+						mWorld.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1.5f, 0.7f);
+						mWorld.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_KNOCKBACK, 1.5f, 1.25f);
+						mWorld.spawnParticle(Particle.CLOUD, mBoss.getLocation(), 25, 0.1, 0.1, 0.1, 0.25);
+						mWorld.spawnParticle(Particle.EXPLOSION_NORMAL, mBoss.getLocation(), 15, 0.1, 0.1, 0.1, 0.2);
+						new BukkitRunnable() {
+							double mDegrees = 30;
 						@Override
 						public void run() {
 							Vector vec;
@@ -81,19 +84,20 @@ public class SpellBash extends Spell {
 							}
 						}
 
-					}.runTaskTimer(mPlugin, 0, 1);
+						}.runTaskTimer(mPlugin, 0, 1);
 
-					for (Player player : PlayerUtils.playersInRange(loc, 4, true)) {
-						Vector toPlayerVector = player.getLocation().toVector().subtract(loc.toVector()).normalize();
-						if (direction.dot(toPlayerVector) > 0.33f) {
-							BossUtils.bossDamage(mBoss, player, 6, mBoss.getLocation(), "Bash");
-							MovementUtils.knockAway(mBoss.getLocation(), player, 0.5f, 0.65f);
+						for (Player player : PlayerUtils.playersInRange(loc, 4, true)) {
+							Vector toPlayerVector = player.getLocation().toVector().subtract(loc.toVector()).normalize();
+							if (direction.dot(toPlayerVector) > 0.33f) {
+								BossUtils.bossDamage(mBoss, player, 6, mBoss.getLocation(), "Bash");
+								MovementUtils.knockAway(mBoss.getLocation(), player, 0.5f, 0.65f);
+							}
 						}
 					}
 				}
-			}
 
-		}.runTaskTimer(mPlugin, 0, 1);
+			}.runTaskTimer(mPlugin, 0, 1);
+		}
 	}
 
 	@Override
@@ -103,9 +107,11 @@ public class SpellBash extends Spell {
 
 	@Override
 	public boolean canRun() {
-		Creature creature = (Creature) mBoss;
-		if (creature.getTarget() != null) {
-			return creature.getTarget().getLocation().distance(mBoss.getLocation()) < 4;
+		if (mBoss instanceof Mob mob) {
+			LivingEntity target = mob.getTarget();
+			if (target != null) {
+				return target.getLocation().distance(mBoss.getLocation()) < 4;
+			}
 		}
 		return false;
 	}

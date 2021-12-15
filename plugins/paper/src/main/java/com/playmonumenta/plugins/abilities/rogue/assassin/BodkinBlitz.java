@@ -19,6 +19,7 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
@@ -45,11 +46,11 @@ public class BodkinBlitz extends MultipleChargeAbility {
 	private final int mStealthDuration;
 	private final int mBonusDmg;
 
-	private BukkitRunnable mRunnable = null;
+	private @Nullable BukkitRunnable mRunnable = null;
 	private boolean mTeleporting = false;
 	private int mTicks;
 
-	public BodkinBlitz(Plugin plugin, Player player) {
+	public BodkinBlitz(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Bodkin Blitz");
 		mInfo.mLinkedSpell = ClassAbility.BODKIN_BLITZ;
 		mInfo.mScoreboardId = "BodkinBlitz";
@@ -68,7 +69,7 @@ public class BodkinBlitz extends MultipleChargeAbility {
 
 	@Override
 	public void cast(Action action) {
-		if (mTeleporting || !mPlayer.isSneaking() || ZoneUtils.hasZoneProperty(mPlayer, ZoneProperty.NO_MOBILITY_ABILITIES)
+		if (mTeleporting || mPlayer == null || !mPlayer.isSneaking() || ZoneUtils.hasZoneProperty(mPlayer, ZoneProperty.NO_MOBILITY_ABILITIES)
 				|| !InventoryUtils.rogueTriggerCheck(mPlayer.getInventory().getItemInMainHand(), mPlayer.getInventory().getItemInOffHand())) {
 			return;
 		}
@@ -106,7 +107,7 @@ public class BodkinBlitz extends MultipleChargeAbility {
 					BoundingBox testBox = mPlayerBox.clone();
 
 					// Preliminary check on the spot the player is standing on, before shifting locations.
-					if (testLocation(testBox)) {
+					if (testLocation(testBox, world)) {
 						mTpLoc = testBox.getCenter().toLocation(world).add(0, -testBox.getHeight() / 2, 0);
 						isBlocked = false;
 					}
@@ -115,7 +116,7 @@ public class BodkinBlitz extends MultipleChargeAbility {
 						testBox.shift(0, -1, 0);
 						for (int dy = 0; dy < 20; dy++) {
 							// Start by scanning along the y-axis, from -1 to +1, to find the lowest available space.
-							if (testLocation(testBox)) {
+							if (testLocation(testBox, world)) {
 								mTpLoc = testBox.getCenter().toLocation(world).add(0, -testBox.getHeight() / 2, 0);
 								isBlocked = false;
 								break;
@@ -198,12 +199,12 @@ public class BodkinBlitz extends MultipleChargeAbility {
 		}.runTaskTimer(mPlugin, 0, 1);
 	}
 
-	private boolean testLocation(BoundingBox box) {
+	private boolean testLocation(BoundingBox box, World world) {
 		for (int x = -1; x <= 1; x++) {
 			for (int z = -1; z <= 1; z++) {
 				for (int y = 0; y <= 2; y++) {
 					// Checking the blocks around the hitbox.
-					Block block = box.getCenter().toLocation(mPlayer.getWorld()).add(x * 0.4, y * 0.975 - box.getHeight() / 2, z * 0.4).getBlock();
+					Block block = box.getCenter().toLocation(world).add(x * 0.4, y * 0.975 - box.getHeight() / 2, z * 0.4).getBlock();
 					// A player's hitbox is 0.625 * 0.625 * 1.8125 blocks. Rounding up to 0.8 * 0.8 * 1.95 to be safe.
 
 					if (block.getType().isSolid() && block.getBoundingBox().overlaps(box)) {
@@ -219,23 +220,20 @@ public class BodkinBlitz extends MultipleChargeAbility {
 
 	@Override
 	public boolean livingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
-		if (mRunnable != null && event.getCause() == DamageCause.ENTITY_ATTACK) {
+		if (mPlayer != null && mRunnable != null && event.getCause() == DamageCause.ENTITY_ATTACK) {
 			mTicks = 0;
 			mRunnable.cancel();
 			mRunnable = null;
-			if (event.getEntity() instanceof Mob) {
-				Mob m = (Mob) event.getEntity();
-				if (m.getTarget() == null || !m.getTarget().getUniqueId().equals(mPlayer.getUniqueId())) {
-					Location entityLoc = m.getLocation().clone().add(0, 1, 0);
+			if (event.getEntity() instanceof Mob mob && (mob.getTarget() == null || !mob.getTarget().getUniqueId().equals(mPlayer.getUniqueId()))) {
+				Location entityLoc = mob.getLocation().clone().add(0, 1, 0);
 
-					World world = entityLoc.getWorld();
-					world.playSound(entityLoc, Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, 0.5f, 2f);
-					world.playSound(entityLoc, Sound.BLOCK_ANVIL_LAND, 0.8f, 2f);
-					world.spawnParticle(Particle.FALLING_DUST, entityLoc, 35, 0.35, 0.5, 0.35, Bukkit.createBlockData("gray_concrete"));
-					world.spawnParticle(Particle.BLOCK_CRACK, entityLoc, 20, 0.25, 0.25, 0.25, 1, Bukkit.createBlockData("redstone_block"));
+				World world = entityLoc.getWorld();
+				world.playSound(entityLoc, Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, 0.5f, 2f);
+				world.playSound(entityLoc, Sound.BLOCK_ANVIL_LAND, 0.8f, 2f);
+				world.spawnParticle(Particle.FALLING_DUST, entityLoc, 35, 0.35, 0.5, 0.35, Bukkit.createBlockData("gray_concrete"));
+				world.spawnParticle(Particle.BLOCK_CRACK, entityLoc, 20, 0.25, 0.25, 0.25, 1, Bukkit.createBlockData("redstone_block"));
 
-					event.setDamage(event.getDamage() + mBonusDmg);
-				}
+				event.setDamage(event.getDamage() + mBonusDmg);
 			}
 		}
 		return true;

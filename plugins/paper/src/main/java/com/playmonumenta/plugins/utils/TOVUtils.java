@@ -3,7 +3,6 @@ package com.playmonumenta.plugins.utils;
 import java.util.Optional;
 
 import org.bukkit.Bukkit;
-import org.bukkit.NamespacedKey;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.Chest;
@@ -47,11 +46,9 @@ public class TOVUtils {
 					return false;
 				}
 
-				if (UNOPENED_CACHE_NAME.equals(name)) {
-					chest.setCustomName(OPENED_CACHE_NAME);
-					chest.setLootTable(Bukkit.getLootTable(NamespacedKey.fromString("epic:" + CACHE_LOOT_TABLE)));
-					chest.update();
-				}
+				chest.setCustomName(OPENED_CACHE_NAME);
+				chest.setLootTable(Bukkit.getLootTable(NamespacedKeyUtils.fromString("epic:" + CACHE_LOOT_TABLE)));
+				chest.update();
 			}
 		}
 

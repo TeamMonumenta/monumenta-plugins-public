@@ -6,17 +6,16 @@ import java.util.List;
 import java.util.Map.Entry;
 
 import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-
 import com.goncalomb.bukkit.mylib.utils.CustomInventory;
 import com.playmonumenta.plugins.depths.abilities.WeaponAspectDepthsAbility;
 import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.utils.NamespacedKeyUtils;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -166,7 +165,7 @@ public class DepthsWeaponAspectGUI extends CustomInventory {
 
 	Boolean attemptUpgrade(Player player) {
 		int totalToRemove = CCS_AMOUNT;
-		ItemStack currencyItem = InventoryUtils.getItemFromLootTable(player, NamespacedKey.fromString("epic:r2/items/currency/compressed_crystalline_shard"));
+		ItemStack currencyItem = InventoryUtils.getItemFromLootTable(player, NamespacedKeyUtils.fromString("epic:r2/items/currency/compressed_crystalline_shard"));
 		currencyItem.setAmount(1);
 		String currencyName = "Compressed Crystalline Shard";
 

@@ -18,6 +18,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
@@ -48,7 +49,7 @@ public class Bezoar extends Ability {
 
 	private int mKills = 0;
 
-	public Bezoar(Plugin plugin, Player player) {
+	public Bezoar(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Bezoar");
 		mInfo.mLinkedSpell = ClassAbility.BEZOAR;
 		mInfo.mScoreboardId = "Bezoar";

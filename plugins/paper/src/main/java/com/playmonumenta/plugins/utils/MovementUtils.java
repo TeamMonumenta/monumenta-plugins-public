@@ -39,7 +39,7 @@ public class MovementUtils {
 
 		dir = dir.normalize().multiply(speed);
 		dir.setY(y);
-		double mult = 1 - target.getAttribute(Attribute.GENERIC_KNOCKBACK_RESISTANCE).getValue();
+		double mult = 1 - EntityUtils.getAttributeOrDefault(target, Attribute.GENERIC_KNOCKBACK_RESISTANCE, 0);
 		if (mult > 0 || !useKnockbackRes) {
 			if (!useKnockbackRes) {
 				mult = 1;
@@ -60,7 +60,7 @@ public class MovementUtils {
 		if (y != 0) {
 			dir.setY(y);
 		}
-		double mult = 1 - target.getAttribute(Attribute.GENERIC_KNOCKBACK_RESISTANCE).getValue();
+		double mult = 1 - EntityUtils.getAttributeOrDefault(target, Attribute.GENERIC_KNOCKBACK_RESISTANCE, 0);
 		if (mult > 0) {
 			dir.multiply(mult);
 
@@ -76,7 +76,7 @@ public class MovementUtils {
 		if (dir.getY() < 0) {
 			dir.setY(0.5f);
 		}
-		double mult = 1 - target.getAttribute(Attribute.GENERIC_KNOCKBACK_RESISTANCE).getValue();
+		double mult = 1 - EntityUtils.getAttributeOrDefault(target, Attribute.GENERIC_KNOCKBACK_RESISTANCE, 0);
 		if (mult > 0) {
 			dir.multiply(mult);
 
@@ -92,7 +92,7 @@ public class MovementUtils {
 		if (dir.getY() < 0) {
 			dir.setY(0.5f);
 		}
-		double mult = 1 - target.getAttribute(Attribute.GENERIC_KNOCKBACK_RESISTANCE).getValue();
+		double mult = 1 - EntityUtils.getAttributeOrDefault(target, Attribute.GENERIC_KNOCKBACK_RESISTANCE, 0);
 		if (mult > 0) {
 			dir.multiply(mult);
 			target.setVelocity(dir);

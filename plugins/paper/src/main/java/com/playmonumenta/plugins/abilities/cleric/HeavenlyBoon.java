@@ -45,7 +45,7 @@ public final class HeavenlyBoon extends Ability implements KillTriggeredAbility 
 
 	private @Nullable Crusade mCrusade;
 
-	public HeavenlyBoon(Plugin plugin, Player player) {
+	public HeavenlyBoon(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Heavenly Boon");
 		mInfo.mScoreboardId = "HeavenlyBoon";
 		mInfo.mShorthandName = "HB";

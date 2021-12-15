@@ -63,6 +63,9 @@ public class ChaosDagger extends DepthsAbility {
 
 	@Override
 	public void playerSwapHandItemsEvent(PlayerSwapHandItemsEvent event) {
+		if (mPlayer == null) {
+			return;
+		}
 
 		event.setCancelled(true);
 
@@ -92,9 +95,9 @@ public class ChaosDagger extends DepthsAbility {
 			new BukkitRunnable() {
 
 				int mExpire = 0;
-				World mWorld = mPlayer.getWorld();
-				LivingEntity mTarget = EntityUtils.getNearestMob(tincture.getLocation(), 20.0);
-				Location mLastLocation = null;
+				final World mWorld = mPlayer.getWorld();
+				@Nullable LivingEntity mTarget = EntityUtils.getNearestMob(tincture.getLocation(), 20.0);
+				@Nullable Location mLastLocation = null;
 
 				@Override
 				public void run() {

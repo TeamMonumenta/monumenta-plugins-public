@@ -56,7 +56,7 @@ public class JudgementChain extends Ability {
 
 	private @Nullable LivingEntity mTarget = null;
 
-	public JudgementChain(Plugin plugin, Player player) {
+	public JudgementChain(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Judgement Chain");
 		mInfo.mLinkedSpell = ClassAbility.JUDGEMENT_CHAIN;
 		mInfo.mScoreboardId = "JudgementChain";

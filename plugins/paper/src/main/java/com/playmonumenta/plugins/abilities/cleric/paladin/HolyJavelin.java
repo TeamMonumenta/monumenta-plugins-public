@@ -52,7 +52,7 @@ public class HolyJavelin extends Ability {
 	private @Nullable DivineJustice mDivineJustice;
 	private @Nullable LuminousInfusion mLuminousInfusion;
 
-	public HolyJavelin(Plugin plugin, Player player) {
+	public HolyJavelin(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Holy Javelin");
 		mInfo.mLinkedSpell = ClassAbility.HOLY_JAVELIN;
 		mInfo.mScoreboardId = "HolyJavelin";
@@ -67,15 +67,18 @@ public class HolyJavelin extends Ability {
 
 		if (player != null) {
 			Bukkit.getScheduler().runTask(plugin, () -> {
-				mCrusade = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(mPlayer, Crusade.class);
-				mDivineJustice = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(mPlayer, DivineJustice.class);
-				mLuminousInfusion = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(mPlayer, LuminousInfusion.class);
+				mCrusade = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, Crusade.class);
+				mDivineJustice = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, DivineJustice.class);
+				mLuminousInfusion = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, LuminousInfusion.class);
 			});
 		}
 	}
 
 	@Override
 	public boolean runCheck() {
+		if (mPlayer == null) {
+			return false;
+		}
 		ItemStack mainHand = mPlayer.getInventory().getItemInMainHand();
 		return mPlayer.isSprinting() && !mPlayer.isSneaking() && !ItemUtils.isPickaxe(mainHand);
 	}
@@ -112,6 +115,9 @@ public class HolyJavelin extends Ability {
 		double bonusDamage,
 		@Nullable LivingEntity triggeringEnemy
 	) {
+		if (mPlayer == null) {
+			return;
+		}
 		putOnCooldown();
 
 		World world = mPlayer.getWorld();

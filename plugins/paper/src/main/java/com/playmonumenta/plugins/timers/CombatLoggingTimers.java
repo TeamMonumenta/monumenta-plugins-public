@@ -14,10 +14,10 @@ import org.bukkit.entity.Monster;
 import com.playmonumenta.plugins.utils.EntityUtils;
 
 public class CombatLoggingTimers {
-	public HashMap<UUID, Integer> mTimers = null;
+
+	private final HashMap<UUID, Integer> mTimers = new HashMap<>();
 
 	public CombatLoggingTimers() {
-		mTimers = new HashMap<UUID, Integer>();
 	}
 
 	public void addTimer(UUID entityUUID, int time) {

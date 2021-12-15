@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.abilities.other;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.entity.Player;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
@@ -17,12 +18,12 @@ public class AttribaAttackSpeed extends Ability {
 		return player != null && player.getScoreboardTags().contains(MODIFIER_NAME);
 	}
 
-	public AttribaAttackSpeed(Plugin plugin, Player player) {
+	public AttribaAttackSpeed(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "AttribaAttackSpeed");
 
 		if (player != null) {
 			EntityUtils.addAttribute(player, Attribute.GENERIC_ATTACK_SPEED,
-				new AttributeModifier(MODIFIER_NAME, REDUCTION, AttributeModifier.Operation.MULTIPLY_SCALAR_1));
+			                         new AttributeModifier(MODIFIER_NAME, REDUCTION, AttributeModifier.Operation.MULTIPLY_SCALAR_1));
 		}
 	}
 }

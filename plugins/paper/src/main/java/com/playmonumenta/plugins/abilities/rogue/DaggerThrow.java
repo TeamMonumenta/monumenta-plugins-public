@@ -19,6 +19,7 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
@@ -54,7 +55,7 @@ public class DaggerThrow extends Ability {
 	private final int mDamage;
 	private final int mVulnAmplifier;
 
-	public DaggerThrow(Plugin plugin, Player player) {
+	public DaggerThrow(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Dagger Throw");
 		mInfo.mLinkedSpell = ClassAbility.DAGGER_THROW;
 		mInfo.mScoreboardId = "DaggerThrow";
@@ -70,6 +71,9 @@ public class DaggerThrow extends Ability {
 
 	@Override
 	public void cast(Action action) {
+		if (mPlayer == null) {
+			return;
+		}
 		Location loc = mPlayer.getEyeLocation();
 		Vector dir = loc.getDirection();
 		List<LivingEntity> mobs = EntityUtils.getNearbyMobs(loc, DAGGER_THROW_RANGE + 1, mPlayer);

@@ -49,7 +49,7 @@ public class HowlingWinds extends DepthsAbility {
 	@Override
 	public void playerSwapHandItemsEvent(PlayerSwapHandItemsEvent event) {
 		event.setCancelled(true);
-		if (!isTimerActive() && DepthsUtils.isWeaponItem(mPlayer.getInventory().getItemInMainHand())) {
+		if (mPlayer != null && !isTimerActive() && DepthsUtils.isWeaponItem(mPlayer.getInventory().getItemInMainHand())) {
 			putOnCooldown();
 
 			Location loc = mPlayer.getEyeLocation();
@@ -73,6 +73,9 @@ public class HowlingWinds extends DepthsAbility {
 	}
 
 	private void explode(Location loc) {
+		if (mPlayer == null) {
+			return;
+		}
 		World world = mPlayer.getWorld();
 		world.spawnParticle(Particle.CLOUD, loc, 35, 4, 4, 4, 0.125);
 		world.spawnParticle(Particle.FIREWORKS_SPARK, loc, 25, 2, 2, 2, 0.125);

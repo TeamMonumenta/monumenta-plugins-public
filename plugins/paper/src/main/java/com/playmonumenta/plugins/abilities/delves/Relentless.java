@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.abilities.delves;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntitySpawnEvent;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.bosses.bosses.DistanceCloserBoss;
@@ -39,7 +40,7 @@ public class Relentless extends DelveModifier {
 
 	private final int mDistanceCloserSpeedRawPercent;
 
-	public Relentless(Plugin plugin, Player player) {
+	public Relentless(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, Modifier.RELENTLESS);
 
 		if (player != null) {

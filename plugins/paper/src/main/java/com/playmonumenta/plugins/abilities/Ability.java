@@ -110,7 +110,7 @@ public abstract class Ability {
 	}
 
 	public boolean isTimerActive(ClassAbility spell) {
-		return mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), spell);
+		return mPlayer != null && mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), spell);
 	}
 
 	public void putOnCooldown() {
@@ -321,8 +321,8 @@ public abstract class Ability {
 	 * For performance, this caches the first scoreboard lookup for future use
 	 */
 	public int getAbilityScore(@UnknownInitialization(Ability.class)Ability this) {
-		AbilityInfo info = getInfo();
-		if (mPlayer != null && info.mScoreboardId != null) {
+		AbilityInfo info = mInfo;
+		if (mPlayer != null && info != null && info.mScoreboardId != null) {
 			if (mScore == null) {
 				mScore = ScoreboardUtils.getScoreboardValue(mPlayer, info.mScoreboardId).orElse(0);
 			}

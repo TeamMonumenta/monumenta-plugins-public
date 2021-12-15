@@ -13,6 +13,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.point.AreaBounds;
 import com.playmonumenta.plugins.point.Point;
@@ -34,21 +35,21 @@ public class CommandUtils {
 	 *
 	 * @return sender's location or raises an exception
 	 */
-	public static Location getLocation(CommandSender sender) throws Exception {
+	public static Location getLocation(@Nullable CommandSender sender) throws Exception {
 		return getLocation(sender, false);
 	}
 
-	public static Location getLocation(CommandSender sender, boolean doSubtractEntityOffset) throws Exception {
+	public static Location getLocation(@Nullable CommandSender sender, boolean doSubtractEntityOffset) throws Exception {
 		if (sender == null) {
 			throw new Exception("sender is null!");
 		} else if (sender instanceof Entity) {
-			Location senderLoc = ((Entity)sender).getLocation();
+			Location senderLoc = ((Entity) sender).getLocation();
 			if (doSubtractEntityOffset) {
 				senderLoc.subtract(0.5, 0.5, 0.5);
 			}
 			return senderLoc;
 		} else if (sender instanceof BlockCommandSender) {
-			return ((BlockCommandSender)sender).getBlock().getLocation();
+			return ((BlockCommandSender) sender).getBlock().getLocation();
 		} else if (sender instanceof ProxiedCommandSender) {
 			return getLocation(((ProxiedCommandSender)sender).getCallee(), doSubtractEntityOffset);
 		} else {
@@ -56,7 +57,7 @@ public class CommandUtils {
 		}
 	}
 
-	public static int parseIntFromString(CommandSender sender, String str) throws Exception {
+	public static int parseIntFromString(@Nullable CommandSender sender, String str) throws Exception {
 		int value = 0;
 
 		try {
@@ -71,7 +72,7 @@ public class CommandUtils {
 		return value;
 	}
 
-	public static double parseDoubleFromString(CommandSender sender, String str) throws Exception {
+	public static double parseDoubleFromString(@Nullable CommandSender sender, String str) throws Exception {
 		double value = 0;
 
 		try {
@@ -86,7 +87,7 @@ public class CommandUtils {
 		return value;
 	}
 
-	public static AreaBounds parseAreaFromString(CommandSender sender,
+	public static AreaBounds parseAreaFromString(@Nullable CommandSender sender,
 	                                             String xStr1, String yStr1, String zStr1,
 	                                             String xStr2, String yStr2, String zStr2) throws Exception {
 		Point pos1;
@@ -117,7 +118,7 @@ public class CommandUtils {
 		return new AreaBounds(pos1, pos2);
 	}
 
-	public static double parseCoordFromString(CommandSender sender,
+	public static double parseCoordFromString(@Nullable CommandSender sender,
 	                                          double senderPos, String str) throws Exception {
 		try {
 			if (str.equals("~")) {
@@ -144,11 +145,11 @@ public class CommandUtils {
 		}
 	}
 
-	public static void enchantify(CommandSender sender, Player player, String enchantment) throws WrapperCommandSyntaxException {
+	public static void enchantify(@Nullable CommandSender sender, Player player, String enchantment) throws WrapperCommandSyntaxException {
 		enchantify(sender, player, enchantment, null);
 	}
 
-	public static void enchantify(CommandSender sender, Player player, String enchantment, String ownerPrefix) throws WrapperCommandSyntaxException {
+	public static void enchantify(@Nullable CommandSender sender, Player player, String enchantment, String ownerPrefix) throws WrapperCommandSyntaxException {
 		ItemStack item = player.getEquipment().getItemInMainHand();
 
 		try {

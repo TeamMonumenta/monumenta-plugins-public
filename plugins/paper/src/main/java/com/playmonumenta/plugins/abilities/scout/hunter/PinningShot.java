@@ -18,6 +18,7 @@ import org.bukkit.entity.SpectralArrow;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
@@ -40,7 +41,7 @@ public class PinningShot extends Ability {
 
 	private final Map<LivingEntity, Boolean> mPinnedMobs = new HashMap<LivingEntity, Boolean>();
 
-	public PinningShot(Plugin plugin, Player player) {
+	public PinningShot(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Pinning Shot");
 		mInfo.mScoreboardId = "PinningShot";
 		mInfo.mShorthandName = "PSh";

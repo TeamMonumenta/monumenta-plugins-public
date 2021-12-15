@@ -6,6 +6,7 @@ import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDeathEvent;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
@@ -52,7 +53,7 @@ public class Dreadful extends DelveModifier {
 
 	private final double mSpawnChance;
 
-	public Dreadful(Plugin plugin, Player player) {
+	public Dreadful(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, Modifier.DREADFUL);
 
 		if (player != null) {

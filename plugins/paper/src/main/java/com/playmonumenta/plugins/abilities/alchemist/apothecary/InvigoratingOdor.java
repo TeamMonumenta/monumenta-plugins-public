@@ -10,6 +10,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.alchemist.PotionAbility;
@@ -28,7 +29,7 @@ public class InvigoratingOdor extends PotionAbility {
 	private static final Particle.DustOptions APOTHECARY_LIGHT_COLOR = new Particle.DustOptions(Color.fromRGB(255, 255, 100), 1.5f);
 	private static final Particle.DustOptions APOTHECARY_DARK_COLOR = new Particle.DustOptions(Color.fromRGB(83, 0, 135), 1.5f);
 
-	public InvigoratingOdor(Plugin plugin, Player player) {
+	public InvigoratingOdor(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Invigorating Odor", INVIGORATING_1_DAMAGE, INVIGORATING_2_DAMAGE);
 		mInfo.mLinkedSpell = ClassAbility.INVIGORATING_ODOR;
 		mInfo.mScoreboardId = "InvigoratingOdor";
@@ -40,6 +41,9 @@ public class InvigoratingOdor extends PotionAbility {
 
 	@Override
 	public void createAura(Location loc, double radius) {
+		if (mPlayer == null) {
+			return;
+		}
 		World world = mPlayer.getWorld();
 		world.spawnParticle(Particle.END_ROD, loc, 35, 0.3, 0.3, 0.3, 0.1);
 		world.spawnParticle(Particle.SPELL, loc, 35, radius / 2, 0.15, radius / 2);

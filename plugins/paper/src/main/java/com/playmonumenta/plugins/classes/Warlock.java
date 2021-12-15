@@ -3,21 +3,20 @@ package com.playmonumenta.plugins.classes;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.warlock.AmplifyingHex;
-import com.playmonumenta.plugins.abilities.warlock.PhlegmaticResolve;
 import com.playmonumenta.plugins.abilities.warlock.CholericFlames;
 import com.playmonumenta.plugins.abilities.warlock.CursedWound;
-import com.playmonumenta.plugins.abilities.warlock.MelancholicLament;
 import com.playmonumenta.plugins.abilities.warlock.GraspingClaws;
+import com.playmonumenta.plugins.abilities.warlock.MelancholicLament;
+import com.playmonumenta.plugins.abilities.warlock.PhlegmaticResolve;
 import com.playmonumenta.plugins.abilities.warlock.SanguineHarvest;
 import com.playmonumenta.plugins.abilities.warlock.SoulRend;
-
 import com.playmonumenta.plugins.abilities.warlock.reaper.DarkPact;
 import com.playmonumenta.plugins.abilities.warlock.reaper.JudgementChain;
 import com.playmonumenta.plugins.abilities.warlock.reaper.VoodooBonds;
-
 import com.playmonumenta.plugins.abilities.warlock.tenebrist.HauntingShades;
 import com.playmonumenta.plugins.abilities.warlock.tenebrist.UmbralWail;
 import com.playmonumenta.plugins.abilities.warlock.tenebrist.WitheringGaze;
@@ -29,7 +28,7 @@ import net.md_5.bungee.api.ChatColor;
 
 public class Warlock extends PlayerClass {
 
-	Warlock(Plugin plugin, Player player) {
+	Warlock(Plugin plugin, @Nullable Player player) {
 		mAbilities.add(new AmplifyingHex(plugin, player));
 		mAbilities.add(new PhlegmaticResolve(plugin, player));
 		mAbilities.add(new CholericFlames(plugin, player));

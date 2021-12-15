@@ -131,7 +131,7 @@ public class ItemManager {
 		return nameMap.getOrDefault(name, null);
 	}
 
-	public @Nullable MonumentaItem getMMItemWithEdits(ItemStack itemStack) {
+	public MonumentaItem getMMItemWithEdits(ItemStack itemStack) {
 		String json = new NBTItem(itemStack).getString("MonumentaItemEdits");
 		MonumentaItem edits = null;
 		if (json != null) {

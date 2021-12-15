@@ -51,6 +51,9 @@ public class RingOfFlames extends DepthsAbility {
 
 	@Override
 	public void cast(Action trigger) {
+		if (mPlayer == null) {
+			return;
+		}
 		putOnCooldown();
 
 		World world = mPlayer.getWorld();
@@ -135,7 +138,7 @@ public class RingOfFlames extends DepthsAbility {
 
 	@Override
 	public boolean runCheck() {
-		return mPlayer.isSneaking() && DepthsUtils.isWeaponItem(mPlayer.getInventory().getItemInMainHand());
+		return mPlayer != null && mPlayer.isSneaking() && DepthsUtils.isWeaponItem(mPlayer.getInventory().getItemInMainHand());
 	}
 
 	@Override

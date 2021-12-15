@@ -2,11 +2,14 @@ package com.playmonumenta.plugins.server.properties;
 
 import java.util.ArrayList;
 import java.util.EnumSet;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import org.bukkit.ChatColor;
+import org.bukkit.Material;
+import org.bukkit.command.CommandSender;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -14,14 +17,9 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.scriptedquests.utils.QuestUtils;
 
-import org.bukkit.ChatColor;
-import org.bukkit.Material;
-import org.bukkit.command.CommandSender;
-import org.checkerframework.checker.nullness.qual.Nullable;
-
 public class ServerProperties {
-	/* Only the most recent instance of this is used */
-	private static ServerProperties INSTANCE = null;
+
+	private static final ServerProperties INSTANCE = new ServerProperties();
 
 	private boolean mDailyResetEnabled = false;
 	private boolean mJoinMessagesEnabled = false;
@@ -41,111 +39,82 @@ public class ServerProperties {
 
 	private String mShardName = "default_settings";
 
-	private EnumSet<Material> mUnbreakableBlocks = EnumSet.noneOf(Material.class);
-	private EnumSet<Material> mAlwaysPickupMats = EnumSet.noneOf(Material.class);
-	private EnumSet<Material> mNamedPickupMats = EnumSet.noneOf(Material.class);
+	private final EnumSet<Material> mUnbreakableBlocks = EnumSet.noneOf(Material.class);
+	private final EnumSet<Material> mAlwaysPickupMats = EnumSet.noneOf(Material.class);
+	private final EnumSet<Material> mNamedPickupMats = EnumSet.noneOf(Material.class);
 
 	public ServerProperties() {
-		INSTANCE = this;
-	}
-
-	/*
-	 * Ensures that INSTANCE is non null
-	 * If it is null, creates a default instance with default values
-	 */
-	private static void ensureInstance() {
-		if (INSTANCE == null) {
-			new ServerProperties();
-		}
 	}
 
 	public static boolean getDailyResetEnabled() {
-		ensureInstance();
 		return INSTANCE.mDailyResetEnabled;
 	}
 
 	public static boolean getJoinMessagesEnabled() {
-		ensureInstance();
 		return INSTANCE.mJoinMessagesEnabled;
 	}
 
 	public static boolean getIsTownWorld() {
-		ensureInstance();
 		return INSTANCE.mIsTownWorld;
 	}
 
 	public static int getPlotSurvivalMinHeight() {
-		ensureInstance();
 		return INSTANCE.mPlotSurvivalMinHeight;
 	}
 
 	public static boolean getIsSleepingEnabled() {
-		ensureInstance();
 		return INSTANCE.mIsSleepingEnabled;
 	}
 
 	public static boolean getKeepLowTierInventory() {
-		ensureInstance();
 		return INSTANCE.mKeepLowTierInventory;
 	}
 
 	public static boolean getClassSpecializationsEnabled() {
-		ensureInstance();
 		return INSTANCE.mClassSpecializationsEnabled;
 	}
 
 	public static boolean getAuditMessagesEnabled() {
-		ensureInstance();
 		return INSTANCE.mAuditMessagesEnabled;
 	}
 
 	public static boolean getRepairExplosions() {
-		ensureInstance();
 		return INSTANCE.mRepairExplosions;
 	}
 
 	public static boolean getPreventDungeonItemTransfer() {
-		ensureInstance();
 		return INSTANCE.mPreventDungeonItemTransfer;
 	}
 
 	public static boolean getReplaceSpawnerEntities() {
-		ensureInstance();
 		return INSTANCE.mReplaceSpawnerEntities;
 	}
 
 	public static boolean getInfusionsEnabled() {
-		ensureInstance();
 		return INSTANCE.mInfusionsEnabled;
 	}
 
 	public static int getHTTPStatusPort() {
-		ensureInstance();
 		return INSTANCE.mHTTPStatusPort;
 	}
 
 	public static String getShardName() {
-		ensureInstance();
 		return INSTANCE.mShardName;
 	}
 
 	public static Set<Material> getUnbreakableBlocks() {
-		ensureInstance();
 		return INSTANCE.mUnbreakableBlocks;
 	}
 
 	public static Set<Material> getAlwaysPickupMats() {
-		ensureInstance();
 		return INSTANCE.mAlwaysPickupMats;
 	}
 
 	public static Set<Material> getNamedPickupMats() {
-		ensureInstance();
 		return INSTANCE.mNamedPickupMats;
 	}
 
 	public static void load(Plugin plugin, @Nullable CommandSender sender) {
-		ensureInstance();
 		INSTANCE.loadInternal(plugin, sender);
 	}
 
@@ -247,14 +216,12 @@ public class ServerProperties {
 		return value;
 	}
 
-	private void getPropertyValueMaterialList(Plugin plugin, JsonObject object, String propertyName, CommandSender sender, Set<Material> set) {
+	private void getPropertyValueMaterialList(Plugin plugin, JsonObject object, String propertyName, @Nullable CommandSender sender, Set<Material> set) {
 		JsonElement element = object.get(propertyName);
 		if (element != null) {
 			set.clear();
 
-			Iterator<JsonElement> targetIter = element.getAsJsonArray().iterator();
-			while (targetIter.hasNext()) {
-				JsonElement iter = targetIter.next();
+			for (JsonElement iter : element.getAsJsonArray()) {
 				try {
 					String blockName = iter.getAsString();
 					Material mat = Material.getMaterial(blockName);

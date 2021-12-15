@@ -6,7 +6,6 @@ import java.util.UUID;
 
 import org.bukkit.Material;
 import org.bukkit.Particle;
-import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Player;
 
 import com.playmonumenta.plugins.Plugin;
@@ -15,6 +14,7 @@ import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
+import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 
 import net.md_5.bungee.api.ChatColor;
@@ -28,8 +28,6 @@ public class Rejuvenation extends DepthsAbility {
 
 	private static final Map<UUID, Integer> LAST_HEAL_TICK = new HashMap<>();
 
-	private int mHealInterval;
-
 	private int mTimer = 0;
 
 	public Rejuvenation(Plugin plugin, Player player) {
@@ -40,10 +38,10 @@ public class Rejuvenation extends DepthsAbility {
 
 	@Override
 	public void periodicTrigger(boolean twoHertz, boolean oneSecond, int ticks) {
-		mHealInterval = HEAL_INTERVAL[mRarity - 1];
-		if (oneSecond && !mPlayer.isDead()) {
+		int healInterval = HEAL_INTERVAL[mRarity - 1];
+		if (mPlayer != null && oneSecond && !mPlayer.isDead()) {
 			mTimer += 20;
-			if (mTimer % mHealInterval == 0) {
+			if (mTimer % healInterval == 0) {
 				for (Player player : PlayerUtils.playersInRange(mPlayer.getLocation(), RADIUS, true)) {
 					// Prevents stacking
 					boolean highestLevel = true;
@@ -57,10 +55,10 @@ public class Rejuvenation extends DepthsAbility {
 						}
 					}
 					Integer lastHealTick = LAST_HEAL_TICK.get(player.getUniqueId());
-					if (lastHealTick == null || player.getTicksLived() - lastHealTick >= mHealInterval && highestLevel) {
+					if (lastHealTick == null || player.getTicksLived() - lastHealTick >= healInterval && highestLevel) {
 						LAST_HEAL_TICK.put(player.getUniqueId(), player.getTicksLived());
 
-						double maxHealth = player.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue();
+						double maxHealth = EntityUtils.getMaxHealth(player);
 						if (player.getHealth() != maxHealth) {
 							PlayerUtils.healPlayer(player, PERCENT_HEAL * maxHealth);
 							player.getWorld().spawnParticle(Particle.HEART, (player.getLocation()).add(0, 2, 0), 1, 0.07, 0.07, 0.07, 0.001);

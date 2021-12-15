@@ -50,7 +50,10 @@ public class InstantDrink implements BaseEnchantment {
 
 	@Override
 	public void onPlayerInteract(Plugin plugin, Player player, PlayerInteractEvent event, int level) {
-		if (event.getAction() == Action.RIGHT_CLICK_AIR || (event.getAction() == Action.RIGHT_CLICK_BLOCK && !ItemUtils.interactableBlocks.contains(event.getClickedBlock().getBlockData().getMaterial()))) {
+		if (event.getAction() == Action.RIGHT_CLICK_AIR ||
+				(event.getAction() == Action.RIGHT_CLICK_BLOCK
+						&& event.getClickedBlock() != null
+						&& !ItemUtils.interactableBlocks.contains(event.getClickedBlock().getBlockData().getMaterial()))) {
 			ItemStack item = player.getInventory().getItemInMainHand();
 			if (item.getType() == Material.POTION) {
 				PotionMeta meta = (PotionMeta) item.getItemMeta();
@@ -64,7 +67,9 @@ public class InstantDrink implements BaseEnchantment {
 					}
 				} else {
 					PotionInfo info = PotionUtils.getPotionInfo(meta.getBasePotionData(), 1);
-					PotionUtils.apply(player, info);
+					if (info != null) {
+						PotionUtils.apply(player, info);
+					}
 				}
 
 				//Apply Starvation if applicable
@@ -75,8 +80,8 @@ public class InstantDrink implements BaseEnchantment {
 
 				player.getWorld().playSound(player.getLocation(), Sound.ENTITY_GENERIC_DRINK, 1, 1);
 				World world = player.getWorld();
-				if (meta.hasColor()) {
-					Color color = meta.getColor();
+				Color color = meta.getColor();
+				if (color != null) {
 					double red = color.getRed() / 255D;
 					double green = color.getGreen() / 255D;
 					double blue = color.getBlue() / 255D;

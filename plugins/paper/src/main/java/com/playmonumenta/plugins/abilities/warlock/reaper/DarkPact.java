@@ -56,7 +56,7 @@ public class DarkPact extends Ability {
 	private int mTicks = 0;
 	private @Nullable JudgementChain mJudgementChain;
 
-	public DarkPact(Plugin plugin, Player player) {
+	public DarkPact(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Dark Pact");
 		mInfo.mScoreboardId = "DarkPact";
 		mInfo.mShorthandName = "DaP";
@@ -71,14 +71,14 @@ public class DarkPact extends Ability {
 
 		if (player != null) {
 			Bukkit.getScheduler().runTask(plugin, () -> {
-				mJudgementChain = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(mPlayer, JudgementChain.class);
+				mJudgementChain = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, JudgementChain.class);
 			});
 		}
 	}
 
 	@Override
 	public void playerSwapHandItemsEvent(PlayerSwapHandItemsEvent event) {
-		if (ItemUtils.isHoe(mPlayer.getInventory().getItemInMainHand())) {
+		if (mPlayer != null && ItemUtils.isHoe(mPlayer.getInventory().getItemInMainHand())) {
 			event.setCancelled(true);
 			// *TO DO* - Turn into boolean in constructor -or- look at changing trigger entirely
 			if (mPlayer.isOnGround() || mPlayer.isSneaking() || mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.mLinkedSpell) || (mPlayer.isSneaking() && mJudgementChain != null && mPlayer.getLocation().getPitch() < -50.0)) {
@@ -110,6 +110,9 @@ public class DarkPact extends Ability {
 
 	@Override
 	public void entityDeathEvent(EntityDeathEvent event, boolean shouldGenDrops) {
+		if (mPlayer == null) {
+			return;
+		}
 		if (mTicks != 0) {
 			mTicks += DURATION_INCREASE_ON_KILL;
 		}
@@ -142,7 +145,7 @@ public class DarkPact extends Ability {
 
 	@Override
 	public boolean livingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
-		if (event.getCause() == DamageCause.ENTITY_ATTACK) {
+		if (mPlayer != null && event.getCause() == DamageCause.ENTITY_ATTACK) {
 			if (!ItemUtils.isHoe(mPlayer.getInventory().getItemInMainHand())) {
 				event.setDamage(event.getDamage() / (1 + mPercentDamageDealt));
 			}

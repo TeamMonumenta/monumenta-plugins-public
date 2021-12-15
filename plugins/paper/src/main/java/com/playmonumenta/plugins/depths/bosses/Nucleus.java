@@ -49,7 +49,7 @@ import com.playmonumenta.plugins.utils.SerializationUtils;
 
 import net.md_5.bungee.api.ChatColor;
 
-public class Nucleus extends BossAbilityGroup {
+public final class Nucleus extends BossAbilityGroup {
 	public static final String identityTag = "boss_nucleus";
 	public static final int detectionRange = 50;
 	public static final String DOOR_FILL_TAG = "Door";
@@ -285,9 +285,7 @@ public class Nucleus extends BossAbilityGroup {
 			List<LivingEntity> nearbyMobs = EntityUtils.getNearbyMobs(loc, 1.0);
 			if (mEyes.get(loc) == null && nearbyMobs.size() == 0) {
 				//Summon a new plant here
-				String plant = EYE_LOS;
-
-				LivingEntity newPlant = (LivingEntity) LibraryOfSoulsIntegration.summon(loc, plant);
+				LivingEntity newPlant = (LivingEntity) LibraryOfSoulsIntegration.summon(loc, EYE_LOS);
 				mEyes.put(loc, newPlant);
 				newPlant.setAI(false);
 				newPlant.setGlowing(true);
@@ -319,8 +317,8 @@ public class Nucleus extends BossAbilityGroup {
 
 		// Health is scaled by 1.5 times each time you fight the boss
 		DepthsParty party = DepthsUtils.getPartyFromNearbyPlayers(mSpawnLoc);
-		int modifiedHealth = (int) (NUCLEUS_HEALTH * Math.pow(1.15, (party.getFloor() - 1) / 3));
-		mBoss.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(modifiedHealth);
+		int modifiedHealth = (int) (NUCLEUS_HEALTH * Math.pow(1.15, party == null ? 0 : (party.getFloor() - 1) / 3));
+		EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_MAX_HEALTH, modifiedHealth);
 		mBoss.setHealth(modifiedHealth);
 
 		Bukkit.getServer().dispatchCommand(Bukkit.getServer().getConsoleSender(), "growable grow " + (int) (mSpawnLoc.getX() - 1) + " " + (int) (mSpawnLoc.getY() + 21) + " " + (int) (mSpawnLoc.getZ() - 1) + " jellyfish 1 20 true");

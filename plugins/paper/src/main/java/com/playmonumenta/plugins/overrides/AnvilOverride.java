@@ -15,6 +15,7 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
@@ -25,11 +26,11 @@ public class AnvilOverride extends BaseOverride {
 	private static final String REPAIR_OBJECTIVE = "RepairT";
 
 	@Override
-	public boolean rightClickBlockInteraction(Plugin plugin, Player player, Action action, ItemStack item, Block block, PlayerInteractEvent event) {
+	public boolean rightClickBlockInteraction(Plugin plugin, Player player, Action action, @Nullable ItemStack item, Block block, PlayerInteractEvent event) {
 		if (player == null || player.getGameMode() == GameMode.CREATIVE) {
 			return true;
 		} else if (player.getGameMode() == GameMode.ADVENTURE
-		           && block.getLocation().subtract(0, 0.75, 0).getBlock().getType() != Material.DISPENSER) {
+				&& block.getLocation().subtract(0, 0.75, 0).getBlock().getType() != Material.DISPENSER) {
 			return false;
 		}
 

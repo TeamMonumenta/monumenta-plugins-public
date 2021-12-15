@@ -4,6 +4,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Vex;
 import org.bukkit.event.entity.SpawnerSpawnEvent;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.bosses.bosses.BlockBreakBoss;
@@ -42,7 +43,7 @@ public class Pernicious extends DelveModifier {
 			}
 	};
 
-	public Pernicious(Plugin plugin, Player player) {
+	public Pernicious(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, Modifier.PERNICIOUS);
 
 		if (player != null) {

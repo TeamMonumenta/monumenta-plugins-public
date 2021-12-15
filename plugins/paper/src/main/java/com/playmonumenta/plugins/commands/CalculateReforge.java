@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
@@ -15,6 +14,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.ItemUtils.ItemRegion;
+import com.playmonumenta.plugins.utils.NamespacedKeyUtils;
 
 import dev.jorel.commandapi.CommandAPI;
 import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
@@ -47,16 +47,16 @@ public class CalculateReforge extends GenericCommand {
 	private static void run(Player player) throws WrapperCommandSyntaxException {
 		// Grab currency items from the loot tables so we can scan for and remove them from players' inventories.
 		if (mCXP == null) {
-			mCXP = InventoryUtils.getItemFromLootTable(player, NamespacedKey.fromString("epic:r1/items/currency/concentrated_experience"));
+			mCXP = InventoryUtils.getItemFromLootTable(player, NamespacedKeyUtils.fromString("epic:r1/items/currency/concentrated_experience"));
 		}
 		if (mHXP == null) {
-			mHXP = InventoryUtils.getItemFromLootTable(player, NamespacedKey.fromString("epic:r1/items/currency/hyper_experience"));
+			mHXP = InventoryUtils.getItemFromLootTable(player, NamespacedKeyUtils.fromString("epic:r1/items/currency/hyper_experience"));
 		}
 		if (mCCS == null) {
-			mCCS = InventoryUtils.getItemFromLootTable(player, NamespacedKey.fromString("epic:r2/items/currency/compressed_crystalline_shard"));
+			mCCS = InventoryUtils.getItemFromLootTable(player, NamespacedKeyUtils.fromString("epic:r2/items/currency/compressed_crystalline_shard"));
 		}
 		if (mHCS == null) {
-			mHCS = InventoryUtils.getItemFromLootTable(player, NamespacedKey.fromString("epic:r2/items/currency/hyper_crystalline_shard"));
+			mHCS = InventoryUtils.getItemFromLootTable(player, NamespacedKeyUtils.fromString("epic:r2/items/currency/hyper_crystalline_shard"));
 		}
 
 		List<ItemStack> shatteredItems = new ArrayList<>();

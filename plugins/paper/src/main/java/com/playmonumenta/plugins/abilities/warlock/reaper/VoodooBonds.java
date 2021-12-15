@@ -15,6 +15,7 @@ import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
@@ -41,7 +42,7 @@ public class VoodooBonds extends Ability {
 
 	private static final Particle.DustOptions COLOR = new Particle.DustOptions(Color.fromRGB(13, 13, 13), 1.0f);
 
-	public VoodooBonds(Plugin plugin, Player player) {
+	public VoodooBonds(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Voodoo Bonds");
 		mInfo.mLinkedSpell = ClassAbility.VOODOO_BONDS;
 		mInfo.mScoreboardId = "VoodooBonds";

@@ -53,7 +53,7 @@ public class PowerInjection extends Ability {
 
 	private @Nullable Player mTargetPlayer;
 
-	public PowerInjection(Plugin plugin, Player player) {
+	public PowerInjection(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Power Injection");
 		mInfo.mLinkedSpell = ClassAbility.POWER_INJECTION;
 		mInfo.mScoreboardId = "PowerInjection";
@@ -115,11 +115,14 @@ public class PowerInjection extends Ability {
 
 	@Override
 	public boolean runCheck() {
+		if (mPlayer == null) {
+			return false;
+		}
 		ItemStack inMainHand = mPlayer.getInventory().getItemInMainHand();
 		if (ItemUtils.isAlchemistItem(inMainHand)) {
 			LivingEntity targetEntity = EntityUtils.getEntityAtCursor(mPlayer, CAST_RANGE, true, true, true);
-			if (targetEntity instanceof Player && ((Player) targetEntity).getGameMode() != GameMode.SPECTATOR) {
-				mTargetPlayer = (Player) targetEntity;
+			if (targetEntity instanceof Player targetPlayer && targetPlayer.getGameMode() != GameMode.SPECTATOR) {
+				mTargetPlayer = targetPlayer;
 			}
 
 			return true;

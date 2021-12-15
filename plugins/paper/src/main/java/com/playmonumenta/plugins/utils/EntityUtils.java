@@ -24,38 +24,8 @@ import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.attribute.AttributeModifier.Operation;
 import org.bukkit.block.Block;
 import org.bukkit.enchantments.Enchantment;
-import org.bukkit.entity.AbstractArrow;
-import org.bukkit.entity.AreaEffectCloud;
-import org.bukkit.entity.Bee;
-import org.bukkit.entity.Blaze;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
-import org.bukkit.entity.Flying;
-import org.bukkit.entity.Ghast;
-import org.bukkit.entity.Giant;
-import org.bukkit.entity.Hoglin;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.MagmaCube;
-import org.bukkit.entity.Mob;
-import org.bukkit.entity.Monster;
-import org.bukkit.entity.Phantom;
-import org.bukkit.entity.PigZombie;
-import org.bukkit.entity.Piglin;
-import org.bukkit.entity.Player;
-import org.bukkit.entity.PolarBear;
-import org.bukkit.entity.Projectile;
-import org.bukkit.entity.PufferFish;
-import org.bukkit.entity.Rabbit;
+import org.bukkit.entity.*;
 import org.bukkit.entity.Rabbit.Type;
-import org.bukkit.entity.Shulker;
-import org.bukkit.entity.SkeletonHorse;
-import org.bukkit.entity.Slime;
-import org.bukkit.entity.ThrownPotion;
-import org.bukkit.entity.Vex;
-import org.bukkit.entity.Wither;
-import org.bukkit.entity.WitherSkeleton;
-import org.bukkit.entity.Wolf;
-import org.bukkit.entity.ZombieHorse;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
@@ -352,7 +322,10 @@ public class EntityUtils {
 		return tags.contains("Boss");
 	}
 
-	public static boolean isHostileMob(Entity entity) {
+	public static boolean isHostileMob(@Nullable Entity entity) {
+		if (entity == null) {
+			return false;
+		}
 		if (!entity.getScoreboardTags().contains("SkillImmune")) {
 			if (entity instanceof Monster || entity instanceof Slime || entity instanceof Ghast || entity instanceof PolarBear
 					|| entity instanceof Phantom || entity instanceof Shulker || entity instanceof PufferFish
@@ -1322,6 +1295,14 @@ public class EntityUtils {
 	}
 
 	/**
+	 * Returns {@code entity.getAttribute(attribute).getValue(value)} if the attribute exists, or {@code def} if not.
+	 */
+	public static double getAttributeOrDefault(LivingEntity entity, Attribute attribute, double def) {
+		AttributeInstance attr = entity.getAttribute(attribute);
+		return attr == null ? def : attr.getValue();
+	}
+
+	/**
 	 * Returns {@code entity.getAttribute(attribute).getBaseValue(value)} if the attribute exists, or {@code def} if not.
 	 */
 	public static double getAttributeBaseOrDefault(LivingEntity entity, Attribute attribute, double def) {
@@ -1452,7 +1433,7 @@ public class EntityUtils {
 		return getProjSkillDamage(player, plugin, true, null);
 	}
 
-	public static double getProjSkillDamage(Player player, Plugin plugin, boolean includeSniperAndPB, Location targetLoc) {
+	public static double getProjSkillDamage(Player player, Plugin plugin, boolean includeSniperAndPB, @Nullable Location targetLoc) {
 		double damage = PlayerUtils.getAttribute(player, AttributeProjectileDamage.PROPERTY_NAME);
 		int focusLevel = plugin.mTrackingManager.mPlayers.getPlayerCustomEnchantLevel(player, Focus.class);
 		if (focusLevel > 0) {

@@ -6,16 +6,17 @@ import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class GuiItem {
-	private int mPage;
-	private int mSlot;
-	private ItemStack mShowedItem;
-	private Map<ItemStack, Integer> mCost;
-	private DoubleParameterFunction<Player, Inventory, Boolean> mAfterClickFunction;
-	private DoubleParameterFunction<Player, Inventory, Boolean> mCondition;
+	private final int mPage;
+	private final int mSlot;
+	private final ItemStack mShowedItem;
+	private final @Nullable Map<ItemStack, Integer> mCost;
+	private final @Nullable DoubleParameterFunction<Player, Inventory, Boolean> mAfterClickFunction;
+	private final @Nullable DoubleParameterFunction<Player, Inventory, Boolean> mCondition;
 
-	public GuiItem(int page, int slot, ItemStack showedItem, Map<ItemStack, Integer> cost, DoubleParameterFunction<Player, Inventory, Boolean> cond, DoubleParameterFunction<Player, Inventory, Boolean> afterClick) {
+	public GuiItem(int page, int slot, ItemStack showedItem, @Nullable Map<ItemStack, Integer> cost, @Nullable DoubleParameterFunction<Player, Inventory, Boolean> cond, @Nullable DoubleParameterFunction<Player, Inventory, Boolean> afterClick) {
 		this.mPage = page;
 		this.mSlot = slot;
 		this.mShowedItem = showedItem;
@@ -24,28 +25,28 @@ public class GuiItem {
 		this.mAfterClickFunction = afterClick;
 	}
 
-	public GuiItem(int page, int slot, ItemStack showedItem, Map<ItemStack, Integer> cost, DoubleParameterFunction<Player, Inventory, Boolean> cond) {
+	public GuiItem(int page, int slot, ItemStack showedItem, @Nullable Map<ItemStack, Integer> cost, @Nullable DoubleParameterFunction<Player, Inventory, Boolean> cond) {
 		this(page, slot, showedItem, cost, cond, null);
 	}
 
-	public GuiItem(int page, int slot, ItemStack showedItem, DoubleParameterFunction<Player, Inventory, Boolean> cond, DoubleParameterFunction<Player, Inventory, Boolean> afterClick) {
+	public GuiItem(int page, int slot, ItemStack showedItem, @Nullable DoubleParameterFunction<Player, Inventory, Boolean> cond, @Nullable DoubleParameterFunction<Player, Inventory, Boolean> afterClick) {
 		this(page, slot, showedItem, null, cond, afterClick);
 	}
 
-	public GuiItem(int page, int slot, ItemStack showedItem, Map<ItemStack, Integer> cost) {
-		this (page, slot, showedItem, cost, null);
+	public GuiItem(int page, int slot, ItemStack showedItem, @Nullable Map<ItemStack, Integer> cost) {
+		this(page, slot, showedItem, cost, null);
 	}
 
-	public GuiItem(int slot, ItemStack showedItem, Map<ItemStack, Integer> cost) {
-		this (0, slot, showedItem, cost);
+	public GuiItem(int slot, ItemStack showedItem, @Nullable Map<ItemStack, Integer> cost) {
+		this(0, slot, showedItem, cost);
 	}
 
 	public GuiItem(int slot, ItemStack showedItemStack) {
-		this (0, slot, showedItemStack, (Map<ItemStack, Integer>) null);
+		this(0, slot, showedItemStack, (Map<ItemStack, Integer>) null);
 	}
 
-	public GuiItem(int page, int slot, ItemStack showedItemStack, DoubleParameterFunction<Player, Inventory, Boolean> cond) {
-		this (page, slot, showedItemStack, (Map<ItemStack, Integer>) null, cond);
+	public GuiItem(int page, int slot, ItemStack showedItemStack, @Nullable DoubleParameterFunction<Player, Inventory, Boolean> cond) {
+		this(page, slot, showedItemStack, (Map<ItemStack, Integer>) null, cond);
 	}
 
 	public int getPage() {
@@ -61,7 +62,7 @@ public class GuiItem {
 	}
 
 	public boolean isVisible(Player player, Inventory inventory) {
-		return mCondition.apply(player, inventory);
+		return mCondition == null || mCondition.apply(player, inventory);
 	}
 
 	public boolean afterClick(Player player, Inventory inventory) {
@@ -72,10 +73,7 @@ public class GuiItem {
 	}
 
 	public boolean doesSomethingOnClick() {
-		if (mAfterClickFunction != null) {
-			return true;
-		}
-		return false;
+		return mAfterClickFunction != null;
 	}
 
 	public boolean canPurchase(Player player) {
@@ -84,41 +82,20 @@ public class GuiItem {
 		}
 		//a player in creative don't have to pay
 
-		if (isFree()) {
+		if (mCost == null || isFree()) {
 			return true;
 		}
 		//if the item is free return
 
-		boolean result = true;
-		for (ItemStack itemStack : mCost.keySet()) {
-			int amount = mCost.get(itemStack);
-			int times = 0;
-
-			while (amount > 64) {
-				itemStack.setAmount(64);
-				if (!player.getInventory().containsAtLeast(itemStack, 64)) {
-					result = false;
-					break;
-				}
-				player.getInventory().removeItem(itemStack);
-				amount -= 64;
-				times++;
-			}
+		for (Map.Entry<ItemStack, Integer> entry : mCost.entrySet()) {
+			ItemStack itemStack = entry.getKey();
+			int amount = entry.getValue();
 			if (!player.getInventory().containsAtLeast(itemStack, amount)) {
-				result = false;
+				return false;
 			}
-
-			//refound the currency
-			while (times > 0) {
-				itemStack.setAmount(64);
-				player.getInventory().addItem(itemStack);
-				times--;
-			}
-
-			itemStack.setAmount(1);
 		}
 
-		return result;
+		return true;
 	}
 
 	public boolean purchase(Player player) {
@@ -127,13 +104,14 @@ public class GuiItem {
 		}
 		//a player in creative don't have to pay
 
-		if (isFree()) {
+		if (mCost == null || isFree()) {
 			return true;
 		}
 		//if the item is free return
 
-		for (ItemStack itemStack : mCost.keySet()) {
-			int amount = mCost.get(itemStack);
+		for (Map.Entry<ItemStack, Integer> entry : mCost.entrySet()) {
+			ItemStack itemStack = entry.getKey();
+			int amount = entry.getValue();
 			while (amount > 64) {
 				itemStack.setAmount(64);
 				player.getInventory().removeItem(itemStack);

@@ -3,10 +3,11 @@ package com.playmonumenta.plugins.commands;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.bukkit.entity.Player;
+
+import com.playmonumenta.plugins.utils.CommandUtils;
 import com.playmonumenta.plugins.utils.InfusionUtils;
 import com.playmonumenta.plugins.utils.InfusionUtils.InfusionSelection;
-
-import org.bukkit.entity.Player;
 
 import dev.jorel.commandapi.CommandAPI;
 import dev.jorel.commandapi.CommandAPICommand;
@@ -44,16 +45,14 @@ public class InfuseHeldItem extends GenericCommand {
 			.withPermission(perms)
 			.withArguments(arguments)
 			.executes((sender, args) -> {
-				if (sender instanceof Player) {
-					InfusionSelection selection = InfusionSelection.getInfusionSelection((String) args[0]);
-					if (selection == null) {
-						CommandAPI.fail("Invalid infusion selection; how did we get here?");
-					}
-					for (int i = 0; i < (Integer)args[1]; i++) {
-						InfusionUtils.infuseItem(((Player)sender).getInventory().getItemInMainHand(), selection);
-					}
-				} else {
-					CommandAPI.fail("This command can only be run by players");
+				Player player = CommandUtils.getPlayerFromSender(sender);
+				InfusionSelection selection = InfusionSelection.getInfusionSelection((String) args[0]);
+				if (selection == null) {
+					CommandAPI.fail("Invalid infusion selection; how did we get here?");
+					throw new RuntimeException();
+				}
+				for (int i = 0; i < (Integer) args[1]; i++) {
+					InfusionUtils.infuseItem(player.getInventory().getItemInMainHand(), selection);
 				}
 			})
 			.register();

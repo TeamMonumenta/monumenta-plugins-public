@@ -11,7 +11,6 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.World;
-import org.bukkit.attribute.Attribute;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
 import org.bukkit.entity.EntityType;
@@ -163,9 +162,10 @@ public class SpellGraspingHands extends Spell {
 									List<LivingEntity> mobs = EntityUtils.getNearbyMobs(mLoc, 5.0, 3.0, 5.0);
 									for (LivingEntity e : mobs) {
 										if (!(e.getType() == EntityType.PLAYER) && !e.isDead()) {
-											double restore = e.getHealth() + e.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue() * 0.01 + 3;
-											if (restore >= e.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue()) {
-												e.setHealth(e.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue());
+											double maxHealth = EntityUtils.getMaxHealth(e);
+											double restore = e.getHealth() + maxHealth * 0.01 + 3;
+											if (restore >= maxHealth) {
+												e.setHealth(maxHealth);
 											} else {
 												e.setHealth(restore);
 											}

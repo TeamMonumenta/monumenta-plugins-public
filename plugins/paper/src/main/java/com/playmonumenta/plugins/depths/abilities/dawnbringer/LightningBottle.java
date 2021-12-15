@@ -86,6 +86,9 @@ public class LightningBottle extends DepthsAbility {
 
 	@Override
 	public void entityDeathRadiusEvent(EntityDeathEvent event, boolean shouldGenDrops) {
+		if (mPlayer == null) {
+			return;
+		}
 		mCount++;
 		if (mCount >= KILLS_PER) {
 			mCount = 0;
@@ -95,7 +98,7 @@ public class LightningBottle extends DepthsAbility {
 			int potCount = 0;
 
 			for (ItemStack item : inv.getContents()) {
-				if (InventoryUtils.testForItemWithName(item, POTION_NAME)) {
+				if (item != null && InventoryUtils.testForItemWithName(item, POTION_NAME)) {
 					if (firstFoundPotStack == null) {
 						firstFoundPotStack = item;
 					}

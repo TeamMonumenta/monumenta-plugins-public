@@ -17,7 +17,7 @@ import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
 import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.utils.ItemUtils;
 
 import net.md_5.bungee.api.ChatColor;
 
@@ -39,8 +39,11 @@ public class Whirlwind extends DepthsAbility {
 
 	@Override
 	public boolean blockBreakEvent(BlockBreakEvent event) {
+		if (mPlayer == null) {
+			return true;
+		}
 		//If we break a spawner with a pickaxe
-		if (InventoryUtils.isPickaxeItem(event.getPlayer().getInventory().getItemInMainHand()) && event.getBlock().getType() == Material.SPAWNER) {
+		if (ItemUtils.isPickaxe(event.getPlayer().getInventory().getItemInMainHand()) && event.getBlock().getType() == Material.SPAWNER) {
 			World world = event.getPlayer().getWorld();
 			Location loc = event.getBlock().getLocation().add(0.5, 0.5, 0.5);
 			world.playSound(loc, Sound.ENTITY_HORSE_BREATHE, 1.2f, 0.25f);

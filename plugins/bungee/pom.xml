@@ -137,7 +137,14 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-checkstyle-plugin</artifactId>
-                <version>3.1.0</version>
+                <version>3.1.2</version>
+                <dependencies>
+                    <dependency>
+                        <groupId>com.puppycrawl.tools</groupId>
+                        <artifactId>checkstyle</artifactId>
+                        <version>9.2</version>
+                    </dependency>
+                </dependencies>
                 <configuration>
                     <configLocation>${basedir}/../checkstyle.xml</configLocation>
                     <suppressionsLocation>${basedir}/../checkstyle-suppressions.xml</suppressionsLocation>

@@ -11,6 +11,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.inventory.ItemStack;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
@@ -30,7 +31,7 @@ public class CounterStrike extends Ability {
 	private final double mReflect;
 	private final int mDamage;
 
-	public CounterStrike(Plugin plugin, Player player) {
+	public CounterStrike(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Counter Strike");
 		mInfo.mScoreboardId = "CounterStrike";
 		mInfo.mShorthandName = "CS";

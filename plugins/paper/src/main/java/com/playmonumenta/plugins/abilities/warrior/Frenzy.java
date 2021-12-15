@@ -4,6 +4,7 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.inventory.ItemStack;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
@@ -23,7 +24,7 @@ public class Frenzy extends Ability {
 
 	private final double mPercentAttackSpeedEffect;
 
-	public Frenzy(Plugin plugin, Player player) {
+	public Frenzy(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Frenzy");
 		mInfo.mScoreboardId = "Frenzy";
 		mInfo.mShorthandName = "Fnz";

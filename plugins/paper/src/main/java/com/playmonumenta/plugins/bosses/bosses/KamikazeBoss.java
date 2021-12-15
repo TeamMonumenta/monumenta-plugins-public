@@ -53,8 +53,7 @@ public final class KamikazeBoss extends BossAbilityGroup {
 	public void bossProjectileHit(ProjectileHitEvent event) {
 		if (event.getHitEntity() instanceof Player) {
 			ProjectileSource shooter = event.getEntity().getShooter();
-			if (shooter instanceof Damageable) {
-				Damageable entity = (Damageable) shooter;
+			if (shooter instanceof Damageable entity) {
 				entity.setHealth(0);
 				World world = event.getEntity().getWorld();
 				world.playSound(entity.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 0.5f, 0.7f);

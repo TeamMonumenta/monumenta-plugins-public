@@ -36,14 +36,14 @@ public class Stasis extends Effect {
 
 	@Override
 	public void entityGainEffect(Entity entity) {
-		if (entity instanceof Player) {
-			entity.sendActionBar(Component.text("You are in stasis! You cannot use abilities for " + getDuration() / 20 + "s", NamedTextColor.DARK_RED));
-			entity.addScoreboardTag(Constants.Tags.STASIS);
-			((Player)entity).addPotionEffect(new PotionEffect(PotionEffectType.SLOW, mDuration, 100), false);
-			((Player)entity).addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, mDuration, 100), false);
-			((Player)entity).addPotionEffect(new PotionEffect(PotionEffectType.GLOWING, mDuration, 100), false);
-			(entity.getLocation().getWorld()).playSound(entity.getLocation(), Sound.BLOCK_BELL_USE, 1, 1.2f);
-			AbilityManager.getManager().getPlayerAbilities((Player) entity).silence();
+		if (entity instanceof Player player) {
+			player.sendActionBar(Component.text("You are in stasis! You cannot use abilities for " + getDuration() / 20 + "s", NamedTextColor.DARK_RED));
+			player.addScoreboardTag(Constants.Tags.STASIS);
+			player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, mDuration, 100));
+			player.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, mDuration, 100));
+			player.addPotionEffect(new PotionEffect(PotionEffectType.GLOWING, mDuration, 100));
+			(player.getLocation().getWorld()).playSound(player.getLocation(), Sound.BLOCK_BELL_USE, 1, 1.2f);
+			AbilityManager.getManager().getPlayerAbilities(player).silence();
 		}
 
 	}

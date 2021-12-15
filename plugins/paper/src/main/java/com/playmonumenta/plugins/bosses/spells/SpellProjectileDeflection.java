@@ -25,19 +25,16 @@ public class SpellProjectileDeflection extends Spell {
 	@Override
 	public void bossHitByProjectile(ProjectileHitEvent event) {
 		Projectile proj = event.getEntity();
-		if (proj.getShooter() instanceof Player) {
-			Player player = (Player) proj.getShooter();
+		if (proj.getShooter() instanceof Player player) {
 			if (!(proj instanceof Trident)) {
 				Projectile deflected = (Projectile) mBoss.getWorld().spawnEntity(proj.getLocation().subtract(proj.getVelocity().normalize()), proj.getType());
 				deflected.setShooter(mBoss);
-				if (deflected instanceof Arrow && proj instanceof Arrow) {
-					Arrow arrow = (Arrow) deflected;
-					Arrow projec = (Arrow) proj;
+				if (deflected instanceof Arrow deflectedArrow && proj instanceof Arrow originalArrow) {
 					((Arrow) deflected).setCritical(((Arrow) proj).isCritical());
-					if (projec.getBasePotionData() != null) {
-						arrow.setBasePotionData((projec).getBasePotionData());
-						for (PotionEffect effect : (projec).getCustomEffects()) {
-							arrow.addCustomEffect(effect, true);
+					if (originalArrow.getBasePotionData() != null) {
+						deflectedArrow.setBasePotionData((originalArrow).getBasePotionData());
+						for (PotionEffect effect : (originalArrow).getCustomEffects()) {
+							deflectedArrow.addCustomEffect(effect, true);
 						}
 					}
 

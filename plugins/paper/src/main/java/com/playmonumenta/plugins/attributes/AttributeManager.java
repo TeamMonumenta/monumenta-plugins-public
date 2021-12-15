@@ -207,7 +207,7 @@ public class AttributeManager {
 		plugin.mAttributeManager.mAttributeTrie.reset(player, updateMainHandOnly);
 
 		PlayerInventory inventory = player.getInventory();
-		List<List<String>> lores = new ArrayList<List<String>>();
+		List<List<String>> lores = new ArrayList<>();
 		ItemStack item;
 		item = inventory.getItemInMainHand();
 		lores.add(item == null ? null : item.getLore());
@@ -295,7 +295,11 @@ public class AttributeManager {
 	public void updateAttributeArrowTrie(Plugin plugin, Player player, ItemStack item) {
 		boolean readAttributes = false;
 
-		for (String loreEntry : item.getLore()) {
+		List<String> lore = item.getLore();
+		if (lore == null) {
+			return;
+		}
+		for (String loreEntry : lore) {
 			if (!readAttributes) {
 				if (ATTRIBUTE_ARROW.equals(loreEntry)) {
 					readAttributes = true;

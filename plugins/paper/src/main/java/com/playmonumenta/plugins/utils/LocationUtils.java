@@ -1091,14 +1091,14 @@ public class LocationUtils {
 	}
 
 	public static boolean travelTillObstructed(
-		World world,
-		BoundingBox movingBoundingBox,
-		double maxDistance,
-		Vector vector,
-		double increment,
-		TravelAction travelAction,
-		int actionFrequency,
-		int actionChance
+			World world,
+			BoundingBox movingBoundingBox,
+			double maxDistance,
+			Vector vector,
+			double increment,
+			@Nullable TravelAction travelAction,
+			int actionFrequency,
+			int actionChance
 	) {
 		Vector start = movingBoundingBox.getCenter(); // For checking if exceeded maxDistance
 		Vector vectorIncrement = vector.clone().normalize().multiply(increment);

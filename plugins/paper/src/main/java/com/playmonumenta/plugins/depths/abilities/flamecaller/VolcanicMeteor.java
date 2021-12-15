@@ -41,7 +41,10 @@ public class VolcanicMeteor extends DepthsAbility {
 
 	@Override
 	public void playerSwapHandItemsEvent(PlayerSwapHandItemsEvent event) {
-		//sets swap event to cancelled so this doesnt become annoying
+		if (mPlayer == null) {
+			return;
+		}
+		//sets swap event to cancelled so this doesn't become annoying
 		event.setCancelled(true);
 		if (!isTimerActive()) {
 			putOnCooldown();
@@ -74,6 +77,9 @@ public class VolcanicMeteor extends DepthsAbility {
 			double mT = 0;
 			@Override
 			public void run() {
+				if (mPlayer == null) {
+					return;
+				}
 				mT += 1;
 				World world = mPlayer.getWorld();
 				for (int i = 0; i < 8; i++) {
@@ -131,7 +137,7 @@ public class VolcanicMeteor extends DepthsAbility {
 
 	@Override
 	public boolean runCheck() {
-		return (!isOnCooldown() && DepthsUtils.isWeaponItem(mPlayer.getInventory().getItemInMainHand()));
+		return mPlayer != null && !isOnCooldown() && DepthsUtils.isWeaponItem(mPlayer.getInventory().getItemInMainHand());
 	}
 }
 

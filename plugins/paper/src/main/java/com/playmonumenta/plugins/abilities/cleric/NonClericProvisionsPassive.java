@@ -6,6 +6,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.entity.ThrownPotion;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.event.player.PlayerItemDamageEvent;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
@@ -19,7 +20,7 @@ public class NonClericProvisionsPassive extends Ability {
 	private static final float PROVISIONS_1_CHANCE = 0.2f;
 	private static final float PROVISIONS_2_CHANCE = 0.4f;
 
-	public NonClericProvisionsPassive(Plugin plugin, Player player) {
+	public NonClericProvisionsPassive(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, null);
 	}
 
@@ -50,7 +51,7 @@ public class NonClericProvisionsPassive extends Ability {
 
 	@Override
 	public void playerItemConsumeEvent(PlayerItemConsumeEvent event) {
-		if (testRandomChance(mPlayer)) {
+		if (mPlayer != null && testRandomChance(mPlayer)) {
 			event.setReplacement(event.getItem());
 			sacredProvisionsSound(mPlayer);
 		}
@@ -58,14 +59,14 @@ public class NonClericProvisionsPassive extends Ability {
 
 	@Override
 	public void playerItemDamageEvent(PlayerItemDamageEvent event) {
-		if (testRandomChance(mPlayer)) {
+		if (mPlayer != null && testRandomChance(mPlayer)) {
 			event.setDamage(0);
 		}
 	}
 
 	@Override
 	public boolean playerShotArrowEvent(AbstractArrow arrow) {
-		if (testRandomChance(mPlayer)) {
+		if (mPlayer != null && testRandomChance(mPlayer)) {
 			AbilityUtils.refundArrow(mPlayer, arrow);
 		}
 		return true;
@@ -73,7 +74,7 @@ public class NonClericProvisionsPassive extends Ability {
 
 	@Override
 	public boolean playerThrewSplashPotionEvent(ThrownPotion potion) {
-		if (testRandomChance(mPlayer)) {
+		if (mPlayer != null && testRandomChance(mPlayer)) {
 			if (AbilityUtils.refundPotion(mPlayer, potion)) {
 				sacredProvisionsSound(mPlayer);
 			}
@@ -83,7 +84,7 @@ public class NonClericProvisionsPassive extends Ability {
 
 	@Override
 	public boolean playerThrewLingeringPotionEvent(ThrownPotion potion) {
-		if (testRandomChance(mPlayer)) {
+		if (mPlayer != null && testRandomChance(mPlayer)) {
 			if (AbilityUtils.refundPotion(mPlayer, potion)) {
 				sacredProvisionsSound(mPlayer);
 			}

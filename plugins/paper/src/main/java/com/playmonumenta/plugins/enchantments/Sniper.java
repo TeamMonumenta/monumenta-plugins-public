@@ -2,9 +2,6 @@ package com.playmonumenta.plugins.enchantments;
 
 import java.util.EnumSet;
 
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
-
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -19,6 +16,9 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.projectiles.ProjectileSource;
+
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
 
 public class Sniper implements BaseEnchantment {
 	private static final String PROPERTY_NAME = ChatColor.GRAY + "Sniper";
@@ -62,8 +62,7 @@ public class Sniper implements BaseEnchantment {
 		if (proj.hasMetadata(LEVEL_METAKEY) && proj.hasMetadata(LOCATION_METAKEY)) {
 			int level = proj.getMetadata(LEVEL_METAKEY).get(0).asInt();
 			Location loc = (Location)proj.getMetadata(LOCATION_METAKEY).get(0).value();
-
-			if (loc.distance(target.getLocation()) > DISTANCE) {
+			if (loc != null && loc.distance(target.getLocation()) > DISTANCE) {
 				event.setDamage(event.getDamage() + level * DAMAGE_PER_LEVEL);
 				ProjectileSource shooter = proj.getShooter();
 				if (shooter instanceof Player) {

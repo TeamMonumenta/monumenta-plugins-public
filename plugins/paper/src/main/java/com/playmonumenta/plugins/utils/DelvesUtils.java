@@ -15,7 +15,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
 import org.bukkit.Sound;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
@@ -358,7 +357,7 @@ public class DelvesUtils {
 		}
 
 		public int getRank(@Nullable Modifier modifier) {
-			return mModifierRanks.getOrDefault(modifier, 0);
+			return modifier == null ? 0 : mModifierRanks.getOrDefault(modifier, 0);
 		}
 
 		public int getDepthPoints() {
@@ -626,7 +625,7 @@ public class DelvesUtils {
 			if (group != null) {
 				String newPath = group.getDelveLootTable(depthPoints, playerCount);
 				if (newPath != null) {
-					chest.setLootTable(Bukkit.getLootTable(NamespacedKey.fromString("epic:" + newPath)));
+					chest.setLootTable(Bukkit.getLootTable(NamespacedKeyUtils.fromString("epic:" + newPath)));
 					chest.update();
 				}
 			}

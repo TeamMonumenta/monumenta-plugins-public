@@ -30,6 +30,7 @@ import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.effects.AbilitySilence;
@@ -47,7 +48,7 @@ public class AbilityUtils {
 	private static final String POTION_REFUNDED_METAKEY = "PotionRefunded";
 
 	private static final Map<Player, Integer> INVISIBLE_PLAYERS = new HashMap<Player, Integer>();
-	private static BukkitRunnable invisTracker = null;
+	private static @Nullable BukkitRunnable invisTracker = null;
 
 	public static final String IGNORE_TAG = "summon_ignore";
 
@@ -189,7 +190,7 @@ public class AbilityUtils {
 
 		// Make sure the player has enough potions
 		for (ItemStack item : inv.getContents()) {
-			if (InventoryUtils.testForItemWithName(item, "Alchemist's Potion")) {
+			if (item != null && InventoryUtils.testForItemWithName(item, "Alchemist's Potion")) {
 				potionCount += item.getAmount();
 				potionStacks.add(item);
 				if (potionCount >= numPotionsToRemove) {
@@ -239,13 +240,11 @@ public class AbilityUtils {
 			item.setItemMeta(potionMeta);
 		}
 
-		if (meta.getDisplayName() != null) {
-			if (meta.getDisplayName().contains("Alchemist's Bag")) {
-				meta.setDisplayName(ChatColor.DARK_GREEN + "" + ChatColor.BOLD + "Alchemist's Bag (" + count + ")");
-				item.setItemMeta(meta);
-				ItemUtils.setPlainTag(item);
-				return true;
-			}
+		if (meta.hasDisplayName() && meta.getDisplayName().contains("Alchemist's Bag")) {
+			meta.setDisplayName(ChatColor.DARK_GREEN + "" + ChatColor.BOLD + "Alchemist's Bag (" + count + ")");
+			item.setItemMeta(meta);
+			ItemUtils.setPlainTag(item);
+			return true;
 		}
 		return false;
 	}

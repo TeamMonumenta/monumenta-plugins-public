@@ -7,7 +7,6 @@ import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
-import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.plugin.Plugin;
@@ -60,7 +59,7 @@ public class VindictiveBoss extends BossAbilityGroup {
 			plugin.mEffectManager.addEffect(mob, PERCENT_DAMAGE_DEALT_EFFECT_NAME,
 					new PercentDamageDealt(DURATION, PERCENT_DAMAGE_DEALT_EFFECT));
 
-			mob.setHealth(Math.min(mob.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue(), mob.getHealth() + HEAL));
+			mob.setHealth(Math.min(EntityUtils.getMaxHealth(mob), mob.getHealth() + HEAL));
 		}
 	}
 }

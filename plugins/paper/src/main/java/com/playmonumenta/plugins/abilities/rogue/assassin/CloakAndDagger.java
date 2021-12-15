@@ -13,6 +13,7 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.inventory.ItemStack;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
@@ -46,7 +47,7 @@ public class CloakAndDagger extends Ability implements KillTriggeredAbility, Abi
 	private int mCloakOnActivation = 0;
 	private boolean mActive = false;
 
-	public CloakAndDagger(Plugin plugin, Player player) {
+	public CloakAndDagger(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Cloak and Dagger");
 		mInfo.mScoreboardId = "CloakAndDagger";
 		mInfo.mShorthandName = "CnD";
@@ -63,7 +64,8 @@ public class CloakAndDagger extends Ability implements KillTriggeredAbility, Abi
 
 	@Override
 	public void cast(Action action) {
-		if (!AbilityUtils.isStealthed(mPlayer) && mCloak >= CLOAK_MIN_STACKS
+		if (mPlayer != null
+				&& !AbilityUtils.isStealthed(mPlayer) && mCloak >= CLOAK_MIN_STACKS
 				&& mPlayer.isSneaking() && mPlayer.getLocation().getPitch() < -50
 				&& InventoryUtils.rogueTriggerCheck(mPlayer.getInventory().getItemInMainHand(), mPlayer.getInventory().getItemInOffHand())) {
 			mCloakOnActivation = mCloak;
@@ -81,7 +83,7 @@ public class CloakAndDagger extends Ability implements KillTriggeredAbility, Abi
 
 	@Override
 	public boolean onStealthAttack(EntityDamageByEntityEvent event) {
-		if (event.getCause() == DamageCause.ENTITY_ATTACK && mActive) {
+		if (mPlayer != null && event.getCause() == DamageCause.ENTITY_ATTACK && mActive) {
 			AbilityUtils.removeStealth(mPlugin, mPlayer, false);
 			if (InventoryUtils.rogueTriggerCheck(mPlayer.getInventory().getItemInMainHand(), mPlayer.getInventory().getItemInOffHand())) {
 				LivingEntity damagee = (LivingEntity) event.getEntity();
@@ -126,7 +128,7 @@ public class CloakAndDagger extends Ability implements KillTriggeredAbility, Abi
 
 	@Override
 	public void periodicTrigger(boolean twoHertz, boolean oneSecond, int ticks) {
-		if (mActive) {
+		if (mPlayer != null && mActive) {
 			if (!AbilityUtils.isStealthed(mPlayer)) {
 				mActive = false;
 			}
@@ -135,6 +137,9 @@ public class CloakAndDagger extends Ability implements KillTriggeredAbility, Abi
 
 	@Override
 	public void triggerOnKill(LivingEntity mob) {
+		if (mPlayer == null) {
+			return;
+		}
 		if (mCloak < mMaxStacks) {
 			if (EntityUtils.isElite(mob) || EntityUtils.isBoss(mob)) {
 				mCloak = Math.min(mMaxStacks, mCloak + CLOAK_STACKS_ON_ELITE_KILL);

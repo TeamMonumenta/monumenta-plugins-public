@@ -15,7 +15,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.depths.abilities.WeaponAspectDepthsAbility;
-import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 
 public class ScytheAspect extends WeaponAspectDepthsAbility {
@@ -33,7 +33,7 @@ public class ScytheAspect extends WeaponAspectDepthsAbility {
 
 		//Life steal aspect
 
-		if (event.getCause().equals(DamageCause.ENTITY_ATTACK) && InventoryUtils.isScytheItem(mPlayer.getInventory().getItemInMainHand())) {
+		if (event.getCause().equals(DamageCause.ENTITY_ATTACK) && ItemUtils.isHoe(mPlayer.getInventory().getItemInMainHand())) {
 			if (PlayerUtils.isFallingAttack(mPlayer)) {
 				PlayerUtils.healPlayer(mPlayer, 1.0);
 			} else {
@@ -66,7 +66,7 @@ public class ScytheAspect extends WeaponAspectDepthsAbility {
 	@Override
 	public boolean playerDamagedEvent(EntityDamageEvent event) {
 
-		if (InventoryUtils.isScytheItem(mPlayer.getInventory().getItemInMainHand())) {
+		if (ItemUtils.isHoe(mPlayer.getInventory().getItemInMainHand())) {
 			event.setDamage(event.getDamage() * DAMAGE_MODIFIER);
 		}
 

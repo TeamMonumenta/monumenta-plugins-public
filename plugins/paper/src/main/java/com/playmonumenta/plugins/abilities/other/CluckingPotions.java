@@ -12,16 +12,17 @@ import org.bukkit.event.entity.PotionSplashEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.metadata.FixedMetadataValue;
-
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.format.TextDecoration;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
+
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 
 /* TODO:
  * There is no reason this should be a player ability - it doesn't need a unique object per player
@@ -30,7 +31,7 @@ import com.playmonumenta.plugins.utils.ItemUtils;
  * into something like EntityListener
  */
 public class CluckingPotions extends Ability {
-	public CluckingPotions(Plugin plugin, Player player) {
+	public CluckingPotions(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, null);
 	}
 
@@ -54,8 +55,7 @@ public class CluckingPotions extends Ability {
 			if (affectedEntities != null && !affectedEntities.isEmpty()) {
 				for (LivingEntity entity : affectedEntities) {
 					entity.getLocation().getWorld().spawnParticle(Particle.EXPLOSION_LARGE, entity.getLocation(), 1, 0, 0, 0, 0);
-					if (entity instanceof Player) {
-						Player player = (Player) entity;
+					if (entity instanceof Player player) {
 						List<ItemStack> cluckingCandidates = new ArrayList<>();
 						for (ItemStack armor : player.getInventory().getArmorContents()) {
 							if (armor != null) {
@@ -63,7 +63,8 @@ public class CluckingPotions extends Ability {
 							}
 						}
 
-						loop: while (!cluckingCandidates.isEmpty()) {
+						loop:
+						while (!cluckingCandidates.isEmpty()) {
 							int idx = FastUtils.RANDOM.nextInt(cluckingCandidates.size());
 							ItemStack item = cluckingCandidates.get(idx);
 							cluckingCandidates.remove(idx);

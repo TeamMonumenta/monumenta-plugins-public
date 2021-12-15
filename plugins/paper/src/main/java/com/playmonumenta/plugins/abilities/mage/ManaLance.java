@@ -16,6 +16,7 @@ import org.bukkit.event.block.Action;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
@@ -50,7 +51,7 @@ public class ManaLance extends Ability {
 	private static final int COOLDOWN_2 = 3 * 20;
 	private static final Particle.DustOptions MANA_LANCE_COLOR = new Particle.DustOptions(Color.fromRGB(91, 187, 255), 1.0f);
 
-	public ManaLance(Plugin plugin, Player player) {
+	public ManaLance(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Mana Lance");
 		mInfo.mLinkedSpell = ClassAbility.MANA_LANCE;
 		mInfo.mScoreboardId = "ManaLance";
@@ -64,6 +65,9 @@ public class ManaLance extends Ability {
 
 	@Override
 	public void cast(Action action) {
+		if (mPlayer == null) {
+			return;
+		}
 		//Ability enchantments
 		float damage = getAbilityScore() == 1 ? DAMAGE_1 : DAMAGE_2;
 		damage += ManaLanceDamageEnchantment.getExtraDamage(mPlayer, ManaLanceDamageEnchantment.class);
@@ -110,6 +114,9 @@ public class ManaLance extends Ability {
 
 	@Override
 	public boolean runCheck() {
+		if (mPlayer == null) {
+			return false;
+		}
 		ItemStack mainHand = mPlayer.getInventory().getItemInMainHand();
 		return !mPlayer.isSneaking() && ItemUtils.isWand(mainHand);
 	}

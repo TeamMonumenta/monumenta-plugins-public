@@ -54,8 +54,7 @@ public class AttributeProjectileDamage implements BaseAttribute {
 			}
 
 			//Trident can have mob specific enchantments (Impaling, Smite, Bane of Arthropods)
-			if (proj instanceof Trident) {
-				Trident trident = (Trident) proj;
+			if (proj instanceof Trident trident) {
 				ItemStack item = trident.getItemStack();
 
 				if (item.containsEnchantment(org.bukkit.enchantments.Enchantment.DAMAGE_UNDEAD) && EntityUtils.isUndead(target)) {

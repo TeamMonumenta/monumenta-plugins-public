@@ -11,6 +11,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.inventory.ItemStack;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
@@ -29,7 +30,7 @@ public class Skirmisher extends Ability {
 	private final double mIsolatedPercentDamage;
 	private final double mIsolatedFlatDamage;
 
-	public Skirmisher(Plugin plugin, Player player) {
+	public Skirmisher(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Skirmisher");
 		mInfo.mScoreboardId = "Skirmisher";
 		mInfo.mShorthandName = "Sk";
@@ -42,7 +43,7 @@ public class Skirmisher extends Ability {
 
 	@Override
 	public boolean livingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
-		if (event.getCause() == DamageCause.ENTITY_ATTACK) {
+		if (mPlayer != null && event.getCause() == DamageCause.ENTITY_ATTACK) {
 			LivingEntity mob = (LivingEntity) event.getEntity();
 			Location loc = mob.getLocation();
 
@@ -66,6 +67,9 @@ public class Skirmisher extends Ability {
 
 	@Override
 	public boolean runCheck() {
+		if (mPlayer == null) {
+			return false;
+		}
 		ItemStack mainHand = mPlayer.getInventory().getItemInMainHand();
 		ItemStack offHand = mPlayer.getInventory().getItemInOffHand();
 		return InventoryUtils.rogueTriggerCheck(mainHand, offHand);

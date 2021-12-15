@@ -6,6 +6,7 @@ import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDeathEvent;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
@@ -60,7 +61,7 @@ public class Spectral extends DelveModifier {
 
 	private final double mSpawnChance;
 
-	public Spectral(Plugin plugin, Player player) {
+	public Spectral(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, Modifier.SPECTRAL);
 
 		if (player != null) {

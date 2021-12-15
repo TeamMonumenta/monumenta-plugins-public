@@ -12,7 +12,7 @@ import com.playmonumenta.plugins.guis.SinglePageGUI;
 
 public class ExampleSinglePageGUI extends SinglePageGUI {
 
-	public ExampleSinglePageGUI(@Nullable Player player, @Nullable String[] args) {
+	public ExampleSinglePageGUI(@Nullable Player player, String[] args) {
 		super(player, args);
 	}
 

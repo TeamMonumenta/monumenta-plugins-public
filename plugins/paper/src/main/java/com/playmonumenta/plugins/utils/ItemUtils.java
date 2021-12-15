@@ -28,6 +28,7 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.potion.PotionType;
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.checkerframework.checker.nullness.qual.PolyNull;
 
 import com.playmonumenta.plugins.Constants.Materials;
 import com.playmonumenta.plugins.enchantments.Colossal;
@@ -449,7 +450,7 @@ public class ItemUtils {
 	}
 
 	// Return the quest ID string, which is assumed to start with "#Q", or null
-	public static @Nullable String getItemQuestId(ItemStack item) {
+	public static @Nullable String getItemQuestId(@Nullable ItemStack item) {
 		if (item == null) {
 			return null;
 		}
@@ -477,7 +478,7 @@ public class ItemUtils {
 		DESTROY, // Item is destroyed on death, like Curse of Vanishing 2
 	}
 
-	public static ItemRegion getItemRegion(ItemStack item) {
+	public static ItemRegion getItemRegion(@Nullable ItemStack item) {
 		if (item != null) {
 			if (item.hasItemMeta()) {
 				ItemMeta meta = item.getItemMeta();
@@ -513,7 +514,7 @@ public class ItemUtils {
 		return ItemRegion.UNKNOWN;
 	}
 
-	public static ItemTier getItemTier(ItemStack item) {
+	public static ItemTier getItemTier(@Nullable ItemStack item) {
 		if (item == null) {
 			return ItemTier.UNKNOWN;
 		}
@@ -762,9 +763,9 @@ public class ItemUtils {
 	}
 
 	/**
-	 * Items drop if they have lore that does not contain $$$
+	 * Items drop if they have lore that does not contain $$
 	 */
-	public static float getItemDropChance(ItemStack item) {
+	public static float getItemDropChance(@Nullable ItemStack item) {
 		if (item != null && (item.hasItemMeta() && item.getItemMeta().hasLore()) && !InventoryUtils.testForItemWithLore(item, "$$")) {
 			return 100.0f;
 		} else {
@@ -772,7 +773,7 @@ public class ItemUtils {
 		}
 	}
 
-	public static @Nullable String getBookTitle(ItemStack book) {
+	public static @Nullable String getBookTitle(@Nullable ItemStack book) {
 		if (book == null) {
 			return null;
 		}
@@ -783,7 +784,7 @@ public class ItemUtils {
 		return ((BookMeta) itemMeta).getTitle();
 	}
 
-	public static @Nullable String getBookAuthor(ItemStack book) {
+	public static @Nullable String getBookAuthor(@Nullable ItemStack book) {
 		if (book == null) {
 			return null;
 		}
@@ -833,7 +834,7 @@ public class ItemUtils {
 	}
 
 	// Check if item has the "* Shattered *" lore entry
-	public static boolean isItemShattered(ItemStack item) {
+	public static boolean isItemShattered(@Nullable ItemStack item) {
 		if (item != null) {
 			List<String> lore = item.getLore();
 			if (lore != null) {
@@ -847,7 +848,7 @@ public class ItemUtils {
 		return false;
 	}
 
-	public static boolean isItemCurseOfVanishingII(ItemStack item) {
+	public static boolean isItemCurseOfVanishingII(@Nullable ItemStack item) {
 		if (item != null) {
 			if (item.getEnchantmentLevel(Enchantment.VANISHING_CURSE) == 2) {
 				return true;
@@ -864,7 +865,7 @@ public class ItemUtils {
 		return false;
 	}
 
-	public static boolean isItemDeathless(ItemStack item) {
+	public static boolean isItemDeathless(@Nullable ItemStack item) {
 		if (item != null) {
 			String deathlessIdentifier = ChatColor.GRAY + "Deathless";
 			if (InventoryUtils.testForItemWithLore(item, deathlessIdentifier)) {
@@ -874,11 +875,11 @@ public class ItemUtils {
 		return false;
 	}
 
-	public static boolean shatterItem(ItemStack item) {
+	public static boolean shatterItem(@Nullable ItemStack item) {
 		if (item == null
-		    || !((getItemDeathResult(item) == ItemDeathResult.SHATTER
-		        || getItemDeathResult(item) == ItemDeathResult.SHATTER_NOW)
-		        && !isItemShattered(item))) {
+			|| !((getItemDeathResult(item) == ItemDeathResult.SHATTER
+			|| getItemDeathResult(item) == ItemDeathResult.SHATTER_NOW)
+			&& !isItemShattered(item))) {
 			return false;
 		}
 		ItemMeta itemMeta = item.getItemMeta();
@@ -898,7 +899,7 @@ public class ItemUtils {
 		return true;
 	}
 
-	public static boolean reforgeItem(ItemStack item) {
+	public static boolean reforgeItem(@Nullable ItemStack item) {
 		boolean reforged = false;
 		if (item == null) {
 			return reforged;
@@ -1037,11 +1038,11 @@ public class ItemUtils {
 		setPlainLore(itemStack);
 	}
 
-	public static String getPlainName(ItemStack itemStack) {
+	public static String getPlainName(@Nullable ItemStack itemStack) {
 		return getPlainName(itemStack, false);
 	}
 
-	public static String getPlainName(ItemStack itemStack, boolean refresh) {
+	public static String getPlainName(@Nullable ItemStack itemStack, boolean refresh) {
 		if (itemStack == null || itemStack.getType().isAir() || !itemStack.hasItemMeta() || !itemStack.getItemMeta().hasDisplayName()) {
 			return "";
 		}
@@ -1051,7 +1052,7 @@ public class ItemUtils {
 		return getPlainNameIfExists(itemStack);
 	}
 
-	public static String getPlainNameIfExists(ItemStack itemStack) {
+	public static String getPlainNameIfExists(@Nullable ItemStack itemStack) {
 		if (itemStack == null || itemStack.getType().isAir() || !itemStack.hasItemMeta()) {
 			return "";
 		}
@@ -1067,7 +1068,7 @@ public class ItemUtils {
 		return display.hasKey(NAME_KEY) ? display.getString(NAME_KEY) : "";
 	}
 
-	public static boolean hasPlainName(ItemStack itemStack) {
+	public static boolean hasPlainName(@Nullable ItemStack itemStack) {
 		if (itemStack == null || itemStack.getType().isAir() || !itemStack.hasItemMeta()) {
 			return false;
 		}
@@ -1094,7 +1095,7 @@ public class ItemUtils {
 		setPlainName(itemStack, itemName);
 	}
 
-	public static void setPlainName(ItemStack itemStack, String plainName) {
+	public static void setPlainName(@Nullable ItemStack itemStack, @Nullable String plainName) {
 		if (itemStack == null || itemStack.getType().isAir()) {
 			return;
 		}
@@ -1128,11 +1129,11 @@ public class ItemUtils {
 		itemStack.setItemMeta(nbtItem.getItem().getItemMeta());
 	}
 
-	public static List<String> getPlainLore(ItemStack itemStack) {
+	public static List<String> getPlainLore(@Nullable ItemStack itemStack) {
 		return getPlainLore(itemStack, false);
 	}
 
-	public static List<String> getPlainLore(ItemStack itemStack, boolean refresh) {
+	public static List<String> getPlainLore(@Nullable ItemStack itemStack, boolean refresh) {
 		if (itemStack == null || !itemStack.hasItemMeta() || !itemStack.getItemMeta().hasLore()) {
 			return new ArrayList<>();
 		}
@@ -1143,7 +1144,7 @@ public class ItemUtils {
 		return getPlainLoreIfExists(itemStack);
 	}
 
-	private static List<String> getPlainLoreIfExists(ItemStack itemStack) {
+	private static List<String> getPlainLoreIfExists(@Nullable ItemStack itemStack) {
 		if (itemStack == null || itemStack.getType().isAir() || !itemStack.hasItemMeta()) {
 			return new ArrayList<>();
 		}
@@ -1159,7 +1160,7 @@ public class ItemUtils {
 		return display.hasKey(LORE_KEY) ? display.getStringList(LORE_KEY) : new ArrayList<>();
 	}
 
-	public static boolean hasPlainLore(ItemStack itemStack) {
+	public static boolean hasPlainLore(@Nullable ItemStack itemStack) {
 		if (itemStack == null || itemStack.getType().isAir() || !itemStack.hasItemMeta()) {
 			return false;
 		}
@@ -1189,7 +1190,7 @@ public class ItemUtils {
 		setPlainLore(itemStack, plainLore);
 	}
 
-	public static void setPlainLore(ItemStack itemStack, List<String> plainLore) {
+	public static void setPlainLore(ItemStack itemStack, @Nullable List<String> plainLore) {
 		NBTItem nbtItem = new NBTItem(itemStack);
 		if (plainLore != null && plainLore.size() > 0) {
 			// addComponent effectively runs:
@@ -1232,7 +1233,7 @@ public class ItemUtils {
 		return NON_PLAIN_REGEX.matcher(plainText).replaceAll("").trim();
 	}
 
-	public static boolean isArmor(ItemStack itemStack) {
+	public static boolean isArmor(@Nullable ItemStack itemStack) {
 		if (itemStack != null) {
 			return Materials.ARMOR.contains(itemStack.getType());
 		} else {
@@ -1240,7 +1241,7 @@ public class ItemUtils {
 		}
 	}
 
-	public static boolean isWearable(ItemStack itemStack) {
+	public static boolean isWearable(@Nullable ItemStack itemStack) {
 		if (itemStack != null) {
 			return Materials.WEARABLE.contains(itemStack.getType());
 		} else {
@@ -1249,7 +1250,7 @@ public class ItemUtils {
 
 	}
 
-	public static boolean isShatteredWearable(ItemStack itemStack) {
+	public static boolean isShatteredWearable(@Nullable ItemStack itemStack) {
 		if (itemStack != null) {
 			return isWearable(itemStack) && isItemShattered(itemStack);
 		} else {
@@ -1257,7 +1258,7 @@ public class ItemUtils {
 		}
 	}
 
-	public static boolean isSword(ItemStack itemStack) {
+	public static boolean isSword(@Nullable ItemStack itemStack) {
 		if (itemStack != null) {
 			return Materials.SWORDS.contains(itemStack.getType());
 		} else {
@@ -1265,7 +1266,7 @@ public class ItemUtils {
 		}
 	}
 
-	public static boolean isSomeBow(ItemStack itemStack) {
+	public static boolean isSomeBow(@Nullable ItemStack itemStack) {
 		if (itemStack != null) {
 			return Materials.BOWS.contains(itemStack.getType());
 		} else {
@@ -1276,7 +1277,7 @@ public class ItemUtils {
 	/*
 	 * Does not count shattered hoes.
 	 */
-	public static boolean isHoe(ItemStack itemStack) {
+	public static boolean isHoe(@Nullable ItemStack itemStack) {
 		if (itemStack != null) {
 			if (isItemShattered(itemStack)) {
 				return false;
@@ -1291,7 +1292,7 @@ public class ItemUtils {
 	/*
 	 * Does not count shattered wands.
 	 */
-	public static boolean isWand(ItemStack itemStack) {
+	public static boolean isWand(@Nullable ItemStack itemStack) {
 		if (itemStack != null) {
 			if (isItemShattered(itemStack)) {
 				return false;
@@ -1311,7 +1312,7 @@ public class ItemUtils {
 
 	}
 
-	public static boolean isAlchemistItem(ItemStack itemStack) {
+	public static boolean isAlchemistItem(@Nullable ItemStack itemStack) {
 		if (itemStack != null) {
 			if (isItemShattered(itemStack)) {
 				return false;
@@ -1327,7 +1328,7 @@ public class ItemUtils {
 		return false;
 	}
 
-	public static boolean isPickaxe(ItemStack itemStack) {
+	public static boolean isPickaxe(@Nullable ItemStack itemStack) {
 		if (itemStack != null) {
 			return Materials.PICKAXES.contains(itemStack.getType());
 		} else {
@@ -1335,7 +1336,7 @@ public class ItemUtils {
 		}
 	}
 
-	public static boolean isAxe(ItemStack itemStack) {
+	public static boolean isAxe(@Nullable ItemStack itemStack) {
 		if (itemStack != null) {
 			return Materials.AXES.contains(itemStack.getType());
 		} else {
@@ -1343,7 +1344,7 @@ public class ItemUtils {
 		}
 	}
 
-	public static boolean isShovel(ItemStack itemStack) {
+	public static boolean isShovel(@Nullable ItemStack itemStack) {
 		if (itemStack != null) {
 			return Materials.SHOVELS.contains(itemStack.getType());
 		} else {
@@ -1351,7 +1352,7 @@ public class ItemUtils {
 		}
 	}
 
-	public static boolean isSomePotion(ItemStack itemStack) {
+	public static boolean isSomePotion(@Nullable ItemStack itemStack) {
 		if (itemStack != null) {
 			return Materials.POTIONS.contains(itemStack.getType());
 		} else {
@@ -1359,7 +1360,7 @@ public class ItemUtils {
 		}
 	}
 
-	public static void enchantifyItem(ItemStack itemStack, String enchantment) throws Exception {
+	public static void enchantifyItem(@Nullable ItemStack itemStack, String enchantment) throws Exception {
 		enchantifyItem(itemStack, enchantment, null, null);
 	}
 
@@ -1370,7 +1371,7 @@ public class ItemUtils {
 	 * This most likely means @NickNackGus or @Combustible
 	 * If this does not happen, your changes will NOT persist across weekly updates!
 	 */
-	public static void enchantifyItem(ItemStack itemStack, String enchantment, String ownerPrefix, Player player) throws Exception {
+	public static void enchantifyItem(@Nullable ItemStack itemStack, String enchantment, @PolyNull String ownerPrefix, @PolyNull Player player) throws Exception {
 
 		if (itemStack == null) {
 			throw new Exception("Player must have a valid item in their main hand!");

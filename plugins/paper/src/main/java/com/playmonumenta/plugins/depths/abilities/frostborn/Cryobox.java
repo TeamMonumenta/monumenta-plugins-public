@@ -5,8 +5,6 @@ import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
-import org.bukkit.attribute.Attribute;
-import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
@@ -81,7 +79,7 @@ public class Cryobox extends DepthsAbility {
 	}
 
 	private void execute(EntityDamageEvent event) {
-		if (AbilityUtils.isBlocked(event)) {
+		if (mPlayer == null || AbilityUtils.isBlocked(event)) {
 			return;
 		}
 
@@ -92,8 +90,7 @@ public class Cryobox extends DepthsAbility {
 		// Health is less than 0 but does not penetrate the absorption shield
 		boolean dealDamageLater = healthRemaining < 0 && healthRemaining > -(ABSORPTION_HEALTH[mRarity - 1]);
 
-		AttributeInstance maxHealth = mPlayer.getAttribute(Attribute.GENERIC_MAX_HEALTH);
-		if (healthRemaining > maxHealth.getValue() * TRIGGER_HEALTH) {
+		if (healthRemaining > EntityUtils.getMaxHealth(mPlayer) * TRIGGER_HEALTH) {
 			return;
 		} else if (dealDamageLater) {
 			// The player has taken fatal damage BUT will be saved by the absorption, so set damage to 0 and compensate later

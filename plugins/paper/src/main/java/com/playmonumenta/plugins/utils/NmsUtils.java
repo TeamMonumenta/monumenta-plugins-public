@@ -95,7 +95,7 @@ public class NmsUtils {
 		unblockableEntityDamageEntity(damagee, amount, damager, null);
 	}
 
-	public static void unblockableEntityDamageEntity(LivingEntity damagee, double amount, LivingEntity damager, String cause) {
+	public static void unblockableEntityDamageEntity(LivingEntity damagee, double amount, LivingEntity damager, @Nullable String cause) {
 		// Don't damage invulnerable entities even though this is unblockable
 		if (damagee.isInvulnerable()) {
 			return;

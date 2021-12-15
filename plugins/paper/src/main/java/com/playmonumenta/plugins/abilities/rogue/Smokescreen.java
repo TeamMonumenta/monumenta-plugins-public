@@ -9,6 +9,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
 import org.bukkit.inventory.ItemStack;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
@@ -28,7 +29,7 @@ public class Smokescreen extends Ability {
 
 	private final double mWeakenEffect;
 
-	public Smokescreen(Plugin plugin, Player player) {
+	public Smokescreen(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Smoke Screen");
 		mInfo.mLinkedSpell = ClassAbility.SMOKESCREEN;
 		mInfo.mScoreboardId = "SmokeScreen";

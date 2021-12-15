@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.abilities.delves;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.SpawnerSpawnEvent;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.utils.DelvesUtils;
@@ -50,7 +51,7 @@ public class Legionary extends DelveModifier {
 			}
 	};
 
-	public Legionary(Plugin plugin, Player player) {
+	public Legionary(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, Modifier.LEGIONARY);
 
 		if (player != null) {

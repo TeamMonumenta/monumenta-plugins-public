@@ -1,6 +1,5 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -30,26 +29,22 @@ import com.playmonumenta.plugins.bosses.spells.varcosamist.SpellActions;
 import com.playmonumenta.plugins.bosses.spells.varcosamist.SpellJibberJabber;
 import com.playmonumenta.plugins.bosses.spells.varcosamist.SpellSummonConstantly;
 import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.SerializationUtils;
 
 
-public class VarcosaSummonerBoss extends BossAbilityGroup {
+public final class VarcosaSummonerBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_varcosa_summoner";
 	public static final int detectionRange = 50;
 	public static int mSummonPeriod = 20 * 5;
-	private List<String> mSummonableMobs = new ArrayList<>();
-	private String[] mSpeak = new String[3];
-	private final int mRadius = 50;
 	private Location mCenter = null;
 	private boolean mActive;
-	private Location mEndLoc;
-	private Location mSpawnLoc;
+	private final Location mEndLoc;
+	private final Location mSpawnLoc;
 
 	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
-		return SerializationUtils.statefulBossDeserializer(boss, identityTag, (spawnLoc, endLoc) -> {
-			return new VarcosaSummonerBoss(plugin, boss, spawnLoc, endLoc);
-		});
+		return SerializationUtils.statefulBossDeserializer(boss, identityTag, (spawnLoc, endLoc) -> new VarcosaSummonerBoss(plugin, boss, spawnLoc, endLoc));
 	}
 
 	@Override
@@ -62,15 +57,15 @@ public class VarcosaSummonerBoss extends BossAbilityGroup {
 		mEndLoc = endLoc;
 		mSpawnLoc = spawnLoc;
 
-		mSummonableMobs.add("SeaWolf");
-		mSummonableMobs.add("PirateGunner");
-		mSummonableMobs.add("DrownedCrewman");
+		List<String> summonableMobs = List.of("SeaWolf", "PirateGunner", "DrownedCrewman");
 
-		mSpeak[0] = "Yarr! It be you again? This shan't end the way it did before, matey!";
-		mSpeak[1] = "Ye took me treasure, ye stole me fleece. Now I be takin' ye to the beyond!";
-		mSpeak[2] = "Yarr! Me ghostly crew rides forth!";
+		String[] speak = new String[] {
+				"Yarr! It be you again? This shan't end the way it did before, matey!",
+				"Ye took me treasure, ye stole me fleece. Now I be takin' ye to the beyond!",
+				"Yarr! Me ghostly crew rides forth!"};
 
-		for (LivingEntity e : mBoss.getLocation().getNearbyEntitiesByType(ArmorStand.class, mRadius, mRadius, mRadius)) {
+		int radius = 50;
+		for (LivingEntity e : mBoss.getLocation().getNearbyEntitiesByType(ArmorStand.class, radius, radius, radius)) {
 			if (e.getScoreboardTags() != null && !e.getScoreboardTags().isEmpty() && e.getScoreboardTags().contains("varcosa_center")) {
 				mCenter = e.getLocation();
 				break;
@@ -93,7 +88,9 @@ public class VarcosaSummonerBoss extends BossAbilityGroup {
 		summonArmorStandIfNoneAreThere(mCenter.clone().add(11.5, 0, 0));
 		summonArmorStandIfNoneAreThere(mCenter.clone().add(-11.5, 0, 0));
 
-		List<Spell> passiveSpells = Arrays.asList(new SpellSummonConstantly(mSummonableMobs, mSummonPeriod, 50, 5, 2, mCenter, this), new SpellJibberJabber(mBoss, mSpeak, mRadius), action, tooHighAction);
+		List<Spell> passiveSpells = Arrays.asList(new SpellSummonConstantly(summonableMobs, mSummonPeriod, 50, 5, 2, mCenter, this),
+		                                          new SpellJibberJabber(mBoss, speak, radius),
+		                                          action, tooHighAction);
 		SpellManager activeSpells = new SpellManager(Arrays.asList(new SpellPurgeNegatives(mBoss, 100)));
 
 		Map<Integer, BossHealthAction> events = new HashMap<Integer, BossHealthAction>();
@@ -137,9 +134,9 @@ public class VarcosaSummonerBoss extends BossAbilityGroup {
 		mBoss.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 99, 9999));
 		mBoss.setAI(false);
 
-		mBoss.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(bossTargetHp);
-		mBoss.getAttribute(Attribute.GENERIC_FOLLOW_RANGE).setBaseValue(detectionRange);
-		mBoss.getAttribute(Attribute.GENERIC_KNOCKBACK_RESISTANCE).setBaseValue(1);
+		EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_MAX_HEALTH, bossTargetHp);
+		EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_FOLLOW_RANGE, detectionRange);
+		EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_KNOCKBACK_RESISTANCE, 1);
 
 		mBoss.setHealth(bossTargetHp);
 

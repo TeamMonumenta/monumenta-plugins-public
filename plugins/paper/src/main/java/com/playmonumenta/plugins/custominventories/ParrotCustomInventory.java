@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.entity.Player;
@@ -26,13 +25,14 @@ import com.playmonumenta.plugins.parrots.ParrotManager.ParrotVariant;
 import com.playmonumenta.plugins.parrots.ParrotManager.PlayerShoulder;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.NamespacedKeyUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 
-public class ParrotCustomInventory extends CustomInventory {
+public final class ParrotCustomInventory extends CustomInventory {
 
 	private enum ParrotGUIPage {
 		R1(0),
@@ -166,15 +166,15 @@ public class ParrotCustomInventory extends CustomInventory {
 		ItemStack mUP = null;
 		ItemStack mLi = null;
 
-		mHCS = InventoryUtils.getItemFromLootTable(playerLoad, NamespacedKey.fromString("epic:r2/items/currency/hyper_crystalline_shard"));
-		mHXP = InventoryUtils.getItemFromLootTable(playerLoad, NamespacedKey.fromString("epic:r1/items/currency/hyper_experience"));
-		mPGo = InventoryUtils.getItemFromLootTable(playerLoad, NamespacedKey.fromString("epic:r1/items/currency/pulsating_gold"));
-		mPPe = InventoryUtils.getItemFromLootTable(playerLoad, NamespacedKey.fromString("epic:r2/items/currency/pulsating_emerald"));
-		mKS = InventoryUtils.getItemFromLootTable(playerLoad, NamespacedKey.fromString("epic:r1/kaul/crownshard"));
-		mFG = InventoryUtils.getItemFromLootTable(playerLoad, NamespacedKey.fromString("epic:r2/eldrask/materials/epic_material"));
-		mDM = InventoryUtils.getItemFromLootTable(playerLoad, NamespacedKey.fromString("epic:r2/depths/loot/voidstained_geode"));
-		mUP = InventoryUtils.getItemFromLootTable(playerLoad, NamespacedKey.fromString("epic:r1/dungeons/4/static_uncommons/unicorn_puke"));
-		mLi = InventoryUtils.getItemFromLootTable(playerLoad, NamespacedKey.fromString("epic:r2/lich/materials/ancestral_effigy"));
+		mHCS = InventoryUtils.getItemFromLootTable(playerLoad, NamespacedKeyUtils.fromString("epic:r2/items/currency/hyper_crystalline_shard"));
+		mHXP = InventoryUtils.getItemFromLootTable(playerLoad, NamespacedKeyUtils.fromString("epic:r1/items/currency/hyper_experience"));
+		mPGo = InventoryUtils.getItemFromLootTable(playerLoad, NamespacedKeyUtils.fromString("epic:r1/items/currency/pulsating_gold"));
+		mPPe = InventoryUtils.getItemFromLootTable(playerLoad, NamespacedKeyUtils.fromString("epic:r2/items/currency/pulsating_emerald"));
+		mKS = InventoryUtils.getItemFromLootTable(playerLoad, NamespacedKeyUtils.fromString("epic:r1/kaul/crownshard"));
+		mFG = InventoryUtils.getItemFromLootTable(playerLoad, NamespacedKeyUtils.fromString("epic:r2/eldrask/materials/epic_material"));
+		mDM = InventoryUtils.getItemFromLootTable(playerLoad, NamespacedKeyUtils.fromString("epic:r2/depths/loot/voidstained_geode"));
+		mUP = InventoryUtils.getItemFromLootTable(playerLoad, NamespacedKeyUtils.fromString("epic:r1/dungeons/4/static_uncommons/unicorn_puke"));
+		mLi = InventoryUtils.getItemFromLootTable(playerLoad, NamespacedKeyUtils.fromString("epic:r2/lich/materials/ancestral_effigy"));
 
 		List<String> lore = new ArrayList<>();
 		Map<ItemStack, Integer> cost = new HashMap<>();
@@ -1029,12 +1029,16 @@ public class ParrotCustomInventory extends CustomInventory {
 			return;
 		}
 
-		if (event.getCurrentItem().getType().equals(JUNK_BORDER_ITEM.getType()) || event.getCurrentItem().getType().equals(JUNK_INTERIOR_ITEM.getType())) {
+		ItemStack currentItem = event.getCurrentItem();
+
+		if (currentItem == null
+				|| currentItem.getType() == JUNK_BORDER_ITEM.getType()
+				|| currentItem.getType() == JUNK_INTERIOR_ITEM.getType()) {
 			//if the player press the junk item nothing happen    // Magikarp use SPLASH!
 			return;
 		}
 
-		if (event.getCurrentItem().getType().equals(Material.OAK_SIGN)) {
+		if (currentItem.getType() == Material.OAK_SIGN) {
 			return;
 		}
 
@@ -1043,7 +1047,7 @@ public class ParrotCustomInventory extends CustomInventory {
 		Player whoClicked = (Player) event.getWhoClicked();
 		Inventory inventory = event.getClickedInventory();
 
-		if (gItem.doesSomethingOnClick()) {
+		if (gItem != null && gItem.doesSomethingOnClick()) {
 			if (gItem.canPurchase(whoClicked)) {
 				if (gItem.purchase(whoClicked)) {
 					whoClicked.playSound(whoClicked.getLocation(), Sound.UI_CARTOGRAPHY_TABLE_TAKE_RESULT, SoundCategory.NEUTRAL, 10f, 1.3f);
@@ -1051,7 +1055,7 @@ public class ParrotCustomInventory extends CustomInventory {
 					updateInventory(whoClicked);
 				} else {
 					whoClicked.sendMessage(Component.text("[SYSTEM]", NamedTextColor.RED).decoration(TextDecoration.BOLD, true)
-					.append(Component.text(" Error! please contact a mod! fail with purchasing.", NamedTextColor.RED).decoration(TextDecoration.BOLD, false)));
+							                       .append(Component.text(" Error! please contact a mod! fail with purchasing.", NamedTextColor.RED).decoration(TextDecoration.BOLD, false)));
 				}
 			} else {
 				whoClicked.sendMessage(Component.text("You don't have enough currency to pay for this item.", NamedTextColor.RED));

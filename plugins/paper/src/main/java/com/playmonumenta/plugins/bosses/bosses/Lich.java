@@ -114,7 +114,7 @@ public final class Lich extends BossAbilityGroup {
 	private static final String mShieldCrystal = "DeathCrystal";
 	private static final String mCrystalShield = "CrystalShield";
 	private final String mFinalCrystal = "WarpedCrystal";
-	private static LivingEntity mStart;
+	private @Nullable static LivingEntity mStart;
 	private @Nullable LivingEntity mKey;
 	private final double mL = 26.5;
 	private final double mY = 14.5;
@@ -915,9 +915,8 @@ public final class Lich extends BossAbilityGroup {
 	}
 
 	private boolean mAggro = true;
-	private Player mTarget = null;
+	private @Nullable Player mTarget = null;
 	private double mTotalDamage = 0;
-	private boolean mLocFound;
 
 	@Override
 	public void bossDamagedByEntity(EntityDamageByEntityEvent event) {
@@ -939,8 +938,8 @@ public final class Lich extends BossAbilityGroup {
 			event.setCancelled(true);
 			mBoss.setHealth(100);
 			if (!mActivated) {
-				if (mKey.isValid()) {
-					mBoss.setHealth(mBoss.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue() * 0.15);
+				if (mKey != null && mKey.isValid()) {
+					mBoss.setHealth(EntityUtils.getMaxHealth(mBoss) * 0.15);
 
 
 					mBoss.getWorld().playSound(mBoss.getLocation(), Sound.ENTITY_ENDER_DRAGON_GROWL, SoundCategory.HOSTILE, 5.0f, 0.75f);
@@ -1016,8 +1015,7 @@ public final class Lich extends BossAbilityGroup {
 			Player player = null;
 			if (event.getDamager() instanceof Player) {
 				player = (Player) event.getDamager();
-			} else if (event.getDamager() instanceof Projectile) {
-				Projectile proj = (Projectile) event.getDamager();
+			} else if (event.getDamager() instanceof Projectile proj) {
 				if (proj.getShooter() instanceof Player) {
 					player = (Player) proj.getShooter();
 				}
@@ -1046,8 +1044,7 @@ public final class Lich extends BossAbilityGroup {
 		Player player = null;
 		if (event.getDamager() instanceof Player) {
 			player = (Player) event.getDamager();
-		} else if (event.getDamager() instanceof Projectile) {
-			Projectile proj = (Projectile) event.getDamager();
+		} else if (event.getDamager() instanceof Projectile proj) {
 			if (proj.getShooter() instanceof Player) {
 				player = (Player) proj.getShooter();
 			}
@@ -1064,17 +1061,17 @@ public final class Lich extends BossAbilityGroup {
 		// teleport
 		mTotalDamage += event.getDamage();
 		Location loc = mBoss.getLocation();
-		if (mTotalDamage / mBoss.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue() >= 0.04 && !mActivated && !mCutscene) {
+		if (mTotalDamage / EntityUtils.getMaxHealth(mBoss) >= 0.04 && !mActivated && !mCutscene) {
 			World world = mBoss.getWorld();
 			mTotalDamage = 0;
-			mLocFound = false;
-			while (!mLocFound && !SpellDiesIrae.getActive()) {
+			boolean locFound = false;
+			while (!locFound && !SpellDiesIrae.getActive()) {
 				double x = FastUtils.randomDoubleInRange(-16, 16);
 				double z = FastUtils.randomDoubleInRange(-16, 16);
 				Location newloc = loc.clone().add(x, 0, z);
 				newloc.setY(mSpawnLoc.clone().getY());
 				if (newloc.distance(mSpawnLoc) < 30 && newloc.getBlock().getType() == Material.AIR) {
-					mLocFound = true;
+					locFound = true;
 					for (int i = 0; i < 50; i++) {
 						Vector vec = LocationUtils.getDirectionTo(newloc, loc);
 						Location pLoc = mBoss.getEyeLocation();
@@ -1178,7 +1175,7 @@ public final class Lich extends BossAbilityGroup {
 			ItemMeta meta = item.getItemMeta();
 			// remove lore + ench
 			if (meta.hasLore()) {
-				meta.lore().clear();
+				meta.lore(Collections.emptyList());
 			}
 			if (meta.hasEnchants()) {
 				meta.removeEnchant(Enchantment.PROTECTION_ENVIRONMENTAL);
@@ -1544,7 +1541,7 @@ public final class Lich extends BossAbilityGroup {
 				}
 				if (mT > dio.length) {
 					this.cancel();
-					mBoss.setHealth(mBoss.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue());
+					mBoss.setHealth(EntityUtils.getMaxHealth(mBoss));
 					p4(world);
 				}
 			}
@@ -1670,7 +1667,7 @@ public final class Lich extends BossAbilityGroup {
 						SpellFinalCrystal.setTriggered(false);
 						Collections.shuffle(mTowerGroup);
 						lastStand(mTowerGroup.get(0));
-						mBoss.setHealth(mBoss.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue());
+						mBoss.setHealth(EntityUtils.getMaxHealth(mBoss));
 						if (mChat == 0) {
 							mChat++;
 							for (Player p : playersInRange(mStart.getLocation(), detectionRange, true)) {
@@ -1684,7 +1681,7 @@ public final class Lich extends BossAbilityGroup {
 						Collections.shuffle(mTowerGroup);
 						lastStand(mTowerGroup.get(0));
 						world.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_AMBIENT, SoundCategory.HOSTILE, 3, 0.9f);
-						mBoss.setHealth(mBoss.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue() * 0.75);
+						mBoss.setHealth(EntityUtils.getMaxHealth(mBoss) * 0.75);
 						if (mChat == 1) {
 							mChat++;
 							for (Player p : playersInRange(mStart.getLocation(), detectionRange, true)) {
@@ -1697,7 +1694,7 @@ public final class Lich extends BossAbilityGroup {
 						SpellFinalCrystal.setTriggered(false);
 						Collections.shuffle(mTowerGroup);
 						lastStand(mTowerGroup.get(0));
-						mBoss.setHealth(mBoss.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue() * 0.5);
+						mBoss.setHealth(EntityUtils.getMaxHealth(mBoss) * 0.5);
 						world.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_AMBIENT, SoundCategory.HOSTILE, 3, 0.8f);
 						world.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_HURT, SoundCategory.HOSTILE, 3, 1);
 						if (mChat == 2) {
@@ -1712,7 +1709,7 @@ public final class Lich extends BossAbilityGroup {
 						SpellFinalCrystal.setTriggered(false);
 						Collections.shuffle(mTowerGroup);
 						lastStand(mTowerGroup.get(0));
-						mBoss.setHealth(mBoss.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue() * 0.25);
+						mBoss.setHealth(EntityUtils.getMaxHealth(mBoss) * 0.25);
 						world.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_AMBIENT, SoundCategory.HOSTILE, 3, 0.7f);
 						world.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_HURT, SoundCategory.HOSTILE, 3, 0.8f);
 						if (mChat == 3) {

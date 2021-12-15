@@ -25,6 +25,7 @@ import com.playmonumenta.plugins.bosses.bosses.HeadlessHorsemanBoss;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 
 
@@ -101,12 +102,12 @@ public class SpellReaperOfLife extends Spell {
 							mPlayerScalingHP = 1000;
 						}
 						LivingEntity nuke = (LivingEntity) LibraryOfSoulsIntegration.summon(mCenter, "WorldEnder");
-						nuke.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(mPlayerScalingHP);
-						nuke.setHealth(mPlayerScalingHP);
-						if (!mSummoned.contains(nuke.getUniqueId())) {
+						if (nuke != null) {
+							EntityUtils.setAttributeBase(nuke, Attribute.GENERIC_MAX_HEALTH, mPlayerScalingHP);
+							nuke.setHealth(mPlayerScalingHP);
 							mSummoned.add(nuke.getUniqueId());
+							bomb(nuke, mPlayerScalingHP);
 						}
-						bomb(nuke, mPlayerScalingHP);
 						this.cancel();
 					}
 				}
@@ -119,7 +120,7 @@ public class SpellReaperOfLife extends Spell {
 
 	public void bomb(LivingEntity z, double mPSHP) {
 		z.setAI(false);
-		z.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(mPSHP);
+		EntityUtils.setAttributeBase(z, Attribute.GENERIC_MAX_HEALTH, mPSHP);
 		z.setHealth(mPSHP);
 		new BukkitRunnable() {
 			int mInc = 0;

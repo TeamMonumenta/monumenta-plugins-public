@@ -29,7 +29,7 @@ public class OneWithTheWind extends DepthsAbility {
 
 	@Override
 	public void periodicTrigger(boolean twoHertz, boolean oneSecond, int ticks) {
-		if (PlayerUtils.otherPlayersInRange(mPlayer, RANGE, true).size() == 0) {
+		if (mPlayer != null && PlayerUtils.otherPlayersInRange(mPlayer, RANGE, true).size() == 0) {
 			Plugin.getInstance().mEffectManager.addEffect(mPlayer, ABILITY_NAME, new PercentSpeed(40, SPEED[mRarity - 1], ABILITY_NAME));
 			mPlugin.mEffectManager.addEffect(mPlayer, ABILITY_NAME, new PercentDamageReceived(40, PERCENT_DAMAGE_RECEIVED[mRarity - 1]));
 		}

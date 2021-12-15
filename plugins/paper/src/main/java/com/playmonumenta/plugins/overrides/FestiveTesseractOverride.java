@@ -6,14 +6,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.bosses.BossManager;
-import com.playmonumenta.plugins.bosses.bosses.FestiveTesseractSnowmanBoss;
-import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
-import com.playmonumenta.plugins.utils.FastUtils;
-import com.playmonumenta.plugins.utils.ItemUtils;
-import com.playmonumenta.plugins.utils.MessagingUtils;
-
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
@@ -29,6 +21,15 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.loot.Lootable;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.bosses.BossManager;
+import com.playmonumenta.plugins.bosses.bosses.FestiveTesseractSnowmanBoss;
+import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
+import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.MessagingUtils;
+
 public class FestiveTesseractOverride extends BaseOverride {
 	private static final String TESSERACT_NAME = "Tesseract of Festivity";
 	private static final String TESSERACT_UPGRADENAME = "Tesseract of Festivity (u)";
@@ -36,12 +37,12 @@ public class FestiveTesseractOverride extends BaseOverride {
 	private static final Particle.DustOptions FESTIVE_GREEN_COLOR = new Particle.DustOptions(Color.fromRGB(75, 200, 0), 1.0f);
 	private static final int COOLDOWN = 60 * 20 * 5;
 	private static final HashMap<UUID, Integer> PLAYERS_ON_COOLDOWN = new HashMap<>();
-	private static List<String> STANDARD_SUMMONS = new ArrayList<String>(Arrays.asList("TurretSnowman", "SpeedySnowman", "HeavySnowman", "HoppingSnowman"));
-	private static List<String> UPGRADE_SUMMONS = new ArrayList<String>(Arrays.asList("SentrySnowman", "SneakySnowman", "TankSnowman", "AgileSnowman"));
+	private static final List<String> STANDARD_SUMMONS = new ArrayList<String>(Arrays.asList("TurretSnowman", "SpeedySnowman", "HeavySnowman", "HoppingSnowman"));
+	private static final List<String> UPGRADE_SUMMONS = new ArrayList<String>(Arrays.asList("SentrySnowman", "SneakySnowman", "TankSnowman", "AgileSnowman"));
 
 	@Override
-	public boolean leftClickItemInteraction(Plugin plugin, Player player, Action action, ItemStack item, Block block) {
-		if (checkTesseractName(item) == 0) {
+	public boolean leftClickItemInteraction(Plugin plugin, Player player, Action action, ItemStack item, @Nullable Block block) {
+		if (!InventoryUtils.testForItemWithName(item, TESSERACT_NAME)) {
 			return true;
 		}
 
@@ -61,7 +62,7 @@ public class FestiveTesseractOverride extends BaseOverride {
 	}
 
 	@Override
-	public boolean rightClickItemInteraction(Plugin plugin, Player player, Action action, ItemStack item, Block block) {
+	public boolean rightClickItemInteraction(Plugin plugin, Player player, Action action, ItemStack item, @Nullable Block block) {
 		if (checkTesseractName(item) == 0) {
 			return true;
 		}
@@ -74,7 +75,7 @@ public class FestiveTesseractOverride extends BaseOverride {
 		Integer cooldownEnds = PLAYERS_ON_COOLDOWN.get(player.getUniqueId());
 		if (cooldownEnds != null) {
 			// On cooldown
-			int secondsLeft = (cooldownEnds - Bukkit.getServer().getCurrentTick())/20;
+			int secondsLeft = (cooldownEnds - Bukkit.getServer().getCurrentTick()) / 20;
 
 			String timespec;
 			if (secondsLeft < 60) {

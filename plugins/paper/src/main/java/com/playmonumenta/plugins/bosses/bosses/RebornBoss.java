@@ -3,7 +3,6 @@ package com.playmonumenta.plugins.bosses.bosses;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
-import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.plugin.Plugin;
@@ -34,7 +33,7 @@ public class RebornBoss extends BossAbilityGroup {
 			World world = mBoss.getWorld();
 			event.setCancelled(true);
 			world.playSound(mBoss.getLocation(), Sound.ITEM_TOTEM_USE, 1, 1);
-			mBoss.setHealth(mBoss.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue() / 2);
+			mBoss.setHealth(EntityUtils.getMaxHealth(mBoss) / 2);
 			mBoss.setFireTicks(-1);
 			for (PotionEffect effect : mBoss.getActivePotionEffects()) {
 				mBoss.removePotionEffect(effect.getType());

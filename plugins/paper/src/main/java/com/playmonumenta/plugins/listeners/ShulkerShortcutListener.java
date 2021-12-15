@@ -29,6 +29,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BlockStateMeta;
 import org.bukkit.permissions.Permission;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.enchantments.curses.CurseOfEphemerality;
@@ -84,16 +85,16 @@ public class ShulkerShortcutListener implements Listener {
 					}
 				}.runTask(mPlugin);
 			} else if (itemClicked != null &&
-			           click == ClickType.RIGHT &&
-			           isEnderExpansion(itemClicked) &&
-					   !event.getClickedInventory().getType().equals(InventoryType.ENDER_CHEST)) {
+				click == ClickType.RIGHT &&
+				isEnderExpansion(itemClicked) &&
+				!clickedInventory.getType().equals(InventoryType.ENDER_CHEST)) {
 				// Right clicked an Ender Chest Expansion shulker outside an ender chest
 				player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1.0f, 1.0f);
 				player.sendMessage(ChatColor.RED + "This item only works in an ender chest");
 				event.setCancelled(true);
 			} else if (itemClicked != null &&
-			           click == ClickType.RIGHT &&
-			           isPurpleTesseractContainer(itemClicked)) {
+				click == ClickType.RIGHT &&
+				isPurpleTesseractContainer(itemClicked)) {
 				// Right clicked a purple tesseract shulker that can't be opened
 				player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1.0f, 1.0f);
 				player.sendMessage(ChatColor.RED + "This container must be placed to access its items");
@@ -259,7 +260,7 @@ public class ShulkerShortcutListener implements Listener {
 			} else if (isPurpleTesseractContainer(event.getItemInHand())) {
 				ItemStack item = event.getItemInHand();
 				ShulkerBox sbox = (ShulkerBox) ((BlockStateMeta) item.getItemMeta()).getBlockState();
-				ItemStack[] contents = sbox.getInventory().getContents();
+				@Nullable ItemStack[] contents = sbox.getInventory().getContents();
 				final String lockStr;
 				if (sbox.isLocked()) {
 					lockStr = sbox.getLock();

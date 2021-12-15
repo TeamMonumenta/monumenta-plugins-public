@@ -7,6 +7,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.inventory.ItemStack;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
@@ -22,7 +23,7 @@ public class Toughness extends Ability {
 
 	private final double mDoTDamageReduction;
 
-	public Toughness(Plugin plugin, Player player) {
+	public Toughness(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Toughness");
 		mInfo.mScoreboardId = "Toughness";
 		mInfo.mShorthandName = "Tgh";

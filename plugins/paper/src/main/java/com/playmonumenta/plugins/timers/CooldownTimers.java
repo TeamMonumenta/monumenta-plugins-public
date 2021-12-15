@@ -15,12 +15,12 @@ import com.playmonumenta.plugins.network.ClientModHandler;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 
 public class CooldownTimers {
-	public HashMap<UUID, HashMap<ClassAbility, Integer>> mTimers = null;
-	private Plugin mPlugin = null;
+
+	private final HashMap<UUID, HashMap<ClassAbility, Integer>> mTimers = new HashMap<>();
+	private final Plugin mPlugin;
 
 	public CooldownTimers(Plugin plugin) {
 		mPlugin = plugin;
-		mTimers = new HashMap<UUID, HashMap<ClassAbility, Integer>>();
 	}
 
 	public void registerCooldown(Player player, ClassAbility spell, Integer cooldownTime) {

@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.abilities.delves;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntitySpawnEvent;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.bosses.bosses.CarapaceBoss;
@@ -60,7 +61,7 @@ public class Carapace extends DelveModifier {
 
 	private final int mCarapaceHealthRawPercent;
 
-	public Carapace(Plugin plugin, Player player) {
+	public Carapace(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, Modifier.CARAPACE);
 
 		if (player != null) {

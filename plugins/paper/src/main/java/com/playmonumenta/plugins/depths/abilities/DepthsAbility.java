@@ -26,7 +26,7 @@ public abstract class DepthsAbility extends Ability {
 
 	public int mRarity;
 	public Material mDisplayItem = Material.STICK;
-	public DepthsTree mTree = null;
+	public @Nullable DepthsTree mTree = null;
 
 
 	public DepthsAbility(Plugin plugin, Player player, String displayName) {

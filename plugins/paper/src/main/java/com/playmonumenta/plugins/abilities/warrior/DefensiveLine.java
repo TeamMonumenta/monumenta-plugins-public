@@ -14,6 +14,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
@@ -47,7 +48,7 @@ public class DefensiveLine extends Ability {
 
 	private final double mPercentDamageReceived;
 
-	public DefensiveLine(Plugin plugin, Player player) {
+	public DefensiveLine(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Defensive Line");
 		mInfo.mLinkedSpell = ClassAbility.DEFENSIVE_LINE;
 		mInfo.mScoreboardId = "DefensiveLine";
@@ -66,7 +67,7 @@ public class DefensiveLine extends Ability {
 		new BukkitRunnable() {
 			@Override
 			public void run() {
-				if (mPlayer.isHandRaised()) {
+				if (mPlayer != null && mPlayer.isHandRaised()) {
 					World world = mPlayer.getWorld();
 					world.playSound(mPlayer.getLocation(), Sound.BLOCK_ANVIL_PLACE, 1.25f, 1.35f);
 					world.playSound(mPlayer.getLocation(), Sound.ENTITY_ILLUSIONER_CAST_SPELL, 1.25f, 1.1f);
@@ -139,11 +140,14 @@ public class DefensiveLine extends Ability {
 
 	@Override
 	public boolean runCheck() {
+		if (mPlayer == null) {
+			return false;
+		}
 		ItemStack offHand = mPlayer.getInventory().getItemInOffHand();
 		ItemStack mainHand = mPlayer.getInventory().getItemInMainHand();
 		return mPlayer.isSneaking()
-		       && !ItemUtils.isSomeBow(mainHand)
-		       && (mainHand.getType() == Material.SHIELD || offHand.getType() == Material.SHIELD);
+			&& !ItemUtils.isSomeBow(mainHand)
+			&& (mainHand.getType() == Material.SHIELD || offHand.getType() == Material.SHIELD);
 	}
 
 	@Override

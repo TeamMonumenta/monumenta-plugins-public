@@ -31,7 +31,7 @@ import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
-
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 
 public class SpatialShatter extends Ability {
@@ -55,7 +55,7 @@ public class SpatialShatter extends Ability {
 	private final double mLevelReduction;
 	private final int mLevelCap;
 
-	public SpatialShatter(Plugin plugin, Player player) {
+	public SpatialShatter(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, NAME);
 		mInfo.mLinkedSpell = ABILITY;
 

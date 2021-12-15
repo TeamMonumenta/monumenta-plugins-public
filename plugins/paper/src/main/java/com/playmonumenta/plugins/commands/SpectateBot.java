@@ -32,7 +32,7 @@ import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.CommandPermission;
 import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
 
-public class SpectateBot extends GenericCommand implements Listener {
+public final class SpectateBot extends GenericCommand implements Listener {
 	public static final int MAX_RADIUS = 17;
 	public static final int MIN_RADIUS = 4;
 	public static final double DISTANCE_VELOCITY = 0.05;
@@ -51,7 +51,7 @@ public class SpectateBot extends GenericCommand implements Listener {
 		public double mPitch = 20;
 		public double mDistance = MAX_RADIUS;
 		public int mTimeSinceLastSwitch = 0;
-		public Player mTarget = null;
+		public @Nullable Player mTarget = null;
 		public Location mLastTargetLoc;
 		public final Player mSpectator;
 
@@ -62,7 +62,7 @@ public class SpectateBot extends GenericCommand implements Listener {
 	}
 
 	public final Map<UUID, SpectateContext> mSpectators = new HashMap<>();
-	public BukkitRunnable mRunnable = null;
+	public @Nullable BukkitRunnable mRunnable = null;
 
 	public SpectateBot(Plugin plugin) {
 		/* No-argument variant which just is the sender (if they are a player) */

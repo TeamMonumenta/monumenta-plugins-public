@@ -7,6 +7,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.SpawnerSpawnEvent;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.bosses.bosses.FireBombTossBoss;
@@ -111,7 +112,7 @@ public class Infernal extends DelveModifier {
 	private final double mBurningDamageTakenMultiplier;
 	private final double mAbilityChance;
 
-	public Infernal(Plugin plugin, Player player) {
+	public Infernal(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, Modifier.INFERNAL);
 
 		if (player != null) {

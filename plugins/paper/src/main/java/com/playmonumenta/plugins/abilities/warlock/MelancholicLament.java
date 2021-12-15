@@ -43,7 +43,7 @@ public class MelancholicLament extends Ability {
 	private @Nullable JudgementChain mJudgementChain;
 
 
-	public MelancholicLament(Plugin plugin, Player player) {
+	public MelancholicLament(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Melancholic Lament");
 		mInfo.mLinkedSpell = ClassAbility.MELANCHOLIC_LAMENT;
 		mInfo.mScoreboardId = "Melancholic";

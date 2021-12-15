@@ -48,6 +48,9 @@ public class Taunt extends DepthsAbility {
 
 	@Override
 	public void cast(Action action) {
+		if (mPlayer == null) {
+			return;
+		}
 		Location loc = mPlayer.getLocation();
 		World world = mPlayer.getWorld();
 		List<LivingEntity> mobs = EntityUtils.getNearbyMobs(loc, CAST_RANGE);
@@ -81,7 +84,7 @@ public class Taunt extends DepthsAbility {
 
 	@Override
 	public boolean runCheck() {
-		return (!isOnCooldown() && mPlayer.isSneaking() && DepthsUtils.isWeaponItem(mPlayer.getInventory().getItemInMainHand()));
+		return mPlayer != null && !isOnCooldown() && mPlayer.isSneaking() && DepthsUtils.isWeaponItem(mPlayer.getInventory().getItemInMainHand());
 	}
 
 	@Override

@@ -26,7 +26,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.Plugin;
 
-public class EffectManager implements Listener {
+public final class EffectManager implements Listener {
 
 	private static class Effects {
 
@@ -177,7 +177,7 @@ public class EffectManager implements Listener {
 
 	private final Map<Entity, Effects> mEntities = new HashMap<Entity, Effects>();
 	private final BukkitRunnable mTimer;
-	private static EffectManager INSTANCE = null;
+	private static @Nullable EffectManager INSTANCE = null;
 
 	@SuppressWarnings("unchecked")
 	public EffectManager(Plugin plugin) {

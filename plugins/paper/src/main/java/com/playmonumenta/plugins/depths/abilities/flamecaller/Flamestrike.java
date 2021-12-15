@@ -46,6 +46,9 @@ public class Flamestrike extends DepthsAbility {
 
 	@Override
 	public void cast(Action action) {
+		if (mPlayer == null) {
+			return;
+		}
 		putOnCooldown();
 
 		double damage = DAMAGE[mRarity - 1];
@@ -98,7 +101,7 @@ public class Flamestrike extends DepthsAbility {
 
 	@Override
 	public boolean runCheck() {
-		return (mPlayer.isSneaking() && !isOnCooldown() && DepthsUtils.isWeaponItem(mPlayer.getInventory().getItemInMainHand()));
+		return mPlayer != null && mPlayer.isSneaking() && !isOnCooldown() && DepthsUtils.isWeaponItem(mPlayer.getInventory().getItemInMainHand());
 	}
 
 	@Override

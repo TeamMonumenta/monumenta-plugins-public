@@ -14,6 +14,7 @@ import org.bukkit.event.block.Action;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
@@ -60,7 +61,7 @@ public class MagmaShield extends Ability {
 
 	private boolean mLookUpRestriction = false;
 
-	public MagmaShield(Plugin plugin, Player player) {
+	public MagmaShield(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, NAME);
 		mInfo.mLinkedSpell = ABILITY;
 
@@ -90,7 +91,7 @@ public class MagmaShield extends Ability {
 
 		if (player != null) {
 			Bukkit.getScheduler().runTask(plugin, () -> {
-				Blizzard blizzard = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(mPlayer, Blizzard.class);
+				Blizzard blizzard = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, Blizzard.class);
 				mLookUpRestriction = blizzard != null; // If Blizzard is not null, player has Blizzard, require restriction
 			});
 		}
@@ -98,6 +99,9 @@ public class MagmaShield extends Ability {
 
 	@Override
 	public void cast(Action action) {
+		if (mPlayer == null) {
+			return;
+		}
 		putOnCooldown();
 
 		float damage = SpellPower.getSpellDamage(mPlayer, mLevelDamage);
@@ -155,9 +159,7 @@ public class MagmaShield extends Ability {
 
 	@Override
 	public boolean runCheck() {
-		if (ItemUtils.isWand(
-			mPlayer.getInventory().getItemInMainHand()
-		)) {
+		if (mPlayer != null && ItemUtils.isWand(mPlayer.getInventory().getItemInMainHand())) {
 			boolean lookingTooHigh = false;
 			if (mLookUpRestriction) {
 				// Only check if looking too high, if have restriction. Otherwise never looking too high (false)

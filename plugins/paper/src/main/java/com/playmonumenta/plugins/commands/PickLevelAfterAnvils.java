@@ -17,6 +17,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.utils.ExperienceUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.utils.NamespacedKeyUtils;
 import com.playmonumenta.plugins.utils.SignUtils;
 
 import dev.jorel.commandapi.CommandAPICommand;
@@ -29,7 +30,7 @@ import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
 public class PickLevelAfterAnvils extends GenericCommand {
 	static final String COMMAND = "picklevelafteranvils";
 	static final String FAILURE = "Please enter a number between 1 and your current level.";
-	public static final NamespacedKey ANVILTABLE = NamespacedKey.fromString("epic:r1/items/misc/repair_anvil");
+	public static final NamespacedKey ANVILTABLE = NamespacedKeyUtils.fromString("epic:r1/items/misc/repair_anvil");
 
 	public static void register() {
 		CommandPermission perms = CommandPermission.fromString("monumenta.command.picklevelafteranvils");

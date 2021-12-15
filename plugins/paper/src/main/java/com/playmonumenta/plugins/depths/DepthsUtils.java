@@ -43,7 +43,6 @@ import com.playmonumenta.plugins.depths.abilities.aspects.WandAspect;
 import com.playmonumenta.plugins.depths.abilities.frostborn.Permafrost;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FileUtils;
-import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 
@@ -318,8 +317,8 @@ public class DepthsUtils {
 	 * @return if the item is an axe, sword, scythe or wand
 	 */
 	public static boolean isWeaponItem(ItemStack item) {
-		return (InventoryUtils.isAxeItem(item) || InventoryUtils.isSwordItem(item) ||
-				InventoryUtils.isWandItem(item) || InventoryUtils.isScytheItem(item));
+		return (ItemUtils.isAxe(item) || ItemUtils.isSword(item) ||
+			ItemUtils.isWand(item) || ItemUtils.isHoe(item));
 	}
 
 	public static double roundDouble(double num) {

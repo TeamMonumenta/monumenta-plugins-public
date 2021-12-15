@@ -9,6 +9,7 @@ import org.bukkit.entity.Projectile;
 import org.bukkit.entity.SpectralArrow;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.inventory.ItemStack;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
@@ -23,7 +24,7 @@ public class Sharpshooter extends Ability implements AbilityWithChargesOrStacks 
 	private static final int MAX_STACKS = 8;
 	private static final double PERCENT_DAMAGE_PER_STACK = 0.03;
 
-	public Sharpshooter(Plugin plugin, Player player) {
+	public Sharpshooter(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Sharpshooter");
 		mInfo.mScoreboardId = "Sharpshooter";
 		mInfo.mShorthandName = "Ss";
@@ -38,6 +39,9 @@ public class Sharpshooter extends Ability implements AbilityWithChargesOrStacks 
 
 	@Override
 	public boolean livingEntityShotByPlayerEvent(Projectile proj, LivingEntity damagee, EntityDamageByEntityEvent event) {
+		if (mPlayer == null) {
+			return true;
+		}
 		if (proj instanceof Arrow || proj instanceof SpectralArrow) {
 			AbstractArrow arrow = (AbstractArrow) proj;
 
@@ -60,6 +64,9 @@ public class Sharpshooter extends Ability implements AbilityWithChargesOrStacks 
 
 	@Override
 	public void periodicTrigger(boolean twoHertz, boolean oneSecond, int ticks) {
+		if (mPlayer == null) {
+			return;
+		}
 		if (mStacks > 0) {
 			mTicksToStackDecay -= 5;
 
@@ -77,7 +84,7 @@ public class Sharpshooter extends Ability implements AbilityWithChargesOrStacks 
 		if (ss != null) {
 			ss.mStacks = Math.min(MAX_STACKS, ss.mStacks + stacks);
 			MessagingUtils.sendActionBarMessage(plugin, player, "Sharpshooter Stacks: " + ss.mStacks);
-			ClientModHandler.updateAbility(ss.mPlayer, ss);
+			ClientModHandler.updateAbility(player, ss);
 		}
 	}
 

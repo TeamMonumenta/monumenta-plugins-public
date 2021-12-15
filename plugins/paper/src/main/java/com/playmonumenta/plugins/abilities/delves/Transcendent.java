@@ -7,6 +7,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.entity.SpawnerSpawnEvent;
 import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.ItemStack;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.bosses.bosses.CommanderBoss;
@@ -59,7 +60,7 @@ public class Transcendent extends DelveModifier {
 
 	private final double mAbilityChance;
 
-	public Transcendent(Plugin plugin, Player player) {
+	public Transcendent(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, Modifier.TRANSCENDENT);
 
 		if (player != null) {

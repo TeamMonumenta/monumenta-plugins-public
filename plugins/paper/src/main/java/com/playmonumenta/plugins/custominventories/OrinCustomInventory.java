@@ -245,7 +245,7 @@ public class OrinCustomInventory extends CustomInventory {
 	}
 
 	public void completeCommand(Player player, String cmd) {
-		if (cmd == "") {
+		if (cmd.isEmpty()) {
 			return;
 		}
 		if (isInternalCommand(cmd)) {

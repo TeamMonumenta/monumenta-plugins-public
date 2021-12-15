@@ -15,6 +15,7 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
@@ -50,10 +51,10 @@ public class DeadlyRonde extends Ability implements AbilityWithChargesOrStacks {
 
 	private static final Particle.DustOptions SWORDSAGE_COLOR = new Particle.DustOptions(Color.fromRGB(150, 0, 0), 1.0f);
 
-	BukkitRunnable mActiveRunnable = null;
-	int mRondeStacks = 0;
+	private @Nullable BukkitRunnable mActiveRunnable = null;
+	private int mRondeStacks = 0;
 
-	public DeadlyRonde(Plugin plugin, Player player) {
+	public DeadlyRonde(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Deadly Ronde");
 		mInfo.mLinkedSpell = ClassAbility.DEADLY_RONDE;
 		mInfo.mScoreboardId = "DeadlyRonde";
@@ -65,6 +66,9 @@ public class DeadlyRonde extends Ability implements AbilityWithChargesOrStacks {
 
 	@Override
 	public boolean abilityCastEvent(AbilityCastEvent event) {
+		if (mPlayer == null) {
+			return true;
+		}
 		/* Re-up the duration every time an ability is cast */
 		if (mActiveRunnable != null) {
 			mActiveRunnable.cancel();
@@ -108,7 +112,7 @@ public class DeadlyRonde extends Ability implements AbilityWithChargesOrStacks {
 
 	@Override
 	public boolean livingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
-		if (mActiveRunnable != null && event.getCause() == DamageCause.ENTITY_ATTACK) {
+		if (mPlayer != null && mActiveRunnable != null && event.getCause() == DamageCause.ENTITY_ATTACK) {
 
 			ItemStack mainHand = mPlayer.getInventory().getItemInMainHand();
 			ItemStack offHand = mPlayer.getInventory().getItemInMainHand();

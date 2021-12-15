@@ -17,6 +17,9 @@ public class PlayerPotionInfo {
 	private final HashMap<PotionEffectType, PotionMap> mPotionInfo = new HashMap<PotionEffectType, PotionMap>();
 
 	protected void addPotionInfo(Player player, PotionID id, PotionInfo info) {
+		if (info.mType == null) {
+			return;
+		}
 		PotionMap type = mPotionInfo.get(info.mType);
 		if (type != null) {
 			type.addPotionMap(player, id, info);
@@ -70,6 +73,9 @@ public class PlayerPotionInfo {
 	protected void loadFromJsonObject(JsonObject object) throws Exception {
 		for (Entry<String, JsonElement> info : object.entrySet()) {
 			PotionEffectType type = PotionEffectType.getByName(info.getKey());
+			if (type == null) {
+				throw new Exception("Invalid potion type " + info.getKey());
+			}
 			PotionMap map = new PotionMap(type);
 
 			map.loadFromJsonObject(info.getValue().getAsJsonObject());

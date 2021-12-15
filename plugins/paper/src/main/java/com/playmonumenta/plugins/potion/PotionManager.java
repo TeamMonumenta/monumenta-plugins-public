@@ -76,12 +76,13 @@ public class PotionManager {
 		addPotion(player, id, effect, 1.0);
 	}
 
-	public void addPotion(Player player, PotionID id, PotionInfo info) {
+	public void addPotion(Player player, PotionID id, @Nullable PotionInfo info) {
 		// Instant potions do not need to be tracked
 		if (Constants.POTION_MANAGER_ENABLED
 			&& info != null
-		    && !info.mType.equals(PotionEffectType.HARM)
-		    && !info.mType.equals(PotionEffectType.HEAL)) {
+			&& info.mType != null
+			&& !info.mType.equals(PotionEffectType.HARM)
+			&& !info.mType.equals(PotionEffectType.HEAL)) {
 
 			UUID uuid = player.getUniqueId();
 			PlayerPotionInfo potionInfo = mPlayerPotions.get(uuid);

@@ -8,6 +8,7 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
@@ -61,7 +62,7 @@ public class Colossal extends DelveModifier {
 
 	private final double mSpawnChance;
 
-	public Colossal(Plugin plugin, Player player) {
+	public Colossal(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, Modifier.COLOSSAL);
 
 		if (player != null) {

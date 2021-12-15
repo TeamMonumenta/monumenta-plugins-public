@@ -951,8 +951,8 @@ public class Kaul extends BossAbilityGroup {
 			}
 		}
 		new BukkitRunnable() {
-			Location mLoc = mShrineMarker.getLocation().subtract(0, 0.5, 0);
-			double mRotation = 0;
+			final Location mLoc = mShrineMarker.getLocation().subtract(0, 0.5, 0);
+			final double mRotation = 0;
 			double mRadius = 0;
 			int mT = 0;
 

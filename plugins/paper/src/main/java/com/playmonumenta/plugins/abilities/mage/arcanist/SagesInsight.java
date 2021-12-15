@@ -11,6 +11,7 @@ import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
@@ -41,7 +42,7 @@ public class SagesInsight extends Ability implements AbilityWithChargesOrStacks 
 
 	private HashMap<ClassAbility, Boolean> mStacksMap;
 
-	public SagesInsight(Plugin plugin, Player player) {
+	public SagesInsight(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Sage's Insight");
 		mInfo.mScoreboardId = "SagesInsight";
 		mInfo.mShorthandName = "SgI";
@@ -61,7 +62,7 @@ public class SagesInsight extends Ability implements AbilityWithChargesOrStacks 
 
 	@Override
 	public void periodicTrigger(boolean twoHertz, boolean oneSecond, int ticks) {
-		if (mStacks > 0) {
+		if (mPlayer != null && mStacks > 0) {
 			mTicksToStackDecay -= 5;
 
 			if (mTicksToStackDecay <= 0) {
@@ -76,7 +77,7 @@ public class SagesInsight extends Ability implements AbilityWithChargesOrStacks 
 	@Override
 	public void playerDealtCustomDamageEvent(CustomDamageEvent event) {
 		ClassAbility spell = event.getSpell();
-		if (spell == null) {
+		if (mPlayer == null || spell == null) {
 			return;
 		}
 		mTicksToStackDecay = DECAY_TIMER;

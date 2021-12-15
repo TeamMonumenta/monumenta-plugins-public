@@ -21,6 +21,7 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
@@ -85,7 +86,7 @@ public class AmplifyingHex extends Ability {
 	private float mRegionCap;
 	private float mDamage = 0f;
 
-	public AmplifyingHex(Plugin plugin, Player player) {
+	public AmplifyingHex(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Amplifying Hex");
 		mInfo.mScoreboardId = "AmplifyingHex";
 		mInfo.mShorthandName = "AH";
@@ -113,6 +114,9 @@ public class AmplifyingHex extends Ability {
 
 	@Override
 	public void cast(Action action) {
+		if (mPlayer == null) {
+			return;
+		}
 		World world = mPlayer.getWorld();
 		mRegionCap = ServerProperties.getClassSpecializationsEnabled() == true ? R2_CAP : R1_CAP;
 		new BukkitRunnable() {
@@ -215,9 +219,12 @@ public class AmplifyingHex extends Ability {
 
 	@Override
 	public boolean runCheck() {
+		if (mPlayer == null) {
+			return false;
+		}
 		double pitch = mPlayer.getLocation().getPitch();
 		return (mPlayer.isSneaking() && pitch < 50 && pitch > -50
-				&& ItemUtils.isHoe(mPlayer.getInventory().getItemInMainHand()));
+			&& ItemUtils.isHoe(mPlayer.getInventory().getItemInMainHand()));
 	}
 
 	@Override

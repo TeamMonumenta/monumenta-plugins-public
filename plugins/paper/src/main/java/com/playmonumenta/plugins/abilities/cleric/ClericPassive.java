@@ -7,6 +7,7 @@ import java.util.UUID;
 
 import org.bukkit.Particle;
 import org.bukkit.entity.Player;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
@@ -32,7 +33,7 @@ public class ClericPassive extends Ability {
 
 	private int mTimer = 0;
 
-	public ClericPassive(Plugin plugin, Player player) {
+	public ClericPassive(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, null);
 	}
 

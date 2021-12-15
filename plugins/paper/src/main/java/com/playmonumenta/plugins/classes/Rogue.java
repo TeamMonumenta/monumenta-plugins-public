@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.classes;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.rogue.AdvancingShadows;
@@ -13,11 +14,9 @@ import com.playmonumenta.plugins.abilities.rogue.EscapeDeath;
 import com.playmonumenta.plugins.abilities.rogue.Skirmisher;
 import com.playmonumenta.plugins.abilities.rogue.Smokescreen;
 import com.playmonumenta.plugins.abilities.rogue.ViciousCombos;
-
 import com.playmonumenta.plugins.abilities.rogue.assassin.BodkinBlitz;
 import com.playmonumenta.plugins.abilities.rogue.assassin.CloakAndDagger;
 import com.playmonumenta.plugins.abilities.rogue.assassin.CoupDeGrace;
-
 import com.playmonumenta.plugins.abilities.rogue.swordsage.BladeDance;
 import com.playmonumenta.plugins.abilities.rogue.swordsage.DeadlyRonde;
 import com.playmonumenta.plugins.abilities.rogue.swordsage.WindWalk;
@@ -29,7 +28,7 @@ import net.md_5.bungee.api.ChatColor;
 
 public class Rogue extends PlayerClass {
 
-	Rogue(Plugin plugin, Player player) {
+	Rogue(Plugin plugin, @Nullable Player player) {
 		mAbilities.add(new AdvancingShadows(plugin, player));
 		mAbilities.add(new ByMyBlade(plugin, player));
 		mAbilities.add(new DaggerThrow(plugin, player));

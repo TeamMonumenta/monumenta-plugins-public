@@ -49,7 +49,7 @@ public class WhirlingBlade extends MultipleChargeAbility {
 	private int mLastCastTicks = 0;
 	private @Nullable WindBomb mWindBomb;
 
-	public WhirlingBlade(Plugin plugin, Player player) {
+	public WhirlingBlade(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Whirling Blade");
 		mInfo.mScoreboardId = "WhirlingBlade";
 		mInfo.mShorthandName = "WB";

@@ -1,16 +1,16 @@
 package com.playmonumenta.plugins.abilities.mage;
 
+import org.bukkit.entity.Player;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
+import org.bukkit.inventory.ItemStack;
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.events.AbilityCastEvent;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
-
-import org.bukkit.entity.Player;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
-import org.bukkit.inventory.ItemStack;
-
 
 
 public class MagePassive extends Ability {
@@ -19,7 +19,7 @@ public class MagePassive extends Ability {
 
 	private boolean mCast = false;
 
-	public MagePassive(Plugin plugin, Player player) {
+	public MagePassive(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, null);
 	}
 
@@ -38,7 +38,7 @@ public class MagePassive extends Ability {
 
 	@Override
 	public boolean livingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
-		if (event.getCause() == DamageCause.ENTITY_ATTACK) {
+		if (mPlayer != null && event.getCause() == DamageCause.ENTITY_ATTACK) {
 			ItemStack mainHand = mPlayer.getInventory().getItemInMainHand();
 			if (ItemUtils.isWand(mainHand) && mCast) {
 				event.setDamage((event.getDamage() * (1 + PERCENT_MELEE_INCREASE)));

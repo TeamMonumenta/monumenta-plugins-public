@@ -9,7 +9,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.depths.abilities.WeaponAspectDepthsAbility;
 import com.playmonumenta.plugins.enchantments.abilities.SpellPower;
 import com.playmonumenta.plugins.events.CustomDamageEvent;
-import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.utils.ItemUtils;
 
 public class WandAspect extends WeaponAspectDepthsAbility {
 
@@ -25,7 +25,7 @@ public class WandAspect extends WeaponAspectDepthsAbility {
 	@Override
 	public boolean livingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
 
-		if (event.getCause().equals(DamageCause.ENTITY_ATTACK) && InventoryUtils.isWandItem(mPlayer.getInventory().getItemInMainHand())) {
+		if (mPlayer != null && event.getCause().equals(DamageCause.ENTITY_ATTACK) && ItemUtils.isWand(mPlayer.getInventory().getItemInMainHand())) {
 			event.setDamage(event.getDamage() + DAMAGE);
 		}
 
@@ -34,8 +34,7 @@ public class WandAspect extends WeaponAspectDepthsAbility {
 
 	@Override
 	public void playerDealtCustomDamageEvent(CustomDamageEvent event) {
-
-		if (InventoryUtils.isWandItem(mPlayer.getInventory().getItemInMainHand())) {
+		if (mPlayer != null && ItemUtils.isWand(mPlayer.getInventory().getItemInMainHand())) {
 			double initialDamage = event.getDamage();
 
 			//Find out what the damage with full spell power would be here

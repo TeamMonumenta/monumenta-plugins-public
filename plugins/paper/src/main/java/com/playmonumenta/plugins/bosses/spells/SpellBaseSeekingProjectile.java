@@ -15,6 +15,7 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
@@ -35,10 +36,11 @@ public class SpellBaseSeekingProjectile extends Spell {
 	public interface HitAction {
 		/**
 		 * Called when the projectile intersects a player (or possibly a block)
+		 *
 		 * @param target Player being targeted (null if hit a block)
 		 * @param loc    Location where the projectile hit (either at player or block)
 		 */
-		void run(World world, LivingEntity target, Location loc);
+		void run(World world, @Nullable LivingEntity target, Location loc);
 	}
 
 	private final Plugin mPlugin;
@@ -198,8 +200,8 @@ public class SpellBaseSeekingProjectile extends Spell {
 		}
 
 		BukkitRunnable initiateSpell = new BukkitRunnable() {
-			List<Player> mPlayers = players;
-			Map<Player, Location> mLocations = locations;
+			final List<Player> mPlayers = players;
+			final Map<Player, Location> mLocations = locations;
 
 			@Override
 			public void run() {

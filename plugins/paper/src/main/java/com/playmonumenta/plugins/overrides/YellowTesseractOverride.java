@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.overrides;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -50,12 +51,12 @@ public class YellowTesseractOverride extends BaseOverride {
 	private static final double MOB_RANGE = 20;
 
 	@Override
-	public boolean rightClickItemInteraction(Plugin plugin, Player player, Action action, ItemStack item, Block block) {
+	public boolean rightClickItemInteraction(Plugin plugin, Player player, Action action, ItemStack item, @Nullable Block block) {
 		return interaction(player, action, item);
 	}
 
 	@Override
-	public boolean leftClickItemInteraction(Plugin plugin, Player player, Action action, ItemStack item, Block block) {
+	public boolean leftClickItemInteraction(Plugin plugin, Player player, Action action, ItemStack item, @Nullable Block block) {
 		return interaction(player, action, item);
 	}
 
@@ -215,7 +216,7 @@ public class YellowTesseractOverride extends BaseOverride {
 			if (level != null) {
 				String scoreboard = reference.getScoreboard();
 				if (scoreboard != null) {
-					ScoreboardUtils.setScoreboardValue(player, reference.getScoreboard(), level);
+					ScoreboardUtils.setScoreboardValue(player, scoreboard, level);
 					totalSkillsAdded += level;
 				}
 			}
@@ -227,7 +228,7 @@ public class YellowTesseractOverride extends BaseOverride {
 			if (level != null) {
 				String scoreboard = reference.getScoreboard();
 				if (scoreboard != null) {
-					ScoreboardUtils.setScoreboardValue(player, reference.getScoreboard(), level);
+					ScoreboardUtils.setScoreboardValue(player, scoreboard, level);
 					totalSkillsAdded += level;
 				}
 			}
@@ -260,6 +261,9 @@ public class YellowTesseractOverride extends BaseOverride {
 	private void storeSkills(Player player, ItemStack item) {
 		ItemMeta meta = item.getItemMeta();
 		List<Component> lore = meta.lore();
+		if (lore == null) {
+			lore = new ArrayList<>();
+		}
 		Integer classLevel = ScoreboardUtils.getScoreboardValue(player, LEVEL).orElse(0);
 		Integer totalLevel = ScoreboardUtils.getScoreboardValue(player, TOTAL_LEVEL).orElse(0);
 		Integer specLevel = ScoreboardUtils.getScoreboardValue(player, SPEC_LEVEL).orElse(0);
@@ -298,16 +302,19 @@ public class YellowTesseractOverride extends BaseOverride {
 		player.sendMessage(Component.text("The Tesseract of the Elements has stored your skills!", NamedTextColor.YELLOW));
 	}
 
-	private void clearTesseractLore(List<Component> lore) {
+	private void clearTesseractLore(@Nullable List<Component> lore) {
+		if (lore == null) {
+			return;
+		}
 		Iterator<Component> iter = lore.iterator();
 		while (iter.hasNext()) {
 			String current = MessagingUtils.plainText(iter.next());
 			if (current.startsWith(CLASS_STR)
-				|| current.startsWith(SPEC_STR)
-				|| current.startsWith(CLASSL_STR)
-				|| current.startsWith(SPECL_STR)
-			    || current.startsWith(PREFIX)
-				|| current.startsWith("* Soulbound to")) {
+					|| current.startsWith(SPEC_STR)
+					|| current.startsWith(CLASSL_STR)
+					|| current.startsWith(SPECL_STR)
+					|| current.startsWith(PREFIX)
+					|| current.startsWith("* Soulbound to")) {
 				iter.remove();
 			}
 		}

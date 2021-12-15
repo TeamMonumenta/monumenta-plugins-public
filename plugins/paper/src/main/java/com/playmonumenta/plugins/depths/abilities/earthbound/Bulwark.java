@@ -43,6 +43,9 @@ public class Bulwark extends DepthsAbility {
 	}
 
 	private void trigger(EntityDamageByEntityEvent event) {
+		if (mPlayer == null) {
+			return;
+		}
 		Location loc = mPlayer.getLocation();
 		World world = mPlayer.getWorld();
 		Location particleLoc = loc.add(0, mPlayer.getHeight() / 2, 0);

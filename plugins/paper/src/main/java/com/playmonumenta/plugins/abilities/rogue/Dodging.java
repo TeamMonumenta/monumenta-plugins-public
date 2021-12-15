@@ -20,6 +20,7 @@ import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionData;
 import org.bukkit.potion.PotionType;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
@@ -65,7 +66,7 @@ public class Dodging extends Ability {
 
 	private int mTriggerTick = 0;
 
-	public Dodging(Plugin plugin, Player player) {
+	public Dodging(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Dodging");
 		mInfo.mLinkedSpell = ClassAbility.DODGING;
 		mInfo.mScoreboardId = "Dodging";
@@ -109,6 +110,9 @@ public class Dodging extends Ability {
 
 	@Override
 	public boolean playerHitByProjectileEvent(ProjectileHitEvent event) {
+		if (mPlayer == null) {
+			return true;
+		}
 		Projectile proj = event.getEntity();
 		// See if we should dodge. If false, allow the event to proceed normally
 		if ((proj.getShooter() instanceof Player) || mPlayer.isBlocking()) {
@@ -118,8 +122,7 @@ public class Dodging extends Ability {
 			return true;
 		}
 
-		if (proj instanceof Arrow) {
-			Arrow arrow = (Arrow) proj;
+		if (proj instanceof Arrow arrow) {
 			arrow.setBasePotionData(new PotionData(PotionType.MUNDANE));
 			arrow.clearCustomEffects();
 		}
@@ -136,6 +139,9 @@ public class Dodging extends Ability {
 	}
 
 	private boolean dodge() {
+		if (mPlayer == null) {
+			return false;
+		}
 		if (mTriggerTick == mPlayer.getTicksLived()) {
 			// Dodging was activated this tick - allow it
 			return true;

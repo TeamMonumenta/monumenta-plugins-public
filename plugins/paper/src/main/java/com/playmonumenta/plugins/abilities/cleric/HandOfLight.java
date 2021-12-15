@@ -15,6 +15,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
@@ -39,7 +40,7 @@ public class HandOfLight extends Ability {
 	private static final int HEALING_1_COOLDOWN = 14 * 20;
 	private static final int HEALING_2_COOLDOWN = 10 * 20;
 
-	public HandOfLight(Plugin plugin, Player player) {
+	public HandOfLight(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Hand of Light");
 		mInfo.mLinkedSpell = ClassAbility.HAND_OF_LIGHT;
 		mInfo.mScoreboardId = "Healing";
@@ -53,6 +54,9 @@ public class HandOfLight extends Ability {
 
 	@Override
 	public void cast(Action action) {
+		if (mPlayer == null) {
+			return;
+		}
 		//Must be holding weapon or tool.
 		ItemStack inMainHand = mPlayer.getInventory().getItemInMainHand();
 		ItemStack inOffHand = mPlayer.getInventory().getItemInOffHand();

@@ -21,7 +21,7 @@ public class ChargeUpManager {
 	private Location mLoc;
 	private final int mRange;
 	private final BossBar mBar;
-	private BukkitRunnable mRunnable;
+	private @Nullable BukkitRunnable mRunnable;
 	private int mRefresh;
 
 	public ChargeUpManager(LivingEntity boss, int chargeTime, String title, BarColor color, BarStyle style, int range) {

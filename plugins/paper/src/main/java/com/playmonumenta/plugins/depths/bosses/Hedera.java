@@ -152,14 +152,14 @@ public class Hedera extends BossAbilityGroup {
 			new SpellEvolutionSeeds(plugin, mCooldownTicks, mPlants, mPlantTypes)
 		));
 		//Extra summon ability if fighting on f4 or higher
-		if (party.getFloor() != 1) {
+		if (party != null && party.getFloor() != 1) {
 			activeSpells = new SpellManager(Arrays.asList(
 					//new SpellEarthshake(plugin, mBoss, 5, 80),
 					new SpellLeafNova(plugin, mBoss, mCooldownTicks),
 					new SpellIvyGarden(plugin, mCooldownTicks, mPlants),
 					new SpellEvolutionSeeds(plugin, mCooldownTicks, mPlants, mPlantTypes),
 					new SpellEndlessHederaSummons(mBoss, mCooldownTicks, ((party.getFloor() - 1) / 3) + 1)
-				));
+			));
 		}
 
 		List<Spell> passiveSpells = Arrays.asList(
@@ -177,8 +177,8 @@ public class Hedera extends BossAbilityGroup {
 	public void init() {
 		// Health is scaled by 1.15 times each time you fight the boss
 		DepthsParty party = DepthsUtils.getPartyFromNearbyPlayers(mSpawnLoc);
-		int modifiedHealth = (int) (HEDERA_HEALTH * Math.pow(1.15, party.getFloor() / 3));
-		mBoss.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(modifiedHealth);
+		int modifiedHealth = (int) (HEDERA_HEALTH * Math.pow(1.15, party == null ? 0 : party.getFloor() / 3));
+		EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_MAX_HEALTH, modifiedHealth);
 		mBoss.setHealth(modifiedHealth);
 
 		//launch event related spawn commands
@@ -267,7 +267,7 @@ public class Hedera extends BossAbilityGroup {
 			PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "tellraw @s [\"\",{\"text\":\"[Hedera]\",\"color\":\"gold\"},{\"text\":\" Consumeth me mine hydrophytes, the vines begone now give me life!\",\"color\":\"dark_green\"}]");
 			//Heal Hedera
 			double amountToHeal = Math.max(.05, .25 - (mTimesHealed * .05));
-			mBoss.setHealth(mBoss.getHealth() + (mBoss.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue() * amountToHeal));
+			mBoss.setHealth(mBoss.getHealth() + (EntityUtils.getMaxHealth(mBoss) * amountToHeal));
 			mTimesHealed++;
 
 			//Particles from consumed plant to Hedera

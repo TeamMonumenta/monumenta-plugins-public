@@ -11,6 +11,7 @@ import org.bukkit.event.block.Action;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
@@ -39,7 +40,7 @@ public class TacticalManeuver extends MultipleChargeAbility {
 
 	private int mLastCastTicks = 0;
 
-	public TacticalManeuver(Plugin plugin, Player player) {
+	public TacticalManeuver(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Tactical Maneuver");
 		mInfo.mLinkedSpell = ClassAbility.TACTICAL_MANEUVER;
 		mInfo.mScoreboardId = "TacticalManeuver";

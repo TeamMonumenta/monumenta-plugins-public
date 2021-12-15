@@ -28,6 +28,7 @@ import org.bukkit.event.entity.SpawnerSpawnEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.bosses.bosses.ShadeParticleBoss;
@@ -69,7 +70,7 @@ public class Twisted extends DelveModifier {
 			}
 	};
 
-	public Twisted(Plugin plugin, Player player) {
+	public Twisted(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, Modifier.TWISTED);
 	}
 
@@ -136,7 +137,7 @@ public class Twisted extends DelveModifier {
 				shadeOfDeath(mobs);
 			} else if (random == 2) {
 				shadeOfDespair(plugin, mobs);
-			} else if (random == 3) {
+			} else {
 				shadeOfCorruption(plugin, mobs);
 			}
 		}

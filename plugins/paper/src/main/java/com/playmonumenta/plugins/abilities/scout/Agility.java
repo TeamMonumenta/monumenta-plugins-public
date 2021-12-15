@@ -7,6 +7,7 @@ import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
@@ -19,7 +20,7 @@ public class Agility extends Ability {
 	private static final int AGILITY_BONUS_DAMAGE = 1;
 	private static final double SCALING_DAMAGE = 0.1;
 
-	public Agility(Plugin plugin, Player player) {
+	public Agility(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Agility");
 		mInfo.mScoreboardId = "Agility";
 		mInfo.mShorthandName = "Agl";

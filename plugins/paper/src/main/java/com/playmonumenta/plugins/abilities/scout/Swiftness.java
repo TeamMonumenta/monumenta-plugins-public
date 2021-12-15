@@ -9,12 +9,13 @@ import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
@@ -28,7 +29,7 @@ public class Swiftness extends Ability {
 	private boolean mWasInNoMobilityZone = false;
 	private boolean mJumpBoost = true;
 
-	public Swiftness(Plugin plugin, Player player) {
+	public Swiftness(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Swiftness");
 		mInfo.mScoreboardId = "Swiftness";
 		mInfo.mShorthandName = "Swf";
@@ -68,7 +69,7 @@ public class Swiftness extends Ability {
 
 		event.setCancelled(true);
 
-		if (mPlayer.isSneaking() || mPlayer.getLocation().getPitch() >= -45 || InventoryUtils.isBowItem(mPlayer.getInventory().getItemInMainHand())) {
+		if (mPlayer.isSneaking() || mPlayer.getLocation().getPitch() >= -45 || ItemUtils.isSomeBow(mPlayer.getInventory().getItemInMainHand())) {
 			return;
 		}
 

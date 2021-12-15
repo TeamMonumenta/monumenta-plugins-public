@@ -16,6 +16,7 @@ import org.bukkit.entity.TNTPrimed;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
@@ -41,7 +42,7 @@ public class SpellBombToss extends Spell {
 	private final int mFuse;
 	private final boolean mSetFire;
 	private final boolean mBreakBlocks;
-	private final ExplodeAction mExplodeAction;
+	private final @Nullable ExplodeAction mExplodeAction;
 	private final int mCooldown;
 
 	private final List<TNTPrimed> mTNTList = new ArrayList<TNTPrimed>();

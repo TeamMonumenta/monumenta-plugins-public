@@ -15,6 +15,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
@@ -35,7 +36,7 @@ public class SplitArrow extends Ability {
 
 	private final double mDamagePercent;
 
-	public SplitArrow(Plugin plugin, Player player) {
+	public SplitArrow(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Split Arrow");
 		mInfo.mLinkedSpell = ClassAbility.SPLIT_ARROW;
 		mInfo.mScoreboardId = "SplitArrow";

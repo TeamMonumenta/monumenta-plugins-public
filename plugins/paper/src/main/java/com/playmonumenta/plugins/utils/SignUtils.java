@@ -34,7 +34,7 @@ public final class SignUtils {
 	private final Plugin mPlugin;
 
 	private final Map<Player, Menu> mInputs;
-	private static SignUtils INSTANCE = null;
+	private static @Nullable SignUtils INSTANCE = null;
 
 	public SignUtils(Plugin plugin) {
 		INSTANCE = this;
@@ -121,7 +121,7 @@ public final class SignUtils {
 				return;
 			}
 			Location location = player.getLocation();
-			this.mPosition = new BlockPosition(location.getBlockX(), location.getBlockY() + (255 - location.getBlockY()), location.getBlockZ());
+			this.mPosition = new BlockPosition(location.getBlockX(), 255, location.getBlockZ());
 
 			player.sendBlockChange(this.mPosition.toLocation(location.getWorld()), Material.OAK_SIGN.createBlockData());
 

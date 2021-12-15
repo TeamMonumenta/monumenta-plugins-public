@@ -19,7 +19,6 @@ import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Fireball;
 import org.bukkit.entity.Item;
@@ -45,12 +44,12 @@ import com.playmonumenta.plugins.bosses.spells.SpellBlockBreak;
 import com.playmonumenta.plugins.bosses.spells.SpellPurgeNegatives;
 import com.playmonumenta.plugins.bosses.spells.falsespirit.DamageBlocker;
 import com.playmonumenta.plugins.bosses.spells.falsespirit.GatesOfHell;
+import com.playmonumenta.plugins.bosses.spells.falsespirit.LapseOfReality;
 import com.playmonumenta.plugins.bosses.spells.falsespirit.NothingnessSeeker;
 import com.playmonumenta.plugins.bosses.spells.falsespirit.SpellFlamethrower;
 import com.playmonumenta.plugins.bosses.spells.falsespirit.SpellForceTwo;
 import com.playmonumenta.plugins.bosses.spells.falsespirit.SpellMultiEarthshake;
 import com.playmonumenta.plugins.bosses.spells.falsespirit.TriplicateSlash;
-import com.playmonumenta.plugins.bosses.spells.falsespirit.LapseOfReality;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.DelvesUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -58,7 +57,7 @@ import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.SerializationUtils;
 
-public class FalseSpirit extends BossAbilityGroup {
+public final class FalseSpirit extends BossAbilityGroup {
 	public static final String identityTag = "boss_falsespirit";
 	public static final int detectionRange = 75;
 	public static final int meleeRange = 10;
@@ -125,20 +124,18 @@ public class FalseSpirit extends BossAbilityGroup {
 
 		List<LivingEntity> portals = new ArrayList<>(24);
 		LivingEntity ceilingPortal = null;
-		for (Entity e : EntityUtils.getNearbyMobs(spawnLoc, 75, EnumSet.of(EntityType.ARMOR_STAND))) {
-			if (e instanceof LivingEntity) {
-				Set<String> tags = e.getScoreboardTags();
-				for (String tag : tags) {
-					switch (tag) {
-						case PORTAL_TAG:
-							portals.add((LivingEntity) e);
-							break;
-						case PORTAL_CEILING_TAG:
-							ceilingPortal = (LivingEntity) e;
-							break;
-						default:
-							break;
-					}
+		for (LivingEntity e : EntityUtils.getNearbyMobs(spawnLoc, 75, EnumSet.of(EntityType.ARMOR_STAND))) {
+			Set<String> tags = e.getScoreboardTags();
+			for (String tag : tags) {
+				switch (tag) {
+				case PORTAL_TAG:
+					portals.add(e);
+					break;
+				case PORTAL_CEILING_TAG:
+					ceilingPortal = e;
+					break;
+				default:
+					break;
 				}
 			}
 		}
@@ -306,8 +303,7 @@ public class FalseSpirit extends BossAbilityGroup {
 
 	@Override
 	public void bossLaunchedProjectile(ProjectileLaunchEvent event) {
-		if (event.getEntity() instanceof Fireball) {
-			Fireball ball = (Fireball) event.getEntity();
+		if (event.getEntity() instanceof Fireball ball) {
 			ball.setIsIncendiary(false);
 			ball.setYield(0f);
 			ball.setFireTicks(0);
@@ -319,20 +315,15 @@ public class FalseSpirit extends BossAbilityGroup {
 	@Override
 	public void bossDamagedEntity(EntityDamageByEntityEvent event) {
 		//If player dies, heal health
-		if (event.getEntity() instanceof Player) {
-			Player player = (Player) event.getEntity();
+		if (event.getEntity() instanceof Player player) {
 			if (event.getFinalDamage() > player.getHealth()) {
 				World world = mBoss.getWorld();
 				Location loc = mBoss.getLocation();
 
 				//Heal code
 				double hp = mBoss.getHealth() + HEALTH_HEALED;
-				double max = mBoss.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue();
-				if (hp >= max) {
-					mBoss.setHealth(max);
-				} else {
-					mBoss.setHealth(hp);
-				}
+				double max = EntityUtils.getMaxHealth(mBoss);
+				mBoss.setHealth(Math.min(hp, max));
 				world.playSound(loc, Sound.ENTITY_ILLUSIONER_CAST_SPELL, SoundCategory.HOSTILE, 1, 1.25f);
 				world.playSound(loc, Sound.ENTITY_ZOMBIE_VILLAGER_CONVERTED, SoundCategory.HOSTILE, 1, 2f);
 				world.spawnParticle(Particle.REDSTONE, loc.clone().add(0, 1, 0), 5, 0.15, 0.15, 0.15, RED_COLOR);
@@ -343,13 +334,11 @@ public class FalseSpirit extends BossAbilityGroup {
 	@Override
 	public void bossDamagedByEntity(EntityDamageByEntityEvent event) {
 		//Do not take damage to the gate closer trident
-		if (event.getEntity() instanceof Trident) {
-			Trident trident = (Trident) event.getEntity();
+		if (event.getEntity() instanceof Trident trident) {
 			ItemStack item = trident.getItemStack();
 
 			if (item != null && ItemUtils.getPlainName(item).contains("Gate Closer")) {
 				event.setCancelled(true);
-				return;
 			}
 		}
 	}
@@ -453,10 +442,10 @@ public class FalseSpirit extends BossAbilityGroup {
 			noDamageTicksTake = 5;
 		}
 		mBoss.setMaximumNoDamageTicks(mBoss.getMaximumNoDamageTicks() - noDamageTicksTake);
-		bossTargetHp = (int) (hpDel * (1 + (1 - 1/Math.E) * Math.log(playerCount)));
-		mBoss.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(bossTargetHp);
-		mBoss.getAttribute(Attribute.GENERIC_FOLLOW_RANGE).setBaseValue(detectionRange);
-		mBoss.getAttribute(Attribute.GENERIC_KNOCKBACK_RESISTANCE).setBaseValue(1);
+		bossTargetHp = (int) (hpDel * (1 + (1 - 1 / Math.E) * Math.log(playerCount)));
+		EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_MAX_HEALTH, bossTargetHp);
+		EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_FOLLOW_RANGE, detectionRange);
+		EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_KNOCKBACK_RESISTANCE, 1);
 		mBoss.setHealth(bossTargetHp);
 
 		mBoss.setPersistent(true);

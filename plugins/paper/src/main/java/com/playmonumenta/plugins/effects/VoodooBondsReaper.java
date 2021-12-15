@@ -78,13 +78,14 @@ public class VoodooBondsReaper extends Effect {
 
 	@Override
 	public void entityLoseEffect(Entity entity) {
-		if (!mDone) {
+		if (mPlayer != null && !mDone) {
 			double absorbHealth = AbsorptionUtils.getAbsorption(mPlayer);
+			double maxHealth = EntityUtils.getMaxHealth(mPlayer);
 			if (absorbHealth <= 0) {
-				mPlayer.setHealth(Math.max(Math.min(mPlayer.getHealth() - mPlayer.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue() * mDamagePercent, mPlayer.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue()), 1));
+				mPlayer.setHealth(Math.max(Math.min(mPlayer.getHealth() - maxHealth * mDamagePercent, mPlayer.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue()), 1));
 			} else {
-				if (mPlayer.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue() * mDamagePercent >= absorbHealth) {
-					double leftoverHealth = mPlayer.getHealth() + absorbHealth - mPlayer.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue() * mDamagePercent;
+				if (maxHealth * mDamagePercent >= absorbHealth) {
+					double leftoverHealth = mPlayer.getHealth() + absorbHealth - maxHealth * mDamagePercent;
 					AbsorptionUtils.subtractAbsorption(mPlayer, absorbHealth);
 					mPlayer.setHealth(Math.max(leftoverHealth, 1));
 				} else {
@@ -104,6 +105,9 @@ public class VoodooBondsReaper extends Effect {
 
 	@Override
 	public void entityTickEffect(Entity entity, boolean fourHertz, boolean twoHertz, boolean oneHertz) {
+		if (mPlayer == null) {
+			return;
+		}
 		if (oneHertz) {
 			mPlayer.getWorld().playSound(mPlayer.getLocation(), Sound.BLOCK_NOTE_BLOCK_CHIME, 1f, 0.5f);
 		}

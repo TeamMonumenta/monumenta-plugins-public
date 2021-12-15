@@ -23,8 +23,7 @@ public class NoFireBoss extends BossAbilityGroup {
 	//Prevents fireballs from setting fire
 	@Override
 	public void bossLaunchedProjectile(ProjectileLaunchEvent event) {
-		if (event.getEntity() instanceof Fireball) {
-			Fireball ball = (Fireball) event.getEntity();
+		if (event.getEntity() instanceof Fireball ball) {
 			ball.setIsIncendiary(false);
 			ball.setYield(0f);
 			ball.setFireTicks(0);

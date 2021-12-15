@@ -13,6 +13,7 @@ import org.bukkit.event.block.Action;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
@@ -42,7 +43,7 @@ public class WitheringGaze extends Ability {
 
 	private final int mDOTDuration;
 
-	public WitheringGaze(Plugin plugin, Player player) {
+	public WitheringGaze(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Withering Gaze");
 		mInfo.mScoreboardId = "WitheringGaze";
 		mInfo.mShorthandName = "WG";

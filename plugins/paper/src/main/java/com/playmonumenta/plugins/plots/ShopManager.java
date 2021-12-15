@@ -419,7 +419,8 @@ public class ShopManager implements Listener {
 			pLoc.subtract(0, 1, 0);
 		}
 		if (startLoc == null) {
-			CommandAPI.fail("Could not find material " + SHOP_EMPTY_MAT.toString() + " under the player");
+			CommandAPI.fail("Could not find material " + SHOP_EMPTY_MAT + " under the player");
+			throw new RuntimeException();
 		}
 
 		if (!ZoneUtils.hasZoneProperty(player, ZoneProperty.SHOPS_POSSIBLE)) {
@@ -563,7 +564,7 @@ public class ShopManager implements Listener {
 		});
 	}
 
-	private static void shopLock(Entity shopEntity, Player player) throws WrapperCommandSyntaxException {
+	private static void shopLock(Entity shopEntity, @Nullable Player player) throws WrapperCommandSyntaxException {
 		if (!ZoneUtils.hasZoneProperty(shopEntity, ZoneProperty.SHOPS_POSSIBLE)) {
 			CommandAPI.fail("This command can only be used within a Shops Possible zone");
 		}
@@ -605,7 +606,7 @@ public class ShopManager implements Listener {
 		}
 	}
 
-	private static void shopUnlock(Entity shopEntity, Player player) throws WrapperCommandSyntaxException {
+	private static void shopUnlock(Entity shopEntity, @Nullable Player player) throws WrapperCommandSyntaxException {
 		if (!ZoneUtils.hasZoneProperty(shopEntity, ZoneProperty.SHOPS_POSSIBLE)) {
 			CommandAPI.fail("This command can only be used within a Shops Possible zone");
 		}
@@ -649,7 +650,7 @@ public class ShopManager implements Listener {
 		}
 	}
 
-	private static void shopReset(Entity shopEntity, Player player) throws WrapperCommandSyntaxException {
+	private static void shopReset(Entity shopEntity, @Nullable Player player) throws WrapperCommandSyntaxException {
 		if (!ZoneUtils.hasZoneProperty(shopEntity, ZoneProperty.SHOPS_POSSIBLE)) {
 			CommandAPI.fail("This command can only be used within a Shops Possible zone");
 		}
@@ -702,7 +703,7 @@ public class ShopManager implements Listener {
 	}
 
 	/* Throws an exception if not allowed and sends a message to the player, otherwise returns */
-	private static void checkAllowedToChangeLock(Shop shop, Player player) throws WrapperCommandSyntaxException {
+	private static void checkAllowedToChangeLock(Shop shop, @Nullable Player player) throws WrapperCommandSyntaxException {
 		/* This command was run without a player (i.e. via a command block) - always allow it */
 		if (player == null || player.isOp() || player.getGameMode().equals(GameMode.CREATIVE)) {
 			return;

@@ -5,6 +5,18 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
+import org.bukkit.World;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
+import org.bukkit.event.block.Action;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.scheduler.BukkitRunnable;
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
@@ -19,18 +31,6 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.StringUtils;
-
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
-import org.bukkit.World;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
-import org.bukkit.event.block.Action;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.scheduler.BukkitRunnable;
-
 
 
 public class Blizzard extends Ability {
@@ -61,28 +61,28 @@ public class Blizzard extends Ability {
 	private final double mLevelSlowMultiplierA;
 	private final double mLevelSlowMultiplierB;
 
-	public Blizzard(Plugin plugin, Player player) {
+	public Blizzard(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, NAME);
 		mInfo.mLinkedSpell = ABILITY;
 
 		mInfo.mScoreboardId = NAME;
 		mInfo.mShorthandName = "Bl";
 		mInfo.mDescriptions.add(
-			String.format(
-				"While sneaking and looking upwards, right-clicking with a wand creates an aura of ice and snow, dealing %s ice damage to all enemies in a %s-block cube around you every second for %ss. The aura chills enemies in it, afflicting them with %s%% slowness for %ss. After %ss in the aura, the slowness is increased to %s%%, and after %ss, to %s%%. Bosses cannot reach the last tier of slowness and players in the aura are extinguished if they're on fire. The damage ignores iframes and cannot apply but can trigger %s. You can no longer cast %s while looking upwards. Cooldown: %ss.",
-				DAMAGE_1,
-				SIZE_1,
-				StringUtils.ticksToSeconds(DURATION_TICKS),
-				StringUtils.multiplierToPercentage(SLOW_MULTIPLIER_A_1),
-				StringUtils.ticksToSeconds(SLOW_TICKS),
-				StringUtils.ticksToSeconds(B_THRESHOLD),
-				StringUtils.multiplierToPercentage(SLOW_MULTIPLIER_B_1),
-				StringUtils.ticksToSeconds(C_THRESHOLD),
-				StringUtils.multiplierToPercentage(SLOW_MULTIPLIER_C),
-				Spellshock.NAME,
-				MagmaShield.NAME,
-				StringUtils.ticksToSeconds(COOLDOWN_TICKS_1)
-			) // Damage interval of 20 ticks hardcoded to say "every second"
+				String.format(
+						"While sneaking and looking upwards, right-clicking with a wand creates an aura of ice and snow, dealing %s ice damage to all enemies in a %s-block cube around you every second for %ss. The aura chills enemies in it, afflicting them with %s%% slowness for %ss. After %ss in the aura, the slowness is increased to %s%%, and after %ss, to %s%%. Bosses cannot reach the last tier of slowness and players in the aura are extinguished if they're on fire. The damage ignores iframes and cannot apply but can trigger %s. You can no longer cast %s while looking upwards. Cooldown: %ss.",
+						DAMAGE_1,
+						SIZE_1,
+						StringUtils.ticksToSeconds(DURATION_TICKS),
+						StringUtils.multiplierToPercentage(SLOW_MULTIPLIER_A_1),
+						StringUtils.ticksToSeconds(SLOW_TICKS),
+						StringUtils.ticksToSeconds(B_THRESHOLD),
+						StringUtils.multiplierToPercentage(SLOW_MULTIPLIER_B_1),
+						StringUtils.ticksToSeconds(C_THRESHOLD),
+						StringUtils.multiplierToPercentage(SLOW_MULTIPLIER_C),
+						Spellshock.NAME,
+						MagmaShield.NAME,
+						StringUtils.ticksToSeconds(COOLDOWN_TICKS_1)
+				) // Damage interval of 20 ticks hardcoded to say "every second"
 		);
 		mInfo.mDescriptions.add(
 			String.format(
@@ -116,7 +116,7 @@ public class Blizzard extends Ability {
 
 	@Override
 	public void cast(Action action) {
-		if (mActive) {
+		if (mPlayer == null || mActive) {
 			return;
 		}
 
@@ -183,12 +183,9 @@ public class Blizzard extends Ability {
 
 	@Override
 	public boolean runCheck() {
-		return (
-			ItemUtils.isWand(
-				mPlayer.getInventory().getItemInMainHand()
-			)
-			&& mPlayer.isSneaking()
-			&& mPlayer.getLocation().getPitch() < ANGLE
-		);
+		return mPlayer != null
+				&& ItemUtils.isWand(mPlayer.getInventory().getItemInMainHand())
+				&& mPlayer.isSneaking()
+				&& mPlayer.getLocation().getPitch() < ANGLE;
 	}
 }

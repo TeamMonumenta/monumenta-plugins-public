@@ -6,7 +6,6 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.World;
-import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
@@ -15,6 +14,7 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 
@@ -73,7 +73,7 @@ public class SpellMultihitHeal extends Spell {
 
 								//Heal Mimic Queen by 15 health on hit
 								double hp = originalHealth + HEALTH_HEALED;
-								double max = mBoss.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue();
+								double max = EntityUtils.getMaxHealth(mBoss);
 								if (hp >= max) {
 									mBoss.setHealth(max);
 								} else {

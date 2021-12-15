@@ -34,7 +34,7 @@ public class Brutalize extends DepthsAbility {
 	@Override
 	public boolean livingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
 
-		if (event.getCause().equals(DamageCause.ENTITY_ATTACK) && PlayerUtils.isFallingAttack(mPlayer)) {
+		if (mPlayer != null && event.getCause().equals(DamageCause.ENTITY_ATTACK) && PlayerUtils.isFallingAttack(mPlayer)) {
 			double originalDamage = event.getDamage();
 			double brutalizeDamage = DAMAGE[mRarity - 1] * originalDamage;
 			event.setDamage(originalDamage + brutalizeDamage);

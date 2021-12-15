@@ -2,13 +2,13 @@ package com.playmonumenta.plugins.commands;
 
 import java.util.UUID;
 
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.integrations.MonumentaNetworkRelayIntegration;
-import com.playmonumenta.plugins.utils.CommandUtils;
-
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.metadata.FixedMetadataValue;
+
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.integrations.MonumentaNetworkRelayIntegration;
+import com.playmonumenta.plugins.utils.CommandUtils;
 
 import dev.jorel.commandapi.CommandAPI;
 import dev.jorel.commandapi.CommandAPICommand;
@@ -49,7 +49,7 @@ public class ClaimRaffle {
 		if (player == null || !player.isOnline()) {
 			if (claimReward && eligible) {
 				/* This player tried to claim a reward then disappeared - send back the reward to bungee */
-				MonumentaNetworkRelayIntegration.sendCheckRaffleEligibilityPacket(player.getUniqueId(), false, true);
+				MonumentaNetworkRelayIntegration.sendCheckRaffleEligibilityPacket(uuid, false, true);
 			}
 			return;
 		}

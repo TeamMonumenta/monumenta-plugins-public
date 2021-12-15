@@ -11,6 +11,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.inventory.ItemStack;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
@@ -57,7 +58,7 @@ public class BruteForce extends Ability {
 	private static final float BRUTE_FORCE_KNOCKBACK_SPEED = 0.7f;
 
 
-	public BruteForce(Plugin plugin, Player player) {
+	public BruteForce(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Brute Force");
 		mInfo.mLinkedSpell = ClassAbility.BRUTE_FORCE;
 		mInfo.mScoreboardId = "BruteForce";
@@ -69,7 +70,7 @@ public class BruteForce extends Ability {
 
 	@Override
 	public boolean livingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
-		if (PlayerUtils.isFallingAttack(mPlayer) && event.getCause() == DamageCause.ENTITY_ATTACK) {
+		if (mPlayer != null && PlayerUtils.isFallingAttack(mPlayer) && event.getCause() == DamageCause.ENTITY_ATTACK) {
 			double damageBonus = getAbilityScore() == 1 ? BRUTE_FORCE_DAMAGE : BRUTE_FORCE_2_DAMAGE + event.getDamage() * SCALING_DAMAGE;
 			damageBonus += BruteForceDamageEnchantment.getExtraDamage(mPlayer, BruteForceDamageEnchantment.class);
 			event.setDamage(event.getDamage() + damageBonus);

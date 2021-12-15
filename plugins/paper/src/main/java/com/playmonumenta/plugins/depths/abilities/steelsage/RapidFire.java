@@ -30,7 +30,7 @@ import com.playmonumenta.plugins.depths.abilities.windwalker.Skyhook;
 import com.playmonumenta.plugins.enchantments.PointBlank;
 import com.playmonumenta.plugins.enchantments.Sniper;
 import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.utils.ItemUtils;
 
 import net.md_5.bungee.api.ChatColor;
 
@@ -55,7 +55,7 @@ public class RapidFire extends DepthsAbility {
 	@Override
 	public void cast(Action action) {
 		ItemStack inMainHand = mPlayer.getInventory().getItemInMainHand();
-		if (!InventoryUtils.isBowItem(inMainHand) || mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.mLinkedSpell)) {
+		if (!ItemUtils.isSomeBow(inMainHand) || mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.mLinkedSpell)) {
 			return;
 		}
 		new BukkitRunnable() {
@@ -69,7 +69,7 @@ public class RapidFire extends DepthsAbility {
 				}
 
 				ItemStack inMainHand = mPlayer.getInventory().getItemInMainHand();
-				if (InventoryUtils.isBowItem(inMainHand)) {
+				if (ItemUtils.isSomeBow(inMainHand)) {
 					Arrow arrow = mPlayer.getWorld().spawnArrow(mPlayer.getEyeLocation(), mPlayer.getLocation().getDirection(), 3.0f, 0, Arrow.class);
 					arrow.setCritical(true);
 					arrow.setMetadata(META_DATA_TAG, new FixedMetadataValue(mPlugin, 0));

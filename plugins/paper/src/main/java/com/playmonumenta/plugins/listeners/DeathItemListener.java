@@ -19,6 +19,7 @@ import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.utils.FastUtils;
@@ -53,8 +54,8 @@ public class DeathItemListener implements Listener {
 				//Player is in an area where they drop their items
 				&& !event.getKeepInventory()) {
 
-			ItemStack[] contents = event.getEntity().getInventory().getContents();
-			List<ItemStack> beforeDeathItems = Arrays.asList(contents);
+			@Nullable ItemStack[] contents = event.getEntity().getInventory().getContents();
+			List<@Nullable ItemStack> beforeDeathItems = Arrays.asList(contents);
 
 			//Do not put in the death map of a player with no items
 			for (ItemStack item : beforeDeathItems) {

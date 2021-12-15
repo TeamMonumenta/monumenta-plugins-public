@@ -14,6 +14,7 @@ import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
@@ -55,7 +56,7 @@ public class EnfeeblingElixir extends Ability {
 	private final double mSpeedAmp;
 	private final float mKnockbackSpeed;
 
-	public EnfeeblingElixir(Plugin plugin, Player player) {
+	public EnfeeblingElixir(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Enfeebling Elixir");
 		mInfo.mLinkedSpell = ClassAbility.ENFEEBLING_ELIXIR;
 		mInfo.mScoreboardId = "EnfeeblingElixir";
@@ -73,6 +74,9 @@ public class EnfeeblingElixir extends Ability {
 
 	@Override
 	public void cast(Action action) {
+		if (mPlayer == null) {
+			return;
+		}
 		ItemStack hand = mPlayer.getInventory().getItemInMainHand();
 
 		if (!ItemUtils.isSomeBow(hand) && hand.getType() != Material.SPLASH_POTION) {
@@ -82,7 +86,7 @@ public class EnfeeblingElixir extends Ability {
 			}
 
 			mPlugin.mEffectManager.addEffect(mPlayer, PERCENT_SPEED_EFFECT_NAME,
-					new PercentSpeed(mDuration, mSpeedAmp, PERCENT_SPEED_EFFECT_NAME));
+			                                 new PercentSpeed(mDuration, mSpeedAmp, PERCENT_SPEED_EFFECT_NAME));
 			mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF,
 			                                 new PotionEffect(PotionEffectType.JUMP, mDuration, JUMP_LEVEL));
 

@@ -16,6 +16,7 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
@@ -45,7 +46,7 @@ public class WindWalk extends MultipleChargeAbility {
 	private int mLeftClicks = 0;
 	private int mLastCastTicks = 0;
 
-	public WindWalk(Plugin plugin, Player player) {
+	public WindWalk(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Wind Walk");
 		mInfo.mLinkedSpell = ClassAbility.WIND_WALK;
 		mInfo.mScoreboardId = "WindWalk";

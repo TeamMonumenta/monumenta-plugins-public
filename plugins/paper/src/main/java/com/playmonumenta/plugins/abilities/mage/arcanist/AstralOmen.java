@@ -2,6 +2,15 @@ package com.playmonumenta.plugins.abilities.mage.arcanist;
 
 import java.util.NavigableSet;
 
+import org.bukkit.Material;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
+import org.bukkit.World;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
@@ -15,15 +24,6 @@ import com.playmonumenta.plugins.events.CustomDamageEvent;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.StringUtils;
-
-import org.bukkit.Material;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
-import org.bukkit.World;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
-
 
 
 public class AstralOmen extends Ability {
@@ -47,22 +47,22 @@ public class AstralOmen extends Ability {
 	private final double mLevelBonusMultiplier;
 	private final boolean mDoPull;
 
-	public AstralOmen(Plugin plugin, Player player) {
+	public AstralOmen(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, NAME);
 		mInfo.mLinkedSpell = ABILITY;
 
 		mInfo.mScoreboardId = "AstralOmen";
 		mInfo.mShorthandName = "AO";
 		mInfo.mDescriptions.add(
-			String.format(
-				"Dealing spell damage to an enemy marks its fate, giving it an astral omen. If an enemy hits %s omens, its fate is sealed, clearing its omens and causing a magical implosion that deals %s arcane damage to it and all enemies in a %s-block cube around it. It then takes %s%% more damage from you for %ss. An enemy loses all its omens after %ss of it not gaining another omen. That implosion's damage ignores iframes and itself cannot apply omens.",
-				STACK_THRESHOLD,
-				DAMAGE,
-				SIZE,
-				StringUtils.multiplierToPercentage(BONUS_MULTIPLIER_1),
-				StringUtils.ticksToSeconds(BONUS_TICKS),
-				StringUtils.ticksToSeconds(STACK_TICKS)
-			)
+				String.format(
+						"Dealing spell damage to an enemy marks its fate, giving it an astral omen. If an enemy hits %s omens, its fate is sealed, clearing its omens and causing a magical implosion that deals %s arcane damage to it and all enemies in a %s-block cube around it. It then takes %s%% more damage from you for %ss. An enemy loses all its omens after %ss of it not gaining another omen. That implosion's damage ignores iframes and itself cannot apply omens.",
+						STACK_THRESHOLD,
+						DAMAGE,
+						SIZE,
+						StringUtils.multiplierToPercentage(BONUS_MULTIPLIER_1),
+						StringUtils.ticksToSeconds(BONUS_TICKS),
+						StringUtils.ticksToSeconds(STACK_TICKS)
+				)
 		);
 		mInfo.mDescriptions.add(
 			String.format(
@@ -82,14 +82,14 @@ public class AstralOmen extends Ability {
 
 	@Override
 	public void playerDealtCustomDamageEvent(CustomDamageEvent event) {
-		if (event.getSpell() == null || event.getSpell() == mInfo.mLinkedSpell) {
+		if (mPlayer == null || event.getSpell() == null || event.getSpell() == mInfo.mLinkedSpell) {
 			return;
 		}
 
 
 		LivingEntity target = event.getDamaged();
 		NavigableSet<Effect> stacks = mPlugin.mEffectManager.getEffects(target, STACKS_SOURCE);
-		int level = stacks == null ? 0 : (int)stacks.last().getMagnitude();
+		int level = stacks == null ? 0 : (int) stacks.last().getMagnitude();
 
 		if (stacks != null) {
 			mPlugin.mEffectManager.clearEffects(target, STACKS_SOURCE);
