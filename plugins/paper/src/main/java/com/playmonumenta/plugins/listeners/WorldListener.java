@@ -210,7 +210,7 @@ public class WorldListener implements Listener {
 	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
 	public void tntPrimeEvent(TNTPrimeEvent event) {
 		Location loc = event.getBlock().getLocation();
-		if (ZoneUtils.hasZoneProperty(loc, ZoneUtils.ZoneProperty.ADVENTURE_MODE)) {
+		if (ZoneUtils.hasZoneProperty(loc, ZoneUtils.ZoneProperty.NO_EXPLOSIONS)) {
 			event.setCancelled(true);
 		}
 	}

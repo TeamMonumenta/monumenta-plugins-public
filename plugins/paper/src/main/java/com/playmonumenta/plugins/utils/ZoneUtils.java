@@ -35,6 +35,7 @@ public class ZoneUtils {
 		BIG_DOOR_DOWN_CW("Big Door Down is CW"),
 		NO_VEHICLES("No Vehicles"),
 		ADVENTURE_MODE("Adventure Mode"),
+		NO_EXPLOSIONS("No Explosions"),
 		RESTRICTED("Restricted");
 
 		private final String mPropertyName;

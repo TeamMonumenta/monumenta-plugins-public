@@ -869,8 +869,8 @@ public class EntityListener implements Listener {
 	// Cancel explosions in adventure zones
 	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
 	public void entityExplodeEvent(EntityExplodeEvent event) {
-		// Cancel the event immediately if within a adventure zone
-		if (ZoneUtils.hasZoneProperty(event.getLocation(), ZoneProperty.ADVENTURE_MODE)) {
+		// Cancel the event immediately if within a no-explosions zone
+		if (ZoneUtils.hasZoneProperty(event.getLocation(), ZoneProperty.NO_EXPLOSIONS)) {
 			event.setCancelled(true);
 			return;
 		}
@@ -886,8 +886,8 @@ public class EntityListener implements Listener {
 		while (iter.hasNext()) {
 			Block block = iter.next();
 
-			// If any block damaged by an explosion is with a adventure zone, cancel the explosion
-			if (ZoneUtils.hasZoneProperty(block.getLocation(), ZoneProperty.ADVENTURE_MODE)) {
+			// If any block damaged by an explosion is with a no-explosions zone, cancel the explosion
+			if (ZoneUtils.hasZoneProperty(block.getLocation(), ZoneProperty.NO_EXPLOSIONS)) {
 				event.setCancelled(true);
 				return;
 			}
@@ -904,7 +904,7 @@ public class EntityListener implements Listener {
 	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
 	public void blockExplodeEvent(BlockExplodeEvent event) {
 		// Cancel the event immediately if within a zone with no explosions
-		if (ZoneUtils.hasZoneProperty(event.getBlock().getLocation(), ZoneProperty.ADVENTURE_MODE)) {
+		if (ZoneUtils.hasZoneProperty(event.getBlock().getLocation(), ZoneProperty.NO_EXPLOSIONS)) {
 			event.setCancelled(true);
 			return;
 		}
@@ -914,7 +914,7 @@ public class EntityListener implements Listener {
 			Block block = iter.next();
 
 			// If any block damaged by an explosion is with an adventure zone, cancel the explosion
-			if (ZoneUtils.hasZoneProperty(block.getLocation(), ZoneProperty.ADVENTURE_MODE)) {
+			if (ZoneUtils.hasZoneProperty(block.getLocation(), ZoneProperty.NO_EXPLOSIONS)) {
 				event.setCancelled(true);
 				return;
 			}
