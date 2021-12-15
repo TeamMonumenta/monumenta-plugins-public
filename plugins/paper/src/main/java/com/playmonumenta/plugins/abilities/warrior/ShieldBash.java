@@ -13,8 +13,6 @@ import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -56,7 +54,7 @@ public class ShieldBash extends Ability {
 		mInfo.mLinkedSpell = ClassAbility.SHIELD_BASH;
 		mInfo.mScoreboardId = "ShieldBash";
 		mInfo.mShorthandName = "SB";
-		mInfo.mDescriptions.add("Block while looking at an enemy within 4 blocks to deal 5 damage, stun for 1 second, and taunt. Cooldown: 8s.");
+		mInfo.mDescriptions.add("Block while looking at an enemy within 4 blocks to deal 5 damage, stun for 1 second, and taunt. Elites and bosses are rooted instead of stunned. Cooldown: 8s.");
 		mInfo.mDescriptions.add("Additionally, apply damage, stun, and taunt to all enemies in a 2 block radius from the enemy you are looking at.");
 		mInfo.mCooldown = SHIELD_BASH_COOLDOWN;
 		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
@@ -91,26 +89,10 @@ public class ShieldBash extends Ability {
 								world.playSound(eyeLoc, Sound.ENTITY_PLAYER_ATTACK_CRIT, 1.5f, 0.5f);
 
 								if (getAbilityScore() == 1) {
-									EntityUtils.damageEntity(mPlugin, mob, damage, mPlayer);
-									if (EntityUtils.isBoss(mob) || EntityUtils.isElite(mob)) {
-										mob.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, SHIELD_BASH_STUN, 6));
-									} else {
-										EntityUtils.applyStun(mPlugin, SHIELD_BASH_STUN, mob);
-									}
-									if (mob instanceof Mob) {
-										((Mob) mob).setTarget(mPlayer);
-									}
+									bash(mob, damage);
 								} else {
 									for (LivingEntity le : EntityUtils.getNearbyMobs(mob.getLocation(), SHIELD_BASH_2_RADIUS)) {
-										EntityUtils.damageEntity(mPlugin, le, damage, mPlayer);
-										if (EntityUtils.isBoss(le) || EntityUtils.isElite(le)) {
-											le.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, SHIELD_BASH_STUN, 6));
-										} else {
-											EntityUtils.applyStun(mPlugin, SHIELD_BASH_STUN, le);
-										}
-										if (le instanceof Mob) {
-											((Mob) le).setTarget(mPlayer);
-										}
+										bash(le, damage);
 									}
 								}
 
@@ -123,6 +105,18 @@ public class ShieldBash extends Ability {
 				this.cancel();
 			}
 		}.runTaskLater(mPlugin, 1);
+	}
+
+	private void bash(LivingEntity le, int damage) {
+		EntityUtils.damageEntity(mPlugin, le, damage, mPlayer);
+		if (EntityUtils.isBoss(le) || EntityUtils.isElite(le)) {
+			EntityUtils.applySlow(mPlugin, SHIELD_BASH_STUN, .99, le);
+		} else {
+			EntityUtils.applyStun(mPlugin, SHIELD_BASH_STUN, le);
+		}
+		if (le instanceof Mob mob) {
+			mob.setTarget(mPlayer);
+		}
 	}
 
 	@Override
