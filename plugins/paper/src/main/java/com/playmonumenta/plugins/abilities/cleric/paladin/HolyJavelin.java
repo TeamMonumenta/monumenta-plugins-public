@@ -157,7 +157,7 @@ public class HolyJavelin extends Ability {
 				}
 			}
 
-			if (loc.getBlock().getType().isSolid()) {
+			if (!loc.isChunkLoaded() || loc.getBlock().getType().isSolid()) {
 				loc.subtract(increment.multiply(0.5));
 				world.spawnParticle(Particle.CLOUD, loc, 30, 0, 0, 0, 0.125f);
 				world.playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_BLAST, 1, 1.65f);

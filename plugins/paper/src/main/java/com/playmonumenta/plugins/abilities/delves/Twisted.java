@@ -31,6 +31,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.bosses.BossManager;
 import com.playmonumenta.plugins.bosses.bosses.ShadeParticleBoss;
 import com.playmonumenta.plugins.bosses.bosses.ShadePossessedBoss;
 import com.playmonumenta.plugins.bosses.bosses.TwistedEventBoss;
@@ -178,8 +179,12 @@ public class Twisted extends DelveModifier {
 		for (LivingEntity mob : mobs) {
 			mob.getWorld().playSound(mob.getLocation(), Sound.ENTITY_WITHER_SPAWN, 0.3f, 0.5f);
 
-			Bukkit.getConsoleSender().getServer().dispatchCommand(Bukkit.getConsoleSender(),
-					"bossfight " + mob.getUniqueId() + " " + ShadePossessedBoss.identityTag);
+			try {
+				BossManager.createBoss(null, mob, ShadePossessedBoss.identityTag);
+			} catch (Exception ex) {
+				Plugin.getInstance().getLogger().severe("Failed to create ShadePossessedBoss: " + ex.getMessage());
+				ex.printStackTrace();
+			}
 		}
 	}
 
@@ -209,8 +214,12 @@ public class Twisted extends DelveModifier {
 			world.playSound(loc, Sound.ENTITY_HUSK_CONVERTED_TO_ZOMBIE, 0.5f, 0.5f);
 			world.playSound(loc, Sound.ENTITY_HUSK_DEATH, 0.5f, 0.5f);
 
-			Bukkit.getConsoleSender().getServer().dispatchCommand(Bukkit.getConsoleSender(),
-					"bossfight " + mob.getUniqueId() + " " + ShadeParticleBoss.identityTag);
+			try {
+				BossManager.createBoss(null, mob, ShadeParticleBoss.identityTag);
+			} catch (Exception ex) {
+				Plugin.getInstance().getLogger().severe("Failed to create ShadeParticleBoss: " + ex.getMessage());
+				ex.printStackTrace();
+			}
 
 			new BukkitRunnable() {
 				@Override

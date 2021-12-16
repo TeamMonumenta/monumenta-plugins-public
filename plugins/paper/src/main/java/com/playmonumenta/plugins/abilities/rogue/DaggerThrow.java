@@ -109,7 +109,7 @@ public class DaggerThrow extends Ability {
 						EntityUtils.damageEntity(mPlugin, mob, mDamage, mPlayer, MagicType.PHYSICAL, true, mInfo.mLinkedSpell);
 						PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(PotionEffectType.UNLUCK, DAGGER_THROW_DURATION, mVulnAmplifier, true, false));
 						break;
-					} else if (bLoc.getBlock().getType().isSolid()) {
+					} else if (!bLoc.isChunkLoaded() || bLoc.getBlock().getType().isSolid()) {
 						bLoc.subtract((newDir.clone()).multiply(0.5));
 						world.spawnParticle(Particle.SWEEP_ATTACK, bLoc, 3, 0.3, 0.3, 0.3, 0.1);
 						break;

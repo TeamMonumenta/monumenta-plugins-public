@@ -38,6 +38,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import com.playmonumenta.plugins.Plugin;
 
 public class LocationUtils {
 	public static Vector getVectorTo(Location to, Location from) {
@@ -1169,6 +1170,35 @@ public class LocationUtils {
 
 	public static Location getLocationCentre(Location location) {
 		return location.add(0.5, 0.5, 0.5);
+	}
+
+	// Fills blocks between two locations with a specific material. Locations are inclusive (will place a block at both start and end)
+	public static void fillBlocks(Location pos1, Location pos2, Material mat) {
+		if (!pos1.getWorld().equals(pos2.getWorld())) {
+			// Can't fill blocks between two difefrent worlds
+			Plugin.getInstance().getLogger().severe("Attempted to fill blocks between " + pos1 + " and " + pos2 + " which are in different worlds");
+			return;
+		}
+		World world = pos1.getWorld();
+		Location min = new Location(world,
+									Math.min(pos1.getX(), pos2.getX()),
+									Math.min(pos1.getY(), pos2.getY()),
+									Math.min(pos1.getZ(), pos2.getZ()));
+		Location max = new Location(world,
+									Math.max(pos1.getX(), pos2.getX()),
+									Math.max(pos1.getY(), pos2.getY()),
+									Math.max(pos1.getZ(), pos2.getZ()));
+		Location temp = min.clone();
+		for (int dx = 0; dx <= (max.getBlockX() - min.getBlockX()); dx++) {
+			for (int dy = 0; dy <= (max.getBlockY() - min.getBlockY()); dy++) {
+				for (int dz = 0; dz <= (max.getBlockZ() - min.getBlockZ()); dz++) {
+					temp.setX(min.getBlockX() + dx);
+					temp.setY(min.getBlockY() + dy);
+					temp.setZ(min.getBlockZ() + dz);
+					temp.getBlock().setType(mat);
+				}
+			}
+		}
 	}
 
 

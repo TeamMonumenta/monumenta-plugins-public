@@ -193,6 +193,7 @@ public class JudgementChain extends Ability {
 									}
 									if (mTarget.getFireTicks() > 0 && (m.getFireTicks() <= 0 && !Inferno.mobHasInferno(mPlugin, m)
 											&& (!EntityUtils.isFireResistant(m) || PlayerTracking.getInstance().getPlayerCustomEnchantLevel(mPlayer, Inferno.class) > 0)
+											&& m.getLocation().isChunkLoaded()
 											&& m.getLocation().getBlock().getType() != Material.WATER)) {
 										EntityUtils.applyFire(mPlugin, BUFF_DURATION, m, mPlayer);
 									}

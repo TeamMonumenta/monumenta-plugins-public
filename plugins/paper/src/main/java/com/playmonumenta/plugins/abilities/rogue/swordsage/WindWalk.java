@@ -108,7 +108,7 @@ public class WindWalk extends MultipleChargeAbility {
 			final List<LivingEntity> mMobsNotHit = EntityUtils.getNearbyMobs(mPlayer.getLocation(), 32);
 			@Override
 			public void run() {
-				if (mPlayer.isOnGround() || mPlayer.isDead() || !mPlayer.isOnline()) {
+				if (mPlayer.isOnGround() || mPlayer.isDead() || !mPlayer.isOnline() || !mPlayer.getLocation().isChunkLoaded()) {
 					this.cancel();
 					return;
 				}

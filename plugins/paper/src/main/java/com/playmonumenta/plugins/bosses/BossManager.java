@@ -114,11 +114,11 @@ public class BossManager implements Listener {
 	/*
 	 * Holds a static reference to the most recently instantiated boss manager
 	 */
-	static BossManager mInstance = null;
+	private static @Nullable BossManager INSTANCE = null;
 
-	static final Map<String, StatelessBossConstructor> mStatelessBosses;
-	static final Map<String, StatefulBossConstructor> mStatefulBosses;
-	static final Map<String, BossDeserializer> mBossDeserializers;
+	private static final Map<String, StatelessBossConstructor> mStatelessBosses;
+	private static final Map<String, StatefulBossConstructor> mStatefulBosses;
+	private static final Map<String, BossDeserializer> mBossDeserializers;
 	public static final Map<String, BossParameters> mBossParameters;
 
 	static {
@@ -504,7 +504,6 @@ public class BossManager implements Listener {
 	private boolean mNearbyPlayerDeathEnabled = false;
 
 	public BossManager(Plugin plugin) {
-		mInstance = this;
 		mPlugin = plugin;
 		mBosses = new HashMap<UUID, Boss>();
 
@@ -518,6 +517,8 @@ public class BossManager implements Listener {
 				processEntity((LivingEntity)entity);
 			}
 		}
+
+		INSTANCE = this;
 	}
 
 	/********************************************************************************
@@ -890,8 +891,8 @@ public class BossManager implements Listener {
 	/********************************************************************************
 	 * Static public methods
 	 *******************************************************************************/
-	public static BossManager getInstance() {
-		return mInstance;
+	public static @Nullable BossManager getInstance() {
+		return INSTANCE;
 	}
 
 	public static void registerStatelessBoss(String identityTag, StatelessBossConstructor fn) {
@@ -935,10 +936,14 @@ public class BossManager implements Listener {
 		mBosses.clear();
 	}
 
-	public void createBoss(@Nullable CommandSender sender, LivingEntity targetEntity, String requestedTag) throws Exception {
+	public static void createBoss(@Nullable CommandSender sender, LivingEntity targetEntity, String requestedTag) throws Exception {
+		if (INSTANCE == null) {
+			throw new Exception("BossManager is not loaded");
+		}
+
 		StatelessBossConstructor stateless = mStatelessBosses.get(requestedTag);
 		if (stateless != null) {
-			createBossInternal(targetEntity, stateless.construct(mPlugin, targetEntity));
+			INSTANCE.createBossInternal(targetEntity, stateless.construct(INSTANCE.mPlugin, targetEntity));
 			if (sender != null) {
 				sender.sendMessage("Successfully gave '" + requestedTag + "' to mob");
 			}
@@ -958,15 +963,19 @@ public class BossManager implements Listener {
 		}
 	}
 
-	public void createBoss(CommandSender sender, LivingEntity targetEntity, String requestedTag, Location endLoc) throws Exception {
-		StatefulBossConstructor stateful = mStatefulBosses.get(requestedTag);
+	public static void createBoss(@Nullable CommandSender sender, LivingEntity targetEntity, String requestedTag, Location endLoc) throws Exception {
+		if (INSTANCE == null) {
+			throw new Exception("BossManager is not loaded");
+		}
+
+		StatefulBossConstructor stateful = INSTANCE.mStatefulBosses.get(requestedTag);
 		if (stateful != null) {
-			createBossInternal(targetEntity, stateful.construct(mPlugin, targetEntity, targetEntity.getLocation(), endLoc));
+			INSTANCE.createBossInternal(targetEntity, stateful.construct(INSTANCE.mPlugin, targetEntity, targetEntity.getLocation(), endLoc));
 			if (sender != null) {
 				sender.sendMessage("Successfully gave '" + requestedTag + "' to mob");
 			}
 		} else {
-			if (mStatelessBosses.get(requestedTag) != null) {
+			if (INSTANCE.mStatelessBosses.get(requestedTag) != null) {
 				if (sender != null) {
 					sender.sendMessage(ChatColor.GOLD + "There is a boss with the tag '" +
 									   ChatColor.GREEN + requestedTag + ChatColor.GOLD +

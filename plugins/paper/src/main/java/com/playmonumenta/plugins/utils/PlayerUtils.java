@@ -121,7 +121,8 @@ public class PlayerUtils {
 
 	/* Command should use @s for targeting selector */
 	private static String getExecuteCommandOnNearbyPlayers(Location loc, int radius, String command) {
-		String executeCmd = "execute as @a[x=" + (int)loc.getX() +
+		String executeCmd = "execute in " + loc.getWorld().getName() +
+		                    " as @a[x=" + (int)loc.getX() +
 		                    ",y=" + (int)loc.getY() +
 		                    ",z=" + (int)loc.getZ() +
 		                    ",distance=.." + radius + "] at @s run ";
@@ -196,7 +197,7 @@ public class PlayerUtils {
 	 * They cannot be on the ground or climbing.
 	 */
 	public static boolean isFreeFalling(Player player) {
-		if (!player.isOnGround()) {
+		if (!player.isOnGround() && player.getLocation().isChunkLoaded()) {
 			Material playerFeetMaterial = player.getLocation().getBlock().getType();
 			// Accounts for vines, ladders, nether vines, scaffolding etc
 			if (!MaterialSetTag.CLIMBABLE.isTagged(playerFeetMaterial)) {

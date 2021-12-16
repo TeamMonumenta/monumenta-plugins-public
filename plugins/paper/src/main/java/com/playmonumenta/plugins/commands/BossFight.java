@@ -30,8 +30,8 @@ public class BossFight {
 		List<Argument> arguments = new ArrayList<>();
 
 		arguments.add(new EntitySelectorArgument("entity", EntitySelector.ONE_ENTITY));
-		arguments.add(new StringArgument("boss_tag").overrideSuggestions(
-			(sender) -> {
+		arguments.add(new StringArgument("boss_tag").replaceSuggestions(
+			(info) -> {
 				return BossManager.getInstance().listBosses();
 			}
 		));
@@ -57,7 +57,7 @@ public class BossFight {
 	private static void createBossStateless(CommandSender sender, Entity entity, String requestedTag) {
 		if (entity instanceof LivingEntity && !(entity instanceof Player)) {
 			try {
-				BossManager.getInstance().createBoss(sender, (LivingEntity)entity, requestedTag);
+				BossManager.createBoss(sender, (LivingEntity)entity, requestedTag);
 			} catch (Exception ex) {
 				MessagingUtils.sendStackTrace(sender, ex);
 			}
@@ -69,7 +69,7 @@ public class BossFight {
 	private static void createBossStateful(CommandSender sender, Entity entity, String requestedTag, Location endLoc) {
 		if (entity instanceof LivingEntity && !(entity instanceof Player)) {
 				try {
-					BossManager.getInstance().createBoss(sender, (LivingEntity)entity, requestedTag, endLoc);
+					BossManager.createBoss(sender, (LivingEntity)entity, requestedTag, endLoc);
 				} catch (Exception ex) {
 					MessagingUtils.sendStackTrace(sender, ex);
 				}

@@ -204,7 +204,13 @@ public class BodkinBlitz extends MultipleChargeAbility {
 			for (int z = -1; z <= 1; z++) {
 				for (int y = 0; y <= 2; y++) {
 					// Checking the blocks around the hitbox.
-					Block block = box.getCenter().toLocation(world).add(x * 0.4, y * 0.975 - box.getHeight() / 2, z * 0.4).getBlock();
+					Location loc = box.getCenter().toLocation(world).add(x * 0.4, y * 0.975 - box.getHeight() / 2, z * 0.4);
+					if (!loc.isChunkLoaded()) {
+						// Somehow ended up in an unloaded area - not valid
+						return false;
+					}
+
+					Block block = loc.getBlock();
 					// A player's hitbox is 0.625 * 0.625 * 1.8125 blocks. Rounding up to 0.8 * 0.8 * 1.95 to be safe.
 
 					if (block.getType().isSolid() && block.getBoundingBox().overlaps(box)) {

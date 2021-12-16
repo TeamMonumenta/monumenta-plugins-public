@@ -129,13 +129,13 @@ public class AdvancingShadows extends Ability {
 
 			// Just in case the player's teleportation loc is in a block.
 			int count = 0;
-			while (count < 5 && loc.getBlock().getType().isSolid()) {
+			while (count < 5 && (!loc.isChunkLoaded() || loc.getBlock().getType().isSolid())) {
 				count++;
 				loc.subtract(dir.clone().multiply(1.15));
 			}
 
 			// If still solid, something is wrong.
-			if (loc.getBlock().getType().isSolid()) {
+			if (!loc.isChunkLoaded() || loc.getBlock().getType().isSolid()) {
 				world.playSound(mPlayer.getLocation(), Sound.ENTITY_ILLUSIONER_MIRROR_MOVE, 1.0f, 1.8f);
 				return;
 			}
@@ -146,6 +146,9 @@ public class AdvancingShadows extends Ability {
 				for (int y = 0; y < loc.getY() - 1; y++) {
 					Location tempLoc = loc.clone();
 					tempLoc.setY(y);
+					if (!tempLoc.isChunkLoaded()) {
+						continue;
+					}
 					if (!tempLoc.getBlock().isPassable()) {
 						safe = true;
 						break;

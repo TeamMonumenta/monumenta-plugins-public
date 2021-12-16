@@ -89,7 +89,7 @@ public class TacticalManeuver extends MultipleChargeAbility {
 			new BukkitRunnable() {
 				@Override
 				public void run() {
-					if (mPlayer.isOnGround() || mPlayer.isDead() || !mPlayer.isOnline()) {
+					if (mPlayer.isOnGround() || mPlayer.isDead() || !mPlayer.isOnline() || !mPlayer.getLocation().isChunkLoaded()) {
 						this.cancel();
 						return;
 					}

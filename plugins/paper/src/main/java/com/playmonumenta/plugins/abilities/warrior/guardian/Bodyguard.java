@@ -78,7 +78,7 @@ public class Bodyguard extends Ability {
 		for (int i = 0; i < RANGE; i++) {
 			box.shift(dir);
 			Location bLoc = box.getCenter().toLocation(world);
-			if (bLoc.getBlock().getType().isSolid()) {
+			if (!bLoc.isChunkLoaded() || bLoc.getBlock().getType().isSolid()) {
 				if (lookingDown) {
 					mLeftClicks++;
 					new BukkitRunnable() {

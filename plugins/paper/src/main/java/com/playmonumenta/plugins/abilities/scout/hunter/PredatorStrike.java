@@ -110,7 +110,7 @@ public class PredatorStrike extends Ability {
 				world.spawnParticle(Particle.SMOKE_NORMAL, bLoc, 10, 0.15, 0.15, 0.15, 0.075);
 				world.spawnParticle(Particle.FLAME, bLoc, 2, 0.2, 0.2, 0.2, 0.1);
 
-				if (bLoc.getBlock().getType().isSolid()) {
+				if (!bLoc.isChunkLoaded() || bLoc.getBlock().getType().isSolid()) {
 					bLoc.subtract(direction.multiply(0.5));
 					explode(bLoc);
 					return true;

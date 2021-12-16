@@ -367,51 +367,6 @@ public class EntityUtils {
 		return false;
 	}
 
-	/**
-	 * Gets the entity in the crosshair of the player
-	 * <p>
-	 * Utilizes raycasting for the detection.
-	 *
-	 * @param player
-	 * @param range
-	 * @param targetPlayers
-	 * @param targetNonPlayers
-	 * @return The Entity in the crosshair of the player
-	 */
-	public static @Nullable LivingEntity getCrosshairTarget(Player player, int range, boolean targetPlayers,
-	                                                        boolean targetNonPlayers, boolean checkLos, boolean throughNonOccluding) {
-		Location loc = player.getEyeLocation();
-		Vector dir = loc.getDirection();
-
-		for (int i = 0; i < (range * 2); i++) {
-			loc.add(dir.clone().multiply(0.5));
-			//Is the block solid?
-
-			if (checkLos) {
-				if (loc.getBlock().getType().isSolid()) {
-					if (throughNonOccluding) {
-						if (loc.getBlock().getType().isOccluding()) {
-							return null;
-						}
-					} else {
-						return null;
-					}
-				}
-			}
-			for (Entity e : loc.getWorld().getNearbyEntities(loc, 0.75, 0.75, 0.75)) {
-				//  Make sure to only get living entities.
-				if (e instanceof LivingEntity) {
-					//  Make sure we should be targeting this entity.
-					if ((targetPlayers && (e instanceof Player)) || (targetNonPlayers && (!(e instanceof Player)))) {
-						return (LivingEntity) e;
-					}
-				}
-			}
-		}
-
-		return null;
-	}
-
 	public static @Nullable LivingEntity getEntityAtCursor(Player player, int range, boolean targetPlayers, boolean targetNonPlayers, boolean checkLos) {
 		List<Entity> en = player.getNearbyEntities(range, range, range);
 		ArrayList<LivingEntity> entities = new ArrayList<LivingEntity>();

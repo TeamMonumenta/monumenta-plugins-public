@@ -22,6 +22,7 @@ import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
@@ -31,6 +32,7 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityManager;
+import com.playmonumenta.plugins.bosses.BossManager;
 import com.playmonumenta.plugins.depths.DepthsRoomType.DepthsRewardType;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
@@ -429,6 +431,7 @@ public class DepthsManager {
 				}
 			} catch (Exception e) {
 				Plugin.getInstance().getLogger().info("Error while attempting to set player depths ability");
+				e.printStackTrace();
 			}
 		}
 		AbilityManager.getManager().updatePlayerAbilities(p);
@@ -1354,15 +1357,29 @@ public class DepthsManager {
 
 		}
 		//Spawn boss depending on which floor we're on
+		final String losName;
+		final String bossTag;
 		if (getPartyFromId(dp).getFloor() % 3 == 1) {
-			LibraryOfSoulsIntegration.summon(l, HEDERA_LOS);
-			Bukkit.getServer().dispatchCommand(Bukkit.getServer().getConsoleSender(), "execute positioned " + l.getX() + " " + l.getY() + " " + l.getZ() + " run bossfight @e[type=witch,limit=1,distance=..2] boss_hedera ~ ~-2 ~");
+			losName = HEDERA_LOS;
+			bossTag = "boss_hedera";
 		} else if (getPartyFromId(dp).getFloor() % 3 == 2) {
-			LibraryOfSoulsIntegration.summon(l, DAVEY_LOS);
-			Bukkit.getServer().dispatchCommand(Bukkit.getServer().getConsoleSender(), "execute positioned " + l.getX() + " " + l.getY() + " " + l.getZ() + " run bossfight @e[type=wither_skeleton,limit=1,distance=..2] boss_davey ~ ~-2 ~");
+			losName = DAVEY_LOS;
+			bossTag = "boss_davey";
 		} else {
-			LibraryOfSoulsIntegration.summon(l, NUCLEUS_LOS);
-			Bukkit.getServer().dispatchCommand(Bukkit.getServer().getConsoleSender(), "execute positioned " + l.getX() + " " + l.getY() + " " + l.getZ() + " run bossfight @e[type=magma_cube,limit=1,distance=..2] boss_nucleus ~ ~-2 ~");
+			losName = NUCLEUS_LOS;
+			bossTag = "boss_nucleus";
+		}
+
+		try {
+			Entity entity = LibraryOfSoulsIntegration.summon(l, losName);
+			if (entity != null && entity instanceof LivingEntity) {
+				BossManager.createBoss(null, (LivingEntity)entity, bossTag, l.clone().add(0, -2, 0));
+			} else {
+				Plugin.getInstance().getLogger().severe("Failed to summon depths boss " + bossTag);
+			}
+		} catch (Exception e) {
+			Plugin.getInstance().getLogger().severe("Failed to set up depths boss '" + bossTag + "': " + e.getMessage());
+			e.printStackTrace();
 		}
 	}
 

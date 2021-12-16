@@ -121,7 +121,7 @@ public class FestiveTesseractOverride extends BaseOverride {
 				if (checkTesseractName(item) == 1) {
 					BossManager.getInstance().unload(summon, false);
 					try {
-						BossManager.getInstance().createBoss(null, summon, FestiveTesseractSnowmanBoss.identityTag);
+						BossManager.createBoss(null, summon, FestiveTesseractSnowmanBoss.identityTag);
 					} catch (Exception ex) {
 						ex.printStackTrace();
 					}

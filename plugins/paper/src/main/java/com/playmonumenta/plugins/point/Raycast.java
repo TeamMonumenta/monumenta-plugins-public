@@ -80,7 +80,7 @@ public class Raycast {
 			}
 
 			mStart.add(mDir.clone().multiply(mDirMultiplier));
-			if (!mStart.getWorld().isChunkLoaded(mStart.getBlockX() >> 4, mStart.getBlockZ() >> 4)) {
+			if (!mStart.isChunkLoaded()) {
 				break;
 			}
 			Block block = mStart.getBlock();

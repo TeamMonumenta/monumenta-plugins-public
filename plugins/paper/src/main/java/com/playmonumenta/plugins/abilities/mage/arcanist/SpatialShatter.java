@@ -127,7 +127,7 @@ public class SpatialShatter extends Ability {
 					world.spawnParticle(Particle.SPELL_WITCH, bLoc, 5, 0, 0, 0, 0.5);
 					world.spawnParticle(Particle.REDSTONE, bLoc, 20, 0.2, 0.2, 0.2, 0.1, COLOR_BLUE);
 
-					if (bLoc.getBlock().getType().isSolid()) {
+					if (!bLoc.isChunkLoaded() || bLoc.getBlock().getType().isSolid()) {
 						bLoc.subtract(direction.multiply(0.5));
 						explode(bLoc);
 						return;

@@ -95,7 +95,7 @@ public class Starfall extends Ability {
 
 					mPlayer.spawnParticle(Particle.FLAME, loc, 1, 0, 0, 0, 0);
 					int size = EntityUtils.getNearbyMobs(loc, 2, mPlayer).size();
-					if (loc.getBlock().getType().isSolid() || i >= 24 || size > 0) {
+					if (!loc.isChunkLoaded() || loc.getBlock().getType().isSolid() || i >= 24 || size > 0) {
 						launchMeteor(mPlayer, loc);
 						break;
 					}
@@ -115,7 +115,7 @@ public class Starfall extends Ability {
 				World world = mPlayer.getWorld();
 				for (int i = 0; i < 8; i++) {
 					loc.subtract(0, 0.25, 0);
-					if (loc.getBlock().getType().isSolid()) {
+					if (!loc.isChunkLoaded() || loc.getBlock().getType().isSolid()) {
 						if (loc.getY() - ogLoc.getY() <= 2) {
 							world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 1, 0);
 							world.spawnParticle(Particle.FLAME, loc, 175, 0, 0, 0, 0.235F);

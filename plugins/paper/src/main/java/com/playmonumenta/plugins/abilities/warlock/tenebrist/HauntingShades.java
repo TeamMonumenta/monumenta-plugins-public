@@ -129,7 +129,7 @@ public class HauntingShades extends MultipleChargeAbility {
 					}
 				}
 
-				if (bLoc.getBlock().getType().isSolid()) {
+				if (!bLoc.isChunkLoaded() || bLoc.getBlock().getType().isSolid()) {
 					bLoc.subtract(direction.multiply(0.5));
 					placeShade(bLoc);
 					return;

@@ -44,6 +44,7 @@ import com.playmonumenta.plugins.depths.bosses.spells.SpellTectonicDevastation;
 import com.playmonumenta.plugins.depths.bosses.spells.VolcanicDeepmise;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.SerializationUtils;
 
@@ -147,10 +148,10 @@ public final class Nucleus extends BossAbilityGroup {
 				stand.remove();
 				Location p1 = baseLoc.clone().add(0, -6, -6);
 				Location p2 = baseLoc.clone().add(0, 6, 6);
-				Bukkit.getServer().dispatchCommand(Bukkit.getServer().getConsoleSender(), "fill " + (int) p1.getX() + " " + (int) p1.getY() + " " + (int) p1.getZ() + " " + (int) p2.getX() + " " + (int) p2.getY() + " " + (int) p2.getZ() + " bedrock");
+				LocationUtils.fillBlocks(p1, p2, Material.BEDROCK);
 				p1 = p1.clone().add(1, 0, 0);
 				p2 = p2.clone().add(1, 0, 0);
-				Bukkit.getServer().dispatchCommand(Bukkit.getServer().getConsoleSender(), "fill " + (int) p1.getX() + " " + (int) p1.getY() + " " + (int) p1.getZ() + " " + (int) p2.getX() + " " + (int) p2.getY() + " " + (int) p2.getZ() + " black_concrete");
+				LocationUtils.fillBlocks(p1, p2, Material.BLACK_CONCRETE);
 			}
 		}
 

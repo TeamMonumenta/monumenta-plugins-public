@@ -16,6 +16,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.depths.DepthsRoom.RoomDirection;
 import com.playmonumenta.scriptedquests.Plugin;
+import com.playmonumenta.structures.StructuresAPI;
 
 /**
  * @author ShadowVisions
@@ -361,7 +362,8 @@ public class DepthsRoomRepository {
 		}
 
 		Plugin.getInstance().getLogger().info("Summoning structure " + room.mLoadPath);
-		Bukkit.getServer().dispatchCommand(Bukkit.getServer().getConsoleSender(), "loadstructure " + room.mLoadPath + " " + spawn.getX() + " " + spawn.getY() + " " + spawn.getZ() + " true");
+		// Start loading and don't wait for completion
+		StructuresAPI.loadAndPasteStructure(room.mLoadPath, spawn, true);
 		return room;
 	}
 
@@ -481,9 +483,11 @@ public class DepthsRoomRepository {
 		//Separate rooms by floor here
 		int nextFloorNum = party.getFloor() + 1;
 		if (nextFloorNum > CUSTOM_FLOOR_LOBBIES) {
-			Bukkit.getServer().dispatchCommand(Bukkit.getServer().getConsoleSender(), "loadstructure \"depths/f11lobby\" " + loc.getX() + " " + loc.getY() + " " + loc.getZ() + " false");
+			// Start loading and don't wait for completion
+			StructuresAPI.loadAndPasteStructure("depths/f11lobby", loc, false);
 		} else {
-			Bukkit.getServer().dispatchCommand(Bukkit.getServer().getConsoleSender(), "loadstructure \"depths/f" + nextFloorNum + "lobby\" " + loc.getX() + " " + loc.getY() + " " + loc.getZ() + " false");
+			// Start loading and don't wait for completion
+			StructuresAPI.loadAndPasteStructure("depths/f" + nextFloorNum + "lobby", loc, false);
 		}
 
 		//Tp all the players to it

@@ -72,7 +72,6 @@ public class ManaLance extends Ability {
 		float damage = getAbilityScore() == 1 ? DAMAGE_1 : DAMAGE_2;
 		damage += ManaLanceDamageEnchantment.getExtraDamage(mPlayer, ManaLanceDamageEnchantment.class);
 		damage = SpellPower.getSpellDamage(mPlayer, damage);
-		float cd = getAbilityScore() == 1 ? COOLDOWN_1 : COOLDOWN_2;
 
 		putOnCooldown();
 
@@ -91,7 +90,7 @@ public class ManaLance extends Ability {
 			world.spawnParticle(Particle.EXPLOSION_NORMAL, bLoc, 2, 0.05, 0.05, 0.05, 0.025);
 			world.spawnParticle(Particle.REDSTONE, bLoc, 18, 0.35, 0.35, 0.35, MANA_LANCE_COLOR);
 
-			if (bLoc.getBlock().getType().isSolid()) {
+			if (!bLoc.isChunkLoaded() || bLoc.getBlock().getType().isSolid()) {
 				bLoc.subtract(dir.multiply(0.5));
 				world.spawnParticle(Particle.CLOUD, bLoc, 30, 0, 0, 0, 0.125);
 				world.playSound(bLoc, Sound.ENTITY_FIREWORK_ROCKET_BLAST, 1, 1.65f);

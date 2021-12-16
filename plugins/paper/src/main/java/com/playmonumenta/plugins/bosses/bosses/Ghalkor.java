@@ -14,6 +14,7 @@ import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDeathEvent;
@@ -243,12 +244,16 @@ public final class Ghalkor extends BossAbilityGroup {
 
 			PlayerUtils.executeCommandOnNearbyPlayers(mSpawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"[Ghalkor]\",\"color\":\"gold\"},{\"text\":\" With mine Laastasem...  My lifeblood fuels the ritual... Come forth o Beast!\",\"color\":\"dark_gray\"}]");
 
-			LivingEntity beast = (LivingEntity) LibraryOfSoulsIntegration.summon(mSpawnLoc.add(-2, -3, 0), BeastOfTheBlackFlame.losName);
-			try {
-				BossManager.getInstance().createBoss(null, beast, BeastOfTheBlackFlame.identityTag, mEndLoc);
-			} catch (Exception e) {
-				mPlugin.getLogger().warning("Failed to create boss BeastOfTheBlackFlame: " + e.getMessage());
-				e.printStackTrace();
+			Entity beast = LibraryOfSoulsIntegration.summon(mSpawnLoc.add(-2, -3, 0), BeastOfTheBlackFlame.losName);
+			if (beast != null && beast instanceof LivingEntity leBeast) {
+				try {
+					BossManager.createBoss(null, leBeast, BeastOfTheBlackFlame.identityTag, mEndLoc);
+				} catch (Exception e) {
+					mPlugin.getLogger().warning("Failed to create boss BeastOfTheBlackFlame: " + e.getMessage());
+					e.printStackTrace();
+				}
+			} else {
+				mPlugin.getLogger().warning("Failed to summon BeastOfTheBlackFlame");
 			}
 		}
 	}

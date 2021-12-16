@@ -111,10 +111,15 @@ public class HuntingCompanion extends Ability {
 			Vector perp = (new Vector(-facingDirection.getZ(), 0, facingDirection.getX())).normalize(); //projection of the perpendicular vector to facingDirection onto the xz plane
 
 			Vector sideOffset = new Vector(0, 0, 0);
-			if (!loc.clone().add(perp).getBlock().isSolid() && !loc.clone().add(perp).add(0, 1, 0).getBlock().isSolid()) {
+			Location pos = loc.clone().add(perp);
+			Location neg = loc.clone().subtract(perp);
+			if (pos.isChunkLoaded() && !pos.getBlock().isSolid() && !pos.add(0, 1, 0).getBlock().isSolid()) {
 				sideOffset = perp;
-			} else if (!loc.clone().subtract(perp).getBlock().isSolid() && !loc.clone().subtract(perp).add(0, 1, 0).getBlock().isSolid()) {
+			} else if (neg.isChunkLoaded() && !neg.getBlock().isSolid() && !neg.add(0, 1, 0).getBlock().isSolid()) {
 				sideOffset = perp.clone().multiply(-1);
+			} else if (!loc.isChunkLoaded()) {
+				// Player is standing somewhere that's not loaded, abort
+				return;
 			}
 
 			mFox = (Fox) LibraryOfSoulsIntegration.summon(loc.clone().add(sideOffset).add(facingDirection.clone().setY(0).normalize().multiply(-0.25)), FOX_NAME); // adds facing direction so golem doesn't spawn inside user
