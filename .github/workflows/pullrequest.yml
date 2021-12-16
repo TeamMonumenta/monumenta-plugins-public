@@ -3,8 +3,43 @@ name: reviewdog
 on: [pull_request]
 
 jobs:
-  reviewdog:
-    name: reviewdog
+  deps:
+    name: Build Dependencies
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v1
+    - name: Set up JDK 1.16
+      uses: actions/setup-java@v1
+      with:
+        java-version: 1.16
+
+    - name: git config
+      run: |
+        git config --global user.name "Monumenta CI"
+        git config --global user.email "Monumenta.CI@NotARealEmail.com"
+
+    - name: Cache maven dependencies
+      uses: actions/cache@v2
+      env:
+        cache-name: cache-maven-dependencies
+      with:
+        # maven files are stored in `~/.m2/repository`
+        path: ~/.m2/repository
+        # Create the key based on runner os, cache name, and a hash of all the pom.xml files
+        key: ${{ runner.os }}-build-v2-${{ env.cache-name }}-${{ hashFiles('**/pom.xml') }}
+
+    - name: Build Paper
+      run: |
+        if [[ ! -d ~/.m2/repository/com/destroystokyo/paper ]]; then
+          git clone https://github.com/TeamMonumenta/Paper.git
+          cd Paper
+          git checkout 1.16
+          ./paper jar
+        fi
+
+  style:
+    name: Checkstyle and PMD
+    needs: deps
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v1
@@ -32,16 +67,7 @@ jobs:
         # Create the key based on runner os, cache name, and a hash of all the pom.xml files
         key: ${{ runner.os }}-build-v2-${{ env.cache-name }}-${{ hashFiles('**/pom.xml') }}
 
-    - name: Build Paper
-      run: |
-        if [[ ! -d ~/.m2/repository/com/destroystokyo/paper ]]; then
-          git clone https://github.com/TeamMonumenta/Paper.git
-          cd Paper
-          git checkout 1.16
-          ./paper jar
-        fi
-
-    - name: Build and report style/pmd/warnings
+    - name: Build and report compile warnings
       working-directory: ./plugins
       env:
         REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -60,8 +86,77 @@ jobs:
 
         cd ..
         cat bungee/target/pmd.txt paper/target/pmd.txt | reviewdog -efm="%f:%l:	%m" -name="pmd" -reporter=github-pr-check
+
+  build:
+    name: Test Compilation
+    needs: deps
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v1
+    - name: Set up JDK 1.16
+      uses: actions/setup-java@v1
+      with:
+        java-version: 1.16
+
+    - uses: reviewdog/action-setup@v1
+      with:
+        reviewdog_version: latest
+
+    - name: git config
+      run: |
+        git config --global user.name "Monumenta CI"
+        git config --global user.email "Monumenta.CI@NotARealEmail.com"
+
+    - name: Cache maven dependencies
+      uses: actions/cache@v2
+      env:
+        cache-name: cache-maven-dependencies
+      with:
+        # maven files are stored in `~/.m2/repository`
+        path: ~/.m2/repository
+        # Create the key based on runner os, cache name, and a hash of all the pom.xml files
+        key: ${{ runner.os }}-build-v2-${{ env.cache-name }}-${{ hashFiles('**/pom.xml') }}
+
+    - name: Build and report compile warnings
+      working-directory: ./plugins
+      env:
+        REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        set -o pipefail
+
         ./compile-all.sh --batch-mode --no-snapshot-updates | tee compile.log
         cat compile.log | reviewdog -efm="%+C %.%#" -efm="%W[WARNING] %f:[%l,%c] %m" -name="compiler-warnings" -reporter=github-pr-check
+
+
+  checker:
+    name: Checker Framework
+    needs: deps
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v1
+    - name: Set up JDK 1.16
+      uses: actions/setup-java@v1
+      with:
+        java-version: 1.16
+
+    - uses: reviewdog/action-setup@v1
+      with:
+        reviewdog_version: latest
+
+    - name: git config
+      run: |
+        git config --global user.name "Monumenta CI"
+        git config --global user.email "Monumenta.CI@NotARealEmail.com"
+
+    - name: Cache maven dependencies
+      uses: actions/cache@v2
+      env:
+        cache-name: cache-maven-dependencies
+      with:
+        # maven files are stored in `~/.m2/repository`
+        path: ~/.m2/repository
+        # Create the key based on runner os, cache name, and a hash of all the pom.xml files
+        key: ${{ runner.os }}-build-v2-${{ env.cache-name }}-${{ hashFiles('**/pom.xml') }}
 
     - name: Checker framework warnings
       working-directory: ./plugins
