@@ -13,6 +13,7 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
 
@@ -20,11 +21,13 @@ public class PumpkinPieOverride extends BaseOverride {
 	@Override
 	public boolean rightClickEntityInteraction(Plugin plugin, Player player, Entity clickedEntity, ItemStack item) {
 		if (player == null
-			|| clickedEntity == null
-			|| !(clickedEntity instanceof Creeper)
-			|| !InventoryUtils.testForItemWithName(item, "Creeper's Delight")
-			|| clickedEntity.getScoreboardTags() == null
-			|| clickedEntity.getScoreboardTags().contains("boss_halloween_creeper")) {
+				|| clickedEntity == null
+				|| !(clickedEntity instanceof Creeper)
+				|| !InventoryUtils.testForItemWithName(item, "Creeper's Delight")
+				|| "plots".equals(ServerProperties.getShardName())
+				|| "playerplots".equals(ServerProperties.getShardName())
+				|| clickedEntity.getScoreboardTags() == null
+				|| clickedEntity.getScoreboardTags().contains("boss_halloween_creeper")) {
 			return true;
 		}
 
