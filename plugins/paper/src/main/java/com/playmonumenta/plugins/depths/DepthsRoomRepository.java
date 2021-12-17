@@ -369,7 +369,12 @@ public class DepthsRoomRepository {
 
 		Plugin.getInstance().getLogger().info("Summoning structure " + room.mLoadPath);
 		// Start loading and don't wait for completion
-		StructuresAPI.loadAndPasteStructure(room.mLoadPath, spawn, true);
+		StructuresAPI.loadAndPasteStructure(room.mLoadPath, spawn, true).whenComplete((unused, err) -> {
+			if (err != null) {
+				Plugin.getInstance().getLogger().severe("Failed to load '" + room.mLoadPath + "': " + err.getMessage());
+				err.printStackTrace();
+			}
+		});
 		return room;
 	}
 
@@ -490,10 +495,20 @@ public class DepthsRoomRepository {
 		int nextFloorNum = party.getFloor() + 1;
 		if (nextFloorNum > CUSTOM_FLOOR_LOBBIES) {
 			// Start loading and don't wait for completion
-			StructuresAPI.loadAndPasteStructure("depths/f11lobby", loc, false);
+			StructuresAPI.loadAndPasteStructure("depths/f11lobby", loc, false).whenComplete((unused, err) -> {
+				if (err != null) {
+					Plugin.getInstance().getLogger().severe("Failed to load 'depths/f11lobby': " + err.getMessage());
+					err.printStackTrace();
+				}
+			});
 		} else {
 			// Start loading and don't wait for completion
-			StructuresAPI.loadAndPasteStructure("depths/f" + nextFloorNum + "lobby", loc, false);
+			StructuresAPI.loadAndPasteStructure("depths/f" + nextFloorNum + "lobby", loc, false).whenComplete((unused, err) -> {
+				if (err != null) {
+					Plugin.getInstance().getLogger().severe("Failed to load 'depths/f" + nextFloorNum + "lobby': " + err.getMessage());
+					err.printStackTrace();
+				}
+			});
 		}
 
 		//Tp all the players to it
