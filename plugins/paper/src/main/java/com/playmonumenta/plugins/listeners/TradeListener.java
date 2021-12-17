@@ -110,7 +110,7 @@ public class TradeListener implements Listener {
 					}
 					List<String> playerItemLore = playerItem.getLore();
 					// Check that the playerItem has the same base item as the trade's source:
-					// - same type
+					// - same type (and for shulker boxes, ignore color)
 					// - same name
 					// - same vanilla enchantments
 					// - a superset of lore lines, i.e. all base item lore lines plus optionally some more.
@@ -118,10 +118,10 @@ public class TradeListener implements Listener {
 					//   (ignoring order, but this should not be an issue as the type + name check make stat checks superfluous)
 					// The enchantment and lore checks are just a failsafe, as type + name should be enough to specify a tiered item in general.
 					if (playerItemLore == null
-						|| !Objects.equals(source.getType(), playerItem.getType())
-						|| !Objects.equals(source.getItemMeta().displayName(), playerItem.getItemMeta().displayName())
-						|| !Objects.equals(source.getEnchantments(), playerItem.getEnchantments())
-						|| !removeIgnoredLoreLines(playerItemLore).containsAll(removeIgnoredLoreLines(sourceLore))) {
+							|| !(source.getType() == playerItem.getType() || ItemUtils.isShulkerBox(source.getType()) && ItemUtils.isShulkerBox(playerItem.getType()))
+							|| !Objects.equals(source.getItemMeta().displayName(), playerItem.getItemMeta().displayName())
+							|| !Objects.equals(source.getEnchantments(), playerItem.getEnchantments())
+							|| !removeIgnoredLoreLines(playerItemLore).containsAll(removeIgnoredLoreLines(sourceLore))) {
 						continue;
 					}
 
