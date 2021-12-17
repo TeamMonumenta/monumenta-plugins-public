@@ -93,7 +93,9 @@ public class PlotBorderCustomInventory extends CustomInventory {
 
 
 		BORDER_ITEMS.add(new TeleportEntry(1, 20, "Narsen Village", "A small town of Narsen citizens, bearing some resemblance to the old plots world.", Material.LIGHT_BLUE_CONCRETE, null, 0, "narsen_village"));
-		BORDER_ITEMS.add(new TeleportEntry(1, 24, "King's Valley Jungle", "A plot nestled in the jungles of the King's Valley.", Material.GREEN_CONCRETE, null, 0, "kings_valley_jungle"));
+		BORDER_ITEMS.add(new TeleportEntry(1, 21, "King's Valley Jungle", "A plot nestled in the jungles of the King's Valley.", Material.GREEN_CONCRETE, null, 0, "kings_valley_jungle"));
+		BORDER_ITEMS.add(new TeleportEntry(1, 23, "Flat Grass Field", "A flat and boring field of grass.", Material.GRASS_BLOCK, null, 0, "flatgrass"));
+		BORDER_ITEMS.add(new TeleportEntry(1, 24, "Void", "Nothing to see here.", Material.BLACK_STAINED_GLASS, null, 0, "void"));
 
 
 		BORDER_ITEMS.add(new TeleportEntry(2, 20, "Celsian Isles: Chillwind", "Located in the frosty forests of Chillwind.", Material.SNOW_BLOCK, "Quest101", 13, "celsian_isles_chillwind"));
@@ -102,11 +104,15 @@ public class PlotBorderCustomInventory extends CustomInventory {
 		BORDER_ITEMS.add(new TeleportEntry(2, 23, "Eldrask's Arena", "Located in the Eldrask arena.", Material.PACKED_ICE, "FGWins", 1, "eldrask_arena"));
 		BORDER_ITEMS.add(new TeleportEntry(2, 24, "Hekawt's Arena", "Located in the Hekawt arena.", Material.RED_SANDSTONE, "LichWins", 1, "hekawt_arena"));
 
-
-		BORDER_ITEMS.add(new TeleportEntry(3, 19, "Celsian Isles Ocean", "A plot drowned beneath the waters of the Celsian Isles.", Material.BUBBLE_CORAL, "Quest101", 13, "celsian_isles_ocean"));
-		BORDER_ITEMS.add(new TeleportEntry(3, 21, "Salazar's Folly", "Located right in the middle of the Viridian City.", Material.LIME_WOOL, "Lime", 1, "dungeons/lime"));
-		BORDER_ITEMS.add(new TeleportEntry(3, 23, "Grasp of Avarice", "A plot found at the end of the orange branch of the dungeon.", Material.PURPLE_WOOL, "Purple", 1, "dungeons/purple"));
-		BORDER_ITEMS.add(new TeleportEntry(3, 25, "Echoes of Oblivion", "Warp to another time with this plot located in Era 3!", Material.CYAN_CONCRETE_POWDER, "Teal", 1, "dungeons/teal"));
+		BORDER_ITEMS.add(new TeleportEntry(3, 18, "Halls of Wind and Blood", "A plot right in the middle of the main room.", Material.WHITE_WOOL, "White", 1, "dungeons/white"));
+		BORDER_ITEMS.add(new TeleportEntry(3, 19, "Arcane Rivalry", "Located in the lake looking in towards the first castle.", Material.LIGHT_BLUE_WOOL, "LightBlue", 1, "dungeons/lightblue"));
+		BORDER_ITEMS.add(new TeleportEntry(3, 20, "Malevolent Reverie", "The best destination for corrupted nightmares of Sierhaven!", Material.NETHER_WART_BLOCK, "Corrupted", 1, "dungeons/reverie"));
+		BORDER_ITEMS.add(new TeleportEntry(3, 21, "Celsian Isles Ocean", "A plot drowned beneath the waters of the Celsian Isles.", Material.BUBBLE_CORAL, "Quest101", 13, "celsian_isles_ocean"));
+		BORDER_ITEMS.add(new TeleportEntry(3, 22, "Snow Wool Spirit's Arena", "A festive snowglobe.", Material.WHITE_STAINED_GLASS, "Quest58", 8, "snow_spirit_arena"));
+		BORDER_ITEMS.add(new TeleportEntry(3, 23, "Salazar's Folly", "Located right in the middle of the Viridian City.", Material.LIME_WOOL, "Lime", 1, "dungeons/lime"));
+		BORDER_ITEMS.add(new TeleportEntry(3, 24, "Valley of Forgotten Pharaohs", "A plot in the hostile town within the gray dungeon.", Material.GRAY_WOOL, "Gray", 1, "dungeons/gray"));
+		BORDER_ITEMS.add(new TeleportEntry(3, 25, "Grasp of Avarice", "A plot found at the end of the orange branch of the dungeon.", Material.PURPLE_WOOL, "Purple", 1, "dungeons/purple"));
+		BORDER_ITEMS.add(new TeleportEntry(3, 26, "Echoes of Oblivion", "Warp to another time with this plot located in Era 3!", Material.CYAN_CONCRETE_POWDER, "Teal", 1, "dungeons/teal"));
 	}
 
 	private int mCurrentPage = 0;
