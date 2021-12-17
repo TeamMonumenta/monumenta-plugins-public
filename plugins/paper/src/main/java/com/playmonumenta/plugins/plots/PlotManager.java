@@ -176,7 +176,11 @@ public class PlotManager {
 							sender.sendMessage(ChatColor.RED + "Only the owner of this plot can change its border");
 							player.sendMessage(ChatColor.RED + "Only the owner of this plot can change its border");
 						} else {
-							new PlotBorderCustomInventory(player, false).openInventory(player, Plugin.getInstance());
+							if (player.hasPermission("monumenta.plotborderoverride")) {
+								new PlotBorderCustomInventory(player, true).openInventory(player, Plugin.getInstance());
+							} else {
+								new PlotBorderCustomInventory(player, false).openInventory(player, Plugin.getInstance());
+							}
 						}
 					}
 				})))
