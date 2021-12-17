@@ -830,10 +830,12 @@ public class BossManager implements Listener {
 	public void playerDeathEvent(PlayerDeathEvent event) {
 		Player player = event.getEntity();
 		if (player.hasMetadata(WinterSnowmanEventBoss.deathMetakey)) {
+			Entity snowman = Bukkit.getEntity(UUID.fromString(player.getMetadata(WinterSnowmanEventBoss.deathMetakey).get(0).asString()));
+			Component snowmanName = snowman != null ? snowman.customName() : null;
 			Component deathMessage = Component.text("")
-				.append(Component.selector(player.getName()))
-				.append(Component.text(" was snowballed by "))
-				.append(Component.selector(player.getMetadata(WinterSnowmanEventBoss.deathMetakey).get(0).asString()));
+					.append(Component.selector(player.getName()))
+					.append(Component.text(" was snowballed by "))
+					.append(snowmanName != null ? snowmanName : Component.text("a snowman"));
 			event.deathMessage(deathMessage);
 			player.removeMetadata(WinterSnowmanEventBoss.deathMetakey, mPlugin);
 		}
