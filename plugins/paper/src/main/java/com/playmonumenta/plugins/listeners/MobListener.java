@@ -49,7 +49,6 @@ import com.destroystokyo.paper.event.entity.EntityZapEvent;
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityManager;
-import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
@@ -318,26 +317,30 @@ public class MobListener implements Listener {
 				}
 			}
 		}
-		//If the item has meta, run through the lore to check if it has quest item in the lore list
-		ListIterator<ItemStack> iter = event.getDrops().listIterator();
-		while (iter.hasNext()) {
-			ItemStack item = iter.next();
-			if (item == null) {
-				continue;
-			}
-			List<String> lore = ItemUtils.getPlainLore(item);
-			if (lore != null && !lore.isEmpty()) {
-				for (String loreEntry : lore) {
-					if (loreEntry.contains("Quest Item")) {
-						//Scales based off player count in a 20 meter radius, drops at least one quest item
-						int count = PlayerUtils.playersInRange(livingEntity.getLocation(), 20, true).size();
-						if (count < 1) {
-							count = 1;
+
+		// If the item has meta, run through the lore to check if it has quest item in the lore list
+		// Don't do this for armor stands to prevent item duplication
+		if (!(livingEntity instanceof ArmorStand)) {
+			ListIterator<ItemStack> iter = event.getDrops().listIterator();
+			while (iter.hasNext()) {
+				ItemStack item = iter.next();
+				if (item == null) {
+					continue;
+				}
+				List<String> lore = ItemUtils.getPlainLore(item);
+				if (lore != null && !lore.isEmpty()) {
+					for (String loreEntry : lore) {
+						if (loreEntry.contains("Quest Item")) {
+							//Scales based off player count in a 20 meter radius, drops at least one quest item
+							int count = PlayerUtils.playersInRange(livingEntity.getLocation(), 20, true).size();
+							if (count < 1) {
+								count = 1;
+							}
+							if (count > item.getAmount()) {
+								item.setAmount(count);
+							}
+							return;
 						}
-						if (count > item.getAmount()) {
-							item.setAmount(count);
-						}
-						return;
 					}
 				}
 			}
