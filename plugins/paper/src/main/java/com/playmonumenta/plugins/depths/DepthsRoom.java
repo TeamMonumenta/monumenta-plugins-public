@@ -1,6 +1,5 @@
 package com.playmonumenta.plugins.depths;
 
-import org.bukkit.Location;
 import org.bukkit.util.Vector;
 
 public class DepthsRoom {
@@ -14,11 +13,11 @@ public class DepthsRoom {
 	//Which way the door goes for the room, to make sure players don't go off into the void
 	public RoomDirection mDirection;
 
-	public DepthsRoom(String path, DepthsRoomType type, Vector size, Location entry, int spawnerCount, RoomDirection direction) {
+	public DepthsRoom(String path, DepthsRoomType type, Vector size, Vector entry, int spawnerCount, RoomDirection direction) {
 		mLoadPath = path;
 		mRoomType = type;
 		mSize = size;
-		mEntry = new Vector(entry.getX(), entry.getY(), entry.getZ());
+		mEntry = entry;
 		mSpawnerCount = spawnerCount;
 		mDirection = direction;
 	}
