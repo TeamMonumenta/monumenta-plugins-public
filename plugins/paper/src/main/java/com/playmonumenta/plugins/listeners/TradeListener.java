@@ -101,11 +101,11 @@ public class TradeListener implements Listener {
 				List<ItemStack> createdTrades = new ArrayList<>();
 
 				// Current trade is a re-skin trade, check if the player has matching source items and add new trades if so
-				for (ItemStack playerItem : player.getInventory().getStorageContents()) {
+				for (ItemStack playerItem : player.getInventory().getContents()) {
 					// Skip over empty slots, and skip over items that already match an existing trade exactly
 					if (playerItem == null
-						|| playerItem.isSimilar(source)
-						|| createdTrades.stream().anyMatch(t -> t.isSimilar(playerItem))) {
+							|| playerItem.isSimilar(source)
+							|| createdTrades.stream().anyMatch(t -> t.isSimilar(playerItem))) {
 						continue;
 					}
 					List<String> playerItemLore = playerItem.getLore();
