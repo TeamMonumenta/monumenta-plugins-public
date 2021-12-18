@@ -2,6 +2,8 @@ package com.playmonumenta.plugins.utils;
 
 import java.lang.reflect.Field;
 
+import org.bukkit.World;
+import org.bukkit.craftbukkit.v1_16_R3.CraftWorld;
 import org.bukkit.craftbukkit.v1_16_R3.entity.CraftEntity;
 import org.bukkit.craftbukkit.v1_16_R3.entity.CraftHumanEntity;
 import org.bukkit.craftbukkit.v1_16_R3.entity.CraftLivingEntity;
@@ -117,6 +119,14 @@ public class NmsUtils {
 		((CraftEntity) newEntity).getHandle().load(nbttagcompound);
 
 		return newEntity;
+	}
+
+	/**
+	 * Gets an entity by its {@link org.bukkit.entity.Entity#getEntityId() id} (i.e. not by its {@link org.bukkit.entity.Entity#getUniqueId() UUID).
+	 */
+	public static org.bukkit.entity.@Nullable Entity getEntityById(World world, int entityId) {
+		net.minecraft.server.v1_16_R3.Entity entity = ((CraftWorld) world).getHandle().getEntity(entityId);
+		return entity == null ? null : entity.getBukkitEntity();
 	}
 
 	private static final Field attackCooldownField = getAttackCooldownField();
