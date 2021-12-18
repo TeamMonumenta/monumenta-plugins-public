@@ -170,13 +170,6 @@ public class Inferno implements BaseEnchantment {
 
 		sPendingTagMobs.put(target, new InfernoMob(player, level, fireAspectLevel));
 		// Analog to potion effects, only track duration of highest level inferno
-		if (target.getFireTicks() > 0) {
-			// Fire aspect applies fire ticks after onDamage and will set the fireticks to the right amount with this change.
-			// Due to ordering this differs for projectiles, which have to be managed manually in onShootAttack()
-			if (type.equals("melee") || type.equals("magichigh")) {
-				target.setFireTicks(1);
-			}
-		}
 
 		/* Make sure the ticking task is running that periodically validates that a mob is still alive and burning */
 		if (sRunnable == null) {
