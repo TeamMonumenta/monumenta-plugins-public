@@ -16,7 +16,6 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.depths.DepthsRoom.RoomDirection;
 import com.playmonumenta.scriptedquests.Plugin;
-import com.playmonumenta.structures.StructuresAPI;
 
 /**
  * @author ShadowVisions
@@ -239,13 +238,7 @@ public class DepthsRoomRepository {
 		}
 
 		Plugin.getInstance().getLogger().info("Summoning structure " + room.mLoadPath);
-		// Start loading and don't wait for completion
-		StructuresAPI.loadAndPasteStructure(room.mLoadPath, spawn, true).whenComplete((unused, err) -> {
-			if (err != null) {
-				Plugin.getInstance().getLogger().severe("Failed to load '" + room.mLoadPath + "': " + err.getMessage());
-				err.printStackTrace();
-			}
-		});
+		Bukkit.getServer().dispatchCommand(Bukkit.getServer().getConsoleSender(), "loadstructure \"" + room.mLoadPath + "\" " + spawn.getX() + " " + spawn.getY() + " " + spawn.getZ() + " true");
 		return room;
 	}
 
@@ -365,21 +358,9 @@ public class DepthsRoomRepository {
 		//Separate rooms by floor here
 		int nextFloorNum = party.getFloor() + 1;
 		if (nextFloorNum > CUSTOM_FLOOR_LOBBIES) {
-			// Start loading and don't wait for completion
-			StructuresAPI.loadAndPasteStructure("depths/f11lobby", loc, false).whenComplete((unused, err) -> {
-				if (err != null) {
-					Plugin.getInstance().getLogger().severe("Failed to load 'depths/f11lobby': " + err.getMessage());
-					err.printStackTrace();
-				}
-			});
+			Bukkit.getServer().dispatchCommand(Bukkit.getServer().getConsoleSender(), "loadstructure \"depths/f11lobby\" " + loc.getX() + " " + loc.getY() + " " + loc.getZ() + " false");
 		} else {
-			// Start loading and don't wait for completion
-			StructuresAPI.loadAndPasteStructure("depths/f" + nextFloorNum + "lobby", loc, false).whenComplete((unused, err) -> {
-				if (err != null) {
-					Plugin.getInstance().getLogger().severe("Failed to load 'depths/f" + nextFloorNum + "lobby': " + err.getMessage());
-					err.printStackTrace();
-				}
-			});
+			Bukkit.getServer().dispatchCommand(Bukkit.getServer().getConsoleSender(), "loadstructure \"depths/f" + nextFloorNum + "lobby\" " + loc.getX() + " " + loc.getY() + " " + loc.getZ() + " false");
 		}
 
 		//Tp all the players to it
