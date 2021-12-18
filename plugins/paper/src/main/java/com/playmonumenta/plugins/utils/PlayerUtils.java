@@ -120,18 +120,15 @@ public class PlayerUtils {
 	}
 
 	/* Command should use @s for targeting selector */
-	private static String getExecuteCommandOnNearbyPlayers(Location loc, int radius, String command) {
-		String executeCmd = "execute in " + loc.getWorld().getName() +
-		                    " as @a[x=" + (int)loc.getX() +
-		                    ",y=" + (int)loc.getY() +
-		                    ",z=" + (int)loc.getZ() +
-		                    ",distance=.." + radius + "] at @s run ";
-		return executeCmd + command;
-	}
-
 	public static void executeCommandOnNearbyPlayers(Location loc, int radius, String command) {
-		Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(),
-		                                   getExecuteCommandOnNearbyPlayers(loc, radius, command));
+		for (Player player : loc.getNearbyPlayers(radius)) {
+			// getNearbyPlayers returns players in a cube, not a sphere, so we need this additional check
+			if (loc.distanceSquared(player.getLocation()) > radius * radius) {
+				continue;
+			}
+			Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(),
+			                                   "execute as " + player.getUniqueId() + " at @s run " + command);
+		}
 	}
 
 	// How far back the player drew their bow,
