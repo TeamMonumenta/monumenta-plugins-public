@@ -543,7 +543,7 @@ public class PlayerListener implements Listener {
 
 			// Workaround for 1.17 clients not having proper inventory state after cancelling click events
 			// (when opening a new inventory after a click event is canceled, a "ghost" item is on the cursor)
-			player.updateInventory();
+			Bukkit.getScheduler().runTaskLater(mPlugin, player::updateInventory, 1);
 		}
 	}
 
