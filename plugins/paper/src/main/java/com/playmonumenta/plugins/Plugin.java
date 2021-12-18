@@ -58,6 +58,7 @@ import com.playmonumenta.plugins.commands.RefreshClass;
 import com.playmonumenta.plugins.commands.RemoveTags;
 import com.playmonumenta.plugins.commands.RestartEmptyCommand;
 import com.playmonumenta.plugins.commands.RunRegion;
+import com.playmonumenta.plugins.commands.SetViewDistance;
 import com.playmonumenta.plugins.commands.ShatterHeldItem;
 import com.playmonumenta.plugins.commands.SkillDescription;
 import com.playmonumenta.plugins.commands.SkillSummary;
@@ -235,6 +236,7 @@ public class Plugin extends JavaPlugin {
 		OpenDelveModifierSelectionGUI.register();
 		GetDepthPoints.register();
 		Magnetize.register();
+		SetViewDistance.register();
 		UnsignBook.register();
 		GetScoreCommand.register(this);
 		Grave.register();
