@@ -6,6 +6,18 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.cleric.NonClericProvisionsPassive;
+import com.playmonumenta.plugins.depths.abilities.dawnbringer.LightningBottle;
+import com.playmonumenta.plugins.enchantments.InstantDrink;
+import com.playmonumenta.plugins.enchantments.curses.Starvation;
+import com.playmonumenta.plugins.integrations.CoreProtectIntegration;
+import com.playmonumenta.plugins.potion.PotionManager.PotionID;
+import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.PotionUtils;
+
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
@@ -32,18 +44,7 @@ import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
-
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.cleric.NonClericProvisionsPassive;
-import com.playmonumenta.plugins.depths.abilities.dawnbringer.LightningBottle;
-import com.playmonumenta.plugins.enchantments.InstantDrink;
-import com.playmonumenta.plugins.enchantments.curses.Starvation;
-import com.playmonumenta.plugins.integrations.CoreProtectIntegration;
-import com.playmonumenta.plugins.potion.PotionManager.PotionID;
-import com.playmonumenta.plugins.utils.FastUtils;
-import com.playmonumenta.plugins.utils.InventoryUtils;
-import com.playmonumenta.plugins.utils.ItemUtils;
-import com.playmonumenta.plugins.utils.PotionUtils;
+import org.bukkit.scheduler.BukkitTask;
 
 public class PotionConsumeListener implements Listener {
 	private static final int DRINK_TICK_DELAY = 4; //How many ticks between each slurp sound
@@ -51,10 +52,13 @@ public class PotionConsumeListener implements Listener {
 	private static final String INVENTORY_DRINK_TAG = "InventoryDrinkTag"; //Tag to enable this feature (drink from inventory right click)
 
 	private final Plugin mPlugin;
+	/* Note that this map only contains non-cancelled tasks. Everywhere these runnables are cancelled they should be removed from this map */
 	private final Map<UUID, BukkitRunnable> mRunnables = new HashMap<UUID, BukkitRunnable>();
+	/* This will only contain an item if currently consuming a potion, cleared after complete */
 	private Map<UUID, ItemStack> mPotionsConsumed = new HashMap<UUID, ItemStack>();
 
-	private Map<UUID, BukkitRunnable> mCooldowns = new HashMap<UUID, BukkitRunnable>();
+	/* Note that this map only contains non-cancelled tasks. Everywhere these runnables are cancelled they should be removed from this map */
+	private Map<UUID, BukkitTask> mCooldowns = new HashMap<>();
 
 	public PotionConsumeListener(Plugin plugin) {
 		mPlugin = plugin;
@@ -99,7 +103,6 @@ public class PotionConsumeListener implements Listener {
 		    item.getType().equals(Material.GLASS_BOTTLE) &&
 		    !item.hasItemMeta() &&
 		    runnable != null &&
-		    !runnable.isCancelled() &&
 		    prevPotion != null &&
 		    !prevPotion.containsEnchantment(Enchantment.ARROW_INFINITE)) {
 
@@ -112,9 +115,10 @@ public class PotionConsumeListener implements Listener {
 				prevPotion.setAmount(1);
 				event.getClickedInventory().addItem(prevPotion);
 			}
-			mPotionsConsumed.put(player.getUniqueId(), null);
+			mPotionsConsumed.remove(player.getUniqueId());
 			mCooldowns.remove(player.getUniqueId());
 			runnable.cancel();
+			mRunnables.remove(player.getUniqueId());
 			event.setCancelled(true);
 			return;
 
@@ -123,7 +127,7 @@ public class PotionConsumeListener implements Listener {
 		           !event.getAction().equals(InventoryAction.PICKUP_HALF) ||
 		           event.getCurrentItem().getType().equals(Material.GLASS_BOTTLE) ||
 		           !tags.contains(INVENTORY_DRINK_TAG) ||
-		           runnable != null && !runnable.isCancelled()) {
+		           runnable != null) {
 
 			//Return time
 			return;
@@ -186,7 +190,7 @@ public class PotionConsumeListener implements Listener {
 				@Override
 				public void run() {
 					//If time to drink is finished, add effects. Otherwise, play sound of slurping every 0.5 seconds for 3.5 seconds total
-					if (mTicks >= DRINK_DURATION && !this.isCancelled()) {
+					if (mTicks >= DRINK_DURATION) {
 						PotionUtils.applyPotion(mPlugin, player, meta);
 
 						//Apply Starvation if applicable
@@ -197,14 +201,13 @@ public class PotionConsumeListener implements Listener {
 
 						//If Sacred Provisions check passes, do not consume, but do not enable cancel quick drink function
 						//Do not run addition on infinity potions
-						if (mPotionsConsumed.get(player.getUniqueId()) != null &&
-							!mPotionsConsumed.get(player.getUniqueId()).containsEnchantment(Enchantment.ARROW_INFINITE) &&
+						ItemStack potion = mPotionsConsumed.remove(player.getUniqueId());
+						if (potion != null && !potion.containsEnchantment(Enchantment.ARROW_INFINITE) &&
 							NonClericProvisionsPassive.testRandomChance(player)) {
 							NonClericProvisionsPassive.sacredProvisionsSound(player);
 
 							Inventory inv = event.getClickedInventory();
 							int slot = event.getSlot();
-							ItemStack potion = mPotionsConsumed.get(player.getUniqueId());
 							ItemStack invItem = inv.getItem(slot);
 							if (invItem == null || invItem.getType().isAir() || invItem.getType().equals(Material.GLASS_BOTTLE)) {
 								inv.setItem(slot, potion);
@@ -222,6 +225,7 @@ public class PotionConsumeListener implements Listener {
 						}
 
 						this.cancel();
+						mRunnables.remove(player.getUniqueId());
 					}
 					float pitch = ((float)FastUtils.RANDOM.nextDouble() - 0.5f) * 0.05f; //Emulate drinking variation of pitch
 					player.getWorld().playSound(player.getLocation(), Sound.ENTITY_GENERIC_DRINK, 1.0f, 1.0f + pitch);
@@ -335,26 +339,22 @@ public class PotionConsumeListener implements Listener {
 
 	//Set cooldown to prevent spam
 	private void setPotionCooldown(Player player) {
-		BukkitRunnable runnable = mCooldowns.remove(player.getUniqueId());
+		BukkitTask runnable = mCooldowns.remove(player.getUniqueId());
 		if (runnable != null) {
 			runnable.cancel();
 		}
-		runnable = new BukkitRunnable() {
-			@Override
-			public void run() {
-				//Don't need to put anything here - method checks if BukkitRunnable is active
-				mCooldowns.remove(player.getUniqueId());
-				this.cancel();
-			}
-		};
-		runnable.runTaskLater(mPlugin, 20 * 5);
-		mCooldowns.put(player.getUniqueId(), runnable);
+
+		UUID playerUUID = player.getUniqueId();
+		mCooldowns.put(playerUUID, Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
+			//Don't need to put anything here - method checks if BukkitRunnable is active
+			mCooldowns.remove(playerUUID);
+		}, 20 * 5));
 	}
 
 	//Returns true if potion cooldown is up right now
 	//False if no cooldowns and the quick drink is activatable now
 	private boolean checkPotionCooldown(HumanEntity player) {
-		return mCooldowns.containsKey(player.getUniqueId()) && !mCooldowns.get(player.getUniqueId()).isCancelled();
+		return mCooldowns.containsKey(player.getUniqueId());
 	}
 
 	private boolean isCooldownApplicable(List<PotionEffect> effects) {

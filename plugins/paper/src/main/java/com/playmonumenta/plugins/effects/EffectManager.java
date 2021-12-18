@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.NavigableSet;
 import java.util.TreeSet;
 
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
@@ -18,6 +19,7 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityRegainHealthEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.projectiles.ProjectileSource;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -493,4 +495,17 @@ public final class EffectManager implements Listener {
 		return true;
 	}
 
+	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+	public void playerQuitEvent(PlayerQuitEvent event) {
+		// 1s after the player leaves, remove them from the map to avoid leaking memory
+		// If the player happens to log back in immediately, still remove them - they will get a new entity object which will be tracked again
+		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
+			// NOTE: If the Entity map is ever changed to key'd by Entity UUID, this will need a guard to check that the player didn't log back in
+			mEntities.remove(event.getPlayer());
+		}, 20);
+
+		// TODO: There is nothing that actually stores the player's effects before they log out.
+		// The above code is NOT the reason that a player can log out and back in to clear their effects
+		// Fixing this will require serializing the Effects to plugindata, then restoring them on player join
+	}
 }

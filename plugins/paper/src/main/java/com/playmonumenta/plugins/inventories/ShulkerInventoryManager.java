@@ -284,8 +284,8 @@ public class ShulkerInventoryManager {
 	 * @return True if the player had a valid open Shulker Box
 	 */
 	private boolean closeShulker(UUID uuid, boolean instant) {
-		if (mInventories.containsKey(uuid)) {
-			ShulkerInventory inv = mInventories.remove(uuid);
+		ShulkerInventory inv = mInventories.remove(uuid);
+		if (inv != null) {
 			return inv.closeShulker(instant);
 		}
 		return false;

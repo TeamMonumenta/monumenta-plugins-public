@@ -295,11 +295,7 @@ public class ShulkerShortcutListener implements Listener {
 
 	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	public void playerQuitEvent(PlayerQuitEvent event) {
-		mPlugin.mShulkerInventoryManager.closeShulker(event.getPlayer(), true);
-	}
-
-	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
-	public void playerKickEvent(PlayerKickEvent event) {
+		mPlugin.mShulkerInventoryManager.closeDepositShulker(event.getPlayer());
 		mPlugin.mShulkerInventoryManager.closeShulker(event.getPlayer(), true);
 	}
 

@@ -6,6 +6,14 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.UUID;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.redissync.MonumentaRedisSyncAPI;
+import com.playmonumenta.redissync.event.PlayerSaveEvent;
+
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
@@ -17,12 +25,6 @@ import org.bukkit.event.world.ChunkUnloadEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.checkerframework.checker.nullness.qual.Nullable;
-
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.playmonumenta.redissync.MonumentaRedisSyncAPI;
-import com.playmonumenta.redissync.event.PlayerSaveEvent;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -94,6 +96,16 @@ public class GraveManager {
 			}
 
 			manager.mLoggedOut = true;
+
+			/* If the player's INSTANCE map hasn't been cleared in 1s and they're still logged out, clear it
+			 * There's some memory leak here where sometimes players don't get removed from this map
+			 */
+			UUID playerUUID = player.getUniqueId();
+			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
+				if (Bukkit.getPlayer(playerUUID) == null) {
+					INSTANCES.remove(playerUUID);
+				}
+			}, 20);
 		}
 	}
 
