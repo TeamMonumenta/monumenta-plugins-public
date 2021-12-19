@@ -36,6 +36,8 @@ public class ZoneUtils {
 		NO_VEHICLES("No Vehicles"),
 		ADVENTURE_MODE("Adventure Mode"),
 		NO_EXPLOSIONS("No Explosions"),
+		WINTER_SNOWBALLS_ONLY("Winter Snowballs Only"),
+		NO_POTIONS("No Potions"),
 		RESTRICTED("Restricted");
 
 		private final String mPropertyName;

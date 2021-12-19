@@ -1,15 +1,22 @@
 package com.playmonumenta.plugins.listeners;
 
+import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.ZoneUtils;
+import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
+import com.playmonumenta.scriptedquests.zones.ZonePropertyChangeEvent;
+
 import org.bukkit.GameMode;
 import org.bukkit.Material;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Snowball;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockFromToEvent;
-
-import com.playmonumenta.plugins.utils.ZoneUtils;
-import com.playmonumenta.scriptedquests.zones.ZonePropertyChangeEvent;
+import org.bukkit.event.entity.ProjectileLaunchEvent;
+import org.bukkit.event.player.PlayerItemConsumeEvent;
 
 public class ZoneListener implements Listener {
 
@@ -36,6 +43,32 @@ public class ZoneListener implements Listener {
 			default:
 				// Do nothing
 			}
+		}
+	}
+
+	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+	public void projectileLaunchEvent(ProjectileLaunchEvent event) {
+		if (event.getEntity().getShooter() instanceof Player player) {
+			if (event.getEntityType() == EntityType.SNOWBALL && event.getEntity() instanceof Snowball snowball) {
+				// Only allow winter arena snowballs in the winter arena
+				if (ZoneUtils.hasZoneProperty(player, ZoneProperty.WINTER_SNOWBALLS_ONLY) && !InventoryUtils.testForItemWithLore(snowball.getItem(), "An unusually dense snowball")) {
+					event.setCancelled(true);
+					return;
+				}
+			} else if (event.getEntityType() == EntityType.SPLASH_POTION) {
+				if (ZoneUtils.hasZoneProperty(player, ZoneProperty.NO_POTIONS)) {
+					event.setCancelled(true);
+					return;
+				}
+			}
+		}
+	}
+
+	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+	public void playerItemConsumeEvent(PlayerItemConsumeEvent event) {
+		if (ItemUtils.isSomePotion(event.getItem()) && ZoneUtils.hasZoneProperty(event.getPlayer(), ZoneProperty.NO_POTIONS)) {
+			event.setCancelled(true);
+			return;
 		}
 	}
 
