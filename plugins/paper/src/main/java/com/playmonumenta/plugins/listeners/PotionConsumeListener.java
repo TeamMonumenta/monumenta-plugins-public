@@ -17,6 +17,8 @@ import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
+import com.playmonumenta.plugins.utils.ZoneUtils;
+import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -82,6 +84,7 @@ public class PotionConsumeListener implements Listener {
 		    (event.getCursor() != null && !event.getCursor().getType().equals(Material.AIR)) ||
 		    event.getCurrentItem() == null ||
 		    ItemUtils.isItemShattered(event.getCurrentItem()) ||
+			ZoneUtils.hasZoneProperty(whoClicked, ZoneProperty.NO_POTIONS) ||
 		    !(event.getCurrentItem().getType().equals(Material.POTION) ||
 		      event.getCurrentItem().getType().equals(Material.GLASS_BOTTLE))
 		    ) {
