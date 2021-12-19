@@ -102,7 +102,7 @@ public class DepthsRoomRepository {
 		mF1EliteRooms.add(new DepthsRoom("depths/f1r38", DepthsRoomType.ABILITY, new Vector(60, 29, 36), new Vector(1.0, -8.0, -17.0), 17, RoomDirection.UP));
 		mF1EliteRooms.add(new DepthsRoom("depths/f1r40", DepthsRoomType.ABILITY, new Vector(30, 22, 71), new Vector(1.0, -2.0, -7.0), 23, RoomDirection.EVEN));
 		mF1EliteRooms.add(new DepthsRoom("depths/f1r43", DepthsRoomType.ABILITY, new Vector(44, 23, 40), new Vector(1.0, -1.0, -32.0), 19, RoomDirection.UP));
-		mF1EliteRooms.add(new DepthsRoom("depths/f1r43", DepthsRoomType.ABILITY, new Vector(34, 40, 36), new Vector(1.0, -23.0, -29.0), 26, RoomDirection.DOWN));
+		mF1EliteRooms.add(new DepthsRoom("depths/f1r44", DepthsRoomType.ABILITY, new Vector(34, 40, 36), new Vector(1.0, -23.0, -29.0), 26, RoomDirection.DOWN));
 
 		//F1 twisted rooms
 		mF1TwistedRooms.add(new DepthsRoom("depths/f1r41", DepthsRoomType.TWISTED, new Vector(51, 60, 70), new Vector(1.0, -3.0, -61.0), 50, RoomDirection.EVEN));
