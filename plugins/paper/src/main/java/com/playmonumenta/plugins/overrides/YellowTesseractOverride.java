@@ -13,6 +13,8 @@ import org.bukkit.Sound;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.inventory.ClickType;
+import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -60,6 +62,14 @@ public class YellowTesseractOverride extends BaseOverride {
 		return interaction(player, action, item);
 	}
 
+	@Override
+	public boolean inventoryClickInteraction(Plugin plugin, Player player, ItemStack item, InventoryClickEvent event) {
+		if (event.getClick() != ClickType.RIGHT) {
+			return true;
+		}
+		return interaction(player, Action.RIGHT_CLICK_AIR, item);
+	}
+
 	private boolean interaction(Player player, Action action, ItemStack item) {
 		if (player == null) {
 			return true;
@@ -98,8 +108,8 @@ public class YellowTesseractOverride extends BaseOverride {
 			}
 		} else if (player.isSneaking()
 			    && (action.equals(Action.LEFT_CLICK_AIR) || action.equals(Action.LEFT_CLICK_BLOCK))) {
-				//Reset Tesseract with shift + left click
-				resetTesseract(player, item);
+			//Reset Tesseract with shift + left click
+			resetTesseract(player, item);
 		} else if (InventoryUtils.isSoulboundToPlayer(item, player)) {
 			/* Active and soulbound to player */
 			if ((action.equals(Action.RIGHT_CLICK_AIR) || action.equals(Action.RIGHT_CLICK_BLOCK))) {
@@ -113,13 +123,13 @@ public class YellowTesseractOverride extends BaseOverride {
 				// If the CD hasn't hit 0, tell the player and exit.
 				if (cd != 0) {
 					player.sendMessage(Component.text("The Tesseract is on cooldown!", NamedTextColor.RED));
-					return true;
+					return false;
 				}
 				// If there's a mob in range and the player isn't in a safezone,
 				// tell the player and exit
 				if (EntityUtils.withinRangeOfMonster(player, MOB_RANGE) && !safeZone) {
 					player.sendMessage(Component.text("There are mobs nearby!", NamedTextColor.RED));
-					return true;
+					return false;
 				}
 				// If Right-Click and YellowCooldown = 0 and either no mobs in range or in safezone,
 				// we can change skills.
@@ -127,7 +137,7 @@ public class YellowTesseractOverride extends BaseOverride {
 			}
 		}
 
-		return true;
+		return false;
 	}
 
 	private void resetTesseract(Player player, ItemStack item) {

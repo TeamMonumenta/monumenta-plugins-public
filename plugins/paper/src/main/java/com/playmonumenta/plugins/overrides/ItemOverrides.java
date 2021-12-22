@@ -4,12 +4,6 @@ import java.util.EnumMap;
 import java.util.EnumSet;
 import java.util.Map;
 
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.server.properties.ServerProperties;
-import com.playmonumenta.plugins.utils.InventoryUtils;
-import com.playmonumenta.plugins.utils.ZoneUtils;
-import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
-
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -19,11 +13,19 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.inventory.ClickType;
+import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.event.player.PlayerRiptideEvent;
 import org.bukkit.inventory.ItemStack;
 import org.checkerframework.checker.nullness.qual.Nullable;
+
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.server.properties.ServerProperties;
+import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.utils.ZoneUtils;
+import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
 
 
 public final class ItemOverrides {
@@ -374,6 +376,20 @@ public final class ItemOverrides {
 		return (override == null) || override.rightClickEntityInteraction(plugin, player, clickedEntity, itemInHand);
 	}
 
+	public boolean inventoryClickInteraction(Plugin plugin, Player player, InventoryClickEvent event) {
+		ItemStack cursorItoem = event.getCursor();
+		if (event.getClick() != ClickType.RIGHT && event.getClick() != ClickType.LEFT
+			    || cursorItoem != null && cursorItoem.getType() != Material.AIR) {
+			return true;
+		}
+		ItemStack item = event.getCurrentItem();
+		if (item == null) {
+			return true;
+		}
+		BaseOverride override = mItems.get(item.getType());
+		return override == null || override.inventoryClickInteraction(plugin, player, item, event);
+	}
+
 	// Returns eventCancelled = true if disallowed, otherwise false
 	@SuppressWarnings({"unused"})
 	private boolean safezoneDisallowsBlockChange(Plugin plugin, Player player, Block block) {
@@ -382,7 +398,7 @@ public final class ItemOverrides {
 		// Prevent players from breaking blocks in safezones from outside of them
 		if (!eventCancelled && player.getGameMode() != GameMode.CREATIVE) {
 			if (ZoneUtils.hasZoneProperty(block.getLocation(), ZoneProperty.ADVENTURE_MODE) &&
-			    !ZoneUtils.hasZoneProperty(player.getLocation(), ZoneProperty.ADVENTURE_MODE)) {
+				    !ZoneUtils.hasZoneProperty(player.getLocation(), ZoneProperty.ADVENTURE_MODE)) {
 				// Allow breaking if the player would be in survival mode at that spot
 				if (!ZoneUtils.isInPlot(block.getLocation())) {
 					eventCancelled = true;

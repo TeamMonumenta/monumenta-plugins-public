@@ -457,27 +457,32 @@ public class PlayerListener implements Listener {
 	// If an inventory interaction happened.
 	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
 	public void inventoryClickEvent(InventoryClickEvent event) {
-		if (!(event.getWhoClicked() instanceof Player)) {
+		if (!(event.getWhoClicked() instanceof Player player)) {
 			return;
 		}
+
 		// If item contains curse of ephemerality, prevent from putting in other inventories
 		// Checks for player inventory unless it's a shift click
-
 		if (
 			// Prevent shift-clicking an ephemeral item from your inventory to something else
 			(
 				(event.getClick() == ClickType.SHIFT_LEFT || event.getClick() == ClickType.SHIFT_RIGHT)
-				&& event.getCurrentItem() != null
-				&& CurseOfEphemerality.isEphemeral(event.getCurrentItem())
-				&& event.getClickedInventory() instanceof PlayerInventory
+					&& event.getCurrentItem() != null
+					&& CurseOfEphemerality.isEphemeral(event.getCurrentItem())
+					&& event.getClickedInventory() instanceof PlayerInventory
 			)
-			// Prevent clicking an ephemeral item from your cursor down into something else
-			|| (
+				// Prevent clicking an ephemeral item from your cursor down into something else
+				|| (
 				event.getClick() != ClickType.SHIFT_LEFT
-				&& event.getClick() != ClickType.SHIFT_RIGHT
-				&& event.getCursor() != null
-			    && CurseOfEphemerality.isEphemeral(event.getCursor())
+					&& event.getClick() != ClickType.SHIFT_RIGHT
+					&& event.getCursor() != null
+					&& CurseOfEphemerality.isEphemeral(event.getCursor())
 			)) {
+			event.setCancelled(true);
+			return;
+		}
+
+		if (!mPlugin.mItemOverrides.inventoryClickInteraction(mPlugin, player, event)) {
 			event.setCancelled(true);
 		}
 	}
