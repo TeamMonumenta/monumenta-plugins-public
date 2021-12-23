@@ -219,7 +219,6 @@ public final class Lich extends BossAbilityGroup {
 		mDefeated = false;
 		mActivated = false;
 		mDead = false;
-		SpellDiesIrae.setActive(false);
 		new BukkitRunnable() {
 			int mT = 0;
 			int mColor = 0;
@@ -238,14 +237,16 @@ public final class Lich extends BossAbilityGroup {
 					}
 				}
 
-				//not getting hit for 5s tps to 4 locations
+				//not getting hit for 9s tps to 4 locations
 				//let boss stand on the high ground after ~~holy chest~~ dies irae
 				if (mGotHit) {
 					mT = 0;
 					mGotHit = false;
 				} else if (!mCutscene) {
 					mT += 5;
-					if (mT >= 20 * 9 && mBoss.getLocation().getY() <= mStart.getLocation().getY() + 3 && !SpellDiesIrae.getActive()) {
+					if (mT >= 20 * 9
+							&& mBoss.getLocation().getY() <= mStart.getLocation().getY() + 3
+							&& !hasRunningSpellOfType(SpellDiesIrae.class, SpellDesecrate.class, SpellDarkOmen.class, SpellSalientOfDecay.class)) {
 						mT = 0;
 						Collections.shuffle(mTp);
 						World world = mBoss.getWorld();
@@ -368,7 +369,7 @@ public final class Lich extends BossAbilityGroup {
 				new SpellPurgeNegatives(mBoss, 4 * 20),
 				new SpellShadowRealm(mStart.getLocation(), detectionRange),
 				new SpellEdgeKill(mBoss, mStart.getLocation()),
-				new SpellAutoAttack(mPlugin, mBoss, mStart.getLocation(), 20 * 4, detectionRange, mCeiling, 1));
+				new SpellAutoAttack(mPlugin, this, mBoss, mStart.getLocation(), 20 * 4, detectionRange, mCeiling, 1));
 
 		List<Spell> phase2PassiveSpells = Arrays.asList(
 				new SpellBossBlockBreak(mBoss, mStart.getLocation().getY(), 1, 3, 1, false, false),
@@ -377,8 +378,8 @@ public final class Lich extends BossAbilityGroup {
 				new SpellPurgeNegatives(mBoss, 3 * 20),
 				new SpellShadowRealm(mStart.getLocation(), detectionRange),
 				new SpellEdgeKill(mBoss, mStart.getLocation()),
-				new SpellAutoAttack(mPlugin, mBoss, mStart.getLocation(), 20 * 4, detectionRange, mCeiling, 2),
-				new SpellCrystalRespawn(mPlugin, mStart.getLocation(), detectionRange, mCrystalLoc, mShieldCrystal));
+				new SpellAutoAttack(mPlugin, this, mBoss, mStart.getLocation(), 20 * 4, detectionRange, mCeiling, 2),
+				new SpellCrystalRespawn(mPlugin, this, mStart.getLocation(), detectionRange, mCrystalLoc, mShieldCrystal));
 
 		List<Spell> phase3PassiveSpells = Arrays.asList(
 				new SpellHorseResist(mBoss, mStart.getLocation(), detectionRange),
@@ -388,8 +389,8 @@ public final class Lich extends BossAbilityGroup {
 				new SpellPurgeNegatives(mBoss, 2 * 20),
 				new SpellShadowRealm(mStart.getLocation(), detectionRange),
 				new SpellEdgeKill(mBoss, mStart.getLocation()),
-				new SpellAutoAttack(mPlugin, mBoss, mStart.getLocation(), 20 * 4, detectionRange, mCeiling, 3),
-				new SpellCrystalRespawn(mPlugin, mStart.getLocation(), detectionRange, mCrystalLoc, mShieldCrystal));
+				new SpellAutoAttack(mPlugin, this, mBoss, mStart.getLocation(), 20 * 4, detectionRange, mCeiling, 3),
+				new SpellCrystalRespawn(mPlugin, this, mStart.getLocation(), detectionRange, mCrystalLoc, mShieldCrystal));
 
 		Map<Integer, BossHealthAction> events = new HashMap<Integer, BossHealthAction>();
 		events.put(100, mBoss -> {
@@ -684,7 +685,6 @@ public final class Lich extends BossAbilityGroup {
 						mBoss.setAI(true);
 						mBoss.setGravity(true);
 						mPhase = 4;
-						SpellDiesIrae.setActive(false);
 						changePhase(phase3Spells, phase3PassiveSpells, null);
 						mCutscene = false;
 						this.cancel();
@@ -968,8 +968,8 @@ public final class Lich extends BossAbilityGroup {
 							new SpellPurgeNegatives(mBoss, 2 * 20),
 							new SpellShadowRealm(mStart.getLocation(), detectionRange),
 							new SpellEdgeKill(mBoss, mStart.getLocation()),
-							new SpellAutoAttack(mPlugin, mBoss, mStart.getLocation(), 20 * 4, detectionRange, mCeiling, 3),
-							new SpellCrystalRespawn(mPlugin, mStart.getLocation(), detectionRange, mCrystalLoc, mShieldCrystal));
+							new SpellAutoAttack(mPlugin, this, mBoss, mStart.getLocation(), 20 * 4, detectionRange, mCeiling, 3),
+							new SpellCrystalRespawn(mPlugin, this, mStart.getLocation(), detectionRange, mCrystalLoc, mShieldCrystal));
 
 					changePhase(keyAlive, null, null);
 					forceCastSpell(SpellDarkOmen.class);
@@ -1061,11 +1061,14 @@ public final class Lich extends BossAbilityGroup {
 		// teleport
 		mTotalDamage += event.getDamage();
 		Location loc = mBoss.getLocation();
-		if (mTotalDamage / EntityUtils.getMaxHealth(mBoss) >= 0.04 && !mActivated && !mCutscene) {
+		if (mTotalDamage / EntityUtils.getMaxHealth(mBoss) >= 0.04
+				&& !mActivated
+				&& !mCutscene
+				&& !hasRunningSpellOfType(SpellDiesIrae.class, SpellDesecrate.class, SpellDarkOmen.class, SpellSalientOfDecay.class)) {
 			World world = mBoss.getWorld();
 			mTotalDamage = 0;
 			boolean locFound = false;
-			while (!locFound && !SpellDiesIrae.getActive()) {
+			while (!locFound) {
 				double x = FastUtils.randomDoubleInRange(-16, 16);
 				double z = FastUtils.randomDoubleInRange(-16, 16);
 				Location newloc = loc.clone().add(x, 0, z);
@@ -1580,7 +1583,6 @@ public final class Lich extends BossAbilityGroup {
 
 	// Phase 4
 	private void p4(World world) {
-		SpellDiesIrae.setActive(false);
 		mDead = false;
 		mCounter = 0;
 		world.playSound(mBoss.getLocation(), Sound.ENTITY_ENDER_DRAGON_GROWL, 3.0f, 1.0f);
@@ -1597,14 +1599,14 @@ public final class Lich extends BossAbilityGroup {
 				new SpellFinalParticle(mPlugin, mBoss, mStart.getLocation(), detectionRange, block),
 				new SpellFinalSwarm(mPlugin, mStart.getLocation(), detectionRange),
 				new SpellFinalCrystal(mPlugin, mBoss, mStart.getLocation(), detectionRange, mCrystalLoc),
-				new SpellAutoAttack(mPlugin, mBoss, mStart.getLocation(), 20 * 5, detectionRange, mCeiling, 4));
+				new SpellAutoAttack(mPlugin, this, mBoss, mStart.getLocation(), 20 * 5, detectionRange, mCeiling, 4));
 		List<Spell> death1Passives = Arrays.asList(
 				new SpellEdgeKill(mBoss, mStart.getLocation()),
 				new SpellFinalParticle(mPlugin, mBoss, mStart.getLocation(), detectionRange, block),
 				new SpellFinalSwarm(mPlugin, mStart.getLocation(), detectionRange),
 				new SpellFinalCrystal(mPlugin, mBoss, mStart.getLocation(), detectionRange, mCrystalLoc),
 				new SpellFinalLaser(mPlugin, mBoss, mStart.getLocation(), detectionRange),
-				new SpellAutoAttack(mPlugin, mBoss, mStart.getLocation(), 20 * 4, detectionRange, mCeiling, 4));
+				new SpellAutoAttack(mPlugin, this, mBoss, mStart.getLocation(), 20 * 4, detectionRange, mCeiling, 4));
 		List<Spell> death2Passives = Arrays.asList(
 				new SpellEdgeKill(mBoss, mStart.getLocation()),
 				new SpellFinalParticle(mPlugin, mBoss, mStart.getLocation(), detectionRange, block),
@@ -1612,7 +1614,7 @@ public final class Lich extends BossAbilityGroup {
 				new SpellFinalCrystal(mPlugin, mBoss, mStart.getLocation(), detectionRange, mCrystalLoc),
 				new SpellFinalHeatMech(mPlugin, mBoss, mStart.getLocation(), detectionRange),
 				new SpellFinalLaser(mPlugin, mBoss, mStart.getLocation(), detectionRange),
-				new SpellAutoAttack(mPlugin, mBoss, mStart.getLocation(), 20 * 3, detectionRange, mCeiling, 4));
+				new SpellAutoAttack(mPlugin, this, mBoss, mStart.getLocation(), 20 * 3, detectionRange, mCeiling, 4));
 		List<Spell> death3Passives = Arrays.asList(
 				new SpellEdgeKill(mBoss, mStart.getLocation()),
 				new SpellFinalParticle(mPlugin, mBoss, mStart.getLocation(), detectionRange, block),
@@ -1620,7 +1622,7 @@ public final class Lich extends BossAbilityGroup {
 				new SpellFinalCrystal(mPlugin, mBoss, mStart.getLocation(), detectionRange, mCrystalLoc),
 				new SpellFinalHeatMech(mPlugin, mBoss, mStart.getLocation(), detectionRange),
 				new SpellFinalLaser(mPlugin, mBoss, mStart.getLocation(), detectionRange),
-				new SpellAutoAttack(mPlugin, mBoss, mStart.getLocation(), 20 * 2, detectionRange, mCeiling, 4));
+				new SpellAutoAttack(mPlugin, this, mBoss, mStart.getLocation(), 20 * 2, detectionRange, mCeiling, 4));
 
 		// partial respawn arena
 		String cmd = "execute positioned " + mStart.getLocation().getX() + " " + mStart.getLocation().getY() + " "

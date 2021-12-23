@@ -63,6 +63,13 @@ public abstract class Spell implements Cloneable {
 	}
 
 	/**
+	 * @return Whether this spell is currently active. By default, this checks if there are active runnables, but may be overridden by spells to be more specific.
+	 */
+	public boolean isRunning() {
+		return mActiveRunnables.stream().anyMatch(r -> !r.isCancelled());
+	}
+
+	/**
 	 * @return Whether this ability ignores being silenced. Currently only works for passive spells.
 	 */
 	public boolean bypassSilence() {

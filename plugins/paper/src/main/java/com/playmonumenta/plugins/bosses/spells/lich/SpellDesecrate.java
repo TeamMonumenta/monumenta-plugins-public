@@ -140,7 +140,8 @@ public class SpellDesecrate extends Spell {
 									p.removePotionEffect(PotionEffectType.SLOW);
 									p.removePotionEffect(PotionEffectType.WEAKNESS);
 									p.playSound(p.getLocation(), Sound.BLOCK_GLASS_BREAK, SoundCategory.HOSTILE, 1, 0.8f);
-									if (p.getPotionEffect(PotionEffectType.JUMP).getAmplifier() < 0) {
+									PotionEffect jumpPotionEffect = p.getPotionEffect(PotionEffectType.JUMP);
+									if (jumpPotionEffect != null && jumpPotionEffect.getAmplifier() < 0) {
 										p.removePotionEffect(PotionEffectType.JUMP);
 									}
 								}

@@ -106,6 +106,7 @@ public class HeadlessHorsemanBoss extends BossAbilityGroup {
 	public static final int arenaSize = 45;
 	public int mCooldownTicks = 11 * 20;
 
+	private final Location mOriginalSpawnLoc;
 	private final Location mSpawnLoc;
 	private final Location mEndLoc;
 
@@ -119,17 +120,19 @@ public class HeadlessHorsemanBoss extends BossAbilityGroup {
 
 	@Override
 	public String serialize() {
-		return SerializationUtils.statefulBossSerializer(mSpawnLoc, mEndLoc);
+		return SerializationUtils.statefulBossSerializer(mOriginalSpawnLoc, mEndLoc);
 	}
 
 	public HeadlessHorsemanBoss(Plugin plugin, LivingEntity boss, Location spawnLoc, Location endLoc) {
 		super(plugin, identityTag, boss);
-		mSpawnLoc = spawnLoc.subtract(0, 4, 0);
+		mOriginalSpawnLoc = spawnLoc;
+		mSpawnLoc = spawnLoc.clone().subtract(0, 4, 0);
 		mEndLoc = endLoc;
 		mBoss.setRemoveWhenFarAway(false);
 
 		new BukkitRunnable() {
 			Creature mHorse = null;
+
 			@Override
 			public void run() {
 				if (!mBoss.isValid() || mBoss.isDead()) {
@@ -137,7 +140,7 @@ public class HeadlessHorsemanBoss extends BossAbilityGroup {
 					return;
 				}
 				if (mHorse == null) {
-					List<Entity> findHorse = mBoss.getNearbyEntities(mBoss.getLocation().getX(), mBoss.getLocation().getY(), mBoss.getLocation().getZ());
+					List<Entity> findHorse = mBoss.getNearbyEntities(5, 5, 5);
 					for (Entity entity : findHorse) {
 						if (entity.getType() == EntityType.SKELETON_HORSE) {
 							mHorse = (Creature) entity;
@@ -172,7 +175,7 @@ public class HeadlessHorsemanBoss extends BossAbilityGroup {
 
 		Map<Integer, BossHealthAction> events = new HashMap<Integer, BossHealthAction>();
 		events.put(100, mBoss -> {
-			PlayerUtils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"[The Horseman] \",\"color\": \"dark_red\"},{\"text\":\"You? You're who they sent? Oh ho ho, \",\"color\":\"gold\"},{\"text\":\"we're \",\"color\":\"dark_red\"},{\"text\":\"going to have some fun.\",\"color\":\"gold\"}]");
+			PlayerUtils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"[The Horseman] \",\"color\":\"dark_red\"},{\"text\":\"You? You're who they sent? Oh ho ho, \",\"color\":\"gold\"},{\"text\":\"we're \",\"color\":\"dark_red\"},{\"text\":\"going to have some fun.\",\"color\":\"gold\"}]");
 		});
 
 		events.put(50, mBoss -> {

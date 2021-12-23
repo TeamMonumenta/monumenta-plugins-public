@@ -33,6 +33,7 @@ import com.playmonumenta.plugins.utils.VectorUtils;
 public class SpellAutoAttack extends Spell {
 
 	private Plugin mPlugin;
+	private Lich mLich;
 	private LivingEntity mBoss;
 	private Location mCenter;
 	private int mTicks;
@@ -53,8 +54,9 @@ public class SpellAutoAttack extends Spell {
 	private PartialParticle mPWitch2;
 	private PartialParticle mPYellow2;
 
-	public SpellAutoAttack(Plugin plugin, LivingEntity boss, Location loc, int ticks, double range, int ceil, int phase) {
+	public SpellAutoAttack(Plugin plugin, Lich lich, LivingEntity boss, Location loc, int ticks, double range, int ceil, int phase) {
 		mPlugin = plugin;
+		mLich = lich;
 		mBoss = boss;
 		mCenter = loc;
 		mTicks = ticks;
@@ -84,7 +86,7 @@ public class SpellAutoAttack extends Spell {
 		}
 		if (mINC >= cd) {
 			mINC -= cd;
-			if (!SpellDiesIrae.getActive()) {
+			if (!mLich.hasRunningSpellOfType(SpellDiesIrae.class)) {
 				bolt();
 			}
 		}

@@ -46,7 +46,6 @@ public class SpellDiesIrae extends Spell {
 	private List<Location> mCrystalLoc;
 	private Collection<EnderCrystal> mCrystal = new ArrayList<EnderCrystal>();
 	private String mCrystalNBT;
-	private static boolean mActive = false;
 	private static double mCrystalDmg;
 	private final PartialParticle mCloud;
 	private final PartialParticle mExpH;
@@ -76,14 +75,6 @@ public class SpellDiesIrae extends Spell {
 		mHeart = new PartialParticle(Particle.HEART, mBoss.getLocation(), 20, 0.5, 0.5, 0.5, 0.1);
 	}
 
-	public static boolean getActive() {
-		return mActive;
-	}
-
-	public static void setActive(boolean active) {
-		mActive = active;
-	}
-
 	public static double getDmg() {
 		return mCrystalDmg;
 	}
@@ -102,7 +93,6 @@ public class SpellDiesIrae extends Spell {
 
 	@Override
 	public void run() {
-		mActive = true;
 		World world = mBoss.getWorld();
 		BossBar bar = Bukkit.getServer().createBossBar(null, BarColor.GREEN, BarStyle.SOLID, BarFlag.PLAY_BOSS_MUSIC);
 		bar.setVisible(true);
@@ -148,7 +138,6 @@ public class SpellDiesIrae extends Spell {
 					mBoss.setGravity(true);
 					mBoss.setInvulnerable(false);
 					bar.setVisible(false);
-					mActive = false;
 					this.cancel();
 					return;
 				}
@@ -277,7 +266,6 @@ public class SpellDiesIrae extends Spell {
 					mBoss.setAI(true);
 					mBoss.setGravity(true);
 					mBoss.setInvulnerable(false);
-					mActive = false;
 					mCrystalDmg = 0;
 					world.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_SHOOT, 3.0f, 0.5f);
 					this.cancel();

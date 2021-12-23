@@ -14,6 +14,7 @@ import com.playmonumenta.plugins.bosses.spells.Spell;
 public class SpellCrystalRespawn extends Spell {
 
 	private Plugin mPlugin;
+	private Lich mLich;
 	private int mT;
 	private double mInc;
 	private int mMinCooldown = 20 * 10;
@@ -26,8 +27,9 @@ public class SpellCrystalRespawn extends Spell {
 	private boolean mTrigger = false;
 	private List<Player> mPlayers = new ArrayList<Player>();
 
-	public SpellCrystalRespawn(Plugin plugin, Location loc, double range, List<Location> crystalLoc, String crystalnbt) {
+	public SpellCrystalRespawn(Plugin plugin, Lich lich, Location loc, double range, List<Location> crystalLoc, String crystalnbt) {
 		mPlugin = plugin;
+		mLich = lich;
 		mCenter = loc;
 		mRange = range;
 		mLoc = crystalLoc;
@@ -54,7 +56,7 @@ public class SpellCrystalRespawn extends Spell {
 		double factor = Math.log(mPlayers.size());
 		mCooldown = (int) Math.max(mMinCooldown, Math.round(mMaxCooldown / factor));
 		mT -= 5;
-		if (mT <= 0 && !SpellDiesIrae.getActive()) {
+		if (mT <= 0 && !mLich.hasRunningSpellOfType(SpellDiesIrae.class)) {
 			mT = mCooldown;
 			mInc = Math.min(5, mPlayers.size() / 5);
 			Lich.spawnCrystal(mLoc, mInc, mCrystalNBT);

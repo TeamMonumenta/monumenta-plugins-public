@@ -1,6 +1,8 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
+import java.util.Arrays;
 import java.util.List;
+import java.util.function.Predicate;
 import java.util.logging.Level;
 
 import org.bukkit.Bukkit;
@@ -453,4 +455,14 @@ public abstract class BossAbilityGroup {
 		}
 		return true;
 	}
+
+	public boolean hasRunningSpell() {
+		return mActiveSpells != null && mActiveSpells.getSpells().stream().anyMatch(Spell::isRunning);
+	}
+
+	public final boolean hasRunningSpellOfType(Class<?>... spellTypes) {
+		Predicate<Spell> isOfArgumentType = s -> Arrays.stream(spellTypes).anyMatch(type -> type.isInstance(s));
+		return mActiveSpells != null && mActiveSpells.getSpells().stream().anyMatch(s -> s.isRunning() && isOfArgumentType.test(s));
+	}
+
 }
