@@ -1,11 +1,16 @@
 package com.playmonumenta.plugins.depths;
 
+import java.util.ArrayList;
 import java.util.EnumSet;
 
-import org.bukkit.ChatColor;
+import com.playmonumenta.plugins.utils.GUIUtils;
+import com.playmonumenta.plugins.utils.ItemUtils;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
@@ -16,103 +21,79 @@ import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 
 public class DepthsRoomChoiceGUI extends CustomInventory {
-	private static final Material FILLER = Material.BLACK_STAINED_GLASS_PANE;
+	private static final Material NO_CHOICE = Material.BLACK_STAINED_GLASS_PANE;
+	private static final Material FILLER = Material.GRAY_STAINED_GLASS_PANE;
+	private static final ArrayList<RoomChoice> ROOM_LOCATIONS = new ArrayList<>();
 
 	public static final int LEVELSIX = 0x703663;
+
+	static class RoomChoice {
+		ItemStack mItem;
+		Integer mLocation;
+		DepthsRoomType mType;
+
+		RoomChoice(Integer loc, DepthsRoomType t, ItemStack i) {
+			mLocation = loc;
+			mType = t;
+			mItem = i;
+		}
+	}
+
+	static {
+		ROOM_LOCATIONS.add(new RoomChoice(0, DepthsRoomType.ABILITY,
+			createBasicItem(Material.BOOK, "Normal Room with Ability Reward",
+				NamedTextColor.LIGHT_PURPLE,
+				"Grants an ability upon clearing the room.")));
+		ROOM_LOCATIONS.add(new RoomChoice(18, DepthsRoomType.ABILITY_ELITE,
+			createBasicItem(Material.ENCHANTED_BOOK, "Elite Room with Ability Reward",
+				NamedTextColor.LIGHT_PURPLE,
+				"Grants a powerful ability upon clearing the room.")));
+		ROOM_LOCATIONS.add(new RoomChoice(22, DepthsRoomType.BOSS,
+			createBasicItem(Material.WITHER_ROSE, "Boss Challenge",
+				NamedTextColor.LIGHT_PURPLE,
+				"")));
+		ROOM_LOCATIONS.add(new RoomChoice(8, DepthsRoomType.UPGRADE,
+			createBasicItem(Material.DAMAGED_ANVIL, "Normal Room with Upgrade Reward",
+				NamedTextColor.LIGHT_PURPLE,
+				"Grants an upgrade upon clearing the room.")));
+		ROOM_LOCATIONS.add(new RoomChoice(26, DepthsRoomType.UPGRADE_ELITE,
+			createBasicItem(Material.ANVIL, "Elite Room with Upgrade Reward",
+				NamedTextColor.LIGHT_PURPLE,
+				"Grants a powerful upgrade upon clearing the room.")));
+		ROOM_LOCATIONS.add(new RoomChoice(11, DepthsRoomType.TREASURE,
+			createBasicItem(Material.GOLD_NUGGET, "Normal Room with Treasure Reward",
+				NamedTextColor.LIGHT_PURPLE,
+				"Grants 3 treasure score for room completion.")));
+		ROOM_LOCATIONS.add(new RoomChoice(15, DepthsRoomType.TREASURE_ELITE,
+			createBasicItem(Material.GOLD_INGOT, "Normal Room with Treasure Reward",
+				NamedTextColor.LIGHT_PURPLE,
+				"Grants 3 treasure score for room completion.")));
+		ROOM_LOCATIONS.add(new RoomChoice(4, DepthsRoomType.UTILITY,
+			createBasicItem(Material.ENDER_CHEST, "Utility Room",
+				NamedTextColor.LIGHT_PURPLE,
+				"A non-combat room with a random other benefit.")));
+		ROOM_LOCATIONS.add(new RoomChoice(13, DepthsRoomType.TWISTED,
+			createBasicItem(Material.ENDER_CHEST, ChatColor.MAGIC + "XXXXXX",
+				TextColor.color(LEVELSIX), "")));
+	}
+
 
 	public DepthsRoomChoiceGUI(Player player) {
 		super(player, 27, "Select the Next Room Type");
 
 		EnumSet<DepthsRoomType> roomChoices = DepthsManager.getInstance().generateRoomOptions(player);
-
-		if (roomChoices.contains(DepthsRoomType.ABILITY)) {
-			ItemStack stack = new ItemStack(Material.BOOK, 1);
-			ItemMeta meta = stack.getItemMeta();
-			meta.setDisplayName(ChatColor.LIGHT_PURPLE + "Normal Room with Ability Reward");
-			stack.setItemMeta(meta);
-			_inventory.setItem(0, stack);
-		} else {
-			_inventory.setItem(0, new ItemStack(Material.BLACK_STAINED_GLASS_PANE));
+		if (roomChoices == null) {
+			return;
 		}
 
-		if (roomChoices.contains(DepthsRoomType.ABILITY_ELITE)) {
-			ItemStack stack = new ItemStack(Material.ENCHANTED_BOOK, 1);
-			ItemMeta meta = stack.getItemMeta();
-			meta.setDisplayName(ChatColor.LIGHT_PURPLE + "Elite Room with Ability Reward");
-			stack.setItemMeta(meta);
-			_inventory.setItem(18, stack);
-		} else {
-			_inventory.setItem(18, new ItemStack(Material.BLACK_STAINED_GLASS_PANE));
+		for (RoomChoice item : ROOM_LOCATIONS) {
+			if (roomChoices.contains(item.mType)) {
+				_inventory.setItem(item.mLocation, item.mItem);
+			} else {
+				_inventory.setItem(item.mLocation, new ItemStack(NO_CHOICE));
+			}
 		}
-
-		if (roomChoices.contains(DepthsRoomType.BOSS)) {
-			ItemStack stack = new ItemStack(Material.WITHER_ROSE, 1);
-			ItemMeta meta = stack.getItemMeta();
-			meta.setDisplayName(ChatColor.RED + "Boss Challenge");
-			stack.setItemMeta(meta);
-			_inventory.setItem(22, stack);
-		} else {
-			_inventory.setItem(22, new ItemStack(Material.BLACK_STAINED_GLASS_PANE));
-		}
-
-		if (roomChoices.contains(DepthsRoomType.UPGRADE)) {
-			ItemStack stack = new ItemStack(Material.DAMAGED_ANVIL, 1);
-			ItemMeta meta = stack.getItemMeta();
-			meta.setDisplayName(ChatColor.LIGHT_PURPLE + "Normal Room with Upgrade Reward");
-			stack.setItemMeta(meta);
-			_inventory.setItem(8, stack);
-		} else {
-			_inventory.setItem(8, new ItemStack(Material.BLACK_STAINED_GLASS_PANE));
-		}
-
-		if (roomChoices.contains(DepthsRoomType.UPGRADE_ELITE)) {
-			ItemStack stack = new ItemStack(Material.ANVIL, 1);
-			ItemMeta meta = stack.getItemMeta();
-			meta.setDisplayName(ChatColor.LIGHT_PURPLE + "Elite Room with Upgrade Reward");
-			stack.setItemMeta(meta);
-			_inventory.setItem(26, stack);
-		} else {
-			_inventory.setItem(26, new ItemStack(Material.BLACK_STAINED_GLASS_PANE));
-		}
-
-		if (roomChoices.contains(DepthsRoomType.TREASURE)) {
-			ItemStack stack = new ItemStack(Material.GOLD_NUGGET, 1);
-			ItemMeta meta = stack.getItemMeta();
-			meta.setDisplayName(ChatColor.LIGHT_PURPLE + "Normal Room with Treasure Reward");
-			stack.setItemMeta(meta);
-			_inventory.setItem(11, stack);
-		} else {
-			_inventory.setItem(11, new ItemStack(Material.BLACK_STAINED_GLASS_PANE));
-		}
-
-		if (roomChoices.contains(DepthsRoomType.TREASURE_ELITE)) {
-			ItemStack stack = new ItemStack(Material.GOLD_INGOT, 1);
-			ItemMeta meta = stack.getItemMeta();
-			meta.setDisplayName(ChatColor.LIGHT_PURPLE + "Elite Room with Treasure Reward");
-			stack.setItemMeta(meta);
-			_inventory.setItem(15, stack);
-		} else {
-			_inventory.setItem(15, new ItemStack(Material.BLACK_STAINED_GLASS_PANE));
-		}
-
-		if (roomChoices.contains(DepthsRoomType.UTILITY)) {
-			ItemStack stack = new ItemStack(Material.ENDER_CHEST, 1);
-			ItemMeta meta = stack.getItemMeta();
-			meta.setDisplayName(ChatColor.LIGHT_PURPLE + "Utility Room");
-			stack.setItemMeta(meta);
-			_inventory.setItem(4, stack);
-		} else {
-			_inventory.setItem(4, new ItemStack(Material.BLACK_STAINED_GLASS_PANE));
-		}
-
-		if (roomChoices.contains(DepthsRoomType.TWISTED)) {
-			ItemStack stack = new ItemStack(Material.BLACK_CONCRETE, 1);
-			ItemMeta meta = stack.getItemMeta();
-			meta.displayName(Component.text(ChatColor.MAGIC + "XXXXXX", TextColor.color(LEVELSIX))
-				.decoration(TextDecoration.ITALIC, false));
-			stack.setItemMeta(meta);
-			_inventory.setItem(13, stack);
-		}
+		fillEmpty();
 	}
 
 	@Override
@@ -121,32 +102,41 @@ public class DepthsRoomChoiceGUI extends CustomInventory {
 		if (event.getClickedInventory() != _inventory ||
 				event.getCurrentItem() == null ||
 				event.getCurrentItem().getType() == FILLER ||
+				event.getCurrentItem().getType() == NO_CHOICE ||
 				event.isShiftClick()) {
 			return;
 		}
 
 		Player p = (Player) event.getWhoClicked();
-
-		if (event.getSlot() == 0) {
-			DepthsManager.getInstance().playerSelectedRoom(DepthsRoomType.ABILITY, p);
-		} else if (event.getSlot() == 18) {
-			DepthsManager.getInstance().playerSelectedRoom(DepthsRoomType.ABILITY_ELITE, p);
-		} else if (event.getSlot() == 22) {
-			DepthsManager.getInstance().playerSelectedRoom(DepthsRoomType.BOSS, p);
-		} else if (event.getSlot() == 8) {
-			DepthsManager.getInstance().playerSelectedRoom(DepthsRoomType.UPGRADE, p);
-		} else if (event.getSlot() == 26) {
-			DepthsManager.getInstance().playerSelectedRoom(DepthsRoomType.UPGRADE_ELITE, p);
-		} else if (event.getSlot() == 11) {
-			DepthsManager.getInstance().playerSelectedRoom(DepthsRoomType.TREASURE, p);
-		} else if (event.getSlot() == 15) {
-			DepthsManager.getInstance().playerSelectedRoom(DepthsRoomType.TREASURE_ELITE, p);
-		} else if (event.getSlot() == 4) {
-			DepthsManager.getInstance().playerSelectedRoom(DepthsRoomType.UTILITY, p);
-		} else if (event.getSlot() == 13) {
-			DepthsManager.getInstance().playerSelectedRoom(DepthsRoomType.TWISTED, p);
+		for (RoomChoice item : ROOM_LOCATIONS) {
+			if (item.mLocation == event.getSlot()) {
+				DepthsManager.getInstance().playerSelectedRoom(item.mType, p);
+			}
 		}
 
 		event.getWhoClicked().closeInventory();
+	}
+
+	private static ItemStack createBasicItem(Material mat, String name, TextColor nameColor, String desc) {
+		ItemStack item = new ItemStack(mat, 1);
+		ItemMeta meta = item.getItemMeta();
+		meta.displayName(Component.text(name, nameColor)
+			.decoration(TextDecoration.ITALIC, false));
+		if (!desc.isEmpty()) {
+			GUIUtils.splitLoreLine(meta, desc, 30, ChatColor.GRAY, true);
+		}
+		meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
+		meta.addItemFlags(ItemFlag.HIDE_POTION_EFFECTS);
+		item.setItemMeta(meta);
+		ItemUtils.setPlainName(item);
+		return item;
+	}
+
+	public void fillEmpty() {
+		for (int i = 0; i < 27; i++) {
+			if (_inventory.getItem(i) == null) {
+				_inventory.setItem(i, new ItemStack(FILLER, 1));
+			}
+		}
 	}
 }

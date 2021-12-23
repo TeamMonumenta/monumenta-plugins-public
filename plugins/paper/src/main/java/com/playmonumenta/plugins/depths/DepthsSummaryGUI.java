@@ -23,14 +23,14 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 
 public class DepthsSummaryGUI extends CustomInventory {
-	public static final ArrayList<Integer> HEAD_LOCATIONS = new ArrayList<Integer>(Arrays.asList(45, 48, 50, 53));
-	public static final ArrayList<Integer> TREE_LOCATIONS = new ArrayList<Integer>(Arrays.asList(2, 3, 5, 6));
+	public static final ArrayList<Integer> HEAD_LOCATIONS = new ArrayList<>(Arrays.asList(45, 48, 50, 53));
+	public static final ArrayList<Integer> TREE_LOCATIONS = new ArrayList<>(Arrays.asList(2, 3, 5, 6));
 	private static final int START_OF_PASSIVES = 27;
 	private static final Material FILLER = Material.GRAY_STAINED_GLASS_PANE;
 	private static final int REWARD_LOCATION = 49;
 	private Boolean mDebugVersion = false;
 
-	class TriggerData {
+	static class TriggerData {
 		int mInvLocation;
 		DepthsTrigger mTrigger;
 		String mString;
@@ -42,7 +42,7 @@ public class DepthsSummaryGUI extends CustomInventory {
 		}
 	}
 
-	public static List<TriggerData> TRIGGER_STRINGS = new ArrayList<TriggerData>();
+	public static final List<TriggerData> TRIGGER_STRINGS = new ArrayList<>();
 
 	public DepthsSummaryGUI(Player player) {
 		this(player, player);
@@ -71,18 +71,22 @@ public class DepthsSummaryGUI extends CustomInventory {
 
 		if (playerInstance != null) {
 			DepthsParty playerParty = DepthsManager.getInstance().getPartyFromId(playerInstance);
-			for (int i = 0; i < playerParty.mPlayersInParty.size(); i++) {
-				if (playerParty.mPlayersInParty.get(i) != null &&
-						Bukkit.getPlayer(playerParty.mPlayersInParty.get(i).mPlayerId) != null &&
-						Bukkit.getPlayer(playerParty.mPlayersInParty.get(i).mPlayerId).isOnline()) {
-					ItemStack playerHead = new ItemStack(Material.PLAYER_HEAD, 1);
-					SkullMeta meta = (SkullMeta) playerHead.getItemMeta();
-					OfflinePlayer targetedPlayer = Bukkit.getPlayer(playerParty.mPlayersInParty.get(i).mPlayerId);
-					meta.setOwningPlayer(targetedPlayer);
-					meta.displayName(Component.text(targetedPlayer.getName() + "'s Abilities", NamedTextColor.YELLOW)
-										.decoration(TextDecoration.ITALIC, false));
-					playerHead.setItemMeta(meta);
-					_inventory.setItem(HEAD_LOCATIONS.get(i), playerHead);
+			if (playerParty != null && playerParty.mPlayersInParty != null) {
+				for (int i = 0; i < playerParty.mPlayersInParty.size(); i++) {
+					DepthsPlayer player = playerParty.mPlayersInParty.get(i);
+					if (player == null) {
+						return;
+					}
+					Player actualPlayer = Bukkit.getPlayer(player.mPlayerId);
+					if (actualPlayer != null && actualPlayer.isOnline()) {
+						ItemStack playerHead = new ItemStack(Material.PLAYER_HEAD, 1);
+						SkullMeta meta = (SkullMeta) playerHead.getItemMeta();
+						meta.setOwningPlayer(actualPlayer);
+						meta.displayName(Component.text(actualPlayer.getName() + "'s Abilities", NamedTextColor.YELLOW)
+							.decoration(TextDecoration.ITALIC, false));
+						playerHead.setItemMeta(meta);
+						_inventory.setItem(HEAD_LOCATIONS.get(i), playerHead);
+					}
 				}
 			}
 		}
@@ -90,8 +94,9 @@ public class DepthsSummaryGUI extends CustomInventory {
 
 
 		//First- check if the player has any rewards to open
+		ItemStack rewardItem;
 		if (playerWhoAsked.mEarnedRewards.size() > 0) {
-			ItemStack rewardItem = new ItemStack(Material.GOLD_INGOT, playerWhoAsked.mEarnedRewards.size());
+			rewardItem = new ItemStack(Material.GOLD_INGOT, playerWhoAsked.mEarnedRewards.size());
 			ItemMeta rewardMeta = rewardItem.getItemMeta();
 			rewardMeta.displayName(Component.text("Claim your Room Reward!", NamedTextColor.YELLOW)
 										.decoration(TextDecoration.ITALIC, false));
@@ -104,17 +109,16 @@ public class DepthsSummaryGUI extends CustomInventory {
 				ItemUtils.setPlainName(rewardItem, "Claim your Room Rewards!");
 			}
 			rewardItem.setItemMeta(rewardMeta);
-			_inventory.setItem(REWARD_LOCATION, rewardItem);
 		} else {
-			ItemStack rewardItem = new ItemStack(Material.GOLD_NUGGET, 1);
+			rewardItem = new ItemStack(Material.GOLD_NUGGET, 1);
 			ItemMeta rewardMeta = rewardItem.getItemMeta();
 			rewardMeta.displayName(Component.text("All Room Rewards Claimed!", NamedTextColor.YELLOW)
 										.decoration(TextDecoration.ITALIC, false));
 			rewardMeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
 			ItemUtils.setPlainName(rewardItem, "All Room Rewards Claimed!");
 			rewardItem.setItemMeta(rewardMeta);
-			_inventory.setItem(REWARD_LOCATION, rewardItem);
 		}
+		_inventory.setItem(REWARD_LOCATION, rewardItem);
 		setAbilities(targetPlayer);
 	}
 
@@ -122,6 +126,7 @@ public class DepthsSummaryGUI extends CustomInventory {
 	protected void inventoryClick(InventoryClickEvent event) {
 		event.setCancelled(true);
 		if (event.getClickedInventory() != _inventory ||
+				event.getCurrentItem() == null ||
 				event.getCurrentItem().getType() == FILLER) {
 			return;
 		}
@@ -129,7 +134,7 @@ public class DepthsSummaryGUI extends CustomInventory {
 		if (event.getCurrentItem().getType() == Material.PLAYER_HEAD) {
 			SkullMeta chosenMeta = (SkullMeta) event.getCurrentItem().getItemMeta();
 			OfflinePlayer chosenPlayer = chosenMeta.getOwningPlayer();
-			if (chosenPlayer.isOnline()) {
+			if (chosenPlayer != null && chosenPlayer.isOnline()) {
 				setAbilities((Player) chosenPlayer);
 				return;
 			}
@@ -154,7 +159,7 @@ public class DepthsSummaryGUI extends CustomInventory {
 			_inventory.setItem(i, new ItemStack(FILLER, 1));
 		}
 
-		List<DepthsAbilityItem> passiveItems = new ArrayList<DepthsAbilityItem>();
+		List<DepthsAbilityItem> passiveItems = new ArrayList<>();
 		for (DepthsAbilityItem item : items) {
 			if (item.mTrigger == DepthsTrigger.PASSIVE) {
 				passiveItems.add(item);
@@ -174,8 +179,9 @@ public class DepthsSummaryGUI extends CustomInventory {
 
 		//all for mystery box
 		DepthsPlayer playerInstance = DepthsManager.getInstance().mPlayers.get(targetPlayer.getUniqueId());
+		ItemStack weaponAspectItem = _inventory.getItem(9);
 		if (playerInstance != null && playerInstance.mHasWeaponAspect &&
-				_inventory.getItem(9) != null && _inventory.getItem(9).getType() == FILLER) {
+				weaponAspectItem != null && weaponAspectItem.getType() == FILLER) {
 			ItemStack mysteryBox = new ItemStack(Material.BARREL, 1);
 			ItemMeta boxMeta = mysteryBox.getItemMeta();
 			boxMeta.displayName(Component.text("Mystery Box", NamedTextColor.WHITE)
@@ -191,7 +197,7 @@ public class DepthsSummaryGUI extends CustomInventory {
 
 		//Tree info
 		if (playerInstance != null) {
-			DepthsTree playerTree = null;
+			DepthsTree playerTree;
 			for (int i = 0; i < 4; i++) {
 				playerTree = playerInstance.mEligibleTrees.get(i);
 				_inventory.setItem(TREE_LOCATIONS.get(i), DepthsUtils.getTreeItem(playerTree));
@@ -199,7 +205,8 @@ public class DepthsSummaryGUI extends CustomInventory {
 		}
 
 		for (int i = 9; i <= 17; i++) {
-			if (_inventory.getItem(i) != null && _inventory.getItem(i).getType() == FILLER) {
+			ItemStack triggerItem = _inventory.getItem(i);
+			if (triggerItem != null && triggerItem.getType() == FILLER) {
 				ItemStack noAbility = new ItemStack(Material.RED_STAINED_GLASS_PANE, 1);
 				ItemMeta noAbilityMeta = noAbility.getItemMeta();
 				for (TriggerData data : TRIGGER_STRINGS) {
@@ -218,23 +225,16 @@ public class DepthsSummaryGUI extends CustomInventory {
 			if (headItem != null && headItem.getType() == Material.PLAYER_HEAD) {
 				SkullMeta chosenMeta = (SkullMeta) headItem.getItemMeta();
 				OfflinePlayer chosenPlayer = chosenMeta.getOwningPlayer();
-				ItemStack indicatorItem = null;
-				if (chosenPlayer.equals(targetPlayer)) {
+				ItemStack indicatorItem;
+				if (chosenPlayer != null && chosenPlayer.equals(targetPlayer)) {
 					indicatorItem = new ItemStack(Material.GREEN_STAINED_GLASS_PANE);
 				} else {
 					indicatorItem = new ItemStack(Material.ORANGE_STAINED_GLASS_PANE);
 				}
 				switch (location) {
-				case 45:
-				case 50:
-					_inventory.setItem(location + 1, indicatorItem);
-					break;
-				case 48:
-				case 53:
-					_inventory.setItem(location - 1, indicatorItem);
-					break;
-				default:
-					_inventory.setItem(location, indicatorItem);
+					case 45, 50 -> _inventory.setItem(location + 1, indicatorItem);
+					case 48, 53 -> _inventory.setItem(location - 1, indicatorItem);
+					default -> _inventory.setItem(location, indicatorItem);
 				}
 			}
 		}

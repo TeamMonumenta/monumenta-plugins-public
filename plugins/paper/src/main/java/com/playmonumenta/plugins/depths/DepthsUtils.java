@@ -7,8 +7,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.FileUtils;
+import com.playmonumenta.plugins.utils.GUIUtils;
+import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
+import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.FireworkEffect;
 import org.bukkit.Location;
@@ -41,10 +46,6 @@ import com.playmonumenta.plugins.depths.abilities.aspects.ScytheAspect;
 import com.playmonumenta.plugins.depths.abilities.aspects.SwordAspect;
 import com.playmonumenta.plugins.depths.abilities.aspects.WandAspect;
 import com.playmonumenta.plugins.depths.abilities.frostborn.Permafrost;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.FileUtils;
-import com.playmonumenta.plugins.utils.ItemUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
@@ -222,7 +223,7 @@ public class DepthsUtils {
 		buildMeta = buildItem.getItemMeta();
 		buildMeta.displayName(name);
 		buildMeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
-		splitLoreLine(buildMeta, description, 30, ChatColor.GRAY);
+		GUIUtils.splitLoreLine(buildMeta, description, 30, ChatColor.GRAY, true);
 		buildItem.setItemMeta(buildMeta);
 		ItemUtils.setPlainName(buildItem);
 
@@ -283,32 +284,6 @@ public class DepthsUtils {
 				}
 			}
 		}.runTaskLater(Plugin.getInstance(), ticks);
-	}
-
-	public static void splitLoreLine(ItemMeta meta, String lore, int maxLength, ChatColor defaultColor) {
-		List<String> finalLines = new ArrayList<>();
-
-		List<String> existingLore = meta.getLore();
-		if (existingLore != null) {
-			finalLines.addAll(existingLore);
-		}
-
-		int currentLength = 0;
-		String[] splitLine = lore.split(" ");
-		String currentString = defaultColor + "";
-		for (String word : splitLine) {
-			if (currentLength + word.length() > maxLength) {
-				finalLines.add(currentString);
-				currentString = defaultColor + "";
-				currentLength = 0;
-			}
-			currentString += word + " ";
-			currentLength += word.length() + 1;
-		}
-		if (!currentString.equals(defaultColor + "")) {
-			finalLines.add(currentString);
-		}
-		meta.setLore(finalLines);
 	}
 
 	/**

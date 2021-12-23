@@ -2,7 +2,6 @@ package com.playmonumenta.plugins.plots;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Map.Entry;
 import java.util.UUID;
 
@@ -16,6 +15,7 @@ import org.bukkit.inventory.meta.SkullMeta;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.goncalomb.bukkit.mylib.utils.CustomInventory;
+import com.playmonumenta.plugins.utils.GUIUtils;
 import com.playmonumenta.plugins.plots.PlotManager.PlotInfo;
 import com.playmonumenta.plugins.plots.PlotManager.PlotInfo.OtherAccessRecord;
 import com.playmonumenta.worlds.paper.ScoreboardUtils;
@@ -27,11 +27,11 @@ import net.md_5.bungee.api.ChatColor;
 
 public class PlotAccessCustomInventory extends CustomInventory {
 	private static final Material FILLER = Material.GRAY_STAINED_GLASS_PANE;
-	private static ArrayList<Integer> LOCATIONS = new ArrayList<>(Arrays.asList(19, 20, 21, 22, 23, 24, 25, 28, 29, 30, 31, 32, 33, 34, 37, 38, 39, 40, 41, 42, 43));
-	private int mNumPages = 1;
-	private ArrayList<PlotEntry> mAccessList = new ArrayList<PlotEntry>();
+	private static final ArrayList<Integer> LOCATIONS = new ArrayList<>(Arrays.asList(19, 20, 21, 22, 23, 24, 25, 28, 29, 30, 31, 32, 33, 34, 37, 38, 39, 40, 41, 42, 43));
+	private final int mNumPages;
+	private final ArrayList<PlotEntry> mAccessList = new ArrayList<>();
 	private int mCurrentPage = 1;
-	private PlotInfo mInfo;
+	private final PlotInfo mInfo;
 
 	private static class PlotEntry {
 		boolean mSelf;
@@ -93,7 +93,7 @@ public class PlotAccessCustomInventory extends CustomInventory {
 			PlotEntry targetLoc = mAccessList.get(whichHead);
 			if (targetLoc.mSelf) {
 				ScoreboardUtils.setScoreboardValue(player, "CurrentPlot", mInfo.mOwnedPlotId);
-			} else {
+			} else if (targetLoc.mEntry != null) {
 				ScoreboardUtils.setScoreboardValue(player, "CurrentPlot", targetLoc.mEntry.mPlotId);
 			}
 			PlotManager.sendPlayerToPlot(player);
@@ -137,7 +137,10 @@ public class PlotAccessCustomInventory extends CustomInventory {
 		if (record.mSelf) {
 			return makeYourHead(player);
 		} else {
-			return record.mEntry.mHead;
+			if (record.mEntry != null) {
+				return record.mEntry.mHead;
+			}
+			return new ItemStack(Material.PLAYER_HEAD);
 		}
 	}
 
@@ -152,33 +155,13 @@ public class PlotAccessCustomInventory extends CustomInventory {
 		return head;
 	}
 
-	public void splitLoreLine(ItemMeta meta, String lore, int maxLength, ChatColor defaultColor, boolean clean) {
-		String[] splitLine = lore.split(" ");
-		String currentString = defaultColor + "";
-		List<String> finalLines = clean ? new ArrayList<String>() : meta.getLore();
-		int currentLength = 0;
-		for (String word : splitLine) {
-			if (currentLength + word.length() > maxLength) {
-				finalLines.add(currentString);
-				currentString = defaultColor + "";
-				currentLength = 0;
-			}
-			currentString += word + " ";
-			currentLength += word.length() + 1;
-		}
-		if (currentString != defaultColor + "") {
-			finalLines.add(currentString);
-		}
-		meta.setLore(finalLines);
-	}
-
 	public ItemStack createBasicItem(Material mat, String name, NamedTextColor nameColor, boolean nameBold, String desc, ChatColor loreColor) {
 		ItemStack item = new ItemStack(mat, 1);
 		ItemMeta meta = item.getItemMeta();
 		meta.displayName(Component.text(name, nameColor)
 				.decoration(TextDecoration.ITALIC, false)
 				.decoration(TextDecoration.BOLD, nameBold));
-		splitLoreLine(meta, desc, 30, loreColor, true);
+		GUIUtils.splitLoreLine(meta, desc, 30, loreColor, true);
 		meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
 		meta.addItemFlags(ItemFlag.HIDE_POTION_EFFECTS);
 		item.setItemMeta(meta);

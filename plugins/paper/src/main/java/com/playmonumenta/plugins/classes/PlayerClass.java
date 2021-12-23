@@ -22,7 +22,7 @@ public class PlayerClass {
 	public @Nullable String mClassName;
 	public @Nullable NamedTextColor mClassColor;
 	public @Nullable ChatColor mChatColor;
-	public @Nullable ItemStack mDisplayItem;
+	public ItemStack mDisplayItem;
 	public @Nullable String mQuestReq = null;
 	public int mQuestReqMin;
 	public @Nullable String mClassDescription;

@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.depths;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.playmonumenta.plugins.utils.GUIUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -38,9 +39,9 @@ public class DepthsDebugGUI extends CustomInventory {
 		}
 	}
 
-	List<DebugGUIItem> GUI_ITEMS = new ArrayList<DebugGUIItem>();
-	Player mPlayerToDebug = null;
-	Plugin mPlugin = null;
+	List<DebugGUIItem> GUI_ITEMS = new ArrayList<>();
+	Player mPlayerToDebug;
+	Plugin mPlugin;
 
 
 
@@ -66,6 +67,7 @@ public class DepthsDebugGUI extends CustomInventory {
 	protected void inventoryClick(InventoryClickEvent event) {
 		event.setCancelled(true);
 		if (event.getClickedInventory() != _inventory ||
+				event.getCurrentItem() == null ||
 				event.getCurrentItem().getType() == FILLER ||
 				event.isShiftClick()) {
 			return;
@@ -73,15 +75,18 @@ public class DepthsDebugGUI extends CustomInventory {
 		Player player = (Player) event.getWhoClicked();
 		for (DebugGUIItem item : GUI_ITEMS) {
 			if (event.getSlot() == item.mSlot) {
-				if (item.mCommand.equals("partyinfo")) {
-					event.getWhoClicked().sendMessage(Component.text("Output from " + mPlayerToDebug.getName() + "'s Point of View:", NamedTextColor.LIGHT_PURPLE)
-							                                  .decoration(TextDecoration.ITALIC, false));
-					event.getWhoClicked().sendMessage(DepthsManager.getInstance().getPartySummary(mPlayerToDebug));
-					event.getWhoClicked().closeInventory();
-				} else if (item.mCommand.equals("abilityinfo")) {
-					new DepthsSummaryGUI(player, mPlayerToDebug).openInventory(player, mPlugin);
-				} else if (item.mCommand.equals("delveinfo")) {
-					Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "openmoderatordmsgui " + player.getName() + " " + mPlayerToDebug.getName() + " depths");
+				switch (item.mCommand) {
+					case "partyinfo" -> {
+						event.getWhoClicked().sendMessage(Component.text("Output from " + mPlayerToDebug.getName() + "'s Point of View:", NamedTextColor.LIGHT_PURPLE)
+							.decoration(TextDecoration.ITALIC, false));
+						event.getWhoClicked().sendMessage(DepthsManager.getInstance().getPartySummary(mPlayerToDebug));
+						event.getWhoClicked().closeInventory();
+					}
+					case "abilityinfo" -> new DepthsSummaryGUI(player, mPlayerToDebug).openInventory(player, mPlugin);
+					case "delveinfo" -> Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "openmoderatordmsgui " + player.getName() + " " + mPlayerToDebug.getName() + " depths");
+					default -> {
+						return;
+					}
 				}
 			}
 		}
@@ -92,29 +97,9 @@ public class DepthsDebugGUI extends CustomInventory {
 		ItemMeta meta = newItem.getItemMeta();
 		meta.displayName(Component.text(targetItem.mName, NamedTextColor.GOLD)
 				.decoration(TextDecoration.ITALIC, false));
-		splitLoreLine(meta, targetItem.mLore, 30, ChatColor.GRAY);
+		GUIUtils.splitLoreLine(meta, targetItem.mLore, 30, ChatColor.GRAY, true);
 		newItem.setItemMeta(meta);
 		ItemUtils.setPlainTag(newItem);
 		_inventory.setItem(targetItem.mSlot, newItem);
-	}
-
-	public void splitLoreLine(ItemMeta meta, String lore, int maxLength, ChatColor defaultColor) {
-		String[] splitLine = lore.split(" ");
-		String currentString = defaultColor + "";
-		List<String> finalLines = new ArrayList<String>();
-		int currentLength = 0;
-		for (String word : splitLine) {
-			if (currentLength + word.length() > maxLength) {
-				finalLines.add(currentString);
-				currentString = defaultColor + "";
-				currentLength = 0;
-			}
-			currentString += word + " ";
-			currentLength += word.length() + 1;
-		}
-		if (currentString != defaultColor + "") {
-			finalLines.add(currentString);
-		}
-		meta.setLore(finalLines);
 	}
 }

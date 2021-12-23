@@ -3,7 +3,8 @@ package com.playmonumenta.plugins.depths.abilities;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.bukkit.ChatColor;
+import com.playmonumenta.plugins.utils.GUIUtils;
+import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemFlag;
@@ -74,7 +75,7 @@ public abstract class DepthsAbility extends Ability {
 
 
 			meta.lore(lore);
-			DepthsUtils.splitLoreLine(meta, getDescription(rarity), 30, ChatColor.WHITE);
+			GUIUtils.splitLoreLine(meta, getDescription(rarity), 30, ChatColor.WHITE, true);
 			stack.setItemMeta(meta);
 			ItemUtils.setPlainName(stack, mInfo.mDisplayName);
 			item.mItem = stack;

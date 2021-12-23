@@ -2,11 +2,11 @@ package com.playmonumenta.plugins.custominventories;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
 import java.util.Set;
 
+import com.playmonumenta.plugins.utils.GUIUtils;
+import com.playmonumenta.plugins.utils.MessagingUtils;
 import org.bukkit.Bukkit;
-import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -19,7 +19,6 @@ import com.goncalomb.bukkit.mylib.utils.CustomInventory;
 import com.playmonumenta.networkrelay.NetworkRelayAPI;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.redissync.MonumentaRedisSyncAPI;
-import com.playmonumenta.scriptedquests.Plugin;
 import com.playmonumenta.scriptedquests.utils.ScoreboardUtils;
 
 import net.kyori.adventure.text.Component;
@@ -30,9 +29,6 @@ import net.md_5.bungee.api.ChatColor;
 public class OrinCustomInventory extends CustomInventory {
 	private static final Material FILLER = Material.GRAY_STAINED_GLASS_PANE;
 	private static final int[] INSTANCE_LOCATIONS = {20, 22, 24, 38, 40, 42};
-	private static final double[] PLOT_FALLBACK = {-2456.0, 56.5, 1104.0, 90, 0};
-	private static final double[] VALLEY_FALLBACK = {-765.5, 106.0625, 70.5, 180, 0};
-	private static final double[] ISLES_FALLBACK = {-762.5, 70.1, 1344.5, 180, 0};
 
 	/*
 	 * Pages explanation: Page x0 of the x0-x9 set is the default landing for the gui.
@@ -43,7 +39,7 @@ public class OrinCustomInventory extends CustomInventory {
 	 */
 
 	public static class TeleportEntry {
-		int mPage = 1;
+		int mPage;
 		int mSlot;
 		String mName;
 		@Nullable String mScoreboard;
@@ -86,8 +82,8 @@ public class OrinCustomInventory extends CustomInventory {
 	 * Page 11: Region Instance Choice
 	 */
 
-	private static ArrayList<TeleportEntry> ORIN_ITEMS = new ArrayList<>();
-	private ArrayList<TeleportEntry> INSTANCE_ITEMS = new ArrayList<>();
+	private static final ArrayList<TeleportEntry> ORIN_ITEMS = new ArrayList<>();
+	private final ArrayList<TeleportEntry> INSTANCE_ITEMS = new ArrayList<>();
 
 	static {
 		ORIN_ITEMS.add(new TeleportEntry(0, 20, "Labs", "Click to teleport!", Material.GLASS_BOTTLE, "D0Access", 1, "execute as @S run function monumenta:lobbies/send_one/d0"));
@@ -144,8 +140,8 @@ public class OrinCustomInventory extends CustomInventory {
 		ORIN_ITEMS.add(new TeleportEntry(10, 4, "Available Shards", "Choose your shard below.", Material.SCUTE, null, 0, ""));
 	}
 
-	private int mCurrentPage = -1;
-	private String mCurrentShard = ServerProperties.getShardName();
+	private int mCurrentPage;
+	private final String mCurrentShard = ServerProperties.getShardName();
 
 	public OrinCustomInventory(Player player, int page) {
 		super(player, 54, "Teleportation Choices");
@@ -169,7 +165,7 @@ public class OrinCustomInventory extends CustomInventory {
 	@Override
 	protected void inventoryClick(InventoryClickEvent event) {
 		event.setCancelled(true);
-		Player player = null;
+		Player player;
 		if (event.getWhoClicked() instanceof Player) {
 			player = (Player) event.getWhoClicked();
 		} else {
@@ -180,7 +176,7 @@ public class OrinCustomInventory extends CustomInventory {
 			return;
 		}
 
-		int commonPage = (int) Math.floor(mCurrentPage / 10) * 10;
+		int commonPage = (int) Math.floor(mCurrentPage / 10.0) * 10;
 		if (clickedItem != null && clickedItem.getType() != FILLER && !event.isShiftClick()) {
 			int chosenSlot = event.getSlot();
 			for (TeleportEntry item : ORIN_ITEMS) {
@@ -214,20 +210,15 @@ public class OrinCustomInventory extends CustomInventory {
 	}
 
 	public Boolean isInternalCommand(String command) {
-		if (command.equals("exit") || command.startsWith("page") || command.startsWith("instancebot") || command.equals("back")) {
-			return true;
-		}
-		return false;
+		return command.equals("exit") || command.startsWith("page") || command.startsWith("instancebot") || command.equals("back");
 	}
 
 	public void runInternalCommand(Player player, String cmd) {
 		if (cmd.startsWith("page")) {
 			mCurrentPage = Integer.parseInt(cmd.split(" ")[1]);
 			setLayout(player);
-			return;
 		} else if (cmd.startsWith("exit")) {
 			player.closeInventory();
-			return;
 		} else if (cmd.startsWith("instancebot")) {
 			String searchTerm = cmd.split(" ")[1];
 			mCurrentPage = (searchTerm.equals("valley")) ? 11 : 12;
@@ -252,45 +243,18 @@ public class OrinCustomInventory extends CustomInventory {
 		}
 		if (isInternalCommand(cmd)) {
 			runInternalCommand(player, cmd);
-			return;
 		} else {
 			if (cmd.startsWith("transferserver")) {
 				//input format should be "transferserver <shard_name>"
 				String[] splitCommand = cmd.split(" ");
 				String targetShard = splitCommand[1];
-				Location returnLoc = null;
-				Float returnYaw = null;
-				Float returnPitch = null;
-
-				if (mCurrentShard.equals("playerplots")) {
-					// Don't modify return location
-				} else {
-					double[] currentShardVals;
-					if (mCurrentShard.contains("valley")) {
-						currentShardVals = VALLEY_FALLBACK;
-					} else if (mCurrentShard.contains("isles")) {
-						currentShardVals = ISLES_FALLBACK;
-					} else {
-						currentShardVals = PLOT_FALLBACK;
-					}
-
-					double x = currentShardVals[0];
-					double y = currentShardVals[1];
-					double z = currentShardVals[2];
-					returnYaw = (float) currentShardVals[3];
-					returnPitch = (float) currentShardVals[4];
-
-					returnLoc = new Location(player.getWorld(), x, y, z);
-				}
 
 				try {
 					/* Note that this API accepts null returnLoc, returnYaw, returnPitch as default current player location */
-					MonumentaRedisSyncAPI.sendPlayer(player, targetShard, returnLoc, returnYaw, returnPitch);
+					MonumentaRedisSyncAPI.sendPlayer(player, targetShard);
 				} catch (Exception e) {
-					player.sendMessage("Exception Message: " + e.getMessage());
-					player.sendMessage("Stack Trace:\n" + e.getStackTrace());
+					MessagingUtils.sendStackTrace(player, e);
 				}
-				return;
 			} else {
 				String finalCommand = cmd.replace("@S", player.getName());
 				Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), finalCommand);
@@ -304,38 +268,17 @@ public class OrinCustomInventory extends CustomInventory {
 		ItemMeta meta = newItem.getItemMeta();
 		meta.displayName(Component.text(location.mName, NamedTextColor.GOLD)
 				.decoration(TextDecoration.ITALIC, false));
-		ArrayList<String> lore = new ArrayList<String>();
-		if (location.mLore != "") {
-			splitLoreLine(meta, location.mLore, 30, ChatColor.DARK_PURPLE);
+		if (!location.mLore.isEmpty()) {
+			GUIUtils.splitLoreLine(meta, location.mLore, 30, ChatColor.DARK_PURPLE, true);
 		}
 		meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
 		newItem.setItemMeta(meta);
 		return newItem;
 	}
 
-	public void splitLoreLine(ItemMeta meta, String lore, int maxLength, ChatColor defaultColor) {
-		String[] splitLine = lore.split(" ");
-		String currentString = defaultColor + "";
-		List<String> finalLines = new ArrayList<String>();
-		int currentLength = 0;
-		for (String word : splitLine) {
-			if (currentLength + word.length() > maxLength) {
-				finalLines.add(currentString);
-				currentString = defaultColor + "";
-				currentLength = 0;
-			}
-			currentString += word + " ";
-			currentLength += word.length() + 1;
-		}
-		if (currentString != defaultColor + "") {
-			finalLines.add(currentString);
-		}
-		meta.setLore(finalLines);
-	}
-
 	public void setLayout(Player player) {
 		_inventory.clear();
-		int commonPage = (int) Math.floor(mCurrentPage / 10) * 10;
+		int commonPage = (int) Math.floor(mCurrentPage / 10.0) * 10;
 		for (TeleportEntry item : ORIN_ITEMS) {
 			if (item.mPage == commonPage) {
 				if (item.mScoreboard == null || ScoreboardUtils.getScoreboardValue(player, item.mScoreboard) >= item.mScoreRequired) {
@@ -371,13 +314,16 @@ public class OrinCustomInventory extends CustomInventory {
 			player.closeInventory();
 		}
 		int index = 0;
+		if (results == null) {
+			return;
+		}
 		results.removeIf(item -> !item.startsWith(searchTerm));
 		int page = (searchTerm.equals("valley")) ? 11 : 12;
 		Material itemType = (searchTerm.equals("valley")) ? Material.GRASS : Material.PUFFERFISH;
 		ArrayList<String> resultList = new ArrayList<>(results);
 		Collections.sort(resultList);
 		for (String shard : resultList) {
-			String shardName = shard.substring(0, 1).toUpperCase() + shard.substring(1, shard.length());
+			String shardName = shard.substring(0, 1).toUpperCase() + shard.substring(1);
 			if (index <= INSTANCE_LOCATIONS.length) {
 				INSTANCE_ITEMS.add(new TeleportEntry(page, INSTANCE_LOCATIONS[index++], shardName, "Click to teleport!", itemType, null, 0, "transferserver " + shard));
 			}

@@ -95,11 +95,11 @@ public final class SignUtils {
 		private final List<String> mText;
 
 		private @Nullable BiPredicate<Player, String[]> mResponse;
-		private boolean mReopenIfFail;
+		private boolean mReopenIfFail = false;
 
 		private @Nullable BlockPosition mPosition;
 
-		private boolean mForceClose;
+		private boolean mForceClose = false;
 
 		Menu(List<String> text) {
 			this.mText = text;

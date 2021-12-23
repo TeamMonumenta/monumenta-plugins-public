@@ -2,8 +2,8 @@ package com.playmonumenta.plugins.custominventories;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
+import com.playmonumenta.plugins.utils.GUIUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -37,11 +37,11 @@ public class ClassSelectionCustomInventory extends CustomInventory {
 	private static final int P1_CLASS_START_LOC = 19;
 	private static final int P1_RESET_CLASS_LOC = 38;
 	private static final int P1_RESET_SPEC_LOC = 42;
-	public static final ArrayList<Integer> P2_ABILITY_LOCS = new ArrayList<Integer>(Arrays.asList(10, 14, 19, 23, 28, 32, 37, 41));
-	public static final ArrayList<Integer> P2_SPEC_LOCS = new ArrayList<Integer>(Arrays.asList(47, 51));
+	public static final ArrayList<Integer> P2_ABILITY_LOCS = new ArrayList<>(Arrays.asList(10, 14, 19, 23, 28, 32, 37, 41));
+	public static final ArrayList<Integer> P2_SPEC_LOCS = new ArrayList<>(Arrays.asList(47, 51));
 	private static final int P2_RESET_SPEC_LOC = 49;
-	public static final ArrayList<Integer> P3_SPEC_LOCS = new ArrayList<Integer>(Arrays.asList(20, 30, 40));
-	private static MonumentaClasses mClasses = new MonumentaClasses(Plugin.getInstance(), null);
+	public static final ArrayList<Integer> P3_SPEC_LOCS = new ArrayList<>(Arrays.asList(20, 30, 40));
+	private static final MonumentaClasses mClasses = new MonumentaClasses(Plugin.getInstance(), null);
 	private static final String ABILITY_SKILLCOUNT = "Skill";
 	private static final String SPEC_SKILLCOUNT = "SkillSpec";
 
@@ -61,7 +61,7 @@ public class ClassSelectionCustomInventory extends CustomInventory {
 				event.isShiftClick()) {
 			return;
 		}
-		if (event.getCurrentItem().getType() == Material.BARRIER) {
+		if (clickedItem.getType() == Material.BARRIER) {
 			//no barrier item should do anything
 			return;
 		}
@@ -74,7 +74,7 @@ public class ClassSelectionCustomInventory extends CustomInventory {
 			//clicked a class location
 			if (chosenSlot >= P1_CLASS_START_LOC && chosenSlot <= P1_CLASS_START_LOC + 6) {
 				for (PlayerClass oneClass : mClasses.mClasses) {
-					if (event.getCurrentItem().getType() == oneClass.mDisplayItem.getType()) {
+					if (oneClass.mDisplayItem != null && clickedItem.getType() == oneClass.mDisplayItem.getType()) {
 						ScoreboardUtils.setScoreboardValue(player, "Class", oneClass.mClass);
 						makePageTwo(oneClass, player);
 						break;
@@ -82,11 +82,11 @@ public class ClassSelectionCustomInventory extends CustomInventory {
 				}
 			} else if (chosenSlot == P1_RESET_CLASS_LOC) {
 				Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(),
-						"execute as " + player.getDisplayName() + " run function monumenta:class_selection/reset");
+						"execute as " + player.getUniqueId() + " run function monumenta:class_selection/reset");
 				makePageOne(player);
 			} else if (chosenSlot == P1_RESET_SPEC_LOC) {
 				Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(),
-						"execute as " + player.getDisplayName() + " run function monumenta:class_selection/reset_spec");
+						"execute as " + player.getUniqueId() + " run function monumenta:class_selection/reset_spec");
 				makePageOne(player);
 			}
 			break;
@@ -116,7 +116,7 @@ public class ClassSelectionCustomInventory extends CustomInventory {
 				}
 			} else if (chosenSlot == P2_RESET_SPEC_LOC) {
 				Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(),
-						"execute as " + player.getDisplayName() + " run function monumenta:class_selection/reset_spec");
+						"execute as " + player.getUniqueId() + " run function monumenta:class_selection/reset_spec");
 				for (PlayerClass oneClass : mClasses.mClasses) {
 					if (ScoreboardUtils.getScoreboardValue(player, "Class") == oneClass.mClass) {
 						makePageTwo(oneClass, player);
@@ -171,8 +171,7 @@ public class ClassSelectionCustomInventory extends CustomInventory {
 			if (oneClass.mQuestReq != null) {
 				lockedClass = ScoreboardUtils.getScoreboardValue(player, oneClass.mQuestReq) < oneClass.mQuestReqMin;
 			}
-			ItemStack createItem = createClassItem(oneClass, player,
-					(playerClass != null && playerClass != oneClass), lockedClass);
+			ItemStack createItem = createClassItem(oneClass, (playerClass != null && playerClass != oneClass), lockedClass);
 			_inventory.setItem(currentSlot++, createItem);
 		}
 
@@ -216,9 +215,11 @@ public class ClassSelectionCustomInventory extends CustomInventory {
 		}
 
 		//summary
-		ItemStack summaryItem = createBasicItem(userClass.mDisplayItem.getType(), "Class Skills", NamedTextColor.WHITE, false,
+		if (userClass.mDisplayItem != null) {
+			ItemStack summaryItem = createBasicItem(userClass.mDisplayItem.getType(), "Class Skills", NamedTextColor.WHITE, false,
 				"Pick your skills and, if unlocked, your specialization.", ChatColor.LIGHT_PURPLE);
-		_inventory.setItem(COMMON_SUMMARY_LOC, summaryItem);
+			_inventory.setItem(COMMON_SUMMARY_LOC, summaryItem);
+		}
 
 		//back button
 		ItemStack backButton = createBasicItem(Material.ARROW, "Back",
@@ -250,9 +251,11 @@ public class ClassSelectionCustomInventory extends CustomInventory {
 		}
 
 		//summary
-		ItemStack summaryItem = createBasicItem(spec.mDisplayItem.getType(), "Specialization Skills", NamedTextColor.WHITE, false,
+		if (spec.mDisplayItem != null) {
+			ItemStack summaryItem = createBasicItem(spec.mDisplayItem.getType(), "Specialization Skills", NamedTextColor.WHITE, false,
 				"Pick your specialization skills.", ChatColor.LIGHT_PURPLE);
-		_inventory.setItem(COMMON_SUMMARY_LOC, summaryItem);
+			_inventory.setItem(COMMON_SUMMARY_LOC, summaryItem);
+		}
 
 		//back button
 		ItemStack backButton = createBasicItem(Material.ARROW, "Back",
@@ -285,7 +288,9 @@ public class ClassSelectionCustomInventory extends CustomInventory {
 					}
 				}
 				makePageTwo(oneClass, player);
-				AbilityManager.getManager().updatePlayerAbilities(player);
+				if (AbilityManager.getManager() != null) {
+					AbilityManager.getManager().updatePlayerAbilities(player);
+				}
 				return;
 			}
 		}
@@ -327,10 +332,15 @@ public class ClassSelectionCustomInventory extends CustomInventory {
 			}
 			makePageThree(theClass, spec, player);
 		}
-		AbilityManager.getManager().updatePlayerAbilities(player);
+		if (AbilityManager.getManager() != null) {
+			AbilityManager.getManager().updatePlayerAbilities(player);
+		}
 	}
 
 	public void addSpecItem(PlayerSpec spec, PlayerSpec otherSpec, int specNumber, Player player) {
+		if (spec.mDisplayItem == null) {
+			return;
+		}
 		if (ScoreboardUtils.getScoreboardValue(player, spec.mSpecQuestScoreboard) < 100) {
 			//not unlocked
 			ItemStack specItem = createBasicItem(Material.BARRIER, "Unknown", NamedTextColor.RED, false,
@@ -352,7 +362,7 @@ public class ClassSelectionCustomInventory extends CustomInventory {
 					"Click to choose this specialization!", ChatColor.GRAY);
 			if (spec.mDescription != null) {
 				ItemMeta newMeta = specItem.getItemMeta();
-				splitLoreLine(newMeta, "Description: " + spec.mDescription, 30, ChatColor.YELLOW, false);
+				GUIUtils.splitLoreLine(newMeta, "Description: " + spec.mDescription, 30, ChatColor.YELLOW, false);
 				specItem.setItemMeta(newMeta);
 			}
 			_inventory.setItem(P2_SPEC_LOCS.get(specNumber - 1), specItem);
@@ -362,68 +372,42 @@ public class ClassSelectionCustomInventory extends CustomInventory {
 	public ItemStack createLevelItem(PlayerClass theClass, Ability ability, int level, Player player) {
 		Material newMat = ScoreboardUtils.getScoreboardValue(player, ability.getScoreboard()) >= level ?
 				Material.LIME_STAINED_GLASS_PANE : Material.RED_STAINED_GLASS_PANE;
-		ItemStack newItem = createBasicItem(newMat, "Level " + level,
+		return createBasicItem(newMat, "Level " + level,
 				theClass.mClassColor, true, ability.mInfo.mDescriptions.get(level - 1), ChatColor.WHITE);
-		return newItem;
 	}
 
 	public ItemStack createAbilityItem(PlayerClass theClass, Ability ability) {
-		ItemStack newItem = createBasicItem(ability.mDisplayItem.getType(), ability.getDisplayName(),
+		return createBasicItem(ability.mDisplayItem.getType(), ability.getDisplayName(),
 				theClass.mClassColor, true, "Click here to remove your levels in this skill, and click the panes to the right to pick a level in this skill.", ChatColor.WHITE);
-
 		//in case someone makes ability descriptions not the length of a short essay:
 		//also need to getlore from the function call, then add to it if these lines are used
-		//splitLoreLine(meta, "Level 1: " + ability.mInfo.mDescriptions.get(0), 30, ChatColor.WHITE, true);
-		//splitLoreLine(meta, "Level 2: " + ability.mInfo.mDescriptions.get(1), 30, ChatColor.WHITE, false);
-		return newItem;
+		//GUIUtils.splitLoreLine(meta, "Level 1: " + ability.mInfo.mDescriptions.get(0), 30, ChatColor.WHITE, true);
+		//GUIUtils.splitLoreLine(meta, "Level 2: " + ability.mInfo.mDescriptions.get(1), 30, ChatColor.WHITE, false);
 	}
 
-	public ItemStack createClassItem(PlayerClass classToItemize, Player player, boolean otherChosen, boolean locked) {
+	public ItemStack createClassItem(PlayerClass classToItemize, boolean otherChosen, boolean locked) {
 		if (locked) {
-
-			ItemStack newItem = createBasicItem(Material.BARRIER, classToItemize.mClassName,
+			return createBasicItem(Material.BARRIER, classToItemize.mClassName,
 					classToItemize.mClassColor, true, "You don't have the requirements to choose this class.", ChatColor.RED);
-			return newItem;
 		}
 		if (otherChosen) {
-			ItemStack newItem = createBasicItem(Material.BARRIER, classToItemize.mClassName,
+			return createBasicItem(Material.BARRIER, classToItemize.mClassName,
 					classToItemize.mClassColor, true, "Reset your class to choose this one!", ChatColor.RED);
-			return newItem;
 		}
 		ItemStack newItem = createBasicItem(classToItemize.mDisplayItem.getType(), classToItemize.mClassName,
 				classToItemize.mClassColor, true, "Click to choose this class!", ChatColor.GRAY);
 		if (classToItemize.mClassDescription != null) {
 			ItemMeta newMeta = newItem.getItemMeta();
-			splitLoreLine(newMeta, "Description: " + classToItemize.mClassDescription, 30, ChatColor.YELLOW, false);
+			GUIUtils.splitLoreLine(newMeta, "Description: " + classToItemize.mClassDescription, 30, ChatColor.YELLOW, false);
 			newItem.setItemMeta(newMeta);
 		}
 		if (classToItemize.mClassPassiveDescription != null) {
 			ItemMeta newMeta = newItem.getItemMeta();
-			splitLoreLine(newMeta, "Passive: " + classToItemize.mClassPassiveDescription, 30, ChatColor.GREEN, false);
+			GUIUtils.splitLoreLine(newMeta, "Passive: " + classToItemize.mClassPassiveDescription, 30, ChatColor.GREEN, false);
 			newItem.setItemMeta(newMeta);
 		}
 
 		return newItem;
-	}
-
-	public void splitLoreLine(ItemMeta meta, String lore, int maxLength, ChatColor defaultColor, boolean clean) {
-		String[] splitLine = lore.split(" ");
-		String currentString = defaultColor + "";
-		List<String> finalLines = clean ? new ArrayList<String>() : meta.getLore();
-		int currentLength = 0;
-		for (String word : splitLine) {
-			if (currentLength + word.length() > maxLength) {
-				finalLines.add(currentString);
-				currentString = defaultColor + "";
-				currentLength = 0;
-			}
-			currentString += word + " ";
-			currentLength += word.length() + 1;
-		}
-		if (currentString != defaultColor + "") {
-			finalLines.add(currentString);
-		}
-		meta.setLore(finalLines);
 	}
 
 	public ItemStack createBasicItem(Material mat, String name, NamedTextColor nameColor, boolean nameBold, String desc, ChatColor loreColor) {
@@ -432,7 +416,7 @@ public class ClassSelectionCustomInventory extends CustomInventory {
 		meta.displayName(Component.text(name, nameColor)
 				.decoration(TextDecoration.ITALIC, false)
 				.decoration(TextDecoration.BOLD, nameBold));
-		splitLoreLine(meta, desc, 30, loreColor, true);
+		GUIUtils.splitLoreLine(meta, desc, 30, loreColor, true);
 		meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
 		meta.addItemFlags(ItemFlag.HIDE_POTION_EFFECTS);
 		item.setItemMeta(meta);

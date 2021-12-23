@@ -17,6 +17,9 @@ public class DepthsAbilitiesGUI extends CustomInventory {
 
 
 		List<DepthsAbilityItem> items = DepthsManager.getInstance().getAbilityUnlocks(player);
+		if (items == null || items.size() < 1) {
+			return;
+		}
 
 		for (int i = 0; i < 27; i++) {
 			_inventory.setItem(i, new ItemStack(FILLER, 1));
@@ -37,11 +40,12 @@ public class DepthsAbilitiesGUI extends CustomInventory {
 	protected void inventoryClick(InventoryClickEvent event) {
 		event.setCancelled(true);
 		if (event.getClickedInventory() != _inventory ||
+				event.getCurrentItem() == null ||
 				event.getCurrentItem().getType() == FILLER ||
 				event.isShiftClick()) {
 			return;
 		}
-		int slot = 0;
+		int slot;
 		if (event.getSlot() == 10) {
 			slot = 0;
 		} else if (event.getSlot() == 13) {

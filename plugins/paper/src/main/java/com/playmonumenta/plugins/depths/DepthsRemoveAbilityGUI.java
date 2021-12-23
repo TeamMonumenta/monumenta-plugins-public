@@ -1,9 +1,10 @@
 package com.playmonumenta.plugins.depths;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
+import com.playmonumenta.plugins.utils.GUIUtils;
+import com.playmonumenta.plugins.utils.ItemUtils;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -21,14 +22,13 @@ import net.kyori.adventure.text.format.TextDecoration;
 import net.md_5.bungee.api.ChatColor;
 
 public class DepthsRemoveAbilityGUI extends CustomInventory {
-	public static final ArrayList<Integer> HEAD_LOCATIONS = new ArrayList<Integer>(Arrays.asList(46, 48, 50, 52));
 	private static final int START_OF_PASSIVES = 36;
 	private static final Material FILLER = Material.GRAY_STAINED_GLASS_PANE;
 	private static final Material CONFIRM_MAT = Material.GREEN_STAINED_GLASS_PANE;
 	private static final Material CANCEL_MAT = Material.ORANGE_STAINED_GLASS_PANE;
 	private static final int CONFIRM_ABILITY_LOC = 13;
 
-	class TriggerData {
+	static class TriggerData {
 		int mInvLocation;
 		DepthsTrigger mTrigger;
 		String mString;
@@ -40,7 +40,9 @@ public class DepthsRemoveAbilityGUI extends CustomInventory {
 		}
 	}
 
-	public static List<TriggerData> TRIGGER_STRINGS = new ArrayList<TriggerData>();
+	public static List<TriggerData> TRIGGER_STRINGS = new ArrayList<>();
+
+	private String mAbilityName;
 
 	public DepthsRemoveAbilityGUI(Player targetPlayer) {
 		super(targetPlayer, 54, "Remove an Ability");
@@ -80,7 +82,7 @@ public class DepthsRemoveAbilityGUI extends CustomInventory {
 
 		if (event.getCurrentItem().getType() == CONFIRM_MAT) {
 			for (DepthsAbility ability : abilities) {
-				if (_inventory.getItem(CONFIRM_ABILITY_LOC).getItemMeta().getDisplayName().contains(ability.mInfo.mDisplayName)) {
+				if (ability.mInfo.mDisplayName != null && mAbilityName.contains(ability.mInfo.mDisplayName)) {
 					DepthsPlayer depthsplayer = instance.mPlayers.get(player.getUniqueId());
 					if (depthsplayer != null && !depthsplayer.mUsedAbilityDeletion) {
 						depthsplayer.mUsedAbilityDeletion = true;
@@ -95,18 +97,20 @@ public class DepthsRemoveAbilityGUI extends CustomInventory {
 			setAbilities(player);
 		} else {
 			for (DepthsAbility ability : abilities) {
-				if (_inventory.getItem(event.getSlot()).getItemMeta().getDisplayName().contains(ability.mInfo.mDisplayName)) {
-					setConfirmation(player, _inventory.getItem(event.getSlot()));
+				if (ability.mInfo.mDisplayName != null &&
+					ItemUtils.getPlainName(_inventory.getItem(event.getSlot())).contains(ability.mInfo.mDisplayName)) {
+					setConfirmation(_inventory.getItem(event.getSlot()));
 					return;
 				}
 			}
 		}
 	}
 
-	public void setConfirmation(Player player, ItemStack item) {
+	public void setConfirmation(ItemStack item) {
 		for (int i = 0; i < _inventory.getSize(); i++) {
 			_inventory.setItem(i, new ItemStack(FILLER, 1));
 		}
+		mAbilityName = ItemUtils.getPlainName(item);
 
 		_inventory.setItem(CONFIRM_ABILITY_LOC, item);
 		ItemStack createItem = createCustomItem(CONFIRM_MAT, "Confirm", "Confirm ability removal");
@@ -131,7 +135,7 @@ public class DepthsRemoveAbilityGUI extends CustomInventory {
 				"Remove 1 ability of your choosing at no cost.");
 		_inventory.setItem(4, createItem);
 
-		List<DepthsAbilityItem> passiveItems = new ArrayList<DepthsAbilityItem>();
+		List<DepthsAbilityItem> passiveItems = new ArrayList<>();
 		for (DepthsAbilityItem item : items) {
 			if (item.mTrigger == DepthsTrigger.PASSIVE) {
 				passiveItems.add(item);
@@ -150,7 +154,8 @@ public class DepthsRemoveAbilityGUI extends CustomInventory {
 		}
 
 		for (int i = 19; i <= 25; i++) {
-			if (_inventory.getItem(i) != null && _inventory.getItem(i).getType() == FILLER) {
+			ItemStack checkItem = _inventory.getItem(i);
+			if (checkItem != null && checkItem.getType() == FILLER) {
 				ItemStack noAbility = new ItemStack(Material.RED_STAINED_GLASS_PANE, 1);
 				ItemMeta noAbilityMeta = noAbility.getItemMeta();
 				for (TriggerData data : TRIGGER_STRINGS) {
@@ -170,36 +175,16 @@ public class DepthsRemoveAbilityGUI extends CustomInventory {
 	public ItemStack createCustomItem(Material type, String name, String lore) {
 		ItemStack newItem = new ItemStack(type, 1);
 		ItemMeta meta = newItem.getItemMeta();
-		if (name != "") {
+		if (!name.isEmpty()) {
 			meta.displayName(Component.text(name, NamedTextColor.WHITE)
 					.decoration(TextDecoration.ITALIC, false)
 					.decoration(TextDecoration.BOLD, true));
 		}
 		ChatColor defaultColor = ChatColor.GRAY;
-		if (lore != "") {
-			splitLoreLine(meta, lore, 30, defaultColor);
+		if (!lore.isEmpty()) {
+			GUIUtils.splitLoreLine(meta, lore, 30, defaultColor, true);
 		}
 		newItem.setItemMeta(meta);
 		return newItem;
-	}
-
-	public void splitLoreLine(ItemMeta meta, String lore, int maxLength, ChatColor defaultColor) {
-		String[] splitLine = lore.split(" ");
-		String currentString = defaultColor + "";
-		List<String> finalLines = new ArrayList<String>();
-		int currentLength = 0;
-		for (String word : splitLine) {
-			if (currentLength + word.length() > maxLength) {
-				finalLines.add(currentString);
-				currentString = defaultColor + "";
-				currentLength = 0;
-			}
-			currentString += word + " ";
-			currentLength += word.length() + 1;
-		}
-		if (currentString != defaultColor + "") {
-			finalLines.add(currentString);
-		}
-		meta.setLore(finalLines);
 	}
 }

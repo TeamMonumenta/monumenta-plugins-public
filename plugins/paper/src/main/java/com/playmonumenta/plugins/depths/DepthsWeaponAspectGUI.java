@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
 
+import com.playmonumenta.plugins.utils.ItemUtils;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -40,6 +41,7 @@ public class DepthsWeaponAspectGUI extends CustomInventory {
 	protected void inventoryClick(InventoryClickEvent event) {
 		event.setCancelled(true);
 		if (event.getClickedInventory() != _inventory ||
+				event.getCurrentItem() == null ||
 				event.getCurrentItem().getType() == FILLER ||
 				event.getCurrentItem().getType() == PURCHASED_MAT ||
 				event.isShiftClick()) {
@@ -56,45 +58,29 @@ public class DepthsWeaponAspectGUI extends CustomInventory {
 			return;
 		}
 
-		int slot = 0;
+		int slot;
 		if (player.getScoreboardTags().contains(PAID_SCOREBOARD_TAG)) {
 			switch (event.getSlot()) {
-			case 10:
-				slot = 0;
-				break;
-			case 11:
-				slot = 1;
-				break;
-			case 12:
-				slot = 2;
-				break;
-			case 14:
-				slot = 3;
-				break;
-			case 15:
-				slot = 4;
-				break;
-			case 16:
-				slot = 5;
-				break;
-			default:
-				player.closeInventory();
-				return;
+				case 10 -> slot = 0;
+				case 11 -> slot = 1;
+				case 12 -> slot = 2;
+				case 14 -> slot = 3;
+				case 15 -> slot = 4;
+				case 16 -> slot = 5;
+				default -> {
+					player.closeInventory();
+					return;
+				}
 			}
 		} else {
 			switch (event.getSlot()) {
-			case 10:
-				slot = 0;
-				break;
-			case 13:
-				slot = 1;
-				break;
-			case 16:
-				slot = 2;
-				break;
-			default:
-				player.closeInventory();
-				return;
+				case 10 -> slot = 0;
+				case 13 -> slot = 1;
+				case 16 -> slot = 2;
+				default -> {
+					player.closeInventory();
+					return;
+				}
 			}
 		}
 
@@ -106,7 +92,7 @@ public class DepthsWeaponAspectGUI extends CustomInventory {
 	void setLayout(Player player, Inventory inventory, Boolean paid) {
 		int[] paidLocations = {10, 11, 12, 14, 15, 16};
 		int[] unpaidLocations = {10, 13, 16};
-		int[] chosenArray = null;
+		int[] chosenArray;
 
 		List<WeaponAspectDepthsAbility> weapons = DepthsManager.getInstance().mPlayers.get(player.getUniqueId()).mWeaponOfferings;
 		List<DepthsAbilityItem> items = new ArrayList<>();
@@ -118,11 +104,6 @@ public class DepthsWeaponAspectGUI extends CustomInventory {
 
 		for (WeaponAspectDepthsAbility weapon : weapons) {
 			items.add(weapon.getAbilityItem(1));
-		}
-
-		if (items == null || items.size() == 0) {
-			close();
-			return;
 		}
 
 		Material payButton = (paid) ? PURCHASED_MAT : BUY_ITEM;
@@ -144,7 +125,7 @@ public class DepthsWeaponAspectGUI extends CustomInventory {
 			ItemMeta meta = paidFor.getItemMeta();
 			meta.displayName(Component.text("Purchase Upgrade", NamedTextColor.YELLOW)
 					.decoration(TextDecoration.ITALIC, false));
-			ArrayList<Component> loreLines = new ArrayList<Component>();
+			ArrayList<Component> loreLines = new ArrayList<>();
 			loreLines.add(Component.text("Choose from all aspects", NamedTextColor.GRAY)
 					.decoration(TextDecoration.ITALIC, false));
 			loreLines.add(Component.text("for ", NamedTextColor.GRAY)
@@ -166,6 +147,9 @@ public class DepthsWeaponAspectGUI extends CustomInventory {
 	Boolean attemptUpgrade(Player player) {
 		int totalToRemove = CCS_AMOUNT;
 		ItemStack currencyItem = InventoryUtils.getItemFromLootTable(player, NamespacedKeyUtils.fromString("epic:r2/items/currency/compressed_crystalline_shard"));
+		if (currencyItem == null) {
+			return false;
+		}
 		currencyItem.setAmount(1);
 		String currencyName = "Compressed Crystalline Shard";
 
@@ -176,7 +160,7 @@ public class DepthsWeaponAspectGUI extends CustomInventory {
 				for (Entry<Integer, ? extends ItemStack> set : findItems.entrySet()) {
 					ItemStack testStack = set.getValue().clone();
 					testStack.setAmount(1);
-					if (testStack.getItemMeta().getDisplayName().contains(currencyName)) {
+					if (ItemUtils.getPlainName(testStack).contains(currencyName)) {
 						ItemStack foundItem = set.getValue();
 						if (foundItem.getAmount() > totalToRemove) {
 							foundItem.setAmount(foundItem.getAmount() - totalToRemove);

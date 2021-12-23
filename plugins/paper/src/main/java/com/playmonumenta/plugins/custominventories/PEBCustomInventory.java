@@ -2,8 +2,9 @@ package com.playmonumenta.plugins.custominventories;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
+import com.playmonumenta.plugins.utils.GUIUtils;
+import com.playmonumenta.plugins.utils.ItemUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -14,7 +15,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.goncalomb.bukkit.mylib.utils.CustomInventory;
 import com.playmonumenta.plugins.Plugin;
@@ -30,13 +30,13 @@ public class PEBCustomInventory extends CustomInventory {
 	private static final Material FILLER = Material.GRAY_STAINED_GLASS_PANE;
 
 	public static class PebItem {
-		int mPage = 1;
+		int mPage;
 		int mSlot;
 		String mName;
 		String mLore;
 		Material mType;
 		String mCommand;
-		@Nullable ChatColor mChatColor = null;
+		ChatColor mChatColor;
 		Boolean mCloseAfter;
 
 		public PebItem(int pg, int sl, String n, String l, ChatColor cc, Material t, String cmd, Boolean closeAfter) {
@@ -52,7 +52,7 @@ public class PEBCustomInventory extends CustomInventory {
 
 	}
 
-	private static ArrayList<PebItem> PEB_ITEMS = new ArrayList<>();
+	private static final ArrayList<PebItem> PEB_ITEMS = new ArrayList<>();
 
 	static {
 		//If the command is internal to the GUI, closeAfter is ignored. Otherwise, the GUI abides by that boolean.
@@ -305,7 +305,7 @@ public class PEBCustomInventory extends CustomInventory {
 	@Override
 	protected void inventoryClick(InventoryClickEvent event) {
 		event.setCancelled(true);
-		Player player = null;
+		Player player;
 		if (event.getWhoClicked() instanceof Player) {
 			player = (Player) event.getWhoClicked();
 		} else {
@@ -330,20 +330,14 @@ public class PEBCustomInventory extends CustomInventory {
 	}
 
 	public Boolean isInternalCommand(String command) {
-		if (command.equals("exit") || command.startsWith("page") || command.equals("threshold")) {
-			return true;
-		}
-		return false;
+		return command.equals("exit") || command.startsWith("page") || command.equals("threshold");
 	}
 
 	public Boolean isPlayerCommand(String command) {
-		if (command.startsWith("clickable") ||
-				command.startsWith("pickup") ||
-				command.equals("toggleswap") ||
-				command.startsWith("disabledrop")) {
-			return true;
-		}
-		return false;
+		return command.startsWith("clickable") ||
+			command.startsWith("pickup") ||
+			command.equals("toggleswap") ||
+			command.startsWith("disabledrop");
 	}
 
 	public void runInternalCommand(Player player, PebItem item) {
@@ -380,10 +374,10 @@ public class PEBCustomInventory extends CustomInventory {
 
 	public void callSignUI(Player target) {
 		SignUtils.Menu menu = SignUtils.newMenu(
-				new ArrayList<String>(Arrays.asList("", "~~~~~~~~~~~", "Input a number", "from 1-65 above.")))
+				new ArrayList<>(Arrays.asList("", "~~~~~~~~~~~", "Input a number", "from 1-65 above.")))
 	            .reopenIfFail(false)
 	            .response((player, strings) -> {
-					int inputVal = -1;
+					int inputVal;
 					try {
 						inputVal = Integer.parseInt(strings[0]);
 					} catch (Exception e) {
@@ -425,37 +419,18 @@ public class PEBCustomInventory extends CustomInventory {
 			newItem.setItemMeta(meta);
 		}
 		ItemMeta meta = newItem.getItemMeta();
-		if (item.mName != "") {
+		if (!item.mName.isEmpty()) {
 			meta.displayName(Component.text(item.mName, NamedTextColor.WHITE)
 				                 .decoration(TextDecoration.ITALIC, false));
 		}
 		ChatColor defaultColor = (item.mChatColor != null) ? item.mChatColor : ChatColor.LIGHT_PURPLE;
-		if (item.mLore != "") {
-			splitLoreLine(meta, item.mLore, 30, defaultColor);
+		if (!item.mLore.isEmpty()) {
+			GUIUtils.splitLoreLine(meta, item.mLore, 30, defaultColor, true);
 		}
 		meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
 		newItem.setItemMeta(meta);
+		ItemUtils.setPlainName(newItem);
 		return newItem;
-	}
-
-	public static void splitLoreLine(ItemMeta meta, String lore, int maxLength, ChatColor defaultColor) {
-		String[] splitLine = lore.split(" ");
-		String currentString = defaultColor + "";
-		List<String> finalLines = new ArrayList<String>();
-		int currentLength = 0;
-		for (String word : splitLine) {
-			if (currentLength + word.length() > maxLength) {
-				finalLines.add(currentString);
-				currentString = defaultColor + "";
-				currentLength = 0;
-			}
-			currentString += word + " ";
-			currentLength += word.length() + 1;
-		}
-		if (currentString != defaultColor + "") {
-			finalLines.add(currentString);
-		}
-		meta.setLore(finalLines);
 	}
 
 	public static void setLayout(Inventory inventory, int page, Player player) {

@@ -3,11 +3,11 @@ package com.playmonumenta.plugins.plots;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
 import com.goncalomb.bukkit.mylib.utils.CustomInventory;
+import com.playmonumenta.plugins.utils.GUIUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.scriptedquests.utils.ScoreboardUtils;
 import com.playmonumenta.structures.StructuresAPI;
@@ -39,7 +39,7 @@ public class PlotBorderCustomInventory extends CustomInventory {
 	 */
 
 	public static class TeleportEntry {
-		int mPage = 1;
+		int mPage;
 		int mSlot;
 		String mName;
 		@Nullable String mScoreboard;
@@ -47,19 +47,6 @@ public class PlotBorderCustomInventory extends CustomInventory {
 		int mScoreRequired;
 		Material mType;
 		String mLeftClick;
-		@Nullable UUID mBuilder;
-
-		public TeleportEntry(int p, int s, String n, String l, Material t, @Nullable String sc, int sr, String left, @Nullable String builder) {
-			mPage = p;
-			mSlot = s;
-			mName = n;
-			mLore = l;
-			mType = t;
-			mScoreboard = sc;
-			mScoreRequired = sr;
-			mLeftClick = left;
-			mBuilder = UUID.fromString(builder);
-		}
 
 		public TeleportEntry(int p, int s, String n, String l, Material t, @Nullable String sc, int sr, String left) {
 			mPage = p;
@@ -70,7 +57,6 @@ public class PlotBorderCustomInventory extends CustomInventory {
 			mScoreboard = sc;
 			mScoreRequired = sr;
 			mLeftClick = left;
-			mBuilder = null;
 		}
 	}
 	/* Page Info
@@ -82,9 +68,8 @@ public class PlotBorderCustomInventory extends CustomInventory {
 	 * Page 11: Region Instance Choice
 	 */
 
-	private static ArrayList<UUID> BUILDER_IDS = new ArrayList<>();
 
-	private static ArrayList<TeleportEntry> BORDER_ITEMS = new ArrayList<>();
+	private static final ArrayList<TeleportEntry> BORDER_ITEMS = new ArrayList<>();
 
 	static {
 		BORDER_ITEMS.add(new TeleportEntry(0, 47, "Base Choices", "Click to view the plot borders with no requirements.", Material.GRASS_BLOCK, null, 0, "page 1"));
@@ -115,8 +100,8 @@ public class PlotBorderCustomInventory extends CustomInventory {
 		BORDER_ITEMS.add(new TeleportEntry(3, 26, "Echoes of Oblivion", "Warp to another time with this plot located in Era 3!", Material.CYAN_CONCRETE_POWDER, "Teal", 1, "dungeons/teal"));
 	}
 
-	private int mCurrentPage = 0;
-	private Boolean mOverridePermissions = false;
+	private int mCurrentPage;
+	private final Boolean mOverridePermissions;
 
 	public PlotBorderCustomInventory(Player player, boolean fullAccess) {
 		super(player, 54, "Border Choices");
@@ -128,7 +113,7 @@ public class PlotBorderCustomInventory extends CustomInventory {
 	@Override
 	protected void inventoryClick(InventoryClickEvent event) {
 		event.setCancelled(true);
-		Player player = null;
+		Player player;
 		if (event.getWhoClicked() instanceof Player) {
 			player = (Player) event.getWhoClicked();
 		} else {
@@ -139,7 +124,7 @@ public class PlotBorderCustomInventory extends CustomInventory {
 			return;
 		}
 
-		int commonPage = (int) Math.floor(mCurrentPage / 10) * 10;
+		int commonPage = (int) Math.floor(mCurrentPage / 10.0) * 10;
 		if (clickedItem != null && clickedItem.getType() != FILLER && !event.isShiftClick()) {
 			int chosenSlot = event.getSlot();
 			for (TeleportEntry item : BORDER_ITEMS) {
@@ -158,20 +143,15 @@ public class PlotBorderCustomInventory extends CustomInventory {
 	}
 
 	public Boolean isInternalCommand(String command) {
-		if (command.equals("exit") || command.startsWith("page") || command.startsWith("instancebot") || command.equals("back")) {
-			return true;
-		}
-		return false;
+		return command.equals("exit") || command.startsWith("page") || command.startsWith("instancebot") || command.equals("back");
 	}
 
 	public void runInternalCommand(Player player, String cmd) {
 		if (cmd.startsWith("page")) {
 			mCurrentPage = Integer.parseInt(cmd.split(" ")[1]);
 			setLayout(player);
-			return;
 		} else if (cmd.startsWith("exit")) {
 			player.closeInventory();
-			return;
 		} else if (cmd.equals("back")) {
 			mCurrentPage = 1;
 			setLayout(player);
@@ -179,14 +159,13 @@ public class PlotBorderCustomInventory extends CustomInventory {
 	}
 
 	public void completeCommand(Player player, String name, String cmd) {
-		if (cmd == "") {
+		if (cmd.isEmpty()) {
 			return;
 		}
 		if (isInternalCommand(cmd)) {
 			runInternalCommand(player, cmd);
-			return;
 		} else {
-			long timeLeft = COOLDOWNS.getOrDefault(player.getUniqueId(), Long.valueOf(0)) - Instant.now().getEpochSecond();
+			long timeLeft = COOLDOWNS.getOrDefault(player.getUniqueId(), 0L) - Instant.now().getEpochSecond();
 
 			if (timeLeft > 0 && !player.isOp()) {
 				player.sendMessage("Too fast! You can only change the border once every 120s (" + timeLeft + "s remaining)");
@@ -209,7 +188,6 @@ public class PlotBorderCustomInventory extends CustomInventory {
 				});
 			}
 			player.closeInventory();
-			return;
 		}
 	}
 
@@ -218,8 +196,8 @@ public class PlotBorderCustomInventory extends CustomInventory {
 		ItemMeta meta = newItem.getItemMeta();
 		meta.displayName(Component.text(location.mName, NamedTextColor.GOLD)
 				.decoration(TextDecoration.ITALIC, false));
-		if (location.mLore != "") {
-			splitLoreLine(meta, location.mLore, 30, ChatColor.DARK_PURPLE);
+		if (!location.mLore.isEmpty()) {
+			GUIUtils.splitLoreLine(meta, location.mLore, 30, ChatColor.DARK_PURPLE, true);
 		}
 		meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
 		newItem.setItemMeta(meta);
@@ -227,45 +205,19 @@ public class PlotBorderCustomInventory extends CustomInventory {
 		return newItem;
 	}
 
-	public void splitLoreLine(ItemMeta meta, String lore, int maxLength, ChatColor defaultColor) {
-		String[] splitLine = lore.split(" ");
-		String currentString = defaultColor + "";
-		List<String> finalLines = new ArrayList<String>();
-		int currentLength = 0;
-		for (String word : splitLine) {
-			if (currentLength + word.length() > maxLength) {
-				finalLines.add(currentString);
-				currentString = defaultColor + "";
-				currentLength = 0;
-			}
-			currentString += word + " ";
-			currentLength += word.length() + 1;
-		}
-		if (currentString != defaultColor + "") {
-			finalLines.add(currentString);
-		}
-		meta.setLore(finalLines);
-	}
-
 	public void setLayout(Player player) {
 		_inventory.clear();
-		int commonPage = (int) Math.floor(mCurrentPage / 10) * 10;
+		int commonPage = (int) Math.floor(mCurrentPage / 10.0) * 10;
 		for (TeleportEntry item : BORDER_ITEMS) {
 			if (item.mPage == commonPage) {
 				if (item.mScoreboard == null || mOverridePermissions ||
-						ScoreboardUtils.getScoreboardValue(player, item.mScoreboard) >= item.mScoreRequired ||
-						BUILDER_IDS.contains(player.getUniqueId())) {
+						ScoreboardUtils.getScoreboardValue(player, item.mScoreboard) >= item.mScoreRequired) {
 					_inventory.setItem(item.mSlot, createCustomItem(item));
 				}
 			} //intentionally not else, so overrides can happen
 			if (item.mPage == mCurrentPage) {
-				if (item.mBuilder != null) {
-					player.sendMessage(player.getUniqueId().toString());
-					player.sendMessage(item.mBuilder.toString());
-				}
 				if (item.mScoreboard == null || mOverridePermissions ||
-						ScoreboardUtils.getScoreboardValue(player, item.mScoreboard) >= item.mScoreRequired ||
-						player.getUniqueId().equals(item.mBuilder)) {
+						ScoreboardUtils.getScoreboardValue(player, item.mScoreboard) >= item.mScoreRequired) {
 					_inventory.setItem(item.mSlot, createCustomItem(item));
 				}
 			}
