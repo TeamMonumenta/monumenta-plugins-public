@@ -13,6 +13,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.utils.AbilityUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 
 import dev.jorel.commandapi.Tooltip;
@@ -25,8 +26,10 @@ public class EffectsList {
 			EFFECT_RUNNER = new HashMap<>();
 			EFFECT_RUNNER.put("fire", (p, boss, duration) -> p.setFireTicks((int) duration));
 			EFFECT_RUNNER.put("silence", (p, boss, duration) -> {
-				if (p instanceof Player) {
-					AbilityUtils.silencePlayer((Player)p, (int) duration);
+				if (p instanceof Player player) {
+					AbilityUtils.silencePlayer(player, (int) duration);
+				} else {
+					EntityUtils.applySilence(Plugin.getInstance(), (int) duration, p);
 				}
 			});
 			EFFECT_RUNNER.put("pullforce", (p, boss, duration) -> MovementUtils.pullTowards(boss, p, duration));

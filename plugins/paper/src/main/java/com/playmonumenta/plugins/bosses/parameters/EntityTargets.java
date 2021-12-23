@@ -438,6 +438,7 @@ public class EntityTargets {
 
 
 		public static final Limit DEFAULT = new Limit(LIMITSENUM.ALL, SORTING.RANDOM);
+		public static final Limit DEFAULT_ONE = new Limit(1, SORTING.RANDOM);
 
 		//format (num,sortingEnum) || (limitEnum,sortingEnum)
 		public static ParseResult<Limit> fromReader(StringReader reader, String hoverDescription) {
@@ -494,6 +495,7 @@ public class EntityTargets {
 
 
 	public static final EntityTargets GENERIC_PLAYER_TARGET = new EntityTargets(TARGETS.PLAYER, 30, true, Limit.DEFAULT, new ArrayList<>(), TagsListFiter.DEFAULT);
+	public static final EntityTargets GENERIC_ONE_PLAYER_TARGET = new EntityTargets(TARGETS.PLAYER, 30, true, Limit.DEFAULT_ONE, new ArrayList<>(), TagsListFiter.DEFAULT);
 
 	private static final String LIMIT_STRING = "limit=";
 	private static final String FILTERS_STRING = "filters=";
@@ -548,7 +550,11 @@ public class EntityTargets {
 	}
 
 	public List<? extends LivingEntity> getTargetsList(LivingEntity boss) {
-		List<? extends LivingEntity> list = mTargets.getTargets(boss, boss.getLocation(), mRange, mOptional);
+		return getTargetsListByLocation(boss, boss.getLocation());
+	}
+
+	public List<? extends LivingEntity> getTargetsListByLocation(LivingEntity boss, Location loc) {
+		List<? extends LivingEntity> list = mTargets.getTargets(boss, loc, mRange, mOptional);
 
 		if (!mTagsFilter.mTags.isEmpty() || !mFilters.isEmpty()) {
 			for (LivingEntity entity : new ArrayList<>(list)) {
@@ -570,7 +576,11 @@ public class EntityTargets {
 			}
 		}
 
-		return mLimit.sort(boss.getLocation(), list);
+		return mLimit.sort(loc, list);
+	}
+
+	public double getRange() {
+		return mRange;
 	}
 
 	public List<Location> getTargetsLocationList(LivingEntity boss) {
@@ -581,10 +591,6 @@ public class EntityTargets {
 		}
 		return locations;
 	}
-
-
-
-
 
 	public static EntityTargets fromString(String string) {
 		ParseResult<EntityTargets> result = fromReader(new StringReader(string), "");

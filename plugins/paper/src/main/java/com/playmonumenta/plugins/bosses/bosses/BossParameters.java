@@ -20,6 +20,7 @@ import com.playmonumenta.plugins.commands.BossTagCommand.TypeAndDesc;
 import com.playmonumenta.plugins.utils.BossUtils;
 
 import org.bukkit.Color;
+import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Entity;
 import org.bukkit.potion.PotionEffectType;
@@ -216,6 +217,18 @@ public abstract class BossParameters {
 							return ParseResult.of(suggArgs.toArray(Tooltip.arrayOf()));
 						}
 						validType.getField().set(parameters, val);
+					} else if (validTypeClass == Material.class) {
+						Material mat = reader.readMaterial();
+						if (mat == null) {
+							// Entry not valid, offer all entries as completions
+							List<Tooltip<String>> suggArgs = new ArrayList<>(Material.values().length);
+							String soFar = reader.readSoFar();
+							for (Material valid : Material.values()) {
+								suggArgs.add(Tooltip.of(soFar + valid.name(), validType.getDesc()));
+							}
+							return ParseResult.of(suggArgs.toArray(Tooltip.arrayOf()));
+						}
+						validType.getField().set(parameters, mat);
 					} else if (validTypeClass == SoundsList.class) {
 						ParseResult<SoundsList> result = SoundsList.fromReader(reader, validType.getDesc());
 						if (result.getTooltip() != null) {
