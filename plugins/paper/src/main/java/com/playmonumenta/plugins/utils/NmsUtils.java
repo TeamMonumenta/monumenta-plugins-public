@@ -13,6 +13,7 @@ import org.bukkit.craftbukkit.v1_16_R3.entity.CraftLivingEntity;
 import org.bukkit.craftbukkit.v1_16_R3.entity.CraftPlayer;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.util.Vector;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import net.minecraft.server.v1_16_R3.ChatMessage;
@@ -160,6 +161,27 @@ public class NmsUtils {
 			// Should not happen as the field is set to be accessible
 			throw new RuntimeException(e);
 		}
+	}
+
+	/**
+	 * Gets the actual direction of an entity instead of the direction of its head.
+	 * This is particularly useful for players as this gives the direction a player is actually looking
+	 * instead of one slightly in the past as the head is lagging behind the actual direction.
+	 */
+	public static Vector getActualDirection(org.bukkit.entity.Entity entity) {
+		Vector vector = new Vector();
+
+		double rotX = ((CraftEntity) entity).getHandle().yaw;
+		double rotY = ((CraftEntity) entity).getHandle().pitch;
+
+		vector.setY(-Math.sin(Math.toRadians(rotY)));
+
+		double xz = Math.cos(Math.toRadians(rotY));
+
+		vector.setX(-xz * Math.sin(Math.toRadians(rotX)));
+		vector.setZ(xz * Math.cos(Math.toRadians(rotX)));
+
+		return vector;
 	}
 
 	private static Method getMethod(Class<?> clazz, String method, Class<?>... arguments) {
