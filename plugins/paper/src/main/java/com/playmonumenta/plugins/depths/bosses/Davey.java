@@ -8,7 +8,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.attribute.Attribute;
@@ -45,6 +44,7 @@ import com.playmonumenta.plugins.depths.bosses.spells.SpellVoidGrenades;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
+import com.playmonumenta.plugins.utils.NmsUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.SerializationUtils;
 
@@ -236,7 +236,7 @@ public class Davey extends BossAbilityGroup {
 			player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 60, 1));
 			if (event.getCause().equals(DamageCause.ENTITY_ATTACK)) {
 				if (player.isBlocking()) {
-					player.setCooldown(Material.SHIELD, 20 * 30);
+					NmsUtils.stunShield(player, 20 * 30);
 				}
 			}
 		}

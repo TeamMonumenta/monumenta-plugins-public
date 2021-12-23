@@ -31,6 +31,7 @@ import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
+import com.playmonumenta.plugins.utils.NmsUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 
 public class ImmortalElementalKaulBoss extends BossAbilityGroup {
@@ -117,7 +118,7 @@ public class ImmortalElementalKaulBoss extends BossAbilityGroup {
 	public void bossDamagedEntity(EntityDamageByEntityEvent event) {
 		if (event.getEntity() instanceof Player player && event.getCause().equals(DamageCause.ENTITY_ATTACK)) {
 			if (player.isBlocking()) {
-				player.setCooldown(Material.SHIELD, 20 * 30);
+				NmsUtils.stunShield(player, 20 * 30);
 			}
 		}
 	}

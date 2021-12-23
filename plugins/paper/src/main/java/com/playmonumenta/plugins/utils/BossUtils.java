@@ -57,7 +57,7 @@ public class BossUtils {
 
 		if ((target instanceof Player) && bossDamageBlocked((Player)target, damage, source)) {
 			/* One second of cooldown for every 2 points of damage */
-			((Player) target).setCooldown(Material.SHIELD, (int)(20 * damage / 2.5));
+			NmsUtils.stunShield((Player) target, (int) (20 * damage / 2.5));
 			target.getWorld().playSound(target.getLocation(), Sound.ITEM_SHIELD_BREAK, SoundCategory.PLAYERS, 1.0f, 1.0f);
 			ItemUtils.damageShield((Player) target, (int)(damage / 5));
 		} else {
@@ -126,12 +126,12 @@ public class BossUtils {
 			 */
 			if (raw) {
 				if (toTake > 1) {
-					((Player) target).setCooldown(Material.SHIELD, (int) Math.ceil(toTake * 0.5));
+					NmsUtils.stunShield((Player) target, (int) Math.ceil(toTake * 0.5));
 				}
 				target.getWorld().playSound(target.getLocation(), Sound.ITEM_SHIELD_BREAK, SoundCategory.PLAYERS, 1.0f, 1.0f);
 				ItemUtils.damageShield((Player) target, (int) Math.ceil(toTake / 2.5));
 			} else {
-				((Player) target).setCooldown(Material.SHIELD, (int)(20 * percentHealth * 20));
+				NmsUtils.stunShield((Player) target, (int) (20 * percentHealth * 20));
 				target.getWorld().playSound(target.getLocation(), Sound.ITEM_SHIELD_BREAK, SoundCategory.PLAYERS, 1.0f, 1.0f);
 				ItemUtils.damageShield((Player) target, (int)(percentHealth * 20 / 2.5));
 			}

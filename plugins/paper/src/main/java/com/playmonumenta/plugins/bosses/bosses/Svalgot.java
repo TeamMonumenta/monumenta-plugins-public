@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
@@ -36,6 +35,7 @@ import com.playmonumenta.plugins.bosses.spells.sealedremorse.SvalgotBoneSweep;
 import com.playmonumenta.plugins.bosses.spells.sealedremorse.SvalgotOrbOfBones;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.NmsUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.SerializationUtils;
 
@@ -201,7 +201,7 @@ public final class Svalgot extends BossAbilityGroup {
 		if (event.getEntity() instanceof Player && event.getCause().equals(DamageCause.ENTITY_ATTACK)) {
 			Player player = (Player) event.getEntity();
 			if (player.isBlocking()) {
-				player.setCooldown(Material.SHIELD, 20 * 6);
+				NmsUtils.stunShield(player, 20 * 6);
 			}
 		}
 	}

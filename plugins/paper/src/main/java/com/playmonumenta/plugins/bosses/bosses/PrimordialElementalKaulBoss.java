@@ -41,6 +41,7 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
+import com.playmonumenta.plugins.utils.NmsUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 
 /*
@@ -133,7 +134,7 @@ public final class PrimordialElementalKaulBoss extends BossAbilityGroup {
 		if (event.getEntity() instanceof Player && event.getCause().equals(DamageCause.ENTITY_ATTACK)) {
 			Player player = (Player) event.getEntity();
 			if (player.isBlocking()) {
-				player.setCooldown(Material.SHIELD, 20 * 30);
+				NmsUtils.stunShield(player, 20 * 30);
 			}
 		}
 	}

@@ -33,6 +33,7 @@ import com.playmonumenta.plugins.bosses.spells.SpellGenericCharge;
 import com.playmonumenta.plugins.bosses.spells.SpellTpSwapPlaces;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.NmsUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.SerializationUtils;
 
@@ -126,7 +127,7 @@ public final class Varcosa extends BossAbilityGroup {
 		if (event.getEntity() instanceof Player && event.getCause().equals(DamageCause.ENTITY_ATTACK)) {
 			Player player = (Player) event.getEntity();
 			if (player.isBlocking()) {
-				player.setCooldown(Material.SHIELD, 20 * 6);
+				NmsUtils.stunShield(player, 20 * 6);
 			}
 		}
 	}

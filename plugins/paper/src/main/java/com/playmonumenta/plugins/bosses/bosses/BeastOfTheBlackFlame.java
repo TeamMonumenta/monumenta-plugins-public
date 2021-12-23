@@ -39,6 +39,7 @@ import com.playmonumenta.plugins.bosses.spells.sealedremorse.BlackflameGolemNecr
 import com.playmonumenta.plugins.bosses.spells.sealedremorse.BlackflameOrb;
 import com.playmonumenta.plugins.bosses.spells.sealedremorse.PassiveVoidRift;
 import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.NmsUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.SerializationUtils;
 
@@ -238,7 +239,7 @@ public final class BeastOfTheBlackFlame extends BossAbilityGroup {
 	public void bossDamagedEntity(EntityDamageByEntityEvent event) {
 		if (event.getEntity() instanceof Player player && event.getCause().equals(DamageCause.ENTITY_ATTACK)) {
 			if (player.isBlocking()) {
-				player.setCooldown(Material.SHIELD, 20 * 6);
+				NmsUtils.stunShield(player, 20 * 6);
 			}
 		}
 	}

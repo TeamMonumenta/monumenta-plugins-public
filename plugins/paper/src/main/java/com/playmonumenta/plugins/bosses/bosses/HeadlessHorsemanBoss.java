@@ -44,6 +44,7 @@ import com.playmonumenta.plugins.bosses.spells.headlesshorseman.SpellPhantomOfTh
 import com.playmonumenta.plugins.bosses.spells.headlesshorseman.SpellReaperOfLife;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.NmsUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.SerializationUtils;
 
@@ -269,7 +270,7 @@ public class HeadlessHorsemanBoss extends BossAbilityGroup {
 
 		if (event.getEntity() instanceof Player player) {
 			if (player.isBlocking()) {
-				player.setCooldown(Material.SHIELD, 20 * 30);
+				NmsUtils.stunShield(player, 20 * 30);
 			}
 		}
 	}
