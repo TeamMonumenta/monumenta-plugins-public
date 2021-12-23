@@ -179,7 +179,6 @@ public class Plugin extends JavaPlugin {
 		OpenDelveModifierSelectionGUI.register();
 		GetDepthPoints.register();
 		Magnetize.register();
-		SetViewDistance.register();
 		UnsignBook.register();
 		GetScoreCommand.register(this);
 		Grave.register();
