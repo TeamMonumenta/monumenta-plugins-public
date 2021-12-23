@@ -80,6 +80,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
+import org.bukkit.inventory.meta.CrossbowMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.metadata.FixedMetadataValue;
@@ -128,6 +129,7 @@ import com.playmonumenta.plugins.utils.CommandUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.NmsUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
@@ -259,11 +261,37 @@ public class PlayerListener implements Listener {
 			if (block != null) {
 				Location location = block.getLocation();
 				if (player.getGameMode() == GameMode.ADVENTURE
-				    && ZoneUtils.isInPlot(location)) {
+					    && ZoneUtils.isInPlot(location)) {
 					event.setUseInteractedBlock(Event.Result.DENY);
 					return;
 				}
 			}
+		}
+
+		// Immediately load crossbows when the right mouse button is held down for long enough instead of only when released.
+		// This prevents "ghost" loading crossbows, where the client thinks the button was held for long enough, but the server disagrees.
+		if ((action == Action.RIGHT_CLICK_AIR || action == Action.RIGHT_CLICK_BLOCK)
+			    && event.useItemInHand() != Event.Result.DENY
+			    && item != null
+			    && item.getType() == Material.CROSSBOW
+			    && item.getItemMeta() instanceof CrossbowMeta meta
+			    && meta.getChargedProjectiles().isEmpty()) {
+			int slot = player.getInventory().getHeldItemSlot();
+			new BukkitRunnable() {
+				@Override
+				public void run() {
+					if (slot != player.getInventory().getHeldItemSlot()
+						    || !item.equals(player.getActiveItem())
+						    || !player.isHandRaised()) {
+						this.cancel();
+						return;
+					}
+					if (player.getItemUseRemainingTime() <= 0) {
+						this.cancel();
+						NmsUtils.releaseActiveItem(player, false);
+					}
+				}
+			}.runTaskTimer(mPlugin, 0, 1);
 		}
 	}
 

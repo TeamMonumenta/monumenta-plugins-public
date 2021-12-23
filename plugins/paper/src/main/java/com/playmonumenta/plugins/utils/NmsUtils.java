@@ -1,7 +1,10 @@
 package com.playmonumenta.plugins.utils;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 
+import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.craftbukkit.v1_16_R3.CraftWorld;
 import org.bukkit.craftbukkit.v1_16_R3.entity.CraftEntity;
@@ -129,37 +132,107 @@ public class NmsUtils {
 		return entity == null ? null : entity.getBukkitEntity();
 	}
 
-	private static final Field attackCooldownField = getAttackCooldownField();
-
-	private static Field getAttackCooldownField() {
+	private static Field getField(Class<?> clazz, String field) {
 		try {
-			Field f = EntityLiving.class.getDeclaredField("at");
+			Field f = clazz.getDeclaredField(field);
 			f.setAccessible(true);
 			return f;
 		} catch (NoSuchFieldException e) {
-			// Should only happen if Minecraft is updated. If it happens, update the field name in the above code.
-			// To find the new field name, see which field is reset by EntityHuman.resetAttackCooldown
-			// If the field's type changed from int to another type, update the type used by the getAttackCooldown/setAttackCooldown methods in this class accordingly.
+			// Should only happen if Minecraft is updated.
+			// Check the documentation of where this is used for how to find the new name.
 			throw new RuntimeException(e);
 		}
 	}
+
+	private static @Nullable Object getFieldValue(Field field, Object target) {
+		try {
+			return field.get(target);
+		} catch (IllegalAccessException e) {
+			// Should not happen as the field is set to be accessible
+			throw new RuntimeException(e);
+		}
+	}
+
+	private static void setFieldValue(Field field, Object target, @Nullable Object value) {
+		try {
+			field.set(target, value);
+		} catch (IllegalAccessException e) {
+			// Should not happen as the field is set to be accessible
+			throw new RuntimeException(e);
+		}
+	}
+
+	private static Method getMethod(Class<?> clazz, String method, Class<?>... arguments) {
+		try {
+			Method m = clazz.getDeclaredMethod(method, arguments);
+			m.setAccessible(true);
+			return m;
+		} catch (NoSuchMethodException e) {
+			// Should only happen if Minecraft is updated.
+			// Check the documentation of where this is used for how to find the new name.
+			throw new RuntimeException(e);
+		}
+	}
+
+	private static @Nullable Object invokeMethod(Method method, Object target, @Nullable Object... args) {
+		try {
+			return method.invoke(target, args);
+		} catch (IllegalAccessException e) {
+			// Should not happen as the method is set to be accessible
+			throw new RuntimeException(e);
+		} catch (InvocationTargetException e) {
+			// RuntimeException and Errors can happen, just throw them again (without the InvocationTargetException wrapper)
+			if (e.getCause() instanceof RuntimeException runtimeException) {
+				throw runtimeException;
+			}
+			if (e.getCause() instanceof Error error) {
+				throw error;
+			}
+			// This should not happen as long as the methods have no checked exceptions declared
+			throw new RuntimeException(e);
+		}
+	}
+
+	// To find the new field name, see which field is reset by EntityHuman.resetAttackCooldown
+	// If the field's type changed from int to another type, update the type used by the getAttackCooldown/setAttackCooldown methods in this class accordingly.
+	private static final Field attackCooldownField = getField(EntityLiving.class, "at");
 
 	@SuppressWarnings("unboxing.of.nullable")
 	public static int getAttackCooldown(LivingEntity entity) {
-		try {
-			return (int) attackCooldownField.get(((CraftLivingEntity) entity).getHandle());
-		} catch (IllegalAccessException e) {
-			// Should not happen as the field is set to be accessible
-			throw new RuntimeException(e);
-		}
+		return (int) getFieldValue(attackCooldownField, ((CraftLivingEntity) entity).getHandle());
 	}
 
 	public static void setAttackCooldown(LivingEntity entity, int newCooldown) {
-		try {
-			attackCooldownField.set(((CraftLivingEntity) entity).getHandle(), newCooldown);
-		} catch (IllegalAccessException e) {
-			// Should not happen as the field is set to be accessible
-			throw new RuntimeException(e);
+		setFieldValue(attackCooldownField, ((CraftLivingEntity) entity).getHandle(), newCooldown);
+	}
+
+	// Update the code in releaseActiveItem() below before updating this, as this may not even be used anymore.
+	private static final Method tickActiveItemStack = getMethod(EntityLiving.class, "t");
+
+	/**
+	 * Forces the given living entity to stop using its active item, e.g. lowers a raised shield or charges a crossbow (if it has been changing for long enough).
+	 *
+	 * @param clearActiveItem If false, will keep the item in use. Useful only for crossbows to not cause them to shoot immediately after this method is called.
+	 */
+	public static void releaseActiveItem(LivingEntity entity, boolean clearActiveItem) {
+		EntityLiving nmsEntity = ((CraftLivingEntity) entity).getHandle();
+		if (clearActiveItem) {
+			nmsEntity.releaseActiveItem();
+		} else {
+			// This code is copied from releaseActiveItem(), without the call to clearActiveItem()
+			if (!nmsEntity.activeItem.isEmpty()) {
+				nmsEntity.activeItem.a(nmsEntity.world, nmsEntity, nmsEntity.dZ());
+				if (nmsEntity.activeItem.m()) {
+					invokeMethod(tickActiveItemStack, nmsEntity);
+				}
+			}
+		}
+	}
+
+	public static void stunShield(Player player, int ticks) {
+		player.setCooldown(Material.SHIELD, ticks);
+		if (player.getActiveItem() != null && player.getActiveItem().getType() == Material.SHIELD) {
+			releaseActiveItem(player, true);
 		}
 	}
 
