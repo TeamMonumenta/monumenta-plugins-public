@@ -65,9 +65,9 @@ public class DepthsRoomChoiceGUI extends CustomInventory {
 				NamedTextColor.LIGHT_PURPLE,
 				"Grants 3 treasure score for room completion.")));
 		ROOM_LOCATIONS.add(new RoomChoice(15, DepthsRoomType.TREASURE_ELITE,
-			createBasicItem(Material.GOLD_INGOT, "Normal Room with Treasure Reward",
+			createBasicItem(Material.GOLD_INGOT, "Elite Room with Treasure Reward",
 				NamedTextColor.LIGHT_PURPLE,
-				"Grants 3 treasure score for room completion.")));
+				"Grants 5 treasure score for room completion.")));
 		ROOM_LOCATIONS.add(new RoomChoice(4, DepthsRoomType.UTILITY,
 			createBasicItem(Material.ENDER_CHEST, "Utility Room",
 				NamedTextColor.LIGHT_PURPLE,

@@ -75,7 +75,7 @@ public abstract class DepthsAbility extends Ability {
 
 
 			meta.lore(lore);
-			GUIUtils.splitLoreLine(meta, getDescription(rarity), 30, ChatColor.WHITE, true);
+			GUIUtils.splitLoreLine(meta, getDescription(rarity), 30, ChatColor.WHITE, false);
 			stack.setItemMeta(meta);
 			ItemUtils.setPlainName(stack, mInfo.mDisplayName);
 			item.mItem = stack;
