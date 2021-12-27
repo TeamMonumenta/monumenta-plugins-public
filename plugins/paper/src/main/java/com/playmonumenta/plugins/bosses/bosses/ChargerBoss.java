@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
 import java.util.Arrays;
+import java.util.List;
 
 import org.bukkit.Location;
 import org.bukkit.entity.LivingEntity;
@@ -92,8 +93,8 @@ public class ChargerBoss extends BossAbilityGroup {
 			//same object
 			//probably an older mob version?
 			//build a new target from others config
-			p.TARGETS = new EntityTargets(TARGETS.PLAYER, p.DETECTION, false);
-			//by default Charger don't take player in stealt.
+			p.TARGETS = new EntityTargets(TARGETS.PLAYER, p.DETECTION, false, EntityTargets.Limit.DEFAULT, List.of(EntityTargets.PLAYERFILTER.HAS_LINEOFSIGHT));
+			//by default Charger don't take player in stealth.
 		}
 
 
