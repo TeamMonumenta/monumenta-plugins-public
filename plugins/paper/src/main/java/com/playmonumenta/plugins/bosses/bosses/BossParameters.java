@@ -38,7 +38,10 @@ public abstract class BossParameters {
 				reader.advance(identityTag);
 
 				// Parse as many parameters as possible... but ignore the result, and just return the populated parameters
-				parseParameters(reader, parameters);
+				ParseResult<T> res = parseParameters(reader, parameters);
+				if (res.getResult() == null) {
+					Plugin.getInstance().getLogger().warning("[BossParameters] problems during parsing tag for entity: " + boss.getName() + " on tag: " + tag);
+				}
 			}
 		}
 		return parameters;
@@ -62,20 +65,25 @@ public abstract class BossParameters {
 		for (Field field : fields) {
 			String description = "undefined";
 			BossParam paramAnnotations = field.getAnnotation(BossParam.class);
+			boolean deprecated = false;
 			if (paramAnnotations != null) {
 				description = paramAnnotations.help();
+				deprecated = paramAnnotations.deprecated();
 			}
-			validParams.put(BossUtils.translateFieldNameToTag(field.getName()), new TypeAndDesc(field, description));
+			validParams.put(BossUtils.translateFieldNameToTag(field.getName()), new TypeAndDesc(field, description, deprecated));
 		}
 
 		Set<String> usedParams = new LinkedHashSet<>(fields.length);
 		boolean atLeastOneIter = false;
+		boolean containsDeprecatedField = false;
 		while (true) {
 			// Require a comma to separate arguments the 2nd time through
 			if (atLeastOneIter) {
 				if (!reader.advance(",")) {
 					if (reader.advance("]")) {
-						return ParseResult.of(parameters);
+						ParseResult<T> res = ParseResult.of(parameters);
+						res.mContainsDeprecated = containsDeprecatedField;
+						return res;
 					} else {
 						return ParseResult.of(Tooltip.arrayOf(
 							Tooltip.of(reader.readSoFar() + ",", ""),
@@ -85,7 +93,9 @@ public abstract class BossParameters {
 				}
 			} else {
 				if (reader.advance("]")) {
-					return ParseResult.of(parameters);
+					ParseResult<T> res = ParseResult.of(parameters);
+					res.mContainsDeprecated = containsDeprecatedField;
+					return res;
 				}
 			}
 
@@ -94,7 +104,9 @@ public abstract class BossParameters {
 			try {
 				if (reader.advance("]")) {
 					// End!
-					return ParseResult.of(parameters);
+					ParseResult<T> res = ParseResult.of(parameters);
+					res.mContainsDeprecated = containsDeprecatedField;
+					return res;
 				}
 
 				String validKey = reader.readOneOf(validParams.keySet());
@@ -123,6 +135,10 @@ public abstract class BossParameters {
 					TypeAndDesc validType = validParams.get(validKey);
 					if (!reader.advance("=")) {
 						return ParseResult.of(Tooltip.arrayOf(Tooltip.of(reader.readSoFar() + "=", validType.getDesc())));
+					}
+
+					if (validType.getDeprecated()) {
+						containsDeprecatedField = true;
 					}
 
 					Class<?> validTypeClass = validType.getField().getType();

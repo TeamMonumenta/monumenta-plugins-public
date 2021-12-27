@@ -7,4 +7,6 @@ import java.lang.annotation.RetentionPolicy;
 
 public @interface BossParam {
 	String help() default "not written";
+
+	boolean deprecated() default false;
 }

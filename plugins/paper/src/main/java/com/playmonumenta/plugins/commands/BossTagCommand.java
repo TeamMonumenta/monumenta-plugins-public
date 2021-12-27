@@ -12,8 +12,14 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.block.Block;
+import org.bukkit.block.Chest;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 
 import com.goncalomb.bukkit.mylib.reflect.NBTTagList;
 import com.goncalomb.bukkit.nbteditor.bos.BookOfSouls;
@@ -26,6 +32,7 @@ import com.playmonumenta.plugins.bosses.bosses.BossParameters;
 import com.playmonumenta.plugins.bosses.parameters.BossParam;
 import com.playmonumenta.plugins.bosses.parameters.ParseResult;
 import com.playmonumenta.plugins.bosses.parameters.StringReader;
+import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import com.playmonumenta.plugins.utils.BossUtils;
 
 import dev.jorel.commandapi.CommandAPI;
@@ -151,6 +158,15 @@ public class BossTagCommand {
 			})
 			.register();
 
+		arguments.clear();
+		arguments.add(new MultiLiteralArgument("deprecated"));
+		new CommandAPICommand(COMMAND)
+			.withPermission("monumenta.bosstag.deprecated")
+			.withArguments(arguments)
+			.executesPlayer((player, args) -> {
+				checksAllLos(player);
+			})
+			.register();
 
 		arguments.clear();
 		arguments.add(new MultiLiteralArgument("help"));
@@ -226,10 +242,16 @@ public class BossTagCommand {
 	public static class TypeAndDesc {
 		private final Field mField;
 		private final String mDesc;
+		private final boolean mIsDeprecated;
 
 		public TypeAndDesc(Field field, String desc) {
+			this(field, desc, false);
+		}
+
+		public TypeAndDesc(Field field, String desc, boolean deprecated) {
 			mField = field;
 			mDesc = desc;
+			mIsDeprecated = deprecated;
 		}
 
 		public Field getField() {
@@ -238,6 +260,10 @@ public class BossTagCommand {
 
 		public String getDesc() {
 			return mDesc;
+		}
+
+		public Boolean getDeprecated() {
+			return mIsDeprecated;
 		}
 	}
 
@@ -711,32 +737,34 @@ public class BossTagCommand {
 			BookOfSouls bos = getBos((Player)info.sender());
 			NBTTagList nbtTagsList = bos.getEntityNBT().getData().getList("Tags");
 
-			List<Tooltip<String>> bossTags = new LinkedList<>();
-			List<String> bossTagList = new LinkedList<>();
-			Map<String, Map<String, String>> paramsMap = new LinkedHashMap<>();
+			if (nbtTagsList != null) {
+				List<Tooltip<String>> bossTags = new LinkedList<>();
+				List<String> bossTagList = new LinkedList<>();
+				Map<String, Map<String, String>> paramsMap = new LinkedHashMap<>();
 
-			for (Object tag : nbtTagsList.getAsArray()) {
-				String tagString = (String) tag;
+				for (Object tag : nbtTagsList.getAsArray()) {
+					String tagString = (String) tag;
 
-				if (BossManager.mBossParameters.get(tagString) != null) {
-					bossTagList.add(tagString);
-					paramsMap.put(tagString, new LinkedHashMap<>());
-					bossTags.add(Tooltip.of(tagString, null));
-					//TODO- write a better Tooltip
-				}
-			}
-
-			//we need a better way to do this.
-			for (Object tag : nbtTagsList.getAsArray()) {
-				String tagString = (String) tag;
-				for (String bossTag : bossTagList) {
-					if (tagString.startsWith(bossTag + "[")) {
-						BossUtils.addModifiersFromString(paramsMap.get(bossTag), tagString.replace(bossTag, ""));
+					if (BossManager.mBossParameters.get(tagString) != null) {
+						bossTagList.add(tagString);
+						paramsMap.put(tagString, new LinkedHashMap<>());
+						bossTags.add(Tooltip.of(tagString, null));
+						//TODO- write a better Tooltip
 					}
 				}
+
+				//we need a better way to do this.
+				for (Object tag : nbtTagsList.getAsArray()) {
+					String tagString = (String) tag;
+					for (String bossTag : bossTagList) {
+						if (tagString.startsWith(bossTag + "[")) {
+							BossUtils.addModifiersFromString(paramsMap.get(bossTag), tagString.replace(bossTag, ""));
+						}
+					}
+				}
+				//TODO-finish this part.
+				return bossTags.toArray(Tooltip.arrayOf());
 			}
-			//TODO-finish this part.
-			return bossTags.toArray(Tooltip.arrayOf());
 
 		} catch (Exception e) {
 			info.sender().sendMessage(Component.text(e.getMessage(), NamedTextColor.RED));
@@ -825,6 +853,127 @@ public class BossTagCommand {
 			                   .append(Component.text("[BossTag] ", NamedTextColor.GOLD).decoration(TextDecoration.BOLD, true))
 			                   .append(Component.text("Squash complited!", NamedTextColor.GRAY).decoration(TextDecoration.BOLD, false))
 		);
+	}
+
+	public static void checksAllLos(Player player) throws WrapperCommandSyntaxException {
+		Map<Soul, List<String>> soulsBosTagMap = new LinkedHashMap<>();
+
+		player.sendMessage(Component.empty()
+			                   .append(Component.text("[BossTag] ", NamedTextColor.GOLD).decoration(TextDecoration.BOLD, true))
+			                   .append(Component.text("Working! it may take a while...", NamedTextColor.GRAY).decoration(TextDecoration.BOLD, false))
+		);
+		for (String soulName : LibraryOfSoulsIntegration.getSoulNames()) {
+			Soul soul = SoulsDatabase.getInstance().getSoul(soulName);
+			NBTTagList tags = soul.getNBT().getList("Tags");
+			if (tags != null) {
+				for (int i = 0; i < tags.size(); i++) {
+					String tag = (String) tags.get(i);
+					if (BossManager.mBossParameters.get(tag) != null) {
+						//this Soul may be with some parameters, lets save it to check later
+						if (soulsBosTagMap.get(soul) == null) {
+							soulsBosTagMap.put(soul, new LinkedList<>());
+						}
+						soulsBosTagMap.get(soul).add(tag);
+					}
+				}
+			}
+		}
+
+		player.sendMessage(Component.empty()
+								.append(Component.text("[BossTag] ", NamedTextColor.GOLD).decoration(TextDecoration.BOLD, true))
+								.append(Component.text("Checked all the mobs in the LoS", NamedTextColor.GRAY).decoration(TextDecoration.BOLD, false))
+		);
+
+		Map<Soul, List<String>> soulDeprecatedTagMap = new LinkedHashMap<>();
+
+		for (Map.Entry<Soul, List<String>> entry : soulsBosTagMap.entrySet()) {
+			Soul soul = entry.getKey();
+			List<String> bossTags = entry.getValue();
+			NBTTagList tags = soul.getNBT().getList("Tags");
+
+			for (String bossTag : bossTags) {
+				for (int i = 0; i < tags.size(); i++) {
+					String tag = (String) tags.get(i);
+					if (tag.startsWith(bossTag + "[")) {
+						//found a param string
+						StringReader reader = new StringReader(tag);
+						reader.advance(bossTag);
+
+						ParseResult<?> result = BossParameters.parseParameters(reader, BossManager.mBossParameters.get(bossTag));
+
+						if (result.getResult() == null || result.mContainsDeprecated) {
+							//we get a deprecated tag somehow
+							//lets save it to give it to the player
+							if (soulDeprecatedTagMap.get(soul) == null) {
+								soulDeprecatedTagMap.put(soul, new LinkedList<>());
+							}
+
+							soulDeprecatedTagMap.get(soul).add(tag);
+						}
+					}
+				}
+			}
+		}
+
+		player.sendMessage(Component.empty()
+								.append(Component.text("[BossTag] ", NamedTextColor.GOLD).decoration(TextDecoration.BOLD, true))
+								.append(Component.text("Found some problems on: " + soulDeprecatedTagMap.keySet().size(), NamedTextColor.GRAY).decoration(TextDecoration.BOLD, false))
+		);
+
+
+		player.sendMessage(Component.empty()
+								.append(Component.text("[BossTag] ", NamedTextColor.GOLD).decoration(TextDecoration.BOLD, true))
+								.append(Component.text("Summoning chest", NamedTextColor.GRAY).decoration(TextDecoration.BOLD, false))
+		);
+
+		Location loc = player.getLocation().add(1, 0, 0);
+		Block block = loc.getBlock();
+		block.setType(Material.CHEST);
+		Chest chest = ((Chest)block.getState());
+		Inventory chestInventory = chest.getBlockInventory();
+		int startPoint = 0;
+		for (Map.Entry<Soul, List<String>> entry : soulDeprecatedTagMap.entrySet()) {
+			Soul soul = entry.getKey();
+			List<String> bossTags = entry.getValue();
+
+			ItemStack book = soul.getBoS();
+			ItemStack paper = buildPaper(soul.getLabel(), bossTags);
+
+			chestInventory.addItem(book, paper);
+			startPoint += 2;
+
+			if (startPoint >= 26) {
+				//the chest is full, create a new one
+				startPoint = 0;
+				loc = loc.add(1, 0, 0);
+				block = loc.getBlock();
+				block.setType(Material.CHEST);
+				chest = ((Chest)block.getState());
+				chestInventory = chest.getBlockInventory();
+			}
+		}
+
+		player.sendMessage(Component.empty()
+							.append(Component.text("[BossTag] ", NamedTextColor.GOLD).decoration(TextDecoration.BOLD, true))
+							.append(Component.text("All done, HAVE FUN!", NamedTextColor.GRAY).decoration(TextDecoration.BOLD, false))
+		);
+
+	}
+
+	private static ItemStack buildPaper(String name, List<String> lore) {
+		ItemStack paper = new ItemStack(Material.PAPER);
+		ItemMeta meta = paper.getItemMeta();
+
+		meta.displayName(Component.text(name).decoration(TextDecoration.ITALIC, false));
+		List<Component> loreC = new LinkedList<>();
+
+		for (String loreS : lore) {
+			loreC.add(Component.text(loreS).decoration(TextDecoration.ITALIC, false));
+		}
+		meta.lore(loreC);
+		paper.setItemMeta(meta);
+
+		return paper;
 	}
 
 	private static void helpBossTags(Player player) {

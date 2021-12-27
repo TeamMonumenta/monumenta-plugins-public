@@ -6,6 +6,8 @@ public class ParseResult<T> {
 	private final Tooltip<String>[] mTooltip;
 	private final T mResults;
 
+	public Boolean mContainsDeprecated = false;
+
 	private ParseResult(Tooltip<String>[] tooltip, T results) {
 		mTooltip = tooltip;
 		mResults = results;
