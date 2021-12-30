@@ -44,7 +44,16 @@ public class RegionScalingDamageTaken implements BaseEnchantment {
 
 	@Override
 	public void onHurt(Plugin plugin, Player player, int level, EntityDamageEvent event) {
+		if (event.getCause() == DamageCause.VOID) {
+			return;
+		}
+
 		event.setDamage(event.getDamage() * DAMAGE_TAKEN_MULTIPLIER);
+
+		if (event.getDamage() > 1000000) {
+			event.setDamage(1000000);
+		}
+
 		if (event.getCause() == DamageCause.POISON) {
 			event.setDamage(Math.min(event.getDamage(), Math.max(player.getHealth() - 1, 0)));
 		}
