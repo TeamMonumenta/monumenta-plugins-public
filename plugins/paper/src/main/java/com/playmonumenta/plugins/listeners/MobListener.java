@@ -66,11 +66,12 @@ public class MobListener implements Listener {
 
 	@EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
 	void creatureSpawnEvent(CreatureSpawnEvent event) {
-		Entity entity = event.getEntity();
+		LivingEntity entity = event.getEntity();
+		CreatureSpawnEvent.SpawnReason spawnReason = event.getSpawnReason();
 
-		if (event.getSpawnReason() == CreatureSpawnEvent.SpawnReason.BUILD_WITHER ||
-		    event.getSpawnReason() == CreatureSpawnEvent.SpawnReason.CURED ||
-		    event.getSpawnReason() == CreatureSpawnEvent.SpawnReason.VILLAGE_DEFENSE) {
+		if (spawnReason == CreatureSpawnEvent.SpawnReason.BUILD_WITHER ||
+			    spawnReason == CreatureSpawnEvent.SpawnReason.CURED ||
+			    spawnReason == CreatureSpawnEvent.SpawnReason.VILLAGE_DEFENSE) {
 			event.setCancelled(true);
 			return;
 		}
@@ -78,7 +79,7 @@ public class MobListener implements Listener {
 		// No natural bat or slime spawning
 		if (
 			(entity instanceof Bat || entity instanceof Slime)
-			&& event.getSpawnReason().equals(CreatureSpawnEvent.SpawnReason.NATURAL)
+				&& spawnReason.equals(CreatureSpawnEvent.SpawnReason.NATURAL)
 		) {
 			event.setCancelled(true);
 			return;
@@ -86,29 +87,25 @@ public class MobListener implements Listener {
 
 		// We need to allow spawning hostile mobs intentionally, but disable natural spawns.
 		// It's easier to check the intentional ways than the natural ones.
-		if (event.getSpawnReason() != CreatureSpawnEvent.SpawnReason.CUSTOM &&
-		    event.getSpawnReason() != CreatureSpawnEvent.SpawnReason.SPAWNER_EGG &&
-		    event.getSpawnReason() != CreatureSpawnEvent.SpawnReason.SPAWNER &&
-		    event.getSpawnReason() != CreatureSpawnEvent.SpawnReason.DEFAULT &&
-		    event.getSpawnReason() != CreatureSpawnEvent.SpawnReason.COMMAND &&
-		    EntityUtils.isHostileMob(entity)) {
-			if (ZoneUtils.hasZoneProperty(entity, ZoneProperty.NO_NATURAL_SPAWNS)) {
-				// Cancel spawning unless this is from a dispenser in a plot
-				if (!event.getSpawnReason().equals(CreatureSpawnEvent.SpawnReason.SPAWNER_EGG) || !ZoneUtils.isInPlot(entity.getLocation())) {
-					event.setCancelled(true);
-					return;
-				}
-			}
+		if (spawnReason != CreatureSpawnEvent.SpawnReason.CUSTOM &&
+			    spawnReason != CreatureSpawnEvent.SpawnReason.SPAWNER_EGG &&
+			    spawnReason != CreatureSpawnEvent.SpawnReason.DISPENSE_EGG &&
+			    spawnReason != CreatureSpawnEvent.SpawnReason.SPAWNER &&
+			    spawnReason != CreatureSpawnEvent.SpawnReason.DEFAULT &&
+			    spawnReason != CreatureSpawnEvent.SpawnReason.COMMAND &&
+			    EntityUtils.isHostileMob(entity) &&
+			    ZoneUtils.hasZoneProperty(entity, ZoneProperty.NO_NATURAL_SPAWNS)) {
+			event.setCancelled(true);
+			return;
 		}
 
-		if ((entity instanceof LivingEntity) && !(entity instanceof Player) && !(entity instanceof ArmorStand)) {
-			LivingEntity mob = (LivingEntity)entity;
+		if (!(entity instanceof Player) && !(entity instanceof ArmorStand)) {
 
 			// Mark mobs not able to pick-up items.
-			mob.setCanPickupItems(false);
+			entity.setCanPickupItems(false);
 
 			// Overwrite drop chances for mob armor and held items
-			EntityEquipment equipment = mob.getEquipment();
+			EntityEquipment equipment = entity.getEquipment();
 			if (equipment != null) {
 				equipment.setHelmetDropChance(ItemUtils.getItemDropChance(equipment.getHelmet()));
 				equipment.setChestplateDropChance(ItemUtils.getItemDropChance(equipment.getChestplate()));
