@@ -2,94 +2,130 @@ package com.playmonumenta.plugins.bosses.spells;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 
+import com.playmonumenta.plugins.utils.EntityUtils;
+
 import org.bukkit.Location;
-import org.bukkit.entity.Player;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Mob;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
+/**
+ * Spawn mobs around boss locations
+ */
 public class SpellBaseSummon extends Spell {
+
 	@FunctionalInterface
-	public interface GetTargetPlayers {
+	public interface GetSpawningLocations {
 		/**
-		 * Given the location of a boss, get which players should be targeted by summon
+		 * Must return a list of location where the spawning will start
 		 */
-		List<Player> run();
+		List<Location> run();
+	}
+
+	@FunctionalInterface
+	public interface GetMobQuantity {
+		/**
+		 * Must return the number of entity that will be summoned
+		 */
+		int run();
 	}
 
 	@FunctionalInterface
 	public interface SummonMobAt {
 		/**
-		 * Given a valid location and a player to target, summon the mob
-		 * <p>
-		 * Must return the bukkit runnable spawned for cancellation purposes, if any
-		 * <p>
-		 * Might want to also override the cancel method here to do something to the mob
-		 * if gets cancelled
-		 * <p>
-		 * Note this needs to always explicitly call cancel() when done to be cleaned up correctly.
+		 * Given a valid locationto target, summon the mob
+		 *
+		 * Must return the entity spawned for cancellation purposes
 		 */
-		@Nullable BukkitRunnable run(Location loc, Player player);
+		Entity run(Location loc, int times);
 	}
 
 	@FunctionalInterface
-	public interface SummonerAnimation {
+	public interface SummonAesthetic {
 		/**
-		 * Plays an animation around the summoner about spawning
 		 *
-		 * Might want to also override the cancel method here to do something to the mob
-		 * if gets cancelled
-		 *
-		 * Note this needs to always explicitly call cancel() when done to be cleaned up correctly.
 		 */
-		BukkitRunnable run();
-	}
-
-	@FunctionalInterface
-	public interface CanRun {
-		/**
-		 * Used to determine if summoning is allowed
-		 */
-		boolean check();
+		void run(LivingEntity mob, Location loc, int ticks);
 	}
 
 	private final Plugin mPlugin;
-	private final int mCastTime;
-	private final int mDuration;
-	private final int mSpawnsPerPlayer;
-	private final boolean mStopWhenHit;
-	private final int mSummonRate;
-	private final GetTargetPlayers mGetPlayers;
+	private final LivingEntity mBoss;
+	private final int mCooldown;
+	private final int mSummoningDuration;
+	private final float mDeepness;
+	private final boolean mCanBeStopped;
+	private final boolean mCanMove;
+	private final boolean mSingleTarget;
+	private final GetMobQuantity mSummonQuantity;
+	private final GetSpawningLocations mSpawningLocations;
 	private final SummonMobAt mSummon;
-	private final SummonerAnimation mAnimation;
-	private final CanRun mCanRun;
+	private final SummonAesthetic mBossAnimation;
+	private final SummonAesthetic mSummonAnimation;
 	private final List<Vector> mLocationOffsets;
 
-	public SpellBaseSummon(Plugin plugin, int castTime, int duration, int rangeFromPlayer,
-	                       int spawnsPerPlayer, boolean stopWhenHit, int summonRate, GetTargetPlayers getPlayers,
-	                       SummonMobAt summon, SummonerAnimation animation, CanRun canRun) {
+	//keep track of how many times the spell cast
+	private int mTimes = 0;
+
+	/**
+	 * @param plugin                Plugin
+	 * @param boss                  the entity that will cast this spell
+	 * @param cooldown              cooldown
+	 * @param summoningDuration     how much the summoning will last
+	 * @param summonRange           range of how distance the spawn can be
+	 * @param canBeStopped          if the spell can be stopped when the bos is stunned
+	 * @param canMove               if the bos can move while casting
+	 * @param singleTarget          if the spell will only launch at one random pos
+	 * @param summonQuantity        return the number of mob that will be spawened at each pos
+	 * @param spawningLocations     return a list of spawning location
+	 * @param summonMob             return the mob spawned at the given locatio
+	 * @param bossAnimation         animation for the boss
+	 * @param summonAnimation       animation for each summon mob
+	 */
+	public SpellBaseSummon(
+		Plugin plugin,
+		LivingEntity boss,
+		int cooldown,
+		int summoningDuration,
+		int summonRange,
+		float deepness,
+		boolean canBeStopped,
+		Boolean canMove,
+		Boolean singleTarget,
+		GetMobQuantity summonQuantity,
+		GetSpawningLocations spawningLocations,
+		SummonMobAt summonMob,
+		SummonAesthetic bossAnimation,
+		SummonAesthetic summonAnimation
+	) {
+
 		mPlugin = plugin;
-		mCastTime = castTime;
-		mDuration = duration;
-		mSpawnsPerPlayer = spawnsPerPlayer;
-		mStopWhenHit = stopWhenHit;
-		mGetPlayers = getPlayers;
-		mSummon = summon;
-		mAnimation = animation;
-		mSummonRate = summonRate;
-		mCanRun = canRun;
+		mBoss = boss;
+		mCooldown = cooldown;
+		mSummoningDuration = summoningDuration;
+		mDeepness = deepness;
+		mCanBeStopped = canBeStopped;
+		mCanMove = canMove;
+		mSingleTarget = singleTarget;
+		mSummonQuantity = summonQuantity;
+		mSpawningLocations = spawningLocations;
+		mSummon = summonMob;
+		mBossAnimation = bossAnimation;
+		mSummonAnimation = summonAnimation;
 
 		// Calculate a reference list of offsets to randomly try when spawning mobs
 		mLocationOffsets = new ArrayList<Vector>();
-		for (int y = -rangeFromPlayer / 3; y <= rangeFromPlayer / 3; y++) {
-			for (int x = -rangeFromPlayer; x <= rangeFromPlayer; x++) {
+		for (int y = -summonRange / 3; y <= summonRange / 3; y++) {
+			for (int x = -summonRange; x <= summonRange; x++) {
 				for (int z = -6; z <= 6; z++) {
-					// Don't spawn very close to the player - no fun
+					// Don't spawn very close - no fun
 					if (x > -4 && x < 4 && z > -4 && z < 4) {
 						continue;
 					}
@@ -102,114 +138,142 @@ public class SpellBaseSummon extends Spell {
 
 	@Override
 	public void run() {
-		List<Player> players = mGetPlayers.run();
+		mTimes++;
 
-		// Allow garbage collection of runnables that are no longer running
-		Iterator<BukkitRunnable> iterator = mActiveRunnables.iterator();
-		while (iterator.hasNext()) {
-			BukkitRunnable runnable = iterator.next();
-			if (runnable.isCancelled()) {
-				iterator.remove();
-			} else {
-				mPlugin.getLogger().warning("Summon process restarted but some previous summons still running!");
-			}
+		if (!mCanMove) {
+			mBoss.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, mSummoningDuration, 100));
 		}
 
-		BukkitRunnable runnable = mAnimation.run();
-		if (runnable != null) {
-			mActiveRunnables.add(runnable);
-		}
+		List<Location> locations = mSpawningLocations.run();
+		int mSummonNum = mSummonQuantity.run();
 
-		// Shuffle the list once per run - all players will use same shuffled list
-		Collections.shuffle(mLocationOffsets);
-		if (mSummonRate > 0) {
-			for (Player player : players) {
-				new BukkitRunnable() {
-					int mNumSummoned = 0;
+		aestheticBoss();
 
-					int mIndex = 0;
-					@Override
-					public void run() {
-						mNumSummoned++;
-
-						Vector offset = mLocationOffsets.get(mIndex);
-						Location loc = player.getLocation().add(offset);
-
-						// Underneath block must be solid
-						if (!loc.subtract(0, 1, 0).getBlock().getType().isSolid()) {
-							return;
-						}
-
-						// Blocks above summon-on block must be not solid
-						if (loc.add(0, 1, 0).getBlock().getType().isSolid() || loc.add(0, 1, 0).getBlock().getType().isSolid()) {
-							return;
-						}
-
-						// Summon the mob
-						BukkitRunnable r = mSummon.run(loc, player);
-						if (r != null) {
-							mActiveRunnables.add(r);
-						}
-						mIndex++;
-						if (mNumSummoned >= mSpawnsPerPlayer) {
-							this.cancel();
-						}
-					}
-
-				}.runTaskTimer(mPlugin, 0, mSummonRate);
-			}
+		if (mSingleTarget) {
+			Collections.shuffle(locations);
+			Location summonLoc = locations.get(0);
+			summoningRunnable(mSummonNum, summonLoc);
 		} else {
-			for (Player player : players) {
-				int numSummoned = 0;
-				for (Vector offset : mLocationOffsets) {
-					Location loc = player.getLocation().add(offset);
-
-					// Underneath block must be solid
-					if (!loc.subtract(0, 1, 0).getBlock().getType().isSolid()) {
-						continue;
-					}
-
-					// Blocks above summon-on block must be not solid
-					if (loc.add(0, 1, 0).getBlock().getType().isSolid() || loc.add(0, 1, 0).getBlock().getType().isSolid()) {
-						continue;
-					}
-
-					// Summon the mob
-					runnable = mSummon.run(loc, player);
-					if (runnable != null) {
-						mActiveRunnables.add(runnable);
-					}
-
-					// Stop once the right number of mobs have been summoned for this player
-					numSummoned++;
-					if (numSummoned >= mSpawnsPerPlayer) {
-						break;
-					}
-				}
+			for (Location summonLoc : locations) {
+				summoningRunnable(mSummonNum, summonLoc);
 			}
 		}
-	}
 
-	@Override
-	public int castTicks() {
-		return mCastTime;
 	}
 
 	@Override
 	public int cooldownTicks() {
-		return mDuration;
+		return mCooldown;
 	}
 
-	@Override
-	public boolean canRun() {
-		return mCanRun.check();
+
+	private void aestheticBoss() {
+		new BukkitRunnable() {
+			int mTimer = 0;
+
+			@Override
+			public void run() {
+				if (mBoss == null || !mBoss.isValid() || mBoss.isDead()) {
+					this.cancel();
+					return;
+				}
+
+				if (mCanBeStopped && (EntityUtils.isStunned(mBoss))) {
+					this.cancel();
+					return;
+				}
+
+				mBossAnimation.run(mBoss, mBoss.getLocation(), mTimer);
+
+				if (mTimer >= mSummoningDuration) {
+					this.cancel();
+					return;
+				}
+
+				mTimer++;
+			}
+
+			@Override
+			public void cancel() {
+				super.cancel();
+				if (!mCanMove) {
+					mBoss.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 1, 100));
+				}
+
+			}
+
+		}.runTaskTimer(mPlugin, 0, 1);
 	}
 
-	@Override
-	public void bossDamagedByEntity(EntityDamageByEntityEvent event) {
-		if (mStopWhenHit) {
-			// Cancel all active runnables
-			cancel();
+	private void summoningRunnable(int summonQuantity, Location summonLoc) {
+		Collections.shuffle(mLocationOffsets);
+		int index = 0;
+		for (int i = 0; i < summonQuantity; i++) {
+
+			Vector offset = mLocationOffsets.get(index);
+			Location loc = summonLoc.clone().add(offset);
+
+			//don't summon inside solid block
+			while (loc.clone().add(0, 1, 0).getBlock().getType().isSolid() || loc.clone().add(0, 2, 0).getBlock().getType().isSolid() || !loc.clone().add(0, -1, 0).getBlock().getType().isSolid()) {
+				index = (index + 1 >= mLocationOffsets.size() ? 0 : index + 1);
+				loc = summonLoc.clone().add(mLocationOffsets.get(index));
+			}
+
+			Entity entity = mSummon.run(loc.clone().subtract(0, mDeepness, 0), mTimes);
+			if (entity instanceof Mob) {
+				Mob mob = (Mob) entity;
+				mob.setAI(false);
+
+				//summoning
+				new BukkitRunnable() {
+					int mTimer = 0;
+					Mob mMob = mob;
+
+					@Override
+					public void run() {
+						if (mBoss == null || !mBoss.isValid() || mBoss.isDead()) {
+							this.cancel();
+							return;
+						}
+
+						if (mCanBeStopped && (EntityUtils.isStunned(mBoss))) {
+							this.cancel();
+							return;
+						}
+
+						if (mTimer >= mSummoningDuration) {
+							mob.setAI(true);
+
+							this.cancel();
+							return;
+						}
+
+						Location mobLoc = mob.getLocation().add(0, mDeepness/mSummoningDuration, 0);
+						mob.teleport(mobLoc);
+						mSummonAnimation.run(mob, mobLoc, mTimer);
+
+						mTimer += 1;
+					}
+
+					@Override
+					public void cancel() {
+						super.cancel();
+						mMob.setGlowing(false);
+						//if the cast is not over remove the mob
+						if (mTimer < mSummoningDuration) {
+							mMob.remove();
+						}
+					}
+
+
+				}.runTaskTimer(mPlugin, 0, 1);
+
+
+
+			}
+
+			index = (index + 1 >= mLocationOffsets.size() ? 0 : index + 1);
 		}
 	}
+
 }

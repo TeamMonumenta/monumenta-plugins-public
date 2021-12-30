@@ -1,7 +1,12 @@
 package com.playmonumenta.plugins.integrations;
 
+import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
+
+import com.playmonumenta.libraryofsouls.LibraryOfSoulsAPI;
+import com.playmonumenta.libraryofsouls.Soul;
+import com.playmonumenta.plugins.utils.FastUtils;
 
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
@@ -34,6 +39,34 @@ public class LibraryOfSoulsIntegration {
 	public static @Nullable Set<String> getSoulLocations() {
 		if (ENABLED) {
 			return LibraryOfSoulsAPI.getSoulLocations();
+		}
+		return null;
+	}
+
+	public static @Nullable Set<String> getPoolNames() {
+		if (ENABLED) {
+			return LibraryOfSoulsAPI.getSoulPoolNames();
+		}
+		return null;
+	}
+
+	public static @Nullable Set<String> getGroupNames() {
+		if (ENABLED) {
+			return LibraryOfSoulsAPI.getSoulGroupNames();
+		}
+		return null;
+	}
+
+	public static @Nullable Set<String> getPartyNames() {
+		if (ENABLED) {
+			return LibraryOfSoulsAPI.getSoulPartyNames();
+		}
+		return null;
+	}
+
+	public static @Nullable Map<Soul, Integer> getPool(String pool) {
+		if (ENABLED) {
+			return LibraryOfSoulsAPI.getRandomSouls(pool, FastUtils.RANDOM);
 		}
 		return null;
 	}

@@ -11,6 +11,7 @@ import java.util.Set;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.bosses.parameters.BossParam;
 import com.playmonumenta.plugins.bosses.parameters.EffectsList;
+import com.playmonumenta.plugins.bosses.parameters.LoSPool;
 import com.playmonumenta.plugins.bosses.parameters.EntityTargets;
 import com.playmonumenta.plugins.bosses.parameters.ParseResult;
 import com.playmonumenta.plugins.bosses.parameters.ParticlesList;
@@ -259,6 +260,12 @@ public abstract class BossParameters {
 						validType.getField().set(parameters, result.getResult());
 					} else if (validTypeClass == ParticlesList.class) {
 						ParseResult<ParticlesList> result = ParticlesList.fromReader(reader, validType.getDesc());
+						if (result.getTooltip() != null) {
+							return ParseResult.of(result.getTooltip());
+						}
+						validType.getField().set(parameters, result.getResult());
+					} else if (validTypeClass == LoSPool.class) {
+						ParseResult<LoSPool> result = LoSPool.fromReader(reader, validType.getDesc());
 						if (result.getTooltip() != null) {
 							return ParseResult.of(result.getTooltip());
 						}
