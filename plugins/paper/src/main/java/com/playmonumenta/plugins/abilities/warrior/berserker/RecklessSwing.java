@@ -69,6 +69,9 @@ public class RecklessSwing extends Ability {
 	public boolean livingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
 		if (event.getCause() == DamageCause.ENTITY_ATTACK) {
 			event.setDamage(computeDamageUsingHealth(event.getDamage()));
+			if (mPlayer.isSneaking()) {
+				cast(Action.LEFT_CLICK_AIR);
+			}
 		}
 		return true;
 	}
