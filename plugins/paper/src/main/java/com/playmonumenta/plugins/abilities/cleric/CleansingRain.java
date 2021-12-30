@@ -76,6 +76,12 @@ public class CleansingRain extends Ability {
 
 			@Override
 			public void run() {
+
+				if (mPlayer == null || !mPlayer.isOnline() || mPlayer.isDead()) {
+					this.cancel();
+					return;
+				}
+
 				world.spawnParticle(Particle.CLOUD, mPlayer.getLocation().add(0, 4, 0), 5, 2.5, 0.35, 2.5, 0);
 				world.spawnParticle(Particle.WATER_DROP, mPlayer.getLocation().add(0, 2, 0), 15, 2.5, 2, 2.5, 0.001);
 				world.spawnParticle(Particle.VILLAGER_HAPPY, mPlayer.getLocation().add(0, 2, 0), 1, 2, 1.5, 2, 0.001);
