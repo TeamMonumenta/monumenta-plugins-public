@@ -53,4 +53,18 @@ public class ScoreboardUtils {
 	) {
 		return player.getScoreboardTags().contains(tag);
 	}
+
+	/**
+	 * "Toggles" a tag between being present and being absent
+	 *
+	 * @return Whether the tag is present after toggling it
+	 */
+	public static boolean toggleTag(Player player, String tag) {
+		boolean removed = player.getScoreboardTags().remove(tag);
+		if (!removed) {
+			player.getScoreboardTags().add(tag);
+		}
+		return !removed;
+	}
+
 }

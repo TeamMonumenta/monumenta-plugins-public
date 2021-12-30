@@ -25,6 +25,7 @@ import com.comphenix.protocol.wrappers.nbt.NbtCompound;
 import com.comphenix.protocol.wrappers.nbt.NbtFactory;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.commands.GlowingCommand;
+import com.playmonumenta.plugins.protocollib.VirtualFirmamentReplacer;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.NmsUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
@@ -141,6 +142,8 @@ public class ProtocolLibIntegration implements Listener {
 				}
 			}
 		});
+
+		manager.addPacketListener(new VirtualFirmamentReplacer(plugin));
 	}
 
 	private void stripNBT(NbtCompound nbt) {

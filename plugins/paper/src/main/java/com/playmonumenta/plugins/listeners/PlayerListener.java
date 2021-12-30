@@ -1277,6 +1277,14 @@ public class PlayerListener implements Listener {
 		}
 	}
 
+	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+	public void gamemodeChangeEvent(PlayerGameModeChangeEvent event) {
+		// When switching to creative, update the inventory to update any virtual Firmaments back into normal Firmaments to prevent breaking them
+		if (event.getNewGameMode() == GameMode.CREATIVE) {
+			Bukkit.getScheduler().runTaskLater(mPlugin, () -> event.getPlayer().updateInventory(), 1);
+		}
+	}
+
 	/*
 	 * Refresh class abilities after event (end of tick)
 	 * when switching to/from spectator.

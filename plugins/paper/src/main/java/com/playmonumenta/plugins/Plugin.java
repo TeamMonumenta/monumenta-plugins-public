@@ -194,6 +194,7 @@ public class Plugin extends JavaPlugin {
 		JingleBells.register();
 		Stuck.register(this);
 		GlowingCommand.register();
+		VirtualFirmament.register();
 
 
 		try {
