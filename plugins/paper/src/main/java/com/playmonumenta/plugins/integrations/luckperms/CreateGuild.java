@@ -5,15 +5,15 @@ import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.Executor;
 
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.integrations.MonumentaNetworkRelayIntegration;
-import com.playmonumenta.plugins.utils.ScoreboardUtils;
-
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Sound;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.integrations.MonumentaNetworkRelayIntegration;
+import com.playmonumenta.plugins.utils.ScoreboardUtils;
 
 import dev.jorel.commandapi.CommandAPI;
 import dev.jorel.commandapi.CommandAPICommand;
@@ -61,36 +61,30 @@ public class CreateGuild {
 			CommandAPI.fail("The luckperms group '" + cleanGuildName + "' already exists!");
 		}
 
-		int totalPrestige = 0;
-		boolean hasEnoughPrestige = true;
+		boolean hasEnoughLevels = true;
 		boolean inGuildAlready = false;
 		for (Player founder : founders) {
 			if (LuckPermsIntegration.getGuild(founder) != null) {
 				sender.sendMessage(ChatColor.DARK_RED + "" + ChatColor.ITALIC + "Player "
-				                   + founder.getName() + " is already in a guild!");
+					                   + founder.getName() + " is already in a guild!");
 				inGuildAlready = true;
 			}
 
-			int prestige = ScoreboardUtils.getScoreboardValue(founder, "Prestige").orElse(0);
-			if (prestige < 8) {
-				sender.sendMessage(ChatColor.DARK_RED + "" + ChatColor.ITALIC + "The minimal prestige count for "
-				                   + founder.getName() + " is not reached ("
-				                   + ScoreboardUtils.getScoreboardValue(founder, "Prestige").orElse(0) + "/8)");
-				hasEnoughPrestige = false;
+			int level = ScoreboardUtils.getScoreboardValue(founder, "TotalLevel").orElse(0);
+			if (level < 5) {
+				sender.sendMessage(ChatColor.DARK_RED + "" + ChatColor.ITALIC + "The minimal level for "
+					                   + founder.getName() + " is not reached ("
+					                   + level + "/5)");
+				hasEnoughLevels = false;
 			}
-			totalPrestige += prestige;
 		}
 
-		// Displays ALL founders in a guild / without enough prestige
+		// Displays ALL founders in a guild / without enough levels
 		if (inGuildAlready) {
 			CommandAPI.fail("At least one founder is already in a guild");
 		}
-		if (!hasEnoughPrestige) {
-			CommandAPI.fail("Individual founder prestige requirements not met");
-		}
-		if (totalPrestige < 50) {
-			CommandAPI.fail(ChatColor.DARK_RED + "" + ChatColor.ITALIC + "The total prestige count is not enough ("
-			                   + totalPrestige + "/50)");
+		if (!hasEnoughLevels) {
+			CommandAPI.fail("Individual founder level requirements not met");
 		}
 
 		// Add tags, display messages and effects

@@ -262,9 +262,10 @@ public class PlayerTracking implements EntityTracking {
 
 						if (mode == GameMode.SURVIVAL && !isInPlot) {
 							player.setGameMode(GameMode.ADVENTURE);
-						} else if (mode == GameMode.ADVENTURE && isInPlot
-									&& loc.mY > ServerProperties.getPlotSurvivalMinHeight()
-									&& ScoreboardUtils.getScoreboardValue(player, "Prestige").orElse(0) >= 3) {
+						} else if (mode == GameMode.ADVENTURE
+							           && isInPlot
+							           && loc.mY > ServerProperties.getPlotSurvivalMinHeight()
+							           && ScoreboardUtils.getScoreboardValue(player, "TotalLevel").orElse(0) >= 5) {
 							player.setGameMode(GameMode.SURVIVAL);
 						}
 					}
