@@ -222,17 +222,21 @@ public final class ParrotCustomInventory extends CustomInventory {
 
 		ItemStack visibleParrots = buildItem(Material.SADDLE, "Set parrots visible", new ArrayList<>());
 		GUI_ITEMS.add(new GuiItem(ParrotGUIPage.OTHERS.mNum, ROWS * COLUMNS - 2, visibleParrots, (player, inv) -> {
-						return ParrotManager.hasParrotOnShoulders(player) && !ParrotManager.isParrotsVisible(player); },
-							(player, inv) -> {
-								ParrotManager.setParrotVisible(player, true);
-								return true; }));
+			return ParrotManager.hasParrotOnShoulders(player) && !ParrotManager.areParrotsVisible(player);
+		},
+		                          (player, inv) -> {
+			                          ParrotManager.setParrotVisible(player, true);
+			                          return true;
+		                          }));
 
 		ItemStack invisibleParrots = buildItem(Material.SADDLE, "Set parrots invisible", new ArrayList<>());
 		GUI_ITEMS.add(new GuiItem(ParrotGUIPage.OTHERS.mNum, ROWS * COLUMNS - 2, invisibleParrots, (player, inv) -> {
-						return ParrotManager.hasParrotOnShoulders(player) && ParrotManager.isParrotsVisible(player); },
-							(player, inv) -> {
-								ParrotManager.setParrotVisible(player, false);
-								return true; }));
+			return ParrotManager.hasParrotOnShoulders(player) && ParrotManager.areParrotsVisible(player);
+		},
+		                          (player, inv) -> {
+			                          ParrotManager.setParrotVisible(player, false);
+			                          return true;
+		                          }));
 
 		lore.clear();
 		lore.add("Click to buy!");
@@ -312,7 +316,7 @@ public final class ParrotCustomInventory extends CustomInventory {
 		GUI_ITEMS.add(new GuiItem(ParrotGUIPage.R1.mNum, 10, boughGreen, (player, inv) -> {
 			return ScoreboardUtils.getScoreboardValue(player, "ParrotBought4").orElse(0) > 0 && mShoulderSelected != PlayerShoulder.NONE; },
 				(player, inv) -> {
-					ParrotManager.updateParrot(player, ParrotVariant.GREEN, mShoulderSelected);
+					ParrotManager.selectParrot(player, ParrotVariant.GREEN, mShoulderSelected);
 					return true;
 				}));
 
@@ -335,7 +339,7 @@ public final class ParrotCustomInventory extends CustomInventory {
 		GUI_ITEMS.add(new GuiItem(ParrotGUIPage.R1.mNum, 11, boughGray, (player, inv) -> {
 						return ScoreboardUtils.getScoreboardValue(player, "ParrotBought5").orElse(0) > 0 && mShoulderSelected != PlayerShoulder.NONE; },
 							(player, inv) -> {
-								ParrotManager.updateParrot(player, ParrotVariant.GRAY, mShoulderSelected);
+								ParrotManager.selectParrot(player, ParrotVariant.GRAY, mShoulderSelected);
 								return true; }));
 
 		//GOLD
@@ -360,7 +364,7 @@ public final class ParrotCustomInventory extends CustomInventory {
 		GUI_ITEMS.add(new GuiItem(ParrotGUIPage.R1.mNum, 12, boughGolden, (player, inv) -> {
 						return ScoreboardUtils.getScoreboardValue(player, "ParrotBought7").orElse(0) > 0 && mShoulderSelected != PlayerShoulder.NONE; },
 							(player, inv) -> {
-								ParrotManager.updateParrot(player, ParrotVariant.PULSATING_GOLD, mShoulderSelected);
+								ParrotManager.selectParrot(player, ParrotVariant.PULSATING_GOLD, mShoulderSelected);
 								return true; }));
 
 		//BEE Parrot!
@@ -386,7 +390,7 @@ public final class ParrotCustomInventory extends CustomInventory {
 		GUI_ITEMS.add(new GuiItem(ParrotGUIPage.R1.mNum, 13, boughtBee, (player, inv) -> {
 						return ScoreboardUtils.getScoreboardValue(player, "ParrotBought16").orElse(0) > 0 && mShoulderSelected != PlayerShoulder.NONE;
 							}, (player, inv) -> {
-								ParrotManager.updateParrot(player, ParrotVariant.BEE, mShoulderSelected);
+			ParrotManager.selectParrot(player, ParrotVariant.BEE, mShoulderSelected);
 								return true;
 							}));
 
@@ -425,7 +429,7 @@ public final class ParrotCustomInventory extends CustomInventory {
 		GUI_ITEMS.add(new GuiItem(ParrotGUIPage.R1.mNum, 14, boughtRadiant, (player, inv) -> {
 						return ScoreboardUtils.getScoreboardValue(player, "ParrotBought17").orElse(0) > 0 && mShoulderSelected != PlayerShoulder.NONE;
 							}, (player, inv) -> {
-								ParrotManager.updateParrot(player, ParrotVariant.RADIANT, mShoulderSelected);
+			ParrotManager.selectParrot(player, ParrotVariant.RADIANT, mShoulderSelected);
 								return true;
 							}));
 
@@ -461,7 +465,7 @@ public final class ParrotCustomInventory extends CustomInventory {
 		GUI_ITEMS.add(new GuiItem(ParrotGUIPage.R1.mNum, 15, boughtKaul, (player, inv) -> {
 						return ScoreboardUtils.getScoreboardValue(player, "ParrotBought10").orElse(0) > 0 && mShoulderSelected != PlayerShoulder.NONE;
 							}, (player, inv) -> {
-								ParrotManager.updateParrot(player, ParrotVariant.KAUL, mShoulderSelected);
+			ParrotManager.selectParrot(player, ParrotVariant.KAUL, mShoulderSelected);
 								return true;
 							}));
 
@@ -495,7 +499,7 @@ public final class ParrotCustomInventory extends CustomInventory {
 		GUI_ITEMS.add(new GuiItem(ParrotGUIPage.R2.mNum, 10, boughtRed, (player, inv) -> {
 						return ScoreboardUtils.getScoreboardValue(player, "ParrotBought1").orElse(0) > 0 && mShoulderSelected != PlayerShoulder.NONE; },
 							(player, inv) -> {
-								ParrotManager.updateParrot(player, ParrotVariant.RED, mShoulderSelected);
+								ParrotManager.selectParrot(player, ParrotVariant.RED, mShoulderSelected);
 								return true; }));
 
 
@@ -520,7 +524,7 @@ public final class ParrotCustomInventory extends CustomInventory {
 		GUI_ITEMS.add(new GuiItem(ParrotGUIPage.R2.mNum, 11, boughtBlue, (player, inv) -> {
 						return ScoreboardUtils.getScoreboardValue(player, "ParrotBought2").orElse(0) > 0 && mShoulderSelected != PlayerShoulder.NONE;
 							}, (player, inv) -> {
-								ParrotManager.updateParrot(player, ParrotVariant.BLUE, mShoulderSelected);
+			ParrotManager.selectParrot(player, ParrotVariant.BLUE, mShoulderSelected);
 								return true; }));
 
 
@@ -543,7 +547,7 @@ public final class ParrotCustomInventory extends CustomInventory {
 		GUI_ITEMS.add(new GuiItem(ParrotGUIPage.R2.mNum, 12, boughtYellow, (player, inv) -> {
 						return ScoreboardUtils.getScoreboardValue(player, "ParrotBought3").orElse(0) > 0 && mShoulderSelected != PlayerShoulder.NONE; },
 							(player, inv) -> {
-								ParrotManager.updateParrot(player, ParrotVariant.CYAN, mShoulderSelected);
+								ParrotManager.selectParrot(player, ParrotVariant.CYAN, mShoulderSelected);
 								return true; }));
 
 		//EMERALD
@@ -568,7 +572,7 @@ public final class ParrotCustomInventory extends CustomInventory {
 		GUI_ITEMS.add(new GuiItem(ParrotGUIPage.R2.mNum, 13, boughEmerald, (player, inv) -> {
 						return ScoreboardUtils.getScoreboardValue(player, "ParrotBought8").orElse(0) > 0 && mShoulderSelected != PlayerShoulder.NONE; },
 							(player, inv) -> {
-								ParrotManager.updateParrot(player, ParrotVariant.PULSATING_EMERALD, mShoulderSelected);
+								ParrotManager.selectParrot(player, ParrotVariant.PULSATING_EMERALD, mShoulderSelected);
 								return true; }));
 
 		//PIRATE
@@ -593,7 +597,7 @@ public final class ParrotCustomInventory extends CustomInventory {
 		GUI_ITEMS.add(new GuiItem(ParrotGUIPage.R2.mNum, 14, boughPirate, (player, inv) -> {
 						return ScoreboardUtils.getScoreboardValue(player, "ParrotBought9").orElse(0) > 0 && mShoulderSelected != PlayerShoulder.NONE; },
 							(player, inv) -> {
-								ParrotManager.updateParrot(player, ParrotVariant.PIRATE, mShoulderSelected);
+								ParrotManager.selectParrot(player, ParrotVariant.PIRATE, mShoulderSelected);
 								return true; }));
 
 		//Snowy
@@ -621,7 +625,7 @@ public final class ParrotCustomInventory extends CustomInventory {
 		GUI_ITEMS.add(new GuiItem(ParrotGUIPage.R2.mNum, 15, boughtSnowy, (player, inv) -> {
 			return ScoreboardUtils.getScoreboardValue(player, "ParrotBought13").orElse(0) > 0 && mShoulderSelected != PlayerShoulder.NONE;
 		}, (player, inv) -> {
-			ParrotManager.updateParrot(player, ParrotVariant.SNOWY, mShoulderSelected);
+			ParrotManager.selectParrot(player, ParrotVariant.SNOWY, mShoulderSelected);
 			return true;
 		}));
 
@@ -658,7 +662,7 @@ public final class ParrotCustomInventory extends CustomInventory {
 		GUI_ITEMS.add(new GuiItem(ParrotGUIPage.R2.mNum, 16, boughtEldrask, (player, inv) -> {
 			return ScoreboardUtils.getScoreboardValue(player, "ParrotBought11").orElse(0) > 0 && mShoulderSelected != PlayerShoulder.NONE;
 		}, (player, inv) -> {
-			ParrotManager.updateParrot(player, ParrotVariant.ELDRASK, mShoulderSelected);
+			ParrotManager.selectParrot(player, ParrotVariant.ELDRASK, mShoulderSelected);
 			return true;
 		}));
 
@@ -695,7 +699,7 @@ public final class ParrotCustomInventory extends CustomInventory {
 		GUI_ITEMS.add(new GuiItem(ParrotGUIPage.R2.mNum, 19, boughtHekawt, (player, inv) -> {
 			return ScoreboardUtils.getScoreboardValue(player, "ParrotBought18").orElse(0) > 0 && mShoulderSelected != PlayerShoulder.NONE;
 		}, (player, inv) -> {
-			ParrotManager.updateParrot(player, ParrotVariant.HEKAWT, mShoulderSelected);
+			ParrotManager.selectParrot(player, ParrotVariant.HEKAWT, mShoulderSelected);
 			return true;
 		}));
 
@@ -747,7 +751,7 @@ public final class ParrotCustomInventory extends CustomInventory {
 		GUI_ITEMS.add(new GuiItem(ParrotGUIPage.R2.mNum, 20, boughtDepths, (player, inv) -> {
 			return ScoreboardUtils.getScoreboardValue(player, "ParrotBought14").orElse(0) > 0 && mShoulderSelected != PlayerShoulder.NONE;
 		}, (player, inv) -> {
-			ParrotManager.updateParrot(player, ParrotVariant.DEPTHS, mShoulderSelected);
+			ParrotManager.selectParrot(player, ParrotVariant.DEPTHS, mShoulderSelected);
 			return true;
 		}));
 
@@ -798,7 +802,7 @@ public final class ParrotCustomInventory extends CustomInventory {
 		GUI_ITEMS.add(new GuiItem(ParrotGUIPage.R2.mNum, 21, boughtDepthsU, (player, inv) -> {
 			return ScoreboardUtils.getScoreboardValue(player, "ParrotBought15").orElse(0) > 0 && mShoulderSelected != PlayerShoulder.NONE;
 		}, (player, inv) -> {
-			ParrotManager.updateParrot(player, ParrotVariant.DEPTHS_UPGRADE, mShoulderSelected);
+			ParrotManager.selectParrot(player, ParrotVariant.DEPTHS_UPGRADE, mShoulderSelected);
 			return true;
 		}));
 
@@ -826,7 +830,7 @@ public final class ParrotCustomInventory extends CustomInventory {
 		GUI_ITEMS.add(new GuiItem(ParrotGUIPage.SPECIAL.mNum, 10, boughPatreon, (player, inv) -> {
 						return ScoreboardUtils.getScoreboardValue(player, "Patreon").orElse(0) >= 5 && mShoulderSelected != PlayerShoulder.NONE;
 							}, (player, inv) -> {
-								ParrotManager.updateParrot(player, ParrotVariant.PATREON, mShoulderSelected);
+			ParrotManager.selectParrot(player, ParrotVariant.PATREON, mShoulderSelected);
 								return true; }));
 
 		//PRIDE PARROT!
@@ -901,7 +905,7 @@ public final class ParrotCustomInventory extends CustomInventory {
 		GUI_ITEMS.add(new GuiItem(ParrotGUIPage.SPECIAL.mNum, 11, boughtPrideParrot, (player, inv) -> {
 			return ScoreboardUtils.getScoreboardValue(player, "ParrotBought12").orElse(0) > 0 && mShoulderSelected != PlayerShoulder.NONE;
 		}, (player, inv) -> {
-			ParrotManager.updateParrot(player, ParrotVariant.RAINBOW, mShoulderSelected);
+			ParrotManager.selectParrot(player, ParrotVariant.RAINBOW, mShoulderSelected);
 			return true;
 		}));
 

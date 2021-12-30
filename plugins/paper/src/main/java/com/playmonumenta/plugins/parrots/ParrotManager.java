@@ -1,6 +1,8 @@
 package com.playmonumenta.plugins.parrots;
 
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import org.bukkit.Bukkit;
@@ -14,18 +16,14 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntitySpawnEvent;
 import org.bukkit.event.player.PlayerBedEnterEvent;
 import org.bukkit.event.player.PlayerBedLeaveEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerToggleFlightEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
-
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.format.TextDecoration;
 
 public class ParrotManager implements Listener {
 
@@ -88,6 +86,18 @@ public class ParrotManager implements Listener {
 		public void setVariant(Parrot.Variant variant) {
 			this.mVariant = variant;
 		}
+
+		public static @Nullable ParrotVariant getVariantByNumber(int number) {
+			if (number == 0) {
+				return null;
+			}
+			for (ParrotVariant variant : values()) {
+				if (variant.mNumber == number) {
+					return variant;
+				}
+			}
+			return null;
+		}
 	}
 
 	public enum PlayerShoulder {
@@ -114,6 +124,9 @@ public class ParrotManager implements Listener {
 	private static final Set<Player> mPrideRight = new HashSet<>();
 	private static final Set<Player> mPrideLeft = new HashSet<>();
 
+	private static final Map<Player, ParrotVariant> mLeftShoulders = new HashMap<>();
+	private static final Map<Player, ParrotVariant> mRightShoulders = new HashMap<>();
+
 	private static final int PRIDE_FREQUENCY = 3;
 
 	private static @Nullable BukkitRunnable mPrideRunnable;
@@ -130,211 +143,159 @@ public class ParrotManager implements Listener {
 				for (Player player : Bukkit.getOnlinePlayers()) {
 					// Flying players lose parrots almost instantly, causing flickering, so don't update parrots for them. They'll get their parrots back once they land.
 					if (!player.isFlying() && player.getGameMode() != GameMode.SPECTATOR) {
-						updateAllIfVisible(player);
+						respawnParrots(player);
 					}
 				}
 			}
-		}.runTaskTimer(plugin, 10 * 20L, 20L); // low priority task, so can start after a long delay
+		}.runTaskTimer(plugin, 10 * 20L, 3 * 20L); // low priority task, so can start after a long delay
 	}
 
-	public static void removeParrot(Player p) {
-		p.setShoulderEntityLeft(null);
-		p.setShoulderEntityRight(null);
+	private static void respawnParrots(Player player) {
+		ParrotVariant leftParrot = mLeftShoulders.get(player);
+		if (leftParrot != null) {
+			ParrotPet pp = new ParrotPet(leftParrot, player);
+			player.setShoulderEntityLeft(pp.spawnParrot());
+		}
+
+		ParrotVariant rightParrot = mRightShoulders.get(player);
+		if (rightParrot != null) {
+			ParrotPet pp = new ParrotPet(rightParrot, player);
+			player.setShoulderEntityRight(pp.spawnParrot());
+		}
 	}
 
-	public static @Nullable ParrotVariant getParrotVariantByName(String name) {
-		for (ParrotVariant pv : ParrotVariant.values()) {
-			if (pv.getName().equals(name)) {
-				return pv;
-			}
-		}
-		return null;
-	}
+	public static void updateParrots(Player player) {
 
-	public static void updateParrot(Player p, ParrotVariant variant, PlayerShoulder shoulder) {
-		updateParrot(p, variant.mNumber, shoulder);
-	}
+		boolean visible = areParrotsVisible(player);
+		int leftShoulderParrot = visible ? ScoreboardUtils.getScoreboardValue(player, SCOREBOARD_PARROT_LEFT).orElse(0) : 0;
+		int rightShoulderParrot = visible ? ScoreboardUtils.getScoreboardValue(player, SCOREBOARD_PARROT_RIGHT).orElse(0) : 0;
+		ParrotVariant leftVariant = ParrotVariant.getVariantByNumber(leftShoulderParrot);
+		ParrotVariant rightVariant = ParrotVariant.getVariantByNumber(rightShoulderParrot);
 
-	public static void updateParrot(Player p, int variantNum, PlayerShoulder shoulder) {
-		if (shoulder == PlayerShoulder.NONE) {
-			p.sendMessage(Component.text("[Parrot Manager] shoulder == none. how do we get here? please contact a Mod.", NamedTextColor.RED).decoration(TextDecoration.BOLD, true));
-			return;
+		if (!hasDoubleShoulders(player) && leftShoulderParrot != 0 && rightShoulderParrot != 0) { // player somehow has two parrots but can only have one - remove one
+			ScoreboardUtils.setScoreboardValue(player, SCOREBOARD_PARROT_RIGHT, 0);
+			rightVariant = null;
 		}
 
-		ParrotVariant variant;
-
-		try {
-			variant = ParrotVariant.values()[variantNum - 1];
-		} catch (Exception ex) {
-			mPlugin.getLogger().warning("[Parrot Manager] Catch an IndexOutOfBoundException. Probably coming from a different version of the plugin?");
-			p.sendMessage(Component.text("[Parrot Manager] Error converting parrot. Please contact a Mod", NamedTextColor.RED).decoration(TextDecoration.BOLD, true).hoverEvent(Component.text(ex.getMessage())));
-			return;
-		}
-
-		int leftShoulderParrot = ScoreboardUtils.getScoreboardValue(p, SCOREBOARD_PARROT_LEFT).orElse(0);
-		int rightShoulderParrot = ScoreboardUtils.getScoreboardValue(p, SCOREBOARD_PARROT_RIGHT).orElse(0);
-
-		int bothShoulder = ScoreboardUtils.getScoreboardValue(p, SCOREBOARD_PARROT_BOTH).orElse(0);
-
-		ScoreboardUtils.setScoreboardValue(p, SCOREBOARD_PARROT_VISIBLE, 1);
-
-		if (bothShoulder == 0) { // only one parrot!
-			if (shoulder == PlayerShoulder.RIGHT && leftShoulderParrot != 0) {
-				p.setShoulderEntityLeft(null);
-				ScoreboardUtils.setScoreboardValue(p, SCOREBOARD_PARROT_LEFT, 0);
-				mPrideLeft.remove(p);
-			}
-
-			if (shoulder == PlayerShoulder.LEFT && rightShoulderParrot != 0) {
-				p.setShoulderEntityRight(null);
-				ScoreboardUtils.setScoreboardValue(p, SCOREBOARD_PARROT_RIGHT, 0);
-				mPrideRight.remove(p);
-			}
-		}
-
-		ParrotPet pp = new ParrotPet(variant, p);
-
-		if (shoulder == PlayerShoulder.LEFT) {
-			mPrideLeft.remove(p);
-		} else {
-			mPrideRight.remove(p);
-		}
-
-		if (variantNum == ParrotVariant.RAINBOW.getNumber()) {
-			//pride parrot.
-
-			if (shoulder == PlayerShoulder.LEFT) {
-				mPrideLeft.add(p);
+		if (leftVariant != null) {
+			mLeftShoulders.put(player, leftVariant);
+			if (leftVariant == ParrotVariant.RAINBOW) {
+				mPrideLeft.add(player);
 			} else {
-				mPrideRight.add(p);
+				mPrideLeft.remove(player);
 			}
-
-			if (mPrideRunnable == null) {
-				//no task is running so create a new one
-				mPrideRunnable = new BukkitRunnable() {
-					final Parrot.Variant[] mVariants = Parrot.Variant.values();
-					int mRandom = FastUtils.RANDOM.nextInt(5);
-
-					@Override
-					public void run() {
-						if (mPrideLeft.isEmpty() && mPrideRight.isEmpty()) {
-							this.cancel();
-						}
-
-						if (this.isCancelled()) {
-							mPrideLeft.clear();
-							mPrideRight.clear();
-							mPrideRunnable = null;
-							return;
-						}
-
-						mRandom = (mRandom + 1) % mVariants.length;
-						Parrot.Variant variant = mVariants[mRandom];
-						for (Player player : mPrideRight) {
-							Parrot parrot = (Parrot) player.getShoulderEntityRight();
-							if (parrot != null) {
-								parrot.setVariant(variant);
-								player.setShoulderEntityRight(parrot);
-							}
-						}
-
-						for (Player player : mPrideLeft) {
-							Parrot parrot = (Parrot) player.getShoulderEntityLeft();
-							if (parrot != null) {
-								parrot.setVariant(variant);
-								player.setShoulderEntityLeft(parrot);
-							}
-						}
-
-					}
-				};
-				mPrideRunnable.runTaskTimer(mPlugin, 0, PRIDE_FREQUENCY);
+		} else {
+			mLeftShoulders.remove(player);
+			mPrideLeft.remove(player);
+		}
+		if (rightVariant != null) {
+			mRightShoulders.put(player, rightVariant);
+			if (rightVariant == ParrotVariant.RAINBOW) {
+				mPrideRight.add(player);
+			} else {
+				mPrideRight.remove(player);
 			}
+		} else {
+			mRightShoulders.remove(player);
+			mPrideRight.remove(player);
 		}
 
-		if (shoulder == PlayerShoulder.LEFT) {
-			ScoreboardUtils.setScoreboardValue(p, SCOREBOARD_PARROT_LEFT, variantNum);
-			p.setShoulderEntityLeft(null);
-			p.setShoulderEntityLeft(pp.spawnParrot());
-		} else {
-			ScoreboardUtils.setScoreboardValue(p, SCOREBOARD_PARROT_RIGHT, variantNum);
-			p.setShoulderEntityRight(null);
-			p.setShoulderEntityRight(pp.spawnParrot());
+		player.setShoulderEntityLeft(null);
+		player.setShoulderEntityRight(null);
+		respawnParrots(player);
+
+		if (mPrideRunnable == null && (!mPrideLeft.isEmpty() || !mPrideRight.isEmpty())) {
+			// no task is running so create a new one
+			mPrideRunnable = new BukkitRunnable() {
+				static final Parrot.Variant[] VARIANTS = Parrot.Variant.values();
+				int mVariant = 0;
+
+				@Override
+				public void run() {
+					if (mPrideLeft.isEmpty() && mPrideRight.isEmpty()) {
+						this.cancel();
+					}
+
+					if (this.isCancelled()) {
+						mPrideLeft.clear();
+						mPrideRight.clear();
+						mPrideRunnable = null;
+						return;
+					}
+
+					mVariant = (mVariant + 1) % VARIANTS.length;
+					Parrot.Variant variant = VARIANTS[mVariant];
+					for (Player player : mPrideRight) {
+						if (player.getShoulderEntityRight() instanceof Parrot parrot) {
+							parrot.setVariant(variant);
+							player.setShoulderEntityRight(parrot);
+						}
+					}
+
+					for (Player player : mPrideLeft) {
+						if (player.getShoulderEntityLeft() instanceof Parrot parrot) {
+							parrot.setVariant(variant);
+							player.setShoulderEntityLeft(parrot);
+						}
+					}
+				}
+			};
+			mPrideRunnable.runTaskTimer(mPlugin, 0, PRIDE_FREQUENCY);
 		}
 	}
 
 	public static void setParrotVisible(Player player, boolean visible) {
-		if (visible) {
-			ScoreboardUtils.setScoreboardValue(player, SCOREBOARD_PARROT_VISIBLE, 1);
-			int parrotLeft = ScoreboardUtils.getScoreboardValue(player, SCOREBOARD_PARROT_LEFT).orElse(0);
-			int parrotRight = ScoreboardUtils.getScoreboardValue(player, SCOREBOARD_PARROT_RIGHT).orElse(0);
-			if (parrotLeft != 0) {
-				updateParrot(player, parrotLeft, PlayerShoulder.LEFT);
-			}
-			if (parrotRight != 0) {
-				updateParrot(player, parrotRight, PlayerShoulder.RIGHT);
-			}
-		} else {
-			mPrideLeft.remove(player);
-			mPrideRight.remove(player);
-			player.setShoulderEntityLeft(null);
-			player.setShoulderEntityRight(null);
-			ScoreboardUtils.setScoreboardValue(player, SCOREBOARD_PARROT_VISIBLE, 0);
-		}
+		ScoreboardUtils.setScoreboardValue(player, SCOREBOARD_PARROT_VISIBLE, visible ? 1 : 0);
+		updateParrots(player);
 	}
 
 	public static void clearParrots(Player player) {
-		setParrotVisible(player, false);
+		ScoreboardUtils.setScoreboardValue(player, SCOREBOARD_PARROT_VISIBLE, 0);
 		ScoreboardUtils.setScoreboardValue(player, SCOREBOARD_PARROT_LEFT, 0);
 		ScoreboardUtils.setScoreboardValue(player, SCOREBOARD_PARROT_RIGHT, 0);
+		mPrideLeft.remove(player);
+		mPrideRight.remove(player);
+		mLeftShoulders.remove(player);
+		mRightShoulders.remove(player);
+		updateParrots(player);
+	}
+
+	public static void selectParrot(Player player, ParrotVariant variant, PlayerShoulder shoulder) {
+		ScoreboardUtils.setScoreboardValue(player, shoulder == PlayerShoulder.LEFT ? SCOREBOARD_PARROT_LEFT : SCOREBOARD_PARROT_RIGHT, variant.mNumber);
+		if (!hasDoubleShoulders(player)) {
+			// if the player only has a single shoulder available, remove the parrot from the other shoulder (if applicable)
+			ScoreboardUtils.setScoreboardValue(player, shoulder == PlayerShoulder.LEFT ? SCOREBOARD_PARROT_RIGHT : SCOREBOARD_PARROT_LEFT, 0);
+		}
+		ScoreboardUtils.setScoreboardValue(player, SCOREBOARD_PARROT_VISIBLE, 1);
+		updateParrots(player);
 	}
 
 	public static boolean hasParrotOnShoulders(Player player) {
 		return ScoreboardUtils.getScoreboardValue(player, SCOREBOARD_PARROT_LEFT).orElse(0) != 0 || ScoreboardUtils.getScoreboardValue(player, SCOREBOARD_PARROT_RIGHT).orElse(0) != 0;
 	}
 
-	public static void updateAllParrot(Player player) {
-		int parrotRight = ScoreboardUtils.getScoreboardValue(player, SCOREBOARD_PARROT_RIGHT).orElse(0);
-		int parrotLeft = ScoreboardUtils.getScoreboardValue(player, SCOREBOARD_PARROT_LEFT).orElse(0);
-
-		if (parrotLeft != 0) {
-			ParrotManager.updateParrot(player, parrotLeft, PlayerShoulder.LEFT);
-		}
-
-		if (parrotRight != 0) {
-			ParrotManager.updateParrot(player, parrotRight, PlayerShoulder.RIGHT);
-		}
+	public static boolean areParrotsVisible(Player player) {
+		return ScoreboardUtils.getScoreboardValue(player, SCOREBOARD_PARROT_VISIBLE).orElse(0) != 0;
 	}
 
-	public static void updateAllIfVisible(Player player) {
-		if (ParrotManager.isParrotsVisible(player)) {
-			updateAllParrot(player);
-		}
-	}
-
-	public static boolean isParrotsVisible(Player p) {
-		return ScoreboardUtils.getScoreboardValue(p, SCOREBOARD_PARROT_VISIBLE).orElse(0) != 0;
-	}
-
-	public static boolean hasDoubleShoulders(Player p) {
-		return ScoreboardUtils.getScoreboardValue(p, SCOREBOARD_PARROT_BOTH).orElse(0) > 0;
+	public static boolean hasDoubleShoulders(Player player) {
+		return ScoreboardUtils.getScoreboardValue(player, SCOREBOARD_PARROT_BOTH).orElse(0) > 0;
 	}
 
 	@EventHandler(ignoreCancelled = true)
-	public void parrotSpawnEvent(EntitySpawnEvent e) {
-		Entity entity = e.getEntity();
+	public void parrotSpawnEvent(EntitySpawnEvent event) {
+		Entity entity = event.getEntity();
 
-		if (entity instanceof Parrot) {
+		if (entity instanceof Parrot parrot) {
 			if (entity.getScoreboardTags().contains(PARROT_TAG)) {
-				e.setCancelled(true);
+				event.setCancelled(true);
 				return;
 			}
 
-			//parrot spawned with an old version will not have the tag, so we need to check the name
-			Parrot parrot = (Parrot) entity;
+			// parrot spawned with an old version will not have the tag, so we need to check the name
 			for (ParrotVariant variant : ParrotVariant.values()) {
 				if (parrot.getCustomName() != null && parrot.getCustomName().contains(variant.mName)) {
-					e.setCancelled(true);
+					event.setCancelled(true);
 					return;
 				}
 			}
@@ -342,50 +303,62 @@ public class ParrotManager implements Listener {
 	}
 
 	@EventHandler(ignoreCancelled = true)
-	public void onCFlight(PlayerToggleFlightEvent e) {
-		final Player player = e.getPlayer();
-		if (isParrotsVisible(player) && player.isFlying()) {
+	public void onCFlight(PlayerToggleFlightEvent event) {
+		final Player player = event.getPlayer();
+		if (areParrotsVisible(player) && !event.isFlying()) {
 			new BukkitRunnable() {
 				@Override
 				public void run() {
-					updateAllParrot(player);
+					updateParrots(player);
 				}
 			}.runTaskLater(mPlugin, 5L);
 		}
 	}
 
 	@EventHandler(ignoreCancelled = true)
-	public void onJoinBed(PlayerBedEnterEvent e) {
-		//we need to remove the parrots when someone go to the bed
-		final Player player = e.getPlayer();
-		if (isParrotsVisible(player)) {
-			mPrideLeft.remove(player);
-			mPrideRight.remove(player);
-		}
+	public void onJoinBed(PlayerBedEnterEvent event) {
+		// we need to remove the parrots when someone sleeps in a bed
+		final Player player = event.getPlayer();
+		mPrideLeft.remove(player);
+		mPrideRight.remove(player);
+		mLeftShoulders.remove(player);
+		mRightShoulders.remove(player);
 	}
 
-
 	@EventHandler(ignoreCancelled = true)
-	public void onLeaveBed(PlayerBedLeaveEvent e) {
-		final Player player = e.getPlayer();
-		if (isParrotsVisible(player)) {
+	public void onLeaveBed(PlayerBedLeaveEvent event) {
+		final Player player = event.getPlayer();
+		if (areParrotsVisible(player)) {
 			new BukkitRunnable() {
 				@Override
 				public void run() {
-					updateAllIfVisible(player);
+					updateParrots(player);
 				}
 			}.runTaskLater(mPlugin, 5L);
 		}
 	}
 
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-	public void onPlayerQuit(PlayerQuitEvent e) {
-		//we need to remove the player from the set when quitting
-		final Player player = e.getPlayer();
-		if (isParrotsVisible(player)) {
-			mPrideLeft.remove(player);
-			mPrideRight.remove(player);
+	public void onPlayerJoin(PlayerJoinEvent event) {
+		final Player player = event.getPlayer();
+		if (areParrotsVisible(player)) {
+			new BukkitRunnable() {
+				@Override
+				public void run() {
+					updateParrots(player);
+				}
+			}.runTaskLater(mPlugin, 5L);
 		}
+	}
+
+	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+	public void onPlayerQuit(PlayerQuitEvent event) {
+		// remove the player from any sets and maps when quitting
+		final Player player = event.getPlayer();
+		mPrideLeft.remove(player);
+		mPrideRight.remove(player);
+		mLeftShoulders.remove(player);
+		mRightShoulders.remove(player);
 	}
 
 }
