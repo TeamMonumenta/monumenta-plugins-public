@@ -57,7 +57,7 @@ public class Updraft extends DepthsAbility {
 
 	@Override
 	public void cast(Action trigger) {
-		if (mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.mLinkedSpell)) {
+		if (mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.mLinkedSpell) || !mPlayer.isSneaking() || !DepthsUtils.isWeaponItem(mPlayer.getInventory().getItemInMainHand())) {
 			return;
 		}
 		World world = mPlayer.getWorld();
@@ -122,11 +122,6 @@ public class Updraft extends DepthsAbility {
 	@Override
 	public String getDescription(int rarity) {
 		return "Right click while sneaking to shoot a projectile. At the location where the projectile lands, push players and enemies within a " + RADIUS + " block radius upwards with a velocity of " + DepthsUtils.getRarityColor(rarity) + KNOCKBACK_SPEED[rarity - 1] + ChatColor.WHITE + ". Affected mobs are applied Slow Falling " + (SLOW_FALLING_LEVEL + 1) + " and " + DepthsUtils.getRarityColor(rarity) + DepthsUtils.roundPercent(VULNERABILITY[rarity - 1]) + "%" + ChatColor.WHITE + " vulnerability for " + DURATION / 20 + " seconds. Cooldown: " + COOLDOWN / 20 + "s.";
-	}
-
-	@Override
-	public boolean runCheck() {
-		return (mPlayer.isSneaking() && DepthsUtils.isWeaponItem(mPlayer.getInventory().getItemInMainHand()));
 	}
 
 	@Override
