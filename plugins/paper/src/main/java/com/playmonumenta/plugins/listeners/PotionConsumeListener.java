@@ -6,20 +6,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.cleric.NonClericProvisionsPassive;
-import com.playmonumenta.plugins.depths.abilities.dawnbringer.LightningBottle;
-import com.playmonumenta.plugins.enchantments.InstantDrink;
-import com.playmonumenta.plugins.enchantments.curses.Starvation;
-import com.playmonumenta.plugins.integrations.CoreProtectIntegration;
-import com.playmonumenta.plugins.potion.PotionManager.PotionID;
-import com.playmonumenta.plugins.utils.FastUtils;
-import com.playmonumenta.plugins.utils.InventoryUtils;
-import com.playmonumenta.plugins.utils.ItemUtils;
-import com.playmonumenta.plugins.utils.PotionUtils;
-import com.playmonumenta.plugins.utils.ZoneUtils;
-import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
-
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
@@ -48,10 +34,25 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.cleric.NonClericProvisionsPassive;
+import com.playmonumenta.plugins.depths.abilities.dawnbringer.LightningBottle;
+import com.playmonumenta.plugins.effects.PercentSpeed;
+import com.playmonumenta.plugins.enchantments.InstantDrink;
+import com.playmonumenta.plugins.enchantments.curses.Starvation;
+import com.playmonumenta.plugins.integrations.CoreProtectIntegration;
+import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.PotionUtils;
+import com.playmonumenta.plugins.utils.ZoneUtils;
+import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
+
 public class PotionConsumeListener implements Listener {
 	private static final int DRINK_TICK_DELAY = 4; //How many ticks between each slurp sound
 	private static final int DRINK_DURATION = 24; //Ticks of total drinking
 	private static final String INVENTORY_DRINK_TAG = "InventoryDrinkTag"; //Tag to enable this feature (drink from inventory right click)
+	private static final String INVENTORY_DRINK_SLOW_EFFECT_NAME = "InventoryDrinkSlowEffect";
 
 	private final Plugin mPlugin;
 	/* Note that this map only contains non-cancelled tasks. Everywhere these runnables are cancelled they should be removed from this map */
@@ -185,8 +186,8 @@ public class PotionConsumeListener implements Listener {
 				Starvation.apply(player, starvation);
 			}
 		} else {
-			//Gives slowness IV to emulate the slow walking of drinking, extra 5 ticks to match delay of drinking
-			mPlugin.mPotionManager.addPotion(player, PotionID.ITEM, new PotionEffect(PotionEffectType.SLOW, DRINK_DURATION + 5, 3, true, false));
+			//Gives 80% slowness to emulate the slow walking of drinking, extra 5 ticks to match delay of drinking
+			mPlugin.mEffectManager.addEffect(player, INVENTORY_DRINK_SLOW_EFFECT_NAME, new PercentSpeed(DRINK_DURATION + 5, -0.8, INVENTORY_DRINK_SLOW_EFFECT_NAME));
 
 			runnable = new BukkitRunnable() {
 				int mTicks = 0;
