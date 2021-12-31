@@ -62,6 +62,10 @@
             <url>https://raw.githubusercontent.com/TeamMonumenta/monumenta-structure-management/master/mvn-repo/</url>
         </repository>
         <repository>
+            <id>intellectualsites-worldedit-enginehub</id>
+            <url>https://maven.enginehub.org/repo/</url>
+        </repository>
+        <repository>
             <id>monumenta-network-relay</id>
             <url>https://raw.githubusercontent.com/TeamMonumenta/monumenta-network-relay/master/mvn-repo/</url>
         </repository>
