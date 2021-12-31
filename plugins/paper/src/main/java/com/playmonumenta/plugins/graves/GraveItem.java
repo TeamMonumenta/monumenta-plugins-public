@@ -83,19 +83,21 @@ public class GraveItem {
 	private static final String KEY_INSTANCE = "instance";
 	private static final String KEY_NBT = "nbt";
 	private static final String KEY_AGE = "age";
+	private static final String KEY_SLOT = "slot";
 	private static final String KEY_X = "x";
 	private static final String KEY_Y = "y";
 	private static final String KEY_Z = "z";
-	private BukkitRunnable mRunnable;
-	private GraveManager mManager;
-	private Grave mGrave;
-	private Player mPlayer;
+	private @Nullable BukkitRunnable mRunnable;
+	private final GraveManager mManager;
+	private final Grave mGrave;
+	private final Player mPlayer;
 	ItemStack mItem;
 	private @Nullable Item mEntity;
 	private @Nullable Location mLocation;
 	private @Nullable Vector mVelocity;
 	private @Nullable Integer mDungeonInstance;
 	private @Nullable Short mAge;
+	@Nullable public Integer mSlot;
 	@Nullable Status mStatus;
 	private int mTickLastStatusChange;
 
@@ -109,18 +111,20 @@ public class GraveItem {
 		mVelocity = null;
 		mDungeonInstance = null;
 		mAge = null;
+		mSlot = null;
 		mStatus = null;
 		mRunnable = null;
 		mTickLastStatusChange = Bukkit.getCurrentTick();
 	}
 
 	// Full GraveItem from deserialized data
-	public GraveItem(GraveManager manager, Grave grave, Player player, ItemStack item, Status status, Integer instance, Location location, Vector velocity, Short age) {
+	public GraveItem(GraveManager manager, Grave grave, Player player, ItemStack item, Status status, Integer instance, Location location, Vector velocity, Short age, Integer slot) {
 		this(manager, grave, player, item);
 		mStatus = status;
 		mLocation = location != null ? location : mGrave.getLocation();
 		mVelocity = velocity;
 		mAge = age;
+		mSlot = slot;
 		mDungeonInstance = instance;
 		if (mStatus == Status.DROPPED && isInThisWorld()) {
 			updateInstance();
@@ -129,21 +133,22 @@ public class GraveItem {
 	}
 
 	// New GraveItem from player death
-	public GraveItem(Grave grave, ItemStack item) {
+	public GraveItem(Grave grave, ItemStack item, int slot) {
 		this(grave.mManager, grave, grave.mPlayer, item);
 		switch (ItemUtils.getItemDeathResult(item)) {
-			case SHATTER_NOW:
-				mStatus = Status.SHATTERED;
-				break;
-			case SAFE:
-				mStatus = Status.SAFE;
-				break;
-			default:
-				mStatus = Status.DROPPED;
+		case SHATTER_NOW:
+			mStatus = Status.SHATTERED;
+			break;
+		case SAFE:
+			mStatus = Status.SAFE;
+			break;
+		default:
+			mStatus = Status.DROPPED;
 		}
 		mDungeonInstance = grave.mDungeonInstance;
 		mLocation = grave.getLocation();
 		mVelocity = null;
+		mSlot = slot;
 		if (mStatus == Status.DROPPED && isInThisWorld()) {
 			mManager.addUnloadedItem(Chunk.getChunkKey(mLocation), this);
 			spawn();
@@ -433,6 +438,7 @@ public class GraveItem {
 		Status status = null;
 		Integer instance = null;
 		Short age = null;
+		Integer slot = null;
 		Location location = null;
 		Vector velocity = null;
 		if (data.has(KEY_NBT) && data.get(KEY_NBT).isJsonPrimitive() && data.getAsJsonPrimitive(KEY_NBT).isString()) {
@@ -451,6 +457,9 @@ public class GraveItem {
 		if (data.has(KEY_AGE) && data.get(KEY_AGE).isJsonPrimitive() && data.getAsJsonPrimitive(KEY_AGE).isNumber()) {
 			age = data.getAsJsonPrimitive(KEY_AGE).getAsShort();
 		}
+		if (data.has(KEY_SLOT) && data.get(KEY_SLOT).isJsonPrimitive() && data.getAsJsonPrimitive(KEY_SLOT).isNumber()) {
+			slot = data.getAsJsonPrimitive(KEY_SLOT).getAsInt();
+		}
 		if (data.has(KEY_LOCATION) && data.get(KEY_LOCATION).isJsonObject()) {
 			JsonObject loc = data.getAsJsonObject(KEY_LOCATION);
 			double x = loc.get(KEY_X).getAsDouble();
@@ -466,7 +475,7 @@ public class GraveItem {
 			velocity = new Vector(x, y, z);
 		}
 
-		return new GraveItem(manager, grave, player, item, status, instance, location, velocity, age);
+		return new GraveItem(manager, grave, player, item, status, instance, location, velocity, age, slot);
 	}
 
 	@Nullable JsonObject serialize() {
@@ -479,6 +488,7 @@ public class GraveItem {
 		data.addProperty(KEY_STATUS, mStatus == null ? null : mStatus.toString());
 		data.addProperty(KEY_INSTANCE, mDungeonInstance);
 		data.addProperty(KEY_AGE, mAge);
+		data.addProperty(KEY_SLOT, mSlot);
 
 		if (mLocation != null) {
 			JsonObject location = new JsonObject();

@@ -4,14 +4,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 import java.util.UUID;
-
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.redissync.MonumentaRedisSyncAPI;
-import com.playmonumenta.redissync.event.PlayerSaveEvent;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -25,6 +20,13 @@ import org.bukkit.event.world.ChunkUnloadEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.checkerframework.checker.nullness.qual.Nullable;
+
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.redissync.MonumentaRedisSyncAPI;
+import com.playmonumenta.redissync.event.PlayerSaveEvent;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -199,7 +201,7 @@ public class GraveManager {
 	}
 
 	// Called only on a death that would result in a grave
-	public static void onDeath(Player player, ArrayList<ItemStack> droppedItems, HashMap<EquipmentSlot, @Nullable ItemStack> equipment) {
+	public static void onDeath(Player player, Map<Integer, ItemStack> droppedItems, HashMap<EquipmentSlot, @Nullable ItemStack> equipment) {
 		GraveManager manager = INSTANCES.get(player.getUniqueId());
 		manager.mGraves.add(new Grave(manager, player, droppedItems, equipment));
 	}
@@ -253,6 +255,10 @@ public class GraveManager {
 
 	public static boolean isGraveItem(Entity entity) {
 		return entity.getScoreboardTags().contains("GraveItem") || GRAVE_ITEMS.containsKey(entity.getUniqueId());
+	}
+
+	public static @Nullable GraveItem getGraveItem(Entity entity) {
+		return GRAVE_ITEMS.get(entity.getUniqueId());
 	}
 
 	public static boolean isThrownItem(Entity entity) {
@@ -389,6 +395,10 @@ public class GraveManager {
 				.append(Component.text(")", NamedTextColor.GRAY));
 		}
 		return null;
+	}
+
+	public List<Grave> getGraves() {
+		return mGraves;
 	}
 
 	public boolean summonGrave(int index, Location location) {
