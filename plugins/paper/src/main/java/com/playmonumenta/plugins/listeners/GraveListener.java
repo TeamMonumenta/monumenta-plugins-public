@@ -1,9 +1,9 @@
 package com.playmonumenta.plugins.listeners;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -258,7 +258,7 @@ public class GraveListener implements Listener {
 			event.setKeepLevel(false);
 			event.getDrops().clear();
 
-			Map<Integer, ItemStack> droppedItems = new HashMap<>();
+			ArrayList<ItemStack> droppedItems = new ArrayList<>();
 			HashMap<EquipmentSlot, @Nullable ItemStack> equipment = new HashMap<>();
 			equipment.put(EquipmentSlot.HEAD, player.getInventory().getHelmet());
 			equipment.put(EquipmentSlot.CHEST, player.getInventory().getChestplate());
@@ -282,7 +282,7 @@ public class GraveListener implements Listener {
 					ItemUtils.damageItemPercent(item, KEPT_ITEM_DURABILITY_DAMAGE_PERCENT, false);
 				} else if (result != ItemUtils.ItemDeathResult.KEEP
 				           && result != ItemUtils.ItemDeathResult.KEEP_NOGRAVE) {
-					droppedItems.put(slot, item);
+					droppedItems.add(item);
 					inv.setItem(slot, null);
 				}
 			}
@@ -290,7 +290,7 @@ public class GraveListener implements Listener {
 			if (droppedItems.size() > 0) {
 				if (player.getScoreboardTags().contains("DisableGraves")) {
 					// Graves disabled, just drop items
-					for (ItemStack item : droppedItems.values()) {
+					for (ItemStack item : droppedItems) {
 						player.getWorld().dropItemNaturally(player.getLocation(), item);
 					}
 				} else {

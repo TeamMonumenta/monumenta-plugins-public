@@ -1,13 +1,12 @@
 package com.playmonumenta.plugins.graves;
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 import org.bukkit.Chunk;
@@ -112,7 +111,7 @@ public final class Grave {
 	}
 
 	// For spawning a new grave on death
-	public Grave(GraveManager manager, Player player, Map<Integer, ItemStack> droppedItems, HashMap<EquipmentSlot, @Nullable ItemStack> equipment) {
+	public Grave(GraveManager manager, Player player, ArrayList<ItemStack> droppedItems, HashMap<EquipmentSlot, @Nullable ItemStack> equipment) {
 		mManager = manager;
 		mPlayer = player;
 		mDeathTime = Instant.now();
@@ -135,8 +134,8 @@ public final class Grave {
 		mEquipment.put(KEY_EQUIPMENT_OFF_HAND, equipment.get(EquipmentSlot.OFF_HAND));
 		generateNewPose();
 		mItems = new HashSet<>();
-		for (Map.Entry<Integer, ItemStack> item : droppedItems.entrySet()) {
-			mItems.add(new GraveItem(this, item.getValue(), item.getKey()));
+		for (ItemStack item : droppedItems) {
+			mItems.add(new GraveItem(this, item));
 		}
 		if (!mAlertedSpawned) {
 			mAlertedSpawned = true;
@@ -188,14 +187,6 @@ public final class Grave {
 			return mEntity.getLocation().clone();
 		}
 		return mLocation.clone();
-	}
-
-	public Instant getDeathTime() {
-		return mDeathTime;
-	}
-
-	public Collection<GraveItem> getItems() {
-		return mItems;
 	}
 
 	void removeItem(GraveItem item) {
@@ -317,7 +308,7 @@ public final class Grave {
 		int slot = player.getInventory().firstEmpty();
 		if (slot != -1) {
 			Item entity = player.getWorld().dropItem(getLocation(), item.getItem());
-			int remaining = Plugin.getInstance().mDeathItemListener.pickupItem(player, entity, item);
+			int remaining = Plugin.getInstance().mDeathItemListener.pickupItem(player, entity);
 			item.collect(remaining);
 			return remaining;
 		}
