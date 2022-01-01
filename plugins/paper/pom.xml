@@ -15,6 +15,7 @@
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
         <minecraft.server.version>1.16.5-R0.1-SNAPSHOT</minecraft.server.version>
+        <analyzed.classes>**/*</analyzed.classes>
     </properties>
 
     <repositories>
@@ -380,6 +381,7 @@
                         <artifactId>maven-compiler-plugin</artifactId>
                         <configuration>
                             <fork>true</fork>
+                            <includes>${analyzed.classes}</includes>
                             <compilerArgs combine.children="append">
 								<arg>-Xlint</arg>
 								<arg>-Awarns</arg>
