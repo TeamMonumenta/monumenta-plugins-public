@@ -47,50 +47,49 @@ public class ProtocolLibIntegration implements Listener {
 		mLogger = plugin.getLogger();
 		mLogger.info("Enabling ProtocolLib integration");
 
-		if (!ServerProperties.getReplaceSpawnerEntities()) {
-			mLogger.info("Will not replace spawner entities on this shard");
-			return;
-		} else {
-			mLogger.info("Enabling replacement of spawner entities");
-		}
-
 		ProtocolManager manager = ProtocolLibrary.getProtocolManager();
 
-		// packet listener for selectively disabling mob equipment in spawners
-		manager.addPacketListener(new PacketAdapter(plugin, ListenerPriority.NORMAL,
-		                                            PacketType.Play.Server.TILE_ENTITY_DATA,
-		                                            PacketType.Play.Server.MAP_CHUNK) {
-			@Override
-			public void onPacketSending(PacketEvent event) {
-				if (event.getPacketType().equals(PacketType.Play.Server.TILE_ENTITY_DATA) ||
-						event.getPacketType().equals(PacketType.Play.Server.MAP_CHUNK)) {
+		if (ServerProperties.getReplaceSpawnerEntities()) {
+			mLogger.info("Enabling replacement of spawner entities");
+			// packet listener for selectively disabling mob equipment in spawners
+			manager.addPacketListener(new PacketAdapter(plugin, ListenerPriority.NORMAL,
+			                                            PacketType.Play.Server.TILE_ENTITY_DATA,
+			                                            PacketType.Play.Server.MAP_CHUNK) {
+				@Override
+				public void onPacketSending(PacketEvent event) {
+					if (event.getPacketType().equals(PacketType.Play.Server.TILE_ENTITY_DATA) ||
+						    event.getPacketType().equals(PacketType.Play.Server.MAP_CHUNK)) {
 
-					if (event.getPlayer().getScoreboardTags().contains("displaySpawnerEquipment")) {
-						return;
-					}
-
-					if (event.getPacketType().equals(PacketType.Play.Server.TILE_ENTITY_DATA)) {
-						PacketContainer packet = event.getPacket();
-						for (NbtBase<?> base : packet.getNbtModifier().getValues()) {
-							if (base != null) {
-								stripNBT(NbtFactory.asCompound(base));
-							}
+						if (event.getPlayer().getScoreboardTags().contains("displaySpawnerEquipment")) {
+							return;
 						}
-						event.setPacket(packet);
-					} else if (event.getPacketType().equals(PacketType.Play.Server.MAP_CHUNK)) {
-						PacketContainer packet = event.getPacket();
-						for (List<NbtBase<?>> listNBT : packet.getListNbtModifier().getValues()) {
-							for (NbtBase<?> base : listNBT) {
+
+						if (event.getPacketType().equals(PacketType.Play.Server.TILE_ENTITY_DATA)) {
+							PacketContainer packet = event.getPacket();
+							for (NbtBase<?> base : packet.getNbtModifier().getValues()) {
 								if (base != null) {
 									stripNBT(NbtFactory.asCompound(base));
 								}
 							}
+							event.setPacket(packet);
+						} else if (event.getPacketType().equals(PacketType.Play.Server.MAP_CHUNK)) {
+							PacketContainer packet = event.getPacket();
+							for (List<NbtBase<?>> listNBT : packet.getListNbtModifier().getValues()) {
+								for (NbtBase<?> base : listNBT) {
+									if (base != null) {
+										stripNBT(NbtFactory.asCompound(base));
+									}
+								}
+							}
+							event.setPacket(packet);
 						}
-						event.setPacket(packet);
 					}
 				}
-			}
-		});
+			});
+
+		} else {
+			mLogger.info("Will not replace spawner entities on this shard");
+		}
 
 		// packet listener for selectively disabling the glowing effect
 		manager.addPacketListener(new PacketAdapter(plugin, ListenerPriority.NORMAL,
