@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.integrations.luckperms;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.playmonumenta.plugins.server.properties.ServerProperties;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
@@ -31,7 +32,9 @@ public class PromoteGuild {
 			.withPermission(perms)
 			.withArguments(arguments)
 			.executes((sender, args) -> {
-				run((Player) args[0]);
+				if (!ServerProperties.getShardName().contains("build")) {
+					run((Player) args[0]);
+				}
 			})
 			.register();
 	}

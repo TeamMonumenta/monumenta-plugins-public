@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.Executor;
 
+import com.playmonumenta.plugins.server.properties.ServerProperties;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Sound;
@@ -45,7 +46,9 @@ public class CreateGuild {
 			.withPermission(perms)
 			.withArguments(arguments)
 			.executes((sender, args) -> {
-				run(plugin, sender, (String) args[0], (String) args[1], (Collection<Player>) args[2]);
+				if (!ServerProperties.getShardName().contains("build")) {
+					run(plugin, sender, (String) args[0], (String) args[1], (Collection<Player>) args[2]);
+				}
 			})
 			.register();
 	}

@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.integrations.luckperms;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.playmonumenta.plugins.server.properties.ServerProperties;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
@@ -30,7 +31,9 @@ public class SetGuildTeleport {
 			.withPermission(perms)
 			.withArguments(arguments)
 			.executes((sender, args) -> {
-				run(plugin, sender, (String)args[0]);
+				if (!ServerProperties.getShardName().contains("build")) {
+					run(plugin, sender, (String) args[0]);
+				}
 			})
 			.register();
 	}
