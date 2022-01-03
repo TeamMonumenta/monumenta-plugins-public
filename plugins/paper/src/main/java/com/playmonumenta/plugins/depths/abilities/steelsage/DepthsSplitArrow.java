@@ -33,6 +33,7 @@ public class DepthsSplitArrow extends DepthsAbility {
 	public static final String ABILITY_NAME = "Split Arrow";
 	public static final double[] DAMAGE_MOD = {.40, .50, .60, .70, .80, 1.00};
 	private static final PotionEffect SPECTRAL_ARROW_EFFECT = new PotionEffect(PotionEffectType.GLOWING, 200, 0);
+	private static final int IFRAMES = 10;
 
 	public DepthsSplitArrow(Plugin plugin, Player player) {
 		super(plugin, player, ABILITY_NAME);
@@ -42,7 +43,7 @@ public class DepthsSplitArrow extends DepthsAbility {
 
 	@Override
 	public boolean livingEntityShotByPlayerEvent(Projectile proj, LivingEntity damagee, EntityDamageByEntityEvent event) {
-		if (mPlayer != null && (proj instanceof Arrow || proj instanceof SpectralArrow) && !proj.hasMetadata(RapidFire.META_DATA_TAG)) {
+		if (mPlayer != null && (proj instanceof Arrow || proj instanceof SpectralArrow) && !proj.hasMetadata(RapidFire.META_DATA_TAG) && EntityUtils.isHostileMob(damagee)) {
 			LivingEntity nearestMob = EntityUtils.getNearestMob(damagee.getLocation(), SPLIT_ARROW_CHAIN_RANGE, damagee);
 
 			if (nearestMob != null && !nearestMob.getScoreboardTags().contains(AbilityUtils.IGNORE_TAG)) {
@@ -57,16 +58,20 @@ public class DepthsSplitArrow extends DepthsAbility {
 						break;
 					}
 				}
-				world.spawnParticle(Particle.CRIT, eye, 30, 0, 0, 0, 0.6);
-				world.spawnParticle(Particle.CRIT_MAGIC, eye, 20, 0, 0, 0, 0.6);
-				world.playSound(eye, Sound.ENTITY_ARROW_HIT, 1, 1.2f);
 
-				if (proj instanceof SpectralArrow) {
-					nearestMob.addPotionEffect(SPECTRAL_ARROW_EFFECT);
+				if (!EntityUtils.hasArrowIframes(mPlugin, nearestMob)) {
+					world.spawnParticle(Particle.CRIT, eye, 30, 0, 0, 0, 0.6);
+					world.spawnParticle(Particle.CRIT_MAGIC, eye, 20, 0, 0, 0, 0.6);
+					world.playSound(eye, Sound.ENTITY_ARROW_HIT, 1, 1.2f);
+
+					if (proj instanceof SpectralArrow) {
+						nearestMob.addPotionEffect(SPECTRAL_ARROW_EFFECT);
+					}
+
+					EntityUtils.damageEntity(mPlugin, nearestMob, event.getDamage() * DAMAGE_MOD[mRarity - 1], mPlayer, MagicType.PHYSICAL, true, mInfo.mLinkedSpell, true, true, true, false);
+					MovementUtils.knockAway(damagee, nearestMob, 0.125f, 0.35f);
+					EntityUtils.applyArrowIframes(mPlugin, IFRAMES, nearestMob);
 				}
-
-				EntityUtils.damageEntity(mPlugin, nearestMob, event.getDamage() * DAMAGE_MOD[mRarity - 1], mPlayer, MagicType.PHYSICAL, true, mInfo.mLinkedSpell, true, true, true, false);
-				MovementUtils.knockAway(damagee, nearestMob, 0.125f, 0.35f);
 			}
 		}
 
