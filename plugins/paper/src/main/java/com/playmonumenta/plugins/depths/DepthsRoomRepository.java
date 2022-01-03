@@ -139,7 +139,7 @@ public class DepthsRoomRepository {
 		mF2NormalRooms.add(new DepthsRoom("depths/f2r31", DepthsRoomType.ABILITY, new Vector(34, 29, 34), new Vector(1.0, -5.0, -14.0), 8, RoomDirection.UP));
 		mF2NormalRooms.add(new DepthsRoom("depths/f2r36", DepthsRoomType.ABILITY, new Vector(34, 31, 37), new Vector(1.0, -14.0, -30.0), 12, RoomDirection.DOWN));
 		mF2NormalRooms.add(new DepthsRoom("depths/f2r37", DepthsRoomType.ABILITY, new Vector(34, 29, 31), new Vector(1.0, -15.0, -21.0), 14, RoomDirection.DOWN));
-		mF2NormalRooms.add(new DepthsRoom("depths/f2r38", DepthsRoomType.ABILITY, new Vector(47, 54, 42), new Vector(1.0, -36.0, -23.0), 17, RoomDirection.DOWN));
+		mF2NormalRooms.add(new DepthsRoom("depths/f2r38", DepthsRoomType.ABILITY, new Vector(47, 54, 42), new Vector(1.0, -36.0, -21.0), 17, RoomDirection.DOWN));
 		mF2NormalRooms.add(new DepthsRoom("depths/f2r40", DepthsRoomType.ABILITY, new Vector(49, 29, 35), new Vector(1.0, -10.0, -13.0), 11, RoomDirection.EVEN));
 
 		//F2 elite rooms
