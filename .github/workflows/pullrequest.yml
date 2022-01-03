@@ -171,16 +171,17 @@ jobs:
           changedPaperFiles=$(git diff --name-only origin/${{github.base_ref}} | grep "^plugins/paper/src/main/java/" | cut -d/ -f6- - | paste -sd , || true)
           echo "Changed files in paper: $changedPaperFiles"
           if [ -n "$changedPaperFiles" ]; then
-            mvn compile --batch-mode --no-snapshot-updates -P checkerframework "-Danalyzed.classes=$changedPaperFiles" | tee -a compile.log
+            mvn compile --batch-mode --no-snapshot-updates -P checkerframework "-Danalyzed.classes=$changedPaperFiles" | tee -a ../compile.log
           fi
           
           cd ../bungee
           changedBungeeFiles=$(git diff --name-only origin/${{github.base_ref}} | grep "^plugins/bungee/src/main/java/" | cut -d/ -f6- - | paste -sd , || true)
           echo "Changed files in bungee: $changedBungeeFiles"
           if [ -n "$changedBungeeFiles" ]; then
-            mvn compile --batch-mode --no-snapshot-updates -P checkerframework "-Danalyzed.classes=$changedBungeeFiles" | tee -a compile.log
+            mvn compile --batch-mode --no-snapshot-updates -P checkerframework "-Danalyzed.classes=$changedBungeeFiles" | tee -a ../compile.log
           fi
           
+          cd ..
           if [[ -n "$changedPaperFiles" || -n "$changedBungeeFiles" ]]; then
             cat compile.log | reviewdog -efm="%+C %.%#" -efm="%W[WARNING] %f:[%l,%c] %m" -name="checker framework warnings" -reporter=github-pr-check
           else

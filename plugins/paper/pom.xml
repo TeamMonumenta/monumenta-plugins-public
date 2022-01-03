@@ -382,18 +382,17 @@
                         <configuration>
                             <fork>true</fork>
                             <includes>${analyzed.classes}</includes>
-                            <compilerArgs combine.children="append">
-								<arg>-Xlint</arg>
-								<arg>-Awarns</arg>
-								<arg>-Xmaxwarns</arg>
-								<arg>10000</arg>
-								<arg>-AinvariantArrays</arg>
-								<arg>-Astubs=${project.basedir}/../../stubs</arg>
-								<!-- assumePure gets rid of lots of false positives at the cost of allowing some false negatives -->
-								<arg>-AassumePure</arg>
-								<arg>-J--add-exports=jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED</arg>
-								<arg>-J--add-exports=jdk.compiler/com.sun.tools.javac.code=ALL-UNNAMED</arg>
-								<arg>-J--add-exports=jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED</arg>
+                            <compilerArgs combine.children="override">
+                                <arg>-Awarns</arg>
+                                <arg>-Xmaxwarns</arg>
+                                <arg>10000</arg>
+                                <arg>-AinvariantArrays</arg>
+                                <arg>-Astubs=${project.basedir}/../../stubs</arg>
+                                <!-- assumePure gets rid of lots of false positives at the cost of allowing some false negatives -->
+                                <arg>-AassumePure</arg>
+                                <arg>-J--add-exports=jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED</arg>
+                                <arg>-J--add-exports=jdk.compiler/com.sun.tools.javac.code=ALL-UNNAMED</arg>
+                                <arg>-J--add-exports=jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED</arg>
 								<arg>-J--add-exports=jdk.compiler/com.sun.tools.javac.main=ALL-UNNAMED</arg>
 								<arg>-J--add-exports=jdk.compiler/com.sun.tools.javac.model=ALL-UNNAMED</arg>
 								<arg>-J--add-exports=jdk.compiler/com.sun.tools.javac.processing=ALL-UNNAMED</arg>
