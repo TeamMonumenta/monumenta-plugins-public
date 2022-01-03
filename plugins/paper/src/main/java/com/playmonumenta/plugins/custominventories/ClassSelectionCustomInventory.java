@@ -3,7 +3,6 @@ package com.playmonumenta.plugins.custominventories;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import com.playmonumenta.plugins.utils.GUIUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -12,13 +11,14 @@ import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import com.goncalomb.bukkit.mylib.utils.CustomInventory;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.classes.MonumentaClasses;
 import com.playmonumenta.plugins.classes.PlayerClass;
 import com.playmonumenta.plugins.classes.PlayerSpec;
+import com.playmonumenta.plugins.utils.GUIUtils;
+import com.playmonumenta.scriptedquests.utils.CustomInventory;
 import com.playmonumenta.scriptedquests.utils.ScoreboardUtils;
 
 import net.kyori.adventure.text.Component;
@@ -56,9 +56,9 @@ public class ClassSelectionCustomInventory extends CustomInventory {
 		event.setCancelled(true);
 		Player player = (Player) event.getWhoClicked();
 		ItemStack clickedItem = event.getCurrentItem();
-		if (event.getClickedInventory() != _inventory ||
-				clickedItem == null || clickedItem.getType() == FILLER ||
-				event.isShiftClick()) {
+		if (event.getClickedInventory() != mInventory ||
+			    clickedItem == null || clickedItem.getType() == FILLER ||
+			    event.isShiftClick()) {
 			return;
 		}
 		if (clickedItem.getType() == Material.BARRIER) {
@@ -153,7 +153,7 @@ public class ClassSelectionCustomInventory extends CustomInventory {
 	}
 
 	public void makePageOne(Player player) {
-		_inventory.clear();
+		mInventory.clear();
 		ScoreboardUtils.setScoreboardValue(player, "ClassSelectPage", 1);
 		//Get the current class, if they have one.
 		int currentClass = ScoreboardUtils.getScoreboardValue(player, "Class");
@@ -172,41 +172,41 @@ public class ClassSelectionCustomInventory extends CustomInventory {
 				lockedClass = ScoreboardUtils.getScoreboardValue(player, oneClass.mQuestReq) < oneClass.mQuestReqMin;
 			}
 			ItemStack createItem = createClassItem(oneClass, (playerClass != null && playerClass != oneClass), lockedClass);
-			_inventory.setItem(currentSlot++, createItem);
+			mInventory.setItem(currentSlot++, createItem);
 		}
 
 		ItemStack summaryItem = createBasicItem(Material.SCUTE, "Main Menu", NamedTextColor.WHITE, false,
 				"Pick a class to view abilities within that class. You can reset your class at any time, with no consequences.", ChatColor.LIGHT_PURPLE);
-		_inventory.setItem(COMMON_SUMMARY_LOC, summaryItem);
+		mInventory.setItem(COMMON_SUMMARY_LOC, summaryItem);
 
 		if (ScoreboardUtils.getScoreboardValue(player, "Class") != 0) {
 			ItemStack resetItem = createBasicItem(Material.CYAN_BED, "Reset Your Class", NamedTextColor.WHITE, false,
 					"Click here to reset your class, allowing access to other choices.", ChatColor.LIGHT_PURPLE);
-			_inventory.setItem(P1_RESET_CLASS_LOC, resetItem);
+			mInventory.setItem(P1_RESET_CLASS_LOC, resetItem);
 		}
 
 		//possibly create reset spec item
 		if (ScoreboardUtils.getScoreboardValue(player, "Specialization") != 0) {
 			ItemStack specItem = createBasicItem(Material.RED_BANNER, "Reset Your Specialization", NamedTextColor.WHITE, false,
 					"Click here to reset your specialization, allowing access to choose either specialization.", ChatColor.LIGHT_PURPLE);
-			_inventory.setItem(P1_RESET_SPEC_LOC, specItem);
+			mInventory.setItem(P1_RESET_SPEC_LOC, specItem);
 		}
 		makeRemainingCountItems(player);
 		fillEmpty();
 	}
 
 	public void makePageTwo(PlayerClass userClass, Player player) {
-		_inventory.clear();
+		mInventory.clear();
 		//make abilities
 		ScoreboardUtils.setScoreboardValue(player, "ClassSelectPage", 2);
 		int iterator = 0;
 		for (Ability ability : userClass.mAbilities) {
 			ItemStack item = createAbilityItem(userClass, ability);
-			_inventory.setItem(P2_ABILITY_LOCS.get(iterator), item);
+			mInventory.setItem(P2_ABILITY_LOCS.get(iterator), item);
 			ItemStack levelOne = createLevelItem(userClass, ability, 1, player);
-			_inventory.setItem(P2_ABILITY_LOCS.get(iterator) + 1, levelOne);
+			mInventory.setItem(P2_ABILITY_LOCS.get(iterator) + 1, levelOne);
 			ItemStack levelTwo = createLevelItem(userClass, ability, 2, player);
-			_inventory.setItem(P2_ABILITY_LOCS.get(iterator++) + 2, levelTwo);
+			mInventory.setItem(P2_ABILITY_LOCS.get(iterator++) + 2, levelTwo);
 		}
 		//specs
 		if (ScoreboardUtils.getScoreboardValue(player, UNLOCK_SPECS) >= UNLOCK_SPECS_MIN) {
@@ -218,19 +218,19 @@ public class ClassSelectionCustomInventory extends CustomInventory {
 		if (userClass.mDisplayItem != null) {
 			ItemStack summaryItem = createBasicItem(userClass.mDisplayItem.getType(), "Class Skills", NamedTextColor.WHITE, false,
 				"Pick your skills and, if unlocked, your specialization.", ChatColor.LIGHT_PURPLE);
-			_inventory.setItem(COMMON_SUMMARY_LOC, summaryItem);
+			mInventory.setItem(COMMON_SUMMARY_LOC, summaryItem);
 		}
 
 		//back button
 		ItemStack backButton = createBasicItem(Material.ARROW, "Back",
 				NamedTextColor.GRAY, false, "Return to the class selection page.", ChatColor.GRAY);
-		_inventory.setItem(COMMON_BACK_LOC, backButton);
+		mInventory.setItem(COMMON_BACK_LOC, backButton);
 
 		//possibly create reset spec item
 		if (ScoreboardUtils.getScoreboardValue(player, "Specialization") != 0) {
 			ItemStack specItem = createBasicItem(Material.RED_BANNER, "Reset Your Specialization", NamedTextColor.WHITE, false,
 					"Click here to reset your specialization to select a new one.", ChatColor.LIGHT_PURPLE);
-			_inventory.setItem(P2_RESET_SPEC_LOC, specItem);
+			mInventory.setItem(P2_RESET_SPEC_LOC, specItem);
 		}
 
 		makeRemainingCountItems(player);
@@ -238,29 +238,29 @@ public class ClassSelectionCustomInventory extends CustomInventory {
 	}
 
 	public void makePageThree(PlayerClass userClass, PlayerSpec spec, Player player) {
-		_inventory.clear();
+		mInventory.clear();
 		ScoreboardUtils.setScoreboardValue(player, "ClassSelectPage", 3);
 		int iterator = 0;
 		for (Ability ability : spec.mAbilities) {
 			ItemStack item = createAbilityItem(userClass, ability);
-			_inventory.setItem(P3_SPEC_LOCS.get(iterator), item);
+			mInventory.setItem(P3_SPEC_LOCS.get(iterator), item);
 			ItemStack levelOne = createLevelItem(userClass, ability, 1, player);
-			_inventory.setItem(P3_SPEC_LOCS.get(iterator) + 1, levelOne);
+			mInventory.setItem(P3_SPEC_LOCS.get(iterator) + 1, levelOne);
 			ItemStack levelTwo = createLevelItem(userClass, ability, 2, player);
-			_inventory.setItem(P3_SPEC_LOCS.get(iterator++) + 2, levelTwo);
+			mInventory.setItem(P3_SPEC_LOCS.get(iterator++) + 2, levelTwo);
 		}
 
 		//summary
 		if (spec.mDisplayItem != null) {
 			ItemStack summaryItem = createBasicItem(spec.mDisplayItem.getType(), "Specialization Skills", NamedTextColor.WHITE, false,
 				"Pick your specialization skills.", ChatColor.LIGHT_PURPLE);
-			_inventory.setItem(COMMON_SUMMARY_LOC, summaryItem);
+			mInventory.setItem(COMMON_SUMMARY_LOC, summaryItem);
 		}
 
 		//back button
 		ItemStack backButton = createBasicItem(Material.ARROW, "Back",
 				NamedTextColor.GRAY, false, "Return to the skill selection page.", ChatColor.GRAY);
-		_inventory.setItem(COMMON_BACK_LOC, backButton);
+		mInventory.setItem(COMMON_BACK_LOC, backButton);
 		makeRemainingCountItems(player);
 		fillEmpty();
 	}
@@ -345,17 +345,17 @@ public class ClassSelectionCustomInventory extends CustomInventory {
 			//not unlocked
 			ItemStack specItem = createBasicItem(Material.BARRIER, "Unknown", NamedTextColor.RED, false,
 					"You haven't unlocked this specialization yet.", ChatColor.WHITE);
-			_inventory.setItem(P2_SPEC_LOCS.get(specNumber - 1), specItem);
+			mInventory.setItem(P2_SPEC_LOCS.get(specNumber - 1), specItem);
 		} else if (ScoreboardUtils.getScoreboardValue(player, "Specialization") == otherSpec.mSpecialization) {
 			//unlocked, but using other spec
 			ItemStack specItem = createBasicItem(Material.BARRIER, spec.mSpecName, NamedTextColor.RED, false,
 					"Reset your specialization to select a new one.", ChatColor.WHITE);
-			_inventory.setItem(P2_SPEC_LOCS.get(specNumber - 1), specItem);
+			mInventory.setItem(P2_SPEC_LOCS.get(specNumber - 1), specItem);
 		} else if (ScoreboardUtils.getScoreboardValue(player, "Specialization") == spec.mSpecialization) {
 			//unlocked and already using this spec
 			ItemStack specItem = createBasicItem(spec.mDisplayItem.getType(), spec.mSpecName, NamedTextColor.RED, false,
 					"Click to view your specialization skills.", ChatColor.WHITE);
-			_inventory.setItem(P2_SPEC_LOCS.get(specNumber - 1), specItem);
+			mInventory.setItem(P2_SPEC_LOCS.get(specNumber - 1), specItem);
 		} else if (ScoreboardUtils.getScoreboardValue(player, "Specialization") == 0) {
 			//unlocked and no spec selected
 			ItemStack specItem = createBasicItem(spec.mDisplayItem.getType(), spec.mSpecName, NamedTextColor.RED, false,
@@ -365,7 +365,7 @@ public class ClassSelectionCustomInventory extends CustomInventory {
 				GUIUtils.splitLoreLine(newMeta, "Description: " + spec.mDescription, 30, ChatColor.YELLOW, false);
 				specItem.setItemMeta(newMeta);
 			}
-			_inventory.setItem(P2_SPEC_LOCS.get(specNumber - 1), specItem);
+			mInventory.setItem(P2_SPEC_LOCS.get(specNumber - 1), specItem);
 		}
 	}
 
@@ -429,19 +429,19 @@ public class ClassSelectionCustomInventory extends CustomInventory {
 			ItemStack summaryItem = createBasicItem(currentSpecCount == 0 ? Material.BARRIER : Material.SAND, "Specialization Points", NamedTextColor.WHITE, false,
 					"You have " + currentSpecCount + " specialization points remaining.", ChatColor.LIGHT_PURPLE);
 			summaryItem.setAmount(currentSpecCount > 0 ? currentSpecCount : 1);
-			_inventory.setItem(COMMON_REMAINING_SPEC_LOC, summaryItem);
+			mInventory.setItem(COMMON_REMAINING_SPEC_LOC, summaryItem);
 		}
 		int currentSkillCount = ScoreboardUtils.getScoreboardValue(player, ABILITY_SKILLCOUNT);
 		ItemStack summaryItem = createBasicItem(currentSkillCount == 0 ? Material.BARRIER : Material.GRASS_BLOCK, "Skill Points", NamedTextColor.WHITE, false,
 				"You have " + currentSkillCount + " skill points remaining.", ChatColor.LIGHT_PURPLE);
 		summaryItem.setAmount(currentSkillCount > 0 ? currentSkillCount : 1);
-		_inventory.setItem(COMMON_REMAINING_SKILL_LOC, summaryItem);
+		mInventory.setItem(COMMON_REMAINING_SKILL_LOC, summaryItem);
 	}
 
 	public void fillEmpty() {
 		for (int i = 0; i < 54; i++) {
-			if (_inventory.getItem(i) == null) {
-				_inventory.setItem(i, new ItemStack(FILLER, 1));
+			if (mInventory.getItem(i) == null) {
+				mInventory.setItem(i, new ItemStack(FILLER, 1));
 			}
 		}
 	}

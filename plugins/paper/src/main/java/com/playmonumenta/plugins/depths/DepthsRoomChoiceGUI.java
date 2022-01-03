@@ -3,10 +3,6 @@ package com.playmonumenta.plugins.depths;
 import java.util.ArrayList;
 import java.util.EnumSet;
 
-import com.playmonumenta.plugins.utils.GUIUtils;
-import com.playmonumenta.plugins.utils.ItemUtils;
-import net.kyori.adventure.text.format.NamedTextColor;
-import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -14,11 +10,15 @@ import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import com.goncalomb.bukkit.mylib.utils.CustomInventory;
+import com.playmonumenta.plugins.utils.GUIUtils;
+import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.scriptedquests.utils.CustomInventory;
 
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
+import net.md_5.bungee.api.ChatColor;
 
 public class DepthsRoomChoiceGUI extends CustomInventory {
 	private static final Material NO_CHOICE = Material.BLACK_STAINED_GLASS_PANE;
@@ -88,9 +88,9 @@ public class DepthsRoomChoiceGUI extends CustomInventory {
 
 		for (RoomChoice item : ROOM_LOCATIONS) {
 			if (roomChoices.contains(item.mType)) {
-				_inventory.setItem(item.mLocation, item.mItem);
+				mInventory.setItem(item.mLocation, item.mItem);
 			} else {
-				_inventory.setItem(item.mLocation, new ItemStack(NO_CHOICE));
+				mInventory.setItem(item.mLocation, new ItemStack(NO_CHOICE));
 			}
 		}
 		fillEmpty();
@@ -99,11 +99,12 @@ public class DepthsRoomChoiceGUI extends CustomInventory {
 	@Override
 	protected void inventoryClick(InventoryClickEvent event) {
 		event.setCancelled(true);
-		if (event.getClickedInventory() != _inventory ||
-				event.getCurrentItem() == null ||
-				event.getCurrentItem().getType() == FILLER ||
-				event.getCurrentItem().getType() == NO_CHOICE ||
-				event.isShiftClick()) {
+		ItemStack clickedItem = event.getCurrentItem();
+		if (event.getClickedInventory() != mInventory ||
+			    clickedItem == null ||
+			    clickedItem.getType() == FILLER ||
+			    clickedItem.getType() == NO_CHOICE ||
+			    event.isShiftClick()) {
 			return;
 		}
 
@@ -134,8 +135,8 @@ public class DepthsRoomChoiceGUI extends CustomInventory {
 
 	public void fillEmpty() {
 		for (int i = 0; i < 27; i++) {
-			if (_inventory.getItem(i) == null) {
-				_inventory.setItem(i, new ItemStack(FILLER, 1));
+			if (mInventory.getItem(i) == null) {
+				mInventory.setItem(i, new ItemStack(FILLER, 1));
 			}
 		}
 	}

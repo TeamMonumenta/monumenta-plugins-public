@@ -19,13 +19,13 @@ import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import com.goncalomb.bukkit.mylib.utils.CustomInventory;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.tracking.PlayerTracking;
 import com.playmonumenta.plugins.utils.InfusionUtils;
 import com.playmonumenta.plugins.utils.InfusionUtils.InfusionSelection;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.ItemUtils.ItemRegion;
+import com.playmonumenta.scriptedquests.utils.CustomInventory;
 
 import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
 import net.kyori.adventure.text.Component;
@@ -271,7 +271,7 @@ public class InfusionCustomInventory extends CustomInventory {
 	}
 
 	public void loadInv(Player player) {
-		_inventory.clear();
+		mInventory.clear();
 		mMapFunction.clear();
 		PlayerInventory pi = player.getInventory();
 		List<ItemStack> items = new ArrayList<>();
@@ -302,17 +302,17 @@ public class InfusionCustomInventory extends CustomInventory {
 							meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
 							itemStack.setItemMeta(meta);
 							ItemUtils.setPlainName(itemStack, ItemUtils.getPlainName(is));
-							_inventory.setItem((mRow*9) + 1, itemStack);
+							mInventory.setItem((mRow * 9) + 1, itemStack);
 						}
 					}.runTaskLater(Plugin.getInstance(), 2);
 
 				} else {
 					ItemStack invalidItem = mInvalidItems.get(row);
-					_inventory.setItem((row*9) + 1, invalidItem);
+					mInventory.setItem((row * 9) + 1, invalidItem);
 				}
 			} else {
 				ItemStack invalidItem = mInvalidItems.get(row);
-				_inventory.setItem((row*9) + 1, invalidItem);
+				mInventory.setItem((row * 9) + 1, invalidItem);
 			}
 			row++;
 		}
@@ -327,8 +327,8 @@ public class InfusionCustomInventory extends CustomInventory {
 		junk.setItemMeta(meta);
 
 		for (int i = 0; i < (ROW * COLUMNS); i++) {
-			if (_inventory.getItem(i) == null) {
-				_inventory.setItem(i, junk);
+			if (mInventory.getItem(i) == null) {
+				mInventory.setItem(i, junk);
 			}
 		}
 	}
@@ -344,7 +344,7 @@ public class InfusionCustomInventory extends CustomInventory {
 		//check if the item has an infusion or not
 		if (infusionLvl > 0) {
 			//set the refund item
-			_inventory.setItem((row * 9), mRefundItem);
+			mInventory.setItem((row * 9), mRefundItem);
 			mMapFunction.put((row * 9), (p, inventory, slot) -> {
 				try {
 					InfusionUtils.refundInfusion(item, p);
@@ -356,7 +356,7 @@ public class InfusionCustomInventory extends CustomInventory {
 			//set the pannels to show the current infusion and level
 			if (pannelsInfusions != null) {
 				for (int index = 0; index < infusionLvl; index++) {
-					_inventory.setItem((row * 9) + 2 + index, pannelsInfusions.get(index));
+					mInventory.setItem((row * 9) + 2 + index, pannelsInfusions.get(index));
 				}
 			}
 
@@ -392,7 +392,7 @@ public class InfusionCustomInventory extends CustomInventory {
 				}
 				infuseMeta.lore(itemLore);
 				infuseItem.setItemMeta(infuseMeta);
-				_inventory.setItem(slot, infuseItem);
+				mInventory.setItem(slot, infuseItem);
 
 				mMapFunction.put(slot, (p, inventory, itemSlot) -> {
 					if (InfusionUtils.canPayInfusion(p, item)) {
@@ -408,7 +408,7 @@ public class InfusionCustomInventory extends CustomInventory {
 				});
 			} else {
 				int slot = (row * 9) + 2 + infusionLvl;
-				_inventory.setItem(slot, mMaxLevelReachedItem);
+				mInventory.setItem(slot, mMaxLevelReachedItem);
 			}
 		} else {
 			ItemStack mInfuseStack = new ItemStack(Material.ENCHANTED_BOOK, 1);
@@ -420,12 +420,12 @@ public class InfusionCustomInventory extends CustomInventory {
 			lore.add(Component.text("The first infusion costs only " + InfusionUtils.getExpLvlInfuseCost(item) + " experience levels", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false));
 			meta.lore(lore);
 			mInfuseStack.setItemMeta(meta);
-			_inventory.setItem((row*9), mInfuseStack);
+			mInventory.setItem((row * 9), mInfuseStack);
 
 			//set the function when the item is clicked
 
-			_inventory.setItem((row*9) + 2, mPannelList.get(0));
-			mMapFunction.put((row*9) + 2, (p, inventory, slot) -> {
+			mInventory.setItem((row * 9) + 2, mPannelList.get(0));
+			mMapFunction.put((row * 9) + 2, (p, inventory, slot) -> {
 				if (InfusionUtils.canPayExp(p, item)) {
 					InfusionUtils.payInfusion(p, item);
 					InfusionUtils.animate(p);
@@ -435,8 +435,8 @@ public class InfusionCustomInventory extends CustomInventory {
 				}
 			});
 
-			_inventory.setItem((row*9) + 3, mPannelList.get(1));
-			mMapFunction.put((row*9) + 3, (p, inventory, slot) -> {
+			mInventory.setItem((row * 9) + 3, mPannelList.get(1));
+			mMapFunction.put((row * 9) + 3, (p, inventory, slot) -> {
 				if (InfusionUtils.canPayExp(p, item)) {
 					if (InfusionUtils.payInfusion(p, item)) {
 						InfusionUtils.animate(p);
@@ -449,8 +449,8 @@ public class InfusionCustomInventory extends CustomInventory {
 				}
 			});
 
-			_inventory.setItem((row*9) + 4, mPannelList.get(2));
-			mMapFunction.put((row*9) + 4, (p, inventory, slot) -> {
+			mInventory.setItem((row * 9) + 4, mPannelList.get(2));
+			mMapFunction.put((row * 9) + 4, (p, inventory, slot) -> {
 				if (InfusionUtils.canPayExp(p, item)) {
 					if (InfusionUtils.payInfusion(p, item)) {
 						InfusionUtils.animate(p);
@@ -463,8 +463,8 @@ public class InfusionCustomInventory extends CustomInventory {
 				}
 			});
 
-			_inventory.setItem((row*9) + 5, mPannelList.get(3));
-			mMapFunction.put((row*9) + 5, (p, inventory, slot) -> {
+			mInventory.setItem((row * 9) + 5, mPannelList.get(3));
+			mMapFunction.put((row * 9) + 5, (p, inventory, slot) -> {
 				if (InfusionUtils.canPayExp(p, item)) {
 					if (InfusionUtils.payInfusion(p, item)) {
 						InfusionUtils.animate(p);
@@ -477,8 +477,8 @@ public class InfusionCustomInventory extends CustomInventory {
 				}
 			});
 
-			_inventory.setItem((row*9) + 6, mPannelList.get(4));
-			mMapFunction.put((row*9) + 6, (p, inventory, slot) -> {
+			mInventory.setItem((row * 9) + 6, mPannelList.get(4));
+			mMapFunction.put((row * 9) + 6, (p, inventory, slot) -> {
 				if (InfusionUtils.canPayExp(p, item)) {
 					if (InfusionUtils.payInfusion(p, item)) {
 						InfusionUtils.animate(p);
@@ -491,8 +491,8 @@ public class InfusionCustomInventory extends CustomInventory {
 				}
 			});
 
-			_inventory.setItem((row*9) + 7, mPannelList.get(5));
-			mMapFunction.put((row*9) + 7, (p, inventory, slot) -> {
+			mInventory.setItem((row * 9) + 7, mPannelList.get(5));
+			mMapFunction.put((row * 9) + 7, (p, inventory, slot) -> {
 				if (InfusionUtils.canPayExp(p, item)) {
 					if (InfusionUtils.payInfusion(p, item)) {
 						InfusionUtils.animate(p);
@@ -519,7 +519,7 @@ public class InfusionCustomInventory extends CustomInventory {
 			return;
 		}
 
-		if (!_inventory.equals(clickedInventory)) {
+		if (!mInventory.equals(clickedInventory)) {
 			return;
 		}
 

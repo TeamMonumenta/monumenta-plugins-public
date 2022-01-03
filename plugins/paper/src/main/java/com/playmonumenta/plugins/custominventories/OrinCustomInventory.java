@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Set;
 
-import com.playmonumenta.plugins.utils.GUIUtils;
-import com.playmonumenta.plugins.utils.MessagingUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -15,10 +13,12 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-import com.goncalomb.bukkit.mylib.utils.CustomInventory;
 import com.playmonumenta.networkrelay.NetworkRelayAPI;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
+import com.playmonumenta.plugins.utils.GUIUtils;
+import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.redissync.MonumentaRedisSyncAPI;
+import com.playmonumenta.scriptedquests.utils.CustomInventory;
 import com.playmonumenta.scriptedquests.utils.ScoreboardUtils;
 
 import net.kyori.adventure.text.Component;
@@ -172,7 +172,7 @@ public class OrinCustomInventory extends CustomInventory {
 			return;
 		}
 		ItemStack clickedItem = event.getCurrentItem();
-		if (event.getClickedInventory() != _inventory) {
+		if (event.getClickedInventory() != mInventory) {
 			return;
 		}
 
@@ -277,24 +277,24 @@ public class OrinCustomInventory extends CustomInventory {
 	}
 
 	public void setLayout(Player player) {
-		_inventory.clear();
+		mInventory.clear();
 		int commonPage = (int) Math.floor(mCurrentPage / 10.0) * 10;
 		for (TeleportEntry item : ORIN_ITEMS) {
 			if (item.mPage == commonPage) {
 				if (item.mScoreboard == null || ScoreboardUtils.getScoreboardValue(player, item.mScoreboard) >= item.mScoreRequired) {
-					_inventory.setItem(item.mSlot, createCustomItem(item));
+					mInventory.setItem(item.mSlot, createCustomItem(item));
 				}
 			} //intentionally not else, so overrides can happen
 			if (item.mPage == mCurrentPage) {
 				if (item.mScoreboard == null || ScoreboardUtils.getScoreboardValue(player, item.mScoreboard) >= item.mScoreRequired) {
-					_inventory.setItem(item.mSlot, createCustomItem(item));
+					mInventory.setItem(item.mSlot, createCustomItem(item));
 				}
 			}
 		}
 
 		for (int i = 0; i < 54; i++) {
-			if (_inventory.getItem(i) == null) {
-				_inventory.setItem(i, new ItemStack(FILLER, 1));
+			if (mInventory.getItem(i) == null) {
+				mInventory.setItem(i, new ItemStack(FILLER, 1));
 			}
 		}
 		if (mCurrentPage == 11) {
@@ -330,7 +330,7 @@ public class OrinCustomInventory extends CustomInventory {
 		}
 
 		for (TeleportEntry item : INSTANCE_ITEMS) {
-			_inventory.setItem(item.mSlot, createCustomItem(item));
+			mInventory.setItem(item.mSlot, createCustomItem(item));
 		}
 	}
 }

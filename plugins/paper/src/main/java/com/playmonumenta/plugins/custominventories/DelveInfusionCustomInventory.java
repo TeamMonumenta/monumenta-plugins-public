@@ -19,13 +19,13 @@ import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import com.goncalomb.bukkit.mylib.utils.CustomInventory;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.tracking.PlayerTracking;
 import com.playmonumenta.plugins.utils.DelveInfusionUtils;
 import com.playmonumenta.plugins.utils.DelveInfusionUtils.DelveInfusionSelection;
 import com.playmonumenta.plugins.utils.InfusionUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.scriptedquests.utils.CustomInventory;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -489,7 +489,7 @@ public final class DelveInfusionCustomInventory extends CustomInventory {
 	}
 
 	private void loadInv(Player player) {
-		_inventory.clear();
+		mInventory.clear();
 		mMapFunction.clear();
 		PlayerInventory pi = player.getInventory();
 		List<ItemStack> items = new ArrayList<>();
@@ -516,27 +516,27 @@ public final class DelveInfusionCustomInventory extends CustomInventory {
 				ItemStack itemStack = new ItemStack(infusedItem.getType());
 				ItemMeta meta = itemStack.getItemMeta();
 				meta.displayName(Component.text("Placeholder", TextColor.fromCSSHexString("000000"))
-								.decoration(TextDecoration.BOLD, true)
-								.decoration(TextDecoration.ITALIC, false));
+					                 .decoration(TextDecoration.BOLD, true)
+					                 .decoration(TextDecoration.ITALIC, false));
 				itemStack.setItemMeta(meta);
 				ItemUtils.setPlainName(itemStack, ItemUtils.getPlainName(infusedItem));
-				_inventory.setItem(4, itemStack);
+				mInventory.setItem(4, itemStack);
 			}
 		}.runTaskLater(Plugin.getInstance(), 2);
 
 		//R1 = 6
-		_inventory.setItem(19, mDelvePannelList.get(0));
-		_inventory.setItem(20, mDelvePannelList.get(1));
-		_inventory.setItem(21, mDelvePannelList.get(2));
+		mInventory.setItem(19, mDelvePannelList.get(0));
+		mInventory.setItem(20, mDelvePannelList.get(1));
+		mInventory.setItem(21, mDelvePannelList.get(2));
 		//white space
-		_inventory.setItem(23, mDelvePannelList.get(3));
-		_inventory.setItem(24, mDelvePannelList.get(4));
-		_inventory.setItem(25, mDelvePannelList.get(5));
+		mInventory.setItem(23, mDelvePannelList.get(3));
+		mInventory.setItem(24, mDelvePannelList.get(4));
+		mInventory.setItem(25, mDelvePannelList.get(5));
 
 		//R2
 		int index = 27;
 		for (int i = 6; i < mDelvePannelList.size(); i++) {
-			_inventory.setItem(index++, mDelvePannelList.get(i));
+			mInventory.setItem(index++, mDelvePannelList.get(i));
 		}
 
 		ItemStack swapPage = new ItemStack(Material.PAPER);
@@ -546,7 +546,7 @@ public final class DelveInfusionCustomInventory extends CustomInventory {
 				.decoration(TextDecoration.ITALIC, false)
 				.color(TextColor.fromCSSHexString("ffa000")));
 		swapPage.setItemMeta(meta);
-		_inventory.setItem(53, swapPage);
+		mInventory.setItem(53, swapPage);
 
 		mMapFunction.put(53, (p, clickedInventory, slot) -> {
 			mRowSelected = 99;
@@ -849,13 +849,13 @@ public final class DelveInfusionCustomInventory extends CustomInventory {
 							meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
 							itemStack.setItemMeta(meta);
 							ItemUtils.setPlainName(itemStack, ItemUtils.getPlainName(item));
-							_inventory.setItem((rowF*9) + 1, itemStack);
+							mInventory.setItem((rowF * 9) + 1, itemStack);
 						}
 					}.runTaskLater(Plugin.getInstance(), 2);
 
 					if (infusion != null) {
-						_inventory.setItem((row*9), mRefundItem);
-						mMapFunction.put((row*9), (p, inventory, slot) -> {
+						mInventory.setItem((row * 9), mRefundItem);
+						mMapFunction.put((row * 9), (p, inventory, slot) -> {
 							DelveInfusionUtils.refundInfusion(item, p);
 						});
 
@@ -865,7 +865,7 @@ public final class DelveInfusionCustomInventory extends CustomInventory {
 						if (pannelsList != null) {
 							for (int i = 0; i < level; i++) {
 								if (pannelsList.get(i) != null) {
-									_inventory.setItem((row*9) + 2 + i, pannelsList.get(i));
+									mInventory.setItem((row * 9) + 2 + i, pannelsList.get(i));
 								}
 							}
 						}
@@ -892,7 +892,7 @@ public final class DelveInfusionCustomInventory extends CustomInventory {
 
 							infuseMeta.lore(itemLore);
 							infuseItem.setItemMeta(infuseMeta);
-							_inventory.setItem(slot, infuseItem);
+							mInventory.setItem(slot, infuseItem);
 
 							mMapFunction.put(slot, (p, inventory, slotClicked) -> {
 								try {
@@ -913,7 +913,7 @@ public final class DelveInfusionCustomInventory extends CustomInventory {
 						} else {
 							//Max level reached
 							int slot = (row * 9) + 2 + level;
-							_inventory.setItem(slot, mMaxLevelReachedItem);
+							mInventory.setItem(slot, mMaxLevelReachedItem);
 						}
 					} else {
 						//Item with no infusion -> load item to swap page
@@ -935,7 +935,7 @@ public final class DelveInfusionCustomInventory extends CustomInventory {
 						infuseMeta.lore(itemLore);
 						infuseItem.setItemMeta(infuseMeta);
 
-						_inventory.setItem((rowF * 9) + 2 + 4, infuseItem);
+						mInventory.setItem((rowF * 9) + 2 + 4, infuseItem);
 						mMapFunction.put((rowF * 9) + 2 + 4, (p, inventory, slot) -> {
 							mRowSelected = rowF;
 
@@ -943,11 +943,11 @@ public final class DelveInfusionCustomInventory extends CustomInventory {
 					}
 				} else {
 					ItemStack invalidItem = mInvalidItems.get(row);
-					_inventory.setItem((row*9) + 1, invalidItem);
+					mInventory.setItem((row * 9) + 1, invalidItem);
 				}
 			} else {
 				ItemStack invalidItem = mInvalidItems.get(row);
-				_inventory.setItem((row*9) + 1, invalidItem);
+				mInventory.setItem((row * 9) + 1, invalidItem);
 			}
 			row++;
 		}
@@ -960,8 +960,8 @@ public final class DelveInfusionCustomInventory extends CustomInventory {
 		junk.setItemMeta(meta);
 
 		for (int i = 0; i < 54; i++) {
-			if (_inventory.getItem(i) == null) {
-				_inventory.setItem(i, junk);
+			if (mInventory.getItem(i) == null) {
+				mInventory.setItem(i, junk);
 			}
 		}
 	}
@@ -978,7 +978,7 @@ public final class DelveInfusionCustomInventory extends CustomInventory {
 			return;
 		}
 
-		if (!_inventory.equals(clickedInventory)) {
+		if (!mInventory.equals(clickedInventory)) {
 			return;
 		}
 

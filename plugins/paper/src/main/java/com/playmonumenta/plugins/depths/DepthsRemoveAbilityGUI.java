@@ -3,17 +3,17 @@ package com.playmonumenta.plugins.depths;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.playmonumenta.plugins.utils.GUIUtils;
-import com.playmonumenta.plugins.utils.ItemUtils;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import com.goncalomb.bukkit.mylib.utils.CustomInventory;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
+import com.playmonumenta.plugins.utils.GUIUtils;
+import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.scriptedquests.utils.CustomInventory;
 import com.playmonumenta.scriptedquests.utils.MessagingUtils;
 
 import net.kyori.adventure.text.Component;
@@ -58,7 +58,7 @@ public class DepthsRemoveAbilityGUI extends CustomInventory {
 		TRIGGER_STRINGS.add(new TriggerData(26, DepthsTrigger.LIFELINE, "No Lifeline ability!"));
 
 		for (int i = 0; i < 54; i++) {
-			_inventory.setItem(i, new ItemStack(FILLER, 1));
+			mInventory.setItem(i, new ItemStack(FILLER, 1));
 		}
 
 		setAbilities(targetPlayer);
@@ -67,9 +67,10 @@ public class DepthsRemoveAbilityGUI extends CustomInventory {
 	@Override
 	protected void inventoryClick(InventoryClickEvent event) {
 		event.setCancelled(true);
-		if (event.getClickedInventory() != _inventory ||
-			event.getCurrentItem() == null
-			|| event.getCurrentItem().getType() == FILLER) {
+		ItemStack clickedItem = event.getCurrentItem();
+		if (event.getClickedInventory() != mInventory
+			    || clickedItem == null
+			    || clickedItem.getType() == FILLER) {
 			return;
 		}
 		Player player = (Player) event.getWhoClicked();
@@ -80,7 +81,7 @@ public class DepthsRemoveAbilityGUI extends CustomInventory {
 			return;
 		}
 
-		if (event.getCurrentItem().getType() == CONFIRM_MAT) {
+		if (clickedItem.getType() == CONFIRM_MAT) {
 			for (DepthsAbility ability : abilities) {
 				if (ability.mInfo.mDisplayName != null && mAbilityName.contains(ability.mInfo.mDisplayName)) {
 					DepthsPlayer depthsplayer = instance.mPlayers.get(player.getUniqueId());
@@ -93,13 +94,13 @@ public class DepthsRemoveAbilityGUI extends CustomInventory {
 					}
 				}
 			}
-		} else if (event.getCurrentItem().getType() == CANCEL_MAT) {
+		} else if (clickedItem.getType() == CANCEL_MAT) {
 			setAbilities(player);
 		} else {
 			for (DepthsAbility ability : abilities) {
-				if (ability.mInfo.mDisplayName != null &&
-					ItemUtils.getPlainName(_inventory.getItem(event.getSlot())).contains(ability.mInfo.mDisplayName)) {
-					setConfirmation(_inventory.getItem(event.getSlot()));
+				if (ability.mInfo.mDisplayName != null
+					    && ItemUtils.getPlainName(clickedItem).contains(ability.mInfo.mDisplayName)) {
+					setConfirmation(clickedItem);
 					return;
 				}
 			}
@@ -107,16 +108,16 @@ public class DepthsRemoveAbilityGUI extends CustomInventory {
 	}
 
 	public void setConfirmation(ItemStack item) {
-		for (int i = 0; i < _inventory.getSize(); i++) {
-			_inventory.setItem(i, new ItemStack(FILLER, 1));
+		for (int i = 0; i < mInventory.getSize(); i++) {
+			mInventory.setItem(i, new ItemStack(FILLER, 1));
 		}
 		mAbilityName = ItemUtils.getPlainName(item);
 
-		_inventory.setItem(CONFIRM_ABILITY_LOC, item);
+		mInventory.setItem(CONFIRM_ABILITY_LOC, item);
 		ItemStack createItem = createCustomItem(CONFIRM_MAT, "Confirm", "Confirm ability removal");
-		_inventory.setItem(29, createItem);
+		mInventory.setItem(29, createItem);
 		createItem = createCustomItem(CANCEL_MAT, "Cancel", "Returns to previous page.");
-		_inventory.setItem(33, createItem);
+		mInventory.setItem(33, createItem);
 	}
 
 	public Boolean setAbilities(Player targetPlayer) {
@@ -126,14 +127,14 @@ public class DepthsRemoveAbilityGUI extends CustomInventory {
 			return false;
 		}
 
-		for (int i = 0; i < _inventory.getSize(); i++) {
-			_inventory.setItem(i, new ItemStack(FILLER, 1));
+		for (int i = 0; i < mInventory.getSize(); i++) {
+			mInventory.setItem(i, new ItemStack(FILLER, 1));
 		}
 
 		ItemStack createItem = createCustomItem(Material.PURPLE_STAINED_GLASS_PANE,
-				"Click the ability to remove",
-				"Remove 1 ability of your choosing at no cost.");
-		_inventory.setItem(4, createItem);
+		                                        "Click the ability to remove",
+		                                        "Remove 1 ability of your choosing at no cost.");
+		mInventory.setItem(4, createItem);
 
 		List<DepthsAbilityItem> passiveItems = new ArrayList<>();
 		for (DepthsAbilityItem item : items) {
@@ -142,7 +143,7 @@ public class DepthsRemoveAbilityGUI extends CustomInventory {
 			} else {
 				for (TriggerData data : TRIGGER_STRINGS) {
 					if (data.mTrigger == item.mTrigger) {
-						_inventory.setItem(data.mInvLocation, item.mItem);
+						mInventory.setItem(data.mInvLocation, item.mItem);
 						break;
 					}
 				}
@@ -150,11 +151,11 @@ public class DepthsRemoveAbilityGUI extends CustomInventory {
 		}
 
 		for (int i = 0; i < passiveItems.size() && i < 18; i++) {
-			_inventory.setItem(i + START_OF_PASSIVES, passiveItems.get(i).mItem);
+			mInventory.setItem(i + START_OF_PASSIVES, passiveItems.get(i).mItem);
 		}
 
 		for (int i = 19; i <= 25; i++) {
-			ItemStack checkItem = _inventory.getItem(i);
+			ItemStack checkItem = mInventory.getItem(i);
 			if (checkItem != null && checkItem.getType() == FILLER) {
 				ItemStack noAbility = new ItemStack(Material.RED_STAINED_GLASS_PANE, 1);
 				ItemMeta noAbilityMeta = noAbility.getItemMeta();
@@ -163,7 +164,7 @@ public class DepthsRemoveAbilityGUI extends CustomInventory {
 						noAbilityMeta.displayName(Component.text(data.mString, NamedTextColor.RED)
 								.decoration(TextDecoration.ITALIC, false));
 						noAbility.setItemMeta(noAbilityMeta);
-						_inventory.setItem(i, noAbility);
+						mInventory.setItem(i, noAbility);
 					}
 				}
 			}

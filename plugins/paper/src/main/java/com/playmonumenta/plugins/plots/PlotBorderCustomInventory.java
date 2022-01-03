@@ -6,12 +6,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-import com.goncalomb.bukkit.mylib.utils.CustomInventory;
-import com.playmonumenta.plugins.utils.GUIUtils;
-import com.playmonumenta.plugins.utils.ItemUtils;
-import com.playmonumenta.scriptedquests.utils.ScoreboardUtils;
-import com.playmonumenta.structures.StructuresAPI;
-
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -20,6 +14,12 @@ import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.checkerframework.checker.nullness.qual.Nullable;
+
+import com.playmonumenta.plugins.utils.GUIUtils;
+import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.scriptedquests.utils.CustomInventory;
+import com.playmonumenta.scriptedquests.utils.ScoreboardUtils;
+import com.playmonumenta.structures.StructuresAPI;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -120,7 +120,7 @@ public class PlotBorderCustomInventory extends CustomInventory {
 			return;
 		}
 		ItemStack clickedItem = event.getCurrentItem();
-		if (event.getClickedInventory() != _inventory) {
+		if (event.getClickedInventory() != mInventory) {
 			return;
 		}
 
@@ -206,26 +206,26 @@ public class PlotBorderCustomInventory extends CustomInventory {
 	}
 
 	public void setLayout(Player player) {
-		_inventory.clear();
+		mInventory.clear();
 		int commonPage = (int) Math.floor(mCurrentPage / 10.0) * 10;
 		for (TeleportEntry item : BORDER_ITEMS) {
 			if (item.mPage == commonPage) {
 				if (item.mScoreboard == null || mOverridePermissions ||
 						ScoreboardUtils.getScoreboardValue(player, item.mScoreboard) >= item.mScoreRequired) {
-					_inventory.setItem(item.mSlot, createCustomItem(item));
+					mInventory.setItem(item.mSlot, createCustomItem(item));
 				}
 			} //intentionally not else, so overrides can happen
 			if (item.mPage == mCurrentPage) {
 				if (item.mScoreboard == null || mOverridePermissions ||
 						ScoreboardUtils.getScoreboardValue(player, item.mScoreboard) >= item.mScoreRequired) {
-					_inventory.setItem(item.mSlot, createCustomItem(item));
+					mInventory.setItem(item.mSlot, createCustomItem(item));
 				}
 			}
 		}
 
 		for (int i = 0; i < 54; i++) {
-			if (_inventory.getItem(i) == null) {
-				_inventory.setItem(i, new ItemStack(FILLER, 1));
+			if (mInventory.getItem(i) == null) {
+				mInventory.setItem(i, new ItemStack(FILLER, 1));
 			}
 		}
 	}

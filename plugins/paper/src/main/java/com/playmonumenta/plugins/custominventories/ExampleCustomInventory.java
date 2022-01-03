@@ -5,7 +5,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 
-import com.goncalomb.bukkit.mylib.utils.CustomInventory;
+import com.playmonumenta.scriptedquests.utils.CustomInventory;
 
 public class ExampleCustomInventory extends CustomInventory {
 	private static final Material FILLER = Material.GRAY_STAINED_GLASS_PANE;
@@ -20,11 +20,11 @@ public class ExampleCustomInventory extends CustomInventory {
 
 		//Main setup thread, create the first page of the GUI that loads in here.
 		for (int i = 0; i < 27; i++) {
-			_inventory.setItem(i, new ItemStack(FILLER, 1));
+			mInventory.setItem(i, new ItemStack(FILLER, 1));
 		}
 
 		ItemStack exampleItem = new ItemStack(Material.BAKED_POTATO, 1);
-		_inventory.setItem(13, exampleItem);
+		mInventory.setItem(13, exampleItem);
 	}
 
 	@Override
@@ -33,10 +33,10 @@ public class ExampleCustomInventory extends CustomInventory {
 		event.setCancelled(true);
 		//Check to make sure they clicked the GUI, didn't shift click, and
 		//did not click the filler item
-		if (event.getClickedInventory() != _inventory
-			|| event.getCurrentItem() == null
-			|| event.getCurrentItem().getType() == FILLER
-			|| event.isShiftClick()) {
+		if (event.getClickedInventory() != mInventory
+			    || event.getCurrentItem() == null
+			    || event.getCurrentItem().getType() == FILLER
+			    || event.isShiftClick()) {
 			return;
 		}
 

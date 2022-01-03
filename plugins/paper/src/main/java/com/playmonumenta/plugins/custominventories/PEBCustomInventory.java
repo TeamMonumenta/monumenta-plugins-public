@@ -3,8 +3,6 @@ package com.playmonumenta.plugins.custominventories;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import com.playmonumenta.plugins.utils.GUIUtils;
-import com.playmonumenta.plugins.utils.ItemUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -16,9 +14,11 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import com.goncalomb.bukkit.mylib.utils.CustomInventory;
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.utils.GUIUtils;
+import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.SignUtils;
+import com.playmonumenta.scriptedquests.utils.CustomInventory;
 import com.playmonumenta.scriptedquests.utils.ScoreboardUtils;
 
 import net.kyori.adventure.text.Component;
@@ -300,7 +300,7 @@ public class PEBCustomInventory extends CustomInventory {
 
 		ScoreboardUtils.setScoreboardValue(player, "PEBPage", 1);
 
-		setLayout(_inventory, 1, player);
+		setLayout(mInventory, 1, player);
 	}
 	@Override
 	protected void inventoryClick(InventoryClickEvent event) {
@@ -312,7 +312,7 @@ public class PEBCustomInventory extends CustomInventory {
 			return;
 		}
 		ItemStack clickedItem = event.getCurrentItem();
-		if (event.getClickedInventory() != _inventory) {
+		if (event.getClickedInventory() != mInventory) {
 			return;
 		}
 		int currentPage = ScoreboardUtils.getScoreboardValue(player, "PEBPage");
@@ -343,7 +343,7 @@ public class PEBCustomInventory extends CustomInventory {
 	public void runInternalCommand(Player player, PebItem item) {
 		if (item.mCommand.startsWith("page")) {
 			int newPageValue = Integer.parseInt(item.mCommand.split(" ")[1]);
-			setLayout(_inventory, newPageValue, player);
+			setLayout(mInventory, newPageValue, player);
 		} else if (item.mCommand.startsWith("exit")) {
 			player.closeInventory();
 		} else if (item.mCommand.equals("threshold")) {

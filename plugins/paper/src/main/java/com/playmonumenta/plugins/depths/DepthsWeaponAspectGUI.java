@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
 
-import com.playmonumenta.plugins.utils.ItemUtils;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -13,17 +12,18 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import com.goncalomb.bukkit.mylib.utils.CustomInventory;
 import com.playmonumenta.plugins.depths.abilities.WeaponAspectDepthsAbility;
 import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.NamespacedKeyUtils;
+import com.playmonumenta.scriptedquests.utils.CustomInventory;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 
 
-public class DepthsWeaponAspectGUI extends CustomInventory {
+public final class DepthsWeaponAspectGUI extends CustomInventory {
 	private static final Material FILLER = Material.RED_STAINED_GLASS_PANE;
 	private static final Material PURCHASED_MAT = Material.LIME_STAINED_GLASS_PANE;
 	private static final Material BUY_ITEM = Material.GOLD_NUGGET;
@@ -34,25 +34,26 @@ public class DepthsWeaponAspectGUI extends CustomInventory {
 		super(player, 27, "Select an Aspect");
 
 
-		setLayout(player, _inventory, player.getScoreboardTags().contains(PAID_SCOREBOARD_TAG));
+		setLayout(player, mInventory, player.getScoreboardTags().contains(PAID_SCOREBOARD_TAG));
 	}
 
 	@Override
 	protected void inventoryClick(InventoryClickEvent event) {
 		event.setCancelled(true);
-		if (event.getClickedInventory() != _inventory ||
-				event.getCurrentItem() == null ||
-				event.getCurrentItem().getType() == FILLER ||
-				event.getCurrentItem().getType() == PURCHASED_MAT ||
-				event.isShiftClick()) {
+		ItemStack clickedItem = event.getCurrentItem();
+		if (event.getClickedInventory() != mInventory ||
+			    clickedItem == null ||
+			    clickedItem.getType() == FILLER ||
+			    clickedItem.getType() == PURCHASED_MAT ||
+			    event.isShiftClick()) {
 			return;
 		}
 		Player player = (Player) event.getWhoClicked();
 
-		if (event.getCurrentItem().getType() == BUY_ITEM) {
+		if (clickedItem.getType() == BUY_ITEM) {
 			Boolean didUpgrade = attemptUpgrade(player);
 			if (didUpgrade) {
-				setLayout(player, _inventory, true);
+				setLayout(player, mInventory, true);
 				player.addScoreboardTag(PAID_SCOREBOARD_TAG);
 			}
 			return;

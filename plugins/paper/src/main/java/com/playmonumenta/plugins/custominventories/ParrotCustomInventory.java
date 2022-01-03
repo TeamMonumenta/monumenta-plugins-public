@@ -18,7 +18,6 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-import com.goncalomb.bukkit.mylib.utils.CustomInventory;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.parrots.ParrotManager;
 import com.playmonumenta.plugins.parrots.ParrotManager.ParrotVariant;
@@ -27,6 +26,7 @@ import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.NamespacedKeyUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
+import com.playmonumenta.scriptedquests.utils.CustomInventory;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -984,22 +984,22 @@ public final class ParrotCustomInventory extends CustomInventory {
 	}
 
 	public void updateInventory(Player player) {
-		_inventory.clear();
+		mInventory.clear();
 		mInvMapping.clear();
 
 		if (SIGN_MAP.get(mCurrentPage) != null) {
-			_inventory.setItem(4, SIGN_MAP.get(mCurrentPage));
+			mInventory.setItem(4, SIGN_MAP.get(mCurrentPage));
 		}
 
 		for (GuiItem gItem : GUI_ITEMS) {
 			ParrotGUIPage itemPage = ParrotGUIPage.valueOfPage(gItem.getPage());
-			if (itemPage != null && (itemPage == mCurrentPage || itemPage == ParrotGUIPage.OTHERS) && gItem.isVisible(player, _inventory)) {
-				_inventory.setItem(gItem.getSlot(), gItem.getShowedItem());
+			if (itemPage != null && (itemPage == mCurrentPage || itemPage == ParrotGUIPage.OTHERS) && gItem.isVisible(player, mInventory)) {
+				mInventory.setItem(gItem.getSlot(), gItem.getShowedItem());
 				mInvMapping.put(gItem.getSlot(), gItem);
 			}
 		}
 
-		fillWithJunk(_inventory);
+		fillWithJunk(mInventory);
 
 	}
 
@@ -1029,7 +1029,7 @@ public final class ParrotCustomInventory extends CustomInventory {
 			return;
 		}
 
-		if (!_inventory.equals(event.getClickedInventory())) {
+		if (!mInventory.equals(event.getClickedInventory())) {
 			return;
 		}
 

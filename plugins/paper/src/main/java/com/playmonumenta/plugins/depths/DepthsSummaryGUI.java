@@ -14,9 +14,9 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 
-import com.goncalomb.bukkit.mylib.utils.CustomInventory;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
 import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.scriptedquests.utils.CustomInventory;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -65,7 +65,7 @@ public class DepthsSummaryGUI extends CustomInventory {
 		TRIGGER_STRINGS.add(new TriggerData(17, DepthsTrigger.LIFELINE, "No Lifeline ability!"));
 
 		for (int i = 0; i < 54; i++) {
-			_inventory.setItem(i, new ItemStack(FILLER, 1));
+			mInventory.setItem(i, new ItemStack(FILLER, 1));
 		}
 		DepthsPlayer playerInstance = DepthsManager.getInstance().mPlayers.get(targetPlayer.getUniqueId());
 
@@ -85,7 +85,7 @@ public class DepthsSummaryGUI extends CustomInventory {
 						meta.displayName(Component.text(actualPlayer.getName() + "'s Abilities", NamedTextColor.YELLOW)
 							.decoration(TextDecoration.ITALIC, false));
 						playerHead.setItemMeta(meta);
-						_inventory.setItem(HEAD_LOCATIONS.get(i), playerHead);
+						mInventory.setItem(HEAD_LOCATIONS.get(i), playerHead);
 					}
 				}
 			}
@@ -118,16 +118,16 @@ public class DepthsSummaryGUI extends CustomInventory {
 			ItemUtils.setPlainName(rewardItem, "All Room Rewards Claimed!");
 			rewardItem.setItemMeta(rewardMeta);
 		}
-		_inventory.setItem(REWARD_LOCATION, rewardItem);
+		mInventory.setItem(REWARD_LOCATION, rewardItem);
 		setAbilities(targetPlayer);
 	}
 
 	@Override
 	protected void inventoryClick(InventoryClickEvent event) {
 		event.setCancelled(true);
-		if (event.getClickedInventory() != _inventory ||
-				event.getCurrentItem() == null ||
-				event.getCurrentItem().getType() == FILLER) {
+		if (event.getClickedInventory() != mInventory ||
+			    event.getCurrentItem() == null ||
+			    event.getCurrentItem().getType() == FILLER) {
 			return;
 		}
 		Player clicker = (Player) event.getWhoClicked();
@@ -156,7 +156,7 @@ public class DepthsSummaryGUI extends CustomInventory {
 		}
 
 		for (int i = 0; i < 45; i++) {
-			_inventory.setItem(i, new ItemStack(FILLER, 1));
+			mInventory.setItem(i, new ItemStack(FILLER, 1));
 		}
 
 		List<DepthsAbilityItem> passiveItems = new ArrayList<>();
@@ -166,7 +166,7 @@ public class DepthsSummaryGUI extends CustomInventory {
 			} else {
 				for (TriggerData data : TRIGGER_STRINGS) {
 					if (data.mTrigger == item.mTrigger) {
-						_inventory.setItem(data.mInvLocation, item.mItem);
+						mInventory.setItem(data.mInvLocation, item.mItem);
 						break;
 					}
 				}
@@ -174,12 +174,12 @@ public class DepthsSummaryGUI extends CustomInventory {
 		}
 
 		for (int i = 0; i < passiveItems.size() && i < 18; i++) {
-			_inventory.setItem(i + START_OF_PASSIVES, passiveItems.get(i).mItem);
+			mInventory.setItem(i + START_OF_PASSIVES, passiveItems.get(i).mItem);
 		}
 
 		//all for mystery box
 		DepthsPlayer playerInstance = DepthsManager.getInstance().mPlayers.get(targetPlayer.getUniqueId());
-		ItemStack weaponAspectItem = _inventory.getItem(9);
+		ItemStack weaponAspectItem = mInventory.getItem(9);
 		if (playerInstance != null && playerInstance.mHasWeaponAspect &&
 				weaponAspectItem != null && weaponAspectItem.getType() == FILLER) {
 			ItemStack mysteryBox = new ItemStack(Material.BARREL, 1);
@@ -192,7 +192,7 @@ public class DepthsSummaryGUI extends CustomInventory {
 					.decoration(TextDecoration.ITALIC, false));
 			boxMeta.lore(lore);
 			mysteryBox.setItemMeta(boxMeta);
-			_inventory.setItem(9, mysteryBox);
+			mInventory.setItem(9, mysteryBox);
 		}
 
 		//Tree info
@@ -200,12 +200,12 @@ public class DepthsSummaryGUI extends CustomInventory {
 			DepthsTree playerTree;
 			for (int i = 0; i < 4; i++) {
 				playerTree = playerInstance.mEligibleTrees.get(i);
-				_inventory.setItem(TREE_LOCATIONS.get(i), DepthsUtils.getTreeItem(playerTree));
+				mInventory.setItem(TREE_LOCATIONS.get(i), DepthsUtils.getTreeItem(playerTree));
 			}
 		}
 
 		for (int i = 9; i <= 17; i++) {
-			ItemStack triggerItem = _inventory.getItem(i);
+			ItemStack triggerItem = mInventory.getItem(i);
 			if (triggerItem != null && triggerItem.getType() == FILLER) {
 				ItemStack noAbility = new ItemStack(Material.RED_STAINED_GLASS_PANE, 1);
 				ItemMeta noAbilityMeta = noAbility.getItemMeta();
@@ -214,14 +214,14 @@ public class DepthsSummaryGUI extends CustomInventory {
 						noAbilityMeta.displayName(Component.text(data.mString, NamedTextColor.RED)
 								.decoration(TextDecoration.ITALIC, false));
 						noAbility.setItemMeta(noAbilityMeta);
-						_inventory.setItem(i, noAbility);
+						mInventory.setItem(i, noAbility);
 					}
 				}
 			}
 		}
 
 		for (int location : HEAD_LOCATIONS) {
-			ItemStack headItem = _inventory.getItem(location);
+			ItemStack headItem = mInventory.getItem(location);
 			if (headItem != null && headItem.getType() == Material.PLAYER_HEAD) {
 				SkullMeta chosenMeta = (SkullMeta) headItem.getItemMeta();
 				OfflinePlayer chosenPlayer = chosenMeta.getOwningPlayer();
@@ -232,9 +232,9 @@ public class DepthsSummaryGUI extends CustomInventory {
 					indicatorItem = new ItemStack(Material.ORANGE_STAINED_GLASS_PANE);
 				}
 				switch (location) {
-					case 45, 50 -> _inventory.setItem(location + 1, indicatorItem);
-					case 48, 53 -> _inventory.setItem(location - 1, indicatorItem);
-					default -> _inventory.setItem(location, indicatorItem);
+				case 45, 50 -> mInventory.setItem(location + 1, indicatorItem);
+				case 48, 53 -> mInventory.setItem(location - 1, indicatorItem);
+				default -> mInventory.setItem(location, indicatorItem);
 				}
 			}
 		}

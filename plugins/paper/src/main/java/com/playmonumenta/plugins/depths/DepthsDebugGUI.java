@@ -3,7 +3,6 @@ package com.playmonumenta.plugins.depths;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.playmonumenta.plugins.utils.GUIUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -12,8 +11,9 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.Plugin;
 
-import com.goncalomb.bukkit.mylib.utils.CustomInventory;
+import com.playmonumenta.plugins.utils.GUIUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.scriptedquests.utils.CustomInventory;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -55,7 +55,7 @@ public class DepthsDebugGUI extends CustomInventory {
 		GUI_ITEMS.add(new DebugGUIItem(16, Material.MAGMA_BLOCK, "List Party Delve Info", "Opens the delve GUI as if you are the player.", "delveinfo"));
 
 		for (int i = 0; i < 27; i++) {
-			_inventory.setItem(i, new ItemStack(Material.GRAY_STAINED_GLASS_PANE, 1));
+			mInventory.setItem(i, new ItemStack(Material.GRAY_STAINED_GLASS_PANE, 1));
 		}
 
 		for (DebugGUIItem item : GUI_ITEMS) {
@@ -66,10 +66,10 @@ public class DepthsDebugGUI extends CustomInventory {
 	@Override
 	protected void inventoryClick(InventoryClickEvent event) {
 		event.setCancelled(true);
-		if (event.getClickedInventory() != _inventory ||
-				event.getCurrentItem() == null ||
-				event.getCurrentItem().getType() == FILLER ||
-				event.isShiftClick()) {
+		if (event.getClickedInventory() != mInventory ||
+			    event.getCurrentItem() == null ||
+			    event.getCurrentItem().getType() == FILLER ||
+			    event.isShiftClick()) {
 			return;
 		}
 		Player player = (Player) event.getWhoClicked();
@@ -100,6 +100,6 @@ public class DepthsDebugGUI extends CustomInventory {
 		GUIUtils.splitLoreLine(meta, targetItem.mLore, 30, ChatColor.GRAY, true);
 		newItem.setItemMeta(meta);
 		ItemUtils.setPlainTag(newItem);
-		_inventory.setItem(targetItem.mSlot, newItem);
+		mInventory.setItem(targetItem.mSlot, newItem);
 	}
 }

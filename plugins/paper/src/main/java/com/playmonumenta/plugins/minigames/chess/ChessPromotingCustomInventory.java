@@ -3,16 +3,16 @@ package com.playmonumenta.plugins.minigames.chess;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.goncalomb.bukkit.mylib.utils.CustomInventory;
-import com.playmonumenta.plugins.minigames.chess.ChessBoard.BoardState;
-import com.playmonumenta.plugins.minigames.chess.ChessBoard.ChessPiece;
-import com.playmonumenta.plugins.minigames.chess.ChessBoard.ChessPieceType;
-import com.playmonumenta.plugins.minigames.chess.ChessBoard.ChessTeam;
-
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+
+import com.playmonumenta.plugins.minigames.chess.ChessBoard.BoardState;
+import com.playmonumenta.plugins.minigames.chess.ChessBoard.ChessPiece;
+import com.playmonumenta.plugins.minigames.chess.ChessBoard.ChessPieceType;
+import com.playmonumenta.plugins.minigames.chess.ChessBoard.ChessTeam;
+import com.playmonumenta.scriptedquests.utils.CustomInventory;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -85,14 +85,14 @@ public class ChessPromotingCustomInventory extends CustomInventory {
 		mBoard.updateState(BoardState.WAIT_TURN);
 		mPiece = promotingPiece;
 		for (int i = 0; i < 4; i++) {
-			_inventory.setItem(3 + i, mPiece.getPieceTeam() == ChessTeam.WHITE ? GUI_ITEM_WHITE.get(i) : GUI_ITEM_BLACK.get(i));
+			mInventory.setItem(3 + i, mPiece.getPieceTeam() == ChessTeam.WHITE ? GUI_ITEM_WHITE.get(i) : GUI_ITEM_BLACK.get(i));
 		}
 	}
 
 	protected void inventoryClick(org.bukkit.event.inventory.InventoryClickEvent event) {
 		event.setCancelled(true);
 
-		if (event.getClickedInventory() != _inventory) {
+		if (event.getClickedInventory() != mInventory) {
 			return;
 		}
 

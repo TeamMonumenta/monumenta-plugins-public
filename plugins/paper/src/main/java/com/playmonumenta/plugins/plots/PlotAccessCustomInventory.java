@@ -14,10 +14,10 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-import com.goncalomb.bukkit.mylib.utils.CustomInventory;
-import com.playmonumenta.plugins.utils.GUIUtils;
 import com.playmonumenta.plugins.plots.PlotManager.PlotInfo;
 import com.playmonumenta.plugins.plots.PlotManager.PlotInfo.OtherAccessRecord;
+import com.playmonumenta.plugins.utils.GUIUtils;
+import com.playmonumenta.scriptedquests.utils.CustomInventory;
 import com.playmonumenta.worlds.paper.ScoreboardUtils;
 
 import net.kyori.adventure.text.Component;
@@ -71,10 +71,10 @@ public class PlotAccessCustomInventory extends CustomInventory {
 		event.setCancelled(true);
 		//Check to make sure they clicked the GUI, didn't shift click, and
 		//did not click the filler item
-		if (event.getClickedInventory() != _inventory ||
-				event.getCurrentItem() == null ||
-				event.getCurrentItem().getType() == FILLER ||
-				event.isShiftClick()) {
+		if (event.getClickedInventory() != mInventory ||
+			    event.getCurrentItem() == null ||
+			    event.getCurrentItem().getType() == FILLER ||
+			    event.isShiftClick()) {
 			return;
 		}
 		//back and next buttons
@@ -103,11 +103,11 @@ public class PlotAccessCustomInventory extends CustomInventory {
 
 	private void setLayout(Player player, int page) {
 		mCurrentPage = page;
-		_inventory.clear();
+		mInventory.clear();
 		int pageOffset = (mCurrentPage - 1) * LOCATIONS.size();
 		for (int i = 0; i < LOCATIONS.size(); i++) {
 			if (i + pageOffset < mAccessList.size()) {
-				_inventory.setItem(LOCATIONS.get(i), makeHead(mAccessList.get(i + pageOffset), player));
+				mInventory.setItem(LOCATIONS.get(i), makeHead(mAccessList.get(i + pageOffset), player));
 			}
 		}
 		makeControlButtons();
@@ -115,15 +115,15 @@ public class PlotAccessCustomInventory extends CustomInventory {
 	}
 
 	private void makeControlButtons() {
-		_inventory.setItem(4, createBasicItem(Material.SCUTE, "Plot Selection", NamedTextColor.AQUA, false, "Click the head of the plot you would like to visit.",
-				ChatColor.GOLD));
+		mInventory.setItem(4, createBasicItem(Material.SCUTE, "Plot Selection", NamedTextColor.AQUA, false, "Click the head of the plot you would like to visit.",
+		                                      ChatColor.GOLD));
 		if (mCurrentPage != 1) {
-			_inventory.setItem(0, createBasicItem(Material.ARROW, "Back", NamedTextColor.GRAY, false, "Click to go to page " + (mCurrentPage - 1),
-					ChatColor.GRAY));
+			mInventory.setItem(0, createBasicItem(Material.ARROW, "Back", NamedTextColor.GRAY, false, "Click to go to page " + (mCurrentPage - 1),
+			                                      ChatColor.GRAY));
 		}
 		if (mCurrentPage < mNumPages) {
-			_inventory.setItem(8, createBasicItem(Material.ARROW, "Next", NamedTextColor.GRAY, false, "Click to go to page " + (mCurrentPage + 1),
-					ChatColor.GRAY));
+			mInventory.setItem(8, createBasicItem(Material.ARROW, "Next", NamedTextColor.GRAY, false, "Click to go to page " + (mCurrentPage + 1),
+			                                      ChatColor.GRAY));
 		}
 	}
 
@@ -171,8 +171,8 @@ public class PlotAccessCustomInventory extends CustomInventory {
 
 	private void fillJunk() {
 		for (int i = 0; i < 54; i++) {
-			if (_inventory.getItem(i) == null) {
-				_inventory.setItem(i, new ItemStack(FILLER, 1));
+			if (mInventory.getItem(i) == null) {
+				mInventory.setItem(i, new ItemStack(FILLER, 1));
 			}
 		}
 	}
