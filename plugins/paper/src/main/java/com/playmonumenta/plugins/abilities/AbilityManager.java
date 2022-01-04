@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.attribute.Attribute;
@@ -815,6 +816,9 @@ public class AbilityManager {
 
 	public void playerQuitEvent(Player player, PlayerQuitEvent event) {
 		conditionalCast(player, (ability) -> ability.playerQuitEvent(event));
+		Bukkit.getScheduler().runTask(mPlugin, () -> {
+			mAbilities.remove(player.getUniqueId());
+		});
 	}
 
 	public void playerInteractEvent(Player player, Action action, Material blockClicked) {
