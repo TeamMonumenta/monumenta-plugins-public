@@ -35,6 +35,17 @@ jobs:
           cd Paper
           git checkout 1.16
           ./paper jar
+        
+          # run all checkers to make sure they and their dependencies are downloaded and thus cached
+          cd ../plugins/paper
+          mvn compile --batch-mode --no-snapshot-updates -P checkerframework "-Danalyzed.classes=com/playmonumenta/plugins/Plugin.java"
+          mvn checkstyle:checkstyle --batch-mode --no-snapshot-updates
+          mvn pmd:pmd --batch-mode
+        
+          cd ../bungee
+          mvn compile --batch-mode --no-snapshot-updates
+          mvn checkstyle:checkstyle --batch-mode --no-snapshot-updates
+          mvn pmd:pmd --batch-mode
         fi
 
   style:

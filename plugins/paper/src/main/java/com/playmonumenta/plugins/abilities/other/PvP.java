@@ -57,7 +57,7 @@ public class PvP extends Ability {
 			world.spawnParticle(Particle.BLOCK_CRACK, player.getLocation().add(0, 1, 0), 30, 0.15, 0.15, 0.15, 0.75F, Material.REDSTONE_BLOCK.createBlockData());
 			player.sendTitle(ChatColor.RED + "Respawning...", ChatColor.GREEN + "In 3 seconds...", 10, 20 * 2, 10);
 			PotionUtils.clearNegatives(mPlugin, player);
-			ItemStack[] inv = player.getInventory().getContents();
+			@Nullable ItemStack[] inv = player.getInventory().getContents();
 			for (ItemStack item : inv) {
 				if (item != null && item.getType().getMaxDurability() > 0) {
 					ItemMeta meta = item.getItemMeta();

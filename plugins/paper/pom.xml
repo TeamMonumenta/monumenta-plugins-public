@@ -386,20 +386,29 @@
                                 <arg>-Awarns</arg>
                                 <arg>-Xmaxwarns</arg>
                                 <arg>10000</arg>
+                                <!-- Better arrays -->
                                 <arg>-AinvariantArrays</arg>
+                                <!-- Stub files for annotating used libraries -->
                                 <arg>-Astubs=${project.basedir}/../../stubs</arg>
-                                <!-- assumePure gets rid of lots of false positives at the cost of allowing some false negatives -->
+                                <!-- assumePure gets rid of lots of false positives at the cost of allowing some false negatives. -->
+                                <!-- Appears to not work reliably. -->
                                 <arg>-AassumePure</arg>
+                                <!-- The Map Key Checker is pretty useless, ignore it. -->
+                                <arg>-AsuppressWarnings=keyfor</arg>
+                                <!-- Even with verbose debug logging without forking these seem to produce absolutely no output. -->
+                                <!-- They are here anyway in case a future version fixes them. -->
+                                <arg>-AstubDebug</arg>
+                                <arg>-AstubWarnIfNotFound</arg>
                                 <arg>-J--add-exports=jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED</arg>
                                 <arg>-J--add-exports=jdk.compiler/com.sun.tools.javac.code=ALL-UNNAMED</arg>
                                 <arg>-J--add-exports=jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED</arg>
-								<arg>-J--add-exports=jdk.compiler/com.sun.tools.javac.main=ALL-UNNAMED</arg>
-								<arg>-J--add-exports=jdk.compiler/com.sun.tools.javac.model=ALL-UNNAMED</arg>
-								<arg>-J--add-exports=jdk.compiler/com.sun.tools.javac.processing=ALL-UNNAMED</arg>
-								<arg>-J--add-exports=jdk.compiler/com.sun.tools.javac.tree=ALL-UNNAMED</arg>
-								<arg>-J--add-exports=jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED</arg>
-								<arg>-J--add-opens=jdk.compiler/com.sun.tools.javac.comp=ALL-UNNAMED</arg>
-							</compilerArgs>
+                                <arg>-J--add-exports=jdk.compiler/com.sun.tools.javac.main=ALL-UNNAMED</arg>
+                                <arg>-J--add-exports=jdk.compiler/com.sun.tools.javac.model=ALL-UNNAMED</arg>
+                                <arg>-J--add-exports=jdk.compiler/com.sun.tools.javac.processing=ALL-UNNAMED</arg>
+                                <arg>-J--add-exports=jdk.compiler/com.sun.tools.javac.tree=ALL-UNNAMED</arg>
+                                <arg>-J--add-exports=jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED</arg>
+                                <arg>-J--add-opens=jdk.compiler/com.sun.tools.javac.comp=ALL-UNNAMED</arg>
+                            </compilerArgs>
                             <annotationProcessorPaths>
                                 <path>
                                     <groupId>org.checkerframework</groupId>

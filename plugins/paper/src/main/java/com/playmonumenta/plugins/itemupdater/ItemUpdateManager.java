@@ -94,7 +94,7 @@ public class ItemUpdateManager implements Listener {
 		new BukkitRunnable() {
 			@Override
 			public void run() {
-				ItemStack[] items = player.getInventory().getContents();
+				@Nullable ItemStack[] items = player.getInventory().getContents();
 				for (int i = 0; i < items.length; i++) {
 					ItemStack item = items[i];
 					if (preGrabbedItem.isSimilar(item)) {

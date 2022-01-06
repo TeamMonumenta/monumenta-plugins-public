@@ -13,9 +13,9 @@ package org.bukkit.inventory;
 
 public interface Inventory {
 
-	// ItemStack arrays here are all nonnull, but may contain null. Paper fixes getContents, but not other methods.
+    // ItemStack arrays here are all nonnull, but may contain null. Paper fixes getContents, but not other methods.
 
-	@Nullable ItemStack @NonNull [] getStorageContents();
+    @Nullable ItemStack @NonNull [] getStorageContents();
 
     void setContents(@Nullable ItemStack @NonNull [] items);
 
@@ -37,7 +37,7 @@ public interface PlayerInventory extends Inventory {
 
 public class ItemStack {
 
-     boolean equals(@Nullable Object obj);
+    boolean equals(@Nullable Object obj);
 
 }
 
@@ -46,16 +46,16 @@ package org.bukkit.inventory.meta;
 
 public interface ItemMeta {
 
-	// if hasLore() returns true, then getLore() and lore() will not return null
-	@EnsuresNonNullIf(expression="getLore()", result=true)
-	@EnsuresNonNullIf(expression="lore()", result=true)
-	boolean hasLore();
+    // if hasLore() returns true, then getLore() and lore() will not return null
+    @EnsuresNonNullIf(expression="getLore()", result=true)
+    @EnsuresNonNullIf(expression="lore()", result=true)
+    boolean hasLore();
 
-	@EnsuresNonNullIf(expression="getColor()", result=true)
-	boolean hasColor();
+    @EnsuresNonNullIf(expression="getColor()", result=true)
+    boolean hasColor();
 
-	@EnsuresNonNullIf(expression="getDisplayName()", result=true)
-	@EnsuresNonNullIf(expression="displayName()", result=true)
+    @EnsuresNonNullIf(expression="getDisplayName()", result=true)
+    @EnsuresNonNullIf(expression="displayName()", result=true)
     boolean hasDisplayName();
 
 }
@@ -65,9 +65,10 @@ public interface ItemMeta {
 package org.bukkit;
 
 public enum ChatColor {
+    BLACK;
 
-	// returns null only if the argument is null
-	static @PolyNull String stripColor(@PolyNull String input)
+    // returns null only if the argument is null
+    static @PolyNull String stripColor(@PolyNull String input);
 
 }
 
@@ -77,7 +78,7 @@ package org.bukkit.loot;
 
 public interface Lootable {
 
-	@EnsuresNonNullIf(expression="getLootTable()", result=true)
+    @EnsuresNonNullIf(expression="getLootTable()", result=true)
     boolean hasLootTable();
 
 }
@@ -88,7 +89,14 @@ package org.bukkit.entity;
 
 public interface LivingEntity {
 
-	@EnsuresNonNullIf(expression="getPotionEffect(#1)", result=true)
-    boolean hasPotionEffect(@NotNull PotionEffectType type);
+    @EnsuresNonNullIf(expression="getPotionEffect(#1)", result=true)
+    boolean hasPotionEffect(@NonNull PotionEffectType type);
+
+}
+
+public interface Player {
+
+    // For some reason Checker Framework thinks this is nullable (probably because of AnimalTamer), so force it to use NonNull
+    @NonNull String getName();
 
 }
