@@ -1,8 +1,11 @@
 package com.playmonumenta.plugins.listeners;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
@@ -35,6 +38,7 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.entity.EntityRegainHealthEvent;
@@ -75,6 +79,7 @@ import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import org.bukkit.event.player.PlayerToggleSneakEvent;
+import org.bukkit.event.player.PlayerVelocityEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
@@ -1389,4 +1394,50 @@ public class PlayerListener implements Listener {
 		}
 		event.setCancelled(cancel);
 	}
+
+	private static final Set<DamageCause> DISABLE_KNOCKBACK_DAMAGE_CAUSES = Set.of(
+		DamageCause.CONTACT,
+		DamageCause.FALL,
+		DamageCause.FIRE,
+		DamageCause.FIRE_TICK,
+		DamageCause.VOID,
+		DamageCause.STARVATION,
+		DamageCause.POISON,
+		DamageCause.WITHER,
+		DamageCause.HOT_FLOOR);
+
+	private final Set<UUID> mIgnoreKnockbackThisTick = new HashSet<>();
+	private final Set<UUID> mIgnoreKnockbackNextTick = new HashSet<>();
+	private int mKnockbackTaskId = -1;
+
+	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+	public void entityDamageEvent(EntityDamageEvent event) {
+		if (event.getEntity() instanceof Player player
+			    && player.getNoDamageTicks() <= player.getMaximumNoDamageTicks() / 2.0f // can only take knockback again after half the iframes are over
+			    && DISABLE_KNOCKBACK_DAMAGE_CAUSES.contains(event.getCause())) {
+			mIgnoreKnockbackNextTick.add(player.getUniqueId());
+
+			// NB: The two sets are required because this task runs after the damage event, but before the velocity change event.
+			if (mKnockbackTaskId < 0 || !Bukkit.getScheduler().isQueued(mKnockbackTaskId)) {
+				mKnockbackTaskId = Bukkit.getScheduler().scheduleSyncRepeatingTask(mPlugin, () -> {
+					mIgnoreKnockbackThisTick.clear();
+					mIgnoreKnockbackThisTick.addAll(mIgnoreKnockbackNextTick);
+					mIgnoreKnockbackNextTick.clear();
+					if (mIgnoreKnockbackThisTick.isEmpty()) {
+						Bukkit.getScheduler().cancelTask(mKnockbackTaskId);
+						mKnockbackTaskId = -1;
+					}
+				}, 0, 1);
+			}
+		}
+	}
+
+	// Handles cancelled events to properly remove the player from the mIgnoreNextKnockback set even if the event has already been cancelled by another listener
+	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = false)
+	public void playerVelocityEvent(PlayerVelocityEvent event) {
+		if (mIgnoreKnockbackThisTick.remove(event.getPlayer().getUniqueId())) {
+			event.setCancelled(true);
+		}
+	}
+
 }
