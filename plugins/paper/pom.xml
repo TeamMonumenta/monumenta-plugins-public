@@ -394,11 +394,13 @@
                                 <!-- Appears to not work reliably. -->
                                 <arg>-AassumePure</arg>
                                 <!-- The Map Key Checker is pretty useless, ignore it. -->
-                                <arg>-AsuppressWarnings=keyfor</arg>
+                                <!-- Initialisation checks are nice, but cause tons of warnings due to the way bosses are set up. -->
+                                <arg>-AsuppressWarnings=keyfor,initialization</arg>
                                 <!-- Even with verbose debug logging without forking these seem to produce absolutely no output. -->
                                 <!-- They are here anyway in case a future version fixes them. -->
                                 <arg>-AstubDebug</arg>
                                 <arg>-AstubWarnIfNotFound</arg>
+                                <!-- These are required for Checker Framework to run -->
                                 <arg>-J--add-exports=jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED</arg>
                                 <arg>-J--add-exports=jdk.compiler/com.sun.tools.javac.code=ALL-UNNAMED</arg>
                                 <arg>-J--add-exports=jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED</arg>
