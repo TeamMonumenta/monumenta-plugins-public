@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.overrides;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -26,6 +27,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.enchantments.StatTrack.StatTrackOptions;
 import com.playmonumenta.plugins.enchantments.StatTrackManager;
 import com.playmonumenta.plugins.integrations.CoreProtectIntegration;
+import com.playmonumenta.plugins.protocollib.FirmamentLagFix;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
@@ -120,65 +122,58 @@ public class FirmamentOverride extends BaseOverride {
 			if (currentItem.getType().isBlock() && (meta == null || meta instanceof BlockDataMeta)) {
 				//Stat tracking for firmament
 				StatTrackManager.incrementStat(item, player, StatTrackOptions.BLOCKS_PLACED, 1);
-				BlockState state = event.getBlockReplacedState();
-				if (FastUtils.RANDOM.nextBoolean()
-						&& item.getItemMeta().hasLore()
-						&& (InventoryUtils.testForItemWithLore(item, "Prismarine Enabled") || InventoryUtils.testForItemWithLore(item, "Blackstone Enabled"))) {
 
-					// Place a prismarine block instead of the block from the shulker
-					BlockData blockData = null;
+				BlockData blockData;
+				boolean removeItem = true;
+				if (FastUtils.RANDOM.nextBoolean()
+					    && item.getItemMeta().hasLore()
+					    && (InventoryUtils.testForItemWithLore(item, "Prismarine Enabled") || InventoryUtils.testForItemWithLore(item, "Blackstone Enabled"))) {
+					removeItem = false;
+					// Place a prismarine/blackstone block instead of the block from the shulker
 					if (InventoryUtils.testForItemWithName(item, ITEM_NAME)) {
 						blockData = Material.PRISMARINE.createBlockData();
-						state.setBlockData(blockData);
-
-						// Forcibly update the new block state and apply physics
-						state.update(true, true);
-						state.setType(Material.PRISMARINE);
-						//Log the placement
-						CoreProtectIntegration.logPlacement(player, event.getBlock().getLocation(), Material.PRISMARINE, blockData);
 					} else {
 						blockData = Material.BLACKSTONE.createBlockData();
-						state.setBlockData(blockData);
-
-						// Forcibly update the new block state and apply physics
-						state.update(true, true);
-						state.setType(Material.BLACKSTONE);
-						//Log the placement
-						CoreProtectIntegration.logPlacement(player, event.getBlock().getLocation(), Material.BLACKSTONE, blockData);
 					}
-					// No changes needed to the shulker, exit here and cancel the event
-					return false;
-				}
-
-				BlockData blockData = currentItem.getType().createBlockData();
-				if (blockData instanceof Leaves) {
-					((Leaves)blockData).setPersistent(true);
-				}
-
-				if (meta == null) {
-					// If no block data (simple block), create default
-					state.setBlockData(blockData);
-				} else if (meta instanceof BlockDataMeta) {
-					// If some block data (complex block), use it
-					BlockDataMeta blockMeta = (BlockDataMeta)meta;
-					if (blockMeta.hasBlockData()) {
-						//Change blockData if the meta has some already
+				} else {
+					// Use block data from meta if the meta has some already
+					if (meta instanceof BlockDataMeta blockMeta && blockMeta.hasBlockData()) {
 						blockData = blockMeta.getBlockData(currentItem.getType());
-						state.setBlockData(blockData);
 					} else {
-						state.setBlockData(blockData);
+						blockData = currentItem.getType().createBlockData();
+						if (blockData instanceof Leaves) {
+							((Leaves) blockData).setPersistent(true);
+						}
 					}
 				}
-				//Log the placement of the blocks
-				CoreProtectIntegration.logPlacement(player, event.getBlock().getLocation(), currentItem.getType(), blockData);
-				// Forcibly update the new block state and apply physics
-				state.update(true, true);
-				// Set the type of the block
-				state.setType(currentItem.getType());
-				// Update the shulker's inventory and abort
-				shulkerInventory.setItem(i, currentItem.subtract());
-				shulkerMeta.setBlockState(shulkerBox);
-				item.setItemMeta(shulkerMeta);
+
+				// Place the chosen block instead of the Firmament
+				// This is done by setting the "replaced" block state to the desired block state, and then cancelling the event, which will "revert" the block to this state
+				event.getBlockReplacedState().setBlockData(blockData);
+
+				// Log the placement of the block
+				CoreProtectIntegration.logPlacement(player, event.getBlock().getLocation(), blockData.getMaterial(), blockData);
+
+				// Update the Shulker's inventory unless it was a free placement
+				if (removeItem) {
+					shulkerInventory.setItem(i, currentItem.subtract());
+					shulkerMeta.setBlockState(shulkerBox);
+					item.setItemMeta(shulkerMeta);
+				}
+
+				// Prevent sending block update packets for neighbors of the placed block
+				FirmamentLagFix.firmamentUsed(event.getBlock());
+
+				// Force update physics on the placed block
+				Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> {
+					BlockState state = event.getBlock().getState();
+					if (state.getBlockData().equals(blockData)) {
+						event.getBlock().setType(Material.AIR, false);
+						state.update(true, true);
+					}
+				});
+
+				// Cancel the event
 				return false;
 			}
 		}
