@@ -48,6 +48,6 @@ public class MonsterEggOverride extends BaseOverride {
 			}
 		}
 
-		return false;
+		return true;
 	}
 }
