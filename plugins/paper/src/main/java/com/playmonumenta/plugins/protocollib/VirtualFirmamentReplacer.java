@@ -53,6 +53,11 @@ public class VirtualFirmamentReplacer extends PacketAdapter {
 		}
 	}
 
+	public static boolean isVirtualFirmament(ItemStack itemStack) {
+		return itemStack.getType() == Material.PRISMARINE && "Firmament".equals(ItemUtils.getPlainNameIfExists(itemStack))
+			       || itemStack.getType() == Material.BLACKSTONE && "Doorway from Eternity".equals(ItemUtils.getPlainNameIfExists(itemStack));
+	}
+
 	private void processItem(ItemStack itemStack) {
 		if (ItemUtils.isShulkerBox(itemStack.getType())) {
 			String plainName = ItemUtils.getPlainNameIfExists(itemStack);

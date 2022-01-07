@@ -48,6 +48,7 @@ import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.CraftItemEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
+import org.bukkit.event.inventory.InventoryCreativeEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.event.inventory.InventoryInteractEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
@@ -127,6 +128,7 @@ import com.playmonumenta.plugins.network.ClientModHandler;
 import com.playmonumenta.plugins.point.Point;
 import com.playmonumenta.plugins.portals.PortalManager;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
+import com.playmonumenta.plugins.protocollib.VirtualFirmamentReplacer;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.server.reset.DailyReset;
 import com.playmonumenta.plugins.utils.ChestUtils;
@@ -1287,6 +1289,15 @@ public class PlayerListener implements Listener {
 		// When switching to creative, update the inventory to update any virtual Firmaments back into normal Firmaments to prevent breaking them
 		if (event.getNewGameMode() == GameMode.CREATIVE) {
 			Bukkit.getScheduler().runTaskLater(mPlugin, () -> event.getPlayer().updateInventory(), 1);
+		}
+	}
+
+	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+	public void inventoryCreativeEvent(InventoryCreativeEvent event) {
+		// The inventory update initiated above takes a while, during which the Firmament can be broken anyway, so need to watch for these events as well
+		if (event.getCurrentItem() != null && VirtualFirmamentReplacer.isVirtualFirmament(event.getCurrentItem())
+			    || VirtualFirmamentReplacer.isVirtualFirmament(event.getCursor())) {
+			event.setCancelled(true);
 		}
 	}
 
