@@ -41,7 +41,7 @@ import com.playmonumenta.plugins.depths.bosses.spells.SpellPassiveSummons;
 import com.playmonumenta.plugins.depths.bosses.spells.SpellRisingTides;
 import com.playmonumenta.plugins.depths.bosses.spells.SpellSurroundingDeath;
 import com.playmonumenta.plugins.depths.bosses.spells.SpellTectonicDevastation;
-import com.playmonumenta.plugins.depths.bosses.spells.VolcanicDeepmise;
+import com.playmonumenta.plugins.depths.bosses.spells.SpellVolcanicDeepmise;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
@@ -185,7 +185,7 @@ public final class Nucleus extends BossAbilityGroup {
 		));
 		List<Spell> phase3Passives = Arrays.asList(
 			new SpellBlockBreak(mBoss, 2, 3, 2),
-			new VolcanicDeepmise(mBoss, mSpawnLoc),
+			new SpellVolcanicDeepmise(mBoss, mSpawnLoc),
 			new SpellPassiveEyes(mBoss, this, spawnLoc),
 			new SpellPassiveSummons(plugin, mBoss, 30.0, 15, mSpawnLoc.getY(), mSpawnLoc, ((party.getFloor() - 1) / 3) + 1, this)
 		);

@@ -295,6 +295,9 @@ public class BossManager implements Listener {
 		mStatefulBosses.put(Ghalkor.identityTag, (Plugin p, LivingEntity e, Location s, Location l) -> new Ghalkor(p, e, s, l));
 		mStatefulBosses.put(Svalgot.identityTag, (Plugin p, LivingEntity e, Location s, Location l) -> new Svalgot(p, e, s, l));
 		mStatefulBosses.put(BeastOfTheBlackFlame.identityTag, (Plugin p, LivingEntity e, Location s, Location l) -> new BeastOfTheBlackFlame(p, e, s, l));
+		mStatefulBosses.put(RKitxet.identityTag, (Plugin p, LivingEntity e, Location s, Location l) -> new RKitxet(p, e, s, l));
+		mStatefulBosses.put(VerdantMinibossBoss.identityTag, (Plugin p, LivingEntity e, Location s, Location l) -> new VerdantMinibossBoss(p, e, s, l));
+
 
 		/* All bosses have a deserializer which gives the boss back their abilities when chunks re-load */
 		mBossDeserializers = new HashMap<String, BossDeserializer>();
@@ -446,6 +449,8 @@ public class BossManager implements Listener {
 		mBossDeserializers.put(PounceBoss.identityTag, (Plugin p, LivingEntity e) -> PounceBoss.deserialize(p, e));
 		mBossDeserializers.put(NoAbilityDamageBoss.identityTag, (Plugin p, LivingEntity e) -> NoAbilityDamageBoss.deserialize(p, e));
 		mBossDeserializers.put(NoGlowingBoss.identityTag, (Plugin p, LivingEntity e) -> NoGlowingBoss.deserialize(p, e));
+		mBossDeserializers.put(RKitxet.identityTag, (Plugin p, LivingEntity e) -> RKitxet.deserialize(p, e));
+		mBossDeserializers.put(VerdantMinibossBoss.identityTag, (Plugin p, LivingEntity e) -> VerdantMinibossBoss.deserialize(p, e));
 		mBossDeserializers.put(MobRisingBoss.identityTag, (Plugin p, LivingEntity e) -> MobRisingBoss.deserialize(p, e));
 		mBossDeserializers.put(GrenadeLauncherBoss.identityTag, (Plugin p, LivingEntity e) -> GrenadeLauncherBoss.deserialize(p, e));
 

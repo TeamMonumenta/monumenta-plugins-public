@@ -15,6 +15,7 @@ import dev.jorel.commandapi.CommandPermission;
 import dev.jorel.commandapi.arguments.Argument;
 import dev.jorel.commandapi.arguments.IntegerArgument;
 import dev.jorel.commandapi.arguments.MultiLiteralArgument;
+import dev.jorel.commandapi.executors.CommandExecutor;
 
 /*
  * NOTICE!
@@ -44,7 +45,7 @@ public class InfuseHeldItem extends GenericCommand {
 		new CommandAPICommand(COMMAND)
 			.withPermission(perms)
 			.withArguments(arguments)
-			.executes((sender, args) -> {
+			.executes((CommandExecutor) (sender, args) -> {
 				Player player = CommandUtils.getPlayerFromSender(sender);
 				InfusionSelection selection = InfusionSelection.getInfusionSelection((String) args[0]);
 				if (selection == null) {

@@ -18,7 +18,7 @@ import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 
-public class VolcanicDeepmise extends Spell {
+public class SpellVolcanicDeepmise extends Spell {
 
 	public static final double ARENA_SIZE = 30.0;
 	public static final int DAMAGE = 35;
@@ -28,7 +28,7 @@ public class VolcanicDeepmise extends Spell {
 	private final LivingEntity mBoss;
 
 
-	public VolcanicDeepmise(LivingEntity boss, Location spawnLoc) {
+	public SpellVolcanicDeepmise(LivingEntity boss, Location spawnLoc) {
 		mBoss = boss;
 		mCenter = spawnLoc;
 	}
