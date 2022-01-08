@@ -818,6 +818,7 @@ public class AbilityManager {
 		conditionalCast(player, (ability) -> ability.playerQuitEvent(event));
 		Bukkit.getScheduler().runTask(mPlugin, () -> {
 			mAbilities.remove(player.getUniqueId());
+			DelvesUtils.removeDelveInfo(player);
 		});
 	}
 
