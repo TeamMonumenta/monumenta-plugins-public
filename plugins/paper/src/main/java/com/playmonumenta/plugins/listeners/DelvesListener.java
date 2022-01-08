@@ -7,7 +7,6 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.logging.Level;
 
-import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
@@ -23,15 +22,6 @@ import org.bukkit.event.inventory.InventoryInteractEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.util.BoundingBox;
 import org.checkerframework.checker.nullness.qual.Nullable;
-
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.AbilityManager;
-import com.playmonumenta.plugins.abilities.delves.DelveModifier;
-import com.playmonumenta.plugins.server.properties.ServerProperties;
-import com.playmonumenta.plugins.utils.DelvesUtils;
-import com.playmonumenta.plugins.utils.DelvesUtils.DelveModifierSelectionGUI;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.scriptedquests.utils.MessagingUtils;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityManager;
@@ -100,7 +90,7 @@ public class DelvesListener implements Listener {
 
 				// Check that all the delve modifiers are present on the player in the form of abilities before applying them
 				boolean mismatch = false;
-				for (Class<? extends DelveModifier> cls : DelvesUtils.getDelveInfo(player).getActiveModifiers()) {
+				for (Class<? extends DelveModifier> cls : DelvesUtils.getDelveInfo(player).getActiveModifiers(player)) {
 					if (AbilityManager.getManager().getPlayerAbility(player, cls) == null) {
 						mismatch = true;
 						break;
@@ -111,7 +101,7 @@ public class DelvesListener implements Listener {
 				if (mismatch) {
 					AbilityManager.getManager().updatePlayerAbilities(player);
 
-					for (Class<? extends DelveModifier> cls : DelvesUtils.getDelveInfo(player).getActiveModifiers()) {
+					for (Class<? extends DelveModifier> cls : DelvesUtils.getDelveInfo(player).getActiveModifiers(player)) {
 						if (AbilityManager.getManager().getPlayerAbility(player, cls) == null) {
 							// Reset delve points to prevent cases like broken modifiers but loot still being boosted
 							DelvesUtils.setDelveScore(player, ServerProperties.getShardName(), 0);
@@ -125,7 +115,7 @@ public class DelvesListener implements Listener {
 				}
 
 				// Actually apply modifiers now that we know they're all present
-				for (Class<? extends DelveModifier> cls : DelvesUtils.getDelveInfo(player).getActiveModifiers()) {
+				for (Class<? extends DelveModifier> cls : DelvesUtils.getDelveInfo(player).getActiveModifiers(player)) {
 					AbilityManager.getManager().getPlayerAbility(player, cls).applyOnSpawnModifiers((LivingEntity) entity, event);
 				}
 			}

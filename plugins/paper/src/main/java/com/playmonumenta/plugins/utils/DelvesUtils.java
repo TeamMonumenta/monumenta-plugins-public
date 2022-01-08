@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.WeakHashMap;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
@@ -127,6 +128,11 @@ public class DelvesUtils {
 		}
 	}
 
+	/*
+	 * NOTE: This class must not hold a reference to the player it describes,
+	 * otherwise this will form a reference loop and prevent the player object
+	 * from being garbage collected once it is no longer in use
+	 */
 	public static final class DelveInfo {
 
 		private static final int MAX_DEPTH_POINTS;
@@ -181,7 +187,6 @@ public class DelvesUtils {
 			MAX_DEPTH_POINTS = maxDepthPoints;
 		}
 
-		private final Player mPlayer;
 		private final String mDungeon;
 
 		private boolean mIsDepths = false;
@@ -203,7 +208,6 @@ public class DelvesUtils {
 		}
 
 		private DelveInfo(Player player, String dungeon, long delveScore) {
-			mPlayer = player;
 			mDungeon = dungeon;
 			mDelveScore = delveScore;
 			if (ServerProperties.getShardName().contains("depths")
@@ -211,7 +215,7 @@ public class DelvesUtils {
 				mIsDepths = true;
 			}
 
-			if (!storeDelveInfo()) {
+			if (!storeDelveInfo(player)) {
 				player.sendMessage("You currently have an invalid Delves score. Please contact a moderator, and do NOT start/continue a Delve.");
 			}
 		}
@@ -223,7 +227,7 @@ public class DelvesUtils {
 		 * 00 0 0000000000000 000000 000 000 000 000 000 000 000 000 000 000 000 000 000 000
 		 * x  a u             d      m   m   m   m   m   m   m   m   m   m   m   m   m   m
 		 */
-		private boolean storeDelveInfo() {
+		private boolean storeDelveInfo(Player player) {
 			if (mDelveScore == 0) {
 				mIsEditable = true;
 
@@ -295,7 +299,7 @@ public class DelvesUtils {
 			return mIsEditable;
 		}
 
-		public void storeDelveScore() {
+		public void storeDelveScore(Player player) {
 			assignEntropyDepthPoints();
 
 			mDelveScore = getDepthPoints();
@@ -312,9 +316,9 @@ public class DelvesUtils {
 				mDelveScore |= 0x2000000000000000L;
 			}
 
-			setDelveScore(mPlayer, mDungeon, mDelveScore);
+			setDelveScore(player, mDungeon, mDelveScore);
 
-			DELVE_INFO_MAPPINGS.put(mPlayer.getUniqueId(), this);
+			DELVE_INFO_MAPPINGS.put(player, this);
 		}
 
 		private void assignEntropyDepthPoints() {
@@ -365,15 +369,15 @@ public class DelvesUtils {
 			                mDepthPointsRegular + mDepthPointsEntropyUnassigned) + mDepthPointsTwisted;
 		}
 
-		public Collection<Class<? extends DelveModifier>> getActiveModifiers() {
+		public Collection<Class<? extends DelveModifier>> getActiveModifiers(Player player) {
 			Collection<Class<? extends DelveModifier>> activeModifiers = new ArrayList<>();
 
-			if (StatMultiplier.canUseStatic(mPlayer)) {
+			if (StatMultiplier.canUseStatic(player)) {
 				activeModifiers.add(StatMultiplier.class);
 			}
 
 			for (Modifier modifier : mModifierRanks.keySet()) {
-				if (DelveModifier.canUse(mPlayer, modifier)) {
+				if (DelveModifier.canUse(player, modifier)) {
 					activeModifiers.add(modifier.getAbilityClass());
 				}
 			}
@@ -382,7 +386,8 @@ public class DelvesUtils {
 		}
 	}
 
-	private static final Map<UUID, DelveInfo> DELVE_INFO_MAPPINGS = new HashMap<>();
+	/* NOTE: This is a WeakHashMap (weak keys), so entries will be automatically removed by garbage collection */
+	private static final Map<Player, DelveInfo> DELVE_INFO_MAPPINGS = new WeakHashMap<>();
 
 	private static final Map<String, String> SHARD_SCOREBOARD_PREFIX_MAPPINGS = new HashMap<>();
 
@@ -435,10 +440,10 @@ public class DelvesUtils {
 	}
 
 	public static DelveInfo getDelveInfo(Player player) {
-		DelveInfo info = DELVE_INFO_MAPPINGS.get(player.getUniqueId());
+		DelveInfo info = DELVE_INFO_MAPPINGS.get(player);
 		if (info == null) {
 			info = new DelveInfo(player);
-			DELVE_INFO_MAPPINGS.put(player.getUniqueId(), info);
+			DELVE_INFO_MAPPINGS.put(player, info);
 		}
 
 		return info;
@@ -455,7 +460,7 @@ public class DelvesUtils {
 	}
 
 	public static @Nullable DelveInfo removeDelveInfo(Player player) {
-		return DELVE_INFO_MAPPINGS.remove(player.getUniqueId());
+		return DELVE_INFO_MAPPINGS.remove(player);
 	}
 
 	public static void duplicateLibraryOfSoulsMob(LivingEntity mob) {
@@ -755,7 +760,7 @@ public class DelvesUtils {
 
 		private void beginDelve() {
 			if (mCanBeginDelve) {
-				mDelveInfo.storeDelveScore();
+				mDelveInfo.storeDelveScore(mPlayer);
 				DelvesListener.closeGUI(mPlayer);
 
 				Bukkit.getConsoleSender().getServer().dispatchCommand(Bukkit.getConsoleSender(),

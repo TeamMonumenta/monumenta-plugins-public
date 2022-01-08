@@ -54,10 +54,10 @@ public class DepthsEndlessDifficulty {
 		if (twisted) {
 			info.setRank(Modifier.TWISTED, 1);
 			info.setRank(Modifier.ENTROPY, 5);
-			info.storeDelveScore();
+			info.storeDelveScore(playerToUse);
 		} else {
 			//Assign random points to that player on top of what they currently have
-			assignRandomDelvePoints(info, pointsToAssign);
+			assignRandomDelvePoints(playerToUse, info, pointsToAssign);
 		}
 
 		//Store player's modifiers in the party index
@@ -83,7 +83,7 @@ public class DepthsEndlessDifficulty {
 				} else {
 					playerInfo.setRank(m, 0);
 				}
-				playerInfo.storeDelveScore();
+				playerInfo.storeDelveScore(p);
 			}
 		}
 
@@ -96,7 +96,7 @@ public class DepthsEndlessDifficulty {
 		}
 	}
 
-	public static void assignRandomDelvePoints(DelveInfo info, int points) {
+	private static void assignRandomDelvePoints(Player player, DelveInfo info, int points) {
 
 		// Mostly copied from entropy assignment, gives random available delve points to the player before
 		// distributing them to the rest of the party
@@ -119,6 +119,6 @@ public class DepthsEndlessDifficulty {
 				modifiers.remove(index);
 			}
 		}
-		info.storeDelveScore();
+		info.storeDelveScore(player);
 	}
 }
