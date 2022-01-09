@@ -22,6 +22,7 @@ import org.bukkit.entity.Projectile;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.event.entity.EntityTargetEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -42,6 +43,7 @@ import com.playmonumenta.plugins.bosses.spells.rkitxet.SpellVerdantProtection;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.NmsUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
 import com.playmonumenta.plugins.utils.SerializationUtils;
@@ -98,8 +100,8 @@ public class RKitxet extends BossAbilityGroup {
 				}
 
 				List<Player> players = PlayerUtils.playersInRange(mSpawnLoc, detectionRange, true);
-				if (players != null && players.size() > 0 && mBoss instanceof Mob) {
-					((Mob)mBoss).setTarget(players.get(0));
+				if (players != null && players.size() > 0 && mBoss instanceof Mob mob) {
+					mob.setTarget(players.get(0));
 				}
 			}
 		}.runTaskTimer(mPlugin, 0, SWAP_TARGET_SECONDS * 20);
@@ -235,8 +237,23 @@ public class RKitxet extends BossAbilityGroup {
 				} else if (mCount == 3) {
 					message = ChatColor.DARK_GREEN + "THIS PLACE BELONGS TO THE JUNGLE ALONE. YOU ALL SHALL PAY FOR YOUR TRANSGRESSIONS.";
 				} else {
+					// Do health scaling here because players might not have been teleported in yet when init() would be run
+					List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true);
+					int playerCount = players.size();
+					int hp = (int) (RKITXET_HEALTH * (1 + (1 - 1/Math.E) * Math.log(playerCount)));
+					mBoss.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(hp);
+					mBoss.setHealth(hp);
 					mBoss.setInvulnerable(false);
 					mBoss.setAI(true);
+					mBoss.getAttribute(Attribute.GENERIC_FOLLOW_RANGE).setBaseValue(detectionRange);
+					mBoss.getAttribute(Attribute.GENERIC_KNOCKBACK_RESISTANCE).setBaseValue(1);
+
+					//launch event related spawn commands
+					PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "effect give @s minecraft:blindness 2 2");
+					PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "title @s title [\"\",{\"text\":\"R'Kitxet\",\"color\":\"dark_green\",\"bold\":true}]");
+					PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "title @s subtitle [\"\",{\"text\":\"Forsaken Elder\",\"color\":\"light_green\",\"bold\":true}]");
+					PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "playsound minecraft:entity.wither.spawn master @s ~ ~ ~ 10 0.7");
+
 					changePhase(phase1Actives, phase1Passives, null);
 					this.cancel();
 					return;
@@ -249,23 +266,6 @@ public class RKitxet extends BossAbilityGroup {
 		}.runTaskTimer(mPlugin, 0, 20);
 
 		super.constructBoss(phase1Actives, phase1Passives, detectionRange, bossBar);
-	}
-
-	@Override
-	public void init() {
-		List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true);
-		int playerCount = players.size();
-		int hp = (int) (RKITXET_HEALTH * (1 + (1 - 1/Math.E) * Math.log(playerCount)));
-		mBoss.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(hp);
-		mBoss.setHealth(hp);
-		mBoss.getAttribute(Attribute.GENERIC_FOLLOW_RANGE).setBaseValue(detectionRange);
-		mBoss.getAttribute(Attribute.GENERIC_KNOCKBACK_RESISTANCE).setBaseValue(1);
-
-		//launch event related spawn commands
-		PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "effect give @s minecraft:blindness 2 2");
-		PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "title @s title [\"\",{\"text\":\"R'Kitxet\",\"color\":\"dark_green\",\"bold\":true}]");
-		PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "title @s subtitle [\"\",{\"text\":\"Forsaken Elder\",\"color\":\"light_green\",\"bold\":true}]");
-		PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "playsound minecraft:entity.wither.spawn master @s ~ ~ ~ 10 0.7");
 	}
 
 	@Override
@@ -330,10 +330,21 @@ public class RKitxet extends BossAbilityGroup {
 		if (event.getEntity() instanceof Player player) {
 			if (event.getCause().equals(DamageCause.ENTITY_ATTACK)) {
 				if (player.isBlocking()) {
-					player.setCooldown(Material.SHIELD, 20 * 10);
+					NmsUtils.stunShield(player, 20 * 10);
 				}
 			}
 		}
+	}
+
+	@Override
+	public void bossChangedTarget(EntityTargetEvent event) {
+		if (!(event.getTarget() instanceof Player)) {
+			event.setCancelled(true);
+		}
+	}
+
+	public LivingEntity getEntity() {
+		return mBoss;
 	}
 
 	public Location getBossLocation() {

@@ -24,6 +24,7 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.event.entity.EntityTargetEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -38,6 +39,7 @@ import com.playmonumenta.plugins.bosses.spells.rkitxet.SpellKaulsFury;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.NmsUtils;
 import com.playmonumenta.plugins.utils.ParticleUtils;
 import com.playmonumenta.plugins.utils.ParticleUtils.SpawnParticleAction;
 import com.playmonumenta.plugins.utils.PlayerUtils;
@@ -217,7 +219,7 @@ public class VerdantMinibossBoss extends BossAbilityGroup {
 							}
 
 							for (LivingEntity mob : EntityUtils.getNearbyMobs(mLocation, DAMAGE_RADIUS)) {
-								BossUtils.bossDamage(mBoss, mob, DAMAGE / 2.0);
+								mob.damage(DAMAGE / 2.0);
 							}
 
 							world.playSound(mLocation, Sound.ENTITY_GENERIC_EXPLODE, 1.5f, 1);
@@ -278,13 +280,19 @@ public class VerdantMinibossBoss extends BossAbilityGroup {
 
 	@Override
 	public void bossDamagedEntity(EntityDamageByEntityEvent event) {
-		if (event.getEntity() instanceof Player) {
-			Player player = (Player) event.getEntity();
+		if (event.getEntity() instanceof Player player) {
 			if (event.getCause().equals(DamageCause.ENTITY_ATTACK)) {
 				if (player.isBlocking()) {
-					player.setCooldown(Material.SHIELD, 20 * 10);
+					NmsUtils.stunShield(player, 20 * 10);
 				}
 			}
+		}
+	}
+
+	@Override
+	public void bossChangedTarget(EntityTargetEvent event) {
+		if (!(event.getTarget() instanceof Player)) {
+			event.setCancelled(true);
 		}
 	}
 

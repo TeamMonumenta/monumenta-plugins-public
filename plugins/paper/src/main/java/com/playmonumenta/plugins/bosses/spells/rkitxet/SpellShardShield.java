@@ -18,7 +18,7 @@ public class SpellShardShield extends Spell {
 	public static final int SHIELD_INTERVAL_1 = 35 * 20;
 	public static final int SHIELD_INTERVAL_2 = 20 * 20;
 	public static final int MIN_TIME_UNTIL_SHIELD_1 = 15 * 20;
-	public static final int MIN_TIME_UNTIL_SHIELD_2 = 5 * 20;
+	public static final int MIN_TIME_UNTIL_SHIELD_2 = 10 * 20;
 
 	private LivingEntity mBoss;
 	private int mTicks;
@@ -57,7 +57,7 @@ public class SpellShardShield extends Spell {
 
 			world.spawnParticle(Particle.ENCHANTMENT_TABLE, loc.clone().add(0, 1, 0), 10, 1, 1, 1);
 		} else if (mUnshieldableTime == 0 && mTicks % mShieldInterval == 0) {
-			applyShield();
+			applyShield(false);
 		}
 
 		if (mUnshieldableTime > 0) {
@@ -65,18 +65,29 @@ public class SpellShardShield extends Spell {
 		}
 	}
 
-	public void applyShield() {
+	public void applyShield(boolean forced) {
+		if (mMinTimeUntilShield - mUnshieldableTime <= 3 * 20) {
+			return;
+		}
+
 		if (!mShielded) {
 			mTicks = 0;
 			mShielded = true;
 
 			for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), RKitxet.detectionRange, true)) {
-				player.sendMessage(ChatColor.AQUA + "The protective shield reforms around R'Kitxet.");
+				if (!forced) {
+					player.sendMessage(ChatColor.AQUA + "The protective shield reforms around R'Kitxet.");
+				} else {
+					player.sendMessage(ChatColor.AQUA + "R'Kitxet drained someone's lifeforce, reforming the protective shield.");
+				}
 			}
 
 			World world = mBoss.getWorld();
 			world.playSound(mBoss.getLocation(), Sound.BLOCK_BEACON_ACTIVATE, 3f, 0.5f);
 			world.playSound(mBoss.getLocation(), Sound.BLOCK_BEACON_ACTIVATE, 3f, 2f);
+			if (forced) {
+				world.playSound(mBoss.getLocation(), Sound.ENTITY_WITCH_CELEBRATE, 1.2f, 0.6f);
+			}
 		}
 	}
 

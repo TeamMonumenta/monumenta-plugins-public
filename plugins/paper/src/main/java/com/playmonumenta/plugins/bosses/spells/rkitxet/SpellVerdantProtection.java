@@ -65,7 +65,7 @@ public class SpellVerdantProtection extends SpellBaseAoE {
 				}
 
 				if (hasHit) {
-					rKitxet.mShieldSpell.applyShield();
+					rKitxet.mShieldSpell.applyShield(true);
 				}
 			}
 		);

@@ -118,7 +118,7 @@ public class SpellKaulsFury extends Spell {
 						}
 
 						for (LivingEntity mob : EntityUtils.getNearbyMobs(mLocation, DAMAGE_RADIUS)) {
-							BossUtils.bossDamage(mBoss, mob, DAMAGE / 2.0);
+							mob.damage(DAMAGE / 2.0);
 						}
 
 						world.playSound(mLocation, Sound.ENTITY_GENERIC_EXPLODE, 1.5f, 1);
