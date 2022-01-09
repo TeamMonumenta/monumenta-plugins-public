@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.attributes;
 
+import com.playmonumenta.plugins.server.properties.ServerProperties;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -41,6 +42,7 @@ public class AttributeThrowRate implements BaseAttribute {
 
 	@Override
 	public void onLaunchProjectile(Plugin plugin, Player player, double value, Projectile proj, ProjectileLaunchEvent event) {
+
 		/*
 		 * TODO:
 		 * Since we have a generic entity cloning method now, we can
@@ -62,6 +64,11 @@ public class AttributeThrowRate implements BaseAttribute {
 				if (TwoHanded.checkForOffhand(player)) {
 					return;
 				}
+			}
+
+			if (InventoryUtils.testForItemWithLore(player.getItemInHand(), "Celsian Isles : ") && ServerProperties.getClassSpecializationsEnabled() == false) {
+				event.setCancelled(true);
+				return;
 			}
 
 			// Only run Throw Rate if the Infinity enchantment is not on the trident
@@ -130,6 +137,10 @@ public class AttributeThrowRate implements BaseAttribute {
 		} else if (proj instanceof Snowball) {
 			if (value > 0) {
 				Snowball snowball = (Snowball) player.getWorld().spawnEntity(proj.getLocation(), EntityType.SNOWBALL);
+				if (InventoryUtils.testForItemWithLore(player.getItemInHand(), "Celsian Isles : ") && ServerProperties.getClassSpecializationsEnabled() == false) {
+					event.setCancelled(true);
+					return;
+				}
 				snowball.setShooter(player);
 				snowball.setVelocity(proj.getVelocity());
 				player.playSound(player.getLocation(), Sound.ENTITY_SNOWBALL_THROW, SoundCategory.PLAYERS, 0.5f, 0.5f);
