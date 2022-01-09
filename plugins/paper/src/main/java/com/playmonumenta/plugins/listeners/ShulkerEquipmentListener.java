@@ -173,7 +173,7 @@ public class ShulkerEquipmentListener implements Listener {
 		/* Prevent swapping/nesting shulkers */
 		for (Map.Entry<Integer, Integer> slot : SWAP_SLOTS.entrySet()) {
 			ItemStack item = pInv.getItem(slot.getKey());
-			if (item != null && ItemUtils.isShulkerBox(item.getType()) && !FirmamentOverride.isFirmamentItem(item)) {
+			if (item != null && ItemUtils.isShulkerBox(item.getType()) && !FirmamentOverride.isFirmamentItem(item) && !isPotionInjectorItem(item)) {
 				player.sendMessage(ChatColor.RED + "You can not store shulker boxes");
 				player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1.0f, 1.1f);
 				return;
@@ -225,5 +225,14 @@ public class ShulkerEquipmentListener implements Listener {
 	//False if no cooldowns and the lockbox is activatable now
 	private boolean checkSwapCooldown(Player player) {
 		return mCooldowns.containsKey(player.getUniqueId()) && !mCooldowns.get(player.getUniqueId()).isCancelled();
+	}
+
+	public static boolean isPotionInjectorItem(ItemStack item) {
+		return item != null &&
+		       item.getType() != null &&
+		       ItemUtils.isShulkerBox(item.getType()) &&
+			   item.hasItemMeta() &&
+			   item.getItemMeta().hasLore() &&
+		       InventoryUtils.testForItemWithName(item, "Potion Injector");
 	}
 }
