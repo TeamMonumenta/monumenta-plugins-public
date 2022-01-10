@@ -816,9 +816,9 @@ public class AbilityManager {
 
 	public void playerQuitEvent(Player player, PlayerQuitEvent event) {
 		conditionalCast(player, (ability) -> ability.playerQuitEvent(event));
-		Bukkit.getScheduler().runTask(mPlugin, () -> {
+		Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
 			mAbilities.remove(player.getUniqueId());
-		});
+		}, 5);
 	}
 
 	public void playerInteractEvent(Player player, Action action, Material blockClicked) {
