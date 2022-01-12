@@ -1,5 +1,7 @@
 package com.playmonumenta.plugins.bosses.spells.rkitxet;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
 import org.bukkit.Location;
@@ -16,7 +18,7 @@ import com.playmonumenta.plugins.utils.PlayerUtils;
 
 public class SpellEndlessAgonyDamage extends Spell {
 	private double RADIUS = SpellEndlessAgony.RADIUS;
-	private static final double DAMAGE_PERCENT = 0.12;
+	private static final double DAMAGE = 5;
 
 	private ThreadLocalRandom mRand = ThreadLocalRandom.current();
 	private RKitxet mRKitxet;
@@ -34,12 +36,16 @@ public class SpellEndlessAgonyDamage extends Spell {
 		//This function runs every 5 ticks
 		mTicks += 5;
 
+		List<Player> hitPlayers = new ArrayList<Player>();
 		for (Location loc : mRKitxet.mAgonyLocations) {
 			if (mTicks % 10 == 0) {
 				for (Player p : PlayerUtils.playersInCylinder(loc, RADIUS, RADIUS)) {
-					Vector v = p.getVelocity();
-					BossUtils.bossDamagePercent(mBoss, p, DAMAGE_PERCENT, null, "Endless Agony");
-					p.setVelocity(v);
+					if (!hitPlayers.contains(p)) {
+						Vector v = p.getVelocity();
+						BossUtils.bossDamage(mBoss, p, DAMAGE, null, "Endless Agony");
+						p.setVelocity(v);
+						hitPlayers.add(p);
+					}
 				}
 			}
 

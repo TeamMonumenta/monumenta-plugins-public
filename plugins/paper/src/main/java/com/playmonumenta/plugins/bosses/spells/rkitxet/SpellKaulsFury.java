@@ -60,8 +60,12 @@ public class SpellKaulsFury extends Spell {
 			if (players.size() == 0) {
 				return;
 			}
+			if (players.size() > 1 && mRKitxet.getFuryTarget() != null) {
+				players.remove(mRKitxet.getAgonyTarget());
+			}
 			Collections.shuffle(players);
 			Player target = players.get(0);
+			mRKitxet.setFuryTarget(target);
 
 			target.playSound(target.getLocation(), Sound.ENTITY_BLAZE_SHOOT, 2, 1.5f);
 			world.playSound(target.getLocation(), Sound.ENTITY_BLAZE_SHOOT, 1, 2);
@@ -131,6 +135,7 @@ public class SpellKaulsFury extends Spell {
 										})
 								));
 
+						mRKitxet.setFuryTarget(null);
 						this.cancel();
 					}
 

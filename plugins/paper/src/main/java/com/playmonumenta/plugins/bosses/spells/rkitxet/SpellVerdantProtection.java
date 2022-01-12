@@ -24,8 +24,8 @@ public class SpellVerdantProtection extends SpellBaseAoE {
 
 	private RKitxet mRKitxet;
 
-	public SpellVerdantProtection(Plugin plugin, LivingEntity launcher, int radius, int time, RKitxet rKitxet) {
-		super(plugin, launcher, radius, time, rKitxet.mCooldownTicks, false, Sound.BLOCK_ROOTS_BREAK,
+	public SpellVerdantProtection(Plugin plugin, LivingEntity launcher, int radius, int time, int cooldown, RKitxet rKitxet) {
+		super(plugin, launcher, radius, time, cooldown, false, Sound.BLOCK_ROOTS_BREAK,
 			(Location loc) -> {
 				World world = loc.getWorld();
 				world.spawnParticle(Particle.CRIMSON_SPORE, loc, 1, ((double) radius) / 2, ((double) radius) / 2, ((double) radius) / 2);
@@ -48,6 +48,8 @@ public class SpellVerdantProtection extends SpellBaseAoE {
 				world.spawnParticle(Particle.REDSTONE, loc, 1, 0.25, 0.25, 0.25, 0.1, VERDANT_PROTECTION_COLOR);
 			},
 			(Location loc) -> {
+				rKitxet.useSpell("Verdant Protection");
+
 				boolean hasHit = false;
 				for (Player player : PlayerUtils.playersInRange(launcher.getLocation(), radius, true)) {
 					BossUtils.bossDamage(launcher, player, DAMAGE, launcher.getLocation(), "Verdant Protection");
@@ -72,12 +74,12 @@ public class SpellVerdantProtection extends SpellBaseAoE {
 		mRKitxet = rKitxet;
 	}
 
-	public SpellVerdantProtection(Plugin plugin, LivingEntity launcher, RKitxet rKitxet) {
-		this(plugin, launcher, RADIUS, DURATION, rKitxet);
+	public SpellVerdantProtection(Plugin plugin, LivingEntity launcher, int cooldown, RKitxet rKitxet) {
+		this(plugin, launcher, RADIUS, DURATION, cooldown, rKitxet);
 	}
 
 	@Override
-	public int cooldownTicks() {
-		return mRKitxet.mCooldownTicks;
+	public boolean canRun() {
+		return mRKitxet.canUseSpell("Verdant Protection");
 	}
 }

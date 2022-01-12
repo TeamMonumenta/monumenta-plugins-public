@@ -26,12 +26,14 @@ public class SpellRKitxetSummon extends Spell {
 	private Plugin mPlugin;
 	private RKitxet mRKitxet;
 	private LivingEntity mBoss;
+	private int mCooldown;
 	public List<String> mSummonOptions;
 
-	public SpellRKitxetSummon(Plugin plugin, RKitxet rKitxet, LivingEntity boss) {
+	public SpellRKitxetSummon(Plugin plugin, RKitxet rKitxet, LivingEntity boss, int cooldown) {
 		mPlugin = plugin;
 		mRKitxet = rKitxet;
 		mBoss = boss;
+		mCooldown = cooldown;
 		mSummonOptions = new ArrayList<>();
 		mSummonOptions.add("BlightedWarden");
 		mSummonOptions.add("DecayingTlaxan");
@@ -42,6 +44,8 @@ public class SpellRKitxetSummon extends Spell {
 
 	@Override
 	public void run() {
+		mRKitxet.useSpell("Summon");
+
 		int count = 0;
 		List<Location> summonLocs = mRKitxet.mAgonyLocations;
 		Collections.shuffle(summonLocs);
@@ -107,11 +111,11 @@ public class SpellRKitxetSummon extends Spell {
 
 	@Override
 	public boolean canRun() {
-		return mRKitxet.mAgonyLocations.size() > 0 && EntityUtils.getNearbyMobs(mRKitxet.getSpawnLocation(), RKitxet.detectionRange).size() < 25;
+		return mRKitxet.mAgonyLocations.size() > 0 && EntityUtils.getNearbyMobs(mRKitxet.getSpawnLocation(), RKitxet.detectionRange).size() < 25 && mRKitxet.canUseSpell("Summon");
 	}
 
 	@Override
 	public int cooldownTicks() {
-		return mRKitxet.mCooldownTicks;
+		return mCooldown;
 	}
 }

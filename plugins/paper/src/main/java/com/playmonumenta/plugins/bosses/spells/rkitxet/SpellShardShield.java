@@ -66,7 +66,7 @@ public class SpellShardShield extends Spell {
 	}
 
 	public void applyShield(boolean forced) {
-		if (mMinTimeUntilShield - mUnshieldableTime <= 3 * 20) {
+		if (forced && mMinTimeUntilShield - mUnshieldableTime <= 3 * 20) {
 			return;
 		}
 
@@ -109,6 +109,8 @@ public class SpellShardShield extends Spell {
 	public void activatePhase2() {
 		mShieldInterval = SHIELD_INTERVAL_2;
 		mMinTimeUntilShield = MIN_TIME_UNTIL_SHIELD_2;
+		applyShield(false);
+
 	}
 
 	public boolean isShielded() {

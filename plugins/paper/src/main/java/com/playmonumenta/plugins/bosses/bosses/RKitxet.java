@@ -27,6 +27,7 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.bosses.BossBarManager;
 import com.playmonumenta.plugins.bosses.BossBarManager.BossHealthAction;
@@ -53,13 +54,13 @@ import net.md_5.bungee.api.ChatColor;
 public class RKitxet extends BossAbilityGroup {
 	public static final String identityTag = "boss_rkitxet";
 	public static final int detectionRange = 50;
-	public static final int RKITXET_HEALTH = 1000;
+	public static final int RKITXET_HEALTH = 1400;
 	public static final int SWAP_TARGET_SECONDS = 15;
 
 	private static final int MUSIC_DURATION = 3 * 60 + 39; //seconds
 	private static final String GOLEM_TAG = "Golem";
-	private static final int COOLDOWN_TICKS_1 = 12 * 20;
-	private static final int COOLDOWN_TICKS_2 = 8 * 20;
+	private static final int COOLDOWN_TICKS_1 = 10 * 20;
+	private static final int COOLDOWN_TICKS_2 = 7 * 20;
 
 	private final Location mSpawnLoc;
 	private final Location mEndLoc;
@@ -68,7 +69,11 @@ public class RKitxet extends BossAbilityGroup {
 	public SpellEndlessAgony mEndlessAgony;
 	public List<Location> mAgonyLocations;
 
-	public int mCooldownTicks;
+	private @Nullable Player mAgonyTarget;
+	private @Nullable Player mFuryTarget;
+
+	private @Nullable String mLastUsedSpell;
+	private boolean mSameSpellUsedTwice;
 
 	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
 		return SerializationUtils.statefulBossDeserializer(boss, identityTag, (spawnLoc, endLoc) -> {
@@ -86,7 +91,9 @@ public class RKitxet extends BossAbilityGroup {
 		mSpawnLoc = spawnLoc;
 		mEndLoc = endLoc;
 		mAgonyLocations = new ArrayList<Location>();
-		mCooldownTicks = COOLDOWN_TICKS_1;
+
+		mLastUsedSpell = null;
+		mSameSpellUsedTwice = false;
 
 		mBoss.setRemoveWhenFarAway(false);
 		mBoss.addScoreboardTag("Boss");
@@ -116,10 +123,10 @@ public class RKitxet extends BossAbilityGroup {
 				}
 
 				for (Player player : PlayerUtils.playersInRange(mSpawnLoc, detectionRange, true)) {
-					if (player.getLocation().distance(mSpawnLoc) > 30 || player.getLocation().getY() > mSpawnLoc.getY() + 6) {
+					if (player.getLocation().distance(mSpawnLoc) > 30 || (player.getLocation().getY() > mSpawnLoc.getY() + 4 && player.isOnGround())) {
 						//Give 10 seconds at the beginning of the fight before actually damaging
 						if (mBoss.getTicksLived() >= 200) {
-							PotionUtils.applyPotion(mBoss, player, new PotionEffect(PotionEffectType.POISON, 2, 30 * 20));
+							PotionUtils.applyPotion(mBoss, player, new PotionEffect(PotionEffectType.POISON, 30 * 20, 2));
 							BossUtils.bossDamagePercent(mBoss, player, 0.1, (Location)null);
 						}
 					} else if (player.isInWaterOrBubbleColumn()) {
@@ -148,21 +155,18 @@ public class RKitxet extends BossAbilityGroup {
 		//The SpellShardShield class stores the information about the shield and handles adding/removing the shield
 		mShieldSpell = new SpellShardShield(mBoss);
 
-		//EndlessAgony needs to be instantiated so that the portals don't go away
-		mEndlessAgony = new SpellEndlessAgony(mPlugin, this, mSpawnLoc, detectionRange);
-
 		//Only change between phase 1 and 2 is the cooldowns of the spells
 		SpellManager phase1Actives = new SpellManager(Arrays.asList(
-			mEndlessAgony,
-			new SpellForsakenLeap(mPlugin, mBoss, COOLDOWN_TICKS_1),
-			new SpellVerdantProtection(mPlugin, mBoss, this),
-			new SpellRKitxetSummon(mPlugin, this, boss)
+			new SpellEndlessAgony(mPlugin, this, mSpawnLoc, detectionRange, COOLDOWN_TICKS_1),
+			new SpellForsakenLeap(mPlugin, mBoss, COOLDOWN_TICKS_1, this),
+			new SpellVerdantProtection(mPlugin, mBoss, COOLDOWN_TICKS_1, this),
+			new SpellRKitxetSummon(mPlugin, this, boss, COOLDOWN_TICKS_1)
 		));
 		SpellManager phase2Actives = new SpellManager(Arrays.asList(
-			mEndlessAgony,
-			new SpellForsakenLeap(mPlugin, mBoss, COOLDOWN_TICKS_2),
-			new SpellVerdantProtection(mPlugin, mBoss, this),
-			new SpellRKitxetSummon(mPlugin, this, boss)
+			new SpellEndlessAgony(mPlugin, this, mSpawnLoc, detectionRange, COOLDOWN_TICKS_2),
+			new SpellForsakenLeap(mPlugin, mBoss, COOLDOWN_TICKS_2, this),
+			new SpellVerdantProtection(mPlugin, mBoss, COOLDOWN_TICKS_2, this),
+			new SpellRKitxetSummon(mPlugin, this, boss, COOLDOWN_TICKS_2)
 		));
 
 		List<Spell> phase1Passives = Arrays.asList(
@@ -211,7 +215,6 @@ public class RKitxet extends BossAbilityGroup {
 			//Kaul's Fury casts much sooner and falls quicker
 			changePhase(phase2Actives, phase2Passives, null);
 			mShieldSpell.activatePhase2();
-			mCooldownTicks = COOLDOWN_TICKS_2;
 
 			for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true)) {
 				player.sendMessage(ChatColor.GREEN + "Please, end this.");
@@ -219,7 +222,7 @@ public class RKitxet extends BossAbilityGroup {
 		});
 
 		BossBarManager bossBar = new BossBarManager(plugin, boss, detectionRange, BarColor.RED, BarStyle.SEGMENTED_10, events);
-		super.constructBoss(null, null, detectionRange, bossBar);
+		super.constructBoss(null, null, detectionRange, bossBar, 10 * 20);
 		mBoss.setInvulnerable(true);
 		mBoss.setAI(false);
 
@@ -246,7 +249,6 @@ public class RKitxet extends BossAbilityGroup {
 					mBoss.setInvulnerable(false);
 					mBoss.setAI(true);
 					mBoss.getAttribute(Attribute.GENERIC_FOLLOW_RANGE).setBaseValue(detectionRange);
-					mBoss.getAttribute(Attribute.GENERIC_KNOCKBACK_RESISTANCE).setBaseValue(1);
 
 					//launch event related spawn commands
 					PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "effect give @s minecraft:blindness 2 2");
@@ -264,8 +266,6 @@ public class RKitxet extends BossAbilityGroup {
 				mCount++;
 			}
 		}.runTaskTimer(mPlugin, 0, 20);
-
-		super.constructBoss(phase1Actives, phase1Passives, detectionRange, bossBar);
 	}
 
 	@Override
@@ -353,5 +353,35 @@ public class RKitxet extends BossAbilityGroup {
 
 	public Location getSpawnLocation() {
 		return mSpawnLoc;
+	}
+
+	// Cannot use any active spell 3 times in a row (bad/good luck protection)
+	public boolean canUseSpell(String spell) {
+		return !spell.equals(mLastUsedSpell) || !mSameSpellUsedTwice;
+	}
+
+	public void useSpell(String spell) {
+		if (spell.equals(mLastUsedSpell)) {
+			mSameSpellUsedTwice = true;
+		} else {
+			mLastUsedSpell = spell;
+			mSameSpellUsedTwice = false;
+		}
+	}
+
+	public @Nullable Player getAgonyTarget() {
+		return mAgonyTarget;
+	}
+
+	public @Nullable Player getFuryTarget() {
+		return mFuryTarget;
+	}
+
+	public void setAgonyTarget(@Nullable Player player) {
+		mAgonyTarget = player;
+	}
+
+	public void setFuryTarget(@Nullable Player player) {
+		mFuryTarget = player;
 	}
 }

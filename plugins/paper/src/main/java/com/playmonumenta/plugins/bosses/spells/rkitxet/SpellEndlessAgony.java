@@ -36,13 +36,15 @@ public class SpellEndlessAgony extends Spell {
 	private Location mCenter;
 	private int mCount;
 	private ChargeUpManager mChargeUp;
+	private int mCooldown;
 
-	public SpellEndlessAgony(Plugin plugin, RKitxet rKitxet, Location center, double range) {
+	public SpellEndlessAgony(Plugin plugin, RKitxet rKitxet, Location center, double range, int cooldown) {
 		mPlugin = plugin;
 		mRKitxet = rKitxet;
 		mRange = range;
 		mCenter = center;
 		mCount = 0;
+		mCooldown = cooldown;
 
 		mChargeUp = new ChargeUpManager(mRKitxet.getEntity(), MOVEMENT_TIME + WAIT_UNTIL_DAMAGE_TIME, ChatColor.DARK_PURPLE + "Forming Endless Agony...",
 				BarColor.PURPLE, BarStyle.SEGMENTED_10, RKitxet.detectionRange);
@@ -50,14 +52,20 @@ public class SpellEndlessAgony extends Spell {
 
 	@Override
 	public void run() {
+		mRKitxet.useSpell("Endless Agony");
+
 		World world = mCenter.getWorld();
 
 		List<Player> players = PlayerUtils.playersInRange(mCenter, mRange, false);
 		if (players.size() == 0) {
 			return;
 		}
+		if (players.size() > 1 && mRKitxet.getFuryTarget() != null) {
+			players.remove(mRKitxet.getFuryTarget());
+		}
 		Collections.shuffle(players);
 		Player target = players.get(0);
+		mRKitxet.setAgonyTarget(target);
 
 		mCount++;
 
@@ -101,6 +109,7 @@ public class SpellEndlessAgony extends Spell {
 				if (mChargeUp.getTime() >= MOVEMENT_TIME + WAIT_UNTIL_DAMAGE_TIME) {
 					world.playSound(targetLoc, Sound.ENTITY_TURTLE_EGG_HATCH, SoundCategory.HOSTILE, 4, 0.8f);
 					mRKitxet.mAgonyLocations.add(mLoc);
+					mRKitxet.setAgonyTarget(null);
 					mChargeUp.reset();
 					this.cancel();
 					return;
@@ -114,11 +123,11 @@ public class SpellEndlessAgony extends Spell {
 
 	@Override
 	public boolean canRun() {
-		return mCount < MAX_COUNT && PlayerUtils.playersInRange(mCenter, mRange, false).size() > 0;
+		return mCount < MAX_COUNT && PlayerUtils.playersInRange(mCenter, mRange, false).size() > 0 && mRKitxet.canUseSpell("Endless Agony");
 	}
 
 	@Override
 	public int cooldownTicks() {
-		return mRKitxet.mCooldownTicks - 1 * 20;
+		return mCooldown;
 	}
 }

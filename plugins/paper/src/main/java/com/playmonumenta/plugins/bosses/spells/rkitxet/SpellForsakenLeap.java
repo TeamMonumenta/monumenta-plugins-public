@@ -14,6 +14,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.util.Vector;
 
+import com.playmonumenta.plugins.bosses.bosses.RKitxet;
 import com.playmonumenta.plugins.bosses.spells.SpellBaseSlam;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.ParticleUtils;
@@ -31,10 +32,9 @@ public class SpellForsakenLeap extends SpellBaseSlam {
 	public static final int JUMP_HEIGHT = 1;
 
 	public Plugin mPlugin;
+	private RKitxet mRKitxet;
 
-	public int mCooldownTicks;
-
-	public SpellForsakenLeap(Plugin plugin, LivingEntity launcher, int cooldown) {
+	public SpellForsakenLeap(Plugin plugin, LivingEntity launcher, int cooldown, RKitxet rKitxet) {
 		super(plugin, launcher, JUMP_HEIGHT, DETECTION, MIN_RANGE, RUN_DISTANCE, cooldown, VELOCITY_MULTIPLIER,
 				(World world, Location loc) -> {
 					world.playSound(loc, Sound.ENTITY_ENDER_DRAGON_GROWL, SoundCategory.PLAYERS, 1, 1);
@@ -45,6 +45,8 @@ public class SpellForsakenLeap extends SpellBaseSlam {
 				}, (World world, Location loc) -> {
 					world.spawnParticle(Particle.REDSTONE, loc, 4, 0.5, 0.5, 0.5, 1, new Particle.DustOptions(Color.fromRGB(0, 190, 0), 1.0f));
 				}, (World world, Player player, Location loc, Vector dir) -> {
+					rKitxet.useSpell("Forsaken Leap");
+
 					ParticleUtils.explodingRingEffect(plugin, loc, 4, 1, 4,
 							Arrays.asList(
 									new AbstractMap.SimpleEntry<Double, SpawnParticleAction>(0.5, (Location location) -> {
@@ -64,12 +66,12 @@ public class SpellForsakenLeap extends SpellBaseSlam {
 					});
 
 		mPlugin = plugin;
-		mCooldownTicks = cooldown;
+		mRKitxet = rKitxet;
 	}
 
 	@Override
-	public int cooldownTicks() {
-		return mCooldownTicks;
+	public boolean canRun() {
+		return mRKitxet.canUseSpell("Forsaken Leap");
 	}
 
 }
