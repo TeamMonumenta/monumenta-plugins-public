@@ -131,7 +131,7 @@ public class PEBCustomInventory extends CustomInventory {
 				Material.FIREWORK_ROCKET, "clickable peb_uarj", false));
 		PEB_ITEMS.add(new PebItem(3, 21, "Show name on patron buff announcement.",
 				"Toggles whether the player has their IGN in the buff announcement when they"
-				+ " activate " + ChatColor.GOLD + "Patreon " + ChatColor.LIGHT_PURPLE + "buffs.", ChatColor.LIGHT_PURPLE,
+						+ " activate " + ChatColor.GOLD + "Patreon " + ChatColor.LIGHT_PURPLE + "buffs.", ChatColor.LIGHT_PURPLE,
 				Material.GLOWSTONE, "clickable toggle_patron_buff_thank", false));
 		PEB_ITEMS.add(new PebItem(3, 23, "Inventory Drink",
 				"Click to toggle drinking potions with a right click in any inventory.", ChatColor.LIGHT_PURPLE,
@@ -151,12 +151,18 @@ public class PEBCustomInventory extends CustomInventory {
 		PEB_ITEMS.add(new PebItem(3, 39, "Toggle Radiant",
 				"Click to toggle whether Radiant provides Night Vision.", ChatColor.LIGHT_PURPLE,
 				Material.SOUL_LANTERN, "execute as @S run function monumenta:mechanisms/radiant_toggle", false));
+		PEB_ITEMS.add(new PebItem(3, 40, "Glowing options",
+				"Click to choose your preferences for the \"glowing\" effect.", ChatColor.LIGHT_PURPLE,
+				Material.SPECTRAL_ARROW, "page 30", false));
 		PEB_ITEMS.add(new PebItem(3, 41, "Offhand Swapping",
 				"Click to toggle whether pressing your swap key will be fully cancelled or only cancelled when a spellcast does so", ChatColor.LIGHT_PURPLE,
 				Material.SHIELD, "toggleswap", false));
 		PEB_ITEMS.add(new PebItem(3, 42, "Spawner Equipment",
 				"Click to toggle whether mob equipment is displayed in spawners (significantly decreases FPS in many areas)", ChatColor.LIGHT_PURPLE,
 				Material.IRON_CHESTPLATE, "clickable peb_spawnerequipment", false));
+		PEB_ITEMS.add(new PebItem(3, 43, "Virtual Firmament",
+				"Click to toggle Virtual Firmament, which visually turns your Firmament into a stack of blocks for faster placement.", ChatColor.LIGHT_PURPLE,
+				Material.PRISMARINE, "virtualfirmament", false));
 
 		//page 4: Server Info
 		PEB_ITEMS.add(new PebItem(4, 4, "Server Information",
@@ -293,6 +299,39 @@ public class PEBCustomInventory extends CustomInventory {
 				"Set the minimum size of a stack of uninteresting items to pick up.", ChatColor.LIGHT_PURPLE,
 				Material.OAK_SIGN, "threshold", false));
 
+		//page 30: Glowing options
+		PEB_ITEMS.add(new PebItem(30, 0, "Back to Toggleable Options",
+				"", ChatColor.LIGHT_PURPLE,
+				Material.OBSERVER, "page 3", false));
+		PEB_ITEMS.add(new PebItem(30, 4, "Glowing Settings",
+				"Choose for which entity types the glowing effect may be shown. " +
+						"If an entity fits into more than one category (e.g. a boss matches both 'mobs' and 'bosses'), it will glow if any of the matching options are enabled.", ChatColor.LIGHT_PURPLE,
+				Material.SPECTRAL_ARROW, "", false));
+		PEB_ITEMS.add(new PebItem(30, 22, "Enable All",
+				"Enable glowing for all entities (default).", ChatColor.LIGHT_PURPLE,
+				Material.GOLD_INGOT, "glowing enable all", false));
+		PEB_ITEMS.add(new PebItem(30, 28, "Players",
+				"Toggle glowing for players.", ChatColor.LIGHT_PURPLE,
+				Material.PLAYER_HEAD, "glowing toggle players", false));
+		PEB_ITEMS.add(new PebItem(30, 29, "Mobs",
+				"Toggle glowing for mobs.", ChatColor.LIGHT_PURPLE,
+				Material.ZOMBIE_HEAD, "glowing toggle mobs", false));
+		PEB_ITEMS.add(new PebItem(30, 30, "Bosses",
+				"Toggle glowing for bosses. Note that pretty much all bosses are mobs, soa re affected by that option as well.", ChatColor.LIGHT_PURPLE,
+				Material.DRAGON_HEAD, "glowing toggle bosses", false));
+		PEB_ITEMS.add(new PebItem(30, 32, "Invisible Entities",
+				"Toggle glowing for invisible entities.", ChatColor.LIGHT_PURPLE,
+				Material.GLASS, "glowing toggle invisible", false));
+		PEB_ITEMS.add(new PebItem(30, 33, "Experience Orbs",
+				"Toggle glowing for experience orbs.", ChatColor.LIGHT_PURPLE,
+				Material.EXPERIENCE_BOTTLE, "glowing toggle experience_orbs", false));
+		PEB_ITEMS.add(new PebItem(30, 34, "Miscellaneous",
+				"Toggle glowing for miscellaneous entities, i.e. entities that don't fit into any other category.", ChatColor.LIGHT_PURPLE,
+				Material.IRON_NUGGET, "glowing toggle misc", false));
+		PEB_ITEMS.add(new PebItem(30, 40, "Disable All",
+				"Disable glowing for all entities.", ChatColor.LIGHT_PURPLE,
+				Material.DIRT, "glowing disable all", false));
+
 	}
 
 	public PEBCustomInventory(Player player) {
@@ -302,6 +341,7 @@ public class PEBCustomInventory extends CustomInventory {
 
 		setLayout(mInventory, 1, player);
 	}
+
 	@Override
 	protected void inventoryClick(InventoryClickEvent event) {
 		event.setCancelled(true);
@@ -335,9 +375,11 @@ public class PEBCustomInventory extends CustomInventory {
 
 	public Boolean isPlayerCommand(String command) {
 		return command.startsWith("clickable") ||
-			command.startsWith("pickup") ||
-			command.equals("toggleswap") ||
-			command.startsWith("disabledrop");
+				       command.startsWith("pickup") ||
+				       command.equals("toggleswap") ||
+				       command.equals("virtualfirmament") ||
+				       command.startsWith("glowing") ||
+				       command.startsWith("disabledrop");
 	}
 
 	public void runInternalCommand(Player player, PebItem item) {

@@ -120,7 +120,7 @@ public class GlowingCommand {
 		// enable/disable option can take a variable amount of options as arguments
 		String[] optionLiterals = Arrays.stream(Option.values()).map(o -> o.name().toLowerCase(Locale.ROOT)).toArray(String[]::new);
 		List<Argument> arguments = new ArrayList<>();
-		arguments.add(new MultiLiteralArgument("enable", "disable"));
+		arguments.add(new MultiLiteralArgument("enable", "disable", "toggle"));
 		arguments.add(new MultiLiteralArgument(optionLiterals));
 		for (int i = 0; i < optionLiterals.length - 2; i++) { // -1 for "all", and another -1 because listing every single option makes no sense
 			if (i != 0) {
@@ -133,7 +133,7 @@ public class GlowingCommand {
 					.withPermission(PERMISSION)
 					.withArguments(arguments)
 					.executesPlayer((player, args) -> {
-						setOptions(player, (@NonNull Object[]) Arrays.copyOfRange(args, 1, args.length), args[0].equals("enable"));
+						setOptions(player, (@NonNull Object[]) Arrays.copyOfRange(args, 1, args.length), (String) args[0]);
 					})
 					.register();
 
@@ -157,7 +157,7 @@ public class GlowingCommand {
 		player.sendRawMessage(ChatColor.GOLD + "If an entity fits into more than one category (e.g. a boss matches both 'mobs' and 'bosses'), it will glow if any of the matching options are enabled.");
 	}
 
-	private static void setOptions(Player player, Object[] optionStrings, boolean enabled) throws WrapperCommandSyntaxException {
+	private static void setOptions(Player player, Object[] optionStrings, String operation) throws WrapperCommandSyntaxException {
 
 		List<Option> options = new ArrayList<>();
 		for (Object optionString : optionStrings) {
@@ -170,21 +170,29 @@ public class GlowingCommand {
 
 		int value;
 		if (options.contains(Option.ALL)) {
-			value = enabled ? 0 : 0xFFFFFFFF;
+			if ("enable".equals(operation)) {
+				value = 0;
+			} else if ("disable".equals(operation)) {
+				value = 0xFFFFFFFF;
+			} else {
+				value = ~ScoreboardUtils.getScoreboardValue(player, SCOREBOARD_OBJECTIVE).orElse(0);
+			}
 		} else {
 			value = ScoreboardUtils.getScoreboardValue(player, SCOREBOARD_OBJECTIVE).orElse(0);
 			for (Option option : options) {
-				if (enabled) {
+				if ("enable".equals(operation)) {
 					value &= ~(1 << option.mPackedIndex);
-				} else {
+				} else if ("disable".equals(operation)) {
 					value |= 1 << option.mPackedIndex;
+				} else {
+					value ^= 1 << option.mPackedIndex;
 				}
 			}
 		}
 		ScoreboardUtils.setScoreboardValue(player, SCOREBOARD_OBJECTIVE, value);
 
-		player.sendMessage(ChatColor.GOLD + "Glowing " + (enabled ? "enabled" : "disabled")
-				                   + " for " + StringUtils.join(options, ", ") + ". Your new options are:");
+		player.sendMessage(ChatColor.GOLD + "Glowing " + operation + "d"
+			                   + " for " + StringUtils.join(options, ", ") + ". Your new options are:");
 		showConfig(player, false);
 		player.sendMessage(ChatColor.GRAY + " You may need to leave and re-enter the current area for all entities to be updated.");
 
