@@ -195,6 +195,7 @@ public class Plugin extends JavaPlugin {
 		Stuck.register(this);
 		GlowingCommand.register();
 		VirtualFirmament.register();
+		EventCommand.register();
 
 
 		try {

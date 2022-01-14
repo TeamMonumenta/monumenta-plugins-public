@@ -389,7 +389,7 @@ public class DelvesUtils {
 	/* NOTE: This is a WeakHashMap (weak keys), so entries will be automatically removed by garbage collection */
 	private static final Map<Player, DelveInfo> DELVE_INFO_MAPPINGS = new WeakHashMap<>();
 
-	private static final Map<String, String> SHARD_SCOREBOARD_PREFIX_MAPPINGS = new HashMap<>();
+	public static final Map<String, String> SHARD_SCOREBOARD_PREFIX_MAPPINGS = new HashMap<>();
 
 	static {
 		SHARD_SCOREBOARD_PREFIX_MAPPINGS.put("white", "D1Delve");
