@@ -216,7 +216,6 @@ public class BossManager implements Listener {
 		mStatelessBosses.put(ShiftingBoss.identityTag, (Plugin p, LivingEntity e) -> new ShiftingBoss(p, e));
 		mStatelessBosses.put(CarapaceBoss.identityTag, (Plugin p, LivingEntity e) -> new CarapaceBoss(p, e));
 		mStatelessBosses.put(KamikazeBoss.identityTag, (Plugin p, LivingEntity e) -> new KamikazeBoss(p, e));
-		mStatelessBosses.put(PortalBoss.identityTag, (Plugin p, LivingEntity e) -> new PortalBoss(p, e));
 		mStatelessBosses.put(TinyBombTossBoss.identityTag, (Plugin p, LivingEntity e) -> new TinyBombTossBoss(p, e));
 		mStatelessBosses.put(AntiRangeBoss.identityTag, (Plugin p, LivingEntity e) -> new AntiRangeBoss(p, e));
 		mStatelessBosses.put(AntiRangeChivalrousBoss.identityTag, (Plugin p, LivingEntity e) -> new AntiRangeChivalrousBoss(p, e));
@@ -414,7 +413,6 @@ public class BossManager implements Listener {
 		mBossDeserializers.put(ShiftingBoss.identityTag, (Plugin p, LivingEntity e) -> ShiftingBoss.deserialize(p, e));
 		mBossDeserializers.put(CarapaceBoss.identityTag, (Plugin p, LivingEntity e) -> CarapaceBoss.deserialize(p, e));
 		mBossDeserializers.put(KamikazeBoss.identityTag, (Plugin p, LivingEntity e) -> KamikazeBoss.deserialize(p, e));
-		mBossDeserializers.put(PortalBoss.identityTag, (Plugin p, LivingEntity e) -> PortalBoss.deserialize(p, e));
 		mBossDeserializers.put(TinyBombTossBoss.identityTag, (Plugin p, LivingEntity e) -> TinyBombTossBoss.deserialize(p, e));
 		mBossDeserializers.put(AntiRangeBoss.identityTag, (Plugin p, LivingEntity e) -> AntiRangeBoss.deserialize(p, e));
 		mBossDeserializers.put(AntiRangeChivalrousBoss.identityTag, (Plugin p, LivingEntity e) -> AntiRangeChivalrousBoss.deserialize(p, e));

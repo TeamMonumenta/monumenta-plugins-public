@@ -1,24 +1,66 @@
 package com.playmonumenta.plugins.portals;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
+
+import org.bukkit.Bukkit;
+//import org.bukkit.Color; // Uncomment to debug
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.BlockFace;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
+// Uncomment to debug
+//import com.playmonumenta.plugins.utils.ParticleUtils;
+
 public class PortalTeleportCheck extends BukkitRunnable {
+	private static final Set<EntityType> IMMOVABLE_ENTITY_TYPES = Set.of(
+		EntityType.AREA_EFFECT_CLOUD,
+		EntityType.BOAT,
+		EntityType.DONKEY,
+		EntityType.ENDER_CRYSTAL,
+		EntityType.EVOKER_FANGS,
+		EntityType.FISHING_HOOK,
+		EntityType.HORSE,
+		EntityType.ITEM_FRAME,
+		EntityType.LEASH_HITCH,
+		EntityType.LIGHTNING,
+		EntityType.LLAMA,
+		EntityType.MINECART,
+		EntityType.MINECART_CHEST,
+		EntityType.MINECART_COMMAND,
+		EntityType.MINECART_FURNACE,
+		EntityType.MINECART_HOPPER,
+		EntityType.MINECART_MOB_SPAWNER,
+		EntityType.MINECART_TNT,
+		EntityType.MULE,
+		EntityType.PAINTING,
+		EntityType.PIG,
+		EntityType.SHULKER,
+		EntityType.SKELETON_HORSE,
+		EntityType.STRIDER,
+		EntityType.TRADER_LLAMA,
+		EntityType.VILLAGER,
+		EntityType.WANDERING_TRADER,
+		EntityType.ZOMBIE_HORSE
+	);
+
+	private static final Map<UUID, Integer> mCooldowns = new HashMap<>();
+
+	private List<Map<UUID, Vector>> mPastPlayerLocs = new ArrayList<>();
 
 	private final Player mPlayer;
-	private int mCooldown = 0;
-	private @Nullable Location mPastPosition1;
-	private @Nullable Location mPastPosition2;
-	private double mMaxY = 0;
-	private int mMaxYcooldown = 0;
-	//Whether the player most recently went through portal 1 or portal 2
-	private int mLastPortal;
 
 	public PortalTeleportCheck(Player player) {
 		this.mPlayer = player;
@@ -26,199 +68,137 @@ public class PortalTeleportCheck extends BukkitRunnable {
 
 	@Override
 	public void run() {
-
-		if (mMaxYcooldown == 0) {
-			mMaxY = 0;
-		}
-
-		Portal mP1 = PortalManager.mPlayerPortal1.get(mPlayer);
-		Portal mP2 = PortalManager.mPlayerPortal2.get(mPlayer);
-
-		World mWorld = mPlayer.getWorld();
-
-		if (mPastPosition1 != null) {
-			mPastPosition2 = mPastPosition1;
-		}
-
-		mPastPosition1 = mPlayer.getLocation().clone();
-
-		//Detect collision between player and their portals
-		//There are four possibilities (2 portals of 2 blocks each)
-
-		BoundingBox b1 = mWorld.getBlockAt(mP1.mBlock1).getBoundingBox().shift(mP1.getShift()).expand(.1);
-		BoundingBox b2 = mWorld.getBlockAt(mP1.mBlock2).getBoundingBox().shift(mP1.getShift()).expand(.1);
-		BoundingBox b3 = mWorld.getBlockAt(mP2.mBlock1).getBoundingBox().shift(mP2.getShift()).expand(.1);
-		BoundingBox b4 = mWorld.getBlockAt(mP2.mBlock2).getBoundingBox().shift(mP2.getShift()).expand(.1);
-		BoundingBox pb = mPlayer.getBoundingBox();
-
-		if (pb.overlaps(b1) && (mCooldown == 0 || mLastPortal == 1)) {
-			mPlayer.teleport(mP2.getYaw(mP2.mLocation1.toCenterLocation().add(mP2.getOffset(1, mP1.mFacing)), mPlayer));
-
-			//Allow for smooth up-up portals while not trapping player in wall portals
-			if (mP2.mFacing == BlockFace.UP) {
-				mCooldown = 12;
-			} else {
-				mCooldown = 25;
-			}
-
-			mLastPortal = 1;
-			calculateMomentum(mP1.mFacing, mP2.mFacing, mPlayer);
-		} else if (pb.overlaps(b2) && (mCooldown == 0 || mLastPortal == 1)) {
-			mPlayer.teleport(mP2.getYaw(mP2.mLocation2.toCenterLocation().add(mP2.getOffset(2, mP1.mFacing)), mPlayer));
-			if (mP2.mFacing == BlockFace.UP) {
-				mCooldown = 12;
-			} else {
-				mCooldown = 25;
-			}
-			mLastPortal = 1;
-			calculateMomentum(mP1.mFacing, mP2.mFacing, mPlayer);
-		} else if (pb.overlaps(b3) && (mCooldown == 0 || mLastPortal == 2)) {
-			mPlayer.teleport(mP1.getYaw(mP1.mLocation1.toCenterLocation().add(mP1.getOffset(1, mP2.mFacing)), mPlayer));
-
-			if (mP1.mFacing == BlockFace.UP) {
-				mCooldown = 12;
-			} else {
-				mCooldown = 25;
-			}
-			mLastPortal = 2;
-			calculateMomentum(mP2.mFacing, mP1.mFacing, mPlayer);
-		} else if (pb.overlaps(b4) && (mCooldown == 0 || mLastPortal == 2)) {
-			mPlayer.teleport(mP1.getYaw(mP1.mLocation2.toCenterLocation().add(mP1.getOffset(2, mP2.mFacing)), mPlayer));
-			if (mP1.mFacing == BlockFace.UP) {
-				mCooldown = 12;
-			} else {
-				mCooldown = 25;
-			}
-			mLastPortal = 2;
-			calculateMomentum(mP2.mFacing, mP1.mFacing, mPlayer);
-		}
-
-		if (mCooldown > 0) {
-			mCooldown -= 1;
-		}
-
-		if (mMaxYcooldown > 0) {
-			mMaxY -= 1;
-		}
-	}
-
-	//Set the player velocity to what it should be after entering portal
-
-	public void calculateMomentum(BlockFace b1, BlockFace b2, Player p) {
-
-		if (mPastPosition2 == null) {
+		@Nullable Portal p1 = PortalManager.mPlayerPortal1.get(mPlayer);
+		@Nullable Portal p2 = PortalManager.mPlayerPortal2.get(mPlayer);
+		if (p1 == null || p2 == null) {
 			return;
 		}
+		World w1 = p1.getWorld();
+		World w2 = p2.getWorld();
+		BoundingBox b1 = p1.getBoundingBox();
+		BoundingBox b2 = p2.getBoundingBox();
 
-		Vector v = getRecentVelocity(mPastPosition2, mPastPosition1);
+		// Show bounding boxes for debugging
+		//ParticleUtils.tickBoundingBoxEdge(w1, b1, Color.fromRGB(127, 127, 255), 50);
+		//ParticleUtils.tickBoundingBoxEdge(w2, b2, Color.fromRGB(255, 127, 0), 50);
 
-		if (b1 == BlockFace.UP) {
+		Map<UUID, Vector> currentLocs = new HashMap<>();
+		for (Player player : Bukkit.getOnlinePlayers()) {
+			UUID playerUuid = player.getUniqueId();
+			currentLocs.put(playerUuid, player.getLocation().toVector().clone());
+		}
+		mPastPlayerLocs.add(0, currentLocs);
+		if (mPastPlayerLocs.size() > 3) {
+			mPastPlayerLocs.remove(3);
+		}
 
-			//If you go from up portal to side portal, set tertiary axis to zero for more intuitive travel
+		Iterator<Map.Entry<UUID, Integer>> cooldownIt = mCooldowns.entrySet().iterator();
+		while (cooldownIt.hasNext()) {
+			Map.Entry<UUID, Integer> entry = cooldownIt.next();
+			UUID entityUuid = entry.getKey();
+			Entity entity = Bukkit.getEntity(entityUuid);
+			if (entity == null) {
+				// Stop tracking dead/unloaded entities
+				cooldownIt.remove();
+				continue;
+			}
+			BoundingBox be = entity.getBoundingBox();
+			if (!(b1.overlaps(be) || b2.overlaps(be))) {
+				// Clear cooldown immediately if not in either portal
+				cooldownIt.remove();
+				continue;
+			}
 
-			if (b2 == BlockFace.UP) {
-				p.setVelocity(new Vector(v.getX(), v.getY() * -1, v.getZ()));
-			} else if (b2 == BlockFace.DOWN) {
-				p.setVelocity(v.clone());
-			} else if (b2 == BlockFace.WEST) {
-				p.setVelocity(new Vector(v.getY(), v.getX(), 0.0));
-			} else if (b2 == BlockFace.EAST) {
-				p.setVelocity(new Vector(v.getY() * -1, v.getX() * -1, 0.0));
-			} else if (b2 == BlockFace.NORTH) {
-				p.setVelocity(new Vector(0.0, v.getZ(), v.getY()));
-			} else if (b2 == BlockFace.SOUTH) {
-				p.setVelocity(new Vector(0.0, v.getZ() * -1, v.getY() * -1));
-			}
-		} else if (b1 == BlockFace.DOWN) {
-			if (b2 == BlockFace.DOWN) {
-				p.setVelocity(new Vector(v.getX(), v.getY() * -1, v.getZ()));
-			} else if (b2 == BlockFace.UP) {
-				p.setVelocity(v.clone());
-			} else if (b2 == BlockFace.EAST) {
-				p.setVelocity(new Vector(v.getY(), v.getX(), v.getZ()));
-			} else if (b2 == BlockFace.WEST) {
-				p.setVelocity(new Vector(v.getY() * -1, v.getX() * -1, v.getZ()));
-			} else if (b2 == BlockFace.SOUTH) {
-				p.setVelocity(new Vector(v.getX(), v.getZ(), v.getY()));
-			} else if (b2 == BlockFace.NORTH) {
-				p.setVelocity(new Vector(v.getX(), v.getZ() * -1, v.getY() * -1));
-			}
-		} else if (b1 == BlockFace.EAST) {
-			if (b2 == BlockFace.EAST) {
-				p.setVelocity(new Vector(v.getX() * -1, v.getY(), v.getZ()));
-			} else if (b2 == BlockFace.WEST) {
-				p.setVelocity(v.clone());
-			} else if (b2 == BlockFace.DOWN) {
-				p.setVelocity(new Vector(v.getY(), v.getX(), v.getZ()));
-			} else if (b2 == BlockFace.UP) {
-				p.setVelocity(new Vector(v.getY() * -1, v.getX() * -1, v.getZ()));
-			} else if (b2 == BlockFace.NORTH) {
-				p.setVelocity(new Vector(v.getZ(), v.getY(), v.getX()));
-			} else if (b2 == BlockFace.SOUTH) {
-				p.setVelocity(new Vector(v.getZ() * -1, v.getY(), v.getX() * -1));
-			}
-		} else if (b1 == BlockFace.WEST) {
-			if (b2 == BlockFace.WEST) {
-				p.setVelocity(new Vector(v.getX() * -1, v.getY(), v.getZ()));
-			} else if (b2 == BlockFace.EAST) {
-				p.setVelocity(v.clone());
-			} else if (b2 == BlockFace.UP) {
-				p.setVelocity(new Vector(v.getY(), v.getX(), v.getZ()));
-			} else if (b2 == BlockFace.DOWN) {
-				p.setVelocity(new Vector(v.getY() * -1, v.getX() * -1, v.getZ()));
-			} else if (b2 == BlockFace.SOUTH) {
-				p.setVelocity(new Vector(v.getZ(), v.getY(), v.getX()));
-			} else if (b2 == BlockFace.NORTH) {
-				p.setVelocity(new Vector(v.getZ() * -1, v.getY(), v.getX() * -1));
-			}
-		} else if (b1 == BlockFace.NORTH) {
-			if (b2 == BlockFace.NORTH) {
-				p.setVelocity(new Vector(v.getX(), v.getY(), v.getZ() * -1));
-			} else if (b2 == BlockFace.SOUTH) {
-				p.setVelocity(v.clone());
-			} else if (b2 == BlockFace.DOWN) {
-				p.setVelocity(new Vector(v.getX(), v.getZ() * -1, v.getY() * -1));
-			} else if (b2 == BlockFace.UP) {
-				p.setVelocity(new Vector(v.getX(), v.getZ(), v.getY()));
-			} else if (b2 == BlockFace.EAST) {
-				p.setVelocity(new Vector(v.getZ(), v.getY(), v.getX()));
-			} else if (b2 == BlockFace.WEST) {
-				p.setVelocity(new Vector(v.getZ() * -1, v.getY(), v.getX() * -1));
-			}
-		} else if (b1 == BlockFace.SOUTH) {
-			if (b2 == BlockFace.SOUTH) {
-				p.setVelocity(new Vector(v.getX(), v.getY(), v.getZ() * -1));
-			} else if (b2 == BlockFace.NORTH) {
-				p.setVelocity(v.clone());
-			} else if (b2 == BlockFace.UP) {
-				p.setVelocity(new Vector(v.getX(), v.getZ() * -1, v.getY() * -1));
-			} else if (b2 == BlockFace.DOWN) {
-				p.setVelocity(new Vector(v.getX(), v.getZ(), v.getY()));
-			} else if (b2 == BlockFace.WEST) {
-				p.setVelocity(new Vector(v.getZ(), v.getY(), v.getX()));
-			} else if (b2 == BlockFace.EAST) {
-				p.setVelocity(new Vector(v.getZ() * -1, v.getY(), v.getX() * -1));
+			int cooldown = entry.getValue();
+			cooldown--;
+
+			if (cooldown > 1) {
+				entry.setValue(cooldown);
+			} else {
+				cooldownIt.remove();
 			}
 		}
 
-		if (b2 == BlockFace.DOWN) {
-			mCooldown = 5;
-			//Extra short cooldown for people that want to do infinite loops if they are spit out facing up
+		for (Entity entity : w1.getNearbyEntities(b1)) {
+			BoundingBox be = entity.getBoundingBox();
+			if (b1.overlaps(be)) {
+				attemptTeleport(entity, p1, p2);
+			}
 		}
-
-		if (v.getY() > mMaxY) {
-			mMaxY = v.getY();
-			mMaxYcooldown = 10;
+		for (Entity entity : w2.getNearbyEntities(b2)) {
+			BoundingBox be = entity.getBoundingBox();
+			if (b2.overlaps(be)) {
+				attemptTeleport(entity, p2, p1);
+			}
 		}
 	}
 
-	//Workaround for calculating near-instant velocity
-	public Vector getRecentVelocity(Location x, Location y) {
-		Vector difference = new Vector();
-		difference.setX(y.getX() - x.getX());
-		difference.setY(y.getY() - x.getY());
-		difference.setZ(y.getZ() - x.getZ());
-		return difference;
+	public void attemptTeleport(Entity entity, Portal from, Portal to) {
+		if (entity.isDead()) {
+			return;
+		}
+		if (IMMOVABLE_ENTITY_TYPES.contains(entity.getType())) {
+			return;
+		}
+		UUID entityUuid = entity.getUniqueId();
+		if (entity instanceof Player && !entityUuid.equals(mPlayer.getUniqueId())) {
+			return;
+		}
+		if (mCooldowns.containsKey(entityUuid)) {
+			return;
+		}
+		// Ensure the player has a valid velocity to modify
+		if (entity instanceof Player) {
+			from.travel(entity, getRecentVelocity((Player) entity));
+		} else {
+			from.travel(entity);
+		}
+		switch (to.mFacing) {
+		case UP:
+			mCooldowns.put(entityUuid, 8);
+			break;
+		case DOWN:
+			mCooldowns.put(entityUuid, 12);
+			break;
+		default:
+			mCooldowns.put(entityUuid, 25);
+		}
 	}
 
+	// Workaround for calculating near-instant velocity
+	public Vector getRecentVelocity(Player player) {
+		UUID playerUuid = player.getUniqueId();
+
+		@Nullable Vector locNow = null;
+		if (mPastPlayerLocs.size() > 0) {
+			locNow = mPastPlayerLocs.get(0).get(playerUuid);
+		}
+		@Nullable Vector locPrevious1 = null;
+		if (mPastPlayerLocs.size() > 1) {
+			locPrevious1 = mPastPlayerLocs.get(1).get(playerUuid);
+		}
+		@Nullable Vector locPrevious2 = null;
+		if (mPastPlayerLocs.size() > 2) {
+			locPrevious2 = mPastPlayerLocs.get(2).get(playerUuid);
+		}
+
+		@Nullable Vector velocity1 = null;
+		if (locNow != null && locPrevious1 != null) {
+			return locNow.clone().subtract(locPrevious1);
+		}
+		@Nullable Vector velocity2 = null;
+		if (locPrevious1 != null && locPrevious2 != null) {
+			return locPrevious1.clone().subtract(locPrevious2);
+		}
+
+		if (velocity1 == null) {
+			return player.getVelocity();
+		} else if (velocity2 == null) {
+			return velocity1;
+		} else if (velocity2.lengthSquared() > velocity1.lengthSquared()) {
+			return velocity1.normalize().multiply(velocity2.length());
+		} else {
+			return velocity1;
+		}
+	}
 }

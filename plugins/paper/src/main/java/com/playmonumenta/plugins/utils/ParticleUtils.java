@@ -2,18 +2,37 @@ package com.playmonumenta.plugins.utils;
 
 import java.util.Collection;
 import java.util.Map;
+import java.util.NavigableMap;
+import java.util.TreeMap;
 
+import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
 
 
 public class ParticleUtils {
+	public enum BoundingBoxEdge {
+		X_YMIN_ZMIN,
+		X_YMIN_ZMAX,
+		X_YMAX_ZMIN,
+		X_YMAX_ZMAX,
+		Y_XMIN_ZMIN,
+		Y_XMIN_ZMAX,
+		Y_XMAX_ZMIN,
+		Y_XMAX_ZMAX,
+		Z_XMIN_YMIN,
+		Z_XMIN_YMAX,
+		Z_XMAX_YMIN,
+		Z_XMAX_YMAX
+	}
+
 	// TODO use Consumer?
 	@FunctionalInterface
 	public interface SpawnParticleAction {
@@ -102,5 +121,99 @@ public class ParticleUtils {
 			}
 
 		}.runTaskTimer(plugin, 0, 1);
+	}
+
+	public static void tickBoundingBoxEdge(World world, BoundingBox bb, Color color, int count) {
+		Particle.DustOptions dustOptions = new Particle.DustOptions(color, 0.2f);
+		Vector bbSize = bb.getMax().clone().subtract(bb.getMin());
+		NavigableMap<Double, BoundingBoxEdge> edgeWeights = new TreeMap<>();
+		double largestKey = 0.0;
+		for (BoundingBoxEdge edge : BoundingBoxEdge.values()) {
+			double edgeSize;
+			switch (edge) {
+			case X_YMIN_ZMIN:
+			case X_YMIN_ZMAX:
+			case X_YMAX_ZMIN:
+			case X_YMAX_ZMAX:
+				edgeSize = bbSize.getX();
+				break;
+			case Y_XMIN_ZMIN:
+			case Y_XMIN_ZMAX:
+			case Y_XMAX_ZMIN:
+			case Y_XMAX_ZMAX:
+				edgeSize = bbSize.getY();
+				break;
+			default:
+				edgeSize = bbSize.getZ();
+			}
+			// Ensure bounding boxes with a size of 0 still show up
+			edgeSize += 0.001;
+			largestKey += edgeSize;
+			edgeWeights.put(largestKey, edge);
+		}
+		for (int i = 0; i < count; i++) {
+			Map.Entry<Double, BoundingBoxEdge> edgeEntry = edgeWeights.higherEntry(largestKey * FastUtils.RANDOM.nextDouble());
+			if (edgeEntry == null) {
+				// The reviewdog says this is a thing? Why is this a thing?
+				break;
+			}
+			BoundingBoxEdge edge = edgeEntry.getValue();
+
+			double x;
+			switch (edge) {
+			case X_YMIN_ZMIN:
+			case X_YMIN_ZMAX:
+			case X_YMAX_ZMIN:
+			case X_YMAX_ZMAX:
+				x = bb.getMinX() + bbSize.getX() * FastUtils.RANDOM.nextDouble();
+				break;
+			case Y_XMIN_ZMIN:
+			case Y_XMIN_ZMAX:
+			case Z_XMIN_YMIN:
+			case Z_XMIN_YMAX:
+				x = bb.getMinX();
+				break;
+			default:
+				x = bb.getMaxX();
+			}
+
+			double y;
+			switch (edge) {
+			case Y_XMIN_ZMIN:
+			case Y_XMIN_ZMAX:
+			case Y_XMAX_ZMIN:
+			case Y_XMAX_ZMAX:
+				y = bb.getMinY() + bbSize.getY() * FastUtils.RANDOM.nextDouble();
+				break;
+			case X_YMIN_ZMIN:
+			case X_YMIN_ZMAX:
+			case Z_XMIN_YMIN:
+			case Z_XMAX_YMIN:
+				y = bb.getMinY();
+				break;
+			default:
+				y = bb.getMaxY();
+			}
+
+			double z;
+			switch (edge) {
+			case Z_XMIN_YMIN:
+			case Z_XMIN_YMAX:
+			case Z_XMAX_YMIN:
+			case Z_XMAX_YMAX:
+				z = bb.getMinZ() + bbSize.getZ() * FastUtils.RANDOM.nextDouble();
+				break;
+			case X_YMIN_ZMIN:
+			case X_YMAX_ZMIN:
+			case Y_XMIN_ZMIN:
+			case Y_XMAX_ZMIN:
+				z = bb.getMinZ();
+				break;
+			default:
+				z = bb.getMaxZ();
+			}
+
+			world.spawnParticle(Particle.REDSTONE, x, y, z, 1, 0.0, 0.0, 0.0, dustOptions);
+		}
 	}
 }

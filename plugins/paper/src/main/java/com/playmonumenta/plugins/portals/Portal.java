@@ -1,13 +1,17 @@
 package com.playmonumenta.plugins.portals;
 
 import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.Fireball;
 import org.bukkit.entity.Player;
+import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class Portal {
+	private static final double VERTICAL_BOOST = 0.18;
 
 	public Location mLocation1;
 	public Location mLocation2;
@@ -16,6 +20,8 @@ public class Portal {
 	public Location mBlock2;
 
 	public BlockFace mFacing;
+	public Vector mPortalTopDirection;
+	public Vector mPortalOutDirection;
 
 	//The portal it links to
 	public @Nullable Portal mPair;
@@ -28,6 +34,8 @@ public class Portal {
 		mFacing = face;
 		mBlock1 = b1;
 		mBlock2 = b2;
+		mPortalTopDirection = b2.toVector().subtract(b1.toVector());
+		mPortalOutDirection = face.getDirection();
 	}
 
 	public @Nullable Vector getShift() {
@@ -94,4 +102,194 @@ public class Portal {
 		return l;
 	}
 
+	public World getWorld() {
+		return mLocation1.getWorld();
+	}
+
+	public BoundingBox getBoundingBox() {
+		return BoundingBox.of(mLocation1, mLocation2).expand(0.1, 0.1, 0.1, 1.1, 1.1, 1.1);
+	}
+
+	private Vector portalLeftDirection() {
+		return mPortalTopDirection.getCrossProduct(mPortalOutDirection);
+	}
+
+	private Location centerLocation() {
+		return mLocation1.clone().toCenterLocation().add(mPortalTopDirection.clone().multiply(0.5));
+	}
+
+	private static boolean willBeInBlock(Entity entity, Location location) {
+		World world = location.getWorld();
+		double entityHalfWidth = entity.getWidth() / 2.0;
+
+		int minX = (int) Math.floor(location.getX() - entityHalfWidth);
+		int minY = (int) Math.floor(location.getY());
+		int minZ = (int) Math.floor(location.getZ() - entityHalfWidth);
+		int maxX = (int) Math.floor(location.getX() + entityHalfWidth);
+		int maxY = (int) Math.floor(location.getY() + entity.getHeight());
+		int maxZ = (int) Math.floor(location.getZ() + entityHalfWidth);
+
+		for (int x = minX; x <= maxX; ++x) {
+			for (int y = minY; y <= maxY; ++y) {
+				for (int z = minZ; z <= maxZ; ++z) {
+					if (!world.getBlockAt(x, y, z).isPassable()) {
+						return true;
+					}
+				}
+			}
+		}
+		return false;
+	}
+
+	private void fixInsideWall(Entity entity, Location location) {
+		double entityHalfWidth = entity.getWidth() / 2.0;
+		switch (mFacing) {
+		case UP:
+			// y+
+			location.setY(Math.max(location.getY(), mLocation1.getY()));
+			break;
+		case DOWN:
+			// y-
+			location.setY(Math.min(location.getY(), mLocation1.getY() + 1.0 - entity.getHeight()));
+			break;
+		case SOUTH:
+			// z+
+			location.setZ(Math.max(location.getZ(), location.getZ() + entityHalfWidth));
+			break;
+		case NORTH:
+			// z-
+			location.setZ(Math.min(location.getZ(), location.getZ() + 1.0 - entityHalfWidth));
+			break;
+		case EAST:
+			// x+
+			location.setX(Math.max(location.getX(), location.getX() + entityHalfWidth));
+			break;
+		case WEST:
+		default:
+			// x-
+			location.setX(Math.min(location.getX(), location.getX() + 1.0 - entityHalfWidth));
+			break;
+		}
+	}
+
+	private Location defaultTeleportLocation(Entity entity) {
+		Location centerLoc = centerLocation();
+		double entityHalfWidth = entity.getWidth() / 2.0;
+		Location location;
+		switch (mFacing) {
+		case UP:
+			// y+
+			location = centerLoc.clone();
+			location.setY(mLocation1.getY());
+			break;
+		case DOWN:
+			// y-
+			location = centerLoc.clone();
+			location.setY(mLocation1.getY() + 1.0 - entity.getHeight());
+			break;
+		case SOUTH:
+			// z+
+			location = mLocation1.clone();
+			location.setX(location.getX() + 0.5);
+			location.setZ(location.getZ() + entityHalfWidth);
+			break;
+		case NORTH:
+			// z-
+			location = mLocation1.clone();
+			location.setX(location.getX() + 0.5);
+			location.setZ(location.getZ() + 1.0 - entityHalfWidth);
+			break;
+		case EAST:
+			// x+
+			location = mLocation1.clone();
+			location.setZ(location.getZ() + 0.5);
+			location.setX(location.getX() + entityHalfWidth);
+			break;
+		case WEST:
+		default:
+			// x-
+			location = mLocation1.clone();
+			location.setZ(location.getZ() + 0.5);
+			location.setX(location.getX() + 1.0 - entityHalfWidth);
+			break;
+		}
+		return location;
+	}
+
+	private static double getVectorComponent(Vector input, Vector direction) {
+		return input.getX() * direction.getX() + input.getY() * direction.getY() + input.getZ() * direction.getZ();
+	}
+
+	private Vector fromInterPortalComponents(Vector input) {
+		Vector result = new Vector();
+		result.add(portalLeftDirection().clone().multiply(input.getX()));
+		result.add(mPortalTopDirection.clone().multiply(input.getY()));
+		result.add(mPortalOutDirection.clone().multiply(input.getZ()));
+		return result;
+	}
+
+	// Does not handle look; that is better handled separately
+	private Location toInterPortalCoords(Location locIn) {
+		Vector locCentered = locIn.clone().subtract(centerLocation()).toVector();
+		double relativeLeft = getVectorComponent(locCentered, portalLeftDirection());
+		double relativeUp = getVectorComponent(locCentered, mPortalTopDirection);
+		double relativeForward = getVectorComponent(locCentered, mPortalOutDirection);
+		return new Location(locIn.getWorld(), -relativeLeft, relativeUp, -relativeForward);
+	}
+
+	private Vector toInterPortalDirection(Vector directionIn) {
+		double relativeLeft = getVectorComponent(directionIn, portalLeftDirection());
+		double relativeUp = getVectorComponent(directionIn, mPortalTopDirection);
+		double relativeForward = getVectorComponent(directionIn, mPortalOutDirection);
+		return new Vector(-relativeLeft, relativeUp, -relativeForward);
+	}
+
+	// Does not handle look; that is better handled separately
+	private Location fromInterPortalCoords(Location locIn) {
+		return centerLocation().add(fromInterPortalComponents(locIn.toVector()));
+	}
+
+	private Vector fromInterPortalDirection(Vector directionIn) {
+		return fromInterPortalComponents(directionIn);
+	}
+
+	// Travel from this portal to the other portal
+	public void travel(Entity entity) {
+		travel(entity, entity.getVelocity());
+	}
+
+	public void travel(Entity entity, Vector velocity) {
+		if (mPair == null) {
+			return;
+		}
+
+		Location location = entity.getLocation().clone();
+		Vector direction = location.getDirection();
+		if (mFacing == BlockFace.DOWN) {
+			direction.setY(Math.abs(direction.getY()));
+		}
+		Vector fireballDirection = direction; // Dummy value to satisfy the compiler; not actually used.
+		if (entity instanceof Fireball) {
+			fireballDirection = ((Fireball)entity).getDirection();
+		}
+
+		location = mPair.fromInterPortalCoords(toInterPortalCoords(location));
+		fixInsideWall(entity, location);
+		if (willBeInBlock(entity, location)) {
+			location = mPair.defaultTeleportLocation(entity);
+		}
+		direction = mPair.fromInterPortalDirection(toInterPortalDirection(direction));
+		velocity = mPair.fromInterPortalDirection(toInterPortalDirection(velocity));
+		velocity.add(mPair.mFacing.getDirection().multiply(VERTICAL_BOOST));
+		if (entity instanceof Fireball) {
+			fireballDirection = mPair.fromInterPortalDirection(toInterPortalDirection(fireballDirection));
+		}
+
+		location.setDirection(direction);
+		entity.teleport(location);
+		entity.setVelocity(velocity);
+		if (entity instanceof Fireball) {
+			((Fireball)entity).setDirection(fireballDirection);
+		}
+	}
 }

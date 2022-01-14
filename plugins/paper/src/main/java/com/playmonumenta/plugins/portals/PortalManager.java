@@ -24,6 +24,22 @@ import com.playmonumenta.plugins.utils.CommandUtils;
 import com.playmonumenta.scriptedquests.Plugin;
 
 public class PortalManager {
+	public static final Set<Material> TRANSPARENT_BLOCKS_1 = Set.of(
+		Material.LIGHT_BLUE_STAINED_GLASS,
+		Material.PURPLE_STAINED_GLASS,
+		Material.AIR,
+		Material.WATER,
+		Material.LAVA,
+		Material.VINE
+	);
+	public static final Set<Material> TRANSPARENT_BLOCKS_2 = Set.of(
+		Material.ORANGE_STAINED_GLASS,
+		Material.PURPLE_STAINED_GLASS,
+		Material.AIR,
+		Material.WATER,
+		Material.LAVA,
+		Material.VINE
+	);
 
 	public static Portal mPortal1 = null;
 	public static Portal mPortal2 = null;
@@ -54,25 +70,10 @@ public class PortalManager {
 		World mWorld = player.getWorld();
 
 		Block blockHit = null;
-		Set<Material> transparentBlocks1 = new HashSet<Material>();
-		transparentBlocks1.add(Material.PURPLE_STAINED_GLASS);
-		transparentBlocks1.add(Material.LIGHT_BLUE_STAINED_GLASS);
-		transparentBlocks1.add(Material.AIR);
-		transparentBlocks1.add(Material.WATER);
-		transparentBlocks1.add(Material.LAVA);
-		transparentBlocks1.add(Material.VINE);
-		Set<Material> transparentBlocks2 = new HashSet<Material>();
-		transparentBlocks2.add(Material.PURPLE_STAINED_GLASS);
-		transparentBlocks2.add(Material.ORANGE_STAINED_GLASS);
-		transparentBlocks2.add(Material.AIR);
-		transparentBlocks2.add(Material.WATER);
-		transparentBlocks2.add(Material.LAVA);
-		transparentBlocks2.add(Material.VINE);
-
 		if (portalNum == 1) {
-			blockHit = player.getTargetBlock(transparentBlocks1, 50);
+			blockHit = player.getTargetBlock(TRANSPARENT_BLOCKS_1, 50);
 		} else if (portalNum == 2) {
-			blockHit = player.getTargetBlock(transparentBlocks2, 50);
+			blockHit = player.getTargetBlock(TRANSPARENT_BLOCKS_2, 50);
 		}
 
 		BlockFace targetFace = player.getTargetBlockFace(50);
