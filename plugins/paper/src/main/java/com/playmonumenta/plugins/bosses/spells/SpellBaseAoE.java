@@ -1,7 +1,5 @@
 package com.playmonumenta.plugins.bosses.spells;
 
-import java.util.List;
-
 import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
@@ -26,7 +24,6 @@ public class SpellBaseAoE extends Spell {
 	public interface ChargeAuraAction {
 		/**
 		 * Runs the large particle aura around the entity
-		 * @param player The player to affect
 		 */
 		void run(Location loc);
 	}
@@ -35,7 +32,6 @@ public class SpellBaseAoE extends Spell {
 	public interface ChargeCircleAction {
 		/**
 		 * Runs the large particle aura around the entity
-		 * @param player The player to affect
 		 */
 		void run(Location loc);
 	}
@@ -44,7 +40,6 @@ public class SpellBaseAoE extends Spell {
 	public interface OutburstAction {
 		/**
 		 * Runs the large particle aura around the entity
-		 * @param player The player to affect
 		 */
 		void run(Location loc);
 	}
@@ -53,7 +48,6 @@ public class SpellBaseAoE extends Spell {
 	public interface CircleOutburstAction {
 		/**
 		 * Runs the large particle aura around the entity
-		 * @param player The player to affect
 		 */
 		void run(Location loc);
 	}
@@ -62,7 +56,6 @@ public class SpellBaseAoE extends Spell {
 	public interface DealDamageAction {
 		/**
 		 * Runs the large particle aura around the entity
-		 * @param player The player to affect
 		 */
 		void run(Location loc);
 	}
@@ -147,16 +140,11 @@ public class SpellBaseAoE extends Spell {
 		if (!mCanMoveWhileCasting) {
 			((LivingEntity) mLauncher).addPotionEffect(new PotionEffect(PotionEffectType.SLOW, mDuration, 20));
 		}
-		// TODO: This should really be refactored / made more generic
-		// healer exception shouldn't be here but there's not an easy way to do this right
-		if (mLauncher.getScoreboardTags().contains("boss_rejuvenation") && !shouldHeal()) {
-			// Do not cast as healer if too many healers and check fails
-			return;
-		}
+
 		new BukkitRunnable() {
 			float mTicks = 0;
 			double mCurrentRadius = mRadius;
-			World mWorld = mLauncher.getWorld();
+			final World mWorld = mLauncher.getWorld();
 
 			@Override
 			public void run() {
@@ -187,7 +175,7 @@ public class SpellBaseAoE extends Spell {
 					mOutburstAction.run(loc);
 
 					new BukkitRunnable() {
-						Location mLoc = mLauncher.getLocation();
+						final Location mLoc = mLauncher.getLocation();
 						double mBurstRadius = 0;
 						@Override
 						public void run() {
@@ -216,20 +204,6 @@ public class SpellBaseAoE extends Spell {
 	@Override
 	public int cooldownTicks() {
 		return mCooldown;
-	}
-
-	private boolean shouldHeal() {
-		List<Entity> nearby = mLauncher.getNearbyEntities(10, 10, 10);
-		int healers = 1;
-		for (Entity e : nearby) {
-			if (e.getScoreboardTags().contains("boss_rejuvenation")) {
-				healers++;
-			}
-		}
-		if (FastUtils.RANDOM.nextDouble() > 1.0 / Math.pow(healers, 2)) {
-			return false;
-		}
-		return true;
 	}
 
 }
