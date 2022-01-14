@@ -111,7 +111,7 @@ public class SpellRKitxetSummon extends Spell {
 
 	@Override
 	public boolean canRun() {
-		return mRKitxet.mAgonyLocations.size() > 0 && EntityUtils.getNearbyMobs(mRKitxet.getSpawnLocation(), RKitxet.detectionRange).size() < 25 && mRKitxet.canUseSpell("Summon");
+		return mRKitxet.mAgonyLocations.size() >= 3 && EntityUtils.getNearbyMobs(mRKitxet.getSpawnLocation(), RKitxet.detectionRange).size() < 25 && mRKitxet.canUseSpell("Summon");
 	}
 
 	@Override

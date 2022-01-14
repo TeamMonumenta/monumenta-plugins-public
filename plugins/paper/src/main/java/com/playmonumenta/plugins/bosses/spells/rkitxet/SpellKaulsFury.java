@@ -38,11 +38,11 @@ public class SpellKaulsFury extends Spell {
 	private int mChargeTime;
 	private int mImpactTime;
 
-	public SpellKaulsFury(Plugin plugin, LivingEntity boss, RKitxet rKitxet, int triggerInterval, int chargeTime, int impactTime) {
+	public SpellKaulsFury(Plugin plugin, LivingEntity boss, RKitxet rKitxet, int triggerInterval, int chargeTime, int impactTime, int initialDelay) {
 		mPlugin = plugin;
 		mBoss = boss;
 		mRKitxet = rKitxet;
-		mTicks = 0;
+		mTicks = triggerInterval - initialDelay;
 		mTriggerInterval = triggerInterval;
 		mChargeTime = chargeTime;
 		mImpactTime = impactTime;

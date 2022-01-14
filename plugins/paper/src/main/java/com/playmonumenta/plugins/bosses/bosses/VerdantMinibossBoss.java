@@ -13,6 +13,7 @@ import org.bukkit.attribute.Attribute;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
 import org.bukkit.entity.ArmorStand;
+import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -27,6 +28,7 @@ import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityTargetEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -249,6 +251,9 @@ public class VerdantMinibossBoss extends BossAbilityGroup {
 			if (damager instanceof Player player) {
 				shieldDamage(event, player);
 			} else if (damager instanceof Projectile proj && proj.getShooter() instanceof Player player) {
+				if (proj instanceof Arrow arrow && arrow.hasCustomEffect(PotionEffectType.SLOW)) {
+					arrow.removeCustomEffect(PotionEffectType.SLOW);
+				}
 				shieldDamage(event, player);
 			} else {
 				event.setCancelled(true);

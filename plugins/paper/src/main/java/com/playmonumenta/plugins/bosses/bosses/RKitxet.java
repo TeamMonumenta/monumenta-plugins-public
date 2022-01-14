@@ -14,6 +14,7 @@ import org.bukkit.attribute.Attribute;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
 import org.bukkit.entity.ArmorStand;
+import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
@@ -158,25 +159,25 @@ public class RKitxet extends BossAbilityGroup {
 		//Only change between phase 1 and 2 is the cooldowns of the spells
 		SpellManager phase1Actives = new SpellManager(Arrays.asList(
 			new SpellEndlessAgony(mPlugin, this, mSpawnLoc, detectionRange, COOLDOWN_TICKS_1),
-			new SpellForsakenLeap(mPlugin, mBoss, COOLDOWN_TICKS_1, this),
-			new SpellVerdantProtection(mPlugin, mBoss, COOLDOWN_TICKS_1, this),
-			new SpellRKitxetSummon(mPlugin, this, boss, COOLDOWN_TICKS_1)
+			new SpellForsakenLeap(mPlugin, mBoss, COOLDOWN_TICKS_1 - 1 * 20, this),
+			new SpellVerdantProtection(mPlugin, mBoss, COOLDOWN_TICKS_1 - 1 * 20, this),
+			new SpellRKitxetSummon(mPlugin, this, boss, COOLDOWN_TICKS_1 - 2 * 20)
 		));
 		SpellManager phase2Actives = new SpellManager(Arrays.asList(
 			new SpellEndlessAgony(mPlugin, this, mSpawnLoc, detectionRange, COOLDOWN_TICKS_2),
 			new SpellForsakenLeap(mPlugin, mBoss, COOLDOWN_TICKS_2, this),
-			new SpellVerdantProtection(mPlugin, mBoss, COOLDOWN_TICKS_2, this),
-			new SpellRKitxetSummon(mPlugin, this, boss, COOLDOWN_TICKS_2)
+			new SpellVerdantProtection(mPlugin, mBoss, COOLDOWN_TICKS_2 - 1 * 20, this),
+			new SpellRKitxetSummon(mPlugin, this, boss, COOLDOWN_TICKS_2 - 1 * 20)
 		));
 
 		List<Spell> phase1Passives = Arrays.asList(
-			new SpellKaulsFury(mPlugin, mBoss, this, 15 * 20, 5 * 20, 15),
+			new SpellKaulsFury(mPlugin, mBoss, this, 13 * 20, 5 * 20, 15, 10 * 20),
 			mShieldSpell,
 			new SpellBlockBreak(mBoss),
 			new SpellEndlessAgonyDamage(mBoss, this)
 		);
 		List<Spell> phase2Passives = Arrays.asList(
-			new SpellKaulsFury(mPlugin, mBoss, this, 8 * 20, 3 * 20, 10),
+			new SpellKaulsFury(mPlugin, mBoss, this, 7 * 20, 3 * 20, 10, 7 * 20),
 			mShieldSpell,
 			new SpellBlockBreak(mBoss),
 			new SpellEndlessAgonyDamage(mBoss, this)
@@ -222,7 +223,7 @@ public class RKitxet extends BossAbilityGroup {
 		});
 
 		BossBarManager bossBar = new BossBarManager(plugin, boss, detectionRange, BarColor.RED, BarStyle.SEGMENTED_10, events);
-		super.constructBoss(null, null, detectionRange, bossBar, 10 * 20);
+		super.constructBoss(null, null, detectionRange, bossBar, 7 * 20);
 		mBoss.setInvulnerable(true);
 		mBoss.setAI(false);
 
@@ -312,6 +313,9 @@ public class RKitxet extends BossAbilityGroup {
 			if (damager instanceof Player player) {
 				shieldDamage(event, player);
 			} else if (damager instanceof Projectile proj && proj.getShooter() instanceof Player player) {
+				if (proj instanceof Arrow arrow && arrow.hasCustomEffect(PotionEffectType.SLOW)) {
+					arrow.removeCustomEffect(PotionEffectType.SLOW);
+				}
 				shieldDamage(event, player);
 			} else {
 				event.setCancelled(true);
