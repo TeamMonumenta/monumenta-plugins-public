@@ -1,0 +1,290 @@
+{
+    "title": "Experiencinator Config",
+    "additionalProperties": false,
+    "properties": {
+		"experiencinators": {
+			"required": true,
+			"propertyOrder": 1,
+			"title": "Experiencinators",
+			"description": "Available Experiencinator items. The order of items in this list determines which one is used if there are multiple, with items later in the list being considered better.",
+            "type": "array",
+			"items": {
+				"title": "Experiencinator",
+				"type": "object",
+				"additionalProperties": false,
+				"properties": {
+					"name": {
+						"required": true,
+						"propertyOrder": 1,
+						"title": "Item name (plain)",
+						"type": "string"
+					},
+					"material": {
+						"required": true,
+						"propertyOrder": 2,
+						"title": "Item material",
+						"type": "string"
+					},
+					"conversion_rates": {
+						"required": true,
+						"propertyOrder": 3,
+						"title": "Conversion Rates",
+						"description": "A map from item region to a conversion name (see conversions further down).",
+						"type": "object",
+						"patternProperties": {
+							".*": {
+								"headerTemplate": "{{i}}",
+								"type": "string"
+							}
+						}
+					},
+					"prerequisites": {
+						"required": false,
+						"propertyOrder": 4,
+						"title": "Prerequisites",
+						"description": "Prerequisites to be able to use this experiencinator.",
+						"$ref": "prerequisites.json"
+					},
+					"prerequisites_failure_message": {
+						"required": false,
+						"propertyOrder": 5,
+						"title": "Prerequisites failure message",
+						"description": "Error message that is sent to the player if they attempt to use a shift + left/right click shortcut with this experiencinator if they don't fulfill the required prerequisites.",
+						"type": "string"
+					}
+				}
+			}
+		},
+        "conversions": {
+            "required": true,
+            "propertyOrder": 2,
+            "title": "Conversions",
+			"description": "List of possible conversions (items to currency/tickets/etc.)",
+            "type": "object",
+			"patternProperties": {
+				".*": {
+					"title": "Conversion",
+					"type": "object",
+					"additionalProperties": false,
+					"properties": {
+						"name": {
+							"required": true,
+							"propertyOrder": 1,
+							"title": "Conversion Name",
+							"description": "Display name of this conversion.",
+							"type": "string"
+						},
+						"settings_id": {
+							"required": true,
+							"propertyOrder": 2,
+							"title": "Settings ID",
+							"description": "Digit used to store this setting in the scoreboard. Multiple conversions can have the same ID if they apply to different regions.",
+							"type": "integer",
+							"minimum": 1,
+							"exclusiveMaximum": 10
+						},
+						"rates": {
+							"required": true,
+							"propertyOrder": 3,
+							"title": "Conversion Rates: map of item region -> conversion name -> item tier -> rate",
+							"description": "",
+							"type": "object",
+							"patternProperties": {
+								".*": {
+									"headerTemplate": "{{i}}",
+									"type": "object",
+									"patternProperties": {
+										".*": {
+											"headerTemplate": "{{i}}",
+											"type": "object",
+											"patternProperties": {
+												".*": {
+													"headerTemplate": "{{i}}",
+													"type": "integer",
+													"minimum": 1
+												}
+											}
+										}
+									}
+								}
+							}
+						},
+						"results": {
+							"required": true,
+							"propertyOrder": 4,
+							"title": "Conversion Results",
+							"description": "Map of region to list of conversion results",
+							"type": "object",
+							"patternProperties": {
+								".*": {
+									"headerTemplate": "{{i}}",
+									"type": "array",
+									"minItems": 1,
+									"items": {
+										"title": "Conversion Results",
+										"description": "Map of region to list of conversion results",
+										"type": "object",
+										"additionalProperties": false,
+										"properties": {
+											"value": {
+												"required": true,
+												"propertyOrder": 1,
+												"title": "Value",
+												"description": "Value of this result. At least one result must have value 1. Results with value > 1 are used to give compressed result items if the total value of converted items allows (useful for currencies).",
+												"type": "integer",
+												"minimum": 1
+											},
+											"name": {
+												"required": true,
+												"propertyOrder": 2,
+												"title": "Name",
+												"description": "Name of this result. Plural name if singular differs.",
+												"type": "string"
+											},
+											"name_singular": {
+												"required": false,
+												"propertyOrder": 3,
+												"title": "Name (singular)",
+												"description": "Name of a single piece of this result, if different from the name.",
+												"type": "string"
+											},
+											"loot_table": {
+												"required": true,
+												"propertyOrder": 4,
+												"title": "Loot Table",
+												"description": "Loot table where this item can be found. Should be a loot table containing only a single item.",
+												"type": "string"
+											}
+										}
+									}
+								}
+							}
+						},
+						"compress_existing_results": {
+							"required": false,
+							"propertyOrder": 5,
+							"title": "Compress Existing Results",
+							"description": "When giving compressed result items, will also compress existing uncompressed result items in the player's inventory.",
+							"type": "boolean"
+						},
+						"prerequisites": {
+							"required": false,
+							"propertyOrder": 6,
+							"title": "Prerequisites",
+							"description": "Prerequisites to be able to use this conversion.",
+							"$ref": "prerequisites.json"
+						},
+						"tier_prerequisites": {
+							"required": false,
+							"propertyOrder": 7,
+							"title": "Tier Prerequisites",
+							"description": "A map from item tier to prerequisites to be able to convert items of that tier.",
+							"type": "object",
+							"patternProperties": {
+								".*": {
+									"headerTemplate": "{{i}}",
+									"$ref": "prerequisites.json"
+								}
+							}
+						}
+					}
+				}
+			}
+        },
+        "gui": {
+            "required": true,
+            "propertyOrder": 2,
+            "title": "GUI config",
+			"description": "Options for the in-game player settings GUI",
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+				"region_icons": {
+					"required": true,
+					"propertyOrder": 1,
+					"title": "Region Icons",
+					"description": "A map from item region to an icon item for that region.",
+					"type": "object",
+					"patternProperties": {
+						".*": {
+							"headerTemplate": "{{i}} ",
+							"type": "string"
+						}
+					}
+				},
+				"tier_icons": {
+					"required": true,
+					"propertyOrder": 2,
+					"title": "Tier Icons",
+					"description": "A map from item tier to an icon item for that tier.",
+					"type": "object",
+					"patternProperties": {
+						".*": {
+							"headerTemplate": "{{i}} ",
+							"type": "string"
+						}
+					}
+				},
+				"region_order": {
+					"required": true,
+					"propertyOrder": 3,
+					"title": "Region Order",
+					"description": "Order of item regions in the GUI.",
+					"type": "array",
+					"minItems": 1,
+					"items": {
+						"title": "Item Region",
+						"type": "string"
+					}
+				},
+				"tier_order": {
+					"required": true,
+					"propertyOrder": 4,
+					"title": "Tier Order",
+					"description": "Order of item tiers in the GUI.",
+					"type": "array",
+					"minItems": 1,
+					"items": {
+						"title": "Item Tier",
+						"type": "string"
+					}
+				}
+			}
+        },
+        "scoreboards": {
+            "required": true,
+            "propertyOrder": 2,
+            "title": "Scoreboard Config",
+			"description": "Defines how player settings are stored",
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+				"tier_order": {
+					"required": true,
+					"propertyOrder": 1,
+					"title": "Tier Order",
+					"description": "Order of item tiers in the decimal-packed scoreboard value. New tiers may be added to the end of the list. Note: If items are reordered, existing player settings will break!",
+					"type": "array",
+					"minItems": 1,
+					"items": {
+						"title": "Item Tier",
+						"type": "string"
+					}
+				},
+				"objectives": {
+					"required": true,
+					"propertyOrder": 2,
+					"title": "Scoreboard Objectives",
+					"description": "A map from item region to scoreboard objective where player settings will be stored for items of that region.",
+					"type": "object",
+					"patternProperties": {
+						".*": {
+							"headerTemplate": "{{i}} ",
+							"type": "string"
+						}
+					}
+				}
+			}
+        }
+    }
+}

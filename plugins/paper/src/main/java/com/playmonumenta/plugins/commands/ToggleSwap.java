@@ -1,10 +1,10 @@
 package com.playmonumenta.plugins.commands;
 
-import com.playmonumenta.plugins.Plugin;
-
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+
+import com.playmonumenta.plugins.Plugin;
 
 import dev.jorel.commandapi.CommandAPI;
 import dev.jorel.commandapi.CommandAPICommand;

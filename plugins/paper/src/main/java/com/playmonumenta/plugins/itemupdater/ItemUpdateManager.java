@@ -142,6 +142,9 @@ public class ItemUpdateManager implements Listener {
 					}
 				}
 			}
+			if (ItemUtils.getPlainLore(item, false).contains("This is a placeholder item.")) {
+				return;
+			}
 		}
 
 		ItemUtils.setPlainTag(item);

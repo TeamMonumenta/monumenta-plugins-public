@@ -1,0 +1,280 @@
+{
+    "title": "prerequisites",
+    "type": "object",
+    "defaultProperties": [],
+    "additionalProperties": false,
+    "properties": {
+        "check_scores": {
+            "propertyOrder": 1,
+            "title": "check_scores",
+            "description": "Checks that the player has the specified scoreboard value(s). Click Properties, then type in the scoreboard name in the input box and click the 'add' button. Scoreboards are case-sensitive",
+            "type": "object",
+            "patternProperties": {
+                ".*": {
+                    "headerTemplate": "{{i}}",
+                    "options": {
+                        "keep_oneof_values": false
+                    },
+                    "oneOf": [
+                        {
+                            "title": "Exactly",
+                            "$ref": "score.json"
+                        },
+                        {
+                            "title": "Range",
+                            "type": "object",
+                            "properties": {
+                                "min": {
+                                    "title": "Minimum",
+                                    "$ref": "score.json"
+                                },
+                                "max": {
+                                    "title": "Maximum",
+                                    "$ref": "score.json"
+                                }
+                            }
+                        },
+                        {
+                            "title": "Matches score",
+                            "type": "string"
+                        }
+                    ]
+                }
+            }
+        },
+        "check_advancements": {
+            "propertyOrder": 2,
+            "title": "check_advancements",
+            "description": "Check if the player has that advancement; if an advancement starts with !, check if the player does not have that advancement",
+            "type": "array",
+            "items": {
+                "type": "string"
+            }
+        },
+        "check_tags": {
+            "propertyOrder": 3,
+            "title": "check_tags",
+            "description": "Check if the player has that tag; if a listed tag starts with !, check if the player does not have that tag instead",
+            "type": "array",
+            "items": {
+                "type": "string"
+            }
+        },
+        "items_in_inventory": {
+            "propertyOrder": 4,
+            "title": "items_in_inventory",
+            "description": "Checks that all of the specified items are present in the player's inventory",
+            "type": "array",
+            "minItems": 1,
+            "items": {
+                "title": "Item",
+                "description": "Checks that a specific item stack exists in the player's inventory. All conditions given here must match to succeed. All fields are optional, but at least one of (lore|name|type) must be specified. Items found are not removed.",
+                "$ref": "item.json"
+            }
+        },
+        "item_in_hand": {
+            "propertyOrder": 5,
+            "title": "item_in_hand",
+            "description": "Checks that all of the conditions match for the item in the player's main hand",
+            "type": "array",
+            "minItems": 1,
+            "items": {
+                "title": "Item",
+                "description": "Checks that a specific item stack exists in the player's inventory. All conditions given here must match to succeed. All fields are optional, but at least one of (lore|name|type) must be specified. Items found are not removed.",
+                "$ref": "item.json"
+            }
+        },
+        "item_in_off_hand": {
+            "propertyOrder": 6,
+            "title": "item_in_off_hand",
+            "description": "Checks that all of the conditions match for the item in the player's off hand",
+            "type": "array",
+            "minItems": 1,
+            "items": {
+                "title": "Item",
+                "description": "Checks that a specific item stack exists in the player's inventory. All conditions given here must match to succeed. All fields are optional, but at least one of (lore|name|type) must be specified. Items found are not removed.",
+                "$ref": "item.json"
+            }
+        },
+        "item_in_either_hand": {
+            "propertyOrder": 7,
+            "title": "item_in_either_hand",
+            "description": "Checks that all of the conditions match for the item in the player's main hand or off hand",
+            "type": "array",
+            "minItems": 1,
+            "items": {
+                "title": "Item",
+                "description": "Checks that a specific item stack exists in the player's inventory. All conditions given here must match to succeed. All fields are optional, but at least one of (lore|name|type) must be specified. Items found are not removed.",
+                "$ref": "item.json"
+            }
+        },
+        "location": {
+            "propertyOrder": 8,
+            "$ref": "location.json"
+        },
+        "test_for_block": {
+            "propertyOrder": 9,
+            "title": "test_for_block",
+            "description": "Checks that the block at x y z is the specified material. Will test on the current world the player is in. WILL FAIL IF CHUNK IS NOT LOADED!",
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "x": {
+                    "required": true,
+                    "$ref": "coordinate.json",
+                    "propertyOrder": 1
+                },
+                "y": {
+                    "required": true,
+                    "$ref": "coordinate.json",
+                    "propertyOrder": 2
+                },
+                "z": {
+                    "required": true,
+                    "$ref": "coordinate.json",
+                    "propertyOrder": 3
+                },
+                "type": {
+                    "required": true,
+                    "title": "type",
+                    "description": "Matches if the item type is exactly this Material. List of available materials can be found here: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Material.html",
+                    "type": "string",
+                    "propertyOrder": 4
+                }
+            }
+        },
+        "is_fully_healed": {
+            "propertyOrder": 10,
+            "title": "is_fully_healed",
+            "description": "If checked, succeeds if the entity is at full health; if not checked, succeeds if not at full health",
+            "type": "boolean",
+            "format": "checkbox",
+            "default": "true"
+        },
+        "is_sneaking": {
+            "propertyOrder": 11,
+            "title": "is_sneaking",
+            "description": "If checked, succeeds if the player is sneaking; if not checked, succeeds if not sneaking",
+            "type": "boolean",
+            "format": "checkbox",
+            "default": "true"
+        },
+        "gamemode": {
+            "propertyOrder": 12,
+            "title": "gamemode",
+            "description": "Succeeds if the player is in one of the checked gamemodes",
+            "type": "array",
+            "format": "checkbox",
+            "uniqueItems": true,
+            "items": {
+                "type": "string",
+                "enum": [
+                    "survival",
+                    "creative",
+                    "adventure",
+                    "spectator"
+                ]
+            }
+        },
+        "facing": {
+            "propertyOrder": 13,
+            "title": "facing",
+            "description": "Succeeds if a player is facing the specified location. ",
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "x": {
+                    "required": true,
+                    "$ref": "coordinate.json",
+                    "propertyOrder": 1
+                },
+                "y": {
+                    "required": true,
+                    "$ref": "coordinate.json",
+                    "propertyOrder": 2
+                },
+                "z": {
+                    "required": true,
+                    "$ref": "coordinate.json",
+                    "propertyOrder": 3
+                },
+                "min_alignment": {
+                    "required": true,
+                    "title": "min_alignment",
+                    "description": "Smaller value of min_alignment requires player to be looking less precisely at that spot. For example, 0.2 is something like 'the location is on screen' whereas 0.95 is 'looking almost exactly at that spot'",
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1,
+                    "propertyOrder": 4
+                }
+            }
+        },
+        "min_empty_inventory_slots": {
+            "propertyOrder": 14,
+            "title": "min_empty_inventory_slots",
+            "description": "Checks that at least the specified amount of slots in a player's inventory are empty.",
+            "type": "number",
+            "minimum": 0,
+            "maximum": 41,
+            "default": 1
+        },
+        "zone_properties": {
+            "propertyOrder": 1,
+            "title": "zone_properties",
+            "description": "Checks that the player is in a zone with the specified properties. Properties may be inverted by starting them with `!`. Click Properties, then type in the layer name in the input box and click the 'add' button. Layer and property names are case sensitive.",
+            "type": "object",
+            "defaultProperties": ["default"],
+            "patternProperties": {
+                ".*": {
+                    "headerTemplate": "Layer {{i}}",
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            }
+        },
+        "use_npc_for_prereqs": {
+            "propertyOrder": 14,
+            "title": "use_npc_for_prereqs",
+            "description": "All nested items use the NPC (instead of the player) for prereq checks. Use this to check if the NPC itself has scores, tags, etc. This only works when the NPC actually exists - such as when trading with an NPC or interacting with one directly by hitting them. This will NOT work when this interaction was started by /interactnpc commands or actions. Also does NOT work with inventory-related things such as item in hand/inventory.",
+            "type": "object",
+            "$ref": "prerequisites.json"
+        },
+        "and": {
+            "propertyOrder": 15,
+            "title": "and",
+            "description": "Returns true if all contained prerequisites are true, false otherwise",
+            "type": "object",
+            "$ref": "prerequisites.json"
+        },
+        "or": {
+            "propertyOrder": 16,
+            "title": "or",
+            "description": "Returns true if any contained prerequisite is true, false otherwise",
+            "type": "object",
+            "$ref": "prerequisites.json"
+        },
+        "not_and": {
+            "propertyOrder": 17,
+            "title": "not_and",
+            "description": "Returns true if any contained prerequisite is false, false otherwise",
+            "type": "object",
+            "$ref": "prerequisites.json"
+        },
+        "not_or": {
+            "propertyOrder": 18,
+            "title": "not_or",
+            "description": "Returns true if all contained prerequisites are false, false otherwise",
+            "type": "object",
+            "$ref": "prerequisites.json"
+        },
+        "only_one_of": {
+            "propertyOrder": 19,
+            "title": "only_one_of",
+            "description": "Returns true if exactly one contained prerequisite is true, false otherwise",
+            "type": "object",
+            "$ref": "prerequisites.json"
+        }
+    }
+}

@@ -38,13 +38,13 @@ import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.PotionUtils.PotionInfo;
 
 import de.tr7zw.nbtapi.NBTCompound;
+import de.tr7zw.nbtapi.NBTContainer;
 import de.tr7zw.nbtapi.NBTItem;
 import de.tr7zw.nbtapi.NBTList;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.md_5.bungee.api.ChatColor;
-
 
 
 public class ItemUtils {
@@ -406,7 +406,7 @@ public class ItemUtils {
 		SHULKER_BOX("Shulker Box"),
 		MONUMENTA("Monumenta");
 
-		String mReadableString;
+		final String mReadableString;
 
 		ItemRegion(String s) {
 			this.mReadableString = s;
@@ -414,6 +414,10 @@ public class ItemUtils {
 
 		public String asLoreString() {
 			return ChatColor.DARK_GRAY + this.mReadableString + " : ";
+		}
+
+		public String getReadableString() {
+			return mReadableString;
 		}
 	}
 
@@ -432,13 +436,13 @@ public class ItemUtils {
 		ENHANCED_RARE(ChatColor.YELLOW + "" + ChatColor.BOLD + "Enhanced Rare"),
 		ARTIFACT(ChatColor.DARK_RED + "Artifact"),
 		RELIC(ChatColor.GREEN + "Relic"),
-		EPIC(ChatColor.GOLD + "" + ChatColor.BOLD + "Patron Made"),
+		EPIC(ChatColor.GOLD + "" + ChatColor.BOLD + "Epic"),
 		UNIQUE(ChatColor.DARK_PURPLE + "Unique"),
 		UNIQUE_EVENT(ChatColor.DARK_PURPLE + "Unique Event"),
 		SHULKER_BOX("Shulker Box"),
 		QUEST_COMPASS("Quest Compass");
 
-		String mReadableString;
+		final String mReadableString;
 
 		ItemTier(String s) {
 			this.mReadableString = s;
@@ -446,6 +450,10 @@ public class ItemUtils {
 
 		public String asLoreString() {
 			return this.mReadableString;
+		}
+
+		public String getReadableString() {
+			return ChatColor.stripColor(mReadableString);
 		}
 	}
 
@@ -1445,11 +1453,21 @@ public class ItemUtils {
 	/**
 	 * Properly clones an item stack. The default clone method does not clone NBT, which can lead to issues.
 	 *
-	 * @param itemStack The item stack to be cloned
+	 * @param itemStack The item stack to be cloned, may be null
 	 * @return A completely new item stack that is a clone of the original item stack
 	 */
-	public static ItemStack clone(ItemStack itemStack) {
+	public static @PolyNull ItemStack clone(@PolyNull ItemStack itemStack) {
+		if (itemStack == null) {
+			return null;
+		}
 		return NBTItem.convertNBTtoItem(NBTItem.convertItemtoNBT(itemStack));
+	}
+
+	/**
+	 * Parses an item stack from an NBT Mojangson string (format {"id": "...", "count": x, "tag": {...}})
+	 */
+	public static ItemStack parseItemStack(String nbtMojangson) {
+		return NBTItem.convertNBTtoItem(new NBTContainer(nbtMojangson));
 	}
 
 }

@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.custominventories;
 
 import java.util.Map;
+import java.util.function.BiFunction;
 
 import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
@@ -13,10 +14,10 @@ public class GuiItem {
 	private final int mSlot;
 	private final ItemStack mShowedItem;
 	private final @Nullable Map<ItemStack, Integer> mCost;
-	private final @Nullable DoubleParameterFunction<Player, Inventory, Boolean> mAfterClickFunction;
-	private final @Nullable DoubleParameterFunction<Player, Inventory, Boolean> mCondition;
+	private final @Nullable BiFunction<Player, Inventory, Boolean> mAfterClickFunction;
+	private final @Nullable BiFunction<Player, Inventory, Boolean> mCondition;
 
-	public GuiItem(int page, int slot, ItemStack showedItem, @Nullable Map<ItemStack, Integer> cost, @Nullable DoubleParameterFunction<Player, Inventory, Boolean> cond, @Nullable DoubleParameterFunction<Player, Inventory, Boolean> afterClick) {
+	public GuiItem(int page, int slot, ItemStack showedItem, @Nullable Map<ItemStack, Integer> cost, @Nullable BiFunction<Player, Inventory, Boolean> cond, @Nullable BiFunction<Player, Inventory, Boolean> afterClick) {
 		this.mPage = page;
 		this.mSlot = slot;
 		this.mShowedItem = showedItem;
@@ -25,11 +26,11 @@ public class GuiItem {
 		this.mAfterClickFunction = afterClick;
 	}
 
-	public GuiItem(int page, int slot, ItemStack showedItem, @Nullable Map<ItemStack, Integer> cost, @Nullable DoubleParameterFunction<Player, Inventory, Boolean> cond) {
+	public GuiItem(int page, int slot, ItemStack showedItem, @Nullable Map<ItemStack, Integer> cost, @Nullable BiFunction<Player, Inventory, Boolean> cond) {
 		this(page, slot, showedItem, cost, cond, null);
 	}
 
-	public GuiItem(int page, int slot, ItemStack showedItem, @Nullable DoubleParameterFunction<Player, Inventory, Boolean> cond, @Nullable DoubleParameterFunction<Player, Inventory, Boolean> afterClick) {
+	public GuiItem(int page, int slot, ItemStack showedItem, @Nullable BiFunction<Player, Inventory, Boolean> cond, @Nullable BiFunction<Player, Inventory, Boolean> afterClick) {
 		this(page, slot, showedItem, null, cond, afterClick);
 	}
 
@@ -45,7 +46,7 @@ public class GuiItem {
 		this(0, slot, showedItemStack, (Map<ItemStack, Integer>) null);
 	}
 
-	public GuiItem(int page, int slot, ItemStack showedItemStack, @Nullable DoubleParameterFunction<Player, Inventory, Boolean> cond) {
+	public GuiItem(int page, int slot, ItemStack showedItemStack, @Nullable BiFunction<Player, Inventory, Boolean> cond) {
 		this(page, slot, showedItemStack, (Map<ItemStack, Integer>) null, cond);
 	}
 
@@ -137,8 +138,4 @@ public class GuiItem {
 		return new GuiItem(mPage, mSlot, mShowedItem, mCost, mCondition, mAfterClickFunction);
 	}
 
-	@FunctionalInterface
-	public interface DoubleParameterFunction<P, I, B> {
-		B apply(P p, I i);
-	}
 }

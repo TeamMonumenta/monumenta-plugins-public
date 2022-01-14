@@ -1,0 +1,38 @@
+{
+    "title": "location",
+    "description": "Checks that the player is inside the specified location.",
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+        "x1": {
+            "required": true,
+            "$ref": "coordinate.json",
+            "propertyOrder": 1
+        },
+        "y1": {
+            "required": true,
+            "$ref": "coordinate.json",
+            "propertyOrder": 2
+        },
+        "z1": {
+            "required": true,
+            "$ref": "coordinate.json",
+            "propertyOrder": 3
+        },
+        "x2": {
+            "required": true,
+            "$ref": "coordinate.json",
+            "propertyOrder": 4
+        },
+        "y2": {
+            "required": true,
+            "$ref": "coordinate.json",
+            "propertyOrder": 5
+        },
+        "z2": {
+            "required": true,
+            "$ref": "coordinate.json",
+            "propertyOrder": 6
+        }
+    }
+}

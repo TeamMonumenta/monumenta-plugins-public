@@ -1,0 +1,33 @@
+{
+	"type": "object",
+	"defaultProperties": [],
+	"additionalProperties": false,
+	"properties": {
+		"lore": {
+			"propertyOrder": 1,
+			"title": "lore",
+			"description": "Matches if any line of lore text *contains* this string.",
+			"type": "string"
+		},
+		"name": {
+			"propertyOrder": 2,
+			"title": "name",
+			"description": "Matches if the item name *contains* this string.",
+			"type": "string"
+		},
+		"type": {
+			"propertyOrder": 3,
+			"title": "type",
+			"description": "Matches if the item type is exactly this Material. List of available materials can be found here: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Material.html",
+			"type": "string"
+		},
+		"count": {
+			"propertyOrder": 4,
+			"title": "count",
+			"description": "The minimum number of items matching the specified lore/name/type that must be present to succeed. If 0, will succeed only if no matched items are present. This will match items in multiple stacks, for example a stack of 5 and a stack of 8 will match a count of 10.",
+			"type": "integer",
+			"minimum": 0,
+			"default": 1
+		}
+	}
+}

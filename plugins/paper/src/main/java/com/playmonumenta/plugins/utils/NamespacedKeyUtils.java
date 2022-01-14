@@ -13,7 +13,7 @@ public abstract class NamespacedKeyUtils {
 	public static NamespacedKey fromString(String s) throws IllegalArgumentException {
 		NamespacedKey key = NamespacedKey.fromString(s);
 		if (key == null) {
-			throw new IllegalArgumentException(s);
+			throw new IllegalArgumentException("Invalid namespaced key '" + s + "'");
 		}
 		return key;
 	}

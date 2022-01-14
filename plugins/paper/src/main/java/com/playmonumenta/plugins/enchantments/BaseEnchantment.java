@@ -2,12 +2,6 @@ package com.playmonumenta.plugins.enchantments;
 
 import java.util.EnumSet;
 
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
-import com.playmonumenta.plugins.events.CustomDamageEvent;
-import com.playmonumenta.plugins.events.EvasionEvent;
-import com.playmonumenta.plugins.utils.InventoryUtils;
-
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -24,8 +18,13 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.event.player.PlayerItemDamageEvent;
 import org.bukkit.inventory.ItemStack;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
-
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
+import com.playmonumenta.plugins.events.CustomDamageEvent;
+import com.playmonumenta.plugins.events.EvasionEvent;
+import com.playmonumenta.plugins.utils.InventoryUtils;
 
 
 //TODO update method naming from when this class used to be ItemProperty.
@@ -93,9 +92,9 @@ public interface BaseEnchantment {
 	 * Returns 0 when the enchant is not considered present on the item.
 	 */
 	default int getPlayerItemLevel(
-		ItemStack itemStack,
-		Player player,
-		ItemSlot itemSlot
+			@Nullable ItemStack itemStack,
+			Player player,
+			ItemSlot itemSlot
 	) {
 		if (getValidSlots().contains(itemSlot)) {
 			return getItemLevel(itemStack);
@@ -114,11 +113,11 @@ public interface BaseEnchantment {
 	 * such as Radiant only being considered present when the wielding player
 	 * is the item's soulbound owner.
 	 */
-	default int getItemLevel(ItemStack itemStack) {
+	default int getItemLevel(@Nullable ItemStack itemStack) {
 		return InventoryUtils.getCustomEnchantLevel(
-			itemStack,
-			getProperty(),
-			isMultiLevel()
+				itemStack,
+				getProperty(),
+				isMultiLevel()
 		);
 	}
 

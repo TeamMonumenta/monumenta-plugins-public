@@ -17,6 +17,7 @@ import com.playmonumenta.plugins.bosses.BossManager;
 import com.playmonumenta.plugins.bosses.spells.SpellDetectionCircle;
 import com.playmonumenta.plugins.classes.MonumentaClasses;
 import com.playmonumenta.plugins.commands.*;
+import com.playmonumenta.plugins.commands.experiencinator.ExperiencinatorCommand;
 import com.playmonumenta.plugins.custominventories.CustomInventoryCommands;
 import com.playmonumenta.plugins.depths.DepthsCommand;
 import com.playmonumenta.plugins.depths.DepthsGUICommands;
@@ -195,6 +196,7 @@ public class Plugin extends JavaPlugin {
 		Stuck.register(this);
 		GlowingCommand.register();
 		VirtualFirmament.register();
+		ExperiencinatorCommand.register();
 		EventCommand.register();
 
 
@@ -209,9 +211,9 @@ public class Plugin extends JavaPlugin {
 
 		/* If this is the plots shard, register /plotaccess functions and enable functionality */
 		if (ServerProperties.getShardName().equals("plots")
-			|| ServerProperties.getShardName().equals("mobs")
-			|| ServerProperties.getShardName().equals("dev1")
-			|| ServerProperties.getShardName().equals("dev2")) {
+				|| ServerProperties.getShardName().equals("mobs")
+				|| ServerProperties.getShardName().equals("dev1")
+				|| ServerProperties.getShardName().equals("dev2")) {
 			ShopManager.registerCommands();
 		}
 
@@ -322,8 +324,8 @@ public class Plugin extends JavaPlugin {
 		manager.registerEvents(new TradeListener(), this);
 
 		if (ServerProperties.getShardName().contains("depths")
-			|| ServerProperties.getShardName().equals("mobs")
-			|| ServerProperties.getShardName().startsWith("dev")) {
+				|| ServerProperties.getShardName().equals("mobs")
+				|| ServerProperties.getShardName().startsWith("dev")) {
 			manager.registerEvents(new DepthsListener(this), this);
 		}
 
