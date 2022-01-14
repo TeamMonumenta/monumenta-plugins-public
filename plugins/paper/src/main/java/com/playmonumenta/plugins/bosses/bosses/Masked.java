@@ -75,6 +75,7 @@ public class Masked extends BossAbilityGroup {
 		super(plugin, identityTag, boss);
 		mWorld = boss.getWorld();
 		mSpawnLoc = spawnLoc;
+		mSpawnLoc.setY(mSpawnLoc.getBlockY());
 		mEndLoc = endLoc;
 
 		// Store the Arcane Gladius to a variable for phase 2
@@ -181,7 +182,7 @@ public class Masked extends BossAbilityGroup {
 			// Teleport the boss to spawn preserving look direction whenever in water
 			new SpellRunAction(() -> {
 				Location curLoc = mBoss.getLocation();
-				if (curLoc.getY() < 157) {
+				if (curLoc.getY() < mSpawnLoc.getY() - 5) {
 					Location teleLoc = mSpawnLoc.clone();
 					teleLoc.setYaw(curLoc.getYaw());
 					teleLoc.setPitch(curLoc.getPitch());
