@@ -43,6 +43,10 @@ public class VirtualFirmamentReplacer extends PacketAdapter {
 			}
 		} else { // PacketType.Play.Server.SET_SLOT
 			// doc: https://wiki.vg/Protocol#Set_Slot
+			if (packet.getIntegers().read(0) != 0) {
+				// first int (should be a byte?) is the window ID, with ID 0 being the player inventory
+				return;
+			}
 			// second integer (should be first short?) is the slot ID
 			int slot = packet.getIntegers().read(1);
 			if (36 <= slot && slot < 46) {
