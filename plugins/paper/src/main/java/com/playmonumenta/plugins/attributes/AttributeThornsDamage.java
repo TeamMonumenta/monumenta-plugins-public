@@ -18,6 +18,7 @@ import com.playmonumenta.plugins.effects.Stasis;
 */
 public class AttributeThornsDamage implements BaseAttribute {
 	private static final String PROPERTY_NAME = "Thorns Damage";
+
 	@Override
 	public String getProperty() {
 		return PROPERTY_NAME;

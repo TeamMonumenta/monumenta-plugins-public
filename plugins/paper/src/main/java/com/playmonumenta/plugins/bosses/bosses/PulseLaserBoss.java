@@ -25,6 +25,7 @@ import com.playmonumenta.plugins.utils.BossUtils;
  * </pre></blockquote>
  * @author G3m1n1Boy
  */
+@Deprecated
 public class PulseLaserBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_pulselaser";
 

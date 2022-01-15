@@ -18,6 +18,7 @@ import com.playmonumenta.plugins.bosses.spells.SpellFrostNova;
  * </pre></blockquote>
  * @G3m1n1Boy
  */
+@Deprecated
 public class FrostNovaBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_frostnova";
 

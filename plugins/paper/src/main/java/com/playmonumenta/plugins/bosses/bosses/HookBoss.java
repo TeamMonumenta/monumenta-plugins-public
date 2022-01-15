@@ -27,6 +27,7 @@ import com.playmonumenta.plugins.utils.PotionUtils;
  * </pre></blockquote>
  * @Author G3m1n1Boy
  */
+@Deprecated
 public class HookBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_hook";
 

@@ -25,8 +25,6 @@ import com.playmonumenta.plugins.utils.PotionUtils;
 public class ViciousCombos extends Ability {
 
 	private static final int VICIOUS_COMBOS_RANGE = 5;
-	private static final int VICIOUS_COMBOS_EFFECT_DURATION = 15 * 20;
-	private static final int VICIOUS_COMBOS_EFFECT_LEVEL = 0;
 	private static final int VICIOUS_COMBOS_COOL_1 = 20;
 	private static final int VICIOUS_COMBOS_COOL_2 = 2 * 20;
 	private static final int VICIOUS_COMBOS_CRIPPLE_DURATION = 5 * 20;

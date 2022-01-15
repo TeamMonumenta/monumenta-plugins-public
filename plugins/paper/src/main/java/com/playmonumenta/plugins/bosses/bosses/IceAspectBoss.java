@@ -21,6 +21,7 @@ import com.playmonumenta.plugins.utils.PotionUtils;
  * CARE this ability has some particle & sound, fix those too if you don't want the default values
  * </pre></blockquote>
  */
+@Deprecated
 public final class IceAspectBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_iceaspect";
 

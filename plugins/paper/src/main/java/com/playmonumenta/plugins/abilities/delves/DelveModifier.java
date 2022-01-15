@@ -113,9 +113,13 @@ public class DelveModifier extends Ability {
 		}
 	}
 
-	protected void applyModifiers(LivingEntity mob, EntitySpawnEvent event) { }
+	protected void applyModifiers(LivingEntity mob, EntitySpawnEvent event) {
 
-	protected void applyModifiers(LivingEntity mob, SpawnerSpawnEvent event) { }
+	}
+
+	protected void applyModifiers(LivingEntity mob, SpawnerSpawnEvent event) {
+
+	}
 
 	protected boolean playerTookCustomDamageEvent(EntityDamageByEntityEvent event) {
 		return true;

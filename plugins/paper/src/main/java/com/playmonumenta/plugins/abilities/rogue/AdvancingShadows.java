@@ -49,7 +49,7 @@ public class AdvancingShadows extends Ability {
 			super("Advancing Shadows Knockback Range", EnumSet.of(ItemSlot.MAINHAND, ItemSlot.OFFHAND, ItemSlot.ARMOR));
 		}
 
-		private static float getKnockbackRadius(Player player, float base) {
+		protected static float getKnockbackRadius(Player player, float base) {
 			int level = PlayerTracking.getInstance().getPlayerCustomEnchantLevel(player, AdvancingShadowsKnockbackRadiusEnchantment.class);
 			return base * (float) ((level / 100.0) + 1);
 		}
@@ -60,7 +60,7 @@ public class AdvancingShadows extends Ability {
 			super("Advancing Shadows Knockback Speed", EnumSet.of(ItemSlot.MAINHAND, ItemSlot.OFFHAND, ItemSlot.ARMOR));
 		}
 
-		private static float getKnockbackSpeed(Player player, float base) {
+		protected static float getKnockbackSpeed(Player player, float base) {
 			int level = PlayerTracking.getInstance().getPlayerCustomEnchantLevel(player, AdvancingShadowsKnockbackSpeedEnchantment.class);
 			return base * (float) ((level / 100.0) + 1);
 		}

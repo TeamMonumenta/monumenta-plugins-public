@@ -26,6 +26,7 @@ import com.playmonumenta.plugins.utils.PotionUtils;
  * /bos var Tags add boss_projectile[ParticleLaunch=[(SOUL_FIRE_FLAME,0)],ParticleProjectile=[(SOUL_FIRE_FLAME,5,0.1,0.1,0.1,0.05),(SMOKE_LARGE,2,0.25,0.25,0.25)],ParticleHit=[(SOUL_FIRE_FLAME,30,0,0,0,0.25)]]
  * </pre></blockquote>
  */
+@Deprecated
 public final class ArcaneProjectileBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_arcaneprojectile";
 

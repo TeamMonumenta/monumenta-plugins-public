@@ -22,6 +22,7 @@ import com.playmonumenta.plugins.utils.AbilityUtils;
  * @G3m1n1Boy
  *
 */
+@Deprecated
 public class AbilitySilenceBoss extends BossAbilityGroup {
 
 	public static final String identityTag = "boss_abilitysilence";

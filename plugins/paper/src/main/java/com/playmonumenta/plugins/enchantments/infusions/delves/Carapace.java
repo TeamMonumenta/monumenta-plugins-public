@@ -9,7 +9,6 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.effects.PercentDamageReceived;
-import com.playmonumenta.plugins.effects.PercentKnockbackResist;
 import com.playmonumenta.plugins.enchantments.BaseEnchantment;
 import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
 import com.playmonumenta.plugins.utils.DelveInfusionUtils;

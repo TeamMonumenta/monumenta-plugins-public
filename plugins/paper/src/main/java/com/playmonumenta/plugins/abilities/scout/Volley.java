@@ -40,7 +40,7 @@ public class Volley extends Ability {
 			super("Volley Damage Multiplier", EnumSet.of(ItemSlot.MAINHAND, ItemSlot.OFFHAND, ItemSlot.ARMOR));
 		}
 
-		private static float getMultiplier(Player player, float base) {
+		protected static float getMultiplier(Player player, float base) {
 			int level = PlayerTracking.getInstance().getPlayerCustomEnchantLevel(player, VolleyMultiplierEnchantment.class);
 			return base * (float) ((level / 100.0) + 1);
 		}
@@ -57,7 +57,7 @@ public class Volley extends Ability {
 			super("Volley Arrows", EnumSet.of(ItemSlot.MAINHAND, ItemSlot.OFFHAND, ItemSlot.ARMOR));
 		}
 
-		private static float getExtraArrows(Player player) {
+		protected static float getExtraArrows(Player player) {
 			int level = PlayerTracking.getInstance().getPlayerCustomEnchantLevel(player, VolleyArrowsEnchantment.class);
 			return level;
 		}

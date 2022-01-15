@@ -17,6 +17,7 @@ import com.playmonumenta.plugins.bosses.spells.SpellTpBehindPlayer;
  * </pre></blockquote>
  * @G3m1n1Boy
  */
+@Deprecated
 public class TpBehindTargetedBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_tpbehindtargeted";
 	public static final int detectionRange = 20;

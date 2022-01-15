@@ -9,14 +9,14 @@ public enum DepthsTree {
 	WINDWALKER("Windwalker"),
 	FLAMECALLER("Flamecaller");
 
-	private final String displayName;
+	private final String mDisplayName;
 
 	DepthsTree(String displayName) {
-		this.displayName = displayName;
+		this.mDisplayName = displayName;
 	}
 
 	public String getDisplayName() {
-		return displayName;
+		return mDisplayName;
 	}
 
 }

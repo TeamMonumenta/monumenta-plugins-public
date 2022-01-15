@@ -45,7 +45,7 @@ public class BruteForce extends Ability {
 			super("Brute Force Knockback", EnumSet.of(ItemSlot.MAINHAND, ItemSlot.OFFHAND, ItemSlot.ARMOR));
 		}
 
-		private static float getKnockback(Player player, float base) {
+		protected static float getKnockback(Player player, float base) {
 			int level = PlayerTracking.getInstance().getPlayerCustomEnchantLevel(player, BruteForceKnockbackEnchantment.class);
 			return base * (float) ((level / 100.0) + 1);
 		}

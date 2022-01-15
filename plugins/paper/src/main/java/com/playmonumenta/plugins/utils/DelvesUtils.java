@@ -9,7 +9,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.UUID;
 import java.util.WeakHashMap;
 
 import org.bukkit.Bukkit;
@@ -215,7 +214,7 @@ public class DelvesUtils {
 				mIsDepths = true;
 			}
 
-			if (!storeDelveInfo(player)) {
+			if (!storeDelveInfo()) {
 				player.sendMessage("You currently have an invalid Delves score. Please contact a moderator, and do NOT start/continue a Delve.");
 			}
 		}
@@ -227,7 +226,7 @@ public class DelvesUtils {
 		 * 00 0 0000000000000 000000 000 000 000 000 000 000 000 000 000 000 000 000 000 000
 		 * x  a u             d      m   m   m   m   m   m   m   m   m   m   m   m   m   m
 		 */
-		private boolean storeDelveInfo(Player player) {
+		private boolean storeDelveInfo() {
 			if (mDelveScore == 0) {
 				mIsEditable = true;
 

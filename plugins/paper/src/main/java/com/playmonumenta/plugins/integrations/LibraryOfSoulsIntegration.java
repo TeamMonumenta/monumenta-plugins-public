@@ -12,8 +12,6 @@ import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-import com.playmonumenta.libraryofsouls.LibraryOfSoulsAPI;
-
 public class LibraryOfSoulsIntegration {
 	private static boolean ENABLED = false;
 

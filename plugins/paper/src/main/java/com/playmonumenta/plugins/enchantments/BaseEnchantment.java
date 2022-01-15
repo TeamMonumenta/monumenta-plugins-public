@@ -140,7 +140,9 @@ public interface BaseEnchantment {
 		Plugin plugin,
 		Player player,
 		int newLevel
-	) {}
+	) {
+
+	}
 
 	/* TODO
 	 * Only call this when this enchantment is actually getting removed;
@@ -158,7 +160,9 @@ public interface BaseEnchantment {
 	default void removeProperty(
 		Plugin plugin,
 		Player player
-	) {}
+	) {
+
+	}
 
 	/*
 	 * Called whenever part or all of the player's inventory equipment
@@ -168,7 +172,9 @@ public interface BaseEnchantment {
 	default void onEquipmentUpdate(
 		Plugin plugin,
 		Player player
-	) {}
+	) {
+
+	}
 
 	/*
 	 * When this enchant is considered present,
@@ -179,7 +185,9 @@ public interface BaseEnchantment {
 		Plugin plugin,
 		Player player,
 		int level
-	) {}
+	) {
+
+	}
 
 	/*
 	 * When this enchant is considered present,
@@ -193,7 +201,9 @@ public interface BaseEnchantment {
 		Player player,
 		int level,
 		EvasionEvent evasionEvent
-	) {}
+	) {
+
+	}
 
 	/*
 	 * When this enchant is considered present,
@@ -206,7 +216,9 @@ public interface BaseEnchantment {
 		int level,
 		LivingEntity enemy,
 		CustomDamageEvent customDamageEvent
-	) {}
+	) {
+
+	}
 
 
 
@@ -224,7 +236,9 @@ public interface BaseEnchantment {
 		int level,
 		LivingEntity enemy,
 		EntityDamageByEntityEvent entityDamageByEntityEvent
-	) {}
+	) {
+
+	}
 
 	/*
 	 * When this enchant is considered present,
@@ -237,7 +251,9 @@ public interface BaseEnchantment {
 		int level,
 		LivingEntity enemy,
 		EntityDamageByEntityEvent entityDamageByEntityEvent
-	) {}
+	) {
+
+	}
 
 	/* TODO
 	 * Due to both EntityListener & CrossbowListener appearing to call this,
@@ -257,7 +273,9 @@ public interface BaseEnchantment {
 		int level,
 		Projectile projectile,
 		ProjectileLaunchEvent projectileLaunchEvent
-	) {}
+	) {
+
+	}
 
 	/*
 	 * When this enchant is considered present,
@@ -270,7 +288,9 @@ public interface BaseEnchantment {
 		int level,
 		Entity enemy,
 		EntityDeathEvent entityDeathEvent
-	) {}
+	) {
+
+	}
 
 	/*
 	 * When this enchant is considered present,
@@ -282,7 +302,9 @@ public interface BaseEnchantment {
 		BlockBreakEvent blockBreakEvent,
 		ItemStack itemStack,
 		int level
-	) {}
+	) {
+
+	}
 
 	/*
 	 * When this enchant is considered present,
@@ -297,7 +319,9 @@ public interface BaseEnchantment {
 		Player player,
 		PlayerInteractEvent playerInteractEvent,
 		int level
-	) {}
+	) {
+
+	}
 
 	/*
 	 * When this enchant is considered present,
@@ -308,7 +332,9 @@ public interface BaseEnchantment {
 		Player player,
 		PlayerItemConsumeEvent playerItemConsumeEvent,
 		int level
-	) {}
+	) {
+
+	}
 
 	/*
 	 * When this enchant is considered present,
@@ -319,7 +345,9 @@ public interface BaseEnchantment {
 		Player player,
 		int level,
 		EntityRegainHealthEvent entityRegainHealthEvent
-	) {}
+	) {
+
+	}
 
 	/*
 	 * When this enchant is considered present,
@@ -338,7 +366,9 @@ public interface BaseEnchantment {
 		Player player,
 		int level,
 		EntityDamageEvent entityDamageEvent
-	) {}
+	) {
+
+	}
 
 	/* TODO
 	 * Bug #5914, this is called even if damage is blocked by a shield,
@@ -363,7 +393,9 @@ public interface BaseEnchantment {
 		Player player,
 		int level,
 		EntityDamageEvent entityDamageEvent
-	) {}
+	) {
+
+	}
 
 	/*
 	 * When this enchant is considered present,
@@ -378,7 +410,9 @@ public interface BaseEnchantment {
 		Player player,
 		int level,
 		EntityDamageByEntityEvent entityDamageByEntityEvent
-	) {}
+	) {
+
+	}
 
 	/*
 	 * When this enchant is considered present,
@@ -389,7 +423,9 @@ public interface BaseEnchantment {
 		Player player,
 		PlayerDeathEvent playerDeathEvent,
 		int level
-	) {}
+	) {
+
+	}
 
 	/*
 	 * When this enchant is considered present,
@@ -400,7 +436,9 @@ public interface BaseEnchantment {
 		Player player,
 		PlayerItemDamageEvent playerItemDamageEvent,
 		int level
-	) {}
+	) {
+
+	}
 
 	/*
 	 * When this enchant is considered present,
@@ -411,5 +449,7 @@ public interface BaseEnchantment {
 		Player player,
 		PlayerExpChangeEvent playerExpChangeEvent,
 		int level
-	) {}
+	) {
+
+	}
 }

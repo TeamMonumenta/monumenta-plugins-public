@@ -9,7 +9,6 @@ import com.playmonumenta.plugins.bosses.spells.Spell;
 public class SpellCastEvent extends Event {
 
 	private static final HandlerList handlers = new HandlerList();
-	private boolean mIsCancelled;
 	private LivingEntity mBoss;
 	private Spell mSpell;
 

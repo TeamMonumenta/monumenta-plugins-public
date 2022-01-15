@@ -6,11 +6,9 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.enchantments.BaseEnchantment;
 import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
 import com.playmonumenta.plugins.utils.DelveInfusionUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 
 import org.bukkit.ChatColor;
-import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerExpChangeEvent;
 import org.bukkit.inventory.ItemStack;

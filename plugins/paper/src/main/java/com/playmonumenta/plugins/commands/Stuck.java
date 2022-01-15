@@ -35,16 +35,17 @@ public class Stuck {
 						.decoration(TextDecoration.ITALIC, false));
 				new BukkitRunnable() {
 					int mTime = 10;
-					Player target = player;
-					Location startLoc = player.getLocation();
+					Player mTarget = player;
+					Location mStartLoc = player.getLocation();
+
 					@Override
 					public void run() {
-						if (target == null || !target.isOnline()) {
+						if (mTarget == null || !mTarget.isOnline()) {
 							this.cancel();
 							return;
 						}
-						if (target.getLocation().distance(startLoc) > 2) {
-							target.sendMessage(Component.text("You've moved too far from your original location! Please try again.", NamedTextColor.RED)
+						if (mTarget.getLocation().distance(mStartLoc) > 2) {
+							mTarget.sendMessage(Component.text("You've moved too far from your original location! Please try again.", NamedTextColor.RED)
 									.decoration(TextDecoration.ITALIC, false));
 							this.cancel();
 							return;
@@ -54,13 +55,15 @@ public class Stuck {
 						case 3:
 						case 2:
 						case 1:
-							target.sendMessage(Component.text("Teleporting in " + mTime + " seconds, please stand still!", NamedTextColor.RED)
+							mTarget.sendMessage(Component.text("Teleporting in " + mTime + " seconds, please stand still!", NamedTextColor.RED)
 									.decoration(TextDecoration.ITALIC, false));
 							break;
 						case 0:
-							target.teleport(player.getWorld().getSpawnLocation());
+							mTarget.teleport(player.getWorld().getSpawnLocation());
 							this.cancel();
 							return;
+						default:
+							// Wait
 						}
 						mTime--;
 					}

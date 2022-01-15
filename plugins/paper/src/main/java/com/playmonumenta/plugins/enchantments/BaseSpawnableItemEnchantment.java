@@ -24,5 +24,7 @@ public interface BaseSpawnableItemEnchantment extends BaseEnchantment {
 		Plugin plugin,
 		Item item,
 		int level
-	) {}
+	) {
+
+	}
 }

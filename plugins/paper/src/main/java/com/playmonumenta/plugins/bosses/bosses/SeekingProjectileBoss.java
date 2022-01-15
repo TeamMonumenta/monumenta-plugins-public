@@ -20,6 +20,7 @@ import com.playmonumenta.plugins.utils.PotionUtils;
 /**
  * @deprecated
  */
+@Deprecated
 public class SeekingProjectileBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_seekingprojectile";
 

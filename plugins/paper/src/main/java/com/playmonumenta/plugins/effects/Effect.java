@@ -70,11 +70,17 @@ public abstract class Effect implements Comparable<Effect> {
 		return true;
 	}
 
-	public void entityTickEffect(Entity entity, boolean fourHertz, boolean twoHertz, boolean oneHertz) { }
+	public void entityTickEffect(Entity entity, boolean fourHertz, boolean twoHertz, boolean oneHertz) {
 
-	public void entityGainEffect(Entity entity) { }
+	}
 
-	public void entityLoseEffect(Entity entity) { }
+	public void entityGainEffect(Entity entity) {
+
+	}
+
+	public void entityLoseEffect(Entity entity) {
+
+	}
 
 	/**
 	 * @param ticks Ticks passed since the last time this method was called to check duration expiry

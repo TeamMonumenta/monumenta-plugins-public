@@ -18,6 +18,7 @@ import com.playmonumenta.plugins.bosses.spells.SpellFlameNova;
  * /bos var Tags add boss_nova[ParticleAir=[(lava,2,4.5,4.5,4.5,0.05)],ParticleLoad=[(flame,1,0.25,0.25,0.25,0.1)],ParticleExplode=[(flame,1,0.1,0.1,0.1,0.3),(smoke_normal,2,0.25,0.25,0.25,0.1)]]
  * </pre></blockquote>
  */
+@Deprecated
 public final class FlameNovaBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_flamenova";
 

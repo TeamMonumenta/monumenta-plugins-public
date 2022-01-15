@@ -14,7 +14,6 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.util.Vector;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.Plugin;
@@ -115,7 +114,6 @@ public class VoodooBonds extends Ability {
 			for (LivingEntity mob : EntityUtils.getNearbyMobs(damagee.getLocation(), PASSIVE_RADIUS, mPlayer)) {
 				if (mob.getType().equals(type) && mob != damagee) {
 					Location mLoc = mob.getLocation();
-					Vector velocity = mob.getVelocity();
 					EntityUtils.damageEntity(mPlugin, mob, event.getDamage() * mDamage, mPlayer, MagicType.DARK_MAGIC, true, mInfo.mLinkedSpell);
 					world.spawnParticle(Particle.SPELL_WITCH, mLoc, 30, 0.5, 0.5, 0.5, 0.001);
 					world.spawnParticle(Particle.REDSTONE, mLoc, 30, 0.5, 0.5, 0.5, 0, COLOR);

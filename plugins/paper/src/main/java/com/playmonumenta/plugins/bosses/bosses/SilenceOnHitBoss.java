@@ -20,6 +20,7 @@ import com.playmonumenta.plugins.utils.BossUtils;
  * @G3m1n1Boy
  *
 */
+@Deprecated
 public class SilenceOnHitBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_silencehit";
 	public static final int detectionRange = 30;

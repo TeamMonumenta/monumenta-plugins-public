@@ -213,7 +213,7 @@ public class ShopManager implements Listener {
 			mOriginalEntityMat = originalEntityMat;
 		}
 
-		private static Shop fromShopEntity(Entity shopEntity) throws WrapperCommandSyntaxException {
+		protected static Shop fromShopEntity(Entity shopEntity) throws WrapperCommandSyntaxException {
 			if (!(shopEntity instanceof Shulker)) {
 				CommandAPI.fail("Invalid shop entity - should be shulker");
 			}

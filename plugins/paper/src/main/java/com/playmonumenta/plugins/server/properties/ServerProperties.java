@@ -120,22 +120,22 @@ public class ServerProperties {
 
 	private void loadInternal(Plugin plugin, @Nullable CommandSender sender) {
 		QuestUtils.loadScriptedQuests(plugin, ".", sender, (object) -> {
-			mDailyResetEnabled = getPropertyValueBool(plugin, object, "dailyResetEnabled", mDailyResetEnabled);
-			mJoinMessagesEnabled = getPropertyValueBool(plugin, object, "joinMessagesEnabled", mJoinMessagesEnabled);
-			mIsTownWorld = getPropertyValueBool(plugin, object, "isTownWorld", mIsTownWorld);
-			mPlotSurvivalMinHeight = getPropertyValueInt(plugin, object, "plotSurvivalMinHeight", mPlotSurvivalMinHeight);
+			mDailyResetEnabled = getPropertyValueBool(object, "dailyResetEnabled", mDailyResetEnabled);
+			mJoinMessagesEnabled = getPropertyValueBool(object, "joinMessagesEnabled", mJoinMessagesEnabled);
+			mIsTownWorld = getPropertyValueBool(object, "isTownWorld", mIsTownWorld);
+			mPlotSurvivalMinHeight = getPropertyValueInt(object, "plotSurvivalMinHeight", mPlotSurvivalMinHeight);
 
-			mIsSleepingEnabled = getPropertyValueBool(plugin, object, "isSleepingEnabled", mIsSleepingEnabled);
-			mKeepLowTierInventory = getPropertyValueBool(plugin, object, "keepLowTierInventory", mKeepLowTierInventory);
-			mClassSpecializationsEnabled = getPropertyValueBool(plugin, object, "classSpecializationsEnabled", mClassSpecializationsEnabled);
-			mAuditMessagesEnabled = getPropertyValueBool(plugin, object, "auditMessagesEnabled", mAuditMessagesEnabled);
-			mRepairExplosions = getPropertyValueBool(plugin, object, "repairExplosions", mRepairExplosions);
-			mPreventDungeonItemTransfer = getPropertyValueBool(plugin, object, "preventDungeonItemTransfer", mPreventDungeonItemTransfer);
-			mReplaceSpawnerEntities = getPropertyValueBool(plugin, object, "replaceSpawnerEntities", mReplaceSpawnerEntities);
-			mInfusionsEnabled = getPropertyValueBool(plugin, object, "infusionsEnabled", mInfusionsEnabled);
-			mHTTPStatusPort = getPropertyValueInt(plugin, object, "httpStatusPort", mHTTPStatusPort);
+			mIsSleepingEnabled = getPropertyValueBool(object, "isSleepingEnabled", mIsSleepingEnabled);
+			mKeepLowTierInventory = getPropertyValueBool(object, "keepLowTierInventory", mKeepLowTierInventory);
+			mClassSpecializationsEnabled = getPropertyValueBool(object, "classSpecializationsEnabled", mClassSpecializationsEnabled);
+			mAuditMessagesEnabled = getPropertyValueBool(object, "auditMessagesEnabled", mAuditMessagesEnabled);
+			mRepairExplosions = getPropertyValueBool(object, "repairExplosions", mRepairExplosions);
+			mPreventDungeonItemTransfer = getPropertyValueBool(object, "preventDungeonItemTransfer", mPreventDungeonItemTransfer);
+			mReplaceSpawnerEntities = getPropertyValueBool(object, "replaceSpawnerEntities", mReplaceSpawnerEntities);
+			mInfusionsEnabled = getPropertyValueBool(object, "infusionsEnabled", mInfusionsEnabled);
+			mHTTPStatusPort = getPropertyValueInt(object, "httpStatusPort", mHTTPStatusPort);
 
-			mShardName = getPropertyValueString(plugin, object, "shardName", mShardName);
+			mShardName = getPropertyValueString(object, "shardName", mShardName);
 
 			getPropertyValueMaterialList(plugin, object, "unbreakableBlocks", sender, mUnbreakableBlocks);
 			getPropertyValueMaterialList(plugin, object, "alwaysPickupMaterials", sender, mAlwaysPickupMats);
@@ -183,7 +183,7 @@ public class ServerProperties {
 		return out;
 	}
 
-	private boolean getPropertyValueBool(Plugin plugin, JsonObject object, String properyName, boolean defaultVal) {
+	private boolean getPropertyValueBool(JsonObject object, String properyName, boolean defaultVal) {
 		boolean value = defaultVal;
 
 		JsonElement element = object.get(properyName);
@@ -194,7 +194,7 @@ public class ServerProperties {
 		return value;
 	}
 
-	private int getPropertyValueInt(Plugin plugin, JsonObject object, String properyName, int defaultVal) {
+	private int getPropertyValueInt(JsonObject object, String properyName, int defaultVal) {
 		int value = defaultVal;
 
 		JsonElement element = object.get(properyName);
@@ -205,7 +205,7 @@ public class ServerProperties {
 		return value;
 	}
 
-	private String getPropertyValueString(Plugin plugin, JsonObject object, String properyName, String defaultVal) {
+	private String getPropertyValueString(JsonObject object, String properyName, String defaultVal) {
 		String value = defaultVal;
 
 		JsonElement element = object.get(properyName);

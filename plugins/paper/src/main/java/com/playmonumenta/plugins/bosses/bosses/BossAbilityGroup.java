@@ -361,7 +361,9 @@ public abstract class BossAbilityGroup {
 	 * For performance reasons any boss that uses this MUST also override
 	 * hasNearbyEntityDeathTrigger to return true
 	 */
-	public void nearbyEntityDeath(EntityDeathEvent event) {}
+	public void nearbyEntityDeath(EntityDeathEvent event) {
+
+	}
 
 	public boolean hasNearbyEntityDeathTrigger() {
 		return false;
@@ -375,7 +377,9 @@ public abstract class BossAbilityGroup {
 	 *
 	 * WARNING: VERY PERFORMANCE INTENSIVE
 	 */
-	public void nearbyBlockBreak(BlockBreakEvent event) {}
+	public void nearbyBlockBreak(BlockBreakEvent event) {
+
+	}
 
 	public boolean hasNearbyBlockBreakTrigger() {
 		return false;
@@ -388,7 +392,9 @@ public abstract class BossAbilityGroup {
 	 * hasNearbyPlayerDeathTrigger to return true
 	 *
 	 */
-	public void nearbyPlayerDeath(PlayerDeathEvent event) {}
+	public void nearbyPlayerDeath(PlayerDeathEvent event) {
+
+	}
 
 	public boolean hasNearbyPlayerDeathTrigger() {
 		return false;

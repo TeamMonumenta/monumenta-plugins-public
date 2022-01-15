@@ -20,6 +20,7 @@ import com.playmonumenta.plugins.utils.BossUtils;
  * @G3m1n1Boy
  *
 */
+@Deprecated
 public class WitherHitBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_witherhit";
 	public static final int detectionRange = 20;
