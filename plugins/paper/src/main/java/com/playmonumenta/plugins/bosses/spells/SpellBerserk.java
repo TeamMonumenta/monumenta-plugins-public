@@ -5,6 +5,8 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
+import com.playmonumenta.plugins.utils.EntityUtils;
+
 public class SpellBerserk extends Spell {
 	private final LivingEntity mLauncher;
 
@@ -14,9 +16,9 @@ public class SpellBerserk extends Spell {
 
 	@Override
 	public void run() {
-		double maxHealth = mLauncher.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue();
+		double maxHealth = EntityUtils.getAttributeOrDefault(mLauncher, Attribute.GENERIC_MAX_HEALTH, 0);
 		double health = mLauncher.getHealth();
-		if (health <= maxHealth / 2) {
+		if (mLauncher.isValid() && !mLauncher.isDead() && health <= maxHealth / 2) {
 			mLauncher.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE, 20, 0, false, true));
 		}
 	}
