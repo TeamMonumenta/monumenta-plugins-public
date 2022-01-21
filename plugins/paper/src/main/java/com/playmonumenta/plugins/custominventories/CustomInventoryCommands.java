@@ -62,7 +62,14 @@ public class CustomInventoryCommands {
 			.withArguments(new EntitySelectorArgument("player", EntitySelector.ONE_PLAYER))
 			.executes((sender, args) -> {
 				Player player = (Player)args[0];
-				new ParrotCustomInventory(player).openInventory(player, plugin);
+				try {
+					new ParrotCustomInventory(player).openInventory(player, plugin);
+				} catch (Exception ex) {
+					String msg = "Failed to open Parrot GUI: " + ex.getMessage();
+					sender.sendMessage(msg);
+					player.sendMessage(msg);
+					ex.printStackTrace();
+				}
 			})
 			.register();
 

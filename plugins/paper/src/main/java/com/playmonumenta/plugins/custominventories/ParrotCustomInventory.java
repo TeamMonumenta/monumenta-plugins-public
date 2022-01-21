@@ -153,28 +153,25 @@ public final class ParrotCustomInventory extends CustomInventory {
 	private PlayerShoulder mShoulderSelected = PlayerShoulder.NONE;
 	private ParrotGUIPage mCurrentPage = ParrotGUIPage.R1;
 
-	public void loadItem(Player playerLoad) {
+	private ItemStack loadItemTable(Player playerLoad, String path) throws Exception {
+		ItemStack item = InventoryUtils.getItemFromLootTable(playerLoad, NamespacedKeyUtils.fromString(path));
+		if (item == null) {
+			throw new Exception("Failed to load item '" + path + "' from loot tables");
+		}
+		return item;
+	}
 
+	private void loadItem(Player playerLoad) throws Exception {
 		//getting the currencies from loottable
-		ItemStack mHCS = null;
-		ItemStack mHXP = null;
-		ItemStack mPPe = null;
-		ItemStack mPGo = null;
-		ItemStack mKS = null;
-		ItemStack mFG = null;
-		ItemStack mDM = null;
-		ItemStack mUP = null;
-		ItemStack mLi = null;
-
-		mHCS = InventoryUtils.getItemFromLootTable(playerLoad, NamespacedKeyUtils.fromString("epic:r2/items/currency/hyper_crystalline_shard"));
-		mHXP = InventoryUtils.getItemFromLootTable(playerLoad, NamespacedKeyUtils.fromString("epic:r1/items/currency/hyper_experience"));
-		mPGo = InventoryUtils.getItemFromLootTable(playerLoad, NamespacedKeyUtils.fromString("epic:r1/items/currency/pulsating_gold"));
-		mPPe = InventoryUtils.getItemFromLootTable(playerLoad, NamespacedKeyUtils.fromString("epic:r2/items/currency/pulsating_emerald"));
-		mKS = InventoryUtils.getItemFromLootTable(playerLoad, NamespacedKeyUtils.fromString("epic:r1/kaul/crownshard"));
-		mFG = InventoryUtils.getItemFromLootTable(playerLoad, NamespacedKeyUtils.fromString("epic:r2/eldrask/materials/epic_material"));
-		mDM = InventoryUtils.getItemFromLootTable(playerLoad, NamespacedKeyUtils.fromString("epic:r2/depths/loot/voidstained_geode"));
-		mUP = InventoryUtils.getItemFromLootTable(playerLoad, NamespacedKeyUtils.fromString("epic:r1/dungeons/4/static_uncommons/unicorn_puke"));
-		mLi = InventoryUtils.getItemFromLootTable(playerLoad, NamespacedKeyUtils.fromString("epic:r2/lich/materials/ancestral_effigy"));
+		ItemStack mHCS = loadItemTable(playerLoad, "epic:r2/items/currency/hyper_crystalline_shard");
+		ItemStack mHXP = loadItemTable(playerLoad, "epic:r1/items/currency/hyper_experience");
+		ItemStack mPGo = loadItemTable(playerLoad, "epic:r1/items/currency/pulsating_gold");
+		ItemStack mPPe = loadItemTable(playerLoad, "epic:r2/items/currency/pulsating_emerald");
+		ItemStack mKS = loadItemTable(playerLoad, "epic:r1/kaul/crownshard");
+		ItemStack mFG = loadItemTable(playerLoad, "epic:r2/eldrask/materials/epic_material");
+		ItemStack mDM = loadItemTable(playerLoad, "epic:r2/depths/loot/voidstained_geode");
+		ItemStack mUP = loadItemTable(playerLoad, "epic:r1/dungeons/4/static_uncommons/unicorn_puke");
+		ItemStack mLi = loadItemTable(playerLoad, "epic:r2/lich/materials/ancestral_effigy");
 
 		List<String> lore = new ArrayList<>();
 		Map<ItemStack, Integer> cost = new HashMap<>();
@@ -715,26 +712,26 @@ public final class ParrotCustomInventory extends CustomInventory {
 		}));
 
 		lore.clear();
-		lore.add("Requires clearing floor 6 from Darkest Depths");
+		lore.add("Requires clearing floor 9 from Darkest Depths");
 		int depthsScore = ScoreboardUtils.getScoreboardValue(playerLoad, "DepthsEndless").orElse(0);
 		lore.add("You have cleared floor " + ((depthsScore - 1) / 10));
 		ItemStack buyDepths = buildItem(Material.RED_GLAZED_TERRACOTTA, "Buy Otherworldly Myiopsitta", lore);
 		GUI_ITEMS.add(new GuiItem(ParrotGUIPage.R2.mNum, 20, buyDepths, (player, inv) -> {
 			return ScoreboardUtils.getScoreboardValue(player, "ParrotBought14").orElse(0) == 0 &&
-			ScoreboardUtils.getScoreboardValue(playerLoad, "DepthsEndless").orElse(0) < 61 &&
+			ScoreboardUtils.getScoreboardValue(playerLoad, "DepthsEndless").orElse(0) < 91 &&
 			ScoreboardUtils.getScoreboardValue(playerLoad, "Depths").orElse(0) > 0 &&
 			mShoulderSelected == PlayerShoulder.NONE;
 		}));
 
 		cost.clear();
-		cost.put(mDM, 32);
+		cost.put(mDM, 64);
 		lore.clear();
 		lore.add("Click to buy!");
-		lore.add("32 Voidstained Geode");
+		lore.add("64 Voidstained Geode");
 		ItemStack canBuyDepths = buildItem(Material.RED_GLAZED_TERRACOTTA, "Otherworldly Myiopsitta", lore);
 		GUI_ITEMS.add(new GuiItem(ParrotGUIPage.R2.mNum, 20, canBuyDepths, new HashMap<>(cost), (player, inv) -> {
 			return ScoreboardUtils.getScoreboardValue(player, "ParrotBought14").orElse(0) == 0 &&
-			ScoreboardUtils.getScoreboardValue(playerLoad, "DepthsEndless").orElse(0) >= 61 &&
+			ScoreboardUtils.getScoreboardValue(playerLoad, "DepthsEndless").orElse(0) >= 91 &&
 			mShoulderSelected == PlayerShoulder.NONE;
 		}, (player, inv) -> {
 			ScoreboardUtils.setScoreboardValue(player, "ParrotBought14", (int) Instant.now().getEpochSecond());
@@ -766,25 +763,25 @@ public final class ParrotCustomInventory extends CustomInventory {
 								}));
 
 		lore.clear();
-		lore.add("Requires clearing floor 12 from Darkest Depths");
+		lore.add("Requires clearing floor 15 from Darkest Depths");
 		lore.add("You have cleared floor " + ((depthsScore - 1) / 10));
 		ItemStack canBuyDepthsU2 = buildItem(Material.CRYING_OBSIDIAN, "Otherworldly Myiopsitta (u)", lore);
 		GUI_ITEMS.add(new GuiItem(ParrotGUIPage.R2.mNum, 21, canBuyDepthsU2, (player, inv) -> {
 							return ScoreboardUtils.getScoreboardValue(player, "ParrotBought14").orElse(0) > 0 &&
-							ScoreboardUtils.getScoreboardValue(playerLoad, "DepthsEndless").orElse(0) < 121 &&
+							ScoreboardUtils.getScoreboardValue(playerLoad, "DepthsEndless").orElse(0) < 151 &&
 							ScoreboardUtils.getScoreboardValue(player, "ParrotBought15").orElse(0) == 0 &&
 							mShoulderSelected == PlayerShoulder.NONE;
 								}));
 
 		cost.clear();
-		cost.put(mDM, 64);
+		cost.put(mDM, 96);
 		lore.clear();
 		lore.add("Click to buy!");
-		lore.add("64 Voidstained Geode");
+		lore.add("96 Voidstained Geode");
 		ItemStack buyDepthsU = buildItem(Material.CRYING_OBSIDIAN, "Otherworldly Myiopsitta (u)", lore);
 		GUI_ITEMS.add(new GuiItem(ParrotGUIPage.R2.mNum, 21, buyDepthsU, new HashMap<>(cost), (player, inv) -> {
 			return ScoreboardUtils.getScoreboardValue(player, "ParrotBought15").orElse(0) == 0 &&
-			ScoreboardUtils.getScoreboardValue(playerLoad, "DepthsEndless").orElse(0) >= 121 &&
+			ScoreboardUtils.getScoreboardValue(playerLoad, "DepthsEndless").orElse(0) >= 151 &&
 			ScoreboardUtils.getScoreboardValue(player, "ParrotBought14").orElse(0) > 0 &&
 			mShoulderSelected == PlayerShoulder.NONE;
 		}, (player, inv) -> {
@@ -971,7 +968,7 @@ public final class ParrotCustomInventory extends CustomInventory {
  *
  * Parrots slots = {10-16, 19-25, 28-34, 37-43}
  */
-	public ParrotCustomInventory(Player owner) {
+	public ParrotCustomInventory(Player owner) throws Exception {
 		super(owner, ROWS * COLUMNS, "Parrots");
 		loadItem(owner);
 		owner.playSound(owner.getLocation(), Sound.BLOCK_NOTE_BLOCK_CHIME, 3f, 1.2f);
