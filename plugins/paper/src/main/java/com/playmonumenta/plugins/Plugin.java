@@ -198,6 +198,7 @@ public class Plugin extends JavaPlugin {
 		VirtualFirmament.register();
 		ExperiencinatorCommand.register();
 		EventCommand.register();
+		Eggify.register();
 
 
 		try {

@@ -4,14 +4,15 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.time.Duration;
 
-import com.playmonumenta.plugins.Plugin;
-
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+
+import com.playmonumenta.plugins.Plugin;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import net.kyori.adventure.text.serializer.plain.PlainComponentSerializer;
 
@@ -20,6 +21,7 @@ import net.kyori.adventure.text.serializer.plain.PlainComponentSerializer;
 public class MessagingUtils {
 	public static final LegacyComponentSerializer LEGACY_SERIALIZER = LegacyComponentSerializer.legacySection();
 	public static final PlainComponentSerializer PLAIN_SERIALIZER = PlainComponentSerializer.plain();
+	public static final GsonComponentSerializer GSON_SERIALIZER = GsonComponentSerializer.gson();
 
 	public static String translatePlayerName(Player player, String message) {
 		return (message.replaceAll("@S", player.getName()));
@@ -88,4 +90,9 @@ public class MessagingUtils {
 	public static String plainFromLegacy(String legacyText) {
 		return PLAIN_SERIALIZER.serialize(LEGACY_SERIALIZER.deserialize(legacyText));
 	}
+
+	public static Component parseComponent(String json) {
+		return GSON_SERIALIZER.deserialize(json);
+	}
+
 }

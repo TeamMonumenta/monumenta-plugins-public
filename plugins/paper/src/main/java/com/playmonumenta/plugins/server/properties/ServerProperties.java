@@ -1,13 +1,16 @@
 package com.playmonumenta.plugins.server.properties;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.command.CommandSender;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -15,6 +18,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.utils.MessagingUtils;
+import com.playmonumenta.plugins.utils.NamespacedKeyUtils;
 import com.playmonumenta.scriptedquests.utils.QuestUtils;
 
 public class ServerProperties {
@@ -42,6 +46,8 @@ public class ServerProperties {
 	private final EnumSet<Material> mUnbreakableBlocks = EnumSet.noneOf(Material.class);
 	private final EnumSet<Material> mAlwaysPickupMats = EnumSet.noneOf(Material.class);
 	private final EnumSet<Material> mNamedPickupMats = EnumSet.noneOf(Material.class);
+
+	private final List<NamespacedKey> mEggifySpawnEggs = new ArrayList<>();
 
 	public ServerProperties() {
 	}
@@ -114,6 +120,10 @@ public class ServerProperties {
 		return INSTANCE.mNamedPickupMats;
 	}
 
+	public static List<NamespacedKey> getEggifySpawnEggs() {
+		return INSTANCE.mEggifySpawnEggs;
+	}
+
 	public static void load(Plugin plugin, @Nullable CommandSender sender) {
 		INSTANCE.loadInternal(plugin, sender);
 	}
@@ -140,6 +150,8 @@ public class ServerProperties {
 			getPropertyValueMaterialList(plugin, object, "unbreakableBlocks", sender, mUnbreakableBlocks);
 			getPropertyValueMaterialList(plugin, object, "alwaysPickupMaterials", sender, mAlwaysPickupMats);
 			getPropertyValueMaterialList(plugin, object, "namedPickupMaterials", sender, mNamedPickupMats);
+
+			getPropertyValueCollection(plugin, object, "eggifySpawnEggs", sender, NamespacedKeyUtils::fromString, mEggifySpawnEggs);
 
 			return null;
 		});
@@ -176,9 +188,11 @@ public class ServerProperties {
 
 		out.add("shardName = " + mShardName);
 
-		out.add("unbreakableBlocks = [" + String.join("  ", mUnbreakableBlocks.stream().map((x) -> x.toString()).collect(Collectors.toList())) + "]");
-		out.add("alwaysPickupMaterials = [" + String.join("  ", mAlwaysPickupMats.stream().map((x) -> x.toString()).collect(Collectors.toList())) + "]");
-		out.add("namedPickupMaterials = [" + String.join("  ", mNamedPickupMats.stream().map((x) -> x.toString()).collect(Collectors.toList())) + "]");
+		out.add("unbreakableBlocks = [" + mUnbreakableBlocks.stream().map(Enum::toString).collect(Collectors.joining("  ")) + "]");
+		out.add("alwaysPickupMaterials = [" + mAlwaysPickupMats.stream().map(Enum::toString).collect(Collectors.joining("  ")) + "]");
+		out.add("namedPickupMaterials = [" + mNamedPickupMats.stream().map(Enum::toString).collect(Collectors.joining("  ")) + "]");
+
+		out.add("eggifySpawnEggs = [" + mEggifySpawnEggs.stream().map(NamespacedKey::toString).collect(Collectors.joining("  ")) + "]");
 
 		return out;
 	}
@@ -217,23 +231,27 @@ public class ServerProperties {
 	}
 
 	private void getPropertyValueMaterialList(Plugin plugin, JsonObject object, String propertyName, @Nullable CommandSender sender, Set<Material> set) {
+		getPropertyValueCollection(plugin, object, propertyName, sender, Material::getMaterial, set);
+	}
+
+	private <T> void getPropertyValueCollection(Plugin plugin, JsonObject object, String propertyName, @Nullable CommandSender sender,
+	                                            Function<String, @Nullable T> parser, Collection<T> collection) {
 		JsonElement element = object.get(propertyName);
 		if (element != null) {
-			set.clear();
+			collection.clear();
 
 			for (JsonElement iter : element.getAsJsonArray()) {
 				try {
-					String blockName = iter.getAsString();
-					Material mat = Material.getMaterial(blockName);
-					if (mat != null) {
-						set.add(mat);
+					T value = parser.apply(iter.getAsString());
+					if (value != null) {
+						collection.add(value);
 					}
 				} catch (Exception e) {
-					plugin.getLogger().severe("Invalid unbreakableBlocks element at: '" + iter.toString() + "'");
+					plugin.getLogger().severe("Invalid " + propertyName + " element: '" + iter + "'");
 					e.printStackTrace();
 
 					if (sender != null) {
-						sender.sendMessage(ChatColor.RED + "Invalid unbreakableBlocks element at: '" + iter.toString() + "'");
+						sender.sendMessage(ChatColor.RED + "Invalid " + propertyName + " element: '" + iter + "'");
 						MessagingUtils.sendStackTrace(sender, e);
 					}
 				}

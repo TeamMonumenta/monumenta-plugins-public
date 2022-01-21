@@ -15,6 +15,7 @@ import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
@@ -1468,6 +1469,76 @@ public class ItemUtils {
 	 */
 	public static ItemStack parseItemStack(String nbtMojangson) {
 		return NBTItem.convertNBTtoItem(new NBTContainer(nbtMojangson));
+	}
+
+	public static EntityType getSpawnEggType(Material material) {
+		return switch (material) {
+			case BAT_SPAWN_EGG -> EntityType.BAT;
+			case BEE_SPAWN_EGG -> EntityType.BEE;
+			case BLAZE_SPAWN_EGG -> EntityType.BLAZE;
+			case CAT_SPAWN_EGG -> EntityType.CAT;
+			case CAVE_SPIDER_SPAWN_EGG -> EntityType.CAVE_SPIDER;
+			case CHICKEN_SPAWN_EGG -> EntityType.CHICKEN;
+			case COD_SPAWN_EGG -> EntityType.COD;
+			case COW_SPAWN_EGG -> EntityType.COW;
+			case CREEPER_SPAWN_EGG -> EntityType.CREEPER;
+			case DOLPHIN_SPAWN_EGG -> EntityType.DOLPHIN;
+			case DONKEY_SPAWN_EGG -> EntityType.DONKEY;
+			case DROWNED_SPAWN_EGG -> EntityType.DROWNED;
+			case ELDER_GUARDIAN_SPAWN_EGG -> EntityType.ELDER_GUARDIAN;
+			case ENDERMAN_SPAWN_EGG -> EntityType.ENDERMAN;
+			case ENDERMITE_SPAWN_EGG -> EntityType.ENDERMITE;
+			case EVOKER_SPAWN_EGG -> EntityType.EVOKER;
+			case FOX_SPAWN_EGG -> EntityType.FOX;
+			case GHAST_SPAWN_EGG -> EntityType.GHAST;
+			case GUARDIAN_SPAWN_EGG -> EntityType.GUARDIAN;
+			case HOGLIN_SPAWN_EGG -> EntityType.HOGLIN;
+			case HORSE_SPAWN_EGG -> EntityType.HORSE;
+			case HUSK_SPAWN_EGG -> EntityType.HUSK;
+			case LLAMA_SPAWN_EGG -> EntityType.LLAMA;
+			case MAGMA_CUBE_SPAWN_EGG -> EntityType.MAGMA_CUBE;
+			case MOOSHROOM_SPAWN_EGG -> EntityType.MUSHROOM_COW;
+			case MULE_SPAWN_EGG -> EntityType.MULE;
+			case OCELOT_SPAWN_EGG -> EntityType.OCELOT;
+			case PANDA_SPAWN_EGG -> EntityType.PANDA;
+			case PARROT_SPAWN_EGG -> EntityType.PARROT;
+			case PHANTOM_SPAWN_EGG -> EntityType.PHANTOM;
+			case PIG_SPAWN_EGG -> EntityType.PIG;
+			case PIGLIN_SPAWN_EGG -> EntityType.PIGLIN;
+			case PIGLIN_BRUTE_SPAWN_EGG -> EntityType.PIGLIN_BRUTE;
+			case PILLAGER_SPAWN_EGG -> EntityType.PILLAGER;
+			case POLAR_BEAR_SPAWN_EGG -> EntityType.POLAR_BEAR;
+			case PUFFERFISH_SPAWN_EGG -> EntityType.PUFFERFISH;
+			case RABBIT_SPAWN_EGG -> EntityType.RABBIT;
+			case RAVAGER_SPAWN_EGG -> EntityType.RAVAGER;
+			case SALMON_SPAWN_EGG -> EntityType.SALMON;
+			case SHEEP_SPAWN_EGG -> EntityType.SHEEP;
+			case SHULKER_SPAWN_EGG -> EntityType.SHULKER;
+			case SILVERFISH_SPAWN_EGG -> EntityType.SILVERFISH;
+			case SKELETON_SPAWN_EGG -> EntityType.SKELETON;
+			case SKELETON_HORSE_SPAWN_EGG -> EntityType.SKELETON_HORSE;
+			case SLIME_SPAWN_EGG -> EntityType.SLIME;
+			case SPIDER_SPAWN_EGG -> EntityType.SPIDER;
+			case SQUID_SPAWN_EGG -> EntityType.SQUID;
+			case STRAY_SPAWN_EGG -> EntityType.STRAY;
+			case STRIDER_SPAWN_EGG -> EntityType.STRIDER;
+			case TRADER_LLAMA_SPAWN_EGG -> EntityType.TRADER_LLAMA;
+			case TROPICAL_FISH_SPAWN_EGG -> EntityType.TROPICAL_FISH;
+			case TURTLE_SPAWN_EGG -> EntityType.TURTLE;
+			case VEX_SPAWN_EGG -> EntityType.VEX;
+			case VILLAGER_SPAWN_EGG -> EntityType.VILLAGER;
+			case VINDICATOR_SPAWN_EGG -> EntityType.VINDICATOR;
+			case WANDERING_TRADER_SPAWN_EGG -> EntityType.WANDERING_TRADER;
+			case WITCH_SPAWN_EGG -> EntityType.WITCH;
+			case WITHER_SKELETON_SPAWN_EGG -> EntityType.WITHER_SKELETON;
+			case WOLF_SPAWN_EGG -> EntityType.WOLF;
+			case ZOGLIN_SPAWN_EGG -> EntityType.ZOGLIN;
+			case ZOMBIE_SPAWN_EGG -> EntityType.ZOMBIE;
+			case ZOMBIE_HORSE_SPAWN_EGG -> EntityType.ZOMBIE_HORSE;
+			case ZOMBIE_VILLAGER_SPAWN_EGG -> EntityType.ZOMBIE_VILLAGER;
+			case ZOMBIFIED_PIGLIN_SPAWN_EGG -> EntityType.ZOMBIFIED_PIGLIN;
+			default -> EntityType.UNKNOWN;
+		};
 	}
 
 }
