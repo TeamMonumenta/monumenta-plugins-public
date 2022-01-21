@@ -1407,15 +1407,16 @@ public class PlayerListener implements Listener {
 	}
 
 	private static final Set<DamageCause> DISABLE_KNOCKBACK_DAMAGE_CAUSES = Set.of(
-		DamageCause.CONTACT,
-		DamageCause.FALL,
-		DamageCause.FIRE,
-		DamageCause.FIRE_TICK,
-		DamageCause.VOID,
-		DamageCause.STARVATION,
-		DamageCause.POISON,
-		DamageCause.WITHER,
-		DamageCause.HOT_FLOOR);
+			DamageCause.CONTACT,
+			DamageCause.FALL,
+			DamageCause.FIRE,
+			DamageCause.FIRE_TICK,
+			DamageCause.LAVA,
+			DamageCause.VOID,
+			DamageCause.STARVATION,
+			DamageCause.POISON,
+			DamageCause.WITHER,
+			DamageCause.HOT_FLOOR);
 
 	private final Set<UUID> mIgnoreKnockbackThisTick = new HashSet<>();
 	private final Set<UUID> mIgnoreKnockbackNextTick = new HashSet<>();
