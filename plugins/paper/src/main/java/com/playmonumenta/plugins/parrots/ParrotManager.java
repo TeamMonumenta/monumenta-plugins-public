@@ -1,7 +1,9 @@
 package com.playmonumenta.plugins.parrots;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
@@ -22,6 +24,7 @@ import org.bukkit.event.player.PlayerToggleFlightEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
+import com.google.common.collect.ImmutableList;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 
@@ -136,13 +139,20 @@ public class ParrotManager implements Listener {
 		mPrideRunnable = null;
 
 		// Periodically updates all players' parrots.
-		// Workaround for an Optifine bug that only shows custom parrot textures if the parrot has been a standalone entity before it was put onto a shoulder
+		// Workaround for an Optifine bug that only shows custom parrot textures if the parrot has been a standalone entity before it was put on a shoulder.
+		// Updates only a few players at a time to spread out server load, as this causes noticeable lag when done for many players at once.
 		new BukkitRunnable() {
+			Iterator<? extends Player> mPlayers = Collections.emptyIterator();
+
 			@Override
 			public void run() {
-				for (Player player : Bukkit.getOnlinePlayers()) {
+				if (!mPlayers.hasNext()) {
+					mPlayers = ImmutableList.copyOf(Bukkit.getOnlinePlayers()).iterator();
+				}
+				for (int i = 0; i < 10 && mPlayers.hasNext(); i++) {
+					Player player = mPlayers.next();
 					// Flying players lose parrots almost instantly, causing flickering, so don't update parrots for them. They'll get their parrots back once they land.
-					if (!player.isFlying() && player.getGameMode() != GameMode.SPECTATOR) {
+					if (player.isValid() && !player.isFlying() && player.getGameMode() != GameMode.SPECTATOR) {
 						respawnParrots(player);
 					}
 				}

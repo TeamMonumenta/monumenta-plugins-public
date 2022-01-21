@@ -20,6 +20,7 @@ import com.comphenix.protocol.wrappers.nbt.NbtCompound;
 import com.comphenix.protocol.wrappers.nbt.NbtFactory;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.protocollib.FirmamentLagFix;
+import com.playmonumenta.plugins.protocollib.GlowingReplacer;
 import com.playmonumenta.plugins.protocollib.VirtualFirmamentReplacer;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 
@@ -83,6 +84,8 @@ public class ProtocolLibIntegration implements Listener {
 		} else {
 			mLogger.info("Will not replace spawner entities on this shard");
 		}
+
+		manager.addPacketListener(new GlowingReplacer(plugin));
 
 		manager.addPacketListener(new VirtualFirmamentReplacer(plugin));
 
