@@ -1,21 +1,20 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.NavigableSet;
-
+import com.playmonumenta.plugins.effects.Effect;
+import com.playmonumenta.plugins.effects.PercentSpeed;
+import com.playmonumenta.plugins.events.DamageEvent;
 import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.entity.LivingEntity;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.plugin.Plugin;
 
-import com.playmonumenta.plugins.effects.Effect;
-import com.playmonumenta.plugins.effects.PercentSpeed;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.NavigableSet;
 
 public class CarapaceBoss extends BossAbilityGroup {
 
@@ -83,7 +82,7 @@ public class CarapaceBoss extends BossAbilityGroup {
 	}
 
 	@Override
-	public void bossDamagedByEntity(EntityDamageByEntityEvent event) {
+	public void onHurt(DamageEvent event) {
 		World world = mBoss.getWorld();
 		Location loc = mBoss.getLocation();
 

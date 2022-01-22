@@ -1,19 +1,17 @@
 package com.playmonumenta.plugins.commands;
 
-import java.util.UUID;
-
-import org.bukkit.ChatColor;
-import org.bukkit.entity.Player;
-import org.bukkit.metadata.FixedMetadataValue;
-
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.integrations.MonumentaNetworkRelayIntegration;
-import com.playmonumenta.plugins.utils.CommandUtils;
-
+import com.playmonumenta.plugins.utils.ItemStatUtils;
 import dev.jorel.commandapi.CommandAPI;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.CommandPermission;
 import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
+import org.bukkit.ChatColor;
+import org.bukkit.entity.Player;
+import org.bukkit.metadata.FixedMetadataValue;
+
+import java.util.UUID;
 
 public class ClaimRaffle {
 	private static final String CONFIRMED_METAKEY = "MonumentaRaffleClaimMetadata";
@@ -55,13 +53,7 @@ public class ClaimRaffle {
 		}
 
 		if (claimReward && eligible) {
-			try {
-				CommandUtils.enchantify(player, player, "Gilded", "Gilded by");
-			} catch (WrapperCommandSyntaxException ex) {
-				/* Failed to claim reward - send back the reward to bungee */
-				MonumentaNetworkRelayIntegration.sendCheckRaffleEligibilityPacket(player.getUniqueId(), false, true);
-				player.sendMessage(ChatColor.RED + ex.getException().getMessage());
-			}
+			ItemStatUtils.addInfusion(player.getItemInHand(), ItemStatUtils.InfusionType.GILDED, 1, player.getUniqueId());
 		} else if (!claimReward && eligible) {
 			player.setMetadata(CONFIRMED_METAKEY, new FixedMetadataValue(Plugin.getInstance(), 0));
 			player.sendMessage(ChatColor.GREEN + "You have won the weekly voting raffle! Congratulations!");

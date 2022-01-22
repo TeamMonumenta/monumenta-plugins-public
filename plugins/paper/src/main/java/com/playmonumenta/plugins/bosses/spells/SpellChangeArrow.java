@@ -1,7 +1,6 @@
 package com.playmonumenta.plugins.bosses.spells;
 
 import com.playmonumenta.plugins.utils.FastUtils;
-
 import org.bukkit.Material;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.inventory.ItemStack;

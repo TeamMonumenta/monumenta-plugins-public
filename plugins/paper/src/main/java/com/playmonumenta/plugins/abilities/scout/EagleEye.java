@@ -1,7 +1,14 @@
 package com.playmonumenta.plugins.abilities.scout;
 
-import java.util.EnumSet;
-
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.abilities.AbilityTrigger;
+import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.PotionUtils;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -9,32 +16,15 @@ import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.abilities.AbilityTrigger;
-import com.playmonumenta.plugins.classes.ClassAbility;
-import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
-import com.playmonumenta.plugins.enchantments.abilities.BaseAbilityEnchantment;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.ItemUtils;
-import com.playmonumenta.plugins.utils.PotionUtils;
-
 
 
 public class EagleEye extends Ability {
-	public static class EagleEyeKillRefreshEnchantment extends BaseAbilityEnchantment {
-		public EagleEyeKillRefreshEnchantment() {
-			super("Eagle Eye Kill Refresh", EnumSet.of(ItemSlot.ARMOR));
-		}
-	}
 
 	private static final int EAGLE_EYE_EFFECT_LVL = 0;
 	private static final int EAGLE_EYE_DURATION = 10 * 20;
@@ -87,7 +77,7 @@ public class EagleEye extends Ability {
 				public void run() {
 					mTicks++;
 					if (mob.isDead() || !mob.isValid()) {
-						mPlugin.mTimers.updateCooldown(mPlayer, ClassAbility.EAGLE_EYE, 20 * (2 + (int) EagleEyeKillRefreshEnchantment.getLevel(mPlayer, EagleEyeKillRefreshEnchantment.class)));
+						mPlugin.mTimers.updateCooldown(mPlayer, ClassAbility.EAGLE_EYE, 20 * 2);
 						this.cancel();
 					}
 					if (mTicks >= EAGLE_EYE_DURATION) {
@@ -104,12 +94,10 @@ public class EagleEye extends Ability {
 	}
 
 	@Override
-	public boolean livingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
-	    if (event.getCause().equals(DamageCause.ENTITY_ATTACK)) {
+	public void onDamage(DamageEvent event, LivingEntity enemy) {
+	    if (event.getType() == DamageType.MELEE) {
 	        cast(Action.LEFT_CLICK_AIR);
 	    }
-
-	    return true;
 	}
 
 	@Override

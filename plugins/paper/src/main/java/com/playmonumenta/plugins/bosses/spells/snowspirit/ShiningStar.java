@@ -1,7 +1,13 @@
 package com.playmonumenta.plugins.bosses.spells.snowspirit;
 
-import java.util.List;
-
+import com.playmonumenta.plugins.bosses.bosses.SnowSpirit;
+import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.bosses.spells.SpellBaseSeekingProjectile;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.utils.PotionUtils;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -14,13 +20,7 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import com.playmonumenta.plugins.bosses.bosses.SnowSpirit;
-import com.playmonumenta.plugins.bosses.spells.Spell;
-import com.playmonumenta.plugins.bosses.spells.SpellBaseSeekingProjectile;
-import com.playmonumenta.plugins.utils.BossUtils;
-import com.playmonumenta.plugins.utils.FastUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.plugins.utils.PotionUtils;
+import java.util.List;
 
 public class ShiningStar extends Spell {
 	public static final int DURATION = 20 * 8;
@@ -73,7 +73,7 @@ public class ShiningStar extends Spell {
 					world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 0.5f, 0.5f);
 					world.spawnParticle(Particle.FIREWORKS_SPARK, loc, 10, 0, 0, 0, 0.25);
 					if (player != null) {
-						BossUtils.bossDamage(boss, player, DAMAGE, mBoss.getLocation(), "Shining Star");
+						BossUtils.blockableDamage(boss, player, DamageType.MAGIC, DAMAGE, "Shining Star", mBoss.getLocation());
 					}
 				});
 	}

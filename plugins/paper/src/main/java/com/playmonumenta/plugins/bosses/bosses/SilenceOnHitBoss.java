@@ -2,10 +2,10 @@ package com.playmonumenta.plugins.bosses.bosses;
 
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.plugin.Plugin;
 
+import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.BossUtils;
 
@@ -35,15 +35,12 @@ public class SilenceOnHitBoss extends BossAbilityGroup {
 	}
 
 	@Override
-	public void bossDamagedEntity(EntityDamageByEntityEvent event) {
-		LivingEntity target = (LivingEntity) event.getEntity();
-
-		if (target instanceof Player) {
-			Player player = (Player)target;
-			if (BossUtils.bossDamageBlocked(player, event.getDamage(), event.getDamager().getLocation()) && event.getCause() != DamageCause.MAGIC) {
+	public void onDamage(DamageEvent event, LivingEntity damagee) {
+		if (damagee instanceof Player player) {
+			if (BossUtils.bossDamageBlocked(player, mBoss.getLocation()) && event.getType() != DamageType.MAGIC) {
 				return;
 			}
-			AbilityUtils.silencePlayer((Player)target, 5 * 20);
+			AbilityUtils.silencePlayer(player, 5 * 20);
 		}
 
 	}

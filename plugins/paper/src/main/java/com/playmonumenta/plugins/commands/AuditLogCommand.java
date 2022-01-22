@@ -1,14 +1,12 @@
 package com.playmonumenta.plugins.commands;
 
 import com.playmonumenta.plugins.listeners.AuditListener;
-
-import org.bukkit.entity.Player;
-
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.CommandPermission;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument.EntitySelector;
 import dev.jorel.commandapi.arguments.TextArgument;
+import org.bukkit.entity.Player;
 
 public class AuditLogCommand {
 	public static void register() {

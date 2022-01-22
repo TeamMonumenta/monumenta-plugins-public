@@ -1,9 +1,8 @@
 package com.playmonumenta.plugins.bosses.spells.varcosamist;
 
+import com.playmonumenta.plugins.bosses.spells.Spell;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.potion.PotionEffectType;
-
-import com.playmonumenta.plugins.bosses.spells.Spell;
 
 public class SpellPurgeGlowing extends Spell {
 
@@ -28,7 +27,6 @@ public class SpellPurgeGlowing extends Spell {
 
 	@Override
 	public int cooldownTicks() {
-		// TODO Auto-generated method stub
 		return 0;
 	}
 }

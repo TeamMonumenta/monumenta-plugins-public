@@ -1,8 +1,12 @@
 package com.playmonumenta.plugins.bosses.spells.frostgiant;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import com.playmonumenta.plugins.bosses.bosses.FrostGiant;
+import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.DamageUtils;
+import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Location;
@@ -21,11 +25,8 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
-import com.playmonumenta.plugins.bosses.bosses.FrostGiant;
-import com.playmonumenta.plugins.bosses.spells.Spell;
-import com.playmonumenta.plugins.utils.BossUtils;
-import com.playmonumenta.plugins.utils.FastUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
+import java.util.ArrayList;
+import java.util.List;
 
 public class SpellTitanicRupture extends Spell {
 
@@ -157,7 +158,7 @@ public class SpellTitanicRupture extends Spell {
 					BoundingBox box = BoundingBox.of(loc, 4, 20, 4);
 					for (Player player : players) {
 						if (box.overlaps(player.getBoundingBox())) {
-							BossUtils.bossDamagePercent(mBoss, player, 0.8, "Titanic Rupture");
+							DamageUtils.damage(mBoss, player, DamageType.BLAST, 40, null, false, true, "Titanic Rupture");
 						}
 					}
 					Location particleLoc = loc.clone();

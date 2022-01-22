@@ -1,8 +1,14 @@
 package com.playmonumenta.plugins.abilities.warrior.guardian;
 
-import java.util.EnumSet;
-import java.util.List;
-
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.abilities.AbilityTrigger;
+import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.effects.PercentDamageDealt;
+import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.utils.AbsorptionUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -12,18 +18,11 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.inventory.ItemStack;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.abilities.AbilityTrigger;
-import com.playmonumenta.plugins.classes.ClassAbility;
-import com.playmonumenta.plugins.effects.PercentDamageDealt;
-import com.playmonumenta.plugins.utils.AbsorptionUtils;
-import com.playmonumenta.plugins.utils.EntityUtils;
+import java.util.EnumSet;
+import java.util.List;
 
 public class Challenge extends Ability {
 
@@ -31,9 +30,8 @@ public class Challenge extends Ability {
 	private static final int DURATION = 20 * 10;
 	private static final double PERCENT_DAMAGE_DEALT_EFFECT_1 = 0.15;
 	private static final double PERCENT_DAMAGE_DEALT_EFFECT_2 = 0.3;
-	private static final EnumSet<DamageCause> AFFECTED_DAMAGE_CAUSES = EnumSet.of(
-			DamageCause.ENTITY_ATTACK,
-			DamageCause.ENTITY_SWEEP_ATTACK
+	private static final EnumSet<DamageType> AFFECTED_DAMAGE_TYPES = EnumSet.of(
+			DamageType.MELEE
 	);
 
 	private static final int ABSORPTION_PER_MOB_1 = 1;
@@ -80,7 +78,7 @@ public class Challenge extends Ability {
 
 		List<LivingEntity> mobs = EntityUtils.getNearbyMobs(mPlayer.getLocation(), CHALLENGE_RANGE, mPlayer);
 		AbsorptionUtils.addAbsorption(mPlayer, mAbsorptionPerMob * mobs.size(), mMaxAbsorption, DURATION);
-		mPlugin.mEffectManager.addEffect(mPlayer, PERCENT_DAMAGE_DEALT_EFFECT_NAME, new PercentDamageDealt(DURATION, mPercentDamageDealtEffect, AFFECTED_DAMAGE_CAUSES));
+		mPlugin.mEffectManager.addEffect(mPlayer, PERCENT_DAMAGE_DEALT_EFFECT_NAME, new PercentDamageDealt(DURATION, mPercentDamageDealtEffect, AFFECTED_DAMAGE_TYPES));
 
 		for (LivingEntity mob : mobs) {
 			if (mob instanceof Mob) {
@@ -92,11 +90,9 @@ public class Challenge extends Ability {
 	}
 
 	@Override
-	public boolean livingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
-	    if (event.getCause().equals(DamageCause.ENTITY_ATTACK)) {
+	public void onDamage(DamageEvent event, LivingEntity enemy) {
+	    if (event.getType() == DamageType.MELEE) {
 	        cast(Action.LEFT_CLICK_AIR);
 	    }
-
-	    return true;
 	}
 }

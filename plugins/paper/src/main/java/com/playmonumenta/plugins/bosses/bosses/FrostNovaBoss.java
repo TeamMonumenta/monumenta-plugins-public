@@ -1,12 +1,11 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
-import java.util.Arrays;
-
+import com.playmonumenta.plugins.bosses.SpellManager;
+import com.playmonumenta.plugins.bosses.spells.SpellFrostNova;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.plugin.Plugin;
 
-import com.playmonumenta.plugins.bosses.SpellManager;
-import com.playmonumenta.plugins.bosses.spells.SpellFrostNova;
+import java.util.Arrays;
 
 /**
  * @deprecated use boss_nova instead, like this:

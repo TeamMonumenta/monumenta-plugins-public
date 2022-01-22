@@ -1,10 +1,13 @@
 package com.playmonumenta.plugins.bosses.spells.rkitxet;
 
-import java.util.AbstractMap;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-
+import com.playmonumenta.plugins.bosses.bosses.RKitxet;
+import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.utils.DamageUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.ParticleUtils;
+import com.playmonumenta.plugins.utils.ParticleUtils.SpawnParticleAction;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -14,20 +17,17 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import com.playmonumenta.plugins.bosses.bosses.RKitxet;
-import com.playmonumenta.plugins.bosses.spells.Spell;
-import com.playmonumenta.plugins.utils.BossUtils;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.ParticleUtils;
-import com.playmonumenta.plugins.utils.ParticleUtils.SpawnParticleAction;
-import com.playmonumenta.plugins.utils.PlayerUtils;
+import java.util.AbstractMap;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 public class SpellKaulsFury extends Spell {
 
 	public static final int RADIUS = 3;
 	public static final double DAMAGE_RADIUS = 3.5;
 	public static final int HEIGHT = 8;
-	public static final int DAMAGE = 24;
+	public static final double DAMAGE = 24;
 
 	private LivingEntity mBoss;
 	private int mTicks;
@@ -113,7 +113,7 @@ public class SpellKaulsFury extends Spell {
 						world.playSound(mLocation, Sound.ENTITY_BLAZE_SHOOT, 1, 2.0f);
 					} else {
 						for (Player player : PlayerUtils.playersInRange(mLocation, DAMAGE_RADIUS, true)) {
-							BossUtils.bossDamage(mBoss, player, DAMAGE, mLocation, "Kaul's Fury");
+							DamageUtils.damage(mBoss, player, DamageType.MAGIC, DAMAGE, null, false, true, "Kaul's Fury");
 						}
 
 						//Give 0.5 blocks of leeway for hitting the boss, don't want to make it about being super precise
@@ -122,7 +122,8 @@ public class SpellKaulsFury extends Spell {
 						}
 
 						for (LivingEntity mob : EntityUtils.getNearbyMobs(mLocation, DAMAGE_RADIUS)) {
-							mob.damage(DAMAGE / 2.0);
+							// No damager so that the mobs don't target the boss
+							DamageUtils.damage(null, mob, DamageType.BLAST, DAMAGE / 2, null, false, true, "Kaul's Fury");
 						}
 
 						world.playSound(mLocation, Sound.ENTITY_GENERIC_EXPLODE, 1.5f, 1);

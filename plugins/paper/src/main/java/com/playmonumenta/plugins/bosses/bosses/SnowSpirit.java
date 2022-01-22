@@ -18,9 +18,8 @@ import org.bukkit.boss.BarStyle;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.entity.Projectile;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -36,8 +35,10 @@ import com.playmonumenta.plugins.bosses.spells.snowspirit.DeckTheHalls;
 import com.playmonumenta.plugins.bosses.spells.snowspirit.ElfSummon;
 import com.playmonumenta.plugins.bosses.spells.snowspirit.JollyBall;
 import com.playmonumenta.plugins.bosses.spells.snowspirit.ShiningStar;
+import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.SerializationUtils;
@@ -276,7 +277,7 @@ public class SnowSpirit extends BossAbilityGroup {
 		int bossTargetHp = 0;
 		int playerCount = PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true).size();
 		int hpDel = 2500;
-		bossTargetHp = (int) (hpDel * (1 + (1 - 1/Math.E) * Math.log(playerCount)));
+		bossTargetHp = (int) (hpDel * (1 + (1 - 1/Math.E) * Math.log(playerCount)) * 1.1);
 		mBoss.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(bossTargetHp);
 		mBoss.getAttribute(Attribute.GENERIC_FOLLOW_RANGE).setBaseValue(detectionRange);
 		mBoss.getAttribute(Attribute.GENERIC_KNOCKBACK_RESISTANCE).setBaseValue(1);
@@ -287,18 +288,12 @@ public class SnowSpirit extends BossAbilityGroup {
 	}
 
 	@Override
-	public void bossDamagedByEntity(EntityDamageByEntityEvent event) {
-		Player player = null;
-		if (event.getDamager() instanceof Projectile && ((Projectile) event.getDamager()).getShooter() instanceof Player) {
-			player = (Player) ((Projectile) event.getDamager()).getShooter();
-		} else if (event.getDamager() instanceof Player) {
-			player = (Player) event.getDamager();
-		}
-		if (player != null) {
-			Location loc = mBoss.getLocation();
-			if (mMinibossesPresent) {
-				event.setCancelled(true);
-				player.playSound(loc, Sound.ITEM_SHIELD_BLOCK, 1, 1);
+	public void onHurt(DamageEvent event) {
+		if (mMinibossesPresent) {
+			LivingEntity source = event.getSource();
+			event.setCancelled(true);
+			if (source != null && source instanceof Player player) {
+				player.playSound(mBoss.getLocation(), Sound.ITEM_SHIELD_BLOCK, 1, 1);
 				List<Entity> living = new ArrayList<>(mActiveMinibosses);
 				living.removeIf(miniboss -> miniboss.isDead() || !miniboss.isValid());
 				if (living.size() <= 1) {
@@ -306,8 +301,16 @@ public class SnowSpirit extends BossAbilityGroup {
 				} else {
 					player.sendMessage(ChatColor.AQUA + "Your weapon glides cleanly through the spirit, seemingly doing nothing. There are " + living.size() + " ghosts alive.");
 				}
-				return;
-			} else if (player.getInventory().getHelmet().getItemMeta().getDisplayName().contains("The Grinch")) {
+			}
+		}
+	}
+
+	@Override
+	public void onHurtByEntityWithSource(DamageEvent event, Entity damager, LivingEntity source) {
+		if (source instanceof Player player) {
+			ItemStack helmet = player.getInventory().getHelmet();
+			if (helmet != null && helmet.getItemMeta().getDisplayName().contains("The Grinch")) {
+				Location loc = mBoss.getLocation();
 				event.setDamage(event.getDamage() * 1.2);
 				player.playSound(loc, Sound.ENTITY_WITHER_SHOOT, 0.75f, 1.65f);
 				player.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 0.75f, 0.5f);
@@ -323,14 +326,13 @@ public class SnowSpirit extends BossAbilityGroup {
 
 	private void healthScaleMinibosses() {
 		for (Entity miniboss : mActiveMinibosses) {
-			if (miniboss instanceof LivingEntity) {
-				LivingEntity mini = (LivingEntity) miniboss;
+			if (miniboss instanceof LivingEntity mini) {
 				int bossTargetHp = 0;
 				int playerCount = PlayerUtils.playersInRange(mSpawnLoc, detectionRange, true).size();
 				int hpDel = (int) mini.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue();
 				bossTargetHp = (int) (hpDel * (1 + (1 - 1/Math.E) * Math.log(playerCount)));
-				mini.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(bossTargetHp);
-				mini.setHealth(bossTargetHp);
+				EntityUtils.setAttributeBase(mini, Attribute.GENERIC_MAX_HEALTH, bossTargetHp * 1.1);
+				mini.setHealth(bossTargetHp * 1.1);
 			}
 		}
 	}

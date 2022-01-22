@@ -1,7 +1,7 @@
 package com.playmonumenta.plugins.tracking;
 
-import java.util.List;
-
+import com.playmonumenta.plugins.Constants;
+import com.playmonumenta.plugins.Plugin;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.entity.Boat;
@@ -14,8 +14,7 @@ import org.bukkit.entity.Villager;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.Team;
 
-import com.playmonumenta.plugins.Constants;
-import com.playmonumenta.plugins.Plugin;
+import java.util.List;
 
 public final class TrackingManager {
 	private static final String UNPUSHABLE_TEAM = "UNPUSHABLE_TEAM";

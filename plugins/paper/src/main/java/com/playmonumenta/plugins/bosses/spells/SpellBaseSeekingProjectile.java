@@ -1,11 +1,9 @@
 package com.playmonumenta.plugins.bosses.spells;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.LocationUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Block;
@@ -17,10 +15,11 @@ import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.FastUtils;
-import com.playmonumenta.plugins.utils.LocationUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class SpellBaseSeekingProjectile extends Spell {
 
@@ -246,7 +245,7 @@ public class SpellBaseSeekingProjectile extends Spell {
 
 	@Override
 	public boolean canRun() {
-		if (EntityUtils.isStunned(mBoss) || EntityUtils.isSilenced(mBoss) || EntityUtils.isConfused(mBoss)) {
+		if (EntityUtils.isStunned(mBoss) || EntityUtils.isSilenced(mBoss)) {
 			return false;
 		}
 		if (mGetSpellTargets != null) {

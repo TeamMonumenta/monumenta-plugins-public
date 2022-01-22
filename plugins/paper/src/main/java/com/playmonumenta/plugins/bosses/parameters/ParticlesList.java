@@ -1,12 +1,8 @@
 package com.playmonumenta.plugins.bosses.parameters;
 
-import java.util.ArrayList;
-import java.util.EnumSet;
-import java.util.List;
-
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.player.PartialParticle;
-
+import dev.jorel.commandapi.Tooltip;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -15,7 +11,9 @@ import org.bukkit.Particle.DustOptions;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.inventory.ItemStack;
 
-import dev.jorel.commandapi.Tooltip;
+import java.util.ArrayList;
+import java.util.EnumSet;
+import java.util.List;
 
 public class ParticlesList {
 	private static final EnumSet<Particle> PARTICLE_MATERIALS = EnumSet.of(Particle.ITEM_CRACK, Particle.BLOCK_CRACK, Particle.BLOCK_DUST, Particle.FALLING_DUST);

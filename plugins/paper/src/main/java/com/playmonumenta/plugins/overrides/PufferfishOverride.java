@@ -1,10 +1,9 @@
 package com.playmonumenta.plugins.overrides;
 
-import org.bukkit.entity.Player;
-import org.bukkit.event.player.PlayerItemConsumeEvent;
-
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.utils.InventoryUtils;
+import org.bukkit.entity.Player;
+import org.bukkit.event.player.PlayerItemConsumeEvent;
 
 public class PufferfishOverride extends BaseOverride {
 	@Override

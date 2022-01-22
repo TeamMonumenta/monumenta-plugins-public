@@ -1,26 +1,26 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
-import java.util.Arrays;
-
 import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.parameters.BossParam;
 import com.playmonumenta.plugins.bosses.parameters.EffectsList;
 import com.playmonumenta.plugins.bosses.parameters.EntityTargets;
+import com.playmonumenta.plugins.bosses.parameters.EntityTargets.Limit;
+import com.playmonumenta.plugins.bosses.parameters.EntityTargets.Limit.LIMITSENUM;
+import com.playmonumenta.plugins.bosses.parameters.EntityTargets.TARGETS;
 import com.playmonumenta.plugins.bosses.parameters.ParticlesList;
 import com.playmonumenta.plugins.bosses.parameters.SoundsList;
-import com.playmonumenta.plugins.bosses.parameters.EntityTargets.Limit;
-import com.playmonumenta.plugins.bosses.parameters.EntityTargets.TARGETS;
-import com.playmonumenta.plugins.bosses.parameters.EntityTargets.Limit.LIMITSENUM;
 import com.playmonumenta.plugins.bosses.spells.SpellBaseSeekingProjectile;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
-
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+
+import java.util.Arrays;
 
 public class ProjectileBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_projectile";
@@ -147,21 +147,14 @@ public class ProjectileBoss extends BossAbilityGroup {
 					(World world, LivingEntity target, Location loc) -> {
 						p.SOUND_HIT.play(loc, 0.5f, 0.5f);
 						p.PARTICLE_HIT.spawn(loc, 0d, 0d, 0d, 0.25d);
+
 						if (target != null) {
 							if (p.DAMAGE > 0) {
-								if (p.SPELL_NAME.isEmpty()) {
-									BossUtils.bossDamage(boss, target, p.DAMAGE);
-								} else {
-									BossUtils.bossDamage(boss, target, p.DAMAGE, mBoss.getLocation(), p.SPELL_NAME);
-								}
+								BossUtils.blockableDamage(boss, target, DamageType.MAGIC, p.DAMAGE, p.SPELL_NAME, mBoss.getLocation());
 							}
 
 							if (p.DAMAGE_PERCENTAGE > 0.0) {
-								if (p.SPELL_NAME.isEmpty()) {
-									BossUtils.bossDamagePercent(mBoss, target, p.DAMAGE_PERCENTAGE);
-								} else {
-									BossUtils.bossDamagePercent(mBoss, target, p.DAMAGE_PERCENTAGE, p.SPELL_NAME);
-								}
+								BossUtils.bossDamagePercent(mBoss, target, p.DAMAGE_PERCENTAGE, p.SPELL_NAME);
 							}
 							p.EFFECTS.apply(target, boss);
 						}

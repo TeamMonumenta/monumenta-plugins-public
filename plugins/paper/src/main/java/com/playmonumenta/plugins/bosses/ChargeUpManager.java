@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.bosses;
 
+import com.playmonumenta.scriptedquests.Plugin;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.boss.BarColor;
@@ -9,8 +10,6 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.checkerframework.checker.nullness.qual.Nullable;
-
-import com.playmonumenta.scriptedquests.Plugin;
 
 public class ChargeUpManager {
 

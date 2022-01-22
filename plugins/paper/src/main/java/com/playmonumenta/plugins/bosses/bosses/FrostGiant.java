@@ -1,50 +1,5 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.EnumSet;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import org.bukkit.Bukkit;
-import org.bukkit.Color;
-import org.bukkit.GameMode;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
-import org.bukkit.SoundCategory;
-import org.bukkit.World;
-import org.bukkit.attribute.Attribute;
-import org.bukkit.attribute.AttributeModifier;
-import org.bukkit.boss.BarColor;
-import org.bukkit.boss.BarStyle;
-import org.bukkit.entity.Creature;
-import org.bukkit.entity.EntityType;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Mob;
-import org.bukkit.entity.Player;
-import org.bukkit.entity.Projectile;
-import org.bukkit.event.block.BlockBreakEvent;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
-import org.bukkit.event.entity.EntityDeathEvent;
-import org.bukkit.event.entity.EntityPotionEffectEvent;
-import org.bukkit.event.entity.EntityTargetEvent;
-import org.bukkit.event.entity.ProjectileHitEvent;
-import org.bukkit.inventory.EntityEquipment;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.plugin.Plugin;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
-import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.util.BoundingBox;
-import org.bukkit.util.Vector;
-import org.checkerframework.checker.nullness.qual.Nullable;
-
 import com.playmonumenta.plugins.bosses.BossBarManager;
 import com.playmonumenta.plugins.bosses.BossBarManager.BossHealthAction;
 import com.playmonumenta.plugins.bosses.SpellManager;
@@ -66,17 +21,59 @@ import com.playmonumenta.plugins.bosses.spells.frostgiant.SpellSpinDown;
 import com.playmonumenta.plugins.bosses.spells.frostgiant.SpellTitanicRupture;
 import com.playmonumenta.plugins.bosses.spells.frostgiant.UltimateSeismicRuin;
 import com.playmonumenta.plugins.effects.PercentSpeed;
-import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.SerializationUtils;
-
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
+import org.bukkit.Bukkit;
+import org.bukkit.Color;
+import org.bukkit.GameMode;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
+import org.bukkit.World;
+import org.bukkit.attribute.Attribute;
+import org.bukkit.attribute.AttributeModifier;
+import org.bukkit.boss.BarColor;
+import org.bukkit.boss.BarStyle;
+import org.bukkit.entity.Creature;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
+import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.event.entity.EntityPotionEffectEvent;
+import org.bukkit.event.entity.EntityTargetEvent;
+import org.bukkit.event.entity.ProjectileHitEvent;
+import org.bukkit.inventory.EntityEquipment;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.plugin.Plugin;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
+import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.util.BoundingBox;
+import org.bukkit.util.Vector;
+import org.checkerframework.checker.nullness.qual.Nullable;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /* WARNING: Basically all the spell info in the comments is outdated.
  * Please use the Frost Giant Formal Write-up for up to date spell descriptions.
@@ -373,7 +370,7 @@ public class FrostGiant extends BossAbilityGroup {
 			public void run() {
 				for (Player player : PlayerUtils.playersInRange(mStartLoc, detectionRange, true)) {
 					if (player.isSleeping() && player.getGameMode() != GameMode.ADVENTURE) {
-						BossUtils.bossDamage(mBoss, player, 22);
+						DamageUtils.damage(mBoss, player, DamageType.OTHER, 22);
 						player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 15, 1));
 						player.sendMessage(Component.text("YOU DARE MOCK OUR BATTLE?", NamedTextColor.DARK_AQUA));
 						player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ELDER_GUARDIAN_DEATH, 1, 0.85f);
@@ -961,10 +958,7 @@ public class FrostGiant extends BossAbilityGroup {
 	}
 
 	@Override
-	public void bossDamagedEntity(EntityDamageByEntityEvent event) {
-		if (event.getEntity() instanceof Player && event.getCause().equals(DamageCause.ENTITY_ATTACK)) {
-			event.setCancelled(true);
-		}
+	public void onDamage(DamageEvent event, LivingEntity damagee) {
 		//The "default" Giant attacks need to be cancelled so it does not trigger evasion
 		if (event.getDamage() <= 0) {
 			event.setCancelled(true);
@@ -972,19 +966,17 @@ public class FrostGiant extends BossAbilityGroup {
 	}
 
 	@Override
-	public void bossDamagedByEntity(EntityDamageByEntityEvent event) {
-		World world = mBoss.getWorld();
-		if (event.getDamager() instanceof Mob && !(event.getDamager() instanceof Player)) {
+	public void onHurt(DamageEvent event) {
+		LivingEntity source = event.getSource();
+		if (source == null || !(source instanceof Player)) {
 			event.setCancelled(true);
 		} else if (!mFrostArmorActive) {
-			if (event.getDamager() instanceof Player) {
-				((Player)event.getDamager()).playSound(mBoss.getLocation(), Sound.ENTITY_ENDER_DRAGON_HURT, SoundCategory.HOSTILE, 5, 0.75f);
-			} else {
-				world.playSound(mBoss.getLocation(), Sound.ENTITY_ENDER_DRAGON_HURT, SoundCategory.HOSTILE, 5, 0.75f);
+			if (source instanceof Player player) {
+				player.playSound(mBoss.getLocation(), Sound.ENTITY_ENDER_DRAGON_HURT, SoundCategory.HOSTILE, 5, 0.75f);
 			}
 		}
 		//Punch resist
-		if (event.getDamager() instanceof Projectile) {
+		if (event.getDamager() instanceof Projectile proj) {
 			new BukkitRunnable() {
 				int mTicks = 0;
 				@Override
@@ -996,8 +988,6 @@ public class FrostGiant extends BossAbilityGroup {
 					}
 				}
 			}.runTaskTimer(mPlugin, 0, 1);
-
-			Projectile proj = (Projectile) event.getDamager();
 
 			//Check if arrow shot came from arena
 			if (proj.getShooter() instanceof Player) {
@@ -1087,7 +1077,7 @@ public class FrostGiant extends BossAbilityGroup {
 			noDamageTicksTake = 5;
 		}
 		mBoss.setMaximumNoDamageTicks(mBoss.getMaximumNoDamageTicks() - noDamageTicksTake);
-		bossTargetHp = (int) (hpDel * (1 + (1 - 1/Math.E) * Math.log(playerCount)));
+		bossTargetHp = (int) (hpDel * (1 + (1 - 1/Math.E) * Math.log(playerCount)) * 1.1);
 		mBoss.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(bossTargetHp);
 		mBoss.getAttribute(Attribute.GENERIC_FOLLOW_RANGE).setBaseValue(detectionRange);
 		mBoss.getAttribute(Attribute.GENERIC_KNOCKBACK_RESISTANCE).setBaseValue(1);

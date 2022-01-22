@@ -1,10 +1,11 @@
 package com.playmonumenta.plugins.bosses.spells.sealedremorse;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.UUID;
-
+import com.playmonumenta.plugins.bosses.bosses.BeastOfTheBlackFlame;
+import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
+import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.MovementUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -14,12 +15,10 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import com.playmonumenta.plugins.bosses.bosses.BeastOfTheBlackFlame;
-import com.playmonumenta.plugins.bosses.spells.Spell;
-import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
-import com.playmonumenta.plugins.utils.FastUtils;
-import com.playmonumenta.plugins.utils.MovementUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.UUID;
 
 public class BlackflameGolemNecromancy extends Spell {
 
@@ -119,7 +118,7 @@ public class BlackflameGolemNecromancy extends Spell {
 								if (mRaised) {
 									Block block = ele.getLocation().getBlock();
 									if (block.getType().isSolid() || block.isLiquid()) {
-										MovementUtils.knockAway(mBoss.getLocation(), ele, -2.25f, 0.7f);
+										MovementUtils.knockAway(mBoss.getLocation(), ele, -2.25f, 0.7f, false);
 									} else if (mSpawnLoc.getY() - ele.getLocation().getY() >= 3) {
 										ele.teleport(mSpawnLoc);
 									}

@@ -1,8 +1,9 @@
 package com.playmonumenta.plugins.bosses.spells.frostgiant;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import com.playmonumenta.plugins.bosses.bosses.FrostGiant;
+import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -17,10 +18,8 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import com.playmonumenta.plugins.bosses.bosses.FrostGiant;
-import com.playmonumenta.plugins.bosses.spells.Spell;
-import com.playmonumenta.plugins.utils.BossUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
+import java.util.ArrayList;
+import java.util.List;
 
 /*
  Hailstorm - Creates a snowstorm in a circle that is 18 blocks and beyond that passively

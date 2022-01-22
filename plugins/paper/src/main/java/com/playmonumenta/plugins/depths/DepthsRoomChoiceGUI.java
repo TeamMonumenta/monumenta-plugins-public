@@ -1,8 +1,13 @@
 package com.playmonumenta.plugins.depths;
 
-import java.util.ArrayList;
-import java.util.EnumSet;
-
+import com.playmonumenta.plugins.utils.GUIUtils;
+import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.scriptedquests.utils.CustomInventory;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextColor;
+import net.kyori.adventure.text.format.TextDecoration;
+import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -10,15 +15,8 @@ import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import com.playmonumenta.plugins.utils.GUIUtils;
-import com.playmonumenta.plugins.utils.ItemUtils;
-import com.playmonumenta.scriptedquests.utils.CustomInventory;
-
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.format.TextColor;
-import net.kyori.adventure.text.format.TextDecoration;
-import net.md_5.bungee.api.ChatColor;
+import java.util.ArrayList;
+import java.util.EnumSet;
 
 public class DepthsRoomChoiceGUI extends CustomInventory {
 	private static final Material NO_CHOICE = Material.BLACK_STAINED_GLASS_PANE;

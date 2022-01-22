@@ -1,9 +1,15 @@
 package com.playmonumenta.plugins.bosses.spells.lich;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
+import com.playmonumenta.plugins.bosses.bosses.Lich;
+import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.player.PartialParticle;
+import com.playmonumenta.plugins.utils.AbilityUtils;
+import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.LocationUtils;
+import com.playmonumenta.plugins.utils.MovementUtils;
+import com.playmonumenta.plugins.utils.VectorUtils;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -20,15 +26,9 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
-import com.playmonumenta.plugins.bosses.bosses.Lich;
-import com.playmonumenta.plugins.bosses.spells.Spell;
-import com.playmonumenta.plugins.player.PartialParticle;
-import com.playmonumenta.plugins.utils.AbilityUtils;
-import com.playmonumenta.plugins.utils.BossUtils;
-import com.playmonumenta.plugins.utils.FastUtils;
-import com.playmonumenta.plugins.utils.LocationUtils;
-import com.playmonumenta.plugins.utils.MovementUtils;
-import com.playmonumenta.plugins.utils.VectorUtils;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 public class SpellAutoAttack extends Spell {
 
@@ -198,7 +198,7 @@ public class SpellAutoAttack extends Spell {
 								if (player.getBoundingBox().overlaps(box)) {
 									MovementUtils.knockAway(mBoss.getLocation(), player, 1.5f, 0.5f);
 									mPCrit2.location(player.getLocation()).spawnAsBoss();
-									damage(player);
+									damage(player, true);
 								}
 							}
 						}
@@ -231,7 +231,7 @@ public class SpellAutoAttack extends Spell {
 					Location loc = mBox.getCenter().toLocation(mBoss.getWorld());
 					for (Player player : players) {
 						if (player.getBoundingBox().overlaps(mBox)) {
-							damage(player);
+							damage(player, false);
 							mPSmoke2.location(loc).spawnAsBoss();
 							mPYellow.location(loc).spawnAsBoss();
 							w.playSound(loc, Sound.ENTITY_WITHER_HURT, 1, 0.75f);
@@ -261,26 +261,37 @@ public class SpellAutoAttack extends Spell {
 		mActiveRunnables.add(runC);
 	}
 
-	private void damage(Player player) {
-		if (mPhase == 1) {
-			BossUtils.bossDamage(mBoss, player, 25, mBoss.getLocation(), "Death Bolt");
-		}
-
-		if (mPhase == 2) {
-			BossUtils.bossDamage(mBoss, player, 30, mBoss.getLocation(), "Death Bolt");
-			AbilityUtils.increaseDamageRecievedPlayer(player, 20 * 5, 0.2, "Lich");
-		}
-
-		if (mPhase == 3) {
-			BossUtils.bossDamage(mBoss, player, 35, mBoss.getLocation(), "Death Bolt");
-			AbilityUtils.increaseDamageRecievedPlayer(player, 20 * 5, 0.2, "Lich");
-			AbilityUtils.increaseDamageDealtPlayer(player, 20 * 5, -0.2, "Lich");
-		}
-
-		if (mPhase >= 4) {
-			BossUtils.bossDamage(mBoss, player, 40, mBoss.getLocation(), "Death Bolt");
-			AbilityUtils.increaseDamageRecievedPlayer(player, 20 * 5, 0.2, "Lich");
-			AbilityUtils.increaseDamageDealtPlayer(player, 20 * 5, -0.2, "Lich");
+	private void damage(Player player, boolean melee) {
+		if (melee) {
+			if (mPhase == 1) {
+				BossUtils.dualTypeBlockableDamage(mBoss, player, DamageType.MAGIC, DamageType.MELEE, 23, 0.75, "Death Bolt", mBoss.getLocation());
+			} else if (mPhase == 2) {
+				BossUtils.dualTypeBlockableDamage(mBoss, player, DamageType.MAGIC, DamageType.MELEE, 27, 0.75, "Death Bolt", mBoss.getLocation());
+				AbilityUtils.increaseDamageRecievedPlayer(player, 20 * 5, 0.2, "Lich");
+			} else if (mPhase == 3) {
+				BossUtils.dualTypeBlockableDamage(mBoss, player, DamageType.MAGIC, DamageType.MELEE, 31, 0.75, "Death Bolt", mBoss.getLocation());
+				AbilityUtils.increaseDamageRecievedPlayer(player, 20 * 5, 0.2, "Lich");
+				AbilityUtils.increaseDamageDealtPlayer(player, 20 * 5, -0.2, "Lich");
+			} else {
+				BossUtils.dualTypeBlockableDamage(mBoss, player, DamageType.MAGIC, DamageType.MELEE, 35, 0.75, "Death Bolt", mBoss.getLocation());
+				AbilityUtils.increaseDamageRecievedPlayer(player, 20 * 5, 0.2, "Lich");
+				AbilityUtils.increaseDamageDealtPlayer(player, 20 * 5, -0.2, "Lich");
+			}
+		} else {
+			if (mPhase == 1) {
+				BossUtils.blockableDamage(mBoss, player, DamageType.MAGIC, 22, "Death Bolt", mBoss.getLocation());
+			} else if (mPhase == 2) {
+				BossUtils.blockableDamage(mBoss, player, DamageType.MAGIC, 26, "Death Bolt", mBoss.getLocation());
+				AbilityUtils.increaseDamageRecievedPlayer(player, 20 * 5, 0.2, "Lich");
+			} else if (mPhase == 3) {
+				BossUtils.blockableDamage(mBoss, player, DamageType.MAGIC, 30, "Death Bolt", mBoss.getLocation());
+				AbilityUtils.increaseDamageRecievedPlayer(player, 20 * 5, 0.2, "Lich");
+				AbilityUtils.increaseDamageDealtPlayer(player, 20 * 5, -0.2, "Lich");
+			} else {
+				BossUtils.blockableDamage(mBoss, player, DamageType.MAGIC, 35, "Death Bolt", mBoss.getLocation());
+				AbilityUtils.increaseDamageRecievedPlayer(player, 20 * 5, 0.2, "Lich");
+				AbilityUtils.increaseDamageDealtPlayer(player, 20 * 5, -0.2, "Lich");
+			}
 		}
 	}
 

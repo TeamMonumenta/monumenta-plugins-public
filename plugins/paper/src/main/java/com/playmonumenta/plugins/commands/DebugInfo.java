@@ -1,13 +1,11 @@
 package com.playmonumenta.plugins.commands;
 
-import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
-
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.tracking.PlayerTracking;
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 
 public class DebugInfo extends GenericCommand {
 	public static void register(Plugin plugin) {
@@ -28,9 +26,6 @@ public class DebugInfo extends GenericCommand {
 		}
 		if (plugin.mEffectManager != null) {
 			debugInfo.add("Effect Manager", plugin.mEffectManager.getAsJsonObject(player));
-		}
-		if (PlayerTracking.getInstance() != null) {
-			debugInfo.add("Enchants", PlayerTracking.getInstance().getAsJsonObject(player));
 		}
 
 		Gson gson = new GsonBuilder().setPrettyPrinting().create();

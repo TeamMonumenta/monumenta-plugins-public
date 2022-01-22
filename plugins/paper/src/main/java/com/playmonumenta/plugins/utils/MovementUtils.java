@@ -15,12 +15,24 @@ public class MovementUtils {
 		knockAway(awayFromEntity.getLocation(), target, speed, y);
 	}
 
+	public static void knockAway(Entity awayFromEntity, LivingEntity target, float speed, boolean useKnockbackRes) {
+		knockAway(awayFromEntity.getLocation(), target, speed, 0.5f, useKnockbackRes);
+	}
+
+	public static void knockAway(Entity awayFromEntity, LivingEntity target, float speed, float y, boolean useKnockbackRes) {
+		knockAway(awayFromEntity.getLocation(), target, speed, y, useKnockbackRes);
+	}
+
 	public static void knockAway(Location loc, LivingEntity target, float speed) {
 		knockAway(loc, target, speed, 0.5f);
 	}
 
 	public static void knockAway(Location loc, LivingEntity target, float speed, float y) {
 		knockAway(loc, target, speed, y, true);
+	}
+
+	public static void knockAway(Location loc, LivingEntity target, float speed, boolean useKnockbackRes) {
+		knockAway(loc, target, speed, 0.5f, useKnockbackRes);
 	}
 
 	//useKnockbackRes determines if max knockback resistance should be taken into account in the knock away

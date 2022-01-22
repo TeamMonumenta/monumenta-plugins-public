@@ -1,13 +1,13 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.utils.BossUtils;
 import org.bukkit.GameMode;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Snowman;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.plugin.Plugin;
-
-import com.playmonumenta.plugins.utils.BossUtils;
 
 
 public class SnowballDamageBoss extends BossAbilityGroup {
@@ -37,11 +37,11 @@ public class SnowballDamageBoss extends BossAbilityGroup {
 	}
 
 
+	@Override
 	public void bossProjectileHit(ProjectileHitEvent event) {
-		if (event.getHitEntity() != null && event.getHitEntity() instanceof Player) {
-			Player player = (Player)event.getHitEntity();
+		if (event.getHitEntity() != null && event.getHitEntity() instanceof Player player) {
 			if ((player.getGameMode().equals(GameMode.SURVIVAL) || player.getGameMode().equals(GameMode.ADVENTURE)) && !player.isDead() && player.getHealth() > 0) {
-				BossUtils.bossDamage(mBoss, player, mParams.DAMAGE);
+				BossUtils.blockableDamage(mBoss, player, DamageType.PROJECTILE, mParams.DAMAGE);
 			}
 		}
 	}

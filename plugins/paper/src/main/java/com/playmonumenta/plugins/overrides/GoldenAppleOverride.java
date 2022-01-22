@@ -1,11 +1,10 @@
 package com.playmonumenta.plugins.overrides;
 
+import com.playmonumenta.plugins.Plugin;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.ZombieVillager;
 import org.bukkit.inventory.ItemStack;
-
-import com.playmonumenta.plugins.Plugin;
 
 public class GoldenAppleOverride extends BaseOverride {
 	@Override

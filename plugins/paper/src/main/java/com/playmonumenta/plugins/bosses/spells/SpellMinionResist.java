@@ -1,10 +1,10 @@
 package com.playmonumenta.plugins.bosses.spells;
 
-import java.util.function.Predicate;
-
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.potion.PotionEffect;
+
+import java.util.function.Predicate;
 
 
 public class SpellMinionResist extends Spell {

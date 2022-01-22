@@ -1,7 +1,19 @@
 package com.playmonumenta.plugins.abilities.mage;
 
-import java.util.EnumSet;
-
+import com.playmonumenta.plugins.Constants;
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.abilities.AbilityTrigger;
+import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.itemstats.attributes.SpellPower;
+import com.playmonumenta.plugins.utils.DamageUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.utils.StringUtils;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -10,35 +22,13 @@ import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-import com.playmonumenta.plugins.Constants;
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.abilities.AbilityTrigger;
-import com.playmonumenta.plugins.classes.ClassAbility;
-import com.playmonumenta.plugins.classes.magic.MagicType;
-import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
-import com.playmonumenta.plugins.enchantments.abilities.BaseAbilityEnchantment;
-import com.playmonumenta.plugins.enchantments.abilities.SpellPower;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.FastUtils;
-import com.playmonumenta.plugins.utils.ItemUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.plugins.utils.StringUtils;
-
 
 
 public class FrostNova extends Ability {
-	public static class FrostNovaCooldownEnchantment extends BaseAbilityEnchantment {
-		public FrostNovaCooldownEnchantment() {
-			super("Frost Nova Cooldown", EnumSet.of(ItemSlot.ARMOR));
-		}
-	}
 
 	public static final String NAME = "Frost Nova";
 	public static final ClassAbility ABILITY = ClassAbility.FROST_NOVA;
@@ -63,7 +53,7 @@ public class FrostNova extends Ability {
 		mInfo.mShorthandName = "FN";
 		mInfo.mDescriptions.add(
 			String.format(
-				"While sneaking, left-clicking with a wand unleashes a frost nova, dealing %s ice damage to all enemies in a %s-block cube around you, afflicting them with %s%% slowness for %ss, and extinguishing them if they're on fire. Slowness is reduced by %s%% on elites and bosses, and all players in the nova are also extinguished. The damage ignores iframes. Cooldown: %ss.",
+				"While sneaking, left-clicking with a wand unleashes a frost nova, dealing %s magic damage to all enemies in a %s-block cube around you, afflicting them with %s%% slowness for %ss, and extinguishing them if they're on fire. Slowness is reduced by %s%% on elites and bosses, and all players in the nova are also extinguished. The damage ignores iframes. Cooldown: %ss.",
 				DAMAGE_1,
 				SIZE,
 				StringUtils.multiplierToPercentage(SLOW_MULTIPLIER_1),
@@ -96,14 +86,14 @@ public class FrostNova extends Ability {
 			return;
 		}
 		putOnCooldown();
-		float damage = SpellPower.getSpellDamage(mPlayer, mLevelDamage);
+		float damage = SpellPower.getSpellDamage(mPlugin, mPlayer, mLevelDamage);
 		for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), SIZE, mPlayer)) {
 			if (EntityUtils.isElite(mob) || EntityUtils.isBoss(mob)) {
 				EntityUtils.applySlow(mPlugin, DURATION_TICKS, mLevelSlowMultiplier - REDUCTION_MULTIPLIER, mob);
 			} else {
 				EntityUtils.applySlow(mPlugin, DURATION_TICKS, mLevelSlowMultiplier, mob);
 			}
-			EntityUtils.damageEntity(mPlugin, mob, damage, mPlayer, MagicType.ICE, true, mInfo.mLinkedSpell, true, true, true, true);
+			DamageUtils.damage(mPlayer, mob, DamageType.MAGIC, damage, mInfo.mLinkedSpell, true, false);
 
 			if (mob.getFireTicks() > 1) {
 				mob.setFireTicks(1);
@@ -148,12 +138,10 @@ public class FrostNova extends Ability {
 	}
 
 	@Override
-	public boolean livingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
-	    if (event.getCause().equals(DamageCause.ENTITY_ATTACK)) {
+	public void onDamage(DamageEvent event, LivingEntity enemy) {
+	    if (event.getType() == DamageType.MELEE) {
 	        cast(Action.LEFT_CLICK_AIR);
 	    }
-
-	    return true;
 	}
 
 	@Override
@@ -161,10 +149,5 @@ public class FrostNova extends Ability {
 		return mPlayer != null
 			&& ItemUtils.isWand(mPlayer.getInventory().getItemInMainHand())
 			&& mPlayer.isSneaking();
-	}
-
-	@Override
-	public Class<? extends BaseAbilityEnchantment> getCooldownEnchantment() {
-		return FrostNovaCooldownEnchantment.class;
 	}
 }

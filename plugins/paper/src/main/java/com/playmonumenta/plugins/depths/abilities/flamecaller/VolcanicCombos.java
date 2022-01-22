@@ -7,14 +7,15 @@ import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
 
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.classes.magic.MagicType;
 import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
+import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 
@@ -35,15 +36,15 @@ public class VolcanicCombos extends DepthsAbility {
 	}
 
 	@Override
-	public boolean livingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
+	public void onDamage(DamageEvent event, LivingEntity enemy) {
 		if (mPlayer != null && DepthsUtils.isValidComboAttack(event, mPlayer)) {
 			mComboCount++;
 
 			if (mComboCount >= 3 && mRarity > 0) {
-				Location location = event.getEntity().getLocation();
+				Location location = enemy.getLocation();
 				for (LivingEntity mob : EntityUtils.getNearbyMobs(location, RADIUS)) {
 					EntityUtils.applyFire(mPlugin, FIRE_TICKS, mob, mPlayer);
-					EntityUtils.damageEntity(mPlugin, mob, DAMAGE[mRarity - 1], mPlayer, MagicType.FIRE, true, mInfo.mLinkedSpell, true, true, true, false);
+					DamageUtils.damage(mPlayer, mob, DamageType.MAGIC, DAMAGE[mRarity - 1], mInfo.mLinkedSpell, true);
 				}
 				World world = mPlayer.getWorld();
 				for (int i = 0; i < 360; i += 45) {
@@ -57,13 +58,11 @@ public class VolcanicCombos extends DepthsAbility {
 				mComboCount = 0;
 			}
 		}
-
-		return true;
 	}
 
 	@Override
 	public String getDescription(int rarity) {
-		return "Every third melee attack deals " + DepthsUtils.getRarityColor(rarity) + DAMAGE[rarity - 1] + ChatColor.WHITE + " damage to enemies in a " + RADIUS + " block radius and sets those enemies on fire for " + FIRE_TICKS / 20 + " seconds.";
+		return "Every third melee attack deals " + DepthsUtils.getRarityColor(rarity) + DAMAGE[rarity - 1] + ChatColor.WHITE + " magic damage to enemies in a " + RADIUS + " block radius and sets those enemies on fire for " + FIRE_TICKS / 20 + " seconds.";
 	}
 
 	@Override

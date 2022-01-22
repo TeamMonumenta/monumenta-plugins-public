@@ -1,12 +1,11 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
-import java.util.Arrays;
-
+import com.playmonumenta.plugins.bosses.SpellManager;
+import com.playmonumenta.plugins.bosses.spells.SpellCyanSummon;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.plugin.Plugin;
 
-import com.playmonumenta.plugins.bosses.SpellManager;
-import com.playmonumenta.plugins.bosses.spells.SpellCyanSummon;
+import java.util.Arrays;
 
 public class CyanSummonBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_cyansummon";

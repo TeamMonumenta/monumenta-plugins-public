@@ -5,8 +5,6 @@ import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
-import org.bukkit.attribute.Attribute;
-import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
 import org.bukkit.inventory.ItemStack;
@@ -20,6 +18,7 @@ import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
+import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ParticleUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 
@@ -64,10 +63,7 @@ public class WardOfLight extends DepthsAbility {
 			        && (playerDir.dot(toMobVector) > HEALING_DOT_ANGLE
 			        || p.getLocation().distance(mPlayer.getLocation()) < 2))) {
 
-				AttributeInstance maxHealth = p.getAttribute(Attribute.GENERIC_MAX_HEALTH);
-				if (maxHealth != null) {
-					PlayerUtils.healPlayer(p, maxHealth.getValue() * HEAL[mRarity - 1]);
-				}
+				PlayerUtils.healPlayer(mPlugin, p, EntityUtils.getMaxHealth(p) * HEAL[mRarity - 1], mPlayer);
 
 				Location loc = p.getLocation();
 				world.spawnParticle(Particle.HEART, loc.add(0, 1, 0), 10, 0.7, 0.7, 0.7, 0.001);

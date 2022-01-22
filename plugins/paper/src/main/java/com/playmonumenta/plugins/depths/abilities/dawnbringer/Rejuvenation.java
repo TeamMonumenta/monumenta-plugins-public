@@ -1,13 +1,5 @@
 package com.playmonumenta.plugins.depths.abilities.dawnbringer;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
-
-import org.bukkit.Material;
-import org.bukkit.Particle;
-import org.bukkit.entity.Player;
-
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.depths.DepthsManager;
 import com.playmonumenta.plugins.depths.DepthsTree;
@@ -16,8 +8,14 @@ import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
-
 import net.md_5.bungee.api.ChatColor;
+import org.bukkit.Material;
+import org.bukkit.Particle;
+import org.bukkit.entity.Player;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 
 public class Rejuvenation extends DepthsAbility {
 
@@ -60,7 +58,7 @@ public class Rejuvenation extends DepthsAbility {
 
 						double maxHealth = EntityUtils.getMaxHealth(player);
 						if (player.getHealth() != maxHealth) {
-							PlayerUtils.healPlayer(player, PERCENT_HEAL * maxHealth);
+							PlayerUtils.healPlayer(mPlugin, player, PERCENT_HEAL * maxHealth, mPlayer);
 							player.getWorld().spawnParticle(Particle.HEART, (player.getLocation()).add(0, 2, 0), 1, 0.07, 0.07, 0.07, 0.001);
 						}
 					}

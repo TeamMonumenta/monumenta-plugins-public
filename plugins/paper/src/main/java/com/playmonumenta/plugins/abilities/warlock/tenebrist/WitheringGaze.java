@@ -1,6 +1,15 @@
 package com.playmonumenta.plugins.abilities.warlock.tenebrist;
 
-import org.bukkit.Bukkit;
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.abilities.AbilityManager;
+import com.playmonumenta.plugins.abilities.AbilityTrigger;
+import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.effects.CustomDamageOverTime;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.VectorUtils;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -14,19 +23,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 import org.checkerframework.checker.nullness.qual.Nullable;
-
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.abilities.AbilityManager;
-import com.playmonumenta.plugins.abilities.AbilityTrigger;
-import com.playmonumenta.plugins.classes.ClassAbility;
-import com.playmonumenta.plugins.classes.magic.MagicType;
-import com.playmonumenta.plugins.effects.CustomDamageOverTime;
-import com.playmonumenta.plugins.events.CustomDamageEvent;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.FastUtils;
-import com.playmonumenta.plugins.utils.ItemUtils;
-import com.playmonumenta.plugins.utils.VectorUtils;
 
 
 
@@ -99,9 +95,7 @@ public class WitheringGaze extends Ability {
 							} else {
 								EntityUtils.applyStun(mPlugin, WITHERING_GAZE_STUN_DURATION, le);
 							}
-							mPlugin.mEffectManager.addEffect(le, DOT_EFFECT_NAME, new CustomDamageOverTime(mDOTDuration, WITHERING_GAZE_DOT_DAMAGE, WITHERING_GAZE_DOT_PERIOD, player, MagicType.DARK_MAGIC, null, Particle.SQUID_INK, mPlugin));
-							CustomDamageEvent event = new CustomDamageEvent(player, le, 0, null);
-							Bukkit.getPluginManager().callEvent(event);
+							mPlugin.mEffectManager.addEffect(le, DOT_EFFECT_NAME, new CustomDamageOverTime(mDOTDuration, WITHERING_GAZE_DOT_DAMAGE, WITHERING_GAZE_DOT_PERIOD, mPlayer, null, Particle.SQUID_INK));
 						}
 					}
 				}

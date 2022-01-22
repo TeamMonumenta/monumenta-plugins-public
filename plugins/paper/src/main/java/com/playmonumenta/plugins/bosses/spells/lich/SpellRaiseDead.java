@@ -1,7 +1,11 @@
 package com.playmonumenta.plugins.bosses.spells.lich;
 
-import java.util.List;
-
+import com.playmonumenta.plugins.bosses.ChargeUpManager;
+import com.playmonumenta.plugins.bosses.bosses.Lich;
+import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
+import com.playmonumenta.plugins.player.PartialParticle;
+import com.playmonumenta.plugins.utils.FastUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -15,12 +19,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import com.playmonumenta.plugins.bosses.ChargeUpManager;
-import com.playmonumenta.plugins.bosses.bosses.Lich;
-import com.playmonumenta.plugins.bosses.spells.Spell;
-import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
-import com.playmonumenta.plugins.player.PartialParticle;
-import com.playmonumenta.plugins.utils.FastUtils;
+import java.util.List;
 
 public class SpellRaiseDead extends Spell {
 	private Plugin mPlugin;

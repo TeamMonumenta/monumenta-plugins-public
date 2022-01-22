@@ -1,5 +1,7 @@
 package com.playmonumenta.plugins.abilities.warlock;
 
+import java.util.logging.Level;
+
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -13,14 +15,19 @@ import org.bukkit.entity.Projectile;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.metadata.FixedMetadataValue;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.classes.ClassAbility;
-import com.playmonumenta.plugins.classes.magic.MagicType;
+import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.listeners.DamageListener;
+import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 
@@ -46,7 +53,7 @@ public class GraspingClaws extends Ability {
 		super(plugin, player, "Grasping Claws");
 		mInfo.mScoreboardId = "GraspingClaws";
 		mInfo.mShorthandName = "GC";
-		mInfo.mDescriptions.add("Left-clicking while shifted while holding a bow or crossbow fires an arrow that pulls nearby enemies towards your arrow once it makes contact with a mob or block. Mobs caught in the arrow's 8 block radius are given 20% Slowness for 8 seconds and take 3 damage. Cooldown: 16s.");
+		mInfo.mDescriptions.add("Left-clicking while shifted while holding a bow or crossbow fires an arrow that pulls nearby enemies towards your arrow once it makes contact with a mob or block. Mobs caught in the arrow's 8 block radius are given 20% Slowness for 8 seconds and take 3 magic damage. Cooldown: 16s.");
 		mInfo.mDescriptions.add("The pulled enemies now take 8 damage, and their Slowness is increased to 30%.");
 		mInfo.mLinkedSpell = ClassAbility.GRASPING_CLAWS;
 		mInfo.mCooldown = getAbilityScore() == 1 ? COOLDOWN_1 : COOLDOWN_2;
@@ -63,7 +70,7 @@ public class GraspingClaws extends Ability {
 			return;
 		}
 		ItemStack inMainHand = mPlayer.getInventory().getItemInMainHand();
-		if (!mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), ClassAbility.GRASPING_CLAWS) && mPlayer.isSneaking() && ItemUtils.isSomeBow(inMainHand) && !ItemUtils.isItemShattered(inMainHand)) {
+		if (!mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), ClassAbility.GRASPING_CLAWS) && mPlayer.isSneaking() && ItemUtils.isBowOrTrident(inMainHand) && !ItemStatUtils.isShattered(inMainHand)) {
 			mArrow = mPlayer.getWorld().spawnArrow(mPlayer.getEyeLocation(), mPlayer.getLocation().getDirection(), 1.5f, 0, Arrow.class);
 			mArrow.setShooter(mPlayer);
 			mArrow.setDamage(0);
@@ -89,7 +96,16 @@ public class GraspingClaws extends Ability {
 			world.spawnParticle(Particle.FALLING_DUST, loc, 150, 2, 2, 2, Material.ANVIL.createBlockData());
 
 			for (LivingEntity mob : EntityUtils.getNearbyMobs(loc, RADIUS, mPlayer)) {
-				EntityUtils.damageEntity(mPlugin, mob, mDamage, mPlayer, MagicType.DARK_MAGIC, true, mInfo.mLinkedSpell);
+				Object value = proj.getMetadata(DamageListener.PROJECTILE_ITEM_STATS_METAKEY).get(0);
+				if (value instanceof FixedMetadataValue playerItemStats) {
+					DamageEvent damageEvent = new DamageEvent(mob, mPlayer, mPlayer, DamageType.MAGIC, mInfo.mLinkedSpell, mDamage);
+					damageEvent.setDelayed(true);
+					damageEvent.setPlayerItemStat(playerItemStats);
+					DamageUtils.damage(damageEvent, false, true, null);
+				} else {
+					mPlugin.getLogger().log(Level.WARNING, "Malformed ProjectileItemStats metadata detected (Grasping Claws)");
+				}
+
 				MovementUtils.pullTowards(proj, mob, PULL_SPEED);
 				EntityUtils.applySlow(mPlugin, DURATION, mAmplifier, mob);
 			}

@@ -1,27 +1,26 @@
 package com.playmonumenta.plugins.commands;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
-import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.metadata.FixedMetadataValue;
-import org.bukkit.scheduler.BukkitRunnable;
-import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
-
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.utils.ItemStatUtils;
+import com.playmonumenta.plugins.utils.ItemStatUtils.Region;
 import com.playmonumenta.plugins.utils.ItemUtils;
-import com.playmonumenta.plugins.utils.ItemUtils.ItemRegion;
 import com.playmonumenta.plugins.utils.NamespacedKeyUtils;
-
 import dev.jorel.commandapi.CommandAPI;
 import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ClickEvent.Action;
 import net.md_5.bungee.api.chat.TextComponent;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.metadata.FixedMetadataValue;
+import org.bukkit.scheduler.BukkitRunnable;
+import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 /*
  * NOTICE!
@@ -61,12 +60,12 @@ public class CalculateReforge extends GenericCommand {
 
 		List<ItemStack> shatteredItems = new ArrayList<>();
 		for (ItemStack item : player.getInventory()) {
-			if (ItemUtils.isItemShattered(item)) {
+			if (ItemStatUtils.isShattered(item)) {
 				shatteredItems.add(item);
 			}
 		}
 		if (!shatteredItems.isEmpty()) {
-			Map<ItemRegion, Integer> fullInventoryCost = ItemUtils.getReforgeCosts(shatteredItems);
+			Map<Region, Integer> fullInventoryCost = ItemUtils.getReforgeCosts(shatteredItems);
 			TextComponent message1 = null; // First line, Cost of reforging hand item
 			TextComponent message2 = null; // Second line, Cost of reforging entire inventory
 			TextComponent message3 = new TextComponent("[Reforge Held Item] "); // First clicable area, reforge hand item
@@ -80,17 +79,14 @@ public class CalculateReforge extends GenericCommand {
 
 			// Check how much it costs to reforge the mainhand item
 			ItemStack hand = player.getInventory().getItemInMainHand();
-			if (hand != null && ItemUtils.isItemShattered(hand)) {
-				ItemRegion handRegion = ItemUtils.getItemRegion(hand);
+			if (hand != null && ItemStatUtils.isShattered(hand)) {
+				Region handRegion = ItemStatUtils.getRegion(hand);
 				String handCurrency = null;
-				if (handRegion == ItemRegion.KINGS_VALLEY) {
+				if (handRegion == Region.VALLEY) {
 					handCurrency = "XP";
-				} else if (handRegion == ItemRegion.CELSIAN_ISLES) {
+				} else if (handRegion == Region.ISLES) {
 					handCurrency = "CS";
-				} else if (handRegion == ItemRegion.MONUMENTA) {
-					//Will need rework when R3 launches.
-					handCurrency = "CS";
-				} else if (handRegion == ItemRegion.SHULKER_BOX) {
+				} else if (handRegion == Region.SHULKER_BOX) {
 					// Use the current region to get the currency for the reforge.
 					if (player.getWorld().getName().equals("Project_Epic-valley")) {
 						// King's Valley: Use XP
@@ -112,14 +108,9 @@ public class CalculateReforge extends GenericCommand {
 					                                 handCost % 64, handCurrency, ChatColor.RESET));
 				}
 			}
-			int cxp = fullInventoryCost.getOrDefault(ItemRegion.KINGS_VALLEY, 0);
-			int ccs = fullInventoryCost.getOrDefault(ItemRegion.CELSIAN_ISLES, 0);
-			int cmm = fullInventoryCost.getOrDefault(ItemRegion.MONUMENTA, 0);
-			int csb = fullInventoryCost.getOrDefault(ItemRegion.SHULKER_BOX, 0);
-			if (cmm != 0) {
-				//Will have to rework when R3 launches.
-				ccs += cmm;
-			}
+			int cxp = fullInventoryCost.getOrDefault(Region.VALLEY, 0);
+			int ccs = fullInventoryCost.getOrDefault(Region.ISLES, 0);
+			int csb = fullInventoryCost.getOrDefault(Region.SHULKER_BOX, 0);
 			if (csb != 0) {
 				// The "Shulker Box" tag does not exist. It is internally used to identify shulker boxes.
 				// Shulker boxes can be reforged with R1 or R2 currency, based on the region you are in.

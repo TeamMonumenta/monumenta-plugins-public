@@ -1,5 +1,13 @@
 package com.playmonumenta.plugins.bosses.spells.oldslabsbos;
 
+import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.LocationUtils;
+import com.playmonumenta.plugins.utils.MovementUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.utils.VectorUtils;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -12,14 +20,6 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
-
-import com.playmonumenta.plugins.bosses.spells.Spell;
-import com.playmonumenta.plugins.utils.BossUtils;
-import com.playmonumenta.plugins.utils.FastUtils;
-import com.playmonumenta.plugins.utils.LocationUtils;
-import com.playmonumenta.plugins.utils.MovementUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.plugins.utils.VectorUtils;
 
 public class SpellBash extends Spell {
 
@@ -89,8 +89,8 @@ public class SpellBash extends Spell {
 						for (Player player : PlayerUtils.playersInRange(loc, 4, true)) {
 							Vector toPlayerVector = player.getLocation().toVector().subtract(loc.toVector()).normalize();
 							if (direction.dot(toPlayerVector) > 0.33f) {
-								BossUtils.bossDamage(mBoss, player, 6, mBoss.getLocation(), "Bash");
-								MovementUtils.knockAway(mBoss.getLocation(), player, 0.5f, 0.65f);
+								BossUtils.blockableDamage(mBoss, player, DamageType.MELEE, 6, "Bash", mBoss.getLocation());
+								MovementUtils.knockAway(mBoss.getLocation(), player, 0.5f, 0.65f, false);
 							}
 						}
 					}

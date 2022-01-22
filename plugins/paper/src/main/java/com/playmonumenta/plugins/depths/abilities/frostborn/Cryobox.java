@@ -7,8 +7,6 @@ import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDamageEvent;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.classes.ClassAbility;
@@ -16,6 +14,7 @@ import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
+import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.AbsorptionUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -45,47 +44,14 @@ public class Cryobox extends DepthsAbility {
 	}
 
 	@Override
-	public boolean playerDamagedByLivingEntityEvent(EntityDamageByEntityEvent event) {
-		if (event.isCancelled()) {
-			return true;
-		}
-
-		execute(event);
-		return true;
-	}
-
-	@Override
-	public boolean playerDamagedByProjectileEvent(EntityDamageByEntityEvent event) {
-		if (event.isCancelled()) {
-			return true;
-		}
-
-		execute(event);
-		return true;
-	}
-
-	/*
-	 * Works against all types of damage
-	 */
-	@Override
-	public boolean playerDamagedEvent(EntityDamageEvent event) {
-		// Do not process cancelled damage events
-		if (event.isCancelled() || event instanceof EntityDamageByEntityEvent) {
-			return true;
-		}
-
-		execute(event);
-		return true;
-	}
-
-	private void execute(EntityDamageEvent event) {
-		if (mPlayer == null || AbilityUtils.isBlocked(event)) {
+	public void onHurt(DamageEvent event) {
+		if (event.isCancelled() || event.isBlocked() || mPlayer == null) {
 			return;
 		}
 
 		// Calculate whether this effect should not be run based on player health.
 		// It is intentional that Cryobox saves you from death if you take a buttload of damage somehow.
-		double healthRemaining = mPlayer.getHealth() + AbsorptionUtils.getAbsorption(mPlayer) - EntityUtils.getRealFinalDamage(event);
+		double healthRemaining = mPlayer.getHealth() + AbsorptionUtils.getAbsorption(mPlayer) - event.getDamage();
 
 		// Health is less than 0 but does not penetrate the absorption shield
 		boolean dealDamageLater = healthRemaining < 0 && healthRemaining > -(ABSORPTION_HEALTH[mRarity - 1]);
@@ -104,10 +70,10 @@ public class Cryobox extends DepthsAbility {
 
 		// Conditions match - prismatic shield
 		for (LivingEntity mob : EntityUtils.getNearbyMobs(center, KNOCKBACK_RADIUS, mPlayer)) {
-			MovementUtils.knockAway(mPlayer, mob, KNOCKBACK_SPEED);
+			MovementUtils.knockAway(mPlayer, mob, KNOCKBACK_SPEED, true);
 		}
 		for (LivingEntity mob : EntityUtils.getNearbyMobs(center, ELEVATE_RADIUS, mPlayer)) {
-			if (EntityUtils.isBoss(mob) || mob.getName().contains("Dionaea") || mob.getScoreboardTags().contains(AbilityUtils.IGNORE_TAG)) {
+			if (EntityUtils.isBoss(mob) || DepthsUtils.isPlant(mob) || mob.getScoreboardTags().contains(AbilityUtils.IGNORE_TAG)) {
 				continue;
 			}
 			Location mobLoc = mob.getLocation();
@@ -150,8 +116,6 @@ public class Cryobox extends DepthsAbility {
 			DepthsUtils.spawnIceTerrain(locs[i], ICE_DURATION, mPlayer);
 		}
 	}
-
-
 
 	@Override
 	public String getDescription(int rarity) {

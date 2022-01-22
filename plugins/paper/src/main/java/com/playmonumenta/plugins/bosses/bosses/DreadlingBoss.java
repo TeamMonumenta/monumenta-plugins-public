@@ -1,17 +1,16 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
-import java.util.Arrays;
-import java.util.List;
-
-import org.bukkit.Location;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.plugin.Plugin;
-
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.bosses.spells.SpellDreadlingParticle;
+import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
+import org.bukkit.Location;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.plugin.Plugin;
+
+import java.util.Arrays;
+import java.util.List;
 
 public final class DreadlingBoss extends BossAbilityGroup {
 
@@ -32,9 +31,8 @@ public final class DreadlingBoss extends BossAbilityGroup {
 	}
 
 	@Override
-	public void bossDamagedEntity(EntityDamageByEntityEvent event) {
-		LivingEntity target = (LivingEntity) event.getEntity();
-		Location loc = target.getLocation();
+	public void onDamage(DamageEvent event, LivingEntity damagee) {
+		Location loc = damagee.getLocation();
 
 		LivingEntity dreadnaught = null;
 		double dreadnaughtDistance = Double.POSITIVE_INFINITY;
@@ -49,7 +47,7 @@ public final class DreadlingBoss extends BossAbilityGroup {
 		}
 
 		if (dreadnaught != null) {
-			MovementUtils.pullTowards(dreadnaught, target, 0.5f);
+			MovementUtils.pullTowards(dreadnaught, damagee, 0.5f);
 		}
 	}
 }

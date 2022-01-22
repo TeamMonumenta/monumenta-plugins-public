@@ -1,8 +1,11 @@
 package com.playmonumenta.plugins.itemupdater;
 
-import java.time.Instant;
-import java.util.List;
-
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.utils.ItemStatUtils;
+import com.playmonumenta.plugins.utils.ItemUtils;
+import de.tr7zw.nbtapi.NBTCompound;
+import de.tr7zw.nbtapi.NBTItem;
+import net.kyori.adventure.text.Component;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.Jukebox;
 import org.bukkit.entity.AbstractArrow;
@@ -34,10 +37,8 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.utils.ItemUtils;
-
-import net.kyori.adventure.text.Component;
+import java.time.Instant;
+import java.util.List;
 
 public class ItemUpdateManager implements Listener {
 	// Updates items if needed as they load.
@@ -148,6 +149,13 @@ public class ItemUpdateManager implements Listener {
 		}
 
 		ItemUtils.setPlainTag(item);
+
+		// Only generate item stats on items with Monumenta tag
+		NBTItem nbt = new NBTItem(item);
+		NBTCompound monumenta = nbt.getCompound(ItemStatUtils.getMonumentaKey());
+		if (monumenta != null) {
+			ItemStatUtils.generateItemStats(item);
+		}
 
 		/* Updating containers nested in items disabled for now to improve performance.
 		if (item.hasItemMeta()) {

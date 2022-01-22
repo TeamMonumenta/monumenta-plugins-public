@@ -5,6 +5,21 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
+import org.bukkit.World;
+import org.bukkit.attribute.Attribute;
+import org.bukkit.boss.BarColor;
+import org.bukkit.boss.BarStyle;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
+import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.plugin.Plugin;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
+
 import com.playmonumenta.plugins.bosses.BossBarManager;
 import com.playmonumenta.plugins.bosses.BossBarManager.BossHealthAction;
 import com.playmonumenta.plugins.bosses.SpellManager;
@@ -16,21 +31,13 @@ import com.playmonumenta.plugins.bosses.spells.SpellBaseLaser;
 import com.playmonumenta.plugins.bosses.spells.SpellBlockBreak;
 import com.playmonumenta.plugins.bosses.spells.SpellConditionalTeleport;
 import com.playmonumenta.plugins.bosses.spells.SpellTpBehindPlayer;
+import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.utils.PotionUtils;
 import com.playmonumenta.plugins.utils.SerializationUtils;
-
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
-import org.bukkit.World;
-import org.bukkit.attribute.Attribute;
-import org.bukkit.boss.BarColor;
-import org.bukkit.boss.BarStyle;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.event.entity.EntityDeathEvent;
-import org.bukkit.plugin.Plugin;
 
 public class CAxtal extends BossAbilityGroup {
 	public static final String identityTag = "boss_caxtal";
@@ -85,7 +92,16 @@ public class CAxtal extends BossAbilityGroup {
 			                   },
 			                   // TNT generated at the end of the attack
 			                   (LivingEntity player, Location loc, boolean blocked) -> {
-			                       loc.getWorld().createExplosion(loc, 7);
+									double r = 15;
+									int maxdmg = 60;
+									for (Player p : PlayerUtils.playersInRange(loc, r, true)) {
+										if (p.getLocation().distance(loc) <= r && (LocationUtils.hasLineOfSight(p.getLocation(), loc) || LocationUtils.hasLineOfSight(p.getEyeLocation(), loc))) {
+											double dist = p.getLocation().distance(loc);
+											BossUtils.blockableDamage(mBoss, p, DamageEvent.DamageType.MAGIC, maxdmg * (1 - dist / r), "Corruption Blast", null);
+											PotionUtils.applyPotion(com.playmonumenta.plugins.Plugin.getInstance(), p, new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 2, 10));
+										}
+									}
+									loc.getWorld().createExplosion(loc, 7, false, true, mBoss);
 			                   })
 		));
 		List<Spell> passiveSpells = Arrays.asList(
@@ -126,8 +142,8 @@ public class CAxtal extends BossAbilityGroup {
 			hpDelta = hpDelta / 2;
 			playerCount--;
 		}
-		mBoss.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(bossTargetHp);
-		mBoss.setHealth(bossTargetHp);
+		EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_MAX_HEALTH, bossTargetHp * 1.1);
+		mBoss.setHealth(bossTargetHp * 1.1);
 
 		//launch event related spawn commands
 		PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "effect give @s minecraft:blindness 2 2");

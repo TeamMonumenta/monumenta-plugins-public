@@ -11,8 +11,6 @@ import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
-import org.bukkit.attribute.Attribute;
-import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
@@ -110,18 +108,15 @@ public class TotemOfSalvation extends DepthsAbility {
 					//Heal nearby players once per rarity frequency
 					if (mTicks % TICK_FREQUENCY[mRarity - 1] == 0) {
 						for (Player p : PlayerUtils.playersInRange(item.getLocation(), EFFECT_RADIUS, true)) {
-							AttributeInstance maxHealth = p.getAttribute(Attribute.GENERIC_MAX_HEALTH);
-							if (maxHealth != null) {
-								double maxHealthValue = maxHealth.getValue();
-								double healthFromFull = maxHealthValue - p.getHealth();
-								double healthToHeal = maxHealthValue * PERCENT_HEALING;
+							double maxHealth = EntityUtils.getMaxHealth(p);
+							double healthFromFull = maxHealth - p.getHealth();
+							double healthToHeal = maxHealth * PERCENT_HEALING;
 
-								PlayerUtils.healPlayer(p, healthToHeal);
+							PlayerUtils.healPlayer(mPlugin, p, healthToHeal);
 
-								double remainingHealing = healthToHeal - healthFromFull;
-								if (remainingHealing > 0) {
-									AbsorptionUtils.addAbsorption(p, remainingHealing, MAX_ABSORPTION, ABSORPTION_DURATION);
-								}
+							double remainingHealing = healthToHeal - healthFromFull;
+							if (remainingHealing > 0) {
+								AbsorptionUtils.addAbsorption(p, remainingHealing, MAX_ABSORPTION, ABSORPTION_DURATION);
 							}
 						}
 					}

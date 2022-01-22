@@ -1,11 +1,10 @@
 package com.playmonumenta.plugins.bosses.spells.lich.undeadplayers;
 
+import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.player.PartialParticle;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.entity.LivingEntity;
-
-import com.playmonumenta.plugins.bosses.spells.Spell;
-import com.playmonumenta.plugins.player.PartialParticle;
 
 public class SpellLichCurse extends Spell {
 

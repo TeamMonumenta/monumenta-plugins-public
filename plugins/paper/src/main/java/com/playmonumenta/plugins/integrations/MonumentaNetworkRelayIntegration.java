@@ -1,18 +1,17 @@
 package com.playmonumenta.plugins.integrations;
 
-import java.util.UUID;
-import java.util.logging.Logger;
-
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
-import org.bukkit.event.Listener;
-import org.checkerframework.checker.nullness.qual.Nullable;
-
 import com.google.gson.JsonObject;
 import com.playmonumenta.networkrelay.NetworkRelayAPI;
 import com.playmonumenta.networkrelay.NetworkRelayMessageEvent;
 import com.playmonumenta.plugins.commands.ClaimRaffle;
 import com.playmonumenta.plugins.commands.RedeemVoteRewards;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.Listener;
+import org.checkerframework.checker.nullness.qual.Nullable;
+
+import java.util.UUID;
+import java.util.logging.Logger;
 
 public class MonumentaNetworkRelayIntegration implements Listener {
 	public static final String AUDIT_LOG_CHANNEL = "Monumenta.Automation.AuditLog";

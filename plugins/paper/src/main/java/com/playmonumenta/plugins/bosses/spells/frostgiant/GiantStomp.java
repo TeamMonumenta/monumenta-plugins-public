@@ -1,5 +1,13 @@
 package com.playmonumenta.plugins.bosses.spells.frostgiant;
 
+import com.playmonumenta.plugins.bosses.bosses.FrostGiant;
+import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.MovementUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.utils.VectorUtils;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -11,14 +19,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
-
-import com.playmonumenta.plugins.bosses.bosses.FrostGiant;
-import com.playmonumenta.plugins.bosses.spells.Spell;
-import com.playmonumenta.plugins.utils.BossUtils;
-import com.playmonumenta.plugins.utils.FastUtils;
-import com.playmonumenta.plugins.utils.MovementUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.plugins.utils.VectorUtils;
 
 public class GiantStomp extends Spell {
 
@@ -72,7 +72,7 @@ public class GiantStomp extends Spell {
 
 						if (mTicks >= 20) {
 							for (Player player : PlayerUtils.playersInRange(loc, radius, true)) {
-								BossUtils.bossDamage(mBoss, player, 40, null, "Giant Stomp");
+								BossUtils.blockableDamage(mBoss, player, DamageType.MELEE, 35, "Giant Stomp", null);
 								MovementUtils.knockAway(mBoss.getLocation(), player, 0.5f, 0.1f, true);
 							}
 							this.cancel();

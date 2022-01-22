@@ -1,8 +1,8 @@
 package com.playmonumenta.plugins.bosses.spells;
 
-import java.util.Collections;
-import java.util.List;
-
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.LocationUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
@@ -15,9 +15,8 @@ import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.LocationUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
+import java.util.Collections;
+import java.util.List;
 
 public class SpellBaseCharge extends Spell {
 	@FunctionalInterface
@@ -469,7 +468,7 @@ public class SpellBaseCharge extends Spell {
 
 			@Override
 			public void run() {
-				if (mBoss == null || !mBoss.isValid() || mBoss.isDead() || EntityUtils.isStunned(mBoss) || EntityUtils.isSilenced(mBoss) || EntityUtils.isConfused(mBoss)) {
+				if (mBoss == null || !mBoss.isValid() || mBoss.isDead() || EntityUtils.isStunned(mBoss) || EntityUtils.isSilenced(mBoss)) {
 					if (mBoss != null) {
 						mBoss.setAI(true);
 					}
@@ -594,7 +593,7 @@ public class SpellBaseCharge extends Spell {
 
 			@Override
 			public void run() {
-				if (mBoss == null || !mBoss.isValid() || mBoss.isDead() || EntityUtils.isStunned(mBoss) || EntityUtils.isSilenced(mBoss) || EntityUtils.isConfused(mBoss)) {
+				if (mBoss == null || !mBoss.isValid() || mBoss.isDead() || EntityUtils.isStunned(mBoss) || EntityUtils.isSilenced(mBoss)) {
 					if (mBoss != null) {
 						mBoss.setAI(true);
 					}

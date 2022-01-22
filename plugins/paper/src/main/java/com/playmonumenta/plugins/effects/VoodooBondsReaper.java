@@ -1,5 +1,13 @@
 package com.playmonumenta.plugins.effects;
 
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.AbilityManager;
+import com.playmonumenta.plugins.abilities.warlock.reaper.VoodooBonds;
+import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.utils.AbsorptionUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.MessagingUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Location;
@@ -8,17 +16,9 @@ import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.checkerframework.checker.nullness.qual.Nullable;
-
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.AbilityManager;
-import com.playmonumenta.plugins.abilities.warlock.reaper.VoodooBonds;
-import com.playmonumenta.plugins.utils.AbsorptionUtils;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.MessagingUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
 
 public class VoodooBondsReaper extends Effect {
 
@@ -52,15 +52,15 @@ public class VoodooBondsReaper extends Effect {
 	}
 
 	@Override
-	public boolean entityDealDamageEvent(EntityDamageByEntityEvent event) {
+	public void onDamage(LivingEntity entity, DamageEvent event, LivingEntity enemy) {
 		if (mScore == 0) {
-			return true;
+			return;
 		}
 		double percent = mScore == 1 ? PERCENT_1 : PERCENT_2;
-		if (!EntityUtils.isBoss(event.getEntity())) {
+		if (!EntityUtils.isBoss(enemy)) {
 			event.setDamage(event.getDamage() + mDamageTaken * percent);
 		}
-		Location loc = event.getEntity().getLocation();
+		Location loc = enemy.getLocation();
 		World world = loc.getWorld();
 		//replace with better particles
 		world.spawnParticle(Particle.SPELL_WITCH, loc, 65, 1, 0.5, 1, 0.001);
@@ -68,7 +68,6 @@ public class VoodooBondsReaper extends Effect {
 		world.playSound(loc, Sound.BLOCK_CHAIN_BREAK, 2f, 0.75f);
 		mDone = true;
 		setDuration(0);
-		return true;
 	}
 
 	@Override

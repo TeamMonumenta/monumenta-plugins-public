@@ -1,8 +1,6 @@
 package com.playmonumenta.plugins.abilities.alchemist;
 
-import java.util.EnumSet;
-import java.util.Objects;
-
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -11,7 +9,6 @@ import org.bukkit.World;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
-import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -24,8 +21,8 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.effects.CustomRegeneration;
 import com.playmonumenta.plugins.effects.PercentDamageDealt;
-import com.playmonumenta.plugins.effects.PercentRegeneration;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
@@ -43,11 +40,9 @@ public class Bezoar extends Ability {
 	private static final double HEAL_PERCENT = 0.05;
 	private static final int DAMAGE_DURATION = 8 * 20;
 	private static final double DAMAGE_PERCENT = 0.15;
-	private static final EnumSet<DamageCause> AFFECTED_DAMAGE_CAUSES = EnumSet.of(
-			DamageCause.CUSTOM
-	);
 
 	private int mKills = 0;
+	private @Nullable AlchemistPotions mAlchemistPotions;
 
 	public Bezoar(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Bezoar");
@@ -55,8 +50,12 @@ public class Bezoar extends Ability {
 		mInfo.mScoreboardId = "Bezoar";
 		mInfo.mShorthandName = "BZ";
 		mInfo.mDescriptions.add("Every 5th mob killed within 16 blocks of the Alchemist spawns a Bezoar that lingers for 10s. Picking up a Bezoar will grant the Alchemist an additional Alchemist Potion, and will grant both the player who picks it up and the Alchemist a custom healing effect that regenerates 5% of max health every second for 2 seconds and reduces the duration of all current potion debuffs by 10s.");
-		mInfo.mDescriptions.add("The Bezoar now additionally grants +15% ability damage for 8s.");
+		mInfo.mDescriptions.add("The Bezoar now additionally grants +15% damage from all sources for 8s.");
 		mDisplayItem = new ItemStack(Material.LIME_CONCRETE, 1);
+
+		Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> {
+			mAlchemistPotions = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, AlchemistPotions.class);
+		});
 	}
 
 	public void dropBezoar(EntityDeathEvent event, boolean shouldGenDrops) {
@@ -83,52 +82,15 @@ public class Bezoar extends Ability {
 				}
 				mT++;
 				world.spawnParticle(Particle.FALLING_DUST, item.getLocation(), 1, 0.2, 0.2, 0.2, mFallingDustData);
-				//Other player
+
 				for (Player p : PlayerUtils.playersInRange(item.getLocation(), 1, true)) {
-					if (!Objects.equals(p.getName(), mPlayer.getName())) {
-						for (PotionEffectType effectType : PotionUtils.getNegativeEffects(mPlugin, p)) {
-							PotionEffect effect = p.getPotionEffect(effectType);
-							if (effect != null) {
-								p.removePotionEffect(effectType);
-								// No chance of overwriting and we don't want to trigger PotionApplyEvent for "upgrading" effects, so don't use PotionUtils here
-								p.addPotionEffect(new PotionEffect(effectType, Math.max(effect.getDuration() - DEBUFF_REDUCTION, 0), effect.getAmplifier()));
-							}
-						}
-
-						double maxHealth = EntityUtils.getMaxHealth(p);
-						//if the player has the effect refresh the duration
-						if (mPlugin.mEffectManager.hasEffect(p, "BezoarHealing")) {
-							mPlugin.mEffectManager.clearEffects(p, "BezoarHealing");
-						}
-						mPlugin.mEffectManager.addEffect(p, "BezoarHealing", new PercentRegeneration(HEAL_DURATION, maxHealth * HEAL_PERCENT));
-
-						if (getAbilityScore() > 1) {
-							mPlugin.mEffectManager.addEffect(p, "BezoarAbilityDamage", new PercentDamageDealt(DAMAGE_DURATION, DAMAGE_PERCENT, AFFECTED_DAMAGE_CAUSES));
-						}
+					if (p != mPlayer) {
+						applyEffects(p);
 					}
-					//Alchemist
-					for (PotionEffectType effectType : PotionUtils.getNegativeEffects(mPlugin, mPlayer)) {
-						PotionEffect effect = mPlayer.getPotionEffect(effectType);
-						if (effect != null) {
-							mPlayer.removePotionEffect(effectType);
-							// No chance of overwriting and we don't want to trigger PotionApplyEvent for "upgrading" effects, so don't use PotionUtils here
-							mPlayer.addPotionEffect(new PotionEffect(effectType, Math.max(effect.getDuration() - DEBUFF_REDUCTION, 0), effect.getAmplifier()));
-						}
-					}
+					applyEffects(mPlayer);
 
-					double maxHealth = EntityUtils.getMaxHealth(mPlayer);
-					if (mPlugin.mEffectManager.hasEffect(mPlayer, "BezoarHealing")) {
-						mPlugin.mEffectManager.clearEffects(mPlayer, "BezoarHealing");
-					}
-					mPlugin.mEffectManager.addEffect(mPlayer, "BezoarHealing", new PercentRegeneration(HEAL_DURATION, maxHealth * HEAL_PERCENT));
-
-					if (getAbilityScore() > 1) {
-						mPlugin.mEffectManager.addEffect(mPlayer, "BezoarAbilityDamage", new PercentDamageDealt(DAMAGE_DURATION, DAMAGE_PERCENT, AFFECTED_DAMAGE_CAUSES));
-					}
-
-					AlchemistPotions alchemistPotion = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(mPlayer, AlchemistPotions.class);
-					if (alchemistPotion != null) {
-						alchemistPotion.incrementCharge();
+					if (mAlchemistPotions != null) {
+						mAlchemistPotions.incrementCharge();
 					}
 
 					item.remove();
@@ -142,6 +104,7 @@ public class Bezoar extends Ability {
 					this.cancel();
 					break;
 				}
+
 				if (mT >= LINGER_TIME || item.isDead()) {
 					this.cancel();
 					item.remove();
@@ -149,6 +112,32 @@ public class Bezoar extends Ability {
 			}
 
 		}.runTaskTimer(mPlugin, 0, 1);
+	}
+
+	private void applyEffects(Player player) {
+		if (mPlayer == null) {
+			return;
+		}
+
+		for (PotionEffectType effectType : PotionUtils.getNegativeEffects(mPlugin, player)) {
+			PotionEffect effect = player.getPotionEffect(effectType);
+			if (effect != null) {
+				player.removePotionEffect(effectType);
+				// No chance of overwriting and we don't want to trigger PotionApplyEvent for "upgrading" effects, so don't use PotionUtils here
+				player.addPotionEffect(new PotionEffect(effectType, Math.max(effect.getDuration() - DEBUFF_REDUCTION, 0), effect.getAmplifier()));
+			}
+		}
+
+		double maxHealth = EntityUtils.getMaxHealth(player);
+		//if the player has the effect refresh the duration
+		if (mPlugin.mEffectManager.hasEffect(player, "BezoarHealing")) {
+			mPlugin.mEffectManager.clearEffects(player, "BezoarHealing");
+		}
+		mPlugin.mEffectManager.addEffect(player, "BezoarHealing", new CustomRegeneration(HEAL_DURATION, maxHealth * HEAL_PERCENT, mPlayer, mPlugin));
+
+		if (getAbilityScore() > 1) {
+			mPlugin.mEffectManager.addEffect(player, "BezoarPercentDamageDealtEffect", new PercentDamageDealt(DAMAGE_DURATION, DAMAGE_PERCENT));
+		}
 	}
 
 	public void incrementKills() {

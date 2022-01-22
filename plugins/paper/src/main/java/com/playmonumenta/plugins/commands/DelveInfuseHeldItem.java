@@ -1,18 +1,16 @@
 package com.playmonumenta.plugins.commands;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.bukkit.entity.Player;
-
 import com.playmonumenta.plugins.utils.DelveInfusionUtils;
 import com.playmonumenta.plugins.utils.DelveInfusionUtils.DelveInfusionSelection;
-
 import dev.jorel.commandapi.CommandAPI;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.CommandPermission;
 import dev.jorel.commandapi.arguments.Argument;
 import dev.jorel.commandapi.arguments.MultiLiteralArgument;
+import org.bukkit.entity.Player;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class DelveInfuseHeldItem extends GenericCommand {
 
@@ -29,9 +27,9 @@ public class DelveInfuseHeldItem extends GenericCommand {
 
 		List<Argument> arguments = new ArrayList<>();
 
-		Argument selectionArg = new MultiLiteralArgument(DelveInfusionSelection.AURA.getLabel(),
-														DelveInfusionSelection.PENNATE.getLabel(),
+		Argument selectionArg = new MultiLiteralArgument(DelveInfusionSelection.PENNATE.getLabel(),
 														DelveInfusionSelection.CARAPACE.getLabel(),
+														DelveInfusionSelection.AURA.getLabel(),
 														DelveInfusionSelection.EXPEDITE.getLabel(),
 														DelveInfusionSelection.CHOLER.getLabel(),
 														DelveInfusionSelection.USURPER.getLabel(),
@@ -44,7 +42,6 @@ public class DelveInfuseHeldItem extends GenericCommand {
 														DelveInfusionSelection.EPOCH.getLabel(),
 														DelveInfusionSelection.NATANT.getLabel(),
 														DelveInfusionSelection.UNDERSTANDING.getLabel(),
-														//TODO-add the others
 														DelveInfusionSelection.REFUND.getLabel());
 		arguments.add(selectionArg);
 

@@ -1,19 +1,5 @@
 package com.playmonumenta.plugins.abilities.cleric.hierophant;
 
-import java.util.EnumSet;
-import java.util.List;
-
-import org.bukkit.Color;
-import org.bukkit.Material;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
-import org.bukkit.World;
-import org.bukkit.entity.Player;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
-import org.bukkit.inventory.ItemStack;
-import org.checkerframework.checker.nullness.qual.Nullable;
-
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityWithChargesOrStacks;
@@ -23,9 +9,22 @@ import com.playmonumenta.plugins.effects.PercentAttackSpeed;
 import com.playmonumenta.plugins.effects.PercentDamageDealt;
 import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.effects.ThuribleBonusHealing;
+import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.network.ClientModHandler;
-import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
+import org.bukkit.Color;
+import org.bukkit.Material;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
+import org.bukkit.World;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
+import org.checkerframework.checker.nullness.qual.Nullable;
+
+import java.util.EnumSet;
+import java.util.List;
 
 public class ThuribleProcession extends Ability implements AbilityWithChargesOrStacks {
 
@@ -36,7 +35,7 @@ public class ThuribleProcession extends Ability implements AbilityWithChargesOrS
 	private static final double EFFECT_PERCENT_1 = 0.10;
 	private static final double EFFECT_PERCENT_2 = 0.15;
 	private static final int MAX_BUFFS = 4;
-	private static final EnumSet<DamageCause> ALLOWED_DAMAGE_CAUSES = EnumSet.of(DamageCause.ENTITY_ATTACK, DamageCause.PROJECTILE);
+	private static final EnumSet<DamageType> AFFECTED_DAMAGE_TYPES = EnumSet.of(DamageType.MELEE, DamageType.PROJECTILE);
 	private static final String PERCENT_ATTACK_SPEED_EFFECT_NAME = "ThuribleProcessionPercentAttackSpeedEffect";
 	private static final String PERCENT_SPEED_EFFECT_NAME = "ThuribleProcessionPercentSpeedEffect";
 	public static final String PERCENT_DAMAGE_EFFECT_NAME = "ThuribleProcessionPercentDamageEffect";
@@ -44,7 +43,6 @@ public class ThuribleProcession extends Ability implements AbilityWithChargesOrS
 	private static final String[] EFFECTS_NAMES = new String[] {PERCENT_ATTACK_SPEED_EFFECT_NAME, PERCENT_SPEED_EFFECT_NAME, PERCENT_DAMAGE_EFFECT_NAME, PERCENT_HEAL_EFFECT_NAME};
 
 	private static final Particle.DustOptions COLOR = new Particle.DustOptions(Color.fromRGB(255, 195, 0), 1.0f);
-
 
 	private int mSeconds = 0;
 	private int mBuffs = 0;
@@ -61,14 +59,13 @@ public class ThuribleProcession extends Ability implements AbilityWithChargesOrS
 	}
 
 	@Override
-	public boolean livingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
-
+	public void onDamage(DamageEvent event, LivingEntity enemy) {
 		//If on cooldown, do not cast
 		if (mPlayer == null || !canCast()) {
-			return true;
+			return;
 		}
 
-		if (mBuffs > 0 && event.getCause() == DamageCause.ENTITY_ATTACK && EntityUtils.isHostileMob(event.getEntity())) {
+		if (mBuffs > 0 && event.getType() == DamageType.MELEE) {
 
 			updateBuffs();
 
@@ -85,7 +82,6 @@ public class ThuribleProcession extends Ability implements AbilityWithChargesOrS
 			mSeconds = 0;
 			putOnCooldown();
 		}
-		return true;
 	}
 
 	@Override
@@ -148,8 +144,8 @@ public class ThuribleProcession extends Ability implements AbilityWithChargesOrS
 
 	private Effect[] getEffectArray(int duration) {
 		return getAbilityScore() == 1
-				? new Effect[] {new PercentAttackSpeed(duration, EFFECT_PERCENT_1, PERCENT_ATTACK_SPEED_EFFECT_NAME), new PercentSpeed(duration, EFFECT_PERCENT_1, PERCENT_SPEED_EFFECT_NAME), new PercentDamageDealt(duration, EFFECT_PERCENT_1, ALLOWED_DAMAGE_CAUSES), new ThuribleBonusHealing(duration, EFFECT_PERCENT_1)}
-				: new Effect[] {new PercentAttackSpeed(duration, EFFECT_PERCENT_2, PERCENT_ATTACK_SPEED_EFFECT_NAME), new PercentSpeed(duration, EFFECT_PERCENT_2, PERCENT_SPEED_EFFECT_NAME), new PercentDamageDealt(duration, EFFECT_PERCENT_2, ALLOWED_DAMAGE_CAUSES), new ThuribleBonusHealing(duration, EFFECT_PERCENT_2)};
+				? new Effect[] {new PercentAttackSpeed(duration, EFFECT_PERCENT_1, PERCENT_ATTACK_SPEED_EFFECT_NAME), new PercentSpeed(duration, EFFECT_PERCENT_1, PERCENT_SPEED_EFFECT_NAME), new PercentDamageDealt(duration, EFFECT_PERCENT_1, AFFECTED_DAMAGE_TYPES), new ThuribleBonusHealing(duration, EFFECT_PERCENT_1)}
+				: new Effect[] {new PercentAttackSpeed(duration, EFFECT_PERCENT_2, PERCENT_ATTACK_SPEED_EFFECT_NAME), new PercentSpeed(duration, EFFECT_PERCENT_2, PERCENT_SPEED_EFFECT_NAME), new PercentDamageDealt(duration, EFFECT_PERCENT_2, AFFECTED_DAMAGE_TYPES), new ThuribleBonusHealing(duration, EFFECT_PERCENT_2)};
 	}
 
 	@Override

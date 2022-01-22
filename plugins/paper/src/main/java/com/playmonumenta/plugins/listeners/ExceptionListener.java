@@ -1,14 +1,13 @@
 package com.playmonumenta.plugins.listeners;
 
+import com.destroystokyo.paper.event.server.ServerExceptionEvent;
+import com.destroystokyo.paper.exception.ServerException;
+import com.destroystokyo.paper.exception.ServerSchedulerException;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitTask;
-
-import com.destroystokyo.paper.event.server.ServerExceptionEvent;
-import com.destroystokyo.paper.exception.ServerException;
-import com.destroystokyo.paper.exception.ServerSchedulerException;
 
 public class ExceptionListener implements Listener {
 

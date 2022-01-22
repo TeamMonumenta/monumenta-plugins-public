@@ -1,5 +1,7 @@
 package com.playmonumenta.plugins.bosses.spells;
 
+import com.playmonumenta.plugins.utils.MovementUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -9,9 +11,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-
-import com.playmonumenta.plugins.utils.MovementUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
 
 public class SpellForce extends SpellBaseAoE {
 
@@ -47,13 +46,13 @@ public class SpellForce extends SpellBaseAoE {
 				double distance = player.getLocation().distance(loc);
 				if (distance < radius / 3.0) {
 					player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 100, 2));
-					MovementUtils.knockAway(launcher, player, 3.0f);
+					MovementUtils.knockAway(launcher, player, 3.0f, false);
 				} else if (distance < (radius * 2.0) / 3.0) {
 					player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 100, 1));
-					MovementUtils.knockAway(launcher, player, 2.1f);
+					MovementUtils.knockAway(launcher, player, 2.1f, false);
 				} else if (distance < radius) {
 					player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 100, 0));
-					MovementUtils.knockAway(launcher, player, 1.2f);
+					MovementUtils.knockAway(launcher, player, 1.2f, false);
 				}
 				player.getWorld().spawnParticle(Particle.VILLAGER_ANGRY, player.getLocation().clone().add(0, 1, 0), 4, 0.25, 0.5, 0.25, 0);
 			}

@@ -1,8 +1,8 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
-import java.util.Arrays;
-import java.util.List;
-
+import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.bosses.spells.SpellRunAction;
+import com.playmonumenta.plugins.events.DamageEvent;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -11,13 +11,12 @@ import org.bukkit.entity.Damageable;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.projectiles.ProjectileSource;
 
-import com.playmonumenta.plugins.bosses.spells.Spell;
-import com.playmonumenta.plugins.bosses.spells.SpellRunAction;
+import java.util.Arrays;
+import java.util.List;
 
 public final class KamikazeBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_kamikaze";
@@ -36,8 +35,8 @@ public final class KamikazeBoss extends BossAbilityGroup {
 	}
 
 	@Override
-	public void bossDamagedEntity(EntityDamageByEntityEvent event) {
-		if (event.getEntity() instanceof Player) {
+	public void onDamage(DamageEvent event, LivingEntity damagee) {
+		if (damagee instanceof Player) {
 			Entity damager = event.getDamager();
 			if (damager instanceof Damageable) {
 				((Damageable) damager).setHealth(0);

@@ -1,22 +1,5 @@
 package com.playmonumenta.plugins.abilities.warlock.reaper;
 
-import java.util.EnumSet;
-import java.util.NavigableSet;
-
-import org.bukkit.Bukkit;
-import org.bukkit.Material;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
-import org.bukkit.SoundCategory;
-import org.bukkit.World;
-import org.bukkit.entity.Player;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
-import org.bukkit.event.entity.EntityDeathEvent;
-import org.bukkit.event.player.PlayerSwapHandItemsEvent;
-import org.bukkit.inventory.ItemStack;
-import org.checkerframework.checker.nullness.qual.Nullable;
-
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityManager;
@@ -27,8 +10,25 @@ import com.playmonumenta.plugins.effects.PercentAttackSpeed;
 import com.playmonumenta.plugins.effects.PercentDamageDealt;
 import com.playmonumenta.plugins.effects.PercentDamageReceived;
 import com.playmonumenta.plugins.effects.PercentHeal;
+import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.utils.AbsorptionUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
+import org.bukkit.Bukkit;
+import org.bukkit.Material;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
+import org.bukkit.World;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
+import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.event.player.PlayerSwapHandItemsEvent;
+import org.bukkit.inventory.ItemStack;
+import org.checkerframework.checker.nullness.qual.Nullable;
+
+import java.util.EnumSet;
+import java.util.NavigableSet;
 
 
 public class DarkPact extends Ability {
@@ -43,8 +43,8 @@ public class DarkPact extends Ability {
 	private static final int DURATION = 20 * 7;
 	private static final int DURATION_INCREASE_ON_KILL = 20 * 1;
 	private static final double PERCENT_DAMAGE_DEALT_1 = 0.4;
-	private static final double PERCENT_DAMAGE_DEALT_2 = 1.0;
-	private static final EnumSet<DamageCause> ALLOWED_DAMAGE_CAUSES = EnumSet.of(DamageCause.ENTITY_ATTACK);
+	private static final double PERCENT_DAMAGE_DEALT_2 = 0.8;
+	private static final EnumSet<DamageType> AFFECTED_DAMAGE_TYPES = EnumSet.of(DamageType.MELEE);
 	private static final double PERCENT_ATKS_1 = 0.1;
 	private static final double PERCENT_ATKS_2 = 0.2;
 	private static final int ABSORPTION_ON_KILL = 1;
@@ -60,8 +60,8 @@ public class DarkPact extends Ability {
 		super(plugin, player, "Dark Pact");
 		mInfo.mScoreboardId = "DarkPact";
 		mInfo.mShorthandName = "DaP";
-		mInfo.mDescriptions.add("Swapping while airborne and not sneaking and holding a scythe causes a dark aura to form around you. For the next 7 seconds, you gain 10% damage reduction, +10% attack speed, and deal +40% melee damage on your scythe attacks. Each kill during this time increases the duration of your aura by 1 second and gives 1 absorption health (capped at 6) for the duration of the aura. However, the player cannot heal for 10 seconds. Cooldown: 14s.");
-		mInfo.mDescriptions.add("You gain +20% attack speed and attacks with a scythe deal +100% melee damage, and Soul Rend bypasses the healing prevention, healing the player by +2/+4 HP, depending on the level of Soul Rend. Nearby players are still healed as normal.");
+		mInfo.mDescriptions.add("Swapping while airborne and not sneaking and holding a scythe causes a dark aura to form around you. For the next 7 seconds, you gain 10% damage reduction, +10% attack speed, and deal +40% melee damage on your scythe attacks. Each kill during this time increases the duration of your aura by 1 second and gives 1 absorption health (capped at 6) for the duration of the aura. However, the player cannot heal for 7 seconds. Cooldown: 14s.");
+		mInfo.mDescriptions.add("You gain +20% attack speed and attacks with a scythe deal +80% melee damage, and Soul Rend bypasses the healing prevention, healing the player by +2/+4 HP, depending on the level of Soul Rend. Nearby players are still healed as normal.");
 		mInfo.mCooldown = COOLDOWN;
 		mInfo.mLinkedSpell = ClassAbility.DARK_PACT;
 		mInfo.mIgnoreCooldown = true;
@@ -90,7 +90,7 @@ public class DarkPact extends Ability {
 			world.playSound(mPlayer.getLocation(), Sound.ENTITY_WITHER_SPAWN, SoundCategory.PLAYERS, 0.5f, 1.25f);
 			world.playSound(mPlayer.getLocation(), Sound.BLOCK_BUBBLE_COLUMN_WHIRLPOOL_INSIDE, SoundCategory.PLAYERS, 1, 0.5f);
 
-			mPlugin.mEffectManager.addEffect(mPlayer, PERCENT_DAMAGE_DEALT_EFFECT_NAME, new PercentDamageDealt(DURATION, mPercentDamageDealt, ALLOWED_DAMAGE_CAUSES));
+			mPlugin.mEffectManager.addEffect(mPlayer, PERCENT_DAMAGE_DEALT_EFFECT_NAME, new PercentDamageDealt(DURATION, mPercentDamageDealt, AFFECTED_DAMAGE_TYPES));
 			mPlugin.mEffectManager.addEffect(mPlayer, PERCENT_ATKS_EFFECT_NAME, new PercentAttackSpeed(DURATION, mPercentAtks, PERCENT_ATKS_EFFECT_NAME));
 			mPlugin.mEffectManager.addEffect(mPlayer, PERCENT_HEAL_EFFECT_NAME, new PercentHeal(DURATION, PERCENT_HEAL));
 			mPlugin.mEffectManager.addEffect(mPlayer, PERCENT_DAMAGE_RESIST_EFFECT_NAME, new PercentDamageReceived(DURATION, PERCENT_DAMAGE_RESIST));
@@ -144,12 +144,11 @@ public class DarkPact extends Ability {
 	}
 
 	@Override
-	public boolean livingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
-		if (mPlayer != null && event.getCause() == DamageCause.ENTITY_ATTACK) {
+	public void onDamage(DamageEvent event, LivingEntity enemy) {
+		if (event.getType() == DamageType.MELEE) {
 			if (!ItemUtils.isHoe(mPlayer.getInventory().getItemInMainHand())) {
 				event.setDamage(event.getDamage() / (1 + mPercentDamageDealt));
 			}
 		}
-		return true;
 	}
 }

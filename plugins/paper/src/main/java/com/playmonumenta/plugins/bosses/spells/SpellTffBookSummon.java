@@ -1,8 +1,8 @@
 package com.playmonumenta.plugins.bosses.spells;
 
-import java.util.EnumSet;
-import java.util.List;
-
+import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.LocationUtils;
 import org.bukkit.Sound;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
@@ -11,9 +11,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.LocationUtils;
+import java.util.EnumSet;
+import java.util.List;
 
 public class SpellTffBookSummon extends Spell {
 	private Plugin mPlugin;

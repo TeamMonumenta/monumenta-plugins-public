@@ -1,8 +1,8 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
 import org.bukkit.entity.LivingEntity;
-import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.entity.Player;
+import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.plugin.Plugin;
 
 public class UnstableBoss extends BossAbilityGroup {

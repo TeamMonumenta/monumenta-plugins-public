@@ -1,15 +1,14 @@
 package com.playmonumenta.plugins.abilities.scout;
 
-import org.bukkit.Sound;
-import org.bukkit.entity.AbstractArrow;
-import org.bukkit.entity.Player;
-import org.checkerframework.checker.nullness.qual.Nullable;
-
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
+import org.bukkit.Sound;
+import org.bukkit.entity.AbstractArrow;
+import org.bukkit.entity.Player;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 /*
  * Scout Passive: 20% chance to not consume an arrow when shooting a non-infinity bow

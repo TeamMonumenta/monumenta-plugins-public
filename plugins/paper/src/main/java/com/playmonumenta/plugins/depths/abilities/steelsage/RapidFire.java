@@ -1,5 +1,17 @@
 package com.playmonumenta.plugins.depths.abilities.steelsage;
 
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.AbilityTrigger;
+import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.depths.DepthsTree;
+import com.playmonumenta.plugins.depths.DepthsUtils;
+import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
+import com.playmonumenta.plugins.depths.abilities.windwalker.Skyhook;
+import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.utils.DamageUtils;
+import com.playmonumenta.plugins.utils.ItemUtils;
+import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -9,30 +21,11 @@ import org.bukkit.entity.AbstractArrow.PickupStatus;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.entity.Projectile;
 import org.bukkit.event.block.Action;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
-import org.bukkit.projectiles.ProjectileSource;
 import org.bukkit.scheduler.BukkitRunnable;
-
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.AbilityTrigger;
-import com.playmonumenta.plugins.classes.ClassAbility;
-import com.playmonumenta.plugins.classes.magic.MagicType;
-import com.playmonumenta.plugins.depths.DepthsTree;
-import com.playmonumenta.plugins.depths.DepthsUtils;
-import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
-import com.playmonumenta.plugins.depths.abilities.windwalker.Skyhook;
-import com.playmonumenta.plugins.enchantments.PointBlank;
-import com.playmonumenta.plugins.enchantments.Sniper;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.ItemUtils;
-
-import net.md_5.bungee.api.ChatColor;
 
 public class RapidFire extends DepthsAbility {
 
@@ -82,12 +75,6 @@ public class RapidFire extends DepthsAbility {
 					loc.getWorld().playSound(loc, Sound.ENTITY_ARROW_SHOOT, 1, 0.45f);
 					ProjectileLaunchEvent eventLaunch = new ProjectileLaunchEvent(arrow);
 					Bukkit.getPluginManager().callEvent(eventLaunch);
-					if (arrow.hasMetadata(Sniper.LEVEL_METAKEY)) {
-						arrow.removeMetadata(Sniper.LEVEL_METAKEY, mPlugin);
-					}
-					if (arrow.hasMetadata(PointBlank.LEVEL_METAKEY)) {
-						arrow.removeMetadata(PointBlank.LEVEL_METAKEY, mPlugin);
-					}
 					if (arrow.hasMetadata(Skyhook.META_DATA_TAG)) {
 						arrow.removeMetadata(Skyhook.META_DATA_TAG, mPlugin);
 					}
@@ -99,28 +86,22 @@ public class RapidFire extends DepthsAbility {
 	}
 
 	@Override
-	public boolean livingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
-	    if (event.getCause().equals(DamageCause.ENTITY_ATTACK)) {
+	public void onDamage(DamageEvent event, LivingEntity enemy) {
+		if (event.getType() == DamageType.MELEE) {
 	        cast(Action.LEFT_CLICK_AIR);
+	        return;
 	    }
 
-	    return true;
-	}
-
-	@Override
-	public boolean livingEntityShotByPlayerEvent(Projectile proj, LivingEntity le, EntityDamageByEntityEvent event) {
-		ProjectileSource shooter = proj.getShooter();
-		if (proj instanceof Arrow && shooter instanceof Player && le instanceof LivingEntity && proj.hasMetadata(RapidFire.META_DATA_TAG)) {
-			EntityUtils.damageEntity(mPlugin, le, DAMAGE, (Player) shooter, MagicType.PHYSICAL, true, mInfo.mLinkedSpell, true, true, true, false);
+		if (event.getDamager() instanceof Arrow arrow && arrow.hasMetadata(RapidFire.META_DATA_TAG)) {
+			DamageUtils.damage(mPlayer, enemy, DamageType.PROJECTILE_SKILL, DAMAGE, mInfo.mLinkedSpell, true);
 			event.setCancelled(true);
-			proj.remove();
+			arrow.remove();
 		}
-		return true;
 	}
 
 	@Override
 	public String getDescription(int rarity) {
-		return String.format("Left clicking with a bow shoots a flurry of " + DepthsUtils.getRarityColor(rarity) + ARROWS[rarity - 1] + ChatColor.WHITE + " arrows in the direction that you are looking that deal " + DAMAGE + " damage, bypassing iframes. Cooldown: " + COOLDOWN / 20 + "s.");
+		return String.format("Left clicking with a bow shoots a flurry of " + DepthsUtils.getRarityColor(rarity) + ARROWS[rarity - 1] + ChatColor.WHITE + " arrows in the direction that you are looking that deal " + DAMAGE + " projectile damage, bypassing iframes. Cooldown: " + COOLDOWN / 20 + "s.");
 	}
 
 	@Override

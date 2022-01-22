@@ -1,7 +1,20 @@
 package com.playmonumenta.plugins.abilities.mage.arcanist;
 
-import java.util.NavigableSet;
-
+import com.playmonumenta.plugins.Constants;
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.effects.AstralOmenBonusDamage;
+import com.playmonumenta.plugins.effects.AstralOmenStacks;
+import com.playmonumenta.plugins.effects.Effect;
+import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.itemstats.attributes.SpellPower;
+import com.playmonumenta.plugins.utils.DamageUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.MovementUtils;
+import com.playmonumenta.plugins.utils.StringUtils;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -11,20 +24,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-import com.playmonumenta.plugins.Constants;
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.classes.ClassAbility;
-import com.playmonumenta.plugins.classes.magic.MagicType;
-import com.playmonumenta.plugins.effects.AstralOmenBonusDamage;
-import com.playmonumenta.plugins.effects.AstralOmenStacks;
-import com.playmonumenta.plugins.effects.Effect;
-import com.playmonumenta.plugins.enchantments.abilities.SpellPower;
-import com.playmonumenta.plugins.events.CustomDamageEvent;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.MovementUtils;
-import com.playmonumenta.plugins.utils.StringUtils;
-
+import java.util.NavigableSet;
 
 public class AstralOmen extends Ability {
 	public static final String NAME = "Astral Omen";
@@ -81,38 +81,37 @@ public class AstralOmen extends Ability {
 	}
 
 	@Override
-	public void playerDealtCustomDamageEvent(CustomDamageEvent event) {
-		if (mPlayer == null || event.getSpell() == null || event.getSpell() == mInfo.mLinkedSpell) {
+	public void onDamage(DamageEvent event, LivingEntity enemy) {
+		if (event.getAbility() == null || event.getAbility() == mInfo.mLinkedSpell) {
 			return;
 		}
 
-
-		LivingEntity target = event.getDamaged();
-		NavigableSet<Effect> stacks = mPlugin.mEffectManager.getEffects(target, STACKS_SOURCE);
-		int level = stacks == null ? 0 : (int) stacks.last().getMagnitude();
+		NavigableSet<Effect> stacks = mPlugin.mEffectManager.getEffects(enemy, STACKS_SOURCE);
+		int level = stacks == null ? 0 : (int)stacks.last().getMagnitude();
 
 		if (stacks != null) {
-			mPlugin.mEffectManager.clearEffects(target, STACKS_SOURCE);
+			mPlugin.mEffectManager.clearEffects(enemy, STACKS_SOURCE);
 		}
 
 		if (level >= STACK_THRESHOLD - 1) { // Adding 1 more stack would hit threshold, which removes all stacks anyway, so don't bother adding then removing
-			World world = target.getWorld();
-			float spellDamage = SpellPower.getSpellDamage(mPlayer, DAMAGE);
-			for (LivingEntity enemy : EntityUtils.getNearbyMobs(target.getLocation(), SIZE)) {
-				EntityUtils.damageEntity(mPlugin, enemy, spellDamage, mPlayer, MagicType.ARCANE, true, mInfo.mLinkedSpell, true, true, true);
+			World world = enemy.getWorld();
+			float spellDamage = SpellPower.getSpellDamage(mPlugin, mPlayer, DAMAGE);
+			for (LivingEntity mob : EntityUtils.getNearbyMobs(enemy.getLocation(), SIZE)) {
+				DamageUtils.damage(mPlayer, mob, DamageType.MAGIC, spellDamage, mInfo.mLinkedSpell, true);
 				if (mDoPull) {
-					MovementUtils.pullTowards(target, enemy, PULL_SPEED);
-					EntityUtils.applySlow(mPlugin, SLOW_TICKS, SLOW_MULTIPLIER, enemy);
+					MovementUtils.pullTowards(enemy, mob, PULL_SPEED);
+					EntityUtils.applySlow(mPlugin, SLOW_TICKS, SLOW_MULTIPLIER, mob);
 				}
 
 				world.spawnParticle(Particle.REDSTONE, enemy.getLocation(), 10, 0.2, 0.2, 0.2, 0.1, COLOR_PURPLE);
 			}
 
-			mPlugin.mEffectManager.addEffect(target, BONUS_DAMAGE_SOURCE, new AstralOmenBonusDamage(BONUS_TICKS, mLevelBonusMultiplier, mPlayer));
+			mPlugin.mEffectManager.addEffect(enemy, BONUS_DAMAGE_SOURCE, new AstralOmenBonusDamage(BONUS_TICKS, mLevelBonusMultiplier, mPlayer));
 
-			world.spawnParticle(Particle.ENCHANTMENT_TABLE, target.getLocation(), 80, 0, 0, 0, 4);
-			world.spawnParticle(Particle.REDSTONE, target.getLocation(), 20, 3, 3, 3, 0.1, COLOR_PURPLE);
-			world.playSound(target.getLocation(), Sound.ENTITY_BLAZE_HURT, 1.3f, 1.5f);
+			Location loc = enemy.getLocation();
+			world.spawnParticle(Particle.ENCHANTMENT_TABLE, loc, 80, 0, 0, 0, 4);
+			world.spawnParticle(Particle.REDSTONE, loc, 20, 3, 3, 3, 0.1, COLOR_PURPLE);
+			world.playSound(loc, Sound.ENTITY_BLAZE_HURT, 1.3f, 1.5f);
 		} else {
 			// Effect implements Comparable in compareTo(), which uses the internal magnitude
 			// When EffectManager does addEffect(), it add()s to NavigableSet, which presumably uses compareTo()
@@ -120,7 +119,7 @@ public class AstralOmen extends Ability {
 			//
 			// We just work with 1 effect at all times, of the magnitude (level) we want,
 			// which will handle stack decay times appropriately & not have conflicting magnitudes
-			mPlugin.mEffectManager.addEffect(target, STACKS_SOURCE, new AstralOmenStacks(STACK_TICKS, ++level));
+			mPlugin.mEffectManager.addEffect(enemy, STACKS_SOURCE, new AstralOmenStacks(STACK_TICKS, ++level));
 		}
 	}
 }

@@ -1,11 +1,15 @@
 package com.playmonumenta.plugins.bosses.spells.frostgiant;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
+import com.destroystokyo.paper.entity.Pathfinder;
+import com.playmonumenta.plugins.bosses.bosses.FrostGiant;
+import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.utils.AbilityUtils;
+import com.playmonumenta.plugins.utils.DamageUtils;
+import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.MovementUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.utils.VectorUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Location;
@@ -26,15 +30,11 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
-import com.destroystokyo.paper.entity.Pathfinder;
-import com.playmonumenta.plugins.bosses.bosses.FrostGiant;
-import com.playmonumenta.plugins.bosses.spells.Spell;
-import com.playmonumenta.plugins.utils.AbilityUtils;
-import com.playmonumenta.plugins.utils.BossUtils;
-import com.playmonumenta.plugins.utils.FastUtils;
-import com.playmonumenta.plugins.utils.MovementUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.plugins.utils.VectorUtils;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 public class SpellGreatswordSlam extends Spell {
 
@@ -216,7 +216,7 @@ public class SpellGreatswordSlam extends Spell {
 
 									for (BoundingBox box : boxes) {
 										if (player.getBoundingBox().overlaps(box) && !mHitPlayers.contains(player)) {
-											BossUtils.bossDamage(mBoss, player, 18, null, "Greatsword Slam");
+											DamageUtils.damage(mBoss, player, DamageType.MAGIC, 18, null, false, true, "Greatsword Slam");
 											AbilityUtils.silencePlayer(player, 20 * 5);
 											MovementUtils.knockAway(loc, player, 0f, 1.5f, false);
 											mHitPlayers.add(player);
@@ -300,7 +300,8 @@ public class SpellGreatswordSlam extends Spell {
 					if ((player.getLocation().getBlock().getRelative(BlockFace.DOWN).getType() != Material.AIR || player.getLocation().getBlock().getType() != Material.AIR)
 					    && (player.getLocation().getBlock().getRelative(BlockFace.DOWN).getType() == Material.FROSTED_ICE || player.getLocation().getBlock().getType() == Material.FROSTED_ICE)) {
 						Vector vel = player.getVelocity();
-						BossUtils.bossDamage(mBoss, player, 18, null, "Greatsword Slam");
+						//TODO don't call this greatsword slam since it's just standing on ice damage
+						DamageUtils.damage(mBoss, player, DamageType.MAGIC, 18, null, false, true, "Greatsword Slam");
 						player.setVelocity(vel);
 					}
 				}

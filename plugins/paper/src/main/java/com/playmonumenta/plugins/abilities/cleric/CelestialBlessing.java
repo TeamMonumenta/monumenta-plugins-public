@@ -1,20 +1,5 @@
 package com.playmonumenta.plugins.abilities.cleric;
 
-import java.util.EnumSet;
-import java.util.List;
-
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
-import org.bukkit.World;
-import org.bukkit.entity.Player;
-import org.bukkit.event.block.Action;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
-import org.bukkit.inventory.ItemStack;
-import org.checkerframework.checker.nullness.qual.Nullable;
-
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
@@ -22,20 +7,27 @@ import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.effects.Aesthetics;
 import com.playmonumenta.plugins.effects.PercentDamageDealt;
 import com.playmonumenta.plugins.effects.PercentSpeed;
-import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
-import com.playmonumenta.plugins.enchantments.abilities.BaseAbilityEnchantment;
+import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
+import org.bukkit.World;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
+import org.bukkit.event.block.Action;
+import org.bukkit.inventory.ItemStack;
+import org.checkerframework.checker.nullness.qual.Nullable;
+
+import java.util.EnumSet;
+import java.util.List;
 
 
 
 public class CelestialBlessing extends Ability {
-
-	public static class CelestialCooldownEnchantment extends BaseAbilityEnchantment {
-		public CelestialCooldownEnchantment() {
-			super("Celestial Blessing Cooldown", EnumSet.of(ItemSlot.ARMOR));
-		}
-	}
 
 	private static final int CELESTIAL_COOLDOWN = 40 * 20;
 	private static final int CELESTIAL_1_DURATION = 10 * 20;
@@ -45,10 +37,11 @@ public class CelestialBlessing extends Ability {
 	private static final double CELESTIAL_2_EXTRA_DAMAGE = 0.35;
 	private static final double CELESTIAL_EXTRA_SPEED = 0.20;
 	private static final String ATTR_NAME = "CelestialBlessingExtraSpeedAttr";
-	private static final EnumSet<DamageCause> AFFECTED_DAMAGE_CAUSES = EnumSet.of(
-			DamageCause.ENTITY_ATTACK,
-			DamageCause.ENTITY_SWEEP_ATTACK,
-			DamageCause.PROJECTILE
+	private static final EnumSet<DamageType> AFFECTED_DAMAGE_TYPES = EnumSet.of(
+			DamageType.MELEE,
+			DamageType.MELEE_SKILL,
+			DamageType.MELEE_ENCH,
+			DamageType.PROJECTILE
 	);
 	public static final String DAMAGE_EFFECT_NAME = "CelestialBlessingExtraDamage";
 
@@ -83,7 +76,7 @@ public class CelestialBlessing extends Ability {
 
 		// Give these players the metadata tag that boosts their damage
 		for (Player p : affectedPlayers) {
-			mPlugin.mEffectManager.addEffect(p, DAMAGE_EFFECT_NAME, new PercentDamageDealt(duration, extraDamage, AFFECTED_DAMAGE_CAUSES));
+			mPlugin.mEffectManager.addEffect(p, DAMAGE_EFFECT_NAME, new PercentDamageDealt(duration, extraDamage, AFFECTED_DAMAGE_TYPES));
 			mPlugin.mEffectManager.addEffect(p, "CelestialBlessingExtraSpeed", new PercentSpeed(duration, CELESTIAL_EXTRA_SPEED, ATTR_NAME));
 			mPlugin.mEffectManager.addEffect(p, "CelestialBlessingParticles", new Aesthetics(duration,
 				(entity, fourHertz, twoHertz, oneHertz) -> {
@@ -112,12 +105,10 @@ public class CelestialBlessing extends Ability {
 	}
 
 	@Override
-	public boolean livingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
-	    if (event.getCause().equals(DamageCause.ENTITY_ATTACK)) {
+	public void onDamage(DamageEvent event, LivingEntity enemy) {
+	    if (event.getType() == DamageType.MELEE) {
 	        cast(Action.LEFT_CLICK_AIR);
 	    }
-
-	    return true;
 	}
 
 	@Override
@@ -129,8 +120,4 @@ public class CelestialBlessing extends Ability {
 		return (mPlayer.isSneaking() && !ItemUtils.isPickaxe(mainHand));
 	}
 
-	@Override
-	public Class<? extends BaseAbilityEnchantment> getCooldownEnchantment() {
-		return CelestialCooldownEnchantment.class;
-	}
 }

@@ -1,10 +1,16 @@
 package com.playmonumenta.plugins.bosses.spells.lich;
 
-import java.util.ArrayList;
-import java.util.EnumSet;
-import java.util.List;
-import java.util.concurrent.ThreadLocalRandom;
-
+import com.playmonumenta.plugins.bosses.ChargeUpManager;
+import com.playmonumenta.plugins.bosses.bosses.Lich;
+import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.player.PPGroundCircle;
+import com.playmonumenta.plugins.utils.AbilityUtils;
+import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.DamageUtils;
+import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.LocationUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -29,16 +35,10 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
-import com.playmonumenta.plugins.bosses.ChargeUpManager;
-import com.playmonumenta.plugins.bosses.bosses.Lich;
-import com.playmonumenta.plugins.bosses.spells.Spell;
-import com.playmonumenta.plugins.effects.Stasis;
-import com.playmonumenta.plugins.player.PPGroundCircle;
-import com.playmonumenta.plugins.utils.AbilityUtils;
-import com.playmonumenta.plugins.utils.BossUtils;
-import com.playmonumenta.plugins.utils.FastUtils;
-import com.playmonumenta.plugins.utils.LocationUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
+import java.util.ArrayList;
+import java.util.EnumSet;
+import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class SpellDimensionDoor extends Spell {
 
@@ -279,10 +279,6 @@ public class SpellDimensionDoor extends Spell {
 
 					mTeleport.removeIf(p -> mByPortal.contains(p));
 					for (Player p : mTeleport) {
-						if (com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.hasEffect(p, Stasis.class)) {
-							continue;
-						}
-
 						Location tLoc = p.getLocation();
 						for (Location loc : mPortalLoc) {
 							if (tLoc.getBlock().getType() == Material.END_PORTAL && p.getLocation().distance(loc) <= 4) {
@@ -345,7 +341,7 @@ public class SpellDimensionDoor extends Spell {
 			}
 		} else {
 			t = 20 * 10;
-			BossUtils.bossDamage(mBoss, p, 1);
+			DamageUtils.damage(mBoss, p, DamageType.OTHER, 1);
 			p.playSound(p.getLocation(), Sound.ENTITY_ELDER_GUARDIAN_HURT, SoundCategory.HOSTILE, 1, 1);
 			AbilityUtils.increaseDamageDealtPlayer(p, 20 * 30, -0.2, "Lich");
 			Lich.cursePlayer(plugin, p);
@@ -414,7 +410,7 @@ public class SpellDimensionDoor extends Spell {
 						p.sendMessage(ChatColor.AQUA + "Something feels different. The shadows aren't clinging to me anymore.");
 					} else {
 						p.teleport(leaveLoc);
-						BossUtils.bossDamage(mBoss, p, 1);
+						DamageUtils.damage(mBoss, p, DamageType.OTHER, 1);
 						p.playSound(p.getLocation(), Sound.ENTITY_ELDER_GUARDIAN_HURT, SoundCategory.HOSTILE, 1, 1);
 					}
 				}

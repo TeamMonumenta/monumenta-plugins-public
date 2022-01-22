@@ -1,16 +1,15 @@
 package com.playmonumenta.plugins.potion;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map.Entry;
-
-import org.bukkit.entity.Player;
-import org.bukkit.potion.PotionEffectType;
-
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.utils.PotionUtils.PotionInfo;
+import org.bukkit.entity.Player;
+import org.bukkit.potion.PotionEffectType;
+
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map.Entry;
 
 public class PlayerPotionInfo {
 	//  Effect Type / Potion List

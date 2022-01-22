@@ -1,11 +1,10 @@
 package com.playmonumenta.plugins.bosses.spells.lich.undeadplayers;
 
+import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.bosses.spells.lich.SpellDimensionDoor;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-
-import com.playmonumenta.plugins.bosses.spells.Spell;
-import com.playmonumenta.plugins.bosses.spells.lich.SpellDimensionDoor;
 
 public class SpellLichKeyGlow extends Spell {
 	LivingEntity mBoss;

@@ -1,17 +1,27 @@
 package com.playmonumenta.plugins.depths;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.EnumSet;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.depths.DepthsRoomType.DepthsRewardType;
+import com.playmonumenta.plugins.depths.abilities.aspects.AxeAspect;
+import com.playmonumenta.plugins.depths.abilities.aspects.BowAspect;
+import com.playmonumenta.plugins.depths.abilities.aspects.ScytheAspect;
+import com.playmonumenta.plugins.depths.abilities.aspects.SwordAspect;
+import com.playmonumenta.plugins.depths.abilities.aspects.WandAspect;
+import com.playmonumenta.plugins.depths.abilities.frostborn.Permafrost;
+import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FileUtils;
 import com.playmonumenta.plugins.utils.GUIUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
@@ -26,8 +36,6 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Firework;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
@@ -36,22 +44,12 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.depths.DepthsRoomType.DepthsRewardType;
-import com.playmonumenta.plugins.depths.abilities.aspects.AxeAspect;
-import com.playmonumenta.plugins.depths.abilities.aspects.BowAspect;
-import com.playmonumenta.plugins.depths.abilities.aspects.ScytheAspect;
-import com.playmonumenta.plugins.depths.abilities.aspects.SwordAspect;
-import com.playmonumenta.plugins.depths.abilities.aspects.WandAspect;
-import com.playmonumenta.plugins.depths.abilities.frostborn.Permafrost;
-
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.TextComponent;
-import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.format.TextColor;
-import net.kyori.adventure.text.format.TextDecoration;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class DepthsUtils {
 
@@ -332,8 +330,8 @@ public class DepthsUtils {
 		return null;
 	}
 
-	public static boolean isValidComboAttack(EntityDamageByEntityEvent event, Player player) {
-		return event.getCause() == DamageCause.ENTITY_ATTACK && player.getCooledAttackStrength(0) == 1 && isWeaponItem(player.getInventory().getItemInMainHand());
+	public static boolean isValidComboAttack(DamageEvent event, Player player) {
+		return event.getType() == DamageType.MELEE && player.getCooledAttackStrength(0) == 1 && isWeaponItem(player.getInventory().getItemInMainHand());
 	}
 
 	//Firework effect

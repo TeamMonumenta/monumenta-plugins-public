@@ -1,18 +1,17 @@
 package com.playmonumenta.plugins.bosses.spells;
 
-import java.util.Collections;
-import java.util.List;
-
+import com.playmonumenta.plugins.utils.AbilityUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.LocationUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-import com.playmonumenta.plugins.utils.AbilityUtils;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.LocationUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
+import java.util.Collections;
+import java.util.List;
 
 /*
  * This spell is designed to run as a passive. Here are the rules:
@@ -54,7 +53,7 @@ public class SpellTargetVisiblePlayer extends Spell {
 		mCooldownRemaining -= PERIOD;
 		mTicksSinceLastSeen += PERIOD;
 
-		if (EntityUtils.isStunned(mBoss) || EntityUtils.isConfused(mBoss)) {
+		if (EntityUtils.isStunned(mBoss)) {
 			return;
 		}
 

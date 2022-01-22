@@ -3,7 +3,9 @@ package com.playmonumenta.plugins.abilities;
 import java.util.Collection;
 
 import org.bukkit.GameMode;
+import org.bukkit.Location;
 import org.bukkit.entity.AbstractArrow;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
@@ -11,8 +13,6 @@ import org.bukkit.entity.ThrownPotion;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.entity.EntityCombustByEntityEvent;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityTargetLivingEntityEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
@@ -29,11 +29,11 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.classes.ClassAbility;
-import com.playmonumenta.plugins.enchantments.abilities.BaseAbilityEnchantment;
-import com.playmonumenta.plugins.enchantments.infusions.delves.Epoch;
 import com.playmonumenta.plugins.events.AbilityCastEvent;
-import com.playmonumenta.plugins.events.CustomDamageEvent;
+import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.PotionEffectApplyEvent;
+import com.playmonumenta.plugins.itemstats.enchantments.Aptitude;
+import com.playmonumenta.plugins.itemstats.infusions.Epoch;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 
@@ -123,14 +123,10 @@ public abstract class Ability {
 				//Epoch and Ability Enchantment implementation
 				//Percents are negative so (1 + percent) is between 0 and 1 in most cases
 				double epochPercent = Epoch.getCooldownPercentage(mPlugin, mPlayer);
+				double aptitudePercent = Aptitude.getCooldownPercentage(mPlugin, mPlayer);
+				double ineptitudePercent = Aptitude.getCooldownPercentage(mPlugin, mPlayer);
 
-				Class<? extends BaseAbilityEnchantment> abilityEnchantment = getCooldownEnchantment();
-				double abilityEnchantmentPercent = 0;
-				if (abilityEnchantment != null) {
-					abilityEnchantmentPercent = mPlugin.mTrackingManager.mPlayers.getPlayerCustomEnchantLevel(mPlayer, abilityEnchantment) / 100.0;
-				}
-
-				int cooldown = (int) (info.mCooldown * (1 + epochPercent) * (1 + abilityEnchantmentPercent));
+				int cooldown = (int) (info.mCooldown * (1 + epochPercent) * (1 + aptitudePercent + ineptitudePercent));
 
 				mPlugin.mTimers.addCooldown(mPlayer, info.mLinkedSpell, cooldown);
 				PlayerUtils.callAbilityCastEvent(mPlayer, info.mLinkedSpell);
@@ -149,10 +145,6 @@ public abstract class Ability {
 	//Events
 	//---------------------------------------------------------------------------------------------------------------
 
-	public boolean onStealthAttack(EntityDamageByEntityEvent event) {
-		return true;
-	}
-
 	public boolean blockBreakEvent(BlockBreakEvent event) {
 		return true;
 	}
@@ -161,20 +153,20 @@ public abstract class Ability {
 		return true;
 	}
 
-	public boolean livingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
-		return true;
+	public void onDamage(DamageEvent event, LivingEntity enemy) {
+
 	}
 
-	public boolean playerDamagedEvent(EntityDamageEvent event) {
-		return true;
+	public void onHurt(DamageEvent event) {
+
 	}
 
-	public boolean playerDamagedByLivingEntityEvent(EntityDamageByEntityEvent event) {
-		return true;
+	public void onHurtByEntity(DamageEvent event, Entity damager) {
+
 	}
 
-	public boolean playerDamagedByProjectileEvent(EntityDamageByEntityEvent event) {
-		return true;
+	public void onHurtByEntityWithSource(DamageEvent event, Entity damager, LivingEntity source) {
+
 	}
 
 	public boolean playerHitByProjectileEvent(ProjectileHitEvent event) {
@@ -182,10 +174,6 @@ public abstract class Ability {
 	}
 
 	public boolean playerCombustByEntityEvent(EntityCombustByEntityEvent event) {
-		return true;
-	}
-
-	public boolean livingEntityShotByPlayerEvent(Projectile proj, LivingEntity damagee, EntityDamageByEntityEvent event) {
 		return true;
 	}
 
@@ -224,6 +212,13 @@ public abstract class Ability {
 		return 0;
 	}
 
+	public @Nullable Location entityDeathRadiusCenterLocation() {
+		if (mPlayer != null) {
+			return mPlayer.getLocation();
+		}
+		return null;
+	}
+
 	public void projectileHitEvent(ProjectileHitEvent event, Projectile proj) {
 
 	}
@@ -236,16 +231,12 @@ public abstract class Ability {
 
 	}
 
-	public void playerDealtCustomDamageEvent(CustomDamageEvent event) {
-
-	}
-
 	public void entityTargetLivingEntityEvent(EntityTargetLivingEntityEvent event) {
 
 	}
 
 	// Do not use this for regular abilities
-	public void playerDealtUnregisteredCustomDamageEvent(CustomDamageEvent event) {
+	public void playerDealtUnregisteredCustomDamageEvent(DamageEvent event) {
 
 	}
 
@@ -286,24 +277,7 @@ public abstract class Ability {
 
 	}
 
-	public boolean has1SecondTrigger() {
-		return false;
-	}
-
-	public boolean has2SecondTrigger() {
-		return false;
-	}
-
-	public boolean has40SecondTrigger() {
-		return false;
-	}
-
-	public boolean has60SecondTrigger() {
-		return false;
-	}
-
 	// Every 5 ticks - 4 times a second.
-	// Same rate as BaseEnchantment
 	public void periodicTrigger(boolean twoHertz, boolean oneSecond, int ticks) {
 
 	}
@@ -333,10 +307,6 @@ public abstract class Ability {
 
 	public @Nullable Component getLevelHover(boolean useShorthand) {
 		return mInfo.getLevelHover(getAbilityScore(), useShorthand);
-	}
-
-	public @Nullable Class<? extends BaseAbilityEnchantment> getCooldownEnchantment() {
-		return null;
 	}
 
 	@Override

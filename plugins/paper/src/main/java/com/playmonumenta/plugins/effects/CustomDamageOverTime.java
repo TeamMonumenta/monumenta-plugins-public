@@ -6,32 +6,26 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.classes.ClassAbility;
-import com.playmonumenta.plugins.classes.magic.MagicType;
-import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.utils.DamageUtils;
 
 public class CustomDamageOverTime extends Effect {
 
 	private final double mDamage;
 	private final double mPeriod;
-	private final Plugin mPlugin;
-	private final Player mPlayer;
+	private final @Nullable Player mPlayer;
 	private final @Nullable ClassAbility mSpell;
-	private final @Nullable MagicType mMagic;
 	private final Particle mParticle;
-
 	private int mTicks;
 
-	public CustomDamageOverTime(int duration, double damage, int period, Player player, @Nullable MagicType magic, @Nullable ClassAbility spell, Particle particle, Plugin plugin) {
+	public CustomDamageOverTime(int duration, double damage, int period, @Nullable Player player, @Nullable ClassAbility spell, Particle particle) {
 		super(duration);
 		mDamage = damage;
 		mPeriod = period;
 		mPlayer = player;
 		mSpell = spell;
-		mMagic = magic;
 		mParticle = particle;
-		mPlugin = plugin;
 	}
 
 	//Magnitude is equal to the level of wither that it is equivalent to, at low levels of wither
@@ -43,12 +37,11 @@ public class CustomDamageOverTime extends Effect {
 
 	@Override
 	public void entityTickEffect(Entity entity, boolean fourHertz, boolean twoHertz, boolean oneHertz) {
-		if (entity instanceof LivingEntity && fourHertz) {
+		if (fourHertz && entity instanceof LivingEntity le) {
 			mTicks += 5; //Activates 4 times a second
-			LivingEntity le = (LivingEntity) entity;
 			if (mTicks >= mPeriod) {
 				mTicks %= mPeriod;
-				EntityUtils.damageEntity(mPlugin, le, mDamage, mPlayer, mMagic, true, mSpell, false, false, true, true);
+				DamageUtils.damage(mPlayer, le, DamageType.AILMENT, mDamage, mSpell, true, false);
 				entity.getWorld().spawnParticle(mParticle, le.getEyeLocation(), 8, 0.4, 0.4, 0.4, 0.1);
 			}
 		}

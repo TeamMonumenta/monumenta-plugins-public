@@ -1,13 +1,12 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
-import java.util.Arrays;
-
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.plugin.Plugin;
-
 import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.parameters.BossParam;
 import com.playmonumenta.plugins.bosses.spells.SpellSpawnMobs;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.plugin.Plugin;
+
+import java.util.Arrays;
 
 public class SpawnMobsBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_spawnmobs";

@@ -1,17 +1,16 @@
 package com.playmonumenta.plugins.timers;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map.Entry;
-import java.util.Set;
-import java.util.UUID;
-
+import com.playmonumenta.plugins.utils.EntityUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Monster;
 
-import com.playmonumenta.plugins.utils.EntityUtils;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map.Entry;
+import java.util.Set;
+import java.util.UUID;
 
 public class CombatLoggingTimers {
 

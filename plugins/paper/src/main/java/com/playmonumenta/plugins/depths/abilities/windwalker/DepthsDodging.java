@@ -1,7 +1,12 @@
 package com.playmonumenta.plugins.depths.abilities.windwalker;
 
-import java.util.Collection;
-
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.depths.DepthsTree;
+import com.playmonumenta.plugins.depths.DepthsUtils;
+import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
+import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -9,23 +14,18 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.Arrow;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.entity.ThrownPotion;
 import org.bukkit.event.entity.EntityCombustByEntityEvent;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.PotionSplashEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.potion.PotionData;
 import org.bukkit.potion.PotionType;
 
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.classes.ClassAbility;
-import com.playmonumenta.plugins.depths.DepthsTree;
-import com.playmonumenta.plugins.depths.DepthsUtils;
-import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
-import com.playmonumenta.plugins.utils.AbilityUtils;
+import java.util.Collection;
 
 public class DepthsDodging extends DepthsAbility {
 
@@ -59,18 +59,13 @@ public class DepthsDodging extends DepthsAbility {
 		return false;
 	}
 
-
 	@Override
-	public boolean playerDamagedByProjectileEvent(EntityDamageByEntityEvent event) {
+	public void onHurtByEntityWithSource(DamageEvent event, Entity damager, LivingEntity source) {
 		// See if we should dodge. If false, allow the event to proceed normally
-		Projectile proj = (Projectile) event.getDamager();
-		if ((proj.getShooter() != null && proj.getShooter() instanceof Player) || AbilityUtils.isBlocked(event)) {
-			return true;
+		if (event.getType() == DamageType.PROJECTILE && !event.isCancelled() && !event.isBlocked() && dodge()) {
+			event.setCancelled(true);
 		}
-
-		return !dodge();
 	}
-
 
 	@Override
 	public boolean playerHitByProjectileEvent(ProjectileHitEvent event) {
@@ -80,15 +75,14 @@ public class DepthsDodging extends DepthsAbility {
 		Projectile proj = event.getEntity();
 		// See if we should dodge. If false, allow the event to proceed normally
 		// This probably doesn't properly check for blocking whereas the other method does
-		if ((proj.getShooter() instanceof Player) || mPlayer.isBlocking()) {
+		if (proj.getShooter() instanceof Player) {
 			return true;
 		}
 		if (!dodge()) {
 			return true;
 		}
 
-		if (proj instanceof Arrow) {
-			Arrow arrow = (Arrow) proj;
+		if (proj instanceof Arrow arrow) {
 			arrow.setBasePotionData(new PotionData(PotionType.MUNDANE));
 			arrow.clearCustomEffects();
 		}

@@ -1,5 +1,12 @@
 package com.playmonumenta.plugins.depths.bosses.spells;
 
+import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.depths.bosses.Nucleus;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.utils.DamageUtils;
+import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.MovementUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -10,25 +17,9 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import com.playmonumenta.plugins.bosses.spells.Spell;
-import com.playmonumenta.plugins.depths.bosses.Nucleus;
-import com.playmonumenta.plugins.utils.BossUtils;
-import com.playmonumenta.plugins.utils.FastUtils;
-import com.playmonumenta.plugins.utils.MovementUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
-
-
-/*
- *
- * Shatter - All players within a 70 degree cone in front of the giant after
-a 1 second charge up take 24 damage and are knocked back X blocks. If they
-collide with a wall they take 10 additional damage and are stunned (Slowness 7,
-Negative Jump Boost, weakness 10, maybe putting bows on cooldown, you get the
-idea) for 2 seconds.
- */
 public class SpellSurroundingDeath extends Spell {
 
-	public static final int DAMAGE = 50;
+	public static final int DAMAGE = 45;
 
 	private Plugin mPlugin;
 	private LivingEntity mBoss;
@@ -135,8 +126,8 @@ public class SpellSurroundingDeath extends Spell {
 
 					for (Player p : PlayerUtils.playersInRange(mStartLoc, outerRadius, true)) {
 						if (!PlayerUtils.playersInRange(mStartLoc, innerRadius, true).contains(p)) {
-							BossUtils.bossDamage(mBoss, p, DAMAGE, mStartLoc, "Surrounding Death");
-							MovementUtils.knockAway(mStartLoc, p, 0, .75f);
+							DamageUtils.damage(mBoss, p, DamageType.MAGIC, DAMAGE, null, false, true, "Surrounding Death");
+							MovementUtils.knockAway(mStartLoc, p, 0, .75f, false);
 						}
 					}
 					this.cancel();
@@ -152,6 +143,6 @@ public class SpellSurroundingDeath extends Spell {
 
 	@Override
 	public int cooldownTicks() {
-		return mCooldownTicks + (120);
+		return mCooldownTicks + 120;
 	}
 }

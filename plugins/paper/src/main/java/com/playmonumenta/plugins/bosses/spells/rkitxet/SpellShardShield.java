@@ -1,18 +1,16 @@
 package com.playmonumenta.plugins.bosses.spells.rkitxet;
 
+import com.playmonumenta.plugins.bosses.bosses.RKitxet;
+import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
+import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-
-import com.playmonumenta.plugins.bosses.bosses.RKitxet;
-import com.playmonumenta.plugins.bosses.spells.Spell;
-import com.playmonumenta.plugins.utils.FastUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
-
-import net.md_5.bungee.api.ChatColor;
 
 public class SpellShardShield extends Spell {
 	public static final int SHIELD_INTERVAL_1 = 35 * 20;

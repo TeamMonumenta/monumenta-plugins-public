@@ -1,14 +1,13 @@
 package com.playmonumenta.plugins.tracking;
 
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
-
 import com.playmonumenta.plugins.utils.EntityUtils;
-
 import org.bukkit.Particle;
 import org.bukkit.entity.Creeper;
 import org.bukkit.entity.Entity;
+
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
 
 public class CreeperTracking implements EntityTracking {
 	private Set<Creeper> mEntities = new HashSet<Creeper>();

@@ -1,32 +1,5 @@
 package com.playmonumenta.plugins.depths.bosses;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.Sound;
-import org.bukkit.attribute.Attribute;
-import org.bukkit.block.BlockFace;
-import org.bukkit.boss.BarColor;
-import org.bukkit.boss.BarStyle;
-import org.bukkit.entity.ArmorStand;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Mob;
-import org.bukkit.entity.Player;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDeathEvent;
-import org.bukkit.plugin.Plugin;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
-import org.bukkit.scheduler.BukkitRunnable;
-
 import com.playmonumenta.plugins.bosses.BossBarManager;
 import com.playmonumenta.plugins.bosses.BossBarManager.BossHealthAction;
 import com.playmonumenta.plugins.bosses.SpellManager;
@@ -47,8 +20,32 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.SerializationUtils;
-
 import net.md_5.bungee.api.ChatColor;
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.Sound;
+import org.bukkit.attribute.Attribute;
+import org.bukkit.block.BlockFace;
+import org.bukkit.boss.BarColor;
+import org.bukkit.boss.BarStyle;
+import org.bukkit.entity.ArmorStand;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Mob;
+import org.bukkit.entity.Player;
+import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.plugin.Plugin;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
+import org.bukkit.scheduler.BukkitRunnable;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public final class Nucleus extends BossAbilityGroup {
 	public static final String identityTag = "boss_nucleus";
@@ -181,7 +178,6 @@ public final class Nucleus extends BossAbilityGroup {
 			new SpellTectonicDevastation(mPlugin, mBoss, mSpawnLoc, mCooldownTicks, this),
 			new SpellSurroundingDeath(plugin, mBoss, mSpawnLoc, mCooldownTicks, this),
 			new SpellRisingTides(plugin, mBoss, mSpawnLoc, mCooldownTicks, this)
-			//new SpellTentacleCrawl(plugin, mBoss, mSpawnLoc, mCooldownTicks, this)
 		));
 		List<Spell> phase3Passives = Arrays.asList(
 			new SpellBlockBreak(mBoss, 2, 3, 2),
@@ -389,14 +385,6 @@ public final class Nucleus extends BossAbilityGroup {
 			}
 
 		}.runTaskLater(mPlugin, 80);
-	}
-
-	@Override
-	public void bossDamagedEntity(EntityDamageByEntityEvent event) {
-		//Slow on hit
-		if (event.getEntity() instanceof Player) {
-			((Player) event.getEntity()).addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 60, 1));
-		}
 	}
 
 	BukkitRunnable mMusicRunnable = new BukkitRunnable() {

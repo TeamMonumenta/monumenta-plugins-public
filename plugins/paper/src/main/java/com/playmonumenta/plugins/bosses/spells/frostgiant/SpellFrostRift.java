@@ -1,10 +1,12 @@
 package com.playmonumenta.plugins.bosses.spells.frostgiant;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
+import com.playmonumenta.plugins.bosses.bosses.FrostGiant;
+import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.utils.DamageUtils;
+import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.LocationUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -22,12 +24,10 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
-import com.playmonumenta.plugins.bosses.bosses.FrostGiant;
-import com.playmonumenta.plugins.bosses.spells.Spell;
-import com.playmonumenta.plugins.utils.BossUtils;
-import com.playmonumenta.plugins.utils.FastUtils;
-import com.playmonumenta.plugins.utils.LocationUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /*
  Frost Rift: Targets ⅓  players. Afterwards, breaks the ground towards them,
@@ -191,7 +191,7 @@ public class SpellFrostRift extends Spell {
 
 				for (Player player : players) {
 					if (player.getBoundingBox().overlaps(mBox)) {
-						BossUtils.bossDamage(mBoss, player, 30, mBoss.getLocation(), "Frost Rift");
+						DamageUtils.damage(mBoss, player, DamageType.MAGIC, 30, null, false, true, "Frost Rift");
 					}
 				}
 				if (bLoc.distance(mOgLoc) >= 50) {
@@ -219,7 +219,7 @@ public class SpellFrostRift extends Spell {
 					BoundingBox box = BoundingBox.of(loc, 0.85, 1.2, 0.85);
 					for (Player player : players) {
 						if (player.getBoundingBox().overlaps(box)) {
-							BossUtils.bossDamage(mBoss, player, 25, null, "Frost Rift");
+							DamageUtils.damage(mBoss, player, DamageType.MAGIC, 20, null, false, true, "Frost Rift");
 							player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 6, 2));
 							player.addPotionEffect(new PotionEffect(PotionEffectType.HUNGER, 20 * 6, 49));
 						}

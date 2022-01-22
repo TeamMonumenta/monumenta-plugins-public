@@ -93,11 +93,8 @@ public class FrozenDomain extends DepthsAbility {
 	}
 
 	public void applyHealing() {
-		if (mPlayer == null) {
-			return;
-		}
 		double maxHealth = EntityUtils.getMaxHealth(mPlayer);
-		PlayerUtils.healPlayer(mPlayer, PERCENT_HEAL * maxHealth);
+		PlayerUtils.healPlayer(mPlugin, mPlayer, PERCENT_HEAL * maxHealth, mPlayer);
 		handleParticles();
 	}
 

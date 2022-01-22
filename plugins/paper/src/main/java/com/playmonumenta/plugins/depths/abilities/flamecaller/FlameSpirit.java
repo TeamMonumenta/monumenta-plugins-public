@@ -1,5 +1,17 @@
 package com.playmonumenta.plugins.depths.abilities.flamecaller;
 
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.depths.DepthsTree;
+import com.playmonumenta.plugins.depths.DepthsUtils;
+import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
+import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.player.PartialParticle;
+import com.playmonumenta.plugins.utils.DamageUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.ItemUtils;
+import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -8,19 +20,6 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.scheduler.BukkitRunnable;
-
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.classes.magic.MagicType;
-import com.playmonumenta.plugins.depths.DepthsTree;
-import com.playmonumenta.plugins.depths.DepthsUtils;
-import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
-import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
-import com.playmonumenta.plugins.player.PartialParticle;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.FastUtils;
-import com.playmonumenta.plugins.utils.ItemUtils;
-
-import net.md_5.bungee.api.ChatColor;
 
 public class FlameSpirit extends DepthsAbility {
 
@@ -54,7 +53,7 @@ public class FlameSpirit extends DepthsAbility {
 					for (LivingEntity mob : EntityUtils.getNearbyMobs(centerLoc, RADIUS)) {
 						if (!(mob == null)) {
 							EntityUtils.applyFire(mPlugin, FIRE_TICKS, mob, mPlayer);
-							EntityUtils.damageEntity(mPlugin, mob, DAMAGE[mRarity - 1], mPlayer, MagicType.FIRE, true, mInfo.mLinkedSpell, true, true, true, true);
+							DamageUtils.damage(mPlayer, mob, DamageType.MAGIC, DAMAGE[mRarity - 1], mInfo.mLinkedSpell, true, false);
 						}
 					}
 
@@ -106,7 +105,7 @@ public class FlameSpirit extends DepthsAbility {
 
 	@Override
 	public String getDescription(int rarity) {
-		return "Breaking a spawner summons a spirit that deals " + DepthsUtils.getRarityColor(rarity) + DAMAGE[rarity - 1] + ChatColor.WHITE + " damage in a " + RADIUS + " block radius every second for " + DAMAGE_COUNT + " seconds and sets affected mobs on fire for " + FIRE_TICKS / 20 + " seconds.";
+		return "Breaking a spawner summons a spirit that deals " + DepthsUtils.getRarityColor(rarity) + DAMAGE[rarity - 1] + ChatColor.WHITE + " magic damage in a " + RADIUS + " block radius every second for " + DAMAGE_COUNT + " seconds and sets affected mobs on fire for " + FIRE_TICKS / 20 + " seconds.";
 	}
 
 	@Override

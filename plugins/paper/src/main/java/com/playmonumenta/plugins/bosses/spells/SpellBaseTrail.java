@@ -1,9 +1,6 @@
 package com.playmonumenta.plugins.bosses.spells;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-
+import com.playmonumenta.plugins.utils.EntityUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -11,7 +8,9 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.util.BoundingBox;
 
-import com.playmonumenta.plugins.utils.EntityUtils;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 public class SpellBaseTrail extends Spell {
 
@@ -96,7 +95,7 @@ public class SpellBaseTrail extends Spell {
 
 	@Override
 	public void run() {
-		if (EntityUtils.isStunned(mBoss) || EntityUtils.isSilenced(mBoss) || EntityUtils.isConfused(mBoss)) {
+		if (EntityUtils.isStunned(mBoss) || EntityUtils.isSilenced(mBoss)) {
 			return;
 		}
 		mTicks += mTickRate;

@@ -1,19 +1,17 @@
 package com.playmonumenta.plugins.commands;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
-
-import org.bukkit.command.CommandSender;
-import org.bukkit.command.ProxiedCommandSender;
-import org.bukkit.entity.Player;
-
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.CommandPermission;
 import dev.jorel.commandapi.arguments.Argument;
 import dev.jorel.commandapi.arguments.ObjectiveArgument;
+import org.bukkit.command.CommandSender;
+import org.bukkit.command.ProxiedCommandSender;
+import org.bukkit.entity.Player;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class SkillDescription extends GenericCommand {
 	private static final String COMMAND = "skilldescription";

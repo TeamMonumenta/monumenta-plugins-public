@@ -23,10 +23,13 @@ import org.bukkit.potion.PotionType;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.classes.ClassAbility;
-import com.playmonumenta.plugins.classes.magic.MagicType;
 import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
+import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.itemstats.ItemStatManager;
+import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
@@ -54,9 +57,9 @@ public class LightningBottle extends DepthsAbility {
 
 	@Override
 	public boolean playerThrewSplashPotionEvent(ThrownPotion potion) {
-		if (InventoryUtils.testForItemWithName(potion.getItem(), POTION_NAME)) {
+		if (mPlayer != null && InventoryUtils.testForItemWithName(potion.getItem(), POTION_NAME)) {
 			mPlugin.mProjectileEffectTimers.addEntity(potion, Particle.SPELL);
-			potion.setMetadata(POTION_META_DATA, new FixedMetadataValue(mPlugin, 0));
+			potion.setMetadata(POTION_META_DATA, new FixedMetadataValue(mPlugin, new ItemStatManager.PlayerItemStats(mPlugin.mItemStatManager.getPlayerItemStats(mPlayer))));
 		}
 
 		return true;
@@ -64,24 +67,23 @@ public class LightningBottle extends DepthsAbility {
 
 	@Override
 	public boolean playerSplashPotionEvent(Collection<LivingEntity> affectedEntities, ThrownPotion potion, PotionSplashEvent event) {
-		if (potion.hasMetadata(POTION_META_DATA)) {
-
+		if (mPlayer != null && potion.hasMetadata(POTION_META_DATA) && potion.getMetadata(POTION_META_DATA) instanceof FixedMetadataValue playerItemStats) {
 			if (affectedEntities != null && !affectedEntities.isEmpty()) {
 				for (LivingEntity entity : affectedEntities) {
 					if (EntityUtils.isHostileMob(entity)) {
-						apply(entity);
+						DamageEvent damageEvent = new DamageEvent(entity, mPlayer, mPlayer, DamageType.MAGIC, mInfo.mLinkedSpell, DAMAGE[mRarity - 1]);
+						damageEvent.setDelayed(true);
+						damageEvent.setPlayerItemStat(playerItemStats);
+						DamageUtils.damage(damageEvent, false, true, null);
+
+						EntityUtils.applyVulnerability(mPlugin, DURATION, VULNERABILITY[mRarity - 1], entity);
+						EntityUtils.applySlow(mPlugin, DURATION, SLOWNESS, entity);
 					}
 				}
 			}
 		}
 
 		return true;
-	}
-
-	public void apply(LivingEntity mob) {
-		EntityUtils.damageEntity(mPlugin, mob, DAMAGE[mRarity - 1], mPlayer, MagicType.ALCHEMY, true, mInfo.mLinkedSpell);
-		EntityUtils.applyVulnerability(mPlugin, DURATION, VULNERABILITY[mRarity - 1], mob);
-		EntityUtils.applySlow(mPlugin, DURATION, SLOWNESS, mob);
 	}
 
 	@Override
@@ -145,7 +147,7 @@ public class LightningBottle extends DepthsAbility {
 
 	@Override
 	public String getDescription(int rarity) {
-		return "For every " + KILLS_PER + " mobs that die within " + DEATH_RADIUS + " blocks of you, you gain a lightning bottle, which stack up to " + MAX_STACK + ". Throwing a lightning bottle deals " + DepthsUtils.getRarityColor(rarity) + (float)DAMAGE[rarity - 1] + ChatColor.WHITE + " damage and applies " + (int) DepthsUtils.roundPercent(SLOWNESS) + "% slowness and " + DepthsUtils.getRarityColor(rarity) + DepthsUtils.roundPercent(VULNERABILITY[rarity - 1]) + "%" + ChatColor.WHITE + " vulnerability for " + DURATION / 20 + " seconds.";
+		return "For every " + KILLS_PER + " mobs that die within " + DEATH_RADIUS + " blocks of you, you gain a lightning bottle, which stack up to " + MAX_STACK + ". Throwing a lightning bottle deals " + DepthsUtils.getRarityColor(rarity) + (float)DAMAGE[rarity - 1] + ChatColor.WHITE + " magic damage and applies " + (int) DepthsUtils.roundPercent(SLOWNESS) + "% slowness and " + DepthsUtils.getRarityColor(rarity) + DepthsUtils.roundPercent(VULNERABILITY[rarity - 1]) + "%" + ChatColor.WHITE + " vulnerability for " + DURATION / 20 + " seconds.";
 	}
 
 	@Override

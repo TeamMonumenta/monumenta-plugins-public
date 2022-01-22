@@ -1,5 +1,9 @@
 package com.playmonumenta.plugins.listeners;
 
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.utils.ItemStatUtils;
+import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.MessagingUtils;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
@@ -22,10 +26,6 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.utils.ItemUtils;
-import com.playmonumenta.plugins.utils.MessagingUtils;
-
 public class ShatteredEquipmentListener implements Listener {
 	private Plugin mPlugin;
 
@@ -40,7 +40,7 @@ public class ShatteredEquipmentListener implements Listener {
 		if (event.useItemInHand() != Event.Result.DENY) {
 			Player player = event.getPlayer();
 			ItemStack item = event.getItem();
-			if (item != null && ItemUtils.isItemShattered(item) && !item.containsEnchantment(Enchantment.RIPTIDE)) {
+			if (item != null && ItemStatUtils.isShattered(item) && !item.containsEnchantment(Enchantment.RIPTIDE)) {
 				MessagingUtils.sendActionBarMessage(mPlugin, player, "Shattered items must be reforged before use");
 				event.setUseItemInHand(Event.Result.DENY);
 				event.setCancelled(true);
@@ -58,7 +58,7 @@ public class ShatteredEquipmentListener implements Listener {
 		} else {
 			item = player.getInventory().getItemInOffHand();
 		}
-		if (ItemUtils.isItemShattered(item)) {
+		if (ItemStatUtils.isShattered(item)) {
 			MessagingUtils.sendActionBarMessage(mPlugin, player, "Shattered items must be reforged before use");
 			event.setCancelled(true);
 		}
@@ -67,9 +67,8 @@ public class ShatteredEquipmentListener implements Listener {
 	// One entity attacks another
 	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
 	public void entityDamageByEntityEvent(EntityDamageByEntityEvent event) {
-		if (event.getDamager() instanceof Player) {
-			Player player = (Player) event.getDamager();
-			if (ItemUtils.isItemShattered(player.getInventory().getItemInMainHand())) {
+		if (event.getDamager() instanceof Player player) {
+			if (ItemStatUtils.isShattered(player.getInventory().getItemInMainHand())) {
 				MessagingUtils.sendActionBarMessage(mPlugin, player, "Shattered items must be reforged before use");
 				event.setCancelled(true);
 			}
@@ -78,8 +77,7 @@ public class ShatteredEquipmentListener implements Listener {
 
 	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
 	public void inventoryClickEvent(InventoryClickEvent event) {
-		if (event.getWhoClicked() instanceof Player) {
-			Player player = (Player) event.getWhoClicked();
+		if (event.getWhoClicked() instanceof Player player) {
 			Inventory inventory = event.getClickedInventory();
 			if (inventory instanceof PlayerInventory &&
 				event.getView().getTopInventory().getType() == InventoryType.CRAFTING) {
@@ -114,7 +112,7 @@ public class ShatteredEquipmentListener implements Listener {
 					item = event.getCurrentItem();
 					equipping = true;
 				}
-				if (equipping && ItemUtils.isItemShattered(item)) {
+				if (equipping && ItemStatUtils.isShattered(item)) {
 					event.setCancelled(true);
 					MessagingUtils.sendActionBarMessage(mPlugin, player, "Shattered items must be reforged before use");
 				}
@@ -131,7 +129,7 @@ public class ShatteredEquipmentListener implements Listener {
 					ItemUtils.isShatteredWearable(event.getNewItems().getOrDefault(6, null)) || // Chest Slot
 					ItemUtils.isShatteredWearable(event.getNewItems().getOrDefault(7, null)) || // Legs  Slot
 					ItemUtils.isShatteredWearable(event.getNewItems().getOrDefault(8, null)) || // Feet  Slot
-					ItemUtils.isItemShattered(event.getNewItems().getOrDefault(45, null))) { // Offhand Slot
+					ItemStatUtils.isShattered(event.getNewItems().getOrDefault(45, null))) { // Offhand Slot
 				event.setCancelled(true);
 				MessagingUtils.sendActionBarMessage(mPlugin, player, "Shattered items must be reforged before use");
 			}
@@ -142,7 +140,7 @@ public class ShatteredEquipmentListener implements Listener {
 	// Player swapped hand items
 	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
 	public void playerSwapHandItemsEvent(PlayerSwapHandItemsEvent event) {
-		if (ItemUtils.isItemShattered(event.getOffHandItem()) || ItemUtils.isItemShattered(event.getMainHandItem())) {
+		if (ItemStatUtils.isShattered(event.getOffHandItem()) || ItemStatUtils.isShattered(event.getMainHandItem())) {
 			MessagingUtils.sendActionBarMessage(mPlugin, event.getPlayer(), "Shattered items must be reforged before use");
 			event.setCancelled(true);
 		}
@@ -152,7 +150,7 @@ public class ShatteredEquipmentListener implements Listener {
 	// Cancel dispensers/droppers dropping specific items
 	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
 	public void blockDispenseEvent(BlockDispenseEvent event) {
-		if (ItemUtils.isItemShattered(event.getItem())) {
+		if (ItemStatUtils.isShattered(event.getItem())) {
 			event.setCancelled(true);
 		}
 	}
@@ -161,7 +159,7 @@ public class ShatteredEquipmentListener implements Listener {
 	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
 	public void blockDispenseArmorEvent(BlockDispenseArmorEvent event) {
 		// Cancel dispensers equipping shattered armor to a player
-		if (ItemUtils.isItemShattered(event.getItem())) {
+		if (ItemStatUtils.isShattered(event.getItem())) {
 			if (event.getTargetEntity() instanceof Player) {
 				MessagingUtils.sendActionBarMessage(mPlugin, (Player) event.getTargetEntity(), "Shattered items must be reforged before use");
 			}
@@ -173,7 +171,7 @@ public class ShatteredEquipmentListener implements Listener {
 	public void blockBreakEvent(BlockBreakEvent event) {
 		Player player = event.getPlayer();
 		ItemStack item = player.getInventory().getItemInMainHand();
-		if (ItemUtils.isItemShattered(item)) {
+		if (ItemStatUtils.isShattered(item)) {
 			event.setCancelled(true);
 		}
 	}

@@ -1,8 +1,8 @@
 package com.playmonumenta.plugins.effects;
 
+import com.playmonumenta.plugins.events.DamageEvent;
 import org.bukkit.entity.Entity;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityRegainHealthEvent;
 
@@ -54,16 +54,20 @@ public abstract class Effect implements Comparable<Effect> {
 		return true;
 	}
 
-	public boolean entityDealDamageEvent(EntityDamageByEntityEvent event) {
-		return true;
+	public void onDamage(LivingEntity entity, DamageEvent event, LivingEntity enemy) {
+
 	}
 
-	public boolean entityReceiveDamageEvent(EntityDamageEvent event) {
-		return true;
+	public void onHurt(LivingEntity entity, DamageEvent event) {
+
 	}
 
-	public boolean entityReceiveDamageFromEntityEvent(EntityDamageByEntityEvent event) {
-		return true;
+	public void onHurtByEntity(LivingEntity entity, DamageEvent event, Entity damager) {
+
+	}
+
+	public void onHurtByEntityWithSource(LivingEntity entity, DamageEvent event, Entity damager, LivingEntity source) {
+
 	}
 
 	public boolean entityKilledEvent(EntityDeathEvent event) {

@@ -1,26 +1,21 @@
 package com.playmonumenta.plugins.abilities.delves;
 
-import java.util.Set;
-
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
-import org.bukkit.entity.Projectile;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
-import org.bukkit.event.entity.EntityDeathEvent;
-import org.bukkit.event.entity.EntitySpawnEvent;
-import org.bukkit.event.entity.SpawnerSpawnEvent;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
-import org.bukkit.projectiles.ProjectileSource;
-import org.checkerframework.checker.nullness.qual.Nullable;
-
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.utils.DelvesUtils;
 import com.playmonumenta.plugins.utils.DelvesUtils.Modifier;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
+import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.event.entity.EntitySpawnEvent;
+import org.bukkit.event.entity.SpawnerSpawnEvent;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
+import org.checkerframework.checker.nullness.qual.Nullable;
+
+import java.util.Set;
 
 public class DelveModifier extends Ability {
 
@@ -63,30 +58,6 @@ public class DelveModifier extends Ability {
 	}
 
 	@Override
-	public boolean playerDamagedByLivingEntityEvent(EntityDamageByEntityEvent event) {
-		if (shouldApplyModifiers(event.getDamager())) {
-			if (event.getCause() == DamageCause.CUSTOM) {
-				return playerTookCustomDamageEvent(event);
-			} else {
-				return playerTookMeleeDamageEvent(event);
-			}
-		}
-
-		return true;
-	}
-
-	@Override
-	public boolean playerDamagedByProjectileEvent(EntityDamageByEntityEvent event) {
-		ProjectileSource source = ((Projectile) event.getDamager()).getShooter();
-
-		if (source instanceof Entity entity && shouldApplyModifiers(entity)) {
-			return playerTookProjectileDamageEvent(entity, event);
-		}
-
-		return true;
-	}
-
-	@Override
 	public void entityDeathEvent(EntityDeathEvent event, boolean shouldGenDrops) {
 		if (shouldApplyModifiers(event.getEntity())) {
 			entityDeathEvent(event);
@@ -119,18 +90,6 @@ public class DelveModifier extends Ability {
 
 	protected void applyModifiers(LivingEntity mob, SpawnerSpawnEvent event) {
 
-	}
-
-	protected boolean playerTookCustomDamageEvent(EntityDamageByEntityEvent event) {
-		return true;
-	}
-
-	protected boolean playerTookMeleeDamageEvent(EntityDamageByEntityEvent event) {
-		return true;
-	}
-
-	protected boolean playerTookProjectileDamageEvent(Entity source, EntityDamageByEntityEvent event) {
-		return true;
 	}
 
 }

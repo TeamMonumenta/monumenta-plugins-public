@@ -1,8 +1,21 @@
 package com.playmonumenta.plugins.overrides;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.integrations.CoreProtectIntegration;
+import com.playmonumenta.plugins.itemstats.infusions.StatTrackManager;
+import com.playmonumenta.plugins.protocollib.FirmamentLagFix;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.utils.ItemStatUtils;
+import com.playmonumenta.plugins.utils.ItemStatUtils.Tier;
+import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.MessagingUtils;
+import com.playmonumenta.plugins.utils.ZoneUtils;
+import de.tr7zw.nbtapi.NBTItem;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -23,34 +36,23 @@ import org.bukkit.inventory.meta.BlockStateMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.enchantments.StatTrack.StatTrackOptions;
-import com.playmonumenta.plugins.enchantments.StatTrackManager;
-import com.playmonumenta.plugins.integrations.CoreProtectIntegration;
-import com.playmonumenta.plugins.protocollib.FirmamentLagFix;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.FastUtils;
-import com.playmonumenta.plugins.utils.InventoryUtils;
-import com.playmonumenta.plugins.utils.ItemUtils;
-import com.playmonumenta.plugins.utils.ItemUtils.ItemTier;
-import com.playmonumenta.plugins.utils.MessagingUtils;
-import com.playmonumenta.plugins.utils.ZoneUtils;
-
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.format.TextDecoration;
+import java.util.List;
 
 public class FirmamentOverride extends BaseOverride {
 	private static final String CAN_PLACE_SHULKER_PERM = "monumenta.canplaceshulker";
 
-	private static final Component PRISMARINE_ENABLED = Component.text("Prismarine ").color(NamedTextColor.AQUA).decoration(TextDecoration.ITALIC, false)
+	private static final Component PRISMARINE_ENABLED = Component.text("Prismarine ").color(NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)
 		.append(Component.text("Enabled").color(NamedTextColor.GREEN).decoration(TextDecoration.ITALIC, false));
-	private static final Component PRISMARINE_DISABLED = Component.text("Prismarine ").color(NamedTextColor.AQUA).decoration(TextDecoration.ITALIC, false)
+	private static final Component PRISMARINE_DISABLED = Component.text("Prismarine ").color(NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)
 		.append(Component.text("Disabled").color(NamedTextColor.RED).decoration(TextDecoration.ITALIC, false));
 	private static final Component BLACKSTONE_ENABLED = Component.text("Blackstone ").color(NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)
 		.append(Component.text("Enabled").color(NamedTextColor.GREEN).decoration(TextDecoration.ITALIC, false));
 	private static final Component BLACKSTONE_DISABLED = Component.text("Blackstone ").color(NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)
 		.append(Component.text("Disabled").color(NamedTextColor.RED).decoration(TextDecoration.ITALIC, false));
+	private static final String PLAIN_PRISMARINE_ENABLED = MessagingUtils.plainText(PRISMARINE_ENABLED);
+	private static final String PLAIN_PRISMARINE_DISABLED = MessagingUtils.plainText(PRISMARINE_DISABLED);
+	private static final String PLAIN_BLACKSTONE_ENABLED = MessagingUtils.plainText(BLACKSTONE_ENABLED);
+	private static final String PLAIN_BLACKSTONE_DISABLED = MessagingUtils.plainText(BLACKSTONE_DISABLED);
 	private static final String ITEM_NAME = "Firmament";
 	private static final String DELVE_SKIN_NAME = "Doorway from Eternity";
 
@@ -121,13 +123,13 @@ public class FirmamentOverride extends BaseOverride {
 			// No known way to preserve BlockStateMeta - so check that it's either null or simple BlockDataMeta
 			if (currentItem.getType().isBlock() && (meta == null || meta instanceof BlockDataMeta)) {
 				//Stat tracking for firmament
-				StatTrackManager.incrementStat(item, player, StatTrackOptions.BLOCKS_PLACED, 1);
+				StatTrackManager.incrementStat(item, player, ItemStatUtils.InfusionType.STAT_TRACK_BLOCKS, 1);
 
 				BlockData blockData;
 				boolean removeItem = true;
 				if (FastUtils.RANDOM.nextBoolean()
 					    && item.getItemMeta().hasLore()
-					    && (InventoryUtils.testForItemWithLore(item, "Prismarine Enabled") || InventoryUtils.testForItemWithLore(item, "Blackstone Enabled"))) {
+					    && (InventoryUtils.testForItemWithLore(item, PLAIN_PRISMARINE_ENABLED) || InventoryUtils.testForItemWithLore(item, PLAIN_BLACKSTONE_ENABLED))) {
 					removeItem = false;
 					// Place a prismarine/blackstone block instead of the block from the shulker
 					if (InventoryUtils.testForItemWithName(item, ITEM_NAME)) {
@@ -191,61 +193,60 @@ public class FirmamentOverride extends BaseOverride {
 			return true;
 		}
 
-		List<Component> lore = item.getItemMeta().lore();
-		if (lore == null) {
-			return true;
-		}
-		List<Component> newLore = new ArrayList<>();
+		NBTItem nbt = new NBTItem(item);
+		List<String> lore = ItemStatUtils.getPlainLore(nbt);
+
 		boolean foundLine = false;
 		if (InventoryUtils.testForItemWithName(item, ITEM_NAME)) {
-			for (Component loreEntry : lore) {
-				if (MessagingUtils.plainText(loreEntry).equals("Prismarine Enabled") && !foundLine) {
-					newLore.add(PRISMARINE_DISABLED);
+			for (int i = 0; i < lore.size(); ++i) {
+				String line = lore.get(i);
+				if (line.equals(PLAIN_PRISMARINE_ENABLED) && !foundLine) {
+					ItemStatUtils.removeLore(item, i);
+					ItemStatUtils.addLore(item, i, PRISMARINE_DISABLED);
 					player.sendMessage(PRISMARINE_DISABLED);
 					player.playSound(player.getLocation(), Sound.BLOCK_SHULKER_BOX_CLOSE, SoundCategory.BLOCKS, 1, 1);
 					foundLine = true;
-					continue;
-				} else if (MessagingUtils.plainText(loreEntry).equals("Prismarine Disabled") && !foundLine) {
-					newLore.add(PRISMARINE_ENABLED);
+					break;
+				} else if (line.equals(PLAIN_PRISMARINE_DISABLED) && !foundLine) {
+					ItemStatUtils.removeLore(item, i);
+					ItemStatUtils.addLore(item, i, PRISMARINE_ENABLED);
 					player.sendMessage(PRISMARINE_ENABLED);
 					player.playSound(player.getLocation(), Sound.BLOCK_SHULKER_BOX_OPEN, SoundCategory.BLOCKS, 1, 1);
 					foundLine = true;
-					continue;
-				}
-				newLore.add(loreEntry);
-				if (loreEntry.equals(lore.get(lore.size() - 1)) && !foundLine) {
-					newLore.add(PRISMARINE_ENABLED);
-					player.sendMessage(PRISMARINE_ENABLED);
-					player.playSound(player.getLocation(), Sound.BLOCK_SHULKER_BOX_OPEN, SoundCategory.BLOCKS, 1, 1);
+					break;
 				}
 			}
+			if (!foundLine) {
+				ItemStatUtils.addLore(item, lore.size(), PRISMARINE_ENABLED);
+				player.sendMessage(PRISMARINE_ENABLED);
+				player.playSound(player.getLocation(), Sound.BLOCK_SHULKER_BOX_OPEN, SoundCategory.BLOCKS, 1, 1);
+			}
 		} else if (InventoryUtils.testForItemWithName(item, DELVE_SKIN_NAME)) {
-			for (Component loreEntry : lore) {
-				if (MessagingUtils.plainText(loreEntry).equals("Blackstone Enabled") && !foundLine) {
-					newLore.add(BLACKSTONE_DISABLED);
+			for (int i = 0; i < lore.size(); ++i) {
+				String line = lore.get(i);
+				if (line.equals(PLAIN_BLACKSTONE_ENABLED) && !foundLine) {
+					ItemStatUtils.removeLore(item, i);
+					ItemStatUtils.addLore(item, i, BLACKSTONE_DISABLED);
 					player.sendMessage(BLACKSTONE_DISABLED);
 					player.playSound(player.getLocation(), Sound.BLOCK_SHULKER_BOX_CLOSE, SoundCategory.BLOCKS, 1, 1);
 					foundLine = true;
-					continue;
-				} else if (MessagingUtils.plainText(loreEntry).equals("Blackstone Disabled") && !foundLine) {
-					newLore.add(BLACKSTONE_ENABLED);
+					break;
+				} else if (line.equals(PLAIN_BLACKSTONE_DISABLED) && !foundLine) {
+					ItemStatUtils.removeLore(item, i);
+					ItemStatUtils.addLore(item, i, BLACKSTONE_ENABLED);
 					player.sendMessage(BLACKSTONE_ENABLED);
 					player.playSound(player.getLocation(), Sound.BLOCK_SHULKER_BOX_OPEN, SoundCategory.BLOCKS, 1, 1);
 					foundLine = true;
-					continue;
-				}
-				newLore.add(loreEntry);
-				if (loreEntry.equals(lore.get(lore.size() - 1)) && !foundLine) {
-					newLore.add(BLACKSTONE_ENABLED);
-					player.sendMessage(BLACKSTONE_ENABLED);
-					player.playSound(player.getLocation(), Sound.BLOCK_SHULKER_BOX_OPEN, SoundCategory.BLOCKS, 1, 1);
+					break;
 				}
 			}
+			if (!foundLine) {
+				ItemStatUtils.addLore(item, lore.size(), BLACKSTONE_ENABLED);
+				player.sendMessage(BLACKSTONE_ENABLED);
+				player.playSound(player.getLocation(), Sound.BLOCK_SHULKER_BOX_OPEN, SoundCategory.BLOCKS, 1, 1);
+			}
 		}
-		ItemMeta meta = item.getItemMeta();
-		meta.lore(newLore);
-		item.setItemMeta(meta);
-		ItemUtils.setPlainLore(item);
+		ItemStatUtils.generateItemStats(item);
 		return true;
 	}
 
@@ -254,7 +255,7 @@ public class FirmamentOverride extends BaseOverride {
 		       item.getType() != null &&
 		       (InventoryUtils.testForItemWithName(item, ITEM_NAME) || InventoryUtils.testForItemWithName(item, DELVE_SKIN_NAME)) &&
 		       (InventoryUtils.testForItemWithLore(item, "City of Shifting Waters") || InventoryUtils.testForItemWithLore(item, "Mythic Reliquary")) &&
-		       ItemUtils.getItemTier(item).equals(ItemTier.EPIC) &&
+		       ItemStatUtils.getTier(item).equals(Tier.EPIC) &&
 		       ItemUtils.isShulkerBox(item.getType());
 	}
 }

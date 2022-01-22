@@ -1,9 +1,7 @@
 package com.playmonumenta.plugins.guis;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
-
+import com.playmonumenta.plugins.guis.singlepageguis.ExampleSinglePageGUI;
+import com.playmonumenta.scriptedquests.utils.MessagingUtils;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -14,8 +12,9 @@ import org.bukkit.event.inventory.InventoryInteractEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-import com.playmonumenta.plugins.guis.singlepageguis.ExampleSinglePageGUI;
-import com.playmonumenta.scriptedquests.utils.MessagingUtils;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 
 public class SinglePageGUIManager implements Listener {
 

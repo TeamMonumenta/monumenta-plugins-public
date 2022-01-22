@@ -1,13 +1,15 @@
 package com.playmonumenta.plugins.custominventories;
 
-import java.util.ArrayList;
-import java.util.EnumSet;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
-
+import com.google.common.collect.Lists;
+import com.playmonumenta.plugins.commands.experiencinator.ExperiencinatorConfig;
+import com.playmonumenta.plugins.commands.experiencinator.ExperiencinatorConfig.Conversion;
+import com.playmonumenta.plugins.commands.experiencinator.ExperiencinatorSettings;
+import com.playmonumenta.plugins.commands.experiencinator.ExperiencinatorUtils;
+import com.playmonumenta.plugins.utils.GUIUtils;
+import com.playmonumenta.plugins.utils.ItemStatUtils.Region;
+import com.playmonumenta.plugins.utils.ItemStatUtils.Tier;
+import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.scriptedquests.utils.CustomInventory;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
@@ -17,14 +19,13 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.Plugin;
 
-import com.google.common.collect.Lists;
-import com.playmonumenta.plugins.commands.experiencinator.ExperiencinatorConfig;
-import com.playmonumenta.plugins.commands.experiencinator.ExperiencinatorConfig.Conversion;
-import com.playmonumenta.plugins.commands.experiencinator.ExperiencinatorSettings;
-import com.playmonumenta.plugins.commands.experiencinator.ExperiencinatorUtils;
-import com.playmonumenta.plugins.utils.GUIUtils;
-import com.playmonumenta.plugins.utils.ItemUtils;
-import com.playmonumenta.scriptedquests.utils.CustomInventory;
+import java.util.ArrayList;
+import java.util.EnumSet;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import static org.bukkit.ChatColor.AQUA;
 import static org.bukkit.ChatColor.BOLD;
@@ -63,12 +64,12 @@ public final class ExperiencinatorSettingsGui extends CustomInventory {
 	private final ExperiencinatorConfig.Experiencinator mExperiencinator;
 	private final ItemStack mExperiencinatorItem;
 	private final ExperiencinatorConfig mConfig;
-	private final LinkedHashMap<ItemUtils.ItemRegion, Set<ItemUtils.ItemTier>> mAvailableOptions; // LinkedHashMap to preserve iteration order
-	private final List<ItemUtils.ItemTier> mVisibleTiers;
+	private final LinkedHashMap<Region, Set<Tier>> mAvailableOptions; // LinkedHashMap to preserve iteration order
+	private final List<Tier> mVisibleTiers;
 	private final ExperiencinatorSettings mSettings;
 
 	private ExperiencinatorSettingsGui(Player owner, ExperiencinatorConfig.Experiencinator experiencinator, ItemStack experiencinatorItem, ExperiencinatorConfig config,
-	                                   LinkedHashMap<ItemUtils.ItemRegion, Set<ItemUtils.ItemTier>> availableOptions, List<ItemUtils.ItemTier> visibleTiers) {
+	                                   LinkedHashMap<Region, Set<Tier>> availableOptions, List<Tier> visibleTiers) {
 		super(owner, (3 + availableOptions.size()) * 9, experiencinator.getName() + " Settings");
 
 		mPlayer = owner;
@@ -91,29 +92,29 @@ public final class ExperiencinatorSettingsGui extends CustomInventory {
 		}
 
 		// calculate which options are visible
-		Set<ItemUtils.ItemTier> allUsedTiers = EnumSet.noneOf(ItemUtils.ItemTier.class);
-		LinkedHashMap<ItemUtils.ItemRegion, Set<ItemUtils.ItemTier>> availableTiers = new LinkedHashMap<>();
-		for (ItemUtils.ItemRegion itemRegion : config.getGuiConfig().getRegionOrder()) {
-			String conversionRateName = experiencinator.getConversionRates().get(itemRegion);
-			Set<ItemUtils.ItemTier> tiers = EnumSet.noneOf(ItemUtils.ItemTier.class);
+		Set<Tier> allUsedTiers = EnumSet.noneOf(Tier.class);
+		LinkedHashMap<Region, Set<Tier>> availableTiers = new LinkedHashMap<>();
+		for (Region region : config.getGuiConfig().getRegionOrder()) {
+			String conversionRateName = experiencinator.getConversionRates().get(region);
+			Set<Tier> tiers = EnumSet.noneOf(Tier.class);
 			for (Conversion conversion : config.getConversions()) {
-				ExperiencinatorConfig.ConversionRates conversionRates = conversion.getConversionRates(itemRegion);
+				ExperiencinatorConfig.ConversionRates conversionRates = conversion.getConversionRates(region);
 				if (conversionRates == null) {
 					continue;
 				}
-				Map<ItemUtils.ItemTier, Integer> tierRates = conversionRates.getRates(conversionRateName);
+				Map<Tier, Integer> tierRates = conversionRates.getRates(conversionRateName);
 				if (tierRates == null) {
 					continue;
 				}
-				for (ItemUtils.ItemTier itemTier : tierRates.keySet()) {
-					if (conversion.conversionAllowed(player, itemTier)) {
-						tiers.add(itemTier);
-						allUsedTiers.add(itemTier);
+				for (Tier tier : tierRates.keySet()) {
+					if (conversion.conversionAllowed(player, tier)) {
+						tiers.add(tier);
+						allUsedTiers.add(tier);
 					}
 				}
 			}
 			if (!tiers.isEmpty()) {
-				availableTiers.put(itemRegion, tiers);
+				availableTiers.put(region, tiers);
 				if (availableTiers.size() >= MAX_REGIONS) { // there's only so much space in this GUI
 					break;
 				}
@@ -122,7 +123,7 @@ public final class ExperiencinatorSettingsGui extends CustomInventory {
 		if (availableTiers.isEmpty()) {
 			return;
 		}
-		List<ItemUtils.ItemTier> visibleTiers = config.getGuiConfig().getTierOrder().stream()
+		List<Tier> visibleTiers = config.getGuiConfig().getTierOrder().stream()
 			.filter(allUsedTiers::contains)
 			.limit(MAX_TIERS)
 			.collect(Collectors.toList());
@@ -149,7 +150,7 @@ public final class ExperiencinatorSettingsGui extends CustomInventory {
 		}
 
 		// setup region icons + region options
-		for (Map.Entry<ItemUtils.ItemRegion, Set<ItemUtils.ItemTier>> entry : mAvailableOptions.entrySet()) {
+		for (Map.Entry<Region, Set<Tier>> entry : mAvailableOptions.entrySet()) {
 			setupRegionOptions(entry.getKey(), entry.getValue());
 		}
 
@@ -157,42 +158,42 @@ public final class ExperiencinatorSettingsGui extends CustomInventory {
 		GUIUtils.fillWithFiller(mInventory, Material.GRAY_STAINED_GLASS_PANE);
 	}
 
-	private void setupRegionOptions(ItemUtils.ItemRegion itemRegion, Set<ItemUtils.ItemTier> availableTiers) {
-		int offset = getRegionStartIndex(itemRegion);
+	private void setupRegionOptions(Region region, Set<Tier> availableTiers) {
+		int offset = getRegionStartIndex(region);
 
 		// region icon
-		mInventory.setItem(offset, mConfig.getGuiConfig().getRegionIcon(itemRegion));
+		mInventory.setItem(offset, mConfig.getGuiConfig().getRegionIcon(region));
 
 		// options
 		for (int i = 0; i < mVisibleTiers.size() && i < MAX_TIERS; i++) {
-			ItemUtils.ItemTier itemTier = mVisibleTiers.get(i);
-			if (!availableTiers.contains(itemTier)) {
+			Tier tier = mVisibleTiers.get(i);
+			if (!availableTiers.contains(tier)) {
 				continue;
 			}
-			int conversionId = mSettings.getConversion(itemRegion, itemTier);
+			int conversionId = mSettings.getConversion(region, tier);
 			if (conversionId == 0) {
 				ItemStack item = new ItemStack(Material.BARRIER, 1);
 				ItemMeta meta = item.getItemMeta();
 				meta.setDisplayName(GRAY + "Disabled");
 				meta.setLore(List.of(AQUA + "Will not convert ",
-				                     WHITE + itemRegion.getReadableString() + " : " + itemTier.getReadableString() + AQUA + " items."));
+				                     WHITE + "" + region.getDisplay() + tier.getDisplay() + AQUA + " items."));
 				item.setItemMeta(meta);
 				mInventory.setItem(offset + 1 + i, item);
 			} else {
-				Conversion conversion = mConfig.findConversion(conversionId, itemRegion);
+				Conversion conversion = mConfig.findConversion(conversionId, region);
 				if (conversion == null) {
 					continue;
 				}
-				List<ExperiencinatorConfig.ConversionResult> conversionResults = conversion.getConversionResults(itemRegion);
+				List<ExperiencinatorConfig.ConversionResult> conversionResults = conversion.getConversionResults(region);
 				if (conversionResults == null || conversionResults.isEmpty()) {
 					continue;
 				}
-				ExperiencinatorConfig.ConversionRates conversionRates = conversion.getConversionRates(itemRegion);
+				ExperiencinatorConfig.ConversionRates conversionRates = conversion.getConversionRates(region);
 				if (conversionRates == null) {
 					continue;
 				}
-				String conversionRateName = mExperiencinator.getConversionRates().get(itemRegion);
-				Integer rawAmount = conversionRates.getRate(conversionRateName, itemTier);
+				String conversionRateName = mExperiencinator.getConversionRates().get(region);
+				Integer rawAmount = conversionRates.getRate(conversionRateName, tier);
 				if (rawAmount == null) { // current Experiencinator does not support this option: display it with an unspecified amount
 					rawAmount = -1;
 				}
@@ -213,7 +214,7 @@ public final class ExperiencinatorSettingsGui extends CustomInventory {
 				ItemMeta meta = item.getItemMeta();
 				meta.setDisplayName(WHITE + "Convert to " + GOLD + conversion.getName());
 				List<String> lore = new ArrayList<>();
-				lore.add(AQUA + "Will convert " + WHITE + itemRegion.getReadableString() + " : " + itemTier.getReadableString());
+				lore.add(AQUA + "Will convert " + WHITE + region.getDisplay() + tier.getDisplay());
 				lore.add(AQUA + "items to " + GOLD + (rawAmount < 0 ? "" : item.getAmount() + " ") + (rawAmount > 0 && item.getAmount() == 1 ? conversionResult.getNameSingular() : conversionResult.getName()) + AQUA + ".");
 				if (rawAmount < 0) {
 					lore.add("" + GRAY + ITALIC + "This conversion is not available");
@@ -247,12 +248,12 @@ public final class ExperiencinatorSettingsGui extends CustomInventory {
 			return;
 		}
 
-		for (Map.Entry<ItemUtils.ItemRegion, Set<ItemUtils.ItemTier>> entry : mAvailableOptions.entrySet()) {
-			ItemUtils.ItemRegion itemRegion = entry.getKey();
-			int tierIndex = event.getSlot() - getRegionStartIndex(itemRegion) - 1;
+		for (Map.Entry<Region, Set<Tier>> entry : mAvailableOptions.entrySet()) {
+			Region region = entry.getKey();
+			int tierIndex = event.getSlot() - getRegionStartIndex(region) - 1;
 			if (tierIndex >= 0 && tierIndex < mVisibleTiers.size()) {
-				ItemUtils.ItemTier itemTier = mVisibleTiers.get(tierIndex);
-				cycleOption(itemRegion, itemTier, event.getClick() != ClickType.RIGHT);
+				Tier tier = mVisibleTiers.get(tierIndex);
+				cycleOption(region, tier, event.getClick() != ClickType.RIGHT);
 				setupInventory();
 				return;
 			}
@@ -260,8 +261,8 @@ public final class ExperiencinatorSettingsGui extends CustomInventory {
 
 	}
 
-	private int getRegionStartIndex(ItemUtils.ItemRegion itemRegion) {
-		int regionIndex = List.copyOf(mAvailableOptions.keySet()).indexOf(itemRegion);
+	private int getRegionStartIndex(Region region) {
+		int regionIndex = List.copyOf(mAvailableOptions.keySet()).indexOf(region);
 		// The first region starts at the third row (+18), and each region occupies 1 row (+9)
 		return 18 + regionIndex * 9
 			       // Regions are horizontally centered (as far as possible)
@@ -271,8 +272,8 @@ public final class ExperiencinatorSettingsGui extends CustomInventory {
 	/**
 	 * Cycles through currently valid conversion settings for a given item region and tier.
 	 */
-	private void cycleOption(ItemUtils.ItemRegion itemRegion, ItemUtils.ItemTier itemTier, boolean forwards) {
-		int currentConversion = mSettings.getConversion(itemRegion, itemTier);
+	private void cycleOption(Region region, Tier tier, boolean forwards) {
+		int currentConversion = mSettings.getConversion(region, tier);
 		List<Conversion> conversions = List.copyOf(mConfig.getConversions());
 		if (!forwards) {
 			conversions = Lists.reverse(conversions);
@@ -281,31 +282,31 @@ public final class ExperiencinatorSettingsGui extends CustomInventory {
 		// go through the list of conversions and find the first valid one after the currently active one
 		boolean currentFound = currentConversion == 0; // If currently disabled, switch to the first one
 		for (Conversion conversion : conversions) {
-			if (!isValidConversion(conversion, itemRegion, itemTier)) {
+			if (!isValidConversion(conversion, region, tier)) {
 				continue;
 			}
 			if (conversion.getSettingsId() == currentConversion) {
 				currentFound = true;
 			} else if (currentFound) {
-				mSettings.setConversion(itemRegion, itemTier, conversion.getSettingsId());
+				mSettings.setConversion(region, tier, conversion.getSettingsId());
 				return;
 			}
 		}
 
 		// If we're at the end of the list (current is last or was not found, e.g. because it is not currently valid), switch back to disabled
-		mSettings.setConversion(itemRegion, itemTier, 0);
+		mSettings.setConversion(region, tier, 0);
 	}
 
-	private boolean isValidConversion(Conversion conversion, ItemUtils.ItemRegion itemRegion, ItemUtils.ItemTier itemTier) {
-		if (!conversion.conversionAllowed(mPlayer, itemTier)) {
+	private boolean isValidConversion(Conversion conversion, Region region, Tier tier) {
+		if (!conversion.conversionAllowed(mPlayer, tier)) {
 			return false;
 		}
-		ExperiencinatorConfig.ConversionRates conversionRates = conversion.getConversionRates(itemRegion);
+		ExperiencinatorConfig.ConversionRates conversionRates = conversion.getConversionRates(region);
 		if (conversionRates == null) {
 			return false;
 		}
-		String conversionRateName = mExperiencinator.getConversionRates().get(itemRegion);
-		return conversionRates.getRate(conversionRateName, itemTier) != null;
+		String conversionRateName = mExperiencinator.getConversionRates().get(region);
+		return conversionRates.getRate(conversionRateName, tier) != null;
 	}
 
 }

@@ -1,7 +1,15 @@
 package com.playmonumenta.plugins.abilities.warlock;
 
-import java.util.EnumSet;
-
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.abilities.AbilityTrigger;
+import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.utils.DamageUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.PotionUtils;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -16,26 +24,9 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.abilities.AbilityTrigger;
-import com.playmonumenta.plugins.classes.ClassAbility;
-import com.playmonumenta.plugins.classes.magic.MagicType;
-import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
-import com.playmonumenta.plugins.enchantments.abilities.BaseAbilityEnchantment;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.FastUtils;
-import com.playmonumenta.plugins.utils.ItemUtils;
-import com.playmonumenta.plugins.utils.PotionUtils;
-
 
 
 public class CholericFlames extends Ability {
-	public static class CholericFlamesCooldownEnchantment extends BaseAbilityEnchantment {
-		public CholericFlamesCooldownEnchantment() {
-			super("Choleric Flames Cooldown", EnumSet.of(ItemSlot.ARMOR));
-		}
-	}
 
 	private static final int RADIUS = 8;
 	private static final int DAMAGE_1 = 3;
@@ -49,7 +40,7 @@ public class CholericFlames extends Ability {
 		super(plugin, player, "Choleric Flames");
 		mInfo.mScoreboardId = "CholericFlames";
 		mInfo.mShorthandName = "CF";
-		mInfo.mDescriptions.add("Sneaking and right-clicking while not looking down while holding a scythe knocks back and ignites mobs within 8 blocks of you for 7s, additionally dealing 3 damage. Cooldown: 10s.");
+		mInfo.mDescriptions.add("Sneaking and right-clicking while not looking down while holding a scythe knocks back and ignites mobs within 8 blocks of you for 7s, additionally dealing 3 magic damage. Cooldown: 10s.");
 		mInfo.mDescriptions.add("The damage is increased to 5, and also afflict mobs with Hunger I.");
 		mInfo.mLinkedSpell = ClassAbility.CHOLERIC_FLAMES;
 		mInfo.mCooldown = COOLDOWN;
@@ -94,7 +85,7 @@ public class CholericFlames extends Ability {
 		world.playSound(loc, Sound.ENTITY_BLAZE_SHOOT, 1.0f, 0.35f);
 
 		for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), RADIUS, mPlayer)) {
-			EntityUtils.damageEntity(mPlugin, mob, mDamage, mPlayer, MagicType.DARK_MAGIC, true, mInfo.mLinkedSpell);
+			DamageUtils.damage(mPlayer, mob, DamageType.MAGIC, mDamage, mInfo.mLinkedSpell);
 			EntityUtils.applyFire(mPlugin, DURATION, mob, mPlayer);
 
 			if (getAbilityScore() > 1) {
@@ -109,10 +100,5 @@ public class CholericFlames extends Ability {
 	public boolean runCheck() {
 		return mPlayer.isSneaking() && ItemUtils.isHoe(mPlayer.getInventory().getItemInMainHand())
 		       && mPlayer.getLocation().getPitch() < 50;
-	}
-
-	@Override
-	public Class<? extends BaseAbilityEnchantment> getCooldownEnchantment() {
-		return CholericFlamesCooldownEnchantment.class;
 	}
 }

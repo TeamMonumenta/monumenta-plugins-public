@@ -1,16 +1,16 @@
 package com.playmonumenta.plugins.listeners;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
-import java.util.function.BiPredicate;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
-
-import org.bukkit.ChatColor;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Multimap;
+import com.playmonumenta.plugins.utils.InfusionUtils;
+import com.playmonumenta.plugins.utils.ItemStatUtils;
+import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
+import com.playmonumenta.plugins.utils.ItemStatUtils.InfusionType;
+import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.scriptedquests.trades.TradeWindowOpenEvent;
+import de.tr7zw.nbtapi.NBTCompound;
+import de.tr7zw.nbtapi.NBTCompoundList;
+import de.tr7zw.nbtapi.NBTItem;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.block.ShulkerBox;
@@ -25,15 +25,12 @@ import org.bukkit.inventory.meta.CrossbowMeta;
 import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Multimap;
-import com.playmonumenta.plugins.attributes.AttributeManager;
-import com.playmonumenta.plugins.enchantments.CustomEnchantment;
-import com.playmonumenta.plugins.enchantments.Locked;
-import com.playmonumenta.plugins.enchantments.StatTrack;
-import com.playmonumenta.plugins.utils.InfusionUtils;
-import com.playmonumenta.plugins.utils.ItemUtils;
-import com.playmonumenta.scriptedquests.trades.TradeWindowOpenEvent;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Objects;
+import java.util.Set;
+import java.util.function.BiPredicate;
 
 /**
  * Listens to ScriptedQuest's TradeWindowOpenEvent to dynamically change shown trades.
@@ -50,6 +47,7 @@ public class TradeListener implements Listener {
 	private static final ImmutableSet<String> DISABLED_ITEMS = ImmutableSet.of("Soulsinger");
 
 	// These lore lines are not considered for lore equality, and will also not be copied over to the final item
+	// TODO to tags
 	private static final ImmutableSet<String> IGNORED_LORE = ImmutableSet.of("Prismarine Enabled", "Prismarine Disabled", "Blackstone Enabled", "Blackstone Disabled");
 
 	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
@@ -79,20 +77,14 @@ public class TradeListener implements Listener {
 					continue;
 				}
 				if (DISABLED_ITEMS.contains(ItemUtils.getPlainNameIfExists(source))
-					|| DISABLED_ITEMS.contains(ItemUtils.getPlainNameIfExists(result))) {
+					    || DISABLED_ITEMS.contains(ItemUtils.getPlainNameIfExists(result))) {
 					continue;
 				}
-				// note: we use getLore() in this class instead of lore() to get a unique representation of the lore which is important for equals and subset checks among others
-				List<String> sourceLore = source.getLore();
-				List<String> resultLore = result.getLore();
-				if (sourceLore == null || resultLore == null) {
-					continue;
-				}
-				if (ItemUtils.getItemRegion(source) == ItemUtils.ItemRegion.UNKNOWN
-					|| ItemUtils.getItemRegion(source) != ItemUtils.getItemRegion(result)
-					|| InfusionUtils.getCostMultiplier(source) <= 0
-					|| InfusionUtils.getCostMultiplier(source) != InfusionUtils.getCostMultiplier(result)
-					|| !haveSameStats(source, result)) {
+				if (ItemStatUtils.getRegion(source) == ItemStatUtils.Region.NONE
+					    || ItemStatUtils.getRegion(source) != ItemStatUtils.getRegion(result)
+					    || InfusionUtils.getCostMultiplier(source) <= 0
+					    || InfusionUtils.getCostMultiplier(source) != InfusionUtils.getCostMultiplier(result)
+					    || !haveSameStats(source, result)) {
 					continue;
 				}
 
@@ -104,65 +96,38 @@ public class TradeListener implements Listener {
 				for (ItemStack playerItem : player.getInventory().getContents()) {
 					// Skip over empty slots, and skip over items that already match an existing trade exactly
 					if (playerItem == null
-							|| playerItem.isSimilar(source)
-							|| createdTrades.stream().anyMatch(t -> t.isSimilar(playerItem))) {
+						    || playerItem.isSimilar(source)
+						    || createdTrades.stream().anyMatch(t -> t.isSimilar(playerItem))) {
 						continue;
 					}
-					List<String> playerItemLore = playerItem.getLore();
 					// Check that the playerItem has the same base item as the trade's source:
 					// - same type (and for shulker boxes, ignore color)
-					// - same name
-					// - same vanilla enchantments
-					// - a superset of lore lines, i.e. all base item lore lines plus optionally some more.
-					//   This automatically includes a custom enchantments + attributes check
-					//   (ignoring order, but this should not be an issue as the type + name check make stat checks superfluous)
-					// The enchantment and lore checks are just a failsafe, as type + name should be enough to specify a tiered item in general.
-					if (playerItemLore == null
-							|| !(source.getType() == playerItem.getType() || ItemUtils.isShulkerBox(source.getType()) && ItemUtils.isShulkerBox(playerItem.getType()))
-							|| !Objects.equals(source.getItemMeta().displayName(), playerItem.getItemMeta().displayName())
-							|| !Objects.equals(source.getEnchantments(), playerItem.getEnchantments())
-							|| !removeIgnoredLoreLines(playerItemLore).containsAll(removeIgnoredLoreLines(sourceLore))) {
+					// - same plain name (or both have no plain name)
+					if (!(source.getType() == playerItem.getType() || ItemUtils.isShulkerBox(source.getType()) && ItemUtils.isShulkerBox(playerItem.getType()))
+						    || !Objects.equals(ItemUtils.getPlainNameIfExists(source), ItemUtils.getPlainNameIfExists(playerItem))) {
 						continue;
 					}
 
 					// Shulkers with contents are janky - the trades work, but the trades without contents work on them as well, clearing any content.
 					// Thus we don't allow trades with non-empty Shulkers
 					if (playerItem.getItemMeta() instanceof BlockStateMeta
-						&& ((BlockStateMeta) playerItem.getItemMeta()).getBlockState() instanceof ShulkerBox
-						&& !((ShulkerBox) ((BlockStateMeta) playerItem.getItemMeta()).getBlockState()).getInventory().isEmpty()) {
+						    && ((BlockStateMeta) playerItem.getItemMeta()).getBlockState() instanceof ShulkerBox
+						    && !((ShulkerBox) ((BlockStateMeta) playerItem.getItemMeta()).getBlockState()).getInventory().isEmpty()) {
 						continue;
 					}
 
 					// We cannot use the default ItemStack.clone() here as that doesn't clone NBT properly, causing some edits of the clone to also change the original item (at least for Shulkers' plain lore)
 					ItemStack newResult = ItemUtils.clone(result);
 
-					// Modify the result item to carry over extra lore (infusions etc.)
-					// Positions are chosen the same way ItemUtils.enchantifyItem does it - infusions after normal enchantments, and anything else before the end or first empty line.
-					int enchantsPos = resultLore.size();
-					int othersPos = resultLore.size();
-					for (int j = 0; j < resultLore.size(); j++) {
-						String loreStripped = ChatColor.stripColor(resultLore.get(j)).trim();
-						if (enchantsPos == resultLore.size()
-							&& (loreStripped.contains("King's Valley :") ||
-							loreStripped.contains("Celsian Isles :") ||
-							loreStripped.contains("Monumenta :") ||
-							loreStripped.contains("Armor") ||
-							loreStripped.contains("Magic Wand") ||
-							loreStripped.contains("Alchemical Utensil"))) {
-							enchantsPos = j;
-						} else if (loreStripped.isEmpty()) {
-							if (enchantsPos == resultLore.size()) {
-								enchantsPos = j;
-							}
-							othersPos = j;
-							break;
-						}
-					}
-					List<String> extraLore = new ArrayList<>(playerItemLore);
-					extraLore.removeAll(sourceLore);
-					extraLore = removeIgnoredLoreLines(extraLore);
-					// Kaul reskins add Hope (and unskinning removes it), so need to handle these specially to prevent double hope or removing hope
-					if (CustomEnchantment.HOPE.getEnchantment().getItemLevel(source) == 0
+					// Modify the result item to carry over player modifications (infusions etc.)
+					NBTItem playerItemNbt = new NBTItem(playerItem);
+					NBTItem newResultNbt = new NBTItem(newResult);
+					ItemStatUtils.addPlayerModified(newResultNbt).mergeCompound(ItemStatUtils.getPlayerModified(playerItemNbt));
+					newResult = newResultNbt.getItem();
+
+					// Kaul skins can add or remove Hope, so need to handle this specially to prevent incorrectly doubling/removing/retaining Hope
+					// TODO may need to be changed for item rework
+					/*if (CustomEnchantment.HOPE.getEnchantment().getItemLevel(source) == 0
 						&& CustomEnchantment.HOPE.getEnchantment().getItemLevel(result) > 0
 						&& CustomEnchantment.HOPE.getEnchantment().getItemLevel(playerItem) > 0) {
 						// reskin adds Hope and player item already has hope: remove the extra Hope line
@@ -172,33 +137,20 @@ public class TradeListener implements Listener {
 						&& extraLore.stream().anyMatch(s -> ChatColor.stripColor(s).startsWith("Infused by "))) {
 						// reskin removes Hope and player item is manually hoped: add the missing Hope line
 						extraLore.add(0, CustomEnchantment.HOPE.getEnchantment().getProperty());
-					}
-					List<String> newLore = new ArrayList<>(resultLore);
-					for (String extra : extraLore) {
-						int pos = isCustomEnchantmentLoreLine(extra) ? enchantsPos : othersPos;
-						newLore.add(pos, extra);
-						if (pos <= enchantsPos) {
-							enchantsPos++;
-						}
-						if (pos <= othersPos) {
-							othersPos++;
-						}
-					}
-					newResult.setLore(newLore);
-					ItemUtils.setPlainLore(newResult);
+					}*/
+
+					ItemStatUtils.generateItemStats(newResult);
 
 					// Carry over the durability to not make the trade repair items (a possible shattered state is copied via lore)
-					if (newResult.getItemMeta() instanceof Damageable && playerItem.getItemMeta() instanceof Damageable) {
-						Damageable newResultMeta = (Damageable) newResult.getItemMeta();
-						newResultMeta.setDamage(((Damageable) playerItem.getItemMeta()).getDamage());
+					if (newResult.getItemMeta() instanceof Damageable newResultMeta && playerItem.getItemMeta() instanceof Damageable playerItemMeta) {
+						newResultMeta.setDamage(playerItemMeta.getDamage());
 						newResult.setItemMeta((ItemMeta) newResultMeta);
 					}
 
 					// Carry over the current arrow of a crossbow if the player item has an arrow but the result item doesn't have one
-					if (newResult.getItemMeta() instanceof CrossbowMeta && playerItem.getItemMeta() instanceof CrossbowMeta
-						&& !((CrossbowMeta) newResult.getItemMeta()).hasChargedProjectiles() && ((CrossbowMeta) playerItem.getItemMeta()).hasChargedProjectiles()) {
-						CrossbowMeta newResultMeta = (CrossbowMeta) newResult.getItemMeta();
-						newResultMeta.setChargedProjectiles(((CrossbowMeta) playerItem.getItemMeta()).getChargedProjectiles());
+					if (newResult.getItemMeta() instanceof CrossbowMeta newResultMeta && playerItem.getItemMeta() instanceof CrossbowMeta playerItemMeta
+						    && !newResultMeta.hasChargedProjectiles() && playerItemMeta.hasChargedProjectiles()) {
+						newResultMeta.setChargedProjectiles(playerItemMeta.getChargedProjectiles());
 						newResult.setItemMeta(newResultMeta);
 					}
 
@@ -227,6 +179,9 @@ public class TradeListener implements Listener {
 	 * Checks if two items have the same stats (enchantments, attributes) as far as is relevant for re-skin trades
 	 */
 	private static boolean haveSameStats(ItemStack i1, ItemStack i2) {
+		NBTItem nbt1 = new NBTItem(i1);
+		NBTItem nbt2 = new NBTItem(i2);
+
 		// trades with ignored stat checks
 		for (Set<String> enabledtrade : SKIP_STAT_CHECK_TRADES) {
 			if (enabledtrade.contains(ItemUtils.getPlainNameIfExists(i1)) && enabledtrade.contains(ItemUtils.getPlainNameIfExists(i2))) {
@@ -239,23 +194,25 @@ public class TradeListener implements Listener {
 			return false;
 		}
 
+
 		// custom enchantments
-		for (CustomEnchantment ench : CustomEnchantment.values()) {
-			// Hope and Hopeless are treated as equivalent for re-skin purposes. They are skipped here and checked below.
-			// Divine Aura is a bonus enchantment for Kaul reskins
-			if (ench == CustomEnchantment.HOPE || ench == CustomEnchantment.HOPELESS
-				|| ench == CustomEnchantment.DIVINE_AURA) {
+		// cannot compare NBT directly due to Divine Aura
+		NBTCompound enchantments1 = ItemStatUtils.getEnchantments(nbt1);
+		NBTCompound enchantments2 = ItemStatUtils.getEnchantments(nbt2);
+		for (EnchantmentType ench : EnchantmentType.values()) {
+			// Divine Aura is a bonus enchantment for Kaul reskins, si ignore it
+			if (ench == EnchantmentType.DIVINE_AURA) {
 				continue;
 			}
-			if (ench.getEnchantment().getItemLevel(i1) != ench.getEnchantment().getItemLevel(i2)) {
+			if (ItemStatUtils.getEnchantmentLevel(enchantments1, ench) != ItemStatUtils.getEnchantmentLevel(enchantments2, ench)) {
 				return false;
 			}
 		}
-		// Check Hope/Hopeless
+		// Check Hope
 		// If either item has Divine Aura, skip the Hope check completely, as Hope is added as a bonus during such trades
-		if (CustomEnchantment.DIVINE_AURA.getEnchantment().getItemLevel(i1) == 0 && CustomEnchantment.DIVINE_AURA.getEnchantment().getItemLevel(i2) == 0
-			&& CustomEnchantment.HOPE.getEnchantment().getItemLevel(i1) + CustomEnchantment.HOPELESS.getEnchantment().getItemLevel(i1)
-			!= CustomEnchantment.HOPE.getEnchantment().getItemLevel(i2) + CustomEnchantment.HOPELESS.getEnchantment().getItemLevel(i2)) {
+		if (ItemStatUtils.getEnchantmentLevel(enchantments1, EnchantmentType.DIVINE_AURA) == 0
+			    && ItemStatUtils.getEnchantmentLevel(enchantments2, EnchantmentType.DIVINE_AURA) == 0
+			    && ItemStatUtils.getInfusionLevel(enchantments1, InfusionType.HOPE) != ItemStatUtils.getInfusionLevel(enchantments2, InfusionType.HOPE)) {
 			return false;
 		}
 
@@ -265,8 +222,8 @@ public class TradeListener implements Listener {
 		if (vanillaMods1 != null && vanillaMods2 != null) {
 			for (Attribute attr : Attribute.values()) {
 				// We need to filter out modifiers that have no effect - these sometimes exist and mess up the comparison
-				Collection<AttributeModifier> mods1 = vanillaMods1.get(attr).stream().filter(mod -> mod.getAmount() != 0).collect(Collectors.toList());
-				Collection<AttributeModifier> mods2 = vanillaMods2.get(attr).stream().filter(mod -> mod.getAmount() != 0).collect(Collectors.toList());
+				Collection<AttributeModifier> mods1 = vanillaMods1.get(attr).stream().filter(mod -> mod.getAmount() != 0).toList();
+				Collection<AttributeModifier> mods2 = vanillaMods2.get(attr).stream().filter(mod -> mod.getAmount() != 0).toList();
 				// to check equality with a custom predicate, check that mods1 and mods2 have the same size,
 				// and that every modifier in mods1 is present in mods2 and vice versa
 				if (mods1.size() != mods2.size()) {
@@ -274,7 +231,7 @@ public class TradeListener implements Listener {
 				}
 				BiPredicate<AttributeModifier, AttributeModifier> modsMatch = (mod1, mod2) -> mod1.getSlot() == mod2.getSlot() && mod1.getOperation() == mod2.getOperation() && mod1.getAmount() == mod2.getAmount();
 				if (mods1.stream().anyMatch(mod1 -> mods2.stream().noneMatch(mod2 -> modsMatch.test(mod1, mod2)))
-					|| mods2.stream().anyMatch(mod2 -> mods1.stream().noneMatch(mod1 -> modsMatch.test(mod1, mod2)))) {
+					    || mods2.stream().anyMatch(mod2 -> mods1.stream().noneMatch(mod1 -> modsMatch.test(mod1, mod2)))) {
 					return false;
 				}
 			}
@@ -282,54 +239,16 @@ public class TradeListener implements Listener {
 			return false;
 		}
 
-		// custom attributes
-		// directly compared via lore lines, so the attributes must be in exactly the same order for this to work (and they really should be)
-		Predicate<String> isLoreAttribLine = lore ->
-			Arrays.stream(com.playmonumenta.plugins.itemindex.Attribute.values()).anyMatch(attr -> attr.isCustom() && lore.startsWith(attr.getReadableStringFormat()))
-				|| Arrays.stream(AttributeManager.ATTRIBUTE_INDICATORS).skip(1).anyMatch(indicator -> lore.equals(ChatColor.stripColor(indicator)));
-		List<String> loreAttribs1 = i1.getLore() != null ? i1.getLore().stream().map(l -> ChatColor.stripColor(l).trim()).filter(isLoreAttribLine).collect(Collectors.toList()) : null;
-		List<String> loreAttribs2 = i1.getLore() != null ? i2.getLore().stream().map(l -> ChatColor.stripColor(l).trim()).filter(isLoreAttribLine).collect(Collectors.toList()) : null;
-		if (!Objects.equals(loreAttribs1, loreAttribs2)) {
+		// custom attributes - compare NBT directly, ignoring order
+		NBTCompoundList attrs1 = ItemStatUtils.getAttributes(nbt1);
+		NBTCompoundList attrs2 = ItemStatUtils.getAttributes(nbt2);
+		if ((attrs1 == null) != (attrs2 == null)
+			    || attrs1 != null && attrs2 != null && !Set.copyOf(attrs1).equals(Set.copyOf(attrs2))) {
 			return false;
 		}
 
 		// if we get here, the items have the same stats
 		return true;
-	}
-
-	private static List<String> removeIgnoredLoreLines(List<String> lore) {
-		List<String> reducedLore = new ArrayList<>(lore);
-		reducedLore.removeIf(c -> IGNORED_LORE.contains(ChatColor.stripColor(c)));
-		return reducedLore;
-	}
-
-	private static boolean isCustomEnchantmentLoreLine(String lore) {
-		String plainLore = ChatColor.stripColor(lore);
-
-		for (CustomEnchantment ench : CustomEnchantment.values()) {
-			// "Fake" enchantments for Celsian Isles items. These match "Celsian Isles : " so would consider the region tag an enchantment
-			if (ench == CustomEnchantment.REGION_SCALING_DAMAGE_DEALT || ench == CustomEnchantment.REGION_SCALING_DAMAGE_TAKEN) {
-				continue;
-			}
-			String name = ChatColor.stripColor(ench.getEnchantment().getProperty());
-			if (plainLore.startsWith(name)
-				&& !plainLore.startsWith(name + " by")) { // "Gilded by", and maybe future ones
-				return true;
-			}
-		}
-
-		// Locked is not in the CustomEnchantment enum, so an extra check is needed
-		if (plainLore.startsWith(ChatColor.stripColor(Locked.PROPERTY_NAME))) {
-			return true;
-		}
-
-		for (StatTrack.StatTrackOptions ench : StatTrack.StatTrackOptions.values()) {
-			if (plainLore.startsWith(ench.getEnchantName())) {
-				return true;
-			}
-		}
-
-		return false;
 	}
 
 }

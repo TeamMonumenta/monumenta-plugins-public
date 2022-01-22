@@ -1,10 +1,21 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
+import com.playmonumenta.plugins.bosses.BossBarManager;
+import com.playmonumenta.plugins.bosses.BossBarManager.BossHealthAction;
+import com.playmonumenta.plugins.bosses.SpellManager;
+import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.bosses.spells.SpellBaseLaser;
+import com.playmonumenta.plugins.bosses.spells.SpellBlockBreak;
+import com.playmonumenta.plugins.bosses.spells.SpellConditionalTeleport;
+import com.playmonumenta.plugins.bosses.spells.SpellGenericCharge;
+import com.playmonumenta.plugins.bosses.spells.SpellShieldStun;
+import com.playmonumenta.plugins.bosses.spells.SpellTpSwapPlaces;
+import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.utils.SerializationUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -14,28 +25,15 @@ import org.bukkit.attribute.Attribute;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
 import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
-import com.playmonumenta.plugins.bosses.BossBarManager;
-import com.playmonumenta.plugins.bosses.BossBarManager.BossHealthAction;
-import com.playmonumenta.plugins.bosses.SpellManager;
-import com.playmonumenta.plugins.bosses.spells.Spell;
-import com.playmonumenta.plugins.bosses.spells.SpellBaseLaser;
-import com.playmonumenta.plugins.bosses.spells.SpellBlockBreak;
-import com.playmonumenta.plugins.bosses.spells.SpellConditionalTeleport;
-import com.playmonumenta.plugins.bosses.spells.SpellGenericCharge;
-import com.playmonumenta.plugins.bosses.spells.SpellTpSwapPlaces;
-import com.playmonumenta.plugins.utils.BossUtils;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.NmsUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.plugins.utils.SerializationUtils;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public final class Varcosa extends BossAbilityGroup {
 	public static final String identityTag = "boss_varcosa";
@@ -90,7 +88,7 @@ public final class Varcosa extends BossAbilityGroup {
 						loc.getWorld().spawnParticle(Particle.FIREWORKS_SPARK, loc, 300, 0.8, 0.8, 0.8, 0);
 
 						if (!blocked) {
-							BossUtils.bossDamage(boss, player, 30);
+							BossUtils.blockableDamage(boss, player, DamageType.MAGIC, 30);
 							// Shields don't stop fire!
 							player.setFireTicks(4 * 20);
 						}
@@ -98,6 +96,7 @@ public final class Varcosa extends BossAbilityGroup {
 
 		List<Spell> passiveSpells = Arrays.asList(
 			new SpellBlockBreak(boss),
+			new SpellShieldStun(6 * 20),
 			// Teleport the boss to spawnLoc if he is stuck in bedrock
 			new SpellConditionalTeleport(boss, spawnLoc, b -> b.getLocation().getBlock().getType() == Material.BEDROCK ||
 			                                                   b.getLocation().add(0, 1, 0).getBlock().getType() == Material.BEDROCK ||
@@ -123,18 +122,8 @@ public final class Varcosa extends BossAbilityGroup {
 	}
 
 	@Override
-	public void bossDamagedEntity(EntityDamageByEntityEvent event) {
-		if (event.getEntity() instanceof Player && event.getCause().equals(DamageCause.ENTITY_ATTACK)) {
-			Player player = (Player) event.getEntity();
-			if (player.isBlocking()) {
-				NmsUtils.stunShield(player, 20 * 6);
-			}
-		}
-	}
-
-	@Override
 	public void init() {
-		int bossTargetHp = 1500;
+		int bossTargetHp = 1650;
 		EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_MAX_HEALTH, bossTargetHp);
 		mBoss.setHealth(bossTargetHp);
 
@@ -154,7 +143,7 @@ public final class Varcosa extends BossAbilityGroup {
 
 	//Reduce damage taken for each player by a percent
 	@Override
-	public void bossDamagedByEntity(EntityDamageByEntityEvent event) {
+	public void onHurt(DamageEvent event) {
 		double damage = event.getDamage();
 		switch (BossUtils.getPlayersInRangeForHealthScaling(mBoss, detectionRange)) {
 			case 2:

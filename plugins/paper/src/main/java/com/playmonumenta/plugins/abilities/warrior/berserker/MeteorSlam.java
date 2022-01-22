@@ -8,8 +8,6 @@ import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
@@ -21,8 +19,10 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.classes.ClassAbility;
-import com.playmonumenta.plugins.classes.magic.MagicType;
+import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
+import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.MetadataUtils;
@@ -35,10 +35,10 @@ public final class MeteorSlam extends Ability {
 	public static final ClassAbility ABILITY = ClassAbility.METEOR_SLAM;
 	private static final String SLAM_ONCE_THIS_TICK_METAKEY = "MeteorSlamTickSlammed";
 
-	public static final int DAMAGE_1 = 3;
-	public static final int DAMAGE_2 = 4;
-	public static final int REDUCED_DAMAGE_1 = 2;
-	public static final double REDUCED_DAMAGE_2 = 2.5;
+	public static final int DAMAGE_1 = 2;
+	public static final int DAMAGE_2 = 3;
+	public static final double REDUCED_DAMAGE_1 = 1.5;
+	public static final double REDUCED_DAMAGE_2 = 2;
 	public static final int SIZE_1 = 2;
 	public static final int SIZE_2 = 3;
 	public static final int JUMP_AMPLIFIER_1 = 3;
@@ -71,7 +71,7 @@ public final class MeteorSlam extends Ability {
 		mInfo.mShorthandName = "MS";
 		mInfo.mDescriptions.add(
 				String.format(
-						"Pressing the swap key grants you Jump Boost %s for %ss instead of doing its vanilla function. Cooldown: %ss. | Falling more than %s blocks passively generates a slam when you land, dealing %s physical damage to all enemies in a %s-block cube around you per block fallen for the first %s blocks, and %s damage per block thereafter. Falling more than %s blocks and attacking an enemy also passively generates a slam at that enemy, and resets your blocks fallen and fall damage.",
+						"Pressing the swap key grants you Jump Boost %s for %ss instead of doing its vanilla function. Cooldown: %ss. Falling more than %s blocks passively generates a slam when you land, dealing %s melee damage to all enemies in a %s-block cube around you per block fallen for the first %s blocks, and %s damage per block thereafter. Falling more than %s blocks and attacking an enemy also passively generates a slam at that enemy, and resets your blocks fallen and fall damage.",
 						JUMP_LEVEL_1,
 						DURATION_SECONDS,
 						COOLDOWN_SECONDS_1,
@@ -85,7 +85,7 @@ public final class MeteorSlam extends Ability {
 		);
 		mInfo.mDescriptions.add(
 			String.format(
-				"Jump Boost level is increased from %s to %s. Cooldown is reduced from %ss to %ss. | Damage is increased from %s to %s per block fallen for the first %s blocks, and from %s to %s per block thereafter. Damage size is increased from %s to %s blocks.",
+				"Jump Boost level is increased from %s to %s. Cooldown is reduced from %ss to %ss. Damage is increased from %s to %s per block fallen for the first %s blocks, and from %s to %s per block thereafter. Damage size is increased from %s to %s blocks.",
 				JUMP_LEVEL_1,
 				JUMP_LEVEL_2,
 				COOLDOWN_SECONDS_1,
@@ -155,17 +155,13 @@ public final class MeteorSlam extends Ability {
 	}
 
 	@Override
-	public boolean livingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
-		if (mPlayer != null
-				&& event.getCause() == DamageCause.ENTITY_ATTACK
-				&& calculateFallDistance() > MANUAL_THRESHOLD
-				&& MetadataUtils.checkOnceThisTick(mPlugin, mPlayer, SLAM_ONCE_THIS_TICK_METAKEY)) {
-			doSlamAttack(event.getEntity().getLocation().add(0, 0.15, 0));
+	public void onDamage(DamageEvent event, LivingEntity enemy) {
+		if (mPlayer != null && event.getType() == DamageType.MELEE && calculateFallDistance() > MANUAL_THRESHOLD && MetadataUtils.checkOnceThisTick(mPlugin, mPlayer, SLAM_ONCE_THIS_TICK_METAKEY)) {
+			doSlamAttack(enemy.getLocation().add(0, 0.15, 0));
 			mFallFromY = -7050;
 			// Also reset fall damage, mFallFromY can continue updating from there
 			mPlayer.setFallDistance(0);
 		}
-		return true;
 	}
 
 	@Override
@@ -230,7 +226,7 @@ public final class MeteorSlam extends Ability {
 		double slamDamage = Math.min(REDUCED_THRESHOLD, fallDistance) * mLevelDamage + Math.max(0, (fallDistance - REDUCED_THRESHOLD)) * mLevelReducedDamage;
 
 		for (LivingEntity enemy : EntityUtils.getNearbyMobs(location, mLevelSize)) {
-			EntityUtils.damageEntity(mPlugin, enemy, slamDamage, mPlayer, MagicType.PHYSICAL, true, mInfo.mLinkedSpell);
+			DamageUtils.damage(mPlayer, enemy, DamageType.MELEE_SKILL, slamDamage, mInfo.mLinkedSpell);
 		}
 
 		World world = mPlayer.getWorld();

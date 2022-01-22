@@ -1,21 +1,5 @@
 package com.playmonumenta.plugins.depths.abilities.shadow;
 
-import java.util.EnumSet;
-import java.util.List;
-
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
-import org.bukkit.World;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
-import org.bukkit.event.block.Action;
-import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
-import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
-import org.bukkit.util.Vector;
-import org.checkerframework.checker.nullness.qual.Nullable;
-
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
@@ -26,19 +10,33 @@ import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
 import com.playmonumenta.plugins.effects.EffectManager;
 import com.playmonumenta.plugins.effects.FlatDamageDealt;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.point.Raycast;
 import com.playmonumenta.plugins.point.RaycastData;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
-
 import net.md_5.bungee.api.ChatColor;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
+import org.bukkit.World;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
+import org.bukkit.event.block.Action;
+import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
+import org.bukkit.util.Vector;
+import org.checkerframework.checker.nullness.qual.Nullable;
+
+import java.util.EnumSet;
+import java.util.List;
 
 public class DepthsAdvancingShadows extends DepthsAbility {
 
 	public static final String ABILITY_NAME = "Advancing Shadows";
-	public static final int[] DAMAGE = {5, 7, 9, 11, 13, 17};
+	public static final int[] DAMAGE = {5, 6, 7, 8, 9, 11};
 
 	private static final int ADVANCING_SHADOWS_RANGE = 12;
 	private static final float ADVANCING_SHADOWS_AOE_KNOCKBACKS_SPEED = 0.5f;
@@ -136,14 +134,14 @@ public class DepthsAdvancingShadows extends DepthsAbility {
 			}
 			playerLoc = mPlayer.getLocation();
 
-			EffectManager.getInstance().addEffect(mPlayer, ABILITY_NAME, new FlatDamageDealt(DAMAGE_DURATION, DAMAGE[mRarity - 1], EnumSet.of(DamageCause.ENTITY_ATTACK)));
+			EffectManager.getInstance().addEffect(mPlayer, ABILITY_NAME, new FlatDamageDealt(DAMAGE_DURATION, DAMAGE[mRarity - 1], EnumSet.of(DamageType.MELEE)));
 			float range = ADVANCING_SHADOWS_AOE_KNOCKBACKS_RANGE;
 			float speed = ADVANCING_SHADOWS_AOE_KNOCKBACKS_SPEED;
 			if (advancingShadows > 1) {
 				for (LivingEntity mob : EntityUtils.getNearbyMobs(entity.getLocation(),
 				                                                  range, mPlayer)) {
 					if (mob != entity) {
-						MovementUtils.knockAway(entity, mob, speed);
+						MovementUtils.knockAway(entity, mob, speed, true);
 					}
 				}
 			}

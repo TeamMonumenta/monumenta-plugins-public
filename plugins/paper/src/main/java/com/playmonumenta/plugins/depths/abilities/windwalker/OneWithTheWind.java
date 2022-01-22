@@ -1,8 +1,5 @@
 package com.playmonumenta.plugins.depths.abilities.windwalker;
 
-import org.bukkit.Material;
-import org.bukkit.entity.Player;
-
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.depths.DepthsUtils;
@@ -11,8 +8,9 @@ import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
 import com.playmonumenta.plugins.effects.PercentDamageReceived;
 import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.utils.PlayerUtils;
-
 import net.md_5.bungee.api.ChatColor;
+import org.bukkit.Material;
+import org.bukkit.entity.Player;
 
 public class OneWithTheWind extends DepthsAbility {
 

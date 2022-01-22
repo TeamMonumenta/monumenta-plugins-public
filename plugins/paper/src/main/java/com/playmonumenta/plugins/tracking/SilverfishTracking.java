@@ -1,15 +1,14 @@
 package com.playmonumenta.plugins.tracking;
 
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
-
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.Silverfish;
-
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.Silverfish;
+
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
 
 public class SilverfishTracking implements EntityTracking {
 	private Set<Silverfish> mEntities = new HashSet<Silverfish>();

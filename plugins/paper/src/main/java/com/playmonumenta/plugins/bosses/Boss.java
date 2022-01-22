@@ -6,9 +6,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.entity.AreaEffectCloudApplyEvent;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityPotionEffectEvent;
 import org.bukkit.event.entity.EntityTargetEvent;
@@ -25,6 +25,7 @@ import com.playmonumenta.plugins.bosses.bosses.BossAbilityGroup;
 import com.playmonumenta.plugins.bosses.events.SpellCastEvent;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.events.CustomEffectApplyEvent;
+import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.utils.EntityUtils;
 
 public class Boss {
@@ -42,40 +43,88 @@ public class Boss {
 		mAbilities.add(ability);
 	}
 
-	public void bossDamagedByEntity(EntityDamageByEntityEvent event) {
+	public void onHurt(DamageEvent event) {
 		for (BossAbilityGroup ability : mAbilities) {
 			if (!event.isCancelled()) {
-				ability.bossDamagedByEntity(event);
+				ability.onHurt(event);
 
-				if (ability.getPassives() != null && !ability.getPassives().isEmpty()) {
-					for (Spell passives : ability.getPassives()) {
-						passives.bossDamagedByEntity(event);
+				List<Spell> passives = ability.getPassives();
+				if (passives != null && !passives.isEmpty()) {
+					for (Spell passive : passives) {
+						passive.onHurt(event);
 					}
 				}
 
-				if (ability.getActiveSpells() != null && !ability.getActiveSpells().isEmpty()) {
-					for (Spell actives : ability.getActiveSpells()) {
-						actives.bossDamagedByEntity(event);
+				List<Spell> actives = ability.getActiveSpells();
+				if (actives != null && !actives.isEmpty()) {
+					for (Spell active : actives) {
+						active.onHurt(event);
 					}
 				}
 			}
 		}
 	}
 
-	public void bossDamagedEntity(EntityDamageByEntityEvent event) {
+	public void onHurtByEntity(DamageEvent event, Entity damager) {
 		for (BossAbilityGroup ability : mAbilities) {
 			if (!event.isCancelled()) {
-				ability.bossDamagedEntity(event);
+				ability.onHurtByEntity(event, damager);
 
-				if (ability.getPassives() != null && !ability.getPassives().isEmpty()) {
-					for (Spell passives : ability.getPassives()) {
-						passives.bossDamagedEntity(event);
+				List<Spell> passives = ability.getPassives();
+				if (passives != null && !passives.isEmpty()) {
+					for (Spell passive : passives) {
+						passive.onHurtByEntity(event, damager);
 					}
 				}
 
-				if (ability.getActiveSpells() != null && !ability.getActiveSpells().isEmpty()) {
-					for (Spell actives : ability.getActiveSpells()) {
-						actives.bossDamagedEntity(event);
+				List<Spell> actives = ability.getActiveSpells();
+				if (actives != null && !actives.isEmpty()) {
+					for (Spell active : actives) {
+						active.onHurtByEntity(event, damager);
+					}
+				}
+			}
+		}
+	}
+
+	public void onHurtByEntityWithSource(DamageEvent event, Entity damager, LivingEntity source) {
+		for (BossAbilityGroup ability : mAbilities) {
+			if (!event.isCancelled()) {
+				ability.onHurtByEntityWithSource(event, damager, source);
+
+				List<Spell> passives = ability.getPassives();
+				if (passives != null && !passives.isEmpty()) {
+					for (Spell passive : passives) {
+						passive.onHurtByEntityWithSource(event, damager, source);
+					}
+				}
+
+				List<Spell> actives = ability.getActiveSpells();
+				if (actives != null && !actives.isEmpty()) {
+					for (Spell active : actives) {
+						active.onHurtByEntityWithSource(event, damager, source);
+					}
+				}
+			}
+		}
+	}
+
+	public void onDamage(DamageEvent event, LivingEntity damagee) {
+		for (BossAbilityGroup ability : mAbilities) {
+			if (!event.isCancelled()) {
+				ability.onDamage(event, damagee);
+
+				List<Spell> passives = ability.getPassives();
+				if (passives != null && !passives.isEmpty()) {
+					for (Spell passive : passives) {
+						passive.onDamage(event, damagee);
+					}
+				}
+
+				List<Spell> actives = ability.getActiveSpells();
+				if (actives != null && !actives.isEmpty()) {
+					for (Spell active : actives) {
+						active.onDamage(event, damagee);
 					}
 				}
 			}

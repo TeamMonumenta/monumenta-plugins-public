@@ -1,5 +1,19 @@
 package com.playmonumenta.plugins.depths.abilities.flamecaller;
 
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.AbilityTrigger;
+import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.depths.DepthsTree;
+import com.playmonumenta.plugins.depths.DepthsUtils;
+import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
+import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.utils.DamageUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.MovementUtils;
+import com.playmonumenta.plugins.utils.VectorUtils;
+import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -10,21 +24,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
-
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.AbilityTrigger;
-import com.playmonumenta.plugins.classes.ClassAbility;
-import com.playmonumenta.plugins.classes.magic.MagicType;
-import com.playmonumenta.plugins.depths.DepthsTree;
-import com.playmonumenta.plugins.depths.DepthsUtils;
-import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
-import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.FastUtils;
-import com.playmonumenta.plugins.utils.MovementUtils;
-import com.playmonumenta.plugins.utils.VectorUtils;
-
-import net.md_5.bungee.api.ChatColor;
 
 public class Flamestrike extends DepthsAbility {
 	public static final String ABILITY_NAME = "Flamestrike";
@@ -51,14 +50,13 @@ public class Flamestrike extends DepthsAbility {
 		}
 		putOnCooldown();
 
-		double damage = DAMAGE[mRarity - 1];
 		Vector playerDir = mPlayer.getEyeLocation().getDirection().setY(0).normalize();
 		for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), SIZE, mPlayer)) {
 			Vector toMobVector = mob.getLocation().toVector().subtract(mPlayer.getLocation().toVector()).setY(0).normalize();
 			if (playerDir.dot(toMobVector) > DOT_ANGLE) {
 				EntityUtils.applyFire(mPlugin, FIRE_TICKS, mob, mPlayer);
-				EntityUtils.damageEntity(mPlugin, mob, damage, mPlayer, MagicType.FIRE, true, mInfo.mLinkedSpell, true, true, true, false);
-				MovementUtils.knockAway(mPlayer, mob, KNOCKBACK);
+				DamageUtils.damage(mPlayer, mob, DamageType.MAGIC, DAMAGE[mRarity - 1], mInfo.mLinkedSpell, true, true);
+				MovementUtils.knockAway(mPlayer, mob, KNOCKBACK, true);
 			}
 		}
 
@@ -106,7 +104,7 @@ public class Flamestrike extends DepthsAbility {
 
 	@Override
 	public String getDescription(int rarity) {
-		return "Right click while sneaking to create a torrent of flames, dealing " + DepthsUtils.getRarityColor(rarity) + DAMAGE[rarity - 1] + ChatColor.WHITE + " damage to all enemies in front of you within a " + SIZE + " block cube around you, setting them on fire for " + FIRE_TICKS / 20 + " seconds and knocking them away. Cooldown: " + COOLDOWN / 20 + "s.";
+		return "Right click while sneaking to create a torrent of flames, dealing " + DepthsUtils.getRarityColor(rarity) + DAMAGE[rarity - 1] + ChatColor.WHITE + " magic damage to all enemies in front of you within a " + SIZE + " block cube around you, setting them on fire for " + FIRE_TICKS / 20 + " seconds and knocking them away. Cooldown: " + COOLDOWN / 20 + "s.";
 	}
 
 	@Override

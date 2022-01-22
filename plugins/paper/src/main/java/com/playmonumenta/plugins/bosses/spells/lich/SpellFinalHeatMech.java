@@ -1,8 +1,12 @@
 package com.playmonumenta.plugins.bosses.spells.lich;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import com.playmonumenta.plugins.bosses.bosses.Lich;
+import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.player.PartialParticle;
+import com.playmonumenta.plugins.utils.AbilityUtils;
+import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.MovementUtils;
+import com.playmonumenta.plugins.utils.VectorUtils;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -17,12 +21,8 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
-import com.playmonumenta.plugins.bosses.bosses.Lich;
-import com.playmonumenta.plugins.bosses.spells.Spell;
-import com.playmonumenta.plugins.player.PartialParticle;
-import com.playmonumenta.plugins.utils.BossUtils;
-import com.playmonumenta.plugins.utils.MovementUtils;
-import com.playmonumenta.plugins.utils.VectorUtils;
+import java.util.ArrayList;
+import java.util.List;
 
 public class SpellFinalHeatMech extends Spell {
 
@@ -159,8 +159,9 @@ public class SpellFinalHeatMech extends Spell {
 			List<Player> players = Lich.playersInRange(mCenter, mRange, true);
 			for (Player p : players) {
 				if (p.getBoundingBox().overlaps(box)) {
-					BossUtils.bossDamagePercent(mBoss, p, 1, null, "Malakut's Dynamo");
-					MovementUtils.knockAway(mBoss, p, 0.5f);
+					BossUtils.bossDamagePercent(mBoss, p, 0.5, null, "Malakut's Dynamo");
+					AbilityUtils.increaseHealingPlayer(p, 20 * 30, -0.85, "Lich");
+					MovementUtils.knockAway(mBoss, p, 0.5f, false);
 					p.setFireTicks(100);
 				}
 			}

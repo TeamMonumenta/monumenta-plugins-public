@@ -1,8 +1,13 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
-import java.util.Arrays;
-import java.util.List;
-
+import com.playmonumenta.plugins.bosses.parameters.BossParam;
+import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.bosses.spells.SpellRunAction;
+import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.utils.DamageUtils;
+import com.playmonumenta.plugins.utils.ZoneUtils;
+import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -14,17 +19,12 @@ import org.bukkit.entity.Player;
 import org.bukkit.entity.Snowball;
 import org.bukkit.entity.Snowman;
 import org.bukkit.event.entity.AreaEffectCloudApplyEvent;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.PotionSplashEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.plugin.Plugin;
 
-import com.playmonumenta.plugins.bosses.parameters.BossParam;
-import com.playmonumenta.plugins.bosses.spells.Spell;
-import com.playmonumenta.plugins.bosses.spells.SpellRunAction;
-import com.playmonumenta.plugins.utils.BossUtils;
-import com.playmonumenta.plugins.utils.ZoneUtils;
-import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
+import java.util.Arrays;
+import java.util.List;
 
 public class FestiveTessUpgradeSnowmenBoss extends BossAbilityGroup {
 	public static final String deathMetakey = "PLAYER_SNOWMAN_DEATH_METAKEY";
@@ -61,10 +61,10 @@ public class FestiveTessUpgradeSnowmenBoss extends BossAbilityGroup {
 	}
 
 	@Override
-	public void bossDamagedByEntity(EntityDamageByEntityEvent event) {
+	public void onHurt(DamageEvent event) {
 		Entity damager = event.getDamager();
 
-		if (damager != null && damager instanceof Player && ((Player)damager).getGameMode().equals(GameMode.CREATIVE)) {
+		if (damager != null && damager instanceof Player player && player.getGameMode().equals(GameMode.CREATIVE)) {
 			// This event happens like normal
 			return;
 		} else if (damager instanceof Snowball) {
@@ -88,8 +88,8 @@ public class FestiveTessUpgradeSnowmenBoss extends BossAbilityGroup {
 		}
 
 		if (event.getHitEntity() != null && !(event.getHitEntity() instanceof Player) &&
-				event.getHitEntity() instanceof LivingEntity && !(event.getHitEntity() instanceof Snowman)) {
-			BossUtils.bossDamage(mBoss, (LivingEntity) event.getHitEntity(), mParams.DAMAGE);
+				event.getHitEntity() instanceof LivingEntity le && !(event.getHitEntity() instanceof Snowman)) {
+			DamageUtils.damage(mBoss, le, DamageType.PROJECTILE, mParams.DAMAGE);
 		}
 	}
 

@@ -1,5 +1,14 @@
 package com.playmonumenta.plugins.graves;
 
+import com.google.gson.JsonObject;
+import com.playmonumenta.plugins.Constants;
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.utils.ItemStatUtils;
+import com.playmonumenta.plugins.utils.ItemStatUtils.InfusionType;
+import com.playmonumenta.plugins.utils.ScoreboardUtils;
+import de.tr7zw.nbtapi.NBTContainer;
+import de.tr7zw.nbtapi.NBTEntity;
+import de.tr7zw.nbtapi.NBTItem;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -11,17 +20,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 import org.checkerframework.checker.nullness.qual.Nullable;
-
-import com.google.gson.JsonObject;
-import com.playmonumenta.plugins.Constants;
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.enchantments.Hope;
-import com.playmonumenta.plugins.utils.InventoryUtils;
-import com.playmonumenta.plugins.utils.ScoreboardUtils;
-
-import de.tr7zw.nbtapi.NBTContainer;
-import de.tr7zw.nbtapi.NBTEntity;
-import de.tr7zw.nbtapi.NBTItem;
 
 public class ThrownItem {
 	private static final String KEY_LOCATION = "location";
@@ -113,7 +111,7 @@ public class ThrownItem {
 			mEntity.setCanMobPickup(false);
 			mEntity.setPickupDelay(0);
 			mEntity.setThrower(mPlayer.getUniqueId());
-			if (InventoryUtils.getCustomEnchantLevel(mItem, Hope.PROPERTY_NAME, false) > 0) {
+			if (ItemStatUtils.getInfusionLevel(mItem, InfusionType.HOPE) > 0) {
 				mEntity.setInvulnerable(true);
 			}
 			NBTEntity nbt = new NBTEntity(mEntity);

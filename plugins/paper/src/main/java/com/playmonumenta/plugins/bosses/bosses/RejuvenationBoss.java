@@ -1,19 +1,18 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
-import java.util.Arrays;
-
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.bosses.SpellManager;
+import com.playmonumenta.plugins.bosses.parameters.BossParam;
 import com.playmonumenta.plugins.bosses.parameters.EntityTargets;
 import com.playmonumenta.plugins.bosses.parameters.ParticlesList;
 import com.playmonumenta.plugins.bosses.parameters.SoundsList;
+import com.playmonumenta.plugins.bosses.spells.SpellMobHealAoE;
 import com.playmonumenta.plugins.utils.AbsorptionUtils;
 import org.bukkit.Location;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.LivingEntity;
 
-import com.playmonumenta.plugins.bosses.SpellManager;
-import com.playmonumenta.plugins.bosses.parameters.BossParam;
-import com.playmonumenta.plugins.bosses.spells.SpellMobHealAoE;
+import java.util.Arrays;
 
 public class RejuvenationBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_rejuvenation";

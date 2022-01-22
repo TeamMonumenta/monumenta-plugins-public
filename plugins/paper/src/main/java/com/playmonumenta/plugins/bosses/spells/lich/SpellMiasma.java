@@ -1,8 +1,9 @@
 package com.playmonumenta.plugins.bosses.spells.lich;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import com.playmonumenta.plugins.bosses.bosses.Lich;
+import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.utils.DamageUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -13,9 +14,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
-import com.playmonumenta.plugins.bosses.bosses.Lich;
-import com.playmonumenta.plugins.bosses.spells.Spell;
-import com.playmonumenta.plugins.utils.BossUtils;
+import java.util.ArrayList;
+import java.util.List;
 
 public class SpellMiasma extends Spell {
 
@@ -46,7 +46,7 @@ public class SpellMiasma extends Spell {
 					Location l = player.getEyeLocation();
 					world.spawnParticle(Particle.SQUID_INK, l, 10, 0.1, 0.1, 0.1, 0.25);
 
-					BossUtils.bossDamage(mBoss, player, 20, (Location)null, "Miasma");
+					DamageUtils.damage(mBoss, player, DamageType.MAGIC, 20, null, false, true, "Miasma");
 					player.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 2 * 20, 0));
 					player.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, 6 * 20, 1));
 					if (!mWarnedPlayers.contains(player)) {

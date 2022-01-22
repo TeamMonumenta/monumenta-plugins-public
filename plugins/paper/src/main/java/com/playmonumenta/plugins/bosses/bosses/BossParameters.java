@@ -1,5 +1,23 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.bosses.parameters.BossParam;
+import com.playmonumenta.plugins.bosses.parameters.EffectsList;
+import com.playmonumenta.plugins.bosses.parameters.EntityTargets;
+import com.playmonumenta.plugins.bosses.parameters.LoSPool;
+import com.playmonumenta.plugins.bosses.parameters.ParseResult;
+import com.playmonumenta.plugins.bosses.parameters.ParticlesList;
+import com.playmonumenta.plugins.bosses.parameters.SoundsList;
+import com.playmonumenta.plugins.bosses.parameters.StringReader;
+import com.playmonumenta.plugins.commands.BossTagCommand.TypeAndDesc;
+import com.playmonumenta.plugins.utils.BossUtils;
+import dev.jorel.commandapi.Tooltip;
+import org.bukkit.Color;
+import org.bukkit.Material;
+import org.bukkit.Sound;
+import org.bukkit.entity.Entity;
+import org.bukkit.potion.PotionEffectType;
+
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -7,26 +25,6 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.bosses.parameters.BossParam;
-import com.playmonumenta.plugins.bosses.parameters.EffectsList;
-import com.playmonumenta.plugins.bosses.parameters.LoSPool;
-import com.playmonumenta.plugins.bosses.parameters.EntityTargets;
-import com.playmonumenta.plugins.bosses.parameters.ParseResult;
-import com.playmonumenta.plugins.bosses.parameters.ParticlesList;
-import com.playmonumenta.plugins.bosses.parameters.SoundsList;
-import com.playmonumenta.plugins.bosses.parameters.StringReader;
-import com.playmonumenta.plugins.commands.BossTagCommand.TypeAndDesc;
-import com.playmonumenta.plugins.utils.BossUtils;
-
-import org.bukkit.Color;
-import org.bukkit.Material;
-import org.bukkit.Sound;
-import org.bukkit.entity.Entity;
-import org.bukkit.potion.PotionEffectType;
-
-import dev.jorel.commandapi.Tooltip;
 
 public abstract class BossParameters {
 

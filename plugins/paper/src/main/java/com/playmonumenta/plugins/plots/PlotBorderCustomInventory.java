@@ -1,11 +1,14 @@
 package com.playmonumenta.plugins.plots;
 
-import java.time.Instant;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
-
+import com.playmonumenta.plugins.utils.GUIUtils;
+import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.scriptedquests.utils.CustomInventory;
+import com.playmonumenta.scriptedquests.utils.ScoreboardUtils;
+import com.playmonumenta.structures.StructuresAPI;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
+import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -15,16 +18,11 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-import com.playmonumenta.plugins.utils.GUIUtils;
-import com.playmonumenta.plugins.utils.ItemUtils;
-import com.playmonumenta.scriptedquests.utils.CustomInventory;
-import com.playmonumenta.scriptedquests.utils.ScoreboardUtils;
-import com.playmonumenta.structures.StructuresAPI;
-
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.format.TextDecoration;
-import net.md_5.bungee.api.ChatColor;
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 
 public class PlotBorderCustomInventory extends CustomInventory {
 	private static final Material FILLER = Material.GRAY_STAINED_GLASS_PANE;

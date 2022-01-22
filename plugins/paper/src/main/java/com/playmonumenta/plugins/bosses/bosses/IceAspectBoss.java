@@ -2,12 +2,12 @@ package com.playmonumenta.plugins.bosses.bosses;
 
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
+import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
 
@@ -45,12 +45,12 @@ public final class IceAspectBoss extends BossAbilityGroup {
 	}
 
 	@Override
-	public void bossDamagedEntity(EntityDamageByEntityEvent event) {
-		if (event.getEntity() instanceof Player player) {
-			if (BossUtils.bossDamageBlocked(player, event.getDamage(), event.getDamager().getLocation()) && event.getCause() != DamageCause.MAGIC) {
+	public void onDamage(DamageEvent event, LivingEntity damagee) {
+		if (damagee instanceof Player player) {
+			if (BossUtils.bossDamageBlocked(player, mBoss.getLocation()) && event.getType() != DamageType.MAGIC) {
 				return;
 			}
 		}
-		PotionUtils.applyPotion(mBoss, (LivingEntity) event.getEntity(), new PotionEffect(PotionEffectType.SLOW, mParams.SLOW_DURATION, mParams.SLOW_AMPLIFIER, false, true));
+		PotionUtils.applyPotion(mBoss, damagee, new PotionEffect(PotionEffectType.SLOW, mParams.SLOW_DURATION, mParams.SLOW_AMPLIFIER, false, true));
 	}
 }

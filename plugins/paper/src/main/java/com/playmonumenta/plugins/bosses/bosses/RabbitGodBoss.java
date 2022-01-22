@@ -1,10 +1,24 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
+import com.playmonumenta.plugins.bosses.BossBarManager;
+import com.playmonumenta.plugins.bosses.BossBarManager.BossHealthAction;
+import com.playmonumenta.plugins.bosses.SpellManager;
+import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.bosses.spells.SpellBaseCharge;
+import com.playmonumenta.plugins.bosses.spells.SpellBaseLaser;
+import com.playmonumenta.plugins.bosses.spells.SpellBaseParticleAura;
+import com.playmonumenta.plugins.bosses.spells.SpellConditionalTeleport;
+import com.playmonumenta.plugins.bosses.spells.SpellPlayerAction;
+import com.playmonumenta.plugins.bosses.spells.cluckingop.SpellEruption;
+import com.playmonumenta.plugins.bosses.spells.cluckingop.SpellFluffPools;
+import com.playmonumenta.plugins.bosses.spells.cluckingop.SpellFluffingDeath;
+import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.utils.SerializationUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -18,30 +32,16 @@ import org.bukkit.entity.Chicken;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import com.playmonumenta.plugins.bosses.BossBarManager;
-import com.playmonumenta.plugins.bosses.BossBarManager.BossHealthAction;
-import com.playmonumenta.plugins.bosses.SpellManager;
-import com.playmonumenta.plugins.bosses.spells.Spell;
-import com.playmonumenta.plugins.bosses.spells.SpellBaseCharge;
-import com.playmonumenta.plugins.bosses.spells.SpellBaseLaser;
-import com.playmonumenta.plugins.bosses.spells.SpellBaseParticleAura;
-import com.playmonumenta.plugins.bosses.spells.SpellConditionalTeleport;
-import com.playmonumenta.plugins.bosses.spells.SpellPlayerAction;
-import com.playmonumenta.plugins.bosses.spells.cluckingop.SpellEruption;
-import com.playmonumenta.plugins.bosses.spells.cluckingop.SpellFluffPools;
-import com.playmonumenta.plugins.bosses.spells.cluckingop.SpellFluffingDeath;
-import com.playmonumenta.plugins.utils.BossUtils;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.FastUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.plugins.utils.SerializationUtils;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public final class RabbitGodBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_rabbitgod";
@@ -91,7 +91,7 @@ public final class RabbitGodBoss extends BossAbilityGroup {
 			// Attack hit a player
 			(LivingEntity player) -> {
 				player.getWorld().spawnParticle(Particle.SWEEP_ATTACK, player.getLocation(), 20, 1, 1, 1, 0);
-				BossUtils.bossDamage(boss, player, 1);
+				BossUtils.blockableDamage(boss, player, DamageType.OTHER, 1);
 			},
 			// Attack particles
 			(Location loc) -> {
@@ -122,7 +122,7 @@ public final class RabbitGodBoss extends BossAbilityGroup {
 				world.spawnParticle(Particle.SMOKE_LARGE, loc, 25, 0, 0, 0, 0.25);
 				world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 1.5f, 0.5f);
 				if (!blocked) {
-					BossUtils.bossDamage(mBoss, player, 1);
+					BossUtils.blockableDamage(mBoss, player, DamageType.OTHER, 1);
 				}
 			}
 		);
@@ -418,7 +418,7 @@ public final class RabbitGodBoss extends BossAbilityGroup {
 	}
 
 	@Override
-	public void bossDamagedByEntity(EntityDamageByEntityEvent event) {
+	public void onHurt(DamageEvent event) {
 		if (mPhase2) {
 			event.setDamage(event.getDamage() * 15);
 		}

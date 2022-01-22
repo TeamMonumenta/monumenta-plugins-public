@@ -1,22 +1,20 @@
 package com.playmonumenta.plugins.abilities.scout;
 
-import org.bukkit.Material;
-import org.bukkit.entity.AbstractArrow;
-import org.bukkit.entity.Arrow;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
-import org.bukkit.entity.Projectile;
-import org.bukkit.entity.SpectralArrow;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.inventory.ItemStack;
-import org.checkerframework.checker.nullness.qual.Nullable;
-
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.abilities.AbilityWithChargesOrStacks;
+import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.network.ClientModHandler;
 import com.playmonumenta.plugins.utils.MessagingUtils;
+import org.bukkit.Material;
+import org.bukkit.entity.AbstractArrow;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
+import org.bukkit.entity.Trident;
+import org.bukkit.inventory.ItemStack;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class Sharpshooter extends Ability implements AbilityWithChargesOrStacks {
 	private static final double PERCENT_BASE_DAMAGE = 0.2;
@@ -29,7 +27,7 @@ public class Sharpshooter extends Ability implements AbilityWithChargesOrStacks 
 		mInfo.mScoreboardId = "Sharpshooter";
 		mInfo.mShorthandName = "Ss";
 		mInfo.mDescriptions.add("Your arrows deal 20% more damage.");
-		mInfo.mDescriptions.add("Each enemy hit with a critical arrow gives you a stack of Sharpshooter, up to 8. Stacks decay after 4 seconds of not gaining a stack. Each stack makes your arrows deal +3% damage.");
+		mInfo.mDescriptions.add("Each enemy hit with a critical arrow or trident gives you a stack of Sharpshooter, up to 8. Stacks decay after 4 seconds of not gaining a stack. Each stack makes your arrows and tridents deal +3% damage.");
 		mInfo.mIgnoreTriggerCap = true;
 		mDisplayItem = new ItemStack(Material.TARGET, 1);
 	}
@@ -38,15 +36,13 @@ public class Sharpshooter extends Ability implements AbilityWithChargesOrStacks 
 	private int mTicksToStackDecay = 0;
 
 	@Override
-	public boolean livingEntityShotByPlayerEvent(Projectile proj, LivingEntity damagee, EntityDamageByEntityEvent event) {
-		if (mPlayer == null) {
-			return true;
-		}
-		if (proj instanceof Arrow || proj instanceof SpectralArrow) {
-			AbstractArrow arrow = (AbstractArrow) proj;
+	public void onDamage(DamageEvent event, LivingEntity enemy) {
+		if (event.getType() == DamageType.PROJECTILE && event.getDamager() instanceof AbstractArrow arrow) {
+
+			event.setDamage(event.getDamage() * (1 + PERCENT_BASE_DAMAGE + mStacks * PERCENT_DAMAGE_PER_STACK));
 
 			// Critical arrow and mob is actually going to take damage
-			if (getAbilityScore() > 1 && arrow.isCritical() && (damagee.getNoDamageTicks() <= 10 || damagee.getLastDamage() < event.getDamage())) {
+			if (getAbilityScore() > 1 && (arrow.isCritical() || arrow instanceof Trident) && (enemy.getNoDamageTicks() <= 10 || enemy.getLastDamage() < event.getDamage())) {
 				mTicksToStackDecay = SHARPSHOOTER_DECAY_TIMER;
 
 				if (mStacks < MAX_STACKS) {
@@ -55,11 +51,7 @@ public class Sharpshooter extends Ability implements AbilityWithChargesOrStacks 
 					ClientModHandler.updateAbility(mPlayer, this);
 				}
 			}
-
-			event.setDamage(event.getDamage() * (1 + PERCENT_BASE_DAMAGE + mStacks * PERCENT_DAMAGE_PER_STACK));
 		}
-
-		return true;
 	}
 
 	@Override

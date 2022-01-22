@@ -1,10 +1,19 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
+import com.playmonumenta.plugins.bosses.BossBarManager;
+import com.playmonumenta.plugins.bosses.BossBarManager.BossHealthAction;
+import com.playmonumenta.plugins.bosses.BossManager;
+import com.playmonumenta.plugins.bosses.SpellManager;
+import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.bosses.spells.SpellBlockBreak;
+import com.playmonumenta.plugins.bosses.spells.sealedremorse.GhalkorFlameBolt;
+import com.playmonumenta.plugins.bosses.spells.sealedremorse.GhalkorFlamingCharge;
+import com.playmonumenta.plugins.bosses.spells.sealedremorse.GhalkorForwardSweep;
+import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
+import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.utils.SerializationUtils;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -23,21 +32,10 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-import com.playmonumenta.plugins.bosses.BossBarManager;
-import com.playmonumenta.plugins.bosses.BossBarManager.BossHealthAction;
-import com.playmonumenta.plugins.bosses.BossManager;
-import com.playmonumenta.plugins.bosses.SpellManager;
-import com.playmonumenta.plugins.bosses.spells.Spell;
-import com.playmonumenta.plugins.bosses.spells.SpellBlockBreak;
-import com.playmonumenta.plugins.bosses.spells.SpellPurgeNegatives;
-import com.playmonumenta.plugins.bosses.spells.sealedremorse.GhalkorFlameBolt;
-import com.playmonumenta.plugins.bosses.spells.sealedremorse.GhalkorFlamingCharge;
-import com.playmonumenta.plugins.bosses.spells.sealedremorse.SpellForwardSweep;
-import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
-import com.playmonumenta.plugins.utils.BossUtils;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.plugins.utils.SerializationUtils;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public final class Ghalkor extends BossAbilityGroup {
 
@@ -88,13 +86,12 @@ public final class Ghalkor extends BossAbilityGroup {
 		SpellManager normalSpells = new SpellManager(Arrays.asList(
 				new GhalkorFlamingCharge(mPlugin, mBoss, this),
 				new GhalkorFlameBolt(mBoss, mPlugin, this),
-				new SpellForwardSweep(mPlugin, mBoss, this)
+				new GhalkorForwardSweep(mPlugin, mBoss, this)
 				));
 
 
 
 		List<Spell> passiveNormalSpells = Arrays.asList(
-				new SpellPurgeNegatives(boss, 20 * 5),
 				new SpellBlockBreak(boss, 2, 3, 2)
 			);
 
@@ -171,11 +168,11 @@ public final class Ghalkor extends BossAbilityGroup {
 					teleport(mSpawnLoc);
 				}
 
-				//If player too far from arena center or below 4 blocks or too high and either moving very slowly or is on a block, damage them
+				//If player too far from arena center or below 4 blocks or too high and is on a block, damage them
 				for (Player p : PlayerUtils.playersInRange(mMiddleLoc, detectionRange, true)) {
 					if ((mMiddleLoc.distance(p.getLocation()) > 22
 							|| mMiddleLoc.getY() - p.getLocation().getY() >= 3
-							|| (mMiddleLoc.getY() - p.getLocation().getY() <= -3 && (p.getVelocity().getY() <= 0.1 || p.isOnGround())))
+							|| (mMiddleLoc.getY() - p.getLocation().getY() <= -3 && p.isOnGround()))
 							&& p.getGameMode() != GameMode.CREATIVE) {
 						Vector vel = p.getVelocity();
 						BossUtils.bossDamagePercent(mBoss, p, 0.1);
@@ -274,7 +271,7 @@ public final class Ghalkor extends BossAbilityGroup {
 			noDamageTicksTake = 5;
 		}
 		mBoss.setMaximumNoDamageTicks(mBoss.getMaximumNoDamageTicks() - noDamageTicksTake);
-		bossTargetHp = (int) (BASE_HEALTH * (1 + (1 - 1 / Math.E) * Math.log(playerCount)));
+		bossTargetHp = (int) (BASE_HEALTH * (1 + (1 - 1 / Math.E) * Math.log(playerCount)) * 1.1);
 		EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_MAX_HEALTH, bossTargetHp);
 		EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_FOLLOW_RANGE, detectionRange);
 		EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_KNOCKBACK_RESISTANCE, 1);

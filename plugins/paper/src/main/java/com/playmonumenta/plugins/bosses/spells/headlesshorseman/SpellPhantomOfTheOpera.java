@@ -1,11 +1,8 @@
 package com.playmonumenta.plugins.bosses.spells.headlesshorseman;
 
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
-
+import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -18,9 +15,11 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import com.playmonumenta.plugins.bosses.spells.Spell;
-import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
-import com.playmonumenta.plugins.utils.PlayerUtils;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 
 /*
  *Phantom of the Opera (Idfk) - PASSIVE: chooses random players and spawns phantoms 5 blocks above
@@ -135,7 +134,6 @@ public class SpellPhantomOfTheOpera extends Spell {
 
 	@Override
 	public int cooldownTicks() {
-		// TODO Auto-generated method stub
 		return 0;
 	}
 

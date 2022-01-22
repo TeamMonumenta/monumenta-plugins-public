@@ -1,5 +1,13 @@
 package com.playmonumenta.plugins.bosses.spells.kaul;
 
+import com.playmonumenta.plugins.bosses.ChargeUpManager;
+import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.utils.DamageUtils;
+import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.LocationUtils;
+import com.playmonumenta.plugins.utils.MovementUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -15,14 +23,6 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
-
-import com.playmonumenta.plugins.bosses.ChargeUpManager;
-import com.playmonumenta.plugins.bosses.spells.Spell;
-import com.playmonumenta.plugins.utils.BossUtils;
-import com.playmonumenta.plugins.utils.FastUtils;
-import com.playmonumenta.plugins.utils.LocationUtils;
-import com.playmonumenta.plugins.utils.MovementUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
 
 public class SpellEarthsWrath extends Spell {
 	private Plugin mPlugin;
@@ -76,7 +76,7 @@ public class SpellEarthsWrath extends Spell {
 								world.spawnParticle(Particle.CLOUD, bLoc, 1, 0, 0, 0, 0);
 								for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), 40, true)) {
 									if (player.getBoundingBox().overlaps(mBox)) {
-										BossUtils.bossDamage(mBoss, player, 28, mBoss.getLocation(), "Earth's Wrath");
+										DamageUtils.damage(mBoss, player, DamageType.MAGIC, 24, null, false, true, "Earth's Wrath");
 										MovementUtils.knockAway(centerLoc, player, -0.6f, 0.8f);
 										player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 10, 2));
 										player.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, 20 * 10, -4));

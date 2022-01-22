@@ -17,7 +17,8 @@ import org.bukkit.util.Vector;
 
 import com.playmonumenta.plugins.bosses.bosses.FalseSpirit;
 import com.playmonumenta.plugins.bosses.spells.Spell;
-import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.VectorUtils;
@@ -49,12 +50,11 @@ public class TriplicateSlash extends Spell {
 				Location loc = mBoss.getLocation();
 				loc.setDirection(dir);
 
-				if (mTicks == 26 || mTicks == 50 || mTicks >= 76) {
+				if (mTicks % 30 == 0) {
 					Vector vec;
 					List<BoundingBox> boxes = new ArrayList<BoundingBox>();
 
 					world.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_SWEEP, SoundCategory.HOSTILE, 3, 0.5f);
-
 
 					//Final particle show
 					for (double r = 0; r < 7; r++) {
@@ -77,13 +77,12 @@ public class TriplicateSlash extends Spell {
 					for (Player player : PlayerUtils.playersInRange(loc, 40, true)) {
 						for (BoundingBox box : boxes) {
 							if (player.getBoundingBox().overlaps(box)) {
-								BossUtils.bossDamage(mBoss, player, 30, null, "Triplicate Slash");
+								DamageUtils.damage(mBoss, player, DamageType.MAGIC, 30, null, false, true, "Triplicate Slash");
 							}
 						}
 					}
 
-
-					if (mTicks >= 76) {
+					if (mTicks >= 90) {
 						mDirection = 0;
 						this.cancel();
 					} else if (mDirection == 0) {

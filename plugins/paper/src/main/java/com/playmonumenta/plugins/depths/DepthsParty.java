@@ -1,13 +1,15 @@
 package com.playmonumenta.plugins.depths;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.EnumSet;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-
+import com.playmonumenta.plugins.Constants;
+import com.playmonumenta.plugins.depths.DepthsRoomType.DepthsRewardType;
+import com.playmonumenta.plugins.integrations.MonumentaNetworkRelayIntegration;
+import com.playmonumenta.plugins.server.properties.ServerProperties;
+import com.playmonumenta.plugins.utils.AbilityUtils;
+import com.playmonumenta.plugins.utils.DelvesUtils;
+import com.playmonumenta.plugins.utils.DelvesUtils.Modifier;
+import com.playmonumenta.plugins.utils.ScoreboardUtils;
+import com.playmonumenta.scriptedquests.Plugin;
+import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -22,17 +24,13 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-import com.playmonumenta.plugins.depths.DepthsRoomType.DepthsRewardType;
-import com.playmonumenta.plugins.integrations.MonumentaNetworkRelayIntegration;
-import com.playmonumenta.plugins.server.properties.ServerProperties;
-import com.playmonumenta.plugins.utils.AbilityUtils;
-import com.playmonumenta.plugins.utils.DelvesUtils;
-import com.playmonumenta.plugins.utils.DelvesUtils.Modifier;
-import com.playmonumenta.plugins.utils.ScoreboardUtils;
-import com.playmonumenta.plugins.Constants;
-import com.playmonumenta.scriptedquests.Plugin;
-
-import net.md_5.bungee.api.ChatColor;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 /**
  * @author ShadowVisions
@@ -257,9 +255,8 @@ public class DepthsParty {
 
 		BukkitRunnable itemEffects = new ItemEffects(l, null);
 		if (spawnSlime) {
-			Entity e = l.getWorld().spawnEntity(l.add(0.5, 0.25, 0.5), EntityType.SLIME);
-			if (e instanceof Slime) {
-				Slime slime = (Slime) e;
+			Entity e = l.getWorld().spawnEntity(l.clone().add(0.5, 0.25, 0.5), EntityType.SLIME);
+			if (e instanceof Slime slime) {
 				slime.setSize(1);
 				slime.setAI(false);
 				slime.setGlowing(true);

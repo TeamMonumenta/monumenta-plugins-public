@@ -1,10 +1,12 @@
 package com.playmonumenta.plugins.integrations;
 
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
-
+import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.utils.ItemStatUtils;
+import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.ZoneUtils;
+import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
+import de.jeff_media.chestsort.api.ChestSortAPI;
+import de.jeff_media.chestsort.api.ChestSortEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
@@ -22,13 +24,10 @@ import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 
-import com.playmonumenta.plugins.utils.InventoryUtils;
-import com.playmonumenta.plugins.utils.ItemUtils;
-import com.playmonumenta.plugins.utils.ZoneUtils;
-import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
-
-import de.jeff_media.chestsort.api.ChestSortAPI;
-import de.jeff_media.chestsort.api.ChestSortEvent;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
 
 public class ChestSortIntegration implements Listener {
 	private static boolean checkedForPlugin = false;
@@ -156,7 +155,7 @@ public class ChestSortIntegration implements Listener {
 			String strCount = String.format("%03d", 127 - itemCount);
 
 			String strRegion = "~region~"; // Missing values start with ~ and wind up at the end
-			ItemUtils.ItemRegion region = ItemUtils.getItemRegion(item);
+			ItemStatUtils.Region region = ItemStatUtils.getRegion(item);
 			if (region != null) {
 				int ordinal = region.ordinal();
 				String name = region.toString();
@@ -164,7 +163,7 @@ public class ChestSortIntegration implements Listener {
 			}
 
 			String strTier = "~tier~";
-			ItemUtils.ItemTier tier = ItemUtils.getItemTier(item);
+			ItemStatUtils.Tier tier = ItemStatUtils.getTier(item);
 			if (tier != null) {
 				int ordinal = tier.ordinal();
 				String name = tier.toString();

@@ -1,11 +1,7 @@
 package com.playmonumenta.plugins.bosses.spells;
 
-import java.util.Collection;
-import java.util.List;
-
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.utils.FastUtils;
-
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.FallingBlock;
@@ -13,6 +9,9 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
+
+import java.util.Collection;
+import java.util.List;
 
 public class SpellBaseGrenadeLauncher extends Spell {
 

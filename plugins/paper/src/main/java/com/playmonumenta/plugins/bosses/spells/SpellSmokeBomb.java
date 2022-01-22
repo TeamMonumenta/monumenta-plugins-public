@@ -1,5 +1,9 @@
 package com.playmonumenta.plugins.bosses.spells;
 
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -10,10 +14,6 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitScheduler;
-
-import com.playmonumenta.plugins.utils.BossUtils;
-import com.playmonumenta.plugins.utils.FastUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
 
 public class SpellSmokeBomb extends Spell {
 	private Plugin mPlugin;
@@ -47,7 +47,7 @@ public class SpellSmokeBomb extends Spell {
 			@Override
 			public void run() {
 				for (Player player : PlayerUtils.playersInRange(mLauncher.getLocation(), mRadius, true)) {
-					BossUtils.bossDamage(mLauncher, player, 2);
+					BossUtils.blockableDamage(mLauncher, player, DamageType.BLAST, 2);
 					player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 60, 1));
 					player.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 60, 0));
 				}

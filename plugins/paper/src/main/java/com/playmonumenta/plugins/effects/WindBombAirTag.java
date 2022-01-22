@@ -1,14 +1,13 @@
 package com.playmonumenta.plugins.effects;
 
+import com.playmonumenta.plugins.events.DamageEvent;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.Projectile;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDamageEvent;
+import org.jetbrains.annotations.NotNull;
 
 public class WindBombAirTag extends Effect {
 
@@ -33,21 +32,10 @@ public class WindBombAirTag extends Effect {
 	}
 
 	@Override
-	public boolean entityReceiveDamageEvent(EntityDamageEvent event) {
-		if (event instanceof EntityDamageByEntityEvent) {
-			EntityDamageByEntityEvent edbee = (EntityDamageByEntityEvent) event;
-			if (mPlayer.equals(edbee.getDamager())) {
-				Entity entity = event.getEntity();
-				if (entity instanceof LivingEntity) {
-					event.setDamage(event.getDamage() * (1 + mAmount));
-				}
-			} else if (edbee.getDamager() instanceof Projectile) {
-				if (mPlayer.equals(((Projectile) edbee.getDamager()).getShooter())) {
-					event.setDamage(event.getDamage() * (1 + mAmount));
-				}
-			}
+	public void onHurtByEntityWithSource(@NotNull LivingEntity entity, @NotNull DamageEvent event, @NotNull Entity damager, @NotNull LivingEntity source) {
+		if (mPlayer.equals(source)) {
+			event.setDamage(event.getDamage() * (1 + mAmount));
 		}
-		return true;
 	}
 
 	@Override

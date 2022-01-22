@@ -1,16 +1,14 @@
 package com.playmonumenta.plugins.abilities.rogue;
 
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
-import org.checkerframework.checker.nullness.qual.Nullable;
-
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.events.CustomDamageEvent;
+import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class RoguePassive extends Ability {
 
@@ -27,20 +25,18 @@ public class RoguePassive extends Ability {
 	}
 
 	@Override
-	public void playerDealtCustomDamageEvent(CustomDamageEvent event) {
-		if (event.getDamager() instanceof Player) {
-			Entity damagee = event.getDamaged();
+	public void onDamage(DamageEvent event, LivingEntity enemy) {
+		if (event.getAbility() == null) {
+			return;
+		}
 
-			ItemStack mainHand = mPlayer.getInventory().getItemInMainHand();
-			ItemStack offHand = mPlayer.getInventory().getItemInOffHand();
-			if (InventoryUtils.rogueTriggerCheck(mainHand, offHand)) {
-				//  This test if the damagee is an instance of a Elite.
-				if (damagee != null) {
-					if (EntityUtils.isElite(damagee)) {
-						event.setDamage(event.getDamage() * PASSIVE_DAMAGE_ELITE_MODIFIER);
-					} else if (EntityUtils.isBoss(damagee)) {
-						event.setDamage(event.getDamage() * PASSIVE_DAMAGE_BOSS_MODIFIER);
-					}
+		if (InventoryUtils.rogueTriggerCheck(mPlugin, mPlayer)) {
+			//  This test if the damagee is an instance of a Elite.
+			if (enemy != null) {
+				if (EntityUtils.isElite(enemy)) {
+					event.setDamage(event.getDamage() * PASSIVE_DAMAGE_ELITE_MODIFIER);
+				} else if (EntityUtils.isBoss(enemy)) {
+					event.setDamage(event.getDamage() * PASSIVE_DAMAGE_BOSS_MODIFIER);
 				}
 			}
 		}

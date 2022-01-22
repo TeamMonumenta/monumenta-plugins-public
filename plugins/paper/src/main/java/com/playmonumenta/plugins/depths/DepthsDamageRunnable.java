@@ -1,10 +1,8 @@
 package com.playmonumenta.plugins.depths;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
-
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.DamageUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -16,9 +14,10 @@ import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.utils.BossUtils;
-import com.playmonumenta.plugins.utils.EntityUtils;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 
 public class DepthsDamageRunnable extends BukkitRunnable {
 
@@ -47,7 +46,7 @@ public class DepthsDamageRunnable extends BukkitRunnable {
 			if (BAD_BLOCKS.contains(loc.getBlock().getRelative(BlockFace.DOWN).getType())) {
 				//Damage player
 				Vector vel = p.getVelocity();
-				EntityUtils.damageEntity(Plugin.getInstance(), p, 0.1, null, null, true, null, false, false, false, true);
+				DamageUtils.damage(null, p, DamageType.AILMENT, 0.1, null, true, false);
 				BossUtils.bossDamagePercent(p, p, PCT_DAMAGE);
 				p.setVelocity(vel);
 				world.playSound(loc, Sound.ENTITY_GENERIC_EXTINGUISH_FIRE, 0.3f, 1.5f);

@@ -1,18 +1,16 @@
 package com.playmonumenta.plugins.abilities;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.bukkit.command.CommandSender;
-import org.checkerframework.checker.nullness.qual.Nullable;
-
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.classes.ClassAbility;
-
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
+import org.bukkit.command.CommandSender;
+import org.checkerframework.checker.nullness.qual.Nullable;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * The AbilityInfo class contains the small information bits

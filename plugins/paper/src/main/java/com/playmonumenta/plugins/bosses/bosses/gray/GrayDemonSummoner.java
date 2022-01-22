@@ -1,9 +1,8 @@
 package com.playmonumenta.plugins.bosses.bosses.gray;
 
+import com.playmonumenta.plugins.bosses.bosses.BossAbilityGroup;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.plugin.Plugin;
-
-import com.playmonumenta.plugins.bosses.bosses.BossAbilityGroup;
 
 public class GrayDemonSummoner extends GrayStrongSummonerBase {
 	public static final String identityTag = "boss_gray_summ_demon";

@@ -1,16 +1,16 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
-import java.util.Arrays;
-import java.util.List;
-
+import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.bosses.spells.SpellSwapOnDismount;
+import com.playmonumenta.plugins.events.DamageEvent;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.plugin.Plugin;
 
-import com.playmonumenta.plugins.bosses.spells.Spell;
-import com.playmonumenta.plugins.bosses.spells.SpellSwapOnDismount;
+import java.util.Arrays;
+import java.util.List;
 
 public class SwapOnDismountBoss extends BossAbilityGroup {
 
@@ -36,8 +36,8 @@ public class SwapOnDismountBoss extends BossAbilityGroup {
 	}
 
 	@Override
-	public void bossDamagedByEntity(EntityDamageByEntityEvent event) {
-		if (event.getDamager() instanceof Mob && !(event.getDamager() instanceof Player)) {
+	public void onHurtByEntity(DamageEvent event, Entity damager) {
+		if (damager instanceof Mob && !(damager instanceof Player)) {
 			event.setCancelled(true);
 		}
 	}

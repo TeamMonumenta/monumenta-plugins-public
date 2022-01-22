@@ -11,7 +11,6 @@ import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.block.ShulkerBox;
-import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -30,11 +29,12 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.enchantments.Locked;
-import com.playmonumenta.plugins.enchantments.curses.CurseOfEphemerality;
+import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.overrides.FirmamentOverride;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.utils.ItemStatUtils;
+import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 
@@ -107,40 +107,38 @@ public class ShulkerEquipmentListener implements Listener {
 		PlayerInventory pInv = player.getInventory();
 		ItemStack sboxItem = event.getCurrentItem();
 
-		if (ItemUtils.isShulkerBox(sboxItem.getType()) && !ItemUtils.isItemShattered(sboxItem) && sboxItem.hasItemMeta()) {
-			if (sboxItem.getItemMeta() instanceof BlockStateMeta) {
-				BlockStateMeta sMeta = (BlockStateMeta)sboxItem.getItemMeta();
-				if (sMeta.getBlockState() instanceof ShulkerBox) {
-					ShulkerBox sbox = (ShulkerBox)sMeta.getBlockState();
+		if (sboxItem != null && ItemUtils.isShulkerBox(sboxItem.getType()) && !ItemStatUtils.isShattered(sboxItem) && sboxItem.hasItemMeta()) {
+			if (sboxItem.getItemMeta() instanceof BlockStateMeta sMeta && sMeta.getBlockState() instanceof ShulkerBox sbox) {
+				if (sbox.isLocked() && sbox.getLock().equals(LOCK_STRING)) {
 
-					if (sbox.isLocked() && sbox.getLock().equals(LOCK_STRING)) {
-
-						//if on cooldown don't swap
-						if (checkSwapCooldown(player)) {
-				            player.sendMessage(ChatColor.RED + "Lockbox still on cooldown!");
-				            player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1.0f, 1.0f);
-				            event.setCancelled(true);
-				            return;
-						}
-
-						swap(player, pInv, sbox);
-
-						//check if swapped in radius of boss
-						Location loc = player.getLocation();
-						for (LivingEntity mob : EntityUtils.getNearbyMobs(loc, 24)) {
-					        if (mob.getScoreboardTags().contains("Boss")) {
-					            player.sendMessage(ChatColor.RED + "Close to boss - Lockbox on 15s cooldown!");
-					            setSwapCooldown(player);
-					        }
-					    }
-
-						sMeta.setBlockState(sbox);
-						sboxItem.setItemMeta(sMeta);
-						player.updateInventory();
-						event.setCancelled(true);
-						InventoryUtils.scheduleDelayedEquipmentCheck(mPlugin, player, null);
-
+					//if on cooldown don't swap
+					if (checkSwapCooldown(player)) {
+			            player.sendMessage(ChatColor.RED + "Lockbox still on cooldown!");
+			            player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1.0f, 1.0f);
+			            event.setCancelled(true);
+			            return;
 					}
+
+					swap(player, pInv, sbox);
+
+					//check if swapped in radius of boss
+					Location loc = player.getLocation();
+					for (LivingEntity mob : EntityUtils.getNearbyMobs(loc, 24)) {
+				        if (mob.getScoreboardTags().contains("Boss")) {
+				            player.sendMessage(ChatColor.RED + "Close to boss - Lockbox on 15s cooldown!");
+				            setSwapCooldown(player);
+				        }
+				    }
+
+					sMeta.setBlockState(sbox);
+					sboxItem.setItemMeta(sMeta);
+					player.updateInventory();
+					event.setCancelled(true);
+					Map<UUID, ItemStatManager.PlayerItemStats> itemStatsMap = mPlugin.mItemStatManager.getPlayerItemStatsMappings();
+					if (itemStatsMap.containsKey(player.getUniqueId())) {
+						itemStatsMap.get(player.getUniqueId()).updateStats(true);
+					}
+					InventoryUtils.scheduleDelayedEquipmentCheck(mPlugin, player, null);
 				}
 			}
 		}
@@ -155,11 +153,8 @@ public class ShulkerEquipmentListener implements Listener {
 
 	public static boolean isEquipmentBox(@Nullable ItemStack sboxItem) {
 		if (sboxItem != null && ItemUtils.isShulkerBox(sboxItem.getType()) && sboxItem.hasItemMeta()) {
-			if (sboxItem.getItemMeta() instanceof BlockStateMeta) {
-				BlockStateMeta sMeta = (BlockStateMeta) sboxItem.getItemMeta();
-				if (sMeta.getBlockState() instanceof ShulkerBox) {
-					ShulkerBox sbox = (ShulkerBox) sMeta.getBlockState();
-
+			if (sboxItem.getItemMeta() instanceof BlockStateMeta sMeta) {
+				if (sMeta.getBlockState() instanceof ShulkerBox sbox) {
 					if (sbox.isLocked() && sbox.getLock().equals(LOCK_STRING)) {
 						return true;
 					}
@@ -186,16 +181,17 @@ public class ShulkerEquipmentListener implements Listener {
 
 		for (Map.Entry<Integer, Integer> slot : SWAP_SLOTS.entrySet()) {
 			ItemStack item = pInv.getItem(slot.getKey());
-			if (slot.getKey() >= 36 && slot.getKey() <= 39 && item != null && item.getEnchantmentLevel(Enchantment.BINDING_CURSE) != 0) {
+			if (slot.getKey() >= 36 && slot.getKey() <= 39 && item != null && ItemStatUtils.getEnchantmentLevel(item, EnchantmentType.CURSE_OF_BINDING) != 0) {
 				//Does not swap if armor equipped has curse of binding on it
-			} else if (item != null && InventoryUtils.getCustomEnchantLevel(item, CurseOfEphemerality.PROPERTY_NAME, false) != 0) {
+			} else if (item != null && ItemStatUtils.getEnchantmentLevel(item, EnchantmentType.CURSE_OF_EPHEMERALITY) != 0) {
 				//Doesn't swap with curse of ephemerality either
-			} else if (item != null && InventoryUtils.getCustomEnchantLevel(item, Locked.PROPERTY_NAME, false) != 0) {
+			} else if (item != null && ItemStatUtils.getInfusionLevel(item, ItemStatUtils.InfusionType.LOCKED) != 0) {
 				//Doesn't swap with Locked either
 			} else {
 				swapItem(pInv, sInv, slot.getKey(), slot.getValue());
 			}
 		}
+
 	}
 
 	private void swapItem(Inventory from, Inventory to, int fromSlot, int toSlot) {

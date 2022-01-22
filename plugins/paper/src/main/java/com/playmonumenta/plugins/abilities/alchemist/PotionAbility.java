@@ -1,13 +1,13 @@
 package com.playmonumenta.plugins.abilities.alchemist;
 
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.Ability;
 import org.bukkit.Location;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.ThrownPotion;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.checkerframework.checker.nullness.qual.Nullable;
-
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.Ability;
 
 public abstract class PotionAbility extends Ability {
 
@@ -32,7 +32,11 @@ public abstract class PotionAbility extends Ability {
 		}.runTaskLater(mPlugin, 1);
 	}
 
-	public void apply(LivingEntity mob) {
+	public void apply(LivingEntity mob, ThrownPotion potion, boolean isGruesome) {
+
+	}
+
+	public void applyToPlayer(Player player, ThrownPotion potion, boolean isGruesome) {
 
 	}
 
@@ -48,5 +52,4 @@ public abstract class PotionAbility extends Ability {
 	public double getDamage() {
 		return mDamage;
 	}
-
 }

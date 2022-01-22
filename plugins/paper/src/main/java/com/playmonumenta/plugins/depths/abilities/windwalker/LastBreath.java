@@ -10,8 +10,6 @@ import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.util.Vector;
 
 import com.playmonumenta.plugins.Plugin;
@@ -24,7 +22,7 @@ import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
 import com.playmonumenta.plugins.effects.PercentSpeed;
-import com.playmonumenta.plugins.utils.AbilityUtils;
+import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.utils.AbsorptionUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
@@ -60,46 +58,13 @@ public class LastBreath extends DepthsAbility {
 	}
 
 	@Override
-	public boolean playerDamagedByLivingEntityEvent(EntityDamageByEntityEvent event) {
-		if (event.isCancelled()) {
-			return true;
-		}
-
-		execute(event);
-		return true;
-	}
-
-	@Override
-	public boolean playerDamagedByProjectileEvent(EntityDamageByEntityEvent event) {
-		if (event.isCancelled()) {
-			return true;
-		}
-
-		execute(event);
-		return true;
-	}
-
-	/*
-	 * Works against all types of damage
-	 */
-	@Override
-	public boolean playerDamagedEvent(EntityDamageEvent event) {
-		// Do not process cancelled damage events
-		if (event.isCancelled() || event instanceof EntityDamageByEntityEvent) {
-			return true;
-		}
-
-		execute(event);
-		return true;
-	}
-
-	private void execute(EntityDamageEvent event) {
-		if (mPlayer == null || AbilityUtils.isBlocked(event)) {
+	public void onHurt(DamageEvent event) {
+		if (event.isCancelled() || event.isBlocked() || mPlayer == null) {
 			return;
 		}
 
 		// Calculate whether this effect should not be run based on player health.
-		double healthRemaining = mPlayer.getHealth() + AbsorptionUtils.getAbsorption(mPlayer) - EntityUtils.getRealFinalDamage(event);
+		double healthRemaining = mPlayer.getHealth() + AbsorptionUtils.getAbsorption(mPlayer) - event.getDamage();
 
 		if (healthRemaining > EntityUtils.getMaxHealth(mPlayer) * TRIGGER_HEALTH) {
 			return;
@@ -144,6 +109,7 @@ public class LastBreath extends DepthsAbility {
 		world.playSound(loc, Sound.ENTITY_HORSE_BREATHE, 2.0f, 0.4f);
 
 		MessagingUtils.sendActionBarMessage(mPlugin, mPlayer, "Last Breath has been activated!");
+
 	}
 
 	@Override

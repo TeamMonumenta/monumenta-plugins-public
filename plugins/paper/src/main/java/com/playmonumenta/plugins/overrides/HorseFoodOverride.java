@@ -1,13 +1,12 @@
 package com.playmonumenta.plugins.overrides;
 
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.depths.abilities.steelsage.SteelStallion;
+import com.playmonumenta.plugins.utils.ItemUtils;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Horse;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.depths.abilities.steelsage.SteelStallion;
-import com.playmonumenta.plugins.utils.ItemUtils;
 
 public class HorseFoodOverride extends BaseOverride {
 	@Override

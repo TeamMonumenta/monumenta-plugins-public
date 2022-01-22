@@ -6,8 +6,6 @@ import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -16,8 +14,8 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
-import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.AbsorptionUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
@@ -52,87 +50,47 @@ public class PrismaticShield extends Ability {
 		mDisplayItem = new ItemStack(Material.SHIELD, 1);
 	}
 
-	/*
-	 * Evasion works off the PlayerDamagedByLivingEntity event, and the order of event
-	 * triggers only applies to events of the same type, so we need to break Prismatic
-	 * into two pieces for the trigger order to be correct.
-	 */
 	@Override
-	public boolean playerDamagedByLivingEntityEvent(EntityDamageByEntityEvent event) {
-		if (event.isCancelled()) {
-			return true;
-		}
+	public void onHurt(DamageEvent event) {
+		if (!event.isCancelled() && !event.isBlocked() && mPlayer != null) {
+			// Calculate whether this effect should not be run based on player health.
+			// It is intentional that Prismatic Shield saves you from death if you take a buttload of damage somehow.
+			double healthRemaining = mPlayer.getHealth() + AbsorptionUtils.getAbsorption(mPlayer) - event.getDamage();
 
-		execute(event);
-		return true;
-	}
-
-	@Override
-	public boolean playerDamagedByProjectileEvent(EntityDamageByEntityEvent event) {
-		if (event.isCancelled()) {
-			return true;
-		}
-
-		execute(event);
-		return true;
-	}
-
-	/*
-	 * Works against all types of damage
-	 */
-	@Override
-	public boolean playerDamagedEvent(EntityDamageEvent event) {
-		// Do not process cancelled damage events
-		if (event.isCancelled() || event instanceof EntityDamageByEntityEvent) {
-			return true;
-		}
-
-		execute(event);
-		return true;
-	}
-
-	private void execute(EntityDamageEvent event) {
-		if (AbilityUtils.isBlocked(event)) {
-			return;
-		}
-
-		// Calculate whether this effect should not be run based on player health.
-		// It is intentional that Prismatic Shield saves you from death if you take a buttload of damage somehow.
-		double healthRemaining = mPlayer.getHealth() + AbsorptionUtils.getAbsorption(mPlayer) - EntityUtils.getRealFinalDamage(event);
-
-		// Health is less than 0 but does not penetrate the absorption shield
-		boolean dealDamageLater = healthRemaining < 0 && healthRemaining > -4 * (mAmplifier + 1);
+			// Health is less than 0 but does not penetrate the absorption shield
+			boolean dealDamageLater = healthRemaining < 0 && healthRemaining > -4 * (mAmplifier + 1);
 
 
-		if (healthRemaining > TRIGGER_HEALTH) {
-			return;
-		} else if (dealDamageLater) {
-			// The player has taken fatal damage BUT will be saved by the absorption, so set damage to 0 and compensate later
-			event.setCancelled(true);
-		}
-
-		// Put on cooldown before processing results to prevent infinite recursion
-		putOnCooldown();
-
-		// Conditions match - prismatic shield
-		for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), RADIUS, mPlayer)) {
-			MovementUtils.knockAway(mPlayer, mob, KNOCKBACK_SPEED);
-			if (getAbilityScore() == 2) {
-				EntityUtils.applyStun(mPlugin, STUN_DURATION, mob);
+			if (healthRemaining > TRIGGER_HEALTH) {
+				return;
+			} else if (dealDamageLater) {
+				// The player has taken fatal damage BUT will be saved by the absorption, so set damage to 0 and compensate later
+				event.setCancelled(true);
 			}
-		}
 
-		mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF,
-		                                 new PotionEffect(PotionEffectType.ABSORPTION, mDuration, mAmplifier, true, true));
-		World world = mPlayer.getWorld();
-		world.spawnParticle(Particle.FIREWORKS_SPARK, mPlayer.getLocation().add(0, 1.15, 0), 150, 0.2, 0.35, 0.2, 0.5);
-		world.spawnParticle(Particle.SPELL_INSTANT, mPlayer.getLocation().add(0, 1.15, 0), 100, 0.2, 0.35, 0.2, 1);
-		world.playSound(mPlayer.getLocation(), Sound.ITEM_TOTEM_USE, 1, 1.35f);
-		MessagingUtils.sendActionBarMessage(mPlugin, mPlayer, "Prismatic Shield has been activated");
+			// Put on cooldown before processing results to prevent infinite recursion
+			putOnCooldown();
 
-		if (dealDamageLater) {
-			mPlayer.setHealth(1);
-			AbsorptionUtils.subtractAbsorption(mPlayer, 1 - (float) healthRemaining);
+			// Conditions match - prismatic shield
+			for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), RADIUS, mPlayer)) {
+				MovementUtils.knockAway(mPlayer, mob, KNOCKBACK_SPEED, true);
+				if (getAbilityScore() == 2) {
+					EntityUtils.applyStun(mPlugin, STUN_DURATION, mob);
+				}
+			}
+
+			mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF,
+			                                 new PotionEffect(PotionEffectType.ABSORPTION, mDuration, mAmplifier, true, true));
+			World world = mPlayer.getWorld();
+			world.spawnParticle(Particle.FIREWORKS_SPARK, mPlayer.getLocation().add(0, 1.15, 0), 150, 0.2, 0.35, 0.2, 0.5);
+			world.spawnParticle(Particle.SPELL_INSTANT, mPlayer.getLocation().add(0, 1.15, 0), 100, 0.2, 0.35, 0.2, 1);
+			world.playSound(mPlayer.getLocation(), Sound.ITEM_TOTEM_USE, 1, 1.35f);
+			MessagingUtils.sendActionBarMessage(mPlugin, mPlayer, "Prismatic Shield has been activated");
+
+			if (dealDamageLater) {
+				mPlayer.setHealth(1);
+				AbsorptionUtils.subtractAbsorption(mPlayer, 1 - (float) healthRemaining);
+			}
 		}
 	}
 }

@@ -1,13 +1,5 @@
 package com.playmonumenta.plugins.network;
 
-import java.nio.charset.StandardCharsets;
-import java.util.Comparator;
-import java.util.function.Predicate;
-
-import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
-import org.checkerframework.checker.nullness.qual.Nullable;
-
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.playmonumenta.plugins.Plugin;
@@ -20,6 +12,13 @@ import com.playmonumenta.plugins.classes.MonumentaClasses;
 import com.playmonumenta.plugins.classes.PlayerClass;
 import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
+import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
+import org.checkerframework.checker.nullness.qual.Nullable;
+
+import java.nio.charset.StandardCharsets;
+import java.util.Comparator;
+import java.util.function.Predicate;
 
 /**
  * Handles communication with an (optional) client mod.

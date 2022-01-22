@@ -1,11 +1,13 @@
 package com.playmonumenta.plugins.utils;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.NavigableSet;
-import java.util.Optional;
-
+import com.destroystokyo.paper.MaterialSetTag;
+import com.playmonumenta.plugins.Constants;
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.effects.Effect;
+import com.playmonumenta.plugins.events.AbilityCastEvent;
+import com.playmonumenta.plugins.potion.PotionManager.PotionID;
+import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
@@ -15,23 +17,16 @@ import org.bukkit.entity.AbstractArrow;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityRegainHealthEvent;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-import com.destroystokyo.paper.MaterialSetTag;
-import com.playmonumenta.plugins.Constants;
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.attributes.AttributeManager;
-import com.playmonumenta.plugins.attributes.AttributeProjectileSpeed;
-import com.playmonumenta.plugins.classes.ClassAbility;
-import com.playmonumenta.plugins.effects.Effect;
-import com.playmonumenta.plugins.events.AbilityCastEvent;
-import com.playmonumenta.plugins.potion.PotionManager.PotionID;
-
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.NavigableSet;
+import java.util.Optional;
 
 
 public class PlayerUtils {
@@ -103,7 +98,15 @@ public class PlayerUtils {
 		}
 	}
 
-	public static void healPlayer(Player player, double healAmount) {
+	public static void healPlayer(Plugin plugin, Player player, double healAmount) {
+		healPlayer(plugin, player, healAmount, null);
+	}
+
+	public static void healPlayer(Plugin plugin, Player player, double healAmount, @Nullable Player sourcePlayer) {
+		if ((sourcePlayer != null) && (player != sourcePlayer)) {
+			double healBonus = plugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.TRIAGE) * 0.05;
+			healAmount *= 1 + healBonus;
+		}
 		if (!player.isDead()) {
 			EntityRegainHealthEvent event = new EntityRegainHealthEvent(player, healAmount, EntityRegainHealthEvent.RegainReason.CUSTOM);
 			Bukkit.getPluginManager().callEvent(event);
@@ -137,7 +140,7 @@ public class PlayerUtils {
 	// Returns between 0 to 1, with 1 being full draw
 	public static double calculateBowDraw(AbstractArrow arrowlike) {
 		double currentSpeed = arrowlike.getVelocity().length();
-		double maxLaunchSpeed = Constants.PLAYER_BOW_INITIAL_SPEED * AttributeProjectileSpeed.getProjectileSpeedModifier(arrowlike);
+		double maxLaunchSpeed = Constants.PLAYER_BOW_INITIAL_SPEED;
 
 		return Math.min(
 			1,
@@ -339,123 +342,6 @@ public class PlayerUtils {
 
 		return cylinderPlayers;
 	}
-
-	/*
-	 * Returns the value a Player has of a given attribute
-	 * Used for parsing attribute values for skills, etc. other than their direct effect
-	 */
-	public static double getAttribute(Player player, String attributeName) {
-		PlayerInventory inventory = player.getInventory();
-		List<@Nullable List<String>> lores = new ArrayList<>();
-		ItemStack item;
-		item = inventory.getItemInMainHand();
-		lores.add(item == null ? null : item.getLore());
-		item = inventory.getItemInOffHand();
-		lores.add(item == null ? null : item.getLore());
-		item = inventory.getHelmet();
-		lores.add(item == null ? null : item.getLore());
-		item = inventory.getChestplate();
-		lores.add(item == null ? null : item.getLore());
-		item = inventory.getLeggings();
-		lores.add(item == null ? null : item.getLore());
-		item = inventory.getBoots();
-		lores.add(item == null ? null : item.getLore());
-
-		String[] attributeIndicators = AttributeManager.ATTRIBUTE_INDICATORS;
-		int iterateUntil = attributeIndicators.length;
-
-		List<Double> flats = new ArrayList<Double>();
-		List<Double> mults = new ArrayList<Double>();
-
-		for (int i = 1; i < iterateUntil; i++) {
-			if (lores.get(i - 1) == null) {
-				continue;
-			}
-
-			boolean readAttributes = false;
-
-			for (String loreEntry : lores.get(i - 1)) {
-				if (!readAttributes) {
-					if (attributeIndicators[i].equals(loreEntry)) {
-						readAttributes = true;
-					}
-				} else {
-					if (attributeIndicators[0].equals(loreEntry)) {
-						break;
-					}
-
-					String loreEntryStripped = "";
-					if (loreEntry.startsWith(ChatColor.DARK_GREEN + " ")) {
-						loreEntryStripped = loreEntry.substring(3);
-					} else if (loreEntry.startsWith(ChatColor.BLUE.toString()) || loreEntry.startsWith(ChatColor.RED.toString())) {
-						loreEntryStripped = loreEntry.substring(2);
-					}
-					String[] loreSegments = loreEntryStripped.split(" ", 2);
-
-					if (loreSegments.length < 2) {
-						continue;
-					}
-
-					// We are only looking for lore with attributeName after the number
-					if (!loreSegments[1].contains(attributeName)) {
-						continue;
-					}
-
-					if (loreSegments.length == 2 && loreSegments[0].length() > 0) {
-						boolean isMultiplier = false;
-						if (loreSegments[0].endsWith("%")) {
-							isMultiplier = true;
-							loreSegments[0] = loreSegments[0].substring(0, loreSegments[0].length() - 1);
-						}
-
-						boolean foundDecimal = false;
-						int j;
-						for (j = 0; j < loreSegments[0].length(); j++) {
-							char c = loreSegments[0].charAt(j);
-							if (!Character.isDigit(c) && !(j == 0 && (c == '+' || c == '-'))) {
-								if (c == '.' && loreSegments[0].length() >= 2) {
-									if (foundDecimal) {
-										break;
-									} else {
-										foundDecimal = true;
-									}
-								} else {
-									break;
-								}
-							}
-						}
-
-						// Reached the end of iteration means very-likely to be parsable
-						if (j == loreSegments[0].length()) {
-							try {
-								double value = Double.parseDouble(loreSegments[0]);
-								if (isMultiplier) {
-									value /= 100;
-									mults.add(value);
-								} else {
-									flats.add(value);
-								}
-							} catch (NumberFormatException e) {
-								e.printStackTrace();
-							}
-						}
-					}
-				}
-			}
-		}
-
-		double finalValue = 0;
-		for (double flat : flats) {
-			finalValue += flat;
-		}
-		double overallMultiplier = 1;
-		for (double mult : mults) {
-			overallMultiplier += mult;
-		}
-		finalValue *= overallMultiplier;
-		return finalValue;
-	}
-
 
 	public static boolean isMage(Player player) {
 		Optional<Integer> opt = ScoreboardUtils.getScoreboardValue(player, "Class");

@@ -1,7 +1,11 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
-import java.util.Arrays;
-
+import com.playmonumenta.plugins.bosses.SpellManager;
+import com.playmonumenta.plugins.bosses.parameters.BossParam;
+import com.playmonumenta.plugins.bosses.spells.SpellBombToss;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -11,11 +15,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.entity.TNTPrimed;
 import org.bukkit.plugin.Plugin;
 
-import com.playmonumenta.plugins.bosses.SpellManager;
-import com.playmonumenta.plugins.bosses.parameters.BossParam;
-import com.playmonumenta.plugins.bosses.spells.SpellBombToss;
-import com.playmonumenta.plugins.utils.BossUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
+import java.util.Arrays;
 
 public class FireBombTossBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_firebombtoss";
@@ -25,7 +25,7 @@ public class FireBombTossBoss extends BossAbilityGroup {
 		public int LOBS = 1;
 
 		@BossParam(help = "not written")
-		public int DAMAGE = 64;
+		public int DAMAGE = 32;
 
 		@BossParam(help = "not written")
 		public int DELAY = 100;
@@ -65,7 +65,7 @@ public class FireBombTossBoss extends BossAbilityGroup {
 						for (Player player : PlayerUtils.playersInRange(loc, p.RADIUS, true)) {
 							if (player.hasLineOfSight(tnt)) {
 								double multiplier = (p.RADIUS - player.getLocation().distance(loc)) / p.RADIUS;
-								BossUtils.bossDamage(boss, player, p.DAMAGE * multiplier);
+								BossUtils.dualTypeBlockableDamage(boss, player, DamageType.BLAST, DamageType.FIRE, p.DAMAGE * multiplier, 0.9);
 								player.setFireTicks((int)(p.FIRE_DURATION * multiplier));
 							}
 						}

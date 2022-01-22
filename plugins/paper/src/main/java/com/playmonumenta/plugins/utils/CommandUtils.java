@@ -1,8 +1,9 @@
 package com.playmonumenta.plugins.utils;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import com.playmonumenta.plugins.point.AreaBounds;
+import com.playmonumenta.plugins.point.Point;
+import dev.jorel.commandapi.CommandAPI;
+import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -11,15 +12,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.command.ProxiedCommandSender;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 import org.checkerframework.checker.nullness.qual.Nullable;
-
-import com.playmonumenta.plugins.point.AreaBounds;
-import com.playmonumenta.plugins.point.Point;
-
-import dev.jorel.commandapi.CommandAPI;
-import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
 
 public class CommandUtils {
 
@@ -142,62 +135,6 @@ public class CommandUtils {
 			sender.sendMessage(ChatColor.RED + msg);
 		} else {
 			sender.sendMessage(msg);
-		}
-	}
-
-	public static void enchantify(@Nullable CommandSender sender, Player player, String enchantment) throws WrapperCommandSyntaxException {
-		enchantify(sender, player, enchantment, null);
-	}
-
-	public static void enchantify(@Nullable CommandSender sender, Player player, String enchantment, String ownerPrefix) throws WrapperCommandSyntaxException {
-		ItemStack item = player.getEquipment().getItemInMainHand();
-
-		try {
-			ItemUtils.enchantifyItem(item, enchantment, ownerPrefix, player);
-		} catch (Exception e) {
-			CommandAPI.fail(e.getMessage());
-		}
-
-		if (sender != null) {
-			sender.sendMessage("Successfully added " + enchantment + " to player's held item");
-		}
-	}
-
-	public static void deEnchantifyHeldItem(CommandSender sender, Player player, String enchantment) throws WrapperCommandSyntaxException {
-		enchantment = ChatColor.stripColor(enchantment);
-
-		ItemStack item = player.getInventory().getItemInMainHand();
-
-		ItemMeta meta = item.getItemMeta();
-		if (meta == null) {
-			CommandAPI.fail("Player must have a " + enchantment + " item in their main hand!");
-			throw new RuntimeException();
-		}
-
-		List<String> lore = meta.getLore();
-		if (lore == null || lore.isEmpty()) {
-			CommandAPI.fail("Player must have a " + enchantment + " item in their main hand!");
-			throw new RuntimeException();
-		}
-
-		List<String> newLore = new ArrayList<>();
-		boolean hasEnchant = false;
-		for (String loreEntry : lore) {
-			if (ChatColor.stripColor(loreEntry).startsWith(enchantment)) {
-				hasEnchant = true;
-			} else {
-				newLore.add(loreEntry);
-			}
-		}
-
-		if (!hasEnchant) {
-			CommandAPI.fail("Player must have a " + enchantment + " item in their main hand!");
-		} else {
-			meta.setLore(newLore);
-			item.setItemMeta(meta);
-			ItemUtils.setPlainLore(item);
-
-			sender.sendMessage("Successfully removed " + enchantment + " from the player's held item");
 		}
 	}
 

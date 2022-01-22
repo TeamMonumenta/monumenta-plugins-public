@@ -1,6 +1,5 @@
 package com.playmonumenta.plugins.abilities.rogue;
 
-import java.util.EnumSet;
 import java.util.List;
 
 import org.bukkit.Color;
@@ -12,8 +11,6 @@ import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -25,9 +22,9 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.classes.ClassAbility;
-import com.playmonumenta.plugins.classes.magic.MagicType;
-import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
-import com.playmonumenta.plugins.enchantments.abilities.BaseAbilityEnchantment;
+import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
@@ -35,17 +32,12 @@ import com.playmonumenta.plugins.utils.MetadataUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
 
 public class DaggerThrow extends Ability {
-	public static class DaggerThrowCooldownEnchantment extends BaseAbilityEnchantment {
-		public DaggerThrowCooldownEnchantment() {
-			super("Dagger Throw Cooldown", EnumSet.of(ItemSlot.ARMOR));
-		}
-	}
 
 	private static final String DAGGER_THROW_MOB_HIT_TICK = "HitByDaggerThrowTick";
 	private static final int DAGGER_THROW_COOLDOWN = 12 * 20;
 	private static final int DAGGER_THROW_RANGE = 8;
-	private static final int DAGGER_THROW_1_DAMAGE = 6;
-	private static final int DAGGER_THROW_2_DAMAGE = 12;
+	private static final int DAGGER_THROW_1_DAMAGE = 4;
+	private static final int DAGGER_THROW_2_DAMAGE = 8;
 	private static final int DAGGER_THROW_DURATION = 10 * 20;
 	private static final int DAGGER_THROW_1_VULN = 3;
 	private static final int DAGGER_THROW_2_VULN = 7;
@@ -60,8 +52,8 @@ public class DaggerThrow extends Ability {
 		mInfo.mLinkedSpell = ClassAbility.DAGGER_THROW;
 		mInfo.mScoreboardId = "DaggerThrow";
 		mInfo.mShorthandName = "DT";
-		mInfo.mDescriptions.add("Sneak left click while holding two swords to throw three daggers which deal 6 damage and gives each target 20% Vulnerability for 10 seconds. Cooldown: 12s.");
-		mInfo.mDescriptions.add("The damage is increased to 12 and the Vulnerability increased to 40%.");
+		mInfo.mDescriptions.add("Sneak left click while holding two swords to throw three daggers which deal 4 melee damage and gives each target 20% Vulnerability for 10 seconds. Cooldown: 12s.");
+		mInfo.mDescriptions.add("The damage is increased to 8 and the Vulnerability increased to 40%.");
 		mInfo.mCooldown = DAGGER_THROW_COOLDOWN;
 		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;
 		mDisplayItem = new ItemStack(Material.WOODEN_SWORD, 1);
@@ -106,7 +98,7 @@ public class DaggerThrow extends Ability {
 						world.spawnParticle(Particle.SWEEP_ATTACK, bLoc, 3, 0.3, 0.3, 0.3, 0.1);
 						world.playSound(loc, Sound.BLOCK_ANVIL_PLACE, 0.4f, 2.5f);
 
-						EntityUtils.damageEntity(mPlugin, mob, mDamage, mPlayer, MagicType.PHYSICAL, true, mInfo.mLinkedSpell);
+						DamageUtils.damage(mPlayer, mob, DamageType.MELEE_SKILL, mDamage, mInfo.mLinkedSpell);
 						PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(PotionEffectType.UNLUCK, DAGGER_THROW_DURATION, mVulnAmplifier, true, false));
 						break;
 					} else if (!bLoc.isChunkLoaded() || bLoc.getBlock().getType().isSolid()) {
@@ -122,25 +114,14 @@ public class DaggerThrow extends Ability {
 
 	@Override
 	public boolean runCheck() {
-		if (mPlayer != null && mPlayer.isSneaking() && mPlayer.getLocation().getPitch() > -50) {
-			ItemStack mainHand = mPlayer.getInventory().getItemInMainHand();
-			ItemStack offHand = mPlayer.getInventory().getItemInOffHand();
-			return InventoryUtils.rogueTriggerCheck(mainHand, offHand);
-		}
-		return false;
+		return mPlayer != null && mPlayer.isSneaking() && mPlayer.getLocation().getPitch() > - 50 && InventoryUtils.rogueTriggerCheck(mPlugin, mPlayer);
 	}
 
 	@Override
-	public boolean livingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
-		if (event.getCause().equals(DamageCause.ENTITY_ATTACK)) {
+	public void onDamage(DamageEvent event, LivingEntity enemy) {
+		if (event.getType() == DamageType.MELEE) {
 			cast(Action.LEFT_CLICK_AIR);
 		}
-
-		return true;
 	}
 
-	@Override
-	public Class<? extends BaseAbilityEnchantment> getCooldownEnchantment() {
-		return DaggerThrowCooldownEnchantment.class;
-	}
 }

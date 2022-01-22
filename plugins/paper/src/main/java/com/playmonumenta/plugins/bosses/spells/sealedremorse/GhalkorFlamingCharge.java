@@ -1,7 +1,11 @@
 package com.playmonumenta.plugins.bosses.spells.sealedremorse;
 
-import java.util.List;
-
+import com.playmonumenta.plugins.bosses.bosses.Ghalkor;
+import com.playmonumenta.plugins.bosses.spells.SpellBaseCharge;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.DamageUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -15,15 +19,11 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 
-import com.playmonumenta.plugins.bosses.bosses.Ghalkor;
-import com.playmonumenta.plugins.bosses.spells.SpellBaseCharge;
-import com.playmonumenta.plugins.utils.BossUtils;
-import com.playmonumenta.plugins.utils.NmsUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
+import java.util.List;
 
 public class GhalkorFlamingCharge extends SpellBaseCharge {
 
-	private static final int DAMAGE = 30;
+	private static final int DAMAGE = 20;
 	private static final int GROUND_DAMAGE = 20;
 	private static final int FIRE_DURATION = 20 * 4;
 
@@ -57,7 +57,8 @@ public class GhalkorFlamingCharge extends SpellBaseCharge {
 							0.4, 0.4, 0.4, Material.REDSTONE_BLOCK.createBlockData());
 					player.getWorld().spawnParticle(Particle.BLOCK_CRACK, player.getLocation().add(0, 1, 0), 12, 0.4,
 							0.4, 0.4, 0.4, Material.REDSTONE_WIRE.createBlockData());
-					BossUtils.bossDamage(boss, player, DAMAGE, null, "Flaming Charge");
+					BossUtils.blockableDamage(boss, player, DamageType.MAGIC, DAMAGE * 0.9, "Flaming Charge", null);
+					BossUtils.blockableDamage(boss, player, DamageType.FIRE, DAMAGE * 0.1, "Flaming Charge", null);
 				},
 				// Attack particles
 				(Location loc) -> {
@@ -90,7 +91,7 @@ public class GhalkorFlamingCharge extends SpellBaseCharge {
 								if (mHitbox.overlaps(player.getBoundingBox())) {
 									world.playSound(mParticleLoc, Sound.ENTITY_GENERIC_BURN, 0.5f, 1f);
 									player.setFireTicks(FIRE_DURATION);
-									NmsUtils.unblockableEntityDamageEntity(player, GROUND_DAMAGE, boss);
+									DamageUtils.dualTypeDamage(boss, player, DamageType.MAGIC, DamageType.FIRE, GROUND_DAMAGE, 0.9, null, false, true, "Flaming Charge");
 								}
 							}
 

@@ -1,8 +1,14 @@
 package com.playmonumenta.plugins.bosses.spells.kaul;
 
-import java.util.Collections;
-import java.util.List;
-
+import com.playmonumenta.plugins.bosses.ChargeUpManager;
+import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.DamageUtils;
+import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.LocationUtils;
+import com.playmonumenta.plugins.utils.MovementUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -18,13 +24,8 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 
-import com.playmonumenta.plugins.bosses.ChargeUpManager;
-import com.playmonumenta.plugins.bosses.spells.Spell;
-import com.playmonumenta.plugins.utils.BossUtils;
-import com.playmonumenta.plugins.utils.FastUtils;
-import com.playmonumenta.plugins.utils.LocationUtils;
-import com.playmonumenta.plugins.utils.MovementUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
+import java.util.Collections;
+import java.util.List;
 
 /*
  * Volcanic Demise:
@@ -37,7 +38,7 @@ import com.playmonumenta.plugins.utils.PlayerUtils;
  */
 public class SpellVolcanicDemise extends Spell {
 
-	private static final int DAMAGE = 42;
+	private static final int DAMAGE = 36;
 	private static final int METEOR_COUNT = 25;
 	private static final int METEOR_RATE = 10;
 
@@ -186,11 +187,11 @@ public class SpellVolcanicDemise extends Spell {
 					for (Player player : PlayerUtils.playersInRange(mLoc, 4, true)) {
 						BoundingBox pBox = player.getBoundingBox();
 						if (pBox.overlaps(death)) {
-							BossUtils.bossDamage(mBoss, player, 1000, mLoc, "Volcanic Demise");
+							DamageUtils.damage(mBoss, player, DamageType.BLAST, 1000, null, false, true, "Volcanic Demise");
 							MovementUtils.knockAway(mLoc, player, 0.5f, 0.65f);
 						} else if (pBox.overlaps(box)) {
-							BossUtils.bossDamage(mBoss, player, DAMAGE, mLoc, "Volcanic Demise");
-							if (!BossUtils.bossDamageBlocked(player, DAMAGE, mLoc)) {
+							BossUtils.blockableDamage(mBoss, player, DamageType.BLAST, DAMAGE, "Volcanic Demise", mLoc);
+							if (!BossUtils.bossDamageBlocked(player, mLoc)) {
 								MovementUtils.knockAway(mLoc, player, 0.5f, 0.65f);
 							}
 						}

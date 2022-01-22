@@ -1,13 +1,12 @@
 package com.playmonumenta.plugins.classes;
 
-import java.util.ArrayList;
-
-import org.bukkit.inventory.ItemStack;
-import org.checkerframework.checker.nullness.qual.Nullable;
-
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.abilities.Ability;
+import org.bukkit.inventory.ItemStack;
+import org.checkerframework.checker.nullness.qual.Nullable;
+
+import java.util.ArrayList;
 
 
 public class PlayerSpec {

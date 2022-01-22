@@ -1,13 +1,14 @@
 package com.playmonumenta.plugins.bosses.spells;
 
+import com.playmonumenta.plugins.events.DamageEvent;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -56,15 +57,15 @@ public class SpellShieldSwitch extends Spell {
 	}
 
 	@Override
-	public void bossDamagedByEntity(EntityDamageByEntityEvent event) {
-		if (event.getDamager() instanceof Projectile proj) {
+	public void onHurtByEntityWithSource(DamageEvent event, Entity damager, LivingEntity source) {
+		if (damager instanceof Projectile proj) {
 			ItemStack curItem = mLauncher.getEquipment().getItemInMainHand();
 
 			if (curItem != null && curItem.getType().equals(Material.SHIELD)) {
 				event.setDamage(0.01);
 				mLauncher.getWorld().playSound(mLauncher.getLocation(), Sound.ITEM_SHIELD_BLOCK, SoundCategory.HOSTILE, 1.0f, 1.0f);
-				if (proj.getShooter() instanceof Player shooter) {
-					shooter.playSound(mLauncher.getLocation(), Sound.ITEM_SHIELD_BLOCK, SoundCategory.HOSTILE, 0.5f, 1.0f);
+				if (source instanceof Player player) {
+					player.playSound(mLauncher.getLocation(), Sound.ITEM_SHIELD_BLOCK, SoundCategory.HOSTILE, 0.5f, 1.0f);
 				}
 
 				new BukkitRunnable() {

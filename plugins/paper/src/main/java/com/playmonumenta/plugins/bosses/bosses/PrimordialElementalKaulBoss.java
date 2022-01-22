@@ -1,48 +1,37 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
-import org.bukkit.World;
-import org.bukkit.attribute.Attribute;
-import org.bukkit.block.Block;
-import org.bukkit.boss.BarColor;
-import org.bukkit.boss.BarStyle;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Mob;
-import org.bukkit.entity.Player;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
-import org.bukkit.plugin.Plugin;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
-
 import com.playmonumenta.plugins.bosses.BossBarManager;
 import com.playmonumenta.plugins.bosses.BossBarManager.BossHealthAction;
 import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.events.SpellCastEvent;
 import com.playmonumenta.plugins.bosses.spells.Spell;
-import com.playmonumenta.plugins.bosses.spells.SpellBaseBolt;
 import com.playmonumenta.plugins.bosses.spells.SpellBaseParticleAura;
 import com.playmonumenta.plugins.bosses.spells.SpellBossBlockBreak;
 import com.playmonumenta.plugins.bosses.spells.SpellConditionalTeleport;
-import com.playmonumenta.plugins.bosses.spells.SpellPurgeNegatives;
+import com.playmonumenta.plugins.bosses.spells.SpellShieldStun;
 import com.playmonumenta.plugins.bosses.spells.kaul.SpellEarthenRupture;
+import com.playmonumenta.plugins.bosses.spells.kaul.SpellPrimordialBolt;
 import com.playmonumenta.plugins.bosses.spells.kaul.SpellRaiseJungle;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
-import com.playmonumenta.plugins.utils.LocationUtils;
-import com.playmonumenta.plugins.utils.MovementUtils;
-import com.playmonumenta.plugins.utils.NmsUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.Particle;
+import org.bukkit.World;
+import org.bukkit.attribute.Attribute;
+import org.bukkit.boss.BarColor;
+import org.bukkit.boss.BarStyle;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Mob;
+import org.bukkit.entity.Player;
+import org.bukkit.plugin.Plugin;
+
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /*
  * Summons a powerful Primordial Elemental that is invulnerable and immovable until out of the ground.
@@ -84,14 +73,14 @@ public final class PrimordialElementalKaulBoss extends BossAbilityGroup {
 			hpDelta = hpDelta / 2;
 			playerCount--;
 		}
-		EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_MAX_HEALTH, bossTargetHp);
+		EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_MAX_HEALTH, bossTargetHp * 1.1);
 		EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_FOLLOW_RANGE, detectionRange);
 		EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_KNOCKBACK_RESISTANCE, 1);
-		mBoss.setHealth(bossTargetHp);
+		mBoss.setHealth(bossTargetHp * 1.1);
 		SpellManager activeSpells = new SpellManager(Arrays.asList(
 			new SpellRaiseJungle(plugin, mBoss, 10, detectionRange, 20 * 8, 20 * 20),
 			new SpellEarthenRupture(plugin, mBoss),
-			getBoltSpell(plugin, mBoss)
+			new SpellPrimordialBolt(plugin, mBoss)
 		));
 
 		List<Spell> passiveSpells = Arrays.asList(
@@ -106,7 +95,7 @@ public final class PrimordialElementalKaulBoss extends BossAbilityGroup {
 														       || b.getLocation().add(0, 1, 0).getBlock().getType() == Material.BEDROCK
 														       || b.getLocation().getBlock().getType() == Material.LAVA
 														       || b.getLocation().getBlock().getType() == Material.WATER),
-			new SpellPurgeNegatives(mBoss, 20 * 5)
+			new SpellShieldStun(30 * 20)
 		);
 
 		Map<Integer, BossHealthAction> events = new HashMap<Integer, BossHealthAction>();
@@ -123,94 +112,9 @@ public final class PrimordialElementalKaulBoss extends BossAbilityGroup {
 	@Override
 	public void bossCastAbility(SpellCastEvent event) {
 		List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true);
-		if (players.size() > 0) {
+		if (players.size() > 0 && mBoss instanceof Mob mob) {
 			Player newTarget = players.get(FastUtils.RANDOM.nextInt(players.size()));
-			((Mob) mBoss).setTarget(newTarget);
+			mob.setTarget(newTarget);
 		}
-	}
-
-	@Override
-	public void bossDamagedEntity(EntityDamageByEntityEvent event) {
-		if (event.getEntity() instanceof Player && event.getCause().equals(DamageCause.ENTITY_ATTACK)) {
-			Player player = (Player) event.getEntity();
-			if (player.isBlocking()) {
-				NmsUtils.stunShield(player, 20 * 30);
-			}
-		}
-	}
-
-	protected static SpellBaseBolt getBoltSpell(Plugin plugin, LivingEntity boss) {
-		World world = boss.getWorld();
-
-		return new SpellBaseBolt(plugin, boss, 20 * 2, 20 * 5, 1.1, detectionRange, 0.5, false, true, 1, 1,
-			(Entity entity, int tick) -> {
-				if (entity.getLocation().getY() > 60) {
-					return;
-				}
-				float t = tick / 15;
-				world.spawnParticle(Particle.LAVA, boss.getLocation(), 1, 0.35, 0, 0.35, 0.005);
-				world.spawnParticle(Particle.BLOCK_CRACK, boss.getLocation(), 3, 0, 0, 0, 0.5,
-				Material.STONE.createBlockData());
-				world.playSound(boss.getLocation(), Sound.UI_TOAST_IN, 10, t);
-				boss.removePotionEffect(PotionEffectType.SLOW);
-				boss.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 40, 1));
-			},
-
-			(Entity entity) -> {
-				world.playSound(boss.getLocation(), Sound.ENTITY_BLAZE_SHOOT, 5, 0.5f);
-				world.spawnParticle(Particle.FLAME, boss.getLocation().add(0, 1, 0), 80, 0.2, 0.45,
-				0.2, 0.2);
-				world.spawnParticle(Particle.SMOKE_LARGE, boss.getLocation().add(0, 1, 0), 30, 0.2,
-				0.45, 0.2, 0.1);
-			},
-
-			(Location loc) -> {
-				if (loc.getY() > 60) {
-					return;
-				}
-				world.spawnParticle(Particle.BLOCK_DUST, loc, 6, 0.45, 0.45, 0.45, 0.25,
-				Material.STONE.createBlockData());
-				world.spawnParticle(Particle.EXPLOSION_LARGE, loc, 2, 0.2, 0.2, 0.2, 0.25);
-				for (Block block : LocationUtils.getNearbyBlocks(loc.getBlock(), 1)) {
-					if (block.getType().isSolid()) {
-						Material material = block.getType();
-						if (material == Material.SMOOTH_SANDSTONE
-						|| material == Material.SMOOTH_RED_SANDSTONE
-						|| material == Material.NETHERRACK
-						|| material == Material.MAGMA_BLOCK) {
-							block.setType(Material.AIR);
-						}
-					}
-				}
-			},
-
-			(Player player, Location loc, boolean blocked) -> {
-				if (player == null || player.getLocation().getY() > 60 || (loc != null && loc.getY() > 60)) {
-					return;
-				}
-				if (!blocked) {
-					BossUtils.bossDamage(boss, player, 30);
-					player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 15, 1));
-					player.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, 20 * 15, 0));
-				} else {
-					for (Player p : PlayerUtils.playersInRange(loc, 2.5, true)) {
-						if (p.getLocation().getY() <= 60) {
-							BossUtils.bossDamage(boss, p, 16);
-							MovementUtils.knockAway(loc, p, 0.3f);
-							p.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 10, 1));
-							p.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, 20 * 10, 0));
-						}
-					}
-				}
-				world.spawnParticle(Particle.FLAME, loc, 125, 0, 0, 0, 0.175);
-				world.spawnParticle(Particle.SMOKE_LARGE, loc, 50, 0, 0, 0, 0.25);
-				world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 1, 0.9f);
-			},
-
-			// Only allow targetting players below y=60
-			(Player player) -> {
-				return player != null && player.getLocation().getY() < 60;
-			}
-		);
 	}
 }

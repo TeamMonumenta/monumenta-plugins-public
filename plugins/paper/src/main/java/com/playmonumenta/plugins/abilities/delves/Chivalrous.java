@@ -1,23 +1,22 @@
 package com.playmonumenta.plugins.abilities.delves;
 
-import java.util.EnumSet;
-
-import org.bukkit.entity.Creeper;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.SpawnerSpawnEvent;
-import org.checkerframework.checker.nullness.qual.Nullable;
-
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.bosses.bosses.AntiRangeChivalrousBoss;
+import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import com.playmonumenta.plugins.utils.DelvesUtils;
 import com.playmonumenta.plugins.utils.DelvesUtils.Modifier;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
+import org.bukkit.entity.Creeper;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
+import org.bukkit.event.entity.SpawnerSpawnEvent;
+import org.checkerframework.checker.nullness.qual.Nullable;
+
+import java.util.EnumSet;
 
 public class Chivalrous extends DelveModifier {
 
@@ -71,9 +70,11 @@ public class Chivalrous extends DelveModifier {
 	}
 
 	@Override
-	public boolean playerTookMeleeDamageEvent(EntityDamageByEntityEvent event) {
+	public void onHurtByEntity(DamageEvent event, Entity damager) {
 		// Can't make magma cubes do 0 damage in Vanilla using attributes or Weakness
-		return !MOUNT_NAMES[1].equals(event.getDamager().getCustomName());
+		if (MOUNT_NAMES[1].equals(damager.getCustomName())) {
+			event.setCancelled(true);
+		}
 	}
 
 	@Override

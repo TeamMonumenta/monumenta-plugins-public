@@ -1,8 +1,12 @@
 package com.playmonumenta.plugins.bosses.spells.frostgiant;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import com.playmonumenta.plugins.bosses.bosses.FrostGiant;
+import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -10,25 +14,17 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.World;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.ProjectileHitEvent;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-import com.playmonumenta.plugins.bosses.bosses.FrostGiant;
-import com.playmonumenta.plugins.bosses.spells.Spell;
-import com.playmonumenta.plugins.utils.FastUtils;
-import com.playmonumenta.plugins.utils.ItemUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
-
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
+import java.util.ArrayList;
+import java.util.List;
 
 /*
 Armor of Frost - Once every 60 seconds or phase change
@@ -86,17 +82,9 @@ public class ArmorOfFrost extends Spell {
 	 * Boss was damaged, check if permafrost armor is up or not
 	 */
 	@Override
-	public void bossDamagedByEntity(EntityDamageByEntityEvent event) {
+	public void onHurtByEntityWithSource(DamageEvent event, Entity damager, LivingEntity source) {
 		if (mBossClass.mFrostArmorActive) {
-			if (event.getDamager() instanceof Player) {
-
-				//Debug purposes
-				ItemStack item = ((Player)event.getDamager()).getInventory().getItemInMainHand();
-				if (item != null && ItemUtils.getPlainName(item).equals("Frost Giant Damager")) {
-					return;
-				}
-
-				Player player = (Player) event.getDamager();
+			if (source instanceof Player player) {
 				player.playSound(player.getLocation(), Sound.ITEM_SHIELD_BLOCK, SoundCategory.HOSTILE, 3, 0);
 				if (!mWarned.contains(player)) {
 					player.sendMessage(Component.text("The armor absorbs the damage you dealt.", NamedTextColor.GOLD));
@@ -106,20 +94,6 @@ public class ArmorOfFrost extends Spell {
 				mWarned.add(player);
 			}
 			event.setDamage(0.0001);
-		}
-	}
-
-	@Override
-	public void bossHitByProjectile(ProjectileHitEvent event) {
-		if (mBossClass.mFrostArmorActive) {
-			if (event.getEntity().getShooter() instanceof Player) {
-				Player player = (Player) event.getEntity().getShooter();
-				player.playSound(player.getLocation(), Sound.ITEM_SHIELD_BLOCK, SoundCategory.HOSTILE, 3, 0);
-				if (!mWarned.contains(player)) {
-					player.sendMessage(Component.text("The armor absorbs the damage you dealt.", NamedTextColor.GOLD));
-					mWarned.add(player);
-				}
-			}
 		}
 	}
 

@@ -1,7 +1,10 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
-import java.util.Arrays;
-
+import com.playmonumenta.plugins.bosses.SpellManager;
+import com.playmonumenta.plugins.bosses.spells.SpellBaseSeekingProjectile;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.MovementUtils;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -9,10 +12,7 @@ import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.plugin.Plugin;
 
-import com.playmonumenta.plugins.bosses.SpellManager;
-import com.playmonumenta.plugins.bosses.spells.SpellBaseSeekingProjectile;
-import com.playmonumenta.plugins.utils.BossUtils;
-import com.playmonumenta.plugins.utils.MovementUtils;
+import java.util.Arrays;
 
 public class SpellSlingerBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_spellslinger";
@@ -60,8 +60,8 @@ public class SpellSlingerBoss extends BossAbilityGroup {
 							world.playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_TWINKLE, 0.5f, 1.5f);
 							world.spawnParticle(Particle.FIREWORKS_SPARK, loc, 30, 0, 0, 0, 0.25);
 							if (player != null) {
-								BossUtils.bossDamage(boss, player, DAMAGE);
-								MovementUtils.knockAway(boss, player, KNOCKBACK_SPEED);
+								BossUtils.blockableDamage(boss, player, DamageType.MAGIC, DAMAGE);
+								MovementUtils.knockAway(boss, player, KNOCKBACK_SPEED, false);
 							}
 						})
 		));

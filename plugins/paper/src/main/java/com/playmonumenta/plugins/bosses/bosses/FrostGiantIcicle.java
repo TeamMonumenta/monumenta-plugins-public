@@ -1,13 +1,12 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
-import java.util.Arrays;
-import java.util.List;
-
+import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.bosses.spells.frostgiant.SpellFallingIcicle;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.plugin.Plugin;
 
-import com.playmonumenta.plugins.bosses.spells.Spell;
-import com.playmonumenta.plugins.bosses.spells.frostgiant.SpellFallingIcicle;
+import java.util.Arrays;
+import java.util.List;
 
 /*
  * Boss exclusively used for the armor stands in the icicles for Frost Giant so that they fall and detect collision.

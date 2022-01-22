@@ -1,18 +1,17 @@
 package com.playmonumenta.plugins.potion;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.UUID;
-
+import com.google.gson.JsonObject;
+import com.playmonumenta.plugins.Constants;
+import com.playmonumenta.plugins.utils.PotionUtils.PotionInfo;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-import com.google.gson.JsonObject;
-import com.playmonumenta.plugins.Constants;
-import com.playmonumenta.plugins.utils.PotionUtils.PotionInfo;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.UUID;
 
 public class PotionManager {
 	//  Player ID / Player Potion Info

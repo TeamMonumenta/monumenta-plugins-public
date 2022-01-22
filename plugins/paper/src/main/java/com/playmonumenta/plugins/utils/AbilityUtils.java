@@ -8,8 +8,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -22,11 +20,8 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.ThrownPotion;
-import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -87,7 +82,10 @@ public class AbilityUtils {
 		invisTracker.runTaskTimer(plugin, 0, 1);
 	}
 
-	public static boolean isStealthed(Player player) {
+	public static boolean isStealthed(@Nullable Player player) {
+		if (player == null) {
+			return false;
+		}
 		return INVISIBLE_PLAYERS.containsKey(player);
 	}
 
@@ -133,8 +131,7 @@ public class AbilityUtils {
 		}
 
 		for (LivingEntity entity : EntityUtils.getNearbyMobs(player.getLocation(), 64)) {
-			if (entity instanceof Mob) {
-				Mob mob = (Mob) entity;
+			if (entity instanceof Mob mob) {
 				if (mob.getTarget() != null && mob.getTarget().getUniqueId().equals(player.getUniqueId())) {
 					mob.setTarget(null);
 				}
@@ -216,36 +213,6 @@ public class AbilityUtils {
 			return true;
 		}
 
-		return false;
-	}
-
-
-	public static boolean updateAlchemistItem(ItemStack item, int count) {
-		ItemMeta meta = item.getItemMeta();
-
-		if (item.getType() == Material.SPLASH_POTION) {
-			PotionMeta potionMeta = (PotionMeta) meta;
-
-			if (count >= 4) {
-				potionMeta.setColor(Color.GREEN);
-			} else if (count == 3) {
-				potionMeta.setColor(Color.YELLOW);
-			} else if (count == 2) {
-				potionMeta.setColor(Color.ORANGE);
-			} else if (count == 1) {
-				potionMeta.setColor(Color.RED);
-			} else {
-				potionMeta.setColor(Color.BLACK);
-			}
-			item.setItemMeta(potionMeta);
-		}
-
-		if (meta.hasDisplayName() && meta.getDisplayName().contains("Alchemist's Bag")) {
-			meta.setDisplayName(ChatColor.DARK_GREEN + "" + ChatColor.BOLD + "Alchemist's Bag (" + count + ")");
-			item.setItemMeta(meta);
-			ItemUtils.setPlainTag(item);
-			return true;
-		}
 		return false;
 	}
 
@@ -440,9 +407,5 @@ public class AbilityUtils {
 		default:
 			return 0;
 		}
-	}
-
-	public static boolean isBlocked(EntityDamageEvent event) {
-		return event.getFinalDamage() <= 0;
 	}
 }

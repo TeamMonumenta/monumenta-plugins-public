@@ -1,5 +1,9 @@
 package com.playmonumenta.plugins.bosses.spells.falsespirit;
 
+import com.playmonumenta.plugins.bosses.bosses.FalseSpirit;
+import com.playmonumenta.plugins.bosses.spells.SpellBaseAoE;
+import com.playmonumenta.plugins.utils.MovementUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -9,11 +13,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-
-import com.playmonumenta.plugins.bosses.bosses.FalseSpirit;
-import com.playmonumenta.plugins.bosses.spells.SpellBaseAoE;
-import com.playmonumenta.plugins.utils.MovementUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
 
 public class SpellForceTwo extends SpellBaseAoE {
 
@@ -48,7 +47,7 @@ public class SpellForceTwo extends SpellBaseAoE {
 					if (distance < radius) {
 						player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 5, 8));
 						player.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, 20 * 5, -4));
-						MovementUtils.knockAway(launcher, player, 1.2f);
+						MovementUtils.knockAway(launcher, player, 1.2f, false);
 					}
 					player.getWorld().spawnParticle(Particle.VILLAGER_ANGRY, player.getLocation().clone().add(0, 1, 0), 4, 0.25, 0.5, 0.25, 0);
 				}

@@ -1,13 +1,11 @@
 package com.playmonumenta.plugins.commands;
 
 import com.playmonumenta.plugins.utils.ItemUtils;
-
+import dev.jorel.commandapi.CommandAPI;
+import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-
-import dev.jorel.commandapi.CommandAPI;
-import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
 
 public class UpdateHeldItem extends GenericCommand {
 	public static void register() {

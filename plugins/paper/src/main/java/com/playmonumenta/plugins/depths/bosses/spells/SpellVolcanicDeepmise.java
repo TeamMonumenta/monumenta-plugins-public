@@ -1,7 +1,12 @@
 package com.playmonumenta.plugins.depths.bosses.spells;
 
-import java.util.List;
-
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.MovementUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -11,17 +16,12 @@ import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.bosses.spells.Spell;
-import com.playmonumenta.plugins.utils.BossUtils;
-import com.playmonumenta.plugins.utils.FastUtils;
-import com.playmonumenta.plugins.utils.MovementUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
+import java.util.List;
 
 public class SpellVolcanicDeepmise extends Spell {
 
 	public static final double ARENA_SIZE = 30.0;
-	public static final int DAMAGE = 35;
+	public static final int DAMAGE = 20;
 
 	private Location mCenter;
 	private int mTicks = 0;
@@ -63,9 +63,6 @@ public class SpellVolcanicDeepmise extends Spell {
 	}
 
 	private void rainMeteor(Location locInput, List<Player> players, double spawnY) {
-
-		//Bukkit.broadcastMessage("Player size " + players.size());
-
 		if (players == null || players.size() == 0) {
 			return;
 		}
@@ -110,9 +107,9 @@ public class SpellVolcanicDeepmise extends Spell {
 					for (Player player : PlayerUtils.playersInRange(mLoc, 4, true)) {
 						BoundingBox pBox = player.getBoundingBox();
 						if (pBox.overlaps(box)) {
-							BossUtils.bossDamage(mBoss, player, DAMAGE, mLoc, "Volcanic Deepmise");
-							if (!BossUtils.bossDamageBlocked(player, DAMAGE, mLoc)) {
-								MovementUtils.knockAway(mLoc, player, 0.5f, 0.65f);
+							BossUtils.blockableDamage(mBoss, player, DamageType.BLAST, DAMAGE, "Volcanic Deepmise", mLoc);
+							if (!BossUtils.bossDamageBlocked(player, mLoc)) {
+								MovementUtils.knockAway(mLoc, player, 0.5f, 0.65f, false);
 							}
 						}
 					}

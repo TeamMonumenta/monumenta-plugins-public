@@ -1,17 +1,16 @@
 package com.playmonumenta.plugins.effects;
 
-import java.util.List;
-
-import org.bukkit.entity.Player;
+import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.utils.EntityUtils;
 import org.bukkit.attribute.Attributable;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
-import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 
-import com.playmonumenta.plugins.utils.EntityUtils;
+import java.util.List;
 
 public class JudgementChainMobEffect extends Effect {
 
@@ -39,29 +38,23 @@ public class JudgementChainMobEffect extends Effect {
 	}
 
 	@Override
-	public boolean entityReceiveDamageEvent(EntityDamageEvent event) {
-		List<LivingEntity> e = EntityUtils.getNearbyMobs(event.getEntity().getLocation(), 8);
-		e.remove(event.getEntity());
+	public void onHurt(@NotNull LivingEntity entity, @NotNull DamageEvent event) {
+		List<LivingEntity> e = EntityUtils.getNearbyMobs(entity.getLocation(), 8, entity);
 		if (!e.isEmpty()) {
 			event.setDamage(0);
 		}
-		return true;
 	}
 
 	@Override
-	public boolean entityDealDamageEvent(EntityDamageByEntityEvent event) {
-		if (event.getEntity() instanceof Player) {
-			Player p = (Player) event.getEntity();
-			if (p.getName() != mPlayer.getName()) {
+	public void onDamage(@NotNull LivingEntity entity, @NotNull DamageEvent event, @NotNull LivingEntity enemy) {
+		if (entity instanceof Player) {
+			if (entity != mPlayer) {
 				event.setDamage(0);
 			} else {
-				event.setDamage(event.getDamage() / 2.0);
+				event.setDamage(event.getDamage() / 2);
 			}
 		}
-
-		return true;
 	}
-
 
 	@Override
 	public String toString() {

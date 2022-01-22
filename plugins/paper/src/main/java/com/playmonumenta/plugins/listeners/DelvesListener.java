@@ -1,12 +1,13 @@
 package com.playmonumenta.plugins.listeners;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
-import java.util.logging.Level;
-
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.AbilityManager;
+import com.playmonumenta.plugins.abilities.delves.DelveModifier;
+import com.playmonumenta.plugins.server.properties.ServerProperties;
+import com.playmonumenta.plugins.utils.DelvesUtils;
+import com.playmonumenta.plugins.utils.DelvesUtils.DelveModifierSelectionGUI;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.scriptedquests.utils.MessagingUtils;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
@@ -23,14 +24,12 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.util.BoundingBox;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.AbilityManager;
-import com.playmonumenta.plugins.abilities.delves.DelveModifier;
-import com.playmonumenta.plugins.server.properties.ServerProperties;
-import com.playmonumenta.plugins.utils.DelvesUtils;
-import com.playmonumenta.plugins.utils.DelvesUtils.DelveModifierSelectionGUI;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.scriptedquests.utils.MessagingUtils;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
+import java.util.logging.Level;
 
 public class DelvesListener implements Listener {
 

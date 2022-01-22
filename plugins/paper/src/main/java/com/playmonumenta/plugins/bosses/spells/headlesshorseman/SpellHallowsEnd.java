@@ -1,8 +1,11 @@
 package com.playmonumenta.plugins.bosses.spells.headlesshorseman;
 
-import java.util.Collections;
-import java.util.List;
-
+import com.playmonumenta.plugins.bosses.bosses.HeadlessHorsemanBoss;
+import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.utils.DamageUtils;
+import com.playmonumenta.plugins.utils.MovementUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -12,11 +15,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import com.playmonumenta.plugins.bosses.bosses.HeadlessHorsemanBoss;
-import com.playmonumenta.plugins.bosses.spells.Spell;
-import com.playmonumenta.plugins.utils.BossUtils;
-import com.playmonumenta.plugins.utils.MovementUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
+import java.util.Collections;
+import java.util.List;
 
 /*
  * (Ultimate) Hallow’s End - A pillar of smoke and flames appears on the horseman, after 1 second the area
@@ -75,7 +75,7 @@ public class SpellHallowsEnd extends Spell {
 						if (mHorseman.getSpawnLocation().distance(player.getLocation()) < HeadlessHorsemanBoss.detectionRange) {
 							int mNDT = player.getNoDamageTicks();
 							player.setNoDamageTicks(0);
-							BossUtils.bossDamage(mBoss, player, 50, mBoss.getLocation(), "Hallow's End");
+							DamageUtils.damage(mBoss, player, DamageType.MAGIC, 50, null, false, true, "Hallow's End");
 							player.setFireTicks(20 * 8);
 							player.setNoDamageTicks(mNDT);
 							MovementUtils.knockAway(loc, player, 0.50f, 1.5f);
@@ -157,7 +157,6 @@ public class SpellHallowsEnd extends Spell {
 
 	@Override
 	public int cooldownTicks() {
-		// TODO Auto-generated method stub
 		return mCooldownTicks;
 	}
 

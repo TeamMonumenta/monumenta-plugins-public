@@ -1,11 +1,26 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
+import com.playmonumenta.plugins.bosses.BossBarManager;
+import com.playmonumenta.plugins.bosses.BossBarManager.BossHealthAction;
+import com.playmonumenta.plugins.bosses.SpellManager;
+import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.bosses.spells.SpellBossBlockBreak;
+import com.playmonumenta.plugins.bosses.spells.SpellPlayerAction;
+import com.playmonumenta.plugins.bosses.spells.SpellPurgeNegatives;
+import com.playmonumenta.plugins.bosses.spells.SpellShieldStun;
+import com.playmonumenta.plugins.bosses.spells.varcosamist.ForcefulGrip;
+import com.playmonumenta.plugins.bosses.spells.varcosamist.SpellActions;
+import com.playmonumenta.plugins.bosses.spells.varcosamist.SpellDeathlyCharge;
+import com.playmonumenta.plugins.bosses.spells.varcosamist.SpellGhostlyCannons;
+import com.playmonumenta.plugins.bosses.spells.varcosamist.SpellJibberJabber;
+import com.playmonumenta.plugins.bosses.spells.varcosamist.SpellPurgeGlowing;
+import com.playmonumenta.plugins.bosses.spells.varcosamist.SpellSummonConstantly;
+import com.playmonumenta.plugins.bosses.spells.varcosamist.SpellSwitcheroo;
+import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.utils.SerializationUtils;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -18,32 +33,15 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import com.playmonumenta.plugins.bosses.BossBarManager;
-import com.playmonumenta.plugins.bosses.BossBarManager.BossHealthAction;
-import com.playmonumenta.plugins.bosses.SpellManager;
-import com.playmonumenta.plugins.bosses.spells.Spell;
-import com.playmonumenta.plugins.bosses.spells.SpellBossBlockBreak;
-import com.playmonumenta.plugins.bosses.spells.SpellPlayerAction;
-import com.playmonumenta.plugins.bosses.spells.SpellPurgeNegatives;
-import com.playmonumenta.plugins.bosses.spells.varcosamist.ForcefulGrip;
-import com.playmonumenta.plugins.bosses.spells.varcosamist.SpellActions;
-import com.playmonumenta.plugins.bosses.spells.varcosamist.SpellDeathlyCharge;
-import com.playmonumenta.plugins.bosses.spells.varcosamist.SpellGhostlyCannons;
-import com.playmonumenta.plugins.bosses.spells.varcosamist.SpellJibberJabber;
-import com.playmonumenta.plugins.bosses.spells.varcosamist.SpellPurgeGlowing;
-import com.playmonumenta.plugins.bosses.spells.varcosamist.SpellSummonConstantly;
-import com.playmonumenta.plugins.bosses.spells.varcosamist.SpellSwitcheroo;
-import com.playmonumenta.plugins.utils.BossUtils;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.NmsUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.plugins.utils.SerializationUtils;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public final class VarcosaLingeringWillBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_varcosa_will";
@@ -109,6 +107,7 @@ public final class VarcosaLingeringWillBoss extends BossAbilityGroup {
 			new SpellPurgeNegatives(mBoss, 2),
 			new SpellPurgeGlowing(mBoss, 20 * 15),
 			new SpellBossBlockBreak(mBoss, 175, 1, 3, 1, true, true),
+			new SpellShieldStun(6 * 20),
 			action, tooHighAction
 		);
 
@@ -120,26 +119,18 @@ public final class VarcosaLingeringWillBoss extends BossAbilityGroup {
 	}
 
 	@Override
-	public void bossDamagedEntity(EntityDamageByEntityEvent event) {
+	public void onDamage(DamageEvent event, LivingEntity damagee) {
 		//If we hit a player
-		if (event.getEntity() instanceof Player) {
-			Player player = (Player) event.getEntity();
+		if (damagee instanceof Player player) {
 			//Set all nearby mobs to target them
-			for (LivingEntity mob : EntityUtils.getNearbyMobs(mBoss.getLocation(), detectionRange)) {
-				if (mob instanceof Mob) {
-					((Mob) mob).setTarget(player);
+			for (LivingEntity le : EntityUtils.getNearbyMobs(mBoss.getLocation(), detectionRange)) {
+				if (le instanceof Mob mob) {
+					mob.setTarget(player);
 				}
 			}
 			//Let the players know something happened
 			player.playSound(player.getLocation(), Sound.BLOCK_BELL_RESONATE, 0.3f, 0.9f);
 			player.getWorld().spawnParticle(Particle.VILLAGER_ANGRY, player.getLocation(), 25, 1.5, 1.5, 1.5);
-		}
-
-		if (event.getEntity() instanceof Player && event.getCause().equals(DamageCause.ENTITY_ATTACK)) {
-			Player player = (Player) event.getEntity();
-			if (player.isBlocking()) {
-				NmsUtils.stunShield(player, 20 * 6);
-			}
 		}
 	}
 
@@ -169,10 +160,10 @@ public final class VarcosaLingeringWillBoss extends BossAbilityGroup {
 			playersInRange--;
 		}
 
-		EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_MAX_HEALTH, bossTargetHp);
+		EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_MAX_HEALTH, bossTargetHp * 1.1);
 		EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_FOLLOW_RANGE, detectionRange);
 		EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_KNOCKBACK_RESISTANCE, 1);
-		mBoss.setHealth(bossTargetHp);
+		mBoss.setHealth(bossTargetHp * 1.1);
 
 		PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "effect give @s minecraft:blindness 2 2");
 		PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "title @s title [\"\",{\"text\":\"Lingering Will\",\"color\":\"dark_red\",\"bold\":true}]");

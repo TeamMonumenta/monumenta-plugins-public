@@ -1,10 +1,10 @@
 package com.playmonumenta.plugins.point;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.bukkit.block.Block;
 import org.bukkit.entity.LivingEntity;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class RaycastData {
 

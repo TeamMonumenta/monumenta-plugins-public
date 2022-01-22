@@ -1,8 +1,14 @@
 package com.playmonumenta.plugins.bosses.spells.sealedremorse;
 
-import java.util.AbstractMap;
-import java.util.Arrays;
-
+import com.playmonumenta.plugins.bosses.bosses.Ghalkor;
+import com.playmonumenta.plugins.bosses.bosses.Svalgot;
+import com.playmonumenta.plugins.bosses.spells.SpellBaseSlam;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.ParticleUtils;
+import com.playmonumenta.plugins.utils.ParticleUtils.SpawnParticleAction;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -16,14 +22,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.util.Vector;
 
-import com.playmonumenta.plugins.bosses.bosses.Ghalkor;
-import com.playmonumenta.plugins.bosses.bosses.Svalgot;
-import com.playmonumenta.plugins.bosses.spells.SpellBaseSlam;
-import com.playmonumenta.plugins.utils.BossUtils;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.ParticleUtils;
-import com.playmonumenta.plugins.utils.ParticleUtils.SpawnParticleAction;
-import com.playmonumenta.plugins.utils.PlayerUtils;
+import java.util.AbstractMap;
+import java.util.Arrays;
 
 public class SvalgotBoneSlam extends SpellBaseSlam {
 
@@ -32,7 +32,7 @@ public class SvalgotBoneSlam extends SpellBaseSlam {
 	private static final int RUN_DISTANCE = 0;
 	private static final double VELOCITY_MULTIPLIER = 0.375; //25% slower than 0.5
 	private static final double DAMAGE_RADIUS = 3;
-	private static final double DAMAGE_PERCENT = 0.5;
+	private static final double DAMAGE = 32;
 	private static final int JUMP_HEIGHT = 1;
 
 	public static final String ATTACK_MODIFIER_NAME = "AttackRemoveDamageModifier";
@@ -70,11 +70,11 @@ public class SvalgotBoneSlam extends SpellBaseSlam {
 
 			world.spawnParticle(Particle.SOUL_FIRE_FLAME, loc, 3 * (int)(DAMAGE_RADIUS * DAMAGE_RADIUS), DAMAGE_RADIUS, 0.25f, DAMAGE_RADIUS, 0);
 			if (player != null) {
-				BossUtils.bossDamagePercent(boss, player, DAMAGE_PERCENT, "Bone Slam");
+				BossUtils.dualTypeBlockableDamage(boss, player, DamageType.MAGIC, DamageType.FIRE, DAMAGE, 0.9, "Bone Slam", boss.getLocation());
 				return;
 			}
 			for (Player players : PlayerUtils.playersInRange(loc, DAMAGE_RADIUS, true)) {
-				BossUtils.bossDamagePercent(boss, players, DAMAGE_PERCENT, "Bone Slam");
+				BossUtils.dualTypeBlockableDamage(boss, players, DamageType.MAGIC, DamageType.FIRE, DAMAGE, 0.9, "Bone Slam", boss.getLocation());
 			}
 			});
 

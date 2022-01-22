@@ -1,17 +1,23 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.function.Predicate;
-import java.util.logging.Level;
-
+import com.destroystokyo.paper.event.entity.EntityPathfindEvent;
+import com.playmonumenta.plugins.Constants;
+import com.playmonumenta.plugins.bosses.BossBarManager;
+import com.playmonumenta.plugins.bosses.BossManager;
+import com.playmonumenta.plugins.bosses.SpellManager;
+import com.playmonumenta.plugins.bosses.events.SpellCastEvent;
+import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.events.CustomEffectApplyEvent;
+import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.SerializationUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.entity.AreaEffectCloudApplyEvent;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityPotionEffectEvent;
 import org.bukkit.event.entity.EntityTargetEvent;
@@ -24,17 +30,10 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.checkerframework.checker.initialization.qual.UnknownInitialization;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-import com.destroystokyo.paper.event.entity.EntityPathfindEvent;
-import com.playmonumenta.plugins.Constants;
-import com.playmonumenta.plugins.bosses.BossBarManager;
-import com.playmonumenta.plugins.bosses.BossManager;
-import com.playmonumenta.plugins.bosses.SpellManager;
-import com.playmonumenta.plugins.bosses.events.SpellCastEvent;
-import com.playmonumenta.plugins.bosses.spells.Spell;
-import com.playmonumenta.plugins.events.CustomEffectApplyEvent;
-import com.playmonumenta.plugins.utils.BossUtils;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.SerializationUtils;
+import java.util.Arrays;
+import java.util.List;
+import java.util.function.Predicate;
+import java.util.logging.Level;
 
 
 public abstract class BossAbilityGroup {
@@ -242,16 +241,30 @@ public abstract class BossAbilityGroup {
 	}
 
 	/*
-	 * Boss damaged another entity, includes projectiles
+	 * Boss damaged an entity
 	 */
-	public void bossDamagedEntity(EntityDamageByEntityEvent event) {
+	public void onDamage(DamageEvent event, LivingEntity damagee) {
 
 	}
 
 	/*
-	 * Boss was damaged
+	 * Boss was hurt, with or without an entity
 	 */
-	public void bossDamagedByEntity(EntityDamageByEntityEvent event) {
+	public void onHurt(DamageEvent event) {
+
+	}
+
+	/*
+	 * Boss was hurt by an entity
+	 */
+	public void onHurtByEntity(DamageEvent event, Entity damager) {
+
+	}
+
+	/*
+	 * Boss was hurt by an entity with a source (source is usually the same as the entity)
+	 */
+	public void onHurtByEntityWithSource(DamageEvent event, Entity damager, LivingEntity source) {
 
 	}
 

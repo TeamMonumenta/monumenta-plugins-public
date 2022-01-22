@@ -1,8 +1,20 @@
 package com.playmonumenta.plugins.abilities.warlock;
 
-import java.util.EnumSet;
-import java.util.stream.Stream;
-
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.abilities.AbilityManager;
+import com.playmonumenta.plugins.abilities.warlock.reaper.DarkPact;
+import com.playmonumenta.plugins.abilities.warlock.reaper.JudgementChain;
+import com.playmonumenta.plugins.abilities.warlock.reaper.VoodooBonds;
+import com.playmonumenta.plugins.abilities.warlock.tenebrist.HauntingShades;
+import com.playmonumenta.plugins.abilities.warlock.tenebrist.WitheringGaze;
+import com.playmonumenta.plugins.effects.CustomDamageOverTime;
+import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.utils.PotionUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -11,40 +23,16 @@ import org.bukkit.World;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.abilities.AbilityManager;
-import com.playmonumenta.plugins.abilities.warlock.reaper.DarkPact;
-import com.playmonumenta.plugins.abilities.warlock.reaper.JudgementChain;
-import com.playmonumenta.plugins.abilities.warlock.reaper.VoodooBonds;
-import com.playmonumenta.plugins.abilities.warlock.tenebrist.HauntingShades;
-import com.playmonumenta.plugins.abilities.warlock.tenebrist.UmbralWail;
-import com.playmonumenta.plugins.abilities.warlock.tenebrist.WitheringGaze;
-import com.playmonumenta.plugins.classes.magic.MagicType;
-import com.playmonumenta.plugins.effects.CustomDamageOverTime;
-import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
-import com.playmonumenta.plugins.enchantments.abilities.BaseAbilityEnchantment;
-import com.playmonumenta.plugins.events.CustomDamageEvent;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.ItemUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.plugins.utils.PotionUtils;
+import java.util.stream.Stream;
 
 
 
 public class CursedWound extends Ability {
-	public static class CursedWoundDamageEnchantment extends BaseAbilityEnchantment {
-		public CursedWoundDamageEnchantment() {
-			super("Cursed Wound Damage", EnumSet.of(ItemSlot.OFFHAND));
-		}
-	}
 
 	private static final int CURSED_WOUND_DOT_DAMAGE = 1;
 	private static final int CURSED_WOUND_DOT_PERIOD = 20;
@@ -70,24 +58,23 @@ public class CursedWound extends Ability {
 			Bukkit.getScheduler().runTask(plugin, () -> {
 				mAbilities = Stream.of(AmplifyingHex.class, CholericFlames.class, GraspingClaws.class, SoulRend.class,
 				                       SanguineHarvest.class, MelancholicLament.class, DarkPact.class, VoodooBonds.class,
-				                       JudgementChain.class, HauntingShades.class, WitheringGaze.class, UmbralWail.class)
+				                       JudgementChain.class, HauntingShades.class, WitheringGaze.class)
 					.map(c -> AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, c)).toArray(Ability[]::new);
 			});
 		}
 	}
 
 	@Override
-	public boolean livingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
-		if (mPlayer != null && event.getCause() == DamageCause.ENTITY_ATTACK) {
+	public void onDamage(DamageEvent event, LivingEntity enemy) {
+		if (event.getType() == DamageType.MELEE) {
 			double cursedWoundCap = getAbilityScore() == 1 ? CURSED_WOUND_1_CAP : CURSED_WOUND_2_CAP;
-			LivingEntity damagee = (LivingEntity) event.getEntity();
 			BlockData fallingDustData = Material.ANVIL.createBlockData();
 			World world = mPlayer.getWorld();
-			if (EntityUtils.isHostileMob(damagee)) {
-				world.spawnParticle(Particle.FALLING_DUST, damagee.getLocation().add(0, damagee.getHeight() / 2, 0), 3,
-				                    (damagee.getWidth() / 2) + 0.1, damagee.getHeight() / 3, (damagee.getWidth() / 2) + 0.1, fallingDustData);
-				world.spawnParticle(Particle.SPELL_MOB, damagee.getLocation().add(0, damagee.getHeight() / 2, 0), 6,
-				                    (damagee.getWidth() / 2) + 0.1, damagee.getHeight() / 3, (damagee.getWidth() / 2) + 0.1, 0);
+			if (EntityUtils.isHostileMob(enemy)) {
+				world.spawnParticle(Particle.FALLING_DUST, enemy.getLocation().add(0, enemy.getHeight() / 2, 0), 3,
+				                     (enemy.getWidth() / 2) + 0.1, enemy.getHeight() / 3, (enemy.getWidth() / 2) + 0.1, fallingDustData);
+				world.spawnParticle(Particle.SPELL_MOB, enemy.getLocation().add(0, enemy.getHeight() / 2, 0), 6,
+				                     (enemy.getWidth() / 2) + 0.1, enemy.getHeight() / 3, (enemy.getWidth() / 2) + 0.1, 0);
 
 				int cooldowns = 0;
 				for (Ability ability : mAbilities) {
@@ -96,19 +83,17 @@ public class CursedWound extends Ability {
 					}
 				}
 
-				event.setDamage(event.getDamage() * (1 + CursedWoundDamageEnchantment.getExtraPercentDamage(mPlayer, CursedWoundDamageEnchantment.class, (float) Math.min(cooldowns * CURSED_WOUND_DAMAGE, cursedWoundCap))));
-				CustomDamageEvent customDamageEvent = new CustomDamageEvent(mPlayer, damagee, 0, null);
-				Bukkit.getPluginManager().callEvent(customDamageEvent);
+				event.setDamage(event.getDamage() * (1 + Math.min(cooldowns * CURSED_WOUND_DAMAGE, cursedWoundCap)));
 			}
 
 			if (PlayerUtils.isFallingAttack(mPlayer)) {
 				world.playSound(mPlayer.getLocation(), Sound.BLOCK_BELL_USE, 1.0f, 0.75f);
-				for (LivingEntity mob : EntityUtils.getNearbyMobs(damagee.getLocation(), CURSED_WOUND_RADIUS, mPlayer)) {
+				for (LivingEntity mob : EntityUtils.getNearbyMobs(enemy.getLocation(), CURSED_WOUND_RADIUS, mPlayer)) {
 					world.spawnParticle(Particle.FALLING_DUST, mob.getLocation().add(0, mob.getHeight() / 2, 0), 3,
 					                     (mob.getWidth() / 2) + 0.1, mob.getHeight() / 3, (mob.getWidth() / 2) + 0.1, fallingDustData);
 					world.spawnParticle(Particle.SPELL_MOB, mob.getLocation().add(0, mob.getHeight() / 2, 0), 6,
 					                     (mob.getWidth() / 2) + 0.1, mob.getHeight() / 3, (mob.getWidth() / 2) + 0.1, 0);
-					mPlugin.mEffectManager.addEffect(mob, DOT_EFFECT_NAME, new CustomDamageOverTime(CURSED_WOUND_DURATION, CURSED_WOUND_DOT_DAMAGE, CURSED_WOUND_DOT_PERIOD, mPlayer, MagicType.DARK_MAGIC, null, Particle.SQUID_INK, mPlugin));
+					mPlugin.mEffectManager.addEffect(mob, DOT_EFFECT_NAME, new CustomDamageOverTime(CURSED_WOUND_DURATION, CURSED_WOUND_DOT_DAMAGE, CURSED_WOUND_DOT_PERIOD, mPlayer, null, Particle.SQUID_INK));
 					if (getAbilityScore() > 1) {
 						//Bleed interaction
 						if (EntityUtils.isBleeding(mPlugin, mob)) {
@@ -134,8 +119,6 @@ public class CursedWound extends Ability {
 				}
 			}
 		}
-
-		return true;
 	}
 
 	@Override

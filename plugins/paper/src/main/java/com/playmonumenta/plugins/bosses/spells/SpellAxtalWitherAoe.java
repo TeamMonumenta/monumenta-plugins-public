@@ -1,5 +1,8 @@
 package com.playmonumenta.plugins.bosses.spells;
 
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -9,9 +12,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-
-import com.playmonumenta.plugins.utils.BossUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
 
 public class SpellAxtalWitherAoe extends SpellBaseAoE {
 
@@ -39,7 +39,7 @@ public class SpellAxtalWitherAoe extends SpellBaseAoE {
 			(Location loc) -> {
 				for (Player player : PlayerUtils.playersInRange(launcher.getLocation(), radius, true)) {
 					double distance = player.getLocation().distance(launcher.getLocation());
-					BossUtils.bossDamage(launcher, player, ((maxDamage - minDamage) * ((radius - distance) / radius)) + minDamage);
+					BossUtils.blockableDamage(launcher, player, DamageType.MAGIC, ((maxDamage - minDamage) * ((radius - distance) / radius)) + minDamage);
 					player.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 30, 1));
 				}
 			}

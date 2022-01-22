@@ -1,12 +1,6 @@
 package com.playmonumenta.plugins.integrations.luckperms;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.playmonumenta.plugins.Plugin;
-
-import org.bukkit.entity.Player;
-
 import dev.jorel.commandapi.CommandAPI;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.CommandPermission;
@@ -16,6 +10,10 @@ import dev.jorel.commandapi.arguments.EntitySelectorArgument.EntitySelector;
 import dev.jorel.commandapi.arguments.TextArgument;
 import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
 import net.luckperms.api.model.group.Group;
+import org.bukkit.entity.Player;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class TestGuild {
 	public static void register(Plugin plugin) {

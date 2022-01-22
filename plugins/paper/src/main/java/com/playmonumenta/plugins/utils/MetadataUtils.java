@@ -1,10 +1,5 @@
 package com.playmonumenta.plugins.utils;
 
-import java.lang.reflect.InvocationTargetException;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.logging.Level;
-
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
@@ -12,6 +7,11 @@ import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.metadata.MetadataStoreBase;
 import org.bukkit.metadata.MetadataValue;
 import org.bukkit.plugin.Plugin;
+
+import java.lang.reflect.InvocationTargetException;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.logging.Level;
 
 public class MetadataUtils {
 	/* This method can be used to wrap code that should only execute once per tick

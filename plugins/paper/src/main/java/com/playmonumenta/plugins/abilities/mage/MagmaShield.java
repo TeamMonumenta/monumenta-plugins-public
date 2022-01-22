@@ -1,8 +1,17 @@
 package com.playmonumenta.plugins.abilities.mage;
 
-import java.util.EnumSet;
-
-import org.bukkit.Bukkit;
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.abilities.AbilityTrigger;
+import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.itemstats.attributes.SpellPower;
+import com.playmonumenta.plugins.utils.DamageUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.MovementUtils;
+import com.playmonumenta.plugins.utils.VectorUtils;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -16,30 +25,9 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.abilities.AbilityManager;
-import com.playmonumenta.plugins.abilities.AbilityTrigger;
-import com.playmonumenta.plugins.abilities.mage.elementalist.Blizzard;
-import com.playmonumenta.plugins.classes.ClassAbility;
-import com.playmonumenta.plugins.classes.magic.MagicType;
-import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
-import com.playmonumenta.plugins.enchantments.abilities.BaseAbilityEnchantment;
-import com.playmonumenta.plugins.enchantments.abilities.SpellPower;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.FastUtils;
-import com.playmonumenta.plugins.utils.ItemUtils;
-import com.playmonumenta.plugins.utils.MovementUtils;
-import com.playmonumenta.plugins.utils.VectorUtils;
-
 
 
 public class MagmaShield extends Ability {
-	public static class MagmaShieldCooldownEnchantment extends BaseAbilityEnchantment {
-		public MagmaShieldCooldownEnchantment() {
-			super("Magma Shield Cooldown", EnumSet.of(ItemSlot.ARMOR));
-		}
-	}
 
 	public static final String NAME = "Magma Shield";
 	public static final ClassAbility ABILITY = ClassAbility.MAGMA_SHIELD;
@@ -53,13 +41,10 @@ public class MagmaShield extends Ability {
 	// 70° on each side of look direction for XZ-plane (flattened Y),
 	// so 140° angle of effect
 	public static final int ANGLE = 70;
-	public static final int BLIZZARD_ANGLE = Blizzard.ANGLE;
 	public static final int COOLDOWN_SECONDS = 12;
 	public static final int COOLDOWN_TICKS = COOLDOWN_SECONDS * 20;
 
 	private final int mLevelDamage;
-
-	private boolean mLookUpRestriction = false;
 
 	public MagmaShield(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, NAME);
@@ -69,7 +54,7 @@ public class MagmaShield extends Ability {
 		mInfo.mShorthandName = "MS";
 		mInfo.mDescriptions.add(
 			String.format(
-				"While sneaking, right-clicking with a wand summons a torrent of flames, dealing %s fire damage to all enemies in front of you within a %s-block cube around you, setting them on fire for %ss, and knocking them away. The damage ignores iframes. Cooldown: %ss.",
+				"While sneaking, right-clicking with a wand summons a torrent of flames, dealing %s magic damage to all enemies in front of you within a %s-block cube around you, setting them on fire for %ss, and knocking them away. The damage ignores iframes. Cooldown: %ss.",
 				DAMAGE_1,
 				SIZE,
 				FIRE_SECONDS,
@@ -88,13 +73,6 @@ public class MagmaShield extends Ability {
 		mDisplayItem = new ItemStack(Material.MAGMA_CREAM, 1);
 
 		mLevelDamage = getAbilityScore() == 2 ? DAMAGE_2 : DAMAGE_1;
-
-		if (player != null) {
-			Bukkit.getScheduler().runTask(plugin, () -> {
-				Blizzard blizzard = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, Blizzard.class);
-				mLookUpRestriction = blizzard != null; // If Blizzard is not null, player has Blizzard, require restriction
-			});
-		}
 	}
 
 	@Override
@@ -104,7 +82,7 @@ public class MagmaShield extends Ability {
 		}
 		putOnCooldown();
 
-		float damage = SpellPower.getSpellDamage(mPlayer, mLevelDamage);
+		float damage = SpellPower.getSpellDamage(mPlugin, mPlayer, mLevelDamage);
 		Vector flattenedLookDirection = mPlayer.getEyeLocation().getDirection().setY(0);
 		for (LivingEntity potentialTarget : EntityUtils.getNearbyMobs(mPlayer.getLocation(), SIZE, mPlayer)) {
 			Vector flattenedTargetVector = potentialTarget.getLocation().toVector().subtract(mPlayer.getLocation().toVector()).setY(0);
@@ -116,8 +94,8 @@ public class MagmaShield extends Ability {
 				)
 			) {
 				EntityUtils.applyFire(mPlugin, FIRE_TICKS, potentialTarget, mPlayer);
-				EntityUtils.damageEntity(mPlugin, potentialTarget, damage, mPlayer, MagicType.FIRE, true, mInfo.mLinkedSpell, true, true, true);
-				MovementUtils.knockAway(mPlayer, potentialTarget, KNOCKBACK);
+				DamageUtils.damage(mPlayer, potentialTarget, DamageType.MAGIC, damage, mInfo.mLinkedSpell, true, false);
+				MovementUtils.knockAway(mPlayer, potentialTarget, KNOCKBACK, true);
 			}
 		}
 
@@ -159,19 +137,9 @@ public class MagmaShield extends Ability {
 
 	@Override
 	public boolean runCheck() {
-		if (mPlayer != null && ItemUtils.isWand(mPlayer.getInventory().getItemInMainHand())) {
-			boolean lookingTooHigh = false;
-			if (mLookUpRestriction) {
-				// Only check if looking too high, if have restriction. Otherwise never looking too high (false)
-				lookingTooHigh = mPlayer.getLocation().getPitch() < BLIZZARD_ANGLE;
-			}
-			return mPlayer.isSneaking() && !lookingTooHigh;
+		if (mPlayer != null && mPlayer.isSneaking() && ItemUtils.isWand(mPlayer.getInventory().getItemInMainHand())) {
+			return true;
 		}
 		return false;
-	}
-
-	@Override
-	public Class<? extends BaseAbilityEnchantment> getCooldownEnchantment() {
-		return MagmaShieldCooldownEnchantment.class;
 	}
 }

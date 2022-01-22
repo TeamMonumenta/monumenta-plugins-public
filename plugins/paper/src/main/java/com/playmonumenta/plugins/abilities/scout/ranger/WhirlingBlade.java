@@ -1,8 +1,15 @@
 package com.playmonumenta.plugins.abilities.scout.ranger;
 
-import java.util.Iterator;
-import java.util.List;
-
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.AbilityManager;
+import com.playmonumenta.plugins.abilities.MultipleChargeAbility;
+import com.playmonumenta.plugins.abilities.scout.WindBomb;
+import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.utils.DamageUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.MovementUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -18,22 +25,14 @@ import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.AbilityManager;
-import com.playmonumenta.plugins.abilities.MultipleChargeAbility;
-import com.playmonumenta.plugins.abilities.scout.WindBomb;
-import com.playmonumenta.plugins.classes.ClassAbility;
-import com.playmonumenta.plugins.classes.magic.MagicType;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.ItemUtils;
-import com.playmonumenta.plugins.utils.MovementUtils;
-
+import java.util.Iterator;
+import java.util.List;
 
 
 public class WhirlingBlade extends MultipleChargeAbility {
 
-	private static final int BLADE_1_DAMAGE = 12;
-	private static final int BLADE_2_DAMAGE = 18;
+	private static final int BLADE_1_DAMAGE = 9;
+	private static final int BLADE_2_DAMAGE = 14;
 	private static final float BLADE_1_KNOCKBACK = 0.4f;
 	private static final float BLADE_2_KNOCKBACK = 1.2f;
 	private static final double THROW_RADIUS = 3;
@@ -53,7 +52,7 @@ public class WhirlingBlade extends MultipleChargeAbility {
 		super(plugin, player, "Whirling Blade");
 		mInfo.mScoreboardId = "WhirlingBlade";
 		mInfo.mShorthandName = "WB";
-		mInfo.mDescriptions.add("Use the swap key while holding a weapon and not looking up to throw a whirling blade that circles around you, knocking back and dealing " + BLADE_1_DAMAGE + " damage to enemies it hits. Cooldown: 8s. Charges: 2.");
+		mInfo.mDescriptions.add("Use the swap key while holding a weapon and not looking up to throw a whirling blade that circles around you, knocking back and dealing " + BLADE_1_DAMAGE + " melee damage to enemies it hits. Cooldown: 8s. Charges: 2.");
 		mInfo.mDescriptions.add("The damage is increased to " + BLADE_2_DAMAGE + " and the knockback is greatly increased.");
 		mInfo.mLinkedSpell = ClassAbility.WHIRLING_BLADE;
 		mDamage = getAbilityScore() == 1 ? BLADE_1_DAMAGE : BLADE_2_DAMAGE;
@@ -129,8 +128,8 @@ public class WhirlingBlade extends MultipleChargeAbility {
 				while (mobIter.hasNext()) {
 					LivingEntity mob = mobIter.next();
 					if (mBox1.overlaps(mob.getBoundingBox()) || mBox2.overlaps(mob.getBoundingBox()) || mBox3.overlaps(mob.getBoundingBox())) {
-						EntityUtils.damageEntity(mPlugin, mob, mDamage, mPlayer, MagicType.PHYSICAL, true, mInfo.mLinkedSpell);
-						MovementUtils.knockAway(mPlayer, mob, mKnockback);
+						DamageUtils.damage(mPlayer, mob, DamageType.MELEE_SKILL, mDamage, mInfo.mLinkedSpell);
+						MovementUtils.knockAway(mPlayer, mob, mKnockback, true);
 						mobIter.remove();
 					}
 				}

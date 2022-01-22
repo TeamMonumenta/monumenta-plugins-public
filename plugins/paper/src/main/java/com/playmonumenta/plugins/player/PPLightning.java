@@ -1,18 +1,16 @@
 package com.playmonumenta.plugins.player;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-
 import com.destroystokyo.paper.ParticleBuilder;
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.utils.FastUtils;
-
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.scheduler.BukkitRunnable;
-
 import org.checkerframework.checker.nullness.qual.Nullable;
+
+import java.util.ArrayList;
+import java.util.HashMap;
 
 
 

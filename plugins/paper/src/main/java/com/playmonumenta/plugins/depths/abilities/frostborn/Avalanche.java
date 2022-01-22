@@ -1,7 +1,15 @@
 package com.playmonumenta.plugins.depths.abilities.frostborn;
 
-import java.util.HashSet;
-
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.depths.DepthsTree;
+import com.playmonumenta.plugins.depths.DepthsUtils;
+import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
+import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.utils.DamageUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -12,15 +20,9 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.classes.ClassAbility;
-import com.playmonumenta.plugins.depths.DepthsTree;
-import com.playmonumenta.plugins.depths.DepthsUtils;
-import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
-import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
-import com.playmonumenta.plugins.utils.EntityUtils;
-
-import net.md_5.bungee.api.ChatColor;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
 
 public class Avalanche extends DepthsAbility {
 
@@ -66,14 +68,19 @@ public class Avalanche extends DepthsAbility {
 
 			world.playSound(loc, Sound.BLOCK_GLASS_BREAK, 0.5f, 1f);
 
+			List<LivingEntity> hitMobs = new ArrayList<LivingEntity>();
+
 			//Shatter all nearby ice
 			for (Location l : iceToBreak) {
 				Location aboveLoc = l.clone().add(0.5, 1, 0.5);
 
 				//Damage and root mobs
 				for (LivingEntity mob : EntityUtils.getNearbyMobs(aboveLoc, 1.0)) {
-					EntityUtils.applySlow(mPlugin, SLOW_DURATION, SLOW_MODIFIER, mob);
-					EntityUtils.damageEntity(mPlugin, mob, DAMAGE[mRarity - 1], mPlayer);
+					if (!hitMobs.contains(mob)) {
+						EntityUtils.applySlow(mPlugin, SLOW_DURATION, SLOW_MODIFIER, mob);
+						DamageUtils.damage(mPlayer, mob, DamageType.MAGIC, DAMAGE[mRarity - 1], mInfo.mLinkedSpell);
+						hitMobs.add(mob);
+					}
 				}
 				mPlayer.getWorld().getBlockAt(l).setBlockData(DepthsUtils.iceActive.get(l));
 				DepthsUtils.iceActive.remove(l);
@@ -91,7 +98,7 @@ public class Avalanche extends DepthsAbility {
 
 	@Override
 	public String getDescription(int rarity) {
-		return "Swap hands to shatter all ice blocks within a radius of " + RADIUS + ", dealing " + DepthsUtils.getRarityColor(rarity) + DAMAGE[rarity - 1] + ChatColor.WHITE + " damage to enemies on the shattered ice. Affected enemies are rooted for " + SLOW_DURATION / 20 + " seconds. Cooldown: " + COOLDOWN_TICKS / 20 + "s.";
+		return "Swap hands to shatter all ice blocks within a radius of " + RADIUS + ", dealing " + DepthsUtils.getRarityColor(rarity) + DAMAGE[rarity - 1] + ChatColor.WHITE + " magic damage to enemies on the shattered ice. Affected enemies are rooted for " + SLOW_DURATION / 20 + " seconds. Cooldown: " + COOLDOWN_TICKS / 20 + "s.";
 	}
 
 	@Override

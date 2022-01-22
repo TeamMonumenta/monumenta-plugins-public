@@ -1,8 +1,11 @@
 package com.playmonumenta.plugins.bosses.spells.kaul;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import com.playmonumenta.plugins.bosses.ChargeUpManager;
+import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.utils.DamageUtils;
+import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -21,11 +24,8 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import com.playmonumenta.plugins.bosses.ChargeUpManager;
-import com.playmonumenta.plugins.bosses.spells.Spell;
-import com.playmonumenta.plugins.utils.BossUtils;
-import com.playmonumenta.plugins.utils.FastUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
+import java.util.ArrayList;
+import java.util.List;
 
 /*
  * Putrid Plague (Holds one of four colored wools reflecting a pillar):
@@ -35,6 +35,7 @@ import com.playmonumenta.plugins.utils.PlayerUtils;
 
  */
 public class SpellPutridPlague extends Spell {
+	private static final int DAMAGE = 30;
 	private static final String PUTRID_PLAGUE_TAG_RED = "KaulPutridPlagueRed";
 	private static final String PUTRID_PLAGUE_TAG_BLUE = "KaulPutridPlagueBlue";
 	private static final String PUTRID_PLAGUE_TAG_YELLOW = "KaulPutridPlagueYellow";
@@ -75,7 +76,6 @@ public class SpellPutridPlague extends Spell {
 			}
 		}.runTaskLater(mPlugin, mTime);
 
-		double damage = 30;
 		World world = mBoss.getWorld();
 		world.playSound(mBoss.getLocation(), Sound.BLOCK_BUBBLE_COLUMN_WHIRLPOOL_INSIDE, 10, 0.8f);
 		world.playSound(mBoss.getLocation(), Sound.ENTITY_GENERIC_EXTINGUISH_FIRE, 10, 0f);
@@ -182,7 +182,7 @@ public class SpellPutridPlague extends Spell {
 								player.addPotionEffect(new PotionEffect(PotionEffectType.WITHER, 20 * 30, 1));
 								player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 30, 1));
 								player.addPotionEffect(new PotionEffect(PotionEffectType.POISON, 20 * 30, 1));
-								BossUtils.bossDamage(mBoss, player, damage, (Location)null, "Putrid Plague");
+								DamageUtils.damage(mBoss, player, DamageType.MAGIC, DAMAGE, null, false, true, "Putrid Plague");
 							} else {
 								world.spawnParticle(Particle.SPELL, player.getLocation().add(0, 1, 0), 25, 0.25, 0.45, 0.25, 1);
 								world.spawnParticle(Particle.SPELL_INSTANT, player.getLocation().add(0, 1, 0), 35, 0.25, 0.45, 0.25, 1);

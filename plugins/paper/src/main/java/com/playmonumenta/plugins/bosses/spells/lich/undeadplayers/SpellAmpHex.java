@@ -1,8 +1,13 @@
 package com.playmonumenta.plugins.bosses.spells.lich.undeadplayers;
 
-import java.util.Arrays;
-import java.util.Collection;
-
+import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.player.PartialParticle;
+import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.MovementUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.utils.VectorUtils;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -16,13 +21,8 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
-import com.playmonumenta.plugins.bosses.spells.Spell;
-import com.playmonumenta.plugins.player.PartialParticle;
-import com.playmonumenta.plugins.utils.BossUtils;
-import com.playmonumenta.plugins.utils.FastUtils;
-import com.playmonumenta.plugins.utils.MovementUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.plugins.utils.VectorUtils;
+import java.util.Arrays;
+import java.util.Collection;
 
 /*
  * Every 12 second(s) deals 21 damage in a cone in front of it dealing an additional 7 damage per debuff on that player hit.
@@ -112,8 +112,8 @@ public class SpellAmpHex extends Spell {
 								debuffCount++;
 							}
 						}
-						BossUtils.bossDamage(mBoss, p, 21 + 7 * debuffCount, mBoss.getLocation(), "Amplifying Hex");
-						MovementUtils.knockAway(mBoss, p, 0.3f);
+						BossUtils.blockableDamage(mBoss, p, DamageType.MAGIC, 19 + 6 * debuffCount, "Amplifying Hex", mBoss.getLocation());
+						MovementUtils.knockAway(mBoss, p, 0.3f, false);
 					}
 				}
 			}

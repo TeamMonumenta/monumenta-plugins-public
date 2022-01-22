@@ -1,5 +1,12 @@
 package com.playmonumenta.plugins.bosses.spells.frostgiant;
 
+import com.playmonumenta.plugins.bosses.bosses.FrostGiant;
+import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.player.PPGroundCircle;
+import com.playmonumenta.plugins.utils.DamageUtils;
+import com.playmonumenta.plugins.utils.MovementUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.Location;
@@ -14,13 +21,6 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
-
-import com.playmonumenta.plugins.bosses.bosses.FrostGiant;
-import com.playmonumenta.plugins.bosses.spells.Spell;
-import com.playmonumenta.plugins.player.PPGroundCircle;
-import com.playmonumenta.plugins.utils.BossUtils;
-import com.playmonumenta.plugins.utils.MovementUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
 
 /*
  Ring of Frost: Fast(er) cast speed. All players 18 blocks away or
@@ -100,7 +100,7 @@ public class RingOfFrost extends Spell {
 					Vector vec = loc.toVector();
 					for (Player player : PlayerUtils.playersInRange(loc, 50, true)) {
 						if (!player.getLocation().toVector().isInSphere(vec, mRadius) && mStartLoc.distance(player.getLocation()) <= FrostGiant.fighterRange) {
-							BossUtils.bossDamage(mBoss, player, 40, null, "Ring of Frost");
+							DamageUtils.damage(mBoss, player, DamageType.MAGIC, 40, null, false, true, "Ring of Frost");
 							world.spawnParticle(Particle.EXPLOSION_NORMAL, player.getLocation().add(0, 1, 0), 30, 0.25, 0.45, 0.25, 0.2);
 							MovementUtils.knockAway(loc, player, -2.75f, 0.5f, false);
 							player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 10, 3));

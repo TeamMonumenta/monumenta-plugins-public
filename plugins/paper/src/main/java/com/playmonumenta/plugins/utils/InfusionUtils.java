@@ -20,14 +20,9 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.enchantments.infusions.Acumen;
-import com.playmonumenta.plugins.enchantments.infusions.Focus;
-import com.playmonumenta.plugins.enchantments.infusions.Perspicacity;
-import com.playmonumenta.plugins.enchantments.infusions.Tenacity;
-import com.playmonumenta.plugins.enchantments.infusions.Vigor;
-import com.playmonumenta.plugins.enchantments.infusions.Vitality;
 import com.playmonumenta.plugins.listeners.AuditListener;
-import com.playmonumenta.plugins.utils.ItemUtils.ItemRegion;
+import com.playmonumenta.plugins.utils.ItemStatUtils.InfusionType;
+import com.playmonumenta.plugins.utils.ItemStatUtils.Region;
 
 import dev.jorel.commandapi.CommandAPI;
 import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
@@ -35,15 +30,15 @@ import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
 public class InfusionUtils {
 
 	/**When set to true the refund function will return all the XP used for the infusion, when false only the 50% */
-	public static final boolean FULL_REFUND = false;
+	public static final boolean FULL_REFUND = true;
 
 	public enum InfusionSelection {
-		ACUMEN("acumen", Acumen.PROPERTY_NAME),
-		FOCUS("focus", Focus.PROPERTY_NAME),
-		PERSPICACITY("perspicacity", Perspicacity.PROPERTY_NAME),
-		TENACITY("tenacity", Tenacity.PROPERTY_NAME),
-		VIGOR("vigor", Vigor.PROPERTY_NAME),
-		VITALITY("vitality", Vitality.PROPERTY_NAME),
+		ACUMEN("acumen", "Acumen"),
+		FOCUS("focus", "Focus"),
+		PERSPICACITY("perspicacity", "Perspicacity"),
+		TENACITY("tenacity", "Tenacity"),
+		VIGOR("vigor", "Vigor"),
+		VITALITY("vitality", "Vitality"),
 		REFUND("refund", "refund"),
 		SPEC_REFUND("special", "special");
 
@@ -76,13 +71,13 @@ public class InfusionUtils {
 		}
 	}
 
-	public static void refundInfusion(ItemStack item, Player player) throws WrapperCommandSyntaxException {
-		ItemRegion region = ItemUtils.getItemRegion(item);
+	public static void refundInfusion(ItemStack item, Player player, Plugin plugin) throws WrapperCommandSyntaxException {
+		Region region = ItemStatUtils.getRegion(item);
 		int refundMaterials = 0;
 
 		//Calculate refund amount
 		// First level is free and we calculate based on the level below current.
-		int infuseLevel = getInfuseLevel(item) - 2;
+		int infuseLevel = getInfuseLevel(item) - 1;
 		int costMult = getCostMultiplierWithCheck(item);
 		while (infuseLevel >= 0) {
 			refundMaterials += (costMult * Math.pow(2, infuseLevel));
@@ -95,23 +90,23 @@ public class InfusionUtils {
 
 		//Remove the infusion enchants from the item
 		for (InfusionSelection sel : InfusionSelection.values()) {
-			InventoryUtils.removeCustomEnchant(item, sel.getEnchantName());
+			ItemStatUtils.removeInfusion(item, InfusionType.getInfusionType(sel.getEnchantName()));
 		}
-		if (refundMaterials > 0) {
+		ItemStatUtils.generateItemStats(item);
+		player.sendMessage("refunded " + Integer.toString(refundMaterials));
+		if (refundMaterials > 0 && region != null) {
 			giveMaterials(player, region, refundMaterials);
 		}
 
 		int xp = ExperienceUtils.getTotalExperience(player);
 		int refundXP = 0;
 
-		switch (ItemUtils.getItemTier(item)) {
-			case MEME:
+		switch (ItemStatUtils.getTier(item)) {
 			case UNCOMMON:
-			case ENHANCED_UNCOMMON:
 			case UNIQUE:
-			case UNIQUE_EVENT:
+			case EVENT:
 			case RARE:
-			case PATRON_MADE:
+			case PATRON:
 				switch (level) {
 					case 1:
 						refundXP = (1395);
@@ -130,9 +125,7 @@ public class InfusionUtils {
 						break;
 				}
 				break;
-			case RELIC:
 			case ARTIFACT:
-			case ENHANCED_RARE:
 				switch (level) {
 					case 1:
 						refundXP = (2920);
@@ -178,11 +171,11 @@ public class InfusionUtils {
 		ExperienceUtils.setTotalExperience(player, xp + refundXP);
 	}
 
-	private static void giveMaterials(Player player, ItemRegion region, int refundMaterials) throws WrapperCommandSyntaxException {
+	private static void giveMaterials(Player player, Region region, int refundMaterials) throws WrapperCommandSyntaxException {
 		NamespacedKey key;
-		if (region.equals(ItemRegion.KINGS_VALLEY)) {
+		if (region.equals(Region.VALLEY)) {
 			key = NamespacedKeyUtils.fromString("epic:r1/items/currency/pulsating_gold");
-		} else if (region.equals(ItemRegion.CELSIAN_ISLES) || region.equals(ItemRegion.MONUMENTA)) {
+		} else if (region.equals(Region.ISLES)) {
 			key = NamespacedKeyUtils.fromString("epic:r2/items/currency/pulsating_emerald");
 		} else {
 			CommandAPI.fail("Item must have a Region tag!");
@@ -222,7 +215,7 @@ public class InfusionUtils {
 		}.runTaskLater(Plugin.getInstance(), 5);
 	}
 
-	public static int calcInfuseCost(ItemStack item) throws WrapperCommandSyntaxException {
+	public static int calcInfuseCost(Plugin plugin, Player player, ItemStack item) throws WrapperCommandSyntaxException {
 		// First level is free
 		int infuseLvl = getInfuseLevel(item) - 1;
 		int cost = getCostMultiplierWithCheck(item);
@@ -239,9 +232,9 @@ public class InfusionUtils {
 	}
 
 	public static int getInfuseLevel(ItemStack item) {
-		return InventoryUtils.getCustomEnchantLevel(item, Acumen.PROPERTY_NAME, true) + InventoryUtils.getCustomEnchantLevel(item, Focus.PROPERTY_NAME, true)
-			+ InventoryUtils.getCustomEnchantLevel(item, Perspicacity.PROPERTY_NAME, true) + InventoryUtils.getCustomEnchantLevel(item, Tenacity.PROPERTY_NAME, true)
-			+ InventoryUtils.getCustomEnchantLevel(item, Vigor.PROPERTY_NAME, true) + InventoryUtils.getCustomEnchantLevel(item, Vitality.PROPERTY_NAME, true);
+		return ItemStatUtils.getInfusionLevel(item, InfusionType.ACUMEN) + ItemStatUtils.getInfusionLevel(item, InfusionType.FOCUS)
+			+ ItemStatUtils.getInfusionLevel(item, InfusionType.PERSPICACITY) + ItemStatUtils.getInfusionLevel(item, InfusionType.TENACITY)
+			+ ItemStatUtils.getInfusionLevel(item, InfusionType.VIGOR) + ItemStatUtils.getInfusionLevel(item, InfusionType.VITALITY);
 	}
 
 	private static int getCostMultiplierWithCheck(ItemStack item) throws WrapperCommandSyntaxException {
@@ -257,18 +250,14 @@ public class InfusionUtils {
 	 * Gets the infusion cost multiplier for the given item, or -1 if the item is not of a tier that can be infused.
 	 */
 	public static int getCostMultiplier(ItemStack item) {
-		switch (ItemUtils.getItemTier(item)) {
-			case MEME:
+		switch (ItemStatUtils.getTier(item)) {
 			case UNCOMMON:
-			case ENHANCED_UNCOMMON:
 			case UNIQUE:
-			case UNIQUE_EVENT:
+			case EVENT:
 			case RARE:
-			case PATRON_MADE:
+			case PATRON:
 				return 2;
-			case RELIC:
 			case ARTIFACT:
-			case ENHANCED_RARE:
 				return 3;
 			case EPIC:
 				return 6;
@@ -361,71 +350,44 @@ public class InfusionUtils {
 		}
 	}
 
-	public static InfusionSelection getCurrentInfusion(ItemStack item) {
+	public static InfusionSelection getCurrentInfusion(Plugin plugin, Player player, ItemStack item) {
 
-		if (InventoryUtils.getCustomEnchantLevel(item, Acumen.PROPERTY_NAME, true) > 0) {
+		if (plugin.mItemStatManager.getInfusionLevel(player, InfusionType.ACUMEN) > 0) {
 			return InfusionSelection.ACUMEN;
 		}
 
-		if (InventoryUtils.getCustomEnchantLevel(item, Focus.PROPERTY_NAME, true) > 0) {
+		if (plugin.mItemStatManager.getInfusionLevel(player, InfusionType.FOCUS) > 0) {
 			return InfusionSelection.FOCUS;
 		}
 
-		if (InventoryUtils.getCustomEnchantLevel(item, Perspicacity.PROPERTY_NAME, true) > 0) {
+		if (plugin.mItemStatManager.getInfusionLevel(player, InfusionType.PERSPICACITY) > 0) {
 			return InfusionSelection.PERSPICACITY;
 		}
 
-		if (InventoryUtils.getCustomEnchantLevel(item, Tenacity.PROPERTY_NAME, true) > 0) {
+		if (plugin.mItemStatManager.getInfusionLevel(player, InfusionType.TENACITY) > 0) {
 			return InfusionSelection.TENACITY;
 		}
 
-		if (InventoryUtils.getCustomEnchantLevel(item, Vigor.PROPERTY_NAME, true) > 0) {
+		if (plugin.mItemStatManager.getInfusionLevel(player, InfusionType.VIGOR) > 0) {
 			return InfusionSelection.VIGOR;
 		}
 
-		if (InventoryUtils.getCustomEnchantLevel(item, Vitality.PROPERTY_NAME, true) > 0) {
+		if (plugin.mItemStatManager.getInfusionLevel(player, InfusionType.VITALITY) > 0) {
 			return InfusionSelection.VITALITY;
 		}
 
 		return InfusionSelection.REFUND;
 	}
 
-	public static boolean infuseItem(ItemStack item, InfusionSelection selection) {
-		if (!getCurrentInfusion(item).equals(selection) && getInfuseLevel(item) > 0) {
+	public static boolean infuseItem(Plugin plugin, Player player, ItemStack item, InfusionSelection selection) {
+		if (!getCurrentInfusion(plugin, player, item).equals(selection) && getInfuseLevel(item) > 0) {
 			return false;
 		}
 
-		int prevLvl = InventoryUtils.getCustomEnchantLevel(item, selection.getEnchantName(), true);
-		if (prevLvl > 0) {
-			InventoryUtils.removeCustomEnchant(item, selection.getEnchantName());
-		}
+		int prevLvl = ItemStatUtils.getInfusionLevel(item, InfusionType.getInfusionType(selection.getEnchantName()));
 
-		String numeral = "";
-
-		switch (prevLvl) {
-			case 1:
-				numeral = " II";
-				break;
-			case 2:
-				numeral = " III";
-				break;
-			case 3:
-				numeral = " IV";
-				break;
-			case 0:
-				numeral = " I";
-				break;
-			default:
-				return false;
-		}
-
-		String enchantment = selection.getEnchantName() + numeral;
-
-		try {
-			ItemUtils.enchantifyItem(item, enchantment);
-		} catch (Exception e) {
-			return false;
-		}
+		ItemStatUtils.addInfusion(item, InfusionType.getInfusionType(selection.getEnchantName()), prevLvl + 1, player.getUniqueId());
+		ItemStatUtils.generateItemStats(item);
 
 		return true;
 	}
@@ -440,22 +402,18 @@ public class InfusionUtils {
 			return false;
 		}
 
-		ItemRegion region = ItemUtils.getItemRegion(item);
-		if (region != ItemRegion.KINGS_VALLEY && region != ItemRegion.CELSIAN_ISLES) {
+		Region region = ItemStatUtils.getRegion(item);
+		if (region != Region.VALLEY && region != Region.ISLES) {
 			return false;
 		}
 
-		switch (ItemUtils.getItemTier(item)) {
-			case MEME:
+		switch (ItemStatUtils.getTier(item)) {
 			case UNCOMMON:
-			case ENHANCED_UNCOMMON:
 			case UNIQUE:
-			case UNIQUE_EVENT:
+			case EVENT:
 			case RARE:
-			case PATRON_MADE:
-			case RELIC:
+			case PATRON:
 			case ARTIFACT:
-			case ENHANCED_RARE:
 			case EPIC:
 				break;
 			default:
@@ -465,7 +423,7 @@ public class InfusionUtils {
 		return true;
 	}
 
-	public static int getExpLvlInfuseCost(ItemStack item) {
+	public static int getExpLvlInfuseCost(Plugin plugin, Player player, ItemStack item) {
 		int exp = -10;
 		try {
 			exp = getExpInfuseCost(item);
@@ -491,7 +449,7 @@ public class InfusionUtils {
 		}
 	}
 
-	public static boolean canPayExp(Player player, ItemStack item) {
+	public static boolean canPayExp(Plugin plugin, Player player, ItemStack item) {
 		if (player.getGameMode() == GameMode.CREATIVE) {
 			return true;
 		}
@@ -514,18 +472,18 @@ public class InfusionUtils {
 		return true;
 	}
 
-	public static boolean canPayPulsating(Player player, ItemStack item) {
+	public static boolean canPayPulsating(Plugin plugin, Player player, ItemStack item) {
 		if (player.getGameMode() == GameMode.CREATIVE) {
 			return true;
 		}
 
 		ItemStack currency = null;
 
-		if (ItemUtils.getItemRegion(item) == ItemRegion.CELSIAN_ISLES) {
+		if (ItemStatUtils.getRegion(item) == Region.ISLES) {
 			currency = InventoryUtils.getItemFromLootTable(player, NamespacedKeyUtils.fromString("epic:r2/items/currency/pulsating_emerald"));
 		}
 
-		if (ItemUtils.getItemRegion(item) == ItemRegion.KINGS_VALLEY) {
+		if (ItemStatUtils.getRegion(item) == Region.VALLEY) {
 			currency = InventoryUtils.getItemFromLootTable(player, NamespacedKeyUtils.fromString("epic:r1/items/currency/pulsating_gold"));
 		}
 
@@ -537,7 +495,7 @@ public class InfusionUtils {
 		int amount;
 
 		try {
-			amount = calcInfuseCost(item);
+			amount = calcInfuseCost(plugin, player, item);
 		} catch (WrapperCommandSyntaxException e) {
 			return false;
 		}
@@ -551,11 +509,11 @@ public class InfusionUtils {
 		return true;
 	}
 
-	public static boolean canPayInfusion(Player player, ItemStack item) {
-		return canPayExp(player, item) && canPayPulsating(player, item);
+	public static boolean canPayInfusion(Plugin plugin, Player player, ItemStack item) {
+		return canPayExp(plugin, player, item) && canPayPulsating(plugin, player, item);
 	}
 
-	public static boolean payInfusion(Player player, ItemStack item) {
+	public static boolean payInfusion(Plugin plugin, Player player, ItemStack item) {
 		if (player.getGameMode() == GameMode.CREATIVE) {
 			Plugin.getInstance().getLogger().warning("[Infusion] Player: " + player.getName() + " infused an item while be on creative mode!");
 			return true;
@@ -563,11 +521,11 @@ public class InfusionUtils {
 
 		//currency
 		ItemStack currency = null;
-		if (ItemUtils.getItemRegion(item) == ItemRegion.CELSIAN_ISLES) {
+		if (ItemStatUtils.getRegion(item) == Region.ISLES) {
 			currency = InventoryUtils.getItemFromLootTable(player, NamespacedKeyUtils.fromString("epic:r2/items/currency/pulsating_emerald"));
 		}
 
-		if (ItemUtils.getItemRegion(item) == ItemRegion.KINGS_VALLEY) {
+		if (ItemStatUtils.getRegion(item) == Region.VALLEY) {
 			currency = InventoryUtils.getItemFromLootTable(player, NamespacedKeyUtils.fromString("epic:r1/items/currency/pulsating_gold"));
 		}
 
@@ -578,7 +536,7 @@ public class InfusionUtils {
 
 		int amount;
 		try {
-			amount = calcInfuseCost(item);
+			amount = calcInfuseCost(plugin, player, item);
 		} catch (WrapperCommandSyntaxException e) {
 			return false;
 		}

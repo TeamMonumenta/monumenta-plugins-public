@@ -1,7 +1,14 @@
 package com.playmonumenta.plugins.bosses.spells.sealedremorse;
 
-import java.util.List;
-
+import com.playmonumenta.plugins.bosses.bosses.BeastOfTheBlackFlame;
+import com.playmonumenta.plugins.bosses.bosses.Svalgot;
+import com.playmonumenta.plugins.bosses.spells.SpellBaseSeekingProjectile;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.DamageUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.utils.PotionUtils;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -16,13 +23,7 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 
-import com.playmonumenta.plugins.bosses.bosses.BeastOfTheBlackFlame;
-import com.playmonumenta.plugins.bosses.bosses.Svalgot;
-import com.playmonumenta.plugins.bosses.spells.SpellBaseSeekingProjectile;
-import com.playmonumenta.plugins.utils.BossUtils;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.plugins.utils.PotionUtils;
+import java.util.List;
 
 public class SvalgotOrbOfBones extends SpellBaseSeekingProjectile {
 
@@ -36,7 +37,7 @@ public class SvalgotOrbOfBones extends SpellBaseSeekingProjectile {
 	private static final double HITBOX_LENGTH = 2;
 	private static final boolean COLLIDES_WITH_BLOCKS = false;
 	private static final boolean LINGERS = true;
-	private static final int DAMAGE = 45;
+	private static final int DAMAGE = 35;
 
 	private Plugin mPlugin;
 	private Svalgot mBossClass;
@@ -76,7 +77,7 @@ public class SvalgotOrbOfBones extends SpellBaseSeekingProjectile {
 					world.spawnParticle(Particle.CLOUD, loc, 40, 1, 1, 1, 0.5);
 
 					for (Player p : PlayerUtils.playersInRange(loc, 5, true)) {
-						BossUtils.bossDamage(boss, p, DAMAGE, null, "Orb of Bones");
+						DamageUtils.damage(boss, p, DamageType.MAGIC, DAMAGE, null, false, true, "Orb of Bones");
 						p.setFireTicks(4 * 20);
 					}
 				});
@@ -131,7 +132,7 @@ public class SvalgotOrbOfBones extends SpellBaseSeekingProjectile {
 		world.spawnParticle(Particle.REDSTONE, loc, 40, 0.5, 0.5, 0.5, new Particle.DustOptions(Color.fromRGB(255, 0, 0), 1.0f));
 
 		for (Player p : PlayerUtils.playersInRange(loc, 6, true)) {
-			BossUtils.bossDamage(mBoss, p, DAMAGE, null, "Orb of Bones");
+			BossUtils.dualTypeBlockableDamage(mBoss, p, DamageType.MAGIC, DamageType.FIRE, DAMAGE, 0.6, "Orb of Bones", null);
 			p.setFireTicks(4 * 20);
 		}
 	}

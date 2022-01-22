@@ -1,12 +1,10 @@
 package com.playmonumenta.plugins.commands;
 
 import com.playmonumenta.plugins.Plugin;
-
-import org.bukkit.command.CommandSender;
-
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.CommandPermission;
 import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
+import org.bukkit.command.CommandSender;
 
 public class MonumentaReload {
 	public static void register(Plugin plugin) {

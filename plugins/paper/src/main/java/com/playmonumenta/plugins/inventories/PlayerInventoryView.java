@@ -1,8 +1,9 @@
 package com.playmonumenta.plugins.inventories;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import com.playmonumenta.plugins.point.Raycast;
+import com.playmonumenta.plugins.point.RaycastData;
+import com.playmonumenta.scriptedquests.utils.InventoryUtils;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -24,11 +25,8 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 
-import com.playmonumenta.plugins.point.Raycast;
-import com.playmonumenta.plugins.point.RaycastData;
-import com.playmonumenta.scriptedquests.utils.InventoryUtils;
-
-import net.kyori.adventure.text.Component;
+import java.util.ArrayList;
+import java.util.List;
 
 public class PlayerInventoryView implements Listener {
 	private static final String PERMISSION = "monumenta.peb.inventoryview";

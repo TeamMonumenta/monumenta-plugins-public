@@ -1,7 +1,9 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
-import java.util.Arrays;
-
+import com.playmonumenta.plugins.bosses.SpellManager;
+import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.bosses.spells.SpellRunAction;
+import com.playmonumenta.plugins.bosses.spells.SpellTargetVisiblePlayer;
 import org.bukkit.entity.Dolphin;
 import org.bukkit.entity.Golem;
 import org.bukkit.entity.LivingEntity;
@@ -12,11 +14,7 @@ import org.bukkit.entity.Wolf;
 import org.bukkit.event.entity.EntityTargetEvent;
 import org.bukkit.plugin.Plugin;
 
-import com.playmonumenta.plugins.bosses.SpellManager;
-import com.playmonumenta.plugins.bosses.spells.Spell;
-import com.playmonumenta.plugins.bosses.spells.SpellRunAction;
-import com.playmonumenta.plugins.bosses.spells.SpellTargetVisiblePlayer;
-import com.playmonumenta.plugins.utils.EntityUtils;
+import java.util.Arrays;
 
 public class PlayerTargetBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_targetplayer";
@@ -58,7 +56,7 @@ public class PlayerTargetBoss extends BossAbilityGroup {
 	/* Only allow mobs with this ability to target players */
 	@Override
 	public void bossChangedTarget(EntityTargetEvent event) {
-		if (!EntityUtils.isConfused(mBoss) && !(event.getTarget() instanceof Player)) {
+		if (!(event.getTarget() instanceof Player)) {
 			event.setCancelled(true);
 		}
 	}

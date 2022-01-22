@@ -1,16 +1,15 @@
 package com.playmonumenta.plugins.abilities;
 
-import java.util.Collection;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.checkerframework.checker.nullness.qual.Nullable;
-
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.playmonumenta.plugins.abilities.delves.DelveModifier;
 import com.playmonumenta.plugins.classes.ClassAbility;
+import org.checkerframework.checker.nullness.qual.Nullable;
+
+import java.util.Collection;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 public class AbilityCollection {
 

@@ -1,9 +1,16 @@
 package com.playmonumenta.plugins.custominventories;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Set;
-
+import com.playmonumenta.networkrelay.NetworkRelayAPI;
+import com.playmonumenta.plugins.server.properties.ServerProperties;
+import com.playmonumenta.plugins.utils.GUIUtils;
+import com.playmonumenta.plugins.utils.MessagingUtils;
+import com.playmonumenta.redissync.MonumentaRedisSyncAPI;
+import com.playmonumenta.scriptedquests.utils.CustomInventory;
+import com.playmonumenta.scriptedquests.utils.ScoreboardUtils;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
+import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -13,18 +20,9 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-import com.playmonumenta.networkrelay.NetworkRelayAPI;
-import com.playmonumenta.plugins.server.properties.ServerProperties;
-import com.playmonumenta.plugins.utils.GUIUtils;
-import com.playmonumenta.plugins.utils.MessagingUtils;
-import com.playmonumenta.redissync.MonumentaRedisSyncAPI;
-import com.playmonumenta.scriptedquests.utils.CustomInventory;
-import com.playmonumenta.scriptedquests.utils.ScoreboardUtils;
-
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.format.TextDecoration;
-import net.md_5.bungee.api.ChatColor;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Set;
 
 public class OrinCustomInventory extends CustomInventory {
 	private static final Material FILLER = Material.GRAY_STAINED_GLASS_PANE;

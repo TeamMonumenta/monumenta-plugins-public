@@ -1,8 +1,8 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
+import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import org.bukkit.entity.LivingEntity;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.plugin.Plugin;
 
 public final class BlastResistBoss extends BossAbilityGroup {
@@ -19,8 +19,8 @@ public final class BlastResistBoss extends BossAbilityGroup {
 	}
 
 	@Override
-	public void bossDamagedByEntity(EntityDamageByEntityEvent event) {
-		if (event.getCause() == DamageCause.BLOCK_EXPLOSION || event.getCause() == DamageCause.ENTITY_EXPLOSION) {
+	public void onHurt(DamageEvent event) {
+		if (event.getType() == DamageType.BLAST) {
 			event.setDamage(event.getDamage() * 0.1);
 		}
 	}

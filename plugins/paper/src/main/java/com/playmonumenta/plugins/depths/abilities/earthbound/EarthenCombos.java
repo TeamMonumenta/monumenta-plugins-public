@@ -1,5 +1,14 @@
 package com.playmonumenta.plugins.depths.abilities.earthbound;
 
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.depths.DepthsTree;
+import com.playmonumenta.plugins.depths.DepthsUtils;
+import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
+import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
+import com.playmonumenta.plugins.effects.PercentDamageReceived;
+import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -7,17 +16,6 @@ import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.depths.DepthsTree;
-import com.playmonumenta.plugins.depths.DepthsUtils;
-import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
-import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
-import com.playmonumenta.plugins.effects.PercentDamageReceived;
-import com.playmonumenta.plugins.utils.EntityUtils;
-
-import net.md_5.bungee.api.ChatColor;
 
 public class EarthenCombos extends DepthsAbility {
 
@@ -37,18 +35,18 @@ public class EarthenCombos extends DepthsAbility {
 	}
 
 	@Override
-	public boolean livingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
+	public void onDamage(DamageEvent event, LivingEntity enemy) {
 		if (DepthsUtils.isValidComboAttack(event, mPlayer)) {
 			mComboCount++;
 
 			if (mComboCount >= 3 && mRarity > 0) {
 				mPlugin.mEffectManager.addEffect(mPlayer, PERCENT_DAMAGE_RECEIVED_EFFECT_NAME, new PercentDamageReceived(DURATION, PERCENT_DAMAGE_RECEIVED[mRarity - 1]));
 				mComboCount = 0;
-				EntityUtils.applySlow(mPlugin, ROOT_DURATION, .99, (LivingEntity) (event.getEntity()));
+				EntityUtils.applySlow(mPlugin, ROOT_DURATION, .99, enemy);
 
 				Location loc = mPlayer.getLocation().add(0, 1, 0);
 				World world = mPlayer.getWorld();
-				Location entityLoc = event.getEntity().getLocation();
+				Location entityLoc = enemy.getLocation();
 				world.playSound(loc, Sound.BLOCK_GRASS_BREAK, 0.8f, 0.65f);
 				world.playSound(loc, Sound.BLOCK_NETHER_BRICKS_BREAK, 0.8f, 0.45f);
 				world.spawnParticle(Particle.CRIT_MAGIC, entityLoc.add(0, 1, 0), 10, 0.5, 0.2, 0.5, 0.65);
@@ -56,8 +54,6 @@ public class EarthenCombos extends DepthsAbility {
 				world.spawnParticle(Particle.BLOCK_DUST, loc.add(0, 1, 0), 15, 0.5, 0.3, 0.5, 0.5, Material.ANDESITE.createBlockData());
 			}
 		}
-
-		return true;
 	}
 
 	@Override

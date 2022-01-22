@@ -1,5 +1,17 @@
 package com.playmonumenta.plugins.depths.abilities.steelsage;
 
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.AbilityTrigger;
+import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.depths.DepthsTree;
+import com.playmonumenta.plugins.depths.DepthsUtils;
+import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
+import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
+import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.itemstats.ItemStatManager;
+import com.playmonumenta.plugins.utils.DamageUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
@@ -20,16 +32,6 @@ import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
-
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.AbilityTrigger;
-import com.playmonumenta.plugins.classes.ClassAbility;
-import com.playmonumenta.plugins.classes.magic.MagicType;
-import com.playmonumenta.plugins.depths.DepthsTree;
-import com.playmonumenta.plugins.depths.DepthsUtils;
-import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
-import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
-import com.playmonumenta.plugins.utils.EntityUtils;
 
 public class FireworkBlast extends DepthsAbility {
 	public static final String ABILITY_NAME = "Firework Blast";
@@ -81,6 +83,8 @@ public class FireworkBlast extends DepthsAbility {
 		Bukkit.getPluginManager().callEvent(event);
 		rocket.setVelocity(rocket.getVelocity().multiply(2));
 
+		FixedMetadataValue playerItemStats = new FixedMetadataValue(mPlugin, new ItemStatManager.PlayerItemStats(mPlugin.mItemStatManager.getPlayerItemStats(mPlayer)));
+
 		new BukkitRunnable() {
 			@Override
 			public void run() {
@@ -95,7 +99,10 @@ public class FireworkBlast extends DepthsAbility {
 						double damage = (mPlayer.getLocation().distance(loc) * DAMAGE_INCREASE_PER_BLOCK + 1) * DAMAGE[mRarity - 1];
 
 						//Max damage cap from array
-						EntityUtils.damageEntity(mPlugin, e, Math.min(damage, DAMAGE_CAP[mRarity - 1]), mPlayer, MagicType.PHYSICAL, true, mInfo.mLinkedSpell);
+						DamageEvent damageEvent = new DamageEvent(e, mPlayer, mPlayer, DamageType.PROJECTILE_SKILL, mInfo.mLinkedSpell, Math.min(damage, DAMAGE_CAP[mRarity - 1]));
+						damageEvent.setDelayed(true);
+						damageEvent.setPlayerItemStat(playerItemStats);
+						DamageUtils.damage(damageEvent, false, true, null);
 
 						world.spawnParticle(Particle.SMOKE_LARGE, e.getLocation(), 20, 0, 0, 0, 0.2);
 						world.spawnParticle(Particle.REDSTONE, e.getLocation(), 10, 0.25, 0.25, 0.25, GRAY_COLOR);
@@ -121,7 +128,7 @@ public class FireworkBlast extends DepthsAbility {
 
 	@Override
 	public String getDescription(int rarity) {
-		return "Right click while sneaking and holding a weapon to shoot a firework that deals " + DepthsUtils.getRarityColor(rarity) + DAMAGE[rarity - 1] + ChatColor.WHITE + " damage to enemies within " + RADIUS + " blocks of its explosion. The damage is increased by " + (int) DepthsUtils.roundPercent(DAMAGE_INCREASE_PER_BLOCK) + "% for every block the firework travels, up to " + DepthsUtils.getRarityColor(rarity) + DAMAGE_CAP[rarity - 1] + ChatColor.WHITE + " damage. Cooldown: " + COOLDOWN / 20 + "s.";
+		return "Right click while sneaking and holding a weapon to shoot a firework that deals " + DepthsUtils.getRarityColor(rarity) + DAMAGE[rarity - 1] + ChatColor.WHITE + " projectile damage to enemies within " + RADIUS + " blocks of its explosion. The damage is increased by " + (int) DepthsUtils.roundPercent(DAMAGE_INCREASE_PER_BLOCK) + "% for every block the firework travels, up to " + DepthsUtils.getRarityColor(rarity) + DAMAGE_CAP[rarity - 1] + ChatColor.WHITE + " damage. Cooldown: " + COOLDOWN / 20 + "s.";
 	}
 
 	@Override

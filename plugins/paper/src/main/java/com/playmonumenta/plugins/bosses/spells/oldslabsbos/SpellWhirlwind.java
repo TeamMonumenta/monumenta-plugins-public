@@ -1,8 +1,11 @@
 package com.playmonumenta.plugins.bosses.spells.oldslabsbos;
 
-import java.util.Iterator;
-import java.util.List;
-
+import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.MovementUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -14,11 +17,8 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import com.playmonumenta.plugins.bosses.spells.Spell;
-import com.playmonumenta.plugins.utils.BossUtils;
-import com.playmonumenta.plugins.utils.FastUtils;
-import com.playmonumenta.plugins.utils.MovementUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
+import java.util.Iterator;
+import java.util.List;
 
 public class SpellWhirlwind extends Spell {
 
@@ -98,8 +98,8 @@ public class SpellWhirlwind extends Spell {
 									Player player = iter.next();
 
 									if (player.getLocation().distance(loc) < mBladeDamageRadius) {
-										BossUtils.bossDamage(mBoss, player, 6, mBoss.getLocation(), "Whirlwind");
-										MovementUtils.knockAway(mBoss.getLocation(), player, 0.5f, 0.65f);
+										BossUtils.blockableDamage(mBoss, player, DamageType.MAGIC, 6, "Whirlwind", mBoss.getLocation());
+										MovementUtils.knockAway(mBoss.getLocation(), player, 0.5f, 0.65f, false);
 										iter.remove();
 									}
 								}

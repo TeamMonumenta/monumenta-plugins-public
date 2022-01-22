@@ -9,13 +9,11 @@ import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Projectile;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.plugin.Plugin;
-import org.bukkit.projectiles.ProjectileSource;
 
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.bosses.spells.SpellDreadnaughtParticle;
+import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 
 public class DreadnaughtParticleBoss extends BossAbilityGroup {
@@ -43,17 +41,10 @@ public class DreadnaughtParticleBoss extends BossAbilityGroup {
 	}
 
 	@Override
-	public void bossDamagedByEntity(EntityDamageByEntityEvent event) {
+	public void onHurtByEntityWithSource(DamageEvent event, Entity damager, LivingEntity source) {
 		Location loc = mBoss.getLocation();
-		Entity damager = event.getDamager();
-		if (damager instanceof Projectile) {
-			ProjectileSource source = ((Projectile) damager).getShooter();
-			if (source instanceof LivingEntity) {
-				damager = (LivingEntity) source;
-			}
-		}
 
-		if (loc.distance(damager.getLocation()) > DAMAGE_IMMUNE_DISTANCE) {
+		if (loc.distance(source.getLocation()) > DAMAGE_IMMUNE_DISTANCE) {
 			event.setCancelled(true);
 			World world = mBoss.getWorld();
 			world.playSound(damager.getLocation(), Sound.ENTITY_BLAZE_SHOOT, 0.5f, 0.5f);
@@ -73,7 +64,7 @@ public class DreadnaughtParticleBoss extends BossAbilityGroup {
 
 			loc.add(0, 1, 0);
 
-			World world = event.getEntity().getWorld();
+			World world = mBoss.getWorld();
 			world.playSound(loc, Sound.ENTITY_BLAZE_DEATH, 1, 0.5f);
 			world.spawnParticle(Particle.FLAME, loc, 50, 3, 1, 3, 0);
 			world.spawnParticle(Particle.SMOKE_LARGE, loc, 200, 3, 1, 3, 0);

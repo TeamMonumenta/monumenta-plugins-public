@@ -1,19 +1,18 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
-import java.util.Arrays;
-import java.util.List;
-
+import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.bosses.spells.SpellInspire;
+import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.utils.DelvesUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
 import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.plugin.Plugin;
 
-import com.playmonumenta.plugins.bosses.spells.Spell;
-import com.playmonumenta.plugins.bosses.spells.SpellInspire;
-import com.playmonumenta.plugins.utils.DelvesUtils;
-import com.playmonumenta.plugins.utils.EntityUtils;
+import java.util.Arrays;
+import java.util.List;
 
 public final class CommanderBoss extends BossAbilityGroup {
 
@@ -43,7 +42,7 @@ public final class CommanderBoss extends BossAbilityGroup {
 	}
 
 	@Override
-	public void bossDamagedByEntity(EntityDamageByEntityEvent event) {
+	public void onHurt(DamageEvent event) {
 		if (!mSummonedReinforcements && mBoss.getHealth() < EntityUtils.getMaxHealth(mBoss) / 2) {
 			mSummonedReinforcements = true;
 

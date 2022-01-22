@@ -1,7 +1,11 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
-import java.util.Arrays;
-
+import com.playmonumenta.plugins.bosses.SpellManager;
+import com.playmonumenta.plugins.bosses.spells.SpellBaseSeekingProjectile;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.MovementUtils;
+import com.playmonumenta.plugins.utils.PotionUtils;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -11,11 +15,7 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
-import com.playmonumenta.plugins.bosses.SpellManager;
-import com.playmonumenta.plugins.bosses.spells.SpellBaseSeekingProjectile;
-import com.playmonumenta.plugins.utils.BossUtils;
-import com.playmonumenta.plugins.utils.MovementUtils;
-import com.playmonumenta.plugins.utils.PotionUtils;
+import java.util.Arrays;
 
 /**
  * @deprecated use boss_projectile instead, like this:
@@ -82,7 +82,7 @@ public class WeakHookBoss extends BossAbilityGroup {
 						world.playSound(loc, Sound.ENTITY_ARMOR_STAND_BREAK, 1f, 0.5f);
 						world.spawnParticle(Particle.CRIT, loc, 50, 0, 0, 0, 0.25);
 						if (player != null) {
-							BossUtils.bossDamage(boss, player, DAMAGE);
+							BossUtils.dualTypeBlockableDamage(boss, player, DamageType.MAGIC, DamageType.PROJECTILE, DAMAGE, 0.5);
 							MovementUtils.pullTowardsByUnit(boss, player, p.MULTIPLIER);
 						}
 					}

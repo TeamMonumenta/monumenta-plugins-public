@@ -1,9 +1,5 @@
 package com.playmonumenta.plugins.plots;
 
-import java.util.Deque;
-import java.util.LinkedList;
-import java.util.Map;
-
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -12,7 +8,10 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.utils.FileUtils;
 import com.playmonumenta.structures.StructuresAPI;
 import com.playmonumenta.worlds.paper.MonumentaWorldManagementAPI;
-
+import dev.jorel.commandapi.CommandAPI;
+import dev.jorel.commandapi.CommandAPICommand;
+import dev.jorel.commandapi.CommandPermission;
+import dev.jorel.commandapi.arguments.IntegerArgument;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -22,10 +21,9 @@ import org.bukkit.block.Block;
 import org.bukkit.command.CommandSender;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import dev.jorel.commandapi.CommandAPI;
-import dev.jorel.commandapi.CommandAPICommand;
-import dev.jorel.commandapi.CommandPermission;
-import dev.jorel.commandapi.arguments.IntegerArgument;
+import java.util.Deque;
+import java.util.LinkedList;
+import java.util.Map;
 
 public class UpgradeLegacyPlots {
 	public static void registerCommands() {

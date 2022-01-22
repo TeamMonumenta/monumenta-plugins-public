@@ -1,7 +1,6 @@
 package com.playmonumenta.plugins.minigames.chess;
 
 import com.playmonumenta.plugins.minigames.chess.ChessBoard.ChessTeam;
-
 import org.bukkit.entity.Player;
 
 public class ChessPlayer {

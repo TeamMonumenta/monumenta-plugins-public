@@ -3,7 +3,6 @@ package com.playmonumenta.plugins.inventories;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.listeners.ShulkerShortcutListener;
 import com.playmonumenta.plugins.utils.ItemUtils;
-
 import org.bukkit.Bukkit;
 import org.bukkit.block.ShulkerBox;
 import org.bukkit.entity.Entity;

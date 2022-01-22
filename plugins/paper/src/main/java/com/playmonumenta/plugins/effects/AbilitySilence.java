@@ -1,15 +1,13 @@
 package com.playmonumenta.plugins.effects;
 
+import com.playmonumenta.plugins.abilities.AbilityManager;
+import com.playmonumenta.plugins.network.ClientModHandler;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Color;
 import org.bukkit.Particle;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
-
-import com.playmonumenta.plugins.abilities.AbilityManager;
-import com.playmonumenta.plugins.network.ClientModHandler;
-
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
 
 public class AbilitySilence extends Effect {
 

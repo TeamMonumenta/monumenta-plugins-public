@@ -1,11 +1,10 @@
 package com.playmonumenta.plugins.commands;
 
-import com.playmonumenta.plugins.utils.CommandUtils;
-
+import com.playmonumenta.plugins.utils.ItemStatUtils;
+import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-
-import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
+import org.bukkit.inventory.ItemStack;
 
 /*
  * NOTICE!
@@ -20,6 +19,8 @@ public class GildifyHeldItem extends GenericCommand {
 	}
 
 	private static void run(CommandSender sender, Player player) throws WrapperCommandSyntaxException {
-		CommandUtils.enchantify(sender, player, "Gilded", "Gilded by");
+		ItemStack item = player.getItemInHand();
+		ItemStatUtils.addInfusion(item, ItemStatUtils.InfusionType.GILDED, 1, player.getUniqueId());
+		ItemStatUtils.generateItemStats(item);
 	}
 }

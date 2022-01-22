@@ -1,22 +1,22 @@
 package com.playmonumenta.plugins.bosses.spells.frostgiant;
 
-import java.util.List;
-
+import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import com.playmonumenta.plugins.bosses.spells.Spell;
-import com.playmonumenta.plugins.utils.FastUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
+import java.util.List;
 
 /*
  Shield of Frost - The frost giant gains a shield that absorbs the next
@@ -114,9 +114,8 @@ public class ShieldOfFrost extends Spell {
 	}
 
 	@Override
-	public void bossDamagedByEntity(EntityDamageByEntityEvent event) {
-		if (mBoss.getAbsorptionAmount() > 0 && event.getDamager() instanceof LivingEntity) {
-			LivingEntity player = (LivingEntity) event.getDamager();
+	public void onHurtByEntity(DamageEvent event, Entity damager) {
+		if (mBoss.getAbsorptionAmount() > 0 && damager instanceof Player player) {
 			World world = mBoss.getWorld();
 			player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 5, 2));
 			world.spawnParticle(Particle.FIREWORKS_SPARK, player.getLocation().add(0, 1, 0), 12, 0.4, 0.4, 0.4, 0.15);

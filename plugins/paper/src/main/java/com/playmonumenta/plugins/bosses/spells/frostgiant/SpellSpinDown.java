@@ -1,16 +1,12 @@
 package com.playmonumenta.plugins.bosses.spells.frostgiant;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-
 import com.destroystokyo.paper.entity.Pathfinder;
 import com.playmonumenta.plugins.bosses.bosses.FrostGiant;
 import com.playmonumenta.plugins.bosses.spells.Spell;
-import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
-
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -29,6 +25,10 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
+
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 public class SpellSpinDown extends Spell {
 
@@ -222,7 +222,7 @@ public class SpellSpinDown extends Spell {
 					if ((player.getLocation().getBlock().getRelative(BlockFace.DOWN).getType() != Material.AIR || player.getLocation().getBlock().getType() != Material.AIR)
 					    && (player.getLocation().getBlock().getRelative(BlockFace.DOWN).getType() == Material.FROSTED_ICE || player.getLocation().getBlock().getType() == Material.FROSTED_ICE)) {
 						Vector vel = player.getVelocity();
-						BossUtils.bossDamage(mBoss, player, 18, null);
+						DamageUtils.damage(mBoss, player, DamageType.AILMENT, 18);
 						player.setVelocity(vel);
 					}
 				}

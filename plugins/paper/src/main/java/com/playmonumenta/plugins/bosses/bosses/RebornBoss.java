@@ -1,15 +1,14 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
+import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.utils.EntityUtils;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.scheduler.BukkitRunnable;
-
-import com.playmonumenta.plugins.utils.EntityUtils;
 
 public class RebornBoss extends BossAbilityGroup {
 	private boolean mActivated = false;
@@ -27,11 +26,12 @@ public class RebornBoss extends BossAbilityGroup {
 	}
 
 	@Override
-	public void bossDamagedByEntity(EntityDamageByEntityEvent event) {
-		if (!mActivated && mBoss.getHealth() - event.getFinalDamage() <= 0) {
+	public void onHurt(DamageEvent event) {
+		if (!mActivated && mBoss.getHealth() - event.getDamage() <= 0) {
 			mActivated = true;
 			World world = mBoss.getWorld();
 			event.setCancelled(true);
+			event.setDamage(0);
 			world.playSound(mBoss.getLocation(), Sound.ITEM_TOTEM_USE, 1, 1);
 			mBoss.setHealth(EntityUtils.getMaxHealth(mBoss) / 2);
 			mBoss.setFireTicks(-1);
@@ -41,8 +41,8 @@ public class RebornBoss extends BossAbilityGroup {
 			if (EntityUtils.isSlowed(com.playmonumenta.plugins.Plugin.getInstance(), mBoss)) {
 				EntityUtils.setSlowTicks(com.playmonumenta.plugins.Plugin.getInstance(), mBoss, 0);
 			}
-			if (EntityUtils.isConfused(mBoss)) {
-				EntityUtils.removeConfusion(mBoss);
+			if (EntityUtils.isParalyzed(com.playmonumenta.plugins.Plugin.getInstance(), mBoss)) {
+				EntityUtils.removeParalysis(com.playmonumenta.plugins.Plugin.getInstance(), mBoss);
 			}
 			if (EntityUtils.isStunned(mBoss)) {
 				EntityUtils.removeStun(mBoss);

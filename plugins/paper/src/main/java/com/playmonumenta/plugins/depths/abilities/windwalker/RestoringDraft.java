@@ -1,30 +1,28 @@
 package com.playmonumenta.plugins.depths.abilities.windwalker;
 
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
-import org.bukkit.World;
-import org.bukkit.entity.Player;
-import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
-import org.bukkit.scheduler.BukkitRunnable;
-
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.depths.DepthsManager;
 import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
+import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.utils.MetadataUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
-
 import net.md_5.bungee.api.ChatColor;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
+import org.bukkit.World;
+import org.bukkit.entity.Player;
+import org.bukkit.scheduler.BukkitRunnable;
 
 public final class RestoringDraft extends DepthsAbility {
 
 	public static final String ABILITY_NAME = "Restoring Draft";
-	public static final double[] HEALING = {0.2, 0.3, 0.4, 0.5, 0.6, 0.8};
+	public static final double[] HEALING = {0.1, 0.15, 0.2, 0.25, 0.3, 0.4};
 	public static final int HEIGHT_CAP = 12;
 	private static final String SLAM_ONCE_THIS_TICK_METAKEY = "RestoringDraftTickSlammed";
 	public static final int AUTOMATIC_THRESHOLD = 4;
@@ -123,7 +121,7 @@ public final class RestoringDraft extends DepthsAbility {
 		}
 		double fallDistance = calculateFallDistance();
 		double healing = Math.min(HEIGHT_CAP, fallDistance) * HEALING[mRarity - 1];
-		PlayerUtils.healPlayer(mPlayer, healing);
+		PlayerUtils.healPlayer(mPlugin, mPlayer, healing);
 
 		World world = mPlayer.getWorld();
 		Location location = mPlayer.getLocation();
@@ -133,11 +131,10 @@ public final class RestoringDraft extends DepthsAbility {
 	}
 
 	@Override
-	public boolean playerDamagedEvent(EntityDamageEvent event) {
-		if (event.getCause() == DamageCause.FALL) {
+	public void onHurt(DamageEvent event) {
+		if (event.getType() == DamageType.FALL) {
 			event.setCancelled(true);
 		}
-		return true;
 	}
 
 

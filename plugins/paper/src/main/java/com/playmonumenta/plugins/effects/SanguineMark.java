@@ -1,5 +1,8 @@
 package com.playmonumenta.plugins.effects;
 
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -9,17 +12,18 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDeathEvent;
 
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
-
 public class SanguineMark extends Effect {
 
 	private static final Particle.DustOptions COLOR = new Particle.DustOptions(Color.fromRGB(179, 0, 0), 1.0f);
 	private double mHealPercent;
+	private Player mPlayer;
+	private Plugin mPlugin;
 
-	public SanguineMark(double healPercent, int duration) {
+	public SanguineMark(double healPercent, int duration, Player player, Plugin plugin) {
 		super(duration);
 		mHealPercent = healPercent;
+		mPlayer = player;
+		mPlugin = plugin;
 	}
 
 	@Override
@@ -36,9 +40,9 @@ public class SanguineMark extends Effect {
 	@Override
 	public boolean entityKilledEvent(EntityDeathEvent event) {
 		if (event.getEntity().getKiller() != null) {
-			Player player = event.getEntity().getKiller();
-			double maxHealth = EntityUtils.getMaxHealth(player);
-			 PlayerUtils.healPlayer(player, mHealPercent * maxHealth);
+			 Player player = event.getEntity().getKiller();
+			 double maxHealth = EntityUtils.getMaxHealth(player);
+			 PlayerUtils.healPlayer(mPlugin, player, mHealPercent * maxHealth, mPlayer);
 			 player.getWorld().playSound(player.getLocation(), Sound.ENTITY_SLIME_SQUISH_SMALL, 1.0f, 0.8f);
 		}
 		return true;

@@ -25,6 +25,8 @@ public enum ClassAbility {
 	// [Mage]
 	ARCANE_STRIKE("Arcane Strike"),
 	ELEMENTAL_ARROWS(ElementalArrows.NAME),
+	ELEMENTAL_ARROWS_FIRE("Fire Elemental Arrows"),
+	ELEMENTAL_ARROWS_ICE("Ice Elemental Arrows"),
 	FROST_NOVA(FrostNova.NAME),
 	MAGMA_SHIELD(MagmaShield.NAME),
 	MANA_LANCE("Mana Lance"),
@@ -106,7 +108,7 @@ public enum ClassAbility {
 
 	// Tenebrist
 	HAUNTING_SHADES("Haunting Shades"),
-	UMBRAL_WAIL("Umbral Wail"),
+	RESTLESS_SOULS("Restless Souls"),
 	WITHERING_GAZE("Withering Gaze"),
 
 	// [Warrior]
@@ -128,22 +130,21 @@ public enum ClassAbility {
 
 	// [Alchemist]
 	ALCHEMIST_POTION("Alchemist Potion"),
-	BASILISK_POISON("Basilisk Poison"),
+	ALCHEMICAL_ARTILLERY("Alchemical Artillery"),
 	BEZOAR("Bezoar"),
 	BRUTAL_ALCHEMY("Brutal Alchemy"),
-	ENFEEBLING_ELIXIR("Enfeebling Elixir"),
+	ENERGIZING_ELIXIR("Energizing Elixir"),
 	IRON_TINCTURE("Iron Tincture"),
-	POWER_INJECTION("Power Injection"),
-	UNSTABLE_ARROWS("Unstable Arrows"),
+	UNSTABLE_AMALGAM("Unstable Amalgam"),
 
 	// Apothecary
-	ALCHEMICAL_AMALGAM("Alchemical Amalgam"),
-	INVIGORATING_ODOR("Invigorating_Odor"),
+	PANACEA("Panacea"),
+	TRANSMUTATION_RING("Transmutation Ring"),
 	WARDING_REMEDY("Warding Remedy"),
 
 	// Harbinger
-	NIGHTMARISH_ALCHEMY("Nightmarish Alchemy"),
-	PURPLE_HAZE("Purple Haze"),
+	ESOTERIC_ENHANCEMENTS("Esoteric Enhancements"),
+	TABOO("Taboo"),
 	SCORCHED_EARTH("Scorched Earth"),
 
 	// [DEPTHS ABILITIES]

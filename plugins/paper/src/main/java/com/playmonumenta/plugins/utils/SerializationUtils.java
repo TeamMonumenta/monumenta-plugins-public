@@ -1,9 +1,10 @@
 package com.playmonumenta.plugins.utils;
 
-import java.util.LinkedList;
-import java.util.List;
-import java.util.ListIterator;
-
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
+import com.playmonumenta.plugins.bosses.bosses.BossAbilityGroup;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.LivingEntity;
@@ -12,12 +13,9 @@ import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonObject;
-import com.playmonumenta.plugins.bosses.bosses.BossAbilityGroup;
-
-import net.kyori.adventure.text.Component;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.ListIterator;
 
 public class SerializationUtils {
 	private static final String SERIALCONST = "SERIALDATA=";

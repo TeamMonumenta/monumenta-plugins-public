@@ -1,18 +1,17 @@
 package com.playmonumenta.plugins.abilities.cleric;
 
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.player.PartialParticle;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.StringUtils;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.checkerframework.checker.nullness.qual.Nullable;
-
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.events.CustomDamageEvent;
-import com.playmonumenta.plugins.player.PartialParticle;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.StringUtils;
 
 
 
@@ -46,16 +45,14 @@ public class Crusade extends Ability {
 	}
 
 	@Override
-	public void playerDealtCustomDamageEvent(CustomDamageEvent customDamageEvent) {
-		if (mPlayer == null) {
+	public void onDamage(DamageEvent event, LivingEntity enemy) {
+		if (event.getAbility() == null) {
 			return;
 		}
-		//TODO pass in casted entities for events like these
-		LivingEntity enemy = customDamageEvent.getDamaged();
 
 		if (enemyTriggersAbilities(enemy)) {
-			double originalDamage = customDamageEvent.getDamage();
-			customDamageEvent.setDamage(
+			double originalDamage = event.getDamage();
+			event.setDamage(
 				originalDamage + (originalDamage * DAMAGE_MULTIPLIER)
 			);
 

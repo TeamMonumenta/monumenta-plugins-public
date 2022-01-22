@@ -9,14 +9,10 @@ import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
-import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Fox;
 import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
-import org.bukkit.entity.Projectile;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.inventory.ItemStack;
@@ -31,10 +27,17 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityManager;
+import com.playmonumenta.plugins.bosses.BossManager;
+import com.playmonumenta.plugins.bosses.bosses.BossAbilityGroup;
+import com.playmonumenta.plugins.bosses.bosses.abilities.HuntingCompanionBoss;
 import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
+import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
 
@@ -43,20 +46,17 @@ public class HuntingCompanion extends Ability {
 	public static final int DURATION = 12 * 20;
 	private static final int TICK_INTERVAL = 5;
 	public static final String FOX_NAME = "FoxCompanion";
-	public static final String FOX_TAG = "FoxCompanion";
 	private static final int DETECTION_RANGE = 32;
-	// DAMAGE is a percent of bow damage
-	public static final double DAMAGE_1 = 0.2;
-	public static final double DAMAGE_2 = 0.4;
-	public static final int STUN_TIME_1 = 2 * 20;
-	public static final int STUN_TIME_2 = 3 * 20;
-	public static final String OWNER_METADATA_TAG = "FoxCompanionOwnerMetadataTag";
+	private static final double DAMAGE_FRACTION_1 = 0.2;
+	private static final double DAMAGE_FRACTION_2 = 0.4;
+	private static final int STUN_TIME_1 = 2 * 20;
+	private static final int STUN_TIME_2 = 3 * 20;
 	private static final double VELOCITY = 0.9;
 	private static final double JUMP_HEIGHT = 0.8;
 
 	private @Nullable Fox mFox;
 	private @Nullable LivingEntity mTarget;
-	private final double mDamage;
+	private final double mDamageFraction;
 	public int mStunTime;
 	private @Nullable WindBomb mWindBomb;
 
@@ -66,15 +66,15 @@ public class HuntingCompanion extends Ability {
 		super(plugin, player, "Hunting Companion");
 		mInfo.mScoreboardId = "HuntingCompanion";
 		mInfo.mShorthandName = "HC";
-		mInfo.mDescriptions.add("Swap hands while holding a bow or crossbow to summon an invulnerable fox companion. The fox attacks the nearest mob within " + DETECTION_RANGE + " blocks. The fox prioritizes the first enemy you hit with a projectile after summoning, which can be reapplied once that target dies. The fox deals " + (int) (100 * DAMAGE_1) + "% of your projectile damage attribute (not including class bonuses) when the ability is cast as ability damage, ignoring i-frames. Once per mob, the fox stuns upon attack for " + STUN_TIME_1 / 20 + " seconds, except for elites and bosses. The fox disappears after " + DURATION / 20 + " seconds. Cooldown: " + COOLDOWN / 20 + "s.");
-		mInfo.mDescriptions.add("Damage is increased to " + (int) (100 * DAMAGE_2) + "% of your projectile damage and the stun time is increased to " + STUN_TIME_2 / 20 + " seconds.");
+		mInfo.mDescriptions.add("Swap hands while holding a bow or crossbow to summon an invulnerable fox companion. The fox attacks the nearest mob within " + DETECTION_RANGE + " blocks. The fox prioritizes the first enemy you hit with a projectile after summoning, which can be reapplied once that target dies. The fox deals damage equal to " + (int) (100 * DAMAGE_FRACTION_1) + "% of your projectile damage when the ability is cast, ignoring i-frames. Once per mob, the fox stuns upon attack for " + STUN_TIME_1 / 20 + " seconds, except for elites and bosses. The fox disappears after " + DURATION / 20 + " seconds. Cooldown: " + COOLDOWN / 20 + "s.");
+		mInfo.mDescriptions.add("Damage is increased to " + (int) (100 * DAMAGE_FRACTION_2) + "% of your projectile damage and the stun time is increased to " + STUN_TIME_2 / 20 + " seconds.");
 		mInfo.mCooldown = COOLDOWN;
 		mInfo.mIgnoreCooldown = true;
 		mInfo.mLinkedSpell = ClassAbility.HUNTING_COMPANION;
 		mDisplayItem = new ItemStack(Material.SWEET_BERRIES, 1);
 
 		boolean isLevelOne = getAbilityScore() == 1;
-		mDamage = isLevelOne ? DAMAGE_1 : DAMAGE_2;
+		mDamageFraction = isLevelOne ? DAMAGE_FRACTION_1 : DAMAGE_FRACTION_2;
 		mStunTime = isLevelOne ? STUN_TIME_1 : STUN_TIME_2;
 
 		mStunnedMobs = new ArrayList<Entity>();
@@ -90,13 +90,13 @@ public class HuntingCompanion extends Ability {
 	public void playerSwapHandItemsEvent(PlayerSwapHandItemsEvent event) {
 		event.setCancelled(true);
 
-		if (mPlayer == null || mWindBomb != null && mPlayer.isSneaking()) {
+		if (mPlayer == null || (mWindBomb != null && mPlayer.isSneaking())) {
 			return;
 		}
 
 		ItemStack inMainHand = mPlayer.getInventory().getItemInMainHand();
-		Damageable damageable = (Damageable)inMainHand.getItemMeta();
-		if (!isTimerActive() && !mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.mLinkedSpell) && ItemUtils.isSomeBow(inMainHand) && !(damageable.getDamage() > inMainHand.getType().getMaxDurability() && !ItemUtils.isItemShattered(inMainHand))) {
+		Damageable damageable = (Damageable) inMainHand.getItemMeta();
+		if (!isTimerActive() && !mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.mLinkedSpell) && ItemUtils.isBowOrTrident(inMainHand) && !(damageable.getDamage() > inMainHand.getType().getMaxDurability() && !ItemStatUtils.isShattered(inMainHand))) {
 			putOnCooldown();
 			mStunnedMobs = new ArrayList<Entity>();
 
@@ -126,15 +126,22 @@ public class HuntingCompanion extends Ability {
 			if (mFox == null) {
 				return;
 			}
-			mFox.setInvulnerable(true);
-			mFox.addScoreboardTag(FOX_TAG);
 
-			// Damage calculation - include Base Proj Attr, Focus, Teammate buffs (Blessing/Thurible), and Sharpshooter
-			double damage = EntityUtils.getProjSkillDamage(mPlayer, mPlugin, false, null) * mDamage;
+			double damage = mDamageFraction * ItemStatUtils.getAttributeAmount(mPlayer.getInventory().getItemInMainHand(), ItemStatUtils.AttributeType.PROJECTILE_DAMAGE_ADD, ItemStatUtils.Operation.ADD, ItemStatUtils.Slot.MAINHAND);
 
-			EntityUtils.setAttributeBase(mFox, Attribute.GENERIC_ATTACK_DAMAGE, damage);
-
-			mFox.setMetadata(OWNER_METADATA_TAG, new FixedMetadataValue(mPlugin, mPlayer.getName()));
+			BossManager bossManager = BossManager.getInstance();
+			if (bossManager != null) {
+				List<BossAbilityGroup> abilities = BossManager.getInstance().getAbilities(mFox);
+				if (abilities != null) {
+					for (BossAbilityGroup ability : abilities) {
+						if (ability instanceof HuntingCompanionBoss huntingCompanionBoss) {
+							FixedMetadataValue playerItemStats = new FixedMetadataValue(mPlugin, new ItemStatManager.PlayerItemStats(mPlugin.mItemStatManager.getPlayerItemStats(mPlayer)));
+							huntingCompanionBoss.spawn(mPlayer, damage, mStunTime, playerItemStats);
+							break;
+						}
+					}
+				}
+			}
 
 			mFox.setVelocity(facingDirection.clone().setY(JUMP_HEIGHT).normalize().multiply(VELOCITY));
 			mFox.teleport(mFox.getLocation().setDirection(facingDirection));
@@ -142,8 +149,8 @@ public class HuntingCompanion extends Ability {
 			//Shatter if durability is 0 and isn't shattered.
 			//This is needed because Hunting Companion doesn't consume durability, but there is a high-damage uncommon bow
 			//with 0 durability that should not be infinitely usable.
-			if (damageable.getDamage() >= inMainHand.getType().getMaxDurability() && !ItemUtils.isItemShattered(inMainHand)) {
-				ItemUtils.shatterItem(inMainHand);
+			if (damageable.getDamage() >= inMainHand.getType().getMaxDurability() && !ItemStatUtils.isShattered(inMainHand)) {
+				ItemStatUtils.shatter(inMainHand);
 			}
 
 			world.playSound(loc, Sound.ENTITY_FOX_AMBIENT, 1.5f, 0.8f);
@@ -203,20 +210,17 @@ public class HuntingCompanion extends Ability {
 	}
 
 	@Override
-	public boolean livingEntityShotByPlayerEvent(Projectile proj, LivingEntity le, EntityDamageByEntityEvent event) {
-		if (mPlayer == null || mFox == null || mFox.getHealth() <= 0 || !(mTarget == null || mTarget.getHealth() <= 0)
-			|| le.getLocation().distance(mFox.getLocation()) > DETECTION_RANGE || !(le instanceof Mob)) {
-			return true;
+	public void onDamage(DamageEvent event, LivingEntity enemy) {
+		if (event.getType() != DamageType.PROJECTILE || mFox == null || mFox.getHealth() <= 0 || !(mTarget == null || mTarget.getHealth() <= 0) || enemy.getLocation().distance(mFox.getLocation()) > DETECTION_RANGE) {
+			return;
 		}
 
 		World world = mPlayer.getWorld();
-		mTarget = le;
+		mTarget = enemy;
 		world.playSound(mPlayer.getLocation(), Sound.ENTITY_ARROW_HIT_PLAYER, 1.0f, 0.5f);
 		world.playSound(mFox.getLocation(), Sound.ENTITY_FOX_AGGRO, 1.5f, 1.0f);
 		PotionUtils.applyPotion(mPlayer, mTarget, new PotionEffect(PotionEffectType.GLOWING, DURATION, 0, true, false));
 		world.spawnParticle(Particle.VILLAGER_ANGRY, mFox.getEyeLocation(), 25);
-
-		return true;
 	}
 
 	@Override
@@ -225,9 +229,5 @@ public class HuntingCompanion extends Ability {
 			mFox.remove();
 			mFox = null;
 		}
-	}
-
-	public boolean isThisFox(Fox fox) {
-		return fox == mFox;
 	}
 }

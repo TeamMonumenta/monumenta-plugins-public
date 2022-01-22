@@ -1,16 +1,14 @@
 package com.playmonumenta.plugins.bosses.parameters;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.playmonumenta.plugins.Plugin;
-
+import dev.jorel.commandapi.Tooltip;
 import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 
-import dev.jorel.commandapi.Tooltip;
+import java.util.ArrayList;
+import java.util.List;
 
 public class SoundsList {
 	public static class CSound {

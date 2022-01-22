@@ -1,14 +1,13 @@
 package com.playmonumenta.plugins.abilities.delves;
 
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
-import org.bukkit.event.entity.EntitySpawnEvent;
-import org.checkerframework.checker.nullness.qual.Nullable;
-
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.bosses.bosses.DistanceCloserBoss;
 import com.playmonumenta.plugins.utils.DelvesUtils;
 import com.playmonumenta.plugins.utils.DelvesUtils.Modifier;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
+import org.bukkit.event.entity.EntitySpawnEvent;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class Relentless extends DelveModifier {
 

@@ -1,7 +1,9 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
-import java.util.Arrays;
-
+import com.playmonumenta.plugins.bosses.SpellManager;
+import com.playmonumenta.plugins.bosses.spells.SpellBaseLaser;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.utils.BossUtils;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -10,9 +12,7 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
-import com.playmonumenta.plugins.bosses.SpellManager;
-import com.playmonumenta.plugins.bosses.spells.SpellBaseLaser;
-import com.playmonumenta.plugins.utils.BossUtils;
+import java.util.Arrays;
 
 /**
  * @deprecated use boss_laser instead, like this:
@@ -67,7 +67,7 @@ public class FlameLaserBoss extends BossAbilityGroup {
 						loc.getWorld().playSound(loc, Sound.ENTITY_DRAGON_FIREBALL_EXPLODE, 1f, 1.5f);
 						loc.getWorld().spawnParticle(Particle.FIREWORKS_SPARK, loc, 300, 0.8, 0.8, 0.8, 0);
 						if (!blocked) {
-							BossUtils.bossDamage(boss, target, p.DAMAGE);
+							BossUtils.dualTypeBlockableDamage(boss, target, DamageType.MAGIC, DamageType.FIRE, p.DAMAGE, 0.9);
 							// Shields don't stop fire!
 							target.setFireTicks(p.FIRE_DURATION);
 						}

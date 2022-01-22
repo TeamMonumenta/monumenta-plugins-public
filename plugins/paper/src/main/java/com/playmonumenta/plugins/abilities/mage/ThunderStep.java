@@ -1,8 +1,16 @@
 package com.playmonumenta.plugins.abilities.mage;
 
-import java.util.EnumSet;
-import java.util.List;
-
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.itemstats.attributes.SpellPower;
+import com.playmonumenta.plugins.utils.DamageUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.LocationUtils;
+import com.playmonumenta.plugins.utils.ZoneUtils;
+import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -19,27 +27,11 @@ import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.classes.ClassAbility;
-import com.playmonumenta.plugins.classes.magic.MagicType;
-import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
-import com.playmonumenta.plugins.enchantments.abilities.BaseAbilityEnchantment;
-import com.playmonumenta.plugins.enchantments.abilities.SpellPower;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.ItemUtils;
-import com.playmonumenta.plugins.utils.LocationUtils;
-import com.playmonumenta.plugins.utils.ZoneUtils;
-import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
+import java.util.List;
 
 
 
 public class ThunderStep extends Ability {
-	public static class ThunderStepCooldownEnchantment extends BaseAbilityEnchantment {
-		public ThunderStepCooldownEnchantment() {
-			super("Thunder Step Cooldown", EnumSet.of(ItemSlot.ARMOR));
-		}
-	}
 
 	public static final String NAME = "Thunder Step";
 	public static final ClassAbility ABILITY = ClassAbility.THUNDER_STEP;
@@ -79,7 +71,7 @@ public class ThunderStep extends Ability {
 		mInfo.mShorthandName = "TS";
 		mInfo.mDescriptions.add(
 			String.format(
-				"While holding a wand and sneaking, pressing the swap key materializes a flash of thunder, dealing %s arcane damage to all enemies in a %s-block cube around you and knocking them away. The next moment, you teleport towards where you're looking, travelling up to %s blocks or until you hit a solid block, and repeat the thunder attack at your destination, ignoring iframes. Swapping hands while holding a wand no longer does its vanilla function. Cooldown: %ss.",
+				"While holding a wand while sneaking and airborne, pressing the swap key materializes a flash of thunder, dealing %s magic damage to all enemies in a %s-block cube around you and knocking them away. The next moment, you teleport towards where you're looking, travelling up to %s blocks or until you hit a solid block, and repeat the thunder attack at your destination, ignoring iframes. Cooldown: %ss.",
 				DAMAGE_1,
 				SIZE,
 				DISTANCE_1,
@@ -118,9 +110,8 @@ public class ThunderStep extends Ability {
 	 */
 	@Override
 	public void playerSwapHandItemsEvent(PlayerSwapHandItemsEvent event) {
-		if (
-			mPlayer != null
-				&& ItemUtils.isWand(mPlayer.getInventory().getItemInMainHand())
+		if (mPlayer != null &&
+			ItemUtils.isWand(mPlayer.getInventory().getItemInMainHand())
 		) {
 			event.setCancelled(true);
 
@@ -128,11 +119,12 @@ public class ThunderStep extends Ability {
 				!isTimerActive()
 					&& mPlayer.isSneaking()
 					&& !ZoneUtils.hasZoneProperty(mPlayer, ZoneProperty.NO_MOBILITY_ABILITIES)
+					&& !mPlayer.isOnGround()
 			) {
 				putOnCooldown();
 
 				Location playerStartLocation = mPlayer.getLocation();
-				float spellDamage = SpellPower.getSpellDamage(mPlayer, mLevelDamage);
+				float spellDamage = SpellPower.getSpellDamage(mPlugin, mPlayer, mLevelDamage);
 				doDamage(playerStartLocation, spellDamage, false);
 
 				World world = mPlayer.getWorld();
@@ -183,7 +175,7 @@ public class ThunderStep extends Ability {
 		);
 
 		for (LivingEntity enemy : enemies) {
-			EntityUtils.damageEntity(mPlugin, enemy, spellDamage, mPlayer, MagicType.ARCANE, true, ABILITY, true, true, bypassIFrames);
+			DamageUtils.damage(mPlayer, enemy, DamageType.MAGIC, spellDamage, ABILITY, bypassIFrames);
 			if (mDoStun && !EntityUtils.isBoss(enemy)) {
 				EntityUtils.applyStun(mPlugin, STUN_TICKS, enemy);
 			}
@@ -194,8 +186,4 @@ public class ThunderStep extends Ability {
 		}
 	}
 
-	@Override
-	public Class<? extends BaseAbilityEnchantment> getCooldownEnchantment() {
-		return ThunderStepCooldownEnchantment.class;
-	}
 }

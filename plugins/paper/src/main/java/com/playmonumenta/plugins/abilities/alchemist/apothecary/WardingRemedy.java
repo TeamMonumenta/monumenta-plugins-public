@@ -1,16 +1,5 @@
 package com.playmonumenta.plugins.abilities.alchemist.apothecary;
 
-import org.bukkit.Color;
-import org.bukkit.Material;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
-import org.bukkit.World;
-import org.bukkit.entity.Player;
-import org.bukkit.entity.ThrownPotion;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.scheduler.BukkitRunnable;
-import org.checkerframework.checker.nullness.qual.Nullable;
-
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.classes.ClassAbility;
@@ -18,6 +7,16 @@ import com.playmonumenta.plugins.utils.AbsorptionUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
+import org.bukkit.Color;
+import org.bukkit.Material;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
+import org.bukkit.World;
+import org.bukkit.entity.Player;
+import org.bukkit.event.player.PlayerSwapHandItemsEvent;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.scheduler.BukkitRunnable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class WardingRemedy extends Ability {
 
@@ -37,22 +36,19 @@ public class WardingRemedy extends Ability {
 		mInfo.mLinkedSpell = ClassAbility.WARDING_REMEDY;
 		mInfo.mCooldown = getAbilityScore() == 1 ? WARDING_REMEDY_1_COOLDOWN : WARDING_REMEDY_2_COOLDOWN;
 		mInfo.mShorthandName = "WR";
-		mInfo.mDescriptions.add("You and allies in a 12 block radius passively gain an additional 10% damage on melee and ranged attacks when having absorption health. Shift and right click with an Alchemist Potion to give players (including yourself) within a 6 block radius 1 absorption health per 0.5 seconds for 6 seconds, lasting 30 seconds, up to 6 absorption health. Cooldown: 30s.");
-		mInfo.mDescriptions.add("The damage bonus is increased to 15%, and cooldown decreased to 25s.");
+		mInfo.mDescriptions.add("You and allies in a 12 block radius passively gain +5% damage from all sources while having absorption health. Swap hands while sneaking and holding an Alchemist's Bag to give players (including yourself) within a 6 block radius 1 absorption health per 0.5 seconds for 6 seconds, lasting 30 seconds, up to 6 absorption health. Cooldown: 30s.");
+		mInfo.mDescriptions.add("The damage bonus is increased to 10%, and cooldown decreased to 25s.");
 		mDisplayItem = new ItemStack(Material.GOLDEN_CARROT, 1);
 	}
 
 	@Override
-	public boolean runCheck() {
-		return mPlayer != null && mPlayer.isSneaking() && ItemUtils.isAlchemistItem(mPlayer.getInventory().getItemInMainHand());
-	}
+	public void playerSwapHandItemsEvent(PlayerSwapHandItemsEvent event) {
+		event.setCancelled(true);
 
-	@Override
-	public boolean playerThrewSplashPotionEvent(ThrownPotion potion) {
-		if (mPlayer == null) {
-			return false;
+		if (mPlayer == null || !mPlayer.isSneaking() || !ItemUtils.isAlchemistItem(mPlayer.getInventory().getItemInMainHand())) {
+			return;
 		}
-		// This is sufficient because we are already checking conditions in runCheck()
+
 		putOnCooldown();
 
 		World world = mPlayer.getWorld();
@@ -100,8 +96,6 @@ public class WardingRemedy extends Ability {
 				mTick++;
 			}
 		}.runTaskTimer(mPlugin, 0, 1);
-
-		return true;
 	}
 
 }

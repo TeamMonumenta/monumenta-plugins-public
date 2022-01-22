@@ -1,25 +1,23 @@
 package com.playmonumenta.plugins.abilities.delves;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.bosses.bosses.CrowdControlImmunityBoss;
+import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.server.properties.ServerProperties;
+import com.playmonumenta.plugins.utils.DelvesUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.attribute.AttributeModifier.Operation;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.EntitySpawnEvent;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.bosses.bosses.CrowdControlImmunityBoss;
-import com.playmonumenta.plugins.server.properties.ServerProperties;
-import com.playmonumenta.plugins.utils.DelvesUtils;
-import com.playmonumenta.plugins.utils.EntityUtils;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 public class StatMultiplier extends DelveModifier {
 
@@ -120,30 +118,14 @@ public class StatMultiplier extends DelveModifier {
 	}
 
 	@Override
-	protected boolean playerTookCustomDamageEvent(EntityDamageByEntityEvent event) {
-		return modifyDamage(event.getDamager(), event);
-	}
-
-	@Override
-	protected boolean playerTookMeleeDamageEvent(EntityDamageByEntityEvent event) {
-		return modifyDamage(event.getDamager(), event);
-	}
-
-	@Override
-	protected boolean playerTookProjectileDamageEvent(Entity source, EntityDamageByEntityEvent event) {
-		return modifyDamage(source, event);
-	}
-
-	private boolean modifyDamage(Entity source, EntityDamageByEntityEvent event) {
-		if (DelvesUtils.isDelveMob(source) || event.getCause() == DamageCause.CUSTOM) {
+	public void onHurtByEntityWithSource(DamageEvent event, Entity damager, LivingEntity source) {
+		if (DelvesUtils.isDelveMob(source)) {
 			event.setDamage(event.getDamage() * mDelveMobStatMultiplier);
 		} else {
-			event.setDamage(EntityUtils.getDamageApproximation(event, mStatCompensation));
+			event.setDamage(event.getDamage() * mStatCompensation);
 		}
 
-		event.setDamage(EntityUtils.getDamageApproximation(event, mDamageMultiplier));
-
-		return true;
+		event.setDamage(event.getDamage() * mDamageMultiplier);
 	}
 
 	@Override

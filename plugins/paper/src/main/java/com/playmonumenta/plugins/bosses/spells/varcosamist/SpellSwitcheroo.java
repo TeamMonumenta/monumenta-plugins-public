@@ -1,7 +1,13 @@
 package com.playmonumenta.plugins.bosses.spells.varcosamist;
 
-import java.util.List;
-
+import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.DamageUtils;
+import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.utils.ZoneUtils;
+import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -13,12 +19,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import com.playmonumenta.plugins.bosses.spells.Spell;
-import com.playmonumenta.plugins.utils.BossUtils;
-import com.playmonumenta.plugins.utils.FastUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.plugins.utils.ZoneUtils;
-import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
+import java.util.List;
 
 public class SpellSwitcheroo extends Spell {
 	private static final int MAX_RANGE = 50;
@@ -89,12 +90,13 @@ public class SpellSwitcheroo extends Spell {
 				world.playSound(targetLoc, Sound.ENTITY_GENERIC_EXPLODE, 2, 0.85f);
 
 
-				if (mLauncher instanceof LivingEntity) {
+				if (mLauncher instanceof LivingEntity le) {
 
 					for (Player player : PlayerUtils.playersInRange(targetLoc, 4, false)) {
-						BossUtils.bossDamage((LivingEntity)mLauncher, player, 35, mLauncher.getLocation(), "Shadow Sneak");
+						DamageUtils.damage(le, player, DamageType.MAGIC, 35, null, false, true, "Shadow Sneak");
 					}
-						new BukkitRunnable() {
+
+					new BukkitRunnable() {
 
 						int mT = 0;
 						Location mLoc = mobLoc;
@@ -106,7 +108,7 @@ public class SpellSwitcheroo extends Spell {
 
 							if (mT % 10 == 0) {
 								for (Player player : PlayerUtils.playersInRange(mobLoc, 3, true)) {
-									BossUtils.bossDamagePercent((LivingEntity)mLauncher, player, 0.05, (Location)null, "Phantom Snare");
+									BossUtils.bossDamagePercent(le, player, 0.05, (Location) null, "Phantom Snare");
 								}
 							}
 

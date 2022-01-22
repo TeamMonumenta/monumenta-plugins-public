@@ -27,8 +27,6 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.WitherSkeleton;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.ItemStack;
@@ -48,7 +46,7 @@ import com.playmonumenta.plugins.bosses.spells.SpellBaseParticleAura;
 import com.playmonumenta.plugins.bosses.spells.SpellBossBlockBreak;
 import com.playmonumenta.plugins.bosses.spells.SpellConditionalTeleport;
 import com.playmonumenta.plugins.bosses.spells.SpellPlayerAction;
-import com.playmonumenta.plugins.bosses.spells.SpellPurgeNegatives;
+import com.playmonumenta.plugins.bosses.spells.SpellShieldStun;
 import com.playmonumenta.plugins.bosses.spells.kaul.SpellArachnopocolypse;
 import com.playmonumenta.plugins.bosses.spells.kaul.SpellEarthsWrath;
 import com.playmonumenta.plugins.bosses.spells.kaul.SpellGroundSurge;
@@ -58,16 +56,17 @@ import com.playmonumenta.plugins.bosses.spells.kaul.SpellLightningStrike;
 import com.playmonumenta.plugins.bosses.spells.kaul.SpellPutridPlague;
 import com.playmonumenta.plugins.bosses.spells.kaul.SpellRaiseJungle;
 import com.playmonumenta.plugins.bosses.spells.kaul.SpellVolcanicDemise;
+import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
-import com.playmonumenta.plugins.utils.NmsUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.SerializationUtils;
-
 
 
 /* Woah it's Kaul! */
@@ -78,34 +77,34 @@ Attacks :
 Raise Jungle
 Arachnopocalypse
 Putrid plague
-Earth’s Wrath
+Earth's Wrath
 
 
 Phase 2 :
-Earth’s wrath
+Earth's wrath
 Putrid Plague
 Raise Jungle
-Kaul’s Judgement
+Kaul's Judgement
 
 Phase 2.5 (50% health) :
-Summons a powerful Primordial Elemental that is invulnerable and immovable until out of the ground. Players will have 15 seconds to prepare for the elemental’s arrival. Kaul will not be attacking or casting any abilities (except for his passives) during this time. (512 health)
+Summons a powerful Primordial Elemental that is invulnerable and immovable until out of the ground. Players will have 15 seconds to prepare for the elemental's arrival. Kaul will not be attacking or casting any abilities (except for his passives) during this time. (512 health)
 
-Elemental’s Abilities:
+Elemental's Abilities:
 Normal Block break passive
-Raise Jungle (Kaul’s ability), however the timer for raising them will be 30 seconds instead of 40.
+Raise Jungle (Kaul's ability), however the timer for raising them will be 30 seconds instead of 40.
 Earthen Rupture: After charging for 2 seconds, the Elemental will cause a large rupture that spans out 5 blocks, knocking back all players, dealing 18 damage, and applying Slowness II for 10 seconds.
 Stone Blast: After 1 second, fires at all players a powerful block breaking bolt. Intersecting with a player causes 15 damage and applies Weakness II and Slowness II. Intersecting with a block causes a TNT explosion to happen instead. The bolt will stop travelling if it hits a player or a block.
 Once the elemental is dead, Kaul returns to the fight. The elemental will meld into the ground for later return in Phase 3.5
 
 Phase 3:
-Earth’s Wrath
+Earthâ€™s Wrath
 Putrid plague
 Volcanic demise
-Kaul’s Judgement
+Kaul's Judgement
 
-Phase 3.5 (20% health [Let’s make this even harder shall we?]) :
+Phase 3.5 (20% health [Let's make this even harder shall we?]) :
 The Primordial Elemental from Phase 2.5 returns, however he is completely invulnerable to all attacks, and gains Strength I for the rest of the fight. The elemental will remain active until the end of the fight.
-The elemental will lose his “Raise Jungle” ability, but will still possess the others.
+The elemental will lose his "Raise Jungle" ability, but will still possess the others.
 
  *
  */
@@ -186,7 +185,7 @@ public class Kaul extends BossAbilityGroup {
 			public void run() {
 				for (Player player : PlayerUtils.playersInRange(mSpawnLoc, detectionRange, true)) {
 					if (player.isSleeping()) {
-						BossUtils.bossDamage(mBoss, player, 22);
+						DamageUtils.damage(mBoss, player, DamageType.OTHER, 22);
 						player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 15, 1));
 						player.sendMessage(ChatColor.DARK_GREEN + "THE JUNGLE FORBIDS YOU TO DREAM.");
 						player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ELDER_GUARDIAN_DEATH, 1, 0.85f);
@@ -268,7 +267,7 @@ public class Kaul extends BossAbilityGroup {
 			}),
 			new SpellLightningStrike(this, LIGHTNING_STRIKE_COOLDOWN_SECONDS_1, false, mShrineMarker.getLocation()),
 			new SpellLightningStorm(boss, detectionRange),
-			new SpellPurgeNegatives(mBoss, 20 * 6),
+			new SpellShieldStun(30 * 20),
 			new SpellConditionalTeleport(mBoss, spawnLoc,
 			                             b -> b.getLocation().getBlock().getType() == Material.BEDROCK
 				                             || b.getLocation().add(0, 1, 0).getBlock().getType() == Material.BEDROCK
@@ -284,7 +283,7 @@ public class Kaul extends BossAbilityGroup {
 			}),
 			new SpellLightningStrike(this, LIGHTNING_STRIKE_COOLDOWN_SECONDS_2, true, mShrineMarker.getLocation()),
 			new SpellLightningStorm(boss, detectionRange),
-			new SpellPurgeNegatives(mBoss, 20 * 3),
+			new SpellShieldStun(30 * 20),
 			new SpellConditionalTeleport(mBoss, spawnLoc,
 			                             b -> b.getLocation().getBlock().getType() == Material.BEDROCK
 				                             || b.getLocation().add(0, 1, 0).getBlock().getType() == Material.BEDROCK
@@ -306,7 +305,7 @@ public class Kaul extends BossAbilityGroup {
 			}),
 			new SpellLightningStrike(this, LIGHTNING_STRIKE_COOLDOWN_SECONDS_3, true, mShrineMarker.getLocation()),
 			new SpellLightningStorm(boss, detectionRange),
-			new SpellPurgeNegatives(mBoss, 2),
+			new SpellShieldStun(30 * 20),
 			new SpellConditionalTeleport(mBoss, spawnLoc,
 			                             b -> b.getLocation().getBlock().getType() == Material.BEDROCK
 				                             || b.getLocation().add(0, 1, 0).getBlock().getType() == Material.BEDROCK
@@ -328,7 +327,7 @@ public class Kaul extends BossAbilityGroup {
 			}),
 			new SpellLightningStrike(this, LIGHTNING_STRIKE_COOLDOWN_SECONDS_4, true, mShrineMarker.getLocation()),
 			new SpellLightningStorm(boss, detectionRange),
-			new SpellPurgeNegatives(mBoss, 2),
+			new SpellShieldStun(30 * 20),
 			new SpellConditionalTeleport(mBoss, spawnLoc,
 			                             b -> b.getLocation().getBlock().getType() == Material.BEDROCK
 				                             || b.getLocation().add(0, 1, 0).getBlock().getType() == Material.BEDROCK
@@ -789,7 +788,7 @@ public class Kaul extends BossAbilityGroup {
 		world.playSound(mBoss.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 2, 0.5f);
 		world.playSound(mBoss.getLocation(), Sound.ENTITY_ENDER_DRAGON_GROWL, 2, 0f);
 		for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), r, true)) {
-			MovementUtils.knockAway(mBoss.getLocation(), player, 0.55f);
+			MovementUtils.knockAway(mBoss.getLocation(), player, 0.55f, false);
 			player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 5, 1));
 		}
 		new BukkitRunnable() {
@@ -841,9 +840,9 @@ public class Kaul extends BossAbilityGroup {
 	}
 
 	@Override
-	public void bossDamagedEntity(EntityDamageByEntityEvent event) {
+	public void onDamage(DamageEvent event, LivingEntity damagee) {
 		/* Boss deals AoE damage when melee'ing a player */
-		if (event.getCause() == DamageCause.ENTITY_ATTACK && event.getEntity().getLocation().distance(mBoss.getLocation()) <= 2) {
+		if (event.getType() == DamageType.MELEE && damagee.getLocation().distance(mBoss.getLocation()) <= 2) {
 			if (!mCooldown) {
 				mCooldown = true;
 				new BukkitRunnable() {
@@ -852,10 +851,10 @@ public class Kaul extends BossAbilityGroup {
 						mCooldown = false;
 					}
 				}.runTaskLater(mPlugin, 20);
-				UUID uuid = event.getEntity().getUniqueId();
+				UUID uuid = damagee.getUniqueId();
 				for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), 4, true)) {
 					if (!player.getUniqueId().equals(uuid)) {
-						BossUtils.bossDamage(mBoss, player, event.getDamage());
+						BossUtils.blockableDamage(mBoss, player, DamageType.MELEE, event.getDamage());
 					}
 				}
 				World world = mBoss.getWorld();
@@ -863,12 +862,6 @@ public class Kaul extends BossAbilityGroup {
 				world.spawnParticle(Particle.SWEEP_ATTACK, mBoss.getLocation(), 10, 2, 2, 2, 0.1);
 				world.playSound(mBoss.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1, 0);
 			}
-		}
-
-		if (event.getEntity() instanceof Player player
-			    && event.getCause().equals(DamageCause.ENTITY_ATTACK)
-			    && player.isBlocking()) {
-			NmsUtils.stunShield(player, 20 * 30);
 		}
 	}
 
@@ -1045,10 +1038,10 @@ public class Kaul extends BossAbilityGroup {
 			hpDelta = hpDelta / 2 + 25;
 			playerCount--;
 		}
-		mBoss.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(bossTargetHp);
-		mBoss.getAttribute(Attribute.GENERIC_FOLLOW_RANGE).setBaseValue(detectionRange);
-		mBoss.getAttribute(Attribute.GENERIC_KNOCKBACK_RESISTANCE).setBaseValue(1);
-		mBoss.setHealth(bossTargetHp);
+		EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_MAX_HEALTH, bossTargetHp * 1.1);
+		EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_FOLLOW_RANGE, detectionRange);
+		EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_KNOCKBACK_RESISTANCE, 1);
+		mBoss.setHealth(bossTargetHp * 1.1);
 
 		for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true)) {
 			if (player.hasPotionEffect(PotionEffectType.GLOWING)) {

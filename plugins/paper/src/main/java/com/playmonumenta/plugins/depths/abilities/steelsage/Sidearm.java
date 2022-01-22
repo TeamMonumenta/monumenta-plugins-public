@@ -1,7 +1,16 @@
 package com.playmonumenta.plugins.depths.abilities.steelsage;
 
-import java.util.List;
-
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.AbilityTrigger;
+import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.depths.DepthsTree;
+import com.playmonumenta.plugins.depths.DepthsUtils;
+import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
+import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.utils.DamageUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -14,17 +23,7 @@ import org.bukkit.event.block.Action;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.AbilityTrigger;
-import com.playmonumenta.plugins.classes.ClassAbility;
-import com.playmonumenta.plugins.classes.magic.MagicType;
-import com.playmonumenta.plugins.depths.DepthsTree;
-import com.playmonumenta.plugins.depths.DepthsUtils;
-import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
-import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
-import com.playmonumenta.plugins.utils.EntityUtils;
-
-import net.md_5.bungee.api.ChatColor;
+import java.util.List;
 
 public class Sidearm extends DepthsAbility {
 
@@ -51,6 +50,7 @@ public class Sidearm extends DepthsAbility {
 			return;
 		}
 		putOnCooldown();
+		boolean hasReducedCooldown = false;
 		Location loc = mPlayer.getEyeLocation();
 		BoundingBox box = BoundingBox.of(loc, 0.75, 0.75, 0.75);
 		Vector dir = loc.getDirection();
@@ -75,9 +75,10 @@ public class Sidearm extends DepthsAbility {
 			}
 			for (LivingEntity mob : mobs) {
 				if (box.overlaps(mob.getBoundingBox())) {
-					EntityUtils.damageEntity(mPlugin, mob, DAMAGE[mRarity - 1], mPlayer, MagicType.PHYSICAL, true, mInfo.mLinkedSpell);
-					if ((mob.isDead() || mob.getHealth() <= 0)) {
+					DamageUtils.damage(mPlayer, mob, DamageType.PROJECTILE_SKILL, DAMAGE[mRarity - 1], mInfo.mLinkedSpell);
+					if ((mob == null || mob.isDead() || mob.getHealth() <= 0) && !hasReducedCooldown) {
 						mPlugin.mTimers.addCooldown(mPlayer, mInfo.mLinkedSpell, COOLDOWN - KILL_COOLDOWN_REDUCTION);
+						hasReducedCooldown = true;
 					}
 
 					mob.setVelocity(new Vector(0, 0, 0));
@@ -104,7 +105,7 @@ public class Sidearm extends DepthsAbility {
 
 	@Override
 	public String getDescription(int rarity) {
-		return "Right click while holding a weapon to fire a short range flintlock shot that goes up to " + RANGE + " blocks, stopping at the first enemy hit, dealing " + DepthsUtils.getRarityColor(rarity) + DAMAGE[rarity - 1] + ChatColor.WHITE + " damage. If it kills a mob, the cooldown is reduced by " + KILL_COOLDOWN_REDUCTION / 20 + " seconds. Cooldown: " + COOLDOWN / 20 + "s.";
+		return "Right click while holding a weapon to fire a short range flintlock shot that goes up to " + RANGE + " blocks, stopping at the first enemy hit, dealing " + DepthsUtils.getRarityColor(rarity) + DAMAGE[rarity - 1] + ChatColor.WHITE + " projectile damage. If it kills a mob, the cooldown is reduced by " + KILL_COOLDOWN_REDUCTION / 20 + " seconds. Cooldown: " + COOLDOWN / 20 + "s.";
 	}
 
 	@Override

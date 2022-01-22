@@ -7,8 +7,6 @@ import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
-import org.bukkit.attribute.Attribute;
-import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
 import org.bukkit.inventory.ItemStack;
@@ -24,13 +22,12 @@ import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.cleric.hierophant.EnchantedPrayer;
 import com.playmonumenta.plugins.abilities.cleric.paladin.LuminousInfusion;
 import com.playmonumenta.plugins.classes.ClassAbility;
-import com.playmonumenta.plugins.enchantments.Multitool;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
-import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.ParticleUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
-
 
 
 public class HandOfLight extends Ability {
@@ -39,6 +36,13 @@ public class HandOfLight extends Ability {
 	private static final double HEALING_DOT_ANGLE = 0.33;
 	private static final int HEALING_1_COOLDOWN = 14 * 20;
 	private static final int HEALING_2_COOLDOWN = 10 * 20;
+	private static final int FLAT_1 = 2;
+	private static final int FLAT_2 = 4;
+	private static final double PERCENT_1 = 0.1;
+	private static final double PERCENT_2 = 0.2;
+
+	private int mFlat;
+	private double mPercent;
 
 	public HandOfLight(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Hand of Light");
@@ -50,6 +54,9 @@ public class HandOfLight extends Ability {
 		mInfo.mCooldown = getAbilityScore() == 1 ? HEALING_1_COOLDOWN : HEALING_2_COOLDOWN;
 		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
 		mDisplayItem = new ItemStack(Material.PINK_DYE, 1);
+
+		mFlat = getAbilityScore() == 1 ? FLAT_1 : FLAT_2;
+		mPercent = getAbilityScore() == 1 ? PERCENT_1 : PERCENT_2;
 	}
 
 	@Override
@@ -66,7 +73,7 @@ public class HandOfLight extends Ability {
 		}
 
 		//Cannot be cast with multitool.
-		if (InventoryUtils.testForItemWithLore(inMainHand, Multitool.PROPERTY_NAME)) {
+		if (mPlugin.mItemStatManager.getEnchantmentLevel(mPlayer, EnchantmentType.MULTITOOL) > 0) {
 			return;
 		}
 
@@ -92,10 +99,8 @@ public class HandOfLight extends Ability {
 			        && (playerDir.dot(toMobVector) > HEALING_DOT_ANGLE
 			            || p.getLocation().distance(mPlayer.getLocation()) < 2))) {
 
-				AttributeInstance maxHealth = p.getAttribute(Attribute.GENERIC_MAX_HEALTH);
-				if (maxHealth != null) {
-					PlayerUtils.healPlayer(p, getAbilityScore() == 1 ? 2 + (maxHealth.getValue() * 0.1) : 4 + (maxHealth.getValue() * 0.2));
-				}
+				double maxHealth = EntityUtils.getMaxHealth(p);
+				PlayerUtils.healPlayer(mPlugin, p, mFlat + mPercent * maxHealth, mPlayer);
 
 				Location loc = p.getLocation();
 				mPlugin.mPotionManager.addPotion(p, PotionID.ABILITY_OTHER,

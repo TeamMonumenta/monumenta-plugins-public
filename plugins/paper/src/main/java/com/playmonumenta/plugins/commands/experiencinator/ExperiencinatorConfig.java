@@ -1,5 +1,21 @@
 package com.playmonumenta.plugins.commands.experiencinator;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.utils.ItemStatUtils.Region;
+import com.playmonumenta.plugins.utils.ItemStatUtils.Tier;
+import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.NamespacedKeyUtils;
+import com.playmonumenta.scriptedquests.quests.components.QuestPrerequisites;
+import org.bukkit.ChatColor;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.EnumMap;
@@ -11,23 +27,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.stream.Collectors;
-
-import org.bukkit.ChatColor;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
-import org.checkerframework.checker.nullness.qual.Nullable;
-
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.playmonumenta.plugins.utils.InventoryUtils;
-import com.playmonumenta.plugins.utils.ItemUtils;
-import com.playmonumenta.plugins.utils.ItemUtils.ItemRegion;
-import com.playmonumenta.plugins.utils.ItemUtils.ItemTier;
-import com.playmonumenta.plugins.utils.NamespacedKeyUtils;
-import com.playmonumenta.scriptedquests.quests.components.QuestPrerequisites;
 
 /**
  * Configuration for Experiencinators, stored in a JSON file for quick & easy changes.
@@ -117,10 +116,10 @@ public final class ExperiencinatorConfig {
 		return mConversions.get(id);
 	}
 
-	public @Nullable Conversion findConversion(int conversionSettingsId, ItemUtils.ItemRegion itemRegion) {
+	public @Nullable Conversion findConversion(int conversionSettingsId, Region region) {
 		for (Conversion conversion : mConversions.values()) {
 			if (conversion.getSettingsId() == conversionSettingsId
-				    && conversion.getConversionRates(itemRegion) != null) {
+				    && conversion.getConversionRates(region) != null) {
 				return conversion;
 			}
 		}
@@ -139,7 +138,7 @@ public final class ExperiencinatorConfig {
 
 		private final String mName;
 		private final Material mMaterial;
-		private final Map<ItemRegion, String> mConversionRates = new EnumMap<>(ItemRegion.class);
+		private final Map<Region, String> mConversionRates = new EnumMap<>(Region.class);
 		private final @Nullable QuestPrerequisites mPrerequisites;
 		private final @Nullable String mPrerequisitesFailureMessage;
 
@@ -168,8 +167,8 @@ public final class ExperiencinatorConfig {
 			if (conversionRatesElement != null) {
 				JsonObject conversionRatesObject = conversionRatesElement.getAsJsonObject();
 				for (Entry<String, JsonElement> entry : conversionRatesObject.entrySet()) {
-					ItemRegion itemRegion = parseItemRegion(entry.getKey());
-					mConversionRates.put(itemRegion, entry.getValue().getAsString());
+					Region region = parseItemRegion(entry.getKey());
+					mConversionRates.put(region, entry.getValue().getAsString());
 				}
 			} else {
 				throw new Exception("experiencinator missing conversion_rates value!");
@@ -219,7 +218,7 @@ public final class ExperiencinatorConfig {
 			return mName;
 		}
 
-		public Map<ItemRegion, String> getConversionRates() {
+		public Map<Region, String> getConversionRates() {
 			return mConversionRates;
 		}
 
@@ -229,11 +228,11 @@ public final class ExperiencinatorConfig {
 
 		private final String mName;
 		private final int mSettingsId;
-		private final Map<ItemRegion, ConversionRates> mRates = new EnumMap<>(ItemRegion.class);
-		private final Map<ItemRegion, List<ConversionResult>> mResults = new EnumMap<>(ItemRegion.class);
+		private final Map<Region, ConversionRates> mRates = new EnumMap<>(Region.class);
+		private final Map<Region, List<ConversionResult>> mResults = new EnumMap<>(Region.class);
 		private final boolean mCompressExistingResults;
 		private final @Nullable QuestPrerequisites mPrerequisites;
-		private final Map<ItemTier, QuestPrerequisites> mTierPrerequisites = new EnumMap<>(ItemTier.class);
+		private final Map<Tier, QuestPrerequisites> mTierPrerequisites = new EnumMap<>(Tier.class);
 
 		private Conversion(JsonElement element, Location lootTableLocation) throws Exception {
 			JsonObject object = element.getAsJsonObject();
@@ -256,9 +255,9 @@ public final class ExperiencinatorConfig {
 			if (ratesElement != null) {
 				JsonObject ratesObject = ratesElement.getAsJsonObject();
 				for (Entry<String, JsonElement> entry : ratesObject.entrySet()) {
-					ItemRegion itemRegion = parseItemRegion(entry.getKey());
+					Region region = parseItemRegion(entry.getKey());
 					ConversionRates rates = new ConversionRates(entry.getValue());
-					mRates.put(itemRegion, rates);
+					mRates.put(region, rates);
 				}
 			} else {
 				throw new Exception("conversion missing rates value!");
@@ -268,13 +267,13 @@ public final class ExperiencinatorConfig {
 			if (resultsElement != null) {
 				JsonObject ratesObject = resultsElement.getAsJsonObject();
 				for (Entry<String, JsonElement> entry : ratesObject.entrySet()) {
-					ItemRegion itemRegion = parseItemRegion(entry.getKey());
+					Region region = parseItemRegion(entry.getKey());
 					JsonArray resultsArray = entry.getValue().getAsJsonArray();
 					List<ConversionResult> conversionResults = new ArrayList<>();
 					for (JsonElement resultElement : resultsArray) {
 						conversionResults.add(new ConversionResult(resultElement, lootTableLocation));
 					}
-					mResults.put(itemRegion, conversionResults);
+					mResults.put(region, conversionResults);
 				}
 			} else {
 				throw new Exception("conversion missing rates value!");
@@ -298,9 +297,9 @@ public final class ExperiencinatorConfig {
 			if (tierPrerequisitesElement != null) {
 				JsonObject prerequisitesObject = tierPrerequisitesElement.getAsJsonObject();
 				for (Entry<String, JsonElement> entry : prerequisitesObject.entrySet()) {
-					ItemTier itemTier = parseItemTier(entry.getKey());
+					Tier tier = parseItemTier(entry.getKey());
 					QuestPrerequisites tierPrerequisites = new QuestPrerequisites(entry.getValue());
-					mTierPrerequisites.put(itemTier, tierPrerequisites);
+					mTierPrerequisites.put(tier, tierPrerequisites);
 				}
 			}
 
@@ -314,16 +313,16 @@ public final class ExperiencinatorConfig {
 			return mSettingsId;
 		}
 
-		public @Nullable ConversionRates getConversionRates(ItemRegion itemRegion) {
-			return mRates.get(itemRegion);
+		public @Nullable ConversionRates getConversionRates(Region region) {
+			return mRates.get(region);
 		}
 
 		public Set<String> getConversionRateNames() {
 			return mRates.values().stream().flatMap(rates -> rates.mRates.keySet().stream()).collect(Collectors.toSet());
 		}
 
-		public @Nullable List<ConversionResult> getConversionResults(ItemRegion itemRegion) {
-			return mResults.get(itemRegion);
+		public @Nullable List<ConversionResult> getConversionResults(Region region) {
+			return mResults.get(region);
 		}
 
 		public @Nullable List<ConversionResult> getAnyConversionResult() {
@@ -334,11 +333,11 @@ public final class ExperiencinatorConfig {
 			return mCompressExistingResults;
 		}
 
-		public boolean conversionAllowed(Player player, ItemTier itemTier) {
+		public boolean conversionAllowed(Player player, Tier tier) {
 			if (!conversionAllowedInGeneral(player)) {
 				return false;
 			}
-			QuestPrerequisites tierPrerequisites = mTierPrerequisites.get(itemTier);
+			QuestPrerequisites tierPrerequisites = mTierPrerequisites.get(tier);
 			return tierPrerequisites == null || tierPrerequisites.prerequisiteMet(player, null);
 		}
 
@@ -370,35 +369,35 @@ public final class ExperiencinatorConfig {
 
 	public static class ConversionRates {
 
-		private final Map<String, Map<ItemTier, Integer>> mRates = new HashMap<>();
+		private final Map<String, Map<Tier, Integer>> mRates = new HashMap<>();
 
 		private ConversionRates(JsonElement element) throws IllegalStateException {
 			JsonObject object = element.getAsJsonObject();
 			for (Entry<String, JsonElement> entry : object.entrySet()) {
 				String conversionName = entry.getKey();
-				Map<ItemTier, Integer> rates = new EnumMap<>(ItemTier.class);
+				Map<Tier, Integer> rates = new EnumMap<>(Tier.class);
 				mRates.put(conversionName, rates);
 				JsonObject conversionRatesObject = entry.getValue().getAsJsonObject();
 				for (Entry<String, JsonElement> tierEntry : conversionRatesObject.entrySet()) {
-					ItemTier itemTier = parseItemTier(tierEntry.getKey());
+					Tier tier = parseItemTier(tierEntry.getKey());
 					int value = tierEntry.getValue().getAsInt();
-					rates.put(itemTier, value);
+					rates.put(tier, value);
 				}
 			}
 		}
 
-		public @Nullable Integer getRate(@Nullable String conversionRateName, ItemTier itemTier) {
+		public @Nullable Integer getRate(@Nullable String conversionRateName, Tier tier) {
 			if (conversionRateName == null) {
 				return null;
 			}
-			Map<ItemTier, Integer> tierMap = mRates.get(conversionRateName);
+			Map<Tier, Integer> tierMap = mRates.get(conversionRateName);
 			if (tierMap == null) {
 				return null;
 			}
-			return tierMap.get(itemTier);
+			return tierMap.get(tier);
 		}
 
-		public @Nullable Map<ItemTier, Integer> getRates(@Nullable String conversionRateName) {
+		public @Nullable Map<Tier, Integer> getRates(@Nullable String conversionRateName) {
 			if (conversionRateName == null) {
 				return null;
 			}
@@ -471,10 +470,10 @@ public final class ExperiencinatorConfig {
 	}
 
 	public static class GuiConfig {
-		private final Map<ItemRegion, ItemStack> mRegionIcons = new EnumMap<>(ItemRegion.class);
-		private final Map<ItemTier, ItemStack> mTierIcons = new EnumMap<>(ItemTier.class);
-		private final List<ItemRegion> mRegionOrder = new ArrayList<>();
-		private final List<ItemTier> mTierOrder = new ArrayList<>();
+		private final Map<Region, ItemStack> mRegionIcons = new EnumMap<>(Region.class);
+		private final Map<Tier, ItemStack> mTierIcons = new EnumMap<>(Tier.class);
+		private final List<Region> mRegionOrder = new ArrayList<>();
+		private final List<Tier> mTierOrder = new ArrayList<>();
 
 		public GuiConfig(JsonElement element) throws Exception {
 			JsonObject object = element.getAsJsonObject();
@@ -517,27 +516,27 @@ public final class ExperiencinatorConfig {
 
 		}
 
-		public @Nullable ItemStack getRegionIcon(ItemRegion itemRegion) {
-			return ItemUtils.clone(mRegionIcons.get(itemRegion));
+		public @Nullable ItemStack getRegionIcon(Region region) {
+			return ItemUtils.clone(mRegionIcons.get(region));
 		}
 
-		public @Nullable ItemStack getTierIcon(ItemTier itemTier) {
-			return ItemUtils.clone(mTierIcons.get(itemTier));
+		public @Nullable ItemStack getTierIcon(Tier tier) {
+			return ItemUtils.clone(mTierIcons.get(tier));
 		}
 
-		public List<ItemRegion> getRegionOrder() {
+		public List<Region> getRegionOrder() {
 			return mRegionOrder;
 		}
 
-		public List<ItemTier> getTierOrder() {
+		public List<Tier> getTierOrder() {
 			return mTierOrder;
 		}
 
 	}
 
 	public static class ScoreboardConfig {
-		private final List<ItemTier> mTierOrder = new ArrayList<>();
-		private final Map<ItemRegion, String> mObjectives = new EnumMap<>(ItemRegion.class);
+		private final List<Tier> mTierOrder = new ArrayList<>();
+		private final Map<Region, String> mObjectives = new EnumMap<>(Region.class);
 
 		public ScoreboardConfig(JsonElement element) throws Exception {
 			JsonObject object = element.getAsJsonObject();
@@ -561,34 +560,34 @@ public final class ExperiencinatorConfig {
 			}
 		}
 
-		public List<ItemTier> getTierOrder() {
+		public List<Tier> getTierOrder() {
 			return mTierOrder;
 		}
 
-		public Map<ItemRegion, String> getObjectives() {
+		public Map<Region, String> getObjectives() {
 			return mObjectives;
 		}
 	}
 
-	private static ItemRegion parseItemRegion(String region) throws IllegalArgumentException {
-		return ItemRegion.valueOf(region.toUpperCase(Locale.ROOT));
+	private static Region parseItemRegion(String region) throws IllegalArgumentException {
+		return Region.valueOf(region.toUpperCase(Locale.ROOT));
 	}
 
-	private static ItemTier parseItemTier(String tier) throws IllegalArgumentException {
+	private static Tier parseItemTier(String tier) throws IllegalArgumentException {
 		tier = tier.toUpperCase(Locale.ROOT);
 		switch (tier) {
 		case "TIER_1":
-			return ItemTier.ONE;
+			return Tier.I;
 		case "TIER_2":
-			return ItemTier.TWO;
+			return Tier.II;
 		case "TIER_3":
-			return ItemTier.THREE;
+			return Tier.III;
 		case "TIER_4":
-			return ItemTier.FOUR;
+			return Tier.IV;
 		case "TIER_5":
-			return ItemTier.FIVE;
+			return Tier.V;
 		default:
-			return ItemTier.valueOf(tier);
+			return Tier.valueOf(tier);
 		}
 	}
 

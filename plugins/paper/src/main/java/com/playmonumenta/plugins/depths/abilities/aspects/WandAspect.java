@@ -1,21 +1,21 @@
 package com.playmonumenta.plugins.depths.abilities.aspects;
 
 import org.bukkit.Material;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.depths.abilities.WeaponAspectDepthsAbility;
-import com.playmonumenta.plugins.enchantments.abilities.SpellPower;
-import com.playmonumenta.plugins.events.CustomDamageEvent;
+import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.itemstats.attributes.SpellPower;
 import com.playmonumenta.plugins.utils.ItemUtils;
 
 public class WandAspect extends WeaponAspectDepthsAbility {
 
 	public static final String ABILITY_NAME = "Aspect of the Wand";
 	public static final int DAMAGE = 1;
-	public static final double SPELL_MOD = 0.25;
+	public static final double SPELL_MOD = 0.35;
 
 	public WandAspect(Plugin plugin, Player player) {
 		super(plugin, player, ABILITY_NAME);
@@ -23,25 +23,19 @@ public class WandAspect extends WeaponAspectDepthsAbility {
 	}
 
 	@Override
-	public boolean livingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
-
-		if (mPlayer != null && event.getCause().equals(DamageCause.ENTITY_ATTACK) && ItemUtils.isWand(mPlayer.getInventory().getItemInMainHand())) {
-			event.setDamage(event.getDamage() + DAMAGE);
-		}
-
-		return true;
-	}
-
-	@Override
-	public void playerDealtCustomDamageEvent(CustomDamageEvent event) {
+	public void onDamage(DamageEvent event, LivingEntity enemy) {
 		if (mPlayer != null && ItemUtils.isWand(mPlayer.getInventory().getItemInMainHand())) {
-			double initialDamage = event.getDamage();
+			if (event.getType() == DamageType.MELEE) {
+				event.setDamage(event.getDamage() + DAMAGE);
+			} else if (event.getAbility() != null) {
+				double initialDamage = event.getDamage();
 
-			//Find out what the damage with full spell power would be here
-			float fullDamage = SpellPower.getSpellDamage(mPlayer, (float) initialDamage);
+				//Find out what the damage with full spell power would be here
+				float fullDamage = SpellPower.getSpellDamage(mPlugin, mPlayer, (float) initialDamage);
 
-			//Get the difference, divide it by 4 and add it to the damage
-			event.setDamage(initialDamage + ((fullDamage - initialDamage) * SPELL_MOD));
+				//Get the difference, divide it by 4 and add it to the damage
+				event.setDamage(initialDamage + ((fullDamage - initialDamage) * SPELL_MOD));
+			}
 		}
 	}
 

@@ -1,9 +1,9 @@
 package com.playmonumenta.plugins.utils;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.bukkit.ChatColor;
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.itemstats.infusions.Understanding;
+import com.playmonumenta.plugins.listeners.AuditListener;
+import com.playmonumenta.plugins.utils.ItemStatUtils.InfusionType;
 import org.bukkit.Color;
 import org.bukkit.FireworkEffect;
 import org.bukkit.GameMode;
@@ -18,23 +18,8 @@ import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.enchantments.infusions.delves.Ardor;
-import com.playmonumenta.plugins.enchantments.infusions.delves.Aura;
-import com.playmonumenta.plugins.enchantments.infusions.delves.Carapace;
-import com.playmonumenta.plugins.enchantments.infusions.delves.Choler;
-import com.playmonumenta.plugins.enchantments.infusions.delves.Empowered;
-import com.playmonumenta.plugins.enchantments.infusions.delves.Epoch;
-import com.playmonumenta.plugins.enchantments.infusions.delves.Execution;
-import com.playmonumenta.plugins.enchantments.infusions.delves.Expedite;
-import com.playmonumenta.plugins.enchantments.infusions.delves.Mitosis;
-import com.playmonumenta.plugins.enchantments.infusions.delves.Natant;
-import com.playmonumenta.plugins.enchantments.infusions.delves.Nutriment;
-import com.playmonumenta.plugins.enchantments.infusions.delves.Pennate;
-import com.playmonumenta.plugins.enchantments.infusions.delves.Reflection;
-import com.playmonumenta.plugins.enchantments.infusions.delves.Understanding;
-import com.playmonumenta.plugins.enchantments.infusions.delves.Usurper;
-import com.playmonumenta.plugins.listeners.AuditListener;
+import java.util.ArrayList;
+import java.util.List;
 
 public class DelveInfusionUtils {
 
@@ -45,27 +30,27 @@ public class DelveInfusionUtils {
 													//40, 50, 60, 70
 
 	/**When set to true the refund function will return all the XP used for the infusion, when false only the 50% */
-	public static final boolean FULL_REFUND = false;
+	public static final boolean FULL_REFUND = true;
 
 	public static final NamespacedKey DEPTHS_MAT_LOOT_TABLE = NamespacedKeyUtils.fromString("epic:r2/depths/loot/voidstained_geode");
 
 	public enum DelveInfusionSelection {
-		PENNATE("pennate", Pennate.PROPERTY_NAME, NamespacedKeyUtils.fromString("epic:r1/delves/white/auxiliary/delve_material")),
-		CARAPACE("carapace", Carapace.PROPERTY_NAME, NamespacedKeyUtils.fromString("epic:r1/delves/orange/auxiliary/delve_material")),
-		AURA("aura", Aura.PROPERTY_NAME, NamespacedKeyUtils.fromString("epic:r1/delves/magenta/auxiliary/delve_material")),
-		EXPEDITE("expedite", Expedite.PROPERTY_NAME, NamespacedKeyUtils.fromString("epic:r1/delves/lightblue/auxiliary/delve_material")),
-		CHOLER("choler", Choler.PROPERTY_NAME, NamespacedKeyUtils.fromString("epic:r1/delves/yellow/auxiliary/delve_material")),
-		USURPER("usurper", Usurper.PROPERTY_NAME, NamespacedKeyUtils.fromString("epic:r1/delves/reverie/auxiliary/delve_material")),
+		PENNATE("pennate", "Pennate", NamespacedKeyUtils.fromString("epic:r1/delves/white/auxiliary/delve_material")),
+		CARAPACE("carapace", "Carapace", NamespacedKeyUtils.fromString("epic:r1/delves/orange/auxiliary/delve_material")),
+		AURA("aura", "Aura", NamespacedKeyUtils.fromString("epic:r1/delves/magenta/auxiliary/delve_material")),
+		EXPEDITE("expedite", "Expedite", NamespacedKeyUtils.fromString("epic:r1/delves/lightblue/auxiliary/delve_material")),
+		CHOLER("choler", "Choler", NamespacedKeyUtils.fromString("epic:r1/delves/yellow/auxiliary/delve_material")),
+		USURPER("usurper", "Usurper", NamespacedKeyUtils.fromString("epic:r1/delves/reverie/auxiliary/delve_material")),
 
-		EMPOWERED("empowered", Empowered.PROPERTY_NAME, NamespacedKeyUtils.fromString("epic:r2/delves/lime/auxiliary/delve_material")),
-		NUTRIMENT("nutriment", Nutriment.PROPERTY_NAME, NamespacedKeyUtils.fromString("epic:r2/delves/pink/auxiliary/delve_material")),
-		EXECUTION("execution", Execution.PROPERTY_NAME, NamespacedKeyUtils.fromString("epic:r2/delves/gray/auxiliary/delve_material")),
-		REFLECTION("reflection", Reflection.PROPERTY_NAME, NamespacedKeyUtils.fromString("epic:r2/delves/lightgray/auxiliary/delve_material")),
-		MITOSIS("mitosis", Mitosis.PROPERTY_NAME, NamespacedKeyUtils.fromString("epic:r2/delves/cyan/auxiliary/delve_material")),
-		ARDOR("ardor", Ardor.PROPERTY_NAME, NamespacedKeyUtils.fromString("epic:r2/delves/purple/auxiliary/delve_material")),
-		EPOCH("epoch", Epoch.PROPERTY_NAME, NamespacedKeyUtils.fromString("epic:r2/delves/teal/auxiliary/delve_material")),
-		NATANT("natant", Natant.PROPERTY_NAME, NamespacedKeyUtils.fromString("epic:r2/delves/shiftingcity/auxiliary/delve_material")),
-		UNDERSTANDING("understanding", Understanding.PROPERTY_NAME, NamespacedKeyUtils.fromString("epic:r2/delves/forum/auxiliary/delve_material")),
+		EMPOWERED("empowered", "Empowered", NamespacedKeyUtils.fromString("epic:r2/delves/lime/auxiliary/delve_material")),
+		NUTRIMENT("nutriment", "Nutriment", NamespacedKeyUtils.fromString("epic:r2/delves/pink/auxiliary/delve_material")),
+		EXECUTION("execution", "Execution", NamespacedKeyUtils.fromString("epic:r2/delves/gray/auxiliary/delve_material")),
+		REFLECTION("reflection", "Reflection", NamespacedKeyUtils.fromString("epic:r2/delves/lightgray/auxiliary/delve_material")),
+		MITOSIS("mitosis", "Mitosis", NamespacedKeyUtils.fromString("epic:r2/delves/cyan/auxiliary/delve_material")),
+		ARDOR("ardor", "Ardor", NamespacedKeyUtils.fromString("epic:r2/delves/purple/auxiliary/delve_material")),
+		EPOCH("epoch", "Epoch", NamespacedKeyUtils.fromString("epic:r2/delves/teal/auxiliary/delve_material")),
+		NATANT("natant", "Natant", NamespacedKeyUtils.fromString("epic:r2/delves/shiftingcity/auxiliary/delve_material")),
+		UNDERSTANDING("understanding", "Understanding", NamespacedKeyUtils.fromString("epic:r2/delves/forum/auxiliary/delve_material")),
 
 		REFUND("refund", "refund", null);
 
@@ -111,39 +96,26 @@ public class DelveInfusionUtils {
 		}
 
 		//Assume the player has already paid for this infusion
-		int prevLvl = InventoryUtils.getCustomEnchantLevel(item, selection.getEnchantName(), true);
+		int prevLvl = ItemStatUtils.getInfusionLevel(item, InfusionType.getInfusionType(selection.getEnchantName()));
 		if (prevLvl > 0) {
-			InventoryUtils.removeCustomEnchant(item, selection.getEnchantName());
+			ItemStatUtils.removeInfusion(item, InfusionType.getInfusionType(selection.getEnchantName()));
 		}
+		ItemStatUtils.addInfusion(item, InfusionType.getInfusionType(selection.getEnchantName()), prevLvl + 1, player.getUniqueId());
+		ItemStatUtils.generateItemStats(item);
 
-		String numeral = "";
-		switch (prevLvl) {
-			case 1:
-				numeral = " II";
-				break;
-			case 2:
-				numeral = " III";
-				break;
-			case 3:
-				numeral = " IV";
-				break;
-			case 0:
-				numeral = " I";
-				break;
-			default:
-				throw new RuntimeException("Error loading the level");
-		}
-
-		ItemUtils.enchantifyItem(item, ChatColor.stripColor(selection.getEnchantName()) + numeral);
 		animate(player);
 	}
 
 	public static void refundInfusion(ItemStack item, Player player) {
 		DelveInfusionSelection infusion = getCurrentInfusion(item);
+		if (infusion == null) {
+			return;
+		}
 		int level = getInfuseLevel(item) - 1;
 		int levelXp = level;
 
-		InventoryUtils.removeCustomEnchant(item, infusion.getEnchantName());
+		ItemStatUtils.removeInfusion(item, InfusionType.getInfusionType(infusion.getEnchantName()));
+		ItemStatUtils.generateItemStats(item);
 
 		List<ItemStack> mats = null;
 
@@ -206,7 +178,7 @@ public class DelveInfusionUtils {
 	private static int getInfuseLevel(ItemStack item) {
 		int level = 0;
 		for (DelveInfusionSelection d : DelveInfusionSelection.values()) {
-			level += InventoryUtils.getCustomEnchantLevel(item, d.getEnchantName(), true);
+			level += ItemStatUtils.getInfusionLevel(item, InfusionType.getInfusionType(d.getEnchantName()));
 		}
 		return level;
 	}
@@ -280,13 +252,13 @@ public class DelveInfusionUtils {
 
 	// Caps level at MAX_LEVEL, and then adds the forum infusion bonus
 	public static double getModifiedLevel(Plugin plugin, Player player, int level) {
-		return Math.min(MAX_LEVEL, level) + Math.min(plugin.mTrackingManager.mPlayers.getPlayerCustomEnchantLevel(player, Understanding.class), MAX_LEVEL) * Understanding.POINTS_PER_LEVEL;
+		return Math.min(MAX_LEVEL, level) + Math.min(plugin.mItemStatManager.getInfusionLevel(player, InfusionType.UNDERSTANDING), MAX_LEVEL) * Understanding.POINTS_PER_LEVEL;
 	}
 
 
 	public static @Nullable DelveInfusionSelection getCurrentInfusion(ItemStack item) {
 		for (DelveInfusionSelection infusionSelection : DelveInfusionSelection.values()) {
-			if (InventoryUtils.getCustomEnchantLevel(item, infusionSelection.mEnchantName, true) > 0) {
+			if (ItemStatUtils.getInfusionLevel(item, InfusionType.getInfusionType(infusionSelection.getEnchantName())) > 0) {
 				return infusionSelection;
 			}
 		}
@@ -294,7 +266,7 @@ public class DelveInfusionUtils {
 	}
 
 	public static int getInfusionLevel(ItemStack item, DelveInfusionSelection selection) {
-		return InventoryUtils.getCustomEnchantLevel(item, selection.mEnchantName, true);
+		return ItemStatUtils.getInfusionLevel(item, InfusionType.getInfusionType(selection.getEnchantName()));
 	}
 
 	public static int getExpLvlInfuseCost(ItemStack item) {

@@ -1,5 +1,11 @@
 package com.playmonumenta.plugins.bosses.spells.rkitxet;
 
+import com.playmonumenta.plugins.bosses.bosses.RKitxet;
+import com.playmonumenta.plugins.bosses.spells.SpellBaseAoE;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.MovementUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -9,17 +15,11 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
-import com.playmonumenta.plugins.bosses.bosses.RKitxet;
-import com.playmonumenta.plugins.bosses.spells.SpellBaseAoE;
-import com.playmonumenta.plugins.utils.BossUtils;
-import com.playmonumenta.plugins.utils.MovementUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
-
 public class SpellVerdantProtection extends SpellBaseAoE {
 
 	private static final int RADIUS = 5;
 	private static final int DURATION = 4 * 20;
-	private static final int DAMAGE = 11;
+	private static final int DAMAGE = 20;
 	private static final Particle.DustOptions VERDANT_PROTECTION_COLOR = new Particle.DustOptions(Color.fromRGB(20, 200, 20), 1f);
 
 	private RKitxet mRKitxet;
@@ -52,7 +52,7 @@ public class SpellVerdantProtection extends SpellBaseAoE {
 
 				boolean hasHit = false;
 				for (Player player : PlayerUtils.playersInRange(launcher.getLocation(), radius, true)) {
-					BossUtils.bossDamage(launcher, player, DAMAGE, launcher.getLocation(), "Verdant Protection");
+					BossUtils.blockableDamage(launcher, player, DamageType.MAGIC, DAMAGE, "Verdant Protection", launcher.getLocation());
 
 					double distance = player.getLocation().distance(loc);
 					if (distance < radius / 3.0) {

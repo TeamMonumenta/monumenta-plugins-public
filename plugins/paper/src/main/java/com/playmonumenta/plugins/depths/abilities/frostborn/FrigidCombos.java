@@ -1,5 +1,15 @@
 package com.playmonumenta.plugins.depths.abilities.frostborn;
 
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.depths.DepthsTree;
+import com.playmonumenta.plugins.depths.DepthsUtils;
+import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
+import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
+import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.utils.DamageUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -7,17 +17,6 @@ import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.classes.magic.MagicType;
-import com.playmonumenta.plugins.depths.DepthsTree;
-import com.playmonumenta.plugins.depths.DepthsUtils;
-import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
-import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
-import com.playmonumenta.plugins.utils.EntityUtils;
-
-import net.md_5.bungee.api.ChatColor;
 
 public class FrigidCombos extends DepthsAbility {
 
@@ -36,18 +35,18 @@ public class FrigidCombos extends DepthsAbility {
 	}
 
 	@Override
-	public boolean livingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
+	public void onDamage(DamageEvent event, LivingEntity enemy) {
 		if (DepthsUtils.isValidComboAttack(event, mPlayer)) {
 			mComboCount++;
 
 			if (mComboCount >= 3 && mRarity > 0) {
-				Location targetLoc = event.getEntity().getLocation();
+				Location targetLoc = enemy.getLocation();
 				World world = targetLoc.getWorld();
 				for (LivingEntity mob : EntityUtils.getNearbyMobs(targetLoc, RADIUS)) {
 					if (!(mob.getHealth() <= 0 || mob == null)) {
 						world.spawnParticle(Particle.CRIT_MAGIC, mob.getLocation(), 25, .5, .2, .5, 0.65);
 						EntityUtils.applySlow(mPlugin, TIME, SLOW_AMPLIFIER[mRarity - 1], mob);
-						EntityUtils.damageEntity(mPlugin, mob, DAMAGE[mRarity - 1], mPlayer, MagicType.ICE, true, mInfo.mLinkedSpell, true, true, true, false);
+						DamageUtils.damage(mPlayer, mob, DamageType.MAGIC, DAMAGE[mRarity - 1], mInfo.mLinkedSpell, true);
 					}
 				}
 
@@ -60,13 +59,11 @@ public class FrigidCombos extends DepthsAbility {
 				world.spawnParticle(Particle.SNOW_SHOVEL, targetLoc, 25, .5, .2, .5, 0.65);
 			}
 		}
-
-		return true;
 	}
 
 	@Override
 	public String getDescription(int rarity) {
-		return "Every third melee attack deals " + DepthsUtils.getRarityColor(rarity) + DAMAGE[rarity - 1] + ChatColor.WHITE + " damage to all mobs within " + RADIUS + " blocks and applies " + DepthsUtils.getRarityColor(rarity) + DepthsUtils.roundPercent(SLOW_AMPLIFIER[rarity - 1]) + "%" + ChatColor.WHITE + " slowness for " + TIME / 20.0 + " seconds to affected mobs.";
+		return "Every third melee attack deals " + DepthsUtils.getRarityColor(rarity) + DAMAGE[rarity - 1] + ChatColor.WHITE + " magic damage to all mobs within " + RADIUS + " blocks and applies " + DepthsUtils.getRarityColor(rarity) + DepthsUtils.roundPercent(SLOW_AMPLIFIER[rarity - 1]) + "%" + ChatColor.WHITE + " slowness for " + TIME / 20.0 + " seconds to affected mobs.";
 	}
 
 	@Override

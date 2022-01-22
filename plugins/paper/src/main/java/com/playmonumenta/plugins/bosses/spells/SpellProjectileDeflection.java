@@ -1,17 +1,17 @@
 package com.playmonumenta.plugins.bosses.spells;
 
+import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.utils.LocationUtils;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.entity.Arrow;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.entity.Trident;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.potion.PotionEffect;
-
-import com.playmonumenta.plugins.utils.LocationUtils;
 
 public class SpellProjectileDeflection extends Spell {
 	private static final double MAX_DEFLECT_VELOCITY = 3.0;
@@ -48,12 +48,9 @@ public class SpellProjectileDeflection extends Spell {
 	}
 
 	@Override
-	public void bossDamagedByEntity(EntityDamageByEntityEvent event) {
-		if (event.getDamager() instanceof Projectile) {
-			Projectile proj = (Projectile) event.getDamager();
-			if (proj.getShooter() instanceof Player) {
-				event.setCancelled(true);
-			}
+	public void onHurtByEntityWithSource(DamageEvent event, Entity damger, LivingEntity source) {
+		if (event.getDamager() instanceof Projectile && source instanceof Player) {
+			event.setCancelled(true);
 		}
 	}
 

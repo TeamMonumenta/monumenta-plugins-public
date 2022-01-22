@@ -3,14 +3,12 @@ package com.playmonumenta.plugins.utils;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.block.ShulkerBox;
 import org.bukkit.entity.Entity;
@@ -20,7 +18,6 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.BlockStateMeta;
-import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.loot.LootContext;
 import org.bukkit.loot.LootTable;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -31,8 +28,9 @@ import org.yaml.snakeyaml.external.biz.base64Coder.Base64Coder;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityManager;
-import com.playmonumenta.plugins.enchantments.curses.CurseOfEphemerality;
-import com.playmonumenta.plugins.enchantments.curses.TwoHanded;
+import com.playmonumenta.plugins.itemstats.enchantments.CurseOfEphemerality;
+import com.playmonumenta.plugins.itemstats.enchantments.TwoHanded;
+import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -46,7 +44,6 @@ public class InventoryUtils {
 	private static final int LEGGINGS_SLOT = 37;
 	private static final int BOOTS_SLOT = 36;
 
-	//TODO Fix exploit where changing hotbar slots and then firing a projectile uses the old slot's attributes
 	public static void scheduleDelayedEquipmentCheck(final Plugin plugin, final Player player, final @Nullable Event event) {
 		new BukkitRunnable() {
 			@Override
@@ -129,94 +126,19 @@ public class InventoryUtils {
 		return false;
 	}
 
-	public static int getCustomEnchantLevel(final @Nullable ItemStack item, final @Nullable String legacyNameText, final boolean useLevel) {
-		// TODO START Remove this block when all legacy text is updated to use Adventure or plain text.
-		if (legacyNameText == null || legacyNameText.isEmpty()) {
-			return 0;
-		}
-		final String nameText = ItemUtils.toPlainTagText(legacyNameText);
-		// TODO END
-
-		if (nameText == null || nameText.isEmpty()) {
-			return 0;
-		}
-
-		if (item == null || item.getAmount() <= 0) {
-			return 0;
-		}
-
-		final List<String> lore = ItemUtils.getPlainLore(item);
-		if (lore == null || lore.isEmpty()) {
-			return 0;
-		}
-
-		for (final String loreEntry : lore) {
-			if (loreEntry.startsWith(nameText)) {
-				if (useLevel) {
-					int offset = 1;
-					int level = 0;
-					// Does not account for L (50) or higher symbols, which some items have for non-custom enchants
-					while (true) {
-						final char c = loreEntry.charAt(loreEntry.length() - offset);
-						if (c == 'I') {
-							level += 1;
-						} else if (c == 'V') {
-							final char cn = loreEntry.charAt(loreEntry.length() - offset - 1);
-							if (cn == 'I') {
-								level += 4;
-								offset += 1;
-							} else {
-								level += 5;
-							}
-						} else if (c == 'X') {
-							final char cn = loreEntry.charAt(loreEntry.length() - offset - 1);
-							if (cn == 'I') {
-								level += 9;
-								offset += 1;
-							} else {
-								level += 10;
-							}
-						} else if (c == ' ') {
-							break;
-						} else {
-							level = 1;
-							break;
-						}
-						offset += 1;
-					}
-					return level;
-				} else {
-					return 1;
-				}
-			}
-		}
-
-		return 0;
-	}
-
-	public static void removeCustomEnchant(final ItemStack item, final String nameText) {
-		if (!nameText.isEmpty() && item != null) {
-			final ItemMeta meta = item.getItemMeta();
-			if (meta != null) {
-				final List<Component> lore = meta.lore();
-				if (lore != null && !lore.isEmpty()) {
-					final List<Component> newLore = new ArrayList<>();
-					for (final Component line : lore) {
-						if (!MessagingUtils.LEGACY_SERIALIZER.serialize(line).startsWith(nameText)) {
-							newLore.add(line);
-						}
-					}
-					meta.lore(newLore);
-					item.setItemMeta(meta);
-					ItemUtils.setPlainLore(item);
-				}
-			}
-		}
-	}
-
 	public static boolean isSoulboundToPlayer(final ItemStack item, final Player player) {
-		// TODO: Needs to handle renames
-		return testForItemWithLore(item, "* Soulbound to " + player.getName() + " *");
+		if (player == null || item == null || !item.hasItemMeta() || !item.getItemMeta().hasLore()) {
+			return false;
+		}
+		List<String> lore = item.getLore();
+		if (lore != null) {
+			for (String line : lore) {
+				if (line.contains("Soulbound to") && line.contains(player.getName())) {
+					return true;
+				}
+			}
+		}
+		return false;
 	}
 
 	public static int removeSpecialItems(final Player player, final boolean ephemeralOnly) {
@@ -398,10 +320,20 @@ public class InventoryUtils {
 		}
 	}
 
-	public static boolean rogueTriggerCheck(final ItemStack mainhand, final ItemStack offhand) {
+	public static boolean rogueTriggerCheck(Plugin plugin, @Nullable Player player) {
+		if (player == null) {
+			return false;
+		}
+
+		ItemStack mainhand = player.getInventory().getItemInMainHand();
+		ItemStack offhand = player.getInventory().getItemInOffHand();
+
 		boolean isMainhand = ItemUtils.isSword(mainhand);
 		boolean isOffhand = ItemUtils.isSword(offhand);
-		return (isMainhand && isOffhand) || (isMainhand && testForItemWithLore(mainhand, TwoHanded.PROPERTY_NAME) && offhand.getType() == Material.AIR);
+		if ((isMainhand && isOffhand) || (plugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.TWO_HANDED) > 0 && !TwoHanded.checkForOffhand(plugin, player))) {
+			return true;
+		}
+		return false;
 	}
 
 	/* Note this should only be used with loot tables that contain a single item */

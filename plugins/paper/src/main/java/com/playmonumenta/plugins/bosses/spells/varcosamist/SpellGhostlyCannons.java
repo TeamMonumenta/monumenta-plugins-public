@@ -1,8 +1,12 @@
 package com.playmonumenta.plugins.bosses.spells.varcosamist;
 
-import java.util.Collections;
-import java.util.List;
-
+import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.utils.AbilityUtils;
+import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.MovementUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -15,12 +19,8 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
-import com.playmonumenta.plugins.bosses.spells.Spell;
-import com.playmonumenta.plugins.utils.AbilityUtils;
-import com.playmonumenta.plugins.utils.BossUtils;
-import com.playmonumenta.plugins.utils.FastUtils;
-import com.playmonumenta.plugins.utils.MovementUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
+import java.util.Collections;
+import java.util.List;
 
 public class SpellGhostlyCannons extends Spell {
 	private LivingEntity mBoss;
@@ -141,8 +141,8 @@ public class SpellGhostlyCannons extends Spell {
 					for (Player player : PlayerUtils.playersInRange(mLoc, 3, true)) {
 						BoundingBox pBox = player.getBoundingBox();
 						if (pBox.overlaps(box)) {
-							BossUtils.bossDamage(mBoss, player, 45, mLoc, "Ghostly Cannons");
-							MovementUtils.knockAway(mLoc, player, 0.5f, 0.65f);
+							BossUtils.blockableDamage(mBoss, player, DamageType.BLAST, 25, "Ghostly Cannons", mLoc);
+							MovementUtils.knockAway(mLoc, player, 0.5f, 0.65f, false);
 							AbilityUtils.silencePlayer(player, 15 * 20);
 						}
 					}

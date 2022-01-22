@@ -1,14 +1,5 @@
 package com.playmonumenta.plugins.abilities.cleric;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.NavigableSet;
-import java.util.UUID;
-
-import org.bukkit.Particle;
-import org.bukkit.entity.Player;
-import org.checkerframework.checker.nullness.qual.Nullable;
-
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityManager;
@@ -17,6 +8,14 @@ import com.playmonumenta.plugins.effects.ThuribleBonusHealing;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
+import org.bukkit.Particle;
+import org.bukkit.entity.Player;
+import org.checkerframework.checker.nullness.qual.Nullable;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.NavigableSet;
+import java.util.UUID;
 
 
 
@@ -65,7 +64,7 @@ public class ClericPassive extends Ability {
 						double maxHealth = EntityUtils.getMaxHealth(player);
 						double hp = player.getHealth() / maxHealth;
 						if (hp <= HEALTH_LIMIT) {
-							PlayerUtils.healPlayer(player, healPercent * maxHealth);
+							PlayerUtils.healPlayer(mPlugin, player, healPercent * maxHealth, mPlayer);
 							int numHearts = (int) (healPercent * 20);
 							player.getWorld().spawnParticle(Particle.HEART, (player.getLocation()).add(0, 2, 0), numHearts, 0.07, 0.07, 0.07, 0.001);
 						}

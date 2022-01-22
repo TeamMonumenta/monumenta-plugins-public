@@ -1,5 +1,11 @@
 package com.playmonumenta.plugins.bosses.spells.varcosamist;
 
+import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.utils.AbilityUtils;
+import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.MovementUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.Location;
@@ -9,17 +15,12 @@ import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.Creature;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
-
-import com.playmonumenta.plugins.bosses.spells.Spell;
-import com.playmonumenta.plugins.utils.AbilityUtils;
-import com.playmonumenta.plugins.utils.BossUtils;
-import com.playmonumenta.plugins.utils.MovementUtils;
 
 public class SpellDeathlyCharge extends Spell {
 
@@ -121,10 +122,9 @@ public class SpellDeathlyCharge extends Spell {
 	}
 
 	@Override
-	public void bossDamagedEntity(EntityDamageByEntityEvent event) {
-		if (mActive && event.getEntity() instanceof Player) {
+	public void onDamage(DamageEvent event, LivingEntity damagee) {
+		if (mActive && damagee instanceof Player player) {
 			mActive = false;
-			Player player = (Player) event.getEntity();
 			World world = mBoss.getWorld();
 			Location loc = mBoss.getLocation();
 
@@ -133,11 +133,11 @@ public class SpellDeathlyCharge extends Spell {
 			world.playSound(loc, Sound.ENTITY_PLAYER_HURT, 1.5f, 0.65f);
 			world.spawnParticle(Particle.BLOCK_CRACK, player.getLocation().add(0, 1, 0), 45, 0.4, 0.4, 0.4, Material.REDSTONE_WIRE.createBlockData());
 			player.setNoDamageTicks(0);
-			BossUtils.bossDamage(mBoss, player, DAMAGE, mBoss.getLocation(), "Deathly Charge");
+			BossUtils.blockableDamage(mBoss, player, DamageType.MELEE, DAMAGE, "Deathly Charge", mBoss.getLocation());
 			AbilityUtils.silencePlayer(player, 5 * 20);
 			player.addPotionEffect(new PotionEffect(PotionEffectType.WITHER, 20 * 5, 1));
-			if (BossUtils.bossDamageBlocked(player, DAMAGE, loc)) {
-				MovementUtils.knockAway(mBoss.getLocation(), player, .6f, .6f);
+			if (BossUtils.bossDamageBlocked(player, loc)) {
+				MovementUtils.knockAway(mBoss.getLocation(), player, 0.6f, 0.6f, false);
 			}
 		}
 	}
@@ -149,9 +149,8 @@ public class SpellDeathlyCharge extends Spell {
 
 	@Override
 	public boolean canRun() {
-		if (mBoss instanceof Creature) {
-			Creature c = (Creature) mBoss;
-			return c.getTarget() != null;
+		if (mBoss instanceof Mob mob) {
+			return mob.getTarget() != null;
 		}
 		return false;
 	}

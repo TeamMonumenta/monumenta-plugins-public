@@ -1,8 +1,15 @@
 package com.playmonumenta.plugins.custominventories;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.utils.GUIUtils;
+import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.SignUtils;
+import com.playmonumenta.scriptedquests.utils.CustomInventory;
+import com.playmonumenta.scriptedquests.utils.ScoreboardUtils;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
+import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -14,17 +21,8 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.utils.GUIUtils;
-import com.playmonumenta.plugins.utils.ItemUtils;
-import com.playmonumenta.plugins.utils.SignUtils;
-import com.playmonumenta.scriptedquests.utils.CustomInventory;
-import com.playmonumenta.scriptedquests.utils.ScoreboardUtils;
-
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.format.TextDecoration;
-import net.md_5.bungee.api.ChatColor;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 public class PEBCustomInventory extends CustomInventory {
 	private static final Material FILLER = Material.GRAY_STAINED_GLASS_PANE;
@@ -112,12 +110,15 @@ public class PEBCustomInventory extends CustomInventory {
 		PEB_ITEMS.add(new PebItem(2, 24, "Dungeon Instances",
 				"Click to view what dungeon instances you have open, and how old they are.", ChatColor.LIGHT_PURPLE,
 				Material.WHITE_WOOL, "clickable peb_dungeoninfo", true));
-		PEB_ITEMS.add(new PebItem(2, 39, "Patron",
+		PEB_ITEMS.add(new PebItem(2, 38, "Patron",
 				"Click to view patron information. Use /donate to learn about donating.", ChatColor.LIGHT_PURPLE,
 				Material.GLOWSTONE_DUST, "clickable peb_patroninfo", true));
-		PEB_ITEMS.add(new PebItem(2, 41, "Dailies",
+		PEB_ITEMS.add(new PebItem(2, 40, "Dailies",
 				"Click to see what daily content you have and haven't done today.", ChatColor.LIGHT_PURPLE,
 				Material.ACACIA_BOAT, "clickable peb_dailies", true));
+		PEB_ITEMS.add(new PebItem(2, 42, "Item Stats",
+				"Click to view your current item stats and compare items.", ChatColor.LIGHT_PURPLE,
+				Material.KNOWLEDGE_BOOK, "playerstats", true));
 
 		//page 3: Toggle-able Options
 		PEB_ITEMS.add(new PebItem(3, 4, "Toggleable Options",
@@ -126,9 +127,9 @@ public class PEBCustomInventory extends CustomInventory {
 		PEB_ITEMS.add(new PebItem(3, 19, "Self Particles",
 				"Click to toggle self particles.", ChatColor.LIGHT_PURPLE,
 				Material.FIREWORK_STAR, "clickable peb_selfparticles", false));
-		PEB_ITEMS.add(new PebItem(3, 20, "UA Rocket Jumping",
-				"Click to toggle rocket jumping with Unstable Arrows.", ChatColor.LIGHT_PURPLE,
-				Material.FIREWORK_ROCKET, "clickable peb_uarj", false));
+		PEB_ITEMS.add(new PebItem(3, 20, "Glowing options",
+				"Click to choose your preferences for the \"glowing\" effect.", ChatColor.LIGHT_PURPLE,
+				Material.SPECTRAL_ARROW, "page 30", false));
 		PEB_ITEMS.add(new PebItem(3, 21, "Show name on patron buff announcement.",
 				"Toggles whether the player has their IGN in the buff announcement when they"
 						+ " activate " + ChatColor.GOLD + "Patreon " + ChatColor.LIGHT_PURPLE + "buffs.", ChatColor.LIGHT_PURPLE,
@@ -151,9 +152,6 @@ public class PEBCustomInventory extends CustomInventory {
 		PEB_ITEMS.add(new PebItem(3, 39, "Toggle Radiant",
 				"Click to toggle whether Radiant provides Night Vision.", ChatColor.LIGHT_PURPLE,
 				Material.SOUL_LANTERN, "execute as @S run function monumenta:mechanisms/radiant_toggle", false));
-		PEB_ITEMS.add(new PebItem(3, 40, "Glowing options",
-				"Click to choose your preferences for the \"glowing\" effect.", ChatColor.LIGHT_PURPLE,
-				Material.SPECTRAL_ARROW, "page 30", false));
 		PEB_ITEMS.add(new PebItem(3, 41, "Offhand Swapping",
 				"Click to toggle whether pressing your swap key will be fully cancelled or only cancelled when a spellcast does so", ChatColor.LIGHT_PURPLE,
 				Material.SHIELD, "toggleswap", false));
@@ -379,7 +377,8 @@ public class PEBCustomInventory extends CustomInventory {
 				       command.equals("toggleswap") ||
 				       command.equals("virtualfirmament") ||
 				       command.startsWith("glowing") ||
-				       command.startsWith("disabledrop");
+				       command.startsWith("disabledrop") ||
+				       command.startsWith("playerstats");
 	}
 
 	public void runInternalCommand(Player player, PebItem item) {
@@ -401,10 +400,10 @@ public class PEBCustomInventory extends CustomInventory {
 		if (isInternalCommand(item.mCommand)) {
 			runInternalCommand(player, item);
 		} else if (isPlayerCommand(item.mCommand)) {
-			player.performCommand(item.mCommand);
 			if (item.mCloseAfter) {
 				player.closeInventory();
 			}
+			player.performCommand(item.mCommand);
 		} else {
 			String finalCommand = item.mCommand.replace("@S", player.getName());
 			Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), finalCommand);

@@ -1,8 +1,13 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
-import java.util.AbstractMap;
-import java.util.Arrays;
-
+import com.playmonumenta.plugins.bosses.SpellManager;
+import com.playmonumenta.plugins.bosses.parameters.BossParam;
+import com.playmonumenta.plugins.bosses.spells.SpellBaseSlam;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.ParticleUtils;
+import com.playmonumenta.plugins.utils.ParticleUtils.SpawnParticleAction;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -14,13 +19,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.util.Vector;
 
-import com.playmonumenta.plugins.bosses.SpellManager;
-import com.playmonumenta.plugins.bosses.parameters.BossParam;
-import com.playmonumenta.plugins.bosses.spells.SpellBaseSlam;
-import com.playmonumenta.plugins.utils.BossUtils;
-import com.playmonumenta.plugins.utils.ParticleUtils;
-import com.playmonumenta.plugins.utils.ParticleUtils.SpawnParticleAction;
-import com.playmonumenta.plugins.utils.PlayerUtils;
+import java.util.AbstractMap;
+import java.util.Arrays;
 
 public class MeteorSlamBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_meteor_slam";
@@ -41,8 +41,10 @@ public class MeteorSlamBoss extends BossAbilityGroup {
 		public double VELOCITY_MULTIPLIER = 0.5;
 		@BossParam(help = "not written")
 		public double DAMAGE_RADIUS = 3;
-		@BossParam(help = "not written")
-		public double DAMAGE_PERCENT = 0.5;
+		@BossParam(help = "Damage dealt (blast)")
+		public double DAMAGE = 20;
+		@BossParam(help = "Percent health damage dealt")
+		public double DAMAGE_PERCENT = 0;
 		@BossParam(help = "not written")
 		public int JUMP_HEIGHT = 1;
 		//notes: this ability will probably become deprecated in the future!
@@ -78,12 +80,14 @@ public class MeteorSlamBoss extends BossAbilityGroup {
 					world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.PLAYERS, 2, 1.25F);
 					world.spawnParticle(Particle.FLAME, loc, 60, 0F, 0F, 0F, 0.2F);
 					world.spawnParticle(Particle.EXPLOSION_NORMAL, loc, 20, 0F, 0F, 0F, 0.3F);
-					world.spawnParticle(Particle.LAVA, loc, 3 * (int)(p.DAMAGE_RADIUS * p.DAMAGE_RADIUS), p.DAMAGE_RADIUS, 0.25f, p.DAMAGE_RADIUS, 0);
+					world.spawnParticle(Particle.LAVA, loc, 3 * (int) (p.DAMAGE_RADIUS * p.DAMAGE_RADIUS), p.DAMAGE_RADIUS, 0.25f, p.DAMAGE_RADIUS, 0);
 					if (player != null) {
+						BossUtils.blockableDamage(boss, player, DamageType.BLAST, p.DAMAGE);
 						BossUtils.bossDamagePercent(boss, player, p.DAMAGE_PERCENT);
 						return;
 					}
 					for (Player players : PlayerUtils.playersInRange(loc, p.DAMAGE_RADIUS, true)) {
+						BossUtils.blockableDamage(boss, players, DamageType.BLAST, p.DAMAGE);
 						BossUtils.bossDamagePercent(boss, players, p.DAMAGE_PERCENT);
 					}
 					})));

@@ -1,9 +1,13 @@
 package com.playmonumenta.plugins.bosses.spells.kaul;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
-
+import com.playmonumenta.plugins.bosses.ChargeUpManager;
+import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.LocationUtils;
+import com.playmonumenta.plugins.utils.MovementUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -22,13 +26,9 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
-import com.playmonumenta.plugins.bosses.ChargeUpManager;
-import com.playmonumenta.plugins.bosses.spells.Spell;
-import com.playmonumenta.plugins.utils.BossUtils;
-import com.playmonumenta.plugins.utils.FastUtils;
-import com.playmonumenta.plugins.utils.LocationUtils;
-import com.playmonumenta.plugins.utils.MovementUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
 public class SpellGroundSurge extends Spell {
 	private Plugin mPlugin;
@@ -142,7 +142,7 @@ public class SpellGroundSurge extends Spell {
 								for (Player player : players) {
 									if (player.getBoundingBox().overlaps(mBox)) {
 										this.cancel();
-										BossUtils.bossDamage(mBoss, player, 30, mBoss.getLocation(), "Ground Surge");
+										BossUtils.blockableDamage(mBoss, player, DamageType.BLAST, 24, "Ground Surge", mBoss.getLocation());
 										player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 20, 2));
 										MovementUtils.knockAway(mBoss.getLocation(), player, 0.3f, 1f);
 										world.spawnParticle(Particle.SMOKE_LARGE, bLoc, 20, 0, 0, 0, 0.2);
@@ -200,7 +200,7 @@ public class SpellGroundSurge extends Spell {
 															&& !surgePlayer.getUniqueId().equals(player.getUniqueId())
 															&& !mHit.contains(surgePlayer.getUniqueId())) {
 														mHit.add(surgePlayer.getUniqueId());
-														BossUtils.bossDamage(mBoss, surgePlayer, 30, mBoss.getLocation(), "Ground Surge");
+														BossUtils.blockableDamage(mBoss, surgePlayer, DamageType.BLAST, 30, "Ground Surge", mBoss.getLocation());
 														surgePlayer.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 20, 2));
 														MovementUtils.knockAway(loc, player, 0.3f, 1f);
 														world.spawnParticle(Particle.SMOKE_LARGE, innerBoxLoc, 10, 0, 0, 0, 0.2);
@@ -258,7 +258,13 @@ public class SpellGroundSurge extends Spell {
 
 	@Override
 	public boolean canRun() {
-		return ((Mob) mBoss).getTarget() != null && ((Mob) mBoss).getTarget() instanceof Player;
+		if (mBoss instanceof Mob mob) {
+			LivingEntity target = mob.getTarget();
+			if (target != null && target instanceof Player) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	@Override

@@ -1,5 +1,13 @@
 package com.playmonumenta.plugins.bosses.spells.lich.undeadplayers;
 
+import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.player.PartialParticle;
+import com.playmonumenta.plugins.utils.AbilityUtils;
+import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.DamageUtils;
+import com.playmonumenta.plugins.utils.MovementUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -11,13 +19,6 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
-
-import com.playmonumenta.plugins.bosses.spells.Spell;
-import com.playmonumenta.plugins.player.PartialParticle;
-import com.playmonumenta.plugins.utils.AbilityUtils;
-import com.playmonumenta.plugins.utils.BossUtils;
-import com.playmonumenta.plugins.utils.MovementUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
 
 /*
  * Leaves a stationary cloud of doom that deals 20 damage every 0.5 seconds
@@ -66,7 +67,7 @@ public class SpellPotionCloud extends Spell {
 
 				if (mT % 10 == 0 && mT >= 20 && mT < 20 * 15) {
 					for (Player p : PlayerUtils.playersInRange(loc, 2, true)) {
-						BossUtils.bossDamage(mBoss, p, 20, null, "Unstable Concoction");
+						DamageUtils.damage(mBoss, p, DamageType.AILMENT, 9, null, false, true, "Unstable Concoction");
 						p.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 30, 0));
 						p.addPotionEffect(new PotionEffect(PotionEffectType.SLOW_DIGGING, 20 * 30, 0));
 						AbilityUtils.increaseDamageRecievedPlayer(p, 20 * 30, 0.15, "Lich");
@@ -83,11 +84,11 @@ public class SpellPotionCloud extends Spell {
 					mExpH.location(loc).spawnAsEnemy();
 					world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 2f, 1f);
 					for (Player p : PlayerUtils.playersInRange(loc, 3, true)) {
-						BossUtils.bossDamage(mBoss, p, 40, loc, "Unstable Concoction");
+						BossUtils.blockableDamage(mBoss, p, DamageType.BLAST, 35, "Unstable Concoction", loc);
 						p.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 10, 1));
 						p.addPotionEffect(new PotionEffect(PotionEffectType.SLOW_DIGGING, 20 * 10, 2));
 						AbilityUtils.increaseDamageRecievedPlayer(p, 20 * 10, 0.25, "Lich");
-						MovementUtils.knockAway(loc, p, 0.7f);
+						MovementUtils.knockAway(loc, p, 0.7f, false);
 					}
 				}
 			}
@@ -99,7 +100,7 @@ public class SpellPotionCloud extends Spell {
 
 	@Override
 	public int cooldownTicks() {
-		return 20 * 18;
+		return 20 * 8;
 	}
 
 }

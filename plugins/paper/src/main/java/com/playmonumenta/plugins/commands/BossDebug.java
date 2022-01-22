@@ -1,7 +1,6 @@
 package com.playmonumenta.plugins.commands;
 
 import com.playmonumenta.plugins.bosses.BossManager;
-
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.CommandPermission;
 

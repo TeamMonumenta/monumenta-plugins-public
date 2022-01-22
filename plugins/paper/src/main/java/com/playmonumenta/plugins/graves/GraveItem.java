@@ -1,7 +1,17 @@
 package com.playmonumenta.plugins.graves;
 
-import java.util.UUID;
-
+import com.google.gson.JsonObject;
+import com.playmonumenta.plugins.Constants;
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.utils.ItemStatUtils;
+import com.playmonumenta.plugins.utils.ItemStatUtils.InfusionType;
+import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.ScoreboardUtils;
+import de.tr7zw.nbtapi.NBTContainer;
+import de.tr7zw.nbtapi.NBTEntity;
+import de.tr7zw.nbtapi.NBTItem;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
@@ -18,19 +28,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-import com.google.gson.JsonObject;
-import com.playmonumenta.plugins.Constants;
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.enchantments.Hope;
-import com.playmonumenta.plugins.utils.InventoryUtils;
-import com.playmonumenta.plugins.utils.ItemUtils;
-import com.playmonumenta.plugins.utils.ScoreboardUtils;
-
-import de.tr7zw.nbtapi.NBTContainer;
-import de.tr7zw.nbtapi.NBTEntity;
-import de.tr7zw.nbtapi.NBTItem;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
+import java.util.UUID;
 
 public class GraveItem {
 	public enum Status {
@@ -242,7 +240,7 @@ public class GraveItem {
 			mEntity.setPickupDelay(0);
 			mEntity.setThrower(mGrave.getUniqueId());
 			mEntity.setOwner(mPlayer.getUniqueId());
-			if (InventoryUtils.getCustomEnchantLevel(mItem, Hope.PROPERTY_NAME, false) > 0) {
+			if (ItemStatUtils.getInfusionLevel(mItem, InfusionType.HOPE) > 0) {
 				mEntity.setInvulnerable(true);
 			}
 			if (mAge != null) {
@@ -324,7 +322,7 @@ public class GraveItem {
 
 	ItemStack getItem() {
 		if (mStatus == Status.SHATTERED) {
-			ItemUtils.shatterItem(mItem);
+			ItemStatUtils.shatter(mItem);
 		}
 		return mItem;
 	}

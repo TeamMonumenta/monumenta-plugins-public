@@ -1,12 +1,16 @@
 package com.playmonumenta.plugins.custominventories;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.tracking.PlayerTracking;
+import com.playmonumenta.plugins.utils.DelveInfusionUtils;
+import com.playmonumenta.plugins.utils.DelveInfusionUtils.DelveInfusionSelection;
+import com.playmonumenta.plugins.utils.InfusionUtils;
+import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.scriptedquests.utils.CustomInventory;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -19,18 +23,12 @@ import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.tracking.PlayerTracking;
-import com.playmonumenta.plugins.utils.DelveInfusionUtils;
-import com.playmonumenta.plugins.utils.DelveInfusionUtils.DelveInfusionSelection;
-import com.playmonumenta.plugins.utils.InfusionUtils;
-import com.playmonumenta.plugins.utils.ItemUtils;
-import com.playmonumenta.scriptedquests.utils.CustomInventory;
-
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.format.TextColor;
-import net.kyori.adventure.text.format.TextDecoration;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public final class DelveInfusionCustomInventory extends CustomInventory {
 

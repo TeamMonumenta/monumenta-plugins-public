@@ -1,10 +1,9 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
+import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import org.bukkit.entity.Creeper;
-import org.bukkit.entity.Firework;
 import org.bukkit.entity.LivingEntity;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.plugin.Plugin;
 
 public class VolatileBoss extends BossAbilityGroup {
@@ -17,7 +16,7 @@ public class VolatileBoss extends BossAbilityGroup {
 		if (!(boss instanceof Creeper)) {
 			throw new Exception("Attempted to give non-creeper the " + identityTag + " ability: " + boss.toString());
 		}
-		return new VolatileBoss(plugin, (Creeper)boss);
+		return new VolatileBoss(plugin, boss);
 	}
 
 	public VolatileBoss(Plugin plugin, LivingEntity boss) throws Exception {
@@ -33,8 +32,8 @@ public class VolatileBoss extends BossAbilityGroup {
 	}
 
 	@Override
-	public void bossDamagedByEntity(EntityDamageByEntityEvent event) {
-		if (event.getCause().equals(DamageCause.ENTITY_EXPLOSION) && !(event.getDamager() instanceof Firework)) {
+	public void onHurt(DamageEvent event) {
+		if (event.getType() == DamageType.BLAST) {
 			mBoss.explode();
 		}
 	}

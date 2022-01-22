@@ -1,5 +1,10 @@
 package com.playmonumenta.plugins.overrides;
 
+import com.playmonumenta.plugins.Constants;
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.utils.ItemStatUtils;
+import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
+import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
@@ -16,11 +21,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.checkerframework.checker.nullness.qual.Nullable;
-
-import com.playmonumenta.plugins.Constants;
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.utils.InventoryUtils;
-import com.playmonumenta.plugins.utils.ScoreboardUtils;
 
 public class AnvilOverride extends BaseOverride {
 	private static final String REPAIR_OBJECTIVE = "RepairT";
@@ -41,9 +41,7 @@ public class AnvilOverride extends BaseOverride {
 		item = player.getInventory().getItemInMainHand();
 
 		if (item != null && item.getDurability() > 0 && !item.getType().isBlock()
-		    && (!item.hasItemMeta() || !item.getItemMeta().hasLore()
-		        || (!InventoryUtils.testForItemWithLore(item, "* Irreparable *")
-		            && !InventoryUtils.testForItemWithLore(item, "Curse of Irreparability")))
+		    && item.hasItemMeta() && ItemStatUtils.getEnchantmentLevel(item, EnchantmentType.CURSE_OF_IRREPARIBILITY) == 0
 		    && block.hasMetadata(Constants.ANVIL_CONFIRMATION_METAKEY)) {
 
 			item.setDurability((short) 0);

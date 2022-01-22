@@ -7,15 +7,11 @@ import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
-import org.bukkit.attribute.Attribute;
-import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
@@ -30,9 +26,12 @@ import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.MultipleChargeAbility;
 import com.playmonumenta.plugins.abilities.cleric.Crusade;
 import com.playmonumenta.plugins.classes.ClassAbility;
-import com.playmonumenta.plugins.classes.magic.MagicType;
 import com.playmonumenta.plugins.effects.PercentDamageReceived;
+import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
@@ -86,14 +85,14 @@ public class HallowedBeam extends MultipleChargeAbility {
 			return;
 		}
 		LivingEntity e = EntityUtils.getEntityAtCursor(mPlayer, CAST_RANGE, true, true, true);
-		if (e instanceof Player && ((Player) e).getGameMode() != GameMode.SPECTATOR || EntityUtils.isHostileMob(e)) {
+		if (e instanceof Player ePlayer && ePlayer.getGameMode() != GameMode.SPECTATOR || EntityUtils.isHostileMob(e)) {
 			Player player = mPlayer;
 
 			PlayerInventory inventory = mPlayer.getInventory();
 			ItemStack inMainHand = inventory.getItemInMainHand();
 			Damageable damageable = (Damageable) inMainHand.getItemMeta();
 
-			if (ItemUtils.isSomeBow(inMainHand) && !ItemUtils.isShootableItem(inventory.getItemInOffHand()) && !ItemUtils.isItemShattered(inMainHand) && !(damageable.getDamage() > inMainHand.getType().getMaxDurability())) {
+			if (ItemUtils.isSomeBow(inMainHand) && !ItemUtils.isShootableItem(inventory.getItemInOffHand()) && !ItemStatUtils.isShattered(inMainHand) && !(damageable.getDamage() > inMainHand.getType().getMaxDurability())) {
 				int ticks = mPlayer.getTicksLived();
 				// Prevent double casting on accident
 				if (ticks - mLastCastTicks <= 5 || !consumeCharge()) {
@@ -124,7 +123,7 @@ public class HallowedBeam extends MultipleChargeAbility {
 						LivingEntity applyE = e;
 						//Check if heal should override damage
 						for (Entity en : e.getNearbyEntities(1.5, 1.5, 1.5)) {
-							if (en instanceof Player && ((Player) en).getGameMode() != GameMode.SPECTATOR && en.getUniqueId() != mPlayer.getUniqueId()) {
+							if (en instanceof Player enPlayer && enPlayer.getGameMode() != GameMode.SPECTATOR && en.getUniqueId() != mPlayer.getUniqueId()) {
 								Player newP = EntityUtils.getNearestPlayer(en.getLocation(), 1.5);
 								// Don't count if the caster is the closest, can't do a self-heal
 								if (newP != null && newP.getUniqueId() != mPlayer.getUniqueId()) {
@@ -154,15 +153,14 @@ public class HallowedBeam extends MultipleChargeAbility {
 							world.spawnParticle(Particle.SPELL_INSTANT, pe.getLocation(), 500, 2.5, 0.15f, 2.5, 1);
 							world.spawnParticle(Particle.VILLAGER_HAPPY, pe.getLocation(), 150, 2.55, 0.15f, 2.5, 1);
 							world.playSound(player.getEyeLocation(), Sound.ITEM_HONEY_BOTTLE_DRINK, 2, 1.5f);
-							AttributeInstance maxHealth = pe.getAttribute(Attribute.GENERIC_MAX_HEALTH);
-							if (maxHealth != null) {
-								PlayerUtils.healPlayer(pe, maxHealth.getValue() * HALLOWED_HEAL_PERCENT);
-							}
+
+							PlayerUtils.healPlayer(mPlugin, pe, EntityUtils.getMaxHealth(pe) * HALLOWED_HEAL_PERCENT, mPlayer);
+
 							if (getAbilityScore() == 2) {
 								mPlugin.mEffectManager.addEffect(pe, PERCENT_DAMAGE_RESIST_EFFECT_NAME, new PercentDamageReceived(HALLOWED_DAMAGE_REDUCTION_DURATION, HALLOWED_DAMAGE_REDUCTION_PERCENT));
 							}
 							for (LivingEntity le : EntityUtils.getNearbyMobs(eLoc, HALLOWED_RADIUS)) {
-								MovementUtils.knockAway(pe, le, 0.65f);
+								MovementUtils.knockAway(pe, le, 0.65f, true);
 							}
 
 						} else if (Crusade.enemyTriggersAbilities(applyE, mCrusade)) {
@@ -184,10 +182,9 @@ public class HallowedBeam extends MultipleChargeAbility {
 								}
 							}
 
-							//Applies damage based on Projectile Damage attribute, Focus, Enchantments, Proj Damage Effects, AP, and Crusade
-							double damage = EntityUtils.getProjSkillDamage(mPlayer, mPlugin, true, applyE.getLocation());
+							double damage = ItemStatUtils.getAttributeAmount(player.getInventory().getItemInMainHand(), ItemStatUtils.AttributeType.PROJECTILE_DAMAGE_ADD, ItemStatUtils.Operation.ADD, ItemStatUtils.Slot.MAINHAND);
 
-							EntityUtils.damageEntity(mPlugin, applyE, damage, mPlayer, MagicType.HOLY, true, mInfo.mLinkedSpell, false, false, true, false);
+							DamageUtils.damage(mPlayer, applyE, DamageType.PROJECTILE, damage, mInfo.mLinkedSpell);
 
 							Location eLoc = applyE.getLocation().add(0, applyE.getHeight() / 2, 0);
 							world.spawnParticle(Particle.SPIT, eLoc, 40, 0, 0, 0, 0.25f);
@@ -196,8 +193,8 @@ public class HallowedBeam extends MultipleChargeAbility {
 							//Shatter if durability is 0 and isn't shattered.
 							//This is needed because Hallowed doesn't consume durability, but there is a high-damage uncommon bow
 							//with 0 durability that should not be infinitely usable.
-							if (damageable.getDamage() >= inMainHand.getType().getMaxDurability() && !ItemUtils.isItemShattered(inMainHand)) {
-								ItemUtils.shatterItem(inMainHand);
+							if (damageable.getDamage() >= inMainHand.getType().getMaxDurability() && !ItemStatUtils.isShattered(inMainHand)) {
+								ItemStatUtils.shatter(inMainHand);
 							}
 						} else if (EntityUtils.isHostileMob(applyE)) {
 							if (mMode == 1) {
@@ -239,12 +236,10 @@ public class HallowedBeam extends MultipleChargeAbility {
 	}
 
 	@Override
-	public boolean livingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
-		if (event.getCause().equals(DamageCause.ENTITY_ATTACK)) {
+	public void onDamage(DamageEvent event, LivingEntity enemy) {
+		if (event.getType() == DamageType.MELEE) {
 			cast(Action.LEFT_CLICK_AIR);
 		}
-
-		return true;
 	}
 
 	@Override

@@ -1,5 +1,9 @@
 package com.playmonumenta.plugins.listeners;
 
+import com.playmonumenta.plugins.utils.ItemStatUtils;
+import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.ScoreboardUtils;
+import com.playmonumenta.plugins.utils.ZoneUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
@@ -17,10 +21,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BlockStateMeta;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-import com.playmonumenta.plugins.utils.ItemUtils;
-import com.playmonumenta.plugins.utils.ScoreboardUtils;
-import com.playmonumenta.plugins.utils.ZoneUtils;
-
 public class PortableEnderListener implements Listener {
 	private static final String LOCK_STRING = "PortableEnder";
 
@@ -32,7 +32,7 @@ public class PortableEnderListener implements Listener {
 			// An item was right-clicked
 			ItemStack item = event.getCurrentItem();
 			if (isPortableEnder(item) &&
-					!ItemUtils.isItemShattered(item)) {
+					!ItemStatUtils.isShattered(item)) {
 				// The clicked item is a portable ender chest, and is not shattered
 				event.setCancelled(true);
 				if (ZoneUtils.hasZoneProperty(player, ZoneUtils.ZoneProperty.NO_PORTABLE_STORAGE)) {

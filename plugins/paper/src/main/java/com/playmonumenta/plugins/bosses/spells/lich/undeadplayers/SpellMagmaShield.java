@@ -1,5 +1,13 @@
 package com.playmonumenta.plugins.bosses.spells.lich.undeadplayers;
 
+import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.player.PartialParticle;
+import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.MovementUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.utils.VectorUtils;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -12,14 +20,6 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
-
-import com.playmonumenta.plugins.bosses.spells.Spell;
-import com.playmonumenta.plugins.player.PartialParticle;
-import com.playmonumenta.plugins.utils.BossUtils;
-import com.playmonumenta.plugins.utils.FastUtils;
-import com.playmonumenta.plugins.utils.MovementUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.plugins.utils.VectorUtils;
 
 /*
 Undead Mage - Casts Magma shield every 10 second(s) dealing 30 damage in
@@ -65,8 +65,8 @@ public class SpellMagmaShield extends Spell {
 					for (Player p : PlayerUtils.playersInRange(mBoss.getLocation(), 6, true)) {
 						Vector toMobVector = p.getLocation().toVector().subtract(mBoss.getLocation().toVector()).setY(0).normalize();
 						if (playerDir.dot(toMobVector) > 0.33) {
-							MovementUtils.knockAway(mBoss, p, 0.5f);
-							BossUtils.bossDamage(mBoss, p, 30, mBoss.getLocation(), "Magma Shield");
+							MovementUtils.knockAway(mBoss, p, 0.5f, false);
+							BossUtils.blockableDamage(mBoss, p, DamageType.MAGIC, 25, "Magma Shield", mBoss.getLocation());
 							p.setFireTicks(20 * 5);
 						}
 					}

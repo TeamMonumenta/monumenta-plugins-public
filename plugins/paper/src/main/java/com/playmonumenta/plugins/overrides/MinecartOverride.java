@@ -1,14 +1,13 @@
 package com.playmonumenta.plugins.overrides;
 
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.utils.LocationUtils;
 import org.bukkit.FluidCollisionMode;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
 import org.bukkit.inventory.ItemStack;
 import org.checkerframework.checker.nullness.qual.Nullable;
-
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.utils.LocationUtils;
 
 public class MinecartOverride extends BaseOverride {
 	@Override

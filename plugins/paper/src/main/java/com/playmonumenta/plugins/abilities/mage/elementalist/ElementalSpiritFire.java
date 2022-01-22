@@ -1,10 +1,21 @@
 package com.playmonumenta.plugins.abilities.mage.elementalist;
 
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
-
+import com.playmonumenta.plugins.Constants;
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.abilities.AbilityManager;
+import com.playmonumenta.plugins.abilities.mage.ElementalArrows;
+import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.integrations.PremiumVanishIntegration;
+import com.playmonumenta.plugins.itemstats.attributes.SpellPower;
+import com.playmonumenta.plugins.player.PartialParticle;
+import com.playmonumenta.plugins.utils.DamageUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.LocationUtils;
+import com.playmonumenta.plugins.utils.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -20,21 +31,10 @@ import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-import com.playmonumenta.plugins.Constants;
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.abilities.AbilityManager;
-import com.playmonumenta.plugins.abilities.mage.ElementalArrows;
-import com.playmonumenta.plugins.classes.ClassAbility;
-import com.playmonumenta.plugins.classes.magic.MagicType;
-import com.playmonumenta.plugins.enchantments.abilities.SpellPower;
-import com.playmonumenta.plugins.events.CustomDamageEvent;
-import com.playmonumenta.plugins.integrations.PremiumVanishIntegration;
-import com.playmonumenta.plugins.player.PartialParticle;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.FastUtils;
-import com.playmonumenta.plugins.utils.LocationUtils;
-import com.playmonumenta.plugins.utils.StringUtils;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
 
 
 public class ElementalSpiritFire extends Ability {
@@ -64,7 +64,7 @@ public class ElementalSpiritFire extends Ability {
 		mInfo.mShorthandName = "ES";
 		mInfo.mDescriptions.add(
 			String.format(
-				"Two spirits accompany you - one of fire and one of ice. The next moment after you deal fire damage, the fire spirit instantly dashes from you towards the farthest enemy that spell hit, dealing %s fire damage to all enemies in a %s-block cube around it along its path. The next moment after you deal ice damage, the ice spirit warps to the closest enemy that spell hit and induces an extreme local climate, dealing %s ice damage to all enemies in a %s-block cube around it every second for %ss. If the spell was %s, the fire spirit does an additional %s%% of the bow's original damage, and for the ice spirit, an additional %s%%. The spirits' damage ignores iframes. Independent cooldown: %ss.",
+				"Two spirits accompany you - one of fire and one of ice. The next moment after you deal fire damage, the fire spirit instantly dashes from you towards the farthest enemy that spell hit, dealing %s magic damage to all enemies in a %s-block cube around it along its path. The next moment after you deal ice damage, the ice spirit warps to the closest enemy that spell hit and induces an extreme local climate, dealing %s magic damage to all enemies in a %s-block cube around it every second for %ss. If the spell was %s, the fire spirit does an additional %s%% of the bow's original damage, and for the ice spirit, an additional %s%%. The spirits' damage ignores iframes. Independent cooldown: %ss.",
 				DAMAGE_1,
 				HITBOX,
 				ElementalSpiritIce.DAMAGE_1,
@@ -106,12 +106,10 @@ public class ElementalSpiritFire extends Ability {
 	}
 
 	@Override
-	public void playerDealtCustomDamageEvent(CustomDamageEvent event) {
-		if (
-			MagicType.FIRE.equals(event.getMagicType())
-			&& !ABILITY.equals(event.getSpell())
-		) {
-			mEnemiesAffected.add(event.getDamaged());
+	public void onDamage(DamageEvent event, LivingEntity enemy) {
+		if ((event.getAbility() == ClassAbility.ELEMENTAL_ARROWS_FIRE || event.getAbility() == ClassAbility.STARFALL || event.getAbility() == ClassAbility.MAGMA_SHIELD)
+				&& !ABILITY.equals(event.getAbility())) {
+			mEnemiesAffected.add(event.getDamagee());
 			// 1 runnable processes everything 1 tick later, so all enemies to affect are in
 			if (mEnemiesAffectedProcessor == null) {
 				mEnemiesAffectedProcessor = new BukkitRunnable() {
@@ -148,7 +146,7 @@ public class ElementalSpiritFire extends Ability {
 							double increment = 0.2;
 
 							List<LivingEntity> potentialTargets = EntityUtils.getNearbyMobs(playerLocation, maxDistance + HITBOX);
-							float spellDamage = SpellPower.getSpellDamage(mPlayer, mLevelDamage);
+							float spellDamage = SpellPower.getSpellDamage(mPlugin, mPlayer, mLevelDamage);
 							Vector vectorIncrement = vector.normalize().multiply(increment);
 
 							// Fire spirit sound
@@ -163,13 +161,13 @@ public class ElementalSpiritFire extends Ability {
 									if (potentialTarget.getBoundingBox().overlaps(movingSpiritBox)) {
 										float finalDamage = spellDamage;
 										if (
-											ClassAbility.ELEMENTAL_ARROWS.equals(event.getSpell())
+											ClassAbility.ELEMENTAL_ARROWS_FIRE.equals(event.getAbility())
 											&& mElementalArrows != null
 										) {
 											finalDamage += mElementalArrows.getLastDamage() * mLevelBowMultiplier;
 										}
 
-										EntityUtils.damageEntity(mPlugin, potentialTarget, finalDamage, mPlayer, MagicType.FIRE, true, ABILITY, true, true, true);
+										DamageUtils.damage(mPlayer, potentialTarget, DamageType.MAGIC, finalDamage, ABILITY, true);
 										iterator.remove();
 									}
 								}

@@ -1,11 +1,9 @@
 package com.playmonumenta.plugins.bosses.spells;
 
-import org.bukkit.Location;
-
-import org.bukkit.entity.LivingEntity;
-
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import org.bukkit.Location;
+import org.bukkit.entity.LivingEntity;
 
 public class SpellLandSlow extends Spell {
 

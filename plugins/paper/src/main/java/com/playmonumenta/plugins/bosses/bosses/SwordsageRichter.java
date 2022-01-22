@@ -17,7 +17,6 @@ import org.bukkit.boss.BarStyle;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -33,6 +32,8 @@ import com.playmonumenta.plugins.bosses.spells.SpellBladeDance;
 import com.playmonumenta.plugins.bosses.spells.SpellConditionalTeleport;
 import com.playmonumenta.plugins.bosses.spells.SpellProjectileDeflection;
 import com.playmonumenta.plugins.bosses.spells.SpellWindWalk;
+import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
@@ -94,7 +95,7 @@ public final class SwordsageRichter extends BossAbilityGroup {
 
 			                  (Player player, Location loc, boolean blocked) -> {
 			                      if (!blocked) {
-			                          BossUtils.bossDamage(mBoss, player, 15);
+			                          BossUtils.blockableDamage(mBoss, player, DamageType.PROJECTILE, 15);
 			                          player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 6, 1));
 			                          player.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, 20 * 6, 0));
 			                      }
@@ -209,8 +210,8 @@ public final class SwordsageRichter extends BossAbilityGroup {
 	}
 
 	@Override
-	public void bossDamagedByEntity(EntityDamageByEntityEvent event) {
-		if (mBoss.getHealth() - event.getFinalDamage() <= 0) {
+	public void onHurt(DamageEvent event) {
+		if (mBoss.getHealth() - event.getDamage() <= 0) {
 			event.setCancelled(true);
 			event.setDamage(0);
 		}
@@ -279,7 +280,7 @@ public final class SwordsageRichter extends BossAbilityGroup {
 		world.playSound(mBoss.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 2, 1);
 		world.playSound(mBoss.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 2, 0.5f);
 		for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), r, true)) {
-			MovementUtils.knockAway(mBoss.getLocation(), player, 0.45f);
+			MovementUtils.knockAway(mBoss.getLocation(), player, 0.45f, false);
 		}
 		new BukkitRunnable() {
 			double mRotation = 0;

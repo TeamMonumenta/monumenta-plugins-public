@@ -1,10 +1,19 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
+import com.playmonumenta.plugins.bosses.BossBarManager;
+import com.playmonumenta.plugins.bosses.BossBarManager.BossHealthAction;
+import com.playmonumenta.plugins.bosses.SpellManager;
+import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.bosses.spells.SpellBlockBreak;
+import com.playmonumenta.plugins.bosses.spells.SpellShieldStun;
+import com.playmonumenta.plugins.bosses.spells.sealedremorse.BlackflameBurst;
+import com.playmonumenta.plugins.bosses.spells.sealedremorse.BlackflameCharge;
+import com.playmonumenta.plugins.bosses.spells.sealedremorse.BlackflameGolemNecromancy;
+import com.playmonumenta.plugins.bosses.spells.sealedremorse.BlackflameOrb;
+import com.playmonumenta.plugins.bosses.spells.sealedremorse.PassiveVoidRift;
+import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.utils.SerializationUtils;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -18,8 +27,6 @@ import org.bukkit.boss.BarStyle;
 import org.bukkit.entity.Creature;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
@@ -27,21 +34,10 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
-import com.playmonumenta.plugins.bosses.BossBarManager;
-import com.playmonumenta.plugins.bosses.BossBarManager.BossHealthAction;
-import com.playmonumenta.plugins.bosses.SpellManager;
-import com.playmonumenta.plugins.bosses.spells.Spell;
-import com.playmonumenta.plugins.bosses.spells.SpellBlockBreak;
-import com.playmonumenta.plugins.bosses.spells.SpellPurgeNegatives;
-import com.playmonumenta.plugins.bosses.spells.sealedremorse.BlackflameBurst;
-import com.playmonumenta.plugins.bosses.spells.sealedremorse.BlackflameCharge;
-import com.playmonumenta.plugins.bosses.spells.sealedremorse.BlackflameGolemNecromancy;
-import com.playmonumenta.plugins.bosses.spells.sealedremorse.BlackflameOrb;
-import com.playmonumenta.plugins.bosses.spells.sealedremorse.PassiveVoidRift;
-import com.playmonumenta.plugins.utils.BossUtils;
-import com.playmonumenta.plugins.utils.NmsUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.plugins.utils.SerializationUtils;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public final class BeastOfTheBlackFlame extends BossAbilityGroup {
 
@@ -90,15 +86,15 @@ public final class BeastOfTheBlackFlame extends BossAbilityGroup {
 
 
 		List<Spell> passiveNormalSpells = Arrays.asList(
-				new SpellPurgeNegatives(boss, 20 * 3),
-				new SpellBlockBreak(boss, 2, 3, 2)
+				new SpellBlockBreak(boss, 2, 3, 2),
+				new SpellShieldStun(6 * 20)
 			);
 
 		//Under 50%, adds passive
 		List<Spell> lowHealthPassives = Arrays.asList(
-				new SpellPurgeNegatives(boss, 20 * 3),
 				new SpellBlockBreak(boss, 2, 3, 2),
-				new PassiveVoidRift(boss, plugin, 20 * 9)
+				new PassiveVoidRift(boss, plugin, 20 * 9),
+				new SpellShieldStun(6 * 20)
 			);
 
 		Map<Integer, BossHealthAction> events = new HashMap<Integer, BossHealthAction>();
@@ -131,11 +127,11 @@ public final class BeastOfTheBlackFlame extends BossAbilityGroup {
 					teleport(mSpawnLoc);
 				}
 
-				//If player too far from arena center or below 4 blocks or too high and either moving very slowly or is on a block, damage them
+				//If player too far from arena center or below 4 blocks or too high and is on a block, damage them
 				for (Player p : PlayerUtils.playersInRange(mSpawnLoc, detectionRange, true)) {
 					if ((mSpawnLoc.distance(p.getLocation()) > 22
 							|| mSpawnLoc.getY() - p.getLocation().getY() >= 3
-							|| (mSpawnLoc.getY() - p.getLocation().getY() <= -3 && (p.getVelocity().getY() <= 0.1 || p.isOnGround())))
+							|| (mSpawnLoc.getY() - p.getLocation().getY() <= -3 && p.isOnGround()))
 							&& p.getGameMode() != GameMode.CREATIVE) {
 						Vector vel = p.getVelocity();
 						BossUtils.bossDamagePercent(mBoss, p, 0.1);
@@ -236,16 +232,6 @@ public final class BeastOfTheBlackFlame extends BossAbilityGroup {
 	}
 
 	@Override
-	public void bossDamagedEntity(EntityDamageByEntityEvent event) {
-		if (event.getEntity() instanceof Player player && event.getCause().equals(DamageCause.ENTITY_ATTACK)) {
-			if (player.isBlocking()) {
-				NmsUtils.stunShield(player, 20 * 6);
-			}
-		}
-	}
-
-
-	@Override
 	public void death(EntityDeathEvent event) {
 
 		mEndLoc.getBlock().setType(Material.REDSTONE_BLOCK);
@@ -313,7 +299,7 @@ public final class BeastOfTheBlackFlame extends BossAbilityGroup {
 			noDamageTicksTake = 5;
 		}
 		mBoss.setMaximumNoDamageTicks(mBoss.getMaximumNoDamageTicks() - noDamageTicksTake);
-		bossTargetHp = (int) (BASE_HEALTH * (1 + (1 - 1/Math.E) * Math.log(playerCount)));
+		bossTargetHp = (int) (BASE_HEALTH * (1 + (1 - 1/Math.E) * Math.log(playerCount)) * 1.1);
 		mBoss.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(bossTargetHp);
 		mBoss.getAttribute(Attribute.GENERIC_FOLLOW_RANGE).setBaseValue(detectionRange);
 		mBoss.getAttribute(Attribute.GENERIC_KNOCKBACK_RESISTANCE).setBaseValue(1);

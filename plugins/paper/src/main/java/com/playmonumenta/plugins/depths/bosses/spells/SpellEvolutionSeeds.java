@@ -1,17 +1,16 @@
 package com.playmonumenta.plugins.depths.bosses.spells;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
+import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.plugin.Plugin;
 
-import com.playmonumenta.plugins.bosses.spells.Spell;
-import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 public class SpellEvolutionSeeds extends Spell {
 

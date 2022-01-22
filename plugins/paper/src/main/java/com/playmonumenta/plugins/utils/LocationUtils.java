@@ -1,8 +1,8 @@
 package com.playmonumenta.plugins.utils;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+import com.playmonumenta.plugins.Plugin;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -36,9 +36,8 @@ import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
-import com.playmonumenta.plugins.Plugin;
+import java.util.ArrayList;
+import java.util.List;
 
 public class LocationUtils {
 	public static Vector getVectorTo(Location to, Location from) {

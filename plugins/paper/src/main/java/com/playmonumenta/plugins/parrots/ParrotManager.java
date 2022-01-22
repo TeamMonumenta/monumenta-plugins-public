@@ -7,6 +7,10 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
+import com.google.common.collect.ImmutableList;
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.utils.ScoreboardUtils;
+
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.entity.Entity;
@@ -23,10 +27,6 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerToggleFlightEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.checkerframework.checker.nullness.qual.Nullable;
-
-import com.google.common.collect.ImmutableList;
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.utils.ScoreboardUtils;
 
 public class ParrotManager implements Listener {
 

@@ -1,18 +1,16 @@
 package com.playmonumenta.plugins.commands;
 
-import java.util.Arrays;
-import java.util.List;
-
+import com.playmonumenta.plugins.Constants.NotePitches;
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.utils.ScoreboardUtils;
+import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
 import org.bukkit.Sound;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.metadata.FixedMetadataValue;
 
-import com.playmonumenta.plugins.Constants.NotePitches;
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.utils.ScoreboardUtils;
-
-import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
+import java.util.Arrays;
+import java.util.List;
 
 public class JingleBells extends GenericCommand {
 	public static final String OBJECTIVE = "JingleBells";

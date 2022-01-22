@@ -1,8 +1,9 @@
 package com.playmonumenta.plugins.bosses.spells;
 
-import java.util.List;
-import java.util.function.Predicate;
-
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.LocationUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -14,10 +15,8 @@ import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.FastUtils;
-import com.playmonumenta.plugins.utils.LocationUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
+import java.util.List;
+import java.util.function.Predicate;
 
 /**
  * This is the base spell for a bolt spell.
@@ -134,7 +133,7 @@ public class SpellBaseBolt extends Spell {
 					mTicks++;
 					mTickAction.run(mCaster, mTicks);
 
-					if (mCaster == null || mCaster.isDead() || EntityUtils.isStunned(mCaster) || EntityUtils.isSilenced(mCaster) || EntityUtils.isConfused(mCaster)) {
+					if (mCaster == null || mCaster.isDead() || EntityUtils.isStunned(mCaster) || EntityUtils.isSilenced(mCaster)) {
 						this.cancel();
 						return;
 					}

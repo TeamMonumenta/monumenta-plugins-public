@@ -1,7 +1,12 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
-import java.util.Arrays;
-
+import com.playmonumenta.plugins.bosses.SpellManager;
+import com.playmonumenta.plugins.bosses.spells.SpellBaseSeekingProjectile;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.MovementUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.utils.PotionUtils;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -13,12 +18,7 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.BoundingBox;
 
-import com.playmonumenta.plugins.bosses.SpellManager;
-import com.playmonumenta.plugins.bosses.spells.SpellBaseSeekingProjectile;
-import com.playmonumenta.plugins.utils.BossUtils;
-import com.playmonumenta.plugins.utils.MovementUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.plugins.utils.PotionUtils;
+import java.util.Arrays;
 
 public class KineticProjectileBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_kineticprojectile";
@@ -35,7 +35,7 @@ public class KineticProjectileBoss extends BossAbilityGroup {
 	private static final double HITBOX_LENGTH = 1.25;
 	private static final boolean COLLIDES_WITH_BLOCKS = true;
 	private static final boolean LINGERS = true;
-	private static final int DAMAGE = 24;
+	private static final int DAMAGE = 20;
 	private static final double RADIUS = 2.5;
 	private static final float KNOCKBACK_SPEED = 0.5f;
 
@@ -72,10 +72,10 @@ public class KineticProjectileBoss extends BossAbilityGroup {
 
 						for (Player p : PlayerUtils.playersInRange(loc, RADIUS * 3, true)) {
 							if (hitbox.overlaps(p.getBoundingBox())) {
-								BossUtils.bossDamage(boss, p, DAMAGE);
+								BossUtils.blockableDamage(boss, p, DamageType.MAGIC, DAMAGE);
 
 								if (!p.equals(target)) {
-									MovementUtils.knockAway(loc, p, KNOCKBACK_SPEED);
+									MovementUtils.knockAway(loc, p, KNOCKBACK_SPEED, false);
 								}
 							}
 						}

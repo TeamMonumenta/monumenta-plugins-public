@@ -1,9 +1,5 @@
 package com.playmonumenta.plugins.abilities.other;
 
-import org.bukkit.Particle;
-import org.bukkit.entity.Player;
-import org.checkerframework.checker.nullness.qual.Nullable;
-
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
@@ -12,6 +8,9 @@ import com.playmonumenta.plugins.player.PartialParticle;
 import com.playmonumenta.plugins.player.PlayerData;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
+import org.bukkit.Particle;
+import org.bukkit.entity.Player;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 
 public abstract class PatronParticles extends Ability {

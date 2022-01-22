@@ -1,20 +1,5 @@
 package com.playmonumenta.plugins.abilities.rogue.assassin;
 
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
-import org.bukkit.World;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
-import org.bukkit.entity.Projectile;
-import org.bukkit.event.block.Action;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
-import org.bukkit.event.entity.EntityDeathEvent;
-import org.bukkit.inventory.ItemStack;
-import org.checkerframework.checker.nullness.qual.Nullable;
-
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
@@ -22,16 +7,30 @@ import com.playmonumenta.plugins.abilities.AbilityWithChargesOrStacks;
 import com.playmonumenta.plugins.abilities.KillTriggeredAbilityTracker;
 import com.playmonumenta.plugins.abilities.KillTriggeredAbilityTracker.KillTriggeredAbility;
 import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.network.ClientModHandler;
 import com.playmonumenta.plugins.utils.AbilityUtils;
+import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
+import org.bukkit.World;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
+import org.bukkit.event.block.Action;
+import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.inventory.ItemStack;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class CloakAndDagger extends Ability implements KillTriggeredAbility, AbilityWithChargesOrStacks {
 
-	private static final double CLOAK_1_DAMAGE_MULTIPLIER = 1.5;
-	private static final double CLOAK_2_DAMAGE_MULTIPLIER = 2.5;
+	private static final double CLOAK_1_DAMAGE_MULTIPLIER = 1.25;
+	private static final double CLOAK_2_DAMAGE_MULTIPLIER = 1.75;
 	private static final int CLOAK_1_MAX_STACKS = 8;
 	private static final int CLOAK_2_MAX_STACKS = 12;
 	private static final int CLOAK_MIN_STACKS = 5;
@@ -51,8 +50,8 @@ public class CloakAndDagger extends Ability implements KillTriggeredAbility, Abi
 		super(plugin, player, "Cloak and Dagger");
 		mInfo.mScoreboardId = "CloakAndDagger";
 		mInfo.mShorthandName = "CnD";
-		mInfo.mDescriptions.add("When you kill an enemy you gain a stack of cloak. Elite kills and Boss \"kills\" give you five stacks. Stacks are capped at 8. When you sneak left click while looking up with dual wielded swords, you lose your cloak stacks and gain X seconds of Stealth and (1.5)(X) extra damage on your next stealth attack, where X is the number of stacks you had at activation. You must have at least 5 stacks to activate this.");
-		mInfo.mDescriptions.add("Cloak stacks are now capped at 12 and bonus damage is increased to (2.5)(X) where X is the number of stacks you have upon activating this skill.");
+		mInfo.mDescriptions.add("When you kill an enemy you gain a stack of cloak. Elite kills and Boss \"kills\" give you five stacks. Stacks are capped at 8. When you sneak left click while looking up with dual wielded swords, you lose your cloak stacks and gain X seconds of Stealth and (1.25)(X) extra damage on your next stealth attack, where X is the number of stacks you had at activation. You must have at least 5 stacks to activate this.");
+		mInfo.mDescriptions.add("Cloak stacks are now capped at 12 and bonus damage is increased to (1.75)(X) where X is the number of stacks you have upon activating this skill.");
 		mInfo.mLinkedSpell = ClassAbility.CLOAK_AND_DAGGER;
 		mInfo.mCooldown = 0;
 		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;
@@ -67,7 +66,7 @@ public class CloakAndDagger extends Ability implements KillTriggeredAbility, Abi
 		if (mPlayer != null
 				&& !AbilityUtils.isStealthed(mPlayer) && mCloak >= CLOAK_MIN_STACKS
 				&& mPlayer.isSneaking() && mPlayer.getLocation().getPitch() < -50
-				&& InventoryUtils.rogueTriggerCheck(mPlayer.getInventory().getItemInMainHand(), mPlayer.getInventory().getItemInOffHand())) {
+				&& InventoryUtils.rogueTriggerCheck(mPlugin, mPlayer)) {
 			mCloakOnActivation = mCloak;
 			mCloak = 0;
 			mActive = true;
@@ -82,21 +81,21 @@ public class CloakAndDagger extends Ability implements KillTriggeredAbility, Abi
 	}
 
 	@Override
-	public boolean onStealthAttack(EntityDamageByEntityEvent event) {
-		if (mPlayer != null && event.getCause() == DamageCause.ENTITY_ATTACK && mActive) {
+	public void onDamage(DamageEvent event, LivingEntity enemy) {
+		mTracker.updateDamageDealtToBosses(event);
+		if (AbilityUtils.isStealthed(mPlayer) && (event.getType() == DamageType.MELEE || event.getType() == DamageType.MELEE_SKILL || event.getType() == DamageType.MELEE_ENCH) && mActive) {
 			AbilityUtils.removeStealth(mPlugin, mPlayer, false);
-			if (InventoryUtils.rogueTriggerCheck(mPlayer.getInventory().getItemInMainHand(), mPlayer.getInventory().getItemInOffHand())) {
-				LivingEntity damagee = (LivingEntity) event.getEntity();
+			if (InventoryUtils.rogueTriggerCheck(mPlugin, mPlayer)) {
+				LivingEntity damagee = enemy;
 				double eliteScaling = 1.0;
 				if (EntityUtils.isElite(damagee)) {
 					eliteScaling = PASSIVE_DAMAGE_ELITE_MODIFIER;
 				} else if (EntityUtils.isBoss(damagee)) {
 					eliteScaling = PASSIVE_DAMAGE_BOSS_MODIFIER;
 				}
-				event.setDamage(event.getDamage() + (mCloakOnActivation * mDamageMultiplier) * eliteScaling);
+				DamageUtils.damage(mPlayer, damagee, DamageType.MELEE_SKILL, (mCloakOnActivation * mDamageMultiplier) * eliteScaling, mInfo.mLinkedSpell, true);
 
-				Location loc = event.getEntity().getLocation();
-
+				Location loc = enemy.getLocation();
 				World world = mPlayer.getWorld();
 				world.playSound(loc, Sound.ENTITY_IRON_GOLEM_DEATH, 1f, 2f);
 				world.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_STRONG, 1f, 0.5f);
@@ -105,20 +104,6 @@ public class CloakAndDagger extends Ability implements KillTriggeredAbility, Abi
 
 			mActive = false;
 		}
-
-		return true;
-	}
-
-	@Override
-	public boolean livingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
-		mTracker.updateDamageDealtToBosses(event);
-		return true;
-	}
-
-	@Override
-	public boolean livingEntityShotByPlayerEvent(Projectile proj, LivingEntity damagee, EntityDamageByEntityEvent event) {
-		mTracker.updateDamageDealtToBosses(event);
-		return true;
 	}
 
 	@Override

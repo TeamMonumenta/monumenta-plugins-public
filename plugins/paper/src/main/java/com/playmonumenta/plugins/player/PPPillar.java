@@ -2,10 +2,8 @@ package com.playmonumenta.plugins.player;
 
 import com.destroystokyo.paper.ParticleBuilder;
 import com.playmonumenta.plugins.utils.FastUtils;
-
 import org.bukkit.Location;
 import org.bukkit.Particle;
-
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 

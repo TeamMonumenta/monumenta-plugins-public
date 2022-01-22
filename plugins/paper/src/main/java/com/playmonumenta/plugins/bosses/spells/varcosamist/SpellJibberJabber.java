@@ -1,11 +1,10 @@
 package com.playmonumenta.plugins.bosses.spells.varcosamist;
 
-import org.bukkit.Location;
-import org.bukkit.entity.LivingEntity;
-
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
+import org.bukkit.Location;
+import org.bukkit.entity.LivingEntity;
 
 public class SpellJibberJabber extends Spell {
 	private String[] mSpeak;

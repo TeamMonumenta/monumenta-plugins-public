@@ -1,8 +1,9 @@
 package com.playmonumenta.plugins.bosses.spells;
 
-import java.util.Collections;
-import java.util.List;
-
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.LocationUtils;
+import com.playmonumenta.plugins.utils.LocationUtils.TravelAction;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
@@ -13,10 +14,8 @@ import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.LocationUtils;
-import com.playmonumenta.plugins.utils.LocationUtils.TravelAction;
-import com.playmonumenta.plugins.utils.PlayerUtils;
+import java.util.Collections;
+import java.util.List;
 
 public class SpellBaseLaser extends Spell {
 	private static final double BOX_SIZE = 0.5;
@@ -227,7 +226,7 @@ public class SpellBaseLaser extends Spell {
 					mParticleChance
 				);
 
-				if ((mStopWhenBlocked && blocked) || EntityUtils.isStunned(mBoss) || EntityUtils.isSilenced(mBoss) || EntityUtils.isConfused(mBoss)) {
+				if ((mStopWhenBlocked && blocked) || EntityUtils.isStunned(mBoss) || EntityUtils.isSilenced(mBoss)) {
 					mBoss.setAI(true);
 
 					this.cancel();

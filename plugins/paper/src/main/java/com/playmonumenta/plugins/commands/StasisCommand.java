@@ -1,9 +1,8 @@
 package com.playmonumenta.plugins.commands;
 
-import org.bukkit.entity.Player;
-
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.effects.Stasis;
+import org.bukkit.entity.Player;
 
 public class StasisCommand extends GenericCommand {
 

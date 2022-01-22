@@ -1,20 +1,16 @@
 package com.playmonumenta.plugins.depths.abilities.shadow;
 
-import org.bukkit.Material;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
-import org.bukkit.entity.Projectile;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
-import com.playmonumenta.plugins.events.CustomDamageEvent;
+import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.utils.EntityUtils;
-
 import net.md_5.bungee.api.ChatColor;
+import org.bukkit.Material;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
 
 public class Dethroner extends DepthsAbility {
 
@@ -29,32 +25,10 @@ public class Dethroner extends DepthsAbility {
 	}
 
 	@Override
-	public boolean livingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
-		if (EntityUtils.isBoss(event.getEntity())) {
+	public void onDamage(DamageEvent event, LivingEntity enemy) {
+		if (EntityUtils.isBoss(enemy)) {
 			event.setDamage(event.getDamage() * BOSS_DAMAGE[mRarity - 1]);
-		} else if (EntityUtils.isElite(event.getEntity())) {
-			event.setDamage(event.getDamage() * ELITE_DAMAGE[mRarity - 1]);
-		}
-
-		return true;
-	}
-
-	@Override
-	public boolean livingEntityShotByPlayerEvent(Projectile proj, LivingEntity damagee, EntityDamageByEntityEvent event) {
-		if (EntityUtils.isBoss(event.getEntity())) {
-			event.setDamage(event.getDamage() * BOSS_DAMAGE[mRarity - 1]);
-		} else if (EntityUtils.isElite(event.getEntity())) {
-			event.setDamage(event.getDamage() * ELITE_DAMAGE[mRarity - 1]);
-		}
-
-		return true;
-	}
-
-	@Override
-	public void playerDealtCustomDamageEvent(CustomDamageEvent event) {
-		if (EntityUtils.isBoss(event.getDamaged())) {
-			event.setDamage(event.getDamage() * BOSS_DAMAGE[mRarity - 1]);
-		} else if (EntityUtils.isElite(event.getDamaged())) {
+		} else if (EntityUtils.isElite(enemy)) {
 			event.setDamage(event.getDamage() * ELITE_DAMAGE[mRarity - 1]);
 		}
 	}

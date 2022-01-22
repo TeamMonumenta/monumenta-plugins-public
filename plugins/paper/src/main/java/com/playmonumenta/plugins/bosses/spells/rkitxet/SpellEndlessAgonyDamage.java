@@ -8,12 +8,12 @@ import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.util.Vector;
 
 import com.playmonumenta.plugins.bosses.bosses.RKitxet;
 import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.player.PPGroundCircle;
-import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 
 public class SpellEndlessAgonyDamage extends Spell {
@@ -41,9 +41,7 @@ public class SpellEndlessAgonyDamage extends Spell {
 			if (mTicks % 10 == 0) {
 				for (Player p : PlayerUtils.playersInCylinder(loc, RADIUS, RADIUS)) {
 					if (!hitPlayers.contains(p)) {
-						Vector v = p.getVelocity();
-						BossUtils.bossDamage(mBoss, p, DAMAGE, null, "Endless Agony");
-						p.setVelocity(v);
+						DamageUtils.damage(mBoss, p, DamageType.MAGIC, DAMAGE, null, true, false, "Endless Agony");
 						hitPlayers.add(p);
 					}
 				}

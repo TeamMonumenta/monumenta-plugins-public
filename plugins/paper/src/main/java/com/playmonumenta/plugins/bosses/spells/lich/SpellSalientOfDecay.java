@@ -1,10 +1,13 @@
 package com.playmonumenta.plugins.bosses.spells.lich;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
-
+import com.playmonumenta.plugins.bosses.ChargeUpManager;
+import com.playmonumenta.plugins.bosses.bosses.Lich;
+import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.player.PartialParticle;
+import com.playmonumenta.plugins.utils.AbilityUtils;
+import com.playmonumenta.plugins.utils.DamageUtils;
+import com.playmonumenta.plugins.utils.LocationUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.Location;
@@ -22,13 +25,10 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
-import com.playmonumenta.plugins.bosses.ChargeUpManager;
-import com.playmonumenta.plugins.bosses.bosses.Lich;
-import com.playmonumenta.plugins.bosses.spells.Spell;
-import com.playmonumenta.plugins.player.PartialParticle;
-import com.playmonumenta.plugins.utils.AbilityUtils;
-import com.playmonumenta.plugins.utils.BossUtils;
-import com.playmonumenta.plugins.utils.LocationUtils;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
 
 /*
 Salient of Decay - A straight piercing line appears from the lich at ⅓  targets, after 1 second
@@ -133,7 +133,7 @@ public class SpellSalientOfDecay extends Spell {
 											int ndt = p.getNoDamageTicks();
 											p.setNoDamageTicks(0);
 											Vector velocity = p.getVelocity();
-											BossUtils.bossDamage(mBoss, p, 16, null, "Salient of Decay"); //16 dmg every sec, 6 seconds
+											DamageUtils.damage(mBoss, p, DamageType.AILMENT, 5, null, false, true, "Salient of Decay"); //16 dmg every sec, 6 seconds
 											p.setVelocity(velocity);
 											p.setNoDamageTicks(ndt);
 											if (mT >= 6 || p.isDead()) {

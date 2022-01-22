@@ -1,11 +1,15 @@
 package com.playmonumenta.plugins.bosses.spells.frostgiant;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
+import com.playmonumenta.plugins.bosses.bosses.FrostGiant;
+import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.utils.AbilityUtils;
+import com.playmonumenta.plugins.utils.DamageUtils;
+import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.LocationUtils;
+import com.playmonumenta.plugins.utils.MovementUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.utils.VectorUtils;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -22,16 +26,11 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
-import com.playmonumenta.plugins.bosses.bosses.FrostGiant;
-import com.playmonumenta.plugins.bosses.spells.Spell;
-import com.playmonumenta.plugins.utils.AbilityUtils;
-import com.playmonumenta.plugins.utils.BossUtils;
-import com.playmonumenta.plugins.utils.FastUtils;
-import com.playmonumenta.plugins.utils.LocationUtils;
-import com.playmonumenta.plugins.utils.MovementUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.plugins.utils.VectorUtils;
-
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 /*
  *
@@ -42,6 +41,7 @@ Negative Jump Boost, weakness 10, maybe putting bows on cooldown, you get the
 idea) for 2 seconds.
  */
 public class Shatter extends Spell {
+	private static final double DAMAGE = 20;
 
 	private Plugin mPlugin;
 	private LivingEntity mBoss;
@@ -184,11 +184,13 @@ public class Shatter extends Spell {
 							continue;
 						}
 
+						List<Player> hitPlayers = new ArrayList<>();
 						for (BoundingBox box : boxes) {
-							if (player.getBoundingBox().overlaps(box)) {
-								BossUtils.bossDamage(mBoss, player, 35, null, "Shatter");
+							if (player.getBoundingBox().overlaps(box) && !hitPlayers.contains(player)) {
+								DamageUtils.dualTypeDamage(mBoss, player, DamageType.BLAST, DamageType.MELEE, DAMAGE, 0.5, null, true, true, "Shatter");
 								MovementUtils.knockAway(loc, player, mKnockback, 0.5f, false);
 								AbilityUtils.silencePlayer(player, 20 * 5);
+								hitPlayers.add(player);
 							}
 						}
 					}

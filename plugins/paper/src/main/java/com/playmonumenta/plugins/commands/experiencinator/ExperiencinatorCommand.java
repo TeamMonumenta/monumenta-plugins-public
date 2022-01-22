@@ -1,20 +1,10 @@
 package com.playmonumenta.plugins.commands.experiencinator;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.function.BiConsumer;
-
-import org.bukkit.ChatColor;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
-
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.custominventories.ExperiencinatorMainGui;
 import com.playmonumenta.plugins.custominventories.ExperiencinatorSettingsGui;
 import com.playmonumenta.plugins.utils.CommandUtils;
 import com.playmonumenta.scriptedquests.managers.InteractableManager;
-
 import dev.jorel.commandapi.CommandAPI;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.arguments.BooleanArgument;
@@ -22,6 +12,14 @@ import dev.jorel.commandapi.arguments.EntitySelectorArgument;
 import dev.jorel.commandapi.arguments.LiteralArgument;
 import dev.jorel.commandapi.arguments.StringArgument;
 import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
+import org.bukkit.ChatColor;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
+
+import java.util.Collection;
+import java.util.List;
+import java.util.function.BiConsumer;
 
 public class ExperiencinatorCommand {
 

@@ -1,8 +1,10 @@
 package com.playmonumenta.plugins.bosses.spells;
 
-import java.util.Iterator;
-import java.util.List;
-
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.LocationUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -16,10 +18,8 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
-import com.playmonumenta.plugins.utils.BossUtils;
-import com.playmonumenta.plugins.utils.FastUtils;
-import com.playmonumenta.plugins.utils.LocationUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
+import java.util.Iterator;
+import java.util.List;
 
 public class SpellDuelist extends Spell {
 
@@ -108,7 +108,7 @@ public class SpellDuelist extends Spell {
 							Player player = iter.next();
 							BoundingBox box = player.getBoundingBox();
 							if (box.overlaps(hitbox1) || box.overlaps(hitbox2)) {
-								BossUtils.bossDamage(mBoss, player, mDamage);
+								BossUtils.blockableDamage(mBoss, player, DamageType.MELEE, mDamage);
 								iter.remove();
 							}
 						}
@@ -152,7 +152,7 @@ public class SpellDuelist extends Spell {
 						while (iter.hasNext()) {
 							Player player = iter.next();
 							if (player.getBoundingBox().overlaps(hitbox)) {
-								BossUtils.bossDamage(mBoss, player, mDamage);
+								BossUtils.blockableDamage(mBoss, player, DamageType.MELEE, mDamage);
 								iter.remove();
 							}
 						}
@@ -206,7 +206,7 @@ public class SpellDuelist extends Spell {
 							Player player = iter.next();
 							BoundingBox box = player.getBoundingBox();
 							if (box.overlaps(hitbox1) || box.overlaps(hitbox2)) {
-								BossUtils.bossDamage(mBoss, player, mDamage);
+								BossUtils.blockableDamage(mBoss, player, DamageType.MELEE, mDamage);
 								iter.remove();
 							}
 						}

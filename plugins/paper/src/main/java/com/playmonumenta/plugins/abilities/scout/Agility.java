@@ -1,17 +1,17 @@
 package com.playmonumenta.plugins.abilities.scout;
 
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import org.bukkit.Material;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.checkerframework.checker.nullness.qual.Nullable;
-
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 
 public class Agility extends Ability {
 
@@ -30,16 +30,14 @@ public class Agility extends Ability {
 	}
 
 	@Override
-	public boolean livingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
-		if (event.getCause() == DamageCause.ENTITY_ATTACK) {
+	public void onDamage(DamageEvent event, LivingEntity enemy) {
+		if (event.getType() == DamageType.MELEE || event.getType() == DamageType.MELEE_ENCH || event.getType() == DamageType.MELEE_SKILL) {
 			if (getAbilityScore() > 1) {
 				event.setDamage((event.getDamage() + AGILITY_BONUS_DAMAGE) * (1 + SCALING_DAMAGE));
 			} else {
 				event.setDamage(event.getDamage() + AGILITY_BONUS_DAMAGE);
 			}
 		}
-
-		return true;
 	}
 
 	@Override

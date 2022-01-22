@@ -1,12 +1,12 @@
 package com.playmonumenta.plugins.spawnzone;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.bukkit.entity.EntityType;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.checkerframework.checker.nullness.qual.Nullable;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class SpawnEffect {
 	public enum SpawnEffectType {

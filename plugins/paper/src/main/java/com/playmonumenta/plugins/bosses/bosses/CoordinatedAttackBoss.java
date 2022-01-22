@@ -1,9 +1,10 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
-
+import com.playmonumenta.plugins.abilities.delves.DelveModifier;
+import com.playmonumenta.plugins.effects.EffectManager;
+import com.playmonumenta.plugins.effects.PercentSpeed;
+import com.playmonumenta.plugins.utils.AbilityUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -17,11 +18,9 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
-import com.playmonumenta.plugins.abilities.delves.DelveModifier;
-import com.playmonumenta.plugins.effects.EffectManager;
-import com.playmonumenta.plugins.effects.PercentSpeed;
-import com.playmonumenta.plugins.utils.AbilityUtils;
-import com.playmonumenta.plugins.utils.EntityUtils;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
 
 public class CoordinatedAttackBoss extends BossAbilityGroup {
 

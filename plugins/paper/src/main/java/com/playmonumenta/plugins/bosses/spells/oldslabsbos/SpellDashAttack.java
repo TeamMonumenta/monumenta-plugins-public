@@ -1,5 +1,8 @@
 package com.playmonumenta.plugins.bosses.spells.oldslabsbos;
 
+import com.playmonumenta.plugins.bosses.spells.SpellBaseCharge;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.utils.BossUtils;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -8,9 +11,6 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-
-import com.playmonumenta.plugins.bosses.spells.SpellBaseCharge;
-import com.playmonumenta.plugins.utils.BossUtils;
 
 public class SpellDashAttack extends SpellBaseCharge {
 
@@ -40,7 +40,7 @@ public class SpellDashAttack extends SpellBaseCharge {
 		      (LivingEntity player) -> {
 		          player.getWorld().spawnParticle(Particle.BLOCK_CRACK, player.getLocation().add(0, 1, 0), 5, 0.4, 0.4, 0.4, 0.4, Material.REDSTONE_BLOCK.createBlockData());
 		          player.getWorld().spawnParticle(Particle.BLOCK_CRACK, player.getLocation().add(0, 1, 0), 12, 0.4, 0.4, 0.4, 0.4, Material.REDSTONE_WIRE.createBlockData());
-		          BossUtils.bossDamage(boss, player, damage, boss.getLocation(), "Charge");
+		          BossUtils.blockableDamage(boss, player, DamageType.MELEE, damage, "Charge", boss.getLocation());
 		      },
 		      // Attack particles
 		      (Location loc) -> {

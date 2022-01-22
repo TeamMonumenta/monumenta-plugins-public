@@ -1,19 +1,17 @@
 package com.playmonumenta.plugins.bosses.parameters;
 
+import com.playmonumenta.libraryofsouls.Soul;
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
+import dev.jorel.commandapi.Tooltip;
+import org.bukkit.Location;
+import org.bukkit.entity.Entity;
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
-import com.playmonumenta.libraryofsouls.Soul;
-
-import org.bukkit.Location;
-import org.bukkit.entity.Entity;
-
-import dev.jorel.commandapi.Tooltip;
-import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class LoSPool {
 

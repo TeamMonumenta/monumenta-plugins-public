@@ -1,8 +1,5 @@
 package com.playmonumenta.plugins.commands;
 
-import org.bukkit.Location;
-import org.bukkit.entity.Entity;
-
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.CommandPermission;
 import dev.jorel.commandapi.arguments.FunctionArgument;
@@ -10,6 +7,8 @@ import dev.jorel.commandapi.arguments.LocationArgument;
 import dev.jorel.commandapi.arguments.LocationType;
 import dev.jorel.commandapi.arguments.MultiLiteralArgument;
 import dev.jorel.commandapi.wrappers.FunctionWrapper;
+import org.bukkit.Location;
+import org.bukkit.entity.Entity;
 
 public class RunRegion extends GenericCommand {
 	private static final int REGION_POS_MASK = 0xfffffe00;

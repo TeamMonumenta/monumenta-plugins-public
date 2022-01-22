@@ -1,10 +1,14 @@
 package com.playmonumenta.plugins.listeners;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
+import com.destroystokyo.paper.event.entity.EntityRemoveFromWorldEvent;
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.commands.Grave;
+import com.playmonumenta.plugins.graves.GraveManager;
+import com.playmonumenta.plugins.utils.ItemStatUtils;
+import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.redissync.event.PlayerSaveEvent;
+import de.tr7zw.nbtapi.NBTEntity;
+import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -35,15 +39,10 @@ import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-import com.destroystokyo.paper.event.entity.EntityRemoveFromWorldEvent;
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.commands.Grave;
-import com.playmonumenta.plugins.graves.GraveManager;
-import com.playmonumenta.plugins.utils.ItemUtils;
-import com.playmonumenta.redissync.event.PlayerSaveEvent;
-
-import de.tr7zw.nbtapi.NBTEntity;
-import net.md_5.bungee.api.ChatColor;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class GraveListener implements Listener {
 	Plugin mPlugin;
@@ -171,6 +170,10 @@ public class GraveListener implements Listener {
 		Player player = event.getPlayer();
 		Item entity = event.getItemDrop();
 		ItemStack item = entity.getItemStack();
+		if (item == null) {
+			return;
+		}
+
 		ItemUtils.ItemDeathResult result = ItemUtils.getItemDeathResult(item);
 		if (!player.getScoreboardTags().contains("DisableGraves")) {
 			if (result == ItemUtils.ItemDeathResult.SHATTER || result == ItemUtils.ItemDeathResult.SHATTER_NOW
@@ -199,7 +202,7 @@ public class GraveListener implements Listener {
 	public void playerItemBreakEvent(PlayerItemBreakEvent event) {
 		// If an item breaks, attempt to shatter it
 		ItemStack item = event.getBrokenItem();
-		if (ItemUtils.isItemShattered(item) || ItemUtils.shatterItem(item)) {
+		if (ItemStatUtils.isShattered(item) || ItemStatUtils.shatter(item)) {
 			// If the item shatters, drop it on the player with instant pickup, grave item if it couldn't be picked up.
 			Player player = event.getPlayer();
 			Location location = player.getLocation();

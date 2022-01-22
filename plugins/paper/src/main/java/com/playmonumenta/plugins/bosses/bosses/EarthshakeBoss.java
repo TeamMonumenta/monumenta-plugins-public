@@ -1,13 +1,12 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
-import java.util.Arrays;
-
 import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.parameters.BossParam;
 import com.playmonumenta.plugins.bosses.spells.SpellEarthshake;
-
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.plugin.Plugin;
+
+import java.util.Arrays;
 
 public class EarthshakeBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_earthshake";
@@ -23,7 +22,7 @@ public class EarthshakeBoss extends BossAbilityGroup {
 		public int DELAY = 100;
 
 		@BossParam(help = "not written")
-		public int DAMAGE = 35;
+		public int DAMAGE = 28;
 
 		@BossParam(help = "not written")
 		public int COOLDOWN = 160;

@@ -1,9 +1,15 @@
 package com.playmonumenta.plugins.listeners;
 
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
-
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.utils.CommandUtils;
+import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.utils.ItemStatUtils;
+import com.playmonumenta.plugins.utils.ItemStatUtils.Tier;
+import com.playmonumenta.plugins.utils.ItemUtils;
+import dev.jorel.commandapi.CommandAPICommand;
+import dev.jorel.commandapi.CommandPermission;
+import dev.jorel.commandapi.arguments.LiteralArgument;
+import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.command.CommandSender;
@@ -22,16 +28,9 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.utils.CommandUtils;
-import com.playmonumenta.plugins.utils.InventoryUtils;
-import com.playmonumenta.plugins.utils.ItemUtils;
-import com.playmonumenta.plugins.utils.ItemUtils.ItemTier;
-
-import dev.jorel.commandapi.CommandAPICommand;
-import dev.jorel.commandapi.CommandPermission;
-import dev.jorel.commandapi.arguments.LiteralArgument;
-import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.UUID;
 
 public final class ItemDropListener implements Listener {
 	public static final String COMMAND = "disabledrop";
@@ -250,7 +249,7 @@ public final class ItemDropListener implements Listener {
 		if (mAllPlayers.contains(uuid)) {
 			return true;
 		} else if (mTieredPlayers.contains(uuid)) {
-			return ItemUtils.getItemTier(item) != ItemTier.UNKNOWN;
+			return ItemStatUtils.getTier(item) != Tier.NONE;
 		} else if (mLorePlayers.contains(uuid)) {
 			return ItemUtils.hasLore(item) || ItemUtils.isShulkerBox(item.getType());
 		} else if (mInterestingPlayers.contains(uuid)) {

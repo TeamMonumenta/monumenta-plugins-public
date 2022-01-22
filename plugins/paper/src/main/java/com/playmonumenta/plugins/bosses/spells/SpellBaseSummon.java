@@ -1,11 +1,6 @@
 package com.playmonumenta.plugins.bosses.spells;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
 import com.playmonumenta.plugins.utils.EntityUtils;
-
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -15,6 +10,10 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * Spawn mobs around boss locations
@@ -266,13 +265,10 @@ public class SpellBaseSummon extends Spell {
 
 
 				}.runTaskTimer(mPlugin, 0, 1);
-
-
-
 			}
 
 			index = (index + 1 >= mLocationOffsets.size() ? 0 : index + 1);
+
 		}
 	}
-
 }

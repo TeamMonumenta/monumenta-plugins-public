@@ -1,7 +1,13 @@
 package com.playmonumenta.plugins.bosses.spells.sealedremorse;
 
-import java.util.List;
-
+import com.playmonumenta.plugins.bosses.bosses.Ghalkor;
+import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.bosses.spells.SpellBaseSeekingProjectile;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.utils.PotionUtils;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -14,13 +20,7 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import com.playmonumenta.plugins.bosses.bosses.Ghalkor;
-import com.playmonumenta.plugins.bosses.spells.Spell;
-import com.playmonumenta.plugins.bosses.spells.SpellBaseSeekingProjectile;
-import com.playmonumenta.plugins.utils.BossUtils;
-import com.playmonumenta.plugins.utils.FastUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.plugins.utils.PotionUtils;
+import java.util.List;
 
 public class GhalkorFlameBolt extends Spell {
 
@@ -74,8 +74,8 @@ public class GhalkorFlameBolt extends Spell {
 					loc.getWorld().playSound(loc, Sound.ENTITY_BLAZE_DEATH, SoundCategory.HOSTILE, 1, 2);
 					loc.getWorld().spawnParticle(Particle.FLAME, loc, 20, 0.5, 0.5, 0.5, 0.5);
 					if (player != null) {
-						BossUtils.bossDamage(boss, (LivingEntity) player, DAMAGE, mBoss.getLocation(), "Flame Bolt");
-						((LivingEntity) player).setFireTicks(4 * 20);
+						BossUtils.dualTypeBlockableDamage(boss, player, DamageType.MAGIC, DamageType.FIRE, DAMAGE, 0.9, "Flame Bolt", boss.getLocation());
+						player.setFireTicks(4 * 20);
 					}
 				});
 	}

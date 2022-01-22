@@ -1,8 +1,10 @@
 package com.playmonumenta.plugins.bosses.spells.snowspirit;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import com.playmonumenta.plugins.bosses.bosses.SnowSpirit;
+import com.playmonumenta.plugins.bosses.spells.SpellBaseSeekingProjectile;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
 import org.bukkit.Color;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -12,14 +14,11 @@ import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import com.playmonumenta.plugins.bosses.bosses.SnowSpirit;
-import com.playmonumenta.plugins.bosses.spells.SpellBaseSeekingProjectile;
-import com.playmonumenta.plugins.utils.BossUtils;
-import com.playmonumenta.plugins.utils.EntityUtils;
+import java.util.ArrayList;
+import java.util.List;
 
 public class JollyBall extends SpellBaseSeekingProjectile {
 
@@ -70,7 +69,7 @@ public class JollyBall extends SpellBaseSeekingProjectile {
 					world.spawnParticle(Particle.REDSTONE, loc, 30, 0.5, 0.5, 0.5, 0.25, GREEN_COLOR);
 					world.spawnParticle(Particle.REDSTONE, loc, 30, 0.5, 0.5, 0.5, 0.25, RED_COLOR);
 					if (player != null) {
-						BossUtils.bossDamage(boss, player, DAMAGE, boss.getLocation(), "Jolly Ball");
+						BossUtils.blockableDamage(boss, player, DamageType.MAGIC, DAMAGE, "Jolly Ball", boss.getLocation());
 					}
 				});
 		mBoss = boss;
@@ -118,22 +117,5 @@ public class JollyBall extends SpellBaseSeekingProjectile {
 	@Override
 	public int cooldownTicks() {
 		return 0;
-	}
-
-	@Override
-	public void bossDamagedEntity(EntityDamageByEntityEvent event) {
-		//If player dies, no targetting for 60 seconds
-		if (event.getEntity() instanceof Player) {
-			Player player = (Player) event.getEntity();
-			if (event.getFinalDamage() > player.getHealth()) {
-				mNoTarget.add(player);
-				new BukkitRunnable() {
-					@Override
-					public void run() {
-						mNoTarget.remove(player);
-					}
-				}.runTaskLater(mPlugin, 20 * 60);
-			}
-		}
 	}
 }

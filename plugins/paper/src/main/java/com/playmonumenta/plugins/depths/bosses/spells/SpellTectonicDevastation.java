@@ -1,11 +1,17 @@
 package com.playmonumenta.plugins.depths.bosses.spells;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
+import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.depths.bosses.Nucleus;
+import com.playmonumenta.plugins.effects.PercentHeal;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.utils.DamageUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.LocationUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.utils.PotionUtils;
+import com.playmonumenta.plugins.utils.VectorUtils;
+import net.md_5.bungee.api.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -24,28 +30,12 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
-import com.playmonumenta.plugins.bosses.spells.Spell;
-import com.playmonumenta.plugins.depths.bosses.Nucleus;
-import com.playmonumenta.plugins.effects.PercentHeal;
-import com.playmonumenta.plugins.utils.BossUtils;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.FastUtils;
-import com.playmonumenta.plugins.utils.LocationUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.plugins.utils.PotionUtils;
-import com.playmonumenta.plugins.utils.VectorUtils;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
-import net.md_5.bungee.api.ChatColor;
-
-
-/*
- *
- * Shatter - All players within a 70 degree cone in front of the giant after
-a 1 second charge up take 24 damage and are knocked back X blocks. If they
-collide with a wall they take 10 additional damage and are stunned (Slowness 7,
-Negative Jump Boost, weakness 10, maybe putting bows on cooldown, you get the
-idea) for 2 seconds.
- */
 public class SpellTectonicDevastation extends Spell {
 
 	public static final String TAG = "HitByShatter";
@@ -226,7 +216,7 @@ public class SpellTectonicDevastation extends Spell {
 								if (player.getScoreboardTags().contains(TAG)) {
 									continue;
 								} else {
-									BossUtils.bossDamagePercent(mBoss, player, 0.4, (Location) null, "Tectonic Devastation");
+									DamageUtils.damage(mBoss, player, DamageType.MAGIC, 30, null, false, false, "Tectonic Devastation");
 									player.addScoreboardTag(TAG);
 									new BukkitRunnable() {
 										@Override

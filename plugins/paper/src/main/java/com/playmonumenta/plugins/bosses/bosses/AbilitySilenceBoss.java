@@ -1,5 +1,7 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
+import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.utils.AbilityUtils;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -7,10 +9,7 @@ import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.plugin.Plugin;
-
-import com.playmonumenta.plugins.utils.AbilityUtils;
 
 /**
  * @deprecated use boss_onhit instead, like this:
@@ -48,13 +47,13 @@ public class AbilitySilenceBoss extends BossAbilityGroup {
 	}
 
 	@Override
-	public void bossDamagedEntity(EntityDamageByEntityEvent event) {
+	public void onDamage(DamageEvent event, LivingEntity damagee) {
 		// Attack was blocked
-		if (event.getFinalDamage() == 0) {
+		if (event.getDamage() == 0) {
 			return;
 		}
 
-		if (event.getEntity() instanceof Player player) {
+		if (damagee instanceof Player player) {
 			World world = player.getWorld();
 			Location loc = player.getLocation().add(0, 1, 0);
 			world.playSound(loc, Sound.BLOCK_PORTAL_TRIGGER, 0.25f, 2f);

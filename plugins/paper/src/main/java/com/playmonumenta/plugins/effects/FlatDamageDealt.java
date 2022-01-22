@@ -1,19 +1,20 @@
 package com.playmonumenta.plugins.effects;
 
-import java.util.EnumSet;
+import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import org.bukkit.entity.LivingEntity;
 
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDamageEvent;
+import java.util.EnumSet;
 
 public class FlatDamageDealt extends Effect {
 
 	private final double mAmount;
-	private final EnumSet<EntityDamageEvent.DamageCause> mAffectedDamageCauses;
+	private final EnumSet<DamageType> mAffectedDamageTypes;
 
-	public FlatDamageDealt(int duration, double amount, EnumSet<EntityDamageEvent.DamageCause> affectedDamageCauses) {
+	public FlatDamageDealt(int duration, double amount, EnumSet<DamageType> affectedDamageTypes) {
 		super(duration);
 		mAmount = amount;
-		mAffectedDamageCauses = affectedDamageCauses;
+		mAffectedDamageTypes = affectedDamageTypes;
 	}
 
 	public FlatDamageDealt(int duration, double amount) {
@@ -26,26 +27,24 @@ public class FlatDamageDealt extends Effect {
 	}
 
 	@Override
-	public boolean entityDealDamageEvent(EntityDamageByEntityEvent event) {
-		if (mAffectedDamageCauses == null || mAffectedDamageCauses.contains(event.getCause())) {
+	public void onDamage(LivingEntity entity, DamageEvent event, LivingEntity enemy) {
+		if (mAffectedDamageTypes == null || mAffectedDamageTypes.contains(event.getType())) {
 			event.setDamage(event.getDamage() + mAmount);
 		}
-
-		return true;
 	}
 
 	@Override
 	public String toString() {
-		String causes = "any";
-		if (mAffectedDamageCauses != null) {
-			causes = "";
-			for (EntityDamageEvent.DamageCause cause : mAffectedDamageCauses) {
-				if (!causes.isEmpty()) {
-					causes += ",";
+		String types = "any";
+		if (mAffectedDamageTypes != null) {
+			types = "";
+			for (DamageType type : mAffectedDamageTypes) {
+				if (!types.isEmpty()) {
+					types += ",";
 				}
-				causes += cause.name();
+				types += type.name();
 			}
 		}
-		return String.format("FlatDamageDealt duration:%d causes:%s amount:%f", this.getDuration(), causes, mAmount);
+		return String.format("FlatDamageDealt duration:%d types:%s amount:%f", this.getDuration(), types, mAmount);
 	}
 }

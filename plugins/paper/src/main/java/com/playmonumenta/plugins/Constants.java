@@ -1,12 +1,11 @@
 package com.playmonumenta.plugins;
 
-import java.util.EnumSet;
-
+import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Material;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
-import net.kyori.adventure.text.format.TextColor;
+import java.util.EnumSet;
 
 
 

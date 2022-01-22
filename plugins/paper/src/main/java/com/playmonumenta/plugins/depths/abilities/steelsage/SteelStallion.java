@@ -11,8 +11,6 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Horse;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -22,10 +20,9 @@ import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
+import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
-import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.AbsorptionUtils;
-import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 
 import net.md_5.bungee.api.ChatColor;
@@ -52,9 +49,9 @@ public class SteelStallion extends DepthsAbility {
 	}
 
 	@Override
-	public boolean playerDamagedByLivingEntityEvent(EntityDamageByEntityEvent event) {
-		if (event.isCancelled() || event.getDamage() <= 0) {
-			return true;
+	public void onHurt(DamageEvent event) {
+		if (event.isCancelled() || event.isBlocked()) {
+			return;
 		}
 
 		if (mHorse != null) {
@@ -62,60 +59,19 @@ public class SteelStallion extends DepthsAbility {
 			mPlayer.getWorld().playSound(mPlayer.getLocation(), Sound.ENTITY_HORSE_HURT, 0.8f, 1.0f);
 			event.setDamage(0);
 			event.setCancelled(true);
-			return true;
+			return;
 		}
 
 		execute(event);
-		return true;
 	}
 
-	@Override
-	public boolean playerDamagedByProjectileEvent(EntityDamageByEntityEvent event) {
-		if (event.isCancelled() || event.getDamage() <= 0) {
-			return true;
-		}
-
-		if (mHorse != null) {
-			mHorse.setHealth(Math.max(0, mHorse.getHealth() - event.getDamage()));
-			mPlayer.getWorld().playSound(mPlayer.getLocation(), Sound.ENTITY_HORSE_HURT, 0.8f, 1.0f);
-			event.setDamage(0);
-			event.setCancelled(true);
-			return true;
-		}
-
-		execute(event);
-		return true;
-	}
-
-	/*
-	 * Works against all types of damage
-	 */
-	@Override
-	public boolean playerDamagedEvent(EntityDamageEvent event) {
-		// Do not process cancelled damage events
-		if (event.isCancelled() || event instanceof EntityDamageByEntityEvent || event.getDamage() <= 0) {
-			return true;
-		}
-
-		if (mHorse != null) {
-			mHorse.setHealth(Math.max(0, mHorse.getHealth() - event.getDamage()));
-			mPlayer.getWorld().playSound(mPlayer.getLocation(), Sound.ENTITY_HORSE_HURT, 0.8f, 1.0f);
-			event.setDamage(0);
-			event.setCancelled(true);
-			return true;
-		}
-
-		execute(event);
-		return true;
-	}
-
-	private void execute(EntityDamageEvent event) {
-		if (AbilityUtils.isBlocked(event) || mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.mLinkedSpell)) {
+	private void execute(DamageEvent event) {
+		if (mPlayer == null || mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.mLinkedSpell)) {
 			return;
 		}
 
 		// Calculate whether this effect should not be run based on player health.
-		double healthRemaining = mPlayer.getHealth() + AbsorptionUtils.getAbsorption(mPlayer) - EntityUtils.getRealFinalDamage(event);
+		double healthRemaining = mPlayer.getHealth() + AbsorptionUtils.getAbsorption(mPlayer) - event.getDamage();
 
 		AttributeInstance maxHealth = mPlayer.getAttribute(Attribute.GENERIC_MAX_HEALTH);
 		if (healthRemaining > maxHealth.getValue() * TRIGGER_HEALTH) {

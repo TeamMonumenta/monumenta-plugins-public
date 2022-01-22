@@ -1,8 +1,20 @@
 package com.playmonumenta.plugins.abilities.mage.elementalist;
 
-import java.util.HashSet;
-import java.util.Set;
-
+import com.playmonumenta.plugins.Constants;
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.abilities.AbilityManager;
+import com.playmonumenta.plugins.abilities.mage.ElementalArrows;
+import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.integrations.PremiumVanishIntegration;
+import com.playmonumenta.plugins.itemstats.attributes.SpellPower;
+import com.playmonumenta.plugins.player.PartialParticle;
+import com.playmonumenta.plugins.utils.DamageUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.LocationUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -15,20 +27,8 @@ import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.Vector;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-import com.playmonumenta.plugins.Constants;
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.abilities.AbilityManager;
-import com.playmonumenta.plugins.abilities.mage.ElementalArrows;
-import com.playmonumenta.plugins.classes.ClassAbility;
-import com.playmonumenta.plugins.classes.magic.MagicType;
-import com.playmonumenta.plugins.enchantments.abilities.SpellPower;
-import com.playmonumenta.plugins.events.CustomDamageEvent;
-import com.playmonumenta.plugins.integrations.PremiumVanishIntegration;
-import com.playmonumenta.plugins.player.PartialParticle;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.FastUtils;
-import com.playmonumenta.plugins.utils.LocationUtils;
+import java.util.HashSet;
+import java.util.Set;
 
 
 
@@ -76,12 +76,10 @@ public class ElementalSpiritIce extends Ability {
 	}
 
 	@Override
-	public void playerDealtCustomDamageEvent(CustomDamageEvent event) {
-		if (
-			MagicType.ICE.equals(event.getMagicType())
-			&& !ABILITY.equals(event.getSpell())
-		) {
-			mEnemiesAffected.add(event.getDamaged());
+	public void onDamage(DamageEvent event, LivingEntity enemy) {
+		if ((event.getAbility() == ClassAbility.ELEMENTAL_ARROWS_ICE || event.getAbility() == ClassAbility.BLIZZARD || event.getAbility() == ClassAbility.FROST_NOVA)
+				&& !ABILITY.equals(event.getAbility())) {
+			mEnemiesAffected.add(event.getDamagee());
 			if (mEnemiesAffectedProcessor == null) {
 				mEnemiesAffectedProcessor = new BukkitRunnable() {
 					@Override
@@ -107,8 +105,9 @@ public class ElementalSpiritIce extends Ability {
 							putOnCooldown();
 
 							Location centre = LocationUtils.getHalfHeightLocation(closestEnemy);
-							float spellDamage = SpellPower.getSpellDamage(mPlayer, mLevelDamage);
+							float spellDamage = SpellPower.getSpellDamage(mPlugin, mPlayer, mLevelDamage);
 							World world = mPlayer.getWorld();
+
 							mSpiritPulser = new BukkitRunnable() {
 								int mPulses = 1; // The current pulse for this run
 
@@ -118,13 +117,13 @@ public class ElementalSpiritIce extends Ability {
 									for (LivingEntity mob : EntityUtils.getNearbyMobs(centre, SIZE)) {
 										float finalDamage = spellDamage;
 										if (
-											ClassAbility.ELEMENTAL_ARROWS.equals(event.getSpell())
+											ClassAbility.ELEMENTAL_ARROWS_ICE.equals(event.getAbility())
 											&& mElementalArrows != null
 										) {
 											finalDamage += mElementalArrows.getLastDamage() * mLevelBowMultiplier;
 										}
 
-										EntityUtils.damageEntity(mPlugin, mob, finalDamage, mPlayer, MagicType.ICE, true, ABILITY, true, true, true);
+										DamageUtils.damage(mPlayer, mob, DamageType.MAGIC, finalDamage, ABILITY, true);
 										mob.setVelocity(new Vector()); // Wipe velocity, extreme local climate
 									}
 

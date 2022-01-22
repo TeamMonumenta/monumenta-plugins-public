@@ -1,13 +1,13 @@
 package com.playmonumenta.plugins.commands.experiencinator;
 
+import com.playmonumenta.plugins.utils.ItemStatUtils.Region;
+import com.playmonumenta.plugins.utils.ItemStatUtils.Tier;
+import com.playmonumenta.plugins.utils.ScoreboardUtils;
+import org.bukkit.entity.Player;
+
 import java.util.EnumMap;
 import java.util.Map;
 import java.util.Optional;
-
-import org.bukkit.entity.Player;
-
-import com.playmonumenta.plugins.utils.ItemUtils;
-import com.playmonumenta.plugins.utils.ScoreboardUtils;
 
 /**
  * Handles the Experiencinator settings stored as packed decimals in scoreboards.
@@ -19,13 +19,13 @@ public final class ExperiencinatorSettings {
 
 	private final ExperiencinatorConfig.ScoreboardConfig mScoreboardConfig;
 	private final Player mPlayer;
-	private final Map<ItemUtils.ItemRegion, Integer> mPacked = new EnumMap<>(ItemUtils.ItemRegion.class);
+	private final Map<Region, Integer> mPacked = new EnumMap<>(Region.class);
 
 	public ExperiencinatorSettings(ExperiencinatorConfig.ScoreboardConfig scoreboardConfig, Player player) {
 		mScoreboardConfig = scoreboardConfig;
 		mPlayer = player;
 		boolean hadScoreboadValues = false;
-		for (Map.Entry<ItemUtils.ItemRegion, String> entry : scoreboardConfig.getObjectives().entrySet()) {
+		for (Map.Entry<Region, String> entry : scoreboardConfig.getObjectives().entrySet()) {
 			Optional<Integer> scoreboardValue = ScoreboardUtils.getScoreboardValue(player, entry.getValue());
 			if (scoreboardValue.isPresent()) {
 				hadScoreboadValues = true;
@@ -39,8 +39,8 @@ public final class ExperiencinatorSettings {
 		}
 	}
 
-	public void setConversion(ItemUtils.ItemRegion itemRegion, ItemUtils.ItemTier itemTier, int conversionId) {
-		Integer packed = mPacked.get(itemRegion);
+	public void setConversion(Region region, Tier itemTier, int conversionId) {
+		Integer packed = mPacked.get(region);
 		int tier = mScoreboardConfig.getTierOrder().indexOf(itemTier);
 		if (packed == null || tier < 0) { // this should not happen if everything is properly configured.
 			return;
@@ -55,16 +55,16 @@ public final class ExperiencinatorSettings {
 				- ((packed % (10 * digit)) / digit) * digit // remove existing setting
 				+ digit * conversionId; // add new setting
 
-		mPacked.put(itemRegion, newPacked);
+		mPacked.put(region, newPacked);
 
-		String objectiveName = mScoreboardConfig.getObjectives().get(itemRegion);
+		String objectiveName = mScoreboardConfig.getObjectives().get(region);
 		if (objectiveName != null) { // should not be null if everything is properly configured.
 			ScoreboardUtils.setScoreboardValue(mPlayer, objectiveName, newPacked);
 		}
 	}
 
-	public int getConversion(ItemUtils.ItemRegion itemRegion, ItemUtils.ItemTier itemTier) {
-		Integer packed = mPacked.get(itemRegion);
+	public int getConversion(Region region, Tier itemTier) {
+		Integer packed = mPacked.get(region);
 		int tier = mScoreboardConfig.getTierOrder().indexOf(itemTier);
 		if (packed == null || tier < 0) { // this should not happen if everything is properly configured.
 			return 0;
@@ -82,19 +82,19 @@ public final class ExperiencinatorSettings {
 	 * Migrates settings from existing tags if any exist, or sets default values for a new player. Does not clear tags for now.
 	 */
 	private void setupNewPlayer(Player player) {
-		setConversion(ItemUtils.ItemRegion.KINGS_VALLEY, ItemUtils.ItemTier.ONE, ScoreboardUtils.checkTag(player, "NoT1") ? 0 : 1);
-		setConversion(ItemUtils.ItemRegion.KINGS_VALLEY, ItemUtils.ItemTier.TWO, ScoreboardUtils.checkTag(player, "NoT2") ? 0 : 1);
-		setConversion(ItemUtils.ItemRegion.KINGS_VALLEY, ItemUtils.ItemTier.THREE, ScoreboardUtils.checkTag(player, "NoT3") ? 0 : 1);
-		setConversion(ItemUtils.ItemRegion.KINGS_VALLEY, ItemUtils.ItemTier.FOUR, ScoreboardUtils.checkTag(player, "NoT4") ? 0 : 1);
-		setConversion(ItemUtils.ItemRegion.KINGS_VALLEY, ItemUtils.ItemTier.FIVE, ScoreboardUtils.checkTag(player, "NoT5") ? 0 : 1);
-		setConversion(ItemUtils.ItemRegion.KINGS_VALLEY, ItemUtils.ItemTier.UNCOMMON, ScoreboardUtils.checkTag(player, "NoU") ? 0 : 1);
+		setConversion(Region.VALLEY, Tier.I, ScoreboardUtils.checkTag(player, "NoT1") ? 0 : 1);
+		setConversion(Region.VALLEY, Tier.II, ScoreboardUtils.checkTag(player, "NoT2") ? 0 : 1);
+		setConversion(Region.VALLEY, Tier.III, ScoreboardUtils.checkTag(player, "NoT3") ? 0 : 1);
+		setConversion(Region.VALLEY, Tier.IV, ScoreboardUtils.checkTag(player, "NoT4") ? 0 : 1);
+		setConversion(Region.VALLEY, Tier.V, ScoreboardUtils.checkTag(player, "NoT5") ? 0 : 1);
+		setConversion(Region.VALLEY, Tier.UNCOMMON, ScoreboardUtils.checkTag(player, "NoU") ? 0 : 1);
 
-		setConversion(ItemUtils.ItemRegion.CELSIAN_ISLES, ItemUtils.ItemTier.ONE, ScoreboardUtils.checkTag(player, "2NoT1") ? 0 : 1);
-		setConversion(ItemUtils.ItemRegion.CELSIAN_ISLES, ItemUtils.ItemTier.TWO, ScoreboardUtils.checkTag(player, "2NoT2") ? 0 : 1);
-		setConversion(ItemUtils.ItemRegion.CELSIAN_ISLES, ItemUtils.ItemTier.THREE, ScoreboardUtils.checkTag(player, "2NoT3") ? 0 : 1);
-		setConversion(ItemUtils.ItemRegion.CELSIAN_ISLES, ItemUtils.ItemTier.FOUR, ScoreboardUtils.checkTag(player, "2NoT4") ? 0 : 1);
-		setConversion(ItemUtils.ItemRegion.CELSIAN_ISLES, ItemUtils.ItemTier.FIVE, ScoreboardUtils.checkTag(player, "2NoT5") ? 0 : 1);
-		setConversion(ItemUtils.ItemRegion.CELSIAN_ISLES, ItemUtils.ItemTier.UNCOMMON, ScoreboardUtils.checkTag(player, "2NoU") ? 0 : 1);
+		setConversion(Region.ISLES, Tier.I, ScoreboardUtils.checkTag(player, "2NoT1") ? 0 : 1);
+		setConversion(Region.ISLES, Tier.II, ScoreboardUtils.checkTag(player, "2NoT2") ? 0 : 1);
+		setConversion(Region.ISLES, Tier.III, ScoreboardUtils.checkTag(player, "2NoT3") ? 0 : 1);
+		setConversion(Region.ISLES, Tier.IV, ScoreboardUtils.checkTag(player, "2NoT4") ? 0 : 1);
+		setConversion(Region.ISLES, Tier.V, ScoreboardUtils.checkTag(player, "2NoT5") ? 0 : 1);
+		setConversion(Region.ISLES, Tier.UNCOMMON, ScoreboardUtils.checkTag(player, "2NoU") ? 0 : 1);
 	}
 
 }

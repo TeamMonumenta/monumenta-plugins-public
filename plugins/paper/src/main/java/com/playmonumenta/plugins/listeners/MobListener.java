@@ -1,10 +1,14 @@
 package com.playmonumenta.plugins.listeners;
 
-import java.util.Collection;
-import java.util.EnumSet;
-import java.util.List;
-import java.util.ListIterator;
-
+import com.destroystokyo.paper.event.entity.EntityZapEvent;
+import com.playmonumenta.plugins.Constants;
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.AbilityManager;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.utils.ZoneUtils;
+import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.attribute.Attribute;
@@ -24,7 +28,6 @@ import org.bukkit.entity.Firework;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
-import org.bukkit.entity.Projectile;
 import org.bukkit.entity.Slime;
 import org.bukkit.entity.Vex;
 import org.bukkit.entity.Zombie;
@@ -45,15 +48,10 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.projectiles.ProjectileSource;
 
-import com.destroystokyo.paper.event.entity.EntityZapEvent;
-import com.playmonumenta.plugins.Constants;
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.AbilityManager;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.ItemUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.plugins.utils.ZoneUtils;
-import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
+import java.util.Collection;
+import java.util.EnumSet;
+import java.util.List;
+import java.util.ListIterator;
 
 public class MobListener implements Listener {
 	static final int SPAWNER_DROP_THRESHOLD = 20;
@@ -168,10 +166,10 @@ public class MobListener implements Listener {
 
 		if (event.getEntity() instanceof Player) {
 			Entity damager = event.getDamager();
-			if (damager instanceof AbstractArrow) {
-				ProjectileSource source = ((Projectile) damager).getShooter();
-				if (source instanceof LivingEntity) {
-					EntityEquipment equipment = ((LivingEntity) source).getEquipment();
+			if (damager instanceof AbstractArrow arrow) {
+				ProjectileSource source = arrow.getShooter();
+				if (source instanceof LivingEntity le) {
+					EntityEquipment equipment = le.getEquipment();
 					if (equipment != null) {
 						ItemStack mainhand = equipment.getItemInMainHand();
 						Material material = mainhand.getType();
@@ -190,11 +188,11 @@ public class MobListener implements Listener {
 						}
 					}
 				}
-			} else if (damager instanceof Fireball) {
+			} else if (damager instanceof Fireball fireball) {
 				//Custom damage of fireball set by the horse jump strength attribute in the mainhand of the mob
-				ProjectileSource source = ((Projectile) damager).getShooter();
-				if (source instanceof LivingEntity) {
-					EntityEquipment equipment = ((LivingEntity) source).getEquipment();
+				ProjectileSource source = fireball.getShooter();
+				if (source instanceof LivingEntity le) {
+					EntityEquipment equipment = le.getEquipment();
 					if (equipment != null) {
 						ItemStack mainhand = equipment.getItemInMainHand();
 
@@ -213,9 +211,9 @@ public class MobListener implements Listener {
 						}
 					}
 				}
-			} else if (damager instanceof EvokerFangs) {
+			} else if (damager instanceof EvokerFangs fangs) {
 				//Custom damage for evoker fangs, tied to main hand damage of evoker.
-				LivingEntity source = ((EvokerFangs) damager).getOwner();
+				LivingEntity source = fangs.getOwner();
 				if (source != null) {
 					EntityEquipment equipment = source.getEquipment();
 					if (equipment != null) {
@@ -293,7 +291,7 @@ public class MobListener implements Listener {
 		Player player = livingEntity.getKiller();
 		if (player != null && EntityUtils.isHostileMob(livingEntity)) {
 			//  Player kills a mob
-			mPlugin.mTrackingManager.mPlayers.onKill(mPlugin, player, livingEntity, event);
+			mPlugin.mItemStatManager.onKill(mPlugin, player, event, livingEntity);
 			AbilityManager.getManager().entityDeathEvent(player, event, shouldGenDrops);
 			for (Player p : PlayerUtils.playersInRange(livingEntity.getLocation(), 20, true)) {
 				AbilityManager.getManager().entityDeathRadiusEvent(p, event, shouldGenDrops);

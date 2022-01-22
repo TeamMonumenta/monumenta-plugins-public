@@ -1,20 +1,16 @@
 package com.playmonumenta.plugins.depths.abilities.windwalker;
 
-import org.bukkit.Material;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
-import org.bukkit.entity.Projectile;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
-import com.playmonumenta.plugins.events.CustomDamageEvent;
-
+import com.playmonumenta.plugins.events.DamageEvent;
 import net.md_5.bungee.api.ChatColor;
+import org.bukkit.Material;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
 
 public class Aeromancy extends DepthsAbility {
 
@@ -29,22 +25,8 @@ public class Aeromancy extends DepthsAbility {
 	}
 
 	@Override
-	public boolean livingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
-		event.setDamage(event.getDamage() * damageMultiplier(event.getEntity()));
-
-		return true;
-	}
-
-	@Override
-	public boolean livingEntityShotByPlayerEvent(Projectile proj, LivingEntity damagee, EntityDamageByEntityEvent event) {
-		event.setDamage(event.getDamage() * damageMultiplier(damagee));
-
-		return true;
-	}
-
-	@Override
-	public void playerDealtCustomDamageEvent(CustomDamageEvent event) {
-		event.setDamage(event.getDamage() * damageMultiplier(event.getDamaged()));
+	public void onDamage(DamageEvent event, LivingEntity enemy) {
+		event.setDamage(event.getDamage() * damageMultiplier(enemy));
 	}
 
 	private double damageMultiplier(Entity damagee) {

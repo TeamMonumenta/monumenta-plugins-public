@@ -1,17 +1,16 @@
 package com.playmonumenta.plugins.bosses.bosses.lich;
 
-import java.util.Arrays;
-import java.util.List;
-
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.plugin.Plugin;
-
 import com.playmonumenta.plugins.bosses.bosses.BossAbilityGroup;
 import com.playmonumenta.plugins.bosses.bosses.Lich;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.bosses.spells.lich.undeadplayers.SpellLichCurse;
+import com.playmonumenta.plugins.events.DamageEvent;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
+import org.bukkit.plugin.Plugin;
+
+import java.util.Arrays;
+import java.util.List;
 
 public class LichCurseBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_lichcurse";
@@ -34,11 +33,10 @@ public class LichCurseBoss extends BossAbilityGroup {
 	}
 
 	@Override
-	public void bossDamagedEntity(EntityDamageByEntityEvent event) {
-		if (event.getEntity() instanceof Player) {
+	public void onDamage(DamageEvent event, LivingEntity damagee) {
+		if (damagee instanceof Player player) {
 			event.getDamager().remove();
-			Player p = (Player) event.getEntity();
-			Lich.cursePlayer(mPlugin, p, 120);
+			Lich.cursePlayer(mPlugin, player, 120);
 		}
 	}
 }

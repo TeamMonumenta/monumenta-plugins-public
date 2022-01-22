@@ -7,9 +7,6 @@ import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -19,8 +16,8 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.effects.PercentSpeed;
+import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
-import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.AbsorptionUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
@@ -49,78 +46,45 @@ public class EscapeDeath extends Ability {
 	}
 
 	@Override
-	public boolean playerDamagedByLivingEntityEvent(EntityDamageByEntityEvent event) {
-		if (event.isCancelled()) {
-			return true;
-		}
-		execute(event);
-		return true;
-	}
+	public void onHurt(DamageEvent event) {
+		if (!event.isCancelled() && !event.isBlocked() && mPlayer != null) {
+			double newHealth = mPlayer.getHealth() + AbsorptionUtils.getAbsorption(mPlayer) - event.getDamage();
+			boolean dealDamageLater = newHealth < 0 && newHealth > -8 && getAbilityScore() > 1;
+			if (newHealth <= TRIGGER_THRESHOLD_HEALTH && (newHealth > 0 || dealDamageLater)) {
+				if (dealDamageLater) {
+					event.setCancelled(true);
+				}
+				putOnCooldown();
 
-	@Override
-	public boolean playerDamagedByProjectileEvent(EntityDamageByEntityEvent event) {
-		if (event.isCancelled()) {
-			return true;
-		}
-		execute(event);
-		return true;
-	}
+				for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), RANGE, mPlayer)) {
+					EntityUtils.applyStun(mPlugin, STUN_DURATION, mob);
+				}
 
-	@Override
-	public boolean playerDamagedEvent(EntityDamageEvent event) {
-		if (event.isCancelled()) {
-			return true;
-		}
-		if (event.getCause() == DamageCause.ENTITY_EXPLOSION || event.getCause() == DamageCause.CUSTOM) {
-			execute(event);
-			return true;
-		}
-		return true;
-	}
+				if (getAbilityScore() > 1) {
+					mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF,
+							new PotionEffect(PotionEffectType.ABSORPTION, BUFF_DURATION, ABSORPTION_AMPLIFIER, true, true));
+					mPlugin.mEffectManager.addEffect(mPlayer, PERCENT_SPEED_EFFECT_NAME, new PercentSpeed(BUFF_DURATION, SPEED_PERCENT, PERCENT_SPEED_EFFECT_NAME));
+					mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF,
+							new PotionEffect(PotionEffectType.JUMP, BUFF_DURATION, JUMP_BOOST_AMPLIFIER, true, true));
+				}
 
-	// *TO DO* - Turn this into function called by both this skill and Prismatic Shield
-	private void execute(EntityDamageEvent event) {
-		if (AbilityUtils.isBlocked(event)) {
-			return;
-		}
+				Location loc = mPlayer.getLocation();
+				loc.add(0, 1, 0);
 
-		double newHealth = mPlayer.getHealth() + AbsorptionUtils.getAbsorption(mPlayer) - EntityUtils.getRealFinalDamage(event);
-		boolean dealDamageLater = newHealth < 0 && newHealth > -8 && getAbilityScore() > 1;
-		if (newHealth <= TRIGGER_THRESHOLD_HEALTH && (newHealth > 0 || dealDamageLater)) {
-			if (dealDamageLater) {
-				event.setCancelled(true);
-			}
-			putOnCooldown();
+				World world = mPlayer.getWorld();
+				world.spawnParticle(Particle.EXPLOSION_NORMAL, loc, 80, 0, 0, 0, 0.25);
+				world.spawnParticle(Particle.FIREWORKS_SPARK, loc, 125, 0, 0, 0, 0.3);
 
-			for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), RANGE, mPlayer)) {
-				EntityUtils.applyStun(mPlugin, STUN_DURATION, mob);
-			}
+				world.playSound(loc, Sound.ITEM_TOTEM_USE, 0.75f, 1.5f);
+				world.playSound(loc, Sound.ENTITY_ARROW_SHOOT, 1f, 0f);
 
-			if (getAbilityScore() > 1) {
-				mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF,
-						new PotionEffect(PotionEffectType.ABSORPTION, BUFF_DURATION, ABSORPTION_AMPLIFIER, true, true));
-				mPlugin.mEffectManager.addEffect(mPlayer, PERCENT_SPEED_EFFECT_NAME, new PercentSpeed(BUFF_DURATION, SPEED_PERCENT, PERCENT_SPEED_EFFECT_NAME));
-				mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF,
-						new PotionEffect(PotionEffectType.JUMP, BUFF_DURATION, JUMP_BOOST_AMPLIFIER, true, true));
-			}
+				MessagingUtils.sendActionBarMessage(mPlugin, mPlayer, "Escape Death has been activated");
 
-			Location loc = mPlayer.getLocation();
-			loc.add(0, 1, 0);
-
-			World world = mPlayer.getWorld();
-			world.spawnParticle(Particle.EXPLOSION_NORMAL, loc, 80, 0, 0, 0, 0.25);
-			world.spawnParticle(Particle.FIREWORKS_SPARK, loc, 125, 0, 0, 0, 0.3);
-
-			world.playSound(loc, Sound.ITEM_TOTEM_USE, 0.75f, 1.5f);
-			world.playSound(loc, Sound.ENTITY_ARROW_SHOOT, 1f, 0f);
-
-			MessagingUtils.sendActionBarMessage(mPlugin, mPlayer, "Escape Death has been activated");
-
-			if (dealDamageLater) {
-				mPlayer.setHealth(1);
-				AbsorptionUtils.subtractAbsorption(mPlayer, 1 - (float) newHealth);
+				if (dealDamageLater) {
+					mPlayer.setHealth(1);
+					AbsorptionUtils.subtractAbsorption(mPlayer, 1 - (float) newHealth);
+				}
 			}
 		}
 	}
-
 }

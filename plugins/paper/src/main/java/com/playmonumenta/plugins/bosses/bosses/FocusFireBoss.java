@@ -1,14 +1,13 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
+import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.utils.EntityUtils;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.plugin.Plugin;
-
-import com.playmonumenta.plugins.utils.EntityUtils;
 
 public class FocusFireBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_focusfire";
@@ -24,13 +23,13 @@ public class FocusFireBoss extends BossAbilityGroup {
 	}
 
 	@Override
-	public void bossDamagedEntity(EntityDamageByEntityEvent event) {
+	public void onDamage(DamageEvent event, LivingEntity damagee) {
 		//If we hit a player
-		if (event.getEntity() instanceof Player player) {
+		if (damagee instanceof Player player) {
 			//Set all nearby mobs to target them
-			for (LivingEntity mob : EntityUtils.getNearbyMobs(mBoss.getLocation(), detectionRange)) {
-				if (mob instanceof Mob) {
-					((Mob) mob).setTarget(player);
+			for (LivingEntity le : EntityUtils.getNearbyMobs(mBoss.getLocation(), detectionRange)) {
+				if (le instanceof Mob mob) {
+					mob.setTarget(player);
 				}
 			}
 			//Let the players know something happened

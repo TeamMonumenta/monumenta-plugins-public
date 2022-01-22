@@ -1,14 +1,13 @@
 package com.playmonumenta.plugins.utils;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import net.md_5.bungee.api.ChatColor;
+import java.util.ArrayList;
+import java.util.List;
 
 public class GUIUtils {
 

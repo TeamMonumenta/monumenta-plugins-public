@@ -1,8 +1,12 @@
 package com.playmonumenta.plugins.commands;
 
-import java.util.Collection;
-import java.util.Optional;
-
+import com.playmonumenta.plugins.utils.ScoreboardUtils;
+import dev.jorel.commandapi.CommandAPICommand;
+import dev.jorel.commandapi.CommandPermission;
+import dev.jorel.commandapi.arguments.EntitySelectorArgument;
+import dev.jorel.commandapi.arguments.EntitySelectorArgument.EntitySelector;
+import dev.jorel.commandapi.arguments.ObjectiveArgument;
+import dev.jorel.commandapi.arguments.TextArgument;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
@@ -12,14 +16,8 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Score;
 
-import com.playmonumenta.plugins.utils.ScoreboardUtils;
-
-import dev.jorel.commandapi.CommandAPICommand;
-import dev.jorel.commandapi.CommandPermission;
-import dev.jorel.commandapi.arguments.EntitySelectorArgument;
-import dev.jorel.commandapi.arguments.EntitySelectorArgument.EntitySelector;
-import dev.jorel.commandapi.arguments.ObjectiveArgument;
-import dev.jorel.commandapi.arguments.TextArgument;
+import java.util.Collection;
+import java.util.Optional;
 
 public class GetScoreCommand {
 

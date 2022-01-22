@@ -1,7 +1,11 @@
 package com.playmonumenta.plugins.bosses.spells.sealedremorse;
 
-import java.util.List;
-
+import com.playmonumenta.plugins.bosses.bosses.BeastOfTheBlackFlame;
+import com.playmonumenta.plugins.bosses.bosses.Ghalkor;
+import com.playmonumenta.plugins.bosses.spells.SpellBaseCharge;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -15,17 +19,12 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 
-import com.playmonumenta.plugins.bosses.bosses.BeastOfTheBlackFlame;
-import com.playmonumenta.plugins.bosses.bosses.Ghalkor;
-import com.playmonumenta.plugins.bosses.spells.SpellBaseCharge;
-import com.playmonumenta.plugins.utils.BossUtils;
-import com.playmonumenta.plugins.utils.NmsUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
+import java.util.List;
 
 public class BlackflameCharge extends SpellBaseCharge {
 
-	private static final int DAMAGE = 30;
-	private static final int GROUND_DAMAGE = 20;
+	private static final int DAMAGE = 25;
+	private static final int GROUND_DAMAGE = 22;
 	private static final int FIRE_DURATION = 20 * 4;
 
 	private BeastOfTheBlackFlame mBossClass;
@@ -58,7 +57,7 @@ public class BlackflameCharge extends SpellBaseCharge {
 							0.4, 0.4, 0.4, Material.REDSTONE_BLOCK.createBlockData());
 					player.getWorld().spawnParticle(Particle.BLOCK_CRACK, player.getLocation().add(0, 1, 0), 12, 0.4,
 							0.4, 0.4, 0.4, Material.REDSTONE_WIRE.createBlockData());
-					BossUtils.bossDamage(boss, (LivingEntity) player, DAMAGE, boss.getLocation(), "Blackflame Charge");
+					BossUtils.blockableDamage(boss, player, DamageType.MAGIC, DAMAGE, "Blackflame Charge", boss.getLocation());
 				},
 				// Attack particles
 				(Location loc) -> {
@@ -91,7 +90,7 @@ public class BlackflameCharge extends SpellBaseCharge {
 								if (mHitbox.overlaps(player.getBoundingBox())) {
 									world.playSound(mParticleLoc, Sound.ENTITY_BLAZE_HURT, 0.5f, 0f);
 									player.setFireTicks(FIRE_DURATION);
-									NmsUtils.unblockableEntityDamageEntity(player, GROUND_DAMAGE, boss);
+									BossUtils.blockableDamage(boss, player, DamageType.MAGIC, GROUND_DAMAGE, "Blackflame Charge", null);
 								}
 							}
 

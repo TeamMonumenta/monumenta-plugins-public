@@ -1,9 +1,11 @@
 package com.playmonumenta.plugins.bosses.spells.lich;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.ThreadLocalRandom;
-
+import com.playmonumenta.plugins.bosses.ChargeUpManager;
+import com.playmonumenta.plugins.bosses.bosses.Lich;
+import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.player.PPGroundCircle;
+import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.Location;
@@ -22,12 +24,9 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
-import com.playmonumenta.plugins.bosses.ChargeUpManager;
-import com.playmonumenta.plugins.bosses.bosses.Lich;
-import com.playmonumenta.plugins.bosses.spells.Spell;
-import com.playmonumenta.plugins.player.PPGroundCircle;
-import com.playmonumenta.plugins.utils.BossUtils;
-import com.playmonumenta.plugins.utils.EntityUtils;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
 
 /*
 Grasping Hands - Pools of "hands" appear under ½  players in a 5 block radius. Players inside
@@ -46,6 +45,7 @@ public class SpellGraspingHands extends Spell {
 	private static final Particle.DustOptions GRASPING_HANDS_COLOR = new Particle.DustOptions(Color.fromRGB(0, 135, 96), 1.65f);
 	private ChargeUpManager mChargeUp;
 	private boolean mCanRun = true;
+	private double mDuration = 20 * 7.0d;
 
 	public SpellGraspingHands(Plugin plugin, LivingEntity boss) {
 		mPlugin = plugin;
@@ -84,7 +84,6 @@ public class SpellGraspingHands extends Spell {
 					mChargeUp.setColor(BarColor.RED);
 					BukkitRunnable runB = new BukkitRunnable() {
 						int mT = 0;
-						double mDuration = 20 * 5.0d;
 
 						@Override
 						public void run() {
@@ -145,7 +144,6 @@ public class SpellGraspingHands extends Spell {
 						world.playSound(player.getLocation(), Sound.ENTITY_ILLUSIONER_CAST_SPELL, SoundCategory.HOSTILE, 1, 0.75f);
 						BukkitRunnable runD = new BukkitRunnable() {
 							int mT = 0;
-							double mDuration = 20 * 5.0d;
 							@Override
 							public void run() {
 								mT++;

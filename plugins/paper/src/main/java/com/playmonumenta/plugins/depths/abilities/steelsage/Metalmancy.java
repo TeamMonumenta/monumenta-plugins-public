@@ -8,13 +8,9 @@ import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
-import org.bukkit.attribute.Attribute;
-import org.bukkit.entity.IronGolem;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
-import org.bukkit.entity.Projectile;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.metadata.FixedMetadataValue;
@@ -25,12 +21,18 @@ import org.bukkit.util.Vector;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.bosses.BossManager;
+import com.playmonumenta.plugins.bosses.bosses.BossAbilityGroup;
+import com.playmonumenta.plugins.bosses.bosses.abilities.MetalmancyBoss;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
+import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
+import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
@@ -43,14 +45,12 @@ public class Metalmancy extends DepthsAbility {
 	public static final int[] DURATION = {10 * 20, 11 * 20, 12 * 20, 13 * 20, 14 * 20, 18 * 20};
 	public static final int COOLDOWN = 32 * 20;
 	public static final String GOLEM_NAME = "SteelConstruct";
-	public static final String GOLEM_TAG = "boss_metalmancy";
 	public static final double VELOCITY = 2;
 	public static final int DETECTION_RANGE = 32;
 	public static final int TICK_INTERVAL = 5;
-	public static final String OWNER_METADATA_TAG = "MetalmancyOwnerMetadataTag";
 
 	private @Nullable Mob mGolem;
-	private @Nullable Mob mTarget;
+	private @Nullable LivingEntity mTarget;
 
 	public Metalmancy(Plugin plugin, Player player) {
 		super(plugin, player, ABILITY_NAME);
@@ -58,7 +58,7 @@ public class Metalmancy extends DepthsAbility {
 		mTree = DepthsTree.METALLIC;
 		mInfo.mLinkedSpell = ClassAbility.METALMANCY;
 		mInfo.mCooldown = COOLDOWN;
-		mInfo.mIgnoreCooldown = true; // so that the shooting portion functions; activation manually checks for cooldown
+		mInfo.mIgnoreCooldown = true;
 	}
 
 	@Override
@@ -77,12 +77,23 @@ public class Metalmancy extends DepthsAbility {
 			World world = mPlayer.getWorld();
 			Location loc = mPlayer.getLocation();
 			Vector facingDirection = mPlayer.getEyeLocation().getDirection().normalize();
-			mGolem = (Mob) LibraryOfSoulsIntegration.summon(mPlayer.getLocation().add(facingDirection).add(0, 1, 0), GOLEM_NAME); // adds facing direction so golem doesn't spawn inside user
-			mGolem.setInvulnerable(true);
-			mGolem.getAttribute(Attribute.GENERIC_ATTACK_DAMAGE).setBaseValue(DAMAGE[mRarity - 1]);
+			mGolem = (Mob) LibraryOfSoulsIntegration.summon(mPlayer.getLocation().add(facingDirection).add(0, 1, 0), GOLEM_NAME);
 			mGolem.setVelocity(facingDirection.multiply(VELOCITY));
 
-			mGolem.setMetadata(OWNER_METADATA_TAG, new FixedMetadataValue(mPlugin, mPlayer.getName()));
+			BossManager bossManager = BossManager.getInstance();
+			if (bossManager != null) {
+				List<BossAbilityGroup> abilities = bossManager.getAbilities(mGolem);
+				if (abilities != null) {
+					for (BossAbilityGroup ability : abilities) {
+						if (ability instanceof MetalmancyBoss metalmancyBoss) {
+							FixedMetadataValue playerItemStats = new FixedMetadataValue(mPlugin, new ItemStatManager.PlayerItemStats(mPlugin.mItemStatManager.getPlayerItemStats(mPlayer)));
+
+							metalmancyBoss.spawn(mPlayer, DAMAGE[mRarity - 1], playerItemStats);
+							break;
+						}
+					}
+				}
+			}
 
 			world.playSound(loc, Sound.ENTITY_IRON_GOLEM_REPAIR, 1.0f, 1.0f);
 			world.playSound(loc, Sound.BLOCK_CHAIN_BREAK, 1.0f, 1.0f);
@@ -136,18 +147,16 @@ public class Metalmancy extends DepthsAbility {
 	}
 
 	@Override
-	public boolean livingEntityShotByPlayerEvent(Projectile proj, LivingEntity le, EntityDamageByEntityEvent event) {
-		if (mGolem == null || mGolem.getHealth() <= 0 || !(mTarget == null || mTarget.getHealth() <= 0) || le.getLocation().distance(mGolem.getLocation()) > DETECTION_RANGE || !(le instanceof Mob)) {
-			return true;
+	public void onDamage(DamageEvent event, LivingEntity enemy) {
+		if (event.getType() != DamageType.PROJECTILE || mGolem == null || mGolem.getHealth() <= 0 || !(mTarget == null || mTarget.getHealth() <= 0) || enemy.getLocation().distance(mGolem.getLocation()) > DETECTION_RANGE) {
+			return;
 		}
 
 		World world = mPlayer.getWorld();
-		mTarget = (Mob) le;
+		mTarget = enemy;
 		world.playSound(mPlayer.getLocation(), Sound.ENTITY_ARROW_HIT_PLAYER, 1.0f, 0.5f);
 		PotionUtils.applyPotion(mPlayer, mTarget, new PotionEffect(PotionEffectType.GLOWING, DURATION[mRarity - 1], 0, true, false));
 		world.spawnParticle(Particle.VILLAGER_ANGRY, mGolem.getEyeLocation(), 15);
-
-		return true;
 	}
 
 	@Override
@@ -158,17 +167,9 @@ public class Metalmancy extends DepthsAbility {
 		}
 	}
 
-	public boolean isThisGolem(IronGolem golem) {
-		return golem == mGolem;
-	}
-
-	public double getDamage() {
-		return DAMAGE[mRarity - 1];
-	}
-
 	@Override
 	public String getDescription(int rarity) {
-		return "Swap hands while holding a weapon to summon an invulnerable steel construct. The Construct attacks the nearest mob within " + DETECTION_RANGE + " blocks. The Construct prioritizes the first enemy you hit with a projectile after summoning, which can be reapplied once that target dies. The Construct deals " + DepthsUtils.getRarityColor(rarity) + DAMAGE[rarity - 1] + ChatColor.WHITE + " damage and taunts non-boss enemies it hits. The Construct disappears after " + DepthsUtils.getRarityColor(rarity) + DURATION[rarity - 1] / 20 + ChatColor.WHITE + " seconds. Cooldown: " + COOLDOWN / 20 + "s.";
+		return "Swap hands while holding a weapon to summon an invulnerable steel construct. The Construct attacks the nearest mob within " + DETECTION_RANGE + " blocks. The Construct prioritizes the first enemy you hit with a projectile after summoning, which can be reapplied once that target dies. The Construct deals " + DepthsUtils.getRarityColor(rarity) + DAMAGE[rarity - 1] + ChatColor.WHITE + " projectile damage and taunts non-boss enemies it hits. The Construct disappears after " + DepthsUtils.getRarityColor(rarity) + DURATION[rarity - 1] / 20 + ChatColor.WHITE + " seconds. Cooldown: " + COOLDOWN / 20 + "s.";
 	}
 
 	@Override

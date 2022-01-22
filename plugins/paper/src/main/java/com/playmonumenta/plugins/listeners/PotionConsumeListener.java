@@ -16,11 +16,13 @@ import org.bukkit.SoundCategory;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.HumanEntity;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.ThrownPotion;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityPotionEffectEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryAction;
@@ -38,11 +40,13 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.cleric.NonClericProvisionsPassive;
 import com.playmonumenta.plugins.depths.abilities.dawnbringer.LightningBottle;
 import com.playmonumenta.plugins.effects.PercentSpeed;
-import com.playmonumenta.plugins.enchantments.InstantDrink;
-import com.playmonumenta.plugins.enchantments.curses.Starvation;
 import com.playmonumenta.plugins.integrations.CoreProtectIntegration;
+import com.playmonumenta.plugins.itemstats.enchantments.Starvation;
+import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.utils.ItemStatUtils;
+import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
@@ -84,7 +88,7 @@ public class PotionConsumeListener implements Listener {
 		    // Must be a click on a drinkable potion or glass bottle in empty hand
 		    (event.getCursor() != null && !event.getCursor().getType().equals(Material.AIR)) ||
 		    event.getCurrentItem() == null ||
-		    ItemUtils.isItemShattered(event.getCurrentItem()) ||
+		    ItemStatUtils.isShattered(event.getCurrentItem()) ||
 			ZoneUtils.hasZoneProperty(whoClicked, ZoneProperty.NO_POTIONS) ||
 		    !(event.getCurrentItem().getType().equals(Material.POTION) ||
 		      event.getCurrentItem().getType().equals(Material.GLASS_BOTTLE))
@@ -158,7 +162,7 @@ public class PotionConsumeListener implements Listener {
 			return;
 		}
 
-		int instantDrinkLevel = InventoryUtils.getCustomEnchantLevel(item, InstantDrink.PROPERTY_NAME, false);
+		int instantDrinkLevel = (int) mPlugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.INSTANT_DRINK);
 
 		if (PotionUtils.isLuckPotion(meta)) {
 			Location loc = player.getLocation();
@@ -181,7 +185,7 @@ public class PotionConsumeListener implements Listener {
 			PotionUtils.applyPotion(mPlugin, player, meta);
 
 			//Apply Starvation if applicable
-			int starvation = InventoryUtils.getCustomEnchantLevel(item, Starvation.PROPERTY_NAME, true);
+			int starvation = (int) mPlugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.STARVATION);
 			if (starvation > 0) {
 				Starvation.apply(player, starvation);
 			}
@@ -198,7 +202,7 @@ public class PotionConsumeListener implements Listener {
 						PotionUtils.applyPotion(mPlugin, player, meta);
 
 						//Apply Starvation if applicable
-						int starvation = InventoryUtils.getCustomEnchantLevel(item, Starvation.PROPERTY_NAME, true);
+						int starvation = (int) mPlugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.STARVATION);
 						if (starvation > 0) {
 							Starvation.apply(player, starvation);
 						}
@@ -278,7 +282,7 @@ public class PotionConsumeListener implements Listener {
 		    // Must be a click on a shulker box with an empty hand
 		    (event.getCursor() != null && !event.getCursor().getType().equals(Material.AIR)) ||
 		    event.getCurrentItem() == null ||
-			ItemUtils.isItemShattered(event.getCurrentItem()) ||
+			ItemStatUtils.isShattered(event.getCurrentItem()) ||
 		    !(event.getCurrentItem().getType().equals(Material.SPLASH_POTION) ||
 		      event.getCurrentItem().getType().equals(Material.LINGERING_POTION))
 				) {
@@ -339,6 +343,18 @@ public class PotionConsumeListener implements Listener {
 		item.setAmount(item.getAmount() - 1);
 
 		event.setCancelled(true);
+	}
+
+	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+	public void appliedPotionEvent(EntityPotionEffectEvent event) {
+		PotionEffect newEffect = event.getNewEffect();
+		if (event.getModifiedType().getName().equals("WEAKNESS") && newEffect != null) {
+			if (event.getAction() != EntityPotionEffectEvent.Action.REMOVED && event.getAction() != EntityPotionEffectEvent.Action.CLEARED && event.getEntity() instanceof LivingEntity le) {
+				EntityUtils.applyWeaken(mPlugin, newEffect.getDuration(), (newEffect.getAmplifier() + 1) * 0.1, le);
+				le.removePotionEffect(PotionEffectType.WEAKNESS);
+				event.setCancelled(true);
+			}
+		}
 	}
 
 	//Set cooldown to prevent spam

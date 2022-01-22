@@ -1,10 +1,20 @@
 package com.playmonumenta.plugins.abilities.warlock;
 
-import java.util.Arrays;
-import java.util.EnumSet;
-import java.util.List;
-import java.util.stream.Stream;
-
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.abilities.AbilityManager;
+import com.playmonumenta.plugins.abilities.AbilityTrigger;
+import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.itemstats.enchantments.Inferno;
+import com.playmonumenta.plugins.server.properties.ServerProperties;
+import com.playmonumenta.plugins.utils.DamageUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.MovementUtils;
+import com.playmonumenta.plugins.utils.VectorUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -14,8 +24,6 @@ import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -23,38 +31,14 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.abilities.AbilityManager;
-import com.playmonumenta.plugins.abilities.AbilityTrigger;
-import com.playmonumenta.plugins.classes.ClassAbility;
-import com.playmonumenta.plugins.classes.magic.MagicType;
-import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
-import com.playmonumenta.plugins.enchantments.Inferno;
-import com.playmonumenta.plugins.enchantments.abilities.BaseAbilityEnchantment;
-import com.playmonumenta.plugins.server.properties.ServerProperties;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.FastUtils;
-import com.playmonumenta.plugins.utils.ItemUtils;
-import com.playmonumenta.plugins.utils.MovementUtils;
-import com.playmonumenta.plugins.utils.VectorUtils;
-
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Stream;
 
 
 public class AmplifyingHex extends Ability {
-	public static class AmplifyingHexDamageEnchantment extends BaseAbilityEnchantment {
-		public AmplifyingHexDamageEnchantment() {
-			super("Amplifying Hex Damage", EnumSet.of(ItemSlot.MAINHAND, ItemSlot.OFFHAND, ItemSlot.ARMOR));
-		}
-	}
 
-	public static class AmplifyingHexCooldownEnchantment extends BaseAbilityEnchantment {
-		public AmplifyingHexCooldownEnchantment() {
-			super("Amplifying Hex Cooldown", EnumSet.of(ItemSlot.ARMOR));
-		}
-	}
-
-	private static final float FLAT_DAMAGE = 3f;
+	private static final float FLAT_DAMAGE = 2f;
 	private static final float DAMAGE_PER_SKILL_POINT = 0.5f;
 	private static final int AMPLIFIER_DAMAGE_1 = 1;
 	private static final int AMPLIFIER_DAMAGE_2 = 2;
@@ -90,7 +74,7 @@ public class AmplifyingHex extends Ability {
 		super(plugin, player, "Amplifying Hex");
 		mInfo.mScoreboardId = "AmplifyingHex";
 		mInfo.mShorthandName = "AH";
-		mInfo.mDescriptions.add("Left-click while sneaking with a scythe to fire a magic cone up to 8 blocks in front of you, dealing 3 + (0.5 * number of Skill Points, capped at the maximum available Skill Points for each Region) damage to each enemy per debuff (potion effects like Weakness or Wither, as well as Fire and custom effects like Bleed) they have, and an extra +1 damage per extra level of debuff, capped at 2 extra levels. 10% Slowness, Weaken, etc. count as one level. Cooldown: 10s.");
+		mInfo.mDescriptions.add("Left-click while sneaking with a scythe to fire a magic cone up to 8 blocks in front of you, dealing 2 + (0.5 * number of Skill Points, capped at the maximum available Skill Points for each Region) magic damage to each enemy per debuff (potion effects like Weakness or Wither, as well as Fire and custom effects like Bleed) they have, and an extra +1 damage per extra level of debuff, capped at 2 extra levels. 10% Slowness, Weaken, etc. count as one level. Cooldown: 10s.");
 		mInfo.mDescriptions.add("The range is increased to 10 blocks, extra damage increased to +2 per extra level, and the extra level cap is increased to 3 extra levels.");
 		mInfo.mLinkedSpell = ClassAbility.AMPLIFYING;
 		mInfo.mCooldown = COOLDOWN;
@@ -167,14 +151,14 @@ public class AmplifyingHex extends Ability {
 
 				if (mob.getFireTicks() > 0) {
 					debuffCount++;
-					amplifierCount += Math.min(mAmplifierCap, Inferno.getMobInfernoLevel(mPlugin, mob));
+					amplifierCount += Math.min(mAmplifierCap, Inferno.getInfernoLevel(mPlugin, mob));
 				}
 
 				if (EntityUtils.isStunned(mob)) {
 					debuffCount++;
 				}
 
-				if (EntityUtils.isConfused(mob)) {
+				if (EntityUtils.isParalyzed(mPlugin, mob)) {
 					debuffCount++;
 				}
 
@@ -204,13 +188,13 @@ public class AmplifyingHex extends Ability {
 				//Custom DoT interaction
 				if (EntityUtils.hasDamageOverTime(mPlugin, mob)) {
 					debuffCount++;
-					amplifierCount += Math.min(mAmplifierCap, (int) EntityUtils.getDamageOverTimeMagnitude(mPlugin, mob) - 1);
+					amplifierCount += Math.min(mAmplifierCap, (int) EntityUtils.getHighestDamageOverTime(mPlugin, mob) - 1);
 				}
 
 				if (debuffCount > 0) {
-					float finalDamage = AmplifyingHexDamageEnchantment.getExtraPercentDamage(mPlayer, AmplifyingHexDamageEnchantment.class, debuffCount * (FLAT_DAMAGE + Math.min(mDamage, mRegionCap)) + amplifierCount * mAmplifierDamage);
-					EntityUtils.damageEntity(mPlugin, mob, finalDamage, mPlayer, MagicType.DARK_MAGIC, true, mInfo.mLinkedSpell);
-					MovementUtils.knockAway(mPlayer, mob, KNOCKBACK_SPEED);
+					float finalDamage = debuffCount * (FLAT_DAMAGE + Math.min(mDamage, mRegionCap)) + amplifierCount * mAmplifierDamage;
+					DamageUtils.damage(mPlayer, mob, DamageType.MAGIC, finalDamage, mInfo.mLinkedSpell);
+					MovementUtils.knockAway(mPlayer, mob, KNOCKBACK_SPEED, true);
 				}
 			}
 		}
@@ -228,16 +212,9 @@ public class AmplifyingHex extends Ability {
 	}
 
 	@Override
-	public boolean livingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
-	    if (event.getCause().equals(DamageCause.ENTITY_ATTACK)) {
+	public void onDamage(DamageEvent event, LivingEntity enemy) {
+	    if (event.getType() == DamageType.MELEE) {
 	        cast(Action.LEFT_CLICK_AIR);
 	    }
-
-	    return true;
-	}
-
-	@Override
-	public Class<? extends BaseAbilityEnchantment> getCooldownEnchantment() {
-		return AmplifyingHexCooldownEnchantment.class;
 	}
 }

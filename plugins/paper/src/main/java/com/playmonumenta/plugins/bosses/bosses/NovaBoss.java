@@ -1,12 +1,5 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
-import java.util.Arrays;
-
-import org.bukkit.Location;
-import org.bukkit.Sound;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.plugin.Plugin;
-
 import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.parameters.BossParam;
 import com.playmonumenta.plugins.bosses.parameters.EffectsList;
@@ -15,7 +8,14 @@ import com.playmonumenta.plugins.bosses.parameters.EntityTargets.TARGETS;
 import com.playmonumenta.plugins.bosses.parameters.ParticlesList;
 import com.playmonumenta.plugins.bosses.parameters.SoundsList;
 import com.playmonumenta.plugins.bosses.spells.SpellBaseNova;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.utils.BossUtils;
+import org.bukkit.Location;
+import org.bukkit.Sound;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.plugin.Plugin;
+
+import java.util.Arrays;
 
 public final class NovaBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_nova";
@@ -86,7 +86,7 @@ public final class NovaBoss extends BossAbilityGroup {
 				p.PARTICLE_AIR.spawn(loc, ((double) p.RADIUS) / 2, ((double) p.RADIUS) / 2, ((double) p.RADIUS) / 2, 0.05);
 			},
 			(Location loc) -> {
-				p.PARTICLE_LOAD.spawn(loc, 0.25d, 0.25d, 0.25d, (double) 0.0d);
+				p.PARTICLE_LOAD.spawn(loc, 0.25d, 0.25d, 0.25d, 0.0d);
 			},
 			(Location loc) -> {
 				p.SOUND_CAST.play(loc, 1.5f, 0.65f);
@@ -97,19 +97,11 @@ public final class NovaBoss extends BossAbilityGroup {
 			(Location loc) -> {
 				for (LivingEntity target : p.TARGETS.getTargetsList(mBoss)) {
 					if (p.DAMAGE > 0) {
-						if (p.SPELL_NAME.isEmpty()) {
-							BossUtils.bossDamage(boss, target, p.DAMAGE);
-						} else {
-							BossUtils.bossDamage(boss, target, p.DAMAGE, mBoss.getLocation(), p.SPELL_NAME);
-						}
+						BossUtils.blockableDamage(boss, target, DamageType.MAGIC, p.DAMAGE, p.SPELL_NAME, mBoss.getLocation());
 					}
 
 					if (p.DAMAGE_PERCENTAGE > 0.0) {
-						if (p.SPELL_NAME.isEmpty()) {
-							BossUtils.bossDamagePercent(mBoss, target, p.DAMAGE_PERCENTAGE);
-						} else {
-							BossUtils.bossDamagePercent(mBoss, target, p.DAMAGE_PERCENTAGE, p.SPELL_NAME);
-						}
+						BossUtils.bossDamagePercent(mBoss, target, p.DAMAGE_PERCENTAGE, p.SPELL_NAME);
 					}
 					p.EFFECTS.apply(target, mBoss);
 				}

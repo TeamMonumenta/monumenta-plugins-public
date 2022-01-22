@@ -1,13 +1,13 @@
 package com.playmonumenta.plugins.depths.abilities.aspects;
 
-import org.bukkit.Material;
-import org.bukkit.entity.Player;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
-
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.depths.abilities.WeaponAspectDepthsAbility;
+import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.utils.ItemUtils;
+import org.bukkit.Material;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
 
 public class SwordAspect extends WeaponAspectDepthsAbility {
 
@@ -20,13 +20,10 @@ public class SwordAspect extends WeaponAspectDepthsAbility {
 	}
 
 	@Override
-	public boolean livingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
-
-		if (mPlayer != null && event.getCause().equals(DamageCause.ENTITY_ATTACK) && ItemUtils.isSword(mPlayer.getInventory().getItemInMainHand())) {
+	public void onDamage(DamageEvent event, LivingEntity enemy) {
+		if (mPlayer != null && event.getType() == DamageType.MELEE && ItemUtils.isSword(mPlayer.getInventory().getItemInMainHand())) {
 			event.setDamage(event.getDamage() + DAMAGE);
 		}
-
-		return true;
 	}
 
 	@Override

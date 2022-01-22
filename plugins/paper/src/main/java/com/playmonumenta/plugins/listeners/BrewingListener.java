@@ -1,7 +1,10 @@
 package com.playmonumenta.plugins.listeners;
 
-import java.util.List;
-
+import com.playmonumenta.plugins.player.PartialParticle;
+import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.LocationUtils;
+import com.playmonumenta.plugins.utils.MovementUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -19,14 +22,9 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.potion.PotionData;
 import org.bukkit.potion.PotionType;
-
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-import com.playmonumenta.plugins.player.PartialParticle;
-import com.playmonumenta.plugins.utils.ItemUtils;
-import com.playmonumenta.plugins.utils.LocationUtils;
-import com.playmonumenta.plugins.utils.MovementUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
+import java.util.List;
 
 
 
@@ -78,7 +76,7 @@ public class BrewingListener implements Listener {
 				Location blockCentre = LocationUtils.getLocationCentre(block);
 				List<Player> nearbyPlayers = PlayerUtils.playersInRange(blockCentre, 3, true);
 				for (Player player : nearbyPlayers) {
-					MovementUtils.knockAway(blockCentre, player, 1);
+					MovementUtils.knockAway(blockCentre, player, 1, false);
 				}
 
 				// Eject ingredient & refund

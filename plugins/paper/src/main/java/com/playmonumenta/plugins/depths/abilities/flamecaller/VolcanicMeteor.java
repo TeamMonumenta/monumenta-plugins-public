@@ -1,5 +1,17 @@
 package com.playmonumenta.plugins.depths.abilities.flamecaller;
 
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.depths.DepthsTree;
+import com.playmonumenta.plugins.depths.DepthsUtils;
+import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
+import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
+import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.itemstats.ItemStatManager;
+import com.playmonumenta.plugins.utils.DamageUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -8,19 +20,9 @@ import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
+import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
-
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.classes.ClassAbility;
-import com.playmonumenta.plugins.classes.magic.MagicType;
-import com.playmonumenta.plugins.depths.DepthsTree;
-import com.playmonumenta.plugins.depths.DepthsUtils;
-import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
-import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
-import com.playmonumenta.plugins.utils.EntityUtils;
-
-import net.md_5.bungee.api.ChatColor;
 
 public class VolcanicMeteor extends DepthsAbility {
 	public static final String ABILITY_NAME = "Volcanic Meteor";
@@ -49,6 +51,8 @@ public class VolcanicMeteor extends DepthsAbility {
 		if (!isTimerActive()) {
 			putOnCooldown();
 
+			FixedMetadataValue playerItemStats = new FixedMetadataValue(mPlugin, new ItemStatManager.PlayerItemStats(mPlugin.mItemStatManager.getPlayerItemStats(mPlayer)));
+
 			Location loc = mPlayer.getEyeLocation();
 			World world = mPlayer.getWorld();
 			world.playSound(mPlayer.getLocation(), Sound.ENTITY_BLAZE_SHOOT, 1, 0.85f);
@@ -62,7 +66,7 @@ public class VolcanicMeteor extends DepthsAbility {
 				mPlayer.spawnParticle(Particle.FLAME, loc, 1, 0, 0, 0, 0);
 				int size = EntityUtils.getNearbyMobs(loc, 2, mPlayer).size();
 				if (loc.getBlock().getType().isSolid() || i >= 24 || size > 0) {
-					launchMeteor(mPlayer, loc);
+					launchMeteor(loc, playerItemStats);
 					break;
 				}
 			}
@@ -70,7 +74,7 @@ public class VolcanicMeteor extends DepthsAbility {
 	}
 
 
-	private void launchMeteor(final Player player, final Location loc) {
+	private void launchMeteor(final Location loc, final FixedMetadataValue playerItemStats) {
 		Location ogLoc = loc.clone();
 		loc.add(0, 30, 0);
 		new BukkitRunnable() {
@@ -102,7 +106,10 @@ public class VolcanicMeteor extends DepthsAbility {
 								double mult = Math.min(Math.max(0, (6 - distance) / 4), 1);
 
 								EntityUtils.applyFire(mPlugin, FIRE_TICKS, e, mPlayer);
-								EntityUtils.damageEntity(mPlugin, e, damage * mult, player, MagicType.FIRE, true, mInfo.mLinkedSpell);
+								DamageEvent damageEvent = new DamageEvent(e, mPlayer, mPlayer, DamageType.MAGIC, mInfo.mLinkedSpell, damage * mult);
+								damageEvent.setDelayed(true);
+								damageEvent.setPlayerItemStat(playerItemStats);
+								DamageUtils.damage(damageEvent, false, true, null);
 							}
 							break;
 						}
@@ -122,7 +129,7 @@ public class VolcanicMeteor extends DepthsAbility {
 
 	@Override
 	public String getDescription(int rarity) {
-		return "Swap hands to summon a falling meteor location where you are looking, up to " + DISTANCE + " blocks away. When the meteor lands, it deals " + DepthsUtils.getRarityColor(rarity) + DAMAGE[rarity - 1] + ChatColor.WHITE + " damage in a " + SIZE + " block radius, but the damage is reduced depending on the distance from the center. Cooldown: " + COOLDOWN_TICKS / 20 + "s.";
+		return "Swap hands to summon a falling meteor location where you are looking, up to " + DISTANCE + " blocks away. When the meteor lands, it deals " + DepthsUtils.getRarityColor(rarity) + DAMAGE[rarity - 1] + ChatColor.WHITE + " magic damage in a " + SIZE + " block radius, but the damage is reduced depending on the distance from the center. Cooldown: " + COOLDOWN_TICKS / 20 + "s.";
 	}
 
 	@Override

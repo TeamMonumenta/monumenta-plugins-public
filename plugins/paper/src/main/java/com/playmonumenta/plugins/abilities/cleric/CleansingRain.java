@@ -1,7 +1,13 @@
 package com.playmonumenta.plugins.abilities.cleric;
 
-import java.util.EnumSet;
-
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.abilities.AbilityTrigger;
+import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.effects.PercentDamageReceived;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.utils.PotionUtils;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -12,30 +18,9 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.abilities.AbilityTrigger;
-import com.playmonumenta.plugins.classes.ClassAbility;
-import com.playmonumenta.plugins.effects.PercentDamageReceived;
-import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
-import com.playmonumenta.plugins.enchantments.abilities.BaseAbilityEnchantment;
-import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.plugins.utils.PotionUtils;
-
 
 
 public class CleansingRain extends Ability {
-	public static class CleansingRainCooldownEnchantment extends BaseAbilityEnchantment {
-		public CleansingRainCooldownEnchantment() {
-			super("Cleansing Rain Cooldown", EnumSet.of(ItemSlot.ARMOR));
-		}
-	}
-
-	public static class CleansingRainRadiusEnchantment extends BaseAbilityEnchantment {
-		public CleansingRainRadiusEnchantment() {
-			super("Cleansing Rain Range", EnumSet.of(ItemSlot.MAINHAND, ItemSlot.OFFHAND, ItemSlot.ARMOR));
-		}
-	}
 
 	private static final int CLEANSING_DURATION = 15 * 20;
 	private static final double PERCENT_DAMAGE_RESIST = -0.2;
@@ -86,10 +71,10 @@ public class CleansingRain extends Ability {
 				world.spawnParticle(Particle.WATER_DROP, mPlayer.getLocation().add(0, 2, 0), 15, 2.5, 2, 2.5, 0.001);
 				world.spawnParticle(Particle.VILLAGER_HAPPY, mPlayer.getLocation().add(0, 2, 0), 1, 2, 1.5, 2, 0.001);
 
-				float radius = CleansingRainRadiusEnchantment.getRadius(mPlayer, CLEANSING_RADIUS, CleansingRainRadiusEnchantment.class);
-
-				for (Player player : PlayerUtils.playersInRange(mPlayer.getLocation(), radius, true)) {
+				for (Player player : PlayerUtils.playersInRange(mPlayer.getLocation(), CLEANSING_RADIUS, true)) {
 					PotionUtils.clearNegatives(mPlugin, player);
+					EntityUtils.setWeakenTicks(mPlugin, player, 0);
+					EntityUtils.setSlowTicks(mPlugin, player, 0);
 
 					if (player.getFireTicks() > 1) {
 						player.setFireTicks(1);
@@ -121,8 +106,4 @@ public class CleansingRain extends Ability {
 			&& offHand.getType() != Material.BOW;
 	}
 
-	@Override
-	public Class<? extends BaseAbilityEnchantment> getCooldownEnchantment() {
-		return CleansingRainCooldownEnchantment.class;
-	}
 }

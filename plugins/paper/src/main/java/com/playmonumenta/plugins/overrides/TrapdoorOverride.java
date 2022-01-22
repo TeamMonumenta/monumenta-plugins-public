@@ -1,9 +1,8 @@
 package com.playmonumenta.plugins.overrides;
 
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
-
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.utils.ZoneUtils;
+import net.kyori.adventure.text.Component;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -19,10 +18,9 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-import net.kyori.adventure.text.Component;
-
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.utils.ZoneUtils;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
 
 public class TrapdoorOverride extends UnbreakableOnBedrockOverride {
 	@Override

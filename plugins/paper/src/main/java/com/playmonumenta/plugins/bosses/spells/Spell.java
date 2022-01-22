@@ -1,19 +1,20 @@
 package com.playmonumenta.plugins.bosses.spells;
 
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
-
+import com.playmonumenta.plugins.bosses.events.SpellCastEvent;
+import com.playmonumenta.plugins.events.DamageEvent;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.entity.AreaEffectCloudApplyEvent;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.entity.PotionSplashEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import com.playmonumenta.plugins.bosses.events.SpellCastEvent;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
 
 public abstract class Spell implements Cloneable {
 	protected final Set<BukkitRunnable> mActiveRunnables = new LinkedHashSet<BukkitRunnable>();
@@ -72,22 +73,36 @@ public abstract class Spell implements Cloneable {
 	/**
 	 * @return Whether this ability ignores being silenced. Currently only works for passive spells.
 	 */
+	public void onDamage(DamageEvent event, LivingEntity damagee) {
+
+	}
+
+	/*
+	 * Boss was hurt, with or without an entity
+	 */
+	public void onHurt(DamageEvent event) {
+
+	}
+
+	/*
+	 * Boss was hurt by an entity
+	 */
+	public void onHurtByEntity(DamageEvent event, Entity damager) {
+
+	}
+
+	/*
+	 * Boss was hurt by an entity with a source (source is usually the same as the entity)
+	 */
+	public void onHurtByEntityWithSource(DamageEvent event, Entity damager, LivingEntity source) {
+
+	}
+
+	/**
+	 * @return Whether this ability ignores being silenced. Currently only works for passive spells.
+	 */
 	public boolean bypassSilence() {
 		return false;
-	}
-
-	/*
-	 * Boss damaged another entity
-	 */
-	public void bossDamagedEntity(EntityDamageByEntityEvent event) {
-
-	}
-
-	/*
-	 * Boss was damaged
-	 */
-	public void bossDamagedByEntity(EntityDamageByEntityEvent event) {
-
 	}
 
 	/*
@@ -127,6 +142,14 @@ public abstract class Spell implements Cloneable {
 
 	public void bossCastAbility(SpellCastEvent event) {
 
+	}
+
+	public void nearbyPlayerDeath(PlayerDeathEvent event) {
+
+	}
+
+	public boolean hasNearbyPlayerDeathTrigger() {
+		return false;
 	}
 
 	@FunctionalInterface

@@ -1,7 +1,18 @@
 package com.playmonumenta.plugins.depths.bosses.spells;
 
-import java.util.Map;
-
+import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.bosses.spells.SpellBaseAoE.ChargeAuraAction;
+import com.playmonumenta.plugins.bosses.spells.SpellBaseAoE.ChargeCircleAction;
+import com.playmonumenta.plugins.bosses.spells.SpellBaseAoE.CircleOutburstAction;
+import com.playmonumenta.plugins.bosses.spells.SpellBaseAoE.DealDamageAction;
+import com.playmonumenta.plugins.bosses.spells.SpellBaseAoE.OutburstAction;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.LocationUtils;
+import com.playmonumenta.plugins.utils.MovementUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -15,18 +26,7 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import com.playmonumenta.plugins.bosses.spells.Spell;
-import com.playmonumenta.plugins.bosses.spells.SpellBaseAoE.ChargeAuraAction;
-import com.playmonumenta.plugins.bosses.spells.SpellBaseAoE.ChargeCircleAction;
-import com.playmonumenta.plugins.bosses.spells.SpellBaseAoE.CircleOutburstAction;
-import com.playmonumenta.plugins.bosses.spells.SpellBaseAoE.DealDamageAction;
-import com.playmonumenta.plugins.bosses.spells.SpellBaseAoE.OutburstAction;
-import com.playmonumenta.plugins.utils.BossUtils;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.FastUtils;
-import com.playmonumenta.plugins.utils.LocationUtils;
-import com.playmonumenta.plugins.utils.MovementUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
+import java.util.Map;
 
 public class SpellIvyGarden extends Spell {
 
@@ -85,15 +85,15 @@ public class SpellIvyGarden extends Spell {
 								double distance = player.getLocation().distance(loc);
 								if (distance < mRadius / 3.0) {
 									player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 100, 2));
-									MovementUtils.knockAway(le, player, 3.0f);
+									MovementUtils.knockAway(le, player, 3.0f, false);
 								} else if (distance < (mRadius * 2.0) / 3.0) {
 									player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 100, 1));
-									MovementUtils.knockAway(le, player, 2.1f);
+									MovementUtils.knockAway(le, player, 2.1f, false);
 								} else if (distance < mRadius) {
 									player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 100, 0));
-									MovementUtils.knockAway(le, player, 1.2f);
+									MovementUtils.knockAway(le, player, 1.2f, false);
 								}
-								BossUtils.bossDamage(le, player, DAMAGE, le.getLocation(), "Ivy Garden");
+								BossUtils.blockableDamage(le, player, DamageType.MAGIC, DAMAGE, "Ivy Garden", le.getLocation());
 
 								player.getWorld().spawnParticle(Particle.VILLAGER_ANGRY, player.getLocation().clone().add(0, 1, 0), 4, 0.25, 0.5, 0.25, 0);
 							}
@@ -140,7 +140,7 @@ public class SpellIvyGarden extends Spell {
 			public void run() {
 				Location loc = launcher.getLocation();
 
-				if (launcher.isDead() || !launcher.isValid() || EntityUtils.isStunned(launcher) || EntityUtils.isSilenced(launcher) || EntityUtils.isConfused(launcher)) {
+				if (launcher.isDead() || !launcher.isValid() || EntityUtils.isStunned(launcher) || EntityUtils.isSilenced(launcher)) {
 					if (launcher instanceof LivingEntity) {
 						((LivingEntity) launcher).setAI(true);
 					}

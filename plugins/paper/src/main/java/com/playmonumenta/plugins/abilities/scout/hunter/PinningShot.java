@@ -8,20 +8,18 @@ import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
-import org.bukkit.attribute.Attribute;
-import org.bukkit.attribute.AttributeInstance;
-import org.bukkit.entity.Arrow;
+import org.bukkit.entity.AbstractArrow;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.entity.Projectile;
-import org.bukkit.entity.SpectralArrow;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 
 
@@ -55,47 +53,44 @@ public class PinningShot extends Ability {
 	}
 
 	@Override
-	public boolean livingEntityShotByPlayerEvent(Projectile proj, LivingEntity damagee, EntityDamageByEntityEvent event) {
-		if (!(proj instanceof Arrow || proj instanceof SpectralArrow)) {
-			return true;
+	public void onDamage(DamageEvent event, LivingEntity enemy) {
+		if (event.getType() != DamageType.PROJECTILE || !(event.getDamager() instanceof AbstractArrow)) {
+			return;
 		}
 
 		World world = mPlayer.getWorld();
-		if (mPinnedMobs.containsKey(damagee)) {
+		if (mPinnedMobs.containsKey(enemy)) {
 			// If currently pinned
-			if (mPinnedMobs.get(damagee)) {
-				Location loc = damagee.getEyeLocation();
+			if (mPinnedMobs.get(enemy)) {
+				Location loc = enemy.getEyeLocation();
 				world.playSound(loc, Sound.BLOCK_GLASS_BREAK, 1, 0.5f);
 				world.spawnParticle(Particle.FIREWORKS_SPARK, loc, 20, 0, 0, 0, 0.2);
 				world.spawnParticle(Particle.SNOWBALL, loc, 30, 0, 0, 0, 0.25);
-				EntityUtils.setSlowTicks(mPlugin, damagee, 1);
-				EntityUtils.setWeakenTicks(mPlugin, damagee, 1);
-				AttributeInstance maxHealth = damagee.getAttribute(Attribute.GENERIC_MAX_HEALTH);
-				if (!EntityUtils.isBoss(damagee) && maxHealth != null) {
-					EntityUtils.damageEntity(mPlugin, damagee, maxHealth.getValue() * mDamageMultiplier, mPlayer, null, true, null, false, false, true);
+				EntityUtils.setSlowTicks(mPlugin, enemy, 1);
+				EntityUtils.setWeakenTicks(mPlugin, enemy, 1);
+				if (!EntityUtils.isBoss(enemy)) {
+					DamageUtils.damage(mPlayer, enemy, DamageType.OTHER, EntityUtils.getMaxHealth(enemy) * mDamageMultiplier, mInfo.mLinkedSpell, true, false);
 				}
-				mPinnedMobs.put(damagee, false);
+				mPinnedMobs.put(enemy, false);
 			}
-		} else if (!mPinnedMobs.containsKey(damagee)) {
-			Location loc = damagee.getLocation();
+		} else if (!mPinnedMobs.containsKey(enemy)) {
+			Location loc = enemy.getLocation();
 			world.playSound(loc, Sound.BLOCK_SLIME_BLOCK_PLACE, 1, 0.5f);
 			world.spawnParticle(Particle.EXPLOSION_NORMAL, loc, 8, 0, 0, 0, 0.2);
-			if (EntityUtils.isBoss(damagee)) {
-				EntityUtils.applySlow(mPlugin, PINNING_SHOT_DURATION, PINNING_SLOW_BOSS, damagee);
+			if (EntityUtils.isBoss(enemy)) {
+				EntityUtils.applySlow(mPlugin, PINNING_SHOT_DURATION, PINNING_SLOW_BOSS, enemy);
 			} else {
-				EntityUtils.applySlow(mPlugin, PINNING_SHOT_DURATION, PINNING_SLOW, damagee);
-				EntityUtils.applyWeaken(mPlugin, PINNING_SHOT_DURATION, mWeaken, damagee);
+				EntityUtils.applySlow(mPlugin, PINNING_SHOT_DURATION, PINNING_SLOW, enemy);
+				EntityUtils.applyWeaken(mPlugin, PINNING_SHOT_DURATION, mWeaken, enemy);
 			}
-			mPinnedMobs.put(damagee, true);
+			mPinnedMobs.put(enemy, true);
 			new BukkitRunnable() {
 				@Override
 				public void run() {
-					mPinnedMobs.put(damagee, false);
+					mPinnedMobs.put(enemy, false);
 				}
 			}.runTaskLater(mPlugin, PINNING_SHOT_DURATION);
 		}
-
-		return true;
 	}
 
 	@Override

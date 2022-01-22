@@ -1,10 +1,18 @@
 package com.playmonumenta.plugins.plots;
 
-import java.util.Collection;
-import java.util.Set;
-import java.util.UUID;
-import java.util.function.Consumer;
-
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.integrations.luckperms.LuckPermsIntegration;
+import com.playmonumenta.plugins.utils.ZoneUtils;
+import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
+import com.playmonumenta.scriptedquests.quests.QuestNpc;
+import com.playmonumenta.scriptedquests.utils.ScoreboardUtils;
+import dev.jorel.commandapi.CommandAPI;
+import dev.jorel.commandapi.CommandAPICommand;
+import dev.jorel.commandapi.CommandPermission;
+import dev.jorel.commandapi.arguments.EntitySelectorArgument;
+import dev.jorel.commandapi.arguments.EntitySelectorArgument.EntitySelector;
+import dev.jorel.commandapi.arguments.MultiLiteralArgument;
+import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
 import org.bukkit.ChatColor;
 import org.bukkit.DyeColor;
 import org.bukkit.GameMode;
@@ -44,20 +52,10 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.BoundingBox;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.integrations.luckperms.LuckPermsIntegration;
-import com.playmonumenta.plugins.utils.ZoneUtils;
-import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
-import com.playmonumenta.scriptedquests.quests.QuestNpc;
-import com.playmonumenta.scriptedquests.utils.ScoreboardUtils;
-
-import dev.jorel.commandapi.CommandAPI;
-import dev.jorel.commandapi.CommandAPICommand;
-import dev.jorel.commandapi.CommandPermission;
-import dev.jorel.commandapi.arguments.EntitySelectorArgument;
-import dev.jorel.commandapi.arguments.EntitySelectorArgument.EntitySelector;
-import dev.jorel.commandapi.arguments.MultiLiteralArgument;
-import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
+import java.util.Collection;
+import java.util.Set;
+import java.util.UUID;
+import java.util.function.Consumer;
 
 public class ShopManager implements Listener {
 	private static final Material SHOP_EMPTY_MAT = Material.BRICKS;
@@ -75,9 +73,9 @@ public class ShopManager implements Listener {
 		Entity damagee = event.getEntity();
 		Entity damager = event.getDamager();
 
-		if (damager instanceof Player && damagee instanceof Shulker
+		if (damager instanceof Player player && damagee instanceof Shulker
 				&& damagee.getCustomName() != null && damagee.getCustomName().endsWith("Shop")
-				&& ZoneUtils.hasZoneProperty((Player) damager, ZoneProperty.SHOPS_POSSIBLE)) {
+				&& ZoneUtils.hasZoneProperty(damager, ZoneProperty.SHOPS_POSSIBLE)) {
 
 			final Shop shop;
 			try {
@@ -87,8 +85,6 @@ public class ShopManager implements Listener {
 				Plugin.getInstance().getLogger().warning("Tried to damage a shulker that seemed like a shop but wasn't: " + ex.getMessage());
 				return;
 			}
-
-			Player player = (Player)damager;
 
 			com.playmonumenta.scriptedquests.Plugin sq = com.playmonumenta.scriptedquests.Plugin.getInstance();
 
@@ -494,16 +490,16 @@ public class ShopManager implements Listener {
 		Location entityLoc = startLoc.clone();
 		if (minXD <= minZD && minXD <= maxXD && minXD <= maxZD) {
 			entityLoc.setX(minX - 1);
-			entityLoc.setZ((int)((maxZ + minZ) / 2));
+			entityLoc.setZ((maxZ + minZ) / 2);
 		} else if (minZD <= minXD && minZD <= maxXD && minZD <= maxZD) {
 			entityLoc.setZ(minZ - 1);
-			entityLoc.setX((int)((maxX + minX) / 2));
+			entityLoc.setX((maxX + minX) / 2);
 		} else if (maxXD <= minXD && maxXD <= minZD && maxXD <= maxZD) {
 			entityLoc.setX(maxX + 1);
-			entityLoc.setZ((int)((maxZ + minZ) / 2));
+			entityLoc.setZ((maxZ + minZ) / 2);
 		} else {
 			entityLoc.setZ(maxZ + 1);
-			entityLoc.setX((int)((maxX + minX) / 2));
+			entityLoc.setX((maxX + minX) / 2);
 		}
 		entityLoc.add(0.5, 0, 0.5);
 

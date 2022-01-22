@@ -1,11 +1,12 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
+import com.playmonumenta.plugins.events.DamageEvent;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.plugin.Plugin;
 
 public class DamageReducedBoss extends BossAbilityGroup {
@@ -21,14 +22,15 @@ public class DamageReducedBoss extends BossAbilityGroup {
 		super.constructBoss(null, null, detectionRange, null);
 	}
 
-	public void bossDamagedByEntity(EntityDamageByEntityEvent event) {
-		if (event.getFinalDamage() < 4) {
+	@Override
+	public void onHurtByEntity(DamageEvent event, Entity damager) {
+		if (event.getDamage() < 4) {
 			Location loc = mBoss.getLocation();
 			loc.getWorld().playSound(loc, Sound.ENTITY_SHULKER_HURT_CLOSED, SoundCategory.HOSTILE, 1f, 1f);
 			loc.getWorld().spawnParticle(Particle.ENCHANTMENT_TABLE, loc.add(0, 1.4, 0), 20, 0, 0, 0, 0.4);
 			event.setCancelled(true);
 		} else {
-			event.setDamage(event.getFinalDamage() - 4);
+			event.setDamage(event.getDamage() - 4);
 		}
 	}
 }

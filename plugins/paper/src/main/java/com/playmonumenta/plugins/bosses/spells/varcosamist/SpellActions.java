@@ -1,13 +1,10 @@
 package com.playmonumenta.plugins.bosses.spells.varcosamist;
 
-import java.util.Collection;
-
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.bosses.spells.SpellPlayerAction;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.scriptedquests.utils.MetadataUtils;
-
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -15,6 +12,8 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
+
+import java.util.Collection;
 
 
 

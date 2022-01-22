@@ -1,5 +1,7 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
+import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.utils.AbsorptionUtils;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -11,13 +13,10 @@ import org.bukkit.entity.Player;
 import org.bukkit.entity.Snowball;
 import org.bukkit.entity.Snowman;
 import org.bukkit.event.entity.AreaEffectCloudApplyEvent;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.PotionSplashEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.plugin.Plugin;
-
-import com.playmonumenta.plugins.utils.AbsorptionUtils;
 
 public class WinterSnowmanEventBoss extends BossAbilityGroup {
 	public static final String deathMetakey = "PLAYER_SNOWMAN_DEATH_METAKEY";
@@ -40,16 +39,14 @@ public class WinterSnowmanEventBoss extends BossAbilityGroup {
 	}
 
 	@Override
-	public void bossDamagedByEntity(EntityDamageByEntityEvent event) {
-		Entity damager = event.getDamager();
-
-		if (damager != null && damager instanceof Player && ((Player)damager).getGameMode().equals(GameMode.CREATIVE)) {
+	public void onHurtByEntityWithSource(DamageEvent event, Entity damager, LivingEntity source) {
+		if (damager instanceof Player player && player.getGameMode().equals(GameMode.CREATIVE)) {
 			// This event happens like normal
 			return;
 		}
 
 		// If hit by a snowball thrown by a player, damage the snowman by 1 HP after this tick is over
-		if (damager instanceof Snowball && (((Snowball)damager).getShooter() instanceof Player)) {
+		if (damager instanceof Snowball && source instanceof Player) {
 			Location loc = mBoss.getLocation();
 			loc.getWorld().playSound(loc, Sound.BLOCK_CORAL_BLOCK_BREAK, SoundCategory.HOSTILE, 2, 0);
 			loc.getWorld().spawnParticle(Particle.CLOUD, loc, 100, 1, 1, 1, 0.1);

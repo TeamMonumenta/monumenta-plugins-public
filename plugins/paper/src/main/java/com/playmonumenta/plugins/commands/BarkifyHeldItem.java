@@ -1,14 +1,6 @@
 package com.playmonumenta.plugins.commands;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.bukkit.Sound;
-import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
-
-import com.playmonumenta.plugins.utils.CommandUtils;
-
+import com.playmonumenta.plugins.utils.ItemStatUtils;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.CommandPermission;
 import dev.jorel.commandapi.arguments.Argument;
@@ -16,6 +8,13 @@ import dev.jorel.commandapi.arguments.EntitySelectorArgument;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument.EntitySelector;
 import dev.jorel.commandapi.arguments.MultiLiteralArgument;
 import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
+import org.bukkit.Sound;
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /*
  * NOTICE!
@@ -44,18 +43,17 @@ public class BarkifyHeldItem extends GenericCommand {
 	}
 
 	private static void run(CommandSender sender, Player player, String selection) throws WrapperCommandSyntaxException {
-		if (selection.equals("Barking2")) {
-			selection = "Barking II";
-		}
-
-		CommandUtils.enchantify(sender, player, selection);
-
+		ItemStack is = player.getItemInHand();
 		if (selection.equals("Barking")) {
 			player.playSound(player.getLocation(), Sound.ENTITY_WOLF_AMBIENT, 1, 1f);
-		} else if (selection.equals("Barking II")) {
+			ItemStatUtils.addInfusion(is, ItemStatUtils.InfusionType.BARKING, 1, player.getUniqueId());
+		} else if (selection.equals("Barking2")) {
 			player.playSound(player.getLocation(), Sound.ENTITY_WOLF_WHINE, 1, 1f);
+			ItemStatUtils.addInfusion(is, ItemStatUtils.InfusionType.BARKING, 2, player.getUniqueId());
 		} else {
 			player.playSound(player.getLocation(), Sound.ENTITY_WOLF_GROWL, 1, 1f);
+			ItemStatUtils.addInfusion(is, ItemStatUtils.InfusionType.DEBARKING, 1, player.getUniqueId());
 		}
+		ItemStatUtils.generateItemStats(is);
 	}
 }

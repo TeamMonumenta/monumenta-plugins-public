@@ -1,9 +1,23 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
-import java.util.AbstractMap;
-import java.util.Arrays;
-import java.util.Collection;
-
+import com.playmonumenta.plugins.bosses.BossBarManager;
+import com.playmonumenta.plugins.bosses.SpellManager;
+import com.playmonumenta.plugins.bosses.spells.SpellBaseCharge;
+import com.playmonumenta.plugins.bosses.spells.SpellBlockBreak;
+import com.playmonumenta.plugins.bosses.spells.SpellBombToss;
+import com.playmonumenta.plugins.bosses.spells.SpellShieldStun;
+import com.playmonumenta.plugins.bosses.spells.rkitxet.SpellKaulsFury;
+import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.DamageUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.ParticleUtils;
+import com.playmonumenta.plugins.utils.ParticleUtils.SpawnParticleAction;
+import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.utils.SerializationUtils;
+import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -14,16 +28,12 @@ import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Arrow;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.entity.Projectile;
 import org.bukkit.entity.TNTPrimed;
 import org.bukkit.entity.Vindicator;
 import org.bukkit.entity.Witch;
 import org.bukkit.event.block.BlockBreakEvent;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityTargetEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
@@ -32,22 +42,9 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-import com.playmonumenta.plugins.bosses.BossBarManager;
-import com.playmonumenta.plugins.bosses.SpellManager;
-import com.playmonumenta.plugins.bosses.spells.SpellBaseCharge;
-import com.playmonumenta.plugins.bosses.spells.SpellBlockBreak;
-import com.playmonumenta.plugins.bosses.spells.SpellBombToss;
-import com.playmonumenta.plugins.bosses.spells.rkitxet.SpellKaulsFury;
-import com.playmonumenta.plugins.utils.BossUtils;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.FastUtils;
-import com.playmonumenta.plugins.utils.NmsUtils;
-import com.playmonumenta.plugins.utils.ParticleUtils;
-import com.playmonumenta.plugins.utils.ParticleUtils.SpawnParticleAction;
-import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.plugins.utils.SerializationUtils;
-
-import net.md_5.bungee.api.ChatColor;
+import java.util.AbstractMap;
+import java.util.Arrays;
+import java.util.Collection;
 
 public class VerdantMinibossBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_verdantmini";
@@ -58,7 +55,7 @@ public class VerdantMinibossBoss extends BossAbilityGroup {
 	private static final int HEIGHT = SpellKaulsFury.HEIGHT;
 	private static final int RADIUS = SpellKaulsFury.RADIUS;
 	private static final double DAMAGE_RADIUS = SpellKaulsFury.DAMAGE_RADIUS;
-	private static final int DAMAGE = SpellKaulsFury.DAMAGE;
+	private static final double DAMAGE = SpellKaulsFury.DAMAGE;
 	private static final int IMPACT_TIME = 1 * 20;
 	private static final int CHARGE_TIME = FURY_PERIOD - IMPACT_TIME;
 
@@ -129,7 +126,7 @@ public class VerdantMinibossBoss extends BossAbilityGroup {
 
 		mBoss.setRemoveWhenFarAway(false);
 		BossBarManager bossBar = new BossBarManager(plugin, boss, detectionRange, BarColor.YELLOW, BarStyle.SEGMENTED_10, null);
-		super.constructBoss(null, Arrays.asList(new SpellBlockBreak(boss)), detectionRange, bossBar);
+		super.constructBoss(null, Arrays.asList(new SpellBlockBreak(boss), new SpellShieldStun(10 * 20)), detectionRange, bossBar);
 	}
 
 	@Override
@@ -212,7 +209,7 @@ public class VerdantMinibossBoss extends BossAbilityGroup {
 							world.playSound(mLocation, Sound.ENTITY_BLAZE_SHOOT, 1, 2.0f);
 						} else {
 							for (Player player : PlayerUtils.playersInRange(mLocation, DAMAGE_RADIUS, true)) {
-								BossUtils.bossDamage(mBoss, player, DAMAGE, mLocation, "Kaul's Fury");
+								DamageUtils.damage(mBoss, player, DamageType.BLAST, DAMAGE, null, false, true, "Kaul's Fury");
 							}
 
 							//Give 0.5 blocks of leeway for hitting the boss, don't want to make it about being super precise
@@ -221,7 +218,8 @@ public class VerdantMinibossBoss extends BossAbilityGroup {
 							}
 
 							for (LivingEntity mob : EntityUtils.getNearbyMobs(mLocation, DAMAGE_RADIUS)) {
-								mob.damage(DAMAGE / 2.0);
+								// No damager so that the mobs don't target the boss
+								DamageUtils.damage(null, mob, DamageType.BLAST, DAMAGE / 2, null, false, true, "Kaul's Fury");
 							}
 
 							world.playSound(mLocation, Sound.ENTITY_GENERIC_EXPLODE, 1.5f, 1);
@@ -245,26 +243,17 @@ public class VerdantMinibossBoss extends BossAbilityGroup {
 	}
 
 	@Override
-	public void bossDamagedByEntity(EntityDamageByEntityEvent event) {
+	public void onHurt(DamageEvent event) {
 		if (mShielded) {
-			Entity damager = event.getDamager();
-			if (damager instanceof Player player) {
-				shieldDamage(event, player);
-			} else if (damager instanceof Projectile proj && proj.getShooter() instanceof Player player) {
-				if (proj instanceof Arrow arrow && arrow.hasCustomEffect(PotionEffectType.SLOW)) {
-					arrow.removeCustomEffect(PotionEffectType.SLOW);
-				}
-				shieldDamage(event, player);
-			} else {
-				event.setCancelled(true);
+			event.setCancelled(true);
+			if (event.getDamager() instanceof Arrow arrow && arrow.hasCustomEffect(PotionEffectType.SLOW)) {
+				arrow.removeCustomEffect(PotionEffectType.SLOW);
+			}
+			if (event.getSource() instanceof Player player) {
+				player.sendMessage(ChatColor.AQUA + "The shield absorbs your attack.");
+				player.playSound(mBoss.getLocation(), Sound.ITEM_SHIELD_BLOCK, 1, 1);
 			}
 		}
-	}
-
-	private void shieldDamage(EntityDamageByEntityEvent event, Player player) {
-		event.setCancelled(true);
-		player.sendMessage(ChatColor.AQUA + "The shield absorbs your attack.");
-		player.playSound(mBoss.getLocation(), Sound.ITEM_SHIELD_BLOCK, 1, 1);
 	}
 
 	private void removeShield() {
@@ -279,18 +268,7 @@ public class VerdantMinibossBoss extends BossAbilityGroup {
 		//Add new spell
 		SpellManager spellManager = getSpellManager();
 		if (spellManager != null) {
-			changePhase(spellManager, Arrays.asList(new SpellBlockBreak(mBoss)), null);
-		}
-	}
-
-	@Override
-	public void bossDamagedEntity(EntityDamageByEntityEvent event) {
-		if (event.getEntity() instanceof Player player) {
-			if (event.getCause().equals(DamageCause.ENTITY_ATTACK)) {
-				if (player.isBlocking()) {
-					NmsUtils.stunShield(player, 20 * 10);
-				}
-			}
+			changePhase(spellManager, Arrays.asList(new SpellBlockBreak(mBoss), new SpellShieldStun(10 * 20)), null);
 		}
 	}
 
@@ -348,7 +326,7 @@ public class VerdantMinibossBoss extends BossAbilityGroup {
 						(LivingEntity target) -> {
 							world.spawnParticle(Particle.BLOCK_CRACK, target.getEyeLocation(), 5, 0.4, 0.4, 0.4, 0.4, Material.REDSTONE_BLOCK);
 							world.spawnParticle(Particle.BLOCK_CRACK, target.getEyeLocation(), 12, 0.4, 0.4, 0.4, 0.4, Material.REDSTONE_WIRE);
-							BossUtils.bossDamage(mBoss, target, 20);
+							BossUtils.blockableDamage(mBoss, target, DamageType.MELEE, 20);
 						},
 						// Attack particles
 						(Location loc) -> {
@@ -375,7 +353,7 @@ public class VerdantMinibossBoss extends BossAbilityGroup {
 							for (Player player : PlayerUtils.playersInRange(loc, 8, true)) {
 								if (player.hasLineOfSight(tnt)) {
 									double multiplier = (8 - player.getLocation().distance(loc)) / 8;
-									BossUtils.bossDamage(mBoss, player, 32 * multiplier);
+									BossUtils.blockableDamage(mBoss, player, DamageType.BLAST, 32 * multiplier);
 									player.setFireTicks((int)(20 * 8 * multiplier));
 								}
 							}

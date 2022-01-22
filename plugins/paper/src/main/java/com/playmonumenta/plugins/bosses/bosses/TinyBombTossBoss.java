@@ -1,7 +1,10 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
-import java.util.Arrays;
-
+import com.playmonumenta.plugins.bosses.SpellManager;
+import com.playmonumenta.plugins.bosses.spells.SpellBombToss;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -11,10 +14,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.entity.TNTPrimed;
 import org.bukkit.plugin.Plugin;
 
-import com.playmonumenta.plugins.bosses.SpellManager;
-import com.playmonumenta.plugins.bosses.spells.SpellBombToss;
-import com.playmonumenta.plugins.utils.BossUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
+import java.util.Arrays;
 
 public class TinyBombTossBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_tinybombtoss";
@@ -41,7 +41,7 @@ public class TinyBombTossBoss extends BossAbilityGroup {
 						for (Player player : PlayerUtils.playersInRange(loc, RADIUS, true)) {
 							if (player.hasLineOfSight(tnt)) {
 								double multiplier = (RADIUS - player.getLocation().distance(loc)) / RADIUS;
-								BossUtils.bossDamage(boss, player, POINT_BLANK_DAMAGE * multiplier);
+								BossUtils.blockableDamage(boss, player, DamageType.BLAST, POINT_BLANK_DAMAGE * multiplier);
 							}
 						}
 					})

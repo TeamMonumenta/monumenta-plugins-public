@@ -1,8 +1,17 @@
 package com.playmonumenta.plugins.abilities.cleric.paladin;
 
-import java.util.Iterator;
-import java.util.List;
-
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.abilities.AbilityManager;
+import com.playmonumenta.plugins.abilities.AbilityTrigger;
+import com.playmonumenta.plugins.abilities.cleric.Crusade;
+import com.playmonumenta.plugins.abilities.cleric.DivineJustice;
+import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.utils.DamageUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.ItemUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Location;
@@ -13,23 +22,13 @@ import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.abilities.AbilityManager;
-import com.playmonumenta.plugins.abilities.AbilityTrigger;
-import com.playmonumenta.plugins.abilities.cleric.Crusade;
-import com.playmonumenta.plugins.abilities.cleric.DivineJustice;
-import com.playmonumenta.plugins.classes.ClassAbility;
-import com.playmonumenta.plugins.classes.magic.MagicType;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.ItemUtils;
+import java.util.Iterator;
+import java.util.List;
 
 
 
@@ -57,7 +56,7 @@ public class HolyJavelin extends Ability {
 		mInfo.mLinkedSpell = ClassAbility.HOLY_JAVELIN;
 		mInfo.mScoreboardId = "HolyJavelin";
 		mInfo.mShorthandName = "HJ";
-		mInfo.mDescriptions.add("While sprinting, left-clicking with a non-pickaxe throws a piercing spear of light, instantly travelling up to 12 blocks or until it hits a solid block. It deals 18 holy damage to all enemies in a 0.75-block cube around it along its path, or 9 damage to non-undead, and sets them all on fire for 5s. Cooldown: 12s.");
+		mInfo.mDescriptions.add("While sprinting, left-clicking with a non-pickaxe throws a piercing spear of light, instantly travelling up to 12 blocks or until it hits a solid block. It deals 18 magic damage to all enemies in a 0.75-block cube around it along its path, or 9 magic damage to non-undead, and sets them all on fire for 5s. Cooldown: 12s.");
 		mInfo.mDescriptions.add("Attacking an undead enemy with that left-click now transmits any passive Divine Justice and Luminous Infusion damage to other enemies pierced by the spear. Damage is increased from 18 to 24, and from 9 to 18 against non-undead.");
 		mInfo.mCooldown = COOLDOWN;
 		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;
@@ -89,11 +88,8 @@ public class HolyJavelin extends Ability {
 	}
 
 	@Override
-	public boolean livingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
-		//TODO pass in casted entities for events like these
-		LivingEntity enemy = (LivingEntity)event.getEntity();
-
-		if (DamageCause.ENTITY_ATTACK.equals(event.getCause())) {
+	public void onDamage(DamageEvent event, LivingEntity enemy) {
+		if (event.getType() == DamageType.MELEE) {
 			double sharedPassiveDamage = 0;
 			if (mLuminousInfusion != null) {
 				sharedPassiveDamage += mLuminousInfusion.mLastPassiveMeleeDamage;
@@ -107,8 +103,6 @@ public class HolyJavelin extends Ability {
 			}
 			execute(sharedPassiveDamage, enemy);
 		}
-
-		return true;
 	}
 
 	public void execute(
@@ -152,7 +146,7 @@ public class HolyJavelin extends Ability {
 						damage += bonusDamage;
 					}
 					EntityUtils.applyFire(mPlugin, FIRE_DURATION, enemy, mPlayer);
-					EntityUtils.damageEntity(mPlugin, enemy, damage, mPlayer, MagicType.HOLY, true, mInfo.mLinkedSpell);
+					DamageUtils.damage(mPlayer, enemy, DamageType.MAGIC, damage, mInfo.mLinkedSpell);
 					iterator.remove();
 				}
 			}

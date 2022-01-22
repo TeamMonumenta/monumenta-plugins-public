@@ -1,7 +1,18 @@
 package com.playmonumenta.plugins.abilities.alchemist;
 
-import java.util.EnumSet;
-
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.abilities.AbilityManager;
+import com.playmonumenta.plugins.abilities.AbilityTrigger;
+import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.utils.AbsorptionUtils;
+import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -16,34 +27,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.abilities.AbilityTrigger;
-import com.playmonumenta.plugins.classes.ClassAbility;
-import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
-import com.playmonumenta.plugins.enchantments.abilities.BaseAbilityEnchantment;
-import com.playmonumenta.plugins.utils.AbsorptionUtils;
-import com.playmonumenta.plugins.utils.FastUtils;
-import com.playmonumenta.plugins.utils.ItemUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
-
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.format.TextDecoration;
-
 public class IronTincture extends Ability {
-
-	public static class IronTinctureAbsorptionEnchantment extends BaseAbilityEnchantment {
-		public IronTinctureAbsorptionEnchantment() {
-			super("Iron Tincture Absorption Level", EnumSet.of(ItemSlot.MAINHAND, ItemSlot.OFFHAND, ItemSlot.ARMOR));
-		}
-	}
-
-	public static class IronTinctureCooldownEnchantment extends BaseAbilityEnchantment {
-		public IronTinctureCooldownEnchantment() {
-			super("Iron Tincture Cooldown", EnumSet.of(ItemSlot.ARMOR));
-		}
-	}
 
 	private static final int IRON_TINCTURE_THROW_COOLDOWN = 10 * 20;
 	private static final int IRON_TINCTURE_USE_COOLDOWN = 50 * 20;
@@ -53,16 +37,22 @@ public class IronTincture extends Ability {
 	private static final int IRON_TINCTURE_TICK_PERIOD = 2;
 	private static final double IRON_TINCTURE_VELOCITY = 0.7;
 
+	private @Nullable AlchemistPotions mAlchemistPotions;
+
 	public IronTincture(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Iron Tincture");
 		mInfo.mLinkedSpell = ClassAbility.IRON_TINCTURE;
 		mInfo.mScoreboardId = "IronTincture";
 		mInfo.mShorthandName = "IT";
-		mInfo.mDescriptions.add("Crouch and right-click to throw a tincture. If you walk over the tincture, gain 8 absorption health for 50 seconds, up to 8 absorption health. If an ally walks over it, or is hit by it, you both gain the effect. If it isn't grabbed before it disappears it will quickly come off cooldown. Cooldown: 50s.");
+		mInfo.mDescriptions.add("Crouch and right-click to throw a tincture. If you walk over the tincture, gain 8 absorption health for 50 seconds, up to 8 absorption health. If an ally walks over it, or is hit by it, you both gain the effect. If it isn't grabbed before it disappears it will quickly come off cooldown. When another player grabs the tincture, you gain 2 Alchemist's Potions. When you grab the tincture, you gain 1 Alchemist's Potion. Cooldown: 50s.");
 		mInfo.mDescriptions.add("Effect and effect cap increased to 12 absorption health.");
 		mInfo.mCooldown = IRON_TINCTURE_USE_COOLDOWN; // Full duration cooldown
 		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
 		mDisplayItem = new ItemStack(Material.SPLASH_POTION, 1);
+
+		Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> {
+			mAlchemistPotions = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, AlchemistPotions.class);
+		});
 	}
 
 	@Override
@@ -96,7 +86,7 @@ public class IronTincture extends Ability {
 		tincture.setVelocity(vel);
 		tincture.setGlowing(true);
 
-		mInfo.mCooldown = (int) IronTinctureCooldownEnchantment.getCooldown(mPlayer, IRON_TINCTURE_USE_COOLDOWN, IronTinctureCooldownEnchantment.class);
+		mInfo.mCooldown = IRON_TINCTURE_USE_COOLDOWN;
 		// Full duration cooldown - is shortened if not picked up
 		putOnCooldown();
 
@@ -119,8 +109,15 @@ public class IronTincture extends Ability {
 					tincture.remove();
 
 					execute(mPlayer);
+					if (mAlchemistPotions != null) {
+						mAlchemistPotions.incrementCharge();
+					}
+
 					if (p != mPlayer) {
 						execute(p);
+						if (mAlchemistPotions != null) {
+							mAlchemistPotions.incrementCharge();
+						}
 					}
 
 					mPlugin.mTimers.removeCooldown(mPlayer, mInfo.mLinkedSpell);
@@ -145,7 +142,6 @@ public class IronTincture extends Ability {
 
 	private void execute(Player player) {
 		int absorption = getAbilityScore() == 1 ? IRON_TINCTURE_1_ABSORPTION : IRON_TINCTURE_2_ABSORPTION;
-		absorption += IronTinctureAbsorptionEnchantment.getLevel(mPlayer, IronTinctureAbsorptionEnchantment.class);
 
 		AbsorptionUtils.addAbsorption(player, absorption, absorption, IRON_TINCTURE_ABSORPTION_DURATION);
 

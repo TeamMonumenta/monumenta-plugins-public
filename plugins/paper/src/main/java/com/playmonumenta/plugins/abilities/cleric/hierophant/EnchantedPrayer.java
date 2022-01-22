@@ -1,26 +1,25 @@
 package com.playmonumenta.plugins.abilities.cleric.hierophant;
 
-import java.util.EnumSet;
-
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.effects.EnchantedPrayerAoE;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
-import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.classes.ClassAbility;
-import com.playmonumenta.plugins.effects.EnchantedPrayerAoE;
-import com.playmonumenta.plugins.utils.FastUtils;
-import com.playmonumenta.plugins.utils.ItemUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
+import java.util.EnumSet;
 
 
 
@@ -32,9 +31,9 @@ public class EnchantedPrayer extends Ability {
 	private static final double ENCHANTED_PRAYER_1_HEAL = 0.1;
 	private static final double ENCHANTED_PRAYER_2_HEAL = 0.2;
 	private static final int ENCHANTED_PRAYER_RANGE = 15;
-	private static final EnumSet<DamageCause> AFFECTED_DAMAGE_CAUSES = EnumSet.of(
-			DamageCause.ENTITY_ATTACK,
-			DamageCause.PROJECTILE
+	private static final EnumSet<DamageType> AFFECTED_DAMAGE_TYPES = EnumSet.of(
+			DamageType.MELEE,
+			DamageType.PROJECTILE
 	);
 
 	private final int mDamage;
@@ -104,7 +103,7 @@ public class EnchantedPrayer extends Ability {
 			p.playSound(p.getLocation(), Sound.ENTITY_ILLUSIONER_PREPARE_MIRROR, 1.2f, 1.0f);
 			world.spawnParticle(Particle.SPELL_INSTANT, mPlayer.getLocation(), 50, 0.25, 0, 0.25, 0.01);
 			mPlugin.mEffectManager.addEffect(p, "EnchantedPrayerEffect",
-					new EnchantedPrayerAoE(mPlugin, ENCHANTED_PRAYER_COOLDOWN, mDamage, mHeal, p, AFFECTED_DAMAGE_CAUSES));
+					new EnchantedPrayerAoE(mPlugin, ENCHANTED_PRAYER_COOLDOWN, mDamage, mHeal, p, AFFECTED_DAMAGE_TYPES));
 		}
 	}
 }

@@ -1,12 +1,23 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-
+import com.playmonumenta.plugins.bosses.BossBarManager;
+import com.playmonumenta.plugins.bosses.BossBarManager.BossHealthAction;
+import com.playmonumenta.plugins.bosses.SpellManager;
+import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.bosses.spells.SpellConditionalTeleport;
+import com.playmonumenta.plugins.bosses.spells.SpellShieldStun;
+import com.playmonumenta.plugins.bosses.spells.headlesshorseman.SpellBeeBombs;
+import com.playmonumenta.plugins.bosses.spells.headlesshorseman.SpellBurningVengence;
+import com.playmonumenta.plugins.bosses.spells.headlesshorseman.SpellHallowsEnd;
+import com.playmonumenta.plugins.bosses.spells.headlesshorseman.SpellHellzoneGrenade;
+import com.playmonumenta.plugins.bosses.spells.headlesshorseman.SpellPhantomOfTheOpera;
+import com.playmonumenta.plugins.bosses.spells.headlesshorseman.SpellReaperOfLife;
+import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.utils.SerializationUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -23,30 +34,18 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Phantom;
 import org.bukkit.entity.Player;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import com.playmonumenta.plugins.bosses.BossBarManager;
-import com.playmonumenta.plugins.bosses.BossBarManager.BossHealthAction;
-import com.playmonumenta.plugins.bosses.SpellManager;
-import com.playmonumenta.plugins.bosses.spells.Spell;
-import com.playmonumenta.plugins.bosses.spells.SpellConditionalTeleport;
-import com.playmonumenta.plugins.bosses.spells.headlesshorseman.SpellBeeBombs;
-import com.playmonumenta.plugins.bosses.spells.headlesshorseman.SpellBurningVengence;
-import com.playmonumenta.plugins.bosses.spells.headlesshorseman.SpellHallowsEnd;
-import com.playmonumenta.plugins.bosses.spells.headlesshorseman.SpellHellzoneGrenade;
-import com.playmonumenta.plugins.bosses.spells.headlesshorseman.SpellPhantomOfTheOpera;
-import com.playmonumenta.plugins.bosses.spells.headlesshorseman.SpellReaperOfLife;
-import com.playmonumenta.plugins.utils.BossUtils;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.NmsUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.plugins.utils.SerializationUtils;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 /*
  * Barrier of Flames - (Hard mode only) When the boss enters phase 2 he gains a shield of
@@ -170,7 +169,8 @@ public class HeadlessHorsemanBoss extends BossAbilityGroup {
 				new SpellConditionalTeleport(mBoss, spawnLoc, b -> b.getLocation().getBlock().getType() == Material.BEDROCK ||
 				                                                   b.getLocation().add(0, 1, 0).getBlock().getType() == Material.BEDROCK ||
 				                                                   b.getLocation().getBlock().getType() == Material.LAVA),
-				new SpellPhantomOfTheOpera(plugin, boss, mSpawnLoc, detectionRange, 20 * 60)
+				new SpellPhantomOfTheOpera(plugin, boss, mSpawnLoc, detectionRange, 20 * 60),
+				new SpellShieldStun(30 * 20)
 			);
 
 		Map<Integer, BossHealthAction> events = new HashMap<Integer, BossHealthAction>();
@@ -223,13 +223,8 @@ public class HeadlessHorsemanBoss extends BossAbilityGroup {
 	}
 
 	@Override
-	public void bossDamagedByEntity(EntityDamageByEntityEvent event) {
-
-	}
-
-	@Override
-	public void bossDamagedEntity(EntityDamageByEntityEvent event) {
-		if (event.getCause() == DamageCause.ENTITY_ATTACK && event.getEntity().getLocation().distance(mBoss.getLocation()) <= 2) {
+	public void onDamage(DamageEvent event, LivingEntity damagee) {
+		if (event.getType() == DamageType.MELEE && damagee.getLocation().distance(mBoss.getLocation()) <= 2) {
 			if (!mCooldown) {
 				mCooldown = true;
 				new BukkitRunnable() {
@@ -238,10 +233,10 @@ public class HeadlessHorsemanBoss extends BossAbilityGroup {
 						mCooldown = false;
 					}
 				}.runTaskLater(mPlugin, 20);
-				UUID uuid = event.getEntity().getUniqueId();
+				UUID uuid = damagee.getUniqueId();
 				for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), 4, true)) {
 					if (!player.getUniqueId().equals(uuid)) {
-						BossUtils.bossDamage(mBoss, player, event.getDamage());
+						BossUtils.blockableDamage(mBoss, player, DamageType.MELEE, event.getDamage());
 					}
 				}
 				World world = mBoss.getWorld();
@@ -251,10 +246,10 @@ public class HeadlessHorsemanBoss extends BossAbilityGroup {
 			}
 		}
 
-		if (event.getEntity().getLocation().distance(mBoss.getLocation()) < 2.5) {
+		if (damagee.getLocation().distance(mBoss.getLocation()) < 2.5) {
 			List<Player> players = PlayerUtils.playersInRange(mSpawnLoc, detectionRange, false);
-			if (players.contains(event.getEntity())) {
-				players.remove(event.getEntity());
+			if (players.contains(damagee)) {
+				players.remove(damagee);
 			}
 
 			double dist = 100;
@@ -270,12 +265,6 @@ public class HeadlessHorsemanBoss extends BossAbilityGroup {
 				((Creature) mBoss).setTarget(target);
 			}
 		}
-
-		if (event.getEntity() instanceof Player player) {
-			if (player.isBlocking()) {
-				NmsUtils.stunShield(player, 20 * 30);
-			}
-		}
 	}
 
 	public LivingEntity getEntity() {
@@ -288,7 +277,7 @@ public class HeadlessHorsemanBoss extends BossAbilityGroup {
 		int playerCount = BossUtils.getPlayersInRangeForHealthScaling(mSpawnLoc, detectionRange);
 		int hpDelta = 2500;
 
-		bossTargetHp = (int) (hpDelta * (1 + (1 - 1/Math.E) * Math.log(playerCount)));
+		bossTargetHp = (int) (hpDelta * (1 + (1 - 1/Math.E) * Math.log(playerCount)) * 1.1);
 		mBoss.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(bossTargetHp);
 		mBoss.setHealth(bossTargetHp);
 

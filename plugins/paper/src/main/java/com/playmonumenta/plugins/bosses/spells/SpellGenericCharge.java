@@ -1,13 +1,13 @@
 package com.playmonumenta.plugins.bosses.spells;
 
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.utils.BossUtils;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.plugin.Plugin;
-
-import com.playmonumenta.plugins.utils.BossUtils;
 
 public class SpellGenericCharge extends SpellBaseCharge {
 	public SpellGenericCharge(Plugin plugin, LivingEntity boss, int range, float damage) {
@@ -36,7 +36,7 @@ public class SpellGenericCharge extends SpellBaseCharge {
 		      (LivingEntity player) -> {
 		          player.getWorld().spawnParticle(Particle.BLOCK_CRACK, player.getLocation().add(0, 1, 0), 5, 0.4, 0.4, 0.4, 0.4, Material.REDSTONE_BLOCK.createBlockData());
 		          player.getWorld().spawnParticle(Particle.BLOCK_CRACK, player.getLocation().add(0, 1, 0), 12, 0.4, 0.4, 0.4, 0.4, Material.REDSTONE_WIRE.createBlockData());
-		          BossUtils.bossDamage(boss, player, damage);
+		          BossUtils.blockableDamage(boss, player, DamageType.MELEE, damage);
 		      },
 		      // Attack particles
 		      (Location loc) -> {

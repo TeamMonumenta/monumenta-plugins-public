@@ -1,13 +1,12 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
+import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.plugin.Plugin;
 
 public class NoAbilityDamageBoss extends BossAbilityGroup {
@@ -24,11 +23,11 @@ public class NoAbilityDamageBoss extends BossAbilityGroup {
 	}
 
 	@Override
-	public void bossDamagedByEntity(EntityDamageByEntityEvent event) {
-		if (event.getDamager() instanceof Player && event.getCause() == DamageCause.CUSTOM) {
+	public void onHurt(DamageEvent event) {
+		if (event.getType() == DamageType.MAGIC) {
 			event.setCancelled(true);
 
-			Location loc = event.getEntity().getLocation().add(0, 1, 0);
+			Location loc = event.getDamagee().getLocation().add(0, 1, 0);
 			World world = loc.getWorld();
 			world.playSound(loc, Sound.BLOCK_ANVIL_PLACE, 0.25f, 1.5f);
 			world.playSound(loc, Sound.ENTITY_ZOMBIE_ATTACK_WOODEN_DOOR, 0.25f, 0.75f);

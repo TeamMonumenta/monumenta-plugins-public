@@ -1,16 +1,15 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
+import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.utils.CommandUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.entity.Creeper;
 import org.bukkit.entity.LivingEntity;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
-
-import com.playmonumenta.plugins.utils.CommandUtils;
 
 public class HalloweenCreeperBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_halloween_creeper";
@@ -87,7 +86,7 @@ public class HalloweenCreeperBoss extends BossAbilityGroup {
 	}
 
 	@Override
-	public void bossDamagedByEntity(EntityDamageByEntityEvent event) {
+	public void onHurt(DamageEvent event) {
 		// Reduce the damage but don't cancel the hit
 		event.setDamage(0);
 	}

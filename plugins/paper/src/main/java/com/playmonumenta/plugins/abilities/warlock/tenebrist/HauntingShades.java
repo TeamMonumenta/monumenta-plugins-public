@@ -1,10 +1,17 @@
 package com.playmonumenta.plugins.abilities.warlock.tenebrist;
 
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
-
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.abilities.AbilityTrigger;
+import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.effects.CustomRegeneration;
+import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
+import com.playmonumenta.plugins.potion.PotionManager;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.utils.PotionUtils;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -24,32 +31,21 @@ import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.AbilityTrigger;
-import com.playmonumenta.plugins.abilities.MultipleChargeAbility;
-import com.playmonumenta.plugins.classes.ClassAbility;
-import com.playmonumenta.plugins.effects.PercentSpeed;
-import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.FastUtils;
-import com.playmonumenta.plugins.utils.ItemUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.plugins.utils.PotionUtils;
-import com.playmonumenta.plugins.utils.ZoneUtils;
-import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
 
-public class HauntingShades extends MultipleChargeAbility {
+public class HauntingShades extends Ability {
 
-	private static final String ATTR_NAME = "HauntingShadesExtraSpeedAttr";
+	private static final String ATTR_NAME = "HauntingShadesHealing";
 
-	private static final int COOLDOWN = 15 * 20;
-	private static final int SHADES_DURATION = 8 * 20;
-	private static final int SHADES_CHARGES_1 = 2;
-	private static final int SHADES_CHARGES_2 = 3;
-	private static final int VULN_1 = 1;
-	private static final int VULN_2 = 2;
-	private static final double EXTRA_SPEED = 0.1;
-	private static final int EFFECT_DURATION = 20 * 2;
+	private static final int COOLDOWN = 10 * 20;
+	private static final int SHADES_DURATION = 7 * 20;
+	private static final int VULN = 1;
+	private static final double HEAL_PERCENT = 0.025;
+	private static final int EFFECT_LEVEL = 0;
+	private static final int EFFECT_DURATION = 20 * 1;
 	private static final int RANGE = 10;
 	private static final int AOE_RANGE = 6;
 	private static final double HITBOX_LENGTH = 0.55;
@@ -63,22 +59,18 @@ public class HauntingShades extends MultipleChargeAbility {
 		mInfo.mLinkedSpell = ClassAbility.HAUNTING_SHADES;
 		mInfo.mScoreboardId = "HauntingShades";
 		mInfo.mShorthandName = "HS";
-		mInfo.mDescriptions.add("Press the swap key while not sneaking with a scythe to conjure a Shade at the target block or mob location. Mobs within 6 blocks of a Shade are afflicted with 10% Vulnerability, and players within 6 blocks of the shade are given 10% speed. A Shade fades back into darkness after 8 seconds. Cooldown: 15s. Charges: 2.");
-		mInfo.mDescriptions.add("Your number of charges increases to 3 and mobs within 6 blocks of a Shade are afflicted with 15% Vulnerability.");
+		mInfo.mDescriptions.add("Press the swap key while not sneaking with a scythe to conjure a Shade at the target block or mob location. Mobs within 6 blocks of a Shade are afflicted with 10% Vulnerability. A Shade fades back into darkness after 7 seconds. Cooldown: 10s.");
+		mInfo.mDescriptions.add("Players within 6 blocks of the shade are given strength 1 and gain a custom healing effect that regenerates 2.5% of max health every second for 1 second. Effects do not stack with other Tenebrists.");
 		mInfo.mCooldown = COOLDOWN;
 		mInfo.mTrigger = AbilityTrigger.ALL;
 		mInfo.mIgnoreCooldown = true;
 		mDisplayItem = new ItemStack(Material.SKELETON_SKULL, 1);
-		mVuln = getAbilityScore() == 1 ? VULN_1 : VULN_2;
-		mMaxCharges = getAbilityScore() == 1 ? SHADES_CHARGES_1 : SHADES_CHARGES_2;
+		mVuln = VULN;
 	}
 
 	@Override
 	public boolean runCheck() {
 		if (mPlayer == null) {
-			return false;
-		}
-		if (ZoneUtils.hasZoneProperty(mPlayer, ZoneProperty.NO_MOBILITY_ABILITIES)) {
 			return false;
 		}
 		return (ItemUtils.isHoe(mPlayer.getInventory().getItemInMainHand()));
@@ -92,14 +84,11 @@ public class HauntingShades extends MultipleChargeAbility {
 		ItemStack mainHandItem = mPlayer.getInventory().getItemInMainHand();
 		if (ItemUtils.isHoe(mainHandItem)) {
 			event.setCancelled(true);
-			// *TO DO* - Turn into boolean in constructor -or- look at changing trigger entirely
-			if (mPlayer.isSneaking() || ZoneUtils.hasZoneProperty(mPlayer, ZoneProperty.NO_MOBILITY_ABILITIES)) {
+			// TODO - Turn into boolean in constructor -or- look at changing trigger entirely
+			if (isTimerActive() || mPlayer.isSneaking()) {
 				return;
 			}
-
-			if (!consumeCharge()) {
-				return;
-			}
+			putOnCooldown();
 
 			Location loc = mPlayer.getEyeLocation();
 			Vector direction = loc.getDirection();
@@ -164,9 +153,19 @@ public class HauntingShades extends MultipleChargeAbility {
 				if (mT % 5 == 0) {
 					List<Player> affectedPlayers = PlayerUtils.playersInRange(l, AOE_RANGE, true);
 				    Set<LivingEntity> affectedMobs = new HashSet<LivingEntity>(EntityUtils.getNearbyMobs(l, AOE_RANGE));
-				    for (Player p : affectedPlayers) {
-						mPlugin.mEffectManager.addEffect(p, "HauntingShadesExtraSpeed", new PercentSpeed(EFFECT_DURATION, EXTRA_SPEED, ATTR_NAME));
-				    }
+					if (getAbilityScore() > 1) {
+						for (Player p : affectedPlayers) {
+							double maxHealth = EntityUtils.getMaxHealth(p);
+							//if the player has the effect refresh the duration
+							if (mPlugin.mEffectManager.hasEffect(p, ATTR_NAME)) {
+								mPlugin.mEffectManager.clearEffects(p, ATTR_NAME);
+							}
+							mPlugin.mEffectManager.addEffect(p, ATTR_NAME, new CustomRegeneration(EFFECT_DURATION, maxHealth * HEAL_PERCENT, mPlayer, mPlugin));
+
+							mPlugin.mPotionManager.addPotion(p, PotionManager.PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.INCREASE_DAMAGE, EFFECT_DURATION, EFFECT_LEVEL, true, false));
+						}
+					}
+
 				    for (LivingEntity m : affectedMobs) {
 						PotionUtils.applyPotion(mPlayer, m, new PotionEffect(PotionEffectType.UNLUCK, EFFECT_DURATION, mVuln, true, false));
 				    }

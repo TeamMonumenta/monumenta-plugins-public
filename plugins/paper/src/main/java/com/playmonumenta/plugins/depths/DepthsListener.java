@@ -1,25 +1,19 @@
 package com.playmonumenta.plugins.depths;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
-import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.Chest;
 import org.bukkit.block.DoubleChest;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Firework;
-import org.bukkit.entity.IronGolem;
 import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.entity.Slime;
@@ -27,9 +21,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
@@ -37,20 +28,16 @@ import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.player.PlayerExpChangeEvent;
 import org.bukkit.event.player.PlayerItemDamageEvent;
 import org.bukkit.projectiles.ProjectileSource;
-import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.util.Vector;
 
 import com.destroystokyo.paper.event.player.PlayerPostRespawnEvent;
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.AbilityManager;
-import com.playmonumenta.plugins.classes.ClassAbility;
-import com.playmonumenta.plugins.classes.magic.MagicType;
 import com.playmonumenta.plugins.depths.abilities.dawnbringer.Enlightenment;
 import com.playmonumenta.plugins.depths.abilities.dawnbringer.Sundrops;
 import com.playmonumenta.plugins.depths.abilities.earthbound.EarthenWrath;
 import com.playmonumenta.plugins.depths.abilities.flamecaller.Pyromania;
 import com.playmonumenta.plugins.depths.abilities.steelsage.FireworkBlast;
-import com.playmonumenta.plugins.depths.abilities.steelsage.Metalmancy;
+import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
@@ -144,11 +131,13 @@ public class DepthsListener implements Listener {
 	}
 
 	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
-	public void entityDamageEvent(EntityDamageEvent event) {
+	public void damageEvent(DamageEvent event) {
+		LivingEntity damagee = event.getDamagee();
+		LivingEntity source = event.getSource();
+
 		//Pyromania implementation handler
-		if (!(event.getEntity() instanceof Player) && event.getCause() == DamageCause.FIRE_TICK && event.getEntity() instanceof LivingEntity) {
-			LivingEntity entity = (LivingEntity) event.getEntity();
-			List<Player> playersToCheck = PlayerUtils.playersInRange(event.getEntity().getLocation(), Pyromania.RADIUS, true);
+		if (event.getType() == DamageType.FIRE && !(damagee instanceof Player)) {
+			List<Player> playersToCheck = PlayerUtils.playersInRange(damagee.getLocation(), Pyromania.RADIUS, true);
 			double addedDamage = 0;
 			for (Player p : playersToCheck) {
 				DepthsPlayer dp = DepthsManager.getInstance().mPlayers.get(p.getUniqueId());
@@ -160,113 +149,35 @@ public class DepthsListener implements Listener {
 					}
 				}
 			}
+
 			if (addedDamage > 0) {
 				event.setDamage(event.getDamage() + addedDamage);
-				entity.setNoDamageTicks(0);
+				damagee.setNoDamageTicks(0);
 			}
 		}
 
-		if (event.getEntity() instanceof Player) {
-			Player player = (Player) event.getEntity();
-			DepthsPlayer dp1 = DepthsManager.getInstance().mPlayers.get(player.getUniqueId());
-			if (dp1 == null || DepthsManager.getInstance().getPartyFromId(dp1) == null) {
+		if (damagee instanceof Player player) {
+			DepthsPlayer dp = DepthsManager.getInstance().mPlayers.get(player.getUniqueId());
+			if (dp == null) {
 				return;
 			}
-			DepthsParty party = DepthsManager.getInstance().getPartyFromId(dp1);
+			DepthsParty party = DepthsManager.getInstance().getPartyFromId(dp);
+			if (party == null) {
+				return;
+			}
+
+			// Handle earthen wrath damage
+			EarthenWrath.handleDamageEvent(event, player, party);
+
 			// Extra damage taken at higher floors
 			int floor = party.getFloor();
 			if (floor > 15) {
 				double multiplier = 1 + (0.1 * (((floor - 1) / 3) - 4));
 			    event.setDamage(event.getDamage() * multiplier);
 			}
-		}
-	}
-
-	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
-	public void entityDamageByEntityEvent(EntityDamageByEntityEvent event) {
-		Entity entity = event.getEntity();
-		Entity damager = event.getDamager();
-
-		//EarthenWrath implementation handler
-		if (entity instanceof Player) {
-			Player player = (Player) entity;
-			DepthsPlayer dp1 = DepthsManager.getInstance().mPlayers.get(player.getUniqueId());
-			if (dp1 == null || DepthsManager.getInstance().getPartyFromId(dp1) == null) {
-				return;
-			}
-
-			DepthsParty party = DepthsManager.getInstance().getPartyFromId(dp1);
-
-			//Creates a new party list with random order without modifying the normal order of the party
-			List<DepthsPlayer> playersInParty = new ArrayList<DepthsPlayer>();
-			for (DepthsPlayer dp : party.mPlayersInParty) {
-				playersInParty.add(dp);
-			}
-			Collections.shuffle(playersInParty);
-
-			for (DepthsPlayer dp : playersInParty) {
-				if (dp == null || dp.mAbilities == null || dp.mAbilities.size() == 0) {
-					continue;
-				}
-
-				Player p = Bukkit.getPlayer(dp.mPlayerId);
-				try {
-					if (dp != null && dp.mAbilities != null && dp.mAbilities.get(EarthenWrath.ABILITY_NAME) != null && dp.mAbilities.get(EarthenWrath.ABILITY_NAME).intValue() > 0 && p != null && p.isOnline() && !p.equals(player)) {
-						//Breaks only if the damage is absorbed to allow for multiple party members with earthen wrath
-						if (AbilityManager.getManager().getPlayerAbility(p, EarthenWrath.class).damagedEntity(player, event)) {
-							break;
-						}
-					}
-				} catch (Exception e) {
-					Plugin.getInstance().getLogger().info("Exception for depths on entity damage- earthen wrath");
-				}
-			}
-		}
-
-		//Scaling boss damage- 5% extra per 3 floors
-		if (EntityUtils.isBoss(damager) && entity instanceof Player && DepthsManager.getInstance().isInSystem((Player) entity)) {
-			DepthsPlayer dp1 = DepthsManager.getInstance().mPlayers.get(entity.getUniqueId());
-			if (DepthsManager.getInstance().getPartyFromId(dp1).getFloor() > 3) {
-				double multiplier = 1 + (0.05 * (((DepthsManager.getInstance().getPartyFromId(dp1).getFloor() - 1) / 3)));
-				event.setDamage(event.getDamage() * multiplier);
-			}
-		}
-
-		//Prevent plants from getting hit up
-		if (entity.getName().contains("Dionaea")) {
-			new BukkitRunnable() {
-				@Override
-				public void run() {
-					entity.setVelocity(new Vector(0, 0, 0));
-				}
-			}.runTaskLater(mPlugin, 1);
-		}
-
-		//Metalmancy damage/taunt implementation
-		if (damager instanceof IronGolem && damager.getScoreboardTags().contains(Metalmancy.GOLEM_TAG)) {
-			IronGolem golem = (IronGolem) damager;
-			if (golem.getTicksLived() <= Metalmancy.DURATION[4]) {
-				World world = golem.getWorld();
-				if (golem.hasMetadata(Metalmancy.OWNER_METADATA_TAG) && entity instanceof Mob) {
-					Player owner = Bukkit.getPlayer(golem.getMetadata(Metalmancy.OWNER_METADATA_TAG).get(0).asString());
-					if (owner != null && owner.getWorld() == world) {
-						event.setCancelled(true);
-						event.setDamage(0);
-						Metalmancy metalmancy = AbilityManager.getManager().getPlayerAbility(owner, Metalmancy.class);
-						if (metalmancy == null || !metalmancy.isThisGolem(golem)) {
-							golem.remove();
-						} else {
-							if (!EntityUtils.isBoss(entity)) {
-								((Mob) entity).setTarget(golem);
-							}
-							EntityUtils.damageEntity(mPlugin, (LivingEntity) entity, metalmancy.getDamage(), owner, MagicType.PHYSICAL, true, ClassAbility.METALMANCY, false, false, true, false); //bypasses iframes, counts as damage from the player
-						}
-					} else {
-						golem.remove();
-					}
-				}
-			} else {
-				golem.remove();
+			if (source != null && EntityUtils.isBoss(source) && floor > 3) {
+				double multiplier = 1 + (0.05 * ((floor - 1) / 3));
+			    event.setDamage(event.getDamage() * multiplier);
 			}
 		}
 	}
@@ -276,12 +187,12 @@ public class DepthsListener implements Listener {
 		Projectile proj = event.getEntity();
 		ProjectileSource shooter = proj.getShooter();
 		Entity damagee = event.getHitEntity();
-		if (proj instanceof Firework && FireworkBlast.isDamaging((Firework) proj) && damagee instanceof Player) {
+		if (proj instanceof Firework firework && FireworkBlast.isDamaging(firework) && damagee instanceof Player) {
 			// Firework Blast fireworks go through players
 			event.setCancelled(true);
-		} else if (damagee instanceof Slime && damagee.getName().contains("Eye") && shooter instanceof Player) {
+		} else if (damagee instanceof Slime && damagee.getName().contains("Eye") && shooter instanceof Player player) {
 			// Sound on shooting an eye
-			((Player) shooter).playSound(((Player)shooter).getLocation(), Sound.ENTITY_BAT_HURT, 0.4f, 0.2f);
+			player.playSound(player.getLocation(), Sound.ENTITY_BAT_HURT, 0.4f, 0.2f);
 		}
 	}
 

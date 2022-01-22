@@ -1,14 +1,13 @@
 package com.playmonumenta.plugins.protocollib;
 
-import org.bukkit.Bukkit;
-import org.bukkit.block.Block;
-
 import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.events.ListenerPriority;
 import com.comphenix.protocol.events.PacketAdapter;
 import com.comphenix.protocol.events.PacketEvent;
 import com.comphenix.protocol.wrappers.BlockPosition;
 import com.playmonumenta.plugins.Plugin;
+import org.bukkit.Bukkit;
+import org.bukkit.block.Block;
 
 /**
  * Cancels the block update packets for neighboring blocks of a placed Firmament.

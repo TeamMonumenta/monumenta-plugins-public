@@ -1,30 +1,29 @@
 package com.playmonumenta.plugins.abilities.scout.hunter;
 
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.utils.AbilityUtils;
+import com.playmonumenta.plugins.utils.DamageUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.LocationUtils;
+import com.playmonumenta.plugins.utils.MovementUtils;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
-import org.bukkit.entity.Arrow;
+import org.bukkit.entity.AbstractArrow;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.entity.Projectile;
 import org.bukkit.entity.SpectralArrow;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 import org.checkerframework.checker.nullness.qual.Nullable;
-
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.classes.ClassAbility;
-import com.playmonumenta.plugins.classes.magic.MagicType;
-import com.playmonumenta.plugins.utils.AbilityUtils;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.LocationUtils;
-import com.playmonumenta.plugins.utils.MovementUtils;
 
 public class SplitArrow extends Ability {
 
@@ -50,12 +49,12 @@ public class SplitArrow extends Ability {
 	}
 
 	@Override
-	public boolean livingEntityShotByPlayerEvent(Projectile proj, LivingEntity damagee, EntityDamageByEntityEvent event) {
-		if (mPlayer != null && (proj instanceof Arrow || proj instanceof SpectralArrow) && EntityUtils.isHostileMob(damagee)) {
-			LivingEntity nearestMob = EntityUtils.getNearestMob(damagee.getLocation(), SPLIT_ARROW_CHAIN_RANGE, damagee);
+	public void onDamage(DamageEvent event, LivingEntity enemy) {
+		if (event.getType() == DamageType.PROJECTILE && event.getDamager() instanceof AbstractArrow && EntityUtils.isHostileMob(enemy)) {
+			LivingEntity nearestMob = EntityUtils.getNearestMob(enemy.getLocation(), SPLIT_ARROW_CHAIN_RANGE, enemy);
 
 			if (nearestMob != null && !nearestMob.getScoreboardTags().contains(AbilityUtils.IGNORE_TAG)) {
-				Location loc = damagee.getEyeLocation();
+				Location loc = enemy.getEyeLocation();
 				Location eye = nearestMob.getEyeLocation();
 				Vector dir = LocationUtils.getDirectionTo(eye, loc);
 				World world = mPlayer.getWorld();
@@ -72,17 +71,15 @@ public class SplitArrow extends Ability {
 					world.spawnParticle(Particle.CRIT_MAGIC, eye, 20, 0, 0, 0, 0.6);
 					world.playSound(eye, Sound.ENTITY_ARROW_HIT, 1, 1.2f);
 
-					EntityUtils.damageEntity(mPlugin, nearestMob, event.getDamage() * mDamagePercent, mPlayer, MagicType.PHYSICAL, true, mInfo.mLinkedSpell, true, true, true, false);
-					MovementUtils.knockAway(damagee, nearestMob, 0.125f, 0.35f);
+					DamageUtils.damage(mPlayer, nearestMob, DamageType.OTHER, event.getDamage() * mDamagePercent, mInfo.mLinkedSpell, true, true);
+					MovementUtils.knockAway(enemy, nearestMob, 0.125f, 0.35f, true);
 					EntityUtils.applyArrowIframes(mPlugin, IFRAMES, nearestMob);
-					if (proj instanceof SpectralArrow) {
+					if (event.getDamager() instanceof SpectralArrow) {
 						nearestMob.addPotionEffect(SPECTRAL_ARROW_EFFECT);
 					}
 				}
 			}
 		}
-
-		return true;
 	}
 
 }

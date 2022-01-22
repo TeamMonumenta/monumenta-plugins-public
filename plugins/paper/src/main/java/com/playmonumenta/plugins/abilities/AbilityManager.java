@@ -10,11 +10,13 @@ import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.entity.AbstractArrow;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
@@ -22,9 +24,6 @@ import org.bukkit.entity.ThrownPotion;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.entity.EntityCombustByEntityEvent;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityTargetLivingEntityEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
@@ -40,22 +39,22 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.google.gson.JsonElement;
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.alchemist.AlchemicalArtillery;
 import com.playmonumenta.plugins.abilities.alchemist.AlchemistPotions;
-import com.playmonumenta.plugins.abilities.alchemist.BasiliskPoison;
 import com.playmonumenta.plugins.abilities.alchemist.Bezoar;
 import com.playmonumenta.plugins.abilities.alchemist.BrutalAlchemy;
-import com.playmonumenta.plugins.abilities.alchemist.EnfeeblingElixir;
+import com.playmonumenta.plugins.abilities.alchemist.EmpoweringOdor;
+import com.playmonumenta.plugins.abilities.alchemist.EnergizingElixir;
 import com.playmonumenta.plugins.abilities.alchemist.GruesomeAlchemy;
 import com.playmonumenta.plugins.abilities.alchemist.IronTincture;
-import com.playmonumenta.plugins.abilities.alchemist.PowerInjection;
-import com.playmonumenta.plugins.abilities.alchemist.UnstableArrows;
-import com.playmonumenta.plugins.abilities.alchemist.apothecary.AlchemicalAmalgam;
-import com.playmonumenta.plugins.abilities.alchemist.apothecary.InvigoratingOdor;
+import com.playmonumenta.plugins.abilities.alchemist.UnstableAmalgam;
+import com.playmonumenta.plugins.abilities.alchemist.apothecary.Panacea;
+import com.playmonumenta.plugins.abilities.alchemist.apothecary.TransmutationRing;
 import com.playmonumenta.plugins.abilities.alchemist.apothecary.WardingRemedy;
 import com.playmonumenta.plugins.abilities.alchemist.apothecary.WardingRemedyNonApothecary;
-import com.playmonumenta.plugins.abilities.alchemist.harbinger.NightmarishAlchemy;
-import com.playmonumenta.plugins.abilities.alchemist.harbinger.PurpleHaze;
+import com.playmonumenta.plugins.abilities.alchemist.harbinger.EsotericEnhancements;
 import com.playmonumenta.plugins.abilities.alchemist.harbinger.ScorchedEarth;
+import com.playmonumenta.plugins.abilities.alchemist.harbinger.Taboo;
 import com.playmonumenta.plugins.abilities.cleric.CelestialBlessing;
 import com.playmonumenta.plugins.abilities.cleric.CleansingRain;
 import com.playmonumenta.plugins.abilities.cleric.ClericPassive;
@@ -157,7 +156,7 @@ import com.playmonumenta.plugins.abilities.warlock.reaper.DarkPact;
 import com.playmonumenta.plugins.abilities.warlock.reaper.JudgementChain;
 import com.playmonumenta.plugins.abilities.warlock.reaper.VoodooBonds;
 import com.playmonumenta.plugins.abilities.warlock.tenebrist.HauntingShades;
-import com.playmonumenta.plugins.abilities.warlock.tenebrist.UmbralWail;
+import com.playmonumenta.plugins.abilities.warlock.tenebrist.RestlessSouls;
 import com.playmonumenta.plugins.abilities.warlock.tenebrist.WitheringGaze;
 import com.playmonumenta.plugins.abilities.warrior.BruteForce;
 import com.playmonumenta.plugins.abilities.warrior.CounterStrike;
@@ -175,16 +174,16 @@ import com.playmonumenta.plugins.abilities.warrior.guardian.Bodyguard;
 import com.playmonumenta.plugins.abilities.warrior.guardian.Challenge;
 import com.playmonumenta.plugins.abilities.warrior.guardian.ShieldWall;
 import com.playmonumenta.plugins.depths.DepthsManager;
-import com.playmonumenta.plugins.enchantments.infusions.Vitality;
 import com.playmonumenta.plugins.events.AbilityCastEvent;
-import com.playmonumenta.plugins.events.CustomDamageEvent;
+import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.PotionEffectApplyEvent;
+import com.playmonumenta.plugins.itemstats.infusions.Vitality;
 import com.playmonumenta.plugins.network.ClientModHandler;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
-import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.AbsorptionUtils;
 import com.playmonumenta.plugins.utils.DelvesUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MetadataUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
@@ -313,13 +312,13 @@ public class AbilityManager {
 
 			//********** ALCHEMIST **********//
 			new Bezoar(mPlugin, null),
-			new BasiliskPoison(mPlugin, null),
-			new UnstableArrows(mPlugin, null),
-			new PowerInjection(mPlugin, null),
+			new AlchemicalArtillery(mPlugin, null),
+			new EmpoweringOdor(mPlugin, null),
+			new UnstableAmalgam(mPlugin, null),
 			new IronTincture(mPlugin, null),
 			new GruesomeAlchemy(mPlugin, null),
 			new BrutalAlchemy(mPlugin, null),
-			new EnfeeblingElixir(mPlugin, null),
+			new EnergizingElixir(mPlugin, null),
 			new AlchemistPotions(mPlugin, null)
 		);
 
@@ -391,17 +390,17 @@ public class AbilityManager {
 			// TENEBRIST
 			new WitheringGaze(mPlugin, null),
 			new HauntingShades(mPlugin, null),
-			new UmbralWail(mPlugin, null),
+			new RestlessSouls(mPlugin, null),
 
 			//********** ALCHEMIST **********//
 			// HARBINGER
 			new ScorchedEarth(mPlugin, null),
-			new NightmarishAlchemy(mPlugin, null),
-			new PurpleHaze(mPlugin, null),
+			new EsotericEnhancements(mPlugin, null),
+			new Taboo(mPlugin, null),
 
 			// APOTHECARY
-			new AlchemicalAmalgam(mPlugin, null),
-			new InvigoratingOdor(mPlugin, null),
+			new Panacea(mPlugin, null),
+			new TransmutationRing(mPlugin, null),
 			new WardingRemedy(mPlugin, null),
 			new WardingRemedyNonApothecary(mPlugin, null)
 		);
@@ -443,8 +442,11 @@ public class AbilityManager {
 		);
 
 		List<Ability> triggerLastAbilities = Arrays.asList(
+			new SanctifiedArmor(mPlugin, null),
+			new Rampage(mPlugin, null),
 			new PrismaticShield(mPlugin, null),
-			new EscapeDeath(mPlugin, null)
+			new EscapeDeath(mPlugin, null),
+			new CoupDeGrace(mPlugin, null)
 		);
 		mReferenceAbilities.addAll(delveModifiers);
 		if (!ServerProperties.getShardName().contains("depths")) {
@@ -462,24 +464,12 @@ public class AbilityManager {
 
 		AttributeInstance knockbackResistance = player.getAttribute(Attribute.GENERIC_KNOCKBACK_RESISTANCE);
 		AttributeInstance movementSpeed = player.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED);
-		AttributeInstance armor = player.getAttribute(Attribute.GENERIC_ARMOR);
-		AttributeInstance toughness = player.getAttribute(Attribute.GENERIC_ARMOR_TOUGHNESS);
-		AttributeInstance attackDamage = player.getAttribute(Attribute.GENERIC_ATTACK_DAMAGE);
 		AttributeInstance attackSpeed = player.getAttribute(Attribute.GENERIC_ATTACK_SPEED);
 		AttributeInstance maxHealth = player.getAttribute(Attribute.GENERIC_MAX_HEALTH);
 
 		// Reset passive buffs to player base attributes
 		if (knockbackResistance != null) {
 			knockbackResistance.setBaseValue(0);
-		}
-		if (armor != null) {
-			armor.setBaseValue(0);
-		}
-		if (toughness != null) {
-			toughness.setBaseValue(0);
-		}
-		if (attackDamage != null) {
-			attackDamage.setBaseValue(1);
 		}
 		if (attackSpeed != null) {
 			attackSpeed.setBaseValue(4.0);
@@ -515,9 +505,6 @@ public class AbilityManager {
 		 */
 		@Nullable AttributeInstance[] instances = {
 			knockbackResistance,
-			armor,
-			toughness,
-			attackDamage,
 			attackSpeed,
 			movementSpeed,
 			maxHealth
@@ -597,11 +584,17 @@ public class AbilityManager {
 		return collection;
 	}
 
-	public <T extends @Nullable Ability> T getPlayerAbility(Player player, Class<T> cls) {
+	public <T extends Ability> @Nullable T getPlayerAbility(@Nullable Player player, Class<T> cls) {
+		if (player == null) {
+			return null;
+		}
 		return getPlayerAbilities(player).getAbility(cls);
 	}
 
-	public <T extends @Nullable Ability> T getPlayerAbilityIgnoringSilence(Player player, Class<T> cls) {
+	public <T extends Ability> @Nullable T getPlayerAbilityIgnoringSilence(@Nullable Player player, Class<T> cls) {
+		if (player == null) {
+			return null;
+		}
 		return getPlayerAbilities(player).getAbilityIgnoringSilence(cls);
 	}
 
@@ -629,8 +622,6 @@ public class AbilityManager {
 	//---------------------------------------------------------------------------------------------------------------
 
 	public boolean abilityCastEvent(Player player, AbilityCastEvent event) {
-		//TODO Ensnare implementation
-
 		for (Ability abil : getPlayerAbilities(player).getAbilities()) {
 			if (abil.canCast()) {
 				if (!abil.abilityCastEvent(event)) {
@@ -645,28 +636,24 @@ public class AbilityManager {
 		return conditionalCastCancellable(player, (ability) -> ability.blockBreakEvent(event));
 	}
 
-	public boolean livingEntityDamagedByPlayerEvent(Player player, EntityDamageByEntityEvent event) {
-		// Use the counter instead of scoreboard name because some "abilities" do not have a scoreboard
+	public void onDamage(Player player, DamageEvent event, LivingEntity enemy) {
+		if (!EntityUtils.isHostileMob(enemy)) {
+			return;
+		}
+
 		int i = 0;
 		for (Ability abil : getPlayerAbilities(player).getAbilities()) {
 			i++;
 			if (abil.canCast()) {
 				// Do not allow any skills with no cooldown to apply damage more than once
-				// Always allow sweep attacks to go through for things like Deadly Ronde
-				if (event.getCause() != DamageCause.ENTITY_SWEEP_ATTACK && !abil.getInfo().mIgnoreTriggerCap
+				if (!abil.getInfo().mIgnoreTriggerCap
 					&& (abil.getInfo().mCooldown == 0 || abil.getInfo().mIgnoreCooldown)
 					&& !MetadataUtils.checkOnceThisTick(mPlugin, player, i + "LivingEntityDamagedByPlayerEventTickTriggered")) {
-					return true;
+					return;
 				}
-				if (!abil.livingEntityDamagedByPlayerEvent(event)) {
-					return false;
-				}
-				if (AbilityUtils.isStealthed(player) && !abil.onStealthAttack(event)) {
-					return false;
-				}
+				abil.onDamage(event, enemy);
 			}
 		}
-		return true;
 	}
 
 	@FunctionalInterface
@@ -698,24 +685,32 @@ public class AbilityManager {
 		return true;
 	}
 
-	public boolean playerDamagedEvent(Player player, EntityDamageEvent event) {
-		return conditionalCastCancellable(player, (ability) -> ability.playerDamagedEvent(event));
+	public void onHurt(Player player, DamageEvent event) {
+		for (Ability abil : getPlayerAbilities(player).getAbilities()) {
+			if (abil.canCast()) {
+				abil.onHurt(event);
+			}
+		}
 	}
 
-	public boolean playerDamagedByLivingEntityEvent(Player player, EntityDamageByEntityEvent event) {
-		return conditionalCastCancellable(player, (ability) -> ability.playerDamagedByLivingEntityEvent(event));
+	public void onHurtByEntity(Player player, DamageEvent event, Entity damager) {
+		for (Ability abil : getPlayerAbilities(player).getAbilities()) {
+			if (abil.canCast()) {
+				abil.onHurtByEntity(event, damager);
+			}
+		}
 	}
 
-	public boolean playerDamagedByProjectileEvent(Player player, EntityDamageByEntityEvent event) {
-		return conditionalCastCancellable(player, (ability) -> ability.playerDamagedByProjectileEvent(event));
+	public void onHurtByEntityWithSource(Player player, DamageEvent event, Entity damager, LivingEntity source) {
+		for (Ability abil : getPlayerAbilities(player).getAbilities()) {
+			if (abil.canCast()) {
+				abil.onHurtByEntityWithSource(event, damager, source);
+			}
+		}
 	}
 
 	public boolean playerCombustByEntityEvent(Player player, EntityCombustByEntityEvent event) {
 		return conditionalCastCancellable(player, (ability) -> ability.playerCombustByEntityEvent(event));
-	}
-
-	public boolean livingEntityShotByPlayerEvent(Player player, Projectile proj, LivingEntity damagee, EntityDamageByEntityEvent event) {
-		return conditionalCastCancellable(player, (ability) -> ability.livingEntityShotByPlayerEvent(proj, damagee, event));
 	}
 
 	public boolean playerShotArrowEvent(Player player, AbstractArrow arrow) {
@@ -754,7 +749,8 @@ public class AbilityManager {
 
 	public void entityDeathRadiusEvent(Player player, EntityDeathEvent event, boolean shouldGenDrops) {
 		conditionalCast(player, (ability) -> {
-			if (event.getEntity().getLocation().distance(player.getLocation()) <= ability.entityDeathRadius()) {
+			Location center = ability.entityDeathRadiusCenterLocation();
+			if (center != null && event.getEntity().getLocation().distance(center) <= ability.entityDeathRadius()) {
 				ability.entityDeathRadiusEvent(event, shouldGenDrops);
 			}
 		});
@@ -780,17 +776,13 @@ public class AbilityManager {
 		conditionalCast(player, (ability) -> ability.periodicTrigger(twoHertz, oneSecond, ticks));
 	}
 
-	public void playerDealtCustomDamageEvent(Player player, CustomDamageEvent event) {
-		conditionalCast(player, (ability) -> ability.playerDealtCustomDamageEvent(event));
-	}
-
 	/*
 	 * EntityUtils.damageEntity() does not trigger the EntityDamageByEntityEvent, and it may not
 	 * trigger the CustomDamageEvent either if the flag is set to such. Since we need to attach an
 	 * event to ALL damage dealt (currently, for delves to work), we need to trigger a dummy event
 	 * for this express purpose that isn't used in things like regular abilities.
 	 */
-	public void playerDealtUnregisteredCustomDamageEvent(Player player, CustomDamageEvent event) {
+	public void playerDealtUnregisteredCustomDamageEvent(Player player, DamageEvent event) {
 		conditionalCast(player, (ability) -> ability.playerDealtUnregisteredCustomDamageEvent(event));
 	}
 

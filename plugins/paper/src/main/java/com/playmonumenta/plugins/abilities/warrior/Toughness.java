@@ -1,24 +1,23 @@
 package com.playmonumenta.plugins.abilities.warrior;
 
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.utils.EntityUtils;
 import org.bukkit.Material;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.entity.Player;
-import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.inventory.ItemStack;
 import org.checkerframework.checker.nullness.qual.Nullable;
-
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.utils.EntityUtils;
 
 public class Toughness extends Ability {
 
 	public static final double PERCENT_HEALTH_1 = 0.1;
 	public static final double PERCENT_HEALTH_2 = 0.2;
-	public static final double DOT_DAMAGE_REDUCTION_1 = 0.25;
-	public static final double DOT_DAMAGE_REDUCTION_2 = 0.50;
+	public static final double DOT_DAMAGE_REDUCTION_1 = 0.2;
+	public static final double DOT_DAMAGE_REDUCTION_2 = 0.40;
 	public static final String TOUGHNESS_MODIFIER_NAME = "ToughnessPercentHealthModifier";
 
 	private final double mDoTDamageReduction;
@@ -27,8 +26,8 @@ public class Toughness extends Ability {
 		super(plugin, player, "Toughness");
 		mInfo.mScoreboardId = "Toughness";
 		mInfo.mShorthandName = "Tgh";
-		mInfo.mDescriptions.add("Gain +10% max health and damage from Poison, Wither, and Drowning is reduced by 25%.");
-		mInfo.mDescriptions.add("Gain +20% max health and damage from Poison, Wither, and Drowning is reduced by 50%.");
+		mInfo.mDescriptions.add("Gain +10% max health and damage from Poison, Wither, and Drowning is reduced by 20%.");
+		mInfo.mDescriptions.add("Gain +20% max health and damage from Poison, Wither, and Drowning is reduced by 40%.");
 		mDisplayItem = new ItemStack(Material.IRON_HELMET, 1);
 		mDoTDamageReduction = getAbilityScore() == 1 ? DOT_DAMAGE_REDUCTION_1 : DOT_DAMAGE_REDUCTION_2;
 
@@ -40,12 +39,10 @@ public class Toughness extends Ability {
 	}
 
 	@Override
-	public boolean playerDamagedEvent(EntityDamageEvent event) {
-		if (event.getCause() == DamageCause.POISON || event.getCause() == DamageCause.WITHER || event.getCause() == DamageCause.DROWNING) {
+	public void onHurt(DamageEvent event) {
+		if (event.getType() == DamageType.AILMENT) {
 			event.setDamage(event.getDamage() * (1 - mDoTDamageReduction));
 		}
-
-		return true;
 	}
 
 }

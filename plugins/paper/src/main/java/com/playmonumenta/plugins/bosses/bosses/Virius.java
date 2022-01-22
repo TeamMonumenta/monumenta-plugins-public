@@ -1,7 +1,13 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
-import java.util.Arrays;
-
+import com.playmonumenta.plugins.bosses.BossBarManager;
+import com.playmonumenta.plugins.bosses.SpellManager;
+import com.playmonumenta.plugins.bosses.spells.SpellBaseLaser;
+import com.playmonumenta.plugins.bosses.spells.SpellChangeFloor;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.SerializationUtils;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -15,13 +21,7 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
-import com.playmonumenta.plugins.bosses.BossBarManager;
-import com.playmonumenta.plugins.bosses.SpellManager;
-import com.playmonumenta.plugins.bosses.spells.SpellBaseLaser;
-import com.playmonumenta.plugins.bosses.spells.SpellChangeFloor;
-import com.playmonumenta.plugins.utils.BossUtils;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.SerializationUtils;
+import java.util.Arrays;
 
 public class Virius extends BossAbilityGroup {
 	public static final String identityTag = "boss_virius";
@@ -70,7 +70,7 @@ public class Virius extends BossAbilityGroup {
 							loc.getWorld().playSound(loc, Sound.ENTITY_DRAGON_FIREBALL_EXPLODE, 1f, 1.5f);
 							loc.getWorld().spawnParticle(Particle.WATER_WAKE, loc, 300, 0.8, 0.8, 0.8, 0);
 							if (!blocked) {
-								BossUtils.bossDamage(boss, player, 20);
+								BossUtils.blockableDamage(boss, player, DamageType.MAGIC, 20);
 							}
 						})
 		));

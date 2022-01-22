@@ -1,5 +1,14 @@
 package com.playmonumenta.plugins.bosses.spells.headlesshorseman;
 
+import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.player.PPGroundCircle;
+import com.playmonumenta.plugins.player.PartialParticle;
+import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.DamageUtils;
+import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.MovementUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -11,14 +20,6 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
-
-import com.playmonumenta.plugins.bosses.spells.Spell;
-import com.playmonumenta.plugins.player.PPGroundCircle;
-import com.playmonumenta.plugins.player.PartialParticle;
-import com.playmonumenta.plugins.utils.BossUtils;
-import com.playmonumenta.plugins.utils.FastUtils;
-import com.playmonumenta.plugins.utils.MovementUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
 
 /*
  * Burning Vengeance - The horseman after 0.5 seconds summons a ring of flames at the edge of a 16 block
@@ -57,9 +58,7 @@ public class SpellBurningVengence extends Spell {
 		}
 
 		if (mBoss.getVehicle() != null) {
-			if (mBoss.getVehicle() instanceof LivingEntity) {
-				LivingEntity h = (LivingEntity) mBoss.getVehicle();
-
+			if (mBoss.getVehicle() instanceof LivingEntity h) {
 				PPGroundCircle outerFlameCircle = new PPGroundCircle(Particle.FLAME, h.getLocation(), 48, 0.07, 0.07, 0.07, 0.01).init(0, true);
 
 				BukkitRunnable run = new BukkitRunnable() {
@@ -83,7 +82,7 @@ public class SpellBurningVengence extends Spell {
 
 							for (Player player : PlayerUtils.playersInRange(loc, 0.75, true)) {
 								if (mCenter.distance(player.getLocation()) < mRange) {
-									BossUtils.bossDamage(mBoss, player, 4, mBoss.getLocation(), "Burning Vengence");
+									DamageUtils.damage(mBoss, player, DamageType.FIRE, 4, null, false, true, "Burning Vengence");
 									player.setFireTicks(20 * 5);
 									MovementUtils.pullTowardsByUnit(mBoss, player, (float)0.5);
 								}
@@ -104,7 +103,7 @@ public class SpellBurningVengence extends Spell {
 							for (Player player : PlayerUtils.playersInRange(loc, 5, true)) {
 								if (mCenter.distance(player.getLocation()) < mRange) {
 									BossUtils.bossDamagePercent(mBoss, player, mDamage, "Burning Vengence");
-									MovementUtils.knockAway(loc, player, 3.0f);
+									MovementUtils.knockAway(loc, player, 3.0f, false);
 								}
 							}
 						}

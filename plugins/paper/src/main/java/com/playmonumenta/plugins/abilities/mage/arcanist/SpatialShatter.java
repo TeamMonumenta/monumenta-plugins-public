@@ -1,23 +1,18 @@
 package com.playmonumenta.plugins.abilities.mage.arcanist;
 
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
-
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.classes.ClassAbility;
-import com.playmonumenta.plugins.classes.magic.MagicType;
-import com.playmonumenta.plugins.enchantments.abilities.SpellPower;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.itemstats.attributes.SpellPower;
+import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.StringUtils;
-
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -32,6 +27,11 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 import org.checkerframework.checker.nullness.qual.Nullable;
+
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
 
 
 public class SpatialShatter extends Ability {
@@ -63,7 +63,7 @@ public class SpatialShatter extends Ability {
 		mInfo.mShorthandName = "SpSh";
 		mInfo.mDescriptions.add(
 			String.format(
-				"While holding a wand, pressing the swap key fires a burst of magic, instantly travelling up to %s blocks. If this projectile hits a solid block or enemy, it explodes, dealing %s arcane damage to all enemies in a %s-block cube around it and reducing all your other skill cooldowns by %s%%, capped at %ss. Swapping hands while holding a wand no longer does its vanilla function. Cooldown: %ss.",
+				"While holding a wand, pressing the swap key fires a burst of magic, instantly travelling up to %s blocks. If this projectile hits a solid block or enemy, it explodes, dealing %s magic damage to all enemies in a %s-block cube around it and reducing all your other skill cooldowns by %s%%, capped at %ss. Cooldown: %ss.",
 				DISTANCE,
 				DAMAGE_1,
 				SIZE,
@@ -150,7 +150,7 @@ public class SpatialShatter extends Ability {
 	}
 
 	private void explode(Location loc) {
-		double damage = SpellPower.getSpellDamage(mPlayer, mLevelDamage);
+		double damage = SpellPower.getSpellDamage(mPlugin, mPlayer, mLevelDamage);
 		boolean cdr = true;
 		World world = mPlayer.getWorld();
 		world.spawnParticle(Particle.CLOUD, loc, 25, 0, 0, 0, 0.125);
@@ -167,8 +167,8 @@ public class SpatialShatter extends Ability {
 				cdr = false;
 				updateCooldowns(mLevelReduction);
 			}
-			EntityUtils.damageEntity(mPlugin, mob, damage, mPlayer, MagicType.ARCANE, true, mInfo.mLinkedSpell);
-			MovementUtils.knockAway(loc, mob, KNOCKBACK, KNOCKBACK);
+			DamageUtils.damage(mPlayer, mob, DamageType.MAGIC, damage, mInfo.mLinkedSpell);
+			MovementUtils.knockAway(loc, mob, KNOCKBACK, KNOCKBACK, true);
 		}
 	}
 

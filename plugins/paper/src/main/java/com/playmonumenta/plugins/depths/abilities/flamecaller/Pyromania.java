@@ -1,14 +1,12 @@
 package com.playmonumenta.plugins.depths.abilities.flamecaller;
 
-import org.bukkit.Material;
-import org.bukkit.entity.Player;
-
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
-
 import net.md_5.bungee.api.ChatColor;
+import org.bukkit.Material;
+import org.bukkit.entity.Player;
 
 public class Pyromania extends DepthsAbility {
 

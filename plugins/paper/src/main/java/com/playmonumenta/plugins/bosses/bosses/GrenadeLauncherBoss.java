@@ -1,7 +1,5 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
-import java.util.Arrays;
-
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.parameters.BossParam;
@@ -10,11 +8,13 @@ import com.playmonumenta.plugins.bosses.parameters.EntityTargets;
 import com.playmonumenta.plugins.bosses.parameters.ParticlesList;
 import com.playmonumenta.plugins.bosses.parameters.SoundsList;
 import com.playmonumenta.plugins.bosses.spells.SpellBaseGrenadeLauncher;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.utils.BossUtils;
-
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.LivingEntity;
+
+import java.util.Arrays;
 
 
 public class GrenadeLauncherBoss extends BossAbilityGroup {
@@ -137,19 +137,11 @@ public class GrenadeLauncherBoss extends BossAbilityGroup {
 					//hit actions
 
 					if (p.DAMAGE > 0) {
-						if (p.SPELL_NAME.isEmpty()) {
-							BossUtils.bossDamage(boss, target, p.DAMAGE);
-						} else {
-							BossUtils.bossDamage(boss, target, p.DAMAGE, loc, p.SPELL_NAME);
-						}
+						BossUtils.blockableDamage(boss, target, DamageType.BLAST, p.DAMAGE, p.SPELL_NAME, loc);
 					}
 
 					if (p.DAMAGE_PERCENTAGE > 0.0) {
-						if (p.SPELL_NAME.isEmpty()) {
-							BossUtils.bossDamagePercent(mBoss, target, p.DAMAGE_PERCENTAGE);
-						} else {
-							BossUtils.bossDamagePercent(mBoss, target, p.DAMAGE_PERCENTAGE, p.SPELL_NAME);
-						}
+						BossUtils.bossDamagePercent(mBoss, target, p.DAMAGE_PERCENTAGE, p.SPELL_NAME);
 					}
 
 					p.EFFECTS.apply(target, boss);
@@ -170,9 +162,10 @@ public class GrenadeLauncherBoss extends BossAbilityGroup {
 					//hit ring actions
 					if (p.LINGERING_DAMAGE > 0) {
 						if (p.SPELL_NAME.isEmpty()) {
-							BossUtils.bossDamage(boss, target, p.LINGERING_DAMAGE);
+							//TODO maybe not blockable? not going to worry about it right now
+							BossUtils.blockableDamage(boss, target, DamageType.BLAST, p.LINGERING_DAMAGE);
 						} else {
-							BossUtils.bossDamage(boss, target, p.LINGERING_DAMAGE, loc, p.SPELL_NAME);
+							BossUtils.blockableDamage(boss, target, DamageType.BLAST, p.LINGERING_DAMAGE, p.SPELL_NAME, loc);
 						}
 					}
 

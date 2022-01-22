@@ -1,10 +1,6 @@
 package com.playmonumenta.plugins.bosses.spells;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.EnumSet;
-import java.util.List;
-
+import com.playmonumenta.plugins.utils.ItemUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -20,7 +16,10 @@ import org.bukkit.entity.Entity;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.loot.Lootable;
 
-import com.playmonumenta.plugins.utils.ItemUtils;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.EnumSet;
+import java.util.List;
 
 public class SpellBlockBreak extends Spell {
 

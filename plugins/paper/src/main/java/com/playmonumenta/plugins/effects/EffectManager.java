@@ -10,23 +10,21 @@ import java.util.TreeSet;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityRegainHealthEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.projectiles.ProjectileSource;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.events.DamageEvent;
 
 public final class EffectManager implements Listener {
 
@@ -455,44 +453,37 @@ public final class EffectManager implements Listener {
 		return true;
 	}
 
-	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
-	public boolean entityDamageByEntityEvent(EntityDamageByEntityEvent event) {
-		Entity damager = event.getDamager();
-		if (damager instanceof Projectile) {
-			ProjectileSource shooter = ((Projectile) damager).getShooter();
-			if (shooter instanceof Entity) {
-				damager = (Entity) shooter;
-			}
-		}
+	//@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
+	public void damageEvent(DamageEvent event) {
+		LivingEntity damagee = event.getDamagee();
+		LivingEntity source = event.getSource();
 
-		Effects effects = mEntities.get(damager);
+		Effects effects = mEntities.get(damagee);
 		if (effects != null) {
 			for (Map<String, NavigableSet<Effect>> priorityEffects : effects.mPriorityMap.values()) {
 				for (NavigableSet<Effect> effectGroup : priorityEffects.values()) {
-					if (!effectGroup.last().entityDealDamageEvent(event) && !effectGroup.last().entityReceiveDamageFromEntityEvent(event)) {
-						return false;
+					effectGroup.last().onHurt(damagee, event);
+					Entity damager = event.getDamager();
+					if (damager != null) {
+						effectGroup.last().onHurtByEntity(damagee, event, damager);
+						if (source != null) {
+							effectGroup.last().onHurtByEntityWithSource(damagee, event, damager, source);
+						}
 					}
 				}
 			}
 		}
 
-		return true;
-	}
-
-	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
-	public boolean entityDamageEvent(EntityDamageEvent event) {
-		Effects effects = mEntities.get(event.getEntity());
-		if (effects != null) {
-			for (Map<String, NavigableSet<Effect>> priorityEffects : effects.mPriorityMap.values()) {
-				for (NavigableSet<Effect> effectGroup : priorityEffects.values()) {
-					if (!effectGroup.last().entityReceiveDamageEvent(event)) {
-						return false;
+		if (source != null) {
+			Effects sourceEffects = mEntities.get(source);
+			if (sourceEffects != null) {
+				for (Map<String, NavigableSet<Effect>> priorityEffects : sourceEffects.mPriorityMap.values()) {
+					for (NavigableSet<Effect> effectGroup : priorityEffects.values()) {
+						effectGroup.last().onDamage(source, event, damagee);
 					}
 				}
 			}
 		}
-
-		return true;
 	}
 
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)

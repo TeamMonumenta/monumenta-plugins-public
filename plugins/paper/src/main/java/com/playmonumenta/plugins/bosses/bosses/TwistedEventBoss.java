@@ -1,14 +1,13 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
+import com.playmonumenta.plugins.abilities.delves.Twisted;
+import com.playmonumenta.plugins.utils.FastUtils;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityTargetEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
-
-import com.playmonumenta.plugins.abilities.delves.Twisted;
-import com.playmonumenta.plugins.utils.FastUtils;
 
 public class TwistedEventBoss extends BossAbilityGroup {
 

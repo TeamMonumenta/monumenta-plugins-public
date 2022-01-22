@@ -1,5 +1,10 @@
 package com.playmonumenta.plugins.bosses.spells.cluckingop;
 
+import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -9,11 +14,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
-
-import com.playmonumenta.plugins.bosses.spells.Spell;
-import com.playmonumenta.plugins.utils.BossUtils;
-import com.playmonumenta.plugins.utils.FastUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
 
 public class SpellOmegaLeap extends Spell {
 
@@ -69,7 +69,7 @@ public class SpellOmegaLeap extends Spell {
 							}
 							for (Player player : PlayerUtils.playersInRange(mAttackLocation, mRadius, true)) {
 								if (player.getLocation().toVector().isInSphere(mAttackLocation.toVector(), mRadius)) {
-									BossUtils.bossDamage(mBoss, player, 1);
+									BossUtils.blockableDamage(mBoss, player, DamageType.MAGIC, 1);
 								}
 							}
 							mRadius += 1;

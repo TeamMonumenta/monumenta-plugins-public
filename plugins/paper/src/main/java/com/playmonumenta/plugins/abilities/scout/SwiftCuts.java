@@ -1,5 +1,9 @@
 package com.playmonumenta.plugins.abilities.scout;
 
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -7,13 +11,8 @@ import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.inventory.ItemStack;
 import org.checkerframework.checker.nullness.qual.Nullable;
-
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.Ability;
 
 public class SwiftCuts extends Ability {
 
@@ -35,26 +34,19 @@ public class SwiftCuts extends Ability {
 	}
 
 	@Override
-	public boolean livingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
-		if (mPlayer == null) {
-			return true;
-		}
-		if (event.getCause() == DamageCause.ENTITY_ATTACK) {
-			LivingEntity mob = (LivingEntity) event.getEntity();
-
-			if (mob.equals(mLastTarget)) {
-				Location loc = mob.getLocation();
+	public void onDamage(DamageEvent event, LivingEntity enemy) {
+		if (event.getType() == DamageType.MELEE || event.getType() == DamageType.MELEE_SKILL || event.getType() == DamageType.MELEE_ENCH) {
+			if (enemy.equals(mLastTarget)) {
+				Location loc = enemy.getLocation();
 				World world = mPlayer.getWorld();
 				world.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 0.5f, 1.5f);
 				world.spawnParticle(Particle.SWEEP_ATTACK, loc, 2, 0.25, 0.35, 0.25, 0.001);
 
 				event.setDamage(event.getDamage() * (1 + mConsecutivePercentDamage));
 			} else {
-				mLastTarget = mob;
+				mLastTarget = enemy;
 			}
 		}
-
-		return true;
 	}
 
 }

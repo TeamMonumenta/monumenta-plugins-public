@@ -1,10 +1,9 @@
 package com.playmonumenta.plugins.bosses.spells.frostgiant;
 
+import com.playmonumenta.plugins.bosses.spells.Spell;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.LivingEntity;
-
-import com.playmonumenta.plugins.bosses.spells.Spell;
 
 //Frost Giant breaks frosted ice that he walks over
 public class SpellFrostedIceBreak extends Spell {

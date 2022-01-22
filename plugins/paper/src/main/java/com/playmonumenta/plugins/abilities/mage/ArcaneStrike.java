@@ -8,8 +8,6 @@ import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -20,8 +18,10 @@ import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.classes.ClassAbility;
-import com.playmonumenta.plugins.classes.magic.MagicType;
-import com.playmonumenta.plugins.enchantments.abilities.SpellPower;
+import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.itemstats.attributes.SpellPower;
+import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
@@ -49,7 +49,7 @@ public class ArcaneStrike extends Ability {
 		mInfo.mLinkedSpell = ClassAbility.ARCANE_STRIKE;
 		mInfo.mScoreboardId = "ArcaneStrike";
 		mInfo.mShorthandName = "AS";
-		mInfo.mDescriptions.add("When you attack an enemy with a wand, you unleash an arcane explosion dealing 4 damage to all mobs in a 4 block radius around the target. Enemies that are on fire or slowed take 2 extra damage. Arcane strike can not trigger Spellshock's static. Cooldown: 5s.");
+		mInfo.mDescriptions.add("When you attack an enemy with a wand, you unleash an arcane explosion dealing 4 magic damage to all mobs in a 4 block radius around the target. Enemies that are on fire or slowed take 2 extra damage. Arcane strike can not trigger Spellshock's static. Cooldown: 5s.");
 		mInfo.mDescriptions.add("The damage is increased to 7. Mobs that are on fire or slowed take 3 additional damage.");
 		mInfo.mCooldown = COOLDOWN;
 		mDisplayItem = new ItemStack(Material.GOLDEN_SWORD, 1);
@@ -58,27 +58,25 @@ public class ArcaneStrike extends Ability {
 	}
 
 	@Override
-	public boolean livingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
-		if (event.getCause() == DamageCause.ENTITY_ATTACK) {
+	public void onDamage(DamageEvent event, LivingEntity enemy) {
+		if (event.getType() == DamageType.MELEE && mPlayer != null) {
 			putOnCooldown();
 
-			LivingEntity damagee = (LivingEntity) event.getEntity();
-
-			for (LivingEntity mob : EntityUtils.getNearbyMobs(damagee.getLocation(), RADIUS, mPlayer)) {
-				float dmg = SpellPower.getSpellDamage(mPlayer, mDamageBonus);
+			for (LivingEntity mob : EntityUtils.getNearbyMobs(enemy.getLocation(), RADIUS, mPlayer)) {
+				float dmg = SpellPower.getSpellDamage(mPlugin, mPlayer, mDamageBonus);
 
 				// Arcane Strike extra damage if on fire or slowed (but effect not applied this tick)
 				if (EntityUtils.isSlowed(mPlugin, mob) || ((mob.hasPotionEffect(PotionEffectType.SLOW)
 				     && !MetadataUtils.happenedThisTick(mPlugin, mob, Constants.ENTITY_SLOWED_NONCE_METAKEY, 0)))
 				    || (mob.getFireTicks() > 0
 				        && !MetadataUtils.happenedThisTick(mPlugin, mob, Constants.ENTITY_COMBUST_NONCE_METAKEY, 0))) {
-					dmg += SpellPower.getSpellDamage(mPlayer, mDamageBonusAffected);
+					dmg += SpellPower.getSpellDamage(mPlugin, mPlayer, mDamageBonusAffected);
 				}
 
-				EntityUtils.damageEntity(mPlugin, mob, dmg, mPlayer, MagicType.ARCANE, true, mInfo.mLinkedSpell, true, false, false, true);
+				DamageUtils.damage(mPlayer, mob, DamageType.MAGIC, dmg, mInfo.mLinkedSpell, false, true);
 			}
 
-			Location locD = damagee.getLocation().add(0, 1, 0);
+			Location locD = enemy.getLocation().add(0, 1, 0);
 			World world = mPlayer.getWorld();
 			world.spawnParticle(Particle.DRAGON_BREATH, locD, 75, 0, 0, 0, 0.25);
 			world.spawnParticle(Particle.EXPLOSION_NORMAL, locD, 35, 0, 0, 0, 0.2);
@@ -115,8 +113,6 @@ public class ArcaneStrike extends Ability {
 
 			}.runTaskTimer(mPlugin, 0, 1);
 		}
-
-		return true;
 	}
 
 	@Override

@@ -1,8 +1,9 @@
 package com.playmonumenta.plugins.bosses.spells.cluckingop;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -14,9 +15,8 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import com.playmonumenta.plugins.bosses.spells.Spell;
-import com.playmonumenta.plugins.utils.BossUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
+import java.util.ArrayList;
+import java.util.List;
 
 public class SpellFluffPools extends Spell {
 
@@ -68,7 +68,7 @@ public class SpellFluffPools extends Spell {
 						public void run() {
 							mInnerTicks += 2;
 							for (Player player : PlayerUtils.playersInRange(loc, 3, true)) {
-								BossUtils.bossDamage(mBoss, player, 1);
+								BossUtils.blockableDamage(mBoss, player, DamageType.MAGIC, 1);
 								player.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, 20 * 5, -6));
 							}
 							world.spawnParticle(Particle.CLOUD, loc, 35, 3, 0.1, 3, 0.1);

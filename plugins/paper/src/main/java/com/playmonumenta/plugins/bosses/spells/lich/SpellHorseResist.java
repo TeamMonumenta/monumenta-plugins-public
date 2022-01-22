@@ -1,14 +1,13 @@
 package com.playmonumenta.plugins.bosses.spells.lich;
 
-import java.util.List;
-
+import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.utils.EntityUtils;
 import org.bukkit.Location;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
-import com.playmonumenta.plugins.bosses.spells.Spell;
-import com.playmonumenta.plugins.utils.EntityUtils;
+import java.util.List;
 
 public class SpellHorseResist extends Spell {
 

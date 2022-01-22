@@ -1,23 +1,23 @@
 package com.playmonumenta.plugins.bosses.bosses.lich;
 
-import java.util.Arrays;
-import java.util.List;
-
+import com.playmonumenta.plugins.bosses.bosses.BossAbilityGroup;
+import com.playmonumenta.plugins.bosses.bosses.Lich;
+import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.bosses.spells.lich.undeadplayers.SpellCrystalParticle;
+import com.playmonumenta.plugins.events.DamageEvent;
 import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.AbstractArrow;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.plugin.Plugin;
 
-import com.playmonumenta.plugins.bosses.bosses.BossAbilityGroup;
-import com.playmonumenta.plugins.bosses.bosses.Lich;
-import com.playmonumenta.plugins.bosses.spells.Spell;
-import com.playmonumenta.plugins.bosses.spells.lich.undeadplayers.SpellCrystalParticle;
+import java.util.Arrays;
+import java.util.List;
 
 public class LichShieldBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_lichshield";
@@ -53,15 +53,15 @@ public class LichShieldBoss extends BossAbilityGroup {
 	}
 
 	@Override
-	public void bossDamagedByEntity(EntityDamageByEntityEvent event) {
-		if (event.getEntity() instanceof AbstractArrow) {
-			AbstractArrow proj = (AbstractArrow) event.getEntity();
+	public void onHurt(DamageEvent event) {
+		Entity damager = event.getDamager();
+		if (damager != null && damager instanceof AbstractArrow proj) {
 			proj.remove();
 		}
 		if (event.getDamage() > 32) {
 			event.setDamage(32);
 		}
-		if (mBoss.getHealth() - event.getFinalDamage() <= 0) {
+		if (mBoss.getHealth() - event.getDamage() <= 0) {
 			event.setCancelled(true);
 			World world = mBoss.getWorld();
 			world.playSound(mBoss.getLocation(), Sound.BLOCK_GLASS_BREAK, SoundCategory.HOSTILE, 5, 1.2f);

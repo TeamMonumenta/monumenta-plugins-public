@@ -100,7 +100,7 @@ public final class Azacor extends BossAbilityGroup {
 			                       loc.getWorld().spawnParticle(Particle.EXPLOSION_LARGE, loc, 30, 0, 0, 0, 0.3);
 			                       if (!blocked) {
 									   BossUtils.bossDamagePercent(mBoss, target, 0.75, mBoss.getLocation());
-									   if ((target instanceof Player) && BossUtils.bossDamageBlocked((Player)target, 1, mBoss.getLocation())) {
+									   if (target instanceof Player player && BossUtils.bossDamageBlocked(player, mBoss.getLocation())) {
 										   BossUtils.bossDamagePercent(mBoss, target, 0.25);
 									   }
 									   target.addPotionEffect(new PotionEffect(PotionEffectType.WITHER, 100, 2));
@@ -154,7 +154,7 @@ public final class Azacor extends BossAbilityGroup {
 	}
 
 	private void randomMinion(String tellraw) {
-		randomMinion(tellraw, mSpawnLoc, 100.0 + BossUtils.getPlayersInRangeForHealthScaling(mSpawnLoc, detectionRange) * 75.0);
+		randomMinion(tellraw, mSpawnLoc, (100.0 + BossUtils.getPlayersInRangeForHealthScaling(mSpawnLoc, detectionRange) * 75.0) * 1.1);
 	}
 
 	protected static void randomMinion(String tellraw, Location loc, double eliteHealth) {
@@ -191,8 +191,8 @@ public final class Azacor extends BossAbilityGroup {
 			hpDelta = hpDelta / 2;
 			playerCount--;
 		}
-		mBoss.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(bossTargetHp);
-		mBoss.setHealth(bossTargetHp);
+		EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_MAX_HEALTH, bossTargetHp * 1.1);
+		mBoss.setHealth(bossTargetHp * 1.1);
 
 		//launch event related spawn commands
 		PlayerUtils.executeCommandOnNearbyPlayers(mSpawnLoc, detectionRange, "effect give @s minecraft:blindness 2 2");

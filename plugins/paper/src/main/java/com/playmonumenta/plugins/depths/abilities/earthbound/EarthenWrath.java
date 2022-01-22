@@ -1,25 +1,24 @@
 package com.playmonumenta.plugins.depths.abilities.earthbound;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.entity.Projectile;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
-import org.bukkit.projectiles.ProjectileSource;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.classes.ClassAbility;
-import com.playmonumenta.plugins.classes.magic.MagicType;
 import com.playmonumenta.plugins.depths.DepthsManager;
 import com.playmonumenta.plugins.depths.DepthsParty;
 import com.playmonumenta.plugins.depths.DepthsPlayer;
@@ -27,8 +26,9 @@ import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
-import com.playmonumenta.plugins.utils.AbilityUtils;
-import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 
@@ -77,7 +77,7 @@ public class EarthenWrath extends DepthsAbility {
 
 			@Override
 			public void run() {
-				mAbsorbDamage = true;
+				startWrath();
 				mTicks++;
 
 				if (mTicks % 10 == 0) {
@@ -107,15 +107,13 @@ public class EarthenWrath extends DepthsAbility {
 
 				if (mTicks >= DURATION) {
 					this.cancel();
-					mAbsorbDamage = false;
+					endWrath();
 
 					Location loc = mPlayer.getLocation();
 
 					if (mDamageAbsorbed > 0) {
 						for (LivingEntity mob : EntityUtils.getNearbyMobs(loc, DAMAGE_RADIUS)) {
-							if (!(mob instanceof Player)) {
-								EntityUtils.damageEntity(mPlugin, mob, mDamageAbsorbed * PERCENT_DAMAGE_REFLECTED[mRarity - 1], mPlayer, MagicType.PHYSICAL, true, mInfo.mLinkedSpell);
-							}
+							DamageUtils.damage(mPlayer, mob, DamageType.OTHER, mDamageAbsorbed * PERCENT_DAMAGE_REFLECTED[mRarity - 1], mInfo.mLinkedSpell);
 						}
 
 						world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 1.5f, 0.5f);
@@ -132,51 +130,39 @@ public class EarthenWrath extends DepthsAbility {
 	}
 
 	//Returns true if the damage was absorbed
-	public boolean damagedEntity(Player player, EntityDamageByEntityEvent event) {
-		if (mPlayer == null || AbilityUtils.isBlocked(event)) {
-			return false;
-		}
-
-		Entity damager = event.getDamager();
-		LivingEntity realDamager = null;
-		if (damager instanceof LivingEntity) {
-			realDamager = (LivingEntity) damager;
-		} else if (damager instanceof Projectile) {
-			ProjectileSource source = ((Projectile) damager).getShooter();
-			if (source instanceof LivingEntity) {
-				realDamager = (LivingEntity) source;
-			}
-		}
-		if (realDamager == null) {
-			return false;
-		}
-
-		DepthsPlayer dp = DepthsManager.getInstance().mPlayers.get(player.getUniqueId());
+	public boolean damagedEntity(Player otherPlayer, DamageEvent event) {
+		DepthsPlayer dp = DepthsManager.getInstance().mPlayers.get(otherPlayer.getUniqueId());
 
 		if (dp != null) {
-			EarthenWrath otherWrath = AbilityManager.getManager().getPlayerAbility(player, EarthenWrath.class);
+			EarthenWrath otherWrath = AbilityManager.getManager().getPlayerAbility(otherPlayer, EarthenWrath.class);
 			if (otherWrath != null) {
-				if (otherWrath.mAbsorbDamage) {
+				if (otherWrath.isWrathing()) {
 					return false;
 				}
 			}
 		}
 
-		if (mAbsorbDamage && !player.equals(mPlayer)) {
+		if (isWrathing() && !otherPlayer.equals(mPlayer)) {
 			mDamageAbsorbed += event.getDamage();
 
 			Vector velocity = mPlayer.getVelocity();
-			BossUtils.bossDamage(realDamager, mPlayer, event.getDamage() * (1 - PERCENT_DAMAGE_REDUCTION[mRarity - 1]), null, "Earthen Wrath");
+
+			// Create a new DamageEvent from the EntityDamageEvent with the same damage and damage type but a different damagee
+			DamageUtils.damage(event.getSource(), mPlayer, event.getType(), event.getDamage(), null, false, false, ABILITY_NAME);
+
 			mPlayer.setVelocity(velocity);
 
 			World world = mPlayer.getWorld();
-			world.playSound(mPlayer.getLocation(), Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, 1, 2);
-			world.playSound(player.getLocation(), Sound.ITEM_SHIELD_BLOCK, 1, 2);
-			world.spawnParticle(Particle.TOTEM, player.getLocation(), 30, 0.1, 0.1, 0.1, 0.6);
+			Location wrathLoc = mPlayer.getLocation();
+			Location otherLoc = otherPlayer.getLocation();
 
-			Location pLoc = player.getLocation().add(0, 0.5, 0);
-			Vector dir = mPlayer.getLocation().toVector().subtract(player.getLocation().toVector()).normalize();
-			for (int i = 0; i <= mPlayer.getLocation().distance(player.getLocation()); i++) {
+			world.playSound(wrathLoc, Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, 1, 2);
+			world.playSound(otherLoc, Sound.ITEM_SHIELD_BLOCK, 1, 2);
+			world.spawnParticle(Particle.TOTEM, otherLoc, 30, 0.1, 0.1, 0.1, 0.6);
+
+			Location pLoc = otherLoc.clone().add(0, 0.5, 0);
+			Vector dir = wrathLoc.toVector().subtract(otherLoc.toVector()).normalize();
+			for (int i = 0; i <= wrathLoc.distance(otherLoc); i++) {
 				pLoc.add(dir);
 
 				world.spawnParticle(Particle.VILLAGER_HAPPY, pLoc, 3, 0.25, 0.25, 0.25, 0);
@@ -187,6 +173,51 @@ public class EarthenWrath extends DepthsAbility {
 			return true;
 		}
 		return false;
+	}
+
+	// Called in DepthsListener
+	// Handles all incoming damage events, regardless of if anyone has this skill
+	public static void handleDamageEvent(DamageEvent event, Player damagee, DepthsParty party) {
+		if (event.isCancelled() || event.isBlocked()) {
+			return;
+		}
+
+		//Creates a new party list with random order without modifying the normal order of the party
+		List<DepthsPlayer> playersInParty = new ArrayList<DepthsPlayer>();
+		for (DepthsPlayer dp : party.mPlayersInParty) {
+			playersInParty.add(dp);
+		}
+		Collections.shuffle(playersInParty);
+
+		for (DepthsPlayer dp : playersInParty) {
+			if (dp == null || dp.mAbilities == null || dp.mAbilities.size() == 0) {
+				continue;
+			}
+
+			Player p = Bukkit.getPlayer(dp.mPlayerId);
+			try {
+				if (p != null && p.isOnline() && !p.equals(damagee)) {
+					EarthenWrath wrath = AbilityManager.getManager().getPlayerAbility(p, EarthenWrath.class);
+					if (wrath != null && wrath.damagedEntity(damagee, event)) {
+						break;
+					}
+				}
+			} catch (Exception e) {
+				Plugin.getInstance().getLogger().info("Exception for depths on entity damage- earthen wrath");
+			}
+		}
+	}
+
+	public boolean isWrathing() {
+		return mAbsorbDamage;
+	}
+
+	private void startWrath() {
+		mAbsorbDamage = true;
+	}
+
+	private void endWrath() {
+		mAbsorbDamage = false;
 	}
 
 	@Override

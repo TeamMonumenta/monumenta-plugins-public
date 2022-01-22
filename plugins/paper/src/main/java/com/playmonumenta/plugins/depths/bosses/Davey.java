@@ -1,36 +1,12 @@
 package com.playmonumenta.plugins.depths.bosses;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.attribute.Attribute;
-import org.bukkit.boss.BarColor;
-import org.bukkit.boss.BarStyle;
-import org.bukkit.entity.ArmorStand;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Mob;
-import org.bukkit.entity.Player;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
-import org.bukkit.event.entity.EntityDeathEvent;
-import org.bukkit.plugin.Plugin;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
-import org.bukkit.scheduler.BukkitRunnable;
-
 import com.playmonumenta.plugins.bosses.BossBarManager;
 import com.playmonumenta.plugins.bosses.BossBarManager.BossHealthAction;
 import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.bosses.BossAbilityGroup;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.bosses.spells.SpellBlockBreak;
+import com.playmonumenta.plugins.bosses.spells.SpellShieldStun;
 import com.playmonumenta.plugins.depths.DepthsManager;
 import com.playmonumenta.plugins.depths.DepthsParty;
 import com.playmonumenta.plugins.depths.DepthsUtils;
@@ -41,12 +17,34 @@ import com.playmonumenta.plugins.depths.bosses.spells.SpellDaveyAnticheese;
 import com.playmonumenta.plugins.depths.bosses.spells.SpellLinkBeyondLife;
 import com.playmonumenta.plugins.depths.bosses.spells.SpellVoidBlast;
 import com.playmonumenta.plugins.depths.bosses.spells.SpellVoidGrenades;
+import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
-import com.playmonumenta.plugins.utils.NmsUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.SerializationUtils;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.attribute.Attribute;
+import org.bukkit.boss.BarColor;
+import org.bukkit.boss.BarStyle;
+import org.bukkit.entity.ArmorStand;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Mob;
+import org.bukkit.entity.Player;
+import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.plugin.Plugin;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
+import org.bukkit.scheduler.BukkitRunnable;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class Davey extends BossAbilityGroup {
 	public static final String identityTag = "boss_davey";
@@ -158,7 +156,8 @@ public class Davey extends BossAbilityGroup {
 		List<Spell> passiveSpells = Arrays.asList(
 			new SpellBlockBreak(mBoss, 2, 3, 2),
 			new SpellDaveyAnticheese(mBoss, mSpawnLoc),
-			new SpellAbyssalSpawnPassive(mBoss, mVexes)
+			new SpellAbyssalSpawnPassive(mBoss, mVexes),
+			new SpellShieldStun(20 * 30)
 		);
 
 		Map<Integer, BossHealthAction> events = new HashMap<Integer, BossHealthAction>();
@@ -230,15 +229,10 @@ public class Davey extends BossAbilityGroup {
 	}
 
 	@Override
-	public void bossDamagedEntity(EntityDamageByEntityEvent event) {
+	public void onDamage(DamageEvent event, LivingEntity damagee) {
 		//Slow on hit
-		if (event.getEntity() instanceof Player player) {
+		if (damagee instanceof Player player) {
 			player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 60, 1));
-			if (event.getCause().equals(DamageCause.ENTITY_ATTACK)) {
-				if (player.isBlocking()) {
-					NmsUtils.stunShield(player, 20 * 30);
-				}
-			}
 		}
 	}
 

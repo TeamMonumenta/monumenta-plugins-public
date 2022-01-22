@@ -1,16 +1,15 @@
 package com.playmonumenta.plugins.integrations;
 
-import java.util.Map;
-import java.util.Set;
-import java.util.logging.Logger;
-
 import com.playmonumenta.libraryofsouls.LibraryOfSoulsAPI;
 import com.playmonumenta.libraryofsouls.Soul;
 import com.playmonumenta.plugins.utils.FastUtils;
-
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.checkerframework.checker.nullness.qual.Nullable;
+
+import java.util.Map;
+import java.util.Set;
+import java.util.logging.Logger;
 
 public class LibraryOfSoulsIntegration {
 	private static boolean ENABLED = false;

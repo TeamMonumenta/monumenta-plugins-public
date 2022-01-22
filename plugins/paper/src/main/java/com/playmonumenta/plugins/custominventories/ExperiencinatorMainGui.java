@@ -1,7 +1,10 @@
 package com.playmonumenta.plugins.custominventories;
 
-import java.util.List;
-
+import com.playmonumenta.plugins.commands.experiencinator.ExperiencinatorConfig;
+import com.playmonumenta.plugins.commands.experiencinator.ExperiencinatorUtils;
+import com.playmonumenta.plugins.utils.GUIUtils;
+import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.scriptedquests.utils.CustomInventory;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
@@ -10,11 +13,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.Plugin;
 
-import com.playmonumenta.plugins.commands.experiencinator.ExperiencinatorConfig;
-import com.playmonumenta.plugins.commands.experiencinator.ExperiencinatorUtils;
-import com.playmonumenta.plugins.utils.GUIUtils;
-import com.playmonumenta.plugins.utils.ItemUtils;
-import com.playmonumenta.scriptedquests.utils.CustomInventory;
+import java.util.List;
 
 import static org.bukkit.ChatColor.BOLD;
 import static org.bukkit.ChatColor.GOLD;

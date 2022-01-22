@@ -1,21 +1,20 @@
 package com.playmonumenta.plugins.potion;
 
-import java.util.EnumMap;
-import java.util.Iterator;
-import java.util.Map.Entry;
-import java.util.TreeMap;
-
-import org.bukkit.entity.Player;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
-import org.checkerframework.checker.nullness.qual.Nullable;
-
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.utils.PotionUtils;
 import com.playmonumenta.plugins.utils.PotionUtils.PotionInfo;
+import org.bukkit.entity.Player;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
+import org.checkerframework.checker.nullness.qual.Nullable;
+
+import java.util.EnumMap;
+import java.util.Iterator;
+import java.util.Map.Entry;
+import java.util.TreeMap;
 
 public class PotionMap {
 	// PotionID is the type (safezone, item, etc.)

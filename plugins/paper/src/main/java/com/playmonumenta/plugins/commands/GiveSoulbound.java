@@ -1,27 +1,20 @@
 package com.playmonumenta.plugins.commands;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
-import com.playmonumenta.plugins.utils.ItemUtils;
-
-import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.loot.LootContext;
-import org.bukkit.loot.LootTable;
-
+import com.playmonumenta.plugins.utils.ItemStatUtils;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.CommandPermission;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument.EntitySelector;
 import dev.jorel.commandapi.arguments.ItemStackArgument;
 import dev.jorel.commandapi.arguments.LootTableArgument;
-import net.kyori.adventure.text.Component;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.loot.LootContext;
+import org.bukkit.loot.LootTable;
+
+import java.util.Collection;
 
 /*
  * NOTICE!
@@ -66,24 +59,8 @@ public class GiveSoulbound extends GenericCommand {
 	}
 
 	private static void give(Player player, ItemStack stack) {
-		ItemMeta meta = null;
-		if (stack.hasItemMeta()) {
-			meta = stack.getItemMeta();
-		} else {
-			meta = Bukkit.getServer().getItemFactory().getItemMeta(stack.getType());
-		}
-
-		List<Component> lore = null;
-		if (meta.hasLore()) {
-			lore = meta.lore();
-		} else {
-			lore = new ArrayList<>();
-		}
-
-		lore.add(Component.text("* Soulbound to " + player.getName() + " *"));
-		meta.lore(lore);
-		stack.setItemMeta(meta);
-		ItemUtils.setPlainTag(stack);
+		ItemStatUtils.addInfusion(stack, ItemStatUtils.InfusionType.SOULBOUND, 1, player.getUniqueId());
+		ItemStatUtils.generateItemStats(stack);
 		InventoryUtils.giveItem(player, stack);
 	}
 }

@@ -1,12 +1,26 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
+import com.playmonumenta.plugins.bosses.BossBarManager;
+import com.playmonumenta.plugins.bosses.BossBarManager.BossHealthAction;
+import com.playmonumenta.plugins.bosses.SpellManager;
+import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.bosses.spells.SpellBlockBreak;
+import com.playmonumenta.plugins.bosses.spells.SpellShieldStun;
+import com.playmonumenta.plugins.bosses.spells.rkitxet.SpellEndlessAgony;
+import com.playmonumenta.plugins.bosses.spells.rkitxet.SpellEndlessAgonyDamage;
+import com.playmonumenta.plugins.bosses.spells.rkitxet.SpellForsakenLeap;
+import com.playmonumenta.plugins.bosses.spells.rkitxet.SpellKaulsFury;
+import com.playmonumenta.plugins.bosses.spells.rkitxet.SpellRKitxetSummon;
+import com.playmonumenta.plugins.bosses.spells.rkitxet.SpellShardShield;
+import com.playmonumenta.plugins.bosses.spells.rkitxet.SpellVerdantProtection;
+import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
+import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.utils.PotionUtils;
+import com.playmonumenta.plugins.utils.SerializationUtils;
+import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -19,9 +33,6 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
-import org.bukkit.entity.Projectile;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityTargetEvent;
 import org.bukkit.plugin.Plugin;
@@ -30,27 +41,12 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-import com.playmonumenta.plugins.bosses.BossBarManager;
-import com.playmonumenta.plugins.bosses.BossBarManager.BossHealthAction;
-import com.playmonumenta.plugins.bosses.SpellManager;
-import com.playmonumenta.plugins.bosses.spells.Spell;
-import com.playmonumenta.plugins.bosses.spells.SpellBlockBreak;
-import com.playmonumenta.plugins.bosses.spells.rkitxet.SpellEndlessAgony;
-import com.playmonumenta.plugins.bosses.spells.rkitxet.SpellEndlessAgonyDamage;
-import com.playmonumenta.plugins.bosses.spells.rkitxet.SpellForsakenLeap;
-import com.playmonumenta.plugins.bosses.spells.rkitxet.SpellKaulsFury;
-import com.playmonumenta.plugins.bosses.spells.rkitxet.SpellRKitxetSummon;
-import com.playmonumenta.plugins.bosses.spells.rkitxet.SpellShardShield;
-import com.playmonumenta.plugins.bosses.spells.rkitxet.SpellVerdantProtection;
-import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
-import com.playmonumenta.plugins.utils.BossUtils;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.NmsUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.plugins.utils.PotionUtils;
-import com.playmonumenta.plugins.utils.SerializationUtils;
-
-import net.md_5.bungee.api.ChatColor;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class RKitxet extends BossAbilityGroup {
 	public static final String identityTag = "boss_rkitxet";
@@ -174,12 +170,14 @@ public class RKitxet extends BossAbilityGroup {
 			new SpellKaulsFury(mPlugin, mBoss, this, 13 * 20, 5 * 20, 15, 10 * 20),
 			mShieldSpell,
 			new SpellBlockBreak(mBoss),
+			new SpellShieldStun(10 * 20),
 			new SpellEndlessAgonyDamage(mBoss, this)
 		);
 		List<Spell> phase2Passives = Arrays.asList(
 			new SpellKaulsFury(mPlugin, mBoss, this, 7 * 20, 3 * 20, 10, 7 * 20),
 			mShieldSpell,
 			new SpellBlockBreak(mBoss),
+			new SpellShieldStun(10 * 20),
 			new SpellEndlessAgonyDamage(mBoss, this)
 		);
 
@@ -307,35 +305,15 @@ public class RKitxet extends BossAbilityGroup {
 	}
 
 	@Override
-	public void bossDamagedByEntity(EntityDamageByEntityEvent event) {
+	public void onHurt(DamageEvent event) {
 		if (mShieldSpell.isShielded()) {
-			Entity damager = event.getDamager();
-			if (damager instanceof Player player) {
-				shieldDamage(event, player);
-			} else if (damager instanceof Projectile proj && proj.getShooter() instanceof Player player) {
-				if (proj instanceof Arrow arrow && arrow.hasCustomEffect(PotionEffectType.SLOW)) {
-					arrow.removeCustomEffect(PotionEffectType.SLOW);
-				}
-				shieldDamage(event, player);
-			} else {
-				event.setCancelled(true);
+			event.setCancelled(true);
+			if (event.getDamager() instanceof Arrow arrow && arrow.hasCustomEffect(PotionEffectType.SLOW)) {
+				arrow.removeCustomEffect(PotionEffectType.SLOW);
 			}
-		}
-	}
-
-	private void shieldDamage(EntityDamageByEntityEvent event, Player player) {
-		event.setCancelled(true);
-		player.sendMessage(ChatColor.AQUA + "The Elder's shield absorbs your attack.");
-		player.playSound(mBoss.getLocation(), Sound.ITEM_SHIELD_BLOCK, 1, 1);
-	}
-
-	@Override
-	public void bossDamagedEntity(EntityDamageByEntityEvent event) {
-		if (event.getEntity() instanceof Player player) {
-			if (event.getCause().equals(DamageCause.ENTITY_ATTACK)) {
-				if (player.isBlocking()) {
-					NmsUtils.stunShield(player, 20 * 10);
-				}
+			if (event.getSource() instanceof Player player) {
+				player.sendMessage(ChatColor.AQUA + "The Elder's shield absorbs your attack.");
+				player.playSound(mBoss.getLocation(), Sound.ITEM_SHIELD_BLOCK, 1, 1);
 			}
 		}
 	}

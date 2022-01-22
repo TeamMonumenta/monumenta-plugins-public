@@ -1,5 +1,16 @@
 package com.playmonumenta.plugins.abilities.scout.ranger;
 
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.AbilityTrigger;
+import com.playmonumenta.plugins.abilities.MultipleChargeAbility;
+import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.utils.DamageUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.MovementUtils;
+import com.playmonumenta.plugins.utils.ZoneUtils;
+import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -13,18 +24,6 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.AbilityTrigger;
-import com.playmonumenta.plugins.abilities.MultipleChargeAbility;
-import com.playmonumenta.plugins.classes.ClassAbility;
-import com.playmonumenta.plugins.classes.magic.MagicType;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.ItemUtils;
-import com.playmonumenta.plugins.utils.MovementUtils;
-import com.playmonumenta.plugins.utils.ZoneUtils;
-import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
-
-
 
 public class TacticalManeuver extends MultipleChargeAbility {
 
@@ -33,7 +32,7 @@ public class TacticalManeuver extends MultipleChargeAbility {
 	private static final int TACTICAL_MANEUVER_1_COOLDOWN = 20 * 12;
 	private static final int TACTICAL_MANEUVER_2_COOLDOWN = 20 * 10;
 	private static final int TACTICAL_MANEUVER_RADIUS = 3;
-	private static final int TACTICAL_DASH_DAMAGE = 16;
+	private static final int TACTICAL_DASH_DAMAGE = 14;
 	private static final int TACTICAL_DASH_STUN_DURATION = 20 * 1;
 	private static final int TACTICAL_LEAP_DAMAGE = 8;
 	private static final float TACTICAL_LEAP_KNOCKBACK_SPEED = 0.5f;
@@ -45,7 +44,7 @@ public class TacticalManeuver extends MultipleChargeAbility {
 		mInfo.mLinkedSpell = ClassAbility.TACTICAL_MANEUVER;
 		mInfo.mScoreboardId = "TacticalManeuver";
 		mInfo.mShorthandName = "TM";
-		mInfo.mDescriptions.add("Sprint right click to dash forward, dealing the first enemy hit 16 damage, and stunning it and all enemies in a 3 block radius for 1 second. Shift right click to leap backwards, dealing enemies in a 3 block radius 8 damage and knocking them away. Only triggers with non-trident melee weapons. Cooldown: 12s. Charges: 2.");
+		mInfo.mDescriptions.add("Sprint right click to dash forward, dealing the first enemy hit 14 damage, and stunning it and all enemies in a 3 block radius for 1 second. Shift right click to leap backwards, dealing enemies in a 3 block radius 8 damage and knocking them away. Only triggers with non-trident melee weapons. Cooldown: 12s. Charges: 2.");
 		mInfo.mDescriptions.add("Cooldown: 10s. Charges: 3.");
 		mInfo.mCooldown = getAbilityScore() == 1 ? TACTICAL_MANEUVER_1_COOLDOWN : TACTICAL_MANEUVER_2_COOLDOWN;
 		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
@@ -108,7 +107,7 @@ public class TacticalManeuver extends MultipleChargeAbility {
 					}
 					for (LivingEntity le : EntityUtils.getNearbyMobs(loc, 2, mPlayer)) {
 						if (!le.isDead()) {
-							EntityUtils.damageEntity(mPlugin, le, TACTICAL_DASH_DAMAGE, mPlayer, null, true, mInfo.mLinkedSpell);
+							DamageUtils.damage(mPlayer, le, DamageType.MELEE_SKILL, TACTICAL_DASH_DAMAGE, mInfo.mLinkedSpell);
 							for (LivingEntity e : EntityUtils.getNearbyMobs(le.getLocation(), TACTICAL_MANEUVER_RADIUS)) {
 								EntityUtils.applyStun(mPlugin, TACTICAL_DASH_STUN_DURATION, e);
 							}
@@ -126,7 +125,7 @@ public class TacticalManeuver extends MultipleChargeAbility {
 			// Needs the 5 tick delay since being close to the ground will cancel the runnable
 		} else {
 			for (LivingEntity le : EntityUtils.getNearbyMobs(mPlayer.getLocation(), TACTICAL_MANEUVER_RADIUS, mPlayer)) {
-				EntityUtils.damageEntity(mPlugin, le, TACTICAL_LEAP_DAMAGE, mPlayer, MagicType.PHYSICAL, true, mInfo.mLinkedSpell);
+				DamageUtils.damage(mPlayer, le, DamageType.MELEE_SKILL, TACTICAL_LEAP_DAMAGE, mInfo.mLinkedSpell);
 				MovementUtils.knockAway(mPlayer, le, TACTICAL_LEAP_KNOCKBACK_SPEED);
 			}
 

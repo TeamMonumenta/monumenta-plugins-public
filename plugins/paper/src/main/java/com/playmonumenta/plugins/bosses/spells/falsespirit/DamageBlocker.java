@@ -1,31 +1,31 @@
 package com.playmonumenta.plugins.bosses.spells.falsespirit;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import com.playmonumenta.plugins.bosses.bosses.FalseSpirit;
+import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.LocationUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.utils.VectorUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.entity.Arrow;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.entity.Trident;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
-import com.playmonumenta.plugins.bosses.bosses.FalseSpirit;
-import com.playmonumenta.plugins.bosses.spells.Spell;
-import com.playmonumenta.plugins.utils.FastUtils;
-import com.playmonumenta.plugins.utils.LocationUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.plugins.utils.VectorUtils;
+import java.util.ArrayList;
+import java.util.List;
 
 public class DamageBlocker extends Spell {
 
@@ -84,27 +84,8 @@ public class DamageBlocker extends Spell {
 	}
 
 	@Override
-	public void bossDamagedByEntity(EntityDamageByEntityEvent event) {
-		if (event.getDamager() instanceof Projectile) {
-			Projectile proj = (Projectile) event.getDamager();
-			if (proj.getShooter() instanceof Player) {
-				Player player = (Player) proj.getShooter();
-				if (player.getLocation().distance(mBoss.getLocation()) > 7 || mHell.checkPortals() || mCeilingHell.checkPortals()) {
-					if (!mWarned.contains(player) && (mHell.checkPortals() || mCeilingHell.checkPortals())) {
-						player.sendMessage(ChatColor.DARK_RED + "Foolish. I am made of nothing. Your attacks shall do nothing to me while my gates are powered.");
-						mWarned.add(player);
-					} else if (!mWarned.contains(player)) {
-						player.sendMessage(ChatColor.GOLD + "[Bhairavi]" + ChatColor.WHITE + " You must get closer! It's turning your attacks to nothing!");
-						mWarned.add(player);
-					}
-					event.setCancelled(true);
-					player.playSound(mBoss.getLocation(), Sound.BLOCK_ANVIL_PLACE, 1, 2);
-					mBoss.getWorld().spawnParticle(Particle.FIREWORKS_SPARK, proj.getLocation(), 10, 0, 0, 0, 0.1);
-				}
-			}
-		}
-
-		if (event.getDamager() instanceof Player) {
+	public void onHurtByEntityWithSource(DamageEvent event, Entity damager, LivingEntity source) {
+		if (source instanceof Player) {
 			Player player = (Player) event.getDamager();
 			if (player.getLocation().distance(mBoss.getLocation()) > 7 || mHell.checkPortals() || mCeilingHell.checkPortals()) {
 				if (!mWarned.contains(player) && (mHell.checkPortals() || mCeilingHell.checkPortals())) {

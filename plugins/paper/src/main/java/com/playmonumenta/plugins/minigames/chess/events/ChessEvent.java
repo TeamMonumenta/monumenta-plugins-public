@@ -2,7 +2,6 @@ package com.playmonumenta.plugins.minigames.chess.events;
 
 import com.playmonumenta.plugins.minigames.chess.ChessBoard;
 import com.playmonumenta.plugins.minigames.chess.ChessPlayer;
-
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 

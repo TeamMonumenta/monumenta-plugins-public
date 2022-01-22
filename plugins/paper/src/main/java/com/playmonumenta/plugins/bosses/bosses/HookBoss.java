@@ -1,7 +1,11 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
-import java.util.Arrays;
-
+import com.playmonumenta.plugins.bosses.SpellManager;
+import com.playmonumenta.plugins.bosses.spells.SpellBaseSeekingProjectile;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.MovementUtils;
+import com.playmonumenta.plugins.utils.PotionUtils;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -11,11 +15,7 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
-import com.playmonumenta.plugins.bosses.SpellManager;
-import com.playmonumenta.plugins.bosses.spells.SpellBaseSeekingProjectile;
-import com.playmonumenta.plugins.utils.BossUtils;
-import com.playmonumenta.plugins.utils.MovementUtils;
-import com.playmonumenta.plugins.utils.PotionUtils;
+import java.util.Arrays;
 
 /**
  * @deprecated use boss_projectile instead, like this:
@@ -32,7 +32,7 @@ public class HookBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_hook";
 
 	public static class Parameters extends BossParameters {
-		public int DAMAGE = 30;
+		public int DAMAGE = 24;
 		public int DETECTION = 24;
 		public int DELAY = 20 * 1;
 		public double SPEED = 0.8;
@@ -55,8 +55,6 @@ public class HookBoss extends BossAbilityGroup {
 		super(plugin, identityTag, boss);
 
 		Parameters p = BossParameters.getParameters(boss, identityTag, new Parameters());
-
-
 
 		SpellManager activeSpells = new SpellManager(Arrays.asList(
 			new SpellBaseSeekingProjectile(plugin, boss, p.DETECTION, p.SINGLE_TARGET, p.LAUNCH_TRACKING, p.COOLDOWN, p.DELAY,
@@ -84,7 +82,7 @@ public class HookBoss extends BossAbilityGroup {
 						world.playSound(loc, Sound.ENTITY_ARMOR_STAND_BREAK, 1f, 0.5f);
 						world.spawnParticle(Particle.CRIT, loc, 50, 0, 0, 0, 0.25);
 						if (target != null) {
-							BossUtils.bossDamage(boss, target, p.DAMAGE);
+							BossUtils.dualTypeBlockableDamage(boss, target, DamageType.PROJECTILE, DamageType.MAGIC, p.DAMAGE, 0.5);
 							MovementUtils.pullTowards(boss, target, 1);
 						}
 					}

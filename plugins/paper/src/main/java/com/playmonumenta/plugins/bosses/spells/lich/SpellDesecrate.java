@@ -1,8 +1,16 @@
 package com.playmonumenta.plugins.bosses.spells.lich;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import com.playmonumenta.plugins.bosses.ChargeUpManager;
+import com.playmonumenta.plugins.bosses.bosses.Lich;
+import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.player.PPGroundCircle;
+import com.playmonumenta.plugins.player.PartialParticle;
+import com.playmonumenta.plugins.utils.AbilityUtils;
+import com.playmonumenta.plugins.utils.DamageUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.LocationUtils;
+import com.playmonumenta.plugins.utils.MovementUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -19,16 +27,8 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
-import com.playmonumenta.plugins.bosses.ChargeUpManager;
-import com.playmonumenta.plugins.bosses.bosses.Lich;
-import com.playmonumenta.plugins.bosses.spells.Spell;
-import com.playmonumenta.plugins.player.PPGroundCircle;
-import com.playmonumenta.plugins.player.PartialParticle;
-import com.playmonumenta.plugins.utils.AbilityUtils;
-import com.playmonumenta.plugins.utils.BossUtils;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.LocationUtils;
-import com.playmonumenta.plugins.utils.MovementUtils;
+import java.util.ArrayList;
+import java.util.List;
 
 /*
 Desecrate - After a 1.5 second delay, each player within 12 blocks of the lich are dealt 20 damage, knockbacked,
@@ -98,8 +98,8 @@ public class SpellDesecrate extends Spell {
 						player.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, 20 * 3, -10));
 						player.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, 20 * 3, 10));
 						AbilityUtils.silencePlayer(player, 3 * 20);
-						BossUtils.bossDamage(mBoss, player, 20, null, "Desecrate");
-						MovementUtils.knockAway(mBoss.getLocation(), player, 0.2f);
+						DamageUtils.damage(mBoss, player, DamageType.MAGIC, 20, null, false, true, "Desecrate");
+						MovementUtils.knockAway(mBoss.getLocation(), player, 0.2f, false);
 					}
 
 					BukkitRunnable runB = new BukkitRunnable() {
@@ -147,8 +147,8 @@ public class SpellDesecrate extends Spell {
 								}
 								//fail to escape
 								if (pHoriLoc.distance(mBossLoc) < mRadius) {
-									BossUtils.bossDamage(mBoss, p, 85, null, "Desecrate");
-									MovementUtils.knockAway(mBoss.getLocation(), p, 0.5f);
+									DamageUtils.damage(mBoss, p, DamageType.MAGIC, 70, null, false, true, "Desecrate");
+									MovementUtils.knockAway(mBoss.getLocation(), p, 0.5f, false);
 									world.playSound(p.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 1.0f, 0.75f);
 									world.playSound(mBossLoc, Sound.BLOCK_ENCHANTMENT_TABLE_USE, 2.0f, 0.5f);
 									mHeart.location(mBoss.getEyeLocation()).spawnAsBoss();

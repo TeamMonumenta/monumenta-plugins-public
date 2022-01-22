@@ -1,9 +1,15 @@
 package com.playmonumenta.plugins.abilities.mage;
 
-import java.util.EnumSet;
-import java.util.Iterator;
-import java.util.List;
-
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.abilities.AbilityTrigger;
+import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.itemstats.attributes.SpellPower;
+import com.playmonumenta.plugins.utils.DamageUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.MovementUtils;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -18,32 +24,11 @@ import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.abilities.AbilityTrigger;
-import com.playmonumenta.plugins.classes.ClassAbility;
-import com.playmonumenta.plugins.classes.magic.MagicType;
-import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
-import com.playmonumenta.plugins.enchantments.abilities.BaseAbilityEnchantment;
-import com.playmonumenta.plugins.enchantments.abilities.SpellPower;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.ItemUtils;
-import com.playmonumenta.plugins.utils.MovementUtils;
-
+import java.util.Iterator;
+import java.util.List;
 
 
 public class ManaLance extends Ability {
-	public static class ManaLanceDamageEnchantment extends BaseAbilityEnchantment {
-		public ManaLanceDamageEnchantment() {
-			super("Mana Lance Damage", EnumSet.of(ItemSlot.MAINHAND, ItemSlot.OFFHAND, ItemSlot.ARMOR));
-		}
-	}
-
-	public static class ManaLanceCooldownEnchantment extends BaseAbilityEnchantment {
-		public ManaLanceCooldownEnchantment() {
-			super("Mana Lance Cooldown", EnumSet.of(ItemSlot.OFFHAND));
-		}
-	}
 
 	private static final float DAMAGE_1 = 6.0f;
 	private static final float DAMAGE_2 = 7.0f;
@@ -56,7 +41,7 @@ public class ManaLance extends Ability {
 		mInfo.mLinkedSpell = ClassAbility.MANA_LANCE;
 		mInfo.mScoreboardId = "ManaLance";
 		mInfo.mShorthandName = "ML";
-		mInfo.mDescriptions.add("Right clicking with a wand fires forth a piercing beam of Mana going 8 blocks, dealing 6 damage to enemies in the path of the beam. This beam will not go through solid blocks. Cooldown: 5s.");
+		mInfo.mDescriptions.add("Right clicking with a wand fires forth a piercing beam of Mana going 8 blocks, dealing 6 magic damage to enemies in the path of the beam. This beam will not go through solid blocks. Cooldown: 5s.");
 		mInfo.mDescriptions.add("The beam instead deals 7 damage. Cooldown: 3s.");
 		mInfo.mCooldown = getAbilityScore() == 1 ? COOLDOWN_1 : COOLDOWN_2;
 		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
@@ -68,10 +53,8 @@ public class ManaLance extends Ability {
 		if (mPlayer == null) {
 			return;
 		}
-		//Ability enchantments
 		float damage = getAbilityScore() == 1 ? DAMAGE_1 : DAMAGE_2;
-		damage += ManaLanceDamageEnchantment.getExtraDamage(mPlayer, ManaLanceDamageEnchantment.class);
-		damage = SpellPower.getSpellDamage(mPlayer, damage);
+		damage = SpellPower.getSpellDamage(mPlugin, mPlayer, damage);
 
 		putOnCooldown();
 
@@ -100,8 +83,8 @@ public class ManaLance extends Ability {
 			while (iter.hasNext()) {
 				LivingEntity mob = iter.next();
 				if (box.overlaps(mob.getBoundingBox())) {
-					EntityUtils.damageEntity(mPlugin, mob, damage, mPlayer, MagicType.ARCANE, true, mInfo.mLinkedSpell);
-					MovementUtils.knockAway(mPlayer.getLocation(), mob, 0.25f, 0.25f);
+					DamageUtils.damage(mPlayer, mob, DamageType.MAGIC, damage, mInfo.mLinkedSpell);
+					MovementUtils.knockAway(mPlayer.getLocation(), mob, 0.25f, 0.25f, true);
 					iter.remove();
 					mobs.remove(mob);
 				}
@@ -120,13 +103,4 @@ public class ManaLance extends Ability {
 		return !mPlayer.isSneaking() && ItemUtils.isWand(mainHand);
 	}
 
-	public float getDamage() {
-		//Just in case the damage changes in the future
-		return getAbilityScore() == 1 ? DAMAGE_1 : DAMAGE_2;
-	}
-
-	@Override
-	public Class<? extends BaseAbilityEnchantment> getCooldownEnchantment() {
-		return ManaLanceCooldownEnchantment.class;
-	}
 }

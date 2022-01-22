@@ -1,9 +1,17 @@
 package com.playmonumenta.plugins.abilities.delves;
 
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
-
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.bosses.BossManager;
+import com.playmonumenta.plugins.bosses.bosses.ShadeParticleBoss;
+import com.playmonumenta.plugins.bosses.bosses.ShadePossessedBoss;
+import com.playmonumenta.plugins.bosses.bosses.TwistedEventBoss;
+import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
+import com.playmonumenta.plugins.utils.DelvesUtils.Modifier;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.PotionUtils;
+import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -19,28 +27,17 @@ import org.bukkit.entity.IronGolem;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
-import org.bukkit.entity.Projectile;
 import org.bukkit.entity.Spider;
 import org.bukkit.entity.Witch;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.SpawnerSpawnEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.bosses.BossManager;
-import com.playmonumenta.plugins.bosses.bosses.ShadeParticleBoss;
-import com.playmonumenta.plugins.bosses.bosses.ShadePossessedBoss;
-import com.playmonumenta.plugins.bosses.bosses.TwistedEventBoss;
-import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
-import com.playmonumenta.plugins.utils.DelvesUtils.Modifier;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.FastUtils;
-import com.playmonumenta.plugins.utils.PotionUtils;
-
-import net.md_5.bungee.api.ChatColor;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
 
 public class Twisted extends DelveModifier {
 
@@ -75,48 +72,19 @@ public class Twisted extends DelveModifier {
 	}
 
 	@Override
-	public boolean livingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
-		modifyDamageReceived(event);
-
-		return true;
-	}
-
-	@Override
-	public boolean livingEntityShotByPlayerEvent(Projectile proj, LivingEntity damagee, EntityDamageByEntityEvent event) {
-		modifyDamageReceived(event);
-
-		return true;
-	}
-
-	private void modifyDamageReceived(EntityDamageByEntityEvent event) {
-		Set<String> tags = event.getEntity().getScoreboardTags();
+	public void onDamage(DamageEvent event, LivingEntity enemy) {
+		Set<String> tags = event.getDamagee().getScoreboardTags();
 		if (tags != null && tags.contains(SHADE_OF_CORRUPTION_TAG)) {
 			event.setDamage(event.getDamage() * CORRUPTION_DAMAGE_RECEIVED_MULTIPLIER);
 		}
 	}
 
 	@Override
-	protected boolean playerTookCustomDamageEvent(EntityDamageByEntityEvent event) {
-		return modifyDamageDealt(event);
-	}
-
-	@Override
-	protected boolean playerTookMeleeDamageEvent(EntityDamageByEntityEvent event) {
-		return modifyDamageDealt(event);
-	}
-
-	@Override
-	protected boolean playerTookProjectileDamageEvent(Entity source, EntityDamageByEntityEvent event) {
-		return modifyDamageDealt(event);
-	}
-
-	private boolean modifyDamageDealt(EntityDamageByEntityEvent event) {
-		Set<String> tags = event.getEntity().getScoreboardTags();
+	public void onHurtByEntityWithSource(DamageEvent event, Entity damager, LivingEntity source) {
+		Set<String> tags = source.getScoreboardTags();
 		if (tags != null && tags.contains(SHADE_OF_CORRUPTION_TAG)) {
-			event.setDamage(EntityUtils.getDamageApproximation(event, CORRUPTION_DAMAGE_DEALT_MULTIPLIER));
+			event.setDamage(event.getDamage() * CORRUPTION_DAMAGE_DEALT_MULTIPLIER);
 		}
-
-		return true;
 	}
 
 	@Override

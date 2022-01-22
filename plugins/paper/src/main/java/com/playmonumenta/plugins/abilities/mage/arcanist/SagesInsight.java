@@ -8,6 +8,7 @@ import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -19,7 +20,7 @@ import com.playmonumenta.plugins.abilities.AbilityWithChargesOrStacks;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.events.AbilityCastEvent;
-import com.playmonumenta.plugins.events.CustomDamageEvent;
+import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.network.ClientModHandler;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 
@@ -75,20 +76,20 @@ public class SagesInsight extends Ability implements AbilityWithChargesOrStacks 
 	}
 
 	@Override
-	public void playerDealtCustomDamageEvent(CustomDamageEvent event) {
-		ClassAbility spell = event.getSpell();
-		if (mPlayer == null || spell == null) {
+	public void onDamage(DamageEvent event, LivingEntity enemy) {
+		ClassAbility ability = event.getAbility();
+		if (ability == null) {
 			return;
 		}
 		mTicksToStackDecay = DECAY_TIMER;
 		World world = mPlayer.getWorld();
 		Location loc = mPlayer.getLocation();
-		Location locD = event.getDamaged().getLocation().add(0, 1, 0);
+		Location locD = event.getDamagee().getLocation().add(0, 1, 0);
 		if (mStacks < MAX_STACKS) {
-			Boolean bool = mStacksMap.get(spell);
+			Boolean bool = mStacksMap.get(ability);
 			if (bool != null && bool) {
 				mStacks++;
-				mStacksMap.put(spell, false);
+				mStacksMap.put(ability, false);
 				if (mStacks == MAX_STACKS) {
 					mPlugin.mEffectManager.addEffect(mPlayer, "SagesExtraSpeed", new PercentSpeed(SPEED_DURATION, mSpeed, ATTR_NAME));
 					world.spawnParticle(Particle.REDSTONE, loc, 20, 1.4, 1.4, 1.4, COLOR);

@@ -1,20 +1,19 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
+import com.playmonumenta.plugins.bosses.parameters.BossParam;
+import com.playmonumenta.plugins.bosses.parameters.ParticlesList;
+import com.playmonumenta.plugins.bosses.parameters.SoundsList;
+import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.utils.EntityUtils;
 import org.bukkit.Location;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.entity.LivingEntity;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
-
-import com.playmonumenta.plugins.bosses.parameters.BossParam;
-import com.playmonumenta.plugins.bosses.parameters.ParticlesList;
-import com.playmonumenta.plugins.bosses.parameters.SoundsList;
-import com.playmonumenta.plugins.utils.EntityUtils;
 
 public class AvengerBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_avenger";
@@ -73,9 +72,9 @@ public class AvengerBoss extends BossAbilityGroup {
 
 	// Use this instead of the attribute to catch ability damage, ranged damage, etc.
 	@Override
-	public void bossDamagedEntity(EntityDamageByEntityEvent event) {
+	public void onDamage(DamageEvent event, LivingEntity damgaee) {
 		if (mStacks > 0) {
-			event.setDamage(EntityUtils.getDamageApproximation(event, 1 + mStacks * mParam.DAMAGE_PERCENT_INCREMENT));
+			event.setDamage(event.getDamage() * (1 + mStacks * mParam.DAMAGE_PERCENT_INCREMENT));
 		}
 	}
 
@@ -103,6 +102,7 @@ public class AvengerBoss extends BossAbilityGroup {
 					int mCount = 0;
 					final int mMaxCount = mParam.VECTOR_TICKS;
 
+					@Override
 					public void run() {
 						if (mCount >= mMaxCount) {
 							mParam.PARTICLE_BOSS.spawn(bossLoc, 20, 1.5, 1.5, 1.5);

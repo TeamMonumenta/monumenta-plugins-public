@@ -1,24 +1,20 @@
 package com.playmonumenta.plugins.depths.abilities.steelsage;
 
-import org.bukkit.Material;
-import org.bukkit.entity.AbstractArrow;
-import org.bukkit.entity.Arrow;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
-import org.bukkit.entity.Projectile;
-import org.bukkit.entity.SpectralArrow;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.abilities.AbilityWithChargesOrStacks;
 import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
+import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.network.ClientModHandler;
 import com.playmonumenta.plugins.utils.MessagingUtils;
-
 import net.md_5.bungee.api.ChatColor;
+import org.bukkit.Material;
+import org.bukkit.entity.AbstractArrow;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
 
 public class DepthsSharpshooter extends DepthsAbility implements AbilityWithChargesOrStacks {
 
@@ -37,12 +33,12 @@ public class DepthsSharpshooter extends DepthsAbility implements AbilityWithChar
 	}
 
 	@Override
-	public boolean livingEntityShotByPlayerEvent(Projectile proj, LivingEntity damagee, EntityDamageByEntityEvent event) {
-		if (proj instanceof Arrow || proj instanceof SpectralArrow) {
-			AbstractArrow arrow = (AbstractArrow) proj;
+	public void onDamage(DamageEvent event, LivingEntity enemy) {
+		if (event.getType() == DamageType.PROJECTILE && event.getDamager() instanceof AbstractArrow arrow) {
+			event.setDamage(event.getDamage() * (1 + mStacks * DAMAGE_PER_STACK[mRarity - 1]));
 
 			// Critical arrow and mob is actually going to take damage
-			if (arrow.isCritical() && (damagee.getNoDamageTicks() <= 10 || damagee.getLastDamage() < event.getDamage()) && !arrow.hasMetadata("RapidFireArrow")) {
+			if (arrow.isCritical() && (enemy.getNoDamageTicks() <= 10 || enemy.getLastDamage() < event.getDamage()) && !arrow.hasMetadata("RapidFireArrow")) {
 				mTicksToStackDecay = SHARPSHOOTER_DECAY_TIMER;
 
 				if (mStacks < MAX_STACKS) {
@@ -51,11 +47,7 @@ public class DepthsSharpshooter extends DepthsAbility implements AbilityWithChar
 					ClientModHandler.updateAbility(mPlayer, this);
 				}
 			}
-
-			event.setDamage(event.getDamage() * (1 + mStacks * DAMAGE_PER_STACK[mRarity - 1]));
 		}
-
-		return true;
 	}
 
 	@Override
@@ -84,14 +76,9 @@ public class DepthsSharpshooter extends DepthsAbility implements AbilityWithChar
 		}
 	}
 
-	public static double getDamageMultiplier(Player player) {
-		DepthsSharpshooter ss = AbilityManager.getManager().getPlayerAbility(player, DepthsSharpshooter.class);
-		return ss == null ? 1 : (1 + MAX_STACKS * DAMAGE_PER_STACK[ss.mRarity - 1]);
-	}
-
 	@Override
 	public String getDescription(int rarity) {
-		return "Each enemy hit with a critical arrow gives you a stack of Sharpshooter, up to " + MAX_STACKS + ". Stacks decay after " + SHARPSHOOTER_DECAY_TIMER / 20 + " seconds of not gaining a stack. Each stack increases your arrow damage by " + DepthsUtils.getRarityColor(rarity) + DepthsUtils.roundPercent(DAMAGE_PER_STACK[rarity - 1]) + "%" + ChatColor.WHITE + ".";
+		return "Each enemy hit with a critical arrow or trident gives you a stack of Sharpshooter, up to " + MAX_STACKS + ". Stacks decay after " + SHARPSHOOTER_DECAY_TIMER / 20 + " seconds of not gaining a stack. Each stack increases your arrow and trident damage by " + DepthsUtils.getRarityColor(rarity) + DepthsUtils.roundPercent(DAMAGE_PER_STACK[rarity - 1]) + "%" + ChatColor.WHITE + ".";
 	}
 
 	@Override

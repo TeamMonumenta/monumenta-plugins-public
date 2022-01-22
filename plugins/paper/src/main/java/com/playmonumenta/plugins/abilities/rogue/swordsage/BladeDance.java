@@ -1,5 +1,15 @@
 package com.playmonumenta.plugins.abilities.rogue.swordsage;
 
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.abilities.AbilityTrigger;
+import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.utils.DamageUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.utils.MovementUtils;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -14,21 +24,11 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.abilities.AbilityTrigger;
-import com.playmonumenta.plugins.classes.ClassAbility;
-import com.playmonumenta.plugins.classes.magic.MagicType;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.FastUtils;
-import com.playmonumenta.plugins.utils.InventoryUtils;
-import com.playmonumenta.plugins.utils.MovementUtils;
-
 
 public class BladeDance extends Ability {
 
-	private static final int DANCE_1_DAMAGE = 14;
-	private static final int DANCE_2_DAMAGE = 24;
+	private static final int DANCE_1_DAMAGE = 10;
+	private static final int DANCE_2_DAMAGE = 18;
 	private static final double SLOWNESS_AMPLIFIER = 0.4;
 	private static final double WEAKEN_AMP_1 = 0.5;
 	private static final double WEAKEN_AMP_2 = 0.7;
@@ -44,28 +44,18 @@ public class BladeDance extends Ability {
 		super(plugin, player, "Blade Dance");
 		mInfo.mScoreboardId = "BladeDance";
 		mInfo.mShorthandName = "BD";
-		mInfo.mDescriptions.add("When holding two swords, right-click while looking down to enter a defensive stance, parrying all attacks and becoming invulnerable for 0.75 seconds. Afterwards, unleash a powerful attack that deals 14 damage to and afflicts 40% Slowness and 50% Weaken to all enemies in a 4 block radius for 2 seconds. Cooldown: 16s.");
-		mInfo.mDescriptions.add("The area attack now deals 24 damage and afflicts 70% Weaken.");
+		mInfo.mDescriptions.add("When holding two swords, right-click while looking down to enter a defensive stance, parrying all attacks and becoming invulnerable for 0.75 seconds. Afterwards, unleash a powerful attack that deals 10 melee damage to and afflicts 40% Slowness and 50% Weaken to all enemies in a 4 block radius for 2 seconds. Cooldown: 16s.");
+		mInfo.mDescriptions.add("The area attack now deals 18 damage and afflicts 70% Weaken.");
 		mInfo.mLinkedSpell = ClassAbility.BLADE_DANCE;
 		mInfo.mCooldown = COOLDOWN;
 		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
 		mDisplayItem = new ItemStack(Material.STRING, 1);
 		mWeakenAmp = getAbilityScore() == 1 ? WEAKEN_AMP_1 : WEAKEN_AMP_2;
-
-		/*
-		 * NOTE! Because BladeDance has two events (cast and damage), we need both
-		 * events to trigger even when it is on cooldown. Therefor it needs to bypass
-		 * the automatic cooldown check and manage cooldown itself
-		 */
-		mInfo.mIgnoreCooldown = true;
 	}
 
 	@Override
 	public void cast(Action action) {
-		if (mPlayer == null
-				|| mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), ClassAbility.BLADE_DANCE)
-				|| mPlayer.getLocation().getPitch() < 50 || mPlayer.isSneaking()
-				|| !InventoryUtils.rogueTriggerCheck(mPlayer.getInventory().getItemInMainHand(), mPlayer.getInventory().getItemInOffHand())) {
+		if (mPlayer == null) {
 			return;
 		}
 
@@ -106,8 +96,8 @@ public class BladeDance extends Ability {
 
 					for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), DANCE_RADIUS)) {
 						mob.setNoDamageTicks(0);
-						EntityUtils.damageEntity(mPlugin, mob, damage, mPlayer, MagicType.PHYSICAL, true, mInfo.mLinkedSpell);
-						MovementUtils.knockAway(mPlayer, mob, DANCE_KNOCKBACK_SPEED);
+						DamageUtils.damage(mPlayer, mob, DamageType.MELEE_SKILL, damage, mInfo.mLinkedSpell);
+						MovementUtils.knockAway(mPlayer, mob, DANCE_KNOCKBACK_SPEED, true);
 
 						EntityUtils.applySlow(mPlugin, DURATION, SLOWNESS_AMPLIFIER, mob);
 						EntityUtils.applyWeaken(mPlugin, DURATION, mWeakenAmp, mob);
@@ -147,5 +137,10 @@ public class BladeDance extends Ability {
 		}.runTaskTimer(mPlugin, 0, 1);
 
 		putOnCooldown();
+	}
+
+	@Override
+	public boolean runCheck() {
+		return mPlayer != null && !mPlayer.isSneaking() && mPlayer.getLocation().getPitch() >= 50 && InventoryUtils.rogueTriggerCheck(mPlugin, mPlayer);
 	}
 }

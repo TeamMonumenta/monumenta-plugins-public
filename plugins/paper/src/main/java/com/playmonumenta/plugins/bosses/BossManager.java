@@ -19,7 +19,6 @@ import org.bukkit.entity.AreaEffectCloud;
 import org.bukkit.entity.Creeper;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
-import org.bukkit.entity.EvokerFangs;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
@@ -31,9 +30,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.entity.AreaEffectCloudApplyEvent;
 import org.bukkit.event.entity.CreatureSpawnEvent;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.EntityPotionEffectEvent;
@@ -55,6 +51,10 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import com.destroystokyo.paper.event.entity.EntityPathfindEvent;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.bosses.bosses.*;
+import com.playmonumenta.plugins.bosses.bosses.abilities.DummyDecoyBoss;
+import com.playmonumenta.plugins.bosses.bosses.abilities.HuntingCompanionBoss;
+import com.playmonumenta.plugins.bosses.bosses.abilities.MetalmancyBoss;
+import com.playmonumenta.plugins.bosses.bosses.abilities.RestlessSoulsBoss;
 import com.playmonumenta.plugins.bosses.bosses.gray.GrayBookSummoner;
 import com.playmonumenta.plugins.bosses.bosses.gray.GrayDemonSummoner;
 import com.playmonumenta.plugins.bosses.bosses.gray.GrayGolemSummoner;
@@ -79,6 +79,7 @@ import com.playmonumenta.plugins.depths.bosses.Davey;
 import com.playmonumenta.plugins.depths.bosses.Hedera;
 import com.playmonumenta.plugins.depths.bosses.Nucleus;
 import com.playmonumenta.plugins.events.CustomEffectApplyEvent;
+import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.parrots.RainbowParrot;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
@@ -260,6 +261,9 @@ public class BossManager implements Listener {
 		mStatelessBosses.put(LichShieldBoss.identityTag, (Plugin p, LivingEntity e) -> new LichShieldBoss(p, e));
 		mStatelessBosses.put(LichKeyGlowBoss.identityTag, (Plugin p, LivingEntity e) -> new LichKeyGlowBoss(p, e));
 		mStatelessBosses.put(FestiveTessUpgradeSnowmenBoss.identityTag, (Plugin p, LivingEntity e) -> new FestiveTessUpgradeSnowmenBoss(p, e));
+		mStatelessBosses.put(HuntingCompanionBoss.identityTag, (Plugin p, LivingEntity e) -> new HuntingCompanionBoss(p, e));
+		mStatelessBosses.put(MetalmancyBoss.identityTag, (Plugin p, LivingEntity e) -> new MetalmancyBoss(p, e));
+		mStatelessBosses.put(RestlessSoulsBoss.identityTag, (Plugin p, LivingEntity e) -> new RestlessSoulsBoss(p, e));
 
 		/* Stateful bosses have a remembered spawn location and end location where a redstone block is set when they die */
 		mStatefulBosses = new HashMap<String, StatefulBossConstructor>();
@@ -468,6 +472,9 @@ public class BossManager implements Listener {
 		mBossDeserializers.put(LichShieldBoss.identityTag, (Plugin p, LivingEntity e) -> LichShieldBoss.deserialize(p, e));
 		mBossDeserializers.put(LichKeyGlowBoss.identityTag, (Plugin p, LivingEntity e) -> LichKeyGlowBoss.deserialize(p, e));
 		mBossDeserializers.put(FestiveTessUpgradeSnowmenBoss.identityTag, (Plugin p, LivingEntity e) -> FestiveTessUpgradeSnowmenBoss.deserialize(p, e));
+		mBossDeserializers.put(HuntingCompanionBoss.identityTag, (Plugin p, LivingEntity e) -> HuntingCompanionBoss.deserialize(p, e));
+		mBossDeserializers.put(MetalmancyBoss.identityTag, (Plugin p, LivingEntity e) -> MetalmancyBoss.deserialize(p, e));
+		mBossDeserializers.put(RestlessSoulsBoss.identityTag, (Plugin p, LivingEntity e) -> RestlessSoulsBoss.deserialize(p, e));
 
 
 		/***************************************************
@@ -688,21 +695,6 @@ public class BossManager implements Listener {
 		}
 	}
 
-	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-	public void entityDamageEvent(EntityDamageEvent event) {
-		if (event.getCause() == DamageCause.FIRE_TICK) {
-			Entity damagee = event.getEntity();
-			if (damagee != null) {
-				Boss boss = mBosses.get(damagee.getUniqueId());
-				if (boss != null && boss.getLastHitBy() != null) {
-					// May cancel the event
-					EntityDamageByEntityEvent newEvent = new EntityDamageByEntityEvent(boss.getLastHitBy(), damagee, DamageCause.FIRE_TICK, event.getDamage());
-					boss.bossDamagedByEntity(newEvent);
-				}
-			}
-		}
-	}
-
 	@SuppressWarnings("unchecked")
 	public <T extends @Nullable BossAbilityGroup> @Nullable T getBoss(Entity entity, Class<T> cls) {
 		Boss boss = mBosses.get(entity.getUniqueId());
@@ -718,9 +710,10 @@ public class BossManager implements Listener {
 	}
 
 	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-	public void entityDamageByEntityEvent(EntityDamageByEntityEvent event) {
-		Entity damagee = event.getEntity();
+	public void damageEvent(DamageEvent event) {
+		LivingEntity damagee = event.getDamagee();
 		Entity damager = event.getDamager();
+		LivingEntity source = event.getSource();
 
 		if (!(damagee instanceof LivingEntity)) {
 			return;
@@ -729,38 +722,21 @@ public class BossManager implements Listener {
 		Boss boss = mBosses.get(damagee.getUniqueId());
 		if (boss != null) {
 			// May cancel the event
-			boss.bossDamagedByEntity(event);
-			if (damager instanceof Projectile && ((Projectile) damager).getShooter() instanceof Entity) {
-				Entity e = (Entity) ((Projectile) damager).getShooter();
-				boss.setLastHitBy(e);
-			} else {
-				boss.setLastHitBy(damager);
+			boss.onHurt(event);
+			if (damager != null) {
+				boss.onHurtByEntity(event, damager);
+				if (source != null) {
+					boss.onHurtByEntityWithSource(event, damager, source);
+				}
 			}
+			boss.setLastHitBy(source);
 		}
 
-		if (damager != null) {
-			boss = mBosses.get(damager.getUniqueId());
+		if (source != null) {
+			boss = mBosses.get(source.getUniqueId());
 			if (boss != null) {
 				// May cancel the event
-				boss.bossDamagedEntity(event);
-			}
-
-			if (damager instanceof EvokerFangs) {
-				LivingEntity owner = ((EvokerFangs) damager).getOwner();
-				if (owner != null) {
-					boss = mBosses.get(owner.getUniqueId());
-					if (boss != null) {
-						// May cancel the event
-						boss.bossDamagedEntity(event);
-					}
-				}
-			}
-			if (damager instanceof Projectile && ((Projectile) damager).getShooter() instanceof LivingEntity shooter) {
-				boss = mBosses.get(shooter.getUniqueId());
-				if (boss != null) {
-					// May cancel the event
-					boss.bossDamagedEntity(event);
-				}
+				boss.onDamage(event, damagee);
 			}
 		}
 	}
@@ -813,15 +789,6 @@ public class BossManager implements Listener {
 		Boss boss = mBosses.get(entity.getUniqueId());
 		if (boss != null) {
 			boss.bossStunned();
-		}
-	}
-
-	/* Not actually an event handler - must be called by EntityUtils applyConfusion() */
-	/* TODO: Probably make this an actual event? */
-	public void entityConfused(Entity entity) {
-		Boss boss = mBosses.get(entity.getUniqueId());
-		if (boss != null) {
-			boss.bossConfused();
 		}
 	}
 
@@ -921,6 +888,14 @@ public class BossManager implements Listener {
 	/********************************************************************************
 	 * Public Methods
 	 *******************************************************************************/
+
+	public @Nullable List<BossAbilityGroup> getAbilities(Entity entity) {
+		Boss boss = mBosses.get(entity.getUniqueId());
+		if (boss != null) {
+			return boss.getAbilities();
+		}
+		return null;
+	}
 
 	/*
 	 * Every way to unload a boss needs to bounce through this function to ensure

@@ -1,9 +1,18 @@
 package com.playmonumenta.plugins.abilities.warlock.reaper;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.effects.JudgementChainMobEffect;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.itemstats.enchantments.Inferno;
+import com.playmonumenta.plugins.potion.PotionManager.PotionID;
+import com.playmonumenta.plugins.utils.DamageUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
+import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.utils.PotionUtils;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -22,18 +31,9 @@ import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.classes.ClassAbility;
-import com.playmonumenta.plugins.classes.magic.MagicType;
-import com.playmonumenta.plugins.effects.JudgementChainMobEffect;
-import com.playmonumenta.plugins.enchantments.Inferno;
-import com.playmonumenta.plugins.potion.PotionManager.PotionID;
-import com.playmonumenta.plugins.tracking.PlayerTracking;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.ItemUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.plugins.utils.PotionUtils;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 
 
@@ -150,7 +150,7 @@ public class JudgementChain extends Ability {
 								// Only do Regeneration I regardless of Poison/Wither level
 								mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_OTHER, new PotionEffect(effect.getKey(), BUFF_DURATION, 0, true, true));
 								// Simulate Regen (1 health every 50 ticks = 1/50 health every tick) since constant application never heals
-								PlayerUtils.healPlayer(mPlayer, 1.0d / 50.0d);
+								PlayerUtils.healPlayer(mPlugin, mPlayer, 1.0d / 50.0d, mPlayer);
 							} else {
 								mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_OTHER, new PotionEffect(effect.getKey(), BUFF_DURATION, Math.min(mAmplifierCap, effect.getValue()), true, true));
 							}
@@ -174,6 +174,8 @@ public class JudgementChain extends Ability {
 									} else if (effect.getKey() == PotionEffectType.REGENERATION) {
 										// Only do Regeneration I regardless of Poison/Wither level
 										mPlugin.mPotionManager.addPotion(pl, PotionID.ABILITY_OTHER, new PotionEffect(effect.getKey(), BUFF_DURATION, 0, true, true));
+										// Simulate Regen (1 health every 50 ticks = 1/50 health every tick) since constant application never heals
+										PlayerUtils.healPlayer(mPlugin, pl, 1.0d / 50.0d, mPlayer);
 									} else {
 										mPlugin.mPotionManager.addPotion(pl, PotionID.ABILITY_OTHER, new PotionEffect(effect.getKey(), BUFF_DURATION, Math.min(mAmplifierCap, effect.getValue()), true, true));
 									}
@@ -191,8 +193,8 @@ public class JudgementChain extends Ability {
 									if (EntityUtils.isBleeding(mPlugin, mTarget)) {
 										EntityUtils.applyBleed(mPlugin, BUFF_DURATION, EntityUtils.getBleedLevel(mPlugin, mTarget), m);
 									}
-									if (mTarget.getFireTicks() > 0 && (m.getFireTicks() <= 0 && !Inferno.mobHasInferno(mPlugin, m)
-											&& (!EntityUtils.isFireResistant(m) || PlayerTracking.getInstance().getPlayerCustomEnchantLevel(mPlayer, Inferno.class) > 0)
+									if (mTarget.getFireTicks() > 0 && (m.getFireTicks() <= 0 && !Inferno.hasInferno(mPlugin, m)
+											&& (!EntityUtils.isFireResistant(m) || mPlugin.mItemStatManager.getEnchantmentLevel(mPlayer, EnchantmentType.INFERNO) > 0)
 											&& m.getLocation().isChunkLoaded()
 											&& m.getLocation().getBlock().getType() != Material.WATER)) {
 										EntityUtils.applyFire(mPlugin, BUFF_DURATION, m, mPlayer);
@@ -242,10 +244,10 @@ public class JudgementChain extends Ability {
 			world.playSound(loc, Sound.BLOCK_ANVIL_DESTROY, SoundCategory.PLAYERS, 0.6f, 0.6f);
 
 			if (doDamage) {
-				EntityUtils.damageEntity(mPlugin, mTarget, CHAIN_BREAK_DAMAGE, mPlayer, MagicType.DARK_MAGIC, true, mInfo.mLinkedSpell);
+				DamageUtils.damage(mPlayer, mTarget, DamageType.MAGIC, CHAIN_BREAK_DAMAGE, mInfo.mLinkedSpell);
 				if (getAbilityScore() > 1) {
 					for (LivingEntity m : EntityUtils.getNearbyMobs(mTarget.getLocation(), CHAIN_BREAK_RANGE, mTarget)) {
-						EntityUtils.damageEntity(mPlugin, m, CHAIN_BREAK_DAMAGE, mPlayer, MagicType.DARK_MAGIC, true, mInfo.mLinkedSpell);
+						DamageUtils.damage(mPlayer, m, DamageType.MAGIC, CHAIN_BREAK_DAMAGE, mInfo.mLinkedSpell);
 					}
 				}
 			}

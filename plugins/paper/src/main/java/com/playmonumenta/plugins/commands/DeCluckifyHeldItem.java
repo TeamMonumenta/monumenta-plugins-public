@@ -1,6 +1,6 @@
 package com.playmonumenta.plugins.commands;
 
-import com.playmonumenta.plugins.utils.CommandUtils;
+import com.playmonumenta.plugins.utils.ItemStatUtils;
 
 /*
  * NOTICE!
@@ -11,6 +11,10 @@ import com.playmonumenta.plugins.utils.CommandUtils;
  */
 public class DeCluckifyHeldItem extends GenericCommand {
 	public static void register() {
-		registerPlayerCommand("decluckifyhelditem", "monumenta.command.decluckifyhelditem", (sender, player) -> CommandUtils.deEnchantifyHeldItem(sender, player, "Clucking"));
+		registerPlayerCommand("decluckifyhelditem", "monumenta.command.decluckifyhelditem", (sender, player) -> {
+			ItemStatUtils.removeEnchantment(player.getItemInHand(), ItemStatUtils.EnchantmentType.CLUCKING);
+			ItemStatUtils.generateItemStats(player.getItemInHand());
+			});
+
 	}
 }

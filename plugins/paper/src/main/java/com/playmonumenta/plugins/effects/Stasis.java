@@ -1,20 +1,17 @@
 package com.playmonumenta.plugins.effects;
 
+import com.playmonumenta.plugins.Constants;
+import com.playmonumenta.plugins.abilities.AbilityManager;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-
-import com.playmonumenta.plugins.Constants;
-import com.playmonumenta.plugins.abilities.AbilityManager;
-
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
 
 public class Stasis extends Effect {
 
@@ -26,13 +23,7 @@ public class Stasis extends Effect {
 		Stasis.mDuration = duration;
 	}
 
-	@Override
-	public boolean entityReceiveDamageEvent(EntityDamageEvent event) {
-		if (event.getEntity() instanceof Player) {
-			event.setCancelled(true);
-		}
-		return true;
-	}
+	// Most functionality handled in StasisListener
 
 	@Override
 	public void entityGainEffect(Entity entity) {

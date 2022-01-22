@@ -1,7 +1,14 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
-import java.util.Arrays;
-
+import com.playmonumenta.plugins.bosses.SpellManager;
+import com.playmonumenta.plugins.bosses.parameters.BossParam;
+import com.playmonumenta.plugins.bosses.parameters.EffectsList;
+import com.playmonumenta.plugins.bosses.parameters.ParticlesList;
+import com.playmonumenta.plugins.bosses.parameters.SoundsList;
+import com.playmonumenta.plugins.bosses.spells.SpellBaseAoE;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.entity.LivingEntity;
@@ -10,14 +17,7 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
-import com.playmonumenta.plugins.bosses.SpellManager;
-import com.playmonumenta.plugins.bosses.parameters.EffectsList;
-import com.playmonumenta.plugins.bosses.parameters.BossParam;
-import com.playmonumenta.plugins.bosses.parameters.ParticlesList;
-import com.playmonumenta.plugins.bosses.parameters.SoundsList;
-import com.playmonumenta.plugins.bosses.spells.SpellBaseAoE;
-import com.playmonumenta.plugins.utils.BossUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
+import java.util.Arrays;
 
 
 public class SwingBoss extends BossAbilityGroup {
@@ -83,7 +83,7 @@ public class SwingBoss extends BossAbilityGroup {
 						}, (Location loc) -> {
 							for (Player player : PlayerUtils.playersInRange(boss.getLocation(), p.RADIUS, true)) {
 								if (p.DAMAGE > 0) {
-									BossUtils.bossDamage(boss, player, p.DAMAGE);
+									BossUtils.blockableDamage(boss, player, DamageType.MELEE, p.DAMAGE);
 								}
 
 								if (p.DAMAGE_PERCENT > 0.0) {

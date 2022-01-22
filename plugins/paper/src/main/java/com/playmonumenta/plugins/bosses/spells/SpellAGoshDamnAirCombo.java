@@ -1,5 +1,8 @@
 package com.playmonumenta.plugins.bosses.spells;
 
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.MovementUtils;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -10,9 +13,6 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
-
-import com.playmonumenta.plugins.utils.BossUtils;
-import com.playmonumenta.plugins.utils.MovementUtils;
 
 
 public class SpellAGoshDamnAirCombo extends SpellBaseCharge {
@@ -49,7 +49,7 @@ public class SpellAGoshDamnAirCombo extends SpellBaseCharge {
 						player.getWorld().spawnParticle(Particle.LAVA, player.getLocation(), 80, 1.25, 0.1, 1.25, 0);
 						player.getWorld().spawnParticle(Particle.EXPLOSION_NORMAL, player.getLocation(), 50, 1.25, 0.1, 1.25, 0);
 						boss.getWorld().playSound(player.getLocation(), Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, 0.85f, 1f);
-						BossUtils.bossDamage(boss, player, 12);
+						BossUtils.blockableDamage(boss, player, DamageType.MELEE, 12);
 						player.setVelocity(new Vector(0, 1.15, 0));
 						boss.setVelocity(new Vector(0, 1.23, 0));
 						boss.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 20 * 3, 10));
@@ -57,7 +57,7 @@ public class SpellAGoshDamnAirCombo extends SpellBaseCharge {
 
 							@Override
 							public void run() {
-								BossUtils.bossDamage(boss, player, 12);
+								BossUtils.blockableDamage(boss, player, DamageType.MELEE, 12);
 								boss.getWorld().playSound(player.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 1.3F, 1);
 								boss.getWorld().playSound(player.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1.3F, 0);
 								Location loc = player.getLocation().add(0, 1, 0);
@@ -65,7 +65,7 @@ public class SpellAGoshDamnAirCombo extends SpellBaseCharge {
 								player.getWorld().spawnParticle(Particle.FLAME, loc, 150, 0, 0, 0, 0.175);
 								player.getWorld().spawnParticle(Particle.SMOKE_LARGE, loc, 50, 0, 0, 0, 0.25);
 								player.getWorld().spawnParticle(Particle.SWEEP_ATTACK, loc, 75, 3, 3, 3, 0);
-								MovementUtils.knockAway(boss.getLocation(), player, 0.65f);
+								MovementUtils.knockAway(boss.getLocation(), player, 0.65f, false);
 								boss.setVelocity(new Vector(0, -5, 0));
 								new BukkitRunnable() {
 									int mTicks = 0;
@@ -78,7 +78,6 @@ public class SpellAGoshDamnAirCombo extends SpellBaseCharge {
 											boss.setFallDistance(0);
 											boss.removePotionEffect(PotionEffectType.DAMAGE_RESISTANCE);
 										}
-
 									}
 
 								}.runTaskTimer(plugin, 0, 1);

@@ -1,8 +1,14 @@
 package com.playmonumenta.plugins.bosses.spells.lich;
 
-import java.util.Collections;
-import java.util.List;
-
+import com.playmonumenta.plugins.bosses.ChargeUpManager;
+import com.playmonumenta.plugins.bosses.bosses.Lich;
+import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.player.PPGroundCircle;
+import com.playmonumenta.plugins.player.PartialParticle;
+import com.playmonumenta.plugins.utils.DamageUtils;
+import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.LocationUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.Location;
@@ -17,14 +23,8 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
-import com.playmonumenta.plugins.bosses.ChargeUpManager;
-import com.playmonumenta.plugins.bosses.bosses.Lich;
-import com.playmonumenta.plugins.bosses.spells.Spell;
-import com.playmonumenta.plugins.player.PPGroundCircle;
-import com.playmonumenta.plugins.player.PartialParticle;
-import com.playmonumenta.plugins.utils.BossUtils;
-import com.playmonumenta.plugins.utils.FastUtils;
-import com.playmonumenta.plugins.utils.LocationUtils;
+import java.util.Collections;
+import java.util.List;
 
 /*
 Gravity Well - A well of gravity is created at the boss, every 0.75 seconds players within line of
@@ -135,14 +135,14 @@ public class SpellGravityWell extends Spell {
 									Vector dir = LocationUtils.getDirectionTo(player.getLocation(), clone);
 
 									if (player.getLocation().distance(mLoc) > 4) {
-										BossUtils.bossDamage(mBoss, player, 20, null, "Gravity Well");
+										DamageUtils.damage(mBoss, player, DamageType.MAGIC, 18, null, false, true, "Gravity Well");
 									}
 									player.setVelocity(dir.multiply(-0.65));
 								}
 
 								if (mT % 10 == 0) {
 									if (player.getLocation().distance(mLoc) <= 4) {
-										BossUtils.bossDamage(mBoss, player, 35, null, "Gravity Well");
+										DamageUtils.damage(mBoss, player, DamageType.MAGIC, 30, null, false, true, "Gravity Well");
 									}
 								}
 							}

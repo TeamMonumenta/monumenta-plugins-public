@@ -1,8 +1,12 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
-import java.util.AbstractMap;
-import java.util.Arrays;
-
+import com.playmonumenta.plugins.bosses.SpellManager;
+import com.playmonumenta.plugins.bosses.spells.SpellBaseLeapAttack;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.ParticleUtils;
+import com.playmonumenta.plugins.utils.ParticleUtils.SpawnParticleAction;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -12,12 +16,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.util.Vector;
 
-import com.playmonumenta.plugins.bosses.SpellManager;
-import com.playmonumenta.plugins.bosses.spells.SpellBaseLeapAttack;
-import com.playmonumenta.plugins.utils.BossUtils;
-import com.playmonumenta.plugins.utils.ParticleUtils;
-import com.playmonumenta.plugins.utils.ParticleUtils.SpawnParticleAction;
-import com.playmonumenta.plugins.utils.PlayerUtils;
+import java.util.AbstractMap;
+import java.util.Arrays;
 
 public class LeapBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_leap";
@@ -66,7 +66,7 @@ public class LeapBoss extends BossAbilityGroup {
 						world.spawnParticle(Particle.EXPLOSION_LARGE, loc, 1, 0, 0, 0, 0);
 						world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 1f, 0.5f);
 						for (Player p : PlayerUtils.playersInRange(loc, DAMAGE_RADIUS, true)) {
-							BossUtils.bossDamage(boss, p, DAMAGE);
+							BossUtils.blockableDamage(boss, p, DamageType.MELEE, DAMAGE);
 						}
 					}, null, null)
 		));

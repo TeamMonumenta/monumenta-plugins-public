@@ -1,43 +1,40 @@
 package com.playmonumenta.plugins.abilities.delves;
 
-import java.util.EnumSet;
-
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
-import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
-import org.bukkit.event.entity.SpawnerSpawnEvent;
-import org.checkerframework.checker.nullness.qual.Nullable;
-
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.bosses.bosses.FireBombTossBoss;
 import com.playmonumenta.plugins.bosses.bosses.FlameNovaBoss;
 import com.playmonumenta.plugins.bosses.bosses.FlameTrailBoss;
 import com.playmonumenta.plugins.bosses.bosses.SeekingProjectileBoss;
+import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.utils.DelvesUtils;
 import com.playmonumenta.plugins.utils.DelvesUtils.Modifier;
 import com.playmonumenta.plugins.utils.FastUtils;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
+import org.bukkit.event.entity.SpawnerSpawnEvent;
+import org.checkerframework.checker.nullness.qual.Nullable;
+
+import java.util.EnumSet;
 
 public class Infernal extends DelveModifier {
 
-	private static final EnumSet<DamageCause> ENVIRONMENTAL_DAMAGE_CAUSES = EnumSet.of(
-			DamageCause.BLOCK_EXPLOSION,
-			DamageCause.CONTACT,
-			DamageCause.DROWNING,
-			DamageCause.FALL,
-			DamageCause.FALLING_BLOCK,
-			DamageCause.FIRE,
-			DamageCause.FLY_INTO_WALL,
-			DamageCause.HOT_FLOOR,
-			DamageCause.LAVA,
-			DamageCause.LIGHTNING,
-			DamageCause.POISON,
-			DamageCause.STARVATION,
-			DamageCause.SUFFOCATION,
-			DamageCause.WITHER
+	private static final EnumSet<DamageType> ENVIRONMENTAL_DAMAGE_CAUSES = EnumSet.of(
+			DamageType.AILMENT,
+			DamageType.FALL
 	);
 
 	private static final double[] ENVIRONMENTAL_DAMAGE_TAKEN_MULTIPLIER = {
+			1.1,
+			1.2,
+			1.3,
+			1.4,
+			1.5,
+			1.6,
+			1.7
+	};
+
+	private static final double[] BURNING_DAMAGE_TAKEN_MULTIPLIER = {
 			1.2,
 			1.4,
 			1.6,
@@ -45,16 +42,6 @@ public class Infernal extends DelveModifier {
 			2,
 			2.2,
 			2.4
-	};
-
-	private static final double[] BURNING_DAMAGE_TAKEN_MULTIPLIER = {
-			1.4,
-			1.8,
-			2.2,
-			2.6,
-			3,
-			3.4,
-			3.8
 	};
 
 	private static final double[] ABILITY_CHANCE = {
@@ -128,20 +115,12 @@ public class Infernal extends DelveModifier {
 	}
 
 	@Override
-	public boolean playerDamagedEvent(EntityDamageEvent event) {
-		if (mPlayer == null) {
-			return true;
-		}
-		if (event.getCause() == DamageCause.FIRE_TICK) {
+	public void onHurt(DamageEvent event) {
+		if (event.getType() == DamageType.FIRE) {
 			event.setDamage(event.getDamage() * mBurningDamageTakenMultiplier);
-		} else if (ENVIRONMENTAL_DAMAGE_CAUSES.contains(event.getCause())) {
+		} else if (ENVIRONMENTAL_DAMAGE_CAUSES.contains(event.getType())) {
 			event.setDamage(event.getDamage() * mEnvironmentalDamageTakenMultiplier);
-			if (event.getCause() == DamageCause.POISON) {
-				event.setDamage(Math.min(event.getDamage(), Math.max(mPlayer.getHealth() - 1, 0)));
-			}
 		}
-
-		return true;
 	}
 
 	@Override

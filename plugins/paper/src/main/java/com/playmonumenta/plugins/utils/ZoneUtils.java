@@ -1,10 +1,7 @@
 package com.playmonumenta.plugins.utils;
 
-import java.util.Optional;
-
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.scriptedquests.zones.Zone;
-
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -14,6 +11,8 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 import org.checkerframework.checker.nullness.qual.Nullable;
+
+import java.util.Optional;
 
 public class ZoneUtils {
 	public enum ZoneProperty {

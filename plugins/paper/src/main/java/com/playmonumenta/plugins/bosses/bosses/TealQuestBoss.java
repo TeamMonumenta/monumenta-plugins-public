@@ -1,10 +1,18 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
-import java.util.AbstractMap;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
+import com.playmonumenta.plugins.bosses.BossBarManager;
+import com.playmonumenta.plugins.bosses.SpellManager;
+import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.bosses.spells.SpellBarrier;
+import com.playmonumenta.plugins.bosses.spells.SpellBaseAoE;
+import com.playmonumenta.plugins.bosses.spells.SpellBaseSlam;
+import com.playmonumenta.plugins.bosses.spells.SpellCrowdControlClear;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.ParticleUtils;
+import com.playmonumenta.plugins.utils.ParticleUtils.SpawnParticleAction;
+import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.utils.SerializationUtils;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -23,18 +31,10 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 
-import com.playmonumenta.plugins.bosses.BossBarManager;
-import com.playmonumenta.plugins.bosses.SpellManager;
-import com.playmonumenta.plugins.bosses.spells.Spell;
-import com.playmonumenta.plugins.bosses.spells.SpellBarrier;
-import com.playmonumenta.plugins.bosses.spells.SpellBaseAoE;
-import com.playmonumenta.plugins.bosses.spells.SpellBaseSlam;
-import com.playmonumenta.plugins.bosses.spells.SpellCrowdControlClear;
-import com.playmonumenta.plugins.utils.BossUtils;
-import com.playmonumenta.plugins.utils.ParticleUtils;
-import com.playmonumenta.plugins.utils.ParticleUtils.SpawnParticleAction;
-import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.plugins.utils.SerializationUtils;
+import java.util.AbstractMap;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class TealQuestBoss extends BossAbilityGroup {
 
@@ -127,7 +127,7 @@ public class TealQuestBoss extends BossAbilityGroup {
 							world.spawnParticle(Particle.REDSTONE, loc, 2, 0.25, 0.25, 0.25, 0.1, REDSTONE_COLOR_SWING);
 						}, (Location loc) -> {
 							for (Player player : PlayerUtils.playersInRange(boss.getLocation(), RADIUS, false)) {
-								BossUtils.bossDamage(boss, player, 35);
+								BossUtils.blockableDamage(boss, player, DamageType.MELEE, 35);
 							}
 						})));
 

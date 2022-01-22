@@ -1,19 +1,18 @@
 package com.playmonumenta.plugins.utils;
 
-import java.util.Iterator;
-import java.util.Map;
-
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
 import org.bukkit.advancement.Advancement;
 import org.bukkit.advancement.AdvancementProgress;
 import org.bukkit.entity.Player;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
+import java.util.Iterator;
+import java.util.Map;
 
 public class AdvancementUtils {
 	public static JsonObject getAsJsonObject(Player player) {

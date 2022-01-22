@@ -1,11 +1,11 @@
 package com.playmonumenta.plugins.depths.bosses.spells;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Random;
-import java.util.UUID;
-
+import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.depths.bosses.Nucleus;
+import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
+import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.MovementUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -15,12 +15,11 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import com.playmonumenta.plugins.bosses.spells.Spell;
-import com.playmonumenta.plugins.depths.bosses.Nucleus;
-import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
-import com.playmonumenta.plugins.utils.FastUtils;
-import com.playmonumenta.plugins.utils.MovementUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Random;
+import java.util.UUID;
 
 public class SpellPassiveSummons extends Spell {
 
@@ -96,7 +95,7 @@ public class SpellPassiveSummons extends Spell {
 						sLoc = loc.clone().add(x, 0.25, z);
 					}
 					Location spawn = sLoc.clone().subtract(0, 1.75, 0);
-					LivingEntity ele = (isElite || isEliteSummon()) ? (LivingEntity)LibraryOfSoulsIntegration.summon(spawn, CONSTRUCTS_ELITE.get(FastUtils.RANDOM.nextInt(CONSTRUCTS.size()))) : (LivingEntity)LibraryOfSoulsIntegration.summon(spawn, CONSTRUCTS.get(FastUtils.RANDOM.nextInt(CONSTRUCTS.size())));
+					LivingEntity ele = (isElite || isEliteSummon()) ? (LivingEntity) LibraryOfSoulsIntegration.summon(spawn, CONSTRUCTS_ELITE.get(FastUtils.RANDOM.nextInt(CONSTRUCTS.size()))) : (LivingEntity) LibraryOfSoulsIntegration.summon(spawn, CONSTRUCTS.get(FastUtils.RANDOM.nextInt(CONSTRUCTS.size())));
 					Location scLoc = sLoc.clone();
 					if (ele != null && !mSummoned.contains(ele.getUniqueId())) {
 						mSummoned.add(ele.getUniqueId());
@@ -131,7 +130,7 @@ public class SpellPassiveSummons extends Spell {
 								if (mRaised) {
 									Block block = ele.getLocation().getBlock();
 									if (block.getType().isSolid() || block.isLiquid()) {
-										MovementUtils.knockAway(mBoss.getLocation(), ele, -2.25f, 0.7f);
+										MovementUtils.knockAway(mBoss.getLocation(), ele, -2.25f, 0.7f, false);
 									} else if (mSpawnLoc.getY() - ele.getLocation().getY() >= 3) {
 										ele.teleport(mSpawnLoc);
 									}
@@ -191,7 +190,7 @@ public class SpellPassiveSummons extends Spell {
 
 	@Override
 	public int castTicks() {
-		return (mSummonTime);
+		return mSummonTime;
 	}
 
 	@Override

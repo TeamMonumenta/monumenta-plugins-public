@@ -9,18 +9,18 @@ import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDamageEvent;
+import org.jetbrains.annotations.NotNull;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.classes.ClassAbility;
-import com.playmonumenta.plugins.classes.magic.MagicType;
 import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
-import com.playmonumenta.plugins.utils.AbilityUtils;
+import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.utils.AbsorptionUtils;
+import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
@@ -44,46 +44,13 @@ public class Apocalypse extends DepthsAbility {
 	}
 
 	@Override
-	public boolean playerDamagedByLivingEntityEvent(EntityDamageByEntityEvent event) {
-		if (event.isCancelled()) {
-			return true;
-		}
-
-		execute(event);
-		return true;
-	}
-
-	@Override
-	public boolean playerDamagedByProjectileEvent(EntityDamageByEntityEvent event) {
-		if (event.isCancelled()) {
-			return true;
-		}
-
-		execute(event);
-		return true;
-	}
-
-	/*
-	 * Works against all types of damage
-	 */
-	@Override
-	public boolean playerDamagedEvent(EntityDamageEvent event) {
-		// Do not process cancelled damage events
-		if (event.isCancelled() || event instanceof EntityDamageByEntityEvent) {
-			return true;
-		}
-
-		execute(event);
-		return true;
-	}
-
-	private void execute(EntityDamageEvent event) {
-		if (mPlayer == null || AbilityUtils.isBlocked(event)) {
+	public void onHurt(@NotNull DamageEvent event) {
+		if (event.isCancelled() || event.isBlocked() || mPlayer == null) {
 			return;
 		}
 
 		// Calculate whether this effect should not be run based on player health.
-		double healthRemaining = mPlayer.getHealth() + AbsorptionUtils.getAbsorption(mPlayer) - EntityUtils.getRealFinalDamage(event);
+		double healthRemaining = mPlayer.getHealth() + AbsorptionUtils.getAbsorption(mPlayer) - event.getDamage();
 
 		double maxHealth = EntityUtils.getMaxHealth(mPlayer);
 		if (healthRemaining > maxHealth * TRIGGER_HEALTH) {
@@ -96,13 +63,13 @@ public class Apocalypse extends DepthsAbility {
 		List<LivingEntity> nearbyMobs = EntityUtils.getNearbyMobs(loc, RADIUS);
 		int count = 0;
 		for (LivingEntity mob : nearbyMobs) {
-			EntityUtils.damageEntity(mPlugin, mob, DAMAGE[mRarity - 1], mPlayer, MagicType.FIRE, true, mInfo.mLinkedSpell, false, false, true);
+			DamageUtils.damage(mPlayer, mob, DamageType.MAGIC, DAMAGE[mRarity - 1], mInfo.mLinkedSpell, true);
 			if (mob == null || mob.isDead() || mob.getHealth() <= 0) {
 				count++;
 			}
 		}
 
-		PlayerUtils.healPlayer(mPlayer, maxHealth * count * HEALING);
+		PlayerUtils.healPlayer(mPlugin, mPlayer, maxHealth * count * HEALING);
 
 		World world = mPlayer.getWorld();
 		world.spawnParticle(Particle.EXPLOSION_HUGE, loc, 10, 2, 2, 2);
@@ -117,7 +84,7 @@ public class Apocalypse extends DepthsAbility {
 
 	@Override
 	public String getDescription(int rarity) {
-		return "When your health drops below " + (int) DepthsUtils.roundPercent(TRIGGER_HEALTH) + "%, deal " + DepthsUtils.getRarityColor(rarity) + DAMAGE[rarity - 1] + ChatColor.WHITE + " damage in a " + RADIUS + " block radius. For each mob that is killed, heal " + (int) DepthsUtils.roundPercent(HEALING) + "% of your max health. Cooldown: " + COOLDOWN / 20 + "s.";
+		return "When your health drops below " + (int) DepthsUtils.roundPercent(TRIGGER_HEALTH) + "%, deal " + DepthsUtils.getRarityColor(rarity) + DAMAGE[rarity - 1] + ChatColor.WHITE + " magic damage in a " + RADIUS + " block radius. For each mob that is killed, heal " + (int) DepthsUtils.roundPercent(HEALING) + "% of your max health. Cooldown: " + COOLDOWN / 20 + "s.";
 	}
 
 	@Override

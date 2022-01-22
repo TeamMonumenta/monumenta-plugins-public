@@ -18,11 +18,12 @@ import org.bukkit.util.Vector;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.classes.ClassAbility;
-import com.playmonumenta.plugins.classes.magic.MagicType;
 import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 
@@ -77,10 +78,10 @@ public class IceLance extends DepthsAbility {
 			while (iter.hasNext()) {
 				LivingEntity mob = iter.next();
 				if (box.overlaps(mob.getBoundingBox())) {
-					EntityUtils.damageEntity(mPlugin, mob, DAMAGE[mRarity - 1], mPlayer, MagicType.ARCANE, true, mInfo.mLinkedSpell);
+					DamageUtils.damage(mPlayer, mob, DamageType.MAGIC, DAMAGE[mRarity - 1], mInfo.mLinkedSpell);
 					EntityUtils.applySlow(mPlugin, DURATION, AMPLIFIER, mob);
 					EntityUtils.applyWeaken(mPlugin, DURATION, AMPLIFIER, mob);
-					MovementUtils.knockAway(mPlayer.getLocation(), mob, 0.25f, 0.25f);
+					MovementUtils.knockAway(mPlayer.getLocation(), mob, 0.25f, 0.25f, true);
 					iter.remove();
 					mobs.remove(mob);
 				}
@@ -92,12 +93,12 @@ public class IceLance extends DepthsAbility {
 
 	@Override
 	public String getDescription(int rarity) {
-		return "Right click to shoot an ice lance that travels " + RANGE + " blocks and pierces through mobs, dealing " + DepthsUtils.getRarityColor(rarity) + DAMAGE[rarity - 1] + ChatColor.WHITE + " damage and applying " + (int) DepthsUtils.roundPercent(AMPLIFIER) + "% slowness and weaken for " + DURATION / 20 + " seconds. Cooldown: " + COOLDOWN / 20 + "s.";
+		return "Right click to shoot an ice lance that travels " + RANGE + " blocks and pierces through mobs, dealing " + DepthsUtils.getRarityColor(rarity) + DAMAGE[rarity - 1] + ChatColor.WHITE + " magic damage and applying " + (int) DepthsUtils.roundPercent(AMPLIFIER) + "% slowness and weaken for " + DURATION / 20 + " seconds. Cooldown: " + COOLDOWN / 20 + "s.";
 	}
 
 	@Override
 	public boolean runCheck() {
-		return (!mPlayer.isSneaking() && DepthsUtils.isWeaponItem(mPlayer.getInventory().getItemInMainHand()));
+		return mPlayer != null && !mPlayer.isSneaking() && DepthsUtils.isWeaponItem(mPlayer.getInventory().getItemInMainHand());
 	}
 
 	@Override

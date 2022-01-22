@@ -1,32 +1,5 @@
 package com.playmonumenta.plugins.depths.bosses;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.Particle;
-import org.bukkit.World;
-import org.bukkit.attribute.Attribute;
-import org.bukkit.boss.BarColor;
-import org.bukkit.boss.BarStyle;
-import org.bukkit.entity.ArmorStand;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Mob;
-import org.bukkit.entity.Player;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDeathEvent;
-import org.bukkit.plugin.Plugin;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
-import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.util.Vector;
-
 import com.playmonumenta.plugins.bosses.BossBarManager;
 import com.playmonumenta.plugins.bosses.BossBarManager.BossHealthAction;
 import com.playmonumenta.plugins.bosses.SpellManager;
@@ -42,10 +15,36 @@ import com.playmonumenta.plugins.depths.bosses.spells.SpellHederaAnticheese;
 import com.playmonumenta.plugins.depths.bosses.spells.SpellIvyGarden;
 import com.playmonumenta.plugins.depths.bosses.spells.SpellLeafNova;
 import com.playmonumenta.plugins.depths.bosses.spells.SpellPassiveGarden;
+import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.SerializationUtils;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.Particle;
+import org.bukkit.World;
+import org.bukkit.attribute.Attribute;
+import org.bukkit.boss.BarColor;
+import org.bukkit.boss.BarStyle;
+import org.bukkit.entity.ArmorStand;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Mob;
+import org.bukkit.entity.Player;
+import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.plugin.Plugin;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
+import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.util.Vector;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class Hedera extends BossAbilityGroup {
 	public static final String identityTag = "boss_hedera";
@@ -242,17 +241,23 @@ public class Hedera extends BossAbilityGroup {
 	}
 
 	@Override
-	public void bossDamagedByEntity(EntityDamageByEntityEvent event) {
+	public void onHurt(DamageEvent event) {
 		boolean plantsAlive = mPlants.values().size() > 0;
 
 		//Prevents bypassing plants if a single high damage hit is done
-		if (event.getFinalDamage() >= mBoss.getHealth() && plantsAlive) {
+		if (event.getDamage() >= mBoss.getHealth() && plantsAlive) {
 			event.setDamage(1);
 			mBoss.setHealth(1);
 		}
 
 		//Consume random plant if there are any
 		if (mBoss.getHealth() < PLANT_CONSUME_HP && plantsAlive) {
+
+			//If not being damaged from a source, don't consume plants but don't take damage
+			if (event.getSource() == null) {
+				event.setDamage(1);
+			}
+
 			Collection<Location> plantsCollection = mPlants.keySet();
 			List<Location> plants = new ArrayList<>();
 			for (Location plant : plantsCollection) {

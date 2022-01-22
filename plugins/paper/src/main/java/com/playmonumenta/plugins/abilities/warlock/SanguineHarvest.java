@@ -1,10 +1,15 @@
 package com.playmonumenta.plugins.abilities.warlock;
 
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
-
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.abilities.AbilityTrigger;
+import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.effects.SanguineMark;
+import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.MetadataUtils;
+import com.playmonumenta.plugins.utils.MovementUtils;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -20,16 +25,10 @@ import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.abilities.AbilityTrigger;
-import com.playmonumenta.plugins.classes.ClassAbility;
-import com.playmonumenta.plugins.effects.SanguineMark;
-import com.playmonumenta.plugins.events.CustomDamageEvent;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.ItemUtils;
-import com.playmonumenta.plugins.utils.MetadataUtils;
-import com.playmonumenta.plugins.utils.MovementUtils;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
 
 
 public class SanguineHarvest extends Ability {
@@ -150,14 +149,16 @@ public class SanguineHarvest extends Ability {
 
 		List<LivingEntity> mobs = EntityUtils.getNearbyMobs(loc, mRadius, mPlayer);
 		for (LivingEntity mob : mobs) {
-			MovementUtils.knockAway(loc, mob, 0.2f, 0.2f);
-			mPlugin.mEffectManager.addEffect(mob, SANGUINE_NAME, new SanguineMark(mHealPercent, 20 * 30));
+			MovementUtils.knockAway(loc, mob, 0.2f, 0.2f, true);
+			mPlugin.mEffectManager.addEffect(mob, SANGUINE_NAME, new SanguineMark(mHealPercent, 20 * 30, mPlayer, mPlugin));
 		}
 	}
 
 	@Override
-	public void playerDealtCustomDamageEvent(CustomDamageEvent event) {
-		LivingEntity damagee = (LivingEntity) event.getDamaged();
-		EntityUtils.applyBleed(mPlugin, BLEED_DURATION, mBleedLevel, damagee);
+	public void onDamage(DamageEvent event, LivingEntity enemy) {
+		if (event.getAbility() == null) {
+			return;
+		}
+		EntityUtils.applyBleed(mPlugin, BLEED_DURATION, mBleedLevel, enemy);
 	}
 }

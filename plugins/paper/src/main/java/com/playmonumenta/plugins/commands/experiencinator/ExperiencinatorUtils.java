@@ -1,14 +1,14 @@
 package com.playmonumenta.plugins.commands.experiencinator;
 
-import java.io.File;
-import java.io.FileReader;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.logging.Level;
-
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.commands.experiencinator.ExperiencinatorConfig.Experiencinator;
+import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.utils.ItemStatUtils;
+import com.playmonumenta.plugins.utils.ItemStatUtils.InfusionType;
+import com.playmonumenta.plugins.utils.ItemStatUtils.Region;
+import com.playmonumenta.plugins.utils.ItemStatUtils.Tier;
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -18,54 +18,16 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.commands.experiencinator.ExperiencinatorConfig.Experiencinator;
-import com.playmonumenta.plugins.enchantments.CustomEnchantment;
-import com.playmonumenta.plugins.enchantments.Locked;
-import com.playmonumenta.plugins.utils.InventoryUtils;
-import com.playmonumenta.plugins.utils.ItemUtils;
-import com.playmonumenta.plugins.utils.ItemUtils.ItemRegion;
-import com.playmonumenta.plugins.utils.ItemUtils.ItemTier;
+import java.io.File;
+import java.io.FileReader;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.logging.Level;
 
 public abstract class ExperiencinatorUtils {
-
-	/**
-	 * Items with these enchantments will not be converted
-	 */
-	private static final CustomEnchantment[] INFUSIONS = {
-		CustomEnchantment.ACUMEN,
-		CustomEnchantment.FOCUS,
-		CustomEnchantment.PERSPICACITY,
-		CustomEnchantment.TENACITY,
-		CustomEnchantment.VIGOR,
-		CustomEnchantment.VITALITY,
-
-		CustomEnchantment.PENNATE,
-		CustomEnchantment.CARAPACE,
-		CustomEnchantment.AURA,
-		CustomEnchantment.EXPEDITE,
-		CustomEnchantment.CHOLER,
-		CustomEnchantment.USURPER,
-		CustomEnchantment.EMPOWERED,
-		CustomEnchantment.BALANCE,
-		CustomEnchantment.EXECUTION,
-		CustomEnchantment.REFLECTION,
-		CustomEnchantment.MITOSIS,
-		CustomEnchantment.ARDOR,
-		CustomEnchantment.EPOCH,
-		CustomEnchantment.NATANT,
-		CustomEnchantment.NOTHINGNESS,
-
-		CustomEnchantment.COLOSSAL,
-		CustomEnchantment.PHYLACTERY,
-
-		CustomEnchantment.FESTIVE,
-		CustomEnchantment.GILDED,
-
-		CustomEnchantment.STAT_TRACK
-	};
 
 	private static @Nullable File mConfigFile;
 	private static long mConfigLastModTimestamp;
@@ -104,7 +66,7 @@ public abstract class ExperiencinatorUtils {
 	 */
 	public static boolean checkExperiencinator(Experiencinator experiencinator, ItemStack experiencinatorItem, Player player) {
 
-		if (ItemUtils.isItemShattered(experiencinatorItem)) {
+		if (ItemStatUtils.isShattered(experiencinatorItem)) {
 			player.sendRawMessage(ChatColor.DARK_RED + "Your " + experiencinator.getName() + " is shattered and cannot be used!");
 			return false;
 		}
@@ -132,12 +94,12 @@ public abstract class ExperiencinatorUtils {
 
 		ExperiencinatorSettings settings = new ExperiencinatorSettings(mConfig.getScoreboardConfig(), player);
 
-		Map<ItemRegion, String> conversionRateNames = experiencinator.getConversionRates();
+		Map<Region, String> conversionRateNames = experiencinator.getConversionRates();
 
 		boolean soldSomething = false;
 		for (ExperiencinatorConfig.Conversion conversion : mConfig.getConversions()) {
 
-			Map<ItemRegion, Integer> totalSellValue = new HashMap<>();
+			Map<Region, Integer> totalSellValue = new HashMap<>();
 
 			@Nullable ItemStack[] inventory = player.getInventory().getStorageContents();
 			for (int i = 9; i < inventory.length; i++) {
@@ -145,42 +107,42 @@ public abstract class ExperiencinatorUtils {
 				if (item == null) {
 					continue;
 				}
-				ItemRegion itemRegion = ItemUtils.getItemRegion(item);
-				ExperiencinatorConfig.ConversionRates conversionRates = conversion.getConversionRates(itemRegion);
+				Region region = ItemStatUtils.getRegion(item);
+				ExperiencinatorConfig.ConversionRates conversionRates = conversion.getConversionRates(region);
 				if (conversionRates == null) { // cannot convert items of this region with this conversion
 					continue;
 				}
-				ItemTier itemTier = ItemUtils.getItemTier(item);
-				if (!conversion.conversionAllowed(player, itemTier)) { // prerequisites for conversion not met
+				Tier tier = ItemStatUtils.getTier(item);
+				if (!conversion.conversionAllowed(player, tier)) { // prerequisites for conversion not met
 					continue;
 				}
-				if (settings.getConversion(itemRegion, itemTier) != conversion.getSettingsId()) { // conversion not enabled
+				if (settings.getConversion(region, tier) != conversion.getSettingsId()) { // conversion not enabled
 					continue;
 				}
-				String conversionRateName = conversionRateNames.get(itemRegion);
-				Integer sellValue = conversionRates.getRate(conversionRateName, itemTier);
+				String conversionRateName = conversionRateNames.get(region);
+				Integer sellValue = conversionRates.getRate(conversionRateName, tier);
 				if (sellValue == null) { // cannot convert items of this tier with this conversion
 					continue;
 				}
 				if (!canConvert(item)) { // item is modified by player (infused etc.)
 					continue;
 				}
-				List<ExperiencinatorConfig.ConversionResult> conversionResults = conversion.getConversionResults(itemRegion);
+				List<ExperiencinatorConfig.ConversionResult> conversionResults = conversion.getConversionResults(region);
 				if (conversionResults == null || conversionResults.stream().anyMatch(res -> res.getItem().isSimilar(item))) { // no result, or item is a result item itself
 					continue;
 				}
 
 				// calculate sell value for the entire item stack and clear the item
 				int value = sellValue * item.getAmount();
-				totalSellValue.merge(itemRegion, value, Integer::sum);
+				totalSellValue.merge(region, value, Integer::sum);
 				inventory[i] = null;
 			}
 			player.getInventory().setStorageContents(inventory);
 
 			// Give currency to player and send a chat message
 			// Iterate over regions to get a consistent order
-			for (ItemRegion itemRegion : ItemRegion.values()) {
-				Integer sellValue = totalSellValue.get(itemRegion);
+			for (Region region : Region.values()) {
+				Integer sellValue = totalSellValue.get(region);
 				if (sellValue == null) {
 					continue;
 				}
@@ -188,7 +150,7 @@ public abstract class ExperiencinatorUtils {
 				if (sellValue > 0) {
 					soldSomething = true;
 
-					giveResults(sellValue, conversion, player, itemRegion, true);
+					giveResults(sellValue, conversion, player, region, true);
 				}
 			}
 		}
@@ -203,34 +165,22 @@ public abstract class ExperiencinatorUtils {
 	 * Checks if the given item is allowed to be converted, i.e. has no player modifications (stat tracking, infusions, etc.)
 	 */
 	private static boolean canConvert(ItemStack item) {
-
-		// don't sell items with player-added enchantments
-		for (CustomEnchantment customEnchantment : INFUSIONS) {
-			if (customEnchantment.getEnchantment().getItemLevel(item) > 0) {
+		for (InfusionType infusion : InfusionType.values()) {
+			if (ItemStatUtils.getInfusionLevel(item, infusion) > 0) {
 				return false;
 			}
 		}
-		if (new Locked().getItemLevel(item) > 0) {
-			return false;
-		}
-		// for hoped items, look for the "Infused by" lore line instead of checking if the item has Hope, as Hope can be on the item by default.
-		List<String> lore = item.getLore();
-		if (lore != null && lore.stream().anyMatch(l -> ChatColor.stripColor(l).trim().startsWith("Infused by"))) {
-			return false;
-		}
-
 		return true;
-
 	}
 
 	/**
 	 * Gives result items to the player, including compressing them if enabled,a dn sends a chat message of the total amount given if desired.
 	 */
-	private static void giveResults(int sellValue, ExperiencinatorConfig.Conversion conversion, Player player, ItemRegion itemRegion, boolean chatMessage) {
+	private static void giveResults(int sellValue, ExperiencinatorConfig.Conversion conversion, Player player, Region region, boolean chatMessage) {
 		int totalValue = sellValue;
 		int remainingValue = sellValue;
 		try {
-			List<ExperiencinatorConfig.ConversionResult> conversionResults = conversion.getConversionResults(itemRegion);
+			List<ExperiencinatorConfig.ConversionResult> conversionResults = conversion.getConversionResults(region);
 			assert conversionResults != null : "@AssumeAssertion(nullness): if a sell value is set, a conversion must exist for that value to have been calculated";
 			// sort by value ascending
 			conversionResults.sort(Comparator.comparingInt(ExperiencinatorConfig.ConversionResult::getValue));
@@ -348,23 +298,23 @@ public abstract class ExperiencinatorUtils {
 			return false;
 		}
 
-		ItemRegion itemRegion = ItemUtils.getItemRegion(item);
-		ItemTier itemTier = ItemUtils.getItemTier(item);
+		Region region = ItemStatUtils.getRegion(item);
+		Tier tier = ItemStatUtils.getTier(item);
 
-		ExperiencinatorConfig.ConversionRates conversionRates = conversion.getConversionRates(itemRegion);
+		ExperiencinatorConfig.ConversionRates conversionRates = conversion.getConversionRates(region);
 		if (conversionRates == null) {
 			return false;
 		}
-		Integer value = conversionRates.getRate(conversionRateName, itemTier);
+		Integer value = conversionRates.getRate(conversionRateName, tier);
 		if (value == null) {
 			return false;
 		}
-		List<ExperiencinatorConfig.ConversionResult> conversionResults = conversion.getConversionResults(itemRegion);
+		List<ExperiencinatorConfig.ConversionResult> conversionResults = conversion.getConversionResults(region);
 		if (conversionResults == null || conversionResults.stream().anyMatch(res -> res.getItem().isSimilar(item))) {
 			return false;
 		}
 
-		giveResults(value * item.getAmount(), conversion, player, itemRegion, false);
+		giveResults(value * item.getAmount(), conversion, player, region, false);
 		return true;
 	}
 

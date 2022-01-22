@@ -1,7 +1,20 @@
 package com.playmonumenta.plugins.depths.abilities.windwalker;
 
-import java.util.List;
-
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.AbilityTrigger;
+import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.depths.DepthsManager;
+import com.playmonumenta.plugins.depths.DepthsTree;
+import com.playmonumenta.plugins.depths.DepthsUtils;
+import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
+import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.utils.DamageUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.LocationUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
+import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -15,21 +28,7 @@ import org.bukkit.event.block.Action;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.AbilityTrigger;
-import com.playmonumenta.plugins.classes.ClassAbility;
-import com.playmonumenta.plugins.classes.magic.MagicType;
-import com.playmonumenta.plugins.depths.DepthsManager;
-import com.playmonumenta.plugins.depths.DepthsTree;
-import com.playmonumenta.plugins.depths.DepthsUtils;
-import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
-import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.FastUtils;
-import com.playmonumenta.plugins.utils.LocationUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
-
-import net.md_5.bungee.api.ChatColor;
+import java.util.List;
 
 public class GuardingBolt extends DepthsAbility {
 
@@ -140,7 +139,7 @@ public class GuardingBolt extends DepthsAbility {
 		);
 
 		for (LivingEntity enemy : enemies) {
-			EntityUtils.damageEntity(mPlugin, enemy, DAMAGE[mRarity - 1], mPlayer, MagicType.ARCANE, true, mInfo.mLinkedSpell, true, true, false);
+			DamageUtils.damage(mPlayer, enemy, DamageType.MAGIC, DAMAGE[mRarity - 1], mInfo.mLinkedSpell);
 			if (!EntityUtils.isBoss(enemy)) {
 				EntityUtils.applyStun(mPlugin, STUN_DURATION[mRarity - 1], enemy);
 			}
@@ -153,7 +152,7 @@ public class GuardingBolt extends DepthsAbility {
 
 	@Override
 	public String getDescription(int rarity) {
-		return "Left click the air while sneaking and looking directly at a player within " + RANGE + " blocks to dash to their location. Mobs in a " + RADIUS + " block radius of the destination are dealt " + DepthsUtils.getRarityColor(rarity) + DAMAGE[rarity - 1] + ChatColor.WHITE + " damage, knocked back, and stunned for " + DepthsUtils.getRarityColor(rarity) + STUN_DURATION[rarity - 1] / 20.0 + ChatColor.WHITE + " seconds. Cooldown: " + COOLDOWN / 20 + "s.";
+		return "Left click the air while sneaking and looking directly at a player within " + RANGE + " blocks to dash to their location. Mobs in a " + RADIUS + " block radius of the destination are dealt " + DepthsUtils.getRarityColor(rarity) + DAMAGE[rarity - 1] + ChatColor.WHITE + " magic damage, knocked back, and stunned for " + DepthsUtils.getRarityColor(rarity) + STUN_DURATION[rarity - 1] / 20.0 + ChatColor.WHITE + " seconds. Cooldown: " + COOLDOWN / 20 + "s.";
 	}
 
 	@Override

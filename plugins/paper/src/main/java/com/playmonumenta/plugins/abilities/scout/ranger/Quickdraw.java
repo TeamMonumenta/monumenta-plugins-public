@@ -1,5 +1,13 @@
 package com.playmonumenta.plugins.abilities.scout.ranger;
 
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.abilities.AbilityTrigger;
+import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.utils.ItemStatUtils;
+import com.playmonumenta.plugins.utils.ItemUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -8,10 +16,9 @@ import org.bukkit.World;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.AbstractArrow.PickupStatus;
 import org.bukkit.entity.Arrow;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.Damageable;
@@ -19,12 +26,6 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 import org.checkerframework.checker.nullness.qual.Nullable;
-
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.abilities.AbilityTrigger;
-import com.playmonumenta.plugins.classes.ClassAbility;
-import com.playmonumenta.plugins.utils.ItemUtils;
 
 
 
@@ -56,7 +57,7 @@ public class Quickdraw extends Ability {
 		}
 		ItemStack inMainHand = mPlayer.getInventory().getItemInMainHand();
 		Damageable damageable = (Damageable) inMainHand.getItemMeta();
-		if (!mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.mLinkedSpell) && ItemUtils.isSomeBow(inMainHand) && !(damageable.getDamage() > inMainHand.getType().getMaxDurability()) && !ItemUtils.isItemShattered(inMainHand)) {
+		if (!mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.mLinkedSpell) && ItemUtils.isSomeBow(inMainHand) && !(damageable.getDamage() > inMainHand.getType().getMaxDurability()) && !ItemStatUtils.isShattered(inMainHand)) {
 			World world = mPlayer.getWorld();
 			world.playSound(mPlayer.getLocation(), Sound.ENTITY_ARROW_SHOOT, 1, 1.4f);
 			world.spawnParticle(Particle.CRIT, mPlayer.getEyeLocation().add(mPlayer.getLocation().getDirection()), 15, 0, 0, 0, 0.6f);
@@ -75,8 +76,8 @@ public class Quickdraw extends Ability {
 				//Shatter bow if durability is 0 and isn't shattered.
 				//This is needed because QuickDraw doesn't consume durability, but there is a high-damage uncommon bow
 				//with 0 durability that should not be infinitely usable with the QuickDraw ability
-				if ((damageable.getDamage() >= inMainHand.getType().getMaxDurability()) && !ItemUtils.isItemShattered(inMainHand)) {
-					ItemUtils.shatterItem(inMainHand);
+				if ((damageable.getDamage() >= inMainHand.getType().getMaxDurability()) && !ItemStatUtils.isShattered(inMainHand)) {
+					ItemStatUtils.shatter(inMainHand);
 				}
 			}
 		}
@@ -111,11 +112,9 @@ public class Quickdraw extends Ability {
 	}
 
 	@Override
-	public boolean livingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
-		if (event.getCause().equals(DamageCause.ENTITY_ATTACK)) {
+	public void onDamage(DamageEvent event, LivingEntity enemy) {
+		if (event.getType() == DamageType.MELEE) {
 			cast(Action.LEFT_CLICK_AIR);
 		}
-
-		return true;
 	}
 }

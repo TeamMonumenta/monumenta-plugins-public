@@ -1,7 +1,13 @@
 package com.playmonumenta.plugins.bosses.spells.falsespirit;
 
-import java.util.List;
-
+import com.playmonumenta.plugins.bosses.bosses.FalseSpirit;
+import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.bosses.spells.SpellBaseSeekingProjectile;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.utils.PotionUtils;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -14,13 +20,7 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import com.playmonumenta.plugins.bosses.bosses.FalseSpirit;
-import com.playmonumenta.plugins.bosses.spells.Spell;
-import com.playmonumenta.plugins.bosses.spells.SpellBaseSeekingProjectile;
-import com.playmonumenta.plugins.utils.BossUtils;
-import com.playmonumenta.plugins.utils.FastUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.plugins.utils.PotionUtils;
+import java.util.List;
 
 public class LapseOfReality extends Spell {
 
@@ -43,7 +43,7 @@ public class LapseOfReality extends Spell {
 	private static final double HITBOX_LENGTH = 0.5;
 	private static final boolean COLLIDES_WITH_BLOCKS = false;
 	private static final boolean LINGERS = true;
-	private static final int DAMAGE = 35;
+	private static final int DAMAGE = 30;
 
 	public LapseOfReality(LivingEntity boss, Plugin plugin) {
 		mBoss = boss;
@@ -72,7 +72,7 @@ public class LapseOfReality extends Spell {
 					world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 0.5f, 0.5f);
 					world.spawnParticle(Particle.FIREWORKS_SPARK, loc, 10, 0, 0, 0, 0.25);
 					if (player != null) {
-						BossUtils.bossDamage(boss, player, DAMAGE, mBoss.getLocation(), "Lapse of Reality");
+						BossUtils.blockableDamage(boss, player, DamageType.MAGIC, DAMAGE, "Lapse of Reality", mBoss.getLocation());
 					}
 				});
 	}

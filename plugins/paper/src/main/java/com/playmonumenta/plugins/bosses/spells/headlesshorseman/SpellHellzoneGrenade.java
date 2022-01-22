@@ -1,8 +1,13 @@
 package com.playmonumenta.plugins.bosses.spells.headlesshorseman;
 
-import java.util.Collections;
-import java.util.List;
-
+import com.playmonumenta.plugins.bosses.bosses.HeadlessHorsemanBoss;
+import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.player.PPGroundCircle;
+import com.playmonumenta.plugins.player.PartialParticle;
+import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.LocationUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -15,13 +20,8 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
-import com.playmonumenta.plugins.bosses.bosses.HeadlessHorsemanBoss;
-import com.playmonumenta.plugins.bosses.spells.Spell;
-import com.playmonumenta.plugins.player.PPGroundCircle;
-import com.playmonumenta.plugins.player.PartialParticle;
-import com.playmonumenta.plugins.utils.BossUtils;
-import com.playmonumenta.plugins.utils.LocationUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
+import java.util.Collections;
+import java.util.List;
 
 /*
  * Hellzone Grenade - The horseman fires a pumpkin (Fireball with pumpkin block maybe) that
@@ -124,7 +124,7 @@ public class SpellHellzoneGrenade extends Spell {
 
 						for (Player player : PlayerUtils.playersInRange(loc, 4, true)) {
 							if (mCenter.distance(player.getLocation()) < HeadlessHorsemanBoss.detectionRange) {
-								BossUtils.bossDamage(mBoss, player, 35, loc, "Hellzone Grenades");
+								BossUtils.blockableDamage(mBoss, player, DamageType.MAGIC, 35, "Hellzone Grenades", loc);
 								// Shields don't stop fire!
 								player.setFireTicks(20 * 3);
 							}

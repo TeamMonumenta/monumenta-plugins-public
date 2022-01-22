@@ -1,7 +1,19 @@
 package com.playmonumenta.plugins.depths.abilities.frostborn;
 
-import java.util.ArrayList;
-
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.AbilityTrigger;
+import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.depths.DepthsTree;
+import com.playmonumenta.plugins.depths.DepthsUtils;
+import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
+import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
+import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.utils.DamageUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
+import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -12,23 +24,9 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.AbilityTrigger;
-import com.playmonumenta.plugins.classes.ClassAbility;
-import com.playmonumenta.plugins.classes.magic.MagicType;
-import com.playmonumenta.plugins.depths.DepthsTree;
-import com.playmonumenta.plugins.depths.DepthsUtils;
-import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
-import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.FastUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
-
-import net.md_5.bungee.api.ChatColor;
+import java.util.ArrayList;
 
 public class DepthsFrostNova extends DepthsAbility {
 
@@ -57,7 +55,7 @@ public class DepthsFrostNova extends DepthsAbility {
 			if (mob.getFireTicks() > 1) {
 				mob.setFireTicks(1);
 			}
-			EntityUtils.damageEntity(mPlugin, mob, DAMAGE[mRarity - 1], mPlayer, MagicType.ICE, true, mInfo.mLinkedSpell, true, true, true, false);
+			DamageUtils.damage(mPlayer, mob, DamageType.MAGIC, DAMAGE[mRarity - 1], mInfo.mLinkedSpell, true);
 		}
 
 		// Extinguish fire on all nearby players
@@ -131,12 +129,10 @@ public class DepthsFrostNova extends DepthsAbility {
 	}
 
 	@Override
-	public boolean livingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
-	    if (event.getCause().equals(DamageCause.ENTITY_ATTACK)) {
+	public void onDamage(DamageEvent event, LivingEntity enemy) {
+	    if (event.getType() == DamageType.MELEE) {
 	        cast(Action.LEFT_CLICK_AIR);
 	    }
-
-	    return true;
 	}
 
 	@Override
@@ -146,7 +142,7 @@ public class DepthsFrostNova extends DepthsAbility {
 
 	@Override
 	public String getDescription(int rarity) {
-		return "Left click while sneaking and holding a weapon to unleash a frost nova, dealing " + DepthsUtils.getRarityColor(rarity) + DAMAGE[rarity - 1] + ChatColor.WHITE + " damage to all enemies in a " + SIZE + " block cube around you and afflicting them with " + DepthsUtils.getRarityColor(rarity) + (int) DepthsUtils.roundPercent(SLOW_MULTIPLIER[rarity - 1]) + "%" + ChatColor.WHITE + " slowness for " + DURATION_TICKS / 20 + " seconds. All mobs and players within range are extinguished if they are on fire. Nearby blocks are replaced with ice for " + ICE_TICKS / 20 + " seconds. Cooldown: " + COOLDOWN_TICKS / 20 + "s.";
+		return "Left click while sneaking and holding a weapon to unleash a frost nova, dealing " + DepthsUtils.getRarityColor(rarity) + DAMAGE[rarity - 1] + ChatColor.WHITE + " magic damage to all enemies in a " + SIZE + " block cube around you and afflicting them with " + DepthsUtils.getRarityColor(rarity) + (int) DepthsUtils.roundPercent(SLOW_MULTIPLIER[rarity - 1]) + "%" + ChatColor.WHITE + " slowness for " + DURATION_TICKS / 20 + " seconds. All mobs and players within range are extinguished if they are on fire. Nearby blocks are replaced with ice for " + ICE_TICKS / 20 + " seconds. Cooldown: " + COOLDOWN_TICKS / 20 + "s.";
 	}
 
 	@Override

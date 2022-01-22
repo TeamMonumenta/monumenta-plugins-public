@@ -1,7 +1,9 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
-import java.util.Arrays;
-
+import com.playmonumenta.plugins.bosses.SpellManager;
+import com.playmonumenta.plugins.bosses.spells.SpellBaseLaser;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.utils.BossUtils;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -10,9 +12,7 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
-import com.playmonumenta.plugins.bosses.SpellManager;
-import com.playmonumenta.plugins.bosses.spells.SpellBaseLaser;
-import com.playmonumenta.plugins.utils.BossUtils;
+import java.util.Arrays;
 
 public class ArcaneLaserBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_arcanelaser";
@@ -55,7 +55,7 @@ public class ArcaneLaserBoss extends BossAbilityGroup {
 						loc.getWorld().playSound(loc, Sound.ENTITY_DRAGON_FIREBALL_EXPLODE, 0.6f, 1.5f);
 						loc.getWorld().spawnParticle(Particle.EXPLOSION_NORMAL, loc, 35, 0, 0, 0, 0.25);
 						if (!blocked) {
-							BossUtils.bossDamage(boss, target, 18);
+							BossUtils.blockableDamage(boss, target, DamageType.MAGIC, 18);
 							target.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, p.SLOW_DURATION, p.SLOW_LEVEL));
 						}
 					})

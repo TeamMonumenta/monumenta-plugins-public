@@ -1,12 +1,11 @@
 package com.playmonumenta.plugins.bosses.spells;
 
+import com.playmonumenta.plugins.utils.FastUtils;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
-
-import com.playmonumenta.plugins.utils.FastUtils;
 
 public class SpellDreadnaughtParticle extends Spell {
 

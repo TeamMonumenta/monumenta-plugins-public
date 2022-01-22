@@ -2,17 +2,21 @@ package com.playmonumenta.plugins.abilities.alchemist;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.EnumSet;
-import java.util.HashSet;
 import java.util.List;
+import java.util.logging.Level;
 
+import org.bukkit.Color;
 import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.Sound;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.ThrownPotion;
 import org.bukkit.event.entity.PotionSplashEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
+import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -21,18 +25,18 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.abilities.AbilityWithChargesOrStacks;
-import com.playmonumenta.plugins.abilities.alchemist.apothecary.AlchemicalAmalgam;
-import com.playmonumenta.plugins.abilities.alchemist.apothecary.InvigoratingOdor;
+import com.playmonumenta.plugins.abilities.alchemist.apothecary.Panacea;
+import com.playmonumenta.plugins.abilities.alchemist.apothecary.TransmutationRing;
 import com.playmonumenta.plugins.abilities.alchemist.apothecary.WardingRemedy;
-import com.playmonumenta.plugins.abilities.alchemist.harbinger.NightmarishAlchemy;
-import com.playmonumenta.plugins.abilities.alchemist.harbinger.PurpleHaze;
+import com.playmonumenta.plugins.abilities.alchemist.harbinger.EsotericEnhancements;
 import com.playmonumenta.plugins.abilities.alchemist.harbinger.ScorchedEarth;
+import com.playmonumenta.plugins.abilities.alchemist.harbinger.Taboo;
 import com.playmonumenta.plugins.classes.ClassAbility;
-import com.playmonumenta.plugins.classes.magic.MagicType;
-import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
-import com.playmonumenta.plugins.enchantments.abilities.BaseAbilityEnchantment;
+import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.network.ClientModHandler;
-import com.playmonumenta.plugins.utils.AbilityUtils;
+import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
@@ -43,34 +47,30 @@ import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
 
+import net.md_5.bungee.api.ChatColor;
+
 /*
- * Handles giving potions on kills and the direct damage aspect
+ * Handles giving potions and the direct damage aspect
  */
 public class AlchemistPotions extends Ability implements AbilityWithChargesOrStacks {
 
-	public static class AlchemistPotionsDamageEnchantment extends BaseAbilityEnchantment {
-		public AlchemistPotionsDamageEnchantment() {
-			super("Alchemist Potion Damage", EnumSet.of(ItemSlot.ARMOR));
-		}
-	}
-
-	private static final int MAX_CHARGE_POTIONS = 6;
+	private static final int MAX_CHARGES = 8;
 	private static final int POTIONS_TIMER_BASE = 2 * 20;
-	private static final int POTION_TIMER_HARB = (int) (1.5 * 20);
 	private static final int POTIONS_TIMER_TOWN = 1 * 20;
 
 	private static final double DAMAGE_PER_SKILL_POINT = 0.5;
 	private static final double DAMAGE_PER_SPEC_POINT = 1;
 	private static final String POTION_SCOREBOARD = "StoredPotions";
 
-	public static final String POTION_METADATA_PLAYER_NAME = "HitByAlchemist";
-
 	private List<PotionAbility> mPotionAbilities = new ArrayList<PotionAbility>();
 	private double mDamage = 0;
 	private int mTimer = 0;
-	private int mSlot = 0;
+	private int mSlot;
+	private int mMaxCharges;
 	private int mCharges;
 	private int mChargeTime;
+
+	private boolean mGruesomeMode;
 
 	private static @Nullable ItemStack POTION = null;
 
@@ -91,54 +91,75 @@ public class AlchemistPotions extends Ability implements AbilityWithChargesOrSta
 		 */
 		mCharges = ScoreboardUtils.getScoreboardValue(player, POTION_SCOREBOARD).orElse(0);
 		mChargeTime = POTIONS_TIMER_BASE;
+		mMaxCharges = MAX_CHARGES;
+
+		// Scan hotbar for alch potion
+		PlayerInventory inv = player.getInventory();
+		mSlot = 0;
+		for (int i = 0; i < 9; i++) {
+			if (ItemUtils.isAlchemistItem(inv.getItem(i))) {
+				mSlot = i;
+				break;
+			}
+		}
+
 		new BukkitRunnable() {
 			@Override
 			public void run() {
 				Ability[] classAbilities = new Ability[8];
-				Ability[] specializationAbilities = new Ability[6];
+				Ability[] specAbilities = new Ability[6];
 				classAbilities[0] = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, GruesomeAlchemy.class);
 				classAbilities[1] = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, BrutalAlchemy.class);
+				classAbilities[3] = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, EmpoweringOdor.class);
 				classAbilities[2] = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, IronTincture.class);
-				classAbilities[3] = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, BasiliskPoison.class);
-				classAbilities[4] = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, PowerInjection.class);
-				classAbilities[5] = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, UnstableArrows.class);
-				classAbilities[6] = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, EnfeeblingElixir.class);
+				classAbilities[4] = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, AlchemicalArtillery.class);
+				classAbilities[5] = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, UnstableAmalgam.class);
+				classAbilities[6] = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, EnergizingElixir.class);
 				classAbilities[7] = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, Bezoar.class);
-				specializationAbilities[0] = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, PurpleHaze.class);
-				specializationAbilities[1] = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, NightmarishAlchemy.class);
-				specializationAbilities[2] = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, ScorchedEarth.class);
-				specializationAbilities[3] = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, WardingRemedy.class);
-				specializationAbilities[4] = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, InvigoratingOdor.class);
-				specializationAbilities[5] = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, AlchemicalAmalgam.class);
+				specAbilities[0] = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, Taboo.class);
+				specAbilities[1] = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, EsotericEnhancements.class);
+				specAbilities[2] = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, ScorchedEarth.class);
+				specAbilities[3] = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, WardingRemedy.class);
+				specAbilities[4] = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, TransmutationRing.class);
+				specAbilities[5] = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, Panacea.class);
 
 				for (Ability classAbility : classAbilities) {
 					if (classAbility != null) {
-						mDamage += DAMAGE_PER_SKILL_POINT * classAbility.getAbilityScore();
+						int abilityScore = classAbility.getAbilityScore();
+						mDamage += DAMAGE_PER_SKILL_POINT * abilityScore;
 
 						if (classAbility instanceof PotionAbility potionAbility) {
 							mPotionAbilities.add(potionAbility);
 							mDamage += potionAbility.getDamage();
 						}
+
+						if (classAbility instanceof EmpoweringOdor && abilityScore > 1) {
+							mChargeTime -= EmpoweringOdor.POTION_RECHARGE_TIME_REDUCTION_2;
+						}
 					}
 				}
 
-				for (Ability specializationAbility : specializationAbilities) {
-					if (specializationAbility != null) {
-						mDamage += DAMAGE_PER_SPEC_POINT * specializationAbility.getAbilityScore();
+				for (Ability specAbility : specAbilities) {
+					if (specAbility != null) {
+						int abilityScore = specAbility.getAbilityScore();
+						mDamage += DAMAGE_PER_SPEC_POINT * abilityScore;
 
-						if (specializationAbility instanceof PotionAbility potionAbility) {
+						if (specAbility instanceof PotionAbility potionAbility) {
 							mPotionAbilities.add(potionAbility);
 							mDamage += potionAbility.getDamage();
 						}
 
-						if (specializationAbility instanceof NightmarishAlchemy) {
-							mChargeTime = POTION_TIMER_HARB;
+						if (specAbility instanceof EsotericEnhancements && abilityScore > 1) {
+							mMaxCharges += EsotericEnhancements.POTION_CAP_INCREASE_2;
 						}
 					}
 				}
 
 			}
 		}.runTaskLater(mPlugin, 5);
+
+		// Always switch back to the default mode when refreshing class
+		mGruesomeMode = false;
 	}
 
 	@Override
@@ -149,17 +170,8 @@ public class AlchemistPotions extends Ability implements AbilityWithChargesOrSta
 	@Override
 	public boolean playerThrewSplashPotionEvent(ThrownPotion potion) {
 		if (mPlayer != null && ItemUtils.isAlchemistItem(mPlayer.getInventory().getItemInMainHand()) && ItemUtils.isAlchemistItem(potion.getItem())) {
-			if (consumeCharge()) {
-				potion.setMetadata("AlchemistPotion", new FixedMetadataValue(mPlugin, 0));
-
-				if (POTION == null) {
-					POTION = InventoryUtils.getItemFromLootTable(mPlayer, NamespacedKeyUtils.fromString("epic:r1/items/alchemists_potion"));
-				}
-				if (POTION != null) {
-					potion.setItem(POTION);
-				} else {
-					mPlugin.getLogger().severe("Failed to get alchemist's potion from loot table!");
-				}
+			if (decrementCharge()) {
+				setPotionToAlchemistPotion(potion);
 			} else {
 				potion.remove();
 			}
@@ -168,15 +180,50 @@ public class AlchemistPotions extends Ability implements AbilityWithChargesOrSta
 		return true;
 	}
 
+	public void setPotionToAlchemistPotion(ThrownPotion potion) {
+		if (mPlayer == null) {
+			return;
+		}
+
+		potion.setMetadata("AlchemistPotion", new FixedMetadataValue(mPlugin, new ItemStatManager.PlayerItemStats(mPlugin.mItemStatManager.getPlayerItemStats(mPlayer))));
+		if (mGruesomeMode) {
+			potion.setMetadata("GruesomeAlchemistPotion", new FixedMetadataValue(mPlugin, 0));
+		}
+
+		if (POTION == null) {
+			POTION = InventoryUtils.getItemFromLootTable(mPlayer, NamespacedKeyUtils.fromString("epic:r1/items/alchemists_potion"));
+		}
+
+		if (POTION != null) {
+			potion.setItem(POTION);
+		} else {
+			mPlugin.getLogger().severe("Failed to get alchemist's potion from loot table!");
+		}
+	}
+
 	@Override
 	public boolean playerSplashPotionEvent(Collection<LivingEntity> affectedEntities, ThrownPotion potion, PotionSplashEvent event) {
 		if (potion.hasMetadata("AlchemistPotion")) {
 			createAura(potion.getLocation());
 
+			if (potion.hasMetadata(TransmutationRing.TRANSMUTATION_POTION_TAG)) {
+				for (PotionAbility potionAbility : mPotionAbilities) {
+					if (potionAbility instanceof TransmutationRing transmutationRing) {
+						transmutationRing.applyTransmutationPotion(affectedEntities);
+						return true;
+					}
+				}
+			}
+
 			if (affectedEntities != null && !affectedEntities.isEmpty()) {
+				boolean isGruesome = isGruesome(potion);
 				for (LivingEntity entity : affectedEntities) {
 					if (EntityUtils.isHostileMob(entity)) {
-						apply(entity);
+						apply(entity, potion, isGruesome);
+					}
+
+					if (entity instanceof Player player && player != mPlayer) {
+						applyToPlayer(player, potion, isGruesome);
 					}
 				}
 			}
@@ -197,41 +244,48 @@ public class AlchemistPotions extends Ability implements AbilityWithChargesOrSta
 		}
 	}
 
-	public void apply(LivingEntity mob) {
+	public void apply(LivingEntity mob, ThrownPotion potion, boolean isGruesome) {
 		if (mPlayer != null && MetadataUtils.checkOnceThisTick(mPlugin, mob, "AlchemistPotionApplying")) {
-			if (!mob.hasMetadata(POTION_METADATA_PLAYER_NAME)) {
-				mob.setMetadata(POTION_METADATA_PLAYER_NAME, new FixedMetadataValue(mPlugin, new HashSet<String>()));
+			double damage = mDamage;
+
+			if (isGruesome) {
+				damage *= GruesomeAlchemy.GRUESOME_POTION_DAMAGE_MULTIPLIER;
 			}
 
-			Object obj = mob.getMetadata(POTION_METADATA_PLAYER_NAME).get(0).value();
-			if (obj instanceof HashSet) {
-				((HashSet<String>) obj).add(mPlayer.getName());
+			if (potion.hasMetadata(AlchemicalArtillery.ARTILLERY_POTION_TAG)) {
+				damage += potion.getMetadata(AlchemicalArtillery.ARTILLERY_POTION_TAG).get(0).asDouble();
 			}
 
-			// Apply effects first so stuff like Vulnerability properly stacks
-			for (PotionAbility potionAbility : mPotionAbilities) {
-				potionAbility.apply(mob);
+			if (potion.hasMetadata("AlchemistPotion") && potion.getMetadata("AlchemistPotion").get(0) instanceof FixedMetadataValue playerItemStats) {
+				DamageEvent damageEvent = new DamageEvent(mob, mPlayer, mPlayer, DamageType.MAGIC, mInfo.mLinkedSpell, damage);
+				damageEvent.setDelayed(true);
+				damageEvent.setPlayerItemStat(playerItemStats);
+				DamageUtils.damage(damageEvent, false, true, null);
+
+				// Intentionally apply effects after damage
+				applyEffects(mob, potion, isGruesome);
+			} else {
+				mPlugin.getLogger().log(Level.WARNING, "Failed to retrieve PlayerItemStats in AlchemistPotion: " + mPlayer.getName());
 			}
-			double damage = getDamage();
-			EntityUtils.damageEntity(mPlugin, mob, damage, mPlayer, MagicType.ALCHEMY, true, mInfo.mLinkedSpell);
 		}
 	}
 
-	public void applyEffects(LivingEntity mob) {
+	public void applyToPlayer(Player player, ThrownPotion potion, boolean isGruesome) {
+		if (mPlayer != null && MetadataUtils.checkOnceThisTick(mPlugin, player, "AlchemistPotionApplying")) {
+			for (PotionAbility potionAbility : mPotionAbilities) {
+				potionAbility.applyToPlayer(player, potion, isGruesome);
+			}
+		}
+	}
+
+	public void applyEffects(LivingEntity mob, ThrownPotion potion, boolean isGruesome) {
 		//Apply potions effects but no damage
 		for (PotionAbility potionAbility : mPotionAbilities) {
-			potionAbility.apply(mob);
+			potionAbility.apply(mob, potion, isGruesome);
 		}
 	}
 
-	public double getDamage() {
-		if (mPlayer == null) {
-			return 0;
-		}
-		return mDamage + AlchemistPotionsDamageEnchantment.getExtraDamage(mPlayer, AlchemistPotionsDamageEnchantment.class);
-	}
-
-	public boolean consumeCharge() {
+	public boolean decrementCharge() {
 		if (mPlayer != null && mCharges > 0) {
 			mCharges--;
 			ScoreboardUtils.setScoreboardValue(mPlayer, POTION_SCOREBOARD, mCharges);
@@ -239,8 +293,16 @@ public class AlchemistPotions extends Ability implements AbilityWithChargesOrSta
 
 			PlayerUtils.callAbilityCastEvent(mPlayer, mInfo.mLinkedSpell);
 
-			AbilityUtils.updateAlchemistItem(inventory.getItemInMainHand(), mCharges);
-			mSlot = inventory.getHeldItemSlot();
+			if (ItemUtils.isAlchemistItem(inventory.getItemInMainHand())) {
+				updateAlchemistItem(inventory.getItemInMainHand(), mCharges);
+				mSlot = inventory.getHeldItemSlot();
+			} else if (ItemUtils.isAlchemistItem(inventory.getItem(mSlot))) {
+				updateAlchemistItem(inventory.getItem(mSlot), mCharges);
+			} else {
+				// Cannot find alch bag
+				return false;
+			}
+
 
 			ClientModHandler.updateAbility(mPlayer, this);
 
@@ -250,13 +312,13 @@ public class AlchemistPotions extends Ability implements AbilityWithChargesOrSta
 	}
 
 	public boolean incrementCharge() {
-		if (mPlayer != null && mCharges < MAX_CHARGE_POTIONS) {
+		if (mPlayer != null && mCharges < mMaxCharges) {
 			mCharges++;
 			ScoreboardUtils.setScoreboardValue(mPlayer, POTION_SCOREBOARD, mCharges);
 			//update item
 			ItemStack item = mPlayer.getInventory().getItem(mSlot);
 			if (item != null) {
-				AbilityUtils.updateAlchemistItem(item, mCharges);
+				updateAlchemistItem(item, mCharges);
 			}
 			ClientModHandler.updateAbility(mPlayer, this);
 			return true;
@@ -280,17 +342,17 @@ public class AlchemistPotions extends Ability implements AbilityWithChargesOrSta
 				}
 			}
 
-			if (mCharges < MAX_CHARGE_POTIONS) {
+			if (mCharges < mMaxCharges) {
 				mOnCooldown = true;
 			}
 
-			if (mCharges > MAX_CHARGE_POTIONS) {
-				mCharges = MAX_CHARGE_POTIONS;
+			if (mCharges > mMaxCharges) {
+				mCharges = mMaxCharges;
 				ScoreboardUtils.setScoreboardValue(mPlayer, POTION_SCOREBOARD, mCharges);
 				//update item
 
 				if (item != null) {
-					AbilityUtils.updateAlchemistItem(item, mCharges);
+					updateAlchemistItem(item, mCharges);
 				}
 				ClientModHandler.updateAbility(mPlayer, this);
 			}
@@ -301,6 +363,46 @@ public class AlchemistPotions extends Ability implements AbilityWithChargesOrSta
 		}
 	}
 
+	public void swapMode() {
+		if (mPlayer == null) {
+			return;
+		}
+
+		mGruesomeMode = !mGruesomeMode;
+		String mode = "";
+		if (mGruesomeMode) {
+			mode = "Gruesome";
+			mPlayer.playSound(mPlayer.getLocation(), Sound.BLOCK_CHEST_CLOSE, 1, 1.25f);
+		} else {
+			mode = "Brutal";
+			mPlayer.playSound(mPlayer.getLocation(), Sound.BLOCK_CHEST_CLOSE, 1, 0.75f);
+		}
+
+		mPlayer.sendActionBar(ChatColor.YELLOW + "Alchemist's Potions swapped to " + mode + " mode");
+		mPlayer.playSound(mPlayer.getLocation(), Sound.BLOCK_BREWING_STAND_BREW, 0.9f, 1);
+		updateAlchemistItem(mPlayer.getInventory().getItem(mSlot), mCharges);
+	}
+
+	public boolean isGruesomeMode() {
+		return mGruesomeMode;
+	}
+
+	private boolean isGruesome(ThrownPotion potion) {
+		return potion.hasMetadata("GruesomeAlchemistPotion");
+	}
+
+	public void increaseChargeTime(int ticks) {
+		mChargeTime += ticks;
+	}
+
+	public void reduceChargeTime(int ticks) {
+		mChargeTime -= ticks;
+	}
+
+	public double getDamage() {
+		return mDamage;
+	}
+
 	@Override
 	public int getCharges() {
 		return mCharges;
@@ -308,7 +410,34 @@ public class AlchemistPotions extends Ability implements AbilityWithChargesOrSta
 
 	@Override
 	public int getMaxCharges() {
-		return MAX_CHARGE_POTIONS;
+		return mMaxCharges;
 	}
 
+	private boolean updateAlchemistItem(@Nullable ItemStack item, int count) {
+		if (item == null) {
+			return false;
+		}
+
+		ItemMeta meta = item.getItemMeta();
+
+		if (item.getType() == Material.SPLASH_POTION && meta instanceof PotionMeta potionMeta) {
+			double ratio = ((double) count) / mMaxCharges;
+			int color = (int) (ratio * 255);
+			if (mGruesomeMode) {
+				potionMeta.setColor(Color.fromRGB(color, 0, 0));
+			} else {
+				potionMeta.setColor(Color.fromRGB(0, color, 0));
+			}
+			item.setItemMeta(potionMeta);
+		}
+
+		if (meta.hasDisplayName() && meta.getDisplayName().contains("Alchemist's Bag")) {
+			meta.setDisplayName(ChatColor.DARK_GREEN + "" + ChatColor.BOLD + "Alchemist's Bag (" + count + ")");
+			item.setItemMeta(meta);
+			ItemUtils.setPlainTag(item);
+			return true;
+		}
+
+		return false;
+	}
 }

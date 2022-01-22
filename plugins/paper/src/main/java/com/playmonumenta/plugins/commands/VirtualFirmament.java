@@ -1,11 +1,9 @@
 package com.playmonumenta.plugins.commands;
 
+import com.playmonumenta.plugins.utils.ScoreboardUtils;
+import dev.jorel.commandapi.CommandAPICommand;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
-
-import com.playmonumenta.plugins.utils.ScoreboardUtils;
-
-import dev.jorel.commandapi.CommandAPICommand;
 
 public class VirtualFirmament {
 

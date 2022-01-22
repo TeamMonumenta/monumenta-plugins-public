@@ -14,7 +14,8 @@ import org.bukkit.plugin.Plugin;
 import com.playmonumenta.plugins.bosses.parameters.BossParam;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.bosses.spells.SpellBaseTrail;
-import com.playmonumenta.plugins.utils.NmsUtils;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.utils.DamageUtils;
 
 public final class FlameTrailBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_flametrail";
@@ -27,7 +28,7 @@ public final class FlameTrailBoss extends BossAbilityGroup {
 		public int DAMAGE = 10;
 
 		@BossParam(help = "not written")
-		public int TICK_RATE = 5;
+		public int TICK_RATE = 20;
 
 		@BossParam(help = "not written")
 		public int DETECTION = 24;
@@ -71,7 +72,7 @@ public final class FlameTrailBoss extends BossAbilityGroup {
 					(World world, Player player, Location loc) -> {
 						world.playSound(loc, Sound.ENTITY_GENERIC_BURN, 0.5f, 1f);
 						player.setFireTicks(p.FIRE_DURATION);
-						NmsUtils.unblockableEntityDamageEntity(player, p.DAMAGE, boss);
+						DamageUtils.dualTypeDamage(boss, player, DamageType.MAGIC, DamageType.FIRE, p.DAMAGE, 0.5);
 					},
 					// Expire Action
 					(World world, Location loc) -> { })

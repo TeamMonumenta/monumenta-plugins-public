@@ -1,9 +1,9 @@
 package com.playmonumenta.plugins.utils;
 
+import org.bukkit.attribute.Attribute;
+
 import java.text.DecimalFormat;
 import java.util.TreeMap;
-
-import org.bukkit.attribute.Attribute;
 
 public class StringUtils {
 

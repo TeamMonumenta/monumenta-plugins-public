@@ -1,8 +1,15 @@
 package com.playmonumenta.plugins.bosses.spells.frostgiant;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import com.destroystokyo.paper.entity.Pathfinder;
+import com.playmonumenta.plugins.bosses.bosses.FrostGiant;
+import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
+import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.DamageUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.MovementUtils;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -20,14 +27,8 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 
-import com.destroystokyo.paper.entity.Pathfinder;
-import com.playmonumenta.plugins.bosses.bosses.FrostGiant;
-import com.playmonumenta.plugins.bosses.spells.Spell;
-import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
-import com.playmonumenta.plugins.utils.BossUtils;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.FastUtils;
-import com.playmonumenta.plugins.utils.MovementUtils;
+import java.util.ArrayList;
+import java.util.List;
 
 public class SpellAirGolemStrike extends Spell {
 
@@ -140,7 +141,7 @@ public class SpellAirGolemStrike extends Spell {
 					BoundingBox box = BoundingBox.of(loc, 1, 20, 1);
 					for (Player player : players) {
 						if (box.overlaps(player.getBoundingBox())) {
-							BossUtils.bossDamage(mBoss, player, 45, mBoss.getLocation(), "Air Golem Strike");
+							BossUtils.blockableDamage(mBoss, player, DamageType.MELEE, 45, "Air Golem Strike", mBoss.getLocation());
 						}
 					}
 					Location particleLoc = loc.clone();
@@ -214,8 +215,8 @@ public class SpellAirGolemStrike extends Spell {
 							}
 
 						}.runTaskLater(mPlugin, 30);
-						if (target instanceof Player) {
-							BossUtils.bossDamage(golem, (Player) target, mAttackDamage, mBoss.getLocation(), "Air Golem Strike");
+						if (target instanceof Player player) {
+							DamageUtils.damage(golem, player, DamageType.MELEE, mAttackDamage, null, false, true, "Air Golem Strike");
 						} else {
 							target.damage(mAttackDamage, golem);
 						}

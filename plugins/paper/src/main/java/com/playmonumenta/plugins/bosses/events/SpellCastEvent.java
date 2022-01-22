@@ -1,10 +1,9 @@
 package com.playmonumenta.plugins.bosses.events;
 
+import com.playmonumenta.plugins.bosses.spells.Spell;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
-
-import com.playmonumenta.plugins.bosses.spells.Spell;
 
 public class SpellCastEvent extends Event {
 

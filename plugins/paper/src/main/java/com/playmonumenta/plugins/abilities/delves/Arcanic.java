@@ -1,13 +1,5 @@
 package com.playmonumenta.plugins.abilities.delves;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
-import org.bukkit.event.entity.SpawnerSpawnEvent;
-import org.checkerframework.checker.nullness.qual.Nullable;
-
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.bosses.bosses.ChargerBoss;
 import com.playmonumenta.plugins.bosses.bosses.ProjectileBoss;
@@ -16,6 +8,13 @@ import com.playmonumenta.plugins.bosses.bosses.TpBehindBoss;
 import com.playmonumenta.plugins.utils.DelvesUtils;
 import com.playmonumenta.plugins.utils.DelvesUtils.Modifier;
 import com.playmonumenta.plugins.utils.FastUtils;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
+import org.bukkit.event.entity.SpawnerSpawnEvent;
+import org.checkerframework.checker.nullness.qual.Nullable;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class Arcanic extends DelveModifier {
 
@@ -57,7 +56,7 @@ public class Arcanic extends DelveModifier {
 		//ChargerStrongBoss
 		List<String> charger = new ArrayList<>();
 		charger.add(ChargerBoss.identityTag);
-		charger.add(ChargerBoss.identityTag + "[damage=37.5]");
+		charger.add(ChargerBoss.identityTag + "[damage=30]");
 		ABILITY_POOL.add(charger);
 
 		//ProjectileBoss - magic arrow

@@ -1,20 +1,18 @@
 package com.playmonumenta.plugins.commands;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.Player;
-
 import com.playmonumenta.plugins.listeners.DelvesListener;
 import com.playmonumenta.plugins.utils.DelvesUtils.DelveModifierSelectionGUI;
-
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.CommandPermission;
 import dev.jorel.commandapi.arguments.Argument;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument.EntitySelector;
 import dev.jorel.commandapi.arguments.StringArgument;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.Player;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class OpenDelveModifierSelectionGUI extends GenericCommand {
 

@@ -1,5 +1,11 @@
 package com.playmonumenta.plugins.inventories;
 
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.utils.ItemStatUtils;
+import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
+import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.ScoreboardUtils;
+import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -13,13 +19,6 @@ import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
-
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.utils.ItemUtils;
-import com.playmonumenta.plugins.utils.ScoreboardUtils;
-import com.playmonumenta.scriptedquests.utils.InventoryUtils;
-
-import net.md_5.bungee.api.ChatColor;
 
 public class AnvilFixInInventory implements Listener {
 	private static final String REPAIR_OBJECTIVE = "RepairT";
@@ -49,9 +48,7 @@ public class AnvilFixInInventory implements Listener {
 
 		Player player = (Player)event.getWhoClicked();
 		if ((item != null && item.getDurability() > 0 && !item.getType().isBlock()
-		    && (!item.hasItemMeta() || !item.getItemMeta().hasLore()
-		        || (!InventoryUtils.testForItemWithLore(item, "* Irreparable *")
-		            && !InventoryUtils.testForItemWithLore(item, "Curse of Irreparability"))))) {
+		    && item.hasItemMeta() && ItemStatUtils.getEnchantmentLevel(item, EnchantmentType.CURSE_OF_IRREPARIBILITY) == 0)) {
 			item.setDurability((short) 0);
 			anvil.subtract();
 			World world = player.getWorld();

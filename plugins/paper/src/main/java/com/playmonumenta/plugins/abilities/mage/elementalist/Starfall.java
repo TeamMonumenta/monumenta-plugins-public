@@ -3,12 +3,14 @@ package com.playmonumenta.plugins.abilities.mage.elementalist;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.classes.ClassAbility;
-import com.playmonumenta.plugins.classes.magic.MagicType;
-import com.playmonumenta.plugins.enchantments.abilities.SpellPower;
+import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.itemstats.ItemStatManager;
+import com.playmonumenta.plugins.itemstats.attributes.SpellPower;
+import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
-
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -18,6 +20,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -27,8 +30,8 @@ public class Starfall extends Ability {
 	public static final String NAME = "Starfall";
 	public static final ClassAbility ABILITY = ClassAbility.STARFALL;
 
-	public static final int DAMAGE_1 = 15;
-	public static final int DAMAGE_2 = 27;
+	public static final int DAMAGE_1 = 13;
+	public static final int DAMAGE_2 = 23;
 	public static final int SIZE = 5;
 	public static final int DISTANCE = 25;
 	public static final int FIRE_SECONDS = 3;
@@ -47,7 +50,7 @@ public class Starfall extends Ability {
 		mInfo.mShorthandName = "SF";
 		mInfo.mDescriptions.add(
 			String.format(
-				"While holding a wand, pressing the swap key marks where you're looking, up to %s blocks away. You summon a falling meteor above the mark that lands strongly, dealing %s fire damage to all enemies in a %s-block cube around it, setting them on fire for %ss, and knocking them away. Swapping hands while holding a wand no longer does its vanilla function. Cooldown: %ss.",
+				"While holding a wand, pressing the swap key marks where you're looking, up to %s blocks away. You summon a falling meteor above the mark that lands strongly, dealing %s magic damage to all enemies in a %s-block cube around it, setting them on fire for %ss, and knocking them away. Cooldown: %ss.",
 				DISTANCE,
 				DAMAGE_1,
 				SIZE,
@@ -86,6 +89,10 @@ public class Starfall extends Ability {
 
 				Location loc = mPlayer.getEyeLocation();
 				World world = mPlayer.getWorld();
+
+				FixedMetadataValue playerItemStats = new FixedMetadataValue(mPlugin, new ItemStatManager.PlayerItemStats(mPlugin.mItemStatManager.getPlayerItemStats(mPlayer)));
+				float damage = SpellPower.getSpellDamage(mPlugin, mPlayer, mLevelDamage);
+
 				world.playSound(mPlayer.getLocation(), Sound.ENTITY_BLAZE_SHOOT, 1, 0.85f);
 				world.spawnParticle(Particle.LAVA, mPlayer.getLocation(), 15, 0.25f, 0.1f, 0.25f);
 				world.spawnParticle(Particle.FLAME, mPlayer.getLocation(), 30, 0.25f, 0.1f, 0.25f, 0.15f);
@@ -96,7 +103,7 @@ public class Starfall extends Ability {
 					mPlayer.spawnParticle(Particle.FLAME, loc, 1, 0, 0, 0, 0);
 					int size = EntityUtils.getNearbyMobs(loc, 2, mPlayer).size();
 					if (!loc.isChunkLoaded() || loc.getBlock().getType().isSolid() || i >= 24 || size > 0) {
-						launchMeteor(mPlayer, loc);
+						launchMeteor(loc, playerItemStats, damage);
 						break;
 					}
 				}
@@ -104,9 +111,10 @@ public class Starfall extends Ability {
 		}
 	}
 
-	private void launchMeteor(final Player player, final Location loc) {
+	private void launchMeteor(final Location loc, final FixedMetadataValue playerItemStats, final float damage) {
 		Location ogLoc = loc.clone();
 		loc.add(0, 40, 0);
+
 		new BukkitRunnable() {
 			double mT = 0;
 			@Override
@@ -123,12 +131,13 @@ public class Starfall extends Ability {
 							world.spawnParticle(Particle.EXPLOSION_NORMAL, loc, 50, 0, 0, 0, 0.2F);
 							this.cancel();
 
-							float damage = SpellPower.getSpellDamage(mPlayer, mLevelDamage);
-
 							for (LivingEntity e : EntityUtils.getNearbyMobs(loc, SIZE, mPlayer)) {
 								EntityUtils.applyFire(mPlugin, FIRE_TICKS, e, mPlayer);
-								EntityUtils.damageEntity(mPlugin, e, damage, player, MagicType.FIRE, true, mInfo.mLinkedSpell);
-								MovementUtils.knockAway(loc, e, KNOCKBACK);
+								DamageEvent damageEvent = new DamageEvent(e, mPlayer, mPlayer, DamageType.MAGIC, mInfo.mLinkedSpell, damage);
+								damageEvent.setDelayed(true);
+								damageEvent.setPlayerItemStat(playerItemStats);
+								DamageUtils.damage(damageEvent, false, true, null);
+								MovementUtils.knockAway(loc, e, KNOCKBACK, true);
 							}
 							break;
 						}

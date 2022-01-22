@@ -1,12 +1,11 @@
 package com.playmonumenta.plugins.bosses.spells.lich.undeadplayers;
 
-import org.bukkit.Location;
-import org.bukkit.Particle;
-import org.bukkit.entity.LivingEntity;
-
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.player.PartialParticle;
 import com.playmonumenta.plugins.utils.FastUtils;
+import org.bukkit.Location;
+import org.bukkit.Particle;
+import org.bukkit.entity.LivingEntity;
 
 public class SpellCrystalParticle extends Spell {
 

@@ -1,11 +1,23 @@
 package com.playmonumenta.plugins.overrides;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.abilities.AbilityCollection;
+import com.playmonumenta.plugins.abilities.AbilityManager;
+import com.playmonumenta.plugins.utils.AbilityUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.utils.ItemStatUtils;
+import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.MessagingUtils;
+import com.playmonumenta.plugins.utils.ScoreboardUtils;
+import com.playmonumenta.plugins.utils.ZoneUtils;
+import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
+import de.tr7zw.nbtapi.NBTItem;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -19,23 +31,9 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.abilities.AbilityCollection;
-import com.playmonumenta.plugins.abilities.AbilityManager;
-import com.playmonumenta.plugins.utils.AbilityUtils;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.InventoryUtils;
-import com.playmonumenta.plugins.utils.ItemUtils;
-import com.playmonumenta.plugins.utils.MessagingUtils;
-import com.playmonumenta.plugins.utils.ScoreboardUtils;
-import com.playmonumenta.plugins.utils.ZoneUtils;
-import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
-
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.TextComponent;
-import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.format.TextDecoration;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class YellowTesseractOverride extends BaseOverride {
 	private static final TextComponent TESSERACT_NAME = Component.text("Tesseract of the Elements", NamedTextColor.YELLOW, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false);
@@ -142,11 +140,9 @@ public class YellowTesseractOverride extends BaseOverride {
 
 	private void resetTesseract(Player player, ItemStack item) {
 		ItemMeta meta = item.getItemMeta();
-		List<Component> lore = meta.lore();
 
-		clearTesseractLore(lore);
+		clearTesseractLore(item);
 
-		meta.lore(lore);
 		meta.displayName(TESSERACT_NAME);
 		item.setItemMeta(meta);
 		ItemUtils.setPlainTag(item);
@@ -269,64 +265,64 @@ public class YellowTesseractOverride extends BaseOverride {
 	}
 
 	private void storeSkills(Player player, ItemStack item) {
-		ItemMeta meta = item.getItemMeta();
-		List<Component> lore = meta.lore();
-		if (lore == null) {
-			lore = new ArrayList<>();
-		}
 		Integer classLevel = ScoreboardUtils.getScoreboardValue(player, LEVEL).orElse(0);
 		Integer totalLevel = ScoreboardUtils.getScoreboardValue(player, TOTAL_LEVEL).orElse(0);
 		Integer specLevel = ScoreboardUtils.getScoreboardValue(player, SPEC_LEVEL).orElse(0);
 		Integer totalSpec = ScoreboardUtils.getScoreboardValue(player, TOTAL_SPEC).orElse(0);
 
 		if (InventoryUtils.testForItemWithLore(item, CLASS_STR)) {
-			clearTesseractLore(lore);
+			clearTesseractLore(item);
 		}
 
-		lore.add(Component.text(CLASS_STR + AbilityUtils.getClass(player), NamedTextColor.YELLOW).decoration(TextDecoration.ITALIC, false));
-		lore.add(Component.text(CLASSL_STR + (totalLevel - classLevel), NamedTextColor.YELLOW).decoration(TextDecoration.ITALIC, false));
-		lore.add(Component.text(SPEC_STR + AbilityUtils.getSpec(player), NamedTextColor.YELLOW).decoration(TextDecoration.ITALIC, false));
-		lore.add(Component.text(SPECL_STR + (totalSpec - specLevel), NamedTextColor.YELLOW).decoration(TextDecoration.ITALIC, false));
+		NBTItem nbt = new NBTItem(item);
+		List<String> lore = ItemStatUtils.getPlainLore(nbt);
+		int newLoreIdx = lore.size();
+
+		ItemStatUtils.addLore(item, newLoreIdx++, Component.text(CLASS_STR + AbilityUtils.getClass(player), NamedTextColor.YELLOW).decoration(TextDecoration.ITALIC, false));
+		ItemStatUtils.addLore(item, newLoreIdx++, Component.text(CLASSL_STR + (totalLevel - classLevel), NamedTextColor.YELLOW).decoration(TextDecoration.ITALIC, false));
+		ItemStatUtils.addLore(item, newLoreIdx++, Component.text(SPEC_STR + AbilityUtils.getSpec(player), NamedTextColor.YELLOW).decoration(TextDecoration.ITALIC, false));
+		ItemStatUtils.addLore(item, newLoreIdx++, Component.text(SPECL_STR + (totalSpec - specLevel), NamedTextColor.YELLOW).decoration(TextDecoration.ITALIC, false));
 
 		AbilityCollection coll = AbilityManager.getManager().getPlayerAbilities(player);
 		if (coll != null) {
 			for (Ability ability : coll.getAbilitiesIgnoringSilence()) {
 				if (ability.getDisplayName() != null) {
-					lore.add(Component.text(PREFIX + ability.getDisplayName() + " : " + ability.getAbilityScore(),
-					                        NamedTextColor.YELLOW).decoration(TextDecoration.ITALIC, false));
+					ItemStatUtils.addLore(item, newLoreIdx++, Component.text(PREFIX + ability.getDisplayName() + " : " + ability.getAbilityScore(),
+					                                                         NamedTextColor.YELLOW).decoration(TextDecoration.ITALIC, false));
 				}
 			}
 		}
 
-		lore.add(Component.text("* Soulbound to " + player.getName() + " *"));
+		ItemStatUtils.addInfusion(item, ItemStatUtils.InfusionType.SOULBOUND, 1, player.getUniqueId());
 
-		meta.lore(lore);
+		ItemMeta meta = item.getItemMeta();
 		meta.displayName(CONFIGURED);
-		item.setItemMeta(meta);
-		ItemUtils.setPlainTag(item);
 
 		Location pLoc = player.getLocation();
 		pLoc.setY(pLoc.getY() + player.getEyeHeight() - 0.5);
 		player.getWorld().spawnParticle(Particle.SNOWBALL, pLoc, 10, 0.5, 0.5, 0.5, 0);
 		player.getWorld().playSound(player.getLocation(), Sound.BLOCK_ENDER_CHEST_CLOSE, 1, 2.5f);
 		player.sendMessage(Component.text("The Tesseract of the Elements has stored your skills!", NamedTextColor.YELLOW));
+
+		ItemStatUtils.generateItemStats(item);
 	}
 
-	private void clearTesseractLore(@Nullable List<Component> lore) {
-		if (lore == null) {
-			return;
-		}
-		Iterator<Component> iter = lore.iterator();
-		while (iter.hasNext()) {
-			String current = MessagingUtils.plainText(iter.next());
-			if (current.startsWith(CLASS_STR)
-					|| current.startsWith(SPEC_STR)
-					|| current.startsWith(CLASSL_STR)
-					|| current.startsWith(SPECL_STR)
-					|| current.startsWith(PREFIX)
-					|| current.startsWith("* Soulbound to")) {
-				iter.remove();
+	private void clearTesseractLore(ItemStack item) {
+		NBTItem nbt = new NBTItem(item);
+		List<String> lore = ItemStatUtils.getPlainLore(nbt);
+
+		ItemStatUtils.removeInfusion(item, ItemStatUtils.InfusionType.SOULBOUND);
+		for (int i = lore.size() - 1; i >= 0; --i) {
+			String line = lore.get(i);
+			if (line.startsWith(CLASS_STR)
+				|| line.startsWith(SPEC_STR)
+				|| line.startsWith(CLASSL_STR)
+				|| line.startsWith(SPECL_STR)
+				|| line.startsWith(PREFIX)) {
+				ItemStatUtils.removeLore(item, i);
 			}
 		}
+
+		ItemStatUtils.generateItemStats(item);
 	}
 }

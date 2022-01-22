@@ -1,20 +1,22 @@
 package com.playmonumenta.plugins.effects;
 
-import java.util.EnumSet;
+import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import org.bukkit.entity.LivingEntity;
+import org.jetbrains.annotations.NotNull;
 
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDamageEvent;
+import java.util.EnumSet;
 
 public class PercentDamageDealt extends Effect {
 
 	private final double mAmount;
-	private final EnumSet<EntityDamageEvent.DamageCause> mAffectedDamageCauses;
+	private final EnumSet<DamageType> mAffectedDamageTypes;
 	private final int mPriority;
 
-	public PercentDamageDealt(int duration, double amount, EnumSet<EntityDamageEvent.DamageCause> affectedDamageCauses, int priority) {
+	public PercentDamageDealt(int duration, double amount, EnumSet<DamageType> affectedDamageTypes, int priority) {
 		super(duration);
 		mAmount = amount;
-		mAffectedDamageCauses = affectedDamageCauses;
+		mAffectedDamageTypes = affectedDamageTypes;
 		mPriority = priority;
 	}
 
@@ -22,8 +24,8 @@ public class PercentDamageDealt extends Effect {
 		this(duration, amount, null, 0);
 	}
 
-	public PercentDamageDealt(int duration, double amount, EnumSet<EntityDamageEvent.DamageCause> affectedDamageCauses) {
-		this(duration, amount, affectedDamageCauses, 0);
+	public PercentDamageDealt(int duration, double amount, EnumSet<DamageType> affectedDamageTypes) {
+		this(duration, amount, affectedDamageTypes, 0);
 	}
 
 	// This needs to trigger before any flat damage
@@ -43,27 +45,29 @@ public class PercentDamageDealt extends Effect {
 		return Math.abs(mAmount);
 	}
 
+	public EnumSet<DamageType> getAffectedDamageTypes() {
+		return mAffectedDamageTypes;
+	}
+
 	@Override
-	public boolean entityDealDamageEvent(EntityDamageByEntityEvent event) {
-		if (mAffectedDamageCauses == null || mAffectedDamageCauses.contains(event.getCause())) {
+	public void onDamage(@NotNull LivingEntity entity, @NotNull DamageEvent event, @NotNull LivingEntity enemy) {
+		if (mAffectedDamageTypes == null || mAffectedDamageTypes.contains(event.getType())) {
 			event.setDamage(event.getDamage() * (1 + mAmount));
 		}
-
-		return true;
 	}
 
 	@Override
 	public String toString() {
-		String causes = "any";
-		if (mAffectedDamageCauses != null) {
-			causes = "";
-			for (EntityDamageEvent.DamageCause cause : mAffectedDamageCauses) {
-				if (!causes.isEmpty()) {
-					causes += ",";
+		String types = "any";
+		if (mAffectedDamageTypes != null) {
+			types = "";
+			for (DamageType type : mAffectedDamageTypes) {
+				if (!types.isEmpty()) {
+					types += ",";
 				}
-				causes += cause.name();
+				types += type.name();
 			}
 		}
-		return String.format("PercentDamageDealt duration:%d causes:%s amount:%f", this.getDuration(), causes, mAmount);
+		return String.format("PercentDamageDealt duration:%d types:%s amount:%f", this.getDuration(), types, mAmount);
 	}
 }

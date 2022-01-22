@@ -1,20 +1,19 @@
 package com.playmonumenta.plugins.commands;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.utils.ItemStatUtils;
+import com.playmonumenta.plugins.utils.ItemStatUtils.Region;
 import com.playmonumenta.plugins.utils.ItemUtils;
-import com.playmonumenta.plugins.utils.ItemUtils.ItemRegion;
-
+import dev.jorel.commandapi.CommandAPI;
+import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
 import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 
-import dev.jorel.commandapi.CommandAPI;
-import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 /*
  * NOTICE!
@@ -35,8 +34,8 @@ public class ReforgeInventory extends GenericCommand {
 		// If the player is in creative, reforge for free.
 		if (player.getGameMode() == GameMode.CREATIVE) {
 			for (ItemStack item : player.getInventory()) {
-				if (ItemUtils.isItemShattered(item)) {
-					ItemUtils.reforgeItem(item);
+				if (ItemStatUtils.isShattered(item)) {
+					ItemStatUtils.reforge(item);
 				}
 			}
 			player.sendMessage("All of your items have been reforged!");
@@ -46,21 +45,14 @@ public class ReforgeInventory extends GenericCommand {
 			// Get the cost to reforge the entire inventory
 			List<ItemStack> toReforge = new ArrayList<>();
 			for (ItemStack item : player.getInventory()) {
-				if (ItemUtils.isItemShattered(item)) {
+				if (ItemStatUtils.isShattered(item)) {
 					toReforge.add(item);
 				}
 			}
-			Map<ItemRegion, Integer> reforgeCost = ItemUtils.getReforgeCosts(toReforge);
-			int cxpCost = reforgeCost.getOrDefault(ItemRegion.KINGS_VALLEY, 0);
-			int ccsCost = reforgeCost.getOrDefault(ItemRegion.CELSIAN_ISLES, 0);
-			int cmmCost = reforgeCost.getOrDefault(ItemRegion.MONUMENTA, 0);
-			int csbCost = reforgeCost.getOrDefault(ItemRegion.SHULKER_BOX, 0);
-			if (cmmCost != 0) {
-				// ItemRegion.MONUMENTA currently only exists to allow items from
-				// Celsian Isles to be used in King's Valley. So the cost to reforge is Celsian Isles currency
-				// We need to figure out a more permanent solution to this at some point.
-				ccsCost += cmmCost;
-			}
+			Map<Region, Integer> reforgeCost = ItemUtils.getReforgeCosts(toReforge);
+			int cxpCost = reforgeCost.getOrDefault(Region.VALLEY, 0);
+			int ccsCost = reforgeCost.getOrDefault(Region.ISLES, 0);
+			int csbCost = reforgeCost.getOrDefault(Region.SHULKER_BOX, 0);
 			if (csbCost != 0) {
 				// ItemRegion.SHULKER_BOX currently only exists to allow shulker boxes to be
 				// reforged with either King's Valley or Celsian Isles currency.
@@ -141,7 +133,7 @@ public class ReforgeInventory extends GenericCommand {
 			}
 			if (paid) {
 				for (ItemStack item : toReforge) {
-					ItemUtils.reforgeItem(item);
+					ItemStatUtils.reforge(item);
 				}
 				player.sendMessage("All of your items have been reforged!");
 			} else {

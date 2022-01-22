@@ -1,15 +1,14 @@
 package com.playmonumenta.plugins.bosses.spells;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import com.playmonumenta.plugins.utils.PlayerUtils;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-import com.playmonumenta.plugins.utils.PlayerUtils;
+import java.util.ArrayList;
+import java.util.List;
 
 public class SpellBaseAura extends Spell {
 	@FunctionalInterface

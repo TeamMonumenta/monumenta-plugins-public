@@ -1,18 +1,16 @@
 package com.playmonumenta.plugins.commands;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import com.playmonumenta.plugins.utils.CommandUtils;
-
-import org.bukkit.entity.Player;
-
+import com.playmonumenta.plugins.utils.ItemStatUtils;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.CommandPermission;
 import dev.jorel.commandapi.arguments.Argument;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument.EntitySelector;
 import dev.jorel.commandapi.arguments.MultiLiteralArgument;
+import org.bukkit.entity.Player;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /*
  * NOTICE!
@@ -31,7 +29,13 @@ public class DeBarkifyHeldItem extends GenericCommand {
 			.withPermission(CommandPermission.fromString("monumenta.command.debarkifyhelditem"))
 			.withArguments(arguments)
 			.executes((sender, args) -> {
-				CommandUtils.deEnchantifyHeldItem(sender, (Player)args[1], (String)args[0]);
+				if (args[0].equals("Barking")) {
+					ItemStatUtils.removeInfusion(((Player)args[1]).getItemInHand(), ItemStatUtils.InfusionType.BARKING);
+
+				} else {
+					ItemStatUtils.removeInfusion(((Player)args[1]).getItemInHand(), ItemStatUtils.InfusionType.DEBARKING);
+				}
+				ItemStatUtils.generateItemStats(((Player)args[1]).getItemInHand());
 			})
 			.register();
 	}

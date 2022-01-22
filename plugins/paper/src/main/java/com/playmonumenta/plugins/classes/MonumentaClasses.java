@@ -1,11 +1,10 @@
 package com.playmonumenta.plugins.classes;
 
-import org.bukkit.entity.Player;
-import org.checkerframework.checker.nullness.qual.Nullable;
-
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.Plugin;
+import org.bukkit.entity.Player;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class MonumentaClasses extends ClassList {
 	public MonumentaClasses(Plugin plugin, @Nullable Player player) {

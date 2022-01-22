@@ -1,8 +1,18 @@
 package com.playmonumenta.plugins.depths.abilities.steelsage;
 
-import java.util.Iterator;
-import java.util.List;
-
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.AbilityTrigger;
+import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.depths.DepthsTree;
+import com.playmonumenta.plugins.depths.DepthsUtils;
+import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
+import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
+import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.utils.DamageUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.FastUtils;
+import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -12,23 +22,11 @@ import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.AbilityTrigger;
-import com.playmonumenta.plugins.classes.ClassAbility;
-import com.playmonumenta.plugins.classes.magic.MagicType;
-import com.playmonumenta.plugins.depths.DepthsTree;
-import com.playmonumenta.plugins.depths.DepthsUtils;
-import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
-import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.FastUtils;
-
-import net.md_5.bungee.api.ChatColor;
+import java.util.Iterator;
+import java.util.List;
 
 public class Scrapshot extends DepthsAbility {
 	public static final String ABILITY_NAME = "Scrapshot";
@@ -101,7 +99,7 @@ public class Scrapshot extends DepthsAbility {
 					while (iter.hasNext()) {
 						LivingEntity mob = iter.next();
 						if (box.overlaps(mob.getBoundingBox())) {
-							EntityUtils.damageEntity(mPlugin, mob, DISTANCE_MULTIPLIER[i] * DAMAGE[mRarity - 1], mPlayer, MagicType.PHYSICAL, true, mInfo.mLinkedSpell);
+							DamageUtils.damage(mPlayer, mob, DamageType.PROJECTILE_SKILL, DISTANCE_MULTIPLIER[i] * DAMAGE[mRarity - 1], mInfo.mLinkedSpell);
 
 							mob.setVelocity(new Vector(0, 0, 0));
 							iter.remove();
@@ -119,12 +117,10 @@ public class Scrapshot extends DepthsAbility {
 	}
 
 	@Override
-	public boolean livingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
-	    if (event.getCause().equals(DamageCause.ENTITY_ATTACK)) {
+	public void onDamage(DamageEvent event, LivingEntity enemy) {
+	    if (event.getType() == DamageType.MELEE) {
 	        cast(Action.LEFT_CLICK_AIR);
 	    }
-
-	    return true;
 	}
 
 	@Override
@@ -134,7 +130,7 @@ public class Scrapshot extends DepthsAbility {
 
 	@Override
 	public String getDescription(int rarity) {
-		return "Left click while sneaking and holding a weapon to fire a blunderbuss shot that goes up to " + RANGE + " blocks, in a cone that deals " + DepthsUtils.getRarityColor(rarity) + DAMAGE[rarity - 1] + ChatColor.WHITE + " damage and knocks you backward. Damage is decreased for every block of distance after the first 4 blocks. Cooldown: " + COOLDOWN / 20 + "s.";
+		return "Left click while sneaking and holding a weapon to fire a blunderbuss shot that goes up to " + RANGE + " blocks, in a cone that deals " + DepthsUtils.getRarityColor(rarity) + DAMAGE[rarity - 1] + ChatColor.WHITE + " projectile damage and knocks you backward. Damage is decreased for every block of distance after the first 4 blocks. Cooldown: " + COOLDOWN / 20 + "s.";
 	}
 
 	@Override

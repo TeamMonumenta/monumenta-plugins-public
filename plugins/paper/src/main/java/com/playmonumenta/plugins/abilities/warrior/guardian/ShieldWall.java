@@ -1,8 +1,18 @@
 package com.playmonumenta.plugins.abilities.warrior.guardian;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.abilities.AbilityManager;
+import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.itemstats.ItemStatManager;
+import com.playmonumenta.plugins.utils.DamageUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.MovementUtils;
+import com.playmonumenta.plugins.utils.PotionUtils;
+import com.playmonumenta.plugins.utils.VectorUtils;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -14,6 +24,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -21,16 +32,8 @@ import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.abilities.AbilityManager;
-import com.playmonumenta.plugins.classes.ClassAbility;
-import com.playmonumenta.plugins.classes.magic.MagicType;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.FastUtils;
-import com.playmonumenta.plugins.utils.MovementUtils;
-import com.playmonumenta.plugins.utils.PotionUtils;
-import com.playmonumenta.plugins.utils.VectorUtils;
+import java.util.ArrayList;
+import java.util.List;
 
 
 
@@ -46,7 +49,7 @@ public class ShieldWall extends Ability {
 		super(plugin, player, "Shield Wall");
 		mInfo.mScoreboardId = "ShieldWall";
 		mInfo.mShorthandName = "SW";
-		mInfo.mDescriptions.add("Press the swap key while holding a shield in either hand to create a 180 degree arc of particles 5 blocks high and 4 blocks wide in front of the user. This blocks all enemy projectiles (Ghast fireballs explode on the wall) and deals 6 damage to enemies that pass through the wall. The shield lasts 8 seconds. Cooldown: 30s.");
+		mInfo.mDescriptions.add("Press the swap key while holding a shield in either hand to create a 180 degree arc of particles 5 blocks high and 4 blocks wide in front of the user. This blocks all enemy projectiles (Ghast fireballs explode on the wall) and deals 6 magic damage to enemies that pass through the wall. The shield lasts 8 seconds. Cooldown: 30s.");
 		mInfo.mDescriptions.add("The shield lasts 10 seconds instead. Additionally, the shield knocks back enemies that try to go through it. Cooldown: 20s.");
 		mInfo.mCooldown = getAbilityScore() == 1 ? SHIELD_WALL_1_COOLDOWN : SHIELD_WALL_2_COOLDOWN;
 		mInfo.mLinkedSpell = ClassAbility.SHIELD_WALL;
@@ -68,6 +71,9 @@ public class ShieldWall extends Ability {
 			world.playSound(mPlayer.getLocation(), Sound.ENTITY_IRON_GOLEM_HURT, 1, 0.8f);
 			world.spawnParticle(Particle.FIREWORKS_SPARK, mPlayer.getLocation(), 70, 0, 0, 0, 0.3f);
 			putOnCooldown();
+
+			FixedMetadataValue playerItemStats = new FixedMetadataValue(mPlugin, new ItemStatManager.PlayerItemStats(mPlugin.mItemStatManager.getPlayerItemStats(mPlayer)));
+
 			new BukkitRunnable() {
 				int mT = 0;
 				final Location mLoc = mPlayer.getLocation();
@@ -103,23 +109,27 @@ public class ShieldWall extends Ability {
 							Location eLoc = e.getLocation();
 							if (e instanceof Projectile proj) {
 								if (proj.getShooter() instanceof LivingEntity shooter
-										&& (!(shooter instanceof Player) || AbilityManager.getManager().isPvPEnabled((Player) shooter))) {
+										&& (!(proj.getShooter() instanceof Player) || AbilityManager.getManager().isPvPEnabled((Player) shooter))) {
 									proj.remove();
 									world.spawnParticle(Particle.FIREWORKS_SPARK, eLoc, 5, 0, 0, 0, 0.25f);
 									world.playSound(eLoc, Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, 0.75f, 1.5f);
 								}
-							} else if (EntityUtils.isHostileMob(e)) {
-								LivingEntity le = (LivingEntity) e;
+							} else if (e instanceof LivingEntity le && EntityUtils.isHostileMob(e)) {
 								// Stores mobs hit this tick
 								mMobsHitThisTick.add(le);
 								// This list does not update to the mobs hit this tick until after everything runs
 								if (!mMobsAlreadyHit.contains(le)) {
 									mMobsAlreadyHit.add(le);
 									Vector v = le.getVelocity();
-									EntityUtils.damageEntity(mPlugin, le, SHIELD_WALL_DAMAGE, mPlayer, MagicType.HOLY, true, mInfo.mLinkedSpell);
+
+									DamageEvent damageEvent = new DamageEvent(le, mPlayer, mPlayer, DamageType.MAGIC, mInfo.mLinkedSpell, SHIELD_WALL_DAMAGE);
+									damageEvent.setDelayed(true);
+									damageEvent.setPlayerItemStat(playerItemStats);
+									DamageUtils.damage(damageEvent, false, true, null);
+
 									//Bosses should not be affected by slowness or knockback.
 									if (knockback && !e.getScoreboardTags().contains("Boss")) {
-										MovementUtils.knockAway(mLoc, le, 0.3f);
+										MovementUtils.knockAway(mLoc, le, 0.3f, true);
 										world.spawnParticle(Particle.EXPLOSION_NORMAL, eLoc, 50, 0, 0, 0, 0.35f);
 										world.playSound(eLoc, Sound.ENTITY_GENERIC_EXPLODE, 1, 1f);
 									} else {

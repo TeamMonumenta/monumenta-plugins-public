@@ -1,10 +1,5 @@
 package com.playmonumenta.plugins.classes;
 
-import org.bukkit.Material;
-import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
-import org.checkerframework.checker.nullness.qual.Nullable;
-
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.warlock.AmplifyingHex;
 import com.playmonumenta.plugins.abilities.warlock.CholericFlames;
@@ -18,12 +13,15 @@ import com.playmonumenta.plugins.abilities.warlock.reaper.DarkPact;
 import com.playmonumenta.plugins.abilities.warlock.reaper.JudgementChain;
 import com.playmonumenta.plugins.abilities.warlock.reaper.VoodooBonds;
 import com.playmonumenta.plugins.abilities.warlock.tenebrist.HauntingShades;
-import com.playmonumenta.plugins.abilities.warlock.tenebrist.UmbralWail;
+import com.playmonumenta.plugins.abilities.warlock.tenebrist.RestlessSouls;
 import com.playmonumenta.plugins.abilities.warlock.tenebrist.WitheringGaze;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
-
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.md_5.bungee.api.ChatColor;
+import org.bukkit.Material;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 
 public class Warlock extends PlayerClass {
@@ -57,7 +55,7 @@ public class Warlock extends PlayerClass {
 		mSpecOne.mDescription = "Reapers use scythes in combination with dark magic to bring death to their enemies. They specialize in melee combat.";
 
 		mSpecTwo.mAbilities.add(new HauntingShades(plugin, player));
-		mSpecTwo.mAbilities.add(new UmbralWail(plugin, player));
+		mSpecTwo.mAbilities.add(new RestlessSouls(plugin, player));
 		mSpecTwo.mAbilities.add(new WitheringGaze(plugin, player));
 		mSpecTwo.mSpecQuestScoreboard = "Quest103n";
 		mSpecTwo.mSpecialization = 14;

@@ -1,16 +1,15 @@
 package com.playmonumenta.plugins.depths.abilities.aspects;
 
-import org.bukkit.Material;
-import org.bukkit.Sound;
-import org.bukkit.entity.AbstractArrow;
-import org.bukkit.entity.Player;
-
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.abilities.WeaponAspectDepthsAbility;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
+import org.bukkit.Material;
+import org.bukkit.Sound;
+import org.bukkit.entity.AbstractArrow;
+import org.bukkit.entity.Player;
 
 public class BowAspect extends WeaponAspectDepthsAbility {
 

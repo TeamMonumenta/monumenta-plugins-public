@@ -1,7 +1,21 @@
 package com.playmonumenta.plugins.depths.abilities.shadow;
 
-import java.util.List;
-
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.AbilityTrigger;
+import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.depths.DepthsTree;
+import com.playmonumenta.plugins.depths.DepthsUtils;
+import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
+import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
+import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.utils.AbilityUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.ItemUtils;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
+import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -11,28 +25,12 @@ import org.bukkit.entity.Item;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.AbilityTrigger;
-import com.playmonumenta.plugins.classes.ClassAbility;
-import com.playmonumenta.plugins.depths.DepthsTree;
-import com.playmonumenta.plugins.depths.DepthsUtils;
-import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
-import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
-import com.playmonumenta.plugins.utils.AbilityUtils;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.ItemUtils;
-
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.format.TextDecoration;
-import net.md_5.bungee.api.ChatColor;
+import java.util.List;
 
 public class CloakOfShadows extends DepthsAbility {
 
@@ -41,7 +39,7 @@ public class CloakOfShadows extends DepthsAbility {
 	public static final int WEAKEN_DURATION = 20 * 6;
 	public static final int[] STEALTH_DURATION = {30, 35, 40, 45, 50, 60};
 	public static final double[] WEAKEN_AMPLIFIER = {0.2, 0.25, 0.3, 0.35, 0.4, 0.5};
-	public static final int[] DAMAGE = {12, 15, 18, 21, 24, 30};
+	public static final double[] DAMAGE = {10, 12.5, 15, 17.5, 20, 25};
 	public static final int DAMAGE_DURATION = 4 * 20;
 	private static final double VELOCITY = 0.7;
 	private static final int RADIUS = 5;
@@ -122,20 +120,15 @@ public class CloakOfShadows extends DepthsAbility {
 	}
 
 	@Override
-	public boolean livingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
-		if (mPlayer == null) {
-			return false;
+	public void onDamage(DamageEvent event, LivingEntity enemy) {
+		if (event.getType() == DamageType.MELEE) {
+			if (mBonusDamage) {
+				event.setDamage(event.getDamage() + DAMAGE[mRarity - 1]);
+				mBonusDamage = false;
+			} else if (mPlayer.isSneaking() && !mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.mLinkedSpell) && DepthsUtils.isWeaponItem(mPlayer.getInventory().getItemInMainHand())) {
+				cast(Action.LEFT_CLICK_AIR);
+			}
 		}
-		if (event.getCause().equals(DamageCause.ENTITY_ATTACK) && mBonusDamage) {
-			event.setDamage(event.getDamage() + DAMAGE[mRarity - 1]);
-			mBonusDamage = false;
-		}
-
-		if (event.getCause().equals(DamageCause.ENTITY_ATTACK) && mPlayer.isSneaking() && !mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.mLinkedSpell) && DepthsUtils.isWeaponItem(mPlayer.getInventory().getItemInMainHand())) {
-			cast(Action.LEFT_CLICK_AIR);
-		}
-
-		return true;
 	}
 
 	@Override

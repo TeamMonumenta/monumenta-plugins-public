@@ -1,8 +1,8 @@
 package com.playmonumenta.plugins.bosses.spells;
 
-import java.util.Collections;
-import java.util.List;
-
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.LocationUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
@@ -14,9 +14,8 @@ import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.LocationUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
+import java.util.Collections;
+import java.util.List;
 
 public class SpellBaseLeapAttack extends Spell {
 
@@ -135,7 +134,7 @@ public class SpellBaseLeapAttack extends Spell {
 			}
 		}
 
-		if (locTarget == null || targetPlayer == null || EntityUtils.isStunned(mBoss) || EntityUtils.isSilenced(mBoss) || EntityUtils.isConfused(mBoss)) {
+		if (locTarget == null || targetPlayer == null || EntityUtils.isStunned(mBoss) || EntityUtils.isSilenced(mBoss)) {
 			return;
 		}
 

@@ -1,5 +1,11 @@
 package com.playmonumenta.plugins.listeners;
 
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.inventories.ShulkerInventoryManager;
+import com.playmonumenta.plugins.itemstats.enchantments.CurseOfEphemerality;
+import com.playmonumenta.plugins.utils.ItemStatUtils;
+import com.playmonumenta.plugins.utils.ItemUtils;
+import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -29,13 +35,6 @@ import org.bukkit.inventory.meta.BlockStateMeta;
 import org.bukkit.permissions.Permission;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.checkerframework.checker.nullness.qual.Nullable;
-
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.enchantments.curses.CurseOfEphemerality;
-import com.playmonumenta.plugins.inventories.ShulkerInventoryManager;
-import com.playmonumenta.plugins.utils.ItemUtils;
-
-import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 
 /**
  * These listeners work together with ShulkerInventoryManager and ShulkerInventory to
@@ -101,7 +100,7 @@ public class ShulkerShortcutListener implements Listener {
 			} else if (itemClicked != null && ItemUtils.isShulkerBox(itemClicked.getType()) &&
 			           !ShulkerEquipmentListener.isEquipmentBox(itemClicked) &&
 			           !PortableEnderListener.isPortableEnder(itemClicked) &&
-			           !ItemUtils.isItemShattered(itemClicked)) {
+			           !ItemStatUtils.isShattered(itemClicked)) {
 				// Player clicked a non-shattered non-equipment shulker box in an inventory.
 				if (mPlugin.mShulkerInventoryManager.isShulkerInUse(itemClicked)) {
 					// A currently open shulker box was clicked, cancel.

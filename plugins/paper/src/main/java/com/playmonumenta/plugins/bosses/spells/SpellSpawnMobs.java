@@ -1,10 +1,9 @@
 package com.playmonumenta.plugins.bosses.spells;
 
-import org.bukkit.Location;
-import org.bukkit.entity.LivingEntity;
-
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import com.playmonumenta.plugins.utils.FastUtils;
+import org.bukkit.Location;
+import org.bukkit.entity.LivingEntity;
 
 public class SpellSpawnMobs extends Spell {
 	private final int mSummonRange;

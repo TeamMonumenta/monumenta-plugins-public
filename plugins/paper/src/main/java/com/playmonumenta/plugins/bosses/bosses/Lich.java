@@ -1,59 +1,5 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
-
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.GameMode;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
-import org.bukkit.SoundCategory;
-import org.bukkit.World;
-import org.bukkit.attribute.Attribute;
-import org.bukkit.attribute.AttributeModifier;
-import org.bukkit.block.Block;
-import org.bukkit.boss.BarColor;
-import org.bukkit.boss.BarFlag;
-import org.bukkit.boss.BarStyle;
-import org.bukkit.boss.BossBar;
-import org.bukkit.enchantments.Enchantment;
-import org.bukkit.entity.ArmorStand;
-import org.bukkit.entity.Creature;
-import org.bukkit.entity.EnderCrystal;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
-import org.bukkit.entity.FallingBlock;
-import org.bukkit.entity.Ghast;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
-import org.bukkit.entity.Projectile;
-import org.bukkit.entity.WitherSkull;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.PlayerDeathEvent;
-import org.bukkit.inventory.EntityEquipment;
-import org.bukkit.inventory.EquipmentSlot;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.PlayerInventory;
-import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.plugin.Plugin;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
-import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.util.BoundingBox;
-import org.bukkit.util.Vector;
-import org.checkerframework.checker.nullness.qual.Nullable;
-
 import com.playmonumenta.plugins.bosses.BossBarManager;
 import com.playmonumenta.plugins.bosses.BossBarManager.BossHealthAction;
 import com.playmonumenta.plugins.bosses.SpellManager;
@@ -80,6 +26,8 @@ import com.playmonumenta.plugins.bosses.spells.lich.SpellRaiseDead;
 import com.playmonumenta.plugins.bosses.spells.lich.SpellSalientOfDecay;
 import com.playmonumenta.plugins.bosses.spells.lich.SpellShadowRealm;
 import com.playmonumenta.plugins.bosses.spells.lich.SpellSoulShackle;
+import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import com.playmonumenta.plugins.player.PPGroundCircle;
 import com.playmonumenta.plugins.player.PartialParticle;
@@ -90,10 +38,61 @@ import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.utils.PotionUtils;
 import com.playmonumenta.plugins.utils.SerializationUtils;
-
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.GameMode;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
+import org.bukkit.World;
+import org.bukkit.attribute.Attribute;
+import org.bukkit.attribute.AttributeModifier;
+import org.bukkit.block.Block;
+import org.bukkit.boss.BarColor;
+import org.bukkit.boss.BarFlag;
+import org.bukkit.boss.BarStyle;
+import org.bukkit.boss.BossBar;
+import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.ArmorStand;
+import org.bukkit.entity.Creature;
+import org.bukkit.entity.EnderCrystal;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.FallingBlock;
+import org.bukkit.entity.Ghast;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
+import org.bukkit.entity.WitherSkull;
+import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.inventory.EntityEquipment;
+import org.bukkit.inventory.EquipmentSlot;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.PlayerInventory;
+import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.plugin.Plugin;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
+import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.util.BoundingBox;
+import org.bukkit.util.Vector;
+import org.checkerframework.checker.nullness.qual.Nullable;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
 
 /*
  * Lich:
@@ -634,7 +633,7 @@ public final class Lich extends BossAbilityGroup {
 						}
 						List<Player> players = playersInRange(mStart.getLocation(), detectionRange, true);
 						for (Player p : players) {
-							MovementUtils.knockAway(mBoss, p, 3);
+							MovementUtils.knockAway(mBoss, p, 3, false);
 						}
 						// change terracotta to red nether bricks
 						new BukkitRunnable() {
@@ -889,7 +888,7 @@ public final class Lich extends BossAbilityGroup {
 		world.playSound(mBoss.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 2.0f, 1.0f);
 		world.playSound(mBoss.getLocation(), Sound.ENTITY_ENDER_DRAGON_GROWL, 2.0f, 0f);
 		for (Player player : playersInRange(mBoss.getLocation(), r, true)) {
-			MovementUtils.knockAway(mBoss.getLocation(), player, 0.55f);
+			MovementUtils.knockAway(mBoss.getLocation(), player, 0.55f, false);
 			player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 5, 1));
 		}
 	}
@@ -919,11 +918,11 @@ public final class Lich extends BossAbilityGroup {
 	private double mTotalDamage = 0;
 
 	@Override
-	public void bossDamagedByEntity(EntityDamageByEntityEvent event) {
+	public void onHurtByEntityWithSource(DamageEvent event, Entity damager, LivingEntity source) {
 		mGotHit = true;
 
 		// ridiculous burst prevention, 1% above the next health action
-		double damage = event.getFinalDamage();
+		double damage = event.getDamage();
 		double maxHealth = EntityUtils.getMaxHealth(mBoss);
 		if (mPhase == 1 && mBoss.getHealth() - damage <= maxHealth * 0.51) {
 			event.setDamage(mBoss.getHealth() - maxHealth * 0.51);
@@ -934,8 +933,9 @@ public final class Lich extends BossAbilityGroup {
 		}
 
 		// death check
-		if (mBoss.getHealth() - event.getFinalDamage() <= 0) {
+		if (mBoss.getHealth() - event.getDamage() <= 0) {
 			event.setCancelled(true);
+			event.setDamage(0);
 			mBoss.setHealth(100);
 			if (!mActivated) {
 				if (mKey != null && mKey.isValid()) {
@@ -1013,12 +1013,8 @@ public final class Lich extends BossAbilityGroup {
 		if (mAggro) {
 			mAggro = false;
 			Player player = null;
-			if (event.getDamager() instanceof Player) {
-				player = (Player) event.getDamager();
-			} else if (event.getDamager() instanceof Projectile proj) {
-				if (proj.getShooter() instanceof Player) {
-					player = (Player) proj.getShooter();
-				}
+			if (source instanceof Player) {
+				player = (Player) source;
 			}
 
 			mTarget = player;
@@ -1042,13 +1038,10 @@ public final class Lich extends BossAbilityGroup {
 
 		//damage immunity if over 15 blocks
 		Player player = null;
-		if (event.getDamager() instanceof Player) {
-			player = (Player) event.getDamager();
-		} else if (event.getDamager() instanceof Projectile proj) {
-			if (proj.getShooter() instanceof Player) {
-				player = (Player) proj.getShooter();
-			}
+		if (source instanceof Player) {
+			player = (Player) source;
 		}
+
 		if (player != null && player.getLocation().distance(mBoss.getLocation()) > 15) {
 			event.setCancelled(true);
 			player.playSound(mBoss.getLocation(), Sound.BLOCK_ANVIL_PLACE, 1, 5);
@@ -1098,7 +1091,7 @@ public final class Lich extends BossAbilityGroup {
 								BoundingBox box = BoundingBox.of(pLoc, 0.3, 0.3, 0.3);
 								for (Player p : playersInRange(mBoss.getLocation(), detectionRange, true)) {
 									if (p.getBoundingBox().overlaps(box)) {
-										BossUtils.bossDamage(mBoss, p, 20);
+										BossUtils.dualTypeBlockableDamage(mBoss, p, DamageType.MAGIC, DamageType.MELEE, 20, 0.75);
 									}
 								}
 							}
@@ -1330,9 +1323,8 @@ public final class Lich extends BossAbilityGroup {
 		}
 
 		for (Player player : players) {
-			player.removePotionEffect(PotionEffectType.DAMAGE_RESISTANCE);
-			player.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 20 * 40, 10));
-			player.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, 20 * 40, 1));
+			PotionUtils.applyPotion(com.playmonumenta.plugins.Plugin.getInstance(), player, new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 20 * 17, 10));
+			PotionUtils.applyPotion(com.playmonumenta.plugins.Plugin.getInstance(), player, new PotionEffect(PotionEffectType.REGENERATION, 20 * 17, 1));
 		}
 		String[] dio1 = new String[] {
 				"I... WILL... NOT... BE... DESTROYED...",
@@ -1565,8 +1557,6 @@ public final class Lich extends BossAbilityGroup {
 					if (!mTrigger) {
 						mTrigger = true;
 						world.playSound(p.getLocation(), Sound.ENTITY_ILLUSIONER_CAST_SPELL, 1, 1.25f);
-						p.removePotionEffect(PotionEffectType.DAMAGE_RESISTANCE);
-						p.removePotionEffect(PotionEffectType.REGENERATION);
 					}
 					Location pLoc = mStart.clone().add(mVec.clone().multiply(mT));
 					new PartialParticle(Particle.FIREWORKS_SPARK, pLoc, 2, 0.1, 0.1, 0.1, 0.02).spawnAsBoss();
@@ -1873,8 +1863,8 @@ public final class Lich extends BossAbilityGroup {
 		// invuln players
 		List<Player> players = playersInRange(mStart.getLocation(), detectionRange, true);
 		for (Player player : players) {
-			player.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 20 * 40, 10));
-			player.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, 20 * 40, 2));
+			PotionUtils.applyPotion(com.playmonumenta.plugins.Plugin.getInstance(), player, new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 20 * 40, 10));
+			PotionUtils.applyPotion(com.playmonumenta.plugins.Plugin.getInstance(), player, new PotionEffect(PotionEffectType.REGENERATION, 20 * 40, 1));
 		}
 
 		new BukkitRunnable() {
@@ -2082,7 +2072,7 @@ public final class Lich extends BossAbilityGroup {
 		int bossTargetHp = 0;
 		int playercount = playersInRange(mBoss.getLocation(), detectionRange, true).size();
 		double hpdel = 4000;
-		bossTargetHp = (int) (hpdel * (1 + (1 - 1 / Math.E) * Math.max(Math.log(playercount), 0)));
+		bossTargetHp = (int) (hpdel * (1 + (1 - 1 / Math.E) * Math.max(Math.log(playercount), 0)) * 1.1);
 		EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_MAX_HEALTH, bossTargetHp);
 		EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_FOLLOW_RANGE, detectionRange);
 		EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_KNOCKBACK_RESISTANCE, 1);

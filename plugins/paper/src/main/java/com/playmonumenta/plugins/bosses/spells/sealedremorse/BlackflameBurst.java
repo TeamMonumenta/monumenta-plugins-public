@@ -1,8 +1,14 @@
 package com.playmonumenta.plugins.bosses.spells.sealedremorse;
 
-import java.util.Collections;
-import java.util.List;
-
+import com.playmonumenta.plugins.bosses.bosses.BeastOfTheBlackFlame;
+import com.playmonumenta.plugins.bosses.bosses.Ghalkor;
+import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.bosses.spells.SpellBaseSeekingProjectile;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.utils.PotionUtils;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -15,14 +21,8 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import com.playmonumenta.plugins.bosses.bosses.BeastOfTheBlackFlame;
-import com.playmonumenta.plugins.bosses.bosses.Ghalkor;
-import com.playmonumenta.plugins.bosses.spells.Spell;
-import com.playmonumenta.plugins.bosses.spells.SpellBaseSeekingProjectile;
-import com.playmonumenta.plugins.utils.BossUtils;
-import com.playmonumenta.plugins.utils.FastUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.plugins.utils.PotionUtils;
+import java.util.Collections;
+import java.util.List;
 
 public class BlackflameBurst extends Spell {
 
@@ -76,8 +76,8 @@ public class BlackflameBurst extends Spell {
 					loc.getWorld().playSound(loc, Sound.ENTITY_WITHER_HURT, SoundCategory.HOSTILE, 1, 0);
 					loc.getWorld().spawnParticle(Particle.SOUL_FIRE_FLAME, loc, 20, 0.5, 0.5, 0.5, 0.5);
 					if (player != null) {
-						BossUtils.bossDamage(boss, player, DAMAGE, mBoss.getLocation(), "Blackflame Burst");
-						((LivingEntity) player).setFireTicks(4 * 20);
+						BossUtils.dualTypeBlockableDamage(boss, player, DamageType.MAGIC, DamageType.FIRE, DAMAGE, 0.9, "Blackflame Burst", mBoss.getLocation());
+						player.setFireTicks(4 * 20);
 					}
 				});
 	}

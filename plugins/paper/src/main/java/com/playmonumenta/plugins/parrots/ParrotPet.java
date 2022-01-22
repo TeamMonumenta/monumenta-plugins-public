@@ -1,11 +1,10 @@
 package com.playmonumenta.plugins.parrots;
 
+import com.playmonumenta.plugins.parrots.ParrotManager.ParrotVariant;
 import org.bukkit.entity.AnimalTamer;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Parrot;
 import org.bukkit.entity.Player;
-
-import com.playmonumenta.plugins.parrots.ParrotManager.ParrotVariant;
 
 public class ParrotPet {
 

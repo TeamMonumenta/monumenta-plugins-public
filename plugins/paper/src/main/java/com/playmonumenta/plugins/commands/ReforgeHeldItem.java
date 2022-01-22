@@ -1,18 +1,17 @@
 package com.playmonumenta.plugins.commands;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.utils.ItemStatUtils;
+import com.playmonumenta.plugins.utils.ItemStatUtils.Region;
 import com.playmonumenta.plugins.utils.ItemUtils;
-import com.playmonumenta.plugins.utils.ItemUtils.ItemRegion;
-
+import dev.jorel.commandapi.CommandAPI;
+import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
-
-import dev.jorel.commandapi.CommandAPI;
-import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
 
 /*
  * NOTICE!
@@ -33,8 +32,8 @@ public class ReforgeHeldItem extends GenericCommand {
 		if (player.getGameMode() == GameMode.CREATIVE) {
 			if (item == null || !item.hasItemMeta() || !item.getItemMeta().hasLore()) {
 				CommandAPI.fail("Player must have a Shattered item in their main hand!");
-			} else if (ItemUtils.isItemShattered(item)) {
-				ItemUtils.reforgeItem(item);
+			} else if (ItemStatUtils.isShattered(item)) {
+				ItemStatUtils.reforge(item);
 				player.sendMessage("Your item has been reforged!");
 				if (sender != player) {
 					sender.sendMessage("Successfully reforged the player's held item");
@@ -46,33 +45,27 @@ public class ReforgeHeldItem extends GenericCommand {
 			player.removeMetadata("PlayerCanReforge", Plugin.getInstance());
 			if (item == null || !item.hasItemMeta() || !item.getItemMeta().hasLore()) {
 				CommandAPI.fail("Player must have a Shattered item in their main hand!");
-			} else if (ItemUtils.isItemShattered(item)) {
-				ItemRegion region = ItemUtils.getItemRegion(item);
+			} else if (ItemStatUtils.isShattered(item)) {
+				Region region = ItemStatUtils.getRegion(item);
 				int cost = ItemUtils.getReforgeCost(item);
 				PlayerInventory inventory = player.getInventory();
-				if (region == ItemRegion.MONUMENTA) {
-					// ItemRegion.MONUMENTA currently only exists to allow items from
-					// Celsian Isles to be used in King's Valley. So the cost to reforge is Celsian Isles currency
-					// We need to figure out a more permanent solution to this at some point.
-					region = ItemRegion.CELSIAN_ISLES;
-				}
-				if (region == ItemRegion.SHULKER_BOX) {
+				if (region == Region.SHULKER_BOX) {
 					// ItemRegion.SHULKER_BOX currently only exists to allow shulker boxes to be
 					// reforged with either King's Valley or Celsian Isles currency.
 					// We need to figure out a more permanent solution to this at some point.
 					if (player.getWorld().getName().equals("Project_Epic-valley")) {
 						// King's Valley: Use XP
-						region = ItemRegion.KINGS_VALLEY;
+						region = Region.VALLEY;
 					} else if (player.getWorld().getName().equals("Project_Epic-isles")) {
 						// Celsian Isles: Use CS
-						region = ItemRegion.CELSIAN_ISLES;
+						region = Region.ISLES;
 					} else {
 						// This shouldn't happen, but if it does, default to XP
-						region = ItemRegion.KINGS_VALLEY;
+						region = Region.VALLEY;
 					}
 
 				}
-				if (region == ItemRegion.KINGS_VALLEY) {
+				if (region == Region.VALLEY) {
 					ItemStack cxp = CalculateReforge.mCXP.clone();
 					ItemStack hxp = CalculateReforge.mHXP.clone();
 					if (inventory.containsAtLeast(cxp, cost)) {
@@ -92,7 +85,7 @@ public class ReforgeHeldItem extends GenericCommand {
 						}
 						return;
 					}
-				} else if (region == ItemRegion.CELSIAN_ISLES) {
+				} else if (region == Region.ISLES) {
 					ItemStack ccs = CalculateReforge.mCCS.clone();
 					ItemStack hcs = CalculateReforge.mHCS.clone();
 					if (inventory.containsAtLeast(ccs, cost)) {
@@ -117,7 +110,7 @@ public class ReforgeHeldItem extends GenericCommand {
 					CommandAPI.fail("Invalid ItemRegion");
 					return;
 				}
-				ItemUtils.reforgeItem(item);
+				ItemStatUtils.reforge(item);
 				player.sendMessage("Your item has been reforged!");
 				if (sender != player) {
 					sender.sendMessage("Successfully reforged the player's held item");

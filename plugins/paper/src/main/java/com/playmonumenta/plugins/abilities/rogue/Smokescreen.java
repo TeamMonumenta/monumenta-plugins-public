@@ -1,5 +1,11 @@
 package com.playmonumenta.plugins.abilities.rogue;
 
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.abilities.AbilityTrigger;
+import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.InventoryUtils;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -10,13 +16,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
 import org.bukkit.inventory.ItemStack;
 import org.checkerframework.checker.nullness.qual.Nullable;
-
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.abilities.AbilityTrigger;
-import com.playmonumenta.plugins.classes.ClassAbility;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.InventoryUtils;
 
 public class Smokescreen extends Ability {
 
@@ -59,9 +58,7 @@ public class Smokescreen extends Ability {
 	@Override
 	public boolean runCheck() {
 		if (mPlayer.isSneaking() && mPlayer.getLocation().getPitch() > 50) {
-			ItemStack mainHand = mPlayer.getInventory().getItemInMainHand();
-			ItemStack offHand = mPlayer.getInventory().getItemInOffHand();
-			return InventoryUtils.rogueTriggerCheck(mainHand, offHand);
+			return InventoryUtils.rogueTriggerCheck(mPlugin, mPlayer);
 		}
 		return false;
 	}

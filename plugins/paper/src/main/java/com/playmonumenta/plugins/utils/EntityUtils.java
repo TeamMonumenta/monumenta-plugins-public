@@ -15,6 +15,7 @@ import java.util.UUID;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.World;
 import org.bukkit.attribute.Attributable;
@@ -23,15 +24,41 @@ import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.attribute.AttributeModifier.Operation;
 import org.bukkit.block.Block;
-import org.bukkit.enchantments.Enchantment;
-import org.bukkit.entity.*;
+import org.bukkit.entity.AbstractArrow;
+import org.bukkit.entity.AreaEffectCloud;
+import org.bukkit.entity.Bee;
+import org.bukkit.entity.Blaze;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Flying;
+import org.bukkit.entity.Ghast;
+import org.bukkit.entity.Giant;
+import org.bukkit.entity.Hoglin;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.MagmaCube;
+import org.bukkit.entity.Mob;
+import org.bukkit.entity.Monster;
+import org.bukkit.entity.Phantom;
+import org.bukkit.entity.PigZombie;
+import org.bukkit.entity.Piglin;
+import org.bukkit.entity.Player;
+import org.bukkit.entity.PolarBear;
+import org.bukkit.entity.Projectile;
+import org.bukkit.entity.PufferFish;
+import org.bukkit.entity.Rabbit;
 import org.bukkit.entity.Rabbit.Type;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.entity.Shulker;
+import org.bukkit.entity.SkeletonHorse;
+import org.bukkit.entity.Slime;
+import org.bukkit.entity.ThrownPotion;
+import org.bukkit.entity.Vex;
+import org.bukkit.entity.Wither;
+import org.bukkit.entity.WitherSkeleton;
+import org.bukkit.entity.Wolf;
+import org.bukkit.entity.ZombieHorse;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -42,29 +69,20 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityManager;
-import com.playmonumenta.plugins.abilities.cleric.CelestialBlessing;
-import com.playmonumenta.plugins.abilities.cleric.hierophant.ThuribleProcession;
-import com.playmonumenta.plugins.abilities.scout.Sharpshooter;
-import com.playmonumenta.plugins.attributes.AttributeProjectileDamage;
 import com.playmonumenta.plugins.bosses.BossManager;
 import com.playmonumenta.plugins.bosses.bosses.CrowdControlImmunityBoss;
-import com.playmonumenta.plugins.classes.ClassAbility;
-import com.playmonumenta.plugins.classes.magic.MagicType;
+import com.playmonumenta.plugins.effects.Aesthetics;
 import com.playmonumenta.plugins.effects.Bleed;
 import com.playmonumenta.plugins.effects.CustomDamageOverTime;
 import com.playmonumenta.plugins.effects.Effect;
+import com.playmonumenta.plugins.effects.Paralyze;
 import com.playmonumenta.plugins.effects.PercentDamageDealt;
 import com.playmonumenta.plugins.effects.PercentDamageReceived;
 import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.effects.SplitArrowIframesEffect;
-import com.playmonumenta.plugins.enchantments.Inferno;
-import com.playmonumenta.plugins.enchantments.PointBlank;
-import com.playmonumenta.plugins.enchantments.RegionScalingDamageDealt;
-import com.playmonumenta.plugins.enchantments.Sniper;
-import com.playmonumenta.plugins.enchantments.infusions.Focus;
-import com.playmonumenta.plugins.events.CustomDamageEvent;
-import com.playmonumenta.plugins.server.properties.ServerProperties;
-
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.itemstats.enchantments.Inferno;
+import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
 
 
 public class EntityUtils {
@@ -107,7 +125,6 @@ public class EntityUtils {
 	);
 
 	private static final EnumSet<EntityType> AQUATIC_MOBS = EnumSet.of(
-			EntityType.DOLPHIN,
 			EntityType.GUARDIAN,
 			EntityType.ELDER_GUARDIAN,
 			EntityType.SQUID,
@@ -131,6 +148,11 @@ public class EntityUtils {
 			EntityType.SLIME,
 			EntityType.MAGMA_CUBE,
 			EntityType.SHULKER,
+			EntityType.SPIDER,
+			EntityType.CAVE_SPIDER,
+			EntityType.SILVERFISH,
+			EntityType.ENDERMITE,
+			EntityType.BEE,
 			EntityType.POLAR_BEAR,
 			EntityType.BAT,
 			EntityType.CAT,
@@ -147,7 +169,16 @@ public class EntityUtils {
 			EntityType.PIG,
 			EntityType.RABBIT,
 			EntityType.RAVAGER,
-			EntityType.SHEEP
+			EntityType.SHEEP,
+			EntityType.DOLPHIN,
+			EntityType.GUARDIAN,
+			EntityType.ELDER_GUARDIAN,
+			EntityType.SQUID,
+			EntityType.TURTLE,
+			EntityType.COD,
+			EntityType.SALMON,
+			EntityType.TROPICAL_FISH,
+			EntityType.PUFFERFISH
 	);
 
 	// This list is hardcoded for Crusade description & Duelist advancement
@@ -171,10 +202,10 @@ public class EntityUtils {
 
 	private static final String COOLING_ATTR_NAME = "CoolingSlownessAttr";
 	private static final String STUN_ATTR_NAME = "StunSlownessAttr";
+	private static final String IGNORE_TAUNT_TAG = "taunt_ignore";
 	private static final Map<LivingEntity, Integer> COOLING_MOBS = new HashMap<LivingEntity, Integer>();
 	private static final Map<LivingEntity, Integer> STUNNED_MOBS = new HashMap<LivingEntity, Integer>();
 	private static final Map<LivingEntity, Integer> SILENCED_MOBS = new HashMap<LivingEntity, Integer>();
-	private static final Map<LivingEntity, Integer> CONFUSED_MOBS = new HashMap<LivingEntity, Integer>();
 	private static BukkitRunnable mobsTracker = null;
 
 	private static final Particle.DustOptions STUN_COLOR = new Particle.DustOptions(Color.fromRGB(255, 255, 100), 1.0f);
@@ -195,7 +226,6 @@ public class EntityUtils {
 				Iterator<Map.Entry<LivingEntity, Integer>> coolingIter = COOLING_MOBS.entrySet().iterator();
 				Iterator<Map.Entry<LivingEntity, Integer>> stunnedIter = STUNNED_MOBS.entrySet().iterator();
 				Iterator<Map.Entry<LivingEntity, Integer>> silencedIter = SILENCED_MOBS.entrySet().iterator();
-				Iterator<Map.Entry<LivingEntity, Integer>> confusedIter = CONFUSED_MOBS.entrySet().iterator();
 
 				while (coolingIter.hasNext()) {
 					Map.Entry<LivingEntity, Integer> cooling = coolingIter.next();
@@ -261,26 +291,6 @@ public class EntityUtils {
 						silencedIter.remove();
 					}
 				}
-
-				while (confusedIter.hasNext()) {
-					Map.Entry<LivingEntity, Integer> confused = confusedIter.next();
-					Mob mob = (Mob) confused.getKey();
-					CONFUSED_MOBS.put(mob, confused.getValue() - 1);
-
-					double angle = Math.toRadians(mRotation);
-					Location l = mob.getLocation();
-					l.add(FastUtils.cos(angle) * 0.5, mob.getHeight() + 0.25, FastUtils.sin(angle) * 0.5);
-					mob.getWorld().spawnParticle(Particle.REDSTONE, l, 2, 0, 0, 0, CONFUSION_COLOR);
-
-					if (mob.getTarget() == null) {
-						mob.setTarget(getNearestMob(mob.getLocation(), 8, mob));
-					}
-
-					if (confused.getValue() <= 0 || mob.isDead() || !mob.isValid()) {
-						mob.setTarget(null);
-						confusedIter.remove();
-					}
-				}
 			}
 		};
 
@@ -310,6 +320,11 @@ public class EntityUtils {
 	// Affected by Duelist
 	public static boolean isHumanlike(LivingEntity mob) {
 		return HUMANLIKE_MOBS.contains(mob.getType());
+	}
+
+	// Affected by Abyssal
+	public static boolean isInWater(LivingEntity mob) {
+		return mob.getLocation().getBlock().getType().equals(Material.WATER) || mob.getLocation().subtract(0, 1, 0).getBlock().getType().equals(Material.WATER);
 	}
 
 	public static boolean isElite(Entity entity) {
@@ -451,13 +466,13 @@ public class EntityUtils {
 		return arrow;
 	}
 
-	public static List<Projectile> spawnArrowVolley(Plugin plugin, LivingEntity player, int numProjectiles, float speed, double spacing, Class<? extends AbstractArrow> arrowClass) {
-		List<Projectile> projectiles = new ArrayList<Projectile>();
+	public static List<AbstractArrow> spawnArrowVolley(Plugin plugin, LivingEntity player, int numProjectiles, float speed, double spacing, Class<? extends AbstractArrow> arrowClass) {
+		List<AbstractArrow> projectiles = new ArrayList<AbstractArrow>();
 
 		for (double yaw = -spacing * (numProjectiles / 2); yaw < spacing * ((numProjectiles / 2) + 1); yaw += spacing) {
 			Projectile proj = spawnArrow(plugin, player, yaw, 0.0, new Vector(0, 0, 0), speed, arrowClass);
-			if (proj != null) {
-				projectiles.add(proj);
+			if (proj != null && proj instanceof AbstractArrow arrow) {
+				projectiles.add(arrow);
 			}
 		}
 
@@ -653,68 +668,6 @@ public class EntityUtils {
 		return null;
 	}
 
-	// Manually calculates the real final damage dealt to a player, in case of manual event calls or absorption hearts.
-	// Evasion is not accounted for, as evasion modifies the actual event damage. Works only for players.
-	// Does NOT include blocking, so a separate check (event.getFinalDamage > 0) is needed for that
-	public static double getRealFinalDamage(EntityDamageEvent event) {
-		if (!(event.getEntity() instanceof Player)) {
-			// Give garbage value if being used incorrectly
-			return -1;
-		}
-
-		// getFinalDamage() is 0 if the damage was blocked by a shield. Only trust the vanilla calculation in this case.
-		if (event.getFinalDamage() <= 0) {
-			return 0;
-		}
-
-		Player player = (Player) event.getEntity();
-		DamageCause cause = event.getCause();
-		double damage = event.getDamage();
-		double armor = 0;
-		double toughness = 0;
-
-		if (PHYSICAL_DAMAGE.contains(cause)) {
-			armor = player.getAttribute(Attribute.GENERIC_ARMOR).getValue();
-			toughness = player.getAttribute(Attribute.GENERIC_ARMOR_TOUGHNESS).getValue();
-		}
-
-		int protection = 0;
-		ItemStack[] armorContents = player.getInventory().getArmorContents();
-
-		for (int i = 0; i < armorContents.length; i++) {
-			if (armorContents[i] != null) {
-				if (armorContents[i].containsEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL)) {
-					protection += armorContents[i].getEnchantmentLevel(Enchantment.PROTECTION_ENVIRONMENTAL);
-				}
-
-				if (cause == DamageCause.PROJECTILE) {
-					if (armorContents[i].containsEnchantment(Enchantment.PROTECTION_PROJECTILE)) {
-						protection += armorContents[i].getEnchantmentLevel(Enchantment.PROTECTION_PROJECTILE) * 2;
-					}
-				} else if (cause == DamageCause.BLOCK_EXPLOSION || cause == DamageCause.ENTITY_EXPLOSION) {
-					if (armorContents[i].containsEnchantment(Enchantment.PROTECTION_EXPLOSIONS)) {
-						protection += armorContents[i].getEnchantmentLevel(Enchantment.PROTECTION_EXPLOSIONS) * 2;
-					}
-				} else if (cause == DamageCause.FIRE || cause == DamageCause.FIRE_TICK || cause == DamageCause.HOT_FLOOR || cause == DamageCause.LAVA) {
-					if (armorContents[i].containsEnchantment(Enchantment.PROTECTION_FIRE)) {
-						protection += armorContents[i].getEnchantmentLevel(Enchantment.PROTECTION_FIRE) * 2;
-					}
-				} else if (cause == DamageCause.FALL) {
-					if (armorContents[i].containsEnchantment(Enchantment.PROTECTION_FALL)) {
-						protection += armorContents[i].getEnchantmentLevel(Enchantment.PROTECTION_FALL) * 3;
-					}
-				}
-			}
-		}
-
-		int resistance = player.getPotionEffect(PotionEffectType.DAMAGE_RESISTANCE) == null
-				? 0 : (player.getPotionEffect(PotionEffectType.DAMAGE_RESISTANCE).getAmplifier() + 1);
-		int vulnerability = (player.getPotionEffect(PotionEffectType.UNLUCK) == null
-				? 0 : (player.getPotionEffect(PotionEffectType.UNLUCK).getAmplifier() + 1));
-
-		return calculateDamageAfterArmor(damage, armor, toughness, false) * (1 - Math.min(20.0, protection) / 25) * (1 - Math.min(5.0, resistance) / 5) * (1 + 0.05 * vulnerability);
-	}
-
 	public static double vulnerabilityMult(LivingEntity target) {
 		PotionEffect unluck = target.getPotionEffect(PotionEffectType.UNLUCK);
 		if (unluck != null) {
@@ -839,13 +792,30 @@ public class EntityUtils {
 
 	private static final String WEAKEN_EFFECT_NAME = "WeakenEffect";
 
-	private static final EnumSet<DamageCause> WEAKEN_EFFECT_AFFECTED_DAMAGE_CAUSES = EnumSet.of(
-			DamageCause.ENTITY_ATTACK,
-			DamageCause.PROJECTILE
+	private static final EnumSet<DamageType> WEAKEN_EFFECT_AFFECTED_DAMAGE_TYPES = EnumSet.of(
+			DamageType.MELEE,
+			DamageType.PROJECTILE
 		);
 
 	public static void applyWeaken(Plugin plugin, int ticks, double amount, LivingEntity mob) {
-		plugin.mEffectManager.addEffect(mob, WEAKEN_EFFECT_NAME, new PercentDamageDealt(ticks, -amount, WEAKEN_EFFECT_AFFECTED_DAMAGE_CAUSES));
+		plugin.mEffectManager.addEffect(mob, WEAKEN_EFFECT_NAME, new PercentDamageDealt(ticks, -amount, WEAKEN_EFFECT_AFFECTED_DAMAGE_TYPES));
+		plugin.mEffectManager.addEffect(mob, "WeakenEffectAesthetics", new Aesthetics(ticks,
+			(entity, fourHertz, twoHertz, oneHertz) -> {
+				if (fourHertz) {
+					if (!(mob instanceof Player)) {
+						return;
+					}
+					Player p = (Player) mob;
+					World world = p.getWorld();
+					Location rightHand = PlayerUtils.getRightSide(p.getEyeLocation(), 0.45).subtract(0, .8, 0);
+					Location leftHand = PlayerUtils.getRightSide(p.getEyeLocation(), -0.45).subtract(0, .8, 0);
+					world.spawnParticle(Particle.SMOKE_NORMAL, leftHand, 2, 0.05f, 0.05f, 0.05f, 0);
+					world.spawnParticle(Particle.SMOKE_NORMAL, rightHand, 2, 0.05f, 0.05f, 0.05f, 0);
+				}
+			},
+			(entity) -> {
+
+			}));
 	}
 
 	public static boolean isWeakened(Plugin plugin, LivingEntity mob) {
@@ -878,8 +848,13 @@ public class EntityUtils {
 
 	public static void setWeakenTicks(Plugin plugin, LivingEntity mob, int ticks) {
 		NavigableSet<Effect> weaks = plugin.mEffectManager.getEffects(mob, WEAKEN_EFFECT_NAME);
+		NavigableSet<Effect> weaksAesthetics = plugin.mEffectManager.getEffects(mob, "WeakenEffectAesthetics");
 		if (weaks != null) {
 			Effect weak = weaks.last();
+			weak.setDuration(ticks);
+		}
+		if (weaksAesthetics != null) {
+			Effect weak = weaksAesthetics.last();
 			weak.setDuration(ticks);
 		}
 	}
@@ -892,44 +867,36 @@ public class EntityUtils {
 		return plugin.mEffectManager.getEffects(mob, CustomDamageOverTime.class).size();
 	}
 
-	public static double getDamageOverTimeMagnitude(Plugin plugin, LivingEntity mob) {
-		double sum = 0;
+	public static double getHighestDamageOverTime(Plugin plugin, LivingEntity mob) {
+		double highest = 0;
 		for (Effect effect : plugin.mEffectManager.getEffects(mob, CustomDamageOverTime.class)) {
-			sum += effect.getMagnitude();
+			highest = Math.max(highest, effect.getMagnitude());
 		}
-		return sum;
+		return highest;
 	}
 
 	public static void applyFire(Plugin plugin, int fireTicks, LivingEntity target, Player player) {
-		target.setMetadata(Inferno.SET_FIRE_TICK_METAKEY, new FixedMetadataValue(plugin, target.getTicksLived()));
-		target.setMetadata(Inferno.FIRE_TICK_METAKEY, new FixedMetadataValue(plugin, target.getTicksLived()));
+		int inferno = (int) plugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.INFERNO);
+		if (inferno > 0) {
+			Inferno.apply(plugin, player, inferno, target, fireTicks);
+		}
+
 		if (target.getFireTicks() < fireTicks) {
 			target.setFireTicks(fireTicks);
 		}
-
-		//TODO this 0.001 damage can get affected by abilities/enchants,
-		// becoming high enough (> 0.01) to be displayed by training dummies.
-		// Perhaps it's possible to trigger Inferno's "on fire" effect using its class directly,
-		// instead of sending damage through?
-		// Then if damage does indeed happen after, it should not retrigger Inferno
-		//
-		// Also unsure if the change hotbar slot exploit works when it gets mainhand item -
-		// hitting an enemy without fire aspect and then switching to a fire aspect item for the check
-
-		// Inferno detects a damage event (since it can light fire-resistant mobs "on fire"), so do some damage.
-		// We need to do this even for abilities that deal damage, since the damage events might not occur due to iframes.
-		// This damage will always bypass iframes & doesn't affect velocity
-		damageEntity(plugin, target, 0.001, player, MagicType.FIRE, false, null, false, false, true, true);
 	}
 
 	public static void applyTaunt(Plugin plugin, LivingEntity tauntedEntity, Player targetedPlayer) {
-		Mob tauntedMob = (Mob)tauntedEntity;
-		tauntedMob.setTarget(targetedPlayer);
-		targetedPlayer.getWorld().spawnParticle(Particle.REDSTONE, tauntedEntity.getEyeLocation().add(0, 0.5, 0), 12, 0.4, 0.5, 0.4, TAUNT_COLOR);
+		if (!tauntedEntity.getScoreboardTags().contains(IGNORE_TAUNT_TAG)) {
+			Mob tauntedMob = (Mob)tauntedEntity;
+			tauntedMob.setTarget(targetedPlayer);
+			targetedPlayer.getWorld().spawnParticle(Particle.REDSTONE, tauntedEntity.getEyeLocation().add(0, 0.5, 0), 12, 0.4, 0.5, 0.4, TAUNT_COLOR);
 
-		// Damage the taunted enemy to keep focus on the player who casted the taunt.
-		// Damage bypasses iframes & doesn't affect velocity
-		damageEntity(plugin, tauntedMob, 0.001, targetedPlayer, MagicType.HOLY, false, null, false, false, true, true);
+			// Damage the taunted enemy to keep focus on the player who casted the taunt.
+			// Damage bypasses iframes & doesn't affect velocity
+			DamageUtils.damage(targetedPlayer, tauntedMob, DamageType.OTHER, 0.001, null, true, true);
+
+		}
 	}
 
 	public static boolean isCooling(Entity mob) {
@@ -1040,44 +1007,6 @@ public class EntityUtils {
 		}
 	}
 
-	public static boolean isConfused(Entity mob) {
-		return CONFUSED_MOBS.containsKey(mob);
-	}
-
-	public static void removeConfusion(LivingEntity mob) {
-		if (CONFUSED_MOBS.containsKey(mob)) {
-			CONFUSED_MOBS.put(mob, 0);
-		}
-	}
-
-	public static void applyConfusion(Plugin plugin, int ticks, LivingEntity mob) {
-		if (isBoss(mob) || !(mob instanceof Mob) || mob.getScoreboardTags().contains(CrowdControlImmunityBoss.identityTag)) {
-			return;
-		}
-
-		if (mobsTracker == null || mobsTracker.isCancelled()) {
-			startTracker(plugin);
-		}
-
-		Mob creature = (Mob) mob;
-
-		/* Fake "event" so bosses can handle being confused if they need to */
-		BossManager.getInstance().entityConfused(mob);
-
-		List<LivingEntity> nearby = getNearbyMobs(mob.getLocation(), 8, mob);
-		if (nearby.size() > 0) {
-			creature.setTarget(nearby.get(0));
-		} else {
-			creature.setTarget(null);
-		}
-		PotionUtils.applyPotion(null, mob, new PotionEffect(PotionEffectType.SPEED, ticks, 2, false, true));
-
-		Integer t = CONFUSED_MOBS.get(mob);
-		if (t == null || t < ticks) {
-			CONFUSED_MOBS.put(mob, ticks);
-		}
-	}
-
 	public static void summonEntityAt(Location loc, EntityType type, String nbt) {
 		try {
 			getSummonEntityAt(loc, type, nbt);
@@ -1128,90 +1057,6 @@ public class EntityUtils {
 
 		// If our manual search didn't find the target, then just default to the buggy location value
 		return proj.getLocation();
-	}
-
-	private static final double MARGIN_OF_ERROR = 0.001;
-	private static final int MAXIMUM_ITERATIONS = (int)(Math.log(MARGIN_OF_ERROR) / Math.log(0.5) * 2);
-
-	/**
-	 * Returns the raw damage needed to achieve a final damage multiplied by some constant, undershoots to the margin of error.
-	 * <p>
-	 * If raw damage is directly multiplied, then armor piercing effects make the damage exponentially more punishing.
-	 * <p>
-	 * IMPORTANT: do not use this method if the damage taken is not reduced by armor.
-	 *
-	 * @param armor      the armor of the damagee
-	 * @param toughness  the armor toughness of the damagee
-	 * @param damage     the initial raw damage
-	 * @param multiplier the desired multiplier for the final damage
-	 * @return the raw damage needed to achieve the desired multiplier for final damage
-	 */
-	public static double getDamageApproximation(double armor, double toughness, double damage, double multiplier) {
-		return getDamageApproximation(armor, toughness, damage, multiplier, false);
-	}
-
-	private static double getDamageApproximation(double armor, double toughness, double damage, double multiplier, boolean useVanillaArmorCalculation) {
-		double rawDamageLowerBound;
-		double rawDamageUpperBound;
-
-		if (multiplier > 1) {
-			rawDamageLowerBound = damage;
-			rawDamageUpperBound = rawDamageLowerBound * multiplier;
-		} else if (multiplier < 1) {
-			rawDamageUpperBound = damage;
-			rawDamageLowerBound = 0; // Since armor gets better at lower damage, there's no good lower bound
-		} else {
-			return damage;
-		}
-
-		double finalDamageBaseline = calculateDamageAfterArmor(damage, armor, toughness, useVanillaArmorCalculation);
-
-		// Infinite loop safe this in case of bugs
-		for (int i = 0; i < MAXIMUM_ITERATIONS; i++) {
-			// No need to worry about double overflow
-			double rawDamageMiddle = (rawDamageLowerBound + rawDamageUpperBound) / 2;
-			// Protection is constant, evasion is already factored in
-			double damageRatio = calculateDamageAfterArmor(rawDamageMiddle, armor, toughness, useVanillaArmorCalculation) / finalDamageBaseline;
-
-			if (damageRatio <= multiplier) {
-				if (damageRatio > multiplier * (1 - MARGIN_OF_ERROR)) {
-					return rawDamageMiddle;
-				}
-				rawDamageLowerBound = rawDamageMiddle;
-			} else {
-				rawDamageUpperBound = rawDamageMiddle;
-			}
-		}
-
-		// Can only reach because of bug, so return a very noticeable fail case
-		return 0;
-	}
-
-	public static double getDamageApproximation(EntityDamageByEntityEvent event, double multiplier) {
-		return getDamageApproximation(event, multiplier, false);
-	}
-
-	public static double getDamageApproximation(EntityDamageByEntityEvent event, double multiplier, boolean useVanillaArmorCalculation) {
-		// Not affected by armor
-		if (!PHYSICAL_DAMAGE.contains(event.getCause())) {
-			return event.getDamage() * multiplier;
-		}
-
-		// Has no attributes
-		if (!(event.getEntity() instanceof LivingEntity)) {
-			return event.getDamage() * multiplier;
-		}
-
-		LivingEntity le = (LivingEntity) event.getEntity();
-
-		return getDamageApproximation(le.getAttribute(Attribute.GENERIC_ARMOR).getValue(), le.getAttribute(Attribute.GENERIC_ARMOR_TOUGHNESS).getValue(), event.getDamage(), multiplier, useVanillaArmorCalculation);
-	}
-
-	// getFinalDamage() does not work for dummy event calls, and this is fewer calculations than getRealFinalDamage()
-	private static double calculateDamageAfterArmor(double damage, double armor, double toughness, boolean useVanillaArmorCalculation) {
-		armor = Math.min(30, armor);
-		toughness = Math.min(20, toughness);
-		return damage * (1 - Math.min(20, Math.max(armor / 5, armor - (damage <= 16 || useVanillaArmorCalculation ? damage : 4 * Math.log(damage) / LOG_2) / (2 + toughness / 4))) / 25);
 	}
 
 	// Only use this to set max health of newly spawned mobs
@@ -1275,150 +1120,34 @@ public class EntityUtils {
 		}
 	}
 
-	// Skip magic type, register event, spell, spellshock, iframes, velocity
-	public static void damageEntity(Plugin plugin, LivingEntity target, double damage, @Nullable Entity attacker) {
-		damageEntity(plugin, target, damage, attacker, null);
-	}
-
-	// Skip register event, spell, spellshock, iframes, velocity
-	public static void damageEntity(Plugin plugin, LivingEntity target, double damage, @Nullable Entity attacker, @Nullable MagicType magicType) {
-		damageEntity(plugin, target, damage, attacker, magicType, true);
-	}
-
-	// Skip spell, spellshock, iframes, velocity
-	public static void damageEntity(Plugin plugin, LivingEntity target, double damage, @Nullable Entity attacker, @Nullable MagicType magicType, boolean registerEvent) {
-		damageEntity(plugin, target, damage, attacker, magicType, registerEvent, null);
-	}
-
-	// Skip spellshock, iframes, velocity
-	public static void damageEntity(Plugin plugin, LivingEntity target, double damage, @Nullable Entity attacker, @Nullable MagicType magicType, boolean registerEvent, @Nullable ClassAbility spell) {
-		damageEntity(plugin, target, damage, attacker, magicType, registerEvent, spell, true, true);
-	}
-
-	// Skip iframes, velocity
-	public static void damageEntity(Plugin plugin, LivingEntity target, double damage, @Nullable Entity attacker, @Nullable MagicType magicType, boolean registerEvent, @Nullable ClassAbility spell, boolean applySpellshock, boolean triggerSpellshock) {
-		damageEntity(plugin, target, damage, attacker, magicType, registerEvent, spell, applySpellshock, triggerSpellshock, false);
-	}
-
-	// Skip velocity
-	public static void damageEntity(Plugin plugin, LivingEntity target, double damage, @Nullable Entity attacker, @Nullable MagicType magicType, boolean registerEvent, @Nullable ClassAbility spell, boolean applySpellshock, boolean triggerSpellshock, boolean bypassIFrames) {
-		damageEntity(plugin, target, damage, attacker, magicType, registerEvent, spell, applySpellshock, triggerSpellshock, bypassIFrames, false);
-	}
-
-	public static void damageEntity(
-		Plugin plugin,
-		LivingEntity target,
-		double damage,
-		@Nullable Entity attacker,
-		@Nullable MagicType magicType,
-		boolean registerEvent,
-		@Nullable ClassAbility spell,
-		boolean applySpellshock,
-		boolean triggerSpellshock,
-		// Usual damage iframe behaviour would be like setting to false.
-		// Set to true to easily, properly ignore iframes without messing up last damage or resetting aka further extending iframes
-		boolean bypassIFrames,
-		// Usual damage knockback behaviour would be like setting to false.
-		// Set to true to easily set back velocity from before the damage
-		boolean restoreVelocity
-	) {
-		if (target.isValid() && !target.isInvulnerable()) {
-			CustomDamageEvent event = new CustomDamageEvent(attacker, target, damage, magicType, registerEvent, spell, applySpellshock, triggerSpellshock);
-			Bukkit.getPluginManager().callEvent(event);
-			if (event.isCancelled()) {
-				return;
-			}
-
-			int originalAttackCooldown = 0;
-			if (attacker instanceof LivingEntity) {
-				originalAttackCooldown = NmsUtils.getAttackCooldown((LivingEntity) attacker);
-			}
-
-			int originalIFrames = target.getNoDamageTicks();
-			double originalLastDamage = target.getLastDamage();
-			Vector originalVelocity = target.getVelocity();
-			if (bypassIFrames) {
-				target.setNoDamageTicks(0);
-			}
-
-			double actualDamage = event.getDamage();
-			if (attacker instanceof Player) {
-				if (
-					magicType != null
-					&& magicType != MagicType.NONE
-					&& magicType != MagicType.PHYSICAL
-				) {
-					MetadataUtils.checkOnceThisTick(plugin, attacker, "LastMagicUseTime");
-				}
-				// Applies DamageCause.CUSTOM
-				NmsUtils.customDamageEntity(target, actualDamage, (Player)attacker, "magic");
-			} else {
-				// Applies DamageCause.ENTITY_ATTACK
-				target.damage(actualDamage, attacker);
-			}
-
-			if (bypassIFrames) {
-				target.setNoDamageTicks(originalIFrames);
-				target.setLastDamage(originalLastDamage);
-			}
-			if (restoreVelocity) {
-				target.setVelocity(originalVelocity);
-			}
-
-			if (attacker instanceof LivingEntity) {
-				NmsUtils.setAttackCooldown((LivingEntity) attacker, originalAttackCooldown);
-			}
-
-		}
-	}
-
-	public static boolean isSomeArrow(Projectile projectile) {
+	public static boolean isSomeArrow(Entity projectile) {
 		return isSomeArrow(projectile.getType());
 	}
 
 	public static boolean isSomeArrow(EntityType entityType) {
 		// TippedArrow is deprecated
-		return (
-			entityType == EntityType.ARROW
-				|| entityType == EntityType.SPECTRAL_ARROW
-		);
+		return entityType == EntityType.ARROW || entityType == EntityType.SPECTRAL_ARROW;
 	}
 
-	public static double getProjSkillDamage(Player player, Plugin plugin) {
-		return getProjSkillDamage(player, plugin, true, null);
+	private static final String PARALYZE_EFFECT_NAME = "ParalyzeEffect";
+
+	public static void paralyze(Plugin plugin, int ticks, LivingEntity mob) {
+		plugin.mEffectManager.addEffect(mob, PARALYZE_EFFECT_NAME, new Paralyze(ticks, plugin));
 	}
 
-	public static double getProjSkillDamage(Player player, Plugin plugin, boolean includeSniperAndPB, @Nullable Location targetLoc) {
-		double damage = PlayerUtils.getAttribute(player, AttributeProjectileDamage.PROPERTY_NAME);
-		int focusLevel = plugin.mTrackingManager.mPlayers.getPlayerCustomEnchantLevel(player, Focus.class);
-		if (focusLevel > 0) {
-			damage *= 1 + focusLevel * Focus.DAMAGE_PCT_PER_LEVEL;
+	public static boolean isParalyzed(Plugin plugin, LivingEntity mob) {
+		NavigableSet<Effect> paralyses = plugin.mEffectManager.getEffects(mob, PARALYZE_EFFECT_NAME);
+		if (paralyses != null) {
+			return true;
 		}
+		return false;
+	}
 
-		if (includeSniperAndPB && targetLoc != null) {
-			int pointBlankLevel = plugin.mTrackingManager.mPlayers.getPlayerCustomEnchantLevel(player, PointBlank.class);
-			int sniperLevel = plugin.mTrackingManager.mPlayers.getPlayerCustomEnchantLevel(player, Sniper.class);
-			if (pointBlankLevel > 0 && player.getLocation().distance(targetLoc) < PointBlank.DISTANCE) {
-				damage += pointBlankLevel * PointBlank.DAMAGE_PER_LEVEL;
-			} else if (sniperLevel > 0 && player.getLocation().distance(targetLoc) > Sniper.DISTANCE) {
-				damage += sniperLevel * Sniper.DAMAGE_PER_LEVEL;
-			}
+	public static void removeParalysis(Plugin plugin, LivingEntity mob) {
+		NavigableSet<Effect> paralyses = plugin.mEffectManager.getEffects(mob, PARALYZE_EFFECT_NAME);
+		if (paralyses != null) {
+			paralyses.last().setDuration(0);
 		}
-
-		// All possible Proj Damage sources that don't also include Ability Damage at the same level, prevents things from double-stacking
-		NavigableSet<Effect> celestialBlessingEffects = plugin.mEffectManager.getEffects(player, CelestialBlessing.DAMAGE_EFFECT_NAME);
-		NavigableSet<Effect> thuribleEffects = plugin.mEffectManager.getEffects(player, ThuribleProcession.PERCENT_DAMAGE_EFFECT_NAME);
-		double blessingBonus = celestialBlessingEffects != null ? celestialBlessingEffects.last().getMagnitude() : 0;
-		double thuribleBonus = thuribleEffects != null ? thuribleEffects.last().getMagnitude() : 0;
-
-		damage *= Sharpshooter.getDamageMultiplier(player) + blessingBonus + thuribleBonus;
-
-		//If they're using an r2 bow/crossbow in r1, decrease damage appropriately
-		if (!ServerProperties.getClassSpecializationsEnabled() && plugin.mTrackingManager.mPlayers.getPlayerCustomEnchantLevel(player, RegionScalingDamageDealt.class) > 0) {
-			damage *= RegionScalingDamageDealt.DAMAGE_DEALT_MULTIPLIER;
-		}
-
-		return damage;
 	}
 
 }

@@ -1,8 +1,8 @@
 package com.playmonumenta.plugins.depths.abilities.flamecaller;
 
 import java.util.List;
+import java.util.logging.Level;
 
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -10,23 +10,24 @@ import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.AbstractArrow;
 import org.bukkit.entity.AbstractArrow.PickupStatus;
-import org.bukkit.entity.Arrow;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.entity.Projectile;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.metadata.FixedMetadataValue;
+import org.bukkit.metadata.MetadataValue;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.classes.ClassAbility;
-import com.playmonumenta.plugins.classes.magic.MagicType;
 import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
 import com.playmonumenta.plugins.depths.abilities.aspects.BowAspect;
+import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.listeners.DamageListener;
+import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 
 import net.md_5.bungee.api.ChatColor;
@@ -50,67 +51,34 @@ public class Pyroblast extends DepthsAbility {
 		mInfo.mIgnoreCooldown = true;
 	}
 
-	public void execute() {
-		if (mPlayer == null) {
-			return;
-		}
-		World world = mPlayer.getWorld();
-		world.playSound(mPlayer.getLocation(), Sound.ENTITY_FIREWORK_ROCKET_BLAST, 1, 1.4f);
-
-		Arrow arrow = mPlayer.launchProjectile(Arrow.class);
-
-		arrow.setPierceLevel(0);
-		arrow.setCritical(true);
-		arrow.setPickupStatus(PickupStatus.CREATIVE_ONLY);
-		arrow.setVelocity(mPlayer.getLocation().getDirection().multiply(2.0));
-		arrow.setMetadata(META_DATA_TAG, new FixedMetadataValue(mPlugin, 0));
-
-		mPlugin.mProjectileEffectTimers.addEntity(arrow, Particle.SOUL_FIRE_FLAME);
-		mPlugin.mProjectileEffectTimers.addEntity(arrow, Particle.CAMPFIRE_SIGNAL_SMOKE);
-		ProjectileLaunchEvent eventLaunch = new ProjectileLaunchEvent(arrow);
-		Bukkit.getPluginManager().callEvent(eventLaunch);
-
-		new BukkitRunnable() {
-			int mT = 0;
-			@Override
-			public void run() {
-
-				if (arrow == null || mT > COOLDOWN) {
-					arrow.remove();
-
-					this.cancel();
-				}
-				if (arrow.getVelocity().length() < .05 || arrow.isOnGround()) {
-					explode(arrow, arrow.getLocation());
-
-					this.cancel();
-				}
-				mT++;
-			}
-
-		}.runTaskTimer(mPlugin, 0, 1);
-	}
-
 	@Override
-	public boolean livingEntityShotByPlayerEvent(Projectile proj, LivingEntity le, EntityDamageByEntityEvent event) {
-		if (proj instanceof AbstractArrow && proj.hasMetadata(META_DATA_TAG)) {
-			explode((AbstractArrow) proj, le.getLocation());
+	public void onDamage(DamageEvent event, LivingEntity enemy) {
+		Entity damager = event.getDamager();
+		if (event.getType() == DamageType.PROJECTILE && damager != null && damager instanceof AbstractArrow arrow && damager.hasMetadata(META_DATA_TAG)) {
+			explode(arrow, enemy.getLocation());
 		}
-
-		return true;
 	}
 
 	private void explode(AbstractArrow arrow, Location loc) {
+		MetadataValue value = arrow.getMetadata(DamageListener.PROJECTILE_ITEM_STATS_METAKEY).get(0);
+		if (mPlayer != null && value instanceof FixedMetadataValue playerItemStats) {
+			List<LivingEntity> mobs = EntityUtils.getNearbyMobs(loc, RADIUS);
+			for (LivingEntity mob : mobs) {
+				EntityUtils.applyFire(mPlugin, DURATION, mob, mPlayer);
+				DamageEvent damageEvent = new DamageEvent(mob, mPlayer, mPlayer, DamageType.MAGIC, mInfo.mLinkedSpell, DAMAGE[mRarity - 1]);
+				damageEvent.setDelayed(true);
+				damageEvent.setPlayerItemStat(playerItemStats);
+				DamageUtils.damage(damageEvent, false, true, null);
+			}
+		} else {
+			mPlugin.getLogger().log(Level.WARNING, "Malformed ProjectileItemStats metadata detected (Pyroblast)");
+		}
+
 		World world = arrow.getWorld();
 		world.spawnParticle(Particle.EXPLOSION_HUGE, loc, 1, 0, 0, 0);
 		world.spawnParticle(Particle.SOUL_FIRE_FLAME, loc, 40, 2, 2, 2, 0);
 		world.spawnParticle(Particle.FLAME, loc, 40, 2, 2, 2, 0);
 		world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 1, 1);
-		List<LivingEntity> mobs = EntityUtils.getNearbyMobs(loc, RADIUS);
-		for (LivingEntity e : mobs) {
-			EntityUtils.applyFire(mPlugin, DURATION, e, mPlayer);
-			EntityUtils.damageEntity(mPlugin, e, DAMAGE[mRarity - 1], mPlayer, MagicType.FIRE, true, mInfo.mLinkedSpell);
-		}
 		arrow.remove();
 	}
 
@@ -121,17 +89,46 @@ public class Pyroblast extends DepthsAbility {
 		}
 
 		if (mPlayer.isSneaking()) {
-			arrow.remove();
 			mInfo.mCooldown = (int) (COOLDOWN * BowAspect.getCooldownReduction(mPlayer));
 			putOnCooldown();
-			execute();
+			World world = mPlayer.getWorld();
+			world.playSound(mPlayer.getLocation(), Sound.ENTITY_FIREWORK_ROCKET_BLAST, 1, 1.4f);
+
+			arrow.setPierceLevel(0);
+			arrow.setCritical(true);
+			arrow.setPickupStatus(PickupStatus.CREATIVE_ONLY);
+			arrow.setVelocity(mPlayer.getLocation().getDirection().multiply(2.0));
+			arrow.setMetadata(META_DATA_TAG, new FixedMetadataValue(mPlugin, 0));
+
+			mPlugin.mProjectileEffectTimers.addEntity(arrow, Particle.SOUL_FIRE_FLAME);
+			mPlugin.mProjectileEffectTimers.addEntity(arrow, Particle.CAMPFIRE_SIGNAL_SMOKE);
+
+			new BukkitRunnable() {
+				int mT = 0;
+				@Override
+				public void run() {
+
+					if (arrow == null || mT > COOLDOWN) {
+						arrow.remove();
+
+						this.cancel();
+					}
+					if (arrow.getVelocity().length() < .05 || arrow.isOnGround()) {
+						explode(arrow, arrow.getLocation());
+
+						this.cancel();
+					}
+					mT++;
+				}
+
+			}.runTaskTimer(mPlugin, 0, 1);
 		}
 		return true;
 	}
 
 	@Override
 	public String getDescription(int rarity) {
-		return "Shooting a bow while sneaking fires an exploding arrow, which deals " + DepthsUtils.getRarityColor(rarity) + DAMAGE[rarity - 1] + ChatColor.WHITE + " damage within a " + RADIUS + " block radius of it and sets nearby mobs on fire for " + DURATION / 20 + " seconds upon impact. Cooldown: " + COOLDOWN / 20 + "s.";
+		return "Shooting a bow or trident while sneaking fires an exploding arrow, which deals " + DepthsUtils.getRarityColor(rarity) + DAMAGE[rarity - 1] + ChatColor.WHITE + " magic damage within a " + RADIUS + " block radius of it and sets nearby mobs on fire for " + DURATION / 20 + " seconds upon impact. Cooldown: " + COOLDOWN / 20 + "s.";
 	}
 
 	@Override

@@ -1,15 +1,17 @@
 package com.playmonumenta.plugins.graves;
 
-import java.time.Instant;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.playmonumenta.plugins.Constants;
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.itemstats.ItemStatManager;
+import com.playmonumenta.plugins.itemstats.infusions.Phylactery;
+import com.playmonumenta.plugins.utils.ScoreboardUtils;
+import de.tr7zw.nbtapi.NBTContainer;
+import de.tr7zw.nbtapi.NBTItem;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -24,18 +26,15 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.EulerAngle;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.playmonumenta.plugins.Constants;
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.enchantments.Phylactery;
-import com.playmonumenta.plugins.utils.ScoreboardUtils;
-
-import de.tr7zw.nbtapi.NBTContainer;
-import de.tr7zw.nbtapi.NBTItem;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
+import java.time.Instant;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 public final class Grave {
 	private static final String KEY_TIME = "time";
@@ -449,6 +448,12 @@ public final class Grave {
 					}
 				}
 			}
+
+			Map<UUID, ItemStatManager.PlayerItemStats> itemStatsMap = Plugin.getInstance().mItemStatManager.getPlayerItemStatsMappings();
+			if (itemStatsMap.containsKey(player.getUniqueId())) {
+				itemStatsMap.get(player.getUniqueId()).updateStats(true);
+			}
+
 			if (collected > 0) {
 				player.sendMessage(Component.text("You collected ", NamedTextColor.AQUA)
 					.append(Component.text(collected == 1 ? "1 item from the grave" : collected + " items from the grave"))

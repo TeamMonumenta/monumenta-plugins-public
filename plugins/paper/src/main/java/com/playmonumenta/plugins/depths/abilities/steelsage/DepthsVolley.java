@@ -1,7 +1,17 @@
 package com.playmonumenta.plugins.depths.abilities.steelsage;
 
-import java.util.List;
-
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.depths.DepthsTree;
+import com.playmonumenta.plugins.depths.DepthsUtils;
+import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
+import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
+import com.playmonumenta.plugins.depths.abilities.aspects.BowAspect;
+import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.scriptedquests.utils.MetadataUtils;
+import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -13,26 +23,13 @@ import org.bukkit.entity.AbstractArrow.PickupStatus;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.entity.Projectile;
-import org.bukkit.entity.SpectralArrow;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.potion.PotionData;
 import org.bukkit.potion.PotionType;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.classes.ClassAbility;
-import com.playmonumenta.plugins.depths.DepthsTree;
-import com.playmonumenta.plugins.depths.DepthsUtils;
-import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
-import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
-import com.playmonumenta.plugins.depths.abilities.aspects.BowAspect;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.scriptedquests.utils.MetadataUtils;
-
-import net.md_5.bungee.api.ChatColor;
+import java.util.List;
 
 public class DepthsVolley extends DepthsAbility {
 
@@ -73,15 +70,11 @@ public class DepthsVolley extends DepthsAbility {
 		new BukkitRunnable() {
 			@Override
 			public void run() {
-				int numArrows = ARROWS[mRarity - 1];
-
-				List<Projectile> projectiles;
 				// Store PotionData from the original arrow only if it is weakness or slowness
 				PotionData tArrowData = null;
 				int fireticks = 0;
 
-				if (arrow instanceof Arrow) {
-					Arrow regularArrow = (Arrow) arrow;
+				if (arrow instanceof Arrow regularArrow) {
 					fireticks = regularArrow.getFireTicks();
 					if (regularArrow.hasCustomEffects()) {
 						tArrowData = regularArrow.getBasePotionData();
@@ -90,31 +83,27 @@ public class DepthsVolley extends DepthsAbility {
 							tArrowData = null;
 						}
 					}
-
-					projectiles = EntityUtils.spawnArrowVolley(mPlugin, mPlayer, numArrows, arrowSpeed, 5, Arrow.class);
-				} else {
-					projectiles = EntityUtils.spawnArrowVolley(mPlugin, mPlayer, numArrows, arrowSpeed, 5, SpectralArrow.class);
 				}
 
-				for (Projectile proj : projectiles) {
-					AbstractArrow projArrow = (AbstractArrow) proj;
-					projArrow.setPickupStatus(PickupStatus.CREATIVE_ONLY);
+				List<AbstractArrow> projectiles = EntityUtils.spawnArrowVolley(mPlugin, mPlayer, ARROWS[mRarity - 1], arrowSpeed, 5, arrow.getClass());
+				for (AbstractArrow proj : projectiles) {
+					proj.setPickupStatus(PickupStatus.CREATIVE_ONLY);
 					if (fireticks > 0) {
-						projArrow.setFireTicks(fireticks);
+						proj.setFireTicks(fireticks);
 					}
 
-					projArrow.setMetadata(VOLLEY_METAKEY, new FixedMetadataValue(mPlugin, null));
-					projArrow.setCritical(arrow.isCritical());
-					projArrow.setPierceLevel(arrow.getPierceLevel());
+					proj.setMetadata(VOLLEY_METAKEY, new FixedMetadataValue(mPlugin, null));
+					proj.setCritical(arrow.isCritical());
+					proj.setPierceLevel(arrow.getPierceLevel());
 
 					// If the base arrow's potion data is still stored, apply it to the new arrows
 					if (tArrowData != null) {
-						((Arrow) projArrow).setBasePotionData(tArrowData);
+						((Arrow) proj).setBasePotionData(tArrowData);
 					}
 
-					mPlugin.mProjectileEffectTimers.addEntity(projArrow, Particle.SMOKE_NORMAL);
+					mPlugin.mProjectileEffectTimers.addEntity(proj, Particle.SMOKE_NORMAL);
 
-					ProjectileLaunchEvent event = new ProjectileLaunchEvent(projArrow);
+					ProjectileLaunchEvent event = new ProjectileLaunchEvent(proj);
 					Bukkit.getPluginManager().callEvent(event);
 				}
 
@@ -129,18 +118,16 @@ public class DepthsVolley extends DepthsAbility {
 	}
 
 	@Override
-	public boolean livingEntityShotByPlayerEvent(Projectile proj, LivingEntity le, EntityDamageByEntityEvent event) {
-		if (proj instanceof Arrow && ((Arrow) proj).hasMetadata(VOLLEY_METAKEY)) {
-			if (MetadataUtils.checkOnceThisTick(mPlugin, le, VOLLEY_HIT_METAKEY)) {
+	public void onDamage(DamageEvent event, LivingEntity enemy) {
+		if (event.getType() == DamageType.PROJECTILE && event.getDamager() instanceof Arrow arrow && arrow.hasMetadata(VOLLEY_METAKEY)) {
+			if (MetadataUtils.checkOnceThisTick(mPlugin, enemy, VOLLEY_HIT_METAKEY)) {
 				double damageMultiplier = DAMAGE_MULTIPLIER[mRarity - 1];
 				event.setDamage(event.getDamage() * damageMultiplier);
 			} else {
 				// Only let one Volley arrow hit a given mob
-				return false;
+				event.setCancelled(true);
 			}
 		}
-
-		return true;
 	}
 
 	@Override

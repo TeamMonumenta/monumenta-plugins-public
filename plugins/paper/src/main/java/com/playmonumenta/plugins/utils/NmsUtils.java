@@ -6,7 +6,6 @@ import java.lang.reflect.Method;
 
 import org.bukkit.Material;
 import org.bukkit.craftbukkit.v1_16_R3.entity.CraftEntity;
-import org.bukkit.craftbukkit.v1_16_R3.entity.CraftHumanEntity;
 import org.bukkit.craftbukkit.v1_16_R3.entity.CraftLivingEntity;
 import org.bukkit.craftbukkit.v1_16_R3.entity.CraftPlayer;
 import org.bukkit.entity.LivingEntity;
@@ -26,7 +25,7 @@ import net.minecraft.server.v1_16_R3.Vec3D;
 
 public class NmsUtils {
 	public static void resetPlayerIdleTimer(Player player) {
-		CraftPlayer p = (CraftPlayer)player;
+		CraftPlayer p = (CraftPlayer) player;
 		EntityPlayer playerHandle = p.getHandle();
 		playerHandle.resetIdleTimer();
 	}
@@ -52,14 +51,14 @@ public class NmsUtils {
 		}
 	}
 
-	public static void customDamageEntity(LivingEntity entity, double amount, Player damager) {
-		customDamageEntity(entity, amount, damager, null);
+	public static void customDamageEntity(@Nullable LivingEntity damager, LivingEntity damagee, double amount) {
+		customDamageEntity(damager, damagee, amount, null);
 	}
 
-	public static void customDamageEntity(LivingEntity entity, double amount, Player damager, @Nullable String killedUsingMsg) {
-		DamageSource reason = new CustomDamageSource(((CraftHumanEntity) damager).getHandle(), killedUsingMsg);
+	public static void customDamageEntity(LivingEntity damager, LivingEntity damagee, double amount, @Nullable String killedUsingMsg) {
+		DamageSource reason = new CustomDamageSource(damager == null ? null : ((CraftLivingEntity) damager).getHandle(), killedUsingMsg);
 
-		((CraftLivingEntity) entity).getHandle().damageEntity(reason, (float) amount);
+		((CraftLivingEntity) damagee).getHandle().damageEntity(reason, (float) amount);
 	}
 
 	private static class UnblockableEntityDamageSource extends EntityDamageSource {
@@ -72,7 +71,12 @@ public class NmsUtils {
 
 		public UnblockableEntityDamageSource(Entity damager, @Nullable String killedUsingMsg) {
 			super("custom", damager);
-			mKilledUsingMsg = killedUsingMsg;
+			if (killedUsingMsg == null || !killedUsingMsg.isEmpty()) {
+				mKilledUsingMsg = killedUsingMsg;
+			} else {
+				// We don't want to see "Player was killed by Mob using ", so just get rid of the message if it's nothing
+				mKilledUsingMsg = null;
+			}
 		}
 
 		@Override

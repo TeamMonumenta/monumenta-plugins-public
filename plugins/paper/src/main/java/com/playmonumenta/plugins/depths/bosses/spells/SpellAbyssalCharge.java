@@ -1,20 +1,19 @@
 package com.playmonumenta.plugins.depths.bosses.spells;
 
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.MovementUtils;
 import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
-
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.bosses.spells.Spell;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.MovementUtils;
 
 public class SpellAbyssalCharge extends Spell {
 	private int mCooldownTicks;
@@ -43,7 +42,7 @@ public class SpellAbyssalCharge extends Spell {
 			return;
 		}
 		//Jump back
-		MovementUtils.knockAway(e, mBoss, 2.0f);
+		MovementUtils.knockAway(e, mBoss, 2.0f, false);
 		mBoss.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, DURATION, 1));
 		loc.getWorld().playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_SPAWN, 5, 1.25f);
 		loc.getWorld().playSound(mBoss.getLocation(), Sound.ENTITY_WITCH_AMBIENT, 5, 0.5f);
@@ -68,11 +67,11 @@ public class SpellAbyssalCharge extends Spell {
 	}
 
 	@Override
-	public void bossDamagedEntity(EntityDamageByEntityEvent event) {
+	public void onDamage(DamageEvent event, LivingEntity damagee) {
 		//Extra damage
-		if (event.getEntity() instanceof Player && mEmpoweredAttack) {
+		if (mEmpoweredAttack && damagee instanceof Player) {
 			event.setDamage(event.getDamage() * DAMAGE_MULTIPLIER);
-			event.getEntity().getWorld().playSound(mBoss.getLocation(), Sound.BLOCK_RESPAWN_ANCHOR_CHARGE, 5, 1.25f);
+			mBoss.getWorld().playSound(mBoss.getLocation(), Sound.BLOCK_RESPAWN_ANCHOR_CHARGE, 5, 1.25f);
 			mEmpoweredAttack = false;
 		}
 	}

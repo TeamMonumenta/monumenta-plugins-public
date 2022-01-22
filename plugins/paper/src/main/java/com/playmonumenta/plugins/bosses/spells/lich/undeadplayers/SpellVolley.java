@@ -1,7 +1,8 @@
 package com.playmonumenta.plugins.bosses.spells.lich.undeadplayers;
 
-import java.util.List;
-
+import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.player.PartialParticle;
+import com.playmonumenta.plugins.utils.EntityUtils;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
@@ -10,15 +11,12 @@ import org.bukkit.entity.AbstractArrow;
 import org.bukkit.entity.AbstractArrow.PickupStatus;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Projectile;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import com.playmonumenta.plugins.bosses.spells.Spell;
-import com.playmonumenta.plugins.player.PartialParticle;
-import com.playmonumenta.plugins.utils.EntityUtils;
+import java.util.List;
 
 /*
  * Casts Volley every 16 seconds in a cone in front of it dealing 32 damage to enemies hit.
@@ -49,21 +47,19 @@ public class SpellVolley extends Spell {
 			public void run() {
 				w.playSound(mBoss.getLocation(), Sound.ENTITY_FIREWORK_ROCKET_LAUNCH, SoundCategory.HOSTILE, 3, 1);
 				w.playSound(mBoss.getLocation(), Sound.ENTITY_FIREWORK_ROCKET_SHOOT, SoundCategory.HOSTILE, 3, 1);
-				List<Projectile> projectiles;
-				projectiles = EntityUtils.spawnArrowVolley(com.playmonumenta.plugins.Plugin.getInstance(), mBoss, 10, 2, 5.0, Arrow.class);
-				for (Projectile proj : projectiles) {
-					AbstractArrow projArrow = (AbstractArrow) proj;
-					projArrow.setPickupStatus(PickupStatus.CREATIVE_ONLY);
-					projArrow.setDamage(32);
+				List<AbstractArrow> projectiles = EntityUtils.spawnArrowVolley(com.playmonumenta.plugins.Plugin.getInstance(), mBoss, 10, 2, 5.0, Arrow.class);
+				for (AbstractArrow proj : projectiles) {
+					proj.setPickupStatus(PickupStatus.CREATIVE_ONLY);
+					proj.setDamage(20);
 
 					BukkitRunnable runB = new BukkitRunnable() {
 
 						@Override
 						public void run() {
 							// spawn particle
-							mSpark.location(projArrow.getLocation()).spawnAsEnemy();
+							mSpark.location(proj.getLocation()).spawnAsEnemy();
 
-							if (projArrow.isInBlock() || !projArrow.isValid()) {
+							if (proj.isInBlock() || !proj.isValid()) {
 								this.cancel();
 							}
 						}
@@ -81,7 +77,6 @@ public class SpellVolley extends Spell {
 
 	@Override
 	public int cooldownTicks() {
-		// TODO Auto-generated method stub
 		return 20 * 16;
 	}
 

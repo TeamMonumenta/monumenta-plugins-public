@@ -1,5 +1,7 @@
 package com.playmonumenta.plugins.bosses.spells;
 
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.utils.BossUtils;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -7,8 +9,6 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-
-import com.playmonumenta.plugins.utils.BossUtils;
 
 public class SpellTsunamiCharge extends SpellBaseCharge {
 	public SpellTsunamiCharge(Plugin plugin, LivingEntity boss, int range, float damage) {
@@ -31,7 +31,7 @@ public class SpellTsunamiCharge extends SpellBaseCharge {
 		      // Attack hit a player
 		      (LivingEntity player) -> {
 		          player.getWorld().spawnParticle(Particle.DAMAGE_INDICATOR, player.getLocation(), 80, 1, 1, 1, 0);
-		          BossUtils.bossDamage(boss, (LivingEntity) player, damage);
+		          BossUtils.blockableDamage(boss, player, DamageType.MAGIC, damage);
 		      },
 		      // Attack particles
 		      (Location loc) -> {

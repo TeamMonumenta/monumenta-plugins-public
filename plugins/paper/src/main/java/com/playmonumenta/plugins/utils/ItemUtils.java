@@ -1,19 +1,22 @@
 package com.playmonumenta.plugins.utils;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.EnumSet;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.regex.Pattern;
-
-import org.apache.commons.lang.StringUtils;
+import com.playmonumenta.plugins.Constants.Materials;
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.listeners.ShulkerShortcutListener;
+import com.playmonumenta.plugins.server.properties.ServerProperties;
+import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
+import com.playmonumenta.plugins.utils.ItemStatUtils.InfusionType;
+import com.playmonumenta.plugins.utils.ItemStatUtils.Region;
+import com.playmonumenta.plugins.utils.PotionUtils.PotionInfo;
+import de.tr7zw.nbtapi.NBTCompound;
+import de.tr7zw.nbtapi.NBTContainer;
+import de.tr7zw.nbtapi.NBTItem;
+import de.tr7zw.nbtapi.NBTList;
+import net.kyori.adventure.text.Component;
+import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.Sound;
-import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
@@ -31,21 +34,15 @@ import org.bukkit.potion.PotionType;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.checkerframework.checker.nullness.qual.PolyNull;
 
-import com.playmonumenta.plugins.Constants.Materials;
-import com.playmonumenta.plugins.enchantments.Colossal;
-import com.playmonumenta.plugins.itemindex.Attribute;
-import com.playmonumenta.plugins.listeners.ShulkerShortcutListener;
-import com.playmonumenta.plugins.server.properties.ServerProperties;
-import com.playmonumenta.plugins.utils.PotionUtils.PotionInfo;
-
-import de.tr7zw.nbtapi.NBTCompound;
-import de.tr7zw.nbtapi.NBTContainer;
-import de.tr7zw.nbtapi.NBTItem;
-import de.tr7zw.nbtapi.NBTList;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.format.TextDecoration;
-import net.md_5.bungee.api.ChatColor;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import java.util.regex.Pattern;
 
 
 public class ItemUtils {
@@ -263,16 +260,6 @@ public class ItemUtils {
 		Material.SNOWBALL
 	);
 
-	public static final Set<Attribute> mainStat = EnumSet.of(
-		Attribute.ATTACK_DAMAGE,
-		Attribute.RANGED_DAMAGE,
-		Attribute.ATTACK_SPEED,
-		Attribute.PROJECTILE_SPEED,
-		Attribute.THROW_RATE,
-		Attribute.THORNS_DAMAGE,
-		Attribute.ABILITY_POWER
-	);
-
 	public static final Set<Material> dyes = EnumSet.of(
 		Material.RED_DYE,
 		Material.GREEN_DYE,
@@ -359,105 +346,6 @@ public class ItemUtils {
 		Material.BEDROCK
 	);
 
-	public static String buildAttributeLoreLine(com.playmonumenta.plugins.itemindex.EquipmentSlot slot, Attribute attribute, AttributeModifier.Operation operation, Double amount) {
-		ChatColor color = ChatColor.BLUE;
-		String isPercent = "%";
-		String isPositive = "+";
-		if (amount <= 0) {
-			color = ChatColor.RED;
-			isPositive = "-";
-			amount *= -1;
-		}
-		if (operation == AttributeModifier.Operation.ADD_NUMBER) {
-			isPercent = "";
-		} else {
-			amount *= 100;
-		}
-		if (slot == com.playmonumenta.plugins.itemindex.EquipmentSlot.MAIN_HAND) {
-			if (mainStat.contains(attribute)) {
-				color = ChatColor.DARK_GREEN;
-				isPositive = " ";
-			}
-			switch (attribute) {
-				case ATTACK_DAMAGE:
-				case PROJECTILE_SPEED:
-					amount += 1;
-					break;
-				case ATTACK_SPEED:
-					amount += 4;
-					break;
-				case RANGED_DAMAGE:
-					amount += 8;
-					break;
-				default:
-					break;
-			}
-		}
-		String numberStr = StringUtils.left(amount.toString(), 4);
-		if (amount.equals((double)(amount.intValue() + 0))) {
-			numberStr = numberStr.split("\\.")[0];
-		}
-		return color + isPositive + numberStr + isPercent + attribute.getReadableStringFormat();
-	}
-
-	public enum ItemRegion {
-		UNKNOWN("Unknown"),
-		KINGS_VALLEY("King's Valley"),
-		CELSIAN_ISLES("Celsian Isles"),
-		SHULKER_BOX("Shulker Box"),
-		MONUMENTA("Monumenta");
-
-		final String mReadableString;
-
-		ItemRegion(String s) {
-			this.mReadableString = s;
-		}
-
-		public String asLoreString() {
-			return ChatColor.DARK_GRAY + this.mReadableString + " : ";
-		}
-
-		public String getReadableString() {
-			return mReadableString;
-		}
-	}
-
-	public enum ItemTier {
-		UNKNOWN(ChatColor.BLACK + "Unknown"),
-		ONE(ChatColor.DARK_GRAY + "Tier I"),
-		TWO(ChatColor.DARK_GRAY + "Tier II"),
-		THREE(ChatColor.DARK_GRAY + "Tier III"),
-		FOUR(ChatColor.DARK_GRAY + "Tier IV"),
-		FIVE(ChatColor.DARK_GRAY + "Tier V"),
-		MEME(ChatColor.DARK_GRAY + "Meme"),
-		UNCOMMON(ChatColor.DARK_GRAY + "Uncommon"),
-		ENHANCED_UNCOMMON(ChatColor.DARK_GRAY + "" + ChatColor.BOLD + "Enhanced Uncommon"),
-		PATRON_MADE(ChatColor.GOLD + "Patron Made"),
-		RARE(ChatColor.YELLOW + "Rare"),
-		ENHANCED_RARE(ChatColor.YELLOW + "" + ChatColor.BOLD + "Enhanced Rare"),
-		ARTIFACT(ChatColor.DARK_RED + "Artifact"),
-		RELIC(ChatColor.GREEN + "Relic"),
-		EPIC(ChatColor.GOLD + "" + ChatColor.BOLD + "Epic"),
-		UNIQUE(ChatColor.DARK_PURPLE + "Unique"),
-		UNIQUE_EVENT(ChatColor.DARK_PURPLE + "Unique Event"),
-		SHULKER_BOX("Shulker Box"),
-		QUEST_COMPASS("Quest Compass");
-
-		final String mReadableString;
-
-		ItemTier(String s) {
-			this.mReadableString = s;
-		}
-
-		public String asLoreString() {
-			return this.mReadableString;
-		}
-
-		public String getReadableString() {
-			return ChatColor.stripColor(mReadableString);
-		}
-	}
-
 	// Return the quest ID string, which is assumed to start with "#Q", or null
 	public static @Nullable String getItemQuestId(@Nullable ItemStack item) {
 		if (item == null) {
@@ -487,120 +375,13 @@ public class ItemUtils {
 		DESTROY, // Item is destroyed on death, like Curse of Vanishing 2
 	}
 
-	public static ItemRegion getItemRegion(@Nullable ItemStack item) {
-		if (item != null) {
-			if (item.hasItemMeta()) {
-				ItemMeta meta = item.getItemMeta();
-				if (meta.hasDisplayName()) {
-					String name = meta.getDisplayName();
-					if (name.contains("Alchemist's Bag")) {
-						return ItemRegion.KINGS_VALLEY;
-					} else if (name.contains("Experiencinator")) {
-						return ItemRegion.KINGS_VALLEY;
-					} else if (name.contains("Crystallizer")) {
-						return ItemRegion.CELSIAN_ISLES;
-					}
-				}
-				if (meta.hasLore()) {
-					List<String> lore = item.getLore();
-					for (String loreEntry : lore) {
-						String stripped = ChatColor.stripColor(loreEntry);
-						if (stripped.startsWith("King's Valley :")) {
-							return ItemRegion.KINGS_VALLEY;
-						} else if (stripped.startsWith("Celsian Isles :")) {
-							return ItemRegion.CELSIAN_ISLES;
-						} else if (stripped.startsWith("Monumenta :")) {
-							return ItemRegion.MONUMENTA;
-						}
-					}
-				}
-			}
-			// Shulker Boxes without lore should be considered "King's Valley : Shulker Box" items so they can shatter
-			if (isShulkerBox(item.getType())) {
-				return ItemRegion.SHULKER_BOX;
-			}
-		}
-		return ItemRegion.UNKNOWN;
-	}
-
-	public static ItemTier getItemTier(@Nullable ItemStack item) {
-		if (item == null) {
-			return ItemTier.UNKNOWN;
-		}
-
-		if (item.hasItemMeta()) {
-			ItemMeta meta = item.getItemMeta();
-			if (meta.hasDisplayName()) {
-				String itemName = meta.getDisplayName();
-				if (itemName.contains("Alchemist's Bag")) {
-					return ItemTier.RARE;
-				} else if (itemName.contains("Experiencinator (u)")) {
-					return ItemTier.ENHANCED_RARE;
-				} else if (itemName.contains("Experiencinator")) {
-					return ItemTier.RARE;
-				} else if (itemName.contains("Perfect Crystallizer")) {
-					return ItemTier.EPIC;
-				} else if (itemName.contains("Crystallizer (u)")) {
-					return ItemTier.ENHANCED_RARE;
-				} else if (itemName.contains("Crystallizer")) {
-					return ItemTier.ENHANCED_RARE;
-				}
-			}
-			if (meta.hasLore()) {
-				for (String loreEntry : meta.getLore()) {
-					String stripped = ChatColor.stripColor(loreEntry);
-					if (stripped.endsWith(": Tier I")) {
-						return ItemTier.ONE;
-					} else if (stripped.endsWith(": Tier II")) {
-						return ItemTier.TWO;
-					} else if (stripped.endsWith(": Tier III")) {
-						return ItemTier.THREE;
-					} else if (stripped.endsWith(": Tier IV")) {
-						return ItemTier.FOUR;
-					} else if (stripped.endsWith(": Tier V")) {
-						return ItemTier.FIVE;
-					} else if (stripped.endsWith(": Meme")) {
-						return ItemTier.MEME;
-					} else if (stripped.endsWith(": Uncommon")) {
-						return ItemTier.UNCOMMON;
-					} else if (stripped.endsWith(": Enhanced Uncommon")) {
-						return ItemTier.ENHANCED_UNCOMMON;
-					} else if (stripped.endsWith(": Patron Made")) {
-						return ItemTier.PATRON_MADE;
-					} else if (stripped.endsWith(": Rare")) {
-						return ItemTier.RARE;
-					} else if (stripped.endsWith(": Enhanced Rare")) {
-						return ItemTier.ENHANCED_RARE;
-					} else if (stripped.endsWith(": Artifact")) {
-						return ItemTier.ARTIFACT;
-					} else if (stripped.endsWith(": Relic")) {
-						return ItemTier.RELIC;
-					} else if (stripped.endsWith(": Epic")) {
-						return ItemTier.EPIC;
-					} else if (stripped.endsWith(": Unique")) {
-						return ItemTier.UNIQUE;
-					} else if (stripped.endsWith(": Unique Event")) {
-						return ItemTier.UNIQUE_EVENT;
-					}
-				}
-			}
-		}
-
-		// Shulker Boxes without lore should be considered "King's Valley : Shulker Box" items so they can shatter
-		if (isShulkerBox(item.getType())) {
-			return ItemTier.SHULKER_BOX;
-		}
-		return ItemTier.UNKNOWN;
-	}
-
 	// Returns an ItemDeathResult reporting what should happen to an item when the player carrying it dies.
 	public static ItemDeathResult getItemDeathResult(ItemStack item) {
 		if (isItemCurseOfVanishingII(item)) {
 			return ItemDeathResult.DESTROY;
 		} else if (item.containsEnchantment(Enchantment.VANISHING_CURSE)) {
 			return ItemDeathResult.SHATTER_NOW;
-		} else if (ShulkerShortcutListener.isEnderExpansion(item) ||
-		           isItemDeathless(item)) {
+		} else if (ShulkerShortcutListener.isEnderExpansion(item)) {
 			return ItemDeathResult.KEEP;
 		} else if (item.getType().equals(Material.COMPASS)) {
 			switch (getPlainName(item)) {
@@ -611,35 +392,36 @@ public class ItemUtils {
 					return ItemDeathResult.KEEP;
 			}
 		}
-		switch (getItemRegion(item)) {
-		case KINGS_VALLEY:
-		case CELSIAN_ISLES:
+		switch (Objects.requireNonNull(ItemStatUtils.getRegion(item))) {
+		case VALLEY:
+		case ISLES:
+		case RING:
 		case SHULKER_BOX:
-		case MONUMENTA:
-			switch (getItemTier(item)) {
-			case ONE:
-			case TWO:
-			case THREE:
+			switch (Objects.requireNonNull(ItemStatUtils.getTier(item))) {
+			case ZERO:
+			case I:
+			case II:
+			case III:
 				if (ServerProperties.getKeepLowTierInventory() && !(item.containsEnchantment(Enchantment.BINDING_CURSE))) {
 					return ItemDeathResult.KEEP_EQUIPPED;
 				} else {
 					return ItemDeathResult.LOSE;
 				}
-			case FOUR:
-			case FIVE:
-			case MEME:
+			case IV:
+			case V:
 			case UNCOMMON:
-			case ENHANCED_UNCOMMON:
-			case PATRON_MADE:
+			case PATRON:
 			case RARE:
-			case ENHANCED_RARE:
 			case ARTIFACT:
-			case RELIC:
+			case OBFUSCATED:
 			case EPIC:
 			case UNIQUE:
-			case UNIQUE_EVENT:
+			case EVENT:
 			case SHULKER_BOX:
+			case CURRENCY:
 				return ItemDeathResult.SHATTER;
+			case KEYTIER:
+				return ItemDeathResult.SAFE;
 			default:
 				return ItemDeathResult.LOSE;
 			}
@@ -650,14 +432,14 @@ public class ItemUtils {
 
 	// Returns the costs (in tier 2 currency (CXP/CCS/etc.)) for each region to reforge a list of items.
 	// There is no global "MONUMENTA" currency. The calling function will determine what to do with this cost.
-	public static Map<ItemRegion, Integer> getReforgeCosts(Collection<ItemStack> items) {
-		Map<ItemRegion, Integer> costs = new HashMap<>();
-		costs.put(ItemRegion.KINGS_VALLEY, 0);
-		costs.put(ItemRegion.CELSIAN_ISLES, 0);
-		costs.put(ItemRegion.SHULKER_BOX, 0);
-		costs.put(ItemRegion.MONUMENTA, 0);
+	public static Map<Region, Integer> getReforgeCosts(Collection<ItemStack> items) {
+		Map<Region, Integer> costs = new HashMap<>();
+		costs.put(Region.VALLEY, 0);
+		costs.put(Region.ISLES, 0);
+		costs.put(Region.RING, 0);
+		costs.put(Region.SHULKER_BOX, 0);
 		for (ItemStack item : items) {
-			ItemRegion type = getItemRegion(item);
+			Region type = ItemStatUtils.getRegion(item);
 			costs.computeIfPresent(type, (k, v) -> v += getReforgeCost(item));
 		}
 
@@ -666,29 +448,26 @@ public class ItemUtils {
 
 	// Returns the cost (in tier 2 currency (CXP/CCS/etc.)) to reforge an item.
 	public static Integer getReforgeCost(ItemStack item) {
-		switch (getItemTier(item)) {
-		case FOUR:
+		switch (ItemStatUtils.getTier(item)) {
+		case IV:
 			return item.getAmount() * 1;
-		case FIVE:
+		case V:
 			return item.getAmount() * 4;
-		case MEME:
 		case UNCOMMON:
 		case UNIQUE:
 			return item.getAmount() * 16;
-		case UNIQUE_EVENT:
-		case ENHANCED_UNCOMMON:
+		case EVENT:
 			return item.getAmount() * 32;
 		case RARE:
-		case PATRON_MADE:
+		case PATRON:
 			return item.getAmount() * 48;
-		case RELIC:
 		case ARTIFACT:
-		case ENHANCED_RARE:
+		case OBFUSCATED:
 			return item.getAmount() * 64;
 		case SHULKER_BOX:
 			return item.getAmount() * 64 * 2;
 		case EPIC:
-			return item.getAmount() * 64 * 4;
+			return item.getAmount() * 64 * 3;
 		default:
 			return 0;
 		}
@@ -842,104 +621,13 @@ public class ItemUtils {
 		ItemUtils.setPlainName(potion);
 	}
 
-	// Check if item has the "* Shattered *" lore entry
-	public static boolean isItemShattered(@Nullable ItemStack item) {
-		if (item != null) {
-			List<String> lore = item.getLore();
-			if (lore != null) {
-				for (String loreEntry : lore) {
-					if (loreEntry.contains(ChatColor.DARK_RED + "" + ChatColor.BOLD + "* SHATTERED *")) {
-						return true;
-					}
-				}
-			}
+	// TODO: all of these methods are redundant, the sources should just directly use ItemStatUtils
+	public static boolean isItemCurseOfVanishingII(ItemStack item) {
+		if (item != null && item.getType() != Material.AIR) {
+			return ItemStatUtils.getEnchantmentLevel(ItemStatUtils.getEnchantments(new NBTItem(item)), EnchantmentType.CURSE_OF_VANISHING) == 2;
 		}
+
 		return false;
-	}
-
-	public static boolean isItemCurseOfVanishingII(@Nullable ItemStack item) {
-		if (item != null) {
-			if (item.getEnchantmentLevel(Enchantment.VANISHING_CURSE) == 2) {
-				return true;
-			}
-			List<String> lore = item.getLore();
-			if (lore != null) {
-				for (String loreEntry : lore) {
-					if (loreEntry.contains("Curse of Vanishing II")) {
-						return true;
-					}
-				}
-			}
-		}
-		return false;
-	}
-
-	public static boolean isItemDeathless(@Nullable ItemStack item) {
-		if (item != null) {
-			String deathlessIdentifier = ChatColor.GRAY + "Deathless";
-			if (InventoryUtils.testForItemWithLore(item, deathlessIdentifier)) {
-				return true;
-			}
-		}
-		return false;
-	}
-
-	public static boolean shatterItem(@Nullable ItemStack item) {
-		if (item == null
-			|| !((getItemDeathResult(item) == ItemDeathResult.SHATTER
-			|| getItemDeathResult(item) == ItemDeathResult.SHATTER_NOW)
-			&& !isItemShattered(item))) {
-			return false;
-		}
-		ItemMeta itemMeta = item.getItemMeta();
-		if (itemMeta == null) {
-			return false;
-		}
-		List<Component> lore = itemMeta.lore();
-		if (lore == null) {
-			lore = new ArrayList<>();
-		}
-		lore.add(Component.text("* SHATTERED *", NamedTextColor.DARK_RED, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false));
-		lore.add(Component.text("Maybe a Master Repairman", NamedTextColor.DARK_RED).decoration(TextDecoration.ITALIC, false));
-		lore.add(Component.text("could reforge it...", NamedTextColor.DARK_RED).decoration(TextDecoration.ITALIC, false));
-		itemMeta.lore(lore);
-		item.setItemMeta(itemMeta);
-		ItemUtils.setPlainLore(item);
-		return true;
-	}
-
-	public static boolean reforgeItem(@Nullable ItemStack item) {
-		boolean reforged = false;
-		if (item == null) {
-			return reforged;
-		}
-		ItemMeta itemMeta = item.getItemMeta();
-		if (itemMeta == null) {
-			return reforged;
-		}
-		List<String> oldPlainLore = getPlainLore(item, true);
-		List<Component> oldLore = itemMeta.lore();
-		List<Component> newLore = new ArrayList<>();
-		if (oldLore != null && isItemShattered(item)) {
-			for (int i = 0; i < oldLore.size(); i++) {
-				String line = oldPlainLore.get(i);
-				if (line.equals("* SHATTERED *") ||
-				    line.equals("Maybe a Master Repairman") ||
-				    line.equals("could reforge it...")) {
-					reforged = true;
-				} else {
-					newLore.add(oldLore.get(i));
-				}
-			}
-			if (newLore.isEmpty()) {
-				itemMeta.lore(null);
-			} else {
-				itemMeta.lore(newLore);
-			}
-		}
-		item.setItemMeta(itemMeta);
-		ItemUtils.setPlainLore(item);
-		return reforged;
 	}
 
 	public static boolean isShootableItem(ItemStack item) {
@@ -1020,12 +708,12 @@ public class ItemUtils {
 		}
 	}
 
-	public static void damageItemWithUnbreaking(ItemStack item, int damage, boolean canBreak) {
+	public static void damageItemWithUnbreaking(Plugin plugin, Player player, ItemStack item, int damage, boolean canBreak) {
 		//Damages item by chance based on unbreaking level (always damages for no unbreaking)
 		//Chance to do damage (Unbreaking 0 = 1 or 100%, Unbreaking 1 = 1/2 or 50%, etc.)
 		//Colossal is also an extra 50% chance to not lose durability on top of unbreaking
 		//Need to add all enchantments to do with durability here
-		double chance = 1.0 / ((item.getEnchantmentLevel(Enchantment.DURABILITY) + 1) * (InventoryUtils.getCustomEnchantLevel(item, Colossal.PROPERTY_NAME, false) + 1));
+		double chance = 1.0 / ((item.getEnchantmentLevel(Enchantment.DURABILITY) + 1) * (plugin.mItemStatManager.getInfusionLevel(player, InfusionType.COLOSSAL) + 1));
 		double rand = Math.random();
 		if (rand < chance) {
 			damageItem(item, damage, canBreak);
@@ -1191,6 +879,9 @@ public class ItemUtils {
 			ItemMeta itemMeta = itemStack.getItemMeta();
 			if (itemMeta.hasLore()) {
 				plainLore = new ArrayList<>();
+				if (itemMeta.lore() == null) {
+					return;
+				}
 				for (Component loreLine : itemMeta.lore()) {
 					plainLore.add(toPlainTagText(loreLine));
 				}
@@ -1261,7 +952,7 @@ public class ItemUtils {
 
 	public static boolean isShatteredWearable(@Nullable ItemStack itemStack) {
 		if (itemStack != null) {
-			return isWearable(itemStack) && isItemShattered(itemStack);
+			return isWearable(itemStack) && ItemStatUtils.isShattered(itemStack);
 		} else {
 			return false;
 		}
@@ -1283,12 +974,20 @@ public class ItemUtils {
 		}
 	}
 
+	public static boolean isBowOrTrident(@Nullable ItemStack itemStack) {
+		if (itemStack != null) {
+			return Materials.BOWS.contains(itemStack.getType()) || itemStack.getType() == Material.TRIDENT;
+		} else {
+			return false;
+		}
+	}
+
 	/*
 	 * Does not count shattered hoes.
 	 */
 	public static boolean isHoe(@Nullable ItemStack itemStack) {
 		if (itemStack != null) {
-			if (isItemShattered(itemStack)) {
+			if (ItemStatUtils.isShattered(itemStack)) {
 				return false;
 			}
 
@@ -1303,7 +1002,7 @@ public class ItemUtils {
 	 */
 	public static boolean isWand(@Nullable ItemStack itemStack) {
 		if (itemStack != null) {
-			if (isItemShattered(itemStack)) {
+			if (ItemStatUtils.isShattered(itemStack)) {
 				return false;
 			}
 
@@ -1323,7 +1022,7 @@ public class ItemUtils {
 
 	public static boolean isAlchemistItem(@Nullable ItemStack itemStack) {
 		if (itemStack != null) {
-			if (isItemShattered(itemStack)) {
+			if (ItemStatUtils.isShattered(itemStack)) {
 				return false;
 			}
 
@@ -1367,80 +1066,6 @@ public class ItemUtils {
 		} else {
 			return false;
 		}
-	}
-
-	public static void enchantifyItem(@Nullable ItemStack itemStack, String enchantment) throws Exception {
-		enchantifyItem(itemStack, enchantment, null, null);
-	}
-
-	/*
-	 * NOTICE!
-	 * If this method gets changed, make sure someone updates the Python item replacement code to match!
-	 * Constants and new enchantments included!
-	 * This most likely means @NickNackGus or @Combustible
-	 * If this does not happen, your changes will NOT persist across weekly updates!
-	 */
-	public static void enchantifyItem(@Nullable ItemStack itemStack, String enchantment, @PolyNull String ownerPrefix, @PolyNull Player player) throws Exception {
-
-		if (itemStack == null) {
-			throw new Exception("Player must have a valid item in their main hand!");
-		}
-
-		ItemMeta meta = itemStack.getItemMeta();
-		if (meta == null) {
-			throw new Exception("Player must have a valid item in their main hand!");
-		}
-
-		List<Component> lore = meta.lore();
-		if (lore == null || lore.isEmpty()) {
-			throw new Exception("Player must have a valid item in their main hand!");
-		}
-
-		if (itemStack.getAmount() > 1) {
-			throw new Exception("Only one item can be enchanted!");
-		}
-
-		List<Component> newLore = new ArrayList<>();
-		boolean enchantmentFound = false;
-		boolean nameAdded = (ownerPrefix == null);
-		for (Component loreEntry : lore) {
-			String legacyLoreEntry = MessagingUtils.LEGACY_SERIALIZER.serialize(loreEntry);
-			if (legacyLoreEntry.contains(ChatColor.GRAY + enchantment)) {
-				enchantmentFound = true;
-			}
-
-			String loreStripped = ChatColor.stripColor(legacyLoreEntry).trim();
-			if (!enchantmentFound && (loreStripped.contains("King's Valley :") ||
-					loreStripped.contains("Celsian Isles :") ||
-					loreStripped.contains("Monumenta :") ||
-					loreStripped.contains("Armor") ||
-					loreStripped.contains("Magic Wand") ||
-					loreStripped.contains("Alchemical Utensil") ||
-					loreStripped.isEmpty())) {
-				newLore.add(MessagingUtils.LEGACY_SERIALIZER.deserialize(ChatColor.GRAY + enchantment).decoration(TextDecoration.ITALIC, false));
-				enchantmentFound = true;
-			}
-
-			if (!nameAdded && loreStripped.isEmpty()) {
-				newLore.add(Component.text(ownerPrefix + " " + player.getName()));
-				nameAdded = true;
-			}
-
-			newLore.add(loreEntry);
-		}
-
-		if (!enchantmentFound) {
-			throw new Exception("Item must be labeled 'King's Valley', 'Celsian Isles', or 'Monumenta'");
-		}
-
-		if (!nameAdded) {
-			newLore.add(Component.text(ownerPrefix + " " + player.getName()));
-		}
-
-		meta.lore(newLore);
-		itemStack.setItemMeta(meta);
-		setPlainLore(itemStack);
-
 	}
 
 	public static boolean hasLore(ItemStack item) {

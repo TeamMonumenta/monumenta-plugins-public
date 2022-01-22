@@ -25,8 +25,10 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.scout.Sharpshooter;
 import com.playmonumenta.plugins.classes.ClassAbility;
-import com.playmonumenta.plugins.classes.magic.MagicType;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 
@@ -50,7 +52,7 @@ public class PredatorStrike extends Ability {
 		mInfo.mLinkedSpell = ClassAbility.PREDATOR_STRIKE;
 		mInfo.mScoreboardId = "PredatorStrike";
 		mInfo.mShorthandName = "PrS";
-		mInfo.mDescriptions.add("Left-clicking with a bow while not sneaking will prime a Predator Strike that unprimes after 5s. When you fire a critical arrow, it will instantaneously travel in a straight line for up to 30 blocks or until it hits an enemy or block and damages enemies in a 0.75 block radius. This ability deals 100% of your projectile damage (including bonuses from other skills) increased by 10% for every block of distance from you and the target (up to 12 blocks, or 220% total). Hit targets contribute to Sharpshooter stacks. Cooldown: 18s.");
+		mInfo.mDescriptions.add("Left-clicking with a bow or trident while not sneaking will prime a Predator Strike that unprimes after 5s. When you fire a critical arrow, it will instantaneously travel in a straight line for up to 30 blocks or until it hits an enemy or block and damages enemies in a 0.75 block radius. This ability deals 100% of your projectile base damage increased by 10% for every block of distance from you and the target (up to 12 blocks, or 220% total). Hit targets contribute to Sharpshooter stacks. Cooldown: 18s.");
 		mInfo.mDescriptions.add("Damage now increases 15% for each block of distance (up to 280%). Cooldown: 14s.");
 		mInfo.mCooldown = getAbilityScore() == 1 ? COOLDOWN_1 : COOLDOWN_2;
 		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;
@@ -63,7 +65,7 @@ public class PredatorStrike extends Ability {
 	public void cast(Action action) {
 		if (mPlayer != null && !mPlayer.isSneaking() && !mActive && !mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.mLinkedSpell)) {
 			ItemStack mainHand = mPlayer.getInventory().getItemInMainHand();
-			if (ItemUtils.isSomeBow(mainHand)) {
+			if (ItemUtils.isBowOrTrident(mainHand)) {
 				Player player = mPlayer;
 				mActive = true;
 				World world = mPlayer.getWorld();
@@ -138,8 +140,7 @@ public class PredatorStrike extends Ability {
 		}
 		World world = mPlayer.getWorld();
 
-		// Damage calculation - include Proj Attribute, Focus, Enchants, Teammate buffs (Blessing/Thurible), and Sharpshooter
-		double damage = EntityUtils.getProjSkillDamage(mPlayer, mPlugin, true, loc) * (2 + mDistanceScale * Math.min(mPlayer.getLocation().distance(loc), MAX_DAMAGE_RANGE));
+		double damage = ItemStatUtils.getAttributeAmount(mPlayer.getInventory().getItemInMainHand(), ItemStatUtils.AttributeType.PROJECTILE_DAMAGE_ADD, ItemStatUtils.Operation.ADD, ItemStatUtils.Slot.MAINHAND) * (2 + mDistanceScale * Math.min(mPlayer.getLocation().distance(loc), MAX_DAMAGE_RANGE));
 
 		world.spawnParticle(Particle.SMOKE_NORMAL, loc, 45, EXPLODE_RADIUS, EXPLODE_RADIUS, EXPLODE_RADIUS, 0.125);
 		world.spawnParticle(Particle.FLAME, loc, 12, EXPLODE_RADIUS, EXPLODE_RADIUS, EXPLODE_RADIUS, 0.1);
@@ -149,8 +150,8 @@ public class PredatorStrike extends Ability {
 
 		List<LivingEntity> mobs = EntityUtils.getNearbyMobs(loc, EXPLODE_RADIUS, mPlayer);
 		for (LivingEntity mob : mobs) {
-			MovementUtils.knockAway(loc, mob, 0.25f, 0.25f);
-			EntityUtils.damageEntity(mPlugin, mob, damage, mPlayer, MagicType.SHADOWS, true, mInfo.mLinkedSpell);
+			MovementUtils.knockAway(loc, mob, 0.25f, 0.25f, true);
+			DamageUtils.damage(mPlayer, mob, DamageType.PROJECTILE, damage, mInfo.mLinkedSpell);
 		}
 		Sharpshooter.addStacks(mPlugin, mPlayer, mobs.size());
 	}

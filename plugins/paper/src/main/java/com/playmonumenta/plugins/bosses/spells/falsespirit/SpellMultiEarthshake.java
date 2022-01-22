@@ -17,7 +17,7 @@ import org.bukkit.block.data.type.Bed;
 import org.bukkit.entity.FallingBlock;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
@@ -25,6 +25,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.bosses.bosses.FalseSpirit;
 import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
@@ -147,61 +148,63 @@ public class SpellMultiEarthshake extends Spell {
 					for (Location loc : locs) {
 						this.cancel();
 
-						ArrayList<Block> blocks = new ArrayList<Block>();
+						if (mDelve) {
+							ArrayList<Block> blocks = new ArrayList<Block>();
 
-						//Populate the blocks array with nearby blocks- logic here to get the topmost block with air above it
-						for (int x = mRadius * -1; x <= mRadius; x++) {
-							for (int y = mRadius * -1; y <= mRadius; y++) {
-								Block selected = null;
-								Block test = mWorld.getBlockAt(loc.clone().add(x, -2, y));
-								if (test.getType() != Material.AIR) {
-									selected = mWorld.getBlockAt(loc.clone().add(x, -2, y));
-								}
-								test = mWorld.getBlockAt(loc.clone().add(x, -1, y));
-								if (test.getType() != Material.AIR) {
-									selected = mWorld.getBlockAt(loc.clone().add(x, -1, y));
-								} else {
-									blocks.add(selected);
-									continue;
-								}
-								test = mWorld.getBlockAt(loc.clone().add(x, 0, y));
-								if (test.getType() != Material.AIR) {
-									selected = mWorld.getBlockAt(loc.clone().add(x, 0, y));
-								} else {
-									blocks.add(selected);
-									continue;
-								}
-								test = mWorld.getBlockAt(loc.clone().add(x, 1, y));
-								if (test.getType() != Material.AIR) {
-									selected = mWorld.getBlockAt(loc.clone().add(x, 1, y));
-								} else {
-									blocks.add(selected);
-									continue;
-								}
-								test = mWorld.getBlockAt(loc.clone().add(x, 2, y));
-								if (test.getBlockData().getMaterial() != Material.AIR) {
-									selected = mWorld.getBlockAt(loc.clone().add(x, 2, y));
-								} else {
-									blocks.add(selected);
-									continue;
+							//Populate the blocks array with nearby blocks- logic here to get the topmost block with air above it
+							for (int x = mRadius * -1; x <= mRadius; x++) {
+								for (int y = mRadius * -1; y <= mRadius; y++) {
+									Block selected = null;
+									Block test = mWorld.getBlockAt(loc.clone().add(x, -2, y));
+									if (test.getType() != Material.AIR) {
+										selected = mWorld.getBlockAt(loc.clone().add(x, -2, y));
+									}
+									test = mWorld.getBlockAt(loc.clone().add(x, -1, y));
+									if (test.getType() != Material.AIR) {
+										selected = mWorld.getBlockAt(loc.clone().add(x, -1, y));
+									} else if (selected != null) {
+										blocks.add(selected);
+										continue;
+									}
+									test = mWorld.getBlockAt(loc.clone().add(x, 0, y));
+									if (test.getType() != Material.AIR) {
+										selected = mWorld.getBlockAt(loc.clone().add(x, 0, y));
+									} else {
+										blocks.add(selected);
+										continue;
+									}
+									test = mWorld.getBlockAt(loc.clone().add(x, 1, y));
+									if (test.getType() != Material.AIR) {
+										selected = mWorld.getBlockAt(loc.clone().add(x, 1, y));
+									} else {
+										blocks.add(selected);
+										continue;
+									}
+									test = mWorld.getBlockAt(loc.clone().add(x, 2, y));
+									if (test.getBlockData().getMaterial() != Material.AIR) {
+										selected = mWorld.getBlockAt(loc.clone().add(x, 2, y));
+									} else {
+										blocks.add(selected);
+										continue;
+									}
 								}
 							}
-						}
 
-						//Make the blocks go flying
-						for (Block b: blocks) {
-							if (b == null) {
-								continue;
-							}
+							//Make the blocks go flying
+							for (Block b: blocks) {
+								if (b == null) {
+									continue;
+								}
 
-							Material material = b.getType();
-							if (!mIgnoredMats.contains(material) && !LocationUtils.containsWater(b) && !(b.getBlockData() instanceof Bed) && FastUtils.RANDOM.nextInt(4) > 1) {
-								double x = (FastUtils.RANDOM.nextInt(5) - 2) / 10.0;
-								double z = (FastUtils.RANDOM.nextInt(5) - 2) / 10.0;
+								Material material = b.getType();
+								if (!mIgnoredMats.contains(material) && !LocationUtils.containsWater(b) && !(b.getBlockData() instanceof Bed) && FastUtils.RANDOM.nextInt(4) > 1) {
+									double x = (FastUtils.RANDOM.nextInt(5) - 2) / 10.0;
+									double z = (FastUtils.RANDOM.nextInt(5) - 2) / 10.0;
 
-								FallingBlock block = mWorld.spawnFallingBlock(b.getLocation(), b.getBlockData());
-								block.setVelocity(new Vector(x, 1.0, z));
-								mWorld.getBlockAt(b.getLocation()).setType(Material.AIR);
+									FallingBlock block = mWorld.spawnFallingBlock(b.getLocation(), b.getBlockData());
+									block.setVelocity(new Vector(x, 1.0, z));
+									mWorld.getBlockAt(b.getLocation()).setType(Material.AIR);
+								}
 							}
 						}
 
@@ -211,16 +214,16 @@ public class SpellMultiEarthshake extends Spell {
 							if (p.getLocation().distance(loc) <= mRadius) {
 								p.setVelocity(p.getVelocity().add(new Vector(0.0, 1.5, 0.0)));
 								if (mDelve) {
-									BossUtils.bossDamage(mBoss, p, 45.0, mBoss.getLocation(), "Earthshake");
+									BossUtils.blockableDamage(mBoss, p, DamageType.BLAST, 32, "Earthshake", mBoss.getLocation());
 								} else {
-									BossUtils.bossDamage(mBoss, p, 40.0, mBoss.getLocation(), "Earthshake");
+									BossUtils.blockableDamage(mBoss, p, DamageType.BLAST, 28, "Earthshake", mBoss.getLocation());
 								}
 							} else {
 								p.setVelocity(p.getVelocity().add(new Vector(0.0, 1.0, 0.0)));
 								if (mDelve) {
-									BossUtils.bossDamage(mBoss, p, 45.0, mBoss.getLocation(), "Earthshake");
+									BossUtils.blockableDamage(mBoss, p, DamageType.BLAST, 32, "Earthshake", mBoss.getLocation());
 								} else {
-									BossUtils.bossDamage(mBoss, p, 40.0, mBoss.getLocation(), "Earthshake");
+									BossUtils.blockableDamage(mBoss, p, DamageType.BLAST, 28, "Earthshake", mBoss.getLocation());
 								}
 							}
 						}
@@ -260,19 +263,18 @@ public class SpellMultiEarthshake extends Spell {
 	}
 
 	@Override
-	public void bossDamagedEntity(EntityDamageByEntityEvent event) {
-		//If player dies, no targetting for 60 seconds
-		if (event.getEntity() instanceof Player) {
-			Player player = (Player) event.getEntity();
-			if (event.getFinalDamage() > player.getHealth()) {
-				mNoTarget.add(player);
-				new BukkitRunnable() {
-					@Override
-					public void run() {
-						mNoTarget.remove(player);
-					}
-				}.runTaskLater(mPlugin, 20 * 60);
+	public void nearbyPlayerDeath(PlayerDeathEvent event) {
+		mNoTarget.add(event.getEntity());
+		new BukkitRunnable() {
+			@Override
+			public void run() {
+				mNoTarget.remove(event.getEntity());
 			}
-		}
+		}.runTaskLater(mPlugin, 20 * 60);
+	}
+
+	@Override
+	public boolean hasNearbyPlayerDeathTrigger() {
+		return true;
 	}
 }

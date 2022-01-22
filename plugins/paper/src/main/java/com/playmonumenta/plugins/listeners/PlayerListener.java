@@ -1,16 +1,41 @@
 package com.playmonumenta.plugins.listeners;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
-
+import com.playmonumenta.plugins.Constants;
+import com.playmonumenta.plugins.Constants.Colors;
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.commands.ToggleSwap;
+import com.playmonumenta.plugins.events.AbilityCastEvent;
+import com.playmonumenta.plugins.itemstats.enchantments.CurseOfEphemerality;
+import com.playmonumenta.plugins.itemstats.infusions.StatTrackManager;
+import com.playmonumenta.plugins.network.ClientModHandler;
+import com.playmonumenta.plugins.point.Point;
+import com.playmonumenta.plugins.portals.PortalManager;
+import com.playmonumenta.plugins.potion.PotionManager.PotionID;
+import com.playmonumenta.plugins.protocollib.VirtualFirmamentReplacer;
+import com.playmonumenta.plugins.server.properties.ServerProperties;
+import com.playmonumenta.plugins.server.reset.DailyReset;
+import com.playmonumenta.plugins.utils.ChestUtils;
+import com.playmonumenta.plugins.utils.CommandUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.utils.ItemStatUtils;
+import com.playmonumenta.plugins.utils.ItemStatUtils.InfusionType;
+import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.NmsUtils;
+import com.playmonumenta.plugins.utils.PotionUtils;
+import com.playmonumenta.plugins.utils.ScoreboardUtils;
+import com.playmonumenta.plugins.utils.ZoneUtils;
+import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
+import com.playmonumenta.scriptedquests.utils.MessagingUtils;
+import com.playmonumenta.scriptedquests.utils.MetadataUtils;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.World;
@@ -20,6 +45,7 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.Chest;
 import org.bukkit.block.CommandBlock;
+import org.bukkit.block.data.BlockData;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Animals;
 import org.bukkit.entity.ArmorStand;
@@ -27,9 +53,6 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.entity.Projectile;
-import org.bukkit.entity.Trident;
-import org.bukkit.entity.Villager;
 import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -37,12 +60,10 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.entity.EntityRegainHealthEvent;
-import org.bukkit.event.entity.EntityShootBowEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.CraftItemEvent;
@@ -71,7 +92,6 @@ import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.event.player.PlayerItemDamageEvent;
 import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerRegisterChannelEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
@@ -87,65 +107,20 @@ import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.CrossbowMeta;
+import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-import org.bukkit.projectiles.ProjectileSource;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import com.playmonumenta.plugins.Constants;
-import com.playmonumenta.plugins.Constants.Colors;
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.attributes.AttributeProjectileDamage;
-import com.playmonumenta.plugins.attributes.AttributeThrowRate;
-import com.playmonumenta.plugins.commands.ToggleSwap;
-import com.playmonumenta.plugins.effects.Stasis;
-import com.playmonumenta.plugins.enchantments.Bleeding;
-import com.playmonumenta.plugins.enchantments.Decay;
-import com.playmonumenta.plugins.enchantments.Duelist;
-import com.playmonumenta.plugins.enchantments.Frost;
-import com.playmonumenta.plugins.enchantments.HexEater;
-import com.playmonumenta.plugins.enchantments.IceAspect;
-import com.playmonumenta.plugins.enchantments.Inferno;
-import com.playmonumenta.plugins.enchantments.PointBlank;
-import com.playmonumenta.plugins.enchantments.Regicide;
-import com.playmonumenta.plugins.enchantments.RegionScalingDamageDealt;
-import com.playmonumenta.plugins.enchantments.Slayer;
-import com.playmonumenta.plugins.enchantments.Sniper;
-import com.playmonumenta.plugins.enchantments.Spark;
-import com.playmonumenta.plugins.enchantments.StatTrack.StatTrackOptions;
-import com.playmonumenta.plugins.enchantments.StatTrackManager;
-import com.playmonumenta.plugins.enchantments.ThunderAspect;
-import com.playmonumenta.plugins.enchantments.curses.CurseOfEphemerality;
-import com.playmonumenta.plugins.enchantments.evasions.EvasionInfo;
-import com.playmonumenta.plugins.enchantments.infusions.Focus;
-import com.playmonumenta.plugins.enchantments.infusions.delves.Choler;
-import com.playmonumenta.plugins.events.AbilityCastEvent;
-import com.playmonumenta.plugins.events.EvasionEvent;
-import com.playmonumenta.plugins.network.ClientModHandler;
-import com.playmonumenta.plugins.point.Point;
-import com.playmonumenta.plugins.portals.PortalManager;
-import com.playmonumenta.plugins.potion.PotionManager.PotionID;
-import com.playmonumenta.plugins.protocollib.VirtualFirmamentReplacer;
-import com.playmonumenta.plugins.server.properties.ServerProperties;
-import com.playmonumenta.plugins.server.reset.DailyReset;
-import com.playmonumenta.plugins.utils.ChestUtils;
-import com.playmonumenta.plugins.utils.CommandUtils;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.InventoryUtils;
-import com.playmonumenta.plugins.utils.ItemUtils;
-import com.playmonumenta.plugins.utils.NmsUtils;
-import com.playmonumenta.plugins.utils.PotionUtils;
-import com.playmonumenta.plugins.utils.ScoreboardUtils;
-import com.playmonumenta.plugins.utils.ZoneUtils;
-import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
-import com.playmonumenta.scriptedquests.utils.MetadataUtils;
-
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.format.TextDecoration;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
 
 
 
@@ -210,18 +185,6 @@ public class PlayerListener implements Listener {
 		}
 	}
 
-	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
-	public void onPlayerMove(PlayerMoveEvent event) {
-		Player player = event.getPlayer();
-		if (mPlugin.mEffectManager.hasEffect(player, Stasis.class)) {
-			Location to = event.getFrom();
-			to.setPitch(event.getTo().getPitch());
-			to.setYaw(event.getTo().getYaw());
-			event.setTo(event.getFrom());
-		}
-	}
-
-	// This event's cancelled state should not be used, as useItemInHand()/useInteractedBlock() should be used instead
 	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = false)
 	public void playerInteractEvent(PlayerInteractEvent event) {
 		if (event.useInteractedBlock() == Event.Result.DENY && event.useItemInHand() == Event.Result.DENY) {
@@ -240,7 +203,7 @@ public class PlayerListener implements Listener {
 		}
 
 		mPlugin.mAbilityManager.playerInteractEvent(player, action, mat);
-		mPlugin.mTrackingManager.mPlayers.onPlayerInteract(mPlugin, player, event);
+		mPlugin.mItemStatManager.onPlayerInteract(mPlugin, player, event);
 
 		// Overrides
 		// TODO: Rewrite overrides system to handle item/block interactions separately
@@ -308,11 +271,6 @@ public class PlayerListener implements Listener {
 		Player player = event.getPlayer();
 		Block block = event.getBlock();
 
-		if (mPlugin.mEffectManager.hasEffect(player, Stasis.class)) {
-			event.setCancelled(true);
-			return;
-		}
-
 		if (!mPlugin.mItemOverrides.blockPlaceInteraction(mPlugin, player, item, event)) {
 			event.setCancelled(true);
 			return;
@@ -329,10 +287,7 @@ public class PlayerListener implements Listener {
 	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
 	public void playerInteractEntityEvent(PlayerInteractEntityEvent event) {
 		Player player = event.getPlayer();
-		if (mPlugin.mEffectManager.hasEffect(player, Stasis.class)) {
-			event.setCancelled(true);
-			return;
-		}
+
 		/* Don't let the player do this when in a restricted zone */
 		if (ZoneUtils.hasZoneProperty(player, ZoneProperty.RESTRICTED) && player.getGameMode() != GameMode.CREATIVE) {
 			event.setCancelled(true);
@@ -400,10 +355,6 @@ public class PlayerListener implements Listener {
 	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	public void playerArmorStandManipulateEvent(PlayerArmorStandManipulateEvent event) {
 		Player player = event.getPlayer();
-		if (mPlugin.mEffectManager.hasEffect(player, Stasis.class)) {
-			event.setCancelled(true);
-			return;
-		}
 		ArmorStand armorStand = event.getRightClicked();
 
 		/* Don't let the player do this in a restricted zone */
@@ -416,18 +367,6 @@ public class PlayerListener implements Listener {
 		if (player.getGameMode() == GameMode.ADVENTURE && ZoneUtils.isInPlot(armorStand)) {
 			event.setCancelled(true);
 			return;
-		}
-	}
-
-	@EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
-	public void entityShootBowEvent(EntityShootBowEvent event) {
-		if (mPlugin.mEffectManager.hasEffect(event.getEntity(), Stasis.class)) {
-			event.setCancelled(true);
-			return;
-		}
-		if (event.getEntity() instanceof Player && event.getArrowItem() != null && event.getArrowItem().hasItemMeta() && event.getArrowItem().getItemMeta().hasLore()) {
-			mPlugin.mAttributeManager.mAttributeTrie.resetArrow((Player) event.getEntity());
-			mPlugin.mAttributeManager.updateAttributeArrowTrie(mPlugin, (Player) event.getEntity(), event.getArrowItem());
 		}
 	}
 
@@ -455,10 +394,7 @@ public class PlayerListener implements Listener {
 	public void entityPickupItemEvent(EntityPickupItemEvent event) {
 		if (event.getEntity() instanceof Player) {
 			Player player = (Player) event.getEntity();
-			if (mPlugin.mEffectManager.hasEffect(player, Stasis.class)) {
-				event.setCancelled(true);
-				return;
-			}
+
 			/* Don't let the player do this when in a restricted zone */
 			if (ZoneUtils.hasZoneProperty(player, ZoneProperty.RESTRICTED) && player.getGameMode() != GameMode.CREATIVE) {
 				event.setCancelled(true);
@@ -470,6 +406,7 @@ public class PlayerListener implements Listener {
 				event.setCancelled(true);
 				return;
 			}
+
 			// If the item contains lore, schedule an equipment update
 			if (event.getItem().getItemStack().getItemMeta().hasLore()) {
 				InventoryUtils.scheduleDelayedEquipmentCheck(mPlugin, player, event);
@@ -653,9 +590,6 @@ public class PlayerListener implements Listener {
 	public void playerDeathEvent(PlayerDeathEvent event) {
 		Player player = event.getEntity();
 
-		mPlugin.mTrackingManager.mPlayers.onDeath(mPlugin, player, event);
-		mPlugin.mAbilityManager.playerDeathEvent(player, event);
-
 		if (player.getHealth() > 0) {
 			return;
 		}
@@ -666,6 +600,9 @@ public class PlayerListener implements Listener {
 			if (maxHealth != null && maxHealth.getValue() <= 0) {
 				event.setKeepInventory(false);
 			}
+		} else {
+			//Only activate on death effects for non-safe deaths
+			mPlugin.mItemStatManager.onDeath(mPlugin, player, event);
 		}
 
 		// Give the player a NewDeath score of 1 so the city guides will give items again
@@ -709,10 +646,6 @@ public class PlayerListener implements Listener {
 	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	public void playerFishEvent(PlayerFishEvent event) {
 		Player player = event.getPlayer();
-		if (mPlugin.mEffectManager.hasEffect(player, Stasis.class)) {
-			event.setCancelled(true);
-			return;
-		}
 		if (event.getState() == State.FISHING) {
 			mPlugin.mTrackingManager.mFishingHook.addEntity(player, event.getHook());
 		} else if (event.getState() == State.CAUGHT_ENTITY || event.getState() == State.CAUGHT_FISH) {
@@ -727,13 +660,9 @@ public class PlayerListener implements Listener {
 	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	public void playerItemConsumeEvent(PlayerItemConsumeEvent event) {
 		Player player = event.getPlayer();
-		if (mPlugin.mEffectManager.hasEffect(player, Stasis.class)) {
-			event.setCancelled(true);
-			return;
-		}
-		mPlugin.mAbilityManager.playerItemConsumeEvent(player, event);
+
 		/* Don't let players consume shattered items */
-		if (ItemUtils.isItemShattered(event.getItem())) {
+		if (ItemStatUtils.isShattered(event.getItem())) {
 			event.setCancelled(true);
 			return;
 		}
@@ -753,12 +682,15 @@ public class PlayerListener implements Listener {
 			return;
 		}
 
+		mPlugin.mAbilityManager.playerItemConsumeEvent(player, event);
+
 		if (event.getItem().containsEnchantment(Enchantment.ARROW_INFINITE)) {
 			event.setReplacement(event.getItem());
 			//Stat tracker for consuming infinity items
-			StatTrackManager.incrementStat(event.getItem(), player, StatTrackOptions.TIMES_CONSUMED, 1);
+			StatTrackManager.incrementStat(event.getItem(), player, InfusionType.STAT_TRACK_CONSUMED, 1);
 		}
-		mPlugin.mTrackingManager.mPlayers.onConsume(mPlugin, player, event);
+
+		mPlugin.mItemStatManager.onConsume(mPlugin, player, event);
 
 		for (PotionEffect effect : PotionUtils.getEffects(event.getItem())) {
 			// Kill the player if they drink a potion with instant damage 10+
@@ -792,40 +724,57 @@ public class PlayerListener implements Listener {
 	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	public void playerItemDamageEvent(PlayerItemDamageEvent event) {
 		Player player = event.getPlayer();
-		if (mPlugin.mEffectManager.hasEffect(player, Stasis.class)) {
-			event.setCancelled(true);
-			return;
-		}
 		ItemStack item = event.getItem();
+
 		mPlugin.mAbilityManager.playerItemDamageEvent(player, event);
 
-		int damage = event.getDamage();
+		int oldDamage = event.getDamage();
+		int newDamage = oldDamage;
 
 		if (ItemUtils.isArmor(item)) {
 			// Players that get resistance from safezones don't take armor damage
-			if (damage < 0 || ZoneUtils.hasZoneProperty(player, ZoneProperty.NO_EQUIPMENT_DAMAGE)) {
-				damage = 0;
+			if (oldDamage < 0 || ZoneUtils.hasZoneProperty(player, ZoneProperty.NO_EQUIPMENT_DAMAGE)) {
+				newDamage = 0;
 			}
-
-			event.setDamage(damage);
 		}
 
 		//Tridents do not take damage in safezones
-		if (event.getItem().getType() == Material.TRIDENT && ZoneUtils.hasZoneProperty(player, ZoneProperty.NO_EQUIPMENT_DAMAGE)) {
-			event.setDamage(0);
+		if (item.getType() == Material.TRIDENT && ZoneUtils.hasZoneProperty(player, ZoneProperty.NO_EQUIPMENT_DAMAGE)) {
+			newDamage = 0;
 		}
 
-		mPlugin.mTrackingManager.mPlayers.onItemDamage(mPlugin, player, event);
+		event.setDamage(newDamage);
+		mPlugin.mItemStatManager.onItemDamage(mPlugin, player, event);
+
+		// Low durability notification code
+		Material mat = item.getType();
+		if (item.getItemMeta() instanceof Damageable) {
+			Damageable dMeta = (Damageable) item.getItemMeta();
+			int itemDamage = dMeta.getDamage();
+			if (itemDamage > mat.getMaxDurability() * 0.1 && itemDamage + newDamage < mat.getMaxDurability() * 0.1) {
+				World world = player.getWorld();
+				Location loc = player.getLocation();
+				world.playSound(loc, Sound.BLOCK_GLASS_BREAK, 1, 0.45f);
+				world.playSound(loc, Sound.BLOCK_GLASS_BREAK, 1, 0.25f);
+				BlockData fallingDustData = Material.ANVIL.createBlockData();
+				world.spawnParticle(Particle.FALLING_DUST, loc.add(0, 1, 0), 20,
+					1.1, 0.6, 1.1, fallingDustData);
+				String itemName = ItemUtils.getPlainName(item);
+				if (itemName.equals("")) {
+					itemName = mat.toString();
+				}
+				MessagingUtils.sendActionBarMessage(player, NamedTextColor.RED, false, "Your " + itemName + " is about to break!");
+			}
+		}
 	}
 
 	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	public void playerRiptideEvent(PlayerRiptideEvent event) {
 		Player player = event.getPlayer();
 		Location loc = player.getLocation();
-		boolean stasis = mPlugin.mEffectManager.hasEffect(player, Stasis.class);
 
 		//Manually forces the player in place during the riptide if they use it out of water (in rain)
-		if (stasis || !mPlugin.mItemOverrides.playerRiptide(mPlugin, player, event)) {
+		if (StasisListener.isInStasis(player) || !mPlugin.mItemOverrides.playerRiptide(mPlugin, player, event)) {
 			player.teleport(loc);
 			player.setCooldown(Material.TRIDENT, 15*20);
 			new BukkitRunnable() {
@@ -845,7 +794,7 @@ public class PlayerListener implements Listener {
 	public void playerExpChangeEvent(PlayerExpChangeEvent event) {
 		Player player = event.getPlayer();
 
-		mPlugin.mTrackingManager.mPlayers.onExpChange(mPlugin, player, event);
+		mPlugin.mItemStatManager.onExpChange(mPlugin, player, event);
 	}
 
 	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
@@ -1074,10 +1023,6 @@ public class PlayerListener implements Listener {
 		ItemStack item = player.getInventory().getItemInMainHand();
 		Block block = event.getBlock();
 
-		if (mPlugin.mEffectManager.hasEffect(player, Stasis.class)) {
-			event.setCancelled(true);
-			return;
-		}
 		if (!mPlugin.mItemOverrides.blockBreakInteraction(mPlugin, event.getPlayer(), block, event)) {
 			event.setCancelled(true);
 			return;
@@ -1089,15 +1034,7 @@ public class PlayerListener implements Listener {
 			return;
 		}
 
-		mPlugin.mTrackingManager.mPlayers.onBlockBreak(mPlugin, player, event, item);
-	}
-
-	@EventHandler(ignoreCancelled = true)
-	public void evasionEvent(EvasionEvent event) {
-		Player player = event.getPlayer();
-		if (!mPlugin.mEffectManager.hasEffect(player, Stasis.class)) {
-			mPlugin.mTrackingManager.mPlayers.onEvade(mPlugin, player, event);
-		}
+		mPlugin.mItemStatManager.onBlockBreak(mPlugin, player, event);
 	}
 
 	@EventHandler(ignoreCancelled = true)
@@ -1113,85 +1050,7 @@ public class PlayerListener implements Listener {
 	public void onRegain(EntityRegainHealthEvent event) {
 		if (event.getEntity() instanceof Player) {
 			Player player = (Player) event.getEntity();
-			mPlugin.mTrackingManager.mPlayers.onRegain(mPlugin, player, event);
-		}
-	}
-
-	/*
-	 * Handles on damage enchants. Needs to be EventPriority.LOW to apply
-	 * base damage modifiers like projectile attributes before any
-	 * modifiers from custom effects (EventPriority.NORMAL) or abilities
-	 * (EventPriority.HIGH) are applied.
-	 */
-	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
-	public void entityDamageByEntityEvent(EntityDamageByEntityEvent event) {
-		Entity damagee = event.getEntity();
-		Entity damager = event.getDamager();
-
-		if (mPlugin.mEffectManager.hasEffect(damagee, Stasis.class) || mPlugin.mEffectManager.hasEffect(damager, Stasis.class)) {
-			event.setCancelled(true);
-			return;
-		}
-		if (damagee instanceof Player) {
-			Player player = (Player) damagee;
-			mPlugin.mTrackingManager.mPlayers.onHurtByEntity(mPlugin, player, event);
-			if (event.getDamage() > 0) {
-				EvasionInfo.triggerEvasion(player, event);
-			}
-		} else if (damagee instanceof LivingEntity && !(damagee instanceof Villager)) {
-			if (damager instanceof Projectile) {
-				ProjectileSource source = ((Projectile) damager).getShooter();
-				if (source instanceof Player) {
-					Projectile proj = (Projectile) damager;
-					LivingEntity le = (LivingEntity) damagee;
-
-					AttributeProjectileDamage.onShootAttack(mPlugin, proj, le, event);
-
-					Sniper.onShootAttack(mPlugin, proj, le, event);
-					PointBlank.onShootAttack(mPlugin, proj, le, event);
-					Frost.onShootAttack(mPlugin, proj, le, event);
-					Inferno.onShootAttack(mPlugin, proj, le, event);
-					Focus.onShootAttack(mPlugin, proj, le, event);
-					Spark.onShootAttack(mPlugin, proj, le, event);
-					Regicide.onShootAttack(mPlugin, proj, le, event);
-					Choler.onShootAttack(mPlugin, proj, le, event);
-
-					if (damager instanceof Trident) {
-						IceAspect.onShootAttack(mPlugin, proj, le, event);
-						ThunderAspect.onShootAttack(mPlugin, proj, le, event);
-						Bleeding.onShootAttack(mPlugin, proj, le, event);
-						Decay.onShootAttack(mPlugin, proj, le, event);
-						HexEater.onShootAttack(mPlugin, proj, le, event);
-						Slayer.onShootAttack(mPlugin, proj, le, event);
-						Duelist.onShootAttack(mPlugin, proj, le, event);
-
-						//Fire aspect trident implementation
-						if (damager.hasMetadata(AttributeThrowRate.FIRE_ASPECT_META) && !EntityUtils.isFireResistant(le)) {
-							le.setFireTicks(le.getFireTicks() + 4 * 20 * damager.getMetadata(AttributeThrowRate.FIRE_ASPECT_META).get(0).asInt());
-						}
-
-						Inferno.onShootAttack(mPlugin, proj, le, event);
-
-						/*
-						 * The trident damage from Smite, Bane, Impaling seems to be properly applied, even
-						 * though AttributeProjectileDamage.onShootAttack(mPlugin, proj, le, event); does
-						 * direct damage setting, so that's convenient
-						 */
-					}
-
-					RegionScalingDamageDealt.onShootAttack(mPlugin, proj, le, event);
-				}
-			} else if (damager instanceof Player) {
-				if (event.getCause() != DamageCause.THORNS) {
-					Player player = (Player) damager;
-
-					mPlugin.mTrackingManager.mPlayers.onDamage(mPlugin, player, (LivingEntity) damagee, event);
-
-					if (event.getCause().equals(DamageCause.ENTITY_ATTACK)) {
-						mPlugin.mTrackingManager.mPlayers.onAttack(mPlugin, player, (LivingEntity) damagee, event);
-					}
-				}
-			}
+			mPlugin.mItemStatManager.onRegain(mPlugin, player, event);
 		}
 	}
 

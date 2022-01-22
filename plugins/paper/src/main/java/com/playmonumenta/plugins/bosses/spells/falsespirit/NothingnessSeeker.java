@@ -1,8 +1,11 @@
 package com.playmonumenta.plugins.bosses.spells.falsespirit;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import com.playmonumenta.plugins.bosses.bosses.FalseSpirit;
+import com.playmonumenta.plugins.bosses.spells.SpellBaseSeekingProjectile;
+import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
 import org.bukkit.Color;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -12,14 +15,11 @@ import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import com.playmonumenta.plugins.bosses.bosses.FalseSpirit;
-import com.playmonumenta.plugins.bosses.spells.SpellBaseSeekingProjectile;
-import com.playmonumenta.plugins.utils.BossUtils;
-import com.playmonumenta.plugins.utils.EntityUtils;
+import java.util.ArrayList;
+import java.util.List;
 
 public class NothingnessSeeker extends SpellBaseSeekingProjectile {
 
@@ -67,9 +67,9 @@ public class NothingnessSeeker extends SpellBaseSeekingProjectile {
 					world.spawnParticle(Particle.REDSTONE, loc, 50, 0.5, 0.5, 0.5, 0.25, GREEN_COLOR);
 					if (player != null) {
 						if (delve) {
-							BossUtils.bossDamage(boss, player, 30, boss.getLocation(), "Nothingness Seeker");
+							BossUtils.blockableDamage(boss, player, DamageType.MAGIC, 30, "Nothingness Seeker", boss.getLocation());
 						} else {
-							BossUtils.bossDamage(boss, player, 25, boss.getLocation(), "Nothingness Seeker");
+							BossUtils.blockableDamage(boss, player, DamageType.MAGIC, 25, "Nothingness Seeker", boss.getLocation());
 						}
 					}
 				});
@@ -121,11 +121,10 @@ public class NothingnessSeeker extends SpellBaseSeekingProjectile {
 	}
 
 	@Override
-	public void bossDamagedEntity(EntityDamageByEntityEvent event) {
+	public void onDamage(DamageEvent event, LivingEntity damagee) {
 		//If player dies, no targetting for 60 seconds
-		if (event.getEntity() instanceof Player) {
-			Player player = (Player) event.getEntity();
-			if (event.getFinalDamage() > player.getHealth()) {
+		if (damagee instanceof Player player) {
+			if (event.getDamage() > player.getHealth()) {
 				mNoTarget.add(player);
 				new BukkitRunnable() {
 					@Override

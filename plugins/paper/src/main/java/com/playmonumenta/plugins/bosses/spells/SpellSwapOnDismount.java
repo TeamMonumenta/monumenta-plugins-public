@@ -26,7 +26,6 @@ public class SpellSwapOnDismount extends Spell {
 
 	@Override
 	public int cooldownTicks() {
-		// TODO Auto-generated method stub
 		return 0;
 	}
 

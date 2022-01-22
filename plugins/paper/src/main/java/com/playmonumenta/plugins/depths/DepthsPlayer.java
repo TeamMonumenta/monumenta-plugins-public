@@ -1,5 +1,10 @@
 package com.playmonumenta.plugins.depths;
 
+import com.playmonumenta.plugins.depths.DepthsRoomType.DepthsRewardType;
+import com.playmonumenta.plugins.depths.abilities.WeaponAspectDepthsAbility;
+import com.playmonumenta.scriptedquests.utils.ScoreboardUtils;
+import org.bukkit.entity.Player;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -8,12 +13,6 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentLinkedQueue;
-
-import org.bukkit.entity.Player;
-
-import com.playmonumenta.plugins.depths.DepthsRoomType.DepthsRewardType;
-import com.playmonumenta.plugins.depths.abilities.WeaponAspectDepthsAbility;
-import com.playmonumenta.scriptedquests.utils.ScoreboardUtils;
 
 public class DepthsPlayer {
 

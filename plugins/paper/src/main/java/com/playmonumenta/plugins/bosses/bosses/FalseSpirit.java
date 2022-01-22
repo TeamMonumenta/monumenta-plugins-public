@@ -1,41 +1,5 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.EnumSet;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import org.bukkit.Color;
-import org.bukkit.GameMode;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
-import org.bukkit.SoundCategory;
-import org.bukkit.World;
-import org.bukkit.attribute.Attribute;
-import org.bukkit.boss.BarColor;
-import org.bukkit.boss.BarStyle;
-import org.bukkit.entity.EntityType;
-import org.bukkit.entity.Fireball;
-import org.bukkit.entity.Item;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
-import org.bukkit.entity.Trident;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDeathEvent;
-import org.bukkit.event.entity.PlayerDeathEvent;
-import org.bukkit.event.entity.ProjectileLaunchEvent;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.plugin.Plugin;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
-import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.util.Vector;
-
 import com.playmonumenta.plugins.bosses.BossBarManager;
 import com.playmonumenta.plugins.bosses.BossBarManager.BossHealthAction;
 import com.playmonumenta.plugins.bosses.SpellManager;
@@ -50,12 +14,48 @@ import com.playmonumenta.plugins.bosses.spells.falsespirit.SpellFlamethrower;
 import com.playmonumenta.plugins.bosses.spells.falsespirit.SpellForceTwo;
 import com.playmonumenta.plugins.bosses.spells.falsespirit.SpellMultiEarthshake;
 import com.playmonumenta.plugins.bosses.spells.falsespirit.TriplicateSlash;
+import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.DelvesUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.SerializationUtils;
+import org.bukkit.Color;
+import org.bukkit.GameMode;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
+import org.bukkit.World;
+import org.bukkit.attribute.Attribute;
+import org.bukkit.boss.BarColor;
+import org.bukkit.boss.BarStyle;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Fireball;
+import org.bukkit.entity.Item;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
+import org.bukkit.entity.Trident;
+import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.entity.ProjectileLaunchEvent;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.plugin.Plugin;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
+import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.util.Vector;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public final class FalseSpirit extends BossAbilityGroup {
 	public static final String identityTag = "boss_falsespirit";
@@ -311,30 +311,10 @@ public final class FalseSpirit extends BossAbilityGroup {
 		}
 	}
 
-
 	@Override
-	public void bossDamagedEntity(EntityDamageByEntityEvent event) {
-		//If player dies, heal health
-		if (event.getEntity() instanceof Player player) {
-			if (event.getFinalDamage() > player.getHealth()) {
-				World world = mBoss.getWorld();
-				Location loc = mBoss.getLocation();
-
-				//Heal code
-				double hp = mBoss.getHealth() + HEALTH_HEALED;
-				double max = EntityUtils.getMaxHealth(mBoss);
-				mBoss.setHealth(Math.min(hp, max));
-				world.playSound(loc, Sound.ENTITY_ILLUSIONER_CAST_SPELL, SoundCategory.HOSTILE, 1, 1.25f);
-				world.playSound(loc, Sound.ENTITY_ZOMBIE_VILLAGER_CONVERTED, SoundCategory.HOSTILE, 1, 2f);
-				world.spawnParticle(Particle.REDSTONE, loc.clone().add(0, 1, 0), 5, 0.15, 0.15, 0.15, RED_COLOR);
-			}
-		}
-	}
-
-	@Override
-	public void bossDamagedByEntity(EntityDamageByEntityEvent event) {
+	public void onHurtByEntity(DamageEvent event, Entity damager) {
 		//Do not take damage to the gate closer trident
-		if (event.getEntity() instanceof Trident trident) {
+		if (damager instanceof Trident trident) {
 			ItemStack item = trident.getItemStack();
 
 			if (item != null && ItemUtils.getPlainName(item).contains("Gate Closer")) {
@@ -353,6 +333,17 @@ public final class FalseSpirit extends BossAbilityGroup {
 				}
 			}
 		}.runTaskLater(mPlugin, 0);
+
+		World world = mBoss.getWorld();
+		Location loc = mBoss.getLocation();
+
+		//Heal code
+		double hp = mBoss.getHealth() + HEALTH_HEALED;
+		double max = EntityUtils.getMaxHealth(mBoss);
+		mBoss.setHealth(Math.min(hp, max));
+		world.playSound(loc, Sound.ENTITY_ILLUSIONER_CAST_SPELL, SoundCategory.HOSTILE, 1, 1.25f);
+		world.playSound(loc, Sound.ENTITY_ZOMBIE_VILLAGER_CONVERTED, SoundCategory.HOSTILE, 1, 2f);
+		world.spawnParticle(Particle.REDSTONE, loc.clone().add(0, 1, 0), 5, 0.15, 0.15, 0.15, RED_COLOR);
 	}
 
 	@Override
@@ -442,7 +433,7 @@ public final class FalseSpirit extends BossAbilityGroup {
 			noDamageTicksTake = 5;
 		}
 		mBoss.setMaximumNoDamageTicks(mBoss.getMaximumNoDamageTicks() - noDamageTicksTake);
-		bossTargetHp = (int) (hpDel * (1 + (1 - 1 / Math.E) * Math.log(playerCount)));
+		bossTargetHp = (int) (hpDel * (1 + (1 - 1 / Math.E) * Math.log(playerCount)) * 1.1);
 		EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_MAX_HEALTH, bossTargetHp);
 		EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_FOLLOW_RANGE, detectionRange);
 		EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_KNOCKBACK_RESISTANCE, 1);

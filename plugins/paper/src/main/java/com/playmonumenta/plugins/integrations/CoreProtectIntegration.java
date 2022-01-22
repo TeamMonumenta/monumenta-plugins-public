@@ -1,7 +1,7 @@
 package com.playmonumenta.plugins.integrations;
 
-import java.util.logging.Logger;
-
+import net.coreprotect.CoreProtect;
+import net.coreprotect.CoreProtectAPI;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -10,8 +10,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-import net.coreprotect.CoreProtect;
-import net.coreprotect.CoreProtectAPI;
+import java.util.logging.Logger;
 
 public class CoreProtectIntegration {
 	private static @Nullable CoreProtectAPI API = null;

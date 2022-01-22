@@ -1,21 +1,21 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
-import java.util.Arrays;
-import java.util.List;
-
+import com.playmonumenta.plugins.bosses.SpellManager;
+import com.playmonumenta.plugins.bosses.parameters.BossParam;
+import com.playmonumenta.plugins.bosses.parameters.EffectsList;
+import com.playmonumenta.plugins.bosses.parameters.EntityTargets;
+import com.playmonumenta.plugins.bosses.parameters.EntityTargets.TARGETS;
+import com.playmonumenta.plugins.bosses.parameters.ParticlesList;
+import com.playmonumenta.plugins.bosses.parameters.SoundsList;
+import com.playmonumenta.plugins.bosses.spells.SpellBaseCharge;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.utils.BossUtils;
 import org.bukkit.Location;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.plugin.Plugin;
 
-import com.playmonumenta.plugins.bosses.SpellManager;
-import com.playmonumenta.plugins.bosses.parameters.EffectsList;
-import com.playmonumenta.plugins.bosses.parameters.EntityTargets;
-import com.playmonumenta.plugins.bosses.parameters.BossParam;
-import com.playmonumenta.plugins.bosses.parameters.ParticlesList;
-import com.playmonumenta.plugins.bosses.parameters.SoundsList;
-import com.playmonumenta.plugins.bosses.parameters.EntityTargets.TARGETS;
-import com.playmonumenta.plugins.bosses.spells.SpellBaseCharge;
-import com.playmonumenta.plugins.utils.BossUtils;
+import java.util.Arrays;
+import java.util.List;
 
 public class ChargerBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_charger";
@@ -123,19 +123,11 @@ public class ChargerBoss extends BossAbilityGroup {
 			(LivingEntity target) -> {
 				p.PARTICLE_HIT.spawn(target.getEyeLocation(), 0.4d, 0.4d, 0.4d, 0.4d);
 				if (p.DAMAGE > 0) {
-					if (p.SPELL_NAME.isEmpty()) {
-						BossUtils.bossDamage(boss, target, p.DAMAGE);
-					} else {
-						BossUtils.bossDamage(boss, target, p.DAMAGE, mBoss.getLocation(), p.SPELL_NAME);
-					}
+					BossUtils.blockableDamage(boss, target, DamageType.MELEE, p.DAMAGE, p.SPELL_NAME, mBoss.getLocation());
 				}
 
 				if (p.DAMAGE_PERCENTAGE > 0.0) {
-					if (p.SPELL_NAME.isEmpty()) {
-						BossUtils.bossDamagePercent(mBoss, target, p.DAMAGE_PERCENTAGE);
-					} else {
-						BossUtils.bossDamagePercent(mBoss, target, p.DAMAGE_PERCENTAGE, p.SPELL_NAME);
-					}
+					BossUtils.bossDamagePercent(mBoss, target, p.DAMAGE_PERCENTAGE, p.SPELL_NAME);
 				}
 
 				p.EFFECTS.apply(target, mBoss);

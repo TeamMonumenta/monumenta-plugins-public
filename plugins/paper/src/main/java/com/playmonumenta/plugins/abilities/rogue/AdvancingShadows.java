@@ -1,8 +1,20 @@
 package com.playmonumenta.plugins.abilities.rogue;
 
-import java.util.EnumSet;
-import java.util.List;
-
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.abilities.AbilityManager;
+import com.playmonumenta.plugins.abilities.AbilityTrigger;
+import com.playmonumenta.plugins.abilities.rogue.swordsage.BladeDance;
+import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.effects.FlatDamageDealt;
+import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.point.Raycast;
+import com.playmonumenta.plugins.point.RaycastData;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.utils.LocationUtils;
+import com.playmonumenta.plugins.utils.MovementUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -14,63 +26,13 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.abilities.AbilityManager;
-import com.playmonumenta.plugins.abilities.AbilityTrigger;
-import com.playmonumenta.plugins.abilities.rogue.swordsage.BladeDance;
-import com.playmonumenta.plugins.classes.ClassAbility;
-import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
-import com.playmonumenta.plugins.enchantments.abilities.BaseAbilityEnchantment;
-import com.playmonumenta.plugins.point.Raycast;
-import com.playmonumenta.plugins.point.RaycastData;
-import com.playmonumenta.plugins.potion.PotionManager.PotionID;
-import com.playmonumenta.plugins.tracking.PlayerTracking;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.InventoryUtils;
-import com.playmonumenta.plugins.utils.LocationUtils;
-import com.playmonumenta.plugins.utils.MovementUtils;
+import java.util.EnumSet;
+import java.util.List;
 
 public class AdvancingShadows extends Ability {
-
-	public static class AdvancingShadowsRadiusEnchantment extends BaseAbilityEnchantment {
-		public AdvancingShadowsRadiusEnchantment() {
-			super("Advancing Shadows Range", EnumSet.of(ItemSlot.MAINHAND, ItemSlot.OFFHAND, ItemSlot.ARMOR));
-		}
-	}
-
-	public static class AdvancingShadowsKnockbackRadiusEnchantment extends BaseAbilityEnchantment {
-		public AdvancingShadowsKnockbackRadiusEnchantment() {
-			super("Advancing Shadows Knockback Range", EnumSet.of(ItemSlot.MAINHAND, ItemSlot.OFFHAND, ItemSlot.ARMOR));
-		}
-
-		protected static float getKnockbackRadius(Player player, float base) {
-			int level = PlayerTracking.getInstance().getPlayerCustomEnchantLevel(player, AdvancingShadowsKnockbackRadiusEnchantment.class);
-			return base * (float) ((level / 100.0) + 1);
-		}
-	}
-
-	public static class AdvancingShadowsKnockbackSpeedEnchantment extends BaseAbilityEnchantment {
-		public AdvancingShadowsKnockbackSpeedEnchantment() {
-			super("Advancing Shadows Knockback Speed", EnumSet.of(ItemSlot.MAINHAND, ItemSlot.OFFHAND, ItemSlot.ARMOR));
-		}
-
-		protected static float getKnockbackSpeed(Player player, float base) {
-			int level = PlayerTracking.getInstance().getPlayerCustomEnchantLevel(player, AdvancingShadowsKnockbackSpeedEnchantment.class);
-			return base * (float) ((level / 100.0) + 1);
-		}
-	}
-
-	public static class AdvancingShadowsCooldownEnchantment extends BaseAbilityEnchantment {
-		public AdvancingShadowsCooldownEnchantment() {
-			super("Advancing Shadows Cooldown", EnumSet.of(ItemSlot.OFFHAND));
-		}
-	}
 
 	private static final int ADVANCING_SHADOWS_RANGE_1 = 11;
 	private static final int ADVANCING_SHADOWS_RANGE_2 = 16;
@@ -78,11 +40,17 @@ public class AdvancingShadows extends Ability {
 	private static final float ADVANCING_SHADOWS_AOE_KNOCKBACKS_RANGE = 4;
 	private static final double ADVANCING_SHADOWS_OFFSET = 2.7;
 	private static final int DURATION = 5 * 20;
-	private static final int EFFECT_LEVEL = 1;
+	private static final int DAMAGE_BONUS_1 = 3;
+	private static final int DAMAGE_BONUS_2 = 4;
 	private static final int ADVANCING_SHADOWS_COOLDOWN = 20 * 20;
+
+	private static final String FLAT_DAMAGE_DEALT_EFFECT_NAME = "AdvancingShadowsFlatDamageDealtEffect";
+	private static final EnumSet<DamageEvent.DamageType> AFFECTED_DAMAGE_TYPES = EnumSet.of(DamageType.MELEE, DamageType.MELEE_ENCH, DamageType.MELEE_SKILL);
 
 	private @Nullable LivingEntity mTarget = null;
 	private @Nullable BladeDance mBladeDance;
+
+	private final int mFlatDamageDealt;
 
 	public AdvancingShadows(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Advancing Shadows");
@@ -91,9 +59,10 @@ public class AdvancingShadows extends Ability {
 		mInfo.mShorthandName = "AS";
 		mInfo.mCooldown = ADVANCING_SHADOWS_COOLDOWN;
 		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
-		mInfo.mDescriptions.add("While holding two swords and not sneaking, right click to teleport to the target hostile enemy within " + (ADVANCING_SHADOWS_RANGE_1 - 1) + " blocks and gain strength 2 for 5 seconds. Cooldown: 20s.");
-		mInfo.mDescriptions.add("Teleport range is increased to " + (ADVANCING_SHADOWS_RANGE_2 - 1) + " blocks and all hostile non-target mobs within " + ADVANCING_SHADOWS_AOE_KNOCKBACKS_RANGE + " blocks are knocked away from the target.");
+		mInfo.mDescriptions.add("While holding two swords and not sneaking, right click to teleport to the target hostile enemy within " + (ADVANCING_SHADOWS_RANGE_1 - 1) + " blocks and gain +3 Attack Damage for 5 seconds. Cooldown: 20s.");
+		mInfo.mDescriptions.add("Damage increased to +4 Melee Damage for 5s, teleport range is increased to " + (ADVANCING_SHADOWS_RANGE_2 - 1) + " blocks and all hostile non-target mobs within " + ADVANCING_SHADOWS_AOE_KNOCKBACKS_RANGE + " blocks are knocked away from the target.");
 		mDisplayItem = new ItemStack(Material.ENDER_EYE, 1);
+		mFlatDamageDealt = getAbilityScore() == 1 ? DAMAGE_BONUS_1 : DAMAGE_BONUS_2;
 
 		if (player != null) {
 			Bukkit.getScheduler().runTask(plugin, () -> {
@@ -179,14 +148,12 @@ public class AdvancingShadows extends Ability {
 				mPlayer.teleport(loc, TeleportCause.UNKNOWN);
 			}
 
-			mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.INCREASE_DAMAGE, DURATION, EFFECT_LEVEL, true, false));
-			float range = AdvancingShadowsKnockbackRadiusEnchantment.getKnockbackRadius(mPlayer, ADVANCING_SHADOWS_AOE_KNOCKBACKS_RANGE);
-			float speed = AdvancingShadowsKnockbackSpeedEnchantment.getKnockbackSpeed(mPlayer, ADVANCING_SHADOWS_AOE_KNOCKBACKS_SPEED);
+			mPlugin.mEffectManager.addEffect(mPlayer, FLAT_DAMAGE_DEALT_EFFECT_NAME, new FlatDamageDealt(DURATION, mFlatDamageDealt, AFFECTED_DAMAGE_TYPES));
 			if (advancingShadows > 1) {
 				for (LivingEntity mob : EntityUtils.getNearbyMobs(entity.getLocation(),
-				                                                  range, mPlayer)) {
+						ADVANCING_SHADOWS_AOE_KNOCKBACKS_RANGE, mPlayer)) {
 					if (mob != entity) {
-						MovementUtils.knockAway(entity, mob, speed);
+						MovementUtils.knockAway(entity, mob, ADVANCING_SHADOWS_AOE_KNOCKBACKS_SPEED, true);
 					}
 				}
 			}
@@ -201,12 +168,7 @@ public class AdvancingShadows extends Ability {
 
 	@Override
 	public boolean runCheck() {
-		if (mPlayer == null) {
-			return false;
-		}
-		ItemStack mainHand = mPlayer.getInventory().getItemInMainHand();
-		ItemStack offHand = mPlayer.getInventory().getItemInOffHand();
-		if (InventoryUtils.rogueTriggerCheck(mainHand, offHand)) {
+		if (InventoryUtils.rogueTriggerCheck(mPlugin, mPlayer)) {
 			if (!mPlayer.isSneaking()) {
 				// *TO DO* - Turn into boolean in constructor -or- look at changing trigger entirely
 				if (mBladeDance != null && mPlayer.getLocation().getPitch() >= 50) {
@@ -239,17 +201,12 @@ public class AdvancingShadows extends Ability {
 		return false;
 	}
 
-	@Override
-	public Class<? extends BaseAbilityEnchantment> getCooldownEnchantment() {
-		return AdvancingShadowsCooldownEnchantment.class;
-	}
-
 	private double getActivationRange() {
 		if (mPlayer == null) {
 			return 0;
 		}
 		int advancingShadows = getAbilityScore();
 		int range = (advancingShadows == 1) ? ADVANCING_SHADOWS_RANGE_1 : ADVANCING_SHADOWS_RANGE_2;
-		return AdvancingShadowsRadiusEnchantment.getRadius(mPlayer, range, AdvancingShadowsRadiusEnchantment.class);
+		return range;
 	}
 }

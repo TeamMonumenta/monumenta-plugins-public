@@ -8,17 +8,17 @@ import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityManager;
-import com.playmonumenta.plugins.classes.magic.MagicType;
 import com.playmonumenta.plugins.depths.DepthsManager;
 import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
+import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.MetadataUtils;
 
@@ -27,7 +27,7 @@ import net.md_5.bungee.api.ChatColor;
 public final class ShadowSlam extends DepthsAbility {
 
 	public static final String ABILITY_NAME = "Shadow Slam";
-	public static final double[] DAMAGE = {2.5, 3.0, 3.5, 4.0, 4.5, 5.5};
+	public static final double[] DAMAGE = {2, 2.5, 3, 3.5, 4, 5.5};
 	public static final int SIZE = 3;
 	private static final String SLAM_ONCE_THIS_TICK_METAKEY = "MeteorSlamTickSlammed";
 	public static final int REDUCED_THRESHOLD = 128; //No reduced damage for depths
@@ -121,7 +121,7 @@ public final class ShadowSlam extends DepthsAbility {
 		double slamDamage = Math.min(REDUCED_THRESHOLD, fallDistance) * DAMAGE[mRarity - 1] + Math.max(0, (fallDistance - REDUCED_THRESHOLD)) * 0.0;
 
 		for (LivingEntity enemy : EntityUtils.getNearbyMobs(location, SIZE)) {
-			EntityUtils.damageEntity(mPlugin, enemy, slamDamage, mPlayer, MagicType.PHYSICAL, true, mInfo.mLinkedSpell);
+			DamageUtils.damage(mPlayer, enemy, DamageType.MELEE_SKILL, slamDamage, mInfo.mLinkedSpell);
 		}
 
 		World world = mPlayer.getWorld();
@@ -134,24 +134,20 @@ public final class ShadowSlam extends DepthsAbility {
 	}
 
 	@Override
-	public boolean livingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
-		if (mPlayer != null
-				&& event.getCause() == DamageCause.ENTITY_ATTACK
-				&& calculateFallDistance() > MANUAL_THRESHOLD
-				&& MetadataUtils.checkOnceThisTick(mPlugin, mPlayer, SLAM_ONCE_THIS_TICK_METAKEY)) {
-			doSlamAttack(event.getEntity().getLocation().add(0, 0.15, 0));
+	public void onDamage(DamageEvent event, LivingEntity enemy) {
+		if (mPlayer != null && event.getType() == DamageType.MELEE && calculateFallDistance() > MANUAL_THRESHOLD && MetadataUtils.checkOnceThisTick(mPlugin, mPlayer, SLAM_ONCE_THIS_TICK_METAKEY)) {
+			doSlamAttack(enemy.getLocation().add(0, 0.15, 0));
 			mFallFromY = -7050;
 			// Also reset fall damage, mFallFromY can continue updating from there
 			mPlayer.setFallDistance(0);
 		}
-		return true;
 	}
 
 
 
 	@Override
 	public String getDescription(int rarity) {
-		return "When you fall more than " + AUTOMATIC_THRESHOLD + " blocks, landing causes a slam, dealing " + DepthsUtils.getRarityColor(rarity) + DAMAGE[rarity - 1] + ChatColor.WHITE + " damage per block fallen in a " + SIZE + " block radius. Falling more than " + MANUAL_THRESHOLD + " blocks and damaging an enemy also generates a slam and cancels fall damage.";
+		return "When you fall more than " + AUTOMATIC_THRESHOLD + " blocks, landing causes a slam, dealing " + DepthsUtils.getRarityColor(rarity) + DAMAGE[rarity - 1] + ChatColor.WHITE + " melee damage per block fallen in a " + SIZE + " block radius. Falling more than " + MANUAL_THRESHOLD + " blocks and damaging an enemy also generates a slam and cancels fall damage.";
 	}
 
 	@Override

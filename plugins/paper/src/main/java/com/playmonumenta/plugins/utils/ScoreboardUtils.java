@@ -1,12 +1,12 @@
 package com.playmonumenta.plugins.utils;
 
-import java.util.Optional;
-
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Score;
+
+import java.util.Optional;
 
 public class ScoreboardUtils {
 	public static Optional<Integer> getScoreboardValue(String scoreHolder, String objectiveName) {

@@ -1,12 +1,12 @@
 package com.playmonumenta.plugins.bosses.spells;
 
-import java.util.EnumSet;
-import java.util.Set;
-
 import org.bukkit.Material;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
 import org.bukkit.inventory.ItemStack;
+
+import java.util.EnumSet;
+import java.util.Set;
 
 public class SpellWeaponSwitch extends Spell {
 	private static final Set<Material> RANGED_MATERIALS = EnumSet.of(Material.BOW, Material.CROSSBOW, Material.TRIDENT);

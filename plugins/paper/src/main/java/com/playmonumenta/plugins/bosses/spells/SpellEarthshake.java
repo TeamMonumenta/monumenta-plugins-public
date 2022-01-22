@@ -1,10 +1,11 @@
 package com.playmonumenta.plugins.bosses.spells;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.EnumSet;
-import java.util.List;
-
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.LocationUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -20,11 +21,10 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.util.Vector;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-import com.playmonumenta.plugins.utils.BossUtils;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.FastUtils;
-import com.playmonumenta.plugins.utils.LocationUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.EnumSet;
+import java.util.List;
 
 public class SpellEarthshake extends SpellBaseAoE {
 
@@ -164,10 +164,10 @@ public class SpellEarthshake extends SpellBaseAoE {
 					for (Player p : PlayerUtils.playersInRange(loc, radius * 2, true)) {
 						world.playSound(p.getLocation(), Sound.ENTITY_WITHER_BREAK_BLOCK, 1.0f, 1.0f);
 						if (p.getLocation().distance(loc) <= radius) {
-							BossUtils.bossDamage(launcher, p, damage);
+							BossUtils.blockableDamage(launcher, p, DamageType.BLAST, damage);
 							p.setVelocity(p.getVelocity().add(new Vector(0.0, knockUpSpeed + 0.5, 0.0)));
 						} else {
-							BossUtils.bossDamage(launcher, p, damage);
+							BossUtils.blockableDamage(launcher, p, DamageType.BLAST, damage);
 							p.setVelocity(p.getVelocity().add(new Vector(0.0, knockUpSpeed, 0.0)));
 						}
 					}

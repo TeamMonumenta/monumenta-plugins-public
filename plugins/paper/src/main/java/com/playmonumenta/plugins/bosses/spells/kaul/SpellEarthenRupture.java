@@ -1,5 +1,11 @@
 package com.playmonumenta.plugins.bosses.spells.kaul;
 
+import com.playmonumenta.plugins.bosses.ChargeUpManager;
+import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.MovementUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -14,12 +20,6 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
-
-import com.playmonumenta.plugins.bosses.ChargeUpManager;
-import com.playmonumenta.plugins.bosses.spells.Spell;
-import com.playmonumenta.plugins.utils.BossUtils;
-import com.playmonumenta.plugins.utils.MovementUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
 
 /*
  * Earthen Rupture: After charging for 2 seconds, the Elemental will cause a large rupture that
@@ -66,7 +66,7 @@ public class SpellEarthenRupture extends Spell {
 					world.spawnParticle(Particle.LAVA, loc, 100, 3, 0.1, 3, 0.25);
 					world.spawnParticle(Particle.EXPLOSION_NORMAL, loc, 75, 3, 0.1, 3, 0.25);
 					for (Player player : PlayerUtils.playersInRange(loc, 6, true)) {
-						BossUtils.bossDamage(mBoss, player, 23, mBoss.getLocation(), "Earthen Rupture");
+						BossUtils.blockableDamage(mBoss, player, DamageType.BLAST, 20, "Earthen Rupture", mBoss.getLocation());
 						MovementUtils.knockAway(loc, player, 0.50f, 1.5f);
 						player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 10, 2));
 					}
@@ -78,7 +78,6 @@ public class SpellEarthenRupture extends Spell {
 
 	@Override
 	public int cooldownTicks() {
-		// TODO Auto-generated method stub
 		return 20 * 15;
 	}
 

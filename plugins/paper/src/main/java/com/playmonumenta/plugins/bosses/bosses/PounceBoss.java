@@ -1,8 +1,16 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
-import java.util.AbstractMap;
-import java.util.Arrays;
-
+import com.playmonumenta.plugins.bosses.SpellManager;
+import com.playmonumenta.plugins.bosses.parameters.BossParam;
+import com.playmonumenta.plugins.bosses.parameters.EffectsList;
+import com.playmonumenta.plugins.bosses.parameters.ParticlesList;
+import com.playmonumenta.plugins.bosses.parameters.SoundsList;
+import com.playmonumenta.plugins.bosses.spells.SpellBaseSlam;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.ParticleUtils;
+import com.playmonumenta.plugins.utils.ParticleUtils.SpawnParticleAction;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
@@ -10,16 +18,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.util.Vector;
 
-import com.playmonumenta.plugins.bosses.SpellManager;
-import com.playmonumenta.plugins.bosses.parameters.BossParam;
-import com.playmonumenta.plugins.bosses.parameters.EffectsList;
-import com.playmonumenta.plugins.bosses.parameters.ParticlesList;
-import com.playmonumenta.plugins.bosses.parameters.SoundsList;
-import com.playmonumenta.plugins.bosses.spells.SpellBaseSlam;
-import com.playmonumenta.plugins.utils.BossUtils;
-import com.playmonumenta.plugins.utils.ParticleUtils;
-import com.playmonumenta.plugins.utils.ParticleUtils.SpawnParticleAction;
-import com.playmonumenta.plugins.utils.PlayerUtils;
+import java.util.AbstractMap;
+import java.util.Arrays;
 
 //general version of bossMeteorSlam
 public final class PounceBoss extends BossAbilityGroup {
@@ -106,7 +106,7 @@ public final class PounceBoss extends BossAbilityGroup {
 
 					if (player != null) {
 						if (p.DAMAGE > 0) {
-							BossUtils.bossDamage(boss, player, p.DAMAGE);
+							BossUtils.blockableDamage(boss, player, DamageType.BLAST, p.DAMAGE);
 						}
 
 						if (p.DAMAGE_PERCENT > 0.0) {
@@ -118,7 +118,7 @@ public final class PounceBoss extends BossAbilityGroup {
 					}
 					for (Player players : PlayerUtils.playersInRange(loc, p.DAMAGE_RADIUS, true)) {
 						if (p.DAMAGE > 0) {
-							BossUtils.bossDamage(boss, players, p.DAMAGE);
+							BossUtils.blockableDamage(boss, players, DamageType.BLAST, p.DAMAGE);
 						}
 
 						if (p.DAMAGE_PERCENT > 0.0) {

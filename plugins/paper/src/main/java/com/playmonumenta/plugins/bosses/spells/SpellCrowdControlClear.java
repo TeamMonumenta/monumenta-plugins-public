@@ -1,9 +1,8 @@
 package com.playmonumenta.plugins.bosses.spells;
 
+import com.playmonumenta.plugins.utils.EntityUtils;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.potion.PotionEffectType;
-
-import com.playmonumenta.plugins.utils.EntityUtils;
 
 public class SpellCrowdControlClear extends Spell {
 	//Super simple spell to clear crowd control for variable times

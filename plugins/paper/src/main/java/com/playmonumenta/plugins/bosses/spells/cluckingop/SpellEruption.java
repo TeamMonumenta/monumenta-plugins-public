@@ -1,7 +1,9 @@
 package com.playmonumenta.plugins.bosses.spells.cluckingop;
 
-import java.util.List;
-
+import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
@@ -13,9 +15,7 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
-import com.playmonumenta.plugins.bosses.spells.Spell;
-import com.playmonumenta.plugins.utils.BossUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
+import java.util.List;
 
 public class SpellEruption extends Spell {
 
@@ -50,12 +50,12 @@ public class SpellEruption extends Spell {
 						world.spawnParticle(Particle.FLAME, player.getLocation(), 150, 0, 0, 0, 0.175);
 						world.spawnParticle(Particle.SMOKE_LARGE, player.getLocation(), 75, 0, 0, 0, 0.25);
 						world.playSound(player.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 1, 1);
-						BossUtils.bossDamage(mBoss, player, 1);
+						BossUtils.blockableDamage(mBoss, player, DamageType.BLAST, 1);
 						new BukkitRunnable() {
 
 							@Override
 							public void run() {
-								BossUtils.bossDamage(mBoss, player, 1);
+								BossUtils.blockableDamage(mBoss, player, DamageType.BLAST, 1);
 								world.spawnParticle(Particle.FLAME, player.getLocation(), 150, 0, 0, 0, 0.175);
 								world.spawnParticle(Particle.SMOKE_LARGE, player.getLocation(), 75, 0, 0, 0, 0.25);
 								world.playSound(player.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 1, 1);
@@ -71,7 +71,7 @@ public class SpellEruption extends Spell {
 
 												@Override
 												public void run() {
-													BossUtils.bossDamage(mBoss, player, 1);
+													BossUtils.blockableDamage(mBoss, player, DamageType.BLAST, 1);
 													world.spawnParticle(Particle.FLAME, player.getLocation(), 150, 0, 0, 0, 0.175);
 													world.spawnParticle(Particle.SMOKE_LARGE, player.getLocation(), 75, 0, 0, 0, 0.25);
 													world.playSound(player.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 1, 1);

@@ -1,9 +1,7 @@
 package com.playmonumenta.plugins.bosses.spells;
 
-import java.util.EnumSet;
-import java.util.LinkedList;
-import java.util.List;
-
+import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -16,8 +14,9 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import com.playmonumenta.plugins.utils.FastUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
+import java.util.EnumSet;
+import java.util.LinkedList;
+import java.util.List;
 
 public class SpellChangeFloor extends Spell {
 	private Plugin mPlugin;

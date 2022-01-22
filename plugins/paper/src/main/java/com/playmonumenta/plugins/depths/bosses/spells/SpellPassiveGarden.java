@@ -1,11 +1,10 @@
 package com.playmonumenta.plugins.depths.bosses.spells;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-
+import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.depths.bosses.Hedera;
+import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.entity.Entity;
@@ -15,11 +14,11 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-import com.playmonumenta.plugins.bosses.spells.Spell;
-import com.playmonumenta.plugins.depths.bosses.Hedera;
-import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
 public class SpellPassiveGarden extends Spell {
 
@@ -117,10 +116,8 @@ public class SpellPassiveGarden extends Spell {
 				mPlants.put(loc, newPlant);
 				mPlantTypes.put(loc, plant);
 
-				//TODO effects
 				mLauncher.getWorld().playSound(loc, Sound.ENTITY_WITHER_BREAK_BLOCK, 20.0f, 1.0f);
 				mLauncher.getWorld().playSound(loc, Sound.BLOCK_GRASS_PLACE, 20.0f, 1.0f);
-
 
 				break;
 			}

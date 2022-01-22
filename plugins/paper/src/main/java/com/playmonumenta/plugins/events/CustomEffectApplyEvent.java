@@ -1,11 +1,10 @@
 package com.playmonumenta.plugins.events;
 
+import com.playmonumenta.plugins.effects.Effect;
 import org.bukkit.entity.Entity;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
-
-import com.playmonumenta.plugins.effects.Effect;
 
 public class CustomEffectApplyEvent extends Event implements Cancellable {
 

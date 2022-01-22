@@ -1,7 +1,7 @@
 package com.playmonumenta.plugins.overrides;
 
-import java.util.EnumSet;
-
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.utils.InventoryUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
@@ -13,8 +13,7 @@ import org.bukkit.event.block.Action;
 import org.bukkit.inventory.ItemStack;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.utils.InventoryUtils;
+import java.util.EnumSet;
 
 public class MapOverride extends BaseOverride {
 	public static EnumSet<Material> BANNERS = EnumSet.of(

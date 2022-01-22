@@ -1,8 +1,7 @@
 package com.playmonumenta.plugins.overrides;
 
-import org.bukkit.block.Block;
-
 import com.playmonumenta.plugins.Plugin;
+import org.bukkit.block.Block;
 
 public class FarmlandOverride extends BaseOverride {
 	@Override

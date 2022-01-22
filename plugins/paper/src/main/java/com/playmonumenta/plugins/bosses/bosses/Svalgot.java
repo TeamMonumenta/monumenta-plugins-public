@@ -1,10 +1,19 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
+import com.playmonumenta.plugins.bosses.BossBarManager;
+import com.playmonumenta.plugins.bosses.BossBarManager.BossHealthAction;
+import com.playmonumenta.plugins.bosses.BossManager;
+import com.playmonumenta.plugins.bosses.SpellManager;
+import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.bosses.spells.SpellBlockBreak;
+import com.playmonumenta.plugins.bosses.spells.SpellShieldStun;
+import com.playmonumenta.plugins.bosses.spells.sealedremorse.SvalgotBoneSlam;
+import com.playmonumenta.plugins.bosses.spells.sealedremorse.SvalgotOrbOfBones;
+import com.playmonumenta.plugins.bosses.spells.sealedremorse.SvalgotRisingBlackflame;
+import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.utils.SerializationUtils;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -15,29 +24,15 @@ import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-import com.playmonumenta.plugins.bosses.BossBarManager;
-import com.playmonumenta.plugins.bosses.BossBarManager.BossHealthAction;
-import com.playmonumenta.plugins.bosses.BossManager;
-import com.playmonumenta.plugins.bosses.SpellManager;
-import com.playmonumenta.plugins.bosses.spells.Spell;
-import com.playmonumenta.plugins.bosses.spells.SpellBlockBreak;
-import com.playmonumenta.plugins.bosses.spells.SpellPurgeNegatives;
-import com.playmonumenta.plugins.bosses.spells.sealedremorse.SvalgotBoneSlam;
-import com.playmonumenta.plugins.bosses.spells.sealedremorse.SvalgotBoneSweep;
-import com.playmonumenta.plugins.bosses.spells.sealedremorse.SvalgotOrbOfBones;
-import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.NmsUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.plugins.utils.SerializationUtils;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public final class Svalgot extends BossAbilityGroup {
 
@@ -84,15 +79,13 @@ public final class Svalgot extends BossAbilityGroup {
 
 		SpellManager normalSpells = new SpellManager(Arrays.asList(
 				new SvalgotBoneSlam(plugin, boss, this),
-				new SvalgotBoneSweep(plugin, boss, this),
+				new SvalgotRisingBlackflame(plugin, boss, this),
 				new SvalgotOrbOfBones(boss, plugin, this)
 				));
 
-
-
 		List<Spell> passiveNormalSpells = Arrays.asList(
-				new SpellPurgeNegatives(boss, 20 * 5),
-				new SpellBlockBreak(boss, 2, 3, 2)
+				new SpellBlockBreak(boss, 2, 3, 2),
+				new SpellShieldStun(6 * 20)
 			);
 
 		Map<Integer, BossHealthAction> events = new HashMap<Integer, BossHealthAction>();
@@ -197,16 +190,6 @@ public final class Svalgot extends BossAbilityGroup {
 	}
 
 	@Override
-	public void bossDamagedEntity(EntityDamageByEntityEvent event) {
-		if (event.getEntity() instanceof Player && event.getCause().equals(DamageCause.ENTITY_ATTACK)) {
-			Player player = (Player) event.getEntity();
-			if (player.isBlocking()) {
-				NmsUtils.stunShield(player, 20 * 6);
-			}
-		}
-	}
-
-	@Override
 	public void death(EntityDeathEvent event) {
 		if ((mGhalkor == null || mGhalkor.isDead() || !mGhalkor.isValid()) && (mGhalkorBoss == null || !mGhalkorBoss.mSummonedFinalBoss)) {
 			mSummonedFinalBoss = true;
@@ -243,7 +226,7 @@ public final class Svalgot extends BossAbilityGroup {
 			noDamageTicksTake = 5;
 		}
 		mBoss.setMaximumNoDamageTicks(mBoss.getMaximumNoDamageTicks() - noDamageTicksTake);
-		bossTargetHp = (int) (BASE_HEALTH * (1 + (1 - 1 / Math.E) * Math.log(playerCount)));
+		bossTargetHp = (int) (BASE_HEALTH * (1 + (1 - 1 / Math.E) * Math.log(playerCount)) * 1.1);
 		EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_MAX_HEALTH, bossTargetHp);
 		EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_FOLLOW_RANGE, detectionRange);
 		EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_KNOCKBACK_RESISTANCE, 1);

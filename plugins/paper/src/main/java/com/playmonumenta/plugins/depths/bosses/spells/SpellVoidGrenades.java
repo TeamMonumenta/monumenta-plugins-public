@@ -1,8 +1,14 @@
 package com.playmonumenta.plugins.depths.bosses.spells;
 
-import java.util.Collections;
-import java.util.List;
-
+import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.depths.bosses.Davey;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.player.PPGroundCircle;
+import com.playmonumenta.plugins.player.PartialParticle;
+import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.DamageUtils;
+import com.playmonumenta.plugins.utils.LocationUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -16,13 +22,8 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
-import com.playmonumenta.plugins.bosses.spells.Spell;
-import com.playmonumenta.plugins.depths.bosses.Davey;
-import com.playmonumenta.plugins.player.PPGroundCircle;
-import com.playmonumenta.plugins.player.PartialParticle;
-import com.playmonumenta.plugins.utils.BossUtils;
-import com.playmonumenta.plugins.utils.LocationUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
+import java.util.Collections;
+import java.util.List;
 
 public class SpellVoidGrenades extends Spell {
 	private static final Particle.DustOptions BLACK_COLOR = new Particle.DustOptions(Color.fromRGB(0, 0, 0), 1.0f);
@@ -113,7 +114,7 @@ public class SpellVoidGrenades extends Spell {
 						mWorld.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 2, 0.85f);
 
 						for (Player player : PlayerUtils.playersInRange(loc, 3, true)) {
-							BossUtils.bossDamage(mBoss, player, 40, null, "Void Grenades");
+							BossUtils.blockableDamage(mBoss, player, DamageType.MAGIC, 35, "Void Grenades", null);
 						}
 
 						Location alternateHeight = loc.clone();
@@ -135,8 +136,7 @@ public class SpellVoidGrenades extends Spell {
 
 								if (mTicks % 10 == 0) {
 									for (Player player : PlayerUtils.playersInRange(loc, 3, true)) {
-										/* Fire aura can not be blocked */
-										BossUtils.bossDamagePercent(mBoss, player, 0.1, (Location)null, "Void Grenades");
+										DamageUtils.damage(mBoss, player, DamageType.MAGIC, 8, null, true, true, "Void Grenades");
 									}
 								}
 

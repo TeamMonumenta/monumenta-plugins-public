@@ -1,11 +1,10 @@
 package com.playmonumenta.plugins.spawnzone;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import com.playmonumenta.plugins.point.Point;
 import org.bukkit.Location;
 
-import com.playmonumenta.plugins.point.Point;
+import java.util.ArrayList;
+import java.util.List;
 
 public class SpawnZone {
 

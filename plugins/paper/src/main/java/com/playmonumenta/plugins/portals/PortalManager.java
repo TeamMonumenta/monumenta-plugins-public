@@ -1,11 +1,8 @@
 package com.playmonumenta.plugins.portals;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-
+import com.playmonumenta.plugins.server.properties.ServerProperties;
+import com.playmonumenta.plugins.utils.CommandUtils;
+import com.playmonumenta.scriptedquests.Plugin;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -19,9 +16,10 @@ import org.bukkit.entity.Player;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
-import com.playmonumenta.plugins.server.properties.ServerProperties;
-import com.playmonumenta.plugins.utils.CommandUtils;
-import com.playmonumenta.scriptedquests.Plugin;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 public class PortalManager {
 	public static final Set<Material> TRANSPARENT_BLOCKS_1 = Set.of(

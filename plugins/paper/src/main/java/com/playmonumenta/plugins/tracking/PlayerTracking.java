@@ -1,40 +1,7 @@
 package com.playmonumenta.plugins.tracking;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map.Entry;
-import java.util.Set;
-
-import org.bukkit.GameMode;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.block.Block;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
-import org.bukkit.entity.Projectile;
-import org.bukkit.event.Event;
-import org.bukkit.event.block.BlockBreakEvent;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.event.entity.EntityDeathEvent;
-import org.bukkit.event.entity.EntityRegainHealthEvent;
-import org.bukkit.event.entity.PlayerDeathEvent;
-import org.bukkit.event.entity.ProjectileLaunchEvent;
-import org.bukkit.event.player.PlayerDropItemEvent;
-import org.bukkit.event.player.PlayerExpChangeEvent;
-import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.event.player.PlayerItemConsumeEvent;
-import org.bukkit.event.player.PlayerItemDamageEvent;
-import org.bukkit.inventory.ItemStack;
-import org.checkerframework.checker.nullness.qual.Nullable;
-
-import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.enchantments.BaseEnchantment;
-import com.playmonumenta.plugins.events.CustomDamageEvent;
-import com.playmonumenta.plugins.events.EvasionEvent;
 import com.playmonumenta.plugins.player.PlayerInventoryManager;
 import com.playmonumenta.plugins.point.Point;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
@@ -43,6 +10,20 @@ import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
+import org.bukkit.GameMode;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.block.Block;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.Player;
+import org.bukkit.event.Event;
+import org.bukkit.event.player.PlayerDropItemEvent;
+import org.checkerframework.checker.nullness.qual.Nullable;
+
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map.Entry;
+import java.util.Set;
 
 public class PlayerTracking implements EntityTracking {
 	private static @Nullable PlayerTracking INSTANCE = null;
@@ -61,48 +42,32 @@ public class PlayerTracking implements EntityTracking {
 
 	@Override
 	public void addEntity(Entity entity) {
-		Player player = (Player)entity;
+		if (entity instanceof Player player) {
+			/* Make sure the player is in the correct mode for where they logged in */
+			if (player.getGameMode().equals(GameMode.SURVIVAL)
+				&& ZoneUtils.hasZoneProperty(player, ZoneProperty.ADVENTURE_MODE)
+				&& !ZoneUtils.isInPlot(player)) {
+				player.setGameMode(GameMode.ADVENTURE);
+			} else if (player.getGameMode().equals(GameMode.ADVENTURE)
+				&& (!ZoneUtils.hasZoneProperty(player, ZoneProperty.ADVENTURE_MODE)
+					|| ZoneUtils.isInPlot(player))) {
+				player.setGameMode(GameMode.SURVIVAL);
+			}
 
-		/* Make sure the player is in the correct mode for where they logged in */
-		if (player.getGameMode().equals(GameMode.SURVIVAL)
-			&& ZoneUtils.hasZoneProperty(player, ZoneProperty.ADVENTURE_MODE)
-			&& !ZoneUtils.isInPlot(player)) {
-			player.setGameMode(GameMode.ADVENTURE);
-		} else if (player.getGameMode().equals(GameMode.ADVENTURE)
-			&& (!ZoneUtils.hasZoneProperty(player, ZoneProperty.ADVENTURE_MODE)
-				|| ZoneUtils.isInPlot(player))) {
-			player.setGameMode(GameMode.SURVIVAL);
+			// Load the players inventory / custom enchantments and apply them
+			mPlayers.put(player, new PlayerInventoryManager(mPlugin, player));
 		}
-
-		// Load the players inventory / custom enchantments and apply them
-		mPlayers.put(player, new PlayerInventoryManager(mPlugin, player));
 	}
 
 	@Override
 	public void removeEntity(Entity entity) {
-		Player player = (Player)entity;
-
-		mPlayers.remove(player);
+		if (entity instanceof Player player) {
+			mPlayers.remove(player);
+		}
 	}
 
 	public Set<Player> getPlayers() {
 		return mPlayers.keySet();
-	}
-
-	public JsonObject getAsJsonObject(Player player) {
-		PlayerInventoryManager manager = mPlayers.get(player);
-		if (manager != null) {
-			return manager.getAsJsonObject();
-		}
-		return new JsonObject();
-	}
-
-	public int getPlayerCustomEnchantLevel(Player player, Class<? extends BaseEnchantment> cls) {
-		PlayerInventoryManager manager = mPlayers.get(player);
-		if (manager != null) {
-			return manager.getEnchantmentLevel(mPlugin, cls);
-		}
-		return 0;
 	}
 
 	public void updateEquipmentProperties(Player player, @Nullable Event event) {
@@ -116,120 +81,6 @@ public class PlayerTracking implements EntityTracking {
 		PlayerInventoryManager manager = mPlayers.get(player);
 		if (manager != null) {
 			manager.updateItemSlotProperties(mPlugin, player, slot);
-		}
-	}
-
-	public void onKill(Plugin plugin, Player player, Entity target, EntityDeathEvent event) {
-		PlayerInventoryManager manager = mPlayers.get(player);
-		if (manager != null) {
-			manager.onKill(plugin, player, target, event);
-		}
-	}
-
-	public void onAttack(Plugin plugin, Player player, LivingEntity target, EntityDamageByEntityEvent event) {
-		PlayerInventoryManager manager = mPlayers.get(player);
-		if (manager != null) {
-			manager.onAttack(plugin, player, target, event);
-		}
-	}
-
-	public void onDamage(Plugin plugin, Player player, LivingEntity target, EntityDamageByEntityEvent event) {
-		PlayerInventoryManager manager = mPlayers.get(player);
-		if (manager != null) {
-			manager.onDamage(plugin, player, target, event);
-		}
-	}
-
-	public void onAbility(Plugin plugin, Player player, LivingEntity target, CustomDamageEvent event) {
-		PlayerInventoryManager manager = mPlayers.get(player);
-		if (manager != null) {
-			manager.onAbility(plugin, player, target, event);
-		}
-	}
-
-	public void onLaunchProjectile(Plugin plugin, Player player, Projectile proj, ProjectileLaunchEvent event) {
-		PlayerInventoryManager manager = mPlayers.get(player);
-		if (manager != null) {
-			manager.onLaunchProjectile(plugin, player, proj, event);
-		}
-	}
-
-	public void onBlockBreak(Plugin plugin, Player player, BlockBreakEvent event, ItemStack item) {
-		PlayerInventoryManager manager = mPlayers.get(player);
-		if (manager != null) {
-			manager.onBlockBreak(plugin, player, event, item);
-		}
-	}
-
-	public void onPlayerInteract(Plugin plugin, Player player, PlayerInteractEvent event) {
-		PlayerInventoryManager manager = mPlayers.get(player);
-		if (manager != null) {
-			manager.onPlayerInteract(plugin, player, event);
-		}
-	}
-
-	public void onDeath(Plugin plugin, Player player, PlayerDeathEvent event) {
-		PlayerInventoryManager manager = mPlayers.get(player);
-		if (manager != null) {
-			manager.onDeath(plugin, player, event);
-		}
-	}
-
-	public void onExpChange(Plugin plugin, Player player, PlayerExpChangeEvent event) {
-		PlayerInventoryManager manager = mPlayers.get(player);
-		if (manager != null) {
-			manager.onExpChange(plugin, player, event);
-		}
-	}
-
-	public void onHurt(Plugin plugin, Player player, EntityDamageEvent event) {
-		PlayerInventoryManager manager = mPlayers.get(player);
-		if (manager != null) {
-			manager.onHurt(plugin, player, event);
-		}
-	}
-
-	public void onHurtByEntity(Plugin plugin, Player player, EntityDamageByEntityEvent event) {
-		PlayerInventoryManager manager = mPlayers.get(player);
-		if (manager != null) {
-			manager.onHurtByEntity(plugin, player, event);
-		}
-	}
-
-	public void onFatalHurt(Plugin plugin, Player player, EntityDamageEvent event) {
-		PlayerInventoryManager manager = mPlayers.get(player);
-		if (manager != null) {
-			manager.onFatalHurt(plugin, player, event);
-		}
-	}
-
-	public void onEvade(Plugin plugin, Player player, EvasionEvent event) {
-		PlayerInventoryManager manager = mPlayers.get(player);
-		if (manager != null) {
-			manager.onEvade(plugin, player, event);
-		}
-	}
-
-	public void onConsume(Plugin plugin, Player player, PlayerItemConsumeEvent event) {
-		PlayerInventoryManager manager = mPlayers.get(player);
-		if (manager != null) {
-
-			manager.onConsume(plugin, player, event);
-		}
-	}
-
-	public void onItemDamage(Plugin plugin, Player player, PlayerItemDamageEvent event) {
-		PlayerInventoryManager manager = mPlayers.get(player);
-		if (manager != null) {
-
-			manager.onItemDamage(plugin, player, event);
-		}
-	}
-
-	public void onRegain(Plugin plugin, Player player, EntityRegainHealthEvent event) {
-		PlayerInventoryManager manager = mPlayers.get(player);
-		if (manager != null) {
-			manager.onRegain(plugin, player, event);
 		}
 	}
 
@@ -322,15 +173,4 @@ public class PlayerTracking implements EntityTracking {
 		return manager.getDroppedSlotId(event);
 	}
 
-	@Override
-	public void unloadTrackedEntities() {
-		Iterator<Entry<Player, PlayerInventoryManager>> iter = mPlayers.entrySet().iterator();
-		while (iter.hasNext()) {
-			Entry<Player, PlayerInventoryManager> entry = iter.next();
-			Player player = entry.getKey();
-			entry.getValue().removeProperties(mPlugin, player);
-		}
-
-		mPlayers.clear();
-	}
 }

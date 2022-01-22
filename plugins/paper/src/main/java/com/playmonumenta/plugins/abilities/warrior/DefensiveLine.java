@@ -1,9 +1,15 @@
 package com.playmonumenta.plugins.abilities.warrior;
 
-import java.util.EnumSet;
-import java.util.Iterator;
-import java.util.List;
-
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.abilities.AbilityTrigger;
+import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.effects.PercentDamageReceived;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.MovementUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -16,25 +22,10 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.abilities.AbilityTrigger;
-import com.playmonumenta.plugins.classes.ClassAbility;
-import com.playmonumenta.plugins.effects.PercentDamageReceived;
-import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
-import com.playmonumenta.plugins.enchantments.abilities.BaseAbilityEnchantment;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.FastUtils;
-import com.playmonumenta.plugins.utils.ItemUtils;
-import com.playmonumenta.plugins.utils.MovementUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
+import java.util.Iterator;
+import java.util.List;
 
 public class DefensiveLine extends Ability {
-	public static class DefensiveLineCooldownEnchantment extends BaseAbilityEnchantment {
-		public DefensiveLineCooldownEnchantment() {
-			super("Defensive Line Cooldown", EnumSet.of(ItemSlot.ARMOR));
-		}
-	}
 
 	private static final String PERCENT_DAMAGE_RECEIVED_EFFECT_NAME = "DefensiveLinePercentDamageReceivedEffect";
 	private static final double PERCENT_DAMAGE_RECEIVED_EFFECT_1 = -0.20;
@@ -87,7 +78,7 @@ public class DefensiveLine extends Ability {
 						mPlugin.mEffectManager.addEffect(player, PERCENT_DAMAGE_RECEIVED_EFFECT_NAME, new PercentDamageReceived(DURATION, mPercentDamageReceived));
 
 						for (LivingEntity mob : EntityUtils.getNearbyMobs(loc, KNOCK_AWAY_RADIUS, mPlayer)) {
-							MovementUtils.knockAway(player, mob, KNOCK_AWAY_SPEED);
+							MovementUtils.knockAway(player, mob, KNOCK_AWAY_SPEED, true);
 						}
 					}
 
@@ -148,10 +139,5 @@ public class DefensiveLine extends Ability {
 		return mPlayer.isSneaking()
 			&& !ItemUtils.isSomeBow(mainHand)
 			&& (mainHand.getType() == Material.SHIELD || offHand.getType() == Material.SHIELD);
-	}
-
-	@Override
-	public Class<? extends BaseAbilityEnchantment> getCooldownEnchantment() {
-		return DefensiveLineCooldownEnchantment.class;
 	}
 }

@@ -1,14 +1,13 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
-import java.util.Arrays;
-import java.util.List;
-
-import org.bukkit.Location;
-import org.bukkit.entity.LivingEntity;
-
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.bosses.spells.SpellRunAction;
+import org.bukkit.Location;
+import org.bukkit.entity.LivingEntity;
+
+import java.util.Arrays;
+import java.util.List;
 
 public final class SpinBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_spin";

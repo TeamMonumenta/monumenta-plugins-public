@@ -1,8 +1,12 @@
 package com.playmonumenta.plugins.bosses.spells.sealedremorse;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import com.playmonumenta.plugins.bosses.bosses.BeastOfTheBlackFlame;
+import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.utils.DamageUtils;
+import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.MovementUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -13,12 +17,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import com.playmonumenta.plugins.bosses.bosses.BeastOfTheBlackFlame;
-import com.playmonumenta.plugins.bosses.spells.Spell;
-import com.playmonumenta.plugins.utils.BossUtils;
-import com.playmonumenta.plugins.utils.FastUtils;
-import com.playmonumenta.plugins.utils.MovementUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
+import java.util.ArrayList;
+import java.util.List;
 
 public class PassiveVoidRift extends Spell {
 	private int mCooldown = 0;
@@ -74,8 +74,8 @@ public class PassiveVoidRift extends Spell {
 							world.playSound(loc, Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, 1.5f, 1);
 
 							for (Player p : PlayerUtils.playersInRange(loc, mRadius, true)) {
-								BossUtils.bossDamage(mBoss, p, 35, mBoss.getLocation(), "Void Rift");
-								MovementUtils.knockAway(loc, p, 0f, 1f);
+								DamageUtils.damage(mBoss, p, DamageType.MAGIC, 30, null, false, true, "Void Rift");
+								MovementUtils.knockAway(loc, p, 0f, 1f, false);
 							}
 						}
 

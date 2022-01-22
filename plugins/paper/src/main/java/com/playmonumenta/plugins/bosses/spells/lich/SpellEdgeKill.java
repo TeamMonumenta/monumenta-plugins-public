@@ -1,9 +1,9 @@
 package com.playmonumenta.plugins.bosses.spells.lich;
 
-import java.util.ArrayList;
-import java.util.EnumSet;
-import java.util.List;
-
+import com.playmonumenta.plugins.bosses.bosses.Lich;
+import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.MovementUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -12,10 +12,9 @@ import org.bukkit.SoundCategory;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
-import com.playmonumenta.plugins.bosses.bosses.Lich;
-import com.playmonumenta.plugins.bosses.spells.Spell;
-import com.playmonumenta.plugins.utils.BossUtils;
-import com.playmonumenta.plugins.utils.MovementUtils;
+import java.util.ArrayList;
+import java.util.EnumSet;
+import java.util.List;
 
 public class SpellEdgeKill extends Spell {
 
@@ -57,7 +56,7 @@ public class SpellEdgeKill extends Spell {
 						(!mIgnoredMats.contains(p.getLocation().getBlock().getType()) || !mIgnoredMats.contains(standLoc.getBlock().getType()))) {
 					//players are on the outer ring of the arena, do damage + massive knock back into arena
 					BossUtils.bossDamagePercent(mBoss, p, 0.4);
-					MovementUtils.knockAway(mCenter, p, -5);
+					MovementUtils.knockAway(mCenter, p, -5, false);
 					p.playSound(p.getLocation(), Sound.ENTITY_GHAST_SCREAM, SoundCategory.HOSTILE, 3, 0.5f);
 					p.playSound(p.getLocation(), Sound.ENTITY_GHAST_HURT, SoundCategory.HOSTILE, 3, 0.8f);
 

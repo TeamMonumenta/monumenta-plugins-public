@@ -1,13 +1,12 @@
 package com.playmonumenta.plugins.utils;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.NavigableSet;
-
+import com.google.gson.JsonObject;
+import com.playmonumenta.plugins.Constants;
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.effects.Effect;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.events.PotionEffectApplyEvent;
+import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -20,13 +19,13 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.potion.PotionType;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-import com.google.gson.JsonObject;
-import com.playmonumenta.plugins.Constants;
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.effects.Effect;
-import com.playmonumenta.plugins.events.PotionEffectApplyEvent;
-import com.playmonumenta.plugins.potion.PotionManager.PotionID;
-
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.NavigableSet;
 
 
 public class PotionUtils {
@@ -308,6 +307,7 @@ public class PotionUtils {
 				}
 			}
 		}
+
 	}
 
 	public static void applyPotion(Plugin plugin, Player player, PotionEffect effect) {
@@ -362,10 +362,10 @@ public class PotionUtils {
 						if (effect.getAmplifier() >= 9) {
 							player.setHealth(0);
 						} else {
-							EntityUtils.damageEntity(plugin, player, 3 * Math.pow(2, effect.getAmplifier() + 1), null);
+							DamageUtils.damage(null, player, DamageType.MAGIC, 3 * Math.pow(2, effect.getAmplifier() + 1));
 						}
 					} else if (effect.getType().equals(PotionEffectType.HEAL)) {
-						PlayerUtils.healPlayer(player, 2 * Math.pow(2, effect.getAmplifier() + 1));
+						PlayerUtils.healPlayer(plugin, player, 2 * Math.pow(2, effect.getAmplifier() + 1));
 					}
 				}
 
@@ -376,10 +376,10 @@ public class PotionUtils {
 
 			//If instant healing, manually add health, otherwise if instant damage, manually remove health, else add effect
 			//Check then add health
-			if (info != null && info.mType != null && info.mType.equals(PotionEffectType.HEAL)) {
-				PlayerUtils.healPlayer(player, 2 * Math.pow(2, info.mAmplifier + 1));
-			} else if (info != null && info.mType != null && info.mType.equals(PotionEffectType.HARM)) {
-				EntityUtils.damageEntity(plugin, player, 3 * Math.pow(2, info.mAmplifier + 1), null);
+			if (info != null && info.mType.equals(PotionEffectType.HEAL)) {
+				PlayerUtils.healPlayer(plugin, player, 2 * Math.pow(2, info.mAmplifier + 1));
+			} else if (info != null && info.mType.equals(PotionEffectType.HARM)) {
+				DamageUtils.damage(null, player, DamageType.MAGIC, 3 * Math.pow(2, info.mAmplifier + 1));
 			} else {
 				plugin.mPotionManager.addPotion(player, PotionID.APPLIED_POTION, info);
 			}

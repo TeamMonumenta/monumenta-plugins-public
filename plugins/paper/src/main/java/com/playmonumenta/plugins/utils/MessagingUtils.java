@@ -7,11 +7,16 @@ import java.time.Duration;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonElement;
 import com.playmonumenta.plugins.Plugin;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.minimessage.MiniMessage;
+import net.kyori.adventure.text.minimessage.transformation.TransformationRegistry;
+import net.kyori.adventure.text.minimessage.transformation.TransformationType;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import net.kyori.adventure.text.serializer.plain.PlainComponentSerializer;
@@ -19,18 +24,39 @@ import net.kyori.adventure.text.serializer.plain.PlainComponentSerializer;
 
 
 public class MessagingUtils {
+	public static final Gson GSON = new Gson();
+	public static final MiniMessage MINIMESSAGE_ALL = MiniMessage.builder()
+		.transformations(
+			TransformationRegistry.builder().clear()
+				.add(TransformationType.COLOR)
+				.add(TransformationType.DECORATION)
+				.add(TransformationType.HOVER_EVENT)
+				.add(TransformationType.CLICK_EVENT)
+				.add(TransformationType.KEYBIND)
+				.add(TransformationType.TRANSLATABLE)
+				.add(TransformationType.INSERTION)
+				.add(TransformationType.FONT)
+				.add(TransformationType.GRADIENT)
+				.add(TransformationType.RAINBOW)
+				.build()
+		)
+		.build();
 	public static final LegacyComponentSerializer LEGACY_SERIALIZER = LegacyComponentSerializer.legacySection();
-	public static final PlainComponentSerializer PLAIN_SERIALIZER = PlainComponentSerializer.plain();
 	public static final GsonComponentSerializer GSON_SERIALIZER = GsonComponentSerializer.gson();
+	public static final PlainComponentSerializer PLAIN_SERIALIZER = PlainComponentSerializer.plain();
 
 	public static String translatePlayerName(Player player, String message) {
 		return (message.replaceAll("@S", player.getName()));
 	}
 
 	public static void sendActionBarMessage(Plugin plugin, Player player, String message) {
+		sendActionBarMessage(plugin, player, message, NamedTextColor.YELLOW);
+	}
+
+	public static void sendActionBarMessage(Plugin plugin, Player player, String message, NamedTextColor color) {
 		message = translatePlayerName(player, message);
 		TextComponent formattedMessage = LEGACY_SERIALIZER.deserialize(message)
-			.color(NamedTextColor.YELLOW);
+			.color(color);
 		player.sendActionBar(formattedMessage);
 	}
 
@@ -89,6 +115,22 @@ public class MessagingUtils {
 
 	public static String plainFromLegacy(String legacyText) {
 		return PLAIN_SERIALIZER.serialize(LEGACY_SERIALIZER.deserialize(legacyText));
+	}
+
+	public static Component fromGson(String gsonText) {
+		return fromGson(GSON.fromJson(gsonText, JsonElement.class));
+	}
+
+	public static Component fromGson(JsonElement gsonText) {
+		return GSON_SERIALIZER.deserializeFromTree(gsonText);
+	}
+
+	public static JsonElement toGson(Component component) {
+		return GSON_SERIALIZER.serializeToTree(component);
+	}
+
+	public static Component fromMiniMessage(String miniMessageText) {
+		return MINIMESSAGE_ALL.parse(miniMessageText);
 	}
 
 	public static Component parseComponent(String json) {

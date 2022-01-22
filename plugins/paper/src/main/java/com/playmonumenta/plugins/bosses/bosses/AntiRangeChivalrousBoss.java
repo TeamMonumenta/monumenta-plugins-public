@@ -1,19 +1,16 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
-import java.util.Set;
-
+import com.playmonumenta.plugins.abilities.delves.Chivalrous;
+import com.playmonumenta.plugins.events.DamageEvent;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Projectile;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.plugin.Plugin;
-import org.bukkit.projectiles.ProjectileSource;
 
-import com.playmonumenta.plugins.abilities.delves.Chivalrous;
+import java.util.Set;
 
 public class AntiRangeChivalrousBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_antirangechivalrous";
@@ -33,7 +30,7 @@ public class AntiRangeChivalrousBoss extends BossAbilityGroup {
 	}
 
 	@Override
-	public void bossDamagedByEntity(EntityDamageByEntityEvent event) {
+	public void onHurtByEntityWithSource(DamageEvent event, Entity damager, LivingEntity source) {
 		Entity root = mBoss;
 		while (root.isInsideVehicle()) {
 			root = root.getVehicle();
@@ -45,7 +42,6 @@ public class AntiRangeChivalrousBoss extends BossAbilityGroup {
 		}
 
 		Location loc = mBoss.getLocation();
-		Entity damager = event.getDamager();
 
 		//Arrows are given ignoreTag from a Depths ability to ignore the boss ability
 		Set<String> tags = damager.getScoreboardTags();
@@ -53,22 +49,13 @@ public class AntiRangeChivalrousBoss extends BossAbilityGroup {
 			return;
 		}
 
-		if (damager instanceof Projectile) {
-			ProjectileSource source = ((Projectile) damager).getShooter();
-			if (source instanceof LivingEntity) {
-				damager = (LivingEntity) source;
-			}
-		}
+		if (loc.distance(source.getLocation()) > ANTI_RANGE_DISTANCE) {
+			event.setCancelled(true);
 
-		if (damager instanceof LivingEntity) {
-			if (loc.distance(damager.getLocation()) > ANTI_RANGE_DISTANCE) {
-				event.setCancelled(true);
-
-				World world = mBoss.getWorld();
-				loc.add(0, 1, 0);
-				world.spawnParticle(Particle.FIREWORKS_SPARK, loc, 20, 0, 0, 0, 0.3);
-				world.playSound(loc, Sound.BLOCK_ANVIL_PLACE, 0.2f, 1.5f);
-			}
+			World world = mBoss.getWorld();
+			loc.add(0, 1, 0);
+			world.spawnParticle(Particle.FIREWORKS_SPARK, loc, 20, 0, 0, 0, 0.3);
+			world.playSound(loc, Sound.BLOCK_ANVIL_PLACE, 0.2f, 1.5f);
 		}
 	}
 

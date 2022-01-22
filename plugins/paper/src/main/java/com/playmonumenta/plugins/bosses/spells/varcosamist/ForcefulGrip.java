@@ -1,5 +1,11 @@
 package com.playmonumenta.plugins.bosses.spells.varcosamist;
 
+import com.playmonumenta.plugins.bosses.spells.SpellBaseSeekingProjectile;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.MovementUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.utils.PotionUtils;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -8,12 +14,6 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-
-import com.playmonumenta.plugins.bosses.spells.SpellBaseSeekingProjectile;
-import com.playmonumenta.plugins.utils.BossUtils;
-import com.playmonumenta.plugins.utils.MovementUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.plugins.utils.PotionUtils;
 
 public class ForcefulGrip extends SpellBaseSeekingProjectile {
 	public static final int detectionRange = 24;
@@ -59,7 +59,7 @@ public class ForcefulGrip extends SpellBaseSeekingProjectile {
 						world.playSound(loc, Sound.ENTITY_ARMOR_STAND_BREAK, 1f, 0.5f);
 						world.spawnParticle(Particle.CRIT, loc, 50, 0, 0, 0, 0.25);
 						if (player != null) {
-							BossUtils.bossDamage(boss, player, DAMAGE, boss.getLocation(), "Forceful Grip");
+							BossUtils.dualTypeBlockableDamage(boss, player, DamageType.MAGIC, DamageType.PROJECTILE, DAMAGE, 0.5, "Forceful Grip", boss.getLocation());
 							MovementUtils.pullTowards(boss, player, 1);
 						}
 					});

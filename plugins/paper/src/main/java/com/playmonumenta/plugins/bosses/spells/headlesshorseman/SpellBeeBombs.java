@@ -1,5 +1,12 @@
 package com.playmonumenta.plugins.bosses.spells.headlesshorseman;
 
+import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
+import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.MovementUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -8,13 +15,6 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
-
-import com.playmonumenta.plugins.bosses.spells.Spell;
-import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
-import com.playmonumenta.plugins.utils.BossUtils;
-import com.playmonumenta.plugins.utils.FastUtils;
-import com.playmonumenta.plugins.utils.MovementUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
 
 /*
  * Bee Bomb - The Horseman summons bees around himself to distract his enemies. After some seconds
@@ -74,8 +74,8 @@ public class SpellBeeBombs extends Spell {
 
 								for (Player player : PlayerUtils.playersInRange(loc, 5.5, true)) {
 									if (mCenter.distance(player.getLocation()) < mRange) {
-										BossUtils.bossDamage(mBoss, player, DAMAGE, loc, "Bee Bombs");
-										if (!BossUtils.bossDamageBlocked(player, DAMAGE, loc)) {
+										BossUtils.blockableDamage(mBoss, player, DamageType.BLAST, DAMAGE, "Bee Bombs", loc);
+										if (!BossUtils.bossDamageBlocked(player, loc)) {
 											MovementUtils.knockAway(loc, player, 0.2f, 0.4f);
 										}
 									}

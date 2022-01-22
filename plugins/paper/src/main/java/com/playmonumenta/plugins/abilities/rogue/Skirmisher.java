@@ -8,13 +8,13 @@ import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.inventory.ItemStack;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 
@@ -34,7 +34,7 @@ public class Skirmisher extends Ability {
 		super(plugin, player, "Skirmisher");
 		mInfo.mScoreboardId = "Skirmisher";
 		mInfo.mShorthandName = "Sk";
-		mInfo.mDescriptions.add("When holding two swords, deal 1 + 10% final damage to mobs when other mobs are within 2.5 blocks.");
+		mInfo.mDescriptions.add("When dealing melee damage to a mob that has at least one other mob within 2.5 blocks and is not targeting you, deal + 1 + 10% final damage.");
 		mInfo.mDescriptions.add("The damage bonus now also applies to mobs not targeting you, and the damage bonus is increased to 2 + 15% final damage done.");
 		mDisplayItem = new ItemStack(Material.BONE, 1);
 		mIsolatedPercentDamage = getAbilityScore() == 1 ? GROUPED_PERCENT_DAMAGE_1 : GROUPED_PERCENT_DAMAGE_2;
@@ -42,13 +42,12 @@ public class Skirmisher extends Ability {
 	}
 
 	@Override
-	public boolean livingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
-		if (mPlayer != null && event.getCause() == DamageCause.ENTITY_ATTACK) {
-			LivingEntity mob = (LivingEntity) event.getEntity();
-			Location loc = mob.getLocation();
+	public void onDamage(DamageEvent event, LivingEntity enemy) {
+		if (mPlayer != null && (event.getType() == DamageType.MELEE || event.getType() == DamageType.MELEE_SKILL || event.getType() == DamageType.MELEE_ENCH)) {
+			Location loc = enemy.getLocation();
 
-			if (EntityUtils.getNearbyMobs(loc, SKIRMISHER_FRIENDLY_RADIUS, mob).size() >= MOB_COUNT_CUTOFF
-					|| getAbilityScore() > 1 && mob instanceof Mob && !mPlayer.equals(((Mob) mob).getTarget())) {
+			if (EntityUtils.getNearbyMobs(loc, SKIRMISHER_FRIENDLY_RADIUS, enemy).size() >= MOB_COUNT_CUTOFF
+					|| getAbilityScore() > 1 && enemy instanceof Mob mob && !mPlayer.equals(mob.getTarget())) {
 				World world = mPlayer.getWorld();
 				world.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1f, 1.5f);
 				world.playSound(loc, Sound.BLOCK_IRON_TRAPDOOR_CLOSE, 1, 0.5f);
@@ -61,18 +60,11 @@ public class Skirmisher extends Ability {
 				event.setDamage((event.getDamage() + mIsolatedFlatDamage) * (1 + mIsolatedPercentDamage));
 			}
 		}
-
-		return true;
 	}
 
 	@Override
 	public boolean runCheck() {
-		if (mPlayer == null) {
-			return false;
-		}
-		ItemStack mainHand = mPlayer.getInventory().getItemInMainHand();
-		ItemStack offHand = mPlayer.getInventory().getItemInOffHand();
-		return InventoryUtils.rogueTriggerCheck(mainHand, offHand);
+		return InventoryUtils.rogueTriggerCheck(mPlugin, mPlayer);
 	}
 }
 

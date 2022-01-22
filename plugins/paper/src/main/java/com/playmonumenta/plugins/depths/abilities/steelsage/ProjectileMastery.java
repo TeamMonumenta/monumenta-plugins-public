@@ -1,18 +1,15 @@
 package com.playmonumenta.plugins.depths.abilities.steelsage;
 
-import org.bukkit.Material;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
-import org.bukkit.entity.Projectile;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
-
+import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import net.md_5.bungee.api.ChatColor;
+import org.bukkit.Material;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
 
 public class ProjectileMastery extends DepthsAbility {
 
@@ -26,15 +23,10 @@ public class ProjectileMastery extends DepthsAbility {
 	}
 
 	@Override
-	public boolean livingEntityShotByPlayerEvent(Projectile proj, LivingEntity le, EntityDamageByEntityEvent event) {
-		event.setDamage(event.getDamage() * getDamageMultiplier(mPlayer));
-
-		return true;
-	}
-
-	public static double getDamageMultiplier(Player player) {
-		ProjectileMastery pm = AbilityManager.getManager().getPlayerAbility(player, ProjectileMastery.class);
-		return pm == null ? 1 : SPELL_MOD[pm.mRarity - 1];
+	public void onDamage(DamageEvent event, LivingEntity enemy) {
+		if (event.getType() == DamageType.PROJECTILE) {
+			event.setDamage(event.getDamage() * SPELL_MOD[mRarity - 1]);
+		}
 	}
 
 	@Override

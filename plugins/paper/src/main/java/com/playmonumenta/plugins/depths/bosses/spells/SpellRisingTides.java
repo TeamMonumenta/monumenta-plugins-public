@@ -1,7 +1,11 @@
 package com.playmonumenta.plugins.depths.bosses.spells;
 
-import java.util.List;
-
+import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.depths.bosses.Nucleus;
+import com.playmonumenta.plugins.effects.PercentSpeed;
+import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -12,22 +16,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import com.playmonumenta.plugins.bosses.spells.Spell;
-import com.playmonumenta.plugins.depths.bosses.Nucleus;
-import com.playmonumenta.plugins.effects.PercentSpeed;
-import com.playmonumenta.plugins.utils.BossUtils;
-import com.playmonumenta.plugins.utils.FastUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
+import java.util.List;
 
-
-/*
- *
- * Shatter - All players within a 70 degree cone in front of the giant after
-a 1 second charge up take 24 damage and are knocked back X blocks. If they
-collide with a wall they take 10 additional damage and are stunned (Slowness 7,
-Negative Jump Boost, weakness 10, maybe putting bows on cooldown, you get the
-idea) for 2 seconds.
- */
 public class SpellRisingTides extends Spell {
 
 	public static final double DAMAGE = .5;

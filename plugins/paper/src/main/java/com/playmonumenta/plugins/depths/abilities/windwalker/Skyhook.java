@@ -1,24 +1,5 @@
 package com.playmonumenta.plugins.depths.abilities.windwalker;
 
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
-import org.bukkit.World;
-import org.bukkit.block.BlockFace;
-import org.bukkit.entity.AbstractArrow;
-import org.bukkit.entity.AbstractArrow.PickupStatus;
-import org.bukkit.entity.Arrow;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
-import org.bukkit.entity.Projectile;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.ProjectileLaunchEvent;
-import org.bukkit.metadata.FixedMetadataValue;
-import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.util.Vector;
-
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.depths.DepthsTree;
@@ -27,8 +8,23 @@ import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
 import com.playmonumenta.plugins.depths.abilities.aspects.BowAspect;
 import com.playmonumenta.plugins.depths.abilities.steelsage.RapidFire;
-
+import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import net.md_5.bungee.api.ChatColor;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
+import org.bukkit.World;
+import org.bukkit.block.BlockFace;
+import org.bukkit.entity.AbstractArrow;
+import org.bukkit.entity.AbstractArrow.PickupStatus;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
+import org.bukkit.metadata.FixedMetadataValue;
+import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.util.Vector;
 
 public class Skyhook extends DepthsAbility {
 	public static final String ABILITY_NAME = "Skyhook";
@@ -45,55 +41,14 @@ public class Skyhook extends DepthsAbility {
 		mInfo.mIgnoreCooldown = true;
 	}
 
-	public void execute() {
-		mInfo.mCooldown = (int) (COOLDOWN[mRarity - 1] * BowAspect.getCooldownReduction(mPlayer));
-		putOnCooldown();
-		World world = mPlayer.getWorld();
-		Location loc = mPlayer.getLocation();
-		world.playSound(loc, Sound.ITEM_CROSSBOW_QUICK_CHARGE_3, 1, 1.0f);
-
-		Arrow arrow = mPlayer.launchProjectile(Arrow.class);
-
-		arrow.setPierceLevel(0);
-		arrow.setCritical(true);
-		arrow.setPickupStatus(PickupStatus.CREATIVE_ONLY);
-		arrow.setVelocity(mPlayer.getLocation().getDirection().multiply(2.0));
-		arrow.setMetadata(META_DATA_TAG, new FixedMetadataValue(mPlugin, 0));
-
-		mPlugin.mProjectileEffectTimers.addEntity(arrow, Particle.FIREWORKS_SPARK);
-		ProjectileLaunchEvent eventLaunch = new ProjectileLaunchEvent(arrow);
-		Bukkit.getPluginManager().callEvent(eventLaunch);
-		new BukkitRunnable() {
-			int mT = 0;
-			@Override
-			public void run() {
-				if (arrow == null || mT > MAX_TICKS) {
-					mPlugin.mProjectileEffectTimers.removeEntity(arrow);
-					arrow.removeMetadata(META_DATA_TAG, mPlugin);
-					arrow.remove();
-					this.cancel();
-				}
-
-				if (arrow.getVelocity().length() < .05 || arrow.isOnGround()) {
-					hook(arrow);
-					this.cancel();
-				}
-				mT++;
-			}
-
-		}.runTaskTimer(mPlugin, 0, 1);
-	}
-
 	@Override
-	public boolean livingEntityShotByPlayerEvent(Projectile proj, LivingEntity le, EntityDamageByEntityEvent event) {
-		if (proj instanceof AbstractArrow && proj.hasMetadata(META_DATA_TAG)) {
-			hook((AbstractArrow) proj);
+	public void onDamage(DamageEvent event, LivingEntity enemy) {
+		if (event.getType() == DamageType.PROJECTILE && event.getDamager() instanceof AbstractArrow arrow && arrow.hasMetadata(META_DATA_TAG)) {
+			hook(arrow);
 		}
-
-		return true;
 	}
 
-	public void hook(AbstractArrow arrow) {
+	private void hook(Entity arrow) {
 		Location loc = arrow.getLocation();
 		World world = mPlayer.getWorld();
 
@@ -131,9 +86,39 @@ public class Skyhook extends DepthsAbility {
 		}
 
 		if (mPlayer.isSneaking()) {
-			arrow.remove();
-			mPlugin.mProjectileEffectTimers.removeEntity(arrow);
-			execute();
+			mInfo.mCooldown = (int) (COOLDOWN[mRarity - 1] * BowAspect.getCooldownReduction(mPlayer));
+			putOnCooldown();
+			World world = mPlayer.getWorld();
+			Location loc = mPlayer.getLocation();
+			world.playSound(loc, Sound.ITEM_CROSSBOW_QUICK_CHARGE_3, 1, 1.0f);
+
+			arrow.setPierceLevel(0);
+			arrow.setCritical(true);
+			arrow.setPickupStatus(PickupStatus.CREATIVE_ONLY);
+			arrow.setVelocity(mPlayer.getLocation().getDirection().multiply(2.0));
+			arrow.setMetadata(META_DATA_TAG, new FixedMetadataValue(mPlugin, 0));
+
+			mPlugin.mProjectileEffectTimers.addEntity(arrow, Particle.FIREWORKS_SPARK);
+
+			new BukkitRunnable() {
+				int mT = 0;
+				@Override
+				public void run() {
+					if (arrow == null || mT > MAX_TICKS) {
+						mPlugin.mProjectileEffectTimers.removeEntity(arrow);
+						arrow.removeMetadata(META_DATA_TAG, mPlugin);
+						arrow.remove();
+						this.cancel();
+					}
+
+					if (arrow.getVelocity().length() < .05 || arrow.isOnGround()) {
+						hook(arrow);
+						this.cancel();
+					}
+					mT++;
+				}
+
+			}.runTaskTimer(mPlugin, 0, 1);
 		}
 
 		return true;

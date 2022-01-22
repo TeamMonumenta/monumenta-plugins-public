@@ -1,11 +1,10 @@
 package com.playmonumenta.plugins.custominventories;
 
-import org.bukkit.entity.Player;
-import org.bukkit.plugin.Plugin;
-
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument.EntitySelector;
+import org.bukkit.entity.Player;
+import org.bukkit.plugin.Plugin;
 
 public class CustomInventoryCommands {
 	public static void register(Plugin plugin) {

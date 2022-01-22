@@ -1,5 +1,10 @@
 package com.playmonumenta.plugins.depths.bosses.spells;
 
+import com.playmonumenta.plugins.bosses.spells.SpellBaseAoE;
+import com.playmonumenta.plugins.effects.AbilitySilence;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -8,18 +13,13 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
-import com.playmonumenta.plugins.bosses.spells.SpellBaseAoE;
-import com.playmonumenta.plugins.effects.AbilitySilence;
-import com.playmonumenta.plugins.utils.BossUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
-
 public class SpellVoidBlast extends SpellBaseAoE {
 
 	public static final int CAST_DURATION = 3 * 20;
 	public static final int SILENCE_DURATION = 5 * 20;
 	public static final int RADIUS = 5;
-	public static final int MIN_DAMAGE = 30;
-	public static final int MAX_DAMAGE = 50;
+	public static final int MIN_DAMAGE = 25;
+	public static final int MAX_DAMAGE = 40;
 
 
 	public SpellVoidBlast(Plugin plugin, LivingEntity launcher, int radius, float maxDamage, float minDamage, int duration, int cooldown) {
@@ -44,7 +44,7 @@ public class SpellVoidBlast extends SpellBaseAoE {
 			(Location loc) -> {
 				for (Player player : PlayerUtils.playersInRange(launcher.getLocation(), radius, true)) {
 					double distance = player.getLocation().distance(launcher.getLocation());
-					BossUtils.bossDamage(launcher, player, ((maxDamage - minDamage) * ((radius - distance) / radius)) + minDamage, launcher.getLocation(), "Void Blast");
+					BossUtils.blockableDamage(launcher, player, DamageType.MAGIC, ((maxDamage - minDamage) * ((radius - distance) / radius)) + minDamage, "Void Blast", launcher.getLocation());
 					com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(player, "Void Blast", new AbilitySilence(SILENCE_DURATION));
 				}
 			}

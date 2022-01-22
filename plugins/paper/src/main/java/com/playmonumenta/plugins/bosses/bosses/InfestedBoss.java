@@ -1,8 +1,9 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
-import java.util.Arrays;
-import java.util.List;
-
+import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.bosses.spells.SpellDelayedAction;
+import com.playmonumenta.plugins.bosses.spells.SpellRunAction;
+import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -10,10 +11,8 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.plugin.Plugin;
 
-import com.playmonumenta.plugins.bosses.spells.Spell;
-import com.playmonumenta.plugins.bosses.spells.SpellDelayedAction;
-import com.playmonumenta.plugins.bosses.spells.SpellRunAction;
-import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
+import java.util.Arrays;
+import java.util.List;
 
 public class InfestedBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_infested";

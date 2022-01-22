@@ -1,12 +1,31 @@
 package com.playmonumenta.plugins.minigames.chess;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.minigames.chess.ChessBoard.BoardState;
+import com.playmonumenta.plugins.minigames.chess.ChessBoard.ChessPiece;
+import com.playmonumenta.plugins.minigames.chess.ChessBoard.ChessPieceType;
+import com.playmonumenta.plugins.minigames.chess.ChessBoard.ChessTeam;
+import com.playmonumenta.plugins.minigames.chess.ChessInterface.InterfaceType;
+import com.playmonumenta.plugins.minigames.chess.events.ChessEvent;
+import com.playmonumenta.plugins.minigames.chess.events.EndGameChessEvent;
+import com.playmonumenta.plugins.minigames.chess.events.MovePieceChessEvent;
+import com.playmonumenta.plugins.minigames.chess.events.PromotingChessEvent;
+import dev.jorel.commandapi.CommandAPI;
+import dev.jorel.commandapi.CommandAPICommand;
+import dev.jorel.commandapi.CommandPermission;
+import dev.jorel.commandapi.arguments.Argument;
+import dev.jorel.commandapi.arguments.GreedyStringArgument;
+import dev.jorel.commandapi.arguments.IntegerArgument;
+import dev.jorel.commandapi.arguments.LocationArgument;
+import dev.jorel.commandapi.arguments.LocationType;
+import dev.jorel.commandapi.arguments.MultiLiteralArgument;
+import dev.jorel.commandapi.arguments.PlayerArgument;
+import dev.jorel.commandapi.arguments.StringArgument;
+import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.event.ClickEvent;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.FireworkEffect;
@@ -31,33 +50,12 @@ import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.minigames.chess.ChessBoard.BoardState;
-import com.playmonumenta.plugins.minigames.chess.ChessBoard.ChessPiece;
-import com.playmonumenta.plugins.minigames.chess.ChessBoard.ChessPieceType;
-import com.playmonumenta.plugins.minigames.chess.ChessBoard.ChessTeam;
-import com.playmonumenta.plugins.minigames.chess.ChessInterface.InterfaceType;
-import com.playmonumenta.plugins.minigames.chess.events.ChessEvent;
-import com.playmonumenta.plugins.minigames.chess.events.EndGameChessEvent;
-import com.playmonumenta.plugins.minigames.chess.events.MovePieceChessEvent;
-import com.playmonumenta.plugins.minigames.chess.events.PromotingChessEvent;
-
-import dev.jorel.commandapi.CommandAPI;
-import dev.jorel.commandapi.CommandAPICommand;
-import dev.jorel.commandapi.CommandPermission;
-import dev.jorel.commandapi.arguments.Argument;
-import dev.jorel.commandapi.arguments.GreedyStringArgument;
-import dev.jorel.commandapi.arguments.IntegerArgument;
-import dev.jorel.commandapi.arguments.LocationArgument;
-import dev.jorel.commandapi.arguments.LocationType;
-import dev.jorel.commandapi.arguments.MultiLiteralArgument;
-import dev.jorel.commandapi.arguments.PlayerArgument;
-import dev.jorel.commandapi.arguments.StringArgument;
-import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.event.ClickEvent;
-import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.format.TextDecoration;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public class ChessManager implements Listener {
 

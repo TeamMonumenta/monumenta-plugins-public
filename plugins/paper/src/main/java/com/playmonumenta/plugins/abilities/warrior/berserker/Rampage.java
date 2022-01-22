@@ -5,12 +5,10 @@ import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
-import org.bukkit.attribute.Attribute;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.inventory.ItemStack;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -19,9 +17,11 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityWithChargesOrStacks;
 import com.playmonumenta.plugins.classes.ClassAbility;
-import com.playmonumenta.plugins.classes.magic.MagicType;
 import com.playmonumenta.plugins.effects.PercentDamageReceived;
+import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.network.ClientModHandler;
+import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
@@ -76,7 +76,7 @@ public class Rampage extends Ability implements AbilityWithChargesOrStacks {
 		if (mStacks >= 10 && loc.getPitch() > 70) {
 			World world = mPlayer.getWorld();
 			for (LivingEntity mob : EntityUtils.getNearbyMobs(loc, RAMPAGE_RADIUS)) {
-				EntityUtils.damageEntity(mPlugin, mob, mStacks, mPlayer, MagicType.PHYSICAL, true, mInfo.mLinkedSpell);
+				DamageUtils.damage(mPlayer, mob, DamageType.MELEE, mStacks, mInfo.mLinkedSpell);
 				world.spawnParticle(Particle.VILLAGER_ANGRY, mob.getLocation(), 5, 0, 0, 0, 0.1);
 			}
 
@@ -110,19 +110,18 @@ public class Rampage extends Ability implements AbilityWithChargesOrStacks {
 		if (oneSecond) {
 			if (mTimer > 0) {
 				mTimer--;
-				double maxHealth = mPlayer.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue();
-				PlayerUtils.healPlayer(mPlayer, HEAL_PERCENT * maxHealth);
+				double maxHealth = EntityUtils.getMaxHealth(mPlayer);
+				PlayerUtils.healPlayer(mPlugin, mPlayer, HEAL_PERCENT * maxHealth);
 				mPlayer.getWorld().spawnParticle(Particle.HEART, (mPlayer.getLocation()).add(0, 2, 0), 1, 0.07, 0.07, 0.07, 0.001);
 			}
 		}
 	}
 
 	@Override
-	public boolean livingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
-		if (event.getCause() == DamageCause.ENTITY_ATTACK) {
-			damageDealt(event.getFinalDamage());
+	public void onDamage(DamageEvent event, LivingEntity enemy) {
+		if (event.getType() == DamageType.MELEE || event.getType() == DamageType.MELEE_SKILL || event.getType() == DamageType.MELEE_ENCH) {
+			damageDealt(event.getDamage());
 		}
-		return true;
 	}
 
 	public void customRecklessSwingInteraction(double swingDamage) {
@@ -147,15 +146,8 @@ public class Rampage extends Ability implements AbilityWithChargesOrStacks {
 	}
 
 	@Override
-	public boolean playerDamagedByLivingEntityEvent(EntityDamageByEntityEvent event) {
-		event.setDamage(EntityUtils.getDamageApproximation(event, 1 - mStacks * RAMPAGE_DAMAGE_RESISTANCE_STACK_RATIO / 100.0));
-		return true;
-	}
-
-	@Override
-	public boolean playerDamagedByProjectileEvent(EntityDamageByEntityEvent event) {
-		event.setDamage(EntityUtils.getDamageApproximation(event, 1 - mStacks * RAMPAGE_DAMAGE_RESISTANCE_STACK_RATIO / 100.0));
-		return true;
+	public void onHurtByEntityWithSource(DamageEvent event, Entity damager, LivingEntity source) {
+		event.setDamage(event.getDamage() * (1 - mStacks * RAMPAGE_DAMAGE_RESISTANCE_STACK_RATIO / 100.0));
 	}
 
 	@Override

@@ -1,11 +1,10 @@
 package com.playmonumenta.plugins.overrides;
 
+import com.playmonumenta.plugins.Plugin;
 import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.inventory.ItemStack;
-
-import com.playmonumenta.plugins.Plugin;
 
 public class NoAdventureModePlacementOverride extends BaseOverride {
 	@Override

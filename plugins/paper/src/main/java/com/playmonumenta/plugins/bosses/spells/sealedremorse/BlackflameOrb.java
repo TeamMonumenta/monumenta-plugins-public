@@ -1,7 +1,14 @@
 package com.playmonumenta.plugins.bosses.spells.sealedremorse;
 
-import java.util.List;
-
+import com.playmonumenta.plugins.bosses.bosses.BeastOfTheBlackFlame;
+import com.playmonumenta.plugins.bosses.bosses.Svalgot;
+import com.playmonumenta.plugins.bosses.spells.SpellBaseSeekingProjectile;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.DamageUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.utils.PotionUtils;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -15,13 +22,7 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 
-import com.playmonumenta.plugins.bosses.bosses.BeastOfTheBlackFlame;
-import com.playmonumenta.plugins.bosses.bosses.Svalgot;
-import com.playmonumenta.plugins.bosses.spells.SpellBaseSeekingProjectile;
-import com.playmonumenta.plugins.utils.BossUtils;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.plugins.utils.PotionUtils;
+import java.util.List;
 
 public class BlackflameOrb extends SpellBaseSeekingProjectile {
 
@@ -39,6 +40,7 @@ public class BlackflameOrb extends SpellBaseSeekingProjectile {
 	private static final double HITBOX_LENGTH = 2;
 	private static final boolean COLLIDES_WITH_BLOCKS = false;
 	private static final boolean LINGERS = true;
+	private static final double DAMAGE = 40;
 
 	private boolean mOnCooldown = false;
 
@@ -73,7 +75,7 @@ public class BlackflameOrb extends SpellBaseSeekingProjectile {
 					world.spawnParticle(Particle.SMOKE_LARGE, loc, 40, 1, 1, 1, 0.5);
 
 					for (Player p : PlayerUtils.playersInRange(loc, 5, true)) {
-						BossUtils.bossDamagePercent(boss, p, 0.7, "Blackflame Orb");
+						DamageUtils.dualTypeDamage(boss, p, DamageType.MAGIC, DamageType.FIRE, DAMAGE, 0.6, null, false, true, "Blackflame Orb");
 						p.setFireTicks(4 * 20);
 					}
 				});

@@ -1,11 +1,10 @@
 package com.playmonumenta.plugins.effects;
 
+import com.playmonumenta.plugins.utils.EntityUtils;
 import org.bukkit.attribute.Attributable;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.entity.Entity;
-
-import com.playmonumenta.plugins.utils.EntityUtils;
 
 public class FlatAttributeDamageDealt extends Effect {
 

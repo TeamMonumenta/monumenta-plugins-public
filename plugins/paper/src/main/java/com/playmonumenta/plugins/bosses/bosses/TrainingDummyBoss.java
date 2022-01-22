@@ -4,15 +4,15 @@ import java.text.DecimalFormat;
 import java.util.Arrays;
 
 import org.bukkit.ChatColor;
+import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.entity.Projectile;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.plugin.Plugin;
 
 import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.spells.SpellRunAction;
+import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.utils.EntityUtils;
 
 public class TrainingDummyBoss extends BossAbilityGroup {
@@ -37,9 +37,8 @@ public class TrainingDummyBoss extends BossAbilityGroup {
 	}
 
 	@Override
-	public void bossDamagedByEntity(EntityDamageByEntityEvent event) {
-		Entity damager = event.getDamager();
-		double damage = event.getFinalDamage();
+	public void onHurtByEntityWithSource(DamageEvent event, Entity damager, LivingEntity source) {
+		double damage = event.getDamage();
 
 		// Damage smaller than this is only meant to tag the mob as damaged by a player
 		if (damage < 0.01) {
@@ -51,12 +50,12 @@ public class TrainingDummyBoss extends BossAbilityGroup {
 			damageString += ".0"; // DecimalFormat would take 1.0 to "1", but the ".0" is desired
 		}
 
-		if (damager instanceof Player player) {
+		if (source instanceof Player player) {
 			player.sendMessage(ChatColor.GOLD + "Damage: " + ChatColor.RED + damageString);
-		} else if (damager instanceof Projectile projectile) {
-			if (projectile.getShooter() instanceof Player player) {
-				player.sendMessage(ChatColor.GOLD + "Damage: " + ChatColor.RED + damageString);
-			}
+		}
+
+		if (mBoss.isValid() && !mBoss.isDead() && mBoss.getHealth() > 0) {
+			mBoss.setHealth(EntityUtils.getAttributeOrDefault(mBoss, Attribute.GENERIC_MAX_HEALTH, 1000));
 		}
 	}
 }

@@ -1,9 +1,12 @@
 package com.playmonumenta.plugins.overrides;
 
-import java.util.Arrays;
-import java.util.EnumSet;
-import java.util.List;
-
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.utils.ChestUtils;
+import com.playmonumenta.plugins.utils.DelvesUtils;
+import com.playmonumenta.plugins.utils.MessagingUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.utils.TOVUtils;
+import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -21,14 +24,9 @@ import org.bukkit.loot.LootTable;
 import org.bukkit.util.Vector;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.utils.ChestUtils;
-import com.playmonumenta.plugins.utils.DelvesUtils;
-import com.playmonumenta.plugins.utils.MessagingUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.plugins.utils.TOVUtils;
-
-import net.md_5.bungee.api.ChatColor;
+import java.util.Arrays;
+import java.util.EnumSet;
+import java.util.List;
 
 public class ChestOverride extends BaseOverride {
 	// Convenience list of offsets to get adjacent blocks

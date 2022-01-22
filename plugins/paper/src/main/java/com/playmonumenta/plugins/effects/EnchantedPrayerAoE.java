@@ -9,12 +9,13 @@ import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDamageEvent;
+import org.jetbrains.annotations.NotNull;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.classes.ClassAbility;
-import com.playmonumenta.plugins.classes.magic.MagicType;
+import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 
@@ -24,15 +25,15 @@ public class EnchantedPrayerAoE extends Effect {
 	private final int mDamageAmount;
 	private final double mHealAmount;
 	private final Player mPlayer;
-	private final EnumSet<EntityDamageEvent.DamageCause> mAffectedDamageCauses;
+	private final EnumSet<DamageType> mAffectedDamageTypes;
 
-	public EnchantedPrayerAoE(Plugin plugin, int duration, int damageAmount, double healAmount, Player player, EnumSet<EntityDamageEvent.DamageCause> affectedDamageCauses) {
+	public EnchantedPrayerAoE(Plugin plugin, int duration, int damageAmount, double healAmount, Player player, EnumSet<DamageType> affectedDamageTypes) {
 		super(duration);
 		mPlugin = plugin;
 		mDamageAmount = damageAmount;
 		mHealAmount = healAmount;
 		mPlayer = player;
-		mAffectedDamageCauses = affectedDamageCauses;
+		mAffectedDamageTypes = affectedDamageTypes;
 	}
 
 	// This needs to trigger after any percent damage
@@ -47,22 +48,20 @@ public class EnchantedPrayerAoE extends Effect {
 	}
 
 	@Override
-	public boolean entityDealDamageEvent(EntityDamageByEntityEvent event) {
-		if (mPlayer != null && (mAffectedDamageCauses == null || mAffectedDamageCauses.contains(event.getCause()))) {
-			Entity damagee = event.getEntity();
-			World world = mPlayer.getWorld();
-			world.playSound(damagee.getLocation(), Sound.ENTITY_FIREWORK_ROCKET_BLAST, 1, 0.9f);
-			world.playSound(damagee.getLocation(), Sound.ENTITY_BLAZE_DEATH, 1, 1.75f);
-			world.spawnParticle(Particle.SPELL_INSTANT, damagee.getLocation().add(0, damagee.getHeight() / 2, 0), 100, 0.25f, 0.3f, 0.25f, 1);
-			world.spawnParticle(Particle.FIREWORKS_SPARK, damagee.getLocation().add(0, damagee.getHeight() / 2, 0), 75, 0, 0, 0, 0.3);
-			for (LivingEntity le : EntityUtils.getNearbyMobs(damagee.getLocation(), 3.5)) {
-				EntityUtils.damageEntity(mPlugin, le, mDamageAmount, mPlayer, MagicType.HOLY, true, ClassAbility.ENCHANTED_PRAYER, false, false, true, false);
+	public void onDamage(@NotNull LivingEntity entity, @NotNull DamageEvent event, @NotNull LivingEntity enemy) {
+		if (mAffectedDamageTypes == null || mAffectedDamageTypes.contains(event.getType())) {
+			World world = entity.getWorld();
+			world.playSound(enemy.getLocation(), Sound.ENTITY_FIREWORK_ROCKET_BLAST, 1, 0.9f);
+			world.playSound(enemy.getLocation(), Sound.ENTITY_BLAZE_DEATH, 1, 1.75f);
+			world.spawnParticle(Particle.SPELL_INSTANT, enemy.getLocation().add(0, enemy.getHeight() / 2, 0), 100, 0.25f, 0.3f, 0.25f, 1);
+			world.spawnParticle(Particle.FIREWORKS_SPARK, enemy.getLocation().add(0, enemy.getHeight() / 2, 0), 75, 0, 0, 0, 0.3);
+			for (LivingEntity le : EntityUtils.getNearbyMobs(enemy.getLocation(), 3.5)) {
+				DamageUtils.damage(mPlayer, le, DamageType.MAGIC, mDamageAmount, ClassAbility.ENCHANTED_PRAYER, true, true);
 			}
-			PlayerUtils.healPlayer(mPlayer, EntityUtils.getMaxHealth(mPlayer) * mHealAmount);
+			double maxHealth = EntityUtils.getMaxHealth(mPlayer);
+			PlayerUtils.healPlayer(mPlugin, mPlayer, maxHealth * mHealAmount, mPlayer);
 			setDuration(0);
 		}
-
-		return true;
 	}
 
 	@Override

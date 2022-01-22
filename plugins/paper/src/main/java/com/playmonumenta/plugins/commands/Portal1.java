@@ -1,8 +1,7 @@
 package com.playmonumenta.plugins.commands;
 
-import org.bukkit.entity.Player;
-
 import com.playmonumenta.plugins.portals.PortalManager;
+import org.bukkit.entity.Player;
 
 public class Portal1 extends GenericCommand {
 	public static void register() {

@@ -10,16 +10,15 @@ import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.entity.Projectile;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.plugin.Plugin;
-import org.bukkit.projectiles.ProjectileSource;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
 import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.spells.SpellBaseLeapAttack;
 import com.playmonumenta.plugins.bosses.spells.SpellDuelist;
+import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
@@ -90,7 +89,7 @@ public class WrathBoss extends BossAbilityGroup {
 									mWorld.playSound(mLocation, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1f, 1f);
 									mWorld.playSound(mLocation, Sound.ITEM_SHIELD_BREAK, 1f, 1f);
 									for (Player p : PlayerUtils.playersInRange(mLocation.add(mDirection), DAMAGE_RADIUS, true)) {
-										BossUtils.bossDamage(mBoss, p, DAMAGE);
+										BossUtils.blockableDamage(mBoss, p, DamageType.MELEE, DAMAGE);
 									}
 								}
 							} else if (mTime <= 10) {
@@ -110,7 +109,7 @@ public class WrathBoss extends BossAbilityGroup {
 									mWorld.playSound(mLocation, Sound.ITEM_SHIELD_BREAK, 1f, 1f);
 									for (Player p : PlayerUtils.playersInRange(mLocation.add(mDirection), DAMAGE_RADIUS, true)) {
 										p.setNoDamageTicks(0);
-										BossUtils.bossDamage(mBoss, p, DAMAGE);
+										BossUtils.blockableDamage(mBoss, p, DamageType.MELEE, DAMAGE);
 									}
 								}
 							} else {
@@ -131,52 +130,45 @@ public class WrathBoss extends BossAbilityGroup {
 	}
 
 	@Override
-	public void bossDamagedByEntity(EntityDamageByEntityEvent event) {
+	public void onHurtByEntityWithSource(DamageEvent event, Entity damager, LivingEntity source) {
 		Location loc = mBoss.getLocation();
-		Entity damager = event.getDamager();
-		if (damager instanceof Projectile) {
-			ProjectileSource source = ((Projectile) damager).getShooter();
-			if (source instanceof LivingEntity) {
-				damager = (LivingEntity) source;
+		if (loc.distance(source.getLocation()) > ULTIMATE_EYE_DISTANCE) {
+			if (!EntityUtils.isStunned(mBoss)) {
+				dodge(event);
 			}
-		}
-
-		if (damager instanceof LivingEntity) {
-			if (loc.distance(damager.getLocation()) > ULTIMATE_EYE_DISTANCE) {
+		} else {
+			if (FastUtils.RANDOM.nextDouble() < DODGE_CHANCE) {
 				if (!EntityUtils.isStunned(mBoss)) {
 					dodge(event);
-				}
-			} else {
-				if (FastUtils.RANDOM.nextDouble() < DODGE_CHANCE) {
-					if (!EntityUtils.isStunned(mBoss)) {
-						dodge(event);
-					}
 				}
 			}
 		}
 	}
 
-	private void dodge(EntityDamageByEntityEvent event) {
+	private void dodge(DamageEvent event) {
 		event.setCancelled(true);
 		World world = mBoss.getWorld();
 		Location loc = mBoss.getLocation().add(0, 1, 0);
-		Vector direction = event.getDamager().getLocation().subtract(loc).toVector().setY(0).normalize();
-		Vector sideways = new Vector(direction.getZ(), 0, -direction.getX());
-		sideways.subtract(direction.multiply(0.25));
-		if (FastUtils.RANDOM.nextBoolean()) {
-			sideways.multiply(-1);
-		}
+		Entity damgaer = event.getDamager();
+		if (damgaer != null) {
+			Vector direction = event.getDamager().getLocation().subtract(loc).toVector().setY(0).normalize();
+			Vector sideways = new Vector(direction.getZ(), 0, -direction.getX());
+			sideways.subtract(direction.multiply(0.25));
+			if (FastUtils.RANDOM.nextBoolean()) {
+				sideways.multiply(-1);
+			}
 
-		loc.add(sideways.multiply(3));
-		for (int i = 0; i < 3; i++) {
-			if (loc.getBlock().isPassable()) {
-				world.spawnParticle(Particle.SMOKE_LARGE, loc, 10, 0, 0, 0, 0.5);
-				world.playSound(loc, Sound.ENTITY_BLAZE_SHOOT, 0.5f, 0.5f);
+			loc.add(sideways.multiply(3));
+			for (int i = 0; i < 3; i++) {
+				if (loc.getBlock().isPassable()) {
+					world.spawnParticle(Particle.SMOKE_LARGE, loc, 10, 0, 0, 0, 0.5);
+					world.playSound(loc, Sound.ENTITY_BLAZE_SHOOT, 0.5f, 0.5f);
 
-				mBoss.teleport(loc);
-				break;
-			} else {
-				loc.add(0, 1, 0);
+					mBoss.teleport(loc);
+					break;
+				} else {
+					loc.add(0, 1, 0);
+				}
 			}
 		}
 	}

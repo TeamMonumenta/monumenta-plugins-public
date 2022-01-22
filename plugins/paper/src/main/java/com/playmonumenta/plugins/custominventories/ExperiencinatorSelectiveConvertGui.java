@@ -1,9 +1,15 @@
 package com.playmonumenta.plugins.custominventories;
 
-import java.util.List;
-import java.util.Map.Entry;
-import java.util.stream.Collectors;
-
+import com.playmonumenta.plugins.commands.experiencinator.ExperiencinatorConfig;
+import com.playmonumenta.plugins.commands.experiencinator.ExperiencinatorConfig.Conversion;
+import com.playmonumenta.plugins.commands.experiencinator.ExperiencinatorSettings;
+import com.playmonumenta.plugins.commands.experiencinator.ExperiencinatorUtils;
+import com.playmonumenta.plugins.utils.GUIUtils;
+import com.playmonumenta.plugins.utils.ItemStatUtils;
+import com.playmonumenta.plugins.utils.ItemStatUtils.Region;
+import com.playmonumenta.plugins.utils.ItemStatUtils.Tier;
+import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.scriptedquests.utils.CustomInventory;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
@@ -14,13 +20,9 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.Plugin;
 
-import com.playmonumenta.plugins.commands.experiencinator.ExperiencinatorConfig;
-import com.playmonumenta.plugins.commands.experiencinator.ExperiencinatorConfig.Conversion;
-import com.playmonumenta.plugins.commands.experiencinator.ExperiencinatorSettings;
-import com.playmonumenta.plugins.commands.experiencinator.ExperiencinatorUtils;
-import com.playmonumenta.plugins.utils.GUIUtils;
-import com.playmonumenta.plugins.utils.ItemUtils;
-import com.playmonumenta.scriptedquests.utils.CustomInventory;
+import java.util.List;
+import java.util.Map.Entry;
+import java.util.stream.Collectors;
 
 import static org.bukkit.ChatColor.BOLD;
 import static org.bukkit.ChatColor.GOLD;
@@ -212,18 +214,18 @@ public final class ExperiencinatorSelectiveConvertGui extends CustomInventory {
 	}
 
 	private boolean sellItem(ItemStack item) {
-		ItemUtils.ItemRegion itemRegion = ItemUtils.getItemRegion(item);
-		ItemUtils.ItemTier itemTier = ItemUtils.getItemTier(item);
-		String conversionRateName = mExperiencinator.getConversionRates().get(itemRegion);
+		Region region = ItemStatUtils.getRegion(item);
+		Tier tier = ItemStatUtils.getTier(item);
+		String conversionRateName = mExperiencinator.getConversionRates().get(region);
 		if (conversionRateName == null) {
 			return false;
 		}
-		int conversionSettingsId = mSelectedConversion < 0 ? mSettings.getConversion(itemRegion, itemTier) : mConversions.get(mSelectedConversion).get(0).getSettingsId();
-		Conversion conversion = mConfig.findConversion(conversionSettingsId, itemRegion);
+		int conversionSettingsId = mSelectedConversion < 0 ? mSettings.getConversion(region, tier) : mConversions.get(mSelectedConversion).get(0).getSettingsId();
+		Conversion conversion = mConfig.findConversion(conversionSettingsId, region);
 		if (conversion == null) {
 			return false;
 		}
-		if (!conversion.conversionAllowed(mPlayer, itemTier)) {
+		if (!conversion.conversionAllowed(mPlayer, tier)) {
 			return false;
 		}
 		return ExperiencinatorUtils.convertSingleItem(mPlayer, item, conversion, conversionRateName);

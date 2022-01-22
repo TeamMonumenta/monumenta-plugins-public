@@ -10,14 +10,13 @@ import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.abilities.warlock.reaper.VoodooBonds;
+import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
@@ -52,36 +51,26 @@ public class VoodooBondsOtherPlayer extends Effect {
 	}
 
 	@Override
-	public boolean entityReceiveDamageEvent(EntityDamageEvent event) {
+	public void onHurt(LivingEntity entity, DamageEvent event) {
 		int duration = mScore == 1 ? DURATION_1 : DURATION_2;
-		Player p = (Player) event.getEntity();
-		double damage = event.getFinalDamage();
-		double maxHealth = EntityUtils.getMaxHealth(p);
+		double damage = event.getDamage();
+		double maxHealth = EntityUtils.getMaxHealth(entity);
 		double percentDamage = damage / maxHealth;
 
-		if (event instanceof EntityDamageByEntityEvent) {
-			EntityDamageByEntityEvent entityEvent = (EntityDamageByEntityEvent) event;
-			if (EntityUtils.isBoss(entityEvent.getDamager())) {
+		LivingEntity source = event.getSource();
+		if (source != null) {
+			if (EntityUtils.isBoss(source)) {
 				event.setDamage(event.getDamage() / 2);
 			} else {
 				event.setDamage(0);
-				if (entityEvent.getDamager() instanceof LivingEntity) {
-					MovementUtils.knockAway(mPlayer.getLocation(), (LivingEntity) entityEvent.getDamager(), 0.3f, 0.15f);
+				if (event.getDamager() instanceof LivingEntity le) {
+					MovementUtils.knockAway(mPlayer.getLocation(), le, 0.3f, 0.15f, true);
 				}
 			}
 		} else {
 			// Ignore DoT damage
-			if (event.getCause() == DamageCause.FIRE
-					|| event.getCause() == DamageCause.WITHER
-					|| event.getCause() == DamageCause.CONTACT
-					|| event.getCause() == DamageCause.DROWNING
-					|| event.getCause() == DamageCause.FIRE_TICK
-					|| event.getCause() == DamageCause.HOT_FLOOR
-					|| event.getCause() == DamageCause.POISON
-					|| event.getCause() == DamageCause.DROWNING
-					|| event.getCause() == DamageCause.STARVATION
-					|| event.getCause() == DamageCause.SUFFOCATION) {
-				return true;
+			if (event.getType() == DamageType.FIRE || event.getType() == DamageType.AILMENT) {
+				return;
 			}
 			event.setDamage(0);
 		}
@@ -92,19 +81,17 @@ public class VoodooBondsOtherPlayer extends Effect {
 			mPlugin.mEffectManager.addEffect(mPlayer, SEND_EFFECT_NAME, new VoodooBondsReaper(duration, mPlayer, event.getDamage(), percentDamage, mPlugin));
 		});
 
-		Location loc = event.getEntity().getLocation();
+		Location loc = entity.getLocation();
 		World world = loc.getWorld();
 		world.spawnParticle(Particle.SPELL_WITCH, loc, 65, 1, 0.5, 1, 0.001);
 		world.spawnParticle(Particle.REDSTONE, loc, 65, 1, 0.5, 1, 0, COLOR);
 		world.playSound(loc, Sound.BLOCK_CHAIN_BREAK, 2f, 0.75f);
-		return true;
 	}
 
 	@Override
 	public void entityTickEffect(Entity entity, boolean fourHertz, boolean twoHertz, boolean oneHertz) {
-		if (entity instanceof LivingEntity) {
+		if (entity instanceof LivingEntity le) {
 			mRotation += 20;
-			LivingEntity le = (LivingEntity) entity;
 			Location loc = le.getLocation();
 			World world = loc.getWorld();
 			//replace with halo effect

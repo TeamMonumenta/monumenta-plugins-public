@@ -1,16 +1,27 @@
 package com.playmonumenta.plugins.utils;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.EnumMap;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.WeakHashMap;
-
+import com.playmonumenta.plugins.abilities.delves.Arcanic;
+import com.playmonumenta.plugins.abilities.delves.Bloodthirsty;
+import com.playmonumenta.plugins.abilities.delves.Carapace;
+import com.playmonumenta.plugins.abilities.delves.Chivalrous;
+import com.playmonumenta.plugins.abilities.delves.Colossal;
+import com.playmonumenta.plugins.abilities.delves.DelveModifier;
+import com.playmonumenta.plugins.abilities.delves.Dreadful;
+import com.playmonumenta.plugins.abilities.delves.Entropy;
+import com.playmonumenta.plugins.abilities.delves.Infernal;
+import com.playmonumenta.plugins.abilities.delves.Legionary;
+import com.playmonumenta.plugins.abilities.delves.Pernicious;
+import com.playmonumenta.plugins.abilities.delves.Relentless;
+import com.playmonumenta.plugins.abilities.delves.Spectral;
+import com.playmonumenta.plugins.abilities.delves.StatMultiplier;
+import com.playmonumenta.plugins.abilities.delves.Transcendent;
+import com.playmonumenta.plugins.abilities.delves.Twisted;
+import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
+import com.playmonumenta.plugins.listeners.DelvesListener;
+import com.playmonumenta.plugins.server.properties.ServerProperties;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Location;
@@ -31,29 +42,16 @@ import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.loot.LootTable;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-import com.playmonumenta.plugins.abilities.delves.Arcanic;
-import com.playmonumenta.plugins.abilities.delves.Bloodthirsty;
-import com.playmonumenta.plugins.abilities.delves.Carapace;
-import com.playmonumenta.plugins.abilities.delves.Chivalrous;
-import com.playmonumenta.plugins.abilities.delves.Colossal;
-import com.playmonumenta.plugins.abilities.delves.DelveModifier;
-import com.playmonumenta.plugins.abilities.delves.Dreadful;
-import com.playmonumenta.plugins.abilities.delves.Entropy;
-import com.playmonumenta.plugins.abilities.delves.Infernal;
-import com.playmonumenta.plugins.abilities.delves.Legionary;
-import com.playmonumenta.plugins.abilities.delves.Pernicious;
-import com.playmonumenta.plugins.abilities.delves.Relentless;
-import com.playmonumenta.plugins.abilities.delves.Spectral;
-import com.playmonumenta.plugins.abilities.delves.StatMultiplier;
-import com.playmonumenta.plugins.abilities.delves.Transcendent;
-import com.playmonumenta.plugins.abilities.delves.Twisted;
-import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
-import com.playmonumenta.plugins.listeners.DelvesListener;
-import com.playmonumenta.plugins.server.properties.ServerProperties;
-
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.format.TextDecoration;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.EnumMap;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.WeakHashMap;
 
 public class DelvesUtils {
 

@@ -1,6 +1,5 @@
 package com.playmonumenta.plugins.abilities.cleric;
 
-import java.util.EnumSet;
 import java.util.List;
 
 import org.bukkit.Bukkit;
@@ -9,8 +8,6 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -21,10 +18,10 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.classes.ClassAbility;
-import com.playmonumenta.plugins.classes.magic.MagicType;
-import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
-import com.playmonumenta.plugins.enchantments.abilities.BaseAbilityEnchantment;
+import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.player.PartialParticle;
+import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
@@ -33,11 +30,6 @@ import com.playmonumenta.plugins.utils.StringUtils;
 
 
 public class DivineJustice extends Ability {
-	public static class DivineJusticeAllyHealingEnchantment extends BaseAbilityEnchantment {
-		public DivineJusticeAllyHealingEnchantment() {
-			super("Divine Justice Ally Healing", EnumSet.of(ItemSlot.OFFHAND));
-		}
-	}
 
 	public static final String NAME = "Divine Justice";
 	public static final ClassAbility ABILITY = ClassAbility.DIVINE_JUSTICE;
@@ -66,7 +58,7 @@ public class DivineJustice extends Ability {
 		mInfo.mShorthandName = "DJ";
 		mInfo.mDescriptions.add(
 			String.format(
-				"Your critical attacks passively deal %s holy damage to undead enemies, ignoring iframes.",
+				"Your critical attacks passively deal %s magic damage to undead enemies, ignoring iframes.",
 				DAMAGE
 			)
 		);
@@ -93,16 +85,9 @@ public class DivineJustice extends Ability {
 	}
 
 	@Override
-	public boolean livingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent entityDamageByEntityEvent) {
-		//TODO pass in casted entities for events like these
-		LivingEntity enemy = (LivingEntity)entityDamageByEntityEvent.getEntity();
-
-		if (
-			entityDamageByEntityEvent.getCause() == DamageCause.ENTITY_ATTACK
-			&& PlayerUtils.isFallingAttack(mPlayer)
-			&& Crusade.enemyTriggersAbilities(enemy, mCrusade)
-		) {
-			double originalDamage = entityDamageByEntityEvent.getDamage();
+	public void onDamage(DamageEvent event, LivingEntity enemy) {
+		if (mPlayer != null && event.getType() == DamageType.MELEE && PlayerUtils.isFallingAttack(mPlayer) && Crusade.enemyTriggersAbilities(enemy, mCrusade)) {
+			double originalDamage = event.getDamage();
 			double damage = DAMAGE;
 			if (mDoHealingAndMultiplier) {
 				// Use the whole melee damage here
@@ -110,18 +95,7 @@ public class DivineJustice extends Ability {
 			}
 
 			mLastPassiveDamage = damage;
-			EntityUtils.damageEntity(
-				Plugin.getInstance(),
-				enemy,
-				damage,
-				mPlayer,
-				MagicType.HOLY,
-				true,
-				ABILITY,
-				true,
-				true,
-				true
-			);
+			DamageUtils.damage(mPlayer, enemy, DamageType.MAGIC, damage, mInfo.mLinkedSpell, true, false);
 
 			double widerWidthDelta = PartialParticle.getWidthDelta(enemy) * 1.5;
 			PartialParticle partialParticle = new PartialParticle(
@@ -144,8 +118,6 @@ public class DivineJustice extends Ability {
 				1.5f
 			);
 		}
-
-		return true;
 	}
 
 	@Override
@@ -156,14 +128,17 @@ public class DivineJustice extends Ability {
 				&& Crusade.enemyTriggersAbilities(entityDeathEvent.getEntity(), mCrusade)
 		) {
 			PlayerUtils.healPlayer(
+				mPlugin,
 				mPlayer,
 				EntityUtils.getMaxHealth(mPlayer) * HEALING_MULTIPLIER_OWN
 			);
 			List<Player> players = PlayerUtils.otherPlayersInRange(mPlayer, RADIUS, true);
 			for (Player otherPlayer : players) {
 				PlayerUtils.healPlayer(
+					mPlugin,
 					otherPlayer,
-					EntityUtils.getMaxHealth(otherPlayer) * DivineJusticeAllyHealingEnchantment.getExtraPercentHealing(mPlayer, DivineJusticeAllyHealingEnchantment.class, (float) HEALING_MULTIPLIER_OTHER)
+					EntityUtils.getMaxHealth(mPlayer),
+					mPlayer
 				);
 			}
 

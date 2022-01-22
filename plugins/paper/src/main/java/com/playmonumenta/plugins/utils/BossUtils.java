@@ -15,55 +15,92 @@ import org.bukkit.util.Vector;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.effects.Stasis;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.listeners.StasisListener;
 
 public class BossUtils {
 
-	public static boolean bossDamageBlocked(Player target, double damage, @Nullable Location source) {
+	public static boolean bossDamageBlocked(Player player, @Nullable Location location) {
 		/*
 		 * Attacks can only be blocked if:
 		 * - They have a source location
 		 * - Shield is not on cooldown
-		 * - The damage is less than 100
 		 * - The player is facing towards the damage
 		 */
-		if (target.isBlocking() && source != null && target.getCooldown(Material.SHIELD) <= 0 && damage < 100) {
-			Vector playerDir = target.getEyeLocation().getDirection().setY(0).normalize();
-			Vector toSourceVector = source.toVector().subtract(target.getLocation().toVector()).setY(0).normalize();
+		if (player.isBlocking() && location != null && player.getCooldown(Material.SHIELD) <= 0) {
+			Vector playerDir = player.getEyeLocation().getDirection().setY(0).normalize();
+			Vector toSourceVector = location.toVector().subtract(player.getLocation().toVector()).setY(0).normalize();
 			return playerDir.dot(toSourceVector) > 0.33;
 		}
 
 		return false;
 	}
 
-	public static void bossDamage(LivingEntity boss, LivingEntity target, double damage) {
-		bossDamage(boss, target, damage, boss.getLocation(), null);
-	}
-
-	public static void bossDamage(LivingEntity boss, LivingEntity target, double damage, @Nullable Location source) {
-		bossDamage(boss, target, damage, source, null);
-	}
-
-	public static void bossDamage(LivingEntity boss, LivingEntity target, double damage, @Nullable Location source, @Nullable String cause) {
-		int resistance = 0;
-		if (target.hasPotionEffect(PotionEffectType.DAMAGE_RESISTANCE)) {
-			resistance = target.getPotionEffect(PotionEffectType.DAMAGE_RESISTANCE).getAmplifier() + 1;
+	public static void blockableDamage(@Nullable LivingEntity damager, LivingEntity damagee, DamageType type, double damage) {
+		Location location = null;
+		if (damager != null) {
+			location = damager.getLocation();
 		}
+		blockableDamage(damager, damagee, type, damage, null, location);
+	}
 
-		// Resist 5 = no damage
-		if (resistance >= 5) {
+	public static void blockableDamage(@Nullable LivingEntity damager, LivingEntity damagee, DamageType type, double damage, @Nullable Location location) {
+		blockableDamage(damager, damagee, type, damage, null, location);
+	}
+
+	public static void blockableDamage(@Nullable LivingEntity damager, LivingEntity damagee, DamageType type, double damage, @Nullable String cause, @Nullable Location location) {
+		// One second of cooldown for every 2.5 points of damage
+		blockableDamage(damager, damagee, type, damage, cause, location, (int) (20 * damage / 2.5));
+	}
+
+	public static void blockableDamage(@Nullable LivingEntity damager, LivingEntity damagee, DamageType type, double damage, @Nullable String cause, @Nullable Location location, int stunTicks) {
+		// One shield durability damage for every 5 points of damage
+		blockableDamage(damager, damagee, type, damage, false, true, cause, location, stunTicks, (int) (damage / 5));
+	}
+
+	public static void blockableDamage(@Nullable LivingEntity damager, LivingEntity damagee, DamageType type, double damage, boolean bypassIFrames, boolean causeKnockback, @Nullable String cause, @Nullable Location location, int stunTicks, int durability) {
+		// If they have resistance 5 or are in stasis, do not deal damage or stun shield
+		if ((damagee.hasPotionEffect(PotionEffectType.DAMAGE_RESISTANCE) && damagee.getPotionEffect(PotionEffectType.DAMAGE_RESISTANCE).getAmplifier() >= 4) || StasisListener.isInStasis(damagee)) {
 			return;
 		}
 
-		if ((target instanceof Player) && bossDamageBlocked((Player)target, damage, source)) {
-			/* One second of cooldown for every 2 points of damage */
-			NmsUtils.stunShield((Player) target, (int) (20 * damage / 2.5));
-			target.getWorld().playSound(target.getLocation(), Sound.ITEM_SHIELD_BREAK, SoundCategory.PLAYERS, 1.0f, 1.0f);
-			ItemUtils.damageShield((Player) target, (int)(damage / 5));
+		if (damagee instanceof Player player && bossDamageBlocked(player, location)) {
+			if (stunTicks > 0) {
+				NmsUtils.stunShield(player, stunTicks);
+				damagee.getWorld().playSound(damagee.getLocation(), Sound.ITEM_SHIELD_BREAK, SoundCategory.PLAYERS, 1.0f, 1.0f);
+			}
+			ItemUtils.damageShield(player, durability);
 		} else {
-			// Don't adjust damage to account for resistance, because target.damage() already does this
-			// Apply the damage using a custom damage source that can not be blocked
-			NmsUtils.unblockableEntityDamageEntity(target, damage, boss, cause);
+			DamageUtils.damage(damager, damagee, type, damage, null, bypassIFrames, causeKnockback, cause);
+		}
+	}
+
+	public static void dualTypeBlockableDamage(@Nullable LivingEntity damager, LivingEntity damagee, DamageType type1, DamageType type2, double damage, double percentType1) {
+		Location location = null;
+		if (damager != null) {
+			location = damager.getLocation();
+		}
+		dualTypeBlockableDamage(damager, damagee, type1, type2, damage, percentType1, null, location);
+	}
+
+	public static void dualTypeBlockableDamage(@Nullable LivingEntity damager, LivingEntity damagee, DamageType type1, DamageType type2, double damage, double percentType1, @Nullable String cause, @Nullable Location location) {
+		dualTypeBlockableDamage(damager, damagee, type1, type2, damage, percentType1, false, true, cause, location, (int) (20 * damage / 2.5), (int) (damage / 5));
+	}
+
+	public static void dualTypeBlockableDamage(@Nullable LivingEntity damager, LivingEntity damagee, DamageType type1, DamageType type2, double damage, double percentType1, boolean bypassIFrames, boolean causeKnockback, @Nullable String cause, @Nullable Location location, int stunTicks, int durability) {
+		// If they have resistance 5 or are in stasis, do not deal damage or stun shield
+		if ((damagee.hasPotionEffect(PotionEffectType.DAMAGE_RESISTANCE) && damagee.getPotionEffect(PotionEffectType.DAMAGE_RESISTANCE).getAmplifier() >= 4) || StasisListener.isInStasis(damagee)) {
+			return;
+		}
+
+		if (damagee instanceof Player player && bossDamageBlocked(player, location)) {
+			if (stunTicks > 0) {
+				NmsUtils.stunShield(player, stunTicks);
+				damagee.getWorld().playSound(damagee.getLocation(), Sound.ITEM_SHIELD_BREAK, SoundCategory.PLAYERS, 1.0f, 1.0f);
+			}
+			ItemUtils.damageShield(player, durability);
+		} else {
+			DamageUtils.dualTypeDamage(damager, damagee, type1, type2, damage, percentType1, null, bypassIFrames, causeKnockback, cause);
 		}
 	}
 
@@ -71,29 +108,37 @@ public class BossUtils {
 		return bossDamagePercent(boss, target, percentHealth, null, false, null);
 	}
 
-	public static boolean bossDamagePercent(LivingEntity boss, LivingEntity target, double percentHealth, @Nullable Location source) {
-		return bossDamagePercent(boss, target, percentHealth, source, false, null);
+	public static boolean bossDamagePercent(LivingEntity boss, LivingEntity target, double percentHealth, @Nullable Location location) {
+		return bossDamagePercent(boss, target, percentHealth, location, false, null);
 	}
 
-	public static boolean bossDamagePercent(LivingEntity boss, LivingEntity target, double percentHealth, @Nullable Location source, boolean raw) {
-		return bossDamagePercent(boss, target, percentHealth, source, raw, null);
+	public static boolean bossDamagePercent(LivingEntity boss, LivingEntity target, double percentHealth, @Nullable Location location, boolean raw) {
+		return bossDamagePercent(boss, target, percentHealth, location, raw, null);
 	}
 
 	public static boolean bossDamagePercent(LivingEntity boss, LivingEntity target, double percentHealth, String cause) {
 		return bossDamagePercent(boss, target, percentHealth, null, false, cause);
 	}
 
-	public static boolean bossDamagePercent(LivingEntity boss, LivingEntity target, double percentHealth, @Nullable Location source, @Nullable String cause) {
-		return bossDamagePercent(boss, target, percentHealth, source, false, cause);
+	public static boolean bossDamagePercent(LivingEntity boss, LivingEntity target, double percentHealth, @Nullable Location location, @Nullable String cause) {
+		return bossDamagePercent(boss, target, percentHealth, location, false, cause);
 	}
 
 	/*
 	 * Returns whether or not the player survived (true) or was killed (false)
 	 */
-	public static boolean bossDamagePercent(LivingEntity boss, LivingEntity target, double percentHealth, @Nullable Location source, boolean raw, @Nullable String cause) {
-		if (target instanceof Player) {
-			Player player = (Player) target;
+	public static boolean bossDamagePercent(LivingEntity boss, LivingEntity target, double percentHealth, @Nullable Location location, boolean raw, @Nullable String cause) {
+		if (percentHealth <= 0) {
+			return true;
+		}
+
+		if (target instanceof Player player) {
 			if (player.getGameMode() == GameMode.CREATIVE || player.getGameMode() == GameMode.SPECTATOR) {
+				return true;
+			}
+
+			// Do not damage players currently in stasis
+			if (StasisListener.isInStasis(player)) {
 				return true;
 			}
 		}
@@ -108,32 +153,26 @@ public class BossUtils {
 			return true;
 		}
 
-		// Do not damage players currently in stasis
-		Plugin plugin = Plugin.getInstance();
-		if (plugin.mEffectManager.hasEffect(target, Stasis.class)) {
-			return true;
-		}
-
 		double toTake = EntityUtils.getMaxHealth(target) * percentHealth;
 		if (raw) {
 			toTake = percentHealth;
 		}
 
-		if ((target instanceof Player) && bossDamageBlocked((Player) target, 0, source)) {
+		if (target instanceof Player player && bossDamageBlocked(player, location)) {
 			/*
 			 * One second of cooldown for every 2 points of damage
 			 * Since this is % based, compute cooldown based on "Normal" health
 			 */
 			if (raw) {
 				if (toTake > 1) {
-					NmsUtils.stunShield((Player) target, (int) Math.ceil(toTake * 0.5));
+					NmsUtils.stunShield(player, (int) Math.ceil(toTake * 0.5));
 				}
 				target.getWorld().playSound(target.getLocation(), Sound.ITEM_SHIELD_BREAK, SoundCategory.PLAYERS, 1.0f, 1.0f);
-				ItemUtils.damageShield((Player) target, (int) Math.ceil(toTake / 2.5));
+				ItemUtils.damageShield(player, (int) Math.ceil(toTake / 2.5));
 			} else {
-				NmsUtils.stunShield((Player) target, (int) (20 * percentHealth * 20));
+				NmsUtils.stunShield(player, (int) (20 * percentHealth * 20));
 				target.getWorld().playSound(target.getLocation(), Sound.ITEM_SHIELD_BREAK, SoundCategory.PLAYERS, 1.0f, 1.0f);
-				ItemUtils.damageShield((Player) target, (int)(percentHealth * 20 / 2.5));
+				ItemUtils.damageShield(player, (int)(percentHealth * 20 / 2.5));
 			}
 		} else {
 			double absorp = AbsorptionUtils.getAbsorption(target);

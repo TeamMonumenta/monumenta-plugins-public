@@ -1,16 +1,7 @@
 package com.playmonumenta.plugins.integrations.luckperms;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import com.playmonumenta.plugins.server.properties.ServerProperties;
-import org.bukkit.ChatColor;
-import org.bukkit.Location;
-import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
-
 import com.playmonumenta.plugins.Plugin;
-
+import com.playmonumenta.plugins.server.properties.ServerProperties;
 import dev.jorel.commandapi.CommandAPI;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.CommandPermission;
@@ -18,6 +9,13 @@ import dev.jorel.commandapi.arguments.Argument;
 import dev.jorel.commandapi.arguments.TextArgument;
 import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
 import net.luckperms.api.model.group.Group;
+import org.bukkit.ChatColor;
+import org.bukkit.Location;
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class SetGuildTeleport {
 	public static void register(Plugin plugin) {

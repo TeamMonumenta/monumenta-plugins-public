@@ -1,11 +1,11 @@
 package com.playmonumenta.plugins.bosses.spells.kaul;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.bosses.ChargeUpManager;
+import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
+import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.utils.PotionUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -28,12 +28,11 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.bosses.ChargeUpManager;
-import com.playmonumenta.plugins.bosses.spells.Spell;
-import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
-import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.plugins.utils.PotionUtils;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 
 /*
  * Kaul’s Judgement: (Stone Brick)Give a Tellraw to ¼ (min 2) of the
@@ -281,8 +280,7 @@ public class SpellKaulsJudgement extends Spell implements Listener {
 	public void entityDamageEvent(EntityDamageEvent event) {
 		Entity damagee = event.getEntity();
 
-		if (damagee instanceof Player) {
-			Player player = (Player)damagee;
+		if (damagee instanceof Player player) {
 			if (mOrigPlayerLocs.containsKey(player)) {
 				/* A player currently in judgement took damage */
 				if (event.getFinalDamage() > player.getHealth()) {

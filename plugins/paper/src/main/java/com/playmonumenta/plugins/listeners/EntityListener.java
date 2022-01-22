@@ -12,14 +12,11 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
-import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.World;
-import org.bukkit.attribute.Attribute;
-import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.block.Block;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.AbstractArrow;
@@ -33,7 +30,6 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.EvokerFangs;
 import org.bukkit.entity.Firework;
-import org.bukkit.entity.Fox;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.LivingEntity;
@@ -45,7 +41,6 @@ import org.bukkit.entity.Sheep;
 import org.bukkit.entity.Snowball;
 import org.bukkit.entity.ThrownPotion;
 import org.bukkit.entity.Villager;
-import org.bukkit.entity.Witch;
 import org.bukkit.entity.Wither;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -74,7 +69,6 @@ import org.bukkit.event.entity.VillagerReplenishTradeEvent;
 import org.bukkit.event.hanging.HangingBreakByEntityEvent;
 import org.bukkit.event.world.WorldUnloadEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.potion.PotionData;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -85,27 +79,19 @@ import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 import org.spigotmc.event.entity.EntityDismountEvent;
 
-import com.destroystokyo.paper.event.entity.WitchThrowPotionEvent;
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityManager;
-import com.playmonumenta.plugins.abilities.scout.HuntingCompanion;
-import com.playmonumenta.plugins.attributes.AttributeProjectileDamage;
-import com.playmonumenta.plugins.classes.ClassAbility;
-import com.playmonumenta.plugins.classes.magic.MagicType;
 import com.playmonumenta.plugins.depths.abilities.steelsage.SteelStallion;
-import com.playmonumenta.plugins.effects.Stasis;
-import com.playmonumenta.plugins.enchantments.Inferno;
-import com.playmonumenta.plugins.enchantments.ThrowingKnife;
-import com.playmonumenta.plugins.events.CustomDamageEvent;
 import com.playmonumenta.plugins.events.PotionEffectApplyEvent;
+import com.playmonumenta.plugins.itemstats.enchantments.Inferno;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
-import com.playmonumenta.plugins.tracking.PlayerTracking;
 import com.playmonumenta.plugins.utils.AbilityUtils;
-import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.utils.ItemStatUtils;
+import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.MetadataUtils;
@@ -185,17 +171,13 @@ public class EntityListener implements Listener {
 
 	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	public void entityCombustByEntityEvent(EntityCombustByEntityEvent event) {
-		if (mPlugin.mEffectManager.hasEffect(event.getEntity(), Stasis.class)) {
-			event.setCancelled(true);
-			return;
-		}
+		Entity combustee = event.getEntity();
+		Entity combuster = event.getCombuster();
+
 		// Record the time of the player who sets a mob on fire
 		// Used to prevent arcane strike from counting mobs on fire that were
 		// set on fire by the same hit that triggered arcane strike
 		// Only mark mobs that were not already burning
-		Entity combustee = event.getEntity();
-		Entity combuster = event.getCombuster();
-
 		if ((combuster instanceof Player) && (combustee.getFireTicks() <= 0)) {
 			MetadataUtils.checkOnceThisTick(mPlugin, combustee,
 			                                Constants.ENTITY_COMBUST_NONCE_METAKEY);
@@ -204,8 +186,8 @@ public class EntityListener implements Listener {
 		if ((combuster instanceof Player) && (combustee.getFireTicks() > 0)) {
 			Player player = (Player) combuster;
 			if (player.getInventory().getItemInMainHand().containsEnchantment(Enchantment.FIRE_ASPECT)
-				&& combustee instanceof LivingEntity && Inferno.mobHasInferno(mPlugin, (LivingEntity) combustee)
-				&& PlayerTracking.getInstance().getPlayerCustomEnchantLevel(player, Inferno.class) < Inferno.sTaggedMobs.get(combustee).mLevel) {
+				&& combustee instanceof LivingEntity && Inferno.hasInferno(mPlugin, (LivingEntity) combustee)
+				&& mPlugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.INFERNO) < Inferno.getInfernoLevel(mPlugin, (LivingEntity) combustee)) {
 				event.setCancelled(true);
 				return;
 			}
@@ -220,53 +202,22 @@ public class EntityListener implements Listener {
 		}
 	}
 
-	@EventHandler(ignoreCancelled = true)
-	public void customDamageEvent(CustomDamageEvent event) {
-		if (mPlugin.mEffectManager.hasEffect(event.getDamager(), Stasis.class) || mPlugin.mEffectManager.hasEffect(event.getDamaged(), Stasis.class)) {
-			event.setCancelled(true);
-			return;
-		}
-		if (event.getDamager() instanceof Player) {
-			// If the event has a valid spell, call onAbility
-			if (event.getSpell() != null) {
-				mPlugin.mTrackingManager.mPlayers.onAbility(mPlugin, (Player) event.getDamager(), event.getDamaged(), event);
-			}
-
-			if (event.getRegistered()) {
-				mAbilities.playerDealtCustomDamageEvent((Player) event.getDamager(), event);
-			} else {
-				mAbilities.playerDealtUnregisteredCustomDamageEvent((Player)event.getDamager(), event);
-			}
-		}
-	}
-
 	//  An Entity hit another Entity.
 	@EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
 	public void entityDamageByEntityEvent(EntityDamageByEntityEvent event) {
 		Entity damagee = event.getEntity();
 		Entity damager = event.getDamager();
-		if (mPlugin.mEffectManager.hasEffect(damagee, Stasis.class) || mPlugin.mEffectManager.hasEffect(damager, Stasis.class)) {
-			event.setCancelled(true);
-			return;
-		}
+
 		//  If the entity getting hurt is the player.
 		if (damagee instanceof Player) {
-			Player player = (Player)damagee;
-
 			if (damager instanceof LivingEntity) {
-				if (!mAbilities.playerDamagedByLivingEntityEvent(player, event)) {
-					event.setCancelled(true);
-				}
 				MetadataUtils.checkOnceThisTick(mPlugin, damagee, Constants.PLAYER_DAMAGE_NONCE_METAKEY);
 			} else if (damager instanceof Firework) {
 				//  If we're hit by a rocket, cancel the damage.
 				event.setCancelled(true);
-			} else if (damager instanceof Projectile) {
-				if (!mAbilities.playerDamagedByProjectileEvent(player, event)) {
-					damager.remove();
-					event.setCancelled(true);
-				}
 			}
+
+			// TODO: add a mob ability that does thorns based on DamageType instead of this janky check, which no longer works
 			if (event.getCause() == DamageCause.THORNS && MetadataUtils.happenedThisTick(mPlugin, damagee, "LastMagicUseTime", 0)) {
 				// Check that thorns isn't being caused by 'magic'; if it is, cancel the damage
 				event.setCancelled(true);
@@ -290,115 +241,40 @@ public class EntityListener implements Listener {
 			}
 		}
 
-		if (damager instanceof Player) {
-			Player player = (Player)damager;
-			if (damagee instanceof Player) {
-				if (!mAbilities.isPvPEnabled((Player)damagee) || !mAbilities.isPvPEnabled((Player)damager)) {
+		if (damager instanceof Player playerDamager) {
+			if (damagee instanceof Player playerDamagee) {
+				if (!mAbilities.isPvPEnabled(playerDamagee) || !mAbilities.isPvPEnabled(playerDamagee)) {
 					event.setCancelled(true);
 					return;
 				}
 			}
 
 			// Plot Security: If damagee is inside a plot but the player is in adventure, cancel.
+			if (playerDamager.getGameMode() == GameMode.ADVENTURE && ZoneUtils.isInPlot(damagee)) {
+				event.setCancelled(true);
+				return;
+			}
+		} else if (damager instanceof Projectile proj && proj.getShooter() instanceof Player player) {
+			// Plot Security: If damagee is inside a plot but the player is in adventure, cancel.
 			if (player.getGameMode() == GameMode.ADVENTURE && ZoneUtils.isInPlot(damagee)) {
+				damager.remove();
 				event.setCancelled(true);
 				return;
 			}
 
-			// Make sure to not trigger class abilities off Thorns
-			if (event.getCause() != DamageCause.THORNS) {
-				// Class damage-based abilities only apply to living entities that are not villagers
-				if (damagee instanceof LivingEntity && (damagee instanceof Player || EntityUtils.isHostileMob(damagee))) {
-					if (!mAbilities.livingEntityDamagedByPlayerEvent(player, event)) {
-						event.setCancelled(true);
-					}
-				}
-			}
-		} else if (damager instanceof Projectile) {
-			Projectile proj = (Projectile) damager;
-
-			ProjectileSource shooter = proj.getShooter();
-			if (shooter instanceof Player) {
-				Player player = (Player) shooter;
-
-				// Plot Security: If damagee is inside a plot but the player is in adventure, cancel.
-				if (player.getGameMode() == GameMode.ADVENTURE && ZoneUtils.isInPlot(damagee)) {
-					damager.remove();
-					event.setCancelled(true);
-					return;
-				}
-
-				if (damagee instanceof LivingEntity && !(damagee instanceof Villager)) {
-					if (damagee instanceof Player && !AbilityManager.getManager().isPvPEnabled((Player) damagee)) {
-						damager.remove();
-						event.setCancelled(true);
-						/*
-						 * If we don't return, then the side effects of LivingEntityShotByPlayerEvent() will
-						 * still occur (e.g. wither) despite the damage event being canceled.
-						 */
-						return;
-					}
-
-					// Call events if not a throwing knife
-					if (!(proj instanceof AbstractArrow && ThrowingKnife.isThrowingKnife((AbstractArrow) proj))) {
-						if (!mAbilities.livingEntityShotByPlayerEvent(player, proj, (LivingEntity) damagee, event)) {
-							damager.remove();
-							event.setCancelled(true);
-						}
-					}
-				}
-			}
-		} else if (damager instanceof Fox && damager.getScoreboardTags().contains(HuntingCompanion.FOX_TAG)) {
-			Fox fox = (Fox) damager;
-			if (fox.getTicksLived() <= HuntingCompanion.DURATION) {
-				World world = fox.getWorld();
-				if (fox.hasMetadata(HuntingCompanion.OWNER_METADATA_TAG) && damagee instanceof LivingEntity) {
-					Player owner = Bukkit.getPlayer(fox.getMetadata(HuntingCompanion.OWNER_METADATA_TAG).get(0).asString());
-					if (owner != null && owner.getWorld() == world) {
-						event.setCancelled(true);
-						double damage = event.getDamage();
-						event.setDamage(0);
-						HuntingCompanion huntingCompanion = AbilityManager.getManager().getPlayerAbility(owner, HuntingCompanion.class);
-						if (huntingCompanion == null || !huntingCompanion.isThisFox(fox)) {
-							fox.remove();
-						} else {
-							if (!EntityUtils.isElite(damagee)) {
-								List<Entity> stunnedMobs = huntingCompanion.mStunnedMobs;
-								if (!stunnedMobs.contains(damagee)) {
-									EntityUtils.applyStun(mPlugin, huntingCompanion.mStunTime, (LivingEntity) damagee);
-									stunnedMobs.add(damagee);
-								}
-							}
-							EntityUtils.damageEntity(mPlugin, (LivingEntity) damagee, damage, owner, MagicType.PHYSICAL, true, ClassAbility.HUNTING_COMPANION, false, false, true, false); //bypasses iframes, counts as damage from the player
-							world.playSound(fox.getLocation(), Sound.ENTITY_FOX_BITE, 1.5f, 1.0f);
-						}
-					} else {
-						fox.remove();
-					}
-				}
-			} else {
-				fox.remove();
+			if (damagee instanceof Player playerDamagee && !AbilityManager.getManager().isPvPEnabled(playerDamagee)) {
+				damager.remove();
+				event.setCancelled(true);
+				/*
+				 * If we don't return, then the side effects of LivingEntityShotByPlayerEvent() will
+				 * still occur (e.g. wither) despite the damage event being canceled.
+				 */
+				return;
 			}
 		}
 
-		if (damagee instanceof LivingEntity) {
-			LivingEntity mob = (LivingEntity) damagee;
+		if (damagee instanceof LivingEntity mob) {
 			event.setDamage(event.getDamage() * EntityUtils.vulnerabilityMult(mob));
-
-			if (damagee instanceof Player) {
-				// Damage triggering logic in PlayerInventory.java
-				mPlugin.mTrackingManager.mPlayers.onFatalHurt(mPlugin, (Player) damagee, event);
-
-				// Armor Piercing rescaling
-				double damage = event.getDamage();
-				if (damage > 16) {
-					// Set event damage to the amount of damage that armor piercing should account for
-					event.setDamage(4 * Math.log(damage) / Math.log(2));
-
-					// Multiply the "final" event damage by the amount reduced - this multiplier adjusts for armor piercing
-					event.setDamage(EntityUtils.getDamageApproximation(event, damage / event.getDamage(), true));
-				}
-			}
 		}
 	}
 
@@ -407,15 +283,13 @@ public class EntityListener implements Listener {
 	public void entityDamageEvent(EntityDamageEvent event) {
 		Entity damagee = event.getEntity();
 		DamageCause source = event.getCause();
-		if (mPlugin.mEffectManager.hasEffect(damagee, Stasis.class)) {
-			event.setCancelled(true);
-			return;
-		}
+
 		if ((source == DamageCause.BLOCK_EXPLOSION || source == DamageCause.ENTITY_EXPLOSION) &&
 			(damagee.getScoreboardTags().contains("ExplosionImmune") || damagee instanceof ItemFrame) || damagee instanceof Painting) {
 			event.setCancelled(true);
 			return;
 		}
+
 		if (damagee instanceof ItemFrame || damagee instanceof Painting) {
 			// Attempting to damage an item frame
 			if (event instanceof EntityDamageByEntityEvent) {
@@ -439,28 +313,16 @@ public class EntityListener implements Listener {
 			// No more processing needed for invulnerable item frames/paintings
 			return;
 		}
+
 		if (damagee instanceof Player) {
 			Player player = (Player)damagee;
 			World world = player.getWorld();
-			mPlugin.mTrackingManager.mPlayers.onHurt(mPlugin, player, event);
 
 			if (ZoneUtils.hasZoneProperty(player.getLocation(), ZoneProperty.RESIST_5)) {
 				if (DAMAGE_CAUSES_IGNORED_IN_TOWNS.contains(source)) {
 					event.setCancelled(true);
 					return;
 				}
-			}
-
-			if (!mAbilities.playerDamagedEvent(player, event)) {
-				event.setCancelled(true);
-			}
-
-			// If this is an EntityDamageByEntityEvent, we'll handle it in entityDamageByEntityEvent(),
-			// letting that decide whether to call mPlayers.onFatalHurt() on its own,
-			// since changes to damage need to run there before it decides
-			if (!(event instanceof EntityDamageByEntityEvent)) {
-				// Damage triggering logic in PlayerInventory.java
-				mPlugin.mTrackingManager.mPlayers.onFatalHurt(mPlugin, player, event);
 			}
 
 			if (source.equals(DamageCause.SUFFOCATION) && player.getVehicle() != null) {
@@ -503,36 +365,7 @@ public class EntityListener implements Listener {
 			if (damagee.getTicksLived() <= 100 && (source.equals(DamageCause.ENTITY_EXPLOSION) || source.equals(DamageCause.BLOCK_EXPLOSION))) {
 				event.setCancelled(true);
 			}
-		} else {
-			// Not damaging a player
-
-			// If this damage was caused by burning, check if the mob takes extra damage from Inferno
-			if (source.equals(DamageCause.FIRE_TICK) && (damagee instanceof LivingEntity)) {
-				Inferno.onFireTick((LivingEntity)damagee, event);
-			}
 		}
-	}
-
-	//changes the potion in the witches mainhand to throw
-	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
-	public void witchThrowPotionEvent(WitchThrowPotionEvent event) {
-		Witch witch = event.getEntity();
-		ItemStack potion = event.getPotion();
-		ItemStack heldPotion = witch.getEquipment().getItemInOffHand();
-		if (potion != null && potion.getType() == Material.SPLASH_POTION && heldPotion != null) {
-			potion = heldPotion;
-		}
-		if (witch.isDrinkingPotion()) { //different ideas: something about checking how long the witch is drinking and make this not work until then?
-			event.setCancelled(true);
-		}
-		event.setPotion(potion);
-
-		new BukkitRunnable() {
-			@Override
-			public void run() {
-				witch.getEquipment().setItemInMainHand(heldPotion);
-			}
-		}.runTaskLater(mPlugin, 1);
 	}
 
 	// Entity interacts with something
@@ -559,20 +392,17 @@ public class EntityListener implements Listener {
 	public void hangingBreakByEntityEvent(HangingBreakByEntityEvent event) {
 		Entity damager = event.getRemover();
 
-		if (damager instanceof Player) {
+		if (damager instanceof Player player) {
 			// If hurt by a player in adventure mode we want to prevent the break;
-			Player player = (Player)damager;
 
 			if (player.getGameMode() == GameMode.ADVENTURE) {
 				event.setCancelled(true);
 			}
-		} else if (damager instanceof Projectile) {
+		} else if (damager instanceof Projectile projectile) {
 			// If hurt by a projectile from a player in adventure mode.
-			Projectile projectile = (Projectile)damager;
 
 			ProjectileSource source = projectile.getShooter();
-			if (source instanceof Player) {
-				Player player = (Player)source;
+			if (source instanceof Player player) {
 				if (player.getGameMode() == GameMode.ADVENTURE) {
 					event.setCancelled(true);
 				}
@@ -583,22 +413,22 @@ public class EntityListener implements Listener {
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void entityResurrectEvent(EntityResurrectEvent event) {
 		Entity entity = event.getEntity();
-		if (entity instanceof Player) {
-			ItemStack mainhand = ((Player) entity).getInventory().getItemInMainHand();
-			ItemStack offhand = ((Player) entity).getInventory().getItemInOffHand();
+		if (entity instanceof Player player) {
+			ItemStack mainhand = player.getInventory().getItemInMainHand();
+			ItemStack offhand = player.getInventory().getItemInOffHand();
 			//If one hand has a shattered totem, do not resurrect
-			if (mainhand.getType() == Material.TOTEM_OF_UNDYING && ItemUtils.isItemShattered(mainhand) ||
-				offhand.getType() == Material.TOTEM_OF_UNDYING && ItemUtils.isItemShattered(offhand)) {
+			if (mainhand.getType() == Material.TOTEM_OF_UNDYING && ItemStatUtils.isShattered(mainhand) ||
+				offhand.getType() == Material.TOTEM_OF_UNDYING && ItemStatUtils.isShattered(offhand)) {
 				event.setCancelled(true);
 			}
 
 			//Updates custom enchants in inventory
-			InventoryUtils.scheduleDelayedEquipmentCheck(mPlugin, (Player) entity, event);
+			InventoryUtils.scheduleDelayedEquipmentCheck(mPlugin, player, event);
 
 			new BukkitRunnable() {
 				@Override
 				public void run() {
-					mPlugin.mAbilityManager.updatePlayerAbilities((Player)entity);
+					mPlugin.mAbilityManager.updatePlayerAbilities(player);
 				}
 			}.runTaskLater(mPlugin, 1);
 		}
@@ -617,12 +447,7 @@ public class EntityListener implements Listener {
 	public void projectileLaunchEvent(ProjectileLaunchEvent event) {
 		Projectile proj = event.getEntity();
 		ProjectileSource shooter = proj.getShooter();
-		if (shooter instanceof Entity && mPlugin.mEffectManager.hasEffect((Entity) shooter, Stasis.class)) {
-			event.setCancelled(true);
-			return;
-		}
-		if (shooter instanceof Player) {
-			Player player = (Player) shooter;
+		if (shooter instanceof Player player) {
 
 			/*
 			 * Too many bugs arise as a result of being able to shoot things from offhand.
@@ -632,10 +457,12 @@ public class EntityListener implements Listener {
 				return;
 			}
 
-			mPlugin.mTrackingManager.mPlayers.onLaunchProjectile(mPlugin, player, proj, event);
+			mPlugin.mItemStatManager.onLaunchProjectile(mPlugin, player, event, proj);
 			if (event.isCancelled()) {
 				return;
 			}
+
+			// TODO: change the infinity stuff to lowest priority listener, and cancel and re-call the event so that other listeners can catch the proper event
 
 			if (event.getEntityType() == EntityType.SNOWBALL) {
 				Snowball origBall = (Snowball)proj;
@@ -652,10 +479,6 @@ public class EntityListener implements Listener {
 
 					newBall.setShooter(player);
 					newBall.setVelocity(origBall.getVelocity());
-					// Set projectile attributes; don't need to do speed attribute since that's only used to calculate non-critical arrow damage
-					if (origBall.hasMetadata(AttributeProjectileDamage.DAMAGE_METAKEY)) {
-						newBall.setMetadata(AttributeProjectileDamage.DAMAGE_METAKEY, new FixedMetadataValue(mPlugin, origBall.getMetadata(AttributeProjectileDamage.DAMAGE_METAKEY).get(0).asDouble()));
-					}
 					player.getLocation().getWorld().playSound(player.getLocation(), Sound.ENTITY_SNOWBALL_THROW, 0.4f, 0.5f);
 					event.setCancelled(true);
 					return;
@@ -675,22 +498,19 @@ public class EntityListener implements Listener {
 
 					newPearl.setShooter(player);
 					newPearl.setVelocity(origPearl.getVelocity());
-					//Set Ranged Damage attribute
-					if (origPearl.hasMetadata(AttributeProjectileDamage.DAMAGE_METAKEY)) {
-						newPearl.setMetadata(AttributeProjectileDamage.DAMAGE_METAKEY, new FixedMetadataValue(mPlugin, origPearl.getMetadata(AttributeProjectileDamage.DAMAGE_METAKEY).get(0).asDouble()));
-					}
 					event.setCancelled(true);
 					return;
 				}
-			} else if (event.getEntityType() == EntityType.ARROW || event.getEntityType() == EntityType.SPECTRAL_ARROW) {
-				AbstractArrow arrow = (AbstractArrow) proj;
+			} else if (event.getEntity() instanceof AbstractArrow arrow) {
+				// Includes arrows and spectral arrows
+				// Tridents are handled in ThrowRate
 				if (!mAbilities.playerShotArrowEvent(player, arrow)) {
 					event.setCancelled(true);
 				}
 
 				MetadataUtils.checkOnceThisTick(mPlugin, player, Constants.PLAYER_BOW_SHOT_METAKEY);
 			} else if (event.getEntityType() == EntityType.SPLASH_POTION) {
-				ThrownPotion potion = (ThrownPotion)proj;
+				ThrownPotion potion = (ThrownPotion) proj;
 				if (potion.getItem() != null) {
 					ItemStack potionItem = potion.getItem();
 
@@ -728,15 +548,9 @@ public class EntityListener implements Listener {
 
 	@EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
 	public void potionSplashEvent(PotionSplashEvent event) {
-		if (event.getPotion().getShooter() != null
-				&& event.getPotion().getShooter() instanceof Entity
-				&& mPlugin.mEffectManager.hasEffect((Entity) event.getPotion().getShooter(), Stasis.class)) {
-			event.setCancelled(true);
-			return;
-		}
-
 		ThrownPotion potion = event.getPotion();
 		ProjectileSource source = potion.getShooter();
+
 		Collection<LivingEntity> affectedEntities = event.getAffectedEntities();
 		List<Player> affectedPlayers = new ArrayList<>();
 
@@ -752,8 +566,8 @@ public class EntityListener implements Listener {
 		}
 
 		/* If a player threw this potion, trigger applicable abilities (potentially cancelling or modifying the event!) */
-		if (source instanceof Player) {
-			if (!mAbilities.playerSplashPotionEvent((Player)source, affectedEntities, potion, event)) {
+		if (source instanceof Player player) {
+			if (!mAbilities.playerSplashPotionEvent(player, affectedEntities, potion, event)) {
 				event.setCancelled(true);
 				return;
 			}
@@ -765,22 +579,20 @@ public class EntityListener implements Listener {
 		 * Since the ability might modify the affectedEntities list while iterating, need to make a copy of it
 		 */
 		for (LivingEntity entity : new ArrayList<LivingEntity>(affectedEntities)) {
-			if (entity instanceof Player) {
-				affectedPlayers.add((Player)entity);
-				if (!mAbilities.playerSplashedByPotionEvent((Player)entity, affectedEntities, potion, event)) {
+			if (entity instanceof Player player) {
+				affectedPlayers.add(player);
+				if (!mAbilities.playerSplashedByPotionEvent(player, affectedEntities, potion, event)) {
 					event.setCancelled(true);
 					return;
 				}
 			}
 		}
 
-		// If event was not cancelled, track all player potion effects with the potion manager
-		if (!event.isCancelled()) {
-			for (LivingEntity entity : affectedEntities) {
-				if (entity instanceof Player) {
-					mPlugin.mPotionManager.addPotion((Player)entity, PotionID.APPLIED_POTION, PotionUtils.getEffects(potion.getItem()),
-					                                 event.getIntensity(entity));
-				}
+		// Track all player potion effects with the potion manager
+		for (LivingEntity entity : affectedEntities) {
+			if (entity instanceof Player player) {
+				mPlugin.mPotionManager.addPotion(player, PotionID.APPLIED_POTION, PotionUtils.getEffects(potion.getItem()),
+				                                 event.getIntensity(entity));
 			}
 		}
 
@@ -799,24 +611,17 @@ public class EntityListener implements Listener {
 					}, 1);
 				}
 			}
-			//does damage to user equal to witch's attack statistic
-			if (source instanceof Witch) {
-				AttributeInstance damage = ((Witch) source).getAttribute(Attribute.GENERIC_ATTACK_DAMAGE);
-				double dam = 1.0;
-				if (damage != null) {
-					dam = Math.max(dam, damage.getBaseValue());
-				}
-				BossUtils.bossDamage((Witch) source, p, dam);
-			}
 		}
 	}
 
 	// Entity ran into the effect cloud.
 	@EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
 	public void areaEffectCloudApplyEvent(AreaEffectCloudApplyEvent event) {
-		event.getAffectedEntities().removeIf((l) -> mPlugin.mEffectManager.hasEffect(l, Stasis.class));
 		AreaEffectCloud cloud = event.getEntity();
 		Collection<LivingEntity> affectedEntities = event.getAffectedEntities();
+
+		// Don't apply to players in stasis
+		affectedEntities.removeIf(l -> StasisListener.isInStasis(l));
 
 		// Never apply effects to villagers
 		affectedEntities.removeIf(entity -> (entity instanceof Villager));
@@ -871,13 +676,6 @@ public class EntityListener implements Listener {
 	public void entityExplodeEvent(EntityExplodeEvent event) {
 		// Cancel the event immediately if within a no-explosions zone
 		if (ZoneUtils.hasZoneProperty(event.getLocation(), ZoneProperty.NO_EXPLOSIONS)) {
-			event.setCancelled(true);
-			return;
-		}
-
-		// Cancel the event if from a confused creeper, damage still applies it seems
-		Entity entity = event.getEntity();
-		if (entity instanceof Creeper && EntityUtils.isConfused(event.getEntity())) {
 			event.setCancelled(true);
 			return;
 		}
@@ -959,11 +757,9 @@ public class EntityListener implements Listener {
 		Entity entity = event.getHitEntity();
 		Projectile proj = event.getEntity();
 		ProjectileSource source = proj.getShooter();
-		if (source instanceof Entity && mPlugin.mEffectManager.hasEffect((Entity) source, Stasis.class)) {
-			event.setCancelled(true);
-			return;
-		}
-		if (entity instanceof Player player) {
+
+		if (entity != null && entity instanceof Player) {
+			Player player = (Player) entity;
 			mAbilities.playerHitByProjectileEvent(player, event);
 
 			// Tipped Arrow shenanigans
@@ -989,14 +785,6 @@ public class EntityListener implements Listener {
 				if (effects != null) {
 					mPlugin.mPotionManager.addPotion(player, PotionID.APPLIED_POTION, effects);
 				}
-			}
-		}
-
-		if (entity instanceof LivingEntity hitEntity && !(proj instanceof ThrownPotion)) {
-			if (hitEntity.getFireTicks() > 0) {
-				// Save old fireticks, the fire ticks will be managed in Inferno.onShootAttack(), which triggers for every projectile attack.
-				hitEntity.setMetadata(Inferno.OLD_FIRE_TICKS_METAKEY, new FixedMetadataValue(mPlugin, hitEntity.getFireTicks()));
-				hitEntity.setFireTicks(1);
 			}
 		}
 
@@ -1029,8 +817,7 @@ public class EntityListener implements Listener {
 		Entity entity = event.getEntity();
 		LivingEntity target = event.getTarget();
 
-		if (entity instanceof Creature && (EntityUtils.isStunned(entity)
-			|| EntityUtils.isConfused(entity))) {
+		if (entity instanceof Creature && (EntityUtils.isStunned(entity))) {
 			event.setCancelled(true);
 			return;
 		}
@@ -1045,22 +832,14 @@ public class EntityListener implements Listener {
 					mAbilities.entityTargetLivingEntityEvent(player, event);
 				}
 			}
-
-			//Disallows mobs targeting fox companion
-			if (target instanceof Fox && target.getScoreboardTags().contains(HuntingCompanion.FOX_TAG)) {
-				event.setCancelled(true);
-			}
-
-			//Disallows fox companion targeting players or some mobs it shouldn't
-			if (entity instanceof Fox && entity.getScoreboardTags().contains(HuntingCompanion.FOX_TAG) && (target instanceof Player || target.getScoreboardTags().contains(AbilityUtils.IGNORE_TAG) || !EntityUtils.isHostileMob(entity))) {
-				event.setCancelled(true);
-			}
 		}
 	}
 
 	@EventHandler(ignoreCancelled = true)
 	public void potionEffectApplyEvent(PotionEffectApplyEvent event) {
 		LivingEntity applied = event.getApplied();
+
+		PotionEffect pe = event.getEffect();
 
 		LivingEntity applier;
 		if (event.getApplier() instanceof Projectile) {
@@ -1076,10 +855,7 @@ public class EntityListener implements Listener {
 		} else {
 			return;
 		}
-		if (mPlugin.mEffectManager.hasEffect(applier, Stasis.class)) {
-			event.setCancelled(true);
-			return;
-		}
+
 		/* Mark as applying slowness so arcane strike won't activate this tick */
 		if (applier instanceof Player && !applied.hasPotionEffect(PotionEffectType.SLOW)
 		    && event.getEffect().getType() == PotionEffectType.SLOW) {

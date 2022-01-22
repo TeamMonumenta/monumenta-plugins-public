@@ -12,8 +12,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.inventory.ItemStack;
 
-import com.playmonumenta.plugins.utils.ItemUtils;
-
 public class TridentListener implements Listener {
 
 	@EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
@@ -47,10 +45,8 @@ public class TridentListener implements Listener {
 
 			//Puts the item back into inventory slot so that it stays in the slot
 			if (mainhand.equals(item)) {
-				ItemUtils.damageItemWithUnbreaking(item, 1, false);
 				player.getInventory().setItemInMainHand(item);
 			} else if (offhand.equals(item)) {
-				ItemUtils.damageItemWithUnbreaking(item, 1, false);
 				player.getInventory().setItemInOffHand(item);
 			}
 		}

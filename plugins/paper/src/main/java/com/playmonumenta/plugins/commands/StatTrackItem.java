@@ -1,26 +1,10 @@
 package com.playmonumenta.plugins.commands;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.bukkit.Color;
-import org.bukkit.FireworkEffect;
-import org.bukkit.Location;
-import org.bukkit.command.CommandSender;
-import org.bukkit.entity.EntityType;
-import org.bukkit.entity.Firework;
-import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.FireworkMeta;
-import org.bukkit.scheduler.BukkitRunnable;
-
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.enchantments.StatTrack.StatTrackOptions;
-import com.playmonumenta.plugins.enchantments.StatTrackManager;
+import com.playmonumenta.plugins.itemstats.infusions.StatTrackManager;
 import com.playmonumenta.plugins.player.PlayerData;
-import com.playmonumenta.plugins.utils.CommandUtils;
-import com.playmonumenta.plugins.utils.InventoryUtils;
-
+import com.playmonumenta.plugins.utils.ItemStatUtils;
+import com.playmonumenta.plugins.utils.ItemStatUtils.InfusionType;
 import dev.jorel.commandapi.CommandAPI;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.CommandPermission;
@@ -30,8 +14,18 @@ import dev.jorel.commandapi.arguments.EntitySelectorArgument.EntitySelector;
 import dev.jorel.commandapi.arguments.IntegerArgument;
 import dev.jorel.commandapi.arguments.MultiLiteralArgument;
 import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
-import net.md_5.bungee.api.ChatColor;
+import org.bukkit.Color;
+import org.bukkit.FireworkEffect;
+import org.bukkit.Location;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Firework;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.FireworkMeta;
+import org.bukkit.scheduler.BukkitRunnable;
 
+import java.util.ArrayList;
+import java.util.List;
 
 
 /*
@@ -48,8 +42,8 @@ public class StatTrackItem extends GenericCommand {
 		CommandPermission perms = CommandPermission.fromString("monumenta.command.stattrackhelditem");
 
 		List<String> labels = new ArrayList<>();
-		for (StatTrackOptions stat : StatTrackOptions.values()) {
-			labels.add(stat.getLabel());
+		for (InfusionType stat : InfusionType.STAT_TRACK_OPTIONS) {
+			labels.add(stat.getName().replace(" ", ""));
 		}
 
 		Argument selectionArg = new MultiLiteralArgument(labels.toArray(new String[labels.size()]));
@@ -61,11 +55,11 @@ public class StatTrackItem extends GenericCommand {
 			.withPermission(perms)
 			.withArguments(arguments)
 			.executes((sender, args) -> {
-				StatTrackOptions selection = StatTrackOptions.getInfusionSelection((String) args[1]);
+				InfusionType selection = InfusionType.getInfusionType((String) args[1]);
 				if (selection == null) {
 					CommandAPI.fail("Invalid stat selection; how did we get here?");
 				}
-				run(sender, (Player) args[0], selection);
+				run((Player) args[0], selection);
 			})
 			.register();
 
@@ -103,7 +97,7 @@ public class StatTrackItem extends GenericCommand {
 	 * @param option the stat track enchant option to infuse with
 	 * @throws WrapperCommandSyntaxException
 	 */
-	private static void run(CommandSender sender, Player player, StatTrackOptions option) throws WrapperCommandSyntaxException {
+	private static void run(Player player, InfusionType option) throws WrapperCommandSyntaxException {
 
 		//Check to see if the player is a patron
 		if (
@@ -114,19 +108,15 @@ public class StatTrackItem extends GenericCommand {
 		}
 		//Check to see if the item in hand is already infused
 		ItemStack is = player.getInventory().getItemInMainHand();
-		if (InventoryUtils.getCustomEnchantLevel(is, ChatColor.GRAY + "Stat Track", false) > 0) {
+		if (ItemStatUtils.getInfusionLevel(is, InfusionType.STAT_TRACK) > 0) {
 			player.sendMessage("This item is already infused with stat tracking!");
 			return;
 		}
 		//Add the chosen stat tracking enchant to the item
-		try {
-			CommandUtils.enchantify(sender, player, "Stat Track", "Tracked by");
-			CommandUtils.enchantify(sender, player, ChatColor.RED + option.getEnchantName() + ": 0");
-			animate(player);
-		} catch (WrapperCommandSyntaxException ex) {
-			player.sendMessage("Failed to add stat track: " + (ex.getException() != null ? ex.getException().getRawMessage() : "unexpected error"));
-			throw ex;
-		}
+		ItemStatUtils.addInfusion(is, InfusionType.STAT_TRACK, 1, player.getUniqueId());
+		ItemStatUtils.addInfusion(is, option, 1, player.getUniqueId());
+		ItemStatUtils.generateItemStats(is);
+		animate(player);
 	}
 
 	/**
@@ -139,12 +129,12 @@ public class StatTrackItem extends GenericCommand {
 		//Check to see if the item in hand is already infused
 		ItemStack is = player.getInventory().getItemInMainHand();
 
-		if (InventoryUtils.getCustomEnchantLevel(is, ChatColor.GRAY + "Stat Track", false) <= 0) {
+		if (ItemStatUtils.getInfusionLevel(is, ItemStatUtils.InfusionType.STAT_TRACK) <= 0) {
 			player.sendMessage("This item is not infused with stat tracking!");
 			return;
 		}
 		//Update the counter of the item
-		StatTrackOptions type = StatTrackManager.getTrackingType(is);
+		InfusionType type = StatTrackManager.getTrackingType(is);
 		if (type == null) {
 			player.sendMessage("Could not find stat track infusion type!");
 			return;
@@ -162,32 +152,23 @@ public class StatTrackItem extends GenericCommand {
 	private static void runRemove(Player player) {
 		//Check to see if the item in hand is already infused
 		ItemStack is = player.getInventory().getItemInMainHand();
-		if (InventoryUtils.getCustomEnchantLevel(is, ChatColor.GRAY + "Stat Track", false) <= 0) {
-			player.sendMessage("This item is not infused with stat tracking!");
-			return;
-		}
-		StatTrackOptions type = StatTrackManager.getTrackingType(is);
+		InfusionType type = StatTrackManager.getTrackingType(is);
 		if (type == null) {
 			player.sendMessage("Could not find stat track infusion type!");
-			return;
-		}
-
-		List<String> lore = is.getLore();
-		if (lore != null) {
-			for (String line : lore) {
-				if (line.contains("Tracked by " + player.getName())) {
-					//Remove the lore from the item
-					InventoryUtils.removeCustomEnchant(is, ChatColor.RED + type.getEnchantName() + ": ");
-					InventoryUtils.removeCustomEnchant(is, ChatColor.GRAY + "Stat Track");
-					InventoryUtils.removeCustomEnchant(is, "Tracked by");
-					player.sendMessage("Removed Stat Tracking from your item!");
-					animate(player);
-					return;
-				}
+		} else if (ItemStatUtils.getInfusionLevel(is, ItemStatUtils.InfusionType.STAT_TRACK) <= 0) {
+			player.sendMessage("This item is not infused with stat tracking!");
+		} else if (StatTrackManager.isPlayersItem(is, player)) {
+			ItemStatUtils.removeInfusion(is, ItemStatUtils.InfusionType.STAT_TRACK);
+			for (InfusionType stat : InfusionType.STAT_TRACK_OPTIONS) {
+				ItemStatUtils.removeInfusion(is, stat);
 			}
-		}
+			ItemStatUtils.generateItemStats(is);
+			player.sendMessage("Removed Stat Tracking from your item!");
+			animate(player);
 
-		player.sendMessage("You cannot remove stat track from an item not tracked by you!");
+		} else {
+			player.sendMessage("You cannot remove stat track from an item not tracked by you!");
+		}
 	}
 
 	//Firework effect for stat infusion

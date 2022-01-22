@@ -1,8 +1,11 @@
 package com.playmonumenta.plugins.bosses.spells.rkitxet;
 
-import java.util.AbstractMap;
-import java.util.Arrays;
-
+import com.playmonumenta.plugins.bosses.bosses.RKitxet;
+import com.playmonumenta.plugins.bosses.spells.SpellBaseSlam;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.ParticleUtils;
+import com.playmonumenta.plugins.utils.ParticleUtils.SpawnParticleAction;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -14,11 +17,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.util.Vector;
 
-import com.playmonumenta.plugins.bosses.bosses.RKitxet;
-import com.playmonumenta.plugins.bosses.spells.SpellBaseSlam;
-import com.playmonumenta.plugins.utils.BossUtils;
-import com.playmonumenta.plugins.utils.ParticleUtils;
-import com.playmonumenta.plugins.utils.ParticleUtils.SpawnParticleAction;
+import java.util.AbstractMap;
+import java.util.Arrays;
 
 public class SpellForsakenLeap extends SpellBaseSlam {
 
@@ -61,7 +61,7 @@ public class SpellForsakenLeap extends SpellBaseSlam {
 					world.spawnParticle(Particle.EXPLOSION_NORMAL, loc, 20, 0F, 0F, 0F, 0.3F);
 					world.spawnParticle(Particle.FLAME, loc, 3 * (int)(DAMAGE_RADIUS * DAMAGE_RADIUS), DAMAGE_RADIUS, 0.25f, DAMAGE_RADIUS, 0);
 					if (player != null) {
-						BossUtils.bossDamage(launcher, player, DAMAGE, loc, "Forsaken Leap");
+						BossUtils.blockableDamage(launcher, player, DamageType.BLAST, DAMAGE, "Forsaken Leap", loc);
 					}
 					});
 

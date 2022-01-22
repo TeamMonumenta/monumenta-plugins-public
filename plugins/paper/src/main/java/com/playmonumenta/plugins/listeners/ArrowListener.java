@@ -1,8 +1,5 @@
 package com.playmonumenta.plugins.listeners;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.bukkit.entity.AbstractArrow;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -14,6 +11,9 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class ArrowListener implements Listener {
 

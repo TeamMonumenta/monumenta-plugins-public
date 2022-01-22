@@ -1,10 +1,9 @@
 package com.playmonumenta.plugins.depths.abilities.aspects;
 
-import org.bukkit.Material;
-import org.bukkit.entity.Player;
-
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.depths.abilities.WeaponAspectDepthsAbility;
+import org.bukkit.Material;
+import org.bukkit.entity.Player;
 
 public class RandomAspect extends WeaponAspectDepthsAbility {
 

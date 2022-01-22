@@ -1,15 +1,14 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
-import org.bukkit.Location;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.plugin.Plugin;
-
 import com.playmonumenta.plugins.bosses.parameters.BossParam;
 import com.playmonumenta.plugins.bosses.parameters.EffectsList;
 import com.playmonumenta.plugins.bosses.parameters.ParticlesList;
 import com.playmonumenta.plugins.bosses.parameters.SoundsList;
+import com.playmonumenta.plugins.events.DamageEvent;
+import org.bukkit.Location;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
+import org.bukkit.plugin.Plugin;
 
 public class OnHitBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_onhit";
@@ -43,17 +42,16 @@ public class OnHitBoss extends BossAbilityGroup {
 	}
 
 	@Override
-	public void bossDamagedEntity(EntityDamageByEntityEvent event) {
+	public void onDamage(DamageEvent event, LivingEntity damagee) {
 		if (mParams.CAN_BLOCK) {
-			if (event.getFinalDamage() == 0) {
+			if (event.getDamage() == 0) {
 				// Attack was blocked
 				return;
 			}
 		}
 
-		LivingEntity target = (LivingEntity) event.getEntity();
-		if (target instanceof Player player) {
-			Location loc = target.getLocation().add(0, 1, 0);
+		if (damagee instanceof Player player) {
+			Location loc = damagee.getLocation().add(0, 1, 0);
 
 			mParams.EFFECTS.apply(player, mBoss);
 

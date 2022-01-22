@@ -6,8 +6,6 @@ import org.bukkit.Sound;
 import org.bukkit.entity.AbstractArrow;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.entity.Projectile;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.bosses.bosses.AntiRangeChivalrousBoss;
@@ -16,6 +14,8 @@ import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
 import com.playmonumenta.plugins.effects.Bleed;
+import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 
 import net.md_5.bungee.api.ChatColor;
 
@@ -35,13 +35,13 @@ public class FocusedCombos extends DepthsAbility {
 	}
 
 	@Override
-	public boolean livingEntityShotByPlayerEvent(Projectile proj, LivingEntity le, EntityDamageByEntityEvent event) {
-		if (mPlayer != null && proj instanceof AbstractArrow && ((AbstractArrow) proj).isCritical() && !proj.hasMetadata(RapidFire.META_DATA_TAG)) {
+	public void onDamage(DamageEvent event, LivingEntity enemy) {
+		if (event.getDamager() instanceof AbstractArrow proj && event.getType() == DamageType.PROJECTILE && proj != null && proj.isCritical()) {
 			mComboCount++;
 
 			if (mComboCount >= 3) {
 				mComboCount = 0;
-				mPlugin.mEffectManager.addEffect(le, ABILITY_NAME, new Bleed(BLEED_DURATION, BLEED_LEVEL, mPlugin));
+				mPlugin.mEffectManager.addEffect(enemy, ABILITY_NAME, new Bleed(BLEED_DURATION, BLEED_LEVEL, mPlugin));
 				event.setDamage(event.getDamage() * DAMAGE[mRarity - 1]);
 
 				Location playerLoc = mPlayer.getLocation();
@@ -49,8 +49,6 @@ public class FocusedCombos extends DepthsAbility {
 				mPlayer.playSound(playerLoc, Sound.BLOCK_ANVIL_PLACE, 0.4f, 1.75f);
 			}
 		}
-
-		return true;
 	}
 
 	@Override

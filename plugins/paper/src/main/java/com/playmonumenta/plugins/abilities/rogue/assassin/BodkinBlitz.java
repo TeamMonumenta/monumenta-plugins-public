@@ -7,11 +7,10 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.block.Block;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
@@ -25,8 +24,11 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.MultipleChargeAbility;
 import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.utils.AbilityUtils;
+import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
@@ -35,8 +37,8 @@ public class BodkinBlitz extends MultipleChargeAbility {
 
 	private static final int BODKINBLITZ_1_COOLDOWN = 20 * 20;
 	private static final int BODKINBLITZ_2_COOLDOWN = 20 * 18;
-	private static final int BODKINBLITZ_1_BONUS_DMG = 10;
-	private static final int BODKINBLITZ_2_BONUS_DMG = 20;
+	private static final int BODKINBLITZ_1_BONUS_DMG = 7;
+	private static final int BODKINBLITZ_2_BONUS_DMG = 14;
 	private static final int BODKINBLITZ_1_STEALTH_DURATION = 20;
 	private static final int BODKINBLITZ_2_STEALTH_DURATION = 30;
 	private static final int BODKINBLITZ_1_STEP = 25;
@@ -55,8 +57,8 @@ public class BodkinBlitz extends MultipleChargeAbility {
 		mInfo.mLinkedSpell = ClassAbility.BODKIN_BLITZ;
 		mInfo.mScoreboardId = "BodkinBlitz";
 		mInfo.mShorthandName = "BB";
-		mInfo.mDescriptions.add("Sneak right click while holding two swords to teleport 10 blocks forwards. Gain 1 second of Stealth upon teleporting. Upon teleporting, your next melee attack deals 10 bonus damage if your target is not focused on you. This ability cannot be used in safe zones. Cooldown: 20s. Charges: 2.");
-		mInfo.mDescriptions.add("Range increased to 14 blocks, Stealth increased to 1.5 seconds. Upon teleporting, your next melee attack deals 20 bonus damage if your target is not focused on you. Cooldown: 18s.");
+		mInfo.mDescriptions.add("Sneak right click while holding two swords to teleport 10 blocks forwards. Gain 1 second of Stealth upon teleporting. Upon teleporting, your next melee attack deals 7 bonus damage if your target is not focused on you. This ability cannot be used in safe zones. Cooldown: 20s. Charges: 2.");
+		mInfo.mDescriptions.add("Range increased to 14 blocks, Stealth increased to 1.5 seconds. Upon teleporting, your next melee attack deals 14 bonus damage if your target is not focused on you. Cooldown: 18s.");
 		mInfo.mCooldown = getAbilityScore() == 1 ? BODKINBLITZ_1_COOLDOWN : BODKINBLITZ_2_COOLDOWN;
 		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
 		mInfo.mIgnoreCooldown = true;
@@ -69,8 +71,8 @@ public class BodkinBlitz extends MultipleChargeAbility {
 
 	@Override
 	public void cast(Action action) {
-		if (mTeleporting || mPlayer == null || !mPlayer.isSneaking() || ZoneUtils.hasZoneProperty(mPlayer, ZoneProperty.NO_MOBILITY_ABILITIES)
-				|| !InventoryUtils.rogueTriggerCheck(mPlayer.getInventory().getItemInMainHand(), mPlayer.getInventory().getItemInOffHand())) {
+		if (mPlayer == null || mTeleporting || !mPlayer.isSneaking() || ZoneUtils.hasZoneProperty(mPlayer, ZoneProperty.NO_MOBILITY_ABILITIES)
+				|| !InventoryUtils.rogueTriggerCheck(mPlugin, mPlayer)) {
 			return;
 		}
 
@@ -225,24 +227,26 @@ public class BodkinBlitz extends MultipleChargeAbility {
 	}
 
 	@Override
-	public boolean livingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
-		if (mPlayer != null && mRunnable != null && event.getCause() == DamageCause.ENTITY_ATTACK) {
+	public void onDamage(DamageEvent event, LivingEntity enemy) {
+		if (mRunnable != null && (event.getType() == DamageType.MELEE || event.getType() == DamageType.MELEE_SKILL || event.getType() == DamageType.MELEE_ENCH)) {
 			mTicks = 0;
 			mRunnable.cancel();
 			mRunnable = null;
-			if (event.getEntity() instanceof Mob mob && (mob.getTarget() == null || !mob.getTarget().getUniqueId().equals(mPlayer.getUniqueId()))) {
-				Location entityLoc = mob.getLocation().clone().add(0, 1, 0);
+			if (enemy instanceof Mob) {
+				Mob m = (Mob) enemy;
+				if (m.getTarget() == null || !m.getTarget().getUniqueId().equals(mPlayer.getUniqueId())) {
+					Location entityLoc = m.getLocation().clone().add(0, 1, 0);
 
-				World world = entityLoc.getWorld();
-				world.playSound(entityLoc, Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, 0.5f, 2f);
-				world.playSound(entityLoc, Sound.BLOCK_ANVIL_LAND, 0.8f, 2f);
-				world.spawnParticle(Particle.FALLING_DUST, entityLoc, 35, 0.35, 0.5, 0.35, Bukkit.createBlockData("gray_concrete"));
-				world.spawnParticle(Particle.BLOCK_CRACK, entityLoc, 20, 0.25, 0.25, 0.25, 1, Bukkit.createBlockData("redstone_block"));
+					World world = entityLoc.getWorld();
+					world.playSound(entityLoc, Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, 0.5f, 2f);
+					world.playSound(entityLoc, Sound.BLOCK_ANVIL_LAND, 0.8f, 2f);
+					world.spawnParticle(Particle.FALLING_DUST, entityLoc, 35, 0.35, 0.5, 0.35, Bukkit.createBlockData("gray_concrete"));
+					world.spawnParticle(Particle.BLOCK_CRACK, entityLoc, 20, 0.25, 0.25, 0.25, 1, Bukkit.createBlockData("redstone_block"));
 
-				event.setDamage(event.getDamage() + mBonusDmg);
+					DamageUtils.damage(mPlayer, m, DamageType.MELEE_SKILL, mBonusDmg, mInfo.mLinkedSpell, true);
+				}
 			}
 		}
-		return true;
 	}
 
 }

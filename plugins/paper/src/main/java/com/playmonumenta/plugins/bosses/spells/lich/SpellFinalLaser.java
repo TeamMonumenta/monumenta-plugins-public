@@ -1,10 +1,12 @@
 package com.playmonumenta.plugins.bosses.spells.lich;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.EnumSet;
-import java.util.List;
-
+import com.playmonumenta.plugins.bosses.bosses.Lich;
+import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.player.PartialParticle;
+import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.LocationUtils;
+import com.playmonumenta.plugins.utils.MovementUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -22,12 +24,10 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
-import com.playmonumenta.plugins.bosses.bosses.Lich;
-import com.playmonumenta.plugins.bosses.spells.Spell;
-import com.playmonumenta.plugins.player.PartialParticle;
-import com.playmonumenta.plugins.utils.BossUtils;
-import com.playmonumenta.plugins.utils.LocationUtils;
-import com.playmonumenta.plugins.utils.MovementUtils;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.EnumSet;
+import java.util.List;
 
 public class SpellFinalLaser extends Spell {
 
@@ -159,8 +159,8 @@ public class SpellFinalLaser extends Spell {
 					mExpL.location(movingLaserBox.getCenter().toLocation(world)).spawnAsBoss();
 					breakBlocks(movingLaserBox.getCenter().toLocation(world));
 					if (movingLaserBox.overlaps(target.getBoundingBox())) {
-						BossUtils.bossDamage(mBoss, target, 60, null, "Death Laser");
-						MovementUtils.knockAway(mCenter, target, 3.2f);
+						BossUtils.blockableDamage(mBoss, target, DamageType.MAGIC, 55, "Death Laser", null);
+						MovementUtils.knockAway(mCenter, target, 3.2f, false);
 						Lich.cursePlayer(mPlugin, target);
 					}
 					this.cancel();

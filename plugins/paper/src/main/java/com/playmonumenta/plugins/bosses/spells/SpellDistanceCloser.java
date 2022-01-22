@@ -1,10 +1,9 @@
 package com.playmonumenta.plugins.bosses.spells;
 
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Mob;
-
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.effects.PercentSpeed;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Mob;
 
 public class SpellDistanceCloser extends Spell {
 

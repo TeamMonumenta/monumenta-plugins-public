@@ -1,8 +1,18 @@
 package com.playmonumenta.plugins.bosses.spells.lich;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import com.playmonumenta.plugins.bosses.ChargeUpManager;
+import com.playmonumenta.plugins.bosses.bosses.Lich;
+import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.player.PPGroundCircle;
+import com.playmonumenta.plugins.player.PartialParticle;
+import com.playmonumenta.plugins.utils.AbilityUtils;
+import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.DamageUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.LocationUtils;
+import com.playmonumenta.plugins.utils.MovementUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -25,17 +35,8 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
-import com.playmonumenta.plugins.bosses.ChargeUpManager;
-import com.playmonumenta.plugins.bosses.bosses.Lich;
-import com.playmonumenta.plugins.bosses.spells.Spell;
-import com.playmonumenta.plugins.player.PPGroundCircle;
-import com.playmonumenta.plugins.player.PartialParticle;
-import com.playmonumenta.plugins.utils.AbilityUtils;
-import com.playmonumenta.plugins.utils.BossUtils;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.FastUtils;
-import com.playmonumenta.plugins.utils.LocationUtils;
-import com.playmonumenta.plugins.utils.MovementUtils;
+import java.util.ArrayList;
+import java.util.List;
 
 public class SpellSoulShackle extends Spell {
 
@@ -123,7 +124,7 @@ public class SpellSoulShackle extends Spell {
 			p.sendMessage(ChatColor.AQUA
 	                   + "You got chained by Hekawt! Don't move outside of the ring!");
 
-			BossUtils.bossDamage(mBoss, p, 35, null, "Soul Shackle");
+			DamageUtils.damage(mBoss, p, DamageType.MAGIC, 30, null, false, true, "Soul Shackle");
 			AbilityUtils.silencePlayer(p, 5 * 20);
 			mRod.location(pLoc).spawnAsBoss();
 			world.playSound(pLoc, Sound.ENTITY_ZOMBIE_VILLAGER_CURE, 0.7f, 0.5f);
@@ -164,7 +165,7 @@ public class SpellSoulShackle extends Spell {
 							p.sendMessage(ChatColor.AQUA + "I shouldn't leave this ring.");
 							world.playSound(p.getLocation(), Sound.BLOCK_END_PORTAL_FRAME_FILL, 2.0f, 1.0f);
 							BossUtils.bossDamagePercent(mBoss, p, 0.15, null, "Soul Shackle");
-							MovementUtils.knockAway(pCheckLoc, p, -0.75f);
+							MovementUtils.knockAway(pCheckLoc, p, -0.75f, false);
 						}
 
 						Location endLoc = pLoc.clone();

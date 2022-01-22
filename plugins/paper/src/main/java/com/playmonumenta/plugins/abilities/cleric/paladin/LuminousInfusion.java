@@ -1,7 +1,18 @@
 package com.playmonumenta.plugins.abilities.cleric.paladin;
 
-import java.util.List;
-
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.abilities.AbilityManager;
+import com.playmonumenta.plugins.abilities.AbilityTrigger;
+import com.playmonumenta.plugins.abilities.cleric.Crusade;
+import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.utils.DamageUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.MessagingUtils;
+import com.playmonumenta.plugins.utils.MovementUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -10,26 +21,12 @@ import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.entity.Projectile;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.abilities.AbilityManager;
-import com.playmonumenta.plugins.abilities.AbilityTrigger;
-import com.playmonumenta.plugins.abilities.cleric.Crusade;
-import com.playmonumenta.plugins.classes.ClassAbility;
-import com.playmonumenta.plugins.classes.magic.MagicType;
-import com.playmonumenta.plugins.events.CustomDamageEvent;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.MessagingUtils;
-import com.playmonumenta.plugins.utils.MovementUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
+import java.util.List;
 
 
 public class LuminousInfusion extends Ability {
@@ -58,7 +55,7 @@ public class LuminousInfusion extends Ability {
 		mInfo.mLinkedSpell = ClassAbility.LUMINOUS_INFUSION;
 		mInfo.mScoreboardId = "LuminousInfusion";
 		mInfo.mShorthandName = "LI";
-		mInfo.mDescriptions.add("While sneaking, pressing the swap key charges your hands with holy light. The next time you damage an undead enemy, your attack is infused with explosive power, dealing 20 holy damage to it and all enemies in a 4-block cube around it, or 10 against non-undead, and knocking other enemies away from it. Swapping hands no longer does its vanilla function. Cooldown: 14s.");
+		mInfo.mDescriptions.add("While sneaking, pressing the swap key charges your hands with holy light. The next time you damage an undead enemy, your attack is infused with explosive power, dealing 20 magic damage to it and all enemies in a 4-block cube around it, or 10 against non-undead, and knocking other enemies away from it. Cooldown: 14s.");
 		mInfo.mDescriptions.add("Your melee attacks now passively deal 20% holy damage to undead enemies, and Divine Justice now passively deals 20% more total damage. Damaging an undead enemy now passively sets it on fire for 3s. That holy damage ignores iframes.");
 		mInfo.mCooldown = COOLDOWN;
 		mInfo.mIgnoreCooldown = true;
@@ -115,21 +112,23 @@ public class LuminousInfusion extends Ability {
 	}
 
 	@Override
-	public boolean livingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
-		//TODO pass in casted entities for events like these
-		LivingEntity enemy = (LivingEntity)event.getEntity();
+	public void onDamage(DamageEvent event, LivingEntity enemy) {
+		// Divine Justice integration
+		if (mDoMultiplierAndFire && event.getAbility() == ClassAbility.DIVINE_JUSTICE) {
+				double originalDamage = event.getDamage();
+				mLastPassiveDJDamage = originalDamage * DAMAGE_MULTIPLIER_2;
+				event.setDamage(originalDamage + mLastPassiveDJDamage);
+				return;
+		}
+
 		boolean enemyTriggersAbilities = Crusade.enemyTriggersAbilities(enemy, mCrusade);
 
 		// Do explosion first, then bypass iframes for passive
 		if (mActive && enemyTriggersAbilities) {
-			execute(enemy, event);
+			execute(enemy);
 		}
 
-		if (
-			mDoMultiplierAndFire
-			&& event.getCause() == DamageCause.ENTITY_ATTACK
-			&& enemyTriggersAbilities
-		) {
+		if (mDoMultiplierAndFire && (event.getType() == DamageType.MELEE || event.getType() == DamageType.PROJECTILE || event.getType() == DamageType.MELEE_ENCH) && enemyTriggersAbilities) {
 			EntityUtils.applyFire(Plugin.getInstance(), FIRE_DURATION_2, enemy, mPlayer);
 
 			double originalDamage = event.getDamage();
@@ -138,53 +137,14 @@ public class LuminousInfusion extends Ability {
 			// the custom damage event will fire including this raw damage,
 			// then event processing runs for it from there
 			mLastPassiveMeleeDamage = originalDamage * DAMAGE_MULTIPLIER_2;
-			EntityUtils.damageEntity(
-				Plugin.getInstance(),
-				enemy,
-				mLastPassiveMeleeDamage,
-				mPlayer,
-				MagicType.HOLY,
-				true,
-				mInfo.mLinkedSpell,
-				true,
-				true,
-				true
-			);
-		}
-
-		return true;
-	}
-
-	@Override
-	public boolean livingEntityShotByPlayerEvent(Projectile proj, LivingEntity damagee, EntityDamageByEntityEvent event) {
-		boolean enemyTriggersAbilities = Crusade.enemyTriggersAbilities(damagee, mCrusade);
-		if (mDoMultiplierAndFire && enemyTriggersAbilities) {
-			EntityUtils.applyFire(Plugin.getInstance(), FIRE_DURATION_2, damagee, mPlayer);
-		}
-
-		if (mActive && enemyTriggersAbilities) {
-			execute(damagee, event);
-		}
-
-		return true;
-	}
-
-	@Override
-	public void playerDealtCustomDamageEvent(CustomDamageEvent customDamageEvent) {
-		if (
-			mDoMultiplierAndFire
-			&& customDamageEvent.getSpell() == ClassAbility.DIVINE_JUSTICE
-		) {
-			double originalDamage = customDamageEvent.getDamage();
-			mLastPassiveDJDamage = originalDamage * DAMAGE_MULTIPLIER_2;
-			customDamageEvent.setDamage(originalDamage + mLastPassiveDJDamage);
+			DamageUtils.damage(mPlayer, enemy, DamageType.MAGIC, mLastPassiveMeleeDamage, mInfo.mLinkedSpell, true);
 		}
 	}
 
-	public void execute(LivingEntity damagee, EntityDamageByEntityEvent event) {
+	public void execute(LivingEntity damagee) {
 		mActive = false;
 
-		EntityUtils.damageEntity(Plugin.getInstance(), damagee, DAMAGE_UNDEAD_1, mPlayer, MagicType.HOLY, true, mInfo.mLinkedSpell);
+		DamageUtils.damage(mPlayer, damagee, DamageType.MAGIC, DAMAGE_UNDEAD_1, mInfo.mLinkedSpell);
 
 		Location loc = damagee.getLocation();
 		World world = mPlayer.getWorld();
@@ -218,11 +178,11 @@ public class LuminousInfusion extends Ability {
 				if (mDoMultiplierAndFire) {
 					EntityUtils.applyFire(Plugin.getInstance(), FIRE_DURATION_2, e, mPlayer);
 				}
-				EntityUtils.damageEntity(Plugin.getInstance(), e, DAMAGE_UNDEAD_1, mPlayer, MagicType.HOLY, true, mInfo.mLinkedSpell);
+				DamageUtils.damage(mPlayer, e, DamageType.MAGIC, DAMAGE_UNDEAD_1, mInfo.mLinkedSpell);
 			} else {
-				EntityUtils.damageEntity(Plugin.getInstance(), e, DAMAGE_1, mPlayer, MagicType.HOLY, true, mInfo.mLinkedSpell);
+				DamageUtils.damage(mPlayer, e, DamageType.MAGIC, DAMAGE_1, mInfo.mLinkedSpell);
 			}
-			MovementUtils.knockAway(loc, e, KNOCKBACK_SPEED, KNOCKBACK_SPEED / 2);
+			MovementUtils.knockAway(loc, e, KNOCKBACK_SPEED, KNOCKBACK_SPEED / 2, true);
 		}
 	}
 }

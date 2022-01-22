@@ -1,7 +1,9 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
-import java.util.Arrays;
-
+import com.playmonumenta.plugins.bosses.SpellManager;
+import com.playmonumenta.plugins.bosses.spells.SpellBaseLaser;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.utils.BossUtils;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -11,9 +13,7 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
-import com.playmonumenta.plugins.bosses.SpellManager;
-import com.playmonumenta.plugins.bosses.spells.SpellBaseLaser;
-import com.playmonumenta.plugins.utils.BossUtils;
+import java.util.Arrays;
 
 /**
  * @deprecated use boss_laser instead, like this:
@@ -70,7 +70,7 @@ public class PulseLaserBoss extends BossAbilityGroup {
 						loc.getWorld().playSound(loc, Sound.ENTITY_DRAGON_FIREBALL_EXPLODE, 0.6f, 1.5f);
 						loc.getWorld().spawnParticle(Particle.EXPLOSION_NORMAL, loc, 35, 0, 0, 0, 0.25);
 						if (!blocked) {
-							BossUtils.bossDamage(boss, player, p.DAMAGE);
+							BossUtils.blockableDamage(boss, player, DamageType.MAGIC, p.DAMAGE);
 						}
 					})
 		));

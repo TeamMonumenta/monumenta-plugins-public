@@ -1,19 +1,18 @@
 package com.playmonumenta.plugins.depths.abilities;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.depths.DepthsAbilityItem;
+import com.playmonumenta.plugins.depths.DepthsManager;
 import com.playmonumenta.plugins.utils.GUIUtils;
+import com.playmonumenta.plugins.utils.ItemUtils;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.depths.DepthsAbilityItem;
-import com.playmonumenta.plugins.depths.DepthsManager;
-import com.playmonumenta.plugins.utils.ItemUtils;
+import java.util.ArrayList;
+import java.util.List;
 
 public abstract class WeaponAspectDepthsAbility extends DepthsAbility {
 
