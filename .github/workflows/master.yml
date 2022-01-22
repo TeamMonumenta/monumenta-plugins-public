@@ -1,4 +1,4 @@
-name: Java CI
+name: Build master
 
 on:
   push:
@@ -26,9 +26,14 @@ jobs:
         cache-name: cache-maven-dependencies
       with:
         # maven files are stored in `~/.m2/repository`
-        path: ~/.m2/repository
+        path: |
+          ~/.m2/repository
+          ~/.gradle/caches
+          ~/.gradle/wrapper
         # Create the key based on runner os, cache name, and a hash of all the pom.xml files
-        key: ${{ runner.os }}-build-v2-${{ env.cache-name }}-${{ hashFiles('**/pom.xml') }}
+        key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+        restore-keys: |
+          ${{ runner.os }}-build-
 
     - name: Build Paper
       run: |
@@ -39,6 +44,6 @@ jobs:
           ./paper jar
         fi
 
-    - name: Build with Maven
-      working-directory: ./plugins
-      run: ./compile-all.sh --batch-mode --no-snapshot-updates
+    - name: Build and deploy to Github Package Registry
+      run: |
+        ./gradlew build

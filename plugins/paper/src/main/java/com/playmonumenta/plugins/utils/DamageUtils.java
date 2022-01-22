@@ -107,7 +107,7 @@ public class DamageUtils {
 
 		int originalAttackCooldown = 0;
 		if (damager != null) {
-			NmsUtils.getAttackCooldown(damager);
+			NmsUtils.getVersionAdapter().getAttackCooldown(damager);
 		}
 
 		Bukkit.getPluginManager().callEvent(event);
@@ -123,7 +123,7 @@ public class DamageUtils {
 		}
 
 		double actualDamage = event.getDamage();
-		NmsUtils.customDamageEntity(damager, damagee, actualDamage, bossCause);
+		NmsUtils.getVersionAdapter().customDamageEntity(damager, damagee, actualDamage, bossCause);
 
 		if (bypassIFrames) {
 			damagee.setNoDamageTicks(originalIFrames);
@@ -135,7 +135,7 @@ public class DamageUtils {
 		}
 
 		if (damager != null) {
-			NmsUtils.setAttackCooldown(damager, originalAttackCooldown);
+			NmsUtils.getVersionAdapter().setAttackCooldown(damager, originalAttackCooldown);
 		}
 	}
 

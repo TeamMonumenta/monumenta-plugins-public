@@ -147,6 +147,7 @@ import com.playmonumenta.plugins.timers.ProjectileEffectTimers;
 import com.playmonumenta.plugins.tracking.TrackingManager;
 import com.playmonumenta.plugins.utils.FileUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
+import com.playmonumenta.plugins.utils.NmsUtils;
 import com.playmonumenta.plugins.utils.MetadataUtils;
 import com.playmonumenta.plugins.utils.SignUtils;
 
@@ -187,6 +188,8 @@ public class Plugin extends JavaPlugin {
 
 	@Override
 	public void onLoad() {
+		NmsUtils.loadVersionAdapter(this.getServer().getClass(), getLogger());
+
 		/*
 		 * CommandAPI commands which register directly and are usable in functions
 		 *

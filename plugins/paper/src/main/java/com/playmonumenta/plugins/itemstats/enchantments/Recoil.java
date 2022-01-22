@@ -39,7 +39,7 @@ public class Recoil implements Enchantment {
 			if (player.isSneaking()) {
 				player.setCooldown(player.getInventory().getItemInMainHand().getType(), (int)(20 * Math.sqrt(level)));
 			} else if (!ZoneUtils.hasZoneProperty(player, ZoneProperty.NO_MOBILITY_ABILITIES)) {
-				Vector velocity = NmsUtils.getActualDirection(player).multiply(-0.5 * Math.sqrt(level));
+				Vector velocity = NmsUtils.getVersionAdapter().getActualDirection(player).multiply(-0.5 * Math.sqrt(level));
 				velocity.setY(Math.max(0.1, velocity.getY()));
 				player.setVelocity(velocity);
 			}

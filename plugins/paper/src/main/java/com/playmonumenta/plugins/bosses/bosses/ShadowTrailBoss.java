@@ -44,7 +44,7 @@ public class ShadowTrailBoss extends BossAbilityGroup {
 					(World world, Player player, Location loc) -> {
 						world.playSound(loc, Sound.ENTITY_SHULKER_SHOOT, 1f, 0.5f);
 						world.spawnParticle(Particle.SMOKE_LARGE, loc, 10, 0, 0, 0, 0.25);
-						NmsUtils.unblockableEntityDamageEntity(player, DAMAGE, boss);
+						NmsUtils.getVersionAdapter().unblockableEntityDamageEntity(player, DAMAGE, boss);
 					},
 					// Expire Action
 					(World world, Location loc) -> { })

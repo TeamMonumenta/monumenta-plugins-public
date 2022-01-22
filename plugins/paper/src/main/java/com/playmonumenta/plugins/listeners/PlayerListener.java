@@ -258,7 +258,7 @@ public class PlayerListener implements Listener {
 					}
 					if (player.getItemUseRemainingTime() <= 0) {
 						this.cancel();
-						NmsUtils.releaseActiveItem(player, false);
+						NmsUtils.getVersionAdapter().releaseActiveItem(player, false);
 					}
 				}
 			}.runTaskTimer(mPlugin, 0, 1);

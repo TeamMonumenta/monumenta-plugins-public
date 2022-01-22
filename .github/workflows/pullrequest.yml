@@ -24,9 +24,14 @@ jobs:
         cache-name: cache-maven-dependencies
       with:
         # maven files are stored in `~/.m2/repository`
-        path: ~/.m2/repository
+        path: |
+          ~/.m2/repository
+          ~/.gradle/caches
+          ~/.gradle/wrapper
         # Create the key based on runner os, cache name, and a hash of all the pom.xml files
-        key: ${{ runner.os }}-build-v2-${{ env.cache-name }}-${{ hashFiles('**/pom.xml') }}
+        key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+        restore-keys: |
+          ${{ runner.os }}-build-
 
     - name: Build Paper
       run: |
@@ -35,71 +40,16 @@ jobs:
           cd Paper
           git checkout 1.16
           ./paper jar
-        
-          # run all checkers to make sure they and their dependencies are downloaded and thus cached
-          cd ../plugins/paper
-          mvn compile --batch-mode --no-snapshot-updates -P checkerframework "-Danalyzed.classes=com/playmonumenta/plugins/Plugin.java"
-          mvn checkstyle:checkstyle --batch-mode --no-snapshot-updates
-          mvn pmd:pmd --batch-mode
-        
-          cd ../bungee
-          mvn compile --batch-mode --no-snapshot-updates
-          mvn checkstyle:checkstyle --batch-mode --no-snapshot-updates
-          mvn pmd:pmd --batch-mode
+
+          # Build the plugin to make sure its dependencies are also cached
+          cd ../plugins
+          ./gradlew build
+
+          # TODO: Need to also run checker framework
         fi
 
-  style:
-    name: Checkstyle and PMD
-    needs: deps
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v1
-    - name: Set up JDK 1.16
-      uses: actions/setup-java@v1
-      with:
-        java-version: 1.16
-
-    - uses: reviewdog/action-setup@v1
-      with:
-        reviewdog_version: latest
-
-    - name: git config
-      run: |
-        git config --global user.name "Monumenta CI"
-        git config --global user.email "Monumenta.CI@NotARealEmail.com"
-
-    - name: Cache maven dependencies
-      uses: actions/cache@v2
-      env:
-        cache-name: cache-maven-dependencies
-      with:
-        # maven files are stored in `~/.m2/repository`
-        path: ~/.m2/repository
-        # Create the key based on runner os, cache name, and a hash of all the pom.xml files
-        key: ${{ runner.os }}-build-v2-${{ env.cache-name }}-${{ hashFiles('**/pom.xml') }}
-
-    - name: Build and report compile warnings
-      working-directory: ./plugins
-      env:
-        REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      run: |
-        set -o pipefail
-
-        cd paper
-        mvn checkstyle:checkstyle --batch-mode --no-snapshot-updates
-        cat target/checkstyle-result.xml | reviewdog -f=checkstyle -name="checkstyle (paper)" -reporter=github-pr-check
-        mvn pmd:pmd --batch-mode
-
-        cd ../bungee
-        mvn checkstyle:checkstyle --batch-mode --no-snapshot-updates
-        cat target/checkstyle-result.xml | reviewdog -f=checkstyle -name="checkstyle (bungee)" -reporter=github-pr-check
-        mvn pmd:pmd --batch-mode
-
-        cd ..
-        cat bungee/target/pmd.txt paper/target/pmd.txt | reviewdog -efm="%f:%l:	%m" -name="pmd" -reporter=github-pr-check
-
   build:
-    name: Test Compilation
+    name: Build plugin
     needs: deps
     runs-on: ubuntu-latest
     steps:
@@ -109,7 +59,8 @@ jobs:
       with:
         java-version: 1.16
 
-    - uses: reviewdog/action-setup@v1
+    - name: Setup reviewdog
+      uses: reviewdog/action-setup@v1
       with:
         reviewdog_version: latest
 
@@ -124,77 +75,94 @@ jobs:
         cache-name: cache-maven-dependencies
       with:
         # maven files are stored in `~/.m2/repository`
-        path: ~/.m2/repository
+        path: |
+          ~/.m2/repository
+          ~/.gradle/caches
+          ~/.gradle/wrapper
         # Create the key based on runner os, cache name, and a hash of all the pom.xml files
-        key: ${{ runner.os }}-build-v2-${{ env.cache-name }}-${{ hashFiles('**/pom.xml') }}
+        key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+        restore-keys: |
+          ${{ runner.os }}-build-
 
-    - name: Build and report compile warnings
+    - name: Build and report style/pmd/warnings
       working-directory: ./plugins
       env:
         REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         set -o pipefail
+        ./gradlew build --console=plain | tee compile.log
+        set +o pipefail
+        cat compile.log | grep '^\[WARNING\].*\.java' | reviewdog -efm="[WARNING] %f:[%l,%c] %m" -name="compiler-warnings" -reporter=github-pr-check
+        set -o pipefail
 
-        ./compile-all.sh --batch-mode --no-snapshot-updates | tee compile.log
-        cat compile.log | reviewdog -efm="%+C %.%#" -efm="%W[WARNING] %f:[%l,%c] %m" -name="compiler-warnings" -reporter=github-pr-check
+        ./gradlew checkstyleMain
+        cat ./adapter_api/build/reports/checkstyle/main.xml | reviewdog -f=checkstyle -name="checkstyle (adapterapi)" -reporter=github-pr-check
+        cat ./adapter_unsupported/build/reports/checkstyle/main.xml | reviewdog -f=checkstyle -name="checkstyle (adapterapi)" -reporter=github-pr-check
+        cat ./adapter_v1_16_R3/build/reports/checkstyle/main.xml | reviewdog -f=checkstyle -name="checkstyle (v1_16_R3)" -reporter=github-pr-check
+        cat ./adapter_v1_18_R1/build/reports/checkstyle/main.xml | reviewdog -f=checkstyle -name="checkstyle (v1_18_R1)" -reporter=github-pr-check
+        cat ./paper/build/reports/checkstyle/main.xml | reviewdog -f=checkstyle -name="checkstyle (plugin)" -reporter=github-pr-check
 
+        # TODO: These need re-enabling
+        # ./mvn_version_wrapper.sh pmd:pmd --batch-mode --no-snapshot-updates
+        # cat plugin/target/pmd.txt adapterapi/target/pmd.txt v1_16_R3/target/pmd.txt v1_17_R1/target/pmd.txt | reviewdog -efm="%f:%l:	%m" -name="pmd" -reporter=github-pr-check
 
-  checker:
-    name: Checker Framework
-    needs: deps
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v1
-      - name: Set up JDK 1.16
-        uses: actions/setup-java@v1
-        with:
-          java-version: 1.16
-
-      - uses: reviewdog/action-setup@v1
-        with:
-          reviewdog_version: latest
-
-      - name: git config
-        run: |
-          git config --global user.name "Monumenta CI"
-          git config --global user.email "Monumenta.CI@NotARealEmail.com"
-
-      - name: Cache maven dependencies
-        uses: actions/cache@v2
-        env:
-          cache-name: cache-maven-dependencies
-        with:
-          # maven files are stored in `~/.m2/repository`
-          path: ~/.m2/repository
-          # Create the key based on runner os, cache name, and a hash of all the pom.xml files
-          key: ${{ runner.os }}-build-v2-${{ env.cache-name }}-${{ hashFiles('**/pom.xml') }}
-
-      - name: Checker framework warnings
-        working-directory: ./plugins
-        env:
-          REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          set -o pipefail
-          
-          echo > compile.log
-          
-          cd paper
-          changedPaperFiles=$(git diff --name-only origin/${{github.base_ref}} | grep "^plugins/paper/src/main/java/" | cut -d/ -f6- - | paste -sd , || true)
-          echo "Changed files in paper: $changedPaperFiles"
-          if [ -n "$changedPaperFiles" ]; then
-            mvn compile --batch-mode --no-snapshot-updates -P checkerframework "-Danalyzed.classes=$changedPaperFiles" | tee -a ../compile.log
-          fi
-          
-          cd ../bungee
-          changedBungeeFiles=$(git diff --name-only origin/${{github.base_ref}} | grep "^plugins/bungee/src/main/java/" | cut -d/ -f6- - | paste -sd , || true)
-          echo "Changed files in bungee: $changedBungeeFiles"
-          if [ -n "$changedBungeeFiles" ]; then
-            mvn compile --batch-mode --no-snapshot-updates -P checkerframework "-Danalyzed.classes=$changedBungeeFiles" | tee -a ../compile.log
-          fi
-          
-          cd ..
-          if [[ -n "$changedPaperFiles" || -n "$changedBungeeFiles" ]]; then
-            cat compile.log | reviewdog -efm="%+C %.%#" -efm="%W[WARNING] %f:[%l,%c] %m" -name="checker framework warnings" -reporter=github-pr-check
-          else
-            echo "No files to analyze."
-          fi
+  # TODO: Need to re-enable this too
+  #  checker:
+  #    name: Checker Framework
+  #    needs: deps
+  #    runs-on: ubuntu-latest
+  #    steps:
+  #      - uses: actions/checkout@v1
+  #      - name: Set up JDK 1.16
+  #        uses: actions/setup-java@v1
+  #        with:
+  #          java-version: 1.16
+  #
+  #      - uses: reviewdog/action-setup@v1
+  #        with:
+  #          reviewdog_version: latest
+  #
+  #      - name: git config
+  #        run: |
+  #          git config --global user.name "Monumenta CI"
+  #          git config --global user.email "Monumenta.CI@NotARealEmail.com"
+  #
+  #      - name: Cache maven dependencies
+  #        uses: actions/cache@v2
+  #        env:
+  #          cache-name: cache-maven-dependencies
+  #        with:
+  #          # maven files are stored in `~/.m2/repository`
+  #          path: ~/.m2/repository
+  #          # Create the key based on runner os, cache name, and a hash of all the pom.xml files
+  #          key: ${{ runner.os }}-build-v2-${{ env.cache-name }}-${{ hashFiles('**/pom.xml') }}
+  #
+  #      - name: Checker framework warnings
+  #        working-directory: ./plugins
+  #        env:
+  #          REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  #        run: |
+  #          set -o pipefail
+  #
+  #          echo > compile.log
+  #
+  #          cd paper
+  #          changedPaperFiles=$(git diff --name-only origin/${{github.base_ref}} | grep "^plugins/paper/src/main/java/" | cut -d/ -f6- - | paste -sd , || true)
+  #          echo "Changed files in paper: $changedPaperFiles"
+  #          if [ -n "$changedPaperFiles" ]; then
+  #            mvn compile --batch-mode --no-snapshot-updates -P checkerframework "-Danalyzed.classes=$changedPaperFiles" | tee -a ../compile.log
+  #          fi
+  #
+  #          cd ../bungee
+  #          changedBungeeFiles=$(git diff --name-only origin/${{github.base_ref}} | grep "^plugins/bungee/src/main/java/" | cut -d/ -f6- - | paste -sd , || true)
+  #          echo "Changed files in bungee: $changedBungeeFiles"
+  #          if [ -n "$changedBungeeFiles" ]; then
+  #            mvn compile --batch-mode --no-snapshot-updates -P checkerframework "-Danalyzed.classes=$changedBungeeFiles" | tee -a ../compile.log
+  #          fi
+  #
+  #          cd ..
+  #          if [[ -n "$changedPaperFiles" || -n "$changedBungeeFiles" ]]; then
+  #            cat compile.log | reviewdog -efm="%+C %.%#" -efm="%W[WARNING] %f:[%l,%c] %m" -name="checker framework warnings" -reporter=github-pr-check
+  #          else
+  #            echo "No files to analyze."
+  #          fi

@@ -61,7 +61,7 @@ public class ThrowRate implements Attribute {
 				}.runTaskLater(plugin, (int)(20 / value));
 
 				// Duplicate the entity, then cancel the throw event so the trident doesn't leave inventory
-				Trident newProj = NmsUtils.duplicateEntity(trident);
+				Trident newProj = NmsUtils.getVersionAdapter().duplicateEntity(trident);
 
 				// Set a bunch of stuff that isn't caught by the entity duplication
 				newProj.setShooter(player);

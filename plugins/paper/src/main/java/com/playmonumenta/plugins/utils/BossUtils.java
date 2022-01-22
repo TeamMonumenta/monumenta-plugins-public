@@ -66,7 +66,7 @@ public class BossUtils {
 
 		if (damagee instanceof Player player && bossDamageBlocked(player, location)) {
 			if (stunTicks > 0) {
-				NmsUtils.stunShield(player, stunTicks);
+				NmsUtils.getVersionAdapter().stunShield(player, stunTicks);
 				damagee.getWorld().playSound(damagee.getLocation(), Sound.ITEM_SHIELD_BREAK, SoundCategory.PLAYERS, 1.0f, 1.0f);
 			}
 			ItemUtils.damageShield(player, durability);
@@ -95,7 +95,7 @@ public class BossUtils {
 
 		if (damagee instanceof Player player && bossDamageBlocked(player, location)) {
 			if (stunTicks > 0) {
-				NmsUtils.stunShield(player, stunTicks);
+				NmsUtils.getVersionAdapter().stunShield(player, stunTicks);
 				damagee.getWorld().playSound(damagee.getLocation(), Sound.ITEM_SHIELD_BREAK, SoundCategory.PLAYERS, 1.0f, 1.0f);
 			}
 			ItemUtils.damageShield(player, durability);
@@ -165,12 +165,12 @@ public class BossUtils {
 			 */
 			if (raw) {
 				if (toTake > 1) {
-					NmsUtils.stunShield(player, (int) Math.ceil(toTake * 0.5));
+					NmsUtils.getVersionAdapter().stunShield(player, (int) Math.ceil(toTake * 0.5));
 				}
 				target.getWorld().playSound(target.getLocation(), Sound.ITEM_SHIELD_BREAK, SoundCategory.PLAYERS, 1.0f, 1.0f);
 				ItemUtils.damageShield(player, (int) Math.ceil(toTake / 2.5));
 			} else {
-				NmsUtils.stunShield(player, (int) (20 * percentHealth * 20));
+				NmsUtils.getVersionAdapter().stunShield(player, (int) (20 * percentHealth * 20));
 				target.getWorld().playSound(target.getLocation(), Sound.ITEM_SHIELD_BREAK, SoundCategory.PLAYERS, 1.0f, 1.0f);
 				ItemUtils.damageShield(player, (int)(percentHealth * 20 / 2.5));
 			}
@@ -180,7 +180,7 @@ public class BossUtils {
 
 			if (adjustedHealth <= 0) {
 				// Kill the player, but allow totems to trigger
-				NmsUtils.unblockableEntityDamageEntity(target, 1000, boss, cause);
+				NmsUtils.getVersionAdapter().unblockableEntityDamageEntity(target, 1000, boss, cause);
 				return false;
 			} else {
 				if (absorp > 0) {
@@ -201,7 +201,7 @@ public class BossUtils {
 				}
 				//TODO B#9334: test if this is doing more damage than the provided percentage - the intended amount
 				// Also test if iframes can eat this part of the damage and prevent events from triggering
-				NmsUtils.unblockableEntityDamageEntity(target, 1, boss, cause);
+				NmsUtils.getVersionAdapter().unblockableEntityDamageEntity(target, 1, boss, cause);
 			}
 		}
 
