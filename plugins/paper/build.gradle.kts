@@ -22,6 +22,8 @@ dependencies {
     implementation("org.openjdk.jmh:jmh-generator-annprocess:1.19")
     implementation("com.github.LeonMangler:PremiumVanishAPI:2.6.3")
     implementation("org.checkerframework:checker-qual:3.21.0")
+    implementation("net.kyori:adventure-text-minimessage:4.2-ab62718")
+    implementation("com.opencsv:opencsv:5.5")
     compileOnly("com.destroystokyo.paper:paper:1.16.5-R0.1-SNAPSHOT")
     compileOnly("dev.jorel.CommandAPI:commandapi-core:6.0.0")
     compileOnly("me.clip:placeholderapi:2.10.4")
@@ -38,8 +40,6 @@ dependencies {
     compileOnly("com.goncalomb.bukkit:nbteditor:3.2")
     compileOnly("de.tr7zw:item-nbt-api-plugin:2.3.1")
     compileOnly("com.comphenix.protocol:ProtocolLib:4.7.0")
-    compileOnly("com.opencsv:opencsv:5.5")
-    compileOnly("net.kyori:adventure-text-minimessage:4.2-ab62718")
 
     // Bungeecord deps
     compileOnly("net.md-5:bungeecord-api:1.12-SNAPSHOT")
