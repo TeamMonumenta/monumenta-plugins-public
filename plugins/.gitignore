@@ -5,6 +5,10 @@ pom.xml.releaseBackup
 pom.xml.versionsBackup
 release.properties
 
+# Vim
+*.swp
+*.swo
+
 # IntelliJ IDEA
 .idea/
 *.iml
