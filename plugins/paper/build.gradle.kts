@@ -93,7 +93,7 @@ tasks.create("dev1-deploy") {
     doLast {
         ssh.runSessions {
             session(basicssh) {
-                execute("cd /home/epic/dev1_shard_plugins && rm Monumenta*.jar")
+                execute("cd /home/epic/dev1_shard_plugins && rm -f Monumenta*.jar")
                 put(shadowJar.archiveFile.get().getAsFile(), "/home/epic/dev1_shard_plugins")
             }
         }
@@ -106,7 +106,7 @@ tasks.create("dev2-deploy") {
     doLast {
         ssh.runSessions {
             session(basicssh) {
-                execute("cd /home/epic/dev2_shard_plugins && rm Monumenta*.jar")
+                execute("cd /home/epic/dev2_shard_plugins && rm -f Monumenta*.jar")
                 put(shadowJar.archiveFile.get().getAsFile(), "/home/epic/dev2_shard_plugins")
             }
         }
@@ -119,7 +119,7 @@ tasks.create("dev3-deploy") {
     doLast {
         ssh.runSessions {
             session(basicssh) {
-                execute("cd /home/epic/dev3_shard_plugins && rm Monumenta*.jar")
+                execute("cd /home/epic/dev3_shard_plugins && rm -f Monumenta*.jar")
                 put(shadowJar.archiveFile.get().getAsFile(), "/home/epic/dev3_shard_plugins")
             }
         }
@@ -132,7 +132,7 @@ tasks.create("dev4-deploy") {
     doLast {
         ssh.runSessions {
             session(basicssh) {
-                execute("cd /home/epic/dev4_shard_plugins && rm Monumenta*.jar")
+                execute("cd /home/epic/dev4_shard_plugins && rm -f Monumenta*.jar")
                 put(shadowJar.archiveFile.get().getAsFile(), "/home/epic/dev4_shard_plugins")
             }
         }
@@ -145,7 +145,7 @@ tasks.create("mobs-deploy") {
     doLast {
         ssh.runSessions {
             session(basicssh) {
-                execute("cd /home/epic/mob_shard_plugins && rm Monumenta*.jar")
+                execute("cd /home/epic/mob_shard_plugins && rm -f Monumenta*.jar")
                 put(shadowJar.archiveFile.get().getAsFile(), "/home/epic/mob_shard_plugins")
             }
         }
