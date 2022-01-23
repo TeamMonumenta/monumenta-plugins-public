@@ -93,18 +93,12 @@ jobs:
         ./gradlew build --console=plain | tee compile.log
         set +o pipefail
         cat compile.log | grep '^\[WARNING\].*\.java' | reviewdog -efm="[WARNING] %f:[%l,%c] %m" -name="compiler-warnings" -reporter=github-pr-check
-        set -o pipefail
-
-        ./gradlew checkstyleMain
         cat ./adapter_api/build/reports/checkstyle/main.xml | reviewdog -f=checkstyle -name="checkstyle (adapterapi)" -reporter=github-pr-check
         cat ./adapter_unsupported/build/reports/checkstyle/main.xml | reviewdog -f=checkstyle -name="checkstyle (adapterapi)" -reporter=github-pr-check
         cat ./adapter_v1_16_R3/build/reports/checkstyle/main.xml | reviewdog -f=checkstyle -name="checkstyle (v1_16_R3)" -reporter=github-pr-check
         cat ./adapter_v1_18_R1/build/reports/checkstyle/main.xml | reviewdog -f=checkstyle -name="checkstyle (v1_18_R1)" -reporter=github-pr-check
         cat ./paper/build/reports/checkstyle/main.xml | reviewdog -f=checkstyle -name="checkstyle (plugin)" -reporter=github-pr-check
-
-        # TODO: These need re-enabling
-        # ./mvn_version_wrapper.sh pmd:pmd --batch-mode --no-snapshot-updates
-        # cat plugin/target/pmd.txt adapterapi/target/pmd.txt v1_16_R3/target/pmd.txt v1_17_R1/target/pmd.txt | reviewdog -efm="%f:%l:	%m" -name="pmd" -reporter=github-pr-check
+        cat ./adapter_v1_16_R3/build/reports/pmd/main.xml ./paper/build/reports/pmd/main.xml ./adapter_v1_18_R1/build/reports/pmd/main.xml ./adapter_api/build/reports/pmd/main.xml ./adapter_unsupported/build/reports/pmd/main.xml | reviewdog -efm='%+P<file name="%f">' -efm='%W<violation beginline="%l%.%#begincolumn="%c%.%#' -efm='%-C<%.%#' -efm='%+C%.%#' -efm='%-Q' -name="pmd" -reporter=github-pr-check
 
   # TODO: Need to re-enable this too
   #  checker:
