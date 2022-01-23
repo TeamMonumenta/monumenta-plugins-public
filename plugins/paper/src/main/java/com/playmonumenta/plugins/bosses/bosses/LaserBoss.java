@@ -1,5 +1,8 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
+import java.util.Arrays;
+import java.util.Collections;
+
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.parameters.BossParam;
@@ -14,12 +17,11 @@ import com.playmonumenta.plugins.bosses.parameters.SoundsList;
 import com.playmonumenta.plugins.bosses.spells.SpellBaseLaser;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.utils.BossUtils;
+
 import org.bukkit.Location;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-
-import java.util.Arrays;
 
 //generalized class for all bosses with laser
 public class LaserBoss extends BossAbilityGroup {
@@ -144,7 +146,7 @@ public class LaserBoss extends BossAbilityGroup {
 					})
 		));
 
-		super.constructBoss(activeSpells, null, p.DETECTION, null, p.DELAY);
+		super.constructBoss(activeSpells, Collections.emptyList(), p.DETECTION, null, p.DELAY);
 	}
 }
 

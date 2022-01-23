@@ -1,5 +1,9 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
+import java.util.AbstractMap;
+import java.util.Arrays;
+import java.util.Collections;
+
 import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.parameters.BossParam;
 import com.playmonumenta.plugins.bosses.spells.SpellBaseSlam;
@@ -8,6 +12,7 @@ import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.ParticleUtils;
 import com.playmonumenta.plugins.utils.ParticleUtils.SpawnParticleAction;
 import com.playmonumenta.plugins.utils.PlayerUtils;
+
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -18,9 +23,6 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.util.Vector;
-
-import java.util.AbstractMap;
-import java.util.Arrays;
 
 public class MeteorSlamBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_meteor_slam";
@@ -91,6 +93,6 @@ public class MeteorSlamBoss extends BossAbilityGroup {
 						BossUtils.bossDamagePercent(boss, players, p.DAMAGE_PERCENT);
 					}
 					})));
-		super.constructBoss(manager, null, p.DETECTION, null, p.DELAY);
+		super.constructBoss(manager, Collections.emptyList(), p.DETECTION, null, p.DELAY);
 	}
 }

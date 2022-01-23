@@ -1,11 +1,13 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
+import java.util.Arrays;
+import java.util.Collections;
+
 import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.spells.SpellTpBehindPlayer;
+
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.plugin.Plugin;
-
-import java.util.Arrays;
 
 /**
  * @deprecated
@@ -32,6 +34,6 @@ public class TpBehindTargetedBoss extends BossAbilityGroup {
 			new SpellTpBehindPlayer(plugin, boss, 240)));
 
 
-		super.constructBoss(activeSpells, null, detectionRange, null);
+		super.constructBoss(activeSpells, Collections.emptyList(), detectionRange, null);
 	}
 }

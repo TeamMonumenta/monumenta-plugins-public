@@ -1,6 +1,10 @@
 package com.playmonumenta.plugins.bosses.bosses.gray;
 
+import java.util.Collections;
+
+import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.bosses.BossAbilityGroup;
+
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.entity.AreaEffectCloudApplyEvent;
 import org.bukkit.plugin.Plugin;
@@ -18,7 +22,7 @@ public class GraySummoned extends BossAbilityGroup {
 	public GraySummoned(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
 
-		super.constructBoss(null, null, detectionRange, null);
+		super.constructBoss(SpellManager.EMPTY, Collections.emptyList(), detectionRange, null);
 	}
 
 	@Override

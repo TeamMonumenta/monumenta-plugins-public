@@ -1,5 +1,9 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
+import java.util.Collections;
+
+import com.playmonumenta.plugins.bosses.SpellManager;
+
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
@@ -15,7 +19,7 @@ public class PlayerDamageOnlyBoss extends BossAbilityGroup {
 
 	public PlayerDamageOnlyBoss(Plugin plugin, LivingEntity boss) throws Exception {
 		super(plugin, identityTag, boss);
-		super.constructBoss(null, null, detectionRange, null);
+		super.constructBoss(SpellManager.EMPTY, Collections.emptyList(), detectionRange, null);
 	}
 
 	public void bossDamagedEntity(EntityDamageByEntityEvent event) {

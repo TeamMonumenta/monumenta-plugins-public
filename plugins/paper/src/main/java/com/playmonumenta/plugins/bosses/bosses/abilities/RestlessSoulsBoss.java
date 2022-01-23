@@ -1,7 +1,26 @@
 package com.playmonumenta.plugins.bosses.bosses.abilities;
 
+import java.util.Collections;
 import java.util.Set;
 import java.util.stream.Stream;
+
+import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.abilities.AbilityManager;
+import com.playmonumenta.plugins.abilities.warlock.CholericFlames;
+import com.playmonumenta.plugins.abilities.warlock.GraspingClaws;
+import com.playmonumenta.plugins.abilities.warlock.MelancholicLament;
+import com.playmonumenta.plugins.abilities.warlock.tenebrist.HauntingShades;
+import com.playmonumenta.plugins.abilities.warlock.tenebrist.WitheringGaze;
+import com.playmonumenta.plugins.bosses.SpellManager;
+import com.playmonumenta.plugins.bosses.bosses.BossAbilityGroup;
+import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.effects.CustomDamageOverTime;
+import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.utils.AbilityUtils;
+import com.playmonumenta.plugins.utils.DamageUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.PotionUtils;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Particle;
@@ -15,23 +34,6 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.checkerframework.checker.nullness.qual.Nullable;
-
-import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.abilities.AbilityManager;
-import com.playmonumenta.plugins.abilities.warlock.CholericFlames;
-import com.playmonumenta.plugins.abilities.warlock.GraspingClaws;
-import com.playmonumenta.plugins.abilities.warlock.MelancholicLament;
-import com.playmonumenta.plugins.abilities.warlock.tenebrist.HauntingShades;
-import com.playmonumenta.plugins.abilities.warlock.tenebrist.WitheringGaze;
-import com.playmonumenta.plugins.bosses.bosses.BossAbilityGroup;
-import com.playmonumenta.plugins.classes.ClassAbility;
-import com.playmonumenta.plugins.effects.CustomDamageOverTime;
-import com.playmonumenta.plugins.events.DamageEvent;
-import com.playmonumenta.plugins.events.DamageEvent.DamageType;
-import com.playmonumenta.plugins.utils.AbilityUtils;
-import com.playmonumenta.plugins.utils.DamageUtils;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.PotionUtils;
 
 public class RestlessSoulsBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_restlesssouls";
@@ -55,7 +57,7 @@ public class RestlessSoulsBoss extends BossAbilityGroup {
 	public RestlessSoulsBoss(Plugin plugin, LivingEntity boss) throws Exception {
 		super(plugin, identityTag, boss);
 		boss.setInvulnerable(true);
-		super.constructBoss(null, null, detectionRange, null);
+		super.constructBoss(SpellManager.EMPTY, Collections.emptyList(), detectionRange, null);
 	}
 
 	public void spawn(Player player, double damage, int silenceTime, int duration, boolean levelone, FixedMetadataValue playerItemStats) {

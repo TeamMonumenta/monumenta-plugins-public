@@ -1,11 +1,13 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
+import java.util.Arrays;
+import java.util.Collections;
+
 import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.spells.SpellShiftingSpeed;
+
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.plugin.Plugin;
-
-import java.util.Arrays;
 
 public class ShiftingBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_shifting";
@@ -22,6 +24,6 @@ public class ShiftingBoss extends BossAbilityGroup {
 			new SpellShiftingSpeed(boss)
 		));
 
-		super.constructBoss(activeSpells, null, detectionRange, null);
+		super.constructBoss(activeSpells, Collections.emptyList(), detectionRange, null);
 	}
 }

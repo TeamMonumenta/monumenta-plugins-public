@@ -1,7 +1,11 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
+import java.util.Collections;
+
+import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.utils.EntityUtils;
+
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
@@ -22,7 +26,7 @@ public class RebornBoss extends BossAbilityGroup {
 	public RebornBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
 
-		super.constructBoss(null, null, detectionRange, null);
+		super.constructBoss(SpellManager.EMPTY, Collections.emptyList(), detectionRange, null);
 	}
 
 	@Override

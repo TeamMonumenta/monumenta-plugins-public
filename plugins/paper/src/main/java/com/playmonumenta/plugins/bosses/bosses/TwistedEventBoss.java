@@ -1,7 +1,11 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
+import java.util.Collections;
+
 import com.playmonumenta.plugins.abilities.delves.Twisted;
+import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.utils.FastUtils;
+
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -28,7 +32,7 @@ public class TwistedEventBoss extends BossAbilityGroup {
 		super(plugin, identityTag, boss);
 		mPlugin = com.playmonumenta.plugins.Plugin.getInstance();
 
-		super.constructBoss(null, null, detectionRange, null);
+		super.constructBoss(SpellManager.EMPTY, Collections.emptyList(), detectionRange, null);
 	}
 
 	@Override

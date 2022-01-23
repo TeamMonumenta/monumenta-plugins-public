@@ -1,5 +1,8 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
+import java.util.Arrays;
+import java.util.Collections;
+
 import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.spells.SpellBaseSeekingProjectile;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
@@ -7,6 +10,7 @@ import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
+
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -17,8 +21,6 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.BoundingBox;
-
-import java.util.Arrays;
 
 public class KineticProjectileBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_kineticprojectile";
@@ -82,6 +84,6 @@ public class KineticProjectileBoss extends BossAbilityGroup {
 					})
 		));
 
-		super.constructBoss(activeSpells, null, detectionRange, null);
+		super.constructBoss(activeSpells, Collections.emptyList(), detectionRange, null);
 	}
 }

@@ -1,10 +1,15 @@
 package com.playmonumenta.plugins.bosses.bosses.lich;
 
+import java.util.Arrays;
+import java.util.List;
+
+import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.bosses.BossAbilityGroup;
 import com.playmonumenta.plugins.bosses.bosses.Lich;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.bosses.spells.lich.undeadplayers.SpellCrystalParticle;
 import com.playmonumenta.plugins.events.DamageEvent;
+
 import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
@@ -15,9 +20,6 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
-
-import java.util.Arrays;
-import java.util.List;
 
 public class LichShieldBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_lichshield";
@@ -40,7 +42,7 @@ public class LichShieldBoss extends BossAbilityGroup {
 			new SpellCrystalParticle(mBoss, mSpawnLoc)
 		);
 
-		super.constructBoss(null, passiveSpells, detectionRange, null);
+		super.constructBoss(SpellManager.EMPTY, passiveSpells, detectionRange, null);
 
 		int hpScaling = Lich.mShieldMin;
 		List<Player> players = Lich.playersInRange(mCenter, detectionRange, true);

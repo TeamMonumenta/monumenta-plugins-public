@@ -1,15 +1,17 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
+import java.util.Arrays;
+import java.util.List;
+
+import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.bosses.spells.SpellRunAction;
 import com.playmonumenta.plugins.utils.BossUtils;
+
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-
-import java.util.Arrays;
-import java.util.List;
 
 /*
  * Mob that is invisible until players are nearby
@@ -37,6 +39,6 @@ public final class HiddenBoss extends BossAbilityGroup {
 
 		List<Spell> passiveSpells = Arrays.asList(invis);
 
-		super.constructBoss(null, passiveSpells, detectionRange, null);
+		super.constructBoss(SpellManager.EMPTY, passiveSpells, detectionRange, null);
 	}
 }

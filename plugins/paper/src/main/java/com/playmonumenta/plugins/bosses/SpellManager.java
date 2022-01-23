@@ -1,8 +1,5 @@
 package com.playmonumenta.plugins.bosses;
 
-import com.playmonumenta.plugins.bosses.spells.Spell;
-import org.checkerframework.checker.nullness.qual.Nullable;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -11,6 +8,10 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
+
+import com.playmonumenta.plugins.bosses.spells.Spell;
+
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 /*
  * The SpellManager class is designed to manage active spells for a boss. It
@@ -27,12 +28,23 @@ import java.util.Queue;
  * chosen either immediately afterward OR the time after that). Etc.
  */
 public class SpellManager {
+	public static final SpellManager EMPTY = new SpellManager(Collections.emptyList());
+
 	private Map<Class<? extends Spell>, Spell> mReadySpells;
 	private final Queue<Spell> mCooldownSpells;
 	private final int mCooldown;
-	private @Nullable Spell mLastCasted;
+	private final boolean mIsEmpty;
+	private @Nullable Spell mLastCasted = null;
+
+	public boolean isEmpty() {
+		return mIsEmpty;
+	}
 
 	public List<Spell> getSpells() {
+		if (mIsEmpty) {
+			return Collections.emptyList();
+		}
+
 		List<Spell> spells = new ArrayList<Spell>();
 		spells.addAll(mCooldownSpells);
 		spells.addAll(mReadySpells.values());
@@ -40,20 +52,26 @@ public class SpellManager {
 	}
 
 	public SpellManager(List<Spell> spells) {
-		/*
-		 * Need a new copy of the list because the passed-in version doesn't
-		 * support removing during iteration... Weird
-		 */
-		mReadySpells = new HashMap<Class<? extends Spell>, Spell>();
-		for (Spell spell : spells) {
-			mReadySpells.put(spell.getClass(), spell);
+		mIsEmpty = spells.isEmpty();
+		if (mIsEmpty) {
+			mReadySpells = Collections.emptyMap();
+		} else {
+			mReadySpells = new HashMap<Class<? extends Spell>, Spell>();
+			for (Spell spell : spells) {
+				mReadySpells.put(spell.getClass(), spell);
+			}
 		}
 
 		mCooldownSpells = new LinkedList<Spell>();
-		mCooldown = (int)Math.floor((mReadySpells.size() - 1.0) / 2.0);
+		mCooldown = (int)Math.max(0, Math.floor((mReadySpells.size() - 1.0) / 2.0));
 	}
 
 	public int runNextSpell() {
+		/* Standard 1s delay with no spells */
+		if (mIsEmpty) {
+			return 20;
+		}
+
 		/*
 		 * If a spell has been on cooldown sufficiently long, remove it from
 		 * the cooldown list and add it to the ready list.
@@ -63,6 +81,10 @@ public class SpellManager {
 			mReadySpells.put(toAdd.getClass(), toAdd);
 		}
 
+		/* No active spells, exit early */
+		if (mReadySpells.isEmpty()) {
+			return 20;
+		}
 
 		/*
 		 * Try the ready spells in random order until can be run or none remain
@@ -88,6 +110,11 @@ public class SpellManager {
 	}
 
 	public int forceCastSpell(Class<? extends Spell> spell) {
+		/* Standard 1s delay with no spells */
+		if (mIsEmpty) {
+			return 20;
+		}
+
 		if (mLastCasted != null) {
 			mLastCasted.cancel();
 			mLastCasted = null;
@@ -108,11 +135,13 @@ public class SpellManager {
 	}
 
 	public void cancelAll() {
-		for (Spell spell : mReadySpells.values()) {
-			spell.cancel();
-		}
-		for (Spell spell : mCooldownSpells) {
-			spell.cancel();
+		if (!mIsEmpty) {
+			for (Spell spell : mReadySpells.values()) {
+				spell.cancel();
+			}
+			for (Spell spell : mCooldownSpells) {
+				spell.cancel();
+			}
 		}
 	}
 }

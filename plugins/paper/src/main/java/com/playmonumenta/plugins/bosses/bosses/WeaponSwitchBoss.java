@@ -1,12 +1,14 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
+import java.util.Arrays;
+import java.util.Collections;
+
 import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.spells.SpellWeaponSwitch;
+
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
 import org.bukkit.plugin.Plugin;
-
-import java.util.Arrays;
 
 public class WeaponSwitchBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_weaponswitch";
@@ -30,6 +32,6 @@ public class WeaponSwitchBoss extends BossAbilityGroup {
 			new SpellWeaponSwitch(mBoss)
 		));
 
-		super.constructBoss(activeSpells, null, detectionRange, null);
+		super.constructBoss(activeSpells, Collections.emptyList(), detectionRange, null);
 	}
 }

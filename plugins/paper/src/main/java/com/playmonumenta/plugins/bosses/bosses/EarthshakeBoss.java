@@ -1,12 +1,14 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
+import java.util.Arrays;
+import java.util.Collections;
+
 import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.parameters.BossParam;
 import com.playmonumenta.plugins.bosses.spells.SpellEarthshake;
+
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.plugin.Plugin;
-
-import java.util.Arrays;
 
 public class EarthshakeBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_earthshake";
@@ -56,6 +58,6 @@ public class EarthshakeBoss extends BossAbilityGroup {
 			new SpellEarthshake(plugin, boss, p.RADIUS, p.FUSE_TIME, p.DAMAGE, p.COOLDOWN, p.RANGE, p.KNOCK_UP_SPEED, p.LINE_OF_SIGHT, p.FLY_BLOCKS)
 		));
 
-		super.constructBoss(activeSpells, null, p.DETECTION, null, p.DELAY);
+		super.constructBoss(activeSpells, Collections.emptyList(), p.DETECTION, null, p.DELAY);
 	}
 }

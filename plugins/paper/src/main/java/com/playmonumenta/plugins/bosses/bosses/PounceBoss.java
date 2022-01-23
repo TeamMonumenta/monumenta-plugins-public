@@ -1,5 +1,9 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
+import java.util.AbstractMap;
+import java.util.Arrays;
+import java.util.Collections;
+
 import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.parameters.BossParam;
 import com.playmonumenta.plugins.bosses.parameters.EffectsList;
@@ -11,15 +15,13 @@ import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.ParticleUtils;
 import com.playmonumenta.plugins.utils.ParticleUtils.SpawnParticleAction;
 import com.playmonumenta.plugins.utils.PlayerUtils;
+
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.util.Vector;
-
-import java.util.AbstractMap;
-import java.util.Arrays;
 
 //general version of bossMeteorSlam
 public final class PounceBoss extends BossAbilityGroup {
@@ -127,6 +129,6 @@ public final class PounceBoss extends BossAbilityGroup {
 						p.EFFECTS.apply(players, boss);
 					}
 					})));
-		super.constructBoss(manager, null, p.DETECTION, null, p.DELAY);
+		super.constructBoss(manager, Collections.emptyList(), p.DETECTION, null, p.DELAY);
 	}
 }

@@ -1,8 +1,16 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.NavigableSet;
+
+import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.effects.Effect;
 import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.events.DamageEvent;
+
 import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.World;
@@ -10,11 +18,6 @@ import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.plugin.Plugin;
-
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.NavigableSet;
 
 public class CarapaceBoss extends BossAbilityGroup {
 
@@ -53,7 +56,7 @@ public class CarapaceBoss extends BossAbilityGroup {
 		super(plugin, identityTag, boss);
 		mPlugin = com.playmonumenta.plugins.Plugin.getInstance();
 
-		super.constructBoss(null, null, detectionRange, null);
+		super.constructBoss(SpellManager.EMPTY, Collections.emptyList(), detectionRange, null);
 
 		double carapaceHealth = 0;
 		double speedEffect = 0;

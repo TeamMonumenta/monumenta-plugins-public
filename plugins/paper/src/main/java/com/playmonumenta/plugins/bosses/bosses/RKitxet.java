@@ -1,5 +1,13 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import com.playmonumenta.plugins.bosses.BossBarManager;
 import com.playmonumenta.plugins.bosses.BossBarManager.BossHealthAction;
 import com.playmonumenta.plugins.bosses.SpellManager;
@@ -20,7 +28,7 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
 import com.playmonumenta.plugins.utils.SerializationUtils;
-import net.md_5.bungee.api.ChatColor;
+
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -41,12 +49,7 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import net.md_5.bungee.api.ChatColor;
 
 public class RKitxet extends BossAbilityGroup {
 	public static final String identityTag = "boss_rkitxet";
@@ -221,7 +224,7 @@ public class RKitxet extends BossAbilityGroup {
 		});
 
 		BossBarManager bossBar = new BossBarManager(plugin, boss, detectionRange, BarColor.RED, BarStyle.SEGMENTED_10, events);
-		super.constructBoss(null, null, detectionRange, bossBar, 7 * 20);
+		super.constructBoss(SpellManager.EMPTY, Collections.emptyList(), detectionRange, bossBar, 7 * 20);
 		mBoss.setInvulnerable(true);
 		mBoss.setAI(false);
 

@@ -1,14 +1,16 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
+import java.util.Arrays;
+import java.util.List;
+
+import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.bosses.spells.SpellMobEffect;
+
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-
-import java.util.Arrays;
-import java.util.List;
 
 public final class HungerCloudBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_hungercloud";
@@ -25,6 +27,6 @@ public final class HungerCloudBoss extends BossAbilityGroup {
 			new SpellMobEffect(boss, new PotionEffect(PotionEffectType.HUNGER, 600, 99, false, false))
 		);
 
-		super.constructBoss(null, passiveSpells, detectionRange, null);
+		super.constructBoss(SpellManager.EMPTY, passiveSpells, detectionRange, null);
 	}
 }

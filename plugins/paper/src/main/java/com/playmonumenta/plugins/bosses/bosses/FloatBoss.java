@@ -1,12 +1,14 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
-import com.playmonumenta.plugins.bosses.spells.Spell;
-import com.playmonumenta.plugins.bosses.spells.SpellFloat;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.plugin.Plugin;
-
 import java.util.Arrays;
 import java.util.List;
+
+import com.playmonumenta.plugins.bosses.SpellManager;
+import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.bosses.spells.SpellFloat;
+
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.plugin.Plugin;
 
 public class FloatBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_float";
@@ -23,6 +25,6 @@ public class FloatBoss extends BossAbilityGroup {
 		                                new SpellFloat(boss)
 		                            );
 
-		super.constructBoss(null, passiveSpells, detectionRange, null);
+		super.constructBoss(SpellManager.EMPTY, passiveSpells, detectionRange, null);
 	}
 }

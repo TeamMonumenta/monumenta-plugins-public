@@ -1,8 +1,13 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
+import java.util.Arrays;
+import java.util.List;
+
+import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.bosses.spells.SpellRunAction;
 import com.playmonumenta.plugins.events.DamageEvent;
+
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -14,9 +19,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.projectiles.ProjectileSource;
-
-import java.util.Arrays;
-import java.util.List;
 
 public final class KamikazeBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_kamikaze";
@@ -31,7 +33,7 @@ public final class KamikazeBoss extends BossAbilityGroup {
 		List<Spell> passiveSpells = Arrays.asList(
 			new SpellRunAction(() -> boss.getLocation().getWorld().spawnParticle(Particle.SMOKE_NORMAL, boss.getLocation().clone().add(new Location(boss.getWorld(), 0, 1, 0)), 2, 0.5, 1, 0.5, 0))
 		);
-		super.constructBoss(null, passiveSpells, detectionRange, null);
+		super.constructBoss(SpellManager.EMPTY, passiveSpells, detectionRange, null);
 	}
 
 	@Override

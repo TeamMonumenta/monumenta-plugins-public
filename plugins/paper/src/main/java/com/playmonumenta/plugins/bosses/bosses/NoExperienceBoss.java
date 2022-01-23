@@ -1,5 +1,9 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
+import java.util.Collections;
+
+import com.playmonumenta.plugins.bosses.SpellManager;
+
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.plugin.Plugin;
@@ -16,7 +20,7 @@ public class NoExperienceBoss extends BossAbilityGroup {
 		super(plugin, identityTag, boss);
 
 		// Boss effectively does nothing
-		super.constructBoss(null, null, detectionRange, null);
+		super.constructBoss(SpellManager.EMPTY, Collections.emptyList(), detectionRange, null);
 	}
 
 	@Override

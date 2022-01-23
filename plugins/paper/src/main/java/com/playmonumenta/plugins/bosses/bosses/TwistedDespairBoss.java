@@ -1,12 +1,14 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
+import java.util.Arrays;
+import java.util.Collections;
+
 import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.spells.SpellTpBehindPlayer;
+
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
-
-import java.util.Arrays;
 
 public class TwistedDespairBoss extends BossAbilityGroup {
 
@@ -26,7 +28,7 @@ public class TwistedDespairBoss extends BossAbilityGroup {
 		SpellManager activeSpells = new SpellManager(Arrays.asList(
 				new SpellTpBehindPlayer(plugin, boss, TP_BEHIND_COOLDOWN)));
 
-		super.constructBoss(activeSpells, null, detectionRange, null);
+		super.constructBoss(activeSpells, Collections.emptyList(), detectionRange, null);
 
 		new BukkitRunnable() {
 			@Override

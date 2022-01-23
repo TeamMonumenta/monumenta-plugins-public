@@ -5,6 +5,14 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.destroystokyo.paper.event.entity.EntityPathfindEvent;
+import com.playmonumenta.plugins.bosses.bosses.BossAbilityGroup;
+import com.playmonumenta.plugins.bosses.events.SpellCastEvent;
+import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.events.CustomEffectApplyEvent;
+import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.utils.EntityUtils;
+
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.block.BlockBreakEvent;
@@ -19,14 +27,6 @@ import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.checkerframework.checker.nullness.qual.Nullable;
-
-import com.destroystokyo.paper.event.entity.EntityPathfindEvent;
-import com.playmonumenta.plugins.bosses.bosses.BossAbilityGroup;
-import com.playmonumenta.plugins.bosses.events.SpellCastEvent;
-import com.playmonumenta.plugins.bosses.spells.Spell;
-import com.playmonumenta.plugins.events.CustomEffectApplyEvent;
-import com.playmonumenta.plugins.events.DamageEvent;
-import com.playmonumenta.plugins.utils.EntityUtils;
 
 public class Boss {
 	private final Plugin mPlugin;
@@ -48,18 +48,12 @@ public class Boss {
 			if (!event.isCancelled()) {
 				ability.onHurt(event);
 
-				List<Spell> passives = ability.getPassives();
-				if (passives != null && !passives.isEmpty()) {
-					for (Spell passive : passives) {
-						passive.onHurt(event);
-					}
+				for (Spell passive : ability.getPassives()) {
+					passive.onHurt(event);
 				}
 
-				List<Spell> actives = ability.getActiveSpells();
-				if (actives != null && !actives.isEmpty()) {
-					for (Spell active : actives) {
-						active.onHurt(event);
-					}
+				for (Spell active : ability.getActiveSpells()) {
+					active.onHurt(event);
 				}
 			}
 		}
@@ -70,18 +64,12 @@ public class Boss {
 			if (!event.isCancelled()) {
 				ability.onHurtByEntity(event, damager);
 
-				List<Spell> passives = ability.getPassives();
-				if (passives != null && !passives.isEmpty()) {
-					for (Spell passive : passives) {
-						passive.onHurtByEntity(event, damager);
-					}
+				for (Spell passive : ability.getPassives()) {
+					passive.onHurtByEntity(event, damager);
 				}
 
-				List<Spell> actives = ability.getActiveSpells();
-				if (actives != null && !actives.isEmpty()) {
-					for (Spell active : actives) {
-						active.onHurtByEntity(event, damager);
-					}
+				for (Spell active : ability.getActiveSpells()) {
+					active.onHurtByEntity(event, damager);
 				}
 			}
 		}
@@ -92,18 +80,12 @@ public class Boss {
 			if (!event.isCancelled()) {
 				ability.onHurtByEntityWithSource(event, damager, source);
 
-				List<Spell> passives = ability.getPassives();
-				if (passives != null && !passives.isEmpty()) {
-					for (Spell passive : passives) {
-						passive.onHurtByEntityWithSource(event, damager, source);
-					}
+				for (Spell passive : ability.getPassives()) {
+					passive.onHurtByEntityWithSource(event, damager, source);
 				}
 
-				List<Spell> actives = ability.getActiveSpells();
-				if (actives != null && !actives.isEmpty()) {
-					for (Spell active : actives) {
-						active.onHurtByEntityWithSource(event, damager, source);
-					}
+				for (Spell active : ability.getActiveSpells()) {
+					active.onHurtByEntityWithSource(event, damager, source);
 				}
 			}
 		}
@@ -114,18 +96,12 @@ public class Boss {
 			if (!event.isCancelled()) {
 				ability.onDamage(event, damagee);
 
-				List<Spell> passives = ability.getPassives();
-				if (passives != null && !passives.isEmpty()) {
-					for (Spell passive : passives) {
-						passive.onDamage(event, damagee);
-					}
+				for (Spell passive : ability.getPassives()) {
+					passive.onDamage(event, damagee);
 				}
 
-				List<Spell> actives = ability.getActiveSpells();
-				if (actives != null && !actives.isEmpty()) {
-					for (Spell active : actives) {
-						active.onDamage(event, damagee);
-					}
+				for (Spell active : ability.getActiveSpells()) {
+					active.onDamage(event, damagee);
 				}
 			}
 		}
@@ -136,16 +112,12 @@ public class Boss {
 			if (!event.isCancelled()) {
 				ability.bossLaunchedProjectile(event);
 
-				if (ability.getPassives() != null && !ability.getPassives().isEmpty()) {
-					for (Spell passives : ability.getPassives()) {
-						passives.bossLaunchedProjectile(event);
-					}
+				for (Spell passive : ability.getPassives()) {
+					passive.bossLaunchedProjectile(event);
 				}
 
-				if (ability.getActiveSpells() != null && !ability.getActiveSpells().isEmpty()) {
-					for (Spell actives : ability.getActiveSpells()) {
-						actives.bossLaunchedProjectile(event);
-					}
+				for (Spell active : ability.getActiveSpells()) {
+					active.bossLaunchedProjectile(event);
 				}
 			}
 		}
@@ -154,16 +126,13 @@ public class Boss {
 	public void bossProjectileHit(ProjectileHitEvent event) {
 		for (BossAbilityGroup ability : mAbilities) {
 			ability.bossProjectileHit(event);
-			if (ability.getPassives() != null && !ability.getPassives().isEmpty()) {
-				for (Spell passives : ability.getPassives()) {
-					passives.bossProjectileHit(event);
-				}
+
+			for (Spell passive : ability.getPassives()) {
+				passive.bossProjectileHit(event);
 			}
 
-			if (ability.getActiveSpells() != null && !ability.getActiveSpells().isEmpty()) {
-				for (Spell actives : ability.getActiveSpells()) {
-					actives.bossProjectileHit(event);
-				}
+			for (Spell active : ability.getActiveSpells()) {
+				active.bossProjectileHit(event);
 			}
 		}
 	}
@@ -171,16 +140,12 @@ public class Boss {
 	public void bossHitByProjectile(ProjectileHitEvent event) {
 		for (BossAbilityGroup ability : mAbilities) {
 			ability.bossHitByProjectile(event);
-			if (ability.getPassives() != null && !ability.getPassives().isEmpty()) {
-				for (Spell passives : ability.getPassives()) {
-					passives.bossHitByProjectile(event);
-				}
+			for (Spell passive : ability.getPassives()) {
+				passive.bossHitByProjectile(event);
 			}
 
-			if (ability.getActiveSpells() != null && !ability.getActiveSpells().isEmpty()) {
-				for (Spell actives : ability.getActiveSpells()) {
-					actives.bossHitByProjectile(event);
-				}
+			for (Spell active : ability.getActiveSpells()) {
+				active.bossHitByProjectile(event);
 			}
 		}
 	}
@@ -189,16 +154,12 @@ public class Boss {
 		for (BossAbilityGroup ability : mAbilities) {
 			ability.areaEffectAppliedToBoss(event);
 
-			if (ability.getPassives() != null && !ability.getPassives().isEmpty()) {
-				for (Spell passives : ability.getPassives()) {
-					passives.areaEffectAppliedToBoss(event);
-				}
+			for (Spell passive : ability.getPassives()) {
+				passive.areaEffectAppliedToBoss(event);
 			}
 
-			if (ability.getActiveSpells() != null && !ability.getActiveSpells().isEmpty()) {
-				for (Spell actives : ability.getActiveSpells()) {
-					actives.areaEffectAppliedToBoss(event);
-				}
+			for (Spell active : ability.getActiveSpells()) {
+				active.areaEffectAppliedToBoss(event);
 			}
 		}
 	}
@@ -207,16 +168,12 @@ public class Boss {
 		for (BossAbilityGroup ability : mAbilities) {
 			ability.splashPotionAppliedToBoss(event);
 
-			if (ability.getPassives() != null && !ability.getPassives().isEmpty()) {
-				for (Spell passives : ability.getPassives()) {
-					passives.splashPotionAppliedToBoss(event);
-				}
+			for (Spell passive : ability.getPassives()) {
+				passive.splashPotionAppliedToBoss(event);
 			}
 
-			if (ability.getActiveSpells() != null && !ability.getActiveSpells().isEmpty()) {
-				for (Spell actives : ability.getActiveSpells()) {
-					actives.splashPotionAppliedToBoss(event);
-				}
+			for (Spell active : ability.getActiveSpells()) {
+				active.splashPotionAppliedToBoss(event);
 			}
 		}
 	}
@@ -227,16 +184,12 @@ public class Boss {
 		}
 		for (BossAbilityGroup ability : mAbilities) {
 			ability.bossCastAbility(event);
-			if (ability.getPassives() != null && !ability.getPassives().isEmpty()) {
-				for (Spell passives : ability.getPassives()) {
-					passives.bossCastAbility(event);
-				}
+			for (Spell passive : ability.getPassives()) {
+				passive.bossCastAbility(event);
 			}
 
-			if (ability.getActiveSpells() != null && !ability.getActiveSpells().isEmpty()) {
-				for (Spell actives : ability.getActiveSpells()) {
-					actives.bossCastAbility(event);
-				}
+			for (Spell active : ability.getActiveSpells()) {
+				active.bossCastAbility(event);
 			}
 		}
 	}

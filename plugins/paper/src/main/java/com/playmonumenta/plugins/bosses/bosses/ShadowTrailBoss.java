@@ -1,8 +1,13 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
+import java.util.Arrays;
+import java.util.List;
+
+import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.bosses.spells.SpellBaseTrail;
 import com.playmonumenta.plugins.utils.NmsUtils;
+
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -10,9 +15,6 @@ import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
-
-import java.util.Arrays;
-import java.util.List;
 
 public class ShadowTrailBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_shadowtrail";
@@ -50,6 +52,6 @@ public class ShadowTrailBoss extends BossAbilityGroup {
 					(World world, Location loc) -> { })
 		);
 
-		super.constructBoss(null, passiveSpells, detectionRange, null);
+		super.constructBoss(SpellManager.EMPTY, passiveSpells, detectionRange, null);
 	}
 }

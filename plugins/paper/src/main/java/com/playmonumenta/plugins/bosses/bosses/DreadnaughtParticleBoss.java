@@ -3,6 +3,12 @@ package com.playmonumenta.plugins.bosses.bosses;
 import java.util.Arrays;
 import java.util.List;
 
+import com.playmonumenta.plugins.bosses.SpellManager;
+import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.bosses.spells.SpellDreadnaughtParticle;
+import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
+
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -10,11 +16,6 @@ import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.plugin.Plugin;
-
-import com.playmonumenta.plugins.bosses.spells.Spell;
-import com.playmonumenta.plugins.bosses.spells.SpellDreadnaughtParticle;
-import com.playmonumenta.plugins.events.DamageEvent;
-import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 
 public class DreadnaughtParticleBoss extends BossAbilityGroup {
 
@@ -37,7 +38,7 @@ public class DreadnaughtParticleBoss extends BossAbilityGroup {
 			new SpellDreadnaughtParticle(boss)
 		);
 
-		super.constructBoss(null, passiveSpells, detectionRange, null);
+		super.constructBoss(SpellManager.EMPTY, passiveSpells, detectionRange, null);
 	}
 
 	@Override

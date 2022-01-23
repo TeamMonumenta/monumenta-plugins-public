@@ -1,13 +1,16 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
-import org.bukkit.plugin.Plugin;
+import java.util.Collections;
 
+import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.BossUtils;
+
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
+import org.bukkit.plugin.Plugin;
 
 
 /**
@@ -31,7 +34,7 @@ public class SilenceOnHitBoss extends BossAbilityGroup {
 
 	public SilenceOnHitBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
-		super.constructBoss(null, null, detectionRange, null);
+		super.constructBoss(SpellManager.EMPTY, Collections.emptyList(), detectionRange, null);
 	}
 
 	@Override

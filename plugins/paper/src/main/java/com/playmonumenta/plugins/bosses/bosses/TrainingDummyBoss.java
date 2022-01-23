@@ -2,6 +2,12 @@ package com.playmonumenta.plugins.bosses.bosses;
 
 import java.text.DecimalFormat;
 import java.util.Arrays;
+import java.util.Collections;
+
+import com.playmonumenta.plugins.bosses.SpellManager;
+import com.playmonumenta.plugins.bosses.spells.SpellRunAction;
+import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.utils.EntityUtils;
 
 import org.bukkit.ChatColor;
 import org.bukkit.attribute.Attribute;
@@ -9,11 +15,6 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
-
-import com.playmonumenta.plugins.bosses.SpellManager;
-import com.playmonumenta.plugins.bosses.spells.SpellRunAction;
-import com.playmonumenta.plugins.events.DamageEvent;
-import com.playmonumenta.plugins.utils.EntityUtils;
 
 public class TrainingDummyBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_training_dummy";
@@ -32,7 +33,7 @@ public class TrainingDummyBoss extends BossAbilityGroup {
 			}, 60 * 20)
 		));
 
-		super.constructBoss(activeSpells, null, detectionRange, null);
+		super.constructBoss(activeSpells, Collections.emptyList(), detectionRange, null);
 		boss.setRemoveWhenFarAway(false);
 	}
 

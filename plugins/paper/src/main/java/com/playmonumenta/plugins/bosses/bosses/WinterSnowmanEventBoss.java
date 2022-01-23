@@ -1,7 +1,11 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
+import java.util.Collections;
+
+import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.utils.AbsorptionUtils;
+
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -35,7 +39,7 @@ public class WinterSnowmanEventBoss extends BossAbilityGroup {
 			throw new Exception("boss_winter_snowman only works on snowmen!");
 		}
 
-		super.constructBoss(null, null, detectionRange, null);
+		super.constructBoss(SpellManager.EMPTY, Collections.emptyList(), detectionRange, null);
 	}
 
 	@Override

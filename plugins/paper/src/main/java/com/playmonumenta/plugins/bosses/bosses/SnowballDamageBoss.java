@@ -1,7 +1,11 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
+import java.util.Collections;
+
+import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.utils.BossUtils;
+
 import org.bukkit.GameMode;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -33,7 +37,7 @@ public class SnowballDamageBoss extends BossAbilityGroup {
 
 		mParams = BossParameters.getParameters(boss, identityTag, new Parameters());
 
-		super.constructBoss(null, null, mParams.DETECTION, null);
+		super.constructBoss(SpellManager.EMPTY, Collections.emptyList(), mParams.DETECTION, null);
 	}
 
 

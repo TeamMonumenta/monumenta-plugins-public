@@ -1,7 +1,11 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
+import java.util.Collections;
+
+import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.utils.CommandUtils;
+
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Sound;
@@ -27,7 +31,7 @@ public class HalloweenCreeperBoss extends BossAbilityGroup {
 			throw new Exception(identityTag + " only works on mobs!");
 		}
 
-		super.constructBoss(null, null, 100, null);
+		super.constructBoss(SpellManager.EMPTY, Collections.emptyList(), 100, null);
 
 		mCreeper = (Creeper)boss;
 		if (mCreeper.isIgnited()) {

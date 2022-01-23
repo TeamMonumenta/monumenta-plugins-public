@@ -1,11 +1,13 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
+import java.util.Arrays;
+import java.util.Collections;
+
 import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.spells.SpellBombToss;
+
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.plugin.Plugin;
-
-import java.util.Arrays;
 
 public class BombTossNoBlockBreakBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_bombtossnoblockbreak";
@@ -24,6 +26,6 @@ public class BombTossNoBlockBreakBoss extends BossAbilityGroup {
 			new SpellBombToss(plugin, boss, detectionRange, EXPLOSION_RADIUS, 1, 50, false, false)
 		));
 
-		super.constructBoss(activeSpells, null, detectionRange, null);
+		super.constructBoss(activeSpells, Collections.emptyList(), detectionRange, null);
 	}
 }

@@ -1,12 +1,14 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
-import com.playmonumenta.plugins.bosses.spells.Spell;
-import com.playmonumenta.plugins.bosses.spells.SpellCrowdControlClear;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.plugin.Plugin;
-
 import java.util.Arrays;
 import java.util.List;
+
+import com.playmonumenta.plugins.bosses.SpellManager;
+import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.bosses.spells.SpellCrowdControlClear;
+
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.plugin.Plugin;
 
 public class CrowdControlResistanceBoss extends BossAbilityGroup {
 
@@ -30,6 +32,6 @@ public class CrowdControlResistanceBoss extends BossAbilityGroup {
 
 		List<Spell> passive = Arrays.asList(new SpellCrowdControlClear(boss, p.CLEAR_TIME));
 
-		super.constructBoss(null, passive, p.DETECTION, null);
+		super.constructBoss(SpellManager.EMPTY, passive, p.DETECTION, null);
 	}
 }

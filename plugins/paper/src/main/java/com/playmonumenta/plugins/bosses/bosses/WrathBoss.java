@@ -1,6 +1,17 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
 import java.util.Arrays;
+import java.util.Collections;
+
+import com.playmonumenta.plugins.bosses.SpellManager;
+import com.playmonumenta.plugins.bosses.spells.SpellBaseLeapAttack;
+import com.playmonumenta.plugins.bosses.spells.SpellDuelist;
+import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -13,16 +24,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
-
-import com.playmonumenta.plugins.bosses.SpellManager;
-import com.playmonumenta.plugins.bosses.spells.SpellBaseLeapAttack;
-import com.playmonumenta.plugins.bosses.spells.SpellDuelist;
-import com.playmonumenta.plugins.events.DamageEvent;
-import com.playmonumenta.plugins.events.DamageEvent.DamageType;
-import com.playmonumenta.plugins.utils.BossUtils;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.FastUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
 
 public class WrathBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_wrath";
@@ -126,7 +127,7 @@ public class WrathBoss extends BossAbilityGroup {
 			}
 		}.runTaskLater(plugin, 1);
 
-		super.constructBoss(activeSpells, null, detectionRange, null);
+		super.constructBoss(activeSpells, Collections.emptyList(), detectionRange, null);
 	}
 
 	@Override

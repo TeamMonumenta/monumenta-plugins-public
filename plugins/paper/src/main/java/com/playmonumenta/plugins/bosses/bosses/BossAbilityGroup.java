@@ -1,5 +1,11 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.function.Consumer;
+import java.util.function.Predicate;
+import java.util.logging.Level;
+
 import com.destroystokyo.paper.event.entity.EntityPathfindEvent;
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.bosses.BossBarManager;
@@ -12,6 +18,7 @@ import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.SerializationUtils;
+
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
@@ -30,21 +37,8 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.checkerframework.checker.initialization.qual.UnknownInitialization;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.function.Predicate;
-import java.util.logging.Level;
-
 
 public abstract class BossAbilityGroup {
-	@FunctionalInterface
-	public interface PhaseAction {
-		/**
-		 * Function called whenever the boss changes phase
-		 */
-		void run(LivingEntity entity);
-	}
-
 	public static final int PASSIVE_RUN_INTERVAL_DEFAULT = Constants.QUARTER_TICKS_PER_SECOND;
 
 	protected final Plugin mPlugin;
@@ -52,8 +46,8 @@ public abstract class BossAbilityGroup {
 	private final String mIdentityTag;
 
 	private @Nullable BossBarManager mBossBar;
-	private @Nullable SpellManager mActiveSpells;
-	private @Nullable List<Spell> mPassiveSpells;
+	private SpellManager mActiveSpells;
+	private List<Spell> mPassiveSpells;
 	private @Nullable BukkitRunnable mTaskPassive = null;
 	private @Nullable BukkitRunnable mTaskActive = null;
 	private boolean mUnloaded = false;
@@ -67,35 +61,32 @@ public abstract class BossAbilityGroup {
 		mBoss.addScoreboardTag(mIdentityTag);
 	}
 
-	public void changePhase(@Nullable SpellManager activeSpells,
-	                        @Nullable List<Spell> passiveSpells, @Nullable PhaseAction action) {
+	public void changePhase(SpellManager activeSpells,
+	                        List<Spell> passiveSpells, @Nullable Consumer<LivingEntity> phaseAction) {
 
-		if (action != null) {
-			action.run(mBoss);
+		if (phaseAction != null) {
+			phaseAction.accept(mBoss);
 		}
 
-		if (mActiveSpells != null) {
-			mActiveSpells.cancelAll();
-		}
-
+		mActiveSpells.cancelAll();
 		mActiveSpells = activeSpells;
 		mPassiveSpells = passiveSpells;
 	}
 
 
-	public void constructBoss(@UnknownInitialization(BossAbilityGroup.class)BossAbilityGroup this,
-	                          @Nullable SpellManager activeSpells, @Nullable List<Spell> passiveSpells, int detectionRange, @Nullable BossBarManager bossBar) {
+	public void constructBoss(@UnknownInitialization(BossAbilityGroup.class) BossAbilityGroup this,
+	                          SpellManager activeSpells, List<Spell> passiveSpells, int detectionRange, @Nullable BossBarManager bossBar) {
 		constructBoss(activeSpells, passiveSpells, detectionRange, bossBar, 100);
 	}
 
-	public void constructBoss(@UnknownInitialization(BossAbilityGroup.class)BossAbilityGroup this,
-	                          @Nullable SpellManager activeSpells, @Nullable List<Spell> passiveSpells, int detectionRange, @Nullable BossBarManager bossBar, long spellDelay) {
+	public void constructBoss(@UnknownInitialization(BossAbilityGroup.class) BossAbilityGroup this,
+	                          SpellManager activeSpells, List<Spell> passiveSpells, int detectionRange, @Nullable BossBarManager bossBar, long spellDelay) {
 		constructBoss(activeSpells, passiveSpells, detectionRange, bossBar, spellDelay, PASSIVE_RUN_INTERVAL_DEFAULT);
 	}
 
 	/* If detectionRange <= 0, will always run regardless of whether players are nearby */
-	public void constructBoss(@UnknownInitialization(BossAbilityGroup.class)BossAbilityGroup this,
-	                          @Nullable SpellManager activeSpells, @Nullable List<Spell> passiveSpells, int detectionRange, @Nullable BossBarManager bossBar, long spellDelay, long passiveIntervalTicks) {
+	public void constructBoss(@UnknownInitialization(BossAbilityGroup.class) BossAbilityGroup this,
+	                          SpellManager activeSpells, List<Spell> passiveSpells, int detectionRange, @Nullable BossBarManager bossBar, long spellDelay, long passiveIntervalTicks) {
 		mBossBar = bossBar;
 		mActiveSpells = activeSpells;
 		mPassiveSpells = passiveSpells;
@@ -179,9 +170,7 @@ public abstract class BossAbilityGroup {
 						/* Cancel all the spells just in case they were activated */
 						mDisabled = true;
 
-						if (mActiveSpells != null) {
-							mActiveSpells.cancelAll();
-						}
+						mActiveSpells.cancelAll();
 					}
 					return;
 				}
@@ -189,7 +178,7 @@ public abstract class BossAbilityGroup {
 				/* Some spells might have been run - so when this next deactivates they need to be cancelled */
 				mDisabled = false;
 
-				if (mActiveSpells != null && !EntityUtils.isSilenced(mBoss)) {
+				if (!EntityUtils.isSilenced(mBoss)) {
 					// Run the next spell and store how long before the next spell can run
 					mNextActiveTimer = mActiveSpells.runNextSpell();
 
@@ -206,17 +195,13 @@ public abstract class BossAbilityGroup {
 	}
 
 	public void forceCastSpell(Class<? extends Spell> spell) {
-		if (mActiveSpells != null) {
-			mNextActiveTimer = mActiveSpells.forceCastSpell(spell);
-			Spell sp = mActiveSpells.getLastCastedSpell();
-			if (sp != null) {
-				SpellCastEvent event = new SpellCastEvent(mBoss, sp);
-				Bukkit.getPluginManager().callEvent(event);
-			} else {
-				mPlugin.getLogger().severe("Warning: Boss '" + mIdentityTag + "' attempted to force cast '" + spell.toString() + "' but boss does not have this spell!");
-			}
+		mNextActiveTimer = mActiveSpells.forceCastSpell(spell);
+		Spell sp = mActiveSpells.getLastCastedSpell();
+		if (sp != null) {
+			SpellCastEvent event = new SpellCastEvent(mBoss, sp);
+			Bukkit.getPluginManager().callEvent(event);
 		} else {
-			mPlugin.getLogger().severe("Warning: Boss '" + mIdentityTag + "' attempted to force cast '" + spell.toString() + "' but there are no active spells!");
+			mPlugin.getLogger().severe("Warning: Boss '" + mIdentityTag + "' attempted to force cast '" + spell.toString() + "' but boss does not have this spell!");
 		}
 	}
 
@@ -228,16 +213,12 @@ public abstract class BossAbilityGroup {
 	 * Event Handlers
 	 *******************************************************************************/
 
-	public @Nullable List<Spell> getPassives() {
+	public List<Spell> getPassives() {
 		return mPassiveSpells;
 	}
 
-	public @Nullable List<Spell> getActiveSpells() {
-		if (mActiveSpells != null) {
-			return mActiveSpells.getSpells();
-		} else {
-			return null;
-		}
+	public List<Spell> getActiveSpells() {
+		return mActiveSpells.getSpells();
 	}
 
 	/*
@@ -327,27 +308,21 @@ public abstract class BossAbilityGroup {
 	 * Boss was stunned by a player. Mobs with the "Boss" tag can't be stunned
 	 */
 	public void bossStunned() {
-		if (mActiveSpells != null) {
-			mActiveSpells.cancelAll();
-		}
+		mActiveSpells.cancelAll();
 	}
 
 	/*
 	 * Boss was confused by a player. Mobs with the "Boss" tag can't be confused
 	 */
 	public void bossConfused() {
-		if (mActiveSpells != null) {
-			mActiveSpells.cancelAll();
-		}
+		mActiveSpells.cancelAll();
 	}
 
 	/*
 	 * Boss was silenced by a player. Mobs with the "Boss" tag can't be silenced
 	 */
 	public void bossSilenced() {
-		if (mActiveSpells != null) {
-			mActiveSpells.cancelAll();
-		}
+		mActiveSpells.cancelAll();
 	}
 
 	/*
@@ -443,9 +418,7 @@ public abstract class BossAbilityGroup {
 		if (!mUnloaded) {
 			mUnloaded = true;
 
-			if (mActiveSpells != null) {
-				mActiveSpells.cancelAll();
-			}
+			mActiveSpells.cancelAll();
 
 			if (mBossBar != null) {
 				mBossBar.remove();
@@ -476,12 +449,12 @@ public abstract class BossAbilityGroup {
 	}
 
 	public boolean hasRunningSpell() {
-		return mActiveSpells != null && mActiveSpells.getSpells().stream().anyMatch(Spell::isRunning);
+		return !mActiveSpells.isEmpty() && mActiveSpells.getSpells().stream().anyMatch(Spell::isRunning);
 	}
 
 	public final boolean hasRunningSpellOfType(Class<?>... spellTypes) {
 		Predicate<Spell> isOfArgumentType = s -> Arrays.stream(spellTypes).anyMatch(type -> type.isInstance(s));
-		return mActiveSpells != null && mActiveSpells.getSpells().stream().anyMatch(s -> s.isRunning() && isOfArgumentType.test(s));
+		return !mActiveSpells.isEmpty() && mActiveSpells.getSpells().stream().anyMatch(s -> s.isRunning() && isOfArgumentType.test(s));
 	}
 
 }

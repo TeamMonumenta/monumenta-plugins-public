@@ -1,7 +1,12 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
+import java.util.Collections;
+import java.util.Set;
+
 import com.playmonumenta.plugins.abilities.delves.Chivalrous;
+import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.events.DamageEvent;
+
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -9,8 +14,6 @@ import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.plugin.Plugin;
-
-import java.util.Set;
 
 public class AntiRangeChivalrousBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_antirangechivalrous";
@@ -26,7 +29,7 @@ public class AntiRangeChivalrousBoss extends BossAbilityGroup {
 	public AntiRangeChivalrousBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
 
-		super.constructBoss(null, null, detectionRange, null);
+		super.constructBoss(SpellManager.EMPTY, Collections.emptyList(), detectionRange, null);
 	}
 
 	@Override

@@ -1,10 +1,14 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
+import java.util.Collections;
+
+import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.parameters.BossParam;
 import com.playmonumenta.plugins.bosses.parameters.EffectsList;
 import com.playmonumenta.plugins.bosses.parameters.ParticlesList;
 import com.playmonumenta.plugins.bosses.parameters.SoundsList;
 import com.playmonumenta.plugins.events.DamageEvent;
+
 import org.bukkit.Location;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -38,7 +42,7 @@ public class OnHitBoss extends BossAbilityGroup {
 		super(plugin, identityTag, boss);
 		//this boss has no ability
 		mParams = BossParameters.getParameters(boss, identityTag, new Parameters());
-		super.constructBoss(null, null, mParams.DETECTION, null);
+		super.constructBoss(SpellManager.EMPTY, Collections.emptyList(), mParams.DETECTION, null);
 	}
 
 	@Override

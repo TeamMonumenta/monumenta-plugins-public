@@ -1,12 +1,14 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
-import com.playmonumenta.plugins.bosses.spells.Spell;
-import com.playmonumenta.plugins.bosses.spells.SpellShadeParticle;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.plugin.Plugin;
-
 import java.util.Arrays;
 import java.util.List;
+
+import com.playmonumenta.plugins.bosses.SpellManager;
+import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.bosses.spells.SpellShadeParticle;
+
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.plugin.Plugin;
 
 public final class ShadeParticleBoss extends BossAbilityGroup {
 
@@ -23,6 +25,6 @@ public final class ShadeParticleBoss extends BossAbilityGroup {
 			new SpellShadeParticle(boss)
 		);
 
-		super.constructBoss(null, passiveSpells, detectionRange, null);
+		super.constructBoss(SpellManager.EMPTY, passiveSpells, detectionRange, null);
 	}
 }

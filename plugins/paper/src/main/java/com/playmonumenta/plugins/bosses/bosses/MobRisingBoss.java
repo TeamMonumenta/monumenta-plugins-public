@@ -1,15 +1,17 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
+import java.util.Arrays;
+import java.util.Collections;
+
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.parameters.EntityTargets;
 import com.playmonumenta.plugins.bosses.parameters.LoSPool;
 import com.playmonumenta.plugins.bosses.spells.SpellBaseSummon;
+
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.entity.LivingEntity;
-
-import java.util.Arrays;
 
 public class MobRisingBoss extends BossAbilityGroup {
 
@@ -91,7 +93,7 @@ public class MobRisingBoss extends BossAbilityGroup {
 			));
 
 
-			super.constructBoss(activeSpells, null, p.DETECTION, null, p.DELAY);
+			super.constructBoss(activeSpells, Collections.emptyList(), p.DETECTION, null, p.DELAY);
 		} else {
 			Plugin.getInstance().getLogger().warning("[MobRisingBoss] tried to summon a boss with default LoSPool MOB_POOL = EMPTY");
 		}

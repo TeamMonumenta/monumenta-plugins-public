@@ -1,9 +1,13 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
+import java.util.Arrays;
+import java.util.Collections;
+
 import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.bosses.spells.SpellRunAction;
 import com.playmonumenta.plugins.bosses.spells.SpellTargetVisiblePlayer;
+
 import org.bukkit.entity.Dolphin;
 import org.bukkit.entity.Golem;
 import org.bukkit.entity.LivingEntity;
@@ -13,8 +17,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.entity.Wolf;
 import org.bukkit.event.entity.EntityTargetEvent;
 import org.bukkit.plugin.Plugin;
-
-import java.util.Arrays;
 
 public class PlayerTargetBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_targetplayer";
@@ -50,7 +52,7 @@ public class PlayerTargetBoss extends BossAbilityGroup {
 			})
 		));
 
-		super.constructBoss(activeSpells, null, detectionRange, null);
+		super.constructBoss(activeSpells, Collections.emptyList(), detectionRange, null);
 	}
 
 	/* Only allow mobs with this ability to target players */

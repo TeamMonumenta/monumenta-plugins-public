@@ -1,13 +1,15 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.bosses.spells.Spell;
-import com.playmonumenta.plugins.bosses.spells.SpellRunAction;
-import org.bukkit.Location;
-import org.bukkit.entity.LivingEntity;
-
 import java.util.Arrays;
 import java.util.List;
+
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.bosses.SpellManager;
+import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.bosses.spells.SpellRunAction;
+
+import org.bukkit.Location;
+import org.bukkit.entity.LivingEntity;
 
 public final class SpinBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_spin";
@@ -34,7 +36,7 @@ public final class SpinBoss extends BossAbilityGroup {
 			boss.teleport(loc);
 		}));
 
-		super.constructBoss(null, passiveSpells, -1, null, 100, 1);
+		super.constructBoss(SpellManager.EMPTY, passiveSpells, -1, null, 100, 1);
 	}
 }
 

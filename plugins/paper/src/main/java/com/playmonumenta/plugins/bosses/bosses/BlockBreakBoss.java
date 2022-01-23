@@ -1,12 +1,14 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
-import com.playmonumenta.plugins.bosses.spells.Spell;
-import com.playmonumenta.plugins.bosses.spells.SpellBlockBreak;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.plugin.Plugin;
-
 import java.util.Arrays;
 import java.util.List;
+
+import com.playmonumenta.plugins.bosses.SpellManager;
+import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.bosses.spells.SpellBlockBreak;
+
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.plugin.Plugin;
 
 public class BlockBreakBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_blockbreak";
@@ -20,6 +22,6 @@ public class BlockBreakBoss extends BossAbilityGroup {
 		super(plugin, identityTag, boss);
 		List<Spell> passiveSpells = Arrays.asList(new SpellBlockBreak(boss));
 
-		super.constructBoss(null, passiveSpells, detectionRange, null);
+		super.constructBoss(SpellManager.EMPTY, passiveSpells, detectionRange, null);
 	}
 }

@@ -1,5 +1,9 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
+import java.util.Collections;
+
+import com.playmonumenta.plugins.bosses.SpellManager;
+
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.plugin.Plugin;
@@ -21,7 +25,7 @@ public class VarcosaSummonedMob extends BossAbilityGroup {
 		super(plugin, "boss_varcosa_summoned", boss);
 		mSummoner = summoner;
 
-		super.constructBoss(null, null, 100, null);
+		super.constructBoss(SpellManager.EMPTY, Collections.emptyList(), 100, null);
 	}
 
 	@Override

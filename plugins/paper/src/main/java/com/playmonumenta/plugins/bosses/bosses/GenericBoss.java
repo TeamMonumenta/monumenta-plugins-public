@@ -1,6 +1,10 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
+import java.util.Collections;
+
 import com.playmonumenta.plugins.bosses.BossBarManager;
+import com.playmonumenta.plugins.bosses.SpellManager;
+
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
 import org.bukkit.entity.LivingEntity;
@@ -20,6 +24,6 @@ public class GenericBoss extends BossAbilityGroup {
 
 		BossBarManager bossBar = new BossBarManager(plugin, boss, detectionRange, BarColor.WHITE, BarStyle.SOLID, null);
 
-		super.constructBoss(null, null, detectionRange, bossBar);
+		super.constructBoss(SpellManager.EMPTY, Collections.emptyList(), detectionRange, bossBar);
 	}
 }

@@ -1,13 +1,15 @@
 package com.playmonumenta.plugins.parrots;
 
+import java.util.Arrays;
+import java.util.List;
+
+import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.bosses.BossAbilityGroup;
 import com.playmonumenta.plugins.bosses.spells.Spell;
+
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Parrot;
 import org.bukkit.plugin.Plugin;
-
-import java.util.Arrays;
-import java.util.List;
 
 public class RainbowParrot extends BossAbilityGroup {
 	public static final String identityTag = "RainbowParrot";
@@ -23,6 +25,6 @@ public class RainbowParrot extends BossAbilityGroup {
 			new RainbowParrotPassive((Parrot) boss, 1)
 		);
 
-		super.constructBoss(null, passiveSpells, 20, null, 20);
+		super.constructBoss(SpellManager.EMPTY, passiveSpells, 20, null, 20);
 	}
 }

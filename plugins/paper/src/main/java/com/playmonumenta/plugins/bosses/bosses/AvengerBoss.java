@@ -1,10 +1,14 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
+import java.util.Collections;
+
+import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.parameters.BossParam;
 import com.playmonumenta.plugins.bosses.parameters.ParticlesList;
 import com.playmonumenta.plugins.bosses.parameters.SoundsList;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.utils.EntityUtils;
+
 import org.bukkit.Location;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
@@ -67,7 +71,7 @@ public class AvengerBoss extends BossAbilityGroup {
 	public AvengerBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
 		mParam = BossParameters.getParameters(boss, identityTag, new Parameters());
-		super.constructBoss(null, null, mParam.DETECTION, null);
+		super.constructBoss(SpellManager.EMPTY, Collections.emptyList(), mParam.DETECTION, null);
 	}
 
 	// Use this instead of the attribute to catch ability damage, ranged damage, etc.

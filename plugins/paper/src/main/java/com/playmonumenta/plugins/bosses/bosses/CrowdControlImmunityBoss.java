@@ -1,15 +1,17 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
+import java.util.Arrays;
+import java.util.List;
+
+import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.spells.CrowdControlImmunity;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.effects.Effect;
 import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.events.CustomEffectApplyEvent;
+
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.plugin.Plugin;
-
-import java.util.Arrays;
-import java.util.List;
 
 public class CrowdControlImmunityBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_ccimmune";
@@ -26,7 +28,7 @@ public class CrowdControlImmunityBoss extends BossAbilityGroup {
 			new CrowdControlImmunity(boss)
 		);
 
-		super.constructBoss(null, passiveSpells, detectionRange, null);
+		super.constructBoss(SpellManager.EMPTY, passiveSpells, detectionRange, null);
 	}
 
 	@Override

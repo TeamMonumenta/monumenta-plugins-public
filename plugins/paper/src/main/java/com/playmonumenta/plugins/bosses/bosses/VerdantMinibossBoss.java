@@ -1,5 +1,9 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
+import java.util.AbstractMap;
+import java.util.Arrays;
+import java.util.Collection;
+
 import com.playmonumenta.plugins.bosses.BossBarManager;
 import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.spells.SpellBaseCharge;
@@ -17,7 +21,7 @@ import com.playmonumenta.plugins.utils.ParticleUtils;
 import com.playmonumenta.plugins.utils.ParticleUtils.SpawnParticleAction;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.SerializationUtils;
-import net.md_5.bungee.api.ChatColor;
+
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -42,9 +46,7 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-import java.util.AbstractMap;
-import java.util.Arrays;
-import java.util.Collection;
+import net.md_5.bungee.api.ChatColor;
 
 public class VerdantMinibossBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_verdantmini";
@@ -126,7 +128,7 @@ public class VerdantMinibossBoss extends BossAbilityGroup {
 
 		mBoss.setRemoveWhenFarAway(false);
 		BossBarManager bossBar = new BossBarManager(plugin, boss, detectionRange, BarColor.YELLOW, BarStyle.SEGMENTED_10, null);
-		super.constructBoss(null, Arrays.asList(new SpellBlockBreak(boss), new SpellShieldStun(10 * 20)), detectionRange, bossBar);
+		super.constructBoss(SpellManager.EMPTY, Arrays.asList(new SpellBlockBreak(boss), new SpellShieldStun(10 * 20)), detectionRange, bossBar);
 	}
 
 	@Override

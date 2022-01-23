@@ -3,18 +3,19 @@ package com.playmonumenta.plugins.bosses.bosses.abilities;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.bukkit.Particle;
-import org.bukkit.Sound;
-import org.bukkit.World;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.event.entity.EntityDeathEvent;
-
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.bosses.BossAbilityGroup;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.bosses.spells.SpellDrawAggro;
 import com.playmonumenta.plugins.depths.abilities.shadow.DummyDecoy;
 import com.playmonumenta.plugins.utils.EntityUtils;
+
+import org.bukkit.Particle;
+import org.bukkit.Sound;
+import org.bukkit.World;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.event.entity.EntityDeathEvent;
 
 public class DummyDecoyBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_dummydecoy";
@@ -32,7 +33,7 @@ public class DummyDecoyBoss extends BossAbilityGroup {
 		List<Spell> passives = new ArrayList<>();
 		passives.add(new SpellDrawAggro(boss, DummyDecoy.AGGRO_RADIUS));
 
-		super.constructBoss(null, passives, detectionRange, null);
+		super.constructBoss(SpellManager.EMPTY, passives, detectionRange, null);
 	}
 
 	@Override

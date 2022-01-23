@@ -3,6 +3,13 @@ package com.playmonumenta.plugins.bosses.bosses;
 import java.util.Arrays;
 import java.util.List;
 
+import com.playmonumenta.plugins.bosses.SpellManager;
+import com.playmonumenta.plugins.bosses.parameters.BossParam;
+import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.bosses.spells.SpellBaseTrail;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.utils.DamageUtils;
+
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -10,12 +17,6 @@ import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
-
-import com.playmonumenta.plugins.bosses.parameters.BossParam;
-import com.playmonumenta.plugins.bosses.spells.Spell;
-import com.playmonumenta.plugins.bosses.spells.SpellBaseTrail;
-import com.playmonumenta.plugins.events.DamageEvent.DamageType;
-import com.playmonumenta.plugins.utils.DamageUtils;
 
 public final class FlameTrailBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_flametrail";
@@ -78,6 +79,6 @@ public final class FlameTrailBoss extends BossAbilityGroup {
 					(World world, Location loc) -> { })
 		);
 
-		super.constructBoss(null, passiveSpells, p.DETECTION, null, p.DELAY);
+		super.constructBoss(SpellManager.EMPTY, passiveSpells, p.DETECTION, null, p.DELAY);
 	}
 }

@@ -1,7 +1,11 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
+import java.util.Collections;
+
+import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.utils.AbilityUtils;
+
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -43,7 +47,7 @@ public class AbilitySilenceBoss extends BossAbilityGroup {
 
 		mParams = BossParameters.getParameters(boss, identityTag, new Parameters());
 
-		super.constructBoss(null, null, mParams.DETECTION, null);
+		super.constructBoss(SpellManager.EMPTY, Collections.emptyList(), mParams.DETECTION, null);
 	}
 
 	@Override

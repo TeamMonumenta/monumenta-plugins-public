@@ -1,5 +1,9 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
+import java.util.Collections;
+
+import com.playmonumenta.plugins.bosses.SpellManager;
+
 import org.bukkit.entity.Fireball;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
@@ -17,7 +21,7 @@ public class NoFireBoss extends BossAbilityGroup {
 		super(plugin, identityTag, boss);
 
 		// Little changes to boss
-		super.constructBoss(null, null, detectionRange, null);
+		super.constructBoss(SpellManager.EMPTY, Collections.emptyList(), detectionRange, null);
 	}
 
 	//Prevents fireballs from setting fire

@@ -1,18 +1,20 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
+import java.util.Arrays;
+import java.util.List;
+
+import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.bosses.spells.SpellInspire;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.utils.DelvesUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
+
 import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.plugin.Plugin;
-
-import java.util.Arrays;
-import java.util.List;
 
 public final class CommanderBoss extends BossAbilityGroup {
 
@@ -38,7 +40,7 @@ public final class CommanderBoss extends BossAbilityGroup {
 			new SpellInspire(com.playmonumenta.plugins.Plugin.getInstance(), boss, mParams.RANGE)
 		);
 
-		super.constructBoss(null, passiveSpells, mParams.DETECTION, null);
+		super.constructBoss(SpellManager.EMPTY, passiveSpells, mParams.DETECTION, null);
 	}
 
 	@Override

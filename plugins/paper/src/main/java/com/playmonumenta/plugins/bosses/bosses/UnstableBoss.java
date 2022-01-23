@@ -1,5 +1,9 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
+import java.util.Collections;
+
+import com.playmonumenta.plugins.bosses.SpellManager;
+
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDeathEvent;
@@ -25,7 +29,7 @@ public class UnstableBoss extends BossAbilityGroup {
 		super(plugin, identityTag, boss);
 		mPFinal = BossParameters.getParameters(boss, identityTag, new Parameters());
 		// Boss effectively does nothing lol
-		super.constructBoss(null, null, mPFinal.DETECTION, null);
+		super.constructBoss(SpellManager.EMPTY, Collections.emptyList(), mPFinal.DETECTION, null);
 	}
 
 	@Override

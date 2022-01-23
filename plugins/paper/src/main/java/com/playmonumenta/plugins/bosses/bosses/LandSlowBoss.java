@@ -1,12 +1,14 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.bosses.spells.Spell;
-import com.playmonumenta.plugins.bosses.spells.SpellLandSlow;
-import org.bukkit.entity.LivingEntity;
-
 import java.util.Arrays;
 import java.util.List;
+
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.bosses.SpellManager;
+import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.bosses.spells.SpellLandSlow;
+
+import org.bukkit.entity.LivingEntity;
 
 public class LandSlowBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_land_slow";
@@ -25,6 +27,6 @@ public class LandSlowBoss extends BossAbilityGroup {
 		Parameters p = BossParameters.getParameters(boss, identityTag, new Parameters());
 		List<Spell> passiveSpells = Arrays.asList(new SpellLandSlow(plugin, boss, p.SLOWNESSPERCENT));
 
-		super.constructBoss(null, passiveSpells, detectionRange, null);
+		super.constructBoss(SpellManager.EMPTY, passiveSpells, detectionRange, null);
 	}
 }

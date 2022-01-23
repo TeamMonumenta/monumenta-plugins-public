@@ -1,7 +1,12 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+
 import com.playmonumenta.plugins.bosses.BossBarManager;
 import com.playmonumenta.plugins.bosses.BossBarManager.BossHealthAction;
+import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -9,6 +14,7 @@ import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.SerializationUtils;
+
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -22,9 +28,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
-
-import java.util.HashMap;
-import java.util.Map;
 
 public final class CrownbearerBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_crownbearer";
@@ -106,7 +109,7 @@ public final class CrownbearerBoss extends BossAbilityGroup {
 
 		BossBarManager bossBar = new BossBarManager(plugin, boss, detectionRange, BarColor.GREEN, BarStyle.SEGMENTED_10, events);
 
-		super.constructBoss(null, null, detectionRange, bossBar);
+		super.constructBoss(SpellManager.EMPTY, Collections.emptyList(), detectionRange, bossBar);
 	}
 
 	private void summonSOTF(Location loc) {
