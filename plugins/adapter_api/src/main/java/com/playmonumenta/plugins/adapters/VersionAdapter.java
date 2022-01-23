@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.adapters;
 
 import org.bukkit.World;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
@@ -17,19 +18,19 @@ public interface VersionAdapter {
 
 	void unblockableEntityDamageEntity(LivingEntity damagee, double amount, LivingEntity damager, @Nullable String cause);
 
-	<T extends org.bukkit.entity.Entity> T duplicateEntity(T entity);
+	<T extends Entity> T duplicateEntity(T entity);
 
 	/**
-	 * Gets an entity by its {@link org.bukkit.entity.Entity#getEntityId() id} (i.e. not by its {@link org.bukkit.entity.Entity#getUniqueId() UUID}).
+	 * Gets an entity by its {@link Entity#getEntityId() id} (i.e. not by its {@link Entity#getUniqueId() UUID}).
 	 */
-	org.bukkit.entity.@Nullable Entity getEntityById(World world, int entityId);
+	@Nullable Entity getEntityById(World world, int entityId);
 
 	/**
 	 * Gets the actual direction of an entity instead of the direction of its head.
 	 * This is particularly useful for players as this gives the direction a player is actually looking
 	 * instead of one slightly in the past as the head is lagging behind the actual direction.
 	 */
-	Vector getActualDirection(org.bukkit.entity.Entity entity);
+	Vector getActualDirection(Entity entity);
 
 	int getAttackCooldown(LivingEntity entity);
 

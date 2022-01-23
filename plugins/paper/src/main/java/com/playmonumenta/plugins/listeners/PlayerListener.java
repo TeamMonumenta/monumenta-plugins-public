@@ -1020,7 +1020,6 @@ public class PlayerListener implements Listener {
 	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	public void blockBreakEvent(BlockBreakEvent event) {
 		Player player = event.getPlayer();
-		ItemStack item = player.getInventory().getItemInMainHand();
 		Block block = event.getBlock();
 
 		if (!mPlugin.mItemOverrides.blockBreakInteraction(mPlugin, event.getPlayer(), block, event)) {
@@ -1072,19 +1071,6 @@ public class PlayerListener implements Listener {
 		// event.cancelMessage(),
 		// instead of doing player.sendMessage() separately
 		if (GameMode.SURVIVAL.equals(newGameMode) && shouldBeAdventure) {
-			// event.cancelMessage(
-			// 	Component
-			// 		.text("Set own game mode to ", Colors.GREENISH_BLUE)
-			// 		.append(
-			// 			Component.text("Adventure Mode ", Colors.GREENISH_BLUE_DARK)
-			// 		)
-			// 		.append(
-			// 			Component.text(
-			// 				"instead of Survival due to zone.",
-			// 				Colors.GREENISH_BLUE
-			// 			)
-			// 		)
-			// );
 			event.setCancelled(true);
 			player.setGameMode(GameMode.ADVENTURE);
 			// Op check since listener also catches mechanisms putting players
@@ -1110,19 +1096,6 @@ public class PlayerListener implements Listener {
 				);
 			}
 		} else if (GameMode.ADVENTURE.equals(newGameMode) && !shouldBeAdventure) {
-			// event.cancelMessage(
-			// 	Component
-			// 		.text("Set own game mode to ", Colors.GREENISH_BLUE)
-			// 		.append(
-			// 			Component.text("Survival Mode ", Colors.GREENISH_BLUE_DARK)
-			// 		)
-			// 		.append(
-			// 			Component.text(
-			// 				"instead of Adventure due to zone.",
-			// 				Colors.GREENISH_BLUE
-			// 			)
-			// 		)
-			// );
 			event.setCancelled(true);
 			player.setGameMode(GameMode.SURVIVAL);
 			if (player.isOp()) {

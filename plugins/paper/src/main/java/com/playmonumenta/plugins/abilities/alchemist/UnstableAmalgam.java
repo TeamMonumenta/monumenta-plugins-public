@@ -6,7 +6,6 @@ import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
-import org.bukkit.entity.AbstractArrow;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -46,7 +45,6 @@ public class UnstableAmalgam extends Ability {
 	private static final int UNSTABLE_AMALGAM_RADIUS = 4;
 	private static final float UNSTABLE_AMALGAM_KNOCKBACK_SPEED = 2.5f;
 
-	private @Nullable AbstractArrow mUnstableArrow = null;
 	private @Nullable AlchemistPotions mAlchemistPotions;
 	private @Nullable Slime mAmalgam;
 	private int mDamage;

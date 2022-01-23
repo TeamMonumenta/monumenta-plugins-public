@@ -254,9 +254,6 @@ public class PotionConsumeListener implements Listener {
 			if (instantDrinkLevel == 0) {
 				if (item.getAmount() == 0) {
 					event.getClickedInventory().setItem(event.getSlot(), new ItemStack(Material.GLASS_BOTTLE));
-				} else {
-					//Re-enable if we ever want stacked non-instant drink potions to be cancellable (can't remove the bottle though)
-//					player.getInventory().addItem(new ItemStack(Material.GLASS_BOTTLE));
 				}
 			}
 		}

@@ -12,7 +12,7 @@ public class UpdateHeldItem extends GenericCommand {
 		registerPlayerCommand("updatehelditem", "monumenta.command.updatehelditem", UpdateHeldItem::run);
 	}
 
-	private static void run(CommandSender sender, Player player) throws WrapperCommandSyntaxException {
+	public static void run(CommandSender sender, Player player) throws WrapperCommandSyntaxException {
 		ItemStack item = player.getEquipment().getItemInMainHand();
 		if (item == null || item.getAmount() <= 0) {
 			CommandAPI.fail("Player must have a valid item in their main hand!");

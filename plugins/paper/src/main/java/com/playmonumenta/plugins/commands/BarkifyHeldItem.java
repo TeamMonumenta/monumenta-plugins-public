@@ -1,6 +1,14 @@
 package com.playmonumenta.plugins.commands;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.playmonumenta.plugins.utils.ItemStatUtils;
+
+import org.bukkit.Sound;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
+
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.CommandPermission;
 import dev.jorel.commandapi.arguments.Argument;
@@ -8,13 +16,6 @@ import dev.jorel.commandapi.arguments.EntitySelectorArgument;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument.EntitySelector;
 import dev.jorel.commandapi.arguments.MultiLiteralArgument;
 import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
-import org.bukkit.Sound;
-import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /*
  * NOTICE!
@@ -37,12 +38,12 @@ public class BarkifyHeldItem extends GenericCommand {
 			.withPermission(perms)
 			.withArguments(arguments)
 			.executes((sender, args) -> {
-				run(sender, (Player)args[1], (String)args[0]);
+				run((Player)args[1], (String)args[0]);
 			})
 			.register();
 	}
 
-	private static void run(CommandSender sender, Player player, String selection) throws WrapperCommandSyntaxException {
+	private static void run(Player player, String selection) throws WrapperCommandSyntaxException {
 		ItemStack is = player.getItemInHand();
 		if (selection.equals("Barking")) {
 			player.playSound(player.getLocation(), Sound.ENTITY_WOLF_AMBIENT, 1, 1f);

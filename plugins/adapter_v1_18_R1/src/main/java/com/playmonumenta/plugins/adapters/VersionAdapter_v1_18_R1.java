@@ -10,6 +10,7 @@ import org.bukkit.craftbukkit.v1_18_R1.CraftWorld;
 import org.bukkit.craftbukkit.v1_18_R1.entity.CraftEntity;
 import org.bukkit.craftbukkit.v1_18_R1.entity.CraftLivingEntity;
 import org.bukkit.craftbukkit.v1_18_R1.entity.CraftPlayer;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
@@ -21,7 +22,6 @@ import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.EntityDamageSource;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
 
@@ -35,7 +35,7 @@ public class VersionAdapter_v1_18_R1 implements VersionAdapter {
 	private static class CustomDamageSource extends EntityDamageSource {
 		String mKilledUsingMsg;
 
-		public CustomDamageSource(Entity damager, @Nullable String killedUsingMsg) {
+		public CustomDamageSource(net.minecraft.world.entity.Entity damager, @Nullable String killedUsingMsg) {
 			super("custom", damager);
 
 			if (killedUsingMsg == null) {
@@ -66,12 +66,12 @@ public class VersionAdapter_v1_18_R1 implements VersionAdapter {
 	private static class UnblockableEntityDamageSource extends EntityDamageSource {
 		private final @Nullable String mKilledUsingMsg;
 
-		public UnblockableEntityDamageSource(Entity entity) {
+		public UnblockableEntityDamageSource(net.minecraft.world.entity.Entity entity) {
 			super("custom", entity);
 			mKilledUsingMsg = null;
 		}
 
-		public UnblockableEntityDamageSource(Entity damager, @Nullable String killedUsingMsg) {
+		public UnblockableEntityDamageSource(net.minecraft.world.entity.Entity damager, @Nullable String killedUsingMsg) {
 			super("custom", damager);
 			if (killedUsingMsg == null || !killedUsingMsg.isEmpty()) {
 			    mKilledUsingMsg = killedUsingMsg;
@@ -116,7 +116,7 @@ public class VersionAdapter_v1_18_R1 implements VersionAdapter {
 	}
 
 	@SuppressWarnings("unchecked")
-	public <T extends org.bukkit.entity.Entity> T duplicateEntity(T entity) {
+	public <T extends Entity> T duplicateEntity(T entity) {
 		T newEntity = (T)entity.getWorld().spawnEntity(entity.getLocation(), entity.getType());
 
 		CompoundTag nbttagcompound = ((CraftEntity) entity).getHandle().saveWithoutId(new CompoundTag());
@@ -129,8 +129,8 @@ public class VersionAdapter_v1_18_R1 implements VersionAdapter {
 		return newEntity;
 	}
 
-	public org.bukkit.entity.@Nullable Entity getEntityById(World world, int entityId) {
-		Entity entity = ((CraftWorld) world).getHandle().getEntity(entityId);
+	public @Nullable Entity getEntityById(World world, int entityId) {
+		net.minecraft.world.entity.Entity entity = ((CraftWorld) world).getHandle().getEntity(entityId);
 		return entity == null ? null : entity.getBukkitEntity();
 	}
 
@@ -164,7 +164,7 @@ public class VersionAdapter_v1_18_R1 implements VersionAdapter {
 		}
 	}
 
-	public Vector getActualDirection(org.bukkit.entity.Entity entity) {
+	public Vector getActualDirection(Entity entity) {
 		Vector vector = new Vector();
 
 		double rotX = ((CraftEntity) entity).getHandle().getXRot();

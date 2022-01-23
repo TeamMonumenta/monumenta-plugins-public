@@ -18,7 +18,7 @@ public class GildifyHeldItem extends GenericCommand {
 		registerPlayerCommand("gildifyhelditem", "monumenta.command.gildifyhelditem", GildifyHeldItem::run);
 	}
 
-	private static void run(CommandSender sender, Player player) throws WrapperCommandSyntaxException {
+	public static void run(CommandSender sender, Player player) throws WrapperCommandSyntaxException {
 		ItemStack item = player.getItemInHand();
 		ItemStatUtils.addInfusion(item, ItemStatUtils.InfusionType.GILDED, 1, player.getUniqueId());
 		ItemStatUtils.generateItemStats(item);

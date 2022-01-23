@@ -972,7 +972,7 @@ public class DepthsManager {
 
 		// Generate the room
 		if (mRoomRepository == null) {
-			mRoomRepository = new DepthsRoomRepository(player.getWorld());
+			mRoomRepository = new DepthsRoomRepository();
 		}
 
 		// Summon the new room and give it to the party
@@ -1320,7 +1320,7 @@ public class DepthsManager {
 		}
 
 		if (mRoomRepository == null) {
-			mRoomRepository = new DepthsRoomRepository(p.getWorld());
+			mRoomRepository = new DepthsRoomRepository();
 		}
 		mRoomRepository.goToNextFloor(getPartyFromId(dp), treasureScoreIncrease);
 		getPartyFromId(dp).mBeatBoss = true;

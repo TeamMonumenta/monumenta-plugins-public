@@ -11,7 +11,7 @@ public class PhylacteryifyHeldItem extends GenericCommand {
 		registerPlayerCommand("phylacteryifyhelditem", "monumenta.command.phylacteryifyhelditem", PhylacteryifyHeldItem::run);
 	}
 
-	private static void run(CommandSender sender, Player player) throws WrapperCommandSyntaxException {
+	public static void run(CommandSender sender, Player player) throws WrapperCommandSyntaxException {
 		ItemStack item = player.getItemInHand();
 		ItemStatUtils.addInfusion(item, ItemStatUtils.InfusionType.PHYLACTERY, 1, player.getUniqueId());
 		ItemStatUtils.generateItemStats(item);

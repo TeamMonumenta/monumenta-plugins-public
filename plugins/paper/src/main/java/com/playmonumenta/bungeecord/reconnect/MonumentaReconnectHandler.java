@@ -25,7 +25,7 @@ public class MonumentaReconnectHandler implements ReconnectHandler {
 	private HashMap<String, String> data;
 	private String mDefaultServer = null;
 
-    @SuppressWarnings("unchecked")
+	@SuppressWarnings("unchecked")
 	public MonumentaReconnectHandler(String defaultServer) {
 		/* Note this might be null, which is ok */
 		mDefaultServer = defaultServer;

@@ -45,8 +45,8 @@ public class DepthsRoomRepository {
 	@Nullable DepthsRoom mF3BossRoom;
 	@Nullable DepthsRoom mWeaponAspectRoom;
 
-	public DepthsRoomRepository(World world) {
-		initRooms(world);
+	public DepthsRoomRepository() {
+		initRooms();
 	}
 
 	/**
@@ -55,7 +55,7 @@ public class DepthsRoomRepository {
 	 * They also have a spawner count to track player progress and a vector to represent the size.
 	 * @param world
 	 */
-	private void initRooms(World world) {
+	private void initRooms() {
 		//Load room details
 		//F1 utility rooms
 		mF1UtilityRooms.add(new DepthsRoom("depths/f1r9", DepthsRoomType.UTILITY, new Vector(38, 26, 38), new Vector(1.0, -11.0, -17.0), 0, RoomDirection.EVEN));

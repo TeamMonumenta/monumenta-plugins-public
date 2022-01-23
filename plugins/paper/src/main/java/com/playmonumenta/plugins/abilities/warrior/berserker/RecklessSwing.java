@@ -71,7 +71,6 @@ public class RecklessSwing extends Ability {
 		if (mPlayer.isSneaking()) {
 			// Run at the end of this tick so it'll apply after any damage dealt to mobs
 			Bukkit.getScheduler().runTask(mPlugin, () -> {
-				double preReduceHealthDamage = computeDamageUsingHealth(mDamage);
 				if (mPlayer.getHealth() <= SELF_DAMAGE) {
 					mPlayer.damage(9001);
 				} else {

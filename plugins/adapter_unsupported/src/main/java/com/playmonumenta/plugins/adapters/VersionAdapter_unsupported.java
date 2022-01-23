@@ -1,10 +1,5 @@
 package com.playmonumenta.plugins.adapters;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-
-import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -34,7 +29,7 @@ public class VersionAdapter_unsupported implements VersionAdapter {
 	}
 
 	@SuppressWarnings("unchecked")
-	public <T extends org.bukkit.entity.Entity> T duplicateEntity(T entity) {
+	public <T extends Entity> T duplicateEntity(T entity) {
 		return (T)entity.getWorld().spawnEntity(entity.getLocation(), entity.getType());
 	}
 

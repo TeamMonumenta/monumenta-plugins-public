@@ -46,10 +46,6 @@ public class TradeListener implements Listener {
 	// Items for which to completely disable reskin trades
 	private static final ImmutableSet<String> DISABLED_ITEMS = ImmutableSet.of("Soulsinger");
 
-	// These lore lines are not considered for lore equality, and will also not be copied over to the final item
-	// TODO to tags
-	private static final ImmutableSet<String> IGNORED_LORE = ImmutableSet.of("Prismarine Enabled", "Prismarine Disabled", "Blackstone Enabled", "Blackstone Disabled");
-
 	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
 	public void tradeWindowOpenEvent(TradeWindowOpenEvent event) {
 
@@ -242,9 +238,12 @@ public class TradeListener implements Listener {
 		// custom attributes - compare NBT directly, ignoring order
 		NBTCompoundList attrs1 = ItemStatUtils.getAttributes(nbt1);
 		NBTCompoundList attrs2 = ItemStatUtils.getAttributes(nbt2);
-		if ((attrs1 == null) != (attrs2 == null)
-			    || attrs1 != null && attrs2 != null && !Set.copyOf(attrs1).equals(Set.copyOf(attrs2))) {
+		if ((attrs1 == null) != (attrs2 == null)) {
+			// Different nullness - objects are different
 			return false;
+		} else if (attrs1 != null && attrs2 != null) {
+			// Both are non-null, compare contents without order
+			return Set.copyOf(attrs1).equals(Set.copyOf(attrs2));
 		}
 
 		// if we get here, the items have the same stats

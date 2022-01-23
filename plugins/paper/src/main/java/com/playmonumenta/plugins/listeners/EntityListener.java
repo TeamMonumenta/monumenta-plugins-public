@@ -839,8 +839,6 @@ public class EntityListener implements Listener {
 	public void potionEffectApplyEvent(PotionEffectApplyEvent event) {
 		LivingEntity applied = event.getApplied();
 
-		PotionEffect pe = event.getEffect();
-
 		LivingEntity applier;
 		if (event.getApplier() instanceof Projectile) {
 			Projectile proj = (Projectile) event.getApplier();

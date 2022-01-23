@@ -10,7 +10,7 @@ public class ColossalifyHeldItem extends GenericCommand {
 		registerPlayerCommand("colossalifyhelditem", "monumenta.command.colossalifyhelditem", ColossalifyHeldItem::run);
 	}
 
-	private static void run(CommandSender sender, Player player) throws WrapperCommandSyntaxException {
+	public static void run(CommandSender sender, Player player) throws WrapperCommandSyntaxException {
 		ItemStatUtils.addInfusion(player.getItemInHand(), ItemStatUtils.InfusionType.COLOSSAL, 1, player.getUniqueId());
 		ItemStatUtils.generateItemStats(player.getItemInHand());
 	}

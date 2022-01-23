@@ -18,7 +18,7 @@ public class HopeifyHeldItem extends GenericCommand {
 		registerPlayerCommand("hopeifyhelditem", "monumenta.command.hopeifyhelditem", HopeifyHeldItem::run);
 	}
 
-	private static void run(CommandSender sender, Player player) throws WrapperCommandSyntaxException {
+	public static void run(CommandSender sender, Player player) throws WrapperCommandSyntaxException {
 		ItemStack item = player.getItemInHand();
 		ItemStatUtils.addInfusion(item, ItemStatUtils.InfusionType.HOPE, 1, player.getUniqueId());
 		ItemStatUtils.generateItemStats(item);

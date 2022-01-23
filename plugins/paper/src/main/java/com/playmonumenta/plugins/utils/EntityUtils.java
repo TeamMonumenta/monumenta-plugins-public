@@ -56,7 +56,6 @@ import org.bukkit.entity.Wither;
 import org.bukkit.entity.WitherSkeleton;
 import org.bukkit.entity.Wolf;
 import org.bukkit.entity.ZombieHorse;
-import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
@@ -86,20 +85,6 @@ import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
 
 
 public class EntityUtils {
-
-	private static final EnumSet<DamageCause> PHYSICAL_DAMAGE = EnumSet.of(
-			DamageCause.CUSTOM,
-			DamageCause.ENTITY_ATTACK,
-			DamageCause.ENTITY_EXPLOSION,
-			DamageCause.ENTITY_SWEEP_ATTACK,
-			DamageCause.FALLING_BLOCK,
-			DamageCause.FIRE,
-			DamageCause.HOT_FLOOR,
-			DamageCause.LAVA,
-			DamageCause.LIGHTNING,
-			DamageCause.PROJECTILE,
-			DamageCause.THORNS
-	);
 
 	private static final EnumSet<EntityType> UNDEAD_MOBS = EnumSet.of(
 			EntityType.ZOMBIE,
@@ -210,10 +195,7 @@ public class EntityUtils {
 
 	private static final Particle.DustOptions STUN_COLOR = new Particle.DustOptions(Color.fromRGB(255, 255, 100), 1.0f);
 	private static final Particle.DustOptions SILENCE_COLOR = new Particle.DustOptions(Color.fromRGB(13, 13, 13), 1.0f);
-	private static final Particle.DustOptions CONFUSION_COLOR = new Particle.DustOptions(Color.fromRGB(62, 0, 102), 1.0f);
 	private static final Particle.DustOptions TAUNT_COLOR = new Particle.DustOptions(Color.fromRGB(200, 0, 0), 1.0f);
-
-	private static final double LOG_2 = Math.log(2);
 
 	private static void startTracker(Plugin plugin) {
 		mobsTracker = new BukkitRunnable() {
