@@ -4,6 +4,8 @@ import org.hidetake.groovy.ssh.core.Remote
 import org.hidetake.groovy.ssh.core.RunHandler
 import org.hidetake.groovy.ssh.core.Service
 import org.hidetake.groovy.ssh.session.SessionHandler
+import org.checkerframework.gradle.plugin.CheckerFrameworkExtension
+import org.checkerframework.gradle.plugin.CheckerFrameworkTaskExtension
 
 plugins {
     id("com.github.johnrengelman.shadow") version "7.1.2"
@@ -11,6 +13,8 @@ plugins {
     id("net.minecrell.plugin-yml.bukkit") version "0.5.1" // Generates plugin.yml
     id("net.minecrell.plugin-yml.bungee") version "0.5.1" // Generates bungee.yml
     id("org.hidetake.ssh") version "2.10.1"
+    id("org.checkerframework") version "0.6.7"
+    id("java")
 }
 
 dependencies {
@@ -21,7 +25,7 @@ dependencies {
     implementation("org.openjdk.jmh:jmh-core:1.19")
     implementation("org.openjdk.jmh:jmh-generator-annprocess:1.19")
     implementation("com.github.LeonMangler:PremiumVanishAPI:2.6.3")
-    implementation("org.checkerframework:checker-qual:3.21.0")
+    implementation("org.checkerframework:checker-qual:3.21.1")
     implementation("net.kyori:adventure-text-minimessage:4.2-ab62718")
     implementation("com.opencsv:opencsv:5.5")
     compileOnly("com.destroystokyo.paper:paper:1.16.5-R0.1-SNAPSHOT")
@@ -69,6 +73,48 @@ bungee {
     main = "com.playmonumenta.bungeecord.Main"
     author = "The Monumenta Team"
     softDepends = setOf("MonumentaNetworkRelay", "Votifier", "SuperVanish", "PremiumVanish", "BungeeTabListPlus", "LuckPerms")
+}
+
+configure<CheckerFrameworkExtension> {
+    skipCheckerFramework = false
+    excludeTests = true
+    checkers = listOf(
+        "org.checkerframework.checker.nullness.NullnessChecker"
+    )
+    extraJavacArgs = listOf(
+        "-Awarns",
+        "-Xmaxwarns", "10000",
+        // Better arrays
+        "-AinvariantArrays",
+        // Stub files for annotating used libraries
+        "-Astubs=$rootDir/../stubs/",
+        // assumePure gets rid of lots of false positives at the cost of allowing some false negatives.
+        // Appears to not work reliably.
+        "-AassumePure",
+        // The Map Key Checker is pretty useless, ignore it.
+        // Initialisation checks are nice, but cause tons of warnings due to the way bosses are set up.
+        "-AsuppressWarnings=keyfor,initialization",
+    )
+}
+tasks.withType(JavaCompile::class).configureEach {
+    configure<CheckerFrameworkTaskExtension> {
+      skipCheckerFramework = true
+    }
+}
+tasks.register<JavaCompile>("checkerframework") {
+    val compileJava by tasks.named<JavaCompile>("compileJava")
+    dependsOn(compileJava)
+    classpath = compileJava.classpath.plus(files(compileJava.destinationDir))
+    sourceCompatibility = compileJava.sourceCompatibility
+    targetCompatibility = compileJava.targetCompatibility
+    destinationDir = compileJava.destinationDir
+
+    options.isIncremental = false
+    source("src/main/java/")
+    include(project.findProperty("analyzed.classes") as String? ?: "**/*")
+    configure<CheckerFrameworkTaskExtension> {
+        skipCheckerFramework = false
+    }
 }
 
 val basicssh = remotes.create("basicssh") {

@@ -87,6 +87,13 @@ public interface Lootable {
 
 package org.bukkit.entity;
 
+public interface Entity {
+
+    @EnsuresNonNullIf(expression="getVehicle()", result=true)
+    boolean isInsideVehicle();
+
+}
+
 public interface LivingEntity {
 
     @EnsuresNonNullIf(expression="getPotionEffect(#1)", result=true)
