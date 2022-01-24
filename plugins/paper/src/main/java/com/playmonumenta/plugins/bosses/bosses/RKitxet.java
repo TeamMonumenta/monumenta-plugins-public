@@ -272,7 +272,7 @@ public class RKitxet extends BossAbilityGroup {
 
 	@Override
 	public void death(EntityDeathEvent event) {
-		changePhase(null, null, null);
+		changePhase(SpellManager.EMPTY, Collections.emptyList(), null);
 
 		for (LivingEntity e : EntityUtils.getNearbyMobs(mBoss.getLocation(), detectionRange)) {
 			e.damage(10000);

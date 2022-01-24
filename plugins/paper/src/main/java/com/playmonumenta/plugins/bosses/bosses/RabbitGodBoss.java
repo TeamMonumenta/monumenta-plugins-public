@@ -1,5 +1,11 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import com.playmonumenta.plugins.bosses.BossBarManager;
 import com.playmonumenta.plugins.bosses.BossBarManager.BossHealthAction;
 import com.playmonumenta.plugins.bosses.SpellManager;
@@ -19,6 +25,7 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.SerializationUtils;
+
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -37,11 +44,6 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
-
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 public final class RabbitGodBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_rabbitgod";
@@ -218,7 +220,7 @@ public final class RabbitGodBoss extends BossAbilityGroup {
 				"OINK OINK. OINK OINK OINK. OINK OINK!",
 				"OINK OINK, OINK OINK OINK OINK. OOINKKKK!!"
 			};
-			changePhase(null, null, null);
+			changePhase(SpellManager.EMPTY, Collections.emptyList(), null);
 			knockback(plugin, 10);
 			mBoss.setAI(false);
 			mBoss.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 20 * 10, 10));
@@ -329,7 +331,7 @@ public final class RabbitGodBoss extends BossAbilityGroup {
 															world.playSound(chicken.getLocation(), Sound.BLOCK_PORTAL_TRAVEL, 2, 2f);
 															world.playSound(chicken.getLocation(), Sound.ENTITY_CHICKEN_DEATH, 2, 0.5f);
 															chicken.remove();
-															changePhase(null, passive2Spells, null);
+															changePhase(SpellManager.EMPTY, passive2Spells, null);
 															for (Player player : PlayerUtils.playersInRange(mSpawnLoc, detectionRange, true)) {
 																world.spawnParticle(Particle.FIREWORKS_SPARK, player.getLocation().add(0, 1, 0), 100, 0, 0, 0, 0.4f);
 																player.removePotionEffect(PotionEffectType.SLOW);
@@ -428,7 +430,7 @@ public final class RabbitGodBoss extends BossAbilityGroup {
 	public void death(EntityDeathEvent event) {
 		World world = mBoss.getWorld();
 		mBoss.setHealth(800);
-		changePhase(null, null, null);
+		changePhase(SpellManager.EMPTY, Collections.emptyList(), null);
 		mBoss.setAI(false);
 		mBoss.setInvulnerable(true);
 		PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "tellraw @s [\"\",{\"text\":\"OINK! OINK OINK! OINK OINK OINK OINK!?!?!?\",\"color\":\"dark_red\"}]");

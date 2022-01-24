@@ -2,9 +2,28 @@ package com.playmonumenta.plugins.bosses.bosses;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import com.playmonumenta.plugins.bosses.BossBarManager;
+import com.playmonumenta.plugins.bosses.BossBarManager.BossHealthAction;
+import com.playmonumenta.plugins.bosses.SpellManager;
+import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.bosses.spells.SpellPurgeNegatives;
+import com.playmonumenta.plugins.bosses.spells.falsespirit.SpellForceTwo;
+import com.playmonumenta.plugins.bosses.spells.snowspirit.DeckTheHalls;
+import com.playmonumenta.plugins.bosses.spells.snowspirit.ElfSummon;
+import com.playmonumenta.plugins.bosses.spells.snowspirit.JollyBall;
+import com.playmonumenta.plugins.bosses.spells.snowspirit.ShiningStar;
+import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
+import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.utils.SerializationUtils;
 
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -24,24 +43,6 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
-
-import com.playmonumenta.plugins.bosses.BossBarManager;
-import com.playmonumenta.plugins.bosses.BossBarManager.BossHealthAction;
-import com.playmonumenta.plugins.bosses.SpellManager;
-import com.playmonumenta.plugins.bosses.spells.Spell;
-import com.playmonumenta.plugins.bosses.spells.SpellPurgeNegatives;
-import com.playmonumenta.plugins.bosses.spells.falsespirit.SpellForceTwo;
-import com.playmonumenta.plugins.bosses.spells.snowspirit.DeckTheHalls;
-import com.playmonumenta.plugins.bosses.spells.snowspirit.ElfSummon;
-import com.playmonumenta.plugins.bosses.spells.snowspirit.JollyBall;
-import com.playmonumenta.plugins.bosses.spells.snowspirit.ShiningStar;
-import com.playmonumenta.plugins.events.DamageEvent;
-import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
-import com.playmonumenta.plugins.utils.BossUtils;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.FastUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.plugins.utils.SerializationUtils;
 
 import net.md_5.bungee.api.ChatColor;
 
@@ -106,7 +107,7 @@ public class SnowSpirit extends BossAbilityGroup {
 			healthScaleMinibosses();
 
 			mMinibossesPresent = true;
-			changePhase(null, passiveSpells, null);
+			changePhase(SpellManager.EMPTY, passiveSpells, null);
 		});
 
 		events.put(50, mBoss -> {
@@ -115,7 +116,7 @@ public class SnowSpirit extends BossAbilityGroup {
 			healthScaleMinibosses();
 
 			mMinibossesPresent = true;
-			changePhase(null, passiveSpells, null);
+			changePhase(SpellManager.EMPTY, passiveSpells, null);
 		});
 
 		events.put(25, mBoss -> {
@@ -125,12 +126,12 @@ public class SnowSpirit extends BossAbilityGroup {
 			healthScaleMinibosses();
 
 			mMinibossesPresent = true;
-			changePhase(null, passiveSpells, null);
+			changePhase(SpellManager.EMPTY, passiveSpells, null);
 			mFinalPhase = true;
 		});
 
 		events.put(0, mBoss -> {
-			changePhase(null, null, null);
+			changePhase(SpellManager.EMPTY, Collections.emptyList(), null);
 		});
 
 		BossBarManager bossBar = new BossBarManager(plugin, boss, detectionRange, BarColor.WHITE, BarStyle.SEGMENTED_10, events);
@@ -225,7 +226,7 @@ public class SnowSpirit extends BossAbilityGroup {
 
 	@Override
 	public void death(EntityDeathEvent event) {
-		changePhase(null, null, null);
+		changePhase(SpellManager.EMPTY, Collections.emptyList(), null);
 		mBoss.setHealth(100);
 		mBoss.setInvulnerable(true);
 		mBoss.setAI(false);

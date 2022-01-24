@@ -1,5 +1,16 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
+
 import com.playmonumenta.plugins.bosses.BossBarManager;
 import com.playmonumenta.plugins.bosses.BossBarManager.BossHealthAction;
 import com.playmonumenta.plugins.bosses.SpellManager;
@@ -40,8 +51,7 @@ import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
 import com.playmonumenta.plugins.utils.SerializationUtils;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
+
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
@@ -83,16 +93,8 @@ import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 
 /*
  * Lich:
@@ -407,7 +409,7 @@ public final class Lich extends BossAbilityGroup {
 
 		events.put(66, mBoss -> {
 			mPhaseCD = true;
-			changePhase(null, null, null);
+			changePhase(SpellManager.EMPTY, Collections.emptyList(), null);
 			mCutscene = true;
 			World world = mBoss.getWorld();
 			knockback(world, 10);
@@ -552,7 +554,7 @@ public final class Lich extends BossAbilityGroup {
 
 		events.put(33, mBoss -> {
 			mPhaseCD = true;
-			changePhase(null, null, null);
+			changePhase(SpellManager.EMPTY, Collections.emptyList(), null);
 			mCutscene = true;
 			World world = mBoss.getWorld();
 			knockback(world, 10);
@@ -971,7 +973,7 @@ public final class Lich extends BossAbilityGroup {
 							new SpellAutoAttack(mPlugin, this, mBoss, mStart.getLocation(), 20 * 4, detectionRange, mCeiling, 3),
 							new SpellCrystalRespawn(mPlugin, this, mStart.getLocation(), detectionRange, mCrystalLoc, mShieldCrystal));
 
-					changePhase(keyAlive, null, null);
+					changePhase(keyAlive, Collections.emptyList(), null);
 					forceCastSpell(SpellDarkOmen.class);
 					forceCastSpell(SpellSoulShackle.class);
 					forceCastSpell(SpellRaiseDead.class);
@@ -1352,7 +1354,7 @@ public final class Lich extends BossAbilityGroup {
 		mBoss.setInvulnerable(true);
 		mBoss.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 20 * 60, 10));
 		mBoss.setAI(false);
-		changePhase(null, null, null);
+		changePhase(SpellManager.EMPTY, Collections.emptyList(), null);
 		World world = mBoss.getWorld();
 		world.playSound(mBoss.getLocation(), Sound.ENTITY_ENDER_DRAGON_GROWL, SoundCategory.HOSTILE, 10, 1);
 		world.playSound(mBoss.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 3, 1);
@@ -1655,7 +1657,7 @@ public final class Lich extends BossAbilityGroup {
 				if (!mTrigger && mT % 20 == 0) {
 					if (mCounter == 0) {
 						mTrigger = true;
-						changePhase(null, death0Passives, null);
+						changePhase(SpellManager.EMPTY, death0Passives, null);
 						SpellFinalCrystal.setTriggered(false);
 						Collections.shuffle(mTowerGroup);
 						lastStand(mTowerGroup.get(0));
@@ -1668,7 +1670,7 @@ public final class Lich extends BossAbilityGroup {
 						}
 					} else if (mCounter == 1) {
 						mTrigger = true;
-						changePhase(null, death1Passives, null);
+						changePhase(SpellManager.EMPTY, death1Passives, null);
 						SpellFinalCrystal.setTriggered(false);
 						Collections.shuffle(mTowerGroup);
 						lastStand(mTowerGroup.get(0));
@@ -1682,7 +1684,7 @@ public final class Lich extends BossAbilityGroup {
 						}
 					} else if (mCounter == 2) {
 						mTrigger = true;
-						changePhase(null, death2Passives, null);
+						changePhase(SpellManager.EMPTY, death2Passives, null);
 						SpellFinalCrystal.setTriggered(false);
 						Collections.shuffle(mTowerGroup);
 						lastStand(mTowerGroup.get(0));
@@ -1697,7 +1699,7 @@ public final class Lich extends BossAbilityGroup {
 						}
 					} else if (mCounter == 3) {
 						mTrigger = true;
-						changePhase(null, death3Passives, null);
+						changePhase(SpellManager.EMPTY, death3Passives, null);
 						SpellFinalCrystal.setTriggered(false);
 						Collections.shuffle(mTowerGroup);
 						lastStand(mTowerGroup.get(0));
@@ -1711,7 +1713,7 @@ public final class Lich extends BossAbilityGroup {
 							}
 						}
 					} else if (mCounter == 4) {
-						changePhase(null, null, null);
+						changePhase(SpellManager.EMPTY, Collections.emptyList(), null);
 						timer.setVisible(false);
 						mBoss.setHealth(100);
 						mBoss.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 100, 10));

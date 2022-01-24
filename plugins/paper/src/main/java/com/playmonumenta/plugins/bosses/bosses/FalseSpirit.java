@@ -1,5 +1,14 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import com.playmonumenta.plugins.bosses.BossBarManager;
 import com.playmonumenta.plugins.bosses.BossBarManager.BossHealthAction;
 import com.playmonumenta.plugins.bosses.SpellManager;
@@ -21,6 +30,7 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.SerializationUtils;
+
 import org.bukkit.Color;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -48,14 +58,6 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.EnumSet;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 public final class FalseSpirit extends BossAbilityGroup {
 	public static final String identityTag = "boss_falsespirit";
@@ -195,7 +197,7 @@ public final class FalseSpirit extends BossAbilityGroup {
 			mMania.run();
 
 			//Prevents other moves from being used during bullet world
-			changePhase(null, null, null);
+			changePhase(SpellManager.EMPTY, Collections.emptyList(), null);
 			new BukkitRunnable() {
 				@Override
 				public void run() {
@@ -211,7 +213,7 @@ public final class FalseSpirit extends BossAbilityGroup {
 			mMania.run();
 
 			//Prevents other moves from being used during bullet world
-			changePhase(null, null, null);
+			changePhase(SpellManager.EMPTY, Collections.emptyList(), null);
 			new BukkitRunnable() {
 				@Override
 				public void run() {
@@ -234,7 +236,7 @@ public final class FalseSpirit extends BossAbilityGroup {
 			mMania.run();
 
 			//Prevents other moves from being used during bullet world
-			changePhase(null, null, null);
+			changePhase(SpellManager.EMPTY, Collections.emptyList(), null);
 			new BukkitRunnable() {
 				@Override
 				public void run() {
@@ -369,7 +371,7 @@ public final class FalseSpirit extends BossAbilityGroup {
 	@Override
 	public void death(EntityDeathEvent event) {
 
-		changePhase(null, null, null);
+		changePhase(SpellManager.EMPTY, Collections.emptyList(), null);
 		mBoss.setHealth(100);
 		mBoss.setInvulnerable(true);
 		mBoss.setAI(false);

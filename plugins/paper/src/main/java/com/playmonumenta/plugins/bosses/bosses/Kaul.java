@@ -9,34 +9,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.Color;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
-import org.bukkit.World;
-import org.bukkit.attribute.Attribute;
-import org.bukkit.block.Block;
-import org.bukkit.boss.BarColor;
-import org.bukkit.boss.BarStyle;
-import org.bukkit.entity.ArmorStand;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Mob;
-import org.bukkit.entity.Player;
-import org.bukkit.entity.WitherSkeleton;
-import org.bukkit.event.entity.EntityDeathEvent;
-import org.bukkit.inventory.EntityEquipment;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.plugin.Plugin;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
-import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.util.Vector;
-import org.checkerframework.checker.nullness.qual.Nullable;
-
 import com.playmonumenta.plugins.bosses.BossBarManager;
 import com.playmonumenta.plugins.bosses.BossBarManager.BossHealthAction;
 import com.playmonumenta.plugins.bosses.SpellManager;
@@ -67,6 +39,34 @@ import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.SerializationUtils;
+
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.Color;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
+import org.bukkit.World;
+import org.bukkit.attribute.Attribute;
+import org.bukkit.block.Block;
+import org.bukkit.boss.BarColor;
+import org.bukkit.boss.BarStyle;
+import org.bukkit.entity.ArmorStand;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Mob;
+import org.bukkit.entity.Player;
+import org.bukkit.entity.WitherSkeleton;
+import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.inventory.EntityEquipment;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.plugin.Plugin;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
+import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.util.Vector;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 
 /* Woah it's Kaul! */
@@ -352,7 +352,7 @@ public class Kaul extends BossAbilityGroup {
 
 		// Phase 2
 		events.put(66, mBoss -> {
-			changePhase(null, null, null);
+			changePhase(SpellManager.EMPTY, Collections.emptyList(), null);
 			knockback(plugin, 10);
 			mBoss.setInvulnerable(true);
 			mBoss.setAI(false);
@@ -393,7 +393,7 @@ public class Kaul extends BossAbilityGroup {
 							if (mRadius <= 0) {
 								this.cancel();
 								Location loc = mShrineMarker.getLocation().subtract(0, 0.5, 0);
-								changePhase(null, phase2PassiveSpells, null);
+								changePhase(SpellManager.EMPTY, phase2PassiveSpells, null);
 								new BukkitRunnable() {
 									int mT = 0;
 									double mRotation = 0;
@@ -467,7 +467,7 @@ public class Kaul extends BossAbilityGroup {
 
 		// Phase 2.5
 		events.put(50, mBoss -> {
-			changePhase(null, passiveSpells, null);
+			changePhase(SpellManager.EMPTY, passiveSpells, null);
 			knockback(plugin, 10);
 			mBoss.setInvulnerable(true);
 			mBoss.setAI(false);
@@ -545,7 +545,7 @@ public class Kaul extends BossAbilityGroup {
 
 		// Phase 3
 		events.put(33, mBoss -> {
-			changePhase(null, passiveSpells, null);
+			changePhase(SpellManager.EMPTY, passiveSpells, null);
 			knockback(plugin, 10);
 			mBoss.setInvulnerable(true);
 			mBoss.setAI(false);
@@ -617,7 +617,7 @@ public class Kaul extends BossAbilityGroup {
 										world.spawnParticle(Particle.FLAME, mShrineMarker.getLocation().add(0, 3, 0), 40, 6, 5, 6, 0.1);
 										mBoss.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).setBaseValue(mBoss.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).getBaseValue() + 0.02);
 										mBoss.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE, 20 * 9999, 0));
-										changePhase(null, phase3PassiveSpells, null);
+										changePhase(SpellManager.EMPTY, phase3PassiveSpells, null);
 										world.spawnParticle(Particle.FLAME, mBoss.getLocation().add(0, 1, 0), 200, 0, 0, 0, 0.175);
 										world.spawnParticle(Particle.SMOKE_LARGE, mBoss.getLocation().add(0, 1, 0), 75, 0, 0, 0, 0.25);
 										world.spawnParticle(Particle.EXPLOSION_NORMAL, mBoss.getLocation().add(0, 1, 0), 75, 0, 0, 0, 0.25);
@@ -931,7 +931,7 @@ public class Kaul extends BossAbilityGroup {
 			player.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 20 * 40, 10));
 			player.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, 20 * 40, 1));
 		}
-		changePhase(null, null, null);
+		changePhase(SpellManager.EMPTY, Collections.emptyList(), null);
 		mBoss.setHealth(100);
 		mBoss.setInvulnerable(true);
 		mBoss.setAI(false);

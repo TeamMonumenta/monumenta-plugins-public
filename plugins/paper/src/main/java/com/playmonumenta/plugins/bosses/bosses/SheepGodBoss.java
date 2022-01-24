@@ -1,11 +1,15 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
+import java.util.Collections;
+
+import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.SerializationUtils;
+
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -61,7 +65,7 @@ public class SheepGodBoss extends BossAbilityGroup {
 	public void death(EntityDeathEvent event) {
 		World world = mBoss.getWorld();
 		mBoss.setHealth(800);
-		changePhase(null, null, null);
+		changePhase(SpellManager.EMPTY, Collections.emptyList(), null);
 		mBoss.setAI(false);
 		mBoss.setInvulnerable(true);
 		PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "tellraw @s [\"\",{\"text\":\"BAAA! BAA BAAAA! BAA BAAA BAAA BAAAAAA!?!?!?\",\"color\":\"dark_red\"}]");

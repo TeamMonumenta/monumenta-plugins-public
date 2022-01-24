@@ -84,7 +84,7 @@ public final class CrownbearerBoss extends BossAbilityGroup {
 		});
 		events.put(30, mBoss -> {
 			knockback(plugin, 6);
-			changePhase(null, null, null);
+			changePhase(SpellManager.EMPTY, Collections.emptyList(), null);
 			PlayerUtils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"[Onyx Crownbearer] \",\"color\":\"gold\"},{\"text\":\"Agh! This battle ends here and now! I will not let you stall this any longer!\",\"color\":\"white\"}]");
 		});
 		events.put(20, mBoss -> {
