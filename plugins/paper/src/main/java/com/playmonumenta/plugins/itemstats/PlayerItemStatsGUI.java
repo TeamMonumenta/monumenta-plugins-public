@@ -15,7 +15,6 @@ import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-import com.goncalomb.bukkit.mylib.utils.CustomInventory;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.itemstats.ItemStatManager.PlayerItemStats;
 import com.playmonumenta.plugins.utils.DamageUtils;
@@ -24,6 +23,7 @@ import com.playmonumenta.plugins.utils.ItemStatUtils.AttributeType;
 import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
 import com.playmonumenta.plugins.utils.ItemStatUtils.Operation;
 import com.playmonumenta.plugins.utils.ItemStatUtils.Slot;
+import com.playmonumenta.scriptedquests.utils.CustomInventory;
 
 import de.tr7zw.nbtapi.NBTCompoundList;
 import de.tr7zw.nbtapi.NBTItem;
@@ -280,7 +280,6 @@ public class PlayerItemStatsGUI extends CustomInventory {
 	private final Player mPlayer;
 	private final PlayerItemStats mCurrentStats;
 	private final PlayerItemStats mOtherStats;
-	private final Inventory mInventory;
 
 	private Metric mMetric = Metric.DAMAGE_REDUCTION;
 	private boolean[] mSecondaryStatEnabled = new boolean[54];
@@ -292,7 +291,6 @@ public class PlayerItemStatsGUI extends CustomInventory {
 		mPlayer = player;
 		mCurrentStats = new PlayerItemStats(player);
 		mOtherStats = new PlayerItemStats(player);
-		mInventory = _inventory;
 		generateInventory();
 	}
 
