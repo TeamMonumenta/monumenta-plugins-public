@@ -23,7 +23,7 @@ import org.bukkit.loot.LootTable;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.io.BukkitObjectInputStream;
 import org.bukkit.util.io.BukkitObjectOutputStream;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import javax.annotation.Nullable;
 import org.yaml.snakeyaml.external.biz.base64Coder.Base64Coder;
 
 import com.playmonumenta.plugins.Plugin;

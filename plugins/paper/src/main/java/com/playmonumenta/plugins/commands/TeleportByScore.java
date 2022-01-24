@@ -17,7 +17,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import javax.annotation.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -83,7 +83,7 @@ public class TeleportByScore extends GenericCommand {
 	private static void teleport(CommandSender sender, Entity entity,
 	                             String objX, String objY, String objZ,
 	                             @Nullable String objYaw, @Nullable String objPitch, float scale,
-	                             FunctionWrapper @Nullable [] asyncFunctions) {
+	                             FunctionWrapper[] asyncFunctions) {
 		Integer x = getValue(entity, objX);
 		Integer y = getValue(entity, objY);
 		Integer z = getValue(entity, objZ);

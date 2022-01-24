@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.itemstats.enchantments;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.itemstats.Enchantment;
+import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
 import com.playmonumenta.plugins.utils.ItemStatUtils.Slot;
 import org.bukkit.GameMode;
@@ -50,7 +51,7 @@ public class ThrowingKnife implements Enchantment {
 			ItemStack item = event.getItem();
 			if (item != null && (item.getType() == Material.ARROW || item.getType() == Material.SPECTRAL_ARROW || item.getType() == Material.TIPPED_ARROW)) {
 				if (player.getCooldown(item.getType()) <= 0) {
-					if (!item.getEnchantments().containsKey(EnchantmentType.INFINITY) && player.getGameMode() != GameMode.CREATIVE) {
+					if (ItemStatUtils.getEnchantmentLevel(item, EnchantmentType.INFINITY) == 0 && player.getGameMode() != GameMode.CREATIVE) {
 						item.setAmount(item.getAmount() - 1);
 					}
 					player.setCooldown(item.getType(), (int)(20 * 0.75));

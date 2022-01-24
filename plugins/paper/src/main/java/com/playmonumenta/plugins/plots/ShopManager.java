@@ -50,7 +50,7 @@ import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.loot.LootTables;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.BoundingBox;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import javax.annotation.Nullable;
 
 import java.util.Collection;
 import java.util.Set;

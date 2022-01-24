@@ -26,7 +26,7 @@ import org.bukkit.event.player.PlayerAttemptPickupItemEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import javax.annotation.Nullable;
 
 import java.util.UUID;
 
@@ -95,7 +95,7 @@ public class GraveItem {
 	private @Nullable Vector mVelocity;
 	private @Nullable Integer mDungeonInstance;
 	private @Nullable Short mAge;
-	@Nullable public Integer mSlot;
+	public @Nullable Integer mSlot;
 	@Nullable Status mStatus;
 	private int mTickLastStatusChange;
 

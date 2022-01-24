@@ -9,7 +9,7 @@ import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.ThrownPotion;
 import org.bukkit.inventory.ItemStack;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import javax.annotation.Nullable;
 
 public class EmpoweringOdor extends PotionAbility {
 	public static final double POTION_RECHARGE_TIME_REDUCTION_2 = 10;

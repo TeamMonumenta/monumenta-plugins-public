@@ -6,7 +6,6 @@ plugins {
 dependencies {
     implementation(project(":adapter_api"))
     paperDevBundle("1.18.1-R0.1-SNAPSHOT")
-    compileOnly("org.checkerframework:checker-qual:3.21.0")
 }
 
 description = "adapter_v1_18_R1"

@@ -17,7 +17,7 @@ import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.loot.LootContext;
 import org.bukkit.loot.LootTable;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import javax.annotation.Nullable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.listeners.AuditListener;

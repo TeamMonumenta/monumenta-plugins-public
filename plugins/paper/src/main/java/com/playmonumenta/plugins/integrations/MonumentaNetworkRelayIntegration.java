@@ -8,7 +8,7 @@ import com.playmonumenta.plugins.commands.RedeemVoteRewards;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import javax.annotation.Nullable;
 
 import java.util.UUID;
 import java.util.logging.Logger;

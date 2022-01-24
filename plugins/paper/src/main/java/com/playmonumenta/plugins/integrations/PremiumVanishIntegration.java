@@ -2,7 +2,7 @@ package com.playmonumenta.plugins.integrations;
 
 import de.myzelyam.api.vanish.VanishAPI;
 import org.bukkit.entity.Player;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import javax.annotation.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;

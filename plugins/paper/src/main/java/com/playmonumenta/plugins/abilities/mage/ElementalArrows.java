@@ -17,7 +17,7 @@ import org.bukkit.entity.Stray;
 import org.bukkit.entity.Trident;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import javax.annotation.Nullable;
 
 
 public class ElementalArrows extends Ability {

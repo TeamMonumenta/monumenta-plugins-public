@@ -19,7 +19,7 @@ import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.event.world.ChunkUnloadEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import javax.annotation.Nullable;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -199,7 +199,7 @@ public class GraveManager {
 	}
 
 	// Called only on a death that would result in a grave
-	public static void onDeath(Player player, Map<Integer, ItemStack> droppedItems, HashMap<EquipmentSlot, @Nullable ItemStack> equipment) {
+	public static void onDeath(Player player, Map<Integer, ItemStack> droppedItems, HashMap<EquipmentSlot, ItemStack> equipment) {
 		GraveManager manager = INSTANCES.get(player.getUniqueId());
 		manager.mGraves.add(new Grave(manager, player, droppedItems, equipment));
 	}

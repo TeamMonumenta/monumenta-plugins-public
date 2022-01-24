@@ -16,7 +16,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,10 +30,10 @@ import java.util.Map;
  */
 public class CalculateReforge extends GenericCommand {
 
-	public static @MonotonicNonNull ItemStack mCXP = null;
-	public static @MonotonicNonNull ItemStack mHXP = null;
-	public static @MonotonicNonNull ItemStack mCCS = null;
-	public static @MonotonicNonNull ItemStack mHCS = null;
+	public static ItemStack mCXP = null;
+	public static ItemStack mHXP = null;
+	public static ItemStack mCCS = null;
+	public static ItemStack mHCS = null;
 
 	public static void register() {
 		registerPlayerCommand("calculatereforge", "monumenta.command.calculatereforge", (sender, player) -> {

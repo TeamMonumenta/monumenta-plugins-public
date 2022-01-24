@@ -10,7 +10,7 @@ import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import org.bukkit.Particle;
 import org.bukkit.entity.Player;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import javax.annotation.Nullable;
 
 
 public abstract class PatronParticles extends Ability {

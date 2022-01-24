@@ -11,7 +11,7 @@ import org.bukkit.entity.Fish;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
 import org.bukkit.inventory.ItemStack;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import javax.annotation.Nullable;
 
 public class BucketOverride extends BaseOverride {
 	@Override

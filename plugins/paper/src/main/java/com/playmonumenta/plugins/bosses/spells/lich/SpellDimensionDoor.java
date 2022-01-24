@@ -79,7 +79,7 @@ public class SpellDimensionDoor extends Spell {
 	}
 
 	public static void clearShadowed() {
-		mShadowed.removeAll(mShadowed);
+		mShadowed.clear();
 	}
 
 	@Override

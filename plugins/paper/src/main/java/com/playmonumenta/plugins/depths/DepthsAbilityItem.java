@@ -2,7 +2,7 @@ package com.playmonumenta.plugins.depths;
 
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
 import org.bukkit.inventory.ItemStack;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import javax.annotation.Nullable;
 
 public class DepthsAbilityItem {
 

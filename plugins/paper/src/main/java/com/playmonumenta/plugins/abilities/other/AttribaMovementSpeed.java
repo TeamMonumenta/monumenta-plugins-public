@@ -6,7 +6,7 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.entity.Player;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import javax.annotation.Nullable;
 
 public class AttribaMovementSpeed extends Ability {
 	public static final double REDUCTION = -0.75;

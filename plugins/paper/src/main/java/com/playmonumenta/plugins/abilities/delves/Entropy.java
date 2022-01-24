@@ -3,7 +3,7 @@ package com.playmonumenta.plugins.abilities.delves;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.utils.DelvesUtils.Modifier;
 import org.bukkit.entity.Player;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import javax.annotation.Nullable;
 
 public class Entropy extends DelveModifier {
 

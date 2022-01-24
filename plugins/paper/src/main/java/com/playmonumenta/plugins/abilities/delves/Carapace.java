@@ -8,7 +8,7 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntitySpawnEvent;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import javax.annotation.Nullable;
 
 public class Carapace extends DelveModifier {
 

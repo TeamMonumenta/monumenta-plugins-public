@@ -46,7 +46,7 @@ import org.bukkit.event.world.ChunkUnloadEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.projectiles.ProjectileSource;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import javax.annotation.Nullable;
 
 import com.destroystokyo.paper.event.entity.EntityPathfindEvent;
 import com.playmonumenta.plugins.Plugin;
@@ -696,7 +696,7 @@ public class BossManager implements Listener {
 	}
 
 	@SuppressWarnings("unchecked")
-	public <T extends @Nullable BossAbilityGroup> @Nullable T getBoss(Entity entity, Class<T> cls) {
+	public <T extends BossAbilityGroup> @Nullable T getBoss(Entity entity, Class<T> cls) {
 		Boss boss = mBosses.get(entity.getUniqueId());
 		if (boss != null) {
 			for (BossAbilityGroup ability : boss.getAbilities()) {

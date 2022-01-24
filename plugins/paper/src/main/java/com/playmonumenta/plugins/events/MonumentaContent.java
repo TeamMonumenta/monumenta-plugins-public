@@ -1,6 +1,6 @@
 package com.playmonumenta.plugins.events;
 
-import org.checkerframework.checker.nullness.qual.Nullable;
+import javax.annotation.Nullable;
 
 public enum MonumentaContent {
 	WHITE("white", ContentType.DUNGEON, 1),

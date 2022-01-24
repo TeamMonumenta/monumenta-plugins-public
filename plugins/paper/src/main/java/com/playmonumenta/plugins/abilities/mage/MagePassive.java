@@ -10,7 +10,7 @@ import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import javax.annotation.Nullable;
 
 
 public class MagePassive extends Ability {

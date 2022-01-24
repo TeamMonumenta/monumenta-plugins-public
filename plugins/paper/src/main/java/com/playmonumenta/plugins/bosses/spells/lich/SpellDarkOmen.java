@@ -107,7 +107,7 @@ public class SpellDarkOmen extends Spell {
 				//blade function
 				if (mT >= mTell || Lich.phase3over()) {
 					//clear all entries before launching blade
-					mDamaged.removeAll(mDamaged);
+					mDamaged.clear();
 
 					world.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_SHOOT, 10.0f, 0.75f);
 					world.playSound(mBoss.getLocation(), Sound.ENTITY_VEX_CHARGE, 10.0f, 1.0f);

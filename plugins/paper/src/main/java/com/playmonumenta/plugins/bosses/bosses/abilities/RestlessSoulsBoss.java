@@ -33,7 +33,7 @@ import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import javax.annotation.Nullable;
 
 public class RestlessSoulsBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_restlesssouls";

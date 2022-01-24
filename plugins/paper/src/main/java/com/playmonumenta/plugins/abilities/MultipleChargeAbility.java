@@ -5,7 +5,7 @@ import com.playmonumenta.plugins.network.ClientModHandler;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.scriptedquests.utils.MessagingUtils;
 import org.bukkit.entity.Player;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import javax.annotation.Nullable;
 
 public abstract class MultipleChargeAbility extends Ability implements AbilityWithChargesOrStacks {
 

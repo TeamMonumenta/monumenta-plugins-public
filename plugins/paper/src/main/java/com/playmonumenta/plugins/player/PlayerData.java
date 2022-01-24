@@ -5,7 +5,7 @@ import com.playmonumenta.plugins.Constants.Tags;
 import com.playmonumenta.plugins.player.PartialParticle.Source;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import org.bukkit.entity.Player;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import javax.annotation.Nullable;
 
 
 

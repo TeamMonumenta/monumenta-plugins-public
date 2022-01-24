@@ -14,7 +14,7 @@ import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import javax.annotation.Nullable;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Comparator;
@@ -177,7 +177,7 @@ public class ClientModHandler {
 
 		final String _type = "ClassUpdatePacket";
 
-		AbilityInfo @Nullable [] abilities;
+		AbilityInfo[] abilities;
 
 		public static class AbilityInfo {
 

@@ -34,8 +34,7 @@ import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.checkerframework.checker.initialization.qual.UnknownInitialization;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import javax.annotation.Nullable;
 
 
 public abstract class BossAbilityGroup {
@@ -74,18 +73,18 @@ public abstract class BossAbilityGroup {
 	}
 
 
-	public void constructBoss(@UnknownInitialization(BossAbilityGroup.class) BossAbilityGroup this,
+	public void constructBoss(BossAbilityGroup this,
 	                          SpellManager activeSpells, List<Spell> passiveSpells, int detectionRange, @Nullable BossBarManager bossBar) {
 		constructBoss(activeSpells, passiveSpells, detectionRange, bossBar, 100);
 	}
 
-	public void constructBoss(@UnknownInitialization(BossAbilityGroup.class) BossAbilityGroup this,
+	public void constructBoss(BossAbilityGroup this,
 	                          SpellManager activeSpells, List<Spell> passiveSpells, int detectionRange, @Nullable BossBarManager bossBar, long spellDelay) {
 		constructBoss(activeSpells, passiveSpells, detectionRange, bossBar, spellDelay, PASSIVE_RUN_INTERVAL_DEFAULT);
 	}
 
 	/* If detectionRange <= 0, will always run regardless of whether players are nearby */
-	public void constructBoss(@UnknownInitialization(BossAbilityGroup.class) BossAbilityGroup this,
+	public void constructBoss(BossAbilityGroup this,
 	                          SpellManager activeSpells, List<Spell> passiveSpells, int detectionRange, @Nullable BossBarManager bossBar, long spellDelay, long passiveIntervalTicks) {
 		mBossBar = bossBar;
 		mActiveSpells = activeSpells;

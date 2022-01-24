@@ -4,8 +4,8 @@ import org.hidetake.groovy.ssh.core.Remote
 import org.hidetake.groovy.ssh.core.RunHandler
 import org.hidetake.groovy.ssh.core.Service
 import org.hidetake.groovy.ssh.session.SessionHandler
-import org.checkerframework.gradle.plugin.CheckerFrameworkExtension
-import org.checkerframework.gradle.plugin.CheckerFrameworkTaskExtension
+import net.ltgt.gradle.errorprone.errorprone
+import net.ltgt.gradle.errorprone.CheckSeverity
 
 plugins {
     id("com.github.johnrengelman.shadow") version "7.1.2"
@@ -13,8 +13,9 @@ plugins {
     id("net.minecrell.plugin-yml.bukkit") version "0.5.1" // Generates plugin.yml
     id("net.minecrell.plugin-yml.bungee") version "0.5.1" // Generates bungee.yml
     id("org.hidetake.ssh") version "2.10.1"
-    id("org.checkerframework") version "0.6.7"
     id("java")
+    id("net.ltgt.errorprone") version "2.0.2"
+    id("net.ltgt.nullaway") version "1.3.0"
 }
 
 dependencies {
@@ -27,7 +28,6 @@ dependencies {
     implementation("com.github.LeonMangler:PremiumVanishAPI:2.6.3")
     implementation("net.kyori:adventure-text-minimessage:4.2-ab62718")
     implementation("com.opencsv:opencsv:5.5")
-    compileOnly("org.checkerframework:checker-qual:3.21.1")
     compileOnly("com.destroystokyo.paper:paper:1.16.5-R0.1-SNAPSHOT")
     compileOnly("dev.jorel.CommandAPI:commandapi-core:6.0.0")
     compileOnly("me.clip:placeholderapi:2.10.4")
@@ -44,6 +44,8 @@ dependencies {
     compileOnly("com.goncalomb.bukkit:nbteditor:3.2")
     compileOnly("de.tr7zw:item-nbt-api-plugin:2.3.1")
     compileOnly("com.comphenix.protocol:ProtocolLib:4.7.0")
+    errorprone("com.google.errorprone:error_prone_core:2.10.0")
+    errorprone("com.uber.nullaway:nullaway:0.9.5")
 
     // Bungeecord deps
     compileOnly("net.md-5:bungeecord-api:1.12-SNAPSHOT")
@@ -75,45 +77,38 @@ bungee {
     softDepends = setOf("MonumentaNetworkRelay", "Votifier", "SuperVanish", "PremiumVanish", "BungeeTabListPlus", "LuckPerms")
 }
 
-configure<CheckerFrameworkExtension> {
-    skipCheckerFramework = false
-    excludeTests = true
-    checkers = listOf(
-        "org.checkerframework.checker.nullness.NullnessChecker"
-    )
-    extraJavacArgs = listOf(
-        "-Awarns",
-        "-Xmaxwarns", "10000",
-        // Better arrays
-        "-AinvariantArrays",
-        // Stub files for annotating used libraries
-        "-Astubs=$rootDir/../stubs/",
-        // assumePure gets rid of lots of false positives at the cost of allowing some false negatives.
-        // Appears to not work reliably.
-        "-AassumePure",
-        // The Map Key Checker is pretty useless, ignore it.
-        // Initialisation checks are nice, but cause tons of warnings due to the way bosses are set up.
-        "-AsuppressWarnings=keyfor,initialization",
-    )
-}
-tasks.withType(JavaCompile::class).configureEach {
-    configure<CheckerFrameworkTaskExtension> {
-      skipCheckerFramework = true
-    }
-}
-tasks.register<JavaCompile>("checkerframework") {
-    val compileJava by tasks.named<JavaCompile>("compileJava")
-    dependsOn(compileJava)
-    classpath = compileJava.classpath.plus(files(compileJava.destinationDir))
-    sourceCompatibility = compileJava.sourceCompatibility
-    targetCompatibility = compileJava.targetCompatibility
-    destinationDir = compileJava.destinationDir
+tasks.withType<JavaCompile>().configureEach {
+    options.compilerArgs.add("-Xmaxwarns")
+    options.compilerArgs.add("10000")
 
-    options.isIncremental = false
-    source("src/main/java/")
-    include(project.findProperty("analyzed.classes") as String? ?: "**/*")
-    configure<CheckerFrameworkTaskExtension> {
-        skipCheckerFramework = false
+    // TODO: Also need to re-enable these deprecation warnings
+    options.compilerArgs.add("-Xlint:deprecation")
+
+    options.errorprone {
+        // TODO This must be turned back on as soon as some of the other warnings are under control
+        option("NullAway:AnnotatedPackages", "com.playmonumenta.DISABLE")
+
+        // These are errors but should not be, downgrade to warning
+        check("IdentityBinaryExpression", CheckSeverity.WARN)
+        check("FormatString", CheckSeverity.WARN)
+        check("ArrayToString", CheckSeverity.WARN)
+
+        // These we almost certainly don't want
+        check("CatchAndPrintStackTrace", CheckSeverity.OFF)
+        check("OperatorPrecedence", CheckSeverity.OFF)
+        check("StaticAssignmentInConstructor", CheckSeverity.OFF)
+
+        // TODO: We probably want to turn these back on when the number is more reasonable
+        check("ImmutableEnumChecker", CheckSeverity.OFF)
+        check("UnnecessaryParentheses", CheckSeverity.OFF)
+        check("DefaultCharset", CheckSeverity.OFF)
+        check("JavaTimeDefaultTimeZone", CheckSeverity.OFF)
+        check("LockNotBeforeTry", CheckSeverity.OFF)
+        check("MutablePublicArray", CheckSeverity.OFF)
+
+        // Javadoc string stuff, would be nice to have these back someday
+        check("EmptyBlockTag", CheckSeverity.OFF)
+        check("MissingSummary", CheckSeverity.OFF)
     }
 }
 

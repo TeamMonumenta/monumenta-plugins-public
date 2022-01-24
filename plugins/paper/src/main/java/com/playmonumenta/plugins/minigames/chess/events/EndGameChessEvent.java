@@ -2,7 +2,7 @@ package com.playmonumenta.plugins.minigames.chess.events;
 
 import com.playmonumenta.plugins.minigames.chess.ChessBoard;
 import com.playmonumenta.plugins.minigames.chess.ChessPlayer;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import javax.annotation.Nullable;
 
 public class EndGameChessEvent extends ChessEvent {
 

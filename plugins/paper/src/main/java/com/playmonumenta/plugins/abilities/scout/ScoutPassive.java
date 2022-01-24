@@ -8,7 +8,7 @@ import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import org.bukkit.Sound;
 import org.bukkit.entity.AbstractArrow;
 import org.bukkit.entity.Player;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import javax.annotation.Nullable;
 
 /*
  * Scout Passive: 20% chance to not consume an arrow when shooting a non-infinity bow

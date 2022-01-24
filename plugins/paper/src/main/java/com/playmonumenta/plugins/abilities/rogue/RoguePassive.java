@@ -8,7 +8,7 @@ import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import javax.annotation.Nullable;
 
 public class RoguePassive extends Ability {
 

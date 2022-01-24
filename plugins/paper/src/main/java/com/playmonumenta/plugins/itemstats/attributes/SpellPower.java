@@ -1,7 +1,7 @@
 package com.playmonumenta.plugins.itemstats.attributes;
 
 import org.bukkit.entity.Player;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import javax.annotation.Nullable;
 import org.jetbrains.annotations.NotNull;
 
 import com.playmonumenta.plugins.Plugin;

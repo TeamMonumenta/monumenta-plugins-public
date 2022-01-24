@@ -71,7 +71,7 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import javax.annotation.Nullable;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -207,7 +207,7 @@ public class FrostGiant extends BossAbilityGroup {
 		});
 	}
 
-	public ItemStack @Nullable [] mArmor = null;
+	public @Nullable ItemStack[] mArmor = null;
 	private @Nullable ItemStack mMainhand = null;
 	private @Nullable ItemStack mOffhand = null;
 

@@ -6,7 +6,7 @@ import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.entity.Player;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import javax.annotation.Nullable;
 
 public class WarriorPassive extends Ability {
 

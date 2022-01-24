@@ -37,7 +37,6 @@ import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -262,7 +261,7 @@ public class GraveListener implements Listener {
 			event.getDrops().clear();
 
 			Map<Integer, ItemStack> droppedItems = new HashMap<>();
-			HashMap<EquipmentSlot, @Nullable ItemStack> equipment = new HashMap<>();
+			HashMap<EquipmentSlot, ItemStack> equipment = new HashMap<>();
 			equipment.put(EquipmentSlot.HEAD, player.getInventory().getHelmet());
 			equipment.put(EquipmentSlot.CHEST, player.getInventory().getChestplate());
 			equipment.put(EquipmentSlot.LEGS, player.getInventory().getLeggings());

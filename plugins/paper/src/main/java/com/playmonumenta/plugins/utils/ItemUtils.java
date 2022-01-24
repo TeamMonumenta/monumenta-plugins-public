@@ -31,8 +31,7 @@ import org.bukkit.potion.PotionData;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.potion.PotionType;
-import org.checkerframework.checker.nullness.qual.Nullable;
-import org.checkerframework.checker.nullness.qual.PolyNull;
+import javax.annotation.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -1082,7 +1081,7 @@ public class ItemUtils {
 	 * @param itemStack The item stack to be cloned, may be null
 	 * @return A completely new item stack that is a clone of the original item stack
 	 */
-	public static @PolyNull ItemStack clone(@PolyNull ItemStack itemStack) {
+	public static ItemStack clone(ItemStack itemStack) {
 		if (itemStack == null) {
 			return null;
 		}

@@ -11,7 +11,7 @@ import java.util.Queue;
 
 import com.playmonumenta.plugins.bosses.spells.Spell;
 
-import org.checkerframework.checker.nullness.qual.Nullable;
+import javax.annotation.Nullable;
 
 /*
  * The SpellManager class is designed to manage active spells for a boss. It

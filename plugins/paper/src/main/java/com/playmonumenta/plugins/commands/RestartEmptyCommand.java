@@ -7,7 +7,7 @@ import dev.jorel.commandapi.arguments.LiteralArgument;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import javax.annotation.Nullable;
 
 public class RestartEmptyCommand {
 	public static @Nullable BukkitRunnable TASK = null;

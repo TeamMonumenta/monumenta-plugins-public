@@ -24,7 +24,7 @@ import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.EulerAngle;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import javax.annotation.Nullable;
 
 import java.time.Instant;
 import java.util.Arrays;
@@ -74,7 +74,7 @@ public final class Grave {
 	Integer mDungeonInstance;
 	Location mLocation;
 	private @Nullable HashMap<String, EulerAngle> mPose;
-	private final HashMap<String, @Nullable ItemStack> mEquipment;
+	private final HashMap<String, ItemStack> mEquipment;
 	HashSet<GraveItem> mItems;
 	private @Nullable ArmorStand mEntity;
 
@@ -86,7 +86,7 @@ public final class Grave {
 	// For deserializing a grave from data
 	private Grave(GraveManager manager, Player player, String world, Integer instance,
 	              Instant time, boolean small, Location location, @Nullable HashMap<String, EulerAngle> pose,
-	              HashMap<String, @Nullable ItemStack> equipment, JsonArray items) {
+	              HashMap<String, ItemStack> equipment, JsonArray items) {
 		mManager = manager;
 		mPlayer = player;
 		mDeathTime = time;
@@ -111,7 +111,7 @@ public final class Grave {
 	}
 
 	// For spawning a new grave on death
-	public Grave(GraveManager manager, Player player, Map<Integer, ItemStack> droppedItems, HashMap<EquipmentSlot, @Nullable ItemStack> equipment) {
+	public Grave(GraveManager manager, Player player, Map<Integer, ItemStack> droppedItems, HashMap<EquipmentSlot, ItemStack> equipment) {
 		mManager = manager;
 		mPlayer = player;
 		mDeathTime = Instant.now();

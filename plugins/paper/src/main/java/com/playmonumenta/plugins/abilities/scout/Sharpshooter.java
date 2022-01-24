@@ -14,7 +14,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Trident;
 import org.bukkit.inventory.ItemStack;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import javax.annotation.Nullable;
 
 public class Sharpshooter extends Ability implements AbilityWithChargesOrStacks {
 	private static final double PERCENT_BASE_DAMAGE = 0.2;

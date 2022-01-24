@@ -15,7 +15,6 @@ import org.bukkit.entity.ExperienceOrb;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
-import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -131,7 +130,7 @@ public class GlowingCommand {
 					.withPermission(PERMISSION)
 					.withArguments(arguments)
 					.executesPlayer((player, args) -> {
-						setOptions(player, (@NonNull Object[]) Arrays.copyOfRange(args, 1, args.length), (String) args[0]);
+						setOptions(player, (Object[]) Arrays.copyOfRange(args, 1, args.length), (String) args[0]);
 					})
 					.register();
 

@@ -24,8 +24,7 @@ import org.bukkit.event.player.PlayerItemDamageEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.inventory.ItemStack;
-import org.checkerframework.checker.initialization.qual.UnknownInitialization;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import javax.annotation.Nullable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.classes.ClassAbility;
@@ -294,7 +293,7 @@ public abstract class Ability {
 	/*
 	 * For performance, this caches the first scoreboard lookup for future use
 	 */
-	public int getAbilityScore(@UnknownInitialization(Ability.class)Ability this) {
+	public int getAbilityScore(Ability this) {
 		AbilityInfo info = mInfo;
 		if (mPlayer != null && info != null && info.mScoreboardId != null) {
 			if (mScore == null) {

@@ -4,7 +4,6 @@ import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import org.bukkit.entity.LivingEntity;
-import org.checkerframework.checker.initialization.qual.UnknownInitialization;
 
 public class KillTriggeredAbilityTracker {
 
@@ -20,7 +19,7 @@ public class KillTriggeredAbilityTracker {
 
 	private double mDamageDealtToBosses = 0;
 
-	public KillTriggeredAbilityTracker(@UnknownInitialization(KillTriggeredAbility.class) KillTriggeredAbility linkedAbility) {
+	public KillTriggeredAbilityTracker(KillTriggeredAbility linkedAbility) {
 		mLinkedAbility = linkedAbility;
 		mDamageDealtToBossesPerKill = ServerProperties.getClassSpecializationsEnabled() ? DAMAGE_DEALT_TO_R2_BOSSES_PER_KILL : DAMAGE_DEALT_TO_R1_BOSSES_PER_KILL;
 	}
