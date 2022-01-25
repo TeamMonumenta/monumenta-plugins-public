@@ -83,7 +83,14 @@ public class SwingBoss extends BossAbilityGroup {
 						}, (Location loc) -> {
 							p.PARTICLE_CIRCLE_EXPLODE.spawn(loc, 0.2, 0.2, 0.2, 0.2);
 						}, (Location loc) -> {
+							double bossY = boss.getLocation().getY();
 							for (Player player : PlayerUtils.playersInRange(boss.getLocation(), p.RADIUS, true)) {
+								double playerY = player.getLocation().getY();
+								if (bossY + 0.1 < playerY || playerY + player.getHeight() < bossY - player.getHeight()) {
+									continue;
+								}
+
+
 								if (p.DAMAGE > 0) {
 									BossUtils.blockableDamage(boss, player, DamageType.MELEE, p.DAMAGE);
 								}
