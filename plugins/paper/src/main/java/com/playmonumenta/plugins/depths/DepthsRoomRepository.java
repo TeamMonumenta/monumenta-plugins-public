@@ -53,7 +53,6 @@ public class DepthsRoomRepository {
 	 * Rooms are stored in the depths system here
 	 * Rooms have an entry point that describes the offset from the door to the structure corner of the room
 	 * They also have a spawner count to track player progress and a vector to represent the size.
-	 * @param world
 	 */
 	private void initRooms() {
 		//Load room details

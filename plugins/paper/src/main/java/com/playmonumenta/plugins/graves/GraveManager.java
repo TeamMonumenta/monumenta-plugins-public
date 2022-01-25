@@ -330,7 +330,7 @@ public class GraveManager {
 	}
 
 	boolean isOwner(Player player) {
-		return player.getUniqueId() == mPlayer.getUniqueId();
+		return player.getUniqueId().equals(mPlayer.getUniqueId());
 	}
 
 	boolean hasPermission(Player player) {

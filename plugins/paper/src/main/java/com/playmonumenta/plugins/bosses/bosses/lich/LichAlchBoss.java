@@ -15,7 +15,6 @@ import java.util.List;
 public class LichAlchBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_lichalch";
 	public static final int detectionRange = 20;
-	LivingEntity mBoss;
 
 	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
 		return new LichAlchBoss(plugin, boss);
@@ -24,7 +23,6 @@ public class LichAlchBoss extends BossAbilityGroup {
 	public LichAlchBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
 
-		mBoss = boss;
 		SpellManager activeSpells = new SpellManager(Arrays.asList(
 			new SpellPotionCloud(plugin, mBoss)
 		));

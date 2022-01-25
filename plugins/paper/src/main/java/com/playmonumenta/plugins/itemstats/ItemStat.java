@@ -38,7 +38,7 @@ public interface ItemStat {
 	/**
 	 * Priority order in event handling, with lower values being handled earlier than higher ones. Defaults to 999.
 	 *
-	 * @returns the priorty order
+	 * @return the priorty order
 	 */
 	default double getPriorityAmount() {
 		return 999;

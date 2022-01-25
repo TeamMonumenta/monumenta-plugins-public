@@ -16,7 +16,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.FireworkEffect;
-import org.bukkit.FireworkEffect.Type;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -70,7 +69,7 @@ public class FireworkBlast extends DepthsAbility {
 		Vector vel = mPlayer.getLocation().getDirection();
 		rocket.setVelocity(vel);
 
-		FireworkEffect effect = FireworkEffect.builder().with(Type.BALL).withColor(Color.BLACK, Color.WHITE, Color.RED).withFade(Color.GRAY, Color.SILVER, Color.ORANGE).build();
+		FireworkEffect effect = FireworkEffect.builder().with(FireworkEffect.Type.BALL).withColor(Color.BLACK, Color.WHITE, Color.RED).withFade(Color.GRAY, Color.SILVER, Color.ORANGE).build();
 		FireworkMeta meta = rocket.getFireworkMeta();
 		meta.addEffect(effect);
 		meta.setPower(3);

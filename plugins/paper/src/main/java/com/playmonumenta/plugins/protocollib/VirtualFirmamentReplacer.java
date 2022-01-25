@@ -29,7 +29,7 @@ public class VirtualFirmamentReplacer extends PacketAdapter {
 			return;
 		}
 		PacketContainer packet = event.getPacket();
-		if (packet.getType() == PacketType.Play.Server.WINDOW_ITEMS) {
+		if (packet.getType().equals(PacketType.Play.Server.WINDOW_ITEMS)) {
 			// doc: https://wiki.vg/Protocol#Window_Items
 			if (packet.getIntegers().read(0) != 0) {
 				// first int (should be a byte?) is the window ID, with ID 0 being the player inventory

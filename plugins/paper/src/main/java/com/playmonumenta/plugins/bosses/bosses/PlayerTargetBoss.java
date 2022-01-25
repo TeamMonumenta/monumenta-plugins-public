@@ -22,8 +22,6 @@ public class PlayerTargetBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_targetplayer";
 	public static final int detectionRange = 30;
 
-	Mob mBoss;
-
 	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
 		return new PlayerTargetBoss(plugin, boss);
 	}
@@ -38,9 +36,7 @@ public class PlayerTargetBoss extends BossAbilityGroup {
 			boss.setRemoveWhenFarAway(true);
 		}
 
-		mBoss = (Mob)boss;
-
-		Spell tgt = new SpellTargetVisiblePlayer(mBoss, detectionRange, 60, 160);
+		Spell tgt = new SpellTargetVisiblePlayer((Mob)boss, detectionRange, 60, 160);
 
 		SpellManager activeSpells = new SpellManager(Arrays.asList(
 			new SpellRunAction(() -> {

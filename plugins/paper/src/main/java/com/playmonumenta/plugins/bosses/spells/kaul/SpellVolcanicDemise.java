@@ -86,7 +86,7 @@ public class SpellVolcanicDemise extends Spell {
 					BukkitRunnable runnable = new BukkitRunnable() {
 
 						@Override
-						public void cancel() {
+						public synchronized void cancel() {
 							super.cancel();
 							mChargeUp.reset();
 							mChargeUp.setTitle(ChatColor.GREEN + "Charging " + ChatColor.DARK_RED + "" + ChatColor.BOLD + "Volcanic Demise...");

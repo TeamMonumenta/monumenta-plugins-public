@@ -6,12 +6,12 @@ import com.playmonumenta.plugins.abilities.delves.Twisted;
 import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.utils.FastUtils;
 
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityTargetEvent;
 import org.bukkit.plugin.Plugin;
-import org.bukkit.scheduler.BukkitRunnable;
 
 public class TwistedEventBoss extends BossAbilityGroup {
 
@@ -21,7 +21,6 @@ public class TwistedEventBoss extends BossAbilityGroup {
 	private static final int DELAY_MIN = 20 * 2;
 	private static final int DELAY_MAX = 20 * 8;
 
-	private final com.playmonumenta.plugins.Plugin mPlugin;
 	private boolean mTriggered = false;
 
 	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
@@ -30,7 +29,6 @@ public class TwistedEventBoss extends BossAbilityGroup {
 
 	public TwistedEventBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
-		mPlugin = com.playmonumenta.plugins.Plugin.getInstance();
 
 		super.constructBoss(SpellManager.EMPTY, Collections.emptyList(), detectionRange, null);
 	}
@@ -45,15 +43,11 @@ public class TwistedEventBoss extends BossAbilityGroup {
 		if (target instanceof Player) {
 			mTriggered = true;
 
-			BukkitRunnable runnable = new BukkitRunnable() {
-				@Override
-				public void run() {
-					Twisted.runEvent(mPlugin, mBoss);
-				}
-			};
-
-			runnable.runTaskLater(mPlugin, FastUtils.RANDOM.nextInt(DELAY_MAX - DELAY_MIN) + DELAY_MIN);
+			Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
+				Twisted.runEvent(mBoss);
+			}, FastUtils.RANDOM.nextInt(DELAY_MAX - DELAY_MIN) + DELAY_MIN);
 		}
 	}
+
 
 }

@@ -1,13 +1,14 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.NavigableSet;
 
 import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.effects.Effect;
+import com.playmonumenta.plugins.effects.EffectManager;
 import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.events.DamageEvent;
 
@@ -38,12 +39,11 @@ public class CarapaceBoss extends BossAbilityGroup {
 	private static final String SPEED_EFFECT_NAME = "CarapaceSpeedEffect";
 	private static final int PERIOD = 20 * 10;
 
-	private final com.playmonumenta.plugins.Plugin mPlugin;
 	private final double mCarapaceHealth;
 	private final double mSpeedEffect;
 
-	private final List<DamageInstance> mDamageInstancesPeriod = new LinkedList<DamageInstance>();
-	private final List<DamageInstance> mDamageInstancesReactivate = new LinkedList<DamageInstance>();
+	private final List<DamageInstance> mDamageInstancesPeriod = new ArrayList<DamageInstance>();
+	private final List<DamageInstance> mDamageInstancesReactivate = new ArrayList<DamageInstance>();
 
 	private double mDamageCounterPeriod = 0;
 	private double mDamageCounterReactivate = 0;
@@ -54,7 +54,6 @@ public class CarapaceBoss extends BossAbilityGroup {
 
 	public CarapaceBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
-		mPlugin = com.playmonumenta.plugins.Plugin.getInstance();
 
 		super.constructBoss(SpellManager.EMPTY, Collections.emptyList(), detectionRange, null);
 
@@ -134,10 +133,10 @@ public class CarapaceBoss extends BossAbilityGroup {
 
 			int duration = PERIOD - mBoss.getTicksLived() + reactivateTick;
 
-			NavigableSet<Effect> effects = mPlugin.mEffectManager.getEffects(mBoss, SPEED_EFFECT_NAME);
+			NavigableSet<Effect> effects = EffectManager.getInstance().getEffects(mBoss, SPEED_EFFECT_NAME);
 			if (effects == null) {
 				if (mSpeedEffect > 0) {
-					mPlugin.mEffectManager.addEffect(mBoss, SPEED_EFFECT_NAME, new PercentSpeed(duration, mSpeedEffect, SPEED_EFFECT_NAME));
+					EffectManager.getInstance().addEffect(mBoss, SPEED_EFFECT_NAME, new PercentSpeed(duration, mSpeedEffect, SPEED_EFFECT_NAME));
 				}
 			} else {
 				effects.last().setDuration(duration);

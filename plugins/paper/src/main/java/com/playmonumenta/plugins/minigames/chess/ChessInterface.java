@@ -249,6 +249,7 @@ public class ChessInterface {
 			Vector mDirection = mDistance.clone().normalize();
 			int mTimer = 0;
 
+			@Override
 			public void run() {
 				if (isCancelled()) {
 					return;

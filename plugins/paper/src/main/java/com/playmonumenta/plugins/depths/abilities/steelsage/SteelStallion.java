@@ -123,7 +123,7 @@ public class SteelStallion extends DepthsAbility {
 	}
 
 	public static boolean isSteelStallion(Entity entity) {
-		return entity instanceof Horse && entity.getName() == ABILITY_NAME;
+		return entity instanceof Horse && ABILITY_NAME.equals(entity.getName());
 	}
 
 	@Override

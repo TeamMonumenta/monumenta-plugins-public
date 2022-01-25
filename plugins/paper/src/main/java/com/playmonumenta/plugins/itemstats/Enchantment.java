@@ -10,7 +10,7 @@ public interface Enchantment extends ItemStat {
 	/**
 	 * A reference back to the associated EnchantmentType in ItemStatUtils.
 	 *
-	 * @returns the associated EnchantmentType
+	 * @return the associated EnchantmentType
 	 */
 	EnchantmentType getEnchantmentType();
 

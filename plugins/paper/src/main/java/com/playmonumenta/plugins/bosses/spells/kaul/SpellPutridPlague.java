@@ -194,10 +194,10 @@ public class SpellPutridPlague extends Spell {
 									player.removePotionEffect(PotionEffectType.WEAKNESS);
 								} else {
 									for (PotionEffect effect : player.getActivePotionEffects()) {
-										if (effect.getType() == PotionEffectType.WITHER
-										    || effect.getType() == PotionEffectType.SLOW
-										    || effect.getType() == PotionEffectType.POISON
-										    || effect.getType() == PotionEffectType.WEAKNESS) {
+										if (effect.getType().equals(PotionEffectType.WITHER)
+										    || effect.getType().equals(PotionEffectType.SLOW)
+										    || effect.getType().equals(PotionEffectType.POISON)
+										    || effect.getType().equals(PotionEffectType.WEAKNESS)) {
 											int duration = effect.getDuration() - (20 * 80);
 											if (duration <= 0) {
 												continue;

@@ -1,21 +1,13 @@
 package com.playmonumenta.plugins.abilities.mage;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.NavigableSet;
 import java.util.Set;
 
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
-import org.bukkit.World;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 import javax.annotation.Nullable;
 
 import com.playmonumenta.plugins.Plugin;
@@ -31,6 +23,15 @@ import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.scriptedquests.utils.MetadataUtils;
+
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
+import org.bukkit.World;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 
 
 
@@ -105,8 +106,7 @@ public class Spellshock extends Ability {
 
 					// Grab all realistically possible nearby mobs for simplicity, use Set for fast removal
 					Set<LivingEntity> nearbyMobs = new HashSet<LivingEntity>(EntityUtils.getNearbyMobs(enemy.getLocation(), 32));
-					// Adding and removing elements in the middle of the list means LinkedList ListIterator should be more efficient
-					List<LivingEntity> triggeredMobs = new LinkedList<LivingEntity>();
+					List<LivingEntity> triggeredMobs = new ArrayList<LivingEntity>();
 					triggeredMobs.add(enemy);
 
 					/*

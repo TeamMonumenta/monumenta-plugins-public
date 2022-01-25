@@ -23,6 +23,7 @@ public class HopperOverride extends BaseOverride {
 		return true;
 	}
 
+	@Override
 	public boolean blockExplodeInteraction(Plugin plugin, Block block) {
 		return false;
 	}

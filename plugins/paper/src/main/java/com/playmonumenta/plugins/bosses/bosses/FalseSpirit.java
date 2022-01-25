@@ -64,9 +64,6 @@ public final class FalseSpirit extends BossAbilityGroup {
 	public static final int detectionRange = 75;
 	public static final int meleeRange = 10;
 
-	private final Plugin mPlugin;
-	public final LivingEntity mBoss;
-
 	//If delves is enabled in instance, turn on delves mode
 	private boolean mDelve = false;
 
@@ -107,8 +104,6 @@ public final class FalseSpirit extends BossAbilityGroup {
 	public FalseSpirit(Plugin plugin, LivingEntity boss, Location spawnLoc, Location endLoc) {
 		super(plugin, identityTag, boss);
 
-		mPlugin = plugin;
-		mBoss = boss;
 		mSpawnLoc = spawnLoc;
 		mEndLoc = endLoc;
 
@@ -420,7 +415,6 @@ public final class FalseSpirit extends BossAbilityGroup {
 
 	@Override
 	public void init() {
-		int bossTargetHp = 0;
 		int playerCount = PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true).size();
 		int hpDel = 3012;
 
@@ -435,7 +429,7 @@ public final class FalseSpirit extends BossAbilityGroup {
 			noDamageTicksTake = 5;
 		}
 		mBoss.setMaximumNoDamageTicks(mBoss.getMaximumNoDamageTicks() - noDamageTicksTake);
-		bossTargetHp = (int) (hpDel * (1 + (1 - 1 / Math.E) * Math.log(playerCount)) * 1.1);
+		int bossTargetHp = (int) (hpDel * (1 + (1 - 1 / Math.E) * Math.log(playerCount)) * 1.1);
 		EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_MAX_HEALTH, bossTargetHp);
 		EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_FOLLOW_RANGE, detectionRange);
 		EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_KNOCKBACK_RESISTANCE, 1);

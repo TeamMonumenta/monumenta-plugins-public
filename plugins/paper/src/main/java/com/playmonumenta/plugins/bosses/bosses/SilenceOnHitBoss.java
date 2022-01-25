@@ -18,9 +18,9 @@ import org.bukkit.plugin.Plugin;
  *<blockquote><pre>
  * /boss var Tags add boss_onhit
  * /boss var Tags add boss_onhit[effects=[(silence,100)]]
- * CARE this ability has some particle & sound, fix those too if you don't want the default values
+ * CARE this ability has some particle and sound, fix those too if you don't want the default values
  * </pre></blockquote>
- * @G3m1n1Boy
+ * G3m1n1Boy
  *
 */
 @Deprecated

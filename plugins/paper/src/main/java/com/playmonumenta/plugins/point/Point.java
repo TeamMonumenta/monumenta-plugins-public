@@ -86,6 +86,7 @@ public class Point {
 		return new Point(x, y, z);
 	}
 
+	@Override
 	public String toString() {
 		return "(" + Double.toString(mX) + ", " +
 		       Double.toString(mY) + ", " + Double.toString(mZ) + ")";

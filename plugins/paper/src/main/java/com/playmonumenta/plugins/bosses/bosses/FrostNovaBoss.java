@@ -17,7 +17,7 @@ import org.bukkit.plugin.Plugin;
  * /bos var Tags add boss_nova[soundCharge=ENTITY_SNOWBALL_THROW,SoundCast=[(BLOCK_GLASS_BREAK,1.5,0.65)]]
  * /bos var Tags add boss_nova[ParticleAir=[(CLOUD,2,4.5,4.5,4.5,0.05)],ParticleLoad=[(snowball,1,0.25,0.25,0.25,0.1)],ParticleExplode=[(Cloud,1,0.1,0.1,0.1,0.3),(snowball,2,0.25,0.25,0.25,0.1)]]
  * </pre></blockquote>
- * @G3m1n1Boy
+ * G3m1n1Boy
  */
 @Deprecated
 public class FrostNovaBoss extends BossAbilityGroup {

@@ -94,8 +94,7 @@ public class SpellAutoAttack extends Spell {
 
 	private void bolt() {
 		World world = mBoss.getWorld();
-		List<Player> tooClose = new ArrayList<Player>();
-		tooClose = Lich.playersInRange(mBoss.getLocation(), 6, true);
+		List<Player> tooClose = Lich.playersInRange(mBoss.getLocation(), 6, true);
 
 		if (tooClose.size() > 0 && mBoss.getLocation().getY() < mCenter.getY() + 3) {
 			Collections.shuffle(tooClose);

@@ -48,7 +48,7 @@ public class DepthsSummaryGUI extends CustomInventory {
 
 	public DepthsSummaryGUI(Player requestingPlayer, Player targetPlayer) {
 		super(requestingPlayer, 54, "Current Abilities");
-		if (requestingPlayer.getUniqueId() != targetPlayer.getUniqueId()) {
+		if (!requestingPlayer.getUniqueId().equals(targetPlayer.getUniqueId())) {
 			mDebugVersion = true;
 		}
 

@@ -41,7 +41,7 @@ public class EventListener implements Listener {
 		}
 	}
 
-	private void _joinLeaveEvent(ProxiedPlayer player, String operation, boolean isVanished) {
+	private void joinLeaveEvent(ProxiedPlayer player, String operation, boolean isVanished) {
 		if (!isVanished) {
 			/* No vanish - send everyone the login message */
 
@@ -98,7 +98,7 @@ public class EventListener implements Listener {
 		if (mMain.mJoinMessagesEnabled && !mOnlinePlayers.contains(player.getUniqueId())) {
 			/* This player is not already online - send join message */
 			mOnlinePlayers.add(player.getUniqueId());
-			_joinLeaveEvent(player, " joined the game",
+			joinLeaveEvent(player, " joined the game",
 			                mVanishEnabled && BungeeVanishAPI.isInvisible(player));
 		}
 	}
@@ -110,7 +110,7 @@ public class EventListener implements Listener {
 		if (mMain.mJoinMessagesEnabled && mOnlinePlayers.contains(player.getUniqueId())) {
 			/* This player was online - send leave message */
 			mOnlinePlayers.remove(player.getUniqueId());
-			_joinLeaveEvent(player, " left the game",
+			joinLeaveEvent(player, " left the game",
 			                mVanishEnabled && BungeeVanishAPI.isInvisible(player));
 		}
 	}

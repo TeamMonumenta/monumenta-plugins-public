@@ -1,8 +1,20 @@
 package com.playmonumenta.plugins.abilities.alchemist.harbinger;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+
+import javax.annotation.Nullable;
+
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.MultipleChargeAbility;
+import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.effects.EffectManager;
+import com.playmonumenta.plugins.effects.ScorchedEarthDamage;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.ItemUtils;
 
 import org.bukkit.Color;
 import org.bukkit.Location;
@@ -17,16 +29,6 @@ import org.bukkit.event.entity.PotionSplashEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.scheduler.BukkitRunnable;
-import javax.annotation.Nullable;
-
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.MultipleChargeAbility;
-import com.playmonumenta.plugins.classes.ClassAbility;
-import com.playmonumenta.plugins.effects.EffectManager;
-import com.playmonumenta.plugins.effects.ScorchedEarthDamage;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.FastUtils;
-import com.playmonumenta.plugins.utils.ItemUtils;
 
 
 
@@ -65,7 +67,8 @@ public class ScorchedEarth extends MultipleChargeAbility {
 	@Override
 	public void periodicTrigger(boolean twoHertz, boolean oneSecond, int ticks) {
 		manageChargeCooldowns();
-		for (Location loc : mCenters.keySet()) {
+        // Copy list to avoid ConcurrentModificationException
+		for (Location loc : new ArrayList<Location>(mCenters.keySet())) {
 			int timeRemaining = mCenters.get(loc);
 			if (timeRemaining <= 0) {
 				mCenters.remove(loc);

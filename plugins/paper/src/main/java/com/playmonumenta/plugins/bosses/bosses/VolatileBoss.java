@@ -14,7 +14,7 @@ public class VolatileBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_volatile";
 	public static final int detectionRange = 20;
 
-	private final Creeper mBoss;
+	private final Creeper mCreeper;
 
 	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
 		if (!(boss instanceof Creeper)) {
@@ -29,7 +29,7 @@ public class VolatileBoss extends BossAbilityGroup {
 			throw new Exception("Attempted to give non-creeper the " + identityTag + " ability: " + boss.toString());
 		}
 
-		mBoss = (Creeper)boss;
+		mCreeper = (Creeper)boss;
 
 		// Boss effectively does nothing
 		super.constructBoss(SpellManager.EMPTY, Collections.emptyList(), detectionRange, null);
@@ -38,7 +38,7 @@ public class VolatileBoss extends BossAbilityGroup {
 	@Override
 	public void onHurt(DamageEvent event) {
 		if (event.getType() == DamageType.BLAST) {
-			mBoss.explode();
+			mCreeper.explode();
 		}
 	}
 }

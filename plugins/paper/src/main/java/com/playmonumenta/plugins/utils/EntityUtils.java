@@ -46,7 +46,6 @@ import org.bukkit.entity.PolarBear;
 import org.bukkit.entity.Projectile;
 import org.bukkit.entity.PufferFish;
 import org.bukkit.entity.Rabbit;
-import org.bukkit.entity.Rabbit.Type;
 import org.bukkit.entity.Shulker;
 import org.bukkit.entity.SkeletonHorse;
 import org.bukkit.entity.Slime;
@@ -332,7 +331,7 @@ public class EntityUtils {
 			} else if (entity instanceof Wolf) {
 				return (((Wolf) entity).isAngry() && ((Wolf) entity).getOwner() != null) || entity.getScoreboardTags().contains("boss_targetplayer");
 			} else if (entity instanceof Rabbit) {
-				return ((Rabbit) entity).getRabbitType() == Type.THE_KILLER_BUNNY;
+				return ((Rabbit) entity).getRabbitType().equals(Rabbit.Type.THE_KILLER_BUNNY);
 			} else if (entity instanceof Player) {
 				return AbilityManager.getManager().isPvPEnabled((Player) entity);
 			} else if (entity instanceof Mob) {
@@ -580,7 +579,7 @@ public class EntityUtils {
 			Iterator<Player> iter = nearbyPlayers.iterator();
 			while (iter.hasNext()) {
 				Player p = iter.next();
-				if (p.getName() == self.getName()) {
+				if (p.getName().equals(self.getName())) {
 					iter.remove();
 					continue;
 				}
@@ -642,7 +641,7 @@ public class EntityUtils {
 	public static @Nullable Entity getEntity(World world, UUID entityUUID) {
 		List<Entity> entities = world.getEntities();
 		for (Entity entity : entities) {
-			if (entity.getUniqueId() == entityUUID) {
+			if (entity.getUniqueId().equals(entityUUID)) {
 				return entity;
 			}
 		}

@@ -22,8 +22,6 @@ public class ExperienceUtils {
 	}
 
 	public static void setTotalExperience(Player player, int amount) {
-		int level = 0;
-		int xp = 0;
 		float a = 0;
 		float b = 0;
 		float c = -amount;
@@ -40,8 +38,8 @@ public class ExperienceUtils {
 			b = -162.5f;
 			c += 2220;
 		}
-		level = (int) Math.floor((-b + Math.sqrt(Math.pow(b, 2) - (4 * a * c))) / (2 * a));
-		xp = amount - getTotalExperience(level);
+		int level = (int) Math.floor((-b + Math.sqrt(Math.pow(b, 2) - (4 * a * c))) / (2 * a));
+		int xp = amount - getTotalExperience(level);
 		player.setLevel(level);
 		player.setExp(0);
 		player.giveExp(xp);

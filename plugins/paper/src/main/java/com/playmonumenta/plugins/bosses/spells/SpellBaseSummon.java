@@ -192,7 +192,7 @@ public class SpellBaseSummon extends Spell {
 			}
 
 			@Override
-			public void cancel() {
+			public synchronized void cancel() {
 				super.cancel();
 				if (!mCanMove) {
 					mBoss.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 1, 100));
@@ -254,7 +254,7 @@ public class SpellBaseSummon extends Spell {
 					}
 
 					@Override
-					public void cancel() {
+					public synchronized void cancel() {
 						super.cancel();
 						mMob.setGlowing(false);
 						//if the cast is not over remove the mob

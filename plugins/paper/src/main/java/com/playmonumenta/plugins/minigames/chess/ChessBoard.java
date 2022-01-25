@@ -246,7 +246,6 @@ public class ChessBoard {
 		List<Integer> list = new ArrayList<>();
 		int canMove = 0;
 
-		canMove = 0;
 		for (int move: KING_MOVES) {
 			canMove = canMoveTo(piece, piece.mBoardLoc + move);
 			if (canMove >= 0 && !squareUnderAttack(piece.mTeam, piece.mBoardLoc + move)) {
@@ -753,7 +752,7 @@ public class ChessBoard {
 				continue;
 			} else {
 				if (Character.isDigit(piece)) {
-					pos += Character.getNumericValue(piece);
+					pos += Integer.valueOf(piece);
 				} else {
 					ChessTeam team = Character.isUpperCase(piece) ? ChessTeam.WHITE : ChessTeam.BLACK;
 					ChessPieceType type = null;

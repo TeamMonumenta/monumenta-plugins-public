@@ -165,7 +165,7 @@ public class SpellRaiseJungle extends Spell {
 				new BukkitRunnable() {
 
 					@Override
-					public void cancel() {
+					public synchronized void cancel() {
 						super.cancel();
 						mChargeUp.reset();
 					}

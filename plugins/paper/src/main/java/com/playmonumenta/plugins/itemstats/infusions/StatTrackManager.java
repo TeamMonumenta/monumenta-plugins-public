@@ -213,7 +213,7 @@ public class StatTrackManager {
 	 * After 60 seconds of not switching the item or being able to update it, it is removed from the map
 	 *
 	 */
-	public class StatDelayedUpdateCheck extends BukkitRunnable {
+	public static class StatDelayedUpdateCheck extends BukkitRunnable {
 
 		Player mPlayer;
 		String mItemName;

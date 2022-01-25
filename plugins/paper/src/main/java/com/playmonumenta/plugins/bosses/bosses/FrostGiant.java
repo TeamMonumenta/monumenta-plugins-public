@@ -943,7 +943,7 @@ public class FrostGiant extends BossAbilityGroup {
 
 	@Override
 	public void entityPotionEffectEvent(EntityPotionEffectEvent event) {
-		if (event.getModifiedType() == PotionEffectType.SLOW) {
+		if (event.getModifiedType().equals(PotionEffectType.SLOW)) {
 			if (event.getNewEffect().getAmplifier() > 0) {
 				event.getNewEffect().withAmplifier(event.getNewEffect().getAmplifier() - 1);
 			} else {
@@ -1064,7 +1064,6 @@ public class FrostGiant extends BossAbilityGroup {
 
 	@Override
 	public void init() {
-		int bossTargetHp = 0;
 		List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true);
 		int playerCount = players.size();
 		int hpDel = 5012;
@@ -1080,7 +1079,7 @@ public class FrostGiant extends BossAbilityGroup {
 			noDamageTicksTake = 5;
 		}
 		mBoss.setMaximumNoDamageTicks(mBoss.getMaximumNoDamageTicks() - noDamageTicksTake);
-		bossTargetHp = (int) (hpDel * (1 + (1 - 1/Math.E) * Math.log(playerCount)) * 1.1);
+		int bossTargetHp = (int) (hpDel * (1 + (1 - 1/Math.E) * Math.log(playerCount)) * 1.1);
 		mBoss.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(bossTargetHp);
 		mBoss.getAttribute(Attribute.GENERIC_FOLLOW_RANGE).setBaseValue(detectionRange);
 		mBoss.getAttribute(Attribute.GENERIC_KNOCKBACK_RESISTANCE).setBaseValue(1);

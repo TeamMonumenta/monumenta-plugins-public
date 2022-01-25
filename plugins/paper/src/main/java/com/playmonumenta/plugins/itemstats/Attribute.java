@@ -7,7 +7,7 @@ public interface Attribute extends ItemStat {
 	/**
 	 * A reference back to the associated AttributeType in ItemStatUtils.
 	 *
-	 * @returns the associated AttributeType
+	 * @return the associated AttributeType
 	 */
 	AttributeType getAttributeType();
 

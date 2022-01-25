@@ -27,7 +27,6 @@ public class LichShieldBoss extends BossAbilityGroup {
 	private final Location mCenter = Lich.getLichSpawn();
 	private final Location mSpawnLoc;
 	private double mHp = 0;
-	private LivingEntity mBoss;
 
 	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
 		return new LichShieldBoss(plugin, boss);
@@ -35,7 +34,6 @@ public class LichShieldBoss extends BossAbilityGroup {
 
 	public LichShieldBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
-		mBoss = boss;
 
 		mSpawnLoc = mBoss.getLocation();
 		List<Spell> passiveSpells = Arrays.asList(

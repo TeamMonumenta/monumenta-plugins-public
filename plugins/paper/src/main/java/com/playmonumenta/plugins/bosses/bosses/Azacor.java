@@ -157,7 +157,7 @@ public final class Azacor extends BossAbilityGroup {
 		randomMinion(tellraw, mSpawnLoc, (100.0 + BossUtils.getPlayersInRangeForHealthScaling(mSpawnLoc, detectionRange) * 75.0) * 1.1);
 	}
 
-	protected static void randomMinion(String tellraw, Location loc, double eliteHealth) {
+	static void randomMinion(String tellraw, Location loc, double eliteHealth) {
 		int rand = FastUtils.RANDOM.nextInt(4);
 		if (rand == 0) {
 			LivingEntity elite = (LivingEntity) LibraryOfSoulsIntegration.summon(loc, "SarintultheUnseen");

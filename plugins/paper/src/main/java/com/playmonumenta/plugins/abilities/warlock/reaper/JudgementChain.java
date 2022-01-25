@@ -143,10 +143,10 @@ public class JudgementChain extends Ability {
 							mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_OTHER, new PotionEffect(PotionEffectType.INCREASE_DAMAGE, BUFF_DURATION, Math.min(mAmplifierCap, (int) (EntityUtils.getWeakenAmount(mPlugin, mTarget) * 10) - 1), true, true));
 						}
 						for (Map.Entry<PotionEffectType, Integer> effect : effects.entrySet()) {
-							if (effect.getKey() == PotionEffectType.DAMAGE_RESISTANCE) {
+							if (effect.getKey().equals(PotionEffectType.DAMAGE_RESISTANCE)) {
 								// Only do Resistance I regardless of Vulnerability level
 								mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_OTHER, new PotionEffect(effect.getKey(), BUFF_DURATION, 0, true, true));
-							} else if (effect.getKey() == PotionEffectType.REGENERATION) {
+							} else if (effect.getKey().equals(PotionEffectType.REGENERATION)) {
 								// Only do Regeneration I regardless of Poison/Wither level
 								mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_OTHER, new PotionEffect(effect.getKey(), BUFF_DURATION, 0, true, true));
 								// Simulate Regen (1 health every 50 ticks = 1/50 health every tick) since constant application never heals
@@ -168,10 +168,10 @@ public class JudgementChain extends Ability {
 									mPlugin.mPotionManager.addPotion(pl, PotionID.ABILITY_OTHER, new PotionEffect(PotionEffectType.INCREASE_DAMAGE, BUFF_DURATION, Math.min(mAmplifierCap, (int) (EntityUtils.getWeakenAmount(mPlugin, mTarget) * 10) - 1), true, true));
 								}
 								for (Map.Entry<PotionEffectType, Integer> effect : effects.entrySet()) {
-									if (effect.getKey() == PotionEffectType.DAMAGE_RESISTANCE) {
+									if (effect.getKey().equals(PotionEffectType.DAMAGE_RESISTANCE)) {
 										// Only do Resistance I regardless of Vulnerability level
 										mPlugin.mPotionManager.addPotion(pl, PotionID.ABILITY_OTHER, new PotionEffect(effect.getKey(), BUFF_DURATION, 0, true, true));
-									} else if (effect.getKey() == PotionEffectType.REGENERATION) {
+									} else if (effect.getKey().equals(PotionEffectType.REGENERATION)) {
 										// Only do Regeneration I regardless of Poison/Wither level
 										mPlugin.mPotionManager.addPotion(pl, PotionID.ABILITY_OTHER, new PotionEffect(effect.getKey(), BUFF_DURATION, 0, true, true));
 										// Simulate Regen (1 health every 50 ticks = 1/50 health every tick) since constant application never heals

@@ -46,7 +46,7 @@ public class DeathMsg {
 		public static DeathMessageState getDeathMessageState(String cmdLiteral) {
 			if (cmdLiteral == null) {
 				return DeathMessageState.VISIBLE;
-			} else if (cmdLiteral == DeathMessageState.HIDDEN.getCmdLiteral()) {
+			} else if (cmdLiteral.equals(DeathMessageState.HIDDEN.getCmdLiteral())) {
 				return DeathMessageState.HIDDEN;
 			} else {
 				return DeathMessageState.VISIBLE;

@@ -273,11 +273,10 @@ public class HeadlessHorsemanBoss extends BossAbilityGroup {
 
 	@Override
 	public void init() {
-		int bossTargetHp = 0;
 		int playerCount = BossUtils.getPlayersInRangeForHealthScaling(mSpawnLoc, detectionRange);
 		int hpDelta = 2500;
 
-		bossTargetHp = (int) (hpDelta * (1 + (1 - 1/Math.E) * Math.log(playerCount)) * 1.1);
+		int bossTargetHp = (int) (hpDelta * (1 + (1 - 1/Math.E) * Math.log(playerCount)) * 1.1);
 		mBoss.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(bossTargetHp);
 		mBoss.setHealth(bossTargetHp);
 

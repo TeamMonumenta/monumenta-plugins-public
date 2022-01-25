@@ -82,7 +82,7 @@ tasks.withType<JavaCompile>().configureEach {
     options.compilerArgs.add("10000")
 
     // TODO: Also need to re-enable these deprecation warnings
-    options.compilerArgs.add("-Xlint:deprecation")
+    //options.compilerArgs.add("-Xlint:deprecation")
 
     options.errorprone {
         // TODO This must be turned back on as soon as some of the other warnings are under control
@@ -91,15 +91,20 @@ tasks.withType<JavaCompile>().configureEach {
         // These are errors but should not be, downgrade to warning
         check("IdentityBinaryExpression", CheckSeverity.WARN)
         check("FormatString", CheckSeverity.WARN)
-        check("ArrayToString", CheckSeverity.WARN)
 
         // These we almost certainly don't want
         check("CatchAndPrintStackTrace", CheckSeverity.OFF)
         check("OperatorPrecedence", CheckSeverity.OFF)
         check("StaticAssignmentInConstructor", CheckSeverity.OFF)
+        check("StringSplitter", CheckSeverity.OFF)
+        check("MixedMutabilityReturnType", CheckSeverity.OFF)
+        check("InlineFormatString", CheckSeverity.OFF)
+        check("FloatCast", CheckSeverity.OFF)
 
         // TODO: We probably want to turn these back on when the number is more reasonable
+        check("NarrowingCompoundAssignment", CheckSeverity.OFF)
         check("ImmutableEnumChecker", CheckSeverity.OFF)
+        check("FutureReturnValueIgnored", CheckSeverity.OFF)
         check("UnnecessaryParentheses", CheckSeverity.OFF)
         check("DefaultCharset", CheckSeverity.OFF)
         check("JavaTimeDefaultTimeZone", CheckSeverity.OFF)

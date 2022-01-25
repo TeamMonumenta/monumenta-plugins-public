@@ -18,8 +18,6 @@ public final class ShieldSwitchBoss extends BossAbilityGroup {
 		public int DELAY = 5 * 20;
 	}
 
-	Mob mBoss;
-
 	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
 		return new ShieldSwitchBoss(plugin, boss);
 	}
@@ -30,12 +28,10 @@ public final class ShieldSwitchBoss extends BossAbilityGroup {
 			throw new Exception("boss_shieldswitch only works on mobs!");
 		}
 
-		mBoss = (Mob)boss;
-
 		Parameters p = BossParameters.getParameters(boss, identityTag, new Parameters());
 
 		SpellManager activeSpells = new SpellManager(Arrays.asList(
-			new SpellShieldSwitch(mBoss, plugin)
+			new SpellShieldSwitch((Mob)mBoss, plugin)
 		));
 
 		super.constructBoss(activeSpells, Collections.emptyList(), p.DETECTION, null, p.DELAY);

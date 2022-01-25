@@ -273,7 +273,7 @@ public class BossUtils {
 			if (toMap.length == 2) {
 				map.put(toMap[0].replace(" ", "").toLowerCase(), toMap[1]);
 			} else {
-				Plugin.getInstance().getLogger().warning("Fail to load: " + toMap + ". Illegal declaration");
+				Plugin.getInstance().getLogger().warning("Fail to load: [" + String.join(",", toMap) + "]. Illegal declaration");
 			}
 		} else {
 			Plugin.getInstance().getLogger().warning("Fail too many brackets/quote inside: " + s);

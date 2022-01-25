@@ -17,7 +17,6 @@ import org.bukkit.plugin.Plugin;
 public class LichCurseBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_lichcurse";
 	public static final int detectionRange = 55;
-	LivingEntity mBoss;
 
 	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
 		return new LichCurseBoss(plugin, boss);
@@ -25,7 +24,6 @@ public class LichCurseBoss extends BossAbilityGroup {
 
 	public LichCurseBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
-		mBoss = boss;
 
 		List<Spell> passiveSpells = Arrays.asList(
 			new SpellLichCurse(mBoss)

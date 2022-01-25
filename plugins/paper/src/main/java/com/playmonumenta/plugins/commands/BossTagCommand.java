@@ -42,7 +42,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -509,7 +508,7 @@ public class BossTagCommand {
 			BossUtils.addModifiersFromString(param, realBossTag);
 		}
 
-		List<Soul> soulsList = new LinkedList<>();
+		List<Soul> soulsList = new ArrayList<>();
 		Set<String> soulsName = LibraryOfSoulsAPI.getSoulNames();
 
 		Boolean shouldAdd = false;
@@ -646,8 +645,8 @@ public class BossTagCommand {
 		//load params
 		Map<String, String> params = new LinkedHashMap<>();
 		BossUtils.addModifiersFromString(params, bossTag.replace(realBossTag, ""));
-		List<String> paramsList = new LinkedList<>();
-		List<String> newOldTags = new LinkedList<>();
+		List<String> paramsList = new ArrayList<>();
+		List<String> newOldTags = new ArrayList<>();
 
 		for (String paramKey : params.keySet()) {
 			paramsList.add(paramKey + "=" + params.get(paramKey));
@@ -709,7 +708,7 @@ public class BossTagCommand {
 			BookOfSouls bos = getBos((Player)info.sender());
 			NBTTagList nbtTagsList = bos.getEntityNBT().getData().getList("Tags");
 
-			List<Tooltip<String>> bossTags = new LinkedList<>();
+			List<Tooltip<String>> bossTags = new ArrayList<>();
 
 			for (Object tag : nbtTagsList.getAsArray()) {
 				String tagString = (String) tag;
@@ -736,8 +735,8 @@ public class BossTagCommand {
 			NBTTagList nbtTagsList = bos.getEntityNBT().getData().getList("Tags");
 
 			if (nbtTagsList != null) {
-				List<Tooltip<String>> bossTags = new LinkedList<>();
-				List<String> bossTagList = new LinkedList<>();
+				List<Tooltip<String>> bossTags = new ArrayList<>();
+				List<String> bossTagList = new ArrayList<>();
 				Map<String, Map<String, String>> paramsMap = new LinkedHashMap<>();
 
 				for (Object tag : nbtTagsList.getAsArray()) {
@@ -813,7 +812,7 @@ public class BossTagCommand {
 		}
 
 		//recreate the tags and load back
-		List<String> nextTags = new LinkedList<>();
+		List<String> nextTags = new ArrayList<>();
 		String tag;
 		for (String bossTag : bossTagParamertersMap.keySet()) {
 			if (!bossTagParamertersMap.get(bossTag).isEmpty()) {
@@ -869,7 +868,7 @@ public class BossTagCommand {
 					if (BossManager.mBossParameters.get(tag) != null) {
 						//this Soul may be with some parameters, lets save it to check later
 						if (soulsBosTagMap.get(soul) == null) {
-							soulsBosTagMap.put(soul, new LinkedList<>());
+							soulsBosTagMap.put(soul, new ArrayList<>());
 						}
 						soulsBosTagMap.get(soul).add(tag);
 					}
@@ -903,7 +902,7 @@ public class BossTagCommand {
 							//we get a deprecated tag somehow
 							//lets save it to give it to the player
 							if (soulDeprecatedTagMap.get(soul) == null) {
-								soulDeprecatedTagMap.put(soul, new LinkedList<>());
+								soulDeprecatedTagMap.put(soul, new ArrayList<>());
 							}
 
 							soulDeprecatedTagMap.get(soul).add(tag);
@@ -963,7 +962,7 @@ public class BossTagCommand {
 		ItemMeta meta = paper.getItemMeta();
 
 		meta.displayName(Component.text(name).decoration(TextDecoration.ITALIC, false));
-		List<Component> loreC = new LinkedList<>();
+		List<Component> loreC = new ArrayList<>();
 
 		for (String loreS : lore) {
 			loreC.add(Component.text(loreS).decoration(TextDecoration.ITALIC, false));

@@ -19,8 +19,6 @@ public class SwapOnDismountBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_swapondismount";
 	public static final int detectionRange = 35;
 
-	Mob mBoss;
-
 	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
 		return new SwapOnDismountBoss(plugin, boss);
 	}
@@ -31,8 +29,7 @@ public class SwapOnDismountBoss extends BossAbilityGroup {
 			throw new Exception("boss_swapondismount only works on mobs!");
 		}
 
-		mBoss = (Mob)boss;
-		List<Spell> passiveSpells = Arrays.asList(new SpellSwapOnDismount(mBoss));
+		List<Spell> passiveSpells = Arrays.asList(new SpellSwapOnDismount(boss));
 
 		super.constructBoss(SpellManager.EMPTY, passiveSpells, detectionRange, null);
 	}

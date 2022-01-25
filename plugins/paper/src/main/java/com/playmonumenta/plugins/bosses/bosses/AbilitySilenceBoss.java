@@ -22,7 +22,7 @@ import org.bukkit.plugin.Plugin;
  * /boss var Tags add boss_onhit[SilenceTicks=60,COLOR=XXXXX]
  * we have yet to find a way to look at color
  * </pre></blockquote>
- * @G3m1n1Boy
+ * G3m1n1Boy
  *
 */
 @Deprecated

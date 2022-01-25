@@ -32,7 +32,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BlockStateMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.loot.LootContext;
-import org.bukkit.loot.LootContext.Builder;
 import org.bukkit.loot.LootTable;
 
 import java.util.Collection;
@@ -90,7 +89,7 @@ public class LootChestsInInventory implements Listener {
 		}
 		//Make an inventory and do some good ol roundabout population of the loot
 		Inventory inventory = Bukkit.createInventory(null, 27, item.getItemMeta().displayName());
-		Builder builder = new LootContext.Builder(player.getLocation());
+		LootContext.Builder builder = new LootContext.Builder(player.getLocation());
 		Collection<ItemStack> loot = table.populateLoot(FastUtils.RANDOM, builder.build());
 		item.subtract();
 		//I hate this, but its the only way for it to work :(

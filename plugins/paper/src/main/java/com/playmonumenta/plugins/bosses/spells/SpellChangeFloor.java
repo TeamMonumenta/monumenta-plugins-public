@@ -1,7 +1,12 @@
 package com.playmonumenta.plugins.bosses.spells;
 
+import java.util.ArrayList;
+import java.util.EnumSet;
+import java.util.List;
+
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
+
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -13,10 +18,6 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
-
-import java.util.EnumSet;
-import java.util.LinkedList;
-import java.util.List;
 
 public class SpellChangeFloor extends Spell {
 	private Plugin mPlugin;
@@ -75,7 +76,7 @@ public class SpellChangeFloor extends Spell {
 
 		BukkitRunnable runnable = new BukkitRunnable() {
 			int mTicks = 0;
-			List<BlockState> mBlocksToRestore = new LinkedList<BlockState>();
+			List<BlockState> mBlocksToRestore = new ArrayList<BlockState>();
 
 			@Override
 			public void run() {

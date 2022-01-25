@@ -45,9 +45,6 @@ public final class Ghalkor extends BossAbilityGroup {
 	private static final int BASE_HEALTH = 1524;
 	private static final String duoTag = "svalgotthevoidwalker";
 
-	private final Plugin mPlugin;
-	public final LivingEntity mBoss;
-
 	private final Location mSpawnLoc;
 	private final Location mEndLoc;
 	private final Location mMiddleLoc;
@@ -76,8 +73,6 @@ public final class Ghalkor extends BossAbilityGroup {
 	public Ghalkor(Plugin plugin, LivingEntity boss, Location spawnLoc, Location endLoc) {
 		super(plugin, identityTag, boss);
 
-		mPlugin = plugin;
-		mBoss = boss;
 		mSpawnLoc = spawnLoc;
 		mEndLoc = endLoc;
 
@@ -257,7 +252,6 @@ public final class Ghalkor extends BossAbilityGroup {
 
 	@Override
 	public void init() {
-		int bossTargetHp = 0;
 		int playerCount = PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true).size();
 
 		/*
@@ -271,7 +265,7 @@ public final class Ghalkor extends BossAbilityGroup {
 			noDamageTicksTake = 5;
 		}
 		mBoss.setMaximumNoDamageTicks(mBoss.getMaximumNoDamageTicks() - noDamageTicksTake);
-		bossTargetHp = (int) (BASE_HEALTH * (1 + (1 - 1 / Math.E) * Math.log(playerCount)) * 1.1);
+		int bossTargetHp = (int) (BASE_HEALTH * (1 + (1 - 1 / Math.E) * Math.log(playerCount)) * 1.1);
 		EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_MAX_HEALTH, bossTargetHp);
 		EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_FOLLOW_RANGE, detectionRange);
 		EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_KNOCKBACK_RESISTANCE, 1);

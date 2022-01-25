@@ -14,7 +14,6 @@ import org.bukkit.plugin.Plugin;
 public final class LichKeyGlowBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_lich_keyglow";
 	public static final int detectionRange = 55;
-	LivingEntity mBoss;
 
 	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
 		return new LichKeyGlowBoss(plugin, boss);
@@ -22,7 +21,6 @@ public final class LichKeyGlowBoss extends BossAbilityGroup {
 
 	public LichKeyGlowBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
-		mBoss = boss;
 
 		List<Spell> passiveSpells = Arrays.asList(
 			new SpellLichKeyGlow(mBoss)

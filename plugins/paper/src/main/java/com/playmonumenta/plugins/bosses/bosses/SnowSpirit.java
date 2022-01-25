@@ -50,9 +50,6 @@ public class SnowSpirit extends BossAbilityGroup {
 	public static final String identityTag = "boss_snowspirit";
 	public static final int detectionRange = 75;
 
-	private final Plugin mPlugin;
-	public final LivingEntity mBoss;
-
 	private final Location mSpawnLoc;
 	private final Location mEndLoc;
 
@@ -74,8 +71,6 @@ public class SnowSpirit extends BossAbilityGroup {
 	public SnowSpirit(Plugin plugin, LivingEntity boss, Location spawnLoc, Location endLoc) {
 		super(plugin, identityTag, boss);
 
-		mPlugin = plugin;
-		mBoss = boss;
 		mSpawnLoc = spawnLoc;
 		mEndLoc = endLoc;
 		mFinalPhase = false;
@@ -275,10 +270,9 @@ public class SnowSpirit extends BossAbilityGroup {
 
 	@Override
 	public void init() {
-		int bossTargetHp = 0;
 		int playerCount = PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true).size();
 		int hpDel = 2500;
-		bossTargetHp = (int) (hpDel * (1 + (1 - 1/Math.E) * Math.log(playerCount)) * 1.1);
+		int bossTargetHp = (int) (hpDel * (1 + (1 - 1/Math.E) * Math.log(playerCount)) * 1.1);
 		mBoss.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(bossTargetHp);
 		mBoss.getAttribute(Attribute.GENERIC_FOLLOW_RANGE).setBaseValue(detectionRange);
 		mBoss.getAttribute(Attribute.GENERIC_KNOCKBACK_RESISTANCE).setBaseValue(1);
@@ -328,10 +322,9 @@ public class SnowSpirit extends BossAbilityGroup {
 	private void healthScaleMinibosses() {
 		for (Entity miniboss : mActiveMinibosses) {
 			if (miniboss instanceof LivingEntity mini) {
-				int bossTargetHp = 0;
 				int playerCount = PlayerUtils.playersInRange(mSpawnLoc, detectionRange, true).size();
 				int hpDel = (int) mini.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue();
-				bossTargetHp = (int) (hpDel * (1 + (1 - 1/Math.E) * Math.log(playerCount)));
+				int bossTargetHp = (int) (hpDel * (1 + (1 - 1/Math.E) * Math.log(playerCount)));
 				EntityUtils.setAttributeBase(mini, Attribute.GENERIC_MAX_HEALTH, bossTargetHp * 1.1);
 				mini.setHealth(bossTargetHp * 1.1);
 			}

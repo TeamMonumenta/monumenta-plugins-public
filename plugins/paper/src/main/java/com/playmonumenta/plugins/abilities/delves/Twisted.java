@@ -94,8 +94,9 @@ public class Twisted extends DelveModifier {
 		}
 	}
 
-	public static void runEvent(Plugin plugin, LivingEntity mob) {
+	public static void runEvent(LivingEntity mob) {
 		if (mob instanceof Mob) {
+			Plugin plugin = Plugin.getInstance();
 			int random = FastUtils.RANDOM.nextInt(4);
 			List<LivingEntity> mobs = getAffectedMobs(mob);
 

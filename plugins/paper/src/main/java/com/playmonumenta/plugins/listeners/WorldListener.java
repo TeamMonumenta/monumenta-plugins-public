@@ -28,8 +28,8 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.util.Vector;
 
+import java.util.ArrayDeque;
 import java.util.Arrays;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Queue;
@@ -131,7 +131,7 @@ public class WorldListener implements Listener {
 		 * completes should be removed as they are not reachable from the structure's
 		 * origin
 		 */
-		Queue<Location> locList = new LinkedList<>();
+		Queue<Location> locList = new ArrayDeque<>();
 		// Start at the first block of the structure/tree (the sapling)
 		locList.add(event.getLocation());
 

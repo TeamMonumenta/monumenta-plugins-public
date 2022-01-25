@@ -78,6 +78,6 @@ public class EnchantedPrayerAoE extends Effect {
 
 	@Override
 	public String toString() {
-		return String.format("EnchantedPrayerAoE duration:%d player:%s amount:%f", this.getDuration(), mPlayer.getName(), mDamageAmount);
+		return String.format("EnchantedPrayerAoE duration:%d player:%s amount:%d", this.getDuration(), mPlayer.getName(), mDamageAmount);
 	}
 }

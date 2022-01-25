@@ -59,9 +59,6 @@ public class FalseSpiritPortal extends BossAbilityGroup {
 	private static final String TRIDENT_TAG = "GoHTrident";
 	private List<LivingEntity> mTridentStands = new ArrayList<>();
 
-	private Plugin mPlugin;
-	private LivingEntity mBoss;
-
 	private int mPlayerCount;
 
 	private ItemStack mTrident = null;
@@ -87,9 +84,6 @@ public class FalseSpiritPortal extends BossAbilityGroup {
 
 	public FalseSpiritPortal(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
-
-		mPlugin = plugin;
-		mBoss = boss;
 
 		World world = mBoss.getWorld();
 		mBoss.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 20 * 60 * 27, 3));

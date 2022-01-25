@@ -243,7 +243,7 @@ public class EntityListener implements Listener {
 
 		if (damager instanceof Player playerDamager) {
 			if (damagee instanceof Player playerDamagee) {
-				if (!mAbilities.isPvPEnabled(playerDamagee) || !mAbilities.isPvPEnabled(playerDamagee)) {
+				if (!mAbilities.isPvPEnabled(playerDamagee) || !mAbilities.isPvPEnabled(playerDamager)) {
 					event.setCancelled(true);
 					return;
 				}
@@ -856,7 +856,7 @@ public class EntityListener implements Listener {
 
 		/* Mark as applying slowness so arcane strike won't activate this tick */
 		if (applier instanceof Player && !applied.hasPotionEffect(PotionEffectType.SLOW)
-		    && event.getEffect().getType() == PotionEffectType.SLOW) {
+		    && event.getEffect().getType().equals(PotionEffectType.SLOW)) {
 			MetadataUtils.checkOnceThisTick(mPlugin, applied, Constants.ENTITY_SLOWED_NONCE_METAKEY);
 		}
 

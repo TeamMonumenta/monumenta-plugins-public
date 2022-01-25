@@ -972,6 +972,7 @@ public final class ParrotCustomInventory extends CustomInventory {
 		owner.playSound(owner.getLocation(), Sound.BLOCK_NOTE_BLOCK_CHIME, 3f, 1.2f);
 
 		new BukkitRunnable() {
+			@Override
 			public void run() {
 				updateInventory(owner);
 			}

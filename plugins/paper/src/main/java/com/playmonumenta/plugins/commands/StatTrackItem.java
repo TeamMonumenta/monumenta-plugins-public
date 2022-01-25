@@ -92,7 +92,6 @@ public class StatTrackItem extends GenericCommand {
 
 	/**
 	 * The typical infusion logic that players will run themselves from an npc
-	 * @param sender command sender
 	 * @param player the player who is stat tracking their gear
 	 * @param option the stat track enchant option to infuse with
 	 * @throws WrapperCommandSyntaxException

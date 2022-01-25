@@ -91,7 +91,7 @@ public abstract class BossAbilityGroup {
 		mPassiveSpells = passiveSpells;
 
 		mTaskPassive = new BukkitRunnable() {
-			private int mMissingTicks = 0;
+			private long mMissingTicks = 0;
 
 			@Override
 			public void run() {

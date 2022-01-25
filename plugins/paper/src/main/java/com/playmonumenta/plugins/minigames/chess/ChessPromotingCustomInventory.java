@@ -87,6 +87,7 @@ public class ChessPromotingCustomInventory extends CustomInventory {
 		}
 	}
 
+	@Override
 	protected void inventoryClick(org.bukkit.event.inventory.InventoryClickEvent event) {
 		event.setCancelled(true);
 
@@ -123,6 +124,7 @@ public class ChessPromotingCustomInventory extends CustomInventory {
 		}
 	}
 
+	@Override
 	protected void inventoryClose(org.bukkit.event.inventory.InventoryCloseEvent event) {
 		if (!mPromoted) {
 			mBoard.changePieceType(mPiece, ChessPieceType.QUEEN);

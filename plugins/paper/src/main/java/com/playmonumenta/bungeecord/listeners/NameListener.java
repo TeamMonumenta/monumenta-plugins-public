@@ -26,7 +26,7 @@ import net.md_5.bungee.event.EventPriority;
 public class NameListener implements Listener {
 	private static NameListener globalNameListener = null;
 
-	private final Yaml yaml = new Yaml();
+	private final Yaml mYaml = new Yaml();
 	private final File file = new File("uuid2name.yml");
 	private final ReadWriteLock lock = new ReentrantReadWriteLock();
 
@@ -48,7 +48,7 @@ public class NameListener implements Listener {
 		try {
 			file.createNewFile();
 			try (FileReader rd = new FileReader(file)) {
-				Map<String, String> map = yaml.loadAs(rd, Map.class);
+				Map<String, String> map = mYaml.loadAs(rd, Map.class);
 				if (map != null) {
 					uuid2name.putAll(map);
 				}
@@ -82,9 +82,8 @@ public class NameListener implements Listener {
 		UUID uuid = player.getUniqueId();
 		String name = player.getName();
 
-		String storedName = null;
 		lock.readLock().lock();
-		storedName = uuid2name.get(uuid.toString());
+		String storedName = uuid2name.get(uuid.toString());
 		lock.readLock().unlock();
 
 		if (storedName == null || !storedName.equals(name)) {
@@ -150,7 +149,7 @@ public class NameListener implements Listener {
 		}
 
 		try (FileWriter wr = new FileWriter(file)) {
-			yaml.dump(copy, wr);
+			mYaml.dump(copy, wr);
 			logger.info("Successfully saved uuid2name mappings");
 		} catch (IOException ex) {
 			logger.log(Level.WARNING, "Could not save uuid2name", ex);

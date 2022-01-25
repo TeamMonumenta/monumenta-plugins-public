@@ -1117,19 +1117,19 @@ public final class Lich extends BossAbilityGroup {
 		String c = AbilityUtils.getClass(player);
 
 		// set spawn nbt
-		if (c == "Mage") {
+		if (c.equals("Mage")) {
 			summonNbt = "MageUndead";
-		} else if (c == "Warlock") {
+		} else if (c.equals("Warlock")) {
 			summonNbt = "WarlockUndead";
-		} else if (c == "Alchemist") {
+		} else if (c.equals("Alchemist")) {
 			summonNbt = "AlchUndead";
-		} else if (c == "Cleric") {
+		} else if (c.equals("Cleric")) {
 			summonNbt = "ClericUndead";
-		} else if (c == "Warrior") {
+		} else if (c.equals("Warrior")) {
 			summonNbt = "WarriorUndead";
-		} else if (c == "Rogue") {
+		} else if (c.equals("Rogue")) {
 			summonNbt = "RogueUndead";
-		} else if (c == "Scout") {
+		} else if (c.equals("Scout")) {
 			summonNbt = "ScoutUndead";
 		} else {
 			summonNbt = "AdventurerUndead";
@@ -1142,7 +1142,7 @@ public final class Lich extends BossAbilityGroup {
 			mSummoned.add(undead.getUniqueId());
 		}
 
-		if (summonNbt == "AdventurerUndead") {
+		if (summonNbt.equals("AdventurerUndead")) {
 			undead.setCustomName(ChatColor.WHITE + player.getName());
 		} else {
 			undead.setCustomName(ChatColor.GOLD + player.getName());
@@ -1249,7 +1249,7 @@ public final class Lich extends BossAbilityGroup {
 				Collections.shuffle(missing);
 				Location spawnLoc = missing.get(0);
 				LibraryOfSoulsIntegration.summon(spawnLoc, nbt);
-				if (nbt == mShieldCrystal && playersInRange(mStart.getLocation(), detectionRange, true).size() >= mShieldMin) {
+				if (nbt.equals(mShieldCrystal) && playersInRange(mStart.getLocation(), detectionRange, true).size() >= mShieldMin) {
 					LibraryOfSoulsIntegration.summon(spawnLoc.clone().subtract(0, 1, 0), mCrystalShield);
 				}
 				world.playSound(spawnLoc, Sound.BLOCK_BEACON_ACTIVATE, 5.0f, 1.0f);
@@ -2071,10 +2071,9 @@ public final class Lich extends BossAbilityGroup {
 
 	@Override
 	public void init() {
-		int bossTargetHp = 0;
 		int playercount = playersInRange(mBoss.getLocation(), detectionRange, true).size();
 		double hpdel = 4000;
-		bossTargetHp = (int) (hpdel * (1 + (1 - 1 / Math.E) * Math.max(Math.log(playercount), 0)) * 1.1);
+		int bossTargetHp = (int) (hpdel * (1 + (1 - 1 / Math.E) * Math.max(Math.log(playercount), 0)) * 1.1);
 		EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_MAX_HEALTH, bossTargetHp);
 		EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_FOLLOW_RANGE, detectionRange);
 		EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_KNOCKBACK_RESISTANCE, 1);

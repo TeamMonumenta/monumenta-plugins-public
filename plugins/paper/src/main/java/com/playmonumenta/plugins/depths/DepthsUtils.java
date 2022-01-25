@@ -162,7 +162,6 @@ public class DepthsUtils {
 	}
 
 	public static ItemStack getTreeItem(DepthsTree tree) {
-		ItemStack buildItem = new ItemStack(Material.RED_STAINED_GLASS_PANE, 1);
 		ItemMeta buildMeta;
 		Material itemMat;
 		Component name;
@@ -217,7 +216,7 @@ public class DepthsUtils {
 					.decoration(TextDecoration.BOLD, true);
 			description = "Please report this item's existence to a moderator.";
 		}
-		buildItem = new ItemStack(itemMat, 1);
+		ItemStack buildItem = new ItemStack(itemMat, 1);
 		buildMeta = buildItem.getItemMeta();
 		buildMeta.displayName(name);
 		buildMeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
@@ -415,7 +414,7 @@ public class DepthsUtils {
 		}
 		List<Block> blocks = event.blockList();
 		for (Block b : blocks) {
-			if (iceBarrier.get(b.getLocation()) == Boolean.TRUE) {
+			if (Boolean.TRUE.equals(iceBarrier.get(b.getLocation()))) {
 				// Apply ice barrier slow passive effect to the mob
 				EntityUtils.applySlow(Plugin.getInstance(), 2 * 20, .5, (LivingEntity) event.getEntity());
 				return;

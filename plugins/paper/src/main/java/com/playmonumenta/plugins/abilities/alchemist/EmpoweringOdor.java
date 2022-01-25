@@ -12,7 +12,7 @@ import org.bukkit.inventory.ItemStack;
 import javax.annotation.Nullable;
 
 public class EmpoweringOdor extends PotionAbility {
-	public static final double POTION_RECHARGE_TIME_REDUCTION_2 = 10;
+	public static final int POTION_RECHARGE_TIME_REDUCTION_2 = 10;
 
 	private static final int EMPOWERING_ODOR_DURATION = 8 * 20;
 	private static final double EMPOWERING_ODOR_SPEED_AMPLIFIER = 0.1;

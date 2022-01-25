@@ -126,6 +126,7 @@ public class XoRoShiRo128PlusRandom extends Random {
 	 * @param n the positive bound on the random number to be returned.
 	 * @return the next pseudorandom {@code long} value between {@code 0} (inclusive) and {@code n} (exclusive).
 	 */
+	@Override
 	public long nextLong(final long n) {
 		if (n <= 0) {
 			throw new IllegalArgumentException("illegal bound " + n + " (must be positive)");
@@ -168,6 +169,7 @@ public class XoRoShiRo128PlusRandom extends Random {
 	 * @since 2.4.1
 	 */
 	/* Monumenta NOTE: Renamed to nextDouble(), which was removed */
+	@Override
 	public double nextDouble() {
 		return Double.longBitsToDouble(0x3FFL << 52 | nextLong() >>> 12) - 1.0;
 	}
@@ -322,7 +324,7 @@ public class XoRoShiRo128PlusRandom extends Random {
 	 */
 	/* Monumenta NOTE : Just use Java's Random instead to generate the seed */
 	@Override
-	public void setSeed(final long seed) {
+	public synchronized void setSeed(final long seed) {
 		final Random r = new Random(seed);
 		mS0 = r.nextLong();
 		mS1 = r.nextLong();

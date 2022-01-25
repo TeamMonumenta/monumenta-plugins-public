@@ -27,9 +27,9 @@ public class AbsorptionUtils {
 
 		// Removes expired absorption instances and returns the next maximum absorption amount
 		private double elapse(int ticks) {
-			Iterator<SortedMap.Entry<Double, Integer>> iter = mAbsorptionInstances.entrySet().iterator();
+			Iterator<Map.Entry<Double, Integer>> iter = mAbsorptionInstances.entrySet().iterator();
 			while (iter.hasNext()) {
-				SortedMap.Entry<Double, Integer> entry = iter.next();
+				Map.Entry<Double, Integer> entry = iter.next();
 				double amount = entry.getKey();
 				int newDuration = entry.getValue() - ticks;
 				mAbsorptionInstances.put(amount, newDuration);

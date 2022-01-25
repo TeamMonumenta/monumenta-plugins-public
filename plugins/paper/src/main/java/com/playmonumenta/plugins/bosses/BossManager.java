@@ -715,10 +715,6 @@ public class BossManager implements Listener {
 		Entity damager = event.getDamager();
 		LivingEntity source = event.getSource();
 
-		if (!(damagee instanceof LivingEntity)) {
-			return;
-		}
-
 		Boss boss = mBosses.get(damagee.getUniqueId());
 		if (boss != null) {
 			// May cancel the event

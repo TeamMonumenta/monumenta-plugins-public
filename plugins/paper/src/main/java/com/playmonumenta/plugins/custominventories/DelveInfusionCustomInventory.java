@@ -472,7 +472,7 @@ public final class DelveInfusionCustomInventory extends CustomInventory {
 			currentString += word + " ";
 			currentLength += word.length() + 1;
 		}
-		if (currentString != defaultColor + "") {
+		if (!currentString.equals(defaultColor + "")) {
 			finalLines.add(currentString);
 		}
 		meta.setLore(finalLines);

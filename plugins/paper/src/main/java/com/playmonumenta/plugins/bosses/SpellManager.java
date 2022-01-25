@@ -1,17 +1,17 @@
 package com.playmonumenta.plugins.bosses;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 
-import com.playmonumenta.plugins.bosses.spells.Spell;
-
 import javax.annotation.Nullable;
+
+import com.playmonumenta.plugins.bosses.spells.Spell;
 
 /*
  * The SpellManager class is designed to manage active spells for a boss. It
@@ -62,7 +62,7 @@ public class SpellManager {
 			}
 		}
 
-		mCooldownSpells = new LinkedList<Spell>();
+		mCooldownSpells = new ArrayDeque<Spell>();
 		mCooldown = (int)Math.max(0, Math.floor((mReadySpells.size() - 1.0) / 2.0));
 	}
 

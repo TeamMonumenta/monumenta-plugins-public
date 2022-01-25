@@ -16,6 +16,6 @@ public class ThuribleBonusHealing extends Effect {
 
 	@Override
 	public String toString() {
-		return String.format("ThuribleBonusHealing duration=%d healing=%d", this.getDuration(), mLevel);
+		return String.format("ThuribleBonusHealing duration=%d healing=%f", this.getDuration(), mLevel);
 	}
 }

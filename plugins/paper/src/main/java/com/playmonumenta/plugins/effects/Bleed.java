@@ -58,6 +58,6 @@ public class Bleed extends Effect {
 
 	@Override
 	public String toString() {
-		return String.format("Bleed duration:%d modifier:%s level:%f", this.getDuration(), "Bleed", mLevel);
+		return String.format("Bleed duration:%d modifier:%s level:%d", this.getDuration(), "Bleed", mLevel);
 	}
 }

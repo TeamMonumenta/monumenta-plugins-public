@@ -14,8 +14,6 @@ public class WeaponSwitchBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_weaponswitch";
 	public static final int detectionRange = 35;
 
-	Mob mBoss;
-
 	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
 		return new WeaponSwitchBoss(plugin, boss);
 	}
@@ -26,10 +24,8 @@ public class WeaponSwitchBoss extends BossAbilityGroup {
 			throw new Exception("boss_weaponswitch only works on mobs!");
 		}
 
-		mBoss = (Mob)boss;
-
 		SpellManager activeSpells = new SpellManager(Arrays.asList(
-			new SpellWeaponSwitch(mBoss)
+			new SpellWeaponSwitch((Mob)mBoss)
 		));
 
 		super.constructBoss(activeSpells, Collections.emptyList(), detectionRange, null);

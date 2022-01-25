@@ -24,7 +24,6 @@ import org.bukkit.block.data.type.Gate;
 import org.bukkit.block.data.type.GlassPane;
 import org.bukkit.block.data.type.Piston;
 import org.bukkit.block.data.type.Slab;
-import org.bukkit.block.data.type.Slab.Type;
 import org.bukkit.block.data.type.Snow;
 import org.bukkit.block.data.type.Stairs;
 import org.bukkit.block.data.type.Stairs.Shape;
@@ -632,11 +631,11 @@ public class LocationUtils {
 		// cases for block data type groups
 		default:
 			if (block.getBlockData() instanceof Slab) {
-				if (((Slab) block.getBlockData()).getType() == Type.BOTTOM) {
+				if (((Slab) block.getBlockData()).getType() == Slab.Type.BOTTOM) {
 					if (y > 0.5) {
 						collides = false;
 					}
-				} else if (((Slab) block.getBlockData()).getType() == Type.TOP) {
+				} else if (((Slab) block.getBlockData()).getType() == Slab.Type.TOP) {
 					if (y < 0.5) {
 						collides = false;
 					}
@@ -761,7 +760,7 @@ public class LocationUtils {
 			} else if (block.getBlockData() instanceof Fence) {
 				int width = 4;
 				if (block.getType() == Material.COBBLESTONE_WALL
-				    || block.getType() == Material.COBBLESTONE_WALL) {
+				    || block.getType() == Material.MOSSY_COBBLESTONE_WALL) {
 					width = 8;
 				}
 				Fence fence = ((Fence) block.getBlockData());

@@ -526,14 +526,13 @@ public final class Grave {
 	}
 
 	private void generateNewPose() {
-		mPose = new HashMap<String, EulerAngle>() {{
-			put(KEY_POSE_HEAD, new EulerAngle(0, 0, 0));
-			put(KEY_POSE_BODY, new EulerAngle(0, 0, 0));
-			put(KEY_POSE_LEFT_ARM, new EulerAngle(0, 0, 0));
-			put(KEY_POSE_RIGHT_ARM, new EulerAngle(0, 0, 0));
-			put(KEY_POSE_LEFT_LEG, new EulerAngle(0, 0, 0));
-			put(KEY_POSE_RIGHT_LEG, new EulerAngle(0, 0, 0));
-		}};
+		mPose = new HashMap<String, EulerAngle>();
+		mPose.put(KEY_POSE_HEAD, new EulerAngle(0, 0, 0));
+		mPose.put(KEY_POSE_BODY, new EulerAngle(0, 0, 0));
+		mPose.put(KEY_POSE_LEFT_ARM, new EulerAngle(0, 0, 0));
+		mPose.put(KEY_POSE_RIGHT_ARM, new EulerAngle(0, 0, 0));
+		mPose.put(KEY_POSE_LEFT_LEG, new EulerAngle(0, 0, 0));
+		mPose.put(KEY_POSE_RIGHT_LEG, new EulerAngle(0, 0, 0));
 		//TODO Actually generate a randomized pose
 	}
 
@@ -581,16 +580,14 @@ public final class Grave {
 		boolean small = false;
 		Location location = null;
 		JsonArray items = new JsonArray();
-		HashMap<String, EulerAngle> pose = new HashMap<String, EulerAngle>() {{
-			for (String key : KEYS_POSE_PARTS) {
-				put(key, new EulerAngle(0, 0, 0));
-			}
-		}};
-		HashMap<String, ItemStack> equipment = new HashMap<String, ItemStack>() {{
-			for (String key : KEYS_EQUIPMENT_PARTS) {
-				put(key, null);
-			}
-		}};
+		HashMap<String, EulerAngle> pose = new HashMap<String, EulerAngle>();
+		for (String key : KEYS_POSE_PARTS) {
+			pose.put(key, new EulerAngle(0, 0, 0));
+		}
+		HashMap<String, ItemStack> equipment = new HashMap<String, ItemStack>();
+		for (String key : KEYS_EQUIPMENT_PARTS) {
+			equipment.put(key, null);
+		}
 		if (data.has(KEY_WORLD) && data.get(KEY_WORLD).isJsonPrimitive() && data.getAsJsonPrimitive(KEY_WORLD).isString()) {
 			world = data.getAsJsonPrimitive(KEY_WORLD).getAsString();
 		}

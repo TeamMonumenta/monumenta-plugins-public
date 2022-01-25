@@ -121,8 +121,8 @@ public class SpellBaseAura extends Spell {
 				for (Player player : PlayerUtils.playersInRange(bossLoc, mRadius, true)) {
 					Location playerLoc = player.getLocation();
 					if (Math.abs(playerLoc.getX() - bossLoc.getX()) < mDX &&
-							Math.abs(playerLoc.getX() - bossLoc.getX()) < mDX &&
-							Math.abs(playerLoc.getX() - bossLoc.getX()) < mDX) {
+							Math.abs(playerLoc.getY() - bossLoc.getY()) < mDY &&
+							Math.abs(playerLoc.getZ() - bossLoc.getZ()) < mDZ) {
 						// Player is within range
 						mAuraEffect.run(player);
 					}

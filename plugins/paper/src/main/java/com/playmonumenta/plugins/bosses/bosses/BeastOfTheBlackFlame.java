@@ -49,9 +49,6 @@ public final class BeastOfTheBlackFlame extends BossAbilityGroup {
 
 	private static final int BASE_HEALTH = 2524;
 
-	private final Plugin mPlugin;
-	public final LivingEntity mBoss;
-
 	private final Location mSpawnLoc;
 	private final Location mEndLoc;
 
@@ -73,8 +70,6 @@ public final class BeastOfTheBlackFlame extends BossAbilityGroup {
 	public BeastOfTheBlackFlame(Plugin plugin, LivingEntity boss, Location spawnLoc, Location endLoc) {
 		super(plugin, identityTag, boss);
 
-		mPlugin = plugin;
-		mBoss = boss;
 		mSpawnLoc = spawnLoc.add(0, 3, 0);
 		mEndLoc = endLoc;
 
@@ -287,7 +282,6 @@ public final class BeastOfTheBlackFlame extends BossAbilityGroup {
 
 	@Override
 	public void init() {
-		int bossTargetHp = 0;
 		int playerCount = PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true).size();
 
 		/*
@@ -301,7 +295,7 @@ public final class BeastOfTheBlackFlame extends BossAbilityGroup {
 			noDamageTicksTake = 5;
 		}
 		mBoss.setMaximumNoDamageTicks(mBoss.getMaximumNoDamageTicks() - noDamageTicksTake);
-		bossTargetHp = (int) (BASE_HEALTH * (1 + (1 - 1/Math.E) * Math.log(playerCount)) * 1.1);
+		int bossTargetHp = (int) (BASE_HEALTH * (1 + (1 - 1/Math.E) * Math.log(playerCount)) * 1.1);
 		mBoss.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(bossTargetHp);
 		mBoss.getAttribute(Attribute.GENERIC_FOLLOW_RANGE).setBaseValue(detectionRange);
 		mBoss.getAttribute(Attribute.GENERIC_KNOCKBACK_RESISTANCE).setBaseValue(1);

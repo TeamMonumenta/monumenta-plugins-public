@@ -47,7 +47,7 @@ public class GenerateItems extends GenericCommand {
 		int chestCounter = 0;
 		for (List<String> row : records) {
 			for (int i = 12; i < row.size(); i++) {
-				if (row.get(i).equals("") || row.get(i) == null || row.get(i).equals(null)) {
+				if (row.get(i).equals("") || row.get(i) == null) {
 					row.set(i, "0");
 				}
 			}
@@ -105,7 +105,7 @@ public class GenerateItems extends GenericCommand {
 			} else {
 				String fullText = "";
 				for (int i = 0; i < 6; i++) {
-					if (row.get(6 + i).equals("") || row.get(6 + i).equals("-") || row.get(6 + i) == null || row.get(6 + i).equals(null)) {
+					if (row.get(6 + i).equals("") || row.get(6 + i).equals("-") || row.get(6 + i) == null) {
 						continue;
 					} else {
 						fullText += " ";

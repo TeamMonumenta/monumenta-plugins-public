@@ -177,7 +177,7 @@ public class GraveListener implements Listener {
 		if (!player.getScoreboardTags().contains("DisableGraves")) {
 			if (result == ItemUtils.ItemDeathResult.SHATTER || result == ItemUtils.ItemDeathResult.SHATTER_NOW
 				|| result == ItemUtils.ItemDeathResult.SAFE || result == ItemUtils.ItemDeathResult.KEEP) {
-				if (entity.getThrower() == player.getUniqueId()) {
+				if (entity.getThrower().equals(player.getUniqueId())) {
 					GraveManager.onDropItem(player, entity);
 				} else {
 					new BukkitRunnable() {

@@ -54,9 +54,9 @@ public class PotionMap {
 			    || bestEffect.mAmplifier < newPotionInfo.mAmplifier
 			    || (bestEffect.mAmplifier == newPotionInfo.mAmplifier
 			        && bestEffect.mDuration < newPotionInfo.mDuration
-			        && (newPotionInfo.mType != PotionEffectType.POISON
+			        && (!newPotionInfo.mType.equals(PotionEffectType.POISON)
 			            || newPotionInfo.mDuration - bestEffect.mDuration >= 25 / (bestEffect.mAmplifier + 1) + 1)
-			        && (newPotionInfo.mType != PotionEffectType.WITHER
+			        && (!newPotionInfo.mType.equals(PotionEffectType.WITHER)
 			            || newPotionInfo.mDuration - bestEffect.mDuration >= 40 / (bestEffect.mAmplifier + 1) + 1))) {
 				trackedPotionInfo.put(amplifier, newPotionInfo);
 			}
@@ -70,7 +70,7 @@ public class PotionMap {
 			PotionInfo currentInfo = trackedPotionInfo.get(amplifier);
 			if (currentInfo == null
 			    || (currentInfo.mDuration < newPotionInfo.mDuration
-			        && (currentInfo.mType != PotionEffectType.REGENERATION
+			        && (!currentInfo.mType.equals(PotionEffectType.REGENERATION)
 			            || newPotionInfo.mDuration - currentInfo.mDuration >= 50 / (currentInfo.mAmplifier + 1) + 1))) {
 				trackedPotionInfo.put(amplifier, newPotionInfo);
 			}

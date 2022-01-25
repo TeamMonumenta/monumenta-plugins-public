@@ -70,9 +70,6 @@ public abstract class Spell implements Cloneable {
 		return mActiveRunnables.stream().anyMatch(r -> !r.isCancelled());
 	}
 
-	/**
-	 * @return Whether this ability ignores being silenced. Currently only works for passive spells.
-	 */
 	public void onDamage(DamageEvent event, LivingEntity damagee) {
 
 	}

@@ -26,7 +26,7 @@ import org.bukkit.potion.PotionEffectType;
  * /bos var Tags add boss_projectile[SoundStart=[(ENTITY_FIREWORK_ROCKET_LAUNCH,0.01,1)],SoundLaunch=[(ENTITY_FIREWORK_ROCKET_LAUNCH,1,1.5)],SoundProjectile=[(ENTITY_BLAZE_BURN,0)],SoundHit=[(ENTITY_FIREWORK_ROCKET_TWINKLE,0.5,1.5)]]
  * /bos var Tags add boss_projectile[ParticleLaunch=[(FIREWORKS_SPARK,0)],ParticleProjectile=[(FIREWORKS_SPARK,5,0.1,0.1,0.1,0.05),(CRIT_MAGIC,20,0.2,0.2,0.2,0.1)],ParticleHit=[(FIREWORKS_SPARK,30,0,0,0,0.25)]]
  * </pre></blockquote>
- * @G3m1n1Boy
+ * G3m1n1Boy
  */
 @Deprecated
 public class MagicArrowBoss extends BossAbilityGroup {

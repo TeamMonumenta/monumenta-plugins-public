@@ -78,6 +78,7 @@ public class VoteContext {
 		}
 	}
 
+	@Override
 	public String toString() {
 		Gson gson = new GsonBuilder().setPrettyPrinting().create();
 

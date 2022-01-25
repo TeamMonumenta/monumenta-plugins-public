@@ -27,7 +27,7 @@ import org.bukkit.potion.PotionEffectType;
 	/bos var Tags add boss_projectile[SoundStart=[(ITEM_CROSSBOW_LOADING_MIDDLE,2,0.5)],SoundHit=[(ENTITY_ARMOR_STAND_BREAK,1,0.5)],SoundProjectile=[(ENTITY_ARROW_SHOOT,2,0.2)],SoundLaunch=[(ITEM_CROSSBOW_SHOOT,2,0.5)]]
 	/bos var Tags add boss_projectile[ParticleLaunch=[(CRIT,1)],ParticleProjectile=[(crit,3,0,0,0,0.1),(SPELL_INSTANT,4,0.25,0.25,0.25)],ParticleHit=[(CRIT,50,0,0,0,0.25)]]
  * </pre></blockquote>
- * @Author G3m1n1Boy
+ * G3m1n1Boy
  */
 @Deprecated
 public class WeakHookBoss extends BossAbilityGroup {

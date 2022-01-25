@@ -7,7 +7,7 @@ public interface Infusion extends ItemStat {
 	/**
 	 * A reference back to the associated InfusionType in ItemStatUtils.
 	 *
-	 * @returns the associated InfusionType
+	 * @return the associated InfusionType
 	 */
 	InfusionType getInfusionType();
 

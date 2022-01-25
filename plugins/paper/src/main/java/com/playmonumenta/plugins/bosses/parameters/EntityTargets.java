@@ -77,11 +77,13 @@ public class EntityTargets {
 	//enum don't works with generics
 	public enum TARGETS implements EntityFinder {
 		PLAYER {
+			@Override
 			public List<Player> getTargets(LivingEntity launcher, Location loc, double range, boolean includeNonTargetable) {
 				return PlayerUtils.playersInRange(loc, range, includeNonTargetable);
 			}
 		},
 		MOB {
+			@Override
 			public List<LivingEntity> getTargets(LivingEntity launcher, Location loc, double range, boolean notIncludeLauncher) {
 				List<LivingEntity> mobs = EntityUtils.getNearbyMobs(loc, range, (LivingEntity) launcher);
 				if (!notIncludeLauncher) {
@@ -91,6 +93,7 @@ public class EntityTargets {
 			}
 		},
 		ENTITY {
+			@Override
 			public List<LivingEntity> getTargets(LivingEntity launcher, Location loc, double range, boolean notIncludeLauncher) {
 				Collection<Entity> entities = loc.getWorld().getNearbyEntities(loc, range, range, range);
 				if (notIncludeLauncher) {
@@ -105,6 +108,7 @@ public class EntityTargets {
 			}
 		},
 		SELF {
+			@Override
 			public List<LivingEntity> getTargets(LivingEntity launcher, Location notUsed, double notUsed2, boolean notUsed3) {
 				return Arrays.asList(launcher);
 			}
@@ -184,6 +188,7 @@ public class EntityTargets {
 			}
 		},
 		HAS_LINEOFSIGHT {
+			@Override
 			public <V extends Entity> boolean filter(LivingEntity launcher, V entity) {
 				return launcher.hasLineOfSight(entity);
 			}
@@ -213,6 +218,7 @@ public class EntityTargets {
 			}
 		},
 		HAS_LINEOFSIGHT {
+			@Override
 			public <V extends Entity> boolean filter(LivingEntity launcher, V entity) {
 				return launcher.hasLineOfSight(entity);
 			}
@@ -355,6 +361,7 @@ public class EntityTargets {
 				}
 			},
 			FARTHER {
+				@Override
 				public <V extends Entity> void sort(Location loc, List<V> list) {
 					Collections.sort(list, (e1, e2) -> {
 						return (int) (loc.distance(((Entity)e1).getLocation()) - loc.distance(((Entity)e2).getLocation())) * -1;
@@ -362,6 +369,7 @@ public class EntityTargets {
 				}
 			},
 			LOWER_HP {
+				@Override
 				public <V extends Entity> void sort(Location loc, List<V> list) {
 					Collections.sort(list, (e1, e2) -> {
 						if (e1 instanceof LivingEntity && e2 instanceof LivingEntity) {
@@ -372,6 +380,7 @@ public class EntityTargets {
 				}
 			},
 			HIGHER_HP {
+				@Override
 				public <V extends Entity> void sort(Location loc, List<V> list) {
 					Collections.sort(list, (e1, e2) -> {
 						if (e1 instanceof LivingEntity && e2 instanceof LivingEntity) {
@@ -426,6 +435,7 @@ public class EntityTargets {
 
 		}
 
+		@Override
 		public String toString() {
 			if (mLimitEnum == null) {
 				return "(" + mNumb + "," + mSorting.name() + ")";
@@ -535,7 +545,7 @@ public class EntityTargets {
 		mTagsFilter = tagsfilter;
 	}
 
-
+	@Override
 	public String toString() {
 		String string = "[" + mTargets.name() + "," + mRange + "," + mOptional.toString() + "," + LIMIT_STRING + mLimit.toString() + "," + FILTERS_STRING + "[";
 		boolean first = true;

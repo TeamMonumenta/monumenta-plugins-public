@@ -16,13 +16,13 @@ import org.bukkit.potion.PotionEffectType;
 
 
 /**
- * @G3m1n1Boy
  * @deprecated use boss_onhit instead, like this:
  * <blockquote><pre>
  * /boss var Tags add boss_onhit
  * /boss var Tags add boss_onhit[EFFECTS=[(SLOW,80,1)]]
- * CARE this ability has some particle & sound, fix those too if you don't want the default values
+ * CARE this ability has some particle and sound, fix those too if you don't want the default values
  * </pre></blockquote>
+ * G3m1n1Boy
  */
 @Deprecated
 public final class IceAspectBoss extends BossAbilityGroup {

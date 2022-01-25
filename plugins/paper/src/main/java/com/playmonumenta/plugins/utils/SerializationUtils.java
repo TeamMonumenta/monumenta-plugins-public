@@ -1,10 +1,14 @@
 package com.playmonumenta.plugins.utils;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.ListIterator;
+
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.bosses.bosses.BossAbilityGroup;
-import net.kyori.adventure.text.Component;
+
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.LivingEntity;
@@ -13,16 +17,14 @@ import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import java.util.LinkedList;
-import java.util.List;
-import java.util.ListIterator;
+import net.kyori.adventure.text.Component;
 
 public class SerializationUtils {
 	private static final String SERIALCONST = "SERIALDATA=";
 	private static final int SERIALLEN = 50;
 
 	private static List<String> serializeStringToLore(String data) {
-		List<String> ret = new LinkedList<String>();
+		List<String> ret = new ArrayList<String>();
 		for (int start = 0; start < data.length(); start += SERIALLEN) {
 			ret.add(SERIALCONST + data.substring(start, Math.min(data.length(), start + SERIALLEN)));
 		}

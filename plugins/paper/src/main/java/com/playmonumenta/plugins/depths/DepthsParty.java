@@ -360,7 +360,7 @@ public class DepthsParty {
 
 	//Spawns the reward chest in the given location- needs a 1s delay to not be overwritten
 	//By spawner break event
-	public class PlaceChest extends BukkitRunnable {
+	public static class PlaceChest extends BukkitRunnable {
 
 		Location mLocation;
 
@@ -375,7 +375,7 @@ public class DepthsParty {
 	}
 
 	//Slime chest runnable
-	public class ItemEffects extends BukkitRunnable {
+	public static class ItemEffects extends BukkitRunnable {
 
 		Location mLocation;
 		int mSeconds;
