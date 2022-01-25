@@ -23,6 +23,7 @@ public class ZoneUtils {
 		NO_PORTABLE_STORAGE("No Portable Storage"),
 		SPECTATE_AVAILABLE("Spectate Available"),
 		RESIST_5("Resistance V"),
+		DISABLE_GRAVES("Disable Graves"),
 		SPEED_2("Speed II"),
 		SATURATION_2("Saturation II"),
 		MASK_SPEED("Mask Speed"),

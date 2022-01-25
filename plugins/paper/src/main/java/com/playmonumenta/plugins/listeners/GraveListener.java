@@ -6,6 +6,7 @@ import com.playmonumenta.plugins.commands.Grave;
 import com.playmonumenta.plugins.graves.GraveManager;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.ZoneUtils;
 import com.playmonumenta.redissync.event.PlayerSaveEvent;
 import de.tr7zw.nbtapi.NBTEntity;
 import net.md_5.bungee.api.ChatColor;
@@ -174,7 +175,7 @@ public class GraveListener implements Listener {
 		}
 
 		ItemUtils.ItemDeathResult result = ItemUtils.getItemDeathResult(item);
-		if (!player.getScoreboardTags().contains("DisableGraves")) {
+		if (gravesEnabled(player)) {
 			if (result == ItemUtils.ItemDeathResult.SHATTER || result == ItemUtils.ItemDeathResult.SHATTER_NOW
 				|| result == ItemUtils.ItemDeathResult.SAFE || result == ItemUtils.ItemDeathResult.KEEP) {
 				if (entity.getThrower().equals(player.getUniqueId())) {
@@ -215,7 +216,7 @@ public class GraveListener implements Listener {
 					droppedItem.setOwner(null);
 				}
 			}, 200);
-			if (!player.getScoreboardTags().contains("DisableGraves")) {
+			if (gravesEnabled(player)) {
 				GraveManager.onDropItem(player, droppedItem);
 			}
 			player.sendMessage(ChatColor.RED + "An item shattered because it ran out of durability");
@@ -290,7 +291,7 @@ public class GraveListener implements Listener {
 			}
 
 			if (droppedItems.size() > 0) {
-				if (player.getScoreboardTags().contains("DisableGraves")) {
+				if (!gravesEnabled(player)) {
 					// Graves disabled, just drop items
 					for (ItemStack item : droppedItems.values()) {
 						player.getWorld().dropItemNaturally(player.getLocation(), item);
@@ -301,5 +302,15 @@ public class GraveListener implements Listener {
 				}
 			}
 		}
+	}
+
+	public boolean gravesEnabled(Player player) {
+		if (player.getScoreboardTags().contains("DisableGraves")) {
+			return false;
+		}
+		if (ZoneUtils.hasZoneProperty(player, ZoneUtils.ZoneProperty.DISABLE_GRAVES)) {
+			return false;
+		}
+		return true;
 	}
 }
