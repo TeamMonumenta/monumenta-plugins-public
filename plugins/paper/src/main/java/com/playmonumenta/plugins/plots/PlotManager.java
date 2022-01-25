@@ -43,8 +43,6 @@ public class PlotManager {
 
 	@SuppressWarnings("unchecked")
 	private static void registerCommands() {
-		UpgradeLegacyPlots.registerCommands();
-
 		new CommandAPICommand("plot")
 			.withPermission(CommandPermission.NONE)
 			/********************* ACCESS *********************/
