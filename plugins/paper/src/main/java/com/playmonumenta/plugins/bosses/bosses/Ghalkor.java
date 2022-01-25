@@ -167,7 +167,7 @@ public final class Ghalkor extends BossAbilityGroup {
 				for (Player p : PlayerUtils.playersInRange(mMiddleLoc, detectionRange, true)) {
 					if ((mMiddleLoc.distance(p.getLocation()) > 22
 							|| mMiddleLoc.getY() - p.getLocation().getY() >= 3
-							|| (mMiddleLoc.getY() - p.getLocation().getY() <= -3 && p.isOnGround()))
+							|| (mMiddleLoc.getY() - p.getLocation().getY() <= -2 && p.isOnGround()))
 							&& p.getGameMode() != GameMode.CREATIVE) {
 						Vector vel = p.getVelocity();
 						BossUtils.bossDamagePercent(mBoss, p, 0.1);

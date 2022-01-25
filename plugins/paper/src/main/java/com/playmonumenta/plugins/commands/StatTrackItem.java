@@ -25,6 +25,7 @@ import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 
@@ -41,12 +42,15 @@ public class StatTrackItem extends GenericCommand {
 	public static void register() {
 		CommandPermission perms = CommandPermission.fromString("monumenta.command.stattrackhelditem");
 
-		List<String> labels = new ArrayList<>();
-		for (InfusionType stat : InfusionType.STAT_TRACK_OPTIONS) {
-			labels.add(stat.getName().replace(" ", ""));
-		}
+		HashMap<String, InfusionType> options = new HashMap<>();
+		options.put("kills", InfusionType.STAT_TRACK_KILLS);
+		options.put("melee", InfusionType.STAT_TRACK_MELEE);
+		options.put("boss", InfusionType.STAT_TRACK_BOSS);
+		options.put("spawners", InfusionType.STAT_TRACK_SPAWNER);
+		options.put("consumed", InfusionType.STAT_TRACK_CONSUMED);
+		options.put("blocks", InfusionType.STAT_TRACK_BLOCKS);
 
-		Argument selectionArg = new MultiLiteralArgument(labels.toArray(new String[labels.size()]));
+		Argument selectionArg = new MultiLiteralArgument(options.keySet().toArray(new String[options.size()]));
 
 		List<Argument> arguments = new ArrayList<>();
 		arguments.add(new EntitySelectorArgument("player", EntitySelector.ONE_PLAYER));
@@ -55,7 +59,7 @@ public class StatTrackItem extends GenericCommand {
 			.withPermission(perms)
 			.withArguments(arguments)
 			.executes((sender, args) -> {
-				InfusionType selection = InfusionType.getInfusionType((String) args[1]);
+				InfusionType selection = options.get((String) args[1]);
 				if (selection == null) {
 					CommandAPI.fail("Invalid stat selection; how did we get here?");
 				}

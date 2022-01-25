@@ -43,6 +43,7 @@ import com.playmonumenta.plugins.itemstats.enchantments.FeatherFalling;
 import com.playmonumenta.plugins.itemstats.enchantments.Festive;
 import com.playmonumenta.plugins.itemstats.enchantments.FireAspect;
 import com.playmonumenta.plugins.itemstats.enchantments.FireProtection;
+import com.playmonumenta.plugins.itemstats.enchantments.Flame;
 import com.playmonumenta.plugins.itemstats.enchantments.Frost;
 import com.playmonumenta.plugins.itemstats.enchantments.Gilded;
 import com.playmonumenta.plugins.itemstats.enchantments.Gills;
@@ -166,9 +167,9 @@ import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import javax.annotation.Nullable;
 import org.jetbrains.annotations.NotNull;
 
+import javax.annotation.Nullable;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -255,6 +256,7 @@ public class ItemStatUtils {
 		LEGACY("legacy", Component.text("Legacy", TextColor.fromHexString("#EEE6D6")).decoration(TextDecoration.ITALIC, false)),
 		CURRENCY("currency", Component.text("Currency", TextColor.fromHexString("#DCAE32")).decoration(TextDecoration.ITALIC, false)),
 		KEYTIER("key", Component.text("Key", TextColor.fromHexString("#47B6B5")).decoration(TextDecoration.ITALIC, false)),
+		TROPHY("trophy", Component.text("Trophy", TextColor.fromHexString("#CAFFFD")).decoration(TextDecoration.ITALIC, false)),
 		OBFUSCATED("obfuscated", Component.text("Stick_:)", TextColor.fromHexString("#5D2D87")).decoration(TextDecoration.ITALIC, false).decoration(TextDecoration.OBFUSCATED, true)),
 		SHULKER_BOX("shulker", Component.text("Invalid Type", TextColor.fromHexString("#EEE6D6")).decoration(TextDecoration.ITALIC, false)),
 		QUEST_COMPASS("quest_compass", Component.text("Invalid Type", TextColor.fromHexString("#EEE6D6")).decoration(TextDecoration.ITALIC, false));
@@ -404,7 +406,6 @@ public class ItemStatUtils {
 		LOOTING(Enchantment.LOOT_BONUS_MOBS, "Looting", true, false, false),
 		RIPTIDE(Enchantment.RIPTIDE, "Riptide", true, false, false),
 		PUNCH(Enchantment.ARROW_KNOCKBACK, "Punch", true, false, false),
-		FLAME(Enchantment.ARROW_FIRE, "Flame", false, false, false),
 		QUICK_CHARGE(Enchantment.QUICK_CHARGE, "Quick Charge", true, false, false),
 		PIERCING(Enchantment.PIERCING, "Piercing", true, false, false),
 		MULTISHOT(Enchantment.MULTISHOT, "Multishot", false, false, false),
@@ -450,6 +451,7 @@ public class ItemStatUtils {
 		ICE_ASPECT(new IceAspect(), true, false, false),
 		FIRE_ASPECT(new FireAspect(), true, false, false),
 		THUNDER_ASPECT(new ThunderAspect(), true, false, false),
+		FLAME(new Flame(), false, false, false),
 		FROST(new Frost(), false, false, false),
 		GILLS(new Gills(), false, false, false),
 		HEX_EATER(new HexEater(), true, false, false),
@@ -1469,8 +1471,9 @@ public class ItemStatUtils {
 		// Checks for PI + Totem of Transposing
 		if (ItemUtils.getPlainName(item).equals("Potion Injector") && ItemUtils.isShulkerBox(item.getType())) {
 			List<String> plainLore = ItemUtils.getPlainLore(item);
+			Component potionName = item.lore().get(1);
 			lore.add(Component.text(plainLore.get(0), NamedTextColor.YELLOW).decoration(TextDecoration.ITALIC, false));
-			lore.add(Component.text(plainLore.get(1), NamedTextColor.RED).decoration(TextDecoration.ITALIC, false));
+			lore.add(potionName);
 		} else if (ItemUtils.getPlainName(item).equals("Totem of Transposing")) {
 			List<String> plainLore = ItemUtils.getPlainLore(item);
 			lore.add(Component.text(plainLore.get(0), NamedTextColor.GOLD).decoration(TextDecoration.ITALIC, false));
@@ -1654,7 +1657,7 @@ public class ItemStatUtils {
 		meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
 		meta.addItemFlags(ItemFlag.HIDE_DYE);
 		meta.addItemFlags(ItemFlag.HIDE_UNBREAKABLE);
-		if (item.getType().name().contains("PATTERN")) {
+		if (item.getType().name().contains("PATTERN") || item.getType().name().contains("SHIELD")) {
 			meta.addItemFlags(ItemFlag.HIDE_POTION_EFFECTS);
 		}
 		meta.removeAttributeModifier(Attribute.GENERIC_ARMOR_TOUGHNESS);

@@ -32,7 +32,7 @@ import java.util.List;
 public class LuminousInfusion extends Ability {
 	public static final int DAMAGE_1 = 10;
 	public static final int DAMAGE_UNDEAD_1 = 20;
-	public static final double DAMAGE_MULTIPLIER_2 = 0.2;
+	public static final double DAMAGE_MULTIPLIER_2 = 0.15;
 
 	private final boolean mDoMultiplierAndFire;
 
@@ -56,7 +56,7 @@ public class LuminousInfusion extends Ability {
 		mInfo.mScoreboardId = "LuminousInfusion";
 		mInfo.mShorthandName = "LI";
 		mInfo.mDescriptions.add("While sneaking, pressing the swap key charges your hands with holy light. The next time you damage an undead enemy, your attack is infused with explosive power, dealing 20 magic damage to it and all enemies in a 4-block cube around it, or 10 against non-undead, and knocking other enemies away from it. Cooldown: 14s.");
-		mInfo.mDescriptions.add("Your melee attacks now passively deal 20% holy damage to undead enemies, and Divine Justice now passively deals 20% more total damage. Damaging an undead enemy now passively sets it on fire for 3s. That holy damage ignores iframes.");
+		mInfo.mDescriptions.add("Your melee attacks now passively deal 20% holy damage to undead enemies, and Divine Justice now passively deals 15% more total damage. Damaging an undead enemy now passively sets it on fire for 3s. That holy damage ignores iframes.");
 		mInfo.mCooldown = COOLDOWN;
 		mInfo.mIgnoreCooldown = true;
 		mInfo.mIgnoreTriggerCap = true;

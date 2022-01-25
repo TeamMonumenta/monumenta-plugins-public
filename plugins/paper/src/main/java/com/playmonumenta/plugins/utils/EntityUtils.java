@@ -1,17 +1,21 @@
 package com.playmonumenta.plugins.utils;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.EnumSet;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.NavigableSet;
-import java.util.Set;
-import java.util.UUID;
-
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.AbilityManager;
+import com.playmonumenta.plugins.bosses.BossManager;
+import com.playmonumenta.plugins.bosses.bosses.CrowdControlImmunityBoss;
+import com.playmonumenta.plugins.effects.Aesthetics;
+import com.playmonumenta.plugins.effects.Bleed;
+import com.playmonumenta.plugins.effects.CustomDamageOverTime;
+import com.playmonumenta.plugins.effects.Effect;
+import com.playmonumenta.plugins.effects.Paralyze;
+import com.playmonumenta.plugins.effects.PercentDamageDealt;
+import com.playmonumenta.plugins.effects.PercentDamageReceived;
+import com.playmonumenta.plugins.effects.PercentSpeed;
+import com.playmonumenta.plugins.effects.SplitArrowIframesEffect;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.itemstats.enchantments.Inferno;
+import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Location;
@@ -63,24 +67,19 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BlockIterator;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
-import javax.annotation.Nullable;
 
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.AbilityManager;
-import com.playmonumenta.plugins.bosses.BossManager;
-import com.playmonumenta.plugins.bosses.bosses.CrowdControlImmunityBoss;
-import com.playmonumenta.plugins.effects.Aesthetics;
-import com.playmonumenta.plugins.effects.Bleed;
-import com.playmonumenta.plugins.effects.CustomDamageOverTime;
-import com.playmonumenta.plugins.effects.Effect;
-import com.playmonumenta.plugins.effects.Paralyze;
-import com.playmonumenta.plugins.effects.PercentDamageDealt;
-import com.playmonumenta.plugins.effects.PercentDamageReceived;
-import com.playmonumenta.plugins.effects.PercentSpeed;
-import com.playmonumenta.plugins.effects.SplitArrowIframesEffect;
-import com.playmonumenta.plugins.events.DamageEvent.DamageType;
-import com.playmonumenta.plugins.itemstats.enchantments.Inferno;
-import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
+import javax.annotation.Nullable;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.NavigableSet;
+import java.util.Set;
+import java.util.UUID;
 
 
 public class EntityUtils {
@@ -862,7 +861,7 @@ public class EntityUtils {
 			Inferno.apply(plugin, player, inferno, target, fireTicks);
 		}
 
-		if (target.getFireTicks() < fireTicks) {
+		if (target.getFireTicks() < fireTicks && !isFireResistant(target)) {
 			target.setFireTicks(fireTicks);
 		}
 	}

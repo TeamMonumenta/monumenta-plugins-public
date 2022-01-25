@@ -27,7 +27,7 @@ public class Darksight implements Enchantment {
 	public void tick(Plugin plugin, Player player, double value, boolean twoHz, boolean oneHz) {
 		if (oneHz) {
 			if (!player.getScoreboardTags().contains(DARKSIGHT_DISABLED_TAG)) {
-				plugin.mPotionManager.addPotion(player, PotionID.ITEM, new PotionEffect(PotionEffectType.NIGHT_VISION, 21, 0, true, false));
+				plugin.mPotionManager.addPotion(player, PotionID.ITEM, new PotionEffect(PotionEffectType.NIGHT_VISION, 20 * 10, 0, true, false));
 			}
 		}
 	}

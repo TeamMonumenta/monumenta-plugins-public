@@ -8,6 +8,7 @@ import com.playmonumenta.plugins.itemstats.Enchantment;
 import com.playmonumenta.plugins.player.PartialParticle;
 import com.playmonumenta.plugins.player.PartialParticle.DeltaVarianceGroup;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
 import com.playmonumenta.plugins.utils.ItemStatUtils.Slot;
 import com.playmonumenta.plugins.utils.LocationUtils;
@@ -21,7 +22,6 @@ import org.bukkit.entity.Guardian;
 import org.bukkit.entity.IronGolem;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.entity.Trident;
 
 import java.util.EnumSet;
 
@@ -54,13 +54,13 @@ public class Spark implements Enchantment {
 
 	@Override
 	public void onDamage(Plugin plugin, Player player, double value, DamageEvent event, LivingEntity enemy) {
-		if (event.getType() == DamageType.PROJECTILE && !(event.getDamager() instanceof Trident)) {
+		if (event.getType() == DamageType.PROJECTILE) {
 			boolean doEffects = false;
 			if (enemy instanceof Guardian || enemy instanceof IronGolem) {
 				doEffects = true;
 				event.setDamage(event.getDamage() + 1);
 			}
-			if (EntityUtils.isElite(enemy) || EntityUtils.isBoss(enemy)) {
+			if (!(EntityUtils.isElite(enemy) || EntityUtils.isBoss(enemy)) && FastUtils.randomDoubleInRange(0, 1) > 0.5) {
 				doEffects = true;
 				EntityUtils.applyStun(plugin, Constants.TICKS_PER_SECOND / 2, enemy);
 			}

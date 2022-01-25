@@ -19,7 +19,6 @@ import org.bukkit.World;
 import org.bukkit.entity.Blaze;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.entity.Trident;
 
 import java.util.EnumSet;
 
@@ -51,7 +50,7 @@ public class Frost implements Enchantment {
 
 	@Override
 	public void onDamage(Plugin plugin, Player player, double value, DamageEvent event, LivingEntity enemy) {
-		if (event.getType() == DamageType.PROJECTILE && !(event.getDamager() instanceof Trident)) {
+		if (event.getType() == DamageType.PROJECTILE) {
 			if (enemy instanceof Blaze) {
 				event.setDamage(event.getDamage() + 1);
 			}

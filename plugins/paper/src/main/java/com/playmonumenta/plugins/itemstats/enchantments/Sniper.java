@@ -1,21 +1,19 @@
 package com.playmonumenta.plugins.itemstats.enchantments;
 
-import java.util.EnumSet;
-
-import org.bukkit.Location;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
-import org.bukkit.World;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
-import org.bukkit.entity.Trident;
-
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.Enchantment;
 import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
 import com.playmonumenta.plugins.utils.ItemStatUtils.Slot;
+import org.bukkit.Location;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
+import org.bukkit.World;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
+
+import java.util.EnumSet;
 
 public class Sniper implements Enchantment {
 	public static final int DISTANCE = 16;
@@ -43,7 +41,7 @@ public class Sniper implements Enchantment {
 
 	@Override
 	public void onDamage(Plugin plugin, Player player, double level, DamageEvent event, LivingEntity enemy) {
-		if (event.getType() == DamageType.PROJECTILE && !(event.getDamager() instanceof Trident)) {
+		if (event.getType() == DamageType.PROJECTILE) {
 			Location loca = player.getLocation();
 			if (loca.distance(enemy.getLocation()) > DISTANCE) {
 				event.setDamage(event.getDamage() + level * DAMAGE_PER_LEVEL);

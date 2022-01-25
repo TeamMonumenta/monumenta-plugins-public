@@ -83,7 +83,7 @@ public class Spellshock extends Ability {
 					e.clearEffect();
 				}
 			}
-		} else if (event.getAbility() != null && event.getAbility() != Blizzard.ABILITY) {
+		} else if (event.getAbility() != null && event.getAbility() != Blizzard.ABILITY && event.getAbility() != ArcaneStrike.ABILITY) {
 			// Check if the mob has static, and trigger it if possible; otherwise, apply/refresh it
 			NavigableSet<Effect> effectGroupOriginal = mPlugin.mEffectManager.getEffects(enemy, SPELL_SHOCK_STATIC_EFFECT_NAME);
 			if (effectGroupOriginal != null) {

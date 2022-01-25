@@ -14,7 +14,6 @@ import org.bukkit.Particle;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockBreakEvent;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.NavigableSet;
 
@@ -22,13 +21,13 @@ public class Adrenaline implements Enchantment {
 
 	private static final String PERCENT_SPEED_EFFECT_NAME = "AdrenalinePercentSpeedEffect";
 	private static final int DURATION = 20 * 3;
-	private static final int SPAWNER_DURATION = 20 * 8;
+	private static final int SPAWNER_DURATION = 20 * 6;
 	private static final double PERCENT_SPEED_PER_LEVEL = 0.1;
 
 	private static final Particle.DustOptions RED_COLOR = new Particle.DustOptions(Color.fromRGB(200, 0, 0), 1.0f);
 
 	@Override
-	public @NotNull String getName() {
+	public String getName() {
 		return "Adrenaline";
 	}
 
@@ -38,7 +37,7 @@ public class Adrenaline implements Enchantment {
 	}
 
 	@Override
-	public void onDamage(@NotNull Plugin plugin, @NotNull Player player, double value, @NotNull DamageEvent event, @NotNull LivingEntity enemy) {
+	public void onDamage(Plugin plugin, Player player, double value, DamageEvent event, LivingEntity enemy) {
 		if (event.getType() == DamageType.MELEE) {
 			player.getWorld().spawnParticle(Particle.REDSTONE, player.getLocation().add(0, 1, 0), 12, 0.4, 0.5, 0.4, RED_COLOR);
 			NavigableSet<Effect> speedEffects = plugin.mEffectManager.getEffects(player, PERCENT_SPEED_EFFECT_NAME);
@@ -64,7 +63,7 @@ public class Adrenaline implements Enchantment {
 				}
 			} else {
 				double level = plugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.ADRENALINE);
-				plugin.mEffectManager.addEffect(player, PERCENT_SPEED_EFFECT_NAME, new PercentSpeed(DURATION, PERCENT_SPEED_PER_LEVEL * level, PERCENT_SPEED_EFFECT_NAME));
+				plugin.mEffectManager.addEffect(player, PERCENT_SPEED_EFFECT_NAME, new PercentSpeed(DURATION, PERCENT_SPEED_PER_LEVEL * level * 0.5, PERCENT_SPEED_EFFECT_NAME));
 			}
 		}
 	}

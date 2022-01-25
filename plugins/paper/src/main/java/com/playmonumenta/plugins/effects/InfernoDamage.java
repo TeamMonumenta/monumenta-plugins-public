@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.effects;
 
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.utils.DamageUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
 import org.bukkit.Particle;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -27,7 +28,7 @@ public class InfernoDamage extends Effect {
 	public void entityTickEffect(Entity entity, boolean fourHertz, boolean twoHertz, boolean oneHertz) {
 		if (oneHertz && entity instanceof LivingEntity le) {
 			double damage = mLevel;
-			if (le.getFireTicks() <= 0) {
+			if (le.getFireTicks() <= 0 || EntityUtils.isFireResistant(le)) {
 				damage *= 0.5;
 			}
 			DamageUtils.damage(mPlayer, le, DamageType.AILMENT, damage, null, true, false);

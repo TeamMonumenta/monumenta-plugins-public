@@ -40,6 +40,7 @@ public class ArcaneStrike extends Ability {
 	private static final int BONUS_DAMAGE_1 = 2;
 	private static final int BONUS_DAMAGE_2 = 3;
 	private static final int COOLDOWN = 5 * 20;
+	public static final ClassAbility ABILITY = ClassAbility.ARCANE_STRIKE;
 
 	private final int mDamageBonus;
 	private final int mDamageBonusAffected;
@@ -73,7 +74,7 @@ public class ArcaneStrike extends Ability {
 					dmg += SpellPower.getSpellDamage(mPlugin, mPlayer, mDamageBonusAffected);
 				}
 
-				DamageUtils.damage(mPlayer, mob, DamageType.MAGIC, dmg, mInfo.mLinkedSpell, false, true);
+				DamageUtils.damage(mPlayer, mob, DamageType.MAGIC, dmg, mInfo.mLinkedSpell, true, true);
 			}
 
 			Location locD = enemy.getLocation().add(0, 1, 0);

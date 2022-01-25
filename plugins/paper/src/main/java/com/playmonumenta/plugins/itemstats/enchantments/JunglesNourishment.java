@@ -1,8 +1,8 @@
 package com.playmonumenta.plugins.itemstats.enchantments;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.effects.PercentDamageReceived;
 import com.playmonumenta.plugins.itemstats.Enchantment;
-import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
 import com.playmonumenta.plugins.utils.PlayerUtils;
@@ -11,13 +11,13 @@ import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 
 public class JunglesNourishment implements Enchantment {
 
 	private static final int HEAL = 8;
 	private static final int DURATION = 20 * 5;
+	private static final double PERCENT_DAMAGE_RECEIVED = -0.2;
+	private static final String PERCENT_DAMAGE_RECEIVED_EFFECT_NAME = "JunglesNourishmentResistance";
 	private static final int COOLDOWN = 20 * 25;
 
 	@Override
@@ -34,8 +34,7 @@ public class JunglesNourishment implements Enchantment {
 	public void onConsume(Plugin plugin, Player player, double level, PlayerItemConsumeEvent event) {
 		if (InventoryUtils.testForItemWithLore(event.getItem(), "Jungle's Nourishment")) {
 			PlayerUtils.healPlayer(plugin, player, HEAL, player);
-			plugin.mPotionManager.addPotion(player, PotionID.ITEM,
-					new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, DURATION, 0, true, true));
+			plugin.mEffectManager.addEffect(player, PERCENT_DAMAGE_RECEIVED_EFFECT_NAME, new PercentDamageReceived(DURATION, PERCENT_DAMAGE_RECEIVED));
 			player.setCooldown(event.getItem().getType(), COOLDOWN);
 			player.setFoodLevel(24);
 			World world = player.getWorld();

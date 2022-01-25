@@ -32,7 +32,7 @@ public class SoulRend extends Ability {
 	private static final int HEAL_1 = 2;
 	private static final int HEAL_2 = 4;
 	private static final int RADIUS = 7;
-	private static final int COOLDOWN = 20 * 6;
+	private static final int COOLDOWN = 20 * 8;
 
 	private final int mHeal;
 
@@ -42,7 +42,7 @@ public class SoulRend extends Ability {
 		super(plugin, player, "Soul Rend");
 		mInfo.mScoreboardId = "SoulRend";
 		mInfo.mShorthandName = "SR";
-		mInfo.mDescriptions.add("Attacking an enemy with a critical scythe attack heals you for 2 health and 20% of the melee damage dealt, capped at 10 total health. Cooldown: 6s.");
+		mInfo.mDescriptions.add("Attacking an enemy with a critical scythe attack heals you for 2 health and 20% of the melee damage dealt, capped at 10 total health. Cooldown: 8s.");
 		mInfo.mDescriptions.add("Players within 7 blocks of you are now also healed. Flat healing is increased from 2 to 4 health.");
 		mInfo.mLinkedSpell = ClassAbility.SOUL_REND;
 		mInfo.mCooldown = COOLDOWN;

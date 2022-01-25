@@ -1,11 +1,5 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import com.playmonumenta.plugins.bosses.BossBarManager;
 import com.playmonumenta.plugins.bosses.BossBarManager.BossHealthAction;
 import com.playmonumenta.plugins.bosses.SpellManager;
@@ -20,7 +14,6 @@ import com.playmonumenta.plugins.bosses.spells.sealedremorse.PassiveVoidRift;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.SerializationUtils;
-
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -40,6 +33,12 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
+
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public final class BeastOfTheBlackFlame extends BossAbilityGroup {
 
@@ -128,7 +127,7 @@ public final class BeastOfTheBlackFlame extends BossAbilityGroup {
 				for (Player p : PlayerUtils.playersInRange(mSpawnLoc, detectionRange, true)) {
 					if ((mSpawnLoc.distance(p.getLocation()) > 22
 							|| mSpawnLoc.getY() - p.getLocation().getY() >= 3
-							|| (mSpawnLoc.getY() - p.getLocation().getY() <= -3 && p.isOnGround()))
+							|| (mSpawnLoc.getY() - p.getLocation().getY() <= -2 && p.isOnGround()))
 							&& p.getGameMode() != GameMode.CREATIVE) {
 						Vector vel = p.getVelocity();
 						BossUtils.bossDamagePercent(mBoss, p, 0.1);

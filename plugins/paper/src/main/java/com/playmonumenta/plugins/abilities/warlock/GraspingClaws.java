@@ -1,7 +1,17 @@
 package com.playmonumenta.plugins.abilities.warlock;
 
-import java.util.logging.Level;
-
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.abilities.AbilityTrigger;
+import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.itemstats.ItemStatManager;
+import com.playmonumenta.plugins.utils.DamageUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.ItemStatUtils;
+import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.MovementUtils;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -18,18 +28,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
 import javax.annotation.Nullable;
 
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.abilities.AbilityTrigger;
-import com.playmonumenta.plugins.classes.ClassAbility;
-import com.playmonumenta.plugins.events.DamageEvent;
-import com.playmonumenta.plugins.events.DamageEvent.DamageType;
-import com.playmonumenta.plugins.listeners.DamageListener;
-import com.playmonumenta.plugins.utils.DamageUtils;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.ItemStatUtils;
-import com.playmonumenta.plugins.utils.ItemUtils;
-import com.playmonumenta.plugins.utils.MovementUtils;
+import java.util.logging.Level;
 
 
 
@@ -44,6 +43,7 @@ public class GraspingClaws extends Ability {
 	private static final int DURATION = 8 * 20;
 	private static final int COOLDOWN_1 = 16 * 20;
 	private static final int COOLDOWN_2 = 12 * 20;
+	private static final String ITEMSTATS_METAKEY = "GraspingClawsMetakey";
 
 	private final double mAmplifier;
 	private final int mDamage;
@@ -76,6 +76,8 @@ public class GraspingClaws extends Ability {
 			mArrow.setDamage(0);
 			mArrow.setPickupStatus(AbstractArrow.PickupStatus.CREATIVE_ONLY);
 			mPlugin.mProjectileEffectTimers.addEntity(mArrow, Particle.SPELL_WITCH);
+			FixedMetadataValue playerItemStats = new FixedMetadataValue(mPlugin, new ItemStatManager.PlayerItemStats(mPlugin.mItemStatManager.getPlayerItemStats(mPlayer)));
+			mArrow.setMetadata(ITEMSTATS_METAKEY, playerItemStats);
 			putOnCooldown();
 		}
 	}
@@ -96,7 +98,7 @@ public class GraspingClaws extends Ability {
 			world.spawnParticle(Particle.FALLING_DUST, loc, 150, 2, 2, 2, Material.ANVIL.createBlockData());
 
 			for (LivingEntity mob : EntityUtils.getNearbyMobs(loc, RADIUS, mPlayer)) {
-				Object value = proj.getMetadata(DamageListener.PROJECTILE_ITEM_STATS_METAKEY).get(0);
+				Object value = proj.getMetadata(ITEMSTATS_METAKEY).get(0);
 				if (value instanceof FixedMetadataValue playerItemStats) {
 					DamageEvent damageEvent = new DamageEvent(mob, mPlayer, mPlayer, DamageType.MAGIC, mInfo.mLinkedSpell, mDamage);
 					damageEvent.setDelayed(true);

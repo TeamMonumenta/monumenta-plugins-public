@@ -39,7 +39,7 @@ public class Eruption implements Enchantment {
 
 	private static final String PERCENT_SPEED_EFFECT_NAME = "AdrenalinePercentSpeedEffect";
 	private static final double PERCENT_SPEED_PER_LEVEL = 0.1;
-	private static final int SPEED_DURATION = 20 * 8;
+	private static final int SPEED_DURATION = 20 * 6;
 
 	@Override
 	public @NotNull String getName() {
@@ -119,7 +119,7 @@ public class Eruption implements Enchantment {
 						}
 					} else {
 						double adrenalineLevel = plugin.mItemStatManager.getEnchantmentLevel(p, EnchantmentType.ADRENALINE);
-						plugin.mEffectManager.addEffect(p, PERCENT_SPEED_EFFECT_NAME, new PercentSpeed(SPEED_DURATION, PERCENT_SPEED_PER_LEVEL * adrenalineLevel, PERCENT_SPEED_EFFECT_NAME));
+						plugin.mEffectManager.addEffect(p, PERCENT_SPEED_EFFECT_NAME, new PercentSpeed(SPEED_DURATION, PERCENT_SPEED_PER_LEVEL * adrenalineLevel * 0.5, PERCENT_SPEED_EFFECT_NAME));
 					}
 				}
 			}

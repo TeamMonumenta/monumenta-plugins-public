@@ -57,7 +57,7 @@ public class Blizzard extends Ability {
 
 		mInfo.mScoreboardId = NAME;
 		mInfo.mShorthandName = "Bl";
-		mInfo.mDescriptions.add("Press the swap key while shifting and on the ground while holing a wand to create a storm of ice and snow that follows the player, dealing 5 magic damage every 2s to all enemies in a 6 block radius around you. The blizzard last for 10s, and chills enemies within it, slowing them by 25%." +
+		mInfo.mDescriptions.add("Press the swap key while shifting, on the ground, and holding a wand to create a storm of ice and snow that follows the player, dealing 5 magic damage every 2s to all enemies in a 6 block radius around you. The blizzard last for 10s, and chills enemies within it, slowing them by 25%." +
 			" Players in the blizzard are extinguished if they are on fire, and the ability's damage bypasses iframes. This ability does not interact with Spellshock. Cooldown: 30s.");
 		mInfo.mDescriptions.add("Damage is increased from 5 to 10, aura size is increased from 6 to 8 blocks, slowness increased to 30%.");
 		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;

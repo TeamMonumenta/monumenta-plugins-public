@@ -6,7 +6,7 @@ import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.rogue.swordsage.BladeDance;
 import com.playmonumenta.plugins.classes.ClassAbility;
-import com.playmonumenta.plugins.effects.FlatDamageDealt;
+import com.playmonumenta.plugins.effects.PercentDamageDealt;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.point.Raycast;
@@ -40,17 +40,17 @@ public class AdvancingShadows extends Ability {
 	private static final float ADVANCING_SHADOWS_AOE_KNOCKBACKS_RANGE = 4;
 	private static final double ADVANCING_SHADOWS_OFFSET = 2.7;
 	private static final int DURATION = 5 * 20;
-	private static final int DAMAGE_BONUS_1 = 3;
-	private static final int DAMAGE_BONUS_2 = 4;
+	private static final double DAMAGE_BONUS_1 = 0.3;
+	private static final double DAMAGE_BONUS_2 = 0.4;
 	private static final int ADVANCING_SHADOWS_COOLDOWN = 20 * 20;
 
-	private static final String FLAT_DAMAGE_DEALT_EFFECT_NAME = "AdvancingShadowsFlatDamageDealtEffect";
+	private static final String PERCENT_DAMAGE_DEALT_EFFECT_NAME = "AdvancingShadowsPercentDamageDealtEffect";
 	private static final EnumSet<DamageEvent.DamageType> AFFECTED_DAMAGE_TYPES = EnumSet.of(DamageType.MELEE, DamageType.MELEE_ENCH, DamageType.MELEE_SKILL);
 
 	private @Nullable LivingEntity mTarget = null;
 	private @Nullable BladeDance mBladeDance;
 
-	private final int mFlatDamageDealt;
+	private final double mPercentDamageDealt;
 
 	public AdvancingShadows(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Advancing Shadows");
@@ -59,10 +59,10 @@ public class AdvancingShadows extends Ability {
 		mInfo.mShorthandName = "AS";
 		mInfo.mCooldown = ADVANCING_SHADOWS_COOLDOWN;
 		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
-		mInfo.mDescriptions.add("While holding two swords and not sneaking, right click to teleport to the target hostile enemy within " + (ADVANCING_SHADOWS_RANGE_1 - 1) + " blocks and gain +3 Attack Damage for 5 seconds. Cooldown: 20s.");
-		mInfo.mDescriptions.add("Damage increased to +4 Melee Damage for 5s, teleport range is increased to " + (ADVANCING_SHADOWS_RANGE_2 - 1) + " blocks and all hostile non-target mobs within " + ADVANCING_SHADOWS_AOE_KNOCKBACKS_RANGE + " blocks are knocked away from the target.");
+		mInfo.mDescriptions.add("While holding two swords and not sneaking, right click to teleport to the target hostile enemy within " + (ADVANCING_SHADOWS_RANGE_1 - 1) + " blocks and gain +30% Melee Damage for 5 seconds. Cooldown: 20s.");
+		mInfo.mDescriptions.add("Damage increased to +40% Melee Damage for 5s, teleport range is increased to " + (ADVANCING_SHADOWS_RANGE_2 - 1) + " blocks and all hostile non-target mobs within " + ADVANCING_SHADOWS_AOE_KNOCKBACKS_RANGE + " blocks are knocked away from the target.");
 		mDisplayItem = new ItemStack(Material.ENDER_EYE, 1);
-		mFlatDamageDealt = getAbilityScore() == 1 ? DAMAGE_BONUS_1 : DAMAGE_BONUS_2;
+		mPercentDamageDealt = getAbilityScore() == 1 ? DAMAGE_BONUS_1 : DAMAGE_BONUS_2;
 
 		if (player != null) {
 			Bukkit.getScheduler().runTask(plugin, () -> {
@@ -148,7 +148,7 @@ public class AdvancingShadows extends Ability {
 				mPlayer.teleport(loc, TeleportCause.UNKNOWN);
 			}
 
-			mPlugin.mEffectManager.addEffect(mPlayer, FLAT_DAMAGE_DEALT_EFFECT_NAME, new FlatDamageDealt(DURATION, mFlatDamageDealt, AFFECTED_DAMAGE_TYPES));
+			mPlugin.mEffectManager.addEffect(mPlayer, PERCENT_DAMAGE_DEALT_EFFECT_NAME, new PercentDamageDealt(DURATION, mPercentDamageDealt, AFFECTED_DAMAGE_TYPES));
 			if (advancingShadows > 1) {
 				for (LivingEntity mob : EntityUtils.getNearbyMobs(entity.getLocation(),
 						ADVANCING_SHADOWS_AOE_KNOCKBACKS_RANGE, mPlayer)) {
