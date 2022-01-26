@@ -86,10 +86,10 @@ public class SwingBoss extends BossAbilityGroup {
 							double bossY = boss.getLocation().getY();
 							for (Player player : PlayerUtils.playersInRange(boss.getLocation(), p.RADIUS, true)) {
 								double playerY = player.getLocation().getY();
-								if (bossY + 0.1 < playerY || playerY + player.getHeight() < bossY - player.getHeight()) {
+								//if the player is on ground increase the size of the swing to avoid slab cheating
+								if ((playerY + player.getHeight() < bossY) || (player.isOnGround() ? bossY + 0.7 < playerY : bossY + 0.1 < playerY)) {
 									continue;
 								}
-
 
 								if (p.DAMAGE > 0) {
 									BossUtils.blockableDamage(boss, player, DamageType.MELEE, p.DAMAGE);
