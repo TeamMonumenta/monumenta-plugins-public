@@ -67,7 +67,11 @@ public class LeaveGuild {
 						user.data().remove(node);
 					}
 				}
-				LuckPermsIntegration.UM.saveUser(user);
+				LuckPermsIntegration.UM.saveUser(user).whenComplete((unused, ex) -> {
+					if (ex != null) {
+						ex.printStackTrace();
+					}
+				});
 				LuckPermsIntegration.pushUserUpdate(user);
 			}
 		}.runTaskAsynchronously(plugin);

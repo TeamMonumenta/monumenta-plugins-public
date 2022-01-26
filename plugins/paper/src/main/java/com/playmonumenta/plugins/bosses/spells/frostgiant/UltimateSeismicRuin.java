@@ -114,7 +114,7 @@ public class UltimateSeismicRuin extends Spell {
 				if (mT % 10 == 0) {
 					mWorld.playSound(loc, Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, SoundCategory.HOSTILE, 2, mPitch);
 				}
-				mPitch += 0.025;
+				mPitch += 0.025f;
 
 				if (mT >= 20 * 4) {
 					mWorld.playSound(loc.clone().add(0, 0, 5), Sound.ENTITY_BLAZE_SHOOT, SoundCategory.HOSTILE, 3, 1);
@@ -248,7 +248,7 @@ public class UltimateSeismicRuin extends Spell {
 				if (mT % 10 == 0) {
 					mWorld.playSound(loc, Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, SoundCategory.HOSTILE, 2, mPitch);
 				}
-				mPitch += 0.025;
+				mPitch += 0.025f;
 
 				if (mT >= 20 * 4) {
 					mWorld.playSound(loc.clone().add(-5, 0, 0), Sound.ENTITY_BLAZE_SHOOT, SoundCategory.HOSTILE, 3, 1);
@@ -383,7 +383,7 @@ public class UltimateSeismicRuin extends Spell {
 				if (mT % 10 == 0) {
 					mWorld.playSound(loc, Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, SoundCategory.HOSTILE, 2, mPitch);
 				}
-				mPitch += 0.025;
+				mPitch += 0.025f;
 
 				if (mT >= 20 * 4) {
 					mWorld.playSound(loc.clone().add(0, 0, -5), Sound.ENTITY_BLAZE_SHOOT, SoundCategory.HOSTILE, 3, 1);
@@ -518,7 +518,7 @@ public class UltimateSeismicRuin extends Spell {
 				if (mT % 10 == 0) {
 					mWorld.playSound(loc, Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, SoundCategory.HOSTILE, 2, mPitch);
 				}
-				mPitch += 0.025;
+				mPitch += 0.025f;
 
 				if (mT >= 20 * 4) {
 					mWorld.playSound(loc.clone().add(5, 0, 0), Sound.ENTITY_BLAZE_SHOOT, SoundCategory.HOSTILE, 3, 1);

@@ -48,9 +48,6 @@ public class SpellBaseSummon extends Spell {
 
 	@FunctionalInterface
 	public interface SummonAesthetic {
-		/**
-		 *
-		 */
 		void run(LivingEntity mob, Location loc, int ticks);
 	}
 
@@ -176,7 +173,7 @@ public class SpellBaseSummon extends Spell {
 					return;
 				}
 
-				if (mCanBeStopped && (EntityUtils.isStunned(mBoss))) {
+				if (mCanBeStopped && EntityUtils.isStunned(mBoss)) {
 					this.cancel();
 					return;
 				}
@@ -234,7 +231,7 @@ public class SpellBaseSummon extends Spell {
 							return;
 						}
 
-						if (mCanBeStopped && (EntityUtils.isStunned(mBoss))) {
+						if (mCanBeStopped && EntityUtils.isStunned(mBoss)) {
 							this.cancel();
 							return;
 						}

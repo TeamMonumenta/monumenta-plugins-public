@@ -15,8 +15,8 @@ public class Empowered implements Infusion {
 
 	private static final double PERCENT_CHANCE = 0.0025;
 	private static final double PERCENT_REPAIR = 0.01;
-	private static final double ACUMEN_BONUS = 0.02;
-	private static final double INTUITION_BONUS = 0.5;
+	private static final float ACUMEN_BONUS = 0.02f;
+	private static final float INTUITION_BONUS = 0.5f;
 
 	@Override
 	public String getName() {

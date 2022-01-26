@@ -26,7 +26,7 @@ public class SpellBaseSeekingProjectile extends Spell {
 	@FunctionalInterface
 	public interface AestheticAction {
 		/**
-		 * @param loc Location to do aesthetics, also provides a ticks ongoing parameter if operations should be performed less often
+		 * Run with the location to do aesthetics, also provides a ticks ongoing parameter if operations should be performed less often
 		 */
 		void run(World world, Location loc, int ticks);
 	}

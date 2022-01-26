@@ -48,7 +48,7 @@ public class Bleeding implements Enchantment {
 			EntityUtils.applyBleed(plugin, (int)(DURATION * player.getCooledAttackStrength(0)), (int) level, enemy);
 			player.getWorld().spawnParticle(Particle.REDSTONE, enemy.getLocation().add(0, 1, 0), 8, 0.3, 0.6, 0.3, COLOR);
 		} else if (event.getType() == DamageType.PROJECTILE && event.getDamager() instanceof Trident) {
-			EntityUtils.applyBleed(plugin, (int)(DURATION), (int) level, enemy);
+			EntityUtils.applyBleed(plugin, (int)DURATION, (int) level, enemy);
 			player.getWorld().spawnParticle(Particle.REDSTONE, enemy.getLocation().add(0, 1, 0), 8, 0.3, 0.6, 0.3, COLOR);
 		}
 	}

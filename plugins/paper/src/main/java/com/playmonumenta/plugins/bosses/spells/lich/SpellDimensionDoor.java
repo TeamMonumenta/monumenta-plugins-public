@@ -184,8 +184,8 @@ public class SpellDimensionDoor extends Spell {
 
 					//move portal center to ground, stop above bedrock so it doesn't replace bedrock
 					Location locdown = mLoc.clone().subtract(0, 1, 0);
-					while (((mLoc.getBlock()).isPassable() || (mLoc.getBlock()).isLiquid()
-							|| (mLoc.getBlock()).isEmpty()) && locdown.getBlock().getType() != Material.BEDROCK
+					while ((mLoc.getBlock().isPassable() || mLoc.getBlock().isLiquid()
+							|| mLoc.getBlock().isEmpty()) && locdown.getBlock().getType() != Material.BEDROCK
 							&& mLoc.getY() > mSpawnLoc.getY() - 5 && mT <= 5) {
 						mLoc.setY(mLoc.getY() - 1);
 						locdown = mLoc.clone().subtract(0, 1, 0);
@@ -377,7 +377,7 @@ public class SpellDimensionDoor extends Spell {
 			public void run() {
 				mT -= 2;
 				p.spawnParticle(Particle.SPELL_WITCH, spectre.getEyeLocation(), 1, 0.1, 0.1, 0.1, 0);
-				double progress = mT * 1.0d / (tick);
+				double progress = mT * 1.0d / tick;
 				if (progress >= 0) {
 					bar.setProgress(progress);
 				}

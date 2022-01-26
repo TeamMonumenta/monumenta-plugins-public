@@ -120,7 +120,7 @@ public class Raycast {
 			for (Entity e : mStart.getWorld().getNearbyEntities(mStart, mHitRange, mHitRange, mHitRange)) {
 				if (e instanceof LivingEntity) {
 					//  Make sure we should be targeting this entity.
-					if ((mTargetPlayers && (e instanceof Player)) || (mTargetNonPlayers && (!(e instanceof Player)))) {
+					if ((mTargetPlayers && (e instanceof Player)) || (mTargetNonPlayers && !(e instanceof Player))) {
 						if (!entities.contains(e)) {
 							data.getEntities().add((LivingEntity)e);
 						}

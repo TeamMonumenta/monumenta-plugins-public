@@ -63,7 +63,7 @@ public class VoodooBonds extends Ability {
 
 	@Override
 	public void cast(Action action) {
-		if (!mPlayer.isSneaking() || mPlayer.getLocation().getPitch() < 50 || isTimerActive() && mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.mLinkedSpell)) {
+		if (!mPlayer.isSneaking() || mPlayer.getLocation().getPitch() < 50 || (isTimerActive() && mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.mLinkedSpell))) {
 			return;
 		}
 

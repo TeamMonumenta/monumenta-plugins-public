@@ -22,7 +22,7 @@ public class VectorUtils {
 		double z = position.getZ();
 		double cos = FastUtils.cosDeg(degrees);
 		double sin = FastUtils.sinDeg(degrees);
-		return (new Vector(x * cos - z * sin, y, z * cos + x * sin));
+		return new Vector(x * cos - z * sin, y, z * cos + x * sin);
 	}
 
 	// rotate vector "position" by angle "degrees" on the y-z-(2D)-plane (pitch; looking up/down)
@@ -34,7 +34,7 @@ public class VectorUtils {
 		double z = position.getZ();
 		double cos = FastUtils.cosDeg(degrees);
 		double sin = FastUtils.sinDeg(degrees);
-		return (new Vector(x, y * cos - z * sin, z * cos + y * sin));
+		return new Vector(x, y * cos - z * sin, z * cos + y * sin);
 	}
 
 	// rotate vector "position" by angle "degrees" on the x-y-(2D)-plane (roll; turn your screen, basically)
@@ -44,7 +44,7 @@ public class VectorUtils {
 		double z = position.getZ();
 		double cos = FastUtils.cosDeg(degrees);
 		double sin = FastUtils.sinDeg(degrees);
-		return (new Vector(x * cos + y * sin, y * cos - x * sin, z));
+		return new Vector(x * cos + y * sin, y * cos - x * sin, z);
 	}
 
 	public static Vector crossProd(Vector u, Vector v) {

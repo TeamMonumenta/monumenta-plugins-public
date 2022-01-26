@@ -342,7 +342,7 @@ public final class ExperiencinatorConfig {
 		}
 
 		/**
-		 * @return Whether the player has access to this conversion. Does not check any tier prerequisites.
+		 * Whether the player has access to this conversion. Does not check any tier prerequisites.
 		 */
 		public boolean conversionAllowedInGeneral(Player player) {
 			return mPrerequisites == null || mPrerequisites.prerequisiteMet(player, null);

@@ -180,7 +180,7 @@ public class ChaosDagger extends DepthsAbility {
 		if (enemy == mHitMob && (event.getType() == DamageType.MELEE || event.getType() == DamageType.PROJECTILE)) {
 			event.setDamage(event.getDamage() * DAMAGE[mRarity - 1]);
 			mHitMob = null;
-			if (!(enemy.isInvisible())) {
+			if (!enemy.isInvisible()) {
 				enemy.setGlowing(false);
 			}
 		}

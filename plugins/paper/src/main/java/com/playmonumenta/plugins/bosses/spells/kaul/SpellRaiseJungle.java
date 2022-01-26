@@ -114,7 +114,7 @@ public class SpellRaiseJungle extends Spell {
 						new BukkitRunnable() {
 							int mTicks = 0;
 							Location mPLoc = scLoc;
-							double mYInc = 1.6 / ((mSummonTime));
+							double mYInc = 1.6 / mSummonTime;
 							boolean mRaised = false;
 							@Override
 							public void run() {

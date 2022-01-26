@@ -30,7 +30,7 @@ public class Sundrops extends DepthsAbility {
 	//Technical implementation of this ability is handled in the depths listener, so that any member of the party can benefit from it
 
 	public static final String ABILITY_NAME = "Sundrops";
-	public static final double[] DROP_CHANCE = {20, 25, 30, 35, 40, 60};
+	public static final int[] DROP_CHANCE = {20, 25, 30, 35, 40, 60};
 	private static final int LINGER_TIME = 10 * 20;
 	private static final int DURATION = 8 * 20;
 	private static final double PERCENT_SPEED = .2;

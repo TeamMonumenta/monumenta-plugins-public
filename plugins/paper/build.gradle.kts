@@ -88,32 +88,17 @@ tasks.withType<JavaCompile>().configureEach {
         // TODO This must be turned back on as soon as some of the other warnings are under control
         option("NullAway:AnnotatedPackages", "com.playmonumenta.DISABLE")
 
-        // These are errors but should not be, downgrade to warning
-        check("IdentityBinaryExpression", CheckSeverity.WARN)
-        check("FormatString", CheckSeverity.WARN)
+        allErrorsAsWarnings.set(true)
 
+        /*** Disabled checks ***/
         // These we almost certainly don't want
-        check("CatchAndPrintStackTrace", CheckSeverity.OFF)
-        check("OperatorPrecedence", CheckSeverity.OFF)
-        check("StaticAssignmentInConstructor", CheckSeverity.OFF)
-        check("StringSplitter", CheckSeverity.OFF)
-        check("MixedMutabilityReturnType", CheckSeverity.OFF)
-        check("InlineFormatString", CheckSeverity.OFF)
-        check("FloatCast", CheckSeverity.OFF)
-
-        // TODO: We probably want to turn these back on when the number is more reasonable
-        check("NarrowingCompoundAssignment", CheckSeverity.OFF)
-        check("ImmutableEnumChecker", CheckSeverity.OFF)
-        check("FutureReturnValueIgnored", CheckSeverity.OFF)
-        check("UnnecessaryParentheses", CheckSeverity.OFF)
-        check("DefaultCharset", CheckSeverity.OFF)
-        check("JavaTimeDefaultTimeZone", CheckSeverity.OFF)
-        check("LockNotBeforeTry", CheckSeverity.OFF)
-        check("MutablePublicArray", CheckSeverity.OFF)
-
-        // Javadoc string stuff, would be nice to have these back someday
-        check("EmptyBlockTag", CheckSeverity.OFF)
-        check("MissingSummary", CheckSeverity.OFF)
+        check("CatchAndPrintStackTrace", CheckSeverity.OFF) // This is the primary way a lot of exceptions are handled
+        check("FutureReturnValueIgnored", CheckSeverity.OFF) // This one is dumb and doesn't let you check return values with .whenComplete()
+        check("ImmutableEnumChecker", CheckSeverity.OFF) // Would like to turn this on but we'd have to annotate a bunch of base classes
+        check("LockNotBeforeTry", CheckSeverity.OFF) // Very few locks in our code, those that we have are simple and refactoring like this would be ugly
+        check("StaticAssignmentInConstructor", CheckSeverity.OFF) // We have tons of these on purpose
+        check("StringSplitter", CheckSeverity.OFF) // We have a lot of string splits too which are fine for this use
+        check("MutablePublicArray", CheckSeverity.OFF) // These are bad practice but annoying to refactor and low risk of actual bugs
     }
 }
 

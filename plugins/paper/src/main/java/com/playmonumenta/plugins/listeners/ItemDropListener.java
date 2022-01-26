@@ -263,7 +263,7 @@ public final class ItemDropListener implements Listener {
 	 * @return Whether the given slot is an equipment slot, i.e. is either an armor or a hotbar slot
 	 */
 	private boolean isEquipmentSlot(int slot) {
-		return 0 <= slot && slot <= 8 || 36 <= slot && slot <= 40;
+		return (0 <= slot && slot <= 8) || (36 <= slot && slot <= 40);
 	}
 
 	private void enable(CommandSender sender) throws WrapperCommandSyntaxException {

@@ -87,14 +87,14 @@ public class DaggerThrow extends Ability {
 				Location bLoc = box.getCenter().toLocation(world);
 				Location pLoc = bLoc.clone();
 				for (int t = 0; t < 10; t++) {
-					pLoc.add((newDir.clone()).multiply(0.1));
+					pLoc.add(newDir.clone().multiply(0.1));
 					world.spawnParticle(Particle.REDSTONE, pLoc, 1, 0.1, 0.1, 0.1, DAGGER_THROW_COLOR);
 				}
 
 				for (LivingEntity mob : mobs) {
 					if (mob.getBoundingBox().overlaps(box)
 						&& MetadataUtils.checkOnceThisTick(mPlugin, mob, DAGGER_THROW_MOB_HIT_TICK)) {
-						bLoc.subtract((newDir.clone()).multiply(0.5));
+						bLoc.subtract(newDir.clone().multiply(0.5));
 						world.spawnParticle(Particle.SWEEP_ATTACK, bLoc, 3, 0.3, 0.3, 0.3, 0.1);
 						world.playSound(loc, Sound.BLOCK_ANVIL_PLACE, 0.4f, 2.5f);
 
@@ -102,7 +102,7 @@ public class DaggerThrow extends Ability {
 						PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(PotionEffectType.UNLUCK, DAGGER_THROW_DURATION, mVulnAmplifier, true, false));
 						break;
 					} else if (!bLoc.isChunkLoaded() || bLoc.getBlock().getType().isSolid()) {
-						bLoc.subtract((newDir.clone()).multiply(0.5));
+						bLoc.subtract(newDir.clone().multiply(0.5));
 						world.spawnParticle(Particle.SWEEP_ATTACK, bLoc, 3, 0.3, 0.3, 0.3, 0.1);
 						break;
 					}

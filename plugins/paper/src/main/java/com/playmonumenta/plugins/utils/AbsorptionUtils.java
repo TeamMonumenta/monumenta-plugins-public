@@ -112,7 +112,7 @@ public class AbsorptionUtils {
 							setAbsorption(entity, newAmount, -1);
 						}
 
-						if (entity.isDead() || !entity.isValid() || entity instanceof Player && !((Player) entity).isOnline()) {
+						if (entity.isDead() || !entity.isValid() || (entity instanceof Player && !((Player) entity).isOnline())) {
 							iter.remove();
 						}
 					}

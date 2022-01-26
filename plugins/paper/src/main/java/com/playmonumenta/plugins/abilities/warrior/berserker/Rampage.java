@@ -45,7 +45,7 @@ public class Rampage extends Ability implements AbilityWithChargesOrStacks {
 	private final int mStackLimit;
 
 	private int mStacks = 0;
-	private int mRemainderDamage = 0;
+	private double mRemainderDamage = 0;
 	private int mTimeToStackDecay = 0;
 	private int mTimer = 0;
 
@@ -112,7 +112,7 @@ public class Rampage extends Ability implements AbilityWithChargesOrStacks {
 				mTimer--;
 				double maxHealth = EntityUtils.getMaxHealth(mPlayer);
 				PlayerUtils.healPlayer(mPlugin, mPlayer, HEAL_PERCENT * maxHealth);
-				mPlayer.getWorld().spawnParticle(Particle.HEART, (mPlayer.getLocation()).add(0, 2, 0), 1, 0.07, 0.07, 0.07, 0.001);
+				mPlayer.getWorld().spawnParticle(Particle.HEART, mPlayer.getLocation().add(0, 2, 0), 1, 0.07, 0.07, 0.07, 0.001);
 			}
 		}
 	}
@@ -132,8 +132,8 @@ public class Rampage extends Ability implements AbilityWithChargesOrStacks {
 		mTimeToStackDecay = 0;
 
 		mRemainderDamage += damage;
-		int newStacks = mRemainderDamage / mDamagePerStack;
-		mRemainderDamage %= mDamagePerStack;
+		int newStacks = (int)(mRemainderDamage / mDamagePerStack);
+		mRemainderDamage -= (newStacks * mDamagePerStack);
 
 		if (newStacks > 0) {
 			int previousStacks = mStacks;

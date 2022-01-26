@@ -110,7 +110,7 @@ public class LocationUtils {
 		 * a non-air block is hit. If it's a rail, this is allowed, otherwise it's not
 		 */
 		loc = loc.clone();
-		for (int i = loc.getBlockY(); i > (Math.max(0, loc.getBlockY() - 50)); i--) {
+		for (int i = loc.getBlockY(); i > Math.max(0, loc.getBlockY() - 50); i--) {
 			loc.setY(i);
 			block = loc.getBlock();
 			if (isRail(block)) {
@@ -147,7 +147,7 @@ public class LocationUtils {
 		 * a non-air block is hit. If it's a liquid, this is allowed, otherwise it's not
 		 */
 		loc = loc.clone();
-		for (int i = loc.getBlockY(); i > (Math.max(0, loc.getBlockY() - 50)); i--) {
+		for (int i = loc.getBlockY(); i > Math.max(0, loc.getBlockY() - 50); i--) {
 			loc.setY(i);
 			Block block = loc.getBlock();
 			if (block.isLiquid() || containsWater(block) || block.getType() == Material.ICE || block.getType() == Material.BLUE_ICE || block.getType() == Material.PACKED_ICE) {
@@ -359,27 +359,27 @@ public class LocationUtils {
 		case BREWING_STAND:
 			if (y > (2.0 / 16.0)
 			    && (x > (9.0 / 16.0) || x < (7.0 / 16.0))
-			    && z > (9.0 / 16.0) || z < (7.0 / 16.0)) {
+			    && (z > (9.0 / 16.0) || z < (7.0 / 16.0))) {
 				collides = false;
 			}
 			break;
 		case CHEST:
 			if (y > (15.0 / 16.0)
-			    || x > (15.0 / 16.0) || x < ((1.0) / 16.0)
+			    || x > (15.0 / 16.0) || x < (1.0 / 16.0)
 			    || z > (15.0 / 16.0) || z < (1.0 / 16.0)) {
 				collides = false;
 			}
 			break;
 		case TRAPPED_CHEST:
 			if (y > (15.0 / 16.0)
-			    || x > (15.0 / 16.0) || x < ((1.0) / 16.0)
+			    || x > (15.0 / 16.0) || x < (1.0 / 16.0)
 			    || z > (15.0 / 16.0) || z < (1.0 / 16.0)) {
 				collides = false;
 			}
 			break;
 		case ENDER_CHEST:
 			if (y > (15.0 / 16.0)
-			    || x > (15.0 / 16.0) || x < ((1.0) / 16.0)
+			    || x > (15.0 / 16.0) || x < (1.0 / 16.0)
 			    || z > (15.0 / 16.0) || z < (1.0 / 16.0)) {
 				collides = false;
 			}

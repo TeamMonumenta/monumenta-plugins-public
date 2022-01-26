@@ -80,7 +80,7 @@ public class SpellAxtalTntThrow extends Spell {
 						Location pLoc = target.getLocation();
 						Location tLoc = tnt.getLocation();
 						Vector vect = new Vector(pLoc.getX() - tLoc.getX(), 0, pLoc.getZ() - tLoc.getZ());
-						vect.normalize().multiply((pLoc.distance(tLoc)) / 20).setY(0.7f);
+						vect.normalize().multiply(pLoc.distance(tLoc) / 20).setY(0.7f);
 						tnt.setVelocity(vect);
 					} catch (Exception e) {
 						mPlugin.getLogger().warning("Summoned TNT but could not find TNT entity");

@@ -21,7 +21,7 @@ public class SpellActions {
 	//Not technically a spell - just putting the repeated actions in a seperate class
 	public static SpellPlayerAction getTooLowAction(LivingEntity boss, Location center) {
 		return new SpellPlayerAction(boss, 50, (player, tick) -> {
-			if (player.getLocation().getBlock().isLiquid() || player.getLocation().getBlockY() <= center.getY() - 3 && tick % 20 == 0) {
+			if (player.getLocation().getBlock().isLiquid() || (player.getLocation().getBlockY() <= center.getY() - 3 && tick % 20 == 0)) {
 				Vector velocity = player.getVelocity();
 				BossUtils.bossDamagePercent(boss, player, 0.025);
 				player.setVelocity(velocity);

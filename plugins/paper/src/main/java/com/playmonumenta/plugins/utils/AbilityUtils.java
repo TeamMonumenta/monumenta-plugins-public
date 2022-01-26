@@ -219,8 +219,6 @@ public class AbilityUtils {
 	/**
 	 * Refunds the shot arrow if possible
 	 *
-	 * @param player
-	 * @param arrow
 	 * @return Whether the arrow was refunded or not
 	 */
 	public static boolean refundArrow(Player player, AbstractArrow arrow) {

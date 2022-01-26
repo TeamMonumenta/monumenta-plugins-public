@@ -47,7 +47,7 @@ public class Skirmisher extends Ability {
 			Location loc = enemy.getLocation();
 
 			if (EntityUtils.getNearbyMobs(loc, SKIRMISHER_FRIENDLY_RADIUS, enemy).size() >= MOB_COUNT_CUTOFF
-					|| getAbilityScore() > 1 && enemy instanceof Mob mob && !mPlayer.equals(mob.getTarget())) {
+					|| (getAbilityScore() > 1 && enemy instanceof Mob mob && !mPlayer.equals(mob.getTarget()))) {
 				World world = mPlayer.getWorld();
 				world.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1f, 1.5f);
 				world.playSound(loc, Sound.BLOCK_IRON_TRAPDOOR_CLOSE, 1, 0.5f);

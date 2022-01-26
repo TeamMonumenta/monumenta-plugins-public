@@ -20,8 +20,8 @@ public class FastUtils {
 		SIN_MASK = ~(-1 << SIN_BITS);
 		SIN_COUNT = SIN_MASK + 1;
 
-		radFull = (Math.PI * 2.0);
-		degFull = (360.0);
+		radFull = Math.PI * 2.0;
+		degFull = 360.0;
 		radToIndex = SIN_COUNT / radFull;
 		degToIndex = SIN_COUNT / degFull;
 

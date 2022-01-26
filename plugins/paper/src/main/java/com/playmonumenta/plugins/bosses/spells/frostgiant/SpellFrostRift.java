@@ -106,7 +106,7 @@ public class SpellFrostRift extends Spell {
 			@Override
 			public void run() {
 				mT += 2;
-				mPitch += 0.025;
+				mPitch += 0.025f;
 
 				for (Location p : locs) {
 					Vector line = LocationUtils.getDirectionTo(p, mLoc).setY(0);

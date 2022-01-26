@@ -10,9 +10,9 @@ public class ExperienceUtils {
 		if (level >= 0 && level <= 15) {
 			xp = (int) Math.round(Math.pow(level, 2) + 6 * level);
 		} else if (level > 15 && level <= 30) {
-			xp = (int) Math.round((2.5 * Math.pow(level, 2) - 40.5 * level + 360));
+			xp = (int) Math.round(2.5 * Math.pow(level, 2) - 40.5 * level + 360);
 		} else if (level > 30) {
-			xp = (int) Math.round(((4.5 * Math.pow(level, 2) - 162.5 * level + 2220)));
+			xp = (int) Math.round(4.5 * Math.pow(level, 2) - 162.5 * level + 2220);
 		}
 		return xp;
 	}

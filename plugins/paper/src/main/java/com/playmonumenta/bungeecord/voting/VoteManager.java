@@ -1,6 +1,7 @@
 package com.playmonumenta.bungeecord.voting;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.util.HashMap;
 import java.util.List;
@@ -90,7 +91,7 @@ public class VoteManager implements Listener {
 		try {
 			VoteContext context = VoteContext.load(mPlugin, uuid);
 			/* Tick the task to make sure times are current */
-			long currentTime = LocalDateTime.now().toInstant(ZoneOffset.UTC).getEpochSecond();
+			long currentTime = LocalDateTime.now(ZoneId.systemDefault()).toInstant(ZoneOffset.UTC).getEpochSecond();
 			context.tick(currentTime);
 
 			/* Tell the player their vote info and remind them about voting */
@@ -178,7 +179,7 @@ public class VoteManager implements Listener {
 	}
 
 	private void tick() {
-		long currentTime = LocalDateTime.now().toInstant(ZoneOffset.UTC).getEpochSecond();
+		long currentTime = LocalDateTime.now(ZoneId.systemDefault()).toInstant(ZoneOffset.UTC).getEpochSecond();
 
 		for (ProxiedPlayer player : mPlugin.getProxy().getPlayers()) {
 			VoteContext context = mContexts.get(player.getUniqueId());

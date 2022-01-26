@@ -80,7 +80,11 @@ public class LuckPermsIntegration {
 		new BukkitRunnable() {
 			@Override
 			public void run() {
-				GM.saveGroup(group);
+				GM.saveGroup(group).whenComplete((unused, ex) -> {
+					if (ex != null) {
+						ex.printStackTrace();
+					}
+				});
 				pushUpdate();
 			}
 		}.runTaskAsynchronously(plugin);

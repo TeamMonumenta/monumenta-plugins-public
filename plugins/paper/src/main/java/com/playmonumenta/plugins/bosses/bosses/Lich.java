@@ -271,7 +271,7 @@ public final class Lich extends BossAbilityGroup {
 				}
 
 				// key death
-				if (mKey == null || (mKey.isDead() || !mKey.isValid()) && mKeyDead == false) {
+				if (mKey == null || ((mKey.isDead() || !mKey.isValid()) && mKeyDead == false)) {
 					mKeyDead = true;
 					List<Player> players = playersInRange(mBoss.getLocation(), detectionRange, true);
 					List<Player> shadowed = SpellDimensionDoor.getShadowed();

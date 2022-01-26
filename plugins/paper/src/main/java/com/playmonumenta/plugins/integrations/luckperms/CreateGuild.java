@@ -116,11 +116,23 @@ public class CreateGuild {
 				for (Player founder : founders) {
 					User user = LuckPermsIntegration.UM.getUser(founder.getUniqueId());
 					user.data().add(InheritanceNode.builder(group).build());
-					LuckPermsIntegration.UM.saveUser(user);
+					LuckPermsIntegration.UM.saveUser(user).whenComplete((unused, ex) -> {
+						if (ex != null) {
+							ex.printStackTrace();
+						}
+					});
 				}
-				LuckPermsIntegration.GM.saveGroup(group);
+				LuckPermsIntegration.GM.saveGroup(group).whenComplete((unused, ex) -> {
+					if (ex != null) {
+						ex.printStackTrace();
+					}
+				});
 				LuckPermsIntegration.pushUpdate();
 			}, executor
-		);
+		).whenComplete((unused, ex) -> {
+			if (ex != null) {
+				ex.printStackTrace();
+			}
+		});
 	}
 }

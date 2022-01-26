@@ -160,7 +160,7 @@ public class SpellGreatswordSlam extends Spell {
 										l.add(0, -1, 0);
 									}
 									//Once it leaves the arena, stop iterating
-									if (l.getBlock().getRelative(BlockFace.UP).getType() == Material.AIR && l.getBlock().getRelative(BlockFace.DOWN).getType() == Material.AIR
+									if ((l.getBlock().getRelative(BlockFace.UP).getType() == Material.AIR && l.getBlock().getRelative(BlockFace.DOWN).getType() == Material.AIR)
 											|| l.distance(mStartLoc) > FrostGiant.fighterRange) {
 										continue;
 									}

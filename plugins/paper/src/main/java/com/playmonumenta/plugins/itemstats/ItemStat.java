@@ -47,7 +47,7 @@ public interface ItemStat {
 	/**
 	 * Runs action every 5 ticks.
 	 *
-	 * @param plugin
+	 * @param plugin   monumenta plugin
 	 * @param player   the Player running the action
 	 * @param value    the value of ItemStat possessed by the Player
 	 * @param twoHz true every 10 ticks
@@ -60,7 +60,7 @@ public interface ItemStat {
 	/**
 	 * Player dealt damage (including Projectiles) to a LivingEntity.
 	 *
-	 * @param plugin
+	 * @param plugin monumenta plugin
 	 * @param player the Player damaging the LivingEntity
 	 * @param value  the value of ItemStat possessed by the Player
 	 * @param event  the associated DamageEvent
@@ -75,7 +75,7 @@ public interface ItemStat {
 	 * <br>
 	 * Only use one of onHurt(), onHurtByEntity(), onHurtByEntityWithSource() in a given class.
 	 *
-	 * @param plugin
+	 * @param plugin  monumenta plugin
 	 * @param player  the Player receiving damage
 	 * @param value   the value of ItemStat possessed by the Player
 	 * @param event   the associated DamageEvent
@@ -89,7 +89,7 @@ public interface ItemStat {
 	 * <br>
 	 * Only use one of onHurt(), onHurtByEntity(), onHurtByEntityWithSource() in a given class.
 	 *
-	 * @param plugin
+	 * @param plugin  monumenta plugin
 	 * @param player  the Player receiving damage
 	 * @param value   the value of ItemStat possessed by the Player
 	 * @param event   the associated DamageEvent
@@ -104,7 +104,7 @@ public interface ItemStat {
 	 * <br>
 	 * Only use one of onHurt(), onHurtByEntity(), onHurtByEntityWithSource() in a given class.
 	 *
-	 * @param plugin
+	 * @param plugin  monumenta plugin
 	 * @param player  the Player receiving damage
 	 * @param value   the value of ItemStat possessed by the Player
 	 * @param event   the associated DamageEvent
@@ -121,7 +121,7 @@ public interface ItemStat {
 	 * <br>
 	 * This is called in addition to onHurt() and related methods.
 	 *
-	 * @param plugin
+	 * @param plugin  monumenta plugin
 	 * @param player  the Player receiving damage
 	 * @param value   the value of ItemStat possessed by the Player
 	 * @param event   the associated DamageEvent
@@ -133,7 +133,7 @@ public interface ItemStat {
 	// TODO: convert everything in CrossbowListener over to the custom enchants system
 	/**
 	 * Player launched a Projectile (e.g. arrow, potion).
-	 * @param plugin
+	 * @param plugin     monumenta plugin
 	 * @param player     the Player launching Projectile
 	 * @param value      the value of ItemStat possessed by the Player
 	 * @param event      the associated ProjectileLaunchEvent
@@ -146,7 +146,7 @@ public interface ItemStat {
 	/**
 	 * Player killed a hostile LivingEntity.
 	 *
-	 * @param plugin
+	 * @param plugin monumenta plugin
 	 * @param player the Player killing LivingEntity
 	 * @param value  the value of ItemStat possessed by the Player
 	 * @param event  the associated EntityDeathEvent
@@ -159,7 +159,7 @@ public interface ItemStat {
 	/**
 	 * Player broke a block.
 	 *
-	 * @param plugin
+	 * @param plugin monumenta plugin
 	 * @param player the Player breaking a block
 	 * @param value  the value of ItemStat possessed by the Player
 	 * @param event  the associated BlockBreakEvent
@@ -173,7 +173,7 @@ public interface ItemStat {
 	 * <br>
 	 * May be called twice, once for each hand. Event may start in cancelled state if the vanilla behavior is to do nothing (e.g. interacting with air).
 	 *
-	 * @param plugin
+	 * @param plugin monumenta plugin
 	 * @param player the Player interacting
 	 * @param value  the value of ItemStat possessed by the Player
 	 * @param event  the associated PlayerInteractEvent
@@ -185,7 +185,7 @@ public interface ItemStat {
 	/**
 	 * Player consumed food item or potion.
 	 *
-	 * @param plugin
+	 * @param plugin monumenta plugin
 	 * @param player the Player consuming
 	 * @param value  the value of ItemStat possessed by the Player
 	 * @param event  the associated PlayerItemConsumeEvent
@@ -197,7 +197,7 @@ public interface ItemStat {
 	/**
 	 * Player regained health.
 	 *
-	 * @param plugin
+	 * @param plugin monumenta plugin
 	 * @param player the Player regaining health
 	 * @param value  the value of ItemStat possessed by the Player
 	 * @param event  the associated EntityRegainHealthEvent
@@ -209,7 +209,7 @@ public interface ItemStat {
 	/**
 	 * Player took durability damage.
 	 *
-	 * @param plugin
+	 * @param plugin monumenta plugin
 	 * @param player the Player taking durability damage
 	 * @param value  the value of ItemStat possessed by the Player
 	 * @param event  the associated PlayerItemDamageEvent
@@ -221,7 +221,7 @@ public interface ItemStat {
 	/**
 	 * Player gained or lost experience.
 	 *
-	 * @param plugin
+	 * @param plugin monumenta plugin
 	 * @param player the Player changing experience
 	 * @param value  the value of ItemStat possessed by the Player
 	 * @param event  the associated PlayerExpChangeEvent
@@ -235,7 +235,7 @@ public interface ItemStat {
 	 * gets updates triggered by events,
 	 * regardless of this enchant's involvement.
 	 *
-	 * @param plugin
+	 * @param plugin monumenta plugin
 	 * @param player the Player changing equipment
 	 * @param value  the value of ItemStat possessed by the Player
 	 */
@@ -247,7 +247,7 @@ public interface ItemStat {
 	 * Called whenever the player dies a non-safe death
 	 * i.e. a grave was formed and exp was dropped
 	 *
-	 * @param plugin
+	 * @param plugin  monumenta plugin
 	 * @param player  the Player who died
 	 * @param value   the value of ItemStat possessed by the Player
 	 * @param event   the associated PlayerDeathEvent
@@ -259,7 +259,7 @@ public interface ItemStat {
 	/**
 	 * Called whenever an item spawns or is loaded into an existing chunk.
 	 *
-	 * @param plugin
+	 * @param plugin  monumenta plugin
 	 * @param item    the Item spawned
 	 * @param value   the value of ItemStat possessed by the Item
 	 */

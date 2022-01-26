@@ -181,7 +181,7 @@ public class SpellTitanicRupture extends Spell {
 				if (mT % 10 == 0) {
 					world.playSound(loc, Sound.ENTITY_WITHER_SHOOT, SoundCategory.HOSTILE, 2, mPitch);
 				}
-				mPitch += 0.05;
+				mPitch += 0.05f;
 
 				for (double deg = 0; deg < 360; deg += (1 * 10)) {
 					if (FastUtils.RANDOM.nextDouble() > 0.4) {

@@ -364,7 +364,7 @@ public class EntityTargets {
 				@Override
 				public <V extends Entity> void sort(Location loc, List<V> list) {
 					Collections.sort(list, (e1, e2) -> {
-						return (int) (loc.distance(((Entity)e1).getLocation()) - loc.distance(((Entity)e2).getLocation())) * -1;
+						return (int) ((loc.distance(((Entity)e1).getLocation()) - loc.distance(((Entity)e2).getLocation())) * -1);
 					});
 				}
 			},
@@ -384,7 +384,7 @@ public class EntityTargets {
 				public <V extends Entity> void sort(Location loc, List<V> list) {
 					Collections.sort(list, (e1, e2) -> {
 						if (e1 instanceof LivingEntity && e2 instanceof LivingEntity) {
-							return (int) (((LivingEntity)e1).getHealth() - ((LivingEntity)e2).getHealth()) * -1;
+							return (int) ((((LivingEntity)e1).getHealth() - ((LivingEntity)e2).getHealth()) * -1);
 						}
 						return 0;
 					});

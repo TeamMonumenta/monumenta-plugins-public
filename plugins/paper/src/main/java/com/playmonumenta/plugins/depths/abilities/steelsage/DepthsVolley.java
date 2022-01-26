@@ -65,7 +65,7 @@ public class DepthsVolley extends DepthsAbility {
 		world.playSound(mPlayer.getLocation(), Sound.ENTITY_ARROW_SHOOT, 1, 1f);
 		world.playSound(mPlayer.getLocation(), Sound.ENTITY_ARROW_SHOOT, 1, 1.33f);
 
-		float arrowSpeed = (float) (arrow.getVelocity().length());
+		float arrowSpeed = (float) arrow.getVelocity().length();
 		// Give time for other skills to set data
 		new BukkitRunnable() {
 			@Override

@@ -858,7 +858,7 @@ public class PlayerListener implements Listener {
 				@Override
 				public void run() {
 					player.playSound(player.getLocation(), Sound.ENTITY_HORSE_DEATH, SoundCategory.MASTER, 1, mFreq);
-					mFreq += 0.05;
+					mFreq += 0.05f;
 					if (mFreq > 1.5) {
 						this.cancel();
 					}
@@ -1127,7 +1127,7 @@ public class PlayerListener implements Listener {
 	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
 	public void inventoryCreativeEvent(InventoryCreativeEvent event) {
 		// The inventory update initiated above takes a while, during which the Firmament can be broken anyway, so need to watch for these events as well
-		if (event.getCurrentItem() != null && VirtualFirmamentReplacer.isVirtualFirmament(event.getCurrentItem())
+		if ((event.getCurrentItem() != null && VirtualFirmamentReplacer.isVirtualFirmament(event.getCurrentItem()))
 			    || VirtualFirmamentReplacer.isVirtualFirmament(event.getCursor())) {
 			event.setCancelled(true);
 		}

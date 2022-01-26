@@ -283,7 +283,7 @@ public class EntityListener implements Listener {
 		DamageCause source = event.getCause();
 
 		if ((source == DamageCause.BLOCK_EXPLOSION || source == DamageCause.ENTITY_EXPLOSION) &&
-			(damagee.getScoreboardTags().contains("ExplosionImmune") || damagee instanceof ItemFrame) || damagee instanceof Painting) {
+			(damagee.getScoreboardTags().contains("ExplosionImmune") || damagee instanceof ItemFrame || damagee instanceof Painting)) {
 			event.setCancelled(true);
 			return;
 		}
@@ -415,8 +415,8 @@ public class EntityListener implements Listener {
 			ItemStack mainhand = player.getInventory().getItemInMainHand();
 			ItemStack offhand = player.getInventory().getItemInOffHand();
 			//If one hand has a shattered totem, do not resurrect
-			if (mainhand.getType() == Material.TOTEM_OF_UNDYING && ItemStatUtils.isShattered(mainhand) ||
-				offhand.getType() == Material.TOTEM_OF_UNDYING && ItemStatUtils.isShattered(offhand)) {
+			if ((mainhand.getType() == Material.TOTEM_OF_UNDYING && ItemStatUtils.isShattered(mainhand)) ||
+				(offhand.getType() == Material.TOTEM_OF_UNDYING && ItemStatUtils.isShattered(offhand))) {
 				event.setCancelled(true);
 			}
 
@@ -556,7 +556,7 @@ public class EntityListener implements Listener {
 		affectedEntities.removeIf(entity -> (entity instanceof Villager));
 
 		// Don't apply effects to invulnerable entities
-		affectedEntities.removeIf(entity -> (entity.isInvulnerable()));
+		affectedEntities.removeIf(entity -> entity.isInvulnerable());
 
 		/* If a potion has negative effects, don't apply them to any players except the thrower (if applicable) */
 		if (source instanceof Player && PotionUtils.hasNegativeEffects(potion.getItem())) {
@@ -625,7 +625,7 @@ public class EntityListener implements Listener {
 		affectedEntities.removeIf(entity -> (entity instanceof Villager));
 
 		// Don't apply effects to invulnerable entities
-		affectedEntities.removeIf(entity -> (entity.isInvulnerable()));
+		affectedEntities.removeIf(entity -> entity.isInvulnerable());
 
 		// Don't apply effects to dead entities
 		affectedEntities.removeIf(entity -> (entity.isDead() || entity.getHealth() <= 0));
@@ -811,7 +811,7 @@ public class EntityListener implements Listener {
 		Entity entity = event.getEntity();
 		LivingEntity target = event.getTarget();
 
-		if (entity instanceof Creature && (EntityUtils.isStunned(entity))) {
+		if (entity instanceof Creature && EntityUtils.isStunned(entity)) {
 			event.setCancelled(true);
 			return;
 		}

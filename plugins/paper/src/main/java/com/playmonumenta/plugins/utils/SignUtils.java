@@ -27,7 +27,6 @@ public final class SignUtils {
 	private static final int ACTION_INDEX = 9;
 	private static final int SIGN_LINES = 4;
 
-	private static final String NBT_FORMAT = "{\"text\":\"%s\"}";
 	private static final String NBT_BLOCK_ID = "minecraft:oak_sign";
 
 	private final Plugin mPlugin;
@@ -132,7 +131,7 @@ public final class SignUtils {
 			NbtCompound signNBT = (NbtCompound) signData.getNbtModifier().read(0);
 
 			for (int line = 0; line < SIGN_LINES; line++) {
-				signNBT.put("Text" + (line + 1), this.mText.size() > line ? String.format(NBT_FORMAT, color(this.mText.get(line))) : "");
+				signNBT.put("Text" + (line + 1), this.mText.size() > line ? String.format("{\"text\":\"%s\"}", color(this.mText.get(line))) : "");
 			}
 
 			signNBT.put("x", this.mPosition.getX());

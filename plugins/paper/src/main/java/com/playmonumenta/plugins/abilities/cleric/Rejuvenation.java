@@ -52,7 +52,7 @@ public class Rejuvenation extends Ability {
 						double maxHealth = EntityUtils.getMaxHealth(player);
 						if (player.getHealth() != maxHealth) {
 							PlayerUtils.healPlayer(mPlugin, player, PERCENT_HEAL * maxHealth, mPlayer);
-							player.getWorld().spawnParticle(Particle.HEART, (player.getLocation()).add(0, 2, 0), 1, 0.07, 0.07, 0.07, 0.001);
+							player.getWorld().spawnParticle(Particle.HEART, player.getLocation().add(0, 2, 0), 1, 0.07, 0.07, 0.07, 0.001);
 						}
 					}
 				}

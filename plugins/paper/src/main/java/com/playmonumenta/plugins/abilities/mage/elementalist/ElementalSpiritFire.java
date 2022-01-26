@@ -159,7 +159,7 @@ public class ElementalSpiritFire extends Ability {
 								while (iterator.hasNext()) {
 									LivingEntity potentialTarget = iterator.next();
 									if (potentialTarget.getBoundingBox().overlaps(movingSpiritBox)) {
-										float finalDamage = spellDamage;
+										double finalDamage = spellDamage;
 										if (
 											ClassAbility.ELEMENTAL_ARROWS_FIRE.equals(event.getAbility())
 											&& mElementalArrows != null

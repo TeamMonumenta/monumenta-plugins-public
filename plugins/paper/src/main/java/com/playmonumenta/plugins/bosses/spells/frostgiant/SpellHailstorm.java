@@ -137,7 +137,7 @@ public class SpellHailstorm extends Spell {
 							}
 						}
 						mTicks += 2;
-						mPitch += 0.025;
+						mPitch += 0.025f;
 					}
 				};
 				runnable.runTaskTimer(mPlugin, 0, 2);

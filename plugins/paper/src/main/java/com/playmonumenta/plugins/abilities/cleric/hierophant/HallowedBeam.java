@@ -85,7 +85,7 @@ public class HallowedBeam extends MultipleChargeAbility {
 			return;
 		}
 		LivingEntity e = EntityUtils.getEntityAtCursor(mPlayer, CAST_RANGE, true, true, true);
-		if (e instanceof Player ePlayer && ePlayer.getGameMode() != GameMode.SPECTATOR || EntityUtils.isHostileMob(e)) {
+		if ((e instanceof Player ePlayer && ePlayer.getGameMode() != GameMode.SPECTATOR) || EntityUtils.isHostileMob(e)) {
 			Player player = mPlayer;
 
 			PlayerInventory inventory = mPlayer.getInventory();

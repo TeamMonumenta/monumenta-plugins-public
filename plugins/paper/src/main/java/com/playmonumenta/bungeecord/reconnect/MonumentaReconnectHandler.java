@@ -1,20 +1,25 @@
 package com.playmonumenta.bungeecord.reconnect;
 
-import net.md_5.bungee.api.ReconnectHandler;
 import java.io.File;
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.Reader;
+import java.io.Writer;
 import java.net.InetSocketAddress;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.logging.Level;
+
+import org.yaml.snakeyaml.Yaml;
+
 import net.md_5.bungee.api.ProxyServer;
+import net.md_5.bungee.api.ReconnectHandler;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
-import org.yaml.snakeyaml.Yaml;
 
 public class MonumentaReconnectHandler implements ReconnectHandler {
 
@@ -32,7 +37,7 @@ public class MonumentaReconnectHandler implements ReconnectHandler {
 
 		try {
 			file.createNewFile();
-			try (FileReader rd = new FileReader(file)) {
+			try (Reader rd = Files.newBufferedReader(file.toPath(), StandardCharsets.UTF_8)) {
 				Map<String, String> map = yaml.loadAs(rd, Map.class);
 				if (map != null) {
 					data = new HashMap<>(map);
@@ -124,7 +129,7 @@ public class MonumentaReconnectHandler implements ReconnectHandler {
 			lock.readLock().unlock();
 		}
 
-		try (FileWriter wr = new FileWriter(file)) {
+		try (Writer wr = Files.newBufferedWriter(file.toPath(), StandardCharsets.UTF_8)) {
 			yaml.dump(copy, wr);
 		} catch (IOException ex) {
 			ProxyServer.getInstance().getLogger().log(Level.WARNING, "Could not save reconnect locations", ex);

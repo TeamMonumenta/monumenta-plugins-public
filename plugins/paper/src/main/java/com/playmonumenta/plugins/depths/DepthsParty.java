@@ -33,10 +33,10 @@ import java.util.Map;
 import java.util.UUID;
 
 /**
- * @author ShadowVisions
- *
  * This class handles dynamic information about depths parties, including key information about the world like locations,
  * as well as run specific information including progress and events, and distribution of loot rooms.
+ *
+ * @author ShadowVisions
  */
 public class DepthsParty {
 	public static final int MAX_LOOT_ROOMS = 4;
@@ -94,7 +94,6 @@ public class DepthsParty {
 
 	/**
 	 * Creates a new depths party with the given players
-	 * @param players
 	 */
 	public DepthsParty(List<DepthsPlayer> players, Location loc) {
 		mPlayersInParty = players;
@@ -186,7 +185,6 @@ public class DepthsParty {
 	/**
 	 * This method is called when a member of a depths party breaks a spawner
 	 * If the spawner was the last they needed to clear the room, a reward chest is spawned
-	 * @param l
 	 */
 	public void partyBrokeSpawner(Location l) {
 

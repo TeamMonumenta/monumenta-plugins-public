@@ -1,9 +1,11 @@
 package com.playmonumenta.bungeecord.listeners;
 
 import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
+import java.io.Reader;
+import java.io.Writer;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -14,6 +16,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.annotation.Nullable;
+
 import org.yaml.snakeyaml.Yaml;
 
 import net.md_5.bungee.api.connection.ProxiedPlayer;
@@ -47,7 +50,7 @@ public class NameListener implements Listener {
 
 		try {
 			file.createNewFile();
-			try (FileReader rd = new FileReader(file)) {
+			try (Reader rd = Files.newBufferedReader(file.toPath(), StandardCharsets.UTF_8)) {
 				Map<String, String> map = mYaml.loadAs(rd, Map.class);
 				if (map != null) {
 					uuid2name.putAll(map);
@@ -148,7 +151,7 @@ public class NameListener implements Listener {
 			lock.readLock().unlock();
 		}
 
-		try (FileWriter wr = new FileWriter(file)) {
+		try (Writer wr = Files.newBufferedWriter(file.toPath(), StandardCharsets.UTF_8)) {
 			mYaml.dump(copy, wr);
 			logger.info("Successfully saved uuid2name mappings");
 		} catch (IOException ex) {

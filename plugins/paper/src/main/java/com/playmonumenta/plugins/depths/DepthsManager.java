@@ -124,11 +124,13 @@ import java.util.UUID;
 import java.util.logging.Logger;
 
 /**
- * @author ShadowVisions
  * This is the main brain of the depths plugin, responsible for handling all interactions from
- * depths commands, events, player and party interaction. Anything from the playable world to the plugin
- * goes through here and is then delegated to other classes in the main package.
+ * depths commands, events, player and party interaction.
  *
+ * Anything from the playable world to the plugin goes through here and is then delegated to
+ * other classes in the main package.
+ *
+ * @author ShadowVisions
  */
 public class DepthsManager {
 

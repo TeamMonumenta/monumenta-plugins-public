@@ -115,7 +115,7 @@ public class ElementalSpiritIce extends Ability {
 								public void run() {
 									// Damage actions
 									for (LivingEntity mob : EntityUtils.getNearbyMobs(centre, SIZE)) {
-										float finalDamage = spellDamage;
+										double finalDamage = spellDamage;
 										if (
 											ClassAbility.ELEMENTAL_ARROWS_ICE.equals(event.getAbility())
 											&& mElementalArrows != null

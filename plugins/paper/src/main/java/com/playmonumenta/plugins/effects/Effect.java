@@ -87,6 +87,8 @@ public abstract class Effect implements Comparable<Effect> {
 	}
 
 	/**
+	 * Ticks the effect, called regularly
+	 *
 	 * @param ticks Ticks passed since the last time this method was called to check duration expiry
 	 * @return Returns true if effect has expired and should be removed by the EffectManager
 	 */

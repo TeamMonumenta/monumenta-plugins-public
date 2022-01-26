@@ -86,7 +86,9 @@ public class SpellSummonConstantly extends Spell {
 					}
 
 					// Blocks above summon-on block must be not solid
-					if (loc.add(0, 1, 0).getBlock().getType().isSolid() || loc.add(0, 1, 0).getBlock().getType().isSolid()) {
+					boolean blockAboveSolid = loc.add(0, 1, 0).getBlock().getType().isSolid();
+					boolean blockTwoAboveSolid = loc.add(0, 1, 0).getBlock().getType().isSolid();
+					if (blockAboveSolid || blockTwoAboveSolid) {
 						continue;
 					}
 

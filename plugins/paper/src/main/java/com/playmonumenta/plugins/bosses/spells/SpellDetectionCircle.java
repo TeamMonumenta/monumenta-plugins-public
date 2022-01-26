@@ -59,7 +59,7 @@ public class SpellDetectionCircle extends Spell {
 
 			@Override
 			public void run() {
-				int n = FastUtils.RANDOM.nextInt(40) + 50 + (int)mRadius * 4;
+				int n = FastUtils.RANDOM.nextInt(40) + 50 + (int)(mRadius * 4);
 				double precision = n;
 				double increment = (2 * Math.PI) / precision;
 				Location particleLoc = new Location(mCenter.getWorld(), 0, mCenter.getY() + 5, 0);
@@ -68,7 +68,7 @@ public class SpellDetectionCircle extends Spell {
 					angle = (double)j * increment;
 					particleLoc.setX(mCenter.getX() + (mRadius * FastUtils.cos(angle)));
 					particleLoc.setZ(mCenter.getZ() + (mRadius * FastUtils.sin(angle)));
-					particleLoc.setY(mCenter.getY() + 5 * (double)(FastUtils.RANDOM.nextInt(120) - 60) / (60));
+					particleLoc.setY(mCenter.getY() + 5 * (double)(FastUtils.RANDOM.nextInt(120) - 60) / 60);
 					particleLoc.getWorld().spawnParticle(Particle.SMOKE_LARGE, particleLoc, 1, 0.02, 0.02, 0.02, 0);
 				}
 

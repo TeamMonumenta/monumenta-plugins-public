@@ -35,7 +35,7 @@ public class UnbreakableOnBedrockOverride extends BaseOverride {
 		if (blockUnder != null && (
 		        blockUnder.getType() == Material.BEDROCK ||
 		        blockUnder.getType() == Material.BARRIER
-		    ) && !(ZoneUtils.isInPlot(block.getLocation()))) {
+		    ) && !ZoneUtils.isInPlot(block.getLocation())) {
 			return false;
 		}
 

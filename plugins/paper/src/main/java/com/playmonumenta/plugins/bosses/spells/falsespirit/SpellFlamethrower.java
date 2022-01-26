@@ -66,7 +66,7 @@ public class SpellFlamethrower extends Spell {
 			private int mTicks = 0;
 			@Override
 			public void run() {
-				if ((!mDelve && mTicks % 6 == 0 || mDelve && mTicks % 4 == 0) && mLoc.distance(target.getEyeLocation()) > 0.5) {
+				if (((!mDelve && mTicks % 6 == 0) || (mDelve && mTicks % 4 == 0)) && mLoc.distance(target.getEyeLocation()) > 0.5) {
 					mLoc.add(target.getEyeLocation().toVector().subtract(mLoc.toVector()).normalize());
 				}
 
@@ -116,7 +116,7 @@ public class SpellFlamethrower extends Spell {
 				if (!blocked) {
 					// Really check to make sure it's not blocked
 					// This takes into account block shapes!
-					blocked = !(LocationUtils.hasLineOfSight(launLoc, tarLoc));
+					blocked = !LocationUtils.hasLineOfSight(launLoc, tarLoc);
 				}
 
 				target.playSound(target.getLocation(), Sound.ENTITY_SHULKER_BULLET_HIT, SoundCategory.HOSTILE, 0.8f, 0.5f + (mTicks / 80f) * 1.5f);
@@ -145,7 +145,7 @@ public class SpellFlamethrower extends Spell {
 								mActiveRunnables.remove(this);
 							}
 
-							if ((!mDelve && mT % 6 == 0 || mDelve && mT % 4 == 0) && mLoc.distance(target.getEyeLocation()) > 0.5) {
+							if (((!mDelve && mT % 6 == 0) || (mDelve && mT % 4 == 0)) && mLoc.distance(target.getEyeLocation()) > 0.5) {
 								mLoc.add(target.getEyeLocation().toVector().subtract(mLoc.toVector()).normalize());
 							}
 
@@ -215,7 +215,7 @@ public class SpellFlamethrower extends Spell {
 							if (!blocked) {
 								// Really check to make sure it's not blocked
 								// This takes into account block shapes!
-								blocked = !(LocationUtils.hasLineOfSight(launLoc, tarLoc));
+								blocked = !LocationUtils.hasLineOfSight(launLoc, tarLoc);
 							}
 
 							mFireLoc++;

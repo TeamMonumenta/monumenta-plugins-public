@@ -111,7 +111,7 @@ public class StringReader {
 		// so it works even when keys are entirely contained within other keys
 		// For example "damage" and "damagepercent". Need to match the longer one first if possible
 		List<String> sortedCopy = new ArrayList<>(validItems);
-		Collections.sort(sortedCopy, (a, b) -> (Integer.compare(b.length(), a.length())));
+		Collections.sort(sortedCopy, (a, b) -> Integer.compare(b.length(), a.length()));
 		for (String item : sortedCopy) {
 			if (remain.startsWith(item)) {
 				advance(item.length());

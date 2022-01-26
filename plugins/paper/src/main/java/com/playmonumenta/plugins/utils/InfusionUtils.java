@@ -80,7 +80,7 @@ public class InfusionUtils {
 		int infuseLevel = getInfuseLevel(item) - 1;
 		int costMult = getCostMultiplierWithCheck(item);
 		while (infuseLevel >= 0) {
-			refundMaterials += (costMult * Math.pow(2, infuseLevel));
+			refundMaterials += (costMult * (int)Math.pow(2, infuseLevel));
 			infuseLevel--;
 		}
 
@@ -109,16 +109,16 @@ public class InfusionUtils {
 			case PATRON:
 				switch (level) {
 					case 1:
-						refundXP = (1395);
+						refundXP = 1395;
 						break;
 					case 2:
-						refundXP = (1395 + 2920);
+						refundXP = 1395 + 2920;
 						break;
 					case 3:
-						refundXP = (1395 + 2920 + 5345);
+						refundXP = 1395 + 2920 + 5345;
 						break;
 					case 4:
-						refundXP = (1395 + 2920 + 5345 + 8670);
+						refundXP = 1395 + 2920 + 5345 + 8670;
 						break;
 					default:
 					case 0:
@@ -128,16 +128,16 @@ public class InfusionUtils {
 			case ARTIFACT:
 				switch (level) {
 					case 1:
-						refundXP = (2920);
+						refundXP = 2920;
 						break;
 					case 2:
-						refundXP = (2920 + 5345);
+						refundXP = 2920 + 5345;
 						break;
 					case 3:
-						refundXP = (2920 + 5345 + 8670);
+						refundXP = 2920 + 5345 + 8670;
 						break;
 					case 4:
-						refundXP = (2920 + 5345 + 8670 + 12895);
+						refundXP = 2920 + 5345 + 8670 + 12895;
 						break;
 					default:
 					case 0:
@@ -147,16 +147,16 @@ public class InfusionUtils {
 			case EPIC:
 				switch (level) {
 					case 1:
-						refundXP = (5345);
+						refundXP = 5345;
 						break;
 					case 2:
-						refundXP = (5345 + 8670);
+						refundXP = 5345 + 8670;
 						break;
 					case 3:
-						refundXP = (5345 + 8670 + 12895);
+						refundXP = 5345 + 8670 + 12895;
 						break;
 					case 4:
-						refundXP = (5345 + 8670 + 12895 + 18020);
+						refundXP = 5345 + 8670 + 12895 + 18020;
 						break;
 					default:
 					case 0:
@@ -223,7 +223,7 @@ public class InfusionUtils {
 		if (infuseLvl == -1) {
 			cost = 0;
 		} else if (infuseLvl <= 2) {
-			cost *= Math.pow(2, infuseLvl);
+			cost *= (int)Math.pow(2, infuseLvl);
 		} else {
 			cost = 99999999;
 			CommandAPI.fail("Items may only be infused 4 times!");

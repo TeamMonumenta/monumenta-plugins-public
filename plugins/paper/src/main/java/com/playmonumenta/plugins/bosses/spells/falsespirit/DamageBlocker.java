@@ -69,8 +69,8 @@ public class DamageBlocker extends Spell {
 						Arrow projec = (Arrow) proj;
 						((Arrow) deflected).setCritical(((Arrow) proj).isCritical());
 						if (projec.getBasePotionData() != null) {
-							arrow.setBasePotionData((projec).getBasePotionData());
-							for (PotionEffect effect : (projec).getCustomEffects()) {
+							arrow.setBasePotionData(projec.getBasePotionData());
+							for (PotionEffect effect : projec.getCustomEffects()) {
 								arrow.addCustomEffect(effect, true);
 							}
 						}

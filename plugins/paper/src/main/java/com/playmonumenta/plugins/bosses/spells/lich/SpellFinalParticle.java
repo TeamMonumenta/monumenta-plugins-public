@@ -60,7 +60,7 @@ public class SpellFinalParticle extends Spell {
 		//smoke ring particle
 		if (mPTick) {
 			mPTick = false;
-			for (int j = 0; j < 20; j += 1.5) {
+			for (double j = 0; j < 20; j += 1.5) {
 				mIndicator.location(mCenter.clone().add(0, j, 0)).spawnAsBoss();
 			}
 		} else {

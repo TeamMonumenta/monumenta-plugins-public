@@ -66,7 +66,7 @@ public class ClericPassive extends Ability {
 						if (hp <= HEALTH_LIMIT) {
 							PlayerUtils.healPlayer(mPlugin, player, healPercent * maxHealth, mPlayer);
 							int numHearts = (int) (healPercent * 20);
-							player.getWorld().spawnParticle(Particle.HEART, (player.getLocation()).add(0, 2, 0), numHearts, 0.07, 0.07, 0.07, 0.001);
+							player.getWorld().spawnParticle(Particle.HEART, player.getLocation().add(0, 2, 0), numHearts, 0.07, 0.07, 0.07, 0.001);
 						}
 					}
 				}

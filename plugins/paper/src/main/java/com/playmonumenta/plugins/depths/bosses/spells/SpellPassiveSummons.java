@@ -105,7 +105,7 @@ public class SpellPassiveSummons extends Spell {
 						new BukkitRunnable() {
 							int mT = 0;
 							Location mPLoc = scLoc;
-							double mYInc = 1.6 / ((mSummonTime));
+							double mYInc = 1.6 / mSummonTime;
 							boolean mRaised = false;
 							@Override
 							public void run() {

@@ -7,6 +7,7 @@ public class Aesthetics extends Effect {
 	@FunctionalInterface
 	public interface TickEffectAction {
 		/**
+		 * Ticking effects on the entity
 		 * @param entity    the entity with the effect
 		 * @param fourHertz true every 5 ticks
 		 * @param twoHertz  true every 10 ticks
@@ -18,7 +19,7 @@ public class Aesthetics extends Effect {
 	@FunctionalInterface
 	public interface LoseEffectAction {
 		/**
-		 * @param entity the entity losing the effect
+		 * Run when the entity loses the effect
 		 */
 		void run(Entity entity);
 	}

@@ -219,7 +219,7 @@ public class OrinCustomInventory extends CustomInventory {
 			player.closeInventory();
 		} else if (cmd.startsWith("instancebot")) {
 			String searchTerm = cmd.split(" ")[1];
-			mCurrentPage = (searchTerm.equals("valley")) ? 11 : 12;
+			mCurrentPage = searchTerm.equals("valley") ? 11 : 12;
 			setLayout(player);
 		} else if (cmd.equals("back")) {
 			if (mCurrentShard.contains("valley")) {
@@ -316,8 +316,8 @@ public class OrinCustomInventory extends CustomInventory {
 			return;
 		}
 		results.removeIf(item -> !item.startsWith(searchTerm));
-		int page = (searchTerm.equals("valley")) ? 11 : 12;
-		Material itemType = (searchTerm.equals("valley")) ? Material.GRASS : Material.PUFFERFISH;
+		int page = searchTerm.equals("valley") ? 11 : 12;
+		Material itemType = searchTerm.equals("valley") ? Material.GRASS : Material.PUFFERFISH;
 		ArrayList<String> resultList = new ArrayList<>(results);
 		Collections.sort(resultList);
 		for (String shard : resultList) {

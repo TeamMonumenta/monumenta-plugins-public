@@ -3,6 +3,7 @@ package com.playmonumenta.bungeecord.voting;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -260,7 +261,7 @@ public class VoteContext {
 				builder.append(displaySite).color(ChatColor.GREEN);
 			} else {
 				/* Still on cooldown */
-				long currentTime = LocalDateTime.now().toInstant(ZoneOffset.UTC).getEpochSecond();
+				long currentTime = LocalDateTime.now(ZoneId.systemDefault()).toInstant(ZoneOffset.UTC).getEpochSecond();
 				long totalSecondsLeft = offCooldownTime - currentTime;
 
 				builder.append(displaySite + ": " + timeDeltaStr(totalSecondsLeft)).color(ChatColor.RED);
@@ -328,14 +329,14 @@ public class VoteContext {
 		mVotesUnclaimed++;
 		mRaffleEntries++;
 
-		long currentTime = LocalDateTime.now().toInstant(ZoneOffset.UTC).getEpochSecond();
+		long currentTime = LocalDateTime.now(ZoneId.systemDefault()).toInstant(ZoneOffset.UTC).getEpochSecond();
 		mOffCooldownTimes.put(matchingSite, currentTime + (cooldownMinutes * 60));
 
 		mLock.writeLock().unlock();
 
 		ProxiedPlayer player = mPlugin.getProxy().getPlayer(mUUID);
 		if (player != null) {
-			player.sendMessage((new ComponentBuilder("Thanks for voting at " + matchingSite + "!").color(ChatColor.GOLD)).create());
+			player.sendMessage(new ComponentBuilder("Thanks for voting at " + matchingSite + "!").color(ChatColor.GOLD).create());
 			sendVoteInfoShort(player);
 		}
 

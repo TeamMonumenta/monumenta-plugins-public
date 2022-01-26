@@ -231,7 +231,7 @@ public class SnowSpirit extends BossAbilityGroup {
 		teleport(mSpawnLoc);
 		World world = mBoss.getWorld();
 
-		(new ShiningStar(mBoss, mPlugin)).run();
+		new ShiningStar(mBoss, mPlugin).run();
 
 		event.setCancelled(true);
 		event.setReviveHealth(100);

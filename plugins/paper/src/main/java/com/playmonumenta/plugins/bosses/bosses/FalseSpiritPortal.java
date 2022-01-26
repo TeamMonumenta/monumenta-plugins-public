@@ -216,7 +216,7 @@ public class FalseSpiritPortal extends BossAbilityGroup {
 				//Scales with playercount to summon mobs
 				//No more than 15 mobs from one portal can be out at a time
 				//Custom spawn rate for delves, 50% faster for normal portals and 25% faster for the ceiling portal
-				if ((!mDelve && mTicks % (100 / mPlayerCount) == 0 || mDelve && mCeilingGate != null && mTicks % (80 / mPlayerCount) == 0 || mDelve && mCeilingGate == null && mTicks % (67 / mPlayerCount) == 0)
+				if (((!mDelve && mTicks % (100 / mPlayerCount) == 0) || (mDelve && mCeilingGate != null && mTicks % (80 / mPlayerCount) == 0) || (mDelve && mCeilingGate == null && mTicks % (67 / mPlayerCount) == 0))
 						&& mMobs.size() <= 15) {
 					ArmorStand as = mGates.get(FastUtils.RANDOM.nextInt(mGates.size()));
 					String mobName;
@@ -259,7 +259,7 @@ public class FalseSpiritPortal extends BossAbilityGroup {
 					}.runTaskLater(mPlugin, 20 * 60);
 				}
 
-				if (!mDelve && mMobsKilled >= 5 * mPlayerCount || mDelve && mMobsKilled >= 6 * mPlayerCount) {
+				if ((!mDelve && mMobsKilled >= 5 * mPlayerCount) || (mDelve && mMobsKilled >= 6 * mPlayerCount)) {
 					//Spawns trident and resets kills (to spawn trident again)
 
 

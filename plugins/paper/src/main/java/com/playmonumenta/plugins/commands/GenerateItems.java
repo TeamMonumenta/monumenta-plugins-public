@@ -1,23 +1,23 @@
 package com.playmonumenta.plugins.commands;
 
+import java.io.File;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import com.opencsv.CSVReader;
-import com.opencsv.exceptions.CsvValidationException;
 import com.playmonumenta.plugins.Plugin;
-import org.bukkit.ChatColor;
+import com.playmonumenta.scriptedquests.utils.MessagingUtils;
+
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.block.Chest;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 public class GenerateItems extends GenericCommand {
 	public static void register() {
@@ -30,18 +30,15 @@ public class GenerateItems extends GenericCommand {
 		}
 		List<List<String>> records = new ArrayList<List<String>>();
 
-		try (CSVReader csvReader = new CSVReader(new FileReader(Plugin.getInstance().getDataFolder() + File.separator + "item_rework_stats.csv"))) {
+		String path = Plugin.getInstance().getDataFolder() + File.separator + "item_rework_stats.csv";
+		try (CSVReader csvReader = new CSVReader(Files.newBufferedReader(Paths.get(path), StandardCharsets.UTF_8))) {
 			String[] values = null;
 			while ((values = csvReader.readNext()) != null) {
 				records.add(Arrays.asList(values));
 			}
-			csvReader.close();
-		} catch (FileNotFoundException fnfe) {
-			sender.sendMessage(ChatColor.RED + "FileNotFoundException");
-		} catch (IOException io) {
-			sender.sendMessage(ChatColor.RED + "IOException");
-		} catch (CsvValidationException csv) {
-			sender.sendMessage(ChatColor.RED + "CsvValidationException");
+		} catch (Exception ex) {
+			MessagingUtils.sendStackTrace(sender, ex);
+			ex.printStackTrace();
 		}
 		int itemCounter = 0;
 		int chestCounter = 0;

@@ -369,7 +369,7 @@ public class EntityUtils {
 			//  Make sure to only get living entities.
 			if (e instanceof LivingEntity) {
 				//  Make sure we should be targeting this entity.
-				if ((targetPlayers && (e instanceof Player)) || (targetNonPlayers && (!(e instanceof Player)))) {
+				if ((targetPlayers && (e instanceof Player)) || (targetNonPlayers && !(e instanceof Player))) {
 					entities.add((LivingEntity) e);
 				}
 			}

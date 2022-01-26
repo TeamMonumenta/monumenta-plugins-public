@@ -105,7 +105,7 @@ public final class DepthsWeaponAspectGUI extends CustomInventory {
 			items.add(weapon.getAbilityItem(1));
 		}
 
-		Material payButton = (paid) ? PURCHASED_MAT : BUY_ITEM;
+		Material payButton = paid ? PURCHASED_MAT : BUY_ITEM;
 		ItemStack paidFor = new ItemStack(payButton, 1);
 
 		for (int i = 0; i < 27; i++) {

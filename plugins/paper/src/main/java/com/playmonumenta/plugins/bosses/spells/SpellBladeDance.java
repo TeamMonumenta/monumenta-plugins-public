@@ -44,7 +44,7 @@ public class SpellBladeDance extends Spell {
 				mIndex += 2;
 				world.spawnParticle(Particle.SWEEP_ATTACK, mCaster.getLocation(), 10, 4, 4, 4, 0);
 				world.playSound(mCaster.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 0.75f, mPitch);
-				mPitch += 0.2;
+				mPitch += 0.2f;
 				Location loc1 = mCaster.getLocation().add(6, 6, 6);
 				Location loc2 = mCaster.getLocation().add(-6, -1, -6);
 

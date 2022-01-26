@@ -98,7 +98,6 @@ public class StatTrackItem extends GenericCommand {
 	 * The typical infusion logic that players will run themselves from an npc
 	 * @param player the player who is stat tracking their gear
 	 * @param option the stat track enchant option to infuse with
-	 * @throws WrapperCommandSyntaxException
 	 */
 	private static void run(Player player, InfusionType option) throws WrapperCommandSyntaxException {
 
@@ -126,7 +125,6 @@ public class StatTrackItem extends GenericCommand {
 	 * Command to be run by moderators to manually set the stat on an item
 	 * @param player the mod who ran the command (get their item in hand)
 	 * @param stat the numerical value the stat should have
-	 * @throws WrapperCommandSyntaxException
 	 */
 	private static void runMod(Player player, int stat) throws WrapperCommandSyntaxException {
 		//Check to see if the item in hand is already infused

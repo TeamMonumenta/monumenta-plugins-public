@@ -217,6 +217,7 @@ public class BossUtils {
 	}
 
 	/**
+	 * Adds modifiers to the existing map from the string
 	 * @param s a string like "[damage=10, cooldown=60, detectionrange=80, singletarget=true....]
 	 * @param map the map where the values ​​will be added
 	 */

@@ -35,8 +35,8 @@ public class PlayerInventoryView implements Listener {
 
 	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = false)
 	public void playerInteractEvent(PlayerInteractEvent event) {
-		if (event.useInteractedBlock() == Event.Result.DENY && event.useItemInHand() == Event.Result.DENY
-				|| !event.getAction().equals(Action.LEFT_CLICK_AIR) && !event.getAction().equals(Action.LEFT_CLICK_BLOCK)) {
+		if ((event.useInteractedBlock() == Event.Result.DENY && event.useItemInHand() == Event.Result.DENY)
+				|| (!event.getAction().equals(Action.LEFT_CLICK_AIR) && !event.getAction().equals(Action.LEFT_CLICK_BLOCK))) {
 			return;
 		}
 
@@ -65,7 +65,7 @@ public class PlayerInventoryView implements Listener {
 				//Below if check is almost certainly not necessary, but always be careful
 				if (data.getEntities().get(0) instanceof Player) {
 					Player clickedPlayer = (Player)data.getEntities().get(0);
-					if (!(clickedPlayer).equals(player)) {
+					if (!clickedPlayer.equals(player)) {
 						inventoryView(event.getPlayer(), clickedPlayer);
 					}
 				}

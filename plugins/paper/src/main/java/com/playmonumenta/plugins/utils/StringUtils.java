@@ -84,8 +84,8 @@ public class StringUtils {
 	}
 
 	public static String ticksToTime(int ticks) {
-		int minutes = ((ticks / 20) / 60);
-		int seconds = ((ticks - ((minutes * 60) * 20))) / 20;
+		int minutes = (ticks / 20) / 60;
+		int seconds = (ticks - ((minutes * 60) * 20)) / 20;
 
 		String time = "";
 		if (minutes > 0) {

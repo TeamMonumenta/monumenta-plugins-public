@@ -573,9 +573,9 @@ public class FrostGiant extends BossAbilityGroup {
 						double radian = Math.toRadians(degree);
 						double cos = FastUtils.cos(radian);
 						double sin = FastUtils.sin(radian);
-						loc.add(cos * (hailstormRadius), 0.5, sin * (hailstormRadius));
+						loc.add(cos * hailstormRadius, 0.5, sin * hailstormRadius);
 						world.spawnParticle(Particle.REDSTONE, loc, 1, 0, 0, 0, LIGHT_BLUE_COLOR);
-						loc.subtract(cos * (hailstormRadius), 0.5, sin * (hailstormRadius));
+						loc.subtract(cos * hailstormRadius, 0.5, sin * hailstormRadius);
 					}
 				}
 
@@ -852,7 +852,7 @@ public class FrostGiant extends BossAbilityGroup {
 						mRotation = 360;
 					}
 				}
-				mPitch -= 0.025;
+				mPitch -= 0.025f;
 
 				Location startLoc = mStartLoc;
 
@@ -1119,7 +1119,7 @@ public class FrostGiant extends BossAbilityGroup {
 			if (mob.getType() == EntityType.IRON_GOLEM) {
 				com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(mob, GOLEM_FREEZE_EFFECT_NAME,
 						new PercentSpeed(20 * 20, -1, GOLEM_FREEZE_EFFECT_NAME));
-				mob.addPotionEffect((new PotionEffect(PotionEffectType.GLOWING, 200, 10)));
+				mob.addPotionEffect(new PotionEffect(PotionEffectType.GLOWING, 200, 10));
 			}
 		}
 	}

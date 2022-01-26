@@ -15,6 +15,7 @@ import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.ItemMeta;
 import javax.annotation.Nullable;
 
+import com.google.common.collect.ImmutableList;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.itemstats.ItemStatManager.PlayerItemStats;
 import com.playmonumenta.plugins.utils.DamageUtils;
@@ -249,7 +250,7 @@ public class PlayerItemStatsGUI extends CustomInventory {
 
 		private final int mSlot;
 		private final String mName;
-		private final List<Component> mLore = List.of(Component.text("Click here, then click an item to compare builds.", NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false));
+		private final ImmutableList<Component> mLore = ImmutableList.of(Component.text("Click here, then click an item to compare builds.", NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false));
 
 		OtherEquipment(int slot, String name) {
 			mSlot = slot;
@@ -268,7 +269,7 @@ public class PlayerItemStatsGUI extends CustomInventory {
 			return Component.text(String.format("%s Slot%s", mName, selected ? " (Selected)" : ""), selected ? NamedTextColor.GREEN : NamedTextColor.GRAY).decorate(TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false);
 		}
 
-		public List<Component> getLore() {
+		public ImmutableList<Component> getLore() {
 			return mLore;
 		}
 	}
@@ -437,8 +438,8 @@ public class PlayerItemStatsGUI extends CustomInventory {
 	}
 
 	private EnumMap<DefenseStat, Double> getDefense(PlayerItemStats stats) {
-		int armorBonus = 0;
-		int agilityBonus = 0;
+		double armorBonus = 0;
+		double agilityBonus = 0;
 		for (SecondaryStat stat : SecondaryStat.values()) {
 			if (mSecondaryStatEnabled[stat.getSlot()]) {
 				if (stat.isArmorModifier()) {

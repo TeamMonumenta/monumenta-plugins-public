@@ -1,5 +1,18 @@
 package com.playmonumenta.plugins.commands.experiencinator;
 
+import java.io.File;
+import java.io.Reader;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.logging.Level;
+
+import javax.annotation.Nullable;
+
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.Plugin;
@@ -9,6 +22,7 @@ import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils.InfusionType;
 import com.playmonumenta.plugins.utils.ItemStatUtils.Region;
 import com.playmonumenta.plugins.utils.ItemStatUtils.Tier;
+
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -16,16 +30,6 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import javax.annotation.Nullable;
-
-import java.io.File;
-import java.io.FileReader;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.logging.Level;
 
 public abstract class ExperiencinatorUtils {
 
@@ -43,7 +47,7 @@ public abstract class ExperiencinatorUtils {
 			}
 			long lastMod = mConfigFile.lastModified();
 			if (mConfig == null || lastMod != mConfigLastModTimestamp) {
-				try (FileReader reader = new FileReader(mConfigFile)) {
+				try (Reader reader = Files.newBufferedReader(mConfigFile.toPath(), StandardCharsets.UTF_8)) {
 					mConfig = new ExperiencinatorConfig(new Gson().fromJson(reader, JsonObject.class), lootTableLocation);
 				}
 				mConfigLastModTimestamp = lastMod;

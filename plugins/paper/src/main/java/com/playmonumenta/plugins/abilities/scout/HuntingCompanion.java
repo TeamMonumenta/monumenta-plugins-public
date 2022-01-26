@@ -108,7 +108,7 @@ public class HuntingCompanion extends Ability {
 			World world = mPlayer.getWorld();
 			Location loc = mPlayer.getLocation();
 			Vector facingDirection = mPlayer.getEyeLocation().getDirection().normalize();
-			Vector perp = (new Vector(-facingDirection.getZ(), 0, facingDirection.getX())).normalize(); //projection of the perpendicular vector to facingDirection onto the xz plane
+			Vector perp = new Vector(-facingDirection.getZ(), 0, facingDirection.getX()).normalize(); //projection of the perpendicular vector to facingDirection onto the xz plane
 
 			Vector sideOffset = new Vector(0, 0, 0);
 			Location pos = loc.clone().add(perp);

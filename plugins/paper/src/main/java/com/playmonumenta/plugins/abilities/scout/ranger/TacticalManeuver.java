@@ -55,7 +55,7 @@ public class TacticalManeuver extends MultipleChargeAbility {
 
 	@Override
 	public void cast(Action action) {
-		if (!mPlayer.isSprinting() && !mPlayer.isSneaking() || ZoneUtils.hasZoneProperty(mPlayer, ZoneProperty.NO_MOBILITY_ABILITIES)) {
+		if ((!mPlayer.isSprinting() && !mPlayer.isSneaking()) || ZoneUtils.hasZoneProperty(mPlayer, ZoneProperty.NO_MOBILITY_ABILITIES)) {
 			return;
 		}
 

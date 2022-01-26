@@ -17,11 +17,10 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * @author ShadowVisions
- *
- * This class contains hard coded information about all the rooms possible in the system, including type, spawner count, load paths, etc
+ * This class contains hard coded information about all the rooms possible in the system, including type, spawner count, load paths, etc.
  * It also is responsible for picking random rooms for the party and dynamically structure loading them into the world.
  *
+ * @author ShadowVisions
  */
 public class DepthsRoomRepository {
 

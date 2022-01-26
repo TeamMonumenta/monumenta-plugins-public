@@ -147,7 +147,7 @@ public class SpellBaseGrenadeLauncher extends Spell {
 			Location pLoc = target.getLocation();
 			Location tLoc = fallingBlock.getLocation();
 			Vector vect = new Vector(pLoc.getX() - tLoc.getX(), 0, pLoc.getZ() - tLoc.getZ());
-			vect.normalize().multiply((pLoc.distance(tLoc)) / 20).setY(0.7f);
+			vect.normalize().multiply(pLoc.distance(tLoc) / 20).setY(0.7f);
 			fallingBlock.setVelocity(vect);
 
 			BukkitRunnable runn = new BukkitRunnable() {

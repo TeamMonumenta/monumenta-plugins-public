@@ -18,7 +18,7 @@ public class PremiumVanishIntegration {
 	}
 
 	/**
-	 * @return A list of the UUIDs of all online vanished players
+	 * A list of the UUIDs of all online vanished players
 	 */
 	public static List<UUID> getInvisiblePlayers() {
 		if (INSTANCE == null) {

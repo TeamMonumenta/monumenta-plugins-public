@@ -32,7 +32,7 @@ public class BrambleShell extends DepthsAbility {
 
 	@Override
 	public void onHurtByEntityWithSource(DamageEvent event, Entity damager, LivingEntity source) {
-		if (mPlayer != null && (event.getType() == DamageType.MELEE || event.getType() == DamageType.PROJECTILE) && !event.isCancelled() || event.isBlocked()) {
+		if (mPlayer != null && (event.getType() == DamageType.MELEE || event.getType() == DamageType.PROJECTILE) && !event.isCancelled() && !event.isBlocked()) {
 			Location loc = source.getLocation();
 			World world = mPlayer.getWorld();
 			world.spawnParticle(Particle.BLOCK_CRACK, loc.add(0, source.getHeight() / 2, 0), 25, 0.5, 0.5, 0.5, 0.125, Bukkit.createBlockData(Material.SWEET_BERRY_BUSH));

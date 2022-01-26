@@ -377,8 +377,8 @@ public final class ItemOverrides {
 
 	public boolean inventoryClickInteraction(Plugin plugin, Player player, InventoryClickEvent event) {
 		ItemStack cursorItoem = event.getCursor();
-		if (event.getClick() != ClickType.RIGHT && event.getClick() != ClickType.LEFT
-			    || cursorItoem != null && cursorItoem.getType() != Material.AIR) {
+		if ((event.getClick() != ClickType.RIGHT && event.getClick() != ClickType.LEFT)
+			    || (cursorItoem != null && cursorItoem.getType() != Material.AIR)) {
 			return true;
 		}
 		ItemStack item = event.getCurrentItem();

@@ -79,7 +79,7 @@ public class Chivalrous extends DelveModifier {
 
 	@Override
 	public void applyModifiers(LivingEntity mob, SpawnerSpawnEvent event) {
-		if (!mob.isInsideVehicle() && !(CHIVALROUS_IMMUNE.contains(mob.getType())) && !EntityUtils.isBoss(mob) && !DelvesUtils.isDelveMob(mob)
+		if (!mob.isInsideVehicle() && !CHIVALROUS_IMMUNE.contains(mob.getType()) && !EntityUtils.isBoss(mob) && !DelvesUtils.isDelveMob(mob)
 				&& FastUtils.RANDOM.nextDouble() < mSpawnChance) {
 			Entity mount = LibraryOfSoulsIntegration.summon(mob.getLocation(), MOUNTS[FastUtils.RANDOM.nextInt(MOUNTS.length)]);
 			mount.addPassenger(mob);

@@ -59,7 +59,7 @@ public class SpellGroundSurge extends Spell {
 			public void run() {
 
 				Location loc = mBoss.getLocation();
-				mPitch += 0.025;
+				mPitch += 0.025f;
 				if (mChargeUp.getTime() % 2 == 0) {
 					world.playSound(loc, Sound.ENTITY_ENDER_DRAGON_HURT, 3, mPitch);
 				}

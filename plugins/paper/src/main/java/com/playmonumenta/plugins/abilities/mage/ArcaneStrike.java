@@ -67,8 +67,8 @@ public class ArcaneStrike extends Ability {
 				float dmg = SpellPower.getSpellDamage(mPlugin, mPlayer, mDamageBonus);
 
 				// Arcane Strike extra damage if on fire or slowed (but effect not applied this tick)
-				if (EntityUtils.isSlowed(mPlugin, mob) || ((mob.hasPotionEffect(PotionEffectType.SLOW)
-				     && !MetadataUtils.happenedThisTick(mPlugin, mob, Constants.ENTITY_SLOWED_NONCE_METAKEY, 0)))
+				if (EntityUtils.isSlowed(mPlugin, mob) || (mob.hasPotionEffect(PotionEffectType.SLOW)
+				     && !MetadataUtils.happenedThisTick(mPlugin, mob, Constants.ENTITY_SLOWED_NONCE_METAKEY, 0))
 				    || (mob.getFireTicks() > 0
 				        && !MetadataUtils.happenedThisTick(mPlugin, mob, Constants.ENTITY_COMBUST_NONCE_METAKEY, 0))) {
 					dmg += SpellPower.getSpellDamage(mPlugin, mPlayer, mDamageBonusAffected);

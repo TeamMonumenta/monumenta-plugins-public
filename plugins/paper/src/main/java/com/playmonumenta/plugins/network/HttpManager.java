@@ -10,6 +10,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
+import java.nio.charset.StandardCharsets;
 
 public class HttpManager {
 	/* Must process a tick within this many milliseconds to be considered alive */
@@ -60,10 +61,10 @@ public class HttpManager {
 		public void handle(HttpExchange request) throws IOException {
 			final byte[] response;
 			if (mLastTickTime > 0) {
-				response = "Ready!".getBytes();
+				response = "Ready!".getBytes(StandardCharsets.UTF_8);
 				request.sendResponseHeaders(200, response.length);
 			} else {
-				response = "No ticks processed yet".getBytes();
+				response = "No ticks processed yet".getBytes(StandardCharsets.UTF_8);
 				request.sendResponseHeaders(503, response.length);
 			}
 			OutputStream stream = request.getResponseBody();
@@ -81,10 +82,10 @@ public class HttpManager {
 		public void handle(HttpExchange request) throws IOException {
 			final byte[] response;
 			if (System.currentTimeMillis() - mLastTickTime < ALIVE_TICK_THRESHOLD) {
-				response = "Alive!".getBytes();
+				response = "Alive!".getBytes(StandardCharsets.UTF_8);
 				request.sendResponseHeaders(200, response.length);
 			} else {
-				response = "Server not ticking - possibly hung".getBytes();
+				response = "Server not ticking - possibly hung".getBytes(StandardCharsets.UTF_8);
 				request.sendResponseHeaders(503, response.length);
 			}
 			OutputStream stream = request.getResponseBody();

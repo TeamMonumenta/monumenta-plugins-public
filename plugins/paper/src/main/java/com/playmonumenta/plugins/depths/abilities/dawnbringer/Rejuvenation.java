@@ -53,13 +53,13 @@ public class Rejuvenation extends DepthsAbility {
 						}
 					}
 					Integer lastHealTick = LAST_HEAL_TICK.get(player.getUniqueId());
-					if (lastHealTick == null || player.getTicksLived() - lastHealTick >= healInterval && highestLevel) {
+					if (lastHealTick == null || (player.getTicksLived() - lastHealTick >= healInterval && highestLevel)) {
 						LAST_HEAL_TICK.put(player.getUniqueId(), player.getTicksLived());
 
 						double maxHealth = EntityUtils.getMaxHealth(player);
 						if (player.getHealth() != maxHealth) {
 							PlayerUtils.healPlayer(mPlugin, player, PERCENT_HEAL * maxHealth, mPlayer);
-							player.getWorld().spawnParticle(Particle.HEART, (player.getLocation()).add(0, 2, 0), 1, 0.07, 0.07, 0.07, 0.001);
+							player.getWorld().spawnParticle(Particle.HEART, player.getLocation().add(0, 2, 0), 1, 0.07, 0.07, 0.07, 0.001);
 						}
 					}
 				}

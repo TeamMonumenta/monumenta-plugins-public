@@ -80,12 +80,12 @@ public class DelvesUtils {
 			}
 		}
 
-		private Class<? extends DelveModifier> mClass;
-		private int mColumn;
-		private Material mIcon;
-		private Component mName;
-		private String mDescription;
-		private String[][] mRankDescriptions;
+		private final Class<? extends DelveModifier> mClass;
+		private final int mColumn;
+		private final Material mIcon;
+		private final Component mName;
+		private final String mDescription;
+		private final String[][] mRankDescriptions;
 
 		Modifier(Class<? extends DelveModifier> cls, int column, Material icon, Component name, String description, String[][] rankDescriptions) {
 			mClass = cls;

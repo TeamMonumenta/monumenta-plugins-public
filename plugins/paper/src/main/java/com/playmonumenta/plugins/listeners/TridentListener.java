@@ -32,8 +32,8 @@ public class TridentListener implements Listener {
 		//If neither hand has the same trident as the projectile,
 		//or mainhand is changed to a trident while the offhand is being thrown (in case the mainhand has trident enchantments),
 		//cancel trident throw
-		if (!mainhand.equals(item) && !offhand.equals(item) ||
-				offhand.equals(item) && mainhand.getType() == Material.TRIDENT) {
+		if ((!mainhand.equals(item) && !offhand.equals(item)) ||
+				(offhand.equals(item) && mainhand.getType() == Material.TRIDENT)) {
 			event.setCancelled(true);
 			return;
 		}

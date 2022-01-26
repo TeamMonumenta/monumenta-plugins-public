@@ -73,7 +73,7 @@ public class HauntingShades extends Ability {
 		if (mPlayer == null) {
 			return false;
 		}
-		return (ItemUtils.isHoe(mPlayer.getInventory().getItemInMainHand()));
+		return ItemUtils.isHoe(mPlayer.getInventory().getItemInMainHand());
 	}
 
 	@Override

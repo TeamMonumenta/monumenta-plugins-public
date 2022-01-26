@@ -89,14 +89,14 @@ public class PlotManager {
 				/***** ADD *****/
 				.withSubcommand(new CommandAPICommand("add")
 					.withArguments(new StringArgument("name").replaceSuggestions((info) -> {
-						return Bukkit.getOnlinePlayers().stream().filter((player) -> !(Objects.equals(player, info.sender()))).map((player) -> player.getName()).toArray(String[]::new);
+						return Bukkit.getOnlinePlayers().stream().filter((player) -> !Objects.equals(player, info.sender())).map((player) -> player.getName()).toArray(String[]::new);
 					}))
 					.executesPlayer((player, args) -> {
 						plotAccessAdd(player, (String)args[0], null);
 					}))
 				.withSubcommand(new CommandAPICommand("add")
 					.withArguments(new StringArgument("name").replaceSuggestions((info) -> {
-						return Bukkit.getOnlinePlayers().stream().filter((player) -> !(Objects.equals(player, info.sender()))).map((player) -> player.getName()).toArray(String[]::new);
+						return Bukkit.getOnlinePlayers().stream().filter((player) -> !Objects.equals(player, info.sender())).map((player) -> player.getName()).toArray(String[]::new);
 					}))
 					.withArguments(new StringArgument("duration"))
 					.executesPlayer((player, args) -> {
@@ -157,7 +157,7 @@ public class PlotManager {
 						});
 					}
 				}))
-			.withSubcommand((new CommandAPICommand("bordergui")
+			.withSubcommand(new CommandAPICommand("bordergui")
 				.withPermission(CommandPermission.fromString("monumenta.plot.bordergui"))
 				.withArguments(new EntitySelectorArgument("players", EntitySelector.MANY_PLAYERS))
 				.executes((sender, args) -> {
@@ -179,7 +179,7 @@ public class PlotManager {
 							}
 						}
 					}
-				})))
+				}))
 			/********************* NEW *********************/
 			.withSubcommand(new CommandAPICommand("new")
 				.withPermission(CommandPermission.fromString("monumenta.plot.new"))

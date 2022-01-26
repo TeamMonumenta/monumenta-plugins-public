@@ -99,7 +99,7 @@ public class TradeListener implements Listener {
 					// Check that the playerItem has the same base item as the trade's source:
 					// - same type (and for shulker boxes, ignore color)
 					// - same plain name (or both have no plain name)
-					if (!(source.getType() == playerItem.getType() || ItemUtils.isShulkerBox(source.getType()) && ItemUtils.isShulkerBox(playerItem.getType()))
+					if (!(source.getType() == playerItem.getType() || (ItemUtils.isShulkerBox(source.getType()) && ItemUtils.isShulkerBox(playerItem.getType())))
 						    || !Objects.equals(ItemUtils.getPlainNameIfExists(source), ItemUtils.getPlainNameIfExists(playerItem))) {
 						continue;
 					}

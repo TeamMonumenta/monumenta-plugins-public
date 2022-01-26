@@ -161,7 +161,7 @@ public final class HeavenlyBoon extends Ability implements KillTriggeredAbility 
 
 			ItemUtils.addPotionEffect(potions, PotionInfo.HEALING);
 
-			Location pos = (mPlayer.getLocation()).add(0, 1, 0);
+			Location pos = mPlayer.getLocation().add(0, 1, 0);
 			EntityUtils.spawnCustomSplashPotion(mPlayer, potions, pos);
 		}
 	}

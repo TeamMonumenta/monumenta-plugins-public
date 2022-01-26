@@ -61,9 +61,9 @@ public class PassiveVoidRift extends Spell {
 								double sin = FastUtils.sin(radian);
 
 								for (Location loc : locs) {
-									loc.add(cos * (mRadius), 0.5, sin * (mRadius));
+									loc.add(cos * mRadius, 0.5, sin * mRadius);
 									world.spawnParticle(Particle.SQUID_INK, loc, 1, 0, 0, 0, 0);
-									loc.subtract(cos * (mRadius), 0.5, sin * (mRadius));
+									loc.subtract(cos * mRadius, 0.5, sin * mRadius);
 								}
 							}
 						}
@@ -89,13 +89,13 @@ public class PassiveVoidRift extends Spell {
 							double sin = FastUtils.sin(radian);
 
 							for (Location loc : locs) {
-								loc.add(cos * (mRadius), 0.5, sin * (mRadius));
+								loc.add(cos * mRadius, 0.5, sin * mRadius);
 								if (FastUtils.RANDOM.nextDouble() < 0.5) {
 									world.spawnParticle(Particle.SPELL_WITCH, loc, 1, 0, 0, 0, 0);
 								} else {
 									world.spawnParticle(Particle.END_ROD, loc, 1, 0, 0, 0, 0);
 								}
-								loc.subtract(cos * (mRadius), 0.5, sin * (mRadius));
+								loc.subtract(cos * mRadius, 0.5, sin * mRadius);
 							}
 						}
 					}

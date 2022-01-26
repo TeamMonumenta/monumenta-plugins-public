@@ -13,7 +13,7 @@ import com.playmonumenta.plugins.utils.DamageUtils;
 public class CustomDamageOverTime extends Effect {
 
 	private final double mDamage;
-	private final double mPeriod;
+	private final int mPeriod;
 	private final @Nullable Player mPlayer;
 	private final @Nullable ClassAbility mSpell;
 	private final Particle mParticle;
@@ -49,6 +49,6 @@ public class CustomDamageOverTime extends Effect {
 
 	@Override
 	public String toString() {
-		return String.format("CustomDoT duration:%d modifier:%s damage:%f period:%f", this.getDuration(), "CustomDamageOverTime", mDamage, mPeriod);
+		return String.format("CustomDoT duration:%d modifier:%s damage:%f period:%d", this.getDuration(), "CustomDamageOverTime", mDamage, mPeriod);
 	}
 }

@@ -378,7 +378,7 @@ public class BossTagCommand {
 
 		if (parameters != null) {
 			player.sendMessage(Component.empty()
-				                   .append(Component.text("Name" + (" ".repeat(26)) + "default value", NamedTextColor.GOLD).decoration(TextDecoration.BOLD, true)));
+				                   .append(Component.text("Name" + " ".repeat(26) + "default value", NamedTextColor.GOLD).decoration(TextDecoration.BOLD, true)));
 
 			for (Field field : parameters.getClass().getFields()) {
 				String fieldName = BossUtils.translateFieldNameToTag(field.getName());
@@ -386,7 +386,7 @@ public class BossTagCommand {
 				int spaces = 30 - fieldName.length();
 
 				player.sendMessage(Component.empty()
-					                   .append(Component.text("- " + fieldName + (" ".repeat(spaces)), NamedTextColor.GOLD).decoration(TextDecoration.BOLD, true)
+					                   .append(Component.text("- " + fieldName + " ".repeat(spaces), NamedTextColor.GOLD).decoration(TextDecoration.BOLD, true)
 						                           .hoverEvent(Component.empty()
 							                                       .append(Component.text("Parameter: ", TextColor.fromHexString("#ffd700")).decoration(TextDecoration.BOLD, true)
 								                                               .append(Component.text(fieldName + "\n", TextColor.fromHexString("#808080")).decoration(TextDecoration.BOLD, false)))
@@ -434,12 +434,12 @@ public class BossTagCommand {
 
 				if (!parameters.isEmpty()) {
 					player.sendMessage(Component.empty()
-						                   .append(Component.text("Name" + (" ".repeat(26)) + "value", NamedTextColor.GOLD).decoration(TextDecoration.BOLD, true)));
+						                   .append(Component.text("Name" + " ".repeat(26) + "value", NamedTextColor.GOLD).decoration(TextDecoration.BOLD, true)));
 
 					for (String paramName : parameters.keySet()) {
 						int spaces = 30 - paramName.length();
 						player.sendMessage(Component.empty()
-							                   .append(Component.text("- " + paramName + (" ".repeat(spaces)), NamedTextColor.GOLD))
+							                   .append(Component.text("- " + paramName + " ".repeat(spaces), NamedTextColor.GOLD))
 							                   .append(Component.text(parameters.get(paramName))));
 					}
 				}
@@ -481,12 +481,12 @@ public class BossTagCommand {
 
 			if (!parameters.isEmpty()) {
 				player.sendMessage(Component.empty()
-					                   .append(Component.text("Name" + (" ".repeat(26)) + "value", NamedTextColor.GOLD).decoration(TextDecoration.BOLD, true)));
+					                   .append(Component.text("Name" + " ".repeat(26) + "value", NamedTextColor.GOLD).decoration(TextDecoration.BOLD, true)));
 
 				for (String paramName : parameters.keySet()) {
 					int spaces = 30 - paramName.length();
 					player.sendMessage(Component.empty()
-						                   .append(Component.text("- " + paramName + (" ".repeat(spaces)), NamedTextColor.GOLD))
+						                   .append(Component.text("- " + paramName + " ".repeat(spaces), NamedTextColor.GOLD))
 						                   .append(Component.text(parameters.get(paramName))));
 				}
 			}

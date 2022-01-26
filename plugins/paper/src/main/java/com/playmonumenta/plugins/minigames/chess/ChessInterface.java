@@ -39,10 +39,10 @@ public class ChessInterface {
 		NORTH("north", +1, -1, +1),
 		SOUTH("south", -1, +1, +1);
 
-		private String mLabel;
-		private double mX;
-		private double mX2;
-		private double mZ;
+		private final String mLabel;
+		private final double mX;
+		private final double mX2;
+		private final double mZ;
 
 		FacingPosition(String label, double x, double y, double z) {
 			mLabel = label;
@@ -245,7 +245,7 @@ public class ChessInterface {
 			Location mFrom = fromLoc.clone();
 			Location mTo = toLoc.clone();
 			World mWorld = world;
-			Vector mDistance = (mTo.clone().toVector().subtract(mFrom.clone().toVector()));
+			Vector mDistance = mTo.clone().toVector().subtract(mFrom.clone().toVector());
 			Vector mDirection = mDistance.clone().normalize();
 			int mTimer = 0;
 

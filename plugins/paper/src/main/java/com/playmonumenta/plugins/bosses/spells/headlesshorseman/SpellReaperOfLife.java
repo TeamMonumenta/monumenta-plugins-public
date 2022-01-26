@@ -60,7 +60,7 @@ public class SpellReaperOfLife extends Spell {
 			Location pLoc = mCenter;
 			Location tLoc = fallingBlock.getLocation();
 			Vector vect = new Vector(pLoc.getX() - tLoc.getX(), 0, pLoc.getZ() - tLoc.getZ());
-			vect.normalize().multiply((pLoc.distance(tLoc)) / 25).setY(0.7f);
+			vect.normalize().multiply(pLoc.distance(tLoc) / 25).setY(0.7f);
 			fallingBlock.setVelocity(vect);
 
 			world.playSound(mBoss.getLocation(), Sound.ENTITY_BLAZE_DEATH, 3, 1.5f);

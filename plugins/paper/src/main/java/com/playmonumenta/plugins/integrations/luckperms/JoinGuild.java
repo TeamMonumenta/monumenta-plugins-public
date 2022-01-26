@@ -65,7 +65,11 @@ public class JoinGuild {
 					public void run() {
 						User user = LuckPermsIntegration.UM.getUser(player.getUniqueId());
 						user.data().add(InheritanceNode.builder(group).build());
-						LuckPermsIntegration.UM.saveUser(user);
+						LuckPermsIntegration.UM.saveUser(user).whenComplete((unused, ex) -> {
+							if (ex != null) {
+								ex.printStackTrace();
+							}
+						});
 						LuckPermsIntegration.pushUserUpdate(user);
 					}
 				}.runTaskAsynchronously(plugin);

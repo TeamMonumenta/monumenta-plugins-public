@@ -38,7 +38,7 @@ public final class ParrotCustomInventory extends CustomInventory {
 		SPECIAL(2),
 		OTHERS(99);
 
-		private int mNum;
+		private final int mNum;
 
 		ParrotGUIPage(int num) {
 			mNum = num;
@@ -247,7 +247,7 @@ public final class ParrotCustomInventory extends CustomInventory {
 
 		lore.clear();
 		lore.add("Owned");
-		lore.add((new Date((long)ScoreboardUtils.getScoreboardValue(playerLoad, SCOREBOARD_BOUGHT_SHOULDERS).orElse(0)*1000).toString()));
+		lore.add(new Date((long)ScoreboardUtils.getScoreboardValue(playerLoad, SCOREBOARD_BOUGHT_SHOULDERS).orElse(0)*1000).toString());
 		ItemStack boughtShoulders = buildItem(Material.INK_SAC, "Both Shoulders", lore);
 		GUI_ITEMS.add(new GuiItem(ParrotGUIPage.OTHERS.mNum, ROWS * COLUMNS - 5, boughtShoulders, (player, inv) -> {
 						return ParrotManager.hasDoubleShoulders(player); }));
@@ -304,7 +304,7 @@ public final class ParrotCustomInventory extends CustomInventory {
 
 		lore.clear();
 		lore.add("Owned");
-		lore.add((new Date((long)ScoreboardUtils.getScoreboardValue(playerLoad, "ParrotBought4").orElse(0)*1000).toString()));
+		lore.add(new Date((long)ScoreboardUtils.getScoreboardValue(playerLoad, "ParrotBought4").orElse(0)*1000).toString());
 		ItemStack boughGreen = buildItem(Material.GREEN_WOOL, "Green Parakeet", lore);
 		GUI_ITEMS.add(new GuiItem(ParrotGUIPage.R1.mNum, 10, boughGreen, (player, inv) -> {
 			return ScoreboardUtils.getScoreboardValue(player, "ParrotBought4").orElse(0) > 0 && mShoulderSelected == PlayerShoulder.NONE; }));
@@ -327,7 +327,7 @@ public final class ParrotCustomInventory extends CustomInventory {
 
 		lore.clear();
 		lore.add("Owned");
-		lore.add((new Date((long)ScoreboardUtils.getScoreboardValue(playerLoad, "ParrotBought5").orElse(0)*1000).toString()));
+		lore.add(new Date((long)ScoreboardUtils.getScoreboardValue(playerLoad, "ParrotBought5").orElse(0)*1000).toString());
 		ItemStack boughGray = buildItem(Material.LIGHT_GRAY_WOOL, "Gray Cockatiel", lore);
 		GUI_ITEMS.add(new GuiItem(ParrotGUIPage.R1.mNum, 11, boughGray, (player, inv) -> {
 							return ScoreboardUtils.getScoreboardValue(player, "ParrotBought5").orElse(0) > 0 && mShoulderSelected == PlayerShoulder.NONE; }));
@@ -352,7 +352,7 @@ public final class ParrotCustomInventory extends CustomInventory {
 
 		lore.clear();
 		lore.add("Owned");
-		lore.add((new Date((long)ScoreboardUtils.getScoreboardValue(playerLoad, "ParrotBought7").orElse(0)*1000).toString()));
+		lore.add(new Date((long)ScoreboardUtils.getScoreboardValue(playerLoad, "ParrotBought7").orElse(0)*1000).toString());
 		ItemStack boughGolden = buildItem(Material.YELLOW_CONCRETE, "Golden Conure", lore);
 		GUI_ITEMS.add(new GuiItem(ParrotGUIPage.R1.mNum, 12, boughGolden, (player, inv) -> {
 						return ScoreboardUtils.getScoreboardValue(player, "ParrotBought7").orElse(0) > 0 && mShoulderSelected == PlayerShoulder.NONE; }));
@@ -377,7 +377,7 @@ public final class ParrotCustomInventory extends CustomInventory {
 
 		lore.clear();
 		lore.add("Owned");
-		lore.add((new Date((long)ScoreboardUtils.getScoreboardValue(playerLoad, "ParrotBought16").orElse(0)*1000).toString()));
+		lore.add(new Date((long)ScoreboardUtils.getScoreboardValue(playerLoad, "ParrotBought16").orElse(0)*1000).toString());
 		ItemStack boughtBee = buildItem(Material.HONEYCOMB_BLOCK, "Bee Conure", lore);
 		GUI_ITEMS.add(new GuiItem(ParrotGUIPage.R1.mNum, 13, boughtBee, (player, inv) -> {
 						return ScoreboardUtils.getScoreboardValue(player, "ParrotBought16").orElse(0) > 0 && mShoulderSelected == PlayerShoulder.NONE;
@@ -416,7 +416,7 @@ public final class ParrotCustomInventory extends CustomInventory {
 
 		lore.clear();
 		lore.add("Owned");
-		lore.add((new Date((long)ScoreboardUtils.getScoreboardValue(playerLoad, "ParrotBought17").orElse(0)*1000).toString()));
+		lore.add(new Date((long)ScoreboardUtils.getScoreboardValue(playerLoad, "ParrotBought17").orElse(0)*1000).toString());
 		ItemStack boughtRadiant = buildItem(Material.GLOWSTONE, "Radiant Conure", lore);
 		GUI_ITEMS.add(new GuiItem(ParrotGUIPage.R1.mNum, 14, boughtRadiant, (player, inv) -> {
 						return ScoreboardUtils.getScoreboardValue(player, "ParrotBought17").orElse(0) > 0 && mShoulderSelected == PlayerShoulder.NONE;
@@ -453,7 +453,7 @@ public final class ParrotCustomInventory extends CustomInventory {
 
 		lore.clear();
 		lore.add("Owned");
-		lore.add((new Date((long)ScoreboardUtils.getScoreboardValue(playerLoad, "ParrotBought10").orElse(0)*1000).toString()));
+		lore.add(new Date((long)ScoreboardUtils.getScoreboardValue(playerLoad, "ParrotBought10").orElse(0)*1000).toString());
 		ItemStack boughtKaul = buildItem(Material.JUNGLE_LEAVES, "Blackroot Kakapo", lore);
 		GUI_ITEMS.add(new GuiItem(ParrotGUIPage.R1.mNum, 15, boughtKaul, (player, inv) -> {
 						return ScoreboardUtils.getScoreboardValue(player, "ParrotBought10").orElse(0) > 0 && mShoulderSelected == PlayerShoulder.NONE; }));
@@ -487,7 +487,7 @@ public final class ParrotCustomInventory extends CustomInventory {
 							}));
 		lore.clear();
 		lore.add("Owned");
-		lore.add((new Date((long)ScoreboardUtils.getScoreboardValue(playerLoad, "ParrotBought1").orElse(0)*1000).toString()));
+		lore.add(new Date((long)ScoreboardUtils.getScoreboardValue(playerLoad, "ParrotBought1").orElse(0)*1000).toString());
 		ItemStack boughtRed = buildItem(Material.RED_WOOL, "Scarlet Macaw", lore);
 		GUI_ITEMS.add(new GuiItem(ParrotGUIPage.R2.mNum, 10, boughtRed, (player, inv) -> {
 						return ScoreboardUtils.getScoreboardValue(player, "ParrotBought1").orElse(0) > 0 && mShoulderSelected == PlayerShoulder.NONE; }));
@@ -512,7 +512,7 @@ public final class ParrotCustomInventory extends CustomInventory {
 									return true; }));
 		lore.clear();
 		lore.add("Owned");
-		lore.add((new Date((long)ScoreboardUtils.getScoreboardValue(playerLoad, "ParrotBought2").orElse(0)*1000).toString()));
+		lore.add(new Date((long)ScoreboardUtils.getScoreboardValue(playerLoad, "ParrotBought2").orElse(0)*1000).toString());
 		ItemStack boughtBlue = buildItem(Material.BLUE_WOOL, "Hyacinth Macaw", lore);
 		GUI_ITEMS.add(new GuiItem(ParrotGUIPage.R2.mNum, 11, boughtBlue, (player, inv) -> {
 						return ScoreboardUtils.getScoreboardValue(player, "ParrotBought2").orElse(0) > 0 && mShoulderSelected == PlayerShoulder.NONE; }));
@@ -535,7 +535,7 @@ public final class ParrotCustomInventory extends CustomInventory {
 									return true; }));
 		lore.clear();
 		lore.add("Owned");
-		lore.add((new Date((long)ScoreboardUtils.getScoreboardValue(playerLoad, "ParrotBought3").orElse(0)*1000).toString()));
+		lore.add(new Date((long)ScoreboardUtils.getScoreboardValue(playerLoad, "ParrotBought3").orElse(0)*1000).toString());
 		ItemStack boughtYellow = buildItem(Material.LIGHT_BLUE_WOOL, "Blue-Yellow Macaw", lore);
 		GUI_ITEMS.add(new GuiItem(ParrotGUIPage.R2.mNum, 12, boughtYellow, (player, inv) -> {
 						return ScoreboardUtils.getScoreboardValue(player, "ParrotBought3").orElse(0) > 0 && mShoulderSelected == PlayerShoulder.NONE; }));
@@ -560,7 +560,7 @@ public final class ParrotCustomInventory extends CustomInventory {
 
 		lore.clear();
 		lore.add("Owned");
-		lore.add((new Date((long)ScoreboardUtils.getScoreboardValue(playerLoad, "ParrotBought8").orElse(0)*1000).toString()));
+		lore.add(new Date((long)ScoreboardUtils.getScoreboardValue(playerLoad, "ParrotBought8").orElse(0)*1000).toString());
 		ItemStack boughEmerald = buildItem(Material.GREEN_CONCRETE, "Emerald Conure", lore);
 		GUI_ITEMS.add(new GuiItem(ParrotGUIPage.R2.mNum, 13, boughEmerald, (player, inv) -> {
 						return ScoreboardUtils.getScoreboardValue(player, "ParrotBought8").orElse(0) > 0 && mShoulderSelected == PlayerShoulder.NONE; }));
@@ -585,7 +585,7 @@ public final class ParrotCustomInventory extends CustomInventory {
 
 		lore.clear();
 		lore.add("Owned");
-		lore.add((new Date((long)ScoreboardUtils.getScoreboardValue(playerLoad, "ParrotBought9").orElse(0)*1000).toString()));
+		lore.add(new Date((long)ScoreboardUtils.getScoreboardValue(playerLoad, "ParrotBought9").orElse(0)*1000).toString());
 		ItemStack boughPirate = buildItem(Material.PURPLE_WOOL, "Scoundrel Macaw", lore);
 		GUI_ITEMS.add(new GuiItem(ParrotGUIPage.R2.mNum, 14, boughPirate, (player, inv) -> {
 						return ScoreboardUtils.getScoreboardValue(player, "ParrotBought9").orElse(0) > 0 && mShoulderSelected == PlayerShoulder.NONE; }));
@@ -611,7 +611,7 @@ public final class ParrotCustomInventory extends CustomInventory {
 
 		lore.clear();
 		lore.add("Owned");
-		lore.add((new Date((long)ScoreboardUtils.getScoreboardValue(playerLoad, "ParrotBought13").orElse(0)*1000).toString()));
+		lore.add(new Date((long)ScoreboardUtils.getScoreboardValue(playerLoad, "ParrotBought13").orElse(0)*1000).toString());
 		ItemStack boughtSnowy = buildItem(Material.SNOW_BLOCK, "Snowy Cockatoo", lore);
 		GUI_ITEMS.add(new GuiItem(ParrotGUIPage.R2.mNum, 15, boughtSnowy, (player, inv) -> {
 			return ScoreboardUtils.getScoreboardValue(player, "ParrotBought13").orElse(0) > 0 && mShoulderSelected == PlayerShoulder.NONE;
@@ -649,7 +649,7 @@ public final class ParrotCustomInventory extends CustomInventory {
 
 		lore.clear();
 		lore.add("Owned");
-		lore.add((new Date((long)ScoreboardUtils.getScoreboardValue(playerLoad, "ParrotBought11").orElse(0)*1000).toString()));
+		lore.add(new Date((long)ScoreboardUtils.getScoreboardValue(playerLoad, "ParrotBought11").orElse(0)*1000).toString());
 		ItemStack boughtEldrask = buildItem(Material.BLUE_ICE, "Permafrost Kea", lore);
 		GUI_ITEMS.add(new GuiItem(ParrotGUIPage.R2.mNum, 16, boughtEldrask, (player, inv) -> {
 			return ScoreboardUtils.getScoreboardValue(player, "ParrotBought11").orElse(0) > 0 && mShoulderSelected == PlayerShoulder.NONE;
@@ -686,7 +686,7 @@ public final class ParrotCustomInventory extends CustomInventory {
 
 		lore.clear();
 		lore.add("Owned");
-		lore.add((new Date((long)ScoreboardUtils.getScoreboardValue(playerLoad, "ParrotBought18").orElse(0)*1000).toString()));
+		lore.add(new Date((long)ScoreboardUtils.getScoreboardValue(playerLoad, "ParrotBought18").orElse(0)*1000).toString());
 		ItemStack boughtHekawt = buildItem(Material.MAGMA_BLOCK, "Veil Electus", lore);
 		GUI_ITEMS.add(new GuiItem(ParrotGUIPage.R2.mNum, 19, boughtHekawt, (player, inv) -> {
 			return ScoreboardUtils.getScoreboardValue(player, "ParrotBought18").orElse(0) > 0 && mShoulderSelected == PlayerShoulder.NONE;
@@ -738,7 +738,7 @@ public final class ParrotCustomInventory extends CustomInventory {
 
 		lore.clear();
 		lore.add("Owned");
-		lore.add((new Date((long)ScoreboardUtils.getScoreboardValue(playerLoad, "ParrotBought14").orElse(0)*1000).toString()));
+		lore.add(new Date((long)ScoreboardUtils.getScoreboardValue(playerLoad, "ParrotBought14").orElse(0)*1000).toString());
 		ItemStack boughtDepths = buildItem(Material.RED_GLAZED_TERRACOTTA, "Otherworldly Myiopsitta", lore);
 		GUI_ITEMS.add(new GuiItem(ParrotGUIPage.R2.mNum, 20, boughtDepths, (player, inv) -> {
 			return ScoreboardUtils.getScoreboardValue(player, "ParrotBought14").orElse(0) > 0 && mShoulderSelected == PlayerShoulder.NONE;
@@ -789,7 +789,7 @@ public final class ParrotCustomInventory extends CustomInventory {
 
 		lore.clear();
 		lore.add("Owned");
-		lore.add((new Date((long)ScoreboardUtils.getScoreboardValue(playerLoad, "ParrotBought15").orElse(0)*1000).toString()));
+		lore.add(new Date((long)ScoreboardUtils.getScoreboardValue(playerLoad, "ParrotBought15").orElse(0)*1000).toString());
 		ItemStack boughtDepthsU = buildItem(Material.CRYING_OBSIDIAN, "Otherworldly Myiopsitta (u)", lore);
 		GUI_ITEMS.add(new GuiItem(ParrotGUIPage.R2.mNum, 21, boughtDepthsU, (player, inv) -> {
 			return ScoreboardUtils.getScoreboardValue(player, "ParrotBought15").orElse(0) > 0 && mShoulderSelected == PlayerShoulder.NONE;
@@ -891,7 +891,7 @@ public final class ParrotCustomInventory extends CustomInventory {
 
 		lore.clear();
 		lore.add("Owned");
-		lore.add((new Date((long)ScoreboardUtils.getScoreboardValue(playerLoad, "ParrotBought12").orElse(0)*1000).toString()));
+		lore.add(new Date((long)ScoreboardUtils.getScoreboardValue(playerLoad, "ParrotBought12").orElse(0)*1000).toString());
 		ItemStack boughtPrideParrot = buildItem(Material.YELLOW_GLAZED_TERRACOTTA, "Rainbow Parrot", lore);
 		GUI_ITEMS.add(new GuiItem(ParrotGUIPage.SPECIAL.mNum, 11, boughtPrideParrot, (player, inv) -> {
 			return ScoreboardUtils.getScoreboardValue(player, "ParrotBought12").orElse(0) > 0 && mShoulderSelected == PlayerShoulder.NONE;

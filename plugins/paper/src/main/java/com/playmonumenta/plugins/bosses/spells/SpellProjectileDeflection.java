@@ -32,8 +32,8 @@ public class SpellProjectileDeflection extends Spell {
 				if (deflected instanceof Arrow deflectedArrow && proj instanceof Arrow originalArrow) {
 					((Arrow) deflected).setCritical(((Arrow) proj).isCritical());
 					if (originalArrow.getBasePotionData() != null) {
-						deflectedArrow.setBasePotionData((originalArrow).getBasePotionData());
-						for (PotionEffect effect : (originalArrow).getCustomEffects()) {
+						deflectedArrow.setBasePotionData(originalArrow.getBasePotionData());
+						for (PotionEffect effect : originalArrow.getCustomEffects()) {
 							deflectedArrow.addCustomEffect(effect, true);
 						}
 					}

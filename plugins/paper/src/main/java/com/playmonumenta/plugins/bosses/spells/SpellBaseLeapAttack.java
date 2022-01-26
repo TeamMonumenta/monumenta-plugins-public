@@ -22,7 +22,7 @@ public class SpellBaseLeapAttack extends Spell {
 	@FunctionalInterface
 	public interface AestheticAction {
 		/**
-		 * @param loc Location to do aesthetics
+		 * Location to do aesthetics
 		 */
 		void run(World world, Location loc);
 	}

@@ -192,7 +192,7 @@ public class SpellFallingIcicle extends Spell {
 				@Override
 				public void run() {
 					/* Replace a slice of blocks every tick, so that all blocks are replaced over the duration */
-					for (; mCount < (((icicle.size() - 1) * mTicks) / (RESPAWN_DURATION)) + 1; mCount++) {
+					for (; mCount < (((icicle.size() - 1) * mTicks) / RESPAWN_DURATION) + 1; mCount++) {
 						icicle.get(mCount).getBlock().setType(Material.ICE);
 					}
 					if (mCount >= icicle.size()) {

@@ -24,8 +24,8 @@ public class PotionManager {
 		SAFE_ZONE(3, "SAFE_ZONE"),
 		ITEM(4, "ITEM");
 
-		private int mValue;
-		private String mName;
+		private final int mValue;
+		private final String mName;
 		PotionID(int value, String name) {
 			this.mValue = value;
 			this.mName = name;

@@ -54,7 +54,7 @@ public class Cryobox extends DepthsAbility {
 		double healthRemaining = mPlayer.getHealth() + AbsorptionUtils.getAbsorption(mPlayer) - event.getDamage();
 
 		// Health is less than 0 but does not penetrate the absorption shield
-		boolean dealDamageLater = healthRemaining < 0 && healthRemaining > -(ABSORPTION_HEALTH[mRarity - 1]);
+		boolean dealDamageLater = healthRemaining < 0 && healthRemaining > -ABSORPTION_HEALTH[mRarity - 1];
 
 		if (healthRemaining > EntityUtils.getMaxHealth(mPlayer) * TRIGGER_HEALTH) {
 			return;

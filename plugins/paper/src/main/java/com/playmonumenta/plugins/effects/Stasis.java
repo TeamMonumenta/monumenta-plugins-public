@@ -33,7 +33,7 @@ public class Stasis extends Effect {
 			player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, mDuration, 100));
 			player.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, mDuration, 100));
 			player.addPotionEffect(new PotionEffect(PotionEffectType.GLOWING, mDuration, 100));
-			(player.getLocation().getWorld()).playSound(player.getLocation(), Sound.BLOCK_BELL_USE, 1, 1.2f);
+			player.getLocation().getWorld().playSound(player.getLocation(), Sound.BLOCK_BELL_USE, 1, 1.2f);
 			AbilityManager.getManager().getPlayerAbilities(player).silence();
 		}
 

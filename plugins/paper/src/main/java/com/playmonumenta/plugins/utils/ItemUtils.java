@@ -401,7 +401,7 @@ public class ItemUtils {
 			case I:
 			case II:
 			case III:
-				if (ServerProperties.getKeepLowTierInventory() && !(item.containsEnchantment(Enchantment.BINDING_CURSE))) {
+				if (ServerProperties.getKeepLowTierInventory() && !item.containsEnchantment(Enchantment.BINDING_CURSE)) {
 					return ItemDeathResult.KEEP_EQUIPPED;
 				} else {
 					return ItemDeathResult.LOSE;
