@@ -184,6 +184,7 @@ public class DepthsRoomRepository {
 		mF3NormalRooms.add(new DepthsRoom("depths/f3r35", DepthsRoomType.ABILITY, new Vector(42, 40, 40), new Vector(1.0, -26.0, -7.0), 13, RoomDirection.DOWN));
 		mF3NormalRooms.add(new DepthsRoom("depths/f3r37", DepthsRoomType.ABILITY, new Vector(48, 20, 47), new Vector(1.0, -3.0, -15.0), 12, RoomDirection.EVEN));
 		mF3NormalRooms.add(new DepthsRoom("depths/f3r38", DepthsRoomType.ABILITY, new Vector(39, 21, 29), new Vector(1.0, -6.0, -19.0), 6, RoomDirection.DOWN));
+		mF3NormalRooms.add(new DepthsRoom("depths/f3r39", DepthsRoomType.ABILITY, new Vector(34, 59, 33), new Vector(1.0, -6.0, -16.0), 13, RoomDirection.UP));
 
 		//F3 elite rooms
 		mF3EliteRooms.add(new DepthsRoom("depths/f3r5", DepthsRoomType.ABILITY, new Vector(39, 40, 40), new Vector(1.0, -5.0, -19.0), 28, RoomDirection.UP));
