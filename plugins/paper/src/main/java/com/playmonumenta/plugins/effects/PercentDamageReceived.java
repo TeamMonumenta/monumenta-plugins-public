@@ -3,15 +3,16 @@ package com.playmonumenta.plugins.effects;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import org.bukkit.entity.LivingEntity;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.util.EnumSet;
 
 public class PercentDamageReceived extends Effect {
 
 	private final double mAmount;
-	private final EnumSet<DamageType> mAffectedDamageTypes;
+	private final @Nullable EnumSet<DamageType> mAffectedDamageTypes;
 
-	public PercentDamageReceived(int duration, double amount, EnumSet<DamageType> affectedDamageTypes) {
+	public PercentDamageReceived(int duration, double amount, @Nullable EnumSet<DamageType> affectedDamageTypes) {
 		super(duration);
 		mAmount = amount;
 		mAffectedDamageTypes = affectedDamageTypes;

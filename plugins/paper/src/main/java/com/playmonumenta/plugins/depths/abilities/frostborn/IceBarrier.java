@@ -20,6 +20,7 @@ import org.bukkit.event.block.Action;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BlockIterator;
 import org.bukkit.util.Vector;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.util.ArrayList;
 
@@ -33,7 +34,7 @@ public class IceBarrier extends DepthsAbility {
 	public static final int CAST_TIME = 5 * 20;
 
 	public boolean mIsPrimed;
-	public Location mPrimedLoc;
+	public @Nullable Location mPrimedLoc;
 
 	public IceBarrier(Plugin plugin, Player player) {
 		super(plugin, player, ABILITY_NAME);

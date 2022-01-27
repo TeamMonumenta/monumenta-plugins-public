@@ -36,7 +36,7 @@ public class WindBomb extends Ability {
 	private static final int RADIUS = 3;
 	private static final double VELOCITY = 1.5;
 
-	private Snowball mProj = null;
+	private @Nullable Snowball mProj = null;
 
 	public WindBomb(Plugin plugin, @Nullable Player player) {
 		super(plugin, player, "Wind Bomb");

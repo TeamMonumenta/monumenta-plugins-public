@@ -1,12 +1,5 @@
 package com.playmonumenta.plugins.abilities.alchemist.harbinger;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.annotation.Nullable;
-
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.MultipleChargeAbility;
 import com.playmonumenta.plugins.classes.ClassAbility;
@@ -15,7 +8,6 @@ import com.playmonumenta.plugins.effects.ScorchedEarthDamage;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
-
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -29,6 +21,12 @@ import org.bukkit.event.entity.PotionSplashEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.scheduler.BukkitRunnable;
+
+import javax.annotation.Nullable;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 
 
@@ -69,7 +67,11 @@ public class ScorchedEarth extends MultipleChargeAbility {
 		manageChargeCooldowns();
         // Copy list to avoid ConcurrentModificationException
 		for (Location loc : new ArrayList<Location>(mCenters.keySet())) {
-			int timeRemaining = mCenters.get(loc);
+			Integer time = mCenters.get(loc);
+			if (time == null) {
+				continue;
+			}
+			int timeRemaining = time.intValue();
 			if (timeRemaining <= 0) {
 				mCenters.remove(loc);
 			} else {

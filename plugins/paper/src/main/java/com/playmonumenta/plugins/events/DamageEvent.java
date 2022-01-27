@@ -158,7 +158,7 @@ public class DamageEvent extends Event implements Cancellable {
 		}
 	}
 
-	public DamageEvent(EntityDamageEvent event, LivingEntity damagee, @Nullable Entity damager, LivingEntity source, DamageType type, @Nullable ClassAbility ability, double damage) {
+	public DamageEvent(@Nullable EntityDamageEvent event, LivingEntity damagee, @Nullable Entity damager, @Nullable LivingEntity source, DamageType type, @Nullable ClassAbility ability, double damage) {
 		mDamagee = damagee;
 		mDamager = damager;
 		mSource = source;

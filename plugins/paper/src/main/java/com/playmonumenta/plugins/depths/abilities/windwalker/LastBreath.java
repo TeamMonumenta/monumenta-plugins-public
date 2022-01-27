@@ -1,17 +1,5 @@
 package com.playmonumenta.plugins.depths.abilities.windwalker;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
-import org.bukkit.World;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
-import org.bukkit.util.Vector;
-
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
@@ -26,8 +14,18 @@ import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.utils.AbsorptionUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
-
 import net.md_5.bungee.api.ChatColor;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
+import org.bukkit.World;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
+import org.bukkit.util.Vector;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class LastBreath extends DepthsAbility {
 	public static final String ABILITY_NAME = "Last Breath";
@@ -75,7 +73,7 @@ public class LastBreath extends DepthsAbility {
 		for (Ability abil : AbilityManager.getManager().getPlayerAbilities(mPlayer).getAbilities()) {
 			AbilityInfo info = abil.getInfo();
 			ClassAbility spell = info.mLinkedSpell;
-			if (spell == mInfo.mLinkedSpell) {
+			if (spell == null || spell == mInfo.mLinkedSpell) {
 				continue;
 			}
 			int totalCD = info.mCooldown;

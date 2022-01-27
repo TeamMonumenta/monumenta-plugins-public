@@ -288,7 +288,7 @@ public class AlchemistPotions extends Ability implements AbilityWithChargesOrSta
 			ScoreboardUtils.setScoreboardValue(mPlayer, POTION_SCOREBOARD, mCharges);
 			PlayerInventory inventory = mPlayer.getInventory();
 
-			PlayerUtils.callAbilityCastEvent(mPlayer, mInfo.mLinkedSpell);
+			PlayerUtils.callAbilityCastEvent(mPlayer, ClassAbility.ALCHEMIST_POTION);
 
 			if (ItemUtils.isAlchemistItem(inventory.getItemInMainHand())) {
 				updateAlchemistItem(inventory.getItemInMainHand(), mCharges);

@@ -1,7 +1,8 @@
 package com.playmonumenta.plugins.listeners;
 
-import java.util.logging.Level;
-
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.itemstats.ItemStatManager.PlayerItemStats;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -16,9 +17,7 @@ import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.projectiles.ProjectileSource;
 
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.events.DamageEvent;
-import com.playmonumenta.plugins.itemstats.ItemStatManager.PlayerItemStats;
+import java.util.logging.Level;
 
 public class DamageListener implements Listener {
 
@@ -53,7 +52,12 @@ public class DamageListener implements Listener {
 		Projectile projectile = event.getEntity();
 		ProjectileSource source = projectile.getShooter();
 		if (source instanceof Player player) {
-			projectile.setMetadata(PROJECTILE_ITEM_STATS_METAKEY, new FixedMetadataValue(mPlugin, new PlayerItemStats(mPlugin.mItemStatManager.getPlayerItemStats(player))));
+			PlayerItemStats playerItemStats = mPlugin.mItemStatManager.getPlayerItemStats(player);
+			if (playerItemStats != null) {
+				projectile.setMetadata(PROJECTILE_ITEM_STATS_METAKEY, new FixedMetadataValue(mPlugin, new PlayerItemStats(playerItemStats)));
+			} else {
+				mPlugin.getLogger().log(Level.WARNING, "Null PlayerItemStats attempted to be added to a projectile. Player: " + player.getName());
+			}
 		}
 	}
 

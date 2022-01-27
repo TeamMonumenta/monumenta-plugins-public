@@ -49,6 +49,7 @@ public class InfuseHeldItem extends GenericCommand {
 				InfusionSelection selection = InfusionSelection.getInfusionSelection((String) args[0]);
 				if (selection == null) {
 					CommandAPI.fail("Invalid infusion selection; how did we get here?");
+					return;
 				}
 				for (int i = 0; i < (Integer) args[1]; i++) {
 					InfusionUtils.infuseItem(Plugin.getInstance(), player, player.getInventory().getItemInMainHand(), selection);

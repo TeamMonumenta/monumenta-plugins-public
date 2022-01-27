@@ -110,7 +110,7 @@ public class RestlessSouls extends Ability {
 
 			BossManager bossManager = BossManager.getInstance();
 			if (bossManager != null) {
-				List<BossAbilityGroup> abilities = BossManager.getInstance().getAbilities(mVex);
+				List<BossAbilityGroup> abilities = bossManager.getAbilities(mVex);
 				if (abilities != null) {
 					for (BossAbilityGroup ability : abilities) {
 						if (ability instanceof RestlessSoulsBoss restlessSoulsBoss) {
@@ -126,7 +126,7 @@ public class RestlessSouls extends Ability {
 			mParticle2 = new PartialParticle(Particle.SOUL_FIRE_FLAME, mVex.getLocation().add(0, 0.25, 0), 1, 0.2, 0.2, 0.2, 0.01).spawnAsPlayer(mPlayer);
 			new BukkitRunnable() {
 				int mTicksElapsed = 0;
-				LivingEntity mTarget;
+				@Nullable LivingEntity mTarget;
 				Vex mBoss = mVex;
 				@Override
 				public void run() {

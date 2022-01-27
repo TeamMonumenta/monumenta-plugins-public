@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.commands;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.utils.DelveInfusionUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.InfusionUtils;
@@ -59,7 +60,10 @@ public class ReworkRefundInfusions extends GenericCommand {
 			ItemStatUtils.removeInfusion(item, InfusionType.LOCKED);
 		}
 		ItemStatUtils.generateItemStats(player.getInventory().getItemInMainHand());
-		Plugin.getInstance().mItemStatManager.getPlayerItemStats(player).updateStats(true);
+		ItemStatManager.PlayerItemStats playerItemStats = Plugin.getInstance().mItemStatManager.getPlayerItemStats(player);
+		if (playerItemStats != null) {
+			playerItemStats.updateStats(true);
+		}
 	}
 
 	private static void giveMaterials(Player player, NamespacedKey key, int refundMaterials) throws WrapperCommandSyntaxException {

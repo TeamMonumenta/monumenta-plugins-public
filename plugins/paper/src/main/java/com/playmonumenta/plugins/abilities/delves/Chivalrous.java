@@ -82,11 +82,13 @@ public class Chivalrous extends DelveModifier {
 		if (!mob.isInsideVehicle() && !CHIVALROUS_IMMUNE.contains(mob.getType()) && !EntityUtils.isBoss(mob) && !DelvesUtils.isDelveMob(mob)
 				&& FastUtils.RANDOM.nextDouble() < mSpawnChance) {
 			Entity mount = LibraryOfSoulsIntegration.summon(mob.getLocation(), MOUNTS[FastUtils.RANDOM.nextInt(MOUNTS.length)]);
-			mount.addPassenger(mob);
-			mob.addScoreboardTag(AntiRangeChivalrousBoss.identityTag);
+			if (mount != null) {
+				mount.addPassenger(mob);
+				mob.addScoreboardTag(AntiRangeChivalrousBoss.identityTag);
 
-			if (mob instanceof Creeper creeper) {
-				creeper.setExplosionRadius((creeper.getExplosionRadius() + 1) / 2);
+				if (mob instanceof Creeper creeper) {
+					creeper.setExplosionRadius((creeper.getExplosionRadius() + 1) / 2);
+				}
 			}
 		}
 	}

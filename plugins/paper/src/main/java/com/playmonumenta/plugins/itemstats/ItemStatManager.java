@@ -570,9 +570,12 @@ public class ItemStatManager implements Listener {
 				Map<String, ItemStatUtils.EnchantmentType> revMap = ItemStatUtils.EnchantmentType.REVERSE_MAPPINGS;
 
 				for (String ench : ItemStatUtils.EnchantmentType.SPAWNABLE_ENCHANTMENTS) {
-					int level = ItemStatUtils.getEnchantmentLevel(enchantments, revMap.get(ench));
-					if (level > 0) {
-						revMap.get(ench).getItemStat().onSpawn(mPlugin, item, level);
+					EnchantmentType enchType = revMap.get(ench);
+					if (enchType != null) {
+						int level = ItemStatUtils.getEnchantmentLevel(enchantments, enchType);
+						if (level > 0) {
+							enchType.getItemStat().onSpawn(mPlugin, item, level);
+						}
 					}
 				}
 

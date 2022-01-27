@@ -1,5 +1,13 @@
 package com.playmonumenta.plugins.effects;
 
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.AbilityManager;
+import com.playmonumenta.plugins.abilities.warlock.reaper.VoodooBonds;
+import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.MovementUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Location;
@@ -10,16 +18,8 @@ import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import javax.annotation.Nullable;
 
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.AbilityManager;
-import com.playmonumenta.plugins.abilities.warlock.reaper.VoodooBonds;
-import com.playmonumenta.plugins.events.DamageEvent;
-import com.playmonumenta.plugins.events.DamageEvent.DamageType;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.FastUtils;
-import com.playmonumenta.plugins.utils.MovementUtils;
+import javax.annotation.Nullable;
 
 public class VoodooBondsOtherPlayer extends Effect {
 
@@ -45,7 +45,11 @@ public class VoodooBondsOtherPlayer extends Effect {
 		if (player != null) {
 			Bukkit.getScheduler().runTask(mPlugin, () -> {
 				mVoodooBonds = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, VoodooBonds.class);
-				mScore = mVoodooBonds.getAbilityScore();
+				if (mVoodooBonds != null) {
+					mScore = mVoodooBonds.getAbilityScore();
+				} else {
+					mScore = 0;
+				}
 			});
 		}
 	}

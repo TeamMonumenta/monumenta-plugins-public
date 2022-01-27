@@ -352,7 +352,7 @@ public class DepthsUtils {
 		}.runTaskLater(Plugin.getInstance(), 5);
 	}
 
-	public static @Nullable DepthsRewardType rewardFromRoom(DepthsRoomType roomType) {
+	public static @Nullable DepthsRewardType rewardFromRoom(@Nullable DepthsRoomType roomType) {
 		if (roomType == DepthsRoomType.ABILITY) {
 			return DepthsRewardType.ABILITY;
 		} else if (roomType == DepthsRoomType.ABILITY_ELITE) {
@@ -367,7 +367,7 @@ public class DepthsUtils {
 		return null;
 	}
 
-	public static String rewardString(DepthsRoomType roomType) {
+	public static String rewardString(@Nullable DepthsRoomType roomType) {
 		if (roomType == DepthsRoomType.ABILITY || roomType == DepthsRoomType.ABILITY_ELITE) {
 			return "Ability";
 		} else if (roomType == DepthsRoomType.UPGRADE || roomType == DepthsRoomType.UPGRADE_ELITE) {

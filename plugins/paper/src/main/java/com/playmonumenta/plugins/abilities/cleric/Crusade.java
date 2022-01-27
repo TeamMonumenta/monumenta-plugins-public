@@ -46,7 +46,7 @@ public class Crusade extends Ability {
 
 	@Override
 	public void onDamage(DamageEvent event, LivingEntity enemy) {
-		if (event.getAbility() == null) {
+		if (event.getAbility() == null || mPlayer == null) {
 			return;
 		}
 

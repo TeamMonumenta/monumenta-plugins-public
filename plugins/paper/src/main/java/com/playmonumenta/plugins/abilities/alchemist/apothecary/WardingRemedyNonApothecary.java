@@ -33,7 +33,7 @@ public class WardingRemedyNonApothecary extends Ability {
 	@Override
 	public void onDamage(DamageEvent event, LivingEntity enemy) {
 		int level = getWardingRemedyLevel();
-		if (level > 0 && AbsorptionUtils.getAbsorption(mPlayer) > 0) {
+		if (level > 0 && mPlayer != null && AbsorptionUtils.getAbsorption(mPlayer) > 0) {
 			double multiplier = level == 1 ? WARDING_REMEDY_1_DAMAGE_MULTIPLIER : WARDING_REMEDY_2_DAMAGE_MULTIPLIER;
 			Location loc = event.getDamagee().getLocation().add(0, 1, 0);
 			World world = mPlayer.getWorld();

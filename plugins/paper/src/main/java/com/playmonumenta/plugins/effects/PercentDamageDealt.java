@@ -3,17 +3,17 @@ package com.playmonumenta.plugins.effects;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import org.bukkit.entity.LivingEntity;
-import org.jetbrains.annotations.NotNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.util.EnumSet;
 
 public class PercentDamageDealt extends Effect {
 
 	private final double mAmount;
-	private final EnumSet<DamageType> mAffectedDamageTypes;
+	private final @Nullable EnumSet<DamageType> mAffectedDamageTypes;
 	private final int mPriority;
 
-	public PercentDamageDealt(int duration, double amount, EnumSet<DamageType> affectedDamageTypes, int priority) {
+	public PercentDamageDealt(int duration, double amount, @Nullable EnumSet<DamageType> affectedDamageTypes, int priority) {
 		super(duration);
 		mAmount = amount;
 		mAffectedDamageTypes = affectedDamageTypes;
@@ -50,7 +50,7 @@ public class PercentDamageDealt extends Effect {
 	}
 
 	@Override
-	public void onDamage(@NotNull LivingEntity entity, @NotNull DamageEvent event, @NotNull LivingEntity enemy) {
+	public void onDamage(LivingEntity entity, DamageEvent event, LivingEntity enemy) {
 		if (mAffectedDamageTypes == null || mAffectedDamageTypes.contains(event.getType())) {
 			event.setDamage(event.getDamage() * (1 + mAmount));
 		}

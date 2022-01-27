@@ -1,9 +1,5 @@
 package com.playmonumenta.plugins.bosses.bosses.abilities;
 
-import java.util.Collections;
-import java.util.Set;
-import java.util.stream.Stream;
-
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.abilities.warlock.CholericFlames;
@@ -21,7 +17,6 @@ import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
-
 import org.bukkit.Bukkit;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -33,7 +28,11 @@ import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+
 import javax.annotation.Nullable;
+import java.util.Collections;
+import java.util.Set;
+import java.util.stream.Stream;
 
 public class RestlessSoulsBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_restlesssouls";
@@ -45,7 +44,7 @@ public class RestlessSoulsBoss extends BossAbilityGroup {
 	private int mSilenceTime = 0;
 	private int mDuration = 0;
 	private boolean mLevelOne;
-	private FixedMetadataValue mPlayerItemStats;
+	private @Nullable FixedMetadataValue mPlayerItemStats;
 
 	private Ability[] mAbilities = {};
 	private static final String DOT_EFFECT_NAME = "RestlessSoulsDamageOverTimeEffect";
@@ -79,7 +78,7 @@ public class RestlessSoulsBoss extends BossAbilityGroup {
 
 	@Override
 	public void onDamage(DamageEvent event, LivingEntity damagee) {
-		if (mPlayer != null) {
+		if (mPlayer != null || mPlayerItemStats != null) {
 			event.setCancelled(true);
 			mBoss.getWorld().playSound(mBoss.getLocation(), Sound.BLOCK_END_PORTAL_FRAME_FILL, 1.5f, 1.0f);
 

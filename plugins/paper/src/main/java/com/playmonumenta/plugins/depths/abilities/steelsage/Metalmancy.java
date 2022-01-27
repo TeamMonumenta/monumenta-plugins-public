@@ -12,7 +12,6 @@ import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
-import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
@@ -77,6 +76,9 @@ public class Metalmancy extends DepthsAbility {
 			Location loc = mPlayer.getLocation();
 			Vector facingDirection = mPlayer.getEyeLocation().getDirection().normalize();
 			mGolem = (Mob) LibraryOfSoulsIntegration.summon(mPlayer.getLocation().add(facingDirection).add(0, 1, 0), GOLEM_NAME);
+			if (mGolem == null) {
+				return;
+			}
 			mGolem.setVelocity(facingDirection.multiply(VELOCITY));
 
 			BossManager bossManager = BossManager.getInstance();

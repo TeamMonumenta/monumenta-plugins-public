@@ -57,17 +57,18 @@ public class IronTincture extends Ability {
 
 	@Override
 	public boolean runCheck() {
+		if (mPlayer == null) {
+			return false;
+		}
 		ItemStack mainHand = mPlayer.getInventory().getItemInMainHand();
-		return mPlayer.isSneaking()
-		       && !ItemUtils.isSomeBow(mainHand)
-			   && !ItemUtils.isAlchemistItem(mainHand)
-		       && mainHand.getType() != Material.SPLASH_POTION
-		       && mainHand.getType() != Material.LINGERING_POTION
-		       && !mainHand.getType().isBlock();
+		return mPlayer.isSneaking() && !ItemUtils.isSomeBow(mainHand) && !ItemUtils.isAlchemistItem(mainHand) && mainHand.getType() != Material.SPLASH_POTION && mainHand.getType() != Material.LINGERING_POTION && !mainHand.getType().isBlock();
 	}
 
 	@Override
 	public void cast(Action action) {
+		if (mPlayer == null) {
+			return;
+		}
 		Location loc = mPlayer.getEyeLocation();
 		ItemStack itemTincture = new ItemStack(Material.SPLASH_POTION);
 		ItemMeta tinctMeta = itemTincture.getItemMeta();

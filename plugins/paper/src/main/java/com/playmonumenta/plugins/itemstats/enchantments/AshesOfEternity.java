@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.itemstats.enchantments;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.Enchantment;
+import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
@@ -39,7 +40,10 @@ public class AshesOfEternity implements Enchantment {
 			ItemStack item = player.getInventory().getItemInMainHand();
 			ItemStatUtils.removeEnchantment(item, EnchantmentType.ASHES_OF_ETERNITY);
 			ItemStatUtils.generateItemStats(item);
-			plugin.mItemStatManager.getPlayerItemStats(player).updateStats(true);
+			ItemStatManager.PlayerItemStats playerItemStats = plugin.mItemStatManager.getPlayerItemStats(player);
+			if (playerItemStats != null) {
+				playerItemStats.updateStats(true);
+			}
 
 			plugin.mPotionManager.clearAllPotions(player);
 

@@ -68,6 +68,11 @@ public class WardingRemedy extends Ability {
 			int mTick = 10;
 			@Override
 			public void run() {
+				if (mPlayer == null) {
+					this.cancel();
+					return;
+				}
+
 				world.spawnParticle(Particle.END_ROD, mPlayer.getLocation().add(0, 0.5, 0), 1, 0.35, 0.15, 0.35, 0.05);
 
 				if (mTick >= WARDING_REMEDY_PULSE_DELAY) {

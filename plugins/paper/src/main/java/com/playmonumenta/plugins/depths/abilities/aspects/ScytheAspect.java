@@ -1,7 +1,10 @@
 package com.playmonumenta.plugins.depths.abilities.aspects;
 
-import java.util.Collection;
-
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.depths.abilities.WeaponAspectDepthsAbility;
+import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 import org.bukkit.Material;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
@@ -9,14 +12,10 @@ import org.bukkit.attribute.AttributeModifier.Operation;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.EquipmentSlot;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.depths.abilities.WeaponAspectDepthsAbility;
-import com.playmonumenta.plugins.events.DamageEvent;
-import com.playmonumenta.plugins.events.DamageEvent.DamageType;
-import com.playmonumenta.plugins.utils.ItemUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
+import java.util.Collection;
 
 public class ScytheAspect extends WeaponAspectDepthsAbility {
 
@@ -30,14 +29,18 @@ public class ScytheAspect extends WeaponAspectDepthsAbility {
 
 	@Override
 	public void onDamage(DamageEvent event, LivingEntity enemy) {
-		if (mPlayer != null && event.getType() == DamageType.MELEE && ItemUtils.isHoe(mPlayer.getInventory().getItemInMainHand())) {
+		if (mPlayer == null || !event.getType().equals(DamageEvent.DamageType.MELEE)) {
+			return;
+		}
+		ItemStack mainhand = mPlayer.getInventory().getItemInMainHand();
+		if (ItemUtils.isHoe(mainhand)) {
 			if (PlayerUtils.isFallingAttack(mPlayer)) {
 				PlayerUtils.healPlayer(mPlugin, mPlayer, 1.0);
 			} else {
 				double attackSpeed = 4;
 				double multiplier = 1;
-				if (mPlayer.getInventory().getItemInMainHand() != null && mPlayer.getInventory().getItemInMainHand().hasItemMeta()) {
-					ItemMeta meta = mPlayer.getInventory().getItemInMainHand().getItemMeta();
+				if (mainhand.hasItemMeta()) {
+					ItemMeta meta = mainhand.getItemMeta();
 					if (meta.hasAttributeModifiers()) {
 						Collection<AttributeModifier> modifiers = meta.getAttributeModifiers(Attribute.GENERIC_ATTACK_SPEED);
 						if (modifiers != null) {

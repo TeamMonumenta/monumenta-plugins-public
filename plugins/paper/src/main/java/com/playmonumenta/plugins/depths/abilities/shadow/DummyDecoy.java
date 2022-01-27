@@ -1,21 +1,5 @@
 package com.playmonumenta.plugins.depths.abilities.shadow;
 
-import java.util.List;
-
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
-import org.bukkit.World;
-import org.bukkit.attribute.Attribute;
-import org.bukkit.entity.AbstractArrow;
-import org.bukkit.entity.AbstractArrow.PickupStatus;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
-import org.bukkit.metadata.FixedMetadataValue;
-import org.bukkit.scheduler.BukkitRunnable;
-
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.bosses.BossManager;
 import com.playmonumenta.plugins.bosses.bosses.BossAbilityGroup;
@@ -30,8 +14,22 @@ import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import com.playmonumenta.plugins.utils.DamageUtils;
-
 import net.md_5.bungee.api.ChatColor;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
+import org.bukkit.World;
+import org.bukkit.attribute.Attribute;
+import org.bukkit.entity.AbstractArrow;
+import org.bukkit.entity.AbstractArrow.PickupStatus;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
+import org.bukkit.metadata.FixedMetadataValue;
+import org.bukkit.scheduler.BukkitRunnable;
+
+import java.util.List;
 
 public class DummyDecoy extends DepthsAbility {
 
@@ -101,7 +99,7 @@ public class DummyDecoy extends DepthsAbility {
 
 		BossManager bossManager = BossManager.getInstance();
 		if (bossManager != null) {
-			List<BossAbilityGroup> abilities = BossManager.getInstance().getAbilities(e);
+			List<BossAbilityGroup> abilities = bossManager.getAbilities(e);
 			if (abilities != null) {
 				for (BossAbilityGroup ability : abilities) {
 					if (ability instanceof DummyDecoyBoss dummyDecoyBoss) {

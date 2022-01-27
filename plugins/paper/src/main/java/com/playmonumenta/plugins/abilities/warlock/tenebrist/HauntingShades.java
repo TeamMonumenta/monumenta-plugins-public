@@ -136,13 +136,16 @@ public class HauntingShades extends Ability {
 		}
 		World world = mPlayer.getWorld();
 		bLoc.setDirection(mPlayer.getLocation().toVector().subtract(bLoc.toVector()).normalize());
-		ArmorStand mStand = (ArmorStand) LibraryOfSoulsIntegration.summon(bLoc, "HauntingShade");
-		mStand.setDisabledSlots(EquipmentSlot.HEAD, EquipmentSlot.CHEST, EquipmentSlot.LEGS, EquipmentSlot.FEET, EquipmentSlot.HAND, EquipmentSlot.OFF_HAND);
-		mStand.setGravity(false);
-		mStand.setCanMove(false);
-		mStand.setSilent(true);
-		mStand.setCustomName("Haunting Shade");
-		mStand.setCustomNameVisible(false);
+		ArmorStand stand = (ArmorStand) LibraryOfSoulsIntegration.summon(bLoc, "HauntingShade");
+		if (stand == null) {
+			return;
+		}
+		stand.setDisabledSlots(EquipmentSlot.HEAD, EquipmentSlot.CHEST, EquipmentSlot.LEGS, EquipmentSlot.FEET, EquipmentSlot.HAND, EquipmentSlot.OFF_HAND);
+		stand.setGravity(false);
+		stand.setCanMove(false);
+		stand.setSilent(true);
+		stand.setCustomName("Haunting Shade");
+		stand.setCustomNameVisible(false);
 
 		new BukkitRunnable() {
 			int mT = 0;
@@ -193,7 +196,7 @@ public class HauntingShades extends Ability {
 				}
 
 				if (mT >= SHADES_DURATION || mPlayer.isDead() || !mPlayer.isValid()) {
-					mStand.remove();
+					stand.remove();
 					world.spawnParticle(Particle.REDSTONE, bLoc, 45, 0.2, 1.1, 0.2, 0.1, COLOR);
 					world.spawnParticle(Particle.SMOKE_NORMAL, bLoc, 40, 0.3, 1.1, 0.3, 0.15);
 					world.playSound(bLoc, Sound.ENTITY_BLAZE_DEATH, 0.7f, 0.5f);

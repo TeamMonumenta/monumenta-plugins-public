@@ -62,6 +62,7 @@ public class StatTrackItem extends GenericCommand {
 				InfusionType selection = options.get((String) args[1]);
 				if (selection == null) {
 					CommandAPI.fail("Invalid stat selection; how did we get here?");
+					return;
 				}
 				run((Player) args[0], selection);
 			})
