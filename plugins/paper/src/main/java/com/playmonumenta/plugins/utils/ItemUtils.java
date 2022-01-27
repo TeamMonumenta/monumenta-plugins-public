@@ -1168,4 +1168,26 @@ public class ItemUtils {
 		};
 	}
 
+	public static String getGiveCommand(ItemStack item) {
+		if (item == null) {
+			return "/tellraw @s {\"text\":\"Item is null\"}";
+		}
+
+		if (item.getType() == Material.AIR) {
+			return "/tellraw @s {\"text\":\"Item is air\"}";
+		}
+
+		if (item.getAmount() <= 0) {
+			return "/tellraw @s {\"text\":\"Item has invalid count\"}";
+		}
+
+		String itemId = item.getType().getKey().asString();
+		if (!item.hasItemMeta()) {
+			return "/give @s " + itemId + " " + item.getAmount();
+		}
+
+		NBTItem nbtItem = new NBTItem(item);
+		String itemTag = nbtItem.toString();
+		return "/give @s " + itemId + itemTag + " " + item.getAmount();
+	}
 }
