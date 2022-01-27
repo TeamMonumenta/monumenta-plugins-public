@@ -111,6 +111,10 @@ public class ParticlesList {
 		mParticleList = particles;
 	}
 
+	public boolean isEmpty() {
+		return mParticleList.isEmpty();
+	}
+
 	public void spawn(Location loc) {
 		spawn(loc, 0, 0, 0);
 	}

@@ -69,6 +69,8 @@ public class SoundsList {
 		mSoundsList = sounds;
 	}
 
+	public static final SoundsList EMPTY = new SoundsList(new ArrayList<>());
+
 	public static SoundsList fromString(String string) {
 		ParseResult<SoundsList> result = fromReader(new StringReader(string), "");
 		if (result.getResult() == null) {
